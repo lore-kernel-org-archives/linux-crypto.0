@@ -1,93 +1,162 @@
-Return-Path: <SRS0=5fel=PH=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-lf1-f65.google.com ([209.85.167.65]:35066 "EHLO
-        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725925AbeL3O7v (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 30 Dec 2018 09:59:51 -0500
-Subject: Re: [PATCH v1 2/2] hwrng: add OP-TEE based rng driver
-To: Jens Wiklander <jens.wiklander@linaro.org>,
-        Sumit Garg <sumit.garg@linaro.org>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        Devicetree List <devicetree@vger.kernel.org>, mpm@selenic.com,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Daniel Thompson <daniel.thompson@linaro.org>,
-        Bhupesh Sharma <bhsharma@redhat.com>, tee-dev@lists.linaro.org
-References: <1545908831-25910-1-git-send-email-sumit.garg@linaro.org>
- <1545908831-25910-3-git-send-email-sumit.garg@linaro.org>
- <CAKv+Gu9ShfrBhfCuRK_L_ZtZ3KnN7Jb-4hcX9nSO7AYbT8V8LQ@mail.gmail.com>
- <CAFA6WYN5+NWKpPhnGHRnh_ZOF9A8K=MvbbSQ9uvc2Tv1expXcA@mail.gmail.com>
- <CAKv+Gu-Go=GwsO=_WvmTr-OZb4WMGGQrMb2joxX1Kzfhza3JiA@mail.gmail.com>
- <CAFA6WYPm3_SZ59vOxceZkn0uzcJw3ECQZs5R_Ypz0ejpzTgAbQ@mail.gmail.com>
- <20181228144610.GA21561@jax.urgonet>
-From: =?UTF-8?B?VmVzYSBKw6TDpHNrZWzDpGluZW4=?= <dachaac@gmail.com>
-Message-ID: <79744651-991d-ff44-2238-96721ff9bc18@gmail.com>
-Date: Sun, 30 Dec 2018 16:59:46 +0200
+Return-Path: <SRS0=k6po=OP=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:43686 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725935AbeLFW0h (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 6 Dec 2018 17:26:37 -0500
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org
+Cc: Paul Crowley <paulcrowley@google.com>
+Subject: [PATCH] crypto: adiantum - adjust some comments to match latest paper
+Date: Thu,  6 Dec 2018 14:21:59 -0800
+Message-Id: <20181206222159.17336-1-ebiggers@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20181228144610.GA21561@jax.urgonet>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi All,
+From: Eric Biggers <ebiggers@google.com>
 
-On 28/12/2018 16.46, Jens Wiklander wrote:
-> Hi Sumit,
-> 
-> On Fri, Dec 28, 2018 at 06:33:22PM +0530, Sumit Garg wrote:
->> On Fri, 28 Dec 2018 at 16:08, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
->> Jens,
->>
->> Is there any particular reason to wait indefinitely in
->> "optee_supp_thrd_req" if there is no supplicant running? I think we
->> should probably return as follows from "optee_supp_thrd_req" API in
->> case no supplicant is available:
->>
->> --- a/drivers/tee/optee/supp.c
->> +++ b/drivers/tee/optee/supp.c
->> @@ -88,10 +88,15 @@ u32 optee_supp_thrd_req(struct tee_context *ctx,
->> u32 func, size_t num_params,
->>   {
->>          struct optee *optee = tee_get_drvdata(ctx->teedev);
->>          struct optee_supp *supp = &optee->supp;
->> -       struct optee_supp_req *req = kzalloc(sizeof(*req), GFP_KERNEL);
->> +       struct optee_supp_req *req;
->>          bool interruptable;
->>          u32 ret;
->>
->> +       /* Return in case there is no supplicant available */
->> +       if (!supp->ctx)
->> +               return TEEC_ERROR_COMMUNICATION;
->> +
->> +       req = kzalloc(sizeof(*req), GFP_KERNEL);
->>          if (!req)
->>                  return TEEC_ERROR_OUT_OF_MEMORY;
-> 
->  From a user space point of view it has been more useful to just wait
-> until the supplicant starts to serve requests than polling the interface
-> until the call succeeds. For this new use case it makes more sense to be
-> able to return an error instead.
-> 
-> The proposed change is a user space API change, so we will need to do a
-> bit more than that.
+The 2018-11-28 revision of the Adiantum paper has revised some notation:
 
-There are parts of kernel that need randomness before user space is ready.
+- 'M' was replaced with 'L' (meaning "Left", for the left-hand part of
+  the message) in the definition of Adiantum hashing, to avoid confusion
+  with the full message
+- ε-almost-∆-universal is now abbreviated as ε-∆U instead of εA∆U
+- "block" is now used only to mean block cipher and Poly1305 blocks
 
-Can't we move necessary logic for this to in kernel now that there is 
-kernel service requiring TEE services?
+Also, Adiantum hashing was moved from the appendix to the main paper.
 
-I suppose there are even more services that would be better to be only 
-optee<->kernel interface and not exposed as such to user space. One 
-example of such would be mass storage encryption key or hardware rooted 
-encryption for Linux keyring. Eg. replacement for TPM chip when TEE 
-environment is available.
+To avoid confusion, update relevant comments in the code to match.
 
-Thanks,
-Vesa Jääskeläinen
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ crypto/adiantum.c   | 35 +++++++++++++++++++----------------
+ crypto/nhpoly1305.c |  8 ++++----
+ 2 files changed, 23 insertions(+), 20 deletions(-)
+
+diff --git a/crypto/adiantum.c b/crypto/adiantum.c
+index ca27e0dc2958c..e62e34f5e389b 100644
+--- a/crypto/adiantum.c
++++ b/crypto/adiantum.c
+@@ -9,7 +9,7 @@
+  * Adiantum is a tweakable, length-preserving encryption mode designed for fast
+  * and secure disk encryption, especially on CPUs without dedicated crypto
+  * instructions.  Adiantum encrypts each sector using the XChaCha12 stream
+- * cipher, two passes of an ε-almost-∆-universal (εA∆U) hash function based on
++ * cipher, two passes of an ε-almost-∆-universal (ε-∆U) hash function based on
+  * NH and Poly1305, and an invocation of the AES-256 block cipher on a single
+  * 16-byte block.  See the paper for details:
+  *
+@@ -21,12 +21,12 @@
+  *	- Stream cipher: XChaCha12 or XChaCha20
+  *	- Block cipher: any with a 128-bit block size and 256-bit key
+  *
+- * This implementation doesn't currently allow other εA∆U hash functions, i.e.
++ * This implementation doesn't currently allow other ε-∆U hash functions, i.e.
+  * HPolyC is not supported.  This is because Adiantum is ~20% faster than HPolyC
+- * but still provably as secure, and also the εA∆U hash function of HBSH is
++ * but still provably as secure, and also the ε-∆U hash function of HBSH is
+  * formally defined to take two inputs (tweak, message) which makes it difficult
+  * to wrap with the crypto_shash API.  Rather, some details need to be handled
+- * here.  Nevertheless, if needed in the future, support for other εA∆U hash
++ * here.  Nevertheless, if needed in the future, support for other ε-∆U hash
+  * functions could be added here.
+  */
+ 
+@@ -41,7 +41,7 @@
+ #include "internal.h"
+ 
+ /*
+- * Size of right-hand block of input data, in bytes; also the size of the block
++ * Size of right-hand part of input data, in bytes; also the size of the block
+  * cipher's block size and the hash function's output.
+  */
+ #define BLOCKCIPHER_BLOCK_SIZE		16
+@@ -77,7 +77,7 @@ struct adiantum_tfm_ctx {
+ struct adiantum_request_ctx {
+ 
+ 	/*
+-	 * Buffer for right-hand block of data, i.e.
++	 * Buffer for right-hand part of data, i.e.
+ 	 *
+ 	 *    P_L => P_M => C_M => C_R when encrypting, or
+ 	 *    C_R => C_M => P_M => P_L when decrypting.
+@@ -93,8 +93,8 @@ struct adiantum_request_ctx {
+ 	bool enc; /* true if encrypting, false if decrypting */
+ 
+ 	/*
+-	 * The result of the Poly1305 εA∆U hash function applied to
+-	 * (message length, tweak).
++	 * The result of the Poly1305 ε-∆U hash function applied to
++	 * (bulk length, tweak)
+ 	 */
+ 	le128 header_hash;
+ 
+@@ -213,13 +213,16 @@ static inline void le128_sub(le128 *r, const le128 *v1, const le128 *v2)
+ }
+ 
+ /*
+- * Apply the Poly1305 εA∆U hash function to (message length, tweak) and save the
+- * result to rctx->header_hash.
++ * Apply the Poly1305 ε-∆U hash function to (bulk length, tweak) and save the
++ * result to rctx->header_hash.  This is the calculation
+  *
+- * This value is reused in both the first and second hash steps.  Specifically,
+- * it's added to the result of an independently keyed εA∆U hash function (for
+- * equal length inputs only) taken over the message.  This gives the overall
+- * Adiantum hash of the (tweak, message) pair.
++ *	H_T ← Poly1305_{K_T}(bin_{128}(|L|) || T)
++ *
++ * from the procedure in section 6.4 of the Adiantum paper.  The resulting value
++ * is reused in both the first and second hash steps.  Specifically, it's added
++ * to the result of an independently keyed ε-∆U hash function (for equal length
++ * inputs only) taken over the left-hand part (the "bulk") of the message, to
++ * give the overall Adiantum hash of the (tweak, left-hand part) pair.
+  */
+ static void adiantum_hash_header(struct skcipher_request *req)
+ {
+@@ -248,7 +251,7 @@ static void adiantum_hash_header(struct skcipher_request *req)
+ 	poly1305_core_emit(&state, &rctx->header_hash);
+ }
+ 
+-/* Hash the left-hand block (the "bulk") of the message using NHPoly1305 */
++/* Hash the left-hand part (the "bulk") of the message using NHPoly1305 */
+ static int adiantum_hash_message(struct skcipher_request *req,
+ 				 struct scatterlist *sgl, le128 *digest)
+ {
+@@ -550,7 +553,7 @@ static int adiantum_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 		goto out_drop_streamcipher;
+ 	blockcipher_alg = ictx->blockcipher_spawn.alg;
+ 
+-	/* NHPoly1305 εA∆U hash function */
++	/* NHPoly1305 ε-∆U hash function */
+ 	_hash_alg = crypto_alg_mod_lookup(nhpoly1305_name,
+ 					  CRYPTO_ALG_TYPE_SHASH,
+ 					  CRYPTO_ALG_TYPE_MASK);
+diff --git a/crypto/nhpoly1305.c b/crypto/nhpoly1305.c
+index c8385853f699d..ec831a5594d8f 100644
+--- a/crypto/nhpoly1305.c
++++ b/crypto/nhpoly1305.c
+@@ -9,15 +9,15 @@
+  * "NHPoly1305" is the main component of Adiantum hashing.
+  * Specifically, it is the calculation
+  *
+- *	H_M ← Poly1305_{K_M}(NH_{K_N}(pad_{128}(M)))
++ *	H_L ← Poly1305_{K_L}(NH_{K_N}(pad_{128}(L)))
+  *
+- * from the procedure in section A.5 of the Adiantum paper [1].  It is an
+- * ε-almost-∆-universal (εA∆U) hash function for equal-length inputs over
++ * from the procedure in section 6.4 of the Adiantum paper [1].  It is an
++ * ε-almost-∆-universal (ε-∆U) hash function for equal-length inputs over
+  * Z/(2^{128}Z), where the "∆" operation is addition.  It hashes 1024-byte
+  * chunks of the input with the NH hash function [2], reducing the input length
+  * by 32x.  The resulting NH digests are evaluated as a polynomial in
+  * GF(2^{130}-5), like in the Poly1305 MAC [3].  Note that the polynomial
+- * evaluation by itself would suffice to achieve the εA∆U property; NH is used
++ * evaluation by itself would suffice to achieve the ε-∆U property; NH is used
+  * for performance since it's over twice as fast as Poly1305.
+  *
+  * This is *not* a cryptographic hash function; do not use it as such!
+-- 
+2.20.0.rc2.403.gdbc3b29805-goog
