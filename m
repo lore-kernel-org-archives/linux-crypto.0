@@ -1,99 +1,82 @@
-Return-Path: <SRS0=eKEb=OU=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from stargate.chelsio.com ([12.32.117.8]:1515 "EHLO
-        stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726114AbeLKKwV (ORCPT
+Return-Path: <SRS0=/ZR5=OQ=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:49018 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725967AbeLGGSp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Dec 2018 05:52:21 -0500
-From: Harsh Jain <harsh@chelsio.com>
-To: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        atul.gupta@chelsio.com, indranil@chelsio.com
-Cc: Harsh Jain <harsh@chelsio.com>
-Subject: [PATCH 6/6] crypto:chelsio: Fix wrong error counter increments
-Date: Tue, 11 Dec 2018 16:21:42 +0530
-Message-Id: <b7d40ca24faf9cda3f79bf34ff94c7e460d26c36.1544520025.git.harsh@chelsio.com>
-In-Reply-To: <cover.1544520025.git.harsh@chelsio.com>
-References: <cover.1544520025.git.harsh@chelsio.com>
-In-Reply-To: <cover.1544520025.git.harsh@chelsio.com>
-References: <cover.1544520025.git.harsh@chelsio.com>
+        Fri, 7 Dec 2018 01:18:45 -0500
+Date: Fri, 7 Dec 2018 14:18:39 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Corentin Labbe <clabbe@baylibre.com>
+Cc: davem@davemloft.net, ebiggers@kernel.org, nhorman@tuxdriver.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 00/11] crypto: crypto_user_stat: misc enhancement
+Message-ID: <20181207061839.k3wuvqflkxpx2int@gondor.apana.org.au>
+References: <1543502546-23870-1-git-send-email-clabbe@baylibre.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1543502546-23870-1-git-send-email-clabbe@baylibre.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Fix error counter increment in AEAD decrypt operation when
-validation of tag is done in Driver instead of H/W.
+On Thu, Nov 29, 2018 at 02:42:15PM +0000, Corentin Labbe wrote:
+> Hello
+> 
+> This patchset fixes all reported problem by Eric biggers.
+> 
+> Regards
+> 
+> Changes since v4:
+> - Inlined functions when !CRYPTO_STATS
+> 
+> Changes since v3:
+> - Added a crypto_stats_init as asked vy Neil Horman
+> - Fixed some checkpatch complaints
+> 
+> Changes since v2:
+> - moved all crypto_stats functions from header to algapi.c for using
+>   crypto_alg_get/put
+> 
+> Changes since v1:
+> - Better locking of crypto_alg via crypto_alg_get/crypto_alg_put
+> - remove all intermediate variables in crypto/crypto_user_stat.c
+> - splited all internal stats variables into different structures
+> 
+> Corentin Labbe (11):
+>   crypto: crypto_user_stat: made crypto_user_stat optional
+>   crypto: CRYPTO_STATS should depend on CRYPTO_USER
+>   crypto: crypto_user_stat: convert all stats from u32 to u64
+>   crypto: crypto_user_stat: split user space crypto stat structures
+>   crypto: tool: getstat: convert user space example to the new
+>     crypto_user_stat uapi
+>   crypto: crypto_user_stat: fix use_after_free of struct xxx_request
+>   crypto: crypto_user_stat: Fix invalid stat reporting
+>   crypto: crypto_user_stat: remove intermediate variable
+>   crypto: crypto_user_stat: Split stats in multiple structures
+>   crypto: crypto_user_stat: rename err_cnt parameter
+>   crypto: crypto_user_stat: Add crypto_stats_init
+> 
+>  crypto/Kconfig                       |   1 +
+>  crypto/Makefile                      |   3 +-
+>  crypto/ahash.c                       |  17 +-
+>  crypto/algapi.c                      | 247 ++++++++++++++++++++++-
+>  crypto/crypto_user_stat.c            | 160 +++++----------
+>  crypto/rng.c                         |   4 +-
+>  include/crypto/acompress.h           |  38 +---
+>  include/crypto/aead.h                |  38 +---
+>  include/crypto/akcipher.h            |  74 ++-----
+>  include/crypto/hash.h                |  32 +--
+>  include/crypto/internal/cryptouser.h |  17 ++
+>  include/crypto/kpp.h                 |  48 +----
+>  include/crypto/rng.h                 |  27 +--
+>  include/crypto/skcipher.h            |  36 +---
+>  include/linux/crypto.h               | 290 ++++++++++++++++++---------
+>  include/uapi/linux/cryptouser.h      | 102 ++++++----
+>  tools/crypto/getstat.c               |  72 +++----
+>  17 files changed, 676 insertions(+), 530 deletions(-)
 
-Signed-off-by: Harsh Jain <harsh@chelsio.com>
----
- drivers/crypto/chelsio/chcr_algo.c |  9 +++++----
- drivers/crypto/chelsio/chcr_core.c | 11 +++++------
- 2 files changed, 10 insertions(+), 10 deletions(-)
-
-diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
-index df52641..eedc331 100644
---- a/drivers/crypto/chelsio/chcr_algo.c
-+++ b/drivers/crypto/chelsio/chcr_algo.c
-@@ -218,7 +218,7 @@ static inline void chcr_dec_wrcount(struct chcr_dev *dev)
- 	atomic_dec(&dev->inflight);
- }
- 
--static inline void chcr_handle_aead_resp(struct aead_request *req,
-+static inline int chcr_handle_aead_resp(struct aead_request *req,
- 					 unsigned char *input,
- 					 int err)
- {
-@@ -233,6 +233,8 @@ static inline void chcr_handle_aead_resp(struct aead_request *req,
- 	}
- 	chcr_dec_wrcount(dev);
- 	req->base.complete(&req->base, err);
-+
-+	return err;
- }
- 
- static void get_aes_decrypt_key(unsigned char *dec_key,
-@@ -2072,14 +2074,13 @@ int chcr_handle_resp(struct crypto_async_request *req, unsigned char *input,
- 
- 	switch (tfm->__crt_alg->cra_flags & CRYPTO_ALG_TYPE_MASK) {
- 	case CRYPTO_ALG_TYPE_AEAD:
--		chcr_handle_aead_resp(aead_request_cast(req), input, err);
-+		err = chcr_handle_aead_resp(aead_request_cast(req), input, err);
- 		break;
- 
- 	case CRYPTO_ALG_TYPE_ABLKCIPHER:
--		 err = chcr_handle_cipher_resp(ablkcipher_request_cast(req),
-+		 chcr_handle_cipher_resp(ablkcipher_request_cast(req),
- 					       input, err);
- 		break;
--
- 	case CRYPTO_ALG_TYPE_AHASH:
- 		chcr_handle_ahash_resp(ahash_request_cast(req), input, err);
- 		}
-diff --git a/drivers/crypto/chelsio/chcr_core.c b/drivers/crypto/chelsio/chcr_core.c
-index e04b3e8..239b933 100644
---- a/drivers/crypto/chelsio/chcr_core.c
-+++ b/drivers/crypto/chelsio/chcr_core.c
-@@ -169,12 +169,8 @@ static int cpl_fw6_pld_handler(struct chcr_dev *dev,
- 
- 	ack_err_status =
- 		ntohl(*(__be32 *)((unsigned char *)&fw6_pld->data[0] + 4));
--	if (ack_err_status) {
--		if (CHK_MAC_ERR_BIT(ack_err_status) ||
--		    CHK_PAD_ERR_BIT(ack_err_status))
--			error_status = -EBADMSG;
--		atomic_inc(&adap->chcr_stats.error);
--	}
-+	if (CHK_MAC_ERR_BIT(ack_err_status) || CHK_PAD_ERR_BIT(ack_err_status))
-+		error_status = -EBADMSG;
- 	/* call completion callback with failure status */
- 	if (req) {
- 		error_status = chcr_handle_resp(req, input, error_status);
-@@ -182,6 +178,9 @@ static int cpl_fw6_pld_handler(struct chcr_dev *dev,
- 		pr_err("Incorrect request address from the firmware\n");
- 		return -EFAULT;
- 	}
-+	if (error_status)
-+		atomic_inc(&adap->chcr_stats.error);
-+
- 	return 0;
- }
- 
+All applied.  Thanks.
 -- 
-2.1.4
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
