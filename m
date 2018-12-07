@@ -1,33 +1,43 @@
-Return-Path: <SRS0=36JE=OX=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from shards.monkeyblade.net ([23.128.96.9]:34706 "EHLO
-        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730887AbeLNVlO (ORCPT
+Return-Path: <SRS0=/ZR5=OQ=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:48994 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725972AbeLGGSf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Dec 2018 16:41:14 -0500
-Date: Fri, 14 Dec 2018 13:41:13 -0800 (PST)
-Message-Id: <20181214.134113.1168474273454555070.davem@davemloft.net>
-To: atul.gupta@chelsio.com
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        netdev@vger.kernel.org, dt@chelsio.com
-Subject: Re: [tls 2/5] net/tls: sleeping function from invalid context
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20181211102009.3561-1-atul.gupta@chelsio.com>
-References: <20181211102009.3561-1-atul.gupta@chelsio.com>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+        Fri, 7 Dec 2018 01:18:35 -0500
+Date: Fri, 7 Dec 2018 14:18:29 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>
+Cc: linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Breno Leitao <leitao@debian.org>,
+        Nayna Jain <nayna@linux.ibm.com>,
+        Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Nicolas Ferre <nicolas.ferre@microchip.com>,
+        Arnd Bergmann <arnd@arndb.de>
+Subject: Re: [PATCH] MAINTAINERS: change NX/VMX maintainers
+Message-ID: <20181207061829.faoyjnwqrfudosfi@gondor.apana.org.au>
+References: <20181127172739.24621-1-pfsmorigo@linux.vnet.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181127172739.24621-1-pfsmorigo@linux.vnet.ibm.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Atul Gupta <atul.gupta@chelsio.com>
-Date: Tue, 11 Dec 2018 02:20:09 -0800
+On Tue, Nov 27, 2018 at 03:27:21PM -0200, Paulo Flabiano Smorigo wrote:
+> Add Breno and Nayna as NX/VMX crypto driver maintainers. Also change my
+> email address to my personal account and remove Leonidas since he's not
+> working with the driver anymore.
+> 
+> Signed-off-by: Paulo Flabiano Smorigo <pfsmorigo@linux.vnet.ibm.com>
+> ---
+>  MAINTAINERS | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
 
-> HW unhash within mutex for registered tls devices cause sleep
-> when called from tcp_set_state for TCP_CLOSE. Release lock and
-> re-acquire after function call with ref count incr/dec.
-> defined kref and fp release for tls_device to ensure device
-> is not released outside lock.
- ...
-> Signed-off-by: Atul Gupta <atul.gupta@chelsio.com>
-
-Applied.
+Patch applied.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
