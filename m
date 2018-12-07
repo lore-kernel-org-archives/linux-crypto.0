@@ -1,99 +1,61 @@
-Return-Path: <SRS0=KZld=OW=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:38461 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727499AbeLMJSz (ORCPT
+Return-Path: <SRS0=/ZR5=OQ=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:48972 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725948AbeLGGOQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 13 Dec 2018 04:18:55 -0500
-Received: by mail-pf1-f194.google.com with SMTP id q1so813769pfi.5
-        for <linux-crypto@vger.kernel.org>; Thu, 13 Dec 2018 01:18:55 -0800 (PST)
-From: Louis Collard <louiscollard@chromium.org>
-To: linux-crypto@vger.kernel.org
-Cc: Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Gary R Hook <gary.hook@amd.com>, Michael Buesch <m@bues.ch>,
-        PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
-        Louis Collard <louiscollard@chromium.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        linux-kernel@vger.kernel.org, apronin@chromium.org,
-        jarkko.sakkinen@linux.intel.com, linux@mniewoehner.de,
-        david.bild@xaptum.com, tytso@mit.edu
-Subject: [PATCH v2] Allow hwrng to initialize crng.
-Date: Thu, 13 Dec 2018 17:18:48 +0800
-Message-Id: <20181213091848.81327-1-louiscollard@chromium.org>
+        Fri, 7 Dec 2018 01:14:16 -0500
+Date: Fri, 7 Dec 2018 14:14:10 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: Crypto Fixes for 4.20
+Message-ID: <20181207061409.xflg423nknleuddw@gondor.apana.org.au>
+References: <20170714141855.GA29426@gondor.apana.org.au>
+ <20170922084401.GA15541@gondor.apana.org.au>
+ <20171128230929.GA17783@gondor.apana.org.au>
+ <20171222064931.GA27068@gondor.apana.org.au>
+ <20180105073808.GA14405@gondor.apana.org.au>
+ <20180212031702.GA26153@gondor.apana.org.au>
+ <20180428080517.haxgpvqrwgotakyo@gondor.apana.org.au>
+ <20180622145403.6ltjip7che227fuo@gondor.apana.org.au>
+ <20180829033353.agnzxra3jk2r2mzg@gondor.apana.org.au>
+ <20181116063146.e7a3mep3ghnfltxe@gondor.apana.org.au>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181116063146.e7a3mep3ghnfltxe@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Some systems, for example embedded systems, do not generate
-enough entropy on boot through interrupts, and boot may be blocked for
-several minutes waiting for a call to getrandom to complete.
+Hi Linus: 
 
-Currently, random data is read from a hwrng when it is registered,
-and is loaded into primary_crng. This data is treated in the same
-way as data that is device-specific but otherwise unchanging, and
-so primary_crng cannot become initialized with the data from the
-hwrng.
+This push fixes the following issues:
 
-This change causes the data initially read from the hwrng to be
-treated the same as subsequent data that is read from the hwrng if
-it's quality score is non-zero.
+- Disable the new crypto stats interface as it's still being changed.
+- Fix potential uses-after-free in cbc/cfb/pcbc.
 
-The implications of this are:
 
-The data read from hwrng can cause primary_crng to become
-initialized, therefore avoiding problems of getrandom blocking
-on boot.
+Please pull from
 
-Calls to getrandom (with GRND_RANDOM) may be using entropy
-exclusively (or in practise, almost exclusively) from the hwrng.
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
 
-Regarding the latter point; this behavior is the same as if a
-user specified a quality score of 1 (bit of entropy per 1024 bits)
-so hopefully this is not too scary a change to make.
 
-This change is the result of the discussion here:
-https://patchwork.kernel.org/patch/10453893/
+Herbert Xu (1):
+      crypto: user - Disable statistics interface
 
-Signed-off-by: Louis Collard <louiscollard@chromium.org>
-Acked-by: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
----
- drivers/char/hw_random/core.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+Pan Bian (1):
+      crypto: do not free algorithm before using
 
-diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
-index 95be7228f327..7736e1a96321 100644
---- a/drivers/char/hw_random/core.c
-+++ b/drivers/char/hw_random/core.c
-@@ -24,6 +24,7 @@
- #include <linux/sched.h>
- #include <linux/slab.h>
- #include <linux/uaccess.h>
-+#include <crypto/chacha20.h>
- 
- #define RNG_MODULE_NAME		"hw_random"
- 
-@@ -64,13 +65,19 @@ static size_t rng_buffer_size(void)
- static void add_early_randomness(struct hwrng *rng)
- {
- 	int bytes_read;
--	size_t size = min_t(size_t, 16, rng_buffer_size());
-+	/* Read enough to initialize crng. */
-+	size_t size = min_t(size_t,
-+			    2*CHACHA20_KEY_SIZE,
-+			    rng_buffer_size());
- 
- 	mutex_lock(&reading_mutex);
- 	bytes_read = rng_get_data(rng, rng_buffer, size, 1);
- 	mutex_unlock(&reading_mutex);
- 	if (bytes_read > 0)
--		add_device_randomness(rng_buffer, bytes_read);
-+		/* Allow crng to become initialized, but do not add
-+		 * entropy to the pool.
-+		 */
-+		add_hwgenerator_randomness(rng_buffer, bytes_read, 0);
- }
- 
- static inline void cleanup_rng(struct kref *kref)
+ crypto/Kconfig | 2 +-
+ crypto/cbc.c   | 6 ++++--
+ crypto/cfb.c   | 6 ++++--
+ crypto/pcbc.c  | 6 ++++--
+ 4 files changed, 13 insertions(+), 7 deletions(-)
+
+Thanks,
 -- 
-2.13.5
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
