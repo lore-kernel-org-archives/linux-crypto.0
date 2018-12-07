@@ -1,37 +1,34 @@
-Return-Path: <SRS0=o+Is=OM=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:39668 "EHLO
+Return-Path: <SRS0=/ZR5=OQ=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:48944 "EHLO
         deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725792AbeLCCx2 (ORCPT
+        with ESMTP id S1725939AbeLGFul (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 2 Dec 2018 21:53:28 -0500
-Date: Mon, 3 Dec 2018 10:53:23 +0800
+        Fri, 7 Dec 2018 00:50:41 -0500
+Date: Fri, 7 Dec 2018 13:50:33 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Sergey Senozhatsky <sergey.senozhatsky.work@gmail.com>
-Cc: Dave Rodgman <dave.rodgman@arm.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        linux-crypto@vger.kernel.org, nd <nd@arm.com>
-Subject: Re: [PATCH 7/7] lib/lzo: separate lzo-rle from lzo
-Message-ID: <20181203025322.ak5eymaib6ubo2nw@gondor.apana.org.au>
-References: <20181127161913.23863-1-dave.rodgman@arm.com>
- <20181127161913.23863-8-dave.rodgman@arm.com>
- <20181129044333.GH6379@jagdpanzerIV>
- <5b504430-fb4b-340b-66c2-1300c816cc3a@arm.com>
- <20181203024019.GB427@jagdpanzerIV>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Corentin Labbe <clabbe@baylibre.com>, davem@davemloft.net,
+        nhorman@tuxdriver.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 00/11] crypto: crypto_user_stat: misc enhancement
+Message-ID: <20181207055033.h5cf73if35rluxof@gondor.apana.org.au>
+References: <1543502546-23870-1-git-send-email-clabbe@baylibre.com>
+ <20181129181625.GA168705@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181203024019.GB427@jagdpanzerIV>
+In-Reply-To: <20181129181625.GA168705@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Dec 03, 2018 at 11:40:19AM +0900, Sergey Senozhatsky wrote:
-> 
-> I'm not in any position to ask you to do this; white-space clean ups
-> are not very popular (it's OK for staging tree; not so much otherwise).
-> So we better ask David and Herbert.
+On Thu, Nov 29, 2018 at 10:16:26AM -0800, Eric Biggers wrote:
+>
+> Herbert, can you send this series to Linus for v4.20 after reviewing it?
+> We don't want to be stuck with a bad UAPI, and the use-after-free needs to be
+> fixed anyway too.
 
-I'm fine with white space cleanups.
+On second thought, I'm just going to revert the whole interface
+for now and reintroduce it in cryptodev so we can fix it properly.
 
 Thanks,
 -- 
