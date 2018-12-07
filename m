@@ -1,46 +1,35 @@
-Return-Path: <SRS0=adZj=OO=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:58120 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726001AbeLEAu1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 4 Dec 2018 19:50:27 -0500
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH] crypto: adiantum - propagate CRYPTO_ALG_ASYNC flag to instance
-Date: Tue,  4 Dec 2018 16:46:54 -0800
-Message-Id: <20181205004654.242204-1-ebiggers@kernel.org>
+Return-Path: <SRS0=/ZR5=OQ=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:49084 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725952AbeLGGTS (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 7 Dec 2018 01:19:18 -0500
+Date: Fri, 7 Dec 2018 14:19:13 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Yangtao Li <tiny.windzz@gmail.com>
+Cc: davem@davemloft.net, Jampala.Srikanth@cavium.com,
+        sgadam@cavium.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: cavium/nitrox convert to DEFINE_SHOW_ATTRIBUTE
+Message-ID: <20181207061913.fpwputw75qi3fn4e@gondor.apana.org.au>
+References: <20181201095630.6232-1-tiny.windzz@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181201095630.6232-1-tiny.windzz@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Eric Biggers <ebiggers@google.com>
+On Sat, Dec 01, 2018 at 04:56:30AM -0500, Yangtao Li wrote:
+> Use DEFINE_SHOW_ATTRIBUTE macro to simplify the code.
+> 
+> Signed-off-by: Yangtao Li <tiny.windzz@gmail.com>
+> ---
+>  drivers/crypto/cavium/nitrox/nitrox_debugfs.c | 48 ++++---------------
+>  1 file changed, 9 insertions(+), 39 deletions(-)
 
-If the stream cipher implementation is asynchronous, then the Adiantum
-instance must be flagged as asynchronous as well.  Otherwise someone
-asking for a synchronous algorithm can get an asynchronous algorithm.
-
-There are no asynchronous xchacha12 or xchacha20 implementations yet
-which makes this largely a theoretical issue, but it should be fixed.
-
-Fixes: 059c2a4d8e16 ("crypto: adiantum - add Adiantum support")
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- crypto/adiantum.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/crypto/adiantum.c b/crypto/adiantum.c
-index 2dfcf12fd4529..ca27e0dc2958c 100644
---- a/crypto/adiantum.c
-+++ b/crypto/adiantum.c
-@@ -590,6 +590,8 @@ static int adiantum_create(struct crypto_template *tmpl, struct rtattr **tb)
- 		     hash_alg->base.cra_driver_name) >= CRYPTO_MAX_ALG_NAME)
- 		goto out_drop_hash;
- 
-+	inst->alg.base.cra_flags = streamcipher_alg->base.cra_flags &
-+				   CRYPTO_ALG_ASYNC;
- 	inst->alg.base.cra_blocksize = BLOCKCIPHER_BLOCK_SIZE;
- 	inst->alg.base.cra_ctxsize = sizeof(struct adiantum_tfm_ctx);
- 	inst->alg.base.cra_alignmask = streamcipher_alg->base.cra_alignmask |
+Patch applied.  Thanks.
 -- 
-2.20.0.rc1.387.gf8505762e3-goog
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
