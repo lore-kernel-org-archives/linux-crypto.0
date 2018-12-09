@@ -1,58 +1,37 @@
-Return-Path: <SRS0=ZXsK=OT=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:43554 "EHLO
-        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728567AbeLJT5E (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Dec 2018 14:57:04 -0500
-From: Dave Watson <davejwatson@fb.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        Junaid Shahid <junaids@google.com>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-CC: Doron Roberts-Kedes <doronrk@fb.com>,
-        Sabrina Dubroca <sd@queasysnail.net>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Stephan Mueller <smueller@chronox.de>
-Subject: [PATCH 00/12] x86/crypto: gcmaes AVX scatter/gather support
-Date: Mon, 10 Dec 2018 19:56:28 +0000
-Message-ID: <cover.1544471415.git.davejwatson@fb.com>
-Content-Language: en-US
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <914379E01B9F9E4695BA62F75999E850@namprd15.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+Return-Path: <SRS0=XS/1=OS=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from imap.thunk.org ([74.207.234.97]:39476 "EHLO imap.thunk.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726284AbeLIV4q (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 9 Dec 2018 16:56:46 -0500
+Date: Sun, 9 Dec 2018 16:56:40 -0500
+From: "Theodore Y. Ts'o" <tytso@mit.edu>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-fscrypt@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Jaegeuk Kim <jaegeuk@kernel.org>,
+        Richard Weinberger <richard@nod.at>,
+        Paul Crowley <paulcrowley@google.com>,
+        Greg Kaiser <gkaiser@google.com>
+Subject: Re: [PATCH v4] fscrypt: add Adiantum support
+Message-ID: <20181209215640.GC1840@mit.edu>
+References: <20181126192737.129355-1-ebiggers@kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20181126192737.129355-1-ebiggers@kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch set refactors the x86 aes/gcm AVX crypto routines to
-support true scatter/gather by adding gcm_enc/dec_update methods.
+On Mon, Nov 26, 2018 at 11:27:37AM -0800, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
+> 
+> Add support for the Adiantum encryption mode to fscrypt.  Adiantum is a
+> tweakable, length-preserving encryption mode with security provably
+> reducible to that of XChaCha12 and AES-256, subject to a security bound.
+> It's also a true wide-block mode, unlike XTS.  See the paper
+> "Adiantum: length-preserving encryption for entry-level processors"
+> (https://eprint.iacr.org/2018/720.pdf) for more details.  Also see
+> commit 059c2a4d8e16 ("crypto: adiantum - add Adiantum support").
 
-It is similar to the previous SSE patchset starting at e1fd316f. =20
-Unlike the SSE routines, the AVX routines did not support
-keysize 192 & 256, this patchset also adds support for those
-keysizes.
+Thanks, applied.
 
-The final patch updates the C glue code, passing everything through
-the crypt_by_sg() function instead of the previous memcpy based
-routines.
-
-Dave Watson (12):
-  x86/crypto: aesni: Merge GCM_ENC_DEC
-  x86/crypto: aesni: Introduce gcm_context_data
-  x86/crypto: aesni: Macro-ify func save/restore
-  x86/crypto: aesni: support 256 byte keys in avx asm
-  x86/crypto: aesni: Add GCM_COMPLETE macro
-  x86/crypto: aesni: Split AAD hash calculation to separate macro
-  x86/crypto: aesni: Merge avx precompute functions
-  x86/crypto: aesni: Fill in new context data structures
-  x86/crypto: aesni: Move ghash_mul to GCM_COMPLETE
-  x86/crypto: aesni: Introduce READ_PARTIAL_BLOCK macro
-  x86/crypto: aesni: Introduce partial block macro
-  x86/crypto: aesni: Add scatter/gather avx stubs, and use them in C
-
- arch/x86/crypto/aesni-intel_avx-x86_64.S | 2125 ++++++++++------------
- arch/x86/crypto/aesni-intel_glue.c       |  353 ++--
- 2 files changed, 1117 insertions(+), 1361 deletions(-)
-
---=20
-2.17.1
+					- Ted
