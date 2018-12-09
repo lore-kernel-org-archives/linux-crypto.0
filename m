@@ -1,159 +1,163 @@
-Return-Path: <SRS0=/ZR5=OQ=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=XS/1=OS=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F32FC07E85
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Dec 2018 20:26:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95611C07E85
+	for <linux-crypto@archiver.kernel.org>; Sun,  9 Dec 2018 20:06:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3D6162081C
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Dec 2018 20:26:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="Q+G7N6R9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D6162081C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTP id 563AE20645
+	for <linux-crypto@archiver.kernel.org>; Sun,  9 Dec 2018 20:06:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 563AE20645
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ucw.cz
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-crypto-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726079AbeLGU02 (ORCPT
+        id S1726260AbeLIUGF (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 7 Dec 2018 15:26:28 -0500
-Received: from mail-it1-f195.google.com ([209.85.166.195]:37172 "EHLO
-        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726008AbeLGU02 (ORCPT
+        Sun, 9 Dec 2018 15:06:05 -0500
+Received: from atrey.karlin.mff.cuni.cz ([195.113.26.193]:39832 "EHLO
+        atrey.karlin.mff.cuni.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726233AbeLIUGF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 7 Dec 2018 15:26:28 -0500
-Received: by mail-it1-f195.google.com with SMTP id b5so9033982iti.2
-        for <linux-crypto@vger.kernel.org>; Fri, 07 Dec 2018 12:26:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=KLYwNXnzoVvepzSuxQ5p4veFSZuSN5QPAisGoFQq+eo=;
-        b=Q+G7N6R9cNmw2rFHSHCBK/LyjNfFNjK6oJlQ9JyHKZBsMx0HxymipERlO49GeMH+20
-         KhxyCMfcVstVMdHpB0rtXG0FadSe+4UM6hpo8dZy0naiJ49nd9djvcPExigmA9q6YjPE
-         X9GOzFNFMdixUDbASur84eKVfqpCpgVQbFM6M=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=KLYwNXnzoVvepzSuxQ5p4veFSZuSN5QPAisGoFQq+eo=;
-        b=EqktGjecSaiSS28npZ12WumJdn2GgLSIKJMlfK5Gt+Xl7FxucbzLyl25mZH1a9ex4U
-         qs3YUDjvrDQfCP4HZeJ/ywnojJKc8C6EJYmXiL1bxfZTT+R5E8iQ7QbhH/4nvKHv4kSE
-         lwXNHnWsoPXTEi0LgXMEUeG02ws/2JXK3lV8h+IdBZFnHnE2Jl//TiTnK4HNJjXavrYG
-         /1BGMoURbNPQmVjcCNAP3QG0UWBhKZNSZp9uxlTBM1zZayRiiMFNs2HkLnb4GWDuD3/g
-         PaRSK1R0H1ykdJM68SvaTNYRAgIJRsIAOjo3mdnknJpfApk6D9hR9qlBug0EEc3SxeyN
-         zZiQ==
-X-Gm-Message-State: AA+aEWa6ibCX/W/YeP7eXmdNpBBmIOIUQXhh2mYwcDGdPkAO2qJ8GSs0
-        dMGBP6P+8pXMzj1GJwPq4Q2erwJS6WsNkgLH+m5qFm4w
-X-Google-Smtp-Source: AFSGD/WzF2x0t8jZwsZm4obvUhsaa6Fi7Yqlyol6bPbkz5Lun5YOwVmvPE6dYEWnDi+4QFfBf7aB2CPX1N+FCwV1vMI=
-X-Received: by 2002:a05:660c:4b:: with SMTP id p11mr3437505itk.71.1544214387289;
- Fri, 07 Dec 2018 12:26:27 -0800 (PST)
-MIME-Version: 1.0
-References: <20181207173309.82A0E6D165@po14163vm.idsi0.si.c-s.fr>
-In-Reply-To: <20181207173309.82A0E6D165@po14163vm.idsi0.si.c-s.fr>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Fri, 7 Dec 2018 21:26:15 +0100
-Message-ID:
- <CAKv+Gu9gz0h2CFNPe9bgrSBzRe7iTVOMxiEEb6OXb75Acv7HUQ@mail.gmail.com>
-Subject: Re: [PATCH] crypto/testmgr: fix skcipher test with CONFIG_VMAP_STACK
-To:     christophe.leroy@c-s.fr
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Sun, 9 Dec 2018 15:06:05 -0500
+Received: by atrey.karlin.mff.cuni.cz (Postfix, from userid 512)
+        id 4290E806FA; Sun,  9 Dec 2018 21:05:57 +0100 (CET)
+Date:   Sun, 9 Dec 2018 21:06:00 +0100
+From:   Pavel Machek <pavel@ucw.cz>
+To:     Josh Triplett <josh@joshtriplett.org>
+Cc:     Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>, x86@kernel.org,
+        platform-driver-x86@vger.kernel.org, dave.hansen@intel.com,
+        sean.j.christopherson@intel.com, nhorman@redhat.com,
+        npmccallum@redhat.com, Alexei Starovoitov <ast@kernel.org>,
+        Andi Kleen <ak@linux.intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Borislav Petkov <bp@suse.de>,
         "David S. Miller" <davem@davemloft.net>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
-Content-Type: text/plain; charset="UTF-8"
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@kernel.org>,
+        "open list:INTEL SGX" <intel-sgx-kernel-dev@lists.01.org>,
+        Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        "open list:KERNEL VIRTUAL MACHINE FOR X86 (KVM/x86)" 
+        <kvm@vger.kernel.org>, Len Brown <len.brown@intel.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        "open list:SPARSE CHECKER" <linux-sparse@vger.kernel.org>,
+        Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Ricardo Neri <ricardo.neri-calderon@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Vikas Shivappa <vikas.shivappa@linux.intel.com>
+Subject: Re: [PATCH v11 00/13] Intel SGX1 support
+Message-ID: <20181209200600.GA11608@amd>
+References: <20180608171216.26521-1-jarkko.sakkinen@linux.intel.com>
+ <20180612105011.GA26931@amd>
+ <20180619145943.GC8034@linux.intel.com>
+ <20180619200414.GA3143@amd>
+ <20180619214833.GA5873@localhost>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha1;
+        protocol="application/pgp-signature"; boundary="bp/iNruPH9dso1Pn"
+Content-Disposition: inline
+In-Reply-To: <20180619214833.GA5873@localhost>
+User-Agent: Mutt/1.5.23 (2014-03-12)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
-Message-ID: <20181207202615.UOc3sCy9fbx_6hPrckEGLXPA5SKzYag9CK4SqzClKMo@z>
+Message-ID: <20181209200600.MwZ8E5UtomlHcaaqEuR9xqgWafN4FofN144ckpJNd4Q@z>
 
-On Fri, 7 Dec 2018 at 18:33, Christophe Leroy <christophe.leroy@c-s.fr> wrote:
->
-> [    2.364486] WARNING: CPU: 0 PID: 60 at ./arch/powerpc/include/asm/io.h:837 dma_nommu_map_page+0x44/0xd4
-> [    2.373579] CPU: 0 PID: 60 Comm: cryptomgr_test Tainted: G        W         4.20.0-rc5-00560-g6bfb52e23a00-dirty #531
-> [    2.384740] NIP:  c000c540 LR: c000c584 CTR: 00000000
-> [    2.389743] REGS: c95abab0 TRAP: 0700   Tainted: G        W          (4.20.0-rc5-00560-g6bfb52e23a00-dirty)
-> [    2.400042] MSR:  00029032 <EE,ME,IR,DR,RI>  CR: 24042204  XER: 00000000
-> [    2.406669]
-> [    2.406669] GPR00: c02f2244 c95abb60 c6262990 c95abd80 0000256a 00000001 00000001 00000001
-> [    2.406669] GPR08: 00000000 00002000 00000010 00000010 24042202 00000000 00000100 c95abd88
-> [    2.406669] GPR16: 00000000 c05569d4 00000001 00000010 c95abc88 c0615664 00000004 00000000
-> [    2.406669] GPR24: 00000010 c95abc88 c95abc88 00000000 c61ae210 c7ff6d40 c61ae210 00003d68
-> [    2.441559] NIP [c000c540] dma_nommu_map_page+0x44/0xd4
-> [    2.446720] LR [c000c584] dma_nommu_map_page+0x88/0xd4
-> [    2.451762] Call Trace:
-> [    2.454195] [c95abb60] [82000808] 0x82000808 (unreliable)
-> [    2.459572] [c95abb80] [c02f2244] talitos_edesc_alloc+0xbc/0x3c8
-> [    2.465493] [c95abbb0] [c02f2600] ablkcipher_edesc_alloc+0x4c/0x5c
-> [    2.471606] [c95abbd0] [c02f4ed0] ablkcipher_encrypt+0x20/0x64
-> [    2.477389] [c95abbe0] [c02023b0] __test_skcipher+0x4bc/0xa08
-> [    2.483049] [c95abe00] [c0204b60] test_skcipher+0x2c/0xcc
-> [    2.488385] [c95abe20] [c0204c48] alg_test_skcipher+0x48/0xbc
-> [    2.494064] [c95abe40] [c0205cec] alg_test+0x164/0x2e8
-> [    2.499142] [c95abf00] [c0200dec] cryptomgr_test+0x48/0x50
-> [    2.504558] [c95abf10] [c0039ff4] kthread+0xe4/0x110
-> [    2.509471] [c95abf40] [c000e1d0] ret_from_kernel_thread+0x14/0x1c
-> [    2.515532] Instruction dump:
-> [    2.518468] 7c7e1b78 7c9d2378 7cbf2b78 41820054 3d20c076 8089c200 3d20c076 7c84e850
-> [    2.526127] 8129c204 7c842e70 7f844840 419c0008 <0fe00000> 2f9e0000 54847022 7c84fa14
-> [    2.533960] ---[ end trace bf78d94af73fe3b8 ]---
-> [    2.539123] talitos ff020000.crypto: master data transfer error
-> [    2.544775] talitos ff020000.crypto: TEA error: ISR 0x20000000_00000040
-> [    2.551625] alg: skcipher: encryption failed on test 1 for ecb-aes-talitos: ret=22
->
-> IV cannot be on stack when CONFIG_VMAP_STACK is selected because the stack
-> cannot be DMA mapped anymore.
->
-> This patch allocates it with kmalloc()
->
 
-This looks like a driver bug to me. Other accelerators in
-drivers/crypto all take a copy of the IV before mapping it for DMA, so
-it would be better if talitos did the same.
+--bp/iNruPH9dso1Pn
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> Fixes: da7f033ddc9f ("crypto: cryptomgr - Add test infrastructure")
-> Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
-> ---
->  crypto/testmgr.c | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
->
-> diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-> index b1f79c6bf409..eea498f9030d 100644
-> --- a/crypto/testmgr.c
-> +++ b/crypto/testmgr.c
-> @@ -1112,12 +1112,16 @@ static int __test_skcipher(struct crypto_skcipher *tfm, int enc,
->         struct crypto_wait wait;
->         const char *input, *result;
->         void *data;
-> -       char iv[MAX_IVLEN];
-> +       char *iv;
->         char *xbuf[XBUFSIZE];
->         char *xoutbuf[XBUFSIZE];
->         int ret = -ENOMEM;
->         unsigned int ivsize = crypto_skcipher_ivsize(tfm);
->
-> +       iv = kmalloc(MAX_IVLEN, GFP_KERNEL | GFP_DMA);
-> +       if (!iv)
-> +               goto out_noiv;
-> +
->         if (testmgr_alloc_buf(xbuf))
->                 goto out_nobuf;
->
-> @@ -1339,6 +1343,8 @@ static int __test_skcipher(struct crypto_skcipher *tfm, int enc,
->  out_nooutbuf:
->         testmgr_free_buf(xbuf);
->  out_nobuf:
-> +       kfree(iv);
-> +out_noiv:
->         return ret;
->  }
->
-> --
-> 2.13.3
->
+Hi!
+
+(sorry to bring up old thread).
+
+> > > > > Intel(R) SGX is a set of CPU instructions that can be used by app=
+lications
+> > > > > to set aside private regions of code and data. The code outside t=
+he enclave
+> > > > > is disallowed to access the memory inside the enclave by the CPU =
+access
+> > > > > control.  In a way you can think that SGX provides inverted sandb=
+ox. It
+> > > > > protects the application from a malicious host.
+> > > >=20
+> > > > Do you intend to allow non-root applications to use SGX?
+> > > >=20
+> > > > What are non-evil uses for SGX?
+> > > >=20
+> > > > ...because it is quite useful for some kinds of evil:
+> > >=20
+> > > The default permissions for the device are 600.
+> >=20
+> > Good. This does not belong to non-root.
+>=20
+> There are entirely legitimate use cases for using this as an
+> unprivileged user. However, that'll be up to system and distribution
+> policy, which can evolve over time, and it makes sense for the *initial*
+> kernel permission to start out root-only and then adjust permissions via
+> udev.
+
+Agreed.
+
+> > What are some non-evil uses for SGX?
+>=20
+> Building a software certificate store. Hardening key-agent software like
+> ssh-agent or gpg-agent. Building a challenge-response authentication
+> system. Providing more assurance that your server infrastructure is
+> uncompromised. Offloading computation to a system without having to
+> fully trust that system.
+
+I think you can do the crypto stuff... as crypto already verifies the
+results. But I don't think you can do the computation offload.
+
+> As one of many possibilities, imagine a distcc that didn't have to trust
+> the compile nodes. The compile nodes could fail to return results at
+> all, but they couldn't alter the results.
+
+distcc on untrusted nodes ... oh yes, that would be great.
+
+Except that you can't do it, right? :-).
+
+First, AFAICT it would be quite hard to get gcc to run under SGX. But
+maybe you have spare month or three and can do it.
+
+But ... you really can't guarantee getting right results. Evil owner
+of the machine might intentionaly overheat the CPU, glitch the power,
+induce single-bit errors using gamma source, ... You can't do it.
+
+									Pavel
+--=20
+(english) http://www.livejournal.com/~pavelmachek
+(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blo=
+g.html
+
+--bp/iNruPH9dso1Pn
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: Digital signature
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlwNdagACgkQMOfwapXb+vLmBACglfRsX3Mr2i4qikFMap6DH0ZS
+3OwAnj5BaVdvd6w1ipEHlMOQVSTpim9l
+=7YhW
+-----END PGP SIGNATURE-----
+
+--bp/iNruPH9dso1Pn--
