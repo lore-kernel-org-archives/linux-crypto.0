@@ -1,349 +1,435 @@
 Return-Path: <SRS0=ZXsK=OT=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from vmicros1.altlinux.org ([194.107.17.57]:60446 "EHLO
-        vmicros1.altlinux.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727570AbeLJTh4 (ORCPT
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:54978 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727721AbeLJT7e (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Dec 2018 14:37:56 -0500
-Date: Mon, 10 Dec 2018 22:37:39 +0300
-From: Vitaly Chikunov <vt@altlinux.org>
-To: David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH] X.509: Parse public key parameters from x509 for
- akcipher
-Message-ID: <20181210193739.g7ald2ufik56fccf@sole.flsd.net>
-References: <20181209135548.26232-1-vt@altlinux.org>
+        Mon, 10 Dec 2018 14:59:34 -0500
+From: Dave Watson <davejwatson@fb.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        Junaid Shahid <junaids@google.com>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+CC: Doron Roberts-Kedes <doronrk@fb.com>,
+        Sabrina Dubroca <sd@queasysnail.net>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH 06/12] x86/crypto: aesni: Split AAD hash calculation to
+ separate macro
+Date: Mon, 10 Dec 2018 19:58:19 +0000
+Message-ID: <12ee6b81fee1d5a112b81537f52b87b23a39caac.1544471415.git.davejwatson@fb.com>
+References: <cover.1544471415.git.davejwatson@fb.com>
+In-Reply-To: <cover.1544471415.git.davejwatson@fb.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <6862799116472045B2319D6FE51A36BE@namprd15.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=koi8-r
-Content-Disposition: inline
-In-Reply-To: <20181209135548.26232-1-vt@altlinux.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Dec 09, 2018 at 04:55:48PM +0300, Vitaly Chikunov wrote:
-> Some public key algorithms (like ECDSA) keep in parameters field
-> important data such as digest and curve OIDs (possibly more for
-> different ECDSA variants). Thus, just setting a public key (as
-> for RSA) is not enough.
-> 
-> Introduce set_params() callback for akcipher which will be used to
-> pass BER encoded parameters array, with additional argument of
-> algorithm OID.
-> 
-> This is done with the intent of adding support for EC-RDSA (ISO/IEC
-> 14888-3:2018, RFC 7091, and basically ECDSA variant) public keys (which
-> will be finally used in IMA subsystem). Thus, also oid_registry.h is
-> updated.
-> 
-> Rationale:
-> 
-> - For such keys just setting public key without parameters is
->   meaningless, so it would be possible to add parameters in
->   crypto_akcipher_set_pub_key (and .set_pub_key) calls. But, this will
->   needlessly change API for RSA akcipher. Also, additional callback
->   making it possible to pass parameters after
->   crypto_akcipher_set_priv_key (and .set_priv_key) in the future.
-> 
-> - Algorithm OID is passed to be validated in .set_params callback,
->   otherwise, it could have the wrong value.
-> 
-> - Particular algorithm OIDs are checked in x509_note_params, (because
->   this is called from AlgorithmIdentifier (ASN.1) parser, which is
->   called multiple times, as it's used multiple times in X.509
->   certificate), to distinguish a public key call from a signature call.
-> 
-> Signed-off-by: Vitaly Chikunov <vt@altlinux.org>
-> ---
->  crypto/asymmetric_keys/public_key.c       | 16 +++++++++++++++
->  crypto/asymmetric_keys/x509.asn1          |  2 +-
->  crypto/asymmetric_keys/x509_cert_parser.c | 27 +++++++++++++++++++++++++
->  crypto/testmgr.c                          |  5 +++++
->  crypto/testmgr.h                          |  3 +++
->  include/crypto/akcipher.h                 | 33 +++++++++++++++++++++++++++++++
->  include/crypto/public_key.h               |  4 ++++
->  include/linux/oid_registry.h              |  6 ++++++
->  8 files changed, 95 insertions(+), 1 deletion(-)
-> 
-> diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
-> index f5d85b47fcc6..3bc090b8adef 100644
-> --- a/crypto/asymmetric_keys/public_key.c
-> +++ b/crypto/asymmetric_keys/public_key.c
-> @@ -45,6 +45,7 @@ void public_key_free(struct public_key *key)
->  {
->  	if (key) {
->  		kfree(key->key);
-> +		kfree(key->params);
->  		kfree(key);
->  	}
->  }
-> @@ -124,6 +125,11 @@ static int software_key_query(const struct kernel_pkey_params *params,
->  	if (ret < 0)
->  		goto error_free_tfm;
->  
-> +	ret = crypto_akcipher_set_params(tfm, pkey->algo, pkey->params,
-> +					 pkey->paramlen);
-> +	if (ret)
-> +		goto error_free_tfm;
-> +
->  	len = crypto_akcipher_maxsize(tfm);
->  	info->key_size = len * 8;
->  	info->max_data_size = len;
-> @@ -182,6 +188,11 @@ static int software_key_eds_op(struct kernel_pkey_params *params,
->  	if (ret)
->  		goto error_free_req;
->  
-> +	ret = crypto_akcipher_set_params(tfm, pkey->algo, pkey->params,
-> +					 pkey->paramlen);
-> +	if (ret)
-> +		goto error_free_req;
-> +
->  	sg_init_one(&in_sg, in, params->in_len);
->  	sg_init_one(&out_sg, out, params->out_len);
->  	akcipher_request_set_crypt(req, &in_sg, &out_sg, params->in_len,
-> @@ -263,6 +274,11 @@ int public_key_verify_signature(const struct public_key *pkey,
->  	if (ret)
->  		goto error_free_req;
->  
-> +	ret = crypto_akcipher_set_params(tfm, pkey->algo, pkey->params,
-> +					 pkey->paramlen);
-> +	if (ret)
-> +		goto error_free_req;
-> +
->  	ret = -ENOMEM;
->  	outlen = crypto_akcipher_maxsize(tfm);
->  	output = kmalloc(outlen, GFP_KERNEL);
-> diff --git a/crypto/asymmetric_keys/x509.asn1 b/crypto/asymmetric_keys/x509.asn1
-> index aae0cde414e2..5c9f4e4a5231 100644
-> --- a/crypto/asymmetric_keys/x509.asn1
-> +++ b/crypto/asymmetric_keys/x509.asn1
-> @@ -22,7 +22,7 @@ CertificateSerialNumber ::= INTEGER
->  
->  AlgorithmIdentifier ::= SEQUENCE {
->  	algorithm		OBJECT IDENTIFIER ({ x509_note_OID }),
-> -	parameters		ANY OPTIONAL
-> +	parameters		ANY OPTIONAL ({ x509_note_params })
->  }
->  
->  Name ::= SEQUENCE OF RelativeDistinguishedName
-> diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetric_keys/x509_cert_parser.c
-> index 991f4d735a4e..16d8936d143b 100644
-> --- a/crypto/asymmetric_keys/x509_cert_parser.c
-> +++ b/crypto/asymmetric_keys/x509_cert_parser.c
-> @@ -26,6 +26,9 @@ struct x509_parse_context {
->  	const void	*cert_start;		/* Start of cert content */
->  	const void	*key;			/* Key data */
->  	size_t		key_size;		/* Size of key data */
-> +	const void	*params;		/* Key parameters */
-> +	size_t		params_size;		/* Size of key parameters */
-> +	enum OID	key_algo;		/* Public key algorithm */
->  	enum OID	last_oid;		/* Last OID encountered */
->  	enum OID	algo_oid;		/* Algorithm OID */
->  	unsigned char	nr_mpi;			/* Number of MPIs stored */
-> @@ -109,6 +112,13 @@ struct x509_certificate *x509_cert_parse(const void *data, size_t datalen)
->  
->  	cert->pub->keylen = ctx->key_size;
->  
-> +	cert->pub->params = kmemdup(ctx->params, ctx->params_size, GFP_KERNEL);
-> +	if (!cert->pub->params)
-> +		goto error_decode;
-> +
-> +	cert->pub->paramlen = ctx->params_size;
-> +	cert->pub->algo = ctx->key_algo;
-> +
->  	/* Grab the signature bits */
->  	ret = x509_get_sig_params(cert);
->  	if (ret < 0)
-> @@ -401,6 +411,23 @@ int x509_note_subject(void *context, size_t hdrlen,
->  }
->  
->  /*
-> + * Extract parameters for particular keys
-> + */
-> +int x509_note_params(void *context, size_t hdrlen,
-> +		     unsigned char tag,
-> +		     const void *value, size_t vlen)
-> +{
-> +	struct x509_parse_context *ctx = context;
-> +
-> +	if (ctx->last_oid != OID_gost2012PublicKey256 &&
-> +	    ctx->last_oid != OID_gost2012PublicKey512)
-> +		return 0;
-> +	ctx->params = value;
-> +	ctx->params_size = vlen;
-> +	return 0;
-> +}
-> +
-> +/*
->   * Extract the data for the public key algorithm
->   */
->  int x509_extract_key_data(void *context, size_t hdrlen,
+AAD hash only needs to be calculated once for each scatter/gather operation=
+.
+Move it to its own macro, and call it from GCM_INIT instead of
+INITIAL_BLOCKS.
 
-Missed one hunk, which set ctx->key_algo:
+Signed-off-by: Dave Watson <davejwatson@fb.com>
+---
+ arch/x86/crypto/aesni-intel_avx-x86_64.S | 228 ++++++++++-------------
+ arch/x86/crypto/aesni-intel_glue.c       |  28 ++-
+ 2 files changed, 115 insertions(+), 141 deletions(-)
 
-@@ -436,16 +449,21 @@ int x509_extract_key_data(void *context, size_t hdrlen,
- {
-        struct x509_parse_context *ctx = context;
-
--       if (ctx->last_oid != OID_rsaEncryption)
-+       ctx->key_algo = ctx->last_oid;
-+       if (ctx->last_oid == OID_rsaEncryption)
-+               ctx->cert->pub->pkey_algo = "rsa";
-+       else if (ctx->last_oid == OID_gost2012PublicKey256 ||
-+                ctx->last_oid == OID_gost2012PublicKey512)
-+               ctx->cert->pub->pkey_algo = "ecrdsa";
-+       else
-                return -ENOPKG;
-
--       ctx->cert->pub->pkey_algo = "rsa";
--
-        /* Discard the BIT STRING metadata */
-        if (vlen < 1 || *(const u8 *)value != 0)
-                return -EBADMSG;
-        ctx->key = value + 1;
-        ctx->key_size = vlen - 1;
+diff --git a/arch/x86/crypto/aesni-intel_avx-x86_64.S b/arch/x86/crypto/aes=
+ni-intel_avx-x86_64.S
+index 8e9ae4b26118..305abece93ad 100644
+--- a/arch/x86/crypto/aesni-intel_avx-x86_64.S
++++ b/arch/x86/crypto/aesni-intel_avx-x86_64.S
+@@ -182,6 +182,14 @@ aad_shift_arr:
+ .text
+=20
+=20
++#define AadHash 16*0
++#define AadLen 16*1
++#define InLen (16*1)+8
++#define PBlockEncKey 16*2
++#define OrigIV 16*3
++#define CurCount 16*4
++#define PBlockLen 16*5
 +
-        return 0;
- }
-
-> diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-> index 0f684a414acb..a030526a6609 100644
-> --- a/crypto/testmgr.c
-> +++ b/crypto/testmgr.c
-> @@ -2257,6 +2257,11 @@ static int test_akcipher_one(struct crypto_akcipher *tfm,
->  	if (err)
->  		goto free_req;
->  
-> +	err = crypto_akcipher_set_params(tfm, vecs->algo, vecs->params,
-> +					 vecs->param_len);
-> +	if (err)
-> +		goto free_req;
-> +
->  	err = -ENOMEM;
->  	out_len_max = crypto_akcipher_maxsize(tfm);
->  	outbuf_enc = kzalloc(out_len_max, GFP_KERNEL);
-> diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-> index e7e56a8febbc..9855da080eaf 100644
-> --- a/crypto/testmgr.h
-> +++ b/crypto/testmgr.h
-> @@ -124,13 +124,16 @@ struct drbg_testvec {
->  
->  struct akcipher_testvec {
->  	const unsigned char *key;
-> +	const unsigned char *params;
->  	const unsigned char *m;
->  	const unsigned char *c;
->  	unsigned int key_len;
-> +	unsigned int param_len;
->  	unsigned int m_size;
->  	unsigned int c_size;
->  	bool public_key_vec;
->  	bool siggen_sigver_test;
-> +	enum OID algo;
->  };
->  
->  struct kpp_testvec {
-> diff --git a/include/crypto/akcipher.h b/include/crypto/akcipher.h
-> index afac71119396..d6aba84ed2c4 100644
-> --- a/include/crypto/akcipher.h
-> +++ b/include/crypto/akcipher.h
-> @@ -13,6 +13,7 @@
->  #ifndef _CRYPTO_AKCIPHER_H
->  #define _CRYPTO_AKCIPHER_H
->  #include <linux/crypto.h>
-> +#include <linux/oid_registry.h>
->  
->  /**
->   * struct akcipher_request - public key request
-> @@ -73,6 +74,9 @@ struct crypto_akcipher {
->   * @set_priv_key: Function invokes the algorithm specific set private key
->   *		function, which knows how to decode and interpret
->   *		the BER encoded private key
-> + * @set_params: Function invokes the algorithm specific set parameters
-> + *		function, which knows how to decode and interpret
-> + *		the BER encoded public key
->   * @max_size:	Function returns dest buffer size required for a given key.
->   * @init:	Initialize the cryptographic transformation object.
->   *		This function is used to initialize the cryptographic
-> @@ -98,6 +102,8 @@ struct akcipher_alg {
->  			   unsigned int keylen);
->  	int (*set_priv_key)(struct crypto_akcipher *tfm, const void *key,
->  			    unsigned int keylen);
-> +	int (*set_params)(struct crypto_akcipher *tfm, enum OID algo,
-> +			  const void *params, unsigned int paramlen);
->  	unsigned int (*max_size)(struct crypto_akcipher *tfm);
->  	int (*init)(struct crypto_akcipher *tfm);
->  	void (*exit)(struct crypto_akcipher *tfm);
-> @@ -452,4 +458,31 @@ static inline int crypto_akcipher_set_priv_key(struct crypto_akcipher *tfm,
->  
->  	return alg->set_priv_key(tfm, key, keylen);
->  }
-> +
-> +/**
-> + * crypto_akcipher_set_params() - Invoke set parameters operation
-> + *
-> + * Function invokes the algorithm specific set parameters function, which
-> + * knows how to decode and interpret the encoded parameters
-> + *
-> + * @tfm:	tfm handle
-> + * @algo:	OID of the key algorithm
-> + * @params:	BER encoded key parameters
-> + * @paramlen:	length of the parameters
-> + *
-> + * Return: zero on success; error code in case of error
-> + */
-> +static inline int crypto_akcipher_set_params(struct crypto_akcipher *tfm,
-> +					     enum OID algo,
-> +					     const void *params,
-> +					     unsigned int paramlen)
-> +{
-> +	struct akcipher_alg *alg = crypto_akcipher_alg(tfm);
-> +
-> +	if (alg->set_params)
-> +		return alg->set_params(tfm, algo, params, paramlen);
-> +	if (!params || !paramlen)
-> +		return 0;
-> +	return -ENOTSUPP;
-> +}
->  #endif
-> diff --git a/include/crypto/public_key.h b/include/crypto/public_key.h
-> index be626eac9113..712fe1214b5f 100644
-> --- a/include/crypto/public_key.h
-> +++ b/include/crypto/public_key.h
-> @@ -15,6 +15,7 @@
->  #define _LINUX_PUBLIC_KEY_H
->  
->  #include <linux/keyctl.h>
-> +#include <linux/oid_registry.h>
->  
->  /*
->   * Cryptographic data for the public-key subtype of the asymmetric key type.
-> @@ -25,6 +26,9 @@
->  struct public_key {
->  	void *key;
->  	u32 keylen;
-> +	enum OID algo;
-> +	void *params;
-> +	u32 paramlen;
->  	bool key_is_private;
->  	const char *id_type;
->  	const char *pkey_algo;
-> diff --git a/include/linux/oid_registry.h b/include/linux/oid_registry.h
-> index d2fa9ca42e9a..e2e323fd4826 100644
-> --- a/include/linux/oid_registry.h
-> +++ b/include/linux/oid_registry.h
-> @@ -93,6 +93,12 @@ enum OID {
->  	OID_authorityKeyIdentifier,	/* 2.5.29.35 */
->  	OID_extKeyUsage,		/* 2.5.29.37 */
->  
-> +	/* EC-RDSA */
-> +	OID_gost2012PublicKey256,	/* 1.2.643.7.1.1.1.1 */
-> +	OID_gost2012PublicKey512,	/* 1.2.643.7.1.1.1.2 */
-> +	OID_gost2012Signature256,	/* 1.2.643.7.1.1.3.2 */
-> +	OID_gost2012Signature512,	/* 1.2.643.7.1.1.3.3 */
-> +
->  	OID__NR
->  };
->  
-> -- 
-> 2.11.0
+ HashKey        =3D 16*6   # store HashKey <<1 mod poly here
+ HashKey_2      =3D 16*7   # store HashKey^2 <<1 mod poly here
+ HashKey_3      =3D 16*8   # store HashKey^3 <<1 mod poly here
+@@ -585,6 +593,74 @@ _T_16\@:
+ _return_T_done\@:
+ .endm
+=20
++.macro CALC_AAD_HASH GHASH_MUL AAD AADLEN T1 T2 T3 T4 T5 T6 T7 T8
++
++	mov     \AAD, %r10                      # r10 =3D AAD
++	mov     \AADLEN, %r12                      # r12 =3D aadLen
++
++
++	mov     %r12, %r11
++
++	vpxor   \T8, \T8, \T8
++	vpxor   \T7, \T7, \T7
++	cmp     $16, %r11
++	jl      _get_AAD_rest8\@
++_get_AAD_blocks\@:
++	vmovdqu (%r10), \T7
++	vpshufb SHUF_MASK(%rip), \T7, \T7
++	vpxor   \T7, \T8, \T8
++	\GHASH_MUL       \T8, \T2, \T1, \T3, \T4, \T5, \T6
++	add     $16, %r10
++	sub     $16, %r12
++	sub     $16, %r11
++	cmp     $16, %r11
++	jge     _get_AAD_blocks\@
++	vmovdqu \T8, \T7
++	cmp     $0, %r11
++	je      _get_AAD_done\@
++
++	vpxor   \T7, \T7, \T7
++
++	/* read the last <16B of AAD. since we have at least 4B of
++	data right after the AAD (the ICV, and maybe some CT), we can
++	read 4B/8B blocks safely, and then get rid of the extra stuff */
++_get_AAD_rest8\@:
++	cmp     $4, %r11
++	jle     _get_AAD_rest4\@
++	movq    (%r10), \T1
++	add     $8, %r10
++	sub     $8, %r11
++	vpslldq $8, \T1, \T1
++	vpsrldq $8, \T7, \T7
++	vpxor   \T1, \T7, \T7
++	jmp     _get_AAD_rest8\@
++_get_AAD_rest4\@:
++	cmp     $0, %r11
++	jle      _get_AAD_rest0\@
++	mov     (%r10), %eax
++	movq    %rax, \T1
++	add     $4, %r10
++	sub     $4, %r11
++	vpslldq $12, \T1, \T1
++	vpsrldq $4, \T7, \T7
++	vpxor   \T1, \T7, \T7
++_get_AAD_rest0\@:
++	/* finalize: shift out the extra bytes we read, and align
++	left. since pslldq can only shift by an immediate, we use
++	vpshufb and an array of shuffle masks */
++	movq    %r12, %r11
++	salq    $4, %r11
++	vmovdqu  aad_shift_arr(%r11), \T1
++	vpshufb \T1, \T7, \T7
++_get_AAD_rest_final\@:
++	vpshufb SHUF_MASK(%rip), \T7, \T7
++	vpxor   \T8, \T7, \T7
++	\GHASH_MUL       \T7, \T2, \T1, \T3, \T4, \T5, \T6
++
++_get_AAD_done\@:
++        vmovdqu \T7, AadHash(arg2)
++.endm
++
+ #ifdef CONFIG_AS_AVX
+ ##########################################################################=
+#####
+ # GHASH_MUL MACRO to implement: Data*HashKey mod (128,127,126,121,0)
+@@ -701,72 +777,9 @@ _return_T_done\@:
+=20
+ .macro INITIAL_BLOCKS_AVX REP num_initial_blocks T1 T2 T3 T4 T5 CTR XMM1 X=
+MM2 XMM3 XMM4 XMM5 XMM6 XMM7 XMM8 T6 T_key ENC_DEC
+ 	i =3D (8-\num_initial_blocks)
+-	j =3D 0
+ 	setreg
++        vmovdqu AadHash(arg2), reg_i
+=20
+-	mov     arg7, %r10                      # r10 =3D AAD
+-	mov     arg8, %r12                      # r12 =3D aadLen
+-
+-
+-	mov     %r12, %r11
+-
+-	vpxor   reg_j, reg_j, reg_j
+-	vpxor   reg_i, reg_i, reg_i
+-	cmp     $16, %r11
+-	jl      _get_AAD_rest8\@
+-_get_AAD_blocks\@:
+-	vmovdqu (%r10), reg_i
+-	vpshufb SHUF_MASK(%rip), reg_i, reg_i
+-	vpxor   reg_i, reg_j, reg_j
+-	GHASH_MUL_AVX       reg_j, \T2, \T1, \T3, \T4, \T5, \T6
+-	add     $16, %r10
+-	sub     $16, %r12
+-	sub     $16, %r11
+-	cmp     $16, %r11
+-	jge     _get_AAD_blocks\@
+-	vmovdqu reg_j, reg_i
+-	cmp     $0, %r11
+-	je      _get_AAD_done\@
+-
+-	vpxor   reg_i, reg_i, reg_i
+-
+-	/* read the last <16B of AAD. since we have at least 4B of
+-	data right after the AAD (the ICV, and maybe some CT), we can
+-	read 4B/8B blocks safely, and then get rid of the extra stuff */
+-_get_AAD_rest8\@:
+-	cmp     $4, %r11
+-	jle     _get_AAD_rest4\@
+-	movq    (%r10), \T1
+-	add     $8, %r10
+-	sub     $8, %r11
+-	vpslldq $8, \T1, \T1
+-	vpsrldq $8, reg_i, reg_i
+-	vpxor   \T1, reg_i, reg_i
+-	jmp     _get_AAD_rest8\@
+-_get_AAD_rest4\@:
+-	cmp     $0, %r11
+-	jle      _get_AAD_rest0\@
+-	mov     (%r10), %eax
+-	movq    %rax, \T1
+-	add     $4, %r10
+-	sub     $4, %r11
+-	vpslldq $12, \T1, \T1
+-	vpsrldq $4, reg_i, reg_i
+-	vpxor   \T1, reg_i, reg_i
+-_get_AAD_rest0\@:
+-	/* finalize: shift out the extra bytes we read, and align
+-	left. since pslldq can only shift by an immediate, we use
+-	vpshufb and an array of shuffle masks */
+-	movq    %r12, %r11
+-	salq    $4, %r11
+-	movdqu  aad_shift_arr(%r11), \T1
+-	vpshufb \T1, reg_i, reg_i
+-_get_AAD_rest_final\@:
+-	vpshufb SHUF_MASK(%rip), reg_i, reg_i
+-	vpxor   reg_j, reg_i, reg_i
+-	GHASH_MUL_AVX       reg_i, \T2, \T1, \T3, \T4, \T5, \T6
+-
+-_get_AAD_done\@:
+ 	# initialize the data pointer offset as zero
+ 	xor     %r11d, %r11d
+=20
+@@ -1535,7 +1548,13 @@ _initial_blocks_done\@:
+ #void   aesni_gcm_precomp_avx_gen2
+ #        (gcm_data     *my_ctx_data,
+ #         gcm_context_data *data,
+-#        u8     *hash_subkey)# /* H, the Hash sub key input. Data starts o=
+n a 16-byte boundary. */
++#        u8     *hash_subkey# /* H, the Hash sub key input. Data starts on=
+ a 16-byte boundary. */
++#        u8      *iv, /* Pre-counter block j0: 4 byte salt
++#			(from Security Association) concatenated with 8 byte
++#			Initialisation Vector (from IPSec ESP Payload)
++#			concatenated with 0x00000001. 16-byte aligned pointer. */
++#        const   u8 *aad, /* Additional Authentication Data (AAD)*/
++#        u64     aad_len) /* Length of AAD in bytes. With RFC4106 this is =
+going to be 8 or 12 Bytes */
+ #############################################################
+ ENTRY(aesni_gcm_precomp_avx_gen2)
+         FUNC_SAVE
+@@ -1560,6 +1579,8 @@ ENTRY(aesni_gcm_precomp_avx_gen2)
+         vmovdqu  %xmm6, HashKey(arg2)       # store HashKey<<1 mod poly
+=20
+=20
++        CALC_AAD_HASH GHASH_MUL_AVX, arg5, arg6, %xmm2, %xmm6, %xmm3, %xmm=
+4, %xmm5, %xmm7, %xmm1, %xmm0
++
+         PRECOMPUTE_AVX  %xmm6, %xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5
+=20
+         FUNC_RESTORE
+@@ -1716,7 +1737,6 @@ ENDPROC(aesni_gcm_dec_avx_gen2)
+=20
+ .endm
+=20
+-
+ ## if a =3D number of total plaintext bytes
+ ## b =3D floor(a/16)
+ ## num_initial_blocks =3D b mod 4#
+@@ -1726,73 +1746,9 @@ ENDPROC(aesni_gcm_dec_avx_gen2)
+=20
+ .macro INITIAL_BLOCKS_AVX2 REP num_initial_blocks T1 T2 T3 T4 T5 CTR XMM1 =
+XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 XMM8 T6 T_key ENC_DEC VER
+ 	i =3D (8-\num_initial_blocks)
+-	j =3D 0
+ 	setreg
++        vmovdqu AadHash(arg2), reg_i
+=20
+-	mov     arg7, %r10                       # r10 =3D AAD
+-	mov     arg8, %r12                       # r12 =3D aadLen
+-
+-
+-	mov     %r12, %r11
+-
+-	vpxor   reg_j, reg_j, reg_j
+-	vpxor   reg_i, reg_i, reg_i
+-
+-	cmp     $16, %r11
+-	jl      _get_AAD_rest8\@
+-_get_AAD_blocks\@:
+-	vmovdqu (%r10), reg_i
+-	vpshufb SHUF_MASK(%rip), reg_i, reg_i
+-	vpxor   reg_i, reg_j, reg_j
+-	GHASH_MUL_AVX2      reg_j, \T2, \T1, \T3, \T4, \T5, \T6
+-	add     $16, %r10
+-	sub     $16, %r12
+-	sub     $16, %r11
+-	cmp     $16, %r11
+-	jge     _get_AAD_blocks\@
+-	vmovdqu reg_j, reg_i
+-	cmp     $0, %r11
+-	je      _get_AAD_done\@
+-
+-	vpxor   reg_i, reg_i, reg_i
+-
+-	/* read the last <16B of AAD. since we have at least 4B of
+-	data right after the AAD (the ICV, and maybe some CT), we can
+-	read 4B/8B blocks safely, and then get rid of the extra stuff */
+-_get_AAD_rest8\@:
+-	cmp     $4, %r11
+-	jle     _get_AAD_rest4\@
+-	movq    (%r10), \T1
+-	add     $8, %r10
+-	sub     $8, %r11
+-	vpslldq $8, \T1, \T1
+-	vpsrldq $8, reg_i, reg_i
+-	vpxor   \T1, reg_i, reg_i
+-	jmp     _get_AAD_rest8\@
+-_get_AAD_rest4\@:
+-	cmp     $0, %r11
+-	jle     _get_AAD_rest0\@
+-	mov     (%r10), %eax
+-	movq    %rax, \T1
+-	add     $4, %r10
+-	sub     $4, %r11
+-	vpslldq $12, \T1, \T1
+-	vpsrldq $4, reg_i, reg_i
+-	vpxor   \T1, reg_i, reg_i
+-_get_AAD_rest0\@:
+-	/* finalize: shift out the extra bytes we read, and align
+-	left. since pslldq can only shift by an immediate, we use
+-	vpshufb and an array of shuffle masks */
+-	movq    %r12, %r11
+-	salq    $4, %r11
+-	movdqu  aad_shift_arr(%r11), \T1
+-	vpshufb \T1, reg_i, reg_i
+-_get_AAD_rest_final\@:
+-	vpshufb SHUF_MASK(%rip), reg_i, reg_i
+-	vpxor   reg_j, reg_i, reg_i
+-	GHASH_MUL_AVX2      reg_i, \T2, \T1, \T3, \T4, \T5, \T6
+-
+-_get_AAD_done\@:
+ 	# initialize the data pointer offset as zero
+ 	xor     %r11d, %r11d
+=20
+@@ -2581,8 +2537,13 @@ _initial_blocks_done\@:
+ #void   aesni_gcm_precomp_avx_gen4
+ #        (gcm_data     *my_ctx_data,
+ #         gcm_context_data *data,
+-#        u8     *hash_subkey)# /* H, the Hash sub key input.
+-#				Data starts on a 16-byte boundary. */
++#        u8     *hash_subkey# /* H, the Hash sub key input. Data starts on=
+ a 16-byte boundary. */
++#        u8      *iv, /* Pre-counter block j0: 4 byte salt
++#			(from Security Association) concatenated with 8 byte
++#			Initialisation Vector (from IPSec ESP Payload)
++#			concatenated with 0x00000001. 16-byte aligned pointer. */
++#        const   u8 *aad, /* Additional Authentication Data (AAD)*/
++#        u64     aad_len) /* Length of AAD in bytes. With RFC4106 this is =
+going to be 8 or 12 Bytes */
+ #############################################################
+ ENTRY(aesni_gcm_precomp_avx_gen4)
+         FUNC_SAVE
+@@ -2606,6 +2567,7 @@ ENTRY(aesni_gcm_precomp_avx_gen4)
+         ##################################################################=
+#####
+         vmovdqu  %xmm6, HashKey(arg2)         # store HashKey<<1 mod poly
+=20
++        CALC_AAD_HASH GHASH_MUL_AVX2, arg5, arg6, %xmm2, %xmm6, %xmm3, %xm=
+m4, %xmm5, %xmm7, %xmm1, %xmm0
+=20
+         PRECOMPUTE_AVX2  %xmm6, %xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5
+=20
+diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-int=
+el_glue.c
+index 7d1259feb0f9..2648842f1c3f 100644
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -189,7 +189,10 @@ asmlinkage void aes_ctr_enc_256_avx_by8(const u8 *in, =
+u8 *iv,
+  */
+ asmlinkage void aesni_gcm_precomp_avx_gen2(void *my_ctx_data,
+ 					   struct gcm_context_data *gdata,
+-					   u8 *hash_subkey);
++					   u8 *hash_subkey,
++					   u8 *iv,
++					   const u8 *aad,
++					   unsigned long aad_len);
+=20
+ asmlinkage void aesni_gcm_enc_avx_gen2(void *ctx,
+ 				struct gcm_context_data *gdata, u8 *out,
+@@ -214,7 +217,8 @@ static void aesni_gcm_enc_avx(void *ctx,
+ 			plaintext_len, iv, hash_subkey, aad,
+ 			aad_len, auth_tag, auth_tag_len);
+ 	} else {
+-		aesni_gcm_precomp_avx_gen2(ctx, data, hash_subkey);
++		aesni_gcm_precomp_avx_gen2(ctx, data, hash_subkey, iv,
++					   aad, aad_len);
+ 		aesni_gcm_enc_avx_gen2(ctx, data, out, in, plaintext_len, iv,
+ 				       aad, aad_len, auth_tag, auth_tag_len);
+ 	}
+@@ -231,7 +235,8 @@ static void aesni_gcm_dec_avx(void *ctx,
+ 			ciphertext_len, iv, hash_subkey, aad,
+ 			aad_len, auth_tag, auth_tag_len);
+ 	} else {
+-		aesni_gcm_precomp_avx_gen2(ctx, data, hash_subkey);
++		aesni_gcm_precomp_avx_gen2(ctx, data, hash_subkey, iv,
++					   aad, aad_len);
+ 		aesni_gcm_dec_avx_gen2(ctx, data, out, in, ciphertext_len, iv,
+ 				       aad, aad_len, auth_tag, auth_tag_len);
+ 	}
+@@ -246,7 +251,10 @@ static void aesni_gcm_dec_avx(void *ctx,
+  */
+ asmlinkage void aesni_gcm_precomp_avx_gen4(void *my_ctx_data,
+ 					   struct gcm_context_data *gdata,
+-					   u8 *hash_subkey);
++					   u8 *hash_subkey,
++					   u8 *iv,
++					   const u8 *aad,
++					   unsigned long aad_len);
+=20
+ asmlinkage void aesni_gcm_enc_avx_gen4(void *ctx,
+ 				struct gcm_context_data *gdata, u8 *out,
+@@ -271,11 +279,13 @@ static void aesni_gcm_enc_avx2(void *ctx,
+ 			      plaintext_len, iv, hash_subkey, aad,
+ 			      aad_len, auth_tag, auth_tag_len);
+ 	} else if (plaintext_len < AVX_GEN4_OPTSIZE) {
+-		aesni_gcm_precomp_avx_gen2(ctx, data, hash_subkey);
++		aesni_gcm_precomp_avx_gen2(ctx, data, hash_subkey, iv,
++					   aad, aad_len);
+ 		aesni_gcm_enc_avx_gen2(ctx, data, out, in, plaintext_len, iv,
+ 				       aad, aad_len, auth_tag, auth_tag_len);
+ 	} else {
+-		aesni_gcm_precomp_avx_gen4(ctx, data, hash_subkey);
++		aesni_gcm_precomp_avx_gen4(ctx, data, hash_subkey, iv,
++					   aad, aad_len);
+ 		aesni_gcm_enc_avx_gen4(ctx, data, out, in, plaintext_len, iv,
+ 				       aad, aad_len, auth_tag, auth_tag_len);
+ 	}
+@@ -292,11 +302,13 @@ static void aesni_gcm_dec_avx2(void *ctx,
+ 			      ciphertext_len, iv, hash_subkey,
+ 			      aad, aad_len, auth_tag, auth_tag_len);
+ 	} else if (ciphertext_len < AVX_GEN4_OPTSIZE) {
+-		aesni_gcm_precomp_avx_gen2(ctx, data, hash_subkey);
++		aesni_gcm_precomp_avx_gen2(ctx, data, hash_subkey, iv,
++					   aad, aad_len);
+ 		aesni_gcm_dec_avx_gen2(ctx, data, out, in, ciphertext_len, iv,
+ 				       aad, aad_len, auth_tag, auth_tag_len);
+ 	} else {
+-		aesni_gcm_precomp_avx_gen4(ctx, data, hash_subkey);
++		aesni_gcm_precomp_avx_gen4(ctx, data, hash_subkey, iv,
++					   aad, aad_len);
+ 		aesni_gcm_dec_avx_gen4(ctx, data, out, in, ciphertext_len, iv,
+ 				       aad, aad_len, auth_tag, auth_tag_len);
+ 	}
+--=20
+2.17.1
