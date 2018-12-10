@@ -1,221 +1,55 @@
-Return-Path: <SRS0=9Gyh=PA=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:34147 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732378AbeLWBQR (ORCPT
+Return-Path: <SRS0=ZXsK=OT=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:54473 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726261AbeLJXuD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 22 Dec 2018 20:16:17 -0500
-Received: by mail-wr1-f66.google.com with SMTP id j2so8780388wrw.1
-        for <linux-crypto@vger.kernel.org>; Sat, 22 Dec 2018 17:16:16 -0800 (PST)
-From: Christian Lamparter <chunkeey@gmail.com>
-To: linux-crypto@vger.kernel.org
-Cc: "David S . Miller" <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH] crypto4xx: add prng crypto support
-Date: Sun, 23 Dec 2018 02:16:13 +0100
-Message-Id: <20181223011613.24145-1-chunkeey@gmail.com>
+        Mon, 10 Dec 2018 18:50:03 -0500
+From: Nathan Chancellor <natechancellor@gmail.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Nathan Chancellor <natechancellor@gmail.com>
+Subject: [PATCH] crypto: ux500 - Use proper enum in hash_set_dma_transfer
+Date: Mon, 10 Dec 2018 16:49:54 -0700
+Message-Id: <20181210234954.5862-1-natechancellor@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch adds support for crypto4xx's ANSI X9.17 Annex C compliant
-pseudo random number generator which provides a pseudo random source
-for the purpose of generating  Initialization Vectors (IV's) for AES
-algorithms to the Packet Engine and other pseudo random number
-requirements.
+Clang warns when one enumerated type is implicitly converted to another:
 
-Signed-off-by: Christian Lamparter <chunkeey@gmail.com>
+drivers/crypto/ux500/hash/hash_core.c:169:4: warning: implicit
+conversion from enumeration type 'enum dma_data_direction' to different
+enumeration type 'enum dma_transfer_direction' [-Wenum-conversion]
+                        direction, DMA_CTRL_ACK | DMA_PREP_INTERRUPT);
+                        ^~~~~~~~~
+1 warning generated.
+
+dmaengine_prep_slave_sg expects an enum from dma_transfer_direction.
+We know that the only direction supported by this function is
+DMA_TO_DEVICE because of the check at the top of this function so we can
+just use the equivalent value from dma_transfer_direction.
+
+DMA_TO_DEVICE = DMA_MEM_TO_DEV = 1
+
+Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
 ---
- drivers/crypto/amcc/crypto4xx_core.c    | 87 +++++++++++++++++++++++++
- drivers/crypto/amcc/crypto4xx_core.h    |  4 ++
- drivers/crypto/amcc/crypto4xx_reg_def.h |  1 +
- 3 files changed, 92 insertions(+)
+ drivers/crypto/ux500/hash/hash_core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/amcc/crypto4xx_core.c b/drivers/crypto/amcc/crypto4xx_core.c
-index 6eaec9ba0f68..59ee52e8e258 100644
---- a/drivers/crypto/amcc/crypto4xx_core.c
-+++ b/drivers/crypto/amcc/crypto4xx_core.c
-@@ -40,9 +40,11 @@
- #include <crypto/ctr.h>
- #include <crypto/gcm.h>
- #include <crypto/sha.h>
-+#include <crypto/rng.h>
- #include <crypto/scatterwalk.h>
- #include <crypto/skcipher.h>
- #include <crypto/internal/aead.h>
-+#include <crypto/internal/rng.h>
- #include <crypto/internal/skcipher.h>
- #include "crypto4xx_reg_def.h"
- #include "crypto4xx_core.h"
-@@ -1035,6 +1037,10 @@ static int crypto4xx_register_alg(struct crypto4xx_device *sec_dev,
- 			rc = crypto_register_ahash(&alg->alg.u.hash);
- 			break;
- 
-+		case CRYPTO_ALG_TYPE_RNG:
-+			rc = crypto_register_rng(&alg->alg.u.rng);
-+			break;
-+
- 		default:
- 			rc = crypto_register_skcipher(&alg->alg.u.cipher);
- 			break;
-@@ -1064,6 +1070,10 @@ static void crypto4xx_unregister_alg(struct crypto4xx_device *sec_dev)
- 			crypto_unregister_aead(&alg->alg.u.aead);
- 			break;
- 
-+		case CRYPTO_ALG_TYPE_RNG:
-+			crypto_unregister_rng(&alg->alg.u.rng);
-+			break;
-+
- 		default:
- 			crypto_unregister_skcipher(&alg->alg.u.cipher);
- 		}
-@@ -1122,6 +1132,69 @@ static irqreturn_t crypto4xx_ce_interrupt_handler_revb(int irq, void *data)
- 		PPC4XX_TMO_ERR_INT);
- }
- 
-+static int ppc4xx_prng_data_read(struct crypto4xx_device *dev,
-+				 u8 *data, unsigned int max)
-+{
-+	unsigned int i, curr = 0;
-+	u32 val[2];
-+
-+	do {
-+		/* trigger PRN generation */
-+		writel(PPC4XX_PRNG_CTRL_AUTO_EN,
-+		       dev->ce_base + CRYPTO4XX_PRNG_CTRL);
-+
-+		for (i = 0; i < 1024; i++) {
-+			/* usually 19 iterations are enough */
-+			if ((readl(dev->ce_base + CRYPTO4XX_PRNG_STAT) &
-+			     CRYPTO4XX_PRNG_STAT_BUSY))
-+				continue;
-+
-+			val[0] = readl_be(dev->ce_base + CRYPTO4XX_PRNG_RES_0);
-+			val[1] = readl_be(dev->ce_base + CRYPTO4XX_PRNG_RES_1);
-+			break;
-+		}
-+		if (i == 1024)
-+			return -ETIMEDOUT;
-+
-+		if ((max - curr) >= 8) {
-+			memcpy(data, &val, 8);
-+			data += 8;
-+			curr += 8;
-+		} else {
-+			/* copy only remaining bytes */
-+			memcpy(data, &val, max - curr);
-+			break;
-+		}
-+	} while (curr < max);
-+
-+	return curr;
-+}
-+
-+static int crypto4xx_prng_generate(struct crypto_rng *tfm,
-+				   const u8 *src, unsigned int slen,
-+				   u8 *dstn, unsigned int dlen)
-+{
-+	struct rng_alg *alg = crypto_rng_alg(tfm);
-+	struct crypto4xx_alg *amcc_alg;
-+	struct crypto4xx_device *dev;
-+	int ret;
-+
-+	amcc_alg = container_of(alg, struct crypto4xx_alg, alg.u.rng);
-+	dev = amcc_alg->dev;
-+
-+	mutex_lock(&dev->core_dev->rng_lock);
-+	ret = ppc4xx_prng_data_read(dev, dstn, dlen);
-+	mutex_unlock(&dev->core_dev->rng_lock);
-+	return ret;
-+}
-+
-+
-+static int crypto4xx_prng_seed(struct crypto_rng *tfm, const u8 *seed,
-+			unsigned int slen)
-+{
-+	return 0;
-+}
-+
- /**
-  * Supported Crypto Algorithms
-  */
-@@ -1291,6 +1364,18 @@ static struct crypto4xx_alg_common crypto4xx_alg[] = {
- 			.cra_module	= THIS_MODULE,
- 		},
- 	} },
-+	{ .type = CRYPTO_ALG_TYPE_RNG, .u.rng = {
-+		.base = {
-+			.cra_name		= "stdrng",
-+			.cra_driver_name        = "crypto4xx_rng",
-+			.cra_priority		= 300,
-+			.cra_ctxsize		= 0,
-+			.cra_module		= THIS_MODULE,
-+		},
-+		.generate               = crypto4xx_prng_generate,
-+		.seed                   = crypto4xx_prng_seed,
-+		.seedsize               = 0,
-+	} },
- };
- 
- /**
-@@ -1360,6 +1445,7 @@ static int crypto4xx_probe(struct platform_device *ofdev)
- 	core_dev->dev->core_dev = core_dev;
- 	core_dev->dev->is_revb = is_revb;
- 	core_dev->device = dev;
-+	mutex_init(&core_dev->rng_lock);
- 	spin_lock_init(&core_dev->lock);
- 	INIT_LIST_HEAD(&core_dev->dev->alg_list);
- 	ratelimit_default_init(&core_dev->dev->aead_ratelimit);
-@@ -1439,6 +1525,7 @@ static int crypto4xx_remove(struct platform_device *ofdev)
- 	tasklet_kill(&core_dev->tasklet);
- 	/* Un-register with Linux CryptoAPI */
- 	crypto4xx_unregister_alg(core_dev->dev);
-+	mutex_destroy(&core_dev->rng_lock);
- 	/* Free all allocated memory */
- 	crypto4xx_stop_all(core_dev);
- 
-diff --git a/drivers/crypto/amcc/crypto4xx_core.h b/drivers/crypto/amcc/crypto4xx_core.h
-index e2ca56722f07..18df695ca6b1 100644
---- a/drivers/crypto/amcc/crypto4xx_core.h
-+++ b/drivers/crypto/amcc/crypto4xx_core.h
-@@ -23,8 +23,10 @@
- #define __CRYPTO4XX_CORE_H__
- 
- #include <linux/ratelimit.h>
-+#include <linux/mutex.h>
- #include <crypto/internal/hash.h>
- #include <crypto/internal/aead.h>
-+#include <crypto/internal/rng.h>
- #include <crypto/internal/skcipher.h>
- #include "crypto4xx_reg_def.h"
- #include "crypto4xx_sa.h"
-@@ -119,6 +121,7 @@ struct crypto4xx_core_device {
- 	u32 irq;
- 	struct tasklet_struct tasklet;
- 	spinlock_t lock;
-+	struct mutex rng_lock;
- };
- 
- struct crypto4xx_ctx {
-@@ -143,6 +146,7 @@ struct crypto4xx_alg_common {
- 		struct skcipher_alg cipher;
- 		struct ahash_alg hash;
- 		struct aead_alg aead;
-+		struct rng_alg rng;
- 	} u;
- };
- 
-diff --git a/drivers/crypto/amcc/crypto4xx_reg_def.h b/drivers/crypto/amcc/crypto4xx_reg_def.h
-index 472331787e04..80c67490bbf6 100644
---- a/drivers/crypto/amcc/crypto4xx_reg_def.h
-+++ b/drivers/crypto/amcc/crypto4xx_reg_def.h
-@@ -100,6 +100,7 @@
- #define CRYPTO4XX_ENDIAN_CFG			0x000600d8
- 
- #define CRYPTO4XX_PRNG_STAT			0x00070000
-+#define CRYPTO4XX_PRNG_STAT_BUSY		0x1
- #define CRYPTO4XX_PRNG_CTRL			0x00070004
- #define CRYPTO4XX_PRNG_SEED_L			0x00070008
- #define CRYPTO4XX_PRNG_SEED_H			0x0007000c
+diff --git a/drivers/crypto/ux500/hash/hash_core.c b/drivers/crypto/ux500/hash/hash_core.c
+index 633321a8dd03..a0bb8a6eec3f 100644
+--- a/drivers/crypto/ux500/hash/hash_core.c
++++ b/drivers/crypto/ux500/hash/hash_core.c
+@@ -166,7 +166,7 @@ static int hash_set_dma_transfer(struct hash_ctx *ctx, struct scatterlist *sg,
+ 		__func__);
+ 	desc = dmaengine_prep_slave_sg(channel,
+ 			ctx->device->dma.sg, ctx->device->dma.sg_len,
+-			direction, DMA_CTRL_ACK | DMA_PREP_INTERRUPT);
++			DMA_MEM_TO_DEV, DMA_CTRL_ACK | DMA_PREP_INTERRUPT);
+ 	if (!desc) {
+ 		dev_err(ctx->device->dev,
+ 			"%s: dmaengine_prep_slave_sg() failed!\n", __func__);
 -- 
-2.20.1
+2.20.0
