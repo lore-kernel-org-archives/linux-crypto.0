@@ -1,51 +1,61 @@
-Return-Path: <SRS0=eKEb=OU=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from stargate.chelsio.com ([12.32.117.8]:57727 "EHLO
-        stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726114AbeLKKwM (ORCPT
+Return-Path: <SRS0=ZXsK=OT=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:47522 "EHLO
+        mx0b-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728036AbeLJT6q (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Dec 2018 05:52:12 -0500
-From: Harsh Jain <harsh@chelsio.com>
-To: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        atul.gupta@chelsio.com, indranil@chelsio.com
-Cc: Harsh Jain <harsh@chelsio.com>
-Subject: [PATCH 5/6] crypto:chelsio: Reset counters on cxgb4 Detach
-Date: Tue, 11 Dec 2018 16:21:41 +0530
-Message-Id: <beb0c0ec53425b33d19b48464453bd1872707bc4.1544520025.git.harsh@chelsio.com>
-In-Reply-To: <cover.1544520025.git.harsh@chelsio.com>
-References: <cover.1544520025.git.harsh@chelsio.com>
-In-Reply-To: <cover.1544520025.git.harsh@chelsio.com>
-References: <cover.1544520025.git.harsh@chelsio.com>
+        Mon, 10 Dec 2018 14:58:46 -0500
+From: Dave Watson <davejwatson@fb.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        Junaid Shahid <junaids@google.com>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+CC: Doron Roberts-Kedes <doronrk@fb.com>,
+        Sabrina Dubroca <sd@queasysnail.net>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH 05/12] x86/crypto: aesni: Add GCM_COMPLETE macro
+Date: Mon, 10 Dec 2018 19:57:49 +0000
+Message-ID: <85c7157eb2c38a3bd0d39e17a8156e451fcd13e2.1544471415.git.davejwatson@fb.com>
+References: <cover.1544471415.git.davejwatson@fb.com>
+In-Reply-To: <cover.1544471415.git.davejwatson@fb.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <BE0B978C3C5C3943A0A68A63FC9D3AAA@namprd15.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Reset the counters on receiving detach from Cxgb4.
+Merge encode and decode tag calculations in GCM_COMPLETE macro.
+Scatter/gather routines will call this once at the end of encryption
+or decryption.
 
-Signed-off-by: Atul Gupta <atul.gupta@chelsio.com>
+Signed-off-by: Dave Watson <davejwatson@fb.com>
 ---
- drivers/crypto/chelsio/chcr_core.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ arch/x86/crypto/aesni-intel_avx-x86_64.S | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/drivers/crypto/chelsio/chcr_core.c b/drivers/crypto/chelsio/chcr_core.c
-index f71a979..e04b3e8 100644
---- a/drivers/crypto/chelsio/chcr_core.c
-+++ b/drivers/crypto/chelsio/chcr_core.c
-@@ -132,6 +132,8 @@ static void chcr_dev_init(struct uld_ctx *u_ctx)
- 
- static int chcr_dev_move(struct uld_ctx *u_ctx)
- {
-+	struct adapter *adap;
+diff --git a/arch/x86/crypto/aesni-intel_avx-x86_64.S b/arch/x86/crypto/aes=
+ni-intel_avx-x86_64.S
+index 2aa11c503bb9..8e9ae4b26118 100644
+--- a/arch/x86/crypto/aesni-intel_avx-x86_64.S
++++ b/arch/x86/crypto/aesni-intel_avx-x86_64.S
+@@ -510,6 +510,14 @@ _less_than_8_bytes_left\@:
+         #############################
+=20
+ _multiple_of_16_bytes\@:
++        GCM_COMPLETE \GHASH_MUL \REP
++.endm
 +
- 	 mutex_lock(&drv_data.drv_mutex);
- 	if (drv_data.last_dev == u_ctx) {
- 		if (list_is_last(&drv_data.last_dev->entry, &drv_data.act_dev))
-@@ -144,6 +146,8 @@ static int chcr_dev_move(struct uld_ctx *u_ctx)
- 	list_move(&u_ctx->entry, &drv_data.inact_dev);
- 	if (list_empty(&drv_data.act_dev))
- 		drv_data.last_dev = NULL;
-+	adap = padap(&u_ctx->dev);
-+	memset(&adap->chcr_stats, 0, sizeof(adap->chcr_stats));
- 	atomic_dec(&drv_data.dev_count);
- 	mutex_unlock(&drv_data.drv_mutex);
- 
--- 
-2.1.4
++
++# GCM_COMPLETE Finishes update of tag of last partial block
++# Output: Authorization Tag (AUTH_TAG)
++# Clobbers rax, r10-r12, and xmm0, xmm1, xmm5-xmm15
++.macro GCM_COMPLETE GHASH_MUL REP
+         mov     arg8, %r12                           # r12 =3D aadLen (num=
+ber of bytes)
+         shl     $3, %r12                             # convert into number=
+ of bits
+         vmovd   %r12d, %xmm15                        # len(A) in xmm15
+--=20
+2.17.1
