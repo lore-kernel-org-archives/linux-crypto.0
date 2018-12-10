@@ -1,231 +1,202 @@
-Return-Path: <SRS0=eKEb=OU=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from vmicros1.altlinux.org ([194.107.17.57]:43632 "EHLO
-        vmicros1.altlinux.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726714AbeLKQ77 (ORCPT
+Return-Path: <SRS0=ZXsK=OT=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:54974 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726699AbeLJT7b (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Dec 2018 11:59:59 -0500
-From: Vitaly Chikunov <vt@altlinux.org>
-To: David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [RFC PATCH] akcipher: Introduce verify2 for public key algorithms
-Date: Tue, 11 Dec 2018 19:59:38 +0300
-Message-Id: <20181211165938.1150-1-vt@altlinux.org>
+        Mon, 10 Dec 2018 14:59:31 -0500
+From: Dave Watson <davejwatson@fb.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        Junaid Shahid <junaids@google.com>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+CC: Doron Roberts-Kedes <doronrk@fb.com>,
+        Sabrina Dubroca <sd@queasysnail.net>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH 08/12] x86/crypto: aesni: Fill in new context data structures
+Date: Mon, 10 Dec 2018 19:58:56 +0000
+Message-ID: <8104eaf3639f9c70ced8d4867e572d6a1182afd2.1544471415.git.davejwatson@fb.com>
+References: <cover.1544471415.git.davejwatson@fb.com>
+In-Reply-To: <cover.1544471415.git.davejwatson@fb.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3D83259952139E418754B441A59A0A77@namprd15.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Current akcipher .verify() just decrypts signature to uncover message
-hash, which is then verified in upper level public_key_verify_signature
-by memcmp with the expected signature value, which is never passed into
-verify().
+Fill in aadhash, aadlen, pblocklen, curcount with appropriate values.
+pblocklen, aadhash, and pblockenckey are also updated at the end
+of each scatter/gather operation, to be carried over to the next
+operation.
 
-This approach is incompatible with ECDSA algorithms, because, to verify
-a signature ECDSA algorithm also needs a hash value as input; also, hash
-is used in ECDSA (together with a signature divided into halves `r||s`),
-not to produce hash, but to produce a number, which is then compared to
-`r` (first part of the signature) to determine if the signature is
-correct.  Thus, for ECDSA, nor requirements of .verify() itself, nor its
-output expectations in public_key_verify_signature aren't satisfied.
-
-Make alternative .verify2() call which gets hash value and produce
-complete signature check (without any output, thus max_size() call will
-not be needed for verify2() operation).
-
-If .verify2() call is present, it should be used in place of .verify().
-
-Signed-off-by: Vitaly Chikunov <vt@altlinux.org>
+Signed-off-by: Dave Watson <davejwatson@fb.com>
 ---
- crypto/asymmetric_keys/public_key.c | 57 ++++++++++++++++++++++++-------------
- include/crypto/akcipher.h           | 54 +++++++++++++++++++++++++++++++++--
- 2 files changed, 89 insertions(+), 22 deletions(-)
+ arch/x86/crypto/aesni-intel_avx-x86_64.S | 51 +++++++++++++++++-------
+ 1 file changed, 37 insertions(+), 14 deletions(-)
 
-diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
-index 3bc090b8adef..51dc1c858c7c 100644
---- a/crypto/asymmetric_keys/public_key.c
-+++ b/crypto/asymmetric_keys/public_key.c
-@@ -242,6 +242,7 @@ int public_key_verify_signature(const struct public_key *pkey,
- 	char alg_name[CRYPTO_MAX_ALG_NAME];
- 	void *output;
- 	unsigned int outlen;
-+	int verify2;
- 	int ret;
- 
- 	pr_devel("==>%s()\n", __func__);
-@@ -279,14 +280,23 @@ int public_key_verify_signature(const struct public_key *pkey,
- 	if (ret)
- 		goto error_free_req;
- 
--	ret = -ENOMEM;
--	outlen = crypto_akcipher_maxsize(tfm);
--	output = kmalloc(outlen, GFP_KERNEL);
--	if (!output)
--		goto error_free_req;
+diff --git a/arch/x86/crypto/aesni-intel_avx-x86_64.S b/arch/x86/crypto/aes=
+ni-intel_avx-x86_64.S
+index e347ba61db65..0a9cdcfdd987 100644
+--- a/arch/x86/crypto/aesni-intel_avx-x86_64.S
++++ b/arch/x86/crypto/aesni-intel_avx-x86_64.S
+@@ -297,7 +297,9 @@ VARIABLE_OFFSET =3D 16*8
+ # clobbering all xmm registers
+ # clobbering r10, r11, r12, r13, r14, r15
+ .macro  GCM_ENC_DEC INITIAL_BLOCKS GHASH_8_ENCRYPT_8_PARALLEL GHASH_LAST_8=
+ GHASH_MUL ENC_DEC REP
++        vmovdqu AadHash(arg2), %xmm8
+         vmovdqu  HashKey(arg2), %xmm13      # xmm13 =3D HashKey
++        add arg5, InLen(arg2)
+=20
+         mov     arg5, %r13                  # save the number of bytes of =
+plaintext/ciphertext
+         and     $-16, %r13                  # r13 =3D r13 - (r13 mod 16)
+@@ -410,6 +412,9 @@ _eight_cipher_left\@:
+=20
+=20
+ _zero_cipher_left\@:
++        vmovdqu %xmm14, AadHash(arg2)
++        vmovdqu %xmm9, CurCount(arg2)
++
+         cmp     $16, arg5
+         jl      _only_less_than_16\@
+=20
+@@ -420,10 +425,14 @@ _zero_cipher_left\@:
+=20
+         # handle the last <16 Byte block seperately
+=20
++        mov %r13, PBlockLen(arg2)
+=20
+         vpaddd   ONE(%rip), %xmm9, %xmm9             # INCR CNT to get Yn
++        vmovdqu %xmm9, CurCount(arg2)
+         vpshufb SHUF_MASK(%rip), %xmm9, %xmm9
++
+         ENCRYPT_SINGLE_BLOCK    \REP, %xmm9                # E(K, Yn)
++        vmovdqu %xmm9, PBlockEncKey(arg2)
+=20
+         sub     $16, %r11
+         add     %r13, %r11
+@@ -451,6 +460,7 @@ _only_less_than_16\@:
+         vpshufb SHUF_MASK(%rip), %xmm9, %xmm9
+         ENCRYPT_SINGLE_BLOCK    \REP, %xmm9                # E(K, Yn)
+=20
++        vmovdqu %xmm9, PBlockEncKey(arg2)
+=20
+         lea     SHIFT_MASK+16(%rip), %r12
+         sub     %r13, %r12                           # adjust the shuffle =
+mask pointer to be
+@@ -480,6 +490,7 @@ _final_ghash_mul\@:
+         vpxor   %xmm2, %xmm14, %xmm14
+ 	#GHASH computation for the last <16 Byte block
+         \GHASH_MUL       %xmm14, %xmm13, %xmm0, %xmm10, %xmm11, %xmm5, %xm=
+m6
++        vmovdqu %xmm14, AadHash(arg2)
+         sub     %r13, %r11
+         add     $16, %r11
+         .else
+@@ -491,6 +502,7 @@ _final_ghash_mul\@:
+         vpxor   %xmm9, %xmm14, %xmm14
+ 	#GHASH computation for the last <16 Byte block
+         \GHASH_MUL       %xmm14, %xmm13, %xmm0, %xmm10, %xmm11, %xmm5, %xm=
+m6
++        vmovdqu %xmm14, AadHash(arg2)
+         sub     %r13, %r11
+         add     $16, %r11
+         vpshufb SHUF_MASK(%rip), %xmm9, %xmm9        # shuffle xmm9 back t=
+o output as ciphertext
+@@ -526,12 +538,16 @@ _multiple_of_16_bytes\@:
+ # Output: Authorization Tag (AUTH_TAG)
+ # Clobbers rax, r10-r12, and xmm0, xmm1, xmm5-xmm15
+ .macro GCM_COMPLETE GHASH_MUL REP
+-        mov     arg8, %r12                           # r12 =3D aadLen (num=
+ber of bytes)
++        vmovdqu AadHash(arg2), %xmm14
++        vmovdqu HashKey(arg2), %xmm13
++
++        mov AadLen(arg2), %r12                          # r12 =3D aadLen (=
+number of bytes)
+         shl     $3, %r12                             # convert into number=
+ of bits
+         vmovd   %r12d, %xmm15                        # len(A) in xmm15
+=20
+-        shl     $3, arg5                             # len(C) in bits  (*1=
+28)
+-        vmovq   arg5, %xmm1
++        mov InLen(arg2), %r12
++        shl     $3, %r12                        # len(C) in bits  (*128)
++        vmovq   %r12, %xmm1
+         vpslldq $8, %xmm15, %xmm15                   # xmm15 =3D len(A)|| =
+0x0000000000000000
+         vpxor   %xmm1, %xmm15, %xmm15                # xmm15 =3D len(A)||l=
+en(C)
+=20
+@@ -539,8 +555,7 @@ _multiple_of_16_bytes\@:
+         \GHASH_MUL       %xmm14, %xmm13, %xmm0, %xmm10, %xmm11, %xmm5, %xm=
+m6    # final GHASH computation
+         vpshufb SHUF_MASK(%rip), %xmm14, %xmm14      # perform a 16Byte sw=
+ap
+=20
+-        mov     arg6, %rax                           # rax =3D *Y0
+-        vmovdqu (%rax), %xmm9                        # xmm9 =3D Y0
++        vmovdqu OrigIV(arg2), %xmm9
+=20
+         ENCRYPT_SINGLE_BLOCK    \REP, %xmm9                # E(K, Y0)
+=20
+@@ -662,6 +677,20 @@ _get_AAD_done\@:
+ .endm
+=20
+ .macro INIT GHASH_MUL PRECOMPUTE
++        mov arg6, %r11
++        mov %r11, AadLen(arg2) # ctx_data.aad_length =3D aad_length
++        xor %r11d, %r11d
++        mov %r11, InLen(arg2) # ctx_data.in_length =3D 0
++
++        mov %r11, PBlockLen(arg2) # ctx_data.partial_block_length =3D 0
++        mov %r11, PBlockEncKey(arg2) # ctx_data.partial_block_enc_key =3D =
+0
++        mov arg4, %rax
++        movdqu (%rax), %xmm0
++        movdqu %xmm0, OrigIV(arg2) # ctx_data.orig_IV =3D iv
++
++        vpshufb SHUF_MASK(%rip), %xmm0, %xmm0
++        movdqu %xmm0, CurCount(arg2) # ctx_data.current_counter =3D iv
++
+         vmovdqu  (arg3), %xmm6              # xmm6 =3D HashKey
+=20
+         vpshufb  SHUF_MASK(%rip), %xmm6, %xmm6
+@@ -809,10 +838,7 @@ _get_AAD_done\@:
+ 	xor     %r11d, %r11d
+=20
+ 	# start AES for num_initial_blocks blocks
+-	mov     arg6, %rax                     # rax =3D *Y0
+-	vmovdqu (%rax), \CTR                   # CTR =3D Y0
+-	vpshufb SHUF_MASK(%rip), \CTR, \CTR
 -
-+	verify2 = crypto_akcipher_have_verify2(req);
-+	if (!verify2) {
-+		/* verify2 does not need output buffer */
-+		ret = -ENOMEM;
-+		outlen = crypto_akcipher_maxsize(tfm);
-+		output = kmalloc(outlen, GFP_KERNEL);
-+		if (!output)
-+			goto error_free_req;
-+
-+		sg_init_one(&digest_sg, output, outlen);
-+	} else {
-+		/* dummy init digest_sg */
-+		memset(&digest_sg, 0, sizeof(digest_sg));
-+		output = NULL;
-+		outlen = 0;
-+	}
- 	sg_init_one(&sig_sg, sig->s, sig->s_size);
--	sg_init_one(&digest_sg, output, outlen);
- 	akcipher_request_set_crypt(req, &sig_sg, &digest_sg, sig->s_size,
- 				   outlen);
- 	crypto_init_wait(&cwait);
-@@ -294,18 +304,27 @@ int public_key_verify_signature(const struct public_key *pkey,
- 				      CRYPTO_TFM_REQ_MAY_SLEEP,
- 				      crypto_req_done, &cwait);
- 
--	/* Perform the verification calculation.  This doesn't actually do the
--	 * verification, but rather calculates the hash expected by the
--	 * signature and returns that to us.
--	 */
--	ret = crypto_wait_req(crypto_akcipher_verify(req), &cwait);
--	if (ret)
--		goto out_free_output;
++	vmovdqu CurCount(arg2), \CTR
+=20
+ 	i =3D (9-\num_initial_blocks)
+ 	setreg
+@@ -1748,16 +1774,13 @@ ENDPROC(aesni_gcm_dec_avx_gen2)
+ .macro INITIAL_BLOCKS_AVX2 REP num_initial_blocks T1 T2 T3 T4 T5 CTR XMM1 =
+XMM2 XMM3 XMM4 XMM5 XMM6 XMM7 XMM8 T6 T_key ENC_DEC VER
+ 	i =3D (8-\num_initial_blocks)
+ 	setreg
+-        vmovdqu AadHash(arg2), reg_i
++	vmovdqu AadHash(arg2), reg_i
+=20
+ 	# initialize the data pointer offset as zero
+ 	xor     %r11d, %r11d
+=20
+ 	# start AES for num_initial_blocks blocks
+-	mov     arg6, %rax                     # rax =3D *Y0
+-	vmovdqu (%rax), \CTR                   # CTR =3D Y0
+-	vpshufb SHUF_MASK(%rip), \CTR, \CTR
 -
--	/* Do the actual verification step. */
--	if (req->dst_len != sig->digest_size ||
--	    memcmp(sig->digest, output, sig->digest_size) != 0)
--		ret = -EKEYREJECTED;
-+	if (!verify2) {
-+		/* Perform the verification calculation.  This doesn't actually
-+		 * do the verification, but rather calculates the hash expected
-+		 * by the signature and returns that to us.
-+		 */
-+		ret = crypto_wait_req(crypto_akcipher_verify(req), &cwait);
-+		if (ret)
-+			goto out_free_output;
-+
-+		/* Do the actual verification step. */
-+		if (req->dst_len != sig->digest_size ||
-+		    memcmp(sig->digest, output, sig->digest_size) != 0)
-+			ret = -EKEYREJECTED;
-+	} else {
-+		/* Perform full verification in one call. */
-+		req->digest = sig->digest;
-+		req->digest_len = sig->digest_size;
-+		ret = crypto_wait_req(crypto_akcipher_verify2(req), &cwait);
-+		if (ret)
-+			goto out_free_output;
-+	}
- 
- out_free_output:
- 	kfree(output);
-diff --git a/include/crypto/akcipher.h b/include/crypto/akcipher.h
-index d6aba84ed2c4..f1ad67474bc1 100644
---- a/include/crypto/akcipher.h
-+++ b/include/crypto/akcipher.h
-@@ -28,6 +28,8 @@
-  *		result.
-  *		In case of error where the dst sgl size was insufficient,
-  *		it will be updated to the size required for the operation.
-+ * @digest:	Digest for verify2.
-+ * @digest_len:	Size of the digest.
-  * @__ctx:	Start of private context data
-  */
- struct akcipher_request {
-@@ -36,6 +38,8 @@ struct akcipher_request {
- 	struct scatterlist *dst;
- 	unsigned int src_len;
- 	unsigned int dst_len;
-+	u8 *digest;
-+	u8 digest_len;
- 	void *__ctx[] CRYPTO_MINALIGN_ATTR;
- };
- 
-@@ -60,6 +64,8 @@ struct crypto_akcipher {
-  *		algorithm. In case of error, where the dst_len was insufficient,
-  *		the req->dst_len will be updated to the size required for the
-  *		operation
-+ * @verify2:	Function performs a verify operation as defined by public key
-+ *		algorithm.
-  * @encrypt:	Function performs an encrypt operation as defined by public key
-  *		algorithm. In case of error, where the dst_len was insufficient,
-  *		the req->dst_len will be updated to the size required for the
-@@ -96,6 +102,7 @@ struct crypto_akcipher {
- struct akcipher_alg {
- 	int (*sign)(struct akcipher_request *req);
- 	int (*verify)(struct akcipher_request *req);
-+	int (*verify2)(struct akcipher_request *req);
- 	int (*encrypt)(struct akcipher_request *req);
- 	int (*decrypt)(struct akcipher_request *req);
- 	int (*set_pub_key)(struct crypto_akcipher *tfm, const void *key,
-@@ -400,11 +407,13 @@ static inline int crypto_akcipher_sign(struct akcipher_request *req)
-  * crypto_akcipher_verify() - Invoke public key verify operation
-  *
-  * Function invokes the specific public key verify operation for a given
-- * public key algorithm
-+ * public key algorithm: basically it does (rsa) decrypt of signature
-+ * producing decrypted hash into dst, which should be compared by a caller
-+ * with expected hash value.
-  *
-- * @req:	asymmetric key request
-+ * @req:	asymmetric key request (without hash)
-  *
-- * Return: zero on success; error code in case of error
-+ * Return: zero on decryption success; error code in case of error
-  */
- static inline int crypto_akcipher_verify(struct akcipher_request *req)
- {
-@@ -418,6 +427,45 @@ static inline int crypto_akcipher_verify(struct akcipher_request *req)
- }
- 
- /**
-+ * crypto_akcipher_verify2() - Invoke public key verify operation
-+ *
-+ * Function performs complete public key verify operation for a given
-+ * public key algorithm
-+ *
-+ * @req:	asymmetric key request (with hash)
-+ *
-+ * Return: zero on verification success; error code in case of error
-+ */
-+static inline int crypto_akcipher_verify2(struct akcipher_request *req)
-+{
-+	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
-+	struct akcipher_alg *alg = crypto_akcipher_alg(tfm);
-+	int ret;
-+
-+	ret = alg->verify2(req);
-+	crypto_stat_akcipher_verify(req, ret);
-+	return ret;
-+}
-+
-+/**
-+ * crypto_akcipher_have_verify2() - Check for existence of public key verify2
-+ * operation
-+ *
-+ * Function checks for existence of verify2 call for the public key algorithm
-+ *
-+ * @req:	asymmetric key request (with hash)
-+ *
-+ * Return: non-zero is verify2 call exists; zero if it does not
-+ */
-+static inline int crypto_akcipher_have_verify2(struct akcipher_request *req)
-+{
-+	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
-+	struct akcipher_alg *alg = crypto_akcipher_alg(tfm);
-+
-+	return !!alg->verify2;
-+}
-+
-+/**
-  * crypto_akcipher_set_pub_key() - Invoke set public key operation
-  *
-  * Function invokes the algorithm specific set key function, which knows
--- 
-2.11.0
++	vmovdqu CurCount(arg2), \CTR
+=20
+ 	i =3D (9-\num_initial_blocks)
+ 	setreg
+--=20
+2.17.1
