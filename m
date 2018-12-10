@@ -1,68 +1,58 @@
-Return-Path: <SRS0=eKEb=OU=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mga14.intel.com ([192.55.52.115]:53163 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726448AbeLKSKk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Dec 2018 13:10:40 -0500
-Subject: Re: [PATCH v11 00/13] Intel SGX1 support
-To: Josh Triplett <josh@joshtriplett.org>, Pavel Machek <pavel@ucw.cz>
-Cc: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>, x86@kernel.org,
-        platform-driver-x86@vger.kernel.org,
-        sean.j.christopherson@intel.com, nhorman@redhat.com,
-        npmccallum@redhat.com, Alexei Starovoitov <ast@kernel.org>,
-        Andi Kleen <ak@linux.intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Borislav Petkov <bp@suse.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@kernel.org>,
-        "open list:INTEL SGX" <intel-sgx-kernel-dev@lists.01.org>,
-        Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        "open list:KERNEL VIRTUAL MACHINE FOR X86 (KVM/x86)"
-        <kvm@vger.kernel.org>, Len Brown <len.brown@intel.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        "open list:SPARSE CHECKER" <linux-sparse@vger.kernel.org>,
-        Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Ricardo Neri <ricardo.neri-calderon@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Vikas Shivappa <vikas.shivappa@linux.intel.com>
-References: <20180608171216.26521-1-jarkko.sakkinen@linux.intel.com>
- <20180612105011.GA26931@amd> <20180619145943.GC8034@linux.intel.com>
- <20180619200414.GA3143@amd> <20180619214833.GA5873@localhost>
- <20181209200600.GA11608@amd> <20181210074717.GA9880@localhost>
- <20181210082704.GA14594@amd> <20181210231159.GA10718@localhost>
-From: Dave Hansen <dave.hansen@intel.com>
-Message-ID: <12301623-0a63-10ac-1d5e-828569a953e5@intel.com>
-Date: Tue, 11 Dec 2018 10:10:38 -0800
-MIME-Version: 1.0
-In-Reply-To: <20181210231159.GA10718@localhost>
-Content-Type: text/plain; charset=utf-8
+Return-Path: <SRS0=ZXsK=OT=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:43554 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728567AbeLJT5E (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 10 Dec 2018 14:57:04 -0500
+From: Dave Watson <davejwatson@fb.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        Junaid Shahid <junaids@google.com>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+CC: Doron Roberts-Kedes <doronrk@fb.com>,
+        Sabrina Dubroca <sd@queasysnail.net>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH 00/12] x86/crypto: gcmaes AVX scatter/gather support
+Date: Mon, 10 Dec 2018 19:56:28 +0000
+Message-ID: <cover.1544471415.git.davejwatson@fb.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <914379E01B9F9E4695BA62F75999E850@namprd15.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 12/10/18 3:12 PM, Josh Triplett wrote:
->> Or maybe even python/shell scripts? It looked to me like virtual
->> memory will be "interesting" for enclaves.
-> Memory management doesn't seem that hard to deal with.
+This patch set refactors the x86 aes/gcm AVX crypto routines to
+support true scatter/gather by adding gcm_enc/dec_update methods.
 
-The problems are:
+It is similar to the previous SSE patchset starting at e1fd316f. =20
+Unlike the SSE routines, the AVX routines did not support
+keysize 192 & 256, this patchset also adds support for those
+keysizes.
 
-1. SGX enclave memory (EPC) is statically allocated at boot and can't
-   grow or shrink
-2. EPC is much smaller than regular RAM
-3. The core VM has no comprehension of EPC use, thus can not help
-   with its algorithms, like the LRU
-4. The SGX driver implements its own VM which is substantially simpler
-   than the core VM, but less feature-rich, fast, or scalable
+The final patch updates the C glue code, passing everything through
+the crypt_by_sg() function instead of the previous memcpy based
+routines.
+
+Dave Watson (12):
+  x86/crypto: aesni: Merge GCM_ENC_DEC
+  x86/crypto: aesni: Introduce gcm_context_data
+  x86/crypto: aesni: Macro-ify func save/restore
+  x86/crypto: aesni: support 256 byte keys in avx asm
+  x86/crypto: aesni: Add GCM_COMPLETE macro
+  x86/crypto: aesni: Split AAD hash calculation to separate macro
+  x86/crypto: aesni: Merge avx precompute functions
+  x86/crypto: aesni: Fill in new context data structures
+  x86/crypto: aesni: Move ghash_mul to GCM_COMPLETE
+  x86/crypto: aesni: Introduce READ_PARTIAL_BLOCK macro
+  x86/crypto: aesni: Introduce partial block macro
+  x86/crypto: aesni: Add scatter/gather avx stubs, and use them in C
+
+ arch/x86/crypto/aesni-intel_avx-x86_64.S | 2125 ++++++++++------------
+ arch/x86/crypto/aesni-intel_glue.c       |  353 ++--
+ 2 files changed, 1117 insertions(+), 1361 deletions(-)
+
+--=20
+2.17.1
