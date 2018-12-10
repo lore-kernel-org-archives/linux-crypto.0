@@ -6,28 +6,31 @@ X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF505C04EB8
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Dec 2018 08:27:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7651C5CFFE
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Dec 2018 23:12:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B82A82081F
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Dec 2018 08:27:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B82A82081F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ucw.cz
+	by mail.kernel.org (Postfix) with ESMTP id 955C620821
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Dec 2018 23:12:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 955C620821
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=joshtriplett.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-crypto-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726292AbeLJI1K (ORCPT
+        id S1730005AbeLJXM3 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 10 Dec 2018 03:27:10 -0500
-Received: from atrey.karlin.mff.cuni.cz ([195.113.26.193]:56076 "EHLO
-        atrey.karlin.mff.cuni.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726170AbeLJI1K (ORCPT
+        Mon, 10 Dec 2018 18:12:29 -0500
+Received: from relay4-d.mail.gandi.net ([217.70.183.196]:41575 "EHLO
+        relay4-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726841AbeLJXM3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Dec 2018 03:27:10 -0500
-Received: by atrey.karlin.mff.cuni.cz (Postfix, from userid 512)
-        id 9F63E807A6; Mon, 10 Dec 2018 09:27:01 +0100 (CET)
-Date:   Mon, 10 Dec 2018 09:27:04 +0100
-From:   Pavel Machek <pavel@ucw.cz>
-To:     Josh Triplett <josh@joshtriplett.org>
+        Mon, 10 Dec 2018 18:12:29 -0500
+X-Originating-IP: 134.134.139.72
+Received: from localhost (jfdmzpr03-ext.jf.intel.com [134.134.139.72])
+        (Authenticated sender: josh@joshtriplett.org)
+        by relay4-d.mail.gandi.net (Postfix) with ESMTPSA id 8E241E0002;
+        Mon, 10 Dec 2018 23:12:05 +0000 (UTC)
+Date:   Mon, 10 Dec 2018 15:12:00 -0800
+From:   Josh Triplett <josh@joshtriplett.org>
+To:     Pavel Machek <pavel@ucw.cz>
 Cc:     Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>, x86@kernel.org,
         platform-driver-x86@vger.kernel.org, dave.hansen@intel.com,
         sean.j.christopherson@intel.com, nhorman@redhat.com,
@@ -60,7 +63,7 @@ Cc:     Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>, x86@kernel.org,
         Tom Lendacky <thomas.lendacky@amd.com>,
         Vikas Shivappa <vikas.shivappa@linux.intel.com>
 Subject: Re: [PATCH v11 00/13] Intel SGX1 support
-Message-ID: <20181210082704.GA14594@amd>
+Message-ID: <20181210231159.GA10718@localhost>
 References: <20180608171216.26521-1-jarkko.sakkinen@linux.intel.com>
  <20180612105011.GA26931@amd>
  <20180619145943.GC8034@linux.intel.com>
@@ -68,93 +71,78 @@ References: <20180608171216.26521-1-jarkko.sakkinen@linux.intel.com>
  <20180619214833.GA5873@localhost>
  <20181209200600.GA11608@amd>
  <20181210074717.GA9880@localhost>
+ <20181210082704.GA14594@amd>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="EeQfGwPcQSOJBaQU"
+Content-Type: text/plain; charset="UTF-8"
 Content-Disposition: inline
-In-Reply-To: <20181210074717.GA9880@localhost>
-User-Agent: Mutt/1.5.23 (2014-03-12)
+In-Reply-To: <20181210082704.GA14594@amd>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
-Message-ID: <20181210082704.QaYD5daSfSD5uuQzbLsmnIRtqv_8yMFDozoNsjtN024@z>
+Message-ID: <20181210231200.kh_YTu-lYk_J1IaPxXq9Y5RXNttZKHrxVWLHm3tTSRg@z>
 
+On Mon, Dec 10, 2018 at 09:27:04AM +0100, Pavel Machek wrote:
+> On Sun 2018-12-09 23:47:17, Josh Triplett wrote:
+> > On Sun, Dec 09, 2018 at 09:06:00PM +0100, Pavel Machek wrote:
+> > ...
+> > > > > > The default permissions for the device are 600.
+> > > > > 
+> > > > > Good. This does not belong to non-root.
+> > > > 
+> > > > There are entirely legitimate use cases for using this as an
+> > > > unprivileged user. However, that'll be up to system and distribution
+> > > > policy, which can evolve over time, and it makes sense for the *initial*
+> > > > kernel permission to start out root-only and then adjust permissions via
+> > > > udev.
+> > > 
+> > > Agreed.
+> > > 
+> > > > Building a software certificate store. Hardening key-agent software like
+> > > > ssh-agent or gpg-agent. Building a challenge-response authentication
+> > > > system. Providing more assurance that your server infrastructure is
+> > > > uncompromised. Offloading computation to a system without having to
+> > > > fully trust that system.
+> > > 
+> > > I think you can do the crypto stuff... as crypto already verifies the
+> > > results. But I don't think you can do the computation offload.
+> > 
+> > You can, as long as you can do attestation.
+> 
+> You can not, because random errors are very easy to trigger for person
+> with physical access,
 
---EeQfGwPcQSOJBaQU
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Random errors can also just happen, so if you're concerned about that
+you might want to build each object on two different machines and
+compare. Good luck generating the *same* random errors on two machines.
 
-On Sun 2018-12-09 23:47:17, Josh Triplett wrote:
-> On Sun, Dec 09, 2018 at 09:06:00PM +0100, Pavel Machek wrote:
-> ...
-> > > > > The default permissions for the device are 600.
-> > > >=20
-> > > > Good. This does not belong to non-root.
-> > >=20
-> > > There are entirely legitimate use cases for using this as an
-> > > unprivileged user. However, that'll be up to system and distribution
-> > > policy, which can evolve over time, and it makes sense for the *initi=
-al*
-> > > kernel permission to start out root-only and then adjust permissions =
-via
-> > > udev.
-> >=20
-> > Agreed.
-> >=20
-> > > Building a software certificate store. Hardening key-agent software l=
-ike
-> > > ssh-agent or gpg-agent. Building a challenge-response authentication
-> > > system. Providing more assurance that your server infrastructure is
-> > > uncompromised. Offloading computation to a system without having to
-> > > fully trust that system.
-> >=20
-> > I think you can do the crypto stuff... as crypto already verifies the
-> > results. But I don't think you can do the computation offload.
->=20
-> You can, as long as you can do attestation.
+(And, of course, someone can also DoS you in any number of other ways,
+such as accepting data and then never sending back a result. So you'll
+need timeouts and failovers.)
 
-You can not, because random errors are very easy to trigger for person
-with physical access, as I explained in the part of email you
-stripped.
+> > > > As one of many possibilities, imagine a distcc that didn't have to trust
+> > > > the compile nodes. The compile nodes could fail to return results at
+> > > > all, but they couldn't alter the results.
+> > > 
+> > > distcc on untrusted nodes ... oh yes, that would be great.
+> > > 
+> > > Except that you can't do it, right? :-).
+> > > 
+> > > First, AFAICT it would be quite hard to get gcc to run under SGX. But
+> > > maybe you have spare month or three and can do it.
+> > 
+> > Assuming you don't need to #include files, gcc seems quite simple to run
+> > in an enclave: data in, computation inside, data out.
+> 
+> So is there a plan to run dynamically linked binaries inside enclave?
 
-> > > As one of many possibilities, imagine a distcc that didn't have to tr=
-ust
-> > > the compile nodes. The compile nodes could fail to return results at
-> > > all, but they couldn't alter the results.
-> >=20
-> > distcc on untrusted nodes ... oh yes, that would be great.
-> >=20
-> > Except that you can't do it, right? :-).
-> >=20
-> > First, AFAICT it would be quite hard to get gcc to run under SGX. But
-> > maybe you have spare month or three and can do it.
->=20
-> Assuming you don't need to #include files, gcc seems quite simple to run
-> in an enclave: data in, computation inside, data out.
+I've seen some approaches for that, but you could also just statically
+link your compiler. (Since you'd need attestation for all the individual
+libraries, you'd need to know the versions of all those libraries, so
+you might as well just statically link.)
 
-So is there a plan to run dynamically linked binaries inside enclave?
-Or maybe even python/shell scripts? It looked to me like virtual
-memory will be "interesting" for enclaves.
+> Or maybe even python/shell scripts? It looked to me like virtual
+> memory will be "interesting" for enclaves.
 
-
-								Pavel
---=20
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blo=
-g.html
-
---EeQfGwPcQSOJBaQU
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iEYEARECAAYFAlwOI1gACgkQMOfwapXb+vLmawCgoL+ivKPUBf9B9dD7LjJnawsy
-T8YAoIpGC5LiF84jvJgnIzvNVAFu+Wrx
-=jQvj
------END PGP SIGNATURE-----
-
---EeQfGwPcQSOJBaQU--
+Memory management doesn't seem that hard to deal with.
