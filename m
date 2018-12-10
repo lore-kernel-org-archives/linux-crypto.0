@@ -1,81 +1,120 @@
-Return-Path: <SRS0=wDfx=ON=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:45984 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725875AbeLDXpJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 4 Dec 2018 18:45:09 -0500
-Date: Tue, 4 Dec 2018 15:45:07 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: "Theodore Y . Ts'o" <tytso@mit.edu>, linux-fscrypt@vger.kernel.org
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH] fscrypt: remove CRYPTO_CTR dependency
-Message-ID: <20181204234506.GD70682@gmail.com>
-References: <20180905192400.71160-1-ebiggers@kernel.org>
- <CAKv+Gu8=dDk+bes8O7oOQ3zTgPHyVi49-gwH1btwdys-vgfyqg@mail.gmail.com>
+Return-Path: <SRS0=ZXsK=OT=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from relay4-d.mail.gandi.net ([217.70.183.196]:41575 "EHLO
+        relay4-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726841AbeLJXM3 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 10 Dec 2018 18:12:29 -0500
+Date: Mon, 10 Dec 2018 15:12:00 -0800
+From: Josh Triplett <josh@joshtriplett.org>
+To: Pavel Machek <pavel@ucw.cz>
+Cc: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>, x86@kernel.org,
+        platform-driver-x86@vger.kernel.org, dave.hansen@intel.com,
+        sean.j.christopherson@intel.com, nhorman@redhat.com,
+        npmccallum@redhat.com, Alexei Starovoitov <ast@kernel.org>,
+        Andi Kleen <ak@linux.intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Borislav Petkov <bp@suse.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@kernel.org>,
+        "open list:INTEL SGX" <intel-sgx-kernel-dev@lists.01.org>,
+        Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        "open list:KERNEL VIRTUAL MACHINE FOR X86 (KVM/x86)"
+        <kvm@vger.kernel.org>, Len Brown <len.brown@intel.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        "open list:SPARSE CHECKER" <linux-sparse@vger.kernel.org>,
+        Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Ricardo Neri <ricardo.neri-calderon@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Vikas Shivappa <vikas.shivappa@linux.intel.com>
+Subject: Re: [PATCH v11 00/13] Intel SGX1 support
+Message-ID: <20181210231159.GA10718@localhost>
+References: <20180608171216.26521-1-jarkko.sakkinen@linux.intel.com>
+ <20180612105011.GA26931@amd>
+ <20180619145943.GC8034@linux.intel.com>
+ <20180619200414.GA3143@amd>
+ <20180619214833.GA5873@localhost>
+ <20181209200600.GA11608@amd>
+ <20181210074717.GA9880@localhost>
+ <20181210082704.GA14594@amd>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAKv+Gu8=dDk+bes8O7oOQ3zTgPHyVi49-gwH1btwdys-vgfyqg@mail.gmail.com>
+In-Reply-To: <20181210082704.GA14594@amd>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Sep 06, 2018 at 12:43:41PM +0200, Ard Biesheuvel wrote:
-> On 5 September 2018 at 21:24, Eric Biggers <ebiggers@kernel.org> wrote:
-> > From: Eric Biggers <ebiggers@google.com>
-> >
-> > fscrypt doesn't use the CTR mode of operation for anything, so there's
-> > no need to select CRYPTO_CTR.  It was added by commit 71dea01ea2ed
-> > ("ext4 crypto: require CONFIG_CRYPTO_CTR if ext4 encryption is
-> > enabled").  But, I've been unable to identify the arm64 crypto bug it
-> > was supposedly working around.
-> >
-> > I suspect the issue was seen only on some old Android device kernel
-> > (circa 3.10?).  So if the fix wasn't mistaken, the real bug is probably
-> > already fixed.  Or maybe it was actually a bug in a non-upstream crypto
-> > driver.
-> >
-> > So, remove the dependency.  If it turns out there's actually still a
-> > bug, we'll fix it properly.
-> >
-> > Signed-off-by: Eric Biggers <ebiggers@google.com>
+On Mon, Dec 10, 2018 at 09:27:04AM +0100, Pavel Machek wrote:
+> On Sun 2018-12-09 23:47:17, Josh Triplett wrote:
+> > On Sun, Dec 09, 2018 at 09:06:00PM +0100, Pavel Machek wrote:
+> > ...
+> > > > > > The default permissions for the device are 600.
+> > > > > 
+> > > > > Good. This does not belong to non-root.
+> > > > 
+> > > > There are entirely legitimate use cases for using this as an
+> > > > unprivileged user. However, that'll be up to system and distribution
+> > > > policy, which can evolve over time, and it makes sense for the *initial*
+> > > > kernel permission to start out root-only and then adjust permissions via
+> > > > udev.
+> > > 
+> > > Agreed.
+> > > 
+> > > > Building a software certificate store. Hardening key-agent software like
+> > > > ssh-agent or gpg-agent. Building a challenge-response authentication
+> > > > system. Providing more assurance that your server infrastructure is
+> > > > uncompromised. Offloading computation to a system without having to
+> > > > fully trust that system.
+> > > 
+> > > I think you can do the crypto stuff... as crypto already verifies the
+> > > results. But I don't think you can do the computation offload.
+> > 
+> > You can, as long as you can do attestation.
 > 
-> Acked-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> 
-> This may be related to
-> 
-> 11e3b725cfc2 crypto: arm64/aes-blk - honour iv_out requirement in CBC
-> and CTR modes
-> 
-> given that the commit in question mentions CTS. How it actually works
-> around the issue is unclear to me, though.
-> 
-> 
-> 
-> 
-> > ---
-> >  fs/crypto/Kconfig | 1 -
-> >  1 file changed, 1 deletion(-)
-> >
-> > diff --git a/fs/crypto/Kconfig b/fs/crypto/Kconfig
-> > index 02b7d91c92310..284b589b4774d 100644
-> > --- a/fs/crypto/Kconfig
-> > +++ b/fs/crypto/Kconfig
-> > @@ -6,7 +6,6 @@ config FS_ENCRYPTION
-> >         select CRYPTO_ECB
-> >         select CRYPTO_XTS
-> >         select CRYPTO_CTS
-> > -       select CRYPTO_CTR
-> >         select CRYPTO_SHA256
-> >         select KEYS
-> >         help
-> > --
-> > 2.19.0.rc2.392.g5ba43deb5a-goog
-> >
+> You can not, because random errors are very easy to trigger for person
+> with physical access,
 
-Ping.  Ted, can you consider applying this to the fscrypt tree for 4.21?
+Random errors can also just happen, so if you're concerned about that
+you might want to build each object on two different machines and
+compare. Good luck generating the *same* random errors on two machines.
 
-Thanks,
+(And, of course, someone can also DoS you in any number of other ways,
+such as accepting data and then never sending back a result. So you'll
+need timeouts and failovers.)
 
-- Eric
+> > > > As one of many possibilities, imagine a distcc that didn't have to trust
+> > > > the compile nodes. The compile nodes could fail to return results at
+> > > > all, but they couldn't alter the results.
+> > > 
+> > > distcc on untrusted nodes ... oh yes, that would be great.
+> > > 
+> > > Except that you can't do it, right? :-).
+> > > 
+> > > First, AFAICT it would be quite hard to get gcc to run under SGX. But
+> > > maybe you have spare month or three and can do it.
+> > 
+> > Assuming you don't need to #include files, gcc seems quite simple to run
+> > in an enclave: data in, computation inside, data out.
+> 
+> So is there a plan to run dynamically linked binaries inside enclave?
+
+I've seen some approaches for that, but you could also just statically
+link your compiler. (Since you'd need attestation for all the individual
+libraries, you'd need to know the versions of all those libraries, so
+you might as well just statically link.)
+
+> Or maybe even python/shell scripts? It looked to me like virtual
+> memory will be "interesting" for enclaves.
+
+Memory management doesn't seem that hard to deal with.
