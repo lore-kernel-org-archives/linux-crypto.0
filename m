@@ -1,4 +1,4 @@
-Return-Path: <SRS0=XS/1=OS=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=ZXsK=OT=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
@@ -6,28 +6,31 @@ X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95611C07E85
-	for <linux-crypto@archiver.kernel.org>; Sun,  9 Dec 2018 20:06:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B656C04EB8
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Dec 2018 07:47:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 563AE20645
-	for <linux-crypto@archiver.kernel.org>; Sun,  9 Dec 2018 20:06:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 563AE20645
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ucw.cz
+	by mail.kernel.org (Postfix) with ESMTP id 2BCBB2081F
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Dec 2018 07:47:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BCBB2081F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=joshtriplett.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-crypto-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726260AbeLIUGF (ORCPT
+        id S1726212AbeLJHrj (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 9 Dec 2018 15:06:05 -0500
-Received: from atrey.karlin.mff.cuni.cz ([195.113.26.193]:39832 "EHLO
-        atrey.karlin.mff.cuni.cz" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726233AbeLIUGF (ORCPT
+        Mon, 10 Dec 2018 02:47:39 -0500
+Received: from relay8-d.mail.gandi.net ([217.70.183.201]:45791 "EHLO
+        relay8-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726202AbeLJHrj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 9 Dec 2018 15:06:05 -0500
-Received: by atrey.karlin.mff.cuni.cz (Postfix, from userid 512)
-        id 4290E806FA; Sun,  9 Dec 2018 21:05:57 +0100 (CET)
-Date:   Sun, 9 Dec 2018 21:06:00 +0100
-From:   Pavel Machek <pavel@ucw.cz>
-To:     Josh Triplett <josh@joshtriplett.org>
+        Mon, 10 Dec 2018 02:47:39 -0500
+X-Originating-IP: 50.39.174.102
+Received: from localhost (50-39-174-102.bvtn.or.frontiernet.net [50.39.174.102])
+        (Authenticated sender: josh@joshtriplett.org)
+        by relay8-d.mail.gandi.net (Postfix) with ESMTPSA id 387411BF215;
+        Mon, 10 Dec 2018 07:47:19 +0000 (UTC)
+Date:   Sun, 9 Dec 2018 23:47:17 -0800
+From:   Josh Triplett <josh@joshtriplett.org>
+To:     Pavel Machek <pavel@ucw.cz>
 Cc:     Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>, x86@kernel.org,
         platform-driver-x86@vger.kernel.org, dave.hansen@intel.com,
         sean.j.christopherson@intel.com, nhorman@redhat.com,
@@ -60,104 +63,59 @@ Cc:     Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>, x86@kernel.org,
         Tom Lendacky <thomas.lendacky@amd.com>,
         Vikas Shivappa <vikas.shivappa@linux.intel.com>
 Subject: Re: [PATCH v11 00/13] Intel SGX1 support
-Message-ID: <20181209200600.GA11608@amd>
+Message-ID: <20181210074717.GA9880@localhost>
 References: <20180608171216.26521-1-jarkko.sakkinen@linux.intel.com>
  <20180612105011.GA26931@amd>
  <20180619145943.GC8034@linux.intel.com>
  <20180619200414.GA3143@amd>
  <20180619214833.GA5873@localhost>
+ <20181209200600.GA11608@amd>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha1;
-        protocol="application/pgp-signature"; boundary="bp/iNruPH9dso1Pn"
+Content-Type: text/plain; charset="UTF-8"
 Content-Disposition: inline
-In-Reply-To: <20180619214833.GA5873@localhost>
-User-Agent: Mutt/1.5.23 (2014-03-12)
+In-Reply-To: <20181209200600.GA11608@amd>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
-Message-ID: <20181209200600.MwZ8E5UtomlHcaaqEuR9xqgWafN4FofN144ckpJNd4Q@z>
+Message-ID: <20181210074717.7WzrYK_XBnlowOvGuyQA2OpOg7RYHaUj6C5d5NBi5Is@z>
 
+On Sun, Dec 09, 2018 at 09:06:00PM +0100, Pavel Machek wrote:
+...
+> > > > The default permissions for the device are 600.
+> > > 
+> > > Good. This does not belong to non-root.
+> > 
+> > There are entirely legitimate use cases for using this as an
+> > unprivileged user. However, that'll be up to system and distribution
+> > policy, which can evolve over time, and it makes sense for the *initial*
+> > kernel permission to start out root-only and then adjust permissions via
+> > udev.
+> 
+> Agreed.
+> 
+> > Building a software certificate store. Hardening key-agent software like
+> > ssh-agent or gpg-agent. Building a challenge-response authentication
+> > system. Providing more assurance that your server infrastructure is
+> > uncompromised. Offloading computation to a system without having to
+> > fully trust that system.
+> 
+> I think you can do the crypto stuff... as crypto already verifies the
+> results. But I don't think you can do the computation offload.
 
---bp/iNruPH9dso1Pn
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+You can, as long as you can do attestation.
 
-Hi!
+> > As one of many possibilities, imagine a distcc that didn't have to trust
+> > the compile nodes. The compile nodes could fail to return results at
+> > all, but they couldn't alter the results.
+> 
+> distcc on untrusted nodes ... oh yes, that would be great.
+> 
+> Except that you can't do it, right? :-).
+> 
+> First, AFAICT it would be quite hard to get gcc to run under SGX. But
+> maybe you have spare month or three and can do it.
 
-(sorry to bring up old thread).
-
-> > > > > Intel(R) SGX is a set of CPU instructions that can be used by app=
-lications
-> > > > > to set aside private regions of code and data. The code outside t=
-he enclave
-> > > > > is disallowed to access the memory inside the enclave by the CPU =
-access
-> > > > > control.  In a way you can think that SGX provides inverted sandb=
-ox. It
-> > > > > protects the application from a malicious host.
-> > > >=20
-> > > > Do you intend to allow non-root applications to use SGX?
-> > > >=20
-> > > > What are non-evil uses for SGX?
-> > > >=20
-> > > > ...because it is quite useful for some kinds of evil:
-> > >=20
-> > > The default permissions for the device are 600.
-> >=20
-> > Good. This does not belong to non-root.
->=20
-> There are entirely legitimate use cases for using this as an
-> unprivileged user. However, that'll be up to system and distribution
-> policy, which can evolve over time, and it makes sense for the *initial*
-> kernel permission to start out root-only and then adjust permissions via
-> udev.
-
-Agreed.
-
-> > What are some non-evil uses for SGX?
->=20
-> Building a software certificate store. Hardening key-agent software like
-> ssh-agent or gpg-agent. Building a challenge-response authentication
-> system. Providing more assurance that your server infrastructure is
-> uncompromised. Offloading computation to a system without having to
-> fully trust that system.
-
-I think you can do the crypto stuff... as crypto already verifies the
-results. But I don't think you can do the computation offload.
-
-> As one of many possibilities, imagine a distcc that didn't have to trust
-> the compile nodes. The compile nodes could fail to return results at
-> all, but they couldn't alter the results.
-
-distcc on untrusted nodes ... oh yes, that would be great.
-
-Except that you can't do it, right? :-).
-
-First, AFAICT it would be quite hard to get gcc to run under SGX. But
-maybe you have spare month or three and can do it.
-
-But ... you really can't guarantee getting right results. Evil owner
-of the machine might intentionaly overheat the CPU, glitch the power,
-induce single-bit errors using gamma source, ... You can't do it.
-
-									Pavel
---=20
-(english) http://www.livejournal.com/~pavelmachek
-(cesky, pictures) http://atrey.karlin.mff.cuni.cz/~pavel/picture/horses/blo=
-g.html
-
---bp/iNruPH9dso1Pn
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: Digital signature
-
------BEGIN PGP SIGNATURE-----
-Version: GnuPG v1
-
-iEYEARECAAYFAlwNdagACgkQMOfwapXb+vLmBACglfRsX3Mr2i4qikFMap6DH0ZS
-3OwAnj5BaVdvd6w1ipEHlMOQVSTpim9l
-=7YhW
------END PGP SIGNATURE-----
-
---bp/iNruPH9dso1Pn--
+Assuming you don't need to #include files, gcc seems quite simple to run
+in an enclave: data in, computation inside, data out.
