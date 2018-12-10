@@ -1,131 +1,229 @@
-Return-Path: <SRS0=KZld=OW=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:58232 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727133AbeLMCMK (ORCPT
+Return-Path: <SRS0=ZXsK=OT=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mx0b-00082601.pphosted.com ([67.231.153.30]:54176 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727515AbeLJT5k (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Dec 2018 21:12:10 -0500
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id wBD2509m012844
-        for <linux-crypto@vger.kernel.org>; Wed, 12 Dec 2018 21:12:10 -0500
-Received: from e33.co.us.ibm.com (e33.co.us.ibm.com [32.97.110.151])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2pbb228bxc-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <linux-crypto@vger.kernel.org>; Wed, 12 Dec 2018 21:12:09 -0500
-Received: from localhost
-        by e33.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-crypto@vger.kernel.org> from <bauerman@linux.ibm.com>;
-        Thu, 13 Dec 2018 02:12:09 -0000
-From: Thiago Jung Bauermann <bauerman@linux.ibm.com>
-To: linux-integrity@vger.kernel.org
-Cc: linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Jessica Yu <jeyu@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jonathan Corbet <corbet@lwn.net>,
-        "AKASHI, Takahiro" <takahiro.akashi@linaro.org>,
-        Thiago Jung Bauermann <bauerman@linux.ibm.com>
-Subject: [PATCH v9 13/14] ima: Write modsig to the measurement list
-Date: Thu, 13 Dec 2018 00:09:06 -0200
-In-Reply-To: <20181213020907.13601-1-bauerman@linux.ibm.com>
-References: <20181213020907.13601-1-bauerman@linux.ibm.com>
-Message-Id: <20181213020907.13601-14-bauerman@linux.ibm.com>
+        Mon, 10 Dec 2018 14:57:40 -0500
+From: Dave Watson <davejwatson@fb.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        Junaid Shahid <junaids@google.com>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+CC: Doron Roberts-Kedes <doronrk@fb.com>,
+        Sabrina Dubroca <sd@queasysnail.net>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH 03/12] x86/crypto: aesni: Macro-ify func save/restore
+Date: Mon, 10 Dec 2018 19:57:12 +0000
+Message-ID: <08b21e5705b45fe799463d4fa708c7b73fa24625.1544471415.git.davejwatson@fb.com>
+References: <cover.1544471415.git.davejwatson@fb.com>
+In-Reply-To: <cover.1544471415.git.davejwatson@fb.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <E2071F740F9B0A45A8419830921FF4EC@namprd15.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Add modsig support to the "sig" template field, allowing the the contents
-of the modsig to be included in the measurement list.
+Macro-ify function save and restore.  These will be used in new functions
+added for scatter/gather update operations.
 
-Suggested-by: Mimi Zohar <zohar@linux.ibm.com>
-Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+Signed-off-by: Dave Watson <davejwatson@fb.com>
 ---
- security/integrity/ima/ima.h              |  7 +++++++
- security/integrity/ima/ima_modsig.c       | 13 +++++++++++++
- security/integrity/ima/ima_template_lib.c | 15 ++++++++++++++-
- 3 files changed, 34 insertions(+), 1 deletion(-)
+ arch/x86/crypto/aesni-intel_avx-x86_64.S | 94 +++++++++---------------
+ 1 file changed, 36 insertions(+), 58 deletions(-)
 
-diff --git a/security/integrity/ima/ima.h b/security/integrity/ima/ima.h
-index 40a6ddfdd9ea..55f8ef65cab4 100644
---- a/security/integrity/ima/ima.h
-+++ b/security/integrity/ima/ima.h
-@@ -318,6 +318,7 @@ int ima_read_collect_modsig(enum ima_hooks func, const void *buf,
- 			    int *xattr_len);
- int ima_get_modsig_hash(struct evm_ima_xattr_data *hdr, enum hash_algo *algo,
- 			const u8 **hash, u8 *len);
-+int ima_modsig_serialize_data(struct evm_ima_xattr_data **data, int *data_len);
- void ima_free_xattr_data(struct evm_ima_xattr_data *hdr);
- #else
- static inline bool ima_hook_supports_modsig(enum ima_hooks func)
-@@ -340,6 +341,12 @@ static inline int ima_get_modsig_hash(struct evm_ima_xattr_data *hdr,
- 	return -EOPNOTSUPP;
- }
- 
-+static inline int ima_modsig_serialize_data(struct evm_ima_xattr_data **data,
-+					    int *data_len)
-+{
-+	return -EOPNOTSUPP;
-+}
+diff --git a/arch/x86/crypto/aesni-intel_avx-x86_64.S b/arch/x86/crypto/aes=
+ni-intel_avx-x86_64.S
+index 284f1b8b88fc..dd895f69399b 100644
+--- a/arch/x86/crypto/aesni-intel_avx-x86_64.S
++++ b/arch/x86/crypto/aesni-intel_avx-x86_64.S
+@@ -247,6 +247,30 @@ VARIABLE_OFFSET =3D 16*8
+ # Utility Macros
+ ################################
+=20
++.macro FUNC_SAVE
++        #the number of pushes must equal STACK_OFFSET
++        push    %r12
++        push    %r13
++        push    %r14
++        push    %r15
 +
- static inline void ima_free_xattr_data(struct evm_ima_xattr_data *hdr)
- {
- 	kfree(hdr);
-diff --git a/security/integrity/ima/ima_modsig.c b/security/integrity/ima/ima_modsig.c
-index 587b79a9afef..0424f844c4c3 100644
---- a/security/integrity/ima/ima_modsig.c
-+++ b/security/integrity/ima/ima_modsig.c
-@@ -190,6 +190,19 @@ int ima_get_modsig_hash(struct evm_ima_xattr_data *hdr, enum hash_algo *algo,
- 	return pkcs7_get_digest(modsig->pkcs7_msg, hash, len);
- }
- 
-+int ima_modsig_serialize_data(struct evm_ima_xattr_data **data, int *data_len)
-+{
-+	struct modsig_hdr *modsig = (struct modsig_hdr *) *data;
++        mov     %rsp, %r14
 +
-+	if (!*data || (*data)->type != IMA_MODSIG)
-+		return -EINVAL;
 +
-+	*data = &modsig->raw_pkcs7;
-+	*data_len = modsig->raw_pkcs7_len;
 +
-+	return 0;
-+}
++        sub     $VARIABLE_OFFSET, %rsp
++        and     $~63, %rsp                    # align rsp to 64 bytes
++.endm
 +
- int ima_modsig_verify(struct key *keyring, const void *hdr)
- {
- 	const struct modsig_hdr *modsig = (const struct modsig_hdr *) hdr;
-diff --git a/security/integrity/ima/ima_template_lib.c b/security/integrity/ima/ima_template_lib.c
-index 36d175816894..417cd153ba60 100644
---- a/security/integrity/ima/ima_template_lib.c
-+++ b/security/integrity/ima/ima_template_lib.c
-@@ -411,10 +411,23 @@ int ima_eventsig_init(struct ima_event_data *event_data,
- 		      struct ima_field_data *field_data)
- {
- 	struct evm_ima_xattr_data *xattr_value = event_data->xattr_value;
-+	int xattr_len = event_data->xattr_len;
- 
- 	if (!is_signed(xattr_value))
- 		return 0;
- 
--	return ima_write_template_field_data(xattr_value, event_data->xattr_len,
-+	/*
-+	 * The xattr_value for IMA_MODSIG is a runtime structure containing
-+	 * pointers. Get its raw data instead.
-+	 */
-+	if (xattr_value->type == IMA_MODSIG) {
-+		int rc;
++.macro FUNC_RESTORE
++        mov     %r14, %rsp
 +
-+		rc = ima_modsig_serialize_data(&xattr_value, &xattr_len);
-+		if (rc)
-+			return rc;
-+	}
++        pop     %r15
++        pop     %r14
++        pop     %r13
++        pop     %r12
++.endm
 +
-+	return ima_write_template_field_data(xattr_value, xattr_len,
- 					     DATA_FMT_HEX, field_data);
- }
+ # Encryption of a single block
+ .macro ENCRYPT_SINGLE_BLOCK XMM0
+                 vpxor    (arg1), \XMM0, \XMM0
+@@ -264,22 +288,6 @@ VARIABLE_OFFSET =3D 16*8
+ # clobbering all xmm registers
+ # clobbering r10, r11, r12, r13, r14, r15
+ .macro  GCM_ENC_DEC INITIAL_BLOCKS GHASH_8_ENCRYPT_8_PARALLEL GHASH_LAST_8=
+ GHASH_MUL ENC_DEC
+-
+-        #the number of pushes must equal STACK_OFFSET
+-        push    %r12
+-        push    %r13
+-        push    %r14
+-        push    %r15
+-
+-        mov     %rsp, %r14
+-
+-
+-
+-
+-        sub     $VARIABLE_OFFSET, %rsp
+-        and     $~63, %rsp                  # align rsp to 64 bytes
+-
+-
+         vmovdqu  HashKey(arg2), %xmm13      # xmm13 =3D HashKey
+=20
+         mov     arg5, %r13                  # save the number of bytes of =
+plaintext/ciphertext
+@@ -566,12 +574,6 @@ _T_16\@:
+         vmovdqu %xmm9, (%r10)
+=20
+ _return_T_done\@:
+-        mov     %r14, %rsp
+-
+-        pop     %r15
+-        pop     %r14
+-        pop     %r13
+-        pop     %r12
+ .endm
+=20
+ #ifdef CONFIG_AS_AVX
+@@ -1511,18 +1513,7 @@ _initial_blocks_done\@:
+ #        u8     *hash_subkey)# /* H, the Hash sub key input. Data starts o=
+n a 16-byte boundary. */
+ #############################################################
+ ENTRY(aesni_gcm_precomp_avx_gen2)
+-        #the number of pushes must equal STACK_OFFSET
+-        push    %r12
+-        push    %r13
+-        push    %r14
+-        push    %r15
+-
+-        mov     %rsp, %r14
+-
+-
+-
+-        sub     $VARIABLE_OFFSET, %rsp
+-        and     $~63, %rsp                  # align rsp to 64 bytes
++        FUNC_SAVE
+=20
+         vmovdqu  (arg3), %xmm6              # xmm6 =3D HashKey
+=20
+@@ -1546,12 +1537,7 @@ ENTRY(aesni_gcm_precomp_avx_gen2)
+=20
+         PRECOMPUTE_AVX  %xmm6, %xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5
+=20
+-        mov     %r14, %rsp
+-
+-        pop     %r15
+-        pop     %r14
+-        pop     %r13
+-        pop     %r12
++        FUNC_RESTORE
+         ret
+ ENDPROC(aesni_gcm_precomp_avx_gen2)
+=20
+@@ -1573,7 +1559,9 @@ ENDPROC(aesni_gcm_precomp_avx_gen2)
+ #				Valid values are 16 (most likely), 12 or 8. */
+ ##########################################################################=
+#####
+ ENTRY(aesni_gcm_enc_avx_gen2)
++        FUNC_SAVE
+         GCM_ENC_DEC INITIAL_BLOCKS_AVX GHASH_8_ENCRYPT_8_PARALLEL_AVX GHAS=
+H_LAST_8_AVX GHASH_MUL_AVX ENC
++        FUNC_RESTORE
+ 	ret
+ ENDPROC(aesni_gcm_enc_avx_gen2)
+=20
+@@ -1595,7 +1583,9 @@ ENDPROC(aesni_gcm_enc_avx_gen2)
+ #				Valid values are 16 (most likely), 12 or 8. */
+ ##########################################################################=
+#####
+ ENTRY(aesni_gcm_dec_avx_gen2)
++        FUNC_SAVE
+         GCM_ENC_DEC INITIAL_BLOCKS_AVX GHASH_8_ENCRYPT_8_PARALLEL_AVX GHAS=
+H_LAST_8_AVX GHASH_MUL_AVX DEC
++        FUNC_RESTORE
+ 	ret
+ ENDPROC(aesni_gcm_dec_avx_gen2)
+ #endif /* CONFIG_AS_AVX */
+@@ -2525,18 +2515,7 @@ _initial_blocks_done\@:
+ #				Data starts on a 16-byte boundary. */
+ #############################################################
+ ENTRY(aesni_gcm_precomp_avx_gen4)
+-        #the number of pushes must equal STACK_OFFSET
+-        push    %r12
+-        push    %r13
+-        push    %r14
+-        push    %r15
+-
+-        mov     %rsp, %r14
+-
+-
+-
+-        sub     $VARIABLE_OFFSET, %rsp
+-        and     $~63, %rsp                    # align rsp to 64 bytes
++        FUNC_SAVE
+=20
+         vmovdqu  (arg3), %xmm6                # xmm6 =3D HashKey
+=20
+@@ -2560,12 +2539,7 @@ ENTRY(aesni_gcm_precomp_avx_gen4)
+=20
+         PRECOMPUTE_AVX2  %xmm6, %xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5
+=20
+-        mov     %r14, %rsp
+-
+-        pop     %r15
+-        pop     %r14
+-        pop     %r13
+-        pop     %r12
++        FUNC_RESTORE
+         ret
+ ENDPROC(aesni_gcm_precomp_avx_gen4)
+=20
+@@ -2588,7 +2562,9 @@ ENDPROC(aesni_gcm_precomp_avx_gen4)
+ #				Valid values are 16 (most likely), 12 or 8. */
+ ##########################################################################=
+#####
+ ENTRY(aesni_gcm_enc_avx_gen4)
++        FUNC_SAVE
+         GCM_ENC_DEC INITIAL_BLOCKS_AVX2 GHASH_8_ENCRYPT_8_PARALLEL_AVX2 GH=
+ASH_LAST_8_AVX2 GHASH_MUL_AVX2 ENC
++        FUNC_RESTORE
+ 	ret
+ ENDPROC(aesni_gcm_enc_avx_gen4)
+=20
+@@ -2610,7 +2586,9 @@ ENDPROC(aesni_gcm_enc_avx_gen4)
+ #				Valid values are 16 (most likely), 12 or 8. */
+ ##########################################################################=
+#####
+ ENTRY(aesni_gcm_dec_avx_gen4)
++        FUNC_SAVE
+         GCM_ENC_DEC INITIAL_BLOCKS_AVX2 GHASH_8_ENCRYPT_8_PARALLEL_AVX2 GH=
+ASH_LAST_8_AVX2 GHASH_MUL_AVX2 DEC
++        FUNC_RESTORE
+ 	ret
+ ENDPROC(aesni_gcm_dec_avx_gen4)
+=20
+--=20
+2.17.1
