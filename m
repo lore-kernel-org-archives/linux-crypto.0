@@ -1,64 +1,58 @@
-Return-Path: <SRS0=9Gyh=PA=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:39024 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731916AbeLWEDq (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 22 Dec 2018 23:03:46 -0500
-Date: Sun, 23 Dec 2018 12:03:44 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] crypto: remove remnants of internal IV generators
-Message-ID: <20181223040344.2746xfu7fif2a2fz@gondor.apana.org.au>
-References: <20181216235506.8680-1-ebiggers@kernel.org>
+Return-Path: <SRS0=ZXsK=OT=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-eopbgr60047.outbound.protection.outlook.com ([40.107.6.47]:44800
+        "EHLO EUR04-DB3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726791AbeLJOPV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 10 Dec 2018 09:15:21 -0500
+From: Horia Geanta <horia.geanta@nxp.com>
+To: Sascha Hauer <s.hauer@pengutronix.de>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+CC: Aymen Sghaier <aymen.sghaier@nxp.com>,
+        "kernel@pengutronix.de" <kernel@pengutronix.de>,
+        "stable@vger.kernel.org" <stable@vger.kernel.org>
+Subject: Re: [PATCH] crypto: caam - fix setting IV after decrypt
+Date: Mon, 10 Dec 2018 14:15:16 +0000
+Message-ID: <VI1PR0402MB34855C6F8F7B08C0DF884B8898A50@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+References: <20181207113123.3394-1-s.hauer@pengutronix.de>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181216235506.8680-1-ebiggers@kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Dec 16, 2018 at 03:55:06PM -0800, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
-> 
-> Remove dead code related to internal IV generators, which are no longer
-> used since they've been replaced with the "seqiv" and "echainiv"
-> templates.  The removed code includes:
-> 
-> - The "givcipher" (GIVCIPHER) algorithm type.  No algorithms are
->   registered with this type anymore, so it's unneeded.
-> 
-> - The "const char *geniv" member of aead_alg, ablkcipher_alg, and
->   blkcipher_alg.  A few algorithms still set this, but it isn't used
->   anymore except to show via /proc/crypto and CRYPTO_MSG_GETALG.
->   Just hardcode "<default>" or "<none>" in those cases.
-> 
-> - The 'skcipher_givcrypt_request' structure, which is never used.
-> 
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-> ---
->  Documentation/crypto/api.rst          |  9 ----
->  Documentation/crypto/architecture.rst | 31 ++---------
->  crypto/ablkcipher.c                   | 76 +--------------------------
->  crypto/blkcipher.c                    |  6 +--
->  crypto/cryptd.c                       |  4 +-
->  crypto/ctr.c                          |  2 -
->  crypto/skcipher.c                     |  6 +--
->  drivers/crypto/bcm/cipher.c           |  1 -
->  drivers/crypto/chelsio/chcr_algo.c    |  1 -
->  drivers/crypto/ixp4xx_crypto.c        |  5 --
->  drivers/crypto/nx/nx-aes-ctr.c        |  1 -
->  drivers/crypto/omap-aes.c             |  1 -
->  drivers/crypto/picoxcell_crypto.c     |  3 +-
->  drivers/crypto/talitos.c              |  1 -
->  include/crypto/aead.h                 |  3 --
->  include/crypto/internal/skcipher.h    |  2 -
->  include/crypto/skcipher.h             | 13 -----
->  include/linux/crypto.h                | 34 ++----------
->  18 files changed, 17 insertions(+), 182 deletions(-)
-
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+On 12/7/2018 1:32 PM, Sascha Hauer wrote:=0A=
+> The crypto API wants the updated IV in req->info after decryption. The=0A=
+> updated IV used to be copied correctly to req->info after running the=0A=
+> decryption job. Since 115957bb3e59 this is done before running the job=0A=
+> so instead of the updated IV only the unmodified input IV is given back=
+=0A=
+> to the crypto API.=0A=
+> =0A=
+Saving IV before running the decryption was done to address in-place cbc=0A=
+decryption - when the last block is overwritten with plaintext before havin=
+g the=0A=
+chance to copy it.=0A=
+=0A=
+Current IV update scheme is ok for cbc (IV <- last ciphertext block), howev=
+er=0A=
+for ctr the counter should be saved instead; this has to be addressed, but =
+IMHO=0A=
+is not the root cause for gcm failure.=0A=
+=0A=
+> This was observed running the gcm(aes) selftest which internally uses=0A=
+> ctr(aes) implemented by the CAAM engine.=0A=
+> =0A=
+I don't see how this patch solves the gcm case you are mentioning, i.e.=0A=
+gcm_base(ctr-aes-caam,ghash-generic).=0A=
+The IV, updated by ctr(aes) CAAM implementation, doesn't seem to be used=0A=
+afterwards - in ghash from gcm SW implementation (crypto/gcm.c).=0A=
+=0A=
+Considering lack of HW coherency on i.MX, I would rather check whether cach=
+eline=0A=
+sharing is the culprit - see previous discussion:=0A=
+https://patchwork.kernel.org/patch/9801965/=0A=
+=0A=
+Thanks,=0A=
+Horia=0A=
+=0A=
