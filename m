@@ -1,97 +1,97 @@
-Return-Path: <SRS0=KZld=OW=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:37293 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727343AbeLMIkf (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 13 Dec 2018 03:40:35 -0500
-Received: by mail-pg1-f194.google.com with SMTP id 80so726604pge.4
-        for <linux-crypto@vger.kernel.org>; Thu, 13 Dec 2018 00:40:34 -0800 (PST)
-From: Louis Collard <louiscollard@chromium.org>
-To: linux-crypto@vger.kernel.org
-Cc: Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Gary R Hook <gary.hook@amd.com>, Michael Buesch <m@bues.ch>,
-        PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
-        Louis Collard <louiscollard@chromium.org>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        linux-kernel@vger.kernel.org, apronin@chromium.org,
-        jarkko.sakkinen@linux.intel.com, linux@mniewoehner.de,
-        david.bild@xaptum.com
-Subject: [RESEND PATCH] Allow hwrng to initialize crng.
-Date: Thu, 13 Dec 2018 16:40:17 +0800
-Message-Id: <20181213084017.80850-1-louiscollard@chromium.org>
+Return-Path: <SRS0=ZXsK=OT=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from lhrrgout.huawei.com ([185.176.76.210]:32807 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726841AbeLJSFC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 10 Dec 2018 13:05:02 -0500
+Subject: Re: [RFC][PATCH 08/12] KEYS: PGP-based public key signature
+ verification
+To: David Howells <dhowells@redhat.com>
+CC: <dwmw2@infradead.org>, <herbert@gondor.apana.org.au>,
+        <davem@davemloft.net>, <keyrings@vger.kernel.org>,
+        <linux-crypto@vger.kernel.org>, <linux-integrity@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <silviu.vlasceanu@huawei.com>
+References: <e55a9f80-d2ea-f28f-06ab-3d99786096c4@huawei.com>
+ <20181112102423.30415-9-roberto.sassu@huawei.com>
+ <20181112102423.30415-1-roberto.sassu@huawei.com>
+ <19985.1542026635@warthog.procyon.org.uk>
+ <17488.1544461088@warthog.procyon.org.uk>
+From: Roberto Sassu <roberto.sassu@huawei.com>
+Message-ID: <12cec606-c31e-9321-b63f-7122ce068179@huawei.com>
+Date: Mon, 10 Dec 2018 19:04:53 +0100
+MIME-Version: 1.0
+In-Reply-To: <17488.1544461088@warthog.procyon.org.uk>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Some systems, for example embedded systems, do not generate
-enough entropy on boot through interrupts, and boot may be blocked for
-several minutes waiting for a call to getrandom to complete.
+On 12/10/2018 5:58 PM, David Howells wrote:
+> Roberto Sassu <roberto.sassu@huawei.com> wrote:
+> 
+>>> You need to consider what it is that the patch trying to achieve.
+>>
+>> I understood that the purpose is to check PGP signatures with built-in
+>> keys or keys provided by the user. Since using the session keyring
+>> caused the issue I reported, I thought it was ok to use the user
+>> keyring.
+>>
+>> Just a note: the original patches were relying on KEY_FLAG_TRUSTED to
+>> determine if a key is trusted; now the trustworthiness depends on the
+>> type of keyring passed to pgp_verify_sig(). I removed the additional key
+>> search in the user (session) keyring to prevent that signature
+>> verification is done with a key provided by the user even when the
+>> caller of pgp_verify_sig() expects that a trusted key is used. The
+>> search in the session keyring is done if the caller of pgp_verify_sig()
+>> sets the keyring pointer to NULL.
+> 
+> Thinking about these patches further, as you point out, the way that trust is
+> computed has changed.  There is no no KEY_FLAG_TRUSTED; rather, a key is
+> assumed to be trusted if it's on a trusted keyring.
+> 
+> *Getting* it onto that trusted keyring is then the trick.  There are two ways:
+> 
+>   (1) A key can be loaded from a trusted source during boot (say a compiled in
+>       set of keys).
+> 
+>   (2) A key can be added to that keyring later, provided that the key is
+>       verified by a key already in the ring and the ring hasn't been closed.
+> 
+> What do we need to check PGP signatures?  Blobs or keys as well?
 
-Currently, random data is read from a hwrng when it is registered,
-and is loaded into primary_crng. This data is treated in the same
-way as data that is device-specific but otherwise unchanging, and
-so primary_crng cannot become initialized with the data from the
-hwrng.
+For my use case, verifying blobs (RPM headers or 'Release' for Debian-
+based distributions) would be sufficient. The keys can be added at
+compile time.
 
-This change causes the data initially read from the hwrng to be
-treated the same as subsequent data that is read from the hwrng if
-it's quality score is non-zero.
 
-The implications of this are:
+> Why does the user keyring need to be a fallback?  (I know the session keyring
+> used to be a fallback when I first did these, but things have changed since
+> then).
 
-The data read from hwrng can cause primary_crng to become
-initialized, therefore avoiding problems of getrandom blocking
-on boot.
+Users can verify signatures with the pgp_test key type (patch 10/12).
+During the first attempt, pgp_test tries to use built-in keys. If
+verification fails, pgp_test tries again with keys in the user keyring.
+But if verification succeeds during the second attempt, the kernel
+prints a warning saying that an untrusted key was used.
 
-Calls to getrandom (with GRND_RANDOM) may be using entropy
-exclusively (or in practise, almost exclusively) from the hwrng.
 
-Regarding the latter point; this behavior is the same as if a
-user specified a quality score of 1 (bit of entropy per 1024 bits)
-so hopefully this is not too scary a change to make.
+> Should we have a separate built-in keyring for PGP keys?  Actually, I suspect
+> we should probably mark keys in some way with what they're permitted to be
+> used for.
 
-This change is the result of the discussion here:
-https://patchwork.kernel.org/patch/10453893/
+I kept PGP keys in the main keyring, so that verify_pgp_signature() uses
+the same convention of verify_pkcs7_signature() (keyring == NULL: use
+primary keys, keyring == 1: use secondary keys).
 
-Signed-off-by: Louis Collard <louiscollard@chromium.org>
-Acked-by: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
----
- drivers/char/hw_random/core.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+In your patches there was a capability checking mechanism, but it was
+removed with commit db6c43bd2132.
 
-diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
-index 95be7228f327..99c3e4127949 100644
---- a/drivers/char/hw_random/core.c
-+++ b/drivers/char/hw_random/core.c
-@@ -24,6 +24,7 @@
- #include <linux/sched.h>
- #include <linux/slab.h>
- #include <linux/uaccess.h>
-+#include <crypto/chacha20.h>
- 
- #define RNG_MODULE_NAME		"hw_random"
- 
-@@ -64,13 +65,17 @@ static size_t rng_buffer_size(void)
- static void add_early_randomness(struct hwrng *rng)
- {
- 	int bytes_read;
--	size_t size = min_t(size_t, 16, rng_buffer_size());
-+	/* Read enough to initialize crng. */
-+	size_t size = 2*CHACHA20_KEY_SIZE;
- 
- 	mutex_lock(&reading_mutex);
- 	bytes_read = rng_get_data(rng, rng_buffer, size, 1);
- 	mutex_unlock(&reading_mutex);
- 	if (bytes_read > 0)
--		add_device_randomness(rng_buffer, bytes_read);
-+		/* Allow crng to become initialized, but do not add
-+		 * entropy to the pool.
-+		 */
-+		add_hwgenerator_randomness(rng_buffer, bytes_read, 0);
- }
- 
- static inline void cleanup_rng(struct kref *kref)
+Roberto
+
+
+> David
+> 
+
 -- 
-2.13.5
+HUAWEI TECHNOLOGIES Duesseldorf GmbH, HRB 56063
+Managing Director: Bo PENG, Jian LI, Yanli SHI
