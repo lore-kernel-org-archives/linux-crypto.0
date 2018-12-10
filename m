@@ -1,58 +1,155 @@
-Return-Path: <SRS0=o+Is=OM=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-io1-f67.google.com ([209.85.166.67]:40955 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726457AbeLCOPA (ORCPT
+Return-Path: <SRS0=ZXsK=OT=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mx0a-00082601.pphosted.com ([67.231.145.42]:54888 "EHLO
+        mx0a-00082601.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727434AbeLJUAJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 3 Dec 2018 09:15:00 -0500
-Received: by mail-io1-f67.google.com with SMTP id n9so10558854ioh.7
-        for <linux-crypto@vger.kernel.org>; Mon, 03 Dec 2018 06:13:49 -0800 (PST)
+        Mon, 10 Dec 2018 15:00:09 -0500
+From: Dave Watson <davejwatson@fb.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        Junaid Shahid <junaids@google.com>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+CC: Doron Roberts-Kedes <doronrk@fb.com>,
+        Sabrina Dubroca <sd@queasysnail.net>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Stephan Mueller <smueller@chronox.de>
+Subject: [PATCH 07/12] x86/crypto: aesni: Merge avx precompute functions
+Date: Mon, 10 Dec 2018 19:58:38 +0000
+Message-ID: <f2b870d980ed5c7fdabd1c4746ab94a145fa9807.1544471415.git.davejwatson@fb.com>
+References: <cover.1544471415.git.davejwatson@fb.com>
+In-Reply-To: <cover.1544471415.git.davejwatson@fb.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <D6B142CDB14D114E973E598D4DA0A361@namprd15.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <20181129230217.158038-1-ebiggers@kernel.org> <20181129230217.158038-4-ebiggers@kernel.org>
- <acad781e9981c49b83b6dfdc8cefed6246df469a.camel@strongswan.org>
-In-Reply-To: <acad781e9981c49b83b6dfdc8cefed6246df469a.camel@strongswan.org>
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date: Mon, 3 Dec 2018 15:13:37 +0100
-Message-ID: <CAKv+Gu89RiDBx35rtGS2uOZ+TwPt6P8UjwpqE17xm7dtMx-nNQ@mail.gmail.com>
-Subject: Re: [PATCH v2 3/6] crypto: x86/chacha20 - limit the
- preemption-disabled section
-To: Martin Willi <martin@strongswan.org>
-Cc: Eric Biggers <ebiggers@kernel.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        Paul Crowley <paulcrowley@google.com>,
-        Milan Broz <gmazyland@gmail.com>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, 2 Dec 2018 at 11:47, Martin Willi <martin@strongswan.org> wrote:
->
->
-> > To improve responsiveness, disable preemption for each step of the
-> > walk (which is at most PAGE_SIZE) rather than for the entire
-> > encryption/decryption operation.
->
-> It seems that it is not that uncommon for IPsec to get small inputs
-> scattered over multiple blocks. Doing FPU context saving for each walk
-> step then can slow down things.
->
-> An alternative approach could be to re-enable preemption not based on
-> the walk steps, but on the amount of bytes processed. This would
-> satisfy both users, I guess.
->
-> In the long run we probably need a better approach for FPU context
-> saving, as this really hurts performance-wise. For IPsec we should find
-> a way to avoid the (multiple) per-packet FPU save/restores in softirq
-> context, but I guess this requires support from process context
-> switching.
->
+The precompute functions differ only by the sub-macros
+they call, merge them to a single macro.   Later diffs
+add more code to fill in the gcm_context_data structure,
+this allows changes in a single place.
 
-At Jason's Zinc talk at plumbers, this came up, and apparently someone
-is working on this, i.e., to ensure that on x86, the FPU restore only
-occurs lazily, when returning to userland rather than every time you
-call kernel_fpu_end() [like we do on arm64 as well]
+Signed-off-by: Dave Watson <davejwatson@fb.com>
+---
+ arch/x86/crypto/aesni-intel_avx-x86_64.S | 76 +++++++++---------------
+ 1 file changed, 27 insertions(+), 49 deletions(-)
 
-Not sure what the ETA for that work is, though, nor did I get the name
-of the guy working on it.
+diff --git a/arch/x86/crypto/aesni-intel_avx-x86_64.S b/arch/x86/crypto/aes=
+ni-intel_avx-x86_64.S
+index 305abece93ad..e347ba61db65 100644
+--- a/arch/x86/crypto/aesni-intel_avx-x86_64.S
++++ b/arch/x86/crypto/aesni-intel_avx-x86_64.S
+@@ -661,6 +661,31 @@ _get_AAD_done\@:
+         vmovdqu \T7, AadHash(arg2)
+ .endm
+=20
++.macro INIT GHASH_MUL PRECOMPUTE
++        vmovdqu  (arg3), %xmm6              # xmm6 =3D HashKey
++
++        vpshufb  SHUF_MASK(%rip), %xmm6, %xmm6
++        ###############  PRECOMPUTATION of HashKey<<1 mod poly from the Ha=
+shKey
++        vmovdqa  %xmm6, %xmm2
++        vpsllq   $1, %xmm6, %xmm6
++        vpsrlq   $63, %xmm2, %xmm2
++        vmovdqa  %xmm2, %xmm1
++        vpslldq  $8, %xmm2, %xmm2
++        vpsrldq  $8, %xmm1, %xmm1
++        vpor     %xmm2, %xmm6, %xmm6
++        #reduction
++        vpshufd  $0b00100100, %xmm1, %xmm2
++        vpcmpeqd TWOONE(%rip), %xmm2, %xmm2
++        vpand    POLY(%rip), %xmm2, %xmm2
++        vpxor    %xmm2, %xmm6, %xmm6        # xmm6 holds the HashKey<<1 mo=
+d poly
++        ##################################################################=
+#####
++        vmovdqu  %xmm6, HashKey(arg2)       # store HashKey<<1 mod poly
++
++        CALC_AAD_HASH \GHASH_MUL, arg5, arg6, %xmm2, %xmm6, %xmm3, %xmm4, =
+%xmm5, %xmm7, %xmm1, %xmm0
++
++        \PRECOMPUTE  %xmm6, %xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5
++.endm
++
+ #ifdef CONFIG_AS_AVX
+ ##########################################################################=
+#####
+ # GHASH_MUL MACRO to implement: Data*HashKey mod (128,127,126,121,0)
+@@ -1558,31 +1583,7 @@ _initial_blocks_done\@:
+ #############################################################
+ ENTRY(aesni_gcm_precomp_avx_gen2)
+         FUNC_SAVE
+-
+-        vmovdqu  (arg3), %xmm6              # xmm6 =3D HashKey
+-
+-        vpshufb  SHUF_MASK(%rip), %xmm6, %xmm6
+-        ###############  PRECOMPUTATION of HashKey<<1 mod poly from the Ha=
+shKey
+-        vmovdqa  %xmm6, %xmm2
+-        vpsllq   $1, %xmm6, %xmm6
+-        vpsrlq   $63, %xmm2, %xmm2
+-        vmovdqa  %xmm2, %xmm1
+-        vpslldq  $8, %xmm2, %xmm2
+-        vpsrldq  $8, %xmm1, %xmm1
+-        vpor     %xmm2, %xmm6, %xmm6
+-        #reduction
+-        vpshufd  $0b00100100, %xmm1, %xmm2
+-        vpcmpeqd TWOONE(%rip), %xmm2, %xmm2
+-        vpand    POLY(%rip), %xmm2, %xmm2
+-        vpxor    %xmm2, %xmm6, %xmm6        # xmm6 holds the HashKey<<1 mo=
+d poly
+-        ##################################################################=
+#####
+-        vmovdqu  %xmm6, HashKey(arg2)       # store HashKey<<1 mod poly
+-
+-
+-        CALC_AAD_HASH GHASH_MUL_AVX, arg5, arg6, %xmm2, %xmm6, %xmm3, %xmm=
+4, %xmm5, %xmm7, %xmm1, %xmm0
+-
+-        PRECOMPUTE_AVX  %xmm6, %xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5
+-
++        INIT GHASH_MUL_AVX, PRECOMPUTE_AVX
+         FUNC_RESTORE
+         ret
+ ENDPROC(aesni_gcm_precomp_avx_gen2)
+@@ -2547,30 +2548,7 @@ _initial_blocks_done\@:
+ #############################################################
+ ENTRY(aesni_gcm_precomp_avx_gen4)
+         FUNC_SAVE
+-
+-        vmovdqu  (arg3), %xmm6                # xmm6 =3D HashKey
+-
+-        vpshufb  SHUF_MASK(%rip), %xmm6, %xmm6
+-        ###############  PRECOMPUTATION of HashKey<<1 mod poly from the Ha=
+shKey
+-        vmovdqa  %xmm6, %xmm2
+-        vpsllq   $1, %xmm6, %xmm6
+-        vpsrlq   $63, %xmm2, %xmm2
+-        vmovdqa  %xmm2, %xmm1
+-        vpslldq  $8, %xmm2, %xmm2
+-        vpsrldq  $8, %xmm1, %xmm1
+-        vpor     %xmm2, %xmm6, %xmm6
+-        #reduction
+-        vpshufd  $0b00100100, %xmm1, %xmm2
+-        vpcmpeqd TWOONE(%rip), %xmm2, %xmm2
+-        vpand    POLY(%rip), %xmm2, %xmm2
+-        vpxor    %xmm2, %xmm6, %xmm6          # xmm6 holds the HashKey<<1 =
+mod poly
+-        ##################################################################=
+#####
+-        vmovdqu  %xmm6, HashKey(arg2)         # store HashKey<<1 mod poly
+-
+-        CALC_AAD_HASH GHASH_MUL_AVX2, arg5, arg6, %xmm2, %xmm6, %xmm3, %xm=
+m4, %xmm5, %xmm7, %xmm1, %xmm0
+-
+-        PRECOMPUTE_AVX2  %xmm6, %xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5
+-
++        INIT GHASH_MUL_AVX2, PRECOMPUTE_AVX2
+         FUNC_RESTORE
+         ret
+ ENDPROC(aesni_gcm_precomp_avx_gen4)
+--=20
+2.17.1
