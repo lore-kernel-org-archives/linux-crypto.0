@@ -1,123 +1,52 @@
-Return-Path: <SRS0=ECh6=O2=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:49814 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726589AbeLQHYt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 17 Dec 2018 02:24:49 -0500
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Rob Rice <rob.rice@broadcom.com>,
-        Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Yael Chemla <yael.chemla@foss.arm.com>
-Subject: [PATCH 3/3] crypto: ccree - convert to use crypto_authenc_extractkeys()
-Date: Sun, 16 Dec 2018 23:23:24 -0800
-Message-Id: <20181217072324.16844-4-ebiggers@kernel.org>
-In-Reply-To: <20181217072324.16844-1-ebiggers@kernel.org>
-References: <20181217072324.16844-1-ebiggers@kernel.org>
+Return-Path: <SRS0=eKEb=OU=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from stargate.chelsio.com ([12.32.117.8]:43998 "EHLO
+        stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726318AbeLKKUP (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 11 Dec 2018 05:20:15 -0500
+From: Atul Gupta <atul.gupta@chelsio.com>
+To: davem@davemloft.net, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, netdev@vger.kernel.org
+Cc: dt@chelsio.com, atul.gupta@chelsio.com
+Subject: [tls 1/5] net/tls: Init routines in create_ctx
+Date: Tue, 11 Dec 2018 02:19:40 -0800
+Message-Id: <20181211101940.3509-1-atul.gupta@chelsio.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Eric Biggers <ebiggers@google.com>
+create_ctx is called from tls_init and tls_hw_prot
+hence initialize function pointers in common routine.
 
-Convert the ccree crypto driver to use crypto_authenc_extractkeys() so
-that it picks up the fix for broken validation of rtattr::rta_len.
-
-Fixes: ff27e85a85bb ("crypto: ccree - add AEAD support")
-Cc: <stable@vger.kernel.org> # v4.17+
-Signed-off-by: Eric Biggers <ebiggers@google.com>
+Signed-off-by: Atul Gupta <atul.gupta@chelsio.com>
 ---
- drivers/crypto/ccree/cc_aead.c | 40 ++++++++++++++++------------------
- 1 file changed, 19 insertions(+), 21 deletions(-)
+ net/tls/tls_main.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/crypto/ccree/cc_aead.c b/drivers/crypto/ccree/cc_aead.c
-index f2643cda45db9..a3527c00b29a9 100644
---- a/drivers/crypto/ccree/cc_aead.c
-+++ b/drivers/crypto/ccree/cc_aead.c
-@@ -549,13 +549,12 @@ static int cc_aead_setkey(struct crypto_aead *tfm, const u8 *key,
- 			  unsigned int keylen)
- {
- 	struct cc_aead_ctx *ctx = crypto_aead_ctx(tfm);
--	struct rtattr *rta = (struct rtattr *)key;
- 	struct cc_crypto_req cc_req = {};
--	struct crypto_authenc_key_param *param;
- 	struct cc_hw_desc desc[MAX_AEAD_SETKEY_SEQ];
--	int rc = -EINVAL;
- 	unsigned int seq_len = 0;
- 	struct device *dev = drvdata_to_dev(ctx->drvdata);
-+	const u8 *enckey, *authkey;
-+	int rc;
+diff --git a/net/tls/tls_main.c b/net/tls/tls_main.c
+index 311cec8..4920803 100644
+--- a/net/tls/tls_main.c
++++ b/net/tls/tls_main.c
+@@ -543,6 +543,9 @@ static struct tls_context *create_ctx(struct sock *sk)
+ 		return NULL;
  
- 	dev_dbg(dev, "Setting key in context @%p for %s. key=%p keylen=%u\n",
- 		ctx, crypto_tfm_alg_name(crypto_aead_tfm(tfm)), key, keylen);
-@@ -563,35 +562,33 @@ static int cc_aead_setkey(struct crypto_aead *tfm, const u8 *key,
- 	/* STAT_PHASE_0: Init and sanity checks */
+ 	icsk->icsk_ulp_data = ctx;
++	ctx->setsockopt = sk->sk_prot->setsockopt;
++	ctx->getsockopt = sk->sk_prot->getsockopt;
++	ctx->sk_proto_close = sk->sk_prot->close;
+ 	return ctx;
+ }
  
- 	if (ctx->auth_mode != DRV_HASH_NULL) { /* authenc() alg. */
--		if (!RTA_OK(rta, keylen))
--			goto badkey;
--		if (rta->rta_type != CRYPTO_AUTHENC_KEYA_PARAM)
--			goto badkey;
--		if (RTA_PAYLOAD(rta) < sizeof(*param))
--			goto badkey;
--		param = RTA_DATA(rta);
--		ctx->enc_keylen = be32_to_cpu(param->enckeylen);
--		key += RTA_ALIGN(rta->rta_len);
--		keylen -= RTA_ALIGN(rta->rta_len);
--		if (keylen < ctx->enc_keylen)
-+		struct crypto_authenc_keys keys;
-+
-+		rc = crypto_authenc_extractkeys(&keys, key, keylen);
-+		if (rc)
- 			goto badkey;
--		ctx->auth_keylen = keylen - ctx->enc_keylen;
-+		enckey = keys.enckey;
-+		authkey = keys.authkey;
-+		ctx->enc_keylen = keys.enckeylen;
-+		ctx->auth_keylen = keys.authkeylen;
- 
- 		if (ctx->cipher_mode == DRV_CIPHER_CTR) {
- 			/* the nonce is stored in bytes at end of key */
-+			rc = -EINVAL;
- 			if (ctx->enc_keylen <
- 			    (AES_MIN_KEY_SIZE + CTR_RFC3686_NONCE_SIZE))
- 				goto badkey;
- 			/* Copy nonce from last 4 bytes in CTR key to
- 			 *  first 4 bytes in CTR IV
- 			 */
--			memcpy(ctx->ctr_nonce, key + ctx->auth_keylen +
--			       ctx->enc_keylen - CTR_RFC3686_NONCE_SIZE,
--			       CTR_RFC3686_NONCE_SIZE);
-+			memcpy(ctx->ctr_nonce, enckey + ctx->enc_keylen -
-+			       CTR_RFC3686_NONCE_SIZE, CTR_RFC3686_NONCE_SIZE);
- 			/* Set CTR key size */
- 			ctx->enc_keylen -= CTR_RFC3686_NONCE_SIZE;
- 		}
- 	} else { /* non-authenc - has just one key */
-+		enckey = key;
-+		authkey = NULL;
- 		ctx->enc_keylen = keylen;
- 		ctx->auth_keylen = 0;
+@@ -675,9 +678,6 @@ static int tls_init(struct sock *sk)
+ 		rc = -ENOMEM;
+ 		goto out;
  	}
-@@ -603,13 +600,14 @@ static int cc_aead_setkey(struct crypto_aead *tfm, const u8 *key,
- 	/* STAT_PHASE_1: Copy key to ctx */
+-	ctx->setsockopt = sk->sk_prot->setsockopt;
+-	ctx->getsockopt = sk->sk_prot->getsockopt;
+-	ctx->sk_proto_close = sk->sk_prot->close;
  
- 	/* Get key material */
--	memcpy(ctx->enckey, key + ctx->auth_keylen, ctx->enc_keylen);
-+	memcpy(ctx->enckey, enckey, ctx->enc_keylen);
- 	if (ctx->enc_keylen == 24)
- 		memset(ctx->enckey + 24, 0, CC_AES_KEY_SIZE_MAX - 24);
- 	if (ctx->auth_mode == DRV_HASH_XCBC_MAC) {
--		memcpy(ctx->auth_state.xcbc.xcbc_keys, key, ctx->auth_keylen);
-+		memcpy(ctx->auth_state.xcbc.xcbc_keys, authkey,
-+		       ctx->auth_keylen);
- 	} else if (ctx->auth_mode != DRV_HASH_NULL) { /* HMAC */
--		rc = cc_get_plain_hmac_key(tfm, key, ctx->auth_keylen);
-+		rc = cc_get_plain_hmac_key(tfm, authkey, ctx->auth_keylen);
- 		if (rc)
- 			goto badkey;
- 	}
+ 	/* Build IPv6 TLS whenever the address of tcpv6	_prot changes */
+ 	if (ip_ver == TLSV6 &&
 -- 
-2.19.2
+1.8.3.1
