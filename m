@@ -1,112 +1,88 @@
-Return-Path: <SRS0=KZld=OW=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-io1-f68.google.com ([209.85.166.68]:40557 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727928AbeLMJsT (ORCPT
+Return-Path: <SRS0=eKEb=OU=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:45306 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726158AbeLKXkR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 13 Dec 2018 04:48:19 -0500
-Received: by mail-io1-f68.google.com with SMTP id n9so1084382ioh.7
-        for <linux-crypto@vger.kernel.org>; Thu, 13 Dec 2018 01:48:18 -0800 (PST)
+        Tue, 11 Dec 2018 18:40:17 -0500
+Received: by mail-pl1-f194.google.com with SMTP id a14so7655967plm.12
+        for <linux-crypto@vger.kernel.org>; Tue, 11 Dec 2018 15:40:16 -0800 (PST)
 MIME-Version: 1.0
-References: <20181213091848.81327-1-louiscollard@chromium.org>
-In-Reply-To: <20181213091848.81327-1-louiscollard@chromium.org>
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date: Thu, 13 Dec 2018 10:48:07 +0100
-Message-ID: <CAKv+Gu9sWw=VHjYivokAkhGP+p1P15bs3ThfRghARNesW5kyOA@mail.gmail.com>
-Subject: Re: [PATCH v2] Allow hwrng to initialize crng.
-To: louiscollard@chromium.org
-Cc: "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>, mpm@selenic.com,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        gary.hook@amd.com, m@bues.ch,
-        PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        apronin@chromium.org,
-        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
-        linux@mniewoehner.de, david.bild@xaptum.com,
-        "Theodore Ts'o" <tytso@mit.edu>
+References: <20181210234929.5729-1-natechancellor@gmail.com>
+In-Reply-To: <20181210234929.5729-1-natechancellor@gmail.com>
+From: Nick Desaulniers <ndesaulniers@google.com>
+Date: Tue, 11 Dec 2018 15:40:04 -0800
+Message-ID: <CAKwvOdkB0BViLgVyWBQZw4jZgFjp-3m2ndjiJmutsbevYjy7nA@mail.gmail.com>
+Subject: Re: [PATCH] crypto: ux500 - Use proper enum in cryp_set_dma_transfer
+To: Nathan Chancellor <natechancellor@gmail.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, 13 Dec 2018 at 10:18, Louis Collard <louiscollard@chromium.org> wrote:
+On Mon, Dec 10, 2018 at 3:49 PM Nathan Chancellor
+<natechancellor@gmail.com> wrote:
 >
-> Some systems, for example embedded systems, do not generate
-> enough entropy on boot through interrupts, and boot may be blocked for
-> several minutes waiting for a call to getrandom to complete.
+> Clang warns when one enumerated type is implicitly converted to another:
 >
-> Currently, random data is read from a hwrng when it is registered,
-> and is loaded into primary_crng. This data is treated in the same
-> way as data that is device-specific but otherwise unchanging, and
-> so primary_crng cannot become initialized with the data from the
-> hwrng.
+> drivers/crypto/ux500/cryp/cryp_core.c:559:5: warning: implicit
+> conversion from enumeration type 'enum dma_data_direction' to different
+> enumeration type 'enum dma_transfer_direction' [-Wenum-conversion]
+>                                 direction, DMA_CTRL_ACK);
+>                                 ^~~~~~~~~
+> drivers/crypto/ux500/cryp/cryp_core.c:583:5: warning: implicit
+> conversion from enumeration type 'enum dma_data_direction' to different
+> enumeration type 'enum dma_transfer_direction' [-Wenum-conversion]
+>                                 direction,
+>                                 ^~~~~~~~~
+> 2 warnings generated.
 >
-> This change causes the data initially read from the hwrng to be
-> treated the same as subsequent data that is read from the hwrng if
-> it's quality score is non-zero.
+> dmaengine_prep_slave_sg expects an enum from dma_transfer_direction.
+> Because we know the value of the dma_data_direction enum from the
+> switch statement, we can just use the proper value from
+> dma_transfer_direction so there is no more conversion.
 >
-> The implications of this are:
+> DMA_TO_DEVICE = DMA_MEM_TO_DEV = 1
+> DMA_FROM_DEVICE = DMA_DEV_TO_MEM = 2
 >
-> The data read from hwrng can cause primary_crng to become
-> initialized, therefore avoiding problems of getrandom blocking
-> on boot.
->
-> Calls to getrandom (with GRND_RANDOM) may be using entropy
-> exclusively (or in practise, almost exclusively) from the hwrng.
->
-> Regarding the latter point; this behavior is the same as if a
-> user specified a quality score of 1 (bit of entropy per 1024 bits)
-> so hopefully this is not too scary a change to make.
->
-> This change is the result of the discussion here:
-> https://patchwork.kernel.org/patch/10453893/
->
-> Signed-off-by: Louis Collard <louiscollard@chromium.org>
-> Acked-by: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+> Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
+
+Deja vu!
+These particular enums get mixed up ALL THE TIME. Thanks for fixing
+probably every instance of this bug (via patches before this one).
+Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+
 > ---
->  drivers/char/hw_random/core.c | 11 +++++++++--
->  1 file changed, 9 insertions(+), 2 deletions(-)
+>  drivers/crypto/ux500/cryp/cryp_core.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >
-> diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
-> index 95be7228f327..7736e1a96321 100644
-> --- a/drivers/char/hw_random/core.c
-> +++ b/drivers/char/hw_random/core.c
-> @@ -24,6 +24,7 @@
->  #include <linux/sched.h>
->  #include <linux/slab.h>
->  #include <linux/uaccess.h>
-> +#include <crypto/chacha20.h>
+> diff --git a/drivers/crypto/ux500/cryp/cryp_core.c b/drivers/crypto/ux500/cryp/cryp_core.c
+> index d2663a4e1f5e..a92a66b1ff46 100644
+> --- a/drivers/crypto/ux500/cryp/cryp_core.c
+> +++ b/drivers/crypto/ux500/cryp/cryp_core.c
+> @@ -556,7 +556,7 @@ static int cryp_set_dma_transfer(struct cryp_ctx *ctx,
+>                 desc = dmaengine_prep_slave_sg(channel,
+>                                 ctx->device->dma.sg_src,
+>                                 ctx->device->dma.sg_src_len,
+> -                               direction, DMA_CTRL_ACK);
+> +                               DMA_MEM_TO_DEV, DMA_CTRL_ACK);
+>                 break;
 >
->  #define RNG_MODULE_NAME                "hw_random"
+>         case DMA_FROM_DEVICE:
+> @@ -580,7 +580,7 @@ static int cryp_set_dma_transfer(struct cryp_ctx *ctx,
+>                 desc = dmaengine_prep_slave_sg(channel,
+>                                 ctx->device->dma.sg_dst,
+>                                 ctx->device->dma.sg_dst_len,
+> -                               direction,
+> +                               DMA_DEV_TO_MEM,
+>                                 DMA_CTRL_ACK |
+>                                 DMA_PREP_INTERRUPT);
 >
-> @@ -64,13 +65,19 @@ static size_t rng_buffer_size(void)
->  static void add_early_randomness(struct hwrng *rng)
->  {
->         int bytes_read;
-> -       size_t size = min_t(size_t, 16, rng_buffer_size());
-> +       /* Read enough to initialize crng. */
-> +       size_t size = min_t(size_t,
-> +                           2*CHACHA20_KEY_SIZE,
-
-This should be as symbolic constant that retains its meaning even if
-we move away from ChaCha20 or modify the current implementation
-
-> +                           rng_buffer_size());
->
->         mutex_lock(&reading_mutex);
->         bytes_read = rng_get_data(rng, rng_buffer, size, 1);
->         mutex_unlock(&reading_mutex);
->         if (bytes_read > 0)
-> -               add_device_randomness(rng_buffer, bytes_read);
-> +               /* Allow crng to become initialized, but do not add
-> +                * entropy to the pool.
-> +                */
-> +               add_hwgenerator_randomness(rng_buffer, bytes_read, 0);
->  }
->
->  static inline void cleanup_rng(struct kref *kref)
 > --
-> 2.13.5
+> 2.20.0
 >
+
+
+-- 
+Thanks,
+~Nick Desaulniers
