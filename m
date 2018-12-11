@@ -1,61 +1,37 @@
-Return-Path: <SRS0=/ZR5=OQ=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:48972 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725948AbeLGGOQ (ORCPT
+Return-Path: <SRS0=eKEb=OU=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from stargate.chelsio.com ([12.32.117.8]:17052 "EHLO
+        stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726577AbeLKKv5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 7 Dec 2018 01:14:16 -0500
-Date: Fri, 7 Dec 2018 14:14:10 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Crypto Fixes for 4.20
-Message-ID: <20181207061409.xflg423nknleuddw@gondor.apana.org.au>
-References: <20170714141855.GA29426@gondor.apana.org.au>
- <20170922084401.GA15541@gondor.apana.org.au>
- <20171128230929.GA17783@gondor.apana.org.au>
- <20171222064931.GA27068@gondor.apana.org.au>
- <20180105073808.GA14405@gondor.apana.org.au>
- <20180212031702.GA26153@gondor.apana.org.au>
- <20180428080517.haxgpvqrwgotakyo@gondor.apana.org.au>
- <20180622145403.6ltjip7che227fuo@gondor.apana.org.au>
- <20180829033353.agnzxra3jk2r2mzg@gondor.apana.org.au>
- <20181116063146.e7a3mep3ghnfltxe@gondor.apana.org.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181116063146.e7a3mep3ghnfltxe@gondor.apana.org.au>
+        Tue, 11 Dec 2018 05:51:57 -0500
+From: Harsh Jain <harsh@chelsio.com>
+To: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        atul.gupta@chelsio.com, indranil@chelsio.com
+Cc: Harsh Jain <harsh@chelsio.com>
+Subject: [PATCH 0/6] crypto:chelsio: Bug Fixes
+Date: Tue, 11 Dec 2018 16:21:36 +0530
+Message-Id: <cover.1544520025.git.harsh@chelsio.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Linus: 
+It includes Bug Fixes
 
-This push fixes the following issues:
+Harsh Jain (5):
+  crypto:chcr: Swap location of AAD and IV sent in WR
+  crypto:chcr:Use same value for both channel in single WR
+  crypto:chcr: cleanup:send addr as value in function argument
+  crypto:chelsio: Fix wrong error counter increments
+  Crypto:Chelsio:Handle PCI shutdown event
 
-- Disable the new crypto stats interface as it's still being changed.
-- Fix potential uses-after-free in cbc/cfb/pcbc.
+Atul Gupta (5):
+  crypto:chelsio: Reset counters on cxgb4 Detach
 
+ drivers/crypto/chelsio/chcr_algo.c   | 401 +++++++++++++++++++++--------------
+ drivers/crypto/chelsio/chcr_algo.h   |   2 +-
+ drivers/crypto/chelsio/chcr_core.c   | 195 +++++++++++------
+ drivers/crypto/chelsio/chcr_core.h   |  35 ++-
+ drivers/crypto/chelsio/chcr_crypto.h |  10 +-
+ 5 files changed, 407 insertions(+), 236 deletions(-)
 
-Please pull from
-
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
-
-
-Herbert Xu (1):
-      crypto: user - Disable statistics interface
-
-Pan Bian (1):
-      crypto: do not free algorithm before using
-
- crypto/Kconfig | 2 +-
- crypto/cbc.c   | 6 ++++--
- crypto/cfb.c   | 6 ++++--
- crypto/pcbc.c  | 6 ++++--
- 4 files changed, 13 insertions(+), 7 deletions(-)
-
-Thanks,
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.1.4
