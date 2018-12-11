@@ -1,106 +1,271 @@
-Return-Path: <SRS0=KZld=OW=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:50056 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726416AbeLMIv2 (ORCPT
+Return-Path: <SRS0=eKEb=OU=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from stargate.chelsio.com ([12.32.117.8]:48323 "EHLO
+        stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726459AbeLKKUQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 13 Dec 2018 03:51:28 -0500
-Date: Thu, 13 Dec 2018 16:51:02 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Louis Collard <louiscollard@chromium.org>
-Cc: linux-crypto@vger.kernel.org, Matt Mackall <mpm@selenic.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Gary R Hook <gary.hook@amd.com>, Michael Buesch <m@bues.ch>,
-        PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        linux-kernel@vger.kernel.org, apronin@chromium.org,
-        jarkko.sakkinen@linux.intel.com, linux@mniewoehner.de,
-        david.bild@xaptum.com, Theodore Ts'o <tytso@mit.edu>
-Subject: Re: [RESEND PATCH] Allow hwrng to initialize crng.
-Message-ID: <20181213085102.aiw64pubxgoohlo3@gondor.apana.org.au>
-References: <20181213084017.80850-1-louiscollard@chromium.org>
+        Tue, 11 Dec 2018 05:20:16 -0500
+From: Atul Gupta <atul.gupta@chelsio.com>
+To: davem@davemloft.net, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, netdev@vger.kernel.org
+Cc: dt@chelsio.com, atul.gupta@chelsio.com
+Subject: [tls 2/5] net/tls: sleeping function from invalid context
+Date: Tue, 11 Dec 2018 02:20:09 -0800
+Message-Id: <20181211102009.3561-1-atul.gupta@chelsio.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181213084017.80850-1-louiscollard@chromium.org>
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Dec 13, 2018 at 04:40:17PM +0800, Louis Collard wrote:
-> Some systems, for example embedded systems, do not generate
-> enough entropy on boot through interrupts, and boot may be blocked for
-> several minutes waiting for a call to getrandom to complete.
-> 
-> Currently, random data is read from a hwrng when it is registered,
-> and is loaded into primary_crng. This data is treated in the same
-> way as data that is device-specific but otherwise unchanging, and
-> so primary_crng cannot become initialized with the data from the
-> hwrng.
-> 
-> This change causes the data initially read from the hwrng to be
-> treated the same as subsequent data that is read from the hwrng if
-> it's quality score is non-zero.
-> 
-> The implications of this are:
-> 
-> The data read from hwrng can cause primary_crng to become
-> initialized, therefore avoiding problems of getrandom blocking
-> on boot.
-> 
-> Calls to getrandom (with GRND_RANDOM) may be using entropy
-> exclusively (or in practise, almost exclusively) from the hwrng.
-> 
-> Regarding the latter point; this behavior is the same as if a
-> user specified a quality score of 1 (bit of entropy per 1024 bits)
-> so hopefully this is not too scary a change to make.
-> 
-> This change is the result of the discussion here:
-> https://patchwork.kernel.org/patch/10453893/
-> 
-> Signed-off-by: Louis Collard <louiscollard@chromium.org>
-> Acked-by: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-> ---
->  drivers/char/hw_random/core.c | 9 +++++++--
->  1 file changed, 7 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
-> index 95be7228f327..99c3e4127949 100644
-> --- a/drivers/char/hw_random/core.c
-> +++ b/drivers/char/hw_random/core.c
-> @@ -24,6 +24,7 @@
->  #include <linux/sched.h>
->  #include <linux/slab.h>
->  #include <linux/uaccess.h>
-> +#include <crypto/chacha20.h>
->  
->  #define RNG_MODULE_NAME		"hw_random"
->  
-> @@ -64,13 +65,17 @@ static size_t rng_buffer_size(void)
->  static void add_early_randomness(struct hwrng *rng)
->  {
->  	int bytes_read;
-> -	size_t size = min_t(size_t, 16, rng_buffer_size());
-> +	/* Read enough to initialize crng. */
-> +	size_t size = 2*CHACHA20_KEY_SIZE;
->  
->  	mutex_lock(&reading_mutex);
->  	bytes_read = rng_get_data(rng, rng_buffer, size, 1);
->  	mutex_unlock(&reading_mutex);
->  	if (bytes_read > 0)
-> -		add_device_randomness(rng_buffer, bytes_read);
-> +		/* Allow crng to become initialized, but do not add
-> +		 * entropy to the pool.
-> +		 */
-> +		add_hwgenerator_randomness(rng_buffer, bytes_read, 0);
->  }
->  
->  static inline void cleanup_rng(struct kref *kref)
-> -- 
-> 2.13.5
-> 
+HW unhash within mutex for registered tls devices cause sleep
+when called from tcp_set_state for TCP_CLOSE. Release lock and
+re-acquire after function call with ref count incr/dec.
+defined kref and fp release for tls_device to ensure device
+is not released outside lock.
 
-Adding Ted Ts'o to the cc list.
+BUG: sleeping function called from invalid context at
+kernel/locking/mutex.c:748
+in_atomic(): 1, irqs_disabled(): 0, pid: 0, name: swapper/7
+INFO: lockdep is turned off.
+CPU: 7 PID: 0 Comm: swapper/7 Tainted: G        W  O
+Call Trace:
+ <IRQ>
+ dump_stack+0x5e/0x8b
+ ___might_sleep+0x222/0x260
+ __mutex_lock+0x5c/0xa50
+ ? vprintk_emit+0x1f3/0x440
+ ? kmem_cache_free+0x22d/0x2a0
+ ? tls_hw_unhash+0x2f/0x80
+ ? printk+0x52/0x6e
+ ? tls_hw_unhash+0x2f/0x80
+ tls_hw_unhash+0x2f/0x80
+ tcp_set_state+0x5f/0x180
+ tcp_done+0x2e/0xe0
+ tcp_rcv_state_process+0x92c/0xdd3
+ ? lock_acquire+0xf5/0x1f0
+ ? tcp_v4_rcv+0xa7c/0xbe0
+ ? tcp_v4_do_rcv+0x70/0x1e0
+
+Signed-off-by: Atul Gupta <atul.gupta@chelsio.com>
+---
+ drivers/crypto/chelsio/chtls/chtls_main.c | 55 ++++++++++++++++++-------------
+ include/net/tls.h                         |  6 ++++
+ net/tls/tls_main.c                        | 36 ++++++++++++--------
+ 3 files changed, 61 insertions(+), 36 deletions(-)
+
+diff --git a/drivers/crypto/chelsio/chtls/chtls_main.c b/drivers/crypto/chelsio/chtls/chtls_main.c
+index f472c51..db40ab6 100644
+--- a/drivers/crypto/chelsio/chtls/chtls_main.c
++++ b/drivers/crypto/chelsio/chtls/chtls_main.c
+@@ -149,6 +149,30 @@ static void chtls_destroy_hash(struct tls_device *dev, struct sock *sk)
+ 		chtls_stop_listen(sk);
+ }
+ 
++static void chtls_free_uld(struct chtls_dev *cdev)
++{
++	int i;
++
++	tls_unregister_device(&cdev->tlsdev);
++	kvfree(cdev->kmap.addr);
++	idr_destroy(&cdev->hwtid_idr);
++	for (i = 0; i < (1 << RSPQ_HASH_BITS); i++)
++		kfree_skb(cdev->rspq_skb_cache[i]);
++	kfree(cdev->lldi);
++	kfree_skb(cdev->askb);
++	kfree(cdev);
++}
++
++static inline void chtls_dev_release(struct kref *kref)
++{
++	struct chtls_dev *cdev;
++	struct tls_device *dev;
++
++	dev = container_of(kref, struct tls_device, kref);
++	cdev = to_chtls_dev(dev);
++	chtls_free_uld(cdev);
++}
++
+ static void chtls_register_dev(struct chtls_dev *cdev)
+ {
+ 	struct tls_device *tlsdev = &cdev->tlsdev;
+@@ -159,15 +183,12 @@ static void chtls_register_dev(struct chtls_dev *cdev)
+ 	tlsdev->feature = chtls_inline_feature;
+ 	tlsdev->hash = chtls_create_hash;
+ 	tlsdev->unhash = chtls_destroy_hash;
+-	tls_register_device(&cdev->tlsdev);
++	tlsdev->release = chtls_dev_release;
++	kref_init(&tlsdev->kref);
++	tls_register_device(tlsdev);
+ 	cdev->cdev_state = CHTLS_CDEV_STATE_UP;
+ }
+ 
+-static void chtls_unregister_dev(struct chtls_dev *cdev)
+-{
+-	tls_unregister_device(&cdev->tlsdev);
+-}
+-
+ static void process_deferq(struct work_struct *task_param)
+ {
+ 	struct chtls_dev *cdev = container_of(task_param,
+@@ -262,28 +283,16 @@ static void *chtls_uld_add(const struct cxgb4_lld_info *info)
+ 	return NULL;
+ }
+ 
+-static void chtls_free_uld(struct chtls_dev *cdev)
+-{
+-	int i;
+-
+-	chtls_unregister_dev(cdev);
+-	kvfree(cdev->kmap.addr);
+-	idr_destroy(&cdev->hwtid_idr);
+-	for (i = 0; i < (1 << RSPQ_HASH_BITS); i++)
+-		kfree_skb(cdev->rspq_skb_cache[i]);
+-	kfree(cdev->lldi);
+-	kfree_skb(cdev->askb);
+-	kfree(cdev);
+-}
+-
+ static void chtls_free_all_uld(void)
+ {
+ 	struct chtls_dev *cdev, *tmp;
+ 
+ 	mutex_lock(&cdev_mutex);
+ 	list_for_each_entry_safe(cdev, tmp, &cdev_list, list) {
+-		if (cdev->cdev_state == CHTLS_CDEV_STATE_UP)
+-			chtls_free_uld(cdev);
++		if (cdev->cdev_state == CHTLS_CDEV_STATE_UP) {
++			list_del(&cdev->list);
++			kref_put(&cdev->tlsdev.kref, cdev->tlsdev.release);
++		}
+ 	}
+ 	mutex_unlock(&cdev_mutex);
+ }
+@@ -304,7 +313,7 @@ static int chtls_uld_state_change(void *handle, enum cxgb4_state new_state)
+ 		mutex_lock(&cdev_mutex);
+ 		list_del(&cdev->list);
+ 		mutex_unlock(&cdev_mutex);
+-		chtls_free_uld(cdev);
++		kref_put(&cdev->tlsdev.kref, cdev->tlsdev.release);
+ 		break;
+ 	default:
+ 		break;
+diff --git a/include/net/tls.h b/include/net/tls.h
+index bab5627..3cbcd12 100644
+--- a/include/net/tls.h
++++ b/include/net/tls.h
+@@ -76,6 +76,10 @@
+  *
+  * void (*unhash)(struct tls_device *device, struct sock *sk);
+  *     This function cleans listen state set by Inline TLS driver
++ *
++ * void (*release)(struct kref *kref);
++ *     Release the registered device and allocated resources
++ * @kref: Number of reference to tls_device
+  */
+ struct tls_device {
+ 	char name[TLS_DEVICE_NAME_MAX];
+@@ -83,6 +87,8 @@ struct tls_device {
+ 	int  (*feature)(struct tls_device *device);
+ 	int  (*hash)(struct tls_device *device, struct sock *sk);
+ 	void (*unhash)(struct tls_device *device, struct sock *sk);
++	void (*release)(struct kref *kref);
++	struct kref kref;
+ };
+ 
+ enum {
+diff --git a/net/tls/tls_main.c b/net/tls/tls_main.c
+index 4920803..1428bd7 100644
+--- a/net/tls/tls_main.c
++++ b/net/tls/tls_main.c
+@@ -56,7 +56,7 @@ enum {
+ static struct proto *saved_tcpv6_prot;
+ static DEFINE_MUTEX(tcpv6_prot_mutex);
+ static LIST_HEAD(device_list);
+-static DEFINE_MUTEX(device_mutex);
++static DEFINE_SPINLOCK(device_spinlock);
+ static struct proto tls_prots[TLS_NUM_PROTS][TLS_NUM_CONFIG][TLS_NUM_CONFIG];
+ static struct proto_ops tls_sw_proto_ops;
+ 
+@@ -555,7 +555,7 @@ static int tls_hw_prot(struct sock *sk)
+ 	struct tls_device *dev;
+ 	int rc = 0;
+ 
+-	mutex_lock(&device_mutex);
++	spin_lock_bh(&device_spinlock);
+ 	list_for_each_entry(dev, &device_list, dev_list) {
+ 		if (dev->feature && dev->feature(dev)) {
+ 			ctx = create_ctx(sk);
+@@ -573,7 +573,7 @@ static int tls_hw_prot(struct sock *sk)
+ 		}
+ 	}
+ out:
+-	mutex_unlock(&device_mutex);
++	spin_unlock_bh(&device_spinlock);
+ 	return rc;
+ }
+ 
+@@ -582,12 +582,17 @@ static void tls_hw_unhash(struct sock *sk)
+ 	struct tls_context *ctx = tls_get_ctx(sk);
+ 	struct tls_device *dev;
+ 
+-	mutex_lock(&device_mutex);
++	spin_lock_bh(&device_spinlock);
+ 	list_for_each_entry(dev, &device_list, dev_list) {
+-		if (dev->unhash)
++		if (dev->unhash) {
++			kref_get(&dev->kref);
++			spin_unlock_bh(&device_spinlock);
+ 			dev->unhash(dev, sk);
++			kref_put(&dev->kref, dev->release);
++			spin_lock_bh(&device_spinlock);
++		}
+ 	}
+-	mutex_unlock(&device_mutex);
++	spin_unlock_bh(&device_spinlock);
+ 	ctx->unhash(sk);
+ }
+ 
+@@ -598,12 +603,17 @@ static int tls_hw_hash(struct sock *sk)
+ 	int err;
+ 
+ 	err = ctx->hash(sk);
+-	mutex_lock(&device_mutex);
++	spin_lock_bh(&device_spinlock);
+ 	list_for_each_entry(dev, &device_list, dev_list) {
+-		if (dev->hash)
++		if (dev->hash) {
++			kref_get(&dev->kref);
++			spin_unlock_bh(&device_spinlock);
+ 			err |= dev->hash(dev, sk);
++			kref_put(&dev->kref, dev->release);
++			spin_lock_bh(&device_spinlock);
++		}
+ 	}
+-	mutex_unlock(&device_mutex);
++	spin_unlock_bh(&device_spinlock);
+ 
+ 	if (err)
+ 		tls_hw_unhash(sk);
+@@ -699,17 +709,17 @@ static int tls_init(struct sock *sk)
+ 
+ void tls_register_device(struct tls_device *device)
+ {
+-	mutex_lock(&device_mutex);
++	spin_lock_bh(&device_spinlock);
+ 	list_add_tail(&device->dev_list, &device_list);
+-	mutex_unlock(&device_mutex);
++	spin_unlock_bh(&device_spinlock);
+ }
+ EXPORT_SYMBOL(tls_register_device);
+ 
+ void tls_unregister_device(struct tls_device *device)
+ {
+-	mutex_lock(&device_mutex);
++	spin_lock_bh(&device_spinlock);
+ 	list_del(&device->dev_list);
+-	mutex_unlock(&device_mutex);
++	spin_unlock_bh(&device_spinlock);
+ }
+ EXPORT_SYMBOL(tls_unregister_device);
+ 
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.8.3.1
