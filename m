@@ -1,92 +1,778 @@
-Return-Path: <SRS0=/ZR5=OQ=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from pegase1.c-s.fr ([93.17.236.30]:63023 "EHLO pegase1.c-s.fr"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726073AbeLGRdM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 7 Dec 2018 12:33:12 -0500
-From: Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: [PATCH] crypto/testmgr: fix skcipher test with CONFIG_VMAP_STACK
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org
-Message-Id: <20181207173309.82A0E6D165@po14163vm.idsi0.si.c-s.fr>
-Date: Fri,  7 Dec 2018 17:33:09 +0000 (UTC)
+Return-Path: <SRS0=eKEb=OU=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from stargate.chelsio.com ([12.32.117.8]:16598 "EHLO
+        stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726617AbeLKKwG (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 11 Dec 2018 05:52:06 -0500
+From: Harsh Jain <harsh@chelsio.com>
+To: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        atul.gupta@chelsio.com, indranil@chelsio.com
+Cc: Harsh Jain <harsh@chelsio.com>
+Subject: [PATCH 4/6] Crypto:Chelsio:Handle PCI shutdown event
+Date: Tue, 11 Dec 2018 16:21:40 +0530
+Message-Id: <e7bb659200f9cd093efeac0b52a34a7c0fb0fd87.1544520025.git.harsh@chelsio.com>
+In-Reply-To: <cover.1544520025.git.harsh@chelsio.com>
+References: <cover.1544520025.git.harsh@chelsio.com>
+In-Reply-To: <cover.1544520025.git.harsh@chelsio.com>
+References: <cover.1544520025.git.harsh@chelsio.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-[    2.364486] WARNING: CPU: 0 PID: 60 at ./arch/powerpc/include/asm/io.h:837 dma_nommu_map_page+0x44/0xd4
-[    2.373579] CPU: 0 PID: 60 Comm: cryptomgr_test Tainted: G        W         4.20.0-rc5-00560-g6bfb52e23a00-dirty #531
-[    2.384740] NIP:  c000c540 LR: c000c584 CTR: 00000000
-[    2.389743] REGS: c95abab0 TRAP: 0700   Tainted: G        W          (4.20.0-rc5-00560-g6bfb52e23a00-dirty)
-[    2.400042] MSR:  00029032 <EE,ME,IR,DR,RI>  CR: 24042204  XER: 00000000
-[    2.406669]
-[    2.406669] GPR00: c02f2244 c95abb60 c6262990 c95abd80 0000256a 00000001 00000001 00000001
-[    2.406669] GPR08: 00000000 00002000 00000010 00000010 24042202 00000000 00000100 c95abd88
-[    2.406669] GPR16: 00000000 c05569d4 00000001 00000010 c95abc88 c0615664 00000004 00000000
-[    2.406669] GPR24: 00000010 c95abc88 c95abc88 00000000 c61ae210 c7ff6d40 c61ae210 00003d68
-[    2.441559] NIP [c000c540] dma_nommu_map_page+0x44/0xd4
-[    2.446720] LR [c000c584] dma_nommu_map_page+0x88/0xd4
-[    2.451762] Call Trace:
-[    2.454195] [c95abb60] [82000808] 0x82000808 (unreliable)
-[    2.459572] [c95abb80] [c02f2244] talitos_edesc_alloc+0xbc/0x3c8
-[    2.465493] [c95abbb0] [c02f2600] ablkcipher_edesc_alloc+0x4c/0x5c
-[    2.471606] [c95abbd0] [c02f4ed0] ablkcipher_encrypt+0x20/0x64
-[    2.477389] [c95abbe0] [c02023b0] __test_skcipher+0x4bc/0xa08
-[    2.483049] [c95abe00] [c0204b60] test_skcipher+0x2c/0xcc
-[    2.488385] [c95abe20] [c0204c48] alg_test_skcipher+0x48/0xbc
-[    2.494064] [c95abe40] [c0205cec] alg_test+0x164/0x2e8
-[    2.499142] [c95abf00] [c0200dec] cryptomgr_test+0x48/0x50
-[    2.504558] [c95abf10] [c0039ff4] kthread+0xe4/0x110
-[    2.509471] [c95abf40] [c000e1d0] ret_from_kernel_thread+0x14/0x1c
-[    2.515532] Instruction dump:
-[    2.518468] 7c7e1b78 7c9d2378 7cbf2b78 41820054 3d20c076 8089c200 3d20c076 7c84e850
-[    2.526127] 8129c204 7c842e70 7f844840 419c0008 <0fe00000> 2f9e0000 54847022 7c84fa14
-[    2.533960] ---[ end trace bf78d94af73fe3b8 ]---
-[    2.539123] talitos ff020000.crypto: master data transfer error
-[    2.544775] talitos ff020000.crypto: TEA error: ISR 0x20000000_00000040
-[    2.551625] alg: skcipher: encryption failed on test 1 for ecb-aes-talitos: ret=22
+chcr receives "CXGB4_STATE_DETACH" event on PCI Shutdown.
+Wait for processing of inflight request and Mark the device unavailable.
 
-IV cannot be on stack when CONFIG_VMAP_STACK is selected because the stack
-cannot be DMA mapped anymore.
-
-This patch allocates it with kmalloc()
-
-Fixes: da7f033ddc9f ("crypto: cryptomgr - Add test infrastructure")
-Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+Signed-off-by: Harsh Jain <harsh@chelsio.com>
 ---
- crypto/testmgr.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ drivers/crypto/chelsio/chcr_algo.c | 157 ++++++++++++++++++++++++++------
+ drivers/crypto/chelsio/chcr_core.c | 180 ++++++++++++++++++++++++-------------
+ drivers/crypto/chelsio/chcr_core.h |  34 +++++--
+ 3 files changed, 278 insertions(+), 93 deletions(-)
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index b1f79c6bf409..eea498f9030d 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -1112,12 +1112,16 @@ static int __test_skcipher(struct crypto_skcipher *tfm, int enc,
- 	struct crypto_wait wait;
- 	const char *input, *result;
- 	void *data;
--	char iv[MAX_IVLEN];
-+	char *iv;
- 	char *xbuf[XBUFSIZE];
- 	char *xoutbuf[XBUFSIZE];
- 	int ret = -ENOMEM;
- 	unsigned int ivsize = crypto_skcipher_ivsize(tfm);
+diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
+index f94364b..df52641 100644
+--- a/drivers/crypto/chelsio/chcr_algo.c
++++ b/drivers/crypto/chelsio/chcr_algo.c
+@@ -123,7 +123,7 @@ static inline struct chcr_authenc_ctx *AUTHENC_CTX(struct chcr_aead_ctx *gctx)
  
-+	iv = kmalloc(MAX_IVLEN, GFP_KERNEL | GFP_DMA);
-+	if (!iv)
-+		goto out_noiv;
-+
- 	if (testmgr_alloc_buf(xbuf))
- 		goto out_nobuf;
- 
-@@ -1339,6 +1343,8 @@ static int __test_skcipher(struct crypto_skcipher *tfm, int enc,
- out_nooutbuf:
- 	testmgr_free_buf(xbuf);
- out_nobuf:
-+	kfree(iv);
-+out_noiv:
- 	return ret;
+ static inline struct uld_ctx *ULD_CTX(struct chcr_context *ctx)
+ {
+-	return ctx->dev->u_ctx;
++	return container_of(ctx->dev, struct uld_ctx, dev);
  }
  
+ static inline int is_ofld_imm(const struct sk_buff *skb)
+@@ -198,17 +198,40 @@ void chcr_verify_tag(struct aead_request *req, u8 *input, int *err)
+ 		*err = 0;
+ }
+ 
++static int chcr_inc_wrcount(struct chcr_dev *dev)
++{
++	int err = 0;
++
++	spin_lock_bh(&dev->lock_chcr_dev);
++	if (dev->state == CHCR_DETACH)
++		err = 1;
++	else
++		atomic_inc(&dev->inflight);
++
++	spin_unlock_bh(&dev->lock_chcr_dev);
++
++	return err;
++}
++
++static inline void chcr_dec_wrcount(struct chcr_dev *dev)
++{
++	atomic_dec(&dev->inflight);
++}
++
+ static inline void chcr_handle_aead_resp(struct aead_request *req,
+ 					 unsigned char *input,
+ 					 int err)
+ {
+ 	struct chcr_aead_reqctx *reqctx = aead_request_ctx(req);
++	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
++	struct chcr_dev *dev = a_ctx(tfm)->dev;
+ 
+ 	chcr_aead_common_exit(req);
+ 	if (reqctx->verify == VERIFY_SW) {
+ 		chcr_verify_tag(req, input, &err);
+ 		reqctx->verify = VERIFY_HW;
+ 	}
++	chcr_dec_wrcount(dev);
+ 	req->base.complete(&req->base, err);
+ }
+ 
+@@ -1100,6 +1123,7 @@ static int chcr_handle_cipher_resp(struct ablkcipher_request *req,
+ 	struct cpl_fw6_pld *fw6_pld = (struct cpl_fw6_pld *)input;
+ 	struct chcr_blkcipher_req_ctx *reqctx = ablkcipher_request_ctx(req);
+ 	struct  cipher_wr_param wrparam;
++	struct chcr_dev *dev = c_ctx(tfm)->dev;
+ 	int bytes;
+ 
+ 	if (err)
+@@ -1161,6 +1185,7 @@ static int chcr_handle_cipher_resp(struct ablkcipher_request *req,
+ unmap:
+ 	chcr_cipher_dma_unmap(&ULD_CTX(c_ctx(tfm))->lldi.pdev->dev, req);
+ complete:
++	chcr_dec_wrcount(dev);
+ 	req->base.complete(&req->base, err);
+ 	return err;
+ }
+@@ -1187,7 +1212,10 @@ static int process_cipher(struct ablkcipher_request *req,
+ 		       ablkctx->enckey_len, req->nbytes, ivsize);
+ 		goto error;
+ 	}
+-	chcr_cipher_dma_map(&ULD_CTX(c_ctx(tfm))->lldi.pdev->dev, req);
++
++	err = chcr_cipher_dma_map(&ULD_CTX(c_ctx(tfm))->lldi.pdev->dev, req);
++	if (err)
++		goto error;
+ 	if (req->nbytes < (SGE_MAX_WR_LEN - (sizeof(struct chcr_wr) +
+ 					    AES_MIN_KEY_SIZE +
+ 					    sizeof(struct cpl_rx_phys_dsgl) +
+@@ -1276,15 +1304,21 @@ static int process_cipher(struct ablkcipher_request *req,
+ static int chcr_aes_encrypt(struct ablkcipher_request *req)
+ {
+ 	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(req);
++	struct chcr_dev *dev = c_ctx(tfm)->dev;
+ 	struct sk_buff *skb = NULL;
+ 	int err, isfull = 0;
+ 	struct uld_ctx *u_ctx = ULD_CTX(c_ctx(tfm));
+ 
++	err = chcr_inc_wrcount(dev);
++	if (err)
++		return -ENXIO;
+ 	if (unlikely(cxgb4_is_crypto_q_full(u_ctx->lldi.ports[0],
+ 					    c_ctx(tfm)->tx_qidx))) {
+ 		isfull = 1;
+-		if (!(req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG))
+-			return -ENOSPC;
++		if (!(req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG)) {
++			err = -ENOSPC;
++			goto error;
++		}
+ 	}
+ 
+ 	err = process_cipher(req, u_ctx->lldi.rxq_ids[c_ctx(tfm)->rx_qidx],
+@@ -1295,15 +1329,23 @@ static int chcr_aes_encrypt(struct ablkcipher_request *req)
+ 	set_wr_txq(skb, CPL_PRIORITY_DATA, c_ctx(tfm)->tx_qidx);
+ 	chcr_send_wr(skb);
+ 	return isfull ? -EBUSY : -EINPROGRESS;
++error:
++	chcr_dec_wrcount(dev);
++	return err;
+ }
+ 
+ static int chcr_aes_decrypt(struct ablkcipher_request *req)
+ {
+ 	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(req);
+ 	struct uld_ctx *u_ctx = ULD_CTX(c_ctx(tfm));
++	struct chcr_dev *dev = c_ctx(tfm)->dev;
+ 	struct sk_buff *skb = NULL;
+ 	int err, isfull = 0;
+ 
++	err = chcr_inc_wrcount(dev);
++	if (err)
++		return -ENXIO;
++
+ 	if (unlikely(cxgb4_is_crypto_q_full(u_ctx->lldi.ports[0],
+ 					    c_ctx(tfm)->tx_qidx))) {
+ 		isfull = 1;
+@@ -1333,10 +1375,11 @@ static int chcr_device_init(struct chcr_context *ctx)
+ 	if (!ctx->dev) {
+ 		u_ctx = assign_chcr_device();
+ 		if (!u_ctx) {
++			err = -ENXIO;
+ 			pr_err("chcr device assignment fails\n");
+ 			goto out;
+ 		}
+-		ctx->dev = u_ctx->dev;
++		ctx->dev = &u_ctx->dev;
+ 		adap = padap(ctx->dev);
+ 		ntxq = u_ctx->lldi.ntxq;
+ 		rxq_perchan = u_ctx->lldi.nrxq / u_ctx->lldi.nchan;
+@@ -1561,6 +1604,7 @@ static int chcr_ahash_update(struct ahash_request *req)
+ 	struct chcr_ahash_req_ctx *req_ctx = ahash_request_ctx(req);
+ 	struct crypto_ahash *rtfm = crypto_ahash_reqtfm(req);
+ 	struct uld_ctx *u_ctx = NULL;
++	struct chcr_dev *dev = h_ctx(rtfm)->dev;
+ 	struct sk_buff *skb;
+ 	u8 remainder = 0, bs;
+ 	unsigned int nbytes = req->nbytes;
+@@ -1569,12 +1613,6 @@ static int chcr_ahash_update(struct ahash_request *req)
+ 
+ 	bs = crypto_tfm_alg_blocksize(crypto_ahash_tfm(rtfm));
+ 	u_ctx = ULD_CTX(h_ctx(rtfm));
+-	if (unlikely(cxgb4_is_crypto_q_full(u_ctx->lldi.ports[0],
+-					    h_ctx(rtfm)->tx_qidx))) {
+-		isfull = 1;
+-		if (!(req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG))
+-			return -ENOSPC;
+-	}
+ 
+ 	if (nbytes + req_ctx->reqlen >= bs) {
+ 		remainder = (nbytes + req_ctx->reqlen) % bs;
+@@ -1585,10 +1623,27 @@ static int chcr_ahash_update(struct ahash_request *req)
+ 		req_ctx->reqlen += nbytes;
+ 		return 0;
+ 	}
++	error = chcr_inc_wrcount(dev);
++	if (error)
++		return -ENXIO;
++	/* Detach state for CHCR means lldi or padap is freed. Increasing
++	 * inflight count for dev guarantees that lldi and padap is valid
++	 */
++	if (unlikely(cxgb4_is_crypto_q_full(u_ctx->lldi.ports[0],
++					    h_ctx(rtfm)->tx_qidx))) {
++		isfull = 1;
++		if (!(req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG)) {
++			error = -ENOSPC;
++			goto err;
++		}
++	}
++
+ 	chcr_init_hctx_per_wr(req_ctx);
+ 	error = chcr_hash_dma_map(&u_ctx->lldi.pdev->dev, req);
+-	if (error)
+-		return -ENOMEM;
++	if (error) {
++		error = -ENOMEM;
++		goto err;
++	}
+ 	get_alg_config(&params.alg_prm, crypto_ahash_digestsize(rtfm));
+ 	params.kctx_len = roundup(params.alg_prm.result_size, 16);
+ 	params.sg_len = chcr_hash_ent_in_wr(req->src, !!req_ctx->reqlen,
+@@ -1628,6 +1683,8 @@ static int chcr_ahash_update(struct ahash_request *req)
+ 	return isfull ? -EBUSY : -EINPROGRESS;
+ unmap:
+ 	chcr_hash_dma_unmap(&u_ctx->lldi.pdev->dev, req);
++err:
++	chcr_dec_wrcount(dev);
+ 	return error;
+ }
+ 
+@@ -1645,10 +1702,16 @@ static int chcr_ahash_final(struct ahash_request *req)
+ {
+ 	struct chcr_ahash_req_ctx *req_ctx = ahash_request_ctx(req);
+ 	struct crypto_ahash *rtfm = crypto_ahash_reqtfm(req);
++	struct chcr_dev *dev = h_ctx(rtfm)->dev;
+ 	struct hash_wr_param params;
+ 	struct sk_buff *skb;
+ 	struct uld_ctx *u_ctx = NULL;
+ 	u8 bs = crypto_tfm_alg_blocksize(crypto_ahash_tfm(rtfm));
++	int error = -EINVAL;
++
++	error = chcr_inc_wrcount(dev);
++	if (error)
++		return -ENXIO;
+ 
+ 	chcr_init_hctx_per_wr(req_ctx);
+ 	u_ctx = ULD_CTX(h_ctx(rtfm));
+@@ -1685,19 +1748,25 @@ static int chcr_ahash_final(struct ahash_request *req)
+ 	}
+ 	params.hash_size = crypto_ahash_digestsize(rtfm);
+ 	skb = create_hash_wr(req, &params);
+-	if (IS_ERR(skb))
+-		return PTR_ERR(skb);
++	if (IS_ERR(skb)) {
++		error = PTR_ERR(skb);
++		goto err;
++	}
+ 	req_ctx->reqlen = 0;
+ 	skb->dev = u_ctx->lldi.ports[0];
+ 	set_wr_txq(skb, CPL_PRIORITY_DATA, h_ctx(rtfm)->tx_qidx);
+ 	chcr_send_wr(skb);
+ 	return -EINPROGRESS;
++err:
++	chcr_dec_wrcount(dev);
++	return error;
+ }
+ 
+ static int chcr_ahash_finup(struct ahash_request *req)
+ {
+ 	struct chcr_ahash_req_ctx *req_ctx = ahash_request_ctx(req);
+ 	struct crypto_ahash *rtfm = crypto_ahash_reqtfm(req);
++	struct chcr_dev *dev = h_ctx(rtfm)->dev;
+ 	struct uld_ctx *u_ctx = NULL;
+ 	struct sk_buff *skb;
+ 	struct hash_wr_param params;
+@@ -1706,17 +1775,24 @@ static int chcr_ahash_finup(struct ahash_request *req)
+ 
+ 	bs = crypto_tfm_alg_blocksize(crypto_ahash_tfm(rtfm));
+ 	u_ctx = ULD_CTX(h_ctx(rtfm));
++	error = chcr_inc_wrcount(dev);
++	if (error)
++		return -ENXIO;
+ 
+ 	if (unlikely(cxgb4_is_crypto_q_full(u_ctx->lldi.ports[0],
+ 					    h_ctx(rtfm)->tx_qidx))) {
+ 		isfull = 1;
+-		if (!(req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG))
+-			return -ENOSPC;
++		if (!(req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG)) {
++			error = -ENOSPC;
++			goto err;
++		}
+ 	}
+ 	chcr_init_hctx_per_wr(req_ctx);
+ 	error = chcr_hash_dma_map(&u_ctx->lldi.pdev->dev, req);
+-	if (error)
+-		return -ENOMEM;
++	if (error) {
++		error = -ENOMEM;
++		goto err;
++	}
+ 
+ 	get_alg_config(&params.alg_prm, crypto_ahash_digestsize(rtfm));
+ 	params.kctx_len = roundup(params.alg_prm.result_size, 16);
+@@ -1773,6 +1849,8 @@ static int chcr_ahash_finup(struct ahash_request *req)
+ 	return isfull ? -EBUSY : -EINPROGRESS;
+ unmap:
+ 	chcr_hash_dma_unmap(&u_ctx->lldi.pdev->dev, req);
++err:
++	chcr_dec_wrcount(dev);
+ 	return error;
+ }
+ 
+@@ -1780,6 +1858,7 @@ static int chcr_ahash_digest(struct ahash_request *req)
+ {
+ 	struct chcr_ahash_req_ctx *req_ctx = ahash_request_ctx(req);
+ 	struct crypto_ahash *rtfm = crypto_ahash_reqtfm(req);
++	struct chcr_dev *dev = h_ctx(rtfm)->dev;
+ 	struct uld_ctx *u_ctx = NULL;
+ 	struct sk_buff *skb;
+ 	struct hash_wr_param params;
+@@ -1788,19 +1867,26 @@ static int chcr_ahash_digest(struct ahash_request *req)
+ 
+ 	rtfm->init(req);
+ 	bs = crypto_tfm_alg_blocksize(crypto_ahash_tfm(rtfm));
++	error = chcr_inc_wrcount(dev);
++	if (error)
++		return -ENXIO;
+ 
+ 	u_ctx = ULD_CTX(h_ctx(rtfm));
+ 	if (unlikely(cxgb4_is_crypto_q_full(u_ctx->lldi.ports[0],
+ 					    h_ctx(rtfm)->tx_qidx))) {
+ 		isfull = 1;
+-		if (!(req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG))
+-			return -ENOSPC;
++		if (!(req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG)) {
++			error = -ENOSPC;
++			goto err;
++		}
+ 	}
+ 
+ 	chcr_init_hctx_per_wr(req_ctx);
+ 	error = chcr_hash_dma_map(&u_ctx->lldi.pdev->dev, req);
+-	if (error)
+-		return -ENOMEM;
++	if (error) {
++		error = -ENOMEM;
++		goto err;
++	}
+ 
+ 	get_alg_config(&params.alg_prm, crypto_ahash_digestsize(rtfm));
+ 	params.kctx_len = roundup(params.alg_prm.result_size, 16);
+@@ -1853,6 +1939,8 @@ static int chcr_ahash_digest(struct ahash_request *req)
+ 	return isfull ? -EBUSY : -EINPROGRESS;
+ unmap:
+ 	chcr_hash_dma_unmap(&u_ctx->lldi.pdev->dev, req);
++err:
++	chcr_dec_wrcount(dev);
+ 	return error;
+ }
+ 
+@@ -1924,6 +2012,7 @@ static inline void chcr_handle_ahash_resp(struct ahash_request *req,
+ 	int digestsize, updated_digestsize;
+ 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
+ 	struct uld_ctx *u_ctx = ULD_CTX(h_ctx(tfm));
++	struct chcr_dev *dev = h_ctx(tfm)->dev;
+ 
+ 	if (input == NULL)
+ 		goto out;
+@@ -1966,6 +2055,7 @@ static inline void chcr_handle_ahash_resp(struct ahash_request *req,
+ 
+ 
+ out:
++	chcr_dec_wrcount(dev);
+ 	req->base.complete(&req->base, err);
+ }
+ 
+@@ -3553,27 +3643,42 @@ static int chcr_aead_op(struct aead_request *req,
+ 			create_wr_t create_wr_fn)
+ {
+ 	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
++	struct chcr_aead_reqctx  *reqctx = aead_request_ctx(req);
+ 	struct uld_ctx *u_ctx;
+ 	struct sk_buff *skb;
+ 	int isfull = 0;
++	struct chcr_dev *cdev;
+ 
+-	if (!a_ctx(tfm)->dev) {
++	cdev = a_ctx(tfm)->dev;
++	if (!cdev) {
+ 		pr_err("chcr : %s : No crypto device.\n", __func__);
+ 		return -ENXIO;
+ 	}
++
++	if (chcr_inc_wrcount(cdev)) {
++	/* Detach state for CHCR means lldi or padap is freed.
++	 * We cannot increment fallback here.
++	 */
++		return chcr_aead_fallback(req, reqctx->op);
++	}
++
+ 	u_ctx = ULD_CTX(a_ctx(tfm));
+ 	if (cxgb4_is_crypto_q_full(u_ctx->lldi.ports[0],
+ 				   a_ctx(tfm)->tx_qidx)) {
+ 		isfull = 1;
+-		if (!(req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG))
++		if (!(req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG)) {
++			chcr_dec_wrcount(cdev);
+ 			return -ENOSPC;
++		}
+ 	}
+ 
+ 	/* Form a WR from req */
+ 	skb = create_wr_fn(req, u_ctx->lldi.rxq_ids[a_ctx(tfm)->rx_qidx], size);
+ 
+-	if (IS_ERR(skb) || !skb)
++	if (IS_ERR(skb) || !skb) {
++		chcr_dec_wrcount(cdev);
+ 		return PTR_ERR(skb);
++	}
+ 
+ 	skb->dev = u_ctx->lldi.ports[0];
+ 	set_wr_txq(skb, CPL_PRIORITY_DATA, a_ctx(tfm)->tx_qidx);
+diff --git a/drivers/crypto/chelsio/chcr_core.c b/drivers/crypto/chelsio/chcr_core.c
+index 2c472e3..f71a979 100644
+--- a/drivers/crypto/chelsio/chcr_core.c
++++ b/drivers/crypto/chelsio/chcr_core.c
+@@ -26,10 +26,7 @@
+ #include "chcr_core.h"
+ #include "cxgb4_uld.h"
+ 
+-static LIST_HEAD(uld_ctx_list);
+-static DEFINE_MUTEX(dev_mutex);
+-static atomic_t dev_count;
+-static struct uld_ctx *ctx_rr;
++static struct chcr_driver_data drv_data;
+ 
+ typedef int (*chcr_handler_func)(struct chcr_dev *dev, unsigned char *input);
+ static int cpl_fw6_pld_handler(struct chcr_dev *dev, unsigned char *input);
+@@ -53,6 +50,29 @@ static struct cxgb4_uld_info chcr_uld_info = {
+ #endif /* CONFIG_CHELSIO_IPSEC_INLINE */
+ };
+ 
++static void detach_work_fn(struct work_struct *work)
++{
++	struct chcr_dev *dev;
++
++	dev = container_of(work, struct chcr_dev, detach_work.work);
++
++	if (atomic_read(&dev->inflight)) {
++		dev->wqretry--;
++		if (dev->wqretry) {
++			pr_debug("Request Inflight Count %d\n",
++				atomic_read(&dev->inflight));
++
++			schedule_delayed_work(&dev->detach_work, WQ_DETACH_TM);
++		} else {
++			WARN(1, "CHCR:%d request Still Pending\n",
++				atomic_read(&dev->inflight));
++			complete(&dev->detach_comp);
++		}
++	} else {
++		complete(&dev->detach_comp);
++	}
++}
++
+ struct uld_ctx *assign_chcr_device(void)
+ {
+ 	struct uld_ctx *u_ctx = NULL;
+@@ -63,56 +83,70 @@ struct uld_ctx *assign_chcr_device(void)
+ 	 * Although One session must use the same device to
+ 	 * maintain request-response ordering.
+ 	 */
+-	mutex_lock(&dev_mutex);
+-	if (!list_empty(&uld_ctx_list)) {
+-		u_ctx = ctx_rr;
+-		if (list_is_last(&ctx_rr->entry, &uld_ctx_list))
+-			ctx_rr = list_first_entry(&uld_ctx_list,
+-						  struct uld_ctx,
+-						  entry);
++	mutex_lock(&drv_data.drv_mutex);
++	if (!list_empty(&drv_data.act_dev)) {
++		u_ctx = drv_data.last_dev;
++		if (list_is_last(&drv_data.last_dev->entry, &drv_data.act_dev))
++			drv_data.last_dev = list_first_entry(&drv_data.act_dev,
++						  struct uld_ctx, entry);
+ 		else
+-			ctx_rr = list_next_entry(ctx_rr, entry);
++			drv_data.last_dev =
++				list_next_entry(drv_data.last_dev, entry);
+ 	}
+-	mutex_unlock(&dev_mutex);
++	mutex_unlock(&drv_data.drv_mutex);
+ 	return u_ctx;
+ }
+ 
+-static int chcr_dev_add(struct uld_ctx *u_ctx)
++static void chcr_dev_add(struct uld_ctx *u_ctx)
+ {
+ 	struct chcr_dev *dev;
+ 
+-	dev = kzalloc(sizeof(*dev), GFP_KERNEL);
+-	if (!dev)
+-		return -ENXIO;
++	dev = &u_ctx->dev;
++	dev->state = CHCR_ATTACH;
++	atomic_set(&dev->inflight, 0);
++	mutex_lock(&drv_data.drv_mutex);
++	list_move(&u_ctx->entry, &drv_data.act_dev);
++	if (!drv_data.last_dev)
++		drv_data.last_dev = u_ctx;
++	mutex_unlock(&drv_data.drv_mutex);
++}
+ 
++static void chcr_dev_init(struct uld_ctx *u_ctx)
++{
++	struct chcr_dev *dev;
++
++	dev = &u_ctx->dev;
+ 	spin_lock_init(&dev->lock_chcr_dev);
+-	u_ctx->dev = dev;
+-	dev->u_ctx = u_ctx;
+-	atomic_inc(&dev_count);
+-	mutex_lock(&dev_mutex);
+-	list_add_tail(&u_ctx->entry, &uld_ctx_list);
+-	if (!ctx_rr)
+-		ctx_rr = u_ctx;
+-	mutex_unlock(&dev_mutex);
+-	return 0;
++	INIT_DELAYED_WORK(&dev->detach_work, detach_work_fn);
++	init_completion(&dev->detach_comp);
++	dev->state = CHCR_INIT;
++	dev->wqretry = WQ_RETRY;
++	atomic_inc(&drv_data.dev_count);
++	atomic_set(&dev->inflight, 0);
++	mutex_lock(&drv_data.drv_mutex);
++	list_add_tail(&u_ctx->entry, &drv_data.inact_dev);
++	if (!drv_data.last_dev)
++		drv_data.last_dev = u_ctx;
++	mutex_unlock(&drv_data.drv_mutex);
+ }
+ 
+-static int chcr_dev_remove(struct uld_ctx *u_ctx)
++static int chcr_dev_move(struct uld_ctx *u_ctx)
+ {
+-	if (ctx_rr == u_ctx) {
+-		if (list_is_last(&ctx_rr->entry, &uld_ctx_list))
+-			ctx_rr = list_first_entry(&uld_ctx_list,
+-						  struct uld_ctx,
+-						  entry);
++	 mutex_lock(&drv_data.drv_mutex);
++	if (drv_data.last_dev == u_ctx) {
++		if (list_is_last(&drv_data.last_dev->entry, &drv_data.act_dev))
++			drv_data.last_dev = list_first_entry(&drv_data.act_dev,
++						  struct uld_ctx, entry);
+ 		else
+-			ctx_rr = list_next_entry(ctx_rr, entry);
++			drv_data.last_dev =
++				list_next_entry(drv_data.last_dev, entry);
+ 	}
+-	list_del(&u_ctx->entry);
+-	if (list_empty(&uld_ctx_list))
+-		ctx_rr = NULL;
+-	kfree(u_ctx->dev);
+-	u_ctx->dev = NULL;
+-	atomic_dec(&dev_count);
++	list_move(&u_ctx->entry, &drv_data.inact_dev);
++	if (list_empty(&drv_data.act_dev))
++		drv_data.last_dev = NULL;
++	atomic_dec(&drv_data.dev_count);
++	mutex_unlock(&drv_data.drv_mutex);
++
+ 	return 0;
+ }
+ 
+@@ -167,6 +201,7 @@ static void *chcr_uld_add(const struct cxgb4_lld_info *lld)
+ 		goto out;
+ 	}
+ 	u_ctx->lldi = *lld;
++	chcr_dev_init(u_ctx);
+ #ifdef CONFIG_CHELSIO_IPSEC_INLINE
+ 	if (lld->crypto & ULP_CRYPTO_IPSEC_INLINE)
+ 		chcr_add_xfrmops(lld);
+@@ -179,7 +214,7 @@ int chcr_uld_rx_handler(void *handle, const __be64 *rsp,
+ 			const struct pkt_gl *pgl)
+ {
+ 	struct uld_ctx *u_ctx = (struct uld_ctx *)handle;
+-	struct chcr_dev *dev = u_ctx->dev;
++	struct chcr_dev *dev = &u_ctx->dev;
+ 	const struct cpl_fw6_pld *rpl = (struct cpl_fw6_pld *)rsp;
+ 
+ 	if (rpl->opcode != CPL_FW6_PLD) {
+@@ -201,6 +236,28 @@ int chcr_uld_tx_handler(struct sk_buff *skb, struct net_device *dev)
+ }
+ #endif /* CONFIG_CHELSIO_IPSEC_INLINE */
+ 
++static void chcr_detach_device(struct uld_ctx *u_ctx)
++{
++	struct chcr_dev *dev = &u_ctx->dev;
++
++	spin_lock_bh(&dev->lock_chcr_dev);
++	if (dev->state == CHCR_DETACH) {
++		spin_unlock_bh(&dev->lock_chcr_dev);
++		pr_debug("Detached Event received for already detach device\n");
++		return;
++	}
++	dev->state = CHCR_DETACH;
++	spin_unlock_bh(&dev->lock_chcr_dev);
++
++	if (atomic_read(&dev->inflight) != 0) {
++		schedule_delayed_work(&dev->detach_work, WQ_DETACH_TM);
++		wait_for_completion(&dev->detach_comp);
++	}
++
++	// Move u_ctx to inactive_dev list
++	chcr_dev_move(u_ctx);
++}
++
+ static int chcr_uld_state_change(void *handle, enum cxgb4_state state)
+ {
+ 	struct uld_ctx *u_ctx = handle;
+@@ -208,23 +265,16 @@ static int chcr_uld_state_change(void *handle, enum cxgb4_state state)
+ 
+ 	switch (state) {
+ 	case CXGB4_STATE_UP:
+-		if (!u_ctx->dev) {
+-			ret = chcr_dev_add(u_ctx);
+-			if (ret != 0)
+-				return ret;
++		if (u_ctx->dev.state != CHCR_INIT) {
++			// ALready Initialised.
++			return 0;
+ 		}
+-		if (atomic_read(&dev_count) == 1)
+-			ret = start_crypto();
++		chcr_dev_add(u_ctx);
++		ret = start_crypto();
+ 		break;
+ 
+ 	case CXGB4_STATE_DETACH:
+-		if (u_ctx->dev) {
+-			mutex_lock(&dev_mutex);
+-			chcr_dev_remove(u_ctx);
+-			mutex_unlock(&dev_mutex);
+-		}
+-		if (!atomic_read(&dev_count))
+-			stop_crypto();
++		chcr_detach_device(u_ctx);
+ 		break;
+ 
+ 	case CXGB4_STATE_START_RECOVERY:
+@@ -237,7 +287,13 @@ static int chcr_uld_state_change(void *handle, enum cxgb4_state state)
+ 
+ static int __init chcr_crypto_init(void)
+ {
++	INIT_LIST_HEAD(&drv_data.act_dev);
++	INIT_LIST_HEAD(&drv_data.inact_dev);
++	atomic_set(&drv_data.dev_count, 0);
++	mutex_init(&drv_data.drv_mutex);
++	drv_data.last_dev = NULL;
+ 	cxgb4_register_uld(CXGB4_ULD_CRYPTO, &chcr_uld_info);
++
+ 	return 0;
+ }
+ 
+@@ -245,18 +301,20 @@ static void __exit chcr_crypto_exit(void)
+ {
+ 	struct uld_ctx *u_ctx, *tmp;
+ 
+-	if (atomic_read(&dev_count))
+-		stop_crypto();
++	stop_crypto();
+ 
++	cxgb4_unregister_uld(CXGB4_ULD_CRYPTO);
+ 	/* Remove all devices from list */
+-	mutex_lock(&dev_mutex);
+-	list_for_each_entry_safe(u_ctx, tmp, &uld_ctx_list, entry) {
+-		if (u_ctx->dev)
+-			chcr_dev_remove(u_ctx);
++	mutex_lock(&drv_data.drv_mutex);
++	list_for_each_entry_safe(u_ctx, tmp, &drv_data.act_dev, entry) {
++		list_del(&u_ctx->entry);
+ 		kfree(u_ctx);
+ 	}
+-	mutex_unlock(&dev_mutex);
+-	cxgb4_unregister_uld(CXGB4_ULD_CRYPTO);
++	list_for_each_entry_safe(u_ctx, tmp, &drv_data.inact_dev, entry) {
++		list_del(&u_ctx->entry);
++		kfree(u_ctx);
++	}
++	mutex_unlock(&drv_data.drv_mutex);
+ }
+ 
+ module_init(chcr_crypto_init);
+diff --git a/drivers/crypto/chelsio/chcr_core.h b/drivers/crypto/chelsio/chcr_core.h
+index a50a24f..1159dee 100644
+--- a/drivers/crypto/chelsio/chcr_core.h
++++ b/drivers/crypto/chelsio/chcr_core.h
+@@ -47,7 +47,7 @@
+ 
+ #define MAX_PENDING_REQ_TO_HW 20
+ #define CHCR_TEST_RESPONSE_TIMEOUT 1000
+-
++#define WQ_DETACH_TM	(msecs_to_jiffies(50))
+ #define PAD_ERROR_BIT		1
+ #define CHK_PAD_ERR_BIT(x)	(((x) >> PAD_ERROR_BIT) & 1)
+ 
+@@ -61,9 +61,6 @@
+ #define HASH_WR_MIN_LEN (sizeof(struct chcr_wr) + \
+ 			DUMMY_BYTES + \
+ 		    sizeof(struct ulptx_sgl))
+-
+-#define padap(dev) pci_get_drvdata(dev->u_ctx->lldi.pdev)
+-
+ struct uld_ctx;
+ 
+ struct _key_ctx {
+@@ -121,6 +118,20 @@ struct _key_ctx {
+ #define KEYCTX_TX_WR_AUTHIN_G(x) \
+ 	(((x) >> KEYCTX_TX_WR_AUTHIN_S) & KEYCTX_TX_WR_AUTHIN_M)
+ 
++#define WQ_RETRY	5
++struct chcr_driver_data {
++	struct list_head act_dev;
++	struct list_head inact_dev;
++	atomic_t dev_count;
++	struct mutex drv_mutex;
++	struct uld_ctx *last_dev;
++};
++
++enum chcr_state {
++	CHCR_INIT = 0,
++	CHCR_ATTACH,
++	CHCR_DETACH,
++};
+ struct chcr_wr {
+ 	struct fw_crypto_lookaside_wr wreq;
+ 	struct ulp_txpkt ulptx;
+@@ -131,14 +142,18 @@ struct chcr_wr {
+ 
+ struct chcr_dev {
+ 	spinlock_t lock_chcr_dev;
+-	struct uld_ctx *u_ctx;
++	enum chcr_state state;
++	atomic_t inflight;
++	int wqretry;
++	struct delayed_work detach_work;
++	struct completion detach_comp;
+ 	unsigned char tx_channel_id;
+ };
+ 
+ struct uld_ctx {
+ 	struct list_head entry;
+ 	struct cxgb4_lld_info lldi;
+-	struct chcr_dev *dev;
++	struct chcr_dev dev;
+ };
+ 
+ struct sge_opaque_hdr {
+@@ -189,6 +204,13 @@ static inline unsigned int sgl_len(unsigned int n)
+ 	return (3 * n) / 2 + (n & 1) + 2;
+ }
+ 
++static inline void *padap(struct chcr_dev *dev)
++{
++	struct uld_ctx *u_ctx = container_of(dev, struct uld_ctx, dev);
++
++	return pci_get_drvdata(u_ctx->lldi.pdev);
++}
++
+ struct uld_ctx *assign_chcr_device(void);
+ int chcr_send_wr(struct sk_buff *skb);
+ int start_crypto(void);
 -- 
-2.13.3
+2.1.4
