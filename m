@@ -1,148 +1,107 @@
-Return-Path: <SRS0=ZXsK=OT=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=eKEb=OU=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7651C5CFFE
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Dec 2018 23:12:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27492C5CFFE
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Dec 2018 05:08:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 955C620821
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Dec 2018 23:12:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 955C620821
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=joshtriplett.org
+	by mail.kernel.org (Postfix) with ESMTP id 91BCF20672
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Dec 2018 05:08:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91BCF20672
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gondor.apana.org.au
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-crypto-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730005AbeLJXM3 (ORCPT
+        id S1727895AbeLKFIA (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 10 Dec 2018 18:12:29 -0500
-Received: from relay4-d.mail.gandi.net ([217.70.183.196]:41575 "EHLO
-        relay4-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726841AbeLJXM3 (ORCPT
+        Tue, 11 Dec 2018 00:08:00 -0500
+Received: from orcrist.hmeau.com ([104.223.48.154]:43246 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726324AbeLKFH7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Dec 2018 18:12:29 -0500
-X-Originating-IP: 134.134.139.72
-Received: from localhost (jfdmzpr03-ext.jf.intel.com [134.134.139.72])
-        (Authenticated sender: josh@joshtriplett.org)
-        by relay4-d.mail.gandi.net (Postfix) with ESMTPSA id 8E241E0002;
-        Mon, 10 Dec 2018 23:12:05 +0000 (UTC)
-Date:   Mon, 10 Dec 2018 15:12:00 -0800
-From:   Josh Triplett <josh@joshtriplett.org>
-To:     Pavel Machek <pavel@ucw.cz>
-Cc:     Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>, x86@kernel.org,
-        platform-driver-x86@vger.kernel.org, dave.hansen@intel.com,
-        sean.j.christopherson@intel.com, nhorman@redhat.com,
-        npmccallum@redhat.com, Alexei Starovoitov <ast@kernel.org>,
-        Andi Kleen <ak@linux.intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Borislav Petkov <bp@suse.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@kernel.org>,
-        "open list:INTEL SGX" <intel-sgx-kernel-dev@lists.01.org>,
-        Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        "open list:KERNEL VIRTUAL MACHINE FOR X86 (KVM/x86)" 
-        <kvm@vger.kernel.org>, Len Brown <len.brown@intel.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        "open list:SPARSE CHECKER" <linux-sparse@vger.kernel.org>,
-        Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Ricardo Neri <ricardo.neri-calderon@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Vikas Shivappa <vikas.shivappa@linux.intel.com>
-Subject: Re: [PATCH v11 00/13] Intel SGX1 support
-Message-ID: <20181210231159.GA10718@localhost>
-References: <20180608171216.26521-1-jarkko.sakkinen@linux.intel.com>
- <20180612105011.GA26931@amd>
- <20180619145943.GC8034@linux.intel.com>
- <20180619200414.GA3143@amd>
- <20180619214833.GA5873@localhost>
- <20181209200600.GA11608@amd>
- <20181210074717.GA9880@localhost>
- <20181210082704.GA14594@amd>
+        Tue, 11 Dec 2018 00:07:59 -0500
+Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
+        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
+        id 1gWaGv-0004Hi-Sx; Tue, 11 Dec 2018 13:07:53 +0800
+Received: from herbert by gondobar with local (Exim 4.89)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1gWaGg-0002Rg-28; Tue, 11 Dec 2018 13:07:38 +0800
+Date:   Tue, 11 Dec 2018 13:07:38 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     christophe.leroy@c-s.fr, "David S. Miller" <davem@davemloft.net>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
+Subject: Re: [PATCH] crypto/testmgr: fix skcipher test with CONFIG_VMAP_STACK
+Message-ID: <20181211050737.ubxpofoxj7gjmcs3@gondor.apana.org.au>
+References: <20181207173309.82A0E6D165@po14163vm.idsi0.si.c-s.fr>
+ <CAKv+Gu9gz0h2CFNPe9bgrSBzRe7iTVOMxiEEb6OXb75Acv7HUQ@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Disposition: inline
-In-Reply-To: <20181210082704.GA14594@amd>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <CAKv+Gu9gz0h2CFNPe9bgrSBzRe7iTVOMxiEEb6OXb75Acv7HUQ@mail.gmail.com>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
-Message-ID: <20181210231200.kh_YTu-lYk_J1IaPxXq9Y5RXNttZKHrxVWLHm3tTSRg@z>
+Message-ID: <20181211050738.TjFk7wlhF3F1idDlXF8Uc2FGkKHW4W8UBOPWbRu9vrs@z>
 
-On Mon, Dec 10, 2018 at 09:27:04AM +0100, Pavel Machek wrote:
-> On Sun 2018-12-09 23:47:17, Josh Triplett wrote:
-> > On Sun, Dec 09, 2018 at 09:06:00PM +0100, Pavel Machek wrote:
-> > ...
-> > > > > > The default permissions for the device are 600.
-> > > > > 
-> > > > > Good. This does not belong to non-root.
-> > > > 
-> > > > There are entirely legitimate use cases for using this as an
-> > > > unprivileged user. However, that'll be up to system and distribution
-> > > > policy, which can evolve over time, and it makes sense for the *initial*
-> > > > kernel permission to start out root-only and then adjust permissions via
-> > > > udev.
-> > > 
-> > > Agreed.
-> > > 
-> > > > Building a software certificate store. Hardening key-agent software like
-> > > > ssh-agent or gpg-agent. Building a challenge-response authentication
-> > > > system. Providing more assurance that your server infrastructure is
-> > > > uncompromised. Offloading computation to a system without having to
-> > > > fully trust that system.
-> > > 
-> > > I think you can do the crypto stuff... as crypto already verifies the
-> > > results. But I don't think you can do the computation offload.
-> > 
-> > You can, as long as you can do attestation.
+On Fri, Dec 07, 2018 at 09:26:15PM +0100, Ard Biesheuvel wrote:
+> On Fri, 7 Dec 2018 at 18:33, Christophe Leroy <christophe.leroy@c-s.fr> wrote:
+> >
+> > [    2.364486] WARNING: CPU: 0 PID: 60 at ./arch/powerpc/include/asm/io.h:837 dma_nommu_map_page+0x44/0xd4
+> > [    2.373579] CPU: 0 PID: 60 Comm: cryptomgr_test Tainted: G        W         4.20.0-rc5-00560-g6bfb52e23a00-dirty #531
+> > [    2.384740] NIP:  c000c540 LR: c000c584 CTR: 00000000
+> > [    2.389743] REGS: c95abab0 TRAP: 0700   Tainted: G        W          (4.20.0-rc5-00560-g6bfb52e23a00-dirty)
+> > [    2.400042] MSR:  00029032 <EE,ME,IR,DR,RI>  CR: 24042204  XER: 00000000
+> > [    2.406669]
+> > [    2.406669] GPR00: c02f2244 c95abb60 c6262990 c95abd80 0000256a 00000001 00000001 00000001
+> > [    2.406669] GPR08: 00000000 00002000 00000010 00000010 24042202 00000000 00000100 c95abd88
+> > [    2.406669] GPR16: 00000000 c05569d4 00000001 00000010 c95abc88 c0615664 00000004 00000000
+> > [    2.406669] GPR24: 00000010 c95abc88 c95abc88 00000000 c61ae210 c7ff6d40 c61ae210 00003d68
+> > [    2.441559] NIP [c000c540] dma_nommu_map_page+0x44/0xd4
+> > [    2.446720] LR [c000c584] dma_nommu_map_page+0x88/0xd4
+> > [    2.451762] Call Trace:
+> > [    2.454195] [c95abb60] [82000808] 0x82000808 (unreliable)
+> > [    2.459572] [c95abb80] [c02f2244] talitos_edesc_alloc+0xbc/0x3c8
+> > [    2.465493] [c95abbb0] [c02f2600] ablkcipher_edesc_alloc+0x4c/0x5c
+> > [    2.471606] [c95abbd0] [c02f4ed0] ablkcipher_encrypt+0x20/0x64
+> > [    2.477389] [c95abbe0] [c02023b0] __test_skcipher+0x4bc/0xa08
+> > [    2.483049] [c95abe00] [c0204b60] test_skcipher+0x2c/0xcc
+> > [    2.488385] [c95abe20] [c0204c48] alg_test_skcipher+0x48/0xbc
+> > [    2.494064] [c95abe40] [c0205cec] alg_test+0x164/0x2e8
+> > [    2.499142] [c95abf00] [c0200dec] cryptomgr_test+0x48/0x50
+> > [    2.504558] [c95abf10] [c0039ff4] kthread+0xe4/0x110
+> > [    2.509471] [c95abf40] [c000e1d0] ret_from_kernel_thread+0x14/0x1c
+> > [    2.515532] Instruction dump:
+> > [    2.518468] 7c7e1b78 7c9d2378 7cbf2b78 41820054 3d20c076 8089c200 3d20c076 7c84e850
+> > [    2.526127] 8129c204 7c842e70 7f844840 419c0008 <0fe00000> 2f9e0000 54847022 7c84fa14
+> > [    2.533960] ---[ end trace bf78d94af73fe3b8 ]---
+> > [    2.539123] talitos ff020000.crypto: master data transfer error
+> > [    2.544775] talitos ff020000.crypto: TEA error: ISR 0x20000000_00000040
+> > [    2.551625] alg: skcipher: encryption failed on test 1 for ecb-aes-talitos: ret=22
+> >
+> > IV cannot be on stack when CONFIG_VMAP_STACK is selected because the stack
+> > cannot be DMA mapped anymore.
+> >
+> > This patch allocates it with kmalloc()
+> >
 > 
-> You can not, because random errors are very easy to trigger for person
-> with physical access,
+> This looks like a driver bug to me. Other accelerators in
+> drivers/crypto all take a copy of the IV before mapping it for DMA, so
+> it would be better if talitos did the same.
 
-Random errors can also just happen, so if you're concerned about that
-you might want to build each object on two different machines and
-compare. Good luck generating the *same* random errors on two machines.
+Yes please fix the driver.  In general, if a paramter is coming in
+as a pointer, you must assume that it may lie on the stack.
 
-(And, of course, someone can also DoS you in any number of other ways,
-such as accepting data and then never sending back a result. So you'll
-need timeouts and failovers.)
-
-> > > > As one of many possibilities, imagine a distcc that didn't have to trust
-> > > > the compile nodes. The compile nodes could fail to return results at
-> > > > all, but they couldn't alter the results.
-> > > 
-> > > distcc on untrusted nodes ... oh yes, that would be great.
-> > > 
-> > > Except that you can't do it, right? :-).
-> > > 
-> > > First, AFAICT it would be quite hard to get gcc to run under SGX. But
-> > > maybe you have spare month or three and can do it.
-> > 
-> > Assuming you don't need to #include files, gcc seems quite simple to run
-> > in an enclave: data in, computation inside, data out.
-> 
-> So is there a plan to run dynamically linked binaries inside enclave?
-
-I've seen some approaches for that, but you could also just statically
-link your compiler. (Since you'd need attestation for all the individual
-libraries, you'd need to know the versions of all those libraries, so
-you might as well just statically link.)
-
-> Or maybe even python/shell scripts? It looked to me like virtual
-> memory will be "interesting" for enclaves.
-
-Memory management doesn't seem that hard to deal with.
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
