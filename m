@@ -1,84 +1,85 @@
-Return-Path: <SRS0=KZld=OW=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:50496 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726886AbeLMKbu (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 13 Dec 2018 05:31:50 -0500
-Date: Thu, 13 Dec 2018 18:31:47 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: linux-crypto@vger.kernel.org, Eric Biggers <ebiggers@kernel.org>,
-        Martin Willi <martin@strongswan.org>
-Subject: Re: [PATCH v2 0/3] crypto: arm64/chacha - performance improvements
-Message-ID: <20181213103147.goqqtdbps3hif4ic@gondor.apana.org.au>
-References: <20181204131333.15046-1-ard.biesheuvel@linaro.org>
+Return-Path: <SRS0=eKEb=OU=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mga01.intel.com ([192.55.52.88]:10758 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726435AbeLKSbC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 11 Dec 2018 13:31:02 -0500
+Date: Tue, 11 Dec 2018 10:31:01 -0800
+From: Sean Christopherson <sean.j.christopherson@intel.com>
+To: Dave Hansen <dave.hansen@intel.com>
+Cc: Josh Triplett <josh@joshtriplett.org>, Pavel Machek <pavel@ucw.cz>,
+        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
+        x86@kernel.org, platform-driver-x86@vger.kernel.org,
+        nhorman@redhat.com, npmccallum@redhat.com,
+        Alexei Starovoitov <ast@kernel.org>,
+        Andi Kleen <ak@linux.intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Borislav Petkov <bp@suse.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        David Woodhouse <dwmw@amazon.co.uk>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@kernel.org>,
+        "open list:INTEL SGX" <intel-sgx-kernel-dev@lists.01.org>,
+        Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>,
+        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
+        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+        "open list:KERNEL VIRTUAL MACHINE FOR X86 (KVM/x86)"
+        <kvm@vger.kernel.org>, Len Brown <len.brown@intel.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        "open list:SPARSE CHECKER" <linux-sparse@vger.kernel.org>,
+        Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Ricardo Neri <ricardo.neri-calderon@linux.intel.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Vikas Shivappa <vikas.shivappa@linux.intel.com>
+Subject: Re: [PATCH v11 00/13] Intel SGX1 support
+Message-ID: <20181211183101.GE14731@linux.intel.com>
+References: <20180608171216.26521-1-jarkko.sakkinen@linux.intel.com>
+ <20180612105011.GA26931@amd>
+ <20180619145943.GC8034@linux.intel.com>
+ <20180619200414.GA3143@amd>
+ <20180619214833.GA5873@localhost>
+ <20181209200600.GA11608@amd>
+ <20181210074717.GA9880@localhost>
+ <20181210082704.GA14594@amd>
+ <20181210231159.GA10718@localhost>
+ <12301623-0a63-10ac-1d5e-828569a953e5@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181204131333.15046-1-ard.biesheuvel@linaro.org>
+In-Reply-To: <12301623-0a63-10ac-1d5e-828569a953e5@intel.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Dec 04, 2018 at 02:13:30PM +0100, Ard Biesheuvel wrote:
-> Improve the performance of NEON based ChaCha:
+On Tue, Dec 11, 2018 at 10:10:38AM -0800, Dave Hansen wrote:
+> On 12/10/18 3:12 PM, Josh Triplett wrote:
+> >> Or maybe even python/shell scripts? It looked to me like virtual
+> >> memory will be "interesting" for enclaves.
+> > Memory management doesn't seem that hard to deal with.
 > 
-> Patch #1 adds a block size of 1472 to the tcrypt test template so we have
-> something that reflects the VPN case.
+> The problems are:
 > 
-> Patch #2 improves performance for arbitrary length inputs: on deep pipelines,
-> throughput increases ~30% when running on inputs blocks whose size is drawn
-> randomly from the interval [64, 1024)
-> 
-> Patch #3 adopts the OpenSSL approach to use the ALU in parallel with the
-> SIMD unit to process a fifth block while the SIMD is operating on 4 blocks.
-> 
-> Performance on Cortex-A57:
-> 
-> BEFORE:
-> =======
-> testing speed of async chacha20 (chacha20-neon) encryption
-> tcrypt: test 0 (256 bit key, 16 byte blocks): 2528223 operations in 1 seconds (40451568 bytes)
-> tcrypt: test 1 (256 bit key, 64 byte blocks): 2518155 operations in 1 seconds (161161920 bytes)
-> tcrypt: test 2 (256 bit key, 256 byte blocks): 1207948 operations in 1 seconds (309234688 bytes)
-> tcrypt: test 3 (256 bit key, 1024 byte blocks): 332194 operations in 1 seconds (340166656 bytes)
-> tcrypt: test 4 (256 bit key, 1472 byte blocks): 185659 operations in 1 seconds (273290048 bytes)
-> tcrypt: test 5 (256 bit key, 8192 byte blocks): 41829 operations in 1 seconds (342663168 bytes)
-> 
-> AFTER:
-> ======
-> testing speed of async chacha20 (chacha20-neon) encryption
-> tcrypt: test 0 (256 bit key, 16 byte blocks): 2530018 operations in 1 seconds (40480288 bytes)
-> tcrypt: test 1 (256 bit key, 64 byte blocks): 2518270 operations in 1 seconds (161169280 bytes)
-> tcrypt: test 2 (256 bit key, 256 byte blocks): 1187760 operations in 1 seconds (304066560 bytes)
-> tcrypt: test 3 (256 bit key, 1024 byte blocks): 361652 operations in 1 seconds (370331648 bytes)
-> tcrypt: test 4 (256 bit key, 1472 byte blocks): 280971 operations in 1 seconds (413589312 bytes)
-> tcrypt: test 5 (256 bit key, 8192 byte blocks): 53654 operations in 1 seconds (439533568 bytes)
-> 
-> Zinc:
-> =====
-> testing speed of async chacha20 (chacha20-software) encryption
-> tcrypt: test 0 (256 bit key, 16 byte blocks): 2510300 operations in 1 seconds (40164800 bytes)
-> tcrypt: test 1 (256 bit key, 64 byte blocks): 2663794 operations in 1 seconds (170482816 bytes)
-> tcrypt: test 2 (256 bit key, 256 byte blocks): 1237617 operations in 1 seconds (316829952 bytes)
-> tcrypt: test 3 (256 bit key, 1024 byte blocks): 364645 operations in 1 seconds (373396480 bytes)
-> tcrypt: test 4 (256 bit key, 1472 byte blocks): 251548 operations in 1 seconds (370278656 bytes)
-> tcrypt: test 5 (256 bit key, 8192 byte blocks): 47650 operations in 1 seconds (390348800 bytes)
-> 
-> Cc: Eric Biggers <ebiggers@kernel.org>
-> Cc: Martin Willi <martin@strongswan.org>
-> 
-> Ard Biesheuvel (3):
->   crypto: tcrypt - add block size of 1472 to skcipher template
->   crypto: arm64/chacha - optimize for arbitrary length inputs
->   crypto: arm64/chacha - use combined SIMD/ALU routine for more speed
-> 
->  arch/arm64/crypto/chacha-neon-core.S | 396 +++++++++++++++++++-
->  arch/arm64/crypto/chacha-neon-glue.c |  59 ++-
->  crypto/tcrypt.c                      |   2 +-
->  3 files changed, 404 insertions(+), 53 deletions(-)
+> 1. SGX enclave memory (EPC) is statically allocated at boot and can't
+>    grow or shrink
+> 2. EPC is much smaller than regular RAM
+> 3. The core VM has no comprehension of EPC use, thus can not help
+>    with its algorithms, like the LRU
+> 4. The SGX driver implements its own VM which is substantially simpler
+>    than the core VM, but less feature-rich, fast, or scalable
 
-All applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+I'd also add:
+
+  5. Swapping EPC pages can only be done through SGX specific ISA that
+     has strict concurrency requirements and enforces TLB flushing.
+  6. There are specialized types of EPC pages that have different
+     swapping requirements than regular EPC pages.
+  7. EPC pages that are exposed to a KVM guest have yet another set of
+     swapping requirements.
+
+In other words, extending the core VM to SGX EPC is painfully difficult.
