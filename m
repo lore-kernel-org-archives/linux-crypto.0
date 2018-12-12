@@ -1,118 +1,94 @@
-Return-Path: <SRS0=eKEb=OU=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=HcFc=OV=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03394C5CFFE
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Dec 2018 18:31:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF89FC6783B
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 Dec 2018 02:40:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CDCC320851
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Dec 2018 18:31:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDCC320851
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTP id 95F672084E
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 Dec 2018 02:40:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=thunk.org header.i=@thunk.org header.b="U8h8CMxq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95F672084E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=mit.edu
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-crypto-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727153AbeLKSbD (ORCPT
+        id S1726237AbeLLCkR (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 11 Dec 2018 13:31:03 -0500
-Received: from mga01.intel.com ([192.55.52.88]:10758 "EHLO mga01.intel.com"
+        Tue, 11 Dec 2018 21:40:17 -0500
+Received: from imap.thunk.org ([74.207.234.97]:52272 "EHLO imap.thunk.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726435AbeLKSbC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Dec 2018 13:31:02 -0500
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 11 Dec 2018 10:31:01 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.56,343,1539673200"; 
-   d="scan'208";a="100721643"
-Received: from sjchrist-coffee.jf.intel.com (HELO linux.intel.com) ([10.54.74.154])
-  by orsmga008.jf.intel.com with ESMTP; 11 Dec 2018 10:31:01 -0800
-Date:   Tue, 11 Dec 2018 10:31:01 -0800
-From:   Sean Christopherson <sean.j.christopherson@intel.com>
-To:     Dave Hansen <dave.hansen@intel.com>
-Cc:     Josh Triplett <josh@joshtriplett.org>, Pavel Machek <pavel@ucw.cz>,
-        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
-        x86@kernel.org, platform-driver-x86@vger.kernel.org,
-        nhorman@redhat.com, npmccallum@redhat.com,
-        Alexei Starovoitov <ast@kernel.org>,
-        Andi Kleen <ak@linux.intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Borislav Petkov <bp@suse.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@kernel.org>,
-        "open list:INTEL SGX" <intel-sgx-kernel-dev@lists.01.org>,
-        Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        "open list:KERNEL VIRTUAL MACHINE FOR X86 (KVM/x86)" 
-        <kvm@vger.kernel.org>, Len Brown <len.brown@intel.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        "open list:SPARSE CHECKER" <linux-sparse@vger.kernel.org>,
-        Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Ricardo Neri <ricardo.neri-calderon@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Vikas Shivappa <vikas.shivappa@linux.intel.com>
-Subject: Re: [PATCH v11 00/13] Intel SGX1 support
-Message-ID: <20181211183101.GE14731@linux.intel.com>
-References: <20180608171216.26521-1-jarkko.sakkinen@linux.intel.com>
- <20180612105011.GA26931@amd>
- <20180619145943.GC8034@linux.intel.com>
- <20180619200414.GA3143@amd>
- <20180619214833.GA5873@localhost>
- <20181209200600.GA11608@amd>
- <20181210074717.GA9880@localhost>
- <20181210082704.GA14594@amd>
- <20181210231159.GA10718@localhost>
- <12301623-0a63-10ac-1d5e-828569a953e5@intel.com>
+        id S1726211AbeLLCkR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 11 Dec 2018 21:40:17 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=thunk.org;
+         s=ef5046eb; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+        :Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+        List-Post:List-Owner:List-Archive;
+        bh=bzNuIfCkh83UKRbWepju59ymEQp9nN1zEvGUvSO2Dfs=; b=U8h8CMxq/VtXKdMTeMmAHZzh+h
+        6dXDAVKBsKNjcVP16cqdl0M2AHVmEbMPaKTBPRoPmxoATNcmcoh8B4ZmH0v+tkvF3aQXjk1YxRAni
+        byTlh9lC8nQ9NQK09ATSlBjX9/4mvrmLWGyYRwxBkeRPXLx2OOWulXYsARSUDZcOV6Fc=;
+Received: from root (helo=callcc.thunk.org)
+        by imap.thunk.org with local-esmtp (Exim 4.89)
+        (envelope-from <tytso@thunk.org>)
+        id 1gWuRb-0000Gg-FZ; Wed, 12 Dec 2018 02:40:15 +0000
+Received: by callcc.thunk.org (Postfix, from userid 15806)
+        id CE12E7A4FD5; Tue, 11 Dec 2018 21:40:14 -0500 (EST)
+Date:   Tue, 11 Dec 2018 21:40:14 -0500
+From:   "Theodore Y. Ts'o" <tytso@mit.edu>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-fscrypt@vger.kernel.org,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>
+Subject: Re: [PATCH] fscrypt: remove CRYPTO_CTR dependency
+Message-ID: <20181212024014.GE4464@thunk.org>
+References: <20180905192400.71160-1-ebiggers@kernel.org>
+ <CAKv+Gu8=dDk+bes8O7oOQ3zTgPHyVi49-gwH1btwdys-vgfyqg@mail.gmail.com>
+ <20181204234506.GD70682@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="UTF-8"
 Content-Disposition: inline
-In-Reply-To: <12301623-0a63-10ac-1d5e-828569a953e5@intel.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20181204234506.GD70682@gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-SA-Exim-Connect-IP: <locally generated>
+X-SA-Exim-Mail-From: tytso@thunk.org
+X-SA-Exim-Scanned: No (on imap.thunk.org); SAEximRunCond expanded to false
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
-Message-ID: <20181211183101.7zIIcFNMNeW-HrnHY3Ld5sDDPGDx1HgVdiX9nYBVOMA@z>
+Message-ID: <20181212024014.tF5Ox1FU5Y88N6fpgc7qJhZcZDX7V0gjyzlhJPzh-Kw@z>
 
-On Tue, Dec 11, 2018 at 10:10:38AM -0800, Dave Hansen wrote:
-> On 12/10/18 3:12 PM, Josh Triplett wrote:
-> >> Or maybe even python/shell scripts? It looked to me like virtual
-> >> memory will be "interesting" for enclaves.
-> > Memory management doesn't seem that hard to deal with.
-> 
-> The problems are:
-> 
-> 1. SGX enclave memory (EPC) is statically allocated at boot and can't
->    grow or shrink
-> 2. EPC is much smaller than regular RAM
-> 3. The core VM has no comprehension of EPC use, thus can not help
->    with its algorithms, like the LRU
-> 4. The SGX driver implements its own VM which is substantially simpler
->    than the core VM, but less feature-rich, fast, or scalable
+On Tue, Dec 04, 2018 at 03:45:07PM -0800, Eric Biggers wrote:
+> On Thu, Sep 06, 2018 at 12:43:41PM +0200, Ard Biesheuvel wrote:
+> > On 5 September 2018 at 21:24, Eric Biggers <ebiggers@kernel.org> wrote:
+> > > From: Eric Biggers <ebiggers@google.com>
+> > >
+> > > fscrypt doesn't use the CTR mode of operation for anything, so there's
+> > > no need to select CRYPTO_CTR.  It was added by commit 71dea01ea2ed
+> > > ("ext4 crypto: require CONFIG_CRYPTO_CTR if ext4 encryption is
+> > > enabled").  But, I've been unable to identify the arm64 crypto bug it
+> > > was supposedly working around.
+> > >
+> > > I suspect the issue was seen only on some old Android device kernel
+> > > (circa 3.10?).  So if the fix wasn't mistaken, the real bug is probably
+> > > already fixed.  Or maybe it was actually a bug in a non-upstream crypto
+> > > driver.
+> > >
+> > > So, remove the dependency.  If it turns out there's actually still a
+> > > bug, we'll fix it properly.
+> > >
+> > > Signed-off-by: Eric Biggers <ebiggers@google.com>
+> > 
+> > Acked-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-I'd also add:
+Thanks, applied.
 
-  5. Swapping EPC pages can only be done through SGX specific ISA that
-     has strict concurrency requirements and enforces TLB flushing.
-  6. There are specialized types of EPC pages that have different
-     swapping requirements than regular EPC pages.
-  7. EPC pages that are exposed to a KVM guest have yet another set of
-     swapping requirements.
-
-In other words, extending the core VM to SGX EPC is painfully difficult.
+					- Ted
