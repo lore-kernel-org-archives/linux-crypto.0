@@ -1,40 +1,35 @@
-Return-Path: <SRS0=ECh6=O2=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:49772 "EHLO mail.kernel.org"
+Return-Path: <SRS0=HcFc=OV=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mx-2.esenfc.pt ([193.137.66.234]:36492 "EHLO mx-2.esenfc.pt"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726395AbeLQHYr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 17 Dec 2018 02:24:47 -0500
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Rob Rice <rob.rice@broadcom.com>,
-        Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Yael Chemla <yael.chemla@foss.arm.com>
-Subject: [PATCH 0/3] crypto: authenc - fix key parsing
-Date: Sun, 16 Dec 2018 23:23:21 -0800
-Message-Id: <20181217072324.16844-1-ebiggers@kernel.org>
+        id S1727471AbeLLOF2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 12 Dec 2018 09:05:28 -0500
+Message-ID: <20181212135209.79542ua5ehnsdhmo@webmail.esenfc.pt>
+Date: Wed, 12 Dec 2018 13:52:09 +0000
+From: "Mr Peter OWEN" <floriano@esenfc.pt>
+Reply-to: oxfordxx101@yahoo.com
+To: undisclosed-recipients:;
+Subject: Lets Work Together
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain;
+        charset=ISO-8859-1;
+        DelSp="Yes";
+        format="flowed"
+Content-Disposition: inline
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Fix incorrect validation of the key passed to "authenc" AEADs that
-allowed crashing the kernel via AF_ALG.  The real fix is in patch 1, but
-two drivers had to be converted to use crypto_authenc_extractkeys() too.
 
-Please note: for the bcm and ccree driver changes I haven't re-run the
-self-tests, as I don't have that hardware.  Please do so if you can.
 
-Eric Biggers (3):
-  crypto: authenc - fix parsing key with misaligned rta_len
-  crypto: bcm - convert to use crypto_authenc_extractkeys()
-  crypto: ccree - convert to use crypto_authenc_extractkeys()
+Good Day,
+Hope you are doing great Today.I have a proposed BUSINESS DEAL that  
+will benefit both parties. This is legitimate,legal and your  
+personality will not be compromised.Please Reply to me ONLY if you are  
+interested and consider your self capable for details.
 
- crypto/authenc.c               | 14 ++++++++---
- drivers/crypto/Kconfig         |  1 +
- drivers/crypto/bcm/cipher.c    | 44 ++++++++++------------------------
- drivers/crypto/ccree/cc_aead.c | 40 +++++++++++++++----------------
- 4 files changed, 44 insertions(+), 55 deletions(-)
+Sincerely,
 
--- 
-2.19.2
+Peter OWEN
+
+----------------------------------------------------------------
+This message was sent using IMP, the Internet Messaging Program.
