@@ -1,84 +1,255 @@
-Return-Path: <SRS0=eKEb=OU=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from pegase1.c-s.fr ([93.17.236.30]:28136 "EHLO pegase1.c-s.fr"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725958AbeLKHbN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Dec 2018 02:31:13 -0500
-Subject: Re: [PATCH] crypto/testmgr: fix skcipher test with CONFIG_VMAP_STACK
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
-References: <20181207173309.82A0E6D165@po14163vm.idsi0.si.c-s.fr>
- <CAKv+Gu9gz0h2CFNPe9bgrSBzRe7iTVOMxiEEb6OXb75Acv7HUQ@mail.gmail.com>
- <20181211050737.ubxpofoxj7gjmcs3@gondor.apana.org.au>
-From: Christophe Leroy <christophe.leroy@c-s.fr>
-Message-ID: <075af039-cac3-e4d5-90e8-8a46adb5e59d@c-s.fr>
-Date: Tue, 11 Dec 2018 08:31:09 +0100
+Return-Path: <SRS0=HcFc=OV=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from hqemgate14.nvidia.com ([216.228.121.143]:5226 "EHLO
+        hqemgate14.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726237AbeLLGZC (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 12 Dec 2018 01:25:02 -0500
+From: Ashish Mhetre <amhetre@nvidia.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <axboe@kernel.dk>, <adrian.hunter@intel.com>,
+        <ulf.hansson@linaro.org>, <linux-crypto@vger.kernel.org>,
+        <linux-nvme@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+        <vdumpa@nvidia.com>, <mmaddireddy@nvidia.com>
+CC: <Snikam@nvidia.com>, <linux-tegra@vger.kernel.org>,
+        Ashish Mhetre <amhetre@nvidia.com>
+Subject: [PATCH] scatterlist: Update size type to support greater then 4GB size.
+Date: Wed, 12 Dec 2018 11:54:13 +0530
+Message-ID: <1544595853-18492-1-git-send-email-amhetre@nvidia.com>
 MIME-Version: 1.0
-In-Reply-To: <20181211050737.ubxpofoxj7gjmcs3@gondor.apana.org.au>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+From: Krishna Reddy <vdumpa@nvidia.com>
 
+In the cases where greater than 4GB allocations are required, current
+definition of scatterlist doesn't support it. For example, Tegra devices
+have more than 4GB of system memory available. So they are expected to
+support larger allocation requests.
+This patch updates the type of scatterlist members to support creating
+scatterlist for allocations of size greater than 4GB size.
+Updated the files that are necessary to fix compilation issues with updated
+type of variables.
 
-Le 11/12/2018 à 06:07, Herbert Xu a écrit :
-> On Fri, Dec 07, 2018 at 09:26:15PM +0100, Ard Biesheuvel wrote:
->> On Fri, 7 Dec 2018 at 18:33, Christophe Leroy <christophe.leroy@c-s.fr> wrote:
->>>
->>> [    2.364486] WARNING: CPU: 0 PID: 60 at ./arch/powerpc/include/asm/io.h:837 dma_nommu_map_page+0x44/0xd4
->>> [    2.373579] CPU: 0 PID: 60 Comm: cryptomgr_test Tainted: G        W         4.20.0-rc5-00560-g6bfb52e23a00-dirty #531
->>> [    2.384740] NIP:  c000c540 LR: c000c584 CTR: 00000000
->>> [    2.389743] REGS: c95abab0 TRAP: 0700   Tainted: G        W          (4.20.0-rc5-00560-g6bfb52e23a00-dirty)
->>> [    2.400042] MSR:  00029032 <EE,ME,IR,DR,RI>  CR: 24042204  XER: 00000000
->>> [    2.406669]
->>> [    2.406669] GPR00: c02f2244 c95abb60 c6262990 c95abd80 0000256a 00000001 00000001 00000001
->>> [    2.406669] GPR08: 00000000 00002000 00000010 00000010 24042202 00000000 00000100 c95abd88
->>> [    2.406669] GPR16: 00000000 c05569d4 00000001 00000010 c95abc88 c0615664 00000004 00000000
->>> [    2.406669] GPR24: 00000010 c95abc88 c95abc88 00000000 c61ae210 c7ff6d40 c61ae210 00003d68
->>> [    2.441559] NIP [c000c540] dma_nommu_map_page+0x44/0xd4
->>> [    2.446720] LR [c000c584] dma_nommu_map_page+0x88/0xd4
->>> [    2.451762] Call Trace:
->>> [    2.454195] [c95abb60] [82000808] 0x82000808 (unreliable)
->>> [    2.459572] [c95abb80] [c02f2244] talitos_edesc_alloc+0xbc/0x3c8
->>> [    2.465493] [c95abbb0] [c02f2600] ablkcipher_edesc_alloc+0x4c/0x5c
->>> [    2.471606] [c95abbd0] [c02f4ed0] ablkcipher_encrypt+0x20/0x64
->>> [    2.477389] [c95abbe0] [c02023b0] __test_skcipher+0x4bc/0xa08
->>> [    2.483049] [c95abe00] [c0204b60] test_skcipher+0x2c/0xcc
->>> [    2.488385] [c95abe20] [c0204c48] alg_test_skcipher+0x48/0xbc
->>> [    2.494064] [c95abe40] [c0205cec] alg_test+0x164/0x2e8
->>> [    2.499142] [c95abf00] [c0200dec] cryptomgr_test+0x48/0x50
->>> [    2.504558] [c95abf10] [c0039ff4] kthread+0xe4/0x110
->>> [    2.509471] [c95abf40] [c000e1d0] ret_from_kernel_thread+0x14/0x1c
->>> [    2.515532] Instruction dump:
->>> [    2.518468] 7c7e1b78 7c9d2378 7cbf2b78 41820054 3d20c076 8089c200 3d20c076 7c84e850
->>> [    2.526127] 8129c204 7c842e70 7f844840 419c0008 <0fe00000> 2f9e0000 54847022 7c84fa14
->>> [    2.533960] ---[ end trace bf78d94af73fe3b8 ]---
->>> [    2.539123] talitos ff020000.crypto: master data transfer error
->>> [    2.544775] talitos ff020000.crypto: TEA error: ISR 0x20000000_00000040
->>> [    2.551625] alg: skcipher: encryption failed on test 1 for ecb-aes-talitos: ret=22
->>>
->>> IV cannot be on stack when CONFIG_VMAP_STACK is selected because the stack
->>> cannot be DMA mapped anymore.
->>>
->>> This patch allocates it with kmalloc()
->>>
->>
->> This looks like a driver bug to me. Other accelerators in
->> drivers/crypto all take a copy of the IV before mapping it for DMA, so
->> it would be better if talitos did the same.
-> 
-> Yes please fix the driver.  In general, if a paramter is coming in
-> as a pointer, you must assume that it may lie on the stack.
+With definition of scatterlist changed in this patch, size of sg has
+increased from 28 bytes to 40 bytes because of which allocations in nvme
+driver are crossing order-0( as sizeof(struct scatterlist) is used in nvme
+driver allocations ) i.e. they are not able to fit into single page.
 
-Yes, just sent a patch for the talitos driver for it.
+Recently a patch to limit the nvme allocations to order-0 is mergerd.
+'commit 943e942e6266f22babee5efeb00f8f672fbff5bd ("nvme-pci: limit
+max IO size and segments to avoid high order allocations")'
+Because of that patch, WARN log is getting printed in our case as
+definition of scatterlist has changed. Alloc size of nvme is calculated as
+NVME_MAX_SEGS * sizeof(struct scatterlist). As sizeof(struct scatterlist)
+has changed from 28 bytes to 40 bytes, so updating NVME_MAX_SEGS from 127
+to 88 to correspond to original nvme alloc size value.
 
-But note that the IV is received via areq->info and not via a standalone 
-pointer.
+Signed-off-by: Krishna Reddy <vdumpa@nvidia.com>
+Signed-off-by: Ashish Mhetre <amhetre@nvidia.com>
+---
+ crypto/shash.c                |  2 +-
+ drivers/ata/libata-sff.c      |  2 +-
+ drivers/mmc/host/sdhci.c      |  2 +-
+ drivers/mmc/host/toshsd.c     |  2 +-
+ drivers/mmc/host/usdhi6rol0.c | 14 +++++++-------
+ drivers/nvme/host/pci.c       |  8 ++++----
+ include/linux/nvme.h          |  2 +-
+ include/linux/scatterlist.h   |  8 ++++----
+ 8 files changed, 20 insertions(+), 20 deletions(-)
 
-Christophe
+diff --git a/crypto/shash.c b/crypto/shash.c
+index d21f04d..434970e 100644
+--- a/crypto/shash.c
++++ b/crypto/shash.c
+@@ -298,7 +298,7 @@ int shash_ahash_digest(struct ahash_request *req, struct shash_desc *desc)
+ 
+ 	if (nbytes &&
+ 	    (sg = req->src, offset = sg->offset,
+-	     nbytes < min(sg->length, ((unsigned int)(PAGE_SIZE)) - offset))) {
++	     nbytes < min(sg->length, ((size_t)(PAGE_SIZE)) - offset))) {
+ 		void *data;
+ 
+ 		data = kmap_atomic(sg_page(sg));
+diff --git a/drivers/ata/libata-sff.c b/drivers/ata/libata-sff.c
+index c5ea0fc..675def6 100644
+--- a/drivers/ata/libata-sff.c
++++ b/drivers/ata/libata-sff.c
+@@ -810,7 +810,7 @@ static int __atapi_pio_bytes(struct ata_queued_cmd *qc, unsigned int bytes)
+ 	offset %= PAGE_SIZE;
+ 
+ 	/* don't overrun current sg */
+-	count = min(sg->length - qc->cursg_ofs, bytes);
++	count = min(sg->length - qc->cursg_ofs, (size_t)bytes);
+ 
+ 	/* don't cross page boundaries */
+ 	count = min(count, (unsigned int)PAGE_SIZE - offset);
+diff --git a/drivers/mmc/host/sdhci.c b/drivers/mmc/host/sdhci.c
+index 99bdae5..bd84c0c 100644
+--- a/drivers/mmc/host/sdhci.c
++++ b/drivers/mmc/host/sdhci.c
+@@ -1025,7 +1025,7 @@ static void sdhci_prepare_data(struct sdhci_host *host, struct mmc_command *cmd)
+ 		if (unlikely(length_mask | offset_mask)) {
+ 			for_each_sg(data->sg, sg, data->sg_len, i) {
+ 				if (sg->length & length_mask) {
+-					DBG("Reverting to PIO because of transfer size (%d)\n",
++					DBG("Reverting to PIO because of transfer size (%zd)\n",
+ 					    sg->length);
+ 					host->flags &= ~SDHCI_REQ_USE_DMA;
+ 					break;
+diff --git a/drivers/mmc/host/toshsd.c b/drivers/mmc/host/toshsd.c
+index dd961c5..af00936 100644
+--- a/drivers/mmc/host/toshsd.c
++++ b/drivers/mmc/host/toshsd.c
+@@ -479,7 +479,7 @@ static void toshsd_start_data(struct toshsd_host *host, struct mmc_data *data)
+ {
+ 	unsigned int flags = SG_MITER_ATOMIC;
+ 
+-	dev_dbg(&host->pdev->dev, "setup data transfer: blocksize %08x  nr_blocks %d, offset: %08x\n",
++	dev_dbg(&host->pdev->dev, "setup data transfer: blocksize %08x  nr_blocks %d, offset: %08lx\n",
+ 		data->blksz, data->blocks, data->sg->offset);
+ 
+ 	host->data = data;
+diff --git a/drivers/mmc/host/usdhi6rol0.c b/drivers/mmc/host/usdhi6rol0.c
+index cd8b1b9..5fce5ff 100644
+--- a/drivers/mmc/host/usdhi6rol0.c
++++ b/drivers/mmc/host/usdhi6rol0.c
+@@ -316,7 +316,7 @@ static void usdhi6_blk_bounce(struct usdhi6_host *host,
+ 	struct mmc_data *data = host->mrq->data;
+ 	size_t blk_head = host->head_len;
+ 
+-	dev_dbg(mmc_dev(host->mmc), "%s(): CMD%u of %u SG: %ux%u @ 0x%x\n",
++	dev_dbg(mmc_dev(host->mmc), "%s(): CMD%u of %u SG: %ux%u @ 0x%lx\n",
+ 		__func__, host->mrq->cmd->opcode, data->sg_len,
+ 		data->blksz, data->blocks, sg->offset);
+ 
+@@ -360,7 +360,7 @@ static void *usdhi6_sg_map(struct usdhi6_host *host)
+ 
+ 	WARN(host->pg.page, "%p not properly unmapped!\n", host->pg.page);
+ 	if (WARN(sg_dma_len(sg) % data->blksz,
+-		 "SG size %u isn't a multiple of block size %u\n",
++		 "SG size %zu isn't a multiple of block size %u\n",
+ 		 sg_dma_len(sg), data->blksz))
+ 		return NULL;
+ 
+@@ -383,7 +383,7 @@ static void *usdhi6_sg_map(struct usdhi6_host *host)
+ 	else
+ 		host->blk_page = host->pg.mapped;
+ 
+-	dev_dbg(mmc_dev(host->mmc), "Mapped %p (%lx) at %p + %u for CMD%u @ 0x%p\n",
++	dev_dbg(mmc_dev(host->mmc), "Mapped %p (%lx) at %p + %lu for CMD%u @ 0x%p\n",
+ 		host->pg.page, page_to_pfn(host->pg.page), host->pg.mapped,
+ 		sg->offset, host->mrq->cmd->opcode, host->mrq);
+ 
+@@ -492,7 +492,7 @@ static void usdhi6_sg_advance(struct usdhi6_host *host)
+ 		host->sg = next;
+ 
+ 		if (WARN(next && sg_dma_len(next) % data->blksz,
+-			 "SG size %u isn't a multiple of block size %u\n",
++			 "SG size %zu isn't a multiple of block size %u\n",
+ 			 sg_dma_len(next), data->blksz))
+ 			data->error = -EINVAL;
+ 
+@@ -1044,7 +1044,7 @@ static int usdhi6_rq_start(struct usdhi6_host *host)
+ 		    (data->blksz % 4 ||
+ 		     data->sg->offset % 4))
+ 			dev_dbg(mmc_dev(host->mmc),
+-				"Bad SG of %u: %ux%u @ %u\n", data->sg_len,
++				"Bad SG of %u: %ux%u @ %lu\n", data->sg_len,
+ 				data->blksz, data->blocks, data->sg->offset);
+ 
+ 		/* Enable DMA for USDHI6_MIN_DMA bytes or more */
+@@ -1056,7 +1056,7 @@ static int usdhi6_rq_start(struct usdhi6_host *host)
+ 			usdhi6_write(host, USDHI6_CC_EXT_MODE, USDHI6_CC_EXT_MODE_SDRW);
+ 
+ 		dev_dbg(mmc_dev(host->mmc),
+-			"%s(): request opcode %u, %u blocks of %u bytes in %u segments, %s %s @+0x%x%s\n",
++			"%s(): request opcode %u, %u blocks of %u bytes in %u segments, %s %s @+0x%lx%s\n",
+ 			__func__, cmd->opcode, data->blocks, data->blksz,
+ 			data->sg_len, use_dma ? "DMA" : "PIO",
+ 			data->flags & MMC_DATA_READ ? "read" : "write",
+@@ -1704,7 +1704,7 @@ static void usdhi6_timeout_work(struct work_struct *work)
+ 	case USDHI6_WAIT_FOR_WRITE:
+ 		sg = host->sg ?: data->sg;
+ 		dev_dbg(mmc_dev(host->mmc),
+-			"%c: page #%u @ +0x%zx %ux%u in SG%u. Current SG %u bytes @ %u\n",
++			"%c: page #%u @ +0x%zx %ux%u in SG%u. Current SG %zu bytes @ %lu\n",
+ 			data->flags & MMC_DATA_READ ? 'R' : 'W', host->page_idx,
+ 			host->offset, data->blocks, data->blksz, data->sg_len,
+ 			sg_dma_len(sg), sg->offset);
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index d668682..57ef89d 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -43,7 +43,7 @@
+  * require an sg allocation that needs more than a page of data.
+  */
+ #define NVME_MAX_KB_SZ	4096
+-#define NVME_MAX_SEGS	127
++#define NVME_MAX_SEGS	88
+ 
+ static int use_threaded_interrupts;
+ module_param(use_threaded_interrupts, int, 0);
+@@ -552,8 +552,8 @@ static void nvme_print_sgl(struct scatterlist *sgl, int nents)
+ 
+ 	for_each_sg(sgl, sg, nents, i) {
+ 		dma_addr_t phys = sg_phys(sg);
+-		pr_warn("sg[%d] phys_addr:%pad offset:%d length:%d "
+-			"dma_address:%pad dma_length:%d\n",
++		pr_warn("sg[%d] phys_addr:%pad offset:%lu length:%zu "
++			"dma_address:%pad dma_length:%zu\n",
+ 			i, &phys, sg->offset, sg->length, &sg_dma_address(sg),
+ 			sg_dma_len(sg));
+ 	}
+@@ -566,7 +566,7 @@ static blk_status_t nvme_pci_setup_prps(struct nvme_dev *dev,
+ 	struct dma_pool *pool;
+ 	int length = blk_rq_payload_bytes(req);
+ 	struct scatterlist *sg = iod->sg;
+-	int dma_len = sg_dma_len(sg);
++	u64 dma_len = sg_dma_len(sg);
+ 	u64 dma_addr = sg_dma_address(sg);
+ 	u32 page_size = dev->ctrl.page_size;
+ 	int offset = dma_addr & (page_size - 1);
+diff --git a/include/linux/nvme.h b/include/linux/nvme.h
+index 68e91ef..0a07a29 100644
+--- a/include/linux/nvme.h
++++ b/include/linux/nvme.h
+@@ -587,7 +587,7 @@ enum {
+ 
+ struct nvme_sgl_desc {
+ 	__le64	addr;
+-	__le32	length;
++	__le64	length;
+ 	__u8	rsvd[3];
+ 	__u8	type;
+ };
+diff --git a/include/linux/scatterlist.h b/include/linux/scatterlist.h
+index 093aa57..f6d3482 100644
+--- a/include/linux/scatterlist.h
++++ b/include/linux/scatterlist.h
+@@ -10,11 +10,11 @@
+ 
+ struct scatterlist {
+ 	unsigned long	page_link;
+-	unsigned int	offset;
+-	unsigned int	length;
++	unsigned long	offset;
++	size_t		length;
+ 	dma_addr_t	dma_address;
+ #ifdef CONFIG_NEED_SG_DMA_LENGTH
+-	unsigned int	dma_length;
++	size_t		dma_length;
+ #endif
+ };
+ 
+@@ -114,7 +114,7 @@ static inline void sg_assign_page(struct scatterlist *sg, struct page *page)
+  *
+  **/
+ static inline void sg_set_page(struct scatterlist *sg, struct page *page,
+-			       unsigned int len, unsigned int offset)
++			       size_t len, unsigned long offset)
+ {
+ 	sg_assign_page(sg, page);
+ 	sg->offset = offset;
+-- 
+2.7.4
