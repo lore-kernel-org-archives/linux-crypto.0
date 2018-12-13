@@ -1,76 +1,88 @@
-Return-Path: <SRS0=BBPV=OK=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from sitav-80046.hsr.ch ([152.96.80.46]:41214 "EHLO
-        mail.strongswan.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726778AbeLBDxh (ORCPT
+Return-Path: <SRS0=KZld=OW=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:50482 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726886AbeLMKbd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 1 Dec 2018 22:53:37 -0500
-Message-ID: <99ed681fa4d3233b18ae9328a14f9e23971073cb.camel@strongswan.org>
-Subject: Re: [PATCH v2 4/6] crypto: x86/chacha20 - add XChaCha20 support
-From: Martin Willi <martin@strongswan.org>
-To: Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org
-Cc: Paul Crowley <paulcrowley@google.com>,
-        Milan Broz <gmazyland@gmail.com>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>,
-        linux-kernel@vger.kernel.org
-Date: Sat, 01 Dec 2018 17:40:40 +0100
-In-Reply-To: <20181129230217.158038-5-ebiggers@kernel.org>
-References: <20181129230217.158038-1-ebiggers@kernel.org>
-         <20181129230217.158038-5-ebiggers@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        Thu, 13 Dec 2018 05:31:33 -0500
+Date: Thu, 13 Dec 2018 18:31:18 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, paulcrowley@google.com,
+        ard.biesheuvel@linaro.org, Jason@zx2c4.com,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 0/4] crypto: ARM64 NEON optimized XChaCha and
+ NHPoly1305 (for Adiantum)
+Message-ID: <20181213103118.qkrsjvsjtcq5pzrr@gondor.apana.org.au>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181204035252.14853-1-ebiggers@kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+Eric Biggers <ebiggers@kernel.org> wrote:
+> Hello,
+> 
+> This series optimizes the Adiantum encryption mode for ARM64 by adding
+> an ARM64 NEON accelerated implementation of NHPoly1305, specifically the
+> NH part; and by modifying the existing ARM64 NEON implementation of
+> ChaCha20 to support XChaCha20 and XChaCha12.
+> 
+> This greatly improves Adiantum performance on ARM64.  For example,
+> encrypting 4096-byte messages (single-threaded) on a Raspberry Pi 3
+> Model B v1.2, which has a Cortex-A53 processor:
+> 
+>                           Before            After
+>                           ---------         ---------
+> adiantum(xchacha12,aes)    44.1 MB/s         82.7 MB/s
+> adiantum(xchacha20,aes)    35.5 MB/s         65.7 MB/s
+> 
+> Decryption is almost exactly the same speed as encryption.
+> 
+> The biggest benefit comes from accelerating XChaCha.  Accelerating NH
+> gives a somewhat smaller, but still significant benefit.
+> 
+> Performance on 512-byte inputs is also improved, though that is much
+> slower in the first place.  When Adiantium is used with dm-crypt (or
+> cryptsetup), we recommend using a 4096-byte sector size.
+> 
+> For comparison, on the same hardware AES-256-XTS encryption is only
+> 24.5 MB/s and decryption 21.6 MB/s, both using the NEON-bitsliced
+> implementation ("xts-aes-neonbs").  That is the fastest AES-256-XTS
+> implementation on this processor, since it doesn't have the ARMv8
+> Cryptography Extensions.  This is despite Adiantum also being a super-
+> pseudorandom permutation (SPRP) over the entire sector, unlike XTS.
+> 
+> Note that XChaCha20 and XChaCha12 can be used for other purposes too.
+> 
+> Changed since v1:
+>  - Create full stack frame in hchacha_block_neon() and
+>    chacha_block_xor_neon().
+>  - Use x30 instead of lr.
+>  - Fix whitespace in nh-neon-core.S.
+> 
+> Eric Biggers (4):
+>  crypto: arm64/nhpoly1305 - add NEON-accelerated NHPoly1305
+>  crypto: arm64/chacha20 - add XChaCha20 support
+>  crypto: arm64/chacha20 - refactor to allow varying number of rounds
+>  crypto: arm64/chacha - add XChaCha12 support
+> 
+> arch/arm64/crypto/Kconfig                     |   7 +-
+> arch/arm64/crypto/Makefile                    |   7 +-
+> ...hacha20-neon-core.S => chacha-neon-core.S} |  92 +++++---
+> arch/arm64/crypto/chacha-neon-glue.c          | 207 ++++++++++++++++++
+> arch/arm64/crypto/chacha20-neon-glue.c        | 133 -----------
+> arch/arm64/crypto/nh-neon-core.S              | 103 +++++++++
+> arch/arm64/crypto/nhpoly1305-neon-glue.c      |  77 +++++++
+> 7 files changed, 461 insertions(+), 165 deletions(-)
+> rename arch/arm64/crypto/{chacha20-neon-core.S => chacha-neon-core.S} (90%)
+> create mode 100644 arch/arm64/crypto/chacha-neon-glue.c
+> delete mode 100644 arch/arm64/crypto/chacha20-neon-glue.c
+> create mode 100644 arch/arm64/crypto/nh-neon-core.S
+> create mode 100644 arch/arm64/crypto/nhpoly1305-neon-glue.c
 
-> An SSSE3 implementation of single-block HChaCha20 is also added so
-> that XChaCha20 can use it rather than the generic
-> implementation.  This required refactoring the ChaCha permutation
-> into its own function. 
-
-> [...]
-
-> +ENTRY(chacha20_block_xor_ssse3)
-> +	# %rdi: Input state matrix, s
-> +	# %rsi: up to 1 data block output, o
-> +	# %rdx: up to 1 data block input, i
-> +	# %rcx: input/output length in bytes
-> +
-> +	# x0..3 = s0..3
-> +	movdqa		0x00(%rdi),%xmm0
-> +	movdqa		0x10(%rdi),%xmm1
-> +	movdqa		0x20(%rdi),%xmm2
-> +	movdqa		0x30(%rdi),%xmm3
-> +	movdqa		%xmm0,%xmm8
-> +	movdqa		%xmm1,%xmm9
-> +	movdqa		%xmm2,%xmm10
-> +	movdqa		%xmm3,%xmm11
-> +
-> +	mov		%rcx,%rax
-> +	call		chacha20_permute
-> +
->  	# o0 = i0 ^ (x0 + s0)
->  	paddd		%xmm8,%xmm0
->  	cmp		$0x10,%rax
-> @@ -189,6 +198,23 @@ ENTRY(chacha20_block_xor_ssse3)
->  
->  ENDPROC(chacha20_block_xor_ssse3)
->  
-> +ENTRY(hchacha20_block_ssse3)
-> +	# %rdi: Input state matrix, s
-> +	# %rsi: output (8 32-bit words)
-> +
-> +	movdqa		0x00(%rdi),%xmm0
-> +	movdqa		0x10(%rdi),%xmm1
-> +	movdqa		0x20(%rdi),%xmm2
-> +	movdqa		0x30(%rdi),%xmm3
-> +
-> +	call		chacha20_permute
-
-AFAIK, the general convention is to create proper stack frames using
-FRAME_BEGIN/END for non leaf-functions. Should chacha20_permute()
-callers do so?
-
-For the other parts:
-
-Reviewed-by: Martin Willi <martin@strongswan.org>
+All applied.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
