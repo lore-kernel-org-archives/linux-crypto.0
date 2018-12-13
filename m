@@ -1,120 +1,93 @@
-Return-Path: <SRS0=al0q=O3=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from szxga07-in.huawei.com ([45.249.212.35]:44861 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726276AbeLRCSr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 17 Dec 2018 21:18:47 -0500
-From: YueHaibing <yuehaibing@huawei.com>
-To: Harsh Jain <harsh@chelsio.com>,
+Return-Path: <SRS0=KZld=OW=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:50184 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726701AbeLMCLs (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 12 Dec 2018 21:11:48 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id wBD23g5A024585
+        for <linux-crypto@vger.kernel.org>; Wed, 12 Dec 2018 21:11:48 -0500
+Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2pbbktf28b-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <linux-crypto@vger.kernel.org>; Wed, 12 Dec 2018 21:11:47 -0500
+Received: from localhost
+        by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-crypto@vger.kernel.org> from <bauerman@linux.ibm.com>;
+        Thu, 13 Dec 2018 02:11:47 -0000
+From: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+To: linux-integrity@vger.kernel.org
+Cc: linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Jessica Yu <jeyu@kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Atul Gupta <atul.gupta@chelsio.com>,
-        Michael Werner <werner@chelsio.com>,
-        Kees Cook <keescook@chromium.org>
-CC: YueHaibing <yuehaibing@huawei.com>, <linux-crypto@vger.kernel.org>,
-        <kernel-janitors@vger.kernel.org>
-Subject: [PATCH -next] crypto: chtls - remove set but not used variables 'err, adap, request, hws'
-Date: Tue, 18 Dec 2018 02:26:14 +0000
-Message-ID: <1545099974-39327-1-git-send-email-yuehaibing@huawei.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-MIME-Version: 1.0
+        "David S. Miller" <davem@davemloft.net>,
+        Jonathan Corbet <corbet@lwn.net>,
+        "AKASHI, Takahiro" <takahiro.akashi@linaro.org>,
+        Thiago Jung Bauermann <bauerman@linux.ibm.com>
+Subject: [PATCH v9 09/14] ima: Export func_tokens
+Date: Thu, 13 Dec 2018 00:09:02 -0200
+In-Reply-To: <20181213020907.13601-1-bauerman@linux.ibm.com>
+References: <20181213020907.13601-1-bauerman@linux.ibm.com>
+Message-Id: <20181213020907.13601-10-bauerman@linux.ibm.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Fixes gcc '-Wunused-but-set-variable' warning:
+ima_read_modsig() will need it so that it can show an error message.
 
-drivers/crypto/chelsio/chtls/chtls_io.c: In function 'csk_wait_memory':
-drivers/crypto/chelsio/chtls/chtls_io.c:925:6: warning:
- variable 'sndbuf' set but not used [-Wunused-but-set-variable]
-
-drivers/crypto/chelsio/chtls/chtls_io.c: In function 'chtls_pt_recvmsg':
-drivers/crypto/chelsio/chtls/chtls_io.c:1411:6: warning:
- variable 'request' set but not used [-Wunused-but-set-variable]
-
-drivers/crypto/chelsio/chtls/chtls_io.c:1407:18: warning:
- variable 'adap' set but not used [-Wunused-but-set-variable]
-
-drivers/crypto/chelsio/chtls/chtls_io.c: In function 'chtls_recvmsg':
-drivers/crypto/chelsio/chtls/chtls_io.c:1701:6: warning:
- variable 'request' set but not used [-Wunused-but-set-variable]
-
-drivers/crypto/chelsio/chtls/chtls_io.c:1697:20: warning:
- variable 'hws' set but not used [-Wunused-but-set-variable]
-
-Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
 ---
- drivers/crypto/chelsio/chtls/chtls_io.c | 12 +-----------
- 1 file changed, 1 insertion(+), 11 deletions(-)
+ security/integrity/ima/ima.h        |  2 ++
+ security/integrity/ima/ima_policy.c | 12 ++++++------
+ 2 files changed, 8 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/crypto/chelsio/chtls/chtls_io.c b/drivers/crypto/chelsio/chtls/chtls_io.c
-index 18f553f..1285a1b 100644
---- a/drivers/crypto/chelsio/chtls/chtls_io.c
-+++ b/drivers/crypto/chelsio/chtls/chtls_io.c
-@@ -922,14 +922,13 @@ static int csk_wait_memory(struct chtls_dev *cdev,
- 			   struct sock *sk, long *timeo_p)
+diff --git a/security/integrity/ima/ima.h b/security/integrity/ima/ima.h
+index e4f72b30cb28..f0bc2a182cbf 100644
+--- a/security/integrity/ima/ima.h
++++ b/security/integrity/ima/ima.h
+@@ -195,6 +195,8 @@ enum ima_hooks {
+ 	__ima_hooks(__ima_hook_enumify)
+ };
+ 
++extern const char *const func_tokens[];
++
+ /* LIM API function definitions */
+ int ima_get_action(struct inode *inode, const struct cred *cred, u32 secid,
+ 		   int mask, enum ima_hooks func, int *pcr);
+diff --git a/security/integrity/ima/ima_policy.c b/security/integrity/ima/ima_policy.c
+index d17a23b5c91d..b7ee342fbe4a 100644
+--- a/security/integrity/ima/ima_policy.c
++++ b/security/integrity/ima/ima_policy.c
+@@ -1138,6 +1138,12 @@ void ima_delete_rules(void)
+ 	}
+ }
+ 
++#define __ima_hook_stringify(str)	(#str),
++
++const char *const func_tokens[] = {
++	__ima_hooks(__ima_hook_stringify)
++};
++
+ #ifdef	CONFIG_IMA_READ_POLICY
+ enum {
+ 	mask_exec = 0, mask_write, mask_read, mask_append
+@@ -1150,12 +1156,6 @@ static const char *const mask_tokens[] = {
+ 	"MAY_APPEND"
+ };
+ 
+-#define __ima_hook_stringify(str)	(#str),
+-
+-static const char *const func_tokens[] = {
+-	__ima_hooks(__ima_hook_stringify)
+-};
+-
+ void *ima_policy_start(struct seq_file *m, loff_t *pos)
  {
- 	DEFINE_WAIT_FUNC(wait, woken_wake_function);
--	int sndbuf, err = 0;
-+	int err = 0;
- 	long current_timeo;
- 	long vm_wait = 0;
- 	bool noblock;
- 
- 	current_timeo = *timeo_p;
- 	noblock = (*timeo_p ? false : true);
--	sndbuf = cdev->max_host_sndbuf;
- 	if (csk_mem_free(cdev, sk)) {
- 		current_timeo = (prandom_u32() % (HZ / 5)) + 2;
- 		vm_wait = (prandom_u32() % (HZ / 5)) + 2;
-@@ -1401,23 +1400,18 @@ static int chtls_pt_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
- 			    int nonblock, int flags, int *addr_len)
- {
- 	struct chtls_sock *csk = rcu_dereference_sk_user_data(sk);
--	struct net_device *dev = csk->egress_dev;
- 	struct chtls_hws *hws = &csk->tlshws;
- 	struct tcp_sock *tp = tcp_sk(sk);
--	struct adapter *adap;
- 	unsigned long avail;
- 	int buffers_freed;
- 	int copied = 0;
--	int request;
- 	int target;
- 	long timeo;
- 
--	adap = netdev2adap(dev);
- 	buffers_freed = 0;
- 
- 	timeo = sock_rcvtimeo(sk, nonblock);
- 	target = sock_rcvlowat(sk, flags & MSG_WAITALL, len);
--	request = len;
- 
- 	if (unlikely(csk_flag(sk, CSK_UPDATE_RCV_WND)))
- 		chtls_cleanup_rbuf(sk, copied);
-@@ -1694,11 +1688,9 @@ int chtls_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
- {
- 	struct tcp_sock *tp = tcp_sk(sk);
- 	struct chtls_sock *csk;
--	struct chtls_hws *hws;
- 	unsigned long avail;    /* amount of available data in current skb */
- 	int buffers_freed;
- 	int copied = 0;
--	int request;
- 	long timeo;
- 	int target;             /* Read at least this many bytes */
- 
-@@ -1718,7 +1710,6 @@ int chtls_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
- 
- 	lock_sock(sk);
- 	csk = rcu_dereference_sk_user_data(sk);
--	hws = &csk->tlshws;
- 
- 	if (is_tls_rx(csk))
- 		return chtls_pt_recvmsg(sk, msg, len, nonblock,
-@@ -1726,7 +1717,6 @@ int chtls_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
- 
- 	timeo = sock_rcvtimeo(sk, nonblock);
- 	target = sock_rcvlowat(sk, flags & MSG_WAITALL, len);
--	request = len;
- 
- 	if (unlikely(csk_flag(sk, CSK_UPDATE_RCV_WND)))
- 		chtls_cleanup_rbuf(sk, copied);
+ 	loff_t l = *pos;
