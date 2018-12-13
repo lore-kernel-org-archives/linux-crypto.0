@@ -1,85 +1,61 @@
-Return-Path: <SRS0=eKEb=OU=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mga01.intel.com ([192.55.52.88]:10758 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726435AbeLKSbC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Dec 2018 13:31:02 -0500
-Date: Tue, 11 Dec 2018 10:31:01 -0800
-From: Sean Christopherson <sean.j.christopherson@intel.com>
-To: Dave Hansen <dave.hansen@intel.com>
-Cc: Josh Triplett <josh@joshtriplett.org>, Pavel Machek <pavel@ucw.cz>,
-        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
-        x86@kernel.org, platform-driver-x86@vger.kernel.org,
-        nhorman@redhat.com, npmccallum@redhat.com,
-        Alexei Starovoitov <ast@kernel.org>,
-        Andi Kleen <ak@linux.intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Borislav Petkov <bp@suse.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        David Woodhouse <dwmw@amazon.co.uk>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@kernel.org>,
-        "open list:INTEL SGX" <intel-sgx-kernel-dev@lists.01.org>,
-        Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>,
-        "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>,
-        Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
-        "open list:KERNEL VIRTUAL MACHINE FOR X86 (KVM/x86)"
-        <kvm@vger.kernel.org>, Len Brown <len.brown@intel.com>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        "open list:SPARSE CHECKER" <linux-sparse@vger.kernel.org>,
-        Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Ricardo Neri <ricardo.neri-calderon@linux.intel.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Vikas Shivappa <vikas.shivappa@linux.intel.com>
-Subject: Re: [PATCH v11 00/13] Intel SGX1 support
-Message-ID: <20181211183101.GE14731@linux.intel.com>
-References: <20180608171216.26521-1-jarkko.sakkinen@linux.intel.com>
- <20180612105011.GA26931@amd>
- <20180619145943.GC8034@linux.intel.com>
- <20180619200414.GA3143@amd>
- <20180619214833.GA5873@localhost>
- <20181209200600.GA11608@amd>
- <20181210074717.GA9880@localhost>
- <20181210082704.GA14594@amd>
- <20181210231159.GA10718@localhost>
- <12301623-0a63-10ac-1d5e-828569a953e5@intel.com>
+Return-Path: <SRS0=KZld=OW=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from szxga06-in.huawei.com ([45.249.212.32]:50923 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728643AbeLMLWO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 13 Dec 2018 06:22:14 -0500
+From: Zhou Wang <wangzhou1@hisilicon.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        <linux-crypto@vger.kernel.org>
+CC: <linux-kernel@vger.kernel.org>, <linuxarm@huawei.com>,
+        Zhou Wang <wangzhou1@hisilicon.com>
+Subject: [PATCH RFC 0/4] crypto: hisilicon: Add HiSilicon QM and ZIP controller driver
+Date: Thu, 13 Dec 2018 19:22:07 +0800
+Message-ID: <1544700131-196846-1-git-send-email-wangzhou1@hisilicon.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <12301623-0a63-10ac-1d5e-828569a953e5@intel.com>
+Content-Type: text/plain
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Dec 11, 2018 at 10:10:38AM -0800, Dave Hansen wrote:
-> On 12/10/18 3:12 PM, Josh Triplett wrote:
-> >> Or maybe even python/shell scripts? It looked to me like virtual
-> >> memory will be "interesting" for enclaves.
-> > Memory management doesn't seem that hard to deal with.
-> 
-> The problems are:
-> 
-> 1. SGX enclave memory (EPC) is statically allocated at boot and can't
->    grow or shrink
-> 2. EPC is much smaller than regular RAM
-> 3. The core VM has no comprehension of EPC use, thus can not help
->    with its algorithms, like the LRU
-> 4. The SGX driver implements its own VM which is substantially simpler
->    than the core VM, but less feature-rich, fast, or scalable
+This series adds HiSilicon QM and ZIP controller driver in crypto subsystem.
 
-I'd also add:
+A simple QM/ZIP driver which helps to provide an example for a general
+accelerator framework is under review in community[1]. Based on this simple
+driver, this series adds HW v2 support, PCI passthrough, reset, PCI/misc error
+handler, debug support. But unlike [1], driver in this patchset only registers
+to crypto subsystem.
 
-  5. Swapping EPC pages can only be done through SGX specific ISA that
-     has strict concurrency requirements and enforces TLB flushing.
-  6. There are specialized types of EPC pages that have different
-     swapping requirements than regular EPC pages.
-  7. EPC pages that are exposed to a KVM guest have yet another set of
-     swapping requirements.
+There will be a long discussion about above accelerator framework in the
+process of upstreaming. So let's firstly review and upstream QM/ZIP crypto
+driver.
 
-In other words, extending the core VM to SGX EPC is painfully difficult.
+References:
+[1] https://lkml.org/lkml/2018/11/12/1951
+
+Zhou Wang (4):
+  Documentation: Add debugfs doc for hisi_zip
+  crypto: hisilicon: Add queue management driver for HiSilicon QM module
+  crypto: hisilicon: Add HiSilicon ZIP accelerator support
+  MAINTAINERS: add maintainer for HiSilicon QM and ZIP controller driver
+
+ Documentation/ABI/testing/debugfs-hisi-zip |   50 +
+ MAINTAINERS                                |    8 +
+ drivers/crypto/hisilicon/Kconfig           |   11 +
+ drivers/crypto/hisilicon/Makefile          |    2 +
+ drivers/crypto/hisilicon/qm.c              | 1815 ++++++++++++++++++++++++++++
+ drivers/crypto/hisilicon/qm.h              |  176 +++
+ drivers/crypto/hisilicon/zip/Makefile      |    2 +
+ drivers/crypto/hisilicon/zip/zip.h         |   55 +
+ drivers/crypto/hisilicon/zip/zip_crypto.c  |  404 +++++++
+ drivers/crypto/hisilicon/zip/zip_main.c    | 1162 ++++++++++++++++++
+ 10 files changed, 3685 insertions(+)
+ create mode 100644 Documentation/ABI/testing/debugfs-hisi-zip
+ create mode 100644 drivers/crypto/hisilicon/qm.c
+ create mode 100644 drivers/crypto/hisilicon/qm.h
+ create mode 100644 drivers/crypto/hisilicon/zip/Makefile
+ create mode 100644 drivers/crypto/hisilicon/zip/zip.h
+ create mode 100644 drivers/crypto/hisilicon/zip/zip_crypto.c
+ create mode 100644 drivers/crypto/hisilicon/zip/zip_main.c
+
+-- 
+2.8.1
