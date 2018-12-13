@@ -1,94 +1,109 @@
-Return-Path: <SRS0=sHEo=PF=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-vs1-f65.google.com ([209.85.217.65]:45914 "EHLO
-        mail-vs1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728449AbeL1JLN (ORCPT
+Return-Path: <SRS0=KZld=OW=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:50518 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727396AbeLMKdA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 28 Dec 2018 04:11:13 -0500
-Received: by mail-vs1-f65.google.com with SMTP id x28so12642180vsh.12
-        for <linux-crypto@vger.kernel.org>; Fri, 28 Dec 2018 01:11:13 -0800 (PST)
+        Thu, 13 Dec 2018 05:33:00 -0500
+Date: Thu, 13 Dec 2018 18:32:51 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, paulcrowley@google.com,
+        martin@strongswan.org, gmazyland@gmail.com, Jason@zx2c4.com,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 0/6] crypto: x86_64 optimized XChaCha and NHPoly1305
+ (for Adiantum)
+Message-ID: <20181213103251.laob3i3jejwfolyj@gondor.apana.org.au>
 MIME-Version: 1.0
-References: <1545908831-25910-1-git-send-email-sumit.garg@linaro.org>
- <1545908831-25910-2-git-send-email-sumit.garg@linaro.org> <CAKv+Gu8o_6Mu8_2vNHXEy46mZ6xrSPekcwPH7BvxR8nec37Ktw@mail.gmail.com>
-In-Reply-To: <CAKv+Gu8o_6Mu8_2vNHXEy46mZ6xrSPekcwPH7BvxR8nec37Ktw@mail.gmail.com>
-From: Sumit Garg <sumit.garg@linaro.org>
-Date: Fri, 28 Dec 2018 14:41:01 +0530
-Message-ID: <CAFA6WYOpw-URTYJ4i0Y_Tie0_ccMwekbOVzXz3d05NttyL9sHg@mail.gmail.com>
-Subject: Re: [PATCH v1 1/2] dt/bindings: add bindings for optional optee
- rng-uuid property
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        Devicetree List <devicetree@vger.kernel.org>, mpm@selenic.com,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Daniel Thompson <daniel.thompson@linaro.org>,
-        Bhupesh Sharma <bhsharma@redhat.com>, tee-dev@lists.linaro.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181205062005.27727-1-ebiggers@kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, 27 Dec 2018 at 19:10, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
->
-> On Thu, 27 Dec 2018 at 12:08, Sumit Garg <sumit.garg@linaro.org> wrote:
-> >
-> > Add bindings for OP-TEE based optional hardware random number
-> > generator identifier property. It could be used on ARM based devices
-> > where entropy source is not accessible to normal world (linux in this
-> > case).
-> >
-> > Signed-off-by: Sumit Garg <sumit.garg@linaro.org>
-> > ---
-> >  Documentation/devicetree/bindings/arm/firmware/linaro,optee-tz.txt | 4 ++++
-> >  1 file changed, 4 insertions(+)
-> >
-> > diff --git a/Documentation/devicetree/bindings/arm/firmware/linaro,optee-tz.txt b/Documentation/devicetree/bindings/arm/firmware/linaro,optee-tz.txt
-> > index d38834c..e3a4c35 100644
-> > --- a/Documentation/devicetree/bindings/arm/firmware/linaro,optee-tz.txt
-> > +++ b/Documentation/devicetree/bindings/arm/firmware/linaro,optee-tz.txt
-> > @@ -20,6 +20,9 @@ the reference implementation maintained by Linaro.
-> >                     "hvc" : HVC #0, with the register assignments specified
-> >                            in drivers/tee/optee/optee_smc.h
-> >
-> > +- rng-uuid       : Optional OP-TEE based RNG service identifier in case
-> > +                   hardware entropy source is not accesible to normal world
-> > +                   (Linux).
-> >
-> >
-> >  Example:
-> > @@ -27,5 +30,6 @@ Example:
-> >                 optee {
-> >                         compatible = "linaro,optee-tz";
-> >                         method = "smc";
-> > +                       rng-uuid = "ab7a617c-b8e7-4d8f-8301-d09b61036b64";
->
-> If OP-TEE is going to expose devices in this way, it should be modeled
-> more like a bus driver, i.e., sub-nodes that represent the devices,
-> with compatible strings, and perhaps even 'reg' properties for the
-> UUIDs.
->
+Eric Biggers <ebiggers@kernel.org> wrote:
+> Hello,
+> 
+> This series optimizes the Adiantum encryption mode for x86_64 by adding
+> SSE2 and AVX2 accelerated implementations of NHPoly1305, specifically
+> the NH part; and by modifying the existing x86_64 SSSE3/AVX2/AVX-512VL
+> implementation of ChaCha20 to support XChaCha20 and XChaCha12.
+> 
+> This greatly improves Adiantum performance on x86_64.  
+> 
+> For example, encrypting 4096-byte messages (single-threaded) on a
+> Skylake-based processor (Intel Xeon, supports AVX-512VL and AVX2):
+> 
+>                           Before                After
+>                           --------              ---------
+> adiantum(xchacha12,aes)    348 MB/s              1493 MB/s
+> adiantum(xchacha20,aes)    266 MB/s              1261 MB/s
+> 
+> And on a Zen-based processor (Threadripper 1950X, supports AVX2):
+> 
+>                           Before                After
+>                           --------              ---------
+> adiantum(xchacha12,aes)    505 MB/s              1292 MB/s
+> adiantum(xchacha20,aes)    387 MB/s              1037 MB/s
+> 
+> Decryption is almost exactly the same speed as encryption.
+> 
+> The biggest benefit comes from accelerating XChaCha.  Accelerating NH
+> gives a somewhat smaller, but still significant benefit.
+> 
+> Performance on 512-byte inputs is also improved, though that is much
+> slower in the first place.  When Adiantium is used with dm-crypt (or
+> cryptsetup), we recommend using a 4096-byte sector size.
+> 
+> For comparison, AES-256-XTS is 2710 MB/s on the Skylake CPU and
+> 4140 MB/s on the Zen CPU.  However, AES has the benefit of direct AES-NI
+> hardware support whereas Adiantum is implemented entirely with
+> general-purpose instructions (scalar and SIMD).  Adiantum is also a
+> super-pseudorandom permutation over the entire sector, unlike XTS.
+> 
+> Note that XChaCha20 and XChaCha12 can be used for other purposes too.
+> 
+> Changed since v2:
+>  - Yield the FPU once per 4096 bytes rather than once per skcipher_walk
+>    step.
+>  - Create full stack frame in hchacha_block_ssse3() and
+>    chacha_block_xor_ssse3().
+> 
+> Changed since v1:
+>  - Rebase on top of latest cryptodev with the AVX-512VL accelerated
+>    ChaCha20 from Martin Willi.
+> 
+> Eric Biggers (6):
+>  crypto: x86/nhpoly1305 - add SSE2 accelerated NHPoly1305
+>  crypto: x86/nhpoly1305 - add AVX2 accelerated NHPoly1305
+>  crypto: x86/chacha20 - add XChaCha20 support
+>  crypto: x86/chacha20 - refactor to allow varying number of rounds
+>  crypto: x86/chacha - add XChaCha12 support
+>  crypto: x86/chacha - yield the FPU occasionally
+> 
+> arch/x86/crypto/Makefile                      |  15 +-
+> ...a20-avx2-x86_64.S => chacha-avx2-x86_64.S} |  33 +-
+> ...12vl-x86_64.S => chacha-avx512vl-x86_64.S} |  35 +--
+> ...0-ssse3-x86_64.S => chacha-ssse3-x86_64.S} | 104 +++---
+> arch/x86/crypto/chacha20_glue.c               | 208 ------------
+> arch/x86/crypto/chacha_glue.c                 | 297 ++++++++++++++++++
+> arch/x86/crypto/nh-avx2-x86_64.S              | 157 +++++++++
+> arch/x86/crypto/nh-sse2-x86_64.S              | 123 ++++++++
+> arch/x86/crypto/nhpoly1305-avx2-glue.c        |  77 +++++
+> arch/x86/crypto/nhpoly1305-sse2-glue.c        |  76 +++++
+> crypto/Kconfig                                |  28 +-
+> 11 files changed, 861 insertions(+), 292 deletions(-)
+> rename arch/x86/crypto/{chacha20-avx2-x86_64.S => chacha-avx2-x86_64.S} (97%)
+> rename arch/x86/crypto/{chacha20-avx512vl-x86_64.S => chacha-avx512vl-x86_64.S} (97%)
+> rename arch/x86/crypto/{chacha20-ssse3-x86_64.S => chacha-ssse3-x86_64.S} (92%)
+> delete mode 100644 arch/x86/crypto/chacha20_glue.c
+> create mode 100644 arch/x86/crypto/chacha_glue.c
+> create mode 100644 arch/x86/crypto/nh-avx2-x86_64.S
+> create mode 100644 arch/x86/crypto/nh-sse2-x86_64.S
+> create mode 100644 arch/x86/crypto/nhpoly1305-avx2-glue.c
+> create mode 100644 arch/x86/crypto/nhpoly1305-sse2-glue.c
 
-This is something Daniel also suggested during our discussion. But we
-agreed to discuss in upstream to get more feedback.
-
-I think generic TEE should be modelled as a bus driver with devices
-identified via UUIDs, probably queried from underline implementations
-like OP-TEE regarding which resident devices (pseudo-TA UUIDs) it
-supports. Then this list of device UUIDs can be compared against child
-driver's UUID as part of match callback during driver registration.
-Also the child driver could maintain list of device UUIDs which it
-supports.
-
-If we go via this approach we may not require device tree entry for
-corresponding device UUIDs.
-
--Sumit
-
-> >                 };
-> >         };
-> > --
-> > 2.7.4
-> >
+All applied.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
