@@ -1,45 +1,36 @@
-Return-Path: <SRS0=HcFc=OV=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:41120 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726242AbeLLGtU (ORCPT
+Return-Path: <SRS0=KZld=OW=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:50556 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728341AbeLMKfh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Dec 2018 01:49:20 -0500
-Subject: Re: [PATCH] scatterlist: Update size type to support greater then 4GB
- size.
-To: David Miller <davem@davemloft.net>, amhetre@nvidia.com
-Cc: axboe@kernel.dk, ulf.hansson@linaro.org,
-        herbert@gondor.apana.org.au, mmaddireddy@nvidia.com,
-        Snikam@nvidia.com, adrian.hunter@intel.com,
-        linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
-        vdumpa@nvidia.com, linux-crypto@vger.kernel.org,
-        linux-tegra@vger.kernel.org
-References: <1544595853-18492-1-git-send-email-amhetre@nvidia.com>
- <20181211.222950.1995970751331458343.davem@davemloft.net>
-From: Sagi Grimberg <sagi@grimberg.me>
-Message-ID: <5f70fc16-e3cd-37c1-e7ed-e131ad79d387@grimberg.me>
-Date: Tue, 11 Dec 2018 22:49:16 -0800
+        Thu, 13 Dec 2018 05:35:37 -0500
+Date: Thu, 13 Dec 2018 18:35:34 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, PanBian <bianpan2016@163.com>
+Subject: Re: [PATCH] crypto: adiantum - fix leaking reference to hash
+ algorithm
+Message-ID: <20181213103534.5xnn76nkoewedrbb@gondor.apana.org.au>
+References: <20181210194558.106364-1-ebiggers@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20181211.222950.1995970751331458343.davem@davemloft.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181210194558.106364-1-ebiggers@kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-
->>   struct nvme_sgl_desc {
->>   	__le64	addr;
->> -	__le32	length;
->> +	__le64	length;
->>   	__u8	rsvd[3];
->>   	__u8	type;
->>   };
+On Mon, Dec 10, 2018 at 11:45:58AM -0800, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
 > 
-> Isn't this a device or protocol defined datastructure?  You can't just
-> change it like this.
+> crypto_alg_mod_lookup() takes a reference to the hash algorithm but
+> crypto_init_shash_spawn() doesn't take ownership of it, hence the
+> reference needs to be dropped in adiantum_create().
+> 
+> Fixes: 059c2a4d8e16 ("crypto: adiantum - add Adiantum support")
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 
-You're correct, we can't...
-[Replied before seeing this issue was already highlighted]
-
-The positive side is that it can safely be removed without affecting the
-rest of the patch...
+Patch applied.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
