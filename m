@@ -1,125 +1,97 @@
-Return-Path: <SRS0=k6po=OP=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:39808 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726173AbeLFX46 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 6 Dec 2018 18:56:58 -0500
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S . Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
-        LABBE Corentin <clabbe@baylibre.com>,
-        Steffen Klassert <steffen.klassert@secunet.com>
-Subject: [PATCH] crypto: user - support incremental algorithm dumps
-Date: Thu,  6 Dec 2018 15:55:41 -0800
-Message-Id: <20181206235541.143730-1-ebiggers@kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Return-Path: <SRS0=KZld=OW=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:37293 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727343AbeLMIkf (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 13 Dec 2018 03:40:35 -0500
+Received: by mail-pg1-f194.google.com with SMTP id 80so726604pge.4
+        for <linux-crypto@vger.kernel.org>; Thu, 13 Dec 2018 00:40:34 -0800 (PST)
+From: Louis Collard <louiscollard@chromium.org>
+To: linux-crypto@vger.kernel.org
+Cc: Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Gary R Hook <gary.hook@amd.com>, Michael Buesch <m@bues.ch>,
+        PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
+        Louis Collard <louiscollard@chromium.org>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        linux-kernel@vger.kernel.org, apronin@chromium.org,
+        jarkko.sakkinen@linux.intel.com, linux@mniewoehner.de,
+        david.bild@xaptum.com
+Subject: [RESEND PATCH] Allow hwrng to initialize crng.
+Date: Thu, 13 Dec 2018 16:40:17 +0800
+Message-Id: <20181213084017.80850-1-louiscollard@chromium.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Eric Biggers <ebiggers@google.com>
+Some systems, for example embedded systems, do not generate
+enough entropy on boot through interrupts, and boot may be blocked for
+several minutes waiting for a call to getrandom to complete.
 
-CRYPTO_MSG_GETALG in NLM_F_DUMP mode sometimes doesn't return all
-registered crypto algorithms, because it doesn't support incremental
-dumps.  crypto_dump_report() only permits itself to be called once, yet
-the netlink subsystem allocates at most ~64 KiB for the skb being dumped
-to.  Thus only the first recvmsg() returns data, and it may only include
-a subset of the crypto algorithms even if the user buffer passed to
-recvmsg() is large enough to hold all of them.
+Currently, random data is read from a hwrng when it is registered,
+and is loaded into primary_crng. This data is treated in the same
+way as data that is device-specific but otherwise unchanging, and
+so primary_crng cannot become initialized with the data from the
+hwrng.
 
-Fix this by using one of the arguments in the netlink_callback structure
-to keep track of the current position in the algorithm list.  Then
-userspace can do multiple recvmsg() on the socket after sending the dump
-request.  This is the way netlink dumps work elsewhere in the kernel;
-it's unclear why this was different (probably just an oversight).
+This change causes the data initially read from the hwrng to be
+treated the same as subsequent data that is read from the hwrng if
+it's quality score is non-zero.
 
-Also fix an integer overflow when calculating the dump buffer size hint.
+The implications of this are:
 
-Fixes: a38f7907b926 ("crypto: Add userspace configuration API")
-Signed-off-by: Eric Biggers <ebiggers@google.com>
+The data read from hwrng can cause primary_crng to become
+initialized, therefore avoiding problems of getrandom blocking
+on boot.
+
+Calls to getrandom (with GRND_RANDOM) may be using entropy
+exclusively (or in practise, almost exclusively) from the hwrng.
+
+Regarding the latter point; this behavior is the same as if a
+user specified a quality score of 1 (bit of entropy per 1024 bits)
+so hopefully this is not too scary a change to make.
+
+This change is the result of the discussion here:
+https://patchwork.kernel.org/patch/10453893/
+
+Signed-off-by: Louis Collard <louiscollard@chromium.org>
+Acked-by: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
 ---
- crypto/crypto_user_base.c | 37 ++++++++++++++++++++-----------------
- 1 file changed, 20 insertions(+), 17 deletions(-)
+ drivers/char/hw_random/core.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/crypto/crypto_user_base.c b/crypto/crypto_user_base.c
-index 7021efbb35a1e..5311fd7fae34b 100644
---- a/crypto/crypto_user_base.c
-+++ b/crypto/crypto_user_base.c
-@@ -231,30 +231,33 @@ static int crypto_report(struct sk_buff *in_skb, struct nlmsghdr *in_nlh,
+diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
+index 95be7228f327..99c3e4127949 100644
+--- a/drivers/char/hw_random/core.c
++++ b/drivers/char/hw_random/core.c
+@@ -24,6 +24,7 @@
+ #include <linux/sched.h>
+ #include <linux/slab.h>
+ #include <linux/uaccess.h>
++#include <crypto/chacha20.h>
  
- static int crypto_dump_report(struct sk_buff *skb, struct netlink_callback *cb)
+ #define RNG_MODULE_NAME		"hw_random"
+ 
+@@ -64,13 +65,17 @@ static size_t rng_buffer_size(void)
+ static void add_early_randomness(struct hwrng *rng)
  {
--	struct crypto_alg *alg;
-+	const size_t start_pos = cb->args[0];
-+	size_t pos = 0;
- 	struct crypto_dump_info info;
--	int err;
--
--	if (cb->args[0])
--		goto out;
--
--	cb->args[0] = 1;
-+	struct crypto_alg *alg;
-+	int res;
+ 	int bytes_read;
+-	size_t size = min_t(size_t, 16, rng_buffer_size());
++	/* Read enough to initialize crng. */
++	size_t size = 2*CHACHA20_KEY_SIZE;
  
- 	info.in_skb = cb->skb;
- 	info.out_skb = skb;
- 	info.nlmsg_seq = cb->nlh->nlmsg_seq;
- 	info.nlmsg_flags = NLM_F_MULTI;
- 
-+	down_read(&crypto_alg_sem);
- 	list_for_each_entry(alg, &crypto_alg_list, cra_list) {
--		err = crypto_report_alg(alg, &info);
--		if (err)
--			goto out_err;
-+		if (pos >= start_pos) {
-+			res = crypto_report_alg(alg, &info);
-+			if (res == -EMSGSIZE)
-+				break;
-+			if (res)
-+				goto out;
-+		}
-+		pos++;
- 	}
--
-+	cb->args[0] = pos;
-+	res = skb->len;
- out:
--	return skb->len;
--out_err:
--	return err;
-+	up_read(&crypto_alg_sem);
-+	return res;
+ 	mutex_lock(&reading_mutex);
+ 	bytes_read = rng_get_data(rng, rng_buffer, size, 1);
+ 	mutex_unlock(&reading_mutex);
+ 	if (bytes_read > 0)
+-		add_device_randomness(rng_buffer, bytes_read);
++		/* Allow crng to become initialized, but do not add
++		 * entropy to the pool.
++		 */
++		add_hwgenerator_randomness(rng_buffer, bytes_read, 0);
  }
  
- static int crypto_dump_report_done(struct netlink_callback *cb)
-@@ -442,7 +445,7 @@ static int crypto_user_rcv_msg(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	if ((type == (CRYPTO_MSG_GETALG - CRYPTO_MSG_BASE) &&
- 	    (nlh->nlmsg_flags & NLM_F_DUMP))) {
- 		struct crypto_alg *alg;
--		u16 dump_alloc = 0;
-+		unsigned long dump_alloc = 0;
- 
- 		if (link->dump == NULL)
- 			return -EINVAL;
-@@ -450,16 +453,16 @@ static int crypto_user_rcv_msg(struct sk_buff *skb, struct nlmsghdr *nlh,
- 		down_read(&crypto_alg_sem);
- 		list_for_each_entry(alg, &crypto_alg_list, cra_list)
- 			dump_alloc += CRYPTO_REPORT_MAXSIZE;
-+		up_read(&crypto_alg_sem);
- 
- 		{
- 			struct netlink_dump_control c = {
- 				.dump = link->dump,
- 				.done = link->done,
--				.min_dump_alloc = dump_alloc,
-+				.min_dump_alloc = min(dump_alloc, 65535UL),
- 			};
- 			err = netlink_dump_start(crypto_nlsk, skb, nlh, &c);
- 		}
--		up_read(&crypto_alg_sem);
- 
- 		return err;
- 	}
+ static inline void cleanup_rng(struct kref *kref)
 -- 
-2.20.0.rc2.403.gdbc3b29805-goog
+2.13.5
