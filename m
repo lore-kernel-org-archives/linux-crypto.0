@@ -1,82 +1,112 @@
-Return-Path: <SRS0=wDfx=ON=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:55278 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725962AbeLDD4I (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 3 Dec 2018 22:56:08 -0500
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: Paul Crowley <paulcrowley@google.com>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v2 0/4] crypto: ARM64 NEON optimized XChaCha and NHPoly1305 (for Adiantum)
-Date: Mon,  3 Dec 2018 19:52:48 -0800
-Message-Id: <20181204035252.14853-1-ebiggers@kernel.org>
+Return-Path: <SRS0=KZld=OW=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-io1-f68.google.com ([209.85.166.68]:40557 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727928AbeLMJsT (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 13 Dec 2018 04:48:19 -0500
+Received: by mail-io1-f68.google.com with SMTP id n9so1084382ioh.7
+        for <linux-crypto@vger.kernel.org>; Thu, 13 Dec 2018 01:48:18 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20181213091848.81327-1-louiscollard@chromium.org>
+In-Reply-To: <20181213091848.81327-1-louiscollard@chromium.org>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date: Thu, 13 Dec 2018 10:48:07 +0100
+Message-ID: <CAKv+Gu9sWw=VHjYivokAkhGP+p1P15bs3ThfRghARNesW5kyOA@mail.gmail.com>
+Subject: Re: [PATCH v2] Allow hwrng to initialize crng.
+To: louiscollard@chromium.org
+Cc: "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>, mpm@selenic.com,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        gary.hook@amd.com, m@bues.ch,
+        PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        apronin@chromium.org,
+        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
+        linux@mniewoehner.de, david.bild@xaptum.com,
+        "Theodore Ts'o" <tytso@mit.edu>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello,
+On Thu, 13 Dec 2018 at 10:18, Louis Collard <louiscollard@chromium.org> wrote:
+>
+> Some systems, for example embedded systems, do not generate
+> enough entropy on boot through interrupts, and boot may be blocked for
+> several minutes waiting for a call to getrandom to complete.
+>
+> Currently, random data is read from a hwrng when it is registered,
+> and is loaded into primary_crng. This data is treated in the same
+> way as data that is device-specific but otherwise unchanging, and
+> so primary_crng cannot become initialized with the data from the
+> hwrng.
+>
+> This change causes the data initially read from the hwrng to be
+> treated the same as subsequent data that is read from the hwrng if
+> it's quality score is non-zero.
+>
+> The implications of this are:
+>
+> The data read from hwrng can cause primary_crng to become
+> initialized, therefore avoiding problems of getrandom blocking
+> on boot.
+>
+> Calls to getrandom (with GRND_RANDOM) may be using entropy
+> exclusively (or in practise, almost exclusively) from the hwrng.
+>
+> Regarding the latter point; this behavior is the same as if a
+> user specified a quality score of 1 (bit of entropy per 1024 bits)
+> so hopefully this is not too scary a change to make.
+>
+> This change is the result of the discussion here:
+> https://patchwork.kernel.org/patch/10453893/
+>
+> Signed-off-by: Louis Collard <louiscollard@chromium.org>
+> Acked-by: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+> ---
+>  drivers/char/hw_random/core.c | 11 +++++++++--
+>  1 file changed, 9 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
+> index 95be7228f327..7736e1a96321 100644
+> --- a/drivers/char/hw_random/core.c
+> +++ b/drivers/char/hw_random/core.c
+> @@ -24,6 +24,7 @@
+>  #include <linux/sched.h>
+>  #include <linux/slab.h>
+>  #include <linux/uaccess.h>
+> +#include <crypto/chacha20.h>
+>
+>  #define RNG_MODULE_NAME                "hw_random"
+>
+> @@ -64,13 +65,19 @@ static size_t rng_buffer_size(void)
+>  static void add_early_randomness(struct hwrng *rng)
+>  {
+>         int bytes_read;
+> -       size_t size = min_t(size_t, 16, rng_buffer_size());
+> +       /* Read enough to initialize crng. */
+> +       size_t size = min_t(size_t,
+> +                           2*CHACHA20_KEY_SIZE,
 
-This series optimizes the Adiantum encryption mode for ARM64 by adding
-an ARM64 NEON accelerated implementation of NHPoly1305, specifically the
-NH part; and by modifying the existing ARM64 NEON implementation of
-ChaCha20 to support XChaCha20 and XChaCha12.
+This should be as symbolic constant that retains its meaning even if
+we move away from ChaCha20 or modify the current implementation
 
-This greatly improves Adiantum performance on ARM64.  For example,
-encrypting 4096-byte messages (single-threaded) on a Raspberry Pi 3
-Model B v1.2, which has a Cortex-A53 processor:
-
-                           Before            After
-                           ---------         ---------
-adiantum(xchacha12,aes)    44.1 MB/s         82.7 MB/s
-adiantum(xchacha20,aes)    35.5 MB/s         65.7 MB/s
-
-Decryption is almost exactly the same speed as encryption.
-
-The biggest benefit comes from accelerating XChaCha.  Accelerating NH
-gives a somewhat smaller, but still significant benefit.
-
-Performance on 512-byte inputs is also improved, though that is much
-slower in the first place.  When Adiantium is used with dm-crypt (or
-cryptsetup), we recommend using a 4096-byte sector size.
-
-For comparison, on the same hardware AES-256-XTS encryption is only
-24.5 MB/s and decryption 21.6 MB/s, both using the NEON-bitsliced
-implementation ("xts-aes-neonbs").  That is the fastest AES-256-XTS
-implementation on this processor, since it doesn't have the ARMv8
-Cryptography Extensions.  This is despite Adiantum also being a super-
-pseudorandom permutation (SPRP) over the entire sector, unlike XTS.
-
-Note that XChaCha20 and XChaCha12 can be used for other purposes too.
-
-Changed since v1:
-  - Create full stack frame in hchacha_block_neon() and
-    chacha_block_xor_neon().
-  - Use x30 instead of lr.
-  - Fix whitespace in nh-neon-core.S.
-
-Eric Biggers (4):
-  crypto: arm64/nhpoly1305 - add NEON-accelerated NHPoly1305
-  crypto: arm64/chacha20 - add XChaCha20 support
-  crypto: arm64/chacha20 - refactor to allow varying number of rounds
-  crypto: arm64/chacha - add XChaCha12 support
-
- arch/arm64/crypto/Kconfig                     |   7 +-
- arch/arm64/crypto/Makefile                    |   7 +-
- ...hacha20-neon-core.S => chacha-neon-core.S} |  92 +++++---
- arch/arm64/crypto/chacha-neon-glue.c          | 207 ++++++++++++++++++
- arch/arm64/crypto/chacha20-neon-glue.c        | 133 -----------
- arch/arm64/crypto/nh-neon-core.S              | 103 +++++++++
- arch/arm64/crypto/nhpoly1305-neon-glue.c      |  77 +++++++
- 7 files changed, 461 insertions(+), 165 deletions(-)
- rename arch/arm64/crypto/{chacha20-neon-core.S => chacha-neon-core.S} (90%)
- create mode 100644 arch/arm64/crypto/chacha-neon-glue.c
- delete mode 100644 arch/arm64/crypto/chacha20-neon-glue.c
- create mode 100644 arch/arm64/crypto/nh-neon-core.S
- create mode 100644 arch/arm64/crypto/nhpoly1305-neon-glue.c
-
--- 
-2.19.2
+> +                           rng_buffer_size());
+>
+>         mutex_lock(&reading_mutex);
+>         bytes_read = rng_get_data(rng, rng_buffer, size, 1);
+>         mutex_unlock(&reading_mutex);
+>         if (bytes_read > 0)
+> -               add_device_randomness(rng_buffer, bytes_read);
+> +               /* Allow crng to become initialized, but do not add
+> +                * entropy to the pool.
+> +                */
+> +               add_hwgenerator_randomness(rng_buffer, bytes_read, 0);
+>  }
+>
+>  static inline void cleanup_rng(struct kref *kref)
+> --
+> 2.13.5
+>
