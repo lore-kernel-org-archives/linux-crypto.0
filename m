@@ -1,30 +1,63 @@
-Return-Path: <SRS0=36JE=OX=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from shards.monkeyblade.net ([23.128.96.9]:34720 "EHLO
-        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731149AbeLNVl1 (ORCPT
+Return-Path: <SRS0=KZld=OW=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:50402 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727720AbeLMKOH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Dec 2018 16:41:27 -0500
-Date: Fri, 14 Dec 2018 13:41:25 -0800 (PST)
-Message-Id: <20181214.134125.654066359681210530.davem@davemloft.net>
-To: atul.gupta@chelsio.com
-Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        netdev@vger.kernel.org, dt@chelsio.com
-Subject: Re: [tls 4/5] crypto/chelsio/chtls: macro correction in tx path
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20181211102040.3665-1-atul.gupta@chelsio.com>
-References: <20181211102040.3665-1-atul.gupta@chelsio.com>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+        Thu, 13 Dec 2018 05:14:07 -0500
+Date: Thu, 13 Dec 2018 18:14:01 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Vitaly Chikunov <vt@altlinux.org>
+Cc: dhowells@redhat.com, davem@davemloft.net, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH] X.509: Parse public key parameters from x509 for
+ akcipher
+Message-ID: <20181213101401.zsmpkz6okgkjmbw3@gondor.apana.org.au>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181209135548.26232-1-vt@altlinux.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Atul Gupta <atul.gupta@chelsio.com>
-Date: Tue, 11 Dec 2018 02:20:40 -0800
-
-> corrected macro used in tx path. removed redundant hdrlen
-> and check for !page in chtls_sendmsg
+Vitaly Chikunov <vt@altlinux.org> wrote:
+> Some public key algorithms (like ECDSA) keep in parameters field
+> important data such as digest and curve OIDs (possibly more for
+> different ECDSA variants). Thus, just setting a public key (as
+> for RSA) is not enough.
 > 
-> Signed-off-by: Atul Gupta <atul.gupta@chelsio.com>
+> Introduce set_params() callback for akcipher which will be used to
+> pass BER encoded parameters array, with additional argument of
+> algorithm OID.
+> 
+> This is done with the intent of adding support for EC-RDSA (ISO/IEC
+> 14888-3:2018, RFC 7091, and basically ECDSA variant) public keys (which
+> will be finally used in IMA subsystem). Thus, also oid_registry.h is
+> updated.
+> 
+> Rationale:
+> 
+> - For such keys just setting public key without parameters is
+>  meaningless, so it would be possible to add parameters in
+>  crypto_akcipher_set_pub_key (and .set_pub_key) calls. But, this will
+>  needlessly change API for RSA akcipher. Also, additional callback
+>  making it possible to pass parameters after
+>  crypto_akcipher_set_priv_key (and .set_priv_key) in the future.
+> 
+> - Algorithm OID is passed to be validated in .set_params callback,
+>  otherwise, it could have the wrong value.
+> 
+> - Particular algorithm OIDs are checked in x509_note_params, (because
+>  this is called from AlgorithmIdentifier (ASN.1) parser, which is
+>  called multiple times, as it's used multiple times in X.509
+>  certificate), to distinguish a public key call from a signature call.
+> 
+> Signed-off-by: Vitaly Chikunov <vt@altlinux.org>
 
-Applied.
+Please post this with a patch that actually uses the set_params
+callback.
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
