@@ -1,4 +1,4 @@
-Return-Path: <SRS0=HcFc=OV=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=KZld=OW=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
@@ -6,320 +6,156 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1EF9C04EB8
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Dec 2018 07:52:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58082C65BAE
+	for <linux-crypto@archiver.kernel.org>; Thu, 13 Dec 2018 09:48:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6EBB62086D
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Dec 2018 07:52:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1CB5221104
+	for <linux-crypto@archiver.kernel.org>; Thu, 13 Dec 2018 09:48:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="KrmfcVJ5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EBB62086D
+	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="M3/BKtg8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CB5221104
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=none smtp.mailfrom=linux-crypto-owner@vger.kernel.org
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726437AbeLLHwK (ORCPT
+        id S1727882AbeLMJsY (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 12 Dec 2018 02:52:10 -0500
-Received: from mail-io1-f67.google.com ([209.85.166.67]:42962 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726007AbeLLHwK (ORCPT
+        Thu, 13 Dec 2018 04:48:24 -0500
+Received: from mail-io1-f68.google.com ([209.85.166.68]:40557 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727928AbeLMJsT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Dec 2018 02:52:10 -0500
-Received: by mail-io1-f67.google.com with SMTP id x6so14052704ioa.9
-        for <linux-crypto@vger.kernel.org>; Tue, 11 Dec 2018 23:52:09 -0800 (PST)
+        Thu, 13 Dec 2018 04:48:19 -0500
+Received: by mail-io1-f68.google.com with SMTP id n9so1084382ioh.7
+        for <linux-crypto@vger.kernel.org>; Thu, 13 Dec 2018 01:48:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=qc44WKY6KYP3WcFORjBBfpRaiwYvWPwG+qV8iumEUqI=;
-        b=KrmfcVJ51WbWInjPWOvMD1yj5973ivYd5DvQzwKDJFHZjffZ42ckjvCDDYkP1bfKzR
-         3CHQ8wyKCAS5AI7JXq36wqQu/GYxnm64vNon0xK6gvg70F26J83zQjcq2ADUSxEa0vwD
-         vrLBRZkHqFVqnvqT3Xl5iIIS8pVGn7/RaORbk=
+        bh=MA/7VFDGosHgcPekhBDpGbbUmcrDyTLEUNnFmkYTeqo=;
+        b=M3/BKtg8jZ20add7U379jPdCGP7xCZ6ZRKXFIQIZgx+ZBGMgQXlEkBbj//1HuwshJX
+         ToL4D1B0RRbirrDMrnwdBHqCgjGUnckEp4gnm4My/zZDch8TqTQnJNq++EmvcB+rQCrL
+         y/1z7RNzW29bHR0LqbMsx1bOlr3J15P4ShK1o=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=qc44WKY6KYP3WcFORjBBfpRaiwYvWPwG+qV8iumEUqI=;
-        b=YMvBTZHSdf3EEGMrP0xSriOoWwji5wZr8gbvJjnTo1bIwUzmNqFfbgz6UPtVYEgpsB
-         nD9+AaOt/u3LAksLr/WFwB02v4RteFi6KGDVr/Cdyerlc5BRTT4FkSUiERxVFUnJF5EW
-         hF87g9f0ZXkAAUNypjCqiwsJ7/wEbLwySi5iviWRlZ/x5r+H3U4aNdVnnd0jOLOHNgf1
-         E3jJoqa7SgHeleGnLcnQgHLDTwLjja0a5yLNVVmP2HvNDfwuDTQIzHB0HU6rUUQxM3sf
-         suUfSoCr3r56tuS9tb2HLwAUQpkddnhnJvzNbCxzlAnoUqOxpNC71TqQzsDOwsWYLYVT
-         YjPQ==
-X-Gm-Message-State: AA+aEWZp6OrHAo+HYYtS1ED1RBBWtJDaBP3Z6lhek5hz5QYAWITcdtY/
-        U3ttajmDbdlms7i1XjwSerhhNne9MyzlqG2WWoWoaA==
-X-Google-Smtp-Source: AFSGD/UWpB+zq6Ou/+S70RbyPPIIaTP6mkUzv+U7SDwD2PU9rnLmQAvJoA5unyLIQfPCwxYp4tNe5RhcS4ueZ5bRC5I=
-X-Received: by 2002:a5e:c202:: with SMTP id v2mr239833iop.60.1544601129225;
- Tue, 11 Dec 2018 23:52:09 -0800 (PST)
+        bh=MA/7VFDGosHgcPekhBDpGbbUmcrDyTLEUNnFmkYTeqo=;
+        b=FNVHpWl5HwWUbOtZGOflSCbIL4JGLBpy5Gnzaa62i4sOqAwQFjTSkFDJwp7NrVW+wM
+         f3YZu8LEHadka96sbr1d25hmuSnhGiFKqDDS2HCLy02KUsu7CzDsOdE6rA3yB5Q7VPEN
+         09SihoXS4mIAC7oMt4JzJ0J4teVYTqhMsdCaiLvUhWfZULIddsiAaP/lA5Y/o/3N0HOE
+         lS5sM/nz3xoeT8hvcT3LodmAU7dYfj5FkxMjG16tTpLZ9HaOLIrUSDusm2ZW20cBWxNG
+         wDbbE9qocBto+VfdA0r6zsiDZpwh4/dI51BOhgFIqJyt//xGEg9JrVdeZ2Xeu6pqW/rI
+         Vs4w==
+X-Gm-Message-State: AA+aEWZFZ3dBLidmZb1a2KOo3FWHooLg8AQjq3mXcbxgAo8KWOoex4gO
+        l8ioF+LIpLV3u0rPmWs3qoZLVzlMMRAOL0otDkY41w==
+X-Google-Smtp-Source: AFSGD/W3qNGNsBBiGQpBel9ajnA1DwW6xJTBKhxvhQJbcGFMGHVnT4EwvUd8SmxTp25+zCCqk1JOlDtb7Pd/A3jCLyI=
+X-Received: by 2002:a5d:8415:: with SMTP id i21mr19613588ion.173.1544694498460;
+ Thu, 13 Dec 2018 01:48:18 -0800 (PST)
 MIME-Version: 1.0
-References: <1544595853-18492-1-git-send-email-amhetre@nvidia.com>
-In-Reply-To: <1544595853-18492-1-git-send-email-amhetre@nvidia.com>
+References: <20181213091848.81327-1-louiscollard@chromium.org>
+In-Reply-To: <20181213091848.81327-1-louiscollard@chromium.org>
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Wed, 12 Dec 2018 08:51:57 +0100
+Date:   Thu, 13 Dec 2018 10:48:07 +0100
 Message-ID:
- <CAKv+Gu9pMz2TdbY6B1eErxzGvcduuYqeQ=+oKUV6Z-7bC311Tw@mail.gmail.com>
-Subject: Re: [PATCH] scatterlist: Update size type to support greater then 4GB size.
-To:     amhetre@nvidia.com
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jens Axboe <axboe@kernel.dk>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>, linux-nvme@lists.infradead.org,
+ <CAKv+Gu9sWw=VHjYivokAkhGP+p1P15bs3ThfRghARNesW5kyOA@mail.gmail.com>
+Subject: Re: [PATCH v2] Allow hwrng to initialize crng.
+To:     louiscollard@chromium.org
+Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>, mpm@selenic.com,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        gary.hook@amd.com, m@bues.ch,
+        PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        vdumpa@nvidia.com, mmaddireddy@nvidia.com, Snikam@nvidia.com,
-        linux-tegra@vger.kernel.org
+        apronin@chromium.org,
+        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
+        linux@mniewoehner.de, david.bild@xaptum.com,
+        "Theodore Ts'o" <tytso@mit.edu>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
-Message-ID: <20181212075157.TUBCEmpTY3iKAK7k5zJxHZdB_CgfXnMXoO5LGiSpHhg@z>
+Message-ID: <20181213094807.LgO-yXzBnVAWfgQTdRi5rtYxzVjmQyt926yQPoywPsA@z>
 
-On Wed, 12 Dec 2018 at 07:25, Ashish Mhetre <amhetre@nvidia.com> wrote:
+On Thu, 13 Dec 2018 at 10:18, Louis Collard <louiscollard@chromium.org> wrote:
 >
-> From: Krishna Reddy <vdumpa@nvidia.com>
+> Some systems, for example embedded systems, do not generate
+> enough entropy on boot through interrupts, and boot may be blocked for
+> several minutes waiting for a call to getrandom to complete.
 >
-> In the cases where greater than 4GB allocations are required, current
-> definition of scatterlist doesn't support it. For example, Tegra devices
-> have more than 4GB of system memory available. So they are expected to
-> support larger allocation requests.
-> This patch updates the type of scatterlist members to support creating
-> scatterlist for allocations of size greater than 4GB size.
-
-Can you explain what the use case is? We have had systems with more
-than 4 GB for a while now, so where does this new requirement come
-from?
-
-Also, you are changing 'length' to size_t and 'offset' to unsigned
-long. What is the rationale behind that? Did you consider 32-bit
-architectures with PAE at all?
-
-
-> Updated the files that are necessary to fix compilation issues with updated
-> type of variables.
+> Currently, random data is read from a hwrng when it is registered,
+> and is loaded into primary_crng. This data is treated in the same
+> way as data that is device-specific but otherwise unchanging, and
+> so primary_crng cannot become initialized with the data from the
+> hwrng.
 >
-> With definition of scatterlist changed in this patch, size of sg has
-> increased from 28 bytes to 40 bytes because of which allocations in nvme
-> driver are crossing order-0( as sizeof(struct scatterlist) is used in nvme
-> driver allocations ) i.e. they are not able to fit into single page.
+> This change causes the data initially read from the hwrng to be
+> treated the same as subsequent data that is read from the hwrng if
+> it's quality score is non-zero.
 >
-> Recently a patch to limit the nvme allocations to order-0 is mergerd.
-> 'commit 943e942e6266f22babee5efeb00f8f672fbff5bd ("nvme-pci: limit
-> max IO size and segments to avoid high order allocations")'
-> Because of that patch, WARN log is getting printed in our case as
-> definition of scatterlist has changed. Alloc size of nvme is calculated as
-> NVME_MAX_SEGS * sizeof(struct scatterlist). As sizeof(struct scatterlist)
-> has changed from 28 bytes to 40 bytes, so updating NVME_MAX_SEGS from 127
-> to 88 to correspond to original nvme alloc size value.
+> The implications of this are:
 >
-> Signed-off-by: Krishna Reddy <vdumpa@nvidia.com>
-> Signed-off-by: Ashish Mhetre <amhetre@nvidia.com>
+> The data read from hwrng can cause primary_crng to become
+> initialized, therefore avoiding problems of getrandom blocking
+> on boot.
+>
+> Calls to getrandom (with GRND_RANDOM) may be using entropy
+> exclusively (or in practise, almost exclusively) from the hwrng.
+>
+> Regarding the latter point; this behavior is the same as if a
+> user specified a quality score of 1 (bit of entropy per 1024 bits)
+> so hopefully this is not too scary a change to make.
+>
+> This change is the result of the discussion here:
+> https://patchwork.kernel.org/patch/10453893/
+>
+> Signed-off-by: Louis Collard <louiscollard@chromium.org>
+> Acked-by: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
 > ---
->  crypto/shash.c                |  2 +-
->  drivers/ata/libata-sff.c      |  2 +-
->  drivers/mmc/host/sdhci.c      |  2 +-
->  drivers/mmc/host/toshsd.c     |  2 +-
->  drivers/mmc/host/usdhi6rol0.c | 14 +++++++-------
->  drivers/nvme/host/pci.c       |  8 ++++----
->  include/linux/nvme.h          |  2 +-
->  include/linux/scatterlist.h   |  8 ++++----
->  8 files changed, 20 insertions(+), 20 deletions(-)
+>  drivers/char/hw_random/core.c | 11 +++++++++--
+>  1 file changed, 9 insertions(+), 2 deletions(-)
 >
-> diff --git a/crypto/shash.c b/crypto/shash.c
-> index d21f04d..434970e 100644
-> --- a/crypto/shash.c
-> +++ b/crypto/shash.c
-> @@ -298,7 +298,7 @@ int shash_ahash_digest(struct ahash_request *req, struct shash_desc *desc)
+> diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
+> index 95be7228f327..7736e1a96321 100644
+> --- a/drivers/char/hw_random/core.c
+> +++ b/drivers/char/hw_random/core.c
+> @@ -24,6 +24,7 @@
+>  #include <linux/sched.h>
+>  #include <linux/slab.h>
+>  #include <linux/uaccess.h>
+> +#include <crypto/chacha20.h>
 >
->         if (nbytes &&
->             (sg = req->src, offset = sg->offset,
-> -            nbytes < min(sg->length, ((unsigned int)(PAGE_SIZE)) - offset))) {
-> +            nbytes < min(sg->length, ((size_t)(PAGE_SIZE)) - offset))) {
->                 void *data;
+>  #define RNG_MODULE_NAME                "hw_random"
 >
->                 data = kmap_atomic(sg_page(sg));
-> diff --git a/drivers/ata/libata-sff.c b/drivers/ata/libata-sff.c
-> index c5ea0fc..675def6 100644
-> --- a/drivers/ata/libata-sff.c
-> +++ b/drivers/ata/libata-sff.c
-> @@ -810,7 +810,7 @@ static int __atapi_pio_bytes(struct ata_queued_cmd *qc, unsigned int bytes)
->         offset %= PAGE_SIZE;
->
->         /* don't overrun current sg */
-> -       count = min(sg->length - qc->cursg_ofs, bytes);
-> +       count = min(sg->length - qc->cursg_ofs, (size_t)bytes);
->
->         /* don't cross page boundaries */
->         count = min(count, (unsigned int)PAGE_SIZE - offset);
-> diff --git a/drivers/mmc/host/sdhci.c b/drivers/mmc/host/sdhci.c
-> index 99bdae5..bd84c0c 100644
-> --- a/drivers/mmc/host/sdhci.c
-> +++ b/drivers/mmc/host/sdhci.c
-> @@ -1025,7 +1025,7 @@ static void sdhci_prepare_data(struct sdhci_host *host, struct mmc_command *cmd)
->                 if (unlikely(length_mask | offset_mask)) {
->                         for_each_sg(data->sg, sg, data->sg_len, i) {
->                                 if (sg->length & length_mask) {
-> -                                       DBG("Reverting to PIO because of transfer size (%d)\n",
-> +                                       DBG("Reverting to PIO because of transfer size (%zd)\n",
->                                             sg->length);
->                                         host->flags &= ~SDHCI_REQ_USE_DMA;
->                                         break;
-> diff --git a/drivers/mmc/host/toshsd.c b/drivers/mmc/host/toshsd.c
-> index dd961c5..af00936 100644
-> --- a/drivers/mmc/host/toshsd.c
-> +++ b/drivers/mmc/host/toshsd.c
-> @@ -479,7 +479,7 @@ static void toshsd_start_data(struct toshsd_host *host, struct mmc_data *data)
+> @@ -64,13 +65,19 @@ static size_t rng_buffer_size(void)
+>  static void add_early_randomness(struct hwrng *rng)
 >  {
->         unsigned int flags = SG_MITER_ATOMIC;
+>         int bytes_read;
+> -       size_t size = min_t(size_t, 16, rng_buffer_size());
+> +       /* Read enough to initialize crng. */
+> +       size_t size = min_t(size_t,
+> +                           2*CHACHA20_KEY_SIZE,
+
+This should be as symbolic constant that retains its meaning even if
+we move away from ChaCha20 or modify the current implementation
+
+> +                           rng_buffer_size());
 >
-> -       dev_dbg(&host->pdev->dev, "setup data transfer: blocksize %08x  nr_blocks %d, offset: %08x\n",
-> +       dev_dbg(&host->pdev->dev, "setup data transfer: blocksize %08x  nr_blocks %d, offset: %08lx\n",
->                 data->blksz, data->blocks, data->sg->offset);
+>         mutex_lock(&reading_mutex);
+>         bytes_read = rng_get_data(rng, rng_buffer, size, 1);
+>         mutex_unlock(&reading_mutex);
+>         if (bytes_read > 0)
+> -               add_device_randomness(rng_buffer, bytes_read);
+> +               /* Allow crng to become initialized, but do not add
+> +                * entropy to the pool.
+> +                */
+> +               add_hwgenerator_randomness(rng_buffer, bytes_read, 0);
+>  }
 >
->         host->data = data;
-> diff --git a/drivers/mmc/host/usdhi6rol0.c b/drivers/mmc/host/usdhi6rol0.c
-> index cd8b1b9..5fce5ff 100644
-> --- a/drivers/mmc/host/usdhi6rol0.c
-> +++ b/drivers/mmc/host/usdhi6rol0.c
-> @@ -316,7 +316,7 @@ static void usdhi6_blk_bounce(struct usdhi6_host *host,
->         struct mmc_data *data = host->mrq->data;
->         size_t blk_head = host->head_len;
->
-> -       dev_dbg(mmc_dev(host->mmc), "%s(): CMD%u of %u SG: %ux%u @ 0x%x\n",
-> +       dev_dbg(mmc_dev(host->mmc), "%s(): CMD%u of %u SG: %ux%u @ 0x%lx\n",
->                 __func__, host->mrq->cmd->opcode, data->sg_len,
->                 data->blksz, data->blocks, sg->offset);
->
-> @@ -360,7 +360,7 @@ static void *usdhi6_sg_map(struct usdhi6_host *host)
->
->         WARN(host->pg.page, "%p not properly unmapped!\n", host->pg.page);
->         if (WARN(sg_dma_len(sg) % data->blksz,
-> -                "SG size %u isn't a multiple of block size %u\n",
-> +                "SG size %zu isn't a multiple of block size %u\n",
->                  sg_dma_len(sg), data->blksz))
->                 return NULL;
->
-> @@ -383,7 +383,7 @@ static void *usdhi6_sg_map(struct usdhi6_host *host)
->         else
->                 host->blk_page = host->pg.mapped;
->
-> -       dev_dbg(mmc_dev(host->mmc), "Mapped %p (%lx) at %p + %u for CMD%u @ 0x%p\n",
-> +       dev_dbg(mmc_dev(host->mmc), "Mapped %p (%lx) at %p + %lu for CMD%u @ 0x%p\n",
->                 host->pg.page, page_to_pfn(host->pg.page), host->pg.mapped,
->                 sg->offset, host->mrq->cmd->opcode, host->mrq);
->
-> @@ -492,7 +492,7 @@ static void usdhi6_sg_advance(struct usdhi6_host *host)
->                 host->sg = next;
->
->                 if (WARN(next && sg_dma_len(next) % data->blksz,
-> -                        "SG size %u isn't a multiple of block size %u\n",
-> +                        "SG size %zu isn't a multiple of block size %u\n",
->                          sg_dma_len(next), data->blksz))
->                         data->error = -EINVAL;
->
-> @@ -1044,7 +1044,7 @@ static int usdhi6_rq_start(struct usdhi6_host *host)
->                     (data->blksz % 4 ||
->                      data->sg->offset % 4))
->                         dev_dbg(mmc_dev(host->mmc),
-> -                               "Bad SG of %u: %ux%u @ %u\n", data->sg_len,
-> +                               "Bad SG of %u: %ux%u @ %lu\n", data->sg_len,
->                                 data->blksz, data->blocks, data->sg->offset);
->
->                 /* Enable DMA for USDHI6_MIN_DMA bytes or more */
-> @@ -1056,7 +1056,7 @@ static int usdhi6_rq_start(struct usdhi6_host *host)
->                         usdhi6_write(host, USDHI6_CC_EXT_MODE, USDHI6_CC_EXT_MODE_SDRW);
->
->                 dev_dbg(mmc_dev(host->mmc),
-> -                       "%s(): request opcode %u, %u blocks of %u bytes in %u segments, %s %s @+0x%x%s\n",
-> +                       "%s(): request opcode %u, %u blocks of %u bytes in %u segments, %s %s @+0x%lx%s\n",
->                         __func__, cmd->opcode, data->blocks, data->blksz,
->                         data->sg_len, use_dma ? "DMA" : "PIO",
->                         data->flags & MMC_DATA_READ ? "read" : "write",
-> @@ -1704,7 +1704,7 @@ static void usdhi6_timeout_work(struct work_struct *work)
->         case USDHI6_WAIT_FOR_WRITE:
->                 sg = host->sg ?: data->sg;
->                 dev_dbg(mmc_dev(host->mmc),
-> -                       "%c: page #%u @ +0x%zx %ux%u in SG%u. Current SG %u bytes @ %u\n",
-> +                       "%c: page #%u @ +0x%zx %ux%u in SG%u. Current SG %zu bytes @ %lu\n",
->                         data->flags & MMC_DATA_READ ? 'R' : 'W', host->page_idx,
->                         host->offset, data->blocks, data->blksz, data->sg_len,
->                         sg_dma_len(sg), sg->offset);
-> diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-> index d668682..57ef89d 100644
-> --- a/drivers/nvme/host/pci.c
-> +++ b/drivers/nvme/host/pci.c
-> @@ -43,7 +43,7 @@
->   * require an sg allocation that needs more than a page of data.
->   */
->  #define NVME_MAX_KB_SZ 4096
-> -#define NVME_MAX_SEGS  127
-> +#define NVME_MAX_SEGS  88
->
->  static int use_threaded_interrupts;
->  module_param(use_threaded_interrupts, int, 0);
-> @@ -552,8 +552,8 @@ static void nvme_print_sgl(struct scatterlist *sgl, int nents)
->
->         for_each_sg(sgl, sg, nents, i) {
->                 dma_addr_t phys = sg_phys(sg);
-> -               pr_warn("sg[%d] phys_addr:%pad offset:%d length:%d "
-> -                       "dma_address:%pad dma_length:%d\n",
-> +               pr_warn("sg[%d] phys_addr:%pad offset:%lu length:%zu "
-> +                       "dma_address:%pad dma_length:%zu\n",
->                         i, &phys, sg->offset, sg->length, &sg_dma_address(sg),
->                         sg_dma_len(sg));
->         }
-> @@ -566,7 +566,7 @@ static blk_status_t nvme_pci_setup_prps(struct nvme_dev *dev,
->         struct dma_pool *pool;
->         int length = blk_rq_payload_bytes(req);
->         struct scatterlist *sg = iod->sg;
-> -       int dma_len = sg_dma_len(sg);
-> +       u64 dma_len = sg_dma_len(sg);
->         u64 dma_addr = sg_dma_address(sg);
->         u32 page_size = dev->ctrl.page_size;
->         int offset = dma_addr & (page_size - 1);
-> diff --git a/include/linux/nvme.h b/include/linux/nvme.h
-> index 68e91ef..0a07a29 100644
-> --- a/include/linux/nvme.h
-> +++ b/include/linux/nvme.h
-> @@ -587,7 +587,7 @@ enum {
->
->  struct nvme_sgl_desc {
->         __le64  addr;
-> -       __le32  length;
-> +       __le64  length;
->         __u8    rsvd[3];
->         __u8    type;
->  };
-> diff --git a/include/linux/scatterlist.h b/include/linux/scatterlist.h
-> index 093aa57..f6d3482 100644
-> --- a/include/linux/scatterlist.h
-> +++ b/include/linux/scatterlist.h
-> @@ -10,11 +10,11 @@
->
->  struct scatterlist {
->         unsigned long   page_link;
-> -       unsigned int    offset;
-> -       unsigned int    length;
-> +       unsigned long   offset;
-> +       size_t          length;
->         dma_addr_t      dma_address;
->  #ifdef CONFIG_NEED_SG_DMA_LENGTH
-> -       unsigned int    dma_length;
-> +       size_t          dma_length;
->  #endif
->  };
->
-> @@ -114,7 +114,7 @@ static inline void sg_assign_page(struct scatterlist *sg, struct page *page)
->   *
->   **/
->  static inline void sg_set_page(struct scatterlist *sg, struct page *page,
-> -                              unsigned int len, unsigned int offset)
-> +                              size_t len, unsigned long offset)
->  {
->         sg_assign_page(sg, page);
->         sg->offset = offset;
+>  static inline void cleanup_rng(struct kref *kref)
 > --
-> 2.7.4
+> 2.13.5
 >
