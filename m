@@ -1,46 +1,31 @@
-Return-Path: <SRS0=Kj53=OL=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from sitav-80046.hsr.ch ([152.96.80.46]:47538 "EHLO
-        mail.strongswan.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725775AbeLBKrr (ORCPT
+Return-Path: <SRS0=36JE=OX=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from shards.monkeyblade.net ([23.128.96.9]:34728 "EHLO
+        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731149AbeLNVlc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 2 Dec 2018 05:47:47 -0500
-Message-ID: <acad781e9981c49b83b6dfdc8cefed6246df469a.camel@strongswan.org>
-Subject: Re: [PATCH v2 3/6] crypto: x86/chacha20 - limit the
- preemption-disabled section
-From: Martin Willi <martin@strongswan.org>
-To: Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org
-Cc: Paul Crowley <paulcrowley@google.com>,
-        Milan Broz <gmazyland@gmail.com>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>,
-        linux-kernel@vger.kernel.org
-Date: Sun, 02 Dec 2018 11:47:42 +0100
-In-Reply-To: <20181129230217.158038-4-ebiggers@kernel.org>
-References: <20181129230217.158038-1-ebiggers@kernel.org>
-         <20181129230217.158038-4-ebiggers@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Fri, 14 Dec 2018 16:41:32 -0500
+Date: Fri, 14 Dec 2018 13:41:30 -0800 (PST)
+Message-Id: <20181214.134130.1418895119807333506.davem@davemloft.net>
+To: atul.gupta@chelsio.com
+Cc: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        netdev@vger.kernel.org, dt@chelsio.com
+Subject: Re: [tls 5/5] crypto/chelsio/chtls: send/recv window update
+From: David Miller <davem@davemloft.net>
+In-Reply-To: <20181211102053.3712-1-atul.gupta@chelsio.com>
+References: <20181211102053.3712-1-atul.gupta@chelsio.com>
 Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+From: Atul Gupta <atul.gupta@chelsio.com>
+Date: Tue, 11 Dec 2018 02:20:53 -0800
 
-> To improve responsiveness, disable preemption for each step of the
-> walk (which is at most PAGE_SIZE) rather than for the entire
-> encryption/decryption operation.
+> recalculated send and receive window using linkspeed.
+> Determine correct value of eck_ok from SYN received and
+> option configured on local system.
+> 
+> Signed-off-by: Atul Gupta <atul.gupta@chelsio.com>
 
-It seems that it is not that uncommon for IPsec to get small inputs
-scattered over multiple blocks. Doing FPU context saving for each walk
-step then can slow down things.
-
-An alternative approach could be to re-enable preemption not based on
-the walk steps, but on the amount of bytes processed. This would
-satisfy both users, I guess.
-
-In the long run we probably need a better approach for FPU context
-saving, as this really hurts performance-wise. For IPsec we should find
-a way to avoid the (multiple) per-packet FPU save/restores in softirq
-context, but I guess this requires support from process context
-switching.
-
-Best regards
-Martin
+Applied.
