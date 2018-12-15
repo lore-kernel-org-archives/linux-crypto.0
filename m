@@ -1,156 +1,138 @@
-Return-Path: <SRS0=KZld=OW=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51952 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726762AbeLMCLT (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Dec 2018 21:11:19 -0500
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.22/8.16.0.22) with SMTP id wBD23hPs123874
-        for <linux-crypto@vger.kernel.org>; Wed, 12 Dec 2018 21:11:17 -0500
-Received: from e35.co.us.ibm.com (e35.co.us.ibm.com [32.97.110.153])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2pbc6pd512-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <linux-crypto@vger.kernel.org>; Wed, 12 Dec 2018 21:11:17 -0500
-Received: from localhost
-        by e35.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-crypto@vger.kernel.org> from <bauerman@linux.ibm.com>;
-        Thu, 13 Dec 2018 02:11:16 -0000
-From: Thiago Jung Bauermann <bauerman@linux.ibm.com>
-To: linux-integrity@vger.kernel.org
-Cc: linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Jessica Yu <jeyu@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jonathan Corbet <corbet@lwn.net>,
-        "AKASHI, Takahiro" <takahiro.akashi@linaro.org>,
-        Thiago Jung Bauermann <bauerman@linux.ibm.com>
-Subject: [PATCH v9 04/14] integrity: Introduce struct evm_xattr
-Date: Thu, 13 Dec 2018 00:08:57 -0200
-In-Reply-To: <20181213020907.13601-1-bauerman@linux.ibm.com>
-References: <20181213020907.13601-1-bauerman@linux.ibm.com>
-Message-Id: <20181213020907.13601-5-bauerman@linux.ibm.com>
+Return-Path: <SRS0=nt8C=OY=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:39924 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727229AbeLOUll (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 15 Dec 2018 15:41:41 -0500
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc: syzkaller-bugs@googlegroups.com, davem@davemloft.net,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: x86/chacha - avoid sleeping under kernel_fpu_begin()
+Date: Sat, 15 Dec 2018 12:40:17 -0800
+Message-Id: <20181215204017.7880-1-ebiggers@kernel.org>
+In-Reply-To: <000000000000fb268d057d13ea55@google.com>
+References: <000000000000fb268d057d13ea55@google.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Even though struct evm_ima_xattr_data includes a fixed-size array to hold a
-SHA1 digest, most of the code ignores the array and uses the struct to mean
-"type indicator followed by data of unspecified size" and tracks the real
-size of what the struct represents in a separate length variable.
+From: Eric Biggers <ebiggers@google.com>
 
-The only exception to that is the EVM code, which correctly uses the
-definition of struct evm_ima_xattr_data.
+Passing atomic=true to skcipher_walk_virt() only makes the later
+skcipher_walk_done() calls use atomic memory allocations, not
+skcipher_walk_virt() itself.  Thus, we have to move it outside of the
+preemption-disabled region (kernel_fpu_begin()/kernel_fpu_end()).
 
-So make this explicit in the code by removing the length specification from
-the array in struct evm_ima_xattr_data. Also, change the name of the
-element from digest to data since in most places the array doesn't hold a
-digest.
+(skcipher_walk_virt() only allocates memory for certain layouts of the
+input scatterlist, hence why I didn't notice this earlier...)
 
-A separate struct evm_xattr is introduced, with the original definition of
-evm_ima_xattr_data to be used in the places that actually expect that
-definition, specifically the EVM HMAC code.
-
-Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
-Reviewed-by: Mimi Zohar <zohar@linux.ibm.com>
+Reported-by: syzbot+9bf843c33f782d73ae7d@syzkaller.appspotmail.com
+Fixes: 4af78261870a ("crypto: x86/chacha20 - add XChaCha20 support")
+Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- security/integrity/evm/evm_main.c     | 8 ++++----
- security/integrity/ima/ima_appraise.c | 7 ++++---
- security/integrity/integrity.h        | 6 ++++++
- 3 files changed, 14 insertions(+), 7 deletions(-)
+ arch/x86/crypto/chacha_glue.c | 33 ++++++++++++++++++++-------------
+ 1 file changed, 20 insertions(+), 13 deletions(-)
 
-diff --git a/security/integrity/evm/evm_main.c b/security/integrity/evm/evm_main.c
-index 7f3f54d89a6e..a1b42d10efc7 100644
---- a/security/integrity/evm/evm_main.c
-+++ b/security/integrity/evm/evm_main.c
-@@ -169,7 +169,7 @@ static enum integrity_status evm_verify_hmac(struct dentry *dentry,
- 	/* check value type */
- 	switch (xattr_data->type) {
- 	case EVM_XATTR_HMAC:
--		if (xattr_len != sizeof(struct evm_ima_xattr_data)) {
-+		if (xattr_len != sizeof(struct evm_xattr)) {
- 			evm_status = INTEGRITY_FAIL;
- 			goto out;
- 		}
-@@ -179,7 +179,7 @@ static enum integrity_status evm_verify_hmac(struct dentry *dentry,
- 				   xattr_value_len, &digest);
- 		if (rc)
- 			break;
--		rc = crypto_memneq(xattr_data->digest, digest.digest,
-+		rc = crypto_memneq(xattr_data->data, digest.digest,
- 				   SHA1_DIGEST_SIZE);
- 		if (rc)
- 			rc = -EINVAL;
-@@ -523,7 +523,7 @@ int evm_inode_init_security(struct inode *inode,
- 				 const struct xattr *lsm_xattr,
- 				 struct xattr *evm_xattr)
+diff --git a/arch/x86/crypto/chacha_glue.c b/arch/x86/crypto/chacha_glue.c
+index 9b1d3fac49433..45c1c41431766 100644
+--- a/arch/x86/crypto/chacha_glue.c
++++ b/arch/x86/crypto/chacha_glue.c
+@@ -127,30 +127,27 @@ static void chacha_dosimd(u32 *state, u8 *dst, const u8 *src,
+ 	}
+ }
+ 
+-static int chacha_simd_stream_xor(struct skcipher_request *req,
++static int chacha_simd_stream_xor(struct skcipher_walk *walk,
+ 				  struct chacha_ctx *ctx, u8 *iv)
  {
--	struct evm_ima_xattr_data *xattr_data;
-+	struct evm_xattr *xattr_data;
- 	int rc;
+ 	u32 *state, state_buf[16 + 2] __aligned(8);
+-	struct skcipher_walk walk;
+ 	int next_yield = 4096; /* bytes until next FPU yield */
+-	int err;
++	int err = 0;
  
- 	if (!evm_key_loaded() || !evm_protected_xattr(lsm_xattr->name))
-@@ -533,7 +533,7 @@ int evm_inode_init_security(struct inode *inode,
- 	if (!xattr_data)
- 		return -ENOMEM;
+ 	BUILD_BUG_ON(CHACHA_STATE_ALIGN != 16);
+ 	state = PTR_ALIGN(state_buf + 0, CHACHA_STATE_ALIGN);
  
--	xattr_data->type = EVM_XATTR_HMAC;
-+	xattr_data->data.type = EVM_XATTR_HMAC;
- 	rc = evm_init_hmac(inode, lsm_xattr, xattr_data->digest);
- 	if (rc < 0)
- 		goto out;
-diff --git a/security/integrity/ima/ima_appraise.c b/security/integrity/ima/ima_appraise.c
-index f6ac405daabb..dcb8226972cf 100644
---- a/security/integrity/ima/ima_appraise.c
-+++ b/security/integrity/ima/ima_appraise.c
-@@ -167,7 +167,8 @@ enum hash_algo ima_get_hash_algo(struct evm_ima_xattr_data *xattr_value,
- 		return sig->hash_algo;
- 		break;
- 	case IMA_XATTR_DIGEST_NG:
--		ret = xattr_value->digest[0];
-+		/* first byte contains algorithm id */
-+		ret = xattr_value->data[0];
- 		if (ret < HASH_ALGO__LAST)
- 			return ret;
- 		break;
-@@ -175,7 +176,7 @@ enum hash_algo ima_get_hash_algo(struct evm_ima_xattr_data *xattr_value,
- 		/* this is for backward compatibility */
- 		if (xattr_len == 21) {
- 			unsigned int zero = 0;
--			if (!memcmp(&xattr_value->digest[16], &zero, 4))
-+			if (!memcmp(&xattr_value->data[16], &zero, 4))
- 				return HASH_ALGO_MD5;
- 			else
- 				return HASH_ALGO_SHA1;
-@@ -274,7 +275,7 @@ int ima_appraise_measurement(enum ima_hooks func,
- 			/* xattr length may be longer. md5 hash in previous
- 			   version occupied 20 bytes in xattr, instead of 16
- 			 */
--			rc = memcmp(&xattr_value->digest[hash_start],
-+			rc = memcmp(&xattr_value->data[hash_start],
- 				    iint->ima_hash->digest,
- 				    iint->ima_hash->length);
- 		else
-diff --git a/security/integrity/integrity.h b/security/integrity/integrity.h
-index 3517d2852a07..2bf0fc51752b 100644
---- a/security/integrity/integrity.h
-+++ b/security/integrity/integrity.h
-@@ -79,6 +79,12 @@ enum evm_ima_xattr_type {
+-	err = skcipher_walk_virt(&walk, req, true);
+-
+ 	crypto_chacha_init(state, ctx, iv);
  
- struct evm_ima_xattr_data {
- 	u8 type;
-+	u8 data[];
-+} __packed;
+-	while (walk.nbytes > 0) {
+-		unsigned int nbytes = walk.nbytes;
++	while (walk->nbytes > 0) {
++		unsigned int nbytes = walk->nbytes;
+ 
+-		if (nbytes < walk.total) {
+-			nbytes = round_down(nbytes, walk.stride);
++		if (nbytes < walk->total) {
++			nbytes = round_down(nbytes, walk->stride);
+ 			next_yield -= nbytes;
+ 		}
+ 
+-		chacha_dosimd(state, walk.dst.virt.addr, walk.src.virt.addr,
++		chacha_dosimd(state, walk->dst.virt.addr, walk->src.virt.addr,
+ 			      nbytes, ctx->nrounds);
+ 
+ 		if (next_yield <= 0) {
+@@ -160,7 +157,7 @@ static int chacha_simd_stream_xor(struct skcipher_request *req,
+ 			next_yield = 4096;
+ 		}
+ 
+-		err = skcipher_walk_done(&walk, walk.nbytes - nbytes);
++		err = skcipher_walk_done(walk, walk->nbytes - nbytes);
+ 	}
+ 
+ 	return err;
+@@ -170,13 +167,18 @@ static int chacha_simd(struct skcipher_request *req)
+ {
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+ 	struct chacha_ctx *ctx = crypto_skcipher_ctx(tfm);
++	struct skcipher_walk walk;
+ 	int err;
+ 
+ 	if (req->cryptlen <= CHACHA_BLOCK_SIZE || !irq_fpu_usable())
+ 		return crypto_chacha_crypt(req);
+ 
++	err = skcipher_walk_virt(&walk, req, true);
++	if (err)
++		return err;
 +
-+/* Only used in the EVM HMAC code. */
-+struct evm_xattr {
-+	struct evm_ima_xattr_data data;
- 	u8 digest[SHA1_DIGEST_SIZE];
- } __packed;
+ 	kernel_fpu_begin();
+-	err = chacha_simd_stream_xor(req, ctx, req->iv);
++	err = chacha_simd_stream_xor(&walk, ctx, req->iv);
+ 	kernel_fpu_end();
+ 	return err;
+ }
+@@ -185,6 +187,7 @@ static int xchacha_simd(struct skcipher_request *req)
+ {
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+ 	struct chacha_ctx *ctx = crypto_skcipher_ctx(tfm);
++	struct skcipher_walk walk;
+ 	struct chacha_ctx subctx;
+ 	u32 *state, state_buf[16 + 2] __aligned(8);
+ 	u8 real_iv[16];
+@@ -193,6 +196,10 @@ static int xchacha_simd(struct skcipher_request *req)
+ 	if (req->cryptlen <= CHACHA_BLOCK_SIZE || !irq_fpu_usable())
+ 		return crypto_xchacha_crypt(req);
  
++	err = skcipher_walk_virt(&walk, req, true);
++	if (err)
++		return err;
++
+ 	BUILD_BUG_ON(CHACHA_STATE_ALIGN != 16);
+ 	state = PTR_ALIGN(state_buf + 0, CHACHA_STATE_ALIGN);
+ 	crypto_chacha_init(state, ctx, req->iv);
+@@ -204,7 +211,7 @@ static int xchacha_simd(struct skcipher_request *req)
+ 
+ 	memcpy(&real_iv[0], req->iv + 24, 8);
+ 	memcpy(&real_iv[8], req->iv + 16, 8);
+-	err = chacha_simd_stream_xor(req, &subctx, real_iv);
++	err = chacha_simd_stream_xor(&walk, &subctx, real_iv);
+ 
+ 	kernel_fpu_end();
+ 
+-- 
+2.19.2
