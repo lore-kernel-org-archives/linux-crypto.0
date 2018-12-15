@@ -1,59 +1,92 @@
-Return-Path: <SRS0=edWn=O6=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from inva021.nxp.com ([92.121.34.21]:49164 "EHLO inva021.nxp.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387764AbeLUP7s (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 Dec 2018 10:59:48 -0500
-From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Iuliana Prodan <iuliana.prodan@nxp.com>,
-        linux-crypto@vger.kernel.org, linux-imx@nxp.com,
-        Iuliana Prodan <Iuliana.Prodan@nxp.com>
-Subject: [PATCH 2/3] crypto: caam - create ahash shared descriptors only once
-Date: Fri, 21 Dec 2018 17:59:09 +0200
-Message-Id: <20181221155910.6235-3-horia.geanta@nxp.com>
-In-Reply-To: <20181221155910.6235-1-horia.geanta@nxp.com>
-References: <20181221155910.6235-1-horia.geanta@nxp.com>
+Return-Path: <SRS0=nt8C=OY=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-io1-f72.google.com ([209.85.166.72]:49103 "EHLO
+        mail-io1-f72.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726533AbeLOSnF (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 15 Dec 2018 13:43:05 -0500
+Received: by mail-io1-f72.google.com with SMTP id r15so7900133ioa.15
+        for <linux-crypto@vger.kernel.org>; Sat, 15 Dec 2018 10:43:04 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Date: Sat, 15 Dec 2018 10:43:03 -0800
+In-Reply-To: <00000000000085c1ce05708f6724@google.com>
+Message-ID: <000000000000fb268d057d13ea55@google.com>
+Subject: Re: BUG: sleeping function called from invalid context at
+ mm/slab.h:LINE (4)
+From: syzbot <syzbot+9bf843c33f782d73ae7d@syzkaller.appspotmail.com>
+To: davem@davemloft.net, gregkh@linuxfoundation.org,
+        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, rafael@kernel.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Iuliana Prodan <Iuliana.Prodan@nxp.com>
+syzbot has found a reproducer for the following crash on:
 
-For keyed hash algorithms, shared descriptors are currently generated
-twice:
--at tfm initialization time, in cra_init() callback
--in setkey() callback
+HEAD commit:    d14b746c6c1c Add linux-next specific files for 20181214
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=129bc943400000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=1da6d2d18f803140
+dashboard link: https://syzkaller.appspot.com/bug?extid=9bf843c33f782d73ae7d
+compiler:       gcc (GCC) 8.0.1 20180413 (experimental)
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=136154cd400000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1687bfa3400000
 
-Since it's mandatory to call setkey() for keyed algorithms, drop the
-generation in cra_init().
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+9bf843c33f782d73ae7d@syzkaller.appspotmail.com
 
-Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>
-Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
----
- drivers/crypto/caam/caamhash.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
-index 33f7c19efb62..179981f44807 100644
---- a/drivers/crypto/caam/caamhash.c
-+++ b/drivers/crypto/caam/caamhash.c
-@@ -1722,7 +1722,12 @@ static int caam_hash_cra_init(struct crypto_tfm *tfm)
- 
- 	crypto_ahash_set_reqsize(__crypto_ahash_cast(tfm),
- 				 sizeof(struct caam_hash_state));
--	return ahash_set_sh_desc(ahash);
-+
-+	/*
-+	 * For keyed hash algorithms shared descriptors
-+	 * will be created later in setkey() callback
-+	 */
-+	return alg->setkey ? 0 : ahash_set_sh_desc(ahash);
- }
- 
- static void caam_hash_cra_exit(struct crypto_tfm *tfm)
--- 
-2.16.2
+sshd (6035) used greatest stack depth: 15600 bytes left
+BUG: sleeping function called from invalid context at mm/slab.h:421
+in_atomic(): 1, irqs_disabled(): 0, pid: 6051, name: syz-executor515
+1 lock held by syz-executor515/6051:
+  #0: 000000002f6552ef (sk_lock-AF_ALG){+.+.}, at: lock_sock  
+include/net/sock.h:1502 [inline]
+  #0: 000000002f6552ef (sk_lock-AF_ALG){+.+.}, at:  
+skcipher_recvmsg+0xbb/0x1420 crypto/algif_skcipher.c:163
+Preemption disabled at:
+[<ffffffff812e4ae6>] kernel_fpu_begin+0x16/0x260  
+arch/x86/kernel/fpu/core.c:127
+CPU: 0 PID: 6051 Comm: syz-executor515 Not tainted  
+4.20.0-rc6-next-20181214+ #171
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
+Google 01/01/2011
+Call Trace:
+  __dump_stack lib/dump_stack.c:77 [inline]
+  dump_stack+0x244/0x39d lib/dump_stack.c:113
+  ___might_sleep.cold.86+0x221/0x254 kernel/sched/core.c:6148
+  __might_sleep+0x95/0x190 kernel/sched/core.c:6101
+  slab_pre_alloc_hook mm/slab.h:421 [inline]
+  slab_alloc mm/slab.c:3365 [inline]
+  __do_kmalloc mm/slab.c:3707 [inline]
+  __kmalloc+0x2da/0x760 mm/slab.c:3718
+  kmalloc include/linux/slab.h:550 [inline]
+  kzalloc include/linux/slab.h:740 [inline]
+  skcipher_next_slow crypto/skcipher.c:254 [inline]
+  skcipher_walk_next+0x7f9/0x17f0 crypto/skcipher.c:358
+  skcipher_walk_first+0xff/0x3a0 crypto/skcipher.c:441
+  skcipher_walk_skcipher+0x541/0x700 crypto/skcipher.c:469
+  skcipher_walk_virt+0x58/0xd0 crypto/skcipher.c:479
+  chacha_simd_stream_xor+0xb3/0xa40 arch/x86/crypto/chacha_glue.c:141
+  chacha_simd+0xd8/0x110 arch/x86/crypto/chacha_glue.c:179
+  crypto_skcipher_decrypt include/crypto/skcipher.h:538 [inline]
+  _skcipher_recvmsg crypto/algif_skcipher.c:146 [inline]
+  skcipher_recvmsg+0xcc9/0x1420 crypto/algif_skcipher.c:165
+  sock_recvmsg_nosec net/socket.c:795 [inline]
+  sock_recvmsg+0xd0/0x110 net/socket.c:802
+  ___sys_recvmsg+0x2b6/0x680 net/socket.c:2279
+  do_recvmmsg+0x303/0xb90 net/socket.c:2392
+  __sys_recvmmsg+0x265/0x2a0 net/socket.c:2471
+  __do_sys_recvmmsg net/socket.c:2494 [inline]
+  __se_sys_recvmmsg net/socket.c:2487 [inline]
+  __x64_sys_recvmmsg+0xe6/0x140 net/socket.c:2487
+  do_syscall_64+0x1b9/0x820 arch/x86/entry/common.c:290
+  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+RIP: 0033:0x440349
+Code: 18 89 d0 c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 48 89 f8 48 89 f7  
+48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff  
+ff 0f 83 fb 13 fc ff c3 66 2e 0f 1f 84 00 00 00 00
+RSP: 002b:00007fff9312c608 EFLAGS: 00000203 ORIG_RAX: 000000000000012b
+RAX: ffffffffffffffda RBX: 00000000004002c8 RCX: 0000000000440349
+RDX: 0000000000000001 RSI: 000000002000a280 RDI: 0000000000000004
+RBP: 00000000006ca018 R08: 0000000000000000 R09: 00000000004002c8
+R10: 0000000000000000 R11: 0000000000000203 R12: 00000000
