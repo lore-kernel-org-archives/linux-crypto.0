@@ -1,70 +1,28 @@
-Return-Path: <SRS0=k6po=OP=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:51026 "EHLO mail.kernel.org"
+Return-Path: <SRS0=ECh6=O2=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.univ-sba.dz ([193.194.79.133]:51926 "EHLO mail.univ-sba.dz"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728294AbeLFEyK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 5 Dec 2018 23:54:10 -0500
-From: Eric Biggers <ebiggers@kernel.org>
-To: dm-devel@redhat.com, Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>
-Cc: linux-crypto@vger.kernel.org
-Subject: [PATCH] dm crypt: log the encryption algorithm implementation
-Date: Wed,  5 Dec 2018 20:53:00 -0800
-Message-Id: <20181206045300.32387-1-ebiggers@kernel.org>
+        id S1726209AbeLQAVu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 16 Dec 2018 19:21:50 -0500
+Date: Mon, 17 Dec 2018 01:06:39 +0100 (CET)
+From: Tayeb Souami <amar.tilmatine@univ-sba.dz>
+Reply-To: Tayeb souami <tayebsouam.spende@gmail.com>
+Message-ID: <856168847.33911.1545005199240.JavaMail.zimbra@univ-sba.dz>
+Subject: =?utf-8?Q?wohlt=C3=A4tige_Spende_von_2.000.000_euro?=
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+To: unlisted-recipients:; (no To-header on input)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Eric Biggers <ebiggers@google.com>
 
-Log the encryption algorithm's driver name when a dm-crypt target is
-created.  This will help people determine whether the expected
-implementation is being used.  In some cases we've seen people do
-benchmarks and reject using encryption for performance reasons, when in
-fact they used a much slower implementation than was possible on the
-hardware.  It can make an enormous difference; e.g., AES-XTS on ARM can
-be over 10x faster with the crypto extensions than without.  It can also
-be useful to know if an implementation using an external crypto
-accelerator is being used instead of a software implementation.
 
-Example message:
-
-[   29.307629] device-mapper: crypt: xts(aes) using implementation "xts-aes-ce"
-
-We've already found the similar message in fs/crypto/keyinfo.c to be
-very useful.
-
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- drivers/md/dm-crypt.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
-
-diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
-index b8eec515a003..7646135487be 100644
---- a/drivers/md/dm-crypt.c
-+++ b/drivers/md/dm-crypt.c
-@@ -1885,6 +1885,13 @@ static int crypt_alloc_tfms_skcipher(struct crypt_config *cc, char *ciphermode)
- 		}
- 	}
- 
-+	/*
-+	 * dm-crypt performance can vary greatly depending on which crypto
-+	 * algorithm implementation is used.  Help people debug performance
-+	 * problems by logging the ->cra_driver_name.
-+	 */
-+	DMINFO("%s using implementation \"%s\"", ciphermode,
-+	       crypto_skcipher_alg(any_tfm(cc))->base.cra_driver_name);
- 	return 0;
- }
- 
-@@ -1903,6 +1910,8 @@ static int crypt_alloc_tfms_aead(struct crypt_config *cc, char *ciphermode)
- 		return err;
- 	}
- 
-+	DMINFO("%s using implementation \"%s\"", ciphermode,
-+	       crypto_aead_alg(any_tfm_aead(cc))->base.cra_driver_name);
- 	return 0;
- }
- 
 -- 
-2.19.2
+
+Lieber Freund,
+Ich bin Herr Tayeb Souami, New Jersey, Vereinigte Staaten von Amerika, der Mega-Gewinner von $ 315million In Mega Millions Jackpot, spende ich an 5 zuf&auml;llige Personen, wenn Sie diese E-Mail erhalten, dann wurde Ihre E-Mail nach einem Spinball ausgew&auml;hlt.Ich habe den gr&ouml;&szlig;ten Teil meines Verm&ouml;gens auf eine Reihe von Wohlt&auml;tigkeitsorganisationen und Organisationen verteilt.Ich habe mich freiwillig dazu entschieden, die Summe von &euro; 2.000.000,00 an Sie als eine der ausgew&auml;hlten 5 zu spenden, um meine Gewinne zu &uuml;berpr&uuml;fen, sehen Sie bitte meine You Tube Seite unten.
+UHR MICH HIER: https://www.youtube.com/watch?v=Z6ui8ZDQ6Ks
+Das ist dein Spendencode: [TS530342018]
+Antworten Sie mit dem SPENDE-CODE an diese E-Mail:Tayebsouam.spende@gmail.com
+Ich hoffe, Sie und Ihre Familie gl&uuml;cklich zu machen.
+Gr&uuml;&szlig;eHerr Tayeb Souami
