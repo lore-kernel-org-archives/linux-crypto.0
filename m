@@ -1,75 +1,40 @@
-Return-Path: <SRS0=eKEb=OU=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:46785 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726158AbeLKXqJ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Dec 2018 18:46:09 -0500
-Received: by mail-pf1-f196.google.com with SMTP id c73so7882802pfe.13
-        for <linux-crypto@vger.kernel.org>; Tue, 11 Dec 2018 15:46:08 -0800 (PST)
+Return-Path: <SRS0=ECh6=O2=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:49772 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726395AbeLQHYr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 17 Dec 2018 02:24:47 -0500
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Rob Rice <rob.rice@broadcom.com>,
+        Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Yael Chemla <yael.chemla@foss.arm.com>
+Subject: [PATCH 0/3] crypto: authenc - fix key parsing
+Date: Sun, 16 Dec 2018 23:23:21 -0800
+Message-Id: <20181217072324.16844-1-ebiggers@kernel.org>
 MIME-Version: 1.0
-References: <20181210234954.5862-1-natechancellor@gmail.com>
-In-Reply-To: <20181210234954.5862-1-natechancellor@gmail.com>
-From: Nick Desaulniers <ndesaulniers@google.com>
-Date: Tue, 11 Dec 2018 15:45:56 -0800
-Message-ID: <CAKwvOd=2ORedFQbBFE+pyhEb-XTu0BVLGWRxYN3dLi7gaSdz+w@mail.gmail.com>
-Subject: Re: [PATCH] crypto: ux500 - Use proper enum in hash_set_dma_transfer
-To: Nathan Chancellor <natechancellor@gmail.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Dec 10, 2018 at 3:50 PM Nathan Chancellor
-<natechancellor@gmail.com> wrote:
->
-> Clang warns when one enumerated type is implicitly converted to another:
->
-> drivers/crypto/ux500/hash/hash_core.c:169:4: warning: implicit
-> conversion from enumeration type 'enum dma_data_direction' to different
-> enumeration type 'enum dma_transfer_direction' [-Wenum-conversion]
->                         direction, DMA_CTRL_ACK | DMA_PREP_INTERRUPT);
->                         ^~~~~~~~~
-> 1 warning generated.
->
-> dmaengine_prep_slave_sg expects an enum from dma_transfer_direction.
-> We know that the only direction supported by this function is
-> DMA_TO_DEVICE because of the check at the top of this function so we can
-> just use the equivalent value from dma_transfer_direction.
+Fix incorrect validation of the key passed to "authenc" AEADs that
+allowed crashing the kernel via AF_ALG.  The real fix is in patch 1, but
+two drivers had to be converted to use crypto_authenc_extractkeys() too.
 
-That's correct. Thanks for fixing up yet another one of these enum
-confusions. (I'm beginning to think we should change the values of the
-enum members so that things break when aliased as such. Unfortunately,
-that would result in runtime bugs rather than strong type system based
-compile time checks; but this warning from Clang helps).
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+Please note: for the bcm and ccree driver changes I haven't re-run the
+self-tests, as I don't have that hardware.  Please do so if you can.
 
->
-> DMA_TO_DEVICE = DMA_MEM_TO_DEV = 1
->
-> Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
-> ---
->  drivers/crypto/ux500/hash/hash_core.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/drivers/crypto/ux500/hash/hash_core.c b/drivers/crypto/ux500/hash/hash_core.c
-> index 633321a8dd03..a0bb8a6eec3f 100644
-> --- a/drivers/crypto/ux500/hash/hash_core.c
-> +++ b/drivers/crypto/ux500/hash/hash_core.c
-> @@ -166,7 +166,7 @@ static int hash_set_dma_transfer(struct hash_ctx *ctx, struct scatterlist *sg,
->                 __func__);
->         desc = dmaengine_prep_slave_sg(channel,
->                         ctx->device->dma.sg, ctx->device->dma.sg_len,
-> -                       direction, DMA_CTRL_ACK | DMA_PREP_INTERRUPT);
-> +                       DMA_MEM_TO_DEV, DMA_CTRL_ACK | DMA_PREP_INTERRUPT);
->         if (!desc) {
->                 dev_err(ctx->device->dev,
->                         "%s: dmaengine_prep_slave_sg() failed!\n", __func__);
-> --
-> 2.20.0
->
+Eric Biggers (3):
+  crypto: authenc - fix parsing key with misaligned rta_len
+  crypto: bcm - convert to use crypto_authenc_extractkeys()
+  crypto: ccree - convert to use crypto_authenc_extractkeys()
 
+ crypto/authenc.c               | 14 ++++++++---
+ drivers/crypto/Kconfig         |  1 +
+ drivers/crypto/bcm/cipher.c    | 44 ++++++++++------------------------
+ drivers/crypto/ccree/cc_aead.c | 40 +++++++++++++++----------------
+ 4 files changed, 44 insertions(+), 55 deletions(-)
 
 -- 
-Thanks,
-~Nick Desaulniers
+2.19.2
