@@ -1,88 +1,123 @@
-Return-Path: <SRS0=KZld=OW=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from szxga06-in.huawei.com ([45.249.212.32]:50922 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728558AbeLMLWO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 13 Dec 2018 06:22:14 -0500
-From: Zhou Wang <wangzhou1@hisilicon.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        <linux-crypto@vger.kernel.org>
-CC: <linux-kernel@vger.kernel.org>, <linuxarm@huawei.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>
-Subject: [PATCH RFC 1/4] Documentation: Add debugfs doc for hisi_zip
-Date: Thu, 13 Dec 2018 19:22:08 +0800
-Message-ID: <1544700131-196846-2-git-send-email-wangzhou1@hisilicon.com>
-In-Reply-To: <1544700131-196846-1-git-send-email-wangzhou1@hisilicon.com>
-References: <1544700131-196846-1-git-send-email-wangzhou1@hisilicon.com>
+Return-Path: <SRS0=ECh6=O2=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:49814 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726589AbeLQHYt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 17 Dec 2018 02:24:49 -0500
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Rob Rice <rob.rice@broadcom.com>,
+        Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Yael Chemla <yael.chemla@foss.arm.com>
+Subject: [PATCH 3/3] crypto: ccree - convert to use crypto_authenc_extractkeys()
+Date: Sun, 16 Dec 2018 23:23:24 -0800
+Message-Id: <20181217072324.16844-4-ebiggers@kernel.org>
+In-Reply-To: <20181217072324.16844-1-ebiggers@kernel.org>
+References: <20181217072324.16844-1-ebiggers@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Add debugfs descriptions for HiSilicon ZIP and QM driver.
+From: Eric Biggers <ebiggers@google.com>
 
-Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
-reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Convert the ccree crypto driver to use crypto_authenc_extractkeys() so
+that it picks up the fix for broken validation of rtattr::rta_len.
+
+Fixes: ff27e85a85bb ("crypto: ccree - add AEAD support")
+Cc: <stable@vger.kernel.org> # v4.17+
+Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- Documentation/ABI/testing/debugfs-hisi-zip | 50 ++++++++++++++++++++++++++++++
- 1 file changed, 50 insertions(+)
- create mode 100644 Documentation/ABI/testing/debugfs-hisi-zip
+ drivers/crypto/ccree/cc_aead.c | 40 ++++++++++++++++------------------
+ 1 file changed, 19 insertions(+), 21 deletions(-)
 
-diff --git a/Documentation/ABI/testing/debugfs-hisi-zip b/Documentation/ABI/testing/debugfs-hisi-zip
-new file mode 100644
-index 0000000..a7c63e6
---- /dev/null
-+++ b/Documentation/ABI/testing/debugfs-hisi-zip
-@@ -0,0 +1,50 @@
-+What:           /sys/kernel/debug/hisi_zip/<bdf>/comp_core[01]/regs
-+Date:           Nov 2018
-+Contact:        linux-crypto@vger.kernel.org
-+Description:    Dump of compression cores related debug registers.
-+		Only available for PF.
+diff --git a/drivers/crypto/ccree/cc_aead.c b/drivers/crypto/ccree/cc_aead.c
+index f2643cda45db9..a3527c00b29a9 100644
+--- a/drivers/crypto/ccree/cc_aead.c
++++ b/drivers/crypto/ccree/cc_aead.c
+@@ -549,13 +549,12 @@ static int cc_aead_setkey(struct crypto_aead *tfm, const u8 *key,
+ 			  unsigned int keylen)
+ {
+ 	struct cc_aead_ctx *ctx = crypto_aead_ctx(tfm);
+-	struct rtattr *rta = (struct rtattr *)key;
+ 	struct cc_crypto_req cc_req = {};
+-	struct crypto_authenc_key_param *param;
+ 	struct cc_hw_desc desc[MAX_AEAD_SETKEY_SEQ];
+-	int rc = -EINVAL;
+ 	unsigned int seq_len = 0;
+ 	struct device *dev = drvdata_to_dev(ctx->drvdata);
++	const u8 *enckey, *authkey;
++	int rc;
+ 
+ 	dev_dbg(dev, "Setting key in context @%p for %s. key=%p keylen=%u\n",
+ 		ctx, crypto_tfm_alg_name(crypto_aead_tfm(tfm)), key, keylen);
+@@ -563,35 +562,33 @@ static int cc_aead_setkey(struct crypto_aead *tfm, const u8 *key,
+ 	/* STAT_PHASE_0: Init and sanity checks */
+ 
+ 	if (ctx->auth_mode != DRV_HASH_NULL) { /* authenc() alg. */
+-		if (!RTA_OK(rta, keylen))
+-			goto badkey;
+-		if (rta->rta_type != CRYPTO_AUTHENC_KEYA_PARAM)
+-			goto badkey;
+-		if (RTA_PAYLOAD(rta) < sizeof(*param))
+-			goto badkey;
+-		param = RTA_DATA(rta);
+-		ctx->enc_keylen = be32_to_cpu(param->enckeylen);
+-		key += RTA_ALIGN(rta->rta_len);
+-		keylen -= RTA_ALIGN(rta->rta_len);
+-		if (keylen < ctx->enc_keylen)
++		struct crypto_authenc_keys keys;
 +
-+What:           /sys/kernel/debug/hisi_zip/<bdf>/decomp_core[0-5]/regs
-+Date:           Nov 2018
-+Contact:        linux-crypto@vger.kernel.org
-+Description:    Dump of decompression cores related debug registers.
-+		Only available for PF.
-+
-+What:           /sys/kernel/debug/hisi_zip/<bdf>/clear_enable
-+Date:           Nov 2018
-+Contact:        linux-crypto@vger.kernel.org
-+Description:    Compression/decompression core debug registers read clear
-+		control. 1 means enable register read clear, otherwise 0.
-+		Writing to this file has no functional effect, only enable or
-+		disable counters clear after reading of these registers.
-+		Only available for PF.
-+
-+What:           /sys/kernel/debug/hisi_zip/<bdf>/current_qm
-+Date:           Nov 2018
-+Contact:        linux-crypto@vger.kernel.org
-+Description:    One ZIP controller has one PF and multiple VFs, each function
-+		has a QM. Select the QM which below qm refers to.
-+		Only available for PF.
-+
-+What:           /sys/kernel/debug/hisi_zip/<bdf>/qm/qm_regs
-+Date:           Nov 2018
-+Contact:        linux-crypto@vger.kernel.org
-+Description:    Dump of QM related debug registers.
-+		Available for PF and VF in host. VF in guest currently only
-+		has one debug register.
-+
-+What:           /sys/kernel/debug/hisi_zip/<bdf>/qm/current_q
-+Date:           Nov 2018
-+Contact:        linux-crypto@vger.kernel.org
-+Description:    One QM may contain multiple queues. Select specific queue to
-+		show its debug registers in above qm_regs.
-+		Only available for PF.
-+
-+What:           /sys/kernel/debug/hisi_zip/<bdf>/qm/clear_enable
-+Date:           Nov 2018
-+Contact:        linux-crypto@vger.kernel.org
-+Description:    QM debug registers(qm_regs) read clear control. 1 means enable
-+		register read clear, otherwise 0.
-+		Writing to this file has no functional effect, only enable or
-+		disable counters clear after reading of these registers.
-+		Only available for PF.
++		rc = crypto_authenc_extractkeys(&keys, key, keylen);
++		if (rc)
+ 			goto badkey;
+-		ctx->auth_keylen = keylen - ctx->enc_keylen;
++		enckey = keys.enckey;
++		authkey = keys.authkey;
++		ctx->enc_keylen = keys.enckeylen;
++		ctx->auth_keylen = keys.authkeylen;
+ 
+ 		if (ctx->cipher_mode == DRV_CIPHER_CTR) {
+ 			/* the nonce is stored in bytes at end of key */
++			rc = -EINVAL;
+ 			if (ctx->enc_keylen <
+ 			    (AES_MIN_KEY_SIZE + CTR_RFC3686_NONCE_SIZE))
+ 				goto badkey;
+ 			/* Copy nonce from last 4 bytes in CTR key to
+ 			 *  first 4 bytes in CTR IV
+ 			 */
+-			memcpy(ctx->ctr_nonce, key + ctx->auth_keylen +
+-			       ctx->enc_keylen - CTR_RFC3686_NONCE_SIZE,
+-			       CTR_RFC3686_NONCE_SIZE);
++			memcpy(ctx->ctr_nonce, enckey + ctx->enc_keylen -
++			       CTR_RFC3686_NONCE_SIZE, CTR_RFC3686_NONCE_SIZE);
+ 			/* Set CTR key size */
+ 			ctx->enc_keylen -= CTR_RFC3686_NONCE_SIZE;
+ 		}
+ 	} else { /* non-authenc - has just one key */
++		enckey = key;
++		authkey = NULL;
+ 		ctx->enc_keylen = keylen;
+ 		ctx->auth_keylen = 0;
+ 	}
+@@ -603,13 +600,14 @@ static int cc_aead_setkey(struct crypto_aead *tfm, const u8 *key,
+ 	/* STAT_PHASE_1: Copy key to ctx */
+ 
+ 	/* Get key material */
+-	memcpy(ctx->enckey, key + ctx->auth_keylen, ctx->enc_keylen);
++	memcpy(ctx->enckey, enckey, ctx->enc_keylen);
+ 	if (ctx->enc_keylen == 24)
+ 		memset(ctx->enckey + 24, 0, CC_AES_KEY_SIZE_MAX - 24);
+ 	if (ctx->auth_mode == DRV_HASH_XCBC_MAC) {
+-		memcpy(ctx->auth_state.xcbc.xcbc_keys, key, ctx->auth_keylen);
++		memcpy(ctx->auth_state.xcbc.xcbc_keys, authkey,
++		       ctx->auth_keylen);
+ 	} else if (ctx->auth_mode != DRV_HASH_NULL) { /* HMAC */
+-		rc = cc_get_plain_hmac_key(tfm, key, ctx->auth_keylen);
++		rc = cc_get_plain_hmac_key(tfm, authkey, ctx->auth_keylen);
+ 		if (rc)
+ 			goto badkey;
+ 	}
 -- 
-2.8.1
+2.19.2
