@@ -1,20 +1,20 @@
-Return-Path: <SRS0=adZj=OO=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:41496 "EHLO mail.kernel.org"
+Return-Path: <SRS0=ECh6=O2=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:49794 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726952AbeLEGVf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 5 Dec 2018 01:21:35 -0500
+        id S1726417AbeLQHYt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 17 Dec 2018 02:24:49 -0500
 From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: Paul Crowley <paulcrowley@google.com>,
-        Martin Willi <martin@strongswan.org>,
-        Milan Broz <gmazyland@gmail.com>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v3 3/6] crypto: x86/chacha20 - add XChaCha20 support
-Date: Tue,  4 Dec 2018 22:20:02 -0800
-Message-Id: <20181205062005.27727-4-ebiggers@kernel.org>
-In-Reply-To: <20181205062005.27727-1-ebiggers@kernel.org>
-References: <20181205062005.27727-1-ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Rob Rice <rob.rice@broadcom.com>,
+        Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Yael Chemla <yael.chemla@foss.arm.com>
+Subject: [PATCH 1/3] crypto: authenc - fix parsing key with misaligned rta_len
+Date: Sun, 16 Dec 2018 23:23:22 -0800
+Message-Id: <20181217072324.16844-2-ebiggers@kernel.org>
+In-Reply-To: <20181217072324.16844-1-ebiggers@kernel.org>
+References: <20181217072324.16844-1-ebiggers@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
@@ -22,335 +22,111 @@ List-ID: <linux-crypto.vger.kernel.org>
 
 From: Eric Biggers <ebiggers@google.com>
 
-Add an XChaCha20 implementation that is hooked up to the x86_64 SIMD
-implementations of ChaCha20.  This can be used by Adiantum.
+Keys for "authenc" AEADs are formatted as an rtattr containing a 4-byte
+'enckeylen', followed by an authentication key and an encryption key.
+crypto_authenc_extractkeys() parses the key to find the inner keys.
 
-An SSSE3 implementation of single-block HChaCha20 is also added so that
-XChaCha20 can use it rather than the generic implementation.  This
-required refactoring the ChaCha permutation into its own function.
+However, it fails to consider the case where the rtattr's payload is
+longer than 4 bytes but not 4-byte aligned, and where the key ends
+before the next 4-byte aligned boundary.  In this case, 'keylen -=
+RTA_ALIGN(rta->rta_len);' underflows to a value near UINT_MAX.  This
+causes a buffer overread and crash during crypto_ahash_setkey().
 
+Fix it by restricting the rtattr payload to the expected size.
+
+Reproducer using AF_ALG:
+
+	#include <linux/if_alg.h>
+	#include <linux/rtnetlink.h>
+	#include <sys/socket.h>
+
+	int main()
+	{
+		int fd;
+		struct sockaddr_alg addr = {
+			.salg_type = "aead",
+			.salg_name = "authenc(hmac(sha256),cbc(aes))",
+		};
+		struct {
+			struct rtattr attr;
+			__be32 enckeylen;
+			char keys[1];
+		} __attribute__((packed)) key = {
+			.attr.rta_len = sizeof(key),
+			.attr.rta_type = 1 /* CRYPTO_AUTHENC_KEYA_PARAM */,
+		};
+
+		fd = socket(AF_ALG, SOCK_SEQPACKET, 0);
+		bind(fd, (void *)&addr, sizeof(addr));
+		setsockopt(fd, SOL_ALG, ALG_SET_KEY, &key, sizeof(key));
+	}
+
+It caused:
+
+	BUG: unable to handle kernel paging request at ffff88007ffdc000
+	PGD 2e01067 P4D 2e01067 PUD 2e04067 PMD 2e05067 PTE 0
+	Oops: 0000 [#1] SMP
+	CPU: 0 PID: 883 Comm: authenc Not tainted 4.20.0-rc1-00108-g00c9fe37a7f27 #13
+	Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.12.0-20181126_142135-anatol 04/01/2014
+	RIP: 0010:sha256_ni_transform+0xb3/0x330 arch/x86/crypto/sha256_ni_asm.S:155
+	[...]
+	Call Trace:
+	 sha256_ni_finup+0x10/0x20 arch/x86/crypto/sha256_ssse3_glue.c:321
+	 crypto_shash_finup+0x1a/0x30 crypto/shash.c:178
+	 shash_digest_unaligned+0x45/0x60 crypto/shash.c:186
+	 crypto_shash_digest+0x24/0x40 crypto/shash.c:202
+	 hmac_setkey+0x135/0x1e0 crypto/hmac.c:66
+	 crypto_shash_setkey+0x2b/0xb0 crypto/shash.c:66
+	 shash_async_setkey+0x10/0x20 crypto/shash.c:223
+	 crypto_ahash_setkey+0x2d/0xa0 crypto/ahash.c:202
+	 crypto_authenc_setkey+0x68/0x100 crypto/authenc.c:96
+	 crypto_aead_setkey+0x2a/0xc0 crypto/aead.c:62
+	 aead_setkey+0xc/0x10 crypto/algif_aead.c:526
+	 alg_setkey crypto/af_alg.c:223 [inline]
+	 alg_setsockopt+0xfe/0x130 crypto/af_alg.c:256
+	 __sys_setsockopt+0x6d/0xd0 net/socket.c:1902
+	 __do_sys_setsockopt net/socket.c:1913 [inline]
+	 __se_sys_setsockopt net/socket.c:1910 [inline]
+	 __x64_sys_setsockopt+0x1f/0x30 net/socket.c:1910
+	 do_syscall_64+0x4a/0x180 arch/x86/entry/common.c:290
+	 entry_SYSCALL_64_after_hwframe+0x49/0xbe
+
+Fixes: e236d4a89a2f ("[CRYPTO] authenc: Move enckeylen into key itself")
+Cc: <stable@vger.kernel.org> # v2.6.25+
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- arch/x86/crypto/chacha20-ssse3-x86_64.S |  81 ++++++++++++------
- arch/x86/crypto/chacha20_glue.c         | 108 ++++++++++++++++++------
- crypto/Kconfig                          |  12 +--
- 3 files changed, 141 insertions(+), 60 deletions(-)
+ crypto/authenc.c | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/crypto/chacha20-ssse3-x86_64.S b/arch/x86/crypto/chacha20-ssse3-x86_64.S
-index d8ac75bb448f..f6792789f875 100644
---- a/arch/x86/crypto/chacha20-ssse3-x86_64.S
-+++ b/arch/x86/crypto/chacha20-ssse3-x86_64.S
-@@ -10,6 +10,7 @@
-  */
- 
- #include <linux/linkage.h>
-+#include <asm/frame.h>
- 
- .section	.rodata.cst16.ROT8, "aM", @progbits, 16
- .align 16
-@@ -23,37 +24,24 @@ CTRINC:	.octa 0x00000003000000020000000100000000
- 
- .text
- 
--ENTRY(chacha20_block_xor_ssse3)
--	# %rdi: Input state matrix, s
--	# %rsi: up to 1 data block output, o
--	# %rdx: up to 1 data block input, i
--	# %rcx: input/output length in bytes
--
--	# This function encrypts one ChaCha20 block by loading the state matrix
--	# in four SSE registers. It performs matrix operation on four words in
--	# parallel, but requires shuffling to rearrange the words after each
--	# round. 8/16-bit word rotation is done with the slightly better
--	# performing SSSE3 byte shuffling, 7/12-bit word rotation uses
--	# traditional shift+OR.
--
--	# x0..3 = s0..3
--	movdqa		0x00(%rdi),%xmm0
--	movdqa		0x10(%rdi),%xmm1
--	movdqa		0x20(%rdi),%xmm2
--	movdqa		0x30(%rdi),%xmm3
--	movdqa		%xmm0,%xmm8
--	movdqa		%xmm1,%xmm9
--	movdqa		%xmm2,%xmm10
--	movdqa		%xmm3,%xmm11
-+/*
-+ * chacha20_permute - permute one block
-+ *
-+ * Permute one 64-byte block where the state matrix is in %xmm0-%xmm3.  This
-+ * function performs matrix operations on four words in parallel, but requires
-+ * shuffling to rearrange the words after each round.  8/16-bit word rotation is
-+ * done with the slightly better performing SSSE3 byte shuffling, 7/12-bit word
-+ * rotation uses traditional shift+OR.
-+ *
-+ * Clobbers: %ecx, %xmm4-%xmm7
-+ */
-+chacha20_permute:
- 
- 	movdqa		ROT8(%rip),%xmm4
- 	movdqa		ROT16(%rip),%xmm5
--
--	mov		%rcx,%rax
- 	mov		$10,%ecx
- 
- .Ldoubleround:
--
- 	# x0 += x1, x3 = rotl32(x3 ^ x0, 16)
- 	paddd		%xmm1,%xmm0
- 	pxor		%xmm0,%xmm3
-@@ -123,6 +111,29 @@ ENTRY(chacha20_block_xor_ssse3)
- 	dec		%ecx
- 	jnz		.Ldoubleround
- 
-+	ret
-+ENDPROC(chacha20_permute)
+diff --git a/crypto/authenc.c b/crypto/authenc.c
+index 37f54d1b2f669..4be293a4b5f0f 100644
+--- a/crypto/authenc.c
++++ b/crypto/authenc.c
+@@ -58,14 +58,22 @@ int crypto_authenc_extractkeys(struct crypto_authenc_keys *keys, const u8 *key,
+ 		return -EINVAL;
+ 	if (rta->rta_type != CRYPTO_AUTHENC_KEYA_PARAM)
+ 		return -EINVAL;
+-	if (RTA_PAYLOAD(rta) < sizeof(*param))
 +
-+ENTRY(chacha20_block_xor_ssse3)
-+	# %rdi: Input state matrix, s
-+	# %rsi: up to 1 data block output, o
-+	# %rdx: up to 1 data block input, i
-+	# %rcx: input/output length in bytes
-+	FRAME_BEGIN
-+
-+	# x0..3 = s0..3
-+	movdqa		0x00(%rdi),%xmm0
-+	movdqa		0x10(%rdi),%xmm1
-+	movdqa		0x20(%rdi),%xmm2
-+	movdqa		0x30(%rdi),%xmm3
-+	movdqa		%xmm0,%xmm8
-+	movdqa		%xmm1,%xmm9
-+	movdqa		%xmm2,%xmm10
-+	movdqa		%xmm3,%xmm11
-+
-+	mov		%rcx,%rax
-+	call		chacha20_permute
-+
- 	# o0 = i0 ^ (x0 + s0)
- 	paddd		%xmm8,%xmm0
- 	cmp		$0x10,%rax
-@@ -156,6 +167,7 @@ ENTRY(chacha20_block_xor_ssse3)
- 	movdqu		%xmm0,0x30(%rsi)
++	/*
++	 * RTA_OK() didn't align the rtattr's payload when validating that it
++	 * fits in the buffer.  Yet, the keys should start on the next 4-byte
++	 * aligned boundary.  To avoid confusion, require that the rtattr
++	 * payload be exactly the param struct, which has a 4-byte aligned size.
++	 */
++	if (RTA_PAYLOAD(rta) != sizeof(*param))
+ 		return -EINVAL;
++	BUILD_BUG_ON(sizeof(*param) % RTA_ALIGNTO);
  
- .Ldone:
-+	FRAME_END
- 	ret
+ 	param = RTA_DATA(rta);
+ 	keys->enckeylen = be32_to_cpu(param->enckeylen);
  
- .Lxorpart:
-@@ -189,6 +201,25 @@ ENTRY(chacha20_block_xor_ssse3)
+-	key += RTA_ALIGN(rta->rta_len);
+-	keylen -= RTA_ALIGN(rta->rta_len);
++	key += rta->rta_len;
++	keylen -= rta->rta_len;
  
- ENDPROC(chacha20_block_xor_ssse3)
- 
-+ENTRY(hchacha20_block_ssse3)
-+	# %rdi: Input state matrix, s
-+	# %rsi: output (8 32-bit words)
-+	FRAME_BEGIN
-+
-+	movdqa		0x00(%rdi),%xmm0
-+	movdqa		0x10(%rdi),%xmm1
-+	movdqa		0x20(%rdi),%xmm2
-+	movdqa		0x30(%rdi),%xmm3
-+
-+	call		chacha20_permute
-+
-+	movdqu		%xmm0,0x00(%rsi)
-+	movdqu		%xmm3,0x10(%rsi)
-+
-+	FRAME_END
-+	ret
-+ENDPROC(hchacha20_block_ssse3)
-+
- ENTRY(chacha20_4block_xor_ssse3)
- 	# %rdi: Input state matrix, s
- 	# %rsi: up to 4 data blocks output, o
-diff --git a/arch/x86/crypto/chacha20_glue.c b/arch/x86/crypto/chacha20_glue.c
-index 773d075a1483..70d388e4a3a2 100644
---- a/arch/x86/crypto/chacha20_glue.c
-+++ b/arch/x86/crypto/chacha20_glue.c
-@@ -23,6 +23,7 @@ asmlinkage void chacha20_block_xor_ssse3(u32 *state, u8 *dst, const u8 *src,
- 					 unsigned int len);
- asmlinkage void chacha20_4block_xor_ssse3(u32 *state, u8 *dst, const u8 *src,
- 					  unsigned int len);
-+asmlinkage void hchacha20_block_ssse3(const u32 *state, u32 *out);
- #ifdef CONFIG_AS_AVX2
- asmlinkage void chacha20_2block_xor_avx2(u32 *state, u8 *dst, const u8 *src,
- 					 unsigned int len);
-@@ -121,10 +122,9 @@ static void chacha20_dosimd(u32 *state, u8 *dst, const u8 *src,
- 	}
- }
- 
--static int chacha20_simd(struct skcipher_request *req)
-+static int chacha20_simd_stream_xor(struct skcipher_request *req,
-+				    struct chacha_ctx *ctx, u8 *iv)
- {
--	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
--	struct chacha_ctx *ctx = crypto_skcipher_ctx(tfm);
- 	u32 *state, state_buf[16 + 2] __aligned(8);
- 	struct skcipher_walk walk;
- 	int err;
-@@ -132,14 +132,9 @@ static int chacha20_simd(struct skcipher_request *req)
- 	BUILD_BUG_ON(CHACHA20_STATE_ALIGN != 16);
- 	state = PTR_ALIGN(state_buf + 0, CHACHA20_STATE_ALIGN);
- 
--	if (req->cryptlen <= CHACHA_BLOCK_SIZE || !may_use_simd())
--		return crypto_chacha_crypt(req);
--
- 	err = skcipher_walk_virt(&walk, req, true);
- 
--	crypto_chacha_init(state, ctx, walk.iv);
--
--	kernel_fpu_begin();
-+	crypto_chacha_init(state, ctx, iv);
- 
- 	while (walk.nbytes > 0) {
- 		unsigned int nbytes = walk.nbytes;
-@@ -153,26 +148,85 @@ static int chacha20_simd(struct skcipher_request *req)
- 		err = skcipher_walk_done(&walk, walk.nbytes - nbytes);
- 	}
- 
-+	return err;
-+}
-+
-+static int chacha20_simd(struct skcipher_request *req)
-+{
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	struct chacha_ctx *ctx = crypto_skcipher_ctx(tfm);
-+	int err;
-+
-+	if (req->cryptlen <= CHACHA_BLOCK_SIZE || !irq_fpu_usable())
-+		return crypto_chacha_crypt(req);
-+
-+	kernel_fpu_begin();
-+	err = chacha20_simd_stream_xor(req, ctx, req->iv);
-+	kernel_fpu_end();
-+	return err;
-+}
-+
-+static int xchacha20_simd(struct skcipher_request *req)
-+{
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	struct chacha_ctx *ctx = crypto_skcipher_ctx(tfm);
-+	struct chacha_ctx subctx;
-+	u32 *state, state_buf[16 + 2] __aligned(8);
-+	u8 real_iv[16];
-+	int err;
-+
-+	if (req->cryptlen <= CHACHA_BLOCK_SIZE || !irq_fpu_usable())
-+		return crypto_xchacha_crypt(req);
-+
-+	BUILD_BUG_ON(CHACHA20_STATE_ALIGN != 16);
-+	state = PTR_ALIGN(state_buf + 0, CHACHA20_STATE_ALIGN);
-+	crypto_chacha_init(state, ctx, req->iv);
-+
-+	kernel_fpu_begin();
-+
-+	hchacha20_block_ssse3(state, subctx.key);
-+
-+	memcpy(&real_iv[0], req->iv + 24, 8);
-+	memcpy(&real_iv[8], req->iv + 16, 8);
-+	err = chacha20_simd_stream_xor(req, &subctx, real_iv);
-+
- 	kernel_fpu_end();
- 
- 	return err;
- }
- 
--static struct skcipher_alg alg = {
--	.base.cra_name		= "chacha20",
--	.base.cra_driver_name	= "chacha20-simd",
--	.base.cra_priority	= 300,
--	.base.cra_blocksize	= 1,
--	.base.cra_ctxsize	= sizeof(struct chacha_ctx),
--	.base.cra_module	= THIS_MODULE,
--
--	.min_keysize		= CHACHA_KEY_SIZE,
--	.max_keysize		= CHACHA_KEY_SIZE,
--	.ivsize			= CHACHA_IV_SIZE,
--	.chunksize		= CHACHA_BLOCK_SIZE,
--	.setkey			= crypto_chacha20_setkey,
--	.encrypt		= chacha20_simd,
--	.decrypt		= chacha20_simd,
-+static struct skcipher_alg algs[] = {
-+	{
-+		.base.cra_name		= "chacha20",
-+		.base.cra_driver_name	= "chacha20-simd",
-+		.base.cra_priority	= 300,
-+		.base.cra_blocksize	= 1,
-+		.base.cra_ctxsize	= sizeof(struct chacha_ctx),
-+		.base.cra_module	= THIS_MODULE,
-+
-+		.min_keysize		= CHACHA_KEY_SIZE,
-+		.max_keysize		= CHACHA_KEY_SIZE,
-+		.ivsize			= CHACHA_IV_SIZE,
-+		.chunksize		= CHACHA_BLOCK_SIZE,
-+		.setkey			= crypto_chacha20_setkey,
-+		.encrypt		= chacha20_simd,
-+		.decrypt		= chacha20_simd,
-+	}, {
-+		.base.cra_name		= "xchacha20",
-+		.base.cra_driver_name	= "xchacha20-simd",
-+		.base.cra_priority	= 300,
-+		.base.cra_blocksize	= 1,
-+		.base.cra_ctxsize	= sizeof(struct chacha_ctx),
-+		.base.cra_module	= THIS_MODULE,
-+
-+		.min_keysize		= CHACHA_KEY_SIZE,
-+		.max_keysize		= CHACHA_KEY_SIZE,
-+		.ivsize			= XCHACHA_IV_SIZE,
-+		.chunksize		= CHACHA_BLOCK_SIZE,
-+		.setkey			= crypto_chacha20_setkey,
-+		.encrypt		= xchacha20_simd,
-+		.decrypt		= xchacha20_simd,
-+	},
- };
- 
- static int __init chacha20_simd_mod_init(void)
-@@ -190,12 +244,12 @@ static int __init chacha20_simd_mod_init(void)
- 				boot_cpu_has(X86_FEATURE_AVX512BW); /* kmovq */
- #endif
- #endif
--	return crypto_register_skcipher(&alg);
-+	return crypto_register_skciphers(algs, ARRAY_SIZE(algs));
- }
- 
- static void __exit chacha20_simd_mod_fini(void)
- {
--	crypto_unregister_skcipher(&alg);
-+	crypto_unregister_skciphers(algs, ARRAY_SIZE(algs));
- }
- 
- module_init(chacha20_simd_mod_init);
-@@ -206,3 +260,5 @@ MODULE_AUTHOR("Martin Willi <martin@strongswan.org>");
- MODULE_DESCRIPTION("chacha20 cipher algorithm, SIMD accelerated");
- MODULE_ALIAS_CRYPTO("chacha20");
- MODULE_ALIAS_CRYPTO("chacha20-simd");
-+MODULE_ALIAS_CRYPTO("xchacha20");
-+MODULE_ALIAS_CRYPTO("xchacha20-simd");
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index e084e2fb6743..df466771e9bf 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -1468,19 +1468,13 @@ config CRYPTO_CHACHA20
- 	  in some performance-sensitive scenarios.
- 
- config CRYPTO_CHACHA20_X86_64
--	tristate "ChaCha20 cipher algorithm (x86_64/SSSE3/AVX2)"
-+	tristate "ChaCha stream cipher algorithms (x86_64/SSSE3/AVX2/AVX-512VL)"
- 	depends on X86 && 64BIT
- 	select CRYPTO_BLKCIPHER
- 	select CRYPTO_CHACHA20
- 	help
--	  ChaCha20 cipher algorithm, RFC7539.
--
--	  ChaCha20 is a 256-bit high-speed stream cipher designed by Daniel J.
--	  Bernstein and further specified in RFC7539 for use in IETF protocols.
--	  This is the x86_64 assembler implementation using SIMD instructions.
--
--	  See also:
--	  <http://cr.yp.to/chacha/chacha-20080128.pdf>
-+	  SSSE3, AVX2, and AVX-512VL optimized implementations of the ChaCha20
-+	  and XChaCha20 stream ciphers.
- 
- config CRYPTO_SEED
- 	tristate "SEED cipher algorithm"
+ 	if (keylen < keys->enckeylen)
+ 		return -EINVAL;
 -- 
 2.19.2
