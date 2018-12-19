@@ -1,98 +1,116 @@
-Return-Path: <SRS0=eKEb=OU=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from stargate.chelsio.com ([12.32.117.8]:46398 "EHLO
-        stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726603AbeLKKwE (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Dec 2018 05:52:04 -0500
-From: Harsh Jain <harsh@chelsio.com>
-To: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        atul.gupta@chelsio.com, indranil@chelsio.com
-Cc: Harsh Jain <harsh@chelsio.com>
-Subject: [PATCH 3/6] crypto:chelsio: cleanup:send addr as value in function argument
-Date: Tue, 11 Dec 2018 16:21:39 +0530
-Message-Id: <a73eb448a9c34549b3aa37d00438fa9e89c54d86.1544520025.git.harsh@chelsio.com>
-In-Reply-To: <cover.1544520025.git.harsh@chelsio.com>
-References: <cover.1544520025.git.harsh@chelsio.com>
-In-Reply-To: <cover.1544520025.git.harsh@chelsio.com>
-References: <cover.1544520025.git.harsh@chelsio.com>
+Return-Path: <SRS0=cBFQ=O4=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from inva020.nxp.com ([92.121.34.13]:37064 "EHLO inva020.nxp.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728013AbeLSOg5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 19 Dec 2018 09:36:57 -0500
+From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Christoph Hellwig <hch@lst.de>, linux-crypto@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-imx@nxp.com
+Subject: [PATCH] crypto: caam - fix zero-length buffer DMA mapping
+Date: Wed, 19 Dec 2018 16:36:44 +0200
+Message-Id: <20181219143644.22089-1-horia.geanta@nxp.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Send dma address as value to function arguments instead of pointer.
+From: Aymen Sghaier <aymen.sghaier@nxp.com>
 
-Signed-off-by: Harsh Jain <harsh@chelsio.com>
+Recent changes - probably DMA API related (generic and/or arm64-specific) -
+exposed a case where driver maps a zero-length buffer:
+ahash_init()->ahash_update()->ahash_final() with a zero-length string to
+hash
+
+kernel BUG at kernel/dma/swiotlb.c:475!
+Internal error: Oops - BUG: 0 [#1] PREEMPT SMP
+Modules linked in:
+CPU: 2 PID: 1823 Comm: cryptomgr_test Not tainted 4.20.0-rc1-00108-g00c9fe37a7f2 #1
+Hardware name: LS1046A RDB Board (DT)
+pstate: 80000005 (Nzcv daif -PAN -UAO)
+pc : swiotlb_tbl_map_single+0x170/0x2b8
+lr : swiotlb_map_page+0x134/0x1f8
+sp : ffff00000f79b8f0
+x29: ffff00000f79b8f0 x28: 0000000000000000
+x27: ffff0000093d0000 x26: 0000000000000000
+x25: 00000000001f3ffe x24: 0000000000200000
+x23: 0000000000000000 x22: 00000009f2c538c0
+x21: ffff800970aeb410 x20: 0000000000000001
+x19: ffff800970aeb410 x18: 0000000000000007
+x17: 000000000000000e x16: 0000000000000001
+x15: 0000000000000019 x14: c32cb8218a167fe8
+x13: ffffffff00000000 x12: ffff80097fdae348
+x11: 0000800976bca000 x10: 0000000000000010
+x9 : 0000000000000000 x8 : ffff0000091fd6c8
+x7 : 0000000000000000 x6 : 00000009f2c538bf
+x5 : 0000000000000000 x4 : 0000000000000001
+x3 : 0000000000000000 x2 : 00000009f2c538c0
+x1 : 00000000f9fff000 x0 : 0000000000000000
+Process cryptomgr_test (pid: 1823, stack limit = 0x(____ptrval____))
+Call trace:
+ swiotlb_tbl_map_single+0x170/0x2b8
+ swiotlb_map_page+0x134/0x1f8
+ ahash_final_no_ctx+0xc4/0x6cc
+ ahash_final+0x10/0x18
+ crypto_ahash_op+0x30/0x84
+ crypto_ahash_final+0x14/0x1c
+ __test_hash+0x574/0xe0c
+ test_hash+0x28/0x80
+ __alg_test_hash+0x84/0xd0
+ alg_test_hash+0x78/0x144
+ alg_test.part.30+0x12c/0x2b4
+ alg_test+0x3c/0x68
+ cryptomgr_test+0x44/0x4c
+ kthread+0xfc/0x128
+ ret_from_fork+0x10/0x18
+Code: d34bfc18 2a1a03f7 1a9f8694 35fff89a (d4210000)
+
+Cc: <stable@vger.kernel.org>
+Signed-off-by: Aymen Sghaier <aymen.sghaier@nxp.com>
+Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
 ---
- drivers/crypto/chelsio/chcr_algo.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
-index ee985ad..f94364b 100644
---- a/drivers/crypto/chelsio/chcr_algo.c
-+++ b/drivers/crypto/chelsio/chcr_algo.c
-@@ -391,7 +391,7 @@ static inline void dsgl_walk_end(struct dsgl_walk *walk, unsigned short qid,
+A bisect b/w above-mentioned commit 00c9fe37a7f2 (bad) and v4.19 (good)
+points to commit
+b4ebe6063204 ("dma-direct: implement complete bus_dma_mask handling")
+
+Chronologically:
+v4.19 (good) -> b4ebe6063204 (bad) -> 00c9fe37a7f2 (bad) -> v4.20-rc7 (good)
+
+Cc-ing stable to make sure patch will be added in 4.20.y
+
+ drivers/crypto/caam/caamhash.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
+index 81712aa5d0f2..bb1a2cdf1951 100644
+--- a/drivers/crypto/caam/caamhash.c
++++ b/drivers/crypto/caam/caamhash.c
+@@ -1072,13 +1072,16 @@ static int ahash_final_no_ctx(struct ahash_request *req)
  
- static inline void dsgl_walk_add_page(struct dsgl_walk *walk,
- 					size_t size,
--					dma_addr_t *addr)
-+					dma_addr_t addr)
- {
- 	int j;
+ 	desc = edesc->hw_desc;
  
-@@ -399,7 +399,7 @@ static inline void dsgl_walk_add_page(struct dsgl_walk *walk,
- 		return;
- 	j = walk->nents;
- 	walk->to->len[j % 8] = htons(size);
--	walk->to->addr[j % 8] = cpu_to_be64(*addr);
-+	walk->to->addr[j % 8] = cpu_to_be64(addr);
- 	j++;
- 	if ((j % 8) == 0)
- 		walk->to++;
-@@ -473,16 +473,16 @@ static inline void ulptx_walk_end(struct ulptx_walk *walk)
+-	state->buf_dma = dma_map_single(jrdev, buf, buflen, DMA_TO_DEVICE);
+-	if (dma_mapping_error(jrdev, state->buf_dma)) {
+-		dev_err(jrdev, "unable to map src\n");
+-		goto unmap;
+-	}
++	if (buflen) {
++		state->buf_dma = dma_map_single(jrdev, buf, buflen,
++						DMA_TO_DEVICE);
++		if (dma_mapping_error(jrdev, state->buf_dma)) {
++			dev_err(jrdev, "unable to map src\n");
++			goto unmap;
++		}
  
- static inline void ulptx_walk_add_page(struct ulptx_walk *walk,
- 					size_t size,
--					dma_addr_t *addr)
-+					dma_addr_t addr)
- {
- 	if (!size)
- 		return;
+-	append_seq_in_ptr(desc, state->buf_dma, buflen, 0);
++		append_seq_in_ptr(desc, state->buf_dma, buflen, 0);
++	}
  
- 	if (walk->nents == 0) {
- 		walk->sgl->len0 = cpu_to_be32(size);
--		walk->sgl->addr0 = cpu_to_be64(*addr);
-+		walk->sgl->addr0 = cpu_to_be64(addr);
- 	} else {
--		walk->pair->addr[walk->pair_idx] = cpu_to_be64(*addr);
-+		walk->pair->addr[walk->pair_idx] = cpu_to_be64(addr);
- 		walk->pair->len[walk->pair_idx] = cpu_to_be32(size);
- 		walk->pair_idx = !walk->pair_idx;
- 		if (!walk->pair_idx)
-@@ -2481,7 +2481,7 @@ void chcr_add_aead_src_ent(struct aead_request *req,
- 		ulptx_walk_init(&ulp_walk, ulptx);
- 		if (reqctx->b0_len)
- 			ulptx_walk_add_page(&ulp_walk, reqctx->b0_len,
--					    &reqctx->b0_dma);
-+					    reqctx->b0_dma);
- 		ulptx_walk_add_sg(&ulp_walk, req->src, req->cryptlen +
- 				  req->assoclen,  0);
- 		ulptx_walk_end(&ulp_walk);
-@@ -2500,7 +2500,7 @@ void chcr_add_aead_dst_ent(struct aead_request *req,
- 	u32 temp;
- 
- 	dsgl_walk_init(&dsgl_walk, phys_cpl);
--	dsgl_walk_add_page(&dsgl_walk, IV + reqctx->b0_len, &reqctx->iv_dma);
-+	dsgl_walk_add_page(&dsgl_walk, IV + reqctx->b0_len, reqctx->iv_dma);
- 	temp = req->assoclen + req->cryptlen +
- 		(reqctx->op ? -authsize : authsize);
- 	dsgl_walk_add_sg(&dsgl_walk, req->dst, temp, 0);
-@@ -2571,7 +2571,7 @@ void chcr_add_hash_src_ent(struct ahash_request *req,
- 		ulptx_walk_init(&ulp_walk, ulptx);
- 		if (param->bfr_len)
- 			ulptx_walk_add_page(&ulp_walk, param->bfr_len,
--					    &reqctx->hctx_wr.dma_addr);
-+					    reqctx->hctx_wr.dma_addr);
- 		ulptx_walk_add_sg(&ulp_walk, reqctx->hctx_wr.srcsg,
- 				  param->sg_len, reqctx->hctx_wr.src_ofst);
- 		reqctx->hctx_wr.srcsg = ulp_walk.last_sg;
+ 	edesc->dst_dma = map_seq_out_ptr_result(desc, jrdev, req->result,
+ 						digestsize);
 -- 
-2.1.4
+2.16.2
