@@ -1,42 +1,37 @@
-Return-Path: <SRS0=9Gyh=PA=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:38960 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731793AbeLWEBw (ORCPT
+Return-Path: <SRS0=cBFQ=O4=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from sonic317-34.consmr.mail.ne1.yahoo.com ([66.163.184.45]:39708
+        "EHLO sonic317-34.consmr.mail.ne1.yahoo.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727572AbeLSQHb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 22 Dec 2018 23:01:52 -0500
-Date: Sun, 23 Dec 2018 12:01:41 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: YueHaibing <yuehaibing@huawei.com>
-Cc: Harsh Jain <harsh@chelsio.com>, linux-crypto@vger.kernel.org,
-        kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH -next] crypto: chelsio - remove set but not used variable
- 'kctx_len'
-Message-ID: <20181223040141.yylwdffy3i3kv4kq@gondor.apana.org.au>
-References: <1544515919-193254-1-git-send-email-yuehaibing@huawei.com>
+        Wed, 19 Dec 2018 11:07:31 -0500
+Date: Wed, 19 Dec 2018 16:07:24 +0000 (UTC)
+From: Mr Cobo Suleman <cobosuleman00@gmail.com>
+Reply-To: Mr Cobo Suleman <cobosuleman1@gmail.com>
+Message-ID: <1188917028.209343.1545235644474@mail.yahoo.com>
+Subject: : I need your urgent respons.
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1544515919-193254-1-git-send-email-yuehaibing@huawei.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+References: <1188917028.209343.1545235644474.ref@mail.yahoo.com>
+To: unlisted-recipients:; (no To-header on input)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Dec 11, 2018 at 08:11:59AM +0000, YueHaibing wrote:
-> Fixes gcc '-Wunused-but-set-variable' warning:
-> 
-> drivers/crypto/chelsio/chcr_ipsec.c: In function 'chcr_ipsec_xmit':
-> drivers/crypto/chelsio/chcr_ipsec.c:674:33: warning:
->  variable 'kctx_len' set but not used [-Wunused-but-set-variable]
->   unsigned int flits = 0, ndesc, kctx_len;
-> 
-> It not used since commit 8362ea16f69f ("crypto: chcr - ESN for Inline IPSec Tx")
-> 
-> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
-> ---
->  drivers/crypto/chelsio/chcr_ipsec.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
+Dear Friend,
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+I know that this mail will come to you as a surprise as we have never met before,I need your Urgent assistance in transferring the sum of $18 mllion US Dollars immediately to your Private account.The money has been here in our Bank lying dormant for years now without anybody coming for the claim of it.Waiting to hear from you.
+
+The information required should include the following-:
+Your full names
+Your address
+Telephone number
+Your private email
+Occupation
+Age
+
+Please reply me through my email address. Email:  { cobosuleman1@gmail.com }
+this is to enable my further discussion with you in confidence.
+
+Best regards and wishes to you.
+
+Mr.Cobo Suleman
