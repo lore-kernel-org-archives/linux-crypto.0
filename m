@@ -1,83 +1,60 @@
-Return-Path: <SRS0=wDfx=ON=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:55320 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725962AbeLDD4K (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 3 Dec 2018 22:56:10 -0500
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: Paul Crowley <paulcrowley@google.com>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v2 4/4] crypto: arm64/chacha - add XChaCha12 support
-Date: Mon,  3 Dec 2018 19:52:52 -0800
-Message-Id: <20181204035252.14853-5-ebiggers@kernel.org>
-In-Reply-To: <20181204035252.14853-1-ebiggers@kernel.org>
-References: <20181204035252.14853-1-ebiggers@kernel.org>
+Return-Path: <SRS0=pvly=O5=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mout.kundenserver.de ([212.227.126.130]:39789 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729937AbeLTP2d (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 20 Dec 2018 10:28:33 -0500
+From: Arnd Bergmann <arnd@arndb.de>
+To: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Cc: Arnd Bergmann <arnd@arndb.de>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: caam/qi2 - add a CRYPTO_DEV_FSL_CAAM dependency
+Date: Thu, 20 Dec 2018 16:28:08 +0100
+Message-Id: <20181220152815.3613164-1-arnd@arndb.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Eric Biggers <ebiggers@google.com>
+My previous bugfix was incomplete, we still have a broken kernel
+with CRYPTO_DEV_FSL_CAAM=m and CRYPTO_DEV_FSL_DPAA2_CAAM=y:
 
-Now that the ARM64 NEON implementation of ChaCha20 and XChaCha20 has
-been refactored to support varying the number of rounds, add support for
-XChaCha12.  This is identical to XChaCha20 except for the number of
-rounds, which is 12 instead of 20.  This can be used by Adiantum.
+drivers/crypto/caam/caamalg_desc.o: In function `cnstr_shdsc_aead_null_encap':
+caamalg_desc.c:(.text+0x14): undefined reference to `caam_little_end'
+drivers/crypto/caam/caamalg_desc.o: In function `cnstr_shdsc_aead_null_encap':
+caamalg_desc.c:(.text+0x310): undefined reference to `caam_imx'
+caamalg_desc.c:(.text+0x4a8): undefined reference to `caam_little_end'
+drivers/crypto/caam/caamalg_desc.o: In function `cnstr_shdsc_aead_null_encap':
+caamalg_desc.c:(.text+0x664): undefined reference to `caam_imx'
 
-Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Signed-off-by: Eric Biggers <ebiggers@google.com>
+Everything is fine for the other combinations: if both are loadable
+modules, or both are built-in, the flags work as expected, also if
+only one of the two is enabled.
+
+Add a dependency to enforce using one of the working configurations.
+Overall, I'm still not happy with that dependency, but for now
+it documents what the code requires.
+
+Fixes: 52813ab24959 ("crypto: caam/qi2 - avoid double export")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- arch/arm64/crypto/Kconfig            |  2 +-
- arch/arm64/crypto/chacha-neon-glue.c | 18 ++++++++++++++++++
- 2 files changed, 19 insertions(+), 1 deletion(-)
+ drivers/crypto/caam/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
-index d54ddb8468ef..d9a523ecdd83 100644
---- a/arch/arm64/crypto/Kconfig
-+++ b/arch/arm64/crypto/Kconfig
-@@ -101,7 +101,7 @@ config CRYPTO_AES_ARM64_NEON_BLK
- 	select CRYPTO_SIMD
- 
- config CRYPTO_CHACHA20_NEON
--	tristate "ChaCha20 and XChaCha20 stream ciphers using NEON instructions"
-+	tristate "ChaCha20, XChaCha20, and XChaCha12 stream ciphers using NEON instructions"
- 	depends on KERNEL_MODE_NEON
+diff --git a/drivers/crypto/caam/Kconfig b/drivers/crypto/caam/Kconfig
+index c4b1cade55c1..4dff65e518e7 100644
+--- a/drivers/crypto/caam/Kconfig
++++ b/drivers/crypto/caam/Kconfig
+@@ -158,6 +158,7 @@ config CRYPTO_DEV_FSL_DPAA2_CAAM
+ 	tristate "QorIQ DPAA2 CAAM (DPSECI) driver"
+ 	depends on FSL_MC_DPIO
+ 	depends on NETDEVICES
++	depends on CRYPTO_DEV_FSL_CAAM || !CRYPTO_DEV_FSL_CAAM
+ 	select CRYPTO_DEV_FSL_CAAM_COMMON
  	select CRYPTO_BLKCIPHER
- 	select CRYPTO_CHACHA20
-diff --git a/arch/arm64/crypto/chacha-neon-glue.c b/arch/arm64/crypto/chacha-neon-glue.c
-index 4d992029b912..346eb85498a1 100644
---- a/arch/arm64/crypto/chacha-neon-glue.c
-+++ b/arch/arm64/crypto/chacha-neon-glue.c
-@@ -161,6 +161,22 @@ static struct skcipher_alg algs[] = {
- 		.setkey			= crypto_chacha20_setkey,
- 		.encrypt		= xchacha_neon,
- 		.decrypt		= xchacha_neon,
-+	}, {
-+		.base.cra_name		= "xchacha12",
-+		.base.cra_driver_name	= "xchacha12-neon",
-+		.base.cra_priority	= 300,
-+		.base.cra_blocksize	= 1,
-+		.base.cra_ctxsize	= sizeof(struct chacha_ctx),
-+		.base.cra_module	= THIS_MODULE,
-+
-+		.min_keysize		= CHACHA_KEY_SIZE,
-+		.max_keysize		= CHACHA_KEY_SIZE,
-+		.ivsize			= XCHACHA_IV_SIZE,
-+		.chunksize		= CHACHA_BLOCK_SIZE,
-+		.walksize		= 4 * CHACHA_BLOCK_SIZE,
-+		.setkey			= crypto_chacha12_setkey,
-+		.encrypt		= xchacha_neon,
-+		.decrypt		= xchacha_neon,
- 	}
- };
- 
-@@ -187,3 +203,5 @@ MODULE_ALIAS_CRYPTO("chacha20");
- MODULE_ALIAS_CRYPTO("chacha20-neon");
- MODULE_ALIAS_CRYPTO("xchacha20");
- MODULE_ALIAS_CRYPTO("xchacha20-neon");
-+MODULE_ALIAS_CRYPTO("xchacha12");
-+MODULE_ALIAS_CRYPTO("xchacha12-neon");
+ 	select CRYPTO_AUTHENC
 -- 
-2.19.2
+2.20.0
