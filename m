@@ -1,47 +1,39 @@
-Return-Path: <SRS0=KZld=OW=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:53926 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726847AbeLMIgr (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 13 Dec 2018 03:36:47 -0500
-Received: by mail-wm1-f67.google.com with SMTP id y1so1402616wmi.3
-        for <linux-crypto@vger.kernel.org>; Thu, 13 Dec 2018 00:36:46 -0800 (PST)
-From: Corentin Labbe <clabbe@baylibre.com>
-To: davem@davemloft.net, herbert@gondor.apana.org.au
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Corentin Labbe <clabbe@baylibre.com>
-Subject: [PATCH 2/2] crypto: document missing stats member
-Date: Thu, 13 Dec 2018 08:36:38 +0000
-Message-Id: <1544690198-21993-2-git-send-email-clabbe@baylibre.com>
-In-Reply-To: <1544690198-21993-1-git-send-email-clabbe@baylibre.com>
-References: <1544690198-21993-1-git-send-email-clabbe@baylibre.com>
+Return-Path: <SRS0=edWn=O6=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from inva020.nxp.com ([92.121.34.13]:51690 "EHLO inva020.nxp.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725790AbeLUP7s (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 21 Dec 2018 10:59:48 -0500
+From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Iuliana Prodan <iuliana.prodan@nxp.com>,
+        linux-crypto@vger.kernel.org, linux-imx@nxp.com
+Subject: [PATCH 0/3] crypto: caam - add support for xcbc(aes)
+Date: Fri, 21 Dec 2018 17:59:07 +0200
+Message-Id: <20181221155910.6235-1-horia.geanta@nxp.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patchs adds missing member of stats documentation.
+This patch set adds support for xcbc(aes) and improves a few ahash things
+along the way.
 
-Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
----
- include/linux/crypto.h | 7 +++++++
- 1 file changed, 7 insertions(+)
+It depends on the following patch:
+[v2] crypto: caam - fix SHA support detection
+https://patchwork.kernel.org/patch/10740373/
 
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index 9850b41e38ae..81e178fb9ed8 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -564,6 +564,13 @@ struct crypto_istat_rng {
-  * @cra_destroy: internally used
-  *
-  * @stats: union of all possible crypto_istat_xxx structures
-+ * @stats.aead:		statistics for AEAD algorithm
-+ * @stats.akcipher:	statistics for akcipher algorithm
-+ * @stats.cipher:	statistics for cipher algorithm
-+ * @stats.compress:	statistics for compress algorithm
-+ * @stats.hash:		statistics for hash algorithm
-+ * @stats.rng:		statistics for rng algorithm
-+ * @stats.kpp:		statistics for KPP algorithm
-  *
-  * The struct crypto_alg describes a generic Crypto API algorithm and is common
-  * for all of the transformations. Any variable not documented here shall not
+Iuliana Prodan (3):
+  crypto: caam - fix error reporting for caam_hash_alloc
+  crypto: caam - create ahash shared descriptors only once
+  crypto: caam - add support for xcbc(aes)
+
+ drivers/crypto/caam/caamhash.c      | 199 ++++++++++++++++++++++++++++++++----
+ drivers/crypto/caam/caamhash_desc.c |  58 ++++++++++-
+ drivers/crypto/caam/caamhash_desc.h |   2 +
+ 3 files changed, 240 insertions(+), 19 deletions(-)
+
 -- 
-2.19.2
+2.16.2
