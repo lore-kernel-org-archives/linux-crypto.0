@@ -1,39 +1,83 @@
-Return-Path: <SRS0=9Gyh=PA=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:38974 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729640AbeLWECX (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 22 Dec 2018 23:02:23 -0500
-Date: Sun, 23 Dec 2018 12:02:16 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Corentin Labbe <clabbe@baylibre.com>
-Cc: davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] crypto: crypto_user_stat: remove unused dump
- functions
-Message-ID: <20181223040216.ebailnnyyq4fzkpg@gondor.apana.org.au>
-References: <1544690198-21993-1-git-send-email-clabbe@baylibre.com>
+Return-Path: <SRS0=edWn=O6=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from inva020.nxp.com ([92.121.34.13]:48704 "EHLO inva020.nxp.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2390384AbeLUMn0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 21 Dec 2018 07:43:26 -0500
+From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        linux-crypto@vger.kernel.org, linux-imx@nxp.com
+Subject: [PATCH] crypto: caam - fix SHA support detection
+Date: Fri, 21 Dec 2018 14:43:16 +0200
+Message-Id: <20181221124316.23572-1-horia.geanta@nxp.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1544690198-21993-1-git-send-email-clabbe@baylibre.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Dec 13, 2018 at 08:36:37AM +0000, Corentin Labbe wrote:
-> This patch removes unused dump functions for crypto_user_stats.
-> There are remains of the copy/paste of crypto_user_base to
-> crypto_user_stat and I forgot to remove them.
-> 
-> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
-> ---
->  crypto/crypto_user_base.c            |  4 +---
->  crypto/crypto_user_stat.c            | 33 ----------------------------
->  include/crypto/internal/cryptouser.h | 12 ----------
->  3 files changed, 1 insertion(+), 48 deletions(-)
+The addition of Chacha20 + Poly1305 authenc support inadvertently broke
+detection of algorithms supported by MDHA (Message Digest Hardware
+Accelerator), fix it.
 
-All applied.  Thanks.
+Cc: <stable@vger.kernel.org>
+Fixes: d6bbd4eea243 ("crypto: caam/jr - add support for Chacha20 + Poly1305")
+Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
+---
+ drivers/crypto/caam/caamalg.c | 2 +-
+ drivers/crypto/caam/desc.h    | 1 +
+ drivers/crypto/caam/error.h   | 8 ++++++++
+ 3 files changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
+index 92e593e2069a..80ae69f906fb 100644
+--- a/drivers/crypto/caam/caamalg.c
++++ b/drivers/crypto/caam/caamalg.c
+@@ -3476,7 +3476,7 @@ static int __init caam_algapi_init(void)
+ 		 * Skip algorithms requiring message digests
+ 		 * if MD or MD size is not supported by device.
+ 		 */
+-		if ((c2_alg_sel & ~OP_ALG_ALGSEL_SUBMASK) == 0x40 &&
++		if (is_mdha(c2_alg_sel) &&
+ 		    (!md_inst || t_alg->aead.maxauthsize > md_limit))
+ 			continue;
+ 
+diff --git a/drivers/crypto/caam/desc.h b/drivers/crypto/caam/desc.h
+index ec10230178c5..4b6854bf896a 100644
+--- a/drivers/crypto/caam/desc.h
++++ b/drivers/crypto/caam/desc.h
+@@ -1155,6 +1155,7 @@
+ #define OP_ALG_ALGSEL_DES	(0x20 << OP_ALG_ALGSEL_SHIFT)
+ #define OP_ALG_ALGSEL_3DES	(0x21 << OP_ALG_ALGSEL_SHIFT)
+ #define OP_ALG_ALGSEL_ARC4	(0x30 << OP_ALG_ALGSEL_SHIFT)
++#define OP_ALG_CHA_MDHA		(0x40 << OP_ALG_ALGSEL_SHIFT)
+ #define OP_ALG_ALGSEL_MD5	(0x40 << OP_ALG_ALGSEL_SHIFT)
+ #define OP_ALG_ALGSEL_SHA1	(0x41 << OP_ALG_ALGSEL_SHIFT)
+ #define OP_ALG_ALGSEL_SHA224	(0x42 << OP_ALG_ALGSEL_SHIFT)
+diff --git a/drivers/crypto/caam/error.h b/drivers/crypto/caam/error.h
+index 67ea94079837..a3ff448822d0 100644
+--- a/drivers/crypto/caam/error.h
++++ b/drivers/crypto/caam/error.h
+@@ -5,6 +5,8 @@
+  * Copyright 2009-2011 Freescale Semiconductor, Inc.
+  */
+ 
++#include "desc.h"
++
+ #ifndef CAAM_ERROR_H
+ #define CAAM_ERROR_H
+ #define CAAM_ERROR_STR_MAX 302
+@@ -17,4 +19,10 @@ void caam_strstatus(struct device *dev, u32 status, bool qi_v2);
+ void caam_dump_sg(const char *level, const char *prefix_str, int prefix_type,
+ 		  int rowsize, int groupsize, struct scatterlist *sg,
+ 		  size_t tlen, bool ascii);
++
++static inline bool is_mdha(u32 algtype)
++{
++	return (algtype & OP_ALG_ALGSEL_MASK & ~OP_ALG_ALGSEL_SUBMASK) ==
++	       OP_ALG_CHA_MDHA;
++}
+ #endif /* CAAM_ERROR_H */
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.16.2
