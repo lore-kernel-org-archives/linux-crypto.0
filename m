@@ -1,33 +1,51 @@
-Return-Path: <SRS0=HcFc=OV=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from bombadil.infradead.org ([198.137.202.133]:50812 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726317AbeLLIHA (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Dec 2018 03:07:00 -0500
-Date: Wed, 12 Dec 2018 00:06:52 -0800
-From: Christoph Hellwig <hch@infradead.org>
-To: Ashish Mhetre <amhetre@nvidia.com>
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net, axboe@kernel.dk,
-        adrian.hunter@intel.com, ulf.hansson@linaro.org,
-        linux-crypto@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-kernel@vger.kernel.org, vdumpa@nvidia.com,
-        mmaddireddy@nvidia.com, linux-tegra@vger.kernel.org,
-        Snikam@nvidia.com
-Subject: Re: [PATCH] scatterlist: Update size type to support greater then
- 4GB size.
-Message-ID: <20181212080652.GA14877@infradead.org>
-References: <1544595853-18492-1-git-send-email-amhetre@nvidia.com>
+Return-Path: <SRS0=ErXm=O7=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from szxga05-in.huawei.com ([45.249.212.191]:16652 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725814AbeLVXgF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 22 Dec 2018 18:36:05 -0500
+From: Zhou Wang <wangzhou1@hisilicon.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        <linux-crypto@vger.kernel.org>
+CC: <linux-kernel@vger.kernel.org>, <linuxarm@huawei.com>,
+        Zhou Wang <wangzhou1@hisilicon.com>
+Subject: [PATCH 4/4] MAINTAINERS: add maintainer for HiSilicon QM and ZIP controller driver
+Date: Sat, 22 Dec 2018 15:51:45 +0800
+Message-ID: <1545465105-133138-5-git-send-email-wangzhou1@hisilicon.com>
+In-Reply-To: <1545465105-133138-1-git-send-email-wangzhou1@hisilicon.com>
+References: <1545465105-133138-1-git-send-email-wangzhou1@hisilicon.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1544595853-18492-1-git-send-email-amhetre@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-scatterlist elements longer than 4GB sound odd.  Please submit it
-in a series with your actual user so that we can help figuring out
-if it really makes sense or if there is a better way to solve your
-problem.
+Add Zhou Wang as a maintainer for HiSilicon QM and ZIP controller driver.
 
-As is this patch will massively increase the memory usage for all users
-of struct scatterlist, so you better have a really good reason.
+Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
+Reviewed-by: John Garry <john.garry@huawei.com>
+---
+ MAINTAINERS | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 0767f1d..5be84e2 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -6785,6 +6785,14 @@ S:	Supported
+ F:	drivers/scsi/hisi_sas/
+ F:	Documentation/devicetree/bindings/scsi/hisilicon-sas.txt
+ 
++HISILICON QM AND ZIP Controller DRIVER
++M:	Zhou Wang <wangzhou1@hisilicon.com>
++L:	linux-crypto@vger.kernel.org
++S:	Maintained
++F:	drivers/crypto/hisilicon/qm.c
++F:	drivers/crypto/hisilicon/qm.h
++F:	drivers/crypto/hisilicon/zip/
++
+ HMM - Heterogeneous Memory Management
+ M:	Jérôme Glisse <jglisse@redhat.com>
+ L:	linux-mm@kvack.org
+-- 
+2.8.1
