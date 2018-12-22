@@ -1,104 +1,61 @@
-Return-Path: <SRS0=adZj=OO=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:41464 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726820AbeLEGVe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 5 Dec 2018 01:21:34 -0500
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org
-Cc: Paul Crowley <paulcrowley@google.com>,
-        Martin Willi <martin@strongswan.org>,
-        Milan Broz <gmazyland@gmail.com>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v3 0/6] crypto: x86_64 optimized XChaCha and NHPoly1305 (for Adiantum)
-Date: Tue,  4 Dec 2018 22:19:59 -0800
-Message-Id: <20181205062005.27727-1-ebiggers@kernel.org>
+Return-Path: <SRS0=ErXm=O7=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from szxga05-in.huawei.com ([45.249.212.191]:16650 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S2392969AbeLVXgF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 22 Dec 2018 18:36:05 -0500
+From: Zhou Wang <wangzhou1@hisilicon.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        <linux-crypto@vger.kernel.org>
+CC: <linux-kernel@vger.kernel.org>, <linuxarm@huawei.com>,
+        Zhou Wang <wangzhou1@hisilicon.com>
+Subject: [PATCH 0/4] crypto: hisilicon: Add HiSilicon QM and ZIP controller driver
+Date: Sat, 22 Dec 2018 15:51:41 +0800
+Message-ID: <1545465105-133138-1-git-send-email-wangzhou1@hisilicon.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello,
+This series adds HiSilicon QM and ZIP controller driver in crypto subsystem.
 
-This series optimizes the Adiantum encryption mode for x86_64 by adding
-SSE2 and AVX2 accelerated implementations of NHPoly1305, specifically
-the NH part; and by modifying the existing x86_64 SSSE3/AVX2/AVX-512VL
-implementation of ChaCha20 to support XChaCha20 and XChaCha12.
+A simple QM/ZIP driver which helps to provide an example for a general
+accelerator framework is under review in community[1]. Based on this simple
+driver, this series adds HW v2 support, PCI passthrough, reset, PCI/misc error
+handler, debug support. But unlike [1], driver in this patchset only registers
+to crypto subsystem.
 
-This greatly improves Adiantum performance on x86_64.  
+There will be a long discussion about above accelerator framework in the
+process of upstreaming. So let's firstly review and upstream QM/ZIP crypto
+driver.
 
-For example, encrypting 4096-byte messages (single-threaded) on a
-Skylake-based processor (Intel Xeon, supports AVX-512VL and AVX2):
+References:
+[1] https://lkml.org/lkml/2018/11/12/1951
 
-                           Before                After
-                           --------              ---------
-adiantum(xchacha12,aes)    348 MB/s              1493 MB/s
-adiantum(xchacha20,aes)    266 MB/s              1261 MB/s
+Zhou Wang (4):
+  Documentation: Add debugfs doc for hisi_zip
+  crypto: hisilicon: Add queue management driver for HiSilicon QM module
+  crypto: hisilicon: Add HiSilicon ZIP accelerator support
+  MAINTAINERS: add maintainer for HiSilicon QM and ZIP controller driver
 
-And on a Zen-based processor (Threadripper 1950X, supports AVX2):
-
-                           Before                After
-                           --------              ---------
-adiantum(xchacha12,aes)    505 MB/s              1292 MB/s
-adiantum(xchacha20,aes)    387 MB/s              1037 MB/s
-
-Decryption is almost exactly the same speed as encryption.
-
-The biggest benefit comes from accelerating XChaCha.  Accelerating NH
-gives a somewhat smaller, but still significant benefit.
-
-Performance on 512-byte inputs is also improved, though that is much
-slower in the first place.  When Adiantium is used with dm-crypt (or
-cryptsetup), we recommend using a 4096-byte sector size.
-
-For comparison, AES-256-XTS is 2710 MB/s on the Skylake CPU and
-4140 MB/s on the Zen CPU.  However, AES has the benefit of direct AES-NI
-hardware support whereas Adiantum is implemented entirely with
-general-purpose instructions (scalar and SIMD).  Adiantum is also a
-super-pseudorandom permutation over the entire sector, unlike XTS.
-
-Note that XChaCha20 and XChaCha12 can be used for other purposes too.
-
-Changed since v2:
-  - Yield the FPU once per 4096 bytes rather than once per skcipher_walk
-    step.
-  - Create full stack frame in hchacha_block_ssse3() and
-    chacha_block_xor_ssse3().
-
-Changed since v1:
-  - Rebase on top of latest cryptodev with the AVX-512VL accelerated
-    ChaCha20 from Martin Willi.
-
-Eric Biggers (6):
-  crypto: x86/nhpoly1305 - add SSE2 accelerated NHPoly1305
-  crypto: x86/nhpoly1305 - add AVX2 accelerated NHPoly1305
-  crypto: x86/chacha20 - add XChaCha20 support
-  crypto: x86/chacha20 - refactor to allow varying number of rounds
-  crypto: x86/chacha - add XChaCha12 support
-  crypto: x86/chacha - yield the FPU occasionally
-
- arch/x86/crypto/Makefile                      |  15 +-
- ...a20-avx2-x86_64.S => chacha-avx2-x86_64.S} |  33 +-
- ...12vl-x86_64.S => chacha-avx512vl-x86_64.S} |  35 +--
- ...0-ssse3-x86_64.S => chacha-ssse3-x86_64.S} | 104 +++---
- arch/x86/crypto/chacha20_glue.c               | 208 ------------
- arch/x86/crypto/chacha_glue.c                 | 297 ++++++++++++++++++
- arch/x86/crypto/nh-avx2-x86_64.S              | 157 +++++++++
- arch/x86/crypto/nh-sse2-x86_64.S              | 123 ++++++++
- arch/x86/crypto/nhpoly1305-avx2-glue.c        |  77 +++++
- arch/x86/crypto/nhpoly1305-sse2-glue.c        |  76 +++++
- crypto/Kconfig                                |  28 +-
- 11 files changed, 861 insertions(+), 292 deletions(-)
- rename arch/x86/crypto/{chacha20-avx2-x86_64.S => chacha-avx2-x86_64.S} (97%)
- rename arch/x86/crypto/{chacha20-avx512vl-x86_64.S => chacha-avx512vl-x86_64.S} (97%)
- rename arch/x86/crypto/{chacha20-ssse3-x86_64.S => chacha-ssse3-x86_64.S} (92%)
- delete mode 100644 arch/x86/crypto/chacha20_glue.c
- create mode 100644 arch/x86/crypto/chacha_glue.c
- create mode 100644 arch/x86/crypto/nh-avx2-x86_64.S
- create mode 100644 arch/x86/crypto/nh-sse2-x86_64.S
- create mode 100644 arch/x86/crypto/nhpoly1305-avx2-glue.c
- create mode 100644 arch/x86/crypto/nhpoly1305-sse2-glue.c
+ Documentation/ABI/testing/debugfs-hisi-zip |   50 +
+ MAINTAINERS                                |    8 +
+ drivers/crypto/hisilicon/Kconfig           |   11 +
+ drivers/crypto/hisilicon/Makefile          |    2 +
+ drivers/crypto/hisilicon/qm.c              | 1823 ++++++++++++++++++++++++++++
+ drivers/crypto/hisilicon/qm.h              |  177 +++
+ drivers/crypto/hisilicon/zip/Makefile      |    2 +
+ drivers/crypto/hisilicon/zip/zip.h         |   60 +
+ drivers/crypto/hisilicon/zip/zip_crypto.c  |  410 +++++++
+ drivers/crypto/hisilicon/zip/zip_main.c    | 1161 ++++++++++++++++++
+ 10 files changed, 3704 insertions(+)
+ create mode 100644 Documentation/ABI/testing/debugfs-hisi-zip
+ create mode 100644 drivers/crypto/hisilicon/qm.c
+ create mode 100644 drivers/crypto/hisilicon/qm.h
+ create mode 100644 drivers/crypto/hisilicon/zip/Makefile
+ create mode 100644 drivers/crypto/hisilicon/zip/zip.h
+ create mode 100644 drivers/crypto/hisilicon/zip/zip_crypto.c
+ create mode 100644 drivers/crypto/hisilicon/zip/zip_main.c
 
 -- 
-2.19.2
+2.8.1
