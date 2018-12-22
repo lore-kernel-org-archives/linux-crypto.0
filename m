@@ -1,57 +1,88 @@
-Return-Path: <SRS0=sHEo=PF=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from szxga07-in.huawei.com ([45.249.212.35]:43012 "EHLO huawei.com"
+Return-Path: <SRS0=ErXm=O7=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from szxga05-in.huawei.com ([45.249.212.191]:16654 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728615AbeL1Gq5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 28 Dec 2018 01:46:57 -0500
-From: YueHaibing <yuehaibing@huawei.com>
-To: Harsh Jain <harsh@chelsio.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-CC: YueHaibing <yuehaibing@huawei.com>, <linux-crypto@vger.kernel.org>,
-        <kernel-janitors@vger.kernel.org>
-Subject: [PATCH v2 -next] crypto: chelsio - remove set but not used variables 'adap'
-Date: Fri, 28 Dec 2018 06:53:53 +0000
-Message-ID: <1545980033-196068-1-git-send-email-yuehaibing@huawei.com>
-In-Reply-To: <1545979302-111921-1-git-send-email-yuehaibing@huawei.com>
-References: <1545979302-111921-1-git-send-email-yuehaibing@huawei.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
+        id S2391187AbeLVXgF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 22 Dec 2018 18:36:05 -0500
+From: Zhou Wang <wangzhou1@hisilicon.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        <linux-crypto@vger.kernel.org>
+CC: <linux-kernel@vger.kernel.org>, <linuxarm@huawei.com>,
+        Zhou Wang <wangzhou1@hisilicon.com>
+Subject: [PATCH 1/4] Documentation: Add debugfs doc for hisi_zip
+Date: Sat, 22 Dec 2018 15:51:42 +0800
+Message-ID: <1545465105-133138-2-git-send-email-wangzhou1@hisilicon.com>
+In-Reply-To: <1545465105-133138-1-git-send-email-wangzhou1@hisilicon.com>
+References: <1545465105-133138-1-git-send-email-wangzhou1@hisilicon.com>
 MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Fixes gcc '-Wunused-but-set-variable' warning:
+Add debugfs descriptions for HiSilicon ZIP and QM driver.
 
-drivers/crypto/chelsio/chcr_algo.c: In function 'chcr_device_init':
-drivers/crypto/chelsio/chcr_algo.c:1371:18: warning:
- variable 'adap' set but not used [-Wunused-but-set-variable]
-
-It not used since commit a1c6fd4308d3 ("crypto: chelsio - Update ntx queue
-received from cxgb4")
-
-Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
+Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 ---
-v2: fix title
----
- drivers/crypto/chelsio/chcr_algo.c | 2 --
- 1 file changed, 2 deletions(-)
+ Documentation/ABI/testing/debugfs-hisi-zip | 50 ++++++++++++++++++++++++++++++
+ 1 file changed, 50 insertions(+)
+ create mode 100644 Documentation/ABI/testing/debugfs-hisi-zip
 
-diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
-index bcef765..c8cd2d3 100644
---- a/drivers/crypto/chelsio/chcr_algo.c
-+++ b/drivers/crypto/chelsio/chcr_algo.c
-@@ -1368,7 +1368,6 @@ static int chcr_aes_decrypt(struct ablkcipher_request *req)
- static int chcr_device_init(struct chcr_context *ctx)
- {
- 	struct uld_ctx *u_ctx = NULL;
--	struct adapter *adap;
- 	unsigned int id;
- 	int txq_perchan, txq_idx, ntxq;
- 	int err = 0, rxq_perchan, rxq_idx;
-@@ -1382,7 +1381,6 @@ static int chcr_device_init(struct chcr_context *ctx)
- 			goto out;
- 		}
- 		ctx->dev = &u_ctx->dev;
--		adap = padap(ctx->dev);
- 		ntxq = u_ctx->lldi.ntxq;
- 		rxq_perchan = u_ctx->lldi.nrxq / u_ctx->lldi.nchan;
- 		txq_perchan = ntxq / u_ctx->lldi.nchan;
+diff --git a/Documentation/ABI/testing/debugfs-hisi-zip b/Documentation/ABI/testing/debugfs-hisi-zip
+new file mode 100644
+index 0000000..a7c63e6
+--- /dev/null
++++ b/Documentation/ABI/testing/debugfs-hisi-zip
+@@ -0,0 +1,50 @@
++What:           /sys/kernel/debug/hisi_zip/<bdf>/comp_core[01]/regs
++Date:           Nov 2018
++Contact:        linux-crypto@vger.kernel.org
++Description:    Dump of compression cores related debug registers.
++		Only available for PF.
++
++What:           /sys/kernel/debug/hisi_zip/<bdf>/decomp_core[0-5]/regs
++Date:           Nov 2018
++Contact:        linux-crypto@vger.kernel.org
++Description:    Dump of decompression cores related debug registers.
++		Only available for PF.
++
++What:           /sys/kernel/debug/hisi_zip/<bdf>/clear_enable
++Date:           Nov 2018
++Contact:        linux-crypto@vger.kernel.org
++Description:    Compression/decompression core debug registers read clear
++		control. 1 means enable register read clear, otherwise 0.
++		Writing to this file has no functional effect, only enable or
++		disable counters clear after reading of these registers.
++		Only available for PF.
++
++What:           /sys/kernel/debug/hisi_zip/<bdf>/current_qm
++Date:           Nov 2018
++Contact:        linux-crypto@vger.kernel.org
++Description:    One ZIP controller has one PF and multiple VFs, each function
++		has a QM. Select the QM which below qm refers to.
++		Only available for PF.
++
++What:           /sys/kernel/debug/hisi_zip/<bdf>/qm/qm_regs
++Date:           Nov 2018
++Contact:        linux-crypto@vger.kernel.org
++Description:    Dump of QM related debug registers.
++		Available for PF and VF in host. VF in guest currently only
++		has one debug register.
++
++What:           /sys/kernel/debug/hisi_zip/<bdf>/qm/current_q
++Date:           Nov 2018
++Contact:        linux-crypto@vger.kernel.org
++Description:    One QM may contain multiple queues. Select specific queue to
++		show its debug registers in above qm_regs.
++		Only available for PF.
++
++What:           /sys/kernel/debug/hisi_zip/<bdf>/qm/clear_enable
++Date:           Nov 2018
++Contact:        linux-crypto@vger.kernel.org
++Description:    QM debug registers(qm_regs) read clear control. 1 means enable
++		register read clear, otherwise 0.
++		Writing to this file has no functional effect, only enable or
++		disable counters clear after reading of these registers.
++		Only available for PF.
+-- 
+2.8.1
