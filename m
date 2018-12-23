@@ -1,64 +1,64 @@
-Return-Path: <SRS0=sHEo=PF=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from szxga07-in.huawei.com ([45.249.212.35]:41700 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729055AbeL1GnW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 28 Dec 2018 01:43:22 -0500
-Subject: Re: [PATCH -next] crypto: chelsio - CHECK-remove set but not used
- variables 'adap'
-To: Harsh Jain <harsh@chelsio.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-References: <1545979302-111921-1-git-send-email-yuehaibing@huawei.com>
-CC: <linux-crypto@vger.kernel.org>, <kernel-janitors@vger.kernel.org>
-From: YueHaibing <yuehaibing@huawei.com>
-Message-ID: <cd4d42db-3c03-1345-7bf5-5b5ece495324@huawei.com>
-Date: Fri, 28 Dec 2018 14:43:00 +0800
+Return-Path: <SRS0=9Gyh=PA=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:39024 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731916AbeLWEDq (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 22 Dec 2018 23:03:46 -0500
+Date: Sun, 23 Dec 2018 12:03:44 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org
+Subject: Re: [PATCH] crypto: remove remnants of internal IV generators
+Message-ID: <20181223040344.2746xfu7fif2a2fz@gondor.apana.org.au>
+References: <20181216235506.8680-1-ebiggers@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <1545979302-111921-1-git-send-email-yuehaibing@huawei.com>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20181216235506.8680-1-ebiggers@kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Sorry, Pls ignore this, the title need respin.
-
-On 2018/12/28 14:41, YueHaibing wrote:
-> Fixes gcc '-Wunused-but-set-variable' warning:
+On Sun, Dec 16, 2018 at 03:55:06PM -0800, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
 > 
-> drivers/crypto/chelsio/chcr_algo.c: In function 'chcr_device_init':
-> drivers/crypto/chelsio/chcr_algo.c:1371:18: warning:
->  variable 'adap' set but not used [-Wunused-but-set-variable]
+> Remove dead code related to internal IV generators, which are no longer
+> used since they've been replaced with the "seqiv" and "echainiv"
+> templates.  The removed code includes:
 > 
-> It not used since commit a1c6fd4308d3 ("crypto: chelsio - Update ntx queue
-> received from cxgb4")
+> - The "givcipher" (GIVCIPHER) algorithm type.  No algorithms are
+>   registered with this type anymore, so it's unneeded.
 > 
-> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+> - The "const char *geniv" member of aead_alg, ablkcipher_alg, and
+>   blkcipher_alg.  A few algorithms still set this, but it isn't used
+>   anymore except to show via /proc/crypto and CRYPTO_MSG_GETALG.
+>   Just hardcode "<default>" or "<none>" in those cases.
+> 
+> - The 'skcipher_givcrypt_request' structure, which is never used.
+> 
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 > ---
->  drivers/crypto/chelsio/chcr_algo.c | 2 --
->  1 file changed, 2 deletions(-)
-> 
-> diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
-> index bcef765..c8cd2d3 100644
-> --- a/drivers/crypto/chelsio/chcr_algo.c
-> +++ b/drivers/crypto/chelsio/chcr_algo.c
-> @@ -1368,7 +1368,6 @@ static int chcr_aes_decrypt(struct ablkcipher_request *req)
->  static int chcr_device_init(struct chcr_context *ctx)
->  {
->  	struct uld_ctx *u_ctx = NULL;
-> -	struct adapter *adap;
->  	unsigned int id;
->  	int txq_perchan, txq_idx, ntxq;
->  	int err = 0, rxq_perchan, rxq_idx;
-> @@ -1382,7 +1381,6 @@ static int chcr_device_init(struct chcr_context *ctx)
->  			goto out;
->  		}
->  		ctx->dev = &u_ctx->dev;
-> -		adap = padap(ctx->dev);
->  		ntxq = u_ctx->lldi.ntxq;
->  		rxq_perchan = u_ctx->lldi.nrxq / u_ctx->lldi.nchan;
->  		txq_perchan = ntxq / u_ctx->lldi.nchan;
-> 
-> 
-> 
-> 
-> .
-> 
+>  Documentation/crypto/api.rst          |  9 ----
+>  Documentation/crypto/architecture.rst | 31 ++---------
+>  crypto/ablkcipher.c                   | 76 +--------------------------
+>  crypto/blkcipher.c                    |  6 +--
+>  crypto/cryptd.c                       |  4 +-
+>  crypto/ctr.c                          |  2 -
+>  crypto/skcipher.c                     |  6 +--
+>  drivers/crypto/bcm/cipher.c           |  1 -
+>  drivers/crypto/chelsio/chcr_algo.c    |  1 -
+>  drivers/crypto/ixp4xx_crypto.c        |  5 --
+>  drivers/crypto/nx/nx-aes-ctr.c        |  1 -
+>  drivers/crypto/omap-aes.c             |  1 -
+>  drivers/crypto/picoxcell_crypto.c     |  3 +-
+>  drivers/crypto/talitos.c              |  1 -
+>  include/crypto/aead.h                 |  3 --
+>  include/crypto/internal/skcipher.h    |  2 -
+>  include/crypto/skcipher.h             | 13 -----
+>  include/linux/crypto.h                | 34 ++----------
+>  18 files changed, 17 insertions(+), 182 deletions(-)
+
+Patch applied.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
