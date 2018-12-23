@@ -1,51 +1,54 @@
-Return-Path: <SRS0=r27M=OJ=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:35182 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725754AbeLAFIK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 1 Dec 2018 00:08:10 -0500
-Date: Fri, 30 Nov 2018 09:58:03 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-fscrypt@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Paul Crowley <paulcrowley@google.com>,
-        Greg Kaiser <gkaiser@google.com>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>,
-        Samuel Neves <samuel.c.p.neves@gmail.com>,
-        Tomer Ashur <tomer.ashur@esat.kuleuven.be>
-Subject: Re: [PATCH v4 00/14] crypto: Adiantum support
-Message-ID: <20181130175802.GB135453@gmail.com>
-References: <20181117012631.23528-1-ebiggers@kernel.org>
+Return-Path: <SRS0=9Gyh=PA=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:38938 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731793AbeLWEBU (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 22 Dec 2018 23:01:20 -0500
+Date: Sun, 23 Dec 2018 12:01:18 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Nathan Chancellor <natechancellor@gmail.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Nick Desaulniers <ndesaulniers@google.com>
+Subject: Re: [PATCH] crypto: ux500 - Use proper enum in cryp_set_dma_transfer
+Message-ID: <20181223040118.qzk4flxswf5xvckp@gondor.apana.org.au>
+References: <20181210234929.5729-1-natechancellor@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181117012631.23528-1-ebiggers@kernel.org>
+In-Reply-To: <20181210234929.5729-1-natechancellor@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Nov 16, 2018 at 05:26:17PM -0800, Eric Biggers wrote:
+On Mon, Dec 10, 2018 at 04:49:29PM -0700, Nathan Chancellor wrote:
+> Clang warns when one enumerated type is implicitly converted to another:
 > 
-> Therefore, we (well, Paul Crowley did the real work) designed a new
-> encryption mode, Adiantum.  In essence, Adiantum makes it secure to use
-> the ChaCha stream cipher for disk encryption.  Adiantum is specified by
-> our paper here: https://eprint.iacr.org/2018/720.pdf ("Adiantum:
-> length-preserving encryption for entry-level processors").  Reference
-> code and test vectors are here: https://github.com/google/adiantum.
-> Most of the high-level concepts of Adiantum are not new; similar
-> existing modes include XCB, HCTR, and HCH.  Adiantum and these modes are
-> true wide-block modes (tweakable super-pseudorandom permutations), so
-> they actually provide a stronger notion of security than XTS.
+> drivers/crypto/ux500/cryp/cryp_core.c:559:5: warning: implicit
+> conversion from enumeration type 'enum dma_data_direction' to different
+> enumeration type 'enum dma_transfer_direction' [-Wenum-conversion]
+>                                 direction, DMA_CTRL_ACK);
+>                                 ^~~~~~~~~
+> drivers/crypto/ux500/cryp/cryp_core.c:583:5: warning: implicit
+> conversion from enumeration type 'enum dma_data_direction' to different
+> enumeration type 'enum dma_transfer_direction' [-Wenum-conversion]
+>                                 direction,
+>                                 ^~~~~~~~~
+> 2 warnings generated.
 > 
+> dmaengine_prep_slave_sg expects an enum from dma_transfer_direction.
+> Because we know the value of the dma_data_direction enum from the
+> switch statement, we can just use the proper value from
+> dma_transfer_direction so there is no more conversion.
+> 
+> DMA_TO_DEVICE = DMA_MEM_TO_DEV = 1
+> DMA_FROM_DEVICE = DMA_DEV_TO_MEM = 2
+> 
+> Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
+> ---
+>  drivers/crypto/ux500/cryp/cryp_core.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
-In case anyone is interested: Paul and I have made some improvements to the
-Adiantum paper and have updated the preprint at the above link.  The algorithm
-is still the same, but explanations have been improved and the proof has been
-redone using a different technique that is easier to follow.  It also matches
-the version that will be published in IACR Transactions on Symmetric Cryptology
-(ToSC) Volume 2018 Issue 4.
-
-All versions of our paper can be found at https://eprint.iacr.org/2018/720, and
-the .tex source is at https://github.com/google/adiantum/tree/master/specification.
-
-- Eric
+Patch applied.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
