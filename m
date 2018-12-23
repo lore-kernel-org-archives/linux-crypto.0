@@ -1,49 +1,41 @@
-Return-Path: <SRS0=KZld=OW=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:50394 "EHLO
+Return-Path: <SRS0=9Gyh=PA=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:38980 "EHLO
         deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727489AbeLMKMl (ORCPT
+        with ESMTP id S1729640AbeLWECb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 13 Dec 2018 05:12:41 -0500
-Date: Thu, 13 Dec 2018 18:12:33 +0800
+        Sat, 22 Dec 2018 23:02:31 -0500
+Date: Sun, 23 Dec 2018 12:02:29 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Vitaly Chikunov <vt@altlinux.org>
-Cc: dhowells@redhat.com, davem@davemloft.net, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH] akcipher: Introduce verify2 for public key algorithms
-Message-ID: <20181213101233.6t7d5mxxkkavo46h@gondor.apana.org.au>
+To: Fabio Estevam <festevam@gmail.com>
+Cc: linux-crypto@vger.kernel.org, shawnguo@kernel.org
+Subject: Re: [PATCH] crypto: mxc-scc - fix build warnings on ARM64
+Message-ID: <20181223040229.ij6jjwb62xecwdl6@gondor.apana.org.au>
+References: <1544694752-9293-1-git-send-email-festevam@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181211165938.1150-1-vt@altlinux.org>
+In-Reply-To: <1544694752-9293-1-git-send-email-festevam@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Vitaly Chikunov <vt@altlinux.org> wrote:
-> Current akcipher .verify() just decrypts signature to uncover message
-> hash, which is then verified in upper level public_key_verify_signature
-> by memcmp with the expected signature value, which is never passed into
-> verify().
+On Thu, Dec 13, 2018 at 07:52:32AM -0200, Fabio Estevam wrote:
+> The following build warnings are seen when building for ARM64 allmodconfig:
 > 
-> This approach is incompatible with ECDSA algorithms, because, to verify
-> a signature ECDSA algorithm also needs a hash value as input; also, hash
-> is used in ECDSA (together with a signature divided into halves `r||s`),
-> not to produce hash, but to produce a number, which is then compared to
-> `r` (first part of the signature) to determine if the signature is
-> correct.  Thus, for ECDSA, nor requirements of .verify() itself, nor its
-> output expectations in public_key_verify_signature aren't satisfied.
+> drivers/crypto/mxc-scc.c:181:20: warning: format '%d' expects argument of type 'int', but argument 5 has type 'size_t' {aka 'long unsigned int'} [-Wformat=]
+> drivers/crypto/mxc-scc.c:186:21: warning: format '%d' expects argument of type 'int', but argument 4 has type 'size_t' {aka 'long unsigned int'} [-Wformat=]
+> drivers/crypto/mxc-scc.c:277:21: warning: format '%d' expects argument of type 'int', but argument 4 has type 'size_t' {aka 'long unsigned int'} [-Wformat=]
+> drivers/crypto/mxc-scc.c:339:3: warning: cast to pointer from integer of different size [-Wint-to-pointer-cast]
+> drivers/crypto/mxc-scc.c:340:3: warning: cast to pointer from integer of different size [-Wint-to-pointer-cast]
 > 
-> Make alternative .verify2() call which gets hash value and produce
-> complete signature check (without any output, thus max_size() call will
-> not be needed for verify2() operation).
+> Fix them by using the %zu specifier to print a size_t variable and using
+> a plain %x to print the result of a readl().
 > 
-> If .verify2() call is present, it should be used in place of .verify().
-> 
-> Signed-off-by: Vitaly Chikunov <vt@altlinux.org>
+> Signed-off-by: Fabio Estevam <festevam@gmail.com>
+> ---
+>  drivers/crypto/mxc-scc.c | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
 
-We should convert all existing users to this interface and not
-have both verify/verify2 forever.
-
-Thanks,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
