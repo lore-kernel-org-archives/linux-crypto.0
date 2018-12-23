@@ -1,62 +1,45 @@
-Return-Path: <SRS0=KZld=OW=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:50402 "EHLO
+Return-Path: <SRS0=9Gyh=PA=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:38996 "EHLO
         deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727720AbeLMKOH (ORCPT
+        with ESMTP id S1729640AbeLWEDV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 13 Dec 2018 05:14:07 -0500
-Date: Thu, 13 Dec 2018 18:14:01 +0800
+        Sat, 22 Dec 2018 23:03:21 -0500
+Date: Sun, 23 Dec 2018 12:03:13 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Vitaly Chikunov <vt@altlinux.org>
-Cc: dhowells@redhat.com, davem@davemloft.net, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH] X.509: Parse public key parameters from x509 for
- akcipher
-Message-ID: <20181213101401.zsmpkz6okgkjmbw3@gondor.apana.org.au>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+        davem@davemloft.net, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: x86/chacha - avoid sleeping under
+ kernel_fpu_begin()
+Message-ID: <20181223040312.twgpjgmfs3wybnmb@gondor.apana.org.au>
+References: <000000000000fb268d057d13ea55@google.com>
+ <20181215204017.7880-1-ebiggers@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20181209135548.26232-1-vt@altlinux.org>
+In-Reply-To: <20181215204017.7880-1-ebiggers@kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Vitaly Chikunov <vt@altlinux.org> wrote:
-> Some public key algorithms (like ECDSA) keep in parameters field
-> important data such as digest and curve OIDs (possibly more for
-> different ECDSA variants). Thus, just setting a public key (as
-> for RSA) is not enough.
+On Sat, Dec 15, 2018 at 12:40:17PM -0800, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
 > 
-> Introduce set_params() callback for akcipher which will be used to
-> pass BER encoded parameters array, with additional argument of
-> algorithm OID.
+> Passing atomic=true to skcipher_walk_virt() only makes the later
+> skcipher_walk_done() calls use atomic memory allocations, not
+> skcipher_walk_virt() itself.  Thus, we have to move it outside of the
+> preemption-disabled region (kernel_fpu_begin()/kernel_fpu_end()).
 > 
-> This is done with the intent of adding support for EC-RDSA (ISO/IEC
-> 14888-3:2018, RFC 7091, and basically ECDSA variant) public keys (which
-> will be finally used in IMA subsystem). Thus, also oid_registry.h is
-> updated.
+> (skcipher_walk_virt() only allocates memory for certain layouts of the
+> input scatterlist, hence why I didn't notice this earlier...)
 > 
-> Rationale:
-> 
-> - For such keys just setting public key without parameters is
->  meaningless, so it would be possible to add parameters in
->  crypto_akcipher_set_pub_key (and .set_pub_key) calls. But, this will
->  needlessly change API for RSA akcipher. Also, additional callback
->  making it possible to pass parameters after
->  crypto_akcipher_set_priv_key (and .set_priv_key) in the future.
-> 
-> - Algorithm OID is passed to be validated in .set_params callback,
->  otherwise, it could have the wrong value.
-> 
-> - Particular algorithm OIDs are checked in x509_note_params, (because
->  this is called from AlgorithmIdentifier (ASN.1) parser, which is
->  called multiple times, as it's used multiple times in X.509
->  certificate), to distinguish a public key call from a signature call.
-> 
-> Signed-off-by: Vitaly Chikunov <vt@altlinux.org>
+> Reported-by: syzbot+9bf843c33f782d73ae7d@syzkaller.appspotmail.com
+> Fixes: 4af78261870a ("crypto: x86/chacha20 - add XChaCha20 support")
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
+>  arch/x86/crypto/chacha_glue.c | 33 ++++++++++++++++++++-------------
+>  1 file changed, 20 insertions(+), 13 deletions(-)
 
-Please post this with a patch that actually uses the set_params
-callback.
-
-Thanks,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
