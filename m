@@ -1,61 +1,65 @@
-Return-Path: <SRS0=ErXm=O7=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from szxga05-in.huawei.com ([45.249.212.191]:16650 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2392969AbeLVXgF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 22 Dec 2018 18:36:05 -0500
-From: Zhou Wang <wangzhou1@hisilicon.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        <linux-crypto@vger.kernel.org>
-CC: <linux-kernel@vger.kernel.org>, <linuxarm@huawei.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>
-Subject: [PATCH 0/4] crypto: hisilicon: Add HiSilicon QM and ZIP controller driver
-Date: Sat, 22 Dec 2018 15:51:41 +0800
-Message-ID: <1545465105-133138-1-git-send-email-wangzhou1@hisilicon.com>
+Return-Path: <SRS0=VXLt=PD=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from stargate.chelsio.com ([12.32.117.8]:64910 "EHLO
+        stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726013AbeLZJqk (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 26 Dec 2018 04:46:40 -0500
+Subject: Re: IPSec ESN: Packets decryption fail with ESN enabled connection
+From: Harsh Jain <harsh@chelsio.com>
+To: steffen.klassert@secunet.com, herbert@gondor.apana.org.au,
+        davem@davemloft.net, netdev@vger.kernel.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Cc: atul.gupta@chelsio.com, harshjain.prof@gmail.com
+References: <93ad9333-1e77-58fc-3f47-a967294fe188@chelsio.com>
+Message-ID: <f1a91df3-c191-7ce1-1721-c94ca4322aa9@chelsio.com>
+Date: Wed, 26 Dec 2018 15:16:29 +0530
 MIME-Version: 1.0
-Content-Type: text/plain
+In-Reply-To: <93ad9333-1e77-58fc-3f47-a967294fe188@chelsio.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This series adds HiSilicon QM and ZIP controller driver in crypto subsystem.
++linux-crypto
 
-A simple QM/ZIP driver which helps to provide an example for a general
-accelerator framework is under review in community[1]. Based on this simple
-driver, this series adds HW v2 support, PCI passthrough, reset, PCI/misc error
-handler, debug support. But unlike [1], driver in this patchset only registers
-to crypto subsystem.
-
-There will be a long discussion about above accelerator framework in the
-process of upstreaming. So let's firstly review and upstream QM/ZIP crypto
-driver.
-
-References:
-[1] https://lkml.org/lkml/2018/11/12/1951
-
-Zhou Wang (4):
-  Documentation: Add debugfs doc for hisi_zip
-  crypto: hisilicon: Add queue management driver for HiSilicon QM module
-  crypto: hisilicon: Add HiSilicon ZIP accelerator support
-  MAINTAINERS: add maintainer for HiSilicon QM and ZIP controller driver
-
- Documentation/ABI/testing/debugfs-hisi-zip |   50 +
- MAINTAINERS                                |    8 +
- drivers/crypto/hisilicon/Kconfig           |   11 +
- drivers/crypto/hisilicon/Makefile          |    2 +
- drivers/crypto/hisilicon/qm.c              | 1823 ++++++++++++++++++++++++++++
- drivers/crypto/hisilicon/qm.h              |  177 +++
- drivers/crypto/hisilicon/zip/Makefile      |    2 +
- drivers/crypto/hisilicon/zip/zip.h         |   60 +
- drivers/crypto/hisilicon/zip/zip_crypto.c  |  410 +++++++
- drivers/crypto/hisilicon/zip/zip_main.c    | 1161 ++++++++++++++++++
- 10 files changed, 3704 insertions(+)
- create mode 100644 Documentation/ABI/testing/debugfs-hisi-zip
- create mode 100644 drivers/crypto/hisilicon/qm.c
- create mode 100644 drivers/crypto/hisilicon/qm.h
- create mode 100644 drivers/crypto/hisilicon/zip/Makefile
- create mode 100644 drivers/crypto/hisilicon/zip/zip.h
- create mode 100644 drivers/crypto/hisilicon/zip/zip_crypto.c
- create mode 100644 drivers/crypto/hisilicon/zip/zip_main.c
-
--- 
-2.8.1
+On 26-12-2018 14:54, Harsh Jain wrote:
+> Hi All,
+>
+> Kernel version on both machines: 4.19.7.
+>
+> Packet drops with EBADMSG is observed on receive end of connection. It seems that sometimes crypto driver receives packet with wrong "seq_hi" value in AAD. See below the dump of assoc data for 1 such instance.
+>
+> [  380.823454] assoclen 8th byte 1 clen 1464 op 1  ==> High byte of ESN
+> [  380.828398] authsize 12 cryptlen 1464
+> [  380.832637] dt00000000: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 06 ==> Decrypted data seems correct,last byte is proto(06 TCP)
+> [  380.840215] dt00000010: bf ee 4f 80 a4 7f 2a 50 6a 5a 0b 10
+> [  380.846636] ass00000000: 0a bc d3 31 <00 00 00 01> 00 1c e5 ec 0e af 04 69 ==> ESN-Hi = 1
+> [  380.854316] ass00000010: a4 fc 08 ad
+>
+> Note: If I decrypt the same packet with ESN - Hi = 0. It Decrypt successfully means peer machine has used ESN-HI = 0 while encrypting.
+>
+> To debug further we added trace in "xfrm_replay_seqhi". Following was the output:
+>
+>  <idle>-0     [003] ..s.   380.967766: xfrm_replay_seqhi: seq_hi 0x 1 seq 0x 1ce5ec bottom 0x 1ce5ee replay seq 0x 1ce62d replay window 0x 40
+>
+> 1) Is this an expected variable with ESN enables connection?.
+>
+> 2) If packets are supposed to be dropped can't we avoid decryption overhead.
+>
+> Following logs are attached
+>
+> 1) dmesg log
+>
+> 2) debug patch used to reproduce the issue.
+>
+> 3) ftace log file
+>
+> 4) ip xfrm state list
+>
+>
+> Regards
+>
+> Harsh Jain
+>
+>
