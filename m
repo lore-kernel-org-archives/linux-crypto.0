@@ -1,38 +1,47 @@
-Return-Path: <SRS0=VXLt=PD=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:37514 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726847AbeLZQtM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Dec 2018 11:49:12 -0500
-Date: Wed, 26 Dec 2018 10:49:08 -0600
-From: Eric Biggers <ebiggers@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: Crypto Update for 4.21
-Message-ID: <20181226164906.GA622@zzz.localdomain>
-References: <20161119102748.GA4277@gondor.apana.org.au>
- <20161213132414.GA7898@gondor.apana.org.au>
- <20170223125141.GA17400@gondor.apana.org.au>
- <20170904101225.GA12613@gondor.apana.org.au>
- <20171113074346.GA20245@gondor.apana.org.au>
- <20181023100958.GA11991@gondor.apana.org.au>
- <20181226132257.w43gf2fouprimwk2@gondor.apana.org.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181226132257.w43gf2fouprimwk2@gondor.apana.org.au>
+Return-Path: <SRS0=t27p=PE=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:44702 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729577AbeL0LIG (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 27 Dec 2018 06:08:06 -0500
+Received: by mail-pg1-f193.google.com with SMTP id t13so8673561pgr.11
+        for <linux-crypto@vger.kernel.org>; Thu, 27 Dec 2018 03:08:06 -0800 (PST)
+From: Sumit Garg <sumit.garg@linaro.org>
+To: linux-crypto@vger.kernel.org, devicetree@vger.kernel.org
+Cc: mpm@selenic.com, herbert@gondor.apana.org.au, robh+dt@kernel.org,
+        mark.rutland@arm.com, arnd@arndb.de, gregkh@linuxfoundation.org,
+        jens.wiklander@linaro.org, daniel.thompson@linaro.org,
+        ard.biesheuvel@linaro.org, bhsharma@redhat.com,
+        tee-dev@lists.linaro.org, Sumit Garg <sumit.garg@linaro.org>
+Subject: [PATCH v1 0/2] Add OP-TEE based hwrng driver
+Date: Thu, 27 Dec 2018 16:37:09 +0530
+Message-Id: <1545908831-25910-1-git-send-email-sumit.garg@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Dec 26, 2018 at 09:22:57PM +0800, Herbert Xu wrote:
-> 
-> Please pull from
-> 
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
-> 
+On ARM SoC's with TrustZone enabled, peripherals like entropy sources
+might not be accessible to normal world (linux in this case) and rather
+accessible to secure world (OP-TEE in this case) only. So this driver
+aims to provides a generic interface to OP-TEE based random number
+generator service.
 
-Hi Herbert, that branch is still on an old commit.  Probably you forgot to push.
+Example case is Developerbox based on Socionext's Synquacer SoC [1]
+which provides 7 thermal sensors accessible from secure world only which
+could be used as entropy sources (thermal/measurement noise).
 
-- Eric
+[1] https://www.96boards.org/product/developerbox/
+
+Sumit Garg (2):
+  dt/bindings: add bindings for optional optee rng-uuid property
+  hwrng: add OP-TEE based rng driver
+
+ .../bindings/arm/firmware/linaro,optee-tz.txt      |   4 +
+ MAINTAINERS                                        |   5 +
+ drivers/char/hw_random/Kconfig                     |  15 ++
+ drivers/char/hw_random/Makefile                    |   1 +
+ drivers/char/hw_random/optee-rng.c                 | 273 +++++++++++++++++++++
+ 5 files changed, 298 insertions(+)
+ create mode 100644 drivers/char/hw_random/optee-rng.c
+
+-- 
+2.7.4
