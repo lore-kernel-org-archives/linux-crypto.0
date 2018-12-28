@@ -1,39 +1,53 @@
-Return-Path: <SRS0=edWn=O6=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from inva020.nxp.com ([92.121.34.13]:51690 "EHLO inva020.nxp.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725790AbeLUP7s (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 Dec 2018 10:59:48 -0500
-From: =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Iuliana Prodan <iuliana.prodan@nxp.com>,
-        linux-crypto@vger.kernel.org, linux-imx@nxp.com
-Subject: [PATCH 0/3] crypto: caam - add support for xcbc(aes)
-Date: Fri, 21 Dec 2018 17:59:07 +0200
-Message-Id: <20181221155910.6235-1-horia.geanta@nxp.com>
+Return-Path: <SRS0=sHEo=PF=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from szxga05-in.huawei.com ([45.249.212.191]:16665 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725929AbeL1Geq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 28 Dec 2018 01:34:46 -0500
+From: YueHaibing <yuehaibing@huawei.com>
+To: Harsh Jain <harsh@chelsio.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+CC: YueHaibing <yuehaibing@huawei.com>, <linux-crypto@vger.kernel.org>,
+        <kernel-janitors@vger.kernel.org>
+Subject: [PATCH -next] crypto: chelsio - CHECK-remove set but not used variables 'adap'
+Date: Fri, 28 Dec 2018 06:41:42 +0000
+Message-ID: <1545979302-111921-1-git-send-email-yuehaibing@huawei.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch set adds support for xcbc(aes) and improves a few ahash things
-along the way.
+Fixes gcc '-Wunused-but-set-variable' warning:
 
-It depends on the following patch:
-[v2] crypto: caam - fix SHA support detection
-https://patchwork.kernel.org/patch/10740373/
+drivers/crypto/chelsio/chcr_algo.c: In function 'chcr_device_init':
+drivers/crypto/chelsio/chcr_algo.c:1371:18: warning:
+ variable 'adap' set but not used [-Wunused-but-set-variable]
 
-Iuliana Prodan (3):
-  crypto: caam - fix error reporting for caam_hash_alloc
-  crypto: caam - create ahash shared descriptors only once
-  crypto: caam - add support for xcbc(aes)
+It not used since commit a1c6fd4308d3 ("crypto: chelsio - Update ntx queue
+received from cxgb4")
 
- drivers/crypto/caam/caamhash.c      | 199 ++++++++++++++++++++++++++++++++----
- drivers/crypto/caam/caamhash_desc.c |  58 ++++++++++-
- drivers/crypto/caam/caamhash_desc.h |   2 +
- 3 files changed, 240 insertions(+), 19 deletions(-)
+Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+---
+ drivers/crypto/chelsio/chcr_algo.c | 2 --
+ 1 file changed, 2 deletions(-)
 
--- 
-2.16.2
+diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
+index bcef765..c8cd2d3 100644
+--- a/drivers/crypto/chelsio/chcr_algo.c
++++ b/drivers/crypto/chelsio/chcr_algo.c
+@@ -1368,7 +1368,6 @@ static int chcr_aes_decrypt(struct ablkcipher_request *req)
+ static int chcr_device_init(struct chcr_context *ctx)
+ {
+ 	struct uld_ctx *u_ctx = NULL;
+-	struct adapter *adap;
+ 	unsigned int id;
+ 	int txq_perchan, txq_idx, ntxq;
+ 	int err = 0, rxq_perchan, rxq_idx;
+@@ -1382,7 +1381,6 @@ static int chcr_device_init(struct chcr_context *ctx)
+ 			goto out;
+ 		}
+ 		ctx->dev = &u_ctx->dev;
+-		adap = padap(ctx->dev);
+ 		ntxq = u_ctx->lldi.ntxq;
+ 		rxq_perchan = u_ctx->lldi.nrxq / u_ctx->lldi.nchan;
+ 		txq_perchan = ntxq / u_ctx->lldi.nchan;
