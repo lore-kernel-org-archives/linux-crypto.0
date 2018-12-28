@@ -1,604 +1,519 @@
-Return-Path: <SRS0=HgT6=OZ=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:57724 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730719AbeLPXzU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 16 Dec 2018 18:55:20 -0500
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH] crypto: remove remnants of internal IV generators
-Date: Sun, 16 Dec 2018 15:55:06 -0800
-Message-Id: <20181216235506.8680-1-ebiggers@kernel.org>
+Return-Path: <SRS0=sHEo=PF=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-vs1-f65.google.com ([209.85.217.65]:33324 "EHLO
+        mail-vs1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728957AbeL1NDg (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 28 Dec 2018 08:03:36 -0500
+Received: by mail-vs1-f65.google.com with SMTP id p74so12958674vsc.0
+        for <linux-crypto@vger.kernel.org>; Fri, 28 Dec 2018 05:03:34 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <1545908831-25910-1-git-send-email-sumit.garg@linaro.org>
+ <1545908831-25910-3-git-send-email-sumit.garg@linaro.org> <CAKv+Gu9ShfrBhfCuRK_L_ZtZ3KnN7Jb-4hcX9nSO7AYbT8V8LQ@mail.gmail.com>
+ <CAFA6WYN5+NWKpPhnGHRnh_ZOF9A8K=MvbbSQ9uvc2Tv1expXcA@mail.gmail.com> <CAKv+Gu-Go=GwsO=_WvmTr-OZb4WMGGQrMb2joxX1Kzfhza3JiA@mail.gmail.com>
+In-Reply-To: <CAKv+Gu-Go=GwsO=_WvmTr-OZb4WMGGQrMb2joxX1Kzfhza3JiA@mail.gmail.com>
+From: Sumit Garg <sumit.garg@linaro.org>
+Date: Fri, 28 Dec 2018 18:33:22 +0530
+Message-ID: <CAFA6WYPm3_SZ59vOxceZkn0uzcJw3ECQZs5R_Ypz0ejpzTgAbQ@mail.gmail.com>
+Subject: Re: [PATCH v1 2/2] hwrng: add OP-TEE based rng driver
+To: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>,
+        Devicetree List <devicetree@vger.kernel.org>, mpm@selenic.com,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Daniel Thompson <daniel.thompson@linaro.org>,
+        Bhupesh Sharma <bhsharma@redhat.com>, tee-dev@lists.linaro.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Eric Biggers <ebiggers@google.com>
+On Fri, 28 Dec 2018 at 16:08, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+>
+> On Fri, 28 Dec 2018 at 10:58, Sumit Garg <sumit.garg@linaro.org> wrote:
+> >
+> > Thanks Ard for your comments.
+> >
+> > On Thu, 27 Dec 2018 at 23:58, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+> > >
+> > > On Thu, 27 Dec 2018 at 12:08, Sumit Garg <sumit.garg@linaro.org> wrote:
+> > > >
+> > > > On ARM SoC's with TrustZone enabled, peripherals like entropy sources
+> > > > might not be accessible to normal world (linux in this case) and rather
+> > > > accessible to secure world (OP-TEE in this case) only. So this driver
+> > > > aims to provides a generic interface to OP-TEE based random number
+> > > > generator service.
+> > > >
+> > > > Signed-off-by: Sumit Garg <sumit.garg@linaro.org>
+> > > > ---
+> > > >  MAINTAINERS                        |   5 +
+> > > >  drivers/char/hw_random/Kconfig     |  15 ++
+> > > >  drivers/char/hw_random/Makefile    |   1 +
+> > > >  drivers/char/hw_random/optee-rng.c | 273 +++++++++++++++++++++++++++++++++++++
+> > > >  4 files changed, 294 insertions(+)
+> > > >  create mode 100644 drivers/char/hw_random/optee-rng.c
+> > > >
+> > >
+> > > Hi Sumit,
+> > >
+> > > I am having some trouble with this driver. Even though the firmware
+> > > manages to invoke the pseudo-TA, the kernel driver responds with
+> > >
+> > > [   73.915971] tee_client_open_session failed, error: ffff0008
+> > >
+> >
+> > Please double check UUID in device tree (probably via dtc dump).
+> >
+>
+> I have added this to the DT:
+>
+> --- a/Silicon/Socionext/SynQuacer/DeviceTree/SynQuacer.dtsi
+> +++ b/Silicon/Socionext/SynQuacer/DeviceTree/SynQuacer.dtsi
+> @@ -583,6 +583,7 @@
+>              compatible = "linaro,optee-tz";
+>              method = "smc";
+>              status = "disabled";
+> +            rng-uuid = "ab7a617c-b8e7-4d8f-8301-d09b61036b64";
+>          };
+>      };
+>  };
+>
 
-Remove dead code related to internal IV generators, which are no longer
-used since they've been replaced with the "seqiv" and "echainiv"
-templates.  The removed code includes:
+It pretty strange as it could work well at my end. Can you please
+build optee_os with CFG_TEE_CORE_LOG_LEVEL=4 and share logs?
 
-- The "givcipher" (GIVCIPHER) algorithm type.  No algorithms are
-  registered with this type anymore, so it's unneeded.
+>
+> > > (note that I need to run teesupplicant or the insmod just hangs)
+> > >
+> >
+> > Actually OP-TEE tries to find TA in following order:
+> >
+> > 1. early/pseudo TAs (resident).
+> > 2. Dynamic TAs (loaded at runtime).
+> >
+> > So if it doesn't find early/pseudo TAs then it tries to load dynamic
+> > TAs via tee-supplicant. It seems that its probably stuck in
+> > "optee_supp_thrd_req" (drivers/tee/optee/supp.c +85) where it waits
+> > for supplicant to fulfil the request.
+> >
+> > I think this should be resolved via TEE bus driver approach that I
+> > have proposed in previous patch.
+> >
+>
+> It would be useful if we could detect the absence of teesupplicant
+> rather than wait indefinitely. Currenty, we cannot make the RNG driver
+> a builtin due to this, so please add 'depends on m' as a dependency if
+> we don't resolve this in the short term.
+>
 
-- The "const char *geniv" member of aead_alg, ablkcipher_alg, and
-  blkcipher_alg.  A few algorithms still set this, but it isn't used
-  anymore except to show via /proc/crypto and CRYPTO_MSG_GETALG.
-  Just hardcode "<default>" or "<none>" in those cases.
+By default this module is out of tree only (default m).
 
-- The 'skcipher_givcrypt_request' structure, which is never used.
+Jens,
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- Documentation/crypto/api.rst          |  9 ----
- Documentation/crypto/architecture.rst | 31 ++---------
- crypto/ablkcipher.c                   | 76 +--------------------------
- crypto/blkcipher.c                    |  6 +--
- crypto/cryptd.c                       |  4 +-
- crypto/ctr.c                          |  2 -
- crypto/skcipher.c                     |  6 +--
- drivers/crypto/bcm/cipher.c           |  1 -
- drivers/crypto/chelsio/chcr_algo.c    |  1 -
- drivers/crypto/ixp4xx_crypto.c        |  5 --
- drivers/crypto/nx/nx-aes-ctr.c        |  1 -
- drivers/crypto/omap-aes.c             |  1 -
- drivers/crypto/picoxcell_crypto.c     |  3 +-
- drivers/crypto/talitos.c              |  1 -
- include/crypto/aead.h                 |  3 --
- include/crypto/internal/skcipher.h    |  2 -
- include/crypto/skcipher.h             | 13 -----
- include/linux/crypto.h                | 34 ++----------
- 18 files changed, 17 insertions(+), 182 deletions(-)
+Is there any particular reason to wait indefinitely in
+"optee_supp_thrd_req" if there is no supplicant running? I think we
+should probably return as follows from "optee_supp_thrd_req" API in
+case no supplicant is available:
 
-diff --git a/Documentation/crypto/api.rst b/Documentation/crypto/api.rst
-index 2e519193ab4a4..b91b31736df8b 100644
---- a/Documentation/crypto/api.rst
-+++ b/Documentation/crypto/api.rst
-@@ -1,15 +1,6 @@
- Programming Interface
- =====================
- 
--Please note that the kernel crypto API contains the AEAD givcrypt API
--(crypto_aead_giv\* and aead_givcrypt\* function calls in
--include/crypto/aead.h). This API is obsolete and will be removed in the
--future. To obtain the functionality of an AEAD cipher with internal IV
--generation, use the IV generator as a regular cipher. For example,
--rfc4106(gcm(aes)) is the AEAD cipher with external IV generation and
--seqniv(rfc4106(gcm(aes))) implies that the kernel crypto API generates
--the IV. Different IV generators are available.
--
- .. class:: toc-title
- 
- 	   Table of contents
-diff --git a/Documentation/crypto/architecture.rst b/Documentation/crypto/architecture.rst
-index ca2d09b991f5d..ee8ff0762d7fa 100644
---- a/Documentation/crypto/architecture.rst
-+++ b/Documentation/crypto/architecture.rst
-@@ -157,10 +157,6 @@ applicable to a cipher, it is not displayed:
- 
-    -  rng for random number generator
- 
--   -  givcipher for cipher with associated IV generator (see the geniv
--      entry below for the specification of the IV generator type used by
--      the cipher implementation)
--
-    -  kpp for a Key-agreement Protocol Primitive (KPP) cipher such as
-       an ECDH or DH implementation
- 
-@@ -174,16 +170,7 @@ applicable to a cipher, it is not displayed:
- 
- -  digestsize: output size of the message digest
- 
---  geniv: IV generation type:
--
--   -  eseqiv for encrypted sequence number based IV generation
--
--   -  seqiv for sequence number based IV generation
--
--   -  chainiv for chain iv generation
--
--   -  <builtin> is a marker that the cipher implements IV generation and
--      handling as it is specific to the given cipher
-+-  geniv: IV generator (obsolete)
- 
- Key Sizes
- ---------
-@@ -218,10 +205,6 @@ the aforementioned cipher types:
- 
- -  CRYPTO_ALG_TYPE_ABLKCIPHER Asynchronous multi-block cipher
- 
---  CRYPTO_ALG_TYPE_GIVCIPHER Asynchronous multi-block cipher packed
--   together with an IV generator (see geniv field in the /proc/crypto
--   listing for the known IV generators)
--
- -  CRYPTO_ALG_TYPE_KPP Key-agreement Protocol Primitive (KPP) such as
-    an ECDH or DH implementation
- 
-@@ -338,18 +321,14 @@ uses the API applicable to the cipher type specified for the block.
- 
- The following call sequence is applicable when the IPSEC layer triggers
- an encryption operation with the esp_output function. During
--configuration, the administrator set up the use of rfc4106(gcm(aes)) as
--the cipher for ESP. The following call sequence is now depicted in the
--ASCII art above:
-+configuration, the administrator set up the use of seqiv(rfc4106(gcm(aes)))
-+as the cipher for ESP. The following call sequence is now depicted in
-+the ASCII art above:
- 
- 1. esp_output() invokes crypto_aead_encrypt() to trigger an
-    encryption operation of the AEAD cipher with IV generator.
- 
--   In case of GCM, the SEQIV implementation is registered as GIVCIPHER
--   in crypto_rfc4106_alloc().
--
--   The SEQIV performs its operation to generate an IV where the core
--   function is seqiv_geniv().
-+   The SEQIV generates the IV.
- 
- 2. Now, SEQIV uses the AEAD API function calls to invoke the associated
-    AEAD cipher. In our case, during the instantiation of SEQIV, the
-diff --git a/crypto/ablkcipher.c b/crypto/ablkcipher.c
-index b5e9ce19d324e..b339587073c3e 100644
---- a/crypto/ablkcipher.c
-+++ b/crypto/ablkcipher.c
-@@ -368,8 +368,7 @@ static int crypto_ablkcipher_report(struct sk_buff *skb, struct crypto_alg *alg)
- 	memset(&rblkcipher, 0, sizeof(rblkcipher));
- 
- 	strscpy(rblkcipher.type, "ablkcipher", sizeof(rblkcipher.type));
--	strscpy(rblkcipher.geniv, alg->cra_ablkcipher.geniv ?: "<default>",
--		sizeof(rblkcipher.geniv));
-+	strscpy(rblkcipher.geniv, "<default>", sizeof(rblkcipher.geniv));
- 
- 	rblkcipher.blocksize = alg->cra_blocksize;
- 	rblkcipher.min_keysize = alg->cra_ablkcipher.min_keysize;
-@@ -399,7 +398,7 @@ static void crypto_ablkcipher_show(struct seq_file *m, struct crypto_alg *alg)
- 	seq_printf(m, "min keysize  : %u\n", ablkcipher->min_keysize);
- 	seq_printf(m, "max keysize  : %u\n", ablkcipher->max_keysize);
- 	seq_printf(m, "ivsize       : %u\n", ablkcipher->ivsize);
--	seq_printf(m, "geniv        : %s\n", ablkcipher->geniv ?: "<default>");
-+	seq_printf(m, "geniv        : <default>\n");
- }
- 
- const struct crypto_type crypto_ablkcipher_type = {
-@@ -411,74 +410,3 @@ const struct crypto_type crypto_ablkcipher_type = {
- 	.report = crypto_ablkcipher_report,
- };
- EXPORT_SYMBOL_GPL(crypto_ablkcipher_type);
--
--static int crypto_init_givcipher_ops(struct crypto_tfm *tfm, u32 type,
--				      u32 mask)
--{
--	struct ablkcipher_alg *alg = &tfm->__crt_alg->cra_ablkcipher;
--	struct ablkcipher_tfm *crt = &tfm->crt_ablkcipher;
--
--	if (alg->ivsize > PAGE_SIZE / 8)
--		return -EINVAL;
--
--	crt->setkey = tfm->__crt_alg->cra_flags & CRYPTO_ALG_GENIV ?
--		      alg->setkey : setkey;
--	crt->encrypt = alg->encrypt;
--	crt->decrypt = alg->decrypt;
--	crt->base = __crypto_ablkcipher_cast(tfm);
--	crt->ivsize = alg->ivsize;
--
--	return 0;
--}
--
--#ifdef CONFIG_NET
--static int crypto_givcipher_report(struct sk_buff *skb, struct crypto_alg *alg)
--{
--	struct crypto_report_blkcipher rblkcipher;
--
--	memset(&rblkcipher, 0, sizeof(rblkcipher));
--
--	strscpy(rblkcipher.type, "givcipher", sizeof(rblkcipher.type));
--	strscpy(rblkcipher.geniv, alg->cra_ablkcipher.geniv ?: "<built-in>",
--		sizeof(rblkcipher.geniv));
--
--	rblkcipher.blocksize = alg->cra_blocksize;
--	rblkcipher.min_keysize = alg->cra_ablkcipher.min_keysize;
--	rblkcipher.max_keysize = alg->cra_ablkcipher.max_keysize;
--	rblkcipher.ivsize = alg->cra_ablkcipher.ivsize;
--
--	return nla_put(skb, CRYPTOCFGA_REPORT_BLKCIPHER,
--		       sizeof(rblkcipher), &rblkcipher);
--}
--#else
--static int crypto_givcipher_report(struct sk_buff *skb, struct crypto_alg *alg)
--{
--	return -ENOSYS;
--}
--#endif
--
--static void crypto_givcipher_show(struct seq_file *m, struct crypto_alg *alg)
--	__maybe_unused;
--static void crypto_givcipher_show(struct seq_file *m, struct crypto_alg *alg)
--{
--	struct ablkcipher_alg *ablkcipher = &alg->cra_ablkcipher;
--
--	seq_printf(m, "type         : givcipher\n");
--	seq_printf(m, "async        : %s\n", alg->cra_flags & CRYPTO_ALG_ASYNC ?
--					     "yes" : "no");
--	seq_printf(m, "blocksize    : %u\n", alg->cra_blocksize);
--	seq_printf(m, "min keysize  : %u\n", ablkcipher->min_keysize);
--	seq_printf(m, "max keysize  : %u\n", ablkcipher->max_keysize);
--	seq_printf(m, "ivsize       : %u\n", ablkcipher->ivsize);
--	seq_printf(m, "geniv        : %s\n", ablkcipher->geniv ?: "<built-in>");
--}
--
--const struct crypto_type crypto_givcipher_type = {
--	.ctxsize = crypto_ablkcipher_ctxsize,
--	.init = crypto_init_givcipher_ops,
--#ifdef CONFIG_PROC_FS
--	.show = crypto_givcipher_show,
--#endif
--	.report = crypto_givcipher_report,
--};
--EXPORT_SYMBOL_GPL(crypto_givcipher_type);
-diff --git a/crypto/blkcipher.c b/crypto/blkcipher.c
-index 193237514e902..c5398bd54942c 100644
---- a/crypto/blkcipher.c
-+++ b/crypto/blkcipher.c
-@@ -510,8 +510,7 @@ static int crypto_blkcipher_report(struct sk_buff *skb, struct crypto_alg *alg)
- 	memset(&rblkcipher, 0, sizeof(rblkcipher));
- 
- 	strscpy(rblkcipher.type, "blkcipher", sizeof(rblkcipher.type));
--	strscpy(rblkcipher.geniv, alg->cra_blkcipher.geniv ?: "<default>",
--		sizeof(rblkcipher.geniv));
-+	strscpy(rblkcipher.geniv, "<default>", sizeof(rblkcipher.geniv));
- 
- 	rblkcipher.blocksize = alg->cra_blocksize;
- 	rblkcipher.min_keysize = alg->cra_blkcipher.min_keysize;
-@@ -537,8 +536,7 @@ static void crypto_blkcipher_show(struct seq_file *m, struct crypto_alg *alg)
- 	seq_printf(m, "min keysize  : %u\n", alg->cra_blkcipher.min_keysize);
- 	seq_printf(m, "max keysize  : %u\n", alg->cra_blkcipher.max_keysize);
- 	seq_printf(m, "ivsize       : %u\n", alg->cra_blkcipher.ivsize);
--	seq_printf(m, "geniv        : %s\n", alg->cra_blkcipher.geniv ?:
--					     "<default>");
-+	seq_printf(m, "geniv        : <default>\n");
- }
- 
- const struct crypto_type crypto_blkcipher_type = {
-diff --git a/crypto/cryptd.c b/crypto/cryptd.c
-index 7118fb5efbaad..5640e5db7bdbf 100644
---- a/crypto/cryptd.c
-+++ b/crypto/cryptd.c
-@@ -422,8 +422,6 @@ static int cryptd_create_blkcipher(struct crypto_template *tmpl,
- 	inst->alg.cra_ablkcipher.min_keysize = alg->cra_blkcipher.min_keysize;
- 	inst->alg.cra_ablkcipher.max_keysize = alg->cra_blkcipher.max_keysize;
- 
--	inst->alg.cra_ablkcipher.geniv = alg->cra_blkcipher.geniv;
--
- 	inst->alg.cra_ctxsize = sizeof(struct cryptd_blkcipher_ctx);
- 
- 	inst->alg.cra_init = cryptd_blkcipher_init_tfm;
-@@ -1174,7 +1172,7 @@ struct cryptd_ablkcipher *cryptd_alloc_ablkcipher(const char *alg_name,
- 		return ERR_PTR(-EINVAL);
- 	type = crypto_skcipher_type(type);
- 	mask &= ~CRYPTO_ALG_TYPE_MASK;
--	mask |= (CRYPTO_ALG_GENIV | CRYPTO_ALG_TYPE_BLKCIPHER_MASK);
-+	mask |= CRYPTO_ALG_TYPE_BLKCIPHER_MASK;
- 	tfm = crypto_alloc_base(cryptd_alg_name, type, mask);
- 	if (IS_ERR(tfm))
- 		return ERR_CAST(tfm);
-diff --git a/crypto/ctr.c b/crypto/ctr.c
-index 435b75bd619e4..30f3946efc6da 100644
---- a/crypto/ctr.c
-+++ b/crypto/ctr.c
-@@ -233,8 +233,6 @@ static struct crypto_instance *crypto_ctr_alloc(struct rtattr **tb)
- 	inst->alg.cra_blkcipher.encrypt = crypto_ctr_crypt;
- 	inst->alg.cra_blkcipher.decrypt = crypto_ctr_crypt;
- 
--	inst->alg.cra_blkcipher.geniv = "chainiv";
--
- out:
- 	crypto_mod_put(alg);
- 	return inst;
-diff --git a/crypto/skcipher.c b/crypto/skcipher.c
-index 41b4f7f27f454..2a969296bc248 100644
---- a/crypto/skcipher.c
-+++ b/crypto/skcipher.c
-@@ -579,8 +579,7 @@ static unsigned int crypto_skcipher_extsize(struct crypto_alg *alg)
- 	if (alg->cra_type == &crypto_blkcipher_type)
- 		return sizeof(struct crypto_blkcipher *);
- 
--	if (alg->cra_type == &crypto_ablkcipher_type ||
--	    alg->cra_type == &crypto_givcipher_type)
-+	if (alg->cra_type == &crypto_ablkcipher_type)
- 		return sizeof(struct crypto_ablkcipher *);
- 
- 	return crypto_alg_extsize(alg);
-@@ -844,8 +843,7 @@ static int crypto_skcipher_init_tfm(struct crypto_tfm *tfm)
- 	if (tfm->__crt_alg->cra_type == &crypto_blkcipher_type)
- 		return crypto_init_skcipher_ops_blkcipher(tfm);
- 
--	if (tfm->__crt_alg->cra_type == &crypto_ablkcipher_type ||
--	    tfm->__crt_alg->cra_type == &crypto_givcipher_type)
-+	if (tfm->__crt_alg->cra_type == &crypto_ablkcipher_type)
- 		return crypto_init_skcipher_ops_ablkcipher(tfm);
- 
- 	skcipher->setkey = skcipher_setkey;
-diff --git a/drivers/crypto/bcm/cipher.c b/drivers/crypto/bcm/cipher.c
-index 2ce3a16d3d10f..c9393ffb70ed8 100644
---- a/drivers/crypto/bcm/cipher.c
-+++ b/drivers/crypto/bcm/cipher.c
-@@ -3868,7 +3868,6 @@ static struct iproc_alg_s driver_algs[] = {
- 			.cra_driver_name = "ctr-aes-iproc",
- 			.cra_blocksize = AES_BLOCK_SIZE,
- 			.cra_ablkcipher = {
--					   /* .geniv = "chainiv", */
- 					   .min_keysize = AES_MIN_KEY_SIZE,
- 					   .max_keysize = AES_MAX_KEY_SIZE,
- 					   .ivsize = AES_BLOCK_SIZE,
-diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
-index 497c57803de71..df43abfea256f 100644
---- a/drivers/crypto/chelsio/chcr_algo.c
-+++ b/drivers/crypto/chelsio/chcr_algo.c
-@@ -3722,7 +3722,6 @@ static struct chcr_alg_template driver_algs[] = {
- 				.setkey		= chcr_aes_rfc3686_setkey,
- 				.encrypt	= chcr_aes_encrypt,
- 				.decrypt	= chcr_aes_decrypt,
--				.geniv          = "seqiv",
- 			}
- 		}
- 	},
-diff --git a/drivers/crypto/ixp4xx_crypto.c b/drivers/crypto/ixp4xx_crypto.c
-index 27f7dad2d45d9..19fba998b86b4 100644
---- a/drivers/crypto/ixp4xx_crypto.c
-+++ b/drivers/crypto/ixp4xx_crypto.c
-@@ -1194,7 +1194,6 @@ static struct ixp_alg ixp4xx_algos[] = {
- 			.min_keysize	= DES_KEY_SIZE,
- 			.max_keysize	= DES_KEY_SIZE,
- 			.ivsize		= DES_BLOCK_SIZE,
--			.geniv		= "eseqiv",
- 			}
- 		}
- 	},
-@@ -1221,7 +1220,6 @@ static struct ixp_alg ixp4xx_algos[] = {
- 			.min_keysize	= DES3_EDE_KEY_SIZE,
- 			.max_keysize	= DES3_EDE_KEY_SIZE,
- 			.ivsize		= DES3_EDE_BLOCK_SIZE,
--			.geniv		= "eseqiv",
- 			}
- 		}
- 	},
-@@ -1247,7 +1245,6 @@ static struct ixp_alg ixp4xx_algos[] = {
- 			.min_keysize	= AES_MIN_KEY_SIZE,
- 			.max_keysize	= AES_MAX_KEY_SIZE,
- 			.ivsize		= AES_BLOCK_SIZE,
--			.geniv		= "eseqiv",
- 			}
- 		}
- 	},
-@@ -1273,7 +1270,6 @@ static struct ixp_alg ixp4xx_algos[] = {
- 			.min_keysize	= AES_MIN_KEY_SIZE,
- 			.max_keysize	= AES_MAX_KEY_SIZE,
- 			.ivsize		= AES_BLOCK_SIZE,
--			.geniv		= "eseqiv",
- 			}
- 		}
- 	},
-@@ -1287,7 +1283,6 @@ static struct ixp_alg ixp4xx_algos[] = {
- 			.min_keysize	= AES_MIN_KEY_SIZE,
- 			.max_keysize	= AES_MAX_KEY_SIZE,
- 			.ivsize		= AES_BLOCK_SIZE,
--			.geniv		= "eseqiv",
- 			.setkey		= ablk_rfc3686_setkey,
- 			.encrypt	= ablk_rfc3686_crypt,
- 			.decrypt	= ablk_rfc3686_crypt }
-diff --git a/drivers/crypto/nx/nx-aes-ctr.c b/drivers/crypto/nx/nx-aes-ctr.c
-index 898c0a280511d..5a26fcd75d2df 100644
---- a/drivers/crypto/nx/nx-aes-ctr.c
-+++ b/drivers/crypto/nx/nx-aes-ctr.c
-@@ -159,7 +159,6 @@ struct crypto_alg nx_ctr3686_aes_alg = {
- 		.min_keysize = AES_MIN_KEY_SIZE + CTR_RFC3686_NONCE_SIZE,
- 		.max_keysize = AES_MAX_KEY_SIZE + CTR_RFC3686_NONCE_SIZE,
- 		.ivsize      = CTR_RFC3686_IV_SIZE,
--		.geniv       = "seqiv",
- 		.setkey      = ctr3686_aes_nx_set_key,
- 		.encrypt     = ctr3686_aes_nx_crypt,
- 		.decrypt     = ctr3686_aes_nx_crypt,
-diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
-index 4c0ea81429232..0120feb2d7462 100644
---- a/drivers/crypto/omap-aes.c
-+++ b/drivers/crypto/omap-aes.c
-@@ -749,7 +749,6 @@ static struct crypto_alg algs_ctr[] = {
- 	.cra_u.ablkcipher = {
- 		.min_keysize	= AES_MIN_KEY_SIZE,
- 		.max_keysize	= AES_MAX_KEY_SIZE,
--		.geniv		= "eseqiv",
- 		.ivsize		= AES_BLOCK_SIZE,
- 		.setkey		= omap_aes_setkey,
- 		.encrypt	= omap_aes_ctr_encrypt,
-diff --git a/drivers/crypto/picoxcell_crypto.c b/drivers/crypto/picoxcell_crypto.c
-index a28f1d18fe01f..17068b55fea53 100644
---- a/drivers/crypto/picoxcell_crypto.c
-+++ b/drivers/crypto/picoxcell_crypto.c
-@@ -1585,8 +1585,7 @@ static struct spacc_alg l2_engine_algs[] = {
- 			.cra_name = "f8(kasumi)",
- 			.cra_driver_name = "f8-kasumi-picoxcell",
- 			.cra_priority = SPACC_CRYPTO_ALG_PRIORITY,
--			.cra_flags = CRYPTO_ALG_TYPE_GIVCIPHER |
--					CRYPTO_ALG_ASYNC |
-+			.cra_flags = CRYPTO_ALG_ASYNC |
- 					CRYPTO_ALG_KERN_DRIVER_ONLY,
- 			.cra_blocksize = 8,
- 			.cra_ctxsize = sizeof(struct spacc_ablk_ctx),
-diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index 6988012deca4c..45e20707cef8d 100644
---- a/drivers/crypto/talitos.c
-+++ b/drivers/crypto/talitos.c
-@@ -3155,7 +3155,6 @@ static struct talitos_crypto_alg *talitos_alg_alloc(struct device *dev,
- 		alg->cra_ablkcipher.setkey = ablkcipher_setkey;
- 		alg->cra_ablkcipher.encrypt = ablkcipher_encrypt;
- 		alg->cra_ablkcipher.decrypt = ablkcipher_decrypt;
--		alg->cra_ablkcipher.geniv = "eseqiv";
- 		break;
- 	case CRYPTO_ALG_TYPE_AEAD:
- 		alg = &t_alg->algt.alg.aead.base;
-diff --git a/include/crypto/aead.h b/include/crypto/aead.h
-index b7b8d24cf765f..9ad595f97c65a 100644
---- a/include/crypto/aead.h
-+++ b/include/crypto/aead.h
-@@ -115,7 +115,6 @@ struct aead_request {
-  * @setkey: see struct skcipher_alg
-  * @encrypt: see struct skcipher_alg
-  * @decrypt: see struct skcipher_alg
-- * @geniv: see struct skcipher_alg
-  * @ivsize: see struct skcipher_alg
-  * @chunksize: see struct skcipher_alg
-  * @init: Initialize the cryptographic transformation object. This function
-@@ -142,8 +141,6 @@ struct aead_alg {
- 	int (*init)(struct crypto_aead *tfm);
- 	void (*exit)(struct crypto_aead *tfm);
- 
--	const char *geniv;
--
- 	unsigned int ivsize;
- 	unsigned int maxauthsize;
- 	unsigned int chunksize;
-diff --git a/include/crypto/internal/skcipher.h b/include/crypto/internal/skcipher.h
-index e42f7063f245b..453e867b4bd92 100644
---- a/include/crypto/internal/skcipher.h
-+++ b/include/crypto/internal/skcipher.h
-@@ -70,8 +70,6 @@ struct skcipher_walk {
- 	unsigned int alignmask;
- };
- 
--extern const struct crypto_type crypto_givcipher_type;
--
- static inline struct crypto_instance *skcipher_crypto_instance(
- 	struct skcipher_instance *inst)
+--- a/drivers/tee/optee/supp.c
++++ b/drivers/tee/optee/supp.c
+@@ -88,10 +88,15 @@ u32 optee_supp_thrd_req(struct tee_context *ctx,
+u32 func, size_t num_params,
  {
-diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
-index 480f8301a47db..e555294ed77fe 100644
---- a/include/crypto/skcipher.h
-+++ b/include/crypto/skcipher.h
-@@ -39,19 +39,6 @@ struct skcipher_request {
- 	void *__ctx[] CRYPTO_MINALIGN_ATTR;
- };
- 
--/**
-- *	struct skcipher_givcrypt_request - Crypto request with IV generation
-- *	@seq: Sequence number for IV generation
-- *	@giv: Space for generated IV
-- *	@creq: The crypto request itself
-- */
--struct skcipher_givcrypt_request {
--	u64 seq;
--	u8 *giv;
--
--	struct ablkcipher_request creq;
--};
--
- struct crypto_skcipher {
- 	int (*setkey)(struct crypto_skcipher *tfm, const u8 *key,
- 	              unsigned int keylen);
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index 9850b41e38ae6..c2f5baed522cc 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -49,7 +49,6 @@
- #define CRYPTO_ALG_TYPE_BLKCIPHER	0x00000004
- #define CRYPTO_ALG_TYPE_ABLKCIPHER	0x00000005
- #define CRYPTO_ALG_TYPE_SKCIPHER	0x00000005
--#define CRYPTO_ALG_TYPE_GIVCIPHER	0x00000006
- #define CRYPTO_ALG_TYPE_KPP		0x00000008
- #define CRYPTO_ALG_TYPE_ACOMPRESS	0x0000000a
- #define CRYPTO_ALG_TYPE_SCOMPRESS	0x0000000b
-@@ -76,12 +75,6 @@
-  */
- #define CRYPTO_ALG_NEED_FALLBACK	0x00000100
- 
--/*
-- * This bit is set for symmetric key ciphers that have already been wrapped
-- * with a generic IV generator to prevent them from being wrapped again.
-- */
--#define CRYPTO_ALG_GENIV		0x00000200
--
- /*
-  * Set if the algorithm has passed automated run-time testing.  Note that
-  * if there is no run-time testing for a given algorithm it is considered
-@@ -157,7 +150,6 @@ struct crypto_async_request;
- struct crypto_blkcipher;
- struct crypto_tfm;
- struct crypto_type;
--struct skcipher_givcrypt_request;
- 
- typedef void (*crypto_completion_t)(struct crypto_async_request *req, int err);
- 
-@@ -246,31 +238,16 @@ struct cipher_desc {
-  *	     be called in parallel with the same transformation object.
-  * @decrypt: Decrypt a single block. This is a reverse counterpart to @encrypt
-  *	     and the conditions are exactly the same.
-- * @givencrypt: Update the IV for encryption. With this function, a cipher
-- *	        implementation may provide the function on how to update the IV
-- *	        for encryption.
-- * @givdecrypt: Update the IV for decryption. This is the reverse of
-- *	        @givencrypt .
-- * @geniv: The transformation implementation may use an "IV generator" provided
-- *	   by the kernel crypto API. Several use cases have a predefined
-- *	   approach how IVs are to be updated. For such use cases, the kernel
-- *	   crypto API provides ready-to-use implementations that can be
-- *	   referenced with this variable.
-  * @ivsize: IV size applicable for transformation. The consumer must provide an
-  *	    IV of exactly that size to perform the encrypt or decrypt operation.
-  *
-- * All fields except @givencrypt , @givdecrypt , @geniv and @ivsize are
-- * mandatory and must be filled.
-+ * All fields except @ivsize are mandatory and must be filled.
-  */
- struct ablkcipher_alg {
- 	int (*setkey)(struct crypto_ablkcipher *tfm, const u8 *key,
- 	              unsigned int keylen);
- 	int (*encrypt)(struct ablkcipher_request *req);
- 	int (*decrypt)(struct ablkcipher_request *req);
--	int (*givencrypt)(struct skcipher_givcrypt_request *req);
--	int (*givdecrypt)(struct skcipher_givcrypt_request *req);
--
--	const char *geniv;
- 
- 	unsigned int min_keysize;
- 	unsigned int max_keysize;
-@@ -284,10 +261,9 @@ struct ablkcipher_alg {
-  * @setkey: see struct ablkcipher_alg
-  * @encrypt: see struct ablkcipher_alg
-  * @decrypt: see struct ablkcipher_alg
-- * @geniv: see struct ablkcipher_alg
-  * @ivsize: see struct ablkcipher_alg
-  *
-- * All fields except @geniv and @ivsize are mandatory and must be filled.
-+ * All fields except @ivsize are mandatory and must be filled.
-  */
- struct blkcipher_alg {
- 	int (*setkey)(struct crypto_tfm *tfm, const u8 *key,
-@@ -299,8 +275,6 @@ struct blkcipher_alg {
- 		       struct scatterlist *dst, struct scatterlist *src,
- 		       unsigned int nbytes);
- 
--	const char *geniv;
--
- 	unsigned int min_keysize;
- 	unsigned int max_keysize;
- 	unsigned int ivsize;
-@@ -924,14 +898,14 @@ static inline struct crypto_ablkcipher *__crypto_ablkcipher_cast(
- 
- static inline u32 crypto_skcipher_type(u32 type)
- {
--	type &= ~(CRYPTO_ALG_TYPE_MASK | CRYPTO_ALG_GENIV);
-+	type &= ~CRYPTO_ALG_TYPE_MASK;
- 	type |= CRYPTO_ALG_TYPE_BLKCIPHER;
- 	return type;
- }
- 
- static inline u32 crypto_skcipher_mask(u32 mask)
- {
--	mask &= ~(CRYPTO_ALG_TYPE_MASK | CRYPTO_ALG_GENIV);
-+	mask &= ~CRYPTO_ALG_TYPE_MASK;
- 	mask |= CRYPTO_ALG_TYPE_BLKCIPHER_MASK;
- 	return mask;
- }
--- 
-2.19.2
+        struct optee *optee = tee_get_drvdata(ctx->teedev);
+        struct optee_supp *supp = &optee->supp;
+-       struct optee_supp_req *req = kzalloc(sizeof(*req), GFP_KERNEL);
++       struct optee_supp_req *req;
+        bool interruptable;
+        u32 ret;
+
++       /* Return in case there is no supplicant available */
++       if (!supp->ctx)
++               return TEEC_ERROR_COMMUNICATION;
++
++       req = kzalloc(sizeof(*req), GFP_KERNEL);
+        if (!req)
+                return TEEC_ERROR_OUT_OF_MEMORY;
+
+> > > Also, I have some concerns about the DT dependency (see my comment on
+> > > the previous patch)
+> > > I will cc you on some patches I have to expose OP-TEE via ACPI (as
+> > > well as DT) as a platform device. I'd prefer it if we could do the
+> > > same for this driver in one way or the other.
+> > >
+> >
+> > Probably via TEE bus driver approach we may get rid of DT or ACPI
+> > dependency. BTW, I will switch to platform device as it looks more
+> > appropriate.
+> >
+>
+> The bus driver approach only makes sense if we can enumerate the
+> available TAs, rather than describe them via the DT or ACPI tables.
+>
+> But a child node with its own compatible string is an improvement in
+> any case, and you can let the driver core instantiate the platform
+> device for you.
+>
+
+Ok then I will keep DT or ACPI child node.
+
+-Sumit
+
+> > > > diff --git a/MAINTAINERS b/MAINTAINERS
+> > > > index 0767f1d..fe0fb74 100644
+> > > > --- a/MAINTAINERS
+> > > > +++ b/MAINTAINERS
+> > > > @@ -11100,6 +11100,11 @@ M:     Jens Wiklander <jens.wiklander@linaro.org>
+> > > >  S:     Maintained
+> > > >  F:     drivers/tee/optee/
+> > > >
+> > > > +OP-TEE RANDOM NUMBER GENERATOR (RNG) DRIVER
+> > > > +M:     Sumit Garg <sumit.garg@linaro.org>
+> > > > +S:     Maintained
+> > > > +F:     drivers/char/hw_random/optee-rng.c
+> > > > +
+> > > >  OPA-VNIC DRIVER
+> > > >  M:     Dennis Dalessandro <dennis.dalessandro@intel.com>
+> > > >  M:     Niranjana Vishwanathapura <niranjana.vishwanathapura@intel.com>
+> > > > diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+> > > > index dac895d..25a7d8f 100644
+> > > > --- a/drivers/char/hw_random/Kconfig
+> > > > +++ b/drivers/char/hw_random/Kconfig
+> > > > @@ -424,6 +424,21 @@ config HW_RANDOM_EXYNOS
+> > > >           will be called exynos-trng.
+> > > >
+> > > >           If unsure, say Y.
+> > > > +
+> > > > +config HW_RANDOM_OPTEE
+> > > > +       tristate "OP-TEE based Random Number Generator support"
+> > > > +       depends on OPTEE
+> > > > +       default HW_RANDOM
+> > > > +       help
+> > > > +         This  driver provides support for OP-TEE based Random Number
+> > > > +         Generator on ARM SoCs where hardware entropy sources are not
+> > > > +         accessible to normal world (Linux).
+> > > > +
+> > > > +         To compile this driver as a module, choose M here: the module
+> > > > +         will be called optee-rng.
+> > > > +
+> > > > +         If unsure, say Y.
+> > > > +
+> > > >  endif # HW_RANDOM
+> > > >
+> > > >  config UML_RANDOM
+> > > > diff --git a/drivers/char/hw_random/Makefile b/drivers/char/hw_random/Makefile
+> > > > index e35ec3c..7c9ef4a 100644
+> > > > --- a/drivers/char/hw_random/Makefile
+> > > > +++ b/drivers/char/hw_random/Makefile
+> > > > @@ -38,3 +38,4 @@ obj-$(CONFIG_HW_RANDOM_CAVIUM) += cavium-rng.o cavium-rng-vf.o
+> > > >  obj-$(CONFIG_HW_RANDOM_MTK)    += mtk-rng.o
+> > > >  obj-$(CONFIG_HW_RANDOM_S390) += s390-trng.o
+> > > >  obj-$(CONFIG_HW_RANDOM_KEYSTONE) += ks-sa-rng.o
+> > > > +obj-$(CONFIG_HW_RANDOM_OPTEE) += optee-rng.o
+> > > > diff --git a/drivers/char/hw_random/optee-rng.c b/drivers/char/hw_random/optee-rng.c
+> > > > new file mode 100644
+> > > > index 0000000..8c63730
+> > > > --- /dev/null
+> > > > +++ b/drivers/char/hw_random/optee-rng.c
+> > > > @@ -0,0 +1,273 @@
+> > > > +// SPDX-License-Identifier: GPL-2.0
+> > > > +/*
+> > > > + * Copyright (C) 2018 Linaro Ltd.
+> > > > + */
+> > > > +
+> > > > +#include <linux/delay.h>
+> > > > +#include <linux/of.h>
+> > > > +#include <linux/hw_random.h>
+> > > > +#include <linux/kernel.h>
+> > > > +#include <linux/module.h>
+> > > > +#include <linux/tee_drv.h>
+> > > > +#include <linux/uuid.h>
+> > > > +
+> > > > +#define TEE_ERROR_HEALTH_TEST_FAIL     0x00000001
+> > > > +
+> > > > +/*
+> > > > + * TA_CMD_GET_ENTROPY - Get Entropy from RNG
+> > > > + *
+> > > > + * param[0] (inout memref) - Entropy buffer memory reference
+> > > > + * param[1] unused
+> > > > + * param[2] unused
+> > > > + * param[3] unused
+> > > > + *
+> > > > + * Result:
+> > > > + * TEE_SUCCESS - Invoke command success
+> > > > + * TEE_ERROR_BAD_PARAMETERS - Incorrect input param
+> > > > + * TEE_ERROR_NOT_SUPPORTED - Requested entropy size greater than size of pool
+> > > > + * TEE_ERROR_HEALTH_TEST_FAIL - Continuous health testing failed
+> > > > + */
+> > > > +#define TA_CMD_GET_ENTROPY             0x0
+> > > > +
+> > > > +/*
+> > > > + * TA_CMD_GET_RNG_INFO - Get RNG information
+> > > > + *
+> > > > + * param[0] (out value) - value.a: RNG data-rate in bytes per second
+> > > > + *                        value.b: Quality/Entropy per 1024 bit of data
+> > > > + * param[1] unused
+> > > > + * param[2] unused
+> > > > + * param[3] unused
+> > > > + *
+> > > > + * Result:
+> > > > + * TEE_SUCCESS - Invoke command success
+> > > > + * TEE_ERROR_BAD_PARAMETERS - Incorrect input param
+> > > > + */
+> > > > +#define TA_CMD_GET_RNG_INFO            0x1
+> > > > +
+> > > > +#define MAX_ENTROPY_REQ_SZ             (4 * 1024)
+> > > > +
+> > > > +static struct tee_context *ctx;
+> > > > +static struct tee_shm *entropy_shm_pool;
+> > > > +static u32 ta_rng_data_rate;
+> > > > +static u32 ta_rng_seesion_id;
+> > >
+> > > session not seesion
+> > >
+> >
+> > Will fix.
+> >
+> > > > +
+> > > > +static size_t get_optee_rng_data(void *buf, size_t req_size)
+> > > > +{
+> > > > +       u32 ret = 0;
+> > > > +       u8 *rng_data = NULL;
+> > > > +       size_t rng_size = 0;
+> > > > +       struct tee_ioctl_invoke_arg inv_arg = {0};
+> > > > +       struct tee_param param[4] = {0};
+> > > > +
+> > > > +       /* Invoke TA_CMD_GET_RNG function of Trusted App */
+> > > > +       inv_arg.func = TA_CMD_GET_ENTROPY;
+> > > > +       inv_arg.session = ta_rng_seesion_id;
+> > > > +       inv_arg.num_params = 4;
+> > > > +
+> > > > +       /* Fill invoke cmd params */
+> > > > +       param[0].attr = TEE_IOCTL_PARAM_ATTR_TYPE_MEMREF_INOUT;
+> > > > +       param[0].u.memref.shm = entropy_shm_pool;
+> > > > +       param[0].u.memref.size = req_size;
+> > > > +       param[0].u.memref.shm_offs = 0;
+> > > > +
+> > > > +       ret = tee_client_invoke_func(ctx, &inv_arg, param);
+> > > > +       if ((ret < 0) || (inv_arg.ret != 0)) {
+> > > > +               pr_err("TA_CMD_GET_ENTROPY invoke function error: %x\n",
+> > > > +                      inv_arg.ret);
+> > > > +               return 0;
+> > > > +       }
+> > > > +
+> > > > +       rng_data = tee_shm_get_va(entropy_shm_pool, 0);
+> > > > +       if (IS_ERR(rng_data)) {
+> > > > +               pr_err("tee_shm_get_va failed\n");
+> > > > +               return 0;
+> > > > +       }
+> > > > +
+> > > > +       rng_size = param[0].u.memref.size;
+> > > > +       memcpy(buf, rng_data, rng_size);
+> > > > +
+> > > > +       return rng_size;
+> > > > +}
+> > > > +
+> > > > +static int optee_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
+> > > > +{
+> > > > +       u8 *data = buf;
+> > > > +       size_t read = 0, rng_size = 0;
+> > > > +       int timeout = 1;
+> > > > +
+> > > > +       if (max > MAX_ENTROPY_REQ_SZ)
+> > > > +               max = MAX_ENTROPY_REQ_SZ;
+> > > > +
+> > > > +       while (read == 0) {
+> > > > +               rng_size = get_optee_rng_data(data, (max - read));
+> > > > +
+> > > > +               data += rng_size;
+> > > > +               read += rng_size;
+> > > > +
+> > > > +               if (wait) {
+> > > > +                       if (timeout-- == 0)
+> > > > +                               return read;
+> > > > +                       msleep((1000 * (max - read)) / ta_rng_data_rate);
+> > > > +               } else {
+> > > > +                       return read;
+> > > > +               }
+> > > > +       }
+> > > > +
+> > > > +       return read;
+> > > > +}
+> > > > +
+> > > > +static int optee_rng_init(struct hwrng *rng)
+> > > > +{
+> > > > +       entropy_shm_pool = tee_shm_alloc(ctx, MAX_ENTROPY_REQ_SZ,
+> > > > +                                        TEE_SHM_MAPPED | TEE_SHM_DMA_BUF);
+> > > > +       if (IS_ERR(entropy_shm_pool)) {
+> > > > +               pr_err("tee_shm_alloc failed\n");
+> > > > +               return PTR_ERR(entropy_shm_pool);
+> > > > +       }
+> > > > +
+> > > > +       return 0;
+> > > > +}
+> > > > +
+> > > > +static void optee_rng_cleanup(struct hwrng *rng)
+> > > > +{
+> > > > +       tee_shm_free(entropy_shm_pool);
+> > > > +}
+> > > > +
+> > > > +static struct hwrng optee_rng = {
+> > > > +       .name           = "optee-rng",
+> > > > +       .init           = optee_rng_init,
+> > > > +       .cleanup        = optee_rng_cleanup,
+> > > > +       .read           = optee_rng_read,
+> > > > +};
+> > > > +
+> > > > +static const struct of_device_id optee_match[] = {
+> > > > +       { .compatible = "linaro,optee-tz" },
+> > > > +       {},
+> > > > +};
+> > > > +
+> > > > +static int get_optee_rng_uuid(uuid_t *ta_rng_uuid)
+> > > > +{
+> > > > +       struct device_node *fw_np;
+> > > > +       struct device_node *np;
+> > > > +       const char *uuid;
+> > > > +
+> > > > +       /* Node is supposed to be below /firmware */
+> > > > +       fw_np = of_find_node_by_name(NULL, "firmware");
+> > > > +       if (!fw_np)
+> > > > +               return -ENODEV;
+> > > > +
+> > > > +       np = of_find_matching_node(fw_np, optee_match);
+> > > > +       if (!np || !of_device_is_available(np))
+> > > > +               return -ENODEV;
+> > > > +
+> > > > +       if (of_property_read_string(np, "rng-uuid", &uuid)) {
+> > > > +               pr_warn("missing \"uuid\" property\n");
+> > > > +               return -ENXIO;
+> > > > +       }
+> > > > +
+> > >
+> > > So, duplicating all of this is really not a good idea.
+> > >
+> >
+> > Yeah, we may not need this in case we go via TEE bus driver approach.
+> >
+> > > > +       if (uuid_parse(uuid, ta_rng_uuid)) {
+> > > > +               pr_warn("incorrect rng ta uuid\n");
+> > > > +               return -EINVAL;
+> > > > +       }
+> > > > +
+> > > > +       return 0;
+> > > > +}
+> > > > +
+> > > > +static int get_optee_rng_info(void)
+> > > > +{
+> > > > +       u32 ret = 0;
+> > > > +       struct tee_ioctl_invoke_arg inv_arg = {0};
+> > > > +       struct tee_param param[4] = {0};
+> > > > +
+> > > > +       /* Invoke TA_CMD_GET_RNG function of Trusted App */
+> > > > +       inv_arg.func = TA_CMD_GET_RNG_INFO;
+> > > > +       inv_arg.session = ta_rng_seesion_id;
+> > > > +       inv_arg.num_params = 4;
+> > > > +
+> > > > +       /* Fill invoke cmd params */
+> > > > +       param[0].attr = TEE_IOCTL_PARAM_ATTR_TYPE_VALUE_OUTPUT;
+> > > > +
+> > > > +       ret = tee_client_invoke_func(ctx, &inv_arg, param);
+> > > > +       if ((ret < 0) || (inv_arg.ret != 0)) {
+> > > > +               pr_err("TA_CMD_GET_RNG_INFO invoke function error: %x\n",
+> > > > +                      inv_arg.ret);
+> > > > +               return -EINVAL;
+> > > > +       }
+> > > > +
+> > > > +       ta_rng_data_rate = param[0].u.value.a;
+> > > > +       optee_rng.quality = param[0].u.value.b;
+> > > > +
+> > > > +       return 0;
+> > > > +}
+> > > > +
+> > > > +static int optee_ctx_match(struct tee_ioctl_version_data *ver, const void *data)
+> > > > +{
+> > > > +       if (ver->impl_id == TEE_IMPL_ID_OPTEE)
+> > > > +               return 1;
+> > > > +       else
+> > > > +               return 0;
+> > > > +}
+> > > > +
+> > > > +static int __init mod_init(void)
+> > > > +{
+> > > > +       int ret = 0, err = -ENODEV;
+> > > > +       struct tee_ioctl_open_session_arg sess_arg = {0};
+> > > > +       uuid_t ta_rng_uuid = {0};
+> > > > +
+> > > > +       err = get_optee_rng_uuid(&ta_rng_uuid);
+> > > > +       if (err)
+> > > > +               return err;
+> > > > +
+> > > > +       /* Open context with TEE driver */
+> > > > +       ctx = tee_client_open_context(NULL, optee_ctx_match, NULL, NULL);
+> > > > +       if (IS_ERR(ctx))
+> > > > +               return -ENODEV;
+> > > > +
+> > > > +       /* Open session with hwrng Trusted App */
+> > > > +       memcpy(sess_arg.uuid, ta_rng_uuid.b, TEE_IOCTL_UUID_LEN);
+> > > > +       sess_arg.clnt_login = TEE_IOCTL_LOGIN_PUBLIC;
+> > > > +       sess_arg.num_params = 0;
+> > > > +
+> > > > +       ret = tee_client_open_session(ctx, &sess_arg, NULL);
+> > > > +       if ((ret < 0) || (sess_arg.ret != 0)) {
+> > > > +               pr_err("tee_client_open_session failed, error: %x\n",
+> > > > +                      sess_arg.ret);
+> > > > +               err = -EINVAL;
+> > > > +               goto out_ctx;
+> > > > +       }
+> > > > +       ta_rng_seesion_id = sess_arg.session;
+> > > > +
+> > > > +       err = get_optee_rng_info();
+> > > > +       if (err)
+> > > > +               goto out_sess;
+> > > > +
+> > > > +       err = hwrng_register(&optee_rng);
+> > > > +       if (err) {
+> > > > +               pr_err("registering failed (%d)\n", err);
+> > > > +               goto out_sess;
+> > > > +       }
+> > > > +
+> > > > +       return 0;
+> > > > +
+> > > > +out_sess:
+> > > > +       tee_client_close_session(ctx, ta_rng_seesion_id);
+> > > > +out_ctx:
+> > > > +       tee_client_close_context(ctx);
+> > > > +
+> > > > +       return err;
+> > > > +}
+> > > > +
+> > > > +static void __exit mod_exit(void)
+> > > > +{
+> > > > +       tee_client_close_session(ctx, ta_rng_seesion_id);
+> > > > +       tee_client_close_context(ctx);
+> > > > +       hwrng_unregister(&optee_rng);
+> > > > +}
+> > > > +
+> > > > +module_init(mod_init);
+> > > > +module_exit(mod_exit);
+> > > > +
+> > > > +MODULE_LICENSE("GPL");
+> > > > +MODULE_AUTHOR("Sumit Garg <sumit.garg@linaro.org>");
+> > > > +MODULE_DESCRIPTION("OP-TEE based random number generator driver");
+> > > > +MODULE_SOFTDEP("pre: optee");
+> > >
+> > > This is also an indicator that the API design needs some work. If the
+> > > OP-TEE driver becomes a 'bus' driver of some sort, the child RNG
+> > > device (which is what this driver should bind to) will only exist if
+> > > a) the OP-TEE driver is loaded, and b) it has actually bound to the
+> > > /firmware/optee node.
+> > >
+> >
+> > Agree.
+> >
+> > > > --
+> > > > 2.7.4
+> > > >
