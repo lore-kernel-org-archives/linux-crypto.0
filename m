@@ -1,53 +1,46 @@
 Return-Path: <SRS0=sHEo=PF=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from szxga05-in.huawei.com ([45.249.212.191]:16665 "EHLO huawei.com"
+Received: from szxga04-in.huawei.com ([45.249.212.190]:17065 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725929AbeL1Geq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 28 Dec 2018 01:34:46 -0500
+        id S1726143AbeL1GDg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 28 Dec 2018 01:03:36 -0500
 From: YueHaibing <yuehaibing@huawei.com>
-To: Harsh Jain <harsh@chelsio.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        Markus Elfring <elfring@users.sourceforge.net>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Nathan Chancellor <natechancellor@gmail.com>,
+        Randy Dunlap <rdunlap@infradead.org>
 CC: YueHaibing <yuehaibing@huawei.com>, <linux-crypto@vger.kernel.org>,
         <kernel-janitors@vger.kernel.org>
-Subject: [PATCH -next] crypto: chelsio - CHECK-remove set but not used variables 'adap'
-Date: Fri, 28 Dec 2018 06:41:42 +0000
-Message-ID: <1545979302-111921-1-git-send-email-yuehaibing@huawei.com>
+Subject: [PATCH -next] crypto: ux500 catch dma submission error
+Date: Fri, 28 Dec 2018 06:10:33 +0000
+Message-ID: <1545977433-125317-1-git-send-email-yuehaibing@huawei.com>
 Content-Type: text/plain; charset="ISO-8859-1"
 Content-Transfer-Encoding: 7bit
 MIME-Version: 1.0
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Fixes gcc '-Wunused-but-set-variable' warning:
-
-drivers/crypto/chelsio/chcr_algo.c: In function 'chcr_device_init':
-drivers/crypto/chelsio/chcr_algo.c:1371:18: warning:
- variable 'adap' set but not used [-Wunused-but-set-variable]
-
-It not used since commit a1c6fd4308d3 ("crypto: chelsio - Update ntx queue
-received from cxgb4")
+Test cookie return by dmaengine_submit() and return error if any.
 
 Signed-off-by: YueHaibing <yuehaibing@huawei.com>
 ---
- drivers/crypto/chelsio/chcr_algo.c | 2 --
- 1 file changed, 2 deletions(-)
+ drivers/crypto/ux500/cryp/cryp_core.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
-index bcef765..c8cd2d3 100644
---- a/drivers/crypto/chelsio/chcr_algo.c
-+++ b/drivers/crypto/chelsio/chcr_algo.c
-@@ -1368,7 +1368,6 @@ static int chcr_aes_decrypt(struct ablkcipher_request *req)
- static int chcr_device_init(struct chcr_context *ctx)
- {
- 	struct uld_ctx *u_ctx = NULL;
--	struct adapter *adap;
- 	unsigned int id;
- 	int txq_perchan, txq_idx, ntxq;
- 	int err = 0, rxq_perchan, rxq_idx;
-@@ -1382,7 +1381,6 @@ static int chcr_device_init(struct chcr_context *ctx)
- 			goto out;
- 		}
- 		ctx->dev = &u_ctx->dev;
--		adap = padap(ctx->dev);
- 		ntxq = u_ctx->lldi.ntxq;
- 		rxq_perchan = u_ctx->lldi.nrxq / u_ctx->lldi.nchan;
- 		txq_perchan = ntxq / u_ctx->lldi.nchan;
+diff --git a/drivers/crypto/ux500/cryp/cryp_core.c b/drivers/crypto/ux500/cryp/cryp_core.c
+index a92a66b..db94f89 100644
+--- a/drivers/crypto/ux500/cryp/cryp_core.c
++++ b/drivers/crypto/ux500/cryp/cryp_core.c
+@@ -595,6 +595,12 @@ static int cryp_set_dma_transfer(struct cryp_ctx *ctx,
+ 	}
+ 
+ 	cookie = dmaengine_submit(desc);
++	if (dma_submit_error(cookie)) {
++		dev_dbg(ctx->device->dev, "[%s]: DMA submission failed\n",
++			__func__);
++		return cookie;
++	}
++
+ 	dma_async_issue_pending(channel);
+ 
+ 	return 0;
