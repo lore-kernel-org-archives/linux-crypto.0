@@ -1,42 +1,37 @@
-Return-Path: <SRS0=9Gyh=PA=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:38980 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729640AbeLWECb (ORCPT
+Return-Path: <SRS0=iAjb=PG=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from sonic303-23.consmr.mail.gq1.yahoo.com ([98.137.64.204]:46706
+        "EHLO sonic303-23.consmr.mail.gq1.yahoo.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726643AbeL2VLL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 22 Dec 2018 23:02:31 -0500
-Date: Sun, 23 Dec 2018 12:02:29 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Fabio Estevam <festevam@gmail.com>
-Cc: linux-crypto@vger.kernel.org, shawnguo@kernel.org
-Subject: Re: [PATCH] crypto: mxc-scc - fix build warnings on ARM64
-Message-ID: <20181223040229.ij6jjwb62xecwdl6@gondor.apana.org.au>
-References: <1544694752-9293-1-git-send-email-festevam@gmail.com>
+        Sat, 29 Dec 2018 16:11:11 -0500
+Date: Sat, 29 Dec 2018 21:11:08 +0000 (UTC)
+From: Mr Cobo Suleman <cobosuleman00@gmail.com>
+Reply-To: Mr Cobo Suleman <cobosuleman1@gmail.com>
+Message-ID: <138908221.11679858.1546117868912@mail.yahoo.com>
+Subject: : I need your urgent respons.
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1544694752-9293-1-git-send-email-festevam@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+References: <138908221.11679858.1546117868912.ref@mail.yahoo.com>
+To: unlisted-recipients:; (no To-header on input)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Dec 13, 2018 at 07:52:32AM -0200, Fabio Estevam wrote:
-> The following build warnings are seen when building for ARM64 allmodconfig:
-> 
-> drivers/crypto/mxc-scc.c:181:20: warning: format '%d' expects argument of type 'int', but argument 5 has type 'size_t' {aka 'long unsigned int'} [-Wformat=]
-> drivers/crypto/mxc-scc.c:186:21: warning: format '%d' expects argument of type 'int', but argument 4 has type 'size_t' {aka 'long unsigned int'} [-Wformat=]
-> drivers/crypto/mxc-scc.c:277:21: warning: format '%d' expects argument of type 'int', but argument 4 has type 'size_t' {aka 'long unsigned int'} [-Wformat=]
-> drivers/crypto/mxc-scc.c:339:3: warning: cast to pointer from integer of different size [-Wint-to-pointer-cast]
-> drivers/crypto/mxc-scc.c:340:3: warning: cast to pointer from integer of different size [-Wint-to-pointer-cast]
-> 
-> Fix them by using the %zu specifier to print a size_t variable and using
-> a plain %x to print the result of a readl().
-> 
-> Signed-off-by: Fabio Estevam <festevam@gmail.com>
-> ---
->  drivers/crypto/mxc-scc.c | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
+Dear Friend,
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+I know that this mail will come to you as a surprise as we have never met before,I need your Urgent assistance in transferring the sum of $18 mllion US Dollars immediately to your Private account.The money has been here in our Bank lying dormant for years now without anybody coming for the claim of it.Waiting to hear from you.
+
+The information required should include the following-:
+Your full names
+Your address
+Telephone number
+Your private email
+Occupation
+Age
+
+Please reply me through my email address. Email:  { cobosuleman1@gmail.com }
+this is to enable my further discussion with you in confidence.
+
+Best regards and wishes to you.
+
+Mr.Cobo Suleman 
