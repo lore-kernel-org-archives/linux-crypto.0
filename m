@@ -1,77 +1,51 @@
-Return-Path: <SRS0=KZld=OW=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-it1-f171.google.com ([209.85.166.171]:40201 "EHLO
-        mail-it1-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726442AbeLMUMC (ORCPT
+Return-Path: <SRS0=5fel=PH=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from walmailout07.yourhostingaccount.com ([65.254.253.59]:55537 "EHLO
+        walmailout07.yourhostingaccount.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726321AbeL3V65 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 13 Dec 2018 15:12:02 -0500
-Received: by mail-it1-f171.google.com with SMTP id h193so5831446ita.5
-        for <linux-crypto@vger.kernel.org>; Thu, 13 Dec 2018 12:12:01 -0800 (PST)
-Subject: Re: [PATCH 2/2] scsi: ufs: add inline crypto support to UFS HCD
-To: Ladvine D Almeida <ladvine.dalmeida@synopsys.com>,
-        Parshuram Raju Thombare <pthombar@cadence.com>,
-        Eric Biggers <ebiggers@kernel.org>
-Cc: "vinholikatti@gmail.com" <vinholikatti@gmail.com>,
-        "jejb@linux.vnet.ibm.com" <jejb@linux.vnet.ibm.com>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        "mchehab+samsung@kernel.org" <mchehab+samsung@kernel.org>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-        "nicolas.ferre@microchip.com" <nicolas.ferre@microchip.com>,
-        "arnd@arndb.de" <arnd@arndb.de>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        Alan Douglas <adouglas@cadence.com>,
-        Janek Kotas <jank@cadence.com>,
-        Rafal Ciepiela <rafalc@cadence.com>,
-        AnilKumar Chimata <anilc@codeaurora.org>,
-        Satya Tangirala <satyat@google.com>,
-        Paul Crowley <paulcrowley@google.com>,
-        Manjunath M Bettegowda <manjunath.mb@synopsys.com>,
-        Tejas Joglekar <tejas.joglekar@synopsys.com>,
-        Joao Pinto <Joao.Pinto@synopsys.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-References: <20181211095027.GA3316@lvlogina.cadence.com>
- <20181211181647.GC221175@gmail.com>
- <CO2PR07MB2469AD9C0A121EBF94129A11C1A70@CO2PR07MB2469.namprd07.prod.outlook.com>
- <BD7FB879CC136E419544C8E2AE7B9C30227EE5@IN01WEMBXA.internal.synopsys.com>
- <fb17d794-c682-3261-cbad-94ce4c14eea1@kernel.dk>
- <BD7FB879CC136E419544C8E2AE7B9C30227F0B@IN01WEMBXA.internal.synopsys.com>
-From: Jens Axboe <axboe@kernel.dk>
-Message-ID: <6309baec-bb1f-4986-6872-a70047fbc469@kernel.dk>
-Date: Thu, 13 Dec 2018 13:11:58 -0700
+        Sun, 30 Dec 2018 16:58:57 -0500
+Message-ID: <b0c87e6c0241920819eecb057e8869b6.squirrel@email.fatcow.com>
+Date: Sun, 30 Dec 2018 16:28:01 -0500
+Subject: ALLIANCE LOAN OFFER/PROJECT FUNDING
+From: "FUND ALLIANCE INTERNATIONAL" <info@cent.org>
+Reply-To: olistin001@gmail.com
 MIME-Version: 1.0
-In-Reply-To: <BD7FB879CC136E419544C8E2AE7B9C30227F0B@IN01WEMBXA.internal.synopsys.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain;charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+To: unlisted-recipients:; (no To-header on input)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 12/13/18 1:04 PM, Ladvine D Almeida wrote:
-> On 13/12/18 7:42 PM, Jens Axboe wrote:
->> On 12/13/18 12:39 PM, Ladvine D Almeida wrote:
->>> Suggest to take a look into the article https://urldefense.proofpoint.com/v2/url?u=https-3A__lwn.net_Articles_717754&d=DwICaQ&c=DPL6_X_6JkXFx7AXWqB0tg&r=z00zRD9ARrwHpe-XSl1OtUp1uNKGYoXI1G2DhOaDDBI&m=-pGzV3wdSje337vKOYoYB6NgU_DGDmQvfQ9egLDRYNQ&s=c4FXsrwD0BLAjE4UC47R2ngLnx_DP5jiOr0dtZ7tGsw&e=
->>> My real concern is how to achieve it without any modifications to the
->>> bio.(because key slot information has to finally reach the target block
->>> device)
->>
->> Guys, you both need to edit when you reply, wading through 650 lines of
->> text to get to this...
-> Jens, Thanks for your reply. I will take care of it next time onwards. :-)
-> 
->>
->> You obviously can't modify the bio if you don't own it, but you could
->> clone it and then you have storage in ->bi_private.
->>
-> 
-> I agree. I can clone the bio in the crypto target and use bi_private.
-> But, when i finally submit the bio and it reaches the target block
-> device, the information stored in bi_private is lost.
 
-I don't follow, what do you mean it's lost? It's persistent from
-bio setup to end_io time.
 
--- 
-Jens Axboe
+
+Good Day,
+
+I'm Olivia Austin a consultant from Fund Alliance International, We are
+currently offering 95% Non-Recourse Loan with our BG Leased Monetization
+Program for trade finance, constructions, credit enhancement, government
+funding, property investment and all-round range of funding, with 2%
+interest rate per annul for a period of 10-years + 1 year grace period
+with no pre-payment penalties. .
+
+    TERMS:
+
+    2 % INTEREST RATE YEARLY
+    10 YEARS DURATION
+    1M-50B USD / EUR REQUIREMENT:
+
+    1.      CLIENT MUST OWN OR REPRESENT A COMPANY.
+
+    2.      CLIENT MUST BE ABLE TO PROVIDE BUSINESS PLAN OR EXECUTIVE
+SUMMARY OR SUMMARY PURPOSE OF THE LOAN.
+
+Let us know if you are interested in our services and meet up with the
+requirements? so as to provide you with more information.
+
+Regards,
+Olivia Austin
+Fund Alliance
+Lutzowplatz 17 10785, Berlin
+Germany
+Phone: +49 (322) 2109 7890
+Email:olistin001@gmail.com
