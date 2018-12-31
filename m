@@ -1,132 +1,111 @@
-Return-Path: <SRS0=ECh6=O2=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:49794 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726417AbeLQHYt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 17 Dec 2018 02:24:49 -0500
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Rob Rice <rob.rice@broadcom.com>,
-        Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Yael Chemla <yael.chemla@foss.arm.com>
-Subject: [PATCH 1/3] crypto: authenc - fix parsing key with misaligned rta_len
-Date: Sun, 16 Dec 2018 23:23:22 -0800
-Message-Id: <20181217072324.16844-2-ebiggers@kernel.org>
-In-Reply-To: <20181217072324.16844-1-ebiggers@kernel.org>
-References: <20181217072324.16844-1-ebiggers@kernel.org>
+Return-Path: <SRS0=0edi=PI=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-ua1-f67.google.com ([209.85.222.67]:47074 "EHLO
+        mail-ua1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727078AbeLaKgF (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 31 Dec 2018 05:36:05 -0500
+Received: by mail-ua1-f67.google.com with SMTP id v24so8532613uap.13
+        for <linux-crypto@vger.kernel.org>; Mon, 31 Dec 2018 02:36:04 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <1545908831-25910-1-git-send-email-sumit.garg@linaro.org>
+ <1545908831-25910-3-git-send-email-sumit.garg@linaro.org> <CAKv+Gu9ShfrBhfCuRK_L_ZtZ3KnN7Jb-4hcX9nSO7AYbT8V8LQ@mail.gmail.com>
+ <CAFA6WYN5+NWKpPhnGHRnh_ZOF9A8K=MvbbSQ9uvc2Tv1expXcA@mail.gmail.com>
+ <CAKv+Gu-Go=GwsO=_WvmTr-OZb4WMGGQrMb2joxX1Kzfhza3JiA@mail.gmail.com>
+ <CAFA6WYPm3_SZ59vOxceZkn0uzcJw3ECQZs5R_Ypz0ejpzTgAbQ@mail.gmail.com>
+ <20181228144610.GA21561@jax.urgonet> <79744651-991d-ff44-2238-96721ff9bc18@gmail.com>
+In-Reply-To: <79744651-991d-ff44-2238-96721ff9bc18@gmail.com>
+From: Sumit Garg <sumit.garg@linaro.org>
+Date: Mon, 31 Dec 2018 16:05:52 +0530
+Message-ID: <CAFA6WYN958Odx7HfB7-zDAt5hpXw8bCLsfQgJT+sjf_L4BmguQ@mail.gmail.com>
+Subject: Re: [PATCH v1 2/2] hwrng: add OP-TEE based rng driver
+To: =?UTF-8?B?VmVzYSBKw6TDpHNrZWzDpGluZW4=?= <dachaac@gmail.com>
+Cc: Jens Wiklander <jens.wiklander@linaro.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>,
+        Devicetree List <devicetree@vger.kernel.org>, mpm@selenic.com,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Daniel Thompson <daniel.thompson@linaro.org>,
+        Bhupesh Sharma <bhsharma@redhat.com>, tee-dev@lists.linaro.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Eric Biggers <ebiggers@google.com>
+On Sun, 30 Dec 2018 at 20:29, Vesa J=C3=A4=C3=A4skel=C3=A4inen <dachaac@gma=
+il.com> wrote:
+>
+> Hi All,
+>
+> On 28/12/2018 16.46, Jens Wiklander wrote:
+> > Hi Sumit,
+> >
+> > On Fri, Dec 28, 2018 at 06:33:22PM +0530, Sumit Garg wrote:
+> >> On Fri, 28 Dec 2018 at 16:08, Ard Biesheuvel <ard.biesheuvel@linaro.or=
+g> wrote:
+> >> Jens,
+> >>
+> >> Is there any particular reason to wait indefinitely in
+> >> "optee_supp_thrd_req" if there is no supplicant running? I think we
+> >> should probably return as follows from "optee_supp_thrd_req" API in
+> >> case no supplicant is available:
+> >>
+> >> --- a/drivers/tee/optee/supp.c
+> >> +++ b/drivers/tee/optee/supp.c
+> >> @@ -88,10 +88,15 @@ u32 optee_supp_thrd_req(struct tee_context *ctx,
+> >> u32 func, size_t num_params,
+> >>   {
+> >>          struct optee *optee =3D tee_get_drvdata(ctx->teedev);
+> >>          struct optee_supp *supp =3D &optee->supp;
+> >> -       struct optee_supp_req *req =3D kzalloc(sizeof(*req), GFP_KERNE=
+L);
+> >> +       struct optee_supp_req *req;
+> >>          bool interruptable;
+> >>          u32 ret;
+> >>
+> >> +       /* Return in case there is no supplicant available */
+> >> +       if (!supp->ctx)
+> >> +               return TEEC_ERROR_COMMUNICATION;
+> >> +
+> >> +       req =3D kzalloc(sizeof(*req), GFP_KERNEL);
+> >>          if (!req)
+> >>                  return TEEC_ERROR_OUT_OF_MEMORY;
+> >
+> >  From a user space point of view it has been more useful to just wait
+> > until the supplicant starts to serve requests than polling the interfac=
+e
+> > until the call succeeds. For this new use case it makes more sense to b=
+e
+> > able to return an error instead.
+> >
+> > The proposed change is a user space API change, so we will need to do a
+> > bit more than that.
+>
+> There are parts of kernel that need randomness before user space is ready=
+.
+>
+> Can't we move necessary logic for this to in kernel now that there is
+> kernel service requiring TEE services?
+>
 
-Keys for "authenc" AEADs are formatted as an rtattr containing a 4-byte
-'enckeylen', followed by an authentication key and an encryption key.
-crypto_authenc_extractkeys() parses the key to find the inner keys.
+Yes it is exactly what this optee-rng kernel module is trying to achieve.
 
-However, it fails to consider the case where the rtattr's payload is
-longer than 4 bytes but not 4-byte aligned, and where the key ends
-before the next 4-byte aligned boundary.  In this case, 'keylen -=
-RTA_ALIGN(rta->rta_len);' underflows to a value near UINT_MAX.  This
-causes a buffer overread and crash during crypto_ahash_setkey().
+> I suppose there are even more services that would be better to be only
+> optee<->kernel interface and not exposed as such to user space. One
+> example of such would be mass storage encryption key or hardware rooted
+> encryption for Linux keyring. Eg. replacement for TPM chip when TEE
+> environment is available.
+>
 
-Fix it by restricting the rtattr payload to the expected size.
+Agree, for such use-cases we are working on adding TEE bus support so
+that kernel drivers would be able to communicate with TEE based
+devices.
 
-Reproducer using AF_ALG:
+-Sumit
 
-	#include <linux/if_alg.h>
-	#include <linux/rtnetlink.h>
-	#include <sys/socket.h>
-
-	int main()
-	{
-		int fd;
-		struct sockaddr_alg addr = {
-			.salg_type = "aead",
-			.salg_name = "authenc(hmac(sha256),cbc(aes))",
-		};
-		struct {
-			struct rtattr attr;
-			__be32 enckeylen;
-			char keys[1];
-		} __attribute__((packed)) key = {
-			.attr.rta_len = sizeof(key),
-			.attr.rta_type = 1 /* CRYPTO_AUTHENC_KEYA_PARAM */,
-		};
-
-		fd = socket(AF_ALG, SOCK_SEQPACKET, 0);
-		bind(fd, (void *)&addr, sizeof(addr));
-		setsockopt(fd, SOL_ALG, ALG_SET_KEY, &key, sizeof(key));
-	}
-
-It caused:
-
-	BUG: unable to handle kernel paging request at ffff88007ffdc000
-	PGD 2e01067 P4D 2e01067 PUD 2e04067 PMD 2e05067 PTE 0
-	Oops: 0000 [#1] SMP
-	CPU: 0 PID: 883 Comm: authenc Not tainted 4.20.0-rc1-00108-g00c9fe37a7f27 #13
-	Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.12.0-20181126_142135-anatol 04/01/2014
-	RIP: 0010:sha256_ni_transform+0xb3/0x330 arch/x86/crypto/sha256_ni_asm.S:155
-	[...]
-	Call Trace:
-	 sha256_ni_finup+0x10/0x20 arch/x86/crypto/sha256_ssse3_glue.c:321
-	 crypto_shash_finup+0x1a/0x30 crypto/shash.c:178
-	 shash_digest_unaligned+0x45/0x60 crypto/shash.c:186
-	 crypto_shash_digest+0x24/0x40 crypto/shash.c:202
-	 hmac_setkey+0x135/0x1e0 crypto/hmac.c:66
-	 crypto_shash_setkey+0x2b/0xb0 crypto/shash.c:66
-	 shash_async_setkey+0x10/0x20 crypto/shash.c:223
-	 crypto_ahash_setkey+0x2d/0xa0 crypto/ahash.c:202
-	 crypto_authenc_setkey+0x68/0x100 crypto/authenc.c:96
-	 crypto_aead_setkey+0x2a/0xc0 crypto/aead.c:62
-	 aead_setkey+0xc/0x10 crypto/algif_aead.c:526
-	 alg_setkey crypto/af_alg.c:223 [inline]
-	 alg_setsockopt+0xfe/0x130 crypto/af_alg.c:256
-	 __sys_setsockopt+0x6d/0xd0 net/socket.c:1902
-	 __do_sys_setsockopt net/socket.c:1913 [inline]
-	 __se_sys_setsockopt net/socket.c:1910 [inline]
-	 __x64_sys_setsockopt+0x1f/0x30 net/socket.c:1910
-	 do_syscall_64+0x4a/0x180 arch/x86/entry/common.c:290
-	 entry_SYSCALL_64_after_hwframe+0x49/0xbe
-
-Fixes: e236d4a89a2f ("[CRYPTO] authenc: Move enckeylen into key itself")
-Cc: <stable@vger.kernel.org> # v2.6.25+
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- crypto/authenc.c | 14 +++++++++++---
- 1 file changed, 11 insertions(+), 3 deletions(-)
-
-diff --git a/crypto/authenc.c b/crypto/authenc.c
-index 37f54d1b2f669..4be293a4b5f0f 100644
---- a/crypto/authenc.c
-+++ b/crypto/authenc.c
-@@ -58,14 +58,22 @@ int crypto_authenc_extractkeys(struct crypto_authenc_keys *keys, const u8 *key,
- 		return -EINVAL;
- 	if (rta->rta_type != CRYPTO_AUTHENC_KEYA_PARAM)
- 		return -EINVAL;
--	if (RTA_PAYLOAD(rta) < sizeof(*param))
-+
-+	/*
-+	 * RTA_OK() didn't align the rtattr's payload when validating that it
-+	 * fits in the buffer.  Yet, the keys should start on the next 4-byte
-+	 * aligned boundary.  To avoid confusion, require that the rtattr
-+	 * payload be exactly the param struct, which has a 4-byte aligned size.
-+	 */
-+	if (RTA_PAYLOAD(rta) != sizeof(*param))
- 		return -EINVAL;
-+	BUILD_BUG_ON(sizeof(*param) % RTA_ALIGNTO);
- 
- 	param = RTA_DATA(rta);
- 	keys->enckeylen = be32_to_cpu(param->enckeylen);
- 
--	key += RTA_ALIGN(rta->rta_len);
--	keylen -= RTA_ALIGN(rta->rta_len);
-+	key += rta->rta_len;
-+	keylen -= rta->rta_len;
- 
- 	if (keylen < keys->enckeylen)
- 		return -EINVAL;
--- 
-2.19.2
+> Thanks,
+> Vesa J=C3=A4=C3=A4skel=C3=A4inen
