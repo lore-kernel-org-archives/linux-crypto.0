@@ -2,42 +2,52 @@ Return-Path: <SRS0=M78F=PK=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C268AC43387
-	for <linux-crypto@archiver.kernel.org>; Wed,  2 Jan 2019 08:26:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BB96C43387
+	for <linux-crypto@archiver.kernel.org>; Wed,  2 Jan 2019 10:12:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 725E7218AE
-	for <linux-crypto@archiver.kernel.org>; Wed,  2 Jan 2019 08:26:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 201C82073F
+	for <linux-crypto@archiver.kernel.org>; Wed,  2 Jan 2019 10:12:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="Qsbim9yx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728835AbfABI0a (ORCPT
+        id S1729238AbfABKMW (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 2 Jan 2019 03:26:30 -0500
-Received: from mail-lf1-f65.google.com ([209.85.167.65]:33386 "EHLO
-        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727158AbfABI0a (ORCPT
+        Wed, 2 Jan 2019 05:12:22 -0500
+Received: from mail-vs1-f68.google.com ([209.85.217.68]:32909 "EHLO
+        mail-vs1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729242AbfABKMW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 2 Jan 2019 03:26:30 -0500
-Received: by mail-lf1-f65.google.com with SMTP id i26so20506827lfc.0
-        for <linux-crypto@vger.kernel.org>; Wed, 02 Jan 2019 00:26:27 -0800 (PST)
+        Wed, 2 Jan 2019 05:12:22 -0500
+Received: by mail-vs1-f68.google.com with SMTP id p74so18613830vsc.0
+        for <linux-crypto@vger.kernel.org>; Wed, 02 Jan 2019 02:12:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=qWBxA1OaPs3vNVFUDnLC2GLXwjiSba/dxXTMIieILZ4=;
+        b=Qsbim9yxG1dU1yGxgw9IPME+7PfPdm+dJ/XUpOVX6P2M74O66m/6JuHUWZV6k1dHJL
+         kbZsHz/hirPvS49GUddYmCD/0F/Si/sSKNq22dtSe3aGJQxLbuhmYUbU3t4ZnyW0x2Vy
+         J815OZRjn5XO39BgOJDK9Qid+4woUow5VDjSE=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=+z35QJ1P/VPQNW1gKdTx94ylhou19IXxD9kTY39Of9c=;
-        b=uR6ThKh0elcp57Bkn6ti0SdIX21jumCWSQkUEvAph66SR0LmZtBo4aho0/djzHx04N
-         l3BxfRuf58DDtkodvst/wJ6VKoBtKRAV36kh+Cm7aZT5FentBvlg68tSdIjOphDx6ALe
-         Lt7zXPU0IrFJkhxXTEywX4IgS7QXO6FGHNTLzc36837BiMHs/nb75NXvouqffMT0SVnJ
-         DFolYcTuMJM3OF7mZxvU8+d+ZsUeUz9M15J5t8DMSjxQcBwG5ozBdLw7fv3EVTRgA50x
-         f0qR47v9PgqAarNNJW/hTnxoAnYWaUub7mcUorJF9Kgk74sEB+HXTMhDpZpimjCaQcyv
-         PNUA==
-X-Gm-Message-State: AA+aEWZuULkiwxQzsg6dn5tGml/yvz92kdJtXkt0yX74EVRCP7CEaC7J
-        aIbIcQ8X2Evq3xBt+EGAEKwVACGQJyexv9JecAMNIigGGRQ=
-X-Google-Smtp-Source: AFSGD/XWhEeEXaJSR/ZDvXq3C4yCVWGDPJMf/wOubp9iscryb2Vfz1r4di2Sw0wwDBAltWv6ogumM/4qD0XtF+bc+ak=
-X-Received: by 2002:a19:d857:: with SMTP id p84mr20518357lfg.44.1546417586230;
- Wed, 02 Jan 2019 00:26:26 -0800 (PST)
+        bh=qWBxA1OaPs3vNVFUDnLC2GLXwjiSba/dxXTMIieILZ4=;
+        b=SdsUWw/1Df3pUjGDQSyIfnXs7OgmAsQPax4BoPga6DctBGuSQQIuyhq0kYuZ/rr8yt
+         8KaNP6T83f6QdHz8oB7lsVqjnHiiDlQbQZDLIlkxX/5JJKIyj7IsuacfwAVoX38sC8UL
+         GvBKlXee/MB0DomihgNznxLRh5ftSMxvMzLA/vtnSQ4cwZRNEn9GvitAjHx8Nu6uUdvw
+         bcVsn5nY1jQumBWtOnFURE3H6/QNRevB7swvoddpYfUBbIP3FCXMEsHH2nNNsxkoKW9y
+         H1XfqkA/lJomf5yLVqVXYB+lwxYgIEYWmCsbDLVdcVnRvAfDuBnsYf8fg6kDiIcNHBAk
+         mo3g==
+X-Gm-Message-State: AA+aEWb4ha/9MSt5bsaqpEeGHyegAZNvxh/DwJG9iXgvRdQ3+Omh0w+F
+        BWN/ztsL/unGy0VqSvsmRI91Zkka0HG6gGX9Sw83gA==
+X-Google-Smtp-Source: AFSGD/U5un7fZ5nRlYnMSmFde2Aqpg5hV7/pU1rRb2SobXNSI7Pa6HaIAMU6QHiNW4WRsIIsOW0Uoquli8fO/ilqEQk=
+X-Received: by 2002:a67:2045:: with SMTP id g66mr17729662vsg.180.1546423939929;
+ Wed, 02 Jan 2019 02:12:19 -0800 (PST)
 MIME-Version: 1.0
 References: <1545908831-25910-1-git-send-email-sumit.garg@linaro.org>
  <1545908831-25910-3-git-send-email-sumit.garg@linaro.org> <CAKv+Gu9ShfrBhfCuRK_L_ZtZ3KnN7Jb-4hcX9nSO7AYbT8V8LQ@mail.gmail.com>
@@ -47,14 +57,13 @@ References: <1545908831-25910-1-git-send-email-sumit.garg@linaro.org>
  <20181228144610.GA21561@jax.urgonet> <CAFA6WYMC8_VHyXft_jKJOaZ3RDQMm5Djq+wLC4rVSiduGtjiLA@mail.gmail.com>
  <CAHUa44Go8zrxcRiCLmtKqVJZTSQue1Lo4ZdFFadxDVnT2EB++w@mail.gmail.com>
 In-Reply-To: <CAHUa44Go8zrxcRiCLmtKqVJZTSQue1Lo4ZdFFadxDVnT2EB++w@mail.gmail.com>
-From:   Bhupesh Sharma <bhsharma@redhat.com>
-Date:   Wed, 2 Jan 2019 13:56:12 +0530
+From:   Sumit Garg <sumit.garg@linaro.org>
+Date:   Wed, 2 Jan 2019 15:42:08 +0530
 Message-ID:
- <CACi5LpMp=E0Z2Bp+OvFudLogTTq4G6BgsWzr7CL40MCUcup-Ww@mail.gmail.com>
+ <CAFA6WYOJ25zvvaU+vc+wd9fOeLAAXMMueHKh9BJEP9pR4Vvxyg@mail.gmail.com>
 Subject: Re: [PATCH v1 2/2] hwrng: add OP-TEE based rng driver
 To:     Jens Wiklander <jens.wiklander@linaro.org>
-Cc:     Sumit Garg <sumit.garg@linaro.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
         <linux-crypto@vger.kernel.org>,
         Devicetree List <devicetree@vger.kernel.org>, mpm@selenic.com,
@@ -64,17 +73,15 @@ Cc:     Sumit Garg <sumit.garg@linaro.org>,
         Arnd Bergmann <arnd@arndb.de>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Daniel Thompson <daniel.thompson@linaro.org>,
-        tee-dev@lists.linaro.org
+        Bhupesh Sharma <bhsharma@redhat.com>, tee-dev@lists.linaro.org
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
-Message-ID: <20190102082612.Uhsed6Mv6TDyiABZOQfmbfQd-cHn6aBlMFms7LCqIt8@z>
+Message-ID: <20190102101208.vIs0iabUEV0E-LhsS-BM-80j_4LQIA9hM9ct1p2Rhok@z>
 
-Hi Sumit, Jens,
-
-On Wed, Jan 2, 2019 at 1:34 PM Jens Wiklander <jens.wiklander@linaro.org> wrote:
+On Wed, 2 Jan 2019 at 13:34, Jens Wiklander <jens.wiklander@linaro.org> wrote:
 >
 > On Mon, Dec 31, 2018 at 11:24 AM Sumit Garg <sumit.garg@linaro.org> wrote:
 > >
@@ -206,6 +213,15 @@ On Wed, Jan 2, 2019 at 1:34 PM Jens Wiklander <jens.wiklander@linaro.org> wrote:
 > window has to be closed in some way and that's what we've done with
 > the current design.
 >
+
+Thanks Jens for further clarification on this over chat.
+
+It seems that current tee-supplicant when run with "-d" option (daemon
+mode added recently) shouldn't be an issue for this API change
+(non-blocking with return error code). But to be backwards compatible
+where tee-supplicant is usually started as background process (using
+"&"), we need blocking mode as well.
+
 > As I said in my previous mail, we need a way for the caller to tell if
 > it should be blocked or get an error if tee-supplicant isn't
 > available. This has to be done by extending the API instead of making
@@ -213,22 +229,15 @@ On Wed, Jan 2, 2019 at 1:34 PM Jens Wiklander <jens.wiklander@linaro.org> wrote:
 >
 > It is tempting to add a flag to struct tee_context (caller specific
 > struct) which would indicate if tee-supplicant communication is
-> allowed or not.
-
-+1 . Adding a flag to specify a NONBLOCK'ing (call from the caller)
-[similar to the getrandom() user space call - see
-<http://man7.org/linux/man-pages/man2/getrandom.2.html> for details),
-would be helpful - specially when we look to integrate these
-user-space TEE applications with a 'systemd' like framework so that
-they can be launched appropriately (in the right order) while loading
-the initramfs.
-
-Regards,
-Bhupesh
-
-> However, it's a bit ugly and also I'm not sure it will
+> allowed or not. However, it's a bit ugly and also I'm not sure it will
 > cover all cases we'll need.
 >
+
+So will add a flag to "struct tee_context" which is default set to
+blocking mode for tee-supplicant.
+
+-Sumit
+
 > -Jens
 >
 > >
