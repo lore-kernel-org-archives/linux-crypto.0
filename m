@@ -1,73 +1,80 @@
-Return-Path: <SRS0=b7+G=PP=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-it1-f193.google.com ([209.85.166.193]:37052 "EHLO
-        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726667AbfAGXov (ORCPT
+Return-Path: <SRS0=pN5v=PL=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from stargate.chelsio.com ([12.32.117.8]:1680 "EHLO
+        stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727515AbfACKr1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Jan 2019 18:44:51 -0500
-Received: by mail-it1-f193.google.com with SMTP id b5so3681741iti.2
-        for <linux-crypto@vger.kernel.org>; Mon, 07 Jan 2019 15:44:50 -0800 (PST)
+        Thu, 3 Jan 2019 05:47:27 -0500
+Subject: Re: IPSec ESN: Packets decryption fail with ESN enabled connection
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: steffen.klassert@secunet.com, davem@davemloft.net,
+        netdev@vger.kernel.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        atul.gupta@chelsio.com, harshjain.prof@gmail.com
+References: <93ad9333-1e77-58fc-3f47-a967294fe188@chelsio.com>
+ <f1a91df3-c191-7ce1-1721-c94ca4322aa9@chelsio.com>
+ <20190102125109.az6n4rr4m2hng6d6@gondor.apana.org.au>
+From: Harsh Jain <harsh@chelsio.com>
+Message-ID: <692a865e-1903-bff8-a8f4-aface07a96ac@chelsio.com>
+Date: Thu, 3 Jan 2019 16:16:56 +0530
 MIME-Version: 1.0
-From: David Tolnay <dtolnay@gmail.com>
-Date: Mon, 7 Jan 2019 15:44:38 -0800
-Message-ID: <CAJN_sMh5v5YKJ1f0BdSjLAoBfkiYddxi7a-75SbRWT-BwGeLsQ@mail.gmail.com>
-Subject: [PATCH] virtio-rng: Avoid repeated init of completion
-To: Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20190102125109.az6n4rr4m2hng6d6@gondor.apana.org.au>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: David Tolnay <dtolnay@gmail.com>
-Date: Mon, 7 Jan 2019 14:36:11 -0800
-Subject: [PATCH] virtio-rng: Avoid repeated init of completion
 
-The virtio-rng driver uses a completion called have_data to wait for a
-virtio read to be fulfilled by the hypervisor. The completion is reset
-before placing a buffer on the virtio queue and completed by the virtio
-callback once data has been written into the buffer.
+On 02-01-2019 18:21, Herbert Xu wrote:
+> On Wed, Dec 26, 2018 at 03:16:29PM +0530, Harsh Jain wrote:
+>> +linux-crypto
+>>
+>> On 26-12-2018 14:54, Harsh Jain wrote:
+>>> Hi All,
+>>>
+>>> Kernel version on both machines: 4.19.7.
+>>>
+>>> Packet drops with EBADMSG is observed on receive end of connection. It seems that sometimes crypto driver receives packet with wrong "seq_hi" value in AAD. See below the dump of assoc data for 1 such instance.
+>>>
+>>> [  380.823454] assoclen 8th byte 1 clen 1464 op 1  ==> High byte of ESN
+>>> [  380.828398] authsize 12 cryptlen 1464
+>>> [  380.832637] dt00000000: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 06 ==> Decrypted data seems correct,last byte is proto(06 TCP)
+>>> [  380.840215] dt00000010: bf ee 4f 80 a4 7f 2a 50 6a 5a 0b 10
+>>> [  380.846636] ass00000000: 0a bc d3 31 <00 00 00 01> 00 1c e5 ec 0e af 04 69 ==> ESN-Hi = 1
+>>> [  380.854316] ass00000010: a4 fc 08 ad
+>>>
+>>> Note: If I decrypt the same packet with ESN - Hi = 0. It Decrypt successfully means peer machine has used ESN-HI = 0 while encrypting.
+>>>
+>>> To debug further we added trace in "xfrm_replay_seqhi". Following was the output:
+>>>
+>>>  <idle>-0     [003] ..s.   380.967766: xfrm_replay_seqhi: seq_hi 0x 1 seq 0x 1ce5ec bottom 0x 1ce5ee replay seq 0x 1ce62d replay window 0x 40
+>>>
+>>> 1) Is this an expected variable with ESN enables connection?.
+>>>
+>>> 2) If packets are supposed to be dropped can't we avoid decryption overhead.
+>>>
+>>> Following logs are attached
+>>>
+>>> 1) dmesg log
+>>>
+>>> 2) debug patch used to reproduce the issue.
+>>>
+>>> 3) ftace log file
+>>>
+>>> 4) ip xfrm state list
+> Does this occur if you use software crypto on the receiving end
+> while keeping the sending end unchanged?
 
-Prior to this commit, the driver called init_completion on this
-completion both during probe as well as when registering virtio buffers
-as part of a hwrng read operation. The second of these init_completion
-calls should instead be reinit_completion because the have_data
-completion has already been inited by probe. As described in
-Documentation/scheduler/completion.txt, "Calling init_completion() twice
-on the same completion object is most likely a bug".
+I tried with "authencesn(hmac(sha1-ssse3),cbc(aes-asm))" on both sides.
 
-This bug was present in the initial implementation of virtio-rng in
-f7f510ec1957 ("virtio: An entropy device, as suggested by hpa"). Back
-then the have_data completion was a single static completion rather than
-a member of one of potentially multiple virtrng_info structs as
-implemented later by 08e53fbdb85c ("virtio-rng: support multiple
-virtio-rng devices"). The original driver incorrectly used
-init_completion rather than INIT_COMPLETION to reset have_data during
-read.
+Server : iperf  -s  -w 512k  -p 20002
 
-Tested by running `head -c48 /dev/random | hexdump` within crosvm, the
-Chrome OS virtual machine monitor, and confirming that the virtio-rng
-driver successfully produces random bytes from the host.
+Client : iperf  -t 60 -w 512k -l 2048 -c 1.0.0.96 -P 32 -p 20002
 
-Signed-off-by: David Tolnay <dtolnay@gmail.com>
-Tested-by: David Tolnay <dtolnay@gmail.com>
----
- drivers/char/hw_random/virtio-rng.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> If not then I would start debugging this within your driver.
 
-diff --git a/drivers/char/hw_random/virtio-rng.c
-b/drivers/char/hw_random/virtio-rng.c
-index b89df66ea1ae..7abd604e938c 100644
---- a/drivers/char/hw_random/virtio-rng.c
-+++ b/drivers/char/hw_random/virtio-rng.c
-@@ -73,7 +73,7 @@ static int virtio_read(struct hwrng *rng, void *buf,
-size_t size, bool wait)
+ESP Packet whose's sequence No. is out of window gets dropped with EBADMSG.  It seems that "xfrm_replay_seqhi" intentionally increments the "seq_hi" to fail verification for Out of seq packet.
 
-     if (!vi->busy) {
-         vi->busy = true;
--        init_completion(&vi->have_data);
-+        reinit_completion(&vi->have_data);
-         register_buffer(vi, buf, size);
-     }
-
--- 
-2.20.1.97.g81188d93c3-goog
+>
+> Thanks,
