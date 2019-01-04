@@ -4,64 +4,64 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BCDDC43387
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Jan 2019 12:02:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B24A3C43387
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Jan 2019 13:03:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B8F8321872
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Jan 2019 12:02:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7157221872
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Jan 2019 13:03:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="AViYhguE"
+	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="Jq/DXa1l"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726154AbfADMCH (ORCPT
+        id S1727414AbfADNDq (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Jan 2019 07:02:07 -0500
-Received: from mail-vs1-f68.google.com ([209.85.217.68]:43867 "EHLO
-        mail-vs1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726163AbfADMCG (ORCPT
+        Fri, 4 Jan 2019 08:03:46 -0500
+Received: from mail-it1-f195.google.com ([209.85.166.195]:56175 "EHLO
+        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726169AbfADNDq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Jan 2019 07:02:06 -0500
-Received: by mail-vs1-f68.google.com with SMTP id x1so22494138vsc.10
-        for <linux-crypto@vger.kernel.org>; Fri, 04 Jan 2019 04:02:05 -0800 (PST)
+        Fri, 4 Jan 2019 08:03:46 -0500
+Received: by mail-it1-f195.google.com with SMTP id m62so1443470ith.5
+        for <linux-crypto@vger.kernel.org>; Fri, 04 Jan 2019 05:03:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=qBhNm6Ac9YIO6DpF0P8iJrO8ViGll//SYqjJFCTyCmc=;
-        b=AViYhguE0tak8Bj/WPvHRErzSJ7HeJqOzu1Qr5H8N9xK8gJG0gwMhEDY3XndRfxYFl
-         NQ+bqpSOZnDL/yDFBKh6AQ3ANkLdyWx/n4U8zGBD+nAXeMozV2yw//D+W61/H8GuQ10M
-         ZiWlPse0xZyiVzs0nRjwiOUKVDiUEnCYZbBjM=
+        bh=hPqgPLP2kwleNdgoVpetkWxniahAO6/ebhrkFc4SRQ0=;
+        b=Jq/DXa1lXWQP2j6uN3UXOF8qsNy2983oKTv2ILT7IJy/qrR//8d7cGYtmfl1SNZ6rf
+         foGohYU1Y9rJWxIFLMZb+gi3PzbF5wxDMG5CmCVUKkPRK0zqlgEAjbFCJY/DUud1F5r1
+         Pv9RAl87Zj1RIj7eR/GNLX7BrP/Tx3vvn4rQk=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=qBhNm6Ac9YIO6DpF0P8iJrO8ViGll//SYqjJFCTyCmc=;
-        b=T0JA4bCGOUmgxqdi/hEurRbbeX2m7kIwkMoYLMEBj1F3a0RTUKrY55tQfNd2vdB3AF
-         Bn5TxUIK+KSuKv7XHbEDCbyd3D3kTiF1ihyshM/kYwQLgh8gdlfJ9sHHGlf9EBKH2fl1
-         BLgLZtLDBNX2RlDp5CxLgDhM0Y9ymC8pvOxsFl4VOzYQx6kUbo5oG9Sw16c3PuZ0zxgJ
-         4WnjPBWaIZ/yFva4hDvpxDppiHzDWwUnUXb/GKlhK9WiX0hKB9QNddA0p+HumgMXcr69
-         XXu0Us2IXjRJY8XNj7KyuxwgIpCMweHm0sTXdrXxrXE2evKglcH2uF+oT4gT3CR9vKng
-         nZGg==
-X-Gm-Message-State: AJcUukdexFxzxunQgiUTypYKhwf+N/Veo/3EprvNAHDI9MfOS9HJDu/t
-        tFXnpCqGUegyFwedZTUXI5fYyoZwSYSkc0YOhD/0XA==
-X-Google-Smtp-Source: AFSGD/W7NRKn4+/HB0DslcHkQAZnxIs1hr/Z7fJXuX+wFzrBNXT/CVdp3SNsvzrLZte0qWi5bpkY3dDp8MqNKSgEDwA=
-X-Received: by 2002:a67:d684:: with SMTP id o4mr21023454vsj.174.1546603324665;
- Fri, 04 Jan 2019 04:02:04 -0800 (PST)
+        bh=hPqgPLP2kwleNdgoVpetkWxniahAO6/ebhrkFc4SRQ0=;
+        b=hLmwkg951Aut/nQMO5oL0ncRqMHKSyR5j9oJ7PGDrT53bP7lbgctLx9RPOCqMM6C66
+         YXuikFMZYjfoRko1mh3IS50RjmvdcsTojX6PVXzhh+/UzK63Vvsdku4LUKWt9G1iMvgZ
+         2JqCwi6HF/QYfUMJ6ELJy4Wq9CQWp4BxagrUQzD+fiWI8ZQV3I2Je32kTEaYnhjva4Sh
+         yf80+yiRhat+xeSWEg5foBlSpkZEHUMXljWjan5kVkYWKZGPJL9M7CDYCO7SE5liWAQC
+         iSwncl/JRQKLFFl3yMhXb6FIBZxB1nVz3lJ3BWvM8BOZMTe8odG1ePcaFHuW7mhuhKKK
+         0WyA==
+X-Gm-Message-State: AJcUuke0fSiN8hvjoOJIY6ooTmDMjHLl5ZDWYITvUQAwiVQ7Bz7ZzQik
+        bIbX8xVZbsZqqvpObU8ZLBRQLUfCQ4hkw1gCcCoznA==
+X-Google-Smtp-Source: ALg8bN5as6MlLRuBHfk8hX9/0A8Lc6mEX3ikytnx6eGIZQX8xogeEM9R8jwy7hULCN7mI4xVY2TzRh/vTp1+3bZnDXo=
+X-Received: by 2002:a24:874a:: with SMTP id f71mr811326ite.120.1546607024966;
+ Fri, 04 Jan 2019 05:03:44 -0800 (PST)
 MIME-Version: 1.0
 References: <1545908831-25910-1-git-send-email-sumit.garg@linaro.org>
  <1545908831-25910-2-git-send-email-sumit.garg@linaro.org> <CAKv+Gu8o_6Mu8_2vNHXEy46mZ6xrSPekcwPH7BvxR8nec37Ktw@mail.gmail.com>
  <CAFA6WYOpw-URTYJ4i0Y_Tie0_ccMwekbOVzXz3d05NttyL9sHg@mail.gmail.com>
  <20190103171441.6ymnhbxnb4asr3kl@holly.lan> <CAFA6WYP4TgWHaZpathACsKgtcG5xx81FJ+=saimQP6ZyHnL1=w@mail.gmail.com>
- <CAHUa44GwwfW9diUbar4+3L8OhJs3K9iiE2DfBxEBrwmLfczXKA@mail.gmail.com>
-In-Reply-To: <CAHUa44GwwfW9diUbar4+3L8OhJs3K9iiE2DfBxEBrwmLfczXKA@mail.gmail.com>
-From:   Sumit Garg <sumit.garg@linaro.org>
-Date:   Fri, 4 Jan 2019 17:31:52 +0530
+ <CAHUa44GwwfW9diUbar4+3L8OhJs3K9iiE2DfBxEBrwmLfczXKA@mail.gmail.com> <CAFA6WYNobWZq3Y1oK0UXrTzhuG6wQEU+koCWkKgXwpLAGXpfPA@mail.gmail.com>
+In-Reply-To: <CAFA6WYNobWZq3Y1oK0UXrTzhuG6wQEU+koCWkKgXwpLAGXpfPA@mail.gmail.com>
+From:   Jens Wiklander <jens.wiklander@linaro.org>
+Date:   Fri, 4 Jan 2019 14:03:33 +0100
 Message-ID:
- <CAFA6WYNobWZq3Y1oK0UXrTzhuG6wQEU+koCWkKgXwpLAGXpfPA@mail.gmail.com>
+ <CAHUa44GZz=MGiRUAgPzCGH_XCTJizX15KBq5=HEFw4rZ7Z_Riw@mail.gmail.com>
 Subject: Re: [PATCH v1 1/2] dt/bindings: add bindings for optional optee
  rng-uuid property
-To:     Jens Wiklander <jens.wiklander@linaro.org>
+To:     Sumit Garg <sumit.garg@linaro.org>
 Cc:     Daniel Thompson <daniel.thompson@linaro.org>,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
@@ -78,142 +78,156 @@ Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
-Message-ID: <20190104120152.2FJi8JNgO1IWgbmQ8KLvBb-HwpCkvOEh6JFp1PBWh3Q@z>
+Message-ID: <20190104130333.SjdQJGd_CdhIEEzeWDuAvgi9G5G3__6HgKEGZ5npifU@z>
 
-On Fri, 4 Jan 2019 at 16:31, Jens Wiklander <jens.wiklander@linaro.org> wrote:
+On Fri, Jan 4, 2019 at 1:02 PM Sumit Garg <sumit.garg@linaro.org> wrote:
 >
-> On Fri, Jan 4, 2019 at 7:39 AM Sumit Garg <sumit.garg@linaro.org> wrote:
+> On Fri, 4 Jan 2019 at 16:31, Jens Wiklander <jens.wiklander@linaro.org> wrote:
 > >
-> > On Thu, 3 Jan 2019 at 22:44, Daniel Thompson <daniel.thompson@linaro.org> wrote:
+> > On Fri, Jan 4, 2019 at 7:39 AM Sumit Garg <sumit.garg@linaro.org> wrote:
 > > >
-> > > On Fri, Dec 28, 2018 at 02:41:01PM +0530, Sumit Garg wrote:
-> > > > On Thu, 27 Dec 2018 at 19:10, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
-> > > > >
-> > > > > On Thu, 27 Dec 2018 at 12:08, Sumit Garg <sumit.garg@linaro.org> wrote:
-> > > > > >
-> > > > > > Add bindings for OP-TEE based optional hardware random number
-> > > > > > generator identifier property. It could be used on ARM based devices
-> > > > > > where entropy source is not accessible to normal world (linux in this
-> > > > > > case).
-> > > > > >
-> > > > > > Signed-off-by: Sumit Garg <sumit.garg@linaro.org>
-> > > > > > ---
-> > > > > >  Documentation/devicetree/bindings/arm/firmware/linaro,optee-tz.txt | 4 ++++
-> > > > > >  1 file changed, 4 insertions(+)
-> > > > > >
-> > > > > > diff --git a/Documentation/devicetree/bindings/arm/firmware/linaro,optee-tz.txt b/Documentation/devicetree/bindings/arm/firmware/linaro,optee-tz.txt
-> > > > > > index d38834c..e3a4c35 100644
-> > > > > > --- a/Documentation/devicetree/bindings/arm/firmware/linaro,optee-tz.txt
-> > > > > > +++ b/Documentation/devicetree/bindings/arm/firmware/linaro,optee-tz.txt
-> > > > > > @@ -20,6 +20,9 @@ the reference implementation maintained by Linaro.
-> > > > > >                     "hvc" : HVC #0, with the register assignments specified
-> > > > > >                            in drivers/tee/optee/optee_smc.h
-> > > > > >
-> > > > > > +- rng-uuid       : Optional OP-TEE based RNG service identifier in case
-> > > > > > +                   hardware entropy source is not accesible to normal world
-> > > > > > +                   (Linux).
-> > > > > >
-> > > > > >
-> > > > > >  Example:
-> > > > > > @@ -27,5 +30,6 @@ Example:
-> > > > > >                 optee {
-> > > > > >                         compatible = "linaro,optee-tz";
-> > > > > >                         method = "smc";
-> > > > > > +                       rng-uuid = "ab7a617c-b8e7-4d8f-8301-d09b61036b64";
-> > > > >
-> > > > > If OP-TEE is going to expose devices in this way, it should be modeled
-> > > > > more like a bus driver, i.e., sub-nodes that represent the devices,
-> > > > > with compatible strings, and perhaps even 'reg' properties for the
-> > > > > UUIDs.
-> > > > >
+> > > On Thu, 3 Jan 2019 at 22:44, Daniel Thompson <daniel.thompson@linaro.org> wrote:
 > > > >
-> > > > This is something Daniel also suggested during our discussion. But we
-> > > > agreed to discuss in upstream to get more feedback.
+> > > > On Fri, Dec 28, 2018 at 02:41:01PM +0530, Sumit Garg wrote:
+> > > > > On Thu, 27 Dec 2018 at 19:10, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+> > > > > >
+> > > > > > On Thu, 27 Dec 2018 at 12:08, Sumit Garg <sumit.garg@linaro.org> wrote:
+> > > > > > >
+> > > > > > > Add bindings for OP-TEE based optional hardware random number
+> > > > > > > generator identifier property. It could be used on ARM based devices
+> > > > > > > where entropy source is not accessible to normal world (linux in this
+> > > > > > > case).
+> > > > > > >
+> > > > > > > Signed-off-by: Sumit Garg <sumit.garg@linaro.org>
+> > > > > > > ---
+> > > > > > >  Documentation/devicetree/bindings/arm/firmware/linaro,optee-tz.txt | 4 ++++
+> > > > > > >  1 file changed, 4 insertions(+)
+> > > > > > >
+> > > > > > > diff --git a/Documentation/devicetree/bindings/arm/firmware/linaro,optee-tz.txt b/Documentation/devicetree/bindings/arm/firmware/linaro,optee-tz.txt
+> > > > > > > index d38834c..e3a4c35 100644
+> > > > > > > --- a/Documentation/devicetree/bindings/arm/firmware/linaro,optee-tz.txt
+> > > > > > > +++ b/Documentation/devicetree/bindings/arm/firmware/linaro,optee-tz.txt
+> > > > > > > @@ -20,6 +20,9 @@ the reference implementation maintained by Linaro.
+> > > > > > >                     "hvc" : HVC #0, with the register assignments specified
+> > > > > > >                            in drivers/tee/optee/optee_smc.h
+> > > > > > >
+> > > > > > > +- rng-uuid       : Optional OP-TEE based RNG service identifier in case
+> > > > > > > +                   hardware entropy source is not accesible to normal world
+> > > > > > > +                   (Linux).
+> > > > > > >
+> > > > > > >
+> > > > > > >  Example:
+> > > > > > > @@ -27,5 +30,6 @@ Example:
+> > > > > > >                 optee {
+> > > > > > >                         compatible = "linaro,optee-tz";
+> > > > > > >                         method = "smc";
+> > > > > > > +                       rng-uuid = "ab7a617c-b8e7-4d8f-8301-d09b61036b64";
+> > > > > >
+> > > > > > If OP-TEE is going to expose devices in this way, it should be modeled
+> > > > > > more like a bus driver, i.e., sub-nodes that represent the devices,
+> > > > > > with compatible strings, and perhaps even 'reg' properties for the
+> > > > > > UUIDs.
+> > > > > >
+> > > > >
+> > > > > This is something Daniel also suggested during our discussion. But we
+> > > > > agreed to discuss in upstream to get more feedback.
+> > > > >
+> > > > > I think generic TEE should be modelled as a bus driver with devices
+> > > > > identified via UUIDs, probably queried from underline implementations
+> > > > > like OP-TEE regarding which resident devices (pseudo-TA UUIDs) it
+> > > > > supports. Then this list of device UUIDs can be compared against child
+> > > > > driver's UUID as part of match callback during driver registration.
+> > > > > Also the child driver could maintain list of device UUIDs which it
+> > > > > supports.
+> > > > >
+> > > > > If we go via this approach we may not require device tree entry for
+> > > > > corresponding device UUIDs.
 > > > >
-> > > > I think generic TEE should be modelled as a bus driver with devices
-> > > > identified via UUIDs, probably queried from underline implementations
-> > > > like OP-TEE regarding which resident devices (pseudo-TA UUIDs) it
-> > > > supports. Then this list of device UUIDs can be compared against child
-> > > > driver's UUID as part of match callback during driver registration.
-> > > > Also the child driver could maintain list of device UUIDs which it
-> > > > supports.
+> > > > That's pretty much aligned with my thinking.
 > > > >
-> > > > If we go via this approach we may not require device tree entry for
-> > > > corresponding device UUIDs.
+> > > > Having said that I had wondered whether all TEEs would be prepared to
+> > > > describe the set of available UUIDs since AFAIK UUID enumeration isn't
+> > > > part of the GlobalPlatform standards so it is not implemented by GP
+> > > > based TEEs (such as OP-TEE).
+> > > >
+> > > > Is it feasible to extend OP-TEE to enumerate the available UUIDs?
+> > > > If nothing else can it provide an (optional) pseudo TA to provide such a
+> > > > service? Personally I'd be OK with a kernel TEE bus infrastructure that
+> > > > mandated such a service (e.g. a TEE that does not provide the service
+> > > > can only interact with TEE from userspace).
+> > > >
 > > >
-> > > That's pretty much aligned with my thinking.
+> > > Following is the kernel interface for OP-TEE device enumeration that I
+> > > would like to propose:
 > > >
-> > > Having said that I had wondered whether all TEEs would be prepared to
-> > > describe the set of available UUIDs since AFAIK UUID enumeration isn't
-> > > part of the GlobalPlatform standards so it is not implemented by GP
-> > > based TEEs (such as OP-TEE).
+> > > /*
+> > >  * Get next OP-TEE based kernel device
+> > >  *
+> > >  * Secure world can provide support for resident kernel devices/services
+> > >  * as pseudo/early trusted applications. So this function is used to
+> > >  * enumerate OP-TEE based kernel devices.
+> > >  *
+> > >  * Call register usage:
+> > >  * a0   SMC Function ID, OPTEE_SMC_GET_NEXT_DEVICE
+> > >  * a1-6 Not used
+> > >  * a7   Hypervisor Client ID register
+> > >  *
+> > >  * Possible return values:
+> > >  *
+> > >  * OP-TEE OS returns next device UUID.
+> > >  * a0   OPTEE_SMC_RETURN_OK
+> > >  * a1-4 Device UUID
+> > >  * a5-7 Preserved
+> > >  *
+> > >  * OP-TEE OS does not recognize this function.
+> > >  * a0   OPTEE_SMC_RETURN_UNKNOWN_FUNCTION
+> > >  * a1-7 Preserved
+> > >  *
+> > >  * OP-TEE OS done with device enumeration.
+> > >  * a0   OPTEE_SMC_RETURN_ENOTAVAIL
+> > >  * a1-7 Preserved
+> > >  */
+> > > #define OPTEE_SMC_FUNCID_GET_NEXT_DEVICE       15
+> > > #define OPTEE_SMC_GET_NEXT_DEVICE \
+> > >         OPTEE_SMC_FAST_CALL_VAL(OPTEE_SMC_FUNCID_GET_NEXT_DEVICE)
 > > >
-> > > Is it feasible to extend OP-TEE to enumerate the available UUIDs?
-> > > If nothing else can it provide an (optional) pseudo TA to provide such a
-> > > service? Personally I'd be OK with a kernel TEE bus infrastructure that
-> > > mandated such a service (e.g. a TEE that does not provide the service
-> > > can only interact with TEE from userspace).
-> > >
+> > > Also at OP-TEE end, we should add additional TA_FLAG_KERNEL_DEVICE to
+> > > detect particular pseudo/early TA as a kernel device during
+> > > enumeration.
 > >
-> > Following is the kernel interface for OP-TEE device enumeration that I
-> > would like to propose:
+> > I'd rather provide this enumeration via a pseudo TA, to keep the SMC
+> > interface as small as possible. The pseudo TA can be optional, if it's
+> > not available then there's no need to try to instantiate any dependent
+> > drivers either.
 > >
-> > /*
-> >  * Get next OP-TEE based kernel device
-> >  *
-> >  * Secure world can provide support for resident kernel devices/services
-> >  * as pseudo/early trusted applications. So this function is used to
-> >  * enumerate OP-TEE based kernel devices.
-> >  *
-> >  * Call register usage:
-> >  * a0   SMC Function ID, OPTEE_SMC_GET_NEXT_DEVICE
-> >  * a1-6 Not used
-> >  * a7   Hypervisor Client ID register
-> >  *
-> >  * Possible return values:
-> >  *
-> >  * OP-TEE OS returns next device UUID.
-> >  * a0   OPTEE_SMC_RETURN_OK
-> >  * a1-4 Device UUID
-> >  * a5-7 Preserved
-> >  *
-> >  * OP-TEE OS does not recognize this function.
-> >  * a0   OPTEE_SMC_RETURN_UNKNOWN_FUNCTION
-> >  * a1-7 Preserved
-> >  *
-> >  * OP-TEE OS done with device enumeration.
-> >  * a0   OPTEE_SMC_RETURN_ENOTAVAIL
-> >  * a1-7 Preserved
-> >  */
-> > #define OPTEE_SMC_FUNCID_GET_NEXT_DEVICE       15
-> > #define OPTEE_SMC_GET_NEXT_DEVICE \
-> >         OPTEE_SMC_FAST_CALL_VAL(OPTEE_SMC_FUNCID_GET_NEXT_DEVICE)
-> >
-> > Also at OP-TEE end, we should add additional TA_FLAG_KERNEL_DEVICE to
-> > detect particular pseudo/early TA as a kernel device during
-> > enumeration.
 >
-> I'd rather provide this enumeration via a pseudo TA, to keep the SMC
-> interface as small as possible. The pseudo TA can be optional, if it's
-> not available then there's no need to try to instantiate any dependent
-> drivers either.
+> I did thought about having a pseudo TA but following are some
+> negatives to this approach:
+> 1. Where do we specify UUID for this pseudo TA? Should it come from devicetree?
+
+This should be a well known UUID, provided in the .h file describing the TA.
+
+> 2. Adds whole TEE call sequence (ctx, session, shared memory etc.)
+> during "optee_probe".
+
+Yes, is that a problem?
+
+> 3. This pseudo TA would be exposed to user-space as well. I am not
+> sure if we would like user-space to access kernel device specific
+> info.
+
+Doesn't matter, that's not a secret. We can assume that an attacker
+already know the UUID of whatever TA it will target.
+
+- Jens
+
 >
-
-I did thought about having a pseudo TA but following are some
-negatives to this approach:
-1. Where do we specify UUID for this pseudo TA? Should it come from devicetree?
-2. Adds whole TEE call sequence (ctx, session, shared memory etc.)
-during "optee_probe".
-3. This pseudo TA would be exposed to user-space as well. I am not
-sure if we would like user-space to access kernel device specific
-info.
-
--Sumit
-
-> - Jens
+> -Sumit
 >
-> >
-> > -Sumit
+> > - Jens
 > >
 > > >
-> > > Daniel.
+> > > -Sumit
+> > >
+> > > >
+> > > > Daniel.
