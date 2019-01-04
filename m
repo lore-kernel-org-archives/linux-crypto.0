@@ -1,77 +1,40 @@
-Return-Path: <SRS0=b5ak=PZ=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from Galois.linutronix.de ([146.0.238.70]:48007 "EHLO
-        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725898AbfAQXP0 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Jan 2019 18:15:26 -0500
-Message-Id: <20190117231501.254152158@linutronix.de>
-Date: Fri, 18 Jan 2019 00:14:21 +0100
-From: Thomas Gleixner <tglx@linutronix.de>
-To: LKML <linux-kernel@vger.kernel.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Kate Stewart <kstewart@linuxfoundation.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Ondrej Mosnacek <omosnacek@gmail.com>,
+Return-Path: <SRS0=8/la=PM=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:50530 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726315AbfADRHw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 4 Jan 2019 12:07:52 -0500
+Date: Fri, 4 Jan 2019 09:07:49 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: David Howells <dhowells@redhat.com>
+Cc: linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-Subject: [patch 5/9] crypto: morus - Convert to SPDX license identifiers
-References: <20190117231416.111952141@linutronix.de>
+        stable@vger.kernel.org
+Subject: Re: [PATCH 04/16] crypto: pcbc - remove bogus memcpy()s with src ==
+ dest
+Message-ID: <20190104170748.GA67931@gmail.com>
+References: <20190104041625.3259-5-ebiggers@kernel.org>
+ <20190104041625.3259-1-ebiggers@kernel.org>
+ <11047.1546595833@warthog.procyon.org.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <11047.1546595833@warthog.procyon.org.uk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The license boiler plate text is not ideal for machine parsing. The kernel
-uses SPDX license identifiers for that purpose, which replace the boiler
-plate text.
+On Fri, Jan 04, 2019 at 09:57:13AM +0000, David Howells wrote:
+> Eric Biggers <ebiggers@kernel.org> wrote:
+> 
+> > -	u8 *iv = walk->iv;
+> > +	u8 * const iv = walk->iv;
+> 
+> Does adding this const actually gain anything?  (this is done twice)
+> 
+> David
 
-Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-Cc: Ondrej Mosnacek <omosnacek@gmail.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org
----
+It makes it clearer what's going on, especially since some modes update the 'iv'
+pointer after each block (delaying the copy to 'walk.iv' until the end) but
+others can't do that.  The 'const' is helpful to further distinguish these two
+cases, which were confused in both the pcbc and cfb implementations.
 
-P.S.: This patch is part of a larger cleanup, but independent of other
-      patches and is intended to be picked up by the maintainer directly. 
-
----
- crypto/morus1280.c |    6 +-----
- crypto/morus640.c  |    6 +-----
- 2 files changed, 2 insertions(+), 10 deletions(-)
-
---- a/crypto/morus1280.c
-+++ b/crypto/morus1280.c
-@@ -1,13 +1,9 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
- /*
-  * The MORUS-1280 Authenticated-Encryption Algorithm
-  *
-  * Copyright (c) 2016-2018 Ondrej Mosnacek <omosnacek@gmail.com>
-  * Copyright (C) 2017-2018 Red Hat, Inc. All rights reserved.
-- *
-- * This program is free software; you can redistribute it and/or modify it
-- * under the terms of the GNU General Public License as published by the Free
-- * Software Foundation; either version 2 of the License, or (at your option)
-- * any later version.
-  */
- 
- #include <asm/unaligned.h>
---- a/crypto/morus640.c
-+++ b/crypto/morus640.c
-@@ -1,13 +1,9 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
- /*
-  * The MORUS-640 Authenticated-Encryption Algorithm
-  *
-  * Copyright (c) 2016-2018 Ondrej Mosnacek <omosnacek@gmail.com>
-  * Copyright (C) 2017-2018 Red Hat, Inc. All rights reserved.
-- *
-- * This program is free software; you can redistribute it and/or modify it
-- * under the terms of the GNU General Public License as published by the Free
-- * Software Foundation; either version 2 of the License, or (at your option)
-- * any later version.
-  */
- 
- #include <asm/unaligned.h>
+- Eric
