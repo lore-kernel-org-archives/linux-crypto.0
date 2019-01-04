@@ -1,582 +1,165 @@
-Return-Path: <SRS0=CSIn=PT=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mo4-p03-ob.smtp.rzone.de ([81.169.146.175]:15106 "EHLO
-        mo4-p03-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729364AbfAKTOB (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Jan 2019 14:14:01 -0500
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        James Bottomley <James.Bottomley@hansenpartnership.com>,
-        Andy Lutomirski <luto@amacapital.net>,
-        "Lee, Chun-Yi" <joeyli.kernel@gmail.com>,
-        "Rafael J . Wysocki" <rjw@rjwysocki.net>,
-        Pavel Machek <pavel@ucw.cz>, linux-kernel@vger.kernel.org,
-        linux-pm@vger.kernel.org, keyrings@vger.kernel.org,
-        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-        Chen Yu <yu.c.chen@intel.com>,
-        Oliver Neukum <oneukum@suse.com>,
-        Ryan Chen <yu.chen.surf@gmail.com>,
-        David Howells <dhowells@redhat.com>,
-        Giovanni Gherdovich <ggherdovich@suse.cz>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Jann Horn <jannh@google.com>,
-        Andy Lutomirski <luto@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH 2/6] crypto: kdf - SP800-108 Key Derivation Function
-Date: Fri, 11 Jan 2019 20:10:02 +0100
-Message-ID: <1830918.5I3Y3k8tQf@positron.chronox.de>
-In-Reply-To: <9733066.Vrs4h5eWcW@positron.chronox.de>
-References: <20190103143227.9138-1-jlee@suse.com> <20190109082103.GA8586@sol.localdomain> <9733066.Vrs4h5eWcW@positron.chronox.de>
+Return-Path: <SRS0=8/la=PM=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:56434 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727740AbfADEU6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 3 Jan 2019 23:20:58 -0500
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [PATCH 14/16] crypto: arc4 - convert to skcipher API
+Date: Thu,  3 Jan 2019 20:16:23 -0800
+Message-Id: <20190104041625.3259-15-ebiggers@kernel.org>
+In-Reply-To: <20190104041625.3259-1-ebiggers@kernel.org>
+References: <20190104041625.3259-1-ebiggers@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The SP800-108 compliant Key Derivation Function is implemented as a
-random number generator considering that it behaves like a deterministic
-RNG.
+From: Eric Biggers <ebiggers@google.com>
 
-All three KDF types specified in SP800-108 are implemented.
+Convert the "ecb(arc4)" algorithm from the deprecated "blkcipher" API to
+the "skcipher" API.
 
-The code comments provide details about how to invoke the different KDF
-types.
+(Note that this is really a stream cipher and not a block cipher in ECB
+mode as the name implies, but that's a problem for another day...)
 
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
+Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/Kconfig  |   7 +
- crypto/Makefile |   1 +
- crypto/kdf.c    | 492 ++++++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 500 insertions(+)
- create mode 100644 crypto/kdf.c
+ crypto/arc4.c | 82 +++++++++++++++++++++++++++------------------------
+ 1 file changed, 44 insertions(+), 38 deletions(-)
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 86960aa53e0f..cc80d89e0cf5 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -561,6 +561,13 @@ config CRYPTO_HMAC
- 	  HMAC: Keyed-Hashing for Message Authentication (RFC2104).
- 	  This is required for IPSec.
+diff --git a/crypto/arc4.c b/crypto/arc4.c
+index f1a81925558fa..652d24399afa6 100644
+--- a/crypto/arc4.c
++++ b/crypto/arc4.c
+@@ -12,10 +12,10 @@
+  *
+  */
  
-+config CRYPTO_KDF
-+	tristate "Key Derivation Function (SP800-108)"
-+	select CRYPTO_RNG
-+	help
-+	  Support for KDF compliant to SP800-108. All three types of
-+	  KDF specified in SP800-108 are implemented.
-+
- config CRYPTO_XCBC
- 	tristate "XCBC support"
- 	select CRYPTO_HASH
-diff --git a/crypto/Makefile b/crypto/Makefile
-index 799ed5e94606..69a0bb64b0ac 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -58,6 +58,7 @@ crypto_user-y := crypto_user_base.o
- crypto_user-$(CONFIG_CRYPTO_STATS) += crypto_user_stat.o
- obj-$(CONFIG_CRYPTO_CMAC) += cmac.o
- obj-$(CONFIG_CRYPTO_HMAC) += hmac.o
-+obj-$(CONFIG_CRYPTO_KDF) += kdf.o
- obj-$(CONFIG_CRYPTO_VMAC) += vmac.o
- obj-$(CONFIG_CRYPTO_XCBC) += xcbc.o
- obj-$(CONFIG_CRYPTO_NULL2) += crypto_null.o
-diff --git a/crypto/kdf.c b/crypto/kdf.c
-new file mode 100644
-index 000000000000..2c6dd8676a9f
---- /dev/null
-+++ b/crypto/kdf.c
-@@ -0,0 +1,492 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+/*
-+ * SP800-108 Key-derivation function
-+ *
-+ * Copyright (C) 2019, Stephan Mueller <smueller@chronox.de>
-+ */
-+
-+/*
-+ * For performing a KDF operation, the following input is required
-+ * from the caller:
-+ *
-+ *	* Keying material to be used to derive the new keys from
-+ *	  (denoted as Ko in SP800-108)
-+ *	* Label -- a free form binary string
-+ *	* Context -- a free form binary string
-+ *
-+ * The KDF is implemented as a random number generator.
-+ *
-+ * The Ko keying material is to be provided with the initialization of the KDF
-+ * "random number generator", i.e. with the crypto_rng_reset function.
-+ *
-+ * The Label and Context concatenated string is provided when obtaining random
-+ * numbers, i.e. with the crypto_rng_generate function. The caller must format
-+ * the free-form Label || Context input as deemed necessary for the given
-+ * purpose. Note, SP800-108 mandates that the Label and Context are separated
-+ * by a 0x00 byte, i.e. the caller shall provide the input as
-+ * Label || 0x00 || Context when trying to be compliant to SP800-108. For
-+ * the feedback KDF, an IV is required as documented below.
-+ *
-+ * Example without proper error handling:
-+ *	char *keying_material = "\x00\x11\x22\x33\x44\x55\x66\x77";
-+ *	char *label_context = "\xde\xad\xbe\xef\x00\xde\xad\xbe\xef";
-+ *	kdf = crypto_alloc_rng(name, 0, 0);
-+ *	crypto_rng_reset(kdf, keying_material, 8);
-+ *	crypto_rng_generate(kdf, label_context, 9, outbuf, outbuflen);
-+ *
-+ * NOTE: In-place cipher operations are not supported.
-+ */
-+
+-#include <linux/module.h>
+-#include <linux/init.h>
+-#include <linux/crypto.h>
+ #include <crypto/algapi.h>
++#include <crypto/internal/skcipher.h>
++#include <linux/init.h>
 +#include <linux/module.h>
-+#include <crypto/rng.h>
-+#include <crypto/internal/rng.h>
-+#include <crypto/hash.h>
-+#include <crypto/internal/hash.h>
+ 
+ #define ARC4_MIN_KEY_SIZE	1
+ #define ARC4_MAX_KEY_SIZE	256
+@@ -50,6 +50,12 @@ static int arc4_set_key(struct crypto_tfm *tfm, const u8 *in_key,
+ 	return 0;
+ }
+ 
++static int arc4_set_key_skcipher(struct crypto_skcipher *tfm, const u8 *in_key,
++				 unsigned int key_len)
++{
++	return arc4_set_key(&tfm->base, in_key, key_len);
++}
 +
-+struct crypto_kdf_ctx {
-+	struct crypto_shash *kmd;
+ static void arc4_crypt(struct arc4_ctx *ctx, u8 *out, const u8 *in,
+ 		       unsigned int len)
+ {
+@@ -92,30 +98,25 @@ static void arc4_crypt_one(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+ 	arc4_crypt(crypto_tfm_ctx(tfm), out, in, 1);
+ }
+ 
+-static int ecb_arc4_crypt(struct blkcipher_desc *desc, struct scatterlist *dst,
+-			  struct scatterlist *src, unsigned int nbytes)
++static int ecb_arc4_crypt(struct skcipher_request *req)
+ {
+-	struct arc4_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
+-	struct blkcipher_walk walk;
++	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
++	struct arc4_ctx *ctx = crypto_skcipher_ctx(tfm);
++	struct skcipher_walk walk;
+ 	int err;
+ 
+-	blkcipher_walk_init(&walk, dst, src, nbytes);
+-
+-	err = blkcipher_walk_virt(desc, &walk);
++	err = skcipher_walk_virt(&walk, req, false);
+ 
+ 	while (walk.nbytes > 0) {
+-		u8 *wsrc = walk.src.virt.addr;
+-		u8 *wdst = walk.dst.virt.addr;
+-
+-		arc4_crypt(ctx, wdst, wsrc, walk.nbytes);
+-
+-		err = blkcipher_walk_done(desc, &walk, 0);
++		arc4_crypt(ctx, walk.dst.virt.addr, walk.src.virt.addr,
++			   walk.nbytes);
++		err = skcipher_walk_done(&walk, 0);
+ 	}
+ 
+ 	return err;
+ }
+ 
+-static struct crypto_alg arc4_algs[2] = { {
++static struct crypto_alg arc4_cipher = {
+ 	.cra_name		=	"arc4",
+ 	.cra_flags		=	CRYPTO_ALG_TYPE_CIPHER,
+ 	.cra_blocksize		=	ARC4_BLOCK_SIZE,
+@@ -130,34 +131,39 @@ static struct crypto_alg arc4_algs[2] = { {
+ 			.cia_decrypt		=	arc4_crypt_one,
+ 		},
+ 	},
+-}, {
+-	.cra_name		=	"ecb(arc4)",
+-	.cra_priority		=	100,
+-	.cra_flags		=	CRYPTO_ALG_TYPE_BLKCIPHER,
+-	.cra_blocksize		=	ARC4_BLOCK_SIZE,
+-	.cra_ctxsize		=	sizeof(struct arc4_ctx),
+-	.cra_alignmask		=	0,
+-	.cra_type		=	&crypto_blkcipher_type,
+-	.cra_module		=	THIS_MODULE,
+-	.cra_u			=	{
+-		.blkcipher = {
+-			.min_keysize	=	ARC4_MIN_KEY_SIZE,
+-			.max_keysize	=	ARC4_MAX_KEY_SIZE,
+-			.setkey		=	arc4_set_key,
+-			.encrypt	=	ecb_arc4_crypt,
+-			.decrypt	=	ecb_arc4_crypt,
+-		},
+-	},
+-} };
 +};
 +
-+#define CRYPTO_KDF_MAX_DIGESTSIZE	64
-+#define CRYPTO_KDF_MAX_ALIGNMASK	0x3f
-+
-+static inline void crypto_kdf_init_desc(struct shash_desc *desc,
-+					struct crypto_shash *kmd)
-+{
-+	desc->tfm = kmd;
-+	desc->flags = crypto_shash_get_flags(kmd) & CRYPTO_TFM_REQ_MAY_SLEEP;
-+}
-+
-+/*
-+ * Implementation of the KDF in double pipeline iteration mode according with
-+ * counter to SP800-108 section 5.3.
-+ *
-+ * The caller must provide Label || 0x00 || Context in src. This src pointer
-+ * may also be NULL if the caller wishes not to provide anything.
-+ */
-+static int crypto_kdf_dpi_random(struct crypto_rng *rng,
-+				 const u8 *src, unsigned int slen,
-+				 u8 *dst, unsigned int dlen)
-+{
-+	struct crypto_kdf_ctx *ctx = crypto_tfm_ctx(crypto_rng_tfm(rng));
-+	struct crypto_shash *kmd = ctx->kmd;
-+	SHASH_DESC_ON_STACK(desc, kmd);
-+	__be32 counter = cpu_to_be32(1);
-+	unsigned int h = crypto_shash_digestsize(kmd);
-+	unsigned int alignmask = crypto_shash_alignmask(kmd);
-+	int err = 0;
-+	u8 *dst_orig = dst;
-+	u8 Aiblock[CRYPTO_KDF_MAX_DIGESTSIZE + CRYPTO_KDF_MAX_ALIGNMASK];
-+	u8 *Ai = PTR_ALIGN((u8 *)Aiblock, alignmask + 1);
-+
-+	crypto_kdf_init_desc(desc, kmd);
-+
-+	memset(Ai, 0, h);
-+
-+	while (dlen) {
-+		/* Calculate A(i) */
-+		if (dst == dst_orig && src && slen)
-+			/* 5.3 step 4 and 5.a */
-+			err = crypto_shash_digest(desc, src, slen, Ai);
-+		else
-+			/* 5.3 step 5.a */
-+			err = crypto_shash_digest(desc, Ai, h, Ai);
-+		if (err)
-+			goto out;
-+
-+		/* Calculate K(i) -- step 5.b */
-+		err = crypto_shash_init(desc);
-+		if (err)
-+			goto out;
-+
-+		err = crypto_shash_update(desc, Ai, h);
-+		if (err)
-+			goto out;
-+
-+		err = crypto_shash_update(desc, (u8 *)&counter, sizeof(__be32));
-+		if (err)
-+			goto out;
-+		if (src && slen) {
-+			err = crypto_shash_update(desc, src, slen);
-+			if (err)
-+				goto out;
-+		}
-+
-+		if (dlen < h) {
-+			u8 tmpbuffer[CRYPTO_KDF_MAX_DIGESTSIZE];
-+
-+			err = crypto_shash_final(desc, tmpbuffer);
-+			if (err)
-+				goto out;
-+			memcpy(dst, tmpbuffer, dlen);
-+			memzero_explicit(tmpbuffer, h);
-+			goto out;
-+		} else {
-+			err = crypto_shash_final(desc, dst);
-+			if (err)
-+				goto out;
-+			dlen -= h;
-+			dst += h;
-+			counter = cpu_to_be32(be32_to_cpu(counter) + 1);
-+		}
-+	}
-+
-+out:
-+	if (err)
-+		memzero_explicit(dst_orig, dlen);
-+	shash_desc_zero(desc);
-+	memzero_explicit(Ai, h);
-+	return err;
-+}
-+
-+/*
-+ * Implementation of the KDF in feedback mode with a non-NULL IV and with
-+ * counter according to SP800-108 section 5.2. The IV is supplied with src
-+ * and must be equal to the digestsize of the used cipher.
-+ *
-+ * In addition, the caller must provide Label || 0x00 || Context in src. This
-+ * src pointer must not be NULL as the IV is required. The ultimate format of
-+ * the src pointer is IV || Label || 0x00 || Context where the length of the
-+ * IV is equal to the output size of the PRF.
-+ */
-+static int crypto_kdf_fb_random(struct crypto_rng *rng,
-+				const u8 *src, unsigned int slen,
-+				u8 *dst, unsigned int dlen)
-+{
-+	struct crypto_kdf_ctx *ctx = crypto_tfm_ctx(crypto_rng_tfm(rng));
-+	struct crypto_shash *kmd = ctx->kmd;
-+	SHASH_DESC_ON_STACK(desc, kmd);
-+	__be32 counter = cpu_to_be32(1);
-+	unsigned int h = crypto_shash_digestsize(kmd), labellen = 0;
-+	int err = 0;
-+	u8 *dst_orig = dst;
-+	const u8 *label;
-+
-+	/* require the presence of an IV */
-+	if (!src || slen < h)
-+		return -EINVAL;
-+
-+	crypto_kdf_init_desc(desc, kmd);
-+
-+	/* calculate the offset of the label / context data */
-+	label = src + h;
-+	labellen = slen - h;
-+
-+	while (dlen) {
-+		err = crypto_shash_init(desc);
-+		if (err)
-+			goto out;
-+
-+		/*
-+		 * Feedback mode applies to all rounds except first which uses
-+		 * the IV.
-+		 */
-+		if (dst_orig == dst)
-+			err = crypto_shash_update(desc, src, h);
-+		else
-+			err = crypto_shash_update(desc, dst - h, h);
-+		if (err)
-+			goto out;
-+
-+		err = crypto_shash_update(desc, (u8 *)&counter, sizeof(__be32));
-+		if (err)
-+			goto out;
-+		if (labellen) {
-+			err = crypto_shash_update(desc, label, labellen);
-+			if (err)
-+				goto out;
-+		}
-+
-+		if (dlen < h) {
-+			u8 tmpbuffer[CRYPTO_KDF_MAX_DIGESTSIZE];
-+
-+			err = crypto_shash_final(desc, tmpbuffer);
-+			if (err)
-+				goto out;
-+			memcpy(dst, tmpbuffer, dlen);
-+			memzero_explicit(tmpbuffer, h);
-+			goto out;
-+		} else {
-+			err = crypto_shash_final(desc, dst);
-+			if (err)
-+				goto out;
-+			dlen -= h;
-+			dst += h;
-+			counter = cpu_to_be32(be32_to_cpu(counter) + 1);
-+		}
-+	}
-+
-+out:
-+	if (err)
-+		memzero_explicit(dst_orig, dlen);
-+	return err;
-+}
-+
-+/*
-+ * Implementation of the KDF in counter mode according to SP800-108 section 5.1
-+ * as well as SP800-56A section 5.8.1 (Single-step KDF).
-+ *
-+ * SP800-108:
-+ * The caller must provide Label || 0x00 || Context in src. This src pointer
-+ * may also be NULL if the caller wishes not to provide anything.
-+ *
-+ * SP800-56A:
-+ * The key provided for the HMAC during the crypto_rng_reset shall NOT be the
-+ * shared secret from the DH operation, but an independently generated key.
-+ * The src pointer is defined as Z || other info where Z is the shared secret
-+ * from DH and other info is an arbitrary string (see SP800-56A section
-+ * 5.8.1.2).
-+ */
-+static int crypto_kdf_ctr_random(struct crypto_rng *rng,
-+				 const u8 *src, unsigned int slen,
-+				 u8 *dst, unsigned int dlen)
-+{
-+	struct crypto_kdf_ctx *ctx = crypto_tfm_ctx(crypto_rng_tfm(rng));
-+	struct crypto_shash *kmd = ctx->kmd;
-+	SHASH_DESC_ON_STACK(desc, kmd);
-+	__be32 counter = cpu_to_be32(1);
-+	unsigned int h = crypto_shash_digestsize(kmd);
-+	int err = 0;
-+	u8 *dst_orig = dst;
-+
-+	crypto_kdf_init_desc(desc, kmd);
-+
-+	while (dlen) {
-+		err = crypto_shash_init(desc);
-+		if (err)
-+			goto out;
-+
-+		err = crypto_shash_update(desc, (u8 *)&counter, sizeof(__be32));
-+		if (err)
-+			goto out;
-+
-+		if (src && slen) {
-+			err = crypto_shash_update(desc, src, slen);
-+			if (err)
-+				goto out;
-+		}
-+
-+		if (dlen < h) {
-+			u8 tmpbuffer[CRYPTO_KDF_MAX_DIGESTSIZE];
-+
-+			err = crypto_shash_final(desc, tmpbuffer);
-+			if (err)
-+				goto out;
-+			memcpy(dst, tmpbuffer, dlen);
-+			memzero_explicit(tmpbuffer, h);
-+			return 0;
-+		} else {
-+			err = crypto_shash_final(desc, dst);
-+			if (err)
-+				goto out;
-+
-+			dlen -= h;
-+			dst += h;
-+			counter = cpu_to_be32(be32_to_cpu(counter) + 1);
-+		}
-+	}
-+
-+out:
-+	if (err)
-+		memzero_explicit(dst_orig, dlen);
-+	shash_desc_zero(desc);
-+	return err;
-+}
-+
-+/*
-+ * The seeding of the KDF allows to set a key which must be at least
-+ * digestsize long.
-+ */
-+static int crypto_kdf_seed(struct crypto_rng *rng,
-+			   const u8 *seed, unsigned int slen)
-+{
-+	struct crypto_kdf_ctx *ctx = crypto_tfm_ctx(crypto_rng_tfm(rng));
-+	unsigned int ds = crypto_shash_digestsize(ctx->kmd);
-+
-+	/* Check according to SP800-108 section 7.2 */
-+	if (ds > slen)
-+		return -EINVAL;
-+
-+	/*
-+	 * We require that we operate on a MAC -- if we do not operate on a
-+	 * MAC, this function returns an error.
-+	 */
-+	return crypto_shash_setkey(ctx->kmd, seed, slen);
-+}
-+
-+static int crypto_kdf_init_tfm(struct crypto_tfm *tfm)
-+{
-+	struct crypto_instance *inst = crypto_tfm_alg_instance(tfm);
-+	struct crypto_shash_spawn *spawn = crypto_instance_ctx(inst);
-+	struct crypto_kdf_ctx *ctx = crypto_tfm_ctx(tfm);
-+	struct crypto_shash *kmd;
-+	unsigned int ds;
-+
-+	kmd = crypto_spawn_shash(spawn);
-+	if (IS_ERR(kmd))
-+		return PTR_ERR(kmd);
-+
-+	ds = crypto_shash_digestsize(kmd);
-+	/* Hashes with no digest size are not allowed for KDFs. */
-+	if (!ds || ds > CRYPTO_KDF_MAX_DIGESTSIZE ||
-+	    CRYPTO_KDF_MAX_ALIGNMASK < crypto_shash_alignmask(kmd)) {
-+		crypto_free_shash(kmd);
-+		return -EOPNOTSUPP;
-+	}
-+
-+	ctx->kmd = kmd;
-+
-+	return 0;
-+}
-+
-+static void crypto_kdf_exit_tfm(struct crypto_tfm *tfm)
-+{
-+	struct crypto_kdf_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	crypto_free_shash(ctx->kmd);
-+}
-+
-+static void crypto_kdf_free(struct rng_instance *inst)
-+{
-+	crypto_drop_spawn(rng_instance_ctx(inst));
-+	kfree(inst);
-+}
-+
-+static int crypto_kdf_alloc_common(struct crypto_template *tmpl,
-+				   struct rtattr **tb,
-+				   const u8 *name,
-+				   int (*generate)(struct crypto_rng *tfm,
-+						   const u8 *src,
-+						   unsigned int slen,
-+						   u8 *dst, unsigned int dlen))
-+{
-+	struct rng_instance *inst;
-+	struct crypto_alg *alg;
-+	struct shash_alg *salg;
++static struct skcipher_alg arc4_skcipher = {
++	.base.cra_name		=	"ecb(arc4)",
++	.base.cra_priority	=	100,
++	.base.cra_blocksize	=	ARC4_BLOCK_SIZE,
++	.base.cra_ctxsize	=	sizeof(struct arc4_ctx),
++	.base.cra_module	=	THIS_MODULE,
++	.min_keysize		=	ARC4_MIN_KEY_SIZE,
++	.max_keysize		=	ARC4_MAX_KEY_SIZE,
++	.setkey			=	arc4_set_key_skcipher,
++	.encrypt		=	ecb_arc4_crypt,
++	.decrypt		=	ecb_arc4_crypt,
++};
+ 
+ static int __init arc4_init(void)
+ {
+-	return crypto_register_algs(arc4_algs, ARRAY_SIZE(arc4_algs));
 +	int err;
-+	unsigned int ds, ss;
 +
-+	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_RNG);
++	err = crypto_register_alg(&arc4_cipher);
 +	if (err)
 +		return err;
 +
-+	salg = shash_attr_alg(tb[1], 0, 0);
-+	if (IS_ERR(salg))
-+		return PTR_ERR(salg);
-+
-+	ds = salg->digestsize;
-+	ss = salg->statesize;
-+	alg = &salg->base;
-+
-+	inst = rng_alloc_instance(name, alg);
-+	err = PTR_ERR(inst);
-+	if (IS_ERR(inst))
-+		goto out_put_alg;
-+
-+	err = crypto_init_shash_spawn(rng_instance_ctx(inst), salg,
-+				      rng_crypto_instance(inst));
++	err = crypto_register_skcipher(&arc4_skcipher);
 +	if (err)
-+		goto out_free_inst;
-+
-+	inst->alg.base.cra_priority	= alg->cra_priority;
-+	inst->alg.base.cra_blocksize	= alg->cra_blocksize;
-+	inst->alg.base.cra_alignmask	= alg->cra_alignmask;
-+
-+	inst->alg.generate		= generate;
-+	inst->alg.seed			= crypto_kdf_seed;
-+	inst->alg.seedsize		= ds;
-+
-+	inst->alg.base.cra_init		= crypto_kdf_init_tfm;
-+	inst->alg.base.cra_exit		= crypto_kdf_exit_tfm;
-+	inst->alg.base.cra_ctxsize	= ALIGN(sizeof(struct crypto_kdf_ctx) +
-+					  ss * 2, crypto_tfm_ctx_alignment());
-+
-+	inst->free			= crypto_kdf_free;
-+
-+	err = rng_register_instance(tmpl, inst);
-+
-+	if (err) {
-+out_free_inst:
-+		crypto_kdf_free(inst);
-+	}
-+
-+out_put_alg:
-+	crypto_mod_put(alg);
++		crypto_unregister_alg(&arc4_cipher);
 +	return err;
-+}
-+
-+static int crypto_kdf_ctr_create(struct crypto_template *tmpl,
-+				 struct rtattr **tb)
-+{
-+	return crypto_kdf_alloc_common(tmpl, tb, "kdf_ctr",
-+				       crypto_kdf_ctr_random);
-+}
-+
-+static struct crypto_template crypto_kdf_ctr_tmpl = {
-+	.name = "kdf_ctr",
-+	.create = crypto_kdf_ctr_create,
-+	.module = THIS_MODULE,
-+};
-+
-+static int crypto_kdf_fb_create(struct crypto_template *tmpl,
-+				struct rtattr **tb) {
-+	return crypto_kdf_alloc_common(tmpl, tb, "kdf_fb",
-+				       crypto_kdf_fb_random);
-+}
-+
-+static struct crypto_template crypto_kdf_fb_tmpl = {
-+	.name = "kdf_fb",
-+	.create = crypto_kdf_fb_create,
-+	.module = THIS_MODULE,
-+};
-+
-+static int crypto_kdf_dpi_create(struct crypto_template *tmpl,
-+				 struct rtattr **tb) {
-+	return crypto_kdf_alloc_common(tmpl, tb, "kdf_dpi",
-+				       crypto_kdf_dpi_random);
-+}
-+
-+static struct crypto_template crypto_kdf_dpi_tmpl = {
-+	.name = "kdf_dpi",
-+	.create = crypto_kdf_dpi_create,
-+	.module = THIS_MODULE,
-+};
-+
-+static int __init crypto_kdf_init(void)
-+{
-+	int err = crypto_register_template(&crypto_kdf_ctr_tmpl);
-+
-+	if (err)
-+		return err;
-+
-+	err = crypto_register_template(&crypto_kdf_fb_tmpl);
-+	if (err) {
-+		crypto_unregister_template(&crypto_kdf_ctr_tmpl);
-+		return err;
-+	}
-+
-+	err = crypto_register_template(&crypto_kdf_dpi_tmpl);
-+	if (err) {
-+		crypto_unregister_template(&crypto_kdf_ctr_tmpl);
-+		crypto_unregister_template(&crypto_kdf_fb_tmpl);
-+	}
-+	return err;
-+}
-+
-+static void __exit crypto_kdf_exit(void)
-+{
-+	crypto_unregister_template(&crypto_kdf_ctr_tmpl);
-+	crypto_unregister_template(&crypto_kdf_fb_tmpl);
-+	crypto_unregister_template(&crypto_kdf_dpi_tmpl);
-+}
-+
-+module_init(crypto_kdf_init);
-+module_exit(crypto_kdf_exit);
-+
-+MODULE_LICENSE("GPL");
-+MODULE_AUTHOR("Stephan Mueller <smueller@chronox.de>");
-+MODULE_DESCRIPTION("Key Derivation Function according to SP800-108");
-+MODULE_ALIAS_CRYPTO("kdf_ctr");
-+MODULE_ALIAS_CRYPTO("kdf_fb");
-+MODULE_ALIAS_CRYPTO("kdf_dpi");
+ }
+ 
+ static void __exit arc4_exit(void)
+ {
+-	crypto_unregister_algs(arc4_algs, ARRAY_SIZE(arc4_algs));
++	crypto_unregister_alg(&arc4_cipher);
++	crypto_unregister_skcipher(&arc4_skcipher);
+ }
+ 
+ module_init(arc4_init);
 -- 
 2.20.1
