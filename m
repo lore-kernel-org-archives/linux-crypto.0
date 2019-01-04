@@ -1,138 +1,234 @@
-Return-Path: <SRS0=+HSe=PS=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:39092 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727753AbfAJN6C (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Jan 2019 08:58:02 -0500
-Date: Thu, 10 Jan 2019 14:57:57 +0100
-From: Corentin Labbe <clabbe.montjoie@gmail.com>
-To: Kalyani Akula <kalyani.akula@xilinx.com>
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Kalyani Akula <kalyania@xilinx.com>,
-        Sarat Chand Savitala <saratcha@xilinx.com>
-Subject: Re: [RFC PATCH V2 3/4] crypto: Add Xilinx SHA3 driver
-Message-ID: <20190110135757.GA32218@Red>
-References: <1547025985-7228-1-git-send-email-kalyani.akula@xilinx.com>
- <1547025985-7228-4-git-send-email-kalyani.akula@xilinx.com>
+Return-Path: <SRS0=8/la=PM=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:56364 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726132AbfADEUz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 3 Jan 2019 23:20:55 -0500
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc: stable@vger.kernel.org, Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: [PATCH 03/16] crypto: ofb - fix handling partial blocks and make thread-safe
+Date: Thu,  3 Jan 2019 20:16:12 -0800
+Message-Id: <20190104041625.3259-4-ebiggers@kernel.org>
+In-Reply-To: <20190104041625.3259-1-ebiggers@kernel.org>
+References: <20190104041625.3259-1-ebiggers@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1547025985-7228-4-git-send-email-kalyani.akula@xilinx.com>
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jan 09, 2019 at 02:56:24PM +0530, Kalyani Akula wrote:
-> This patch adds SHA3 driver support for the Xilinx
-> ZynqMP SoC.
-> 
-> Signed-off-by: Kalyani Akula <kalyani.akula@xilinx.com>
-> ---
->  drivers/crypto/Kconfig      |   10 ++
->  drivers/crypto/Makefile     |    1 +
->  drivers/crypto/zynqmp-sha.c |  305 +++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 316 insertions(+), 0 deletions(-)
->  create mode 100644 drivers/crypto/zynqmp-sha.c
+From: Eric Biggers <ebiggers@google.com>
 
-Hello
+Fix multiple bugs in the OFB implementation:
 
-I have some comment below
+1. It stored the per-request state 'cnt' in the tfm context, which can be
+   used by multiple threads concurrently (e.g. via AF_ALG).
+2. It didn't support messages not a multiple of the block cipher size,
+   despite being a stream cipher.
+3. It didn't set cra_blocksize to 1 to indicate it is a stream cipher.
 
-> +static int zynqmp_sha_update(struct ahash_request *req)
-> +{
-> +	const struct zynqmp_eemi_ops *eemi_ops = zynqmp_pm_get_eemi_ops();
-> +	struct zynqmp_sha_ctx *tctx = crypto_tfm_ctx(req->base.tfm);
-> +	struct zynqmp_sha_dev *dd = tctx->dd;
-> +	size_t dma_size = req->nbytes;
-> +	dma_addr_t dma_addr;
-> +	char *kbuf;
-> +	int ret;
-> +
-> +	if (!req->nbytes)
-> +		return 0;
-> +
-> +	if (!eemi_ops || !eemi_ops->sha_hash)
-> +		return -ENOTSUPP;
-> +
-> +	kbuf = dma_alloc_coherent(dd->dev, dma_size, &dma_addr, GFP_KERNEL);
-> +	if (!kbuf)
-> +		return -ENOMEM;
-> +
-> +	scatterwalk_map_and_copy(kbuf, req->src, 0, req->nbytes, 0);
-> +	 __flush_cache_user_range((unsigned long)kbuf,
-> +				  (unsigned long)kbuf + dma_size);
+To fix these, set the 'chunksize' property to the cipher block size to
+guarantee that when walking through the scatterlist, a partial block can
+only occur at the end.  Then change the implementation to XOR a block at
+a time at first, then XOR the partial block at the end if needed.  This
+is the same way CTR and CFB are implemented.  As a bonus, this also
+improves performance in most cases over the current approach.
 
-Since kbuf is in dma coherent memory, I dont understand why do you flush cache.
+Fixes: e497c51896b3 ("crypto: ofb - add output feedback mode")
+Cc: <stable@vger.kernel.org> # v4.20+
+Cc: Gilad Ben-Yossef <gilad@benyossef.com>
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ crypto/ofb.c     | 91 ++++++++++++++++++++----------------------------
+ crypto/testmgr.h | 28 +++++++++++++--
+ 2 files changed, 63 insertions(+), 56 deletions(-)
 
-> +	ret = eemi_ops->sha_hash(dma_addr, req->nbytes, ZYNQMP_SHA3_UPDATE);
-> +	dma_free_coherent(dd->dev, dma_size, kbuf, dma_addr);
-
-Since your update function does not return/write any result, I suppose that the resulat is kept in hardware, so what happen if two hash process happen in parallel ?
-Furthermore, how do you have tested import/export function ?
-Anyway, I am sure they are totally buggy.
-
-> +
-> +	return ret;
-> +}
-> +
-> +static int zynqmp_sha_final(struct ahash_request *req)
-> +{
-> +	const struct zynqmp_eemi_ops *eemi_ops = zynqmp_pm_get_eemi_ops();
-> +	struct zynqmp_sha_ctx *tctx = crypto_tfm_ctx(req->base.tfm);
-> +	struct zynqmp_sha_dev *dd = tctx->dd;
-> +	size_t dma_size = SHA384_DIGEST_SIZE;
-> +	dma_addr_t dma_addr;
-> +	char *kbuf;
-> +	int ret;
-> +
-> +	if (!eemi_ops || !eemi_ops->sha_hash)
-> +		return -ENOTSUPP;
-
-You can do this check at probe time.
-
-> +static int zynqmp_sha_finup(struct ahash_request *req)
-> +{
-> +	zynqmp_sha_update(req);
-> +	zynqmp_sha_final(req);
-> +
-> +	return 0;
-> +}
-> +
-> +static int zynqmp_sha_digest(struct ahash_request *req)
-> +{
-> +	zynqmp_sha_init(req);
-> +	zynqmp_sha_update(req);
-> +	zynqmp_sha_final(req);
-> +
-> +	return 0;
-> +}
-
-So you ignore the return value of zynqmp_sha_init/zynqmp_sha_update/zynqmp_sha_final().
-
-> +static int zynqmp_sha_probe(struct platform_device *pdev)
-> +{
-> +	struct zynqmp_sha_dev *sha_dd;
-> +	struct device *dev = &pdev->dev;
-> +	int err;
-> +
-> +	sha_dd = devm_kzalloc(&pdev->dev, sizeof(*sha_dd), GFP_KERNEL);
-> +	if (!sha_dd)
-> +		return -ENOMEM;
-> +
-> +	sha_dd->dev = dev;
-> +	platform_set_drvdata(pdev, sha_dd);
-> +	INIT_LIST_HEAD(&sha_dd->list);
-> +	spin_lock_init(&sha_dd->lock);
-> +	crypto_init_queue(&sha_dd->queue, ZYNQMP_SHA_QUEUE_LENGTH);
-
-As already said in my last review, why init the queue if you do not use it ?
-
-
-> +	spin_lock(&zynqmp_sha.lock);
-> +	list_add_tail(&sha_dd->list, &zynqmp_sha.dev_list);
-> +	spin_unlock(&zynqmp_sha.lock);
-
-Why do you maintain a device list ?
-Clearly your current driver support only one hardware instance.
-
-Regards
+diff --git a/crypto/ofb.c b/crypto/ofb.c
+index 886631708c5e9..cab0b80953fed 100644
+--- a/crypto/ofb.c
++++ b/crypto/ofb.c
+@@ -5,9 +5,6 @@
+  *
+  * Copyright (C) 2018 ARM Limited or its affiliates.
+  * All rights reserved.
+- *
+- * Based loosely on public domain code gleaned from libtomcrypt
+- * (https://github.com/libtom/libtomcrypt).
+  */
+ 
+ #include <crypto/algapi.h>
+@@ -21,7 +18,6 @@
+ 
+ struct crypto_ofb_ctx {
+ 	struct crypto_cipher *child;
+-	int cnt;
+ };
+ 
+ 
+@@ -41,58 +37,40 @@ static int crypto_ofb_setkey(struct crypto_skcipher *parent, const u8 *key,
+ 	return err;
+ }
+ 
+-static int crypto_ofb_encrypt_segment(struct crypto_ofb_ctx *ctx,
+-				      struct skcipher_walk *walk,
+-				      struct crypto_cipher *tfm)
++static int crypto_ofb_crypt(struct skcipher_request *req)
+ {
+-	int bsize = crypto_cipher_blocksize(tfm);
+-	int nbytes = walk->nbytes;
+-
+-	u8 *src = walk->src.virt.addr;
+-	u8 *dst = walk->dst.virt.addr;
+-	u8 *iv = walk->iv;
+-
+-	do {
+-		if (ctx->cnt == bsize) {
+-			if (nbytes < bsize)
+-				break;
+-			crypto_cipher_encrypt_one(tfm, iv, iv);
+-			ctx->cnt = 0;
+-		}
+-		*dst = *src ^ iv[ctx->cnt];
+-		src++;
+-		dst++;
+-		ctx->cnt++;
+-	} while (--nbytes);
+-	return nbytes;
+-}
+-
+-static int crypto_ofb_encrypt(struct skcipher_request *req)
+-{
+-	struct skcipher_walk walk;
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+-	unsigned int bsize;
+ 	struct crypto_ofb_ctx *ctx = crypto_skcipher_ctx(tfm);
+-	struct crypto_cipher *child = ctx->child;
+-	int ret = 0;
++	struct crypto_cipher *cipher = ctx->child;
++	const unsigned int bsize = crypto_cipher_blocksize(cipher);
++	struct skcipher_walk walk;
++	int err;
+ 
+-	bsize =  crypto_cipher_blocksize(child);
+-	ctx->cnt = bsize;
++	err = skcipher_walk_virt(&walk, req, false);
+ 
+-	ret = skcipher_walk_virt(&walk, req, false);
++	while (walk.nbytes >= bsize) {
++		const u8 *src = walk.src.virt.addr;
++		u8 *dst = walk.dst.virt.addr;
++		u8 * const iv = walk.iv;
++		unsigned int nbytes = walk.nbytes;
+ 
+-	while (walk.nbytes) {
+-		ret = crypto_ofb_encrypt_segment(ctx, &walk, child);
+-		ret = skcipher_walk_done(&walk, ret);
+-	}
++		do {
++			crypto_cipher_encrypt_one(cipher, iv, iv);
++			crypto_xor_cpy(dst, src, iv, bsize);
++			dst += bsize;
++			src += bsize;
++		} while ((nbytes -= bsize) >= bsize);
+ 
+-	return ret;
+-}
++		err = skcipher_walk_done(&walk, nbytes);
++	}
+ 
+-/* OFB encrypt and decrypt are identical */
+-static int crypto_ofb_decrypt(struct skcipher_request *req)
+-{
+-	return crypto_ofb_encrypt(req);
++	if (walk.nbytes) {
++		crypto_cipher_encrypt_one(cipher, walk.iv, walk.iv);
++		crypto_xor_cpy(walk.dst.virt.addr, walk.src.virt.addr, walk.iv,
++			       walk.nbytes);
++		err = skcipher_walk_done(&walk, 0);
++	}
++	return err;
+ }
+ 
+ static int crypto_ofb_init_tfm(struct crypto_skcipher *tfm)
+@@ -165,13 +143,18 @@ static int crypto_ofb_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 	if (err)
+ 		goto err_drop_spawn;
+ 
++	/* OFB mode is a stream cipher. */
++	inst->alg.base.cra_blocksize = 1;
++
++	/*
++	 * To simplify the implementation, configure the skcipher walk to only
++	 * give a partial block at the very end, never earlier.
++	 */
++	inst->alg.chunksize = alg->cra_blocksize;
++
+ 	inst->alg.base.cra_priority = alg->cra_priority;
+-	inst->alg.base.cra_blocksize = alg->cra_blocksize;
+ 	inst->alg.base.cra_alignmask = alg->cra_alignmask;
+ 
+-	/* We access the data as u32s when xoring. */
+-	inst->alg.base.cra_alignmask |= __alignof__(u32) - 1;
+-
+ 	inst->alg.ivsize = alg->cra_blocksize;
+ 	inst->alg.min_keysize = alg->cra_cipher.cia_min_keysize;
+ 	inst->alg.max_keysize = alg->cra_cipher.cia_max_keysize;
+@@ -182,8 +165,8 @@ static int crypto_ofb_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 	inst->alg.exit = crypto_ofb_exit_tfm;
+ 
+ 	inst->alg.setkey = crypto_ofb_setkey;
+-	inst->alg.encrypt = crypto_ofb_encrypt;
+-	inst->alg.decrypt = crypto_ofb_decrypt;
++	inst->alg.encrypt = crypto_ofb_crypt;
++	inst->alg.decrypt = crypto_ofb_crypt;
+ 
+ 	inst->free = crypto_ofb_free;
+ 
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index 7f4dae7a57a1c..ca8e8ebef309d 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -16681,8 +16681,7 @@ static const struct cipher_testvec aes_ctr_rfc3686_tv_template[] = {
+ };
+ 
+ static const struct cipher_testvec aes_ofb_tv_template[] = {
+-	 /* From NIST Special Publication 800-38A, Appendix F.5 */
+-	{
++	{ /* From NIST Special Publication 800-38A, Appendix F.5 */
+ 		.key	= "\x2b\x7e\x15\x16\x28\xae\xd2\xa6"
+ 			  "\xab\xf7\x15\x88\x09\xcf\x4f\x3c",
+ 		.klen	= 16,
+@@ -16705,6 +16704,31 @@ static const struct cipher_testvec aes_ofb_tv_template[] = {
+ 			  "\x30\x4c\x65\x28\xf6\x59\xc7\x78"
+ 			  "\x66\xa5\x10\xd9\xc1\xd6\xae\x5e",
+ 		.len	= 64,
++		.also_non_np = 1,
++		.np	= 2,
++		.tap	= { 31, 33 },
++	}, { /* > 16 bytes, not a multiple of 16 bytes */
++		.key	= "\x2b\x7e\x15\x16\x28\xae\xd2\xa6"
++			  "\xab\xf7\x15\x88\x09\xcf\x4f\x3c",
++		.klen	= 16,
++		.iv	= "\x00\x01\x02\x03\x04\x05\x06\x07"
++			  "\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f",
++		.ptext	= "\x6b\xc1\xbe\xe2\x2e\x40\x9f\x96"
++			  "\xe9\x3d\x7e\x11\x73\x93\x17\x2a"
++			  "\xae",
++		.ctext	= "\x3b\x3f\xd9\x2e\xb7\x2d\xad\x20"
++			  "\x33\x34\x49\xf8\xe8\x3c\xfb\x4a"
++			  "\x77",
++		.len	= 17,
++	}, { /* < 16 bytes */
++		.key	= "\x2b\x7e\x15\x16\x28\xae\xd2\xa6"
++			  "\xab\xf7\x15\x88\x09\xcf\x4f\x3c",
++		.klen	= 16,
++		.iv	= "\x00\x01\x02\x03\x04\x05\x06\x07"
++			  "\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f",
++		.ptext	= "\x6b\xc1\xbe\xe2\x2e\x40\x9f",
++		.ctext	= "\x3b\x3f\xd9\x2e\xb7\x2d\xad",
++		.len	= 7,
+ 	}
+ };
+ 
+-- 
+2.20.1
