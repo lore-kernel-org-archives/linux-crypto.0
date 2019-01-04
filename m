@@ -1,95 +1,50 @@
-Return-Path: <SRS0=b5ak=PZ=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-eopbgr810050.outbound.protection.outlook.com ([40.107.81.50]:24298
-        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729689AbfAQHCr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Jan 2019 02:02:47 -0500
-From: Kalyani Akula <kalyani.akula@xilinx.com>
-To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: Kalyani Akula <kalyania@xilinx.com>,
-        Sarat Chand Savitala <saratcha@xilinx.com>,
-        Kalyani Akula <kalyani.akula@xilinx.com>
-Subject: [RFC PATCH 3/5] firmware: xilinx: Add ZynqMP aes API for AES functionality
-Date: Thu, 17 Jan 2019 12:32:19 +0530
-Message-ID: <1547708541-23730-4-git-send-email-kalyani.akula@xilinx.com>
-In-Reply-To: <1547708541-23730-1-git-send-email-kalyani.akula@xilinx.com>
-References: <1547708541-23730-1-git-send-email-kalyani.akula@xilinx.com>
+Return-Path: <SRS0=8/la=PM=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from userp2130.oracle.com ([156.151.31.86]:43872 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725931AbfADGqm (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 4 Jan 2019 01:46:42 -0500
+Date: Fri, 4 Jan 2019 09:46:11 +0300
+From: Dan Carpenter <dan.carpenter@oracle.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        Nagadheeraj Rottela <rnagadheeraj@marvell.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Srikanth Jampala <Jampala.Srikanth@cavium.com>,
+        Gadam Sreerama <sgadam@cavium.com>,
+        "Nagadheeraj, Rottela" <Rottela.Nagadheeraj@cavium.com>,
+        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: [PATCH] crypto: cavium/nitrox - Use after free in
+ process_response_list()
+Message-ID: <20190104064611.GA30627@kadam>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Add ZynqMP firmware AES API to perform encryption/decryption
-of given data.
+We free "sr" and then dereference it on the next line.
 
-Signed-off-by: Kalyani Akula <kalyani.akula@xilinx.com>
+Fixes: c9613335bf4f ("crypto: cavium/nitrox - Added AEAD cipher support")
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 ---
- drivers/firmware/xilinx/zynqmp.c     | 24 ++++++++++++++++++++++++
- include/linux/firmware/xlnx-zynqmp.h |  2 ++
- 2 files changed, 26 insertions(+)
+ drivers/crypto/cavium/nitrox/nitrox_reqmgr.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/firmware/xilinx/zynqmp.c b/drivers/firmware/xilinx/zynqmp.c
-index 9a1c72a..332f98c1 100644
---- a/drivers/firmware/xilinx/zynqmp.c
-+++ b/drivers/firmware/xilinx/zynqmp.c
-@@ -469,6 +469,29 @@ static int zynqmp_pm_ioctl(u32 node_id, u32 ioctl_id, u32 arg1, u32 arg2,
- 				   arg1, arg2, out);
- }
+diff --git a/drivers/crypto/cavium/nitrox/nitrox_reqmgr.c b/drivers/crypto/cavium/nitrox/nitrox_reqmgr.c
+index e34e4df8fd24..fe070d75c842 100644
+--- a/drivers/crypto/cavium/nitrox/nitrox_reqmgr.c
++++ b/drivers/crypto/cavium/nitrox/nitrox_reqmgr.c
+@@ -567,10 +567,10 @@ static void process_response_list(struct nitrox_cmdq *cmdq)
  
-+/**
-+ * zynqmp_pm_aes - Access AES hardware to encrypt/decrypt the data using
-+ * AES-GCM core.
-+ * @address:	Address of the AesParams structure.
-+ * @out:	Returned output value
-+ *
-+ * Return:	Returns status, either success or error code.
-+ */
-+static int zynqmp_pm_aes_engine(const u64 address, u32 *out)
-+{
-+	u32 ret_payload[PAYLOAD_ARG_CNT];
-+	int ret;
-+
-+	if (!out)
-+		return -EINVAL;
-+
-+	ret = zynqmp_pm_invoke_fn(PM_SECURE_AES, upper_32_bits(address),
-+				  lower_32_bits(address),
-+				  0, 0, ret_payload);
-+	*out = ret_payload[1];
-+	return ret;
-+}
-+
- static const struct zynqmp_eemi_ops eemi_ops = {
- 	.get_api_version = zynqmp_pm_get_api_version,
- 	.query_data = zynqmp_pm_query_data,
-@@ -482,6 +505,7 @@ static int zynqmp_pm_ioctl(u32 node_id, u32 ioctl_id, u32 arg1, u32 arg2,
- 	.clock_setparent = zynqmp_pm_clock_setparent,
- 	.clock_getparent = zynqmp_pm_clock_getparent,
- 	.ioctl = zynqmp_pm_ioctl,
-+	.aes = zynqmp_pm_aes_engine,
- };
+ 		/* ORH error code */
+ 		err = READ_ONCE(*sr->resp.orh) & 0xff;
+-		softreq_destroy(sr);
  
- /**
-diff --git a/include/linux/firmware/xlnx-zynqmp.h b/include/linux/firmware/xlnx-zynqmp.h
-index 3c3c28e..815fa30 100644
---- a/include/linux/firmware/xlnx-zynqmp.h
-+++ b/include/linux/firmware/xlnx-zynqmp.h
-@@ -45,6 +45,7 @@ enum pm_api_id {
- 	PM_CLOCK_GETRATE,
- 	PM_CLOCK_SETPARENT,
- 	PM_CLOCK_GETPARENT,
-+	PM_SECURE_AES = 47,
- };
+ 		if (sr->callback)
+ 			sr->callback(sr->cb_arg, err);
++		softreq_destroy(sr);
  
- /* PMU-FW return status codes */
-@@ -102,6 +103,7 @@ struct zynqmp_eemi_ops {
- 	int (*clock_setparent)(u32 clock_id, u32 parent_id);
- 	int (*clock_getparent)(u32 clock_id, u32 *parent_id);
- 	int (*ioctl)(u32 node_id, u32 ioctl_id, u32 arg1, u32 arg2, u32 *out);
-+	int (*aes)(const u64 address, u32 *out);
- };
- 
- #if IS_REACHABLE(CONFIG_ARCH_ZYNQMP)
+ 		req_completed++;
+ 	}
 -- 
-1.9.5
+2.17.1
