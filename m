@@ -1,374 +1,68 @@
-Return-Path: <SRS0=b7+G=PP=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-eopbgr790054.outbound.protection.outlook.com ([40.107.79.54]:27456
-        "EHLO NAM03-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726538AbfAGJDR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Jan 2019 04:03:17 -0500
-From: Kalyani Akula <kalyani.akula@xilinx.com>
-To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: Kalyani Akula <kalyania@xilinx.com>,
-        Sarat Chand Savitala <saratcha@xilinx.com>,
-        Kalyani Akula <kalyani.akula@xilinx.com>
-Subject: [RFC PATCH 2/3] crypto: Add Xilinx SHA3 driver
-Date: Mon, 7 Jan 2019 14:32:55 +0530
-Message-ID: <1546851776-3456-3-git-send-email-kalyani.akula@xilinx.com>
-In-Reply-To: <1546851776-3456-1-git-send-email-kalyani.akula@xilinx.com>
-References: <1546851776-3456-1-git-send-email-kalyani.akula@xilinx.com>
+Return-Path: <SRS0=Mcmw=PN=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mo4-p01-ob.smtp.rzone.de ([85.215.255.54]:31919 "EHLO
+        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726108AbfAEMpw (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 5 Jan 2019 07:45:52 -0500
+From: Stephan Mueller <smueller@chronox.de>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH 05/16] crypto: skcipher - add helper for simple block cipher modes
+Date: Sat, 05 Jan 2019 13:03:40 +0100
+Message-ID: <4030532.EK8pHEC8rB@tauon.chronox.de>
+In-Reply-To: <20190104041625.3259-6-ebiggers@kernel.org>
+References: <20190104041625.3259-1-ebiggers@kernel.org> <20190104041625.3259-6-ebiggers@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch adds SHA3 driver suuport for the Xilinx
-ZynqMP SoC.
+Am Freitag, 4. Januar 2019, 05:16:14 CET schrieb Eric Biggers:
 
-Signed-off-by: Kalyani Akula <kalyani.akula@xilinx.com>
----
- drivers/crypto/Kconfig      |   10 ++
- drivers/crypto/Makefile     |    1 +
- drivers/crypto/zynqmp-sha.c |  303 +++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 314 insertions(+), 0 deletions(-)
- create mode 100755 drivers/crypto/zynqmp-sha.c
+Hi Eric,
 
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index 5a90075..b723e23 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -667,6 +667,16 @@ config CRYPTO_DEV_ROCKCHIP
- 	  This driver interfaces with the hardware crypto accelerator.
- 	  Supporting cbc/ecb chainmode, and aes/des/des3_ede cipher mode.
- 
-+config CRYPTO_DEV_ZYNQMP_SHA3
-+	tristate "Support for Xilinx ZynqMP SHA3 hw accelerator"
-+	depends on ARCH_ZYNQMP || COMPILE_TEST
-+	select CRYPTO_HASH
-+	help
-+	  Xilinx ZynqMP has SHA3 engine used for secure hash calculation.
-+	  This driver interfaces with SHA3 hw engine.
-+	  Select this if you want to use the ZynqMP module
-+	  for SHA3 hash computation.
-+
- config CRYPTO_DEV_MEDIATEK
- 	tristate "MediaTek's EIP97 Cryptographic Engine driver"
- 	depends on (ARM && ARCH_MEDIATEK) || COMPILE_TEST
-diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
-index 8e7e225..64c29fe 100644
---- a/drivers/crypto/Makefile
-+++ b/drivers/crypto/Makefile
-@@ -47,3 +47,4 @@ obj-$(CONFIG_CRYPTO_DEV_BCM_SPU) += bcm/
- obj-$(CONFIG_CRYPTO_DEV_SAFEXCEL) += inside-secure/
- obj-$(CONFIG_CRYPTO_DEV_ARTPEC6) += axis/
- obj-y += hisilicon/
-+obj-$(CONFIG_CRYPTO_DEV_ZYNQMP_SHA3) += zynqmp-sha.o
-diff --git a/drivers/crypto/zynqmp-sha.c b/drivers/crypto/zynqmp-sha.c
-new file mode 100755
-index 0000000..016f826
---- /dev/null
-+++ b/drivers/crypto/zynqmp-sha.c
-@@ -0,0 +1,303 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Cryptographic API.
-+ *
-+ * Support for Xilinx ZynqMP SHA3 HW Acceleration.
-+ *
-+ * Copyright (c) 2018 Xilinx Inc.
-+ *
-+ */
-+#include <asm/cacheflush.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/io.h>
-+#include <linux/platform_device.h>
-+#include <linux/device.h>
-+#include <linux/init.h>
-+#include <linux/scatterlist.h>
-+#include <linux/dma-mapping.h>
-+#include <linux/of_device.h>
-+#include <linux/crypto.h>
-+#include <linux/cryptohash.h>
-+#include <crypto/scatterwalk.h>
-+#include <crypto/algapi.h>
-+#include <crypto/sha.h>
-+#include <crypto/hash.h>
-+#include <crypto/internal/hash.h>
-+#include <linux/firmware/xilinx/zynqmp/firmware.h>
-+
-+#define ZYNQMP_SHA3_INIT	1
-+#define ZYNQMP_SHA3_UPDATE	2
-+#define ZYNQMP_SHA3_FINAL	4
-+
-+#define ZYNQMP_SHA_QUEUE_LENGTH	1
-+
-+struct zynqmp_sha_dev;
-+
-+/*
-+ * .statesize = sizeof(struct zynqmp_sha_reqctx) must be <= PAGE_SIZE / 8 as
-+ *  tested by the ahash_prepare_alg() function.
-+ */
-+struct zynqmp_sha_reqctx {
-+	struct zynqmp_sha_dev	*dd;
-+	unsigned long		flags;
-+};
-+
-+struct zynqmp_sha_ctx {
-+	struct zynqmp_sha_dev	*dd;
-+	unsigned long		flags;
-+};
-+
-+struct zynqmp_sha_dev {
-+	struct list_head	list;
-+	struct device		*dev;
-+	/* the lock protects queue and dev list*/
-+	spinlock_t		lock;
-+	int			err;
-+
-+	unsigned long		flags;
-+	struct crypto_queue	queue;
-+	struct ahash_request	*req;
-+};
-+
-+struct zynqmp_sha_drv {
-+	struct list_head	dev_list;
-+	/* the lock protects dev list*/
-+	spinlock_t		lock;
-+};
-+
-+static struct zynqmp_sha_drv zynqmp_sha = {
-+	.dev_list = LIST_HEAD_INIT(zynqmp_sha.dev_list),
-+	.lock = __SPIN_LOCK_UNLOCKED(zynqmp_sha.lock),
-+};
-+
-+static int zynqmp_sha_init(struct ahash_request *req)
-+{
-+	const struct zynqmp_eemi_ops *eemi_ops = zynqmp_pm_get_eemi_ops();
-+	struct zynqmp_sha_reqctx *ctx = ahash_request_ctx(req);
-+	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
-+	struct zynqmp_sha_ctx *tctx = crypto_ahash_ctx(tfm);
-+	struct zynqmp_sha_dev *dd = NULL;
-+	struct zynqmp_sha_dev *tmp;
-+	int ret;
-+
-+	if (!eemi_ops || !eemi_ops->sha_hash)
-+		return -ENOTSUPP;
-+
-+	spin_lock_bh(&zynqmp_sha.lock);
-+	if (!tctx->dd) {
-+		list_for_each_entry(tmp, &zynqmp_sha.dev_list, list) {
-+			dd = tmp;
-+			break;
-+		}
-+		tctx->dd = dd;
-+	} else {
-+		dd = tctx->dd;
-+	}
-+	spin_unlock_bh(&zynqmp_sha.lock);
-+
-+	ctx->dd = dd;
-+	dev_dbg(dd->dev, "init: digest size: %d\n",
-+		crypto_ahash_digestsize(tfm));
-+
-+	ret = eemi_ops->sha_hash(0, 0, ZYNQMP_SHA3_INIT);
-+
-+	return ret;
-+}
-+
-+static int zynqmp_sha_update(struct ahash_request *req)
-+{
-+	const struct zynqmp_eemi_ops *eemi_ops = zynqmp_pm_get_eemi_ops();
-+	struct zynqmp_sha_ctx *tctx = crypto_tfm_ctx(req->base.tfm);
-+	struct zynqmp_sha_dev *dd = tctx->dd;
-+	size_t dma_size = req->nbytes;
-+	dma_addr_t dma_addr;
-+	char *kbuf;
-+	int ret;
-+
-+	if (!req->nbytes)
-+		return 0;
-+
-+	if (!eemi_ops || !eemi_ops->sha_hash)
-+		return -ENOTSUPP;
-+
-+	kbuf = dma_alloc_coherent(dd->dev, dma_size, &dma_addr, GFP_KERNEL);
-+	if (!kbuf)
-+		return -ENOMEM;
-+
-+	scatterwalk_map_and_copy(kbuf, req->src, 0, req->nbytes, 0);
-+	 __flush_cache_user_range((unsigned long)kbuf,
-+				  (unsigned long)kbuf + dma_size);
-+	ret = eemi_ops->sha_hash(dma_addr, req->nbytes, ZYNQMP_SHA3_UPDATE);
-+	dma_free_coherent(dd->dev, dma_size, kbuf, dma_addr);
-+
-+	return ret;
-+}
-+
-+static int zynqmp_sha_final(struct ahash_request *req)
-+{
-+	const struct zynqmp_eemi_ops *eemi_ops = zynqmp_pm_get_eemi_ops();
-+	struct zynqmp_sha_ctx *tctx = crypto_tfm_ctx(req->base.tfm);
-+	struct zynqmp_sha_dev *dd = tctx->dd;
-+	size_t dma_size = SHA384_DIGEST_SIZE;
-+	dma_addr_t dma_addr;
-+	char *kbuf;
-+	int ret;
-+
-+	if (!eemi_ops || !eemi_ops->sha_hash)
-+		return -ENOTSUPP;
-+
-+	kbuf = dma_alloc_coherent(dd->dev, dma_size, &dma_addr, GFP_KERNEL);
-+	if (!kbuf)
-+		return -ENOMEM;
-+
-+	ret = eemi_ops->sha_hash(dma_addr, dma_size, ZYNQMP_SHA3_FINAL);
-+	memcpy(req->result, kbuf, 48);
-+	dma_free_coherent(dd->dev, dma_size, kbuf, dma_addr);
-+
-+	return ret;
-+}
-+
-+static int zynqmp_sha_finup(struct ahash_request *req)
-+{
-+	zynqmp_sha_update(req);
-+	zynqmp_sha_final(req);
-+
-+	return 0;
-+}
-+
-+static int zynqmp_sha_digest(struct ahash_request *req)
-+{
-+	zynqmp_sha_init(req);
-+	zynqmp_sha_update(req);
-+	zynqmp_sha_final(req);
-+
-+	return 0;
-+}
-+
-+static int zynqmp_sha_export(struct ahash_request *req, void *out)
-+{
-+	const struct zynqmp_sha_reqctx *ctx = ahash_request_ctx(req);
-+
-+	memcpy(out, ctx, sizeof(*ctx));
-+	return 0;
-+}
-+
-+static int zynqmp_sha_import(struct ahash_request *req, const void *in)
-+{
-+	struct zynqmp_sha_reqctx *ctx = ahash_request_ctx(req);
-+
-+	memcpy(ctx, in, sizeof(*ctx));
-+	return 0;
-+}
-+
-+static int zynqmp_sha_cra_init(struct crypto_tfm *tfm)
-+{
-+	crypto_ahash_set_reqsize(__crypto_ahash_cast(tfm),
-+				 sizeof(struct zynqmp_sha_reqctx));
-+
-+	return 0;
-+}
-+
-+static struct ahash_alg sha3_alg = {
-+	.init		= zynqmp_sha_init,
-+	.update		= zynqmp_sha_update,
-+	.final		= zynqmp_sha_final,
-+	.finup		= zynqmp_sha_finup,
-+	.digest		= zynqmp_sha_digest,
-+	.export		= zynqmp_sha_export,
-+	.import		= zynqmp_sha_import,
-+	.halg = {
-+		.digestsize	= SHA384_DIGEST_SIZE,
-+		.statesize	= sizeof(struct sha256_state),
-+		.base	= {
-+			.cra_name		= "xilinx-keccak-384",
-+			.cra_driver_name	= "zynqmp-keccak-384",
-+			.cra_priority		= 300,
-+			.cra_flags		= CRYPTO_ALG_ASYNC,
-+			.cra_blocksize		= SHA384_BLOCK_SIZE,
-+			.cra_ctxsize		= sizeof(struct zynqmp_sha_ctx),
-+			.cra_alignmask		= 0,
-+			.cra_module		= THIS_MODULE,
-+			.cra_init		= zynqmp_sha_cra_init,
-+		}
-+	}
-+};
-+
-+static const struct of_device_id zynqmp_sha_dt_ids[] = {
-+	{ .compatible = "xlnx,zynqmp-keccak-384" },
-+	{ /* sentinel */ }
-+};
-+
-+MODULE_DEVICE_TABLE(of, zynqmp_sha_dt_ids);
-+
-+static int zynqmp_sha_probe(struct platform_device *pdev)
-+{
-+	struct zynqmp_sha_dev *sha_dd;
-+	struct device *dev = &pdev->dev;
-+	int err;
-+
-+	sha_dd = devm_kzalloc(&pdev->dev, sizeof(*sha_dd), GFP_KERNEL);
-+	if (!sha_dd)
-+		return -ENOMEM;
-+
-+	sha_dd->dev = dev;
-+	platform_set_drvdata(pdev, sha_dd);
-+	INIT_LIST_HEAD(&sha_dd->list);
-+	spin_lock_init(&sha_dd->lock);
-+	crypto_init_queue(&sha_dd->queue, ZYNQMP_SHA_QUEUE_LENGTH);
-+	spin_lock(&zynqmp_sha.lock);
-+	list_add_tail(&sha_dd->list, &zynqmp_sha.dev_list);
-+	spin_unlock(&zynqmp_sha.lock);
-+
-+	err = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(44));
-+	if (err < 0)
-+		dev_err(dev, "no usable DMA configuration");
-+
-+	err = crypto_register_ahash(&sha3_alg);
-+	if (err)
-+		goto err_algs;
-+
-+	return 0;
-+
-+err_algs:
-+	spin_lock(&zynqmp_sha.lock);
-+	list_del(&sha_dd->list);
-+	spin_unlock(&zynqmp_sha.lock);
-+	dev_err(dev, "initialization failed.\n");
-+
-+	return err;
-+}
-+
-+static int zynqmp_sha_remove(struct platform_device *pdev)
-+{
-+	static struct zynqmp_sha_dev *sha_dd;
-+
-+	sha_dd = platform_get_drvdata(pdev);
-+
-+	if (!sha_dd)
-+		return -ENODEV;
-+
-+	spin_lock(&zynqmp_sha.lock);
-+	list_del(&sha_dd->list);
-+	spin_unlock(&zynqmp_sha.lock);
-+
-+	crypto_unregister_ahash(&sha3_alg);
-+
-+	return 0;
-+}
-+
-+static struct platform_driver zynqmp_sha_driver = {
-+	.probe		= zynqmp_sha_probe,
-+	.remove		= zynqmp_sha_remove,
-+	.driver		= {
-+		.name	= "zynqmp-keccak-384",
-+		.of_match_table	= of_match_ptr(zynqmp_sha_dt_ids),
-+	},
-+};
-+
-+module_platform_driver(zynqmp_sha_driver);
-+
-+MODULE_DESCRIPTION("ZynqMP SHA3 hw acceleration support.");
-+MODULE_LICENSE("GPL");
-+MODULE_AUTHOR("Nava kishore Manne <navam@xilinx.com>");
--- 
-1.7.1
+> From: Eric Biggers <ebiggers@google.com>
+> 
+> The majority of skcipher templates (including both the existing ones and
+> the ones remaining to be converted from the "blkcipher" API) just wrap a
+> single block cipher algorithm.  This includes cbc, cfb, ctr, ecb, kw,
+> ofb, and pcbc.  Add a helper function skcipher_alloc_instance_simple()
+> that handles allocating an skcipher instance for this common case.
+> 
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+
+Apart from the comment below:
+
+Reviewed-by: Stephan Mueller <smueller@chronox.de>
+
+> +struct skcipher_instance *
+> +skcipher_alloc_instance_simple(struct crypto_template *tmpl, struct rtattr
+> **tb, +			       struct crypto_alg **cipher_alg_ret)
+> +{
+> +	struct crypto_attr_type *algt;
+> +	struct crypto_alg *cipher_alg;
+> +	struct skcipher_instance *inst;
+> +	struct crypto_spawn *spawn;
+> +	u32 mask;
+> +	int err;
+> +
+> +	algt = crypto_get_attr_type(tb);
+> +	if (IS_ERR(algt))
+> +		return ERR_CAST(algt);
+> +
+> +	if ((algt->type ^ CRYPTO_ALG_TYPE_SKCIPHER) & algt->mask)
+> +		return ERR_PTR(-EINVAL);
+
+Why not using crypto_check_attr_type? I understand that it does not return 
+algt for the next check, but maybe we can consolidate the code a bit here?
+
+> +
+> +	mask = CRYPTO_ALG_TYPE_MASK |
+> +		crypto_requires_off(algt->type, algt->mask,
+> +				    CRYPTO_ALG_NEED_FALLBACK);
+
+
+Ciao
+Stephan
