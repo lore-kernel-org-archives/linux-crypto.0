@@ -1,116 +1,39 @@
-Return-Path: <SRS0=EWVs=PV=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mo4-p01-ob.smtp.rzone.de ([81.169.146.166]:30429 "EHLO
-        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726286AbfAMH5K (ORCPT
+Return-Path: <SRS0=Mcmw=PN=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:42888 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726010AbfAEDkT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 13 Jan 2019 02:57:10 -0500
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Eric Biggers <ebiggers@kernel.org>,
-        James Bottomley <James.Bottomley@hansenpartnership.com>,
-        Andy Lutomirski <luto@amacapital.net>,
-        "Lee, Chun-Yi" <joeyli.kernel@gmail.com>,
-        "Rafael J . Wysocki" <rjw@rjwysocki.net>,
-        Pavel Machek <pavel@ucw.cz>, linux-kernel@vger.kernel.org,
-        linux-pm@vger.kernel.org, keyrings@vger.kernel.org,
-        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-        Chen Yu <yu.c.chen@intel.com>,
-        Oliver Neukum <oneukum@suse.com>,
-        Ryan Chen <yu.chen.surf@gmail.com>,
-        David Howells <dhowells@redhat.com>,
-        Giovanni Gherdovich <ggherdovich@suse.cz>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Jann Horn <jannh@google.com>,
-        Andy Lutomirski <luto@kernel.org>, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 4/6] crypto: hkdf - RFC5869 Key Derivation Function
-Date: Sun, 13 Jan 2019 08:56:32 +0100
-Message-ID: <9795894.APlZEWIbOH@positron.chronox.de>
-In-Reply-To: <20190112095535.36rh3ptnrf7yxacv@gondor.apana.org.au>
-References: <20190103143227.9138-1-jlee@suse.com> <20190112051252.GA639@sol.localdomain> <20190112095535.36rh3ptnrf7yxacv@gondor.apana.org.au>
+        Fri, 4 Jan 2019 22:40:19 -0500
+Date: Sat, 5 Jan 2019 11:40:16 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
+        stable@vger.kernel.org,
+        James Bottomley <James.Bottomley@hansenpartnership.com>
+Subject: Re: [PATCH 01/16] crypto: cfb - add missing 'chunksize' property
+Message-ID: <20190105034016.tfn2gtl6uwyguv3s@gondor.apana.org.au>
+References: <20190104041625.3259-2-ebiggers@kernel.org>
+ <20190104210311.5AC542087F@mail.kernel.org>
+ <20190105030747.GA661@sol.localdomain>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190105030747.GA661@sol.localdomain>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Samstag, 12. Januar 2019, 10:55:35 CET schrieb Herbert Xu:
+On Fri, Jan 04, 2019 at 07:07:48PM -0800, Eric Biggers wrote:
+>
+> Herbert, why was CFB accepted without any test vectors in the first place?
 
-Hi Herbert,
+That was an oversight.  Longer term we should restructure how
+the test vectors are stored by moving them in with the generic
+implementation.  That should also ensure that we would never
+add an algorithm without both a generic implementation as well
+as test vectors.
 
-> On Fri, Jan 11, 2019 at 09:12:54PM -0800, Eric Biggers wrote:
-> > Hi Stephan,
-> >=20
-> > On Fri, Jan 11, 2019 at 08:10:39PM +0100, Stephan M=FCller wrote:
-> > > The RFC5869 compliant Key Derivation Function is implemented as a
-> > > random number generator considering that it behaves like a determinis=
-tic
-> > > RNG.
-> >=20
-> > Thanks for the proof of concept!  I guess it ended up okay.  But can you
-> > explain more the benefits of using the crypto_rng interface, as opposed
-> > to just some crypto_hkdf_*() helper functions that are exported for
-> > modules to use?
-> I agree.  I see no benefit in adding this through the RNG API as
-> opposed to just providing it as a helper.  If some form of hardware
-> acceleration were to eventuate in the future we could always revisit
-> this.
-
-The advantages for using the kernel crypto API to add KDFs as opposed to=20
-adding helper wrappers are the following in my view:
-
-=2D employment of the kernel crypto API testmgr - invocation of the testmgr=
- is=20
-transparent and thus already provided without any additional code to link t=
-o=20
-it
-
-=2D FIPS 140-2 compliance: To mark a KDF as FIPS 140-2 approved cipher, it =
-must=20
-be subject to a known-answer self test (implemented by the testmgr) as well=
- as=20
-to an enforcement of the integrity check verification. In FIPS 140-2 mode, =
-the=20
-kernel crypto API panic()s when a kernel crypto API module is loaded and it=
-s=20
-signature does not check out. As this is only relevant for crypto modules (=
-and=20
-not arbitrary other kernel modules), this is implemented with the invocatio=
-ns=20
-the crypto_register_alg as well as crypto_register_template functions. Thus=
-,=20
-when using a wrapper code to implement the KDF, they can per definition not=
- be=20
-=46IPS 140-2 approved.
-
-=2D The invoker of a KDF has one consistent API. This implies that the KDF=
-=20
-selection now becomes more of a "configuration" choice. For example, when y=
-ou=20
-look at the KDF use case for the keys subsystem (security/keys/dh.c),=20
-selecting the type of KDF would only necessitate a change of a string=20
-referencing the KDF. A lot of people somehow favor the extract-and-expand K=
-DFs=20
-over the traditional KDFs. Now, that the RFC5869 HKDF is also approved as p=
-er=20
-SP800-56A rev3, I could see that folks may want to switch to HKDF for the k=
-ey=20
-management. When we have a common API, this choice could even be left to th=
-e=20
-caller.
-
-The question may arise why to plug the KDFs into RNGs. The answer is quite=
-=20
-simple: KDFs are a form of random number generator. In that they take some=
-=20
-input for initialization (aka seed, salt, key, personalization string). The=
-n=20
-they produce pseudo-random bit sequences of arbitrary length. Possibly the=
-=20
-generation operation can be modified by providing some additional input to =
-be=20
-used by the generation process (aka label, context, info string, additional=
-=20
-information string). Thus, the RNG interface is a natural fit for the KDFs.
-
-Ciao
-Stephan
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
