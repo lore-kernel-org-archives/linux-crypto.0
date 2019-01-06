@@ -1,165 +1,235 @@
-Return-Path: <SRS0=8/la=PM=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:56434 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727740AbfADEU6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Jan 2019 23:20:58 -0500
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 14/16] crypto: arc4 - convert to skcipher API
-Date: Thu,  3 Jan 2019 20:16:23 -0800
-Message-Id: <20190104041625.3259-15-ebiggers@kernel.org>
-In-Reply-To: <20190104041625.3259-1-ebiggers@kernel.org>
-References: <20190104041625.3259-1-ebiggers@kernel.org>
+Return-Path: <SRS0=Z4qA=PO=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from vmicros1.altlinux.org ([194.107.17.57]:53002 "EHLO
+        vmicros1.altlinux.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726399AbfAFNgx (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 6 Jan 2019 08:36:53 -0500
+From: Vitaly Chikunov <vt@altlinux.org>
+To: David Howells <dhowells@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [RFC PATCH 2/4] akcipher: Introduce verify2 for public key algorithms
+Date: Sun,  6 Jan 2019 16:36:06 +0300
+Message-Id: <20190106133608.820-3-vt@altlinux.org>
+In-Reply-To: <20190106133608.820-1-vt@altlinux.org>
+References: <20190106133608.820-1-vt@altlinux.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Eric Biggers <ebiggers@google.com>
+Current akcipher .verify() just decrypts signature to uncover message
+hash, which is then verified in upper level public_key_verify_signature
+by memcmp with the expected signature value, which is never passed into
+verify().
 
-Convert the "ecb(arc4)" algorithm from the deprecated "blkcipher" API to
-the "skcipher" API.
+This approach is incompatible with ECDSA algorithms, because, to verify
+a signature ECDSA algorithm also needs a hash value as input; also, hash
+is used in ECDSA (together with a signature divided into halves `r||s`),
+not to produce hash, but to produce a number, which is then compared to
+`r` (first part of the signature) to determine if the signature is
+correct.  Thus, for ECDSA, nor requirements of .verify() itself, nor its
+output expectations in public_key_verify_signature aren't satisfied.
 
-(Note that this is really a stream cipher and not a block cipher in ECB
-mode as the name implies, but that's a problem for another day...)
+Make alternative .verify2() call which gets hash value and produce
+complete signature check (without any output, thus max_size() call will
+not be needed for verify2() operation).
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
+If .verify2() call is present, it should be used in place of .verify().
+
+Signed-off-by: Vitaly Chikunov <vt@altlinux.org>
 ---
- crypto/arc4.c | 82 +++++++++++++++++++++++++++------------------------
- 1 file changed, 44 insertions(+), 38 deletions(-)
+ crypto/asymmetric_keys/public_key.c | 57 ++++++++++++++++++++++++-------------
+ include/crypto/akcipher.h           | 54 +++++++++++++++++++++++++++++++++--
+ 2 files changed, 89 insertions(+), 22 deletions(-)
 
-diff --git a/crypto/arc4.c b/crypto/arc4.c
-index f1a81925558fa..652d24399afa6 100644
---- a/crypto/arc4.c
-+++ b/crypto/arc4.c
-@@ -12,10 +12,10 @@
-  *
+diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
+index 3bc090b8adef..51dc1c858c7c 100644
+--- a/crypto/asymmetric_keys/public_key.c
++++ b/crypto/asymmetric_keys/public_key.c
+@@ -242,6 +242,7 @@ int public_key_verify_signature(const struct public_key *pkey,
+ 	char alg_name[CRYPTO_MAX_ALG_NAME];
+ 	void *output;
+ 	unsigned int outlen;
++	int verify2;
+ 	int ret;
+ 
+ 	pr_devel("==>%s()\n", __func__);
+@@ -279,14 +280,23 @@ int public_key_verify_signature(const struct public_key *pkey,
+ 	if (ret)
+ 		goto error_free_req;
+ 
+-	ret = -ENOMEM;
+-	outlen = crypto_akcipher_maxsize(tfm);
+-	output = kmalloc(outlen, GFP_KERNEL);
+-	if (!output)
+-		goto error_free_req;
+-
++	verify2 = crypto_akcipher_have_verify2(req);
++	if (!verify2) {
++		/* verify2 does not need output buffer */
++		ret = -ENOMEM;
++		outlen = crypto_akcipher_maxsize(tfm);
++		output = kmalloc(outlen, GFP_KERNEL);
++		if (!output)
++			goto error_free_req;
++
++		sg_init_one(&digest_sg, output, outlen);
++	} else {
++		/* dummy init digest_sg */
++		memset(&digest_sg, 0, sizeof(digest_sg));
++		output = NULL;
++		outlen = 0;
++	}
+ 	sg_init_one(&sig_sg, sig->s, sig->s_size);
+-	sg_init_one(&digest_sg, output, outlen);
+ 	akcipher_request_set_crypt(req, &sig_sg, &digest_sg, sig->s_size,
+ 				   outlen);
+ 	crypto_init_wait(&cwait);
+@@ -294,18 +304,27 @@ int public_key_verify_signature(const struct public_key *pkey,
+ 				      CRYPTO_TFM_REQ_MAY_SLEEP,
+ 				      crypto_req_done, &cwait);
+ 
+-	/* Perform the verification calculation.  This doesn't actually do the
+-	 * verification, but rather calculates the hash expected by the
+-	 * signature and returns that to us.
+-	 */
+-	ret = crypto_wait_req(crypto_akcipher_verify(req), &cwait);
+-	if (ret)
+-		goto out_free_output;
+-
+-	/* Do the actual verification step. */
+-	if (req->dst_len != sig->digest_size ||
+-	    memcmp(sig->digest, output, sig->digest_size) != 0)
+-		ret = -EKEYREJECTED;
++	if (!verify2) {
++		/* Perform the verification calculation.  This doesn't actually
++		 * do the verification, but rather calculates the hash expected
++		 * by the signature and returns that to us.
++		 */
++		ret = crypto_wait_req(crypto_akcipher_verify(req), &cwait);
++		if (ret)
++			goto out_free_output;
++
++		/* Do the actual verification step. */
++		if (req->dst_len != sig->digest_size ||
++		    memcmp(sig->digest, output, sig->digest_size) != 0)
++			ret = -EKEYREJECTED;
++	} else {
++		/* Perform full verification in one call. */
++		req->digest = sig->digest;
++		req->digest_len = sig->digest_size;
++		ret = crypto_wait_req(crypto_akcipher_verify2(req), &cwait);
++		if (ret)
++			goto out_free_output;
++	}
+ 
+ out_free_output:
+ 	kfree(output);
+diff --git a/include/crypto/akcipher.h b/include/crypto/akcipher.h
+index 84d68dfb551a..b15a995f6118 100644
+--- a/include/crypto/akcipher.h
++++ b/include/crypto/akcipher.h
+@@ -28,6 +28,8 @@
+  *		result.
+  *		In case of error where the dst sgl size was insufficient,
+  *		it will be updated to the size required for the operation.
++ * @digest:	Digest for verify2.
++ * @digest_len:	Size of the digest.
+  * @__ctx:	Start of private context data
   */
+ struct akcipher_request {
+@@ -36,6 +38,8 @@ struct akcipher_request {
+ 	struct scatterlist *dst;
+ 	unsigned int src_len;
+ 	unsigned int dst_len;
++	u8 *digest;
++	u8 digest_len;
+ 	void *__ctx[] CRYPTO_MINALIGN_ATTR;
+ };
  
--#include <linux/module.h>
--#include <linux/init.h>
--#include <linux/crypto.h>
- #include <crypto/algapi.h>
-+#include <crypto/internal/skcipher.h>
-+#include <linux/init.h>
-+#include <linux/module.h>
- 
- #define ARC4_MIN_KEY_SIZE	1
- #define ARC4_MAX_KEY_SIZE	256
-@@ -50,6 +50,12 @@ static int arc4_set_key(struct crypto_tfm *tfm, const u8 *in_key,
- 	return 0;
+@@ -60,6 +64,8 @@ struct crypto_akcipher {
+  *		algorithm. In case of error, where the dst_len was insufficient,
+  *		the req->dst_len will be updated to the size required for the
+  *		operation
++ * @verify2:	Function performs a verify operation as defined by public key
++ *		algorithm.
+  * @encrypt:	Function performs an encrypt operation as defined by public key
+  *		algorithm. In case of error, where the dst_len was insufficient,
+  *		the req->dst_len will be updated to the size required for the
+@@ -96,6 +102,7 @@ struct crypto_akcipher {
+ struct akcipher_alg {
+ 	int (*sign)(struct akcipher_request *req);
+ 	int (*verify)(struct akcipher_request *req);
++	int (*verify2)(struct akcipher_request *req);
+ 	int (*encrypt)(struct akcipher_request *req);
+ 	int (*decrypt)(struct akcipher_request *req);
+ 	int (*set_pub_key)(struct crypto_akcipher *tfm, const void *key,
+@@ -400,11 +407,13 @@ static inline int crypto_akcipher_sign(struct akcipher_request *req)
+  * crypto_akcipher_verify() - Invoke public key verify operation
+  *
+  * Function invokes the specific public key verify operation for a given
+- * public key algorithm
++ * public key algorithm: basically it does (rsa) decrypt of signature
++ * producing decrypted hash into dst, which should be compared by a caller
++ * with expected hash value.
+  *
+- * @req:	asymmetric key request
++ * @req:	asymmetric key request (without hash)
+  *
+- * Return: zero on success; error code in case of error
++ * Return: zero on decryption success; error code in case of error
+  */
+ static inline int crypto_akcipher_verify(struct akcipher_request *req)
+ {
+@@ -418,6 +427,45 @@ static inline int crypto_akcipher_verify(struct akcipher_request *req)
  }
  
-+static int arc4_set_key_skcipher(struct crypto_skcipher *tfm, const u8 *in_key,
-+				 unsigned int key_len)
+ /**
++ * crypto_akcipher_verify2() - Invoke public key verify operation
++ *
++ * Function performs complete public key verify operation for a given
++ * public key algorithm
++ *
++ * @req:	asymmetric key request (with hash)
++ *
++ * Return: zero on verification success; error code in case of error
++ */
++static inline int crypto_akcipher_verify2(struct akcipher_request *req)
 +{
-+	return arc4_set_key(&tfm->base, in_key, key_len);
++	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
++	struct akcipher_alg *alg = crypto_akcipher_alg(tfm);
++	int ret;
++
++	ret = alg->verify2(req);
++	crypto_stat_akcipher_verify(req, ret);
++	return ret;
 +}
 +
- static void arc4_crypt(struct arc4_ctx *ctx, u8 *out, const u8 *in,
- 		       unsigned int len)
- {
-@@ -92,30 +98,25 @@ static void arc4_crypt_one(struct crypto_tfm *tfm, u8 *out, const u8 *in)
- 	arc4_crypt(crypto_tfm_ctx(tfm), out, in, 1);
- }
- 
--static int ecb_arc4_crypt(struct blkcipher_desc *desc, struct scatterlist *dst,
--			  struct scatterlist *src, unsigned int nbytes)
-+static int ecb_arc4_crypt(struct skcipher_request *req)
- {
--	struct arc4_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
--	struct blkcipher_walk walk;
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	struct arc4_ctx *ctx = crypto_skcipher_ctx(tfm);
-+	struct skcipher_walk walk;
- 	int err;
- 
--	blkcipher_walk_init(&walk, dst, src, nbytes);
--
--	err = blkcipher_walk_virt(desc, &walk);
-+	err = skcipher_walk_virt(&walk, req, false);
- 
- 	while (walk.nbytes > 0) {
--		u8 *wsrc = walk.src.virt.addr;
--		u8 *wdst = walk.dst.virt.addr;
--
--		arc4_crypt(ctx, wdst, wsrc, walk.nbytes);
--
--		err = blkcipher_walk_done(desc, &walk, 0);
-+		arc4_crypt(ctx, walk.dst.virt.addr, walk.src.virt.addr,
-+			   walk.nbytes);
-+		err = skcipher_walk_done(&walk, 0);
- 	}
- 
- 	return err;
- }
- 
--static struct crypto_alg arc4_algs[2] = { {
-+static struct crypto_alg arc4_cipher = {
- 	.cra_name		=	"arc4",
- 	.cra_flags		=	CRYPTO_ALG_TYPE_CIPHER,
- 	.cra_blocksize		=	ARC4_BLOCK_SIZE,
-@@ -130,34 +131,39 @@ static struct crypto_alg arc4_algs[2] = { {
- 			.cia_decrypt		=	arc4_crypt_one,
- 		},
- 	},
--}, {
--	.cra_name		=	"ecb(arc4)",
--	.cra_priority		=	100,
--	.cra_flags		=	CRYPTO_ALG_TYPE_BLKCIPHER,
--	.cra_blocksize		=	ARC4_BLOCK_SIZE,
--	.cra_ctxsize		=	sizeof(struct arc4_ctx),
--	.cra_alignmask		=	0,
--	.cra_type		=	&crypto_blkcipher_type,
--	.cra_module		=	THIS_MODULE,
--	.cra_u			=	{
--		.blkcipher = {
--			.min_keysize	=	ARC4_MIN_KEY_SIZE,
--			.max_keysize	=	ARC4_MAX_KEY_SIZE,
--			.setkey		=	arc4_set_key,
--			.encrypt	=	ecb_arc4_crypt,
--			.decrypt	=	ecb_arc4_crypt,
--		},
--	},
--} };
-+};
++/**
++ * crypto_akcipher_have_verify2() - Check for existence of public key verify2
++ * operation
++ *
++ * Function checks for existence of verify2 call for the public key algorithm
++ *
++ * @req:	asymmetric key request (with hash)
++ *
++ * Return: non-zero is verify2 call exists; zero if it does not
++ */
++static inline int crypto_akcipher_have_verify2(struct akcipher_request *req)
++{
++	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
++	struct akcipher_alg *alg = crypto_akcipher_alg(tfm);
 +
-+static struct skcipher_alg arc4_skcipher = {
-+	.base.cra_name		=	"ecb(arc4)",
-+	.base.cra_priority	=	100,
-+	.base.cra_blocksize	=	ARC4_BLOCK_SIZE,
-+	.base.cra_ctxsize	=	sizeof(struct arc4_ctx),
-+	.base.cra_module	=	THIS_MODULE,
-+	.min_keysize		=	ARC4_MIN_KEY_SIZE,
-+	.max_keysize		=	ARC4_MAX_KEY_SIZE,
-+	.setkey			=	arc4_set_key_skcipher,
-+	.encrypt		=	ecb_arc4_crypt,
-+	.decrypt		=	ecb_arc4_crypt,
-+};
- 
- static int __init arc4_init(void)
- {
--	return crypto_register_algs(arc4_algs, ARRAY_SIZE(arc4_algs));
-+	int err;
++	return !!alg->verify2;
++}
 +
-+	err = crypto_register_alg(&arc4_cipher);
-+	if (err)
-+		return err;
-+
-+	err = crypto_register_skcipher(&arc4_skcipher);
-+	if (err)
-+		crypto_unregister_alg(&arc4_cipher);
-+	return err;
- }
- 
- static void __exit arc4_exit(void)
- {
--	crypto_unregister_algs(arc4_algs, ARRAY_SIZE(arc4_algs));
-+	crypto_unregister_alg(&arc4_cipher);
-+	crypto_unregister_skcipher(&arc4_skcipher);
- }
- 
- module_init(arc4_init);
++/**
+  * crypto_akcipher_set_pub_key() - Invoke set public key operation
+  *
+  * Function invokes the algorithm specific set key function, which knows
 -- 
-2.20.1
+2.11.0
