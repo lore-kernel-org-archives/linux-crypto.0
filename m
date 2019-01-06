@@ -1,151 +1,52 @@
-Return-Path: <SRS0=CSIn=PT=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mo4-p03-ob.smtp.rzone.de ([81.169.146.175]:32571 "EHLO
-        mo4-p03-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729364AbfAKTOP (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Jan 2019 14:14:15 -0500
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        James Bottomley <James.Bottomley@hansenpartnership.com>,
-        Andy Lutomirski <luto@amacapital.net>,
-        "Lee, Chun-Yi" <joeyli.kernel@gmail.com>,
-        "Rafael J . Wysocki" <rjw@rjwysocki.net>,
-        Pavel Machek <pavel@ucw.cz>, linux-kernel@vger.kernel.org,
-        linux-pm@vger.kernel.org, keyrings@vger.kernel.org,
-        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-        Chen Yu <yu.c.chen@intel.com>,
-        Oliver Neukum <oneukum@suse.com>,
-        Ryan Chen <yu.chen.surf@gmail.com>,
-        David Howells <dhowells@redhat.com>,
-        Giovanni Gherdovich <ggherdovich@suse.cz>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Jann Horn <jannh@google.com>,
-        Andy Lutomirski <luto@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH 1/6] crypto: add template handling for RNGs
-Date: Fri, 11 Jan 2019 20:09:42 +0100
-Message-ID: <3591906.ScSkh9qv6E@positron.chronox.de>
-In-Reply-To: <9733066.Vrs4h5eWcW@positron.chronox.de>
-References: <20190103143227.9138-1-jlee@suse.com> <20190109082103.GA8586@sol.localdomain> <9733066.Vrs4h5eWcW@positron.chronox.de>
+Return-Path: <SRS0=Z4qA=PO=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:53412 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726072AbfAFUtY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 6 Jan 2019 15:49:24 -0500
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [PATCH 2/2] crypto: algapi - reject NULL crypto_spawn::inst
+Date: Sun,  6 Jan 2019 12:46:06 -0800
+Message-Id: <20190106204606.11412-2-ebiggers@kernel.org>
+In-Reply-To: <20190106204606.11412-1-ebiggers@kernel.org>
+References: <20190106204606.11412-1-ebiggers@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Add ability to register templates for RNGs. RNGs are
-"meta" mechanisms using raw cipher primitives. Thus, RNGs can now be
-implemented as templates to allow the complete flexibility the kernel
-crypto API provides.
+From: Eric Biggers <ebiggers@google.com>
 
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
+It took me a while to notice the bug where the adiantum template left
+crypto_spawn::inst == NULL, because this only caused problems in certain
+cases where algorithms are dynamically loaded/unloaded.
+
+More improvements are needed, but for now make crypto_init_spawn()
+reject this case and WARN(), so this type of bug will be noticed
+immediately in the future.
+
+Note: I checked all callers and the adiantum template was the only place
+that had this wrong.  So this WARN shouldn't trigger anymore.
+
+Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/rng.c                  | 44 +++++++++++++++++++++++++++++++++++
- include/crypto/internal/rng.h | 26 +++++++++++++++++++++
- 2 files changed, 70 insertions(+)
+ crypto/algapi.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/crypto/rng.c b/crypto/rng.c
-index 33c38a72bff5..da4fd03c0acd 100644
---- a/crypto/rng.c
-+++ b/crypto/rng.c
-@@ -64,6 +64,25 @@ static int crypto_rng_init_tfm(struct crypto_tfm *tfm)
- 	return 0;
- }
- 
-+static inline struct rng_alg *__crypto_rng_alg(struct crypto_alg *alg)
-+{
-+	return container_of(alg, struct rng_alg, base);
-+}
-+
-+static inline struct rng_instance *rng_instance(
-+	struct crypto_instance *inst)
-+{
-+	return container_of(__crypto_rng_alg(&inst->alg),
-+			    struct rng_instance, alg);
-+}
-+
-+static void crypto_rng_free_instance(struct crypto_instance *inst)
-+{
-+	struct rng_instance *rng = rng_instance(inst);
-+
-+	rng->free(rng);
-+}
-+
- static unsigned int seedsize(struct crypto_alg *alg)
+diff --git a/crypto/algapi.c b/crypto/algapi.c
+index f3d766312bd96..713baabeb6438 100644
+--- a/crypto/algapi.c
++++ b/crypto/algapi.c
+@@ -608,6 +608,9 @@ int crypto_init_spawn(struct crypto_spawn *spawn, struct crypto_alg *alg,
  {
- 	struct rng_alg *ralg = container_of(alg, struct rng_alg, base);
-@@ -102,6 +121,7 @@ static void crypto_rng_show(struct seq_file *m, struct crypto_alg *alg)
- static const struct crypto_type crypto_rng_type = {
- 	.extsize = crypto_alg_extsize,
- 	.init_tfm = crypto_rng_init_tfm,
-+	.free = crypto_rng_free_instance,
- #ifdef CONFIG_PROC_FS
- 	.show = crypto_rng_show,
- #endif
-@@ -229,5 +249,29 @@ void crypto_unregister_rngs(struct rng_alg *algs, int count)
- }
- EXPORT_SYMBOL_GPL(crypto_unregister_rngs);
+ 	int err = -EAGAIN;
  
-+static int rng_prepare_alg(struct rng_alg *alg)
-+{
-+	struct crypto_alg *base = &alg->base;
++	if (WARN_ON_ONCE(inst == NULL))
++		return -EINVAL;
 +
-+	base->cra_type = &crypto_rng_type;
-+	base->cra_flags &= ~CRYPTO_ALG_TYPE_MASK;
-+	base->cra_flags |= CRYPTO_ALG_TYPE_RNG;
-+
-+	return 0;
-+}
-+
-+int rng_register_instance(struct crypto_template *tmpl,
-+			  struct rng_instance *inst)
-+{
-+	int err;
-+
-+	err = rng_prepare_alg(&inst->alg);
-+	if (err)
-+		return err;
-+
-+	return crypto_register_instance(tmpl, rng_crypto_instance(inst));
-+}
-+EXPORT_SYMBOL_GPL(rng_register_instance);
-+
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("Random Number Generator");
-diff --git a/include/crypto/internal/rng.h b/include/crypto/internal/rng.h
-index a52ef3483dd7..bfe4482ad336 100644
---- a/include/crypto/internal/rng.h
-+++ b/include/crypto/internal/rng.h
-@@ -42,4 +42,30 @@ static inline void crypto_rng_set_entropy(struct crypto_rng *tfm,
- 	crypto_rng_alg(tfm)->set_ent(tfm, data, len);
- }
+ 	spawn->inst = inst;
+ 	spawn->mask = mask;
  
-+struct rng_instance {
-+	void (*free)(struct rng_instance *inst);
-+	struct rng_alg alg;
-+};
-+
-+static inline struct rng_instance *rng_alloc_instance(
-+	const char *name, struct crypto_alg *alg)
-+{
-+	return crypto_alloc_instance(name, alg,
-+			      sizeof(struct rng_instance) - sizeof(*alg));
-+}
-+
-+static inline struct crypto_instance *rng_crypto_instance(
-+	struct rng_instance *inst)
-+{
-+	return container_of(&inst->alg.base, struct crypto_instance, alg);
-+}
-+
-+static inline void *rng_instance_ctx(struct rng_instance *inst)
-+{
-+	return crypto_instance_ctx(rng_crypto_instance(inst));
-+}
-+
-+int rng_register_instance(struct crypto_template *tmpl,
-+			  struct rng_instance *inst);
-+
- #endif
 -- 
 2.20.1
