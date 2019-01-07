@@ -1,58 +1,62 @@
-Return-Path: <SRS0=Z4qA=PO=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:53410 "EHLO mail.kernel.org"
+Return-Path: <SRS0=b7+G=PP=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:56802 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726061AbfAFUtY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 6 Jan 2019 15:49:24 -0500
+        id S1727002AbfAGQ4J (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 7 Jan 2019 11:56:09 -0500
+Date: Mon, 7 Jan 2019 08:56:07 -0800
 From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 1/2] crypto: adiantum - initialize crypto_spawn::inst
-Date: Sun,  6 Jan 2019 12:46:05 -0800
-Message-Id: <20190106204606.11412-1-ebiggers@kernel.org>
+To: Kalyani Akula <kalyani.akula@xilinx.com>
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Kalyani Akula <kalyania@xilinx.com>,
+        Sarat Chand Savitala <saratcha@xilinx.com>
+Subject: Re: [RFC PATCH 2/3] crypto: Add Xilinx SHA3 driver
+Message-ID: <20190107165606.GA2077@gmail.com>
+References: <1546851776-3456-1-git-send-email-kalyani.akula@xilinx.com>
+ <1546851776-3456-3-git-send-email-kalyani.akula@xilinx.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1546851776-3456-3-git-send-email-kalyani.akula@xilinx.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Eric Biggers <ebiggers@google.com>
+Hi Kalyani,
 
-crypto_grab_*() doesn't set crypto_spawn::inst, so templates must set it
-beforehand.  Otherwise it will be left NULL, which causes a crash in
-certain cases where algorithms are dynamically loaded/unloaded.  E.g.
-with CONFIG_CRYPTO_CHACHA20_X86_64=m, the following caused a crash:
+On Mon, Jan 07, 2019 at 02:32:55PM +0530, Kalyani Akula wrote:
+> This patch adds SHA3 driver suuport for the Xilinx
+> ZynqMP SoC.
+> 
+> Signed-off-by: Kalyani Akula <kalyani.akula@xilinx.com>
+[...]
+> +
+> +static struct ahash_alg sha3_alg = {
+> +	.init		= zynqmp_sha_init,
+> +	.update		= zynqmp_sha_update,
+> +	.final		= zynqmp_sha_final,
+> +	.finup		= zynqmp_sha_finup,
+> +	.digest		= zynqmp_sha_digest,
+> +	.export		= zynqmp_sha_export,
+> +	.import		= zynqmp_sha_import,
+> +	.halg = {
+> +		.digestsize	= SHA384_DIGEST_SIZE,
+> +		.statesize	= sizeof(struct sha256_state),
+> +		.base	= {
+> +			.cra_name		= "xilinx-keccak-384",
+> +			.cra_driver_name	= "zynqmp-keccak-384",
+> +			.cra_priority		= 300,
+> +			.cra_flags		= CRYPTO_ALG_ASYNC,
+> +			.cra_blocksize		= SHA384_BLOCK_SIZE,
+> +			.cra_ctxsize		= sizeof(struct zynqmp_sha_ctx),
+> +			.cra_alignmask		= 0,
+> +			.cra_module		= THIS_MODULE,
+> +			.cra_init		= zynqmp_sha_cra_init,
+> +		}
+> +	}
+> +};
 
-    insmod chacha-x86_64.ko
-    python -c 'import socket; socket.socket(socket.AF_ALG, 5, 0).bind(("skcipher", "adiantum(xchacha12,aes)"))'
-    rmmod chacha-x86_64.ko
-    python -c 'import socket; socket.socket(socket.AF_ALG, 5, 0).bind(("skcipher", "adiantum(xchacha12,aes)"))'
+cra_name needs to match an algorithm that has a generic implementation.
+It should be "sha3-384", or is your hardware not compatible?
+Also does your hardware not support sha3-256 and sha3-512?
 
-Fixes: 059c2a4d8e16 ("crypto: adiantum - add Adiantum support")
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- crypto/adiantum.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/crypto/adiantum.c b/crypto/adiantum.c
-index 6651e713c45d6..5564e73266a6a 100644
---- a/crypto/adiantum.c
-+++ b/crypto/adiantum.c
-@@ -539,6 +539,8 @@ static int adiantum_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	ictx = skcipher_instance_ctx(inst);
- 
- 	/* Stream cipher, e.g. "xchacha12" */
-+	crypto_set_skcipher_spawn(&ictx->streamcipher_spawn,
-+				  skcipher_crypto_instance(inst));
- 	err = crypto_grab_skcipher(&ictx->streamcipher_spawn, streamcipher_name,
- 				   0, crypto_requires_sync(algt->type,
- 							   algt->mask));
-@@ -547,6 +549,8 @@ static int adiantum_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	streamcipher_alg = crypto_spawn_skcipher_alg(&ictx->streamcipher_spawn);
- 
- 	/* Block cipher, e.g. "aes" */
-+	crypto_set_spawn(&ictx->blockcipher_spawn,
-+			 skcipher_crypto_instance(inst));
- 	err = crypto_grab_spawn(&ictx->blockcipher_spawn, blockcipher_name,
- 				CRYPTO_ALG_TYPE_CIPHER, CRYPTO_ALG_TYPE_MASK);
- 	if (err)
--- 
-2.20.1
+- Eric
