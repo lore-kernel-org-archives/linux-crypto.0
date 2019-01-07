@@ -1,99 +1,71 @@
-Return-Path: <SRS0=1Gsi=PR=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:42068 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731169AbfAIP7p (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 9 Jan 2019 10:59:45 -0500
-From: Daniel Bristot de Oliveira <bristot@redhat.com>
-To: linux-rt-users@vger.kernel.org
-Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Clark Williams <williams@redhat.com>,
+Return-Path: <SRS0=b7+G=PP=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from vmicros1.altlinux.org ([194.107.17.57]:48110 "EHLO
+        vmicros1.altlinux.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726573AbfAGJEx (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 7 Jan 2019 04:04:53 -0500
+Date: Mon, 7 Jan 2019 12:04:49 +0300
+From: Vitaly Chikunov <vt@altlinux.org>
+To: Stephan Mueller <smueller@chronox.de>
+Cc: David Howells <dhowells@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH RT] padata: Make padata_do_serial() use get_cpu_light()
-Date: Wed,  9 Jan 2019 16:59:26 +0100
-Message-Id: <5894faebe7c816c6b210ab2616a49330f067a492.1547039140.git.bristot@redhat.com>
+Subject: Re: [RFC PATCH 4/4] crypto: Add EC-RDSA algorithm
+Message-ID: <20190107090449.d364ii24zervlsfq@sole.flsd.net>
+References: <20190106133608.820-1-vt@altlinux.org>
+ <1893001.R2IGJoHzOM@positron.chronox.de>
+ <20190107080710.r4bh7gkqdysxmlnn@sole.flsd.net>
+ <1714084.mfT8VG1pOj@tauon.chronox.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=koi8-r
+Content-Disposition: inline
+In-Reply-To: <1714084.mfT8VG1pOj@tauon.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-We hit the following BUG:
+Stephan,
 
-  BUG: scheduling while atomic: kworker/1:1/24117/0x00000002
-  Preemption disabled at:
-  [<ffffffffb61fd824>] padata_do_serial+0x24/0x110
-  CPU: 1 PID: 24117 Comm: kworker/1:1 Not tainted 4.18.0-56.rt9.107.el8.x86_64 #1
-  Hardware name: HPE ProLiant DL380 Gen10/ProLiant DL380 Gen10, BIOS U30 11/14/2017
-  Workqueue: pencrypt padata_parallel_worker
-  Call Trace:
-    dump_stack+0x5c/0x80
-    ? padata_do_serial+0x24/0x110
-    __schedule_bug.cold.83+0x8e/0x9b
-    __schedule+0x5a0/0x680
-    schedule+0x39/0xd0
-    rt_spin_lock_slowlock_locked+0x10e/0x2b0
-    rt_spin_lock_slowlock+0x50/0x80
-    padata_do_serial+0x4d/0x110
-    padata_parallel_worker+0xaf/0xe0
-    process_one_work+0x183/0x3b0
-    ? process_one_work+0x3b0/0x3b0
-    worker_thread+0x30/0x3d0
-    ? process_one_work+0x3b0/0x3b0
-    kthread+0x112/0x130
-    ? kthread_create_worker_on_cpu+0x70/0x70
-    ret_from_fork+0x35/0x40
+On Mon, Jan 07, 2019 at 09:31:40AM +0100, Stephan Mueller wrote:
+> Am Montag, 7. Januar 2019, 09:07:10 CET schrieb Vitaly Chikunov:
+> 
+> > > Why do you manually parse the ASN.1 structure instead of using the ASN.1
+> > > parser?
+> > 
+> > I am not sure this worth effort and will not be most degenerate use of
+> > asn1_ber_decoder, since 1) I only need to parse one type in each case:
+> > OCTET STRING string above code, and OIDs in below code; 2) this data is
+> > said to be in DER format, which asn1_ber_decoder can not enforce. Surely
+> > this will also produce more code and files.
+> 
+> RSA public keys also only contain n and e in the ASN.1 structure for which the 
+> ASN.1 parser is used (see linux/crypto/rsapubkey.asn1).
 
-and the cause is a spin_lock() taken inside a get_cpu() section.
+Yes I saw it, but at least there is two values (n and e), while EC-RDSA
+pub_key is just one OCTET STRING value (which internally is not defined
+to be ASN.1).
 
-Convert the get/put_cpu to get/put_cpu_light to fix the BUG while reducing the
-preempt_disable section.
+> As ASN.1 parsing is always having security issues, I would rather suggest to
+> have this parsing implemented in one spot and not here and there.
 
-Signed-off-by: Daniel Bristot de Oliveira <bristot@redhat.com>
-Reviewed-by: Clark Williams <williams@redhat.com>
-Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Clark Williams <williams@redhat.com>
-Cc: linux-rt-users@vger.kernel.org
-Cc: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
+Yes. So I tried to parse it very carefully and strictly.
 
-diff --git a/kernel/padata.c b/kernel/padata.c
-index d568cc56405f..bfcbdeb20ba5 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -295,7 +295,7 @@ static void padata_reorder_timer(struct timer_list *t)
- 	unsigned int weight;
- 	int target_cpu, cpu;
- 
--	cpu = get_cpu();
-+	cpu = get_cpu_light();
- 
- 	/* We don't lock pd here to not interfere with parallel processing
- 	 * padata_reorder() calls on other CPUs. We just need any CPU out of
-@@ -321,7 +321,7 @@ static void padata_reorder_timer(struct timer_list *t)
- 		padata_reorder(pd);
- 	}
- 
--	put_cpu();
-+	put_cpu_light();
- }
- 
- static void padata_serial_worker(struct work_struct *serial_work)
-@@ -369,7 +369,7 @@ void padata_do_serial(struct padata_priv *padata)
- 
- 	pd = padata->pd;
- 
--	cpu = get_cpu();
-+	cpu = get_cpu_light();
- 
- 	/* We need to run on the same CPU padata_do_parallel(.., padata, ..)
- 	 * was called on -- or, at least, enqueue the padata object into the
-@@ -387,7 +387,7 @@ void padata_do_serial(struct padata_priv *padata)
- 	list_add_tail(&padata->list, &pqueue->reorder.list);
- 	spin_unlock(&pqueue->reorder.lock);
- 
--	put_cpu();
-+	put_cpu_light();
- 
- 	/* If we're running on the wrong CPU, call padata_reorder() via a
- 	 * kernel worker.
--- 
-2.17.2
+> Regarding your comment (2), I am not sure I understand. Why do you say that 
+> the DER format cannot be parsed by the kernel's ASN.1 parser? For example, 
+
+It can, but DER is stricter than BER. For example, in DER 'OCTET STRING'
+length field should be encoded in just one byte if it's smaller than
+128, in BER it could be encoded in multiple encodings. This does not
+seem like a big deal, though. With BER decoder an improperly DER-encoded
+certificate could be successfully parsed.
+
+> when you generate RSA keys in DER format with, say, openssl, the kernel ASN.1 
+> parser will happily use them. Also, when I created my (not accepted) patch to 
+> load PQG domain parameters for DH using the ASN.1 parser, the PQG domain 
+> parameters created by openssl in DER format were processed well.
+> 
+> Ciao
+> Stephan
+> 
