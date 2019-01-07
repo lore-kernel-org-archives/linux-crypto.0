@@ -1,71 +1,64 @@
-Return-Path: <SRS0=+HSe=PS=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:59662 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727684AbfAJOFQ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Jan 2019 09:05:16 -0500
-Date: Thu, 10 Jan 2019 22:05:01 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Harsh Jain <harsh@chelsio.com>
-Cc: steffen.klassert@secunet.com, davem@davemloft.net,
-        netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
-        atul.gupta@chelsio.com, harshjain.prof@gmail.com,
-        stable@vger.kernel.org
-Subject: Re: [PATCH] crypto:authencesn: Avoid twice completion call in
- decrypt path
-Message-ID: <20190110140500.dgs67mfhaevmvayt@gondor.apana.org.au>
-References: <cover.1546505059.git.harsh@chelsio.com>
- <d142ed822eefb83f5171800a3d97e5567dce4062.1546505059.git.harsh@chelsio.com>
+Return-Path: <SRS0=b7+G=PP=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:46496 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726176AbfAGCtk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 6 Jan 2019 21:49:40 -0500
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [PATCH 3/3] crypto: aead - set CRYPTO_TFM_NEED_KEY if ->setkey() fails
+Date: Sun,  6 Jan 2019 18:47:44 -0800
+Message-Id: <20190107024744.4952-4-ebiggers@kernel.org>
+In-Reply-To: <20190107024744.4952-1-ebiggers@kernel.org>
+References: <20190107024744.4952-1-ebiggers@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d142ed822eefb83f5171800a3d97e5567dce4062.1546505059.git.harsh@chelsio.com>
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jan 03, 2019 at 02:21:05PM +0530, Harsh Jain wrote:
-> Authencesn template in decrypt path unconditionally calls aead_request_complete
-> after ahash_verify which leads to following kernel panic in after decryption.
-> 
-> [  338.539800] BUG: unable to handle kernel NULL pointer dereference at 0000000000000004
-> [  338.548372] PGD 0 P4D 0
-> [  338.551157] Oops: 0000 [#1] SMP PTI
-> [  338.554919] CPU: 0 PID: 0 Comm: swapper/0 Kdump: loaded Tainted: G        W I       4.19.7+ #13
-> [  338.564431] Hardware name: Supermicro X8ST3/X8ST3, BIOS 2.0        07/29/10
-> [  338.572212] RIP: 0010:esp_input_done2+0x350/0x410 [esp4]
-> [  338.578030] Code: ff 0f b6 68 10 48 8b 83 c8 00 00 00 e9 8e fe ff ff 8b 04 25 04 00 00 00 83 e8 01 48 98 48 8b 3c c5 10 00 00 00 e9 f7 fd ff ff <8b> 04 25 04 00 00 00 83 e8 01 48 98 4c 8b 24 c5 10 00 00 00 e9 3b
-> [  338.598547] RSP: 0018:ffff911c97803c00 EFLAGS: 00010246
-> [  338.604268] RAX: 0000000000000002 RBX: ffff911c4469ee00 RCX: 0000000000000000
-> [  338.612090] RDX: 0000000000000000 RSI: 0000000000000130 RDI: ffff911b87c20400
-> [  338.619874] RBP: 0000000000000000 R08: ffff911b87c20498 R09: 000000000000000a
-> [  338.627610] R10: 0000000000000001 R11: 0000000000000004 R12: 0000000000000000
-> [  338.635402] R13: ffff911c89590000 R14: ffff911c91730000 R15: 0000000000000000
-> [  338.643234] FS:  0000000000000000(0000) GS:ffff911c97800000(0000) knlGS:0000000000000000
-> [  338.652047] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [  338.658299] CR2: 0000000000000004 CR3: 00000001ec20a000 CR4: 00000000000006f0
-> [  338.666382] Call Trace:
-> [  338.669051]  <IRQ>
-> [  338.671254]  esp_input_done+0x12/0x20 [esp4]
-> [  338.675922]  chcr_handle_resp+0x3b5/0x790 [chcr]
-> [  338.680949]  cpl_fw6_pld_handler+0x37/0x60 [chcr]
-> [  338.686080]  chcr_uld_rx_handler+0x22/0x50 [chcr]
-> [  338.691233]  uldrx_handler+0x8c/0xc0 [cxgb4]
-> [  338.695923]  process_responses+0x2f0/0x5d0 [cxgb4]
-> [  338.701177]  ? bitmap_find_next_zero_area_off+0x3a/0x90
-> [  338.706882]  ? matrix_alloc_area.constprop.7+0x60/0x90
-> [  338.712517]  ? apic_update_irq_cfg+0x82/0xf0
-> [  338.717177]  napi_rx_handler+0x14/0xe0 [cxgb4]
-> [  338.722015]  net_rx_action+0x2aa/0x3e0
-> [  338.726136]  __do_softirq+0xcb/0x280
-> [  338.730054]  irq_exit+0xde/0xf0
-> [  338.733504]  do_IRQ+0x54/0xd0
-> [  338.736745]  common_interrupt+0xf/0xf
-> 
-> Signed-off-by: Harsh Jain <harsh@chelsio.com>
-> Cc: stable@vger.kernel.org
+From: Eric Biggers <ebiggers@google.com>
 
-Patch applied.  Thanks.
+Some algorithms have a ->setkey() method that is not atomic, in the
+sense that setting a key can fail after changes were already made to the
+tfm context.  In this case, if a key was already set the tfm can end up
+in a state that corresponds to neither the old key nor the new key.
+
+For example, in gcm.c, if the kzalloc() fails due to lack of memory,
+then the CTR part of GCM will have the new key but GHASH will not.
+
+It's not feasible to make all ->setkey() methods atomic, especially ones
+that have to key multiple sub-tfms.  Therefore, make the crypto API set
+CRYPTO_TFM_NEED_KEY if ->setkey() fails, to prevent the tfm from being
+used until a new key is set.
+
+[Cc stable mainly because when introducing the NEED_KEY flag I changed
+ AF_ALG to rely on it; and unlike in-kernel crypto API users, AF_ALG
+ previously didn't have this problem.  So these "incompletely keyed"
+ states became theoretically accessible via AF_ALG -- though, the
+ opportunities for causing real mischief seem pretty limited.]
+
+Fixes: dc26c17f743a ("crypto: aead - prevent using AEADs without setting key")
+Cc: <stable@vger.kernel.org> # v4.16+
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ crypto/aead.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/crypto/aead.c b/crypto/aead.c
+index 189c52d1f63ab..4908b5e846f0e 100644
+--- a/crypto/aead.c
++++ b/crypto/aead.c
+@@ -61,8 +61,10 @@ int crypto_aead_setkey(struct crypto_aead *tfm,
+ 	else
+ 		err = crypto_aead_alg(tfm)->setkey(tfm, key, keylen);
+ 
+-	if (err)
++	if (unlikely(err)) {
++		crypto_aead_set_flags(tfm, CRYPTO_TFM_NEED_KEY);
+ 		return err;
++	}
+ 
+ 	crypto_aead_clear_flags(tfm, CRYPTO_TFM_NEED_KEY);
+ 	return 0;
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.20.1
