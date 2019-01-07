@@ -1,12 +1,12 @@
 Return-Path: <SRS0=b7+G=PP=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from vmicros1.altlinux.org ([194.107.17.57]:48110 "EHLO
+Received: from vmicros1.altlinux.org ([194.107.17.57]:58410 "EHLO
         vmicros1.altlinux.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726573AbfAGJEx (ORCPT
+        with ESMTP id S1725535AbfAGIHP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Jan 2019 04:04:53 -0500
-Date: Mon, 7 Jan 2019 12:04:49 +0300
+        Mon, 7 Jan 2019 03:07:15 -0500
+Date: Mon, 7 Jan 2019 11:07:10 +0300
 From: Vitaly Chikunov <vt@altlinux.org>
-To: Stephan Mueller <smueller@chronox.de>
+To: Stephan =?utf-8?Q?M=C3=BCller?= <smueller@chronox.de>
 Cc: David Howells <dhowells@redhat.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Mimi Zohar <zohar@linux.vnet.ibm.com>,
@@ -14,58 +14,102 @@ Cc: David Howells <dhowells@redhat.com>,
         linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 Subject: Re: [RFC PATCH 4/4] crypto: Add EC-RDSA algorithm
-Message-ID: <20190107090449.d364ii24zervlsfq@sole.flsd.net>
+Message-ID: <20190107080710.r4bh7gkqdysxmlnn@sole.flsd.net>
 References: <20190106133608.820-1-vt@altlinux.org>
+ <20190106133608.820-5-vt@altlinux.org>
  <1893001.R2IGJoHzOM@positron.chronox.de>
- <20190107080710.r4bh7gkqdysxmlnn@sole.flsd.net>
- <1714084.mfT8VG1pOj@tauon.chronox.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=koi8-r
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <1714084.mfT8VG1pOj@tauon.chronox.de>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1893001.R2IGJoHzOM@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
 Stephan,
 
-On Mon, Jan 07, 2019 at 09:31:40AM +0100, Stephan Mueller wrote:
-> Am Montag, 7. Januar 2019, 09:07:10 CET schrieb Vitaly Chikunov:
+On Sun, Jan 06, 2019 at 07:11:50PM +0100, Stephan Müller wrote:
+> Am Sonntag, 6. Januar 2019, 14:36:08 CET schrieb Vitaly Chikunov:
 > 
-> > > Why do you manually parse the ASN.1 structure instead of using the ASN.1
-> > > parser?
-> > 
-> > I am not sure this worth effort and will not be most degenerate use of
-> > asn1_ber_decoder, since 1) I only need to parse one type in each case:
-> > OCTET STRING string above code, and OIDs in below code; 2) this data is
-> > said to be in DER format, which asn1_ber_decoder can not enforce. Surely
-> > this will also produce more code and files.
+> > Add Elliptic Curve Russian Digital Signature Algorithm (GOST R
+> > 34.10-2012, RFC 7091, ISO/IEC 14888-3) is one of the Russian (and since
+> > 2018 the CIS countries) cryptographic standard algorithms (called GOST
+> > algorithms). Only signature verification is supported, with intent to be
+> > used in the IMA.
 > 
-> RSA public keys also only contain n and e in the ASN.1 structure for which the 
-> ASN.1 parser is used (see linux/crypto/rsapubkey.asn1).
+> Do you happen to have test vectors for the testmgr?
 
-Yes I saw it, but at least there is two values (n and e), while EC-RDSA
-pub_key is just one OCTET STRING value (which internally is not defined
-to be ASN.1).
+Yes, I will add this.
 
-> As ASN.1 parsing is always having security issues, I would rather suggest to
-> have this parsing implemented in one spot and not here and there.
-
-Yes. So I tried to parse it very carefully and strictly.
-
-> Regarding your comment (2), I am not sure I understand. Why do you say that 
-> the DER format cannot be parsed by the kernel's ASN.1 parser? For example, 
-
-It can, but DER is stricter than BER. For example, in DER 'OCTET STRING'
-length field should be encoded in just one byte if it's smaller than
-128, in BER it could be encoded in multiple encodings. This does not
-seem like a big deal, though. With BER decoder an improperly DER-encoded
-certificate could be successfully parsed.
-
-> when you generate RSA keys in DER format with, say, openssl, the kernel ASN.1 
-> parser will happily use them. Also, when I created my (not accepted) patch to 
-> load PQG domain parameters for DH using the ASN.1 parser, the PQG domain 
-> parameters created by openssl in DER format were processed well.
+> > +/* Parse DER encoded subjectPublicKey. */
+> > +static int ecrdsa_set_pub_key(struct crypto_akcipher *tfm, const void *ber,
+> > +			      unsigned int len)
+> > +{
+> > +	struct ecrdsa_ctx *ctx = akcipher_tfm_ctx(tfm);
+> > +	unsigned int ndigits;
+> > +	const u8 *k = ber;
+> > +	unsigned int offset;
+> > +
+> > +	/* First chance to zero ctx */
+> > +	memset(ctx, 0, sizeof(*ctx));
+> > +
+> > +	if (len < 3 ||
+> > +	    k[0] != 0x04 || /* OCTET STRING */
+> > +	    (k[1] < 0x80 && len != k[1] + 2) ||
+> > +	    (k[1] == 0x81 && len != k[2] + 3) ||
+> > +	    k[1] > 0x81)
+> > +		return -EBADMSG;
+> > +	offset = (k[1] < 0x80)? 2 : 3;
+> > +	k += offset;
+> > +	len -= offset;
 > 
-> Ciao
-> Stephan
+> Why do you manually parse the ASN.1 structure instead of using the ASN.1 
+> parser?
+
+I am not sure this worth effort and will not be most degenerate use of
+asn1_ber_decoder, since 1) I only need to parse one type in each case:
+OCTET STRING string above code, and OIDs in below code; 2) this data is
+said to be in DER format, which asn1_ber_decoder can not enforce. Surely
+this will also produce more code and files.
+
+> > +/* Parse DER encoded SubjectPublicKeyInfo.AlgorithmIdentifier.parameters.
+> > */ +static int ecrdsa_set_params(struct crypto_akcipher *tfm, enum OID
+> > algo, +			     const void *params, unsigned int paramlen)
+> > +{
+> > +	struct ecrdsa_ctx *ctx = akcipher_tfm_ctx(tfm);
+> > +	const u8 *p = params;
+> > +	int i;
+> > +
+> > +	if (algo == OID_gost2012PublicKey256) {
+> > +		ctx->digest	= "streebog256";
+> > +		ctx->digest_oid	= OID_gost2012Digest256;
+> > +		ctx->digest_len	= 256 / 8;
+> > +	} else if (algo == OID_gost2012PublicKey512) {
+> > +		ctx->digest	= "streebog512";
+> > +		ctx->digest_oid	= OID_gost2012Digest512;
+> > +		ctx->digest_len	= 512 / 8;
+> > +	} else
+> > +		return -ENOPKG;
+> > +	ctx->curve = NULL;
+> > +	ctx->curve_oid = 0;
+> > +	ctx->algo_oid = algo;
+> > +
+> > +	for (i = 0; i < paramlen; i += p[i + 1] + 2) {
+> > +		const struct ecc_curve *curve;
+> > +		enum OID oid;
+> > +
+> > +		if (paramlen - i < 2 ||
+> > +		    p[i] != 0x06 || /* OBJECT IDENTIFIER */
 > 
+> Same here and in the following
+> 
+> > +		    p[i + 1] > paramlen - i - 2)
+> > +			return -EBADMSG;
+> > +		oid = look_up_OID(p + i + 2, p[i + 1]);
+
+> > +MODULE_ALIAS_CRYPTO("ecrdsa");
+> 
+> I do not think you need that alias as the module name already will be named 
+> this way. I guess you rather should add ecrdsa-generic as module alias.
+
+Thanks!
