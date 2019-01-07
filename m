@@ -1,57 +1,51 @@
-Return-Path: <SRS0=CSIn=PT=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:33208 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725773AbfAKGb1 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Jan 2019 01:31:27 -0500
-Date: Fri, 11 Jan 2019 14:31:12 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: YueHaibing <yuehaibing@huawei.com>
-Cc: Harsh Jain <harsh@chelsio.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Atul Gupta <atul.gupta@chelsio.com>,
-        Michael Werner <werner@chelsio.com>,
-        Kees Cook <keescook@chromium.org>,
-        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH -next] crypto: chtls - remove set but not used variables
- 'err, adap, request, hws'
-Message-ID: <20190111063112.celuobsvgo6jjius@gondor.apana.org.au>
-References: <1545099974-39327-1-git-send-email-yuehaibing@huawei.com>
+Return-Path: <SRS0=b7+G=PP=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:55186 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726245AbfAGDIY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 6 Jan 2019 22:08:24 -0500
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [PATCH] crypto: shash - remove pointless checks of shash_alg::{export,import}
+Date: Sun,  6 Jan 2019 19:08:01 -0800
+Message-Id: <20190107030801.10096-1-ebiggers@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1545099974-39327-1-git-send-email-yuehaibing@huawei.com>
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Dec 18, 2018 at 02:26:14AM +0000, YueHaibing wrote:
-> Fixes gcc '-Wunused-but-set-variable' warning:
-> 
-> drivers/crypto/chelsio/chtls/chtls_io.c: In function 'csk_wait_memory':
-> drivers/crypto/chelsio/chtls/chtls_io.c:925:6: warning:
->  variable 'sndbuf' set but not used [-Wunused-but-set-variable]
-> 
-> drivers/crypto/chelsio/chtls/chtls_io.c: In function 'chtls_pt_recvmsg':
-> drivers/crypto/chelsio/chtls/chtls_io.c:1411:6: warning:
->  variable 'request' set but not used [-Wunused-but-set-variable]
-> 
-> drivers/crypto/chelsio/chtls/chtls_io.c:1407:18: warning:
->  variable 'adap' set but not used [-Wunused-but-set-variable]
-> 
-> drivers/crypto/chelsio/chtls/chtls_io.c: In function 'chtls_recvmsg':
-> drivers/crypto/chelsio/chtls/chtls_io.c:1701:6: warning:
->  variable 'request' set but not used [-Wunused-but-set-variable]
-> 
-> drivers/crypto/chelsio/chtls/chtls_io.c:1697:20: warning:
->  variable 'hws' set but not used [-Wunused-but-set-variable]
-> 
-> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
-> ---
->  drivers/crypto/chelsio/chtls/chtls_io.c | 12 +-----------
->  1 file changed, 1 insertion(+), 11 deletions(-)
+From: Eric Biggers <ebiggers@google.com>
 
-Patch applied.  Thanks.
+crypto_init_shash_ops_async() only gives the ahash tfm non-NULL
+->export() and ->import() if the underlying shash alg has these
+non-NULL.  This doesn't make sense because when an shash algorithm is
+registered, shash_prepare_alg() sets a default ->export() and ->import()
+if the implementor didn't provide them.  And elsewhere it's assumed that
+all shash algs and ahash tfms have non-NULL ->export() and ->import().
+
+Therefore, remove these unnecessary, always-true conditions.
+
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ crypto/shash.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/crypto/shash.c b/crypto/shash.c
+index 2bffdecf1f837..15b369c4745f6 100644
+--- a/crypto/shash.c
++++ b/crypto/shash.c
+@@ -388,10 +388,8 @@ int crypto_init_shash_ops_async(struct crypto_tfm *tfm)
+ 	crypto_ahash_set_flags(crt, crypto_shash_get_flags(shash) &
+ 				    CRYPTO_TFM_NEED_KEY);
+ 
+-	if (alg->export)
+-		crt->export = shash_async_export;
+-	if (alg->import)
+-		crt->import = shash_async_import;
++	crt->export = shash_async_export;
++	crt->import = shash_async_import;
+ 
+ 	crt->reqsize = sizeof(struct shash_desc) + crypto_shash_descsize(shash);
+ 
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.20.1
