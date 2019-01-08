@@ -1,127 +1,38 @@
-Return-Path: <SRS0=8/la=PM=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:56444 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727748AbfADEU6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Jan 2019 23:20:58 -0500
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 16/16] crypto: algapi - remove crypto_alloc_instance()
-Date: Thu,  3 Jan 2019 20:16:25 -0800
-Message-Id: <20190104041625.3259-17-ebiggers@kernel.org>
-In-Reply-To: <20190104041625.3259-1-ebiggers@kernel.org>
-References: <20190104041625.3259-1-ebiggers@kernel.org>
+Return-Path: <SRS0=aDvo=PQ=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-eopbgr130075.outbound.protection.outlook.com ([40.107.13.75]:18686
+        "EHLO EUR01-HE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727001AbfAHJrf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 8 Jan 2019 04:47:35 -0500
+From: Horia Geanta <horia.geanta@nxp.com>
+To: Christophe Leroy <christophe.leroy@c-s.fr>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+CC: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+        "stable@vger.kernel.org" <stable@vger.kernel.org>
+Subject: Re: [PATCH v4 1/2] crypto: talitos - reorder code in
+ talitos_edesc_alloc()
+Date: Tue, 8 Jan 2019 09:47:30 +0000
+Message-ID: <VI1PR0402MB3485608DF1B37BB7C740DD36988A0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+References: <5ed91db5e2976a4c260465c3d027acc9affd2d2b.1545445924.git.christophe.leroy@c-s.fr>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-2"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Eric Biggers <ebiggers@google.com>
-
-Now that all "blkcipher" templates have been converted to "skcipher",
-crypto_alloc_instance() is no longer used.  And it's not useful any
-longer as it creates an old-style weakly typed instance rather than a
-new-style strongly typed instance.  So remove it, and now that the name
-is freed up rename crypto_alloc_instance2() to crypto_alloc_instance().
-
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- crypto/algapi.c                | 33 ++-------------------------------
- include/crypto/algapi.h        |  6 ++----
- include/crypto/internal/hash.h |  6 +++---
- 3 files changed, 7 insertions(+), 38 deletions(-)
-
-diff --git a/crypto/algapi.c b/crypto/algapi.c
-index 8b65ada33e5d3..f3d766312bd96 100644
---- a/crypto/algapi.c
-+++ b/crypto/algapi.c
-@@ -845,8 +845,8 @@ int crypto_inst_setname(struct crypto_instance *inst, const char *name,
- }
- EXPORT_SYMBOL_GPL(crypto_inst_setname);
- 
--void *crypto_alloc_instance2(const char *name, struct crypto_alg *alg,
--			     unsigned int head)
-+void *crypto_alloc_instance(const char *name, struct crypto_alg *alg,
-+			    unsigned int head)
- {
- 	struct crypto_instance *inst;
- 	char *p;
-@@ -869,35 +869,6 @@ void *crypto_alloc_instance2(const char *name, struct crypto_alg *alg,
- 	kfree(p);
- 	return ERR_PTR(err);
- }
--EXPORT_SYMBOL_GPL(crypto_alloc_instance2);
--
--struct crypto_instance *crypto_alloc_instance(const char *name,
--					      struct crypto_alg *alg)
--{
--	struct crypto_instance *inst;
--	struct crypto_spawn *spawn;
--	int err;
--
--	inst = crypto_alloc_instance2(name, alg, 0);
--	if (IS_ERR(inst))
--		goto out;
--
--	spawn = crypto_instance_ctx(inst);
--	err = crypto_init_spawn(spawn, alg, inst,
--				CRYPTO_ALG_TYPE_MASK | CRYPTO_ALG_ASYNC);
--
--	if (err)
--		goto err_free_inst;
--
--	return inst;
--
--err_free_inst:
--	kfree(inst);
--	inst = ERR_PTR(err);
--
--out:
--	return inst;
--}
- EXPORT_SYMBOL_GPL(crypto_alloc_instance);
- 
- void crypto_init_queue(struct crypto_queue *queue, unsigned int max_qlen)
-diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
-index 4a5ad10e75f0e..093869f175d6b 100644
---- a/include/crypto/algapi.h
-+++ b/include/crypto/algapi.h
-@@ -185,10 +185,8 @@ static inline struct crypto_alg *crypto_attr_alg(struct rtattr *rta,
- int crypto_attr_u32(struct rtattr *rta, u32 *num);
- int crypto_inst_setname(struct crypto_instance *inst, const char *name,
- 			struct crypto_alg *alg);
--void *crypto_alloc_instance2(const char *name, struct crypto_alg *alg,
--			     unsigned int head);
--struct crypto_instance *crypto_alloc_instance(const char *name,
--					      struct crypto_alg *alg);
-+void *crypto_alloc_instance(const char *name, struct crypto_alg *alg,
-+			    unsigned int head);
- 
- void crypto_init_queue(struct crypto_queue *queue, unsigned int max_qlen);
- int crypto_enqueue_request(struct crypto_queue *queue,
-diff --git a/include/crypto/internal/hash.h b/include/crypto/internal/hash.h
-index a0b0ad9d585e6..e355fdb642a92 100644
---- a/include/crypto/internal/hash.h
-+++ b/include/crypto/internal/hash.h
-@@ -170,7 +170,7 @@ static inline unsigned int ahash_instance_headroom(void)
- static inline struct ahash_instance *ahash_alloc_instance(
- 	const char *name, struct crypto_alg *alg)
- {
--	return crypto_alloc_instance2(name, alg, ahash_instance_headroom());
-+	return crypto_alloc_instance(name, alg, ahash_instance_headroom());
- }
- 
- static inline void ahash_request_complete(struct ahash_request *req, int err)
-@@ -233,8 +233,8 @@ static inline void *shash_instance_ctx(struct shash_instance *inst)
- static inline struct shash_instance *shash_alloc_instance(
- 	const char *name, struct crypto_alg *alg)
- {
--	return crypto_alloc_instance2(name, alg,
--				      sizeof(struct shash_alg) - sizeof(*alg));
-+	return crypto_alloc_instance(name, alg,
-+				     sizeof(struct shash_alg) - sizeof(*alg));
- }
- 
- static inline struct crypto_shash *crypto_spawn_shash(
--- 
-2.20.1
+On 1/8/2019 8:56 AM, Christophe Leroy wrote:=0A=
+> This patch moves the mapping of IV after the kmalloc(). This=0A=
+> avoids having to unmap in case kmalloc() fails.=0A=
+> =0A=
+> Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>=0A=
+Reviewed-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
+=0A=
+Since patch 2/2 is Cc-ing stable, this one should do the same.=0A=
+Herbert, could you append the commit message before applying it?=0A=
+=0A=
+Thanks,=0A=
+Horia=0A=
