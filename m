@@ -1,106 +1,67 @@
-Return-Path: <SRS0=pN5v=PL=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:40683 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731353AbfACROq (ORCPT
+Return-Path: <SRS0=aDvo=PQ=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:54804 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725785AbfAHFBD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Jan 2019 12:14:46 -0500
-Received: by mail-wr1-f68.google.com with SMTP id p4so34247321wrt.7
-        for <linux-crypto@vger.kernel.org>; Thu, 03 Jan 2019 09:14:45 -0800 (PST)
-Date: Thu, 3 Jan 2019 17:14:41 +0000
-From: Daniel Thompson <daniel.thompson@linaro.org>
-To: Sumit Garg <sumit.garg@linaro.org>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        Devicetree List <devicetree@vger.kernel.org>, mpm@selenic.com,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Bhupesh Sharma <bhsharma@redhat.com>, tee-dev@lists.linaro.org
-Subject: Re: [PATCH v1 1/2] dt/bindings: add bindings for optional optee
- rng-uuid property
-Message-ID: <20190103171441.6ymnhbxnb4asr3kl@holly.lan>
-References: <1545908831-25910-1-git-send-email-sumit.garg@linaro.org>
- <1545908831-25910-2-git-send-email-sumit.garg@linaro.org>
- <CAKv+Gu8o_6Mu8_2vNHXEy46mZ6xrSPekcwPH7BvxR8nec37Ktw@mail.gmail.com>
- <CAFA6WYOpw-URTYJ4i0Y_Tie0_ccMwekbOVzXz3d05NttyL9sHg@mail.gmail.com>
+        Tue, 8 Jan 2019 00:01:03 -0500
+Date: Tue, 8 Jan 2019 13:00:28 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Christophe Leroy <christophe.leroy@c-s.fr>
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Horia Geanta <horia.geanta@nxp.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, stable@vger.kernel.org
+Subject: Re: [PATCH v3] crypto: talitos - fix ablkcipher for CONFIG_VMAP_STACK
+Message-ID: <20190108050028.mrdz727dhzmlbi7i@gondor.apana.org.au>
+References: <ae7b64e9415874060977e32ed48b62f1f6148084.1545346337.git.christophe.leroy@c-s.fr>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAFA6WYOpw-URTYJ4i0Y_Tie0_ccMwekbOVzXz3d05NttyL9sHg@mail.gmail.com>
+In-Reply-To: <ae7b64e9415874060977e32ed48b62f1f6148084.1545346337.git.christophe.leroy@c-s.fr>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Dec 28, 2018 at 02:41:01PM +0530, Sumit Garg wrote:
-> On Thu, 27 Dec 2018 at 19:10, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
-> >
-> > On Thu, 27 Dec 2018 at 12:08, Sumit Garg <sumit.garg@linaro.org> wrote:
-> > >
-> > > Add bindings for OP-TEE based optional hardware random number
-> > > generator identifier property. It could be used on ARM based devices
-> > > where entropy source is not accessible to normal world (linux in this
-> > > case).
-> > >
-> > > Signed-off-by: Sumit Garg <sumit.garg@linaro.org>
-> > > ---
-> > >  Documentation/devicetree/bindings/arm/firmware/linaro,optee-tz.txt | 4 ++++
-> > >  1 file changed, 4 insertions(+)
-> > >
-> > > diff --git a/Documentation/devicetree/bindings/arm/firmware/linaro,optee-tz.txt b/Documentation/devicetree/bindings/arm/firmware/linaro,optee-tz.txt
-> > > index d38834c..e3a4c35 100644
-> > > --- a/Documentation/devicetree/bindings/arm/firmware/linaro,optee-tz.txt
-> > > +++ b/Documentation/devicetree/bindings/arm/firmware/linaro,optee-tz.txt
-> > > @@ -20,6 +20,9 @@ the reference implementation maintained by Linaro.
-> > >                     "hvc" : HVC #0, with the register assignments specified
-> > >                            in drivers/tee/optee/optee_smc.h
-> > >
-> > > +- rng-uuid       : Optional OP-TEE based RNG service identifier in case
-> > > +                   hardware entropy source is not accesible to normal world
-> > > +                   (Linux).
-> > >
-> > >
-> > >  Example:
-> > > @@ -27,5 +30,6 @@ Example:
-> > >                 optee {
-> > >                         compatible = "linaro,optee-tz";
-> > >                         method = "smc";
-> > > +                       rng-uuid = "ab7a617c-b8e7-4d8f-8301-d09b61036b64";
-> >
-> > If OP-TEE is going to expose devices in this way, it should be modeled
-> > more like a bus driver, i.e., sub-nodes that represent the devices,
-> > with compatible strings, and perhaps even 'reg' properties for the
-> > UUIDs.
-> >
+On Fri, Dec 21, 2018 at 08:07:52AM +0000, Christophe Leroy wrote:
+> [    2.364486] WARNING: CPU: 0 PID: 60 at ./arch/powerpc/include/asm/io.h:837 dma_nommu_map_page+0x44/0xd4
+> [    2.373579] CPU: 0 PID: 60 Comm: cryptomgr_test Tainted: G        W         4.20.0-rc5-00560-g6bfb52e23a00-dirty #531
+> [    2.384740] NIP:  c000c540 LR: c000c584 CTR: 00000000
+> [    2.389743] REGS: c95abab0 TRAP: 0700   Tainted: G        W          (4.20.0-rc5-00560-g6bfb52e23a00-dirty)
+> [    2.400042] MSR:  00029032 <EE,ME,IR,DR,RI>  CR: 24042204  XER: 00000000
+> [    2.406669]
+> [    2.406669] GPR00: c02f2244 c95abb60 c6262990 c95abd80 0000256a 00000001 00000001 00000001
+> [    2.406669] GPR08: 00000000 00002000 00000010 00000010 24042202 00000000 00000100 c95abd88
+> [    2.406669] GPR16: 00000000 c05569d4 00000001 00000010 c95abc88 c0615664 00000004 00000000
+> [    2.406669] GPR24: 00000010 c95abc88 c95abc88 00000000 c61ae210 c7ff6d40 c61ae210 00003d68
+> [    2.441559] NIP [c000c540] dma_nommu_map_page+0x44/0xd4
+> [    2.446720] LR [c000c584] dma_nommu_map_page+0x88/0xd4
+> [    2.451762] Call Trace:
+> [    2.454195] [c95abb60] [82000808] 0x82000808 (unreliable)
+> [    2.459572] [c95abb80] [c02f2244] talitos_edesc_alloc+0xbc/0x3c8
+> [    2.465493] [c95abbb0] [c02f2600] ablkcipher_edesc_alloc+0x4c/0x5c
+> [    2.471606] [c95abbd0] [c02f4ed0] ablkcipher_encrypt+0x20/0x64
+> [    2.477389] [c95abbe0] [c02023b0] __test_skcipher+0x4bc/0xa08
+> [    2.483049] [c95abe00] [c0204b60] test_skcipher+0x2c/0xcc
+> [    2.488385] [c95abe20] [c0204c48] alg_test_skcipher+0x48/0xbc
+> [    2.494064] [c95abe40] [c0205cec] alg_test+0x164/0x2e8
+> [    2.499142] [c95abf00] [c0200dec] cryptomgr_test+0x48/0x50
+> [    2.504558] [c95abf10] [c0039ff4] kthread+0xe4/0x110
+> [    2.509471] [c95abf40] [c000e1d0] ret_from_kernel_thread+0x14/0x1c
+> [    2.515532] Instruction dump:
+> [    2.518468] 7c7e1b78 7c9d2378 7cbf2b78 41820054 3d20c076 8089c200 3d20c076 7c84e850
+> [    2.526127] 8129c204 7c842e70 7f844840 419c0008 <0fe00000> 2f9e0000 54847022 7c84fa14
+> [    2.533960] ---[ end trace bf78d94af73fe3b8 ]---
+> [    2.539123] talitos ff020000.crypto: master data transfer error
+> [    2.544775] talitos ff020000.crypto: TEA error: ISR 0x20000000_00000040
+> [    2.551625] alg: skcipher: encryption failed on test 1 for ecb-aes-talitos: ret=22
 > 
-> This is something Daniel also suggested during our discussion. But we
-> agreed to discuss in upstream to get more feedback.
+> IV cannot be on stack when CONFIG_VMAP_STACK is selected because the stack
+> cannot be DMA mapped anymore.
 > 
-> I think generic TEE should be modelled as a bus driver with devices
-> identified via UUIDs, probably queried from underline implementations
-> like OP-TEE regarding which resident devices (pseudo-TA UUIDs) it
-> supports. Then this list of device UUIDs can be compared against child
-> driver's UUID as part of match callback during driver registration.
-> Also the child driver could maintain list of device UUIDs which it
-> supports.
-> 
-> If we go via this approach we may not require device tree entry for
-> corresponding device UUIDs.
+> This patch copies the IV into the extended descriptor when iv is not
+> a valid linear address.
 
-That's pretty much aligned with my thinking.
-
-Having said that I had wondered whether all TEEs would be prepared to
-describe the set of available UUIDs since AFAIK UUID enumeration isn't
-part of the GlobalPlatform standards so it is not implemented by GP
-based TEEs (such as OP-TEE).
-
-Is it feasible to extend OP-TEE to enumerate the available UUIDs?
-If nothing else can it provide an (optional) pseudo TA to provide such a
-service? Personally I'd be OK with a kernel TEE bus infrastructure that
-mandated such a service (e.g. a TEE that does not provide the service
-can only interact with TEE from userspace).
-
-
-Daniel.
+Please make the copy unconditional.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
