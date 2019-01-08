@@ -1,177 +1,92 @@
-Return-Path: <SRS0=CSIn=PT=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:35021 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731702AbfAKLuG (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Jan 2019 06:50:06 -0500
-Received: by mail-pg1-f196.google.com with SMTP id s198so6243714pgs.2
-        for <linux-crypto@vger.kernel.org>; Fri, 11 Jan 2019 03:50:05 -0800 (PST)
-From: Sumit Garg <sumit.garg@linaro.org>
-To: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, jens.wiklander@linaro.org,
-        mpm@selenic.com, herbert@gondor.apana.org.au, robh+dt@kernel.org,
-        mark.rutland@arm.com, arnd@arndb.de, gregkh@linuxfoundation.org,
-        daniel.thompson@linaro.org, ard.biesheuvel@linaro.org,
-        bhsharma@redhat.com, tee-dev@lists.linaro.org,
-        Sumit Garg <sumit.garg@linaro.org>
-Subject: [PATCH v3 1/4] tee: add bus driver framework for TEE based devices
-Date: Fri, 11 Jan 2019 17:17:28 +0530
-Message-Id: <1547207251-9372-2-git-send-email-sumit.garg@linaro.org>
-In-Reply-To: <1547207251-9372-1-git-send-email-sumit.garg@linaro.org>
-References: <1547207251-9372-1-git-send-email-sumit.garg@linaro.org>
+Return-Path: <SRS0=aDvo=PQ=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from pegase1.c-s.fr ([93.17.236.30]:53912 "EHLO pegase1.c-s.fr"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727435AbfAHG4u (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 8 Jan 2019 01:56:50 -0500
+Message-Id: <e082265fba04b4a4c17003a73820844c8feb5017.1545445924.git.christophe.leroy@c-s.fr>
+In-Reply-To: <5ed91db5e2976a4c260465c3d027acc9affd2d2b.1545445924.git.christophe.leroy@c-s.fr>
+References: <5ed91db5e2976a4c260465c3d027acc9affd2d2b.1545445924.git.christophe.leroy@c-s.fr>
+From: Christophe Leroy <christophe.leroy@c-s.fr>
+Subject: [PATCH v4 2/2] crypto: talitos - fix ablkcipher for CONFIG_VMAP_STACK
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Horia Geanta <horia.geanta@nxp.com>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, stable@vger.kernel.org
+Date: Tue,  8 Jan 2019 06:56:48 +0000 (UTC)
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Introduce a generic TEE bus driver concept for TEE based kernel drivers
-which would like to communicate with TEE based devices/services.
+[    2.364486] WARNING: CPU: 0 PID: 60 at ./arch/powerpc/include/asm/io.h:837 dma_nommu_map_page+0x44/0xd4
+[    2.373579] CPU: 0 PID: 60 Comm: cryptomgr_test Tainted: G        W         4.20.0-rc5-00560-g6bfb52e23a00-dirty #531
+[    2.384740] NIP:  c000c540 LR: c000c584 CTR: 00000000
+[    2.389743] REGS: c95abab0 TRAP: 0700   Tainted: G        W          (4.20.0-rc5-00560-g6bfb52e23a00-dirty)
+[    2.400042] MSR:  00029032 <EE,ME,IR,DR,RI>  CR: 24042204  XER: 00000000
+[    2.406669]
+[    2.406669] GPR00: c02f2244 c95abb60 c6262990 c95abd80 0000256a 00000001 00000001 00000001
+[    2.406669] GPR08: 00000000 00002000 00000010 00000010 24042202 00000000 00000100 c95abd88
+[    2.406669] GPR16: 00000000 c05569d4 00000001 00000010 c95abc88 c0615664 00000004 00000000
+[    2.406669] GPR24: 00000010 c95abc88 c95abc88 00000000 c61ae210 c7ff6d40 c61ae210 00003d68
+[    2.441559] NIP [c000c540] dma_nommu_map_page+0x44/0xd4
+[    2.446720] LR [c000c584] dma_nommu_map_page+0x88/0xd4
+[    2.451762] Call Trace:
+[    2.454195] [c95abb60] [82000808] 0x82000808 (unreliable)
+[    2.459572] [c95abb80] [c02f2244] talitos_edesc_alloc+0xbc/0x3c8
+[    2.465493] [c95abbb0] [c02f2600] ablkcipher_edesc_alloc+0x4c/0x5c
+[    2.471606] [c95abbd0] [c02f4ed0] ablkcipher_encrypt+0x20/0x64
+[    2.477389] [c95abbe0] [c02023b0] __test_skcipher+0x4bc/0xa08
+[    2.483049] [c95abe00] [c0204b60] test_skcipher+0x2c/0xcc
+[    2.488385] [c95abe20] [c0204c48] alg_test_skcipher+0x48/0xbc
+[    2.494064] [c95abe40] [c0205cec] alg_test+0x164/0x2e8
+[    2.499142] [c95abf00] [c0200dec] cryptomgr_test+0x48/0x50
+[    2.504558] [c95abf10] [c0039ff4] kthread+0xe4/0x110
+[    2.509471] [c95abf40] [c000e1d0] ret_from_kernel_thread+0x14/0x1c
+[    2.515532] Instruction dump:
+[    2.518468] 7c7e1b78 7c9d2378 7cbf2b78 41820054 3d20c076 8089c200 3d20c076 7c84e850
+[    2.526127] 8129c204 7c842e70 7f844840 419c0008 <0fe00000> 2f9e0000 54847022 7c84fa14
+[    2.533960] ---[ end trace bf78d94af73fe3b8 ]---
+[    2.539123] talitos ff020000.crypto: master data transfer error
+[    2.544775] talitos ff020000.crypto: TEA error: ISR 0x20000000_00000040
+[    2.551625] alg: skcipher: encryption failed on test 1 for ecb-aes-talitos: ret=22
 
-In this TEE bus concept, devices/services are identified via Universally
-Unique Identifier (UUID) and drivers register a table of device UUIDs
-which they can support.
+IV cannot be on stack when CONFIG_VMAP_STACK is selected because the stack
+cannot be DMA mapped anymore.
 
-So this TEE bus framework registers a match() callback function which
-iterates over the driver UUID table to find a corresponding match for
-device UUID. If a match is found, then this particular device is probed
-via corresponding probe api registered by the driver. This process
-happens whenever a device or a driver is registered with TEE bus.
+This patch copies the IV into the extended descriptor.
 
-Also this framework allows for device enumeration to be specific to
-corresponding TEE implementation like OP-TEE etc.
-
-Signed-off-by: Sumit Garg <sumit.garg@linaro.org>
+Fixes: 4de9d0b547b9 ("crypto: talitos - Add ablkcipher algorithms")
+Cc: stable@vger.kernel.org
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
 ---
- drivers/tee/tee_core.c  | 43 ++++++++++++++++++++++++++++++++++++++++---
- include/linux/tee_drv.h | 36 ++++++++++++++++++++++++++++++++++++
- 2 files changed, 76 insertions(+), 3 deletions(-)
+ v4: Split in two patches ; made the copy unconditional.
 
-diff --git a/drivers/tee/tee_core.c b/drivers/tee/tee_core.c
-index 7b2bb4c..a685940 100644
---- a/drivers/tee/tee_core.c
-+++ b/drivers/tee/tee_core.c
-@@ -15,7 +15,6 @@
- #define pr_fmt(fmt) "%s: " fmt, __func__
+ v3: Using struct edesc buffer.
+
+ v2: Using per-request context.
+
+ drivers/crypto/talitos.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+index 54d80e7edb86..f8e2c5c3f4eb 100644
+--- a/drivers/crypto/talitos.c
++++ b/drivers/crypto/talitos.c
+@@ -1416,12 +1416,15 @@ static struct talitos_edesc *talitos_edesc_alloc(struct device *dev,
+ 	/* if its a ahash, add space for a second desc next to the first one */
+ 	if (is_sec1 && !dst)
+ 		alloc_len += sizeof(struct talitos_desc);
++	alloc_len += ivsize;
  
- #include <linux/cdev.h>
--#include <linux/device.h>
- #include <linux/fs.h>
- #include <linux/idr.h>
- #include <linux/module.h>
-@@ -1027,6 +1026,30 @@ int tee_client_invoke_func(struct tee_context *ctx,
- }
- EXPORT_SYMBOL_GPL(tee_client_invoke_func);
- 
-+static int tee_client_device_match(struct device *dev,
-+				   struct device_driver *drv)
-+{
-+	struct tee_client_device *tee_device;
-+	const struct tee_client_device_id *id_table;
-+
-+	tee_device = to_tee_client_device(dev);
-+	id_table = to_tee_client_driver(drv)->id_table;
-+
-+	while (!uuid_is_null(&id_table->uuid)) {
-+		if (uuid_equal(&tee_device->id.uuid, &id_table->uuid))
-+			return 1;
-+		id_table++;
+ 	edesc = kmalloc(alloc_len, GFP_DMA | flags);
+ 	if (!edesc)
+ 		return ERR_PTR(-ENOMEM);
+-	if (ivsize)
++	if (ivsize) {
++		iv = memcpy(((u8 *)edesc) + alloc_len - ivsize, iv, ivsize);
+ 		iv_dma = dma_map_single(dev, iv, ivsize, DMA_TO_DEVICE);
 +	}
-+
-+	return 0;
-+}
-+
-+struct bus_type tee_bus_type = {
-+	.name		= "tee",
-+	.match		= tee_client_device_match,
-+};
-+EXPORT_SYMBOL_GPL(tee_bus_type);
-+
- static int __init tee_init(void)
- {
- 	int rc;
-@@ -1040,10 +1063,23 @@ static int __init tee_init(void)
- 	rc = alloc_chrdev_region(&tee_devt, 0, TEE_NUM_DEVICES, "tee");
- 	if (rc) {
- 		pr_err("failed to allocate char dev region\n");
--		class_destroy(tee_class);
--		tee_class = NULL;
-+		goto chrdev_err;
- 	}
+ 	memset(&edesc->desc, 0, sizeof(edesc->desc));
  
-+	rc = bus_register(&tee_bus_type);
-+	if (rc) {
-+		pr_err("failed to register tee bus\n");
-+		goto bus_err;
-+	}
-+
-+	return 0;
-+
-+bus_err:
-+	unregister_chrdev_region(tee_devt, TEE_NUM_DEVICES);
-+chrdev_err:
-+	class_destroy(tee_class);
-+	tee_class = NULL;
-+
- 	return rc;
- }
- 
-@@ -1052,6 +1088,7 @@ static void __exit tee_exit(void)
- 	class_destroy(tee_class);
- 	tee_class = NULL;
- 	unregister_chrdev_region(tee_devt, TEE_NUM_DEVICES);
-+	bus_unregister(&tee_bus_type);
- }
- 
- subsys_initcall(tee_init);
-diff --git a/include/linux/tee_drv.h b/include/linux/tee_drv.h
-index 6cfe058..ed16bf1 100644
---- a/include/linux/tee_drv.h
-+++ b/include/linux/tee_drv.h
-@@ -20,6 +20,8 @@
- #include <linux/kref.h>
- #include <linux/list.h>
- #include <linux/tee.h>
-+#include <linux/device.h>
-+#include <linux/uuid.h>
- 
- /*
-  * The file describes the API provided by the generic TEE driver to the
-@@ -538,4 +540,38 @@ static inline bool tee_param_is_memref(struct tee_param *param)
- 	}
- }
- 
-+extern struct bus_type tee_bus_type;
-+
-+/**
-+ * struct tee_client_device_id - tee based device identifier
-+ * @uuid:		For TEE based client devices we use the device uuid
-+ *			as the identifier.
-+ */
-+struct tee_client_device_id {
-+	uuid_t uuid;
-+};
-+
-+/**
-+ * struct tee_client_device - tee based device
-+ * @id:			device identifier
-+ * @dev:		device structure
-+ */
-+struct tee_client_device {
-+	struct tee_client_device_id id;
-+	struct device dev;
-+};
-+#define to_tee_client_device(d) container_of(d, struct tee_client_device, dev)
-+
-+/**
-+ * struct tee_client_driver - tee client driver
-+ * @id_table:		device id table supported by this driver
-+ * @driver:		driver structure
-+ */
-+struct tee_client_driver {
-+	const struct tee_client_device_id *id_table;
-+	struct device_driver driver;
-+};
-+#define to_tee_client_driver(d) \
-+		container_of(d, struct tee_client_driver, driver)
-+
- #endif /*__TEE_DRV_H*/
+ 	edesc->src_nents = src_nents;
 -- 
-2.7.4
+2.13.3
