@@ -2,117 +2,117 @@ Return-Path: <SRS0=aDvo=PQ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE68EC43612
-	for <linux-crypto@archiver.kernel.org>; Tue,  8 Jan 2019 08:21:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 314C9C43387
+	for <linux-crypto@archiver.kernel.org>; Tue,  8 Jan 2019 08:49:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7E3B720665
-	for <linux-crypto@archiver.kernel.org>; Tue,  8 Jan 2019 08:21:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="BqrDp+KV"
+	by mail.kernel.org (Postfix) with ESMTP id 0C3872070B
+	for <linux-crypto@archiver.kernel.org>; Tue,  8 Jan 2019 08:49:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727368AbfAHIVi (ORCPT
+        id S1728000AbfAHItW convert rfc822-to-8bit (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 8 Jan 2019 03:21:38 -0500
-Received: from mail-it1-f196.google.com ([209.85.166.196]:55519 "EHLO
-        mail-it1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726333AbfAHIVi (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 8 Jan 2019 03:21:38 -0500
-Received: by mail-it1-f196.google.com with SMTP id m62so5086407ith.5
-        for <linux-crypto@vger.kernel.org>; Tue, 08 Jan 2019 00:21:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=r+UQuT6/d5WXeFZdwLa7z3YSWqitaBJNXIzGoQujBTQ=;
-        b=BqrDp+KVT/pf6BZH6ODTGHYRq3aGlZ8+Ly5Ursk2cWH5pBZ80tqNpOOy6/8f9U+7jv
-         rtrxYlAvr5b1ccaxkASJDm3hst/Ag+Xo0anSHrPKV4JTLD521R2aS8e+w4TsmtDTrTGz
-         flg34FePIiW/MNB46WbDRLno4Q8OBfVZstmLU=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=r+UQuT6/d5WXeFZdwLa7z3YSWqitaBJNXIzGoQujBTQ=;
-        b=BwWiZqBS7FOtxmEtzGp1T8egbWVEMVgAX+qFMI4cfY0Lf/Ajx76V0X4mtTiETgqvq0
-         yQYnCXLjACXMgSHbpb/uPnkBW5Estpxz0U1XdddRGBw3cyx2ZjvqvxefUJHskWfpageR
-         MfOArKGa6MTUhxDHYdi1tWH3XvVOgb+fxkQsbIYLmBp9tOIfCH4MS8isNPHc52HN6gg8
-         FMqhUWhSY6z8fJVw4zLVd663abw/LUhJbBFzvciPlhgr7bYyoOzRRaEO+S+puzq6YYkz
-         j7r2Qws2roEf7SJK2nM9POvjIPG0VDuuy3I64irvxXS4uOVeMKFddITWK6OeL+1UKyx6
-         yelw==
-X-Gm-Message-State: AJcUukfX6zdwXSB98+Vu3NP/1gZRztJC6DiP3QocLxqSI2qbAc9wuoTF
-        6icbx8NIJzI1XkN8UWL/eVpiCQNZmtsahMJNalNCTH/ct9cNEg==
-X-Google-Smtp-Source: ALg8bN5Z7NK6TFCAJiNSxJsRxbKVAEMgv58snUxJloU+j6jyf279hj/wjNjv2CXf7lpV1LSrvsO6tDUUN0teXHvqQyM=
-X-Received: by 2002:a05:660c:4b:: with SMTP id p11mr717454itk.71.1546935697186;
- Tue, 08 Jan 2019 00:21:37 -0800 (PST)
+        Tue, 8 Jan 2019 03:49:22 -0500
+Received: from ozlabs.org ([203.11.71.1]:56843 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727295AbfAHItW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 8 Jan 2019 03:49:22 -0500
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by ozlabs.org (Postfix) with ESMTPSA id 43YmCK6zqpz9sMQ;
+        Tue,  8 Jan 2019 19:49:17 +1100 (AEDT)
+From:   Michael Ellerman <mpe@ellerman.id.au>
+To:     Christophe Leroy <christophe.leroy@c-s.fr>,
+        Horia Geanta <horia.geanta@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Cc:     "linux-crypto\@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel\@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linuxppc-dev\@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+        "stable\@vger.kernel.org" <stable@vger.kernel.org>,
+        "iommu\@lists.linux-foundation.org" 
+        <iommu@lists.linux-foundation.org>
+Subject: Re: [PATCH v3] crypto: talitos - fix ablkcipher for CONFIG_VMAP_STACK
+In-Reply-To: <d609078d-b432-0fba-8a48-4224e62b46a9@c-s.fr>
+References: <ae7b64e9415874060977e32ed48b62f1f6148084.1545346337.git.christophe.leroy@c-s.fr> <VI1PR0402MB3485FC2A3758BCEAC05BF3A2988E0@VI1PR0402MB3485.eurprd04.prod.outlook.com> <VI1PR0402MB34853754B8F90F5904710526988E0@VI1PR0402MB3485.eurprd04.prod.outlook.com> <d609078d-b432-0fba-8a48-4224e62b46a9@c-s.fr>
+Date:   Tue, 08 Jan 2019 19:49:14 +1100
+Message-ID: <87muobttyt.fsf@concordia.ellerman.id.au>
 MIME-Version: 1.0
-References: <20190107231559.13357-1-ebiggers@kernel.org>
-In-Reply-To: <20190107231559.13357-1-ebiggers@kernel.org>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Tue, 8 Jan 2019 09:21:24 +0100
-Message-ID:
- <CAKv+Gu-ZMiyXfG_mkdbQh7Mh=J1XG+k-jrtDZ_2S2F5_JaXRSA@mail.gmail.com>
-Subject: Re: [PATCH 4.9,4.4] crypto: x86/chacha20 - avoid sleeping with
- preemption disabled
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     stable <stable@vger.kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        Martin Willi <martin@strongswan.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
-Message-ID: <20190108082124.NPENMvEReU50UlFfrZWm02BqgRuMMKUdmFAyUWeZRxk@z>
+Message-ID: <20190108084914.IiWeWTXhrn2rfZTaW4XOi5X6wc6sQZzlHgitp5xz2uk@z>
 
-On Tue, 8 Jan 2019 at 00:16, Eric Biggers <ebiggers@kernel.org> wrote:
+Christophe Leroy <christophe.leroy@c-s.fr> writes:
+> Le 04/01/2019 à 16:24, Horia Geanta a écrit :
+>> On 1/4/2019 5:17 PM, Horia Geanta wrote:
+>>> On 12/21/2018 10:07 AM, Christophe Leroy wrote:
+>>> [snip]
+>>>> IV cannot be on stack when CONFIG_VMAP_STACK is selected because the stack
+>>>> cannot be DMA mapped anymore.
+>>>> This looks better, thanks.
+>>>
+>>>> This patch copies the IV into the extended descriptor when iv is not
+>>>> a valid linear address.
+>>>>
+>>> Though I am not sure the checks in place are enough.
+>>>
+>>>> Fixes: 4de9d0b547b9 ("crypto: talitos - Add ablkcipher algorithms")
+>>>> Cc: stable@vger.kernel.org
+>>>> Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+>>>> ---
+>>>>   v3: Using struct edesc buffer.
+>>>>
+>>>>   v2: Using per-request context.
+>>> [snip]
+>>>> +	if (ivsize && !virt_addr_valid(iv))
+>>>> +		alloc_len += ivsize;
+>>> [snip]
+>>>>   
+>>>> +	if (ivsize && !virt_addr_valid(iv))
+>>> A more precise condition would be (!is_vmalloc_addr || is_vmalloc_addr(iv))
+>>>
+>> Sorry for the typo, I meant:
+>> (!virt_addr_valid(iv) || is_vmalloc_addr(iv))
 >
-> From: Eric Biggers <ebiggers@google.com>
->
-> Hi Greg, please consider applying this to 4.9-stable and 4.4-stable.
-> It's a minimal fix for a bug that was fixed incidentally by a large
-> refactoring in v4.11.
->
-> >8------------------------------------------------------8<
->
-> In chacha20-simd, clear the MAY_SLEEP flag in the blkcipher_desc to
-> prevent sleeping with preemption disabled, under kernel_fpu_begin().
->
-> This was fixed upstream incidentally by a large refactoring,
-> commit 9ae433bc79f9 ("crypto: chacha20 - convert generic and x86
-> versions to skcipher").  But syzkaller easily trips over this when
-> running on older kernels, as it's easily reachable via AF_ALG.
-> Therefore, this patch makes the minimal fix for older kernels.
->
-> Fixes: c9320b6dcb89 ("crypto: chacha20 - Add a SSSE3 SIMD variant for x86_64")
-> Cc: linux-crypto@vger.kernel.org
-> Cc: Martin Willi <martin@strongswan.org>
-> Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> As far as I know, virt_addr_valid() means the address is in the linear 
+> memory space. So it cannot be a vmalloc_addr if it is a linear space 
+> addr, can it ?
 
-Acked-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+That matches my understanding.
 
-> ---
->  arch/x86/crypto/chacha20_glue.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/arch/x86/crypto/chacha20_glue.c b/arch/x86/crypto/chacha20_glue.c
-> index f910d1d449f00..0a5fedf43bdc8 100644
-> --- a/arch/x86/crypto/chacha20_glue.c
-> +++ b/arch/x86/crypto/chacha20_glue.c
-> @@ -77,6 +77,7 @@ static int chacha20_simd(struct blkcipher_desc *desc, struct scatterlist *dst,
->
->         blkcipher_walk_init(&walk, dst, src, nbytes);
->         err = blkcipher_walk_virt_block(desc, &walk, CHACHA20_BLOCK_SIZE);
-> +       desc->flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
->
->         crypto_chacha20_init(state, crypto_blkcipher_ctx(desc->tfm), walk.iv);
->
-> --
-> 2.20.1.97.g81188d93c3-goog
->
+This is one of those historical macros that has no documentation and its
+behaviour is only defined in terms of other things, so it's kind of hard
+to track down.
+
+In commit e41e53cd4fe3 ("powerpc/mm: Fix virt_addr_valid() etc. on
+64-bit hash")
+
+https://git.kernel.org/torvalds/c/e41e53cd4fe3
+
+I said:
+
+  virt_addr_valid() is supposed to tell you if it's OK to call virt_to_page() on
+  an address. What this means in practice is that it should only return true for
+  addresses in the linear mapping which are backed by a valid PFN.
+
+
+Each arch can define virt_to_page(), so presumably you *could* set
+things up such that virt_to_page() worked on vmalloc addresses.
+
+Originally virt_to_page() would basically just mask and right shift the
+address and then use that as an array index to get the page. Things are
+more complicated now that we have SPARSEMEM etc. but it still only works
+for linear mapping addresses.
+
+Hopefully someone who knows mm stuff can chime in and tell us if we're
+missing anything :)
+
+cheers
