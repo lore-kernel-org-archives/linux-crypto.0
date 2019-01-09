@@ -1,93 +1,68 @@
-Return-Path: <SRS0=CSIn=PT=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:39720 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729272AbfAKLt7 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Jan 2019 06:49:59 -0500
-Received: by mail-pg1-f195.google.com with SMTP id w6so6232808pgl.6
-        for <linux-crypto@vger.kernel.org>; Fri, 11 Jan 2019 03:49:59 -0800 (PST)
-From: Sumit Garg <sumit.garg@linaro.org>
-To: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, jens.wiklander@linaro.org,
-        mpm@selenic.com, herbert@gondor.apana.org.au, robh+dt@kernel.org,
-        mark.rutland@arm.com, arnd@arndb.de, gregkh@linuxfoundation.org,
-        daniel.thompson@linaro.org, ard.biesheuvel@linaro.org,
-        bhsharma@redhat.com, tee-dev@lists.linaro.org,
-        Sumit Garg <sumit.garg@linaro.org>
-Subject: [PATCH v3 0/4] Introduce TEE bus driver framework
-Date: Fri, 11 Jan 2019 17:17:27 +0530
-Message-Id: <1547207251-9372-1-git-send-email-sumit.garg@linaro.org>
+Return-Path: <SRS0=1Gsi=PR=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:57546 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726574AbfAIRWK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 9 Jan 2019 12:22:10 -0500
+Date: Wed, 9 Jan 2019 09:22:07 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: Kalyani Akula <kalyani.akula@xilinx.com>
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Kalyani Akula <kalyania@xilinx.com>,
+        Sarat Chand Savitala <saratcha@xilinx.com>
+Subject: Re: [RFC PATCH 2/3] crypto: Add Xilinx SHA3 driver
+Message-ID: <20190109172206.GA249140@gmail.com>
+References: <1546851776-3456-1-git-send-email-kalyani.akula@xilinx.com>
+ <1546851776-3456-3-git-send-email-kalyani.akula@xilinx.com>
+ <20190107165606.GA2077@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190107165606.GA2077@gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This series introduces a generic TEE bus driver concept for TEE based
-kernel drivers which would like to communicate with TEE based devices/
-services.
+On Mon, Jan 07, 2019 at 08:56:07AM -0800, Eric Biggers wrote:
+> Hi Kalyani,
+> 
+> On Mon, Jan 07, 2019 at 02:32:55PM +0530, Kalyani Akula wrote:
+> > This patch adds SHA3 driver suuport for the Xilinx
+> > ZynqMP SoC.
+> > 
+> > Signed-off-by: Kalyani Akula <kalyani.akula@xilinx.com>
+> [...]
+> > +
+> > +static struct ahash_alg sha3_alg = {
+> > +	.init		= zynqmp_sha_init,
+> > +	.update		= zynqmp_sha_update,
+> > +	.final		= zynqmp_sha_final,
+> > +	.finup		= zynqmp_sha_finup,
+> > +	.digest		= zynqmp_sha_digest,
+> > +	.export		= zynqmp_sha_export,
+> > +	.import		= zynqmp_sha_import,
+> > +	.halg = {
+> > +		.digestsize	= SHA384_DIGEST_SIZE,
+> > +		.statesize	= sizeof(struct sha256_state),
+> > +		.base	= {
+> > +			.cra_name		= "xilinx-keccak-384",
+> > +			.cra_driver_name	= "zynqmp-keccak-384",
+> > +			.cra_priority		= 300,
+> > +			.cra_flags		= CRYPTO_ALG_ASYNC,
+> > +			.cra_blocksize		= SHA384_BLOCK_SIZE,
+> > +			.cra_ctxsize		= sizeof(struct zynqmp_sha_ctx),
+> > +			.cra_alignmask		= 0,
+> > +			.cra_module		= THIS_MODULE,
+> > +			.cra_init		= zynqmp_sha_cra_init,
+> > +		}
+> > +	}
+> > +};
+> 
+> cra_name needs to match an algorithm that has a generic implementation.
+> It should be "sha3-384", or is your hardware not compatible?
+> Also does your hardware not support sha3-256 and sha3-512?
+> 
+> - Eric
 
-Patch #1 adds TEE bus concept where devices/services are identified via
-Universally Unique Identifier (UUID) and drivers register a table of
-device UUIDs which they can support. This concept also allows for device
-enumeration to be specific to corresponding TEE implementation like
-OP-TEE etc.
+Hi Kalyani, this was not addressed in v2.
 
-Patch #2 adds supp_nowait flag for non-blocking requests arising via
-TEE internal client interface.
-
-Patch #3 adds TEE bus device enumeration support for OP-TEE. OP-TEE
-provides a pseudo TA to enumerate TAs which can act as devices/services
-for TEE bus.
-
-Patch #4 adds OP-TEE based hwrng driver which act as TEE bus driver.
-On ARM SoC's with TrustZone enabled, peripherals like entropy sources
-might not be accessible to normal world (linux in this case) and rather
-accessible to secure world (OP-TEE in this case) only. So this driver
-aims to provides a generic interface to OP-TEE based random number
-generator service.
-
-Example case is Developerbox based on Socionext's Synquacer SoC [1]
-which provides 7 thermal sensors accessible from secure world only which
-could be used as entropy sources (thermal/measurement noise).
-
-[1] https://www.96boards.org/product/developerbox/
-
-Changes in v3:
-
-1. Fixed bus error path in Patch #1.
-2. Reversed order of Patch #2 and #3.
-3. Fixed miscellaneous syntax comments and memory leak.
-4. Added comments in Patch #2 for supp_nowait flag.
-
-Changes in v2:
-
-Based on review comments, the scope of this series has increased as
-follows:
-
-1. Added TEE bus driver framework.
-2. Added OP-TEE based device enumeration.
-3. Register optee-rng driver as TEE bus driver.
-4. Removed DT dependency for optee-rng device UUID.
-5. Added supp_nowait flag.
-
-Sumit Garg (4):
-  tee: add bus driver framework for TEE based devices
-  tee: add supp_nowait flag in tee_context struct
-  tee: optee: add TEE bus device enumeration support
-  hwrng: add OP-TEE based rng driver
-
- MAINTAINERS                        |   5 +
- drivers/char/hw_random/Kconfig     |  15 ++
- drivers/char/hw_random/Makefile    |   1 +
- drivers/char/hw_random/optee-rng.c | 272 +++++++++++++++++++++++++++++++++++++
- drivers/tee/optee/Makefile         |   1 +
- drivers/tee/optee/core.c           |   4 +
- drivers/tee/optee/device.c         | 153 +++++++++++++++++++++
- drivers/tee/optee/optee_private.h  |   3 +
- drivers/tee/optee/supp.c           |  10 +-
- drivers/tee/tee_core.c             |  56 +++++++-
- include/linux/tee_drv.h            |  42 ++++++
- 11 files changed, 558 insertions(+), 4 deletions(-)
- create mode 100644 drivers/char/hw_random/optee-rng.c
- create mode 100644 drivers/tee/optee/device.c
-
--- 
-2.7.4
+- Eric
