@@ -1,38 +1,47 @@
-Return-Path: <SRS0=b7+G=PP=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-eopbgr790040.outbound.protection.outlook.com ([40.107.79.40]:42496
-        "EHLO NAM03-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726625AbfAGJDO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Jan 2019 04:03:14 -0500
-From: Kalyani Akula <kalyani.akula@xilinx.com>
-To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: Kalyani Akula <kalyania@xilinx.com>,
-        Sarat Chand Savitala <saratcha@xilinx.com>,
-        Kalyani Akula <kalyani.akula@xilinx.com>
-Subject: [RFC PATCH 0/3] Add Xilinx's ZynqMP SHA3 driver support
-Date: Mon, 7 Jan 2019 14:32:53 +0530
-Message-ID: <1546851776-3456-1-git-send-email-kalyani.akula@xilinx.com>
+Return-Path: <SRS0=1Gsi=PR=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:53270 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725440AbfAIGM5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 9 Jan 2019 01:12:57 -0500
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Gilad Ben-Yossef <gilad@benyossef.com>
+Subject: [PATCH] crypto: sm3 - fix undefined shift by >= width of value
+Date: Tue,  8 Jan 2019 22:12:41 -0800
+Message-Id: <20190109061241.6943-1-ebiggers@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch set adds support for 
-- dt-binding docs for Xilinx ZynqMP SHA3 driver
-- Adds Xilinx ZynqMP driver for SHA3 Algorithm
-- Adds device tree node for ZynqMP SHA3 driver
+From: Eric Biggers <ebiggers@google.com>
 
-Kalyani Akula (3):
-  dt-bindings: crypto: Add bindings for ZynqMP SHA3 driver
-  crypto: Add Xilinx SHA3 driver
-  ARM64: zynqmp: Add Xilinix SHA-384 node.
+sm3_compress() calls rol32() with shift >= 32, which causes undefined
+behavior.  This is easily detected by enabling CONFIG_UBSAN.
 
- .../devicetree/bindings/crypto/zynqmp-sha.txt      |   12 +
- arch/arm64/boot/dts/xilinx/zynqmp.dtsi             |    4 +
- drivers/crypto/Kconfig                             |   10 +
- drivers/crypto/Makefile                            |    1 +
- drivers/crypto/zynqmp-sha.c                        |  303 ++++++++++++++++++++
- 5 files changed, 330 insertions(+), 0 deletions(-)
- create mode 100755 Documentation/devicetree/bindings/crypto/zynqmp-sha.txt
- create mode 100755 drivers/crypto/zynqmp-sha.c
+Explicitly AND with 31 to make the behavior well defined.
+
+Fixes: 4f0fc1600edb ("crypto: sm3 - add OSCCA SM3 secure hash")
+Cc: <stable@vger.kernel.org> # v4.15+
+Cc: Gilad Ben-Yossef <gilad@benyossef.com>
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ crypto/sm3_generic.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/crypto/sm3_generic.c b/crypto/sm3_generic.c
+index 9a5c60f08aad8..c0cf87ae7ef6d 100644
+--- a/crypto/sm3_generic.c
++++ b/crypto/sm3_generic.c
+@@ -100,7 +100,7 @@ static void sm3_compress(u32 *w, u32 *wt, u32 *m)
+ 
+ 	for (i = 0; i <= 63; i++) {
+ 
+-		ss1 = rol32((rol32(a, 12) + e + rol32(t(i), i)), 7);
++		ss1 = rol32((rol32(a, 12) + e + rol32(t(i), i & 31)), 7);
+ 
+ 		ss2 = ss1 ^ rol32(a, 12);
+ 
+-- 
+2.20.1
