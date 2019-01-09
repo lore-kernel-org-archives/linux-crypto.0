@@ -1,75 +1,28 @@
-Return-Path: <SRS0=hYBA=PX=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:54730 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732167AbfAOQio (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Jan 2019 11:38:44 -0500
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: linux-kernel@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        stable@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Eric Biggers <ebiggers@google.com>
-Subject: [PATCH 4.4 49/51] crypto: cts - fix crash on short inputs
-Date: Tue, 15 Jan 2019 17:35:45 +0100
-Message-Id: <20190115154854.089548717@linuxfoundation.org>
-In-Reply-To: <20190115154846.928796000@linuxfoundation.org>
-References: <20190115154846.928796000@linuxfoundation.org>
+Return-Path: <SRS0=+HSe=PS=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from gtsparkplugs.com ([216.245.204.37]:35618 "EHLO catchco.com"
+        rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726458AbfAJCcx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 9 Jan 2019 21:32:53 -0500
+To: linux-crypto@vger.kernel.org
+Subject: Enhancing the photos
+Message-ID: <b8e038d504d0483bd0b542505b6b7026@annthegran.com>
+Date: Wed, 09 Jan 2019 11:38:15 +0100
+From: "Jane" <jeffopreinteesrpadnlop@verizon.net>
+Reply-To: sunchekam@sina.com
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; format=flowed; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-4.4-stable review patch.  If anyone has any objections, please let me know.
+Do you have photos for editing? We asked this because we see your photos on
+your website.
 
-------------------
+We mainly supply service for photos cut out , clipping path, and
+retouching.
 
+You may just send us a photo, we can provide you test editing to check
+quality.
 
-From: Eric Biggers <ebiggers@google.com>
-
-[It's a minimal fix for a bug that was fixed incidentally by a large
-refactoring in v4.8.]
-
-In the CTS template, when the input length is <= one block cipher block
-(e.g. <= 16 bytes for AES) pass the correct length to the underlying CBC
-transform rather than one block.  This matches the upstream behavior and
-makes the encryption/decryption operation correctly return -EINVAL when
-1 <= nbytes < bsize or succeed when nbytes == 0, rather than crashing.
-
-This was fixed upstream incidentally by a large refactoring,
-commit 0605c41cc53c ("crypto: cts - Convert to skcipher").  But
-syzkaller easily trips over this when running on older kernels, as it's
-easily reachable via AF_ALG.  Therefore, this patch makes the minimal
-fix for older kernels.
-
-Cc: linux-crypto@vger.kernel.org
-Fixes: 76cb9521795a ("[CRYPTO] cts: Add CTS mode required for Kerberos AES support")
-Signed-off-by: Eric Biggers <ebiggers@google.com>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- crypto/cts.c |    8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
---- a/crypto/cts.c
-+++ b/crypto/cts.c
-@@ -137,8 +137,8 @@ static int crypto_cts_encrypt(struct blk
- 	lcldesc.info = desc->info;
- 	lcldesc.flags = desc->flags;
- 
--	if (tot_blocks == 1) {
--		err = crypto_blkcipher_encrypt_iv(&lcldesc, dst, src, bsize);
-+	if (tot_blocks <= 1) {
-+		err = crypto_blkcipher_encrypt_iv(&lcldesc, dst, src, nbytes);
- 	} else if (nbytes <= bsize * 2) {
- 		err = cts_cbc_encrypt(ctx, desc, dst, src, 0, nbytes);
- 	} else {
-@@ -232,8 +232,8 @@ static int crypto_cts_decrypt(struct blk
- 	lcldesc.info = desc->info;
- 	lcldesc.flags = desc->flags;
- 
--	if (tot_blocks == 1) {
--		err = crypto_blkcipher_decrypt_iv(&lcldesc, dst, src, bsize);
-+	if (tot_blocks <= 1) {
-+		err = crypto_blkcipher_decrypt_iv(&lcldesc, dst, src, nbytes);
- 	} else if (nbytes <= bsize * 2) {
- 		err = cts_cbc_decrypt(ctx, desc, dst, src, 0, nbytes);
- 	} else {
+Thanks,
+Jane
