@@ -1,39 +1,51 @@
-Return-Path: <SRS0=Mcmw=PN=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:42888 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726010AbfAEDkT (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Jan 2019 22:40:19 -0500
-Date: Sat, 5 Jan 2019 11:40:16 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
-        stable@vger.kernel.org,
-        James Bottomley <James.Bottomley@hansenpartnership.com>
-Subject: Re: [PATCH 01/16] crypto: cfb - add missing 'chunksize' property
-Message-ID: <20190105034016.tfn2gtl6uwyguv3s@gondor.apana.org.au>
-References: <20190104041625.3259-2-ebiggers@kernel.org>
- <20190104210311.5AC542087F@mail.kernel.org>
- <20190105030747.GA661@sol.localdomain>
+Return-Path: <SRS0=1Gsi=PR=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-eopbgr720089.outbound.protection.outlook.com ([40.107.72.89]:30752
+        "EHLO NAM05-CO1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1730112AbfAIJ0q (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 9 Jan 2019 04:26:46 -0500
+From: Kalyani Akula <kalyani.akula@xilinx.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: Kalyani Akula <kalyania@xilinx.com>,
+        Sarat Chand Savitala <saratcha@xilinx.com>,
+        Kalyani Akula <kalyani.akula@xilinx.com>
+Subject: [RFC PATCH V2 1/4] dt-bindings: crypto: Add bindings for ZynqMP SHA3 driver
+Date: Wed, 9 Jan 2019 14:56:22 +0530
+Message-ID: <1547025985-7228-2-git-send-email-kalyani.akula@xilinx.com>
+In-Reply-To: <1547025985-7228-1-git-send-email-kalyani.akula@xilinx.com>
+References: <1547025985-7228-1-git-send-email-kalyani.akula@xilinx.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190105030747.GA661@sol.localdomain>
+Content-Type: text/plain
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jan 04, 2019 at 07:07:48PM -0800, Eric Biggers wrote:
->
-> Herbert, why was CFB accepted without any test vectors in the first place?
+Add documentation to describe Xilinx ZynqMP SHA3 driver
+bindings.
 
-That was an oversight.  Longer term we should restructure how
-the test vectors are stored by moving them in with the generic
-implementation.  That should also ensure that we would never
-add an algorithm without both a generic implementation as well
-as test vectors.
+Signed-off-by: Kalyani Akula <kalyani.akula@xilinx.com>
+---
+ .../devicetree/bindings/crypto/zynqmp-sha.txt      |   12 ++++++++++++
+ 1 files changed, 12 insertions(+), 0 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/crypto/zynqmp-sha.txt
 
-Cheers,
+diff --git a/Documentation/devicetree/bindings/crypto/zynqmp-sha.txt b/Documentation/devicetree/bindings/crypto/zynqmp-sha.txt
+new file mode 100644
+index 0000000..c7be6e2
+--- /dev/null
++++ b/Documentation/devicetree/bindings/crypto/zynqmp-sha.txt
+@@ -0,0 +1,12 @@
++Xilinx ZynqMP SHA3(keccak-384) hw acceleration support.
++
++The ZynqMp PS-SHA hw accelerator is used to calculate the
++SHA3(keccak-384) hash value on the given user data.
++
++Required properties:
++- compatible:	should contain "xlnx,zynqmp-keccak-384"
++
++Example:
++	xlnx_keccak_384: sha384 {
++		compatible = "xlnx,zynqmp-keccak-384";
++	};
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.7.1
