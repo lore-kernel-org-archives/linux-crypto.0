@@ -1,57 +1,28 @@
-Return-Path: <SRS0=hYBA=PX=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:50760 "EHLO
-        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729901AbfAONnq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Jan 2019 08:43:46 -0500
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc: stable@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 5/7] crypto: ccree: unmap buffer before copying IV
-Date: Tue, 15 Jan 2019 15:43:15 +0200
-Message-Id: <20190115134318.28712-6-gilad@benyossef.com>
-In-Reply-To: <20190115134318.28712-1-gilad@benyossef.com>
-References: <20190115134318.28712-1-gilad@benyossef.com>
+Return-Path: <SRS0=1Gsi=PR=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from destinchamber.com ([185.244.39.84]:56435 "EHLO catchco.com"
+        rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728716AbfAITuY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 9 Jan 2019 14:50:24 -0500
+To: linux-crypto@vger.kernel.org
+Subject: Path your photos?
+Message-ID: <ce9b6d4affce5a25a5e4cff035deb537@annthegran.com>
+Date: Wed, 09 Jan 2019 09:59:29 +0100
+From: "Jane" <jeffopreinteesrpafnlop@verizon.net>
+Reply-To: sunchekam@sina.com
 MIME-Version: 1.0
+Content-Type: text/plain; format=flowed; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-We were copying the last ciphertext block into the IV field
-for CBC before removing the DMA mapping of the output buffer
-with the result of the buffer sometime being out-of-sync cache
-wise and were getting intermittent cases of bad output IV.
+Do you have photos for editing? We asked this because we see your photos on
+your website.
 
-Fix it by moving the DMA buffer unmapping before the copy.
+We mainly supply service for photos cut out , clipping path, and
+retouching.
 
-Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
-Fixes: 00904aa0cd59 ("crypto: ccree - fix iv handling")
-Cc: <stable@vger.kernel.org>
----
- drivers/crypto/ccree/cc_cipher.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+You may just send us a photo, we can provide you test editing to check
+quality.
 
-diff --git a/drivers/crypto/ccree/cc_cipher.c b/drivers/crypto/ccree/cc_cipher.c
-index cc92b031fad1..98ea53524250 100644
---- a/drivers/crypto/ccree/cc_cipher.c
-+++ b/drivers/crypto/ccree/cc_cipher.c
-@@ -652,6 +652,8 @@ static void cc_cipher_complete(struct device *dev, void *cc_req, int err)
- 	unsigned int ivsize = crypto_skcipher_ivsize(sk_tfm);
- 	unsigned int len;
- 
-+	cc_unmap_cipher_request(dev, req_ctx, ivsize, src, dst);
-+
- 	switch (ctx_p->cipher_mode) {
- 	case DRV_CIPHER_CBC:
- 		/*
-@@ -681,7 +683,6 @@ static void cc_cipher_complete(struct device *dev, void *cc_req, int err)
- 		break;
- 	}
- 
--	cc_unmap_cipher_request(dev, req_ctx, ivsize, src, dst);
- 	kzfree(req_ctx->iv);
- 
- 	skcipher_request_complete(req, err);
--- 
-2.20.1
+Thanks,
+Jane
