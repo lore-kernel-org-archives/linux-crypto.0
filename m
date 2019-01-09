@@ -1,235 +1,77 @@
-Return-Path: <SRS0=Z4qA=PO=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from vmicros1.altlinux.org ([194.107.17.57]:53002 "EHLO
-        vmicros1.altlinux.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726399AbfAFNgx (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 6 Jan 2019 08:36:53 -0500
-From: Vitaly Chikunov <vt@altlinux.org>
-To: David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [RFC PATCH 2/4] akcipher: Introduce verify2 for public key algorithms
-Date: Sun,  6 Jan 2019 16:36:06 +0300
-Message-Id: <20190106133608.820-3-vt@altlinux.org>
-In-Reply-To: <20190106133608.820-1-vt@altlinux.org>
-References: <20190106133608.820-1-vt@altlinux.org>
+Return-Path: <SRS0=1Gsi=PR=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from szxga04-in.huawei.com ([45.249.212.190]:17095 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728469AbfAIGFB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 9 Jan 2019 01:05:01 -0500
+From: YueHaibing <yuehaibing@huawei.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        Eric Biggers <ebiggers@google.com>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        "Raveendra Padasalagi" <raveendra.padasalagi@broadcom.com>,
+        Stefan Agner <stefan@agner.ch>
+CC: YueHaibing <yuehaibing@huawei.com>, <linux-crypto@vger.kernel.org>,
+        <kernel-janitors@vger.kernel.org>
+Subject: [PATCH v2 -next] crypto: brcm - Fix some set-but-not-used warning
+Date: Wed, 9 Jan 2019 06:11:18 +0000
+Message-ID: <1547014278-93847-1-git-send-email-yuehaibing@huawei.com>
+In-Reply-To: <1545968644-191671-1-git-send-email-yuehaibing@huawei.com>
+References: <1545968644-191671-1-git-send-email-yuehaibing@huawei.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Current akcipher .verify() just decrypts signature to uncover message
-hash, which is then verified in upper level public_key_verify_signature
-by memcmp with the expected signature value, which is never passed into
-verify().
+Fixes gcc '-Wunused-but-set-variable' warning:
 
-This approach is incompatible with ECDSA algorithms, because, to verify
-a signature ECDSA algorithm also needs a hash value as input; also, hash
-is used in ECDSA (together with a signature divided into halves `r||s`),
-not to produce hash, but to produce a number, which is then compared to
-`r` (first part of the signature) to determine if the signature is
-correct.  Thus, for ECDSA, nor requirements of .verify() itself, nor its
-output expectations in public_key_verify_signature aren't satisfied.
+drivers/crypto/bcm/cipher.c: In function 'handle_ahash_req':
+drivers/crypto/bcm/cipher.c:720:15: warning:
+ variable 'chunk_start' set but not used [-Wunused-but-set-variable]
 
-Make alternative .verify2() call which gets hash value and produce
-complete signature check (without any output, thus max_size() call will
-not be needed for verify2() operation).
+drivers/crypto/bcm/cipher.c: In function 'spu_rx_callback':
+drivers/crypto/bcm/cipher.c:1679:31: warning:
+ variable 'areq' set but not used [-Wunused-but-set-variable]
 
-If .verify2() call is present, it should be used in place of .verify().
+drivers/crypto/bcm/cipher.c:1678:22: warning:
+ variable 'ctx' set but not used [-Wunused-but-set-variable]
 
-Signed-off-by: Vitaly Chikunov <vt@altlinux.org>
+Fixes: 9d12ba86f818 ("crypto: brcm - Add Broadcom SPU driver")
+Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+Reviewed-by: Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>
 ---
- crypto/asymmetric_keys/public_key.c | 57 ++++++++++++++++++++++++-------------
- include/crypto/akcipher.h           | 54 +++++++++++++++++++++++++++++++++--
- 2 files changed, 89 insertions(+), 22 deletions(-)
+v2: add Fixes tag
+---
+ drivers/crypto/bcm/cipher.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
-diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
-index 3bc090b8adef..51dc1c858c7c 100644
---- a/crypto/asymmetric_keys/public_key.c
-+++ b/crypto/asymmetric_keys/public_key.c
-@@ -242,6 +242,7 @@ int public_key_verify_signature(const struct public_key *pkey,
- 	char alg_name[CRYPTO_MAX_ALG_NAME];
- 	void *output;
- 	unsigned int outlen;
-+	int verify2;
- 	int ret;
+diff --git a/drivers/crypto/bcm/cipher.c b/drivers/crypto/bcm/cipher.c
+index c9393ff..9a66c29 100644
+--- a/drivers/crypto/bcm/cipher.c
++++ b/drivers/crypto/bcm/cipher.c
+@@ -717,7 +717,7 @@ static int handle_ahash_req(struct iproc_reqctx_s *rctx)
+ 	 */
+ 	unsigned int new_data_len;
  
- 	pr_devel("==>%s()\n", __func__);
-@@ -279,14 +280,23 @@ int public_key_verify_signature(const struct public_key *pkey,
- 	if (ret)
- 		goto error_free_req;
+-	unsigned int chunk_start = 0;
++	unsigned int __maybe_unused chunk_start = 0;
+ 	u32 db_size;	 /* Length of data field, incl gcm and hash padding */
+ 	int pad_len = 0; /* total pad len, including gcm, hash, stat padding */
+ 	u32 data_pad_len = 0;	/* length of GCM/CCM padding */
+@@ -1675,8 +1675,6 @@ static void spu_rx_callback(struct mbox_client *cl, void *msg)
+ 	struct spu_hw *spu = &iproc_priv.spu;
+ 	struct brcm_message *mssg = msg;
+ 	struct iproc_reqctx_s *rctx;
+-	struct iproc_ctx_s *ctx;
+-	struct crypto_async_request *areq;
+ 	int err = 0;
  
--	ret = -ENOMEM;
--	outlen = crypto_akcipher_maxsize(tfm);
--	output = kmalloc(outlen, GFP_KERNEL);
--	if (!output)
--		goto error_free_req;
--
-+	verify2 = crypto_akcipher_have_verify2(req);
-+	if (!verify2) {
-+		/* verify2 does not need output buffer */
-+		ret = -ENOMEM;
-+		outlen = crypto_akcipher_maxsize(tfm);
-+		output = kmalloc(outlen, GFP_KERNEL);
-+		if (!output)
-+			goto error_free_req;
-+
-+		sg_init_one(&digest_sg, output, outlen);
-+	} else {
-+		/* dummy init digest_sg */
-+		memset(&digest_sg, 0, sizeof(digest_sg));
-+		output = NULL;
-+		outlen = 0;
-+	}
- 	sg_init_one(&sig_sg, sig->s, sig->s_size);
--	sg_init_one(&digest_sg, output, outlen);
- 	akcipher_request_set_crypt(req, &sig_sg, &digest_sg, sig->s_size,
- 				   outlen);
- 	crypto_init_wait(&cwait);
-@@ -294,18 +304,27 @@ int public_key_verify_signature(const struct public_key *pkey,
- 				      CRYPTO_TFM_REQ_MAY_SLEEP,
- 				      crypto_req_done, &cwait);
+ 	rctx = mssg->ctx;
+@@ -1686,8 +1684,6 @@ static void spu_rx_callback(struct mbox_client *cl, void *msg)
+ 		err = -EFAULT;
+ 		goto cb_finish;
+ 	}
+-	areq = rctx->parent;
+-	ctx = rctx->ctx;
  
--	/* Perform the verification calculation.  This doesn't actually do the
--	 * verification, but rather calculates the hash expected by the
--	 * signature and returns that to us.
--	 */
--	ret = crypto_wait_req(crypto_akcipher_verify(req), &cwait);
--	if (ret)
--		goto out_free_output;
--
--	/* Do the actual verification step. */
--	if (req->dst_len != sig->digest_size ||
--	    memcmp(sig->digest, output, sig->digest_size) != 0)
--		ret = -EKEYREJECTED;
-+	if (!verify2) {
-+		/* Perform the verification calculation.  This doesn't actually
-+		 * do the verification, but rather calculates the hash expected
-+		 * by the signature and returns that to us.
-+		 */
-+		ret = crypto_wait_req(crypto_akcipher_verify(req), &cwait);
-+		if (ret)
-+			goto out_free_output;
-+
-+		/* Do the actual verification step. */
-+		if (req->dst_len != sig->digest_size ||
-+		    memcmp(sig->digest, output, sig->digest_size) != 0)
-+			ret = -EKEYREJECTED;
-+	} else {
-+		/* Perform full verification in one call. */
-+		req->digest = sig->digest;
-+		req->digest_len = sig->digest_size;
-+		ret = crypto_wait_req(crypto_akcipher_verify2(req), &cwait);
-+		if (ret)
-+			goto out_free_output;
-+	}
- 
- out_free_output:
- 	kfree(output);
-diff --git a/include/crypto/akcipher.h b/include/crypto/akcipher.h
-index 84d68dfb551a..b15a995f6118 100644
---- a/include/crypto/akcipher.h
-+++ b/include/crypto/akcipher.h
-@@ -28,6 +28,8 @@
-  *		result.
-  *		In case of error where the dst sgl size was insufficient,
-  *		it will be updated to the size required for the operation.
-+ * @digest:	Digest for verify2.
-+ * @digest_len:	Size of the digest.
-  * @__ctx:	Start of private context data
-  */
- struct akcipher_request {
-@@ -36,6 +38,8 @@ struct akcipher_request {
- 	struct scatterlist *dst;
- 	unsigned int src_len;
- 	unsigned int dst_len;
-+	u8 *digest;
-+	u8 digest_len;
- 	void *__ctx[] CRYPTO_MINALIGN_ATTR;
- };
- 
-@@ -60,6 +64,8 @@ struct crypto_akcipher {
-  *		algorithm. In case of error, where the dst_len was insufficient,
-  *		the req->dst_len will be updated to the size required for the
-  *		operation
-+ * @verify2:	Function performs a verify operation as defined by public key
-+ *		algorithm.
-  * @encrypt:	Function performs an encrypt operation as defined by public key
-  *		algorithm. In case of error, where the dst_len was insufficient,
-  *		the req->dst_len will be updated to the size required for the
-@@ -96,6 +102,7 @@ struct crypto_akcipher {
- struct akcipher_alg {
- 	int (*sign)(struct akcipher_request *req);
- 	int (*verify)(struct akcipher_request *req);
-+	int (*verify2)(struct akcipher_request *req);
- 	int (*encrypt)(struct akcipher_request *req);
- 	int (*decrypt)(struct akcipher_request *req);
- 	int (*set_pub_key)(struct crypto_akcipher *tfm, const void *key,
-@@ -400,11 +407,13 @@ static inline int crypto_akcipher_sign(struct akcipher_request *req)
-  * crypto_akcipher_verify() - Invoke public key verify operation
-  *
-  * Function invokes the specific public key verify operation for a given
-- * public key algorithm
-+ * public key algorithm: basically it does (rsa) decrypt of signature
-+ * producing decrypted hash into dst, which should be compared by a caller
-+ * with expected hash value.
-  *
-- * @req:	asymmetric key request
-+ * @req:	asymmetric key request (without hash)
-  *
-- * Return: zero on success; error code in case of error
-+ * Return: zero on decryption success; error code in case of error
-  */
- static inline int crypto_akcipher_verify(struct akcipher_request *req)
- {
-@@ -418,6 +427,45 @@ static inline int crypto_akcipher_verify(struct akcipher_request *req)
- }
- 
- /**
-+ * crypto_akcipher_verify2() - Invoke public key verify operation
-+ *
-+ * Function performs complete public key verify operation for a given
-+ * public key algorithm
-+ *
-+ * @req:	asymmetric key request (with hash)
-+ *
-+ * Return: zero on verification success; error code in case of error
-+ */
-+static inline int crypto_akcipher_verify2(struct akcipher_request *req)
-+{
-+	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
-+	struct akcipher_alg *alg = crypto_akcipher_alg(tfm);
-+	int ret;
-+
-+	ret = alg->verify2(req);
-+	crypto_stat_akcipher_verify(req, ret);
-+	return ret;
-+}
-+
-+/**
-+ * crypto_akcipher_have_verify2() - Check for existence of public key verify2
-+ * operation
-+ *
-+ * Function checks for existence of verify2 call for the public key algorithm
-+ *
-+ * @req:	asymmetric key request (with hash)
-+ *
-+ * Return: non-zero is verify2 call exists; zero if it does not
-+ */
-+static inline int crypto_akcipher_have_verify2(struct akcipher_request *req)
-+{
-+	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
-+	struct akcipher_alg *alg = crypto_akcipher_alg(tfm);
-+
-+	return !!alg->verify2;
-+}
-+
-+/**
-  * crypto_akcipher_set_pub_key() - Invoke set public key operation
-  *
-  * Function invokes the algorithm specific set key function, which knows
--- 
-2.11.0
+ 	/* process the SPU status */
+ 	err = spu->spu_status_process(rctx->msg_buf.rx_stat);
