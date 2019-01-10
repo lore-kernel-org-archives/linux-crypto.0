@@ -1,51 +1,40 @@
 Return-Path: <SRS0=+HSe=PS=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:53236 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727558AbfAJUSY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Jan 2019 15:18:24 -0500
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 11/11] crypto: af_alg - remove redundant initializations of sk_family
-Date: Thu, 10 Jan 2019 12:18:02 -0800
-Message-Id: <20190110201802.82442-12-ebiggers@kernel.org>
-In-Reply-To: <20190110201802.82442-1-ebiggers@kernel.org>
-References: <20190110201802.82442-1-ebiggers@kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:59700 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728181AbfAJOGE (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 10 Jan 2019 09:06:04 -0500
+Date: Thu, 10 Jan 2019 22:05:50 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Christophe Leroy <christophe.leroy@c-s.fr>
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Horia Geanta <horia.geanta@nxp.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, stable@vger.kernel.org
+Subject: Re: [PATCH v4 1/2] crypto: talitos - reorder code in
+ talitos_edesc_alloc()
+Message-ID: <20190110140549.utyjd4v6v6ropgjn@gondor.apana.org.au>
+References: <5ed91db5e2976a4c260465c3d027acc9affd2d2b.1545445924.git.christophe.leroy@c-s.fr>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5ed91db5e2976a4c260465c3d027acc9affd2d2b.1545445924.git.christophe.leroy@c-s.fr>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Eric Biggers <ebiggers@google.com>
+On Tue, Jan 08, 2019 at 06:56:46AM +0000, Christophe Leroy wrote:
+> This patch moves the mapping of IV after the kmalloc(). This
+> avoids having to unmap in case kmalloc() fails.
+> 
+> Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+> ---
+>  new in v4
+> 
+>  drivers/crypto/talitos.c | 25 +++++++------------------
+>  1 file changed, 7 insertions(+), 18 deletions(-)
 
-sk_alloc() already sets sock::sk_family to PF_ALG which is passed as the
-'family' argument, so there's no need to set it again.
-
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- crypto/af_alg.c | 3 ---
- 1 file changed, 3 deletions(-)
-
-diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-index 1dd573a441279..c5937c8127999 100644
---- a/crypto/af_alg.c
-+++ b/crypto/af_alg.c
-@@ -302,8 +302,6 @@ int af_alg_accept(struct sock *sk, struct socket *newsock, bool kern)
- 	if (err)
- 		goto unlock;
- 
--	sk2->sk_family = PF_ALG;
--
- 	if (nokey || !ask->refcnt++)
- 		sock_hold(sk);
- 	ask->nokey_refcnt += nokey;
-@@ -380,7 +378,6 @@ static int alg_create(struct net *net, struct socket *sock, int protocol,
- 	sock->ops = &alg_proto_ops;
- 	sock_init_data(sock, sk);
- 
--	sk->sk_family = PF_ALG;
- 	sk->sk_destruct = alg_sock_destruct;
- 
- 	return 0;
+All applied.  Thanks.
 -- 
-2.20.1.97.g81188d93c3-goog
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
