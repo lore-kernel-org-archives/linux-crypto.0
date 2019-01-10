@@ -1,83 +1,46 @@
 Return-Path: <SRS0=+HSe=PS=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:59630 "EHLO
+Received: from orcrist.hmeau.com ([104.223.48.154]:59604 "EHLO
         deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727684AbfAJOD7 (ORCPT
+        with ESMTP id S1727916AbfAJODT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Jan 2019 09:03:59 -0500
-Date: Thu, 10 Jan 2019 22:03:49 +0800
+        Thu, 10 Jan 2019 09:03:19 -0500
+Date: Thu, 10 Jan 2019 22:03:15 +0800
 From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Christoph Hellwig <hch@lst.de>, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-imx@nxp.com
-Subject: Re: [PATCH] crypto: caam - fix zero-length buffer DMA mapping
-Message-ID: <20190110140349.izbgn6jvab4r56at@gondor.apana.org.au>
-References: <20181219143644.22089-1-horia.geanta@nxp.com>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org, Rob Rice <rob.rice@broadcom.com>,
+        Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Yael Chemla <yael.chemla@foss.arm.com>
+Subject: Re: [PATCH 0/3] crypto: authenc - fix key parsing
+Message-ID: <20190110140314.h4jnz6ie3ldqrioo@gondor.apana.org.au>
+References: <20181217072324.16844-1-ebiggers@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20181219143644.22089-1-horia.geanta@nxp.com>
+In-Reply-To: <20181217072324.16844-1-ebiggers@kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Dec 19, 2018 at 04:36:44PM +0200, Horia Geantă wrote:
-> From: Aymen Sghaier <aymen.sghaier@nxp.com>
+On Sun, Dec 16, 2018 at 11:23:21PM -0800, Eric Biggers wrote:
+> Fix incorrect validation of the key passed to "authenc" AEADs that
+> allowed crashing the kernel via AF_ALG.  The real fix is in patch 1, but
+> two drivers had to be converted to use crypto_authenc_extractkeys() too.
 > 
-> Recent changes - probably DMA API related (generic and/or arm64-specific) -
-> exposed a case where driver maps a zero-length buffer:
-> ahash_init()->ahash_update()->ahash_final() with a zero-length string to
-> hash
+> Please note: for the bcm and ccree driver changes I haven't re-run the
+> self-tests, as I don't have that hardware.  Please do so if you can.
 > 
-> kernel BUG at kernel/dma/swiotlb.c:475!
-> Internal error: Oops - BUG: 0 [#1] PREEMPT SMP
-> Modules linked in:
-> CPU: 2 PID: 1823 Comm: cryptomgr_test Not tainted 4.20.0-rc1-00108-g00c9fe37a7f2 #1
-> Hardware name: LS1046A RDB Board (DT)
-> pstate: 80000005 (Nzcv daif -PAN -UAO)
-> pc : swiotlb_tbl_map_single+0x170/0x2b8
-> lr : swiotlb_map_page+0x134/0x1f8
-> sp : ffff00000f79b8f0
-> x29: ffff00000f79b8f0 x28: 0000000000000000
-> x27: ffff0000093d0000 x26: 0000000000000000
-> x25: 00000000001f3ffe x24: 0000000000200000
-> x23: 0000000000000000 x22: 00000009f2c538c0
-> x21: ffff800970aeb410 x20: 0000000000000001
-> x19: ffff800970aeb410 x18: 0000000000000007
-> x17: 000000000000000e x16: 0000000000000001
-> x15: 0000000000000019 x14: c32cb8218a167fe8
-> x13: ffffffff00000000 x12: ffff80097fdae348
-> x11: 0000800976bca000 x10: 0000000000000010
-> x9 : 0000000000000000 x8 : ffff0000091fd6c8
-> x7 : 0000000000000000 x6 : 00000009f2c538bf
-> x5 : 0000000000000000 x4 : 0000000000000001
-> x3 : 0000000000000000 x2 : 00000009f2c538c0
-> x1 : 00000000f9fff000 x0 : 0000000000000000
-> Process cryptomgr_test (pid: 1823, stack limit = 0x(____ptrval____))
-> Call trace:
->  swiotlb_tbl_map_single+0x170/0x2b8
->  swiotlb_map_page+0x134/0x1f8
->  ahash_final_no_ctx+0xc4/0x6cc
->  ahash_final+0x10/0x18
->  crypto_ahash_op+0x30/0x84
->  crypto_ahash_final+0x14/0x1c
->  __test_hash+0x574/0xe0c
->  test_hash+0x28/0x80
->  __alg_test_hash+0x84/0xd0
->  alg_test_hash+0x78/0x144
->  alg_test.part.30+0x12c/0x2b4
->  alg_test+0x3c/0x68
->  cryptomgr_test+0x44/0x4c
->  kthread+0xfc/0x128
->  ret_from_fork+0x10/0x18
-> Code: d34bfc18 2a1a03f7 1a9f8694 35fff89a (d4210000)
+> Eric Biggers (3):
+>   crypto: authenc - fix parsing key with misaligned rta_len
+>   crypto: bcm - convert to use crypto_authenc_extractkeys()
+>   crypto: ccree - convert to use crypto_authenc_extractkeys()
 > 
-> Cc: <stable@vger.kernel.org>
-> Signed-off-by: Aymen Sghaier <aymen.sghaier@nxp.com>
-> Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
+>  crypto/authenc.c               | 14 ++++++++---
+>  drivers/crypto/Kconfig         |  1 +
+>  drivers/crypto/bcm/cipher.c    | 44 ++++++++++------------------------
+>  drivers/crypto/ccree/cc_aead.c | 40 +++++++++++++++----------------
+>  4 files changed, 44 insertions(+), 55 deletions(-)
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
