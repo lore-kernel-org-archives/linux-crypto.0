@@ -1,74 +1,60 @@
-Return-Path: <SRS0=b5ak=PZ=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from stargate.chelsio.com ([12.32.117.8]:38973 "EHLO
-        stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727259AbfAQRXh (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Jan 2019 12:23:37 -0500
-From: Atul Gupta <atul.gupta@chelsio.com>
-To: herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        dt@chelsio.com
-Cc: atul.gupta@chelsio.com
-Subject: [PATCH 1/2] crypto/chelsio: avoid using sa_entry imm
-Date: Thu, 17 Jan 2019 09:18:35 -0800
-Message-Id: <20190117171835.6029-1-atul.gupta@chelsio.com>
+Return-Path: <SRS0=+HSe=PS=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:53230 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729097AbfAJUSY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 10 Jan 2019 15:18:24 -0500
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [PATCH 10/11] crypto: af_alg - use list_for_each_entry() in af_alg_count_tsgl()
+Date: Thu, 10 Jan 2019 12:18:01 -0800
+Message-Id: <20190110201802.82442-11-ebiggers@kernel.org>
+In-Reply-To: <20190110201802.82442-1-ebiggers@kernel.org>
+References: <20190110201802.82442-1-ebiggers@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-use is_eth_imm to determine immediate data than use sa_entry
-field which is common for tunnel and not per skb.
+From: Eric Biggers <ebiggers@google.com>
 
-Signed-off-by: Atul Gupta <atul.gupta@chelsio.com>
+af_alg_count_tsgl() iterates through a list without modifying it, so use
+list_for_each_entry() rather than list_for_each_entry_safe().  Also make
+the pointers 'const' to make it clearer that nothing is modified.
+
+No actual change in behavior.
+
+Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- drivers/crypto/chelsio/chcr_core.h  |  2 +-
- drivers/crypto/chelsio/chcr_ipsec.c | 10 ++++------
- 2 files changed, 5 insertions(+), 7 deletions(-)
+ crypto/af_alg.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/crypto/chelsio/chcr_core.h b/drivers/crypto/chelsio/chcr_core.h
-index 1159dee..ad874d5 100644
---- a/drivers/crypto/chelsio/chcr_core.h
-+++ b/drivers/crypto/chelsio/chcr_core.h
-@@ -183,7 +183,7 @@ struct chcr_ipsec_aadiv {
- struct ipsec_sa_entry {
- 	int hmac_ctrl;
- 	u16 esn;
--	u16 imm;
-+	u16 resv;
- 	unsigned int enckey_len;
- 	unsigned int kctx_len;
- 	unsigned int authsize;
-diff --git a/drivers/crypto/chelsio/chcr_ipsec.c b/drivers/crypto/chelsio/chcr_ipsec.c
-index 2fb48cc..4f24646 100644
---- a/drivers/crypto/chelsio/chcr_ipsec.c
-+++ b/drivers/crypto/chelsio/chcr_ipsec.c
-@@ -415,12 +415,12 @@ inline void *copy_esn_pktxt(struct sk_buff *skb,
- 	iv = skb_transport_header(skb) + sizeof(struct ip_esp_hdr);
- 	memcpy(aadiv->iv, iv, 8);
+diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+index ccae4a7ada8ab..1dd573a441279 100644
+--- a/crypto/af_alg.c
++++ b/crypto/af_alg.c
+@@ -530,17 +530,17 @@ static int af_alg_alloc_tsgl(struct sock *sk)
+  */
+ unsigned int af_alg_count_tsgl(struct sock *sk, size_t bytes, size_t offset)
+ {
+-	struct alg_sock *ask = alg_sk(sk);
+-	struct af_alg_ctx *ctx = ask->private;
+-	struct af_alg_tsgl *sgl, *tmp;
++	const struct alg_sock *ask = alg_sk(sk);
++	const struct af_alg_ctx *ctx = ask->private;
++	const struct af_alg_tsgl *sgl;
+ 	unsigned int i;
+ 	unsigned int sgl_count = 0;
  
--	if (sa_entry->imm) {
-+	if (is_eth_imm(skb, sa_entry)) {
- 		sc_imm = (struct ulptx_idata *)(pos +
- 			  (DIV_ROUND_UP(sizeof(struct chcr_ipsec_aadiv),
- 					sizeof(__be64)) << 3));
--		sc_imm->cmd_more = FILL_CMD_MORE(!sa_entry->imm);
--		sc_imm->len = cpu_to_be32(sa_entry->imm);
-+		sc_imm->cmd_more = FILL_CMD_MORE(0);
-+		sc_imm->len = cpu_to_be32(skb->len);
- 	}
- 	pos += len;
- 	return pos;
-@@ -548,10 +548,8 @@ inline void *chcr_crypto_wreq(struct sk_buff *skb,
- 	if (sa_entry->esn)
- 		ivdrop = 1;
+ 	if (!bytes)
+ 		return 0;
  
--	if (is_eth_imm(skb, sa_entry)) {
-+	if (is_eth_imm(skb, sa_entry))
- 		immdatalen = skb->len;
--		sa_entry->imm = immdatalen;
--	}
+-	list_for_each_entry_safe(sgl, tmp, &ctx->tsgl_list, list) {
+-		struct scatterlist *sg = sgl->sg;
++	list_for_each_entry(sgl, &ctx->tsgl_list, list) {
++		const struct scatterlist *sg = sgl->sg;
  
- 	if (sa_entry->esn)
- 		esnlen = sizeof(struct chcr_ipsec_aadiv);
+ 		for (i = 0; i < sgl->cur; i++) {
+ 			size_t bytes_count;
 -- 
-1.8.3.1
+2.20.1.97.g81188d93c3-goog
