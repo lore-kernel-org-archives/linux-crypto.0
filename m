@@ -1,275 +1,107 @@
-Return-Path: <SRS0=8/la=PM=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:56372 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726132AbfADEU4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Jan 2019 23:20:56 -0500
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 08/16] crypto: ctr - convert to skcipher API
-Date: Thu,  3 Jan 2019 20:16:17 -0800
-Message-Id: <20190104041625.3259-9-ebiggers@kernel.org>
-In-Reply-To: <20190104041625.3259-1-ebiggers@kernel.org>
-References: <20190104041625.3259-1-ebiggers@kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Return-Path: <SRS0=+HSe=PS=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:36775 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728593AbfAJM0B (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 10 Jan 2019 07:26:01 -0500
+Received: by mail-pf1-f193.google.com with SMTP id b85so5242917pfc.3
+        for <linux-crypto@vger.kernel.org>; Thu, 10 Jan 2019 04:26:01 -0800 (PST)
+From: Sumit Garg <sumit.garg@linaro.org>
+To: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, jens.wiklander@linaro.org,
+        mpm@selenic.com, herbert@gondor.apana.org.au, robh+dt@kernel.org,
+        mark.rutland@arm.com, arnd@arndb.de, gregkh@linuxfoundation.org,
+        daniel.thompson@linaro.org, ard.biesheuvel@linaro.org,
+        bhsharma@redhat.com, tee-dev@lists.linaro.org,
+        Sumit Garg <sumit.garg@linaro.org>
+Subject: [PATCH v2 3/4] tee: add supp_nowait flag in tee_context struct
+Date: Thu, 10 Jan 2019 17:54:56 +0530
+Message-Id: <1547123097-16431-4-git-send-email-sumit.garg@linaro.org>
+In-Reply-To: <1547123097-16431-1-git-send-email-sumit.garg@linaro.org>
+References: <1547123097-16431-1-git-send-email-sumit.garg@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Eric Biggers <ebiggers@google.com>
+This flag indicates that requests in this context should not wait for
+tee-supplicant daemon to be started if not present and just return
+with an error code. It is needed for requests which should be
+non-blocking in nature like ones arising from TEE based kernel drivers
+or any in kernel api that uses TEE internal client interface.
 
-Convert the CTR template from the deprecated "blkcipher" API to the
-"skcipher" API, taking advantage of skcipher_alloc_instance_simple() to
-simplify it considerably.
-
-Signed-off-by: Eric Biggers <ebiggers@google.com>
+Signed-off-by: Sumit Garg <sumit.garg@linaro.org>
 ---
- crypto/ctr.c | 160 +++++++++++++--------------------------------------
- 1 file changed, 41 insertions(+), 119 deletions(-)
+ drivers/tee/optee/supp.c | 10 +++++++++-
+ drivers/tee/tee_core.c   |  2 ++
+ include/linux/tee_drv.h  |  6 ++++++
+ 3 files changed, 17 insertions(+), 1 deletion(-)
 
-diff --git a/crypto/ctr.c b/crypto/ctr.c
-index 30f3946efc6da..4c743a96faa49 100644
---- a/crypto/ctr.c
-+++ b/crypto/ctr.c
-@@ -17,14 +17,8 @@
- #include <linux/init.h>
- #include <linux/kernel.h>
- #include <linux/module.h>
--#include <linux/random.h>
--#include <linux/scatterlist.h>
- #include <linux/slab.h>
- 
--struct crypto_ctr_ctx {
--	struct crypto_cipher *child;
--};
--
- struct crypto_rfc3686_ctx {
- 	struct crypto_skcipher *child;
- 	u8 nonce[CTR_RFC3686_NONCE_SIZE];
-@@ -35,24 +29,7 @@ struct crypto_rfc3686_req_ctx {
- 	struct skcipher_request subreq CRYPTO_MINALIGN_ATTR;
- };
- 
--static int crypto_ctr_setkey(struct crypto_tfm *parent, const u8 *key,
--			     unsigned int keylen)
--{
--	struct crypto_ctr_ctx *ctx = crypto_tfm_ctx(parent);
--	struct crypto_cipher *child = ctx->child;
--	int err;
--
--	crypto_cipher_clear_flags(child, CRYPTO_TFM_REQ_MASK);
--	crypto_cipher_set_flags(child, crypto_tfm_get_flags(parent) &
--				CRYPTO_TFM_REQ_MASK);
--	err = crypto_cipher_setkey(child, key, keylen);
--	crypto_tfm_set_flags(parent, crypto_cipher_get_flags(child) &
--			     CRYPTO_TFM_RES_MASK);
--
--	return err;
--}
--
--static void crypto_ctr_crypt_final(struct blkcipher_walk *walk,
-+static void crypto_ctr_crypt_final(struct skcipher_walk *walk,
- 				   struct crypto_cipher *tfm)
+diff --git a/drivers/tee/optee/supp.c b/drivers/tee/optee/supp.c
+index 43626e1..92f56b8 100644
+--- a/drivers/tee/optee/supp.c
++++ b/drivers/tee/optee/supp.c
+@@ -88,10 +88,18 @@ u32 optee_supp_thrd_req(struct tee_context *ctx, u32 func, size_t num_params,
  {
- 	unsigned int bsize = crypto_cipher_blocksize(tfm);
-@@ -70,7 +47,7 @@ static void crypto_ctr_crypt_final(struct blkcipher_walk *walk,
- 	crypto_inc(ctrblk, bsize);
- }
+ 	struct optee *optee = tee_get_drvdata(ctx->teedev);
+ 	struct optee_supp *supp = &optee->supp;
+-	struct optee_supp_req *req = kzalloc(sizeof(*req), GFP_KERNEL);
++	struct optee_supp_req *req;
+ 	bool interruptable;
+ 	u32 ret;
  
--static int crypto_ctr_crypt_segment(struct blkcipher_walk *walk,
-+static int crypto_ctr_crypt_segment(struct skcipher_walk *walk,
- 				    struct crypto_cipher *tfm)
- {
- 	void (*fn)(struct crypto_tfm *, u8 *, const u8 *) =
-@@ -96,7 +73,7 @@ static int crypto_ctr_crypt_segment(struct blkcipher_walk *walk,
- 	return nbytes;
- }
- 
--static int crypto_ctr_crypt_inplace(struct blkcipher_walk *walk,
-+static int crypto_ctr_crypt_inplace(struct skcipher_walk *walk,
- 				    struct crypto_cipher *tfm)
- {
- 	void (*fn)(struct crypto_tfm *, u8 *, const u8 *) =
-@@ -123,135 +100,80 @@ static int crypto_ctr_crypt_inplace(struct blkcipher_walk *walk,
- 	return nbytes;
- }
- 
--static int crypto_ctr_crypt(struct blkcipher_desc *desc,
--			      struct scatterlist *dst, struct scatterlist *src,
--			      unsigned int nbytes)
-+static int crypto_ctr_crypt(struct skcipher_request *req)
- {
--	struct blkcipher_walk walk;
--	struct crypto_blkcipher *tfm = desc->tfm;
--	struct crypto_ctr_ctx *ctx = crypto_blkcipher_ctx(tfm);
--	struct crypto_cipher *child = ctx->child;
--	unsigned int bsize = crypto_cipher_blocksize(child);
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	struct crypto_cipher *cipher = skcipher_cipher_simple(tfm);
-+	const unsigned int bsize = crypto_cipher_blocksize(cipher);
-+	struct skcipher_walk walk;
-+	unsigned int nbytes;
- 	int err;
- 
--	blkcipher_walk_init(&walk, dst, src, nbytes);
--	err = blkcipher_walk_virt_block(desc, &walk, bsize);
-+	err = skcipher_walk_virt(&walk, req, false);
- 
- 	while (walk.nbytes >= bsize) {
- 		if (walk.src.virt.addr == walk.dst.virt.addr)
--			nbytes = crypto_ctr_crypt_inplace(&walk, child);
-+			nbytes = crypto_ctr_crypt_inplace(&walk, cipher);
- 		else
--			nbytes = crypto_ctr_crypt_segment(&walk, child);
-+			nbytes = crypto_ctr_crypt_segment(&walk, cipher);
- 
--		err = blkcipher_walk_done(desc, &walk, nbytes);
-+		err = skcipher_walk_done(&walk, nbytes);
- 	}
- 
- 	if (walk.nbytes) {
--		crypto_ctr_crypt_final(&walk, child);
--		err = blkcipher_walk_done(desc, &walk, 0);
-+		crypto_ctr_crypt_final(&walk, cipher);
-+		err = skcipher_walk_done(&walk, 0);
- 	}
- 
- 	return err;
- }
- 
--static int crypto_ctr_init_tfm(struct crypto_tfm *tfm)
-+static int crypto_ctr_create(struct crypto_template *tmpl, struct rtattr **tb)
- {
--	struct crypto_instance *inst = (void *)tfm->__crt_alg;
--	struct crypto_spawn *spawn = crypto_instance_ctx(inst);
--	struct crypto_ctr_ctx *ctx = crypto_tfm_ctx(tfm);
--	struct crypto_cipher *cipher;
--
--	cipher = crypto_spawn_cipher(spawn);
--	if (IS_ERR(cipher))
--		return PTR_ERR(cipher);
--
--	ctx->child = cipher;
--
--	return 0;
--}
--
--static void crypto_ctr_exit_tfm(struct crypto_tfm *tfm)
--{
--	struct crypto_ctr_ctx *ctx = crypto_tfm_ctx(tfm);
--
--	crypto_free_cipher(ctx->child);
--}
--
--static struct crypto_instance *crypto_ctr_alloc(struct rtattr **tb)
--{
--	struct crypto_instance *inst;
--	struct crypto_attr_type *algt;
-+	struct skcipher_instance *inst;
- 	struct crypto_alg *alg;
--	u32 mask;
- 	int err;
- 
--	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_BLKCIPHER);
--	if (err)
--		return ERR_PTR(err);
--
--	algt = crypto_get_attr_type(tb);
--	if (IS_ERR(algt))
--		return ERR_CAST(algt);
--
--	mask = CRYPTO_ALG_TYPE_MASK |
--		crypto_requires_off(algt->type, algt->mask,
--				    CRYPTO_ALG_NEED_FALLBACK);
--
--	alg = crypto_attr_alg(tb[1], CRYPTO_ALG_TYPE_CIPHER, mask);
--	if (IS_ERR(alg))
--		return ERR_CAST(alg);
-+	inst = skcipher_alloc_instance_simple(tmpl, tb, &alg);
-+	if (IS_ERR(inst))
-+		return PTR_ERR(inst);
- 
- 	/* Block size must be >= 4 bytes. */
- 	err = -EINVAL;
- 	if (alg->cra_blocksize < 4)
--		goto out_put_alg;
-+		goto out_free_inst;
- 
- 	/* If this is false we'd fail the alignment of crypto_inc. */
- 	if (alg->cra_blocksize % 4)
--		goto out_put_alg;
--
--	inst = crypto_alloc_instance("ctr", alg);
--	if (IS_ERR(inst))
--		goto out;
--
--	inst->alg.cra_flags = CRYPTO_ALG_TYPE_BLKCIPHER;
--	inst->alg.cra_priority = alg->cra_priority;
--	inst->alg.cra_blocksize = 1;
--	inst->alg.cra_alignmask = alg->cra_alignmask;
--	inst->alg.cra_type = &crypto_blkcipher_type;
-+		goto out_free_inst;
- 
--	inst->alg.cra_blkcipher.ivsize = alg->cra_blocksize;
--	inst->alg.cra_blkcipher.min_keysize = alg->cra_cipher.cia_min_keysize;
--	inst->alg.cra_blkcipher.max_keysize = alg->cra_cipher.cia_max_keysize;
--
--	inst->alg.cra_ctxsize = sizeof(struct crypto_ctr_ctx);
-+	/* CTR mode is a stream cipher. */
-+	inst->alg.base.cra_blocksize = 1;
- 
--	inst->alg.cra_init = crypto_ctr_init_tfm;
--	inst->alg.cra_exit = crypto_ctr_exit_tfm;
 +	/*
-+	 * To simplify the implementation, configure the skcipher walk to only
-+	 * give a partial block at the very end, never earlier.
++	 * Return in case there is no supplicant available and
++	 * non-blocking request.
 +	 */
-+	inst->alg.chunksize = alg->cra_blocksize;
++	if (!supp->ctx && ctx->supp_nowait)
++		return TEEC_ERROR_COMMUNICATION;
++
++	req = kzalloc(sizeof(*req), GFP_KERNEL);
+ 	if (!req)
+ 		return TEEC_ERROR_OUT_OF_MEMORY;
  
--	inst->alg.cra_blkcipher.setkey = crypto_ctr_setkey;
--	inst->alg.cra_blkcipher.encrypt = crypto_ctr_crypt;
--	inst->alg.cra_blkcipher.decrypt = crypto_ctr_crypt;
-+	inst->alg.encrypt = crypto_ctr_crypt;
-+	inst->alg.decrypt = crypto_ctr_crypt;
+diff --git a/drivers/tee/tee_core.c b/drivers/tee/tee_core.c
+index 9ddb89e..5d6c317 100644
+--- a/drivers/tee/tee_core.c
++++ b/drivers/tee/tee_core.c
+@@ -105,6 +105,7 @@ static int tee_open(struct inode *inode, struct file *filp)
+ 	if (IS_ERR(ctx))
+ 		return PTR_ERR(ctx);
  
--out:
--	crypto_mod_put(alg);
--	return inst;
-+	err = skcipher_register_instance(tmpl, inst);
-+	if (err)
-+		goto out_free_inst;
-+	goto out_put_alg;
- 
-+out_free_inst:
-+	inst->free(inst);
- out_put_alg:
--	inst = ERR_PTR(err);
--	goto out;
--}
--
--static void crypto_ctr_free(struct crypto_instance *inst)
--{
--	crypto_drop_spawn(crypto_instance_ctx(inst));
--	kfree(inst);
-+	crypto_mod_put(alg);
-+	return err;
++	ctx->supp_nowait = false;
+ 	filp->private_data = ctx;
+ 	return 0;
  }
+@@ -981,6 +982,7 @@ tee_client_open_context(struct tee_context *start,
+ 	} while (IS_ERR(ctx) && PTR_ERR(ctx) != -ENOMEM);
  
- static struct crypto_template crypto_ctr_tmpl = {
- 	.name = "ctr",
--	.alloc = crypto_ctr_alloc,
--	.free = crypto_ctr_free,
-+	.create = crypto_ctr_create,
- 	.module = THIS_MODULE,
+ 	put_device(put_dev);
++	ctx->supp_nowait = true;
+ 	return ctx;
+ }
+ EXPORT_SYMBOL_GPL(tee_client_open_context);
+diff --git a/include/linux/tee_drv.h b/include/linux/tee_drv.h
+index ed16bf1..fe1a920 100644
+--- a/include/linux/tee_drv.h
++++ b/include/linux/tee_drv.h
+@@ -49,6 +49,11 @@ struct tee_shm_pool;
+  * @releasing:  flag that indicates if context is being released right now.
+  *		It is needed to break circular dependency on context during
+  *              shared memory release.
++ * @supp_nowait: flag that indicates that requests in this context should not
++ *              wait for tee-supplicant daemon to be started if not present
++ *              and just return with an error code. It is needed for requests
++ *              that arises from TEE based kernel drivers that should be
++ *              non-blocking in nature.
+  */
+ struct tee_context {
+ 	struct tee_device *teedev;
+@@ -56,6 +61,7 @@ struct tee_context {
+ 	void *data;
+ 	struct kref refcount;
+ 	bool releasing;
++	bool supp_nowait;
  };
  
-@@ -480,6 +402,6 @@ module_init(crypto_ctr_module_init);
- module_exit(crypto_ctr_module_exit);
- 
- MODULE_LICENSE("GPL");
--MODULE_DESCRIPTION("CTR Counter block mode");
-+MODULE_DESCRIPTION("CTR block cipher mode of operation");
- MODULE_ALIAS_CRYPTO("rfc3686");
- MODULE_ALIAS_CRYPTO("ctr");
+ struct tee_param_memref {
 -- 
-2.20.1
+2.7.4
