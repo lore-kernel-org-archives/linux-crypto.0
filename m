@@ -1,228 +1,138 @@
-Return-Path: <SRS0=CSIn=PT=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:47040 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389736AbfAKPJW (ORCPT
+Return-Path: <SRS0=+HSe=PS=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:39092 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727753AbfAJN6C (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Jan 2019 10:09:22 -0500
-Received: by mail-pg1-f193.google.com with SMTP id w7so6410441pgp.13
-        for <linux-crypto@vger.kernel.org>; Fri, 11 Jan 2019 07:09:21 -0800 (PST)
-Subject: Re: [PATCH v3 1/4] tee: add bus driver framework for TEE based
- devices
-To: Sumit Garg <sumit.garg@linaro.org>,
-        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, jens.wiklander@linaro.org,
-        mpm@selenic.com, herbert@gondor.apana.org.au, robh+dt@kernel.org,
-        mark.rutland@arm.com, arnd@arndb.de, gregkh@linuxfoundation.org,
-        daniel.thompson@linaro.org, ard.biesheuvel@linaro.org,
-        tee-dev@lists.linaro.org
-References: <1547207251-9372-1-git-send-email-sumit.garg@linaro.org>
- <1547207251-9372-2-git-send-email-sumit.garg@linaro.org>
-From: Bhupesh Sharma <bhsharma@redhat.com>
-Message-ID: <6a01fee4-4331-be63-9a78-c4d646b43d29@redhat.com>
-Date: Fri, 11 Jan 2019 20:39:13 +0530
+        Thu, 10 Jan 2019 08:58:02 -0500
+Date: Thu, 10 Jan 2019 14:57:57 +0100
+From: Corentin Labbe <clabbe.montjoie@gmail.com>
+To: Kalyani Akula <kalyani.akula@xilinx.com>
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Kalyani Akula <kalyania@xilinx.com>,
+        Sarat Chand Savitala <saratcha@xilinx.com>
+Subject: Re: [RFC PATCH V2 3/4] crypto: Add Xilinx SHA3 driver
+Message-ID: <20190110135757.GA32218@Red>
+References: <1547025985-7228-1-git-send-email-kalyani.akula@xilinx.com>
+ <1547025985-7228-4-git-send-email-kalyani.akula@xilinx.com>
 MIME-Version: 1.0
-In-Reply-To: <1547207251-9372-2-git-send-email-sumit.garg@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1547025985-7228-4-git-send-email-kalyani.akula@xilinx.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hi Sumit,
-
-Thanks for the patch. Some nitpicks in-line:
-
-On 01/11/2019 05:17 PM, Sumit Garg wrote:
-> Introduce a generic TEE bus driver concept for TEE based kernel drivers
-> which would like to communicate with TEE based devices/services.
+On Wed, Jan 09, 2019 at 02:56:24PM +0530, Kalyani Akula wrote:
+> This patch adds SHA3 driver support for the Xilinx
+> ZynqMP SoC.
 > 
-> In this TEE bus concept, devices/services are identified via Universally
-> Unique Identifier (UUID) and drivers register a table of device UUIDs
-> which they can support.
-> 
-> So this TEE bus framework registers a match() callback function which
-> iterates over the driver UUID table to find a corresponding match for
-> device UUID. If a match is found, then this particular device is probed
-> via corresponding probe api registered by the driver. This process
-> happens whenever a device or a driver is registered with TEE bus.
-> 
-> Also this framework allows for device enumeration to be specific to
-> corresponding TEE implementation like OP-TEE etc.
-> 
-> Signed-off-by: Sumit Garg <sumit.garg@linaro.org>
+> Signed-off-by: Kalyani Akula <kalyani.akula@xilinx.com>
 > ---
->   drivers/tee/tee_core.c  | 43 ++++++++++++++++++++++++++++++++++++++++---
->   include/linux/tee_drv.h | 36 ++++++++++++++++++++++++++++++++++++
->   2 files changed, 76 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/tee/tee_core.c b/drivers/tee/tee_core.c
-> index 7b2bb4c..a685940 100644
-> --- a/drivers/tee/tee_core.c
-> +++ b/drivers/tee/tee_core.c
-> @@ -15,7 +15,6 @@
->   #define pr_fmt(fmt) "%s: " fmt, __func__
->   
->   #include <linux/cdev.h>
-> -#include <linux/device.h>
->   #include <linux/fs.h>
->   #include <linux/idr.h>
->   #include <linux/module.h>
-> @@ -1027,6 +1026,30 @@ int tee_client_invoke_func(struct tee_context *ctx,
->   }
->   EXPORT_SYMBOL_GPL(tee_client_invoke_func);
->   
-> +static int tee_client_device_match(struct device *dev,
-> +				   struct device_driver *drv)
+>  drivers/crypto/Kconfig      |   10 ++
+>  drivers/crypto/Makefile     |    1 +
+>  drivers/crypto/zynqmp-sha.c |  305 +++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 316 insertions(+), 0 deletions(-)
+>  create mode 100644 drivers/crypto/zynqmp-sha.c
+
+Hello
+
+I have some comment below
+
+> +static int zynqmp_sha_update(struct ahash_request *req)
 > +{
-> +	struct tee_client_device *tee_device;
-> +	const struct tee_client_device_id *id_table;
+> +	const struct zynqmp_eemi_ops *eemi_ops = zynqmp_pm_get_eemi_ops();
+> +	struct zynqmp_sha_ctx *tctx = crypto_tfm_ctx(req->base.tfm);
+> +	struct zynqmp_sha_dev *dd = tctx->dd;
+> +	size_t dma_size = req->nbytes;
+> +	dma_addr_t dma_addr;
+> +	char *kbuf;
+> +	int ret;
 > +
-> +	tee_device = to_tee_client_device(dev);
-> +	id_table = to_tee_client_driver(drv)->id_table;
+> +	if (!req->nbytes)
+> +		return 0;
 > +
-> +	while (!uuid_is_null(&id_table->uuid)) {
-> +		if (uuid_equal(&tee_device->id.uuid, &id_table->uuid))
-> +			return 1;
-> +		id_table++;
-> +	}
+> +	if (!eemi_ops || !eemi_ops->sha_hash)
+> +		return -ENOTSUPP;
+> +
+> +	kbuf = dma_alloc_coherent(dd->dev, dma_size, &dma_addr, GFP_KERNEL);
+> +	if (!kbuf)
+> +		return -ENOMEM;
+> +
+> +	scatterwalk_map_and_copy(kbuf, req->src, 0, req->nbytes, 0);
+> +	 __flush_cache_user_range((unsigned long)kbuf,
+> +				  (unsigned long)kbuf + dma_size);
+
+Since kbuf is in dma coherent memory, I dont understand why do you flush cache.
+
+> +	ret = eemi_ops->sha_hash(dma_addr, req->nbytes, ZYNQMP_SHA3_UPDATE);
+> +	dma_free_coherent(dd->dev, dma_size, kbuf, dma_addr);
+
+Since your update function does not return/write any result, I suppose that the resulat is kept in hardware, so what happen if two hash process happen in parallel ?
+Furthermore, how do you have tested import/export function ?
+Anyway, I am sure they are totally buggy.
+
+> +
+> +	return ret;
+> +}
+> +
+> +static int zynqmp_sha_final(struct ahash_request *req)
+> +{
+> +	const struct zynqmp_eemi_ops *eemi_ops = zynqmp_pm_get_eemi_ops();
+> +	struct zynqmp_sha_ctx *tctx = crypto_tfm_ctx(req->base.tfm);
+> +	struct zynqmp_sha_dev *dd = tctx->dd;
+> +	size_t dma_size = SHA384_DIGEST_SIZE;
+> +	dma_addr_t dma_addr;
+> +	char *kbuf;
+> +	int ret;
+> +
+> +	if (!eemi_ops || !eemi_ops->sha_hash)
+> +		return -ENOTSUPP;
+
+You can do this check at probe time.
+
+> +static int zynqmp_sha_finup(struct ahash_request *req)
+> +{
+> +	zynqmp_sha_update(req);
+> +	zynqmp_sha_final(req);
 > +
 > +	return 0;
 > +}
 > +
-> +struct bus_type tee_bus_type = {
-> +	.name		= "tee",
-> +	.match		= tee_client_device_match,
-> +};
-> +EXPORT_SYMBOL_GPL(tee_bus_type);
-> +
->   static int __init tee_init(void)
->   {
->   	int rc;
-> @@ -1040,10 +1063,23 @@ static int __init tee_init(void)
->   	rc = alloc_chrdev_region(&tee_devt, 0, TEE_NUM_DEVICES, "tee");
->   	if (rc) {
->   		pr_err("failed to allocate char dev region\n");
-> -		class_destroy(tee_class);
-> -		tee_class = NULL;
-> +		goto chrdev_err;
->   	}
->   
-> +	rc = bus_register(&tee_bus_type);
-> +	if (rc) {
-> +		pr_err("failed to register tee bus\n");
-> +		goto bus_err;
-> +	}
+> +static int zynqmp_sha_digest(struct ahash_request *req)
+> +{
+> +	zynqmp_sha_init(req);
+> +	zynqmp_sha_update(req);
+> +	zynqmp_sha_final(req);
 > +
 > +	return 0;
+> +}
+
+So you ignore the return value of zynqmp_sha_init/zynqmp_sha_update/zynqmp_sha_final().
+
+> +static int zynqmp_sha_probe(struct platform_device *pdev)
+> +{
+> +	struct zynqmp_sha_dev *sha_dd;
+> +	struct device *dev = &pdev->dev;
+> +	int err;
 > +
-> +bus_err:
-> +	unregister_chrdev_region(tee_devt, TEE_NUM_DEVICES);
-> +chrdev_err:
-> +	class_destroy(tee_class);
-> +	tee_class = NULL;
+> +	sha_dd = devm_kzalloc(&pdev->dev, sizeof(*sha_dd), GFP_KERNEL);
+> +	if (!sha_dd)
+> +		return -ENOMEM;
 > +
+> +	sha_dd->dev = dev;
+> +	platform_set_drvdata(pdev, sha_dd);
+> +	INIT_LIST_HEAD(&sha_dd->list);
+> +	spin_lock_init(&sha_dd->lock);
+> +	crypto_init_queue(&sha_dd->queue, ZYNQMP_SHA_QUEUE_LENGTH);
 
-Hmm.. these error paths/labels look out-of-order.
-See 'drivers/i2c/i2c-dev.c' for example.
+As already said in my last review, why init the queue if you do not use it ?
 
-Normally our error paths in an __init function is of the same order as 
-the __exit function implementation. So this should be changed to 
-something like:
 
-   +out_unreg_class:
-   +	class_destroy(tee_class);
-   +	tee_class = NULL;
-   +out_unreg_chrdev:
-   +	unregister_chrdev_region(tee_devt, TEE_NUM_DEVICES);
+> +	spin_lock(&zynqmp_sha.lock);
+> +	list_add_tail(&sha_dd->list, &zynqmp_sha.dev_list);
+> +	spin_unlock(&zynqmp_sha.lock);
 
->   	return rc;
->   }
->   
-> @@ -1052,6 +1088,7 @@ static void __exit tee_exit(void)
->   	class_destroy(tee_class);
->   	tee_class = NULL;
->   	unregister_chrdev_region(tee_devt, TEE_NUM_DEVICES);
-> +	bus_unregister(&tee_bus_type);
+Why do you maintain a device list ?
+Clearly your current driver support only one hardware instance.
 
-Since the __exit function order is the reverse of the __init one, lets 
-reorder this as:
-
-  +	bus_unregister(&tee_bus_type);
-   	class_destroy(tee_class);
-    	tee_class = NULL;
-    	unregister_chrdev_region(tee_devt, TEE_NUM_DEVICES);
-
-See 'drivers/i2c/i2c-dev.c' for example.
-
->   }
->   
->   subsys_initcall(tee_init);
-> diff --git a/include/linux/tee_drv.h b/include/linux/tee_drv.h
-> index 6cfe058..ed16bf1 100644
-> --- a/include/linux/tee_drv.h
-> +++ b/include/linux/tee_drv.h
-> @@ -20,6 +20,8 @@
->   #include <linux/kref.h>
->   #include <linux/list.h>
->   #include <linux/tee.h>
-> +#include <linux/device.h>
-> +#include <linux/uuid.h>
-
-If possible, let's keep alphabetical order of header files when making 
-changes in the patch.
-
->   
->   /*
->    * The file describes the API provided by the generic TEE driver to the
-> @@ -538,4 +540,38 @@ static inline bool tee_param_is_memref(struct tee_param *param)
->   	}
->   }
->   
-> +extern struct bus_type tee_bus_type;
-> +
-> +/**
-> + * struct tee_client_device_id - tee based device identifier
-> + * @uuid:		For TEE based client devices we use the device uuid
-> + *			as the identifier.
-> + */
-> +struct tee_client_device_id {
-> +	uuid_t uuid;
-> +};
-
-Hmm.. Do we really need a struct for a single element, rather lets use a 
-simple typedef here.
-
-> +
-> +/**
-> + * struct tee_client_device - tee based device
-> + * @id:			device identifier
-> + * @dev:		device structure
-> + */
-> +struct tee_client_device {
-> +	struct tee_client_device_id id;
-> +	struct device dev;
-> +};
-
-Add a blank line here.
-
-> +#define to_tee_client_device(d) container_of(d, struct tee_client_device, dev)
-> +
-> +/**
-> + * struct tee_client_driver - tee client driver
-> + * @id_table:		device id table supported by this driver
-> + * @driver:		driver structure
-> + */
-> +struct tee_client_driver {
-> +	const struct tee_client_device_id *id_table;
-> +	struct device_driver driver;
-> +};
-
-Add a blank line here.
-> +#define to_tee_client_driver(d) \
-> +		container_of(d, struct tee_client_driver, driver)
-> +
->   #endif /*__TEE_DRV_H*/
-> 
-
-Thanks,
-Bhupesh
+Regards
