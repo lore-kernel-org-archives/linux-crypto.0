@@ -1,86 +1,68 @@
-Return-Path: <SRS0=g5s/=PY=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from ale.deltatee.com ([207.54.116.67]:35052 "EHLO ale.deltatee.com"
+Return-Path: <SRS0=+HSe=PS=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:38660 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728195AbfAPSZd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 16 Jan 2019 13:25:33 -0500
-From: Logan Gunthorpe <logang@deltatee.com>
-To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org,
-        linux-mm@kvack.org, Andrew Morton <akpm@linux-foundation.org>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andy Shevchenko <andy.shevchenko@gmail.com>,
-        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Kate Stewart <kstewart@linuxfoundation.org>,
-        Philippe Ombredanne <pombredanne@nexb.com>
-Date: Wed, 16 Jan 2019 11:25:18 -0700
-Message-Id: <20190116182523.19446-2-logang@deltatee.com>
-In-Reply-To: <20190116182523.19446-1-logang@deltatee.com>
-References: <20190116182523.19446-1-logang@deltatee.com>
+        id S1728572AbfAJTLN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 10 Jan 2019 14:11:13 -0500
+Date: Thu, 10 Jan 2019 20:11:10 +0100
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: stable@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Martin Willi <martin@strongswan.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH 4.9,4.4] crypto: x86/chacha20 - avoid sleeping with
+ preemption disabled
+Message-ID: <20190110191110.GB18221@kroah.com>
+References: <20190107231559.13357-1-ebiggers@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [PATCH v25 1/6] iomap: Use non-raw io functions for io{read|write}XXbe
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190107231559.13357-1-ebiggers@kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Fix an asymmetry in the io{read|write}XXbe functions in that the
-big-endian variants make use of the raw io accessors while the
-little-endian variants use the regular accessors. Some architectures
-implement barriers to order against both spinlocks and DMA accesses
-and for these case, the big-endian variant of the API would not be
-protected.
+On Mon, Jan 07, 2019 at 03:15:59PM -0800, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
+> 
+> Hi Greg, please consider applying this to 4.9-stable and 4.4-stable.
+> It's a minimal fix for a bug that was fixed incidentally by a large
+> refactoring in v4.11.
+> 
+> >8------------------------------------------------------8<
+> 
+> In chacha20-simd, clear the MAY_SLEEP flag in the blkcipher_desc to
+> prevent sleeping with preemption disabled, under kernel_fpu_begin().
+> 
+> This was fixed upstream incidentally by a large refactoring,
+> commit 9ae433bc79f9 ("crypto: chacha20 - convert generic and x86
+> versions to skcipher").  But syzkaller easily trips over this when
+> running on older kernels, as it's easily reachable via AF_ALG.
+> Therefore, this patch makes the minimal fix for older kernels.
+> 
+> Fixes: c9320b6dcb89 ("crypto: chacha20 - Add a SSSE3 SIMD variant for x86_64")
+> Cc: linux-crypto@vger.kernel.org
+> Cc: Martin Willi <martin@strongswan.org>
+> Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
+>  arch/x86/crypto/chacha20_glue.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/arch/x86/crypto/chacha20_glue.c b/arch/x86/crypto/chacha20_glue.c
+> index f910d1d449f00..0a5fedf43bdc8 100644
+> --- a/arch/x86/crypto/chacha20_glue.c
+> +++ b/arch/x86/crypto/chacha20_glue.c
+> @@ -77,6 +77,7 @@ static int chacha20_simd(struct blkcipher_desc *desc, struct scatterlist *dst,
+>  
+>  	blkcipher_walk_init(&walk, dst, src, nbytes);
+>  	err = blkcipher_walk_virt_block(desc, &walk, CHACHA20_BLOCK_SIZE);
+> +	desc->flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
+>  
+>  	crypto_chacha20_init(state, crypto_blkcipher_ctx(desc->tfm), walk.iv);
+>  
+> -- 
+> 2.20.1.97.g81188d93c3-goog
+> 
 
-Thus, change the mmio_XXXXbe macros to use the appropriate swab() function
-wrapping the regular accessor. This is similar to what was done for PIO.
+Now queued up, thanks.
 
-When this code was originally written, barriers in the IO accessors were
-not common and the accessors simply wrapped the raw functions in a
-conversion to CPU endianness. Since then, barriers have been added in
-some architectures and are now missing in the big endian variant of the
-API.
-
-This also manages to silence a few sparse warnings that check
-for using the correct endian types which the original code did
-not annotate correctly.
-
-Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Kate Stewart <kstewart@linuxfoundation.org>
-Cc: Philippe Ombredanne <pombredanne@nexb.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Arnd Bergmann <arnd@arndb.de>
-Link: http://lkml.kernel.org/r/CAK8P3a25zQDxyaY3iVv+JmSSzs7F6ssGc+HdBkGs54ZfViX+Fg@mail.gmail.com
----
- lib/iomap.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/lib/iomap.c b/lib/iomap.c
-index 541d926da95e..2c293b22569f 100644
---- a/lib/iomap.c
-+++ b/lib/iomap.c
-@@ -65,8 +65,8 @@ static void bad_io_access(unsigned long port, const char *access)
- #endif
- 
- #ifndef mmio_read16be
--#define mmio_read16be(addr) be16_to_cpu(__raw_readw(addr))
--#define mmio_read32be(addr) be32_to_cpu(__raw_readl(addr))
-+#define mmio_read16be(addr) swab16(readw(addr))
-+#define mmio_read32be(addr) swab32(readl(addr))
- #endif
- 
- unsigned int ioread8(void __iomem *addr)
-@@ -106,8 +106,8 @@ EXPORT_SYMBOL(ioread32be);
- #endif
- 
- #ifndef mmio_write16be
--#define mmio_write16be(val,port) __raw_writew(be16_to_cpu(val),port)
--#define mmio_write32be(val,port) __raw_writel(be32_to_cpu(val),port)
-+#define mmio_write16be(val,port) writew(swab16(val),port)
-+#define mmio_write32be(val,port) writel(swab32(val),port)
- #endif
- 
- void iowrite8(u8 val, void __iomem *addr)
--- 
-2.19.0
+greg k-h
