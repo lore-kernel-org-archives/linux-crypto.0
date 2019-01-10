@@ -1,94 +1,51 @@
-Return-Path: <SRS0=FsAa=P2=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2256 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727100AbfARF65 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Jan 2019 00:58:57 -0500
-From: Xiongfeng Wang <wangxiongfeng2@huawei.com>
-To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <ebiggers@kernel.org>
-CC: <wangxiongfeng2@huawei.com>, <linux-crypto@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <broonie@kernel.org>,
-        <ard.biesheuvel@linaro.org>, <jonathan.cameron@huawei.com>
-Subject: [PATCH V3 1/5] crypto: api - add a helper to (un)register a array of templates
-Date: Fri, 18 Jan 2019 13:58:11 +0800
-Message-ID: <1547791095-48339-2-git-send-email-wangxiongfeng2@huawei.com>
-In-Reply-To: <1547791095-48339-1-git-send-email-wangxiongfeng2@huawei.com>
-References: <1547791095-48339-1-git-send-email-wangxiongfeng2@huawei.com>
+Return-Path: <SRS0=+HSe=PS=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:53236 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727558AbfAJUSY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 10 Jan 2019 15:18:24 -0500
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [PATCH 11/11] crypto: af_alg - remove redundant initializations of sk_family
+Date: Thu, 10 Jan 2019 12:18:02 -0800
+Message-Id: <20190110201802.82442-12-ebiggers@kernel.org>
+In-Reply-To: <20190110201802.82442-1-ebiggers@kernel.org>
+References: <20190110201802.82442-1-ebiggers@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Xiongfeng Wang <xiongfeng.wang@linaro.org>
+From: Eric Biggers <ebiggers@google.com>
 
-This patch add a helper to (un)register a array of templates. The
-following patches will use this helper to simplify the code.
+sk_alloc() already sets sock::sk_family to PF_ALG which is passed as the
+'family' argument, so there's no need to set it again.
 
-Signed-off-by: Xiongfeng Wang <xiongfeng.wang@linaro.org>
-Reviewed-by: Eric Biggers <ebiggers@google.com>
+Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/algapi.c         | 27 +++++++++++++++++++++++++++
- include/crypto/algapi.h |  2 ++
- 2 files changed, 29 insertions(+)
+ crypto/af_alg.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/crypto/algapi.c b/crypto/algapi.c
-index 713baab..4c9c86b 100644
---- a/crypto/algapi.c
-+++ b/crypto/algapi.c
-@@ -494,6 +494,24 @@ int crypto_register_template(struct crypto_template *tmpl)
- }
- EXPORT_SYMBOL_GPL(crypto_register_template);
+diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+index 1dd573a441279..c5937c8127999 100644
+--- a/crypto/af_alg.c
++++ b/crypto/af_alg.c
+@@ -302,8 +302,6 @@ int af_alg_accept(struct sock *sk, struct socket *newsock, bool kern)
+ 	if (err)
+ 		goto unlock;
  
-+int crypto_register_templates(struct crypto_template *tmpls, int count)
-+{
-+	int i, err;
-+
-+	for (i = 0; i < count; i++) {
-+		err = crypto_register_template(&tmpls[i]);
-+		if (err)
-+			goto out;
-+	}
-+	return 0;
-+
-+out:
-+	for (--i; i >= 0; --i)
-+		crypto_unregister_template(&tmpls[i]);
-+	return err;
-+}
-+EXPORT_SYMBOL_GPL(crypto_register_templates);
-+
- void crypto_unregister_template(struct crypto_template *tmpl)
- {
- 	struct crypto_instance *inst;
-@@ -523,6 +541,15 @@ void crypto_unregister_template(struct crypto_template *tmpl)
- }
- EXPORT_SYMBOL_GPL(crypto_unregister_template);
+-	sk2->sk_family = PF_ALG;
+-
+ 	if (nokey || !ask->refcnt++)
+ 		sock_hold(sk);
+ 	ask->nokey_refcnt += nokey;
+@@ -380,7 +378,6 @@ static int alg_create(struct net *net, struct socket *sock, int protocol,
+ 	sock->ops = &alg_proto_ops;
+ 	sock_init_data(sock, sk);
  
-+void crypto_unregister_templates(struct crypto_template *tmpls, int count)
-+{
-+	int i;
-+
-+	for (i = count - 1; i >= 0; --i)
-+		crypto_unregister_template(&tmpls[i]);
-+}
-+EXPORT_SYMBOL_GPL(crypto_unregister_templates);
-+
- static struct crypto_template *__crypto_lookup_template(const char *name)
- {
- 	struct crypto_template *q, *tmpl = NULL;
-diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
-index 093869f..4be38cd 100644
---- a/include/crypto/algapi.h
-+++ b/include/crypto/algapi.h
-@@ -143,7 +143,9 @@ struct ablkcipher_walk {
- void crypto_mod_put(struct crypto_alg *alg);
+-	sk->sk_family = PF_ALG;
+ 	sk->sk_destruct = alg_sock_destruct;
  
- int crypto_register_template(struct crypto_template *tmpl);
-+int crypto_register_templates(struct crypto_template *tmpls, int count);
- void crypto_unregister_template(struct crypto_template *tmpl);
-+void crypto_unregister_templates(struct crypto_template *tmpls, int count);
- struct crypto_template *crypto_lookup_template(const char *name);
- 
- int crypto_register_instance(struct crypto_template *tmpl,
+ 	return 0;
 -- 
-1.7.12.4
+2.20.1.97.g81188d93c3-goog
