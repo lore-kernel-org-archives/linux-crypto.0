@@ -1,67 +1,125 @@
-Return-Path: <SRS0=8/la=PM=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:56384 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727737AbfADEU5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Jan 2019 23:20:57 -0500
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 12/16] crypto: pcbc - remove ability to wrap internal ciphers
-Date: Thu,  3 Jan 2019 20:16:21 -0800
-Message-Id: <20190104041625.3259-13-ebiggers@kernel.org>
-In-Reply-To: <20190104041625.3259-1-ebiggers@kernel.org>
-References: <20190104041625.3259-1-ebiggers@kernel.org>
+Return-Path: <SRS0=+HSe=PS=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:42448 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728355AbfAJOYB (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 10 Jan 2019 09:24:01 -0500
+Received: by mail-wr1-f68.google.com with SMTP id q18so11558377wrx.9
+        for <linux-crypto@vger.kernel.org>; Thu, 10 Jan 2019 06:23:59 -0800 (PST)
+Date: Thu, 10 Jan 2019 14:23:55 +0000
+From: Daniel Thompson <daniel.thompson@linaro.org>
+To: Sumit Garg <sumit.garg@linaro.org>
+Cc: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, jens.wiklander@linaro.org,
+        mpm@selenic.com, herbert@gondor.apana.org.au, robh+dt@kernel.org,
+        mark.rutland@arm.com, arnd@arndb.de, gregkh@linuxfoundation.org,
+        ard.biesheuvel@linaro.org, bhsharma@redhat.com,
+        tee-dev@lists.linaro.org
+Subject: Re: [PATCH v2 3/4] tee: add supp_nowait flag in tee_context struct
+Message-ID: <20190110142355.bcgw62w2qk2mlzj6@holly.lan>
+References: <1547123097-16431-1-git-send-email-sumit.garg@linaro.org>
+ <1547123097-16431-4-git-send-email-sumit.garg@linaro.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1547123097-16431-4-git-send-email-sumit.garg@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Eric Biggers <ebiggers@google.com>
+On Thu, Jan 10, 2019 at 05:54:56PM +0530, Sumit Garg wrote:
+> This flag indicates that requests in this context should not wait for
+> tee-supplicant daemon to be started if not present and just return
+> with an error code. It is needed for requests which should be
+> non-blocking in nature like ones arising from TEE based kernel drivers
+> or any in kernel api that uses TEE internal client interface.
 
-Following commit 944585a64f5e ("crypto: x86/aes-ni - remove special
-handling of AES in PCBC mode"), it's no longer needed for the PCBC
-template to support wrapping a cipher that has the CRYPTO_ALG_INTERNAL
-flag set.  Thus, remove this now-unused functionality to make PCBC
-consistent with the other single block cipher templates.
+This patch seems out of order in the patch set: Doesn't
+optee_enumarate_devices() require this feature if it is to
+work correctly with a TEE that does not implement the enumeate pTA.
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- crypto/pcbc.c | 10 +++-------
- 1 file changed, 3 insertions(+), 7 deletions(-)
+If so better to implement the feature first so that
+optee_emumerate_devices() works correctly when it first appears.
 
-diff --git a/crypto/pcbc.c b/crypto/pcbc.c
-index 1b182dfedc948..4f97a9d069b62 100644
---- a/crypto/pcbc.c
-+++ b/crypto/pcbc.c
-@@ -219,18 +219,15 @@ static int crypto_pcbc_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	if (IS_ERR(algt))
- 		return PTR_ERR(algt);
- 
--	if (((algt->type ^ CRYPTO_ALG_TYPE_SKCIPHER) & algt->mask) &
--	    ~CRYPTO_ALG_INTERNAL)
-+	if ((algt->type ^ CRYPTO_ALG_TYPE_SKCIPHER) & algt->mask)
- 		return -EINVAL;
- 
- 	inst = kzalloc(sizeof(*inst) + sizeof(*spawn), GFP_KERNEL);
- 	if (!inst)
- 		return -ENOMEM;
- 
--	alg = crypto_get_attr_alg(tb, CRYPTO_ALG_TYPE_CIPHER |
--				      (algt->type & CRYPTO_ALG_INTERNAL),
--				  CRYPTO_ALG_TYPE_MASK |
--				  (algt->mask & CRYPTO_ALG_INTERNAL));
-+	alg = crypto_get_attr_alg(tb, CRYPTO_ALG_TYPE_CIPHER,
-+				  CRYPTO_ALG_TYPE_MASK);
- 	err = PTR_ERR(alg);
- 	if (IS_ERR(alg))
- 		goto err_free_inst;
-@@ -245,7 +242,6 @@ static int crypto_pcbc_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	if (err)
- 		goto err_drop_spawn;
- 
--	inst->alg.base.cra_flags = alg->cra_flags & CRYPTO_ALG_INTERNAL;
- 	inst->alg.base.cra_priority = alg->cra_priority;
- 	inst->alg.base.cra_blocksize = alg->cra_blocksize;
- 	inst->alg.base.cra_alignmask = alg->cra_alignmask;
--- 
-2.20.1
+> 
+> Signed-off-by: Sumit Garg <sumit.garg@linaro.org>
+> ---
+>  drivers/tee/optee/supp.c | 10 +++++++++-
+>  drivers/tee/tee_core.c   |  2 ++
+>  include/linux/tee_drv.h  |  6 ++++++
+>  3 files changed, 17 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/tee/optee/supp.c b/drivers/tee/optee/supp.c
+> index 43626e1..92f56b8 100644
+> --- a/drivers/tee/optee/supp.c
+> +++ b/drivers/tee/optee/supp.c
+> @@ -88,10 +88,18 @@ u32 optee_supp_thrd_req(struct tee_context *ctx, u32 func, size_t num_params,
+>  {
+>  	struct optee *optee = tee_get_drvdata(ctx->teedev);
+>  	struct optee_supp *supp = &optee->supp;
+> -	struct optee_supp_req *req = kzalloc(sizeof(*req), GFP_KERNEL);
+> +	struct optee_supp_req *req;
+>  	bool interruptable;
+>  	u32 ret;
+>  
+> +	/*
+> +	 * Return in case there is no supplicant available and
+> +	 * non-blocking request.
+> +	 */
+> +	if (!supp->ctx && ctx->supp_nowait)
+> +		return TEEC_ERROR_COMMUNICATION;
+> +
+> +	req = kzalloc(sizeof(*req), GFP_KERNEL);
+>  	if (!req)
+>  		return TEEC_ERROR_OUT_OF_MEMORY;
+>  
+> diff --git a/drivers/tee/tee_core.c b/drivers/tee/tee_core.c
+> index 9ddb89e..5d6c317 100644
+> --- a/drivers/tee/tee_core.c
+> +++ b/drivers/tee/tee_core.c
+> @@ -105,6 +105,7 @@ static int tee_open(struct inode *inode, struct file *filp)
+>  	if (IS_ERR(ctx))
+>  		return PTR_ERR(ctx);
+>  
+> +	ctx->supp_nowait = false;
+>  	filp->private_data = ctx;
+>  	return 0;
+>  }
+> @@ -981,6 +982,7 @@ tee_client_open_context(struct tee_context *start,
+>  	} while (IS_ERR(ctx) && PTR_ERR(ctx) != -ENOMEM);
+>  
+>  	put_device(put_dev);
+> +	ctx->supp_nowait = true;
+
+Why automatically set supp_nowait inside open_context() ?
+
+
+>  	return ctx;
+>  }
+>  EXPORT_SYMBOL_GPL(tee_client_open_context);
+> diff --git a/include/linux/tee_drv.h b/include/linux/tee_drv.h
+> index ed16bf1..fe1a920 100644
+> --- a/include/linux/tee_drv.h
+> +++ b/include/linux/tee_drv.h
+> @@ -49,6 +49,11 @@ struct tee_shm_pool;
+>   * @releasing:  flag that indicates if context is being released right now.
+>   *		It is needed to break circular dependency on context during
+>   *              shared memory release.
+> + * @supp_nowait: flag that indicates that requests in this context should not
+> + *              wait for tee-supplicant daemon to be started if not present
+> + *              and just return with an error code. It is needed for requests
+> + *              that arises from TEE based kernel drivers that should be
+> + *              non-blocking in nature.
+>   */
+>  struct tee_context {
+>  	struct tee_device *teedev;
+> @@ -56,6 +61,7 @@ struct tee_context {
+>  	void *data;
+>  	struct kref refcount;
+>  	bool releasing;
+> +	bool supp_nowait;
+>  };
+>  
+>  struct tee_param_memref {
+> -- 
+> 2.7.4
+> 
