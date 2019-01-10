@@ -1,68 +1,84 @@
-Return-Path: <SRS0=1Gsi=PR=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:57546 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726574AbfAIRWK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 9 Jan 2019 12:22:10 -0500
-Date: Wed, 9 Jan 2019 09:22:07 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: Kalyani Akula <kalyani.akula@xilinx.com>
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Kalyani Akula <kalyania@xilinx.com>,
-        Sarat Chand Savitala <saratcha@xilinx.com>
-Subject: Re: [RFC PATCH 2/3] crypto: Add Xilinx SHA3 driver
-Message-ID: <20190109172206.GA249140@gmail.com>
-References: <1546851776-3456-1-git-send-email-kalyani.akula@xilinx.com>
- <1546851776-3456-3-git-send-email-kalyani.akula@xilinx.com>
- <20190107165606.GA2077@gmail.com>
+Return-Path: <SRS0=+HSe=PS=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:59630 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727684AbfAJOD7 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 10 Jan 2019 09:03:59 -0500
+Date: Thu, 10 Jan 2019 22:03:49 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Christoph Hellwig <hch@lst.de>, linux-crypto@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-imx@nxp.com
+Subject: Re: [PATCH] crypto: caam - fix zero-length buffer DMA mapping
+Message-ID: <20190110140349.izbgn6jvab4r56at@gondor.apana.org.au>
+References: <20181219143644.22089-1-horia.geanta@nxp.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190107165606.GA2077@gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20181219143644.22089-1-horia.geanta@nxp.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jan 07, 2019 at 08:56:07AM -0800, Eric Biggers wrote:
-> Hi Kalyani,
+On Wed, Dec 19, 2018 at 04:36:44PM +0200, Horia Geantă wrote:
+> From: Aymen Sghaier <aymen.sghaier@nxp.com>
 > 
-> On Mon, Jan 07, 2019 at 02:32:55PM +0530, Kalyani Akula wrote:
-> > This patch adds SHA3 driver suuport for the Xilinx
-> > ZynqMP SoC.
-> > 
-> > Signed-off-by: Kalyani Akula <kalyani.akula@xilinx.com>
-> [...]
-> > +
-> > +static struct ahash_alg sha3_alg = {
-> > +	.init		= zynqmp_sha_init,
-> > +	.update		= zynqmp_sha_update,
-> > +	.final		= zynqmp_sha_final,
-> > +	.finup		= zynqmp_sha_finup,
-> > +	.digest		= zynqmp_sha_digest,
-> > +	.export		= zynqmp_sha_export,
-> > +	.import		= zynqmp_sha_import,
-> > +	.halg = {
-> > +		.digestsize	= SHA384_DIGEST_SIZE,
-> > +		.statesize	= sizeof(struct sha256_state),
-> > +		.base	= {
-> > +			.cra_name		= "xilinx-keccak-384",
-> > +			.cra_driver_name	= "zynqmp-keccak-384",
-> > +			.cra_priority		= 300,
-> > +			.cra_flags		= CRYPTO_ALG_ASYNC,
-> > +			.cra_blocksize		= SHA384_BLOCK_SIZE,
-> > +			.cra_ctxsize		= sizeof(struct zynqmp_sha_ctx),
-> > +			.cra_alignmask		= 0,
-> > +			.cra_module		= THIS_MODULE,
-> > +			.cra_init		= zynqmp_sha_cra_init,
-> > +		}
-> > +	}
-> > +};
+> Recent changes - probably DMA API related (generic and/or arm64-specific) -
+> exposed a case where driver maps a zero-length buffer:
+> ahash_init()->ahash_update()->ahash_final() with a zero-length string to
+> hash
 > 
-> cra_name needs to match an algorithm that has a generic implementation.
-> It should be "sha3-384", or is your hardware not compatible?
-> Also does your hardware not support sha3-256 and sha3-512?
+> kernel BUG at kernel/dma/swiotlb.c:475!
+> Internal error: Oops - BUG: 0 [#1] PREEMPT SMP
+> Modules linked in:
+> CPU: 2 PID: 1823 Comm: cryptomgr_test Not tainted 4.20.0-rc1-00108-g00c9fe37a7f2 #1
+> Hardware name: LS1046A RDB Board (DT)
+> pstate: 80000005 (Nzcv daif -PAN -UAO)
+> pc : swiotlb_tbl_map_single+0x170/0x2b8
+> lr : swiotlb_map_page+0x134/0x1f8
+> sp : ffff00000f79b8f0
+> x29: ffff00000f79b8f0 x28: 0000000000000000
+> x27: ffff0000093d0000 x26: 0000000000000000
+> x25: 00000000001f3ffe x24: 0000000000200000
+> x23: 0000000000000000 x22: 00000009f2c538c0
+> x21: ffff800970aeb410 x20: 0000000000000001
+> x19: ffff800970aeb410 x18: 0000000000000007
+> x17: 000000000000000e x16: 0000000000000001
+> x15: 0000000000000019 x14: c32cb8218a167fe8
+> x13: ffffffff00000000 x12: ffff80097fdae348
+> x11: 0000800976bca000 x10: 0000000000000010
+> x9 : 0000000000000000 x8 : ffff0000091fd6c8
+> x7 : 0000000000000000 x6 : 00000009f2c538bf
+> x5 : 0000000000000000 x4 : 0000000000000001
+> x3 : 0000000000000000 x2 : 00000009f2c538c0
+> x1 : 00000000f9fff000 x0 : 0000000000000000
+> Process cryptomgr_test (pid: 1823, stack limit = 0x(____ptrval____))
+> Call trace:
+>  swiotlb_tbl_map_single+0x170/0x2b8
+>  swiotlb_map_page+0x134/0x1f8
+>  ahash_final_no_ctx+0xc4/0x6cc
+>  ahash_final+0x10/0x18
+>  crypto_ahash_op+0x30/0x84
+>  crypto_ahash_final+0x14/0x1c
+>  __test_hash+0x574/0xe0c
+>  test_hash+0x28/0x80
+>  __alg_test_hash+0x84/0xd0
+>  alg_test_hash+0x78/0x144
+>  alg_test.part.30+0x12c/0x2b4
+>  alg_test+0x3c/0x68
+>  cryptomgr_test+0x44/0x4c
+>  kthread+0xfc/0x128
+>  ret_from_fork+0x10/0x18
+> Code: d34bfc18 2a1a03f7 1a9f8694 35fff89a (d4210000)
 > 
-> - Eric
+> Cc: <stable@vger.kernel.org>
+> Signed-off-by: Aymen Sghaier <aymen.sghaier@nxp.com>
+> Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
 
-Hi Kalyani, this was not addressed in v2.
-
-- Eric
+Patch applied.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
