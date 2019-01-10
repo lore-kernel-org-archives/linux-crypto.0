@@ -1,152 +1,166 @@
-Return-Path: <SRS0=g5s/=PY=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from szxga06-in.huawei.com ([45.249.212.32]:56338 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1730079AbfAPCvc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Jan 2019 21:51:32 -0500
-From: Xiongfeng Wang <wangxiongfeng2@huawei.com>
-To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <wangxiongfeng2@huawei.com>, <broonie@kernel.org>,
-        <ard.biesheuvel@linaro.org>, <jonathan.cameron@huawei.com>
-Subject: [PATCH 3/5] crypto: gcm - use template array registering API to simplify the code
-Date: Wed, 16 Jan 2019 10:50:32 +0800
-Message-ID: <1547607034-40948-4-git-send-email-wangxiongfeng2@huawei.com>
-In-Reply-To: <1547607034-40948-1-git-send-email-wangxiongfeng2@huawei.com>
-References: <1547607034-40948-1-git-send-email-wangxiongfeng2@huawei.com>
+Return-Path: <SRS0=+HSe=PS=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:53242 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729080AbfAJUSY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 10 Jan 2019 15:18:24 -0500
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [PATCH 09/11] crypto: af_alg - make some functions static
+Date: Thu, 10 Jan 2019 12:18:00 -0800
+Message-Id: <20190110201802.82442-10-ebiggers@kernel.org>
+In-Reply-To: <20190110201802.82442-1-ebiggers@kernel.org>
+References: <20190110201802.82442-1-ebiggers@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Use crypto template array registering API to simplify the code.
+From: Eric Biggers <ebiggers@google.com>
 
-Signed-off-by: Xiongfeng Wang <xiongfeng.wang@linaro.org>
+Some exported functions in af_alg.c aren't used outside of that file.
+Therefore, un-export them and make them 'static'.
+
+Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/gcm.c | 76 +++++++++++++++++++++---------------------------------------
- 1 file changed, 26 insertions(+), 50 deletions(-)
+ crypto/af_alg.c         | 20 +++++++-------------
+ include/crypto/if_alg.h |  7 -------
+ 2 files changed, 7 insertions(+), 20 deletions(-)
 
-diff --git a/crypto/gcm.c b/crypto/gcm.c
-index e438492..c8d5fe3 100644
---- a/crypto/gcm.c
-+++ b/crypto/gcm.c
-@@ -727,12 +727,6 @@ static int crypto_gcm_create(struct crypto_template *tmpl, struct rtattr **tb)
- 					ctr_name, "ghash");
+diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+index 17eb09d222ff4..ccae4a7ada8ab 100644
+--- a/crypto/af_alg.c
++++ b/crypto/af_alg.c
+@@ -425,12 +425,12 @@ int af_alg_make_sg(struct af_alg_sgl *sgl, struct iov_iter *iter, int len)
  }
+ EXPORT_SYMBOL_GPL(af_alg_make_sg);
  
--static struct crypto_template crypto_gcm_tmpl = {
--	.name = "gcm",
--	.create = crypto_gcm_create,
--	.module = THIS_MODULE,
--};
--
- static int crypto_gcm_base_create(struct crypto_template *tmpl,
- 				  struct rtattr **tb)
+-void af_alg_link_sg(struct af_alg_sgl *sgl_prev, struct af_alg_sgl *sgl_new)
++static void af_alg_link_sg(struct af_alg_sgl *sgl_prev,
++			   struct af_alg_sgl *sgl_new)
  {
-@@ -756,12 +750,6 @@ static int crypto_gcm_base_create(struct crypto_template *tmpl,
- 					ctr_name, ghash_name);
+ 	sg_unmark_end(sgl_prev->sg + sgl_prev->npages - 1);
+ 	sg_chain(sgl_prev->sg, sgl_prev->npages + 1, sgl_new->sg);
  }
+-EXPORT_SYMBOL_GPL(af_alg_link_sg);
  
--static struct crypto_template crypto_gcm_base_tmpl = {
--	.name = "gcm_base",
--	.create = crypto_gcm_base_create,
--	.module = THIS_MODULE,
--};
--
- static int crypto_rfc4106_setkey(struct crypto_aead *parent, const u8 *key,
- 				 unsigned int keylen)
+ void af_alg_free_sg(struct af_alg_sgl *sgl)
  {
-@@ -989,12 +977,6 @@ static int crypto_rfc4106_create(struct crypto_template *tmpl,
- 	goto out;
+@@ -441,7 +441,7 @@ void af_alg_free_sg(struct af_alg_sgl *sgl)
  }
+ EXPORT_SYMBOL_GPL(af_alg_free_sg);
  
--static struct crypto_template crypto_rfc4106_tmpl = {
--	.name = "rfc4106",
--	.create = crypto_rfc4106_create,
--	.module = THIS_MODULE,
--};
--
- static int crypto_rfc4543_setkey(struct crypto_aead *parent, const u8 *key,
- 				 unsigned int keylen)
+-int af_alg_cmsg_send(struct msghdr *msg, struct af_alg_control *con)
++static int af_alg_cmsg_send(struct msghdr *msg, struct af_alg_control *con)
  {
-@@ -1231,10 +1213,27 @@ static int crypto_rfc4543_create(struct crypto_template *tmpl,
- 	goto out;
+ 	struct cmsghdr *cmsg;
+ 
+@@ -480,7 +480,6 @@ int af_alg_cmsg_send(struct msghdr *msg, struct af_alg_control *con)
+ 
+ 	return 0;
  }
+-EXPORT_SYMBOL_GPL(af_alg_cmsg_send);
  
--static struct crypto_template crypto_rfc4543_tmpl = {
--	.name = "rfc4543",
--	.create = crypto_rfc4543_create,
--	.module = THIS_MODULE,
-+static struct crypto_template crypto_gcm_tmpl[] = {
-+	{
-+		.name = "gcm_base",
-+		.create = crypto_gcm_base_create,
-+		.module = THIS_MODULE,
-+	},
-+	{
-+		.name = "gcm",
-+		.create = crypto_gcm_create,
-+		.module = THIS_MODULE,
-+	},
-+	{
-+		.name = "rfc4106",
-+		.create = crypto_rfc4106_create,
-+		.module = THIS_MODULE,
-+	},
-+	{
-+		.name = "rfc4543",
-+		.create = crypto_rfc4543_create,
-+		.module = THIS_MODULE,
-+	},
- };
+ /**
+  * af_alg_alloc_tsgl - allocate the TX SGL
+@@ -488,7 +487,7 @@ EXPORT_SYMBOL_GPL(af_alg_cmsg_send);
+  * @sk socket of connection to user space
+  * @return: 0 upon success, < 0 upon error
+  */
+-int af_alg_alloc_tsgl(struct sock *sk)
++static int af_alg_alloc_tsgl(struct sock *sk)
+ {
+ 	struct alg_sock *ask = alg_sk(sk);
+ 	struct af_alg_ctx *ctx = ask->private;
+@@ -517,7 +516,6 @@ int af_alg_alloc_tsgl(struct sock *sk)
  
- static int __init crypto_gcm_module_init(void)
-@@ -1247,42 +1246,19 @@ static int __init crypto_gcm_module_init(void)
+ 	return 0;
+ }
+-EXPORT_SYMBOL_GPL(af_alg_alloc_tsgl);
  
- 	sg_init_one(&gcm_zeroes->sg, gcm_zeroes->buf, sizeof(gcm_zeroes->buf));
+ /**
+  * aead_count_tsgl - Count number of TX SG entries
+@@ -654,7 +652,7 @@ EXPORT_SYMBOL_GPL(af_alg_pull_tsgl);
+  *
+  * @areq Request holding the TX and RX SGL
+  */
+-void af_alg_free_areq_sgls(struct af_alg_async_req *areq)
++static void af_alg_free_areq_sgls(struct af_alg_async_req *areq)
+ {
+ 	struct sock *sk = areq->sk;
+ 	struct alg_sock *ask = alg_sk(sk);
+@@ -683,7 +681,6 @@ void af_alg_free_areq_sgls(struct af_alg_async_req *areq)
+ 		sock_kfree_s(sk, tsgl, areq->tsgl_entries * sizeof(*tsgl));
+ 	}
+ }
+-EXPORT_SYMBOL_GPL(af_alg_free_areq_sgls);
  
--	err = crypto_register_template(&crypto_gcm_base_tmpl);
--	if (err)
--		goto out;
--
--	err = crypto_register_template(&crypto_gcm_tmpl);
-+	err = crypto_register_templates(crypto_gcm_tmpl,
-+			ARRAY_SIZE(crypto_gcm_tmpl));
- 	if (err)
--		goto out_undo_base;
-+		kfree(gcm_zeroes);
+ /**
+  * af_alg_wait_for_wmem - wait for availability of writable memory
+@@ -692,7 +689,7 @@ EXPORT_SYMBOL_GPL(af_alg_free_areq_sgls);
+  * @flags If MSG_DONTWAIT is set, then only report if function would sleep
+  * @return 0 when writable memory is available, < 0 upon error
+  */
+-int af_alg_wait_for_wmem(struct sock *sk, unsigned int flags)
++static int af_alg_wait_for_wmem(struct sock *sk, unsigned int flags)
+ {
+ 	DEFINE_WAIT_FUNC(wait, woken_wake_function);
+ 	int err = -ERESTARTSYS;
+@@ -717,7 +714,6 @@ int af_alg_wait_for_wmem(struct sock *sk, unsigned int flags)
  
--	err = crypto_register_template(&crypto_rfc4106_tmpl);
--	if (err)
--		goto out_undo_gcm;
--
--	err = crypto_register_template(&crypto_rfc4543_tmpl);
--	if (err)
--		goto out_undo_rfc4106;
--
--	return 0;
--
--out_undo_rfc4106:
--	crypto_unregister_template(&crypto_rfc4106_tmpl);
--out_undo_gcm:
--	crypto_unregister_template(&crypto_gcm_tmpl);
--out_undo_base:
--	crypto_unregister_template(&crypto_gcm_base_tmpl);
--out:
--	kfree(gcm_zeroes);
  	return err;
  }
+-EXPORT_SYMBOL_GPL(af_alg_wait_for_wmem);
  
- static void __exit crypto_gcm_module_exit(void)
+ /**
+  * af_alg_wmem_wakeup - wakeup caller when writable memory is available
+@@ -786,8 +782,7 @@ EXPORT_SYMBOL_GPL(af_alg_wait_for_data);
+  *
+  * @sk socket of connection to user space
+  */
+-
+-void af_alg_data_wakeup(struct sock *sk)
++static void af_alg_data_wakeup(struct sock *sk)
  {
- 	kfree(gcm_zeroes);
--	crypto_unregister_template(&crypto_rfc4543_tmpl);
--	crypto_unregister_template(&crypto_rfc4106_tmpl);
--	crypto_unregister_template(&crypto_gcm_tmpl);
--	crypto_unregister_template(&crypto_gcm_base_tmpl);
-+	crypto_unregister_templates(crypto_gcm_tmpl,
-+			ARRAY_SIZE(crypto_gcm_tmpl));
+ 	struct alg_sock *ask = alg_sk(sk);
+ 	struct af_alg_ctx *ctx = ask->private;
+@@ -805,7 +800,6 @@ void af_alg_data_wakeup(struct sock *sk)
+ 	sk_wake_async(sk, SOCK_WAKE_SPACE, POLL_OUT);
+ 	rcu_read_unlock();
+ }
+-EXPORT_SYMBOL_GPL(af_alg_data_wakeup);
+ 
+ /**
+  * af_alg_sendmsg - implementation of sendmsg system call handler
+diff --git a/include/crypto/if_alg.h b/include/crypto/if_alg.h
+index 482461d8931d9..0d464db74bf53 100644
+--- a/include/crypto/if_alg.h
++++ b/include/crypto/if_alg.h
+@@ -169,9 +169,6 @@ int af_alg_accept(struct sock *sk, struct socket *newsock, bool kern);
+ 
+ int af_alg_make_sg(struct af_alg_sgl *sgl, struct iov_iter *iter, int len);
+ void af_alg_free_sg(struct af_alg_sgl *sgl);
+-void af_alg_link_sg(struct af_alg_sgl *sgl_prev, struct af_alg_sgl *sgl_new);
+-
+-int af_alg_cmsg_send(struct msghdr *msg, struct af_alg_control *con);
+ 
+ static inline struct alg_sock *alg_sk(struct sock *sk)
+ {
+@@ -230,15 +227,11 @@ static inline bool af_alg_readable(struct sock *sk)
+ 	return PAGE_SIZE <= af_alg_rcvbuf(sk);
  }
  
- module_init(crypto_gcm_module_init);
+-int af_alg_alloc_tsgl(struct sock *sk);
+ unsigned int af_alg_count_tsgl(struct sock *sk, size_t bytes, size_t offset);
+ void af_alg_pull_tsgl(struct sock *sk, size_t used, struct scatterlist *dst,
+ 		      size_t dst_offset);
+-void af_alg_free_areq_sgls(struct af_alg_async_req *areq);
+-int af_alg_wait_for_wmem(struct sock *sk, unsigned int flags);
+ void af_alg_wmem_wakeup(struct sock *sk);
+ int af_alg_wait_for_data(struct sock *sk, unsigned flags);
+-void af_alg_data_wakeup(struct sock *sk);
+ int af_alg_sendmsg(struct socket *sock, struct msghdr *msg, size_t size,
+ 		   unsigned int ivsize);
+ ssize_t af_alg_sendpage(struct socket *sock, struct page *page,
 -- 
-1.7.12.4
+2.20.1.97.g81188d93c3-goog
