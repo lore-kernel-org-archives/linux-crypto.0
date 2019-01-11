@@ -1,74 +1,62 @@
-Return-Path: <SRS0=8/la=PM=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:56344 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726132AbfADEUy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Jan 2019 23:20:54 -0500
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 00/16] crypto: skcipher template simplifications and conversions
-Date: Thu,  3 Jan 2019 20:16:09 -0800
-Message-Id: <20190104041625.3259-1-ebiggers@kernel.org>
+Return-Path: <SRS0=CSIn=PT=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:33188 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729109AbfAKG1p (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 11 Jan 2019 01:27:45 -0500
+Date: Fri, 11 Jan 2019 14:27:21 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-imx <linux-imx@nxp.com>
+Subject: Re: [PATCH RESEND] crypto: caam - move shared symbols in a common
+ location
+Message-ID: <20190111062721.47a52keto3u6jfdi@gondor.apana.org.au>
+References: <20190110135812.12457-1-horia.geanta@nxp.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190110135812.12457-1-horia.geanta@nxp.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello,
+On Thu, Jan 10, 2019 at 03:58:12PM +0200, Horia Geantă wrote:
+> There are several issues with symbols shared b/w:
+> -caam/jr and caam/qi drivers on one hand
+> -caam/qi2 driver on the other hand
+> 
+> Commit 52813ab24959 ("crypto: caam/qi2 - avoid double export") fixed
+> some of them, however compilation still fails for CRYPTO_DEV_FSL_CAAM=m
+> and CRYPTO_DEV_FSL_DPAA2_CAAM=y.
+> 
+> Another issue is related to dependency cycles reported by depmod when
+> CRYPTO_DEV_FSL_CAAM=n and CRYPTO_DEV_FSL_DPAA2_CAAM=m, as mentioned in
+> 82c7b351be3f ("Revert "arm64: defconfig: Enable FSL_MC_BUS and FSL_MC_DPIO"")
+> 
+> To fix all these, move the symbols shared by these drivers in a common
+> location. The only existing possibility is error.c file (note that naming
+> doesn't help and should probably change).
+> 
+> Fixes: 52813ab24959 ("crypto: caam/qi2 - avoid double export")
+> Reported-by: Arnd Bergmann <arnd@arndb.de>
+> Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
+> ---
+> 
+> Resending to fix patchwork tracking.
+> Initial submission done inline here:
+> https://patchwork.kernel.org/patch/10739071/
+> 
+>  drivers/crypto/caam/caamalg_qi2.c | 7 -------
+>  drivers/crypto/caam/ctrl.c        | 4 ----
+>  drivers/crypto/caam/error.c       | 6 ++++++
+>  3 files changed, 6 insertions(+), 11 deletions(-)
 
-This series adds a function skcipher_alloc_instance_simple() that
-greatly simplifies creating an skcipher_instance that uses a single
-underlying block cipher.  It then converts the cbc, cfb, ctr, ecb, kw,
-ofb, and pcbc templates to use it.  In doing so, ctr, ecb, and kw are
-also converted from the deprecated "blkcipher" API to the skcipher API.
-
-While doing this, I also found some rather silly bugs in the cfb, ofb,
-and pcbc templates...  So I've included the fixes for these first, in
-patches 1-4.  Please consider taking these first 4 patches through
-'crypto' rather than 'cryptodev'.  (But 5-16 are cleanups only, so no
-rush on those.)
-
-Finally, I also converted ecb(arc4) and ecb(cipher_null) to the skcipher
-API, since following the template conversions these were the last
-generic algorithms that were still using the "blkcipher" API.
-
-The overall delta is almost 500 lines removed, due to removing a lot of
-boilerplate that created algorithm instances.
-
-Eric Biggers (16):
-  crypto: cfb - add missing 'chunksize' property
-  crypto: cfb - remove bogus memcpy() with src == dest
-  crypto: ofb - fix handling partial blocks and make thread-safe
-  crypto: pcbc - remove bogus memcpy()s with src == dest
-  crypto: skcipher - add helper for simple block cipher modes
-  crypto: cbc - convert to skcipher_alloc_instance_simple()
-  crypto: cfb - convert to skcipher_alloc_instance_simple()
-  crypto: ctr - convert to skcipher API
-  crypto: ecb - convert to skcipher API
-  crypto: keywrap - convert to skcipher API
-  crypto: ofb - convert to skcipher_alloc_instance_simple()
-  crypto: pcbc - remove ability to wrap internal ciphers
-  crypto: pcbc - convert to skcipher_alloc_instance_simple()
-  crypto: arc4 - convert to skcipher API
-  crypto: null - convert ecb-cipher_null to skcipher API
-  crypto: algapi - remove crypto_alloc_instance()
-
- crypto/algapi.c                    |  33 +----
- crypto/arc4.c                      |  82 ++++++------
- crypto/cbc.c                       | 131 ++-----------------
- crypto/cfb.c                       | 139 +++-----------------
- crypto/crypto_null.c               |  57 ++++----
- crypto/ctr.c                       | 160 ++++++-----------------
- crypto/ecb.c                       | 151 +++++----------------
- crypto/keywrap.c                   | 198 ++++++++++------------------
- crypto/ofb.c                       | 202 ++++++-----------------------
- crypto/pcbc.c                      | 143 +++-----------------
- crypto/skcipher.c                  | 131 +++++++++++++++++++
- crypto/testmgr.h                   |  53 +++++++-
- include/crypto/algapi.h            |   6 +-
- include/crypto/internal/hash.h     |   6 +-
- include/crypto/internal/skcipher.h |  15 +++
- 15 files changed, 508 insertions(+), 999 deletions(-)
-
+Patch applied.  Thanks.
 -- 
-2.20.1
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
