@@ -1,229 +1,88 @@
-Return-Path: <SRS0=fnEV=PW=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:45446 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726708AbfANRxU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Jan 2019 12:53:20 -0500
-Date: Mon, 14 Jan 2019 09:53:16 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        James Bottomley <James.Bottomley@hansenpartnership.com>,
-        Andy Lutomirski <luto@amacapital.net>,
-        "Lee, Chun-Yi" <joeyli.kernel@gmail.com>,
-        "Rafael J . Wysocki" <rjw@rjwysocki.net>,
-        Pavel Machek <pavel@ucw.cz>, linux-kernel@vger.kernel.org,
-        linux-pm@vger.kernel.org, keyrings@vger.kernel.org,
-        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-        Chen Yu <yu.c.chen@intel.com>,
-        Oliver Neukum <oneukum@suse.com>,
-        Ryan Chen <yu.chen.surf@gmail.com>,
-        David Howells <dhowells@redhat.com>,
-        Giovanni Gherdovich <ggherdovich@suse.cz>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Jann Horn <jannh@google.com>,
-        Andy Lutomirski <luto@kernel.org>, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 4/6] crypto: hkdf - RFC5869 Key Derivation Function
-Message-ID: <20190114175315.GB7644@gmail.com>
-References: <20190103143227.9138-1-jlee@suse.com>
- <2423373.Zd5ThvQH5g@positron.chronox.de>
- <20190112051252.GA639@sol.localdomain>
- <4734428.Gj5BGI4uxL@positron.chronox.de>
+Return-Path: <SRS0=CSIn=PT=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:33258 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725773AbfAKGeB (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 11 Jan 2019 01:34:01 -0500
+Date: Fri, 11 Jan 2019 14:33:58 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org
+Subject: Re: [PATCH 00/16] crypto: skcipher template simplifications and
+ conversions
+Message-ID: <20190111063358.pjm776fanp4dspvl@gondor.apana.org.au>
+References: <20190104041625.3259-1-ebiggers@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <4734428.Gj5BGI4uxL@positron.chronox.de>
+In-Reply-To: <20190104041625.3259-1-ebiggers@kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jan 14, 2019 at 10:30:39AM +0100, Stephan Müller wrote:
-> Am Samstag, 12. Januar 2019, 06:12:54 CET schrieb Eric Biggers:
+On Thu, Jan 03, 2019 at 08:16:09PM -0800, Eric Biggers wrote:
+> Hello,
 > 
-> Hi Eric,
+> This series adds a function skcipher_alloc_instance_simple() that
+> greatly simplifies creating an skcipher_instance that uses a single
+> underlying block cipher.  It then converts the cbc, cfb, ctr, ecb, kw,
+> ofb, and pcbc templates to use it.  In doing so, ctr, ecb, and kw are
+> also converted from the deprecated "blkcipher" API to the skcipher API.
 > 
-> [...]
-> 
-> > > The extract and expand phases use different instances of the underlying
-> > > keyed message digest cipher to ensure that while the extraction phase
-> > > generates a new key for the expansion phase, the cipher for the
-> > > expansion phase can still be used. This approach is intended to aid
-> > > multi-threaded uses cases.
-> > 
-> > I think you partially misunderstood what I was asking for.  One HMAC tfm is
-> > sufficient as long as HKDF-Expand is separated from HKDF-Extract, which
-> > you've done.  So just use one HMAC tfm, and in crypto_hkdf_seed() key it
-> > with the 'salt', and then afterwards with the 'prk'.
-> 
-> Ok, thanks for the clarification. I will remove the 2nd HMAC TFM then.
-> > 
-> > Also everywhere in this patchset, please avoid using the word "cipher" to
-> > refer to algorithms that are not encryption/decryption.  I know a lot of
-> > the crypto API docs do this, but I think it is a mistake and confusing. 
-> > Hash algorithms and KDFs are not "ciphers".
-> 
-> As you wish, I will refer to specific name of the cryptographic operation.
-> 
-> [...]
-> 
-> > > + * NOTE: In-place cipher operations are not supported.
-> > > + */
-> > 
-> > What does an "in-place cipher operation" mean in this context?  That the
-> > 'info' buffer must not overlap the 'dst' buffer? 
-> 
-> Correct, no overlapping.
-> 
-> > Maybe
-> > crypto_rng_generate() should check that for all crypto_rngs?  Or is it
-> > different for different crypto_rngs?
-> 
-> This is the case in general for all KDFs (and even RNGs). It is no technical 
-> or cryptographic error to have overlapping buffers. The only issue is that the 
-> result will not match the expected value.
-> 
-> The issue is that the input buffer to the generate function is an input to 
-> every round of the KDF. If the input and output buffer overlap, starting with 
-> the 2nd iteration of the KDF, the input is the output of the 1st round. Again, 
-> I do not think it is a cryptographic error though.
-> 
-> (To support my conclusion: A colleague of mine has proposed an update to the 
-> HKDF specification where the input data changes for each KDF round. This 
-> proposal was considered appropriate by one of the authors of HKDF.)
-> 
-> If the requested output is smaller or equal to the output block size of the 
-> KDF, overlapping buffers are even harmless since the implementation will 
-> calculate the correct output.
-> 
-> Due to that, I removed the statement. But I am not sure we should add a 
-> technical block to deny overlapping input/output buffers.
-> 
-> [...]
-> > > 
-> > > +	desc->flags = crypto_shash_get_flags(expand_kmd) &
-> > > +		      CRYPTO_TFM_REQ_MAY_SLEEP;
-> > 
-> > This line setting desc->flags doesn't make sense.  How is the user meant to
-> > control whether crypto_rng_generate() can sleep or not?  Or can it always
-> > sleep? Either way this part is wrong since the user can't get access to the
-> > HMAC tfm to set this flag being checked for.
-> 
-> Could you please help me why a user should set this flag? Isn't the 
-> implementation specifying that flag to allow identifying whether the 
-> implementation could or could not sleep? Thus, we simply copy the sleeping 
-> flag from the lower level keyed message digest implementation.
-> 
-> At least that is also the implementation found in crypto/hmac.c.
-> 
-> [...]
+> While doing this, I also found some rather silly bugs in the cfb, ofb,
+> and pcbc templates...  So I've included the fixes for these first, in
+> patches 1-4.  Please consider taking these first 4 patches through
+> 'crypto' rather than 'cryptodev'.  (But 5-16 are cleanups only, so no
+> rush on those.)
 
-Whether the crypto_shash* stuff can sleep is controlled on a per-request basis,
-not a per-implementation basis.  So I don't understand what you are talking
-about here.
+I have decided to push all of these through cryptodev because
+it's not clear whether the first four bug fixes are serious enough 
+to warrant going through straight away.  If I'm wrong please let
+me know.
 
+> Finally, I also converted ecb(arc4) and ecb(cipher_null) to the skcipher
+> API, since following the template conversions these were the last
+> generic algorithms that were still using the "blkcipher" API.
 > 
-> > > +		if (dlen < h) {
-> > > +			u8 tmpbuffer[CRYPTO_HKDF_MAX_DIGESTSIZE];
-> > > +
-> > > +			err = crypto_shash_finup(desc, &ctr, 1, tmpbuffer);
-> > > +			if (err)
-> > > +				goto out;
-> > > +			memcpy(dst, tmpbuffer, dlen);
-> > > +			memzero_explicit(tmpbuffer, h);
-> > > +			goto out;
-> > > +		} else {
-> > 
-> > No need for the 'else'.
+> The overall delta is almost 500 lines removed, due to removing a lot of
+> boilerplate that created algorithm instances.
 > 
-> Could you please help me why that else branch is not needed? If the buffer to 
-> be generated is equal or larger than the output block length of the keyed 
-> message digest, I would like to directly operate on the output buffer to avoid 
-> a memcpy.
+> Eric Biggers (16):
+>   crypto: cfb - add missing 'chunksize' property
+>   crypto: cfb - remove bogus memcpy() with src == dest
+>   crypto: ofb - fix handling partial blocks and make thread-safe
+>   crypto: pcbc - remove bogus memcpy()s with src == dest
+>   crypto: skcipher - add helper for simple block cipher modes
+>   crypto: cbc - convert to skcipher_alloc_instance_simple()
+>   crypto: cfb - convert to skcipher_alloc_instance_simple()
+>   crypto: ctr - convert to skcipher API
+>   crypto: ecb - convert to skcipher API
+>   crypto: keywrap - convert to skcipher API
+>   crypto: ofb - convert to skcipher_alloc_instance_simple()
+>   crypto: pcbc - remove ability to wrap internal ciphers
+>   crypto: pcbc - convert to skcipher_alloc_instance_simple()
+>   crypto: arc4 - convert to skcipher API
+>   crypto: null - convert ecb-cipher_null to skcipher API
+>   crypto: algapi - remove crypto_alloc_instance()
+> 
+>  crypto/algapi.c                    |  33 +----
+>  crypto/arc4.c                      |  82 ++++++------
+>  crypto/cbc.c                       | 131 ++-----------------
+>  crypto/cfb.c                       | 139 +++-----------------
+>  crypto/crypto_null.c               |  57 ++++----
+>  crypto/ctr.c                       | 160 ++++++-----------------
+>  crypto/ecb.c                       | 151 +++++----------------
+>  crypto/keywrap.c                   | 198 ++++++++++------------------
+>  crypto/ofb.c                       | 202 ++++++-----------------------
+>  crypto/pcbc.c                      | 143 +++-----------------
+>  crypto/skcipher.c                  | 131 +++++++++++++++++++
+>  crypto/testmgr.h                   |  53 +++++++-
+>  include/crypto/algapi.h            |   6 +-
+>  include/crypto/internal/hash.h     |   6 +-
+>  include/crypto/internal/skcipher.h |  15 +++
+>  15 files changed, 508 insertions(+), 999 deletions(-)
 
-I'm simply saying you don't need the 'else' keyword as the previous block ends
-with a goto.
-
-> > 
-> > > +			err = crypto_shash_finup(desc, &ctr, 1, dst);
-> > > +			if (err)
-> > > +				goto out;
-> > > +
-> > > +			prev = dst;
-> > > +			dst += h;
-> > > +			dlen -= h;
-> > > +			ctr++;
-> > > +		}
-> > > +	}
-> 
-> [...]
-> > 
-> > > +	struct crypto_shash *extract_kmd = ctx->extract_kmd;
-> > > +	struct crypto_shash *expand_kmd = ctx->expand_kmd;
-> > > +	struct rtattr *rta = (struct rtattr *)seed;
-> > > +	SHASH_DESC_ON_STACK(desc, extract_kmd);
-> > > +	u32 saltlen;
-> > > +	unsigned int h = crypto_shash_digestsize(extract_kmd);
-> > > +	int err;
-> > > +	const uint8_t null_salt[CRYPTO_HKDF_MAX_DIGESTSIZE] = { 0 };
-> > 
-> > static const
-> > 
-> 
-> Why would I want to turn that buffer into a static variable? All we need it 
-> for is in case there is no salt provided.
-> 
-> [...]
-> 
-> > > +
-> > > +	if (!RTA_OK(rta, slen))
-> > > +		return -EINVAL;
-> > > +	if (rta->rta_type != 1)
-> > > +		return -EINVAL;
-> > > +	if (RTA_PAYLOAD(rta) < sizeof(saltlen))
-> > > +		return -EINVAL;
-> > > +	saltlen = *((u32 *)RTA_DATA(rta));
-> > 
-> > I'm guessing you copied the weird "length as a rtattr payload" approach from
-> > the authenc template.  I think it's not necessary.  And it's overly
-> > error-prone, as shown by the authenc template getting the parsing wrong for
-> > years and you making the exact same mistake again here...
-> > (See https://patchwork.kernel.org/patch/10732803/)  How about just using a
-> > u32 at the beginning without the 'rtattr' preceding it?
-> 
-> I was not sure whether this approach would be acceptable. I very much would 
-> love to have a u32 pre-pended only without the RTA business.
-> 
-> I updated the implementation accordingly.
-> > 
-> [...]
-> 
-> > 
-> > > +	alg = &salg->base;
-> > 
-> > Check here that the underlying algorithm really is "hmac(" something?
-> 
-> I added a check for the presence of salg->setkey.
-> > 
-> > Alternatively it may be a good idea to simplify usage by making the template
-> > just take the unkeyed hash directly, like "hkdf(sha512)".  And if any users
-> > really need to specify a specific HMAC implementation then another template
-> > usable as "hkdf_base(hmac(sha512))" could be added later.
-> > 
-> 
-> I would not suggest this, because that rounds contrary to the concept of the 
-> kernel crypto API IMHO. The caller has to provide the wrapping cipher. It is 
-> perfectly viable to allow a caller to invoke a specific keyed message digest.
-> 
-
-Sure, but it would not conform to the HKDF specification.  Are you sure it is
-okay to specify an arbitrary keyed hash?
-
-> [...]
-> 
-> Thank you very much for your code review.
-> 
-> Ciao
-> Stephan
-> 
-> 
-
-- Eric
+All applied.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
