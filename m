@@ -1,175 +1,151 @@
-Return-Path: <SRS0=+HSe=PS=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:38860 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728352AbfAJMZo (ORCPT
+Return-Path: <SRS0=CSIn=PT=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mo4-p03-ob.smtp.rzone.de ([81.169.146.175]:32571 "EHLO
+        mo4-p03-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729364AbfAKTOP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Jan 2019 07:25:44 -0500
-Received: by mail-pl1-f193.google.com with SMTP id e5so5119274plb.5
-        for <linux-crypto@vger.kernel.org>; Thu, 10 Jan 2019 04:25:43 -0800 (PST)
-From: Sumit Garg <sumit.garg@linaro.org>
-To: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, jens.wiklander@linaro.org,
-        mpm@selenic.com, herbert@gondor.apana.org.au, robh+dt@kernel.org,
-        mark.rutland@arm.com, arnd@arndb.de, gregkh@linuxfoundation.org,
-        daniel.thompson@linaro.org, ard.biesheuvel@linaro.org,
-        bhsharma@redhat.com, tee-dev@lists.linaro.org,
-        Sumit Garg <sumit.garg@linaro.org>
-Subject: [PATCH v2 1/4] tee: add bus driver framework for TEE based devices
-Date: Thu, 10 Jan 2019 17:54:54 +0530
-Message-Id: <1547123097-16431-2-git-send-email-sumit.garg@linaro.org>
-In-Reply-To: <1547123097-16431-1-git-send-email-sumit.garg@linaro.org>
-References: <1547123097-16431-1-git-send-email-sumit.garg@linaro.org>
+        Fri, 11 Jan 2019 14:14:15 -0500
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        Andy Lutomirski <luto@amacapital.net>,
+        "Lee, Chun-Yi" <joeyli.kernel@gmail.com>,
+        "Rafael J . Wysocki" <rjw@rjwysocki.net>,
+        Pavel Machek <pavel@ucw.cz>, linux-kernel@vger.kernel.org,
+        linux-pm@vger.kernel.org, keyrings@vger.kernel.org,
+        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+        Chen Yu <yu.c.chen@intel.com>,
+        Oliver Neukum <oneukum@suse.com>,
+        Ryan Chen <yu.chen.surf@gmail.com>,
+        David Howells <dhowells@redhat.com>,
+        Giovanni Gherdovich <ggherdovich@suse.cz>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Jann Horn <jannh@google.com>,
+        Andy Lutomirski <luto@kernel.org>, linux-crypto@vger.kernel.org
+Subject: [PATCH 1/6] crypto: add template handling for RNGs
+Date: Fri, 11 Jan 2019 20:09:42 +0100
+Message-ID: <3591906.ScSkh9qv6E@positron.chronox.de>
+In-Reply-To: <9733066.Vrs4h5eWcW@positron.chronox.de>
+References: <20190103143227.9138-1-jlee@suse.com> <20190109082103.GA8586@sol.localdomain> <9733066.Vrs4h5eWcW@positron.chronox.de>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Introduce a generic TEE bus driver concept for TEE based kernel drivers
-which would like to communicate with TEE based devices/services.
+Add ability to register templates for RNGs. RNGs are
+"meta" mechanisms using raw cipher primitives. Thus, RNGs can now be
+implemented as templates to allow the complete flexibility the kernel
+crypto API provides.
 
-In this TEE bus concept, devices/services are identified via Universally
-Unique Identifier (UUID) and drivers register a table of device UUIDs
-which they can support.
-
-So this TEE bus framework registers a match() callback function which
-iterates over the driver UUID table to find a corresponding match for
-device UUID. If a match is found, then this particular device is probed
-via corresponding probe api registered by the driver. This process
-happens whenever a device or a driver is registered with TEE bus.
-
-Also this framework allows for device enumeration to be specific to
-corresponding TEE implementation like OP-TEE etc.
-
-Signed-off-by: Sumit Garg <sumit.garg@linaro.org>
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- drivers/tee/tee_core.c  | 41 ++++++++++++++++++++++++++++++++++++++---
- include/linux/tee_drv.h | 36 ++++++++++++++++++++++++++++++++++++
- 2 files changed, 74 insertions(+), 3 deletions(-)
+ crypto/rng.c                  | 44 +++++++++++++++++++++++++++++++++++
+ include/crypto/internal/rng.h | 26 +++++++++++++++++++++
+ 2 files changed, 70 insertions(+)
 
-diff --git a/drivers/tee/tee_core.c b/drivers/tee/tee_core.c
-index 7b2bb4c..9ddb89e 100644
---- a/drivers/tee/tee_core.c
-+++ b/drivers/tee/tee_core.c
-@@ -15,7 +15,6 @@
- #define pr_fmt(fmt) "%s: " fmt, __func__
- 
- #include <linux/cdev.h>
--#include <linux/device.h>
- #include <linux/fs.h>
- #include <linux/idr.h>
- #include <linux/module.h>
-@@ -1027,6 +1026,30 @@ int tee_client_invoke_func(struct tee_context *ctx,
+diff --git a/crypto/rng.c b/crypto/rng.c
+index 33c38a72bff5..da4fd03c0acd 100644
+--- a/crypto/rng.c
++++ b/crypto/rng.c
+@@ -64,6 +64,25 @@ static int crypto_rng_init_tfm(struct crypto_tfm *tfm)
+ 	return 0;
  }
- EXPORT_SYMBOL_GPL(tee_client_invoke_func);
  
-+static int tee_client_device_match(struct device *dev,
-+				   struct device_driver *drv)
++static inline struct rng_alg *__crypto_rng_alg(struct crypto_alg *alg)
 +{
-+	struct tee_client_device *tee_device;
-+	const struct tee_client_device_id *id_table;
++	return container_of(alg, struct rng_alg, base);
++}
 +
-+	tee_device = to_tee_client_device(dev);
-+	id_table = to_tee_client_driver(drv)->id_table;
++static inline struct rng_instance *rng_instance(
++	struct crypto_instance *inst)
++{
++	return container_of(__crypto_rng_alg(&inst->alg),
++			    struct rng_instance, alg);
++}
 +
-+	while (!uuid_is_null(&id_table->uuid)) {
-+		if (uuid_equal(&tee_device->id.uuid, &id_table->uuid))
-+			return 1;
-+		id_table++;
-+	}
++static void crypto_rng_free_instance(struct crypto_instance *inst)
++{
++	struct rng_instance *rng = rng_instance(inst);
++
++	rng->free(rng);
++}
++
+ static unsigned int seedsize(struct crypto_alg *alg)
+ {
+ 	struct rng_alg *ralg = container_of(alg, struct rng_alg, base);
+@@ -102,6 +121,7 @@ static void crypto_rng_show(struct seq_file *m, struct crypto_alg *alg)
+ static const struct crypto_type crypto_rng_type = {
+ 	.extsize = crypto_alg_extsize,
+ 	.init_tfm = crypto_rng_init_tfm,
++	.free = crypto_rng_free_instance,
+ #ifdef CONFIG_PROC_FS
+ 	.show = crypto_rng_show,
+ #endif
+@@ -229,5 +249,29 @@ void crypto_unregister_rngs(struct rng_alg *algs, int count)
+ }
+ EXPORT_SYMBOL_GPL(crypto_unregister_rngs);
+ 
++static int rng_prepare_alg(struct rng_alg *alg)
++{
++	struct crypto_alg *base = &alg->base;
++
++	base->cra_type = &crypto_rng_type;
++	base->cra_flags &= ~CRYPTO_ALG_TYPE_MASK;
++	base->cra_flags |= CRYPTO_ALG_TYPE_RNG;
 +
 +	return 0;
 +}
 +
-+struct bus_type tee_bus_type = {
-+	.name		= "tee",
-+	.match		= tee_client_device_match,
-+};
-+EXPORT_SYMBOL_GPL(tee_bus_type);
++int rng_register_instance(struct crypto_template *tmpl,
++			  struct rng_instance *inst)
++{
++	int err;
 +
- static int __init tee_init(void)
- {
- 	int rc;
-@@ -1040,10 +1063,21 @@ static int __init tee_init(void)
- 	rc = alloc_chrdev_region(&tee_devt, 0, TEE_NUM_DEVICES, "tee");
- 	if (rc) {
- 		pr_err("failed to allocate char dev region\n");
--		class_destroy(tee_class);
--		tee_class = NULL;
-+		goto class_err;
- 	}
- 
-+	rc = bus_register(&tee_bus_type);
-+	if (rc) {
-+		pr_err("failed to register tee bus\n");
-+		goto class_err;
-+	}
++	err = rng_prepare_alg(&inst->alg);
++	if (err)
++		return err;
 +
-+	return 0;
++	return crypto_register_instance(tmpl, rng_crypto_instance(inst));
++}
++EXPORT_SYMBOL_GPL(rng_register_instance);
 +
-+class_err:
-+	class_destroy(tee_class);
-+	tee_class = NULL;
-+
- 	return rc;
+ MODULE_LICENSE("GPL");
+ MODULE_DESCRIPTION("Random Number Generator");
+diff --git a/include/crypto/internal/rng.h b/include/crypto/internal/rng.h
+index a52ef3483dd7..bfe4482ad336 100644
+--- a/include/crypto/internal/rng.h
++++ b/include/crypto/internal/rng.h
+@@ -42,4 +42,30 @@ static inline void crypto_rng_set_entropy(struct crypto_rng *tfm,
+ 	crypto_rng_alg(tfm)->set_ent(tfm, data, len);
  }
  
-@@ -1052,6 +1086,7 @@ static void __exit tee_exit(void)
- 	class_destroy(tee_class);
- 	tee_class = NULL;
- 	unregister_chrdev_region(tee_devt, TEE_NUM_DEVICES);
-+	bus_unregister(&tee_bus_type);
- }
- 
- subsys_initcall(tee_init);
-diff --git a/include/linux/tee_drv.h b/include/linux/tee_drv.h
-index 6cfe058..ed16bf1 100644
---- a/include/linux/tee_drv.h
-+++ b/include/linux/tee_drv.h
-@@ -20,6 +20,8 @@
- #include <linux/kref.h>
- #include <linux/list.h>
- #include <linux/tee.h>
-+#include <linux/device.h>
-+#include <linux/uuid.h>
- 
- /*
-  * The file describes the API provided by the generic TEE driver to the
-@@ -538,4 +540,38 @@ static inline bool tee_param_is_memref(struct tee_param *param)
- 	}
- }
- 
-+extern struct bus_type tee_bus_type;
-+
-+/**
-+ * struct tee_client_device_id - tee based device identifier
-+ * @uuid:		For TEE based client devices we use the device uuid
-+ *			as the identifier.
-+ */
-+struct tee_client_device_id {
-+	uuid_t uuid;
++struct rng_instance {
++	void (*free)(struct rng_instance *inst);
++	struct rng_alg alg;
 +};
 +
-+/**
-+ * struct tee_client_device - tee based device
-+ * @id:			device identifier
-+ * @dev:		device structure
-+ */
-+struct tee_client_device {
-+	struct tee_client_device_id id;
-+	struct device dev;
-+};
-+#define to_tee_client_device(d) container_of(d, struct tee_client_device, dev)
++static inline struct rng_instance *rng_alloc_instance(
++	const char *name, struct crypto_alg *alg)
++{
++	return crypto_alloc_instance(name, alg,
++			      sizeof(struct rng_instance) - sizeof(*alg));
++}
 +
-+/**
-+ * struct tee_client_driver - tee client driver
-+ * @id_table:		device id table supported by this driver
-+ * @driver:		driver structure
-+ */
-+struct tee_client_driver {
-+	const struct tee_client_device_id *id_table;
-+	struct device_driver driver;
-+};
-+#define to_tee_client_driver(d) \
-+		container_of(d, struct tee_client_driver, driver)
++static inline struct crypto_instance *rng_crypto_instance(
++	struct rng_instance *inst)
++{
++	return container_of(&inst->alg.base, struct crypto_instance, alg);
++}
 +
- #endif /*__TEE_DRV_H*/
++static inline void *rng_instance_ctx(struct rng_instance *inst)
++{
++	return crypto_instance_ctx(rng_crypto_instance(inst));
++}
++
++int rng_register_instance(struct crypto_template *tmpl,
++			  struct rng_instance *inst);
++
+ #endif
 -- 
-2.7.4
+2.20.1
