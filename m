@@ -1,36 +1,92 @@
-Return-Path: <SRS0=g5s/=PY=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mx1.redhat.com ([209.132.183.28]:41574 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730514AbfAPQTO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 16 Jan 2019 11:19:14 -0500
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20190106133608.820-3-vt@altlinux.org>
-References: <20190106133608.820-3-vt@altlinux.org> <20190106133608.820-1-vt@altlinux.org>
-To: Vitaly Chikunov <vt@altlinux.org>
-Cc: dhowells@redhat.com, Herbert Xu <herbert@gondor.apana.org.au>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 2/4] akcipher: Introduce verify2 for public key algorithms
+Return-Path: <SRS0=CSIn=PT=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:33674 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729792AbfAKJjI (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 11 Jan 2019 04:39:08 -0500
+Received: by mail-wm1-f66.google.com with SMTP id r24so1580468wmh.0
+        for <linux-crypto@vger.kernel.org>; Fri, 11 Jan 2019 01:39:06 -0800 (PST)
+Date: Fri, 11 Jan 2019 09:39:02 +0000
+From: Daniel Thompson <daniel.thompson@linaro.org>
+To: Sumit Garg <sumit.garg@linaro.org>
+Cc: linux-arm-kernel@lists.infradead.org,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>, linux-kernel@vger.kernel.org,
+        Jens Wiklander <jens.wiklander@linaro.org>, mpm@selenic.com,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Bhupesh Sharma <bhsharma@redhat.com>, tee-dev@lists.linaro.org
+Subject: Re: [PATCH v2 2/4] tee: optee: add TEE bus device enumeration support
+Message-ID: <20190111093902.hfxb67txjhhlegzu@holly.lan>
+References: <1547123097-16431-1-git-send-email-sumit.garg@linaro.org>
+ <1547123097-16431-3-git-send-email-sumit.garg@linaro.org>
+ <20190110141856.p3evqyf34py74gkg@holly.lan>
+ <CAFA6WYPHmtY4N9ruGLZ70FNeiDCbQE-fs+EP2px-S+GEj2nPTw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <21753.1547655551.1@warthog.procyon.org.uk>
-Date: Wed, 16 Jan 2019 16:19:11 +0000
-Message-ID: <21754.1547655551@warthog.procyon.org.uk>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFA6WYPHmtY4N9ruGLZ70FNeiDCbQE-fs+EP2px-S+GEj2nPTw@mail.gmail.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Vitaly Chikunov <vt@altlinux.org> wrote:
+On Fri, Jan 11, 2019 at 12:52:19PM +0530, Sumit Garg wrote:
+> On Thu, 10 Jan 2019 at 19:49, Daniel Thompson
+> <daniel.thompson@linaro.org> wrote:
+> > > +static int get_devices(struct tee_context *ctx, u32 session,
+> > > +                    struct tee_shm *device_uuid, u32 *shm_size)
+> >
+> > Missing const on device_uuid?
+> >
+> 
+> I don't think we should have a const for device_uuid here as this is
+> shared memory struct pointer which is dynamically allocated and used
+> to fetch device UUIDs.
 
-> Current akcipher .verify() just decrypts signature to uncover message
-> hash, which is then verified in upper level public_key_verify_signature
-> by memcmp with the expected signature value, which is never passed into
-> verify().
+Agree. Perhaps device_uuid is misnamed though (part of the reason I
+misread this is that it is singular so I though it was a single UUID
+travelling into the TZ).
 
-I think it would be better to make ->verify() take the data hash we've been
-given rather than returning the expected hash for the caller to compare.  That
-way the callers don't have to do two different things, depending on how the
-crypto algo works.
+> > > +     rc = get_devices(ctx, sess_arg.session, device_shm, &shm_size);
+> > > +     if (rc < 0)
+> > > +             goto out_shm;
+> > > +
+> > > +     device_uuid = tee_shm_get_va(device_shm, 0);
+> > > +     if (IS_ERR(device_uuid)) {
+> > > +             pr_err("tee_shm_get_va failed\n");
+> > > +             rc = PTR_ERR(device_uuid);
+> > > +             goto out_shm;
+> > > +     }
+> > > +
+> > > +     while (idx < shm_size / sizeof(uuid_t)) {
+> >
+> > This is a very uncommon way to write a for loop ;-).
+> >
+> 
+> Ok, will add "num_devices" variable.
 
-David
+num_devices might add readability but that is not what I meant.
+
+The most idiomatic way to write somthing that loops for every valid index
+value is:
+
+	for (i=0; i < limit; i++)
+
+You wrote it like this:
+
+	int idx=0;
+
+	/* lots of code between initializer and first use */
+
+	while (idx < limit) {
+		/* more code */
+		idx++;
+	}
+
+Sure, they are equivalent but the idiomatic form is easier to read.
+
+
+Daniel.
