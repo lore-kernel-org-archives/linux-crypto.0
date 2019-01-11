@@ -1,96 +1,63 @@
-Return-Path: <SRS0=1Gsi=PR=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from szxga04-in.huawei.com ([45.249.212.190]:17094 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729566AbfAIF6V (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 9 Jan 2019 00:58:21 -0500
-Subject: Re: [PATCH -next] crypto: brcm - Fix some set-but-not-used warning
-To: Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>
-References: <1545968644-191671-1-git-send-email-yuehaibing@huawei.com>
- <CAAFb_vocPLiiPeV210Y-CMj7cVdfQx4OvDzaygkihzJzXhj2NA@mail.gmail.com>
-CC: Herbert Xu <herbert@gondor.apana.org.au>,
-        Eric Biggers <ebiggers@google.com>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Stefan Agner <stefan@agner.ch>, <linux-crypto@vger.kernel.org>,
-        <kernel-janitors@vger.kernel.org>
-From: YueHaibing <yuehaibing@huawei.com>
-Message-ID: <362516b3-0f1c-282b-a6fe-f094f6ea0db1@huawei.com>
-Date: Wed, 9 Jan 2019 13:58:14 +0800
+Return-Path: <SRS0=CSIn=PT=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mo4-p01-ob.smtp.rzone.de ([81.169.146.164]:15915 "EHLO
+        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390316AbfAKTN4 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 11 Jan 2019 14:13:56 -0500
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        Andy Lutomirski <luto@amacapital.net>,
+        "Lee, Chun-Yi" <joeyli.kernel@gmail.com>,
+        "Rafael J . Wysocki" <rjw@rjwysocki.net>,
+        Pavel Machek <pavel@ucw.cz>, linux-kernel@vger.kernel.org,
+        linux-pm@vger.kernel.org, keyrings@vger.kernel.org,
+        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+        Chen Yu <yu.c.chen@intel.com>,
+        Oliver Neukum <oneukum@suse.com>,
+        Ryan Chen <yu.chen.surf@gmail.com>,
+        David Howells <dhowells@redhat.com>,
+        Giovanni Gherdovich <ggherdovich@suse.cz>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Jann Horn <jannh@google.com>,
+        Andy Lutomirski <luto@kernel.org>, linux-crypto@vger.kernel.org
+Subject: [PATCH 6/6] crypto: tcrypt - add KDF test invocation
+Date: Fri, 11 Jan 2019 20:11:12 +0100
+Message-ID: <2181239.cWAz3ldHXA@positron.chronox.de>
+In-Reply-To: <9733066.Vrs4h5eWcW@positron.chronox.de>
+References: <20190103143227.9138-1-jlee@suse.com> <20190109082103.GA8586@sol.localdomain> <9733066.Vrs4h5eWcW@positron.chronox.de>
 MIME-Version: 1.0
-In-Reply-To: <CAAFb_vocPLiiPeV210Y-CMj7cVdfQx4OvDzaygkihzJzXhj2NA@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 2019/1/9 13:35, Raveendra Padasalagi wrote:
-> Hi YueHaibing,
-> 
-> Please add below fixes tag in the commit message,
-> Fixes: 9d12ba86f818 ("crypto: brcm - Add Broadcom SPU driver")
-> 
-> Otherwise patch looks good to me.
+Enable testing of the SP800-108 and RFC5869 KDFs.
 
-Ok, will send v2, Thanks.
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+---
+ crypto/tcrypt.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-> 
-> -Raveendra
-> 
-> On Fri, Dec 28, 2018 at 9:07 AM YueHaibing <yuehaibing@huawei.com> wrote:
->>
->> Fixes gcc '-Wunused-but-set-variable' warning:
->>
->> drivers/crypto/bcm/cipher.c: In function 'handle_ahash_req':
->> drivers/crypto/bcm/cipher.c:720:15: warning:
->>  variable 'chunk_start' set but not used [-Wunused-but-set-variable]
->>
->> drivers/crypto/bcm/cipher.c: In function 'spu_rx_callback':
->> drivers/crypto/bcm/cipher.c:1679:31: warning:
->>  variable 'areq' set but not used [-Wunused-but-set-variable]
->>
->> drivers/crypto/bcm/cipher.c:1678:22: warning:
->>  variable 'ctx' set but not used [-Wunused-but-set-variable]
->>
->> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
->> ---
->>  drivers/crypto/bcm/cipher.c | 6 +-----
->>  1 file changed, 1 insertion(+), 5 deletions(-)
->>
->> diff --git a/drivers/crypto/bcm/cipher.c b/drivers/crypto/bcm/cipher.c
->> index c9393ff..9a66c29 100644
->> --- a/drivers/crypto/bcm/cipher.c
->> +++ b/drivers/crypto/bcm/cipher.c
->> @@ -717,7 +717,7 @@ static int handle_ahash_req(struct iproc_reqctx_s *rctx)
->>          */
->>         unsigned int new_data_len;
->>
->> -       unsigned int chunk_start = 0;
->> +       unsigned int __maybe_unused chunk_start = 0;
->>         u32 db_size;     /* Length of data field, incl gcm and hash padding */
->>         int pad_len = 0; /* total pad len, including gcm, hash, stat padding */
->>         u32 data_pad_len = 0;   /* length of GCM/CCM padding */
->> @@ -1675,8 +1675,6 @@ static void spu_rx_callback(struct mbox_client *cl, void *msg)
->>         struct spu_hw *spu = &iproc_priv.spu;
->>         struct brcm_message *mssg = msg;
->>         struct iproc_reqctx_s *rctx;
->> -       struct iproc_ctx_s *ctx;
->> -       struct crypto_async_request *areq;
->>         int err = 0;
->>
->>         rctx = mssg->ctx;
->> @@ -1686,8 +1684,6 @@ static void spu_rx_callback(struct mbox_client *cl, void *msg)
->>                 err = -EFAULT;
->>                 goto cb_finish;
->>         }
->> -       areq = rctx->parent;
->> -       ctx = rctx->ctx;
->>
->>         /* process the SPU status */
->>         err = spu->spu_status_process(rctx->msg_buf.rx_stat);
->>
->>
->>
->>
->>
-> 
-> .
-> 
+diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+index e7fb87e114a5..5606e59e80ec 100644
+--- a/crypto/tcrypt.c
++++ b/crypto/tcrypt.c
+@@ -2054,6 +2054,14 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
+ 		ret += tcrypt_test("cbc(sm4)");
+ 		ret += tcrypt_test("ctr(sm4)");
+ 		break;
++	case 192:
++		ret += tcrypt_test("kdf_ctr(hmac(sha256))");
++		ret += tcrypt_test("kdf_dpi(hmac(sha256))");
++		ret += tcrypt_test("kdf_fb(hmac(sha256))");
++		break;
++	case 193:
++		ret += tcrypt_test("hkdf(hmac(sha256))");
++		break;
+ 	case 200:
+ 		test_cipher_speed("ecb(aes)", ENCRYPT, sec, NULL, 0,
+ 				speed_template_16_24_32);
+-- 
+2.20.1
