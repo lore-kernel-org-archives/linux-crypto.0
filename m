@@ -1,108 +1,177 @@
-Return-Path: <SRS0=fnEV=PW=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:36208 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726789AbfANRoT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Jan 2019 12:44:19 -0500
-Date: Mon, 14 Jan 2019 09:44:16 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        James Bottomley <James.Bottomley@hansenpartnership.com>,
-        Andy Lutomirski <luto@amacapital.net>,
-        "Lee, Chun-Yi" <joeyli.kernel@gmail.com>,
-        "Rafael J . Wysocki" <rjw@rjwysocki.net>,
-        Pavel Machek <pavel@ucw.cz>, linux-kernel@vger.kernel.org,
-        linux-pm@vger.kernel.org, keyrings@vger.kernel.org,
-        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-        Chen Yu <yu.c.chen@intel.com>,
-        Oliver Neukum <oneukum@suse.com>,
-        Ryan Chen <yu.chen.surf@gmail.com>,
-        David Howells <dhowells@redhat.com>,
-        Giovanni Gherdovich <ggherdovich@suse.cz>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Jann Horn <jannh@google.com>,
-        Andy Lutomirski <luto@kernel.org>, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 5/6] crypto: hkdf - add known answer tests
-Message-ID: <20190114174415.GA7644@gmail.com>
-References: <20190103143227.9138-1-jlee@suse.com>
- <9857029.1Sm7LFDBlJ@positron.chronox.de>
- <20190112051914.GB639@sol.localdomain>
- <2750733.sbdFDJOICv@positron.chronox.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <2750733.sbdFDJOICv@positron.chronox.de>
+Return-Path: <SRS0=CSIn=PT=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:35021 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731702AbfAKLuG (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 11 Jan 2019 06:50:06 -0500
+Received: by mail-pg1-f196.google.com with SMTP id s198so6243714pgs.2
+        for <linux-crypto@vger.kernel.org>; Fri, 11 Jan 2019 03:50:05 -0800 (PST)
+From: Sumit Garg <sumit.garg@linaro.org>
+To: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, jens.wiklander@linaro.org,
+        mpm@selenic.com, herbert@gondor.apana.org.au, robh+dt@kernel.org,
+        mark.rutland@arm.com, arnd@arndb.de, gregkh@linuxfoundation.org,
+        daniel.thompson@linaro.org, ard.biesheuvel@linaro.org,
+        bhsharma@redhat.com, tee-dev@lists.linaro.org,
+        Sumit Garg <sumit.garg@linaro.org>
+Subject: [PATCH v3 1/4] tee: add bus driver framework for TEE based devices
+Date: Fri, 11 Jan 2019 17:17:28 +0530
+Message-Id: <1547207251-9372-2-git-send-email-sumit.garg@linaro.org>
+In-Reply-To: <1547207251-9372-1-git-send-email-sumit.garg@linaro.org>
+References: <1547207251-9372-1-git-send-email-sumit.garg@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Mon, Jan 14, 2019 at 10:25:16AM +0100, Stephan Müller wrote:
-> Am Samstag, 12. Januar 2019, 06:19:15 CET schrieb Eric Biggers:
-> 
-> Hi Eric,
-> 
-> [...]
-> > 
-> > > +			}
-> > > +		}
-> > > +	}, {
-> > > +		.alg = "hkdf(hmac(sha224))",
-> > > +		.test = alg_test_null,
-> > > +		.fips_allowed = 1,
-> > 
-> > I think it is dumb to add algorithms to the testmgr with no tests just so
-> > the 'fips_allowed' flag can be set. 
-> 
-> Currently it is the only way. But I agree that it could be done better.
-> 
-> > And doesn't FIPS sometimes require
-> > tests anyway?  I don't think the "null test" should count as a test :-)
-> 
-> Yes, it DOES count as a test (as strange as it may sound)! :-)
-> 
-> The FIPS requirements are as follows:
-> 
-> - raw ciphers must be subject to a FIPS test with one block chaining mode to 
-> cover that cipher with all block chaining modes (e.g. you can test ecb(aes) to 
-> cover AES with *all* existing block chaining modes).
-> 
-> - for compound crypto algorithm (like RSA with respect to hashes, KDF with 
-> respect to the keyed message digest, HMAC with respect to hashes), the 
-> wrapping crypto algorithm needs to be tested with *one* wrapped cipher at 
-> least (but also not more. E.g. if you have a self test for, say, all SHA-1 and 
-> SHA-2, you only need one HMAC SHA test or one KDF HMAC SHA test.
-> 
-> - in some circumstances, it is even permissible to test wrapping crypto 
-> algorithms where the underlying algo is implicitly tested. E.g. if you have a 
-> HMAC SHA-256 test, you do not need an individual SHA-256 test.
-> 
-> 
-> > 
-> > Perhaps just include sha256 and sha512, and have tests for them?
-> 
-> Do you happen to have an official SHA-512 HKDF test vector? RFC5869 only has 
-> SHA-1 and SHA-256 tests.
-> > 
-> 
+Introduce a generic TEE bus driver concept for TEE based kernel drivers
+which would like to communicate with TEE based devices/services.
 
-No, I don't know of any official HKDF-SHA512 test vectors.
+In this TEE bus concept, devices/services are identified via Universally
+Unique Identifier (UUID) and drivers register a table of device UUIDs
+which they can support.
 
-> [...]
-> > > 
-> > > +/* Test vectors from RFC 5869 appendix A */
-> > > +static struct kdf_testvec hkdf_hmac_sha256_tv_template[] = {
-> > 
-> > const
-> > 
-> > Likewise for all other kdf_testvecs.
-> 
-> const does not work with __VECS :-(
-> 
-> I leave it without const at the moment. I think the __VECS should be updated 
-> along with all test vectors.
-> 
-> [...]
+So this TEE bus framework registers a match() callback function which
+iterates over the driver UUID table to find a corresponding match for
+device UUID. If a match is found, then this particular device is probed
+via corresponding probe api registered by the driver. This process
+happens whenever a device or a driver is registered with TEE bus.
 
-I don't see why.  kdf_testvec just needs to be made const everywhere.
+Also this framework allows for device enumeration to be specific to
+corresponding TEE implementation like OP-TEE etc.
 
-- Eric
+Signed-off-by: Sumit Garg <sumit.garg@linaro.org>
+---
+ drivers/tee/tee_core.c  | 43 ++++++++++++++++++++++++++++++++++++++++---
+ include/linux/tee_drv.h | 36 ++++++++++++++++++++++++++++++++++++
+ 2 files changed, 76 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/tee/tee_core.c b/drivers/tee/tee_core.c
+index 7b2bb4c..a685940 100644
+--- a/drivers/tee/tee_core.c
++++ b/drivers/tee/tee_core.c
+@@ -15,7 +15,6 @@
+ #define pr_fmt(fmt) "%s: " fmt, __func__
+ 
+ #include <linux/cdev.h>
+-#include <linux/device.h>
+ #include <linux/fs.h>
+ #include <linux/idr.h>
+ #include <linux/module.h>
+@@ -1027,6 +1026,30 @@ int tee_client_invoke_func(struct tee_context *ctx,
+ }
+ EXPORT_SYMBOL_GPL(tee_client_invoke_func);
+ 
++static int tee_client_device_match(struct device *dev,
++				   struct device_driver *drv)
++{
++	struct tee_client_device *tee_device;
++	const struct tee_client_device_id *id_table;
++
++	tee_device = to_tee_client_device(dev);
++	id_table = to_tee_client_driver(drv)->id_table;
++
++	while (!uuid_is_null(&id_table->uuid)) {
++		if (uuid_equal(&tee_device->id.uuid, &id_table->uuid))
++			return 1;
++		id_table++;
++	}
++
++	return 0;
++}
++
++struct bus_type tee_bus_type = {
++	.name		= "tee",
++	.match		= tee_client_device_match,
++};
++EXPORT_SYMBOL_GPL(tee_bus_type);
++
+ static int __init tee_init(void)
+ {
+ 	int rc;
+@@ -1040,10 +1063,23 @@ static int __init tee_init(void)
+ 	rc = alloc_chrdev_region(&tee_devt, 0, TEE_NUM_DEVICES, "tee");
+ 	if (rc) {
+ 		pr_err("failed to allocate char dev region\n");
+-		class_destroy(tee_class);
+-		tee_class = NULL;
++		goto chrdev_err;
+ 	}
+ 
++	rc = bus_register(&tee_bus_type);
++	if (rc) {
++		pr_err("failed to register tee bus\n");
++		goto bus_err;
++	}
++
++	return 0;
++
++bus_err:
++	unregister_chrdev_region(tee_devt, TEE_NUM_DEVICES);
++chrdev_err:
++	class_destroy(tee_class);
++	tee_class = NULL;
++
+ 	return rc;
+ }
+ 
+@@ -1052,6 +1088,7 @@ static void __exit tee_exit(void)
+ 	class_destroy(tee_class);
+ 	tee_class = NULL;
+ 	unregister_chrdev_region(tee_devt, TEE_NUM_DEVICES);
++	bus_unregister(&tee_bus_type);
+ }
+ 
+ subsys_initcall(tee_init);
+diff --git a/include/linux/tee_drv.h b/include/linux/tee_drv.h
+index 6cfe058..ed16bf1 100644
+--- a/include/linux/tee_drv.h
++++ b/include/linux/tee_drv.h
+@@ -20,6 +20,8 @@
+ #include <linux/kref.h>
+ #include <linux/list.h>
+ #include <linux/tee.h>
++#include <linux/device.h>
++#include <linux/uuid.h>
+ 
+ /*
+  * The file describes the API provided by the generic TEE driver to the
+@@ -538,4 +540,38 @@ static inline bool tee_param_is_memref(struct tee_param *param)
+ 	}
+ }
+ 
++extern struct bus_type tee_bus_type;
++
++/**
++ * struct tee_client_device_id - tee based device identifier
++ * @uuid:		For TEE based client devices we use the device uuid
++ *			as the identifier.
++ */
++struct tee_client_device_id {
++	uuid_t uuid;
++};
++
++/**
++ * struct tee_client_device - tee based device
++ * @id:			device identifier
++ * @dev:		device structure
++ */
++struct tee_client_device {
++	struct tee_client_device_id id;
++	struct device dev;
++};
++#define to_tee_client_device(d) container_of(d, struct tee_client_device, dev)
++
++/**
++ * struct tee_client_driver - tee client driver
++ * @id_table:		device id table supported by this driver
++ * @driver:		driver structure
++ */
++struct tee_client_driver {
++	const struct tee_client_device_id *id_table;
++	struct device_driver driver;
++};
++#define to_tee_client_driver(d) \
++		container_of(d, struct tee_client_driver, driver)
++
+ #endif /*__TEE_DRV_H*/
+-- 
+2.7.4
