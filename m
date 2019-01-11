@@ -1,45 +1,46 @@
-Return-Path: <SRS0=+HSe=PS=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:59498 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728556AbfAJNKP (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Jan 2019 08:10:15 -0500
-Date: Thu, 10 Jan 2019 21:09:56 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Horia Geanta <horia.geanta@nxp.com>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] crypto: caam/qi2 - add a CRYPTO_DEV_FSL_CAAM dependency
-Message-ID: <20190110130956.j7nitx5sw2xgr3pc@gondor.apana.org.au>
-References: <20181220152815.3613164-1-arnd@arndb.de>
- <VI1PR0402MB3485B39F40CFFDED08D8701698BF0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+Return-Path: <SRS0=CSIn=PT=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:60514 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725803AbfAKR6g (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 11 Jan 2019 12:58:36 -0500
+Date: Fri, 11 Jan 2019 09:58:34 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org
+Subject: Re: [PATCH 00/16] crypto: skcipher template simplifications and
+ conversions
+Message-ID: <20190111175833.GA77447@gmail.com>
+References: <20190104041625.3259-1-ebiggers@kernel.org>
+ <20190111063358.pjm776fanp4dspvl@gondor.apana.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <VI1PR0402MB3485B39F40CFFDED08D8701698BF0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+In-Reply-To: <20190111063358.pjm776fanp4dspvl@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Dec 20, 2018 at 09:27:16PM +0000, Horia Geanta wrote:
->
-> This indeed solves the issue, but as you mentioned won't allow for
-> CRYPTO_DEV_FSL_DPAA2_CAAM=y when CRYPTO_DEV_FSL_CAAM=m.
+On Fri, Jan 11, 2019 at 02:33:58PM +0800, Herbert Xu wrote:
+> On Thu, Jan 03, 2019 at 08:16:09PM -0800, Eric Biggers wrote:
+> > Hello,
+> > 
+> > This series adds a function skcipher_alloc_instance_simple() that
+> > greatly simplifies creating an skcipher_instance that uses a single
+> > underlying block cipher.  It then converts the cbc, cfb, ctr, ecb, kw,
+> > ofb, and pcbc templates to use it.  In doing so, ctr, ecb, and kw are
+> > also converted from the deprecated "blkcipher" API to the skcipher API.
+> > 
+> > While doing this, I also found some rather silly bugs in the cfb, ofb,
+> > and pcbc templates...  So I've included the fixes for these first, in
+> > patches 1-4.  Please consider taking these first 4 patches through
+> > 'crypto' rather than 'cryptodev'.  (But 5-16 are cleanups only, so no
+> > rush on those.)
 > 
-> I think a better solution is the following:
+> I have decided to push all of these through cryptodev because
+> it's not clear whether the first four bug fixes are serious enough 
+> to warrant going through straight away.  If I'm wrong please let
+> me know.
 > 
-> -- >8 --
-> Subject: [PATCH] crypto: caam - move shared symbols in a common location
 
-Hi Horia:
+I'm fine with cryptodev.
 
-Please resend this patch with a new Subject line as patchwork
-no longer tracks patches sent in reply to existing patches.
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+- Eric
