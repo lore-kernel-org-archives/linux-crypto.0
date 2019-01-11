@@ -1,58 +1,101 @@
-Return-Path: <SRS0=b7+G=PP=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:44312 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726638AbfAGXQh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Jan 2019 18:16:37 -0500
-From: Eric Biggers <ebiggers@kernel.org>
-To: stable@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: linux-crypto@vger.kernel.org, Martin Willi <martin@strongswan.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH 4.9,4.4] crypto: x86/chacha20 - avoid sleeping with preemption disabled
-Date: Mon,  7 Jan 2019 15:15:59 -0800
-Message-Id: <20190107231559.13357-1-ebiggers@kernel.org>
+Return-Path: <SRS0=CSIn=PT=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-vs1-f68.google.com ([209.85.217.68]:41979 "EHLO
+        mail-vs1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730155AbfAKJwE (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 11 Jan 2019 04:52:04 -0500
+Received: by mail-vs1-f68.google.com with SMTP id t17so8831441vsc.8
+        for <linux-crypto@vger.kernel.org>; Fri, 11 Jan 2019 01:52:02 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <1547123097-16431-1-git-send-email-sumit.garg@linaro.org>
+ <1547123097-16431-3-git-send-email-sumit.garg@linaro.org> <20190110141856.p3evqyf34py74gkg@holly.lan>
+ <CAFA6WYPHmtY4N9ruGLZ70FNeiDCbQE-fs+EP2px-S+GEj2nPTw@mail.gmail.com> <20190111093902.hfxb67txjhhlegzu@holly.lan>
+In-Reply-To: <20190111093902.hfxb67txjhhlegzu@holly.lan>
+From: Sumit Garg <sumit.garg@linaro.org>
+Date: Fri, 11 Jan 2019 15:21:50 +0530
+Message-ID: <CAFA6WYNp5ve=xZ1bQL+HUGK4Pz7dpzMzWy_fuS0_q8NHaZWL4Q@mail.gmail.com>
+Subject: Re: [PATCH v2 2/4] tee: optee: add TEE bus device enumeration support
+To: Daniel Thompson <daniel.thompson@linaro.org>
+Cc: linux-arm-kernel@lists.infradead.org,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>, linux-kernel@vger.kernel.org,
+        Jens Wiklander <jens.wiklander@linaro.org>, mpm@selenic.com,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Bhupesh Sharma <bhsharma@redhat.com>, tee-dev@lists.linaro.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Eric Biggers <ebiggers@google.com>
+On Fri, 11 Jan 2019 at 15:09, Daniel Thompson
+<daniel.thompson@linaro.org> wrote:
+>
+> On Fri, Jan 11, 2019 at 12:52:19PM +0530, Sumit Garg wrote:
+> > On Thu, 10 Jan 2019 at 19:49, Daniel Thompson
+> > <daniel.thompson@linaro.org> wrote:
+> > > > +static int get_devices(struct tee_context *ctx, u32 session,
+> > > > +                    struct tee_shm *device_uuid, u32 *shm_size)
+> > >
+> > > Missing const on device_uuid?
+> > >
+> >
+> > I don't think we should have a const for device_uuid here as this is
+> > shared memory struct pointer which is dynamically allocated and used
+> > to fetch device UUIDs.
+>
+> Agree. Perhaps device_uuid is misnamed though (part of the reason I
+> misread this is that it is singular so I though it was a single UUID
+> travelling into the TZ).
+>
 
-Hi Greg, please consider applying this to 4.9-stable and 4.4-stable.
-It's a minimal fix for a bug that was fixed incidentally by a large
-refactoring in v4.11.
+Will rename it to device_shm instead.
 
->8------------------------------------------------------8<
+> > > > +     rc = get_devices(ctx, sess_arg.session, device_shm, &shm_size);
+> > > > +     if (rc < 0)
+> > > > +             goto out_shm;
+> > > > +
+> > > > +     device_uuid = tee_shm_get_va(device_shm, 0);
+> > > > +     if (IS_ERR(device_uuid)) {
+> > > > +             pr_err("tee_shm_get_va failed\n");
+> > > > +             rc = PTR_ERR(device_uuid);
+> > > > +             goto out_shm;
+> > > > +     }
+> > > > +
+> > > > +     while (idx < shm_size / sizeof(uuid_t)) {
+> > >
+> > > This is a very uncommon way to write a for loop ;-).
+> > >
+> >
+> > Ok, will add "num_devices" variable.
+>
+> num_devices might add readability but that is not what I meant.
+>
+> The most idiomatic way to write somthing that loops for every valid index
+> value is:
+>
+>         for (i=0; i < limit; i++)
+>
+> You wrote it like this:
+>
+>         int idx=0;
+>
+>         /* lots of code between initializer and first use */
+>
+>         while (idx < limit) {
+>                 /* more code */
+>                 idx++;
+>         }
+>
+> Sure, they are equivalent but the idiomatic form is easier to read.
+>
 
-In chacha20-simd, clear the MAY_SLEEP flag in the blkcipher_desc to
-prevent sleeping with preemption disabled, under kernel_fpu_begin().
+Oh okay, will use "for" loop instead.
 
-This was fixed upstream incidentally by a large refactoring,
-commit 9ae433bc79f9 ("crypto: chacha20 - convert generic and x86
-versions to skcipher").  But syzkaller easily trips over this when
-running on older kernels, as it's easily reachable via AF_ALG.
-Therefore, this patch makes the minimal fix for older kernels.
+-Sumit
 
-Fixes: c9320b6dcb89 ("crypto: chacha20 - Add a SSSE3 SIMD variant for x86_64")
-Cc: linux-crypto@vger.kernel.org
-Cc: Martin Willi <martin@strongswan.org>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- arch/x86/crypto/chacha20_glue.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/arch/x86/crypto/chacha20_glue.c b/arch/x86/crypto/chacha20_glue.c
-index f910d1d449f00..0a5fedf43bdc8 100644
---- a/arch/x86/crypto/chacha20_glue.c
-+++ b/arch/x86/crypto/chacha20_glue.c
-@@ -77,6 +77,7 @@ static int chacha20_simd(struct blkcipher_desc *desc, struct scatterlist *dst,
- 
- 	blkcipher_walk_init(&walk, dst, src, nbytes);
- 	err = blkcipher_walk_virt_block(desc, &walk, CHACHA20_BLOCK_SIZE);
-+	desc->flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
- 
- 	crypto_chacha20_init(state, crypto_blkcipher_ctx(desc->tfm), walk.iv);
- 
--- 
-2.20.1.97.g81188d93c3-goog
+>
+> Daniel.
