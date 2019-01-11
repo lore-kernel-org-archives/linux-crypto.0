@@ -1,40 +1,44 @@
-Return-Path: <SRS0=8/la=PM=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:50530 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726315AbfADRHw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Jan 2019 12:07:52 -0500
-Date: Fri, 4 Jan 2019 09:07:49 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        stable@vger.kernel.org
-Subject: Re: [PATCH 04/16] crypto: pcbc - remove bogus memcpy()s with src ==
- dest
-Message-ID: <20190104170748.GA67931@gmail.com>
-References: <20190104041625.3259-5-ebiggers@kernel.org>
- <20190104041625.3259-1-ebiggers@kernel.org>
- <11047.1546595833@warthog.procyon.org.uk>
+Return-Path: <SRS0=CSIn=PT=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:33202 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725773AbfAKGbY (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 11 Jan 2019 01:31:24 -0500
+Date: Fri, 11 Jan 2019 14:31:21 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: "Hook, Gary" <Gary.Hook@amd.com>
+Cc: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "davem@davemloft.net" <davem@davemloft.net>
+Subject: Re: [PATCH] crypto/ccp: Update copyright notices and dates
+Message-ID: <20190111063121.pphb4mg2a4bdiirq@gondor.apana.org.au>
+References: <154514810757.7167.14162358906458327597.stgit@taos>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <11047.1546595833@warthog.procyon.org.uk>
+In-Reply-To: <154514810757.7167.14162358906458327597.stgit@taos>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jan 04, 2019 at 09:57:13AM +0000, David Howells wrote:
-> Eric Biggers <ebiggers@kernel.org> wrote:
+On Tue, Dec 18, 2018 at 03:48:29PM +0000, Hook, Gary wrote:
+> Correct copyright dates for files that have had code added
+> to them in 2018.
 > 
-> > -	u8 *iv = walk->iv;
-> > +	u8 * const iv = walk->iv;
-> 
-> Does adding this const actually gain anything?  (this is done twice)
-> 
-> David
+> Signed-off-by: Gary R Hook <gary.hook@amd.com>
+> ---
+>  drivers/crypto/ccp/ccp-crypto-aes-cmac.c |    2 +-
+>  drivers/crypto/ccp/ccp-crypto-sha.c      |    2 +-
+>  drivers/crypto/ccp/ccp-ops.c             |    2 +-
+>  drivers/crypto/ccp/psp-dev.c             |    2 +-
+>  drivers/crypto/ccp/psp-dev.h             |    2 +-
+>  drivers/crypto/ccp/sp-dev.c              |    2 +-
+>  drivers/crypto/ccp/sp-dev.h              |    2 +-
+>  drivers/crypto/ccp/sp-pci.c              |    2 +-
+>  drivers/crypto/ccp/sp-platform.c         |    2 +-
+>  9 files changed, 9 insertions(+), 9 deletions(-)
 
-It makes it clearer what's going on, especially since some modes update the 'iv'
-pointer after each block (delaying the copy to 'walk.iv' until the end) but
-others can't do that.  The 'const' is helpful to further distinguish these two
-cases, which were confused in both the pcbc and cfb implementations.
-
-- Eric
+Patch applied.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
