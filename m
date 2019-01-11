@@ -1,257 +1,380 @@
-Return-Path: <SRS0=b5ak=PZ=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-eopbgr700084.outbound.protection.outlook.com ([40.107.70.84]:23296
-        "EHLO NAM04-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729608AbfAQHCs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Jan 2019 02:02:48 -0500
-From: Kalyani Akula <kalyani.akula@xilinx.com>
-To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: Kalyani Akula <kalyania@xilinx.com>,
-        Sarat Chand Savitala <saratcha@xilinx.com>,
-        Kalyani Akula <kalyani.akula@xilinx.com>
-Subject: [RFC PATCH 4/5] crypto: Adds user space interface for ALG_SET_KEY_TYPE
-Date: Thu, 17 Jan 2019 12:32:20 +0530
-Message-ID: <1547708541-23730-5-git-send-email-kalyani.akula@xilinx.com>
-In-Reply-To: <1547708541-23730-1-git-send-email-kalyani.akula@xilinx.com>
-References: <1547708541-23730-1-git-send-email-kalyani.akula@xilinx.com>
+Return-Path: <SRS0=CSIn=PT=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mo4-p02-ob.smtp.rzone.de ([85.215.255.80]:28945 "EHLO
+        mo4-p02-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390300AbfAKTN5 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 11 Jan 2019 14:13:57 -0500
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        Andy Lutomirski <luto@amacapital.net>,
+        "Lee, Chun-Yi" <joeyli.kernel@gmail.com>,
+        "Rafael J . Wysocki" <rjw@rjwysocki.net>,
+        Pavel Machek <pavel@ucw.cz>, linux-kernel@vger.kernel.org,
+        linux-pm@vger.kernel.org, keyrings@vger.kernel.org,
+        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+        Chen Yu <yu.c.chen@intel.com>,
+        Oliver Neukum <oneukum@suse.com>,
+        Ryan Chen <yu.chen.surf@gmail.com>,
+        David Howells <dhowells@redhat.com>,
+        Giovanni Gherdovich <ggherdovich@suse.cz>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Jann Horn <jannh@google.com>,
+        Andy Lutomirski <luto@kernel.org>, linux-crypto@vger.kernel.org
+Subject: [PATCH 4/6] crypto: hkdf - RFC5869 Key Derivation Function
+Date: Fri, 11 Jan 2019 20:10:39 +0100
+Message-ID: <2423373.Zd5ThvQH5g@positron.chronox.de>
+In-Reply-To: <9733066.Vrs4h5eWcW@positron.chronox.de>
+References: <20190103143227.9138-1-jlee@suse.com> <20190109082103.GA8586@sol.localdomain> <9733066.Vrs4h5eWcW@positron.chronox.de>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-ALG_SET_KEY_TYPE requires caller to pass the key_type to be used
-for AES encryption/decryption.
+The RFC5869 compliant Key Derivation Function is implemented as a
+random number generator considering that it behaves like a deterministic
+RNG.
 
-Sometimes the cipher key will be stored in the
-device's hardware. So, there is a need to specify
-the information about the key to use for AES operations.
+The extract and expand phases use different instances of the underlying
+keyed message digest cipher to ensure that while the extraction phase
+generates a new key for the expansion phase, the cipher for the
+expansion phase can still be used. This approach is intended to aid
+multi-threaded uses cases.
 
-In Xilinx ZynqMP SoC, below key types are available
-
-1. Device key, which is flashed in the HW.
-
-2. PUF KEK, which can be regenerated using the
-   helper data programmed in the HW.
-
-3. User supplied key.
-
-So to choose the AES key to be used, this patch adds key-type attribute.
-
-Signed-off-by: Kalyani Akula <kalyani.akula@xilinx.com>
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- crypto/af_alg.c             |  7 +++++++
- crypto/algif_skcipher.c     |  7 +++++++
- crypto/blkcipher.c          |  9 +++++++++
- crypto/skcipher.c           | 18 ++++++++++++++++++
- include/crypto/if_alg.h     |  2 ++
- include/crypto/skcipher.h   | 10 ++++++++++
- include/linux/crypto.h      | 12 ++++++++++++
- include/uapi/linux/if_alg.h |  1 +
- 8 files changed, 66 insertions(+)
+ crypto/Kconfig  |   6 +
+ crypto/Makefile |   1 +
+ crypto/hkdf.c   | 290 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 297 insertions(+)
+ create mode 100644 crypto/hkdf.c
 
-diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-index 17eb09d..c3c0660 100644
---- a/crypto/af_alg.c
-+++ b/crypto/af_alg.c
-@@ -261,6 +261,13 @@ static int alg_setsockopt(struct socket *sock, int level, int optname,
- 		if (!type->setauthsize)
- 			goto unlock;
- 		err = type->setauthsize(ask->private, optlen);
-+		break;
-+	case ALG_SET_KEY_TYPE:
-+		if (sock->state == SS_CONNECTED)
-+			goto unlock;
-+		if (!type->setkeytype)
-+			goto unlock;
-+		err = type->setkeytype(ask->private, optval, optlen);
- 	}
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index cc80d89e0cf5..0eee5e129fa3 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -568,6 +568,12 @@ config CRYPTO_KDF
+ 	  Support for KDF compliant to SP800-108. All three types of
+ 	  KDF specified in SP800-108 are implemented.
  
- unlock:
-diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
-index cfdaab2..9911a56 100644
---- a/crypto/algif_skcipher.c
-+++ b/crypto/algif_skcipher.c
-@@ -320,6 +320,12 @@ static int skcipher_setkey(void *private, const u8 *key, unsigned int keylen)
- 	return crypto_skcipher_setkey(private, key, keylen);
- }
- 
-+static int skcipher_setkeytype(void *private, const u8 *key,
-+			       unsigned int keylen)
++config CRYPTO_HKDF
++	tristate "HMAC-based Extract-and expand Key Derivation Function"
++	select CRYPTO_RNG
++	help
++	  Support for KDF compliant to RFC5869.
++
+ config CRYPTO_XCBC
+ 	tristate "XCBC support"
+ 	select CRYPTO_HASH
+diff --git a/crypto/Makefile b/crypto/Makefile
+index 69a0bb64b0ac..6bbb0a4dea13 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -59,6 +59,7 @@ crypto_user-$(CONFIG_CRYPTO_STATS) += crypto_user_stat.o
+ obj-$(CONFIG_CRYPTO_CMAC) += cmac.o
+ obj-$(CONFIG_CRYPTO_HMAC) += hmac.o
+ obj-$(CONFIG_CRYPTO_KDF) += kdf.o
++obj-$(CONFIG_CRYPTO_HKDF) += hkdf.o
+ obj-$(CONFIG_CRYPTO_VMAC) += vmac.o
+ obj-$(CONFIG_CRYPTO_XCBC) += xcbc.o
+ obj-$(CONFIG_CRYPTO_NULL2) += crypto_null.o
+diff --git a/crypto/hkdf.c b/crypto/hkdf.c
+new file mode 100644
+index 000000000000..35a975ed64a8
+--- /dev/null
++++ b/crypto/hkdf.c
+@@ -0,0 +1,290 @@
++// SPDX-License-Identifier: GPL-2.0
++
++/*
++ * RFC 5869 Key-derivation function
++ *
++ * Copyright (C) 2019, Stephan Mueller <smueller@chronox.de>
++ */
++
++/*
++ * The HKDF extract phase is applied with crypto_rng_reset().
++ * The HKDF expand phase is applied with crypto_rng_generate().
++ *
++ * NOTE: In-place cipher operations are not supported.
++ */
++
++#include <linux/module.h>
++#include <crypto/rng.h>
++#include <crypto/internal/rng.h>
++#include <crypto/hash.h>
++#include <crypto/internal/hash.h>
++#include <linux/rtnetlink.h>
++
++struct crypto_hkdf_ctx {
++	struct crypto_shash *extract_kmd;
++	struct crypto_shash *expand_kmd;
++};
++
++#define CRYPTO_HKDF_MAX_DIGESTSIZE	64
++
++/*
++ * HKDF expand phase
++ */
++static int crypto_hkdf_random(struct crypto_rng *rng,
++			      const u8 *info, unsigned int infolen,
++			      u8 *dst, unsigned int dlen)
 +{
-+	return crypto_skcipher_setkeytype(private, key, keylen);
-+}
++	struct crypto_hkdf_ctx *ctx = crypto_tfm_ctx(crypto_rng_tfm(rng));
++	struct crypto_shash *expand_kmd = ctx->expand_kmd;
++	SHASH_DESC_ON_STACK(desc, expand_kmd);
++	unsigned int h = crypto_shash_digestsize(expand_kmd);
++	int err = 0;
++	u8 *dst_orig = dst;
++	const u8 *prev = NULL;
++	uint8_t ctr = 0x01;
 +
- static void skcipher_sock_destruct(struct sock *sk)
- {
- 	struct alg_sock *ask = alg_sk(sk);
-@@ -384,6 +390,7 @@ static int skcipher_accept_parent(void *private, struct sock *sk)
- 	.bind		=	skcipher_bind,
- 	.release	=	skcipher_release,
- 	.setkey		=	skcipher_setkey,
-+	.setkeytype	=	skcipher_setkeytype,
- 	.accept		=	skcipher_accept_parent,
- 	.accept_nokey	=	skcipher_accept_parent_nokey,
- 	.ops		=	&algif_skcipher_ops,
-diff --git a/crypto/blkcipher.c b/crypto/blkcipher.c
-index c5398bd..8922f58 100644
---- a/crypto/blkcipher.c
-+++ b/crypto/blkcipher.c
-@@ -408,6 +408,14 @@ static int setkey(struct crypto_tfm *tfm, const u8 *key, unsigned int keylen)
- 	return cipher->setkey(tfm, key, keylen);
- }
- 
-+static int setkeytype(struct crypto_tfm *tfm, const u8 *key,
-+		      unsigned int keylen)
-+{
-+	struct blkcipher_alg *cipher = &tfm->__crt_alg->cra_blkcipher;
++	if (dlen > h * 255)
++		return -EINVAL;
 +
-+	return cipher->setkeytype(tfm, key, keylen);
-+}
++	desc->tfm = expand_kmd;
++	desc->flags = crypto_shash_get_flags(expand_kmd) &
++		      CRYPTO_TFM_REQ_MAY_SLEEP;
 +
- static int async_setkey(struct crypto_ablkcipher *tfm, const u8 *key,
- 			unsigned int keylen)
- {
-@@ -478,6 +486,7 @@ static int crypto_init_blkcipher_ops_sync(struct crypto_tfm *tfm)
- 	unsigned long addr;
- 
- 	crt->setkey = setkey;
-+	crt->setkeytype = setkeytype;
- 	crt->encrypt = alg->encrypt;
- 	crt->decrypt = alg->decrypt;
- 
-diff --git a/crypto/skcipher.c b/crypto/skcipher.c
-index 2a96929..6a2a0dd 100644
---- a/crypto/skcipher.c
-+++ b/crypto/skcipher.c
-@@ -605,6 +605,23 @@ static int skcipher_setkey_blkcipher(struct crypto_skcipher *tfm,
- 	return 0;
- }
- 
-+static int skcipher_setkeytype_blkcipher(struct crypto_skcipher *tfm,
-+					 const u8 *key, unsigned int keylen)
-+{
-+	struct crypto_blkcipher **ctx = crypto_skcipher_ctx(tfm);
-+	struct crypto_blkcipher *blkcipher = *ctx;
-+	int err;
++	/* T(1) and following */
++	while (dlen) {
++		err = crypto_shash_init(desc);
++		if (err)
++			goto out;
 +
-+	crypto_blkcipher_clear_flags(blkcipher, ~0);
-+	crypto_blkcipher_set_flags(blkcipher, crypto_skcipher_get_flags(tfm) &
-+			CRYPTO_TFM_REQ_MASK);
-+	err = crypto_blkcipher_setkeytype(blkcipher, key, keylen);
-+	crypto_skcipher_set_flags(tfm, crypto_blkcipher_get_flags(blkcipher) &
-+			CRYPTO_TFM_RES_MASK);
++		if (prev) {
++			err = crypto_shash_update(desc, prev, h);
++			if (err)
++				goto out;
++		}
 +
++		if (info) {
++			err = crypto_shash_update(desc, info, infolen);
++			if (err)
++				goto out;
++		}
++
++		if (dlen < h) {
++			u8 tmpbuffer[CRYPTO_HKDF_MAX_DIGESTSIZE];
++
++			err = crypto_shash_finup(desc, &ctr, 1, tmpbuffer);
++			if (err)
++				goto out;
++			memcpy(dst, tmpbuffer, dlen);
++			memzero_explicit(tmpbuffer, h);
++			goto out;
++		} else {
++			err = crypto_shash_finup(desc, &ctr, 1, dst);
++			if (err)
++				goto out;
++
++			prev = dst;
++			dst += h;
++			dlen -= h;
++			ctr++;
++		}
++	}
++
++out:
++	if (err)
++		memzero_explicit(dst_orig, dlen);
++	shash_desc_zero(desc);
 +	return err;
 +}
 +
- static int skcipher_crypt_blkcipher(struct skcipher_request *req,
- 				    int (*crypt)(struct blkcipher_desc *,
- 						 struct scatterlist *,
-@@ -671,6 +688,7 @@ static int crypto_init_skcipher_ops_blkcipher(struct crypto_tfm *tfm)
- 	tfm->exit = crypto_exit_skcipher_ops_blkcipher;
- 
- 	skcipher->setkey = skcipher_setkey_blkcipher;
-+	skcipher->setkeytype = skcipher_setkeytype_blkcipher;
- 	skcipher->encrypt = skcipher_encrypt_blkcipher;
- 	skcipher->decrypt = skcipher_decrypt_blkcipher;
- 
-diff --git a/include/crypto/if_alg.h b/include/crypto/if_alg.h
-index 482461d..202298e 100644
---- a/include/crypto/if_alg.h
-+++ b/include/crypto/if_alg.h
-@@ -51,6 +51,8 @@ struct af_alg_type {
- 	void *(*bind)(const char *name, u32 type, u32 mask);
- 	void (*release)(void *private);
- 	int (*setkey)(void *private, const u8 *key, unsigned int keylen);
-+	int (*setkeytype)(void *private, const u8 *keytype,
-+			  unsigned int keylen);
- 	int (*accept)(void *private, struct sock *sk);
- 	int (*accept_nokey)(void *private, struct sock *sk);
- 	int (*setauthsize)(void *private, unsigned int authsize);
-diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
-index e555294..a6e1eda 100644
---- a/include/crypto/skcipher.h
-+++ b/include/crypto/skcipher.h
-@@ -42,6 +42,8 @@ struct skcipher_request {
- struct crypto_skcipher {
- 	int (*setkey)(struct crypto_skcipher *tfm, const u8 *key,
- 	              unsigned int keylen);
-+	int (*setkeytype)(struct crypto_skcipher *tfm, const u8 *key,
-+			  unsigned int keylen);
- 	int (*encrypt)(struct skcipher_request *req);
- 	int (*decrypt)(struct skcipher_request *req);
- 
-@@ -116,6 +118,8 @@ struct crypto_sync_skcipher {
- struct skcipher_alg {
- 	int (*setkey)(struct crypto_skcipher *tfm, const u8 *key,
- 	              unsigned int keylen);
-+	int (*setkeytype)(struct crypto_skcipher *tfm, const u8 *key,
-+			  unsigned int keylen);
- 	int (*encrypt)(struct skcipher_request *req);
- 	int (*decrypt)(struct skcipher_request *req);
- 	int (*init)(struct crypto_skcipher *tfm);
-@@ -444,6 +448,12 @@ static inline int crypto_sync_skcipher_setkey(struct crypto_sync_skcipher *tfm,
- 	return crypto_skcipher_setkey(&tfm->base, key, keylen);
- }
- 
-+static inline int crypto_skcipher_setkeytype(struct crypto_skcipher *tfm,
-+					     const u8 *key, unsigned int keylen)
++/*
++ * HKDF extract phase.
++ *
++ * The seed is defined to be a concatenation of the salt and the IKM.
++ * The data buffer is pre-pended by an rtattr which provides an u32 value
++ * with the length of the salt. Thus, the buffer length - salt length is the
++ * IKM length.
++ */
++static int crypto_hkdf_seed(struct crypto_rng *rng,
++			    const u8 *seed, unsigned int slen)
 +{
-+	return tfm->setkeytype(tfm, key, keylen);
++	struct crypto_hkdf_ctx *ctx = crypto_tfm_ctx(crypto_rng_tfm(rng));
++	struct crypto_shash *extract_kmd = ctx->extract_kmd;
++	struct crypto_shash *expand_kmd = ctx->expand_kmd;
++	struct rtattr *rta = (struct rtattr *)seed;
++	SHASH_DESC_ON_STACK(desc, extract_kmd);
++	u32 saltlen;
++	unsigned int h = crypto_shash_digestsize(extract_kmd);
++	int err;
++	const uint8_t null_salt[CRYPTO_HKDF_MAX_DIGESTSIZE] = { 0 };
++	u8 prk[CRYPTO_HKDF_MAX_DIGESTSIZE] = { 0 };
++
++	/* Require aligned buffer to directly read out saltlen below */
++	if (WARN_ON((unsigned long)seed & (sizeof(saltlen) - 1)))
++		return -EINVAL;
++
++	if (!RTA_OK(rta, slen))
++		return -EINVAL;
++	if (rta->rta_type != 1)
++		return -EINVAL;
++	if (RTA_PAYLOAD(rta) < sizeof(saltlen))
++		return -EINVAL;
++	saltlen = *((u32 *)RTA_DATA(rta));
++
++	seed += RTA_ALIGN(rta->rta_len);
++	slen -= RTA_ALIGN(rta->rta_len);
++
++	if (slen < saltlen)
++		return -EINVAL;
++
++	desc->tfm = extract_kmd;
++
++	/* Set the salt as HMAC key */
++	if (saltlen)
++		err = crypto_shash_setkey(extract_kmd, seed, saltlen);
++	else
++		err = crypto_shash_setkey(extract_kmd, null_salt, h);
++	if (err)
++		return err;
++
++	/* Extract the PRK */
++	err = crypto_shash_digest(desc, seed + saltlen, slen - saltlen, prk);
++	if (err)
++		goto err;
++
++	/* Set the PRK for the expand phase */
++	err = crypto_shash_setkey(expand_kmd, prk, h);
++	if (err)
++		goto err;
++
++err:
++	shash_desc_zero(desc);
++	memzero_explicit(prk, h);
++	return err;
 +}
 +
- static inline unsigned int crypto_skcipher_default_keysize(
- 	struct crypto_skcipher *tfm)
- {
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index 902ec17..a47c9a8 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -268,6 +268,8 @@ struct ablkcipher_alg {
- struct blkcipher_alg {
- 	int (*setkey)(struct crypto_tfm *tfm, const u8 *key,
- 	              unsigned int keylen);
-+	int (*setkeytype)(struct crypto_tfm *tfm, const u8 *keytype,
-+			  unsigned int keylen);
- 	int (*encrypt)(struct blkcipher_desc *desc,
- 		       struct scatterlist *dst, struct scatterlist *src,
- 		       unsigned int nbytes);
-@@ -734,6 +736,8 @@ struct blkcipher_tfm {
- 	void *iv;
- 	int (*setkey)(struct crypto_tfm *tfm, const u8 *key,
- 		      unsigned int keylen);
-+	int (*setkeytype)(struct crypto_tfm *tfm, const u8 *key,
-+			  unsigned int keylen);
- 	int (*encrypt)(struct blkcipher_desc *desc, struct scatterlist *dst,
- 		       struct scatterlist *src, unsigned int nbytes);
- 	int (*decrypt)(struct blkcipher_desc *desc, struct scatterlist *dst,
-@@ -1466,6 +1470,14 @@ static inline int crypto_blkcipher_setkey(struct crypto_blkcipher *tfm,
- 						 key, keylen);
- }
- 
-+static inline int crypto_blkcipher_setkeytype(struct crypto_blkcipher *tfm,
-+					      const u8 *key,
-+					      unsigned int keylen)
++static int crypto_hkdf_init_tfm(struct crypto_tfm *tfm)
 +{
-+	return crypto_blkcipher_crt(tfm)->setkeytype(crypto_blkcipher_tfm(tfm),
-+						     key, keylen);
++	struct crypto_instance *inst = crypto_tfm_alg_instance(tfm);
++	struct crypto_shash_spawn *spawn = crypto_instance_ctx(inst);
++	struct crypto_hkdf_ctx *ctx = crypto_tfm_ctx(tfm);
++	struct crypto_shash *extract_kmd = NULL, *expand_kmd = NULL;
++	unsigned int ds;
++
++	extract_kmd = crypto_spawn_shash(spawn);
++	if (IS_ERR(extract_kmd))
++		return PTR_ERR(extract_kmd);
++
++	expand_kmd = crypto_spawn_shash(spawn);
++	if (IS_ERR(expand_kmd)) {
++		crypto_free_shash(extract_kmd);
++		return PTR_ERR(expand_kmd);
++	}
++
++	ds = crypto_shash_digestsize(extract_kmd);
++	/* Hashes with no digest size are not allowed for KDFs. */
++	if (!ds || ds > CRYPTO_HKDF_MAX_DIGESTSIZE) {
++		crypto_free_shash(extract_kmd);
++		crypto_free_shash(expand_kmd);
++		return -EOPNOTSUPP;
++	}
++
++	ctx->extract_kmd = extract_kmd;
++	ctx->expand_kmd = expand_kmd;
++
++	return 0;
 +}
 +
- /**
-  * crypto_blkcipher_encrypt() - encrypt plaintext
-  * @desc: reference to the block cipher handle with meta data
-diff --git a/include/uapi/linux/if_alg.h b/include/uapi/linux/if_alg.h
-index bc2bcde..aa31b18 100644
---- a/include/uapi/linux/if_alg.h
-+++ b/include/uapi/linux/if_alg.h
-@@ -35,6 +35,7 @@ struct af_alg_iv {
- #define ALG_SET_OP			3
- #define ALG_SET_AEAD_ASSOCLEN		4
- #define ALG_SET_AEAD_AUTHSIZE		5
-+#define ALG_SET_KEY_TYPE		6
- 
- /* Operations */
- #define ALG_OP_DECRYPT			0
++static void crypto_hkdf_exit_tfm(struct crypto_tfm *tfm)
++{
++	struct crypto_hkdf_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	crypto_free_shash(ctx->extract_kmd);
++	crypto_free_shash(ctx->expand_kmd);
++}
++
++static void crypto_kdf_free(struct rng_instance *inst)
++{
++	crypto_drop_spawn(rng_instance_ctx(inst));
++	kfree(inst);
++}
++
++static int crypto_hkdf_create(struct crypto_template *tmpl, struct rtattr **tb)
++{
++	struct rng_instance *inst;
++	struct crypto_alg *alg;
++	struct shash_alg *salg;
++	int err;
++	unsigned int ds, ss;
++
++	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_RNG);
++	if (err)
++		return err;
++
++	salg = shash_attr_alg(tb[1], 0, 0);
++	if (IS_ERR(salg))
++		return PTR_ERR(salg);
++
++	ds = salg->digestsize;
++	ss = salg->statesize;
++	alg = &salg->base;
++
++	inst = rng_alloc_instance("hkdf", alg);
++	err = PTR_ERR(inst);
++	if (IS_ERR(inst))
++		goto out_put_alg;
++
++	err = crypto_init_shash_spawn(rng_instance_ctx(inst), salg,
++				      rng_crypto_instance(inst));
++	if (err)
++		goto out_free_inst;
++
++	inst->alg.base.cra_priority	= alg->cra_priority;
++	inst->alg.base.cra_blocksize	= alg->cra_blocksize;
++	inst->alg.base.cra_alignmask	= alg->cra_alignmask;
++
++	inst->alg.generate		= crypto_hkdf_random;
++	inst->alg.seed			= crypto_hkdf_seed;
++	inst->alg.seedsize		= ds;
++
++	inst->alg.base.cra_init		= crypto_hkdf_init_tfm;
++	inst->alg.base.cra_exit		= crypto_hkdf_exit_tfm;
++	inst->alg.base.cra_ctxsize	= ALIGN(sizeof(struct crypto_hkdf_ctx) +
++					  ss * 2, crypto_tfm_ctx_alignment());
++
++	inst->free			= crypto_kdf_free;
++
++	err = rng_register_instance(tmpl, inst);
++
++	if (err) {
++out_free_inst:
++		crypto_kdf_free(inst);
++	}
++
++out_put_alg:
++	crypto_mod_put(alg);
++	return err;
++}
++
++static struct crypto_template crypto_hkdf_tmpl = {
++	.name = "hkdf",
++	.create = crypto_hkdf_create,
++	.module = THIS_MODULE,
++};
++
++static int __init crypto_hkdf_init(void)
++{
++	return crypto_register_template(&crypto_hkdf_tmpl);
++}
++
++static void __exit crypto_hkdf_exit(void)
++{
++	crypto_unregister_template(&crypto_hkdf_tmpl);
++}
++
++module_init(crypto_hkdf_init);
++module_exit(crypto_hkdf_exit);
++
++MODULE_LICENSE("GPL");
++MODULE_AUTHOR("Stephan Mueller <smueller@chronox.de>");
++MODULE_DESCRIPTION("Key Derivation Function according to RFC 5869");
++MODULE_ALIAS_CRYPTO("hkdf");
 -- 
-1.9.5
+2.20.1
