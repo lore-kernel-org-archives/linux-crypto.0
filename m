@@ -1,242 +1,503 @@
-Return-Path: <SRS0=+HSe=PS=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:46444 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728352AbfAJMZw (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Jan 2019 07:25:52 -0500
-Received: by mail-pl1-f196.google.com with SMTP id t13so5110420ply.13
-        for <linux-crypto@vger.kernel.org>; Thu, 10 Jan 2019 04:25:52 -0800 (PST)
-From: Sumit Garg <sumit.garg@linaro.org>
-To: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, jens.wiklander@linaro.org,
-        mpm@selenic.com, herbert@gondor.apana.org.au, robh+dt@kernel.org,
-        mark.rutland@arm.com, arnd@arndb.de, gregkh@linuxfoundation.org,
-        daniel.thompson@linaro.org, ard.biesheuvel@linaro.org,
-        bhsharma@redhat.com, tee-dev@lists.linaro.org,
-        Sumit Garg <sumit.garg@linaro.org>
-Subject: [PATCH v2 2/4] tee: optee: add TEE bus device enumeration support
-Date: Thu, 10 Jan 2019 17:54:55 +0530
-Message-Id: <1547123097-16431-3-git-send-email-sumit.garg@linaro.org>
-In-Reply-To: <1547123097-16431-1-git-send-email-sumit.garg@linaro.org>
-References: <1547123097-16431-1-git-send-email-sumit.garg@linaro.org>
+Return-Path: <SRS0=5PE5=PU=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:57876 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725372AbfALFM6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 12 Jan 2019 00:12:58 -0500
+Date: Fri, 11 Jan 2019 21:12:54 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        Andy Lutomirski <luto@amacapital.net>,
+        "Lee, Chun-Yi" <joeyli.kernel@gmail.com>,
+        "Rafael J . Wysocki" <rjw@rjwysocki.net>,
+        Pavel Machek <pavel@ucw.cz>, linux-kernel@vger.kernel.org,
+        linux-pm@vger.kernel.org, keyrings@vger.kernel.org,
+        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+        Chen Yu <yu.c.chen@intel.com>,
+        Oliver Neukum <oneukum@suse.com>,
+        Ryan Chen <yu.chen.surf@gmail.com>,
+        David Howells <dhowells@redhat.com>,
+        Giovanni Gherdovich <ggherdovich@suse.cz>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Jann Horn <jannh@google.com>,
+        Andy Lutomirski <luto@kernel.org>, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH 4/6] crypto: hkdf - RFC5869 Key Derivation Function
+Message-ID: <20190112051252.GA639@sol.localdomain>
+References: <20190103143227.9138-1-jlee@suse.com>
+ <20190109082103.GA8586@sol.localdomain>
+ <9733066.Vrs4h5eWcW@positron.chronox.de>
+ <2423373.Zd5ThvQH5g@positron.chronox.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <2423373.Zd5ThvQH5g@positron.chronox.de>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-OP-TEE provides a pseudo TA to enumerate TAs which can act as devices/
-services for TEE bus. So implement device enumeration using invoke
-function: PTA_CMD_GET_DEVICES provided by pseudo TA to fetch array of
-device UUIDs. Also register these enumerated devices with TEE bus as
-"optee-clntX" device.
+Hi Stephan,
 
-Signed-off-by: Sumit Garg <sumit.garg@linaro.org>
----
- drivers/tee/optee/Makefile        |   1 +
- drivers/tee/optee/core.c          |   4 +
- drivers/tee/optee/device.c        | 150 ++++++++++++++++++++++++++++++++++++++
- drivers/tee/optee/optee_private.h |   3 +
- 4 files changed, 158 insertions(+)
- create mode 100644 drivers/tee/optee/device.c
+On Fri, Jan 11, 2019 at 08:10:39PM +0100, Stephan Müller wrote:
+> The RFC5869 compliant Key Derivation Function is implemented as a
+> random number generator considering that it behaves like a deterministic
+> RNG.
+> 
 
-diff --git a/drivers/tee/optee/Makefile b/drivers/tee/optee/Makefile
-index 48d262a..56263ae 100644
---- a/drivers/tee/optee/Makefile
-+++ b/drivers/tee/optee/Makefile
-@@ -5,3 +5,4 @@ optee-objs += call.o
- optee-objs += rpc.o
- optee-objs += supp.o
- optee-objs += shm_pool.o
-+optee-objs += device.o
-diff --git a/drivers/tee/optee/core.c b/drivers/tee/optee/core.c
-index e5efce3..ac59c77 100644
---- a/drivers/tee/optee/core.c
-+++ b/drivers/tee/optee/core.c
-@@ -634,6 +634,10 @@ static struct optee *optee_probe(struct device_node *np)
- 	if (optee->sec_caps & OPTEE_SMC_SEC_CAP_DYNAMIC_SHM)
- 		pr_info("dynamic shared memory is enabled\n");
- 
-+	rc = optee_enumerate_devices();
-+	if (rc)
-+		goto err;
-+
- 	pr_info("initialized driver\n");
- 	return optee;
- err:
-diff --git a/drivers/tee/optee/device.c b/drivers/tee/optee/device.c
-new file mode 100644
-index 0000000..b38d24b
---- /dev/null
-+++ b/drivers/tee/optee/device.c
-@@ -0,0 +1,150 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (C) 2019 Linaro Ltd.
-+ */
-+
-+#include <linux/kernel.h>
-+#include <linux/slab.h>
-+#include <linux/tee_drv.h>
-+#include <linux/uuid.h>
-+#include "optee_private.h"
-+
-+/*
-+ * Get device UUIDs
-+ *
-+ * [out]     memref[0]        Array of device UUIDs
-+ *
-+ * Return codes:
-+ * TEE_SUCCESS - Invoke command success
-+ * TEE_ERROR_BAD_PARAMETERS - Incorrect input param
-+ * TEE_ERROR_SHORT_BUFFER - Output buffer size less than required
-+ */
-+#define PTA_CMD_GET_DEVICES		0x0
-+
-+static int optee_ctx_match(struct tee_ioctl_version_data *ver, const void *data)
-+{
-+	if (ver->impl_id == TEE_IMPL_ID_OPTEE)
-+		return 1;
-+	else
-+		return 0;
-+}
-+
-+static int get_devices(struct tee_context *ctx, u32 session,
-+		       struct tee_shm *device_uuid, u32 *shm_size)
-+{
-+	u32 ret = 0;
-+	struct tee_ioctl_invoke_arg inv_arg = {0};
-+	struct tee_param param[4] = {0};
-+
-+	/* Invoke PTA_CMD_GET_DEVICES function */
-+	inv_arg.func = PTA_CMD_GET_DEVICES;
-+	inv_arg.session = session;
-+	inv_arg.num_params = 4;
-+
-+	/* Fill invoke cmd params */
-+	param[0].attr = TEE_IOCTL_PARAM_ATTR_TYPE_MEMREF_OUTPUT;
-+	param[0].u.memref.shm = device_uuid;
-+	param[0].u.memref.size = *shm_size;
-+	param[0].u.memref.shm_offs = 0;
-+
-+	ret = tee_client_invoke_func(ctx, &inv_arg, param);
-+	if ((ret < 0) || ((inv_arg.ret != TEEC_SUCCESS) &&
-+			  (inv_arg.ret != TEEC_ERROR_SHORT_BUFFER))) {
-+		pr_err("PTA_CMD_GET_DEVICES invoke function err: %x\n",
-+		       inv_arg.ret);
-+		return -EINVAL;
-+	}
-+
-+	*shm_size = param[0].u.memref.size;
-+
-+	return 0;
-+}
-+
-+static int optee_register_device(uuid_t *device_uuid, u32 device_id)
-+{
-+	struct tee_client_device *optee_device = NULL;
-+	int rc;
-+
-+	optee_device = kzalloc(sizeof(*optee_device), GFP_KERNEL);
-+	if (!optee_device)
-+		return -ENOMEM;
-+
-+	optee_device->dev.bus = &tee_bus_type;
-+	dev_set_name(&optee_device->dev, "optee-clnt%u", device_id);
-+	uuid_copy(&optee_device->id.uuid, device_uuid);
-+
-+	rc = device_register(&optee_device->dev);
-+	if (rc)
-+		pr_err("device registration failed, err: %d\n", rc);
-+
-+	return rc;
-+}
-+
-+int optee_enumerate_devices(void)
-+{
-+	uuid_t pta_uuid =
-+		UUID_INIT(0x7011a688, 0xddde, 0x4053,
-+			  0xa5, 0xa9, 0x7b, 0x3c, 0x4d, 0xdf, 0x13, 0xb8);
-+	struct tee_ioctl_open_session_arg sess_arg = {0};
-+	struct tee_shm *device_shm = NULL;
-+	uuid_t *device_uuid = NULL;
-+	struct tee_context *ctx = NULL;
-+	u32 shm_size = 0, idx = 0;
-+	int rc;
-+
-+	/* Open context with OP-TEE driver */
-+	ctx = tee_client_open_context(NULL, optee_ctx_match, NULL, NULL);
-+	if (IS_ERR(ctx))
-+		return -ENODEV;
-+
-+	/* Open session with device enumeration pseudo TA */
-+	memcpy(sess_arg.uuid, pta_uuid.b, TEE_IOCTL_UUID_LEN);
-+	sess_arg.clnt_login = TEE_IOCTL_LOGIN_PUBLIC;
-+	sess_arg.num_params = 0;
-+
-+	rc = tee_client_open_session(ctx, &sess_arg, NULL);
-+	if ((rc < 0) || (sess_arg.ret != TEEC_SUCCESS)) {
-+		/* Device enumeration pseudo TA not found */
-+		rc = 0;
-+		goto out_ctx;
-+	}
-+
-+	rc = get_devices(ctx, sess_arg.session, device_shm, &shm_size);
-+	if (rc < 0)
-+		goto out_sess;
-+
-+	device_shm = tee_shm_alloc(ctx, shm_size,
-+				   TEE_SHM_MAPPED | TEE_SHM_DMA_BUF);
-+	if (IS_ERR(device_shm)) {
-+		pr_err("tee_shm_alloc failed\n");
-+		rc = PTR_ERR(device_shm);
-+		goto out_sess;
-+	}
-+
-+	rc = get_devices(ctx, sess_arg.session, device_shm, &shm_size);
-+	if (rc < 0)
-+		goto out_shm;
-+
-+	device_uuid = tee_shm_get_va(device_shm, 0);
-+	if (IS_ERR(device_uuid)) {
-+		pr_err("tee_shm_get_va failed\n");
-+		rc = PTR_ERR(device_uuid);
-+		goto out_shm;
-+	}
-+
-+	while (idx < shm_size / sizeof(uuid_t)) {
-+		rc = optee_register_device(&device_uuid[idx], idx);
-+		if (rc)
-+			goto out_shm;
-+		idx++;
-+	}
-+
-+out_shm:
-+	tee_shm_free(device_shm);
-+out_sess:
-+	tee_client_close_session(ctx, sess_arg.session);
-+out_ctx:
-+	tee_client_close_context(ctx);
-+
-+	return rc;
-+}
-diff --git a/drivers/tee/optee/optee_private.h b/drivers/tee/optee/optee_private.h
-index 35e7938..a5e84af 100644
---- a/drivers/tee/optee/optee_private.h
-+++ b/drivers/tee/optee/optee_private.h
-@@ -28,6 +28,7 @@
- #define TEEC_ERROR_BAD_PARAMETERS	0xFFFF0006
- #define TEEC_ERROR_COMMUNICATION	0xFFFF000E
- #define TEEC_ERROR_OUT_OF_MEMORY	0xFFFF000C
-+#define TEEC_ERROR_SHORT_BUFFER		0xFFFF0010
- 
- #define TEEC_ORIGIN_COMMS		0x00000002
- 
-@@ -181,6 +182,8 @@ void optee_free_pages_list(void *array, size_t num_entries);
- void optee_fill_pages_list(u64 *dst, struct page **pages, int num_pages,
- 			   size_t page_offset);
- 
-+int optee_enumerate_devices(void);
-+
- /*
-  * Small helpers
-  */
--- 
-2.7.4
+Thanks for the proof of concept!  I guess it ended up okay.  But can you explain
+more the benefits of using the crypto_rng interface, as opposed to just some
+crypto_hkdf_*() helper functions that are exported for modules to use?
+
+> The extract and expand phases use different instances of the underlying
+> keyed message digest cipher to ensure that while the extraction phase
+> generates a new key for the expansion phase, the cipher for the
+> expansion phase can still be used. This approach is intended to aid
+> multi-threaded uses cases.
+
+I think you partially misunderstood what I was asking for.  One HMAC tfm is
+sufficient as long as HKDF-Expand is separated from HKDF-Extract, which you've
+done.  So just use one HMAC tfm, and in crypto_hkdf_seed() key it with the
+'salt', and then afterwards with the 'prk'.
+
+Also everywhere in this patchset, please avoid using the word "cipher" to refer
+to algorithms that are not encryption/decryption.  I know a lot of the crypto
+API docs do this, but I think it is a mistake and confusing.  Hash algorithms
+and KDFs are not "ciphers".
+
+> 
+> Signed-off-by: Stephan Mueller <smueller@chronox.de>
+> ---
+>  crypto/Kconfig  |   6 +
+>  crypto/Makefile |   1 +
+>  crypto/hkdf.c   | 290 ++++++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 297 insertions(+)
+>  create mode 100644 crypto/hkdf.c
+> 
+> diff --git a/crypto/Kconfig b/crypto/Kconfig
+> index cc80d89e0cf5..0eee5e129fa3 100644
+> --- a/crypto/Kconfig
+> +++ b/crypto/Kconfig
+> @@ -568,6 +568,12 @@ config CRYPTO_KDF
+>  	  Support for KDF compliant to SP800-108. All three types of
+>  	  KDF specified in SP800-108 are implemented.
+>  
+> +config CRYPTO_HKDF
+> +	tristate "HMAC-based Extract-and expand Key Derivation Function"
+> +	select CRYPTO_RNG
+> +	help
+> +	  Support for KDF compliant to RFC5869.
+> +
+
+Make the description
+"HMAC-based Extract-and-Expand Key Derivation Function (HKDF)"?
+There is a missing dash, and probably the acronym "HKDF" should be in there.
+
+>  config CRYPTO_XCBC
+>  	tristate "XCBC support"
+>  	select CRYPTO_HASH
+> diff --git a/crypto/Makefile b/crypto/Makefile
+> index 69a0bb64b0ac..6bbb0a4dea13 100644
+> --- a/crypto/Makefile
+> +++ b/crypto/Makefile
+> @@ -59,6 +59,7 @@ crypto_user-$(CONFIG_CRYPTO_STATS) += crypto_user_stat.o
+>  obj-$(CONFIG_CRYPTO_CMAC) += cmac.o
+>  obj-$(CONFIG_CRYPTO_HMAC) += hmac.o
+>  obj-$(CONFIG_CRYPTO_KDF) += kdf.o
+> +obj-$(CONFIG_CRYPTO_HKDF) += hkdf.o
+>  obj-$(CONFIG_CRYPTO_VMAC) += vmac.o
+>  obj-$(CONFIG_CRYPTO_XCBC) += xcbc.o
+>  obj-$(CONFIG_CRYPTO_NULL2) += crypto_null.o
+> diff --git a/crypto/hkdf.c b/crypto/hkdf.c
+> new file mode 100644
+> index 000000000000..35a975ed64a8
+> --- /dev/null
+> +++ b/crypto/hkdf.c
+> @@ -0,0 +1,290 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +
+> +/*
+> + * RFC 5869 Key-derivation function
+> + *
+
+People don't know what RFC xyz is.  Please be more explicit than just the RFC
+number, e.g.
+
+"HKDF: HMAC-based Extract-and-Expand Key Derivation Function (RFC 5869)"
+
+> + * Copyright (C) 2019, Stephan Mueller <smueller@chronox.de>
+> + */
+> +
+> +/*
+> + * The HKDF extract phase is applied with crypto_rng_reset().
+> + * The HKDF expand phase is applied with crypto_rng_generate().
+> + *
+> + * NOTE: In-place cipher operations are not supported.
+> + */
+
+What does an "in-place cipher operation" mean in this context?  That the 'info'
+buffer must not overlap the 'dst' buffer?  Maybe crypto_rng_generate() should
+check that for all crypto_rngs?  Or is it different for different crypto_rngs?
+
+> +
+> +#include <linux/module.h>
+> +#include <crypto/rng.h>
+> +#include <crypto/internal/rng.h>
+> +#include <crypto/hash.h>
+> +#include <crypto/internal/hash.h>
+> +#include <linux/rtnetlink.h>
+> +
+> +struct crypto_hkdf_ctx {
+> +	struct crypto_shash *extract_kmd;
+> +	struct crypto_shash *expand_kmd;
+> +};
+> +
+> +#define CRYPTO_HKDF_MAX_DIGESTSIZE	64
+> +
+> +/*
+> + * HKDF expand phase
+> + */
+> +static int crypto_hkdf_random(struct crypto_rng *rng,
+> +			      const u8 *info, unsigned int infolen,
+> +			      u8 *dst, unsigned int dlen)
+
+Why call it crypto_hkdf_random() instead of crypto_hkdf_generate()?  The latter
+would match rng_alg::generate.
+
+> +{
+> +	struct crypto_hkdf_ctx *ctx = crypto_tfm_ctx(crypto_rng_tfm(rng));
+
+const
+
+> +	struct crypto_shash *expand_kmd = ctx->expand_kmd;
+> +	SHASH_DESC_ON_STACK(desc, expand_kmd);
+
+> +	unsigned int h = crypto_shash_digestsize(expand_kmd);
+
+const
+
+> +	int err = 0;
+> +	u8 *dst_orig = dst;
+> +	const u8 *prev = NULL;
+
+> +	uint8_t ctr = 0x01;
+
+u8 instead of uint8_t
+
+> +
+> +	if (dlen > h * 255)
+> +		return -EINVAL;
+> +
+> +	desc->tfm = expand_kmd;
+
+> +	desc->flags = crypto_shash_get_flags(expand_kmd) &
+> +		      CRYPTO_TFM_REQ_MAY_SLEEP;
+
+This line setting desc->flags doesn't make sense.  How is the user meant to
+control whether crypto_rng_generate() can sleep or not?  Or can it always sleep?
+Either way this part is wrong since the user can't get access to the HMAC tfm to
+set this flag being checked for.
+
+> +
+> +	/* T(1) and following */
+> +	while (dlen) {
+> +		err = crypto_shash_init(desc);
+> +		if (err)
+> +			goto out;
+> +
+> +		if (prev) {
+> +			err = crypto_shash_update(desc, prev, h);
+> +			if (err)
+> +				goto out;
+> +		}
+> +
+> +		if (info) {
+> +			err = crypto_shash_update(desc, info, infolen);
+> +			if (err)
+> +				goto out;
+> +		}
+> +
+> +		if (dlen < h) {
+> +			u8 tmpbuffer[CRYPTO_HKDF_MAX_DIGESTSIZE];
+> +
+> +			err = crypto_shash_finup(desc, &ctr, 1, tmpbuffer);
+> +			if (err)
+> +				goto out;
+> +			memcpy(dst, tmpbuffer, dlen);
+> +			memzero_explicit(tmpbuffer, h);
+> +			goto out;
+> +		} else {
+
+No need for the 'else'.
+
+> +			err = crypto_shash_finup(desc, &ctr, 1, dst);
+> +			if (err)
+> +				goto out;
+> +
+> +			prev = dst;
+> +			dst += h;
+> +			dlen -= h;
+> +			ctr++;
+> +		}
+> +	}
+> +
+> +out:
+> +	if (err)
+> +		memzero_explicit(dst_orig, dlen);
+> +	shash_desc_zero(desc);
+> +	return err;
+> +}
+> +
+> +/*
+> + * HKDF extract phase.
+> + *
+> + * The seed is defined to be a concatenation of the salt and the IKM.
+> + * The data buffer is pre-pended by an rtattr which provides an u32 value
+> + * with the length of the salt. Thus, the buffer length - salt length is the
+> + * IKM length.
+> + */
+> +static int crypto_hkdf_seed(struct crypto_rng *rng,
+> +			    const u8 *seed, unsigned int slen)
+> +{
+> +	struct crypto_hkdf_ctx *ctx = crypto_tfm_ctx(crypto_rng_tfm(rng));
+
+const
+
+> +	struct crypto_shash *extract_kmd = ctx->extract_kmd;
+> +	struct crypto_shash *expand_kmd = ctx->expand_kmd;
+> +	struct rtattr *rta = (struct rtattr *)seed;
+> +	SHASH_DESC_ON_STACK(desc, extract_kmd);
+> +	u32 saltlen;
+> +	unsigned int h = crypto_shash_digestsize(extract_kmd);
+> +	int err;
+> +	const uint8_t null_salt[CRYPTO_HKDF_MAX_DIGESTSIZE] = { 0 };
+
+static const
+
+> +	u8 prk[CRYPTO_HKDF_MAX_DIGESTSIZE] = { 0 };
+
+No need to initialize this.
+
+> +
+> +	/* Require aligned buffer to directly read out saltlen below */
+> +	if (WARN_ON((unsigned long)seed & (sizeof(saltlen) - 1)))
+> +		return -EINVAL;
+> +
+> +	if (!RTA_OK(rta, slen))
+> +		return -EINVAL;
+> +	if (rta->rta_type != 1)
+> +		return -EINVAL;
+> +	if (RTA_PAYLOAD(rta) < sizeof(saltlen))
+> +		return -EINVAL;
+> +	saltlen = *((u32 *)RTA_DATA(rta));
+
+I'm guessing you copied the weird "length as a rtattr payload" approach from the
+authenc template.  I think it's not necessary.  And it's overly error-prone, as
+shown by the authenc template getting the parsing wrong for years and you making
+the exact same mistake again here...
+(See https://patchwork.kernel.org/patch/10732803/)  How about just using a u32
+at the beginning without the 'rtattr' preceding it?
+
+Also it should use get_unaligned() so there is no alignment requirement the
+caller has to comply with.
+
+> +
+> +	seed += RTA_ALIGN(rta->rta_len);
+> +	slen -= RTA_ALIGN(rta->rta_len);
+> +
+> +	if (slen < saltlen)
+> +		return -EINVAL;
+> +
+
+> +	desc->tfm = extract_kmd;
+
+desc->flags needs to be set.
+
+> +
+> +	/* Set the salt as HMAC key */
+> +	if (saltlen)
+> +		err = crypto_shash_setkey(extract_kmd, seed, saltlen);
+> +	else
+> +		err = crypto_shash_setkey(extract_kmd, null_salt, h);
+> +	if (err)
+> +		return err;
+> +
+> +	/* Extract the PRK */
+> +	err = crypto_shash_digest(desc, seed + saltlen, slen - saltlen, prk);
+> +	if (err)
+> +		goto err;
+> +
+> +	/* Set the PRK for the expand phase */
+> +	err = crypto_shash_setkey(expand_kmd, prk, h);
+> +	if (err)
+> +		goto err;
+> +
+> +err:
+> +	shash_desc_zero(desc);
+> +	memzero_explicit(prk, h);
+> +	return err;
+> +}
+> +
+> +static int crypto_hkdf_init_tfm(struct crypto_tfm *tfm)
+> +{
+> +	struct crypto_instance *inst = crypto_tfm_alg_instance(tfm);
+> +	struct crypto_shash_spawn *spawn = crypto_instance_ctx(inst);
+> +	struct crypto_hkdf_ctx *ctx = crypto_tfm_ctx(tfm);
+> +	struct crypto_shash *extract_kmd = NULL, *expand_kmd = NULL;
+> +	unsigned int ds;
+> +
+> +	extract_kmd = crypto_spawn_shash(spawn);
+> +	if (IS_ERR(extract_kmd))
+> +		return PTR_ERR(extract_kmd);
+> +
+> +	expand_kmd = crypto_spawn_shash(spawn);
+> +	if (IS_ERR(expand_kmd)) {
+> +		crypto_free_shash(extract_kmd);
+> +		return PTR_ERR(expand_kmd);
+> +	}
+> +
+> +	ds = crypto_shash_digestsize(extract_kmd);
+> +	/* Hashes with no digest size are not allowed for KDFs. */
+> +	if (!ds || ds > CRYPTO_HKDF_MAX_DIGESTSIZE) {
+> +		crypto_free_shash(extract_kmd);
+> +		crypto_free_shash(expand_kmd);
+> +		return -EOPNOTSUPP;
+> +	}
+
+The digest size should be validated when instantiating the template, not here.
+
+> +
+> +	ctx->extract_kmd = extract_kmd;
+> +	ctx->expand_kmd = expand_kmd;
+> +
+> +	return 0;
+> +}
+> +
+> +static void crypto_hkdf_exit_tfm(struct crypto_tfm *tfm)
+> +{
+> +	struct crypto_hkdf_ctx *ctx = crypto_tfm_ctx(tfm);
+> +
+> +	crypto_free_shash(ctx->extract_kmd);
+> +	crypto_free_shash(ctx->expand_kmd);
+> +}
+> +
+> +static void crypto_kdf_free(struct rng_instance *inst)
+> +{
+> +	crypto_drop_spawn(rng_instance_ctx(inst));
+> +	kfree(inst);
+> +}
+> +
+> +static int crypto_hkdf_create(struct crypto_template *tmpl, struct rtattr **tb)
+> +{
+> +	struct rng_instance *inst;
+> +	struct crypto_alg *alg;
+> +	struct shash_alg *salg;
+> +	int err;
+> +	unsigned int ds, ss;
+> +
+> +	err = crypto_check_attr_type(tb, CRYPTO_ALG_TYPE_RNG);
+> +	if (err)
+> +		return err;
+> +
+> +	salg = shash_attr_alg(tb[1], 0, 0);
+> +	if (IS_ERR(salg))
+> +		return PTR_ERR(salg);
+> +
+> +	ds = salg->digestsize;
+> +	ss = salg->statesize;
+
+I don't see what the 'statesize' is needed for.
+
+> +	alg = &salg->base;
+
+Check here that the underlying algorithm really is "hmac(" something?
+
+Alternatively it may be a good idea to simplify usage by making the template
+just take the unkeyed hash directly, like "hkdf(sha512)".  And if any users
+really need to specify a specific HMAC implementation then another template
+usable as "hkdf_base(hmac(sha512))" could be added later.
+
+> +
+> +	inst = rng_alloc_instance("hkdf", alg);
+> +	err = PTR_ERR(inst);
+> +	if (IS_ERR(inst))
+> +		goto out_put_alg;
+> +
+> +	err = crypto_init_shash_spawn(rng_instance_ctx(inst), salg,
+> +				      rng_crypto_instance(inst));
+> +	if (err)
+> +		goto out_free_inst;
+
+This error path calls crypto_drop_spawn() without a prior successful
+crypto_init_spawn().
+
+> +
+> +	inst->alg.base.cra_priority	= alg->cra_priority;
+> +	inst->alg.base.cra_blocksize	= alg->cra_blocksize;
+> +	inst->alg.base.cra_alignmask	= alg->cra_alignmask;
+> +
+> +	inst->alg.generate		= crypto_hkdf_random;
+> +	inst->alg.seed			= crypto_hkdf_seed;
+> +	inst->alg.seedsize		= ds;
+
+What does the seedsize mean here, given that crypto_hkdf_seed() actually takes a
+variable length seed?
+
+> +
+> +	inst->alg.base.cra_init		= crypto_hkdf_init_tfm;
+> +	inst->alg.base.cra_exit		= crypto_hkdf_exit_tfm;
+
+> +	inst->alg.base.cra_ctxsize	= ALIGN(sizeof(struct crypto_hkdf_ctx) +
+> +					  ss * 2, crypto_tfm_ctx_alignment());
+
+Why isn't this simply sizeof(struct crypto_hkdf_ctx)?
+
+> +
+> +	inst->free			= crypto_kdf_free;
+> +
+> +	err = rng_register_instance(tmpl, inst);
+> +
+> +	if (err) {
+> +out_free_inst:
+> +		crypto_kdf_free(inst);
+> +	}
+> +
+> +out_put_alg:
+> +	crypto_mod_put(alg);
+> +	return err;
+> +}
+> +
+> +static struct crypto_template crypto_hkdf_tmpl = {
+> +	.name = "hkdf",
+> +	.create = crypto_hkdf_create,
+> +	.module = THIS_MODULE,
+> +};
+> +
+> +static int __init crypto_hkdf_init(void)
+> +{
+> +	return crypto_register_template(&crypto_hkdf_tmpl);
+> +}
+> +
+> +static void __exit crypto_hkdf_exit(void)
+> +{
+> +	crypto_unregister_template(&crypto_hkdf_tmpl);
+> +}
+> +
+> +module_init(crypto_hkdf_init);
+> +module_exit(crypto_hkdf_exit);
+> +
+> +MODULE_LICENSE("GPL");
+
+MODULE_LICENSE("GPL") means GPLv2+ but the SPDX header says GPLv2 only.
+
+> +MODULE_AUTHOR("Stephan Mueller <smueller@chronox.de>");
+> +MODULE_DESCRIPTION("Key Derivation Function according to RFC 5869");
+
+Mention "HKDF" in the module description?
+
+> +MODULE_ALIAS_CRYPTO("hkdf");
+> -- 
+> 2.20.1
+
+Thanks!
+
+- Eric
