@@ -1,65 +1,152 @@
-Return-Path: <SRS0=b5ak=PZ=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from szxga07-in.huawei.com ([45.249.212.35]:40928 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727449AbfAQCvP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 16 Jan 2019 21:51:15 -0500
-Subject: Re: [PATCH 0/5] Crypto Cleanup
-To: Eric Biggers <ebiggers@kernel.org>
-CC: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <broonie@kernel.org>, <ard.biesheuvel@linaro.org>,
-        <jonathan.cameron@huawei.com>
-References: <1547607034-40948-1-git-send-email-wangxiongfeng2@huawei.com>
- <20190116174949.GA152952@gmail.com>
-From: Xiongfeng Wang <wangxiongfeng2@huawei.com>
-Message-ID: <62435a58-91fb-c48d-73f8-0b7634721924@huawei.com>
-Date: Thu, 17 Jan 2019 10:50:08 +0800
+Return-Path: <SRS0=EWVs=PV=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:56314 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726581AbfAMXeV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 13 Jan 2019 18:34:21 -0500
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [PATCH 3/5] crypto: testmgr - add gcm(aes) decryption tests to encryption tests
+Date: Sun, 13 Jan 2019 15:32:26 -0800
+Message-Id: <20190113233228.5851-4-ebiggers@kernel.org>
+In-Reply-To: <20190113233228.5851-1-ebiggers@kernel.org>
+References: <20190113233228.5851-1-ebiggers@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20190116174949.GA152952@gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
+From: Eric Biggers <ebiggers@google.com>
 
+Some "gcm(aes)" decryption test vectors don't exactly match any of the
+encryption test vectors with input and result swapped.  In preparation
+for removing the AEAD decryption test vectors and testing AEAD
+decryption using the encryption test vectors, add these to the
+encryption test vectors, so we don't lose any test coverage.
 
-On 2019/1/17 1:49, Eric Biggers wrote:
-> On Wed, Jan 16, 2019 at 10:50:29AM +0800, Xiongfeng Wang wrote:
->> The patchset introduce a helper to (un)register a array of crypto templates.
->> The following patches use this helper to simplify the code. This is also
->> a preparation for a coming patchset, which will register several crypto
->> templates.
->>
->> Xiongfeng Wang (5):
->>   crypto: api - add a helper to (un)register a array of templates
->>   crypto: ccm - use template array registering API to simplify the code
->>   crypto: gcm - use template array registering API to simplify the code
->>   crypto: ctr - use template array registering API to simplify the code
->>   crypto: chacha20poly1305 - use template array registering API to
->>     simplify the code
->>
->>  crypto/algapi.c           | 27 ++++++++++++++++
->>  crypto/ccm.c              | 81 +++++++++++++++--------------------------------
->>  crypto/chacha20poly1305.c | 38 +++++++++-------------
->>  crypto/ctr.c              | 46 ++++++++++-----------------
->>  crypto/gcm.c              | 76 +++++++++++++++-----------------------------
->>  include/crypto/algapi.h   |  2 ++
->>  6 files changed, 113 insertions(+), 157 deletions(-)
->>
->> -- 
->> 1.7.12.4
->>
-> 
-> Hi Xiongfeng, I think this a useful cleanup but can you please rebase this onto
-> cryptodev?  There is a conflict in crypto/ctr.c.
+In the case of the chunked test vector, I truncated the last scatterlist
+element to the end of the plaintext.
 
-Hi Eric, thanks for your reply. I will change it in the next version.
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ crypto/testmgr.h | 105 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 105 insertions(+)
 
-Thanks,
-Xiongfeng
-> 
-> - Eric
-> 
-> .
-> 
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index fa0b1af9f7512..5d8f867b9b837 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -16889,6 +16889,111 @@ static const struct aead_testvec aes_gcm_enc_tv_template[] = {
+ 		.result	= "\x53\x0f\x8a\xfb\xc7\x45\x36\xb9"
+ 			  "\xa9\x63\xb4\xf1\xc4\xcb\x73\x8b",
+ 		.rlen	= 16,
++	}, {
++		.key    = zeroed_string,
++		.klen	= 32,
++		.input	= zeroed_string,
++		.ilen	= 16,
++		.result	= "\xce\xa7\x40\x3d\x4d\x60\x6b\x6e"
++			  "\x07\x4e\xc5\xd3\xba\xf3\x9d\x18"
++			  "\xd0\xd1\xc8\xa7\x99\x99\x6b\xf0"
++			  "\x26\x5b\x98\xb5\xd4\x8a\xb9\x19",
++		.rlen	= 32,
++	}, {
++		.key	= "\xfe\xff\xe9\x92\x86\x65\x73\x1c"
++			  "\x6d\x6a\x8f\x94\x67\x30\x83\x08"
++			  "\xfe\xff\xe9\x92\x86\x65\x73\x1c"
++			  "\x6d\x6a\x8f\x94\x67\x30\x83\x08",
++		.klen	= 32,
++		.iv	= "\xca\xfe\xba\xbe\xfa\xce\xdb\xad"
++			  "\xde\xca\xf8\x88",
++		.input	= "\xd9\x31\x32\x25\xf8\x84\x06\xe5"
++			  "\xa5\x59\x09\xc5\xaf\xf5\x26\x9a"
++			  "\x86\xa7\xa9\x53\x15\x34\xf7\xda"
++			  "\x2e\x4c\x30\x3d\x8a\x31\x8a\x72"
++			  "\x1c\x3c\x0c\x95\x95\x68\x09\x53"
++			  "\x2f\xcf\x0e\x24\x49\xa6\xb5\x25"
++			  "\xb1\x6a\xed\xf5\xaa\x0d\xe6\x57"
++			  "\xba\x63\x7b\x39\x1a\xaf\xd2\x55",
++		.ilen	= 64,
++		.result	= "\x52\x2d\xc1\xf0\x99\x56\x7d\x07"
++			  "\xf4\x7f\x37\xa3\x2a\x84\x42\x7d"
++			  "\x64\x3a\x8c\xdc\xbf\xe5\xc0\xc9"
++			  "\x75\x98\xa2\xbd\x25\x55\xd1\xaa"
++			  "\x8c\xb0\x8e\x48\x59\x0d\xbb\x3d"
++			  "\xa7\xb0\x8b\x10\x56\x82\x88\x38"
++			  "\xc5\xf6\x1e\x63\x93\xba\x7a\x0a"
++			  "\xbc\xc9\xf6\x62\x89\x80\x15\xad"
++			  "\xb0\x94\xda\xc5\xd9\x34\x71\xbd"
++			  "\xec\x1a\x50\x22\x70\xe3\xcc\x6c",
++		.rlen	= 80,
++	}, {
++		.key	= "\xfe\xff\xe9\x92\x86\x65\x73\x1c"
++			  "\x6d\x6a\x8f\x94\x67\x30\x83\x08"
++			  "\xfe\xff\xe9\x92\x86\x65\x73\x1c"
++			  "\x6d\x6a\x8f\x94\x67\x30\x83\x08",
++		.klen	= 32,
++		.iv	= "\xca\xfe\xba\xbe\xfa\xce\xdb\xad"
++			  "\xde\xca\xf8\x88",
++		.input	= "\xd9\x31\x32\x25\xf8\x84\x06\xe5"
++			  "\xa5\x59\x09\xc5\xaf\xf5\x26\x9a"
++			  "\x86\xa7\xa9\x53\x15\x34\xf7\xda"
++			  "\x2e\x4c\x30\x3d\x8a\x31\x8a\x72"
++			  "\x1c\x3c\x0c\x95\x95\x68\x09\x53"
++			  "\x2f\xcf\x0e\x24\x49\xa6\xb5\x25"
++			  "\xb1\x6a\xed\xf5\xaa\x0d\xe6\x57"
++			  "\xba\x63\x7b\x39",
++		.ilen	= 60,
++		.assoc	= "\xfe\xed\xfa\xce\xde\xad\xbe\xef"
++			  "\xfe\xed\xfa\xce\xde\xad\xbe\xef"
++			  "\xab\xad\xda\xd2",
++		.alen	= 20,
++		.result	= "\x52\x2d\xc1\xf0\x99\x56\x7d\x07"
++			  "\xf4\x7f\x37\xa3\x2a\x84\x42\x7d"
++			  "\x64\x3a\x8c\xdc\xbf\xe5\xc0\xc9"
++			  "\x75\x98\xa2\xbd\x25\x55\xd1\xaa"
++			  "\x8c\xb0\x8e\x48\x59\x0d\xbb\x3d"
++			  "\xa7\xb0\x8b\x10\x56\x82\x88\x38"
++			  "\xc5\xf6\x1e\x63\x93\xba\x7a\x0a"
++			  "\xbc\xc9\xf6\x62"
++			  "\x76\xfc\x6e\xce\x0f\x4e\x17\x68"
++			  "\xcd\xdf\x88\x53\xbb\x2d\x55\x1b",
++		.rlen	= 76,
++		.np     = 2,
++		.tap    = { 48, 12 },
++		.anp	= 3,
++		.atap	= { 8, 8, 4 }
++	}, {
++		.key	= "\xfe\xff\xe9\x92\x86\x65\x73\x1c"
++			  "\x6d\x6a\x8f\x94\x67\x30\x83\x08"
++			  "\xfe\xff\xe9\x92\x86\x65\x73\x1c",
++		.klen	= 24,
++		.iv	= "\xca\xfe\xba\xbe\xfa\xce\xdb\xad"
++			  "\xde\xca\xf8\x88",
++		.input	= "\xd9\x31\x32\x25\xf8\x84\x06\xe5"
++			  "\xa5\x59\x09\xc5\xaf\xf5\x26\x9a"
++			  "\x86\xa7\xa9\x53\x15\x34\xf7\xda"
++			  "\x2e\x4c\x30\x3d\x8a\x31\x8a\x72"
++			  "\x1c\x3c\x0c\x95\x95\x68\x09\x53"
++			  "\x2f\xcf\x0e\x24\x49\xa6\xb5\x25"
++			  "\xb1\x6a\xed\xf5\xaa\x0d\xe6\x57"
++			  "\xba\x63\x7b\x39",
++		.ilen	= 60,
++		.assoc	= "\xfe\xed\xfa\xce\xde\xad\xbe\xef"
++			  "\xfe\xed\xfa\xce\xde\xad\xbe\xef"
++			  "\xab\xad\xda\xd2",
++		.alen	= 20,
++		.result	= "\x39\x80\xca\x0b\x3c\x00\xe8\x41"
++			  "\xeb\x06\xfa\xc4\x87\x2a\x27\x57"
++			  "\x85\x9e\x1c\xea\xa6\xef\xd9\x84"
++			  "\x62\x85\x93\xb4\x0c\xa1\xe1\x9c"
++			  "\x7d\x77\x3d\x00\xc1\x44\xc5\x25"
++			  "\xac\x61\x9d\x18\xc8\x4a\x3f\x47"
++			  "\x18\xe2\x44\x8b\x2f\xe3\x24\xd9"
++			  "\xcc\xda\x27\x10"
++			  "\x25\x19\x49\x8e\x80\xf1\x47\x8f"
++			  "\x37\xba\x55\xbd\x6d\x27\x61\x8c",
++		.rlen	= 76,
+ 	}
+ };
+ 
+-- 
+2.20.1
