@@ -1,187 +1,241 @@
-Return-Path: <SRS0=+HSe=PS=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:35250 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728611AbfAJOGf (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Jan 2019 09:06:35 -0500
-Received: by mail-wr1-f66.google.com with SMTP id 96so11538670wrb.2
-        for <linux-crypto@vger.kernel.org>; Thu, 10 Jan 2019 06:06:34 -0800 (PST)
-Date: Thu, 10 Jan 2019 14:06:30 +0000
-From: Daniel Thompson <daniel.thompson@linaro.org>
-To: Sumit Garg <sumit.garg@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, jens.wiklander@linaro.org,
-        mpm@selenic.com, herbert@gondor.apana.org.au, robh+dt@kernel.org,
-        mark.rutland@arm.com, arnd@arndb.de, gregkh@linuxfoundation.org,
-        ard.biesheuvel@linaro.org, bhsharma@redhat.com,
-        tee-dev@lists.linaro.org
-Subject: Re: [PATCH v2 1/4] tee: add bus driver framework for TEE based
- devices
-Message-ID: <20190110140630.js7mrhu6nfnjsfhx@holly.lan>
-References: <1547123097-16431-1-git-send-email-sumit.garg@linaro.org>
- <1547123097-16431-2-git-send-email-sumit.garg@linaro.org>
+Return-Path: <SRS0=EWVs=PV=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:56306 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726526AbfAMXeV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 13 Jan 2019 18:34:21 -0500
+From: Eric Biggers <ebiggers@kernel.org>
+To: linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [PATCH 2/5] crypto: testmgr - add ccm(aes) decryption tests to encryption tests
+Date: Sun, 13 Jan 2019 15:32:25 -0800
+Message-Id: <20190113233228.5851-3-ebiggers@kernel.org>
+In-Reply-To: <20190113233228.5851-1-ebiggers@kernel.org>
+References: <20190113233228.5851-1-ebiggers@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1547123097-16431-2-git-send-email-sumit.garg@linaro.org>
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jan 10, 2019 at 05:54:54PM +0530, Sumit Garg wrote:
-> Introduce a generic TEE bus driver concept for TEE based kernel drivers
-> which would like to communicate with TEE based devices/services.
-> 
-> In this TEE bus concept, devices/services are identified via Universally
-> Unique Identifier (UUID) and drivers register a table of device UUIDs
-> which they can support.
-> 
-> So this TEE bus framework registers a match() callback function which
-> iterates over the driver UUID table to find a corresponding match for
-> device UUID. If a match is found, then this particular device is probed
-> via corresponding probe api registered by the driver. This process
-> happens whenever a device or a driver is registered with TEE bus.
-> 
-> Also this framework allows for device enumeration to be specific to
-> corresponding TEE implementation like OP-TEE etc.
-> 
-> Signed-off-by: Sumit Garg <sumit.garg@linaro.org>
-> ---
->  drivers/tee/tee_core.c  | 41 ++++++++++++++++++++++++++++++++++++++---
->  include/linux/tee_drv.h | 36 ++++++++++++++++++++++++++++++++++++
->  2 files changed, 74 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/tee/tee_core.c b/drivers/tee/tee_core.c
-> index 7b2bb4c..9ddb89e 100644
-> --- a/drivers/tee/tee_core.c
-> +++ b/drivers/tee/tee_core.c
-> @@ -15,7 +15,6 @@
->  #define pr_fmt(fmt) "%s: " fmt, __func__
->  
->  #include <linux/cdev.h>
-> -#include <linux/device.h>
->  #include <linux/fs.h>
->  #include <linux/idr.h>
->  #include <linux/module.h>
-> @@ -1027,6 +1026,30 @@ int tee_client_invoke_func(struct tee_context *ctx,
->  }
->  EXPORT_SYMBOL_GPL(tee_client_invoke_func);
->  
-> +static int tee_client_device_match(struct device *dev,
-> +				   struct device_driver *drv)
-> +{
-> +	struct tee_client_device *tee_device;
-> +	const struct tee_client_device_id *id_table;
-> +
-> +	tee_device = to_tee_client_device(dev);
-> +	id_table = to_tee_client_driver(drv)->id_table;
-> +
-> +	while (!uuid_is_null(&id_table->uuid)) {
-> +		if (uuid_equal(&tee_device->id.uuid, &id_table->uuid))
-> +			return 1;
-> +		id_table++;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +struct bus_type tee_bus_type = {
-> +	.name		= "tee",
-> +	.match		= tee_client_device_match,
-> +};
-> +EXPORT_SYMBOL_GPL(tee_bus_type);
-> +
->  static int __init tee_init(void)
->  {
->  	int rc;
-> @@ -1040,10 +1063,21 @@ static int __init tee_init(void)
->  	rc = alloc_chrdev_region(&tee_devt, 0, TEE_NUM_DEVICES, "tee");
->  	if (rc) {
->  		pr_err("failed to allocate char dev region\n");
-> -		class_destroy(tee_class);
-> -		tee_class = NULL;
-> +		goto class_err;
->  	}
->  
-> +	rc = bus_register(&tee_bus_type);
-> +	if (rc) {
-> +		pr_err("failed to register tee bus\n");
-> +		goto class_err;
+From: Eric Biggers <ebiggers@google.com>
 
-There is an unregister_chrdev_region() in tee_exit(). Why isn't it
-needed on this error path?
+Some "ccm(aes)" decryption test vectors don't exactly match any of the
+encryption test vectors with input and result swapped.  In preparation
+for removing the AEAD decryption test vectors and testing AEAD
+decryption using the encryption test vectors, add these to the
+encryption test vectors, so we don't lose any test coverage.
 
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ crypto/testmgr.h | 197 ++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 196 insertions(+), 1 deletion(-)
 
-> +	}
-> +
-> +	return 0;
-> +
-> +class_err:
-> +	class_destroy(tee_class);
-> +	tee_class = NULL;
-> +
->  	return rc;
->  }
->  
-> @@ -1052,6 +1086,7 @@ static void __exit tee_exit(void)
->  	class_destroy(tee_class);
->  	tee_class = NULL;
->  	unregister_chrdev_region(tee_devt, TEE_NUM_DEVICES);
-> +	bus_unregister(&tee_bus_type);
->  }
->  
->  subsys_initcall(tee_init);
-> diff --git a/include/linux/tee_drv.h b/include/linux/tee_drv.h
-> index 6cfe058..ed16bf1 100644
-> --- a/include/linux/tee_drv.h
-> +++ b/include/linux/tee_drv.h
-> @@ -20,6 +20,8 @@
->  #include <linux/kref.h>
->  #include <linux/list.h>
->  #include <linux/tee.h>
-> +#include <linux/device.h>
-> +#include <linux/uuid.h>
->  
->  /*
->   * The file describes the API provided by the generic TEE driver to the
-> @@ -538,4 +540,38 @@ static inline bool tee_param_is_memref(struct tee_param *param)
->  	}
->  }
->  
-> +extern struct bus_type tee_bus_type;
-> +
-> +/**
-> + * struct tee_client_device_id - tee based device identifier
-> + * @uuid:		For TEE based client devices we use the device uuid
-> + *			as the identifier.
-> + */
-> +struct tee_client_device_id {
-> +	uuid_t uuid;
-> +};
-> +
-> +/**
-> + * struct tee_client_device - tee based device
-> + * @id:			device identifier
-> + * @dev:		device structure
-> + */
-> +struct tee_client_device {
-> +	struct tee_client_device_id id;
-> +	struct device dev;
-> +};
-> +#define to_tee_client_device(d) container_of(d, struct tee_client_device, dev)
-> +
-> +/**
-> + * struct tee_client_driver - tee client driver
-> + * @id_table:		device id table supported by this driver
-> + * @driver:		driver structure
-> + */
-> +struct tee_client_driver {
-> +	const struct tee_client_device_id *id_table;
-> +	struct device_driver driver;
-> +};
-> +#define to_tee_client_driver(d) \
-> +		container_of(d, struct tee_client_driver, driver)
-> +
->  #endif /*__TEE_DRV_H*/
-> -- 
-> 2.7.4
-> 
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index ca8e8ebef309d..fa0b1af9f7512 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -18692,7 +18692,202 @@ static const struct aead_testvec aes_ccm_enc_tv_template[] = {
+ 			  "\x5c\xda\xb2\x33\xe5\x13\xe2\x0d"
+ 			  "\x74\xd1\xef\xb5\x0f\x3a\xb5\xf8",
+ 		.rlen	= 48,
+-	}
++	}, {
++		/* This is taken from FIPS CAVS. */
++		.key	= "\xab\x2f\x8a\x74\xb7\x1c\xd2\xb1"
++			  "\xff\x80\x2e\x48\x7d\x82\xf8\xb9",
++		.klen	= 16,
++		.iv	= "\x03\xc6\xfb\x7d\x80\x0d\x13\xab"
++			  "\xd8\xa6\xb2\xd8\x00\x00\x00\x00",
++		.alen	= 0,
++		.input	= "\x00",
++		.ilen	= 0,
++		.result	= "\xd5\xe8\x93\x9f\xc7\x89\x2e\x2b",
++		.rlen	= 8,
++		.novrfy	= 1,
++	}, {
++		.key	= "\xab\x2f\x8a\x74\xb7\x1c\xd2\xb1"
++			  "\xff\x80\x2e\x48\x7d\x82\xf8\xb9",
++		.klen	= 16,
++		.iv	= "\x03\xaf\x94\x87\x78\x35\x82\x81"
++			  "\x7f\x88\x94\x68\x00\x00\x00\x00",
++		.alen	= 0,
++		.input	= "\x00",
++		.ilen	= 0,
++		.result	= "\x41\x3c\xb8\x87\x73\xcb\xf3\xf3",
++		.rlen	= 8,
++	}, {
++		.key	= "\x61\x0e\x8c\xae\xe3\x23\xb6\x38"
++			  "\x76\x1c\xf6\x3a\x67\xa3\x9c\xd8",
++		.klen	= 16,
++		.iv	= "\x03\xc6\xfb\x7d\x80\x0d\x13\xab"
++			  "\xd8\xa6\xb2\xd8\x00\x00\x00\x00",
++		.assoc	= "\xf3\x94\x87\x78\x35\x82\x81\x7f"
++			  "\x88\x94\x68\xb1\x78\x6b\x2b\xd6"
++			  "\x04\x1f\x4e\xed\x78\xd5\x33\x66"
++			  "\xd8\x94\x99\x91\x81\x54\x62\x57",
++		.alen	= 32,
++		.input	= "\x50\x82\x3e\x07\xe2\x1e\xb6\xfb"
++			  "\x33\xe4\x73\xce\xd2\xfb\x95\x79"
++			  "\xe8\xb4\xb5\x77\x11\x10\x62\x6f"
++			  "\x6a\x82\xd1\x13\xec\xf5\xd0\x48",
++		.ilen	= 32,
++		.result	= "\xf0\x7c\x29\x02\xae\x1c\x2f\x55"
++			  "\xd0\xd1\x3d\x1a\xa3\x6d\xe4\x0a"
++			  "\x86\xb0\x87\x6b\x62\x33\x8c\x34"
++			  "\xce\xab\x57\xcc\x79\x0b\xe0\x6f"
++			  "\x5c\x3e\x48\x1f\x6c\x46\xf7\x51"
++			  "\x8b\x84\x83\x2a\xc1\x05\xb8\xc5",
++		.rlen	= 48,
++		.novrfy	= 1,
++	}, {
++		.key	= "\x61\x0e\x8c\xae\xe3\x23\xb6\x38"
++			  "\x76\x1c\xf6\x3a\x67\xa3\x9c\xd8",
++		.klen	= 16,
++		.iv	= "\x03\x05\xe0\xc9\x0f\xed\x34\xea"
++			  "\x97\xd4\x3b\xdf\x00\x00\x00\x00",
++		.assoc	= "\x49\x5c\x50\x1f\x1d\x94\xcc\x81"
++			  "\xba\xb7\xb6\x03\xaf\xa5\xc1\xa1"
++			  "\xd8\x5c\x42\x68\xe0\x6c\xda\x89"
++			  "\x05\xac\x56\xac\x1b\x2a\xd3\x86",
++		.alen	= 32,
++		.input	= "\x75\x05\xbe\xc2\xd9\x1e\xde\x60"
++			  "\x47\x3d\x8c\x7d\xbd\xb5\xd9\xb7"
++			  "\xf2\xae\x61\x05\x8f\x82\x24\x3f"
++			  "\x9c\x67\x91\xe1\x38\x4f\xe4\x0c",
++		.ilen	= 32,
++		.result	= "\x39\xbe\x7d\x15\x62\x77\xf3\x3c"
++			  "\xad\x83\x52\x6d\x71\x03\x25\x1c"
++			  "\xed\x81\x3a\x9a\x16\x7d\x19\x80"
++			  "\x72\x04\x72\xd0\xf6\xff\x05\x0f"
++			  "\xb7\x14\x30\x00\x32\x9e\xa0\xa6"
++			  "\x9e\x5a\x18\xa1\xb8\xfe\xdb\xd3",
++		.rlen	= 48,
++	}, {
++		.key	= "\x39\xbb\xa7\xbe\x59\x97\x9e\x73"
++			  "\xa2\xbc\x6b\x98\xd7\x75\x7f\xe3"
++			  "\xa4\x48\x93\x39\x26\x71\x4a\xc6",
++		.klen	= 24,
++		.iv	= "\x03\xee\x49\x83\xe9\xa9\xff\xe9"
++			  "\x57\xba\xfd\x9e\x00\x00\x00\x00",
++		.assoc	= "\x44\xa6\x2c\x05\xe9\xe1\x43\xb1"
++			  "\x58\x7c\xf2\x5c\x6d\x39\x0a\x64"
++			  "\xa4\xf0\x13\x05\xd1\x77\x99\x67"
++			  "\x11\xc4\xc6\xdb\x00\x56\x36\x61",
++		.alen	= 32,
++		.input	= "\x00",
++		.ilen	= 0,
++		.result	= "\x71\x99\xfa\xf4\x44\x12\x68\x9b",
++		.rlen	= 8,
++	}, {
++		.key	= "\x58\x5d\xa0\x96\x65\x1a\x04\xd7"
++			  "\x96\xe5\xc5\x68\xaa\x95\x35\xe0"
++			  "\x29\xa0\xba\x9e\x48\x78\xd1\xba",
++		.klen	= 24,
++		.iv	= "\x03\xee\x49\x83\xe9\xa9\xff\xe9"
++			  "\x57\xba\xfd\x9e\x00\x00\x00\x00",
++		.assoc	= "\x44\xa6\x2c\x05\xe9\xe1\x43\xb1"
++			  "\x58\x7c\xf2\x5c\x6d\x39\x0a\x64"
++			  "\xa4\xf0\x13\x05\xd1\x77\x99\x67"
++			  "\x11\xc4\xc6\xdb\x00\x56\x36\x61",
++		.alen	= 32,
++		.input	= "\x85\x34\x66\x42\xc8\x92\x0f\x36"
++			  "\x58\xe0\x6b\x91\x3c\x98\x5c\xbb"
++			  "\x0a\x85\xcc\x02\xad\x7a\x96\xe9"
++			  "\x65\x43\xa4\xc3\x0f\xdc\x55\x81",
++		.ilen	= 32,
++		.result	= "\xfb\xe5\x5d\x34\xbe\xe5\xe8\xe7"
++			  "\x5a\xef\x2f\xbf\x1f\x7f\xd4\xb2"
++			  "\x66\xca\x61\x1e\x96\x7a\x61\xb3"
++			  "\x1c\x16\x45\x52\xba\x04\x9c\x9f"
++			  "\xb1\xd2\x40\xbc\x52\x7c\x6f\xb1",
++		.rlen	= 40,
++	}, {
++		.key	= "\x58\x5d\xa0\x96\x65\x1a\x04\xd7"
++			  "\x96\xe5\xc5\x68\xaa\x95\x35\xe0"
++			  "\x29\xa0\xba\x9e\x48\x78\xd1\xba",
++		.klen	= 24,
++		.iv	= "\x03\xd1\xfc\x57\x9c\xfe\xb8\x9c"
++			  "\xad\x71\xaa\x1f\x00\x00\x00\x00",
++		.assoc	= "\x86\x67\xa5\xa9\x14\x5f\x0d\xc6"
++			  "\xff\x14\xc7\x44\xbf\x6c\x3a\xc3"
++			  "\xff\xb6\x81\xbd\xe2\xd5\x06\xc7"
++			  "\x3c\xa1\x52\x13\x03\x8a\x23\x3a",
++		.alen	= 32,
++		.input	= "\x02\x87\x4d\x28\x80\x6e\xb2\xed"
++			  "\x99\x2a\xa8\xca\x04\x25\x45\x90"
++			  "\x1d\xdd\x5a\xd9\xe4\xdb\x9c\x9c"
++			  "\x49\xe9\x01\xfe\xa7\x80\x6d\x6b",
++		.ilen	= 32,
++		.result	= "\x3f\x66\xb0\x9d\xe5\x4b\x38\x00"
++			  "\xc6\x0e\x6e\xe5\xd6\x98\xa6\x37"
++			  "\x8c\x26\x33\xc6\xb2\xa2\x17\xfa"
++			  "\x64\x19\xc0\x30\xd7\xfc\x14\x6b"
++			  "\xe3\x33\xc2\x04\xb0\x37\xbe\x3f"
++			  "\xa9\xb4\x2d\x68\x03\xa3\x44\xef",
++		.rlen	= 48,
++		.novrfy	= 1,
++	}, {
++		.key	= "\xa4\x4b\x54\x29\x0a\xb8\x6d\x01"
++			  "\x5b\x80\x2a\xcf\x25\xc4\xb7\x5c"
++			  "\x20\x2c\xad\x30\xc2\x2b\x41\xfb"
++			  "\x0e\x85\xbc\x33\xad\x0f\x2b\xff",
++		.klen	= 32,
++		.iv	= "\x03\xee\x49\x83\xe9\xa9\xff\xe9"
++			  "\x57\xba\xfd\x9e\x00\x00\x00\x00",
++		.alen	= 0,
++		.input	= "\x00",
++		.ilen	= 0,
++		.result	= "\x1f\xb8\x8f\xa3\xdd\x54\x00\xf2",
++		.rlen	= 8,
++	}, {
++		.key	= "\x39\xbb\xa7\xbe\x59\x97\x9e\x73"
++			  "\xa2\xbc\x6b\x98\xd7\x75\x7f\xe3"
++			  "\xa4\x48\x93\x39\x26\x71\x4a\xc6"
++			  "\xae\x8f\x11\x4c\xc2\x9c\x4a\xbb",
++		.klen	= 32,
++		.iv	= "\x03\x85\x34\x66\x42\xc8\x92\x0f"
++			  "\x36\x58\xe0\x6b\x00\x00\x00\x00",
++		.alen	= 0,
++		.input	= "\xdc\x56\xf2\x71\xb0\xb1\xa0\x6c"
++			  "\xf0\x97\x3a\xfb\x6d\xe7\x32\x99"
++			  "\x3e\xaf\x70\x5e\xb2\x4d\xea\x39"
++			  "\x89\xd4\x75\x7a\x63\xb1\xda\x93",
++		.ilen	= 32,
++		.result	= "\x48\x01\x5e\x02\x24\x04\x66\x47"
++			  "\xa1\xea\x6f\xaf\xe8\xfc\xfb\xdd"
++			  "\xa5\xa9\x87\x8d\x84\xee\x2e\x77"
++			  "\xbb\x86\xb9\xf5\x5c\x6c\xff\xf6"
++			  "\x72\xc3\x8e\xf7\x70\xb1\xb2\x07"
++			  "\xbc\xa8\xa3\xbd\x83\x7c\x1d\x2a",
++		.rlen	= 48,
++		.novrfy	= 1,
++	}, {
++		.key	= "\x58\x5d\xa0\x96\x65\x1a\x04\xd7"
++			  "\x96\xe5\xc5\x68\xaa\x95\x35\xe0"
++			  "\x29\xa0\xba\x9e\x48\x78\xd1\xba"
++			  "\x0d\x1a\x53\x3b\xb5\xe3\xf8\x8b",
++		.klen	= 32,
++		.iv	= "\x03\xcf\x76\x3f\xd9\x95\x75\x8f"
++			  "\x44\x89\x40\x7b\x00\x00\x00\x00",
++		.assoc	= "\x8f\x86\x6c\x4d\x1d\xc5\x39\x88"
++			  "\xc8\xf3\x5c\x52\x10\x63\x6f\x2b"
++			  "\x8a\x2a\xc5\x6f\x30\x23\x58\x7b"
++			  "\xfb\x36\x03\x11\xb4\xd9\xf2\xfe",
++		.alen	= 32,
++		.input	= "\xc2\x54\xc8\xde\x78\x87\x77\x40"
++			  "\x49\x71\xe4\xb7\xe7\xcb\x76\x61"
++			  "\x0a\x41\xb9\xe9\xc0\x76\x54\xab"
++			  "\x04\x49\x3b\x19\x93\x57\x25\x5d",
++		.ilen	= 32,
++		.result	= "\x48\x58\xd6\xf3\xad\x63\x58\xbf"
++			  "\xae\xc7\x5e\xae\x83\x8f\x7b\xe4"
++			  "\x78\x5c\x4c\x67\x71\x89\x94\xbf"
++			  "\x47\xf1\x63\x7e\x1c\x59\xbd\xc5"
++			  "\x7f\x44\x0a\x0c\x01\x18\x07\x92"
++			  "\xe1\xd3\x51\xce\x32\x6d\x0c\x5b",
++		.rlen	= 48,
++	},
+ };
+ 
+ static const struct aead_testvec aes_ccm_dec_tv_template[] = {
+-- 
+2.20.1
