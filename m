@@ -1,187 +1,208 @@
-Return-Path: <SRS0=8/la=PM=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-it1-f195.google.com ([209.85.166.195]:56175 "EHLO
-        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726169AbfADNDq (ORCPT
+Return-Path: <SRS0=fnEV=PW=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mo4-p02-ob.smtp.rzone.de ([81.169.146.170]:12767 "EHLO
+        mo4-p02-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726306AbfANJbI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Jan 2019 08:03:46 -0500
-Received: by mail-it1-f195.google.com with SMTP id m62so1443470ith.5
-        for <linux-crypto@vger.kernel.org>; Fri, 04 Jan 2019 05:03:45 -0800 (PST)
+        Mon, 14 Jan 2019 04:31:08 -0500
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        Andy Lutomirski <luto@amacapital.net>,
+        "Lee, Chun-Yi" <joeyli.kernel@gmail.com>,
+        "Rafael J . Wysocki" <rjw@rjwysocki.net>,
+        Pavel Machek <pavel@ucw.cz>, linux-kernel@vger.kernel.org,
+        linux-pm@vger.kernel.org, keyrings@vger.kernel.org,
+        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+        Chen Yu <yu.c.chen@intel.com>,
+        Oliver Neukum <oneukum@suse.com>,
+        Ryan Chen <yu.chen.surf@gmail.com>,
+        David Howells <dhowells@redhat.com>,
+        Giovanni Gherdovich <ggherdovich@suse.cz>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Jann Horn <jannh@google.com>,
+        Andy Lutomirski <luto@kernel.org>, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH 4/6] crypto: hkdf - RFC5869 Key Derivation Function
+Date: Mon, 14 Jan 2019 10:30:39 +0100
+Message-ID: <4734428.Gj5BGI4uxL@positron.chronox.de>
+In-Reply-To: <20190112051252.GA639@sol.localdomain>
+References: <20190103143227.9138-1-jlee@suse.com> <2423373.Zd5ThvQH5g@positron.chronox.de> <20190112051252.GA639@sol.localdomain>
 MIME-Version: 1.0
-References: <1545908831-25910-1-git-send-email-sumit.garg@linaro.org>
- <1545908831-25910-2-git-send-email-sumit.garg@linaro.org> <CAKv+Gu8o_6Mu8_2vNHXEy46mZ6xrSPekcwPH7BvxR8nec37Ktw@mail.gmail.com>
- <CAFA6WYOpw-URTYJ4i0Y_Tie0_ccMwekbOVzXz3d05NttyL9sHg@mail.gmail.com>
- <20190103171441.6ymnhbxnb4asr3kl@holly.lan> <CAFA6WYP4TgWHaZpathACsKgtcG5xx81FJ+=saimQP6ZyHnL1=w@mail.gmail.com>
- <CAHUa44GwwfW9diUbar4+3L8OhJs3K9iiE2DfBxEBrwmLfczXKA@mail.gmail.com> <CAFA6WYNobWZq3Y1oK0UXrTzhuG6wQEU+koCWkKgXwpLAGXpfPA@mail.gmail.com>
-In-Reply-To: <CAFA6WYNobWZq3Y1oK0UXrTzhuG6wQEU+koCWkKgXwpLAGXpfPA@mail.gmail.com>
-From: Jens Wiklander <jens.wiklander@linaro.org>
-Date: Fri, 4 Jan 2019 14:03:33 +0100
-Message-ID: <CAHUa44GZz=MGiRUAgPzCGH_XCTJizX15KBq5=HEFw4rZ7Z_Riw@mail.gmail.com>
-Subject: Re: [PATCH v1 1/2] dt/bindings: add bindings for optional optee
- rng-uuid property
-To: Sumit Garg <sumit.garg@linaro.org>
-Cc: Daniel Thompson <daniel.thompson@linaro.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        Devicetree List <devicetree@vger.kernel.org>, mpm@selenic.com,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Bhupesh Sharma <bhsharma@redhat.com>, tee-dev@lists.linaro.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jan 4, 2019 at 1:02 PM Sumit Garg <sumit.garg@linaro.org> wrote:
->
-> On Fri, 4 Jan 2019 at 16:31, Jens Wiklander <jens.wiklander@linaro.org> wrote:
-> >
-> > On Fri, Jan 4, 2019 at 7:39 AM Sumit Garg <sumit.garg@linaro.org> wrote:
-> > >
-> > > On Thu, 3 Jan 2019 at 22:44, Daniel Thompson <daniel.thompson@linaro.org> wrote:
-> > > >
-> > > > On Fri, Dec 28, 2018 at 02:41:01PM +0530, Sumit Garg wrote:
-> > > > > On Thu, 27 Dec 2018 at 19:10, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
-> > > > > >
-> > > > > > On Thu, 27 Dec 2018 at 12:08, Sumit Garg <sumit.garg@linaro.org> wrote:
-> > > > > > >
-> > > > > > > Add bindings for OP-TEE based optional hardware random number
-> > > > > > > generator identifier property. It could be used on ARM based devices
-> > > > > > > where entropy source is not accessible to normal world (linux in this
-> > > > > > > case).
-> > > > > > >
-> > > > > > > Signed-off-by: Sumit Garg <sumit.garg@linaro.org>
-> > > > > > > ---
-> > > > > > >  Documentation/devicetree/bindings/arm/firmware/linaro,optee-tz.txt | 4 ++++
-> > > > > > >  1 file changed, 4 insertions(+)
-> > > > > > >
-> > > > > > > diff --git a/Documentation/devicetree/bindings/arm/firmware/linaro,optee-tz.txt b/Documentation/devicetree/bindings/arm/firmware/linaro,optee-tz.txt
-> > > > > > > index d38834c..e3a4c35 100644
-> > > > > > > --- a/Documentation/devicetree/bindings/arm/firmware/linaro,optee-tz.txt
-> > > > > > > +++ b/Documentation/devicetree/bindings/arm/firmware/linaro,optee-tz.txt
-> > > > > > > @@ -20,6 +20,9 @@ the reference implementation maintained by Linaro.
-> > > > > > >                     "hvc" : HVC #0, with the register assignments specified
-> > > > > > >                            in drivers/tee/optee/optee_smc.h
-> > > > > > >
-> > > > > > > +- rng-uuid       : Optional OP-TEE based RNG service identifier in case
-> > > > > > > +                   hardware entropy source is not accesible to normal world
-> > > > > > > +                   (Linux).
-> > > > > > >
-> > > > > > >
-> > > > > > >  Example:
-> > > > > > > @@ -27,5 +30,6 @@ Example:
-> > > > > > >                 optee {
-> > > > > > >                         compatible = "linaro,optee-tz";
-> > > > > > >                         method = "smc";
-> > > > > > > +                       rng-uuid = "ab7a617c-b8e7-4d8f-8301-d09b61036b64";
-> > > > > >
-> > > > > > If OP-TEE is going to expose devices in this way, it should be modeled
-> > > > > > more like a bus driver, i.e., sub-nodes that represent the devices,
-> > > > > > with compatible strings, and perhaps even 'reg' properties for the
-> > > > > > UUIDs.
-> > > > > >
-> > > > >
-> > > > > This is something Daniel also suggested during our discussion. But we
-> > > > > agreed to discuss in upstream to get more feedback.
-> > > > >
-> > > > > I think generic TEE should be modelled as a bus driver with devices
-> > > > > identified via UUIDs, probably queried from underline implementations
-> > > > > like OP-TEE regarding which resident devices (pseudo-TA UUIDs) it
-> > > > > supports. Then this list of device UUIDs can be compared against child
-> > > > > driver's UUID as part of match callback during driver registration.
-> > > > > Also the child driver could maintain list of device UUIDs which it
-> > > > > supports.
-> > > > >
-> > > > > If we go via this approach we may not require device tree entry for
-> > > > > corresponding device UUIDs.
-> > > >
-> > > > That's pretty much aligned with my thinking.
-> > > >
-> > > > Having said that I had wondered whether all TEEs would be prepared to
-> > > > describe the set of available UUIDs since AFAIK UUID enumeration isn't
-> > > > part of the GlobalPlatform standards so it is not implemented by GP
-> > > > based TEEs (such as OP-TEE).
-> > > >
-> > > > Is it feasible to extend OP-TEE to enumerate the available UUIDs?
-> > > > If nothing else can it provide an (optional) pseudo TA to provide such a
-> > > > service? Personally I'd be OK with a kernel TEE bus infrastructure that
-> > > > mandated such a service (e.g. a TEE that does not provide the service
-> > > > can only interact with TEE from userspace).
-> > > >
-> > >
-> > > Following is the kernel interface for OP-TEE device enumeration that I
-> > > would like to propose:
-> > >
-> > > /*
-> > >  * Get next OP-TEE based kernel device
-> > >  *
-> > >  * Secure world can provide support for resident kernel devices/services
-> > >  * as pseudo/early trusted applications. So this function is used to
-> > >  * enumerate OP-TEE based kernel devices.
-> > >  *
-> > >  * Call register usage:
-> > >  * a0   SMC Function ID, OPTEE_SMC_GET_NEXT_DEVICE
-> > >  * a1-6 Not used
-> > >  * a7   Hypervisor Client ID register
-> > >  *
-> > >  * Possible return values:
-> > >  *
-> > >  * OP-TEE OS returns next device UUID.
-> > >  * a0   OPTEE_SMC_RETURN_OK
-> > >  * a1-4 Device UUID
-> > >  * a5-7 Preserved
-> > >  *
-> > >  * OP-TEE OS does not recognize this function.
-> > >  * a0   OPTEE_SMC_RETURN_UNKNOWN_FUNCTION
-> > >  * a1-7 Preserved
-> > >  *
-> > >  * OP-TEE OS done with device enumeration.
-> > >  * a0   OPTEE_SMC_RETURN_ENOTAVAIL
-> > >  * a1-7 Preserved
-> > >  */
-> > > #define OPTEE_SMC_FUNCID_GET_NEXT_DEVICE       15
-> > > #define OPTEE_SMC_GET_NEXT_DEVICE \
-> > >         OPTEE_SMC_FAST_CALL_VAL(OPTEE_SMC_FUNCID_GET_NEXT_DEVICE)
-> > >
-> > > Also at OP-TEE end, we should add additional TA_FLAG_KERNEL_DEVICE to
-> > > detect particular pseudo/early TA as a kernel device during
-> > > enumeration.
-> >
-> > I'd rather provide this enumeration via a pseudo TA, to keep the SMC
-> > interface as small as possible. The pseudo TA can be optional, if it's
-> > not available then there's no need to try to instantiate any dependent
-> > drivers either.
-> >
->
-> I did thought about having a pseudo TA but following are some
-> negatives to this approach:
-> 1. Where do we specify UUID for this pseudo TA? Should it come from devicetree?
+Am Samstag, 12. Januar 2019, 06:12:54 CET schrieb Eric Biggers:
 
-This should be a well known UUID, provided in the .h file describing the TA.
+Hi Eric,
 
-> 2. Adds whole TEE call sequence (ctx, session, shared memory etc.)
-> during "optee_probe".
+[...]
 
-Yes, is that a problem?
+> > The extract and expand phases use different instances of the underlying
+> > keyed message digest cipher to ensure that while the extraction phase
+> > generates a new key for the expansion phase, the cipher for the
+> > expansion phase can still be used. This approach is intended to aid
+> > multi-threaded uses cases.
+> 
+> I think you partially misunderstood what I was asking for.  One HMAC tfm is
+> sufficient as long as HKDF-Expand is separated from HKDF-Extract, which
+> you've done.  So just use one HMAC tfm, and in crypto_hkdf_seed() key it
+> with the 'salt', and then afterwards with the 'prk'.
 
-> 3. This pseudo TA would be exposed to user-space as well. I am not
-> sure if we would like user-space to access kernel device specific
-> info.
+Ok, thanks for the clarification. I will remove the 2nd HMAC TFM then.
+> 
+> Also everywhere in this patchset, please avoid using the word "cipher" to
+> refer to algorithms that are not encryption/decryption.  I know a lot of
+> the crypto API docs do this, but I think it is a mistake and confusing. 
+> Hash algorithms and KDFs are not "ciphers".
 
-Doesn't matter, that's not a secret. We can assume that an attacker
-already know the UUID of whatever TA it will target.
+As you wish, I will refer to specific name of the cryptographic operation.
 
-- Jens
+[...]
 
->
-> -Sumit
->
-> > - Jens
-> >
-> > >
-> > > -Sumit
-> > >
-> > > >
-> > > > Daniel.
+> > + * NOTE: In-place cipher operations are not supported.
+> > + */
+> 
+> What does an "in-place cipher operation" mean in this context?  That the
+> 'info' buffer must not overlap the 'dst' buffer? 
+
+Correct, no overlapping.
+
+> Maybe
+> crypto_rng_generate() should check that for all crypto_rngs?  Or is it
+> different for different crypto_rngs?
+
+This is the case in general for all KDFs (and even RNGs). It is no technical 
+or cryptographic error to have overlapping buffers. The only issue is that the 
+result will not match the expected value.
+
+The issue is that the input buffer to the generate function is an input to 
+every round of the KDF. If the input and output buffer overlap, starting with 
+the 2nd iteration of the KDF, the input is the output of the 1st round. Again, 
+I do not think it is a cryptographic error though.
+
+(To support my conclusion: A colleague of mine has proposed an update to the 
+HKDF specification where the input data changes for each KDF round. This 
+proposal was considered appropriate by one of the authors of HKDF.)
+
+If the requested output is smaller or equal to the output block size of the 
+KDF, overlapping buffers are even harmless since the implementation will 
+calculate the correct output.
+
+Due to that, I removed the statement. But I am not sure we should add a 
+technical block to deny overlapping input/output buffers.
+
+[...]
+> > 
+> > +	desc->flags = crypto_shash_get_flags(expand_kmd) &
+> > +		      CRYPTO_TFM_REQ_MAY_SLEEP;
+> 
+> This line setting desc->flags doesn't make sense.  How is the user meant to
+> control whether crypto_rng_generate() can sleep or not?  Or can it always
+> sleep? Either way this part is wrong since the user can't get access to the
+> HMAC tfm to set this flag being checked for.
+
+Could you please help me why a user should set this flag? Isn't the 
+implementation specifying that flag to allow identifying whether the 
+implementation could or could not sleep? Thus, we simply copy the sleeping 
+flag from the lower level keyed message digest implementation.
+
+At least that is also the implementation found in crypto/hmac.c.
+
+[...]
+
+> > +		if (dlen < h) {
+> > +			u8 tmpbuffer[CRYPTO_HKDF_MAX_DIGESTSIZE];
+> > +
+> > +			err = crypto_shash_finup(desc, &ctr, 1, tmpbuffer);
+> > +			if (err)
+> > +				goto out;
+> > +			memcpy(dst, tmpbuffer, dlen);
+> > +			memzero_explicit(tmpbuffer, h);
+> > +			goto out;
+> > +		} else {
+> 
+> No need for the 'else'.
+
+Could you please help me why that else branch is not needed? If the buffer to 
+be generated is equal or larger than the output block length of the keyed 
+message digest, I would like to directly operate on the output buffer to avoid 
+a memcpy.
+> 
+> > +			err = crypto_shash_finup(desc, &ctr, 1, dst);
+> > +			if (err)
+> > +				goto out;
+> > +
+> > +			prev = dst;
+> > +			dst += h;
+> > +			dlen -= h;
+> > +			ctr++;
+> > +		}
+> > +	}
+
+[...]
+> 
+> > +	struct crypto_shash *extract_kmd = ctx->extract_kmd;
+> > +	struct crypto_shash *expand_kmd = ctx->expand_kmd;
+> > +	struct rtattr *rta = (struct rtattr *)seed;
+> > +	SHASH_DESC_ON_STACK(desc, extract_kmd);
+> > +	u32 saltlen;
+> > +	unsigned int h = crypto_shash_digestsize(extract_kmd);
+> > +	int err;
+> > +	const uint8_t null_salt[CRYPTO_HKDF_MAX_DIGESTSIZE] = { 0 };
+> 
+> static const
+> 
+
+Why would I want to turn that buffer into a static variable? All we need it 
+for is in case there is no salt provided.
+
+[...]
+
+> > +
+> > +	if (!RTA_OK(rta, slen))
+> > +		return -EINVAL;
+> > +	if (rta->rta_type != 1)
+> > +		return -EINVAL;
+> > +	if (RTA_PAYLOAD(rta) < sizeof(saltlen))
+> > +		return -EINVAL;
+> > +	saltlen = *((u32 *)RTA_DATA(rta));
+> 
+> I'm guessing you copied the weird "length as a rtattr payload" approach from
+> the authenc template.  I think it's not necessary.  And it's overly
+> error-prone, as shown by the authenc template getting the parsing wrong for
+> years and you making the exact same mistake again here...
+> (See https://patchwork.kernel.org/patch/10732803/)  How about just using a
+> u32 at the beginning without the 'rtattr' preceding it?
+
+I was not sure whether this approach would be acceptable. I very much would 
+love to have a u32 pre-pended only without the RTA business.
+
+I updated the implementation accordingly.
+> 
+[...]
+
+> 
+> > +	alg = &salg->base;
+> 
+> Check here that the underlying algorithm really is "hmac(" something?
+
+I added a check for the presence of salg->setkey.
+> 
+> Alternatively it may be a good idea to simplify usage by making the template
+> just take the unkeyed hash directly, like "hkdf(sha512)".  And if any users
+> really need to specify a specific HMAC implementation then another template
+> usable as "hkdf_base(hmac(sha512))" could be added later.
+> 
+
+I would not suggest this, because that rounds contrary to the concept of the 
+kernel crypto API IMHO. The caller has to provide the wrapping cipher. It is 
+perfectly viable to allow a caller to invoke a specific keyed message digest.
+
+[...]
+
+Thank you very much for your code review.
+
+Ciao
+Stephan
