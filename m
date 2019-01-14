@@ -1,49 +1,72 @@
-Return-Path: <SRS0=hYBA=PX=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:50768 "EHLO
-        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729245AbfAONns (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Jan 2019 08:43:48 -0500
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 6/7] crypto: ccree: shared irq lines are not a bug
-Date: Tue, 15 Jan 2019 15:43:16 +0200
-Message-Id: <20190115134318.28712-7-gilad@benyossef.com>
-In-Reply-To: <20190115134318.28712-1-gilad@benyossef.com>
-References: <20190115134318.28712-1-gilad@benyossef.com>
+Return-Path: <SRS0=fnEV=PW=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:57946 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726745AbfANXY6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 14 Jan 2019 18:24:58 -0500
+From: Eric Biggers <ebiggers@kernel.org>
+To: stable@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: linux-crypto@vger.kernel.org
+Subject: [PATCH 4.4,3.18] crypto: cts - fix crash on short inputs
+Date: Mon, 14 Jan 2019 15:21:45 -0800
+Message-Id: <20190114232145.205845-1-ebiggers@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The ccree driver was logging an error if it got an interrupt but
-HW indicated nothing to do as might happen if sharing an irq line.
-Remove the error as this is normal and we already have a debug
-print for the IRR register value.
+From: Eric Biggers <ebiggers@google.com>
 
-Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+Hi Greg, please consider applying this to 4.4-stable and 3.18-stable.
+It's a minimal fix for a bug that was fixed incidentally by a large
+refactoring in v4.8.
+
+>8------------------------------------------------------8<
+
+In the CTS template, when the input length is <= one block cipher block
+(e.g. <= 16 bytes for AES) pass the correct length to the underlying CBC
+transform rather than one block.  This matches the upstream behavior and
+makes the encryption/decryption operation correctly return -EINVAL when
+1 <= nbytes < bsize or succeed when nbytes == 0, rather than crashing.
+
+This was fixed upstream incidentally by a large refactoring,
+commit 0605c41cc53c ("crypto: cts - Convert to skcipher").  But
+syzkaller easily trips over this when running on older kernels, as it's
+easily reachable via AF_ALG.  Therefore, this patch makes the minimal
+fix for older kernels.
+
+Cc: linux-crypto@vger.kernel.org
+Fixes: 76cb9521795a ("[CRYPTO] cts: Add CTS mode required for Kerberos AES support")
+Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- drivers/crypto/ccree/cc_driver.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ crypto/cts.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/crypto/ccree/cc_driver.c b/drivers/crypto/ccree/cc_driver.c
-index 8ada308d72ee..e75fbe7a8f84 100644
---- a/drivers/crypto/ccree/cc_driver.c
-+++ b/drivers/crypto/ccree/cc_driver.c
-@@ -103,10 +103,10 @@ static irqreturn_t cc_isr(int irq, void *dev_id)
- 	/* read the interrupt status */
- 	irr = cc_ioread(drvdata, CC_REG(HOST_IRR));
- 	dev_dbg(dev, "Got IRR=0x%08X\n", irr);
--	if (irr == 0) { /* Probably shared interrupt line */
--		dev_err(dev, "Got interrupt with empty IRR\n");
-+
-+	if (irr == 0) /* Probably shared interrupt line */
- 		return IRQ_NONE;
--	}
-+
- 	imr = cc_ioread(drvdata, CC_REG(HOST_IMR));
+diff --git a/crypto/cts.c b/crypto/cts.c
+index e467ec0acf9f0..e65688d6a4caa 100644
+--- a/crypto/cts.c
++++ b/crypto/cts.c
+@@ -137,8 +137,8 @@ static int crypto_cts_encrypt(struct blkcipher_desc *desc,
+ 	lcldesc.info = desc->info;
+ 	lcldesc.flags = desc->flags;
  
- 	/* clear interrupt - must be before processing events */
+-	if (tot_blocks == 1) {
+-		err = crypto_blkcipher_encrypt_iv(&lcldesc, dst, src, bsize);
++	if (tot_blocks <= 1) {
++		err = crypto_blkcipher_encrypt_iv(&lcldesc, dst, src, nbytes);
+ 	} else if (nbytes <= bsize * 2) {
+ 		err = cts_cbc_encrypt(ctx, desc, dst, src, 0, nbytes);
+ 	} else {
+@@ -232,8 +232,8 @@ static int crypto_cts_decrypt(struct blkcipher_desc *desc,
+ 	lcldesc.info = desc->info;
+ 	lcldesc.flags = desc->flags;
+ 
+-	if (tot_blocks == 1) {
+-		err = crypto_blkcipher_decrypt_iv(&lcldesc, dst, src, bsize);
++	if (tot_blocks <= 1) {
++		err = crypto_blkcipher_decrypt_iv(&lcldesc, dst, src, nbytes);
+ 	} else if (nbytes <= bsize * 2) {
+ 		err = cts_cbc_decrypt(ctx, desc, dst, src, 0, nbytes);
+ 	} else {
 -- 
-2.20.1
+2.20.1.97.g81188d93c3-goog
