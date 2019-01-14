@@ -1,37 +1,69 @@
-Return-Path: <SRS0=CSIn=PT=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:33246 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725773AbfAKGcE (ORCPT
+Return-Path: <SRS0=fnEV=PW=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mx0a-0016f401.pphosted.com ([67.231.148.174]:40250 "EHLO
+        mx0b-0016f401.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726534AbfANNxH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Jan 2019 01:32:04 -0500
-Date: Fri, 11 Jan 2019 14:31:56 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: YueHaibing <yuehaibing@huawei.com>
-Cc: harsh@chelsio.com, davem@davemloft.net,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH -next] crypto: chelsio - check set_msg_len overflow in
- generate_b0
-Message-ID: <20190111063156.d3fq6zwayjthcmnq@gondor.apana.org.au>
-References: <20181228064100.16876-1-yuehaibing@huawei.com>
+        Mon, 14 Jan 2019 08:53:07 -0500
+From: Nagadheeraj Rottela <rnagadheeraj@marvell.com>
+To: "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>
+CC: "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Srikanth Jampala" <jsrikanth@marvell.com>,
+        Nagadheeraj Rottela <rnagadheeraj@marvell.com>
+Subject: [PATCH] crypto: cavium/nitrox - Invoke callback after DMA unmap
+Date: Mon, 14 Jan 2019 13:52:24 +0000
+Message-ID: <20190114135204.20693-1-rnagadheeraj@marvell.com>
+Content-Language: en-US
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20181228064100.16876-1-yuehaibing@huawei.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Dec 28, 2018 at 02:41:00PM +0800, YueHaibing wrote:
-> set_msg_len may fails with -EOVERFLOW, It should be propagate
-> to upstream.
-> 
-> Fixes: 2debd3325e55 ("crypto: chcr - Add AEAD algos.")
-> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
-> ---
->  drivers/crypto/chelsio/chcr_algo.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
+In process_response_list() invoke the callback handler after unmapping
+the DMA buffers. It ensures DMA data is synced form device to cpu
+before the client code access the data from callback handler.
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Fixes: c9613335bf4f ("crypto: cavium/nitrox - Added AEAD cipher support")
+Signed-off-by: Nagadheeraj Rottela <rnagadheeraj@marvell.com>
+---
+ drivers/crypto/cavium/nitrox/nitrox_reqmgr.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/crypto/cavium/nitrox/nitrox_reqmgr.c b/drivers/crypto/=
+cavium/nitrox/nitrox_reqmgr.c
+index fe070d75c842..4c97478d44bd 100644
+--- a/drivers/crypto/cavium/nitrox/nitrox_reqmgr.c
++++ b/drivers/crypto/cavium/nitrox/nitrox_reqmgr.c
+@@ -537,6 +537,8 @@ static void process_response_list(struct nitrox_cmdq *c=
+mdq)
+ 	struct nitrox_device *ndev =3D cmdq->ndev;
+ 	struct nitrox_softreq *sr;
+ 	int req_completed =3D 0, err =3D 0, budget;
++	completion_t callback;
++	void *cb_arg;
+=20
+ 	/* check all pending requests */
+ 	budget =3D atomic_read(&cmdq->pending_count);
+@@ -564,13 +566,13 @@ static void process_response_list(struct nitrox_cmdq =
+*cmdq)
+ 		smp_mb__after_atomic();
+ 		/* remove from response list */
+ 		response_list_del(sr, cmdq);
+-
+ 		/* ORH error code */
+ 		err =3D READ_ONCE(*sr->resp.orh) & 0xff;
+-
+-		if (sr->callback)
+-			sr->callback(sr->cb_arg, err);
++		callback =3D sr->callback;
++		cb_arg =3D sr->cb_arg;
+ 		softreq_destroy(sr);
++		if (callback)
++			callback(cb_arg, err);
+=20
+ 		req_completed++;
+ 	}
+--=20
+2.13.6
