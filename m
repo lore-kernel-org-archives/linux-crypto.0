@@ -1,51 +1,49 @@
-Return-Path: <SRS0=1Gsi=PR=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-eopbgr720089.outbound.protection.outlook.com ([40.107.72.89]:30752
-        "EHLO NAM05-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1730112AbfAIJ0q (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 9 Jan 2019 04:26:46 -0500
-From: Kalyani Akula <kalyani.akula@xilinx.com>
-To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: Kalyani Akula <kalyania@xilinx.com>,
-        Sarat Chand Savitala <saratcha@xilinx.com>,
-        Kalyani Akula <kalyani.akula@xilinx.com>
-Subject: [RFC PATCH V2 1/4] dt-bindings: crypto: Add bindings for ZynqMP SHA3 driver
-Date: Wed, 9 Jan 2019 14:56:22 +0530
-Message-ID: <1547025985-7228-2-git-send-email-kalyani.akula@xilinx.com>
-In-Reply-To: <1547025985-7228-1-git-send-email-kalyani.akula@xilinx.com>
-References: <1547025985-7228-1-git-send-email-kalyani.akula@xilinx.com>
+Return-Path: <SRS0=hYBA=PX=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:50736 "EHLO
+        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729844AbfAONni (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 15 Jan 2019 08:43:38 -0500
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Cc: Hadar Gat <hadar.gat@arm.com>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 2/7] crypto: ccree: add error message
+Date: Tue, 15 Jan 2019 15:43:12 +0200
+Message-Id: <20190115134318.28712-3-gilad@benyossef.com>
+In-Reply-To: <20190115134318.28712-1-gilad@benyossef.com>
+References: <20190115134318.28712-1-gilad@benyossef.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Add documentation to describe Xilinx ZynqMP SHA3 driver
-bindings.
+From: Hadar Gat <hadar.gat@arm.com>
 
-Signed-off-by: Kalyani Akula <kalyani.akula@xilinx.com>
+Add error message in case of too many mlli entries.
+
+Signed-off-by: Hadar Gat <hadar.gat@arm.com>
+Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- .../devicetree/bindings/crypto/zynqmp-sha.txt      |   12 ++++++++++++
- 1 files changed, 12 insertions(+), 0 deletions(-)
- create mode 100644 Documentation/devicetree/bindings/crypto/zynqmp-sha.txt
+ drivers/crypto/ccree/cc_buffer_mgr.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/devicetree/bindings/crypto/zynqmp-sha.txt b/Documentation/devicetree/bindings/crypto/zynqmp-sha.txt
-new file mode 100644
-index 0000000..c7be6e2
---- /dev/null
-+++ b/Documentation/devicetree/bindings/crypto/zynqmp-sha.txt
-@@ -0,0 +1,12 @@
-+Xilinx ZynqMP SHA3(keccak-384) hw acceleration support.
-+
-+The ZynqMp PS-SHA hw accelerator is used to calculate the
-+SHA3(keccak-384) hash value on the given user data.
-+
-+Required properties:
-+- compatible:	should contain "xlnx,zynqmp-keccak-384"
-+
-+Example:
-+	xlnx_keccak_384: sha384 {
-+		compatible = "xlnx,zynqmp-keccak-384";
-+	};
+diff --git a/drivers/crypto/ccree/cc_buffer_mgr.c b/drivers/crypto/ccree/cc_buffer_mgr.c
+index 32d2df36ced2..237a87a57830 100644
+--- a/drivers/crypto/ccree/cc_buffer_mgr.c
++++ b/drivers/crypto/ccree/cc_buffer_mgr.c
+@@ -156,8 +156,11 @@ static int cc_render_buff_to_mlli(struct device *dev, dma_addr_t buff_dma,
+ 
+ 	/* Verify there is no memory overflow*/
+ 	new_nents = (*curr_nents + buff_size / CC_MAX_MLLI_ENTRY_SIZE + 1);
+-	if (new_nents > MAX_NUM_OF_TOTAL_MLLI_ENTRIES)
++	if (new_nents > MAX_NUM_OF_TOTAL_MLLI_ENTRIES) {
++		dev_err(dev, "Too many mlli entries. current %d max %d\n",
++			new_nents, MAX_NUM_OF_TOTAL_MLLI_ENTRIES);
+ 		return -ENOMEM;
++	}
+ 
+ 	/*handle buffer longer than 64 kbytes */
+ 	while (buff_size > CC_MAX_MLLI_ENTRY_SIZE) {
 -- 
-1.7.1
+2.20.1
