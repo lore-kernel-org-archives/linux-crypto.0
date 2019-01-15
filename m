@@ -1,43 +1,49 @@
-Return-Path: <SRS0=FsAa=P2=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:48158 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727077AbfARE4B (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Jan 2019 23:56:01 -0500
-Date: Fri, 18 Jan 2019 12:55:46 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Zhou Wang <wangzhou1@hisilicon.com>
-Cc: linux-kernel@vger.kernel.org, linuxarm@huawei.com,
-        linux-crypto@vger.kernel.org,
-        "David S . Miller" <davem@davemloft.net>
-Subject: Re: [PATCH 3/4] crypto: hisilicon: Add HiSilicon ZIP accelerator
- support
-Message-ID: <20190118045546.hs37a2isfnvxgm7j@gondor.apana.org.au>
-References: <1545465105-133138-1-git-send-email-wangzhou1@hisilicon.com>
- <1545465105-133138-4-git-send-email-wangzhou1@hisilicon.com>
- <20190111060859.k647ltxukywjmi3l@gondor.apana.org.au>
- <5C383908.4090107@hisilicon.com>
- <5C3F3BDF.6070409@hisilicon.com>
+Return-Path: <SRS0=hYBA=PX=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:50768 "EHLO
+        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729245AbfAONns (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 15 Jan 2019 08:43:48 -0500
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 6/7] crypto: ccree: shared irq lines are not a bug
+Date: Tue, 15 Jan 2019 15:43:16 +0200
+Message-Id: <20190115134318.28712-7-gilad@benyossef.com>
+In-Reply-To: <20190115134318.28712-1-gilad@benyossef.com>
+References: <20190115134318.28712-1-gilad@benyossef.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5C3F3BDF.6070409@hisilicon.com>
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Wed, Jan 16, 2019 at 10:12:47PM +0800, Zhou Wang wrote:
->
-> A stupid question: how do we test scomp alg?
-> 
-> It seems we can not use general comp API, e.g. crypto_alloc_comp
-> to do this.
-> 
-> Could you give me any clue about this?
+The ccree driver was logging an error if it got an interrupt but
+HW indicated nothing to do as might happen if sharing an irq line.
+Remove the error as this is normal and we already have a debug
+print for the IRR register value.
 
-scomp algorithms are allocated through crypto_alloc_acomp.
+Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+---
+ drivers/crypto/ccree/cc_driver.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Thanks,
+diff --git a/drivers/crypto/ccree/cc_driver.c b/drivers/crypto/ccree/cc_driver.c
+index 8ada308d72ee..e75fbe7a8f84 100644
+--- a/drivers/crypto/ccree/cc_driver.c
++++ b/drivers/crypto/ccree/cc_driver.c
+@@ -103,10 +103,10 @@ static irqreturn_t cc_isr(int irq, void *dev_id)
+ 	/* read the interrupt status */
+ 	irr = cc_ioread(drvdata, CC_REG(HOST_IRR));
+ 	dev_dbg(dev, "Got IRR=0x%08X\n", irr);
+-	if (irr == 0) { /* Probably shared interrupt line */
+-		dev_err(dev, "Got interrupt with empty IRR\n");
++
++	if (irr == 0) /* Probably shared interrupt line */
+ 		return IRQ_NONE;
+-	}
++
+ 	imr = cc_ioread(drvdata, CC_REG(HOST_IMR));
+ 
+ 	/* clear interrupt - must be before processing events */
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.20.1
