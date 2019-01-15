@@ -1,46 +1,49 @@
-Return-Path: <SRS0=CSIn=PT=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:60514 "EHLO mail.kernel.org"
+Return-Path: <SRS0=hYBA=PX=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from foss.arm.com ([217.140.101.70]:50774 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725803AbfAKR6g (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Jan 2019 12:58:36 -0500
-Date: Fri, 11 Jan 2019 09:58:34 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 00/16] crypto: skcipher template simplifications and
- conversions
-Message-ID: <20190111175833.GA77447@gmail.com>
-References: <20190104041625.3259-1-ebiggers@kernel.org>
- <20190111063358.pjm776fanp4dspvl@gondor.apana.org.au>
+        id S1729925AbfAONnv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 15 Jan 2019 08:43:51 -0500
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Cc: stable@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 7/7] crypto: ccree: don't copy zero size ciphertext
+Date: Tue, 15 Jan 2019 15:43:17 +0200
+Message-Id: <20190115134318.28712-8-gilad@benyossef.com>
+In-Reply-To: <20190115134318.28712-1-gilad@benyossef.com>
+References: <20190115134318.28712-1-gilad@benyossef.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190111063358.pjm776fanp4dspvl@gondor.apana.org.au>
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jan 11, 2019 at 02:33:58PM +0800, Herbert Xu wrote:
-> On Thu, Jan 03, 2019 at 08:16:09PM -0800, Eric Biggers wrote:
-> > Hello,
-> > 
-> > This series adds a function skcipher_alloc_instance_simple() that
-> > greatly simplifies creating an skcipher_instance that uses a single
-> > underlying block cipher.  It then converts the cbc, cfb, ctr, ecb, kw,
-> > ofb, and pcbc templates to use it.  In doing so, ctr, ecb, and kw are
-> > also converted from the deprecated "blkcipher" API to the skcipher API.
-> > 
-> > While doing this, I also found some rather silly bugs in the cfb, ofb,
-> > and pcbc templates...  So I've included the fixes for these first, in
-> > patches 1-4.  Please consider taking these first 4 patches through
-> > 'crypto' rather than 'cryptodev'.  (But 5-16 are cleanups only, so no
-> > rush on those.)
-> 
-> I have decided to push all of these through cryptodev because
-> it's not clear whether the first four bug fixes are serious enough 
-> to warrant going through straight away.  If I'm wrong please let
-> me know.
-> 
+For decryption in CBC mode we need to save the last ciphertext block
+for use as the next IV. However, we were trying to do this also with
+zero sized ciphertext resulting in a panic.
 
-I'm fine with cryptodev.
+Fix this by only doing the copy if the ciphertext length is at least
+of IV size.
 
-- Eric
+Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+Cc: stable@vger.kernel.org
+---
+ drivers/crypto/ccree/cc_cipher.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/ccree/cc_cipher.c b/drivers/crypto/ccree/cc_cipher.c
+index 98ea53524250..e202d7c7ea00 100644
+--- a/drivers/crypto/ccree/cc_cipher.c
++++ b/drivers/crypto/ccree/cc_cipher.c
+@@ -800,7 +800,8 @@ static int cc_cipher_decrypt(struct skcipher_request *req)
+ 
+ 	memset(req_ctx, 0, sizeof(*req_ctx));
+ 
+-	if (ctx_p->cipher_mode == DRV_CIPHER_CBC) {
++	if ((ctx_p->cipher_mode == DRV_CIPHER_CBC) &&
++	    (req->cryptlen >= ivsize)) {
+ 
+ 		/* Allocate and save the last IV sized bytes of the source,
+ 		 * which will be lost in case of in-place decryption.
+-- 
+2.20.1
