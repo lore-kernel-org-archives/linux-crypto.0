@@ -1,28 +1,28 @@
-Return-Path: <SRS0=EWVs=PV=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from typhoonoptics.com ([185.202.172.61]:57313 "EHLO
-        dentmagictools.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726833AbfAMEcL (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 12 Jan 2019 23:32:11 -0500
+Return-Path: <SRS0=hYBA=PX=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from walterdyer.com ([185.53.169.28]:34684 "EHLO gazetablic.com"
+        rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726022AbfAORfi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 15 Jan 2019 12:35:38 -0500
 To: linux-crypto@vger.kernel.org
-Subject: Do you need to enhance your photos?
-Message-ID: <6d8d0acf38a92e031b3ca575ea365b5f@omnilexica.com>
-Date: Sat, 12 Jan 2019 14:37:39 +0100
-From: "Ruby" <loupaminteeerparnlop@verizon.net>
-Reply-To: desaiten@aliyun.com
+Subject: Want help?
+Message-ID: <5fbcc39c0fd1bfde5113fae163eea7c4@gazetashneta.com>
+Date: Tue, 15 Jan 2019 14:18:38 +0100
+From: "Nancy" <oraitcinteerpaznlop@verizon.net>
+Reply-To: dobanshan@sina.com
 MIME-Version: 1.0
 Content-Type: text/plain; format=flowed; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Do you need to edit your photos?
+Want editing your photos? We can help.
 
-Here are the editing service we mostly for the photos from our clients.
-Photos cut out background , clipping path, and also retouching.
+No matter you need photos background cutting out , or adding clipping path,
+or even retouching.
+We are the right studio that who can help you for your photo editing with
+the quality you need.
 
-You may send some photos to us. we will let our editing staffs to work on
-them.
+Let me know if interested.
 
 Thanks,
-Ruby
+Nancy
