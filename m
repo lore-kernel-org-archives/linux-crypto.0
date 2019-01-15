@@ -1,234 +1,127 @@
-Return-Path: <SRS0=8/la=PM=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:56364 "EHLO mail.kernel.org"
+Return-Path: <SRS0=hYBA=PX=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:57006 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726132AbfADEUz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Jan 2019 23:20:55 -0500
+        id S1728911AbfAOSkB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 15 Jan 2019 13:40:01 -0500
+Date: Tue, 15 Jan 2019 10:39:58 -0800
 From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc: stable@vger.kernel.org, Gilad Ben-Yossef <gilad@benyossef.com>
-Subject: [PATCH 03/16] crypto: ofb - fix handling partial blocks and make thread-safe
-Date: Thu,  3 Jan 2019 20:16:12 -0800
-Message-Id: <20190104041625.3259-4-ebiggers@kernel.org>
-In-Reply-To: <20190104041625.3259-1-ebiggers@kernel.org>
-References: <20190104041625.3259-1-ebiggers@kernel.org>
+To: syzbot <syzbot+ee4f315443a4ea97512e@syzkaller.appspotmail.com>
+Cc: davem@davemloft.net, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+Subject: Re: general protection fault in crypto_remove_spawns (2)
+Message-ID: <20190115183956.GB10955@gmail.com>
+References: <00000000000005cc6a057f65dcea@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <00000000000005cc6a057f65dcea@google.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Eric Biggers <ebiggers@google.com>
+On Sun, Jan 13, 2019 at 11:19:03PM -0800, syzbot wrote:
+> Hello,
+> 
+> syzbot found the following crash on:
+> 
+> HEAD commit:    4b3c31c8d4dd Merge branch 'i2c/for-current' of git://git.k..
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=144cb817400000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=b05cfdb4ee8ab9b2
+> dashboard link: https://syzkaller.appspot.com/bug?extid=ee4f315443a4ea97512e
+> compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+> 
+> Unfortunately, I don't have any reproducer for this crash yet.
+> 
+> IMPORTANT: if you fix the bug, please add the following tag to the commit:
+> Reported-by: syzbot+ee4f315443a4ea97512e@syzkaller.appspotmail.com
+> 
+> binder: 18706:18709 ioctl 40046207 0 returned -16
+> kasan: GPF could be caused by NULL-ptr deref or user memory access
+> general protection fault: 0000 [#1] PREEMPT SMP KASAN
+> CPU: 1 PID: 18713 Comm: cryptomgr_test Not tainted 5.0.0-rc1+ #21
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS
+> Google 01/01/2011
+> RIP: 0010:crypto_remove_spawns+0x7ac/0x1340 crypto/algapi.c:194
+> Code: 49 8d 7c 24 10 48 89 f8 48 c1 e8 03 80 3c 18 00 0f 85 f2 06 00 00 49
+> c7 44 24 10 00 00 00 00 4d 8d 66 10 4c 89 e0 48 c1 e8 03 <80> 3c 18 00 0f 85
+> ef 06 00 00 49 83 7e 10 00 74 0a e8 4e 9e 24 fe
+> RSP: 0000:ffff888054737b88 EFLAGS: 00010202
+> RAX: 0000000000000002 RBX: dffffc0000000000 RCX: 1ffff1100a8e6f86
+> RDX: 0000000000000000 RSI: ffffffff835d58d2 RDI: ffff888085c226b8
+> RBP: ffff888054737df8 R08: ffff88804fb4e4c0 R09: ffff88804fb4ed60
+> R10: ffff88804fb4ed40 R11: 0000000000000001 R12: 0000000000000010
+> R13: ffffed100a8e6f8e R14: 0000000000000000 R15: ffff888054737dd0
+> FS:  0000000000000000(0000) GS:ffff8880ae700000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00007f6091a29000 CR3: 00000000876f9000 CR4: 00000000001406e0
+> kobject: 'loop2' (00000000d1d42c09): kobject_uevent_env
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> Call Trace:
+> kobject: 'loop2' (00000000d1d42c09): fill_kobj_path: path =
+> '/devices/virtual/block/loop2'
+>  crypto_alg_tested+0x52d/0x790 crypto/algapi.c:339
+>  cryptomgr_test+0x18/0x30 crypto/algboss.c:226
+>  kthread+0x357/0x430 kernel/kthread.c:246
+> binder: BINDER_SET_CONTEXT_MGR already set
+>  ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:352
+> Modules linked in:
+> kobject: 'loop3' (0000000091226001): kobject_uevent_env
+> binder: 18723:18724 ioctl 40046207 0 returned -16
+> kobject: 'loop3' (0000000091226001): fill_kobj_path: path =
+> '/devices/virtual/block/loop3'
+> kobject: 'loop5' (0000000038d1e891): kobject_uevent_env
+> kobject: 'loop5' (0000000038d1e891): fill_kobj_path: path =
+> '/devices/virtual/block/loop5'
+> kobject: 'loop1' (0000000047f20675): kobject_uevent_env
+> kobject: 'loop1' (0000000047f20675): fill_kobj_path: path =
+> '/devices/virtual/block/loop1'
+> kobject: 'loop0' (00000000f3ca3d42): kobject_uevent_env
+> kobject: 'loop0' (00000000f3ca3d42): fill_kobj_path: path =
+> '/devices/virtual/block/loop0'
+> kobject: 'loop5' (0000000038d1e891): kobject_uevent_env
+> kobject: 'loop5' (0000000038d1e891): fill_kobj_path: path =
+> '/devices/virtual/block/loop5'
+> kobject: 'loop1' (0000000047f20675): kobject_uevent_env
+> kobject: 'loop1' (0000000047f20675): fill_kobj_path: path =
+> '/devices/virtual/block/loop1'
+> kobject: 'loop2' (00000000d1d42c09): kobject_uevent_env
+> kobject: 'loop2' (00000000d1d42c09): fill_kobj_path: path =
+> '/devices/virtual/block/loop2'
+> ---[ end trace d2934b3fdb1c156e ]---
+> RIP: 0010:crypto_remove_spawns+0x7ac/0x1340 crypto/algapi.c:194
+> Code: 49 8d 7c 24 10 48 89 f8 48 c1 e8 03 80 3c 18 00 0f 85 f2 06 00 00 49
+> c7 44 24 10 00 00 00 00 4d 8d 66 10 4c 89 e0 48 c1 e8 03 <80> 3c 18 00 0f 85
+> ef 06 00 00 49 83 7e 10 00 74 0a e8 4e 9e 24 fe
+> RSP: 0000:ffff888054737b88 EFLAGS: 00010202
+> RAX: 0000000000000002 RBX: dffffc0000000000 RCX: 1ffff1100a8e6f86
+> RDX: 0000000000000000 RSI: ffffffff835d58d2 RDI: ffff888085c226b8
+> RBP: ffff888054737df8 R08: ffff88804fb4e4c0 R09: ffff88804fb4ed60
+> R10: ffff88804fb4ed40 R11: 0000000000000001 R12: 0000000000000010
+> R13: ffffed100a8e6f8e R14: 0000000000000000 R15: ffff888054737dd0
+> FS:  0000000000000000(0000) GS:ffff8880ae700000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 000000000110cfd0 CR3: 0000000094f35000 CR4: 00000000001406e0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> 
+> 
+> ---
+> This bug is generated by a bot. It may contain errors.
+> See https://goo.gl/tpsmEJ for more information about syzbot.
+> syzbot engineers can be reached at syzkaller@googlegroups.com.
+> 
+> syzbot will keep track of this bug report. See:
+> https://goo.gl/tpsmEJ#bug-status-tracking for how to communicate with
+> syzbot.
+> 
 
-Fix multiple bugs in the OFB implementation:
+This may be the bug that will be fixed by commit 6db43410179b ("crypto: adiantum
+- initialize crypto_spawn::inst"), but I'm not sure.  Since it's unlikely that
+anyone will do anything else with this bug report, I'm going ahead and marking
+this fixed for syzbot so that it doesn't suppress similar crashes in the future.
 
-1. It stored the per-request state 'cnt' in the tfm context, which can be
-   used by multiple threads concurrently (e.g. via AF_ALG).
-2. It didn't support messages not a multiple of the block cipher size,
-   despite being a stream cipher.
-3. It didn't set cra_blocksize to 1 to indicate it is a stream cipher.
+#syz fix: crypto: adiantum - initialize crypto_spawn::inst
 
-To fix these, set the 'chunksize' property to the cipher block size to
-guarantee that when walking through the scatterlist, a partial block can
-only occur at the end.  Then change the implementation to XOR a block at
-a time at first, then XOR the partial block at the end if needed.  This
-is the same way CTR and CFB are implemented.  As a bonus, this also
-improves performance in most cases over the current approach.
-
-Fixes: e497c51896b3 ("crypto: ofb - add output feedback mode")
-Cc: <stable@vger.kernel.org> # v4.20+
-Cc: Gilad Ben-Yossef <gilad@benyossef.com>
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- crypto/ofb.c     | 91 ++++++++++++++++++++----------------------------
- crypto/testmgr.h | 28 +++++++++++++--
- 2 files changed, 63 insertions(+), 56 deletions(-)
-
-diff --git a/crypto/ofb.c b/crypto/ofb.c
-index 886631708c5e9..cab0b80953fed 100644
---- a/crypto/ofb.c
-+++ b/crypto/ofb.c
-@@ -5,9 +5,6 @@
-  *
-  * Copyright (C) 2018 ARM Limited or its affiliates.
-  * All rights reserved.
-- *
-- * Based loosely on public domain code gleaned from libtomcrypt
-- * (https://github.com/libtom/libtomcrypt).
-  */
- 
- #include <crypto/algapi.h>
-@@ -21,7 +18,6 @@
- 
- struct crypto_ofb_ctx {
- 	struct crypto_cipher *child;
--	int cnt;
- };
- 
- 
-@@ -41,58 +37,40 @@ static int crypto_ofb_setkey(struct crypto_skcipher *parent, const u8 *key,
- 	return err;
- }
- 
--static int crypto_ofb_encrypt_segment(struct crypto_ofb_ctx *ctx,
--				      struct skcipher_walk *walk,
--				      struct crypto_cipher *tfm)
-+static int crypto_ofb_crypt(struct skcipher_request *req)
- {
--	int bsize = crypto_cipher_blocksize(tfm);
--	int nbytes = walk->nbytes;
--
--	u8 *src = walk->src.virt.addr;
--	u8 *dst = walk->dst.virt.addr;
--	u8 *iv = walk->iv;
--
--	do {
--		if (ctx->cnt == bsize) {
--			if (nbytes < bsize)
--				break;
--			crypto_cipher_encrypt_one(tfm, iv, iv);
--			ctx->cnt = 0;
--		}
--		*dst = *src ^ iv[ctx->cnt];
--		src++;
--		dst++;
--		ctx->cnt++;
--	} while (--nbytes);
--	return nbytes;
--}
--
--static int crypto_ofb_encrypt(struct skcipher_request *req)
--{
--	struct skcipher_walk walk;
- 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
--	unsigned int bsize;
- 	struct crypto_ofb_ctx *ctx = crypto_skcipher_ctx(tfm);
--	struct crypto_cipher *child = ctx->child;
--	int ret = 0;
-+	struct crypto_cipher *cipher = ctx->child;
-+	const unsigned int bsize = crypto_cipher_blocksize(cipher);
-+	struct skcipher_walk walk;
-+	int err;
- 
--	bsize =  crypto_cipher_blocksize(child);
--	ctx->cnt = bsize;
-+	err = skcipher_walk_virt(&walk, req, false);
- 
--	ret = skcipher_walk_virt(&walk, req, false);
-+	while (walk.nbytes >= bsize) {
-+		const u8 *src = walk.src.virt.addr;
-+		u8 *dst = walk.dst.virt.addr;
-+		u8 * const iv = walk.iv;
-+		unsigned int nbytes = walk.nbytes;
- 
--	while (walk.nbytes) {
--		ret = crypto_ofb_encrypt_segment(ctx, &walk, child);
--		ret = skcipher_walk_done(&walk, ret);
--	}
-+		do {
-+			crypto_cipher_encrypt_one(cipher, iv, iv);
-+			crypto_xor_cpy(dst, src, iv, bsize);
-+			dst += bsize;
-+			src += bsize;
-+		} while ((nbytes -= bsize) >= bsize);
- 
--	return ret;
--}
-+		err = skcipher_walk_done(&walk, nbytes);
-+	}
- 
--/* OFB encrypt and decrypt are identical */
--static int crypto_ofb_decrypt(struct skcipher_request *req)
--{
--	return crypto_ofb_encrypt(req);
-+	if (walk.nbytes) {
-+		crypto_cipher_encrypt_one(cipher, walk.iv, walk.iv);
-+		crypto_xor_cpy(walk.dst.virt.addr, walk.src.virt.addr, walk.iv,
-+			       walk.nbytes);
-+		err = skcipher_walk_done(&walk, 0);
-+	}
-+	return err;
- }
- 
- static int crypto_ofb_init_tfm(struct crypto_skcipher *tfm)
-@@ -165,13 +143,18 @@ static int crypto_ofb_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	if (err)
- 		goto err_drop_spawn;
- 
-+	/* OFB mode is a stream cipher. */
-+	inst->alg.base.cra_blocksize = 1;
-+
-+	/*
-+	 * To simplify the implementation, configure the skcipher walk to only
-+	 * give a partial block at the very end, never earlier.
-+	 */
-+	inst->alg.chunksize = alg->cra_blocksize;
-+
- 	inst->alg.base.cra_priority = alg->cra_priority;
--	inst->alg.base.cra_blocksize = alg->cra_blocksize;
- 	inst->alg.base.cra_alignmask = alg->cra_alignmask;
- 
--	/* We access the data as u32s when xoring. */
--	inst->alg.base.cra_alignmask |= __alignof__(u32) - 1;
--
- 	inst->alg.ivsize = alg->cra_blocksize;
- 	inst->alg.min_keysize = alg->cra_cipher.cia_min_keysize;
- 	inst->alg.max_keysize = alg->cra_cipher.cia_max_keysize;
-@@ -182,8 +165,8 @@ static int crypto_ofb_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	inst->alg.exit = crypto_ofb_exit_tfm;
- 
- 	inst->alg.setkey = crypto_ofb_setkey;
--	inst->alg.encrypt = crypto_ofb_encrypt;
--	inst->alg.decrypt = crypto_ofb_decrypt;
-+	inst->alg.encrypt = crypto_ofb_crypt;
-+	inst->alg.decrypt = crypto_ofb_crypt;
- 
- 	inst->free = crypto_ofb_free;
- 
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 7f4dae7a57a1c..ca8e8ebef309d 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -16681,8 +16681,7 @@ static const struct cipher_testvec aes_ctr_rfc3686_tv_template[] = {
- };
- 
- static const struct cipher_testvec aes_ofb_tv_template[] = {
--	 /* From NIST Special Publication 800-38A, Appendix F.5 */
--	{
-+	{ /* From NIST Special Publication 800-38A, Appendix F.5 */
- 		.key	= "\x2b\x7e\x15\x16\x28\xae\xd2\xa6"
- 			  "\xab\xf7\x15\x88\x09\xcf\x4f\x3c",
- 		.klen	= 16,
-@@ -16705,6 +16704,31 @@ static const struct cipher_testvec aes_ofb_tv_template[] = {
- 			  "\x30\x4c\x65\x28\xf6\x59\xc7\x78"
- 			  "\x66\xa5\x10\xd9\xc1\xd6\xae\x5e",
- 		.len	= 64,
-+		.also_non_np = 1,
-+		.np	= 2,
-+		.tap	= { 31, 33 },
-+	}, { /* > 16 bytes, not a multiple of 16 bytes */
-+		.key	= "\x2b\x7e\x15\x16\x28\xae\xd2\xa6"
-+			  "\xab\xf7\x15\x88\x09\xcf\x4f\x3c",
-+		.klen	= 16,
-+		.iv	= "\x00\x01\x02\x03\x04\x05\x06\x07"
-+			  "\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f",
-+		.ptext	= "\x6b\xc1\xbe\xe2\x2e\x40\x9f\x96"
-+			  "\xe9\x3d\x7e\x11\x73\x93\x17\x2a"
-+			  "\xae",
-+		.ctext	= "\x3b\x3f\xd9\x2e\xb7\x2d\xad\x20"
-+			  "\x33\x34\x49\xf8\xe8\x3c\xfb\x4a"
-+			  "\x77",
-+		.len	= 17,
-+	}, { /* < 16 bytes */
-+		.key	= "\x2b\x7e\x15\x16\x28\xae\xd2\xa6"
-+			  "\xab\xf7\x15\x88\x09\xcf\x4f\x3c",
-+		.klen	= 16,
-+		.iv	= "\x00\x01\x02\x03\x04\x05\x06\x07"
-+			  "\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f",
-+		.ptext	= "\x6b\xc1\xbe\xe2\x2e\x40\x9f",
-+		.ctext	= "\x3b\x3f\xd9\x2e\xb7\x2d\xad",
-+		.len	= 7,
- 	}
- };
- 
--- 
-2.20.1
+- Eric
