@@ -1,51 +1,75 @@
-Return-Path: <SRS0=FsAa=P2=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from szxga07-in.huawei.com ([45.249.212.35]:41632 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727167AbfARHyv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Jan 2019 02:54:51 -0500
-Subject: Re: [PATCH 3/4] crypto: hisilicon: Add HiSilicon ZIP accelerator
- support
-To: Herbert Xu <herbert@gondor.apana.org.au>
-References: <1545465105-133138-1-git-send-email-wangzhou1@hisilicon.com>
- <1545465105-133138-4-git-send-email-wangzhou1@hisilicon.com>
- <20190111060859.k647ltxukywjmi3l@gondor.apana.org.au>
- <5C383908.4090107@hisilicon.com> <5C3F3BDF.6070409@hisilicon.com>
- <20190118045546.hs37a2isfnvxgm7j@gondor.apana.org.au>
-CC: <linux-kernel@vger.kernel.org>, <linuxarm@huawei.com>,
-        <linux-crypto@vger.kernel.org>,
-        "David S . Miller" <davem@davemloft.net>
-From: Zhou Wang <wangzhou1@hisilicon.com>
-Message-ID: <5C418659.30904@hisilicon.com>
-Date: Fri, 18 Jan 2019 15:55:05 +0800
+Return-Path: <SRS0=hYBA=PX=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:54730 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1732167AbfAOQio (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 15 Jan 2019 11:38:44 -0500
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: linux-kernel@vger.kernel.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        stable@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Eric Biggers <ebiggers@google.com>
+Subject: [PATCH 4.4 49/51] crypto: cts - fix crash on short inputs
+Date: Tue, 15 Jan 2019 17:35:45 +0100
+Message-Id: <20190115154854.089548717@linuxfoundation.org>
+In-Reply-To: <20190115154846.928796000@linuxfoundation.org>
+References: <20190115154846.928796000@linuxfoundation.org>
 MIME-Version: 1.0
-In-Reply-To: <20190118045546.hs37a2isfnvxgm7j@gondor.apana.org.au>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 2019/1/18 12:55, Herbert Xu wrote:
-> On Wed, Jan 16, 2019 at 10:12:47PM +0800, Zhou Wang wrote:
->>
->> A stupid question: how do we test scomp alg?
->>
->> It seems we can not use general comp API, e.g. crypto_alloc_comp
->> to do this.
->>
->> Could you give me any clue about this?
-> 
-> scomp algorithms are allocated through crypto_alloc_acomp.
+4.4-stable review patch.  If anyone has any objections, please let me know.
 
-A little strange, but let me try firstly.
+------------------
 
-However, another question is that seems other subsystems in kernel,
-e.g. zswap still use crypto_alloc_comp. So we'd better register this
-ZIP engine using both cryto_alloc_comp and scomp/acomp interface to
-make it compatible with other subsystems?
 
-Best,
-Zhou
+From: Eric Biggers <ebiggers@google.com>
 
-> 
-> Thanks,
-> 
+[It's a minimal fix for a bug that was fixed incidentally by a large
+refactoring in v4.8.]
+
+In the CTS template, when the input length is <= one block cipher block
+(e.g. <= 16 bytes for AES) pass the correct length to the underlying CBC
+transform rather than one block.  This matches the upstream behavior and
+makes the encryption/decryption operation correctly return -EINVAL when
+1 <= nbytes < bsize or succeed when nbytes == 0, rather than crashing.
+
+This was fixed upstream incidentally by a large refactoring,
+commit 0605c41cc53c ("crypto: cts - Convert to skcipher").  But
+syzkaller easily trips over this when running on older kernels, as it's
+easily reachable via AF_ALG.  Therefore, this patch makes the minimal
+fix for older kernels.
+
+Cc: linux-crypto@vger.kernel.org
+Fixes: 76cb9521795a ("[CRYPTO] cts: Add CTS mode required for Kerberos AES support")
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ crypto/cts.c |    8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+--- a/crypto/cts.c
++++ b/crypto/cts.c
+@@ -137,8 +137,8 @@ static int crypto_cts_encrypt(struct blk
+ 	lcldesc.info = desc->info;
+ 	lcldesc.flags = desc->flags;
+ 
+-	if (tot_blocks == 1) {
+-		err = crypto_blkcipher_encrypt_iv(&lcldesc, dst, src, bsize);
++	if (tot_blocks <= 1) {
++		err = crypto_blkcipher_encrypt_iv(&lcldesc, dst, src, nbytes);
+ 	} else if (nbytes <= bsize * 2) {
+ 		err = cts_cbc_encrypt(ctx, desc, dst, src, 0, nbytes);
+ 	} else {
+@@ -232,8 +232,8 @@ static int crypto_cts_decrypt(struct blk
+ 	lcldesc.info = desc->info;
+ 	lcldesc.flags = desc->flags;
+ 
+-	if (tot_blocks == 1) {
+-		err = crypto_blkcipher_decrypt_iv(&lcldesc, dst, src, bsize);
++	if (tot_blocks <= 1) {
++		err = crypto_blkcipher_decrypt_iv(&lcldesc, dst, src, nbytes);
+ 	} else if (nbytes <= bsize * 2) {
+ 		err = cts_cbc_decrypt(ctx, desc, dst, src, 0, nbytes);
+ 	} else {
