@@ -1,101 +1,57 @@
-Return-Path: <SRS0=FsAa=P2=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from stargate.chelsio.com ([12.32.117.8]:7854 "EHLO
-        stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727248AbfARHNh (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Jan 2019 02:13:37 -0500
-From: Atul Gupta <atul.gupta@chelsio.com>
-To: davem@davemloft.net, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
-        dt@chelsio.com
-Cc: atul.gupta@chelsio.com
-Subject: [RFC patch 1/4] net/tls: connect routine for Inline TLS client
-Date: Thu, 17 Jan 2019 23:13:31 -0800
-Message-Id: <20190118071331.9532-1-atul.gupta@chelsio.com>
+Return-Path: <SRS0=hYBA=PX=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:50760 "EHLO
+        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729901AbfAONnq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 15 Jan 2019 08:43:46 -0500
+From: Gilad Ben-Yossef <gilad@benyossef.com>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Cc: stable@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 5/7] crypto: ccree: unmap buffer before copying IV
+Date: Tue, 15 Jan 2019 15:43:15 +0200
+Message-Id: <20190115134318.28712-6-gilad@benyossef.com>
+In-Reply-To: <20190115134318.28712-1-gilad@benyossef.com>
+References: <20190115134318.28712-1-gilad@benyossef.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Define tls_hw_connect to setup Inline TLS client before
-TLS handshake and key program
+We were copying the last ciphertext block into the IV field
+for CBC before removing the DMA mapping of the output buffer
+with the result of the buffer sometime being out-of-sync cache
+wise and were getting intermittent cases of bad output IV.
 
-Signed-off-by: Atul Gupta <atul.gupta@chelsio.com>
+Fix it by moving the DMA buffer unmapping before the copy.
+
+Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+Fixes: 00904aa0cd59 ("crypto: ccree - fix iv handling")
+Cc: <stable@vger.kernel.org>
 ---
- include/net/tls.h  |  5 +++++
- net/tls/tls_main.c | 23 +++++++++++++++++++++++
- 2 files changed, 28 insertions(+)
+ drivers/crypto/ccree/cc_cipher.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/tls.h b/include/net/tls.h
-index 90bf52d..f467cc1 100644
---- a/include/net/tls.h
-+++ b/include/net/tls.h
-@@ -77,6 +77,8 @@
-  * void (*unhash)(struct tls_device *device, struct sock *sk);
-  *     This function cleans listen state set by Inline TLS driver
-  *
-+ * int  (*connect)(struct tls_device *device, struct sock *sk,
-+ *                 struct sockaddr *uaddr, int addr_len);
-  * void (*release)(struct kref *kref);
-  *     Release the registered device and allocated resources
-  * @kref: Number of reference to tls_device
-@@ -87,6 +89,8 @@ struct tls_device {
- 	int  (*feature)(struct tls_device *device);
- 	int  (*hash)(struct tls_device *device, struct sock *sk);
- 	void (*unhash)(struct tls_device *device, struct sock *sk);
-+	int  (*connect)(struct tls_device *device, struct sock *sk,
-+			struct sockaddr *uaddr, int addr_len);
- 	void (*release)(struct kref *kref);
- 	struct kref kref;
- };
-@@ -245,6 +249,7 @@ struct tls_context {
- 			   int __user *optlen);
- 	int  (*hash)(struct sock *sk);
- 	void (*unhash)(struct sock *sk);
-+	int  (*connect)(struct sock *sk, struct sockaddr *uaddr, int addr_len);
- };
+diff --git a/drivers/crypto/ccree/cc_cipher.c b/drivers/crypto/ccree/cc_cipher.c
+index cc92b031fad1..98ea53524250 100644
+--- a/drivers/crypto/ccree/cc_cipher.c
++++ b/drivers/crypto/ccree/cc_cipher.c
+@@ -652,6 +652,8 @@ static void cc_cipher_complete(struct device *dev, void *cc_req, int err)
+ 	unsigned int ivsize = crypto_skcipher_ivsize(sk_tfm);
+ 	unsigned int len;
  
- struct tls_offload_context_rx {
-diff --git a/net/tls/tls_main.c b/net/tls/tls_main.c
-index d36d095..aec7b2a 100644
---- a/net/tls/tls_main.c
-+++ b/net/tls/tls_main.c
-@@ -592,6 +592,28 @@ static void tls_hw_sk_destruct(struct sock *sk)
- 	icsk->icsk_ulp_data = NULL;
- }
- 
-+static int tls_hw_connect(struct sock *sk, struct sockaddr *uaddr,
-+			  int addr_len)
-+{
-+	struct tls_device *dev;
-+	int err;
++	cc_unmap_cipher_request(dev, req_ctx, ivsize, src, dst);
 +
-+	spin_lock_bh(&device_spinlock);
-+	list_for_each_entry(dev, &device_list, dev_list) {
-+		if (dev->connect) {
-+			kref_get(&dev->kref);
-+			spin_unlock_bh(&device_spinlock);
-+			err = dev->connect(dev, sk, uaddr, addr_len);
-+			kref_put(&dev->kref, dev->release);
-+			spin_lock_bh(&device_spinlock);
-+			if (!err)
-+				break;
-+		}
-+	}
-+	spin_unlock_bh(&device_spinlock);
-+	return err;
-+}
-+
- static int tls_hw_prot(struct sock *sk)
- {
- 	struct tls_context *ctx;
-@@ -709,6 +731,7 @@ static void build_protos(struct proto prot[TLS_NUM_CONFIG][TLS_NUM_CONFIG],
- 	prot[TLS_HW_RECORD][TLS_HW_RECORD] = *base;
- 	prot[TLS_HW_RECORD][TLS_HW_RECORD].hash		= tls_hw_hash;
- 	prot[TLS_HW_RECORD][TLS_HW_RECORD].unhash	= tls_hw_unhash;
-+	prot[TLS_HW_RECORD][TLS_HW_RECORD].connect	= tls_hw_connect;
- 	prot[TLS_HW_RECORD][TLS_HW_RECORD].close	= tls_sk_proto_close;
- }
+ 	switch (ctx_p->cipher_mode) {
+ 	case DRV_CIPHER_CBC:
+ 		/*
+@@ -681,7 +683,6 @@ static void cc_cipher_complete(struct device *dev, void *cc_req, int err)
+ 		break;
+ 	}
  
+-	cc_unmap_cipher_request(dev, req_ctx, ivsize, src, dst);
+ 	kzfree(req_ctx->iv);
+ 
+ 	skcipher_request_complete(req, err);
 -- 
-1.8.3.1
+2.20.1
