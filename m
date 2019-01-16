@@ -1,70 +1,90 @@
-Return-Path: <SRS0=+HSe=PS=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:53236 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727558AbfAJUSX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Jan 2019 15:18:23 -0500
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 04/11] crypto: testmgr - handle endianness correctly in alg_test_crc32c()
-Date: Thu, 10 Jan 2019 12:17:55 -0800
-Message-Id: <20190110201802.82442-5-ebiggers@kernel.org>
-In-Reply-To: <20190110201802.82442-1-ebiggers@kernel.org>
-References: <20190110201802.82442-1-ebiggers@kernel.org>
+Return-Path: <SRS0=g5s/=PY=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from szxga04-in.huawei.com ([45.249.212.190]:17550 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728619AbfAPCvR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 15 Jan 2019 21:51:17 -0500
+From: Xiongfeng Wang <wangxiongfeng2@huawei.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <wangxiongfeng2@huawei.com>, <broonie@kernel.org>,
+        <ard.biesheuvel@linaro.org>, <jonathan.cameron@huawei.com>
+Subject: [PATCH 1/5] crypto: api - add a helper to (un)register a array of templates
+Date: Wed, 16 Jan 2019 10:50:30 +0800
+Message-ID: <1547607034-40948-2-git-send-email-wangxiongfeng2@huawei.com>
+In-Reply-To: <1547607034-40948-1-git-send-email-wangxiongfeng2@huawei.com>
+References: <1547607034-40948-1-git-send-email-wangxiongfeng2@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Eric Biggers <ebiggers@google.com>
+This patch add a helper to (un)register a array of templates. The
+following patches will use this helper to simplify the code.
 
-The crc32c context is in CPU endianness, whereas the final digest is
-little endian.  alg_test_crc32c() got this mixed up.  Fix it.
-
-The test passes both before and after, but this patch fixes the
-following sparse warning:
-
-    crypto/testmgr.c:1912:24: warning: cast to restricted __le32
-
-Signed-off-by: Eric Biggers <ebiggers@google.com>
+Signed-off-by: Xiongfeng Wang <xiongfeng.wang@linaro.org>
 ---
- crypto/testmgr.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ crypto/algapi.c         | 27 +++++++++++++++++++++++++++
+ include/crypto/algapi.h |  2 ++
+ 2 files changed, 29 insertions(+)
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 0f684a414acbe..10b7208bd40be 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -1889,7 +1889,7 @@ static int alg_test_crc32c(const struct alg_test_desc *desc,
- 			   const char *driver, u32 type, u32 mask)
+diff --git a/crypto/algapi.c b/crypto/algapi.c
+index 8b65ada..59a6599 100644
+--- a/crypto/algapi.c
++++ b/crypto/algapi.c
+@@ -494,6 +494,24 @@ int crypto_register_template(struct crypto_template *tmpl)
+ }
+ EXPORT_SYMBOL_GPL(crypto_register_template);
+ 
++int crypto_register_templates(struct crypto_template *tmpl, int num)
++{
++	int i, err;
++
++	for (i = 0; i < num; i++) {
++		err = crypto_register_template(&tmpl[i]);
++		if (err)
++			goto out;
++	}
++	return 0;
++
++out:
++	for (i -= 1; i >= 0; i--)
++		crypto_unregister_template(&tmpl[i]);
++	return err;
++}
++EXPORT_SYMBOL_GPL(crypto_register_templates);
++
+ void crypto_unregister_template(struct crypto_template *tmpl)
  {
- 	struct crypto_shash *tfm;
--	u32 val;
-+	__le32 val;
- 	int err;
+ 	struct crypto_instance *inst;
+@@ -523,6 +541,15 @@ void crypto_unregister_template(struct crypto_template *tmpl)
+ }
+ EXPORT_SYMBOL_GPL(crypto_unregister_template);
  
- 	err = alg_test_hash(desc, driver, type, mask);
-@@ -1911,7 +1911,7 @@ static int alg_test_crc32c(const struct alg_test_desc *desc,
- 		shash->tfm = tfm;
- 		shash->flags = 0;
++void crypto_unregister_templates(struct crypto_template *tmpl, int num)
++{
++	int i;
++
++	for (i = num - 1; i >= 0; i--)
++		crypto_unregister_template(&tmpl[i]);
++}
++EXPORT_SYMBOL_GPL(crypto_unregister_templates);
++
+ static struct crypto_template *__crypto_lookup_template(const char *name)
+ {
+ 	struct crypto_template *q, *tmpl = NULL;
+diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
+index 4a5ad10..e879a20 100644
+--- a/include/crypto/algapi.h
++++ b/include/crypto/algapi.h
+@@ -143,7 +143,9 @@ struct ablkcipher_walk {
+ void crypto_mod_put(struct crypto_alg *alg);
  
--		*ctx = le32_to_cpu(420553207);
-+		*ctx = 420553207;
- 		err = crypto_shash_final(shash, (u8 *)&val);
- 		if (err) {
- 			printk(KERN_ERR "alg: crc32c: Operation failed for "
-@@ -1919,9 +1919,9 @@ static int alg_test_crc32c(const struct alg_test_desc *desc,
- 			break;
- 		}
+ int crypto_register_template(struct crypto_template *tmpl);
++int crypto_register_templates(struct crypto_template *tmpl, int num);
+ void crypto_unregister_template(struct crypto_template *tmpl);
++void crypto_unregister_templates(struct crypto_template *tmpl, int num);
+ struct crypto_template *crypto_lookup_template(const char *name);
  
--		if (val != ~420553207) {
--			printk(KERN_ERR "alg: crc32c: Test failed for %s: "
--			       "%d\n", driver, val);
-+		if (val != cpu_to_le32(~420553207)) {
-+			pr_err("alg: crc32c: Test failed for %s: %u\n",
-+			       driver, le32_to_cpu(val));
- 			err = -EINVAL;
- 		}
- 	} while (0);
+ int crypto_register_instance(struct crypto_template *tmpl,
 -- 
-2.20.1.97.g81188d93c3-goog
+1.7.12.4
