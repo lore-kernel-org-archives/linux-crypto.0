@@ -1,68 +1,86 @@
-Return-Path: <SRS0=+HSe=PS=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from szxga06-in.huawei.com ([45.249.212.32]:39946 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725536AbfAJGaj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Jan 2019 01:30:39 -0500
-Subject: Re: [PATCH 0/4] crypto: hisilicon: Add HiSilicon QM and ZIP
- controller driver
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        <linux-crypto@vger.kernel.org>
-References: <1545465105-133138-1-git-send-email-wangzhou1@hisilicon.com>
-CC: <linux-kernel@vger.kernel.org>, <linuxarm@huawei.com>
-From: Zhou Wang <wangzhou1@hisilicon.com>
-Message-ID: <5C36E682.9040701@hisilicon.com>
-Date: Thu, 10 Jan 2019 14:30:26 +0800
+Return-Path: <SRS0=g5s/=PY=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from ale.deltatee.com ([207.54.116.67]:35052 "EHLO ale.deltatee.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728195AbfAPSZd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 16 Jan 2019 13:25:33 -0500
+From: Logan Gunthorpe <logang@deltatee.com>
+To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org,
+        linux-mm@kvack.org, Andrew Morton <akpm@linux-foundation.org>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andy Shevchenko <andy.shevchenko@gmail.com>,
+        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Kate Stewart <kstewart@linuxfoundation.org>,
+        Philippe Ombredanne <pombredanne@nexb.com>
+Date: Wed, 16 Jan 2019 11:25:18 -0700
+Message-Id: <20190116182523.19446-2-logang@deltatee.com>
+In-Reply-To: <20190116182523.19446-1-logang@deltatee.com>
+References: <20190116182523.19446-1-logang@deltatee.com>
 MIME-Version: 1.0
-In-Reply-To: <1545465105-133138-1-git-send-email-wangzhou1@hisilicon.com>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: [PATCH v25 1/6] iomap: Use non-raw io functions for io{read|write}XXbe
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On 2018/12/22 15:51, Zhou Wang wrote:
-> This series adds HiSilicon QM and ZIP controller driver in crypto subsystem.
-> 
-> A simple QM/ZIP driver which helps to provide an example for a general
-> accelerator framework is under review in community[1]. Based on this simple
-> driver, this series adds HW v2 support, PCI passthrough, reset, PCI/misc error
-> handler, debug support. But unlike [1], driver in this patchset only registers
-> to crypto subsystem.
-> 
-> There will be a long discussion about above accelerator framework in the
-> process of upstreaming. So let's firstly review and upstream QM/ZIP crypto
-> driver.
-> 
-> References:
-> [1] https://lkml.org/lkml/2018/11/12/1951
-> 
-> Zhou Wang (4):
->   Documentation: Add debugfs doc for hisi_zip
->   crypto: hisilicon: Add queue management driver for HiSilicon QM module
->   crypto: hisilicon: Add HiSilicon ZIP accelerator support
->   MAINTAINERS: add maintainer for HiSilicon QM and ZIP controller driver
-> 
->  Documentation/ABI/testing/debugfs-hisi-zip |   50 +
->  MAINTAINERS                                |    8 +
->  drivers/crypto/hisilicon/Kconfig           |   11 +
->  drivers/crypto/hisilicon/Makefile          |    2 +
->  drivers/crypto/hisilicon/qm.c              | 1823 ++++++++++++++++++++++++++++
->  drivers/crypto/hisilicon/qm.h              |  177 +++
->  drivers/crypto/hisilicon/zip/Makefile      |    2 +
->  drivers/crypto/hisilicon/zip/zip.h         |   60 +
->  drivers/crypto/hisilicon/zip/zip_crypto.c  |  410 +++++++
->  drivers/crypto/hisilicon/zip/zip_main.c    | 1161 ++++++++++++++++++
->  10 files changed, 3704 insertions(+)
->  create mode 100644 Documentation/ABI/testing/debugfs-hisi-zip
->  create mode 100644 drivers/crypto/hisilicon/qm.c
->  create mode 100644 drivers/crypto/hisilicon/qm.h
->  create mode 100644 drivers/crypto/hisilicon/zip/Makefile
->  create mode 100644 drivers/crypto/hisilicon/zip/zip.h
->  create mode 100644 drivers/crypto/hisilicon/zip/zip_crypto.c
->  create mode 100644 drivers/crypto/hisilicon/zip/zip_main.c
-> 
+Fix an asymmetry in the io{read|write}XXbe functions in that the
+big-endian variants make use of the raw io accessors while the
+little-endian variants use the regular accessors. Some architectures
+implement barriers to order against both spinlocks and DMA accesses
+and for these case, the big-endian variant of the API would not be
+protected.
 
-Any comments about this series?
+Thus, change the mmio_XXXXbe macros to use the appropriate swab() function
+wrapping the regular accessor. This is similar to what was done for PIO.
 
-Best,
-Zhou
+When this code was originally written, barriers in the IO accessors were
+not common and the accessors simply wrapped the raw functions in a
+conversion to CPU endianness. Since then, barriers have been added in
+some architectures and are now missing in the big endian variant of the
+API.
+
+This also manages to silence a few sparse warnings that check
+for using the correct endian types which the original code did
+not annotate correctly.
+
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Kate Stewart <kstewart@linuxfoundation.org>
+Cc: Philippe Ombredanne <pombredanne@nexb.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Arnd Bergmann <arnd@arndb.de>
+Link: http://lkml.kernel.org/r/CAK8P3a25zQDxyaY3iVv+JmSSzs7F6ssGc+HdBkGs54ZfViX+Fg@mail.gmail.com
+---
+ lib/iomap.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/lib/iomap.c b/lib/iomap.c
+index 541d926da95e..2c293b22569f 100644
+--- a/lib/iomap.c
++++ b/lib/iomap.c
+@@ -65,8 +65,8 @@ static void bad_io_access(unsigned long port, const char *access)
+ #endif
+ 
+ #ifndef mmio_read16be
+-#define mmio_read16be(addr) be16_to_cpu(__raw_readw(addr))
+-#define mmio_read32be(addr) be32_to_cpu(__raw_readl(addr))
++#define mmio_read16be(addr) swab16(readw(addr))
++#define mmio_read32be(addr) swab32(readl(addr))
+ #endif
+ 
+ unsigned int ioread8(void __iomem *addr)
+@@ -106,8 +106,8 @@ EXPORT_SYMBOL(ioread32be);
+ #endif
+ 
+ #ifndef mmio_write16be
+-#define mmio_write16be(val,port) __raw_writew(be16_to_cpu(val),port)
+-#define mmio_write32be(val,port) __raw_writel(be32_to_cpu(val),port)
++#define mmio_write16be(val,port) writew(swab16(val),port)
++#define mmio_write32be(val,port) writel(swab32(val),port)
+ #endif
+ 
+ void iowrite8(u8 val, void __iomem *addr)
+-- 
+2.19.0
