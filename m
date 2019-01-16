@@ -1,38 +1,98 @@
-Return-Path: <SRS0=hYBA=PX=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:50800 "EHLO foss.arm.com"
+Return-Path: <SRS0=g5s/=PY=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from ale.deltatee.com ([207.54.116.67]:35046 "EHLO ale.deltatee.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726886AbfAONov (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Jan 2019 08:44:51 -0500
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 0/7] crypto: ccree: bug fixes and cleanups
-Date: Tue, 15 Jan 2019 15:44:46 +0200
-Message-Id: <20190115134447.29064-1-gilad@benyossef.com>
+        id S1728327AbfAPSZc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 16 Jan 2019 13:25:32 -0500
+From: Logan Gunthorpe <logang@deltatee.com>
+To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org,
+        linux-mm@kvack.org, Andrew Morton <akpm@linux-foundation.org>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Andy Shevchenko <andy.shevchenko@gmail.com>,
+        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Jon Mason <jdmason@kudzu.us>
+Date: Wed, 16 Jan 2019 11:25:23 -0700
+Message-Id: <20190116182523.19446-7-logang@deltatee.com>
+In-Reply-To: <20190116182523.19446-1-logang@deltatee.com>
+References: <20190116182523.19446-1-logang@deltatee.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: [PATCH v25 6/6] ntb: ntb_hw_switchtec: Cleanup 64bit IO defines to use the common header
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Assorted bug fixes and cleanups
+Clean up the ifdefs which conditionally defined the io{read|write}64
+functions in favour of the new common io-64-nonatomic-lo-hi header.
 
-Gilad Ben-Yossef (3):
-  crypto: ccree: unmap buffer before copying IV
-  crypto: ccree: shared irq lines are not a bug
-  crypto: ccree: don't copy zero size ciphertext
+Per a nit from Andy Shevchenko, the include list is also made
+alphabetical.
 
-Hadar Gat (4):
-  crypto: ccree: improve error handling
-  crypto: ccree: add error message
-  crypto: ccree: fix free of unallocated mlli buffer
-  crypto: ccree: remove legacy leftover
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>
+Cc: Jon Mason <jdmason@kudzu.us>
+---
+ drivers/ntb/hw/mscc/ntb_hw_switchtec.c | 36 +++-----------------------
+ 1 file changed, 4 insertions(+), 32 deletions(-)
 
- drivers/crypto/ccree/cc_buffer_mgr.c | 87 ++++++++++++++--------------
- drivers/crypto/ccree/cc_cipher.c     |  6 +-
- drivers/crypto/ccree/cc_driver.c     |  6 +-
- drivers/crypto/ccree/cc_driver.h     |  2 -
- 4 files changed, 50 insertions(+), 51 deletions(-)
-
+diff --git a/drivers/ntb/hw/mscc/ntb_hw_switchtec.c b/drivers/ntb/hw/mscc/ntb_hw_switchtec.c
+index f1eaa3c4d46a..f2df2d39c65b 100644
+--- a/drivers/ntb/hw/mscc/ntb_hw_switchtec.c
++++ b/drivers/ntb/hw/mscc/ntb_hw_switchtec.c
+@@ -13,13 +13,14 @@
+  *
+  */
+ 
+-#include <linux/switchtec.h>
+-#include <linux/module.h>
++#include <linux/interrupt.h>
++#include <linux/io-64-nonatomic-lo-hi.h>
+ #include <linux/delay.h>
+ #include <linux/kthread.h>
+-#include <linux/interrupt.h>
++#include <linux/module.h>
+ #include <linux/ntb.h>
+ #include <linux/pci.h>
++#include <linux/switchtec.h>
+ 
+ MODULE_DESCRIPTION("Microsemi Switchtec(tm) NTB Driver");
+ MODULE_VERSION("0.1");
+@@ -36,35 +37,6 @@ module_param(use_lut_mws, bool, 0644);
+ MODULE_PARM_DESC(use_lut_mws,
+ 		 "Enable the use of the LUT based memory windows");
+ 
+-#ifndef ioread64
+-#ifdef readq
+-#define ioread64 readq
+-#else
+-#define ioread64 _ioread64
+-static inline u64 _ioread64(void __iomem *mmio)
+-{
+-	u64 low, high;
+-
+-	low = ioread32(mmio);
+-	high = ioread32(mmio + sizeof(u32));
+-	return low | (high << 32);
+-}
+-#endif
+-#endif
+-
+-#ifndef iowrite64
+-#ifdef writeq
+-#define iowrite64 writeq
+-#else
+-#define iowrite64 _iowrite64
+-static inline void _iowrite64(u64 val, void __iomem *mmio)
+-{
+-	iowrite32(val, mmio);
+-	iowrite32(val >> 32, mmio + sizeof(u32));
+-}
+-#endif
+-#endif
+-
+ #define SWITCHTEC_NTB_MAGIC 0x45CC0001
+ #define MAX_MWS     128
+ 
 -- 
-2.20.1
+2.19.0
