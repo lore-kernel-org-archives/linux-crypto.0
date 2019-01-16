@@ -1,74 +1,101 @@
-Return-Path: <SRS0=EWVs=PV=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:56318 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726591AbfAMXeV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 13 Jan 2019 18:34:21 -0500
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 4/5] crypto: testmgr - add rfc4543(gcm(aes)) decryption test to encryption tests
-Date: Sun, 13 Jan 2019 15:32:27 -0800
-Message-Id: <20190113233228.5851-5-ebiggers@kernel.org>
-In-Reply-To: <20190113233228.5851-1-ebiggers@kernel.org>
-References: <20190113233228.5851-1-ebiggers@kernel.org>
+Return-Path: <SRS0=g5s/=PY=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from szxga04-in.huawei.com ([45.249.212.190]:17552 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1730077AbfAPCvc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 15 Jan 2019 21:51:32 -0500
+From: Xiongfeng Wang <wangxiongfeng2@huawei.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <wangxiongfeng2@huawei.com>, <broonie@kernel.org>,
+        <ard.biesheuvel@linaro.org>, <jonathan.cameron@huawei.com>
+Subject: [PATCH 4/5] crypto: ctr - use template array registering API to simplify the code
+Date: Wed, 16 Jan 2019 10:50:33 +0800
+Message-ID: <1547607034-40948-5-git-send-email-wangxiongfeng2@huawei.com>
+In-Reply-To: <1547607034-40948-1-git-send-email-wangxiongfeng2@huawei.com>
+References: <1547607034-40948-1-git-send-email-wangxiongfeng2@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Eric Biggers <ebiggers@google.com>
+Use crypto template array registering API to simplify the code.
 
-One "ccm(aes)" decryption test vector doesn't exactly match any of the
-encryption test vectors with input and result swapped.  In preparation
-for removing the AEAD decryption test vectors and testing AEAD
-decryption using the encryption test vectors, add this to the encryption
-test vectors, so we don't lose any test coverage.
-
-Signed-off-by: Eric Biggers <ebiggers@google.com>
+Signed-off-by: Xiongfeng Wang <xiongfeng.wang@linaro.org>
 ---
- crypto/testmgr.h | 30 +++++++++++++++++++++++++++++-
- 1 file changed, 29 insertions(+), 1 deletion(-)
+ crypto/ctr.c | 46 +++++++++++++++++-----------------------------
+ 1 file changed, 17 insertions(+), 29 deletions(-)
 
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 5d8f867b9b837..8d1c2dfe3becb 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -18454,7 +18454,35 @@ static const struct aead_testvec aes_gcm_rfc4543_enc_tv_template[] = {
- 			  "\xe1\x55\x10\x6a\xa8\xdc\xd6\x18"
- 			  "\xe4\x09\x9a\xaa",
- 		.rlen	= 68,
--	}
-+	}, { /* nearly same as previous, but should fail */
-+		.key	= "\x4c\x80\xcd\xef\xbb\x5d\x10\xda"
-+			  "\x90\x6a\xc7\x3c\x36\x13\xa6\x34"
-+			  "\x22\x43\x3c\x64",
-+		.klen	= 20,
-+		.iv	= zeroed_string,
-+		.assoc	= "\x00\x00\x43\x21\x00\x00\x00\x07"
-+			  "\x00\x00\x00\x00\x00\x00\x00\x00",
-+		.alen	= 16,
-+		.input	= "\x45\x00\x00\x30\xda\x3a\x00\x00"
-+			  "\x80\x01\xdf\x3b\xc0\xa8\x00\x05"
-+			  "\xc0\xa8\x00\x01\x08\x00\xc6\xcd"
-+			  "\x02\x00\x07\x00\x61\x62\x63\x64"
-+			  "\x65\x66\x67\x68\x69\x6a\x6b\x6c"
-+			  "\x6d\x6e\x6f\x70\x71\x72\x73\x74"
-+			  "\x01\x02\x02\x01",
-+		.ilen	= 52,
-+		.novrfy = 1,
-+		.result	= "\x45\x00\x00\x30\xda\x3a\x00\x00"
-+			  "\x80\x01\xdf\x3b\xc0\xa8\x00\x05"
-+			  "\xc0\xa8\x00\x01\x08\x00\xc6\xcd"
-+			  "\x02\x00\x07\x00\x61\x62\x63\x64"
-+			  "\x65\x66\x67\x68\x69\x6a\x6b\x6c"
-+			  "\x6d\x6e\x6f\x70\x71\x72\x73\x74"
-+			  "\x01\x02\x02\x01\xf2\xa9\xa8\x36"
-+			  "\xe1\x55\x10\x6a\xa8\xdc\xd6\x18"
-+			  "\x00\x00\x00\x00",
-+		.rlen	= 68,
+diff --git a/crypto/ctr.c b/crypto/ctr.c
+index 30f3946..ef51099 100644
+--- a/crypto/ctr.c
++++ b/crypto/ctr.c
+@@ -248,13 +248,6 @@ static void crypto_ctr_free(struct crypto_instance *inst)
+ 	kfree(inst);
+ }
+ 
+-static struct crypto_template crypto_ctr_tmpl = {
+-	.name = "ctr",
+-	.alloc = crypto_ctr_alloc,
+-	.free = crypto_ctr_free,
+-	.module = THIS_MODULE,
+-};
+-
+ static int crypto_rfc3686_setkey(struct crypto_skcipher *parent,
+ 				 const u8 *key, unsigned int keylen)
+ {
+@@ -444,36 +437,31 @@ static int crypto_rfc3686_create(struct crypto_template *tmpl,
+ 	goto out;
+ }
+ 
+-static struct crypto_template crypto_rfc3686_tmpl = {
+-	.name = "rfc3686",
+-	.create = crypto_rfc3686_create,
+-	.module = THIS_MODULE,
++static struct crypto_template crypto_ctr_tmpl[] = {
++	{
++		.name = "ctr",
++		.alloc = crypto_ctr_alloc,
++		.free = crypto_ctr_free,
++		.module = THIS_MODULE,
++	},
++	{
++		.name = "rfc3686",
++		.create = crypto_rfc3686_create,
++		.module = THIS_MODULE,
 +	},
  };
  
- static const struct aead_testvec aes_gcm_rfc4543_dec_tv_template[] = {
++
+ static int __init crypto_ctr_module_init(void)
+ {
+-	int err;
+-
+-	err = crypto_register_template(&crypto_ctr_tmpl);
+-	if (err)
+-		goto out;
+-
+-	err = crypto_register_template(&crypto_rfc3686_tmpl);
+-	if (err)
+-		goto out_drop_ctr;
+-
+-out:
+-	return err;
+-
+-out_drop_ctr:
+-	crypto_unregister_template(&crypto_ctr_tmpl);
+-	goto out;
++	return crypto_register_templates(crypto_ctr_tmpl,
++			ARRAY_SIZE(crypto_ctr_tmpl));
+ }
+ 
+ static void __exit crypto_ctr_module_exit(void)
+ {
+-	crypto_unregister_template(&crypto_rfc3686_tmpl);
+-	crypto_unregister_template(&crypto_ctr_tmpl);
++	crypto_unregister_templates(crypto_ctr_tmpl,
++			ARRAY_SIZE(crypto_ctr_tmpl));
+ }
+ 
+ module_init(crypto_ctr_module_init);
 -- 
-2.20.1
+1.7.12.4
