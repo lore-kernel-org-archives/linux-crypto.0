@@ -1,86 +1,78 @@
-Return-Path: <SRS0=b5ak=PZ=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from szxga06-in.huawei.com ([45.249.212.32]:58994 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728906AbfAQGs5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Jan 2019 01:48:57 -0500
-From: Xiongfeng Wang <wangxiongfeng2@huawei.com>
-To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <ebiggers@kernel.org>
-CC: <wangxiongfeng2@huawei.com>, <linux-crypto@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <broonie@kernel.org>,
-        <ard.biesheuvel@linaro.org>, <jonathan.cameron@huawei.com>
-Subject: [PATCH V2 5/5] crypto: chacha20poly1305 - use template array registering API to simplify the code
-Date: Thu, 17 Jan 2019 14:48:03 +0800
-Message-ID: <1547707683-45878-6-git-send-email-wangxiongfeng2@huawei.com>
-In-Reply-To: <1547707683-45878-1-git-send-email-wangxiongfeng2@huawei.com>
-References: <1547707683-45878-1-git-send-email-wangxiongfeng2@huawei.com>
+Return-Path: <SRS0=g5s/=PY=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:57004 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728878AbfAPRM1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 16 Jan 2019 12:12:27 -0500
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20190116164703.9267-1-vt@altlinux.org>
+References: <20190116164703.9267-1-vt@altlinux.org>
+To: Vitaly Chikunov <vt@altlinux.org>
+Cc: dhowells@redhat.com, Tudor Ambarus <tudor-dan.ambarus@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@st.com>,
+        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Gary Hook <gary.hook@amd.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        keyrings@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-kernel@lists.infradead.org, qat-linux@intel.com
+Subject: Re: [RFC PATCH v2] akcipher: Introduce verify_rsa/verify for public key algorithms
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <24886.1547658740.1@warthog.procyon.org.uk>
+Date: Wed, 16 Jan 2019 17:12:20 +0000
+Message-ID: <24887.1547658740@warthog.procyon.org.uk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Use crypto template array registering API to simplify the code.
+Umm...  What do I apply this patch to?
 
-Signed-off-by: Xiongfeng Wang <xiongfeng.wang@linaro.org>
----
- crypto/chacha20poly1305.c | 37 ++++++++++++++-----------------------
- 1 file changed, 14 insertions(+), 23 deletions(-)
+In your modified public_key_verify_signature():
 
-diff --git a/crypto/chacha20poly1305.c b/crypto/chacha20poly1305.c
-index fef1144..ed2e12e 100644
---- a/crypto/chacha20poly1305.c
-+++ b/crypto/chacha20poly1305.c
-@@ -701,37 +701,28 @@ static int rfc7539esp_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	return chachapoly_create(tmpl, tb, "rfc7539esp", 8);
- }
- 
--static struct crypto_template rfc7539_tmpl = {
--	.name = "rfc7539",
--	.create = rfc7539_create,
--	.module = THIS_MODULE,
--};
--
--static struct crypto_template rfc7539esp_tmpl = {
--	.name = "rfc7539esp",
--	.create = rfc7539esp_create,
--	.module = THIS_MODULE,
-+static struct crypto_template rfc7539_tmpls[] = {
-+	{
-+		.name = "rfc7539",
-+		.create = rfc7539_create,
-+		.module = THIS_MODULE,
-+	}, {
-+		.name = "rfc7539esp",
-+		.create = rfc7539esp_create,
-+		.module = THIS_MODULE,
-+	},
- };
- 
- static int __init chacha20poly1305_module_init(void)
- {
--	int err;
--
--	err = crypto_register_template(&rfc7539_tmpl);
--	if (err)
--		return err;
--
--	err = crypto_register_template(&rfc7539esp_tmpl);
--	if (err)
--		crypto_unregister_template(&rfc7539_tmpl);
--
--	return err;
-+	return crypto_register_templates(rfc7539_tmpls,
-+					 ARRAY_SIZE(rfc7539_tmpls));
- }
- 
- static void __exit chacha20poly1305_module_exit(void)
- {
--	crypto_unregister_template(&rfc7539esp_tmpl);
--	crypto_unregister_template(&rfc7539_tmpl);
-+	crypto_unregister_templates(rfc7539_tmpls,
-+				    ARRAY_SIZE(rfc7539_tmpls));
- }
- 
- module_init(chacha20poly1305_module_init);
--- 
-1.7.12.4
+> -	sg_init_one(&digest_sg, output, outlen);
+> -	akcipher_request_set_crypt(req, &sig_sg, &digest_sg, sig->s_size,
+> +	sg_init_one(&output_sg, output, outlen);
+> +	akcipher_request_set_crypt(req, &sig_sg, &output_sg, sig->s_size,
+>  				   outlen);
+
+Why is the output necessary?  It was there for the decoded hash to be placed
+in prior to comparison - but now that's not necessary.
+
+> -	ret = crypto_wait_req(crypto_akcipher_verify(req), &cwait);
+> +	ret = crypto_wait_req(crypto_akcipher_verify(req, sig->digest,
+> +						     sig->digest_size), &cwait);
+
+I see sig->digest is passed in here.  Should it be passed in in place of
+output_sg above?
+
+> -	inst->alg.verify = pkcs1pad_verify;
+> +	inst->alg.verify_rsa = pkcs1pad_verify;
+
+Is there a reason that pkcs1pad_verify() can't do the comparison?
+
+> -	.verify = rsa_verify,
+> +	.verify_rsa = rsa_verify,
+
+Likewise verify_rsa()?
+
+Granted, this might involve pkcs1pad_verify() dressing up the signature in the
+appropriate wrappings and passing it along to verify_rsa() to do the actual
+comparison there (ie. what pkcs1pad_verify_complete() does).
+
+> -	.verify = caam_rsa_enc,
+> +	.verify_rsa = caam_rsa_enc,
+
+I presume this is the reason - because this reuses its encrypt operation
+directly.  But could this instead perform the comparison upon completion, say
+in rsa_pub_done()?
+
+> -	.verify = qat_rsa_enc,
+> +	.verify_rsa = qat_rsa_enc,
+
+Again, this could do the comparison, say, in qat_rsa_cb().
+
+David
