@@ -1,115 +1,41 @@
-Return-Path: <SRS0=FsAa=P2=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-lf1-f45.google.com ([209.85.167.45]:39056 "EHLO
-        mail-lf1-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727167AbfARIBf (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Jan 2019 03:01:35 -0500
+Return-Path: <SRS0=g5s/=PY=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from szxga04-in.huawei.com ([45.249.212.190]:17551 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729853AbfAPCvR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 15 Jan 2019 21:51:17 -0500
+From: Xiongfeng Wang <wangxiongfeng2@huawei.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <wangxiongfeng2@huawei.com>, <broonie@kernel.org>,
+        <ard.biesheuvel@linaro.org>, <jonathan.cameron@huawei.com>
+Subject: [PATCH 0/5] Crypto Cleanup
+Date: Wed, 16 Jan 2019 10:50:29 +0800
+Message-ID: <1547607034-40948-1-git-send-email-wangxiongfeng2@huawei.com>
 MIME-Version: 1.0
-References: <20190117231416.111952141@linutronix.de> <20190117231501.162093731@linutronix.de>
-In-Reply-To: <20190117231501.162093731@linutronix.de>
-From: =?UTF-8?B?T25kcmVqIE1vc27DocSNZWs=?= <omosnacek@gmail.com>
-Date: Fri, 18 Jan 2019 09:01:22 +0100
-Message-ID: <CAAUqJDu99D=gS5UabQXz1bDMjwiSUNpdW=MVrFcBLXcy_TzWbA@mail.gmail.com>
-Subject: Re: [patch 4/9] crypto: aegis - Convert to SPDX license identifiers
-To: Thomas Gleixner <tglx@linutronix.de>
-Cc: LKML <linux-kernel@vger.kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Kate Stewart <kstewart@linuxfoundation.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-pi 18. 1. 2019 o 0:15 Thomas Gleixner <tglx@linutronix.de> nap=C3=ADsal(a):
-> The license boiler plate text is not ideal for machine parsing. The kerne=
-l
-> uses SPDX license identifiers for that purpose, which replace the boiler
-> plate text.
->
-> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Ondrej Mosnacek <omosnacek@gmail.com>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: linux-crypto@vger.kernel.org
+The patchset introduce a helper to (un)register a array of crypto templates.
+The following patches use this helper to simplify the code. This is also
+a preparation for a coming patchset, which will register several crypto
+templates.
 
-Acked-by: Ondrej Mosnacek <omosnacek@gmail.com>
-(feel free to keep the ack also if you decide to switch to the "GPL-2.0+" f=
-orm)
+Xiongfeng Wang (5):
+  crypto: api - add a helper to (un)register a array of templates
+  crypto: ccm - use template array registering API to simplify the code
+  crypto: gcm - use template array registering API to simplify the code
+  crypto: ctr - use template array registering API to simplify the code
+  crypto: chacha20poly1305 - use template array registering API to
+    simplify the code
 
-> ---
->
-> P.S.: This patch is part of a larger cleanup, but independent of other
->       patches and is intended to be picked up by the maintainer directly.
->
-> ---
->  crypto/aegis128.c  |    6 +-----
->  crypto/aegis128l.c |    6 +-----
->  crypto/aegis256.c  |    6 +-----
->  3 files changed, 3 insertions(+), 15 deletions(-)
->
-> --- a/crypto/aegis128.c
-> +++ b/crypto/aegis128.c
-> @@ -1,13 +1,9 @@
-> +// SPDX-License-Identifier: GPL-2.0-or-later
->  /*
->   * The AEGIS-128 Authenticated-Encryption Algorithm
->   *
->   * Copyright (c) 2017-2018 Ondrej Mosnacek <omosnacek@gmail.com>
->   * Copyright (C) 2017-2018 Red Hat, Inc. All rights reserved.
-> - *
-> - * This program is free software; you can redistribute it and/or modify =
-it
-> - * under the terms of the GNU General Public License as published by the=
- Free
-> - * Software Foundation; either version 2 of the License, or (at your opt=
-ion)
-> - * any later version.
->   */
->
->  #include <crypto/algapi.h>
-> --- a/crypto/aegis128l.c
-> +++ b/crypto/aegis128l.c
-> @@ -1,13 +1,9 @@
-> +// SPDX-License-Identifier: GPL-2.0-or-later
->  /*
->   * The AEGIS-128L Authenticated-Encryption Algorithm
->   *
->   * Copyright (c) 2017-2018 Ondrej Mosnacek <omosnacek@gmail.com>
->   * Copyright (C) 2017-2018 Red Hat, Inc. All rights reserved.
-> - *
-> - * This program is free software; you can redistribute it and/or modify =
-it
-> - * under the terms of the GNU General Public License as published by the=
- Free
-> - * Software Foundation; either version 2 of the License, or (at your opt=
-ion)
-> - * any later version.
->   */
->
->  #include <crypto/algapi.h>
-> --- a/crypto/aegis256.c
-> +++ b/crypto/aegis256.c
-> @@ -1,13 +1,9 @@
-> +// SPDX-License-Identifier: GPL-2.0-or-later
->  /*
->   * The AEGIS-256 Authenticated-Encryption Algorithm
->   *
->   * Copyright (c) 2017-2018 Ondrej Mosnacek <omosnacek@gmail.com>
->   * Copyright (C) 2017-2018 Red Hat, Inc. All rights reserved.
-> - *
-> - * This program is free software; you can redistribute it and/or modify =
-it
-> - * under the terms of the GNU General Public License as published by the=
- Free
-> - * Software Foundation; either version 2 of the License, or (at your opt=
-ion)
-> - * any later version.
->   */
->
->  #include <crypto/algapi.h>
->
->
+ crypto/algapi.c           | 27 ++++++++++++++++
+ crypto/ccm.c              | 81 +++++++++++++++--------------------------------
+ crypto/chacha20poly1305.c | 38 +++++++++-------------
+ crypto/ctr.c              | 46 ++++++++++-----------------
+ crypto/gcm.c              | 76 +++++++++++++++-----------------------------
+ include/crypto/algapi.h   |  2 ++
+ 6 files changed, 113 insertions(+), 157 deletions(-)
+
+-- 
+1.7.12.4
