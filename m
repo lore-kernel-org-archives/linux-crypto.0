@@ -1,101 +1,36 @@
-Return-Path: <SRS0=aDvo=PQ=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:33006 "EHLO mail.kernel.org"
+Return-Path: <SRS0=g5s/=PY=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mx1.redhat.com ([209.132.183.28]:41574 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729443AbfAHT1G (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 8 Jan 2019 14:27:06 -0500
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc: Vitaly Chikunov <vt@altlinux.org>,
-        kernel-hardening@lists.openwall.com,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.20 020/117] crypto: ecc - regularize scalar for scalar multiplication
-Date: Tue,  8 Jan 2019 14:24:48 -0500
-Message-Id: <20190108192628.121270-20-sashal@kernel.org>
-In-Reply-To: <20190108192628.121270-1-sashal@kernel.org>
-References: <20190108192628.121270-1-sashal@kernel.org>
+        id S1730514AbfAPQTO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 16 Jan 2019 11:19:14 -0500
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20190106133608.820-3-vt@altlinux.org>
+References: <20190106133608.820-3-vt@altlinux.org> <20190106133608.820-1-vt@altlinux.org>
+To: Vitaly Chikunov <vt@altlinux.org>
+Cc: dhowells@redhat.com, Herbert Xu <herbert@gondor.apana.org.au>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 2/4] akcipher: Introduce verify2 for public key algorithms
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <21753.1547655551.1@warthog.procyon.org.uk>
+Date: Wed, 16 Jan 2019 16:19:11 +0000
+Message-ID: <21754.1547655551@warthog.procyon.org.uk>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Vitaly Chikunov <vt@altlinux.org>
+Vitaly Chikunov <vt@altlinux.org> wrote:
 
-[ Upstream commit 3da2c1dfdb802b184eea0653d1e589515b52d74b ]
+> Current akcipher .verify() just decrypts signature to uncover message
+> hash, which is then verified in upper level public_key_verify_signature
+> by memcmp with the expected signature value, which is never passed into
+> verify().
 
-ecc_point_mult is supposed to be used with a regularized scalar,
-otherwise, it's possible to deduce the position of the top bit of the
-scalar with timing attack. This is important when the scalar is a
-private key.
+I think it would be better to make ->verify() take the data hash we've been
+given rather than returning the expected hash for the caller to compare.  That
+way the callers don't have to do two different things, depending on how the
+crypto algo works.
 
-ecc_point_mult is already using a regular algorithm (i.e. having an
-operation flow independent of the input scalar) but regularization step
-is not implemented.
-
-Arrange scalar to always have fixed top bit by adding a multiple of the
-curve order (n).
-
-References:
-The constant time regularization step is based on micro-ecc by Kenneth
-MacKay and also referenced in the literature (Bernstein, D. J., & Lange,
-T. (2017). Montgomery curves and the Montgomery ladder. (Cryptology
-ePrint Archive; Vol. 2017/293). s.l.: IACR. Chapter 4.6.2.)
-
-Signed-off-by: Vitaly Chikunov <vt@altlinux.org>
-Cc: kernel-hardening@lists.openwall.com
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- crypto/ecc.c | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
-
-diff --git a/crypto/ecc.c b/crypto/ecc.c
-index 8facafd67802..adcce310f646 100644
---- a/crypto/ecc.c
-+++ b/crypto/ecc.c
-@@ -842,15 +842,23 @@ static void xycz_add_c(u64 *x1, u64 *y1, u64 *x2, u64 *y2, u64 *curve_prime,
- 
- static void ecc_point_mult(struct ecc_point *result,
- 			   const struct ecc_point *point, const u64 *scalar,
--			   u64 *initial_z, u64 *curve_prime,
-+			   u64 *initial_z, const struct ecc_curve *curve,
- 			   unsigned int ndigits)
- {
- 	/* R0 and R1 */
- 	u64 rx[2][ECC_MAX_DIGITS];
- 	u64 ry[2][ECC_MAX_DIGITS];
- 	u64 z[ECC_MAX_DIGITS];
-+	u64 sk[2][ECC_MAX_DIGITS];
-+	u64 *curve_prime = curve->p;
- 	int i, nb;
--	int num_bits = vli_num_bits(scalar, ndigits);
-+	int num_bits;
-+	int carry;
-+
-+	carry = vli_add(sk[0], scalar, curve->n, ndigits);
-+	vli_add(sk[1], sk[0], curve->n, ndigits);
-+	scalar = sk[!carry];
-+	num_bits = sizeof(u64) * ndigits * 8 + 1;
- 
- 	vli_set(rx[1], point->x, ndigits);
- 	vli_set(ry[1], point->y, ndigits);
-@@ -1004,7 +1012,7 @@ int ecc_make_pub_key(unsigned int curve_id, unsigned int ndigits,
- 		goto out;
- 	}
- 
--	ecc_point_mult(pk, &curve->g, priv, NULL, curve->p, ndigits);
-+	ecc_point_mult(pk, &curve->g, priv, NULL, curve, ndigits);
- 	if (ecc_point_is_zero(pk)) {
- 		ret = -EAGAIN;
- 		goto err_free_point;
-@@ -1090,7 +1098,7 @@ int crypto_ecdh_shared_secret(unsigned int curve_id, unsigned int ndigits,
- 		goto err_alloc_product;
- 	}
- 
--	ecc_point_mult(product, pk, priv, rand_z, curve->p, ndigits);
-+	ecc_point_mult(product, pk, priv, rand_z, curve, ndigits);
- 
- 	ecc_swap_digits(product->x, secret, ndigits);
- 
--- 
-2.19.1
+David
