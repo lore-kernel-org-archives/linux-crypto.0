@@ -1,404 +1,355 @@
-Return-Path: <SRS0=+HSe=PS=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-lf1-f68.google.com ([209.85.167.68]:46174 "EHLO
-        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727634AbfAJN4E (ORCPT
+Return-Path: <SRS0=g5s/=PY=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from vmicros1.altlinux.org ([194.107.17.57]:57302 "EHLO
+        vmicros1.altlinux.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2394233AbfAPQrp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Jan 2019 08:56:04 -0500
-Received: by mail-lf1-f68.google.com with SMTP id y14so8329061lfg.13
-        for <linux-crypto@vger.kernel.org>; Thu, 10 Jan 2019 05:56:01 -0800 (PST)
-Date: Thu, 10 Jan 2019 14:55:57 +0100
-From: Joakim Bech <joakim.bech@linaro.org>
-To: Sumit Garg <sumit.garg@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        mark.rutland@arm.com, daniel.thompson@linaro.org,
-        herbert@gondor.apana.org.au, arnd@arndb.de,
-        ard.biesheuvel@linaro.org, gregkh@linuxfoundation.org,
-        bhsharma@redhat.com, linux-kernel@vger.kernel.org,
-        tee-dev@lists.linaro.org, robh+dt@kernel.org, mpm@selenic.com
-Subject: Re: [Tee-dev] [PATCH v2 4/4] hwrng: add OP-TEE based rng driver
-Message-ID: <20190110135557.wjnusuwe5vpkho4t@debby>
-References: <1547123097-16431-1-git-send-email-sumit.garg@linaro.org>
- <1547123097-16431-5-git-send-email-sumit.garg@linaro.org>
+        Wed, 16 Jan 2019 11:47:45 -0500
+From: Vitaly Chikunov <vt@altlinux.org>
+To: Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        David Howells <dhowells@redhat.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@st.com>,
+        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Gary Hook <gary.hook@amd.com>,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        keyrings@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-kernel@lists.infradead.org, qat-linux@intel.com
+Subject: [RFC PATCH v2] akcipher: Introduce verify_rsa/verify for public key algorithms
+Date: Wed, 16 Jan 2019 19:47:03 +0300
+Message-Id: <20190116164703.9267-1-vt@altlinux.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1547123097-16431-5-git-send-email-sumit.garg@linaro.org>
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jan 10, 2019 at 05:54:57PM +0530, Sumit Garg wrote:
-> On ARM SoC's with TrustZone enabled, peripherals like entropy sources
-> might not be accessible to normal world (linux in this case) and rather
-> accessible to secure world (OP-TEE in this case) only. So this driver
-> aims to provides a generic interface to OP-TEE based random number
-> generator service.
-> 
-> This driver registers on TEE bus to interact with OP-TEE based rng
->
-> device/service.
-> 
-> Signed-off-by: Sumit Garg <sumit.garg@linaro.org>
-> ---
->  MAINTAINERS                        |   5 +
->  drivers/char/hw_random/Kconfig     |  15 ++
->  drivers/char/hw_random/Makefile    |   1 +
->  drivers/char/hw_random/optee-rng.c | 272 +++++++++++++++++++++++++++++++++++++
->  4 files changed, 293 insertions(+)
->  create mode 100644 drivers/char/hw_random/optee-rng.c
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 32d44447..502733c 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -11260,6 +11260,11 @@ M:	Jens Wiklander <jens.wiklander@linaro.org>
->  S:	Maintained
->  F:	drivers/tee/optee/
->  
-> +OP-TEE RANDOM NUMBER GENERATOR (RNG) DRIVER
-> +M:	Sumit Garg <sumit.garg@linaro.org>
-> +S:	Maintained
-> +F:	drivers/char/hw_random/optee-rng.c
-> +
->  OPA-VNIC DRIVER
->  M:	Dennis Dalessandro <dennis.dalessandro@intel.com>
->  M:	Niranjana Vishwanathapura <niranjana.vishwanathapura@intel.com>
-> diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
-> index dac895d..25a7d8f 100644
-> --- a/drivers/char/hw_random/Kconfig
-> +++ b/drivers/char/hw_random/Kconfig
-> @@ -424,6 +424,21 @@ config HW_RANDOM_EXYNOS
->  	  will be called exynos-trng.
->  
->  	  If unsure, say Y.
-> +
-> +config HW_RANDOM_OPTEE
-> +	tristate "OP-TEE based Random Number Generator support"
-> +	depends on OPTEE
-> +	default HW_RANDOM
-> +	help
-> +	  This  driver provides support for OP-TEE based Random Number
-> +	  Generator on ARM SoCs where hardware entropy sources are not
-> +	  accessible to normal world (Linux).
-> +
-> +	  To compile this driver as a module, choose M here: the module
-> +	  will be called optee-rng.
-> +
-> +	  If unsure, say Y.
-> +
->  endif # HW_RANDOM
->  
->  config UML_RANDOM
-> diff --git a/drivers/char/hw_random/Makefile b/drivers/char/hw_random/Makefile
-> index e35ec3c..7c9ef4a 100644
-> --- a/drivers/char/hw_random/Makefile
-> +++ b/drivers/char/hw_random/Makefile
-> @@ -38,3 +38,4 @@ obj-$(CONFIG_HW_RANDOM_CAVIUM) += cavium-rng.o cavium-rng-vf.o
->  obj-$(CONFIG_HW_RANDOM_MTK)	+= mtk-rng.o
->  obj-$(CONFIG_HW_RANDOM_S390) += s390-trng.o
->  obj-$(CONFIG_HW_RANDOM_KEYSTONE) += ks-sa-rng.o
-> +obj-$(CONFIG_HW_RANDOM_OPTEE) += optee-rng.o
-> diff --git a/drivers/char/hw_random/optee-rng.c b/drivers/char/hw_random/optee-rng.c
-> new file mode 100644
-> index 0000000..ebfe1f2c
-> --- /dev/null
-> +++ b/drivers/char/hw_random/optee-rng.c
-> @@ -0,0 +1,272 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Copyright (C) 2018-2019 Linaro Ltd.
-> + */
-> +
-> +#include <linux/delay.h>
-> +#include <linux/of.h>
-> +#include <linux/hw_random.h>
-> +#include <linux/kernel.h>
-> +#include <linux/module.h>
-> +#include <linux/slab.h>
-> +#include <linux/tee_drv.h>
-> +#include <linux/uuid.h>
-> +
-> +#define DRIVER_NAME "optee-rng"
-> +
-> +#define TEE_ERROR_HEALTH_TEST_FAIL	0x00000001
-> +
-> +/*
-> + * TA_CMD_GET_ENTROPY - Get Entropy from RNG
-> + *
-> + * param[0] (inout memref) - Entropy buffer memory reference
-> + * param[1] unused
-> + * param[2] unused
-> + * param[3] unused
-> + *
-> + * Result:
-> + * TEE_SUCCESS - Invoke command success
-> + * TEE_ERROR_BAD_PARAMETERS - Incorrect input param
-> + * TEE_ERROR_NOT_SUPPORTED - Requested entropy size greater than size of pool
-> + * TEE_ERROR_HEALTH_TEST_FAIL - Continuous health testing failed
-> + */
-> +#define TA_CMD_GET_ENTROPY		0x0
-> +
-> +/*
-> + * TA_CMD_GET_RNG_INFO - Get RNG information
-> + *
-> + * param[0] (out value) - value.a: RNG data-rate in bytes per second
-> + *                        value.b: Quality/Entropy per 1024 bit of data
-> + * param[1] unused
-> + * param[2] unused
-> + * param[3] unused
-> + *
-> + * Result:
-> + * TEE_SUCCESS - Invoke command success
-> + * TEE_ERROR_BAD_PARAMETERS - Incorrect input param
-> + */
-> +#define TA_CMD_GET_RNG_INFO		0x1
-> +
-> +#define MAX_ENTROPY_REQ_SZ		(4 * 1024)
-> +
-> +static struct tee_context *ctx;
-> +static struct tee_shm *entropy_shm_pool;
-> +static u32 ta_rng_data_rate;
-> +static u32 ta_rng_session_id;
-> +
-> +static size_t get_optee_rng_data(void *buf, size_t req_size)
-> +{
-> +	u32 ret = 0;
-> +	u8 *rng_data = NULL;
-> +	size_t rng_size = 0;
-> +	struct tee_ioctl_invoke_arg inv_arg = {0};
-> +	struct tee_param param[4] = {0};
-> +
-> +	/* Invoke TA_CMD_GET_RNG function of Trusted App */
->
-TA_CMD_GET_ENTROPY?
+To my opinion this new version may fit suggestions of Herbert and David - we only
+have single general top level crypto_akcipher_verify() call, but two low level
+ ->verify() and ->verify_rsa() calls. Final signature verification is moved from
+each caller of crypto_akcipher_verify() into crypto_akcipher_verify() itself.
 
-> +	inv_arg.func = TA_CMD_GET_ENTROPY;
-> +	inv_arg.session = ta_rng_session_id;
-> +	inv_arg.num_params = 4;
-> +
-> +	/* Fill invoke cmd params */
-> +	param[0].attr = TEE_IOCTL_PARAM_ATTR_TYPE_MEMREF_INOUT;
->
-> +	param[0].u.memref.shm = entropy_shm_pool;
-> +	param[0].u.memref.size = req_size;
-> +	param[0].u.memref.shm_offs = 0;
-> +
-> +	ret = tee_client_invoke_func(ctx, &inv_arg, param);
-> +	if ((ret < 0) || (inv_arg.ret != 0)) {
-> +		pr_err("TA_CMD_GET_ENTROPY invoke function error: %x\n",
-> +		       inv_arg.ret);
-> +		return 0;
-> +	}
-> +
-> +	rng_data = tee_shm_get_va(entropy_shm_pool, 0);
-> +	if (IS_ERR(rng_data)) {
-> +		pr_err("tee_shm_get_va failed\n");
-> +		return 0;
-> +	}
-> +
-> +	rng_size = param[0].u.memref.size;
-> +	memcpy(buf, rng_data, rng_size);
-> +
-> +	return rng_size;
-> +}
-> +
-> +static int optee_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
-> +{
-> +	u8 *data = buf;
-> +	size_t read = 0, rng_size = 0;
-> +	int timeout = 1;
-> +
-> +	if (max > MAX_ENTROPY_REQ_SZ)
-> +		max = MAX_ENTROPY_REQ_SZ;
-> +
-> +	while (read == 0) {
-> +		rng_size = get_optee_rng_data(data, (max - read));
-> +
-> +		data += rng_size;
-> +		read += rng_size;
-> +
-> +		if (wait) {
-> +			if (timeout-- == 0)
-> +				return read;
-> +			msleep((1000 * (max - read)) / ta_rng_data_rate);
-> +		} else {
-> +			return read;
-> +		}
-> +	}
-> +
-> +	return read;
-> +}
-> +
-> +static int optee_rng_init(struct hwrng *rng)
-> +{
-> +	entropy_shm_pool = tee_shm_alloc(ctx, MAX_ENTROPY_REQ_SZ,
-> +					 TEE_SHM_MAPPED | TEE_SHM_DMA_BUF);
-> +	if (IS_ERR(entropy_shm_pool)) {
-> +		pr_err("tee_shm_alloc failed\n");
-> +		return PTR_ERR(entropy_shm_pool);
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static void optee_rng_cleanup(struct hwrng *rng)
-> +{
-> +	tee_shm_free(entropy_shm_pool);
-> +}
-> +
-> +static struct hwrng optee_rng = {
-> +	.name		= DRIVER_NAME,
-> +	.init		= optee_rng_init,
-> +	.cleanup	= optee_rng_cleanup,
-> +	.read		= optee_rng_read,
-> +};
-> +
-> +static int get_optee_rng_info(void)
-> +{
-> +	u32 ret = 0;
-> +	struct tee_ioctl_invoke_arg inv_arg = {0};
-> +	struct tee_param param[4] = {0};
-> +
-> +	/* Invoke TA_CMD_GET_RNG function of Trusted App */
->
-TA_CMD_GET_RNG_INFO?
+There is remained crypto_akcipher_verify_rsa() just for rsa specific (pkcs1)
+code (it seems that we are isolating from calling directly ->verify_rsa()).
 
-> +	inv_arg.func = TA_CMD_GET_RNG_INFO;
-> +	inv_arg.session = ta_rng_session_id;
-> +	inv_arg.num_params = 4;
-> +
-> +	/* Fill invoke cmd params */
-> +	param[0].attr = TEE_IOCTL_PARAM_ATTR_TYPE_VALUE_OUTPUT;
-> +
-> +	ret = tee_client_invoke_func(ctx, &inv_arg, param);
-> +	if ((ret < 0) || (inv_arg.ret != 0)) {
-> +		pr_err("TA_CMD_GET_RNG_INFO invoke function error: %x\n",
-> +		       inv_arg.ret);
-> +		return -EINVAL;
-> +	}
-> +
-> +	ta_rng_data_rate = param[0].u.value.a;
-> +	optee_rng.quality = param[0].u.value.b;
-> +
-> +	return 0;
-> +}
-> +
-> +static int optee_ctx_match(struct tee_ioctl_version_data *ver, const void *data)
-> +{
-> +	if (ver->impl_id == TEE_IMPL_ID_OPTEE)
-> +		return 1;
-> +	else
-> +		return 0;
-> +}
-> +
-> +static int optee_rng_probe(struct device *dev)
-> +{
-> +	struct tee_client_device *rng_device = to_tee_client_device(dev);
-> +	int ret = 0, err = -ENODEV;
-> +	struct tee_ioctl_open_session_arg sess_arg = {0};
-> +
-> +	/* Open context with TEE driver */
-> +	ctx = tee_client_open_context(NULL, optee_ctx_match, NULL, NULL);
-> +	if (IS_ERR(ctx))
-> +		return -ENODEV;
-> +
-> +	/* Open session with hwrng Trusted App */
-> +	memcpy(sess_arg.uuid, rng_device->id.uuid.b, TEE_IOCTL_UUID_LEN);
-> +	sess_arg.clnt_login = TEE_IOCTL_LOGIN_PUBLIC;
-> +	sess_arg.num_params = 0;
-> +
-> +	ret = tee_client_open_session(ctx, &sess_arg, NULL);
-> +	if ((ret < 0) || (sess_arg.ret != 0)) {
-> +		pr_err("tee_client_open_session failed, error: %x\n",
-> +		       sess_arg.ret);
-> +		err = -EINVAL;
-> +		goto out_ctx;
-> +	}
-> +	ta_rng_session_id = sess_arg.session;
-> +
-> +	err = get_optee_rng_info();
-> +	if (err)
-> +		goto out_sess;
-> +
-> +	err = hwrng_register(&optee_rng);
-> +	if (err) {
-> +		pr_err("registering failed (%d)\n", err);
-> +		goto out_sess;
-> +	}
-> +
-> +	return 0;
-> +
-> +out_sess:
-> +	tee_client_close_session(ctx, ta_rng_session_id);
-> +out_ctx:
-> +	tee_client_close_context(ctx);
-> +
-> +	return err;
-> +}
-> +
-> +static int optee_rng_remove(struct device *dev)
-> +{
-> +	tee_client_close_session(ctx, ta_rng_session_id);
-> +	tee_client_close_context(ctx);
-> +	hwrng_unregister(&optee_rng);
-> +
-> +	return 0;
-> +}
-> +
-> +const struct tee_client_device_id optee_rng_id_table[] = {
-> +	{UUID_INIT(0xab7a617c, 0xb8e7, 0x4d8f,
-> +		   0x83, 0x01, 0xd0, 0x9b, 0x61, 0x03, 0x6b, 0x64)},
-> +	{}
-> +};
->
-Just so I'm with you here, in the v1 patch set you said, that this could be
-populated with other platform specific RNG UUID/GUID later. So if I implement
-another RNG TA for another device in OP-TEE, then I only need to update this
-array with another corresponding ID? To me it looks like the ta_rng_session_id
-just stores an id for a single TEE RNG source, correct? I.e., this patch set is
-not really written to fully support more than a single source in OP-TEE at this
-point? I.e., my assumption about just adding another UUID to the array is wrong?
+Does it looks good?
 
-> +
-> +static struct tee_client_driver optee_rng_driver = {
-> +	.id_table	= optee_rng_id_table,
-> +	.driver		= {
-> +		.name		= DRIVER_NAME,
-> +		.bus		= &tee_bus_type,
-> +		.probe		= optee_rng_probe,
-> +		.remove		= optee_rng_remove,
-> +	},
-> +};
-> +
-> +static int __init mod_init(void)
-> +{
-> +	int rc;
-> +
-> +	rc = driver_register(&optee_rng_driver.driver);
-> +	if (rc)
-> +		pr_warn("driver registration failed, err: %d", rc);
-> +
-> +	return rc;
-> +}
-> +
-> +static void __exit mod_exit(void)
-> +{
-> +	driver_unregister(&optee_rng_driver.driver);
-> +}
-> +
-> +module_init(mod_init);
-> +module_exit(mod_exit);
-> +
-> +MODULE_LICENSE("GPL");
-> +MODULE_AUTHOR("Sumit Garg <sumit.garg@linaro.org>");
-> +MODULE_DESCRIPTION("OP-TEE based random number generator driver");
-> -- 
-> 2.7.4
-> 
-> _______________________________________________
-> Tee-dev mailing list
-> Tee-dev@lists.linaro.org
-> https://lists.linaro.org/mailman/listinfo/tee-dev
+Original/new commit message:
 
+Previous akcipher .verify() just `decrypts' (using RSA encrypt which is
+using public key) signature to uncover message hash, which was then
+compared in upper level public_key_verify_signature() with the expected
+hash value, which itself was never passed into verify().
+
+This approach was incompatible with EC-DSA family of algorithms,
+because, to verify a signature EC-DSA algorithm also needs a hash value
+as input; then it's used (together with a signature divided into halves
+`r||s') to produce a witness value, which is then compared with `r' to
+determine if the signature is correct. Thus, for EC-DSA, nor
+requirements of .verify() itself, nor its output expectations in
+public_key_verify_signature() wasn't satisfied.
+
+Make improved .verify() call which gets hash value as parameter and
+produce complete signature check (without any output besides status.
+
+Other rsa-centric drivers have replaced verify() with verify_rsa() which
+have old semantic. If akcipher have .verify_rsa() callback, it will be
+used for a partial verification, which then is finished in
+crypto_akcipher_verify().
+
+Now for the top level verification only crypto_akcipher_verify() needs
+to be called.
+
+crypto_akcipher_verify_rsa() is introduced which directly calls
+.verify_rsa() for use by PKCS1 driver to call its backend.
+
+Signed-off-by: Vitaly Chikunov <vt@altlinux.org>
+---
+ crypto/akcipher.c                             | 53 +++++++++++++++++++++++++++
+ crypto/asymmetric_keys/public_key.c           | 19 +++-------
+ crypto/rsa-pkcs1pad.c                         |  4 +-
+ crypto/rsa.c                                  |  2 +-
+ crypto/testmgr.c                              |  5 ++-
+ drivers/crypto/caam/caampkc.c                 |  2 +-
+ drivers/crypto/ccp/ccp-crypto-rsa.c           |  2 +-
+ drivers/crypto/qat/qat_common/qat_asym_algs.c |  2 +-
+ include/crypto/akcipher.h                     | 21 +++++++----
+ 9 files changed, 81 insertions(+), 29 deletions(-)
+
+diff --git a/crypto/akcipher.c b/crypto/akcipher.c
+index 0cbeae137e0a..2e247cbf5115 100644
+--- a/crypto/akcipher.c
++++ b/crypto/akcipher.c
+@@ -25,6 +25,59 @@
+ #include <crypto/internal/akcipher.h>
+ #include "internal.h"
+ 
++/**
++ * crypto_akcipher_verify() - Invoke public key signature verification
++ *
++ * Function invokes the specific public key signature verification operation
++ * for a given public key algorithm.
++ *
++ * @req:	asymmetric key request
++ * @digest:	expected hash value
++ * @digest_len:	hash length
++ *
++ * Return: zero on verification success; error code in case of error.
++ */
++int crypto_akcipher_verify(struct akcipher_request *req,
++			   const unsigned char *digest, unsigned int digest_len)
++{
++	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
++	struct akcipher_alg *alg = crypto_akcipher_alg(tfm);
++	struct crypto_alg *calg = tfm->base.__crt_alg;
++	int ret;
++
++	if (WARN_ON(!digest || !digest_len))
++		return -EINVAL;
++
++	crypto_stats_get(calg);
++	if (alg->verify_rsa) {
++		u8 output[HASH_MAX_DIGESTSIZE];
++
++		/* Perform the verification calculation.  This doesn't actually
++		 * do the verification, but rather calculates the hash expected
++		 * by the signature and returns that to us.
++		 */
++		ret = crypto_akcipher_verify_rsa(req);
++		if (ret)
++			goto out;
++		if (req->dst_len != digest_len ||
++		    WARN_ON(req->dst_len > sizeof(output))) {
++			ret = -EKEYREJECTED;
++			goto out;
++		}
++		sg_copy_to_buffer(req->dst,
++				  sg_nents_for_len(req->dst, digest_len),
++				  output, digest_len);
++		/* Do final verification step. */
++		if (memcmp(digest, output, digest_len))
++			ret = -EKEYREJECTED;
++	} else
++		ret = alg->verify(req, digest, digest_len);
++out:
++	crypto_stats_akcipher_verify(ret, calg);
++	return ret;
++}
++EXPORT_SYMBOL_GPL(crypto_akcipher_verify);
++
+ #ifdef CONFIG_NET
+ static int crypto_akcipher_report(struct sk_buff *skb, struct crypto_alg *alg)
+ {
+diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
+index f5d85b47fcc6..1f86d22548f0 100644
+--- a/crypto/asymmetric_keys/public_key.c
++++ b/crypto/asymmetric_keys/public_key.c
+@@ -227,7 +227,7 @@ int public_key_verify_signature(const struct public_key *pkey,
+ 	struct crypto_wait cwait;
+ 	struct crypto_akcipher *tfm;
+ 	struct akcipher_request *req;
+-	struct scatterlist sig_sg, digest_sg;
++	struct scatterlist sig_sg, output_sg;
+ 	char alg_name[CRYPTO_MAX_ALG_NAME];
+ 	void *output;
+ 	unsigned int outlen;
+@@ -270,27 +270,18 @@ int public_key_verify_signature(const struct public_key *pkey,
+ 		goto error_free_req;
+ 
+ 	sg_init_one(&sig_sg, sig->s, sig->s_size);
+-	sg_init_one(&digest_sg, output, outlen);
+-	akcipher_request_set_crypt(req, &sig_sg, &digest_sg, sig->s_size,
++	sg_init_one(&output_sg, output, outlen);
++	akcipher_request_set_crypt(req, &sig_sg, &output_sg, sig->s_size,
+ 				   outlen);
+ 	crypto_init_wait(&cwait);
+ 	akcipher_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG |
+ 				      CRYPTO_TFM_REQ_MAY_SLEEP,
+ 				      crypto_req_done, &cwait);
+-
+-	/* Perform the verification calculation.  This doesn't actually do the
+-	 * verification, but rather calculates the hash expected by the
+-	 * signature and returns that to us.
+-	 */
+-	ret = crypto_wait_req(crypto_akcipher_verify(req), &cwait);
++	ret = crypto_wait_req(crypto_akcipher_verify(req, sig->digest,
++						     sig->digest_size), &cwait);
+ 	if (ret)
+ 		goto out_free_output;
+ 
+-	/* Do the actual verification step. */
+-	if (req->dst_len != sig->digest_size ||
+-	    memcmp(sig->digest, output, sig->digest_size) != 0)
+-		ret = -EKEYREJECTED;
+-
+ out_free_output:
+ 	kfree(output);
+ error_free_req:
+diff --git a/crypto/rsa-pkcs1pad.c b/crypto/rsa-pkcs1pad.c
+index cfc04e15fd97..f82d70724229 100644
+--- a/crypto/rsa-pkcs1pad.c
++++ b/crypto/rsa-pkcs1pad.c
+@@ -550,7 +550,7 @@ static int pkcs1pad_verify(struct akcipher_request *req)
+ 				   req_ctx->out_sg, req->src_len,
+ 				   ctx->key_size);
+ 
+-	err = crypto_akcipher_verify(&req_ctx->child_req);
++	err = crypto_akcipher_verify_rsa(&req_ctx->child_req);
+ 	if (err != -EINPROGRESS && err != -EBUSY)
+ 		return pkcs1pad_verify_complete(req, err);
+ 
+@@ -674,7 +674,7 @@ static int pkcs1pad_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 	inst->alg.encrypt = pkcs1pad_encrypt;
+ 	inst->alg.decrypt = pkcs1pad_decrypt;
+ 	inst->alg.sign = pkcs1pad_sign;
+-	inst->alg.verify = pkcs1pad_verify;
++	inst->alg.verify_rsa = pkcs1pad_verify;
+ 	inst->alg.set_pub_key = pkcs1pad_set_pub_key;
+ 	inst->alg.set_priv_key = pkcs1pad_set_priv_key;
+ 	inst->alg.max_size = pkcs1pad_get_max_size;
+diff --git a/crypto/rsa.c b/crypto/rsa.c
+index 4167980c243d..42df7d0c915c 100644
+--- a/crypto/rsa.c
++++ b/crypto/rsa.c
+@@ -354,7 +354,7 @@ static struct akcipher_alg rsa = {
+ 	.encrypt = rsa_enc,
+ 	.decrypt = rsa_dec,
+ 	.sign = rsa_sign,
+-	.verify = rsa_verify,
++	.verify_rsa = rsa_verify,
+ 	.set_priv_key = rsa_set_priv_key,
+ 	.set_pub_key = rsa_set_pub_key,
+ 	.max_size = rsa_max_size,
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 1ce53f8058d2..ed59408bf30b 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -2303,7 +2303,7 @@ static int test_akcipher_one(struct crypto_akcipher *tfm,
+ 
+ 	err = crypto_wait_req(vecs->siggen_sigver_test ?
+ 			      /* Run asymmetric signature verification */
+-			      crypto_akcipher_verify(req) :
++			      crypto_akcipher_verify(req, c, c_size) :
+ 			      /* Run asymmetric encrypt */
+ 			      crypto_akcipher_encrypt(req), &wait);
+ 	if (err) {
+@@ -2317,7 +2317,8 @@ static int test_akcipher_one(struct crypto_akcipher *tfm,
+ 		goto free_all;
+ 	}
+ 	/* verify that encrypted message is equal to expected */
+-	if (memcmp(c, outbuf_enc, c_size)) {
++	if (!vecs->siggen_sigver_test &&
++	    memcmp(c, outbuf_enc, c_size)) {
+ 		pr_err("alg: akcipher: %s test failed. Invalid output\n", op);
+ 		hexdump(outbuf_enc, c_size);
+ 		err = -EINVAL;
+diff --git a/drivers/crypto/caam/caampkc.c b/drivers/crypto/caam/caampkc.c
+index 77ab28a2811a..e06b4c9a89e2 100644
+--- a/drivers/crypto/caam/caampkc.c
++++ b/drivers/crypto/caam/caampkc.c
+@@ -995,7 +995,7 @@ static struct akcipher_alg caam_rsa = {
+ 	.encrypt = caam_rsa_enc,
+ 	.decrypt = caam_rsa_dec,
+ 	.sign = caam_rsa_dec,
+-	.verify = caam_rsa_enc,
++	.verify_rsa = caam_rsa_enc,
+ 	.set_pub_key = caam_rsa_set_pub_key,
+ 	.set_priv_key = caam_rsa_set_priv_key,
+ 	.max_size = caam_rsa_max_size,
+diff --git a/drivers/crypto/ccp/ccp-crypto-rsa.c b/drivers/crypto/ccp/ccp-crypto-rsa.c
+index 05850dfd7940..fc669b1bb328 100644
+--- a/drivers/crypto/ccp/ccp-crypto-rsa.c
++++ b/drivers/crypto/ccp/ccp-crypto-rsa.c
+@@ -215,7 +215,7 @@ static struct akcipher_alg ccp_rsa_defaults = {
+ 	.encrypt = ccp_rsa_encrypt,
+ 	.decrypt = ccp_rsa_decrypt,
+ 	.sign = ccp_rsa_decrypt,
+-	.verify = ccp_rsa_encrypt,
++	.verify_rsa = ccp_rsa_encrypt,
+ 	.set_pub_key = ccp_rsa_setpubkey,
+ 	.set_priv_key = ccp_rsa_setprivkey,
+ 	.max_size = ccp_rsa_maxsize,
+diff --git a/drivers/crypto/qat/qat_common/qat_asym_algs.c b/drivers/crypto/qat/qat_common/qat_asym_algs.c
+index 320e7854b4ee..a6c7ff572970 100644
+--- a/drivers/crypto/qat/qat_common/qat_asym_algs.c
++++ b/drivers/crypto/qat/qat_common/qat_asym_algs.c
+@@ -1301,7 +1301,7 @@ static struct akcipher_alg rsa = {
+ 	.encrypt = qat_rsa_enc,
+ 	.decrypt = qat_rsa_dec,
+ 	.sign = qat_rsa_dec,
+-	.verify = qat_rsa_enc,
++	.verify_rsa = qat_rsa_enc,
+ 	.set_pub_key = qat_rsa_setpubkey,
+ 	.set_priv_key = qat_rsa_setprivkey,
+ 	.max_size = qat_rsa_max_size,
+diff --git a/include/crypto/akcipher.h b/include/crypto/akcipher.h
+index 2d690494568c..1bb8ba74b95d 100644
+--- a/include/crypto/akcipher.h
++++ b/include/crypto/akcipher.h
+@@ -55,10 +55,12 @@ struct crypto_akcipher {
+  *		algorithm. In case of error, where the dst_len was insufficient,
+  *		the req->dst_len will be updated to the size required for the
+  *		operation
+- * @verify:	Function performs a sign operation as defined by public key
++ * @verify_rsa:	Function performs a partial verify operation as defined by RSA
+  *		algorithm. In case of error, where the dst_len was insufficient,
+  *		the req->dst_len will be updated to the size required for the
+  *		operation
++ * @verify:	Function performs a complete verify operation as defined by public
++ *		key algorithm. Requires digest value as input parameter.
+  * @encrypt:	Function performs an encrypt operation as defined by public key
+  *		algorithm. In case of error, where the dst_len was insufficient,
+  *		the req->dst_len will be updated to the size required for the
+@@ -91,7 +93,9 @@ struct crypto_akcipher {
+  */
+ struct akcipher_alg {
+ 	int (*sign)(struct akcipher_request *req);
+-	int (*verify)(struct akcipher_request *req);
++	int (*verify_rsa)(struct akcipher_request *req);
++	int (*verify)(struct akcipher_request *req, const u8 *digest,
++		      unsigned int digest_len);
+ 	int (*encrypt)(struct akcipher_request *req);
+ 	int (*decrypt)(struct akcipher_request *req);
+ 	int (*set_pub_key)(struct crypto_akcipher *tfm, const void *key,
+@@ -343,16 +347,15 @@ static inline int crypto_akcipher_sign(struct akcipher_request *req)
+ }
+ 
+ /**
+- * crypto_akcipher_verify() - Invoke public key verify operation
++ * crypto_akcipher_verify_rsa() - Invoke partial RSA verify operation
+  *
+- * Function invokes the specific public key verify operation for a given
+- * public key algorithm
++ * Function invokes partial verify operation for a RSA algorithm
+  *
+  * @req:	asymmetric key request
+  *
+  * Return: zero on success; error code in case of error
+  */
+-static inline int crypto_akcipher_verify(struct akcipher_request *req)
++static inline int crypto_akcipher_verify_rsa(struct akcipher_request *req)
+ {
+ 	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
+ 	struct akcipher_alg *alg = crypto_akcipher_alg(tfm);
+@@ -360,7 +363,7 @@ static inline int crypto_akcipher_verify(struct akcipher_request *req)
+ 	int ret;
+ 
+ 	crypto_stats_get(calg);
+-	ret = alg->verify(req);
++	ret = alg->verify_rsa(req);
+ 	crypto_stats_akcipher_verify(ret, calg);
+ 	return ret;
+ }
+@@ -406,4 +409,8 @@ static inline int crypto_akcipher_set_priv_key(struct crypto_akcipher *tfm,
+ 
+ 	return alg->set_priv_key(tfm, key, keylen);
+ }
++
++int crypto_akcipher_verify(struct akcipher_request *req,
++			   const unsigned char *digest,
++			   unsigned int digest_len);
+ #endif
 -- 
-Regards,
-Joakim
+2.11.0
