@@ -1,32 +1,52 @@
-Return-Path: <SRS0=fnEV=PW=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mout.web.de ([212.227.15.14]:58897 "EHLO mout.web.de"
+Return-Path: <SRS0=g5s/=PY=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail.kernel.org ([198.145.29.99]:42130 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726067AbfANHke (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Jan 2019 02:40:34 -0500
-To: kernel-janitors@vger.kernel.org
-Cc: linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>
-From: Markus Elfring <Markus.Elfring@web.de>
-Subject: Generating identifiers similar to UUIDs but without dashes
-Message-ID: <c7463786-82f1-01c8-7f47-e784f2602209@web.de>
-Date: Mon, 14 Jan 2019 08:40:17 +0100
+        id S1727025AbfAPRtx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 16 Jan 2019 12:49:53 -0500
+Date: Wed, 16 Jan 2019 09:49:51 -0800
+From: Eric Biggers <ebiggers@kernel.org>
+To: Xiongfeng Wang <wangxiongfeng2@huawei.com>
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        broonie@kernel.org, ard.biesheuvel@linaro.org,
+        jonathan.cameron@huawei.com
+Subject: Re: [PATCH 0/5] Crypto Cleanup
+Message-ID: <20190116174949.GA152952@gmail.com>
+References: <1547607034-40948-1-git-send-email-wangxiongfeng2@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1547607034-40948-1-git-send-email-wangxiongfeng2@huawei.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Hello,
+On Wed, Jan 16, 2019 at 10:50:29AM +0800, Xiongfeng Wang wrote:
+> The patchset introduce a helper to (un)register a array of crypto templates.
+> The following patches use this helper to simplify the code. This is also
+> a preparation for a coming patchset, which will register several crypto
+> templates.
+> 
+> Xiongfeng Wang (5):
+>   crypto: api - add a helper to (un)register a array of templates
+>   crypto: ccm - use template array registering API to simplify the code
+>   crypto: gcm - use template array registering API to simplify the code
+>   crypto: ctr - use template array registering API to simplify the code
+>   crypto: chacha20poly1305 - use template array registering API to
+>     simplify the code
+> 
+>  crypto/algapi.c           | 27 ++++++++++++++++
+>  crypto/ccm.c              | 81 +++++++++++++++--------------------------------
+>  crypto/chacha20poly1305.c | 38 +++++++++-------------
+>  crypto/ctr.c              | 46 ++++++++++-----------------
+>  crypto/gcm.c              | 76 +++++++++++++++-----------------------------
+>  include/crypto/algapi.h   |  2 ++
+>  6 files changed, 113 insertions(+), 157 deletions(-)
+> 
+> -- 
+> 1.7.12.4
+> 
 
-The file “/proc/sys/kernel/random/uuid” provides a bit of useful data.
-The formal definition of the string representation for universally unique
-identifiers requires the use of four dashes for the concatenation of fields.
-https://tools.ietf.org/html/rfc4122#page-4
-https://stackoverflow.com/questions/24481801/is-uuid-without-dashes-hyphens-valid#answer-24484051
+Hi Xiongfeng, I think this a useful cleanup but can you please rebase this onto
+cryptodev?  There is a conflict in crypto/ctr.c.
 
-Now I am looking again for possibilities to generate reasonably unique
-identifiers also without these dashes.
-Can any data processing benefit from the avoidance of such extra characters?
-
-Regards,
-Markus
+- Eric
