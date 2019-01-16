@@ -1,106 +1,154 @@
-Return-Path: <SRS0=+HSe=PS=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:53250 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728513AbfAJUSY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Jan 2019 15:18:24 -0500
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Dave Watson <davejwatson@fb.com>
-Subject: [PATCH 06/11] crypto: x86/aesni-gcm - make 'struct aesni_gcm_tfm_s' static const
-Date: Thu, 10 Jan 2019 12:17:57 -0800
-Message-Id: <20190110201802.82442-7-ebiggers@kernel.org>
-In-Reply-To: <20190110201802.82442-1-ebiggers@kernel.org>
-References: <20190110201802.82442-1-ebiggers@kernel.org>
+Return-Path: <SRS0=g5s/=PY=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mo4-p03-ob.smtp.rzone.de ([85.215.255.104]:26740 "EHLO
+        mo4-p03-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389696AbfAPLMC (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 16 Jan 2019 06:12:02 -0500
+From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+To: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Eric Biggers <ebiggers@kernel.org>,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        Andy Lutomirski <luto@amacapital.net>,
+        "Lee, Chun-Yi" <joeyli.kernel@gmail.com>,
+        "Rafael J . Wysocki" <rjw@rjwysocki.net>,
+        Pavel Machek <pavel@ucw.cz>, linux-kernel@vger.kernel.org,
+        linux-pm@vger.kernel.org, keyrings@vger.kernel.org,
+        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+        Chen Yu <yu.c.chen@intel.com>,
+        Oliver Neukum <oneukum@suse.com>,
+        Ryan Chen <yu.chen.surf@gmail.com>,
+        David Howells <dhowells@redhat.com>,
+        Giovanni Gherdovich <ggherdovich@suse.cz>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Jann Horn <jannh@google.com>,
+        Andy Lutomirski <luto@kernel.org>, linux-crypto@vger.kernel.org
+Subject: [PATCH v2 1/6] crypto: add template handling for RNGs
+Date: Wed, 16 Jan 2019 12:07:34 +0100
+Message-ID: <61907509.O7QvflLhaU@positron.chronox.de>
+In-Reply-To: <2082192.jPI8ve1O8G@positron.chronox.de>
+References: <20190103143227.9138-1-jlee@suse.com> <9733066.Vrs4h5eWcW@positron.chronox.de> <2082192.jPI8ve1O8G@positron.chronox.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Eric Biggers <ebiggers@google.com>
+Adds ability to register templates for pseudo random number generators
+(PRNG). PRNGs are "meta" mechanisms using raw cipher primitives. Thus,
+PRNGs can now be implemented as templates to allow the complete
+flexibility the kernel crypto API provides.
 
-Add missing static keywords to fix the following sparse warnings:
+The RNG API provides access to the PRNG algorithms without an entropy
+management.
 
-    arch/x86/crypto/aesni-intel_glue.c:197:24: warning: symbol 'aesni_gcm_tfm_sse' was not declared. Should it be static?
-    arch/x86/crypto/aesni-intel_glue.c:246:24: warning: symbol 'aesni_gcm_tfm_avx_gen2' was not declared. Should it be static?
-    arch/x86/crypto/aesni-intel_glue.c:291:24: warning: symbol 'aesni_gcm_tfm_avx_gen4' was not declared. Should it be static?
-
-I also made the affected structures 'const', and adjusted the
-indentation in the struct definition to not be insane.
-
-Cc: Dave Watson <davejwatson@fb.com>
-Signed-off-by: Eric Biggers <ebiggers@google.com>
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
 ---
- arch/x86/crypto/aesni-intel_glue.c | 34 ++++++++++++------------------
- 1 file changed, 13 insertions(+), 21 deletions(-)
+ crypto/rng.c                  | 44 +++++++++++++++++++++++++++++++++++
+ include/crypto/internal/rng.h | 26 +++++++++++++++++++++
+ 2 files changed, 70 insertions(+)
 
-diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-index 1321700d6647f..9b5ccde3ef315 100644
---- a/arch/x86/crypto/aesni-intel_glue.c
-+++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -175,26 +175,18 @@ asmlinkage void aesni_gcm_finalize(void *ctx,
- 				   struct gcm_context_data *gdata,
- 				   u8 *auth_tag, unsigned long auth_tag_len);
+diff --git a/crypto/rng.c b/crypto/rng.c
+index 33c38a72bff5..da4fd03c0acd 100644
+--- a/crypto/rng.c
++++ b/crypto/rng.c
+@@ -64,6 +64,25 @@ static int crypto_rng_init_tfm(struct crypto_tfm *tfm)
+ 	return 0;
+ }
  
--static struct aesni_gcm_tfm_s {
--void (*init)(void *ctx,
--				struct gcm_context_data *gdata,
--				u8 *iv,
--				u8 *hash_subkey, const u8 *aad,
--				unsigned long aad_len);
--void (*enc_update)(void *ctx,
--					struct gcm_context_data *gdata, u8 *out,
--					const u8 *in,
--					unsigned long plaintext_len);
--void (*dec_update)(void *ctx,
--					struct gcm_context_data *gdata, u8 *out,
--					const u8 *in,
--					unsigned long ciphertext_len);
--void (*finalize)(void *ctx,
--				struct gcm_context_data *gdata,
--				u8 *auth_tag, unsigned long auth_tag_len);
-+static const struct aesni_gcm_tfm_s {
-+	void (*init)(void *ctx, struct gcm_context_data *gdata, u8 *iv,
-+		     u8 *hash_subkey, const u8 *aad, unsigned long aad_len);
-+	void (*enc_update)(void *ctx, struct gcm_context_data *gdata, u8 *out,
-+			   const u8 *in, unsigned long plaintext_len);
-+	void (*dec_update)(void *ctx, struct gcm_context_data *gdata, u8 *out,
-+			   const u8 *in, unsigned long ciphertext_len);
-+	void (*finalize)(void *ctx, struct gcm_context_data *gdata,
-+			 u8 *auth_tag, unsigned long auth_tag_len);
- } *aesni_gcm_tfm;
- 
--struct aesni_gcm_tfm_s aesni_gcm_tfm_sse = {
-+static const struct aesni_gcm_tfm_s aesni_gcm_tfm_sse = {
- 	.init = &aesni_gcm_init,
- 	.enc_update = &aesni_gcm_enc_update,
- 	.dec_update = &aesni_gcm_dec_update,
-@@ -243,7 +235,7 @@ asmlinkage void aesni_gcm_dec_avx_gen2(void *ctx,
- 			const u8 *aad, unsigned long aad_len,
- 			u8 *auth_tag, unsigned long auth_tag_len);
- 
--struct aesni_gcm_tfm_s aesni_gcm_tfm_avx_gen2 = {
-+static const struct aesni_gcm_tfm_s aesni_gcm_tfm_avx_gen2 = {
- 	.init = &aesni_gcm_init_avx_gen2,
- 	.enc_update = &aesni_gcm_enc_update_avx_gen2,
- 	.dec_update = &aesni_gcm_dec_update_avx_gen2,
-@@ -288,7 +280,7 @@ asmlinkage void aesni_gcm_dec_avx_gen4(void *ctx,
- 			const u8 *aad, unsigned long aad_len,
- 			u8 *auth_tag, unsigned long auth_tag_len);
- 
--struct aesni_gcm_tfm_s aesni_gcm_tfm_avx_gen4 = {
-+static const struct aesni_gcm_tfm_s aesni_gcm_tfm_avx_gen4 = {
- 	.init = &aesni_gcm_init_avx_gen4,
- 	.enc_update = &aesni_gcm_enc_update_avx_gen4,
- 	.dec_update = &aesni_gcm_dec_update_avx_gen4,
-@@ -778,7 +770,7 @@ static int gcmaes_crypt_by_sg(bool enc, struct aead_request *req,
++static inline struct rng_alg *__crypto_rng_alg(struct crypto_alg *alg)
++{
++	return container_of(alg, struct rng_alg, base);
++}
++
++static inline struct rng_instance *rng_instance(
++	struct crypto_instance *inst)
++{
++	return container_of(__crypto_rng_alg(&inst->alg),
++			    struct rng_instance, alg);
++}
++
++static void crypto_rng_free_instance(struct crypto_instance *inst)
++{
++	struct rng_instance *rng = rng_instance(inst);
++
++	rng->free(rng);
++}
++
+ static unsigned int seedsize(struct crypto_alg *alg)
  {
- 	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
- 	unsigned long auth_tag_len = crypto_aead_authsize(tfm);
--	struct aesni_gcm_tfm_s *gcm_tfm = aesni_gcm_tfm;
-+	const struct aesni_gcm_tfm_s *gcm_tfm = aesni_gcm_tfm;
- 	struct gcm_context_data data AESNI_ALIGN_ATTR;
- 	struct scatter_walk dst_sg_walk = {};
- 	unsigned long left = req->cryptlen;
+ 	struct rng_alg *ralg = container_of(alg, struct rng_alg, base);
+@@ -102,6 +121,7 @@ static void crypto_rng_show(struct seq_file *m, struct crypto_alg *alg)
+ static const struct crypto_type crypto_rng_type = {
+ 	.extsize = crypto_alg_extsize,
+ 	.init_tfm = crypto_rng_init_tfm,
++	.free = crypto_rng_free_instance,
+ #ifdef CONFIG_PROC_FS
+ 	.show = crypto_rng_show,
+ #endif
+@@ -229,5 +249,29 @@ void crypto_unregister_rngs(struct rng_alg *algs, int count)
+ }
+ EXPORT_SYMBOL_GPL(crypto_unregister_rngs);
+ 
++static int rng_prepare_alg(struct rng_alg *alg)
++{
++	struct crypto_alg *base = &alg->base;
++
++	base->cra_type = &crypto_rng_type;
++	base->cra_flags &= ~CRYPTO_ALG_TYPE_MASK;
++	base->cra_flags |= CRYPTO_ALG_TYPE_RNG;
++
++	return 0;
++}
++
++int rng_register_instance(struct crypto_template *tmpl,
++			  struct rng_instance *inst)
++{
++	int err;
++
++	err = rng_prepare_alg(&inst->alg);
++	if (err)
++		return err;
++
++	return crypto_register_instance(tmpl, rng_crypto_instance(inst));
++}
++EXPORT_SYMBOL_GPL(rng_register_instance);
++
+ MODULE_LICENSE("GPL");
+ MODULE_DESCRIPTION("Random Number Generator");
+diff --git a/include/crypto/internal/rng.h b/include/crypto/internal/rng.h
+index a52ef3483dd7..bfe4482ad336 100644
+--- a/include/crypto/internal/rng.h
++++ b/include/crypto/internal/rng.h
+@@ -42,4 +42,30 @@ static inline void crypto_rng_set_entropy(struct crypto_rng *tfm,
+ 	crypto_rng_alg(tfm)->set_ent(tfm, data, len);
+ }
+ 
++struct rng_instance {
++	void (*free)(struct rng_instance *inst);
++	struct rng_alg alg;
++};
++
++static inline struct rng_instance *rng_alloc_instance(
++	const char *name, struct crypto_alg *alg)
++{
++	return crypto_alloc_instance(name, alg,
++			      sizeof(struct rng_instance) - sizeof(*alg));
++}
++
++static inline struct crypto_instance *rng_crypto_instance(
++	struct rng_instance *inst)
++{
++	return container_of(&inst->alg.base, struct crypto_instance, alg);
++}
++
++static inline void *rng_instance_ctx(struct rng_instance *inst)
++{
++	return crypto_instance_ctx(rng_crypto_instance(inst));
++}
++
++int rng_register_instance(struct crypto_template *tmpl,
++			  struct rng_instance *inst);
++
+ #endif
 -- 
-2.20.1.97.g81188d93c3-goog
+2.20.1
