@@ -1,85 +1,148 @@
-Return-Path: <SRS0=g5s/=PY=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from ale.deltatee.com ([207.54.116.67]:35024 "EHLO ale.deltatee.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728195AbfAPSZb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 16 Jan 2019 13:25:31 -0500
-From: Logan Gunthorpe <logang@deltatee.com>
-To: linux-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
-        linux-ntb@googlegroups.com, linux-crypto@vger.kernel.org,
-        linux-mm@kvack.org, Andrew Morton <akpm@linux-foundation.org>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Andy Shevchenko <andy.shevchenko@gmail.com>,
-        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
-        Logan Gunthorpe <logang@deltatee.com>
-Date: Wed, 16 Jan 2019 11:25:22 -0700
-Message-Id: <20190116182523.19446-6-logang@deltatee.com>
-In-Reply-To: <20190116182523.19446-1-logang@deltatee.com>
-References: <20190116182523.19446-1-logang@deltatee.com>
+Return-Path: <SRS0=b5ak=PZ=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2250 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728295AbfAQGsx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 17 Jan 2019 01:48:53 -0500
+From: Xiongfeng Wang <wangxiongfeng2@huawei.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <ebiggers@kernel.org>
+CC: <wangxiongfeng2@huawei.com>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <broonie@kernel.org>,
+        <ard.biesheuvel@linaro.org>, <jonathan.cameron@huawei.com>
+Subject: [PATCH V2 2/5] crypto: ccm - use template array registering API to simplify the code
+Date: Thu, 17 Jan 2019 14:48:00 +0800
+Message-ID: <1547707683-45878-3-git-send-email-wangxiongfeng2@huawei.com>
+In-Reply-To: <1547707683-45878-1-git-send-email-wangxiongfeng2@huawei.com>
+References: <1547707683-45878-1-git-send-email-wangxiongfeng2@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: [PATCH v25 5/6] ntb: ntb_hw_intel: use io-64-nonatomic instead of in-driver hacks
+Content-Type: text/plain
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Now that ioread64 and iowrite64 are available in io-64-nonatomic,
-we can remove the hack at the top of ntb_hw_intel.c and replace it
-with an include.
+Use crypto template array registering API to simplify the code.
 
-Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-Reviewed-by: Andy Shevchenko <andy.shevchenko@gmail.com>
-Acked-by: Dave Jiang <dave.jiang@intel.com>
-Acked-by: Allen Hubbe <Allen.Hubbe@dell.com>
-Acked-by: Jon Mason <jdmason@kudzu.us>
+Signed-off-by: Xiongfeng Wang <xiongfeng.wang@linaro.org>
 ---
- drivers/ntb/hw/intel/ntb_hw_intel.h | 30 +----------------------------
- 1 file changed, 1 insertion(+), 29 deletions(-)
+ crypto/ccm.c | 78 ++++++++++++++++++------------------------------------------
+ 1 file changed, 23 insertions(+), 55 deletions(-)
 
-diff --git a/drivers/ntb/hw/intel/ntb_hw_intel.h b/drivers/ntb/hw/intel/ntb_hw_intel.h
-index c49ff8970ce3..e071e28bca3f 100644
---- a/drivers/ntb/hw/intel/ntb_hw_intel.h
-+++ b/drivers/ntb/hw/intel/ntb_hw_intel.h
-@@ -53,6 +53,7 @@
- 
- #include <linux/ntb.h>
- #include <linux/pci.h>
-+#include <linux/io-64-nonatomic-lo-hi.h>
- 
- /* PCI device IDs */
- #define PCI_DEVICE_ID_INTEL_NTB_B2B_JSF	0x3725
-@@ -218,33 +219,4 @@ static inline int pdev_is_gen3(struct pci_dev *pdev)
- 	return 0;
+diff --git a/crypto/ccm.c b/crypto/ccm.c
+index b242fd0..50df8f0 100644
+--- a/crypto/ccm.c
++++ b/crypto/ccm.c
+@@ -589,12 +589,6 @@ static int crypto_ccm_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 					mac_name);
  }
  
--#ifndef ioread64
--#ifdef readq
--#define ioread64 readq
--#else
--#define ioread64 _ioread64
--static inline u64 _ioread64(void __iomem *mmio)
--{
--	u64 low, high;
+-static struct crypto_template crypto_ccm_tmpl = {
+-	.name = "ccm",
+-	.create = crypto_ccm_create,
+-	.module = THIS_MODULE,
+-};
 -
--	low = ioread32(mmio);
--	high = ioread32(mmio + sizeof(u32));
--	return low | (high << 32);
--}
--#endif
--#endif
+ static int crypto_ccm_base_create(struct crypto_template *tmpl,
+ 				  struct rtattr **tb)
+ {
+@@ -618,12 +612,6 @@ static int crypto_ccm_base_create(struct crypto_template *tmpl,
+ 					cipher_name);
+ }
+ 
+-static struct crypto_template crypto_ccm_base_tmpl = {
+-	.name = "ccm_base",
+-	.create = crypto_ccm_base_create,
+-	.module = THIS_MODULE,
+-};
 -
--#ifndef iowrite64
--#ifdef writeq
--#define iowrite64 writeq
--#else
--#define iowrite64 _iowrite64
--static inline void _iowrite64(u64 val, void __iomem *mmio)
--{
--	iowrite32(val, mmio);
--	iowrite32(val >> 32, mmio + sizeof(u32));
--}
--#endif
--#endif
+ static int crypto_rfc4309_setkey(struct crypto_aead *parent, const u8 *key,
+ 				 unsigned int keylen)
+ {
+@@ -854,12 +842,6 @@ static int crypto_rfc4309_create(struct crypto_template *tmpl,
+ 	goto out;
+ }
+ 
+-static struct crypto_template crypto_rfc4309_tmpl = {
+-	.name = "rfc4309",
+-	.create = crypto_rfc4309_create,
+-	.module = THIS_MODULE,
+-};
 -
- #endif
+ static int crypto_cbcmac_digest_setkey(struct crypto_shash *parent,
+ 				     const u8 *inkey, unsigned int keylen)
+ {
+@@ -999,51 +981,37 @@ static int cbcmac_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 	return err;
+ }
+ 
+-static struct crypto_template crypto_cbcmac_tmpl = {
+-	.name = "cbcmac",
+-	.create = cbcmac_create,
+-	.free = shash_free_instance,
+-	.module = THIS_MODULE,
++static struct crypto_template crypto_ccm_tmpls[] = {
++	{
++		.name = "cbcmac",
++		.create = cbcmac_create,
++		.free = shash_free_instance,
++		.module = THIS_MODULE,
++	}, {
++		.name = "ccm_base",
++		.create = crypto_ccm_base_create,
++		.module = THIS_MODULE,
++	}, {
++		.name = "ccm",
++		.create = crypto_ccm_create,
++		.module = THIS_MODULE,
++	}, {
++		.name = "rfc4309",
++		.create = crypto_rfc4309_create,
++		.module = THIS_MODULE,
++	},
+ };
+ 
+ static int __init crypto_ccm_module_init(void)
+ {
+-	int err;
+-
+-	err = crypto_register_template(&crypto_cbcmac_tmpl);
+-	if (err)
+-		goto out;
+-
+-	err = crypto_register_template(&crypto_ccm_base_tmpl);
+-	if (err)
+-		goto out_undo_cbcmac;
+-
+-	err = crypto_register_template(&crypto_ccm_tmpl);
+-	if (err)
+-		goto out_undo_base;
+-
+-	err = crypto_register_template(&crypto_rfc4309_tmpl);
+-	if (err)
+-		goto out_undo_ccm;
+-
+-out:
+-	return err;
+-
+-out_undo_ccm:
+-	crypto_unregister_template(&crypto_ccm_tmpl);
+-out_undo_base:
+-	crypto_unregister_template(&crypto_ccm_base_tmpl);
+-out_undo_cbcmac:
+-	crypto_register_template(&crypto_cbcmac_tmpl);
+-	goto out;
++	return crypto_register_templates(crypto_ccm_tmpls,
++					 ARRAY_SIZE(crypto_ccm_tmpls));
+ }
+ 
+ static void __exit crypto_ccm_module_exit(void)
+ {
+-	crypto_unregister_template(&crypto_rfc4309_tmpl);
+-	crypto_unregister_template(&crypto_ccm_tmpl);
+-	crypto_unregister_template(&crypto_ccm_base_tmpl);
+-	crypto_unregister_template(&crypto_cbcmac_tmpl);
++	crypto_unregister_templates(crypto_ccm_tmpls,
++				    ARRAY_SIZE(crypto_ccm_tmpls));
+ }
+ 
+ module_init(crypto_ccm_module_init);
 -- 
-2.19.0
+1.7.12.4
