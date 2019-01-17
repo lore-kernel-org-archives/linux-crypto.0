@@ -1,303 +1,386 @@
-Return-Path: <SRS0=CSIn=PT=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-vs1-f65.google.com ([209.85.217.65]:33554 "EHLO
-        mail-vs1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727764AbfAKHWc (ORCPT
+Return-Path: <SRS0=b5ak=PZ=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:36611 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727498AbfAQKdU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Jan 2019 02:22:32 -0500
-Received: by mail-vs1-f65.google.com with SMTP id p74so8667764vsc.0
-        for <linux-crypto@vger.kernel.org>; Thu, 10 Jan 2019 23:22:31 -0800 (PST)
+        Thu, 17 Jan 2019 05:33:20 -0500
+Date: Thu, 17 Jan 2019 11:33:14 +0100
+From: Corentin Labbe <clabbe.montjoie@gmail.com>
+To: Kalyani Akula <kalyani.akula@xilinx.com>
+Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Kalyani Akula <kalyania@xilinx.com>,
+        Sarat Chand Savitala <saratcha@xilinx.com>
+Subject: Re: [RFC PATCH 5/5] crypto: Add Xilinx AES driver
+Message-ID: <20190117103314.GA10028@Red>
+References: <1547708541-23730-1-git-send-email-kalyani.akula@xilinx.com>
+ <1547708541-23730-6-git-send-email-kalyani.akula@xilinx.com>
 MIME-Version: 1.0
-References: <1547123097-16431-1-git-send-email-sumit.garg@linaro.org>
- <1547123097-16431-3-git-send-email-sumit.garg@linaro.org> <20190110141856.p3evqyf34py74gkg@holly.lan>
-In-Reply-To: <20190110141856.p3evqyf34py74gkg@holly.lan>
-From: Sumit Garg <sumit.garg@linaro.org>
-Date: Fri, 11 Jan 2019 12:52:19 +0530
-Message-ID: <CAFA6WYPHmtY4N9ruGLZ70FNeiDCbQE-fs+EP2px-S+GEj2nPTw@mail.gmail.com>
-Subject: Re: [PATCH v2 2/4] tee: optee: add TEE bus device enumeration support
-To: Daniel Thompson <daniel.thompson@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>, linux-kernel@vger.kernel.org,
-        Jens Wiklander <jens.wiklander@linaro.org>, mpm@selenic.com,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Bhupesh Sharma <bhsharma@redhat.com>, tee-dev@lists.linaro.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1547708541-23730-6-git-send-email-kalyani.akula@xilinx.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, 10 Jan 2019 at 19:49, Daniel Thompson
-<daniel.thompson@linaro.org> wrote:
->
-> On Thu, Jan 10, 2019 at 05:54:55PM +0530, Sumit Garg wrote:
-> > OP-TEE provides a pseudo TA to enumerate TAs which can act as devices/
-> > services for TEE bus. So implement device enumeration using invoke
-> > function: PTA_CMD_GET_DEVICES provided by pseudo TA to fetch array of
-> > device UUIDs. Also register these enumerated devices with TEE bus as
-> > "optee-clntX" device.
-> >
-> > Signed-off-by: Sumit Garg <sumit.garg@linaro.org>
-> > ---
-> >  drivers/tee/optee/Makefile        |   1 +
-> >  drivers/tee/optee/core.c          |   4 +
-> >  drivers/tee/optee/device.c        | 150 ++++++++++++++++++++++++++++++++++++++
-> >  drivers/tee/optee/optee_private.h |   3 +
-> >  4 files changed, 158 insertions(+)
-> >  create mode 100644 drivers/tee/optee/device.c
-> >
-> > diff --git a/drivers/tee/optee/Makefile b/drivers/tee/optee/Makefile
-> > index 48d262a..56263ae 100644
-> > --- a/drivers/tee/optee/Makefile
-> > +++ b/drivers/tee/optee/Makefile
-> > @@ -5,3 +5,4 @@ optee-objs += call.o
-> >  optee-objs += rpc.o
-> >  optee-objs += supp.o
-> >  optee-objs += shm_pool.o
-> > +optee-objs += device.o
-> > diff --git a/drivers/tee/optee/core.c b/drivers/tee/optee/core.c
-> > index e5efce3..ac59c77 100644
-> > --- a/drivers/tee/optee/core.c
-> > +++ b/drivers/tee/optee/core.c
-> > @@ -634,6 +634,10 @@ static struct optee *optee_probe(struct device_node *np)
-> >       if (optee->sec_caps & OPTEE_SMC_SEC_CAP_DYNAMIC_SHM)
-> >               pr_info("dynamic shared memory is enabled\n");
-> >
-> > +     rc = optee_enumerate_devices();
-> > +     if (rc)
-> > +             goto err;
-> > +
-> >       pr_info("initialized driver\n");
-> >       return optee;
-> >  err:
-> > diff --git a/drivers/tee/optee/device.c b/drivers/tee/optee/device.c
-> > new file mode 100644
-> > index 0000000..b38d24b
-> > --- /dev/null
-> > +++ b/drivers/tee/optee/device.c
-> > @@ -0,0 +1,150 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +/*
-> > + * Copyright (C) 2019 Linaro Ltd.
-> > + */
-> > +
-> > +#include <linux/kernel.h>
-> > +#include <linux/slab.h>
-> > +#include <linux/tee_drv.h>
-> > +#include <linux/uuid.h>
-> > +#include "optee_private.h"
-> > +
-> > +/*
-> > + * Get device UUIDs
-> > + *
-> > + * [out]     memref[0]        Array of device UUIDs
-> > + *
-> > + * Return codes:
-> > + * TEE_SUCCESS - Invoke command success
-> > + * TEE_ERROR_BAD_PARAMETERS - Incorrect input param
-> > + * TEE_ERROR_SHORT_BUFFER - Output buffer size less than required
-> > + */
-> > +#define PTA_CMD_GET_DEVICES          0x0
-> > +
-> > +static int optee_ctx_match(struct tee_ioctl_version_data *ver, const void *data)
-> > +{
-> > +     if (ver->impl_id == TEE_IMPL_ID_OPTEE)
-> > +             return 1;
-> > +     else
-> > +             return 0;
-> > +}
-> > +
-> > +static int get_devices(struct tee_context *ctx, u32 session,
-> > +                    struct tee_shm *device_uuid, u32 *shm_size)
->
-> Missing const on device_uuid?
->
+On Thu, Jan 17, 2019 at 12:32:21PM +0530, Kalyani Akula wrote:
+> This patch adds AES driver support for the Xilinx
+> ZynqMP SoC.
+> 
+> Signed-off-by: Kalyani Akula <kalyani.akula@xilinx.com>
+> ---
+>  drivers/crypto/Kconfig      |  11 ++
+>  drivers/crypto/Makefile     |   1 +
+>  drivers/crypto/zynqmp-aes.c | 331 ++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 343 insertions(+)
+>  create mode 100644 drivers/crypto/zynqmp-aes.c
+> 
 
-I don't think we should have a const for device_uuid here as this is
-shared memory struct pointer which is dynamically allocated and used
-to fetch device UUIDs.
+Hello I have some comment below
 
->
-> > +{
-> > +     u32 ret = 0;
-> > +     struct tee_ioctl_invoke_arg inv_arg = {0};
-> > +     struct tee_param param[4] = {0};
-> > +
-> > +     /* Invoke PTA_CMD_GET_DEVICES function */
-> > +     inv_arg.func = PTA_CMD_GET_DEVICES;
-> > +     inv_arg.session = session;
-> > +     inv_arg.num_params = 4;
-> > +
-> > +     /* Fill invoke cmd params */
-> > +     param[0].attr = TEE_IOCTL_PARAM_ATTR_TYPE_MEMREF_OUTPUT;
-> > +     param[0].u.memref.shm = device_uuid;
-> > +     param[0].u.memref.size = *shm_size;
-> > +     param[0].u.memref.shm_offs = 0;
-> > +
-> > +     ret = tee_client_invoke_func(ctx, &inv_arg, param);
-> > +     if ((ret < 0) || ((inv_arg.ret != TEEC_SUCCESS) &&
-> > +                       (inv_arg.ret != TEEC_ERROR_SHORT_BUFFER))) {
-> > +             pr_err("PTA_CMD_GET_DEVICES invoke function err: %x\n",
-> > +                    inv_arg.ret);
-> > +             return -EINVAL;
-> > +     }
-> > +
-> > +     *shm_size = param[0].u.memref.size;
-> > +
-> > +     return 0;
-> > +}
-> > +
-> > +static int optee_register_device(uuid_t *device_uuid, u32 device_id)
->
-> const?
->
+> diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+> index 5a90075..66d9faa 100644
+> --- a/drivers/crypto/Kconfig
+> +++ b/drivers/crypto/Kconfig
+> @@ -667,6 +667,17 @@ config CRYPTO_DEV_ROCKCHIP
+>  	  This driver interfaces with the hardware crypto accelerator.
+>  	  Supporting cbc/ecb chainmode, and aes/des/des3_ede cipher mode.
+>  
+> +config CRYPTO_DEV_ZYNQMP_AES
+> +	tristate "Support for Xilinx ZynqMP AES hw accelerator"
+> +	depends on ARCH_ZYNQMP || COMPILE_TEST
+> +	select CRYPTO_AES
+> +	select CRYPTO_BLKCIPHER
 
-Will add const here.
+BLKCIPHER is deprecated, please use skcipher
 
->
-> > +{
-> > +     struct tee_client_device *optee_device = NULL;
-> > +     int rc;
-> > +
-> > +     optee_device = kzalloc(sizeof(*optee_device), GFP_KERNEL);
-> > +     if (!optee_device)
-> > +             return -ENOMEM;
-> > +
-> > +     optee_device->dev.bus = &tee_bus_type;
-> > +     dev_set_name(&optee_device->dev, "optee-clnt%u", device_id);
-> > +     uuid_copy(&optee_device->id.uuid, device_uuid);
-> > +
-> > +     rc = device_register(&optee_device->dev);
-> > +     if (rc)
-> > +             pr_err("device registration failed, err: %d\n", rc);
->
-> Leak optee_device?
->
+> +	help
+> +	  Xilinx ZynqMP has AES-GCM engine used for symmetric key
+> +	  encryption and decryption. This driver interfaces with AES hw
+> +	  accelerator. Select this if you want to use the ZynqMP module
+> +	  for AES algorithms.
+> +
+>  config CRYPTO_DEV_MEDIATEK
+>  	tristate "MediaTek's EIP97 Cryptographic Engine driver"
+>  	depends on (ARM && ARCH_MEDIATEK) || COMPILE_TEST
+> diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
+> index 8e7e225..991b343 100644
+> --- a/drivers/crypto/Makefile
+> +++ b/drivers/crypto/Makefile
+> @@ -47,3 +47,4 @@ obj-$(CONFIG_CRYPTO_DEV_BCM_SPU) += bcm/
+>  obj-$(CONFIG_CRYPTO_DEV_SAFEXCEL) += inside-secure/
+>  obj-$(CONFIG_CRYPTO_DEV_ARTPEC6) += axis/
+>  obj-y += hisilicon/
+> +obj-$(CONFIG_CRYPTO_DEV_ZYNQMP_AES) += zynqmp-aes.o
+> diff --git a/drivers/crypto/zynqmp-aes.c b/drivers/crypto/zynqmp-aes.c
+> new file mode 100644
+> index 0000000..3a38d2d
+> --- /dev/null
+> +++ b/drivers/crypto/zynqmp-aes.c
+> @@ -0,0 +1,331 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Xilinx ZynqMP AES Driver.
+> + * Copyright (c) 2018 Xilinx Inc.
+> + */
+> +
+> +#include <crypto/aes.h>
+> +#include <crypto/scatterwalk.h>
+> +#include <linux/kernel.h>
+> +#include <linux/module.h>
+> +#include <linux/of_device.h>
+> +#include <linux/scatterlist.h>
+> +#include <linux/spinlock.h>
+> +#include <linux/firmware/xlnx-zynqmp.h>
+> +
+> +#define ZYNQMP_AES_QUEUE_LENGTH			1
+> +#define ZYNQMP_AES_IV_SIZE			12
+> +#define ZYNQMP_AES_GCM_SIZE			16
+> +#define ZYNQMP_AES_KEY_SIZE			32
+> +
+> +#define ZYNQMP_AES_DECRYPT			0
+> +#define ZYNQMP_AES_ENCRYPT			1
+> +
+> +#define ZYNQMP_AES_KUP_KEY			0
+> +
+> +#define ZYNQMP_AES_GCM_TAG_MISMATCH_ERR		0x01
+> +#define ZYNQMP_AES_SIZE_ERR			0x06
+> +#define ZYNQMP_AES_WRONG_KEY_SRC_ERR		0x13
+> +#define ZYNQMP_AES_PUF_NOT_PROGRAMMED		0xE300
+> +
+> +#define ZYNQMP_AES_BLOCKSIZE			0x04
+> +
+> +struct zynqmp_aes_dev {
+> +	struct list_head list;
+> +	struct device *dev;
+> +	/* the lock protects queue and dev list */
+> +	spinlock_t lock;
+> +	struct crypto_queue queue;
+> +};
+> +
+> +struct zynqmp_aes_op {
+> +	struct zynqmp_aes_dev *dd;
+> +	void *src;
+> +	void *dst;
+> +	int len;
+> +	u8 key[ZYNQMP_AES_KEY_SIZE];
+> +	u8 *iv;
+> +	u32 keylen;
+> +	u32 keytype;
+> +};
+> +
+> +struct zynqmp_aes_data {
+> +	u64 src;
+> +	u64 iv;
+> +	u64 key;
+> +	u64 dst;
+> +	u64 size;
+> +	u64 optype;
+> +	u64 keysrc;
+> +};
+> +
+> +struct zynqmp_aes_drv {
+> +	struct list_head dev_list;
+> +	/* the lock protects dev list */
+> +	spinlock_t lock;
+> +};
+> +
+> +static struct zynqmp_aes_drv zynqmp_aes = {
+> +	.dev_list = LIST_HEAD_INIT(zynqmp_aes.dev_list),
+> +	.lock = __SPIN_LOCK_UNLOCKED(zynqmp_aes.lock),
+> +};
+> +
+> +static struct zynqmp_aes_dev *zynqmp_aes_find_dev(struct zynqmp_aes_op *ctx)
+> +{
+> +	struct zynqmp_aes_dev *aes_dd = NULL;
+> +	struct zynqmp_aes_dev *tmp;
+> +
+> +	spin_lock_bh(&zynqmp_aes.lock);
+> +	if (!ctx->dd) {
+> +		list_for_each_entry(tmp, &zynqmp_aes.dev_list, list) {
+> +			aes_dd = tmp;
+> +			break;
+> +		}
+> +		ctx->dd = aes_dd;
+> +	} else {
+> +		aes_dd = ctx->dd;
+> +	}
+> +	spin_unlock_bh(&zynqmp_aes.lock);
+> +
+> +	return aes_dd;
+> +}
+> +
+> +static int zynqmp_setkey_blk(struct crypto_tfm *tfm, const u8 *key,
+> +			     unsigned int len)
+> +{
+> +	struct zynqmp_aes_op *op = crypto_tfm_ctx(tfm);
+> +
 
-Will fix.
+You should validate more the keylen.
 
->
-> > +
-> > +     return rc;
-> > +}
-> > +
-> > +int optee_enumerate_devices(void)
-> > +{
-> > +     uuid_t pta_uuid =
-> > +             UUID_INIT(0x7011a688, 0xddde, 0x4053,
-> > +                       0xa5, 0xa9, 0x7b, 0x3c, 0x4d, 0xdf, 0x13, 0xb8);
->
-> I think this could/should be const too.
->
+> +	op->keylen = len;
+> +	memcpy(op->key, key, len);
+> +
+> +	return 0;
+> +}
+> +
+> +static int zynqmp_setkeytype(struct crypto_tfm *tfm, const u8 *keytype,
+> +			     unsigned int len)
+> +{
+> +	struct zynqmp_aes_op *op = crypto_tfm_ctx(tfm);
+> +
+> +	op->keytype = (u32)(*keytype);
 
-Agree, will add const here too.
+You should validate more what keytype is given.
 
->
-> > +     struct tee_ioctl_open_session_arg sess_arg = {0};
-> > +     struct tee_shm *device_shm = NULL;
-> > +     uuid_t *device_uuid = NULL;
-> > +     struct tee_context *ctx = NULL;
-> > +     u32 shm_size = 0, idx = 0;
-> > +     int rc;
-> > +
-> > +     /* Open context with OP-TEE driver */
-> > +     ctx = tee_client_open_context(NULL, optee_ctx_match, NULL, NULL);
-> > +     if (IS_ERR(ctx))
-> > +             return -ENODEV;
-> > +
-> > +     /* Open session with device enumeration pseudo TA */
-> > +     memcpy(sess_arg.uuid, pta_uuid.b, TEE_IOCTL_UUID_LEN);
-> > +     sess_arg.clnt_login = TEE_IOCTL_LOGIN_PUBLIC;
-> > +     sess_arg.num_params = 0;
-> > +
-> > +     rc = tee_client_open_session(ctx, &sess_arg, NULL);
-> > +     if ((rc < 0) || (sess_arg.ret != TEEC_SUCCESS)) {
-> > +             /* Device enumeration pseudo TA not found */
-> > +             rc = 0;
-> > +             goto out_ctx;
-> > +     }
-> > +
-> > +     rc = get_devices(ctx, sess_arg.session, device_shm, &shm_size);
->
-> Use NULL and 0 directly here instead of relying on initialized values.
-> This makes it clear we are fetching the size of a buffer and are doing
-> something different to the next call to get_devices().
->
+> +
+> +	return 0;
+> +}
+> +
+> +static int zynqmp_aes_xcrypt(struct blkcipher_desc *desc,
+> +			     struct scatterlist *dst,
+> +			     struct scatterlist *src,
+> +			     unsigned int nbytes,
+> +			     unsigned int flags)
+> +{
+> +	struct zynqmp_aes_op *op = crypto_blkcipher_ctx(desc->tfm);
+> +	struct zynqmp_aes_dev *dd = zynqmp_aes_find_dev(op);
+> +	const struct zynqmp_eemi_ops *eemi_ops = zynqmp_pm_get_eemi_ops();
+> +	int err, ret, copy_bytes, src_data = 0, dst_data = 0;
+> +	dma_addr_t dma_addr, dma_addr_buf;
+> +	struct zynqmp_aes_data *abuf;
+> +	struct blkcipher_walk walk;
+> +	unsigned int data_size;
+> +	size_t dma_size;
+> +	char *kbuf;
+> +
+> +	if (!eemi_ops || !eemi_ops->aes)
+> +		return -ENOTSUPP;
+> +
+> +	if (op->keytype == ZYNQMP_AES_KUP_KEY)
+> +		dma_size = nbytes + ZYNQMP_AES_KEY_SIZE
+> +			+ ZYNQMP_AES_IV_SIZE;
+> +	else
+> +		dma_size = nbytes + ZYNQMP_AES_IV_SIZE;
+> +
+> +	kbuf = dma_alloc_coherent(dd->dev, dma_size, &dma_addr, GFP_KERNEL);
+> +	if (!kbuf)
+> +		return -ENOMEM;
+> +
+> +	abuf = dma_alloc_coherent(dd->dev, sizeof(struct zynqmp_aes_data),
+> +				  &dma_addr_buf, GFP_KERNEL);
+> +	if (!abuf) {
+> +		dma_free_coherent(dd->dev, dma_size, kbuf, dma_addr);
+> +		return -ENOMEM;
+> +	}
+> +
+> +	data_size = nbytes;
+> +	blkcipher_walk_init(&walk, dst, src, data_size);
+> +	err = blkcipher_walk_virt(desc, &walk);
+> +	op->iv = walk.iv;
+> +
+> +	while ((nbytes = walk.nbytes)) {
+> +		op->src = walk.src.virt.addr;
+> +		memcpy(kbuf + src_data, op->src, nbytes);
+> +		src_data = src_data + nbytes;
+> +		nbytes &= (ZYNQMP_AES_BLOCKSIZE - 1);
+> +		err = blkcipher_walk_done(desc, &walk, nbytes);
+> +	}
+> +	memcpy(kbuf + data_size, op->iv, ZYNQMP_AES_IV_SIZE);
+> +	abuf->src = dma_addr;
+> +	abuf->dst = dma_addr;
+> +	abuf->iv = abuf->src + data_size;
+> +	abuf->size = data_size - ZYNQMP_AES_GCM_SIZE;
+> +	abuf->optype = flags;
+> +	abuf->keysrc = op->keytype;
+> +
+> +	if (op->keytype == ZYNQMP_AES_KUP_KEY) {
+> +		memcpy(kbuf + data_size + ZYNQMP_AES_IV_SIZE,
+> +		       op->key, ZYNQMP_AES_KEY_SIZE);
+> +
+> +		abuf->key = abuf->src + data_size + ZYNQMP_AES_IV_SIZE;
+> +	} else {
+> +		abuf->key = 0;
+> +	}
+> +	eemi_ops->aes(dma_addr_buf, &ret);
+> +
+> +	if (ret != 0) {
+> +		switch (ret) {
+> +		case ZYNQMP_AES_GCM_TAG_MISMATCH_ERR:
+> +			dev_err(dd->dev, "ERROR: Gcm Tag mismatch\n\r");
+> +			break;
+> +		case ZYNQMP_AES_SIZE_ERR:
+> +			dev_err(dd->dev, "ERROR : Non word aligned data\n\r");
+> +			break;
+> +		case ZYNQMP_AES_WRONG_KEY_SRC_ERR:
+> +			dev_err(dd->dev, "ERROR: Wrong KeySrc, enable secure mode\n\r");
+> +			break;
+> +		case ZYNQMP_AES_PUF_NOT_PROGRAMMED:
+> +			dev_err(dd->dev, "ERROR: PUF is not registered\r\n");
+> +			break;
+> +		default:
+> +			dev_err(dd->dev, "ERROR: Invalid");
+> +			break;
+> +		}
+> +		goto END;
+> +	}
+> +	if (flags)
+> +		copy_bytes = data_size;
+> +	else
+> +		copy_bytes = data_size - ZYNQMP_AES_GCM_SIZE;
+> +
+> +	blkcipher_walk_init(&walk, dst, src, copy_bytes);
+> +	err = blkcipher_walk_virt(desc, &walk);
+> +
+> +	while ((nbytes = walk.nbytes)) {
+> +		memcpy(walk.dst.virt.addr, kbuf + dst_data, nbytes);
+> +		dst_data = dst_data + nbytes;
+> +		nbytes &= (ZYNQMP_AES_BLOCKSIZE - 1);
+> +		err = blkcipher_walk_done(desc, &walk, nbytes);
+> +	}
+> +END:
+> +	dma_free_coherent(dd->dev, dma_size, kbuf, dma_addr);
+> +	dma_free_coherent(dd->dev, sizeof(struct zynqmp_aes_data),
+> +			  abuf, dma_addr_buf);
 
-Ok, will directly pass NULL here.
+You should erase the key/IV from the bounce buffer.
 
->
-> > +     if (rc < 0)
-> > +             goto out_sess;
-> > +
-> > +     device_shm = tee_shm_alloc(ctx, shm_size,
-> > +                                TEE_SHM_MAPPED | TEE_SHM_DMA_BUF);
-> > +     if (IS_ERR(device_shm)) {
-> > +             pr_err("tee_shm_alloc failed\n");
-> > +             rc = PTR_ERR(device_shm);
-> > +             goto out_sess;
-> > +     }
-> > +
-> > +     rc = get_devices(ctx, sess_arg.session, device_shm, &shm_size);
-> > +     if (rc < 0)
-> > +             goto out_shm;
-> > +
-> > +     device_uuid = tee_shm_get_va(device_shm, 0);
-> > +     if (IS_ERR(device_uuid)) {
-> > +             pr_err("tee_shm_get_va failed\n");
-> > +             rc = PTR_ERR(device_uuid);
-> > +             goto out_shm;
-> > +     }
-> > +
-> > +     while (idx < shm_size / sizeof(uuid_t)) {
->
-> This is a very uncommon way to write a for loop ;-).
->
+> +	return err;
+> +}
+> +
+> +static int zynqmp_aes_decrypt(struct blkcipher_desc *desc,
+> +			      struct scatterlist *dst,
+> +			      struct scatterlist *src,
+> +			      unsigned int nbytes)
+> +{
+> +	return zynqmp_aes_xcrypt(desc, dst, src, nbytes, ZYNQMP_AES_DECRYPT);
+> +}
+> +
+> +static int zynqmp_aes_encrypt(struct blkcipher_desc *desc,
+> +			      struct scatterlist *dst,
+> +			      struct scatterlist *src,
+> +			      unsigned int nbytes)
+> +{
+> +	return zynqmp_aes_xcrypt(desc, dst, src, nbytes, ZYNQMP_AES_ENCRYPT);
+> +}
+> +
+> +static struct crypto_alg zynqmp_alg = {
+> +	.cra_name		=	"xilinx-zynqmp-aes",
+> +	.cra_driver_name	=	"zynqmp-aes",
 
-Ok, will add "num_devices" variable.
+Since the driver is for GCM, GCM must appear in the name
 
--Sumit
+> +	.cra_priority		=	400,
+> +	.cra_flags		=	CRYPTO_ALG_TYPE_BLKCIPHER |
+> +					CRYPTO_ALG_KERN_DRIVER_ONLY,
+> +	.cra_blocksize		=	ZYNQMP_AES_BLOCKSIZE,
+> +	.cra_ctxsize		=	sizeof(struct zynqmp_aes_op),
+> +	.cra_alignmask		=	15,
+> +	.cra_type		=	&crypto_blkcipher_type,
+> +	.cra_module		=	THIS_MODULE,
+> +	.cra_u			=	{
+> +	.blkcipher	=	{
+> +			.min_keysize	=	0,
+> +			.max_keysize	=	ZYNQMP_AES_KEY_SIZE,
+> +			.setkey		=	zynqmp_setkey_blk,
+> +			.setkeytype	=	zynqmp_setkeytype,
+> +			.encrypt	=	zynqmp_aes_encrypt,
+> +			.decrypt	=	zynqmp_aes_decrypt,
+> +			.ivsize		=	ZYNQMP_AES_IV_SIZE,
+> +		}
+> +	}
+> +};
+> +
+> +static const struct of_device_id zynqmp_aes_dt_ids[] = {
+> +	{ .compatible = "xlnx,zynqmp-aes" },
+> +	{ /* sentinel */ }
+> +};
+> +MODULE_DEVICE_TABLE(of, zynqmp_aes_dt_ids);
+> +
+> +static int zynqmp_aes_probe(struct platform_device *pdev)
+> +{
+> +	struct zynqmp_aes_dev *aes_dd;
+> +	struct device *dev = &pdev->dev;
+> +	int ret;
+> +
+> +	aes_dd = devm_kzalloc(dev, sizeof(*aes_dd), GFP_KERNEL);
+> +	if (!aes_dd)
+> +		return -ENOMEM;
+> +
+> +	aes_dd->dev = dev;
+> +	platform_set_drvdata(pdev, aes_dd);
+> +
+> +	ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(44));
+> +	if (ret < 0) {
+> +		dev_err(dev, "no usable DMA configuration");
+> +		return ret;
+> +	}
+> +
+> +	INIT_LIST_HEAD(&aes_dd->list);
+> +	crypto_init_queue(&aes_dd->queue, ZYNQMP_AES_QUEUE_LENGTH);
+> +	list_add_tail(&aes_dd->list, &zynqmp_aes.dev_list);
+> +
 
->
-> > +             rc = optee_register_device(&device_uuid[idx], idx);
-> > +             if (rc)
-> > +                     goto out_shm;
-> > +             idx++;
-> > +     }
-> > +
-> > +out_shm:
-> > +     tee_shm_free(device_shm);
-> > +out_sess:
-> > +     tee_client_close_session(ctx, sess_arg.session);
-> > +out_ctx:
-> > +     tee_client_close_context(ctx);
-> > +
-> > +     return rc;
-> > +}
-> > diff --git a/drivers/tee/optee/optee_private.h b/drivers/tee/optee/optee_private.h
-> > index 35e7938..a5e84af 100644
-> > --- a/drivers/tee/optee/optee_private.h
-> > +++ b/drivers/tee/optee/optee_private.h
-> > @@ -28,6 +28,7 @@
-> >  #define TEEC_ERROR_BAD_PARAMETERS    0xFFFF0006
-> >  #define TEEC_ERROR_COMMUNICATION     0xFFFF000E
-> >  #define TEEC_ERROR_OUT_OF_MEMORY     0xFFFF000C
-> > +#define TEEC_ERROR_SHORT_BUFFER              0xFFFF0010
-> >
-> >  #define TEEC_ORIGIN_COMMS            0x00000002
-> >
-> > @@ -181,6 +182,8 @@ void optee_free_pages_list(void *array, size_t num_entries);
-> >  void optee_fill_pages_list(u64 *dst, struct page **pages, int num_pages,
-> >                          size_t page_offset);
-> >
-> > +int optee_enumerate_devices(void);
-> > +
-> >  /*
-> >   * Small helpers
-> >   */
-> > --
-> > 2.7.4
-> >
+Same problem than the SHA3 driver, you init a queue without never using it.
+And same problem for device list that seems useless at all in the current situation.
+
+Regards
