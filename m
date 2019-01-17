@@ -1,190 +1,403 @@
-Return-Path: <SRS0=g5s/=PY=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mo4-p02-ob.smtp.rzone.de ([85.215.255.80]:34072 "EHLO
-        mo4-p02-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389696AbfAPLLt (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 16 Jan 2019 06:11:49 -0500
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Eric Biggers <ebiggers@kernel.org>,
-        James Bottomley <James.Bottomley@hansenpartnership.com>,
-        Andy Lutomirski <luto@amacapital.net>,
-        "Lee, Chun-Yi" <joeyli.kernel@gmail.com>,
-        "Rafael J . Wysocki" <rjw@rjwysocki.net>,
-        Pavel Machek <pavel@ucw.cz>, linux-kernel@vger.kernel.org,
-        linux-pm@vger.kernel.org, keyrings@vger.kernel.org,
-        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-        Chen Yu <yu.c.chen@intel.com>,
-        Oliver Neukum <oneukum@suse.com>,
-        Ryan Chen <yu.chen.surf@gmail.com>,
-        David Howells <dhowells@redhat.com>,
-        Giovanni Gherdovich <ggherdovich@suse.cz>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Jann Horn <jannh@google.com>,
-        Andy Lutomirski <luto@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH v2 5/6] crypto: hkdf - add known answer tests
-Date: Wed, 16 Jan 2019 12:09:11 +0100
-Message-ID: <2443102.TZCsN2CrQ3@positron.chronox.de>
-In-Reply-To: <2082192.jPI8ve1O8G@positron.chronox.de>
-References: <20190103143227.9138-1-jlee@suse.com> <9733066.Vrs4h5eWcW@positron.chronox.de> <2082192.jPI8ve1O8G@positron.chronox.de>
+Return-Path: <SRS0=b5ak=PZ=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-eopbgr820052.outbound.protection.outlook.com ([40.107.82.52]:49856
+        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729597AbfAQHCr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 17 Jan 2019 02:02:47 -0500
+From: Kalyani Akula <kalyani.akula@xilinx.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: Kalyani Akula <kalyania@xilinx.com>,
+        Sarat Chand Savitala <saratcha@xilinx.com>,
+        Kalyani Akula <kalyani.akula@xilinx.com>
+Subject: [RFC PATCH 5/5] crypto: Add Xilinx AES driver
+Date: Thu, 17 Jan 2019 12:32:21 +0530
+Message-ID: <1547708541-23730-6-git-send-email-kalyani.akula@xilinx.com>
+In-Reply-To: <1547708541-23730-1-git-send-email-kalyani.akula@xilinx.com>
+References: <1547708541-23730-1-git-send-email-kalyani.akula@xilinx.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Add known answer tests to the testmgr for the HKDF (RFC5869) cipher.
+This patch adds AES driver support for the Xilinx
+ZynqMP SoC.
 
-The known answer tests are derived from RFC 5869 appendix A.
-
-Note, the HKDF is considered to be a FIPS 140-2 allowed (not approved)
-cipher as of now. Yet, an allowed cipher is usable under FIPS 140-2
-rules.
-
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
+Signed-off-by: Kalyani Akula <kalyani.akula@xilinx.com>
 ---
- crypto/testmgr.c | 26 ++++++++++++++
- crypto/testmgr.h | 91 ++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 117 insertions(+)
+ drivers/crypto/Kconfig      |  11 ++
+ drivers/crypto/Makefile     |   1 +
+ drivers/crypto/zynqmp-aes.c | 331 ++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 343 insertions(+)
+ create mode 100644 drivers/crypto/zynqmp-aes.c
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 309819af55d8..0b06721a70df 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -3189,6 +3189,32 @@ static const struct alg_test_desc alg_test_descs[] = {
- 		.suite = {
- 			.hash = __VECS(ghash_tv_template)
- 		}
-+	}, {
-+		.alg = "hkdf(hmac(sha1))",
-+		.test = alg_test_kdf,
-+		.fips_allowed = 1,
-+		.suite = {
-+			.kdf = __VECS(hkdf_hmac_sha1_tv_template)
-+		}
-+	}, {
-+		.alg = "hkdf(hmac(sha224))",
-+		.test = alg_test_null,
-+		.fips_allowed = 1,
-+	}, {
-+		.alg = "hkdf(hmac(sha256))",
-+		.test = alg_test_kdf,
-+		.fips_allowed = 1,
-+		.suite = {
-+			.kdf = __VECS(hkdf_hmac_sha256_tv_template)
-+		}
-+	}, {
-+		.alg = "hkdf(hmac(sha384))",
-+		.test = alg_test_null,
-+		.fips_allowed = 1,
-+	}, {
-+		.alg = "hkdf(hmac(sha512))",
-+		.test = alg_test_null,
-+		.fips_allowed = 1,
- 	}, {
- 		.alg = "hmac(md5)",
- 		.test = alg_test_hash,
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 65fe3d4ef082..7ffff184fba2 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -27999,6 +27999,97 @@ static const struct kdf_testvec kdf_dpi_hmac_sha256_tv_template[] = {
- 	}
- };
+diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+index 5a90075..66d9faa 100644
+--- a/drivers/crypto/Kconfig
++++ b/drivers/crypto/Kconfig
+@@ -667,6 +667,17 @@ config CRYPTO_DEV_ROCKCHIP
+ 	  This driver interfaces with the hardware crypto accelerator.
+ 	  Supporting cbc/ecb chainmode, and aes/des/des3_ede cipher mode.
  
-+/* Test vectors from RFC 5869 appendix A */
-+static const struct kdf_testvec hkdf_hmac_sha256_tv_template[] = {
-+	{
-+		.K1 =
-+#ifdef __LITTLE_ENDIAN
-+			"\x0d\x00\x00\x00"		/* salt length */
-+#else
-+			"\x00\x00\x00\x0d"		/* salt length */
-+#endif
-+			"\x00\x01\x02\x03\x04\x05\x06\x07"
-+			"\x08\x09\x0a\x0b\x0c"		/* salt */
-+			"\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b"
-+			"\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b"
-+			"\x0b\x0b\x0b\x0b\x0b\x0b",	/* IKM */
-+		.K1len = 39,
-+		.context =
-+			"\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7"
-+			"\xf8\xf9",
-+		.contextlen = 10,
-+		.expected =
-+			"\x3c\xb2\x5f\x25\xfa\xac\xd5\x7a"
-+			"\x90\x43\x4f\x64\xd0\x36\x2f\x2a"
-+			"\x2d\x2d\x0a\x90\xcf\x1a\x5a\x4c"
-+			"\x5d\xb0\x2d\x56\xec\xc4\xc5\xbf"
-+			"\x34\x00\x72\x08\xd5\xb8\x87\x18"
-+			"\x58\x65",
-+		.expectedlen = 42
-+	}, {
-+		.K1 =	"\x00\x00\x00\x00"		/* salt length */
-+			"\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b"
-+			"\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b"
-+			"\x0b\x0b\x0b\x0b\x0b\x0b",	/* IKM */
-+		.K1len = 26,
-+		.context = NULL,
-+		.contextlen = 0,
-+		.expected =
-+			"\x8d\xa4\xe7\x75\xa5\x63\xc1\x8f"
-+			"\x71\x5f\x80\x2a\x06\x3c\x5a\x31"
-+			"\xb8\xa1\x1f\x5c\x5e\xe1\x87\x9e"
-+			"\xc3\x45\x4e\x5f\x3c\x73\x8d\x2d"
-+			"\x9d\x20\x13\x95\xfa\xa4\xb6\x1a"
-+			"\x96\xc8",
-+		.expectedlen = 42
++config CRYPTO_DEV_ZYNQMP_AES
++	tristate "Support for Xilinx ZynqMP AES hw accelerator"
++	depends on ARCH_ZYNQMP || COMPILE_TEST
++	select CRYPTO_AES
++	select CRYPTO_BLKCIPHER
++	help
++	  Xilinx ZynqMP has AES-GCM engine used for symmetric key
++	  encryption and decryption. This driver interfaces with AES hw
++	  accelerator. Select this if you want to use the ZynqMP module
++	  for AES algorithms.
++
+ config CRYPTO_DEV_MEDIATEK
+ 	tristate "MediaTek's EIP97 Cryptographic Engine driver"
+ 	depends on (ARM && ARCH_MEDIATEK) || COMPILE_TEST
+diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
+index 8e7e225..991b343 100644
+--- a/drivers/crypto/Makefile
++++ b/drivers/crypto/Makefile
+@@ -47,3 +47,4 @@ obj-$(CONFIG_CRYPTO_DEV_BCM_SPU) += bcm/
+ obj-$(CONFIG_CRYPTO_DEV_SAFEXCEL) += inside-secure/
+ obj-$(CONFIG_CRYPTO_DEV_ARTPEC6) += axis/
+ obj-y += hisilicon/
++obj-$(CONFIG_CRYPTO_DEV_ZYNQMP_AES) += zynqmp-aes.o
+diff --git a/drivers/crypto/zynqmp-aes.c b/drivers/crypto/zynqmp-aes.c
+new file mode 100644
+index 0000000..3a38d2d
+--- /dev/null
++++ b/drivers/crypto/zynqmp-aes.c
+@@ -0,0 +1,331 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Xilinx ZynqMP AES Driver.
++ * Copyright (c) 2018 Xilinx Inc.
++ */
++
++#include <crypto/aes.h>
++#include <crypto/scatterwalk.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <linux/of_device.h>
++#include <linux/scatterlist.h>
++#include <linux/spinlock.h>
++#include <linux/firmware/xlnx-zynqmp.h>
++
++#define ZYNQMP_AES_QUEUE_LENGTH			1
++#define ZYNQMP_AES_IV_SIZE			12
++#define ZYNQMP_AES_GCM_SIZE			16
++#define ZYNQMP_AES_KEY_SIZE			32
++
++#define ZYNQMP_AES_DECRYPT			0
++#define ZYNQMP_AES_ENCRYPT			1
++
++#define ZYNQMP_AES_KUP_KEY			0
++
++#define ZYNQMP_AES_GCM_TAG_MISMATCH_ERR		0x01
++#define ZYNQMP_AES_SIZE_ERR			0x06
++#define ZYNQMP_AES_WRONG_KEY_SRC_ERR		0x13
++#define ZYNQMP_AES_PUF_NOT_PROGRAMMED		0xE300
++
++#define ZYNQMP_AES_BLOCKSIZE			0x04
++
++struct zynqmp_aes_dev {
++	struct list_head list;
++	struct device *dev;
++	/* the lock protects queue and dev list */
++	spinlock_t lock;
++	struct crypto_queue queue;
++};
++
++struct zynqmp_aes_op {
++	struct zynqmp_aes_dev *dd;
++	void *src;
++	void *dst;
++	int len;
++	u8 key[ZYNQMP_AES_KEY_SIZE];
++	u8 *iv;
++	u32 keylen;
++	u32 keytype;
++};
++
++struct zynqmp_aes_data {
++	u64 src;
++	u64 iv;
++	u64 key;
++	u64 dst;
++	u64 size;
++	u64 optype;
++	u64 keysrc;
++};
++
++struct zynqmp_aes_drv {
++	struct list_head dev_list;
++	/* the lock protects dev list */
++	spinlock_t lock;
++};
++
++static struct zynqmp_aes_drv zynqmp_aes = {
++	.dev_list = LIST_HEAD_INIT(zynqmp_aes.dev_list),
++	.lock = __SPIN_LOCK_UNLOCKED(zynqmp_aes.lock),
++};
++
++static struct zynqmp_aes_dev *zynqmp_aes_find_dev(struct zynqmp_aes_op *ctx)
++{
++	struct zynqmp_aes_dev *aes_dd = NULL;
++	struct zynqmp_aes_dev *tmp;
++
++	spin_lock_bh(&zynqmp_aes.lock);
++	if (!ctx->dd) {
++		list_for_each_entry(tmp, &zynqmp_aes.dev_list, list) {
++			aes_dd = tmp;
++			break;
++		}
++		ctx->dd = aes_dd;
++	} else {
++		aes_dd = ctx->dd;
++	}
++	spin_unlock_bh(&zynqmp_aes.lock);
++
++	return aes_dd;
++}
++
++static int zynqmp_setkey_blk(struct crypto_tfm *tfm, const u8 *key,
++			     unsigned int len)
++{
++	struct zynqmp_aes_op *op = crypto_tfm_ctx(tfm);
++
++	op->keylen = len;
++	memcpy(op->key, key, len);
++
++	return 0;
++}
++
++static int zynqmp_setkeytype(struct crypto_tfm *tfm, const u8 *keytype,
++			     unsigned int len)
++{
++	struct zynqmp_aes_op *op = crypto_tfm_ctx(tfm);
++
++	op->keytype = (u32)(*keytype);
++
++	return 0;
++}
++
++static int zynqmp_aes_xcrypt(struct blkcipher_desc *desc,
++			     struct scatterlist *dst,
++			     struct scatterlist *src,
++			     unsigned int nbytes,
++			     unsigned int flags)
++{
++	struct zynqmp_aes_op *op = crypto_blkcipher_ctx(desc->tfm);
++	struct zynqmp_aes_dev *dd = zynqmp_aes_find_dev(op);
++	const struct zynqmp_eemi_ops *eemi_ops = zynqmp_pm_get_eemi_ops();
++	int err, ret, copy_bytes, src_data = 0, dst_data = 0;
++	dma_addr_t dma_addr, dma_addr_buf;
++	struct zynqmp_aes_data *abuf;
++	struct blkcipher_walk walk;
++	unsigned int data_size;
++	size_t dma_size;
++	char *kbuf;
++
++	if (!eemi_ops || !eemi_ops->aes)
++		return -ENOTSUPP;
++
++	if (op->keytype == ZYNQMP_AES_KUP_KEY)
++		dma_size = nbytes + ZYNQMP_AES_KEY_SIZE
++			+ ZYNQMP_AES_IV_SIZE;
++	else
++		dma_size = nbytes + ZYNQMP_AES_IV_SIZE;
++
++	kbuf = dma_alloc_coherent(dd->dev, dma_size, &dma_addr, GFP_KERNEL);
++	if (!kbuf)
++		return -ENOMEM;
++
++	abuf = dma_alloc_coherent(dd->dev, sizeof(struct zynqmp_aes_data),
++				  &dma_addr_buf, GFP_KERNEL);
++	if (!abuf) {
++		dma_free_coherent(dd->dev, dma_size, kbuf, dma_addr);
++		return -ENOMEM;
++	}
++
++	data_size = nbytes;
++	blkcipher_walk_init(&walk, dst, src, data_size);
++	err = blkcipher_walk_virt(desc, &walk);
++	op->iv = walk.iv;
++
++	while ((nbytes = walk.nbytes)) {
++		op->src = walk.src.virt.addr;
++		memcpy(kbuf + src_data, op->src, nbytes);
++		src_data = src_data + nbytes;
++		nbytes &= (ZYNQMP_AES_BLOCKSIZE - 1);
++		err = blkcipher_walk_done(desc, &walk, nbytes);
++	}
++	memcpy(kbuf + data_size, op->iv, ZYNQMP_AES_IV_SIZE);
++	abuf->src = dma_addr;
++	abuf->dst = dma_addr;
++	abuf->iv = abuf->src + data_size;
++	abuf->size = data_size - ZYNQMP_AES_GCM_SIZE;
++	abuf->optype = flags;
++	abuf->keysrc = op->keytype;
++
++	if (op->keytype == ZYNQMP_AES_KUP_KEY) {
++		memcpy(kbuf + data_size + ZYNQMP_AES_IV_SIZE,
++		       op->key, ZYNQMP_AES_KEY_SIZE);
++
++		abuf->key = abuf->src + data_size + ZYNQMP_AES_IV_SIZE;
++	} else {
++		abuf->key = 0;
++	}
++	eemi_ops->aes(dma_addr_buf, &ret);
++
++	if (ret != 0) {
++		switch (ret) {
++		case ZYNQMP_AES_GCM_TAG_MISMATCH_ERR:
++			dev_err(dd->dev, "ERROR: Gcm Tag mismatch\n\r");
++			break;
++		case ZYNQMP_AES_SIZE_ERR:
++			dev_err(dd->dev, "ERROR : Non word aligned data\n\r");
++			break;
++		case ZYNQMP_AES_WRONG_KEY_SRC_ERR:
++			dev_err(dd->dev, "ERROR: Wrong KeySrc, enable secure mode\n\r");
++			break;
++		case ZYNQMP_AES_PUF_NOT_PROGRAMMED:
++			dev_err(dd->dev, "ERROR: PUF is not registered\r\n");
++			break;
++		default:
++			dev_err(dd->dev, "ERROR: Invalid");
++			break;
++		}
++		goto END;
++	}
++	if (flags)
++		copy_bytes = data_size;
++	else
++		copy_bytes = data_size - ZYNQMP_AES_GCM_SIZE;
++
++	blkcipher_walk_init(&walk, dst, src, copy_bytes);
++	err = blkcipher_walk_virt(desc, &walk);
++
++	while ((nbytes = walk.nbytes)) {
++		memcpy(walk.dst.virt.addr, kbuf + dst_data, nbytes);
++		dst_data = dst_data + nbytes;
++		nbytes &= (ZYNQMP_AES_BLOCKSIZE - 1);
++		err = blkcipher_walk_done(desc, &walk, nbytes);
++	}
++END:
++	dma_free_coherent(dd->dev, dma_size, kbuf, dma_addr);
++	dma_free_coherent(dd->dev, sizeof(struct zynqmp_aes_data),
++			  abuf, dma_addr_buf);
++	return err;
++}
++
++static int zynqmp_aes_decrypt(struct blkcipher_desc *desc,
++			      struct scatterlist *dst,
++			      struct scatterlist *src,
++			      unsigned int nbytes)
++{
++	return zynqmp_aes_xcrypt(desc, dst, src, nbytes, ZYNQMP_AES_DECRYPT);
++}
++
++static int zynqmp_aes_encrypt(struct blkcipher_desc *desc,
++			      struct scatterlist *dst,
++			      struct scatterlist *src,
++			      unsigned int nbytes)
++{
++	return zynqmp_aes_xcrypt(desc, dst, src, nbytes, ZYNQMP_AES_ENCRYPT);
++}
++
++static struct crypto_alg zynqmp_alg = {
++	.cra_name		=	"xilinx-zynqmp-aes",
++	.cra_driver_name	=	"zynqmp-aes",
++	.cra_priority		=	400,
++	.cra_flags		=	CRYPTO_ALG_TYPE_BLKCIPHER |
++					CRYPTO_ALG_KERN_DRIVER_ONLY,
++	.cra_blocksize		=	ZYNQMP_AES_BLOCKSIZE,
++	.cra_ctxsize		=	sizeof(struct zynqmp_aes_op),
++	.cra_alignmask		=	15,
++	.cra_type		=	&crypto_blkcipher_type,
++	.cra_module		=	THIS_MODULE,
++	.cra_u			=	{
++	.blkcipher	=	{
++			.min_keysize	=	0,
++			.max_keysize	=	ZYNQMP_AES_KEY_SIZE,
++			.setkey		=	zynqmp_setkey_blk,
++			.setkeytype	=	zynqmp_setkeytype,
++			.encrypt	=	zynqmp_aes_encrypt,
++			.decrypt	=	zynqmp_aes_decrypt,
++			.ivsize		=	ZYNQMP_AES_IV_SIZE,
++		}
 +	}
 +};
 +
-+/* Test vectors from RFC 5869 appendix A */
-+static const struct kdf_testvec hkdf_hmac_sha1_tv_template[] = {
-+	{
-+		.K1 =
-+#ifdef __LITTLE_ENDIAN
-+			"\x0d\x00\x00\x00"		/* salt length */
-+#else
-+			"\x00\x00\x00\x0d"		/* salt length */
-+#endif
-+			"\x00\x01\x02\x03\x04\x05\x06\x07"
-+			"\x08\x09\x0a\x0b\x0c"		/* salt */
-+			"\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b"
-+			"\x0b\x0b\x0b",			/* IKM */
-+		.K1len = 28,
-+		.context =
-+			"\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7"
-+			"\xf8\xf9",
-+		.contextlen = 10,
-+		.expected =
-+			"\x08\x5a\x01\xea\x1b\x10\xf3\x69"
-+			"\x33\x06\x8b\x56\xef\xa5\xad\x81"
-+			"\xa4\xf1\x4b\x82\x2f\x5b\x09\x15"
-+			"\x68\xa9\xcd\xd4\xf1\x55\xfd\xa2"
-+			"\xc2\x2e\x42\x24\x78\xd3\x05\xf3"
-+			"\xf8\x96",
-+		.expectedlen = 42
-+	}, {
-+		.K1 =	"\x00\x00\x00\x00"		/* salt length */
-+			"\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b"
-+			"\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b"
-+			"\x0b\x0b\x0b\x0b\x0b\x0b",	/* IKM */
-+		.K1len = 26,
-+		.context = NULL,
-+		.contextlen = 0,
-+		.expected =
-+			"\x0a\xc1\xaf\x70\x02\xb3\xd7\x61"
-+			"\xd1\xe5\x52\x98\xda\x9d\x05\x06"
-+			"\xb9\xae\x52\x05\x72\x20\xa3\x06"
-+			"\xe0\x7b\x6b\x87\xe8\xdf\x21\xd0"
-+			"\xea\x00\x03\x3d\xe0\x39\x84\xd3"
-+			"\x49\x18",
-+		.expectedlen = 42
++static const struct of_device_id zynqmp_aes_dt_ids[] = {
++	{ .compatible = "xlnx,zynqmp-aes" },
++	{ /* sentinel */ }
++};
++MODULE_DEVICE_TABLE(of, zynqmp_aes_dt_ids);
++
++static int zynqmp_aes_probe(struct platform_device *pdev)
++{
++	struct zynqmp_aes_dev *aes_dd;
++	struct device *dev = &pdev->dev;
++	int ret;
++
++	aes_dd = devm_kzalloc(dev, sizeof(*aes_dd), GFP_KERNEL);
++	if (!aes_dd)
++		return -ENOMEM;
++
++	aes_dd->dev = dev;
++	platform_set_drvdata(pdev, aes_dd);
++
++	ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(44));
++	if (ret < 0) {
++		dev_err(dev, "no usable DMA configuration");
++		return ret;
 +	}
++
++	INIT_LIST_HEAD(&aes_dd->list);
++	crypto_init_queue(&aes_dd->queue, ZYNQMP_AES_QUEUE_LENGTH);
++	list_add_tail(&aes_dd->list, &zynqmp_aes.dev_list);
++
++	ret = crypto_register_alg(&zynqmp_alg);
++	if (ret)
++		goto err_algs;
++
++	dev_info(dev, "AES Successfully Registered\n\r");
++	return 0;
++
++err_algs:
++	list_del(&aes_dd->list);
++	dev_err(dev, "initialization failed.\n");
++
++	return ret;
++}
++
++static int zynqmp_aes_remove(struct platform_device *pdev)
++{
++	struct zynqmp_aes_dev *aes_dd;
++
++	aes_dd = platform_get_drvdata(pdev);
++	if (!aes_dd)
++		return -ENODEV;
++	list_del(&aes_dd->list);
++	crypto_unregister_alg(&zynqmp_alg);
++	return 0;
++}
++
++static struct platform_driver xilinx_aes_driver = {
++	.probe = zynqmp_aes_probe,
++	.remove = zynqmp_aes_remove,
++	.driver = {
++		.name = "zynqmp_aes",
++		.of_match_table = of_match_ptr(zynqmp_aes_dt_ids),
++	},
 +};
 +
- /* Cast5 test vectors from RFC 2144 */
- static const struct cipher_testvec cast5_tv_template[] = {
- 	{
++module_platform_driver(xilinx_aes_driver);
++
++MODULE_DESCRIPTION("Xilinx ZynqMP AES hw acceleration support.");
++MODULE_LICENSE("GPL v2");
++MODULE_AUTHOR("Nava kishore Manne <nava.manne@xilinx.com>");
++MODULE_AUTHOR("Kalyani Akula <kalyani.akula@xilinx.com>");
 -- 
-2.20.1
+1.9.5
