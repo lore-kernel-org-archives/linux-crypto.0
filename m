@@ -1,57 +1,99 @@
-Return-Path: <SRS0=Z4qA=PO=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-ua1-f67.google.com ([209.85.222.67]:42018 "EHLO
-        mail-ua1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726079AbfAFKjL (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 6 Jan 2019 05:39:11 -0500
-Received: by mail-ua1-f67.google.com with SMTP id d21so13317908uap.9
-        for <linux-crypto@vger.kernel.org>; Sun, 06 Jan 2019 02:39:09 -0800 (PST)
+Return-Path: <SRS0=b5ak=PZ=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2249 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728333AbfAQGsw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 17 Jan 2019 01:48:52 -0500
+From: Xiongfeng Wang <wangxiongfeng2@huawei.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <ebiggers@kernel.org>
+CC: <wangxiongfeng2@huawei.com>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <broonie@kernel.org>,
+        <ard.biesheuvel@linaro.org>, <jonathan.cameron@huawei.com>
+Subject: [PATCH V2 4/5] crypto: ctr - use template array registering API to simplify the code
+Date: Thu, 17 Jan 2019 14:48:02 +0800
+Message-ID: <1547707683-45878-5-git-send-email-wangxiongfeng2@huawei.com>
+In-Reply-To: <1547707683-45878-1-git-send-email-wangxiongfeng2@huawei.com>
+References: <1547707683-45878-1-git-send-email-wangxiongfeng2@huawei.com>
 MIME-Version: 1.0
-References: <20190104041625.3259-1-ebiggers@kernel.org> <20190104041625.3259-4-ebiggers@kernel.org>
-In-Reply-To: <20190104041625.3259-4-ebiggers@kernel.org>
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-Date: Sun, 6 Jan 2019 12:38:57 +0200
-Message-ID: <CAOtvUMchF-g7SCG4OZtg4jGKue6XBGGF+HsW3Hr5bsL_aEnwhQ@mail.gmail.com>
-Subject: Re: [PATCH 03/16] crypto: ofb - fix handling partial blocks and make thread-safe
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jan 4, 2019 at 6:20 AM Eric Biggers <ebiggers@kernel.org> wrote:
->
-> From: Eric Biggers <ebiggers@google.com>
->
-> Fix multiple bugs in the OFB implementation:
->
-> 1. It stored the per-request state 'cnt' in the tfm context, which can be
->    used by multiple threads concurrently (e.g. via AF_ALG).
-> 2. It didn't support messages not a multiple of the block cipher size,
->    despite being a stream cipher.
-> 3. It didn't set cra_blocksize to 1 to indicate it is a stream cipher.
->
-> To fix these, set the 'chunksize' property to the cipher block size to
-> guarantee that when walking through the scatterlist, a partial block can
-> only occur at the end.  Then change the implementation to XOR a block at
-> a time at first, then XOR the partial block at the end if needed.  This
-> is the same way CTR and CFB are implemented.  As a bonus, this also
-> improves performance in most cases over the current approach.
+Use crypto template array registering API to simplify the code.
 
+Signed-off-by: Xiongfeng Wang <xiongfeng.wang@linaro.org>
+---
+ crypto/ctr.c | 43 +++++++++++++++----------------------------
+ 1 file changed, 15 insertions(+), 28 deletions(-)
 
-Well, it certainly looks like my implementation had a lot of room for
-improvement :-)
-Thank you for doing this, Eric
-
-Reviewed-by: Gilad Ben-Yossef <gilad@benyossef.com>
-
-Gilad
-
---=20
-Gilad Ben-Yossef
-Chief Coffee Drinker
-
-values of =CE=B2 will give rise to dom!
+diff --git a/crypto/ctr.c b/crypto/ctr.c
+index 4c743a9..d9f9d65 100644
+--- a/crypto/ctr.c
++++ b/crypto/ctr.c
+@@ -171,12 +171,6 @@ static int crypto_ctr_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 	return err;
+ }
+ 
+-static struct crypto_template crypto_ctr_tmpl = {
+-	.name = "ctr",
+-	.create = crypto_ctr_create,
+-	.module = THIS_MODULE,
+-};
+-
+ static int crypto_rfc3686_setkey(struct crypto_skcipher *parent,
+ 				 const u8 *key, unsigned int keylen)
+ {
+@@ -366,36 +360,29 @@ static int crypto_rfc3686_create(struct crypto_template *tmpl,
+ 	goto out;
+ }
+ 
+-static struct crypto_template crypto_rfc3686_tmpl = {
+-	.name = "rfc3686",
+-	.create = crypto_rfc3686_create,
+-	.module = THIS_MODULE,
++static struct crypto_template crypto_ctr_tmpls[] = {
++	{
++		.name = "ctr",
++		.create = crypto_ctr_create,
++		.module = THIS_MODULE,
++	}, {
++		.name = "rfc3686",
++		.create = crypto_rfc3686_create,
++		.module = THIS_MODULE,
++	},
+ };
+ 
++
+ static int __init crypto_ctr_module_init(void)
+ {
+-	int err;
+-
+-	err = crypto_register_template(&crypto_ctr_tmpl);
+-	if (err)
+-		goto out;
+-
+-	err = crypto_register_template(&crypto_rfc3686_tmpl);
+-	if (err)
+-		goto out_drop_ctr;
+-
+-out:
+-	return err;
+-
+-out_drop_ctr:
+-	crypto_unregister_template(&crypto_ctr_tmpl);
+-	goto out;
++	return crypto_register_templates(crypto_ctr_tmpls,
++					 ARRAY_SIZE(crypto_ctr_tmpls));
+ }
+ 
+ static void __exit crypto_ctr_module_exit(void)
+ {
+-	crypto_unregister_template(&crypto_rfc3686_tmpl);
+-	crypto_unregister_template(&crypto_ctr_tmpl);
++	crypto_unregister_templates(crypto_ctr_tmpls,
++				    ARRAY_SIZE(crypto_ctr_tmpls));
+ }
+ 
+ module_init(crypto_ctr_module_init);
+-- 
+1.7.12.4
