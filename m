@@ -1,51 +1,35 @@
-Return-Path: <SRS0=b7+G=PP=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-eopbgr820052.outbound.protection.outlook.com ([40.107.82.52]:9036
-        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726651AbfAGJDP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Jan 2019 04:03:15 -0500
-From: Kalyani Akula <kalyani.akula@xilinx.com>
-To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: Kalyani Akula <kalyania@xilinx.com>,
-        Sarat Chand Savitala <saratcha@xilinx.com>,
-        Kalyani Akula <kalyani.akula@xilinx.com>
-Subject: [RFC PATCH 1/3] dt-bindings: crypto: Add bindings for ZynqMP SHA3 driver
-Date: Mon, 7 Jan 2019 14:32:54 +0530
-Message-ID: <1546851776-3456-2-git-send-email-kalyani.akula@xilinx.com>
-In-Reply-To: <1546851776-3456-1-git-send-email-kalyani.akula@xilinx.com>
-References: <1546851776-3456-1-git-send-email-kalyani.akula@xilinx.com>
+Return-Path: <SRS0=b5ak=PZ=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from blitzresults.com ([185.244.39.76]:48962 "EHLO primodoors.com"
+        rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726913AbfAQOx7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 17 Jan 2019 09:53:59 -0500
+To: linux-crypto@vger.kernel.org
+Subject: Photos shooting and retouching
+Message-ID: <995be4255cc954571219d0e5f41dc1a3@arboristarlingtontx.com>
+Date: Thu, 17 Jan 2019 11:03:14 +0100
+From: "Lena" <kasantdxeiscsuiter@mail.fr>
+Reply-To: ganmanten@sina.com
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; format=flowed; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Add documentation to describe Xilinx ZynqMP SHA3 driver
-bindings.
+Do you need to shoot photos for your products including editing?
+We are the photo studio who can help you to edit your photos or take care
+of the photo shooting for you,
 
-Signed-off-by: Kalyani Akula <kalyani.akula@xilinx.com>
----
- .../devicetree/bindings/crypto/zynqmp-sha.txt      |   12 ++++++++++++
- 1 files changed, 12 insertions(+), 0 deletions(-)
- create mode 100755 Documentation/devicetree/bindings/crypto/zynqmp-sha.txt
+You ship – We shoot
+White background
+Retouching included
+Optimized for Shopify
+Revisions accepted
 
-diff --git a/Documentation/devicetree/bindings/crypto/zynqmp-sha.txt b/Documentation/devicetree/bindings/crypto/zynqmp-sha.txt
-new file mode 100755
-index 0000000..c7be6e2
---- /dev/null
-+++ b/Documentation/devicetree/bindings/crypto/zynqmp-sha.txt
-@@ -0,0 +1,12 @@
-+Xilinx ZynqMP SHA3(keccak-384) hw acceleration support.
-+
-+The ZynqMp PS-SHA hw accelerator is used to calculate the
-+SHA3(keccak-384) hash value on the given user data.
-+
-+Required properties:
-+- compatible:	should contain "xlnx,zynqmp-keccak-384"
-+
-+Example:
-+	xlnx_keccak_384: sha384 {
-+		compatible = "xlnx,zynqmp-keccak-384";
-+	};
--- 
-1.7.1
+We also provide dedicate editing service for you.
+Such like cutting out, masking, clipping path for your photos, including
+retouching if needed.
+
+Contact us today if need anything.
+
+Thanks,
+Lena
