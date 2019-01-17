@@ -1,47 +1,86 @@
-Return-Path: <SRS0=t27p=PE=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:44702 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729577AbeL0LIG (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 27 Dec 2018 06:08:06 -0500
-Received: by mail-pg1-f193.google.com with SMTP id t13so8673561pgr.11
-        for <linux-crypto@vger.kernel.org>; Thu, 27 Dec 2018 03:08:06 -0800 (PST)
-From: Sumit Garg <sumit.garg@linaro.org>
-To: linux-crypto@vger.kernel.org, devicetree@vger.kernel.org
-Cc: mpm@selenic.com, herbert@gondor.apana.org.au, robh+dt@kernel.org,
-        mark.rutland@arm.com, arnd@arndb.de, gregkh@linuxfoundation.org,
-        jens.wiklander@linaro.org, daniel.thompson@linaro.org,
-        ard.biesheuvel@linaro.org, bhsharma@redhat.com,
-        tee-dev@lists.linaro.org, Sumit Garg <sumit.garg@linaro.org>
-Subject: [PATCH v1 0/2] Add OP-TEE based hwrng driver
-Date: Thu, 27 Dec 2018 16:37:09 +0530
-Message-Id: <1545908831-25910-1-git-send-email-sumit.garg@linaro.org>
+Return-Path: <SRS0=b5ak=PZ=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from szxga06-in.huawei.com ([45.249.212.32]:58994 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728906AbfAQGs5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 17 Jan 2019 01:48:57 -0500
+From: Xiongfeng Wang <wangxiongfeng2@huawei.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <ebiggers@kernel.org>
+CC: <wangxiongfeng2@huawei.com>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <broonie@kernel.org>,
+        <ard.biesheuvel@linaro.org>, <jonathan.cameron@huawei.com>
+Subject: [PATCH V2 5/5] crypto: chacha20poly1305 - use template array registering API to simplify the code
+Date: Thu, 17 Jan 2019 14:48:03 +0800
+Message-ID: <1547707683-45878-6-git-send-email-wangxiongfeng2@huawei.com>
+In-Reply-To: <1547707683-45878-1-git-send-email-wangxiongfeng2@huawei.com>
+References: <1547707683-45878-1-git-send-email-wangxiongfeng2@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On ARM SoC's with TrustZone enabled, peripherals like entropy sources
-might not be accessible to normal world (linux in this case) and rather
-accessible to secure world (OP-TEE in this case) only. So this driver
-aims to provides a generic interface to OP-TEE based random number
-generator service.
+Use crypto template array registering API to simplify the code.
 
-Example case is Developerbox based on Socionext's Synquacer SoC [1]
-which provides 7 thermal sensors accessible from secure world only which
-could be used as entropy sources (thermal/measurement noise).
+Signed-off-by: Xiongfeng Wang <xiongfeng.wang@linaro.org>
+---
+ crypto/chacha20poly1305.c | 37 ++++++++++++++-----------------------
+ 1 file changed, 14 insertions(+), 23 deletions(-)
 
-[1] https://www.96boards.org/product/developerbox/
-
-Sumit Garg (2):
-  dt/bindings: add bindings for optional optee rng-uuid property
-  hwrng: add OP-TEE based rng driver
-
- .../bindings/arm/firmware/linaro,optee-tz.txt      |   4 +
- MAINTAINERS                                        |   5 +
- drivers/char/hw_random/Kconfig                     |  15 ++
- drivers/char/hw_random/Makefile                    |   1 +
- drivers/char/hw_random/optee-rng.c                 | 273 +++++++++++++++++++++
- 5 files changed, 298 insertions(+)
- create mode 100644 drivers/char/hw_random/optee-rng.c
-
+diff --git a/crypto/chacha20poly1305.c b/crypto/chacha20poly1305.c
+index fef1144..ed2e12e 100644
+--- a/crypto/chacha20poly1305.c
++++ b/crypto/chacha20poly1305.c
+@@ -701,37 +701,28 @@ static int rfc7539esp_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 	return chachapoly_create(tmpl, tb, "rfc7539esp", 8);
+ }
+ 
+-static struct crypto_template rfc7539_tmpl = {
+-	.name = "rfc7539",
+-	.create = rfc7539_create,
+-	.module = THIS_MODULE,
+-};
+-
+-static struct crypto_template rfc7539esp_tmpl = {
+-	.name = "rfc7539esp",
+-	.create = rfc7539esp_create,
+-	.module = THIS_MODULE,
++static struct crypto_template rfc7539_tmpls[] = {
++	{
++		.name = "rfc7539",
++		.create = rfc7539_create,
++		.module = THIS_MODULE,
++	}, {
++		.name = "rfc7539esp",
++		.create = rfc7539esp_create,
++		.module = THIS_MODULE,
++	},
+ };
+ 
+ static int __init chacha20poly1305_module_init(void)
+ {
+-	int err;
+-
+-	err = crypto_register_template(&rfc7539_tmpl);
+-	if (err)
+-		return err;
+-
+-	err = crypto_register_template(&rfc7539esp_tmpl);
+-	if (err)
+-		crypto_unregister_template(&rfc7539_tmpl);
+-
+-	return err;
++	return crypto_register_templates(rfc7539_tmpls,
++					 ARRAY_SIZE(rfc7539_tmpls));
+ }
+ 
+ static void __exit chacha20poly1305_module_exit(void)
+ {
+-	crypto_unregister_template(&rfc7539esp_tmpl);
+-	crypto_unregister_template(&rfc7539_tmpl);
++	crypto_unregister_templates(rfc7539_tmpls,
++				    ARRAY_SIZE(rfc7539_tmpls));
+ }
+ 
+ module_init(chacha20poly1305_module_init);
 -- 
-2.7.4
+1.7.12.4
