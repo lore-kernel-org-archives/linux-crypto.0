@@ -1,34 +1,46 @@
-Return-Path: <SRS0=8/la=PM=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from sa136.saturn.dedi.server-hosting.expert ([213.202.222.74]:57772
-        "EHLO carid.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727629AbfADLKr (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Jan 2019 06:10:47 -0500
-To: linux-crypto@vger.kernel.org
-Subject: Question 22
-Message-ID: <49a4c91ceb14b259343440b8b53e3c51@dokan.com>
-Date: Fri, 04 Jan 2019 07:03:21 +0100
-From: "Jessica" <terakintegerpdanlop@orange.fr>
-Reply-To: joshkun@aliyun.com
+Return-Path: <SRS0=b5ak=PZ=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2246 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728158AbfAQGsw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 17 Jan 2019 01:48:52 -0500
+From: Xiongfeng Wang <wangxiongfeng2@huawei.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <ebiggers@kernel.org>
+CC: <wangxiongfeng2@huawei.com>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <broonie@kernel.org>,
+        <ard.biesheuvel@linaro.org>, <jonathan.cameron@huawei.com>
+Subject: [PATCH V2 0/5] Crypto Cleanup
+Date: Thu, 17 Jan 2019 14:47:58 +0800
+Message-ID: <1547707683-45878-1-git-send-email-wangxiongfeng2@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; format=flowed; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Editing for photos. Retouching for photos. Cutting out for photos,
+The patchset introduce a helper to (un)register a array of crypto templates.
+The following patches use this helper to simplify the code. This is also
+a preparation for a coming patchset, which will register several crypto
+templates.
 
-We are a photo team of 20 image editors and we can edit your photos today
-if you need help,
+Changelog:
+v1 -> v2: 
+	rebased to cryptodev, fix some format issue
 
-We mainly work on:
-Clipping path - image cut out
-Shadow creation
-Image masking
-Image retouching
-Beauty model retouching
+Xiongfeng Wang (5):
+  crypto: api - add a helper to (un)register a array of templates
+  crypto: ccm - use template array registering API to simplify the code
+  crypto: gcm - use template array registering API to simplify the code
+  crypto: ctr - use template array registering API to simplify the code
+  crypto: chacha20poly1305 - use template array registering API to
+    simplify the code
 
-Please reply if interested.
+ crypto/algapi.c           | 27 ++++++++++++++++
+ crypto/ccm.c              | 78 ++++++++++++++---------------------------------
+ crypto/chacha20poly1305.c | 37 +++++++++-------------
+ crypto/ctr.c              | 43 +++++++++-----------------
+ crypto/gcm.c              | 73 ++++++++++++++------------------------------
+ include/crypto/algapi.h   |  2 ++
+ 6 files changed, 104 insertions(+), 156 deletions(-)
 
-Thanks,
-Jessica
+-- 
+1.7.12.4
