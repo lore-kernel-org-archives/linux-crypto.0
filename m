@@ -1,77 +1,95 @@
-Return-Path: <SRS0=1Gsi=PR=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from szxga04-in.huawei.com ([45.249.212.190]:17095 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728469AbfAIGFB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 9 Jan 2019 01:05:01 -0500
-From: YueHaibing <yuehaibing@huawei.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        Eric Biggers <ebiggers@google.com>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        "Raveendra Padasalagi" <raveendra.padasalagi@broadcom.com>,
-        Stefan Agner <stefan@agner.ch>
-CC: YueHaibing <yuehaibing@huawei.com>, <linux-crypto@vger.kernel.org>,
-        <kernel-janitors@vger.kernel.org>
-Subject: [PATCH v2 -next] crypto: brcm - Fix some set-but-not-used warning
-Date: Wed, 9 Jan 2019 06:11:18 +0000
-Message-ID: <1547014278-93847-1-git-send-email-yuehaibing@huawei.com>
-In-Reply-To: <1545968644-191671-1-git-send-email-yuehaibing@huawei.com>
-References: <1545968644-191671-1-git-send-email-yuehaibing@huawei.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
+Return-Path: <SRS0=b5ak=PZ=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from Galois.linutronix.de ([146.0.238.70]:48009 "EHLO
+        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727122AbfAQXP0 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 17 Jan 2019 18:15:26 -0500
+Message-Id: <20190117231501.162093731@linutronix.de>
+Date: Fri, 18 Jan 2019 00:14:20 +0100
+From: Thomas Gleixner <tglx@linutronix.de>
+To: LKML <linux-kernel@vger.kernel.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Kate Stewart <kstewart@linuxfoundation.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Ondrej Mosnacek <omosnacek@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org
+Subject: [patch 4/9] crypto: aegis - Convert to SPDX license identifiers
+References: <20190117231416.111952141@linutronix.de>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Fixes gcc '-Wunused-but-set-variable' warning:
+The license boiler plate text is not ideal for machine parsing. The kernel
+uses SPDX license identifiers for that purpose, which replace the boiler
+plate text.
 
-drivers/crypto/bcm/cipher.c: In function 'handle_ahash_req':
-drivers/crypto/bcm/cipher.c:720:15: warning:
- variable 'chunk_start' set but not used [-Wunused-but-set-variable]
-
-drivers/crypto/bcm/cipher.c: In function 'spu_rx_callback':
-drivers/crypto/bcm/cipher.c:1679:31: warning:
- variable 'areq' set but not used [-Wunused-but-set-variable]
-
-drivers/crypto/bcm/cipher.c:1678:22: warning:
- variable 'ctx' set but not used [-Wunused-but-set-variable]
-
-Fixes: 9d12ba86f818 ("crypto: brcm - Add Broadcom SPU driver")
-Signed-off-by: YueHaibing <yuehaibing@huawei.com>
-Reviewed-by: Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>
+Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+Cc: Ondrej Mosnacek <omosnacek@gmail.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org
 ---
-v2: add Fixes tag
----
- drivers/crypto/bcm/cipher.c | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
 
-diff --git a/drivers/crypto/bcm/cipher.c b/drivers/crypto/bcm/cipher.c
-index c9393ff..9a66c29 100644
---- a/drivers/crypto/bcm/cipher.c
-+++ b/drivers/crypto/bcm/cipher.c
-@@ -717,7 +717,7 @@ static int handle_ahash_req(struct iproc_reqctx_s *rctx)
- 	 */
- 	unsigned int new_data_len;
+P.S.: This patch is part of a larger cleanup, but independent of other
+      patches and is intended to be picked up by the maintainer directly. 
+
+---
+ crypto/aegis128.c  |    6 +-----
+ crypto/aegis128l.c |    6 +-----
+ crypto/aegis256.c  |    6 +-----
+ 3 files changed, 3 insertions(+), 15 deletions(-)
+
+--- a/crypto/aegis128.c
++++ b/crypto/aegis128.c
+@@ -1,13 +1,9 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  * The AEGIS-128 Authenticated-Encryption Algorithm
+  *
+  * Copyright (c) 2017-2018 Ondrej Mosnacek <omosnacek@gmail.com>
+  * Copyright (C) 2017-2018 Red Hat, Inc. All rights reserved.
+- *
+- * This program is free software; you can redistribute it and/or modify it
+- * under the terms of the GNU General Public License as published by the Free
+- * Software Foundation; either version 2 of the License, or (at your option)
+- * any later version.
+  */
  
--	unsigned int chunk_start = 0;
-+	unsigned int __maybe_unused chunk_start = 0;
- 	u32 db_size;	 /* Length of data field, incl gcm and hash padding */
- 	int pad_len = 0; /* total pad len, including gcm, hash, stat padding */
- 	u32 data_pad_len = 0;	/* length of GCM/CCM padding */
-@@ -1675,8 +1675,6 @@ static void spu_rx_callback(struct mbox_client *cl, void *msg)
- 	struct spu_hw *spu = &iproc_priv.spu;
- 	struct brcm_message *mssg = msg;
- 	struct iproc_reqctx_s *rctx;
--	struct iproc_ctx_s *ctx;
--	struct crypto_async_request *areq;
- 	int err = 0;
+ #include <crypto/algapi.h>
+--- a/crypto/aegis128l.c
++++ b/crypto/aegis128l.c
+@@ -1,13 +1,9 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  * The AEGIS-128L Authenticated-Encryption Algorithm
+  *
+  * Copyright (c) 2017-2018 Ondrej Mosnacek <omosnacek@gmail.com>
+  * Copyright (C) 2017-2018 Red Hat, Inc. All rights reserved.
+- *
+- * This program is free software; you can redistribute it and/or modify it
+- * under the terms of the GNU General Public License as published by the Free
+- * Software Foundation; either version 2 of the License, or (at your option)
+- * any later version.
+  */
  
- 	rctx = mssg->ctx;
-@@ -1686,8 +1684,6 @@ static void spu_rx_callback(struct mbox_client *cl, void *msg)
- 		err = -EFAULT;
- 		goto cb_finish;
- 	}
--	areq = rctx->parent;
--	ctx = rctx->ctx;
+ #include <crypto/algapi.h>
+--- a/crypto/aegis256.c
++++ b/crypto/aegis256.c
+@@ -1,13 +1,9 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
+ /*
+  * The AEGIS-256 Authenticated-Encryption Algorithm
+  *
+  * Copyright (c) 2017-2018 Ondrej Mosnacek <omosnacek@gmail.com>
+  * Copyright (C) 2017-2018 Red Hat, Inc. All rights reserved.
+- *
+- * This program is free software; you can redistribute it and/or modify it
+- * under the terms of the GNU General Public License as published by the Free
+- * Software Foundation; either version 2 of the License, or (at your option)
+- * any later version.
+  */
  
- 	/* process the SPU status */
- 	err = spu->spu_status_process(rctx->msg_buf.rx_stat);
+ #include <crypto/algapi.h>
