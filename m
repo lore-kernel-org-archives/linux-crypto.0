@@ -1,50 +1,91 @@
-Return-Path: <SRS0=+HSe=PS=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:53214 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727545AbfAJUSW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Jan 2019 15:18:22 -0500
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 00/11] crypto: misc fixes/cleanups
-Date: Thu, 10 Jan 2019 12:17:51 -0800
-Message-Id: <20190110201802.82442-1-ebiggers@kernel.org>
+Return-Path: <SRS0=b5ak=PZ=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2248 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725982AbfAQGsx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 17 Jan 2019 01:48:53 -0500
+From: Xiongfeng Wang <wangxiongfeng2@huawei.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <ebiggers@kernel.org>
+CC: <wangxiongfeng2@huawei.com>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <broonie@kernel.org>,
+        <ard.biesheuvel@linaro.org>, <jonathan.cameron@huawei.com>
+Subject: [PATCH V2 1/5] crypto: api - add a helper to (un)register a array of templates
+Date: Thu, 17 Jan 2019 14:47:59 +0800
+Message-ID: <1547707683-45878-2-git-send-email-wangxiongfeng2@huawei.com>
+In-Reply-To: <1547707683-45878-1-git-send-email-wangxiongfeng2@huawei.com>
+References: <1547707683-45878-1-git-send-email-wangxiongfeng2@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Some more miscellaneous crypto fixes and cleanups:
+This patch add a helper to (un)register a array of templates. The
+following patches will use this helper to simplify the code.
 
-- Patch 1-6: fix sparse warnings in 6 files.
-- Patch 7: fix unaligned memory access in tgr192.
-- Patch 8-11: a few other cleanups.
+Signed-off-by: Xiongfeng Wang <xiongfeng.wang@linaro.org>
+---
+ crypto/algapi.c         | 27 +++++++++++++++++++++++++++
+ include/crypto/algapi.h |  2 ++
+ 2 files changed, 29 insertions(+)
 
-Eric Biggers (11):
-  crypto: gcm - use correct endianness type in gcm_hash_len()
-  crypto: rsa-pkcs1pad - include <crypto/internal/rsa.h>
-  crypto: streebog - use correct endianness type
-  crypto: testmgr - handle endianness correctly in alg_test_crc32c()
-  crypto: user - forward declare crypto_nlsk
-  crypto: x86/aesni-gcm - make 'struct aesni_gcm_tfm_s' static const
-  crypto: tgr192 - fix unaligned memory access
-  crypto: stat - remove unused mutex
-  crypto: af_alg - make some functions static
-  crypto: af_alg - use list_for_each_entry() in af_alg_count_tsgl()
-  crypto: af_alg - remove redundant initializations of sk_family
-
- arch/x86/crypto/aesni-intel_glue.c   | 34 +++++++++++-----------------
- crypto/af_alg.c                      | 33 ++++++++++-----------------
- crypto/crypto_user_stat.c            |  4 ----
- crypto/gcm.c                         |  2 +-
- crypto/rsa-pkcs1pad.c                |  1 +
- crypto/streebog_generic.c            |  2 +-
- crypto/testmgr.c                     | 10 ++++----
- crypto/tgr192.c                      |  6 ++---
- include/crypto/if_alg.h              |  7 ------
- include/crypto/internal/cryptouser.h |  2 ++
- include/crypto/streebog.h            |  2 +-
- 11 files changed, 39 insertions(+), 64 deletions(-)
-
+diff --git a/crypto/algapi.c b/crypto/algapi.c
+index 713baab..4c9c86b 100644
+--- a/crypto/algapi.c
++++ b/crypto/algapi.c
+@@ -494,6 +494,24 @@ int crypto_register_template(struct crypto_template *tmpl)
+ }
+ EXPORT_SYMBOL_GPL(crypto_register_template);
+ 
++int crypto_register_templates(struct crypto_template *tmpls, int count)
++{
++	int i, err;
++
++	for (i = 0; i < count; i++) {
++		err = crypto_register_template(&tmpls[i]);
++		if (err)
++			goto out;
++	}
++	return 0;
++
++out:
++	for (--i; i >= 0; --i)
++		crypto_unregister_template(&tmpls[i]);
++	return err;
++}
++EXPORT_SYMBOL_GPL(crypto_register_templates);
++
+ void crypto_unregister_template(struct crypto_template *tmpl)
+ {
+ 	struct crypto_instance *inst;
+@@ -523,6 +541,15 @@ void crypto_unregister_template(struct crypto_template *tmpl)
+ }
+ EXPORT_SYMBOL_GPL(crypto_unregister_template);
+ 
++void crypto_unregister_templates(struct crypto_template *tmpls, int count)
++{
++	int i;
++
++	for (i = count - 1; i >= 0; --i)
++		crypto_unregister_template(&tmpls[i]);
++}
++EXPORT_SYMBOL_GPL(crypto_unregister_templates);
++
+ static struct crypto_template *__crypto_lookup_template(const char *name)
+ {
+ 	struct crypto_template *q, *tmpl = NULL;
+diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
+index 093869f..4be38cd 100644
+--- a/include/crypto/algapi.h
++++ b/include/crypto/algapi.h
+@@ -143,7 +143,9 @@ struct ablkcipher_walk {
+ void crypto_mod_put(struct crypto_alg *alg);
+ 
+ int crypto_register_template(struct crypto_template *tmpl);
++int crypto_register_templates(struct crypto_template *tmpls, int count);
+ void crypto_unregister_template(struct crypto_template *tmpl);
++void crypto_unregister_templates(struct crypto_template *tmpls, int count);
+ struct crypto_template *crypto_lookup_template(const char *name);
+ 
+ int crypto_register_instance(struct crypto_template *tmpl,
 -- 
-2.20.1.97.g81188d93c3-goog
+1.7.12.4
