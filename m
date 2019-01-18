@@ -1,86 +1,94 @@
-Return-Path: <SRS0=g5s/=PY=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from szxga06-in.huawei.com ([45.249.212.32]:56336 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1730089AbfAPCvc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Jan 2019 21:51:32 -0500
-From: Xiongfeng Wang <wangxiongfeng2@huawei.com>
-To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC: <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <wangxiongfeng2@huawei.com>, <broonie@kernel.org>,
-        <ard.biesheuvel@linaro.org>, <jonathan.cameron@huawei.com>
-Subject: [PATCH 5/5] crypto: chacha20poly1305 - use template array registering API to simplify the code
-Date: Wed, 16 Jan 2019 10:50:34 +0800
-Message-ID: <1547607034-40948-6-git-send-email-wangxiongfeng2@huawei.com>
-In-Reply-To: <1547607034-40948-1-git-send-email-wangxiongfeng2@huawei.com>
-References: <1547607034-40948-1-git-send-email-wangxiongfeng2@huawei.com>
+Return-Path: <SRS0=FsAa=P2=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-lj1-f171.google.com ([209.85.208.171]:38891 "EHLO
+        mail-lj1-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727148AbfARICT (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 18 Jan 2019 03:02:19 -0500
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20190117231416.111952141@linutronix.de> <20190117231501.254152158@linutronix.de>
+In-Reply-To: <20190117231501.254152158@linutronix.de>
+From: =?UTF-8?B?T25kcmVqIE1vc27DocSNZWs=?= <omosnacek@gmail.com>
+Date: Fri, 18 Jan 2019 09:02:06 +0100
+Message-ID: <CAAUqJDufgoZMhPia5M6cc+V5tijX+huzncnd3LSp=DVhXy80Nw@mail.gmail.com>
+Subject: Re: [patch 5/9] crypto: morus - Convert to SPDX license identifiers
+To: Thomas Gleixner <tglx@linutronix.de>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Kate Stewart <kstewart@linuxfoundation.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Use crypto template array registering API to simplify the code.
+pi 18. 1. 2019 o 0:15 Thomas Gleixner <tglx@linutronix.de> nap=C3=ADsal(a):
+> The license boiler plate text is not ideal for machine parsing. The kerne=
+l
+> uses SPDX license identifiers for that purpose, which replace the boiler
+> plate text.
+>
+> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Ondrej Mosnacek <omosnacek@gmail.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: linux-crypto@vger.kernel.org
 
-Signed-off-by: Xiongfeng Wang <xiongfeng.wang@linaro.org>
----
- crypto/chacha20poly1305.c | 38 +++++++++++++++-----------------------
- 1 file changed, 15 insertions(+), 23 deletions(-)
+Acked-by: Ondrej Mosnacek <omosnacek@gmail.com>
+(feel free to keep the ack also if you decide to switch to the "GPL-2.0+" f=
+orm)
 
-diff --git a/crypto/chacha20poly1305.c b/crypto/chacha20poly1305.c
-index fef1144..f5134d3 100644
---- a/crypto/chacha20poly1305.c
-+++ b/crypto/chacha20poly1305.c
-@@ -701,37 +701,29 @@ static int rfc7539esp_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	return chachapoly_create(tmpl, tb, "rfc7539esp", 8);
- }
- 
--static struct crypto_template rfc7539_tmpl = {
--	.name = "rfc7539",
--	.create = rfc7539_create,
--	.module = THIS_MODULE,
--};
--
--static struct crypto_template rfc7539esp_tmpl = {
--	.name = "rfc7539esp",
--	.create = rfc7539esp_create,
--	.module = THIS_MODULE,
-+static struct crypto_template rfc7539_tmpl[] = {
-+	{
-+		.name = "rfc7539",
-+		.create = rfc7539_create,
-+		.module = THIS_MODULE,
-+	},
-+	{
-+		.name = "rfc7539esp",
-+		.create = rfc7539esp_create,
-+		.module = THIS_MODULE,
-+	},
- };
- 
- static int __init chacha20poly1305_module_init(void)
- {
--	int err;
--
--	err = crypto_register_template(&rfc7539_tmpl);
--	if (err)
--		return err;
--
--	err = crypto_register_template(&rfc7539esp_tmpl);
--	if (err)
--		crypto_unregister_template(&rfc7539_tmpl);
--
--	return err;
-+	return crypto_register_templates(rfc7539_tmpl,
-+			ARRAY_SIZE(rfc7539_tmpl));
- }
- 
- static void __exit chacha20poly1305_module_exit(void)
- {
--	crypto_unregister_template(&rfc7539esp_tmpl);
--	crypto_unregister_template(&rfc7539_tmpl);
-+	crypto_unregister_templates(rfc7539_tmpl,
-+			ARRAY_SIZE(rfc7539_tmpl));
- }
- 
- module_init(chacha20poly1305_module_init);
--- 
-1.7.12.4
+> ---
+>
+> P.S.: This patch is part of a larger cleanup, but independent of other
+>       patches and is intended to be picked up by the maintainer directly.
+>
+> ---
+>  crypto/morus1280.c |    6 +-----
+>  crypto/morus640.c  |    6 +-----
+>  2 files changed, 2 insertions(+), 10 deletions(-)
+>
+> --- a/crypto/morus1280.c
+> +++ b/crypto/morus1280.c
+> @@ -1,13 +1,9 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+>  /*
+>   * The MORUS-1280 Authenticated-Encryption Algorithm
+>   *
+>   * Copyright (c) 2016-2018 Ondrej Mosnacek <omosnacek@gmail.com>
+>   * Copyright (C) 2017-2018 Red Hat, Inc. All rights reserved.
+> - *
+> - * This program is free software; you can redistribute it and/or modify =
+it
+> - * under the terms of the GNU General Public License as published by the=
+ Free
+> - * Software Foundation; either version 2 of the License, or (at your opt=
+ion)
+> - * any later version.
+>   */
+>
+>  #include <asm/unaligned.h>
+> --- a/crypto/morus640.c
+> +++ b/crypto/morus640.c
+> @@ -1,13 +1,9 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+>  /*
+>   * The MORUS-640 Authenticated-Encryption Algorithm
+>   *
+>   * Copyright (c) 2016-2018 Ondrej Mosnacek <omosnacek@gmail.com>
+>   * Copyright (C) 2017-2018 Red Hat, Inc. All rights reserved.
+> - *
+> - * This program is free software; you can redistribute it and/or modify =
+it
+> - * under the terms of the GNU General Public License as published by the=
+ Free
+> - * Software Foundation; either version 2 of the License, or (at your opt=
+ion)
+> - * any later version.
+>   */
+>
+>  #include <asm/unaligned.h>
+>
+>
