@@ -1,132 +1,43 @@
-Return-Path: <SRS0=b7+G=PP=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:46490 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726428AbfAGCtk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 6 Jan 2019 21:49:40 -0500
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 2/3] crypto: skcipher - set CRYPTO_TFM_NEED_KEY if ->setkey() fails
-Date: Sun,  6 Jan 2019 18:47:43 -0800
-Message-Id: <20190107024744.4952-3-ebiggers@kernel.org>
-In-Reply-To: <20190107024744.4952-1-ebiggers@kernel.org>
-References: <20190107024744.4952-1-ebiggers@kernel.org>
+Return-Path: <SRS0=FsAa=P2=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from mail-ot1-f48.google.com ([209.85.210.48]:45676 "EHLO
+        mail-ot1-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725934AbfARA0S (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 17 Jan 2019 19:26:18 -0500
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20190117231416.111952141@linutronix.de> <20190117231501.068505479@linutronix.de>
+In-Reply-To: <20190117231501.068505479@linutronix.de>
+From: Fabio Estevam <festevam@gmail.com>
+Date: Thu, 17 Jan 2019 22:26:07 -0200
+Message-ID: <CAOMZO5CsTiQV78d6ZvUBwzzU9iF8ZnCpp_O7VBrvxstZ6kNNRg@mail.gmail.com>
+Subject: Re: [patch 3/9] crypto: morus - Cleanup license mess
+To: Thomas Gleixner <tglx@linutronix.de>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Kate Stewart <kstewart@linuxfoundation.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Ondrej Mosnacek <omosnacek@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
+        <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Eric Biggers <ebiggers@google.com>
+On Thu, Jan 17, 2019 at 9:17 PM Thomas Gleixner <tglx@linutronix.de> wrote:
 
-Some algorithms have a ->setkey() method that is not atomic, in the
-sense that setting a key can fail after changes were already made to the
-tfm context.  In this case, if a key was already set the tfm can end up
-in a state that corresponds to neither the old key nor the new key.
+> --- a/include/crypto/morus1280_glue.h
+> +++ b/include/crypto/morus1280_glue.h
+> @@ -1,15 +1,10 @@
+> -/* SPDX-License-Identifier: GPL-2.0 */
+> +/* SPDX-License-Identifier: GPL-2.0-or-later */
 
-For example, in lrw.c, if gf128mul_init_64k_bbe() fails due to lack of
-memory, then priv::table will be left NULL.  After that, encryption with
-that tfm will cause a NULL pointer dereference.
+Shouldn't this be: /* SPDX-License-Identifier: GPL-2.0+ */ ?
 
-It's not feasible to make all ->setkey() methods atomic, especially ones
-that have to key multiple sub-tfms.  Therefore, make the crypto API set
-CRYPTO_TFM_NEED_KEY if ->setkey() fails and the algorithm requires a
-key, to prevent the tfm from being used until a new key is set.
+At least this is the form documented in Documentation/process/license-rules.rst:
 
-[Cc stable mainly because when introducing the NEED_KEY flag I changed
- AF_ALG to rely on it; and unlike in-kernel crypto API users, AF_ALG
- previously didn't have this problem.  So these "incompletely keyed"
- states became theoretically accessible via AF_ALG -- though, the
- opportunities for causing real mischief seem pretty limited.]
+" License identifiers for licenses like [L]GPL with the 'or later' option
+   are constructed by using a "+" for indicating the 'or later' option.::
 
-Fixes: f8d33fac8480 ("crypto: skcipher - prevent using skciphers without setting key")
-Cc: <stable@vger.kernel.org> # v4.16+
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- crypto/skcipher.c | 27 ++++++++++++++++++---------
- 1 file changed, 18 insertions(+), 9 deletions(-)
-
-diff --git a/crypto/skcipher.c b/crypto/skcipher.c
-index 2a969296bc248..de09ff60991e2 100644
---- a/crypto/skcipher.c
-+++ b/crypto/skcipher.c
-@@ -585,6 +585,12 @@ static unsigned int crypto_skcipher_extsize(struct crypto_alg *alg)
- 	return crypto_alg_extsize(alg);
- }
- 
-+static void skcipher_set_needkey(struct crypto_skcipher *tfm)
-+{
-+	if (tfm->keysize)
-+		crypto_skcipher_set_flags(tfm, CRYPTO_TFM_NEED_KEY);
-+}
-+
- static int skcipher_setkey_blkcipher(struct crypto_skcipher *tfm,
- 				     const u8 *key, unsigned int keylen)
- {
-@@ -598,8 +604,10 @@ static int skcipher_setkey_blkcipher(struct crypto_skcipher *tfm,
- 	err = crypto_blkcipher_setkey(blkcipher, key, keylen);
- 	crypto_skcipher_set_flags(tfm, crypto_blkcipher_get_flags(blkcipher) &
- 				       CRYPTO_TFM_RES_MASK);
--	if (err)
-+	if (unlikely(err)) {
-+		skcipher_set_needkey(tfm);
- 		return err;
-+	}
- 
- 	crypto_skcipher_clear_flags(tfm, CRYPTO_TFM_NEED_KEY);
- 	return 0;
-@@ -677,8 +685,7 @@ static int crypto_init_skcipher_ops_blkcipher(struct crypto_tfm *tfm)
- 	skcipher->ivsize = crypto_blkcipher_ivsize(blkcipher);
- 	skcipher->keysize = calg->cra_blkcipher.max_keysize;
- 
--	if (skcipher->keysize)
--		crypto_skcipher_set_flags(skcipher, CRYPTO_TFM_NEED_KEY);
-+	skcipher_set_needkey(skcipher);
- 
- 	return 0;
- }
-@@ -698,8 +705,10 @@ static int skcipher_setkey_ablkcipher(struct crypto_skcipher *tfm,
- 	crypto_skcipher_set_flags(tfm,
- 				  crypto_ablkcipher_get_flags(ablkcipher) &
- 				  CRYPTO_TFM_RES_MASK);
--	if (err)
-+	if (unlikely(err)) {
-+		skcipher_set_needkey(tfm);
- 		return err;
-+	}
- 
- 	crypto_skcipher_clear_flags(tfm, CRYPTO_TFM_NEED_KEY);
- 	return 0;
-@@ -776,8 +785,7 @@ static int crypto_init_skcipher_ops_ablkcipher(struct crypto_tfm *tfm)
- 			    sizeof(struct ablkcipher_request);
- 	skcipher->keysize = calg->cra_ablkcipher.max_keysize;
- 
--	if (skcipher->keysize)
--		crypto_skcipher_set_flags(skcipher, CRYPTO_TFM_NEED_KEY);
-+	skcipher_set_needkey(skcipher);
- 
- 	return 0;
- }
-@@ -820,8 +828,10 @@ static int skcipher_setkey(struct crypto_skcipher *tfm, const u8 *key,
- 	else
- 		err = cipher->setkey(tfm, key, keylen);
- 
--	if (err)
-+	if (unlikely(err)) {
-+		skcipher_set_needkey(tfm);
- 		return err;
-+	}
- 
- 	crypto_skcipher_clear_flags(tfm, CRYPTO_TFM_NEED_KEY);
- 	return 0;
-@@ -852,8 +862,7 @@ static int crypto_skcipher_init_tfm(struct crypto_tfm *tfm)
- 	skcipher->ivsize = alg->ivsize;
- 	skcipher->keysize = alg->max_keysize;
- 
--	if (skcipher->keysize)
--		crypto_skcipher_set_flags(skcipher, CRYPTO_TFM_NEED_KEY);
-+	skcipher_set_needkey(skcipher);
- 
- 	if (alg->exit)
- 		skcipher->base.exit = crypto_skcipher_exit_tfm;
--- 
-2.20.1
+      // SPDX-License-Identifier: GPL-2.0+"
