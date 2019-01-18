@@ -1,92 +1,51 @@
-Return-Path: <SRS0=aDvo=PQ=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from pegase1.c-s.fr ([93.17.236.30]:53912 "EHLO pegase1.c-s.fr"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727435AbfAHG4u (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 8 Jan 2019 01:56:50 -0500
-Message-Id: <e082265fba04b4a4c17003a73820844c8feb5017.1545445924.git.christophe.leroy@c-s.fr>
-In-Reply-To: <5ed91db5e2976a4c260465c3d027acc9affd2d2b.1545445924.git.christophe.leroy@c-s.fr>
-References: <5ed91db5e2976a4c260465c3d027acc9affd2d2b.1545445924.git.christophe.leroy@c-s.fr>
-From: Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: [PATCH v4 2/2] crypto: talitos - fix ablkcipher for CONFIG_VMAP_STACK
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Horia Geanta <horia.geanta@nxp.com>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, stable@vger.kernel.org
-Date: Tue,  8 Jan 2019 06:56:48 +0000 (UTC)
+Return-Path: <SRS0=FsAa=P2=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from szxga07-in.huawei.com ([45.249.212.35]:41632 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727167AbfARHyv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 18 Jan 2019 02:54:51 -0500
+Subject: Re: [PATCH 3/4] crypto: hisilicon: Add HiSilicon ZIP accelerator
+ support
+To: Herbert Xu <herbert@gondor.apana.org.au>
+References: <1545465105-133138-1-git-send-email-wangzhou1@hisilicon.com>
+ <1545465105-133138-4-git-send-email-wangzhou1@hisilicon.com>
+ <20190111060859.k647ltxukywjmi3l@gondor.apana.org.au>
+ <5C383908.4090107@hisilicon.com> <5C3F3BDF.6070409@hisilicon.com>
+ <20190118045546.hs37a2isfnvxgm7j@gondor.apana.org.au>
+CC: <linux-kernel@vger.kernel.org>, <linuxarm@huawei.com>,
+        <linux-crypto@vger.kernel.org>,
+        "David S . Miller" <davem@davemloft.net>
+From: Zhou Wang <wangzhou1@hisilicon.com>
+Message-ID: <5C418659.30904@hisilicon.com>
+Date: Fri, 18 Jan 2019 15:55:05 +0800
+MIME-Version: 1.0
+In-Reply-To: <20190118045546.hs37a2isfnvxgm7j@gondor.apana.org.au>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-[    2.364486] WARNING: CPU: 0 PID: 60 at ./arch/powerpc/include/asm/io.h:837 dma_nommu_map_page+0x44/0xd4
-[    2.373579] CPU: 0 PID: 60 Comm: cryptomgr_test Tainted: G        W         4.20.0-rc5-00560-g6bfb52e23a00-dirty #531
-[    2.384740] NIP:  c000c540 LR: c000c584 CTR: 00000000
-[    2.389743] REGS: c95abab0 TRAP: 0700   Tainted: G        W          (4.20.0-rc5-00560-g6bfb52e23a00-dirty)
-[    2.400042] MSR:  00029032 <EE,ME,IR,DR,RI>  CR: 24042204  XER: 00000000
-[    2.406669]
-[    2.406669] GPR00: c02f2244 c95abb60 c6262990 c95abd80 0000256a 00000001 00000001 00000001
-[    2.406669] GPR08: 00000000 00002000 00000010 00000010 24042202 00000000 00000100 c95abd88
-[    2.406669] GPR16: 00000000 c05569d4 00000001 00000010 c95abc88 c0615664 00000004 00000000
-[    2.406669] GPR24: 00000010 c95abc88 c95abc88 00000000 c61ae210 c7ff6d40 c61ae210 00003d68
-[    2.441559] NIP [c000c540] dma_nommu_map_page+0x44/0xd4
-[    2.446720] LR [c000c584] dma_nommu_map_page+0x88/0xd4
-[    2.451762] Call Trace:
-[    2.454195] [c95abb60] [82000808] 0x82000808 (unreliable)
-[    2.459572] [c95abb80] [c02f2244] talitos_edesc_alloc+0xbc/0x3c8
-[    2.465493] [c95abbb0] [c02f2600] ablkcipher_edesc_alloc+0x4c/0x5c
-[    2.471606] [c95abbd0] [c02f4ed0] ablkcipher_encrypt+0x20/0x64
-[    2.477389] [c95abbe0] [c02023b0] __test_skcipher+0x4bc/0xa08
-[    2.483049] [c95abe00] [c0204b60] test_skcipher+0x2c/0xcc
-[    2.488385] [c95abe20] [c0204c48] alg_test_skcipher+0x48/0xbc
-[    2.494064] [c95abe40] [c0205cec] alg_test+0x164/0x2e8
-[    2.499142] [c95abf00] [c0200dec] cryptomgr_test+0x48/0x50
-[    2.504558] [c95abf10] [c0039ff4] kthread+0xe4/0x110
-[    2.509471] [c95abf40] [c000e1d0] ret_from_kernel_thread+0x14/0x1c
-[    2.515532] Instruction dump:
-[    2.518468] 7c7e1b78 7c9d2378 7cbf2b78 41820054 3d20c076 8089c200 3d20c076 7c84e850
-[    2.526127] 8129c204 7c842e70 7f844840 419c0008 <0fe00000> 2f9e0000 54847022 7c84fa14
-[    2.533960] ---[ end trace bf78d94af73fe3b8 ]---
-[    2.539123] talitos ff020000.crypto: master data transfer error
-[    2.544775] talitos ff020000.crypto: TEA error: ISR 0x20000000_00000040
-[    2.551625] alg: skcipher: encryption failed on test 1 for ecb-aes-talitos: ret=22
+On 2019/1/18 12:55, Herbert Xu wrote:
+> On Wed, Jan 16, 2019 at 10:12:47PM +0800, Zhou Wang wrote:
+>>
+>> A stupid question: how do we test scomp alg?
+>>
+>> It seems we can not use general comp API, e.g. crypto_alloc_comp
+>> to do this.
+>>
+>> Could you give me any clue about this?
+> 
+> scomp algorithms are allocated through crypto_alloc_acomp.
 
-IV cannot be on stack when CONFIG_VMAP_STACK is selected because the stack
-cannot be DMA mapped anymore.
+A little strange, but let me try firstly.
 
-This patch copies the IV into the extended descriptor.
+However, another question is that seems other subsystems in kernel,
+e.g. zswap still use crypto_alloc_comp. So we'd better register this
+ZIP engine using both cryto_alloc_comp and scomp/acomp interface to
+make it compatible with other subsystems?
 
-Fixes: 4de9d0b547b9 ("crypto: talitos - Add ablkcipher algorithms")
-Cc: stable@vger.kernel.org
-Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
----
- v4: Split in two patches ; made the copy unconditional.
+Best,
+Zhou
 
- v3: Using struct edesc buffer.
-
- v2: Using per-request context.
-
- drivers/crypto/talitos.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index 54d80e7edb86..f8e2c5c3f4eb 100644
---- a/drivers/crypto/talitos.c
-+++ b/drivers/crypto/talitos.c
-@@ -1416,12 +1416,15 @@ static struct talitos_edesc *talitos_edesc_alloc(struct device *dev,
- 	/* if its a ahash, add space for a second desc next to the first one */
- 	if (is_sec1 && !dst)
- 		alloc_len += sizeof(struct talitos_desc);
-+	alloc_len += ivsize;
- 
- 	edesc = kmalloc(alloc_len, GFP_DMA | flags);
- 	if (!edesc)
- 		return ERR_PTR(-ENOMEM);
--	if (ivsize)
-+	if (ivsize) {
-+		iv = memcpy(((u8 *)edesc) + alloc_len - ivsize, iv, ivsize);
- 		iv_dma = dma_map_single(dev, iv, ivsize, DMA_TO_DEVICE);
-+	}
- 	memset(&edesc->desc, 0, sizeof(edesc->desc));
- 
- 	edesc->src_nents = src_nents;
--- 
-2.13.3
+> 
+> Thanks,
+> 
