@@ -1,54 +1,51 @@
-Return-Path: <SRS0=fnEV=PW=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mo4-p03-ob.smtp.rzone.de ([85.215.255.100]:8485 "EHLO
-        mo4-p03-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726491AbfANJcR (ORCPT
+Return-Path: <SRS0=FsAa=P2=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:48478 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727003AbfARK4u (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Jan 2019 04:32:17 -0500
-From: Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-        James Bottomley <James.Bottomley@hansenpartnership.com>,
-        Andy Lutomirski <luto@amacapital.net>,
-        "Lee, Chun-Yi" <joeyli.kernel@gmail.com>,
-        "Rafael J . Wysocki" <rjw@rjwysocki.net>,
-        Pavel Machek <pavel@ucw.cz>, linux-kernel@vger.kernel.org,
-        linux-pm@vger.kernel.org, keyrings@vger.kernel.org,
-        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-        Chen Yu <yu.c.chen@intel.com>,
-        Oliver Neukum <oneukum@suse.com>,
-        Ryan Chen <yu.chen.surf@gmail.com>,
-        David Howells <dhowells@redhat.com>,
-        Giovanni Gherdovich <ggherdovich@suse.cz>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Jann Horn <jannh@google.com>,
-        Andy Lutomirski <luto@kernel.org>, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 2/6] crypto: kdf - SP800-108 Key Derivation Function
-Date: Mon, 14 Jan 2019 10:31:53 +0100
-Message-ID: <1573163.Xcg6e5WDL9@positron.chronox.de>
-In-Reply-To: <20190112052758.GD639@sol.localdomain>
-References: <20190103143227.9138-1-jlee@suse.com> <1830918.5I3Y3k8tQf@positron.chronox.de> <20190112052758.GD639@sol.localdomain>
+        Fri, 18 Jan 2019 05:56:50 -0500
+Date: Fri, 18 Jan 2019 18:56:45 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Vitaly Chikunov <vt@altlinux.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: testmgr - split akcipher tests by a key type
+Message-ID: <20190118105645.w7hpezhdsme7lzev@gondor.apana.org.au>
+References: <20190107175427.13261-1-vt@altlinux.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190107175427.13261-1-vt@altlinux.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-Am Samstag, 12. Januar 2019, 06:27:59 CET schrieb Eric Biggers:
-
-Hi Eric,
-
-[...]
-> > 
-> > +obj-$(CONFIG_CRYPTO_KDF) += kdf.o
+On Mon, Jan 07, 2019 at 08:54:27PM +0300, Vitaly Chikunov wrote:
+> Before this, if akcipher_testvec have `public_key_vec' set to true
+> (i.e. having a public key) only sign/encrypt test is performed, but
+> verify/decrypt test is skipped.
 > 
-> This naming is too generic.  CONFIG_CRYPTO_KDF and kdf.c imply that this is
-> related to all KDFs.  But actually it is an implementation of a few specific
-> KDFs.  Can you give it a clearer name, like KDF_SP800?
+> With a public key we could do encrypt and verify, but to sign and decrypt
+> a private key is required.
 > 
-I am going to use kdf_sp800108 or CRYPTO_CONFIG_KDF_SP800108. The reason is 
-that there are many SP800 documents.
+> This logic is correct for encrypt/decrypt tests (decrypt is skipped if
+> no private key). But incorrect for sign/verify tests - sign is performed
+> no matter if there is no private key, but verify is skipped if there is
+> a public key.
+> 
+> Rework `test_akcipher_one' to arrange tests properly depending on value
+> of `public_key_vec` and `siggen_sigver_test'.
+> 
+> No tests were missed since there is only one sign/verify test (which
+> have `siggen_sigver_test' set to true) and it has a private key, but
+> future tests could benefit from this improvement.
+> 
+> Signed-off-by: Vitaly Chikunov <vt@altlinux.org>
+> ---
+>  crypto/testmgr.c | 86 +++++++++++++++++++++++++++++++++++++-------------------
+>  1 file changed, 57 insertions(+), 29 deletions(-)
 
-Thanks
-
-Ciao
-Stephan
+Patch applied.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
