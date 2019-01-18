@@ -1,56 +1,95 @@
 Return-Path: <SRS0=FsAa=P2=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:44314 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726962AbfARGvB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Jan 2019 01:51:01 -0500
-Date: Fri, 18 Jan 2019 07:50:58 +0100
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Fabio Estevam <festevam@gmail.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>,
-        LKML <linux-kernel@vger.kernel.org>,
+Received: from mail-lj1-f196.google.com ([209.85.208.196]:39088 "EHLO
+        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727148AbfARIC6 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 18 Jan 2019 03:02:58 -0500
+MIME-Version: 1.0
+References: <20190117231416.111952141@linutronix.de> <20190117231500.970473486@linutronix.de>
+In-Reply-To: <20190117231500.970473486@linutronix.de>
+From: =?UTF-8?B?T25kcmVqIE1vc27DocSNZWs=?= <omosnacek@gmail.com>
+Date: Fri, 18 Jan 2019 09:02:44 +0100
+Message-ID: <CAAUqJDs0TqhgUw6kFGmGoR_RWiqUAgb68zne45J3JLKWAFjThw@mail.gmail.com>
+Subject: Re: [patch 2/9] crypto: aegis - Cleanup license mess
+To: Thomas Gleixner <tglx@linutronix.de>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Kate Stewart <kstewart@linuxfoundation.org>,
         Jonathan Corbet <corbet@lwn.net>,
-        Ondrej Mosnacek <omosnacek@gmail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>
-Subject: Re: [patch 3/9] crypto: morus - Cleanup license mess
-Message-ID: <20190118065058.GA9727@kroah.com>
-References: <20190117231416.111952141@linutronix.de>
- <20190117231501.068505479@linutronix.de>
- <CAOMZO5CsTiQV78d6ZvUBwzzU9iF8ZnCpp_O7VBrvxstZ6kNNRg@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAOMZO5CsTiQV78d6ZvUBwzzU9iF8ZnCpp_O7VBrvxstZ6kNNRg@mail.gmail.com>
+        linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jan 17, 2019 at 10:26:07PM -0200, Fabio Estevam wrote:
-> On Thu, Jan 17, 2019 at 9:17 PM Thomas Gleixner <tglx@linutronix.de> wrote:
-> 
-> > --- a/include/crypto/morus1280_glue.h
-> > +++ b/include/crypto/morus1280_glue.h
-> > @@ -1,15 +1,10 @@
-> > -/* SPDX-License-Identifier: GPL-2.0 */
-> > +/* SPDX-License-Identifier: GPL-2.0-or-later */
-> 
-> Shouldn't this be: /* SPDX-License-Identifier: GPL-2.0+ */ ?
-> 
-> At least this is the form documented in Documentation/process/license-rules.rst:
-> 
-> " License identifiers for licenses like [L]GPL with the 'or later' option
->    are constructed by using a "+" for indicating the 'or later' option.::
-> 
->       // SPDX-License-Identifier: GPL-2.0+"
+pi 18. 1. 2019 o 0:15 Thomas Gleixner <tglx@linutronix.de> nap=C3=ADsal(a):
+> Precise and non-ambiguous license information is important. The recently
+> added aegis header file has a SPDX license identifier, which is nice, but
+> at the same time it has a contradictionary license boiler plate text.
+>
+>   SPDX-License-Identifier: GPL-2.0
+>
+> versus
+>
+>   * This program is free software; you can redistribute it and/or modify =
+it
+>   * under the terms of the GNU General Public License as published by the=
+ Free
+>   * Software Foundation; either version 2 of the License, or (at your opt=
+ion)
+>   * any later version
+>
+> Oh well.
+>
+> As the other aegis related files are licensed under the GPL v2 or later,
+> it's assumed that the boiler plate code is correct, but the SPDX license
+> identifier is wrong.
+>
+> Fix the SPDX identifier and remove the boiler plate as it is redundant.
+>
+> Fixes: f606a88e5823 ("crypto: aegis - Add generic AEGIS AEAD implementati=
+ons")
+> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+> Cc: Ondrej Mosnacek <omosnacek@gmail.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: linux-crypto@vger.kernel.org
 
-Either works, please see LICENSES/preferred/GPL-2.0
+Acked-by: Ondrej Mosnacek <omosnacek@gmail.com>
+(feel free to keep the ack also if you decide to switch to the "GPL-2.0+" f=
+orm)
 
-Personally, I think we should stick with the "+" version as that is the
-much more prevalent use in the kernel at the moment, but it's Thomas's
-call, not mine.
-
-thanks,
-
-greg k-h
+> ---
+>
+> P.S.: This patch is part of a larger cleanup, but independent of other
+>       patches and is intended to be picked up by the maintainer directly.
+>
+> ---
+>  crypto/aegis.h |    7 +------
+>  1 file changed, 1 insertion(+), 6 deletions(-)
+>
+> --- a/crypto/aegis.h
+> +++ b/crypto/aegis.h
+> @@ -1,14 +1,9 @@
+> -/* SPDX-License-Identifier: GPL-2.0 */
+> +/* SPDX-License-Identifier: GPL-2.0-or-later */
+>  /*
+>   * AEGIS common definitions
+>   *
+>   * Copyright (c) 2018 Ondrej Mosnacek <omosnacek@gmail.com>
+>   * Copyright (c) 2018 Red Hat, Inc. All rights reserved.
+> - *
+> - * This program is free software; you can redistribute it and/or modify =
+it
+> - * under the terms of the GNU General Public License as published by the=
+ Free
+> - * Software Foundation; either version 2 of the License, or (at your opt=
+ion)
+> - * any later version.
+>   */
+>
+>  #ifndef _CRYPTO_AEGIS_H
+>
+>
