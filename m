@@ -1,104 +1,101 @@
-Return-Path: <SRS0=aDvo=PQ=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from pegase1.c-s.fr ([93.17.236.30]:41849 "EHLO pegase1.c-s.fr"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727435AbfAHG4t (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 8 Jan 2019 01:56:49 -0500
-Message-Id: <5ed91db5e2976a4c260465c3d027acc9affd2d2b.1545445924.git.christophe.leroy@c-s.fr>
-From: Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: [PATCH v4 1/2] crypto: talitos - reorder code in
- talitos_edesc_alloc()
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Horia Geanta <horia.geanta@nxp.com>
-Cc: linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, stable@vger.kernel.org
-Date: Tue,  8 Jan 2019 06:56:46 +0000 (UTC)
+Return-Path: <SRS0=FsAa=P2=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2195 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727237AbfARF7C (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 18 Jan 2019 00:59:02 -0500
+From: Xiongfeng Wang <wangxiongfeng2@huawei.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <ebiggers@kernel.org>
+CC: <wangxiongfeng2@huawei.com>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <broonie@kernel.org>,
+        <ard.biesheuvel@linaro.org>, <jonathan.cameron@huawei.com>
+Subject: [PATCH V3 4/5] crypto: ctr - use template array registering API to simplify the code
+Date: Fri, 18 Jan 2019 13:58:14 +0800
+Message-ID: <1547791095-48339-5-git-send-email-wangxiongfeng2@huawei.com>
+In-Reply-To: <1547791095-48339-1-git-send-email-wangxiongfeng2@huawei.com>
+References: <1547791095-48339-1-git-send-email-wangxiongfeng2@huawei.com>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch moves the mapping of IV after the kmalloc(). This
-avoids having to unmap in case kmalloc() fails.
+From: Xiongfeng Wang <xiongfeng.wang@linaro.org>
 
-Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+Use crypto template array registering API to simplify the code.
+
+Signed-off-by: Xiongfeng Wang <xiongfeng.wang@linaro.org>
+Reviewed-by: Eric Biggers <ebiggers@google.com>
 ---
- new in v4
+ crypto/ctr.c | 42 ++++++++++++++----------------------------
+ 1 file changed, 14 insertions(+), 28 deletions(-)
 
- drivers/crypto/talitos.c | 25 +++++++------------------
- 1 file changed, 7 insertions(+), 18 deletions(-)
-
-diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index 45e20707cef8..54d80e7edb86 100644
---- a/drivers/crypto/talitos.c
-+++ b/drivers/crypto/talitos.c
-@@ -1361,23 +1361,18 @@ static struct talitos_edesc *talitos_edesc_alloc(struct device *dev,
- 	struct talitos_private *priv = dev_get_drvdata(dev);
- 	bool is_sec1 = has_ftr_sec1(priv);
- 	int max_len = is_sec1 ? TALITOS1_MAX_DATA_LEN : TALITOS2_MAX_DATA_LEN;
--	void *err;
- 
- 	if (cryptlen + authsize > max_len) {
- 		dev_err(dev, "length exceeds h/w max limit\n");
- 		return ERR_PTR(-EINVAL);
- 	}
- 
--	if (ivsize)
--		iv_dma = dma_map_single(dev, iv, ivsize, DMA_TO_DEVICE);
--
- 	if (!dst || dst == src) {
- 		src_len = assoclen + cryptlen + authsize;
- 		src_nents = sg_nents_for_len(src, src_len);
- 		if (src_nents < 0) {
- 			dev_err(dev, "Invalid number of src SG.\n");
--			err = ERR_PTR(-EINVAL);
--			goto error_sg;
-+			return ERR_PTR(-EINVAL);
- 		}
- 		src_nents = (src_nents == 1) ? 0 : src_nents;
- 		dst_nents = dst ? src_nents : 0;
-@@ -1387,16 +1382,14 @@ static struct talitos_edesc *talitos_edesc_alloc(struct device *dev,
- 		src_nents = sg_nents_for_len(src, src_len);
- 		if (src_nents < 0) {
- 			dev_err(dev, "Invalid number of src SG.\n");
--			err = ERR_PTR(-EINVAL);
--			goto error_sg;
-+			return ERR_PTR(-EINVAL);
- 		}
- 		src_nents = (src_nents == 1) ? 0 : src_nents;
- 		dst_len = assoclen + cryptlen + (encrypt ? authsize : 0);
- 		dst_nents = sg_nents_for_len(dst, dst_len);
- 		if (dst_nents < 0) {
- 			dev_err(dev, "Invalid number of dst SG.\n");
--			err = ERR_PTR(-EINVAL);
--			goto error_sg;
-+			return ERR_PTR(-EINVAL);
- 		}
- 		dst_nents = (dst_nents == 1) ? 0 : dst_nents;
- 	}
-@@ -1425,10 +1418,10 @@ static struct talitos_edesc *talitos_edesc_alloc(struct device *dev,
- 		alloc_len += sizeof(struct talitos_desc);
- 
- 	edesc = kmalloc(alloc_len, GFP_DMA | flags);
--	if (!edesc) {
--		err = ERR_PTR(-ENOMEM);
--		goto error_sg;
--	}
-+	if (!edesc)
-+		return ERR_PTR(-ENOMEM);
-+	if (ivsize)
-+		iv_dma = dma_map_single(dev, iv, ivsize, DMA_TO_DEVICE);
- 	memset(&edesc->desc, 0, sizeof(edesc->desc));
- 
- 	edesc->src_nents = src_nents;
-@@ -1445,10 +1438,6 @@ static struct talitos_edesc *talitos_edesc_alloc(struct device *dev,
- 						     DMA_BIDIRECTIONAL);
- 	}
- 	return edesc;
--error_sg:
--	if (iv_dma)
--		dma_unmap_single(dev, iv_dma, ivsize, DMA_TO_DEVICE);
--	return err;
+diff --git a/crypto/ctr.c b/crypto/ctr.c
+index 4c743a9..ec8f8b6 100644
+--- a/crypto/ctr.c
++++ b/crypto/ctr.c
+@@ -171,12 +171,6 @@ static int crypto_ctr_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 	return err;
  }
  
- static struct talitos_edesc *aead_edesc_alloc(struct aead_request *areq, u8 *iv,
+-static struct crypto_template crypto_ctr_tmpl = {
+-	.name = "ctr",
+-	.create = crypto_ctr_create,
+-	.module = THIS_MODULE,
+-};
+-
+ static int crypto_rfc3686_setkey(struct crypto_skcipher *parent,
+ 				 const u8 *key, unsigned int keylen)
+ {
+@@ -366,36 +360,28 @@ static int crypto_rfc3686_create(struct crypto_template *tmpl,
+ 	goto out;
+ }
+ 
+-static struct crypto_template crypto_rfc3686_tmpl = {
+-	.name = "rfc3686",
+-	.create = crypto_rfc3686_create,
+-	.module = THIS_MODULE,
++static struct crypto_template crypto_ctr_tmpls[] = {
++	{
++		.name = "ctr",
++		.create = crypto_ctr_create,
++		.module = THIS_MODULE,
++	}, {
++		.name = "rfc3686",
++		.create = crypto_rfc3686_create,
++		.module = THIS_MODULE,
++	},
+ };
+ 
+ static int __init crypto_ctr_module_init(void)
+ {
+-	int err;
+-
+-	err = crypto_register_template(&crypto_ctr_tmpl);
+-	if (err)
+-		goto out;
+-
+-	err = crypto_register_template(&crypto_rfc3686_tmpl);
+-	if (err)
+-		goto out_drop_ctr;
+-
+-out:
+-	return err;
+-
+-out_drop_ctr:
+-	crypto_unregister_template(&crypto_ctr_tmpl);
+-	goto out;
++	return crypto_register_templates(crypto_ctr_tmpls,
++					 ARRAY_SIZE(crypto_ctr_tmpls));
+ }
+ 
+ static void __exit crypto_ctr_module_exit(void)
+ {
+-	crypto_unregister_template(&crypto_rfc3686_tmpl);
+-	crypto_unregister_template(&crypto_ctr_tmpl);
++	crypto_unregister_templates(crypto_ctr_tmpls,
++				    ARRAY_SIZE(crypto_ctr_tmpls));
+ }
+ 
+ module_init(crypto_ctr_module_init);
 -- 
-2.13.3
+1.7.12.4
