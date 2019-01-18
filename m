@@ -1,78 +1,53 @@
-Return-Path: <SRS0=pN5v=PL=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:50220 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729598AbfACQUV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Jan 2019 11:20:21 -0500
+Return-Path: <SRS0=FsAa=P2=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:48492 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726809AbfARK5I (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 18 Jan 2019 05:57:08 -0500
+Date: Fri, 18 Jan 2019 18:56:54 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: YueHaibing <yuehaibing@huawei.com>
+Cc: Eric Biggers <ebiggers@google.com>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>,
+        Stefan Agner <stefan@agner.ch>, linux-crypto@vger.kernel.org,
+        kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH v2 -next] crypto: brcm - Fix some set-but-not-used warning
+Message-ID: <20190118105654.p355fqvz4hhva33h@gondor.apana.org.au>
+References: <1545968644-191671-1-git-send-email-yuehaibing@huawei.com>
+ <1547014278-93847-1-git-send-email-yuehaibing@huawei.com>
 MIME-Version: 1.0
-References: <1545908831-25910-1-git-send-email-sumit.garg@linaro.org>
- <1545908831-25910-2-git-send-email-sumit.garg@linaro.org> <CAKv+Gu8o_6Mu8_2vNHXEy46mZ6xrSPekcwPH7BvxR8nec37Ktw@mail.gmail.com>
-In-Reply-To: <CAKv+Gu8o_6Mu8_2vNHXEy46mZ6xrSPekcwPH7BvxR8nec37Ktw@mail.gmail.com>
-From: Rob Herring <robh+dt@kernel.org>
-Date: Thu, 3 Jan 2019 10:20:08 -0600
-Message-ID: <CAL_JsqKWLb1fYC6yT-w8eHFvsfYnVEK5EA85OhJ0dmGx5SaemA@mail.gmail.com>
-Subject: Re: [PATCH v1 1/2] dt/bindings: add bindings for optional optee
- rng-uuid property
-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Sumit Garg <sumit.garg@linaro.org>
-Cc: "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>,
-        Devicetree List <devicetree@vger.kernel.org>,
-        Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Daniel Thompson <daniel.thompson@linaro.org>,
-        Bhupesh Sharma <bhsharma@redhat.com>, tee-dev@lists.linaro.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1547014278-93847-1-git-send-email-yuehaibing@huawei.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Dec 27, 2018 at 7:40 AM Ard Biesheuvel
-<ard.biesheuvel@linaro.org> wrote:
->
-> On Thu, 27 Dec 2018 at 12:08, Sumit Garg <sumit.garg@linaro.org> wrote:
-> >
-> > Add bindings for OP-TEE based optional hardware random number
-> > generator identifier property. It could be used on ARM based devices
-> > where entropy source is not accessible to normal world (linux in this
-> > case).
-> >
-> > Signed-off-by: Sumit Garg <sumit.garg@linaro.org>
-> > ---
-> >  Documentation/devicetree/bindings/arm/firmware/linaro,optee-tz.txt | 4 ++++
-> >  1 file changed, 4 insertions(+)
-> >
-> > diff --git a/Documentation/devicetree/bindings/arm/firmware/linaro,optee-tz.txt b/Documentation/devicetree/bindings/arm/firmware/linaro,optee-tz.txt
-> > index d38834c..e3a4c35 100644
-> > --- a/Documentation/devicetree/bindings/arm/firmware/linaro,optee-tz.txt
-> > +++ b/Documentation/devicetree/bindings/arm/firmware/linaro,optee-tz.txt
-> > @@ -20,6 +20,9 @@ the reference implementation maintained by Linaro.
-> >                     "hvc" : HVC #0, with the register assignments specified
-> >                            in drivers/tee/optee/optee_smc.h
-> >
-> > +- rng-uuid       : Optional OP-TEE based RNG service identifier in case
-> > +                   hardware entropy source is not accesible to normal world
-> > +                   (Linux).
-> >
-> >
-> >  Example:
-> > @@ -27,5 +30,6 @@ Example:
-> >                 optee {
-> >                         compatible = "linaro,optee-tz";
-> >                         method = "smc";
-> > +                       rng-uuid = "ab7a617c-b8e7-4d8f-8301-d09b61036b64";
->
-> If OP-TEE is going to expose devices in this way, it should be modeled
-> more like a bus driver, i.e., sub-nodes that represent the devices,
-> with compatible strings, and perhaps even 'reg' properties for the
-> UUIDs.
+On Wed, Jan 09, 2019 at 06:11:18AM +0000, YueHaibing wrote:
+> Fixes gcc '-Wunused-but-set-variable' warning:
+> 
+> drivers/crypto/bcm/cipher.c: In function 'handle_ahash_req':
+> drivers/crypto/bcm/cipher.c:720:15: warning:
+>  variable 'chunk_start' set but not used [-Wunused-but-set-variable]
+> 
+> drivers/crypto/bcm/cipher.c: In function 'spu_rx_callback':
+> drivers/crypto/bcm/cipher.c:1679:31: warning:
+>  variable 'areq' set but not used [-Wunused-but-set-variable]
+> 
+> drivers/crypto/bcm/cipher.c:1678:22: warning:
+>  variable 'ctx' set but not used [-Wunused-but-set-variable]
+> 
+> Fixes: 9d12ba86f818 ("crypto: brcm - Add Broadcom SPU driver")
+> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+> Reviewed-by: Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>
+> ---
+> v2: add Fixes tag
+> ---
+>  drivers/crypto/bcm/cipher.c | 6 +-----
+>  1 file changed, 1 insertion(+), 5 deletions(-)
 
-Please, no. We have DT for things that are not discoverable. Make
-OP-TEE services/devices discoverable. We only need the OP-TEE node in
-the first place because sub-functions of the SMC-CC itself isn't
-discoverable. I suppose there could be some need to expose providers
-to consumer nodes in DT, but that's not the case here.
-
-Rob
+Patch applied.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
