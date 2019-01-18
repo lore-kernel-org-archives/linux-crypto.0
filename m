@@ -1,40 +1,153 @@
 Return-Path: <SRS0=FsAa=P2=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from orcrist.hmeau.com ([104.223.48.154]:48502 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726983AbfARK5o (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Jan 2019 05:57:44 -0500
-Date: Fri, 18 Jan 2019 18:57:42 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Eric Biggers <ebiggers@kernel.org>
-Cc: linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 4/5] crypto: testmgr - add rfc4543(gcm(aes)) decryption
- test to encryption tests
-Message-ID: <20190118105742.crqssee5pnu7siqx@gondor.apana.org.au>
-References: <20190113233228.5851-1-ebiggers@kernel.org>
- <20190113233228.5851-5-ebiggers@kernel.org>
- <20190115174538.GA10955@gmail.com>
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2194 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727234AbfARF7C (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 18 Jan 2019 00:59:02 -0500
+From: Xiongfeng Wang <wangxiongfeng2@huawei.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <ebiggers@kernel.org>
+CC: <wangxiongfeng2@huawei.com>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <broonie@kernel.org>,
+        <ard.biesheuvel@linaro.org>, <jonathan.cameron@huawei.com>
+Subject: [PATCH V3 3/5] crypto: gcm - use template array registering API to simplify the code
+Date: Fri, 18 Jan 2019 13:58:13 +0800
+Message-ID: <1547791095-48339-4-git-send-email-wangxiongfeng2@huawei.com>
+In-Reply-To: <1547791095-48339-1-git-send-email-wangxiongfeng2@huawei.com>
+References: <1547791095-48339-1-git-send-email-wangxiongfeng2@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190115174538.GA10955@gmail.com>
+Content-Type: text/plain
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Tue, Jan 15, 2019 at 09:45:40AM -0800, Eric Biggers wrote:
-> On Sun, Jan 13, 2019 at 03:32:27PM -0800, Eric Biggers wrote:
-> > From: Eric Biggers <ebiggers@google.com>
-> > 
-> > One "ccm(aes)" decryption test vector doesn't exactly match any of the
-> > encryption test vectors with input and result swapped.  In preparation
-> 
-> This should say "rfc4543(gcm(aes))".  If I happen to send v2 of this series I'll
-> fix it, otherwise Herbert can you fix this when applying?  Thanks!
+From: Xiongfeng Wang <xiongfeng.wang@linaro.org>
 
-I have made this change.
+Use crypto template array registering API to simplify the code.
 
-All applied.  Thanks.
+Signed-off-by: Xiongfeng Wang <xiongfeng.wang@linaro.org>
+Reviewed-by: Eric Biggers <ebiggers@google.com>
+---
+ crypto/gcm.c | 73 +++++++++++++++++++-----------------------------------------
+ 1 file changed, 23 insertions(+), 50 deletions(-)
+
+diff --git a/crypto/gcm.c b/crypto/gcm.c
+index e438492..31eb694 100644
+--- a/crypto/gcm.c
++++ b/crypto/gcm.c
+@@ -727,12 +727,6 @@ static int crypto_gcm_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 					ctr_name, "ghash");
+ }
+ 
+-static struct crypto_template crypto_gcm_tmpl = {
+-	.name = "gcm",
+-	.create = crypto_gcm_create,
+-	.module = THIS_MODULE,
+-};
+-
+ static int crypto_gcm_base_create(struct crypto_template *tmpl,
+ 				  struct rtattr **tb)
+ {
+@@ -756,12 +750,6 @@ static int crypto_gcm_base_create(struct crypto_template *tmpl,
+ 					ctr_name, ghash_name);
+ }
+ 
+-static struct crypto_template crypto_gcm_base_tmpl = {
+-	.name = "gcm_base",
+-	.create = crypto_gcm_base_create,
+-	.module = THIS_MODULE,
+-};
+-
+ static int crypto_rfc4106_setkey(struct crypto_aead *parent, const u8 *key,
+ 				 unsigned int keylen)
+ {
+@@ -989,12 +977,6 @@ static int crypto_rfc4106_create(struct crypto_template *tmpl,
+ 	goto out;
+ }
+ 
+-static struct crypto_template crypto_rfc4106_tmpl = {
+-	.name = "rfc4106",
+-	.create = crypto_rfc4106_create,
+-	.module = THIS_MODULE,
+-};
+-
+ static int crypto_rfc4543_setkey(struct crypto_aead *parent, const u8 *key,
+ 				 unsigned int keylen)
+ {
+@@ -1231,10 +1213,24 @@ static int crypto_rfc4543_create(struct crypto_template *tmpl,
+ 	goto out;
+ }
+ 
+-static struct crypto_template crypto_rfc4543_tmpl = {
+-	.name = "rfc4543",
+-	.create = crypto_rfc4543_create,
+-	.module = THIS_MODULE,
++static struct crypto_template crypto_gcm_tmpls[] = {
++	{
++		.name = "gcm_base",
++		.create = crypto_gcm_base_create,
++		.module = THIS_MODULE,
++	}, {
++		.name = "gcm",
++		.create = crypto_gcm_create,
++		.module = THIS_MODULE,
++	}, {
++		.name = "rfc4106",
++		.create = crypto_rfc4106_create,
++		.module = THIS_MODULE,
++	}, {
++		.name = "rfc4543",
++		.create = crypto_rfc4543_create,
++		.module = THIS_MODULE,
++	},
+ };
+ 
+ static int __init crypto_gcm_module_init(void)
+@@ -1247,42 +1243,19 @@ static int __init crypto_gcm_module_init(void)
+ 
+ 	sg_init_one(&gcm_zeroes->sg, gcm_zeroes->buf, sizeof(gcm_zeroes->buf));
+ 
+-	err = crypto_register_template(&crypto_gcm_base_tmpl);
+-	if (err)
+-		goto out;
+-
+-	err = crypto_register_template(&crypto_gcm_tmpl);
++	err = crypto_register_templates(crypto_gcm_tmpls,
++					ARRAY_SIZE(crypto_gcm_tmpls));
+ 	if (err)
+-		goto out_undo_base;
++		kfree(gcm_zeroes);
+ 
+-	err = crypto_register_template(&crypto_rfc4106_tmpl);
+-	if (err)
+-		goto out_undo_gcm;
+-
+-	err = crypto_register_template(&crypto_rfc4543_tmpl);
+-	if (err)
+-		goto out_undo_rfc4106;
+-
+-	return 0;
+-
+-out_undo_rfc4106:
+-	crypto_unregister_template(&crypto_rfc4106_tmpl);
+-out_undo_gcm:
+-	crypto_unregister_template(&crypto_gcm_tmpl);
+-out_undo_base:
+-	crypto_unregister_template(&crypto_gcm_base_tmpl);
+-out:
+-	kfree(gcm_zeroes);
+ 	return err;
+ }
+ 
+ static void __exit crypto_gcm_module_exit(void)
+ {
+ 	kfree(gcm_zeroes);
+-	crypto_unregister_template(&crypto_rfc4543_tmpl);
+-	crypto_unregister_template(&crypto_rfc4106_tmpl);
+-	crypto_unregister_template(&crypto_gcm_tmpl);
+-	crypto_unregister_template(&crypto_gcm_base_tmpl);
++	crypto_unregister_templates(crypto_gcm_tmpls,
++				    ARRAY_SIZE(crypto_gcm_tmpls));
+ }
+ 
+ module_init(crypto_gcm_module_init);
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.7.12.4
