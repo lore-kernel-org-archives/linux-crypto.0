@@ -1,50 +1,151 @@
-Return-Path: <SRS0=hYBA=PX=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from foss.arm.com ([217.140.101.70]:50752 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729245AbfAONno (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Jan 2019 08:43:44 -0500
-From: Gilad Ben-Yossef <gilad@benyossef.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc: Hadar Gat <hadar.gat@arm.com>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 4/7] crypto: ccree: remove legacy leftover
-Date: Tue, 15 Jan 2019 15:43:14 +0200
-Message-Id: <20190115134318.28712-5-gilad@benyossef.com>
-In-Reply-To: <20190115134318.28712-1-gilad@benyossef.com>
-References: <20190115134318.28712-1-gilad@benyossef.com>
+Return-Path: <SRS0=FsAa=P2=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2197 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727142AbfARF7C (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 18 Jan 2019 00:59:02 -0500
+From: Xiongfeng Wang <wangxiongfeng2@huawei.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <ebiggers@kernel.org>
+CC: <wangxiongfeng2@huawei.com>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <broonie@kernel.org>,
+        <ard.biesheuvel@linaro.org>, <jonathan.cameron@huawei.com>
+Subject: [PATCH V3 2/5] crypto: ccm - use template array registering API to simplify the code
+Date: Fri, 18 Jan 2019 13:58:12 +0800
+Message-ID: <1547791095-48339-3-git-send-email-wangxiongfeng2@huawei.com>
+In-Reply-To: <1547791095-48339-1-git-send-email-wangxiongfeng2@huawei.com>
+References: <1547791095-48339-1-git-send-email-wangxiongfeng2@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-From: Hadar Gat <hadar.gat@arm.com>
+From: Xiongfeng Wang <xiongfeng.wang@linaro.org>
 
-Remove legacy code no longer in use.
+Use crypto template array registering API to simplify the code.
 
-Signed-off-by: Hadar Gat <hadar.gat@arm.com>
-Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+Signed-off-by: Xiongfeng Wang <xiongfeng.wang@linaro.org>
+Reviewed-by: Eric Biggers <ebiggers@google.com>
 ---
- drivers/crypto/ccree/cc_driver.h | 2 --
- 1 file changed, 2 deletions(-)
+ crypto/ccm.c | 78 ++++++++++++++++++------------------------------------------
+ 1 file changed, 23 insertions(+), 55 deletions(-)
 
-diff --git a/drivers/crypto/ccree/cc_driver.h b/drivers/crypto/ccree/cc_driver.h
-index 5be7fd431b05..33dbf3e6d15d 100644
---- a/drivers/crypto/ccree/cc_driver.h
-+++ b/drivers/crypto/ccree/cc_driver.h
-@@ -111,13 +111,11 @@ struct cc_crypto_req {
-  * @cc_base:	virt address of the CC registers
-  * @irq:	device IRQ number
-  * @irq_mask:	Interrupt mask shadow (1 for masked interrupts)
-- * @fw_ver:	SeP loaded firmware version
-  */
- struct cc_drvdata {
- 	void __iomem *cc_base;
- 	int irq;
- 	u32 irq_mask;
--	u32 fw_ver;
- 	struct completion hw_queue_avail; /* wait for HW queue availability */
- 	struct platform_device *plat_dev;
- 	cc_sram_addr_t mlli_sram_addr;
+diff --git a/crypto/ccm.c b/crypto/ccm.c
+index b242fd0..50df8f0 100644
+--- a/crypto/ccm.c
++++ b/crypto/ccm.c
+@@ -589,12 +589,6 @@ static int crypto_ccm_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 					mac_name);
+ }
+ 
+-static struct crypto_template crypto_ccm_tmpl = {
+-	.name = "ccm",
+-	.create = crypto_ccm_create,
+-	.module = THIS_MODULE,
+-};
+-
+ static int crypto_ccm_base_create(struct crypto_template *tmpl,
+ 				  struct rtattr **tb)
+ {
+@@ -618,12 +612,6 @@ static int crypto_ccm_base_create(struct crypto_template *tmpl,
+ 					cipher_name);
+ }
+ 
+-static struct crypto_template crypto_ccm_base_tmpl = {
+-	.name = "ccm_base",
+-	.create = crypto_ccm_base_create,
+-	.module = THIS_MODULE,
+-};
+-
+ static int crypto_rfc4309_setkey(struct crypto_aead *parent, const u8 *key,
+ 				 unsigned int keylen)
+ {
+@@ -854,12 +842,6 @@ static int crypto_rfc4309_create(struct crypto_template *tmpl,
+ 	goto out;
+ }
+ 
+-static struct crypto_template crypto_rfc4309_tmpl = {
+-	.name = "rfc4309",
+-	.create = crypto_rfc4309_create,
+-	.module = THIS_MODULE,
+-};
+-
+ static int crypto_cbcmac_digest_setkey(struct crypto_shash *parent,
+ 				     const u8 *inkey, unsigned int keylen)
+ {
+@@ -999,51 +981,37 @@ static int cbcmac_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 	return err;
+ }
+ 
+-static struct crypto_template crypto_cbcmac_tmpl = {
+-	.name = "cbcmac",
+-	.create = cbcmac_create,
+-	.free = shash_free_instance,
+-	.module = THIS_MODULE,
++static struct crypto_template crypto_ccm_tmpls[] = {
++	{
++		.name = "cbcmac",
++		.create = cbcmac_create,
++		.free = shash_free_instance,
++		.module = THIS_MODULE,
++	}, {
++		.name = "ccm_base",
++		.create = crypto_ccm_base_create,
++		.module = THIS_MODULE,
++	}, {
++		.name = "ccm",
++		.create = crypto_ccm_create,
++		.module = THIS_MODULE,
++	}, {
++		.name = "rfc4309",
++		.create = crypto_rfc4309_create,
++		.module = THIS_MODULE,
++	},
+ };
+ 
+ static int __init crypto_ccm_module_init(void)
+ {
+-	int err;
+-
+-	err = crypto_register_template(&crypto_cbcmac_tmpl);
+-	if (err)
+-		goto out;
+-
+-	err = crypto_register_template(&crypto_ccm_base_tmpl);
+-	if (err)
+-		goto out_undo_cbcmac;
+-
+-	err = crypto_register_template(&crypto_ccm_tmpl);
+-	if (err)
+-		goto out_undo_base;
+-
+-	err = crypto_register_template(&crypto_rfc4309_tmpl);
+-	if (err)
+-		goto out_undo_ccm;
+-
+-out:
+-	return err;
+-
+-out_undo_ccm:
+-	crypto_unregister_template(&crypto_ccm_tmpl);
+-out_undo_base:
+-	crypto_unregister_template(&crypto_ccm_base_tmpl);
+-out_undo_cbcmac:
+-	crypto_register_template(&crypto_cbcmac_tmpl);
+-	goto out;
++	return crypto_register_templates(crypto_ccm_tmpls,
++					 ARRAY_SIZE(crypto_ccm_tmpls));
+ }
+ 
+ static void __exit crypto_ccm_module_exit(void)
+ {
+-	crypto_unregister_template(&crypto_rfc4309_tmpl);
+-	crypto_unregister_template(&crypto_ccm_tmpl);
+-	crypto_unregister_template(&crypto_ccm_base_tmpl);
+-	crypto_unregister_template(&crypto_cbcmac_tmpl);
++	crypto_unregister_templates(crypto_ccm_tmpls,
++				    ARRAY_SIZE(crypto_ccm_tmpls));
+ }
+ 
+ module_init(crypto_ccm_module_init);
 -- 
-2.20.1
+1.7.12.4
