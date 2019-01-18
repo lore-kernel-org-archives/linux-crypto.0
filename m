@@ -1,59 +1,50 @@
-Return-Path: <SRS0=CSIn=PT=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:47640 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388214AbfAKO2s (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Jan 2019 09:28:48 -0500
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: linux-kernel@vger.kernel.org
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        stable@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Martin Willi <martin@strongswan.org>,
-        Eric Biggers <ebiggers@google.com>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH 4.9 42/63] crypto: x86/chacha20 - avoid sleeping with preemption disabled
-Date: Fri, 11 Jan 2019 15:14:45 +0100
-Message-Id: <20190111131052.654348898@linuxfoundation.org>
-In-Reply-To: <20190111131046.387528003@linuxfoundation.org>
-References: <20190111131046.387528003@linuxfoundation.org>
+Return-Path: <SRS0=FsAa=P2=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from stargate.chelsio.com ([12.32.117.8]:2548 "EHLO
+        stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727170AbfARHNe (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 18 Jan 2019 02:13:34 -0500
+From: Atul Gupta <atul.gupta@chelsio.com>
+To: davem@davemloft.net, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
+        dt@chelsio.com
+Cc: atul.gupta@chelsio.com
+Subject: [RFC patch 0/4] Inline TLS client and v6
+Date: Thu, 17 Jan 2019 23:13:13 -0800
+Message-Id: <20190118071313.9484-1-atul.gupta@chelsio.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-4.9-stable review patch.  If anyone has any objections, please let me know.
+Extends Inline TLS record processing to TLS client. connect
+API is added to tls_context to setup hardware for TLS
+connection and handshake. Functionality wise, this makes the solution
+end-to-end Inline TLS capable. TLS server and client
+can operate in Inline mode and leverage hardware for complete
+TLS offload.
+[0004] Adds IPv6 support to Inline TLS server and client.
 
-------------------
+Atul Gupta (4):
+  net/tls: connect routine for Inline TLS client
+  crypto/chelsio/chtls: hardware connect API
+  crypto/chelsio/chtls: CPL for TLS client
+  crypto/chelsio/chtls: IPv6 for Inline TLS
 
+ drivers/crypto/chelsio/chtls/chtls.h          |   18 +-
+ drivers/crypto/chelsio/chtls/chtls_cm.c       | 1276 ++++++++++++++++++++++---
+ drivers/crypto/chelsio/chtls/chtls_cm.h       |   12 +-
+ drivers/crypto/chelsio/chtls/chtls_hw.c       |    7 +-
+ drivers/crypto/chelsio/chtls/chtls_io.c       |   41 +-
+ drivers/crypto/chelsio/chtls/chtls_main.c     |  168 +++-
+ drivers/net/ethernet/chelsio/cxgb4/t4_msg.h   |   18 +
+ drivers/net/ethernet/chelsio/cxgb4/t4fw_api.h |    2 +
+ include/net/tls.h                             |    5 +
+ include/net/transp_v6.h                       |    8 +
+ net/core/secure_seq.c                         |    1 +
+ net/ipv6/tcp_ipv6.c                           |   26 +-
+ net/tls/tls_main.c                            |   23 +
+ 13 files changed, 1455 insertions(+), 150 deletions(-)
 
-From: Eric Biggers <ebiggers@google.com>
-
-In chacha20-simd, clear the MAY_SLEEP flag in the blkcipher_desc to
-prevent sleeping with preemption disabled, under kernel_fpu_begin().
-
-This was fixed upstream incidentally by a large refactoring,
-commit 9ae433bc79f9 ("crypto: chacha20 - convert generic and x86
-versions to skcipher").  But syzkaller easily trips over this when
-running on older kernels, as it's easily reachable via AF_ALG.
-Therefore, this patch makes the minimal fix for older kernels.
-
-Fixes: c9320b6dcb89 ("crypto: chacha20 - Add a SSSE3 SIMD variant for x86_64")
-Cc: linux-crypto@vger.kernel.org
-Cc: Martin Willi <martin@strongswan.org>
-Signed-off-by: Eric Biggers <ebiggers@google.com>
-Acked-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- arch/x86/crypto/chacha20_glue.c |    1 +
- 1 file changed, 1 insertion(+)
-
---- a/arch/x86/crypto/chacha20_glue.c
-+++ b/arch/x86/crypto/chacha20_glue.c
-@@ -77,6 +77,7 @@ static int chacha20_simd(struct blkciphe
- 
- 	blkcipher_walk_init(&walk, dst, src, nbytes);
- 	err = blkcipher_walk_virt_block(desc, &walk, CHACHA20_BLOCK_SIZE);
-+	desc->flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
- 
- 	crypto_chacha20_init(state, crypto_blkcipher_ctx(desc->tfm), walk.iv);
- 
+-- 
+1.8.3.1
