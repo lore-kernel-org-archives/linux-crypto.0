@@ -1,67 +1,42 @@
 Return-Path: <SRS0=FsAa=P2=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:33806 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726834AbfARC5d (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Jan 2019 21:57:33 -0500
-Date: Thu, 17 Jan 2019 18:57:30 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: Xiongfeng Wang <wangxiongfeng2@huawei.com>
-Cc: herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        broonie@kernel.org, ard.biesheuvel@linaro.org,
-        jonathan.cameron@huawei.com
-Subject: Re: [PATCH V2 0/5] Crypto Cleanup
-Message-ID: <20190118025729.GA737@sol.localdomain>
-References: <1547707683-45878-1-git-send-email-wangxiongfeng2@huawei.com>
+Received: from stargate.chelsio.com ([12.32.117.8]:12044 "EHLO
+        stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726902AbfARE4q (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 17 Jan 2019 23:56:46 -0500
+From: Atul Gupta <atul.gupta@chelsio.com>
+To: davem@davemloft.net, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
+        dt@chelsio.com
+Cc: atul.gupta@chelsio.com
+Subject: [net-next 3/3] cxgb4: TLS record offload enable
+Date: Thu, 17 Jan 2019 20:56:39 -0800
+Message-Id: <20190118045639.2877-1-atul.gupta@chelsio.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1547707683-45878-1-git-send-email-wangxiongfeng2@huawei.com>
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Thu, Jan 17, 2019 at 02:47:58PM +0800, Xiongfeng Wang wrote:
-> The patchset introduce a helper to (un)register a array of crypto templates.
-> The following patches use this helper to simplify the code. This is also
-> a preparation for a coming patchset, which will register several crypto
-> templates.
-> 
-> Changelog:
-> v1 -> v2: 
-> 	rebased to cryptodev, fix some format issue
-> 
-> Xiongfeng Wang (5):
->   crypto: api - add a helper to (un)register a array of templates
->   crypto: ccm - use template array registering API to simplify the code
->   crypto: gcm - use template array registering API to simplify the code
->   crypto: ctr - use template array registering API to simplify the code
->   crypto: chacha20poly1305 - use template array registering API to
->     simplify the code
-> 
->  crypto/algapi.c           | 27 ++++++++++++++++
->  crypto/ccm.c              | 78 ++++++++++++++---------------------------------
->  crypto/chacha20poly1305.c | 37 +++++++++-------------
->  crypto/ctr.c              | 43 +++++++++-----------------
->  crypto/gcm.c              | 73 ++++++++++++++------------------------------
->  include/crypto/algapi.h   |  2 ++
->  6 files changed, 104 insertions(+), 156 deletions(-)
-> 
-> -- 
-> 1.7.12.4
-> 
+Enable Inline TLS record by default
 
-For all 5 patches:
+Signed-off-by: Atul Gupta <atul.gupta@chelsio.com>
+---
+ drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Reviewed-by: Eric Biggers <ebiggers@google.com>
-
-However, you need to fix your email address to be the same in the Author and
-Signed-off-by.  Right now it's:
-
-Author: Xiongfeng Wang <wangxiongfeng2@huawei.com>
-Signed-off-by: Xiongfeng Wang <xiongfeng.wang@linaro.org>
-
-(checkpatch.pl also warns about this.)
-
-Thanks!
-
-- Eric
+diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
+index 6ba9099..73fc247 100644
+--- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
++++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
+@@ -5653,7 +5653,8 @@ static int init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 						   NETIF_F_GSO_UDP_TUNNEL |
+ 						   NETIF_F_TSO | NETIF_F_TSO6;
+ 
+-			netdev->hw_features |= NETIF_F_GSO_UDP_TUNNEL;
++			netdev->hw_features |= NETIF_F_GSO_UDP_TUNNEL |
++					       NETIF_F_HW_TLS_RECORD;
+ 		}
+ 
+ 		if (highdma)
+-- 
+1.8.3.1
