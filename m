@@ -1,85 +1,49 @@
-Return-Path: <SRS0=hYBA=PX=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail.kernel.org ([198.145.29.99]:58548 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728025AbfAORpn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Jan 2019 12:45:43 -0500
-Date: Tue, 15 Jan 2019 09:45:40 -0800
-From: Eric Biggers <ebiggers@kernel.org>
-To: linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 4/5] crypto: testmgr - add rfc4543(gcm(aes)) decryption
- test to encryption tests
-Message-ID: <20190115174538.GA10955@gmail.com>
-References: <20190113233228.5851-1-ebiggers@kernel.org>
- <20190113233228.5851-5-ebiggers@kernel.org>
+Return-Path: <SRS0=FsAa=P2=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2257 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727084AbfARF65 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 18 Jan 2019 00:58:57 -0500
+From: Xiongfeng Wang <wangxiongfeng2@huawei.com>
+To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <ebiggers@kernel.org>
+CC: <wangxiongfeng2@huawei.com>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <broonie@kernel.org>,
+        <ard.biesheuvel@linaro.org>, <jonathan.cameron@huawei.com>
+Subject: [PATCH V3 0/5] Crypto Cleanup
+Date: Fri, 18 Jan 2019 13:58:10 +0800
+Message-ID: <1547791095-48339-1-git-send-email-wangxiongfeng2@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190113233228.5851-5-ebiggers@kernel.org>
+Content-Type: text/plain
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Sun, Jan 13, 2019 at 03:32:27PM -0800, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
-> 
-> One "ccm(aes)" decryption test vector doesn't exactly match any of the
-> encryption test vectors with input and result swapped.  In preparation
+The patchset introduce a helper to (un)register a array of crypto templates.
+The following patches use this helper to simplify the code. This is also
+a preparation for a coming patchset, which will register several crypto
+templates.
 
-This should say "rfc4543(gcm(aes))".  If I happen to send v2 of this series I'll
-fix it, otherwise Herbert can you fix this when applying?  Thanks!
+Changelog:
+v2 -> v3:
+	remove the extra blank line in the fourth patch
+	change author to Xiongfeng Wang <xiongfeng.wang@linaro.org>
+v1 -> v2: 
+	rebased to cryptodev, fix some format issue
 
-- Eric
+Xiongfeng Wang (5):
+  crypto: api - add a helper to (un)register a array of templates
+  crypto: ccm - use template array registering API to simplify the code
+  crypto: gcm - use template array registering API to simplify the code
+  crypto: ctr - use template array registering API to simplify the code
+  crypto: chacha20poly1305 - use template array registering API to
+    simplify the code
 
-> for removing the AEAD decryption test vectors and testing AEAD
-> decryption using the encryption test vectors, add this to the encryption
-> test vectors, so we don't lose any test coverage.
-> 
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-> ---
->  crypto/testmgr.h | 30 +++++++++++++++++++++++++++++-
->  1 file changed, 29 insertions(+), 1 deletion(-)
-> 
-> diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-> index 5d8f867b9b837..8d1c2dfe3becb 100644
-> --- a/crypto/testmgr.h
-> +++ b/crypto/testmgr.h
-> @@ -18454,7 +18454,35 @@ static const struct aead_testvec aes_gcm_rfc4543_enc_tv_template[] = {
->  			  "\xe1\x55\x10\x6a\xa8\xdc\xd6\x18"
->  			  "\xe4\x09\x9a\xaa",
->  		.rlen	= 68,
-> -	}
-> +	}, { /* nearly same as previous, but should fail */
-> +		.key	= "\x4c\x80\xcd\xef\xbb\x5d\x10\xda"
-> +			  "\x90\x6a\xc7\x3c\x36\x13\xa6\x34"
-> +			  "\x22\x43\x3c\x64",
-> +		.klen	= 20,
-> +		.iv	= zeroed_string,
-> +		.assoc	= "\x00\x00\x43\x21\x00\x00\x00\x07"
-> +			  "\x00\x00\x00\x00\x00\x00\x00\x00",
-> +		.alen	= 16,
-> +		.input	= "\x45\x00\x00\x30\xda\x3a\x00\x00"
-> +			  "\x80\x01\xdf\x3b\xc0\xa8\x00\x05"
-> +			  "\xc0\xa8\x00\x01\x08\x00\xc6\xcd"
-> +			  "\x02\x00\x07\x00\x61\x62\x63\x64"
-> +			  "\x65\x66\x67\x68\x69\x6a\x6b\x6c"
-> +			  "\x6d\x6e\x6f\x70\x71\x72\x73\x74"
-> +			  "\x01\x02\x02\x01",
-> +		.ilen	= 52,
-> +		.novrfy = 1,
-> +		.result	= "\x45\x00\x00\x30\xda\x3a\x00\x00"
-> +			  "\x80\x01\xdf\x3b\xc0\xa8\x00\x05"
-> +			  "\xc0\xa8\x00\x01\x08\x00\xc6\xcd"
-> +			  "\x02\x00\x07\x00\x61\x62\x63\x64"
-> +			  "\x65\x66\x67\x68\x69\x6a\x6b\x6c"
-> +			  "\x6d\x6e\x6f\x70\x71\x72\x73\x74"
-> +			  "\x01\x02\x02\x01\xf2\xa9\xa8\x36"
-> +			  "\xe1\x55\x10\x6a\xa8\xdc\xd6\x18"
-> +			  "\x00\x00\x00\x00",
-> +		.rlen	= 68,
-> +	},
->  };
->  
->  static const struct aead_testvec aes_gcm_rfc4543_dec_tv_template[] = {
-> -- 
-> 2.20.1
-> 
+ crypto/algapi.c           | 27 ++++++++++++++++
+ crypto/ccm.c              | 78 ++++++++++++++---------------------------------
+ crypto/chacha20poly1305.c | 37 +++++++++-------------
+ crypto/ctr.c              | 42 +++++++++----------------
+ crypto/gcm.c              | 73 ++++++++++++++------------------------------
+ include/crypto/algapi.h   |  2 ++
+ 6 files changed, 103 insertions(+), 156 deletions(-)
+
+-- 
+1.7.12.4
