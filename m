@@ -1,55 +1,94 @@
-Return-Path: <SRS0=b5ak=PZ=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-eopbgr800073.outbound.protection.outlook.com ([40.107.80.73]:14816
-        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
+Return-Path: <SRS0=FsAa=P2=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2256 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725980AbfAQHCq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Jan 2019 02:02:46 -0500
-From: Kalyani Akula <kalyani.akula@xilinx.com>
+        id S1727100AbfARF65 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 18 Jan 2019 00:58:57 -0500
+From: Xiongfeng Wang <wangxiongfeng2@huawei.com>
 To: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: Kalyani Akula <kalyania@xilinx.com>,
-        Sarat Chand Savitala <saratcha@xilinx.com>,
-        Kalyani Akula <kalyani.akula@xilinx.com>
-Subject: [RFC PATCH 0/5] Add Xilinx's ZynqMP AES driver support
-Date: Thu, 17 Jan 2019 12:32:16 +0530
-Message-ID: <1547708541-23730-1-git-send-email-kalyani.akula@xilinx.com>
+        <ebiggers@kernel.org>
+CC: <wangxiongfeng2@huawei.com>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <broonie@kernel.org>,
+        <ard.biesheuvel@linaro.org>, <jonathan.cameron@huawei.com>
+Subject: [PATCH V3 1/5] crypto: api - add a helper to (un)register a array of templates
+Date: Fri, 18 Jan 2019 13:58:11 +0800
+Message-ID: <1547791095-48339-2-git-send-email-wangxiongfeng2@huawei.com>
+In-Reply-To: <1547791095-48339-1-git-send-email-wangxiongfeng2@huawei.com>
+References: <1547791095-48339-1-git-send-email-wangxiongfeng2@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-This patch set adds support for
-- dt-binding docs for Xilinx ZynqMP AES driver
-- Adds device tree node for ZynqMP SHA3 driver
-- Adds communication layer support for aes in zynqmp.c
-- Adds user space interface for ALG_SET_KEY_TYPE
-- Adds Xilinx ZynqMP driver for AES Algorithm
+From: Xiongfeng Wang <xiongfeng.wang@linaro.org>
 
-Kalyani Akula (5):
-  dt-bindings: crypto: Add bindings for ZynqMP AES driver
-  ARM64: zynqmp: Add Xilinix AES node.
-  firmware: xilinx: Add ZynqMP aes API for AES functionality
-  crypto: Adds user space interface for ALG_SET_KEY_TYPE
-  crypto: Add Xilinx AES driver
+This patch add a helper to (un)register a array of templates. The
+following patches will use this helper to simplify the code.
 
- .../devicetree/bindings/crypto/xlnx,zynqmp-aes.txt |  12 +
- arch/arm64/boot/dts/xilinx/zynqmp.dtsi             |   4 +
- crypto/af_alg.c                                    |   7 +
- crypto/algif_skcipher.c                            |   7 +
- crypto/blkcipher.c                                 |   9 +
- crypto/skcipher.c                                  |  18 ++
- drivers/crypto/Kconfig                             |  11 +
- drivers/crypto/Makefile                            |   1 +
- drivers/crypto/zynqmp-aes.c                        | 331 +++++++++++++++++++++
- drivers/firmware/xilinx/zynqmp.c                   |  24 ++
- include/crypto/if_alg.h                            |   2 +
- include/crypto/skcipher.h                          |  10 +
- include/linux/crypto.h                             |  12 +
- include/linux/firmware/xlnx-zynqmp.h               |   2 +
- include/uapi/linux/if_alg.h                        |   1 +
- 15 files changed, 451 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/crypto/xlnx,zynqmp-aes.txt
- create mode 100644 drivers/crypto/zynqmp-aes.c
+Signed-off-by: Xiongfeng Wang <xiongfeng.wang@linaro.org>
+Reviewed-by: Eric Biggers <ebiggers@google.com>
+---
+ crypto/algapi.c         | 27 +++++++++++++++++++++++++++
+ include/crypto/algapi.h |  2 ++
+ 2 files changed, 29 insertions(+)
 
+diff --git a/crypto/algapi.c b/crypto/algapi.c
+index 713baab..4c9c86b 100644
+--- a/crypto/algapi.c
++++ b/crypto/algapi.c
+@@ -494,6 +494,24 @@ int crypto_register_template(struct crypto_template *tmpl)
+ }
+ EXPORT_SYMBOL_GPL(crypto_register_template);
+ 
++int crypto_register_templates(struct crypto_template *tmpls, int count)
++{
++	int i, err;
++
++	for (i = 0; i < count; i++) {
++		err = crypto_register_template(&tmpls[i]);
++		if (err)
++			goto out;
++	}
++	return 0;
++
++out:
++	for (--i; i >= 0; --i)
++		crypto_unregister_template(&tmpls[i]);
++	return err;
++}
++EXPORT_SYMBOL_GPL(crypto_register_templates);
++
+ void crypto_unregister_template(struct crypto_template *tmpl)
+ {
+ 	struct crypto_instance *inst;
+@@ -523,6 +541,15 @@ void crypto_unregister_template(struct crypto_template *tmpl)
+ }
+ EXPORT_SYMBOL_GPL(crypto_unregister_template);
+ 
++void crypto_unregister_templates(struct crypto_template *tmpls, int count)
++{
++	int i;
++
++	for (i = count - 1; i >= 0; --i)
++		crypto_unregister_template(&tmpls[i]);
++}
++EXPORT_SYMBOL_GPL(crypto_unregister_templates);
++
+ static struct crypto_template *__crypto_lookup_template(const char *name)
+ {
+ 	struct crypto_template *q, *tmpl = NULL;
+diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
+index 093869f..4be38cd 100644
+--- a/include/crypto/algapi.h
++++ b/include/crypto/algapi.h
+@@ -143,7 +143,9 @@ struct ablkcipher_walk {
+ void crypto_mod_put(struct crypto_alg *alg);
+ 
+ int crypto_register_template(struct crypto_template *tmpl);
++int crypto_register_templates(struct crypto_template *tmpls, int count);
+ void crypto_unregister_template(struct crypto_template *tmpl);
++void crypto_unregister_templates(struct crypto_template *tmpls, int count);
+ struct crypto_template *crypto_lookup_template(const char *name);
+ 
+ int crypto_register_instance(struct crypto_template *tmpl,
 -- 
-1.9.5
+1.7.12.4
