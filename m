@@ -1,92 +1,58 @@
-Return-Path: <SRS0=CSIn=PT=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:33674 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729792AbfAKJjI (ORCPT
+Return-Path: <SRS0=FsAa=P2=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:48496 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726809AbfARK5S (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Jan 2019 04:39:08 -0500
-Received: by mail-wm1-f66.google.com with SMTP id r24so1580468wmh.0
-        for <linux-crypto@vger.kernel.org>; Fri, 11 Jan 2019 01:39:06 -0800 (PST)
-Date: Fri, 11 Jan 2019 09:39:02 +0000
-From: Daniel Thompson <daniel.thompson@linaro.org>
-To: Sumit Garg <sumit.garg@linaro.org>
-Cc: linux-arm-kernel@lists.infradead.org,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
-        <linux-crypto@vger.kernel.org>, linux-kernel@vger.kernel.org,
-        Jens Wiklander <jens.wiklander@linaro.org>, mpm@selenic.com,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Bhupesh Sharma <bhsharma@redhat.com>, tee-dev@lists.linaro.org
-Subject: Re: [PATCH v2 2/4] tee: optee: add TEE bus device enumeration support
-Message-ID: <20190111093902.hfxb67txjhhlegzu@holly.lan>
-References: <1547123097-16431-1-git-send-email-sumit.garg@linaro.org>
- <1547123097-16431-3-git-send-email-sumit.garg@linaro.org>
- <20190110141856.p3evqyf34py74gkg@holly.lan>
- <CAFA6WYPHmtY4N9ruGLZ70FNeiDCbQE-fs+EP2px-S+GEj2nPTw@mail.gmail.com>
+        Fri, 18 Jan 2019 05:57:18 -0500
+Date: Fri, 18 Jan 2019 18:57:17 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: linux-crypto@vger.kernel.org
+Subject: Re: [PATCH 00/11] crypto: misc fixes/cleanups
+Message-ID: <20190118105717.rnel2yq3tetefts6@gondor.apana.org.au>
+References: <20190110201802.82442-1-ebiggers@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAFA6WYPHmtY4N9ruGLZ70FNeiDCbQE-fs+EP2px-S+GEj2nPTw@mail.gmail.com>
+In-Reply-To: <20190110201802.82442-1-ebiggers@kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-On Fri, Jan 11, 2019 at 12:52:19PM +0530, Sumit Garg wrote:
-> On Thu, 10 Jan 2019 at 19:49, Daniel Thompson
-> <daniel.thompson@linaro.org> wrote:
-> > > +static int get_devices(struct tee_context *ctx, u32 session,
-> > > +                    struct tee_shm *device_uuid, u32 *shm_size)
-> >
-> > Missing const on device_uuid?
-> >
+On Thu, Jan 10, 2019 at 12:17:51PM -0800, Eric Biggers wrote:
+> Some more miscellaneous crypto fixes and cleanups:
 > 
-> I don't think we should have a const for device_uuid here as this is
-> shared memory struct pointer which is dynamically allocated and used
-> to fetch device UUIDs.
-
-Agree. Perhaps device_uuid is misnamed though (part of the reason I
-misread this is that it is singular so I though it was a single UUID
-travelling into the TZ).
-
-> > > +     rc = get_devices(ctx, sess_arg.session, device_shm, &shm_size);
-> > > +     if (rc < 0)
-> > > +             goto out_shm;
-> > > +
-> > > +     device_uuid = tee_shm_get_va(device_shm, 0);
-> > > +     if (IS_ERR(device_uuid)) {
-> > > +             pr_err("tee_shm_get_va failed\n");
-> > > +             rc = PTR_ERR(device_uuid);
-> > > +             goto out_shm;
-> > > +     }
-> > > +
-> > > +     while (idx < shm_size / sizeof(uuid_t)) {
-> >
-> > This is a very uncommon way to write a for loop ;-).
-> >
+> - Patch 1-6: fix sparse warnings in 6 files.
+> - Patch 7: fix unaligned memory access in tgr192.
+> - Patch 8-11: a few other cleanups.
 > 
-> Ok, will add "num_devices" variable.
+> Eric Biggers (11):
+>   crypto: gcm - use correct endianness type in gcm_hash_len()
+>   crypto: rsa-pkcs1pad - include <crypto/internal/rsa.h>
+>   crypto: streebog - use correct endianness type
+>   crypto: testmgr - handle endianness correctly in alg_test_crc32c()
+>   crypto: user - forward declare crypto_nlsk
+>   crypto: x86/aesni-gcm - make 'struct aesni_gcm_tfm_s' static const
+>   crypto: tgr192 - fix unaligned memory access
+>   crypto: stat - remove unused mutex
+>   crypto: af_alg - make some functions static
+>   crypto: af_alg - use list_for_each_entry() in af_alg_count_tsgl()
+>   crypto: af_alg - remove redundant initializations of sk_family
+> 
+>  arch/x86/crypto/aesni-intel_glue.c   | 34 +++++++++++-----------------
+>  crypto/af_alg.c                      | 33 ++++++++++-----------------
+>  crypto/crypto_user_stat.c            |  4 ----
+>  crypto/gcm.c                         |  2 +-
+>  crypto/rsa-pkcs1pad.c                |  1 +
+>  crypto/streebog_generic.c            |  2 +-
+>  crypto/testmgr.c                     | 10 ++++----
+>  crypto/tgr192.c                      |  6 ++---
+>  include/crypto/if_alg.h              |  7 ------
+>  include/crypto/internal/cryptouser.h |  2 ++
+>  include/crypto/streebog.h            |  2 +-
+>  11 files changed, 39 insertions(+), 64 deletions(-)
 
-num_devices might add readability but that is not what I meant.
-
-The most idiomatic way to write somthing that loops for every valid index
-value is:
-
-	for (i=0; i < limit; i++)
-
-You wrote it like this:
-
-	int idx=0;
-
-	/* lots of code between initializer and first use */
-
-	while (idx < limit) {
-		/* more code */
-		idx++;
-	}
-
-Sure, they are equivalent but the idiomatic form is easier to read.
-
-
-Daniel.
+All applied.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
