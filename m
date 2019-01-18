@@ -1,95 +1,43 @@
-Return-Path: <SRS0=b5ak=PZ=vger.kernel.org=linux-crypto-owner@kernel.org>
-Received: from Galois.linutronix.de ([146.0.238.70]:48009 "EHLO
-        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727122AbfAQXP0 (ORCPT
+Return-Path: <SRS0=FsAa=P2=vger.kernel.org=linux-crypto-owner@kernel.org>
+Received: from orcrist.hmeau.com ([104.223.48.154]:48158 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727077AbfARE4B (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Jan 2019 18:15:26 -0500
-Message-Id: <20190117231501.162093731@linutronix.de>
-Date: Fri, 18 Jan 2019 00:14:20 +0100
-From: Thomas Gleixner <tglx@linutronix.de>
-To: LKML <linux-kernel@vger.kernel.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Kate Stewart <kstewart@linuxfoundation.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Ondrej Mosnacek <omosnacek@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-Subject: [patch 4/9] crypto: aegis - Convert to SPDX license identifiers
-References: <20190117231416.111952141@linutronix.de>
+        Thu, 17 Jan 2019 23:56:01 -0500
+Date: Fri, 18 Jan 2019 12:55:46 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Zhou Wang <wangzhou1@hisilicon.com>
+Cc: linux-kernel@vger.kernel.org, linuxarm@huawei.com,
+        linux-crypto@vger.kernel.org,
+        "David S . Miller" <davem@davemloft.net>
+Subject: Re: [PATCH 3/4] crypto: hisilicon: Add HiSilicon ZIP accelerator
+ support
+Message-ID: <20190118045546.hs37a2isfnvxgm7j@gondor.apana.org.au>
+References: <1545465105-133138-1-git-send-email-wangzhou1@hisilicon.com>
+ <1545465105-133138-4-git-send-email-wangzhou1@hisilicon.com>
+ <20190111060859.k647ltxukywjmi3l@gondor.apana.org.au>
+ <5C383908.4090107@hisilicon.com>
+ <5C3F3BDF.6070409@hisilicon.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5C3F3BDF.6070409@hisilicon.com>
 Sender: linux-crypto-owner@vger.kernel.org
 List-ID: <linux-crypto.vger.kernel.org>
 
-The license boiler plate text is not ideal for machine parsing. The kernel
-uses SPDX license identifiers for that purpose, which replace the boiler
-plate text.
+On Wed, Jan 16, 2019 at 10:12:47PM +0800, Zhou Wang wrote:
+>
+> A stupid question: how do we test scomp alg?
+> 
+> It seems we can not use general comp API, e.g. crypto_alloc_comp
+> to do this.
+> 
+> Could you give me any clue about this?
 
-Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-Cc: Ondrej Mosnacek <omosnacek@gmail.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org
----
+scomp algorithms are allocated through crypto_alloc_acomp.
 
-P.S.: This patch is part of a larger cleanup, but independent of other
-      patches and is intended to be picked up by the maintainer directly. 
-
----
- crypto/aegis128.c  |    6 +-----
- crypto/aegis128l.c |    6 +-----
- crypto/aegis256.c  |    6 +-----
- 3 files changed, 3 insertions(+), 15 deletions(-)
-
---- a/crypto/aegis128.c
-+++ b/crypto/aegis128.c
-@@ -1,13 +1,9 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
- /*
-  * The AEGIS-128 Authenticated-Encryption Algorithm
-  *
-  * Copyright (c) 2017-2018 Ondrej Mosnacek <omosnacek@gmail.com>
-  * Copyright (C) 2017-2018 Red Hat, Inc. All rights reserved.
-- *
-- * This program is free software; you can redistribute it and/or modify it
-- * under the terms of the GNU General Public License as published by the Free
-- * Software Foundation; either version 2 of the License, or (at your option)
-- * any later version.
-  */
- 
- #include <crypto/algapi.h>
---- a/crypto/aegis128l.c
-+++ b/crypto/aegis128l.c
-@@ -1,13 +1,9 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
- /*
-  * The AEGIS-128L Authenticated-Encryption Algorithm
-  *
-  * Copyright (c) 2017-2018 Ondrej Mosnacek <omosnacek@gmail.com>
-  * Copyright (C) 2017-2018 Red Hat, Inc. All rights reserved.
-- *
-- * This program is free software; you can redistribute it and/or modify it
-- * under the terms of the GNU General Public License as published by the Free
-- * Software Foundation; either version 2 of the License, or (at your option)
-- * any later version.
-  */
- 
- #include <crypto/algapi.h>
---- a/crypto/aegis256.c
-+++ b/crypto/aegis256.c
-@@ -1,13 +1,9 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
- /*
-  * The AEGIS-256 Authenticated-Encryption Algorithm
-  *
-  * Copyright (c) 2017-2018 Ondrej Mosnacek <omosnacek@gmail.com>
-  * Copyright (C) 2017-2018 Red Hat, Inc. All rights reserved.
-- *
-- * This program is free software; you can redistribute it and/or modify it
-- * under the terms of the GNU General Public License as published by the Free
-- * Software Foundation; either version 2 of the License, or (at your option)
-- * any later version.
-  */
- 
- #include <crypto/algapi.h>
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
