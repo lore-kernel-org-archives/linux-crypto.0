@@ -1,308 +1,95 @@
-Return-Path: <SRS0=hYBA=PX=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=FsAa=P2=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77F78C43387
-	for <linux-crypto@archiver.kernel.org>; Tue, 15 Jan 2019 11:54:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BEA8C43387
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Jan 2019 00:26:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 37E4C20656
-	for <linux-crypto@archiver.kernel.org>; Tue, 15 Jan 2019 11:54:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1F3AD20823
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Jan 2019 00:26:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="M20DtUKR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MTgvSGaK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728678AbfAOLyC (ORCPT
+        id S1725982AbfARA0S (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 15 Jan 2019 06:54:02 -0500
-Received: from mail-ua1-f68.google.com ([209.85.222.68]:38567 "EHLO
-        mail-ua1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728593AbfAOLyC (ORCPT
+        Thu, 17 Jan 2019 19:26:18 -0500
+Received: from mail-ot1-f48.google.com ([209.85.210.48]:45676 "EHLO
+        mail-ot1-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725934AbfARA0S (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Jan 2019 06:54:02 -0500
-Received: by mail-ua1-f68.google.com with SMTP id p9so809250uaa.5
-        for <linux-crypto@vger.kernel.org>; Tue, 15 Jan 2019 03:54:01 -0800 (PST)
+        Thu, 17 Jan 2019 19:26:18 -0500
+Received: by mail-ot1-f48.google.com with SMTP id 32so12848540ota.12;
+        Thu, 17 Jan 2019 16:26:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
+        d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=QGZ8jmwFtpmyKE1bae9s1cFmCnLiCPqF39zEMxqmUIk=;
-        b=M20DtUKRFqZeeuuhf4mbmFrkhb3K5dyZ2KnkjvinKesWO2GLPsHjVnmb4CZ0Ihf7wi
-         w3SsxUmZq22ehZllF7uAEZjXUeLyZoKi2x/s/5djqylxvayIp0BS5aW704B/C8s7FCC7
-         7mVIgqLPamTWGaBnyq75aAtxXKPbzRA1WieKM=
+        bh=g/4qz3k273AUqayn063tmJ7Wyqn5N71fj5che6XhgWc=;
+        b=MTgvSGaKK+p7ClgFCL7wVM3Db7x2iP3lAnnTxLIvodlyGD9WNMN8FWct9d7qlzzx2D
+         6RUFFFAGFDY4bAksKwKiYAhQvpSfN5vEvxPM2Ct/BF5nRpocvjzAg+5YLdrrw+cZtS+5
+         FVbZU5d5QjffR6jzXSCq0jVk1nXfTvd7mI9tSEBKKcvwrtmezNU2+kd8Yb3wEZwg2cvF
+         jSDq1HzVouiVJ/oGi9gB2NVVWUyTTwNVTygj4aLwZwfNdqpT2875fdPbp3R7aGweyHeK
+         xhtox8DVcCR+eFzlluIIKhu3KwIg59J0TGOnpt0XJw7/ymN4FtMMGZBE3sR+yL419BH7
+         VdmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=QGZ8jmwFtpmyKE1bae9s1cFmCnLiCPqF39zEMxqmUIk=;
-        b=iI5g7uEr8XoDw2EFSP/3qVnntboh6N4qFjKJsIFXbYPQH4L+WITB+qYzEdUg9OyMIu
-         QBxZcRI+1vu86arm3mstAxmppBC67QScTTS/0jxWUvBQI+CDvHyw+Ae3HIk0+xs/b2oR
-         c7lNboUzHvKkMpxuAY9jV7yw6U6JxWCD7Uown9bUQbtXBBuVBrlBx61HuiuWvsmB1QFy
-         Cpv57TN1F3YXCkpO3qnUK35HJz2Zolxzoks+fpMugBgLZfmRc8oWVtOaUbJyVfbG+7vH
-         lOaSFz3OGtuTrbOUOBexBvnEoN0sxDoZ8EhMz64oqkne66IbmsyLs7FyM4Ty9ri6alET
-         LV4Q==
-X-Gm-Message-State: AJcUukdFUsfO0MB4oNS0TNUcbBpPQxSFv4CSv6OeKYq9NThEutG80Jse
-        wb7KQOBtNYgfDRcGOs3d4JW1GPgp2I+QpAA7F+zp2w==
-X-Google-Smtp-Source: ALg8bN6dAB1cphC4ghhhPcCf5peHRxAozdhR4j/11tumXfCuPWXnblFrrqTDpRafqWZ68nAvx9oJClVx/O6ymWXXiHI=
-X-Received: by 2002:a9f:314c:: with SMTP id n12mr1486974uab.33.1547553240372;
- Tue, 15 Jan 2019 03:54:00 -0800 (PST)
+        bh=g/4qz3k273AUqayn063tmJ7Wyqn5N71fj5che6XhgWc=;
+        b=Eg7M284/hOOUGycrkGP7UmPT3GAvM7Kj0vXrM6WvcPeg+z3BWQZANRdyr9N++OJcJQ
+         xZXQDLYGhjce41Hiv4OKM7NV6xE1xEjwzw1v477Ylkqc1pKuc5HtEzR95JdtGh6sD5Pv
+         weEHbOJCB3tcGBUQyzOXG6gtz9glxUd89WooBt/6hv0AdBtwo6S5HtayzbvcURW6Mbya
+         plC8o1MATBiDpik2HH+/g1LZtUO8P3pV1uyk7q5yU+z4bB4gOnpWYVlGRtt5ZzQPVajN
+         Lra2HgvwtFZKFW/YByBxbsFgNpo+r37KTi4NK6JMTtlT8ymmgvlzQsttHhwhOZO/cSWM
+         IWbQ==
+X-Gm-Message-State: AJcUukdM74+nHMMapJ0RTAhUOEtGXS7zEBqS4ICHxz93S4UolpRaD5dH
+        b7MgyuF9NxpzSMsDM3tUHYljvdKI6yVUWs3niiE=
+X-Google-Smtp-Source: ALg8bN5vtwCA8vh/vLRpRj6k/ia93apWErXTlIAvMna//YkQ9Xa13ariSTxW4922X0gxogm70K/hk1y9O5ZXrRDSgBI=
+X-Received: by 2002:a9d:77d4:: with SMTP id w20mr9996114otl.196.1547771177473;
+ Thu, 17 Jan 2019 16:26:17 -0800 (PST)
 MIME-Version: 1.0
-References: <1547207251-9372-1-git-send-email-sumit.garg@linaro.org>
- <1547207251-9372-2-git-send-email-sumit.garg@linaro.org> <6a01fee4-4331-be63-9a78-c4d646b43d29@redhat.com>
-In-Reply-To: <6a01fee4-4331-be63-9a78-c4d646b43d29@redhat.com>
-From:   Sumit Garg <sumit.garg@linaro.org>
-Date:   Tue, 15 Jan 2019 17:23:48 +0530
+References: <20190117231416.111952141@linutronix.de> <20190117231501.068505479@linutronix.de>
+In-Reply-To: <20190117231501.068505479@linutronix.de>
+From:   Fabio Estevam <festevam@gmail.com>
+Date:   Thu, 17 Jan 2019 22:26:07 -0200
 Message-ID:
- <CAFA6WYNmALRBZ=_61e__rMeVsRNJjUOB=E2Gc4RHzMF0OvqhcQ@mail.gmail.com>
-Subject: Re: [PATCH v3 1/4] tee: add bus driver framework for TEE based devices
-To:     Bhupesh Sharma <bhsharma@redhat.com>
-Cc:     linux-arm-kernel@lists.infradead.org,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>, linux-kernel@vger.kernel.org,
-        Jens Wiklander <jens.wiklander@linaro.org>, mpm@selenic.com,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Arnd Bergmann <arnd@arndb.de>,
+ <CAOMZO5CsTiQV78d6ZvUBwzzU9iF8ZnCpp_O7VBrvxstZ6kNNRg@mail.gmail.com>
+Subject: Re: [patch 3/9] crypto: morus - Cleanup license mess
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Daniel Thompson <daniel.thompson@linaro.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        tee-dev@lists.linaro.org
+        Kate Stewart <kstewart@linuxfoundation.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Ondrej Mosnacek <omosnacek@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
-Message-ID: <20190115115348.niKwZW2BB6L9mqAZHJh3NybotZturnSY798dFxbU8AU@z>
+Message-ID: <20190118002607.2kYBBlReJyG1mIj3Jj1WdfWdJDrzFEN8JJUEdLcjrqU@z>
 
-On Fri, 11 Jan 2019 at 20:39, Bhupesh Sharma <bhsharma@redhat.com> wrote:
->
-> Hi Sumit,
->
-> Thanks for the patch. Some nitpicks in-line:
->
+On Thu, Jan 17, 2019 at 9:17 PM Thomas Gleixner <tglx@linutronix.de> wrote:
 
-Apologies for delay in my response as I was on leave. Please find my
-comments inline.
+> --- a/include/crypto/morus1280_glue.h
+> +++ b/include/crypto/morus1280_glue.h
+> @@ -1,15 +1,10 @@
+> -/* SPDX-License-Identifier: GPL-2.0 */
+> +/* SPDX-License-Identifier: GPL-2.0-or-later */
 
-Will include these nitpicks in v4 but let me wait for any further
-major comments.
+Shouldn't this be: /* SPDX-License-Identifier: GPL-2.0+ */ ?
 
-> On 01/11/2019 05:17 PM, Sumit Garg wrote:
-> > Introduce a generic TEE bus driver concept for TEE based kernel drivers
-> > which would like to communicate with TEE based devices/services.
-> >
-> > In this TEE bus concept, devices/services are identified via Universally
-> > Unique Identifier (UUID) and drivers register a table of device UUIDs
-> > which they can support.
-> >
-> > So this TEE bus framework registers a match() callback function which
-> > iterates over the driver UUID table to find a corresponding match for
-> > device UUID. If a match is found, then this particular device is probed
-> > via corresponding probe api registered by the driver. This process
-> > happens whenever a device or a driver is registered with TEE bus.
-> >
-> > Also this framework allows for device enumeration to be specific to
-> > corresponding TEE implementation like OP-TEE etc.
-> >
-> > Signed-off-by: Sumit Garg <sumit.garg@linaro.org>
-> > ---
-> >   drivers/tee/tee_core.c  | 43 ++++++++++++++++++++++++++++++++++++++++---
-> >   include/linux/tee_drv.h | 36 ++++++++++++++++++++++++++++++++++++
-> >   2 files changed, 76 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/drivers/tee/tee_core.c b/drivers/tee/tee_core.c
-> > index 7b2bb4c..a685940 100644
-> > --- a/drivers/tee/tee_core.c
-> > +++ b/drivers/tee/tee_core.c
-> > @@ -15,7 +15,6 @@
-> >   #define pr_fmt(fmt) "%s: " fmt, __func__
-> >
-> >   #include <linux/cdev.h>
-> > -#include <linux/device.h>
-> >   #include <linux/fs.h>
-> >   #include <linux/idr.h>
-> >   #include <linux/module.h>
-> > @@ -1027,6 +1026,30 @@ int tee_client_invoke_func(struct tee_context *ctx,
-> >   }
-> >   EXPORT_SYMBOL_GPL(tee_client_invoke_func);
-> >
-> > +static int tee_client_device_match(struct device *dev,
-> > +                                struct device_driver *drv)
-> > +{
-> > +     struct tee_client_device *tee_device;
-> > +     const struct tee_client_device_id *id_table;
-> > +
-> > +     tee_device = to_tee_client_device(dev);
-> > +     id_table = to_tee_client_driver(drv)->id_table;
-> > +
-> > +     while (!uuid_is_null(&id_table->uuid)) {
-> > +             if (uuid_equal(&tee_device->id.uuid, &id_table->uuid))
-> > +                     return 1;
-> > +             id_table++;
-> > +     }
-> > +
-> > +     return 0;
-> > +}
-> > +
-> > +struct bus_type tee_bus_type = {
-> > +     .name           = "tee",
-> > +     .match          = tee_client_device_match,
-> > +};
-> > +EXPORT_SYMBOL_GPL(tee_bus_type);
-> > +
-> >   static int __init tee_init(void)
-> >   {
-> >       int rc;
-> > @@ -1040,10 +1063,23 @@ static int __init tee_init(void)
-> >       rc = alloc_chrdev_region(&tee_devt, 0, TEE_NUM_DEVICES, "tee");
-> >       if (rc) {
-> >               pr_err("failed to allocate char dev region\n");
-> > -             class_destroy(tee_class);
-> > -             tee_class = NULL;
-> > +             goto chrdev_err;
-> >       }
-> >
-> > +     rc = bus_register(&tee_bus_type);
-> > +     if (rc) {
-> > +             pr_err("failed to register tee bus\n");
-> > +             goto bus_err;
-> > +     }
-> > +
-> > +     return 0;
-> > +
-> > +bus_err:
-> > +     unregister_chrdev_region(tee_devt, TEE_NUM_DEVICES);
-> > +chrdev_err:
-> > +     class_destroy(tee_class);
-> > +     tee_class = NULL;
-> > +
->
-> Hmm.. these error paths/labels look out-of-order.
-> See 'drivers/i2c/i2c-dev.c' for example.
->
-> Normally our error paths in an __init function is of the same order as
-> the __exit function implementation. So this should be changed to
-> something like:
->
->    +out_unreg_class:
->    +    class_destroy(tee_class);
->    +    tee_class = NULL;
->    +out_unreg_chrdev:
->    +    unregister_chrdev_region(tee_devt, TEE_NUM_DEVICES);
->
+At least this is the form documented in Documentation/process/license-rules.rst:
 
-It seems that prior to this patch also allocation order in __init
-function differed from release order in __exit function. Will correct
-that too along with this.
+" License identifiers for licenses like [L]GPL with the 'or later' option
+   are constructed by using a "+" for indicating the 'or later' option.::
 
-> >       return rc;
-> >   }
-> >
-> > @@ -1052,6 +1088,7 @@ static void __exit tee_exit(void)
-> >       class_destroy(tee_class);
-> >       tee_class = NULL;
-> >       unregister_chrdev_region(tee_devt, TEE_NUM_DEVICES);
-> > +     bus_unregister(&tee_bus_type);
->
-> Since the __exit function order is the reverse of the __init one, lets
-> reorder this as:
->
->   +     bus_unregister(&tee_bus_type);
->         class_destroy(tee_class);
->         tee_class = NULL;
->         unregister_chrdev_region(tee_devt, TEE_NUM_DEVICES);
->
-
-Ok.
-
-> See 'drivers/i2c/i2c-dev.c' for example.
->
-> >   }
-> >
-> >   subsys_initcall(tee_init);
-> > diff --git a/include/linux/tee_drv.h b/include/linux/tee_drv.h
-> > index 6cfe058..ed16bf1 100644
-> > --- a/include/linux/tee_drv.h
-> > +++ b/include/linux/tee_drv.h
-> > @@ -20,6 +20,8 @@
-> >   #include <linux/kref.h>
-> >   #include <linux/list.h>
-> >   #include <linux/tee.h>
-> > +#include <linux/device.h>
-> > +#include <linux/uuid.h>
->
-> If possible, let's keep alphabetical order of header files when making
-> changes in the patch.
->
-
-Ok.
-
-> >
-> >   /*
-> >    * The file describes the API provided by the generic TEE driver to the
-> > @@ -538,4 +540,38 @@ static inline bool tee_param_is_memref(struct tee_param *param)
-> >       }
-> >   }
-> >
-> > +extern struct bus_type tee_bus_type;
-> > +
-> > +/**
-> > + * struct tee_client_device_id - tee based device identifier
-> > + * @uuid:            For TEE based client devices we use the device uuid
-> > + *                   as the identifier.
-> > + */
-> > +struct tee_client_device_id {
-> > +     uuid_t uuid;
-> > +};
->
-> Hmm.. Do we really need a struct for a single element, rather lets use a
-> simple typedef here.
->
-
-Agree, will rather use typedef here.
-
-> > +
-> > +/**
-> > + * struct tee_client_device - tee based device
-> > + * @id:                      device identifier
-> > + * @dev:             device structure
-> > + */
-> > +struct tee_client_device {
-> > +     struct tee_client_device_id id;
-> > +     struct device dev;
-> > +};
->
-> Add a blank line here.
->
-
-Ok.
-
-> > +#define to_tee_client_device(d) container_of(d, struct tee_client_device, dev)
-> > +
-> > +/**
-> > + * struct tee_client_driver - tee client driver
-> > + * @id_table:                device id table supported by this driver
-> > + * @driver:          driver structure
-> > + */
-> > +struct tee_client_driver {
-> > +     const struct tee_client_device_id *id_table;
-> > +     struct device_driver driver;
-> > +};
->
-> Add a blank line here.
-
-Ok.
-
--Sumit
-
-> > +#define to_tee_client_driver(d) \
-> > +             container_of(d, struct tee_client_driver, driver)
-> > +
-> >   #endif /*__TEE_DRV_H*/
-> >
->
-> Thanks,
-> Bhupesh
+      // SPDX-License-Identifier: GPL-2.0+"
