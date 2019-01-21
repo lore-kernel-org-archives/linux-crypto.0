@@ -7,51 +7,51 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA92DC282DB
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Jan 2019 09:30:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2246C282DB
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Jan 2019 09:30:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7E2BE20989
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Jan 2019 09:30:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AA719214DA
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Jan 2019 09:30:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="YWp6esVU"
+	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="aDJE+ypp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727743AbfAUJaP (ORCPT
+        id S1727789AbfAUJaX (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Jan 2019 04:30:15 -0500
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:42396 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727137AbfAUJaP (ORCPT
+        Mon, 21 Jan 2019 04:30:23 -0500
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:40697 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727785AbfAUJaW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 21 Jan 2019 04:30:15 -0500
-Received: by mail-pl1-f193.google.com with SMTP id y1so9539694plp.9
-        for <linux-crypto@vger.kernel.org>; Mon, 21 Jan 2019 01:30:15 -0800 (PST)
+        Mon, 21 Jan 2019 04:30:22 -0500
+Received: by mail-pg1-f195.google.com with SMTP id z10so9223547pgp.7
+        for <linux-crypto@vger.kernel.org>; Mon, 21 Jan 2019 01:30:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=gNIfaDAJxo92xkUgZQoWkczYxox0RUjsVUDgKWLkCFo=;
-        b=YWp6esVUSB2LrKD/+WBhGzde6gToqUO5mQeM6RnPUCri/fXUlaYjJNXrIrD6g+xBTi
-         EbVayh/0QmihcMivu7PqkrFDJ7ZjUWRHEKmtEUlmXwLUtpLmbq0MW27EA9sNpVr+2Q3d
-         VaUiwvEN1RTm9KuQpLAnZ/86BWUQ+4obxhQKA=
+        bh=uKLCQxwqa8Js3kK/DxuzRxhuNhuhV7512lhQqbniQjs=;
+        b=aDJE+yppROVooI4t69NTdkyGKbRb/k2yEaxVPv3cHM69UZn8DDD2oqCK7Fmc/LVm/O
+         WAf+8U/zk1xrfBDmRRRYo5IFXDk/SfjtzyOzMaXXOkfAafrd+pAkYRhefNMeAqhPQ2RU
+         QUSYH2zUeqFQNPr2j+idEVGAskM7vM4hSrBp8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=gNIfaDAJxo92xkUgZQoWkczYxox0RUjsVUDgKWLkCFo=;
-        b=PTQEslaCf7h80inMCE5oXSAPb2YQr2f3Iu5Qr/FGhbqkzhccB32YY1b8CvvCYJTOX6
-         OioJe/A27CNrgh+GciefIbTuHx2ii5xmQoVhuFvYmDptSc34eoqUb70LBtPf/Lxxu571
-         tj2HwxsU5BayS360vpRrDmNZxFFsGhTIaW4c7M2wTFQa/IsG2Jcly8jhfA8NeMPPxO6W
-         YLf06agueBuVp/SFkHTYEOWwtW2S/idtkr9mkTcOmpNgHMVeYRnCcMaBHNkOuDphlDXM
-         VjtRIuNoAGw1IjtDVSIUKemDSvQH8FJSTU4ynCuVgEzPpKxONgMYijj9E4wZVZeJYOEW
-         llgA==
-X-Gm-Message-State: AJcUukcVc7OnYCewsULVkxCGyvygr27m7qyhWM9+7BofS9zb1vPTxnlD
-        z2awgfwzbdjx6RBQxGBU+cRxPg==
-X-Google-Smtp-Source: ALg8bN4bswTMfZdJuGXqHLU7a+RQoetA8wtRByat1rPvSwoqe9All32h9wAcUuX4Dp001EDNyBXGHg==
-X-Received: by 2002:a17:902:66e6:: with SMTP id e93mr28756857plk.92.1548063014939;
-        Mon, 21 Jan 2019 01:30:14 -0800 (PST)
+        bh=uKLCQxwqa8Js3kK/DxuzRxhuNhuhV7512lhQqbniQjs=;
+        b=YG1qQ2fsqecNbl8cVhm5OjAUzwJGQ9Dt8UubkzGiJ3TA8HMYEfHQfie6F2iPN2Pg6b
+         s6dmyqvxhODvFJlu20HC6Mt+Ewj9fdr/YSiel9/7pTkz8+V7piIOUcMCHXz0UgSLRBMM
+         YYceSjQxx5dkksCidozYHrFDhamllKTvrphNIWEi6PxdBOfezp6rg+tGjS2iMQrxCUZB
+         hcqx+AqPeSAnnVfkdip3H2sleR5qorMEqfvz15Gv+B8dR7+szIcQQhD1jllEYbL1BnHl
+         hgilI1qw8v2EMYZYyMnacuwkGeIUyrS+HyVeNRsN/+mDao5hgcv65yksddQyV5sHyHl4
+         ge0Q==
+X-Gm-Message-State: AJcUukdast+SCmU0TZfqdXmXAlgDOsnxsQAOcHNESt5YSfX+M1Ce7Tf2
+        cDagPCk5ne73k3Z24wB6lIa/Rw==
+X-Google-Smtp-Source: ALg8bN4HDuKhyj2oq7C1Nm0eJydTl78emKAO4BAfJJJ7W4piGaIUIGyoQxI4Gzp/zZpkOn87ioQuDg==
+X-Received: by 2002:a65:584e:: with SMTP id s14mr27462624pgr.142.1548063021763;
+        Mon, 21 Jan 2019 01:30:21 -0800 (PST)
 Received: from localhost.localdomain ([117.252.65.115])
-        by smtp.gmail.com with ESMTPSA id h9sm16182777pgd.53.2019.01.21.01.30.08
+        by smtp.gmail.com with ESMTPSA id h9sm16182777pgd.53.2019.01.21.01.30.15
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Mon, 21 Jan 2019 01:30:14 -0800 (PST)
+        Mon, 21 Jan 2019 01:30:21 -0800 (PST)
 From:   Sumit Garg <sumit.garg@linaro.org>
 To:     jens.wiklander@linaro.org, herbert@gondor.apana.org.au
 Cc:     linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
@@ -60,9 +60,9 @@ Cc:     linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
         daniel.thompson@linaro.org, ard.biesheuvel@linaro.org,
         bhsharma@redhat.com, tee-dev@lists.linaro.org,
         Sumit Garg <sumit.garg@linaro.org>
-Subject: [PATCH v4 3/4] tee: optee: add TEE bus device enumeration support
-Date:   Mon, 21 Jan 2019 14:59:18 +0530
-Message-Id: <1548062959-31860-4-git-send-email-sumit.garg@linaro.org>
+Subject: [PATCH v4 4/4] hwrng: add OP-TEE based rng driver
+Date:   Mon, 21 Jan 2019 14:59:19 +0530
+Message-Id: <1548062959-31860-5-git-send-email-sumit.garg@linaro.org>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1548062959-31860-1-git-send-email-sumit.garg@linaro.org>
 References: <1548062959-31860-1-git-send-email-sumit.garg@linaro.org>
@@ -71,73 +71,252 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-OP-TEE provides a pseudo TA to enumerate TAs which can act as devices/
-services for TEE bus. So implement device enumeration using invoke
-function: PTA_CMD_GET_DEVICES provided by pseudo TA to fetch array of
-device UUIDs. Also register these enumerated devices with TEE bus as
-"optee-clntX" device.
+On ARM SoC's with TrustZone enabled, peripherals like entropy sources
+might not be accessible to normal world (linux in this case) and rather
+accessible to secure world (OP-TEE in this case) only. So this driver
+aims to provides a generic interface to OP-TEE based random number
+generator service.
+
+This driver registers on TEE bus to interact with OP-TEE based rng
+device/service.
 
 Signed-off-by: Sumit Garg <sumit.garg@linaro.org>
 ---
- drivers/tee/optee/Makefile        |   1 +
- drivers/tee/optee/core.c          |   4 +
- drivers/tee/optee/device.c        | 153 ++++++++++++++++++++++++++++++++++++++
- drivers/tee/optee/optee_private.h |   3 +
- 4 files changed, 161 insertions(+)
- create mode 100644 drivers/tee/optee/device.c
+ MAINTAINERS                        |   5 +
+ drivers/char/hw_random/Kconfig     |  15 ++
+ drivers/char/hw_random/Makefile    |   1 +
+ drivers/char/hw_random/optee-rng.c | 272 +++++++++++++++++++++++++++++++++++++
+ 4 files changed, 293 insertions(+)
+ create mode 100644 drivers/char/hw_random/optee-rng.c
 
-diff --git a/drivers/tee/optee/Makefile b/drivers/tee/optee/Makefile
-index 48d262a..56263ae 100644
---- a/drivers/tee/optee/Makefile
-+++ b/drivers/tee/optee/Makefile
-@@ -5,3 +5,4 @@ optee-objs += call.o
- optee-objs += rpc.o
- optee-objs += supp.o
- optee-objs += shm_pool.o
-+optee-objs += device.o
-diff --git a/drivers/tee/optee/core.c b/drivers/tee/optee/core.c
-index e5efce3..ac59c77 100644
---- a/drivers/tee/optee/core.c
-+++ b/drivers/tee/optee/core.c
-@@ -634,6 +634,10 @@ static struct optee *optee_probe(struct device_node *np)
- 	if (optee->sec_caps & OPTEE_SMC_SEC_CAP_DYNAMIC_SHM)
- 		pr_info("dynamic shared memory is enabled\n");
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 32d44447..502733c 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -11260,6 +11260,11 @@ M:	Jens Wiklander <jens.wiklander@linaro.org>
+ S:	Maintained
+ F:	drivers/tee/optee/
  
-+	rc = optee_enumerate_devices();
-+	if (rc)
-+		goto err;
++OP-TEE RANDOM NUMBER GENERATOR (RNG) DRIVER
++M:	Sumit Garg <sumit.garg@linaro.org>
++S:	Maintained
++F:	drivers/char/hw_random/optee-rng.c
 +
- 	pr_info("initialized driver\n");
- 	return optee;
- err:
-diff --git a/drivers/tee/optee/device.c b/drivers/tee/optee/device.c
+ OPA-VNIC DRIVER
+ M:	Dennis Dalessandro <dennis.dalessandro@intel.com>
+ M:	Niranjana Vishwanathapura <niranjana.vishwanathapura@intel.com>
+diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+index dac895d..25a7d8f 100644
+--- a/drivers/char/hw_random/Kconfig
++++ b/drivers/char/hw_random/Kconfig
+@@ -424,6 +424,21 @@ config HW_RANDOM_EXYNOS
+ 	  will be called exynos-trng.
+ 
+ 	  If unsure, say Y.
++
++config HW_RANDOM_OPTEE
++	tristate "OP-TEE based Random Number Generator support"
++	depends on OPTEE
++	default HW_RANDOM
++	help
++	  This  driver provides support for OP-TEE based Random Number
++	  Generator on ARM SoCs where hardware entropy sources are not
++	  accessible to normal world (Linux).
++
++	  To compile this driver as a module, choose M here: the module
++	  will be called optee-rng.
++
++	  If unsure, say Y.
++
+ endif # HW_RANDOM
+ 
+ config UML_RANDOM
+diff --git a/drivers/char/hw_random/Makefile b/drivers/char/hw_random/Makefile
+index e35ec3c..7c9ef4a 100644
+--- a/drivers/char/hw_random/Makefile
++++ b/drivers/char/hw_random/Makefile
+@@ -38,3 +38,4 @@ obj-$(CONFIG_HW_RANDOM_CAVIUM) += cavium-rng.o cavium-rng-vf.o
+ obj-$(CONFIG_HW_RANDOM_MTK)	+= mtk-rng.o
+ obj-$(CONFIG_HW_RANDOM_S390) += s390-trng.o
+ obj-$(CONFIG_HW_RANDOM_KEYSTONE) += ks-sa-rng.o
++obj-$(CONFIG_HW_RANDOM_OPTEE) += optee-rng.o
+diff --git a/drivers/char/hw_random/optee-rng.c b/drivers/char/hw_random/optee-rng.c
 new file mode 100644
-index 0000000..b7633ce
+index 0000000..6ac862a
 --- /dev/null
-+++ b/drivers/tee/optee/device.c
-@@ -0,0 +1,153 @@
++++ b/drivers/char/hw_random/optee-rng.c
+@@ -0,0 +1,272 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
-+ * Copyright (C) 2019 Linaro Ltd.
++ * Copyright (C) 2018-2019 Linaro Ltd.
 + */
 +
++#include <linux/delay.h>
++#include <linux/of.h>
++#include <linux/hw_random.h>
 +#include <linux/kernel.h>
++#include <linux/module.h>
 +#include <linux/slab.h>
 +#include <linux/tee_drv.h>
 +#include <linux/uuid.h>
-+#include "optee_private.h"
++
++#define DRIVER_NAME "optee-rng"
++
++#define TEE_ERROR_HEALTH_TEST_FAIL	0x00000001
 +
 +/*
-+ * Get device UUIDs
++ * TA_CMD_GET_ENTROPY - Get Entropy from RNG
 + *
-+ * [out]     memref[0]        Array of device UUIDs
++ * param[0] (inout memref) - Entropy buffer memory reference
++ * param[1] unused
++ * param[2] unused
++ * param[3] unused
 + *
-+ * Return codes:
++ * Result:
 + * TEE_SUCCESS - Invoke command success
 + * TEE_ERROR_BAD_PARAMETERS - Incorrect input param
-+ * TEE_ERROR_SHORT_BUFFER - Output buffer size less than required
++ * TEE_ERROR_NOT_SUPPORTED - Requested entropy size greater than size of pool
++ * TEE_ERROR_HEALTH_TEST_FAIL - Continuous health testing failed
 + */
-+#define PTA_CMD_GET_DEVICES		0x0
++#define TA_CMD_GET_ENTROPY		0x0
++
++/*
++ * TA_CMD_GET_RNG_INFO - Get RNG information
++ *
++ * param[0] (out value) - value.a: RNG data-rate in bytes per second
++ *                        value.b: Quality/Entropy per 1024 bit of data
++ * param[1] unused
++ * param[2] unused
++ * param[3] unused
++ *
++ * Result:
++ * TEE_SUCCESS - Invoke command success
++ * TEE_ERROR_BAD_PARAMETERS - Incorrect input param
++ */
++#define TA_CMD_GET_RNG_INFO		0x1
++
++#define MAX_ENTROPY_REQ_SZ		(4 * 1024)
++
++static struct tee_context *ctx;
++static struct tee_shm *entropy_shm_pool;
++static u32 ta_rng_data_rate;
++static u32 ta_rng_session_id;
++
++static size_t get_optee_rng_data(void *buf, size_t req_size)
++{
++	u32 ret = 0;
++	u8 *rng_data = NULL;
++	size_t rng_size = 0;
++	struct tee_ioctl_invoke_arg inv_arg = {0};
++	struct tee_param param[4] = {0};
++
++	/* Invoke TA_CMD_GET_ENTROPY function of Trusted App */
++	inv_arg.func = TA_CMD_GET_ENTROPY;
++	inv_arg.session = ta_rng_session_id;
++	inv_arg.num_params = 4;
++
++	/* Fill invoke cmd params */
++	param[0].attr = TEE_IOCTL_PARAM_ATTR_TYPE_MEMREF_INOUT;
++	param[0].u.memref.shm = entropy_shm_pool;
++	param[0].u.memref.size = req_size;
++	param[0].u.memref.shm_offs = 0;
++
++	ret = tee_client_invoke_func(ctx, &inv_arg, param);
++	if ((ret < 0) || (inv_arg.ret != 0)) {
++		pr_err("TA_CMD_GET_ENTROPY invoke function error: %x\n",
++		       inv_arg.ret);
++		return 0;
++	}
++
++	rng_data = tee_shm_get_va(entropy_shm_pool, 0);
++	if (IS_ERR(rng_data)) {
++		pr_err("tee_shm_get_va failed\n");
++		return 0;
++	}
++
++	rng_size = param[0].u.memref.size;
++	memcpy(buf, rng_data, rng_size);
++
++	return rng_size;
++}
++
++static int optee_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
++{
++	u8 *data = buf;
++	size_t read = 0, rng_size = 0;
++	int timeout = 1;
++
++	if (max > MAX_ENTROPY_REQ_SZ)
++		max = MAX_ENTROPY_REQ_SZ;
++
++	while (read == 0) {
++		rng_size = get_optee_rng_data(data, (max - read));
++
++		data += rng_size;
++		read += rng_size;
++
++		if (wait) {
++			if (timeout-- == 0)
++				return read;
++			msleep((1000 * (max - read)) / ta_rng_data_rate);
++		} else {
++			return read;
++		}
++	}
++
++	return read;
++}
++
++static int optee_rng_init(struct hwrng *rng)
++{
++	entropy_shm_pool = tee_shm_alloc(ctx, MAX_ENTROPY_REQ_SZ,
++					 TEE_SHM_MAPPED | TEE_SHM_DMA_BUF);
++	if (IS_ERR(entropy_shm_pool)) {
++		pr_err("tee_shm_alloc failed\n");
++		return PTR_ERR(entropy_shm_pool);
++	}
++
++	return 0;
++}
++
++static void optee_rng_cleanup(struct hwrng *rng)
++{
++	tee_shm_free(entropy_shm_pool);
++}
++
++static struct hwrng optee_rng = {
++	.name		= DRIVER_NAME,
++	.init		= optee_rng_init,
++	.cleanup	= optee_rng_cleanup,
++	.read		= optee_rng_read,
++};
++
++static int get_optee_rng_info(struct device *dev)
++{
++	u32 ret = 0;
++	struct tee_ioctl_invoke_arg inv_arg = {0};
++	struct tee_param param[4] = {0};
++
++	/* Invoke TA_CMD_GET_RNG_INFO function of Trusted App */
++	inv_arg.func = TA_CMD_GET_RNG_INFO;
++	inv_arg.session = ta_rng_session_id;
++	inv_arg.num_params = 4;
++
++	/* Fill invoke cmd params */
++	param[0].attr = TEE_IOCTL_PARAM_ATTR_TYPE_VALUE_OUTPUT;
++
++	ret = tee_client_invoke_func(ctx, &inv_arg, param);
++	if ((ret < 0) || (inv_arg.ret != 0)) {
++		dev_err(dev, "TA_CMD_GET_RNG_INFO invoke func error: %x\n",
++			inv_arg.ret);
++		return -EINVAL;
++	}
++
++	ta_rng_data_rate = param[0].u.value.a;
++	optee_rng.quality = param[0].u.value.b;
++
++	return 0;
++}
 +
 +static int optee_ctx_match(struct tee_ioctl_version_data *ver, const void *data)
 +{
@@ -147,149 +326,98 @@ index 0000000..b7633ce
 +		return 0;
 +}
 +
-+static int get_devices(struct tee_context *ctx, u32 session,
-+		       struct tee_shm *device_shm, u32 *shm_size)
++static int optee_rng_probe(struct device *dev)
 +{
-+	u32 ret = 0;
-+	struct tee_ioctl_invoke_arg inv_arg = {0};
-+	struct tee_param param[4] = {0};
-+
-+	/* Invoke PTA_CMD_GET_DEVICES function */
-+	inv_arg.func = PTA_CMD_GET_DEVICES;
-+	inv_arg.session = session;
-+	inv_arg.num_params = 4;
-+
-+	/* Fill invoke cmd params */
-+	param[0].attr = TEE_IOCTL_PARAM_ATTR_TYPE_MEMREF_OUTPUT;
-+	param[0].u.memref.shm = device_shm;
-+	param[0].u.memref.size = *shm_size;
-+	param[0].u.memref.shm_offs = 0;
-+
-+	ret = tee_client_invoke_func(ctx, &inv_arg, param);
-+	if ((ret < 0) || ((inv_arg.ret != TEEC_SUCCESS) &&
-+			  (inv_arg.ret != TEEC_ERROR_SHORT_BUFFER))) {
-+		pr_err("PTA_CMD_GET_DEVICES invoke function err: %x\n",
-+		       inv_arg.ret);
-+		return -EINVAL;
-+	}
-+
-+	*shm_size = param[0].u.memref.size;
-+
-+	return 0;
-+}
-+
-+static int optee_register_device(const uuid_t *device_uuid, u32 device_id)
-+{
-+	struct tee_client_device *optee_device = NULL;
-+	int rc;
-+
-+	optee_device = kzalloc(sizeof(*optee_device), GFP_KERNEL);
-+	if (!optee_device)
-+		return -ENOMEM;
-+
-+	optee_device->dev.bus = &tee_bus_type;
-+	dev_set_name(&optee_device->dev, "optee-clnt%u", device_id);
-+	uuid_copy(&optee_device->id, device_uuid);
-+
-+	rc = device_register(&optee_device->dev);
-+	if (rc) {
-+		pr_err("device registration failed, err: %d\n", rc);
-+		kfree(optee_device);
-+	}
-+
-+	return rc;
-+}
-+
-+int optee_enumerate_devices(void)
-+{
-+	const uuid_t pta_uuid =
-+		UUID_INIT(0x7011a688, 0xddde, 0x4053,
-+			  0xa5, 0xa9, 0x7b, 0x3c, 0x4d, 0xdf, 0x13, 0xb8);
++	struct tee_client_device *rng_device = to_tee_client_device(dev);
++	int ret = 0, err = -ENODEV;
 +	struct tee_ioctl_open_session_arg sess_arg = {0};
-+	struct tee_shm *device_shm = NULL;
-+	const uuid_t *device_uuid = NULL;
-+	struct tee_context *ctx = NULL;
-+	u32 shm_size = 0, idx, num_devices = 0;
-+	int rc;
 +
-+	/* Open context with OP-TEE driver */
++	/* Open context with TEE driver */
 +	ctx = tee_client_open_context(NULL, optee_ctx_match, NULL, NULL);
 +	if (IS_ERR(ctx))
 +		return -ENODEV;
 +
-+	/* Open session with device enumeration pseudo TA */
-+	memcpy(sess_arg.uuid, pta_uuid.b, TEE_IOCTL_UUID_LEN);
++	/* Open session with hwrng Trusted App */
++	memcpy(sess_arg.uuid, rng_device->id.b, TEE_IOCTL_UUID_LEN);
 +	sess_arg.clnt_login = TEE_IOCTL_LOGIN_PUBLIC;
 +	sess_arg.num_params = 0;
 +
-+	rc = tee_client_open_session(ctx, &sess_arg, NULL);
-+	if ((rc < 0) || (sess_arg.ret != TEEC_SUCCESS)) {
-+		/* Device enumeration pseudo TA not found */
-+		rc = 0;
++	ret = tee_client_open_session(ctx, &sess_arg, NULL);
++	if ((ret < 0) || (sess_arg.ret != 0)) {
++		dev_err(dev, "tee_client_open_session failed, error: %x\n",
++			sess_arg.ret);
++		err = -EINVAL;
 +		goto out_ctx;
 +	}
++	ta_rng_session_id = sess_arg.session;
 +
-+	rc = get_devices(ctx, sess_arg.session, NULL, &shm_size);
-+	if (rc < 0)
++	err = get_optee_rng_info(dev);
++	if (err)
 +		goto out_sess;
 +
-+	device_shm = tee_shm_alloc(ctx, shm_size,
-+				   TEE_SHM_MAPPED | TEE_SHM_DMA_BUF);
-+	if (IS_ERR(device_shm)) {
-+		pr_err("tee_shm_alloc failed\n");
-+		rc = PTR_ERR(device_shm);
++	err = hwrng_register(&optee_rng);
++	if (err) {
++		dev_err(dev, "hwrng registration failed (%d)\n", err);
 +		goto out_sess;
 +	}
 +
-+	rc = get_devices(ctx, sess_arg.session, device_shm, &shm_size);
-+	if (rc < 0)
-+		goto out_shm;
++	return 0;
 +
-+	device_uuid = tee_shm_get_va(device_shm, 0);
-+	if (IS_ERR(device_uuid)) {
-+		pr_err("tee_shm_get_va failed\n");
-+		rc = PTR_ERR(device_uuid);
-+		goto out_shm;
-+	}
-+
-+	num_devices = shm_size / sizeof(uuid_t);
-+
-+	for (idx = 0; idx < num_devices; idx++) {
-+		rc = optee_register_device(&device_uuid[idx], idx);
-+		if (rc)
-+			goto out_shm;
-+	}
-+
-+out_shm:
-+	tee_shm_free(device_shm);
 +out_sess:
-+	tee_client_close_session(ctx, sess_arg.session);
++	tee_client_close_session(ctx, ta_rng_session_id);
 +out_ctx:
 +	tee_client_close_context(ctx);
 +
++	return err;
++}
++
++static int optee_rng_remove(struct device *dev)
++{
++	hwrng_unregister(&optee_rng);
++	tee_client_close_session(ctx, ta_rng_session_id);
++	tee_client_close_context(ctx);
++
++	return 0;
++}
++
++const tee_client_device_id optee_rng_id_table[] = {
++	UUID_INIT(0xab7a617c, 0xb8e7, 0x4d8f,
++		   0x83, 0x01, 0xd0, 0x9b, 0x61, 0x03, 0x6b, 0x64),
++	{}
++};
++
++static struct tee_client_driver optee_rng_driver = {
++	.id_table	= optee_rng_id_table,
++	.driver		= {
++		.name		= DRIVER_NAME,
++		.bus		= &tee_bus_type,
++		.probe		= optee_rng_probe,
++		.remove		= optee_rng_remove,
++	},
++};
++
++static int __init optee_rng_mod_init(void)
++{
++	int rc;
++
++	rc = driver_register(&optee_rng_driver.driver);
++	if (rc)
++		pr_warn("driver registration failed, err: %d", rc);
++
 +	return rc;
 +}
-diff --git a/drivers/tee/optee/optee_private.h b/drivers/tee/optee/optee_private.h
-index 35e7938..a5e84af 100644
---- a/drivers/tee/optee/optee_private.h
-+++ b/drivers/tee/optee/optee_private.h
-@@ -28,6 +28,7 @@
- #define TEEC_ERROR_BAD_PARAMETERS	0xFFFF0006
- #define TEEC_ERROR_COMMUNICATION	0xFFFF000E
- #define TEEC_ERROR_OUT_OF_MEMORY	0xFFFF000C
-+#define TEEC_ERROR_SHORT_BUFFER		0xFFFF0010
- 
- #define TEEC_ORIGIN_COMMS		0x00000002
- 
-@@ -181,6 +182,8 @@ void optee_free_pages_list(void *array, size_t num_entries);
- void optee_fill_pages_list(u64 *dst, struct page **pages, int num_pages,
- 			   size_t page_offset);
- 
-+int optee_enumerate_devices(void);
 +
- /*
-  * Small helpers
-  */
++static void __exit optee_rng_mod_exit(void)
++{
++	driver_unregister(&optee_rng_driver.driver);
++}
++
++module_init(optee_rng_mod_init);
++module_exit(optee_rng_mod_exit);
++
++MODULE_LICENSE("GPL");
++MODULE_AUTHOR("Sumit Garg <sumit.garg@linaro.org>");
++MODULE_DESCRIPTION("OP-TEE based random number generator driver");
 -- 
 2.7.4
 
