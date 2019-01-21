@@ -2,54 +2,56 @@ Return-Path: <SRS0=ru6j=P5=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EB74C676EF
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Jan 2019 09:30:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D209BC282F6
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Jan 2019 09:30:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DE89B20989
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Jan 2019 09:30:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A0A3120989
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Jan 2019 09:30:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="bm2OnHA3"
+	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="P85rzBSL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727216AbfAUJ3z (ORCPT
+        id S1727053AbfAUJaC (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Jan 2019 04:29:55 -0500
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:42594 "EHLO
+        Mon, 21 Jan 2019 04:30:02 -0500
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:42604 "EHLO
         mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726284AbfAUJ3z (ORCPT
+        with ESMTP id S1726735AbfAUJaB (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 21 Jan 2019 04:29:55 -0500
-Received: by mail-pf1-f194.google.com with SMTP id 64so9853381pfr.9
-        for <linux-crypto@vger.kernel.org>; Mon, 21 Jan 2019 01:29:54 -0800 (PST)
+        Mon, 21 Jan 2019 04:30:01 -0500
+Received: by mail-pf1-f194.google.com with SMTP id 64so9853543pfr.9
+        for <linux-crypto@vger.kernel.org>; Mon, 21 Jan 2019 01:30:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id;
-        bh=ezNTvp94HxKfIHnuTDGydgVtNdYFJn6q8Xf3NcPa2u4=;
-        b=bm2OnHA3iMTFUED27Q3idWBXeh8Qos+EktXabpmpTUs33p0wICYqztSSpUPVGyn0ni
-         fDlRIj+cxLoUVBl4ZguBFkQEaPWF0mHhmsGdi06pcOpCffcMKdcTcYwJQVohdak7YV47
-         yqbCYv0KazcwxOlJYINw0M6QPfJTT/Fd5Yveg=
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=z9Rwq9XvERgXKC4dth0NtQ5GI/bk1t7E/UkygENFoiY=;
+        b=P85rzBSLRM58loF2f7ry1GroGt+dGnwluFo7y3l1N+iyJf0OSFyMvevCC+1SxdCC/c
+         I1IOyDUVciVyLeagtiqh9UcclqlhPhRKjbWictu8UtiJflFZ2JNNhqy0MNTXqSyfdZ45
+         69lIvGfcH6eP/cNyrGwuu1EzFRpnEbIfVXp7o=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=ezNTvp94HxKfIHnuTDGydgVtNdYFJn6q8Xf3NcPa2u4=;
-        b=uk/E2Po/VCcr1Iw97cIDy9htcxEZO6Uo9CtDUUHdqnxuaNvMx1NCscU8wvzNicY9XR
-         HbQL0x0Z45xsZl6eXaFeXpiPT+j8Z7Bkjn/mTPMm9KQIZYHRg5fGbr0AHHqB0OgdPp8I
-         ti7Txrp/+pH1XlCRTOaPiyRUerGDe0NhL79YdC5be9dIaEycCRn8v0DWAl8/ibZZvY9D
-         dt/ixUA3NfjLoAtBcj1nODAJu74i/7DybUSbXWHxzWLoBt4zhSBZzRzugCsuGS+BN3ne
-         GsNd13WyVBA1k5B96/V9PhpFi+42F88cHE2iv6KZlKnJQBYpJ0552rMa4RUGs1ZhEMKj
-         VIMQ==
-X-Gm-Message-State: AJcUukem4ZWo6fm+bz2ZfHrM59KFVzbxSyXP5yIWHnWUx5DNPuDdPSAN
-        cze0ouQtVptYuAktlVLWak8eL2YF3rY=
-X-Google-Smtp-Source: ALg8bN5F+t/mRV0Mf1/foRV3v0b5kBnK/KF97jtxYUW6VhpyWS2UD2SuHvsQdpJXPIgAQ/y4pBi8CQ==
-X-Received: by 2002:a63:5026:: with SMTP id e38mr27560627pgb.123.1548062993927;
-        Mon, 21 Jan 2019 01:29:53 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=z9Rwq9XvERgXKC4dth0NtQ5GI/bk1t7E/UkygENFoiY=;
+        b=aqmqEdMGgTP1bI7FH3vNeQtn1kSjJLn47C8uE5Yt3pVTWPM7jiCDuQhZHQpogBNTkd
+         8LeO0mSUf7gbmaiHXSyBs2C4n+Y28xKeiwPVf/OKspFEFbUcqAY6uGUjQwYsFi+Minfw
+         vsV8FMeaMPRdZUIc05hhJnS6vDM2dQNU3jPKWu/NiTPWROBbDmtG9ttOpb558fbIaUr0
+         jD6X6XtOzjU5Fwamxm84tEf/r/arKAZcqS7FEdhO5nX53UwCLFZfYTMWbHs7q+T1fs9r
+         M3jQe43ji401rNkItJBq392a03MxxgGjCK26ru1XWub5ktA4dqhAHeGNr8IbB7h/GiMf
+         dgBw==
+X-Gm-Message-State: AJcUukctIPQgFrpkY4//S0o4M8LmBoKN5eVzsNtjDh6h6OwsJ2QTiKFT
+        gwQEUo7xJUNSAsDftROHAsUP6g==
+X-Google-Smtp-Source: ALg8bN583xrLn0GqRIRvjtByRE4SLIW/2WMIeTQD2h8yErEqyUtszX4PxsFf4XOHc5hLTduKGxvhbw==
+X-Received: by 2002:a63:1444:: with SMTP id 4mr27674649pgu.430.1548063001031;
+        Mon, 21 Jan 2019 01:30:01 -0800 (PST)
 Received: from localhost.localdomain ([117.252.65.115])
-        by smtp.gmail.com with ESMTPSA id h9sm16182777pgd.53.2019.01.21.01.29.47
+        by smtp.gmail.com with ESMTPSA id h9sm16182777pgd.53.2019.01.21.01.29.54
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Mon, 21 Jan 2019 01:29:53 -0800 (PST)
+        Mon, 21 Jan 2019 01:30:00 -0800 (PST)
 From:   Sumit Garg <sumit.garg@linaro.org>
 To:     jens.wiklander@linaro.org, herbert@gondor.apana.org.au
 Cc:     linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
@@ -58,89 +60,175 @@ Cc:     linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
         daniel.thompson@linaro.org, ard.biesheuvel@linaro.org,
         bhsharma@redhat.com, tee-dev@lists.linaro.org,
         Sumit Garg <sumit.garg@linaro.org>
-Subject: [PATCH v4 0/4] Introduce TEE bus driver framework
-Date:   Mon, 21 Jan 2019 14:59:15 +0530
-Message-Id: <1548062959-31860-1-git-send-email-sumit.garg@linaro.org>
+Subject: [PATCH v4 1/4] tee: add bus driver framework for TEE based devices
+Date:   Mon, 21 Jan 2019 14:59:16 +0530
+Message-Id: <1548062959-31860-2-git-send-email-sumit.garg@linaro.org>
 X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1548062959-31860-1-git-send-email-sumit.garg@linaro.org>
+References: <1548062959-31860-1-git-send-email-sumit.garg@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This series introduces a generic TEE bus driver concept for TEE based
-kernel drivers which would like to communicate with TEE based devices/
-services.
+Introduce a generic TEE bus driver concept for TEE based kernel drivers
+which would like to communicate with TEE based devices/services.
 
-Patch #1 adds TEE bus concept where devices/services are identified via
-Universally Unique Identifier (UUID) and drivers register a table of
-device UUIDs which they can support. This concept also allows for device
-enumeration to be specific to corresponding TEE implementation like
-OP-TEE etc.
+In this TEE bus concept, devices/services are identified via Universally
+Unique Identifier (UUID) and drivers register a table of device UUIDs
+which they can support.
 
-Patch #2 adds supp_nowait flag for non-blocking requests arising via
-TEE internal client interface.
+So this TEE bus framework registers a match() callback function which
+iterates over the driver UUID table to find a corresponding match for
+device UUID. If a match is found, then this particular device is probed
+via corresponding probe api registered by the driver. This process
+happens whenever a device or a driver is registered with TEE bus.
 
-Patch #3 adds TEE bus device enumeration support for OP-TEE. OP-TEE
-provides a pseudo TA to enumerate TAs which can act as devices/services
-for TEE bus.
+Also this framework allows for device enumeration to be specific to
+corresponding TEE implementation like OP-TEE etc.
 
-Patch #4 adds OP-TEE based hwrng driver which act as TEE bus driver.
-On ARM SoC's with TrustZone enabled, peripherals like entropy sources
-might not be accessible to normal world (linux in this case) and rather
-accessible to secure world (OP-TEE in this case) only. So this driver
-aims to provides a generic interface to OP-TEE based random number
-generator service.
+Signed-off-by: Sumit Garg <sumit.garg@linaro.org>
+---
+ drivers/tee/tee_core.c  | 45 +++++++++++++++++++++++++++++++++++++++++----
+ include/linux/tee_drv.h | 37 ++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 77 insertions(+), 5 deletions(-)
 
-Example case is Developerbox based on Socionext's Synquacer SoC [1]
-which provides 7 thermal sensors accessible from secure world only which
-could be used as entropy sources (thermal/measurement noise).
-
-[1] https://www.96boards.org/product/developerbox/
-
-Changes in v4:
-
-1. Use typedef instead of single member tee_client_device_id struct.
-2. Incorporate TEE bus nitpicks.
-
-Changes in v3:
-
-1. Fixed bus error path in Patch #1.
-2. Reversed order of Patch #2 and #3.
-3. Fixed miscellaneous syntax comments and memory leak.
-4. Added comments in Patch #2 for supp_nowait flag.
-
-Changes in v2:
-
-Based on review comments, the scope of this series has increased as
-follows:
-
-1. Added TEE bus driver framework.
-2. Added OP-TEE based device enumeration.
-3. Register optee-rng driver as TEE bus driver.
-4. Removed DT dependency for optee-rng device UUID.
-5. Added supp_nowait flag.
-
-Sumit Garg (4):
-  tee: add bus driver framework for TEE based devices
-  tee: add supp_nowait flag in tee_context struct
-  tee: optee: add TEE bus device enumeration support
-  hwrng: add OP-TEE based rng driver
-
- MAINTAINERS                        |   5 +
- drivers/char/hw_random/Kconfig     |  15 ++
- drivers/char/hw_random/Makefile    |   1 +
- drivers/char/hw_random/optee-rng.c | 272 +++++++++++++++++++++++++++++++++++++
- drivers/tee/optee/Makefile         |   1 +
- drivers/tee/optee/core.c           |   4 +
- drivers/tee/optee/device.c         | 153 +++++++++++++++++++++
- drivers/tee/optee/optee_private.h  |   3 +
- drivers/tee/optee/supp.c           |  10 +-
- drivers/tee/tee_core.c             |  58 +++++++-
- include/linux/tee_drv.h            |  43 +++++-
- 11 files changed, 559 insertions(+), 6 deletions(-)
- create mode 100644 drivers/char/hw_random/optee-rng.c
- create mode 100644 drivers/tee/optee/device.c
-
+diff --git a/drivers/tee/tee_core.c b/drivers/tee/tee_core.c
+index 7b2bb4c..55370d5 100644
+--- a/drivers/tee/tee_core.c
++++ b/drivers/tee/tee_core.c
+@@ -15,7 +15,6 @@
+ #define pr_fmt(fmt) "%s: " fmt, __func__
+ 
+ #include <linux/cdev.h>
+-#include <linux/device.h>
+ #include <linux/fs.h>
+ #include <linux/idr.h>
+ #include <linux/module.h>
+@@ -1027,6 +1026,30 @@ int tee_client_invoke_func(struct tee_context *ctx,
+ }
+ EXPORT_SYMBOL_GPL(tee_client_invoke_func);
+ 
++static int tee_client_device_match(struct device *dev,
++				   struct device_driver *drv)
++{
++	const tee_client_device_id *id_table;
++	struct tee_client_device *tee_device;
++
++	id_table = to_tee_client_driver(drv)->id_table;
++	tee_device = to_tee_client_device(dev);
++
++	while (!uuid_is_null(id_table)) {
++		if (uuid_equal(&tee_device->id, id_table))
++			return 1;
++		id_table++;
++	}
++
++	return 0;
++}
++
++struct bus_type tee_bus_type = {
++	.name		= "tee",
++	.match		= tee_client_device_match,
++};
++EXPORT_SYMBOL_GPL(tee_bus_type);
++
+ static int __init tee_init(void)
+ {
+ 	int rc;
+@@ -1040,18 +1063,32 @@ static int __init tee_init(void)
+ 	rc = alloc_chrdev_region(&tee_devt, 0, TEE_NUM_DEVICES, "tee");
+ 	if (rc) {
+ 		pr_err("failed to allocate char dev region\n");
+-		class_destroy(tee_class);
+-		tee_class = NULL;
++		goto out_unreg_class;
+ 	}
+ 
++	rc = bus_register(&tee_bus_type);
++	if (rc) {
++		pr_err("failed to register tee bus\n");
++		goto out_unreg_chrdev;
++	}
++
++	return 0;
++
++out_unreg_chrdev:
++	unregister_chrdev_region(tee_devt, TEE_NUM_DEVICES);
++out_unreg_class:
++	class_destroy(tee_class);
++	tee_class = NULL;
++
+ 	return rc;
+ }
+ 
+ static void __exit tee_exit(void)
+ {
++	bus_unregister(&tee_bus_type);
++	unregister_chrdev_region(tee_devt, TEE_NUM_DEVICES);
+ 	class_destroy(tee_class);
+ 	tee_class = NULL;
+-	unregister_chrdev_region(tee_devt, TEE_NUM_DEVICES);
+ }
+ 
+ subsys_initcall(tee_init);
+diff --git a/include/linux/tee_drv.h b/include/linux/tee_drv.h
+index 6cfe058..ba985d8 100644
+--- a/include/linux/tee_drv.h
++++ b/include/linux/tee_drv.h
+@@ -15,11 +15,13 @@
+ #ifndef __TEE_DRV_H
+ #define __TEE_DRV_H
+ 
+-#include <linux/types.h>
++#include <linux/device.h>
+ #include <linux/idr.h>
+ #include <linux/kref.h>
+ #include <linux/list.h>
+ #include <linux/tee.h>
++#include <linux/types.h>
++#include <linux/uuid.h>
+ 
+ /*
+  * The file describes the API provided by the generic TEE driver to the
+@@ -538,4 +540,37 @@ static inline bool tee_param_is_memref(struct tee_param *param)
+ 	}
+ }
+ 
++extern struct bus_type tee_bus_type;
++
++/*
++ * For TEE based client devices we use the device uuid as the
++ * identifier.
++ */
++typedef uuid_t tee_client_device_id;
++
++/**
++ * struct tee_client_device - tee based device
++ * @id:			device identifier
++ * @dev:		device structure
++ */
++struct tee_client_device {
++	tee_client_device_id id;
++	struct device dev;
++};
++
++#define to_tee_client_device(d) container_of(d, struct tee_client_device, dev)
++
++/**
++ * struct tee_client_driver - tee client driver
++ * @id_table:		device id table supported by this driver
++ * @driver:		driver structure
++ */
++struct tee_client_driver {
++	const tee_client_device_id *id_table;
++	struct device_driver driver;
++};
++
++#define to_tee_client_driver(d) \
++		container_of(d, struct tee_client_driver, driver)
++
+ #endif /*__TEE_DRV_H*/
 -- 
 2.7.4
 
