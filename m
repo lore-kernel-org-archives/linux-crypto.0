@@ -2,424 +2,399 @@ Return-Path: <SRS0=ru6j=P5=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9F1DC2F3A6
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Jan 2019 13:13:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8025C2F3A6
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Jan 2019 13:23:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7D5E92084C
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Jan 2019 13:13:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ru3C/8P3"
+	by mail.kernel.org (Postfix) with ESMTP id 992B42085A
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Jan 2019 13:23:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728761AbfAUNNw (ORCPT
+        id S1728797AbfAUNXv (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Jan 2019 08:13:52 -0500
-Received: from mail-vs1-f67.google.com ([209.85.217.67]:46615 "EHLO
-        mail-vs1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728620AbfAUNNw (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 21 Jan 2019 08:13:52 -0500
-Received: by mail-vs1-f67.google.com with SMTP id n10so12544213vso.13
-        for <linux-crypto@vger.kernel.org>; Mon, 21 Jan 2019 05:13:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ZBOKKZFD+nGvCwkJNtLaO3wMav7694SfHXPRlek558c=;
-        b=Ru3C/8P3bo+6vPrVWg63nXoUaPGyos6wpCj9LNeP7+kVwy+YJ3gpYk5rnC3IpWGztY
-         fH5XcJIuD524+DJ/fmo8q4iEUMNUdwxkefb9wXzKHNY7K3JLefzUrs6alW6pj0cmZnLR
-         VnWoAnwT88GcVJ9DMn90ZiUlAuCFCB8nPH918=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ZBOKKZFD+nGvCwkJNtLaO3wMav7694SfHXPRlek558c=;
-        b=pkSnRnUaG7LIh5Nq1cYMq/Zy/xgd1U+wNqXt62KrtExmdibya1a7yZn0DLs61YbMvo
-         Qr17fopkb0mHlmLaA5P53Wf82W63geLlOF61DByyb47p2fNbL7fxPDlqAetCwDFD98Wd
-         LDqhKfj56vwmWp53Zv4J9i9I4T44G5hom0pEJGfnvnf+tw6X8YqYLrr54RTiqhzlbR0k
-         kamNq1i8DMQWf/2SwoT6KsJUS+1/XJNdVX9NHp0UyDy0WRc3t1h2RVSYV25cwySlENjP
-         1sJWLl9Vt+HQoeWrATQNe0UVoQkxeeOtJFuiqPtGlfDrnXCAxgk8BUQ1RpeAy/bjEovD
-         bVMQ==
-X-Gm-Message-State: AJcUukdutHgORw/iXozzgDTTFi3JML7qJMCrSC7gtm+prweNgPW973m8
-        AA73p7DiiKqQ3HesN4PXEpTkm6/qAkQzHlwJU8NXEg==
-X-Google-Smtp-Source: ALg8bN49+2uPILt7oxeBXFI0N0U0UYFueVeJyD0pZxxG3TJY3ncJPnqlssCb3U5tZvlwVk0TEGjSMxboSzC6EoJ4zGg=
-X-Received: by 2002:a67:1b04:: with SMTP id b4mr11997758vsb.141.1548076430563;
- Mon, 21 Jan 2019 05:13:50 -0800 (PST)
+        Mon, 21 Jan 2019 08:23:51 -0500
+Received: from inva021.nxp.com ([92.121.34.21]:56072 "EHLO inva021.nxp.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728775AbfAUNXu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 21 Jan 2019 08:23:50 -0500
+Received: from inva021.nxp.com (localhost [127.0.0.1])
+        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 1472C200392;
+        Mon, 21 Jan 2019 14:23:47 +0100 (CET)
+Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
+        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 0737F20038E;
+        Mon, 21 Jan 2019 14:23:47 +0100 (CET)
+Received: from enigma.ea.freescale.net (enigma.ea.freescale.net [10.171.81.110])
+        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id B1F362061D;
+        Mon, 21 Jan 2019 14:23:46 +0100 (CET)
+From:   =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        linux-crypto@vger.kernel.org, linux-imx@nxp.com,
+        Iuliana Prodan <iuliana.prodan@nxp.com>
+Subject: [PATCH] crypto: caam - add support for cmac(aes)
+Date:   Mon, 21 Jan 2019 15:22:42 +0200
+Message-Id: <20190121132242.22928-1-horia.geanta@nxp.com>
+X-Mailer: git-send-email 2.16.2
 MIME-Version: 1.0
-References: <1548062959-31860-1-git-send-email-sumit.garg@linaro.org>
- <1548062959-31860-5-git-send-email-sumit.garg@linaro.org> <CAKv+Gu8icUVE1kqyHkK72wiGpmj7Gzqj_z_z2ox686gY=dCOcQ@mail.gmail.com>
- <CAFA6WYO8HrTr0U+u-iwQ3g84E8H69rKqoBzLsP=5TTFamEv3jA@mail.gmail.com> <CAKv+Gu8bFRoY8ThuDzm8S8gBB3_6Jf9h3=S2ZvEWqy2Tcr7Vuw@mail.gmail.com>
-In-Reply-To: <CAKv+Gu8bFRoY8ThuDzm8S8gBB3_6Jf9h3=S2ZvEWqy2Tcr7Vuw@mail.gmail.com>
-From:   Sumit Garg <sumit.garg@linaro.org>
-Date:   Mon, 21 Jan 2019 18:43:39 +0530
-Message-ID: <CAFA6WYN+4EFsxnbhSsUb=TZMCeJF_5pxhOfXUBh9MTMsq8QMBQ@mail.gmail.com>
-Subject: Re: [PATCH v4 4/4] hwrng: add OP-TEE based rng driver
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc:     Jens Wiklander <jens.wiklander@linaro.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        mpm@selenic.com, Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Daniel Thompson <daniel.thompson@linaro.org>,
-        Bhupesh Sharma <bhsharma@redhat.com>, tee-dev@lists.linaro.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 21 Jan 2019 at 18:32, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
->
-> On Mon, 21 Jan 2019 at 13:59, Sumit Garg <sumit.garg@linaro.org> wrote:
-> >
-> > On Mon, 21 Jan 2019 at 15:33, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
-> > >
-> > > On Mon, 21 Jan 2019 at 10:30, Sumit Garg <sumit.garg@linaro.org> wrote:
-> > > >
-> > > > On ARM SoC's with TrustZone enabled, peripherals like entropy sources
-> > > > might not be accessible to normal world (linux in this case) and rather
-> > > > accessible to secure world (OP-TEE in this case) only. So this driver
-> > > > aims to provides a generic interface to OP-TEE based random number
-> > > > generator service.
-> > > >
-> > > > This driver registers on TEE bus to interact with OP-TEE based rng
-> > > > device/service.
-> > > >
-> > > > Signed-off-by: Sumit Garg <sumit.garg@linaro.org>
-> > > > ---
-> > > >  MAINTAINERS                        |   5 +
-> > > >  drivers/char/hw_random/Kconfig     |  15 ++
-> > > >  drivers/char/hw_random/Makefile    |   1 +
-> > > >  drivers/char/hw_random/optee-rng.c | 272 +++++++++++++++++++++++++++++++++++++
-> > > >  4 files changed, 293 insertions(+)
-> > > >  create mode 100644 drivers/char/hw_random/optee-rng.c
-> > > >
-> > > > diff --git a/MAINTAINERS b/MAINTAINERS
-> > > > index 32d44447..502733c 100644
-> > > > --- a/MAINTAINERS
-> > > > +++ b/MAINTAINERS
-> > > > @@ -11260,6 +11260,11 @@ M:     Jens Wiklander <jens.wiklander@linaro.org>
-> > > >  S:     Maintained
-> > > >  F:     drivers/tee/optee/
-> > > >
-> > > > +OP-TEE RANDOM NUMBER GENERATOR (RNG) DRIVER
-> > > > +M:     Sumit Garg <sumit.garg@linaro.org>
-> > > > +S:     Maintained
-> > > > +F:     drivers/char/hw_random/optee-rng.c
-> > > > +
-> > > >  OPA-VNIC DRIVER
-> > > >  M:     Dennis Dalessandro <dennis.dalessandro@intel.com>
-> > > >  M:     Niranjana Vishwanathapura <niranjana.vishwanathapura@intel.com>
-> > > > diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
-> > > > index dac895d..25a7d8f 100644
-> > > > --- a/drivers/char/hw_random/Kconfig
-> > > > +++ b/drivers/char/hw_random/Kconfig
-> > > > @@ -424,6 +424,21 @@ config HW_RANDOM_EXYNOS
-> > > >           will be called exynos-trng.
-> > > >
-> > > >           If unsure, say Y.
-> > > > +
-> > > > +config HW_RANDOM_OPTEE
-> > > > +       tristate "OP-TEE based Random Number Generator support"
-> > > > +       depends on OPTEE
-> > > > +       default HW_RANDOM
-> > > > +       help
-> > > > +         This  driver provides support for OP-TEE based Random Number
-> > > > +         Generator on ARM SoCs where hardware entropy sources are not
-> > > > +         accessible to normal world (Linux).
-> > > > +
-> > > > +         To compile this driver as a module, choose M here: the module
-> > > > +         will be called optee-rng.
-> > > > +
-> > > > +         If unsure, say Y.
-> > > > +
-> > > >  endif # HW_RANDOM
-> > > >
-> > > >  config UML_RANDOM
-> > > > diff --git a/drivers/char/hw_random/Makefile b/drivers/char/hw_random/Makefile
-> > > > index e35ec3c..7c9ef4a 100644
-> > > > --- a/drivers/char/hw_random/Makefile
-> > > > +++ b/drivers/char/hw_random/Makefile
-> > > > @@ -38,3 +38,4 @@ obj-$(CONFIG_HW_RANDOM_CAVIUM) += cavium-rng.o cavium-rng-vf.o
-> > > >  obj-$(CONFIG_HW_RANDOM_MTK)    += mtk-rng.o
-> > > >  obj-$(CONFIG_HW_RANDOM_S390) += s390-trng.o
-> > > >  obj-$(CONFIG_HW_RANDOM_KEYSTONE) += ks-sa-rng.o
-> > > > +obj-$(CONFIG_HW_RANDOM_OPTEE) += optee-rng.o
-> > > > diff --git a/drivers/char/hw_random/optee-rng.c b/drivers/char/hw_random/optee-rng.c
-> > > > new file mode 100644
-> > > > index 0000000..6ac862a
-> > > > --- /dev/null
-> > > > +++ b/drivers/char/hw_random/optee-rng.c
-> > > > @@ -0,0 +1,272 @@
-> > > > +// SPDX-License-Identifier: GPL-2.0
-> > > > +/*
-> > > > + * Copyright (C) 2018-2019 Linaro Ltd.
-> > > > + */
-> > > > +
-> > > > +#include <linux/delay.h>
-> > > > +#include <linux/of.h>
-> > > > +#include <linux/hw_random.h>
-> > > > +#include <linux/kernel.h>
-> > > > +#include <linux/module.h>
-> > > > +#include <linux/slab.h>
-> > > > +#include <linux/tee_drv.h>
-> > > > +#include <linux/uuid.h>
-> > > > +
-> > > > +#define DRIVER_NAME "optee-rng"
-> > > > +
-> > > > +#define TEE_ERROR_HEALTH_TEST_FAIL     0x00000001
-> > > > +
-> > > > +/*
-> > > > + * TA_CMD_GET_ENTROPY - Get Entropy from RNG
-> > > > + *
-> > > > + * param[0] (inout memref) - Entropy buffer memory reference
-> > > > + * param[1] unused
-> > > > + * param[2] unused
-> > > > + * param[3] unused
-> > > > + *
-> > > > + * Result:
-> > > > + * TEE_SUCCESS - Invoke command success
-> > > > + * TEE_ERROR_BAD_PARAMETERS - Incorrect input param
-> > > > + * TEE_ERROR_NOT_SUPPORTED - Requested entropy size greater than size of pool
-> > > > + * TEE_ERROR_HEALTH_TEST_FAIL - Continuous health testing failed
-> > > > + */
-> > > > +#define TA_CMD_GET_ENTROPY             0x0
-> > > > +
-> > > > +/*
-> > > > + * TA_CMD_GET_RNG_INFO - Get RNG information
-> > > > + *
-> > > > + * param[0] (out value) - value.a: RNG data-rate in bytes per second
-> > > > + *                        value.b: Quality/Entropy per 1024 bit of data
-> > > > + * param[1] unused
-> > > > + * param[2] unused
-> > > > + * param[3] unused
-> > > > + *
-> > > > + * Result:
-> > > > + * TEE_SUCCESS - Invoke command success
-> > > > + * TEE_ERROR_BAD_PARAMETERS - Incorrect input param
-> > > > + */
-> > > > +#define TA_CMD_GET_RNG_INFO            0x1
-> > > > +
-> > > > +#define MAX_ENTROPY_REQ_SZ             (4 * 1024)
-> > > > +
-> > > > +static struct tee_context *ctx;
-> > > > +static struct tee_shm *entropy_shm_pool;
-> > > > +static u32 ta_rng_data_rate;
-> > > > +static u32 ta_rng_session_id;
-> > > > +
-> > > > +static size_t get_optee_rng_data(void *buf, size_t req_size)
-> > > > +{
-> > > > +       u32 ret = 0;
-> > > > +       u8 *rng_data = NULL;
-> > > > +       size_t rng_size = 0;
-> > > > +       struct tee_ioctl_invoke_arg inv_arg = {0};
-> > > > +       struct tee_param param[4] = {0};
-> > > > +
-> > > > +       /* Invoke TA_CMD_GET_ENTROPY function of Trusted App */
-> > > > +       inv_arg.func = TA_CMD_GET_ENTROPY;
-> > > > +       inv_arg.session = ta_rng_session_id;
-> > > > +       inv_arg.num_params = 4;
-> > > > +
-> > > > +       /* Fill invoke cmd params */
-> > > > +       param[0].attr = TEE_IOCTL_PARAM_ATTR_TYPE_MEMREF_INOUT;
-> > > > +       param[0].u.memref.shm = entropy_shm_pool;
-> > > > +       param[0].u.memref.size = req_size;
-> > > > +       param[0].u.memref.shm_offs = 0;
-> > > > +
-> > > > +       ret = tee_client_invoke_func(ctx, &inv_arg, param);
-> > > > +       if ((ret < 0) || (inv_arg.ret != 0)) {
-> > > > +               pr_err("TA_CMD_GET_ENTROPY invoke function error: %x\n",
-> > > > +                      inv_arg.ret);
-> > > > +               return 0;
-> > > > +       }
-> > > > +
-> > > > +       rng_data = tee_shm_get_va(entropy_shm_pool, 0);
-> > > > +       if (IS_ERR(rng_data)) {
-> > > > +               pr_err("tee_shm_get_va failed\n");
-> > > > +               return 0;
-> > > > +       }
-> > > > +
-> > > > +       rng_size = param[0].u.memref.size;
-> > > > +       memcpy(buf, rng_data, rng_size);
-> > > > +
-> > > > +       return rng_size;
-> > > > +}
-> > > > +
-> > > > +static int optee_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
-> > > > +{
-> > > > +       u8 *data = buf;
-> > > > +       size_t read = 0, rng_size = 0;
-> > > > +       int timeout = 1;
-> > > > +
-> > > > +       if (max > MAX_ENTROPY_REQ_SZ)
-> > > > +               max = MAX_ENTROPY_REQ_SZ;
-> > > > +
-> > > > +       while (read == 0) {
-> > > > +               rng_size = get_optee_rng_data(data, (max - read));
-> > > > +
-> > > > +               data += rng_size;
-> > > > +               read += rng_size;
-> > > > +
-> > > > +               if (wait) {
-> > > > +                       if (timeout-- == 0)
-> > > > +                               return read;
-> > > > +                       msleep((1000 * (max - read)) / ta_rng_data_rate);
-> > > > +               } else {
-> > > > +                       return read;
-> > > > +               }
-> > > > +       }
-> > > > +
-> > > > +       return read;
-> > > > +}
-> > > > +
-> > > > +static int optee_rng_init(struct hwrng *rng)
-> > > > +{
-> > > > +       entropy_shm_pool = tee_shm_alloc(ctx, MAX_ENTROPY_REQ_SZ,
-> > > > +                                        TEE_SHM_MAPPED | TEE_SHM_DMA_BUF);
-> > > > +       if (IS_ERR(entropy_shm_pool)) {
-> > > > +               pr_err("tee_shm_alloc failed\n");
-> > > > +               return PTR_ERR(entropy_shm_pool);
-> > > > +       }
-> > > > +
-> > > > +       return 0;
-> > > > +}
-> > > > +
-> > > > +static void optee_rng_cleanup(struct hwrng *rng)
-> > > > +{
-> > > > +       tee_shm_free(entropy_shm_pool);
-> > > > +}
-> > > > +
-> > > > +static struct hwrng optee_rng = {
-> > > > +       .name           = DRIVER_NAME,
-> > > > +       .init           = optee_rng_init,
-> > > > +       .cleanup        = optee_rng_cleanup,
-> > > > +       .read           = optee_rng_read,
-> > > > +};
-> > > > +
-> > > > +static int get_optee_rng_info(struct device *dev)
-> > > > +{
-> > > > +       u32 ret = 0;
-> > > > +       struct tee_ioctl_invoke_arg inv_arg = {0};
-> > > > +       struct tee_param param[4] = {0};
-> > > > +
-> > > > +       /* Invoke TA_CMD_GET_RNG_INFO function of Trusted App */
-> > > > +       inv_arg.func = TA_CMD_GET_RNG_INFO;
-> > > > +       inv_arg.session = ta_rng_session_id;
-> > > > +       inv_arg.num_params = 4;
-> > > > +
-> > > > +       /* Fill invoke cmd params */
-> > > > +       param[0].attr = TEE_IOCTL_PARAM_ATTR_TYPE_VALUE_OUTPUT;
-> > > > +
-> > > > +       ret = tee_client_invoke_func(ctx, &inv_arg, param);
-> > > > +       if ((ret < 0) || (inv_arg.ret != 0)) {
-> > > > +               dev_err(dev, "TA_CMD_GET_RNG_INFO invoke func error: %x\n",
-> > > > +                       inv_arg.ret);
-> > > > +               return -EINVAL;
-> > > > +       }
-> > > > +
-> > > > +       ta_rng_data_rate = param[0].u.value.a;
-> > > > +       optee_rng.quality = param[0].u.value.b;
-> > > > +
-> > > > +       return 0;
-> > > > +}
-> > > > +
-> > > > +static int optee_ctx_match(struct tee_ioctl_version_data *ver, const void *data)
-> > > > +{
-> > > > +       if (ver->impl_id == TEE_IMPL_ID_OPTEE)
-> > > > +               return 1;
-> > > > +       else
-> > > > +               return 0;
-> > > > +}
-> > > > +
-> > > > +static int optee_rng_probe(struct device *dev)
-> > > > +{
-> > > > +       struct tee_client_device *rng_device = to_tee_client_device(dev);
-> > > > +       int ret = 0, err = -ENODEV;
-> > > > +       struct tee_ioctl_open_session_arg sess_arg = {0};
-> > > > +
-> > > > +       /* Open context with TEE driver */
-> > > > +       ctx = tee_client_open_context(NULL, optee_ctx_match, NULL, NULL);
-> > > > +       if (IS_ERR(ctx))
-> > > > +               return -ENODEV;
-> > > > +
-> > > > +       /* Open session with hwrng Trusted App */
-> > > > +       memcpy(sess_arg.uuid, rng_device->id.b, TEE_IOCTL_UUID_LEN);
-> > > > +       sess_arg.clnt_login = TEE_IOCTL_LOGIN_PUBLIC;
-> > > > +       sess_arg.num_params = 0;
-> > > > +
-> > > > +       ret = tee_client_open_session(ctx, &sess_arg, NULL);
-> > > > +       if ((ret < 0) || (sess_arg.ret != 0)) {
-> > > > +               dev_err(dev, "tee_client_open_session failed, error: %x\n",
-> > > > +                       sess_arg.ret);
-> > > > +               err = -EINVAL;
-> > > > +               goto out_ctx;
-> > > > +       }
-> > > > +       ta_rng_session_id = sess_arg.session;
-> > > > +
-> > > > +       err = get_optee_rng_info(dev);
-> > > > +       if (err)
-> > > > +               goto out_sess;
-> > > > +
-> > > > +       err = hwrng_register(&optee_rng);
-> > > > +       if (err) {
-> > > > +               dev_err(dev, "hwrng registration failed (%d)\n", err);
-> > > > +               goto out_sess;
-> > > > +       }
-> > > > +
-> > > > +       return 0;
-> > > > +
-> > > > +out_sess:
-> > > > +       tee_client_close_session(ctx, ta_rng_session_id);
-> > > > +out_ctx:
-> > > > +       tee_client_close_context(ctx);
-> > > > +
-> > > > +       return err;
-> > > > +}
-> > > > +
-> > > > +static int optee_rng_remove(struct device *dev)
-> > > > +{
-> > > > +       hwrng_unregister(&optee_rng);
-> > > > +       tee_client_close_session(ctx, ta_rng_session_id);
-> > > > +       tee_client_close_context(ctx);
-> > > > +
-> > > > +       return 0;
-> > > > +}
-> > > > +
-> > > > +const tee_client_device_id optee_rng_id_table[] = {
-> > > > +       UUID_INIT(0xab7a617c, 0xb8e7, 0x4d8f,
-> > > > +                  0x83, 0x01, 0xd0, 0x9b, 0x61, 0x03, 0x6b, 0x64),
-> > > > +       {}
-> > > > +};
-> > > > +
-> > >
-> > > Could we expose this via MODULE_DEVICE_TABLE() as well? That should
-> > > allow udev to load the module on demand.
-> > >
-> >
-> > IIUC, here you are referring to addition of "modalias" infrastructure
-> > for TEE bus. I think this is good feature to have for automatic
-> > out-of-tree module loading via udev. Shall I create a separate patch
-> > for this feature addition rather than including it in this patch-set?
-> >
-> > Currently I use to put this module entry in /etc/modules for auto-loading.
-> >
->
-> I wouldn't call that auto-loading :-)
->
+From: Iuliana Prodan <iuliana.prodan@nxp.com>
 
-Haha.
+Add cmac(aes) keyed hash offloading support.
 
-> But seriously, I think it provides an important rationale for the
-> patch set as a whole, so I would prefer it if it were included.
+Similar to xcbc implementation, driver must make sure there are still
+some bytes buffered when ahash_final() is called. This way HW is able to
+decide whether padding is needed and which key to derive (L -> K1 / K2)
+for the last block.
 
-Okay then I will include this feature in next version.
+Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>
+Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
+---
+ drivers/crypto/caam/caamhash.c      | 132 ++++++++++++++++++++++++++++++------
+ drivers/crypto/caam/caamhash_desc.c |  30 +++++---
+ drivers/crypto/caam/caamhash_desc.h |  10 ++-
+ 3 files changed, 139 insertions(+), 33 deletions(-)
 
--Sumit
+diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
+index 6c379bef938e..2eb8959e2fdc 100644
+--- a/drivers/crypto/caam/caamhash.c
++++ b/drivers/crypto/caam/caamhash.c
+@@ -3,7 +3,7 @@
+  * caam - Freescale FSL CAAM support for ahash functions of crypto API
+  *
+  * Copyright 2011 Freescale Semiconductor, Inc.
+- * Copyright 2018 NXP
++ * Copyright 2018-2019 NXP
+  *
+  * Based on caamalg.c crypto API driver.
+  *
+@@ -159,12 +159,11 @@ static inline int *alt_buflen(struct caam_hash_state *state)
+ 	return state->current_buf ? &state->buflen_0 : &state->buflen_1;
+ }
+ 
+-static inline bool is_xcbc_aes(u32 algtype)
++static inline bool is_cmac_aes(u32 algtype)
+ {
+ 	return (algtype & (OP_ALG_ALGSEL_MASK | OP_ALG_AAI_MASK)) ==
+-	       (OP_ALG_ALGSEL_AES | OP_ALG_AAI_XCBC_MAC);
++	       (OP_ALG_ALGSEL_AES | OP_ALG_AAI_CMAC);
+ }
+-
+ /* Common job descriptor seq in/out ptr routines */
+ 
+ /* Map state->caam_ctx, and append seq_out_ptr command that points to it */
+@@ -311,8 +310,8 @@ static int axcbc_set_sh_desc(struct crypto_ahash *ahash)
+ 
+ 	/* shared descriptor for ahash_update */
+ 	desc = ctx->sh_desc_update;
+-	cnstr_shdsc_axcbc(desc, &ctx->adata, OP_ALG_AS_UPDATE, ctx->ctx_len,
+-			  ctx->ctx_len, 0);
++	cnstr_shdsc_sk_hash(desc, &ctx->adata, OP_ALG_AS_UPDATE,
++			    ctx->ctx_len, ctx->ctx_len, 0);
+ 	dma_sync_single_for_device(jrdev, ctx->sh_desc_update_dma,
+ 				   desc_bytes(desc), ctx->dir);
+ 	print_hex_dump_debug("axcbc update shdesc@" __stringify(__LINE__)" : ",
+@@ -321,8 +320,8 @@ static int axcbc_set_sh_desc(struct crypto_ahash *ahash)
+ 
+ 	/* shared descriptor for ahash_{final,finup} */
+ 	desc = ctx->sh_desc_fin;
+-	cnstr_shdsc_axcbc(desc, &ctx->adata, OP_ALG_AS_FINALIZE, digestsize,
+-			  ctx->ctx_len, 0);
++	cnstr_shdsc_sk_hash(desc, &ctx->adata, OP_ALG_AS_FINALIZE,
++			    digestsize, ctx->ctx_len, 0);
+ 	dma_sync_single_for_device(jrdev, ctx->sh_desc_fin_dma,
+ 				   desc_bytes(desc), ctx->dir);
+ 	print_hex_dump_debug("axcbc finup shdesc@" __stringify(__LINE__)" : ",
+@@ -334,8 +333,8 @@ static int axcbc_set_sh_desc(struct crypto_ahash *ahash)
+ 
+ 	/* shared descriptor for first invocation of ahash_update */
+ 	desc = ctx->sh_desc_update_first;
+-	cnstr_shdsc_axcbc(desc, &ctx->adata, OP_ALG_AS_INIT, ctx->ctx_len,
+-			  ctx->ctx_len, ctx->key_dma);
++	cnstr_shdsc_sk_hash(desc, &ctx->adata, OP_ALG_AS_INIT, ctx->ctx_len,
++			    ctx->ctx_len, ctx->key_dma);
+ 	dma_sync_single_for_device(jrdev, ctx->sh_desc_update_first_dma,
+ 				   desc_bytes(desc), ctx->dir);
+ 	print_hex_dump_debug("axcbc update first shdesc@" __stringify(__LINE__)" : ",
+@@ -344,13 +343,62 @@ static int axcbc_set_sh_desc(struct crypto_ahash *ahash)
+ 
+ 	/* shared descriptor for ahash_digest */
+ 	desc = ctx->sh_desc_digest;
+-	cnstr_shdsc_axcbc(desc, &ctx->adata, OP_ALG_AS_INITFINAL, digestsize,
+-			  ctx->ctx_len, 0);
++	cnstr_shdsc_sk_hash(desc, &ctx->adata, OP_ALG_AS_INITFINAL,
++			    digestsize, ctx->ctx_len, 0);
+ 	dma_sync_single_for_device(jrdev, ctx->sh_desc_digest_dma,
+ 				   desc_bytes(desc), ctx->dir);
+ 	print_hex_dump_debug("axcbc digest shdesc@" __stringify(__LINE__)" : ",
+ 			     DUMP_PREFIX_ADDRESS, 16, 4, desc, desc_bytes(desc),
+ 			     1);
++	return 0;
++}
++
++static int acmac_set_sh_desc(struct crypto_ahash *ahash)
++{
++	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
++	int digestsize = crypto_ahash_digestsize(ahash);
++	struct device *jrdev = ctx->jrdev;
++	u32 *desc;
++
++	/* shared descriptor for ahash_update */
++	desc = ctx->sh_desc_update;
++	cnstr_shdsc_sk_hash(desc, &ctx->adata, OP_ALG_AS_UPDATE,
++			    ctx->ctx_len, ctx->ctx_len, 0);
++	dma_sync_single_for_device(jrdev, ctx->sh_desc_update_dma,
++				   desc_bytes(desc), ctx->dir);
++	print_hex_dump_debug("acmac update shdesc@" __stringify(__LINE__)" : ",
++			     DUMP_PREFIX_ADDRESS, 16, 4, desc,
++			     desc_bytes(desc), 1);
++
++	/* shared descriptor for ahash_{final,finup} */
++	desc = ctx->sh_desc_fin;
++	cnstr_shdsc_sk_hash(desc, &ctx->adata, OP_ALG_AS_FINALIZE,
++			    digestsize, ctx->ctx_len, 0);
++	dma_sync_single_for_device(jrdev, ctx->sh_desc_fin_dma,
++				   desc_bytes(desc), ctx->dir);
++	print_hex_dump_debug("acmac finup shdesc@" __stringify(__LINE__)" : ",
++			     DUMP_PREFIX_ADDRESS, 16, 4, desc,
++			     desc_bytes(desc), 1);
++
++	/* shared descriptor for first invocation of ahash_update */
++	desc = ctx->sh_desc_update_first;
++	cnstr_shdsc_sk_hash(desc, &ctx->adata, OP_ALG_AS_INIT, ctx->ctx_len,
++			    ctx->ctx_len, 0);
++	dma_sync_single_for_device(jrdev, ctx->sh_desc_update_first_dma,
++				   desc_bytes(desc), ctx->dir);
++	print_hex_dump_debug("acmac update first shdesc@" __stringify(__LINE__)" : ",
++			     DUMP_PREFIX_ADDRESS, 16, 4, desc,
++			     desc_bytes(desc), 1);
++
++	/* shared descriptor for ahash_digest */
++	desc = ctx->sh_desc_digest;
++	cnstr_shdsc_sk_hash(desc, &ctx->adata, OP_ALG_AS_INITFINAL,
++			    digestsize, ctx->ctx_len, 0);
++	dma_sync_single_for_device(jrdev, ctx->sh_desc_digest_dma,
++				   desc_bytes(desc), ctx->dir);
++	print_hex_dump_debug("acmac digest shdesc@" __stringify(__LINE__)" : ",
++			     DUMP_PREFIX_ADDRESS, 16, 4, desc,
++			     desc_bytes(desc), 1);
+ 
+ 	return 0;
+ }
+@@ -502,6 +550,22 @@ static int axcbc_setkey(struct crypto_ahash *ahash, const u8 *key,
+ 
+ 	return axcbc_set_sh_desc(ahash);
+ }
++
++static int acmac_setkey(struct crypto_ahash *ahash, const u8 *key,
++			unsigned int keylen)
++{
++	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
++
++	/* key is immediate data for all cmac shared descriptors */
++	ctx->adata.key_virt = key;
++	ctx->adata.keylen = keylen;
++
++	print_hex_dump_debug("acmac ctx.key@" __stringify(__LINE__)" : ",
++			     DUMP_PREFIX_ADDRESS, 16, 4, key, keylen, 1);
++
++	return acmac_set_sh_desc(ahash);
++}
++
+ /*
+  * ahash_edesc - s/w-extended ahash descriptor
+  * @dst_dma: physical mapped address of req->result
+@@ -779,11 +843,12 @@ static int ahash_update_ctx(struct ahash_request *req)
+ 	to_hash = in_len - *next_buflen;
+ 
+ 	/*
+-	 * For XCBC, if to_hash is multiple of block size,
++	 * For XCBC and CMAC, if to_hash is multiple of block size,
+ 	 * keep last block in internal buffer
+ 	 */
+-	if (is_xcbc_aes(ctx->adata.algtype) && to_hash >= blocksize &&
+-	    (*next_buflen == 0)) {
++	if ((is_xcbc_aes(ctx->adata.algtype) ||
++	     is_cmac_aes(ctx->adata.algtype)) && to_hash >= blocksize &&
++	     (*next_buflen == 0)) {
+ 		*next_buflen = blocksize;
+ 		to_hash -= blocksize;
+ 	}
+@@ -1224,11 +1289,12 @@ static int ahash_update_no_ctx(struct ahash_request *req)
+ 	to_hash = in_len - *next_buflen;
+ 
+ 	/*
+-	 * For XCBC, if to_hash is multiple of block size,
++	 * For XCBC and CMAC, if to_hash is multiple of block size,
+ 	 * keep last block in internal buffer
+ 	 */
+-	if (is_xcbc_aes(ctx->adata.algtype) && to_hash >= blocksize &&
+-	    (*next_buflen == 0)) {
++	if ((is_xcbc_aes(ctx->adata.algtype) ||
++	     is_cmac_aes(ctx->adata.algtype)) && to_hash >= blocksize &&
++	     (*next_buflen == 0)) {
+ 		*next_buflen = blocksize;
+ 		to_hash -= blocksize;
+ 	}
+@@ -1448,11 +1514,12 @@ static int ahash_update_first(struct ahash_request *req)
+ 	to_hash = req->nbytes - *next_buflen;
+ 
+ 	/*
+-	 * For XCBC, if to_hash is multiple of block size,
++	 * For XCBC and CMAC, if to_hash is multiple of block size,
+ 	 * keep last block in internal buffer
+ 	 */
+-	if (is_xcbc_aes(ctx->adata.algtype) && to_hash >= blocksize &&
+-	    (*next_buflen == 0)) {
++	if ((is_xcbc_aes(ctx->adata.algtype) ||
++	     is_cmac_aes(ctx->adata.algtype)) && to_hash >= blocksize &&
++	     (*next_buflen == 0)) {
+ 		*next_buflen = blocksize;
+ 		to_hash -= blocksize;
+ 	}
+@@ -1783,6 +1850,25 @@ static struct caam_hash_template driver_hash[] = {
+ 			},
+ 		 },
+ 		.alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_XCBC_MAC,
++	}, {
++		.hmac_name = "cmac(aes)",
++		.hmac_driver_name = "cmac-aes-caam",
++		.blocksize = AES_BLOCK_SIZE,
++		.template_ahash = {
++			.init = ahash_init,
++			.update = ahash_update,
++			.final = ahash_final,
++			.finup = ahash_finup,
++			.digest = ahash_digest,
++			.export = ahash_export,
++			.import = ahash_import,
++			.setkey = acmac_setkey,
++			.halg = {
++				.digestsize = AES_BLOCK_SIZE,
++				.statesize = sizeof(struct caam_export_state),
++			},
++		 },
++		.alg_type = OP_ALG_ALGSEL_AES | OP_ALG_AAI_CMAC,
+ 	},
+ };
+ 
+@@ -1839,6 +1925,10 @@ static int caam_hash_cra_init(struct crypto_tfm *tfm)
+ 			caam_jr_free(ctx->jrdev);
+ 			return -ENOMEM;
+ 		}
++	} else if (is_cmac_aes(caam_hash->alg_type)) {
++		ctx->dir = DMA_TO_DEVICE;
++		ctx->adata.algtype = OP_TYPE_CLASS1_ALG | caam_hash->alg_type;
++		ctx->ctx_len = 32;
+ 	} else {
+ 		ctx->dir = priv->era >= 6 ? DMA_BIDIRECTIONAL : DMA_TO_DEVICE;
+ 		ctx->adata.algtype = OP_TYPE_CLASS2_ALG | caam_hash->alg_type;
+diff --git a/drivers/crypto/caam/caamhash_desc.c b/drivers/crypto/caam/caamhash_desc.c
+index 053d3a15ef3c..71d018343ee4 100644
+--- a/drivers/crypto/caam/caamhash_desc.c
++++ b/drivers/crypto/caam/caamhash_desc.c
+@@ -2,7 +2,7 @@
+ /*
+  * Shared descriptors for ahash algorithms
+  *
+- * Copyright 2017-2018 NXP
++ * Copyright 2017-2019 NXP
+  */
+ 
+ #include "compat.h"
+@@ -76,7 +76,8 @@ void cnstr_shdsc_ahash(u32 * const desc, struct alginfo *adata, u32 state,
+ EXPORT_SYMBOL(cnstr_shdsc_ahash);
+ 
+ /**
+- * cnstr_shdsc_axcbc - axcbc shared descriptor
++ * cnstr_shdsc_sk_hash - shared descriptor for symmetric key cipher-based
++ *                       hash algorithms
+  * @desc: pointer to buffer used for descriptor construction
+  * @adata: pointer to authentication transform definitions.
+  * @state: algorithm state OP_ALG_AS_{INIT, FINALIZE, INITFINALIZE, UPDATE}
+@@ -84,8 +85,8 @@ EXPORT_SYMBOL(cnstr_shdsc_ahash);
+  * @ctx_len: size of Context Register
+  * @key_dma: I/O Virtual Address of the key
+  */
+-void cnstr_shdsc_axcbc(u32 * const desc, struct alginfo *adata, u32 state,
+-		       int digestsize, int ctx_len, dma_addr_t key_dma)
++void cnstr_shdsc_sk_hash(u32 * const desc, struct alginfo *adata, u32 state,
++			 int digestsize, int ctx_len, dma_addr_t key_dma)
+ {
+ 	u32 *skip_key_load;
+ 
+@@ -98,9 +99,14 @@ void cnstr_shdsc_axcbc(u32 * const desc, struct alginfo *adata, u32 state,
+ 		append_key_as_imm(desc, adata->key_virt, adata->keylen,
+ 				  adata->keylen, CLASS_1 | KEY_DEST_CLASS_REG);
+ 	} else { /* UPDATE, FINALIZE */
+-		/* Load K1 */
+-		append_key(desc, adata->key_dma, adata->keylen,
+-			   CLASS_1 | KEY_DEST_CLASS_REG | KEY_ENC);
++		if (is_xcbc_aes(adata->algtype))
++			/* Load K1 */
++			append_key(desc, adata->key_dma, adata->keylen,
++				   CLASS_1 | KEY_DEST_CLASS_REG | KEY_ENC);
++		else /* CMAC */
++			append_key_as_imm(desc, adata->key_virt, adata->keylen,
++					  adata->keylen, CLASS_1 |
++					  KEY_DEST_CLASS_REG);
+ 		/* Restore context */
+ 		append_seq_load(desc, ctx_len, LDST_CLASS_1_CCB |
+ 				LDST_SRCDST_BYTE_CONTEXT);
+@@ -121,15 +127,19 @@ void cnstr_shdsc_axcbc(u32 * const desc, struct alginfo *adata, u32 state,
+ 	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS1 | FIFOLD_TYPE_LAST1 |
+ 			     FIFOLD_TYPE_MSG | FIFOLDST_VLF);
+ 
+-	/* Save context (partial hash, K2, K3) */
++	/*
++	 * Save context:
++	 * - xcbc: partial hash, keys K2 and K3
++	 * - cmac: partial hash, constant L = E(K,0)
++	 */
+ 	append_seq_store(desc, digestsize, LDST_CLASS_1_CCB |
+ 			 LDST_SRCDST_BYTE_CONTEXT);
+-	if (state == OP_ALG_AS_INIT)
++	if (is_xcbc_aes(adata->algtype) && state == OP_ALG_AS_INIT)
+ 		/* Save K1 */
+ 		append_fifo_store(desc, key_dma, adata->keylen,
+ 				  LDST_CLASS_1_CCB | FIFOST_TYPE_KEY_KEK);
+ }
+-EXPORT_SYMBOL(cnstr_shdsc_axcbc);
++EXPORT_SYMBOL(cnstr_shdsc_sk_hash);
+ 
+ MODULE_LICENSE("Dual BSD/GPL");
+ MODULE_DESCRIPTION("FSL CAAM ahash descriptors support");
+diff --git a/drivers/crypto/caam/caamhash_desc.h b/drivers/crypto/caam/caamhash_desc.h
+index cf4a437d4c02..6947ee1f200c 100644
+--- a/drivers/crypto/caam/caamhash_desc.h
++++ b/drivers/crypto/caam/caamhash_desc.h
+@@ -15,9 +15,15 @@
+ #define DESC_AHASH_FINAL_LEN		(DESC_AHASH_BASE + 5 * CAAM_CMD_SZ)
+ #define DESC_AHASH_DIGEST_LEN		(DESC_AHASH_BASE + 4 * CAAM_CMD_SZ)
+ 
++static inline bool is_xcbc_aes(u32 algtype)
++{
++	return (algtype & (OP_ALG_ALGSEL_MASK | OP_ALG_AAI_MASK)) ==
++	       (OP_ALG_ALGSEL_AES | OP_ALG_AAI_XCBC_MAC);
++}
++
+ void cnstr_shdsc_ahash(u32 * const desc, struct alginfo *adata, u32 state,
+ 		       int digestsize, int ctx_len, bool import_ctx, int era);
+ 
+-void cnstr_shdsc_axcbc(u32 * const desc, struct alginfo *adata, u32 state,
+-		       int digestsize, int ctx_len, dma_addr_t key_dma);
++void cnstr_shdsc_sk_hash(u32 * const desc, struct alginfo *adata, u32 state,
++			 int digestsize, int ctx_len, dma_addr_t key_dma);
+ #endif /* _CAAMHASH_DESC_H_ */
+-- 
+2.16.2
+
