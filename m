@@ -2,166 +2,200 @@ Return-Path: <SRS0=98p2=P6=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FBFBC282C3
-	for <linux-crypto@archiver.kernel.org>; Tue, 22 Jan 2019 15:26:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15D26C282C4
+	for <linux-crypto@archiver.kernel.org>; Tue, 22 Jan 2019 15:27:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2699A217D6
-	for <linux-crypto@archiver.kernel.org>; Tue, 22 Jan 2019 15:26:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="d02JLUi/"
+	by mail.kernel.org (Postfix) with ESMTP id DA30D21019
+	for <linux-crypto@archiver.kernel.org>; Tue, 22 Jan 2019 15:27:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729282AbfAVP0s (ORCPT
+        id S1729206AbfAVP1K (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Jan 2019 10:26:48 -0500
-Received: from mailout1.w1.samsung.com ([210.118.77.11]:49949 "EHLO
-        mailout1.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728918AbfAVP0M (ORCPT
+        Tue, 22 Jan 2019 10:27:10 -0500
+Received: from metis.ext.pengutronix.de ([85.220.165.71]:38639 "EHLO
+        metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728978AbfAVP1K (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Jan 2019 10:26:12 -0500
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20190122152610euoutp01eb9c1a5a7323fda00d5d451037a6fdac~8NRz-Z-2-0912009120euoutp01u
-        for <linux-crypto@vger.kernel.org>; Tue, 22 Jan 2019 15:26:10 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20190122152610euoutp01eb9c1a5a7323fda00d5d451037a6fdac~8NRz-Z-2-0912009120euoutp01u
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1548170770;
-        bh=XhXEUQE5xAKbwygfA7Rdfb9KqEGaRFuvNk9iE5BJLeQ=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=d02JLUi/7SY+ki+lRCcSToGkr87xVapJusChBZjFwT7vv3UMyxDFO7+axUWuyEjMk
-         8ZCzeRyt16jQcHV2XsdbQSujhfiE1G/QdL4Q8lZoD7PkdUg10m+0aJXUDcBmvd+Yf0
-         p/edVB8hT8A9WNcgIGcs5xJ8z6wApWspJzQjdbyc=
-Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
-        20190122152609eucas1p1be2c43da974544abc829e9d5f9aa37ef~8NRzRT7uj0417804178eucas1p1D;
-        Tue, 22 Jan 2019 15:26:09 +0000 (GMT)
-Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
-        eusmges3new.samsung.com (EUCPMTA) with SMTP id 06.F0.04806.116374C5; Tue, 22
-        Jan 2019 15:26:09 +0000 (GMT)
-Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-        20190122152608eucas1p27cff7b53eb3bb23447ef7ba2b3f69671~8NRyhJlmc1355913559eucas1p2b;
-        Tue, 22 Jan 2019 15:26:08 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
-        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20190122152608eusmtrp20261dd303d1b385f6046d7859c7a4e03~8NRySmTs10539205392eusmtrp2V;
-        Tue, 22 Jan 2019 15:26:08 +0000 (GMT)
-X-AuditID: cbfec7f5-367ff700000012c6-1a-5c4736118956
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-        eusmgms2.samsung.com (EUCPMTA) with SMTP id FD.FF.04128.016374C5; Tue, 22
-        Jan 2019 15:26:08 +0000 (GMT)
-Received: from AMDC3218.DIGITAL.local (unknown [106.120.51.18]) by
-        eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-        20190122152608eusmtip21d8df1e7e36aaccbdea35ed588611300~8NRxyhDUY0551405514eusmtip2y;
-        Tue, 22 Jan 2019 15:26:08 +0000 (GMT)
-From:   Kamil Konieczny <k.konieczny@partner.samsung.com>
-To:     k.konieczny@partner.samsung.com
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        Marek Szyprowski <m.szyprowski@samsung.com>
-Subject: [PATCH v1 2/3] dt-bindings: crypto: document Exynos5433 SlimSSS
-Date:   Tue, 22 Jan 2019 16:25:52 +0100
-Message-Id: <20190122152553.1537-3-k.konieczny@partner.samsung.com>
-X-Mailer: git-send-email 2.20.0
-In-Reply-To: <20190122152553.1537-1-k.konieczny@partner.samsung.com>
+        Tue, 22 Jan 2019 10:27:10 -0500
+Received: from dude.hi.pengutronix.de ([2001:67c:670:100:1d::7])
+        by metis.ext.pengutronix.de with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.89)
+        (envelope-from <rhi@pengutronix.de>)
+        id 1glxxC-0003nt-R7; Tue, 22 Jan 2019 16:27:06 +0100
+Received: from rhi by dude.hi.pengutronix.de with local (Exim 4.92-RC4)
+        (envelope-from <rhi@pengutronix.de>)
+        id 1glxxC-0000Kl-Gj; Tue, 22 Jan 2019 16:27:06 +0100
+From:   Roland Hieber <rhi@pengutronix.de>
+To:     =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        linux-crypto@vger.kernel.org
+Cc:     Roland Hieber <r.hieber@pengutronix.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, kernel@pengutronix.de
+Subject: [PATCH 2/2] crypto: caam - fix DMA mapping of stack memory
+Date:   Tue, 22 Jan 2019 16:26:51 +0100
+Message-Id: <20190122152651.1150-1-rhi@pengutronix.de>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA01Sa0hTYRjuO2fbOZvOjnPki1nRwh8VZmHUiSIKtQ6ioFAkZdS0g0rbtB2v
-        9SeYt2aIJGl5TUO0ecuhs1yK2UhTc9nFkkotS7qgRlqmVrbjUfLf8z0XnueFj8QVVrEHGaOL
-        Z/U6tUYlkYksD2f7vF13HQ7f3v7Ok264Vi+mi+ypIrrU1iems7540tltC4i2228T9PDQLEY/
-        aymS0LW2twRd8bIfo9NabcQBJ6ampAYxjbcGMcbS7sWYTZckzP2JexiT3WhCzJR5fQhxXLbv
-        DKuJSWT1PvtPy6Kvmt6huK7VyYaer6KLaN7ZiKQkUDvBUFaLGZGMVFBVCKxFDWJeUFDTCIps
-        CYIwhaBsvEq0nCg0ZEkEoRLBSOlHJDwciSHTC8S7JNRueN/ci/FYSW2C3KF8nDfhVCYO47ZC
-        ghfcKAYel5fgPBZRXpCbOroYkFN+YDZP4ELdBsirNi7yUsof7N0mseBxhUfXPyxOwh0eQ1Ph
-        YgFQFgJsM61LW/2hubtiCbvBl85GQsCesHC3FBNwElibxgghnIqgOLd8SdgLDzr7HW2ko2Ez
-        1Lf4CPRBaPtzk+BpoFzg1birsMEFrlj4I3laDpnpCsHtDSULvWIBrwXjQt0SZsCUly3OQRsL
-        VlxTsOKagv+9NxBuQu5sAqeNYjlfHZu0jVNruQRd1LbIWK0ZOb5Uz9/OH3dQ2++IDkSRSOUs
-        J/sCwhVidSKXou1AQOIqpTyg/1C4Qn5GnXKe1cee0idoWK4DrSVFKnf5hVUjJxRUlDqePcuy
-        cax+WcVIqcdFVJuxx+iXbM9+apNaua29PcM1R46tm/z56VcoasooCNMawk6l18uMz++qAufS
-        8n2eKPHKIKgeKDHXfc4Jr3O77HuBjByIXDM5P/d65OSYpetvBBYy7OQSKMqfCRp945Vr2Bvq
-        la6s/a76qT8XljlfHPxtkCzVHEXG+mmf2OJgq0rERat3bMH1nPof6ZApLk4DAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrFIsWRmVeSWpSXmKPExsVy+t/xe7oCZu4xBm9Wa1lsnLGe1WLO+RYW
-        i/lHzrFadL+Ssejb95/R4vz5DewW9+/9ZLK4vGsOm8XaI3fZLZZev8hk0br3CLsDt8eaeWsY
-        PbasvMnkse2AqsemVZ1sHgff7WHy6NuyitHj8ya5APYoPZui/NKSVIWM/OISW6VoQwsjPUNL
-        Cz0jE0s9Q2PzWCsjUyV9O5uU1JzMstQifbsEvYypqx4yFpzgr2g+/ZqlgfE3TxcjJ4eEgInE
-        7OZuti5GLg4hgaWMEq2/3zBDJKQlGk+vZoKwhSX+XOuCKvrEKDHt+SU2kASbgLnEo+1nwIpE
-        BJQlJt+bzgxSxCwwgVmibckaRpCEsICHxNlF88CmsgioSkxueQzWwCvgLLFp0zuobfIS01Z3
-        gcU5BVwkzp9axQpiCwHVPJ4whxWiXlDi5MwnLCA2M1B989bZzBMYBWYhSc1CklrAyLSKUSS1
-        tDg3PbfYSK84Mbe4NC9dLzk/dxMjMJ62Hfu5ZQdj17vgQ4wCHIxKPLwJF1xjhFgTy4orcw8x
-        SnAwK4nwul50ixHiTUmsrEotyo8vKs1JLT7EaAr0xERmKdHkfGCs55XEG5oamltYGpobmxub
-        WSiJ8543qIwSEkhPLEnNTk0tSC2C6WPi4JRqYLSabK253Mjl8g9/may4WzKlYe9sUxximN0r
-        Kt1jt6xk9O/NeLo83kjKdJuxq7WCKJdTe12L48RPyT6cZ+JENSorjJ3Ftgc3Fs61SwmyDvw6
-        z7Ve+Hxd1W8rkX1Z8v4HX89X6fney2Az1XCdz6xfCY73nhTezv1lyXSdJ5zBj11n5fYPBfFK
-        LMUZiYZazEXFiQD+1HEkvQIAAA==
-X-CMS-MailID: 20190122152608eucas1p27cff7b53eb3bb23447ef7ba2b3f69671
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20190122152608eucas1p27cff7b53eb3bb23447ef7ba2b3f69671
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20190122152608eucas1p27cff7b53eb3bb23447ef7ba2b3f69671
-References: <20190122152553.1537-1-k.konieczny@partner.samsung.com>
-        <CGME20190122152608eucas1p27cff7b53eb3bb23447ef7ba2b3f69671@eucas1p2.samsung.com>
+X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::7
+X-SA-Exim-Mail-From: rhi@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Document DT bindings for crypto Samsung Exynos5433 SlimSSS (Slim Security
-SubSystem) IP.
+On a v4.19 i.MX6 system with IMA and CONFIG_DMA_API_DEBUG enabled, a
+warning is generated when accessing files on a filesystem for which IMA
+measurement is enabled:
 
-Signed-off-by: Kamil Konieczny <k.konieczny@partner.samsung.com>
+    ------------[ cut here ]------------
+    WARNING: CPU: 0 PID: 1 at kernel/dma/debug.c:1181 check_for_stack.part.9+0xd0/0x120
+    caam_jr 2101000.jr0: DMA-API: device driver maps memory from stack [addr=b668049e]
+    Modules linked in:
+    CPU: 0 PID: 1 Comm: switch_root Not tainted 4.19.0-20181214-1 #2
+    Hardware name: Freescale i.MX6 Quad/DualLite (Device Tree)
+    Backtrace:
+    [<c010efb8>] (dump_backtrace) from [<c010f2d0>] (show_stack+0x20/0x24)
+    [<c010f2b0>] (show_stack) from [<c08b04f4>] (dump_stack+0xa0/0xcc)
+    [<c08b0454>] (dump_stack) from [<c012b610>] (__warn+0xf0/0x108)
+    [<c012b520>] (__warn) from [<c012b680>] (warn_slowpath_fmt+0x58/0x74)
+    [<c012b62c>] (warn_slowpath_fmt) from [<c0199acc>] (check_for_stack.part.9+0xd0/0x120)
+    [<c01999fc>] (check_for_stack.part.9) from [<c019a040>] (debug_dma_map_page+0x144/0x174)
+    [<c0199efc>] (debug_dma_map_page) from [<c065f7f4>] (ahash_final_ctx+0x5b4/0xcf0)
+    [<c065f240>] (ahash_final_ctx) from [<c065b3c4>] (ahash_final+0x1c/0x20)
+    [<c065b3a8>] (ahash_final) from [<c03fe278>] (crypto_ahash_op+0x38/0x80)
+    [<c03fe240>] (crypto_ahash_op) from [<c03fe2e0>] (crypto_ahash_final+0x20/0x24)
+    [<c03fe2c0>] (crypto_ahash_final) from [<c03f19a8>] (ima_calc_file_hash+0x29c/0xa40)
+    [<c03f170c>] (ima_calc_file_hash) from [<c03f2b24>] (ima_collect_measurement+0x1dc/0x240)
+    [<c03f2948>] (ima_collect_measurement) from [<c03f0a60>] (process_measurement+0x4c4/0x6b8)
+    [<c03f059c>] (process_measurement) from [<c03f0cdc>] (ima_file_check+0x88/0xa4)
+    [<c03f0c54>] (ima_file_check) from [<c02d8adc>] (path_openat+0x5d8/0x1364)
+    [<c02d8504>] (path_openat) from [<c02dad24>] (do_filp_open+0x84/0xf0)
+    [<c02daca0>] (do_filp_open) from [<c02cf50c>] (do_open_execat+0x84/0x1b0)
+    [<c02cf488>] (do_open_execat) from [<c02d1058>] (__do_execve_file+0x43c/0x890)
+    [<c02d0c1c>] (__do_execve_file) from [<c02d1770>] (sys_execve+0x44/0x4c)
+    [<c02d172c>] (sys_execve) from [<c0101000>] (ret_fast_syscall+0x0/0x28)
+    ---[ end trace 3455789a10e3aefd ]---
+
+The cause is that the struct ahash_request *req is created as a
+stack-local variable up in the stack (presumably somewhere in the IMA
+implementation), then passed down into the CAAM driver, which tries to
+dma_single_map the req->result (indirectly via map_seq_out_ptr_result)
+in order to make that buffer available for the CAAM to store the result
+of the following hash operation.
+
+The calling code doesn't know how req will be used by the CAAM driver,
+and there could be other such occurrences where stack memory is passed
+down to the CAAM driver. Therefore we should rather fix this issue in
+the CAAM driver where the requirements are known.
+
+The problem is solved by introducing a temporary buffer in the auxiliary
+struct ahash_edesc, which is kmalloc'ed and can be DMA-mapped safely to
+receive the result from hardware. Then the result is copied back into
+req->result in the respective done callbacks that are called when the
+CAAM has finished the request.
+
+Other hardware crypto drivers which use DMA also solve it this way, see
+for example atmel_sha_copy_ready_hash() in drivers/crypto/atmel-sha.c.
+
+Supplementary for the above stack trace, fix the issue also in other
+code paths which show the same usage pattern of req->request.
+
+Cc: stable@vger.kernel.org
+Signed-off-by: Roland Hieber <rhi@pengutronix.de>
 ---
- .../devicetree/bindings/crypto/samsung-sss.txt      | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+ drivers/crypto/caam/caamhash.c | 16 ++++++++++------
+ 1 file changed, 10 insertions(+), 6 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/crypto/samsung-sss.txt b/Documentation/devicetree/bindings/crypto/samsung-sss.txt
-index 7a5ca56683cc..75718f86fe50 100644
---- a/Documentation/devicetree/bindings/crypto/samsung-sss.txt
-+++ b/Documentation/devicetree/bindings/crypto/samsung-sss.txt
-@@ -1,4 +1,4 @@
--Samsung SoC SSS (Security SubSystem) module
-+Samsung SoC SSS (Security SubSystem) and SlimSSS module
+diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
+index b65e2e54c5625..3f425d3bf6972 100644
+--- a/drivers/crypto/caam/caamhash.c
++++ b/drivers/crypto/caam/caamhash.c
+@@ -426,7 +426,8 @@ static int ahash_setkey(struct crypto_ahash *ahash,
  
- The SSS module in S5PV210 SoC supports the following:
- -- Feeder (FeedCtrl)
-@@ -15,6 +15,11 @@ supports the following also:
- -- True Random Number Generator (TRNG)
- -- Secure Key Manager
+ /*
+  * ahash_edesc - s/w-extended ahash descriptor
+- * @dst_dma: physical mapped address of req->result
++ * @result: temporary heap buffer to hold req->result
++ * @dst_dma: physical mapped address of result
+  * @sec4_sg_dma: physical mapped address of h/w link table
+  * @src_nents: number of segments in input scatterlist
+  * @sec4_sg_bytes: length of dma mapped sec4_sg space
+@@ -434,6 +435,7 @@ static int ahash_setkey(struct crypto_ahash *ahash,
+  * @sec4_sg: h/w link table
+  */
+ struct ahash_edesc {
++	u8 result[CAAM_MAX_HASH_KEY_SIZE];
+ 	dma_addr_t dst_dma;
+ 	dma_addr_t sec4_sg_dma;
+ 	int src_nents;
+@@ -498,6 +500,7 @@ static void ahash_done(struct device *jrdev, u32 *desc, u32 err,
+ 		caam_jr_strstatus(jrdev, err);
  
-+The SlimSSS module in Exynos5 (Exynos5433) supports:
-+-- Feeder (FeedCtrl)
-+-- Advanced Encryption Standard (AES)
-+-- SHA-1/SHA-256/HMAC (SHA-1/SHA-256)
-+
- Required properties:
+ 	ahash_unmap(jrdev, edesc, req, digestsize);
++	memcpy(req->result, edesc->result, digestsize);
+ 	kfree(edesc);
  
- - compatible : Should contain entries for this and backward compatible
-@@ -22,11 +27,13 @@ Required properties:
-   - "samsung,s5pv210-secss" for S5PV210 SoC.
-   - "samsung,exynos4210-secss" for Exynos4210, Exynos4212, Exynos4412, Exynos5250,
- 		Exynos5260 and Exynos5420 SoCs.
-+  - "samsung,exynos5433-slim-sss" for Exynos542x and Exynos5433 SoCs.
- - reg : Offset and length of the register set for the module
- - interrupts : interrupt specifiers of SSS module interrupts (one feed
- 		control interrupt).
+ #ifdef DEBUG
+@@ -567,6 +570,7 @@ static void ahash_done_ctx_src(struct device *jrdev, u32 *desc, u32 err,
+ 		caam_jr_strstatus(jrdev, err);
  
- - clocks : list of clock phandle and specifier pairs for all clocks  listed in
- 		clock-names property.
--- clock-names : list of device clock input names; should contain one entry
--		"secss".
-+- clock-names : list of device clock input names; should contain "pclk" and
-+		"aclk" for slim-sss in Exynos5433, and one entry "secss" for
-+		other compatibles.
+ 	ahash_unmap_ctx(jrdev, edesc, req, digestsize, DMA_TO_DEVICE);
++	memcpy(req->result, edesc->result, digestsize);
+ 	kfree(edesc);
+ 
+ #ifdef DEBUG
+@@ -858,7 +862,7 @@ static int ahash_final_ctx(struct ahash_request *req)
+ 	append_seq_in_ptr(desc, edesc->sec4_sg_dma, ctx->ctx_len + buflen,
+ 			  LDST_SGF);
+ 
+-	edesc->dst_dma = map_seq_out_ptr_result(desc, jrdev, req->result,
++	edesc->dst_dma = map_seq_out_ptr_result(desc, jrdev, edesc->result,
+ 						digestsize);
+ 	if (dma_mapping_error(jrdev, edesc->dst_dma)) {
+ 		dev_err(jrdev, "unable to map dst\n");
+@@ -945,7 +949,7 @@ static int ahash_finup_ctx(struct ahash_request *req)
+ 	if (ret)
+ 		goto unmap_ctx;
+ 
+-	edesc->dst_dma = map_seq_out_ptr_result(desc, jrdev, req->result,
++	edesc->dst_dma = map_seq_out_ptr_result(desc, jrdev, edesc->result,
+ 						digestsize);
+ 	if (dma_mapping_error(jrdev, edesc->dst_dma)) {
+ 		dev_err(jrdev, "unable to map dst\n");
+@@ -1023,7 +1027,7 @@ static int ahash_digest(struct ahash_request *req)
+ 
+ 	desc = edesc->hw_desc;
+ 
+-	edesc->dst_dma = map_seq_out_ptr_result(desc, jrdev, req->result,
++	edesc->dst_dma = map_seq_out_ptr_result(desc, jrdev, edesc->result,
+ 						digestsize);
+ 	if (dma_mapping_error(jrdev, edesc->dst_dma)) {
+ 		dev_err(jrdev, "unable to map dst\n");
+@@ -1083,7 +1087,7 @@ static int ahash_final_no_ctx(struct ahash_request *req)
+ 		append_seq_in_ptr(desc, state->buf_dma, buflen, 0);
+ 	}
+ 
+-	edesc->dst_dma = map_seq_out_ptr_result(desc, jrdev, req->result,
++	edesc->dst_dma = map_seq_out_ptr_result(desc, jrdev, edesc->result,
+ 						digestsize);
+ 	if (dma_mapping_error(jrdev, edesc->dst_dma)) {
+ 		dev_err(jrdev, "unable to map dst\n");
+@@ -1298,7 +1302,7 @@ static int ahash_finup_no_ctx(struct ahash_request *req)
+ 		goto unmap;
+ 	}
+ 
+-	edesc->dst_dma = map_seq_out_ptr_result(desc, jrdev, req->result,
++	edesc->dst_dma = map_seq_out_ptr_result(desc, jrdev, edesc->result,
+ 						digestsize);
+ 	if (dma_mapping_error(jrdev, edesc->dst_dma)) {
+ 		dev_err(jrdev, "unable to map dst\n");
 -- 
-2.20.0
+2.20.1
 
