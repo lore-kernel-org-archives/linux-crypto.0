@@ -2,25 +2,25 @@ Return-Path: <SRS0=I8vn=P7=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F06FCC282C2
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Jan 2019 13:09:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64109C282C0
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Jan 2019 13:09:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BFBF520823
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Jan 2019 13:09:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3F48E20823
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Jan 2019 13:09:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726296AbfAWNIn (ORCPT
+        id S1726175AbfAWNIn (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Wed, 23 Jan 2019 08:08:43 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:36360 "EHLO huawei.com"
+Received: from szxga06-in.huawei.com ([45.249.212.32]:36366 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726126AbfAWNIn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1725995AbfAWNIn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Wed, 23 Jan 2019 08:08:43 -0500
 Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 47EEC813A4F9BBDD5C5F;
+        by Forcepoint Email with ESMTP id 434D3FE847EE72DC2775;
         Wed, 23 Jan 2019 21:08:40 +0800 (CST)
 Received: from localhost.localdomain (10.67.212.75) by
  DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
@@ -31,10 +31,12 @@ To:     Herbert Xu <herbert@gondor.apana.org.au>,
         <linux-crypto@vger.kernel.org>
 CC:     <linuxarm@huawei.com>, <linux-kernel@vger.kernel.org>,
         Zhou Wang <wangzhou1@hisilicon.com>
-Subject: [PATCH v2 0/4] crypto: hisilicon: Add HiSilicon QM and ZIP controller driver
-Date:   Wed, 23 Jan 2019 21:08:49 +0800
-Message-ID: <1548248933-149853-1-git-send-email-wangzhou1@hisilicon.com>
+Subject: [PATCH v2 1/4] Documentation: Add debugfs doc for hisi_zip
+Date:   Wed, 23 Jan 2019 21:08:50 +0800
+Message-ID: <1548248933-149853-2-git-send-email-wangzhou1@hisilicon.com>
 X-Mailer: git-send-email 2.8.1
+In-Reply-To: <1548248933-149853-1-git-send-email-wangzhou1@hisilicon.com>
+References: <1548248933-149853-1-git-send-email-wangzhou1@hisilicon.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Originating-IP: [10.67.212.75]
@@ -44,55 +46,71 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This series adds HiSilicon QM and ZIP controller driver in crypto subsystem.
+Add debugfs descriptions for HiSilicon ZIP and QM driver.
 
-A simple QM/ZIP driver which helps to provide an example for a general
-accelerator framework is under review in community[1]. Based on this simple
-driver, this series adds HW v2 support, PCI passthrough, reset, PCI/misc error
-handler, debug support. But unlike [1], driver in this patchset only registers
-to crypto subsystem.
-
-There will be a long discussion about above accelerator framework in the
-process of upstreaming. So let's firstly review and upstream QM/ZIP crypto
-driver.
-
-Changes v1 -> v2:
-- Change to register zlib/gzip to scomp.
-- Remove hisi_qm_mem_init/uninit, make QM interfaces compact.
-- Some tiny fixes.
-
-Links:
-- v1  https://lwn.net/Articles/775484/
-- rfc https://lkml.org/lkml/2018/12/13/290
-
-Reference:
-[1] https://lkml.org/lkml/2018/11/12/1951
-
-Zhou Wang (4):
-  Documentation: Add debugfs doc for hisi_zip
-  crypto: hisilicon: Add queue management driver for HiSilicon QM module
-  crypto: hisilicon: Add HiSilicon ZIP accelerator support
-  MAINTAINERS: add maintainer for HiSilicon QM and ZIP controller driver
-
- Documentation/ABI/testing/debugfs-hisi-zip |   50 +
- MAINTAINERS                                |    8 +
- drivers/crypto/hisilicon/Kconfig           |   11 +
- drivers/crypto/hisilicon/Makefile          |    2 +
- drivers/crypto/hisilicon/qm.c              | 1736 ++++++++++++++++++++++++++++
- drivers/crypto/hisilicon/qm.h              |  276 +++++
- drivers/crypto/hisilicon/zip/Makefile      |    2 +
- drivers/crypto/hisilicon/zip/zip.h         |   60 +
- drivers/crypto/hisilicon/zip/zip_crypto.c  |  484 ++++++++
- drivers/crypto/hisilicon/zip/zip_main.c    | 1199 +++++++++++++++++++
- 10 files changed, 3828 insertions(+)
+Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
+Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+---
+ Documentation/ABI/testing/debugfs-hisi-zip | 50 ++++++++++++++++++++++++++++++
+ 1 file changed, 50 insertions(+)
  create mode 100644 Documentation/ABI/testing/debugfs-hisi-zip
- create mode 100644 drivers/crypto/hisilicon/qm.c
- create mode 100644 drivers/crypto/hisilicon/qm.h
- create mode 100644 drivers/crypto/hisilicon/zip/Makefile
- create mode 100644 drivers/crypto/hisilicon/zip/zip.h
- create mode 100644 drivers/crypto/hisilicon/zip/zip_crypto.c
- create mode 100644 drivers/crypto/hisilicon/zip/zip_main.c
 
+diff --git a/Documentation/ABI/testing/debugfs-hisi-zip b/Documentation/ABI/testing/debugfs-hisi-zip
+new file mode 100644
+index 0000000..a7c63e6
+--- /dev/null
++++ b/Documentation/ABI/testing/debugfs-hisi-zip
+@@ -0,0 +1,50 @@
++What:           /sys/kernel/debug/hisi_zip/<bdf>/comp_core[01]/regs
++Date:           Nov 2018
++Contact:        linux-crypto@vger.kernel.org
++Description:    Dump of compression cores related debug registers.
++		Only available for PF.
++
++What:           /sys/kernel/debug/hisi_zip/<bdf>/decomp_core[0-5]/regs
++Date:           Nov 2018
++Contact:        linux-crypto@vger.kernel.org
++Description:    Dump of decompression cores related debug registers.
++		Only available for PF.
++
++What:           /sys/kernel/debug/hisi_zip/<bdf>/clear_enable
++Date:           Nov 2018
++Contact:        linux-crypto@vger.kernel.org
++Description:    Compression/decompression core debug registers read clear
++		control. 1 means enable register read clear, otherwise 0.
++		Writing to this file has no functional effect, only enable or
++		disable counters clear after reading of these registers.
++		Only available for PF.
++
++What:           /sys/kernel/debug/hisi_zip/<bdf>/current_qm
++Date:           Nov 2018
++Contact:        linux-crypto@vger.kernel.org
++Description:    One ZIP controller has one PF and multiple VFs, each function
++		has a QM. Select the QM which below qm refers to.
++		Only available for PF.
++
++What:           /sys/kernel/debug/hisi_zip/<bdf>/qm/qm_regs
++Date:           Nov 2018
++Contact:        linux-crypto@vger.kernel.org
++Description:    Dump of QM related debug registers.
++		Available for PF and VF in host. VF in guest currently only
++		has one debug register.
++
++What:           /sys/kernel/debug/hisi_zip/<bdf>/qm/current_q
++Date:           Nov 2018
++Contact:        linux-crypto@vger.kernel.org
++Description:    One QM may contain multiple queues. Select specific queue to
++		show its debug registers in above qm_regs.
++		Only available for PF.
++
++What:           /sys/kernel/debug/hisi_zip/<bdf>/qm/clear_enable
++Date:           Nov 2018
++Contact:        linux-crypto@vger.kernel.org
++Description:    QM debug registers(qm_regs) read clear control. 1 means enable
++		register read clear, otherwise 0.
++		Writing to this file has no functional effect, only enable or
++		disable counters clear after reading of these registers.
++		Only available for PF.
 -- 
 2.8.1
 
