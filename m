@@ -4,63 +4,63 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB3BFC282C0
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Jan 2019 08:00:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03424C282C0
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Jan 2019 08:13:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B8D422184A
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Jan 2019 08:00:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BBF3A217F5
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Jan 2019 08:13:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1548230412;
-	bh=zmDyYWtKnhfHf7lFKwakcmxsKn8AOs4Tcp/ip0SX4BY=;
+	s=default; t=1548231223;
+	bh=ZN6CWeqhwfuLgxbwWQSMDDCYVZ184BC+vZXvvy9Bvaw=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=lzHNi3OJFtWa9gTn3Arh/en8sPZgQ0YSzopCf57UwpfxrDcNpnXHCjBw5kcioD7T+
-	 fFqXbK+E11EV2d3vnLOcarUoxFzmBV0EFWAR1hWVb+ugZwLKtx3dYDoqWzc7tBWsBD
-	 dht6fETNH67Aw1tClWR3WVmMhvczB00ZKXH3C3bw=
+	b=IMmZqH9e379BAwcSVgt9/+zfl0rg7P2o6vO1N3wMjxSmbq6coAVZl3G0u0jRKPGAq
+	 ivAK2tE6SuQsXLmtOKZBzwfeYlMGp8juNHwuF2YOhlPOzDiKXHEm1B/nBgmG6szHL7
+	 Rx5+/fC6AI2xBz/fJSeZIJch7xoQT3fAuAtaaDsY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726857AbfAWIAM (ORCPT
+        id S1726000AbfAWINn (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Jan 2019 03:00:12 -0500
-Received: from mail.kernel.org ([198.145.29.99]:53362 "EHLO mail.kernel.org"
+        Wed, 23 Jan 2019 03:13:43 -0500
+Received: from mail.kernel.org ([198.145.29.99]:60622 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726827AbfAWIAL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Jan 2019 03:00:11 -0500
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
+        id S1725973AbfAWINn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 23 Jan 2019 03:13:43 -0500
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 19ABC2184A;
-        Wed, 23 Jan 2019 08:00:10 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 35B0A21841;
+        Wed, 23 Jan 2019 08:13:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1548230410;
-        bh=zmDyYWtKnhfHf7lFKwakcmxsKn8AOs4Tcp/ip0SX4BY=;
+        s=default; t=1548231221;
+        bh=ZN6CWeqhwfuLgxbwWQSMDDCYVZ184BC+vZXvvy9Bvaw=;
         h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=H9xegQJSTAX2FX17/+lhkVypQWrZ+eKmB9jp6zRTkifrZeLtHZ+JrGcgqYsXU1YX8
-         LYwL2D6fjIyWr+tW9ZMg141wF3MJuwLxNi0R6eNA5/l7WgNfEhn0xAVXIPTfVpuE3c
-         umhFl4VozTwyiOzUUsK3a1mzAHS6ejcxtPKbxhh4=
-Received: by mail-lf1-f49.google.com with SMTP id a8so878454lfk.5;
-        Wed, 23 Jan 2019 00:00:10 -0800 (PST)
-X-Gm-Message-State: AJcUukcyxdjEnIPA9b6wwn6WhCf6KcGEU3etJLPneOw5rxCt0bBN2n8G
-        5B44bhOyGjNZpRp2yPTepcams3Eku/uU/vbpiOg=
-X-Google-Smtp-Source: ALg8bN5q24GuIwRANJT7Kpr2GPsYoK2FhbiIF3EEQ5Tt61TPzbvOCKsKjkpIlJS3LGV/55TSPpLg7EFoPinYwEPboVE=
-X-Received: by 2002:a19:9b50:: with SMTP id d77mr944239lfe.137.1548230408176;
- Wed, 23 Jan 2019 00:00:08 -0800 (PST)
+        b=efEQ68BCZrG1A5sjPocCMzI0lRuhsVIk2LrMyMCyVEHNzVfIx3CaHFnWZHdGoZNOE
+         0p1+kHO0NWmt+r0nnnj6MDX7u4DEzl06VHPHL89B9mI1mCU3Z/Sw/myUzaatkuH9p1
+         ZNpX11DvF5iqkUKSkDZb2Hgiiihs2o/wkM49X+CQ=
+Received: by mail-lj1-f171.google.com with SMTP id c19-v6so1101014lja.5;
+        Wed, 23 Jan 2019 00:13:41 -0800 (PST)
+X-Gm-Message-State: AJcUukeKKeGTgvzkJ/c90a0+jthxQtJQ+JjB9QQEWorLSjwEdWbmkY+e
+        1GrC4NK2I0/kDJdSySrXnYRhVoY2rZSrxeAUTwc=
+X-Google-Smtp-Source: ALg8bN6UPLK1KJsaAlLnwyCcP75G/5EJgvZ6d3fCAIr0cBdeHzn0tUUupw/kXY1qp4k6FgMsPMH7Yf69Q6Vd8LzKGaE=
+X-Received: by 2002:a2e:9a16:: with SMTP id o22-v6mr1098991lji.112.1548231219295;
+ Wed, 23 Jan 2019 00:13:39 -0800 (PST)
 MIME-Version: 1.0
-References: <CGME20190122152608eucas1p27cff7b53eb3bb23447ef7ba2b3f69671@eucas1p2.samsung.com>
- <20190122152553.1537-1-k.konieczny@partner.samsung.com> <20190122152553.1537-3-k.konieczny@partner.samsung.com>
-In-Reply-To: <20190122152553.1537-3-k.konieczny@partner.samsung.com>
+References: <CGME20190122152609eucas1p287b83592af600dc080374a197e6dd917@eucas1p2.samsung.com>
+ <20190122152553.1537-1-k.konieczny@partner.samsung.com> <20190122152553.1537-4-k.konieczny@partner.samsung.com>
+In-Reply-To: <20190122152553.1537-4-k.konieczny@partner.samsung.com>
 From:   Krzysztof Kozlowski <krzk@kernel.org>
-Date:   Wed, 23 Jan 2019 08:59:56 +0100
-X-Gmail-Original-Message-ID: <CAJKOXPfGJxzPVcAitU=uDFfrmtwQZD1dcbbhy+BjEUF_6exx2g@mail.gmail.com>
-Message-ID: <CAJKOXPfGJxzPVcAitU=uDFfrmtwQZD1dcbbhy+BjEUF_6exx2g@mail.gmail.com>
-Subject: Re: [PATCH v1 2/3] dt-bindings: crypto: document Exynos5433 SlimSSS
+Date:   Wed, 23 Jan 2019 09:13:28 +0100
+X-Gmail-Original-Message-ID: <CAJKOXPdkDrwy2rSs-Fj1rq8rTOHvtQTrZTY5ER=pPWRPwx5qfA@mail.gmail.com>
+Message-ID: <CAJKOXPdkDrwy2rSs-Fj1rq8rTOHvtQTrZTY5ER=pPWRPwx5qfA@mail.gmail.com>
+Subject: Re: [PATCH v1 3/3] crypto: s5p: add AES support for Exynos5433
 To:     Kamil Konieczny <k.konieczny@partner.samsung.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+Cc:     Vladimir Zapolskiy <vz@mleia.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org,
+        "linux-samsung-soc@vger.kernel.org" 
+        <linux-samsung-soc@vger.kernel.org>, linux-kernel@vger.kernel.org,
         Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
         Marek Szyprowski <m.szyprowski@samsung.com>
 Content-Type: text/plain; charset="UTF-8"
@@ -72,63 +72,126 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 On Tue, 22 Jan 2019 at 16:26, Kamil Konieczny
 <k.konieczny@partner.samsung.com> wrote:
 >
-> Document DT bindings for crypto Samsung Exynos5433 SlimSSS (Slim Security
-> SubSystem) IP.
+> Add AES crypto HW acceleration for Exynos5433, with the help of SlimSSS IP.
 >
 > Signed-off-by: Kamil Konieczny <k.konieczny@partner.samsung.com>
 > ---
->  .../devicetree/bindings/crypto/samsung-sss.txt      | 13 ++++++++++---
->  1 file changed, 10 insertions(+), 3 deletions(-)
+>  drivers/crypto/s5p-sss.c | 50 ++++++++++++++++++++++++++++++++++++----
+>  1 file changed, 46 insertions(+), 4 deletions(-)
 >
-> diff --git a/Documentation/devicetree/bindings/crypto/samsung-sss.txt b/Documentation/devicetree/bindings/crypto/samsung-sss.txt
-> index 7a5ca56683cc..75718f86fe50 100644
-> --- a/Documentation/devicetree/bindings/crypto/samsung-sss.txt
-> +++ b/Documentation/devicetree/bindings/crypto/samsung-sss.txt
-> @@ -1,4 +1,4 @@
-> -Samsung SoC SSS (Security SubSystem) module
-> +Samsung SoC SSS (Security SubSystem) and SlimSSS module
+> diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
+> index 0064be0e3941..1ae570ad4391 100644
+> --- a/drivers/crypto/s5p-sss.c
+> +++ b/drivers/crypto/s5p-sss.c
+> @@ -232,6 +232,7 @@
+>   * struct samsung_aes_variant - platform specific SSS driver data
+>   * @aes_offset: AES register offset from SSS module's base.
+>   * @hash_offset: HASH register offset from SSS module's base.
+> + * @clk_names: names of clocks needed to run SSS IP
+>   *
+>   * Specifies platform specific configuration of SSS module.
+>   * Note: A structure for driver specific platform data is used for future
+> @@ -240,6 +241,7 @@
+>  struct samsung_aes_variant {
+>         unsigned int                    aes_offset;
+>         unsigned int                    hash_offset;
+> +       char                            *clk_names[];
+>  };
 >
->  The SSS module in S5PV210 SoC supports the following:
->  -- Feeder (FeedCtrl)
-> @@ -15,6 +15,11 @@ supports the following also:
->  -- True Random Number Generator (TRNG)
->  -- Secure Key Manager
+>  struct s5p_aes_reqctx {
+> @@ -296,6 +298,7 @@ struct s5p_aes_ctx {
+>  struct s5p_aes_dev {
+>         struct device                   *dev;
+>         struct clk                      *clk;
+> +       struct clk                      *pclk;
+>         void __iomem                    *ioaddr;
+>         void __iomem                    *aes_ioaddr;
+>         int                             irq_fc;
+> @@ -384,11 +387,19 @@ struct s5p_hash_ctx {
+>  static const struct samsung_aes_variant s5p_aes_data = {
+>         .aes_offset     = 0x4000,
+>         .hash_offset    = 0x6000,
+> +       .clk_names      = { "secss", }
+
+Put trailing comma so it can be extended without touching previous
+line (just like old code).
+
+>  };
 >
-> +The SlimSSS module in Exynos5 (Exynos5433) supports:
-> +-- Feeder (FeedCtrl)
-> +-- Advanced Encryption Standard (AES)
-> +-- SHA-1/SHA-256/HMAC (SHA-1/SHA-256)
+>  static const struct samsung_aes_variant exynos_aes_data = {
+>         .aes_offset     = 0x200,
+>         .hash_offset    = 0x400,
+> +       .clk_names      = { "secss", }
+
+Ditto.
+
+> +};
 > +
->  Required properties:
+> +static const struct samsung_aes_variant exynos5433_slim_aes_data = {
+> +       .aes_offset     = 0x400,
+> +       .hash_offset    = 0x800,
+> +       .clk_names      = { "pclk", "aclk", }
+
+Ditto.
+
+>  };
 >
->  - compatible : Should contain entries for this and backward compatible
-> @@ -22,11 +27,13 @@ Required properties:
->    - "samsung,s5pv210-secss" for S5PV210 SoC.
->    - "samsung,exynos4210-secss" for Exynos4210, Exynos4212, Exynos4412, Exynos5250,
->                 Exynos5260 and Exynos5420 SoCs.
-> +  - "samsung,exynos5433-slim-sss" for Exynos542x and Exynos5433 SoCs.
+>  static const struct of_device_id s5p_sss_dt_match[] = {
+> @@ -400,6 +411,10 @@ static const struct of_device_id s5p_sss_dt_match[] = {
+>                 .compatible = "samsung,exynos4210-secss",
+>                 .data = &exynos_aes_data,
+>         },
+> +       {
+> +               .compatible = "samsung,exynos5433-slim-sss",
+> +               .data = &exynos5433_slim_aes_data,
+> +       },
+>         { },
+>  };
+>  MODULE_DEVICE_TABLE(of, s5p_sss_dt_match);
+> @@ -2208,18 +2223,40 @@ static int s5p_aes_probe(struct platform_device *pdev)
+>                         return PTR_ERR(pdata->ioaddr);
+>         }
+>
+> -       pdata->clk = devm_clk_get(dev, "secss");
+> +       pdata->clk = devm_clk_get(dev, variant->clk_names[0]);
+>         if (IS_ERR(pdata->clk)) {
+> -               dev_err(dev, "failed to find secss clock source\n");
+> +               dev_err(dev, "failed to find secss clock %s\n",
+> +                       variant->clk_names[0]);
+>                 return -ENOENT;
+>         }
+>
+>         err = clk_prepare_enable(pdata->clk);
+>         if (err < 0) {
+> -               dev_err(dev, "Enabling SSS clk failed, err %d\n", err);
+> +               dev_err(dev, "Enabling clock %s failed, err %d\n",
+> +                       variant->clk_names[0], err);
+>                 return err;
+>         }
+>
+> +       if (variant->clk_names[1]) {
+> +               pdata->pclk = devm_clk_get(dev, variant->clk_names[1]);
+> +               if (IS_ERR(pdata->pclk)) {
+> +                       dev_err(dev, "failed to find clock %s\n",
+> +                               variant->clk_names[1]);
+> +                       clk_disable_unprepare(pdata->clk);
+> +                       return -ENOENT;
 
-For Exynos5420 there is a driver for regular/full SSS module. It would
-be nice to explain what is the difference between them and/or mention
-potential conflicts of usage.
+goto err_irq (eventually rename the label)?
 
-The point is that previously we added drivers/bindings for SSS and now
-you use the other interface. It might be pretty confusing for users...
+> +                       }
+
+Indentation looks wrong here.
+
+> +
+> +               err = clk_prepare_enable(pdata->pclk);
+> +               if (err < 0) {
+> +                       dev_err(dev, "Enabling clock %s failed, err %d\n",
+> +                               variant->clk_names[0], err);
+> +                       clk_disable_unprepare(pdata->clk);
+> +                       return err;
+
+goto...
 
 Best regards,
 Krzysztof
-
->  - reg : Offset and length of the register set for the module
->  - interrupts : interrupt specifiers of SSS module interrupts (one feed
->                 control interrupt).
->
->  - clocks : list of clock phandle and specifier pairs for all clocks  listed in
->                 clock-names property.
-> -- clock-names : list of device clock input names; should contain one entry
-> -               "secss".
-> +- clock-names : list of device clock input names; should contain "pclk" and
-> +               "aclk" for slim-sss in Exynos5433, and one entry "secss" for
-> +               other compatibles.
-> --
-> 2.20.0
->
