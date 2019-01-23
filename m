@@ -2,196 +2,106 @@ Return-Path: <SRS0=I8vn=P7=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03424C282C0
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Jan 2019 08:13:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8BBBC282C0
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Jan 2019 11:24:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BBF3A217F5
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Jan 2019 08:13:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1548231223;
-	bh=ZN6CWeqhwfuLgxbwWQSMDDCYVZ184BC+vZXvvy9Bvaw=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=IMmZqH9e379BAwcSVgt9/+zfl0rg7P2o6vO1N3wMjxSmbq6coAVZl3G0u0jRKPGAq
-	 ivAK2tE6SuQsXLmtOKZBzwfeYlMGp8juNHwuF2YOhlPOzDiKXHEm1B/nBgmG6szHL7
-	 Rx5+/fC6AI2xBz/fJSeZIJch7xoQT3fAuAtaaDsY=
+	by mail.kernel.org (Postfix) with ESMTP id 6C01520870
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Jan 2019 11:24:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="JLGl0iAe"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726000AbfAWINn (ORCPT
+        id S1726804AbfAWLYZ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Jan 2019 03:13:43 -0500
-Received: from mail.kernel.org ([198.145.29.99]:60622 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725973AbfAWINn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Jan 2019 03:13:43 -0500
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 35B0A21841;
-        Wed, 23 Jan 2019 08:13:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1548231221;
-        bh=ZN6CWeqhwfuLgxbwWQSMDDCYVZ184BC+vZXvvy9Bvaw=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=efEQ68BCZrG1A5sjPocCMzI0lRuhsVIk2LrMyMCyVEHNzVfIx3CaHFnWZHdGoZNOE
-         0p1+kHO0NWmt+r0nnnj6MDX7u4DEzl06VHPHL89B9mI1mCU3Z/Sw/myUzaatkuH9p1
-         ZNpX11DvF5iqkUKSkDZb2Hgiiihs2o/wkM49X+CQ=
-Received: by mail-lj1-f171.google.com with SMTP id c19-v6so1101014lja.5;
-        Wed, 23 Jan 2019 00:13:41 -0800 (PST)
-X-Gm-Message-State: AJcUukeKKeGTgvzkJ/c90a0+jthxQtJQ+JjB9QQEWorLSjwEdWbmkY+e
-        1GrC4NK2I0/kDJdSySrXnYRhVoY2rZSrxeAUTwc=
-X-Google-Smtp-Source: ALg8bN6UPLK1KJsaAlLnwyCcP75G/5EJgvZ6d3fCAIr0cBdeHzn0tUUupw/kXY1qp4k6FgMsPMH7Yf69Q6Vd8LzKGaE=
-X-Received: by 2002:a2e:9a16:: with SMTP id o22-v6mr1098991lji.112.1548231219295;
- Wed, 23 Jan 2019 00:13:39 -0800 (PST)
-MIME-Version: 1.0
-References: <CGME20190122152609eucas1p287b83592af600dc080374a197e6dd917@eucas1p2.samsung.com>
- <20190122152553.1537-1-k.konieczny@partner.samsung.com> <20190122152553.1537-4-k.konieczny@partner.samsung.com>
-In-Reply-To: <20190122152553.1537-4-k.konieczny@partner.samsung.com>
-From:   Krzysztof Kozlowski <krzk@kernel.org>
-Date:   Wed, 23 Jan 2019 09:13:28 +0100
-X-Gmail-Original-Message-ID: <CAJKOXPdkDrwy2rSs-Fj1rq8rTOHvtQTrZTY5ER=pPWRPwx5qfA@mail.gmail.com>
-Message-ID: <CAJKOXPdkDrwy2rSs-Fj1rq8rTOHvtQTrZTY5ER=pPWRPwx5qfA@mail.gmail.com>
-Subject: Re: [PATCH v1 3/3] crypto: s5p: add AES support for Exynos5433
-To:     Kamil Konieczny <k.konieczny@partner.samsung.com>
-Cc:     Vladimir Zapolskiy <vz@mleia.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org,
-        "linux-samsung-soc@vger.kernel.org" 
-        <linux-samsung-soc@vger.kernel.org>, linux-kernel@vger.kernel.org,
-        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        Marek Szyprowski <m.szyprowski@samsung.com>
-Content-Type: text/plain; charset="UTF-8"
+        Wed, 23 Jan 2019 06:24:25 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:42741 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727015AbfAWLYZ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 23 Jan 2019 06:24:25 -0500
+Received: by mail-wr1-f68.google.com with SMTP id q18so1960723wrx.9
+        for <linux-crypto@vger.kernel.org>; Wed, 23 Jan 2019 03:24:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id;
+        bh=frm1VMyBnwXapbVBQbQmtvxrwaLvFY7ynrwmcgx7S7s=;
+        b=JLGl0iAeOUU+TIcS3Vzyq+6mVgLKfDpL3r3dLjdvaraayP6CXatZ/Cb9qMUcGug1lJ
+         iOcggUMj+X2ISBQ5rff5DKJpqbtiIf+ztyJAmZ6vDWXhBpmTaruUg8ZRXebcOe4+fBrM
+         bQtAzsREYNSG4Cwm7lVOfbvRKRjtuqoNY0olMTg4eMZdM/ouG+Fv7ty07oMbRT1sR3ic
+         QJv6D8+JhkztbHhTNX89fsxrh9dYXtkdY0ltAfpSvqkm6JJhcaM7W2WBJUYMvhhhQOBE
+         ccsBVEqn0dzgey7NmvwbYcWJ2yub2JBB/mH5FVd8AfEX4DZUKhuOTMhUiBhznyjzH6zh
+         Lsyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=frm1VMyBnwXapbVBQbQmtvxrwaLvFY7ynrwmcgx7S7s=;
+        b=gpnGSU5SdEcwf5cak/ETQupoLA9RqGqR7rKYBUvRmVVVuFToHGBCvO8/xzYh1+c+47
+         aeygmD1KrmVnkOGCWhlck6EExdkduuqmi8t38ScmqV7auxNs/wOY4qUx4F3GEu4e5/Im
+         YcJf4oLMPqVOaTm3FxrmcdvOjIVp/1ZKSQktgxk80vPgexZBdfzHjR+5eGb/U4Jwxwlt
+         wOgbgJmPhTqcaRdrSugKAtPETR4f0T5E4pvSmY1IEde1qqf7xQxGXJ7Jfe4LUG7wiuGe
+         DY5jDqBz0N8R54h78GI9KUHqZFw1fd/6Av7MISrrObYmDAT6ObM2moJpB20pUbapbPWT
+         73KA==
+X-Gm-Message-State: AJcUukc2B9dO1BJmuEcqT499e1vDDOwHwcQMLeUqx9bACYZYrzJ96cDu
+        K6zJmh1CAhJUOL2DyxbN/WZRPw==
+X-Google-Smtp-Source: ALg8bN4g1YD2yMw+RWTqZYR58gMX4n1e5IMCzBI44sUFfnmku5zD59o6heVNbdwWxCwoW+me6ER+zg==
+X-Received: by 2002:a5d:6244:: with SMTP id m4mr2237935wrv.314.1548242663996;
+        Wed, 23 Jan 2019 03:24:23 -0800 (PST)
+Received: from localhost.localdomain ([51.15.160.169])
+        by smtp.googlemail.com with ESMTPSA id m6sm75939095wrv.24.2019.01.23.03.24.22
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Wed, 23 Jan 2019 03:24:23 -0800 (PST)
+From:   Corentin Labbe <clabbe@baylibre.com>
+To:     chunkeey@googlemail.com, davem@davemloft.net,
+        herbert@gondor.apana.org.au
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Corentin Labbe <clabbe@baylibre.com>
+Subject: [PATCH] crypto4xx: Fix wrong ppc4xx_trng_probe()/ppc4xx_trng_remove() arguments
+Date:   Wed, 23 Jan 2019 11:24:18 +0000
+Message-Id: <1548242658-9395-1-git-send-email-clabbe@baylibre.com>
+X-Mailer: git-send-email 2.7.4
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 22 Jan 2019 at 16:26, Kamil Konieczny
-<k.konieczny@partner.samsung.com> wrote:
->
-> Add AES crypto HW acceleration for Exynos5433, with the help of SlimSSS IP.
->
-> Signed-off-by: Kamil Konieczny <k.konieczny@partner.samsung.com>
-> ---
->  drivers/crypto/s5p-sss.c | 50 ++++++++++++++++++++++++++++++++++++----
->  1 file changed, 46 insertions(+), 4 deletions(-)
->
-> diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
-> index 0064be0e3941..1ae570ad4391 100644
-> --- a/drivers/crypto/s5p-sss.c
-> +++ b/drivers/crypto/s5p-sss.c
-> @@ -232,6 +232,7 @@
->   * struct samsung_aes_variant - platform specific SSS driver data
->   * @aes_offset: AES register offset from SSS module's base.
->   * @hash_offset: HASH register offset from SSS module's base.
-> + * @clk_names: names of clocks needed to run SSS IP
->   *
->   * Specifies platform specific configuration of SSS module.
->   * Note: A structure for driver specific platform data is used for future
-> @@ -240,6 +241,7 @@
->  struct samsung_aes_variant {
->         unsigned int                    aes_offset;
->         unsigned int                    hash_offset;
-> +       char                            *clk_names[];
->  };
->
->  struct s5p_aes_reqctx {
-> @@ -296,6 +298,7 @@ struct s5p_aes_ctx {
->  struct s5p_aes_dev {
->         struct device                   *dev;
->         struct clk                      *clk;
-> +       struct clk                      *pclk;
->         void __iomem                    *ioaddr;
->         void __iomem                    *aes_ioaddr;
->         int                             irq_fc;
-> @@ -384,11 +387,19 @@ struct s5p_hash_ctx {
->  static const struct samsung_aes_variant s5p_aes_data = {
->         .aes_offset     = 0x4000,
->         .hash_offset    = 0x6000,
-> +       .clk_names      = { "secss", }
+When building without CONFIG_HW_RANDOM_PPC4XX, I hit the following build failure:
+drivers/crypto/amcc/crypto4xx_core.c: In function 'crypto4xx_probe':
+drivers/crypto/amcc/crypto4xx_core.c:1407:20: error: passing argument 1 of 'ppc4xx_trng_probe' from incompatible pointer type [-Werror=incompatible-pointer-types]
+In file included from drivers/crypto/amcc/crypto4xx_core.c:50:0:
+drivers/crypto/amcc/crypto4xx_trng.h:28:20: note: expected 'struct crypto4xx_device *' but argument is of type 'struct crypto4xx_core_device *'
+drivers/crypto/amcc/crypto4xx_core.c: In function 'crypto4xx_remove':
+drivers/crypto/amcc/crypto4xx_core.c:1434:21: error: passing argument 1 of 'ppc4xx_trng_remove' from incompatible pointer type [-Werror=incompatible-pointer-types]
+In file included from drivers/crypto/amcc/crypto4xx_core.c:50:0:
+drivers/crypto/amcc/crypto4xx_trng.h:30:20: note: expected 'struct crypto4xx_device *' but argument is of type 'struct crypto4xx_core_device *'
 
-Put trailing comma so it can be extended without touching previous
-line (just like old code).
+This patch fix the needed argument of ppc4xx_trng_probe()/ppc4xx_trng_remove() in that case.
 
->  };
->
->  static const struct samsung_aes_variant exynos_aes_data = {
->         .aes_offset     = 0x200,
->         .hash_offset    = 0x400,
-> +       .clk_names      = { "secss", }
+Fixes: 5343e674f32f ("crypto4xx: integrate ppc4xx-rng into crypto4xx")
+Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+---
+ drivers/crypto/amcc/crypto4xx_trng.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Ditto.
+diff --git a/drivers/crypto/amcc/crypto4xx_trng.h b/drivers/crypto/amcc/crypto4xx_trng.h
+index 931d22531f51..7bbda51b7337 100644
+--- a/drivers/crypto/amcc/crypto4xx_trng.h
++++ b/drivers/crypto/amcc/crypto4xx_trng.h
+@@ -26,9 +26,9 @@ void ppc4xx_trng_probe(struct crypto4xx_core_device *core_dev);
+ void ppc4xx_trng_remove(struct crypto4xx_core_device *core_dev);
+ #else
+ static inline void ppc4xx_trng_probe(
+-	struct crypto4xx_device *dev __maybe_unused) { }
++	struct crypto4xx_core_device *dev __maybe_unused) { }
+ static inline void ppc4xx_trng_remove(
+-	struct crypto4xx_device *dev __maybe_unused) { }
++	struct crypto4xx_core_device *dev __maybe_unused) { }
+ #endif
+ 
+ #endif
+-- 
+2.19.2
 
-> +};
-> +
-> +static const struct samsung_aes_variant exynos5433_slim_aes_data = {
-> +       .aes_offset     = 0x400,
-> +       .hash_offset    = 0x800,
-> +       .clk_names      = { "pclk", "aclk", }
-
-Ditto.
-
->  };
->
->  static const struct of_device_id s5p_sss_dt_match[] = {
-> @@ -400,6 +411,10 @@ static const struct of_device_id s5p_sss_dt_match[] = {
->                 .compatible = "samsung,exynos4210-secss",
->                 .data = &exynos_aes_data,
->         },
-> +       {
-> +               .compatible = "samsung,exynos5433-slim-sss",
-> +               .data = &exynos5433_slim_aes_data,
-> +       },
->         { },
->  };
->  MODULE_DEVICE_TABLE(of, s5p_sss_dt_match);
-> @@ -2208,18 +2223,40 @@ static int s5p_aes_probe(struct platform_device *pdev)
->                         return PTR_ERR(pdata->ioaddr);
->         }
->
-> -       pdata->clk = devm_clk_get(dev, "secss");
-> +       pdata->clk = devm_clk_get(dev, variant->clk_names[0]);
->         if (IS_ERR(pdata->clk)) {
-> -               dev_err(dev, "failed to find secss clock source\n");
-> +               dev_err(dev, "failed to find secss clock %s\n",
-> +                       variant->clk_names[0]);
->                 return -ENOENT;
->         }
->
->         err = clk_prepare_enable(pdata->clk);
->         if (err < 0) {
-> -               dev_err(dev, "Enabling SSS clk failed, err %d\n", err);
-> +               dev_err(dev, "Enabling clock %s failed, err %d\n",
-> +                       variant->clk_names[0], err);
->                 return err;
->         }
->
-> +       if (variant->clk_names[1]) {
-> +               pdata->pclk = devm_clk_get(dev, variant->clk_names[1]);
-> +               if (IS_ERR(pdata->pclk)) {
-> +                       dev_err(dev, "failed to find clock %s\n",
-> +                               variant->clk_names[1]);
-> +                       clk_disable_unprepare(pdata->clk);
-> +                       return -ENOENT;
-
-goto err_irq (eventually rename the label)?
-
-> +                       }
-
-Indentation looks wrong here.
-
-> +
-> +               err = clk_prepare_enable(pdata->pclk);
-> +               if (err < 0) {
-> +                       dev_err(dev, "Enabling clock %s failed, err %d\n",
-> +                               variant->clk_names[0], err);
-> +                       clk_disable_unprepare(pdata->clk);
-> +                       return err;
-
-goto...
-
-Best regards,
-Krzysztof
