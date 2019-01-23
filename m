@@ -6,47 +6,47 @@ X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B056DC282C0
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Jan 2019 22:53:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46F1DC282C5
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Jan 2019 22:53:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 75F9F2184C
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Jan 2019 22:53:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 19ACF2184C
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Jan 2019 22:53:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1548284030;
-	bh=OVMlggYjSpXNEz4yzYkF9qJ5ce0TSOvLRhIyZB71b+4=;
+	s=default; t=1548284031;
+	bh=0m28rRGt+dyf2pFnm8cDXy/meEEYN6bA88EXthRWW7s=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=2uwM+DSfdTxy5QsUOjJQkoYZZonCWMvrQxBPLd+L32GKftTV0nS5ucbZ/TyC08dZ7
-	 Idzu/mK3lgmxAxlo9daLX1BKZCSS74JYx7r8as1pSgD4ZHpyKnw/vEEntuBfkKZUsi
-	 Y4rj8oQq42TOWLHWT8i/dhTAAKW3bYgw/7gWeBEk=
+	b=OiK0q0JpPOKKCXUFqVVqI9ebLfRFAuWxQHpCrf/IQRqDaWnxdDGavBrnCgNQNL/RB
+	 Z1RRd/vYtqKJwhvkaMX1JDRc1Dikr+NJoUfzTDtvT9l5h7GH0CbfM2gM0WpjFeAQoB
+	 7HsHPC1n27Pv3gSb7GBxzS8XcKvuNviQUt3QLqMU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727414AbfAWWxj (ORCPT
+        id S1726829AbfAWWwd (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Jan 2019 17:53:39 -0500
+        Wed, 23 Jan 2019 17:52:33 -0500
 Received: from mail.kernel.org ([198.145.29.99]:50122 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726744AbfAWWwe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Jan 2019 17:52:34 -0500
+        id S1726473AbfAWWwd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 23 Jan 2019 17:52:33 -0500
 Received: from ebiggers-linuxstation.mtv.corp.google.com (unknown [104.132.1.77])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4DC43218AC;
-        Wed, 23 Jan 2019 22:52:33 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 560E6218A4;
+        Wed, 23 Jan 2019 22:52:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1548283953;
-        bh=OVMlggYjSpXNEz4yzYkF9qJ5ce0TSOvLRhIyZB71b+4=;
+        s=default; t=1548283952;
+        bh=0m28rRGt+dyf2pFnm8cDXy/meEEYN6bA88EXthRWW7s=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=yhsCMB6Dkc4zzW2r6QukrB0GUHspjvLlrDuehElOdVlFbjUKf8CyHl3KfqvgaE+aa
-         Ta6Z8LygmDcHgPT8sQxi2PjGbvNGxiwfjjlR9lbzR0I7xCuyyxltnjv/FAZYPAp1AB
-         ktr6HWl3UT4meqegQMUli6aVxjCIZh9ygJ7yf3l0=
+        b=iy7kTFLL9AL1eU6MrHhB24uUoidhVgQi65eJqRx5g3mnZIhd+Qc+IGoMI8GHwwHYS
+         PVyNkxbINJt/TKLYrUUXCGX12HMPPZ768kGLbB2A/bU0nb5a4Z7IdyVelhBiHWYobd
+         x32W/BnNIC5zYygs+q9EE0W7UhZ2HA+xLCdpIXJ8=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>
 Cc:     linux-kernel@vger.kernel.org,
         "Jason A . Donenfeld" <Jason@zx2c4.com>, stable@vger.kernel.org,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [RFC/RFT PATCH 07/15] crypto: arm64/aes-neonbs - fix returning final keystream block
-Date:   Wed, 23 Jan 2019 14:49:18 -0800
-Message-Id: <20190123224926.250525-8-ebiggers@kernel.org>
+        Ondrej Mosnacek <omosnace@redhat.com>
+Subject: [RFC/RFT PATCH 04/15] crypto: x86/morus - fix handling chunked inputs and MAY_SLEEP
+Date:   Wed, 23 Jan 2019 14:49:15 -0800
+Message-Id: <20190123224926.250525-5-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.20.1.321.g9e740568ce-goog
 In-Reply-To: <20190123224926.250525-1-ebiggers@kernel.org>
 References: <20190123224926.250525-1-ebiggers@kernel.org>
@@ -59,52 +59,151 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-The arm64 NEON bit-sliced implementation of AES-CTR fails the improved
-skcipher tests because it sometimes produces the wrong ciphertext.  The
-bug is that the final keystream block isn't returned from the assembly
-code when the number of non-final blocks is zero.  This can happen if
-the input data ends a few bytes after a page boundary.  In this case the
-last bytes get "encrypted" by XOR'ing them with uninitialized memory.
+The x86 MORUS implementations all fail the improved AEAD tests because
+they produce the wrong result with some data layouts.  Also, when the
+MAY_SLEEP flag is given, they can sleep in the skcipher_walk_*()
+functions while preemption is disabled by kernel_fpu_begin().
 
-Fix the assembly code to return the final keystream block when needed.
+Fix these bugs.
 
-Fixes: 88a3f582bea9 ("crypto: arm64/aes - don't use IV buffer to return final keystream block")
-Cc: <stable@vger.kernel.org> # v4.11+
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Fixes: 56e8e57fc3a7 ("crypto: morus - Add common SIMD glue code for MORUS")
+Cc: <stable@vger.kernel.org> # v4.18+
+Cc: Ondrej Mosnacek <omosnace@redhat.com>
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- arch/arm64/crypto/aes-neonbs-core.S | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ arch/x86/crypto/morus1280_glue.c | 40 +++++++++++++-------------------
+ arch/x86/crypto/morus640_glue.c  | 39 ++++++++++++-------------------
+ 2 files changed, 31 insertions(+), 48 deletions(-)
 
-diff --git a/arch/arm64/crypto/aes-neonbs-core.S b/arch/arm64/crypto/aes-neonbs-core.S
-index e613a87f8b53..8432c8d0dea6 100644
---- a/arch/arm64/crypto/aes-neonbs-core.S
-+++ b/arch/arm64/crypto/aes-neonbs-core.S
-@@ -971,18 +971,22 @@ CPU_LE(	rev		x8, x8		)
+diff --git a/arch/x86/crypto/morus1280_glue.c b/arch/x86/crypto/morus1280_glue.c
+index 0dccdda1eb3a..7e600f8bcdad 100644
+--- a/arch/x86/crypto/morus1280_glue.c
++++ b/arch/x86/crypto/morus1280_glue.c
+@@ -85,31 +85,20 @@ static void crypto_morus1280_glue_process_ad(
  
- 8:	next_ctr	v0
- 	st1		{v0.16b}, [x24]
--	cbz		x23, 0f
-+	cbz		x23, .Lctr_done
+ static void crypto_morus1280_glue_process_crypt(struct morus1280_state *state,
+ 						struct morus1280_ops ops,
+-						struct aead_request *req)
++						struct skcipher_walk *walk)
+ {
+-	struct skcipher_walk walk;
+-	u8 *cursor_src, *cursor_dst;
+-	unsigned int chunksize, base;
+-
+-	ops.skcipher_walk_init(&walk, req, false);
+-
+-	while (walk.nbytes) {
+-		cursor_src = walk.src.virt.addr;
+-		cursor_dst = walk.dst.virt.addr;
+-		chunksize = walk.nbytes;
+-
+-		ops.crypt_blocks(state, cursor_src, cursor_dst, chunksize);
+-
+-		base = chunksize & ~(MORUS1280_BLOCK_SIZE - 1);
+-		cursor_src += base;
+-		cursor_dst += base;
+-		chunksize &= MORUS1280_BLOCK_SIZE - 1;
+-
+-		if (chunksize > 0)
+-			ops.crypt_tail(state, cursor_src, cursor_dst,
+-				       chunksize);
++	while (walk->nbytes >= MORUS1280_BLOCK_SIZE) {
++		ops.crypt_blocks(state, walk->src.virt.addr,
++				 walk->dst.virt.addr,
++				 round_down(walk->nbytes,
++					    MORUS1280_BLOCK_SIZE));
++		skcipher_walk_done(walk, walk->nbytes % MORUS1280_BLOCK_SIZE);
++	}
  
- 	cond_yield_neon	98b
- 	b		99b
+-		skcipher_walk_done(&walk, 0);
++	if (walk->nbytes) {
++		ops.crypt_tail(state, walk->src.virt.addr, walk->dst.virt.addr,
++			       walk->nbytes);
++		skcipher_walk_done(walk, 0);
+ 	}
+ }
  
--0:	frame_pop
-+.Lctr_done:
-+	frame_pop
- 	ret
+@@ -147,12 +136,15 @@ static void crypto_morus1280_glue_crypt(struct aead_request *req,
+ 	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
+ 	struct morus1280_ctx *ctx = crypto_aead_ctx(tfm);
+ 	struct morus1280_state state;
++	struct skcipher_walk walk;
++
++	ops.skcipher_walk_init(&walk, req, true);
  
- 	/*
- 	 * If we are handling the tail of the input (x6 != NULL), return the
- 	 * final keystream block back to the caller.
- 	 */
-+0:	cbz		x25, 8b
-+	st1		{v0.16b}, [x25]
-+	b		8b
- 1:	cbz		x25, 8b
- 	st1		{v1.16b}, [x25]
- 	b		8b
+ 	kernel_fpu_begin();
+ 
+ 	ctx->ops->init(&state, &ctx->key, req->iv);
+ 	crypto_morus1280_glue_process_ad(&state, ctx->ops, req->src, req->assoclen);
+-	crypto_morus1280_glue_process_crypt(&state, ops, req);
++	crypto_morus1280_glue_process_crypt(&state, ops, &walk);
+ 	ctx->ops->final(&state, tag_xor, req->assoclen, cryptlen);
+ 
+ 	kernel_fpu_end();
+diff --git a/arch/x86/crypto/morus640_glue.c b/arch/x86/crypto/morus640_glue.c
+index 7b58fe4d9bd1..cb3a81732016 100644
+--- a/arch/x86/crypto/morus640_glue.c
++++ b/arch/x86/crypto/morus640_glue.c
+@@ -85,31 +85,19 @@ static void crypto_morus640_glue_process_ad(
+ 
+ static void crypto_morus640_glue_process_crypt(struct morus640_state *state,
+ 					       struct morus640_ops ops,
+-					       struct aead_request *req)
++					       struct skcipher_walk *walk)
+ {
+-	struct skcipher_walk walk;
+-	u8 *cursor_src, *cursor_dst;
+-	unsigned int chunksize, base;
+-
+-	ops.skcipher_walk_init(&walk, req, false);
+-
+-	while (walk.nbytes) {
+-		cursor_src = walk.src.virt.addr;
+-		cursor_dst = walk.dst.virt.addr;
+-		chunksize = walk.nbytes;
+-
+-		ops.crypt_blocks(state, cursor_src, cursor_dst, chunksize);
+-
+-		base = chunksize & ~(MORUS640_BLOCK_SIZE - 1);
+-		cursor_src += base;
+-		cursor_dst += base;
+-		chunksize &= MORUS640_BLOCK_SIZE - 1;
+-
+-		if (chunksize > 0)
+-			ops.crypt_tail(state, cursor_src, cursor_dst,
+-				       chunksize);
++	while (walk->nbytes >= MORUS640_BLOCK_SIZE) {
++		ops.crypt_blocks(state, walk->src.virt.addr,
++				 walk->dst.virt.addr,
++				 round_down(walk->nbytes, MORUS640_BLOCK_SIZE));
++		skcipher_walk_done(walk, walk->nbytes % MORUS640_BLOCK_SIZE);
++	}
+ 
+-		skcipher_walk_done(&walk, 0);
++	if (walk->nbytes) {
++		ops.crypt_tail(state, walk->src.virt.addr, walk->dst.virt.addr,
++			       walk->nbytes);
++		skcipher_walk_done(walk, 0);
+ 	}
+ }
+ 
+@@ -143,12 +131,15 @@ static void crypto_morus640_glue_crypt(struct aead_request *req,
+ 	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
+ 	struct morus640_ctx *ctx = crypto_aead_ctx(tfm);
+ 	struct morus640_state state;
++	struct skcipher_walk walk;
++
++	ops.skcipher_walk_init(&walk, req, true);
+ 
+ 	kernel_fpu_begin();
+ 
+ 	ctx->ops->init(&state, &ctx->key, req->iv);
+ 	crypto_morus640_glue_process_ad(&state, ctx->ops, req->src, req->assoclen);
+-	crypto_morus640_glue_process_crypt(&state, ops, req);
++	crypto_morus640_glue_process_crypt(&state, ops, &walk);
+ 	ctx->ops->final(&state, tag_xor, req->assoclen, cryptlen);
+ 
+ 	kernel_fpu_end();
 -- 
 2.20.1.321.g9e740568ce-goog
 
