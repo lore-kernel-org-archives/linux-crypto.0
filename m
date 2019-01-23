@@ -4,50 +4,48 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE6C0C282C0
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Jan 2019 22:54:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC03EC282C2
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Jan 2019 22:54:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8998E2184C
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Jan 2019 22:54:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AAB042184C
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Jan 2019 22:54:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1548284042;
-	bh=qva0Xse0lWrH/U7mmCUyYmvv8J/PRs6KvA4e7PG1R0M=;
+	s=default; t=1548284044;
+	bh=ufxoBm2hTwA/uh3MG++DT4zHTGEbfgFZcifD2C0Ye2A=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=hSKm8OfV9/XmtRp0V3sgTT7Wgwp112oHJmDOmbTROfQ6UlIoyLXGKvEfmhrBwwgWc
-	 QLx3IpNG3iWs6f9iNAu9ascjHmspPub8G6YcMJr/plWiaZkvbgroTNxqcdSJP6rolK
-	 IfP8C/1oG2BIiMnmOhIkOj9PGdeXhuxGK1ezdHJ8=
+	b=ZH8dNQvJLMQxaw8y6YX9x6JuVFNH06XGAw2zPDmTUgQAxBc1MEhNhIObD7ZI3d9C8
+	 wsUiPoEnPib1fqHCUlBCt0DPvgKc4aV0dVi3/oehietclzEMl3SHyU0t1zYlOwKXLE
+	 AOreX7QioKPiccWv0oKIOeGhKdCCmWuonaTWABsk=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727474AbfAWWxw (ORCPT
+        id S1727469AbfAWWxw (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Wed, 23 Jan 2019 17:53:52 -0500
-Received: from mail.kernel.org ([198.145.29.99]:50134 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:50142 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726517AbfAWWwd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1726693AbfAWWwd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Wed, 23 Jan 2019 17:52:33 -0500
 Received: from ebiggers-linuxstation.mtv.corp.google.com (unknown [104.132.1.77])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id A714F218A6;
+        by mail.kernel.org (Postfix) with ESMTPSA id 039CE218AD;
         Wed, 23 Jan 2019 22:52:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1548283952;
-        bh=qva0Xse0lWrH/U7mmCUyYmvv8J/PRs6KvA4e7PG1R0M=;
+        s=default; t=1548283953;
+        bh=ufxoBm2hTwA/uh3MG++DT4zHTGEbfgFZcifD2C0Ye2A=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=lLThBtyVs0g+kn83jridOI8C6OpSRnlCF+nqEV89ieyg7OqA1JSASzZyxe9w8flVJ
-         z0ikscS8KN8vGvthn4FtAYhnXxNNFl2JOGPHO/NYQHgsHRUzUpjzc7ouM0iJBhMu4X
-         PfulvRVW393pkJljPQpYPo8JDScWi9jjIivVkqLg=
+        b=yfsgeMR0HtM/jmbeXlKpSWqp47+vF9FhpxQ+JynVSTnb+6zyC9LZXH90k+MW/yYaI
+         iYT4v5kYsrsEOgs4kC6k0NQP3ceQ179sBdcuMG3e99DADJmk0mQLMDxQqvBN3CQc2f
+         W3o9bl6Nrhl/r8LSklURXNkeVMecgmf/YkTGWQeg=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>
 Cc:     linux-kernel@vger.kernel.org,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>, stable@vger.kernel.org,
-        Dave Watson <davejwatson@fb.com>
-Subject: [RFC/RFT PATCH 05/15] crypto: x86/aesni-gcm - fix crash on empty plaintext
-Date:   Wed, 23 Jan 2019 14:49:16 -0800
-Message-Id: <20190123224926.250525-6-ebiggers@kernel.org>
+        "Jason A . Donenfeld" <Jason@zx2c4.com>, stable@vger.kernel.org
+Subject: [RFC/RFT PATCH 06/15] crypto: ahash - fix another early termination in hash walk
+Date:   Wed, 23 Jan 2019 14:49:17 -0800
+Message-Id: <20190123224926.250525-7-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.20.1.321.g9e740568ce-goog
 In-Reply-To: <20190123224926.250525-1-ebiggers@kernel.org>
 References: <20190123224926.250525-1-ebiggers@kernel.org>
@@ -60,48 +58,59 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-gcmaes_crypt_by_sg() dereferences the NULL pointer returned by
-scatterwalk_ffwd() when encrypting an empty plaintext and the source
-scatterlist ends immediately after the associated data.
+Hash algorithms with an alignmask set, e.g. "xcbc(aes-aesni)" and
+"michael_mic", fail the improved hash tests because they sometimes
+produce the wrong digest.  The bug is that in the case where a
+scatterlist element crosses pages, not all the data is actually hashed
+because the scatterlist walk terminates too early.  This happens because
+the 'nbytes' variable in crypto_hash_walk_done() is assigned the number
+of bytes remaining in the page, then later interpreted as the number of
+bytes remaining in the scatterlist element.  Fix it.
 
-Fix it by only fast-forwarding to the src/dst data scatterlists if the
-data length is nonzero.
-
-This bug is reproduced by the "rfc4543(gcm(aes))" test vectors when run
-with the new AEAD test manager.
-
-Fixes: e845520707f8 ("crypto: aesni - Update aesni-intel_glue to use scatter/gather")
-Cc: <stable@vger.kernel.org> # v4.17+
-Cc: Dave Watson <davejwatson@fb.com>
+Fixes: 900a081f6912 ("crypto: ahash - Fix early termination in hash walk")
+Cc: stable@vger.kernel.org
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- arch/x86/crypto/aesni-intel_glue.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+ crypto/ahash.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-index 9b5ccde3ef31..1e3d2102033a 100644
---- a/arch/x86/crypto/aesni-intel_glue.c
-+++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -813,11 +813,14 @@ static int gcmaes_crypt_by_sg(bool enc, struct aead_request *req,
- 		scatterwalk_map_and_copy(assoc, req->src, 0, assoclen, 0);
- 	}
+diff --git a/crypto/ahash.c b/crypto/ahash.c
+index ca0d3e281fef..81e2767e2164 100644
+--- a/crypto/ahash.c
++++ b/crypto/ahash.c
+@@ -86,17 +86,17 @@ static int hash_walk_new_entry(struct crypto_hash_walk *walk)
+ int crypto_hash_walk_done(struct crypto_hash_walk *walk, int err)
+ {
+ 	unsigned int alignmask = walk->alignmask;
+-	unsigned int nbytes = walk->entrylen;
  
--	src_sg = scatterwalk_ffwd(src_start, req->src, req->assoclen);
--	scatterwalk_start(&src_sg_walk, src_sg);
--	if (req->src != req->dst) {
--		dst_sg = scatterwalk_ffwd(dst_start, req->dst, req->assoclen);
--		scatterwalk_start(&dst_sg_walk, dst_sg);
-+	if (left) {
-+		src_sg = scatterwalk_ffwd(src_start, req->src, req->assoclen);
-+		scatterwalk_start(&src_sg_walk, src_sg);
-+		if (req->src != req->dst) {
-+			dst_sg = scatterwalk_ffwd(dst_start, req->dst,
-+						  req->assoclen);
-+			scatterwalk_start(&dst_sg_walk, dst_sg);
-+		}
- 	}
+ 	walk->data -= walk->offset;
  
- 	kernel_fpu_begin();
+-	if (nbytes && walk->offset & alignmask && !err) {
+-		walk->offset = ALIGN(walk->offset, alignmask + 1);
+-		nbytes = min(nbytes,
+-			     ((unsigned int)(PAGE_SIZE)) - walk->offset);
+-		walk->entrylen -= nbytes;
++	if (walk->entrylen && (walk->offset & alignmask) && !err) {
++		unsigned int nbytes;
+ 
++		walk->offset = ALIGN(walk->offset, alignmask + 1);
++		nbytes = min(walk->entrylen,
++			     (unsigned int)(PAGE_SIZE - walk->offset));
+ 		if (nbytes) {
++			walk->entrylen -= nbytes;
+ 			walk->data += walk->offset;
+ 			return nbytes;
+ 		}
+@@ -116,7 +116,7 @@ int crypto_hash_walk_done(struct crypto_hash_walk *walk, int err)
+ 	if (err)
+ 		return err;
+ 
+-	if (nbytes) {
++	if (walk->entrylen) {
+ 		walk->offset = 0;
+ 		walk->pg++;
+ 		return hash_walk_next(walk);
 -- 
 2.20.1.321.g9e740568ce-goog
 
