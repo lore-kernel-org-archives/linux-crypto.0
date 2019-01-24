@@ -4,325 +4,124 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33533C282C3
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Jan 2019 11:28:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9692CC282C6
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Jan 2019 12:11:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DEA2C21855
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Jan 2019 11:28:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6764C20855
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Jan 2019 12:11:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="ULcNqx3/"
+	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="KeJi9ktC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727443AbfAXL2r (ORCPT
+        id S1727622AbfAXMLg (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 24 Jan 2019 06:28:47 -0500
-Received: from mail-ua1-f66.google.com ([209.85.222.66]:45258 "EHLO
-        mail-ua1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726105AbfAXL2r (ORCPT
+        Thu, 24 Jan 2019 07:11:36 -0500
+Received: from mail-io1-f65.google.com ([209.85.166.65]:40861 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727556AbfAXMLg (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 24 Jan 2019 06:28:47 -0500
-Received: by mail-ua1-f66.google.com with SMTP id e16so1840972uam.12
-        for <linux-crypto@vger.kernel.org>; Thu, 24 Jan 2019 03:28:45 -0800 (PST)
+        Thu, 24 Jan 2019 07:11:36 -0500
+Received: by mail-io1-f65.google.com with SMTP id k2so4513306iog.7
+        for <linux-crypto@vger.kernel.org>; Thu, 24 Jan 2019 04:11:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=6TtzdD/cba6sa/DrDzOU/l6zlkRVDT6fBw8RnvsQq3s=;
-        b=ULcNqx3/mSpX5maCGz+/K5jI9k2Qj6DXOgdgsx/EVpksvsg7lIyz4wv3fRFo2270xd
-         cFHpOcketX44O2SdfZWKoViwaHt+g4m8GTRmD4b6TqgVRX2UJz3aNtfK/eSNxCkL4GDT
-         WCE/SwpcYAMeU54TM4Cx8W2xalOKiH97v2zgQ=
+        bh=e7C6zUR07TLT9ym38kesf+PfYGHS00+KJqk/gsJOPwA=;
+        b=KeJi9ktC73hG0Edi7qu7Tmvvn/boBH9yI43KQGl/d7UDP2uzWDvDimjGv+cul9CoKW
+         UPAzcpbWYE1HxIr9dz4iTvWqrkB5MoQGvBlFuAozh3t3JVWLw7lD8MG5kATzd9cYcVHk
+         YN8LJ5i1uETsG7w5QQpYEMgpOtg5JO/8CsGlA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=6TtzdD/cba6sa/DrDzOU/l6zlkRVDT6fBw8RnvsQq3s=;
-        b=kfwp3N+WcdPtWKJ/UhugAVP6P+ek+ps38QFHLkuTbDf8S8m+J+2sQKNeTCRWN2pFzb
-         tmxlJVrrHSPsrN4HChXjJUmfHOoE8ntBBPZPMqh1/vsqPw/iGs8/x35z+D4ua1H4Xe0e
-         p1tbUwG8D9Q0azpKqaw49UL81tS8QhxoQMcM5rr64vSEt9N02v7/pmPQhit0AsQYzWoN
-         MXaYvKRqKfPFohDA+XBwoN8kWSVASFHsmlV1FXGB/x5lOvfRYH0WEFPx+kddV0vM0j67
-         BAS5/vmclteFuzUEHyeQC17ePjHR0mMrgBUuVzQbmcgOV55IXCvsvfue4Xx/86fkk2r1
-         vpQQ==
-X-Gm-Message-State: AJcUukcDCKxLZlfJDXxPQ9Ti3DknTfutUqGFphZSiNfocl8jThvrorQZ
-        MxYiBOc5ujxfJiRsDB5IOROLWiGKqhDRAYvTPhImvg==
-X-Google-Smtp-Source: ALg8bN6iS46jnJBIMo8Xyi2MquUv8kAIqGURM0TPbaskQKGy7sLxOz+4QnTtRT/57dqWEHVZ3EJOwGK4XbDdcUCmW4U=
-X-Received: by 2002:ab0:21c6:: with SMTP id u6mr2525197uan.97.1548329325479;
- Thu, 24 Jan 2019 03:28:45 -0800 (PST)
+        bh=e7C6zUR07TLT9ym38kesf+PfYGHS00+KJqk/gsJOPwA=;
+        b=SNH5nc1UdeE1MIxH1IZiqg1FVTDecBVN7NQkp+0BuUtPf4RAXIemNvGCaM1qHmN1rl
+         uXXWhyx2JeQhY6503z8/2g8zuaYF1/f2zRcAtjuq2E98xovN0X3bWlFZpQDTYkGXQaiF
+         A1sreZX2fwfwpCHqrhJxDH5J2GvYJyzhkaeBn81FsYXtOxdjx8B7+ffNrDWmJRbkv8PE
+         0XH3nSHBdMuSyonZR9Jl0iPguk/8ujVBy7QAcYhNLC/3S1ZAf3Sgdqx8GBJhVKRtkYaP
+         NeCAMUBSgbFgLOr2EeyIl/FEq12//N+B246WcIkuj57KliFQAbmtTJkDKV3mdx/T/an/
+         YMhg==
+X-Gm-Message-State: AHQUAuagTOz5VtqcJ1LwXWXFCkrnn0IiuswM2kDqY6O45zL/ZeZLnk1L
+        D99uEs4mOXHX7uOymj6WNZ0g4lAI2ieKO5Pmp2ctKNa7GZS4XA==
+X-Google-Smtp-Source: AHgI3IZLSkcCGV0++rXRWvh7AAga1FfnNCIMra2nStLvcMeOpy4IUuJLOsNPI6DKmWiJme14rp4bRKhVtfTItlpTXhg=
+X-Received: by 2002:a5e:c206:: with SMTP id v6mr3814134iop.60.1548331895362;
+ Thu, 24 Jan 2019 04:11:35 -0800 (PST)
 MIME-Version: 1.0
-References: <1548309279-5281-1-git-send-email-sumit.garg@linaro.org>
- <1548309279-5281-4-git-send-email-sumit.garg@linaro.org> <20190124101509.yrhyaj4xh32bn6pu@holly.lan>
-In-Reply-To: <20190124101509.yrhyaj4xh32bn6pu@holly.lan>
-From:   Sumit Garg <sumit.garg@linaro.org>
-Date:   Thu, 24 Jan 2019 16:58:33 +0530
-Message-ID: <CAFA6WYNTo+fQ0zcgP3SuBXeFmzMY3AiHXsbMtHWE+rNoYQPUgg@mail.gmail.com>
-Subject: Re: [PATCH v5 3/4] tee: optee: add TEE bus device enumeration support
-To:     Daniel Thompson <daniel.thompson@linaro.org>
-Cc:     Jens Wiklander <jens.wiklander@linaro.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+References: <20190123224926.250525-1-ebiggers@kernel.org> <20190123224926.250525-8-ebiggers@kernel.org>
+In-Reply-To: <20190123224926.250525-8-ebiggers@kernel.org>
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date:   Thu, 24 Jan 2019 13:11:23 +0100
+Message-ID: <CAKv+Gu_6ZhXVKZwgkiSh0ZvvgjXGS+ygz9b6E0QmCP8ViJrbmw@mail.gmail.com>
+Subject: Re: [RFC/RFT PATCH 07/15] crypto: arm64/aes-neonbs - fix returning
+ final keystream block
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
         <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        yamada.masahiro@socionext.com, michal.lkml@markovi.net,
-        mpm@selenic.com, Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Bhupesh Sharma <bhsharma@redhat.com>, tee-dev@lists.linaro.org
+        "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        stable <stable@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 24 Jan 2019 at 15:45, Daniel Thompson
-<daniel.thompson@linaro.org> wrote:
+On Wed, 23 Jan 2019 at 23:52, Eric Biggers <ebiggers@kernel.org> wrote:
 >
-> On Thu, Jan 24, 2019 at 11:24:38AM +0530, Sumit Garg wrote:
-> > OP-TEE provides a pseudo TA to enumerate TAs which can act as devices/
-> > services for TEE bus. So implement device enumeration using invoke
-> > function: PTA_CMD_GET_DEVICES provided by pseudo TA to fetch array of
-> > device UUIDs. Also register these enumerated devices with TEE bus as
-> > "optee-clntX" device.
-> >
-> > Signed-off-by: Sumit Garg <sumit.garg@linaro.org>
-> > ---
-> >  drivers/tee/optee/Makefile        |   1 +
-> >  drivers/tee/optee/core.c          |   4 +
-> >  drivers/tee/optee/device.c        | 153 ++++++++++++++++++++++++++++++++++++++
-> >  drivers/tee/optee/optee_private.h |   3 +
-> >  4 files changed, 161 insertions(+)
-> >  create mode 100644 drivers/tee/optee/device.c
-> >
-> > diff --git a/drivers/tee/optee/Makefile b/drivers/tee/optee/Makefile
-> > index 48d262a..56263ae 100644
-> > --- a/drivers/tee/optee/Makefile
-> > +++ b/drivers/tee/optee/Makefile
-> > @@ -5,3 +5,4 @@ optee-objs += call.o
-> >  optee-objs += rpc.o
-> >  optee-objs += supp.o
-> >  optee-objs += shm_pool.o
-> > +optee-objs += device.o
-> > diff --git a/drivers/tee/optee/core.c b/drivers/tee/optee/core.c
-> > index e5efce3..ac59c77 100644
-> > --- a/drivers/tee/optee/core.c
-> > +++ b/drivers/tee/optee/core.c
-> > @@ -634,6 +634,10 @@ static struct optee *optee_probe(struct device_node *np)
-> >       if (optee->sec_caps & OPTEE_SMC_SEC_CAP_DYNAMIC_SHM)
-> >               pr_info("dynamic shared memory is enabled\n");
-> >
-> > +     rc = optee_enumerate_devices();
-> > +     if (rc)
-> > +             goto err;
-> > +
-> >       pr_info("initialized driver\n");
-> >       return optee;
-> >  err:
-> > diff --git a/drivers/tee/optee/device.c b/drivers/tee/optee/device.c
-> > new file mode 100644
-> > index 0000000..987e552
-> > --- /dev/null
-> > +++ b/drivers/tee/optee/device.c
-> > @@ -0,0 +1,153 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +/*
-> > + * Copyright (C) 2019 Linaro Ltd.
-> > + */
-> > +
+> From: Eric Biggers <ebiggers@google.com>
 >
-> Does there need to be a pr_fmt() here (to make the pr_*() messages from
-> this file match those from the optee/core.c):
-> #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+> The arm64 NEON bit-sliced implementation of AES-CTR fails the improved
+> skcipher tests because it sometimes produces the wrong ciphertext.  The
+> bug is that the final keystream block isn't returned from the assembly
+> code when the number of non-final blocks is zero.  This can happen if
+> the input data ends a few bytes after a page boundary.  In this case the
+> last bytes get "encrypted" by XOR'ing them with uninitialized memory.
 >
+> Fix the assembly code to return the final keystream block when needed.
+>
+> Fixes: 88a3f582bea9 ("crypto: arm64/aes - don't use IV buffer to return final keystream block")
+> Cc: <stable@vger.kernel.org> # v4.11+
+> Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 
-I think for consistency with optee/core.c file prints, will add this here.
+Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-> Alternatively you could get the probe function to pass the optee device
-> and use dev_*()...
+> ---
+>  arch/arm64/crypto/aes-neonbs-core.S | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
 >
-> TBH this is pretty severe nitpicking so feel free to add my reviewed
-> by the next time this patch comes around:
+> diff --git a/arch/arm64/crypto/aes-neonbs-core.S b/arch/arm64/crypto/aes-neonbs-core.S
+> index e613a87f8b53..8432c8d0dea6 100644
+> --- a/arch/arm64/crypto/aes-neonbs-core.S
+> +++ b/arch/arm64/crypto/aes-neonbs-core.S
+> @@ -971,18 +971,22 @@ CPU_LE(   rev             x8, x8          )
 >
-
-No worries :).
-
--Sumit
-
-> Reviewed-by: Daniel Thompson <daniel.thompson@linaro.org>
+>  8:     next_ctr        v0
+>         st1             {v0.16b}, [x24]
+> -       cbz             x23, 0f
+> +       cbz             x23, .Lctr_done
 >
+>         cond_yield_neon 98b
+>         b               99b
 >
-> Daniel.
+> -0:     frame_pop
+> +.Lctr_done:
+> +       frame_pop
+>         ret
 >
-> > +#include <linux/kernel.h>
-> > +#include <linux/slab.h>
-> > +#include <linux/tee_drv.h>
-> > +#include <linux/uuid.h>
-> > +#include "optee_private.h"
-> > +
-> > +/*
-> > + * Get device UUIDs
-> > + *
-> > + * [out]     memref[0]        Array of device UUIDs
-> > + *
-> > + * Return codes:
-> > + * TEE_SUCCESS - Invoke command success
-> > + * TEE_ERROR_BAD_PARAMETERS - Incorrect input param
-> > + * TEE_ERROR_SHORT_BUFFER - Output buffer size less than required
-> > + */
-> > +#define PTA_CMD_GET_DEVICES          0x0
-> > +
-> > +static int optee_ctx_match(struct tee_ioctl_version_data *ver, const void *data)
-> > +{
-> > +     if (ver->impl_id == TEE_IMPL_ID_OPTEE)
-> > +             return 1;
-> > +     else
-> > +             return 0;
-> > +}
-> > +
-> > +static int get_devices(struct tee_context *ctx, u32 session,
-> > +                    struct tee_shm *device_shm, u32 *shm_size)
-> > +{
-> > +     u32 ret = 0;
-> > +     struct tee_ioctl_invoke_arg inv_arg = {0};
-> > +     struct tee_param param[4] = {0};
-> > +
-> > +     /* Invoke PTA_CMD_GET_DEVICES function */
-> > +     inv_arg.func = PTA_CMD_GET_DEVICES;
-> > +     inv_arg.session = session;
-> > +     inv_arg.num_params = 4;
-> > +
-> > +     /* Fill invoke cmd params */
-> > +     param[0].attr = TEE_IOCTL_PARAM_ATTR_TYPE_MEMREF_OUTPUT;
-> > +     param[0].u.memref.shm = device_shm;
-> > +     param[0].u.memref.size = *shm_size;
-> > +     param[0].u.memref.shm_offs = 0;
-> > +
-> > +     ret = tee_client_invoke_func(ctx, &inv_arg, param);
-> > +     if ((ret < 0) || ((inv_arg.ret != TEEC_SUCCESS) &&
-> > +                       (inv_arg.ret != TEEC_ERROR_SHORT_BUFFER))) {
-> > +             pr_err("PTA_CMD_GET_DEVICES invoke function err: %x\n",
-> > +                    inv_arg.ret);
-> > +             return -EINVAL;
-> > +     }
-> > +
-> > +     *shm_size = param[0].u.memref.size;
-> > +
-> > +     return 0;
-> > +}
-> > +
-> > +static int optee_register_device(const uuid_t *device_uuid, u32 device_id)
-> > +{
-> > +     struct tee_client_device *optee_device = NULL;
-> > +     int rc;
-> > +
-> > +     optee_device = kzalloc(sizeof(*optee_device), GFP_KERNEL);
-> > +     if (!optee_device)
-> > +             return -ENOMEM;
-> > +
-> > +     optee_device->dev.bus = &tee_bus_type;
-> > +     dev_set_name(&optee_device->dev, "optee-clnt%u", device_id);
-> > +     uuid_copy(&optee_device->id.uuid, device_uuid);
-> > +
-> > +     rc = device_register(&optee_device->dev);
-> > +     if (rc) {
-> > +             pr_err("device registration failed, err: %d\n", rc);
-> > +             kfree(optee_device);
-> > +     }
-> > +
-> > +     return rc;
-> > +}
-> > +
-> > +int optee_enumerate_devices(void)
-> > +{
-> > +     const uuid_t pta_uuid =
-> > +             UUID_INIT(0x7011a688, 0xddde, 0x4053,
-> > +                       0xa5, 0xa9, 0x7b, 0x3c, 0x4d, 0xdf, 0x13, 0xb8);
-> > +     struct tee_ioctl_open_session_arg sess_arg = {0};
-> > +     struct tee_shm *device_shm = NULL;
-> > +     const uuid_t *device_uuid = NULL;
-> > +     struct tee_context *ctx = NULL;
-> > +     u32 shm_size = 0, idx, num_devices = 0;
-> > +     int rc;
-> > +
-> > +     /* Open context with OP-TEE driver */
-> > +     ctx = tee_client_open_context(NULL, optee_ctx_match, NULL, NULL);
-> > +     if (IS_ERR(ctx))
-> > +             return -ENODEV;
-> > +
-> > +     /* Open session with device enumeration pseudo TA */
-> > +     memcpy(sess_arg.uuid, pta_uuid.b, TEE_IOCTL_UUID_LEN);
-> > +     sess_arg.clnt_login = TEE_IOCTL_LOGIN_PUBLIC;
-> > +     sess_arg.num_params = 0;
-> > +
-> > +     rc = tee_client_open_session(ctx, &sess_arg, NULL);
-> > +     if ((rc < 0) || (sess_arg.ret != TEEC_SUCCESS)) {
-> > +             /* Device enumeration pseudo TA not found */
-> > +             rc = 0;
-> > +             goto out_ctx;
-> > +     }
-> > +
-> > +     rc = get_devices(ctx, sess_arg.session, NULL, &shm_size);
-> > +     if (rc < 0)
-> > +             goto out_sess;
-> > +
-> > +     device_shm = tee_shm_alloc(ctx, shm_size,
-> > +                                TEE_SHM_MAPPED | TEE_SHM_DMA_BUF);
-> > +     if (IS_ERR(device_shm)) {
-> > +             pr_err("tee_shm_alloc failed\n");
-> > +             rc = PTR_ERR(device_shm);
-> > +             goto out_sess;
-> > +     }
-> > +
-> > +     rc = get_devices(ctx, sess_arg.session, device_shm, &shm_size);
-> > +     if (rc < 0)
-> > +             goto out_shm;
-> > +
-> > +     device_uuid = tee_shm_get_va(device_shm, 0);
-> > +     if (IS_ERR(device_uuid)) {
-> > +             pr_err("tee_shm_get_va failed\n");
-> > +             rc = PTR_ERR(device_uuid);
-> > +             goto out_shm;
-> > +     }
-> > +
-> > +     num_devices = shm_size / sizeof(uuid_t);
-> > +
-> > +     for (idx = 0; idx < num_devices; idx++) {
-> > +             rc = optee_register_device(&device_uuid[idx], idx);
-> > +             if (rc)
-> > +                     goto out_shm;
-> > +     }
-> > +
-> > +out_shm:
-> > +     tee_shm_free(device_shm);
-> > +out_sess:
-> > +     tee_client_close_session(ctx, sess_arg.session);
-> > +out_ctx:
-> > +     tee_client_close_context(ctx);
-> > +
-> > +     return rc;
-> > +}
-> > diff --git a/drivers/tee/optee/optee_private.h b/drivers/tee/optee/optee_private.h
-> > index 35e7938..a5e84af 100644
-> > --- a/drivers/tee/optee/optee_private.h
-> > +++ b/drivers/tee/optee/optee_private.h
-> > @@ -28,6 +28,7 @@
-> >  #define TEEC_ERROR_BAD_PARAMETERS    0xFFFF0006
-> >  #define TEEC_ERROR_COMMUNICATION     0xFFFF000E
-> >  #define TEEC_ERROR_OUT_OF_MEMORY     0xFFFF000C
-> > +#define TEEC_ERROR_SHORT_BUFFER              0xFFFF0010
-> >
-> >  #define TEEC_ORIGIN_COMMS            0x00000002
-> >
-> > @@ -181,6 +182,8 @@ void optee_free_pages_list(void *array, size_t num_entries);
-> >  void optee_fill_pages_list(u64 *dst, struct page **pages, int num_pages,
-> >                          size_t page_offset);
-> >
-> > +int optee_enumerate_devices(void);
-> > +
-> >  /*
-> >   * Small helpers
-> >   */
-> > --
-> > 2.7.4
-> >
+>         /*
+>          * If we are handling the tail of the input (x6 != NULL), return the
+>          * final keystream block back to the caller.
+>          */
+> +0:     cbz             x25, 8b
+> +       st1             {v0.16b}, [x25]
+> +       b               8b
+>  1:     cbz             x25, 8b
+>         st1             {v1.16b}, [x25]
+>         b               8b
+> --
+> 2.20.1.321.g9e740568ce-goog
+>
