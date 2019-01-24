@@ -1,91 +1,80 @@
 Return-Path: <SRS0=smUI=QA=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: *
-X-Spam-Status: No, score=1.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,MAILING_LIST_MULTI,SPF_PASS,
-	USER_AGENT_MUTT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55893C282C3
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Jan 2019 18:22:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50CA4C282C3
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Jan 2019 18:27:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1A77221872
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Jan 2019 18:22:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1548354151;
-	bh=dgd4MLRhgS7sjOwwgjVTMbOh3xyNoB00wMC+ZZVqkzI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=OrLQIv9O4eTj+sa1tP2AaRWn/aQniRqR5Kl74+7oKX1i0QYIeXlGWi6zS0Ox9EZod
-	 EpIb4iNo7gtc/F/b55zXmZzPIa9CtzcKKeUVb51anKgi1xL3PqqCh4B7hK5Z2K6X8W
-	 5Fe/dAxb9Xos4fyRpUq5o7jmmLtogX5lOgexD4jg=
+	by mail.kernel.org (Postfix) with ESMTP id 0E34C218A6
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Jan 2019 18:27:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="deKJyZ/P"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726030AbfAXSWa (ORCPT
+        id S1725991AbfAXS1U (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 24 Jan 2019 13:22:30 -0500
-Received: from mail.kernel.org ([198.145.29.99]:47806 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725974AbfAXSWa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 24 Jan 2019 13:22:30 -0500
-Received: from gmail.com (unknown [104.132.1.77])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id A16202184C;
-        Thu, 24 Jan 2019 18:22:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1548354149;
-        bh=dgd4MLRhgS7sjOwwgjVTMbOh3xyNoB00wMC+ZZVqkzI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=PV2BA+gI9eyiSXiMmyUtCImdil5lE+jj9m5Dmsd+efIZUuYFFq/+CIiRBc8JFF1lN
-         WcBFoUOPUXsXXwcp0irgQ9ZjYak0LZ2z8H4wNYjM3iXLkGtOgpyDyqJk3azBN+gvpS
-         uWz1rZkuq7RmZNlj5UOlJpqcG5Q/cLKDbdGj9G/8=
-Date:   Thu, 24 Jan 2019 10:22:28 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>
-Subject: Re: [RFC/RFT PATCH 00/15] crypto: improved skcipher, aead, and hash
- tests
-Message-ID: <20190124182226.GA10448@gmail.com>
-References: <20190123224926.250525-1-ebiggers@kernel.org>
- <20190124084818.GA650@sol.localdomain>
- <CAKv+Gu9zridWAYO3cR_KAAbupWfLd+FAMmcgAMuYE5Lgxoek-w@mail.gmail.com>
- <20190124092359.hvizqdi2ptjdsot7@gondor.apana.org.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190124092359.hvizqdi2ptjdsot7@gondor.apana.org.au>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        Thu, 24 Jan 2019 13:27:20 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:42595 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725909AbfAXS1U (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 24 Jan 2019 13:27:20 -0500
+Received: by mail-wr1-f66.google.com with SMTP id q18so7558880wrx.9
+        for <linux-crypto@vger.kernel.org>; Thu, 24 Jan 2019 10:27:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=from:to:cc:subject:date:message-id;
+        bh=7tEGsrVH4vTEegx+XVy42sLNU/2cmGY+71y3NY7A0uE=;
+        b=deKJyZ/PaQWeaYi3RvRGdsFL7ARk2z4a/vRsoNRiIsYOWSdnNCM/DBfdAOznhtFOrn
+         M8VKD5uklytChfX2Hcb4si2RlbTo3e8w5ml1sQ0qeR0L6AT8xblzlJrYakBclEcmNr09
+         Y6SdVkPcSLtwPJaTUa09vPaDO0l/zXjWb34G8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=7tEGsrVH4vTEegx+XVy42sLNU/2cmGY+71y3NY7A0uE=;
+        b=LafZCx7Kt4YRCaPSIwkownLEqogCSFXtpLj9T2cGj9jX9kZbFT7ngBFy0E+QnTHV1O
+         xw7GykOT4nFbh1GaSqcCTu6ka+exKZY82W5uWCX+OiAgsYim11IwD/V93iyqnmnGmM0J
+         yF1cqDm4SDmzDNmOE8UxEl40b+uPnF1qjI9GPe/Yu3/yTAehSwMkdS7UjQH03xekF+TF
+         6olF1/LwCD2hywOCxPIP4PLHbb8g7qdfyWL6BZZxD3rSO6yEYCw0U8chcFy+Oa34HDT9
+         KTLnW84OdjyfxshlD4NyzjJpYEes8AIrHQtLJDQSJDh5xXS9X1IiMwQ5C6SUQSyuKCXG
+         JKFQ==
+X-Gm-Message-State: AJcUukcXs6vu+9rcjYI5ByH8VceY5xyL7EM7y96iuUZXLZDGBQEqLGL3
+        a1JxpHLUX/XWlrgRLFHhXfwEq8Qg1KIEmw==
+X-Google-Smtp-Source: ALg8bN5vq3ftgSt0a6cgCodNgznETVhQQBwHKAaQZ0kaHcfamIGgBVpnJAfGOFSgFgpvjRrbvjvTEQ==
+X-Received: by 2002:adf:8323:: with SMTP id 32mr7986927wrd.176.1548354438289;
+        Thu, 24 Jan 2019 10:27:18 -0800 (PST)
+Received: from dogfood.home ([2a01:cb1d:112:6f00:bcd4:806e:230a:673e])
+        by smtp.gmail.com with ESMTPSA id 202sm73247138wmt.8.2019.01.24.10.27.16
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 24 Jan 2019 10:27:17 -0800 (PST)
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To:     linux-crypto@vger.kernel.org
+Cc:     linux-arm-kernel@lists.infradead.org, herbert@gondor.apana.org.au,
+        ebiggers@kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [PATCH 0/2] crypto: fix crct10dif for ARM and arm64
+Date:   Thu, 24 Jan 2019 19:27:10 +0100
+Message-Id: <20190124182712.7142-1-ard.biesheuvel@linaro.org>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jan 24, 2019 at 05:23:59PM +0800, Herbert Xu wrote:
-> On Thu, Jan 24, 2019 at 09:50:35AM +0100, Ard Biesheuvel wrote:
-> >
-> > Thanks for yet another round of cleanup
-> > 
-> > I'll look into these, but I'd like to clarify one thing first.
-> > 
-> > IIUC, you are trying to deal with the case where a single scatterlist
-> > element describes a range that strides two pages, and I wonder if that
-> > is a valid use of scatterlists in the first place.
-> > 
-> > Herbert?
-> 
-> Yes it is valid.  IIRC the network stack may generate such a
-> scatterlist.
-> 
+Fix the issues in both NEON implementations of the CRC-T10DIF routines,
+that were reported by Eric's new testing code.
 
-Also it can easily happen with kmalloced buffers, e.g.
+Ard Biesheuvel (2):
+  crypto: arm/crct10dif - revert to C code for short inputs
+  crypto: arm64/crct10dif - revert to C code for short inputs
 
-	buf = kmalloc(10000, GFP_KERNEL);
+ arch/arm/crypto/crct10dif-ce-core.S   | 20 ++++++++--------
+ arch/arm/crypto/crct10dif-ce-glue.c   | 23 +++++-------------
+ arch/arm64/crypto/crct10dif-ce-glue.c | 25 +++++---------------
+ 3 files changed, 22 insertions(+), 46 deletions(-)
 
-	[...]
+-- 
+2.17.1
 
-	sg_init_one(&sg, buf, 10000);
-
-- Eric
