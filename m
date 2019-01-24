@@ -2,127 +2,118 @@ Return-Path: <SRS0=smUI=QA=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F929C282C5
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Jan 2019 18:27:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E81AC282C3
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Jan 2019 20:19:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E167E218A6
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Jan 2019 18:27:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="aIpSZUY3"
+	by mail.kernel.org (Postfix) with ESMTP id 1B7D4218D2
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Jan 2019 20:19:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1548361164;
+	bh=LRT47hZfTE/v+3u078Lf9q81Ia1vMc4QeCkwmMR7MTA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=TQOWAO8D0jig4Cx6o3yyRAcrCkZln1m3hFs5pr039wOL0nwrZbd3onoL44A+Y/2PE
+	 vpCeBXy+dhxOyqqDKjHyi3YMiZ99qXXoHm/GOlXxLtZ+S5b0swcqv0cvd5t6QVdmRx
+	 Xpd94NZfW3poYtFkdmW9a/8PW//S8lEHzB6YswBM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725909AbfAXS1X (ORCPT
+        id S1729079AbfAXTVm (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 24 Jan 2019 13:27:23 -0500
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:34529 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726040AbfAXS1X (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 24 Jan 2019 13:27:23 -0500
-Received: by mail-wr1-f66.google.com with SMTP id f7so7621514wrp.1
-        for <linux-crypto@vger.kernel.org>; Thu, 24 Jan 2019 10:27:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=3/1JsJbOO9AapMWTRThG5LlPeoGHhP1SPxErwHi+5nY=;
-        b=aIpSZUY3HDECVs6ewDdoEN9Hdyis2ferKU36Vhx9iyGGId0acU/LfAtbxIhx6gcIuE
-         7XMpikyGfot/vqiMvqbqgqh7pC9Qnp7EPME7IXlJRVzkUbJFdwNoHJfXc82NiVyZWluV
-         7PGeqVprHgmqPoVodW4vgj54HJ0cZh7Y33O5A=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=3/1JsJbOO9AapMWTRThG5LlPeoGHhP1SPxErwHi+5nY=;
-        b=GdXNK/WowIHtb6udMnXriiQx5PW8FacQ0lQ2i7Gee5iirQOzcq7XiJ8o7MBh0kWZsC
-         TfBudkpSAt94eXTq8iJmlwqvieWNLy63wVvOyfSHxNjiqFkjAGGjNlaiJ1GZJZm+PUyl
-         483gWTq2br5mSUMB+UuCrZD9u04KdBdoQmgHIDIwi8Ns5fDbXUIfEMao22ee+Z5C02wr
-         EynjfgWMAIu1U5W6iRdWIzwFkbe/edsYDFa2UWljZeUm38wZjE+AYq9jn2PGxJ+McuxK
-         jXiquPPw0mWlDc1xeFTC6SE6oHHyuKbLozQ0C0hLoX7ayNvlXeOBvmN80xwt7u0AhqiJ
-         mprA==
-X-Gm-Message-State: AJcUukc9nGMY1f/m7NigUZrwFJPU2RYIFOg9qtDXsQNzLcJCCDsT2tPB
-        WoDd0y1NBVSL7AYBHEGqDBogsS4v/WBveA==
-X-Google-Smtp-Source: ALg8bN5yh+PmaunQIPmSunyPL7mY0/f+bAONZd8HEZ9jOTYMa5GuN6haDGb2R1JUvqukAQ09htcm7g==
-X-Received: by 2002:adf:f550:: with SMTP id j16mr8145818wrp.258.1548354441226;
-        Thu, 24 Jan 2019 10:27:21 -0800 (PST)
-Received: from dogfood.home ([2a01:cb1d:112:6f00:bcd4:806e:230a:673e])
-        by smtp.gmail.com with ESMTPSA id 202sm73247138wmt.8.2019.01.24.10.27.19
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 24 Jan 2019 10:27:20 -0800 (PST)
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To:     linux-crypto@vger.kernel.org
-Cc:     linux-arm-kernel@lists.infradead.org, herbert@gondor.apana.org.au,
-        ebiggers@kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH 2/2] crypto: arm64/crct10dif - revert to C code for short inputs
-Date:   Thu, 24 Jan 2019 19:27:12 +0100
-Message-Id: <20190124182712.7142-3-ard.biesheuvel@linaro.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190124182712.7142-1-ard.biesheuvel@linaro.org>
-References: <20190124182712.7142-1-ard.biesheuvel@linaro.org>
+        Thu, 24 Jan 2019 14:21:42 -0500
+Received: from mail.kernel.org ([198.145.29.99]:45984 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726049AbfAXTVl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 24 Jan 2019 14:21:41 -0500
+Received: from localhost (5356596B.cm-6-7b.dynamic.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id CD8AF218D0;
+        Thu, 24 Jan 2019 19:21:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1548357700;
+        bh=LRT47hZfTE/v+3u078Lf9q81Ia1vMc4QeCkwmMR7MTA=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=nGiljGiXa8UAO4fjrqZBF/mTA01uQil8SFPC1q4/qx2ZDLDl+qPTugranSEH4H/ra
+         aAcYmtm5dLwz4q30Tad1kCQiXWj8NqNRsDyXmLV3ZYNqTjEbFXDyylfgObB5nC2hTL
+         9hu5iC5gYR1k2V2k9v8HCBLYe8MjWi9uawdnvk/A=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        stable@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Eric Biggers <ebiggers@google.com>
+Subject: [PATCH 3.18 10/52] crypto: cts - fix crash on short inputs
+Date:   Thu, 24 Jan 2019 20:19:34 +0100
+Message-Id: <20190124190142.661275592@linuxfoundation.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190124190140.879495253@linuxfoundation.org>
+References: <20190124190140.879495253@linuxfoundation.org>
+User-Agent: quilt/0.65
+X-stable: review
+X-Patchwork-Hint: ignore
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The SIMD routine ported from x86 used to have a special code path
-for inputs < 16 bytes, which got lost somewhere along the way.
-Instead, the current glue code aligns the input pointer to permit
-the NEON routine to use special versions of the vld1 instructions
-that assume 16 byte alignment, but this could result in inputs of
-less than 16 bytes to be passed in. This not only fails the new
-extended tests that Eric has implemented, it also results in the
-code reading before the input pointer, which could potentially
-result in crashes when dealing with less than 16 bytes of input
-at the start of a page which is preceded by an unmapped page.
+3.18-stable review patch.  If anyone has any objections, please let me know.
 
-So update the glue code to only invoke the NEON routine if the
-input is more than 16 bytes.
+------------------
 
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+
+From: Eric Biggers <ebiggers@google.com>
+
+[It's a minimal fix for a bug that was fixed incidentally by a large
+refactoring in v4.8.]
+
+In the CTS template, when the input length is <= one block cipher block
+(e.g. <= 16 bytes for AES) pass the correct length to the underlying CBC
+transform rather than one block.  This matches the upstream behavior and
+makes the encryption/decryption operation correctly return -EINVAL when
+1 <= nbytes < bsize or succeed when nbytes == 0, rather than crashing.
+
+This was fixed upstream incidentally by a large refactoring,
+commit 0605c41cc53c ("crypto: cts - Convert to skcipher").  But
+syzkaller easily trips over this when running on older kernels, as it's
+easily reachable via AF_ALG.  Therefore, this patch makes the minimal
+fix for older kernels.
+
+Cc: linux-crypto@vger.kernel.org
+Fixes: 76cb9521795a ("[CRYPTO] cts: Add CTS mode required for Kerberos AES support")
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- arch/arm64/crypto/crct10dif-ce-glue.c | 25 +++++---------------
- 1 file changed, 6 insertions(+), 19 deletions(-)
+ crypto/cts.c |    8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/crypto/crct10dif-ce-glue.c b/arch/arm64/crypto/crct10dif-ce-glue.c
-index b461d62023f2..567c24f3d224 100644
---- a/arch/arm64/crypto/crct10dif-ce-glue.c
-+++ b/arch/arm64/crypto/crct10dif-ce-glue.c
-@@ -39,26 +39,13 @@ static int crct10dif_update(struct shash_desc *desc, const u8 *data,
- 			    unsigned int length)
- {
- 	u16 *crc = shash_desc_ctx(desc);
--	unsigned int l;
+--- a/crypto/cts.c
++++ b/crypto/cts.c
+@@ -137,8 +137,8 @@ static int crypto_cts_encrypt(struct blk
+ 	lcldesc.info = desc->info;
+ 	lcldesc.flags = desc->flags;
  
--	if (unlikely((u64)data % CRC_T10DIF_PMULL_CHUNK_SIZE)) {
--		l = min_t(u32, length, CRC_T10DIF_PMULL_CHUNK_SIZE -
--			  ((u64)data % CRC_T10DIF_PMULL_CHUNK_SIZE));
--
--		*crc = crc_t10dif_generic(*crc, data, l);
--
--		length -= l;
--		data += l;
--	}
--
--	if (length > 0) {
--		if (may_use_simd()) {
--			kernel_neon_begin();
--			*crc = crc_t10dif_pmull(*crc, data, length);
--			kernel_neon_end();
--		} else {
--			*crc = crc_t10dif_generic(*crc, data, length);
--		}
-+	if (length >= CRC_T10DIF_PMULL_CHUNK_SIZE && may_use_simd()) {
-+		kernel_neon_begin();
-+		*crc = crc_t10dif_pmull(*crc, data, length);
-+		kernel_neon_end();
-+	} else {
-+		*crc = crc_t10dif_generic(*crc, data, length);
- 	}
+-	if (tot_blocks == 1) {
+-		err = crypto_blkcipher_encrypt_iv(&lcldesc, dst, src, bsize);
++	if (tot_blocks <= 1) {
++		err = crypto_blkcipher_encrypt_iv(&lcldesc, dst, src, nbytes);
+ 	} else if (nbytes <= bsize * 2) {
+ 		err = cts_cbc_encrypt(ctx, desc, dst, src, 0, nbytes);
+ 	} else {
+@@ -232,8 +232,8 @@ static int crypto_cts_decrypt(struct blk
+ 	lcldesc.info = desc->info;
+ 	lcldesc.flags = desc->flags;
  
- 	return 0;
--- 
-2.17.1
+-	if (tot_blocks == 1) {
+-		err = crypto_blkcipher_decrypt_iv(&lcldesc, dst, src, bsize);
++	if (tot_blocks <= 1) {
++		err = crypto_blkcipher_decrypt_iv(&lcldesc, dst, src, nbytes);
+ 	} else if (nbytes <= bsize * 2) {
+ 		err = cts_cbc_decrypt(ctx, desc, dst, src, 0, nbytes);
+ 	} else {
+
 
