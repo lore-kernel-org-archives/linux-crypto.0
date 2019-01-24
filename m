@@ -1,111 +1,91 @@
 Return-Path: <SRS0=smUI=QA=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Level: *
+X-Spam-Status: No, score=1.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,MAILING_LIST_MULTI,SPF_PASS,
+	USER_AGENT_MUTT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80F67C282C3
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Jan 2019 16:33:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55893C282C3
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Jan 2019 18:22:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 514B72184C
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Jan 2019 16:33:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="UyjWTiTn"
+	by mail.kernel.org (Postfix) with ESMTP id 1A77221872
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Jan 2019 18:22:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1548354151;
+	bh=dgd4MLRhgS7sjOwwgjVTMbOh3xyNoB00wMC+ZZVqkzI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=OrLQIv9O4eTj+sa1tP2AaRWn/aQniRqR5Kl74+7oKX1i0QYIeXlGWi6zS0Ox9EZod
+	 EpIb4iNo7gtc/F/b55zXmZzPIa9CtzcKKeUVb51anKgi1xL3PqqCh4B7hK5Z2K6X8W
+	 5Fe/dAxb9Xos4fyRpUq5o7jmmLtogX5lOgexD4jg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727573AbfAXQd5 (ORCPT
+        id S1726030AbfAXSWa (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 24 Jan 2019 11:33:57 -0500
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:35108 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727649AbfAXQd5 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 24 Jan 2019 11:33:57 -0500
-Received: by mail-wm1-f65.google.com with SMTP id t200so3789901wmt.0
-        for <linux-crypto@vger.kernel.org>; Thu, 24 Jan 2019 08:33:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=RPyzbyLlh3W2c/h1LkXMkKRinYA35oe3Ivdo9s+NBuM=;
-        b=UyjWTiTnHAfLcBttuKjyCyxxh4Aa8zetJMxMInnaRfr1zO2W4PYmohLJUgHs2XjRYt
-         m7nZWUTZoxtpGje/ovujA90qpv32Ks1ViRUam9BPzWF3ib7NlMXjJDfg2nmcz89V9arh
-         C9j8sZlv94rFmsX8+eE17hc0RYJWlCIEmC38w=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=RPyzbyLlh3W2c/h1LkXMkKRinYA35oe3Ivdo9s+NBuM=;
-        b=o2XMWrVJpnBUXxLW1AaAHI93+BimTsWsAzmnmvsEHgvrfVYGbeTFZJR8OEi/duni27
-         Tx65B4LEdChTQAn73BoMyjP16Dyzcyw0Nx9itgbM00S8cvpuhvXtxdKUz/H3tWrHYfZ2
-         0C5XFMtXH0aknnmMs/Y47tHp25r/ISEexlzOtfouZedg1pqByLZ5sfQ2Dad9wZijODiP
-         hPu6l4Godrm6FUKJ0XzoEEwMf81YGP8pf+r68FNocv2HaYmf7setweSuY3gzEXhI4clG
-         CjwixWzjr9KaAfQXx4jkZ2IDA24/ZYo25u3dwSS7qulrLszPd+1RvTcKaqLQxHPIZQDT
-         b2dQ==
-X-Gm-Message-State: AJcUukfuqgztDdynOzySWVodvkimloiaC2sHMvulDQA6ZVEjei+OwHcw
-        rKVFqr5qoQ6rUVo01R7fE3HjNqzftCfMIw==
-X-Google-Smtp-Source: ALg8bN7b0oDEsLhAb/6R7oIs7r3b+HpW9o8u7DH59EbEb2kakzdaoDDWsiCNQhVjvMZNuGu2EUnvTg==
-X-Received: by 2002:a1c:be11:: with SMTP id o17mr3282887wmf.111.1548347635155;
-        Thu, 24 Jan 2019 08:33:55 -0800 (PST)
-Received: from localhost.localdomain (laubervilliers-657-1-83-120.w92-154.abo.wanadoo.fr. [92.154.90.120])
-        by smtp.gmail.com with ESMTPSA id t12sm99629069wrr.65.2019.01.24.08.33.53
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 24 Jan 2019 08:33:54 -0800 (PST)
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To:     linux-crypto@vger.kernel.org
-Cc:     herbert@gondor.apana.org.au, ebiggers@kernel.org,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH 3/3] crypto: arm64/aes-ccm - don't use an atomic walk needlessly
-Date:   Thu, 24 Jan 2019 17:33:47 +0100
-Message-Id: <20190124163347.12653-4-ard.biesheuvel@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190124163347.12653-1-ard.biesheuvel@linaro.org>
-References: <20190124163347.12653-1-ard.biesheuvel@linaro.org>
+        Thu, 24 Jan 2019 13:22:30 -0500
+Received: from mail.kernel.org ([198.145.29.99]:47806 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725974AbfAXSWa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 24 Jan 2019 13:22:30 -0500
+Received: from gmail.com (unknown [104.132.1.77])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id A16202184C;
+        Thu, 24 Jan 2019 18:22:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1548354149;
+        bh=dgd4MLRhgS7sjOwwgjVTMbOh3xyNoB00wMC+ZZVqkzI=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=PV2BA+gI9eyiSXiMmyUtCImdil5lE+jj9m5Dmsd+efIZUuYFFq/+CIiRBc8JFF1lN
+         WcBFoUOPUXsXXwcp0irgQ9ZjYak0LZ2z8H4wNYjM3iXLkGtOgpyDyqJk3azBN+gvpS
+         uWz1rZkuq7RmZNlj5UOlJpqcG5Q/cLKDbdGj9G/8=
+Date:   Thu, 24 Jan 2019 10:22:28 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>
+Subject: Re: [RFC/RFT PATCH 00/15] crypto: improved skcipher, aead, and hash
+ tests
+Message-ID: <20190124182226.GA10448@gmail.com>
+References: <20190123224926.250525-1-ebiggers@kernel.org>
+ <20190124084818.GA650@sol.localdomain>
+ <CAKv+Gu9zridWAYO3cR_KAAbupWfLd+FAMmcgAMuYE5Lgxoek-w@mail.gmail.com>
+ <20190124092359.hvizqdi2ptjdsot7@gondor.apana.org.au>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190124092359.hvizqdi2ptjdsot7@gondor.apana.org.au>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-When the AES-CCM code was first added, the NEON register were saved
-and restored eagerly, and so the code avoided doing so, and executed
-the scatterwalk in atomic context inside the kernel_neon_begin/end
-section.
+On Thu, Jan 24, 2019 at 05:23:59PM +0800, Herbert Xu wrote:
+> On Thu, Jan 24, 2019 at 09:50:35AM +0100, Ard Biesheuvel wrote:
+> >
+> > Thanks for yet another round of cleanup
+> > 
+> > I'll look into these, but I'd like to clarify one thing first.
+> > 
+> > IIUC, you are trying to deal with the case where a single scatterlist
+> > element describes a range that strides two pages, and I wonder if that
+> > is a valid use of scatterlists in the first place.
+> > 
+> > Herbert?
+> 
+> Yes it is valid.  IIRC the network stack may generate such a
+> scatterlist.
+> 
 
-This has been changed in the meantime, so switch to non-atomic
-scatterwalks.
+Also it can easily happen with kmalloced buffers, e.g.
 
-Fixes: bd2ad885e30d ("crypto: arm64/aes-ce-ccm - move kernel mode neon ...")
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
----
- arch/arm64/crypto/aes-ce-ccm-glue.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+	buf = kmalloc(10000, GFP_KERNEL);
 
-diff --git a/arch/arm64/crypto/aes-ce-ccm-glue.c b/arch/arm64/crypto/aes-ce-ccm-glue.c
-index 986191e8c058..5fc6f51908fd 100644
---- a/arch/arm64/crypto/aes-ce-ccm-glue.c
-+++ b/arch/arm64/crypto/aes-ce-ccm-glue.c
-@@ -253,7 +253,7 @@ static int ccm_encrypt(struct aead_request *req)
- 	/* preserve the original iv for the final round */
- 	memcpy(buf, req->iv, AES_BLOCK_SIZE);
- 
--	err = skcipher_walk_aead_encrypt(&walk, req, true);
-+	err = skcipher_walk_aead_encrypt(&walk, req, false);
- 
- 	if (may_use_simd()) {
- 		while (walk.nbytes) {
-@@ -311,7 +311,7 @@ static int ccm_decrypt(struct aead_request *req)
- 	/* preserve the original iv for the final round */
- 	memcpy(buf, req->iv, AES_BLOCK_SIZE);
- 
--	err = skcipher_walk_aead_decrypt(&walk, req, true);
-+	err = skcipher_walk_aead_decrypt(&walk, req, false);
- 
- 	if (may_use_simd()) {
- 		while (walk.nbytes) {
--- 
-2.20.1
+	[...]
 
+	sg_init_one(&sg, buf, 10000);
+
+- Eric
