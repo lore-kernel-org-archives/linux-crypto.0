@@ -1,119 +1,164 @@
-Return-Path: <SRS0=smUI=QA=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=/CTJ=QB=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E81AC282C3
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Jan 2019 20:19:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8973DC282C0
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Jan 2019 04:04:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1B7D4218D2
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Jan 2019 20:19:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1548361164;
-	bh=LRT47hZfTE/v+3u078Lf9q81Ia1vMc4QeCkwmMR7MTA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=TQOWAO8D0jig4Cx6o3yyRAcrCkZln1m3hFs5pr039wOL0nwrZbd3onoL44A+Y/2PE
-	 vpCeBXy+dhxOyqqDKjHyi3YMiZ99qXXoHm/GOlXxLtZ+S5b0swcqv0cvd5t6QVdmRx
-	 Xpd94NZfW3poYtFkdmW9a/8PW//S8lEHzB6YswBM=
+	by mail.kernel.org (Postfix) with ESMTP id 4B1D421872
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Jan 2019 04:04:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=nifty.com header.i=@nifty.com header.b="xUMLAesL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729079AbfAXTVm (ORCPT
+        id S1726423AbfAYEED (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 24 Jan 2019 14:21:42 -0500
-Received: from mail.kernel.org ([198.145.29.99]:45984 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726049AbfAXTVl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 24 Jan 2019 14:21:41 -0500
-Received: from localhost (5356596B.cm-6-7b.dynamic.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id CD8AF218D0;
-        Thu, 24 Jan 2019 19:21:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1548357700;
-        bh=LRT47hZfTE/v+3u078Lf9q81Ia1vMc4QeCkwmMR7MTA=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=nGiljGiXa8UAO4fjrqZBF/mTA01uQil8SFPC1q4/qx2ZDLDl+qPTugranSEH4H/ra
-         aAcYmtm5dLwz4q30Tad1kCQiXWj8NqNRsDyXmLV3ZYNqTjEbFXDyylfgObB5nC2hTL
-         9hu5iC5gYR1k2V2k9v8HCBLYe8MjWi9uawdnvk/A=
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        stable@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Eric Biggers <ebiggers@google.com>
-Subject: [PATCH 3.18 10/52] crypto: cts - fix crash on short inputs
-Date:   Thu, 24 Jan 2019 20:19:34 +0100
-Message-Id: <20190124190142.661275592@linuxfoundation.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190124190140.879495253@linuxfoundation.org>
-References: <20190124190140.879495253@linuxfoundation.org>
-User-Agent: quilt/0.65
-X-stable: review
-X-Patchwork-Hint: ignore
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+        Thu, 24 Jan 2019 23:04:03 -0500
+Received: from condef-03.nifty.com ([202.248.20.68]:45251 "EHLO
+        condef-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726107AbfAYEED (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 24 Jan 2019 23:04:03 -0500
+X-Greylist: delayed 471 seconds by postgrey-1.27 at vger.kernel.org; Thu, 24 Jan 2019 23:04:01 EST
+Received: from conuserg-07.nifty.com ([10.126.8.70])by condef-03.nifty.com with ESMTP id x0P3ofj8010465
+        for <linux-crypto@vger.kernel.org>; Fri, 25 Jan 2019 12:50:41 +0900
+Received: from pug.e01.socionext.com (p14092-ipngnfx01kyoto.kyoto.ocn.ne.jp [153.142.97.92]) (authenticated)
+        by conuserg-07.nifty.com with ESMTP id x0P3nm2q008098;
+        Fri, 25 Jan 2019 12:49:49 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-07.nifty.com x0P3nm2q008098
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1548388189;
+        bh=7Hvixn4R6rXU1nhVDqmVbi8Imwg4x0RJAUaKJwgwJEs=;
+        h=From:To:Cc:Subject:Date:From;
+        b=xUMLAesLK22fVkWqMXs3F/P+iQ7O4JKqLYu1RUPyGV9Ub8lAzLreNGzWgU8a/yvLe
+         phyFQIgFE3t8xDiDKWCXbgYWe/UO+SIu7Z+pKBu2zyUK8Jpmgrxv/T3RJfloF0UQs6
+         ad4SGtqsd5fchOz9SxYj4H3pO/UGDARbxKdFdvfhxOKJICdVVJxVdsCd1FyxLvHmfG
+         KlhH2MbCmKx9OQs2xpYJMayBD8jbM6Ol7awFOSKgCAmBI5I8shj87wytLiNlt1NfWb
+         d16gBEUlLN0LDgQPe6BSCRH3vOx5yTl0X2iWAMSw75vl0J9cS8mcT1TU2NCo5shMu3
+         auPpdqQzdP0XQ==
+X-Nifty-SrcIP: [153.142.97.92]
+From:   Masahiro Yamada <yamada.masahiro@socionext.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org
+Cc:     Masahiro Yamada <yamada.masahiro@socionext.com>,
+        Harsh Jain <harsh@chelsio.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-kernel@vger.kernel.org, qat-linux@intel.com,
+        Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+Subject: [PATCH] crypto: prefix header search paths with $(srctree)/
+Date:   Fri, 25 Jan 2019 12:49:36 +0900
+Message-Id: <1548388176-11325-1-git-send-email-yamada.masahiro@socionext.com>
+X-Mailer: git-send-email 2.7.4
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-3.18-stable review patch.  If anyone has any objections, please let me know.
+Currently, the Kbuild core manipulates header search paths in a crazy
+way [1].
 
-------------------
+To fix this mess, I want all Makefiles to add explicit $(srctree)/ to
+the search paths in the srctree. Some Makefiles are already written in
+that way, but not all. The goal of this work is to make the notation
+consistent, and finally get rid of the gross hacks.
 
+Having whitespaces after -I does not matter since commit 48f6e3cf5bc6
+("kbuild: do not drop -I without parameter").
 
-From: Eric Biggers <ebiggers@google.com>
+[1]: https://patchwork.kernel.org/patch/9632347/
 
-[It's a minimal fix for a bug that was fixed incidentally by a large
-refactoring in v4.8.]
-
-In the CTS template, when the input length is <= one block cipher block
-(e.g. <= 16 bytes for AES) pass the correct length to the underlying CBC
-transform rather than one block.  This matches the upstream behavior and
-makes the encryption/decryption operation correctly return -EINVAL when
-1 <= nbytes < bsize or succeed when nbytes == 0, rather than crashing.
-
-This was fixed upstream incidentally by a large refactoring,
-commit 0605c41cc53c ("crypto: cts - Convert to skcipher").  But
-syzkaller easily trips over this when running on older kernels, as it's
-easily reachable via AF_ALG.  Therefore, this patch makes the minimal
-fix for older kernels.
-
-Cc: linux-crypto@vger.kernel.org
-Fixes: 76cb9521795a ("[CRYPTO] cts: Add CTS mode required for Kerberos AES support")
-Signed-off-by: Eric Biggers <ebiggers@google.com>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 ---
- crypto/cts.c |    8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
 
---- a/crypto/cts.c
-+++ b/crypto/cts.c
-@@ -137,8 +137,8 @@ static int crypto_cts_encrypt(struct blk
- 	lcldesc.info = desc->info;
- 	lcldesc.flags = desc->flags;
- 
--	if (tot_blocks == 1) {
--		err = crypto_blkcipher_encrypt_iv(&lcldesc, dst, src, bsize);
-+	if (tot_blocks <= 1) {
-+		err = crypto_blkcipher_encrypt_iv(&lcldesc, dst, src, nbytes);
- 	} else if (nbytes <= bsize * 2) {
- 		err = cts_cbc_encrypt(ctx, desc, dst, src, 0, nbytes);
- 	} else {
-@@ -232,8 +232,8 @@ static int crypto_cts_decrypt(struct blk
- 	lcldesc.info = desc->info;
- 	lcldesc.flags = desc->flags;
- 
--	if (tot_blocks == 1) {
--		err = crypto_blkcipher_decrypt_iv(&lcldesc, dst, src, bsize);
-+	if (tot_blocks <= 1) {
-+		err = crypto_blkcipher_decrypt_iv(&lcldesc, dst, src, nbytes);
- 	} else if (nbytes <= bsize * 2) {
- 		err = cts_cbc_decrypt(ctx, desc, dst, src, 0, nbytes);
- 	} else {
+ drivers/crypto/chelsio/Makefile            | 2 +-
+ drivers/crypto/chelsio/chtls/Makefile      | 3 ++-
+ drivers/crypto/qat/qat_c3xxx/Makefile      | 2 +-
+ drivers/crypto/qat/qat_c3xxxvf/Makefile    | 2 +-
+ drivers/crypto/qat/qat_c62x/Makefile       | 2 +-
+ drivers/crypto/qat/qat_c62xvf/Makefile     | 2 +-
+ drivers/crypto/qat/qat_dh895xcc/Makefile   | 2 +-
+ drivers/crypto/qat/qat_dh895xccvf/Makefile | 2 +-
+ 8 files changed, 9 insertions(+), 8 deletions(-)
 
+diff --git a/drivers/crypto/chelsio/Makefile b/drivers/crypto/chelsio/Makefile
+index 639e571..b7bd980 100644
+--- a/drivers/crypto/chelsio/Makefile
++++ b/drivers/crypto/chelsio/Makefile
+@@ -1,4 +1,4 @@
+-ccflags-y := -Idrivers/net/ethernet/chelsio/cxgb4
++ccflags-y := -I $(srctree)/drivers/net/ethernet/chelsio/cxgb4
+ 
+ obj-$(CONFIG_CRYPTO_DEV_CHELSIO) += chcr.o
+ chcr-objs :=  chcr_core.o chcr_algo.o
+diff --git a/drivers/crypto/chelsio/chtls/Makefile b/drivers/crypto/chelsio/chtls/Makefile
+index df13795..b958f1b 100644
+--- a/drivers/crypto/chelsio/chtls/Makefile
++++ b/drivers/crypto/chelsio/chtls/Makefile
+@@ -1,4 +1,5 @@
+-ccflags-y := -Idrivers/net/ethernet/chelsio/cxgb4 -Idrivers/crypto/chelsio/
++ccflags-y := -I $(srctree)/drivers/net/ethernet/chelsio/cxgb4 \
++	     -I $(srctree)/drivers/crypto/chelsio
+ 
+ obj-$(CONFIG_CRYPTO_DEV_CHELSIO_TLS) += chtls.o
+ chtls-objs := chtls_main.o chtls_cm.o chtls_io.o chtls_hw.o
+diff --git a/drivers/crypto/qat/qat_c3xxx/Makefile b/drivers/crypto/qat/qat_c3xxx/Makefile
+index 8f5fd48..822b5de 100644
+--- a/drivers/crypto/qat/qat_c3xxx/Makefile
++++ b/drivers/crypto/qat/qat_c3xxx/Makefile
+@@ -1,3 +1,3 @@
+-ccflags-y := -I$(src)/../qat_common
++ccflags-y := -I $(srctree)/$(src)/../qat_common
+ obj-$(CONFIG_CRYPTO_DEV_QAT_C3XXX) += qat_c3xxx.o
+ qat_c3xxx-objs := adf_drv.o adf_c3xxx_hw_data.o
+diff --git a/drivers/crypto/qat/qat_c3xxxvf/Makefile b/drivers/crypto/qat/qat_c3xxxvf/Makefile
+index 16d178e..8f56d27 100644
+--- a/drivers/crypto/qat/qat_c3xxxvf/Makefile
++++ b/drivers/crypto/qat/qat_c3xxxvf/Makefile
+@@ -1,3 +1,3 @@
+-ccflags-y := -I$(src)/../qat_common
++ccflags-y := -I $(srctree)/$(src)/../qat_common
+ obj-$(CONFIG_CRYPTO_DEV_QAT_C3XXXVF) += qat_c3xxxvf.o
+ qat_c3xxxvf-objs := adf_drv.o adf_c3xxxvf_hw_data.o
+diff --git a/drivers/crypto/qat/qat_c62x/Makefile b/drivers/crypto/qat/qat_c62x/Makefile
+index bd75ace..6dcd404 100644
+--- a/drivers/crypto/qat/qat_c62x/Makefile
++++ b/drivers/crypto/qat/qat_c62x/Makefile
+@@ -1,3 +1,3 @@
+-ccflags-y := -I$(src)/../qat_common
++ccflags-y := -I $(srctree)/$(src)/../qat_common
+ obj-$(CONFIG_CRYPTO_DEV_QAT_C62X) += qat_c62x.o
+ qat_c62x-objs := adf_drv.o adf_c62x_hw_data.o
+diff --git a/drivers/crypto/qat/qat_c62xvf/Makefile b/drivers/crypto/qat/qat_c62xvf/Makefile
+index ecd708c..1e5d51d 100644
+--- a/drivers/crypto/qat/qat_c62xvf/Makefile
++++ b/drivers/crypto/qat/qat_c62xvf/Makefile
+@@ -1,3 +1,3 @@
+-ccflags-y := -I$(src)/../qat_common
++ccflags-y := -I $(srctree)/$(src)/../qat_common
+ obj-$(CONFIG_CRYPTO_DEV_QAT_C62XVF) += qat_c62xvf.o
+ qat_c62xvf-objs := adf_drv.o adf_c62xvf_hw_data.o
+diff --git a/drivers/crypto/qat/qat_dh895xcc/Makefile b/drivers/crypto/qat/qat_dh895xcc/Makefile
+index 180a00e..0fc06b1 100644
+--- a/drivers/crypto/qat/qat_dh895xcc/Makefile
++++ b/drivers/crypto/qat/qat_dh895xcc/Makefile
+@@ -1,3 +1,3 @@
+-ccflags-y := -I$(src)/../qat_common
++ccflags-y := -I $(srctree)/$(src)/../qat_common
+ obj-$(CONFIG_CRYPTO_DEV_QAT_DH895xCC) += qat_dh895xcc.o
+ qat_dh895xcc-objs := adf_drv.o adf_dh895xcc_hw_data.o
+diff --git a/drivers/crypto/qat/qat_dh895xccvf/Makefile b/drivers/crypto/qat/qat_dh895xccvf/Makefile
+index 5c3ccf8..9ce906a 100644
+--- a/drivers/crypto/qat/qat_dh895xccvf/Makefile
++++ b/drivers/crypto/qat/qat_dh895xccvf/Makefile
+@@ -1,3 +1,3 @@
+-ccflags-y := -I$(src)/../qat_common
++ccflags-y := -I $(srctree)/$(src)/../qat_common
+ obj-$(CONFIG_CRYPTO_DEV_QAT_DH895xCCVF) += qat_dh895xccvf.o
+ qat_dh895xccvf-objs := adf_drv.o adf_dh895xccvf_hw_data.o
+-- 
+2.7.4
 
