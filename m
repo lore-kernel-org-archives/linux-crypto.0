@@ -2,99 +2,85 @@ Return-Path: <SRS0=/CTJ=QB=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95D61C282C0
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Jan 2019 09:31:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8E31C282C0
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Jan 2019 09:36:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5422421855
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Jan 2019 09:31:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 856AA218E2
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Jan 2019 09:36:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Sf/yNlYa"
+	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="B2MKYAdG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726520AbfAYJb5 (ORCPT
+        id S1726817AbfAYJgf (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 25 Jan 2019 04:31:57 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:53658 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726269AbfAYJb5 (ORCPT
+        Fri, 25 Jan 2019 04:36:35 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:39131 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726269AbfAYJgf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 25 Jan 2019 04:31:57 -0500
-Received: by mail-wm1-f66.google.com with SMTP id d15so6055112wmb.3
-        for <linux-crypto@vger.kernel.org>; Fri, 25 Jan 2019 01:31:56 -0800 (PST)
+        Fri, 25 Jan 2019 04:36:35 -0500
+Received: by mail-wr1-f65.google.com with SMTP id t27so9517871wra.6
+        for <linux-crypto@vger.kernel.org>; Fri, 25 Jan 2019 01:36:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=1D3vIUMKU4kBDwV23M97IGNJ2DSMM/kCwxgNrzbXI5A=;
-        b=Sf/yNlYa4o499i3hneEq5vTJQ0Tz1lG8uaP+tdiVZgxgfhkMa2jtySY1ioKIWomHJR
-         o4VMy/7JV1zcSiJhRMrGbIaPaTfPeL7IDb5YErMUvtzKjwEFTrJebplKBTtsbPaGsnJ6
-         x8CNN2u1b74NAAAvJLezGWIQ+MVre/aFSJIYIvUR4PDI/O+ui8+7ZKQP9hW7ntw/Zxl3
-         qLzQXTmSKrGxRqOM7utCtODg3UyLXLpX9LpBuhADmxDZG1g1B0lryoS/itmhn0iYPzhE
-         b/qUm2wsdjn2dVGA7otUD0VR8jXGF4PUzmIf59hZprNYYX4yrx3m1kOc0WtsoPOWDS8d
-         G9oQ==
+        d=linaro.org; s=google;
+        h=from:to:cc:subject:date:message-id;
+        bh=K82b4u0JeOxmjCgmJBy7RDWk5mZMmmjLdOOMm2/dRP8=;
+        b=B2MKYAdGHJazbaVbP1PZkrkDcNSrjKTR9v9WP3oBqkyUr6SUSazVYMaosXXVikDsfR
+         t4YjVHBbU8r5IYt/yd5oHVJCQgGr8sVR+m96D0lZEtfaExFlXcYaLhgFXYhbI3hckG4b
+         Ee5yhVanr/Oj1fQZj1n9da4GuFiwD1cNSY7Ro=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=1D3vIUMKU4kBDwV23M97IGNJ2DSMM/kCwxgNrzbXI5A=;
-        b=Rv4DSkTB7pT/rqzPhkPQvUpYsOrsu6BLFZyZtG6cBDhvCf8NBHo2u0KUhXe1LljEuN
-         JMsF4dAt28huIBiwPbyabSGSzYSATXoNCYQ8DhB3+FUfXq8/nbQofB5GJKnPg93r2y6t
-         dQlPXxFaqp8shPnRMb1UjtYBdR63zEZLQAeIzAelmRTPYJw3YuYq8RAlugZ5P9ArIQL2
-         u+sioaVyqpFSFvEkwNg6jOKsBO7QNh5rfyGE9Pvh4cvc7E6BozSrnApjohzsTWvwnbiq
-         cp7zI+FRWyx/bXRH0t/LOcPISCeOpOMmwxvs1cM3RiPkrNxcyPjbeqL0aLbqhWNuYsA1
-         UmSQ==
-X-Gm-Message-State: AJcUukcjXJFmpIlcJFS6S/Mu0evgK5CDqwGK+//FXLnCaPOW1xJJSCQH
-        DHyDFhZ1QoYrc8kjBc4yDo4AVFBK
-X-Google-Smtp-Source: ALg8bN6PaNGTCbvE495NgIfQR2JFZdwSZ7HoJlqizksEJ5yB7apxLvcIWVjphi5m32v4R3csxEFcjw==
-X-Received: by 2002:a1c:f207:: with SMTP id s7mr5935487wmc.87.1548408715413;
-        Fri, 25 Jan 2019 01:31:55 -0800 (PST)
-Received: from merlot.mazyland.net (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.googlemail.com with ESMTPSA id x15sm141591928wrs.27.2019.01.25.01.31.54
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=K82b4u0JeOxmjCgmJBy7RDWk5mZMmmjLdOOMm2/dRP8=;
+        b=rNE1esXsFNuiPitG3nWyA6Lwu+HqAlCZrV0xIACBvGXUOz8dAD169K/Wpp3w/WN8DT
+         jHH2WV/gNxR22mInkqWFq7YnOEKSUuje6HjMkAKpXz8F0QwR0kYU76bpukI8Gm3i29z5
+         dPajd9qWYCD3KCnHwfoTXPrpr+TPvAaTxJe4OqOEc5uF6Bc26ni3yeLvJV8SvhBZClem
+         pkphgZhF+DFbL1HJpypZj5cRPxJ84cFYDKGw2mTtCSKPQMH1Hw+ecpMwIWGD9KfMYLoo
+         vM6Bso02i+kPFdqelFvUdHGVBUTr3zoUVt1i++WX2QsGcL/EbRiazo3TgbBy+MB+pCaq
+         Ufpg==
+X-Gm-Message-State: AJcUukfN9024iFZGRPj3XvfGNpNowyT5dJugNzTdjABx2dqvwhXnFwOb
+        fM6nJXFUOh6TwGIi7d9CyJvJ742y9JBiPA==
+X-Google-Smtp-Source: ALg8bN4eEFs0NiKZlfzz0vEKISQvY8Vmh6IoOT7PLzLliyKHbVNwE+FHVkOmm7pHuMj626GWI2sl/Q==
+X-Received: by 2002:adf:dbcb:: with SMTP id e11mr11066521wrj.58.1548408993535;
+        Fri, 25 Jan 2019 01:36:33 -0800 (PST)
+Received: from dogfood.home ([2a01:cb1d:112:6f00:bcd4:806e:230a:673e])
+        by smtp.gmail.com with ESMTPSA id w80sm92323955wme.38.2019.01.25.01.36.32
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 25 Jan 2019 01:31:54 -0800 (PST)
-From:   Milan Broz <gmazyland@gmail.com>
+        Fri, 25 Jan 2019 01:36:32 -0800 (PST)
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
-Cc:     Milan Broz <gmazyland@gmail.com>
-Subject: [PATCH] crypto: mark crc32 checksum as FIPS allowed
-Date:   Fri, 25 Jan 2019 10:31:47 +0100
-Message-Id: <20190125093147.10266-1-gmazyland@gmail.com>
-X-Mailer: git-send-email 2.20.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Cc:     linux-arm-kernel@lists.infradead.org, herbert@gondor.apana.org.au,
+        ebiggers@kernel.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [PATCH 0/2] crypto: arm64 - expose PMULL variants as separate algos
+Date:   Fri, 25 Jan 2019 10:36:25 +0100
+Message-Id: <20190125093627.14288-1-ard.biesheuvel@linaro.org>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The CRC32 is not a cryptographic hash algorithm,
-so the FIPS restrictions should not apply to it.
-(The CRC32C variant is already allowed.)
+Both the GHASH and the CRC-T10DIF SIMD routines are based on 64-bit
+polynomial multiplication, but fall back to the slower 8-bit polynomial
+instructions if the optional 64-bit PMULL instruction is not implemented.
 
-This CRC32 variant is used for in dm-crypt legacy TrueCrypt
-IV implementation (tcw); detected by cryptsetup test suite
-failure in FIPS mode.
+This means we can only ever test one of the two on a single system,
+which is unfortunate. So instead, register both versions on hardware
+that supports them, and let the crypto API decide which is the preferred
+one based on priorities. That way, both will be tested, but only the
+fastest available one will be used.
 
-Signed-off-by: Milan Broz <gmazyland@gmail.com>
----
- crypto/testmgr.c | 1 +
- 1 file changed, 1 insertion(+)
+Ard Biesheuvel (2):
+  crypto: arm64/crct10dif - register PMULL variants as separate algos
+  crypto: arm64/ghash - register PMULL variants as separate algos
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 0f684a414acb..82bc0398bbbf 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -2735,6 +2735,7 @@ static const struct alg_test_desc alg_test_descs[] = {
- 	}, {
- 		.alg = "crc32",
- 		.test = alg_test_hash,
-+		.fips_allowed = 1,
- 		.suite = {
- 			.hash = __VECS(crc32_tv_template)
- 		}
+ arch/arm64/crypto/crct10dif-ce-glue.c |  54 +++++++--
+ arch/arm64/crypto/ghash-ce-glue.c     | 118 +++++++++++++++-----
+ 2 files changed, 132 insertions(+), 40 deletions(-)
+
 -- 
-2.20.1
+2.17.1
 
