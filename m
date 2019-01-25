@@ -6,114 +6,58 @@ X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7750C282C6
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Jan 2019 10:09:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F55AC282C0
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Jan 2019 10:45:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B1F60218A2
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Jan 2019 10:09:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E542B218A2
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Jan 2019 10:45:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727996AbfAYKJj (ORCPT
+        id S1725916AbfAYKpo (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 25 Jan 2019 05:09:39 -0500
-Received: from orcrist.hmeau.com ([104.223.48.154]:44308 "EHLO
+        Fri, 25 Jan 2019 05:45:44 -0500
+Received: from orcrist.hmeau.com ([104.223.48.154]:44386 "EHLO
         deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726878AbfAYKJj (ORCPT
+        with ESMTP id S1725909AbfAYKpo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 25 Jan 2019 05:09:39 -0500
+        Fri, 25 Jan 2019 05:45:44 -0500
 Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
         by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1gmyQX-0004wx-V1; Fri, 25 Jan 2019 18:09:34 +0800
+        id 1gmyzW-0005bm-BU; Fri, 25 Jan 2019 18:45:42 +0800
 Received: from herbert by gondobar with local (Exim 4.89)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1gmyQT-0007Y7-NH; Fri, 25 Jan 2019 18:09:29 +0800
-Date:   Fri, 25 Jan 2019 18:09:29 +0800
+        id 1gmyzS-00023z-81; Fri, 25 Jan 2019 18:45:38 +0800
+Date:   Fri, 25 Jan 2019 18:45:38 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Vitaly Chikunov <vt@altlinux.org>
-Cc:     David Howells <dhowells@redhat.com>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH v3] akcipher: Introduce verify_rsa/verify for public
- key algorithms
-Message-ID: <20190125100929.zxmqbsibnnikh7tv@gondor.apana.org.au>
-References: <20190118205846.20309-1-vt@altlinux.org>
+To:     Nagadheeraj Rottela <rnagadheeraj@marvell.com>
+Cc:     "davem@davemloft.net" <davem@davemloft.net>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Srikanth Jampala <jsrikanth@marvell.com>
+Subject: Re: [PATCH] crypto: cavium/nitrox - Invoke callback after DMA unmap
+Message-ID: <20190125104538.geei73vxp4oeht47@gondor.apana.org.au>
+References: <20190114135204.20693-1-rnagadheeraj@marvell.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190118205846.20309-1-vt@altlinux.org>
+In-Reply-To: <20190114135204.20693-1-rnagadheeraj@marvell.com>
 User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jan 18, 2019 at 11:58:46PM +0300, Vitaly Chikunov wrote:
-> Previous akcipher .verify() just `decrypts' (using RSA encrypt which is
-> using public key) signature to uncover message hash, which was then
-> compared in upper level public_key_verify_signature() with the expected
-> hash value, which itself was never passed into verify().
+On Mon, Jan 14, 2019 at 01:52:24PM +0000, Nagadheeraj Rottela wrote:
+> In process_response_list() invoke the callback handler after unmapping
+> the DMA buffers. It ensures DMA data is synced form device to cpu
+> before the client code access the data from callback handler.
 > 
-> This approach was incompatible with EC-DSA family of algorithms,
-> because, to verify a signature EC-DSA algorithm also needs a hash value
-> as input; then it's used (together with a signature divided into halves
-> `r||s') to produce a witness value, which is then compared with `r' to
-> determine if the signature is correct. Thus, for EC-DSA, nor
-> requirements of .verify() itself, nor its output expectations in
-> public_key_verify_signature() wasn't sufficient.
-> 
-> Make improved .verify() call which gets hash value as parameter and
-> produce complete signature check without any output besides status.
-> 
-> RSA-centric drivers have replaced verify() with verify_rsa() which
-> have old semantic and which they still should implement (if they want
-> pkcs1pad to work). If akcipher have .verify_rsa() callback, it will be
-> used for a partial verification, which then is finished in
-> crypto_akcipher_verify().
-> 
-> Now for the top level verification only crypto_akcipher_verify() needs
-> to be called.
-> 
-> For pkcs1pad crypto_akcipher_verify_rsa() is introduced which directly
-> calls .verify_rsa() for its backend. Without this api PKCS1 can not be
-> implemented.
-> 
-> Tested on x86_64.
-> 
-> Signed-off-by: Vitaly Chikunov <vt@altlinux.org>
+> Fixes: c9613335bf4f ("crypto: cavium/nitrox - Added AEAD cipher support")
+> Signed-off-by: Nagadheeraj Rottela <rnagadheeraj@marvell.com>
+> ---
+>  drivers/crypto/cavium/nitrox/nitrox_reqmgr.c | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
 
-Thanks for working on this!
-
-We have been here before.  We changed the AEAD interface in a way
-that is not dissimilar to what you want to do here.
-
-So I think the basic plan should be:
-
-1) Implement new top-level verify, alongside existing verify_rsa.
-2) For existing drivers implement a wrapper over verify_rsa.
-3) Convert *all* existing users to the new verify API.
-4) Remove top-level verify_rsa API.
-5) Convert existing drivers over to verify API.
-6) Remove verify_rsa completely.
-
-> +int crypto_akcipher_verify(struct akcipher_request *req,
-> +			   const unsigned char *digest, unsigned int digest_len)
-
-We should not add new fields outside of akcipher_request.  So
-these fields need to go inside it.  However, I think we don't
-actually need two new fields.  They could both go into the src
-scatterlist.  All we need is a new field, say textlen to indicate
-where the text stops and where the hash starts.  We could also
-overlay textlen over dstlen as it would now be unused for verify.
-
-The advantage of having it in one scatterlist is that for those
-users that already have the two pieces together could simply provide
-a single SG element (I don't know how likely that is in practice
-though).
-
-For others you would simply tack on an extra SG element.
-
-Thanks,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
