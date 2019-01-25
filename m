@@ -2,62 +2,64 @@ Return-Path: <SRS0=/CTJ=QB=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C10BAC282C0
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Jan 2019 07:47:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6222C282C0
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Jan 2019 07:48:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 924832084C
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Jan 2019 07:47:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 880092084C
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Jan 2019 07:48:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="gy4EduS+"
+	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="A3tRzfQU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726535AbfAYHr0 (ORCPT
+        id S1726344AbfAYHso (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 25 Jan 2019 02:47:26 -0500
-Received: from mail-it1-f196.google.com ([209.85.166.196]:36346 "EHLO
-        mail-it1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726271AbfAYHrZ (ORCPT
+        Fri, 25 Jan 2019 02:48:44 -0500
+Received: from mail-io1-f66.google.com ([209.85.166.66]:40745 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726271AbfAYHsn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 25 Jan 2019 02:47:25 -0500
-Received: by mail-it1-f196.google.com with SMTP id c9so8495772itj.1
-        for <linux-crypto@vger.kernel.org>; Thu, 24 Jan 2019 23:47:25 -0800 (PST)
+        Fri, 25 Jan 2019 02:48:43 -0500
+Received: by mail-io1-f66.google.com with SMTP id k2so7014690iog.7
+        for <linux-crypto@vger.kernel.org>; Thu, 24 Jan 2019 23:48:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=827bJ9grBu+EsiRKUjoQKgKeidmYCRcE7C7Uuj9QU6w=;
-        b=gy4EduS+JK6o+4UZiT1BCAUy32/117KLGdyixIXIH9jjJyAuS2mfIdQVsM91CvFoPr
-         roq6J2SpqkJojdf4cJMzIQ+7YUfls/5pbt5btINjjQ6kUqbsKb8lcB29rk2tY81b71MJ
-         qJqZtyzz92xzEHFImaj+5wsDZoAcxs9yyiefU=
+        bh=9KQ4D/VMCjgV8L/LGDfb0EIfdVa2OsRhqD76smr04P0=;
+        b=A3tRzfQUTuFxnAHGQPsDKw0+HglXq/lR1zbdU1g7AoqmGeRDR9Iz9Y6e+mXw06cHKs
+         fEnK9JDPm9nQwjj7rWqaDvQ9Xyang2jad8oQlc/cDFncpxlEYku//N+CwXo4Gc3PAe4Y
+         1hMyqjd+wa/Soj94IpsvGJM2jD3MqHLWEp90c=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=827bJ9grBu+EsiRKUjoQKgKeidmYCRcE7C7Uuj9QU6w=;
-        b=keW5yezix3FER/OMIV+DN0LQG0DyxMUoYsA+wbzfwu/ybFFO2oS2rI/MNyQvP66j9a
-         6kYSVFV9jG/BqaBQIWgtLed5u8ktj7mXrWAfoSzG9oxxJm9ECTfHAq0aL+VGdNQW2wfI
-         vA07iAIvOM0fVJzG/74tTEQJxvPpmapouq4SUeJOKlv4b1zc5byjHaOPh1K28VcVB3c4
-         tAbIMRtEvb3zpqZLMK5Z7jLseq2CCv0RRncc8yxEMkzQRuUHOd1cOMWOEuBCIMKHTTlD
-         ltBEedBNHGN09v0v/rx/DE2Eb3OGlyseCI/XQuQq0q2GoGRQ/QHYUr3PJaWBEbyfwrmS
-         aMMQ==
-X-Gm-Message-State: AJcUukfsiwEbrcLY2eY3WUwVBd6FSa9rjjB8mCGRvCPzJLtkGgweQymY
-        vl123zejhdBq7y+BaPf99aMvXrRuAOuCpjPl18q/VOK4ldg=
-X-Google-Smtp-Source: ALg8bN4EdwFL7VaKCHIyBx+hDCYyIL+bFqiBbfYHOlk42e1YZ4XR8JxUOy+Drj7H7gyymB1x8TJ3R5cp/IzmnJXWy3o=
-X-Received: by 2002:a02:4c9:: with SMTP id 192mr6279740jab.2.1548402444764;
- Thu, 24 Jan 2019 23:47:24 -0800 (PST)
+        bh=9KQ4D/VMCjgV8L/LGDfb0EIfdVa2OsRhqD76smr04P0=;
+        b=bXnVhJvEECQw0sV6IHNgVoM+qR9UzoU1ZRFGbMwYxDOoZUzGHO+SJppHLImmtogXNR
+         6oGFWM19BGApsucqCPpq2e4suX/44oZMSh6vvt+BvBA7MCcFVzUZGWYhVRb+FsX/F8C5
+         zb/QYG4Bw7/zuq7oYVEYcGXToeGyi7MUryOkvOnVMz7cjCNNqJq8YczcuFMmv9S4GZb9
+         nMBpni0TWHuSujMkQKdiGJGABZoJlLEIhzMKpIk6kI4wtADks1oJ2eNERMVXc3I4VEA9
+         wjDpW6S4PVrNuef7I6NSx23OW2k/QjjG1TcPNI2gYq1iwss0D7SSyD2Thgh6Z2VreHtR
+         PhuQ==
+X-Gm-Message-State: AHQUAuaudpCsNsnaqsgZFJKryk9gj8pKW9Mb0LYKfTKpALv08bkyGqxZ
+        Z4QmMr7pN/b+O7lUk4JkbmhkT8ubZ9ZrfTDcpiadcw==
+X-Google-Smtp-Source: AHgI3IY+kZoHX9DZ7Fw7qYZOH9lZyvWWBOtFh7Lbyv7uhycPI5thUuA9BgXirJOTyFLVHSDwDee3Og++OEhaFLAOjxg=
+X-Received: by 2002:a6b:5d01:: with SMTP id r1mr5631292iob.170.1548402522526;
+ Thu, 24 Jan 2019 23:48:42 -0800 (PST)
 MIME-Version: 1.0
-References: <20190124163347.12653-1-ard.biesheuvel@linaro.org> <20190125064217.GA700@sol.localdomain>
-In-Reply-To: <20190125064217.GA700@sol.localdomain>
+References: <20190124182712.7142-1-ard.biesheuvel@linaro.org>
+ <20190124182712.7142-2-ard.biesheuvel@linaro.org> <20190125072234.GB700@sol.localdomain>
+In-Reply-To: <20190125072234.GB700@sol.localdomain>
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Fri, 25 Jan 2019 08:47:13 +0100
-Message-ID: <CAKv+Gu_n5K80Dg5i7xMAEwnyhuXAaBaBW8WJMDnmN63mgTPZkQ@mail.gmail.com>
-Subject: Re: [PATCH 0/3] crypto: arm64/aes-ccm - various bug fixes
+Date:   Fri, 25 Jan 2019 08:48:31 +0100
+Message-ID: <CAKv+Gu864GTrA36dTTmNsriCpbj-eghS-9fRSA=DMGvFUW8nxw@mail.gmail.com>
+Subject: Re: [PATCH 1/2] crypto: arm/crct10dif - revert to C code for short inputs
 To:     Eric Biggers <ebiggers@kernel.org>
 Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
         <linux-crypto@vger.kernel.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
         Herbert Xu <herbert@gondor.apana.org.au>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
@@ -65,43 +67,161 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 25 Jan 2019 at 07:42, Eric Biggers <ebiggers@kernel.org> wrote:
+On Fri, 25 Jan 2019 at 08:22, Eric Biggers <ebiggers@kernel.org> wrote:
 >
-> On Thu, Jan 24, 2019 at 05:33:44PM +0100, Ard Biesheuvel wrote:
-> > Fix a couple of bugs found by Eric's new testing code, and another
-> > issue found by inspection.
+> On Thu, Jan 24, 2019 at 07:27:11PM +0100, Ard Biesheuvel wrote:
+> > The SIMD routine ported from x86 used to have a special code path
+> > for inputs < 16 bytes, which got lost somewhere along the way.
+> > Instead, the current glue code aligns the input pointer to permit
+> > the NEON routine to use special versions of the vld1 instructions
+> > that assume 16 byte alignment, but this could result in inputs of
+> > less than 16 bytes to be passed in. This not only fails the new
+> > extended tests that Eric has implemented, it also results in the
+> > code reading before the input pointer, which could potentially
+> > result in crashes when dealing with less than 16 bytes of input
+> > at the start of a page which is preceded by an unmapped page.
 > >
-> > Ard Biesheuvel (3):
-> >   crypto: arm64/aes-ccm - fix logical bug in AAD MAC handling
-> >   crypto: arm64/aes-ccm - fix bugs in non-NEON fallback routine
-> >   crypto: arm64/aes-ccm - don't use an atomic walk needlessly
+> > So update the glue code to only invoke the NEON routine if the
+> > input is more than 16 bytes.
 > >
-> >  arch/arm64/crypto/aes-ce-ccm-core.S | 5 +++--
-> >  arch/arm64/crypto/aes-ce-ccm-glue.c | 8 +++-----
-> >  2 files changed, 6 insertions(+), 7 deletions(-)
-> >
+> > Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 >
-> Thanks Ard.  For all three patches:
+> Can you add proper tags?
 >
-> Reviewed-by: Eric Biggers <ebiggers@kernel.org>
->
-> However, can you add Cc stable to the first two?
->
-> BTW: I notice the !may_use_simd() case is still not covered by the self-tests.
-> Do you happen to have any suggestion for how to do it?  If there is a way to
-> make may_use_simd() temporarily return false, I can easily put a flag in 'struct
-> testvec_config' that makes the self-tests sometimes use that context to execute
-> the actual encryption/decryption/hashing.
->
-> It looks like on arm64, wrapping the operation in local_irq_{disable,enable}()
-> or kernel_fpu_{begin,end}() would be sufficient?  But x86 it doesn't look as
-> easy as x86 needs a context where 'in_interrupt() && !interrupted_user_mode() &&
-> !interrupted_kernel_fpu_idle()'.  Likewise arm32 requires 'in_interrupt()'.
->
-> It would be worth doing just for arm64, but ideally it would work on most/all
-> architectures.
+> Fixes: 1d481f1cd892 ("crypto: arm/crct10dif - port x86 SSE implementation to ARM")
+> Cc: <stable@vger.kernel.org> # v4.10+
 >
 
-I think the best way to address this is to [conditionally] wrap
-may_use_simd() into something cryptoapi specific, which is under the
-control of the test framework.
+Ah yes, thanks for digging that up.
+
+> Just double checking as I don't have a system immediately available to run this
+> one on -- I assume it passes with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y now?
+>
+
+Yes.
+
+> Another comment below:
+>
+> > ---
+> >  arch/arm/crypto/crct10dif-ce-core.S | 20 ++++++++---------
+> >  arch/arm/crypto/crct10dif-ce-glue.c | 23 +++++---------------
+> >  2 files changed, 16 insertions(+), 27 deletions(-)
+> >
+> > diff --git a/arch/arm/crypto/crct10dif-ce-core.S b/arch/arm/crypto/crct10dif-ce-core.S
+> > index ce45ba0c0687..3fd13d7c842c 100644
+> > --- a/arch/arm/crypto/crct10dif-ce-core.S
+> > +++ b/arch/arm/crypto/crct10dif-ce-core.S
+> > @@ -124,10 +124,10 @@ ENTRY(crc_t10dif_pmull)
+> >       vext.8          q10, qzr, q0, #4
+> >
+> >       // receive the initial 64B data, xor the initial crc value
+> > -     vld1.64         {q0-q1}, [arg2, :128]!
+> > -     vld1.64         {q2-q3}, [arg2, :128]!
+> > -     vld1.64         {q4-q5}, [arg2, :128]!
+> > -     vld1.64         {q6-q7}, [arg2, :128]!
+> > +     vld1.64         {q0-q1}, [arg2]!
+> > +     vld1.64         {q2-q3}, [arg2]!
+> > +     vld1.64         {q4-q5}, [arg2]!
+> > +     vld1.64         {q6-q7}, [arg2]!
+> >  CPU_LE(      vrev64.8        q0, q0                  )
+> >  CPU_LE(      vrev64.8        q1, q1                  )
+> >  CPU_LE(      vrev64.8        q2, q2                  )
+> > @@ -150,7 +150,7 @@ CPU_LE(   vrev64.8        q7, q7                  )
+> >       veor.8          q0, q0, q10
+> >
+> >       adr             ip, rk3
+> > -     vld1.64         {q10}, [ip, :128]       // xmm10 has rk3 and rk4
+> > +     vld1.64         {q10}, [ip]     // xmm10 has rk3 and rk4
+>
+> This one is loading static data that is 16 byte aligned, so the :128 can be kept
+> here.  Same in the two other places below that load from [ip].
+>
+
+OK, will change that back.
+
+> >
+> >       //
+> >       // we subtract 256 instead of 128 to save one instruction from the loop
+> > @@ -167,7 +167,7 @@ CPU_LE(   vrev64.8        q7, q7                  )
+> >  _fold_64_B_loop:
+> >
+> >       .macro          fold64, reg1, reg2
+> > -     vld1.64         {q11-q12}, [arg2, :128]!
+> > +     vld1.64         {q11-q12}, [arg2]!
+> >
+> >       vmull.p64       q8, \reg1\()h, d21
+> >       vmull.p64       \reg1, \reg1\()l, d20
+> > @@ -203,13 +203,13 @@ CPU_LE( vrev64.8        q12, q12                )
+> >       // constants
+> >
+> >       adr             ip, rk9
+> > -     vld1.64         {q10}, [ip, :128]!
+> > +     vld1.64         {q10}, [ip]!
+> >
+> >       .macro          fold16, reg, rk
+> >       vmull.p64       q8, \reg\()l, d20
+> >       vmull.p64       \reg, \reg\()h, d21
+> >       .ifnb           \rk
+> > -     vld1.64         {q10}, [ip, :128]!
+> > +     vld1.64         {q10}, [ip]!
+> >       .endif
+> >       veor.8          q7, q7, q8
+> >       veor.8          q7, q7, \reg
+> > @@ -238,7 +238,7 @@ _16B_reduction_loop:
+> >       vmull.p64       q7, d15, d21
+> >       veor.8          q7, q7, q8
+> >
+> > -     vld1.64         {q0}, [arg2, :128]!
+> > +     vld1.64         {q0}, [arg2]!
+> >  CPU_LE(      vrev64.8        q0, q0          )
+> >       vswp            d0, d1
+> >       veor.8          q7, q7, q0
+> > @@ -335,7 +335,7 @@ _less_than_128:
+> >       vmov.i8         q0, #0
+> >       vmov            s3, arg1_low32          // get the initial crc value
+> >
+> > -     vld1.64         {q7}, [arg2, :128]!
+> > +     vld1.64         {q7}, [arg2]!
+> >  CPU_LE(      vrev64.8        q7, q7          )
+> >       vswp            d14, d15
+> >       veor.8          q7, q7, q0
+> > diff --git a/arch/arm/crypto/crct10dif-ce-glue.c b/arch/arm/crypto/crct10dif-ce-glue.c
+> > index d428355cf38d..14c19c70a841 100644
+> > --- a/arch/arm/crypto/crct10dif-ce-glue.c
+> > +++ b/arch/arm/crypto/crct10dif-ce-glue.c
+> > @@ -35,26 +35,15 @@ static int crct10dif_update(struct shash_desc *desc, const u8 *data,
+> >                           unsigned int length)
+> >  {
+> >       u16 *crc = shash_desc_ctx(desc);
+> > -     unsigned int l;
+> >
+> > -     if (!may_use_simd()) {
+> > -             *crc = crc_t10dif_generic(*crc, data, length);
+> > +     if (length >= CRC_T10DIF_PMULL_CHUNK_SIZE && may_use_simd()) {
+> > +             kernel_neon_begin();
+> > +             *crc = crc_t10dif_pmull(*crc, data, length);
+> > +             kernel_neon_end();
+> >       } else {
+> > -             if (unlikely((u32)data % CRC_T10DIF_PMULL_CHUNK_SIZE)) {
+> > -                     l = min_t(u32, length, CRC_T10DIF_PMULL_CHUNK_SIZE -
+> > -                               ((u32)data % CRC_T10DIF_PMULL_CHUNK_SIZE));
+> > -
+> > -                     *crc = crc_t10dif_generic(*crc, data, l);
+> > -
+> > -                     length -= l;
+> > -                     data += l;
+> > -             }
+> > -             if (length > 0) {
+> > -                     kernel_neon_begin();
+> > -                     *crc = crc_t10dif_pmull(*crc, data, length);
+> > -                     kernel_neon_end();
+> > -             }
+> > +             *crc = crc_t10dif_generic(*crc, data, length);
+> >       }
+> > +
+> >       return 0;
+> >  }
+> >
+> > --
+> > 2.17.1
+> >
