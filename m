@@ -4,91 +4,145 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EEA3C282C0
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Jan 2019 10:48:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 723E8C282C0
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Jan 2019 11:18:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D3CF4218A2
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Jan 2019 10:48:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4B2BB218A6
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Jan 2019 11:18:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725916AbfAYKsl (ORCPT
+        id S1726095AbfAYLSP (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 25 Jan 2019 05:48:41 -0500
-Received: from orcrist.hmeau.com ([104.223.48.154]:44478 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725909AbfAYKsl (ORCPT
+        Fri, 25 Jan 2019 06:18:15 -0500
+Received: from vmicros1.altlinux.org ([194.107.17.57]:35680 "EHLO
+        vmicros1.altlinux.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725909AbfAYLSO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 25 Jan 2019 05:48:41 -0500
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1gmz2N-0005jt-RU; Fri, 25 Jan 2019 18:48:39 +0800
-Received: from herbert by gondobar with local (Exim 4.89)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1gmz2N-00027H-Nc; Fri, 25 Jan 2019 18:48:39 +0800
-Date:   Fri, 25 Jan 2019 18:48:39 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] crypto: clarify name of WEAK_KEY request flag
-Message-ID: <20190125104839.uakekmhrmqmbjdrw@gondor.apana.org.au>
-References: <20190119064800.6713-1-ebiggers@kernel.org>
+        Fri, 25 Jan 2019 06:18:14 -0500
+Received: from imap.altlinux.org (imap.altlinux.org [194.107.17.38])
+        by vmicros1.altlinux.org (Postfix) with ESMTP id 66ECF72CC61;
+        Fri, 25 Jan 2019 14:18:11 +0300 (MSK)
+Received: from altlinux.org (sole.flsd.net [185.75.180.6])
+        by imap.altlinux.org (Postfix) with ESMTPSA id 4B4354A4A16;
+        Fri, 25 Jan 2019 14:18:11 +0300 (MSK)
+Date:   Fri, 25 Jan 2019 14:18:09 +0300
+From:   Vitaly Chikunov <vt@altlinux.org>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     David Howells <dhowells@redhat.com>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH v3] akcipher: Introduce verify_rsa/verify for public
+ key algorithms
+Message-ID: <20190125111808.slyoptlns53t7fiw@altlinux.org>
+Mail-Followup-To: Herbert Xu <herbert@gondor.apana.org.au>,
+        David Howells <dhowells@redhat.com>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20190118205846.20309-1-vt@altlinux.org>
+ <20190125100929.zxmqbsibnnikh7tv@gondor.apana.org.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=koi8-r
 Content-Disposition: inline
-In-Reply-To: <20190119064800.6713-1-ebiggers@kernel.org>
-User-Agent: NeoMutt/20170113 (1.7.2)
+In-Reply-To: <20190125100929.zxmqbsibnnikh7tv@gondor.apana.org.au>
+User-Agent: NeoMutt/20171215-106-ac61c7
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jan 18, 2019 at 10:48:00PM -0800, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
+On Fri, Jan 25, 2019 at 06:09:29PM +0800, Herbert Xu wrote:
+> On Fri, Jan 18, 2019 at 11:58:46PM +0300, Vitaly Chikunov wrote:
+> > Previous akcipher .verify() just `decrypts' (using RSA encrypt which is
+> > using public key) signature to uncover message hash, which was then
+> > compared in upper level public_key_verify_signature() with the expected
+> > hash value, which itself was never passed into verify().
+> > 
+> > This approach was incompatible with EC-DSA family of algorithms,
+> > because, to verify a signature EC-DSA algorithm also needs a hash value
+> > as input; then it's used (together with a signature divided into halves
+> > `r||s') to produce a witness value, which is then compared with `r' to
+> > determine if the signature is correct. Thus, for EC-DSA, nor
+> > requirements of .verify() itself, nor its output expectations in
+> > public_key_verify_signature() wasn't sufficient.
+> > 
+> > Make improved .verify() call which gets hash value as parameter and
+> > produce complete signature check without any output besides status.
+> > 
+> > RSA-centric drivers have replaced verify() with verify_rsa() which
+> > have old semantic and which they still should implement (if they want
+> > pkcs1pad to work). If akcipher have .verify_rsa() callback, it will be
+> > used for a partial verification, which then is finished in
+> > crypto_akcipher_verify().
+> > 
+> > Now for the top level verification only crypto_akcipher_verify() needs
+> > to be called.
+> > 
+> > For pkcs1pad crypto_akcipher_verify_rsa() is introduced which directly
+> > calls .verify_rsa() for its backend. Without this api PKCS1 can not be
+> > implemented.
+> > 
+> > Tested on x86_64.
+> > 
+> > Signed-off-by: Vitaly Chikunov <vt@altlinux.org>
 > 
-> CRYPTO_TFM_REQ_WEAK_KEY confuses newcomers to the crypto API because it
-> sounds like it is requesting a weak key.  Actually, it is requesting
-> that weak keys be forbidden (for algorithms that have the notion of
-> "weak keys"; currently only DES and XTS do).
+> Thanks for working on this!
 > 
-> Also it is only one letter away from CRYPTO_TFM_RES_WEAK_KEY, with which
-> it can be easily confused.  (This in fact happened in the UX500 driver,
-> though just in some debugging messages.)
+> We have been here before.  We changed the AEAD interface in a way
+> that is not dissimilar to what you want to do here.
 > 
-> Therefore, make the intent clear by renaming it to
-> CRYPTO_TFM_REQ_FORBID_WEAK_KEYS.
-> 
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-> ---
->  arch/s390/crypto/des_s390.c                   |  4 ++--
->  arch/sparc/crypto/des_glue.c                  |  4 ++--
->  crypto/des_generic.c                          |  4 ++--
->  crypto/testmgr.c                              | 14 ++++++-------
->  crypto/testmgr.h                              |  4 ++--
->  drivers/crypto/atmel-tdes.c                   |  2 +-
->  drivers/crypto/bcm/cipher.c                   |  4 ++--
->  drivers/crypto/ccp/ccp-crypto-des3.c          |  2 +-
->  drivers/crypto/ccree/cc_cipher.c              |  3 ++-
->  drivers/crypto/hifn_795x.c                    |  3 ++-
->  .../crypto/inside-secure/safexcel_cipher.c    |  2 +-
->  drivers/crypto/ixp4xx_crypto.c                |  4 ++--
->  drivers/crypto/marvell/cipher.c               |  2 +-
->  drivers/crypto/n2_core.c                      |  2 +-
->  drivers/crypto/omap-des.c                     |  2 +-
->  drivers/crypto/picoxcell_crypto.c             |  3 ++-
->  drivers/crypto/qce/ablkcipher.c               |  4 ++--
->  .../rockchip/rk3288_crypto_ablkcipher.c       |  2 +-
->  drivers/crypto/sunxi-ss/sun4i-ss-cipher.c     |  2 +-
->  drivers/crypto/talitos.c                      |  2 +-
->  drivers/crypto/ux500/cryp/cryp_core.c         | 20 ++++++++++---------
->  fs/crypto/keyinfo.c                           |  4 ++--
->  fs/ecryptfs/crypto.c                          |  5 +++--
->  include/crypto/xts.h                          |  4 ++--
->  include/linux/crypto.h                        |  2 +-
->  25 files changed, 55 insertions(+), 49 deletions(-)
+> So I think the basic plan should be:
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+While time goes, I got another simpler idea how we should settle this:
+
+1. Since we are know that by nature RSA sign/verify is just encrypt/decrypt,
+and since sign/verify calls should not be used directly by any normal
+users:
+- Remove sign/verify calls from all existing RSA backends.
+
+2. pkcs1pad should use encrypt/decrypt API for its low level purposes
+(instead of sign/verify API, which now would be not implemented by them),
+and provide sign (same as before) and new verify (returning only status).
+
+Thus, we avoid verify_rsa call altogether while remaining its
+functionality, and skipping conversion step.
+
+> 1) Implement new top-level verify, alongside existing verify_rsa.
+> 2) For existing drivers implement a wrapper over verify_rsa.
+> 3) Convert *all* existing users to the new verify API.
+> 4) Remove top-level verify_rsa API.
+> 5) Convert existing drivers over to verify API.
+> 6) Remove verify_rsa completely.
+> 
+> > +int crypto_akcipher_verify(struct akcipher_request *req,
+> > +			   const unsigned char *digest, unsigned int digest_len)
+> 
+> We should not add new fields outside of akcipher_request.  So
+> these fields need to go inside it.  However, I think we don't
+> actually need two new fields.  They could both go into the src
+> scatterlist.  All we need is a new field, say textlen to indicate
+> where the text stops and where the hash starts.  We could also
+> overlay textlen over dstlen as it would now be unused for verify.
+
+Well, if we allowed to reuse dst* fields why not just put digest over
+dst scatterlist? That would be much simpler.
+
+Thanks,
+
+
+> The advantage of having it in one scatterlist is that for those
+> users that already have the two pieces together could simply provide
+> a single SG element (I don't know how likely that is in practice
+> though).
+> 
+> For others you would simply tack on an extra SG element.
+> 
+> Thanks,
+> -- 
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
