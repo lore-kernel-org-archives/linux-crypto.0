@@ -2,82 +2,91 @@ Return-Path: <SRS0=/CTJ=QB=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F2F4C282C0
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Jan 2019 06:08:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22A2FC282C0
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Jan 2019 06:42:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 86FB8218D2
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Jan 2019 06:08:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nifty.com header.i=@nifty.com header.b="kdzOFXN5"
+	by mail.kernel.org (Postfix) with ESMTP id C2040218D9
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Jan 2019 06:42:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1548398541;
+	bh=o6N3bqKcjF+nKRpi9aezFDdbCpJ+L7mamGCF5Ju+pDg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=ft7cqH3PHdf32JwvKswzFY569Hb6tiCYCMenjcAkSM8mj1d1cL3Eq6jEqCqUglxNE
+	 VAGKdrGyOeevKoIPU/lhyZvIFaIl+b0vMgy7MbT2BdTblp+i9RiDzxB/0b4IMHBnzy
+	 208ylVo02D08UdvkXcln2VyRhm3kTW3lLtAJQ9Qs=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726289AbfAYGIh (ORCPT
+        id S1726100AbfAYGmV (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 25 Jan 2019 01:08:37 -0500
-Received: from conuserg-12.nifty.com ([210.131.2.79]:31719 "EHLO
-        conuserg-12.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726100AbfAYGIg (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 25 Jan 2019 01:08:36 -0500
-X-Greylist: delayed 8276 seconds by postgrey-1.27 at vger.kernel.org; Fri, 25 Jan 2019 01:08:35 EST
-Received: from pug.e01.socionext.com (p14092-ipngnfx01kyoto.kyoto.ocn.ne.jp [153.142.97.92]) (authenticated)
-        by conuserg-12.nifty.com with ESMTP id x0P67sVU012319;
-        Fri, 25 Jan 2019 15:07:54 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com x0P67sVU012319
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1548396474;
-        bh=gv+6Ws9f6VGzifMs3BOTay8m5/soowYJG26BjthdvwU=;
-        h=From:To:Cc:Subject:Date:From;
-        b=kdzOFXN5I2JQ8HD/qMU6QzH0przQefrFUd97ofzZm0nGpzufXiBv4Hf2ZcYOm86r0
-         n6gLc3AqkAkf+vvn0GZREEBg7W3Kp2Pg7PB9VezogbwxnQ27h+Xa1L1dgpkqwNTr7G
-         DSzabC1Q9jxNS2BB3E3RhcFZ92bAlIEG+M1TAhK2WwGkZz65o/oIEtE55BST3KkCIe
-         xayw5sbilUDRH/9vU1hV2t3Ol7MGQ3RqJxWaOLumRr4AtB85LiaUolcls8QXWWeXYL
-         sidRquS7e8DbqD9DQzT2TKIDix3mzIt0LedJ8sgHoS/EkjIJioBxmy7yshttDpQCSb
-         HMSCqi4S3TFiQ==
-X-Nifty-SrcIP: [153.142.97.92]
-From:   Masahiro Yamada <yamada.masahiro@socionext.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org
-Cc:     Masahiro Yamada <yamada.masahiro@socionext.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: bcm: remove -I. header search path and unused macro define
-Date:   Fri, 25 Jan 2019 15:07:48 +0900
-Message-Id: <1548396469-13395-1-git-send-email-yamada.masahiro@socionext.com>
-X-Mailer: git-send-email 2.7.4
+        Fri, 25 Jan 2019 01:42:21 -0500
+Received: from mail.kernel.org ([198.145.29.99]:55488 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726021AbfAYGmU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 25 Jan 2019 01:42:20 -0500
+Received: from sol.localdomain (c-107-3-167-184.hsd1.ca.comcast.net [107.3.167.184])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id EAFAF218D0;
+        Fri, 25 Jan 2019 06:42:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1548398540;
+        bh=o6N3bqKcjF+nKRpi9aezFDdbCpJ+L7mamGCF5Ju+pDg=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=IqpPLAOzg7/V8xIOQtYZ9OQkzOwH0doA7S9FuN3PsvygcswiQpL9OejWF/m0jlgdv
+         9gmQZL8YorEUpyTPPUFHYyJEPxOKT1JoFWXCn9COi3dgmkjLf0noexf0FPp6aLZjKU
+         MarjAI0hdDtw1KCQiqSsJKTs6L7fIX5On1hds7sg=
+Date:   Thu, 24 Jan 2019 22:42:18 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
+Subject: Re: [PATCH 0/3] crypto: arm64/aes-ccm - various bug fixes
+Message-ID: <20190125064217.GA700@sol.localdomain>
+References: <20190124163347.12653-1-ard.biesheuvel@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190124163347.12653-1-ard.biesheuvel@linaro.org>
+User-Agent: Mutt/1.11.2 (2019-01-07)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The header search path -I. in kernel Makefiles is very suspicious;
-it allows the compiler to search for headers in the top of $(srctree),
-where obviously no header file exists.
+On Thu, Jan 24, 2019 at 05:33:44PM +0100, Ard Biesheuvel wrote:
+> Fix a couple of bugs found by Eric's new testing code, and another
+> issue found by inspection.
+> 
+> Ard Biesheuvel (3):
+>   crypto: arm64/aes-ccm - fix logical bug in AAD MAC handling
+>   crypto: arm64/aes-ccm - fix bugs in non-NEON fallback routine
+>   crypto: arm64/aes-ccm - don't use an atomic walk needlessly
+> 
+>  arch/arm64/crypto/aes-ce-ccm-core.S | 5 +++--
+>  arch/arm64/crypto/aes-ce-ccm-glue.c | 8 +++-----
+>  2 files changed, 6 insertions(+), 7 deletions(-)
+> 
 
-'git grep BCMDRIVER' has no hit. So, this macro is not referenced.
+Thanks Ard.  For all three patches:
 
-I was able to build this driver without the extra compiler options.
+Reviewed-by: Eric Biggers <ebiggers@kernel.org>
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+However, can you add Cc stable to the first two?
 
- drivers/crypto/bcm/Makefile | 2 --
- 1 file changed, 2 deletions(-)
+BTW: I notice the !may_use_simd() case is still not covered by the self-tests.
+Do you happen to have any suggestion for how to do it?  If there is a way to
+make may_use_simd() temporarily return false, I can easily put a flag in 'struct
+testvec_config' that makes the self-tests sometimes use that context to execute
+the actual encryption/decryption/hashing.
 
-diff --git a/drivers/crypto/bcm/Makefile b/drivers/crypto/bcm/Makefile
-index 13cb80e..7469e19 100644
---- a/drivers/crypto/bcm/Makefile
-+++ b/drivers/crypto/bcm/Makefile
-@@ -11,5 +11,3 @@
- obj-$(CONFIG_CRYPTO_DEV_BCM_SPU) := bcm_crypto_spu.o
- 
- bcm_crypto_spu-objs :=  util.o spu.o spu2.o cipher.o
--
--ccflags-y += -I. -DBCMDRIVER
--- 
-2.7.4
+It looks like on arm64, wrapping the operation in local_irq_{disable,enable}()
+or kernel_fpu_{begin,end}() would be sufficient?  But x86 it doesn't look as
+easy as x86 needs a context where 'in_interrupt() && !interrupted_user_mode() &&
+!interrupted_kernel_fpu_idle()'.  Likewise arm32 requires 'in_interrupt()'.
 
+It would be worth doing just for arm64, but ideally it would work on most/all
+architectures.
+
+- Eric
