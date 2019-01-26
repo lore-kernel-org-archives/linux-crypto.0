@@ -3,29 +3,29 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.2 required=3.0 tests=DATE_IN_PAST_12_24,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A575C282C7
-	for <linux-crypto@archiver.kernel.org>; Sat, 26 Jan 2019 21:46:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4730C282C7
+	for <linux-crypto@archiver.kernel.org>; Sat, 26 Jan 2019 21:57:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2487E21903
-	for <linux-crypto@archiver.kernel.org>; Sat, 26 Jan 2019 21:46:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 90BAC2184B
+	for <linux-crypto@archiver.kernel.org>; Sat, 26 Jan 2019 21:57:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726377AbfAZVqt (ORCPT
+        id S1726367AbfAZV5c (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 26 Jan 2019 16:46:49 -0500
-Received: from rtw117.rackrabbit.com ([185.53.170.117]:33780 "EHLO
+        Sat, 26 Jan 2019 16:57:32 -0500
+Received: from rtw117.rackrabbit.com ([185.53.170.117]:35109 "EHLO
         loghomestore.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726262AbfAZVqt (ORCPT
+        with ESMTP id S1726350AbfAZV5c (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 26 Jan 2019 16:46:49 -0500
-X-Greylist: delayed 22226 seconds by postgrey-1.27 at vger.kernel.org; Sat, 26 Jan 2019 16:46:48 EST
+        Sat, 26 Jan 2019 16:57:32 -0500
+X-Greylist: delayed 24154 seconds by postgrey-1.27 at vger.kernel.org; Sat, 26 Jan 2019 16:57:19 EST
 To:     linux-crypto@vger.kernel.org
 Subject: Data entry service and data processing services
-Message-ID: <00e640f22109b360db1e96e64ec6115e@vecteezy.com>
-Date:   Sat, 26 Jan 2019 08:53:19 +0100
-From:   "Linda" <jafentanfse@mail.fr>
+Message-ID: <270e3c2d4ebe2b2abda14e3f45d1d8c9@vecteezy.com>
+Date:   Sat, 26 Jan 2019 08:29:52 +0100
+From:   "Linda" <jafentsanse@mail.fr>
 Reply-To: huhansto@sina.com
 MIME-Version: 1.0
 Content-Type: text/plain; format=flowed; charset="UTF-8"
