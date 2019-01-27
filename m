@@ -4,62 +4,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAAA8C282C0
-	for <linux-crypto@archiver.kernel.org>; Sun, 27 Jan 2019 09:17:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 065D9C282C0
+	for <linux-crypto@archiver.kernel.org>; Sun, 27 Jan 2019 09:17:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B9D70214C6
-	for <linux-crypto@archiver.kernel.org>; Sun, 27 Jan 2019 09:17:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CA6AE214C6
+	for <linux-crypto@archiver.kernel.org>; Sun, 27 Jan 2019 09:17:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="IeNdexJ3"
+	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="CgF/Io8R"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726511AbfA0JRT (ORCPT
+        id S1726487AbfA0JRV (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 27 Jan 2019 04:17:19 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:36510 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726487AbfA0JRT (ORCPT
+        Sun, 27 Jan 2019 04:17:21 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:38540 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726419AbfA0JRU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 27 Jan 2019 04:17:19 -0500
-Received: by mail-wr1-f68.google.com with SMTP id u4so14621017wrp.3
-        for <linux-crypto@vger.kernel.org>; Sun, 27 Jan 2019 01:17:18 -0800 (PST)
+        Sun, 27 Jan 2019 04:17:20 -0500
+Received: by mail-wr1-f65.google.com with SMTP id v13so14592778wrw.5
+        for <linux-crypto@vger.kernel.org>; Sun, 27 Jan 2019 01:17:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=UT69eWfMu3CrrEpHcC7N6bP4fh+2YTgZE2AB6r62TDY=;
-        b=IeNdexJ3bUTrMk4sXS7K0+u+EMGHsicTnWcivNUNYMsBQyC5yPbx7ngfpvEX2DOMZS
-         2bDszTF0BfN1i1/BqJsbs3UGJQSZj6BaOSE4ijRtoAg7gAg63BfZv914388GDT0JiBGW
-         KMe8WOutx6M+EPjiD6sQusFPgxEA1D8LHLxxU=
+        bh=G/cXfni8tC087b78yKP77hOg0xmVLVtxIh5Ne/oqtbI=;
+        b=CgF/Io8Rul3HwRKGuljVs2V0IcBHdz7kEXJPBSfz8qtJDIBrQHsbFJaNlBS2RODl3C
+         Lq4ZL2T9PPQ7H6HGcMwCcTEmBFctsznC8u03Mjr+Ml2tBRH4gLAtZMTaAfSLcE6VG4z2
+         GbInX3fWlhiwulKzWbMysYKydEuox9VZZVN/w=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=UT69eWfMu3CrrEpHcC7N6bP4fh+2YTgZE2AB6r62TDY=;
-        b=NE0kvc6DpqXAsstYIIX7cgb9EYaaPzIjw0gmoUPMvQUXlFvS2R+OqbFnVYSuGhi65h
-         a8d4ccx1doL8GdmUjV3h5lkaBKEIVvW/xZJczis36onl6Afc4bLCLSo1Hvl9Oml12P06
-         /WzoNhbIiTlHWVqbsjbR1G2D9BskZ28gS8FO3/Z7OgaFf9hpYF7/VAEppWqKbnE06ih4
-         idwsY8yFB7oteHHOjvAT9OAUGSQRmdoZbraEPhqJ8kohS+sUWu9w7w5cn12ye+4YHoAJ
-         fRxnk7CUgMAfq+TxANMS6s4txUMhViiynRmW9y+RA3WeLl4tnsI0veioM4QLixMxRk9b
-         CXUQ==
-X-Gm-Message-State: AJcUukenrYq0dUq9wvlu7O3PUesg0LCi+di/JdR5XRqad6nm3RMiLS0A
-        dxq4dkg8RXtFRkGsKrRD4YX0eUkEsqFDYA==
-X-Google-Smtp-Source: ALg8bN5FEPWbExVQhAyDBodyH+yZuBLXAdLgtHl+4Aby8lYZbL8PAmxOPHSIf3+vobLpq56MsM3kKg==
-X-Received: by 2002:a5d:664a:: with SMTP id f10mr17358060wrw.311.1548580637102;
-        Sun, 27 Jan 2019 01:17:17 -0800 (PST)
+        bh=G/cXfni8tC087b78yKP77hOg0xmVLVtxIh5Ne/oqtbI=;
+        b=UyBNyBB2wfgZaZzk21Ghsc6qHGhscyTWoPKJjtOERpC0Eb0TVXigWk2gri4zvmLvb/
+         lJZrXalgDDEUE5kKs07552txnGWBJqaA066Iw68MtWA6T2+mDf4P0zWpxOiFTZUGXSFJ
+         WLHaRnKpIc8OqjuI7PhxzX9B4a//qbi6cg3eYE7MEOnLQcVKYP342jiUrSinRFTrjHxo
+         onD/RKDszZrMdWg1Lh/6KYqK5kb9sH1Ef2BJtFRcio9vYXBU2Dii4z5CDuMvwhSy7pLk
+         Fu6xqRxyBiczP6/UM6+hDMktf2xIPJ5lOcvHjLanwRmu6cIeAsh4cXvlfvGnSMT/Yddi
+         Z/SQ==
+X-Gm-Message-State: AJcUukezkLrn1fu8Tmy2GBVhTccabFFGzvm9NLt6CnUxLpv2iJPu1tmh
+        mva3HJG8KgoAQrZeHRahwQsRTnAe1Ud+rQ==
+X-Google-Smtp-Source: ALg8bN5PaFo7l6DPGI5mROPqb7PvE/mkfUbmorXFNBCNUoXuoNZ5mquXBh66keUFYiWOH0bRovtlgA==
+X-Received: by 2002:adf:dbcb:: with SMTP id e11mr18293645wrj.58.1548580638478;
+        Sun, 27 Jan 2019 01:17:18 -0800 (PST)
 Received: from sudo.home ([2a01:cb1d:112:6f00:887d:32e9:9391:d3bf])
-        by smtp.gmail.com with ESMTPSA id o5sm45397013wrw.46.2019.01.27.01.17.15
+        by smtp.gmail.com with ESMTPSA id o5sm45397013wrw.46.2019.01.27.01.17.17
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 27 Jan 2019 01:17:16 -0800 (PST)
+        Sun, 27 Jan 2019 01:17:17 -0800 (PST)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     herbert@gondor.apana.org.au, ebiggers@kernel.org,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v3 3/4] crypto: arm/crct10dif - remove dead code
-Date:   Sun, 27 Jan 2019 10:16:54 +0100
-Message-Id: <20190127091655.6262-4-ard.biesheuvel@linaro.org>
+Subject: [PATCH v3 4/4] crypto: arm64/crct10dif - remove dead code
+Date:   Sun, 27 Jan 2019 10:16:55 +0100
+Message-Id: <20190127091655.6262-5-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190127091655.6262-1-ard.biesheuvel@linaro.org>
 References: <20190127091655.6262-1-ard.biesheuvel@linaro.org>
@@ -71,45 +70,43 @@ List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 Remove some code that is no longer called now that we make sure never
-to invoke the SIMD routine with less that 16 bytes of input.
+to invoke the SIMD routine with less than 16 bytes of input.
 
 Reviewed-by: Eric Biggers <ebiggers@kernel.org>
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm/crypto/crct10dif-ce-core.S | 13 -------------
- 1 file changed, 13 deletions(-)
+ arch/arm64/crypto/crct10dif-ce-core.S | 11 -----------
+ 1 file changed, 11 deletions(-)
 
-diff --git a/arch/arm/crypto/crct10dif-ce-core.S b/arch/arm/crypto/crct10dif-ce-core.S
-index 16019b5961e7..d058fad423c2 100644
---- a/arch/arm/crypto/crct10dif-ce-core.S
-+++ b/arch/arm/crypto/crct10dif-ce-core.S
-@@ -342,7 +342,6 @@ CPU_LE(	vrev64.8	q7, q7		)
+diff --git a/arch/arm64/crypto/crct10dif-ce-core.S b/arch/arm64/crypto/crct10dif-ce-core.S
+index 9e82e8e8ed05..f7326259c40d 100644
+--- a/arch/arm64/crypto/crct10dif-ce-core.S
++++ b/arch/arm64/crypto/crct10dif-ce-core.S
+@@ -497,7 +497,6 @@ CPU_LE(	ext		v7.16b, v7.16b, v7.16b, #8	)
  
  	cmp		arg3, #16
- 	beq		_128_done		// exactly 16 left
--	blt		_less_than_16_left
+ 	b.eq		.L_128_done_\@		// exactly 16 left
+-	b.lt		.L_less_than_16_left_\@
  
- 	// now if there is, load the constants
- 	vldr		d20, rk1
-@@ -353,18 +352,6 @@ CPU_LE(	vrev64.8	q7, q7		)
- 	addlt		arg3, arg3, #16
- 	blt		_get_last_two_regs
- 	b		_16B_reduction_loop
+ 	ldr_l		q10, rk1, x8		// rk1 and rk2 in xmm10
+ 	__pmull_pre_\p	v10
+@@ -509,16 +508,6 @@ CPU_LE(	ext		v7.16b, v7.16b, v7.16b, #8	)
+ 
+ 	add		arg3, arg3, #16
+ 	b		.L_get_last_two_regs_\@
 -
--_less_than_16_left:
+-.L_less_than_16_left_\@:
 -	// shl r9, 4
--	adr		ip, tbl_shf_table + 16
--	sub		ip, ip, arg3
--	vld1.8		{q0}, [ip]
--	vmov.i8		q9, #0x80
--	veor.8		q0, q0, q9
--	vtbl.8		d18, {d14-d15}, d0
--	vtbl.8		d15, {d14-d15}, d1
--	vmov		d14, d18
--	b		_128_done
- ENDPROC(crc_t10dif_pmull)
+-	adr_l		x0, tbl_shf_table + 16
+-	sub		x0, x0, arg3
+-	ld1		{v0.16b}, [x0]
+-	movi		v9.16b, #0x80
+-	eor		v0.16b, v0.16b, v9.16b
+-	tbl		v7.16b, {v7.16b}, v0.16b
+-	b		.L_128_done_\@
+ 	.endm
  
- // precomputed constants
+ ENTRY(crc_t10dif_pmull_p8)
 -- 
 2.20.1
 
