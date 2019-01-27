@@ -2,111 +2,94 @@ Return-Path: <SRS0=Rknj=QD=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 065D9C282C0
-	for <linux-crypto@archiver.kernel.org>; Sun, 27 Jan 2019 09:17:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE1F8C282C0
+	for <linux-crypto@archiver.kernel.org>; Sun, 27 Jan 2019 10:29:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CA6AE214C6
-	for <linux-crypto@archiver.kernel.org>; Sun, 27 Jan 2019 09:17:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="CgF/Io8R"
+	by mail.kernel.org (Postfix) with ESMTP id 95C442148D
+	for <linux-crypto@archiver.kernel.org>; Sun, 27 Jan 2019 10:29:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726487AbfA0JRV (ORCPT
+        id S1726487AbfA0K3n (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 27 Jan 2019 04:17:21 -0500
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:38540 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726419AbfA0JRU (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 27 Jan 2019 04:17:20 -0500
-Received: by mail-wr1-f65.google.com with SMTP id v13so14592778wrw.5
-        for <linux-crypto@vger.kernel.org>; Sun, 27 Jan 2019 01:17:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=G/cXfni8tC087b78yKP77hOg0xmVLVtxIh5Ne/oqtbI=;
-        b=CgF/Io8Rul3HwRKGuljVs2V0IcBHdz7kEXJPBSfz8qtJDIBrQHsbFJaNlBS2RODl3C
-         Lq4ZL2T9PPQ7H6HGcMwCcTEmBFctsznC8u03Mjr+Ml2tBRH4gLAtZMTaAfSLcE6VG4z2
-         GbInX3fWlhiwulKzWbMysYKydEuox9VZZVN/w=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=G/cXfni8tC087b78yKP77hOg0xmVLVtxIh5Ne/oqtbI=;
-        b=UyBNyBB2wfgZaZzk21Ghsc6qHGhscyTWoPKJjtOERpC0Eb0TVXigWk2gri4zvmLvb/
-         lJZrXalgDDEUE5kKs07552txnGWBJqaA066Iw68MtWA6T2+mDf4P0zWpxOiFTZUGXSFJ
-         WLHaRnKpIc8OqjuI7PhxzX9B4a//qbi6cg3eYE7MEOnLQcVKYP342jiUrSinRFTrjHxo
-         onD/RKDszZrMdWg1Lh/6KYqK5kb9sH1Ef2BJtFRcio9vYXBU2Dii4z5CDuMvwhSy7pLk
-         Fu6xqRxyBiczP6/UM6+hDMktf2xIPJ5lOcvHjLanwRmu6cIeAsh4cXvlfvGnSMT/Yddi
-         Z/SQ==
-X-Gm-Message-State: AJcUukezkLrn1fu8Tmy2GBVhTccabFFGzvm9NLt6CnUxLpv2iJPu1tmh
-        mva3HJG8KgoAQrZeHRahwQsRTnAe1Ud+rQ==
-X-Google-Smtp-Source: ALg8bN5PaFo7l6DPGI5mROPqb7PvE/mkfUbmorXFNBCNUoXuoNZ5mquXBh66keUFYiWOH0bRovtlgA==
-X-Received: by 2002:adf:dbcb:: with SMTP id e11mr18293645wrj.58.1548580638478;
-        Sun, 27 Jan 2019 01:17:18 -0800 (PST)
-Received: from sudo.home ([2a01:cb1d:112:6f00:887d:32e9:9391:d3bf])
-        by smtp.gmail.com with ESMTPSA id o5sm45397013wrw.46.2019.01.27.01.17.17
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 27 Jan 2019 01:17:17 -0800 (PST)
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To:     linux-crypto@vger.kernel.org
-Cc:     herbert@gondor.apana.org.au, ebiggers@kernel.org,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v3 4/4] crypto: arm64/crct10dif - remove dead code
-Date:   Sun, 27 Jan 2019 10:16:55 +0100
-Message-Id: <20190127091655.6262-5-ard.biesheuvel@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190127091655.6262-1-ard.biesheuvel@linaro.org>
-References: <20190127091655.6262-1-ard.biesheuvel@linaro.org>
+        Sun, 27 Jan 2019 05:29:43 -0500
+Received: from gloria.sntech.de ([185.11.138.130]:46756 "EHLO gloria.sntech.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726453AbfA0K3m (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 27 Jan 2019 05:29:42 -0500
+Received: from p5b12725f.dip0.t-ipconnect.de ([91.18.114.95] helo=phil.localnet)
+        by gloria.sntech.de with esmtpsa (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.89)
+        (envelope-from <heiko@sntech.de>)
+        id 1gnhh0-0007bB-Ti; Sun, 27 Jan 2019 11:29:34 +0100
+From:   Heiko Stuebner <heiko@sntech.de>
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     Eric Biggers <ebiggers@kernel.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        Arnd Bergmann <arnd@arndb.de>, Olof Johansson <olof@lixom.net>,
+        Zain Wang <wzz@rock-chips.com>,
+        linux-rockchip@lists.infradead.org,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>, ezequiel@collabora.com
+Subject: Re: [Bug] Rockchip crypto driver sometimes produces wrong ciphertext
+Date:   Sun, 27 Jan 2019 11:29:33 +0100
+Message-ID: <1894799.pWIprST79S@phil>
+In-Reply-To: <CAKv+Gu-RKu9jt+2FnV2529zqyLGR8RSu8r4B8eOs-7Om-pL0aQ@mail.gmail.com>
+References: <20190126210530.GB709@sol.localdomain> <CAKv+Gu-RKu9jt+2FnV2529zqyLGR8RSu8r4B8eOs-7Om-pL0aQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Remove some code that is no longer called now that we make sure never
-to invoke the SIMD routine with less than 16 bytes of input.
+(also add Ezequiel who has spent a bit of time on the rockchip crypto
+driver recently)
 
-Reviewed-by: Eric Biggers <ebiggers@kernel.org>
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
----
- arch/arm64/crypto/crct10dif-ce-core.S | 11 -----------
- 1 file changed, 11 deletions(-)
+Am Sonntag, 27. Januar 2019, 09:54:54 CET schrieb Ard Biesheuvel:
+> (add LAKML and arm-soc maintainers)
+> 
+> On Sat, 26 Jan 2019 at 22:05, Eric Biggers <ebiggers@kernel.org> wrote:
+> >
+> > Hello,
+> >
+> > I don't know whether anyone is actually maintaining the Rockchip crypto driver
+> > in drivers/crypto/rockchip/, but it's failing the improved crypto tests
+> > that I currently have out for review: https://patchwork.kernel.org/cover/10778089/
+> >
+> > See the boot logs for RK3288 from the KernelCI job here:
+> >
+> > https://storage.kernelci.org/ardb/for-kernelci/v5.0-rc1-86-geaffe22db9d1/arm/multi_v7_defconfig/lab-collabora/boot-rk3288-rock2-square.txt
+> > https://storage.kernelci.org/ardb/for-kernelci/v5.0-rc1-86-geaffe22db9d1/arm/multi_v7_defconfig/lab-collabora/boot-rk3288-veyron-jaq.txt
+> >
+> > alg: skcipher: ecb-aes-rk encryption test failed (wrong result) on test vector 0, cfg=\"random: use_digest src_divs=[15.64%@+3258, 84.36%@+4059] dst_divs=[69.11%@+1796, 8.49%@+4027, 6.34%@+1, 16.6%@+4058] iv_offset=21\"
+> > alg: skcipher: cbc-aes-rk encryption test failed (wrong result) on test vector 0, cfg=\"random: may_sleep use_digest src_divs=[100.0%@alignmask+3993] dst_divs=[65.31%@alignmask+1435, 34.69%@+14]\"
+> > alg: skcipher: ecb-des-rk encryption test failed (wrong result) on test vector 0, cfg=\"random: may_sleep use_final src_divs=[<flush> 66.52%@+11, 33.48%@+1519] dst_divs=[58.82%@+1, 19.43%@+4082, 21.75%@+8]\"
+> > alg: skcipher: cbc-des-rk encryption test failed (wrong result) on test vector 0, cfg=\"random: may_sleep use_finup src_divs=[100.0%@+3980] dst_divs=[60.4%@+3763, 23.9%@+4011, 16.87%@+4046]\"
+> > alg: skcipher: ecb-des3-ede-rk encryption test failed (wrong result) on test vector 0, cfg=\"random: may_sleep use_digest src_divs=[100.0%@+4] dst_divs=[47.25%@+19, 14.83%@+22, 37.92%@+31]\"
+> > alg: skcipher: cbc-des3-ede-rk encryption test failed (wrong result) on test vector 0, cfg=\"two even aligned splits\"
+> >
+> > In other words: the ecb-aes-rk, cbc-aes-rk, ecb-des-rk, cbc-des-rk,
+> > ecb-des3-ede-rk, and cbc-des3-ede-rk algorithms are failing because they produce
+> > the wrong ciphertext on some scatterlist layouts.
+> >
+> > You can reproduce by pulling from
+> > https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git
+> > branch "testmgr-improvements", unsetting CONFIG_CRYPTO_MANAGER_DISABLE_TESTS,
+> > setting CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y, rebooting and checking dmesg.
+> >
+> > Note that I don't have this hardware myself, so if it turns out that no one is
+> > interested in fixing this anytime soon I'll instead have to propose disabling
+> > these algorithms until they can be fixed.
+> >
+> > Thanks,
+> >
+> > - Eric
+> 
 
-diff --git a/arch/arm64/crypto/crct10dif-ce-core.S b/arch/arm64/crypto/crct10dif-ce-core.S
-index 9e82e8e8ed05..f7326259c40d 100644
---- a/arch/arm64/crypto/crct10dif-ce-core.S
-+++ b/arch/arm64/crypto/crct10dif-ce-core.S
-@@ -497,7 +497,6 @@ CPU_LE(	ext		v7.16b, v7.16b, v7.16b, #8	)
- 
- 	cmp		arg3, #16
- 	b.eq		.L_128_done_\@		// exactly 16 left
--	b.lt		.L_less_than_16_left_\@
- 
- 	ldr_l		q10, rk1, x8		// rk1 and rk2 in xmm10
- 	__pmull_pre_\p	v10
-@@ -509,16 +508,6 @@ CPU_LE(	ext		v7.16b, v7.16b, v7.16b, #8	)
- 
- 	add		arg3, arg3, #16
- 	b		.L_get_last_two_regs_\@
--
--.L_less_than_16_left_\@:
--	// shl r9, 4
--	adr_l		x0, tbl_shf_table + 16
--	sub		x0, x0, arg3
--	ld1		{v0.16b}, [x0]
--	movi		v9.16b, #0x80
--	eor		v0.16b, v0.16b, v9.16b
--	tbl		v7.16b, {v7.16b}, v0.16b
--	b		.L_128_done_\@
- 	.endm
- 
- ENTRY(crc_t10dif_pmull_p8)
--- 
-2.20.1
+
+
 
