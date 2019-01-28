@@ -7,46 +7,46 @@ X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6F4AC282CF
-	for <linux-crypto@archiver.kernel.org>; Mon, 28 Jan 2019 17:33:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00948C282C8
+	for <linux-crypto@archiver.kernel.org>; Mon, 28 Jan 2019 17:50:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A5C002147A
-	for <linux-crypto@archiver.kernel.org>; Mon, 28 Jan 2019 17:33:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C3DE220881
+	for <linux-crypto@archiver.kernel.org>; Mon, 28 Jan 2019 17:50:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1548696780;
-	bh=U0yYD2++o2KSoLg1EAb0XjmFBMknCsYSZ/X114Occ6E=;
+	s=default; t=1548697827;
+	bh=eizD5II0MRz8O7q9VQ1oOCuRyzcsjd88aNICZeQoZcA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=eZxAl0iZWJbb4sdv3i4JoHqJLGvHoXnHAfSUf6yeTjl6GCfZUK5u5i4siCKtK+JpD
-	 hOLGFbKoa+I5w6np6VPAA9pxOAtQdvWTvuzK8HS6XTVufUyHjeIGbUl3qn0xH3zSlC
-	 wC7cn26lhq0RCWayHOzSf5KO0RiN/E29rq7y3zxc=
+	b=qDiuEafQ1DuGgM8hA/EvezUX5hmVxsKkWqhy/cRu/Xe0zEPvbkO8eyCfZJ17tPZRe
+	 un6M2OH1SD6amepjtSs1nd3exPNahBByeO3cdqLTXsuKWKLYdACk01gx0f2dmJ2K17
+	 0EhEAy64wMwUxmq7jt8UXcxLuEgiWK+Duu9p01Y8=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727914AbfA1P5L (ORCPT
+        id S1726880AbfA1RuV (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 28 Jan 2019 10:57:11 -0500
-Received: from mail.kernel.org ([198.145.29.99]:42688 "EHLO mail.kernel.org"
+        Mon, 28 Jan 2019 12:50:21 -0500
+Received: from mail.kernel.org ([198.145.29.99]:58062 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728174AbfA1P5I (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 28 Jan 2019 10:57:08 -0500
+        id S1727486AbfA1Poo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 28 Jan 2019 10:44:44 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8518321848;
-        Mon, 28 Jan 2019 15:57:06 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 2363F214DA;
+        Mon, 28 Jan 2019 15:44:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1548691027;
-        bh=U0yYD2++o2KSoLg1EAb0XjmFBMknCsYSZ/X114Occ6E=;
+        s=default; t=1548690283;
+        bh=eizD5II0MRz8O7q9VQ1oOCuRyzcsjd88aNICZeQoZcA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=iz3s2M9ddGwZXTG9ep8Nn0t63y3upVRdxKj1t9TOWjGUzhXPurIwDJS0iu1iXQ91B
-         5f6JbjLpH1RtEtR5Dmn4yokieoF3ivHfxLabmoLPmEJiy+l332XoP/z/59fdTA8ORn
-         94BsdxQrQ7ZDG7b9GAYOViFERNWksPN2FwHYh5hY=
+        b=T9rP/aYIdTA1M0sreVuqwBrwz438jp6+0jJMJK1bA++XXIcmExGUnY+zjFFag9mLQ
+         LTgQmdB74cw1NaDe2zjkFJamW8DLBJIQf2mfxZaAbB44wOHkQhBnTi7ymkZtFiap8v
+         mSSc5pj3a7UbzvPU6110A+esStQ4Ysk8sS9oiTrw=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Nathan Chancellor <natechancellor@gmail.com>,
+Cc:     Eric Biggers <ebiggers@google.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.20 266/304] crypto: ux500 - Use proper enum in cryp_set_dma_transfer
-Date:   Mon, 28 Jan 2019 10:43:03 -0500
-Message-Id: <20190128154341.47195-266-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.20 032/304] crypto: aes_ti - disable interrupts while accessing S-box
+Date:   Mon, 28 Jan 2019 10:39:09 -0500
+Message-Id: <20190128154341.47195-32-sashal@kernel.org>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20190128154341.47195-1-sashal@kernel.org>
 References: <20190128154341.47195-1-sashal@kernel.org>
@@ -58,62 +58,113 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Nathan Chancellor <natechancellor@gmail.com>
+From: Eric Biggers <ebiggers@google.com>
 
-[ Upstream commit 9d880c5945c748d8edcac30965f3349a602158c4 ]
+[ Upstream commit 0a6a40c2a8c184a2fb467efacfb1cd338d719e0b ]
 
-Clang warns when one enumerated type is implicitly converted to another:
+In the "aes-fixed-time" AES implementation, disable interrupts while
+accessing the S-box, in order to make cache-timing attacks more
+difficult.  Previously it was possible for the CPU to be interrupted
+while the S-box was loaded into L1 cache, potentially evicting the
+cachelines and causing later table lookups to be time-variant.
 
-drivers/crypto/ux500/cryp/cryp_core.c:559:5: warning: implicit
-conversion from enumeration type 'enum dma_data_direction' to different
-enumeration type 'enum dma_transfer_direction' [-Wenum-conversion]
-                                direction, DMA_CTRL_ACK);
-                                ^~~~~~~~~
-drivers/crypto/ux500/cryp/cryp_core.c:583:5: warning: implicit
-conversion from enumeration type 'enum dma_data_direction' to different
-enumeration type 'enum dma_transfer_direction' [-Wenum-conversion]
-                                direction,
-                                ^~~~~~~~~
-2 warnings generated.
+In tests I did on x86 and ARM, this doesn't affect performance
+significantly.  Responsiveness is potentially a concern, but interrupts
+are only disabled for a single AES block.
 
-dmaengine_prep_slave_sg expects an enum from dma_transfer_direction.
-Because we know the value of the dma_data_direction enum from the
-switch statement, we can just use the proper value from
-dma_transfer_direction so there is no more conversion.
+Note that even after this change, the implementation still isn't
+necessarily guaranteed to be constant-time; see
+https://cr.yp.to/antiforgery/cachetiming-20050414.pdf for a discussion
+of the many difficulties involved in writing truly constant-time AES
+software.  But it's valuable to make such attacks more difficult.
 
-DMA_TO_DEVICE = DMA_MEM_TO_DEV = 1
-DMA_FROM_DEVICE = DMA_DEV_TO_MEM = 2
-
-Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Signed-off-by: Eric Biggers <ebiggers@google.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/ux500/cryp/cryp_core.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ crypto/Kconfig  |  3 ++-
+ crypto/aes_ti.c | 18 ++++++++++++++++++
+ 2 files changed, 20 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/ux500/cryp/cryp_core.c b/drivers/crypto/ux500/cryp/cryp_core.c
-index d2663a4e1f5e..a92a66b1ff46 100644
---- a/drivers/crypto/ux500/cryp/cryp_core.c
-+++ b/drivers/crypto/ux500/cryp/cryp_core.c
-@@ -556,7 +556,7 @@ static int cryp_set_dma_transfer(struct cryp_ctx *ctx,
- 		desc = dmaengine_prep_slave_sg(channel,
- 				ctx->device->dma.sg_src,
- 				ctx->device->dma.sg_src_len,
--				direction, DMA_CTRL_ACK);
-+				DMA_MEM_TO_DEV, DMA_CTRL_ACK);
- 		break;
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 05c91eb10ca1..4f24acac3d48 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -1006,7 +1006,8 @@ config CRYPTO_AES_TI
+ 	  8 for decryption), this implementation only uses just two S-boxes of
+ 	  256 bytes each, and attempts to eliminate data dependent latencies by
+ 	  prefetching the entire table into the cache at the start of each
+-	  block.
++	  block. Interrupts are also disabled to avoid races where cachelines
++	  are evicted when the CPU is interrupted to do something else.
  
- 	case DMA_FROM_DEVICE:
-@@ -580,7 +580,7 @@ static int cryp_set_dma_transfer(struct cryp_ctx *ctx,
- 		desc = dmaengine_prep_slave_sg(channel,
- 				ctx->device->dma.sg_dst,
- 				ctx->device->dma.sg_dst_len,
--				direction,
-+				DMA_DEV_TO_MEM,
- 				DMA_CTRL_ACK |
- 				DMA_PREP_INTERRUPT);
+ config CRYPTO_AES_586
+ 	tristate "AES cipher algorithms (i586)"
+diff --git a/crypto/aes_ti.c b/crypto/aes_ti.c
+index 03023b2290e8..1ff9785b30f5 100644
+--- a/crypto/aes_ti.c
++++ b/crypto/aes_ti.c
+@@ -269,6 +269,7 @@ static void aesti_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+ 	const u32 *rkp = ctx->key_enc + 4;
+ 	int rounds = 6 + ctx->key_length / 4;
+ 	u32 st0[4], st1[4];
++	unsigned long flags;
+ 	int round;
  
+ 	st0[0] = ctx->key_enc[0] ^ get_unaligned_le32(in);
+@@ -276,6 +277,12 @@ static void aesti_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+ 	st0[2] = ctx->key_enc[2] ^ get_unaligned_le32(in + 8);
+ 	st0[3] = ctx->key_enc[3] ^ get_unaligned_le32(in + 12);
+ 
++	/*
++	 * Temporarily disable interrupts to avoid races where cachelines are
++	 * evicted when the CPU is interrupted to do something else.
++	 */
++	local_irq_save(flags);
++
+ 	st0[0] ^= __aesti_sbox[ 0] ^ __aesti_sbox[128];
+ 	st0[1] ^= __aesti_sbox[32] ^ __aesti_sbox[160];
+ 	st0[2] ^= __aesti_sbox[64] ^ __aesti_sbox[192];
+@@ -300,6 +307,8 @@ static void aesti_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+ 	put_unaligned_le32(subshift(st1, 1) ^ rkp[5], out + 4);
+ 	put_unaligned_le32(subshift(st1, 2) ^ rkp[6], out + 8);
+ 	put_unaligned_le32(subshift(st1, 3) ^ rkp[7], out + 12);
++
++	local_irq_restore(flags);
+ }
+ 
+ static void aesti_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+@@ -308,6 +317,7 @@ static void aesti_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+ 	const u32 *rkp = ctx->key_dec + 4;
+ 	int rounds = 6 + ctx->key_length / 4;
+ 	u32 st0[4], st1[4];
++	unsigned long flags;
+ 	int round;
+ 
+ 	st0[0] = ctx->key_dec[0] ^ get_unaligned_le32(in);
+@@ -315,6 +325,12 @@ static void aesti_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+ 	st0[2] = ctx->key_dec[2] ^ get_unaligned_le32(in + 8);
+ 	st0[3] = ctx->key_dec[3] ^ get_unaligned_le32(in + 12);
+ 
++	/*
++	 * Temporarily disable interrupts to avoid races where cachelines are
++	 * evicted when the CPU is interrupted to do something else.
++	 */
++	local_irq_save(flags);
++
+ 	st0[0] ^= __aesti_inv_sbox[ 0] ^ __aesti_inv_sbox[128];
+ 	st0[1] ^= __aesti_inv_sbox[32] ^ __aesti_inv_sbox[160];
+ 	st0[2] ^= __aesti_inv_sbox[64] ^ __aesti_inv_sbox[192];
+@@ -339,6 +355,8 @@ static void aesti_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+ 	put_unaligned_le32(inv_subshift(st1, 1) ^ rkp[5], out + 4);
+ 	put_unaligned_le32(inv_subshift(st1, 2) ^ rkp[6], out + 8);
+ 	put_unaligned_le32(inv_subshift(st1, 3) ^ rkp[7], out + 12);
++
++	local_irq_restore(flags);
+ }
+ 
+ static struct crypto_alg aes_alg = {
 -- 
 2.19.1
 
