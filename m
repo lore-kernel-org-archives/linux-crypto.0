@@ -2,389 +2,108 @@ Return-Path: <SRS0=71ZY=QE=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60997C282C8
-	for <linux-crypto@archiver.kernel.org>; Mon, 28 Jan 2019 19:00:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 965E2C282C8
+	for <linux-crypto@archiver.kernel.org>; Mon, 28 Jan 2019 19:50:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 23A1020989
-	for <linux-crypto@archiver.kernel.org>; Mon, 28 Jan 2019 19:00:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 369C22087F
+	for <linux-crypto@archiver.kernel.org>; Mon, 28 Jan 2019 19:50:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="gJIL1u4l"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726877AbfA1TA6 (ORCPT
+        id S1726744AbfA1Tu5 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 28 Jan 2019 14:00:58 -0500
-Received: from metis.ext.pengutronix.de ([85.220.165.71]:33957 "EHLO
-        metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726678AbfA1TA6 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 28 Jan 2019 14:00:58 -0500
-Received: from ptx.hi.pengutronix.de ([2001:67c:670:100:1d::c0])
-        by metis.ext.pengutronix.de with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.89)
-        (envelope-from <rhi@pengutronix.de>)
-        id 1goC9K-0003Mv-Qn; Mon, 28 Jan 2019 20:00:50 +0100
-Received: from rhi by ptx.hi.pengutronix.de with local (Exim 4.89)
-        (envelope-from <rhi@pengutronix.de>)
-        id 1goC9H-00055t-FI; Mon, 28 Jan 2019 20:00:47 +0100
-Date:   Mon, 28 Jan 2019 20:00:47 +0100
-From:   Roland Hieber <rhi@pengutronix.de>
-To:     Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Mon, 28 Jan 2019 14:50:57 -0500
+Received: from mail-eopbgr00080.outbound.protection.outlook.com ([40.107.0.80]:58080
+        "EHLO EUR02-AM5-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726719AbfA1Tu5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 28 Jan 2019 14:50:57 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ExpgHOA4Ax3dSGpbWZmo7A9t4xDERcv4T0+xxngjsNQ=;
+ b=gJIL1u4l3ek66s1Yt7Yzbfu7BehiuWQ4zHkIaicsFr84orYVVAk0HiO+MRQPdswY0KzI+3iKlHMjH4+JPXhSyjdwo3ry4cj7/zsRQJJZiboFCrFk3mV2GDYYnZMtKp+ArS8A69Gz0R3ahxpPpZsGHg7Quuv8fQkCzSfNE60wBVU=
+Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
+ VI1PR0402MB3936.eurprd04.prod.outlook.com (52.134.17.148) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1558.21; Mon, 28 Jan 2019 19:50:54 +0000
+Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
+ ([fe80::f51e:1692:77db:b931]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
+ ([fe80::f51e:1692:77db:b931%6]) with mapi id 15.20.1558.023; Mon, 28 Jan 2019
+ 19:50:54 +0000
+From:   Horia Geanta <horia.geanta@nxp.com>
+To:     Roland Hieber <rhi@pengutronix.de>
+CC:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
         Aymen Sghaier <aymen.sghaier@nxp.com>,
-        linux-crypto@vger.kernel.org,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         Pengutronix Kernel Team <kernel@pengutronix.de>
 Subject: Re: [PATCH v2 2/2] crypto: caam - fix DMA mapping of stack memory
-Message-ID: <20190128190047.7btanivlbj5jpy3u@pengutronix.de>
+Thread-Topic: [PATCH v2 2/2] crypto: caam - fix DMA mapping of stack memory
+Thread-Index: AQHUtaFSDnpyWRrBME6Rg2w1yvLFEA==
+Date:   Mon, 28 Jan 2019 19:50:54 +0000
+Message-ID: <VI1PR0402MB34850F22F806E819DE5E8D9298960@VI1PR0402MB3485.eurprd04.prod.outlook.com>
 References: <VI1PR0402MB348525A6FEFD55F6896C9249989B0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
  <20190126180215.9842-1-horia.geanta@nxp.com>
+ <20190128190047.7btanivlbj5jpy3u@pengutronix.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=horia.geanta@nxp.com; 
+x-originating-ip: [192.88.166.1]
+x-ms-publictraffictype: Email
+x-microsoft-exchange-diagnostics: 1;VI1PR0402MB3936;6:yqaUj9KK75erhaRr0cvc4KNIHUbXzMuA0NZegxUxTCFRC91f3bztGznqLb0nRwQvX4CpQN7e0yEs1ffu6CPBk0r1SKYnsrjndgX1OMgPvLzrj2hZD//9kjlYWoOqmm1IXlbQ31IXlx3o0pDtgHQmD8eFQgLkN0aAgzYQKzdyo9jIJiQjqdSiRpBb7zDDFj7293qKp7Dw6ao9XFwdrleOj+yqfAVCR5YGDbQUYF4HCiNuDkNXIpDghch5aa6vlFxMyq5ad9nhO8ZMwmNBefjSpPVxLVXgOfxZDnga5RZjuBUPIsUeZqnFv21/oUjhI/bNYmLH+RuzGI97QhRR/SnYBETws4dwq376bEJIjpB/dzwSJDcapHMHc8A0nr04ROvAgUewDJ02tp4jkhHu11qh0mES4dslQcXzWMe1DGzvgpT67cg0ByOsn9ZuCqInNqqqXT7xDlRqnBXIzK0mCedTUQ==;5:pmQ20O/HHksZttG0zaMRFE8E8Ghps515jMY7mkIXFPgr5QSZa45gxcHujvJ/8BSrJdXm/M8u56Y4eIQ8gfAJ60EajxjnsYcOl7tYtAmUv+t2fe9YhIXfJw/oP77BIjaPHxaGqpOvOFPwHRuin+zOm6aX+LAbbXJQrMsBqRxhoCV/BzK/94l6yk74GFTevXOyKWh9lnQTEMbOTHTVkn2Nlw==;7:PEDopZmiVY9kaEEg819+Q5xDQY8JizTWniTgZrnMN0FW17sYwyZdx9qt+FRYdj3MuJLCqfRPNSBbaNNMeL+gItjUC2FqbJS820jt6zp6SOAAl9neYnqu67jw1V45JfWLksRLBeFoDs9GfNOcOhQN8w==
+x-ms-exchange-antispam-srfa-diagnostics: SOS;
+x-ms-office365-filtering-correlation-id: 40a22c74-959d-4531-af1b-08d68559ea1a
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600110)(711020)(4605077)(4618075)(2017052603328)(7153060)(7193020);SRVR:VI1PR0402MB3936;
+x-ms-traffictypediagnostic: VI1PR0402MB3936:
+x-microsoft-antispam-prvs: <VI1PR0402MB393678EB7BB14A591A62E5C598960@VI1PR0402MB3936.eurprd04.prod.outlook.com>
+x-forefront-prvs: 0931CB1479
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(346002)(136003)(396003)(376002)(366004)(39860400002)(199004)(189003)(478600001)(53936002)(54906003)(446003)(25786009)(476003)(14454004)(86362001)(4326008)(105586002)(186003)(316002)(6246003)(486006)(9686003)(6506007)(26005)(53546011)(102836004)(66066001)(97736004)(71190400001)(76176011)(8676002)(81166006)(8936002)(33656002)(74316002)(7736002)(99286004)(7696005)(6116002)(55016002)(14444005)(256004)(44832011)(106356001)(71200400001)(6436002)(6916009)(229853002)(81156014)(2906002)(68736007)(305945005)(3846002)(4744005);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB3936;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: nxp.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: VlcYCU28IX/ZFHtFyvyWBEtXmUjPq2tLmNNCUv5HHKujC5DJ/pVS6VLsk42TfVF4JtXSSXmOJ8nwmPn0wuhCdJF9xbwH+Vh48MTStVpjjsFccpcdzLorjcgXfYnbdd7TLEchkhmARdrvsJaP2xTX+IbRIi2dZIjoZakygkDgOq7pEZJmi3a/oG/ykAl1QtNgfn7l1y7+eBrsIN0o8YSLsMNHh1TGVf4rlw2hzvKlYPe+PBLmNYKVCCrI1420E1ygED2s5Xaq+Jd3uGmTO6dMZRqY7AP6CXIRYOpEh1WB1az+JOLgyOCiMkDcxEVr0Qk+zL4yqqzNKtPyu12U/wNBo5QkMmr1sR2bY3ooAFh5RScIBglwEGi/n50sKoJk1qxZO1PHTrRbsYkUwzWtkYKR0QZLII4lMh0eppurV/B1WGc=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190126180215.9842-1-horia.geanta@nxp.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL:  http://www.pengutronix.de/
-X-IRC:  #ptxdist @freenode
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-Uptime: 19:57:00 up 7 days,  6:10, 49 users,  load average: 0.07, 0.08, 0.09
-User-Agent: NeoMutt/20170113 (1.7.2)
-X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::c0
-X-SA-Exim-Mail-From: rhi@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 40a22c74-959d-4531-af1b-08d68559ea1a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Jan 2019 19:50:54.3953
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3936
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Horia,
-
-I didn't understand your patch thoroughly yet, but I tested it and it
-gets rid of my DMA-API warning, so:
-
-Tested-by: Roland Hieber <rhi@pengutronix.de>
-
-Thanks! :)
-
- - Roland
-
-On Sat, Jan 26, 2019 at 08:02:15PM +0200, Horia Geantă wrote:
-> Roland reports the following issue and provides a root cause analysis:
-> 
-> "On a v4.19 i.MX6 system with IMA and CONFIG_DMA_API_DEBUG enabled, a
-> warning is generated when accessing files on a filesystem for which IMA
-> measurement is enabled:
-> 
->     ------------[ cut here ]------------
->     WARNING: CPU: 0 PID: 1 at kernel/dma/debug.c:1181 check_for_stack.part.9+0xd0/0x120
->     caam_jr 2101000.jr0: DMA-API: device driver maps memory from stack [addr=b668049e]
->     Modules linked in:
->     CPU: 0 PID: 1 Comm: switch_root Not tainted 4.19.0-20181214-1 #2
->     Hardware name: Freescale i.MX6 Quad/DualLite (Device Tree)
->     Backtrace:
->     [<c010efb8>] (dump_backtrace) from [<c010f2d0>] (show_stack+0x20/0x24)
->     [<c010f2b0>] (show_stack) from [<c08b04f4>] (dump_stack+0xa0/0xcc)
->     [<c08b0454>] (dump_stack) from [<c012b610>] (__warn+0xf0/0x108)
->     [<c012b520>] (__warn) from [<c012b680>] (warn_slowpath_fmt+0x58/0x74)
->     [<c012b62c>] (warn_slowpath_fmt) from [<c0199acc>] (check_for_stack.part.9+0xd0/0x120)
->     [<c01999fc>] (check_for_stack.part.9) from [<c019a040>] (debug_dma_map_page+0x144/0x174)
->     [<c0199efc>] (debug_dma_map_page) from [<c065f7f4>] (ahash_final_ctx+0x5b4/0xcf0)
->     [<c065f240>] (ahash_final_ctx) from [<c065b3c4>] (ahash_final+0x1c/0x20)
->     [<c065b3a8>] (ahash_final) from [<c03fe278>] (crypto_ahash_op+0x38/0x80)
->     [<c03fe240>] (crypto_ahash_op) from [<c03fe2e0>] (crypto_ahash_final+0x20/0x24)
->     [<c03fe2c0>] (crypto_ahash_final) from [<c03f19a8>] (ima_calc_file_hash+0x29c/0xa40)
->     [<c03f170c>] (ima_calc_file_hash) from [<c03f2b24>] (ima_collect_measurement+0x1dc/0x240)
->     [<c03f2948>] (ima_collect_measurement) from [<c03f0a60>] (process_measurement+0x4c4/0x6b8)
->     [<c03f059c>] (process_measurement) from [<c03f0cdc>] (ima_file_check+0x88/0xa4)
->     [<c03f0c54>] (ima_file_check) from [<c02d8adc>] (path_openat+0x5d8/0x1364)
->     [<c02d8504>] (path_openat) from [<c02dad24>] (do_filp_open+0x84/0xf0)
->     [<c02daca0>] (do_filp_open) from [<c02cf50c>] (do_open_execat+0x84/0x1b0)
->     [<c02cf488>] (do_open_execat) from [<c02d1058>] (__do_execve_file+0x43c/0x890)
->     [<c02d0c1c>] (__do_execve_file) from [<c02d1770>] (sys_execve+0x44/0x4c)
->     [<c02d172c>] (sys_execve) from [<c0101000>] (ret_fast_syscall+0x0/0x28)
->     ---[ end trace 3455789a10e3aefd ]---
-> 
-> The cause is that the struct ahash_request *req is created as a
-> stack-local variable up in the stack (presumably somewhere in the IMA
-> implementation), then passed down into the CAAM driver, which tries to
-> dma_single_map the req->result (indirectly via map_seq_out_ptr_result)
-> in order to make that buffer available for the CAAM to store the result
-> of the following hash operation.
-> 
-> The calling code doesn't know how req will be used by the CAAM driver,
-> and there could be other such occurrences where stack memory is passed
-> down to the CAAM driver. Therefore we should rather fix this issue in
-> the CAAM driver where the requirements are known."
-> 
-> Fix this problem by:
-> -instructing the crypto engine to write the final hash in state->caam_ctx
-> -subsequently memcpy-ing the final hash into req->result
-> 
-> Cc: <stable@vger.kernel.org> # v4.19+
-> Reported-by: Roland Hieber <rhi@pengutronix.de>
-> Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
-> ---
->  drivers/crypto/caam/caamhash.c | 85 +++++++++++-------------------------------
->  1 file changed, 21 insertions(+), 64 deletions(-)
-> 
-> diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
-> index b65e2e54c562..89ecda28f87b 100644
-> --- a/drivers/crypto/caam/caamhash.c
-> +++ b/drivers/crypto/caam/caamhash.c
-> @@ -178,18 +178,6 @@ static inline int map_seq_out_ptr_ctx(u32 *desc, struct device *jrdev,
->  	return 0;
->  }
->  
-> -/* Map req->result, and append seq_out_ptr command that points to it */
-> -static inline dma_addr_t map_seq_out_ptr_result(u32 *desc, struct device *jrdev,
-> -						u8 *result, int digestsize)
-> -{
-> -	dma_addr_t dst_dma;
-> -
-> -	dst_dma = dma_map_single(jrdev, result, digestsize, DMA_FROM_DEVICE);
-> -	append_seq_out_ptr(desc, dst_dma, digestsize, 0);
-> -
-> -	return dst_dma;
-> -}
-> -
->  /* Map current buffer in state (if length > 0) and put it in link table */
->  static inline int buf_map_to_sec4_sg(struct device *jrdev,
->  				     struct sec4_sg_entry *sec4_sg,
-> @@ -426,7 +414,6 @@ static int ahash_setkey(struct crypto_ahash *ahash,
->  
->  /*
->   * ahash_edesc - s/w-extended ahash descriptor
-> - * @dst_dma: physical mapped address of req->result
->   * @sec4_sg_dma: physical mapped address of h/w link table
->   * @src_nents: number of segments in input scatterlist
->   * @sec4_sg_bytes: length of dma mapped sec4_sg space
-> @@ -434,7 +421,6 @@ static int ahash_setkey(struct crypto_ahash *ahash,
->   * @sec4_sg: h/w link table
->   */
->  struct ahash_edesc {
-> -	dma_addr_t dst_dma;
->  	dma_addr_t sec4_sg_dma;
->  	int src_nents;
->  	int sec4_sg_bytes;
-> @@ -450,8 +436,6 @@ static inline void ahash_unmap(struct device *dev,
->  
->  	if (edesc->src_nents)
->  		dma_unmap_sg(dev, req->src, edesc->src_nents, DMA_TO_DEVICE);
-> -	if (edesc->dst_dma)
-> -		dma_unmap_single(dev, edesc->dst_dma, dst_len, DMA_FROM_DEVICE);
->  
->  	if (edesc->sec4_sg_bytes)
->  		dma_unmap_single(dev, edesc->sec4_sg_dma,
-> @@ -486,9 +470,9 @@ static void ahash_done(struct device *jrdev, u32 *desc, u32 err,
->  	struct ahash_edesc *edesc;
->  	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
->  	int digestsize = crypto_ahash_digestsize(ahash);
-> +	struct caam_hash_state *state = ahash_request_ctx(req);
->  #ifdef DEBUG
->  	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
-> -	struct caam_hash_state *state = ahash_request_ctx(req);
->  
->  	dev_err(jrdev, "%s %d: err 0x%x\n", __func__, __LINE__, err);
->  #endif
-> @@ -497,17 +481,14 @@ static void ahash_done(struct device *jrdev, u32 *desc, u32 err,
->  	if (err)
->  		caam_jr_strstatus(jrdev, err);
->  
-> -	ahash_unmap(jrdev, edesc, req, digestsize);
-> +	ahash_unmap_ctx(jrdev, edesc, req, digestsize, DMA_FROM_DEVICE);
-> +	memcpy(req->result, state->caam_ctx, digestsize);
->  	kfree(edesc);
->  
->  #ifdef DEBUG
->  	print_hex_dump(KERN_ERR, "ctx@"__stringify(__LINE__)": ",
->  		       DUMP_PREFIX_ADDRESS, 16, 4, state->caam_ctx,
->  		       ctx->ctx_len, 1);
-> -	if (req->result)
-> -		print_hex_dump(KERN_ERR, "result@"__stringify(__LINE__)": ",
-> -			       DUMP_PREFIX_ADDRESS, 16, 4, req->result,
-> -			       digestsize, 1);
->  #endif
->  
->  	req->base.complete(&req->base, err);
-> @@ -555,9 +536,9 @@ static void ahash_done_ctx_src(struct device *jrdev, u32 *desc, u32 err,
->  	struct ahash_edesc *edesc;
->  	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
->  	int digestsize = crypto_ahash_digestsize(ahash);
-> +	struct caam_hash_state *state = ahash_request_ctx(req);
->  #ifdef DEBUG
->  	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
-> -	struct caam_hash_state *state = ahash_request_ctx(req);
->  
->  	dev_err(jrdev, "%s %d: err 0x%x\n", __func__, __LINE__, err);
->  #endif
-> @@ -566,17 +547,14 @@ static void ahash_done_ctx_src(struct device *jrdev, u32 *desc, u32 err,
->  	if (err)
->  		caam_jr_strstatus(jrdev, err);
->  
-> -	ahash_unmap_ctx(jrdev, edesc, req, digestsize, DMA_TO_DEVICE);
-> +	ahash_unmap_ctx(jrdev, edesc, req, digestsize, DMA_BIDIRECTIONAL);
-> +	memcpy(req->result, state->caam_ctx, digestsize);
->  	kfree(edesc);
->  
->  #ifdef DEBUG
->  	print_hex_dump(KERN_ERR, "ctx@"__stringify(__LINE__)": ",
->  		       DUMP_PREFIX_ADDRESS, 16, 4, state->caam_ctx,
->  		       ctx->ctx_len, 1);
-> -	if (req->result)
-> -		print_hex_dump(KERN_ERR, "result@"__stringify(__LINE__)": ",
-> -			       DUMP_PREFIX_ADDRESS, 16, 4, req->result,
-> -			       digestsize, 1);
->  #endif
->  
->  	req->base.complete(&req->base, err);
-> @@ -837,7 +815,7 @@ static int ahash_final_ctx(struct ahash_request *req)
->  	edesc->sec4_sg_bytes = sec4_sg_bytes;
->  
->  	ret = ctx_map_to_sec4_sg(jrdev, state, ctx->ctx_len,
-> -				 edesc->sec4_sg, DMA_TO_DEVICE);
-> +				 edesc->sec4_sg, DMA_BIDIRECTIONAL);
->  	if (ret)
->  		goto unmap_ctx;
->  
-> @@ -857,14 +835,7 @@ static int ahash_final_ctx(struct ahash_request *req)
->  
->  	append_seq_in_ptr(desc, edesc->sec4_sg_dma, ctx->ctx_len + buflen,
->  			  LDST_SGF);
-> -
-> -	edesc->dst_dma = map_seq_out_ptr_result(desc, jrdev, req->result,
-> -						digestsize);
-> -	if (dma_mapping_error(jrdev, edesc->dst_dma)) {
-> -		dev_err(jrdev, "unable to map dst\n");
-> -		ret = -ENOMEM;
-> -		goto unmap_ctx;
-> -	}
-> +	append_seq_out_ptr(desc, state->ctx_dma, digestsize, 0);
->  
->  #ifdef DEBUG
->  	print_hex_dump(KERN_ERR, "jobdesc@"__stringify(__LINE__)": ",
-> @@ -877,7 +848,7 @@ static int ahash_final_ctx(struct ahash_request *req)
->  
->  	return -EINPROGRESS;
->   unmap_ctx:
-> -	ahash_unmap_ctx(jrdev, edesc, req, digestsize, DMA_FROM_DEVICE);
-> +	ahash_unmap_ctx(jrdev, edesc, req, digestsize, DMA_BIDIRECTIONAL);
->  	kfree(edesc);
->  	return ret;
->  }
-> @@ -931,7 +902,7 @@ static int ahash_finup_ctx(struct ahash_request *req)
->  	edesc->src_nents = src_nents;
->  
->  	ret = ctx_map_to_sec4_sg(jrdev, state, ctx->ctx_len,
-> -				 edesc->sec4_sg, DMA_TO_DEVICE);
-> +				 edesc->sec4_sg, DMA_BIDIRECTIONAL);
->  	if (ret)
->  		goto unmap_ctx;
->  
-> @@ -945,13 +916,7 @@ static int ahash_finup_ctx(struct ahash_request *req)
->  	if (ret)
->  		goto unmap_ctx;
->  
-> -	edesc->dst_dma = map_seq_out_ptr_result(desc, jrdev, req->result,
-> -						digestsize);
-> -	if (dma_mapping_error(jrdev, edesc->dst_dma)) {
-> -		dev_err(jrdev, "unable to map dst\n");
-> -		ret = -ENOMEM;
-> -		goto unmap_ctx;
-> -	}
-> +	append_seq_out_ptr(desc, state->ctx_dma, digestsize, 0);
->  
->  #ifdef DEBUG
->  	print_hex_dump(KERN_ERR, "jobdesc@"__stringify(__LINE__)": ",
-> @@ -964,7 +929,7 @@ static int ahash_finup_ctx(struct ahash_request *req)
->  
->  	return -EINPROGRESS;
->   unmap_ctx:
-> -	ahash_unmap_ctx(jrdev, edesc, req, digestsize, DMA_FROM_DEVICE);
-> +	ahash_unmap_ctx(jrdev, edesc, req, digestsize, DMA_BIDIRECTIONAL);
->  	kfree(edesc);
->  	return ret;
->  }
-> @@ -1023,10 +988,8 @@ static int ahash_digest(struct ahash_request *req)
->  
->  	desc = edesc->hw_desc;
->  
-> -	edesc->dst_dma = map_seq_out_ptr_result(desc, jrdev, req->result,
-> -						digestsize);
-> -	if (dma_mapping_error(jrdev, edesc->dst_dma)) {
-> -		dev_err(jrdev, "unable to map dst\n");
-> +	ret = map_seq_out_ptr_ctx(desc, jrdev, state, digestsize);
-> +	if (ret) {
->  		ahash_unmap(jrdev, edesc, req, digestsize);
->  		kfree(edesc);
->  		return -ENOMEM;
-> @@ -1041,7 +1004,7 @@ static int ahash_digest(struct ahash_request *req)
->  	if (!ret) {
->  		ret = -EINPROGRESS;
->  	} else {
-> -		ahash_unmap(jrdev, edesc, req, digestsize);
-> +		ahash_unmap_ctx(jrdev, edesc, req, digestsize, DMA_FROM_DEVICE);
->  		kfree(edesc);
->  	}
->  
-> @@ -1083,12 +1046,9 @@ static int ahash_final_no_ctx(struct ahash_request *req)
->  		append_seq_in_ptr(desc, state->buf_dma, buflen, 0);
->  	}
->  
-> -	edesc->dst_dma = map_seq_out_ptr_result(desc, jrdev, req->result,
-> -						digestsize);
-> -	if (dma_mapping_error(jrdev, edesc->dst_dma)) {
-> -		dev_err(jrdev, "unable to map dst\n");
-> +	ret = map_seq_out_ptr_ctx(desc, jrdev, state, digestsize);
-> +	if (ret)
->  		goto unmap;
-> -	}
->  
->  #ifdef DEBUG
->  	print_hex_dump(KERN_ERR, "jobdesc@"__stringify(__LINE__)": ",
-> @@ -1099,7 +1059,7 @@ static int ahash_final_no_ctx(struct ahash_request *req)
->  	if (!ret) {
->  		ret = -EINPROGRESS;
->  	} else {
-> -		ahash_unmap(jrdev, edesc, req, digestsize);
-> +		ahash_unmap_ctx(jrdev, edesc, req, digestsize, DMA_FROM_DEVICE);
->  		kfree(edesc);
->  	}
->  
-> @@ -1298,12 +1258,9 @@ static int ahash_finup_no_ctx(struct ahash_request *req)
->  		goto unmap;
->  	}
->  
-> -	edesc->dst_dma = map_seq_out_ptr_result(desc, jrdev, req->result,
-> -						digestsize);
-> -	if (dma_mapping_error(jrdev, edesc->dst_dma)) {
-> -		dev_err(jrdev, "unable to map dst\n");
-> +	ret = map_seq_out_ptr_ctx(desc, jrdev, state, digestsize);
-> +	if (ret)
->  		goto unmap;
-> -	}
->  
->  #ifdef DEBUG
->  	print_hex_dump(KERN_ERR, "jobdesc@"__stringify(__LINE__)": ",
-> @@ -1314,7 +1271,7 @@ static int ahash_finup_no_ctx(struct ahash_request *req)
->  	if (!ret) {
->  		ret = -EINPROGRESS;
->  	} else {
-> -		ahash_unmap(jrdev, edesc, req, digestsize);
-> +		ahash_unmap_ctx(jrdev, edesc, req, digestsize, DMA_FROM_DEVICE);
->  		kfree(edesc);
->  	}
->  
-> -- 
-> 2.16.2
-> 
-> 
-
--- 
-Roland Hieber                     | r.hieber@pengutronix.de     |
-Pengutronix e.K.                  | https://www.pengutronix.de/ |
-Peiner Str. 6-8, 31137 Hildesheim | Phone: +49-5121-206917-5086 |
-Amtsgericht Hildesheim, HRA 2686  | Fax:   +49-5121-206917-5555 |
+On 1/28/2019 9:00 PM, Roland Hieber wrote:=0A=
+> Hi Horia,=0A=
+> =0A=
+> I didn't understand your patch thoroughly yet, but I tested it and it=0A=
+> gets rid of my DMA-API warning, so:=0A=
+> =0A=
+As mentioned in the commit message, the main idea is to use the buffer hold=
+ing=0A=
+the partial hash (state->caam_ctx) also for the final hash.=0A=
+So now:=0A=
+-crypto engine DMA writes final hash to state->caam_ctx=0A=
+-driver copies hash from state->caam_ctx to req->result=0A=
+=0A=
+There are some implications of this change, mainly the change of DMA mappin=
+g=0A=
+direction for state->caam_ctx, clean-up code (DMA unmapping) and updates in=
+ how=0A=
+crypto engine job descriptors are generated.=0A=
+=0A=
+> Tested-by: Roland Hieber <rhi@pengutronix.de>=0A=
+> =0A=
+Thanks!Horia=0A=
