@@ -4,52 +4,51 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41B50C282C8
-	for <linux-crypto@archiver.kernel.org>; Mon, 28 Jan 2019 17:10:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CA70C282CD
+	for <linux-crypto@archiver.kernel.org>; Mon, 28 Jan 2019 17:33:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 063DE2175B
-	for <linux-crypto@archiver.kernel.org>; Mon, 28 Jan 2019 17:10:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 216AC2148E
+	for <linux-crypto@archiver.kernel.org>; Mon, 28 Jan 2019 17:33:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1548695446;
+	s=default; t=1548696780;
 	bh=74ShYMUvNa6XztpuXX1dwopiHNcWA5LMFoH+zlnCFH0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=eLVnM+NbUDcRzlIVctMvaXhXeZ+eGWhTzzexPpZXA0pePLL5ZvJFlmEfby09M1yir
-	 Ui1R8JQahQvyOof2IxeelTKjSVX+Mxv6sNnJWLgrOEzntJFthrJ7VrMicI5eI9vSBC
-	 3iaQnrjAR0178R0SaFihlX1scV1UXx2S1lS+uniM=
+	b=un8ohGOsRn8Tu3iejGhAnA7bNpZkCRcJWaivz1WDy6H/vmBMlmy0262EY4C5Dvh/d
+	 dXJKf0vR+ac8pgz2pgwgy5xqL9WBo45tcZesu5SfHxqv6PMmOJm95kq4owdTHm0KcN
+	 NtjBqbpEONqSQ0w3RbFtBeZ/BEn/6JiNKcBcayBc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732737AbfA1QKL (ORCPT
+        id S1728486AbfA1Rcx (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 28 Jan 2019 11:10:11 -0500
-Received: from mail.kernel.org ([198.145.29.99]:35770 "EHLO mail.kernel.org"
+        Mon, 28 Jan 2019 12:32:53 -0500
+Received: from mail.kernel.org ([198.145.29.99]:42720 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732732AbfA1QKK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 28 Jan 2019 11:10:10 -0500
+        id S1728751AbfA1P5L (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 28 Jan 2019 10:57:11 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id B0C8C21738;
-        Mon, 28 Jan 2019 16:10:08 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 793EE20881;
+        Mon, 28 Jan 2019 15:57:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1548691810;
+        s=default; t=1548691030;
         bh=74ShYMUvNa6XztpuXX1dwopiHNcWA5LMFoH+zlnCFH0=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=UD3crSs4blKGwJ8KUIS1MDx5yMofo14O8Xig2e5lvgTCwnimcRKPtmXWnvzlz2n5g
-         EO9mjgfkqW3HBGzB2ahUXtDEuGrFnLxztPitfuTBevofL33Sw3cX/mVPBVJcgF/DFs
-         fOxDluuQnbQbCjs1vgotIlBlzIGqjyBTcYZ3Rsn4=
+        b=JI34s1Cn9Es3yRwW4AvTb7BkH1wrO4IZ5/tzS7Fl08R7ZeLiVZnjUX1mY4Ax+SzrY
+         I+qWUImGcM0P3eVKaoMmdkQmTFPHUn9+lzsSFimJ+tuiHQfL/UEXApZpAalbl5p/n2
+         4MeiNZJQSG+mfTyVfoX39LwGd0HYvRy0NiM0DMWE=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Nathan Chancellor <natechancellor@gmail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 224/258] crypto: ux500 - Use proper enum in hash_set_dma_transfer
-Date:   Mon, 28 Jan 2019 10:58:50 -0500
-Message-Id: <20190128155924.51521-224-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.20 267/304] crypto: ux500 - Use proper enum in hash_set_dma_transfer
+Date:   Mon, 28 Jan 2019 10:43:04 -0500
+Message-Id: <20190128154341.47195-267-sashal@kernel.org>
 X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20190128155924.51521-1-sashal@kernel.org>
-References: <20190128155924.51521-1-sashal@kernel.org>
+In-Reply-To: <20190128154341.47195-1-sashal@kernel.org>
+References: <20190128154341.47195-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
