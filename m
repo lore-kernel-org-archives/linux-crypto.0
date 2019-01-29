@@ -2,102 +2,105 @@ Return-Path: <SRS0=zJfq=QF=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81648C282CD
-	for <linux-crypto@archiver.kernel.org>; Tue, 29 Jan 2019 00:01:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1064C282D0
+	for <linux-crypto@archiver.kernel.org>; Tue, 29 Jan 2019 01:19:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 56217214DA
-	for <linux-crypto@archiver.kernel.org>; Tue, 29 Jan 2019 00:01:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9456521738
+	for <linux-crypto@archiver.kernel.org>; Tue, 29 Jan 2019 01:19:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726869AbfA2ABh (ORCPT
+        id S1727380AbfA2BTY (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 28 Jan 2019 19:01:37 -0500
-Received: from smtp.gentoo.org ([140.211.166.183]:59158 "EHLO smtp.gentoo.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726746AbfA2ABh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 28 Jan 2019 19:01:37 -0500
-Received: from gentoo.cpe.tdp.com (unknown [181.67.136.158])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        (Authenticated sender: chrisadr)
-        by smtp.gentoo.org (Postfix) with ESMTPSA id 22C5B335D4C;
-        Tue, 29 Jan 2019 00:01:33 +0000 (UTC)
-From:   Christopher Diaz Riveros <chrisadr@gentoo.org>
-To:     herbert@gondor.apana.org.au, davem@davemloft.net
-Cc:     Christopher Diaz Riveros <chrisadr@gentoo.org>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [patch-next] crypto: testmgr - use kmemdup
-Date:   Mon, 28 Jan 2019 19:01:18 -0500
-Message-Id: <20190129000118.15923-1-chrisadr@gentoo.org>
-X-Mailer: git-send-email 2.20.1
+        Mon, 28 Jan 2019 20:19:24 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:2789 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726993AbfA2BTY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 28 Jan 2019 20:19:24 -0500
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 7450794E94F0EC393648;
+        Tue, 29 Jan 2019 09:19:22 +0800 (CST)
+Received: from [127.0.0.1] (10.63.139.185) by DGGEMS412-HUB.china.huawei.com
+ (10.3.19.212) with Microsoft SMTP Server id 14.3.408.0; Tue, 29 Jan 2019
+ 09:19:14 +0800
+Subject: Re: [PATCH v2 0/4] crypto: hisilicon: Add HiSilicon QM and ZIP
+ controller driver
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        <linux-crypto@vger.kernel.org>
+References: <1548248933-149853-1-git-send-email-wangzhou1@hisilicon.com>
+CC:     <linuxarm@huawei.com>, <linux-kernel@vger.kernel.org>
+From:   Zhou Wang <wangzhou1@hisilicon.com>
+Message-ID: <5C4FAA19.7010807@hisilicon.com>
+Date:   Tue, 29 Jan 2019 09:19:21 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:38.0) Gecko/20100101
+ Thunderbird/38.5.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <1548248933-149853-1-git-send-email-wangzhou1@hisilicon.com>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.63.139.185]
+X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Fixes coccinnelle alerts:
+On 2019/1/23 21:08, Zhou Wang wrote:
+> This series adds HiSilicon QM and ZIP controller driver in crypto subsystem.
+> 
+> A simple QM/ZIP driver which helps to provide an example for a general
+> accelerator framework is under review in community[1]. Based on this simple
+> driver, this series adds HW v2 support, PCI passthrough, reset, PCI/misc error
+> handler, debug support. But unlike [1], driver in this patchset only registers
+> to crypto subsystem.
+> 
+> There will be a long discussion about above accelerator framework in the
+> process of upstreaming. So let's firstly review and upstream QM/ZIP crypto
+> driver.
+> 
+> Changes v1 -> v2:
+> - Change to register zlib/gzip to scomp.
+> - Remove hisi_qm_mem_init/uninit, make QM interfaces compact.
+> - Some tiny fixes.
+> 
+> Links:
+> - v1  https://lwn.net/Articles/775484/
+> - rfc https://lkml.org/lkml/2018/12/13/290
+> 
+> Reference:
+> [1] https://lkml.org/lkml/2018/11/12/1951
+> 
+> Zhou Wang (4):
+>   Documentation: Add debugfs doc for hisi_zip
+>   crypto: hisilicon: Add queue management driver for HiSilicon QM module
+>   crypto: hisilicon: Add HiSilicon ZIP accelerator support
+>   MAINTAINERS: add maintainer for HiSilicon QM and ZIP controller driver
+> 
+>  Documentation/ABI/testing/debugfs-hisi-zip |   50 +
+>  MAINTAINERS                                |    8 +
+>  drivers/crypto/hisilicon/Kconfig           |   11 +
+>  drivers/crypto/hisilicon/Makefile          |    2 +
+>  drivers/crypto/hisilicon/qm.c              | 1736 ++++++++++++++++++++++++++++
+>  drivers/crypto/hisilicon/qm.h              |  276 +++++
+>  drivers/crypto/hisilicon/zip/Makefile      |    2 +
+>  drivers/crypto/hisilicon/zip/zip.h         |   60 +
+>  drivers/crypto/hisilicon/zip/zip_crypto.c  |  484 ++++++++
+>  drivers/crypto/hisilicon/zip/zip_main.c    | 1199 +++++++++++++++++++
+>  10 files changed, 3828 insertions(+)
+>  create mode 100644 Documentation/ABI/testing/debugfs-hisi-zip
+>  create mode 100644 drivers/crypto/hisilicon/qm.c
+>  create mode 100644 drivers/crypto/hisilicon/qm.h
+>  create mode 100644 drivers/crypto/hisilicon/zip/Makefile
+>  create mode 100644 drivers/crypto/hisilicon/zip/zip.h
+>  create mode 100644 drivers/crypto/hisilicon/zip/zip_crypto.c
+>  create mode 100644 drivers/crypto/hisilicon/zip/zip_main.c
+> 
 
-/crypto/testmgr.c:2112:13-20: WARNING opportunity for kmemdup
-/crypto/testmgr.c:2130:13-20: WARNING opportunity for kmemdup
-/crypto/testmgr.c:2152:9-16: WARNING opportunity for kmemdup
+Any comments for this version?
 
-Signed-off-by: Christopher Diaz Riveros <chrisadr@gentoo.org>
----
- crypto/testmgr.c | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
-
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index e4f3f5f688e7..9c95f0eea863 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -2109,12 +2109,11 @@ static int do_test_kpp(struct crypto_kpp *tfm, const struct kpp_testvec *vec,
- 
- 	if (vec->genkey) {
- 		/* Save party A's public key */
--		a_public = kzalloc(out_len_max, GFP_KERNEL);
-+		a_public = kmemdup(sg_virt(req->dst), out_len_max, GFP_KERNEL);
- 		if (!a_public) {
- 			err = -ENOMEM;
- 			goto free_output;
- 		}
--		memcpy(a_public, sg_virt(req->dst), out_len_max);
- 	} else {
- 		/* Verify calculated public key */
- 		if (memcmp(vec->expected_a_public, sg_virt(req->dst),
-@@ -2127,13 +2126,12 @@ static int do_test_kpp(struct crypto_kpp *tfm, const struct kpp_testvec *vec,
- 	}
- 
- 	/* Calculate shared secret key by using counter part (b) public key. */
--	input_buf = kzalloc(vec->b_public_size, GFP_KERNEL);
-+	input_buf = kmemdup(vec->b_public, vec->b_public_size, GFP_KERNEL);
- 	if (!input_buf) {
- 		err = -ENOMEM;
- 		goto free_output;
- 	}
- 
--	memcpy(input_buf, vec->b_public, vec->b_public_size);
- 	sg_init_one(&src, input_buf, vec->b_public_size);
- 	sg_init_one(&dst, output_buf, out_len_max);
- 	kpp_request_set_input(req, &src, vec->b_public_size);
-@@ -2149,12 +2147,11 @@ static int do_test_kpp(struct crypto_kpp *tfm, const struct kpp_testvec *vec,
- 
- 	if (vec->genkey) {
- 		/* Save the shared secret obtained by party A */
--		a_ss = kzalloc(vec->expected_ss_size, GFP_KERNEL);
-+		a_ss = kmemdup(sg_virt(req->dst), vec->expected_ss_size, GFP_KERNEL);
- 		if (!a_ss) {
- 			err = -ENOMEM;
- 			goto free_all;
- 		}
--		memcpy(a_ss, sg_virt(req->dst), vec->expected_ss_size);
- 
- 		/*
- 		 * Calculate party B's shared secret by using party A's
--- 
-2.20.1
+Best,
+Zhou
 
