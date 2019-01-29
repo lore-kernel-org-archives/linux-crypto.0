@@ -7,51 +7,51 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C3D7C169C4
-	for <linux-crypto@archiver.kernel.org>; Tue, 29 Jan 2019 05:50:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E93EBC169C4
+	for <linux-crypto@archiver.kernel.org>; Tue, 29 Jan 2019 05:50:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6A99D20989
-	for <linux-crypto@archiver.kernel.org>; Tue, 29 Jan 2019 05:50:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AE03E20989
+	for <linux-crypto@archiver.kernel.org>; Tue, 29 Jan 2019 05:50:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="M2yTK49o"
+	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="EP5khDfQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727304AbfA2FuU (ORCPT
+        id S1725767AbfA2Fu3 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 29 Jan 2019 00:50:20 -0500
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:35983 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727202AbfA2FuU (ORCPT
+        Tue, 29 Jan 2019 00:50:29 -0500
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:44030 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726164AbfA2Fu2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 29 Jan 2019 00:50:20 -0500
-Received: by mail-pl1-f195.google.com with SMTP id g9so8882726plo.3
-        for <linux-crypto@vger.kernel.org>; Mon, 28 Jan 2019 21:50:20 -0800 (PST)
+        Tue, 29 Jan 2019 00:50:28 -0500
+Received: by mail-pf1-f194.google.com with SMTP id w73so9150021pfk.10
+        for <linux-crypto@vger.kernel.org>; Mon, 28 Jan 2019 21:50:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=4tsUCYoQCIITudwXX50zEbDS6TS2iz02PTI9NIhLDSg=;
-        b=M2yTK49o123n+gyCleT//uhWceNdbgf1/lcglQPUIKwSvTk2G2sC4WVNBtfig0q3s3
-         bJttwPzQCKii3dz0SYLBeAXTjNhfZcLC4aceMXniAxmlE9zHQpbo+29QEc6gHt+jo3MW
-         UIig8KmF3EVsUT6IU+JYb5EihUwmQxesv7afs=
+        bh=Ozv5ZHFw/Cf7Iji5P9OTMzwRZvaafRKOLE70Jrg8d/8=;
+        b=EP5khDfQ3gm0GAwlKnLbrXENlOjiOp59XtBfOszL4DteEMkqFRRCtd17qlx8kPocH9
+         Mz5038vPYn/JDf1jXZKXvEhyMFlry/R3TdvV1cI7SF0OkBMMcbRsWsQzn2S1Rgy/O4kH
+         XMFeGjNz27Denm4iRUYBCWuFzslMYZN+9Xg2w=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=4tsUCYoQCIITudwXX50zEbDS6TS2iz02PTI9NIhLDSg=;
-        b=pnUu4zeG0J33DK2AeUDaFekwHLmPA6qRki1j+resYL6PhYuisoBt4Tax0YYJbn+rnj
-         XBcpQqUOZE5WWOdF1Iaq13UjfWdzX9n+pI00p9HFi4YhoQu2PiNf1O0tso+jjaSi8BcZ
-         3orndUDfFAhRA3cjHiTdoHK4DV7XSrlU86LZP+E8Qwqxi8waSX2FLpE6t+mODQpdBrmC
-         N3bTjrEkC4O0tkZhYUHpEiBKtgiAc9FpaBXTYhNezpBRHqq5NPVIWUbkgq/uxuh9SQeU
-         4UKc0WCJzsiGpUc72gCMi1XrELp0Zg/mL0RXPwCcYb+SybO1Hr4RJo9nTorRI0WBNBjJ
-         q/eg==
-X-Gm-Message-State: AJcUukdt7U3FFuz03LRt03mODiw9lA4SNFrINboEcIZwQG0Gn/ZB35w5
-        sZmxt4QAzECFumOAcgEiHw+DLw==
-X-Google-Smtp-Source: ALg8bN6NppfwJXWi0wuczeIpQyewmgyUiXuJj0bo3GE2f5i5fz0Z+ZPL5dLk71HnwbhoI00B76bP+g==
-X-Received: by 2002:a17:902:bf03:: with SMTP id bi3mr24741865plb.83.1548741020115;
-        Mon, 28 Jan 2019 21:50:20 -0800 (PST)
+        bh=Ozv5ZHFw/Cf7Iji5P9OTMzwRZvaafRKOLE70Jrg8d/8=;
+        b=mQxs3wLFOyD/NpoGgSDw1Modp0VB/awouLUjNDPi8zs4Jlbm0HKoF/j1pXyYbJotpD
+         1VfFJTkq5WIvY4hsS6HspcKtGah1N2ZSlOsQdeunHLs+TP2oHbPhdhIvHEHGUwPT0sBN
+         PfIlnmMva1OzmKaLvHb7O8IpQefgM9q9go35LByh+iRwvaBs17NibraBn4BsDFWLPtvo
+         Y3m7uAmiQXUL+MWY6wNdNp2GJ9O1In1mb8f2CIcwyyDoZxeco89P1RBidKepAM79Fg9Z
+         bYOwrILkcgIuI7dMn44Yg0ROlo8XkSFsJs9MUr0tfmNtBoNvGVGxyhp/Jsw6dKUS3q85
+         OcsA==
+X-Gm-Message-State: AJcUukdBM++40MgW6qsErOPdMJoO0SSvuEOu5Xh+O2+EnsqZpZOUKsW0
+        ukFbSFVaktS8gUta3/3eaYVmtA==
+X-Google-Smtp-Source: ALg8bN6lOrBnlD+zp8inbb2oR6ulDuZTzJgNLIp4VKoNRbvc0qeeQVIvOm2Em4tbiaL3LnCSP03Wiw==
+X-Received: by 2002:a62:8d4f:: with SMTP id z76mr25539135pfd.2.1548741027690;
+        Mon, 28 Jan 2019 21:50:27 -0800 (PST)
 Received: from localhost.localdomain ([117.252.69.38])
-        by smtp.gmail.com with ESMTPSA id y12sm57379437pfk.70.2019.01.28.21.50.13
+        by smtp.gmail.com with ESMTPSA id y12sm57379437pfk.70.2019.01.28.21.50.20
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Mon, 28 Jan 2019 21:50:19 -0800 (PST)
+        Mon, 28 Jan 2019 21:50:27 -0800 (PST)
 From:   Sumit Garg <sumit.garg@linaro.org>
 To:     jens.wiklander@linaro.org, herbert@gondor.apana.org.au
 Cc:     linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
@@ -61,9 +61,9 @@ Cc:     linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
         daniel.thompson@linaro.org, ard.biesheuvel@linaro.org,
         bhsharma@redhat.com, tee-dev@lists.linaro.org,
         Sumit Garg <sumit.garg@linaro.org>
-Subject: [PATCH v6 2/4] tee: add supp_nowait flag in tee_context struct
-Date:   Tue, 29 Jan 2019 11:19:36 +0530
-Message-Id: <1548740978-28495-3-git-send-email-sumit.garg@linaro.org>
+Subject: [PATCH v6 3/4] tee: optee: add TEE bus device enumeration support
+Date:   Tue, 29 Jan 2019 11:19:37 +0530
+Message-Id: <1548740978-28495-4-git-send-email-sumit.garg@linaro.org>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1548740978-28495-1-git-send-email-sumit.garg@linaro.org>
 References: <1548740978-28495-1-git-send-email-sumit.garg@linaro.org>
@@ -72,99 +72,228 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This flag indicates that requests in this context should not wait for
-tee-supplicant daemon to be started if not present and just return
-with an error code. It is needed for requests which should be
-non-blocking in nature like ones arising from TEE based kernel drivers
-or any in kernel api that uses TEE internal client interface.
+OP-TEE provides a pseudo TA to enumerate TAs which can act as devices/
+services for TEE bus. So implement device enumeration using invoke
+function: PTA_CMD_GET_DEVICES provided by pseudo TA to fetch array of
+device UUIDs. Also register these enumerated devices with TEE bus as
+"optee-clntX" device.
 
 Signed-off-by: Sumit Garg <sumit.garg@linaro.org>
 Reviewed-by: Daniel Thompson <daniel.thompson@linaro.org>
 ---
- drivers/tee/optee/supp.c | 10 +++++++++-
- drivers/tee/tee_core.c   | 13 +++++++++++++
- include/linux/tee_drv.h  |  6 ++++++
- 3 files changed, 28 insertions(+), 1 deletion(-)
+ drivers/tee/optee/Makefile        |   1 +
+ drivers/tee/optee/core.c          |   4 +
+ drivers/tee/optee/device.c        | 155 ++++++++++++++++++++++++++++++++++++++
+ drivers/tee/optee/optee_private.h |   3 +
+ 4 files changed, 163 insertions(+)
+ create mode 100644 drivers/tee/optee/device.c
 
-diff --git a/drivers/tee/optee/supp.c b/drivers/tee/optee/supp.c
-index 43626e1..92f56b8 100644
---- a/drivers/tee/optee/supp.c
-+++ b/drivers/tee/optee/supp.c
-@@ -88,10 +88,18 @@ u32 optee_supp_thrd_req(struct tee_context *ctx, u32 func, size_t num_params,
- {
- 	struct optee *optee = tee_get_drvdata(ctx->teedev);
- 	struct optee_supp *supp = &optee->supp;
--	struct optee_supp_req *req = kzalloc(sizeof(*req), GFP_KERNEL);
-+	struct optee_supp_req *req;
- 	bool interruptable;
- 	u32 ret;
+diff --git a/drivers/tee/optee/Makefile b/drivers/tee/optee/Makefile
+index 48d262a..56263ae 100644
+--- a/drivers/tee/optee/Makefile
++++ b/drivers/tee/optee/Makefile
+@@ -5,3 +5,4 @@ optee-objs += call.o
+ optee-objs += rpc.o
+ optee-objs += supp.o
+ optee-objs += shm_pool.o
++optee-objs += device.o
+diff --git a/drivers/tee/optee/core.c b/drivers/tee/optee/core.c
+index e5efce3..ac59c77 100644
+--- a/drivers/tee/optee/core.c
++++ b/drivers/tee/optee/core.c
+@@ -634,6 +634,10 @@ static struct optee *optee_probe(struct device_node *np)
+ 	if (optee->sec_caps & OPTEE_SMC_SEC_CAP_DYNAMIC_SHM)
+ 		pr_info("dynamic shared memory is enabled\n");
  
-+	/*
-+	 * Return in case there is no supplicant available and
-+	 * non-blocking request.
-+	 */
-+	if (!supp->ctx && ctx->supp_nowait)
-+		return TEEC_ERROR_COMMUNICATION;
++	rc = optee_enumerate_devices();
++	if (rc)
++		goto err;
 +
-+	req = kzalloc(sizeof(*req), GFP_KERNEL);
- 	if (!req)
- 		return TEEC_ERROR_OUT_OF_MEMORY;
+ 	pr_info("initialized driver\n");
+ 	return optee;
+ err:
+diff --git a/drivers/tee/optee/device.c b/drivers/tee/optee/device.c
+new file mode 100644
+index 0000000..c24c37f
+--- /dev/null
++++ b/drivers/tee/optee/device.c
+@@ -0,0 +1,155 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (C) 2019 Linaro Ltd.
++ */
++
++#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
++
++#include <linux/kernel.h>
++#include <linux/slab.h>
++#include <linux/tee_drv.h>
++#include <linux/uuid.h>
++#include "optee_private.h"
++
++/*
++ * Get device UUIDs
++ *
++ * [out]     memref[0]        Array of device UUIDs
++ *
++ * Return codes:
++ * TEE_SUCCESS - Invoke command success
++ * TEE_ERROR_BAD_PARAMETERS - Incorrect input param
++ * TEE_ERROR_SHORT_BUFFER - Output buffer size less than required
++ */
++#define PTA_CMD_GET_DEVICES		0x0
++
++static int optee_ctx_match(struct tee_ioctl_version_data *ver, const void *data)
++{
++	if (ver->impl_id == TEE_IMPL_ID_OPTEE)
++		return 1;
++	else
++		return 0;
++}
++
++static int get_devices(struct tee_context *ctx, u32 session,
++		       struct tee_shm *device_shm, u32 *shm_size)
++{
++	u32 ret = 0;
++	struct tee_ioctl_invoke_arg inv_arg = {0};
++	struct tee_param param[4] = {0};
++
++	/* Invoke PTA_CMD_GET_DEVICES function */
++	inv_arg.func = PTA_CMD_GET_DEVICES;
++	inv_arg.session = session;
++	inv_arg.num_params = 4;
++
++	/* Fill invoke cmd params */
++	param[0].attr = TEE_IOCTL_PARAM_ATTR_TYPE_MEMREF_OUTPUT;
++	param[0].u.memref.shm = device_shm;
++	param[0].u.memref.size = *shm_size;
++	param[0].u.memref.shm_offs = 0;
++
++	ret = tee_client_invoke_func(ctx, &inv_arg, param);
++	if ((ret < 0) || ((inv_arg.ret != TEEC_SUCCESS) &&
++			  (inv_arg.ret != TEEC_ERROR_SHORT_BUFFER))) {
++		pr_err("PTA_CMD_GET_DEVICES invoke function err: %x\n",
++		       inv_arg.ret);
++		return -EINVAL;
++	}
++
++	*shm_size = param[0].u.memref.size;
++
++	return 0;
++}
++
++static int optee_register_device(const uuid_t *device_uuid, u32 device_id)
++{
++	struct tee_client_device *optee_device = NULL;
++	int rc;
++
++	optee_device = kzalloc(sizeof(*optee_device), GFP_KERNEL);
++	if (!optee_device)
++		return -ENOMEM;
++
++	optee_device->dev.bus = &tee_bus_type;
++	dev_set_name(&optee_device->dev, "optee-clnt%u", device_id);
++	uuid_copy(&optee_device->id.uuid, device_uuid);
++
++	rc = device_register(&optee_device->dev);
++	if (rc) {
++		pr_err("device registration failed, err: %d\n", rc);
++		kfree(optee_device);
++	}
++
++	return rc;
++}
++
++int optee_enumerate_devices(void)
++{
++	const uuid_t pta_uuid =
++		UUID_INIT(0x7011a688, 0xddde, 0x4053,
++			  0xa5, 0xa9, 0x7b, 0x3c, 0x4d, 0xdf, 0x13, 0xb8);
++	struct tee_ioctl_open_session_arg sess_arg = {0};
++	struct tee_shm *device_shm = NULL;
++	const uuid_t *device_uuid = NULL;
++	struct tee_context *ctx = NULL;
++	u32 shm_size = 0, idx, num_devices = 0;
++	int rc;
++
++	/* Open context with OP-TEE driver */
++	ctx = tee_client_open_context(NULL, optee_ctx_match, NULL, NULL);
++	if (IS_ERR(ctx))
++		return -ENODEV;
++
++	/* Open session with device enumeration pseudo TA */
++	memcpy(sess_arg.uuid, pta_uuid.b, TEE_IOCTL_UUID_LEN);
++	sess_arg.clnt_login = TEE_IOCTL_LOGIN_PUBLIC;
++	sess_arg.num_params = 0;
++
++	rc = tee_client_open_session(ctx, &sess_arg, NULL);
++	if ((rc < 0) || (sess_arg.ret != TEEC_SUCCESS)) {
++		/* Device enumeration pseudo TA not found */
++		rc = 0;
++		goto out_ctx;
++	}
++
++	rc = get_devices(ctx, sess_arg.session, NULL, &shm_size);
++	if (rc < 0)
++		goto out_sess;
++
++	device_shm = tee_shm_alloc(ctx, shm_size,
++				   TEE_SHM_MAPPED | TEE_SHM_DMA_BUF);
++	if (IS_ERR(device_shm)) {
++		pr_err("tee_shm_alloc failed\n");
++		rc = PTR_ERR(device_shm);
++		goto out_sess;
++	}
++
++	rc = get_devices(ctx, sess_arg.session, device_shm, &shm_size);
++	if (rc < 0)
++		goto out_shm;
++
++	device_uuid = tee_shm_get_va(device_shm, 0);
++	if (IS_ERR(device_uuid)) {
++		pr_err("tee_shm_get_va failed\n");
++		rc = PTR_ERR(device_uuid);
++		goto out_shm;
++	}
++
++	num_devices = shm_size / sizeof(uuid_t);
++
++	for (idx = 0; idx < num_devices; idx++) {
++		rc = optee_register_device(&device_uuid[idx], idx);
++		if (rc)
++			goto out_shm;
++	}
++
++out_shm:
++	tee_shm_free(device_shm);
++out_sess:
++	tee_client_close_session(ctx, sess_arg.session);
++out_ctx:
++	tee_client_close_context(ctx);
++
++	return rc;
++}
+diff --git a/drivers/tee/optee/optee_private.h b/drivers/tee/optee/optee_private.h
+index 35e7938..a5e84af 100644
+--- a/drivers/tee/optee/optee_private.h
++++ b/drivers/tee/optee/optee_private.h
+@@ -28,6 +28,7 @@
+ #define TEEC_ERROR_BAD_PARAMETERS	0xFFFF0006
+ #define TEEC_ERROR_COMMUNICATION	0xFFFF000E
+ #define TEEC_ERROR_OUT_OF_MEMORY	0xFFFF000C
++#define TEEC_ERROR_SHORT_BUFFER		0xFFFF0010
  
-diff --git a/drivers/tee/tee_core.c b/drivers/tee/tee_core.c
-index 1e14897..25f3b9c 100644
---- a/drivers/tee/tee_core.c
-+++ b/drivers/tee/tee_core.c
-@@ -105,6 +105,11 @@ static int tee_open(struct inode *inode, struct file *filp)
- 	if (IS_ERR(ctx))
- 		return PTR_ERR(ctx);
+ #define TEEC_ORIGIN_COMMS		0x00000002
  
-+	/*
-+	 * Default user-space behaviour is to wait for tee-supplicant
-+	 * if not present for any requests in this context.
-+	 */
-+	ctx->supp_nowait = false;
- 	filp->private_data = ctx;
- 	return 0;
- }
-@@ -981,6 +986,14 @@ tee_client_open_context(struct tee_context *start,
- 	} while (IS_ERR(ctx) && PTR_ERR(ctx) != -ENOMEM);
+@@ -181,6 +182,8 @@ void optee_free_pages_list(void *array, size_t num_entries);
+ void optee_fill_pages_list(u64 *dst, struct page **pages, int num_pages,
+ 			   size_t page_offset);
  
- 	put_device(put_dev);
-+	/*
-+	 * Default behaviour for in kernel client is to not wait for
-+	 * tee-supplicant if not present for any requests in this context.
-+	 * Also this flag could be configured again before call to
-+	 * tee_client_open_session() if any in kernel client requires
-+	 * different behaviour.
-+	 */
-+	ctx->supp_nowait = true;
- 	return ctx;
- }
- EXPORT_SYMBOL_GPL(tee_client_open_context);
-diff --git a/include/linux/tee_drv.h b/include/linux/tee_drv.h
-index ce957ce..56d7f1b 100644
---- a/include/linux/tee_drv.h
-+++ b/include/linux/tee_drv.h
-@@ -50,6 +50,11 @@ struct tee_shm_pool;
-  * @releasing:  flag that indicates if context is being released right now.
-  *		It is needed to break circular dependency on context during
-  *              shared memory release.
-+ * @supp_nowait: flag that indicates that requests in this context should not
-+ *              wait for tee-supplicant daemon to be started if not present
-+ *              and just return with an error code. It is needed for requests
-+ *              that arises from TEE based kernel drivers that should be
-+ *              non-blocking in nature.
++int optee_enumerate_devices(void);
++
+ /*
+  * Small helpers
   */
- struct tee_context {
- 	struct tee_device *teedev;
-@@ -57,6 +62,7 @@ struct tee_context {
- 	void *data;
- 	struct kref refcount;
- 	bool releasing;
-+	bool supp_nowait;
- };
- 
- struct tee_param_memref {
 -- 
 2.7.4
 
