@@ -2,1014 +2,461 @@ Return-Path: <SRS0=zJfq=QF=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECDBEC169C4
-	for <linux-crypto@archiver.kernel.org>; Tue, 29 Jan 2019 08:01:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EEA1C282D1
+	for <linux-crypto@archiver.kernel.org>; Tue, 29 Jan 2019 09:34:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B0CC921841
-	for <linux-crypto@archiver.kernel.org>; Tue, 29 Jan 2019 08:01:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1548748911;
-	bh=YGgas+iq/hrR0v+9N0H8jt9SmcrXzGDRqj94y5SExmQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=udwa5yH4oq4umvH4Gc0gWRenyuFhpccXDRicwOA7CYzCaVo1jk4gLlj179WgMQLI6
-	 3YmjsHRMCtUf+PoIbUr1kXcrguxGEMxld9y7aOSZOVs/9CH40vhZJEA1zITux9dsnj
-	 HzOxQQmWw/PSWNxoZCRqYZ/n0T6RGwx7G4Vpi5k0=
+	by mail.kernel.org (Postfix) with ESMTP id 1884D214DA
+	for <linux-crypto@archiver.kernel.org>; Tue, 29 Jan 2019 09:34:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="be75JzQ3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726341AbfA2IBu (ORCPT
+        id S1726948AbfA2Jew (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 29 Jan 2019 03:01:50 -0500
-Received: from mail.kernel.org ([198.145.29.99]:33174 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725865AbfA2IBu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 29 Jan 2019 03:01:50 -0500
-Received: from sol.localdomain (c-107-3-167-184.hsd1.ca.comcast.net [107.3.167.184])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 1010A2177E;
-        Tue, 29 Jan 2019 08:01:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1548748908;
-        bh=YGgas+iq/hrR0v+9N0H8jt9SmcrXzGDRqj94y5SExmQ=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=AlKe7V05q6FatS5wifgXqGvWw8dIO+ybSxSV7e/r9RCGQ8FT/NFCF4dYMJJx+5wqq
-         96gFj4kk76xmES40NkTz6xGzcNQ9LeItAdubNC7dJE5NFNZENrhdoKieghlujcPdEV
-         aI1seMRE0/cTT5uEH1uDBYUvT130Y7x35BDYLGDw=
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Tim Chen <tim.c.chen@linux.intel.com>,
-        linux-arm-kernel@lists.infradead.org
-Subject: [PATCH v2 1/3] crypto: x86/crct10dif-pcl - cleanup and optimizations
-Date:   Tue, 29 Jan 2019 00:00:27 -0800
-Message-Id: <20190129080029.22261-2-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190129080029.22261-1-ebiggers@kernel.org>
-References: <20190129080029.22261-1-ebiggers@kernel.org>
+        Tue, 29 Jan 2019 04:34:52 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:40751 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727330AbfA2Jeq (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 29 Jan 2019 04:34:46 -0500
+Received: by mail-wr1-f65.google.com with SMTP id p4so21208536wrt.7
+        for <linux-crypto@vger.kernel.org>; Tue, 29 Jan 2019 01:34:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=1AFF7zfX2emsgFskKDZcDByeBSeYsdpHdS8Qjt8Fvk0=;
+        b=be75JzQ3jNtOmjZ9pY+G6UDaF7nMhsLqBiCx9bEFu67W6j7AG9d3/DmYlWgCo8aE+Z
+         nvXGrGyOCYZspvrLcLX8AKnuV198r3JRJv8Pt3z34OISRcuLUCQz0zSuFM+9Cp/TJagu
+         j0muTfRPiIS3sZuP4GA9JI6slzsTyoHYqBiqQ=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=1AFF7zfX2emsgFskKDZcDByeBSeYsdpHdS8Qjt8Fvk0=;
+        b=WT8hydmgKkSjV3oOq+XhPBdNgtkz46RFpc4tqt3Ltd7XyvUUOEmGKDGmKLSs3WwiZw
+         WBsdysbTKbrlu8XgBQwVMIk4+2HaTwL228FhXy+FJyGDB8Y3jGbJgbMEX9EQhjNgxUt8
+         G77D+tvvrUru1mzeehAoYxbk6EH884o9XnTsW0DsKoc57cFhsKGzaselrrfGa0MBhQjR
+         Y+Xzia6g3lbSdc+fVgGfqv8Qkwuyw8uZ0GqglRLNYGMwslkBUcy35zNezqBPVc6knj96
+         4EuFCxC/FjD/4g/Otz//87XOmXiFqnG8Fcth4UTD7ZODAQ4jxToDDxkEr7+kq5yE7pGa
+         QrEg==
+X-Gm-Message-State: AJcUukdZbGtZULPHon7PClbq1cflTrbtBrj0VZr9BU52YKdwaOP2rvhJ
+        DLYHPlsag8fud//Yv6rkUqZlbQ==
+X-Google-Smtp-Source: ALg8bN7i9H4V36F2QpJD+R1s87YCkrz6LYWM9Om19UoH3tN3s4IGh7jY+42fFDeeASYwZGfbuicQGA==
+X-Received: by 2002:a5d:42ce:: with SMTP id t14mr25430839wrr.51.1548754482836;
+        Tue, 29 Jan 2019 01:34:42 -0800 (PST)
+Received: from holly.lan (cpc141214-aztw34-2-0-cust773.18-1.cable.virginm.net. [86.9.19.6])
+        by smtp.gmail.com with ESMTPSA id f187sm1568911wma.4.2019.01.29.01.34.40
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Tue, 29 Jan 2019 01:34:41 -0800 (PST)
+Date:   Tue, 29 Jan 2019 09:34:39 +0000
+From:   Daniel Thompson <daniel.thompson@linaro.org>
+To:     Sumit Garg <sumit.garg@linaro.org>
+Cc:     jens.wiklander@linaro.org, herbert@gondor.apana.org.au,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yamada.masahiro@socionext.com,
+        michal.lkml@markovi.net, mpm@selenic.com, robh+dt@kernel.org,
+        mark.rutland@arm.com, arnd@arndb.de, gregkh@linuxfoundation.org,
+        ard.biesheuvel@linaro.org, bhsharma@redhat.com,
+        tee-dev@lists.linaro.org
+Subject: Re: [PATCH v6 4/4] hwrng: add OP-TEE based rng driver
+Message-ID: <20190129093439.oftwq4labucdql4b@holly.lan>
+References: <1548740978-28495-1-git-send-email-sumit.garg@linaro.org>
+ <1548740978-28495-5-git-send-email-sumit.garg@linaro.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1548740978-28495-5-git-send-email-sumit.garg@linaro.org>
+User-Agent: NeoMutt/20180716
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+On Tue, Jan 29, 2019 at 11:19:38AM +0530, Sumit Garg wrote:
+> On ARM SoC's with TrustZone enabled, peripherals like entropy sources
+> might not be accessible to normal world (linux in this case) and rather
+> accessible to secure world (OP-TEE in this case) only. So this driver
+> aims to provides a generic interface to OP-TEE based random number
+> generator service.
+> 
+> This driver registers on TEE bus to interact with OP-TEE based rng
+> device/service.
+> 
+> Signed-off-by: Sumit Garg <sumit.garg@linaro.org>
 
-The x86, arm, and arm64 asm implementations of crct10dif are very
-difficult to understand partly because many of the comments, labels, and
-macros are named incorrectly: the lengths mentioned are usually off by a
-factor of two from the actual code.  Many other things are unnecessarily
-convoluted as well, e.g. there are many more fold constants than
-actually needed and some aren't fully reduced.
+Reviewed-by: Daniel Thompson <daniel.thompson@linaro.org>
 
-This series therefore cleans up all these implementations to be much
-more maintainable.  I also made some small optimizations where I saw
-opportunities, resulting in slightly better performance.
 
-This patch cleans up the x86 version.  Note that I opted to retain the
-support for buffers < 16 bytes, but I simplified it to be much shorter
-and have fewer different cases.  Performance on 2 and 3-byte inputs
-dropped slightly but the rest are actually faster now.
+Daniel.
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- arch/x86/crypto/crct10dif-pcl-asm_64.S  | 844 +++++++++---------------
- arch/x86/crypto/crct10dif-pclmul_glue.c |   3 +-
- 2 files changed, 301 insertions(+), 546 deletions(-)
-
-diff --git a/arch/x86/crypto/crct10dif-pcl-asm_64.S b/arch/x86/crypto/crct10dif-pcl-asm_64.S
-index de04d3e98d8d3..e57afa35ac0f9 100644
---- a/arch/x86/crypto/crct10dif-pcl-asm_64.S
-+++ b/arch/x86/crypto/crct10dif-pcl-asm_64.S
-@@ -43,609 +43,365 @@
- # LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- # NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
--########################################################################
--#       Function API:
--#       UINT16 crc_t10dif_pcl(
--#               UINT16 init_crc, //initial CRC value, 16 bits
--#               const unsigned char *buf, //buffer pointer to calculate CRC on
--#               UINT64 len //buffer length in bytes (64-bit data)
--#       );
- #
- #       Reference paper titled "Fast CRC Computation for Generic
- #	Polynomials Using PCLMULQDQ Instruction"
- #       URL: http://www.intel.com/content/dam/www/public/us/en/documents
- #  /white-papers/fast-crc-computation-generic-polynomials-pclmulqdq-paper.pdf
- #
--#
- 
- #include <linux/linkage.h>
- 
- .text
- 
--#define        arg1 %rdi
--#define        arg2 %rsi
--#define        arg3 %rdx
--
--#define        arg1_low32 %edi
-+#define		init_crc	%di
-+#define		init_crcl	%edi
-+#define		buf		%rsi
-+#define		len		%rdx
-+
-+#define		FOLD_CONSTS	%xmm10
-+#define		BSWAP_MASK	%xmm11
-+
-+# Fold reg1, reg2 into the next 32 data bytes, storing the result back into
-+# reg1, reg2.
-+.macro	fold_32_bytes	offset, reg1, reg2
-+	movdqu	\offset(buf), %xmm9
-+	movdqu	\offset+16(buf), %xmm12
-+	pshufb	BSWAP_MASK, %xmm9
-+	pshufb	BSWAP_MASK, %xmm12
-+	movdqa	\reg1, %xmm8
-+	movdqa	\reg2, %xmm13
-+	pclmulqdq	$0x00, FOLD_CONSTS, \reg1
-+	pclmulqdq	$0x11, FOLD_CONSTS, %xmm8
-+	pclmulqdq	$0x00, FOLD_CONSTS, \reg2
-+	pclmulqdq	$0x11, FOLD_CONSTS, %xmm13
-+	pxor	%xmm9 , \reg1
-+	xorps	%xmm8 , \reg1
-+	pxor	%xmm12, \reg2
-+	xorps	%xmm13, \reg2
-+.endm
-+
-+# Fold src_reg into dst_reg.
-+.macro	fold_16_bytes	src_reg, dst_reg
-+	movdqa	\src_reg, %xmm8
-+	pclmulqdq	$0x11, FOLD_CONSTS, \src_reg
-+	pclmulqdq	$0x00, FOLD_CONSTS, %xmm8
-+	pxor	%xmm8, \dst_reg
-+	xorps	\src_reg, \dst_reg
-+.endm
- 
--ENTRY(crc_t10dif_pcl)
-+#
-+# u16 crc_t10dif_pcl(u16 init_crc, const *u8 buf, size_t len);
-+#
- .align 16
--
--	# adjust the 16-bit initial_crc value, scale it to 32 bits
--	shl	$16, arg1_low32
--
--	# Allocate Stack Space
--	mov     %rsp, %rcx
--	sub	$16*2, %rsp
--	# align stack to 16 byte boundary
--	and     $~(0x10 - 1), %rsp
--
--	# check if smaller than 256
--	cmp	$256, arg3
--
--	# for sizes less than 128, we can't fold 64B at a time...
--	jl	_less_than_128
--
--
--	# load the initial crc value
--	movd	arg1_low32, %xmm10	# initial crc
--
--	# crc value does not need to be byte-reflected, but it needs
--	# to be moved to the high part of the register.
--	# because data will be byte-reflected and will align with
--	# initial crc at correct place.
--	pslldq	$12, %xmm10
--
--	movdqa  SHUF_MASK(%rip), %xmm11
--	# receive the initial 64B data, xor the initial crc value
--	movdqu	16*0(arg2), %xmm0
--	movdqu	16*1(arg2), %xmm1
--	movdqu	16*2(arg2), %xmm2
--	movdqu	16*3(arg2), %xmm3
--	movdqu	16*4(arg2), %xmm4
--	movdqu	16*5(arg2), %xmm5
--	movdqu	16*6(arg2), %xmm6
--	movdqu	16*7(arg2), %xmm7
--
--	pshufb	%xmm11, %xmm0
--	# XOR the initial_crc value
--	pxor	%xmm10, %xmm0
--	pshufb	%xmm11, %xmm1
--	pshufb	%xmm11, %xmm2
--	pshufb	%xmm11, %xmm3
--	pshufb	%xmm11, %xmm4
--	pshufb	%xmm11, %xmm5
--	pshufb	%xmm11, %xmm6
--	pshufb	%xmm11, %xmm7
--
--	movdqa	rk3(%rip), %xmm10	#xmm10 has rk3 and rk4
--					#imm value of pclmulqdq instruction
--					#will determine which constant to use
--
--	#################################################################
--	# we subtract 256 instead of 128 to save one instruction from the loop
--	sub	$256, arg3
--
--	# at this section of the code, there is 64*x+y (0<=y<64) bytes of
--	# buffer. The _fold_64_B_loop will fold 64B at a time
--	# until we have 64+y Bytes of buffer
--
--
--	# fold 64B at a time. This section of the code folds 4 xmm
--	# registers in parallel
--_fold_64_B_loop:
--
--	# update the buffer pointer
--	add	$128, arg2		#    buf += 64#
--
--	movdqu	16*0(arg2), %xmm9
--	movdqu	16*1(arg2), %xmm12
--	pshufb	%xmm11, %xmm9
--	pshufb	%xmm11, %xmm12
--	movdqa	%xmm0, %xmm8
--	movdqa	%xmm1, %xmm13
--	pclmulqdq	$0x0 , %xmm10, %xmm0
--	pclmulqdq	$0x11, %xmm10, %xmm8
--	pclmulqdq	$0x0 , %xmm10, %xmm1
--	pclmulqdq	$0x11, %xmm10, %xmm13
--	pxor	%xmm9 , %xmm0
--	xorps	%xmm8 , %xmm0
--	pxor	%xmm12, %xmm1
--	xorps	%xmm13, %xmm1
--
--	movdqu	16*2(arg2), %xmm9
--	movdqu	16*3(arg2), %xmm12
--	pshufb	%xmm11, %xmm9
--	pshufb	%xmm11, %xmm12
--	movdqa	%xmm2, %xmm8
--	movdqa	%xmm3, %xmm13
--	pclmulqdq	$0x0, %xmm10, %xmm2
--	pclmulqdq	$0x11, %xmm10, %xmm8
--	pclmulqdq	$0x0, %xmm10, %xmm3
--	pclmulqdq	$0x11, %xmm10, %xmm13
--	pxor	%xmm9 , %xmm2
--	xorps	%xmm8 , %xmm2
--	pxor	%xmm12, %xmm3
--	xorps	%xmm13, %xmm3
--
--	movdqu	16*4(arg2), %xmm9
--	movdqu	16*5(arg2), %xmm12
--	pshufb	%xmm11, %xmm9
--	pshufb	%xmm11, %xmm12
--	movdqa	%xmm4, %xmm8
--	movdqa	%xmm5, %xmm13
--	pclmulqdq	$0x0,  %xmm10, %xmm4
--	pclmulqdq	$0x11, %xmm10, %xmm8
--	pclmulqdq	$0x0,  %xmm10, %xmm5
--	pclmulqdq	$0x11, %xmm10, %xmm13
--	pxor	%xmm9 ,  %xmm4
--	xorps	%xmm8 ,  %xmm4
--	pxor	%xmm12,  %xmm5
--	xorps	%xmm13,  %xmm5
--
--	movdqu	16*6(arg2), %xmm9
--	movdqu	16*7(arg2), %xmm12
--	pshufb	%xmm11, %xmm9
--	pshufb	%xmm11, %xmm12
--	movdqa	%xmm6 , %xmm8
--	movdqa	%xmm7 , %xmm13
--	pclmulqdq	$0x0 , %xmm10, %xmm6
--	pclmulqdq	$0x11, %xmm10, %xmm8
--	pclmulqdq	$0x0 , %xmm10, %xmm7
--	pclmulqdq	$0x11, %xmm10, %xmm13
--	pxor	%xmm9 , %xmm6
--	xorps	%xmm8 , %xmm6
--	pxor	%xmm12, %xmm7
--	xorps	%xmm13, %xmm7
--
--	sub	$128, arg3
--
--	# check if there is another 64B in the buffer to be able to fold
--	jge	_fold_64_B_loop
--	##################################################################
--
--
--	add	$128, arg2
--	# at this point, the buffer pointer is pointing at the last y Bytes
--	# of the buffer the 64B of folded data is in 4 of the xmm
--	# registers: xmm0, xmm1, xmm2, xmm3
--
--
--	# fold the 8 xmm registers to 1 xmm register with different constants
--
--	movdqa	rk9(%rip), %xmm10
--	movdqa	%xmm0, %xmm8
--	pclmulqdq	$0x11, %xmm10, %xmm0
--	pclmulqdq	$0x0 , %xmm10, %xmm8
--	pxor	%xmm8, %xmm7
--	xorps	%xmm0, %xmm7
--
--	movdqa	rk11(%rip), %xmm10
--	movdqa	%xmm1, %xmm8
--	pclmulqdq	 $0x11, %xmm10, %xmm1
--	pclmulqdq	 $0x0 , %xmm10, %xmm8
--	pxor	%xmm8, %xmm7
--	xorps	%xmm1, %xmm7
--
--	movdqa	rk13(%rip), %xmm10
--	movdqa	%xmm2, %xmm8
--	pclmulqdq	 $0x11, %xmm10, %xmm2
--	pclmulqdq	 $0x0 , %xmm10, %xmm8
--	pxor	%xmm8, %xmm7
--	pxor	%xmm2, %xmm7
--
--	movdqa	rk15(%rip), %xmm10
--	movdqa	%xmm3, %xmm8
--	pclmulqdq	$0x11, %xmm10, %xmm3
--	pclmulqdq	$0x0 , %xmm10, %xmm8
--	pxor	%xmm8, %xmm7
--	xorps	%xmm3, %xmm7
--
--	movdqa	rk17(%rip), %xmm10
--	movdqa	%xmm4, %xmm8
--	pclmulqdq	$0x11, %xmm10, %xmm4
--	pclmulqdq	$0x0 , %xmm10, %xmm8
--	pxor	%xmm8, %xmm7
--	pxor	%xmm4, %xmm7
--
--	movdqa	rk19(%rip), %xmm10
--	movdqa	%xmm5, %xmm8
--	pclmulqdq	$0x11, %xmm10, %xmm5
--	pclmulqdq	$0x0 , %xmm10, %xmm8
--	pxor	%xmm8, %xmm7
--	xorps	%xmm5, %xmm7
--
--	movdqa	rk1(%rip), %xmm10	#xmm10 has rk1 and rk2
--					#imm value of pclmulqdq instruction
--					#will determine which constant to use
--	movdqa	%xmm6, %xmm8
--	pclmulqdq	$0x11, %xmm10, %xmm6
--	pclmulqdq	$0x0 , %xmm10, %xmm8
--	pxor	%xmm8, %xmm7
--	pxor	%xmm6, %xmm7
--
--
--	# instead of 64, we add 48 to the loop counter to save 1 instruction
--	# from the loop instead of a cmp instruction, we use the negative
--	# flag with the jl instruction
--	add	$128-16, arg3
--	jl	_final_reduction_for_128
--
--	# now we have 16+y bytes left to reduce. 16 Bytes is in register xmm7
--	# and the rest is in memory. We can fold 16 bytes at a time if y>=16
--	# continue folding 16B at a time
--
--_16B_reduction_loop:
-+ENTRY(crc_t10dif_pcl)
-+	# Allocate a 16-byte aligned 16-byte stack buffer.
-+	mov	%rsp, %rcx
-+	sub	$16, %rsp
-+	and	$~15, %rsp
-+
-+	movdqa	.Lbswap_mask(%rip), BSWAP_MASK
-+
-+	# For sizes less than 256 bytes, we can't fold 128 bytes at a time.
-+	cmp	$256, len
-+	jl	.Lless_than_256_bytes
-+
-+	# Load the first 128 data bytes.  Byte swapping is necessary to make the
-+	# bit order match the polynomial coefficient order.
-+	movdqu	16*0(buf), %xmm0
-+	movdqu	16*1(buf), %xmm1
-+	movdqu	16*2(buf), %xmm2
-+	movdqu	16*3(buf), %xmm3
-+	movdqu	16*4(buf), %xmm4
-+	movdqu	16*5(buf), %xmm5
-+	movdqu	16*6(buf), %xmm6
-+	movdqu	16*7(buf), %xmm7
-+	add	$128, buf
-+	pshufb	BSWAP_MASK, %xmm0
-+	pshufb	BSWAP_MASK, %xmm1
-+	pshufb	BSWAP_MASK, %xmm2
-+	pshufb	BSWAP_MASK, %xmm3
-+	pshufb	BSWAP_MASK, %xmm4
-+	pshufb	BSWAP_MASK, %xmm5
-+	pshufb	BSWAP_MASK, %xmm6
-+	pshufb	BSWAP_MASK, %xmm7
-+
-+	# XOR the first 16 data *bits* with the initial CRC value.
-+	pxor	%xmm8, %xmm8
-+	pinsrw	$7, init_crcl, %xmm8
-+	pxor	%xmm8, %xmm0
-+
-+	movdqa	.Lfold_across_128_bytes_consts(%rip), FOLD_CONSTS
-+
-+	# Subtract 128 for the 128 data bytes just consumed.  Subtract another
-+	# 128 to simplify the termination condition of the following loop.
-+	sub	$256, len
-+
-+	# While >= 128 data bytes remain (not counting xmm0-7), fold the 128
-+	# bytes xmm0-7 into them, storing the result back into xmm0-7.
-+.Lfold_128_bytes_loop:
-+	fold_32_bytes	0, %xmm0, %xmm1
-+	fold_32_bytes	32, %xmm2, %xmm3
-+	fold_32_bytes	64, %xmm4, %xmm5
-+	fold_32_bytes	96, %xmm6, %xmm7
-+	add	$128, buf
-+	sub	$128, len
-+	jge	.Lfold_128_bytes_loop
-+
-+	# Now fold the 112 bytes in xmm0-xmm6 into the 16 bytes in xmm7.
-+
-+	# Fold across 64 bytes.
-+	movdqa	.Lfold_across_64_bytes_consts(%rip), FOLD_CONSTS
-+	fold_16_bytes	%xmm0, %xmm4
-+	fold_16_bytes	%xmm1, %xmm5
-+	fold_16_bytes	%xmm2, %xmm6
-+	fold_16_bytes	%xmm3, %xmm7
-+	# Fold across 32 bytes.
-+	movdqa	.Lfold_across_32_bytes_consts(%rip), FOLD_CONSTS
-+	fold_16_bytes	%xmm4, %xmm6
-+	fold_16_bytes	%xmm5, %xmm7
-+	# Fold across 16 bytes.
-+	movdqa	.Lfold_across_16_bytes_consts(%rip), FOLD_CONSTS
-+	fold_16_bytes	%xmm6, %xmm7
-+
-+	# Add 128 to get the correct number of data bytes remaining in 0...127
-+	# (not counting xmm7), following the previous extra subtraction by 128.
-+	# Then subtract 16 to simplify the termination condition of the
-+	# following loop.
-+	add	$128-16, len
-+
-+	# While >= 16 data bytes remain (not counting xmm7), fold the 16 bytes
-+	# xmm7 into them, storing the result back into xmm7.
-+	jl	.Lfold_16_bytes_loop_done
-+.Lfold_16_bytes_loop:
- 	movdqa	%xmm7, %xmm8
--	pclmulqdq	$0x11, %xmm10, %xmm7
--	pclmulqdq	$0x0 , %xmm10, %xmm8
-+	pclmulqdq	$0x11, FOLD_CONSTS, %xmm7
-+	pclmulqdq	$0x00, FOLD_CONSTS, %xmm8
- 	pxor	%xmm8, %xmm7
--	movdqu	(arg2), %xmm0
--	pshufb	%xmm11, %xmm0
-+	movdqu	(buf), %xmm0
-+	pshufb	BSWAP_MASK, %xmm0
- 	pxor	%xmm0 , %xmm7
--	add	$16, arg2
--	sub	$16, arg3
--	# instead of a cmp instruction, we utilize the flags with the
--	# jge instruction equivalent of: cmp arg3, 16-16
--	# check if there is any more 16B in the buffer to be able to fold
--	jge	_16B_reduction_loop
--
--	#now we have 16+z bytes left to reduce, where 0<= z < 16.
--	#first, we reduce the data in the xmm7 register
--
--
--_final_reduction_for_128:
--	# check if any more data to fold. If not, compute the CRC of
--	# the final 128 bits
--	add	$16, arg3
--	je	_128_done
--
--	# here we are getting data that is less than 16 bytes.
--	# since we know that there was data before the pointer, we can
--	# offset the input pointer before the actual point, to receive
--	# exactly 16 bytes. after that the registers need to be adjusted.
--_get_last_two_xmms:
-+	add	$16, buf
-+	sub	$16, len
-+	jge	.Lfold_16_bytes_loop
-+
-+.Lfold_16_bytes_loop_done:
-+	# Add 16 to get the correct number of data bytes remaining in 0...15
-+	# (not counting xmm7), following the previous extra subtraction by 16.
-+	add	$16, len
-+	je	.Lreduce_final_16_bytes
-+
-+.Lhandle_partial_segment:
-+	# Reduce the last '16 + len' bytes where 1 <= len <= 15 and the first 16
-+	# bytes are in xmm7 and the rest are the remaining data in 'buf'.  To do
-+	# this without needing a fold constant for each possible 'len', redivide
-+	# the bytes into a first chunk of 'len' bytes and a second chunk of 16
-+	# bytes, then fold the first chunk into the second.
-+
- 	movdqa	%xmm7, %xmm2
- 
--	movdqu	-16(arg2, arg3), %xmm1
--	pshufb	%xmm11, %xmm1
-+	# xmm1 = last 16 original data bytes
-+	movdqu	-16(buf, len), %xmm1
-+	pshufb	BSWAP_MASK, %xmm1
- 
--	# get rid of the extra data that was loaded before
--	# load the shift constant
--	lea	pshufb_shf_table+16(%rip), %rax
--	sub	arg3, %rax
-+	# xmm2 = high order part of second chunk: xmm7 left-shifted by 'len' bytes.
-+	lea	.Lbyteshift_table+16(%rip), %rax
-+	sub	len, %rax
- 	movdqu	(%rax), %xmm0
--
--	# shift xmm2 to the left by arg3 bytes
- 	pshufb	%xmm0, %xmm2
- 
--	# shift xmm7 to the right by 16-arg3 bytes
--	pxor	mask1(%rip), %xmm0
-+	# xmm7 = first chunk: xmm7 right-shifted by '16-len' bytes.
-+	pxor	.Lmask1(%rip), %xmm0
- 	pshufb	%xmm0, %xmm7
-+
-+	# xmm1 = second chunk: 'len' bytes from xmm1 (low-order bytes),
-+	# then '16-len' bytes from xmm2 (high-order bytes).
- 	pblendvb	%xmm2, %xmm1	#xmm0 is implicit
- 
--	# fold 16 Bytes
--	movdqa	%xmm1, %xmm2
-+	# Fold the first chunk into the second chunk, storing the result in xmm7.
- 	movdqa	%xmm7, %xmm8
--	pclmulqdq	$0x11, %xmm10, %xmm7
--	pclmulqdq	$0x0 , %xmm10, %xmm8
-+	pclmulqdq	$0x11, FOLD_CONSTS, %xmm7
-+	pclmulqdq	$0x00, FOLD_CONSTS, %xmm8
- 	pxor	%xmm8, %xmm7
--	pxor	%xmm2, %xmm7
-+	pxor	%xmm1, %xmm7
- 
--_128_done:
--	# compute crc of a 128-bit value
--	movdqa	rk5(%rip), %xmm10	# rk5 and rk6 in xmm10
--	movdqa	%xmm7, %xmm0
-+.Lreduce_final_16_bytes:
-+	# Reduce the 128-bit value M(x), stored in xmm7, to the final 16-bit CRC
- 
--	#64b fold
--	pclmulqdq	$0x1, %xmm10, %xmm7
--	pslldq	$8   ,  %xmm0
--	pxor	%xmm0,  %xmm7
-+	# Load 'x^48 * (x^48 mod G(x))' and 'x^48 * (x^80 mod G(x))'.
-+	movdqa	.Lfinal_fold_consts(%rip), FOLD_CONSTS
- 
--	#32b fold
-+	# Fold the high 64 bits into the low 64 bits, while also multiplying by
-+	# x^64.  This produces a 128-bit value congruent to x^64 * M(x) and
-+	# whose low 48 bits are 0.
- 	movdqa	%xmm7, %xmm0
-+	pclmulqdq	$0x11, FOLD_CONSTS, %xmm7 # high bits * x^48 * (x^80 mod G(x))
-+	pslldq	$8, %xmm0
-+	pxor	%xmm0, %xmm7			  # + low bits * x^64
- 
--	pand	mask2(%rip), %xmm0
--
--	psrldq	$12, %xmm7
--	pclmulqdq	$0x10, %xmm10, %xmm7
--	pxor	%xmm0, %xmm7
--
--	#barrett reduction
--_barrett:
--	movdqa	rk7(%rip), %xmm10	# rk7 and rk8 in xmm10
-+	# Fold the high 32 bits into the low 96 bits.  This produces a 96-bit
-+	# value congruent to x^64 * M(x) and whose low 48 bits are 0.
- 	movdqa	%xmm7, %xmm0
--	pclmulqdq	$0x01, %xmm10, %xmm7
--	pslldq	$4, %xmm7
--	pclmulqdq	$0x11, %xmm10, %xmm7
-+	pand	.Lmask2(%rip), %xmm0		  # zero high 32 bits
-+	psrldq	$12, %xmm7			  # extract high 32 bits
-+	pclmulqdq	$0x00, FOLD_CONSTS, %xmm7 # high 32 bits * x^48 * (x^48 mod G(x))
-+	pxor	%xmm0, %xmm7			  # + low bits
- 
--	pslldq	$4, %xmm7
--	pxor	%xmm0, %xmm7
--	pextrd	$1, %xmm7, %eax
-+.Lbarrett_reduction:
-+	# Load G(x) and floor(x^48 / G(x)).
-+	movdqa	.Lbarrett_reduction_consts(%rip), FOLD_CONSTS
- 
--_cleanup:
--	# scale the result back to 16 bits
--	shr	$16, %eax
--	mov     %rcx, %rsp
-+	# Use Barrett reduction to compute the final CRC value.
-+	movdqa	%xmm7, %xmm0
-+	pclmulqdq	$0x11, FOLD_CONSTS, %xmm7 # high 32 bits * floor(x^48 / G(x))
-+	psrlq	$32, %xmm7			  # /= x^32
-+	pclmulqdq	$0x00, FOLD_CONSTS, %xmm7 # *= G(x)
-+	psrlq	$48, %xmm0
-+	pxor	%xmm7, %xmm0		     # + low 16 nonzero bits
-+	# Final CRC value (x^16 * M(x)) mod G(x) is in low 16 bits of xmm0.
-+
-+	pextrw	$0, %xmm0, %eax
-+.Ldone:
-+	mov	%rcx, %rsp
- 	ret
- 
--########################################################################
--
- .align 16
--_less_than_128:
-+.Lless_than_256_bytes:
-+	pxor	%xmm0, %xmm0
-+	cmp	$16, len
-+	jl	.Lless_than_16_bytes
- 
--	# check if there is enough buffer to be able to fold 16B at a time
--	cmp	$32, arg3
--	jl	_less_than_32
--	movdqa  SHUF_MASK(%rip), %xmm11
-+	# Checksumming a buffer of length 16...255 bytes
- 
--	# now if there is, load the constants
--	movdqa	rk1(%rip), %xmm10	# rk1 and rk2 in xmm10
-+	# Load the first 16 data bytes.
-+	movdqu	(buf), %xmm7
-+	pshufb	BSWAP_MASK, %xmm7
-+	add	$16, buf
- 
--	movd	arg1_low32, %xmm0	# get the initial crc value
--	pslldq	$12, %xmm0	# align it to its correct place
--	movdqu	(arg2), %xmm7	# load the plaintext
--	pshufb	%xmm11, %xmm7	# byte-reflect the plaintext
-+	# XOR the first 16 data *bits* with the initial CRC value.
-+	pinsrw	$7, init_crcl, %xmm0
- 	pxor	%xmm0, %xmm7
- 
--
--	# update the buffer pointer
--	add	$16, arg2
--
--	# update the counter. subtract 32 instead of 16 to save one
--	# instruction from the loop
--	sub	$32, arg3
--
--	jmp	_16B_reduction_loop
--
--
--.align 16
--_less_than_32:
--	# mov initial crc to the return value. this is necessary for
--	# zero-length buffers.
--	mov	arg1_low32, %eax
--	test	arg3, arg3
--	je	_cleanup
--
--	movdqa  SHUF_MASK(%rip), %xmm11
--
--	movd	arg1_low32, %xmm0	# get the initial crc value
--	pslldq	$12, %xmm0	# align it to its correct place
--
--	cmp	$16, arg3
--	je	_exact_16_left
--	jl	_less_than_16_left
--
--	movdqu	(arg2), %xmm7	# load the plaintext
--	pshufb	%xmm11, %xmm7	# byte-reflect the plaintext
--	pxor	%xmm0 , %xmm7	# xor the initial crc value
--	add	$16, arg2
--	sub	$16, arg3
--	movdqa	rk1(%rip), %xmm10	# rk1 and rk2 in xmm10
--	jmp	_get_last_two_xmms
--
-+	movdqa	.Lfold_across_16_bytes_consts(%rip), FOLD_CONSTS
-+	cmp	$16, len
-+	je	.Lreduce_final_16_bytes		# len == 16
-+	sub	$32, len
-+	jge	.Lfold_16_bytes_loop		# 32 <= len <= 255
-+	add	$16, len
-+	jmp	.Lhandle_partial_segment	# 17 <= len <= 31
- 
- .align 16
--_less_than_16_left:
--	# use stack space to load data less than 16 bytes, zero-out
--	# the 16B in memory first.
--
--	pxor	%xmm1, %xmm1
--	mov	%rsp, %r11
--	movdqa	%xmm1, (%r11)
--
--	cmp	$4, arg3
--	jl	_only_less_than_4
--
--	# backup the counter value
--	mov	arg3, %r9
--	cmp	$8, arg3
--	jl	_less_than_8_left
--
--	# load 8 Bytes
--	mov	(arg2), %rax
--	mov	%rax, (%r11)
--	add	$8, %r11
--	sub	$8, arg3
--	add	$8, arg2
--_less_than_8_left:
--
--	cmp	$4, arg3
--	jl	_less_than_4_left
--
--	# load 4 Bytes
--	mov	(arg2), %eax
--	mov	%eax, (%r11)
--	add	$4, %r11
--	sub	$4, arg3
--	add	$4, arg2
--_less_than_4_left:
--
--	cmp	$2, arg3
--	jl	_less_than_2_left
--
--	# load 2 Bytes
--	mov	(arg2), %ax
--	mov	%ax, (%r11)
--	add	$2, %r11
--	sub	$2, arg3
--	add	$2, arg2
--_less_than_2_left:
--	cmp     $1, arg3
--        jl      _zero_left
--
--	# load 1 Byte
--	mov	(arg2), %al
--	mov	%al, (%r11)
--_zero_left:
-+.Lless_than_16_bytes:
-+	cmp	$2, len
-+	jl	.Lless_than_2_bytes
-+
-+	# Checksumming a buffer of length 2...15 bytes.  Copy the data into a
-+	# 16-byte stack buffer, left-padding with zeroes.  Then reduce the
-+	# resulting 16-byte value.
-+
-+	movdqa	%xmm0, (%rsp)
-+	lea	16(%rsp), %r8
-+	sub	len, %r8
-+	mov	%r8, %r10
-+
-+	test	$8, len
-+	jz	1f
-+	movq	(buf), %r9
-+	movq	%r9, (%r8)
-+	add	$8, buf
-+	add	$8, %r8
-+1:
-+	test	$4, len
-+	jz	1f
-+	movl	(buf), %r9d
-+	movl	%r9d, (%r8)
-+	add	$4, buf
-+	add	$4, %r8
-+1:
-+	test	$2, len
-+	jz	1f
-+	movw	(buf), %r9w
-+	movw	%r9w, (%r8)
-+	add	$2, buf
-+	add	$2, %r8
-+1:
-+	test	$1, len
-+	jz	1f
-+	movb	(buf), %r9b
-+	movb	%r9b, (%r8)
-+1:
-+	# XOR the first 16 data *bits* with the initial CRC value.
-+	rol	$0x8, init_crc
-+	xor	init_crc, (%r10)
-+
-+	# Load the data and reduce it.
- 	movdqa	(%rsp), %xmm7
--	pshufb	%xmm11, %xmm7
--	pxor	%xmm0 , %xmm7	# xor the initial crc value
--
--	# shl r9, 4
--	lea	pshufb_shf_table+16(%rip), %rax
--	sub	%r9, %rax
--	movdqu	(%rax), %xmm0
--	pxor	mask1(%rip), %xmm0
--
--	pshufb	%xmm0, %xmm7
--	jmp	_128_done
-+	pshufb	BSWAP_MASK, %xmm7
-+	jmp	.Lreduce_final_16_bytes
- 
- .align 16
--_exact_16_left:
--	movdqu	(arg2), %xmm7
--	pshufb	%xmm11, %xmm7
--	pxor	%xmm0 , %xmm7   # xor the initial crc value
--
--	jmp	_128_done
--
--_only_less_than_4:
--	cmp	$3, arg3
--	jl	_only_less_than_3
--
--	# load 3 Bytes
--	mov	(arg2), %al
--	mov	%al, (%r11)
--
--	mov	1(arg2), %al
--	mov	%al, 1(%r11)
--
--	mov	2(arg2), %al
--	mov	%al, 2(%r11)
--
--	movdqa	 (%rsp), %xmm7
--	pshufb	 %xmm11, %xmm7
--	pxor	 %xmm0 , %xmm7  # xor the initial crc value
--
--	psrldq	$5, %xmm7
--
--	jmp	_barrett
--_only_less_than_3:
--	cmp	$2, arg3
--	jl	_only_less_than_2
--
--	# load 2 Bytes
--	mov	(arg2), %al
--	mov	%al, (%r11)
--
--	mov	1(arg2), %al
--	mov	%al, 1(%r11)
--
--	movdqa	(%rsp), %xmm7
--	pshufb	%xmm11, %xmm7
--	pxor	%xmm0 , %xmm7   # xor the initial crc value
--
--	psrldq	$6, %xmm7
--
--	jmp	_barrett
--_only_less_than_2:
--
--	# load 1 Byte
--	mov	(arg2), %al
--	mov	%al, (%r11)
--
--	movdqa	(%rsp), %xmm7
--	pshufb	%xmm11, %xmm7
--	pxor	%xmm0 , %xmm7   # xor the initial crc value
--
--	psrldq	$7, %xmm7
--
--	jmp	_barrett
-+.Lless_than_2_bytes:
-+	movzwl	init_crc, %eax
-+	test	len, len
-+	je	.Ldone	# len = 0.  Nothing to do, just return init_crc.
-+
-+	# len = 1.  This is a special case because with only 1 data byte the
-+	# 16-bit initial CRC value can't just be XOR'ed with the first 16 data
-+	# bits as usual.  Instead, directly build the scaled value 'x^64 * M(x)'
-+	# and skip to the Barrett reduction step.
-+	xor	(buf), %ah
-+	movd	%eax, %xmm7
-+	pslldq	$7, %xmm7
-+	jmp	.Lbarrett_reduction
- 
- ENDPROC(crc_t10dif_pcl)
- 
- .section	.rodata, "a", @progbits
- .align 16
--# precomputed constants
--# these constants are precomputed from the poly:
--# 0x8bb70000 (0x8bb7 scaled to 32 bits)
--# Q = 0x18BB70000
--# rk1 = 2^(32*3) mod Q << 32
--# rk2 = 2^(32*5) mod Q << 32
--# rk3 = 2^(32*15) mod Q << 32
--# rk4 = 2^(32*17) mod Q << 32
--# rk5 = 2^(32*3) mod Q << 32
--# rk6 = 2^(32*2) mod Q << 32
--# rk7 = floor(2^64/Q)
--# rk8 = Q
--rk1:
--.quad 0x2d56000000000000
--rk2:
--.quad 0x06df000000000000
--rk3:
--.quad 0x9d9d000000000000
--rk4:
--.quad 0x7cf5000000000000
--rk5:
--.quad 0x2d56000000000000
--rk6:
--.quad 0x1368000000000000
--rk7:
--.quad 0x00000001f65a57f8
--rk8:
--.quad 0x000000018bb70000
--
--rk9:
--.quad 0xceae000000000000
--rk10:
--.quad 0xbfd6000000000000
--rk11:
--.quad 0x1e16000000000000
--rk12:
--.quad 0x713c000000000000
--rk13:
--.quad 0xf7f9000000000000
--rk14:
--.quad 0x80a6000000000000
--rk15:
--.quad 0x044c000000000000
--rk16:
--.quad 0xe658000000000000
--rk17:
--.quad 0xad18000000000000
--rk18:
--.quad 0xa497000000000000
--rk19:
--.quad 0x6ee3000000000000
--rk20:
--.quad 0xe7b5000000000000
--
- 
-+# Fold constants precomputed from the polynomial 0x18bb7
-+# G(x) = x^16 + x^15 + x^11 + x^9 + x^8 + x^7 + x^5 + x^4 + x^2 + x^1 + x^0
-+.Lfold_across_128_bytes_consts:
-+	.quad		0x0000000000006123	# x^(8*128)	mod G(x)
-+	.quad		0x0000000000002295	# x^(8*128+64)	mod G(x)
-+.Lfold_across_64_bytes_consts:
-+	.quad		0x0000000000001069	# x^(4*128)	mod G(x)
-+	.quad		0x000000000000dd31	# x^(4*128+64)	mod G(x)
-+.Lfold_across_32_bytes_consts:
-+	.quad		0x000000000000857d	# x^(2*128)	mod G(x)
-+	.quad		0x0000000000007acc	# x^(2*128+64)	mod G(x)
-+.Lfold_across_16_bytes_consts:
-+	.quad		0x000000000000a010	# x^(1*128)	mod G(x)
-+	.quad		0x0000000000001faa	# x^(1*128+64)	mod G(x)
-+.Lfinal_fold_consts:
-+	.quad		0x1368000000000000	# x^48 * (x^48 mod G(x))
-+	.quad		0x2d56000000000000	# x^48 * (x^80 mod G(x))
-+.Lbarrett_reduction_consts:
-+	.quad		0x0000000000018bb7	# G(x)
-+	.quad		0x00000001f65a57f8	# floor(x^48 / G(x))
- 
- .section	.rodata.cst16.mask1, "aM", @progbits, 16
- .align 16
--mask1:
--.octa 0x80808080808080808080808080808080
-+.Lmask1:
-+	.octa	0x80808080808080808080808080808080
- 
- .section	.rodata.cst16.mask2, "aM", @progbits, 16
- .align 16
--mask2:
--.octa 0x00000000FFFFFFFFFFFFFFFFFFFFFFFF
-+.Lmask2:
-+	.octa	0x00000000FFFFFFFFFFFFFFFFFFFFFFFF
-+
-+.section	.rodata.cst16.bswap_mask, "aM", @progbits, 16
-+.align 16
-+.Lbswap_mask:
-+	.octa	0x000102030405060708090A0B0C0D0E0F
- 
--.section	.rodata.cst16.SHUF_MASK, "aM", @progbits, 16
-+.section	.rodata.cst32.byteshift_table, "aM", @progbits, 32
- .align 16
--SHUF_MASK:
--.octa 0x000102030405060708090A0B0C0D0E0F
--
--.section	.rodata.cst32.pshufb_shf_table, "aM", @progbits, 32
--.align 32
--pshufb_shf_table:
--# use these values for shift constants for the pshufb instruction
--# different alignments result in values as shown:
--#	DDQ 0x008f8e8d8c8b8a898887868584838281 # shl 15 (16-1) / shr1
--#	DDQ 0x01008f8e8d8c8b8a8988878685848382 # shl 14 (16-3) / shr2
--#	DDQ 0x0201008f8e8d8c8b8a89888786858483 # shl 13 (16-4) / shr3
--#	DDQ 0x030201008f8e8d8c8b8a898887868584 # shl 12 (16-4) / shr4
--#	DDQ 0x04030201008f8e8d8c8b8a8988878685 # shl 11 (16-5) / shr5
--#	DDQ 0x0504030201008f8e8d8c8b8a89888786 # shl 10 (16-6) / shr6
--#	DDQ 0x060504030201008f8e8d8c8b8a898887 # shl 9  (16-7) / shr7
--#	DDQ 0x07060504030201008f8e8d8c8b8a8988 # shl 8  (16-8) / shr8
--#	DDQ 0x0807060504030201008f8e8d8c8b8a89 # shl 7  (16-9) / shr9
--#	DDQ 0x090807060504030201008f8e8d8c8b8a # shl 6  (16-10) / shr10
--#	DDQ 0x0a090807060504030201008f8e8d8c8b # shl 5  (16-11) / shr11
--#	DDQ 0x0b0a090807060504030201008f8e8d8c # shl 4  (16-12) / shr12
--#	DDQ 0x0c0b0a090807060504030201008f8e8d # shl 3  (16-13) / shr13
--#	DDQ 0x0d0c0b0a090807060504030201008f8e # shl 2  (16-14) / shr14
--#	DDQ 0x0e0d0c0b0a090807060504030201008f # shl 1  (16-15) / shr15
--.octa 0x8f8e8d8c8b8a89888786858483828100
--.octa 0x000e0d0c0b0a09080706050403020100
-+# For 1 <= len <= 15, the 16-byte vector beginning at &byteshift_table[16 - len]
-+# is the index vector to shift left by 'len' bytes, and is also {0x80, ...,
-+# 0x80} XOR the index vector to shift right by '16 - len' bytes.
-+.Lbyteshift_table:
-+	.byte		 0x0, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87
-+	.byte		0x88, 0x89, 0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f
-+	.byte		 0x0,  0x1,  0x2,  0x3,  0x4,  0x5,  0x6,  0x7
-+	.byte		 0x8,  0x9,  0xa,  0xb,  0xc,  0xd,  0xe , 0x0
-diff --git a/arch/x86/crypto/crct10dif-pclmul_glue.c b/arch/x86/crypto/crct10dif-pclmul_glue.c
-index cd4df93225014..80cea60e9c6d6 100644
---- a/arch/x86/crypto/crct10dif-pclmul_glue.c
-+++ b/arch/x86/crypto/crct10dif-pclmul_glue.c
-@@ -33,8 +33,7 @@
- #include <asm/cpufeatures.h>
- #include <asm/cpu_device_id.h>
- 
--asmlinkage __u16 crc_t10dif_pcl(__u16 crc, const unsigned char *buf,
--				size_t len);
-+asmlinkage u16 crc_t10dif_pcl(u16 init_crc, const u8 *buf, size_t len);
- 
- struct chksum_desc_ctx {
- 	__u16 crc;
--- 
-2.20.1
-
+> ---
+>  MAINTAINERS                        |   5 +
+>  drivers/char/hw_random/Kconfig     |  15 ++
+>  drivers/char/hw_random/Makefile    |   1 +
+>  drivers/char/hw_random/optee-rng.c | 298 +++++++++++++++++++++++++++++++++++++
+>  4 files changed, 319 insertions(+)
+>  create mode 100644 drivers/char/hw_random/optee-rng.c
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 51029a4..dcef7e9 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -11262,6 +11262,11 @@ M:	Jens Wiklander <jens.wiklander@linaro.org>
+>  S:	Maintained
+>  F:	drivers/tee/optee/
+>  
+> +OP-TEE RANDOM NUMBER GENERATOR (RNG) DRIVER
+> +M:	Sumit Garg <sumit.garg@linaro.org>
+> +S:	Maintained
+> +F:	drivers/char/hw_random/optee-rng.c
+> +
+>  OPA-VNIC DRIVER
+>  M:	Dennis Dalessandro <dennis.dalessandro@intel.com>
+>  M:	Niranjana Vishwanathapura <niranjana.vishwanathapura@intel.com>
+> diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+> index dac895d..25a7d8f 100644
+> --- a/drivers/char/hw_random/Kconfig
+> +++ b/drivers/char/hw_random/Kconfig
+> @@ -424,6 +424,21 @@ config HW_RANDOM_EXYNOS
+>  	  will be called exynos-trng.
+>  
+>  	  If unsure, say Y.
+> +
+> +config HW_RANDOM_OPTEE
+> +	tristate "OP-TEE based Random Number Generator support"
+> +	depends on OPTEE
+> +	default HW_RANDOM
+> +	help
+> +	  This  driver provides support for OP-TEE based Random Number
+> +	  Generator on ARM SoCs where hardware entropy sources are not
+> +	  accessible to normal world (Linux).
+> +
+> +	  To compile this driver as a module, choose M here: the module
+> +	  will be called optee-rng.
+> +
+> +	  If unsure, say Y.
+> +
+>  endif # HW_RANDOM
+>  
+>  config UML_RANDOM
+> diff --git a/drivers/char/hw_random/Makefile b/drivers/char/hw_random/Makefile
+> index e35ec3c..7c9ef4a 100644
+> --- a/drivers/char/hw_random/Makefile
+> +++ b/drivers/char/hw_random/Makefile
+> @@ -38,3 +38,4 @@ obj-$(CONFIG_HW_RANDOM_CAVIUM) += cavium-rng.o cavium-rng-vf.o
+>  obj-$(CONFIG_HW_RANDOM_MTK)	+= mtk-rng.o
+>  obj-$(CONFIG_HW_RANDOM_S390) += s390-trng.o
+>  obj-$(CONFIG_HW_RANDOM_KEYSTONE) += ks-sa-rng.o
+> +obj-$(CONFIG_HW_RANDOM_OPTEE) += optee-rng.o
+> diff --git a/drivers/char/hw_random/optee-rng.c b/drivers/char/hw_random/optee-rng.c
+> new file mode 100644
+> index 0000000..2b9fc8a
+> --- /dev/null
+> +++ b/drivers/char/hw_random/optee-rng.c
+> @@ -0,0 +1,298 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Copyright (C) 2018-2019 Linaro Ltd.
+> + */
+> +
+> +#include <linux/delay.h>
+> +#include <linux/of.h>
+> +#include <linux/hw_random.h>
+> +#include <linux/kernel.h>
+> +#include <linux/module.h>
+> +#include <linux/slab.h>
+> +#include <linux/tee_drv.h>
+> +#include <linux/uuid.h>
+> +
+> +#define DRIVER_NAME "optee-rng"
+> +
+> +#define TEE_ERROR_HEALTH_TEST_FAIL	0x00000001
+> +
+> +/*
+> + * TA_CMD_GET_ENTROPY - Get Entropy from RNG
+> + *
+> + * param[0] (inout memref) - Entropy buffer memory reference
+> + * param[1] unused
+> + * param[2] unused
+> + * param[3] unused
+> + *
+> + * Result:
+> + * TEE_SUCCESS - Invoke command success
+> + * TEE_ERROR_BAD_PARAMETERS - Incorrect input param
+> + * TEE_ERROR_NOT_SUPPORTED - Requested entropy size greater than size of pool
+> + * TEE_ERROR_HEALTH_TEST_FAIL - Continuous health testing failed
+> + */
+> +#define TA_CMD_GET_ENTROPY		0x0
+> +
+> +/*
+> + * TA_CMD_GET_RNG_INFO - Get RNG information
+> + *
+> + * param[0] (out value) - value.a: RNG data-rate in bytes per second
+> + *                        value.b: Quality/Entropy per 1024 bit of data
+> + * param[1] unused
+> + * param[2] unused
+> + * param[3] unused
+> + *
+> + * Result:
+> + * TEE_SUCCESS - Invoke command success
+> + * TEE_ERROR_BAD_PARAMETERS - Incorrect input param
+> + */
+> +#define TA_CMD_GET_RNG_INFO		0x1
+> +
+> +#define MAX_ENTROPY_REQ_SZ		(4 * 1024)
+> +
+> +/**
+> + * struct optee_rng_private - OP-TEE Random Number Generator private data
+> + * @dev:		OP-TEE based RNG device.
+> + * @ctx:		OP-TEE context handler.
+> + * @session_id:		RNG TA session identifier.
+> + * @data_rate:		RNG data rate.
+> + * @entropy_shm_pool:	Memory pool shared with RNG device.
+> + * @optee_rng:		OP-TEE RNG driver structure.
+> + */
+> +struct optee_rng_private {
+> +	struct device *dev;
+> +	struct tee_context *ctx;
+> +	u32 session_id;
+> +	u32 data_rate;
+> +	struct tee_shm *entropy_shm_pool;
+> +	struct hwrng optee_rng;
+> +};
+> +
+> +#define to_optee_rng_private(r) \
+> +		container_of(r, struct optee_rng_private, optee_rng)
+> +
+> +static size_t get_optee_rng_data(struct optee_rng_private *pvt_data,
+> +				 void *buf, size_t req_size)
+> +{
+> +	u32 ret = 0;
+> +	u8 *rng_data = NULL;
+> +	size_t rng_size = 0;
+> +	struct tee_ioctl_invoke_arg inv_arg = {0};
+> +	struct tee_param param[4] = {0};
+> +
+> +	/* Invoke TA_CMD_GET_ENTROPY function of Trusted App */
+> +	inv_arg.func = TA_CMD_GET_ENTROPY;
+> +	inv_arg.session = pvt_data->session_id;
+> +	inv_arg.num_params = 4;
+> +
+> +	/* Fill invoke cmd params */
+> +	param[0].attr = TEE_IOCTL_PARAM_ATTR_TYPE_MEMREF_INOUT;
+> +	param[0].u.memref.shm = pvt_data->entropy_shm_pool;
+> +	param[0].u.memref.size = req_size;
+> +	param[0].u.memref.shm_offs = 0;
+> +
+> +	ret = tee_client_invoke_func(pvt_data->ctx, &inv_arg, param);
+> +	if ((ret < 0) || (inv_arg.ret != 0)) {
+> +		dev_err(pvt_data->dev, "TA_CMD_GET_ENTROPY invoke err: %x\n",
+> +			inv_arg.ret);
+> +		return 0;
+> +	}
+> +
+> +	rng_data = tee_shm_get_va(pvt_data->entropy_shm_pool, 0);
+> +	if (IS_ERR(rng_data)) {
+> +		dev_err(pvt_data->dev, "tee_shm_get_va failed\n");
+> +		return 0;
+> +	}
+> +
+> +	rng_size = param[0].u.memref.size;
+> +	memcpy(buf, rng_data, rng_size);
+> +
+> +	return rng_size;
+> +}
+> +
+> +static int optee_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
+> +{
+> +	struct optee_rng_private *pvt_data = to_optee_rng_private(rng);
+> +	size_t read = 0, rng_size = 0;
+> +	int timeout = 1;
+> +	u8 *data = buf;
+> +
+> +	if (max > MAX_ENTROPY_REQ_SZ)
+> +		max = MAX_ENTROPY_REQ_SZ;
+> +
+> +	while (read == 0) {
+> +		rng_size = get_optee_rng_data(pvt_data, data, (max - read));
+> +
+> +		data += rng_size;
+> +		read += rng_size;
+> +
+> +		if (wait) {
+> +			if (timeout-- == 0)
+> +				return read;
+> +			msleep((1000 * (max - read)) / pvt_data->data_rate);
+> +		} else {
+> +			return read;
+> +		}
+> +	}
+> +
+> +	return read;
+> +}
+> +
+> +static int optee_rng_init(struct hwrng *rng)
+> +{
+> +	struct optee_rng_private *pvt_data = to_optee_rng_private(rng);
+> +	struct tee_shm *entropy_shm_pool = NULL;
+> +
+> +	entropy_shm_pool = tee_shm_alloc(pvt_data->ctx, MAX_ENTROPY_REQ_SZ,
+> +					 TEE_SHM_MAPPED | TEE_SHM_DMA_BUF);
+> +	if (IS_ERR(entropy_shm_pool)) {
+> +		dev_err(pvt_data->dev, "tee_shm_alloc failed\n");
+> +		return PTR_ERR(entropy_shm_pool);
+> +	}
+> +
+> +	pvt_data->entropy_shm_pool = entropy_shm_pool;
+> +
+> +	return 0;
+> +}
+> +
+> +static void optee_rng_cleanup(struct hwrng *rng)
+> +{
+> +	struct optee_rng_private *pvt_data = to_optee_rng_private(rng);
+> +
+> +	tee_shm_free(pvt_data->entropy_shm_pool);
+> +}
+> +
+> +static struct optee_rng_private pvt_data = {
+> +	.optee_rng = {
+> +		.name		= DRIVER_NAME,
+> +		.init		= optee_rng_init,
+> +		.cleanup	= optee_rng_cleanup,
+> +		.read		= optee_rng_read,
+> +	}
+> +};
+> +
+> +static int get_optee_rng_info(struct device *dev)
+> +{
+> +	u32 ret = 0;
+> +	struct tee_ioctl_invoke_arg inv_arg = {0};
+> +	struct tee_param param[4] = {0};
+> +
+> +	/* Invoke TA_CMD_GET_RNG_INFO function of Trusted App */
+> +	inv_arg.func = TA_CMD_GET_RNG_INFO;
+> +	inv_arg.session = pvt_data.session_id;
+> +	inv_arg.num_params = 4;
+> +
+> +	/* Fill invoke cmd params */
+> +	param[0].attr = TEE_IOCTL_PARAM_ATTR_TYPE_VALUE_OUTPUT;
+> +
+> +	ret = tee_client_invoke_func(pvt_data.ctx, &inv_arg, param);
+> +	if ((ret < 0) || (inv_arg.ret != 0)) {
+> +		dev_err(dev, "TA_CMD_GET_RNG_INFO invoke err: %x\n",
+> +			inv_arg.ret);
+> +		return -EINVAL;
+> +	}
+> +
+> +	pvt_data.data_rate = param[0].u.value.a;
+> +	pvt_data.optee_rng.quality = param[0].u.value.b;
+> +
+> +	return 0;
+> +}
+> +
+> +static int optee_ctx_match(struct tee_ioctl_version_data *ver, const void *data)
+> +{
+> +	if (ver->impl_id == TEE_IMPL_ID_OPTEE)
+> +		return 1;
+> +	else
+> +		return 0;
+> +}
+> +
+> +static int optee_rng_probe(struct device *dev)
+> +{
+> +	struct tee_client_device *rng_device = to_tee_client_device(dev);
+> +	int ret = 0, err = -ENODEV;
+> +	struct tee_ioctl_open_session_arg sess_arg = {0};
+> +
+> +	/* Open context with TEE driver */
+> +	pvt_data.ctx = tee_client_open_context(NULL, optee_ctx_match, NULL,
+> +					       NULL);
+> +	if (IS_ERR(pvt_data.ctx))
+> +		return -ENODEV;
+> +
+> +	/* Open session with hwrng Trusted App */
+> +	memcpy(sess_arg.uuid, rng_device->id.uuid.b, TEE_IOCTL_UUID_LEN);
+> +	sess_arg.clnt_login = TEE_IOCTL_LOGIN_PUBLIC;
+> +	sess_arg.num_params = 0;
+> +
+> +	ret = tee_client_open_session(pvt_data.ctx, &sess_arg, NULL);
+> +	if ((ret < 0) || (sess_arg.ret != 0)) {
+> +		dev_err(dev, "tee_client_open_session failed, err: %x\n",
+> +			sess_arg.ret);
+> +		err = -EINVAL;
+> +		goto out_ctx;
+> +	}
+> +	pvt_data.session_id = sess_arg.session;
+> +
+> +	err = get_optee_rng_info(dev);
+> +	if (err)
+> +		goto out_sess;
+> +
+> +	err = hwrng_register(&pvt_data.optee_rng);
+> +	if (err) {
+> +		dev_err(dev, "hwrng registration failed (%d)\n", err);
+> +		goto out_sess;
+> +	}
+> +
+> +	pvt_data.dev = dev;
+> +
+> +	return 0;
+> +
+> +out_sess:
+> +	tee_client_close_session(pvt_data.ctx, pvt_data.session_id);
+> +out_ctx:
+> +	tee_client_close_context(pvt_data.ctx);
+> +
+> +	return err;
+> +}
+> +
+> +static int optee_rng_remove(struct device *dev)
+> +{
+> +	hwrng_unregister(&pvt_data.optee_rng);
+> +	tee_client_close_session(pvt_data.ctx, pvt_data.session_id);
+> +	tee_client_close_context(pvt_data.ctx);
+> +
+> +	return 0;
+> +}
+> +
+> +const struct tee_client_device_id optee_rng_id_table[] = {
+> +	{UUID_INIT(0xab7a617c, 0xb8e7, 0x4d8f,
+> +		   0x83, 0x01, 0xd0, 0x9b, 0x61, 0x03, 0x6b, 0x64)},
+> +	{}
+> +};
+> +
+> +MODULE_DEVICE_TABLE(tee, optee_rng_id_table);
+> +
+> +static struct tee_client_driver optee_rng_driver = {
+> +	.id_table	= optee_rng_id_table,
+> +	.driver		= {
+> +		.name		= DRIVER_NAME,
+> +		.bus		= &tee_bus_type,
+> +		.probe		= optee_rng_probe,
+> +		.remove		= optee_rng_remove,
+> +	},
+> +};
+> +
+> +static int __init optee_rng_mod_init(void)
+> +{
+> +	return driver_register(&optee_rng_driver.driver);
+> +}
+> +
+> +static void __exit optee_rng_mod_exit(void)
+> +{
+> +	driver_unregister(&optee_rng_driver.driver);
+> +}
+> +
+> +module_init(optee_rng_mod_init);
+> +module_exit(optee_rng_mod_exit);
+> +
+> +MODULE_LICENSE("GPL v2");
+> +MODULE_AUTHOR("Sumit Garg <sumit.garg@linaro.org>");
+> +MODULE_DESCRIPTION("OP-TEE based random number generator driver");
+> -- 
+> 2.7.4
+> 
