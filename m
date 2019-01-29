@@ -1,109 +1,103 @@
-Return-Path: <SRS0=71ZY=QE=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=zJfq=QF=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 965E2C282C8
-	for <linux-crypto@archiver.kernel.org>; Mon, 28 Jan 2019 19:50:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81648C282CD
+	for <linux-crypto@archiver.kernel.org>; Tue, 29 Jan 2019 00:01:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 369C22087F
-	for <linux-crypto@archiver.kernel.org>; Mon, 28 Jan 2019 19:50:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="gJIL1u4l"
+	by mail.kernel.org (Postfix) with ESMTP id 56217214DA
+	for <linux-crypto@archiver.kernel.org>; Tue, 29 Jan 2019 00:01:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726744AbfA1Tu5 (ORCPT
+        id S1726869AbfA2ABh (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 28 Jan 2019 14:50:57 -0500
-Received: from mail-eopbgr00080.outbound.protection.outlook.com ([40.107.0.80]:58080
-        "EHLO EUR02-AM5-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726719AbfA1Tu5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 28 Jan 2019 14:50:57 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ExpgHOA4Ax3dSGpbWZmo7A9t4xDERcv4T0+xxngjsNQ=;
- b=gJIL1u4l3ek66s1Yt7Yzbfu7BehiuWQ4zHkIaicsFr84orYVVAk0HiO+MRQPdswY0KzI+3iKlHMjH4+JPXhSyjdwo3ry4cj7/zsRQJJZiboFCrFk3mV2GDYYnZMtKp+ArS8A69Gz0R3ahxpPpZsGHg7Quuv8fQkCzSfNE60wBVU=
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
- VI1PR0402MB3936.eurprd04.prod.outlook.com (52.134.17.148) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1558.21; Mon, 28 Jan 2019 19:50:54 +0000
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::f51e:1692:77db:b931]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::f51e:1692:77db:b931%6]) with mapi id 15.20.1558.023; Mon, 28 Jan 2019
- 19:50:54 +0000
-From:   Horia Geanta <horia.geanta@nxp.com>
-To:     Roland Hieber <rhi@pengutronix.de>
-CC:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>
-Subject: Re: [PATCH v2 2/2] crypto: caam - fix DMA mapping of stack memory
-Thread-Topic: [PATCH v2 2/2] crypto: caam - fix DMA mapping of stack memory
-Thread-Index: AQHUtaFSDnpyWRrBME6Rg2w1yvLFEA==
-Date:   Mon, 28 Jan 2019 19:50:54 +0000
-Message-ID: <VI1PR0402MB34850F22F806E819DE5E8D9298960@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-References: <VI1PR0402MB348525A6FEFD55F6896C9249989B0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
- <20190126180215.9842-1-horia.geanta@nxp.com>
- <20190128190047.7btanivlbj5jpy3u@pengutronix.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=horia.geanta@nxp.com; 
-x-originating-ip: [192.88.166.1]
-x-ms-publictraffictype: Email
-x-microsoft-exchange-diagnostics: 1;VI1PR0402MB3936;6:yqaUj9KK75erhaRr0cvc4KNIHUbXzMuA0NZegxUxTCFRC91f3bztGznqLb0nRwQvX4CpQN7e0yEs1ffu6CPBk0r1SKYnsrjndgX1OMgPvLzrj2hZD//9kjlYWoOqmm1IXlbQ31IXlx3o0pDtgHQmD8eFQgLkN0aAgzYQKzdyo9jIJiQjqdSiRpBb7zDDFj7293qKp7Dw6ao9XFwdrleOj+yqfAVCR5YGDbQUYF4HCiNuDkNXIpDghch5aa6vlFxMyq5ad9nhO8ZMwmNBefjSpPVxLVXgOfxZDnga5RZjuBUPIsUeZqnFv21/oUjhI/bNYmLH+RuzGI97QhRR/SnYBETws4dwq376bEJIjpB/dzwSJDcapHMHc8A0nr04ROvAgUewDJ02tp4jkhHu11qh0mES4dslQcXzWMe1DGzvgpT67cg0ByOsn9ZuCqInNqqqXT7xDlRqnBXIzK0mCedTUQ==;5:pmQ20O/HHksZttG0zaMRFE8E8Ghps515jMY7mkIXFPgr5QSZa45gxcHujvJ/8BSrJdXm/M8u56Y4eIQ8gfAJ60EajxjnsYcOl7tYtAmUv+t2fe9YhIXfJw/oP77BIjaPHxaGqpOvOFPwHRuin+zOm6aX+LAbbXJQrMsBqRxhoCV/BzK/94l6yk74GFTevXOyKWh9lnQTEMbOTHTVkn2Nlw==;7:PEDopZmiVY9kaEEg819+Q5xDQY8JizTWniTgZrnMN0FW17sYwyZdx9qt+FRYdj3MuJLCqfRPNSBbaNNMeL+gItjUC2FqbJS820jt6zp6SOAAl9neYnqu67jw1V45JfWLksRLBeFoDs9GfNOcOhQN8w==
-x-ms-exchange-antispam-srfa-diagnostics: SOS;
-x-ms-office365-filtering-correlation-id: 40a22c74-959d-4531-af1b-08d68559ea1a
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600110)(711020)(4605077)(4618075)(2017052603328)(7153060)(7193020);SRVR:VI1PR0402MB3936;
-x-ms-traffictypediagnostic: VI1PR0402MB3936:
-x-microsoft-antispam-prvs: <VI1PR0402MB393678EB7BB14A591A62E5C598960@VI1PR0402MB3936.eurprd04.prod.outlook.com>
-x-forefront-prvs: 0931CB1479
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(346002)(136003)(396003)(376002)(366004)(39860400002)(199004)(189003)(478600001)(53936002)(54906003)(446003)(25786009)(476003)(14454004)(86362001)(4326008)(105586002)(186003)(316002)(6246003)(486006)(9686003)(6506007)(26005)(53546011)(102836004)(66066001)(97736004)(71190400001)(76176011)(8676002)(81166006)(8936002)(33656002)(74316002)(7736002)(99286004)(7696005)(6116002)(55016002)(14444005)(256004)(44832011)(106356001)(71200400001)(6436002)(6916009)(229853002)(81156014)(2906002)(68736007)(305945005)(3846002)(4744005);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB3936;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: nxp.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: VlcYCU28IX/ZFHtFyvyWBEtXmUjPq2tLmNNCUv5HHKujC5DJ/pVS6VLsk42TfVF4JtXSSXmOJ8nwmPn0wuhCdJF9xbwH+Vh48MTStVpjjsFccpcdzLorjcgXfYnbdd7TLEchkhmARdrvsJaP2xTX+IbRIi2dZIjoZakygkDgOq7pEZJmi3a/oG/ykAl1QtNgfn7l1y7+eBrsIN0o8YSLsMNHh1TGVf4rlw2hzvKlYPe+PBLmNYKVCCrI1420E1ygED2s5Xaq+Jd3uGmTO6dMZRqY7AP6CXIRYOpEh1WB1az+JOLgyOCiMkDcxEVr0Qk+zL4yqqzNKtPyu12U/wNBo5QkMmr1sR2bY3ooAFh5RScIBglwEGi/n50sKoJk1qxZO1PHTrRbsYkUwzWtkYKR0QZLII4lMh0eppurV/B1WGc=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Mon, 28 Jan 2019 19:01:37 -0500
+Received: from smtp.gentoo.org ([140.211.166.183]:59158 "EHLO smtp.gentoo.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726746AbfA2ABh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 28 Jan 2019 19:01:37 -0500
+Received: from gentoo.cpe.tdp.com (unknown [181.67.136.158])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        (Authenticated sender: chrisadr)
+        by smtp.gentoo.org (Postfix) with ESMTPSA id 22C5B335D4C;
+        Tue, 29 Jan 2019 00:01:33 +0000 (UTC)
+From:   Christopher Diaz Riveros <chrisadr@gentoo.org>
+To:     herbert@gondor.apana.org.au, davem@davemloft.net
+Cc:     Christopher Diaz Riveros <chrisadr@gentoo.org>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [patch-next] crypto: testmgr - use kmemdup
+Date:   Mon, 28 Jan 2019 19:01:18 -0500
+Message-Id: <20190129000118.15923-1-chrisadr@gentoo.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 40a22c74-959d-4531-af1b-08d68559ea1a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Jan 2019 19:50:54.3953
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3936
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 1/28/2019 9:00 PM, Roland Hieber wrote:=0A=
-> Hi Horia,=0A=
-> =0A=
-> I didn't understand your patch thoroughly yet, but I tested it and it=0A=
-> gets rid of my DMA-API warning, so:=0A=
-> =0A=
-As mentioned in the commit message, the main idea is to use the buffer hold=
-ing=0A=
-the partial hash (state->caam_ctx) also for the final hash.=0A=
-So now:=0A=
--crypto engine DMA writes final hash to state->caam_ctx=0A=
--driver copies hash from state->caam_ctx to req->result=0A=
-=0A=
-There are some implications of this change, mainly the change of DMA mappin=
-g=0A=
-direction for state->caam_ctx, clean-up code (DMA unmapping) and updates in=
- how=0A=
-crypto engine job descriptors are generated.=0A=
-=0A=
-> Tested-by: Roland Hieber <rhi@pengutronix.de>=0A=
-> =0A=
-Thanks!Horia=0A=
+Fixes coccinnelle alerts:
+
+/crypto/testmgr.c:2112:13-20: WARNING opportunity for kmemdup
+/crypto/testmgr.c:2130:13-20: WARNING opportunity for kmemdup
+/crypto/testmgr.c:2152:9-16: WARNING opportunity for kmemdup
+
+Signed-off-by: Christopher Diaz Riveros <chrisadr@gentoo.org>
+---
+ crypto/testmgr.c | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
+
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index e4f3f5f688e7..9c95f0eea863 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -2109,12 +2109,11 @@ static int do_test_kpp(struct crypto_kpp *tfm, const struct kpp_testvec *vec,
+ 
+ 	if (vec->genkey) {
+ 		/* Save party A's public key */
+-		a_public = kzalloc(out_len_max, GFP_KERNEL);
++		a_public = kmemdup(sg_virt(req->dst), out_len_max, GFP_KERNEL);
+ 		if (!a_public) {
+ 			err = -ENOMEM;
+ 			goto free_output;
+ 		}
+-		memcpy(a_public, sg_virt(req->dst), out_len_max);
+ 	} else {
+ 		/* Verify calculated public key */
+ 		if (memcmp(vec->expected_a_public, sg_virt(req->dst),
+@@ -2127,13 +2126,12 @@ static int do_test_kpp(struct crypto_kpp *tfm, const struct kpp_testvec *vec,
+ 	}
+ 
+ 	/* Calculate shared secret key by using counter part (b) public key. */
+-	input_buf = kzalloc(vec->b_public_size, GFP_KERNEL);
++	input_buf = kmemdup(vec->b_public, vec->b_public_size, GFP_KERNEL);
+ 	if (!input_buf) {
+ 		err = -ENOMEM;
+ 		goto free_output;
+ 	}
+ 
+-	memcpy(input_buf, vec->b_public, vec->b_public_size);
+ 	sg_init_one(&src, input_buf, vec->b_public_size);
+ 	sg_init_one(&dst, output_buf, out_len_max);
+ 	kpp_request_set_input(req, &src, vec->b_public_size);
+@@ -2149,12 +2147,11 @@ static int do_test_kpp(struct crypto_kpp *tfm, const struct kpp_testvec *vec,
+ 
+ 	if (vec->genkey) {
+ 		/* Save the shared secret obtained by party A */
+-		a_ss = kzalloc(vec->expected_ss_size, GFP_KERNEL);
++		a_ss = kmemdup(sg_virt(req->dst), vec->expected_ss_size, GFP_KERNEL);
+ 		if (!a_ss) {
+ 			err = -ENOMEM;
+ 			goto free_all;
+ 		}
+-		memcpy(a_ss, sg_virt(req->dst), vec->expected_ss_size);
+ 
+ 		/*
+ 		 * Calculate party B's shared secret by using party A's
+-- 
+2.20.1
+
