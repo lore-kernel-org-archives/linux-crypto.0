@@ -6,35 +6,43 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46426C282D9
-	for <linux-crypto@archiver.kernel.org>; Wed, 30 Jan 2019 12:47:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DADEC282D9
+	for <linux-crypto@archiver.kernel.org>; Wed, 30 Jan 2019 12:47:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F3166218D4
-	for <linux-crypto@archiver.kernel.org>; Wed, 30 Jan 2019 12:47:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5843621473
+	for <linux-crypto@archiver.kernel.org>; Wed, 30 Jan 2019 12:47:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730118AbfA3MrY (ORCPT
+        id S1731099AbfA3Mro (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 30 Jan 2019 07:47:24 -0500
-Received: from mx2.suse.de ([195.135.220.15]:44118 "EHLO mx1.suse.de"
+        Wed, 30 Jan 2019 07:47:44 -0500
+Received: from mx2.suse.de ([195.135.220.15]:44178 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1730974AbfA3MrX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 30 Jan 2019 07:47:23 -0500
+        id S1730899AbfA3Mrg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 30 Jan 2019 07:47:36 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 035CAB046;
-        Wed, 30 Jan 2019 12:47:21 +0000 (UTC)
+        by mx1.suse.de (Postfix) with ESMTP id D2493B120;
+        Wed, 30 Jan 2019 12:47:30 +0000 (UTC)
 From:   Jiri Slaby <jslaby@suse.cz>
 To:     mingo@redhat.com
 Cc:     bp@alien8.de, linux-arch@vger.kernel.org,
         linux-kernel@vger.kernel.org, Jiri Slaby <jslaby@suse.cz>,
+        "Rafael J . Wysocki" <rafael.j.wysocki@intel.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH v7 07/28] x86/asm/crypto: annotate local functions
-Date:   Wed, 30 Jan 2019 13:46:50 +0100
-Message-Id: <20190130124711.12463-8-jslaby@suse.cz>
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
+        Matt Fleming <matt@codeblueprint.co.uk>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Juergen Gross <jgross@suse.com>, linux-crypto@vger.kernel.org,
+        linux-pm@vger.kernel.org, linux-efi@vger.kernel.org,
+        xen-devel@lists.xenproject.org
+Subject: [PATCH v7 24/28] x86_64/asm: change all ENTRY+ENDPROC to SYM_FUNC_*
+Date:   Wed, 30 Jan 2019 13:47:07 +0100
+Message-Id: <20190130124711.12463-25-jslaby@suse.cz>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190130124711.12463-1-jslaby@suse.cz>
 References: <20190130124711.12463-1-jslaby@suse.cz>
@@ -45,936 +53,3962 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Use the newly added SYM_FUNC_START_LOCAL to annotate starts of all
-functions which do not have ".globl" annotation, but their ends are
-annotated by ENDPROC. This is needed to balance ENDPROC for tools that
-generate debuginfo.
+These are all functions which are invoked from elsewhere, so we annotate
+them as global using the new SYM_FUNC_START. And their ENDPROC's by
+SYM_FUNC_END.
 
-To be symmetric, we also convert their ENDPROCs to the new SYM_FUNC_END.
+And make sure ENTRY/ENDPROC is not defined on X86_64, given these were
+the last users.
 
 Signed-off-by: Jiri Slaby <jslaby@suse.cz>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
+Reviewed-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com> [hibernate]
+Reviewed-by: Boris Ostrovsky <boris.ostrovsky@oracle.com> [xen bits]
+Cc: "H. Peter Anvin" <hpa@zytor.com>
 Cc: Thomas Gleixner <tglx@linutronix.de>
 Cc: Ingo Molnar <mingo@redhat.com>
-Cc: "H. Peter Anvin" <hpa@zytor.com>
-Cc: <x86@kernel.org>
-Cc: <linux-crypto@vger.kernel.org>
+Cc: x86@kernel.org
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: "Rafael J. Wysocki" <rjw@rjwysocki.net>
+Cc: Len Brown <len.brown@intel.com>
+Cc: Pavel Machek <pavel@ucw.cz>
+Cc: Matt Fleming <matt@codeblueprint.co.uk>
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Boris Ostrovsky <boris.ostrovsky@oracle.com>
+Cc: Juergen Gross <jgross@suse.com>
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-pm@vger.kernel.org
+Cc: linux-efi@vger.kernel.org
+Cc: xen-devel@lists.xenproject.org
 ---
- arch/x86/crypto/aegis128-aesni-asm.S         |  8 ++--
- arch/x86/crypto/aegis128l-aesni-asm.S        |  8 ++--
- arch/x86/crypto/aegis256-aesni-asm.S         |  8 ++--
- arch/x86/crypto/aesni-intel_asm.S            | 49 ++++++++------------
- arch/x86/crypto/camellia-aesni-avx-asm_64.S  | 20 ++++----
- arch/x86/crypto/camellia-aesni-avx2-asm_64.S | 20 ++++----
- arch/x86/crypto/cast5-avx-x86_64-asm_64.S    |  8 ++--
- arch/x86/crypto/cast6-avx-x86_64-asm_64.S    |  8 ++--
- arch/x86/crypto/chacha-ssse3-x86_64.S        |  4 +-
- arch/x86/crypto/ghash-clmulni-intel_asm.S    |  4 +-
- arch/x86/crypto/morus1280-avx2-asm.S         | 16 +++----
- arch/x86/crypto/morus1280-sse2-asm.S         | 16 +++----
- arch/x86/crypto/morus640-sse2-asm.S          | 16 +++----
- arch/x86/crypto/serpent-avx-x86_64-asm_64.S  |  8 ++--
- arch/x86/crypto/serpent-avx2-asm_64.S        |  8 ++--
- arch/x86/crypto/twofish-avx-x86_64-asm_64.S  |  8 ++--
- 16 files changed, 100 insertions(+), 109 deletions(-)
+ arch/x86/boot/compressed/efi_thunk_64.S      |  4 +-
+ arch/x86/boot/compressed/head_64.S           | 16 +++---
+ arch/x86/boot/compressed/mem_encrypt.S       |  8 +--
+ arch/x86/crypto/aegis128-aesni-asm.S         | 28 ++++-----
+ arch/x86/crypto/aegis128l-aesni-asm.S        | 28 ++++-----
+ arch/x86/crypto/aegis256-aesni-asm.S         | 28 ++++-----
+ arch/x86/crypto/aes-i586-asm_32.S            |  8 +--
+ arch/x86/crypto/aes-x86_64-asm_64.S          |  4 +-
+ arch/x86/crypto/aes_ctrby8_avx-x86_64.S      | 12 ++--
+ arch/x86/crypto/aesni-intel_asm.S            | 60 ++++++++++----------
+ arch/x86/crypto/aesni-intel_avx-x86_64.S     | 32 +++++------
+ arch/x86/crypto/blowfish-x86_64-asm_64.S     | 16 +++---
+ arch/x86/crypto/camellia-aesni-avx-asm_64.S  | 24 ++++----
+ arch/x86/crypto/camellia-aesni-avx2-asm_64.S | 24 ++++----
+ arch/x86/crypto/camellia-x86_64-asm_64.S     | 16 +++---
+ arch/x86/crypto/cast5-avx-x86_64-asm_64.S    | 16 +++---
+ arch/x86/crypto/cast6-avx-x86_64-asm_64.S    | 24 ++++----
+ arch/x86/crypto/chacha-avx2-x86_64.S         | 12 ++--
+ arch/x86/crypto/chacha-avx512vl-x86_64.S     | 12 ++--
+ arch/x86/crypto/chacha-ssse3-x86_64.S        | 12 ++--
+ arch/x86/crypto/crc32-pclmul_asm.S           |  4 +-
+ arch/x86/crypto/crc32c-pcl-intel-asm_64.S    |  4 +-
+ arch/x86/crypto/crct10dif-pcl-asm_64.S       |  4 +-
+ arch/x86/crypto/des3_ede-asm_64.S            |  8 +--
+ arch/x86/crypto/ghash-clmulni-intel_asm.S    |  8 +--
+ arch/x86/crypto/morus1280-avx2-asm.S         | 28 ++++-----
+ arch/x86/crypto/morus1280-sse2-asm.S         | 28 ++++-----
+ arch/x86/crypto/morus640-sse2-asm.S          | 28 ++++-----
+ arch/x86/crypto/nh-avx2-x86_64.S             |  4 +-
+ arch/x86/crypto/nh-sse2-x86_64.S             |  4 +-
+ arch/x86/crypto/poly1305-avx2-x86_64.S       |  4 +-
+ arch/x86/crypto/poly1305-sse2-x86_64.S       |  8 +--
+ arch/x86/crypto/serpent-avx-x86_64-asm_64.S  | 24 ++++----
+ arch/x86/crypto/serpent-avx2-asm_64.S        | 24 ++++----
+ arch/x86/crypto/serpent-sse2-x86_64-asm_64.S |  8 +--
+ arch/x86/crypto/sha1_avx2_x86_64_asm.S       |  4 +-
+ arch/x86/crypto/sha1_ni_asm.S                |  4 +-
+ arch/x86/crypto/sha1_ssse3_asm.S             |  4 +-
+ arch/x86/crypto/sha256-avx-asm.S             |  4 +-
+ arch/x86/crypto/sha256-avx2-asm.S            |  4 +-
+ arch/x86/crypto/sha256-ssse3-asm.S           |  4 +-
+ arch/x86/crypto/sha256_ni_asm.S              |  4 +-
+ arch/x86/crypto/sha512-avx-asm.S             |  4 +-
+ arch/x86/crypto/sha512-avx2-asm.S            |  4 +-
+ arch/x86/crypto/sha512-ssse3-asm.S           |  4 +-
+ arch/x86/crypto/twofish-avx-x86_64-asm_64.S  | 24 ++++----
+ arch/x86/crypto/twofish-x86_64-asm_64-3way.S |  8 +--
+ arch/x86/crypto/twofish-x86_64-asm_64.S      |  8 +--
+ arch/x86/entry/entry_64.S                    | 10 ++--
+ arch/x86/entry/entry_64_compat.S             |  4 +-
+ arch/x86/kernel/acpi/wakeup_64.S             |  8 +--
+ arch/x86/kernel/ftrace_64.S                  | 20 +++----
+ arch/x86/kernel/head_64.S                    | 12 ++--
+ arch/x86/kernel/irqflags.S                   |  8 +--
+ arch/x86/kvm/vmx/vmenter.S                   |  8 +--
+ arch/x86/lib/checksum_32.S                   |  8 +--
+ arch/x86/lib/clear_page_64.S                 | 12 ++--
+ arch/x86/lib/cmpxchg16b_emu.S                |  4 +-
+ arch/x86/lib/cmpxchg8b_emu.S                 |  4 +-
+ arch/x86/lib/copy_page_64.S                  |  4 +-
+ arch/x86/lib/copy_user_64.S                  | 16 +++---
+ arch/x86/lib/csum-copy_64.S                  |  4 +-
+ arch/x86/lib/getuser.S                       | 16 +++---
+ arch/x86/lib/hweight.S                       |  8 +--
+ arch/x86/lib/iomap_copy_64.S                 |  4 +-
+ arch/x86/lib/memcpy_64.S                     |  4 +-
+ arch/x86/lib/memmove_64.S                    |  4 +-
+ arch/x86/lib/memset_64.S                     |  4 +-
+ arch/x86/lib/msr-reg.S                       |  8 +--
+ arch/x86/lib/putuser.S                       | 16 +++---
+ arch/x86/lib/retpoline.S                     |  4 +-
+ arch/x86/lib/rwsem.S                         | 24 ++++----
+ arch/x86/mm/mem_encrypt_boot.S               |  8 +--
+ arch/x86/platform/efi/efi_stub_64.S          |  4 +-
+ arch/x86/platform/efi/efi_thunk_64.S         |  4 +-
+ arch/x86/power/hibernate_asm_64.S            |  8 +--
+ arch/x86/xen/xen-asm.S                       | 20 +++----
+ arch/x86/xen/xen-asm_64.S                    | 16 +++---
+ include/linux/linkage.h                      |  4 ++
+ 79 files changed, 467 insertions(+), 463 deletions(-)
 
+diff --git a/arch/x86/boot/compressed/efi_thunk_64.S b/arch/x86/boot/compressed/efi_thunk_64.S
+index 31312070db22..593913692d16 100644
+--- a/arch/x86/boot/compressed/efi_thunk_64.S
++++ b/arch/x86/boot/compressed/efi_thunk_64.S
+@@ -23,7 +23,7 @@
+ 
+ 	.code64
+ 	.text
+-ENTRY(efi64_thunk)
++SYM_FUNC_START(efi64_thunk)
+ 	push	%rbp
+ 	push	%rbx
+ 
+@@ -97,7 +97,7 @@ ENTRY(efi64_thunk)
+ 	pop	%rbx
+ 	pop	%rbp
+ 	ret
+-ENDPROC(efi64_thunk)
++SYM_FUNC_END(efi64_thunk)
+ 
+ SYM_FUNC_START_LOCAL(efi_exit32)
+ 	movq	func_rt_ptr(%rip), %rax
+diff --git a/arch/x86/boot/compressed/head_64.S b/arch/x86/boot/compressed/head_64.S
+index 157b0cbc77ca..b1c1c52a1504 100644
+--- a/arch/x86/boot/compressed/head_64.S
++++ b/arch/x86/boot/compressed/head_64.S
+@@ -45,7 +45,7 @@
+ 
+ 	__HEAD
+ 	.code32
+-ENTRY(startup_32)
++SYM_FUNC_START(startup_32)
+ 	/*
+ 	 * 32bit entry is 0 and it is ABI so immutable!
+ 	 * If we come here directly from a bootloader,
+@@ -222,11 +222,11 @@ ENTRY(startup_32)
+ 
+ 	/* Jump from 32bit compatibility mode into 64bit mode. */
+ 	lret
+-ENDPROC(startup_32)
++SYM_FUNC_END(startup_32)
+ 
+ #ifdef CONFIG_EFI_MIXED
+ 	.org 0x190
+-ENTRY(efi32_stub_entry)
++SYM_FUNC_START(efi32_stub_entry)
+ 	add	$0x4, %esp		/* Discard return address */
+ 	popl	%ecx
+ 	popl	%edx
+@@ -245,7 +245,7 @@ ENTRY(efi32_stub_entry)
+ 	movl	%eax, efi_config(%ebp)
+ 
+ 	jmp	startup_32
+-ENDPROC(efi32_stub_entry)
++SYM_FUNC_END(efi32_stub_entry)
+ #endif
+ 
+ 	.code64
+@@ -444,7 +444,7 @@ SYM_CODE_END(startup_64)
+ #ifdef CONFIG_EFI_STUB
+ 
+ /* The entry point for the PE/COFF executable is efi_pe_entry. */
+-ENTRY(efi_pe_entry)
++SYM_FUNC_START(efi_pe_entry)
+ 	movq	%rcx, efi64_config(%rip)	/* Handle */
+ 	movq	%rdx, efi64_config+8(%rip) /* EFI System table pointer */
+ 
+@@ -493,10 +493,10 @@ fail:
+ 	movl	BP_code32_start(%esi), %eax
+ 	leaq	startup_64(%rax), %rax
+ 	jmp	*%rax
+-ENDPROC(efi_pe_entry)
++SYM_FUNC_END(efi_pe_entry)
+ 
+ 	.org 0x390
+-ENTRY(efi64_stub_entry)
++SYM_FUNC_START(efi64_stub_entry)
+ 	movq	%rdi, efi64_config(%rip)	/* Handle */
+ 	movq	%rsi, efi64_config+8(%rip) /* EFI System table pointer */
+ 
+@@ -505,7 +505,7 @@ ENTRY(efi64_stub_entry)
+ 
+ 	movq	%rdx, %rsi
+ 	jmp	handover_entry
+-ENDPROC(efi64_stub_entry)
++SYM_FUNC_END(efi64_stub_entry)
+ #endif
+ 
+ 	.text
+diff --git a/arch/x86/boot/compressed/mem_encrypt.S b/arch/x86/boot/compressed/mem_encrypt.S
+index 9acc5eab9b71..14f4b6ae6c1d 100644
+--- a/arch/x86/boot/compressed/mem_encrypt.S
++++ b/arch/x86/boot/compressed/mem_encrypt.S
+@@ -18,7 +18,7 @@
+ 
+ 	.text
+ 	.code32
+-ENTRY(get_sev_encryption_bit)
++SYM_FUNC_START(get_sev_encryption_bit)
+ 	xor	%eax, %eax
+ 
+ #ifdef CONFIG_AMD_MEM_ENCRYPT
+@@ -68,10 +68,10 @@ ENTRY(get_sev_encryption_bit)
+ #endif	/* CONFIG_AMD_MEM_ENCRYPT */
+ 
+ 	ret
+-ENDPROC(get_sev_encryption_bit)
++SYM_FUNC_END(get_sev_encryption_bit)
+ 
+ 	.code64
+-ENTRY(set_sev_encryption_mask)
++SYM_FUNC_START(set_sev_encryption_mask)
+ #ifdef CONFIG_AMD_MEM_ENCRYPT
+ 	push	%rbp
+ 	push	%rdx
+@@ -93,7 +93,7 @@ ENTRY(set_sev_encryption_mask)
+ 
+ 	xor	%rax, %rax
+ 	ret
+-ENDPROC(set_sev_encryption_mask)
++SYM_FUNC_END(set_sev_encryption_mask)
+ 
+ 	.data
+ 
 diff --git a/arch/x86/crypto/aegis128-aesni-asm.S b/arch/x86/crypto/aegis128-aesni-asm.S
-index 5f7e43d4f64a..87b94664296a 100644
+index 87b94664296a..4565c2ac888a 100644
 --- a/arch/x86/crypto/aegis128-aesni-asm.S
 +++ b/arch/x86/crypto/aegis128-aesni-asm.S
-@@ -74,7 +74,7 @@
-  *   %r8
-  *   %r9
-  */
--__load_partial:
-+SYM_FUNC_START_LOCAL(__load_partial)
- 	xor %r9d, %r9d
- 	pxor MSG, MSG
- 
-@@ -126,7 +126,7 @@ __load_partial:
- 
- .Lld_partial_8:
- 	ret
--ENDPROC(__load_partial)
-+SYM_FUNC_END(__load_partial)
- 
- /*
-  * __store_partial: internal ABI
-@@ -140,7 +140,7 @@ ENDPROC(__load_partial)
-  *   %r9
-  *   %r10
-  */
--__store_partial:
-+SYM_FUNC_START_LOCAL(__store_partial)
- 	mov LEN, %r8
- 	mov DST, %r9
- 
-@@ -184,7 +184,7 @@ __store_partial:
- 
- .Lst_partial_1:
- 	ret
--ENDPROC(__store_partial)
-+SYM_FUNC_END(__store_partial)
- 
+@@ -189,7 +189,7 @@ SYM_FUNC_END(__store_partial)
  /*
   * void crypto_aegis128_aesni_init(void *state, const void *key, const void *iv);
+  */
+-ENTRY(crypto_aegis128_aesni_init)
++SYM_FUNC_START(crypto_aegis128_aesni_init)
+ 	FRAME_BEGIN
+ 
+ 	/* load IV: */
+@@ -229,13 +229,13 @@ ENTRY(crypto_aegis128_aesni_init)
+ 
+ 	FRAME_END
+ 	ret
+-ENDPROC(crypto_aegis128_aesni_init)
++SYM_FUNC_END(crypto_aegis128_aesni_init)
+ 
+ /*
+  * void crypto_aegis128_aesni_ad(void *state, unsigned int length,
+  *                               const void *data);
+  */
+-ENTRY(crypto_aegis128_aesni_ad)
++SYM_FUNC_START(crypto_aegis128_aesni_ad)
+ 	FRAME_BEGIN
+ 
+ 	cmp $0x10, LEN
+@@ -381,7 +381,7 @@ ENTRY(crypto_aegis128_aesni_ad)
+ .Lad_out:
+ 	FRAME_END
+ 	ret
+-ENDPROC(crypto_aegis128_aesni_ad)
++SYM_FUNC_END(crypto_aegis128_aesni_ad)
+ 
+ .macro encrypt_block a s0 s1 s2 s3 s4 i
+ 	movdq\a (\i * 0x10)(SRC), MSG
+@@ -405,7 +405,7 @@ ENDPROC(crypto_aegis128_aesni_ad)
+  * void crypto_aegis128_aesni_enc(void *state, unsigned int length,
+  *                                const void *src, void *dst);
+  */
+-ENTRY(crypto_aegis128_aesni_enc)
++SYM_FUNC_START(crypto_aegis128_aesni_enc)
+ 	FRAME_BEGIN
+ 
+ 	cmp $0x10, LEN
+@@ -496,13 +496,13 @@ ENTRY(crypto_aegis128_aesni_enc)
+ .Lenc_out:
+ 	FRAME_END
+ 	ret
+-ENDPROC(crypto_aegis128_aesni_enc)
++SYM_FUNC_END(crypto_aegis128_aesni_enc)
+ 
+ /*
+  * void crypto_aegis128_aesni_enc_tail(void *state, unsigned int length,
+  *                                     const void *src, void *dst);
+  */
+-ENTRY(crypto_aegis128_aesni_enc_tail)
++SYM_FUNC_START(crypto_aegis128_aesni_enc_tail)
+ 	FRAME_BEGIN
+ 
+ 	/* load the state: */
+@@ -536,7 +536,7 @@ ENTRY(crypto_aegis128_aesni_enc_tail)
+ 
+ 	FRAME_END
+ 	ret
+-ENDPROC(crypto_aegis128_aesni_enc_tail)
++SYM_FUNC_END(crypto_aegis128_aesni_enc_tail)
+ 
+ .macro decrypt_block a s0 s1 s2 s3 s4 i
+ 	movdq\a (\i * 0x10)(SRC), MSG
+@@ -559,7 +559,7 @@ ENDPROC(crypto_aegis128_aesni_enc_tail)
+  * void crypto_aegis128_aesni_dec(void *state, unsigned int length,
+  *                                const void *src, void *dst);
+  */
+-ENTRY(crypto_aegis128_aesni_dec)
++SYM_FUNC_START(crypto_aegis128_aesni_dec)
+ 	FRAME_BEGIN
+ 
+ 	cmp $0x10, LEN
+@@ -650,13 +650,13 @@ ENTRY(crypto_aegis128_aesni_dec)
+ .Ldec_out:
+ 	FRAME_END
+ 	ret
+-ENDPROC(crypto_aegis128_aesni_dec)
++SYM_FUNC_END(crypto_aegis128_aesni_dec)
+ 
+ /*
+  * void crypto_aegis128_aesni_dec_tail(void *state, unsigned int length,
+  *                                     const void *src, void *dst);
+  */
+-ENTRY(crypto_aegis128_aesni_dec_tail)
++SYM_FUNC_START(crypto_aegis128_aesni_dec_tail)
+ 	FRAME_BEGIN
+ 
+ 	/* load the state: */
+@@ -700,13 +700,13 @@ ENTRY(crypto_aegis128_aesni_dec_tail)
+ 
+ 	FRAME_END
+ 	ret
+-ENDPROC(crypto_aegis128_aesni_dec_tail)
++SYM_FUNC_END(crypto_aegis128_aesni_dec_tail)
+ 
+ /*
+  * void crypto_aegis128_aesni_final(void *state, void *tag_xor,
+  *                                  u64 assoclen, u64 cryptlen);
+  */
+-ENTRY(crypto_aegis128_aesni_final)
++SYM_FUNC_START(crypto_aegis128_aesni_final)
+ 	FRAME_BEGIN
+ 
+ 	/* load the state: */
+@@ -747,4 +747,4 @@ ENTRY(crypto_aegis128_aesni_final)
+ 
+ 	FRAME_END
+ 	ret
+-ENDPROC(crypto_aegis128_aesni_final)
++SYM_FUNC_END(crypto_aegis128_aesni_final)
 diff --git a/arch/x86/crypto/aegis128l-aesni-asm.S b/arch/x86/crypto/aegis128l-aesni-asm.S
-index 491dd61c845c..9f79a2c6752a 100644
+index 9f79a2c6752a..3e01edc2ca2b 100644
 --- a/arch/x86/crypto/aegis128l-aesni-asm.S
 +++ b/arch/x86/crypto/aegis128l-aesni-asm.S
-@@ -65,7 +65,7 @@
-  *   %r8
-  *   %r9
+@@ -314,7 +314,7 @@ SYM_FUNC_END(__store_partial)
+ /*
+  * void crypto_aegis128l_aesni_init(void *state, const void *key, const void *iv);
   */
--__load_partial:
-+SYM_FUNC_START_LOCAL(__load_partial)
- 	xor %r9d, %r9d
- 	pxor MSG0, MSG0
- 	pxor MSG1, MSG1
-@@ -126,7 +126,7 @@ __load_partial:
+-ENTRY(crypto_aegis128l_aesni_init)
++SYM_FUNC_START(crypto_aegis128l_aesni_init)
+ 	FRAME_BEGIN
  
- .Lld_partial_16:
+ 	/* load key: */
+@@ -354,7 +354,7 @@ ENTRY(crypto_aegis128l_aesni_init)
+ 
+ 	FRAME_END
  	ret
--ENDPROC(__load_partial)
-+SYM_FUNC_END(__load_partial)
+-ENDPROC(crypto_aegis128l_aesni_init)
++SYM_FUNC_END(crypto_aegis128l_aesni_init)
+ 
+ .macro ad_block a i
+ 	movdq\a (\i * 0x20 + 0x00)(SRC), MSG0
+@@ -369,7 +369,7 @@ ENDPROC(crypto_aegis128l_aesni_init)
+  * void crypto_aegis128l_aesni_ad(void *state, unsigned int length,
+  *                                const void *data);
+  */
+-ENTRY(crypto_aegis128l_aesni_ad)
++SYM_FUNC_START(crypto_aegis128l_aesni_ad)
+ 	FRAME_BEGIN
+ 
+ 	cmp $0x20, LEN
+@@ -452,7 +452,7 @@ ENTRY(crypto_aegis128l_aesni_ad)
+ .Lad_out:
+ 	FRAME_END
+ 	ret
+-ENDPROC(crypto_aegis128l_aesni_ad)
++SYM_FUNC_END(crypto_aegis128l_aesni_ad)
+ 
+ .macro crypt m0 m1 s0 s1 s2 s3 s4 s5 s6 s7
+ 	pxor \s1, \m0
+@@ -534,7 +534,7 @@ ENDPROC(crypto_aegis128l_aesni_ad)
+  * void crypto_aegis128l_aesni_enc(void *state, unsigned int length,
+  *                                 const void *src, void *dst);
+  */
+-ENTRY(crypto_aegis128l_aesni_enc)
++SYM_FUNC_START(crypto_aegis128l_aesni_enc)
+ 	FRAME_BEGIN
+ 
+ 	cmp $0x20, LEN
+@@ -620,13 +620,13 @@ ENTRY(crypto_aegis128l_aesni_enc)
+ .Lenc_out:
+ 	FRAME_END
+ 	ret
+-ENDPROC(crypto_aegis128l_aesni_enc)
++SYM_FUNC_END(crypto_aegis128l_aesni_enc)
  
  /*
-  * __store_partial: internal ABI
-@@ -141,7 +141,7 @@ ENDPROC(__load_partial)
-  *   %r9
-  *   %r10
+  * void crypto_aegis128l_aesni_enc_tail(void *state, unsigned int length,
+  *                                      const void *src, void *dst);
   */
--__store_partial:
-+SYM_FUNC_START_LOCAL(__store_partial)
- 	mov LEN, %r8
- 	mov DST, %r9
+-ENTRY(crypto_aegis128l_aesni_enc_tail)
++SYM_FUNC_START(crypto_aegis128l_aesni_enc_tail)
+ 	FRAME_BEGIN
  
-@@ -195,7 +195,7 @@ __store_partial:
+ 	state_load
+@@ -646,13 +646,13 @@ ENTRY(crypto_aegis128l_aesni_enc_tail)
  
- .Lst_partial_1:
+ 	FRAME_END
  	ret
--ENDPROC(__store_partial)
-+SYM_FUNC_END(__store_partial)
+-ENDPROC(crypto_aegis128l_aesni_enc_tail)
++SYM_FUNC_END(crypto_aegis128l_aesni_enc_tail)
  
- .macro update
- 	movdqa STATE7, T0
+ /*
+  * void crypto_aegis128l_aesni_dec(void *state, unsigned int length,
+  *                                 const void *src, void *dst);
+  */
+-ENTRY(crypto_aegis128l_aesni_dec)
++SYM_FUNC_START(crypto_aegis128l_aesni_dec)
+ 	FRAME_BEGIN
+ 
+ 	cmp $0x20, LEN
+@@ -738,13 +738,13 @@ ENTRY(crypto_aegis128l_aesni_dec)
+ .Ldec_out:
+ 	FRAME_END
+ 	ret
+-ENDPROC(crypto_aegis128l_aesni_dec)
++SYM_FUNC_END(crypto_aegis128l_aesni_dec)
+ 
+ /*
+  * void crypto_aegis128l_aesni_dec_tail(void *state, unsigned int length,
+  *                                      const void *src, void *dst);
+  */
+-ENTRY(crypto_aegis128l_aesni_dec_tail)
++SYM_FUNC_START(crypto_aegis128l_aesni_dec_tail)
+ 	FRAME_BEGIN
+ 
+ 	state_load
+@@ -778,13 +778,13 @@ ENTRY(crypto_aegis128l_aesni_dec_tail)
+ 
+ 	FRAME_END
+ 	ret
+-ENDPROC(crypto_aegis128l_aesni_dec_tail)
++SYM_FUNC_END(crypto_aegis128l_aesni_dec_tail)
+ 
+ /*
+  * void crypto_aegis128l_aesni_final(void *state, void *tag_xor,
+  *                                   u64 assoclen, u64 cryptlen);
+  */
+-ENTRY(crypto_aegis128l_aesni_final)
++SYM_FUNC_START(crypto_aegis128l_aesni_final)
+ 	FRAME_BEGIN
+ 
+ 	state_load
+@@ -823,4 +823,4 @@ ENTRY(crypto_aegis128l_aesni_final)
+ 
+ 	FRAME_END
+ 	ret
+-ENDPROC(crypto_aegis128l_aesni_final)
++SYM_FUNC_END(crypto_aegis128l_aesni_final)
 diff --git a/arch/x86/crypto/aegis256-aesni-asm.S b/arch/x86/crypto/aegis256-aesni-asm.S
-index 8870c7c5d9a4..e974a876c627 100644
+index e974a876c627..5241454f65ad 100644
 --- a/arch/x86/crypto/aegis256-aesni-asm.S
 +++ b/arch/x86/crypto/aegis256-aesni-asm.S
-@@ -58,7 +58,7 @@
-  *   %r8
-  *   %r9
+@@ -255,7 +255,7 @@ SYM_FUNC_END(__store_partial)
+ /*
+  * void crypto_aegis256_aesni_init(void *state, const void *key, const void *iv);
   */
--__load_partial:
-+SYM_FUNC_START_LOCAL(__load_partial)
- 	xor %r9d, %r9d
- 	pxor MSG, MSG
+-ENTRY(crypto_aegis256_aesni_init)
++SYM_FUNC_START(crypto_aegis256_aesni_init)
+ 	FRAME_BEGIN
  
-@@ -110,7 +110,7 @@ __load_partial:
+ 	/* load key: */
+@@ -300,7 +300,7 @@ ENTRY(crypto_aegis256_aesni_init)
  
- .Lld_partial_8:
+ 	FRAME_END
  	ret
--ENDPROC(__load_partial)
-+SYM_FUNC_END(__load_partial)
+-ENDPROC(crypto_aegis256_aesni_init)
++SYM_FUNC_END(crypto_aegis256_aesni_init)
+ 
+ .macro ad_block a i
+ 	movdq\a (\i * 0x10)(SRC), MSG
+@@ -314,7 +314,7 @@ ENDPROC(crypto_aegis256_aesni_init)
+  * void crypto_aegis256_aesni_ad(void *state, unsigned int length,
+  *                               const void *data);
+  */
+-ENTRY(crypto_aegis256_aesni_ad)
++SYM_FUNC_START(crypto_aegis256_aesni_ad)
+ 	FRAME_BEGIN
+ 
+ 	cmp $0x10, LEN
+@@ -383,7 +383,7 @@ ENTRY(crypto_aegis256_aesni_ad)
+ .Lad_out:
+ 	FRAME_END
+ 	ret
+-ENDPROC(crypto_aegis256_aesni_ad)
++SYM_FUNC_END(crypto_aegis256_aesni_ad)
+ 
+ .macro crypt m s0 s1 s2 s3 s4 s5
+ 	pxor \s1, \m
+@@ -447,7 +447,7 @@ ENDPROC(crypto_aegis256_aesni_ad)
+  * void crypto_aegis256_aesni_enc(void *state, unsigned int length,
+  *                                const void *src, void *dst);
+  */
+-ENTRY(crypto_aegis256_aesni_enc)
++SYM_FUNC_START(crypto_aegis256_aesni_enc)
+ 	FRAME_BEGIN
+ 
+ 	cmp $0x10, LEN
+@@ -519,13 +519,13 @@ ENTRY(crypto_aegis256_aesni_enc)
+ .Lenc_out:
+ 	FRAME_END
+ 	ret
+-ENDPROC(crypto_aegis256_aesni_enc)
++SYM_FUNC_END(crypto_aegis256_aesni_enc)
  
  /*
-  * __store_partial: internal ABI
-@@ -124,7 +124,7 @@ ENDPROC(__load_partial)
-  *   %r9
-  *   %r10
+  * void crypto_aegis256_aesni_enc_tail(void *state, unsigned int length,
+  *                                     const void *src, void *dst);
   */
--__store_partial:
-+SYM_FUNC_START_LOCAL(__store_partial)
- 	mov LEN, %r8
- 	mov DST, %r9
+-ENTRY(crypto_aegis256_aesni_enc_tail)
++SYM_FUNC_START(crypto_aegis256_aesni_enc_tail)
+ 	FRAME_BEGIN
  
-@@ -168,7 +168,7 @@ __store_partial:
+ 	state_load
+@@ -544,13 +544,13 @@ ENTRY(crypto_aegis256_aesni_enc_tail)
  
- .Lst_partial_1:
+ 	FRAME_END
  	ret
--ENDPROC(__store_partial)
-+SYM_FUNC_END(__store_partial)
+-ENDPROC(crypto_aegis256_aesni_enc_tail)
++SYM_FUNC_END(crypto_aegis256_aesni_enc_tail)
  
- .macro update
- 	movdqa STATE5, T0
+ /*
+  * void crypto_aegis256_aesni_dec(void *state, unsigned int length,
+  *                                const void *src, void *dst);
+  */
+-ENTRY(crypto_aegis256_aesni_dec)
++SYM_FUNC_START(crypto_aegis256_aesni_dec)
+ 	FRAME_BEGIN
+ 
+ 	cmp $0x10, LEN
+@@ -622,13 +622,13 @@ ENTRY(crypto_aegis256_aesni_dec)
+ .Ldec_out:
+ 	FRAME_END
+ 	ret
+-ENDPROC(crypto_aegis256_aesni_dec)
++SYM_FUNC_END(crypto_aegis256_aesni_dec)
+ 
+ /*
+  * void crypto_aegis256_aesni_dec_tail(void *state, unsigned int length,
+  *                                     const void *src, void *dst);
+  */
+-ENTRY(crypto_aegis256_aesni_dec_tail)
++SYM_FUNC_START(crypto_aegis256_aesni_dec_tail)
+ 	FRAME_BEGIN
+ 
+ 	state_load
+@@ -657,13 +657,13 @@ ENTRY(crypto_aegis256_aesni_dec_tail)
+ 
+ 	FRAME_END
+ 	ret
+-ENDPROC(crypto_aegis256_aesni_dec_tail)
++SYM_FUNC_END(crypto_aegis256_aesni_dec_tail)
+ 
+ /*
+  * void crypto_aegis256_aesni_final(void *state, void *tag_xor,
+  *                                  u64 assoclen, u64 cryptlen);
+  */
+-ENTRY(crypto_aegis256_aesni_final)
++SYM_FUNC_START(crypto_aegis256_aesni_final)
+ 	FRAME_BEGIN
+ 
+ 	state_load
+@@ -700,4 +700,4 @@ ENTRY(crypto_aegis256_aesni_final)
+ 
+ 	FRAME_END
+ 	ret
+-ENDPROC(crypto_aegis256_aesni_final)
++SYM_FUNC_END(crypto_aegis256_aesni_final)
+diff --git a/arch/x86/crypto/aes-i586-asm_32.S b/arch/x86/crypto/aes-i586-asm_32.S
+index 2849dbc59e11..5b2636c58527 100644
+--- a/arch/x86/crypto/aes-i586-asm_32.S
++++ b/arch/x86/crypto/aes-i586-asm_32.S
+@@ -223,7 +223,7 @@
+ .extern  crypto_ft_tab
+ .extern  crypto_fl_tab
+ 
+-ENTRY(aes_enc_blk)
++SYM_FUNC_START(aes_enc_blk)
+ 	push    %ebp
+ 	mov     ctx(%esp),%ebp
+ 
+@@ -287,7 +287,7 @@ ENTRY(aes_enc_blk)
+ 	mov     %r0,(%ebp)
+ 	pop     %ebp
+ 	ret
+-ENDPROC(aes_enc_blk)
++SYM_FUNC_END(aes_enc_blk)
+ 
+ // AES (Rijndael) Decryption Subroutine
+ /* void aes_dec_blk(struct crypto_aes_ctx *ctx, u8 *out_blk, const u8 *in_blk) */
+@@ -295,7 +295,7 @@ ENDPROC(aes_enc_blk)
+ .extern  crypto_it_tab
+ .extern  crypto_il_tab
+ 
+-ENTRY(aes_dec_blk)
++SYM_FUNC_START(aes_dec_blk)
+ 	push    %ebp
+ 	mov     ctx(%esp),%ebp
+ 
+@@ -359,4 +359,4 @@ ENTRY(aes_dec_blk)
+ 	mov     %r0,(%ebp)
+ 	pop     %ebp
+ 	ret
+-ENDPROC(aes_dec_blk)
++SYM_FUNC_END(aes_dec_blk)
+diff --git a/arch/x86/crypto/aes-x86_64-asm_64.S b/arch/x86/crypto/aes-x86_64-asm_64.S
+index 8739cf7795de..22c44ad3ef42 100644
+--- a/arch/x86/crypto/aes-x86_64-asm_64.S
++++ b/arch/x86/crypto/aes-x86_64-asm_64.S
+@@ -49,7 +49,7 @@
+ #define R11	%r11
+ 
+ #define prologue(FUNC,KEY,B128,B192,r1,r2,r5,r6,r7,r8,r9,r10,r11) \
+-	ENTRY(FUNC);			\
++	SYM_FUNC_START(FUNC);		\
+ 	movq	r1,r2;			\
+ 	leaq	KEY+48(r8),r9;		\
+ 	movq	r10,r11;		\
+@@ -75,7 +75,7 @@
+ 	movl	r7 ## E,8(r9);		\
+ 	movl	r8 ## E,12(r9);		\
+ 	ret;				\
+-	ENDPROC(FUNC);
++	SYM_FUNC_END(FUNC);
+ 
+ #define round(TAB,OFFSET,r1,r2,r3,r4,r5,r6,r7,r8,ra,rb,rc,rd) \
+ 	movzbl	r2 ## H,r5 ## E;	\
+diff --git a/arch/x86/crypto/aes_ctrby8_avx-x86_64.S b/arch/x86/crypto/aes_ctrby8_avx-x86_64.S
+index 5f6a5af9c489..ec437db1fa54 100644
+--- a/arch/x86/crypto/aes_ctrby8_avx-x86_64.S
++++ b/arch/x86/crypto/aes_ctrby8_avx-x86_64.S
+@@ -544,11 +544,11 @@ ddq_add_8:
+  * aes_ctr_enc_128_avx_by8(void *in, void *iv, void *keys, void *out,
+  *			unsigned int num_bytes)
+  */
+-ENTRY(aes_ctr_enc_128_avx_by8)
++SYM_FUNC_START(aes_ctr_enc_128_avx_by8)
+ 	/* call the aes main loop */
+ 	do_aes_ctrmain KEY_128
+ 
+-ENDPROC(aes_ctr_enc_128_avx_by8)
++SYM_FUNC_END(aes_ctr_enc_128_avx_by8)
+ 
+ /*
+  * routine to do AES192 CTR enc/decrypt "by8"
+@@ -557,11 +557,11 @@ ENDPROC(aes_ctr_enc_128_avx_by8)
+  * aes_ctr_enc_192_avx_by8(void *in, void *iv, void *keys, void *out,
+  *			unsigned int num_bytes)
+  */
+-ENTRY(aes_ctr_enc_192_avx_by8)
++SYM_FUNC_START(aes_ctr_enc_192_avx_by8)
+ 	/* call the aes main loop */
+ 	do_aes_ctrmain KEY_192
+ 
+-ENDPROC(aes_ctr_enc_192_avx_by8)
++SYM_FUNC_END(aes_ctr_enc_192_avx_by8)
+ 
+ /*
+  * routine to do AES256 CTR enc/decrypt "by8"
+@@ -570,8 +570,8 @@ ENDPROC(aes_ctr_enc_192_avx_by8)
+  * aes_ctr_enc_256_avx_by8(void *in, void *iv, void *keys, void *out,
+  *			unsigned int num_bytes)
+  */
+-ENTRY(aes_ctr_enc_256_avx_by8)
++SYM_FUNC_START(aes_ctr_enc_256_avx_by8)
+ 	/* call the aes main loop */
+ 	do_aes_ctrmain KEY_256
+ 
+-ENDPROC(aes_ctr_enc_256_avx_by8)
++SYM_FUNC_END(aes_ctr_enc_256_avx_by8)
 diff --git a/arch/x86/crypto/aesni-intel_asm.S b/arch/x86/crypto/aesni-intel_asm.S
-index cb2deb61c5d9..6c349e844581 100644
+index 19effbf9ce35..08c64a1c8db4 100644
 --- a/arch/x86/crypto/aesni-intel_asm.S
 +++ b/arch/x86/crypto/aesni-intel_asm.S
-@@ -1763,7 +1763,7 @@ ENDPROC(aesni_gcm_finalize)
+@@ -1596,7 +1596,7 @@ _esb_loop_\@:
+ * poly = x^128 + x^127 + x^126 + x^121 + 1
+ *
+ *****************************************************************************/
+-ENTRY(aesni_gcm_dec)
++SYM_FUNC_START(aesni_gcm_dec)
+ 	FUNC_SAVE
  
- .align 4
- _key_expansion_128:
--_key_expansion_256a:
-+SYM_FUNC_START_LOCAL(_key_expansion_256a)
- 	pshufd $0b11111111, %xmm1, %xmm1
- 	shufps $0b00010000, %xmm0, %xmm4
- 	pxor %xmm4, %xmm0
-@@ -1774,10 +1774,9 @@ _key_expansion_256a:
- 	add $0x10, TKEYP
+ 	GCM_INIT %arg6, arg7, arg8, arg9
+@@ -1604,7 +1604,7 @@ ENTRY(aesni_gcm_dec)
+ 	GCM_COMPLETE arg10, arg11
+ 	FUNC_RESTORE
  	ret
- ENDPROC(_key_expansion_128)
--ENDPROC(_key_expansion_256a)
-+SYM_FUNC_END(_key_expansion_256a)
+-ENDPROC(aesni_gcm_dec)
++SYM_FUNC_END(aesni_gcm_dec)
  
--.align 4
--_key_expansion_192a:
-+SYM_FUNC_START_LOCAL(_key_expansion_192a)
- 	pshufd $0b01010101, %xmm1, %xmm1
- 	shufps $0b00010000, %xmm0, %xmm4
- 	pxor %xmm4, %xmm0
-@@ -1799,10 +1798,9 @@ _key_expansion_192a:
- 	movaps %xmm1, 0x10(TKEYP)
- 	add $0x20, TKEYP
+ 
+ /*****************************************************************************
+@@ -1684,7 +1684,7 @@ ENDPROC(aesni_gcm_dec)
+ *
+ * poly = x^128 + x^127 + x^126 + x^121 + 1
+ ***************************************************************************/
+-ENTRY(aesni_gcm_enc)
++SYM_FUNC_START(aesni_gcm_enc)
+ 	FUNC_SAVE
+ 
+ 	GCM_INIT %arg6, arg7, arg8, arg9
+@@ -1693,7 +1693,7 @@ ENTRY(aesni_gcm_enc)
+ 	GCM_COMPLETE arg10, arg11
+ 	FUNC_RESTORE
  	ret
--ENDPROC(_key_expansion_192a)
-+SYM_FUNC_END(_key_expansion_192a)
+-ENDPROC(aesni_gcm_enc)
++SYM_FUNC_END(aesni_gcm_enc)
  
--.align 4
--_key_expansion_192b:
-+SYM_FUNC_START_LOCAL(_key_expansion_192b)
- 	pshufd $0b01010101, %xmm1, %xmm1
- 	shufps $0b00010000, %xmm0, %xmm4
- 	pxor %xmm4, %xmm0
-@@ -1819,10 +1817,9 @@ _key_expansion_192b:
- 	movaps %xmm0, (TKEYP)
- 	add $0x10, TKEYP
+ /*****************************************************************************
+ * void aesni_gcm_init(void *aes_ctx,      // AES Key schedule. Starts on a 16 byte boundary.
+@@ -1706,12 +1706,12 @@ ENDPROC(aesni_gcm_enc)
+ *                     const u8 *aad,      // Additional Authentication Data (AAD)
+ *                     u64 aad_len)        // Length of AAD in bytes.
+ */
+-ENTRY(aesni_gcm_init)
++SYM_FUNC_START(aesni_gcm_init)
+ 	FUNC_SAVE
+ 	GCM_INIT %arg3, %arg4,%arg5, %arg6
+ 	FUNC_RESTORE
  	ret
--ENDPROC(_key_expansion_192b)
-+SYM_FUNC_END(_key_expansion_192b)
+-ENDPROC(aesni_gcm_init)
++SYM_FUNC_END(aesni_gcm_init)
  
--.align 4
--_key_expansion_256b:
-+SYM_FUNC_START_LOCAL(_key_expansion_256b)
- 	pshufd $0b10101010, %xmm1, %xmm1
- 	shufps $0b00010000, %xmm2, %xmm4
- 	pxor %xmm4, %xmm2
-@@ -1832,7 +1829,7 @@ _key_expansion_256b:
- 	movaps %xmm2, (TKEYP)
- 	add $0x10, TKEYP
+ /*****************************************************************************
+ * void aesni_gcm_enc_update(void *aes_ctx,      // AES Key schedule. Starts on a 16 byte boundary.
+@@ -1721,12 +1721,12 @@ ENDPROC(aesni_gcm_init)
+ *                    const u8 *in,       // Plaintext input
+ *                    u64 plaintext_len,  // Length of data in bytes for encryption.
+ */
+-ENTRY(aesni_gcm_enc_update)
++SYM_FUNC_START(aesni_gcm_enc_update)
+ 	FUNC_SAVE
+ 	GCM_ENC_DEC enc
+ 	FUNC_RESTORE
  	ret
--ENDPROC(_key_expansion_256b)
-+SYM_FUNC_END(_key_expansion_256b)
+-ENDPROC(aesni_gcm_enc_update)
++SYM_FUNC_END(aesni_gcm_enc_update)
  
- /*
+ /*****************************************************************************
+ * void aesni_gcm_dec_update(void *aes_ctx,      // AES Key schedule. Starts on a 16 byte boundary.
+@@ -1736,12 +1736,12 @@ ENDPROC(aesni_gcm_enc_update)
+ *                    const u8 *in,       // Plaintext input
+ *                    u64 plaintext_len,  // Length of data in bytes for encryption.
+ */
+-ENTRY(aesni_gcm_dec_update)
++SYM_FUNC_START(aesni_gcm_dec_update)
+ 	FUNC_SAVE
+ 	GCM_ENC_DEC dec
+ 	FUNC_RESTORE
+ 	ret
+-ENDPROC(aesni_gcm_dec_update)
++SYM_FUNC_END(aesni_gcm_dec_update)
+ 
+ /*****************************************************************************
+ * void aesni_gcm_finalize(void *aes_ctx,      // AES Key schedule. Starts on a 16 byte boundary.
+@@ -1751,12 +1751,12 @@ ENDPROC(aesni_gcm_dec_update)
+ *                    u64 auth_tag_len);  // Authenticated Tag Length in bytes. Valid values are 16 (most likely),
+ *                                        // 12 or 8.
+ */
+-ENTRY(aesni_gcm_finalize)
++SYM_FUNC_START(aesni_gcm_finalize)
+ 	FUNC_SAVE
+ 	GCM_COMPLETE %arg3 %arg4
+ 	FUNC_RESTORE
+ 	ret
+-ENDPROC(aesni_gcm_finalize)
++SYM_FUNC_END(aesni_gcm_finalize)
+ 
+ #endif
+ 
+@@ -1834,7 +1834,7 @@ SYM_FUNC_END(_key_expansion_256b)
   * int aesni_set_key(struct crypto_aes_ctx *ctx, const u8 *in_key,
-@@ -1985,8 +1982,7 @@ ENDPROC(aesni_enc)
-  *	KEY
-  *	TKEYP (T1)
+  *                   unsigned int key_len)
   */
--.align 4
--_aesni_enc1:
-+SYM_FUNC_START_LOCAL(_aesni_enc1)
- 	movaps (KEYP), KEY		# key
- 	mov KEYP, TKEYP
- 	pxor KEY, STATE		# round 0
-@@ -2029,7 +2025,7 @@ _aesni_enc1:
- 	movaps 0x70(TKEYP), KEY
- 	AESENCLAST KEY STATE
+-ENTRY(aesni_set_key)
++SYM_FUNC_START(aesni_set_key)
+ 	FRAME_BEGIN
+ #ifndef __x86_64__
+ 	pushl KEYP
+@@ -1943,12 +1943,12 @@ ENTRY(aesni_set_key)
+ #endif
+ 	FRAME_END
  	ret
--ENDPROC(_aesni_enc1)
-+SYM_FUNC_END(_aesni_enc1)
+-ENDPROC(aesni_set_key)
++SYM_FUNC_END(aesni_set_key)
  
  /*
-  * _aesni_enc4:	internal ABI
-@@ -2049,8 +2045,7 @@ ENDPROC(_aesni_enc1)
-  *	KEY
-  *	TKEYP (T1)
+  * void aesni_enc(struct crypto_aes_ctx *ctx, u8 *dst, const u8 *src)
   */
--.align 4
--_aesni_enc4:
-+SYM_FUNC_START_LOCAL(_aesni_enc4)
- 	movaps (KEYP), KEY		# key
- 	mov KEYP, TKEYP
- 	pxor KEY, STATE1		# round 0
-@@ -2138,7 +2133,7 @@ _aesni_enc4:
- 	AESENCLAST KEY STATE3
- 	AESENCLAST KEY STATE4
+-ENTRY(aesni_enc)
++SYM_FUNC_START(aesni_enc)
+ 	FRAME_BEGIN
+ #ifndef __x86_64__
+ 	pushl KEYP
+@@ -1967,7 +1967,7 @@ ENTRY(aesni_enc)
+ #endif
+ 	FRAME_END
  	ret
--ENDPROC(_aesni_enc4)
-+SYM_FUNC_END(_aesni_enc4)
+-ENDPROC(aesni_enc)
++SYM_FUNC_END(aesni_enc)
  
+ /*
+  * _aesni_enc1:		internal ABI
+@@ -2137,7 +2137,7 @@ SYM_FUNC_END(_aesni_enc4)
  /*
   * void aesni_dec (struct crypto_aes_ctx *ctx, u8 *dst, const u8 *src)
-@@ -2177,8 +2172,7 @@ ENDPROC(aesni_dec)
-  *	KEY
-  *	TKEYP (T1)
   */
--.align 4
--_aesni_dec1:
-+SYM_FUNC_START_LOCAL(_aesni_dec1)
- 	movaps (KEYP), KEY		# key
- 	mov KEYP, TKEYP
- 	pxor KEY, STATE		# round 0
-@@ -2221,7 +2215,7 @@ _aesni_dec1:
- 	movaps 0x70(TKEYP), KEY
- 	AESDECLAST KEY STATE
+-ENTRY(aesni_dec)
++SYM_FUNC_START(aesni_dec)
+ 	FRAME_BEGIN
+ #ifndef __x86_64__
+ 	pushl KEYP
+@@ -2157,7 +2157,7 @@ ENTRY(aesni_dec)
+ #endif
+ 	FRAME_END
  	ret
--ENDPROC(_aesni_dec1)
-+SYM_FUNC_END(_aesni_dec1)
+-ENDPROC(aesni_dec)
++SYM_FUNC_END(aesni_dec)
  
  /*
-  * _aesni_dec4:	internal ABI
-@@ -2241,8 +2235,7 @@ ENDPROC(_aesni_dec1)
-  *	KEY
-  *	TKEYP (T1)
-  */
--.align 4
--_aesni_dec4:
-+SYM_FUNC_START_LOCAL(_aesni_dec4)
- 	movaps (KEYP), KEY		# key
- 	mov KEYP, TKEYP
- 	pxor KEY, STATE1		# round 0
-@@ -2330,7 +2323,7 @@ _aesni_dec4:
- 	AESDECLAST KEY STATE3
- 	AESDECLAST KEY STATE4
- 	ret
--ENDPROC(_aesni_dec4)
-+SYM_FUNC_END(_aesni_dec4)
- 
- /*
+  * _aesni_dec1:		internal ABI
+@@ -2328,7 +2328,7 @@ SYM_FUNC_END(_aesni_dec4)
   * void aesni_ecb_enc(struct crypto_aes_ctx *ctx, const u8 *dst, u8 *src,
-@@ -2608,8 +2601,7 @@ ENDPROC(aesni_cbc_dec)
-  *	INC:	== 1, in little endian
-  *	BSWAP_MASK == endian swapping mask
+  *		      size_t len)
   */
--.align 4
--_aesni_inc_init:
-+SYM_FUNC_START_LOCAL(_aesni_inc_init)
- 	movaps .Lbswap_mask, BSWAP_MASK
- 	movaps IV, CTR
- 	PSHUFB_XMM BSWAP_MASK CTR
-@@ -2617,7 +2609,7 @@ _aesni_inc_init:
- 	MOVQ_R64_XMM TCTR_LOW INC
- 	MOVQ_R64_XMM CTR TCTR_LOW
+-ENTRY(aesni_ecb_enc)
++SYM_FUNC_START(aesni_ecb_enc)
+ 	FRAME_BEGIN
+ #ifndef __x86_64__
+ 	pushl LEN
+@@ -2382,13 +2382,13 @@ ENTRY(aesni_ecb_enc)
+ #endif
+ 	FRAME_END
  	ret
--ENDPROC(_aesni_inc_init)
-+SYM_FUNC_END(_aesni_inc_init)
+-ENDPROC(aesni_ecb_enc)
++SYM_FUNC_END(aesni_ecb_enc)
  
  /*
-  * _aesni_inc:		internal ABI
-@@ -2634,8 +2626,7 @@ ENDPROC(_aesni_inc_init)
-  *	CTR:	== output IV, in little endian
-  *	TCTR_LOW: == lower qword of CTR
+  * void aesni_ecb_dec(struct crypto_aes_ctx *ctx, const u8 *dst, u8 *src,
+  *		      size_t len);
   */
--.align 4
--_aesni_inc:
-+SYM_FUNC_START_LOCAL(_aesni_inc)
- 	paddq INC, CTR
- 	add $1, TCTR_LOW
- 	jnc .Linc_low
-@@ -2646,7 +2637,7 @@ _aesni_inc:
- 	movaps CTR, IV
- 	PSHUFB_XMM BSWAP_MASK IV
+-ENTRY(aesni_ecb_dec)
++SYM_FUNC_START(aesni_ecb_dec)
+ 	FRAME_BEGIN
+ #ifndef __x86_64__
+ 	pushl LEN
+@@ -2443,13 +2443,13 @@ ENTRY(aesni_ecb_dec)
+ #endif
+ 	FRAME_END
  	ret
--ENDPROC(_aesni_inc)
-+SYM_FUNC_END(_aesni_inc)
+-ENDPROC(aesni_ecb_dec)
++SYM_FUNC_END(aesni_ecb_dec)
  
  /*
+  * void aesni_cbc_enc(struct crypto_aes_ctx *ctx, const u8 *dst, u8 *src,
+  *		      size_t len, u8 *iv)
+  */
+-ENTRY(aesni_cbc_enc)
++SYM_FUNC_START(aesni_cbc_enc)
+ 	FRAME_BEGIN
+ #ifndef __x86_64__
+ 	pushl IVP
+@@ -2487,13 +2487,13 @@ ENTRY(aesni_cbc_enc)
+ #endif
+ 	FRAME_END
+ 	ret
+-ENDPROC(aesni_cbc_enc)
++SYM_FUNC_END(aesni_cbc_enc)
+ 
+ /*
+  * void aesni_cbc_dec(struct crypto_aes_ctx *ctx, const u8 *dst, u8 *src,
+  *		      size_t len, u8 *iv)
+  */
+-ENTRY(aesni_cbc_dec)
++SYM_FUNC_START(aesni_cbc_dec)
+ 	FRAME_BEGIN
+ #ifndef __x86_64__
+ 	pushl IVP
+@@ -2580,7 +2580,7 @@ ENTRY(aesni_cbc_dec)
+ #endif
+ 	FRAME_END
+ 	ret
+-ENDPROC(aesni_cbc_dec)
++SYM_FUNC_END(aesni_cbc_dec)
+ 
+ #ifdef __x86_64__
+ .pushsection .rodata
+@@ -2642,7 +2642,7 @@ SYM_FUNC_END(_aesni_inc)
   * void aesni_ctr_enc(struct crypto_aes_ctx *ctx, const u8 *dst, u8 *src,
+  *		      size_t len, u8 *iv)
+  */
+-ENTRY(aesni_ctr_enc)
++SYM_FUNC_START(aesni_ctr_enc)
+ 	FRAME_BEGIN
+ 	cmp $16, LEN
+ 	jb .Lctr_enc_just_ret
+@@ -2699,7 +2699,7 @@ ENTRY(aesni_ctr_enc)
+ .Lctr_enc_just_ret:
+ 	FRAME_END
+ 	ret
+-ENDPROC(aesni_ctr_enc)
++SYM_FUNC_END(aesni_ctr_enc)
+ 
+ /*
+  * _aesni_gf128mul_x_ble:		internal ABI
+@@ -2723,7 +2723,7 @@ ENDPROC(aesni_ctr_enc)
+  * void aesni_xts_crypt8(struct crypto_aes_ctx *ctx, const u8 *dst, u8 *src,
+  *			 bool enc, u8 *iv)
+  */
+-ENTRY(aesni_xts_crypt8)
++SYM_FUNC_START(aesni_xts_crypt8)
+ 	FRAME_BEGIN
+ 	cmpb $0, %cl
+ 	movl $0, %ecx
+@@ -2827,6 +2827,6 @@ ENTRY(aesni_xts_crypt8)
+ 
+ 	FRAME_END
+ 	ret
+-ENDPROC(aesni_xts_crypt8)
++SYM_FUNC_END(aesni_xts_crypt8)
+ 
+ #endif
+diff --git a/arch/x86/crypto/aesni-intel_avx-x86_64.S b/arch/x86/crypto/aesni-intel_avx-x86_64.S
+index 91c039ab5699..bfa1c0b3e5b4 100644
+--- a/arch/x86/crypto/aesni-intel_avx-x86_64.S
++++ b/arch/x86/crypto/aesni-intel_avx-x86_64.S
+@@ -1775,12 +1775,12 @@ _initial_blocks_done\@:
+ #        const   u8 *aad, /* Additional Authentication Data (AAD)*/
+ #        u64     aad_len) /* Length of AAD in bytes. With RFC4106 this is going to be 8 or 12 Bytes */
+ #############################################################
+-ENTRY(aesni_gcm_init_avx_gen2)
++SYM_FUNC_START(aesni_gcm_init_avx_gen2)
+         FUNC_SAVE
+         INIT GHASH_MUL_AVX, PRECOMPUTE_AVX
+         FUNC_RESTORE
+         ret
+-ENDPROC(aesni_gcm_init_avx_gen2)
++SYM_FUNC_END(aesni_gcm_init_avx_gen2)
+ 
+ ###############################################################################
+ #void   aesni_gcm_enc_update_avx_gen2(
+@@ -1790,7 +1790,7 @@ ENDPROC(aesni_gcm_init_avx_gen2)
+ #        const   u8 *in, /* Plaintext input */
+ #        u64     plaintext_len) /* Length of data in Bytes for encryption. */
+ ###############################################################################
+-ENTRY(aesni_gcm_enc_update_avx_gen2)
++SYM_FUNC_START(aesni_gcm_enc_update_avx_gen2)
+         FUNC_SAVE
+         mov     keysize, %eax
+         cmp     $32, %eax
+@@ -1809,7 +1809,7 @@ key_256_enc_update:
+         GCM_ENC_DEC INITIAL_BLOCKS_AVX, GHASH_8_ENCRYPT_8_PARALLEL_AVX, GHASH_LAST_8_AVX, GHASH_MUL_AVX, ENC, 13
+         FUNC_RESTORE
+         ret
+-ENDPROC(aesni_gcm_enc_update_avx_gen2)
++SYM_FUNC_END(aesni_gcm_enc_update_avx_gen2)
+ 
+ ###############################################################################
+ #void   aesni_gcm_dec_update_avx_gen2(
+@@ -1819,7 +1819,7 @@ ENDPROC(aesni_gcm_enc_update_avx_gen2)
+ #        const   u8 *in, /* Ciphertext input */
+ #        u64     plaintext_len) /* Length of data in Bytes for encryption. */
+ ###############################################################################
+-ENTRY(aesni_gcm_dec_update_avx_gen2)
++SYM_FUNC_START(aesni_gcm_dec_update_avx_gen2)
+         FUNC_SAVE
+         mov     keysize,%eax
+         cmp     $32, %eax
+@@ -1838,7 +1838,7 @@ key_256_dec_update:
+         GCM_ENC_DEC INITIAL_BLOCKS_AVX, GHASH_8_ENCRYPT_8_PARALLEL_AVX, GHASH_LAST_8_AVX, GHASH_MUL_AVX, DEC, 13
+         FUNC_RESTORE
+         ret
+-ENDPROC(aesni_gcm_dec_update_avx_gen2)
++SYM_FUNC_END(aesni_gcm_dec_update_avx_gen2)
+ 
+ ###############################################################################
+ #void   aesni_gcm_finalize_avx_gen2(
+@@ -1848,7 +1848,7 @@ ENDPROC(aesni_gcm_dec_update_avx_gen2)
+ #        u64     auth_tag_len)# /* Authenticated Tag Length in bytes.
+ #				Valid values are 16 (most likely), 12 or 8. */
+ ###############################################################################
+-ENTRY(aesni_gcm_finalize_avx_gen2)
++SYM_FUNC_START(aesni_gcm_finalize_avx_gen2)
+         FUNC_SAVE
+         mov	keysize,%eax
+         cmp     $32, %eax
+@@ -1867,7 +1867,7 @@ key_256_finalize:
+         GCM_COMPLETE GHASH_MUL_AVX, 13, arg3, arg4
+         FUNC_RESTORE
+         ret
+-ENDPROC(aesni_gcm_finalize_avx_gen2)
++SYM_FUNC_END(aesni_gcm_finalize_avx_gen2)
+ 
+ #endif /* CONFIG_AS_AVX */
+ 
+@@ -2746,12 +2746,12 @@ _initial_blocks_done\@:
+ #        const   u8 *aad, /* Additional Authentication Data (AAD)*/
+ #        u64     aad_len) /* Length of AAD in bytes. With RFC4106 this is going to be 8 or 12 Bytes */
+ #############################################################
+-ENTRY(aesni_gcm_init_avx_gen4)
++SYM_FUNC_START(aesni_gcm_init_avx_gen4)
+         FUNC_SAVE
+         INIT GHASH_MUL_AVX2, PRECOMPUTE_AVX2
+         FUNC_RESTORE
+         ret
+-ENDPROC(aesni_gcm_init_avx_gen4)
++SYM_FUNC_END(aesni_gcm_init_avx_gen4)
+ 
+ ###############################################################################
+ #void   aesni_gcm_enc_avx_gen4(
+@@ -2761,7 +2761,7 @@ ENDPROC(aesni_gcm_init_avx_gen4)
+ #        const   u8 *in, /* Plaintext input */
+ #        u64     plaintext_len) /* Length of data in Bytes for encryption. */
+ ###############################################################################
+-ENTRY(aesni_gcm_enc_update_avx_gen4)
++SYM_FUNC_START(aesni_gcm_enc_update_avx_gen4)
+         FUNC_SAVE
+         mov     keysize,%eax
+         cmp     $32, %eax
+@@ -2780,7 +2780,7 @@ key_256_enc_update4:
+         GCM_ENC_DEC INITIAL_BLOCKS_AVX2, GHASH_8_ENCRYPT_8_PARALLEL_AVX2, GHASH_LAST_8_AVX2, GHASH_MUL_AVX2, ENC, 13
+         FUNC_RESTORE
+ 	ret
+-ENDPROC(aesni_gcm_enc_update_avx_gen4)
++SYM_FUNC_END(aesni_gcm_enc_update_avx_gen4)
+ 
+ ###############################################################################
+ #void   aesni_gcm_dec_update_avx_gen4(
+@@ -2790,7 +2790,7 @@ ENDPROC(aesni_gcm_enc_update_avx_gen4)
+ #        const   u8 *in, /* Ciphertext input */
+ #        u64     plaintext_len) /* Length of data in Bytes for encryption. */
+ ###############################################################################
+-ENTRY(aesni_gcm_dec_update_avx_gen4)
++SYM_FUNC_START(aesni_gcm_dec_update_avx_gen4)
+         FUNC_SAVE
+         mov     keysize,%eax
+         cmp     $32, %eax
+@@ -2809,7 +2809,7 @@ key_256_dec_update4:
+         GCM_ENC_DEC INITIAL_BLOCKS_AVX2, GHASH_8_ENCRYPT_8_PARALLEL_AVX2, GHASH_LAST_8_AVX2, GHASH_MUL_AVX2, DEC, 13
+         FUNC_RESTORE
+         ret
+-ENDPROC(aesni_gcm_dec_update_avx_gen4)
++SYM_FUNC_END(aesni_gcm_dec_update_avx_gen4)
+ 
+ ###############################################################################
+ #void   aesni_gcm_finalize_avx_gen4(
+@@ -2819,7 +2819,7 @@ ENDPROC(aesni_gcm_dec_update_avx_gen4)
+ #        u64     auth_tag_len)# /* Authenticated Tag Length in bytes.
+ #                              Valid values are 16 (most likely), 12 or 8. */
+ ###############################################################################
+-ENTRY(aesni_gcm_finalize_avx_gen4)
++SYM_FUNC_START(aesni_gcm_finalize_avx_gen4)
+         FUNC_SAVE
+         mov	keysize,%eax
+         cmp     $32, %eax
+@@ -2838,6 +2838,6 @@ key_256_finalize4:
+         GCM_COMPLETE GHASH_MUL_AVX2, 13, arg3, arg4
+         FUNC_RESTORE
+         ret
+-ENDPROC(aesni_gcm_finalize_avx_gen4)
++SYM_FUNC_END(aesni_gcm_finalize_avx_gen4)
+ 
+ #endif /* CONFIG_AS_AVX2 */
+diff --git a/arch/x86/crypto/blowfish-x86_64-asm_64.S b/arch/x86/crypto/blowfish-x86_64-asm_64.S
+index 8c1fcb6bad21..70c34850ee0b 100644
+--- a/arch/x86/crypto/blowfish-x86_64-asm_64.S
++++ b/arch/x86/crypto/blowfish-x86_64-asm_64.S
+@@ -118,7 +118,7 @@
+ 	bswapq 			RX0; \
+ 	xorq RX0, 		(RIO);
+ 
+-ENTRY(__blowfish_enc_blk)
++SYM_FUNC_START(__blowfish_enc_blk)
+ 	/* input:
+ 	 *	%rdi: ctx
+ 	 *	%rsi: dst
+@@ -154,9 +154,9 @@ ENTRY(__blowfish_enc_blk)
+ .L__enc_xor:
+ 	xor_block();
+ 	ret;
+-ENDPROC(__blowfish_enc_blk)
++SYM_FUNC_END(__blowfish_enc_blk)
+ 
+-ENTRY(blowfish_dec_blk)
++SYM_FUNC_START(blowfish_dec_blk)
+ 	/* input:
+ 	 *	%rdi: ctx
+ 	 *	%rsi: dst
+@@ -186,7 +186,7 @@ ENTRY(blowfish_dec_blk)
+ 	movq %r11, %r12;
+ 
+ 	ret;
+-ENDPROC(blowfish_dec_blk)
++SYM_FUNC_END(blowfish_dec_blk)
+ 
+ /**********************************************************************
+   4-way blowfish, four blocks parallel
+@@ -298,7 +298,7 @@ ENDPROC(blowfish_dec_blk)
+ 	bswapq 			RX3; \
+ 	xorq RX3,		24(RIO);
+ 
+-ENTRY(__blowfish_enc_blk_4way)
++SYM_FUNC_START(__blowfish_enc_blk_4way)
+ 	/* input:
+ 	 *	%rdi: ctx
+ 	 *	%rsi: dst
+@@ -345,9 +345,9 @@ ENTRY(__blowfish_enc_blk_4way)
+ 	popq %rbx;
+ 	popq %r12;
+ 	ret;
+-ENDPROC(__blowfish_enc_blk_4way)
++SYM_FUNC_END(__blowfish_enc_blk_4way)
+ 
+-ENTRY(blowfish_dec_blk_4way)
++SYM_FUNC_START(blowfish_dec_blk_4way)
+ 	/* input:
+ 	 *	%rdi: ctx
+ 	 *	%rsi: dst
+@@ -380,4 +380,4 @@ ENTRY(blowfish_dec_blk_4way)
+ 	popq %r12;
+ 
+ 	ret;
+-ENDPROC(blowfish_dec_blk_4way)
++SYM_FUNC_END(blowfish_dec_blk_4way)
 diff --git a/arch/x86/crypto/camellia-aesni-avx-asm_64.S b/arch/x86/crypto/camellia-aesni-avx-asm_64.S
-index a14af6eb09cb..f4408ca55fdb 100644
+index f4408ca55fdb..d01ddd73de65 100644
 --- a/arch/x86/crypto/camellia-aesni-avx-asm_64.S
 +++ b/arch/x86/crypto/camellia-aesni-avx-asm_64.S
-@@ -189,20 +189,20 @@
-  * larger and would only be 0.5% faster (on sandy-bridge).
-  */
- .align 8
--roundsm16_x0_x1_x2_x3_x4_x5_x6_x7_y0_y1_y2_y3_y4_y5_y6_y7_cd:
-+SYM_FUNC_START_LOCAL(roundsm16_x0_x1_x2_x3_x4_x5_x6_x7_y0_y1_y2_y3_y4_y5_y6_y7_cd)
- 	roundsm16(%xmm0, %xmm1, %xmm2, %xmm3, %xmm4, %xmm5, %xmm6, %xmm7,
- 		  %xmm8, %xmm9, %xmm10, %xmm11, %xmm12, %xmm13, %xmm14, %xmm15,
- 		  %rcx, (%r9));
- 	ret;
--ENDPROC(roundsm16_x0_x1_x2_x3_x4_x5_x6_x7_y0_y1_y2_y3_y4_y5_y6_y7_cd)
-+SYM_FUNC_END(roundsm16_x0_x1_x2_x3_x4_x5_x6_x7_y0_y1_y2_y3_y4_y5_y6_y7_cd)
- 
- .align 8
--roundsm16_x4_x5_x6_x7_x0_x1_x2_x3_y4_y5_y6_y7_y0_y1_y2_y3_ab:
-+SYM_FUNC_START_LOCAL(roundsm16_x4_x5_x6_x7_x0_x1_x2_x3_y4_y5_y6_y7_y0_y1_y2_y3_ab)
- 	roundsm16(%xmm4, %xmm5, %xmm6, %xmm7, %xmm0, %xmm1, %xmm2, %xmm3,
- 		  %xmm12, %xmm13, %xmm14, %xmm15, %xmm8, %xmm9, %xmm10, %xmm11,
- 		  %rax, (%r9));
- 	ret;
--ENDPROC(roundsm16_x4_x5_x6_x7_x0_x1_x2_x3_y4_y5_y6_y7_y0_y1_y2_y3_ab)
-+SYM_FUNC_END(roundsm16_x4_x5_x6_x7_x0_x1_x2_x3_y4_y5_y6_y7_y0_y1_y2_y3_ab)
- 
- /*
-  * IN/OUT:
-@@ -722,7 +722,7 @@ ENDPROC(roundsm16_x4_x5_x6_x7_x0_x1_x2_x3_y4_y5_y6_y7_y0_y1_y2_y3_ab)
- .text
- 
- .align 8
--__camellia_enc_blk16:
-+SYM_FUNC_START_LOCAL(__camellia_enc_blk16)
- 	/* input:
- 	 *	%rdi: ctx, CTX
- 	 *	%rax: temporary storage, 256 bytes
-@@ -806,10 +806,10 @@ __camellia_enc_blk16:
- 		     %xmm15, %rax, %rcx, 24);
- 
- 	jmp .Lenc_done;
--ENDPROC(__camellia_enc_blk16)
-+SYM_FUNC_END(__camellia_enc_blk16)
- 
- .align 8
--__camellia_dec_blk16:
-+SYM_FUNC_START_LOCAL(__camellia_dec_blk16)
- 	/* input:
- 	 *	%rdi: ctx, CTX
- 	 *	%rax: temporary storage, 256 bytes
-@@ -891,7 +891,7 @@ __camellia_dec_blk16:
- 	      ((key_table + (24) * 8) + 4)(CTX));
- 
+@@ -893,7 +893,7 @@ SYM_FUNC_START_LOCAL(__camellia_dec_blk16)
  	jmp .Ldec_max24;
--ENDPROC(__camellia_dec_blk16)
-+SYM_FUNC_END(__camellia_dec_blk16)
+ SYM_FUNC_END(__camellia_dec_blk16)
  
- ENTRY(camellia_ecb_enc_16way)
- 	/* input:
-@@ -1120,7 +1120,7 @@ ENDPROC(camellia_ctr_16way)
- 	vpxor tmp, iv, iv;
- 
- .align 8
--camellia_xts_crypt_16way:
-+SYM_FUNC_START_LOCAL(camellia_xts_crypt_16way)
+-ENTRY(camellia_ecb_enc_16way)
++SYM_FUNC_START(camellia_ecb_enc_16way)
  	/* input:
  	 *	%rdi: ctx, CTX
  	 *	%rsi: dst (16 blocks)
-@@ -1254,7 +1254,7 @@ camellia_xts_crypt_16way:
+@@ -916,9 +916,9 @@ ENTRY(camellia_ecb_enc_16way)
  
  	FRAME_END
  	ret;
--ENDPROC(camellia_xts_crypt_16way)
-+SYM_FUNC_END(camellia_xts_crypt_16way)
+-ENDPROC(camellia_ecb_enc_16way)
++SYM_FUNC_END(camellia_ecb_enc_16way)
  
- ENTRY(camellia_xts_enc_16way)
+-ENTRY(camellia_ecb_dec_16way)
++SYM_FUNC_START(camellia_ecb_dec_16way)
  	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst (16 blocks)
+@@ -946,9 +946,9 @@ ENTRY(camellia_ecb_dec_16way)
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(camellia_ecb_dec_16way)
++SYM_FUNC_END(camellia_ecb_dec_16way)
+ 
+-ENTRY(camellia_cbc_dec_16way)
++SYM_FUNC_START(camellia_cbc_dec_16way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst (16 blocks)
+@@ -997,7 +997,7 @@ ENTRY(camellia_cbc_dec_16way)
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(camellia_cbc_dec_16way)
++SYM_FUNC_END(camellia_cbc_dec_16way)
+ 
+ #define inc_le128(x, minus_one, tmp) \
+ 	vpcmpeqq minus_one, x, tmp; \
+@@ -1005,7 +1005,7 @@ ENDPROC(camellia_cbc_dec_16way)
+ 	vpslldq $8, tmp, tmp; \
+ 	vpsubq tmp, x, x;
+ 
+-ENTRY(camellia_ctr_16way)
++SYM_FUNC_START(camellia_ctr_16way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst (16 blocks)
+@@ -1110,7 +1110,7 @@ ENTRY(camellia_ctr_16way)
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(camellia_ctr_16way)
++SYM_FUNC_END(camellia_ctr_16way)
+ 
+ #define gf128mul_x_ble(iv, mask, tmp) \
+ 	vpsrad $31, iv, tmp; \
+@@ -1256,7 +1256,7 @@ SYM_FUNC_START_LOCAL(camellia_xts_crypt_16way)
+ 	ret;
+ SYM_FUNC_END(camellia_xts_crypt_16way)
+ 
+-ENTRY(camellia_xts_enc_16way)
++SYM_FUNC_START(camellia_xts_enc_16way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst (16 blocks)
+@@ -1268,9 +1268,9 @@ ENTRY(camellia_xts_enc_16way)
+ 	leaq __camellia_enc_blk16, %r9;
+ 
+ 	jmp camellia_xts_crypt_16way;
+-ENDPROC(camellia_xts_enc_16way)
++SYM_FUNC_END(camellia_xts_enc_16way)
+ 
+-ENTRY(camellia_xts_dec_16way)
++SYM_FUNC_START(camellia_xts_dec_16way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst (16 blocks)
+@@ -1286,4 +1286,4 @@ ENTRY(camellia_xts_dec_16way)
+ 	leaq __camellia_dec_blk16, %r9;
+ 
+ 	jmp camellia_xts_crypt_16way;
+-ENDPROC(camellia_xts_dec_16way)
++SYM_FUNC_END(camellia_xts_dec_16way)
 diff --git a/arch/x86/crypto/camellia-aesni-avx2-asm_64.S b/arch/x86/crypto/camellia-aesni-avx2-asm_64.S
-index b66bbfa62f50..916a3e2b8ea4 100644
+index 916a3e2b8ea4..85f0a265dee8 100644
 --- a/arch/x86/crypto/camellia-aesni-avx2-asm_64.S
 +++ b/arch/x86/crypto/camellia-aesni-avx2-asm_64.S
-@@ -228,20 +228,20 @@
-  * larger and would only marginally faster.
-  */
- .align 8
--roundsm32_x0_x1_x2_x3_x4_x5_x6_x7_y0_y1_y2_y3_y4_y5_y6_y7_cd:
-+SYM_FUNC_START_LOCAL(roundsm32_x0_x1_x2_x3_x4_x5_x6_x7_y0_y1_y2_y3_y4_y5_y6_y7_cd)
- 	roundsm32(%ymm0, %ymm1, %ymm2, %ymm3, %ymm4, %ymm5, %ymm6, %ymm7,
- 		  %ymm8, %ymm9, %ymm10, %ymm11, %ymm12, %ymm13, %ymm14, %ymm15,
- 		  %rcx, (%r9));
- 	ret;
--ENDPROC(roundsm32_x0_x1_x2_x3_x4_x5_x6_x7_y0_y1_y2_y3_y4_y5_y6_y7_cd)
-+SYM_FUNC_END(roundsm32_x0_x1_x2_x3_x4_x5_x6_x7_y0_y1_y2_y3_y4_y5_y6_y7_cd)
- 
- .align 8
--roundsm32_x4_x5_x6_x7_x0_x1_x2_x3_y4_y5_y6_y7_y0_y1_y2_y3_ab:
-+SYM_FUNC_START_LOCAL(roundsm32_x4_x5_x6_x7_x0_x1_x2_x3_y4_y5_y6_y7_y0_y1_y2_y3_ab)
- 	roundsm32(%ymm4, %ymm5, %ymm6, %ymm7, %ymm0, %ymm1, %ymm2, %ymm3,
- 		  %ymm12, %ymm13, %ymm14, %ymm15, %ymm8, %ymm9, %ymm10, %ymm11,
- 		  %rax, (%r9));
- 	ret;
--ENDPROC(roundsm32_x4_x5_x6_x7_x0_x1_x2_x3_y4_y5_y6_y7_y0_y1_y2_y3_ab)
-+SYM_FUNC_END(roundsm32_x4_x5_x6_x7_x0_x1_x2_x3_y4_y5_y6_y7_y0_y1_y2_y3_ab)
- 
- /*
-  * IN/OUT:
-@@ -765,7 +765,7 @@ ENDPROC(roundsm32_x4_x5_x6_x7_x0_x1_x2_x3_y4_y5_y6_y7_y0_y1_y2_y3_ab)
- .text
- 
- .align 8
--__camellia_enc_blk32:
-+SYM_FUNC_START_LOCAL(__camellia_enc_blk32)
- 	/* input:
- 	 *	%rdi: ctx, CTX
- 	 *	%rax: temporary storage, 512 bytes
-@@ -849,10 +849,10 @@ __camellia_enc_blk32:
- 		     %ymm15, %rax, %rcx, 24);
- 
- 	jmp .Lenc_done;
--ENDPROC(__camellia_enc_blk32)
-+SYM_FUNC_END(__camellia_enc_blk32)
- 
- .align 8
--__camellia_dec_blk32:
-+SYM_FUNC_START_LOCAL(__camellia_dec_blk32)
- 	/* input:
- 	 *	%rdi: ctx, CTX
- 	 *	%rax: temporary storage, 512 bytes
-@@ -934,7 +934,7 @@ __camellia_dec_blk32:
- 	      ((key_table + (24) * 8) + 4)(CTX));
- 
+@@ -936,7 +936,7 @@ SYM_FUNC_START_LOCAL(__camellia_dec_blk32)
  	jmp .Ldec_max24;
--ENDPROC(__camellia_dec_blk32)
-+SYM_FUNC_END(__camellia_dec_blk32)
+ SYM_FUNC_END(__camellia_dec_blk32)
  
- ENTRY(camellia_ecb_enc_32way)
- 	/* input:
-@@ -1227,7 +1227,7 @@ ENDPROC(camellia_ctr_32way)
- 	vpxor tmp1, iv, iv;
- 
- .align 8
--camellia_xts_crypt_32way:
-+SYM_FUNC_START_LOCAL(camellia_xts_crypt_32way)
+-ENTRY(camellia_ecb_enc_32way)
++SYM_FUNC_START(camellia_ecb_enc_32way)
  	/* input:
  	 *	%rdi: ctx, CTX
  	 *	%rsi: dst (32 blocks)
-@@ -1372,7 +1372,7 @@ camellia_xts_crypt_32way:
+@@ -963,9 +963,9 @@ ENTRY(camellia_ecb_enc_32way)
  
  	FRAME_END
  	ret;
--ENDPROC(camellia_xts_crypt_32way)
-+SYM_FUNC_END(camellia_xts_crypt_32way)
+-ENDPROC(camellia_ecb_enc_32way)
++SYM_FUNC_END(camellia_ecb_enc_32way)
  
- ENTRY(camellia_xts_enc_32way)
+-ENTRY(camellia_ecb_dec_32way)
++SYM_FUNC_START(camellia_ecb_dec_32way)
  	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst (32 blocks)
+@@ -997,9 +997,9 @@ ENTRY(camellia_ecb_dec_32way)
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(camellia_ecb_dec_32way)
++SYM_FUNC_END(camellia_ecb_dec_32way)
+ 
+-ENTRY(camellia_cbc_dec_32way)
++SYM_FUNC_START(camellia_cbc_dec_32way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst (32 blocks)
+@@ -1065,7 +1065,7 @@ ENTRY(camellia_cbc_dec_32way)
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(camellia_cbc_dec_32way)
++SYM_FUNC_END(camellia_cbc_dec_32way)
+ 
+ #define inc_le128(x, minus_one, tmp) \
+ 	vpcmpeqq minus_one, x, tmp; \
+@@ -1081,7 +1081,7 @@ ENDPROC(camellia_cbc_dec_32way)
+ 	vpslldq $8, tmp1, tmp1; \
+ 	vpsubq tmp1, x, x;
+ 
+-ENTRY(camellia_ctr_32way)
++SYM_FUNC_START(camellia_ctr_32way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst (32 blocks)
+@@ -1205,7 +1205,7 @@ ENTRY(camellia_ctr_32way)
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(camellia_ctr_32way)
++SYM_FUNC_END(camellia_ctr_32way)
+ 
+ #define gf128mul_x_ble(iv, mask, tmp) \
+ 	vpsrad $31, iv, tmp; \
+@@ -1374,7 +1374,7 @@ SYM_FUNC_START_LOCAL(camellia_xts_crypt_32way)
+ 	ret;
+ SYM_FUNC_END(camellia_xts_crypt_32way)
+ 
+-ENTRY(camellia_xts_enc_32way)
++SYM_FUNC_START(camellia_xts_enc_32way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst (32 blocks)
+@@ -1387,9 +1387,9 @@ ENTRY(camellia_xts_enc_32way)
+ 	leaq __camellia_enc_blk32, %r9;
+ 
+ 	jmp camellia_xts_crypt_32way;
+-ENDPROC(camellia_xts_enc_32way)
++SYM_FUNC_END(camellia_xts_enc_32way)
+ 
+-ENTRY(camellia_xts_dec_32way)
++SYM_FUNC_START(camellia_xts_dec_32way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst (32 blocks)
+@@ -1405,4 +1405,4 @@ ENTRY(camellia_xts_dec_32way)
+ 	leaq __camellia_dec_blk32, %r9;
+ 
+ 	jmp camellia_xts_crypt_32way;
+-ENDPROC(camellia_xts_dec_32way)
++SYM_FUNC_END(camellia_xts_dec_32way)
+diff --git a/arch/x86/crypto/camellia-x86_64-asm_64.S b/arch/x86/crypto/camellia-x86_64-asm_64.S
+index 95ba6956a7f6..4d77c9dcddbd 100644
+--- a/arch/x86/crypto/camellia-x86_64-asm_64.S
++++ b/arch/x86/crypto/camellia-x86_64-asm_64.S
+@@ -190,7 +190,7 @@
+ 	bswapq				RAB0; \
+ 	movq RAB0,			4*2(RIO);
+ 
+-ENTRY(__camellia_enc_blk)
++SYM_FUNC_START(__camellia_enc_blk)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -235,9 +235,9 @@ ENTRY(__camellia_enc_blk)
+ 
+ 	movq RR12, %r12;
+ 	ret;
+-ENDPROC(__camellia_enc_blk)
++SYM_FUNC_END(__camellia_enc_blk)
+ 
+-ENTRY(camellia_dec_blk)
++SYM_FUNC_START(camellia_dec_blk)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -273,7 +273,7 @@ ENTRY(camellia_dec_blk)
+ 
+ 	movq RR12, %r12;
+ 	ret;
+-ENDPROC(camellia_dec_blk)
++SYM_FUNC_END(camellia_dec_blk)
+ 
+ /**********************************************************************
+   2-way camellia
+@@ -424,7 +424,7 @@ ENDPROC(camellia_dec_blk)
+ 		bswapq				RAB1; \
+ 		movq RAB1,			12*2(RIO);
+ 
+-ENTRY(__camellia_enc_blk_2way)
++SYM_FUNC_START(__camellia_enc_blk_2way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -471,9 +471,9 @@ ENTRY(__camellia_enc_blk_2way)
+ 	movq RR12, %r12;
+ 	popq %rbx;
+ 	ret;
+-ENDPROC(__camellia_enc_blk_2way)
++SYM_FUNC_END(__camellia_enc_blk_2way)
+ 
+-ENTRY(camellia_dec_blk_2way)
++SYM_FUNC_START(camellia_dec_blk_2way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -511,4 +511,4 @@ ENTRY(camellia_dec_blk_2way)
+ 	movq RR12, %r12;
+ 	movq RXOR, %rbx;
+ 	ret;
+-ENDPROC(camellia_dec_blk_2way)
++SYM_FUNC_END(camellia_dec_blk_2way)
 diff --git a/arch/x86/crypto/cast5-avx-x86_64-asm_64.S b/arch/x86/crypto/cast5-avx-x86_64-asm_64.S
-index 86107c961bb4..b26df120413c 100644
+index b26df120413c..3789c61f6166 100644
 --- a/arch/x86/crypto/cast5-avx-x86_64-asm_64.S
 +++ b/arch/x86/crypto/cast5-avx-x86_64-asm_64.S
-@@ -224,7 +224,7 @@
- .text
- 
- .align 16
--__cast5_enc_blk16:
-+SYM_FUNC_START_LOCAL(__cast5_enc_blk16)
- 	/* input:
- 	 *	%rdi: ctx
- 	 *	RL1: blocks 1 and 2
-@@ -295,10 +295,10 @@ __cast5_enc_blk16:
- 	outunpack_blocks(RR4, RL4, RTMP, RX, RKM);
- 
- 	ret;
--ENDPROC(__cast5_enc_blk16)
-+SYM_FUNC_END(__cast5_enc_blk16)
- 
- .align 16
--__cast5_dec_blk16:
-+SYM_FUNC_START_LOCAL(__cast5_dec_blk16)
- 	/* input:
- 	 *	%rdi: ctx
- 	 *	RL1: encrypted blocks 1 and 2
-@@ -372,7 +372,7 @@ __cast5_dec_blk16:
- .L__skip_dec:
- 	vpsrldq $4, RKR, RKR;
+@@ -374,7 +374,7 @@ SYM_FUNC_START_LOCAL(__cast5_dec_blk16)
  	jmp .L__dec_tail;
--ENDPROC(__cast5_dec_blk16)
-+SYM_FUNC_END(__cast5_dec_blk16)
+ SYM_FUNC_END(__cast5_dec_blk16)
  
- ENTRY(cast5_ecb_enc_16way)
+-ENTRY(cast5_ecb_enc_16way)
++SYM_FUNC_START(cast5_ecb_enc_16way)
  	/* input:
+ 	 *	%rdi: ctx
+ 	 *	%rsi: dst
+@@ -409,9 +409,9 @@ ENTRY(cast5_ecb_enc_16way)
+ 	popq %r15;
+ 	FRAME_END
+ 	ret;
+-ENDPROC(cast5_ecb_enc_16way)
++SYM_FUNC_END(cast5_ecb_enc_16way)
+ 
+-ENTRY(cast5_ecb_dec_16way)
++SYM_FUNC_START(cast5_ecb_dec_16way)
+ 	/* input:
+ 	 *	%rdi: ctx
+ 	 *	%rsi: dst
+@@ -447,9 +447,9 @@ ENTRY(cast5_ecb_dec_16way)
+ 	popq %r15;
+ 	FRAME_END
+ 	ret;
+-ENDPROC(cast5_ecb_dec_16way)
++SYM_FUNC_END(cast5_ecb_dec_16way)
+ 
+-ENTRY(cast5_cbc_dec_16way)
++SYM_FUNC_START(cast5_cbc_dec_16way)
+ 	/* input:
+ 	 *	%rdi: ctx
+ 	 *	%rsi: dst
+@@ -499,9 +499,9 @@ ENTRY(cast5_cbc_dec_16way)
+ 	popq %r12;
+ 	FRAME_END
+ 	ret;
+-ENDPROC(cast5_cbc_dec_16way)
++SYM_FUNC_END(cast5_cbc_dec_16way)
+ 
+-ENTRY(cast5_ctr_16way)
++SYM_FUNC_START(cast5_ctr_16way)
+ 	/* input:
+ 	 *	%rdi: ctx
+ 	 *	%rsi: dst
+@@ -575,4 +575,4 @@ ENTRY(cast5_ctr_16way)
+ 	popq %r12;
+ 	FRAME_END
+ 	ret;
+-ENDPROC(cast5_ctr_16way)
++SYM_FUNC_END(cast5_ctr_16way)
 diff --git a/arch/x86/crypto/cast6-avx-x86_64-asm_64.S b/arch/x86/crypto/cast6-avx-x86_64-asm_64.S
-index 7f30b6f0d72c..0a68e42a00f9 100644
+index 0a68e42a00f9..e38ab4571a6b 100644
 --- a/arch/x86/crypto/cast6-avx-x86_64-asm_64.S
 +++ b/arch/x86/crypto/cast6-avx-x86_64-asm_64.S
-@@ -262,7 +262,7 @@
+@@ -356,7 +356,7 @@ SYM_FUNC_START_LOCAL(__cast6_dec_blk8)
+ 	ret;
+ SYM_FUNC_END(__cast6_dec_blk8)
+ 
+-ENTRY(cast6_ecb_enc_8way)
++SYM_FUNC_START(cast6_ecb_enc_8way)
+ 	/* input:
+ 	 *	%rdi: ctx
+ 	 *	%rsi: dst
+@@ -377,9 +377,9 @@ ENTRY(cast6_ecb_enc_8way)
+ 	popq %r15;
+ 	FRAME_END
+ 	ret;
+-ENDPROC(cast6_ecb_enc_8way)
++SYM_FUNC_END(cast6_ecb_enc_8way)
+ 
+-ENTRY(cast6_ecb_dec_8way)
++SYM_FUNC_START(cast6_ecb_dec_8way)
+ 	/* input:
+ 	 *	%rdi: ctx
+ 	 *	%rsi: dst
+@@ -400,9 +400,9 @@ ENTRY(cast6_ecb_dec_8way)
+ 	popq %r15;
+ 	FRAME_END
+ 	ret;
+-ENDPROC(cast6_ecb_dec_8way)
++SYM_FUNC_END(cast6_ecb_dec_8way)
+ 
+-ENTRY(cast6_cbc_dec_8way)
++SYM_FUNC_START(cast6_cbc_dec_8way)
+ 	/* input:
+ 	 *	%rdi: ctx
+ 	 *	%rsi: dst
+@@ -426,9 +426,9 @@ ENTRY(cast6_cbc_dec_8way)
+ 	popq %r12;
+ 	FRAME_END
+ 	ret;
+-ENDPROC(cast6_cbc_dec_8way)
++SYM_FUNC_END(cast6_cbc_dec_8way)
+ 
+-ENTRY(cast6_ctr_8way)
++SYM_FUNC_START(cast6_ctr_8way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -454,9 +454,9 @@ ENTRY(cast6_ctr_8way)
+ 	popq %r12;
+ 	FRAME_END
+ 	ret;
+-ENDPROC(cast6_ctr_8way)
++SYM_FUNC_END(cast6_ctr_8way)
+ 
+-ENTRY(cast6_xts_enc_8way)
++SYM_FUNC_START(cast6_xts_enc_8way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -481,9 +481,9 @@ ENTRY(cast6_xts_enc_8way)
+ 	popq %r15;
+ 	FRAME_END
+ 	ret;
+-ENDPROC(cast6_xts_enc_8way)
++SYM_FUNC_END(cast6_xts_enc_8way)
+ 
+-ENTRY(cast6_xts_dec_8way)
++SYM_FUNC_START(cast6_xts_dec_8way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -508,4 +508,4 @@ ENTRY(cast6_xts_dec_8way)
+ 	popq %r15;
+ 	FRAME_END
+ 	ret;
+-ENDPROC(cast6_xts_dec_8way)
++SYM_FUNC_END(cast6_xts_dec_8way)
+diff --git a/arch/x86/crypto/chacha-avx2-x86_64.S b/arch/x86/crypto/chacha-avx2-x86_64.S
+index 32903fd450af..68fdbf0259ce 100644
+--- a/arch/x86/crypto/chacha-avx2-x86_64.S
++++ b/arch/x86/crypto/chacha-avx2-x86_64.S
+@@ -38,7 +38,7 @@ CTR4BL:	.octa 0x00000000000000000000000000000002
+ 
  .text
  
- .align 8
--__cast6_enc_blk8:
-+SYM_FUNC_START_LOCAL(__cast6_enc_blk8)
- 	/* input:
- 	 *	%rdi: ctx
- 	 *	RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2: blocks
-@@ -307,10 +307,10 @@ __cast6_enc_blk8:
- 	outunpack_blocks(RA2, RB2, RC2, RD2, RTMP, RX, RKRF, RKM);
+-ENTRY(chacha_2block_xor_avx2)
++SYM_FUNC_START(chacha_2block_xor_avx2)
+ 	# %rdi: Input state matrix, s
+ 	# %rsi: up to 2 data blocks output, o
+ 	# %rdx: up to 2 data blocks input, i
+@@ -228,9 +228,9 @@ ENTRY(chacha_2block_xor_avx2)
+ 	lea		-8(%r10),%rsp
+ 	jmp		.Ldone2
  
- 	ret;
--ENDPROC(__cast6_enc_blk8)
-+SYM_FUNC_END(__cast6_enc_blk8)
+-ENDPROC(chacha_2block_xor_avx2)
++SYM_FUNC_END(chacha_2block_xor_avx2)
  
- .align 8
--__cast6_dec_blk8:
-+SYM_FUNC_START_LOCAL(__cast6_dec_blk8)
- 	/* input:
- 	 *	%rdi: ctx
- 	 *	RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2: encrypted blocks
-@@ -354,7 +354,7 @@ __cast6_dec_blk8:
- 	outunpack_blocks(RA2, RB2, RC2, RD2, RTMP, RX, RKRF, RKM);
+-ENTRY(chacha_4block_xor_avx2)
++SYM_FUNC_START(chacha_4block_xor_avx2)
+ 	# %rdi: Input state matrix, s
+ 	# %rsi: up to 4 data blocks output, o
+ 	# %rdx: up to 4 data blocks input, i
+@@ -533,9 +533,9 @@ ENTRY(chacha_4block_xor_avx2)
+ 	lea		-8(%r10),%rsp
+ 	jmp		.Ldone4
  
- 	ret;
--ENDPROC(__cast6_dec_blk8)
-+SYM_FUNC_END(__cast6_dec_blk8)
+-ENDPROC(chacha_4block_xor_avx2)
++SYM_FUNC_END(chacha_4block_xor_avx2)
  
- ENTRY(cast6_ecb_enc_8way)
- 	/* input:
+-ENTRY(chacha_8block_xor_avx2)
++SYM_FUNC_START(chacha_8block_xor_avx2)
+ 	# %rdi: Input state matrix, s
+ 	# %rsi: up to 8 data blocks output, o
+ 	# %rdx: up to 8 data blocks input, i
+@@ -1022,4 +1022,4 @@ ENTRY(chacha_8block_xor_avx2)
+ 
+ 	jmp		.Ldone8
+ 
+-ENDPROC(chacha_8block_xor_avx2)
++SYM_FUNC_END(chacha_8block_xor_avx2)
+diff --git a/arch/x86/crypto/chacha-avx512vl-x86_64.S b/arch/x86/crypto/chacha-avx512vl-x86_64.S
+index 848f9c75fd4f..bb193fde123a 100644
+--- a/arch/x86/crypto/chacha-avx512vl-x86_64.S
++++ b/arch/x86/crypto/chacha-avx512vl-x86_64.S
+@@ -24,7 +24,7 @@ CTR8BL:	.octa 0x00000003000000020000000100000000
+ 
+ .text
+ 
+-ENTRY(chacha_2block_xor_avx512vl)
++SYM_FUNC_START(chacha_2block_xor_avx512vl)
+ 	# %rdi: Input state matrix, s
+ 	# %rsi: up to 2 data blocks output, o
+ 	# %rdx: up to 2 data blocks input, i
+@@ -187,9 +187,9 @@ ENTRY(chacha_2block_xor_avx512vl)
+ 
+ 	jmp		.Ldone2
+ 
+-ENDPROC(chacha_2block_xor_avx512vl)
++SYM_FUNC_END(chacha_2block_xor_avx512vl)
+ 
+-ENTRY(chacha_4block_xor_avx512vl)
++SYM_FUNC_START(chacha_4block_xor_avx512vl)
+ 	# %rdi: Input state matrix, s
+ 	# %rsi: up to 4 data blocks output, o
+ 	# %rdx: up to 4 data blocks input, i
+@@ -453,9 +453,9 @@ ENTRY(chacha_4block_xor_avx512vl)
+ 
+ 	jmp		.Ldone4
+ 
+-ENDPROC(chacha_4block_xor_avx512vl)
++SYM_FUNC_END(chacha_4block_xor_avx512vl)
+ 
+-ENTRY(chacha_8block_xor_avx512vl)
++SYM_FUNC_START(chacha_8block_xor_avx512vl)
+ 	# %rdi: Input state matrix, s
+ 	# %rsi: up to 8 data blocks output, o
+ 	# %rdx: up to 8 data blocks input, i
+@@ -833,4 +833,4 @@ ENTRY(chacha_8block_xor_avx512vl)
+ 
+ 	jmp		.Ldone8
+ 
+-ENDPROC(chacha_8block_xor_avx512vl)
++SYM_FUNC_END(chacha_8block_xor_avx512vl)
 diff --git a/arch/x86/crypto/chacha-ssse3-x86_64.S b/arch/x86/crypto/chacha-ssse3-x86_64.S
-index c05a7a963dc3..eb5f7517d28c 100644
+index eb5f7517d28c..c637315360c8 100644
 --- a/arch/x86/crypto/chacha-ssse3-x86_64.S
 +++ b/arch/x86/crypto/chacha-ssse3-x86_64.S
-@@ -37,7 +37,7 @@ CTRINC:	.octa 0x00000003000000020000000100000000
-  *
-  * Clobbers: %r8d, %xmm4-%xmm7
-  */
--chacha_permute:
-+SYM_FUNC_START_LOCAL(chacha_permute)
+@@ -115,7 +115,7 @@ SYM_FUNC_START_LOCAL(chacha_permute)
+ 	ret
+ SYM_FUNC_END(chacha_permute)
  
- 	movdqa		ROT8(%rip),%xmm4
- 	movdqa		ROT16(%rip),%xmm5
-@@ -113,7 +113,7 @@ chacha_permute:
- 	jnz		.Ldoubleround
+-ENTRY(chacha_block_xor_ssse3)
++SYM_FUNC_START(chacha_block_xor_ssse3)
+ 	# %rdi: Input state matrix, s
+ 	# %rsi: up to 1 data block output, o
+ 	# %rdx: up to 1 data block input, i
+@@ -201,9 +201,9 @@ ENTRY(chacha_block_xor_ssse3)
+ 	lea		-8(%r10),%rsp
+ 	jmp		.Ldone
+ 
+-ENDPROC(chacha_block_xor_ssse3)
++SYM_FUNC_END(chacha_block_xor_ssse3)
+ 
+-ENTRY(hchacha_block_ssse3)
++SYM_FUNC_START(hchacha_block_ssse3)
+ 	# %rdi: Input state matrix, s
+ 	# %rsi: output (8 32-bit words)
+ 	# %edx: nrounds
+@@ -222,9 +222,9 @@ ENTRY(hchacha_block_ssse3)
+ 
+ 	FRAME_END
+ 	ret
+-ENDPROC(hchacha_block_ssse3)
++SYM_FUNC_END(hchacha_block_ssse3)
+ 
+-ENTRY(chacha_4block_xor_ssse3)
++SYM_FUNC_START(chacha_4block_xor_ssse3)
+ 	# %rdi: Input state matrix, s
+ 	# %rsi: up to 4 data blocks output, o
+ 	# %rdx: up to 4 data blocks input, i
+@@ -792,4 +792,4 @@ ENTRY(chacha_4block_xor_ssse3)
+ 
+ 	jmp		.Ldone4
+ 
+-ENDPROC(chacha_4block_xor_ssse3)
++SYM_FUNC_END(chacha_4block_xor_ssse3)
+diff --git a/arch/x86/crypto/crc32-pclmul_asm.S b/arch/x86/crypto/crc32-pclmul_asm.S
+index 1c099dc08cc3..9fd28ff65bc2 100644
+--- a/arch/x86/crypto/crc32-pclmul_asm.S
++++ b/arch/x86/crypto/crc32-pclmul_asm.S
+@@ -103,7 +103,7 @@
+  *	                     size_t len, uint crc32)
+  */
+ 
+-ENTRY(crc32_pclmul_le_16) /* buffer and buffer size are 16 bytes aligned */
++SYM_FUNC_START(crc32_pclmul_le_16) /* buffer and buffer size are 16 bytes aligned */
+ 	movdqa  (BUF), %xmm1
+ 	movdqa  0x10(BUF), %xmm2
+ 	movdqa  0x20(BUF), %xmm3
+@@ -238,4 +238,4 @@ fold_64:
+ 	PEXTRD  0x01, %xmm1, %eax
  
  	ret
--ENDPROC(chacha_permute)
-+SYM_FUNC_END(chacha_permute)
+-ENDPROC(crc32_pclmul_le_16)
++SYM_FUNC_END(crc32_pclmul_le_16)
+diff --git a/arch/x86/crypto/crc32c-pcl-intel-asm_64.S b/arch/x86/crypto/crc32c-pcl-intel-asm_64.S
+index d9b734d0c8cc..0e6690e3618c 100644
+--- a/arch/x86/crypto/crc32c-pcl-intel-asm_64.S
++++ b/arch/x86/crypto/crc32c-pcl-intel-asm_64.S
+@@ -74,7 +74,7 @@
+ # unsigned int crc_pcl(u8 *buffer, int len, unsigned int crc_init);
  
- ENTRY(chacha_block_xor_ssse3)
- 	# %rdi: Input state matrix, s
+ .text
+-ENTRY(crc_pcl)
++SYM_FUNC_START(crc_pcl)
+ #define    bufp		%rdi
+ #define    bufp_dw	%edi
+ #define    bufp_w	%di
+@@ -311,7 +311,7 @@ do_return:
+ 	popq    %rdi
+ 	popq    %rbx
+         ret
+-ENDPROC(crc_pcl)
++SYM_FUNC_END(crc_pcl)
+ 
+ .section	.rodata, "a", @progbits
+         ################################################################
+diff --git a/arch/x86/crypto/crct10dif-pcl-asm_64.S b/arch/x86/crypto/crct10dif-pcl-asm_64.S
+index de04d3e98d8d..f56b499541e0 100644
+--- a/arch/x86/crypto/crct10dif-pcl-asm_64.S
++++ b/arch/x86/crypto/crct10dif-pcl-asm_64.S
+@@ -68,7 +68,7 @@
+ 
+ #define        arg1_low32 %edi
+ 
+-ENTRY(crc_t10dif_pcl)
++SYM_FUNC_START(crc_t10dif_pcl)
+ .align 16
+ 
+ 	# adjust the 16-bit initial_crc value, scale it to 32 bits
+@@ -552,7 +552,7 @@ _only_less_than_2:
+ 
+ 	jmp	_barrett
+ 
+-ENDPROC(crc_t10dif_pcl)
++SYM_FUNC_END(crc_t10dif_pcl)
+ 
+ .section	.rodata, "a", @progbits
+ .align 16
+diff --git a/arch/x86/crypto/des3_ede-asm_64.S b/arch/x86/crypto/des3_ede-asm_64.S
+index 8e49ce117494..82779c08029b 100644
+--- a/arch/x86/crypto/des3_ede-asm_64.S
++++ b/arch/x86/crypto/des3_ede-asm_64.S
+@@ -171,7 +171,7 @@
+ 	movl   left##d,   (io); \
+ 	movl   right##d, 4(io);
+ 
+-ENTRY(des3_ede_x86_64_crypt_blk)
++SYM_FUNC_START(des3_ede_x86_64_crypt_blk)
+ 	/* input:
+ 	 *	%rdi: round keys, CTX
+ 	 *	%rsi: dst
+@@ -253,7 +253,7 @@ ENTRY(des3_ede_x86_64_crypt_blk)
+ 	popq %rbx;
+ 
+ 	ret;
+-ENDPROC(des3_ede_x86_64_crypt_blk)
++SYM_FUNC_END(des3_ede_x86_64_crypt_blk)
+ 
+ /***********************************************************************
+  * 3-way 3DES
+@@ -427,7 +427,7 @@ ENDPROC(des3_ede_x86_64_crypt_blk)
+ #define __movq(src, dst) \
+ 	movq src, dst;
+ 
+-ENTRY(des3_ede_x86_64_crypt_blk_3way)
++SYM_FUNC_START(des3_ede_x86_64_crypt_blk_3way)
+ 	/* input:
+ 	 *	%rdi: ctx, round keys
+ 	 *	%rsi: dst (3 blocks)
+@@ -538,7 +538,7 @@ ENTRY(des3_ede_x86_64_crypt_blk_3way)
+ 	popq %rbx;
+ 
+ 	ret;
+-ENDPROC(des3_ede_x86_64_crypt_blk_3way)
++SYM_FUNC_END(des3_ede_x86_64_crypt_blk_3way)
+ 
+ .section	.rodata, "a", @progbits
+ .align 16
 diff --git a/arch/x86/crypto/ghash-clmulni-intel_asm.S b/arch/x86/crypto/ghash-clmulni-intel_asm.S
-index f94375a8dcd1..c3db86842578 100644
+index c3db86842578..12e3a850257b 100644
 --- a/arch/x86/crypto/ghash-clmulni-intel_asm.S
 +++ b/arch/x86/crypto/ghash-clmulni-intel_asm.S
-@@ -47,7 +47,7 @@
-  *	T2
-  *	T3
-  */
--__clmul_gf128mul_ble:
-+SYM_FUNC_START_LOCAL(__clmul_gf128mul_ble)
- 	movaps DATA, T1
- 	pshufd $0b01001110, DATA, T2
- 	pshufd $0b01001110, SHASH, T3
-@@ -90,7 +90,7 @@ __clmul_gf128mul_ble:
- 	pxor T2, T1
- 	pxor T1, DATA
- 	ret
--ENDPROC(__clmul_gf128mul_ble)
-+SYM_FUNC_END(__clmul_gf128mul_ble)
+@@ -93,7 +93,7 @@ SYM_FUNC_START_LOCAL(__clmul_gf128mul_ble)
+ SYM_FUNC_END(__clmul_gf128mul_ble)
  
  /* void clmul_ghash_mul(char *dst, const u128 *shash) */
- ENTRY(clmul_ghash_mul)
+-ENTRY(clmul_ghash_mul)
++SYM_FUNC_START(clmul_ghash_mul)
+ 	FRAME_BEGIN
+ 	movups (%rdi), DATA
+ 	movups (%rsi), SHASH
+@@ -104,13 +104,13 @@ ENTRY(clmul_ghash_mul)
+ 	movups DATA, (%rdi)
+ 	FRAME_END
+ 	ret
+-ENDPROC(clmul_ghash_mul)
++SYM_FUNC_END(clmul_ghash_mul)
+ 
+ /*
+  * void clmul_ghash_update(char *dst, const char *src, unsigned int srclen,
+  *			   const u128 *shash);
+  */
+-ENTRY(clmul_ghash_update)
++SYM_FUNC_START(clmul_ghash_update)
+ 	FRAME_BEGIN
+ 	cmp $16, %rdx
+ 	jb .Lupdate_just_ret	# check length
+@@ -133,4 +133,4 @@ ENTRY(clmul_ghash_update)
+ .Lupdate_just_ret:
+ 	FRAME_END
+ 	ret
+-ENDPROC(clmul_ghash_update)
++SYM_FUNC_END(clmul_ghash_update)
 diff --git a/arch/x86/crypto/morus1280-avx2-asm.S b/arch/x86/crypto/morus1280-avx2-asm.S
-index de182c460f82..61916af30d94 100644
+index 61916af30d94..7405410907a3 100644
 --- a/arch/x86/crypto/morus1280-avx2-asm.S
 +++ b/arch/x86/crypto/morus1280-avx2-asm.S
-@@ -70,7 +70,7 @@
-  * changed:
-  *   T0
-  */
--__morus1280_update:
-+SYM_FUNC_START_LOCAL(__morus1280_update)
- 	morus1280_round STATE0, STATE1, STATE2, STATE3, STATE4, 13, MASK1
- 	vpxor MSG, STATE1, STATE1
- 	morus1280_round STATE1, STATE2, STATE3, STATE4, STATE0, 46, MASK2
-@@ -81,7 +81,7 @@ __morus1280_update:
- 	vpxor MSG, STATE4, STATE4
- 	morus1280_round STATE4, STATE0, STATE1, STATE2, STATE3,  4, MASK1
- 	ret
--ENDPROC(__morus1280_update)
-+SYM_FUNC_END(__morus1280_update)
- 
- /*
-  * __morus1280_update_zero: internal ABI
-@@ -92,14 +92,14 @@ ENDPROC(__morus1280_update)
-  * changed:
-  *   T0
-  */
--__morus1280_update_zero:
-+SYM_FUNC_START_LOCAL(__morus1280_update_zero)
- 	morus1280_round STATE0, STATE1, STATE2, STATE3, STATE4, 13, MASK1
- 	morus1280_round STATE1, STATE2, STATE3, STATE4, STATE0, 46, MASK2
- 	morus1280_round STATE2, STATE3, STATE4, STATE0, STATE1, 38, MASK3
- 	morus1280_round STATE3, STATE4, STATE0, STATE1, STATE2,  7, MASK2
- 	morus1280_round STATE4, STATE0, STATE1, STATE2, STATE3,  4, MASK1
- 	ret
--ENDPROC(__morus1280_update_zero)
-+SYM_FUNC_END(__morus1280_update_zero)
- 
- /*
-  * __load_partial: internal ABI
-@@ -112,7 +112,7 @@ ENDPROC(__morus1280_update_zero)
-  *   %r8
-  *   %r9
-  */
--__load_partial:
-+SYM_FUNC_START_LOCAL(__load_partial)
- 	xor %r9d, %r9d
- 	vpxor MSG, MSG, MSG
- 
-@@ -171,7 +171,7 @@ __load_partial:
- 
- .Lld_partial_16:
- 	ret
--ENDPROC(__load_partial)
-+SYM_FUNC_END(__load_partial)
- 
- /*
-  * __store_partial: internal ABI
-@@ -185,7 +185,7 @@ ENDPROC(__load_partial)
-  *   %r9
-  *   %r10
-  */
--__store_partial:
-+SYM_FUNC_START_LOCAL(__store_partial)
- 	mov %rcx, %r8
- 	mov %rdx, %r9
- 
-@@ -238,7 +238,7 @@ __store_partial:
- 
- .Lst_partial_1:
- 	ret
--ENDPROC(__store_partial)
-+SYM_FUNC_END(__store_partial)
- 
- /*
+@@ -244,7 +244,7 @@ SYM_FUNC_END(__store_partial)
   * void crypto_morus1280_avx2_init(void *state, const void *key,
+  *                                 const void *iv);
+  */
+-ENTRY(crypto_morus1280_avx2_init)
++SYM_FUNC_START(crypto_morus1280_avx2_init)
+ 	FRAME_BEGIN
+ 
+ 	/* load IV: */
+@@ -290,13 +290,13 @@ ENTRY(crypto_morus1280_avx2_init)
+ 
+ 	FRAME_END
+ 	ret
+-ENDPROC(crypto_morus1280_avx2_init)
++SYM_FUNC_END(crypto_morus1280_avx2_init)
+ 
+ /*
+  * void crypto_morus1280_avx2_ad(void *state, const void *data,
+  *                               unsigned int length);
+  */
+-ENTRY(crypto_morus1280_avx2_ad)
++SYM_FUNC_START(crypto_morus1280_avx2_ad)
+ 	FRAME_BEGIN
+ 
+ 	cmp $32, %rdx
+@@ -343,13 +343,13 @@ ENTRY(crypto_morus1280_avx2_ad)
+ .Lad_out:
+ 	FRAME_END
+ 	ret
+-ENDPROC(crypto_morus1280_avx2_ad)
++SYM_FUNC_END(crypto_morus1280_avx2_ad)
+ 
+ /*
+  * void crypto_morus1280_avx2_enc(void *state, const void *src, void *dst,
+  *                                unsigned int length);
+  */
+-ENTRY(crypto_morus1280_avx2_enc)
++SYM_FUNC_START(crypto_morus1280_avx2_enc)
+ 	FRAME_BEGIN
+ 
+ 	cmp $32, %rcx
+@@ -415,13 +415,13 @@ ENTRY(crypto_morus1280_avx2_enc)
+ .Lenc_out:
+ 	FRAME_END
+ 	ret
+-ENDPROC(crypto_morus1280_avx2_enc)
++SYM_FUNC_END(crypto_morus1280_avx2_enc)
+ 
+ /*
+  * void crypto_morus1280_avx2_enc_tail(void *state, const void *src, void *dst,
+  *                                     unsigned int length);
+  */
+-ENTRY(crypto_morus1280_avx2_enc_tail)
++SYM_FUNC_START(crypto_morus1280_avx2_enc_tail)
+ 	FRAME_BEGIN
+ 
+ 	/* load the state: */
+@@ -454,13 +454,13 @@ ENTRY(crypto_morus1280_avx2_enc_tail)
+ 
+ 	FRAME_END
+ 	ret
+-ENDPROC(crypto_morus1280_avx2_enc_tail)
++SYM_FUNC_END(crypto_morus1280_avx2_enc_tail)
+ 
+ /*
+  * void crypto_morus1280_avx2_dec(void *state, const void *src, void *dst,
+  *                                unsigned int length);
+  */
+-ENTRY(crypto_morus1280_avx2_dec)
++SYM_FUNC_START(crypto_morus1280_avx2_dec)
+ 	FRAME_BEGIN
+ 
+ 	cmp $32, %rcx
+@@ -524,13 +524,13 @@ ENTRY(crypto_morus1280_avx2_dec)
+ .Ldec_out:
+ 	FRAME_END
+ 	ret
+-ENDPROC(crypto_morus1280_avx2_dec)
++SYM_FUNC_END(crypto_morus1280_avx2_dec)
+ 
+ /*
+  * void crypto_morus1280_avx2_dec_tail(void *state, const void *src, void *dst,
+  *                                     unsigned int length);
+  */
+-ENTRY(crypto_morus1280_avx2_dec_tail)
++SYM_FUNC_START(crypto_morus1280_avx2_dec_tail)
+ 	FRAME_BEGIN
+ 
+ 	/* load the state: */
+@@ -570,13 +570,13 @@ ENTRY(crypto_morus1280_avx2_dec_tail)
+ 
+ 	FRAME_END
+ 	ret
+-ENDPROC(crypto_morus1280_avx2_dec_tail)
++SYM_FUNC_END(crypto_morus1280_avx2_dec_tail)
+ 
+ /*
+  * void crypto_morus1280_avx2_final(void *state, void *tag_xor,
+  *                                  u64 assoclen, u64 cryptlen);
+  */
+-ENTRY(crypto_morus1280_avx2_final)
++SYM_FUNC_START(crypto_morus1280_avx2_final)
+ 	FRAME_BEGIN
+ 
+ 	/* load the state: */
+@@ -619,4 +619,4 @@ ENTRY(crypto_morus1280_avx2_final)
+ 
+ 	FRAME_END
+ 	ret
+-ENDPROC(crypto_morus1280_avx2_final)
++SYM_FUNC_END(crypto_morus1280_avx2_final)
 diff --git a/arch/x86/crypto/morus1280-sse2-asm.S b/arch/x86/crypto/morus1280-sse2-asm.S
-index da5d2905db60..927bb362fa98 100644
+index 927bb362fa98..1d5ac8618318 100644
 --- a/arch/x86/crypto/morus1280-sse2-asm.S
 +++ b/arch/x86/crypto/morus1280-sse2-asm.S
-@@ -128,7 +128,7 @@
-  * changed:
-  *   T0
-  */
--__morus1280_update:
-+SYM_FUNC_START_LOCAL(__morus1280_update)
- 	morus1280_round \
- 		STATE0_LO, STATE0_HI, \
- 		STATE1_LO, STATE1_HI, \
-@@ -173,7 +173,7 @@ __morus1280_update:
- 		STATE3_LO, STATE3_HI, \
- 		4, rol1
- 	ret
--ENDPROC(__morus1280_update)
-+SYM_FUNC_END(__morus1280_update)
- 
- /*
-  * __morus1280_update_zero: internal ABI
-@@ -184,7 +184,7 @@ ENDPROC(__morus1280_update)
-  * changed:
-  *   T0
-  */
--__morus1280_update_zero:
-+SYM_FUNC_START_LOCAL(__morus1280_update_zero)
- 	morus1280_round \
- 		STATE0_LO, STATE0_HI, \
- 		STATE1_LO, STATE1_HI, \
-@@ -221,7 +221,7 @@ __morus1280_update_zero:
- 		STATE3_LO, STATE3_HI, \
- 		4, rol1
- 	ret
--ENDPROC(__morus1280_update_zero)
-+SYM_FUNC_END(__morus1280_update_zero)
- 
- /*
-  * __load_partial: internal ABI
-@@ -234,7 +234,7 @@ ENDPROC(__morus1280_update_zero)
-  *   %r8
-  *   %r9
-  */
--__load_partial:
-+SYM_FUNC_START_LOCAL(__load_partial)
- 	xor %r9d, %r9d
- 	pxor MSG_LO, MSG_LO
- 	pxor MSG_HI, MSG_HI
-@@ -295,7 +295,7 @@ __load_partial:
- 
- .Lld_partial_16:
- 	ret
--ENDPROC(__load_partial)
-+SYM_FUNC_END(__load_partial)
- 
- /*
-  * __store_partial: internal ABI
-@@ -309,7 +309,7 @@ ENDPROC(__load_partial)
-  *   %r9
-  *   %r10
-  */
--__store_partial:
-+SYM_FUNC_START_LOCAL(__store_partial)
- 	mov %rcx, %r8
- 	mov %rdx, %r9
- 
-@@ -363,7 +363,7 @@ __store_partial:
- 
- .Lst_partial_1:
- 	ret
--ENDPROC(__store_partial)
-+SYM_FUNC_END(__store_partial)
- 
- /*
+@@ -369,7 +369,7 @@ SYM_FUNC_END(__store_partial)
   * void crypto_morus1280_sse2_init(void *state, const void *key,
+  *                                 const void *iv);
+  */
+-ENTRY(crypto_morus1280_sse2_init)
++SYM_FUNC_START(crypto_morus1280_sse2_init)
+ 	FRAME_BEGIN
+ 
+ 	/* load IV: */
+@@ -426,13 +426,13 @@ ENTRY(crypto_morus1280_sse2_init)
+ 
+ 	FRAME_END
+ 	ret
+-ENDPROC(crypto_morus1280_sse2_init)
++SYM_FUNC_END(crypto_morus1280_sse2_init)
+ 
+ /*
+  * void crypto_morus1280_sse2_ad(void *state, const void *data,
+  *                               unsigned int length);
+  */
+-ENTRY(crypto_morus1280_sse2_ad)
++SYM_FUNC_START(crypto_morus1280_sse2_ad)
+ 	FRAME_BEGIN
+ 
+ 	cmp $32, %rdx
+@@ -491,13 +491,13 @@ ENTRY(crypto_morus1280_sse2_ad)
+ .Lad_out:
+ 	FRAME_END
+ 	ret
+-ENDPROC(crypto_morus1280_sse2_ad)
++SYM_FUNC_END(crypto_morus1280_sse2_ad)
+ 
+ /*
+  * void crypto_morus1280_sse2_enc(void *state, const void *src, void *dst,
+  *                                unsigned int length);
+  */
+-ENTRY(crypto_morus1280_sse2_enc)
++SYM_FUNC_START(crypto_morus1280_sse2_enc)
+ 	FRAME_BEGIN
+ 
+ 	cmp $32, %rcx
+@@ -595,13 +595,13 @@ ENTRY(crypto_morus1280_sse2_enc)
+ .Lenc_out:
+ 	FRAME_END
+ 	ret
+-ENDPROC(crypto_morus1280_sse2_enc)
++SYM_FUNC_END(crypto_morus1280_sse2_enc)
+ 
+ /*
+  * void crypto_morus1280_sse2_enc_tail(void *state, const void *src, void *dst,
+  *                                     unsigned int length);
+  */
+-ENTRY(crypto_morus1280_sse2_enc_tail)
++SYM_FUNC_START(crypto_morus1280_sse2_enc_tail)
+ 	FRAME_BEGIN
+ 
+ 	/* load the state: */
+@@ -653,13 +653,13 @@ ENTRY(crypto_morus1280_sse2_enc_tail)
+ 
+ 	FRAME_END
+ 	ret
+-ENDPROC(crypto_morus1280_sse2_enc_tail)
++SYM_FUNC_END(crypto_morus1280_sse2_enc_tail)
+ 
+ /*
+  * void crypto_morus1280_sse2_dec(void *state, const void *src, void *dst,
+  *                                unsigned int length);
+  */
+-ENTRY(crypto_morus1280_sse2_dec)
++SYM_FUNC_START(crypto_morus1280_sse2_dec)
+ 	FRAME_BEGIN
+ 
+ 	cmp $32, %rcx
+@@ -753,13 +753,13 @@ ENTRY(crypto_morus1280_sse2_dec)
+ .Ldec_out:
+ 	FRAME_END
+ 	ret
+-ENDPROC(crypto_morus1280_sse2_dec)
++SYM_FUNC_END(crypto_morus1280_sse2_dec)
+ 
+ /*
+  * void crypto_morus1280_sse2_dec_tail(void *state, const void *src, void *dst,
+  *                                     unsigned int length);
+  */
+-ENTRY(crypto_morus1280_sse2_dec_tail)
++SYM_FUNC_START(crypto_morus1280_sse2_dec_tail)
+ 	FRAME_BEGIN
+ 
+ 	/* load the state: */
+@@ -825,13 +825,13 @@ ENTRY(crypto_morus1280_sse2_dec_tail)
+ 
+ 	FRAME_END
+ 	ret
+-ENDPROC(crypto_morus1280_sse2_dec_tail)
++SYM_FUNC_END(crypto_morus1280_sse2_dec_tail)
+ 
+ /*
+  * void crypto_morus1280_sse2_final(void *state, void *tag_xor,
+  *                                  u64 assoclen, u64 cryptlen);
+  */
+-ENTRY(crypto_morus1280_sse2_final)
++SYM_FUNC_START(crypto_morus1280_sse2_final)
+ 	FRAME_BEGIN
+ 
+ 	/* load the state: */
+@@ -893,4 +893,4 @@ ENTRY(crypto_morus1280_sse2_final)
+ 
+ 	FRAME_END
+ 	ret
+-ENDPROC(crypto_morus1280_sse2_final)
++SYM_FUNC_END(crypto_morus1280_sse2_final)
 diff --git a/arch/x86/crypto/morus640-sse2-asm.S b/arch/x86/crypto/morus640-sse2-asm.S
-index 414db480250e..4bdd3da7f66c 100644
+index 4bdd3da7f66c..e1b5f5c534dc 100644
 --- a/arch/x86/crypto/morus640-sse2-asm.S
 +++ b/arch/x86/crypto/morus640-sse2-asm.S
-@@ -68,7 +68,7 @@
-  * changed:
-  *   T0
-  */
--__morus640_update:
-+SYM_FUNC_START_LOCAL(__morus640_update)
- 	morus640_round STATE0, STATE1, STATE2, STATE3, STATE4,  5, MASK1
- 	pxor MSG, STATE1
- 	morus640_round STATE1, STATE2, STATE3, STATE4, STATE0, 31, MASK2
-@@ -79,7 +79,7 @@ __morus640_update:
- 	pxor MSG, STATE4
- 	morus640_round STATE4, STATE0, STATE1, STATE2, STATE3, 13, MASK1
- 	ret
--ENDPROC(__morus640_update)
-+SYM_FUNC_END(__morus640_update)
- 
- 
- /*
-@@ -91,14 +91,14 @@ ENDPROC(__morus640_update)
-  * changed:
-  *   T0
-  */
--__morus640_update_zero:
-+SYM_FUNC_START_LOCAL(__morus640_update_zero)
- 	morus640_round STATE0, STATE1, STATE2, STATE3, STATE4,  5, MASK1
- 	morus640_round STATE1, STATE2, STATE3, STATE4, STATE0, 31, MASK2
- 	morus640_round STATE2, STATE3, STATE4, STATE0, STATE1,  7, MASK3
- 	morus640_round STATE3, STATE4, STATE0, STATE1, STATE2, 22, MASK2
- 	morus640_round STATE4, STATE0, STATE1, STATE2, STATE3, 13, MASK1
- 	ret
--ENDPROC(__morus640_update_zero)
-+SYM_FUNC_END(__morus640_update_zero)
- 
- /*
-  * __load_partial: internal ABI
-@@ -112,7 +112,7 @@ ENDPROC(__morus640_update_zero)
-  *   %r8
-  *   %r9
-  */
--__load_partial:
-+SYM_FUNC_START_LOCAL(__load_partial)
- 	xor %r9d, %r9d
- 	pxor MSG, MSG
- 
-@@ -164,7 +164,7 @@ __load_partial:
- 
- .Lld_partial_8:
- 	ret
--ENDPROC(__load_partial)
-+SYM_FUNC_END(__load_partial)
- 
- /*
-  * __store_partial: internal ABI
-@@ -178,7 +178,7 @@ ENDPROC(__load_partial)
-  *   %r9
-  *   %r10
-  */
--__store_partial:
-+SYM_FUNC_START_LOCAL(__store_partial)
- 	mov %rcx, %r8
- 	mov %rdx, %r9
- 
-@@ -222,7 +222,7 @@ __store_partial:
- 
- .Lst_partial_1:
- 	ret
--ENDPROC(__store_partial)
-+SYM_FUNC_END(__store_partial)
- 
+@@ -227,7 +227,7 @@ SYM_FUNC_END(__store_partial)
  /*
   * void crypto_morus640_sse2_init(void *state, const void *key, const void *iv);
+  */
+-ENTRY(crypto_morus640_sse2_init)
++SYM_FUNC_START(crypto_morus640_sse2_init)
+ 	FRAME_BEGIN
+ 
+ 	/* load IV: */
+@@ -271,13 +271,13 @@ ENTRY(crypto_morus640_sse2_init)
+ 
+ 	FRAME_END
+ 	ret
+-ENDPROC(crypto_morus640_sse2_init)
++SYM_FUNC_END(crypto_morus640_sse2_init)
+ 
+ /*
+  * void crypto_morus640_sse2_ad(void *state, const void *data,
+  *                              unsigned int length);
+  */
+-ENTRY(crypto_morus640_sse2_ad)
++SYM_FUNC_START(crypto_morus640_sse2_ad)
+ 	FRAME_BEGIN
+ 
+ 	cmp $16, %rdx
+@@ -324,13 +324,13 @@ ENTRY(crypto_morus640_sse2_ad)
+ .Lad_out:
+ 	FRAME_END
+ 	ret
+-ENDPROC(crypto_morus640_sse2_ad)
++SYM_FUNC_END(crypto_morus640_sse2_ad)
+ 
+ /*
+  * void crypto_morus640_sse2_enc(void *state, const void *src, void *dst,
+  *                               unsigned int length);
+  */
+-ENTRY(crypto_morus640_sse2_enc)
++SYM_FUNC_START(crypto_morus640_sse2_enc)
+ 	FRAME_BEGIN
+ 
+ 	cmp $16, %rcx
+@@ -398,13 +398,13 @@ ENTRY(crypto_morus640_sse2_enc)
+ .Lenc_out:
+ 	FRAME_END
+ 	ret
+-ENDPROC(crypto_morus640_sse2_enc)
++SYM_FUNC_END(crypto_morus640_sse2_enc)
+ 
+ /*
+  * void crypto_morus640_sse2_enc_tail(void *state, const void *src, void *dst,
+  *                                    unsigned int length);
+  */
+-ENTRY(crypto_morus640_sse2_enc_tail)
++SYM_FUNC_START(crypto_morus640_sse2_enc_tail)
+ 	FRAME_BEGIN
+ 
+ 	/* load the state: */
+@@ -438,13 +438,13 @@ ENTRY(crypto_morus640_sse2_enc_tail)
+ 
+ 	FRAME_END
+ 	ret
+-ENDPROC(crypto_morus640_sse2_enc_tail)
++SYM_FUNC_END(crypto_morus640_sse2_enc_tail)
+ 
+ /*
+  * void crypto_morus640_sse2_dec(void *state, const void *src, void *dst,
+  *                               unsigned int length);
+  */
+-ENTRY(crypto_morus640_sse2_dec)
++SYM_FUNC_START(crypto_morus640_sse2_dec)
+ 	FRAME_BEGIN
+ 
+ 	cmp $16, %rcx
+@@ -510,13 +510,13 @@ ENTRY(crypto_morus640_sse2_dec)
+ .Ldec_out:
+ 	FRAME_END
+ 	ret
+-ENDPROC(crypto_morus640_sse2_dec)
++SYM_FUNC_END(crypto_morus640_sse2_dec)
+ 
+ /*
+  * void crypto_morus640_sse2_dec_tail(void *state, const void *src, void *dst,
+  *                                    unsigned int length);
+  */
+-ENTRY(crypto_morus640_sse2_dec_tail)
++SYM_FUNC_START(crypto_morus640_sse2_dec_tail)
+ 	FRAME_BEGIN
+ 
+ 	/* load the state: */
+@@ -560,13 +560,13 @@ ENTRY(crypto_morus640_sse2_dec_tail)
+ 
+ 	FRAME_END
+ 	ret
+-ENDPROC(crypto_morus640_sse2_dec_tail)
++SYM_FUNC_END(crypto_morus640_sse2_dec_tail)
+ 
+ /*
+  * void crypto_morus640_sse2_final(void *state, void *tag_xor,
+  *	                           u64 assoclen, u64 cryptlen);
+  */
+-ENTRY(crypto_morus640_sse2_final)
++SYM_FUNC_START(crypto_morus640_sse2_final)
+ 	FRAME_BEGIN
+ 
+ 	/* load the state: */
+@@ -612,4 +612,4 @@ ENTRY(crypto_morus640_sse2_final)
+ 
+ 	FRAME_END
+ 	ret
+-ENDPROC(crypto_morus640_sse2_final)
++SYM_FUNC_END(crypto_morus640_sse2_final)
+diff --git a/arch/x86/crypto/nh-avx2-x86_64.S b/arch/x86/crypto/nh-avx2-x86_64.S
+index f7946ea1b704..b22c7b936272 100644
+--- a/arch/x86/crypto/nh-avx2-x86_64.S
++++ b/arch/x86/crypto/nh-avx2-x86_64.S
+@@ -69,7 +69,7 @@
+  *
+  * It's guaranteed that message_len % 16 == 0.
+  */
+-ENTRY(nh_avx2)
++SYM_FUNC_START(nh_avx2)
+ 
+ 	vmovdqu		0x00(KEY), K0
+ 	vmovdqu		0x10(KEY), K1
+@@ -154,4 +154,4 @@ ENTRY(nh_avx2)
+ 	vpaddq		T4, T0, T0
+ 	vmovdqu		T0, (HASH)
+ 	ret
+-ENDPROC(nh_avx2)
++SYM_FUNC_END(nh_avx2)
+diff --git a/arch/x86/crypto/nh-sse2-x86_64.S b/arch/x86/crypto/nh-sse2-x86_64.S
+index 51f52d4ab4bb..d7ae22dd6683 100644
+--- a/arch/x86/crypto/nh-sse2-x86_64.S
++++ b/arch/x86/crypto/nh-sse2-x86_64.S
+@@ -71,7 +71,7 @@
+  *
+  * It's guaranteed that message_len % 16 == 0.
+  */
+-ENTRY(nh_sse2)
++SYM_FUNC_START(nh_sse2)
+ 
+ 	movdqu		0x00(KEY), K0
+ 	movdqu		0x10(KEY), K1
+@@ -120,4 +120,4 @@ ENTRY(nh_sse2)
+ 	movdqu		T0, 0x00(HASH)
+ 	movdqu		T1, 0x10(HASH)
+ 	ret
+-ENDPROC(nh_sse2)
++SYM_FUNC_END(nh_sse2)
+diff --git a/arch/x86/crypto/poly1305-avx2-x86_64.S b/arch/x86/crypto/poly1305-avx2-x86_64.S
+index 3b6e70d085da..68b0f4386dc4 100644
+--- a/arch/x86/crypto/poly1305-avx2-x86_64.S
++++ b/arch/x86/crypto/poly1305-avx2-x86_64.S
+@@ -83,7 +83,7 @@ ORMASK:	.octa 0x00000000010000000000000001000000
+ #define d3 %r12
+ #define d4 %r13
+ 
+-ENTRY(poly1305_4block_avx2)
++SYM_FUNC_START(poly1305_4block_avx2)
+ 	# %rdi: Accumulator h[5]
+ 	# %rsi: 64 byte input block m
+ 	# %rdx: Poly1305 key r[5]
+@@ -385,4 +385,4 @@ ENTRY(poly1305_4block_avx2)
+ 	pop		%r12
+ 	pop		%rbx
+ 	ret
+-ENDPROC(poly1305_4block_avx2)
++SYM_FUNC_END(poly1305_4block_avx2)
+diff --git a/arch/x86/crypto/poly1305-sse2-x86_64.S b/arch/x86/crypto/poly1305-sse2-x86_64.S
+index c88c670cb5fc..66715fbedc18 100644
+--- a/arch/x86/crypto/poly1305-sse2-x86_64.S
++++ b/arch/x86/crypto/poly1305-sse2-x86_64.S
+@@ -50,7 +50,7 @@ ORMASK:	.octa 0x00000000010000000000000001000000
+ #define d3 %r11
+ #define d4 %r12
+ 
+-ENTRY(poly1305_block_sse2)
++SYM_FUNC_START(poly1305_block_sse2)
+ 	# %rdi: Accumulator h[5]
+ 	# %rsi: 16 byte input block m
+ 	# %rdx: Poly1305 key r[5]
+@@ -276,7 +276,7 @@ ENTRY(poly1305_block_sse2)
+ 	pop		%r12
+ 	pop		%rbx
+ 	ret
+-ENDPROC(poly1305_block_sse2)
++SYM_FUNC_END(poly1305_block_sse2)
+ 
+ 
+ #define u0 0x00(%r8)
+@@ -301,7 +301,7 @@ ENDPROC(poly1305_block_sse2)
+ #undef d0
+ #define d0 %r13
+ 
+-ENTRY(poly1305_2block_sse2)
++SYM_FUNC_START(poly1305_2block_sse2)
+ 	# %rdi: Accumulator h[5]
+ 	# %rsi: 16 byte input block m
+ 	# %rdx: Poly1305 key r[5]
+@@ -581,4 +581,4 @@ ENTRY(poly1305_2block_sse2)
+ 	pop		%r12
+ 	pop		%rbx
+ 	ret
+-ENDPROC(poly1305_2block_sse2)
++SYM_FUNC_END(poly1305_2block_sse2)
 diff --git a/arch/x86/crypto/serpent-avx-x86_64-asm_64.S b/arch/x86/crypto/serpent-avx-x86_64-asm_64.S
-index 2925077f8c6a..c2d4a1fc9ee8 100644
+index c2d4a1fc9ee8..72de86a8091e 100644
 --- a/arch/x86/crypto/serpent-avx-x86_64-asm_64.S
 +++ b/arch/x86/crypto/serpent-avx-x86_64-asm_64.S
-@@ -570,7 +570,7 @@
- 	transpose_4x4(x0, x1, x2, x3, t0, t1, t2)
+@@ -677,7 +677,7 @@ SYM_FUNC_START_LOCAL(__serpent_dec_blk8_avx)
+ 	ret;
+ SYM_FUNC_END(__serpent_dec_blk8_avx)
  
- .align 8
--__serpent_enc_blk8_avx:
-+SYM_FUNC_START_LOCAL(__serpent_enc_blk8_avx)
+-ENTRY(serpent_ecb_enc_8way_avx)
++SYM_FUNC_START(serpent_ecb_enc_8way_avx)
  	/* input:
  	 *	%rdi: ctx, CTX
- 	 *	RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2: blocks
-@@ -621,10 +621,10 @@ __serpent_enc_blk8_avx:
- 	write_blocks(RA2, RB2, RC2, RD2, RK0, RK1, RK2);
+ 	 *	%rsi: dst
+@@ -693,9 +693,9 @@ ENTRY(serpent_ecb_enc_8way_avx)
  
+ 	FRAME_END
  	ret;
--ENDPROC(__serpent_enc_blk8_avx)
-+SYM_FUNC_END(__serpent_enc_blk8_avx)
+-ENDPROC(serpent_ecb_enc_8way_avx)
++SYM_FUNC_END(serpent_ecb_enc_8way_avx)
  
- .align 8
--__serpent_dec_blk8_avx:
-+SYM_FUNC_START_LOCAL(__serpent_dec_blk8_avx)
+-ENTRY(serpent_ecb_dec_8way_avx)
++SYM_FUNC_START(serpent_ecb_dec_8way_avx)
  	/* input:
  	 *	%rdi: ctx, CTX
- 	 *	RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2: encrypted blocks
-@@ -675,7 +675,7 @@ __serpent_dec_blk8_avx:
- 	write_blocks(RC2, RD2, RB2, RE2, RK0, RK1, RK2);
+ 	 *	%rsi: dst
+@@ -711,9 +711,9 @@ ENTRY(serpent_ecb_dec_8way_avx)
  
+ 	FRAME_END
  	ret;
--ENDPROC(__serpent_dec_blk8_avx)
-+SYM_FUNC_END(__serpent_dec_blk8_avx)
+-ENDPROC(serpent_ecb_dec_8way_avx)
++SYM_FUNC_END(serpent_ecb_dec_8way_avx)
  
- ENTRY(serpent_ecb_enc_8way_avx)
+-ENTRY(serpent_cbc_dec_8way_avx)
++SYM_FUNC_START(serpent_cbc_dec_8way_avx)
  	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -729,9 +729,9 @@ ENTRY(serpent_cbc_dec_8way_avx)
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(serpent_cbc_dec_8way_avx)
++SYM_FUNC_END(serpent_cbc_dec_8way_avx)
+ 
+-ENTRY(serpent_ctr_8way_avx)
++SYM_FUNC_START(serpent_ctr_8way_avx)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -749,9 +749,9 @@ ENTRY(serpent_ctr_8way_avx)
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(serpent_ctr_8way_avx)
++SYM_FUNC_END(serpent_ctr_8way_avx)
+ 
+-ENTRY(serpent_xts_enc_8way_avx)
++SYM_FUNC_START(serpent_xts_enc_8way_avx)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -771,9 +771,9 @@ ENTRY(serpent_xts_enc_8way_avx)
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(serpent_xts_enc_8way_avx)
++SYM_FUNC_END(serpent_xts_enc_8way_avx)
+ 
+-ENTRY(serpent_xts_dec_8way_avx)
++SYM_FUNC_START(serpent_xts_dec_8way_avx)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -793,4 +793,4 @@ ENTRY(serpent_xts_dec_8way_avx)
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(serpent_xts_dec_8way_avx)
++SYM_FUNC_END(serpent_xts_dec_8way_avx)
 diff --git a/arch/x86/crypto/serpent-avx2-asm_64.S b/arch/x86/crypto/serpent-avx2-asm_64.S
-index d67888f2a52a..52c527ce4b18 100644
+index 52c527ce4b18..b866f1632803 100644
 --- a/arch/x86/crypto/serpent-avx2-asm_64.S
 +++ b/arch/x86/crypto/serpent-avx2-asm_64.S
-@@ -566,7 +566,7 @@
- 	transpose_4x4(x0, x1, x2, x3, t0, t1, t2)
+@@ -673,7 +673,7 @@ SYM_FUNC_START_LOCAL(__serpent_dec_blk16)
+ 	ret;
+ SYM_FUNC_END(__serpent_dec_blk16)
  
- .align 8
--__serpent_enc_blk16:
-+SYM_FUNC_START_LOCAL(__serpent_enc_blk16)
+-ENTRY(serpent_ecb_enc_16way)
++SYM_FUNC_START(serpent_ecb_enc_16way)
  	/* input:
  	 *	%rdi: ctx, CTX
- 	 *	RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2: plaintext
-@@ -617,10 +617,10 @@ __serpent_enc_blk16:
- 	write_blocks(RA2, RB2, RC2, RD2, RK0, RK1, RK2);
+ 	 *	%rsi: dst
+@@ -693,9 +693,9 @@ ENTRY(serpent_ecb_enc_16way)
  
+ 	FRAME_END
  	ret;
--ENDPROC(__serpent_enc_blk16)
-+SYM_FUNC_END(__serpent_enc_blk16)
+-ENDPROC(serpent_ecb_enc_16way)
++SYM_FUNC_END(serpent_ecb_enc_16way)
  
- .align 8
--__serpent_dec_blk16:
-+SYM_FUNC_START_LOCAL(__serpent_dec_blk16)
+-ENTRY(serpent_ecb_dec_16way)
++SYM_FUNC_START(serpent_ecb_dec_16way)
  	/* input:
  	 *	%rdi: ctx, CTX
- 	 *	RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2: ciphertext
-@@ -671,7 +671,7 @@ __serpent_dec_blk16:
- 	write_blocks(RC2, RD2, RB2, RE2, RK0, RK1, RK2);
+ 	 *	%rsi: dst
+@@ -715,9 +715,9 @@ ENTRY(serpent_ecb_dec_16way)
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(serpent_ecb_dec_16way)
++SYM_FUNC_END(serpent_ecb_dec_16way)
+ 
+-ENTRY(serpent_cbc_dec_16way)
++SYM_FUNC_START(serpent_cbc_dec_16way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -738,9 +738,9 @@ ENTRY(serpent_cbc_dec_16way)
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(serpent_cbc_dec_16way)
++SYM_FUNC_END(serpent_cbc_dec_16way)
+ 
+-ENTRY(serpent_ctr_16way)
++SYM_FUNC_START(serpent_ctr_16way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst (16 blocks)
+@@ -763,9 +763,9 @@ ENTRY(serpent_ctr_16way)
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(serpent_ctr_16way)
++SYM_FUNC_END(serpent_ctr_16way)
+ 
+-ENTRY(serpent_xts_enc_16way)
++SYM_FUNC_START(serpent_xts_enc_16way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst (16 blocks)
+@@ -789,9 +789,9 @@ ENTRY(serpent_xts_enc_16way)
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(serpent_xts_enc_16way)
++SYM_FUNC_END(serpent_xts_enc_16way)
+ 
+-ENTRY(serpent_xts_dec_16way)
++SYM_FUNC_START(serpent_xts_dec_16way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst (16 blocks)
+@@ -815,4 +815,4 @@ ENTRY(serpent_xts_dec_16way)
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(serpent_xts_dec_16way)
++SYM_FUNC_END(serpent_xts_dec_16way)
+diff --git a/arch/x86/crypto/serpent-sse2-x86_64-asm_64.S b/arch/x86/crypto/serpent-sse2-x86_64-asm_64.S
+index acc066c7c6b2..bdeee900df63 100644
+--- a/arch/x86/crypto/serpent-sse2-x86_64-asm_64.S
++++ b/arch/x86/crypto/serpent-sse2-x86_64-asm_64.S
+@@ -634,7 +634,7 @@
+ 	pxor t0,		x3; \
+ 	movdqu x3,		(3*4*4)(out);
+ 
+-ENTRY(__serpent_enc_blk_8way)
++SYM_FUNC_START(__serpent_enc_blk_8way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -697,9 +697,9 @@ ENTRY(__serpent_enc_blk_8way)
+ 	xor_blocks(%rax, RA2, RB2, RC2, RD2, RK0, RK1, RK2);
  
  	ret;
--ENDPROC(__serpent_dec_blk16)
-+SYM_FUNC_END(__serpent_dec_blk16)
+-ENDPROC(__serpent_enc_blk_8way)
++SYM_FUNC_END(__serpent_enc_blk_8way)
  
- ENTRY(serpent_ecb_enc_16way)
+-ENTRY(serpent_dec_blk_8way)
++SYM_FUNC_START(serpent_dec_blk_8way)
  	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -751,4 +751,4 @@ ENTRY(serpent_dec_blk_8way)
+ 	write_blocks(%rax, RC2, RD2, RB2, RE2, RK0, RK1, RK2);
+ 
+ 	ret;
+-ENDPROC(serpent_dec_blk_8way)
++SYM_FUNC_END(serpent_dec_blk_8way)
+diff --git a/arch/x86/crypto/sha1_avx2_x86_64_asm.S b/arch/x86/crypto/sha1_avx2_x86_64_asm.S
+index 9f712a7dfd79..6decc85ef7b7 100644
+--- a/arch/x86/crypto/sha1_avx2_x86_64_asm.S
++++ b/arch/x86/crypto/sha1_avx2_x86_64_asm.S
+@@ -634,7 +634,7 @@ _loop3:
+  * param: function's name
+  */
+ .macro SHA1_VECTOR_ASM  name
+-	ENTRY(\name)
++	SYM_FUNC_START(\name)
+ 
+ 	push	%rbx
+ 	push	%r12
+@@ -676,7 +676,7 @@ _loop3:
+ 
+ 	ret
+ 
+-	ENDPROC(\name)
++	SYM_FUNC_END(\name)
+ .endm
+ 
+ .section .rodata
+diff --git a/arch/x86/crypto/sha1_ni_asm.S b/arch/x86/crypto/sha1_ni_asm.S
+index ebbdba72ae07..11efe3a45a1f 100644
+--- a/arch/x86/crypto/sha1_ni_asm.S
++++ b/arch/x86/crypto/sha1_ni_asm.S
+@@ -95,7 +95,7 @@
+  */
+ .text
+ .align 32
+-ENTRY(sha1_ni_transform)
++SYM_FUNC_START(sha1_ni_transform)
+ 	mov		%rsp, RSPSAVE
+ 	sub		$FRAME_SIZE, %rsp
+ 	and		$~0xF, %rsp
+@@ -291,7 +291,7 @@ ENTRY(sha1_ni_transform)
+ 	mov		RSPSAVE, %rsp
+ 
+ 	ret
+-ENDPROC(sha1_ni_transform)
++SYM_FUNC_END(sha1_ni_transform)
+ 
+ .section	.rodata.cst16.PSHUFFLE_BYTE_FLIP_MASK, "aM", @progbits, 16
+ .align 16
+diff --git a/arch/x86/crypto/sha1_ssse3_asm.S b/arch/x86/crypto/sha1_ssse3_asm.S
+index 613d0bfc3d84..265caba3d113 100644
+--- a/arch/x86/crypto/sha1_ssse3_asm.S
++++ b/arch/x86/crypto/sha1_ssse3_asm.S
+@@ -71,7 +71,7 @@
+  * param: function's name
+  */
+ .macro SHA1_VECTOR_ASM  name
+-	ENTRY(\name)
++	SYM_FUNC_START(\name)
+ 
+ 	push	%rbx
+ 	push	%r12
+@@ -105,7 +105,7 @@
+ 	pop	%rbx
+ 	ret
+ 
+-	ENDPROC(\name)
++	SYM_FUNC_END(\name)
+ .endm
+ 
+ /*
+diff --git a/arch/x86/crypto/sha256-avx-asm.S b/arch/x86/crypto/sha256-avx-asm.S
+index 001bbcf93c79..22e14c8dd2e4 100644
+--- a/arch/x86/crypto/sha256-avx-asm.S
++++ b/arch/x86/crypto/sha256-avx-asm.S
+@@ -347,7 +347,7 @@ a = TMP_
+ ## arg 3 : Num blocks
+ ########################################################################
+ .text
+-ENTRY(sha256_transform_avx)
++SYM_FUNC_START(sha256_transform_avx)
+ .align 32
+ 	pushq   %rbx
+ 	pushq   %r12
+@@ -460,7 +460,7 @@ done_hash:
+ 	popq	%r12
+ 	popq    %rbx
+ 	ret
+-ENDPROC(sha256_transform_avx)
++SYM_FUNC_END(sha256_transform_avx)
+ 
+ .section	.rodata.cst256.K256, "aM", @progbits, 256
+ .align 64
+diff --git a/arch/x86/crypto/sha256-avx2-asm.S b/arch/x86/crypto/sha256-avx2-asm.S
+index 1420db15dcdd..519b551ad576 100644
+--- a/arch/x86/crypto/sha256-avx2-asm.S
++++ b/arch/x86/crypto/sha256-avx2-asm.S
+@@ -526,7 +526,7 @@ STACK_SIZE	= _RSP      + _RSP_SIZE
+ ## arg 3 : Num blocks
+ ########################################################################
+ .text
+-ENTRY(sha256_transform_rorx)
++SYM_FUNC_START(sha256_transform_rorx)
+ .align 32
+ 	pushq	%rbx
+ 	pushq	%r12
+@@ -713,7 +713,7 @@ done_hash:
+ 	popq	%r12
+ 	popq	%rbx
+ 	ret
+-ENDPROC(sha256_transform_rorx)
++SYM_FUNC_END(sha256_transform_rorx)
+ 
+ .section	.rodata.cst512.K256, "aM", @progbits, 512
+ .align 64
+diff --git a/arch/x86/crypto/sha256-ssse3-asm.S b/arch/x86/crypto/sha256-ssse3-asm.S
+index c6c05ed2c16a..69cc2f91dc4c 100644
+--- a/arch/x86/crypto/sha256-ssse3-asm.S
++++ b/arch/x86/crypto/sha256-ssse3-asm.S
+@@ -353,7 +353,7 @@ a = TMP_
+ ## arg 3 : Num blocks
+ ########################################################################
+ .text
+-ENTRY(sha256_transform_ssse3)
++SYM_FUNC_START(sha256_transform_ssse3)
+ .align 32
+ 	pushq   %rbx
+ 	pushq   %r12
+@@ -471,7 +471,7 @@ done_hash:
+ 	popq    %rbx
+ 
+ 	ret
+-ENDPROC(sha256_transform_ssse3)
++SYM_FUNC_END(sha256_transform_ssse3)
+ 
+ .section	.rodata.cst256.K256, "aM", @progbits, 256
+ .align 64
+diff --git a/arch/x86/crypto/sha256_ni_asm.S b/arch/x86/crypto/sha256_ni_asm.S
+index fb58f58ecfbc..7abade04a3a3 100644
+--- a/arch/x86/crypto/sha256_ni_asm.S
++++ b/arch/x86/crypto/sha256_ni_asm.S
+@@ -97,7 +97,7 @@
+ 
+ .text
+ .align 32
+-ENTRY(sha256_ni_transform)
++SYM_FUNC_START(sha256_ni_transform)
+ 
+ 	shl		$6, NUM_BLKS		/*  convert to bytes */
+ 	jz		.Ldone_hash
+@@ -327,7 +327,7 @@ ENTRY(sha256_ni_transform)
+ .Ldone_hash:
+ 
+ 	ret
+-ENDPROC(sha256_ni_transform)
++SYM_FUNC_END(sha256_ni_transform)
+ 
+ .section	.rodata.cst256.K256, "aM", @progbits, 256
+ .align 64
+diff --git a/arch/x86/crypto/sha512-avx-asm.S b/arch/x86/crypto/sha512-avx-asm.S
+index 39235fefe6f7..3704ddd7e5d5 100644
+--- a/arch/x86/crypto/sha512-avx-asm.S
++++ b/arch/x86/crypto/sha512-avx-asm.S
+@@ -277,7 +277,7 @@ frame_size = frame_GPRSAVE + GPRSAVE_SIZE
+ # message blocks.
+ # L is the message length in SHA512 blocks
+ ########################################################################
+-ENTRY(sha512_transform_avx)
++SYM_FUNC_START(sha512_transform_avx)
+ 	cmp $0, msglen
+ 	je nowork
+ 
+@@ -365,7 +365,7 @@ updateblock:
+ 
+ nowork:
+ 	ret
+-ENDPROC(sha512_transform_avx)
++SYM_FUNC_END(sha512_transform_avx)
+ 
+ ########################################################################
+ ### Binary Data
+diff --git a/arch/x86/crypto/sha512-avx2-asm.S b/arch/x86/crypto/sha512-avx2-asm.S
+index b16d56005162..80d830e7ee09 100644
+--- a/arch/x86/crypto/sha512-avx2-asm.S
++++ b/arch/x86/crypto/sha512-avx2-asm.S
+@@ -569,7 +569,7 @@ frame_size = frame_GPRSAVE + GPRSAVE_SIZE
+ #   message blocks.
+ # L is the message length in SHA512 blocks
+ ########################################################################
+-ENTRY(sha512_transform_rorx)
++SYM_FUNC_START(sha512_transform_rorx)
+ 	# Allocate Stack Space
+ 	mov	%rsp, %rax
+ 	sub	$frame_size, %rsp
+@@ -682,7 +682,7 @@ done_hash:
+ 	# Restore Stack Pointer
+ 	mov	frame_RSPSAVE(%rsp), %rsp
+ 	ret
+-ENDPROC(sha512_transform_rorx)
++SYM_FUNC_END(sha512_transform_rorx)
+ 
+ ########################################################################
+ ### Binary Data
+diff --git a/arch/x86/crypto/sha512-ssse3-asm.S b/arch/x86/crypto/sha512-ssse3-asm.S
+index 66bbd9058a90..838f984e95d9 100644
+--- a/arch/x86/crypto/sha512-ssse3-asm.S
++++ b/arch/x86/crypto/sha512-ssse3-asm.S
+@@ -275,7 +275,7 @@ frame_size = frame_GPRSAVE + GPRSAVE_SIZE
+ #   message blocks.
+ # L is the message length in SHA512 blocks.
+ ########################################################################
+-ENTRY(sha512_transform_ssse3)
++SYM_FUNC_START(sha512_transform_ssse3)
+ 
+ 	cmp $0, msglen
+ 	je nowork
+@@ -364,7 +364,7 @@ updateblock:
+ 
+ nowork:
+ 	ret
+-ENDPROC(sha512_transform_ssse3)
++SYM_FUNC_END(sha512_transform_ssse3)
+ 
+ ########################################################################
+ ### Binary Data
 diff --git a/arch/x86/crypto/twofish-avx-x86_64-asm_64.S b/arch/x86/crypto/twofish-avx-x86_64-asm_64.S
-index 73b471da3622..96ddfda4d7b2 100644
+index 96ddfda4d7b2..16e53c98e6a0 100644
 --- a/arch/x86/crypto/twofish-avx-x86_64-asm_64.S
 +++ b/arch/x86/crypto/twofish-avx-x86_64-asm_64.S
-@@ -249,7 +249,7 @@
- 	vpxor		x3, wkey, x3;
+@@ -330,7 +330,7 @@ SYM_FUNC_START_LOCAL(__twofish_dec_blk8)
+ 	ret;
+ SYM_FUNC_END(__twofish_dec_blk8)
  
- .align 8
--__twofish_enc_blk8:
-+SYM_FUNC_START_LOCAL(__twofish_enc_blk8)
+-ENTRY(twofish_ecb_enc_8way)
++SYM_FUNC_START(twofish_ecb_enc_8way)
  	/* input:
  	 *	%rdi: ctx, CTX
- 	 *	RA1, RB1, RC1, RD1, RA2, RB2, RC2, RD2: blocks
-@@ -288,10 +288,10 @@ __twofish_enc_blk8:
- 	outunpack_blocks(RC2, RD2, RA2, RB2, RK1, RX0, RY0, RK2);
+ 	 *	%rsi: dst
+@@ -348,9 +348,9 @@ ENTRY(twofish_ecb_enc_8way)
  
+ 	FRAME_END
  	ret;
--ENDPROC(__twofish_enc_blk8)
-+SYM_FUNC_END(__twofish_enc_blk8)
+-ENDPROC(twofish_ecb_enc_8way)
++SYM_FUNC_END(twofish_ecb_enc_8way)
  
- .align 8
--__twofish_dec_blk8:
-+SYM_FUNC_START_LOCAL(__twofish_dec_blk8)
+-ENTRY(twofish_ecb_dec_8way)
++SYM_FUNC_START(twofish_ecb_dec_8way)
  	/* input:
  	 *	%rdi: ctx, CTX
- 	 *	RC1, RD1, RA1, RB1, RC2, RD2, RA2, RB2: encrypted blocks
-@@ -328,7 +328,7 @@ __twofish_dec_blk8:
- 	outunpack_blocks(RA2, RB2, RC2, RD2, RK1, RX0, RY0, RK2);
+ 	 *	%rsi: dst
+@@ -368,9 +368,9 @@ ENTRY(twofish_ecb_dec_8way)
  
+ 	FRAME_END
  	ret;
--ENDPROC(__twofish_dec_blk8)
-+SYM_FUNC_END(__twofish_dec_blk8)
+-ENDPROC(twofish_ecb_dec_8way)
++SYM_FUNC_END(twofish_ecb_dec_8way)
  
- ENTRY(twofish_ecb_enc_8way)
+-ENTRY(twofish_cbc_dec_8way)
++SYM_FUNC_START(twofish_cbc_dec_8way)
  	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -393,9 +393,9 @@ ENTRY(twofish_cbc_dec_8way)
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(twofish_cbc_dec_8way)
++SYM_FUNC_END(twofish_cbc_dec_8way)
+ 
+-ENTRY(twofish_ctr_8way)
++SYM_FUNC_START(twofish_ctr_8way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -420,9 +420,9 @@ ENTRY(twofish_ctr_8way)
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(twofish_ctr_8way)
++SYM_FUNC_END(twofish_ctr_8way)
+ 
+-ENTRY(twofish_xts_enc_8way)
++SYM_FUNC_START(twofish_xts_enc_8way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -444,9 +444,9 @@ ENTRY(twofish_xts_enc_8way)
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(twofish_xts_enc_8way)
++SYM_FUNC_END(twofish_xts_enc_8way)
+ 
+-ENTRY(twofish_xts_dec_8way)
++SYM_FUNC_START(twofish_xts_dec_8way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -468,4 +468,4 @@ ENTRY(twofish_xts_dec_8way)
+ 
+ 	FRAME_END
+ 	ret;
+-ENDPROC(twofish_xts_dec_8way)
++SYM_FUNC_END(twofish_xts_dec_8way)
+diff --git a/arch/x86/crypto/twofish-x86_64-asm_64-3way.S b/arch/x86/crypto/twofish-x86_64-asm_64-3way.S
+index e7273a606a07..c830aef77070 100644
+--- a/arch/x86/crypto/twofish-x86_64-asm_64-3way.S
++++ b/arch/x86/crypto/twofish-x86_64-asm_64-3way.S
+@@ -235,7 +235,7 @@
+ 	rorq $32,			RAB2; \
+ 	outunpack3(mov, RIO, 2, RAB, 2);
+ 
+-ENTRY(__twofish_enc_blk_3way)
++SYM_FUNC_START(__twofish_enc_blk_3way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -282,9 +282,9 @@ ENTRY(__twofish_enc_blk_3way)
+ 	popq %r12;
+ 	popq %r13;
+ 	ret;
+-ENDPROC(__twofish_enc_blk_3way)
++SYM_FUNC_END(__twofish_enc_blk_3way)
+ 
+-ENTRY(twofish_dec_blk_3way)
++SYM_FUNC_START(twofish_dec_blk_3way)
+ 	/* input:
+ 	 *	%rdi: ctx, CTX
+ 	 *	%rsi: dst
+@@ -317,4 +317,4 @@ ENTRY(twofish_dec_blk_3way)
+ 	popq %r12;
+ 	popq %r13;
+ 	ret;
+-ENDPROC(twofish_dec_blk_3way)
++SYM_FUNC_END(twofish_dec_blk_3way)
+diff --git a/arch/x86/crypto/twofish-x86_64-asm_64.S b/arch/x86/crypto/twofish-x86_64-asm_64.S
+index a350c990dc86..74ef6c55d75f 100644
+--- a/arch/x86/crypto/twofish-x86_64-asm_64.S
++++ b/arch/x86/crypto/twofish-x86_64-asm_64.S
+@@ -215,7 +215,7 @@
+ 	xor	%r8d,		d ## D;\
+ 	ror	$1,		d ## D;
+ 
+-ENTRY(twofish_enc_blk)
++SYM_FUNC_START(twofish_enc_blk)
+ 	pushq    R1
+ 
+ 	/* %rdi contains the ctx address */
+@@ -266,9 +266,9 @@ ENTRY(twofish_enc_blk)
+ 	popq	R1
+ 	movl	$1,%eax
+ 	ret
+-ENDPROC(twofish_enc_blk)
++SYM_FUNC_END(twofish_enc_blk)
+ 
+-ENTRY(twofish_dec_blk)
++SYM_FUNC_START(twofish_dec_blk)
+ 	pushq    R1
+ 
+ 	/* %rdi contains the ctx address */
+@@ -318,4 +318,4 @@ ENTRY(twofish_dec_blk)
+ 	popq	R1
+ 	movl	$1,%eax
+ 	ret
+-ENDPROC(twofish_dec_blk)
++SYM_FUNC_END(twofish_dec_blk)
+diff --git a/arch/x86/entry/entry_64.S b/arch/x86/entry/entry_64.S
+index 88e865ec9695..5e4212e398f9 100644
+--- a/arch/x86/entry/entry_64.S
++++ b/arch/x86/entry/entry_64.S
+@@ -15,7 +15,7 @@
+  *			at the top of the kernel process stack.
+  *
+  * Some macro usage:
+- * - ENTRY/END:		Define functions in the symbol table.
++ * - SYM_FUNC_START/END:Define functions in the symbol table.
+  * - TRACE_IRQ_*:	Trace hardirq state for lock debugging.
+  * - idtentry:		Define exception entry points.
+  */
+@@ -985,7 +985,7 @@ idtentry simd_coprocessor_error		do_simd_coprocessor_error	has_error_code=0
+ 	 * Reload gs selector with exception handling
+ 	 * edi:  new selector
+ 	 */
+-ENTRY(native_load_gs_index)
++SYM_FUNC_START(native_load_gs_index)
+ 	FRAME_BEGIN
+ 	pushfq
+ 	DISABLE_INTERRUPTS(CLBR_ANY & ~CLBR_RDI)
+@@ -999,7 +999,7 @@ ENTRY(native_load_gs_index)
+ 	popfq
+ 	FRAME_END
+ 	ret
+-ENDPROC(native_load_gs_index)
++SYM_FUNC_END(native_load_gs_index)
+ EXPORT_SYMBOL(native_load_gs_index)
+ 
+ 	_ASM_EXTABLE(.Lgs_change, bad_gs)
+@@ -1020,7 +1020,7 @@ SYM_CODE_END(bad_gs)
+ 	.previous
+ 
+ /* Call softirq on interrupt stack. Interrupts are off. */
+-ENTRY(do_softirq_own_stack)
++SYM_FUNC_START(do_softirq_own_stack)
+ 	pushq	%rbp
+ 	mov	%rsp, %rbp
+ 	ENTER_IRQ_STACK regs=0 old_rsp=%r11
+@@ -1028,7 +1028,7 @@ ENTRY(do_softirq_own_stack)
+ 	LEAVE_IRQ_STACK regs=0
+ 	leaveq
+ 	ret
+-ENDPROC(do_softirq_own_stack)
++SYM_FUNC_END(do_softirq_own_stack)
+ 
+ #ifdef CONFIG_XEN_PV
+ idtentry hypervisor_callback xen_do_hypervisor_callback has_error_code=0
+diff --git a/arch/x86/entry/entry_64_compat.S b/arch/x86/entry/entry_64_compat.S
+index da296435676e..f1d3ccae5dd5 100644
+--- a/arch/x86/entry/entry_64_compat.S
++++ b/arch/x86/entry/entry_64_compat.S
+@@ -46,7 +46,7 @@
+  * ebp  user stack
+  * 0(%ebp) arg6
+  */
+-ENTRY(entry_SYSENTER_compat)
++SYM_FUNC_START(entry_SYSENTER_compat)
+ 	/* Interrupts are off on entry. */
+ 	SWAPGS
+ 
+@@ -147,7 +147,7 @@ ENTRY(entry_SYSENTER_compat)
+ 	popfq
+ 	jmp	.Lsysenter_flags_fixed
+ SYM_INNER_LABEL(__end_entry_SYSENTER_compat, SYM_L_GLOBAL)
+-ENDPROC(entry_SYSENTER_compat)
++SYM_FUNC_END(entry_SYSENTER_compat)
+ 
+ /*
+  * 32-bit SYSCALL entry.
+diff --git a/arch/x86/kernel/acpi/wakeup_64.S b/arch/x86/kernel/acpi/wakeup_64.S
+index 6c60fe346583..042fd30ac493 100644
+--- a/arch/x86/kernel/acpi/wakeup_64.S
++++ b/arch/x86/kernel/acpi/wakeup_64.S
+@@ -13,7 +13,7 @@
+ 	/*
+ 	 * Hooray, we are in Long 64-bit mode (but still running in low memory)
+ 	 */
+-ENTRY(wakeup_long64)
++SYM_FUNC_START(wakeup_long64)
+ 	movq	saved_magic, %rax
+ 	movq	$0x123456789abcdef0, %rdx
+ 	cmpq	%rdx, %rax
+@@ -34,13 +34,13 @@ ENTRY(wakeup_long64)
+ 
+ 	movq	saved_rip, %rax
+ 	jmp	*%rax
+-ENDPROC(wakeup_long64)
++SYM_FUNC_END(wakeup_long64)
+ 
+ SYM_CODE_START_LOCAL(bogus_64_magic)
+ 	jmp	bogus_64_magic
+ SYM_CODE_END(bogus_64_magic)
+ 
+-ENTRY(do_suspend_lowlevel)
++SYM_FUNC_START(do_suspend_lowlevel)
+ 	FRAME_BEGIN
+ 	subq	$8, %rsp
+ 	xorl	%eax, %eax
+@@ -123,7 +123,7 @@ ENTRY(do_suspend_lowlevel)
+ 	addq	$8, %rsp
+ 	FRAME_END
+ 	jmp	restore_processor_state
+-ENDPROC(do_suspend_lowlevel)
++SYM_FUNC_END(do_suspend_lowlevel)
+ 
+ .data
+ saved_rbp:		.quad	0
+diff --git a/arch/x86/kernel/ftrace_64.S b/arch/x86/kernel/ftrace_64.S
+index b09428941320..e3d4ef5d7aff 100644
+--- a/arch/x86/kernel/ftrace_64.S
++++ b/arch/x86/kernel/ftrace_64.S
+@@ -150,11 +150,11 @@ EXPORT_SYMBOL(mcount)
+ 
+ #ifdef CONFIG_DYNAMIC_FTRACE
+ 
+-ENTRY(function_hook)
++SYM_FUNC_START(function_hook)
+ 	retq
+-ENDPROC(function_hook)
++SYM_FUNC_END(function_hook)
+ 
+-ENTRY(ftrace_caller)
++SYM_FUNC_START(ftrace_caller)
+ 	/* save_mcount_regs fills in first two parameters */
+ 	save_mcount_regs
+ 
+@@ -188,9 +188,9 @@ SYM_INNER_LABEL(ftrace_graph_call, SYM_L_GLOBAL)
+  */
+ WEAK(ftrace_stub)
+ 	retq
+-ENDPROC(ftrace_caller)
++SYM_FUNC_END(ftrace_caller)
+ 
+-ENTRY(ftrace_regs_caller)
++SYM_FUNC_START(ftrace_regs_caller)
+ 	/* Save the current flags before any operations that can change them */
+ 	pushfq
+ 
+@@ -259,12 +259,12 @@ SYM_INNER_LABEL(ftrace_regs_caller_end, SYM_L_GLOBAL)
+ 
+ 	jmp ftrace_epilogue
+ 
+-ENDPROC(ftrace_regs_caller)
++SYM_FUNC_END(ftrace_regs_caller)
+ 
+ 
+ #else /* ! CONFIG_DYNAMIC_FTRACE */
+ 
+-ENTRY(function_hook)
++SYM_FUNC_START(function_hook)
+ 	cmpq $ftrace_stub, ftrace_trace_function
+ 	jnz trace
+ 
+@@ -295,11 +295,11 @@ trace:
+ 	restore_mcount_regs
+ 
+ 	jmp fgraph_trace
+-ENDPROC(function_hook)
++SYM_FUNC_END(function_hook)
+ #endif /* CONFIG_DYNAMIC_FTRACE */
+ 
+ #ifdef CONFIG_FUNCTION_GRAPH_TRACER
+-ENTRY(ftrace_graph_caller)
++SYM_FUNC_START(ftrace_graph_caller)
+ 	/* Saves rbp into %rdx and fills first parameter  */
+ 	save_mcount_regs
+ 
+@@ -317,7 +317,7 @@ ENTRY(ftrace_graph_caller)
+ 	restore_mcount_regs
+ 
+ 	retq
+-ENDPROC(ftrace_graph_caller)
++SYM_FUNC_END(ftrace_graph_caller)
+ 
+ SYM_CODE_START(return_to_handler)
+ 	UNWIND_HINT_EMPTY
+diff --git a/arch/x86/kernel/head_64.S b/arch/x86/kernel/head_64.S
+index f6ed36c3aa17..6a39c35a3dd9 100644
+--- a/arch/x86/kernel/head_64.S
++++ b/arch/x86/kernel/head_64.S
+@@ -93,7 +93,7 @@ SYM_CODE_START_NOALIGN(startup_64)
+ 	jmp 1f
+ SYM_CODE_END(startup_64)
+ 
+-ENTRY(secondary_startup_64)
++SYM_CODE_START(secondary_startup_64)
+ 	UNWIND_HINT_EMPTY
+ 	/*
+ 	 * At this point the CPU runs in 64bit mode CS.L = 1 CS.D = 0,
+@@ -243,7 +243,7 @@ ENTRY(secondary_startup_64)
+ 	pushq	%rax		# target address in negative space
+ 	lretq
+ .Lafter_lret:
+-END(secondary_startup_64)
++SYM_CODE_END(secondary_startup_64)
+ 
+ #include "verify_cpu.S"
+ 
+@@ -253,11 +253,11 @@ END(secondary_startup_64)
+  * up already except stack. We just set up stack here. Then call
+  * start_secondary() via .Ljump_to_C_code.
+  */
+-ENTRY(start_cpu0)
++SYM_FUNC_START(start_cpu0)
+ 	movq	initial_stack(%rip), %rsp
+ 	UNWIND_HINT_EMPTY
+ 	jmp	.Ljump_to_C_code
+-ENDPROC(start_cpu0)
++SYM_FUNC_END(start_cpu0)
+ #endif
+ 
+ 	/* Both SMP bootup and ACPI suspend change these variables */
+@@ -274,7 +274,7 @@ SYM_DATA(initial_stack,
+ 	__FINITDATA
+ 
+ 	__INIT
+-ENTRY(early_idt_handler_array)
++SYM_CODE_START(early_idt_handler_array)
+ 	i = 0
+ 	.rept NUM_EXCEPTION_VECTORS
+ 	.if ((EXCEPTION_ERRCODE_MASK >> i) & 1) == 0
+@@ -290,7 +290,7 @@ ENTRY(early_idt_handler_array)
+ 	.fill early_idt_handler_array + i*EARLY_IDT_HANDLER_SIZE - ., 1, 0xcc
+ 	.endr
+ 	UNWIND_HINT_IRET_REGS offset=16
+-END(early_idt_handler_array)
++SYM_CODE_END(early_idt_handler_array)
+ 
+ SYM_CODE_START_LOCAL(early_idt_handler_common)
+ 	/*
+diff --git a/arch/x86/kernel/irqflags.S b/arch/x86/kernel/irqflags.S
+index ddeeaac8adda..0db0375235b4 100644
+--- a/arch/x86/kernel/irqflags.S
++++ b/arch/x86/kernel/irqflags.S
+@@ -7,20 +7,20 @@
+ /*
+  * unsigned long native_save_fl(void)
+  */
+-ENTRY(native_save_fl)
++SYM_FUNC_START(native_save_fl)
+ 	pushf
+ 	pop %_ASM_AX
+ 	ret
+-ENDPROC(native_save_fl)
++SYM_FUNC_END(native_save_fl)
+ EXPORT_SYMBOL(native_save_fl)
+ 
+ /*
+  * void native_restore_fl(unsigned long flags)
+  * %eax/%rdi: flags
+  */
+-ENTRY(native_restore_fl)
++SYM_FUNC_START(native_restore_fl)
+ 	push %_ASM_ARG1
+ 	popf
+ 	ret
+-ENDPROC(native_restore_fl)
++SYM_FUNC_END(native_restore_fl)
+ EXPORT_SYMBOL(native_restore_fl)
+diff --git a/arch/x86/kvm/vmx/vmenter.S b/arch/x86/kvm/vmx/vmenter.S
+index bcef2c7e9bc4..740c756d16a8 100644
+--- a/arch/x86/kvm/vmx/vmenter.S
++++ b/arch/x86/kvm/vmx/vmenter.S
+@@ -18,7 +18,7 @@
+  * they VM-Fail, whereas a successful VM-Enter + VM-Exit will jump
+  * to vmx_vmexit.
+  */
+-ENTRY(vmx_vmenter)
++SYM_FUNC_START(vmx_vmenter)
+ 	/* EFLAGS.ZF is set if VMCS.LAUNCHED == 0 */
+ 	je 2f
+ 
+@@ -40,7 +40,7 @@ ENTRY(vmx_vmenter)
+ 	_ASM_EXTABLE(1b, 5b)
+ 	_ASM_EXTABLE(2b, 5b)
+ 
+-ENDPROC(vmx_vmenter)
++SYM_FUNC_END(vmx_vmenter)
+ 
+ /**
+  * vmx_vmexit - Handle a VMX VM-Exit
+@@ -52,6 +52,6 @@ ENDPROC(vmx_vmenter)
+  * here after hardware loads the host's state, i.e. this is the destination
+  * referred to by VMCS.HOST_RIP.
+  */
+-ENTRY(vmx_vmexit)
++SYM_FUNC_START(vmx_vmexit)
+ 	ret
+-ENDPROC(vmx_vmexit)
++SYM_FUNC_END(vmx_vmexit)
+diff --git a/arch/x86/lib/checksum_32.S b/arch/x86/lib/checksum_32.S
+index ad8e0906d1ea..db1d1dd5ae35 100644
+--- a/arch/x86/lib/checksum_32.S
++++ b/arch/x86/lib/checksum_32.S
+@@ -284,7 +284,7 @@ unsigned int csum_partial_copy_generic (const char *src, char *dst,
+ #define ARGBASE 16		
+ #define FP		12
+ 		
+-ENTRY(csum_partial_copy_generic)
++SYM_FUNC_START(csum_partial_copy_generic)
+ 	subl  $4,%esp	
+ 	pushl %edi
+ 	pushl %esi
+@@ -402,7 +402,7 @@ DST(	movb %cl, (%edi)	)
+ 	popl %edi
+ 	popl %ecx			# equivalent to addl $4,%esp
+ 	ret	
+-ENDPROC(csum_partial_copy_generic)
++SYM_FUNC_END(csum_partial_copy_generic)
+ 
+ #else
+ 
+@@ -420,7 +420,7 @@ ENDPROC(csum_partial_copy_generic)
+ 
+ #define ARGBASE 12
+ 		
+-ENTRY(csum_partial_copy_generic)
++SYM_FUNC_START(csum_partial_copy_generic)
+ 	pushl %ebx
+ 	pushl %edi
+ 	pushl %esi
+@@ -487,7 +487,7 @@ DST(	movb %dl, (%edi)         )
+ 	popl %edi
+ 	popl %ebx
+ 	ret
+-ENDPROC(csum_partial_copy_generic)
++SYM_FUNC_END(csum_partial_copy_generic)
+ 				
+ #undef ROUND
+ #undef ROUND1		
+diff --git a/arch/x86/lib/clear_page_64.S b/arch/x86/lib/clear_page_64.S
+index 88acd349911b..47aa2830010b 100644
+--- a/arch/x86/lib/clear_page_64.S
++++ b/arch/x86/lib/clear_page_64.S
+@@ -12,15 +12,15 @@
+  * Zero a page.
+  * %rdi	- page
+  */
+-ENTRY(clear_page_rep)
++SYM_FUNC_START(clear_page_rep)
+ 	movl $4096/8,%ecx
+ 	xorl %eax,%eax
+ 	rep stosq
+ 	ret
+-ENDPROC(clear_page_rep)
++SYM_FUNC_END(clear_page_rep)
+ EXPORT_SYMBOL_GPL(clear_page_rep)
+ 
+-ENTRY(clear_page_orig)
++SYM_FUNC_START(clear_page_orig)
+ 	xorl   %eax,%eax
+ 	movl   $4096/64,%ecx
+ 	.p2align 4
+@@ -39,13 +39,13 @@ ENTRY(clear_page_orig)
+ 	jnz	.Lloop
+ 	nop
+ 	ret
+-ENDPROC(clear_page_orig)
++SYM_FUNC_END(clear_page_orig)
+ EXPORT_SYMBOL_GPL(clear_page_orig)
+ 
+-ENTRY(clear_page_erms)
++SYM_FUNC_START(clear_page_erms)
+ 	movl $4096,%ecx
+ 	xorl %eax,%eax
+ 	rep stosb
+ 	ret
+-ENDPROC(clear_page_erms)
++SYM_FUNC_END(clear_page_erms)
+ EXPORT_SYMBOL_GPL(clear_page_erms)
+diff --git a/arch/x86/lib/cmpxchg16b_emu.S b/arch/x86/lib/cmpxchg16b_emu.S
+index 9b330242e740..b6ba6360b3ca 100644
+--- a/arch/x86/lib/cmpxchg16b_emu.S
++++ b/arch/x86/lib/cmpxchg16b_emu.S
+@@ -19,7 +19,7 @@
+  * %rcx : high 64 bits of new value
+  * %al  : Operation successful
+  */
+-ENTRY(this_cpu_cmpxchg16b_emu)
++SYM_FUNC_START(this_cpu_cmpxchg16b_emu)
+ 
+ #
+ # Emulate 'cmpxchg16b %gs:(%rsi)' except we return the result in %al not
+@@ -50,4 +50,4 @@ ENTRY(this_cpu_cmpxchg16b_emu)
+ 	xor %al,%al
+ 	ret
+ 
+-ENDPROC(this_cpu_cmpxchg16b_emu)
++SYM_FUNC_END(this_cpu_cmpxchg16b_emu)
+diff --git a/arch/x86/lib/cmpxchg8b_emu.S b/arch/x86/lib/cmpxchg8b_emu.S
+index 03a186fc06ea..77aa18db3968 100644
+--- a/arch/x86/lib/cmpxchg8b_emu.S
++++ b/arch/x86/lib/cmpxchg8b_emu.S
+@@ -19,7 +19,7 @@
+  * %ebx : low 32 bits of new value
+  * %ecx : high 32 bits of new value
+  */
+-ENTRY(cmpxchg8b_emu)
++SYM_FUNC_START(cmpxchg8b_emu)
+ 
+ #
+ # Emulate 'cmpxchg8b (%esi)' on UP except we don't
+@@ -48,5 +48,5 @@ ENTRY(cmpxchg8b_emu)
+ 	popfl
+ 	ret
+ 
+-ENDPROC(cmpxchg8b_emu)
++SYM_FUNC_END(cmpxchg8b_emu)
+ EXPORT_SYMBOL(cmpxchg8b_emu)
+diff --git a/arch/x86/lib/copy_page_64.S b/arch/x86/lib/copy_page_64.S
+index f505870bd93b..2402d4c489d2 100644
+--- a/arch/x86/lib/copy_page_64.S
++++ b/arch/x86/lib/copy_page_64.S
+@@ -13,12 +13,12 @@
+  * prefetch distance based on SMP/UP.
+  */
+ 	ALIGN
+-ENTRY(copy_page)
++SYM_FUNC_START(copy_page)
+ 	ALTERNATIVE "jmp copy_page_regs", "", X86_FEATURE_REP_GOOD
+ 	movl	$4096/8, %ecx
+ 	rep	movsq
+ 	ret
+-ENDPROC(copy_page)
++SYM_FUNC_END(copy_page)
+ EXPORT_SYMBOL(copy_page)
+ 
+ SYM_FUNC_START_LOCAL(copy_page_regs)
+diff --git a/arch/x86/lib/copy_user_64.S b/arch/x86/lib/copy_user_64.S
+index db4e5aa0858b..41226ab87e89 100644
+--- a/arch/x86/lib/copy_user_64.S
++++ b/arch/x86/lib/copy_user_64.S
+@@ -29,7 +29,7 @@
+  * Output:
+  * eax uncopied bytes or 0 if successful.
+  */
+-ENTRY(copy_user_generic_unrolled)
++SYM_FUNC_START(copy_user_generic_unrolled)
+ 	ASM_STAC
+ 	cmpl $8,%edx
+ 	jb 20f		/* less then 8 bytes, go to byte copy loop */
+@@ -112,7 +112,7 @@ ENTRY(copy_user_generic_unrolled)
+ 	_ASM_EXTABLE_UA(19b, 40b)
+ 	_ASM_EXTABLE_UA(21b, 50b)
+ 	_ASM_EXTABLE_UA(22b, 50b)
+-ENDPROC(copy_user_generic_unrolled)
++SYM_FUNC_END(copy_user_generic_unrolled)
+ EXPORT_SYMBOL(copy_user_generic_unrolled)
+ 
+ /* Some CPUs run faster using the string copy instructions.
+@@ -133,7 +133,7 @@ EXPORT_SYMBOL(copy_user_generic_unrolled)
+  * Output:
+  * eax uncopied bytes or 0 if successful.
+  */
+-ENTRY(copy_user_generic_string)
++SYM_FUNC_START(copy_user_generic_string)
+ 	ASM_STAC
+ 	cmpl $8,%edx
+ 	jb 2f		/* less than 8 bytes, go to byte copy loop */
+@@ -158,7 +158,7 @@ ENTRY(copy_user_generic_string)
+ 
+ 	_ASM_EXTABLE_UA(1b, 11b)
+ 	_ASM_EXTABLE_UA(3b, 12b)
+-ENDPROC(copy_user_generic_string)
++SYM_FUNC_END(copy_user_generic_string)
+ EXPORT_SYMBOL(copy_user_generic_string)
+ 
+ /*
+@@ -173,7 +173,7 @@ EXPORT_SYMBOL(copy_user_generic_string)
+  * Output:
+  * eax uncopied bytes or 0 if successful.
+  */
+-ENTRY(copy_user_enhanced_fast_string)
++SYM_FUNC_START(copy_user_enhanced_fast_string)
+ 	ASM_STAC
+ 	cmpl $64,%edx
+ 	jb .L_copy_short_string	/* less then 64 bytes, avoid the costly 'rep' */
+@@ -190,7 +190,7 @@ ENTRY(copy_user_enhanced_fast_string)
+ 	.previous
+ 
+ 	_ASM_EXTABLE_UA(1b, 12b)
+-ENDPROC(copy_user_enhanced_fast_string)
++SYM_FUNC_END(copy_user_enhanced_fast_string)
+ EXPORT_SYMBOL(copy_user_enhanced_fast_string)
+ 
+ /*
+@@ -202,7 +202,7 @@ EXPORT_SYMBOL(copy_user_enhanced_fast_string)
+  *  - Require 8-byte alignment when size is 8 bytes or larger.
+  *  - Require 4-byte alignment when size is 4 bytes.
+  */
+-ENTRY(__copy_user_nocache)
++SYM_FUNC_START(__copy_user_nocache)
+ 	ASM_STAC
+ 
+ 	/* If size is less than 8 bytes, go to 4-byte copy */
+@@ -341,5 +341,5 @@ ENTRY(__copy_user_nocache)
+ 	_ASM_EXTABLE_UA(31b, .L_fixup_4b_copy)
+ 	_ASM_EXTABLE_UA(40b, .L_fixup_1b_copy)
+ 	_ASM_EXTABLE_UA(41b, .L_fixup_1b_copy)
+-ENDPROC(__copy_user_nocache)
++SYM_FUNC_END(__copy_user_nocache)
+ EXPORT_SYMBOL(__copy_user_nocache)
+diff --git a/arch/x86/lib/csum-copy_64.S b/arch/x86/lib/csum-copy_64.S
+index a4a379e79259..3394a8ff7fd0 100644
+--- a/arch/x86/lib/csum-copy_64.S
++++ b/arch/x86/lib/csum-copy_64.S
+@@ -49,7 +49,7 @@
+ 	.endm
+ 
+ 
+-ENTRY(csum_partial_copy_generic)
++SYM_FUNC_START(csum_partial_copy_generic)
+ 	cmpl	$3*64, %edx
+ 	jle	.Lignore
+ 
+@@ -225,4 +225,4 @@ ENTRY(csum_partial_copy_generic)
+ 	jz   .Lende
+ 	movl $-EFAULT, (%rax)
+ 	jmp .Lende
+-ENDPROC(csum_partial_copy_generic)
++SYM_FUNC_END(csum_partial_copy_generic)
+diff --git a/arch/x86/lib/getuser.S b/arch/x86/lib/getuser.S
+index 3ca4eab3a3e6..d330345aaf0c 100644
+--- a/arch/x86/lib/getuser.S
++++ b/arch/x86/lib/getuser.S
+@@ -36,7 +36,7 @@
+ #include <asm/export.h>
+ 
+ 	.text
+-ENTRY(__get_user_1)
++SYM_FUNC_START(__get_user_1)
+ 	mov PER_CPU_VAR(current_task), %_ASM_DX
+ 	cmp TASK_addr_limit(%_ASM_DX),%_ASM_AX
+ 	jae bad_get_user
+@@ -47,10 +47,10 @@ ENTRY(__get_user_1)
+ 	xor %eax,%eax
+ 	ASM_CLAC
+ 	ret
+-ENDPROC(__get_user_1)
++SYM_FUNC_END(__get_user_1)
+ EXPORT_SYMBOL(__get_user_1)
+ 
+-ENTRY(__get_user_2)
++SYM_FUNC_START(__get_user_2)
+ 	add $1,%_ASM_AX
+ 	jc bad_get_user
+ 	mov PER_CPU_VAR(current_task), %_ASM_DX
+@@ -63,10 +63,10 @@ ENTRY(__get_user_2)
+ 	xor %eax,%eax
+ 	ASM_CLAC
+ 	ret
+-ENDPROC(__get_user_2)
++SYM_FUNC_END(__get_user_2)
+ EXPORT_SYMBOL(__get_user_2)
+ 
+-ENTRY(__get_user_4)
++SYM_FUNC_START(__get_user_4)
+ 	add $3,%_ASM_AX
+ 	jc bad_get_user
+ 	mov PER_CPU_VAR(current_task), %_ASM_DX
+@@ -79,10 +79,10 @@ ENTRY(__get_user_4)
+ 	xor %eax,%eax
+ 	ASM_CLAC
+ 	ret
+-ENDPROC(__get_user_4)
++SYM_FUNC_END(__get_user_4)
+ EXPORT_SYMBOL(__get_user_4)
+ 
+-ENTRY(__get_user_8)
++SYM_FUNC_START(__get_user_8)
+ #ifdef CONFIG_X86_64
+ 	add $7,%_ASM_AX
+ 	jc bad_get_user
+@@ -111,7 +111,7 @@ ENTRY(__get_user_8)
+ 	ASM_CLAC
+ 	ret
+ #endif
+-ENDPROC(__get_user_8)
++SYM_FUNC_END(__get_user_8)
+ EXPORT_SYMBOL(__get_user_8)
+ 
+ 
+diff --git a/arch/x86/lib/hweight.S b/arch/x86/lib/hweight.S
+index a14f9939c365..dbf8cc97b7f5 100644
+--- a/arch/x86/lib/hweight.S
++++ b/arch/x86/lib/hweight.S
+@@ -8,7 +8,7 @@
+  * unsigned int __sw_hweight32(unsigned int w)
+  * %rdi: w
+  */
+-ENTRY(__sw_hweight32)
++SYM_FUNC_START(__sw_hweight32)
+ 
+ #ifdef CONFIG_X86_64
+ 	movl %edi, %eax				# w
+@@ -33,10 +33,10 @@ ENTRY(__sw_hweight32)
+ 	shrl $24, %eax				# w = w_tmp >> 24
+ 	__ASM_SIZE(pop,) %__ASM_REG(dx)
+ 	ret
+-ENDPROC(__sw_hweight32)
++SYM_FUNC_END(__sw_hweight32)
+ EXPORT_SYMBOL(__sw_hweight32)
+ 
+-ENTRY(__sw_hweight64)
++SYM_FUNC_START(__sw_hweight64)
+ #ifdef CONFIG_X86_64
+ 	pushq   %rdi
+ 	pushq   %rdx
+@@ -79,5 +79,5 @@ ENTRY(__sw_hweight64)
+ 	popl    %ecx
+ 	ret
+ #endif
+-ENDPROC(__sw_hweight64)
++SYM_FUNC_END(__sw_hweight64)
+ EXPORT_SYMBOL(__sw_hweight64)
+diff --git a/arch/x86/lib/iomap_copy_64.S b/arch/x86/lib/iomap_copy_64.S
+index 33147fef3452..2246fbf32fa8 100644
+--- a/arch/x86/lib/iomap_copy_64.S
++++ b/arch/x86/lib/iomap_copy_64.S
+@@ -20,8 +20,8 @@
+ /*
+  * override generic version in lib/iomap_copy.c
+  */
+-ENTRY(__iowrite32_copy)
++SYM_FUNC_START(__iowrite32_copy)
+ 	movl %edx,%ecx
+ 	rep movsd
+ 	ret
+-ENDPROC(__iowrite32_copy)
++SYM_FUNC_END(__iowrite32_copy)
+diff --git a/arch/x86/lib/memcpy_64.S b/arch/x86/lib/memcpy_64.S
+index cac0e1ad8ed2..64bf1b635607 100644
+--- a/arch/x86/lib/memcpy_64.S
++++ b/arch/x86/lib/memcpy_64.S
+@@ -192,7 +192,7 @@ MCSAFE_TEST_CTL
+  * Note that we only catch machine checks when reading the source addresses.
+  * Writes to target are posted and don't generate machine checks.
+  */
+-ENTRY(__memcpy_mcsafe)
++SYM_FUNC_START(__memcpy_mcsafe)
+ 	cmpl $8, %edx
+ 	/* Less than 8 bytes? Go to byte copy loop */
+ 	jb .L_no_whole_words
+@@ -258,7 +258,7 @@ ENTRY(__memcpy_mcsafe)
+ .L_done_memcpy_trap:
+ 	xorl %eax, %eax
+ 	ret
+-ENDPROC(__memcpy_mcsafe)
++SYM_FUNC_END(__memcpy_mcsafe)
+ EXPORT_SYMBOL_GPL(__memcpy_mcsafe)
+ 
+ 	.section .fixup, "ax"
+diff --git a/arch/x86/lib/memmove_64.S b/arch/x86/lib/memmove_64.S
+index 50c1648311b3..337830d7a59c 100644
+--- a/arch/x86/lib/memmove_64.S
++++ b/arch/x86/lib/memmove_64.S
+@@ -27,7 +27,7 @@
+ .weak memmove
+ 
+ SYM_FUNC_START_ALIAS(memmove)
+-ENTRY(__memmove)
++SYM_FUNC_START(__memmove)
+ 
+ 	/* Handle more 32 bytes in loop */
+ 	mov %rdi, %rax
+@@ -207,7 +207,7 @@ ENTRY(__memmove)
+ 	movb %r11b, (%rdi)
+ 13:
+ 	retq
+-ENDPROC(__memmove)
++SYM_FUNC_END(__memmove)
+ SYM_FUNC_END_ALIAS(memmove)
+ EXPORT_SYMBOL(__memmove)
+ EXPORT_SYMBOL(memmove)
+diff --git a/arch/x86/lib/memset_64.S b/arch/x86/lib/memset_64.S
+index 564abf9ecedb..9ff15ee404a4 100644
+--- a/arch/x86/lib/memset_64.S
++++ b/arch/x86/lib/memset_64.S
+@@ -20,7 +20,7 @@
+  * rax   original destination
+  */
+ SYM_FUNC_START_ALIAS(memset)
+-ENTRY(__memset)
++SYM_FUNC_START(__memset)
+ 	/*
+ 	 * Some CPUs support enhanced REP MOVSB/STOSB feature. It is recommended
+ 	 * to use it when possible. If not available, use fast string instructions.
+@@ -43,7 +43,7 @@ ENTRY(__memset)
+ 	rep stosb
+ 	movq %r9,%rax
+ 	ret
+-ENDPROC(__memset)
++SYM_FUNC_END(__memset)
+ SYM_FUNC_END_ALIAS(memset)
+ EXPORT_SYMBOL(memset)
+ EXPORT_SYMBOL(__memset)
+diff --git a/arch/x86/lib/msr-reg.S b/arch/x86/lib/msr-reg.S
+index ed33cbab3958..a2b9caa5274c 100644
+--- a/arch/x86/lib/msr-reg.S
++++ b/arch/x86/lib/msr-reg.S
+@@ -12,7 +12,7 @@
+  *
+  */
+ .macro op_safe_regs op
+-ENTRY(\op\()_safe_regs)
++SYM_FUNC_START(\op\()_safe_regs)
+ 	pushq %rbx
+ 	pushq %r12
+ 	movq	%rdi, %r10	/* Save pointer */
+@@ -41,13 +41,13 @@ ENTRY(\op\()_safe_regs)
+ 	jmp     2b
+ 
+ 	_ASM_EXTABLE(1b, 3b)
+-ENDPROC(\op\()_safe_regs)
++SYM_FUNC_END(\op\()_safe_regs)
+ .endm
+ 
+ #else /* X86_32 */
+ 
+ .macro op_safe_regs op
+-ENTRY(\op\()_safe_regs)
++SYM_FUNC_START(\op\()_safe_regs)
+ 	pushl %ebx
+ 	pushl %ebp
+ 	pushl %esi
+@@ -83,7 +83,7 @@ ENTRY(\op\()_safe_regs)
+ 	jmp     2b
+ 
+ 	_ASM_EXTABLE(1b, 3b)
+-ENDPROC(\op\()_safe_regs)
++SYM_FUNC_END(\op\()_safe_regs)
+ .endm
+ 
+ #endif
+diff --git a/arch/x86/lib/putuser.S b/arch/x86/lib/putuser.S
+index 67ef9b4c7eea..7dd9cb4a0826 100644
+--- a/arch/x86/lib/putuser.S
++++ b/arch/x86/lib/putuser.S
+@@ -36,7 +36,7 @@
+ 		ret
+ 
+ .text
+-ENTRY(__put_user_1)
++SYM_FUNC_START(__put_user_1)
+ 	ENTER
+ 	cmp TASK_addr_limit(%_ASM_BX),%_ASM_CX
+ 	jae bad_put_user
+@@ -44,10 +44,10 @@ ENTRY(__put_user_1)
+ 1:	movb %al,(%_ASM_CX)
+ 	xor %eax,%eax
+ 	EXIT
+-ENDPROC(__put_user_1)
++SYM_FUNC_END(__put_user_1)
+ EXPORT_SYMBOL(__put_user_1)
+ 
+-ENTRY(__put_user_2)
++SYM_FUNC_START(__put_user_2)
+ 	ENTER
+ 	mov TASK_addr_limit(%_ASM_BX),%_ASM_BX
+ 	sub $1,%_ASM_BX
+@@ -57,10 +57,10 @@ ENTRY(__put_user_2)
+ 2:	movw %ax,(%_ASM_CX)
+ 	xor %eax,%eax
+ 	EXIT
+-ENDPROC(__put_user_2)
++SYM_FUNC_END(__put_user_2)
+ EXPORT_SYMBOL(__put_user_2)
+ 
+-ENTRY(__put_user_4)
++SYM_FUNC_START(__put_user_4)
+ 	ENTER
+ 	mov TASK_addr_limit(%_ASM_BX),%_ASM_BX
+ 	sub $3,%_ASM_BX
+@@ -70,10 +70,10 @@ ENTRY(__put_user_4)
+ 3:	movl %eax,(%_ASM_CX)
+ 	xor %eax,%eax
+ 	EXIT
+-ENDPROC(__put_user_4)
++SYM_FUNC_END(__put_user_4)
+ EXPORT_SYMBOL(__put_user_4)
+ 
+-ENTRY(__put_user_8)
++SYM_FUNC_START(__put_user_8)
+ 	ENTER
+ 	mov TASK_addr_limit(%_ASM_BX),%_ASM_BX
+ 	sub $7,%_ASM_BX
+@@ -86,7 +86,7 @@ ENTRY(__put_user_8)
+ #endif
+ 	xor %eax,%eax
+ 	EXIT
+-ENDPROC(__put_user_8)
++SYM_FUNC_END(__put_user_8)
+ EXPORT_SYMBOL(__put_user_8)
+ 
+ SYM_CODE_START_LOCAL(bad_put_user)
+diff --git a/arch/x86/lib/retpoline.S b/arch/x86/lib/retpoline.S
+index c909961e678a..363ec132df7e 100644
+--- a/arch/x86/lib/retpoline.S
++++ b/arch/x86/lib/retpoline.S
+@@ -11,11 +11,11 @@
+ .macro THUNK reg
+ 	.section .text.__x86.indirect_thunk
+ 
+-ENTRY(__x86_indirect_thunk_\reg)
++SYM_FUNC_START(__x86_indirect_thunk_\reg)
+ 	CFI_STARTPROC
+ 	JMP_NOSPEC %\reg
+ 	CFI_ENDPROC
+-ENDPROC(__x86_indirect_thunk_\reg)
++SYM_FUNC_END(__x86_indirect_thunk_\reg)
+ .endm
+ 
+ /*
+diff --git a/arch/x86/lib/rwsem.S b/arch/x86/lib/rwsem.S
+index dc2ab6ea6768..dcd5c997b068 100644
+--- a/arch/x86/lib/rwsem.S
++++ b/arch/x86/lib/rwsem.S
+@@ -86,7 +86,7 @@
+ #endif
+ 
+ /* Fix up special calling conventions */
+-ENTRY(call_rwsem_down_read_failed)
++SYM_FUNC_START(call_rwsem_down_read_failed)
+ 	FRAME_BEGIN
+ 	save_common_regs
+ 	__ASM_SIZE(push,) %__ASM_REG(dx)
+@@ -96,9 +96,9 @@ ENTRY(call_rwsem_down_read_failed)
+ 	restore_common_regs
+ 	FRAME_END
+ 	ret
+-ENDPROC(call_rwsem_down_read_failed)
++SYM_FUNC_END(call_rwsem_down_read_failed)
+ 
+-ENTRY(call_rwsem_down_read_failed_killable)
++SYM_FUNC_START(call_rwsem_down_read_failed_killable)
+ 	FRAME_BEGIN
+ 	save_common_regs
+ 	__ASM_SIZE(push,) %__ASM_REG(dx)
+@@ -108,9 +108,9 @@ ENTRY(call_rwsem_down_read_failed_killable)
+ 	restore_common_regs
+ 	FRAME_END
+ 	ret
+-ENDPROC(call_rwsem_down_read_failed_killable)
++SYM_FUNC_END(call_rwsem_down_read_failed_killable)
+ 
+-ENTRY(call_rwsem_down_write_failed)
++SYM_FUNC_START(call_rwsem_down_write_failed)
+ 	FRAME_BEGIN
+ 	save_common_regs
+ 	movq %rax,%rdi
+@@ -118,9 +118,9 @@ ENTRY(call_rwsem_down_write_failed)
+ 	restore_common_regs
+ 	FRAME_END
+ 	ret
+-ENDPROC(call_rwsem_down_write_failed)
++SYM_FUNC_END(call_rwsem_down_write_failed)
+ 
+-ENTRY(call_rwsem_down_write_failed_killable)
++SYM_FUNC_START(call_rwsem_down_write_failed_killable)
+ 	FRAME_BEGIN
+ 	save_common_regs
+ 	movq %rax,%rdi
+@@ -128,9 +128,9 @@ ENTRY(call_rwsem_down_write_failed_killable)
+ 	restore_common_regs
+ 	FRAME_END
+ 	ret
+-ENDPROC(call_rwsem_down_write_failed_killable)
++SYM_FUNC_END(call_rwsem_down_write_failed_killable)
+ 
+-ENTRY(call_rwsem_wake)
++SYM_FUNC_START(call_rwsem_wake)
+ 	FRAME_BEGIN
+ 	/* do nothing if still outstanding active readers */
+ 	__ASM_HALF_SIZE(dec) %__ASM_HALF_REG(dx)
+@@ -141,9 +141,9 @@ ENTRY(call_rwsem_wake)
+ 	restore_common_regs
+ 1:	FRAME_END
+ 	ret
+-ENDPROC(call_rwsem_wake)
++SYM_FUNC_END(call_rwsem_wake)
+ 
+-ENTRY(call_rwsem_downgrade_wake)
++SYM_FUNC_START(call_rwsem_downgrade_wake)
+ 	FRAME_BEGIN
+ 	save_common_regs
+ 	__ASM_SIZE(push,) %__ASM_REG(dx)
+@@ -153,4 +153,4 @@ ENTRY(call_rwsem_downgrade_wake)
+ 	restore_common_regs
+ 	FRAME_END
+ 	ret
+-ENDPROC(call_rwsem_downgrade_wake)
++SYM_FUNC_END(call_rwsem_downgrade_wake)
+diff --git a/arch/x86/mm/mem_encrypt_boot.S b/arch/x86/mm/mem_encrypt_boot.S
+index 40a6085063d6..2c0a6fbd4fe8 100644
+--- a/arch/x86/mm/mem_encrypt_boot.S
++++ b/arch/x86/mm/mem_encrypt_boot.S
+@@ -19,7 +19,7 @@
+ 
+ 	.text
+ 	.code64
+-ENTRY(sme_encrypt_execute)
++SYM_FUNC_START(sme_encrypt_execute)
+ 
+ 	/*
+ 	 * Entry parameters:
+@@ -69,9 +69,9 @@ ENTRY(sme_encrypt_execute)
+ 	pop	%rbp
+ 
+ 	ret
+-ENDPROC(sme_encrypt_execute)
++SYM_FUNC_END(sme_encrypt_execute)
+ 
+-ENTRY(__enc_copy)
++SYM_FUNC_START(__enc_copy)
+ /*
+  * Routine used to encrypt memory in place.
+  *   This routine must be run outside of the kernel proper since
+@@ -156,4 +156,4 @@ ENTRY(__enc_copy)
+ 
+ 	ret
+ .L__enc_copy_end:
+-ENDPROC(__enc_copy)
++SYM_FUNC_END(__enc_copy)
+diff --git a/arch/x86/platform/efi/efi_stub_64.S b/arch/x86/platform/efi/efi_stub_64.S
+index 74628ec78f29..b1d2313fe3bf 100644
+--- a/arch/x86/platform/efi/efi_stub_64.S
++++ b/arch/x86/platform/efi/efi_stub_64.S
+@@ -39,7 +39,7 @@
+ 	mov %rsi, %cr0;			\
+ 	mov (%rsp), %rsp
+ 
+-ENTRY(efi_call)
++SYM_FUNC_START(efi_call)
+ 	pushq %rbp
+ 	movq %rsp, %rbp
+ 	SAVE_XMM
+@@ -55,4 +55,4 @@ ENTRY(efi_call)
+ 	RESTORE_XMM
+ 	popq %rbp
+ 	ret
+-ENDPROC(efi_call)
++SYM_FUNC_END(efi_call)
+diff --git a/arch/x86/platform/efi/efi_thunk_64.S b/arch/x86/platform/efi/efi_thunk_64.S
+index d677a7eb2d0a..3189f1394701 100644
+--- a/arch/x86/platform/efi/efi_thunk_64.S
++++ b/arch/x86/platform/efi/efi_thunk_64.S
+@@ -25,7 +25,7 @@
+ 
+ 	.text
+ 	.code64
+-ENTRY(efi64_thunk)
++SYM_FUNC_START(efi64_thunk)
+ 	push	%rbp
+ 	push	%rbx
+ 
+@@ -60,7 +60,7 @@ ENTRY(efi64_thunk)
+ 	pop	%rbx
+ 	pop	%rbp
+ 	retq
+-ENDPROC(efi64_thunk)
++SYM_FUNC_END(efi64_thunk)
+ 
+ /*
+  * We run this function from the 1:1 mapping.
+diff --git a/arch/x86/power/hibernate_asm_64.S b/arch/x86/power/hibernate_asm_64.S
+index e9983385c8b7..21fe8aa8ddcd 100644
+--- a/arch/x86/power/hibernate_asm_64.S
++++ b/arch/x86/power/hibernate_asm_64.S
+@@ -23,7 +23,7 @@
+ #include <asm/processor-flags.h>
+ #include <asm/frame.h>
+ 
+-ENTRY(swsusp_arch_suspend)
++SYM_FUNC_START(swsusp_arch_suspend)
+ 	movq	$saved_context, %rax
+ 	movq	%rsp, pt_regs_sp(%rax)
+ 	movq	%rbp, pt_regs_bp(%rax)
+@@ -51,7 +51,7 @@ ENTRY(swsusp_arch_suspend)
+ 	call swsusp_save
+ 	FRAME_END
+ 	ret
+-ENDPROC(swsusp_arch_suspend)
++SYM_FUNC_END(swsusp_arch_suspend)
+ 
+ SYM_CODE_START(restore_image)
+ 	/* prepare to jump to the image kernel */
+@@ -103,7 +103,7 @@ SYM_CODE_END(core_restore_code)
+ 
+ 	 /* code below belongs to the image kernel */
+ 	.align PAGE_SIZE
+-ENTRY(restore_registers)
++SYM_FUNC_START(restore_registers)
+ 	/* go back to the original page tables */
+ 	movq    %r9, %cr3
+ 
+@@ -145,4 +145,4 @@ ENTRY(restore_registers)
+ 	movq	%rax, in_suspend(%rip)
+ 
+ 	ret
+-ENDPROC(restore_registers)
++SYM_FUNC_END(restore_registers)
+diff --git a/arch/x86/xen/xen-asm.S b/arch/x86/xen/xen-asm.S
+index 8019edd0125c..d7bf6d5cfcb9 100644
+--- a/arch/x86/xen/xen-asm.S
++++ b/arch/x86/xen/xen-asm.S
+@@ -18,7 +18,7 @@
+  * event status with one and operation.  If there are pending events,
+  * then enter the hypervisor to get them handled.
+  */
+-ENTRY(xen_irq_enable_direct)
++SYM_FUNC_START(xen_irq_enable_direct)
+ 	FRAME_BEGIN
+ 	/* Unmask events */
+ 	movb $0, PER_CPU_VAR(xen_vcpu_info) + XEN_vcpu_info_mask
+@@ -37,17 +37,17 @@ ENTRY(xen_irq_enable_direct)
+ 1:
+ 	FRAME_END
+ 	ret
+-	ENDPROC(xen_irq_enable_direct)
++SYM_FUNC_END(xen_irq_enable_direct)
+ 
+ 
+ /*
+  * Disabling events is simply a matter of making the event mask
+  * non-zero.
+  */
+-ENTRY(xen_irq_disable_direct)
++SYM_FUNC_START(xen_irq_disable_direct)
+ 	movb $1, PER_CPU_VAR(xen_vcpu_info) + XEN_vcpu_info_mask
+ 	ret
+-ENDPROC(xen_irq_disable_direct)
++SYM_FUNC_END(xen_irq_disable_direct)
+ 
+ /*
+  * (xen_)save_fl is used to get the current interrupt enable status.
+@@ -58,12 +58,12 @@ ENDPROC(xen_irq_disable_direct)
+  * undefined.  We need to toggle the state of the bit, because Xen and
+  * x86 use opposite senses (mask vs enable).
+  */
+-ENTRY(xen_save_fl_direct)
++SYM_FUNC_START(xen_save_fl_direct)
+ 	testb $0xff, PER_CPU_VAR(xen_vcpu_info) + XEN_vcpu_info_mask
+ 	setz %ah
+ 	addb %ah, %ah
+ 	ret
+-	ENDPROC(xen_save_fl_direct)
++SYM_FUNC_END(xen_save_fl_direct)
+ 
+ 
+ /*
+@@ -73,7 +73,7 @@ ENTRY(xen_save_fl_direct)
+  * interrupt mask state, it checks for unmasked pending events and
+  * enters the hypervisor to get them delivered if so.
+  */
+-ENTRY(xen_restore_fl_direct)
++SYM_FUNC_START(xen_restore_fl_direct)
+ 	FRAME_BEGIN
+ #ifdef CONFIG_X86_64
+ 	testw $X86_EFLAGS_IF, %di
+@@ -94,14 +94,14 @@ ENTRY(xen_restore_fl_direct)
+ 1:
+ 	FRAME_END
+ 	ret
+-	ENDPROC(xen_restore_fl_direct)
++SYM_FUNC_END(xen_restore_fl_direct)
+ 
+ 
+ /*
+  * Force an event check by making a hypercall, but preserve regs
+  * before making the call.
+  */
+-ENTRY(check_events)
++SYM_FUNC_START(check_events)
+ 	FRAME_BEGIN
+ #ifdef CONFIG_X86_32
+ 	push %eax
+@@ -134,4 +134,4 @@ ENTRY(check_events)
+ #endif
+ 	FRAME_END
+ 	ret
+-ENDPROC(check_events)
++SYM_FUNC_END(check_events)
+diff --git a/arch/x86/xen/xen-asm_64.S b/arch/x86/xen/xen-asm_64.S
+index 2a65d59aa853..1b7713f50261 100644
+--- a/arch/x86/xen/xen-asm_64.S
++++ b/arch/x86/xen/xen-asm_64.S
+@@ -127,7 +127,7 @@ SYM_CODE_END(xen_sysret64)
+  */
+ 
+ /* Normal 64-bit system call target */
+-ENTRY(xen_syscall_target)
++SYM_FUNC_START(xen_syscall_target)
+ 	popq %rcx
+ 	popq %r11
+ 
+@@ -140,12 +140,12 @@ ENTRY(xen_syscall_target)
+ 	movq $__USER_CS, 1*8(%rsp)
+ 
+ 	jmp entry_SYSCALL_64_after_hwframe
+-ENDPROC(xen_syscall_target)
++SYM_FUNC_END(xen_syscall_target)
+ 
+ #ifdef CONFIG_IA32_EMULATION
+ 
+ /* 32-bit compat syscall target */
+-ENTRY(xen_syscall32_target)
++SYM_FUNC_START(xen_syscall32_target)
+ 	popq %rcx
+ 	popq %r11
+ 
+@@ -158,25 +158,25 @@ ENTRY(xen_syscall32_target)
+ 	movq $__USER32_CS, 1*8(%rsp)
+ 
+ 	jmp entry_SYSCALL_compat_after_hwframe
+-ENDPROC(xen_syscall32_target)
++SYM_FUNC_END(xen_syscall32_target)
+ 
+ /* 32-bit compat sysenter target */
+-ENTRY(xen_sysenter_target)
++SYM_FUNC_START(xen_sysenter_target)
+ 	mov 0*8(%rsp), %rcx
+ 	mov 1*8(%rsp), %r11
+ 	mov 5*8(%rsp), %rsp
+ 	jmp entry_SYSENTER_compat
+-ENDPROC(xen_sysenter_target)
++SYM_FUNC_END(xen_sysenter_target)
+ 
+ #else /* !CONFIG_IA32_EMULATION */
+ 
+ SYM_FUNC_START_ALIAS(xen_syscall32_target)
+-ENTRY(xen_sysenter_target)
++SYM_FUNC_START(xen_sysenter_target)
+ 	lea 16(%rsp), %rsp	/* strip %rcx, %r11 */
+ 	mov $-ENOSYS, %rax
+ 	pushq $0
+ 	jmp hypercall_iret
+-ENDPROC(xen_sysenter_target)
++SYM_FUNC_END(xen_sysenter_target)
+ SYM_FUNC_END_ALIAS(xen_syscall32_target)
+ 
+ #endif	/* CONFIG_IA32_EMULATION */
+diff --git a/include/linux/linkage.h b/include/linux/linkage.h
+index cb1108dde385..19f3d796ab5b 100644
+--- a/include/linux/linkage.h
++++ b/include/linux/linkage.h
+@@ -114,11 +114,13 @@
+ #endif
+ #endif
+ 
++#ifndef CONFIG_X86_64
+ #ifndef ENTRY
+ /* deprecated, use SYM_FUNC_START */
+ #define ENTRY(name) \
+ 	SYM_FUNC_START(name)
+ #endif
++#endif /* CONFIG_X86_64 */
+ #endif /* LINKER_SCRIPT */
+ 
+ #ifndef WEAK
+@@ -133,6 +135,7 @@
+ 	.size name, .-name
+ #endif
+ 
++#ifndef CONFIG_X86_64
+ /* If symbol 'name' is treated as a subroutine (gets called, and returns)
+  * then please use ENDPROC to mark 'name' as STT_FUNC for the benefit of
+  * static analysis tools such as stack depth analyzer.
+@@ -142,6 +145,7 @@
+ #define ENDPROC(name) \
+ 	SYM_FUNC_END(name)
+ #endif
++#endif /* CONFIG_X86_64 */
+ 
+ /* === generic annotations === */
+ 
 -- 
 2.20.1
 
