@@ -2,187 +2,160 @@ Return-Path: <SRS0=09LE=QH=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6271FC169C4
-	for <linux-crypto@archiver.kernel.org>; Thu, 31 Jan 2019 08:41:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAD54C282D9
+	for <linux-crypto@archiver.kernel.org>; Thu, 31 Jan 2019 09:05:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 30605218AF
-	for <linux-crypto@archiver.kernel.org>; Thu, 31 Jan 2019 08:41:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="jRlW5tRD"
+	by mail.kernel.org (Postfix) with ESMTP id 939B120B1F
+	for <linux-crypto@archiver.kernel.org>; Thu, 31 Jan 2019 09:05:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726142AbfAaIlu (ORCPT
+        id S1725932AbfAaJF3 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 31 Jan 2019 03:41:50 -0500
-Received: from mail-lj1-f194.google.com ([209.85.208.194]:33305 "EHLO
-        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725797AbfAaIlu (ORCPT
+        Thu, 31 Jan 2019 04:05:29 -0500
+Received: from mail-oi1-f196.google.com ([209.85.167.196]:41589 "EHLO
+        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725787AbfAaJF3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 31 Jan 2019 03:41:50 -0500
-Received: by mail-lj1-f194.google.com with SMTP id v1-v6so1977404ljd.0
-        for <linux-crypto@vger.kernel.org>; Thu, 31 Jan 2019 00:41:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=AtIzf0HGZRPgpt0+xARJvlHbAcFWw8amQ5FeEuPrgzo=;
-        b=jRlW5tRDQ4ZJJxS99hOwUiq9v4Mm4NAGKIURjNz9Q+Wjn1UXuCWp7xBlyBM8RZDAZQ
-         VzT/ZwIaTkbsk/OD08+kbHpAy4/uUt6yj9MQIs7hZ0saWh7Uyd74YXN1kVQ3kEHDng+6
-         DEGpY2R3qg311EipfSK64PSVuW1nHDTTsvJNA=
+        Thu, 31 Jan 2019 04:05:29 -0500
+Received: by mail-oi1-f196.google.com with SMTP id j21so2096291oii.8
+        for <linux-crypto@vger.kernel.org>; Thu, 31 Jan 2019 01:05:28 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=AtIzf0HGZRPgpt0+xARJvlHbAcFWw8amQ5FeEuPrgzo=;
-        b=TcPht2df3L3jOkU43B7bt6Qa5YEoagEAv7enqnFNYI5patHONMObKW22s+U0poHzyK
-         Xb/lD0eRw3YrOD+9N8eSQ4s548X5J1ZO4mennM/Vgq0fOkAiNN8NMoAj5tYj9NBS/9Jl
-         RiPlwca7eDXyMgaTTc1qqSoQzMR31MjSQYmUp/nFVT+72G6uWQDMCr7PTGpXUI2112Ve
-         IhHd77msFHpiJGUMUQUVCOxtOM5ajxKaLAfqB+8gE/TI8XgMvAg/G405F1xNSpNalZUL
-         4bDAb3l4DLLOosPzSsTc7qy+hsEwD0RKutTjolkhrQwRGr9eVTRXKbMfXOZVpkjIcrC3
-         TYFQ==
-X-Gm-Message-State: AJcUuke5B5l/+hnPUBruzDhJ34/H2wvL6oG6WkdwwrCHWD0jr4qjpaxO
-        sMo/qwUtvSlxGjxnd/T5cndTIw==
-X-Google-Smtp-Source: ALg8bN7TI6FwVy0odr91FQzGF5FssBBA+RpJVAU+Z3Z7SmuD0Z71r0vxoMxFBDuKjcA0WJjtn7mogw==
-X-Received: by 2002:a2e:9059:: with SMTP id n25-v6mr26312168ljg.155.1548924106995;
-        Thu, 31 Jan 2019 00:41:46 -0800 (PST)
-Received: from jax.urgonet (h-84-105.A175.priv.bahnhof.se. [79.136.84.105])
-        by smtp.gmail.com with ESMTPSA id o88sm721489lfk.38.2019.01.31.00.41.45
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 31 Jan 2019 00:41:46 -0800 (PST)
-Date:   Thu, 31 Jan 2019 09:41:43 +0100
-From:   Jens Wiklander <jens.wiklander@linaro.org>
-To:     Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Olof Johansson <olof@lixom.net>, arnd@arndb.de,
-        Sumit Garg <sumit.garg@linaro.org>,
-        herbert@gondor.apana.org.au, linux-arm-kernel@lists.infradead.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yamada.masahiro@socionext.com, michal.lkml@markovi.net,
-        mpm@selenic.com, robh+dt@kernel.org, mark.rutland@arm.com,
-        daniel.thompson@linaro.org, ard.biesheuvel@linaro.org,
-        bhsharma@redhat.com, tee-dev@lists.linaro.org
-Subject: Re: [PATCH v6 0/4] Introduce TEE bus driver framework
-Message-ID: <20190131084142.GA21196@jax.urgonet>
-References: <1548740978-28495-1-git-send-email-sumit.garg@linaro.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=hIuaQy3oXLliDQ1OXJvDPvmuJ+EYkvpUsfkbj+cxM90=;
+        b=IPPR697ZdKAaDcMTidVE7H/kn5Qu+kgxqEbsWhE9U+cjPQjRW0I9hiDMkdXSMF5HKA
+         SfG683HHg83pu24g6wB3o0/CweKcJxgfHqVVL77qLJiWrMjC3xprPT9ZlCZVSwfc2khH
+         gjswQTe8u6UFxLfV+Hd8uOSlypXd3M2+zZmJlxldBvquSwoxFu5cNCYAKApmDhrkddnZ
+         01SXptc2FiKarDQMX4whkELTDUCkNkDhftzCeivEbiM2clPLbxFL+EOyN9GzO0T2+A87
+         L5xutlnOXURzOimWCrAMbdXFGSGW/rT4N4Pea30GimxG9mFZX7YkGdx0SM2I3BYva9XG
+         iFkA==
+X-Gm-Message-State: AJcUukcna8hvaaSaPaErZ9HHRU6zhZuZYbXd/X4rsGaPFHIRXeG3OEWU
+        ag3Pct57LIdtXdTUtBxOQILTMAilhUalXyShbfOvieae
+X-Google-Smtp-Source: ALg8bN5UyaRl3IfwMVPjrubA/yjJ5ePDHRWuk1mrGVr6RXmM4pB17NiCxOx3PXQvZAp8dtjct9EYKDeMVhOprtlxA08=
+X-Received: by 2002:aca:4b8f:: with SMTP id y137mr15119422oia.132.1548925528134;
+ Thu, 31 Jan 2019 01:05:28 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1548740978-28495-1-git-send-email-sumit.garg@linaro.org>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+References: <20190123224926.250525-1-ebiggers@kernel.org> <20190123224926.250525-3-ebiggers@kernel.org>
+In-Reply-To: <20190123224926.250525-3-ebiggers@kernel.org>
+From:   Ondrej Mosnacek <omosnace@redhat.com>
+Date:   Thu, 31 Jan 2019 10:05:17 +0100
+Message-ID: <CAFqZXNv+=qgg+Jo4iC72D++BmoxK4S0XiKED47M7MQJjFtMYRw@mail.gmail.com>
+Subject: Re: [RFC/RFT PATCH 02/15] crypto: morus - fix handling chunked inputs
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Matt and Herbert,
+Hi Eric,
 
-On Tue, Jan 29, 2019 at 11:19:34AM +0530, Sumit Garg wrote:
-> This series introduces a generic TEE bus driver concept for TEE based
-> kernel drivers which would like to communicate with TEE based devices/
-> services.
-> 
-> Patch #1 adds TEE bus concept where devices/services are identified via
-> Universally Unique Identifier (UUID) and drivers register a table of
-> device UUIDs which they can support. This concept also allows for device
-> enumeration to be specific to corresponding TEE implementation like
-> OP-TEE etc.
-> 
-> Patch #2 adds supp_nowait flag for non-blocking requests arising via
-> TEE internal client interface.
-> 
-> Patch #3 adds TEE bus device enumeration support for OP-TEE. OP-TEE
-> provides a pseudo TA to enumerate TAs which can act as devices/services
-> for TEE bus.
-> 
-> Patch #4 adds OP-TEE based hwrng driver which act as TEE bus driver.
-> On ARM SoC's with TrustZone enabled, peripherals like entropy sources
-> might not be accessible to normal world (linux in this case) and rather
-> accessible to secure world (OP-TEE in this case) only. So this driver
-> aims to provides a generic interface to OP-TEE based random number
-> generator service.
-> 
-> Example case is Developerbox based on Socionext's Synquacer SoC [1]
-> which provides 7 thermal sensors accessible from secure world only which
-> could be used as entropy sources (thermal/measurement noise).
-> 
-> [1] https://www.96boards.org/product/developerbox/
-> 
-> Changes in v6:
-> 
-> 1. Incorporate some nitpicks in patch #1 and #3.
-> 2. Bundle all statics in a data structure in patch #4 and use dev_*
->    instead of pr_*.
-> 3. Add reviewed-by tags for patch #1, #2 and #3.
-> 
-> Changes in v5:
-> 
-> 1. Add support in module device table for TEE bus devices.
-> 2. Correct license for optee-rng module.
-> 
-> Changes in v4:
-> 
-> 1. Use typedef instead of single member tee_client_device_id struct.
-> 2. Incorporate TEE bus nitpicks.
-> 
-> Changes in v3:
-> 
-> 1. Fixed bus error path in Patch #1.
-> 2. Reversed order of Patch #2 and #3.
-> 3. Fixed miscellaneous syntax comments and memory leak.
-> 4. Added comments in Patch #2 for supp_nowait flag.
-> 
-> Changes in v2:
-> 
-> Based on review comments, the scope of this series has increased as
-> follows:
-> 
-> 1. Added TEE bus driver framework.
-> 2. Added OP-TEE based device enumeration.
-> 3. Register optee-rng driver as TEE bus driver.
-> 4. Removed DT dependency for optee-rng device UUID.
-> 5. Added supp_nowait flag.
-> 
-> Sumit Garg (4):
->   tee: add bus driver framework for TEE based devices
->   tee: add supp_nowait flag in tee_context struct
->   tee: optee: add TEE bus device enumeration support
->   hwrng: add OP-TEE based rng driver
-> 
->  MAINTAINERS                        |   5 +
->  drivers/char/hw_random/Kconfig     |  15 ++
->  drivers/char/hw_random/Makefile    |   1 +
->  drivers/char/hw_random/optee-rng.c | 298 +++++++++++++++++++++++++++++++++++++
->  drivers/tee/optee/Makefile         |   1 +
->  drivers/tee/optee/core.c           |   4 +
->  drivers/tee/optee/device.c         | 155 +++++++++++++++++++
->  drivers/tee/optee/optee_private.h  |   3 +
->  drivers/tee/optee/supp.c           |  10 +-
->  drivers/tee/tee_core.c             |  67 ++++++++-
->  include/linux/mod_devicetable.h    |   9 ++
->  include/linux/tee_drv.h            |  38 ++++-
->  scripts/mod/devicetable-offsets.c  |   3 +
->  scripts/mod/file2alias.c           |  19 +++
->  14 files changed, 622 insertions(+), 6 deletions(-)
->  create mode 100644 drivers/char/hw_random/optee-rng.c
->  create mode 100644 drivers/tee/optee/device.c
-> 
-> -- 
-> 2.7.4
-> 
+On Wed, Jan 23, 2019 at 11:52 PM Eric Biggers <ebiggers@kernel.org> wrote:
+> From: Eric Biggers <ebiggers@google.com>
+>
+> The generic MORUS implementations all fail the improved AEAD tests
+> because they produce the wrong result with some data layouts.  Fix them.
+>
+> Fixes: 396be41f16fd ("crypto: morus - Add generic MORUS AEAD implementations")
+> Cc: <stable@vger.kernel.org> # v4.18+
+> Cc: Ondrej Mosnacek <omosnace@redhat.com>
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
+>  crypto/morus1280.c | 13 +++++++------
+>  crypto/morus640.c  | 13 +++++++------
+>  2 files changed, 14 insertions(+), 12 deletions(-)
+>
+> diff --git a/crypto/morus1280.c b/crypto/morus1280.c
+> index 3889c188f266..b83576b4eb55 100644
+> --- a/crypto/morus1280.c
+> +++ b/crypto/morus1280.c
+> @@ -366,18 +366,19 @@ static void crypto_morus1280_process_crypt(struct morus1280_state *state,
+>                                            const struct morus1280_ops *ops)
+>  {
+>         struct skcipher_walk walk;
+> -       u8 *dst;
+> -       const u8 *src;
+>
+>         ops->skcipher_walk_init(&walk, req, false);
+>
+>         while (walk.nbytes) {
+> -               src = walk.src.virt.addr;
+> -               dst = walk.dst.virt.addr;
+> +               unsigned int nbytes = walk.nbytes;
+>
+> -               ops->crypt_chunk(state, dst, src, walk.nbytes);
+> +               if (nbytes < walk.total)
+> +                       nbytes = round_down(nbytes, walk.stride);
+>
+> -               skcipher_walk_done(&walk, 0);
+> +               ops->crypt_chunk(state, walk.dst.virt.addr, walk.src.virt.addr,
+> +                                nbytes);
+> +
+> +               skcipher_walk_done(&walk, walk.nbytes - nbytes);
+>         }
 
-I think this patch series is good now. It has received comments which
-has been addressed and have also gathered a few R-B tags.
+Hm... I assume the problem was that skcipher_walk may give you nbytes
+that is not rounded to the algorithm's walksize (aka walk.stride) even
+in the middle of the stream, right? I must have misread the code in
+skcipher.c and assumed that it automatically makes every step of a
+round size, with the exception of the very last one, which may include
+a final partial block. Thinking about it now it makes sense to me that
+this isn't the case, since for stream ciphers it would mean some
+unnecessary memcpy'ing in the skcipher_walk code...
 
-All patches but "hwrng: add OP-TEE based rng driver" covers what I
-normally send pull requests to arm-soc for.
+Maybe you could explain the problem in one or two sentences in the
+commit message(s), since the contract of skcipher_walk doesn't seem to
+be documented anywhere and so it is not obvious why the change is
+necessary.
 
-Matt, Herbert, are you fine with the patch
-"hwrng: add OP-TEE based rng driver"?
-If so, is it also OK if I take it via my tree which I then will include
-in a pull request to arm-soc? An Acked-By tag would be nice to have.
+Thank you for all your work on this - the improved testmgr tests were
+long needed!
 
-Thanks,
-Jens
+>  }
+>
+> diff --git a/crypto/morus640.c b/crypto/morus640.c
+> index da06ec2f6a80..b6a477444f6d 100644
+> --- a/crypto/morus640.c
+> +++ b/crypto/morus640.c
+> @@ -365,18 +365,19 @@ static void crypto_morus640_process_crypt(struct morus640_state *state,
+>                                           const struct morus640_ops *ops)
+>  {
+>         struct skcipher_walk walk;
+> -       u8 *dst;
+> -       const u8 *src;
+>
+>         ops->skcipher_walk_init(&walk, req, false);
+>
+>         while (walk.nbytes) {
+> -               src = walk.src.virt.addr;
+> -               dst = walk.dst.virt.addr;
+> +               unsigned int nbytes = walk.nbytes;
+>
+> -               ops->crypt_chunk(state, dst, src, walk.nbytes);
+> +               if (nbytes < walk.total)
+> +                       nbytes = round_down(nbytes, walk.stride);
+>
+> -               skcipher_walk_done(&walk, 0);
+> +               ops->crypt_chunk(state, walk.dst.virt.addr, walk.src.virt.addr,
+> +                                nbytes);
+> +
+> +               skcipher_walk_done(&walk, walk.nbytes - nbytes);
+>         }
+>  }
+>
+> --
+> 2.20.1.321.g9e740568ce-goog
+>
+
+--
+Ondrej Mosnacek <omosnace at redhat dot com>
+Associate Software Engineer, Security Technologies
+Red Hat, Inc.
