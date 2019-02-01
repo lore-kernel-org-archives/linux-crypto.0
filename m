@@ -4,47 +4,49 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC4C0C282D8
-	for <linux-crypto@archiver.kernel.org>; Fri,  1 Feb 2019 07:53:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3221EC282D8
+	for <linux-crypto@archiver.kernel.org>; Fri,  1 Feb 2019 07:53:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A28CA20869
-	for <linux-crypto@archiver.kernel.org>; Fri,  1 Feb 2019 07:53:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EF03B20869
+	for <linux-crypto@archiver.kernel.org>; Fri,  1 Feb 2019 07:53:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1549007594;
-	bh=JEDgNap+M+5drnhJ5E+K09EJAdXkerThpeRFd4qRo+w=;
+	s=default; t=1549007609;
+	bh=dIo6KCIQYSo1mruaA/Jv8oH5ntMrjMfXiDm2Bjnh2os=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=XNkzF1acMeL12zLo1lRRiIyqyhcfLurG5317cPmMnQ2N4mLOQg84DWGk9ESqP/Av4
-	 66fJ2eHd7lWSrt1IlAb8yBRJ63tTR0pKL55YvKtAeEgJDnwA39c42jF+o5jtZVE8T0
-	 lcxsd75X6Oa2FKAnTDjUqWifAzLtdO3h2Ve8mODY=
+	b=cK3vfUAGqbjFt//nqrbe4lt8kAXIlm9L+toUvh0pCJkEudramJs751REnl4EA0pUZ
+	 xvWeW3KxSfNg260v8daUWXHFqd99sOkBBJ9b/XUO6WOsL3JN4VdZQoObPpUpOSR99n
+	 tbYRxeRt22KM/tj34KaXouTvuPoxQvWMPCO4I/lY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728577AbfBAHxN (ORCPT
+        id S1728567AbfBAHxN (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Fri, 1 Feb 2019 02:53:13 -0500
-Received: from mail.kernel.org ([198.145.29.99]:36684 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:36688 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726710AbfBAHwD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1726723AbfBAHwD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Fri, 1 Feb 2019 02:52:03 -0500
 Received: from sol.localdomain (c-107-3-167-184.hsd1.ca.comcast.net [107.3.167.184])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 2270E218A6;
+        by mail.kernel.org (Postfix) with ESMTPSA id 6A363218AF;
         Fri,  1 Feb 2019 07:52:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=default; t=1549007522;
-        bh=JEDgNap+M+5drnhJ5E+K09EJAdXkerThpeRFd4qRo+w=;
+        bh=dIo6KCIQYSo1mruaA/Jv8oH5ntMrjMfXiDm2Bjnh2os=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=m/LTj55e25jfjbJz6KIHdDI5+GxHXEMGIzFwjqpYYCPTL3/4brJEN8Q5rcsm0A5Ap
-         ohFXc6NuoTWZQ0CzuOPI43JkQNMcXxzrXktPppz90of7n8waqZlc/DKpWhfVa7x2Hd
-         Vw90V+1rHJPtrHOTfYxKHLwEyqKWT/sbAz8DYg5s=
+        b=uxcyCCU8zmCxY4hYDF6St4xdYaJfVt9q6pY+UcK45TdHSsLpZ85m/rHsj7kObsmJO
+         J6ZT6ILF4Hbqu44mUAvEUnN/Lb9mJTBOEDGAhVjgTZa/YqW3L0mPesgNbrqF9ay3Kg
+         v0taiGueih+4T/VbmRdKRCbNprBF7iALB/HlOuD0=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: [PATCH v2 06/15] crypto: ahash - fix another early termination in hash walk
-Date:   Thu, 31 Jan 2019 23:51:41 -0800
-Message-Id: <20190201075150.18644-7-ebiggers@kernel.org>
+Cc:     linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [PATCH v2 07/15] crypto: arm64/aes-neonbs - fix returning final keystream block
+Date:   Thu, 31 Jan 2019 23:51:42 -0800
+Message-Id: <20190201075150.18644-8-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190201075150.18644-1-ebiggers@kernel.org>
 References: <20190201075150.18644-1-ebiggers@kernel.org>
@@ -57,59 +59,52 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-Hash algorithms with an alignmask set, e.g. "xcbc(aes-aesni)" and
-"michael_mic", fail the improved hash tests because they sometimes
-produce the wrong digest.  The bug is that in the case where a
-scatterlist element crosses pages, not all the data is actually hashed
-because the scatterlist walk terminates too early.  This happens because
-the 'nbytes' variable in crypto_hash_walk_done() is assigned the number
-of bytes remaining in the page, then later interpreted as the number of
-bytes remaining in the scatterlist element.  Fix it.
+The arm64 NEON bit-sliced implementation of AES-CTR fails the improved
+skcipher tests because it sometimes produces the wrong ciphertext.  The
+bug is that the final keystream block isn't returned from the assembly
+code when the number of non-final blocks is zero.  This can happen if
+the input data ends a few bytes after a page boundary.  In this case the
+last bytes get "encrypted" by XOR'ing them with uninitialized memory.
 
-Fixes: 900a081f6912 ("crypto: ahash - Fix early termination in hash walk")
-Cc: stable@vger.kernel.org
+Fix the assembly code to return the final keystream block when needed.
+
+Fixes: 88a3f582bea9 ("crypto: arm64/aes - don't use IV buffer to return final keystream block")
+Cc: <stable@vger.kernel.org> # v4.11+
+Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/ahash.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ arch/arm64/crypto/aes-neonbs-core.S | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/crypto/ahash.c b/crypto/ahash.c
-index ca0d3e281fefb..81e2767e2164e 100644
---- a/crypto/ahash.c
-+++ b/crypto/ahash.c
-@@ -86,17 +86,17 @@ static int hash_walk_new_entry(struct crypto_hash_walk *walk)
- int crypto_hash_walk_done(struct crypto_hash_walk *walk, int err)
- {
- 	unsigned int alignmask = walk->alignmask;
--	unsigned int nbytes = walk->entrylen;
+diff --git a/arch/arm64/crypto/aes-neonbs-core.S b/arch/arm64/crypto/aes-neonbs-core.S
+index e613a87f8b53f..8432c8d0dea66 100644
+--- a/arch/arm64/crypto/aes-neonbs-core.S
++++ b/arch/arm64/crypto/aes-neonbs-core.S
+@@ -971,18 +971,22 @@ CPU_LE(	rev		x8, x8		)
  
- 	walk->data -= walk->offset;
+ 8:	next_ctr	v0
+ 	st1		{v0.16b}, [x24]
+-	cbz		x23, 0f
++	cbz		x23, .Lctr_done
  
--	if (nbytes && walk->offset & alignmask && !err) {
--		walk->offset = ALIGN(walk->offset, alignmask + 1);
--		nbytes = min(nbytes,
--			     ((unsigned int)(PAGE_SIZE)) - walk->offset);
--		walk->entrylen -= nbytes;
-+	if (walk->entrylen && (walk->offset & alignmask) && !err) {
-+		unsigned int nbytes;
+ 	cond_yield_neon	98b
+ 	b		99b
  
-+		walk->offset = ALIGN(walk->offset, alignmask + 1);
-+		nbytes = min(walk->entrylen,
-+			     (unsigned int)(PAGE_SIZE - walk->offset));
- 		if (nbytes) {
-+			walk->entrylen -= nbytes;
- 			walk->data += walk->offset;
- 			return nbytes;
- 		}
-@@ -116,7 +116,7 @@ int crypto_hash_walk_done(struct crypto_hash_walk *walk, int err)
- 	if (err)
- 		return err;
+-0:	frame_pop
++.Lctr_done:
++	frame_pop
+ 	ret
  
--	if (nbytes) {
-+	if (walk->entrylen) {
- 		walk->offset = 0;
- 		walk->pg++;
- 		return hash_walk_next(walk);
+ 	/*
+ 	 * If we are handling the tail of the input (x6 != NULL), return the
+ 	 * final keystream block back to the caller.
+ 	 */
++0:	cbz		x25, 8b
++	st1		{v0.16b}, [x25]
++	b		8b
+ 1:	cbz		x25, 8b
+ 	st1		{v1.16b}, [x25]
+ 	b		8b
 -- 
 2.20.1
 
