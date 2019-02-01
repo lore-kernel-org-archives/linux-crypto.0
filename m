@@ -2,50 +2,54 @@ Return-Path: <SRS0=hzfm=QI=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93D4AC282D8
-	for <linux-crypto@archiver.kernel.org>; Fri,  1 Feb 2019 07:52:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94AB6C282D8
+	for <linux-crypto@archiver.kernel.org>; Fri,  1 Feb 2019 07:52:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5C020218EA
-	for <linux-crypto@archiver.kernel.org>; Fri,  1 Feb 2019 07:52:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 63FEE218AC
+	for <linux-crypto@archiver.kernel.org>; Fri,  1 Feb 2019 07:52:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1549007522;
-	bh=/sB5fskfV6GY5Q36ePo6xYiR6d87nJ++rUMlLZ+pDEY=;
-	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=KWMK5eRmWra9tBq4xGjdrcGO6bN2ReeTeofO69vY+StVSZZlphfIT/L8wsPx/5CYs
-	 0MwevOW10zdzobc2X3FOLOr15jxY3ORuZXeWgVwzUDx0SEU8LYYHu3izVxqK7Oy22j
-	 NohV7ntTHlf5NtCqd3J83KzDlUsIiLg+1AfH/XMs=
+	s=default; t=1549007526;
+	bh=FnVYn8qF0+QeyMw1S+mh+0ro1ICT8cNf+QV/Kcx1Q2c=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=feY/sia8RC+3uNedFIz9W/0wBQqNR0XWkzgyw+BxhUh6/L9V6wvUozgDOwDQHxaLp
+	 NkK9SDfeEDz/VLX2UB/ac7BrcjiXL3TiyhD1Iq8EknRjtKa94kxAviLmJ2w00BoMSE
+	 u6+LUUe+nsVzGkIZR+U3xYmZWIIsaf7hI7GUries=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726172AbfBAHwB (ORCPT
+        id S1727035AbfBAHwF (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 1 Feb 2019 02:52:01 -0500
-Received: from mail.kernel.org ([198.145.29.99]:36618 "EHLO mail.kernel.org"
+        Fri, 1 Feb 2019 02:52:05 -0500
+Received: from mail.kernel.org ([198.145.29.99]:36676 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725831AbfBAHwB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 1 Feb 2019 02:52:01 -0500
+        id S1725831AbfBAHwD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 1 Feb 2019 02:52:03 -0500
 Received: from sol.localdomain (c-107-3-167-184.hsd1.ca.comcast.net [107.3.167.184])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4162620869;
-        Fri,  1 Feb 2019 07:52:00 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id C8A98218AC;
+        Fri,  1 Feb 2019 07:52:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1549007520;
-        bh=/sB5fskfV6GY5Q36ePo6xYiR6d87nJ++rUMlLZ+pDEY=;
-        h=From:To:Cc:Subject:Date:From;
-        b=IYQv4qjfi2KMasW2lbf3B9tbIZsfkDVNu3RPxBN06IVc+LD9pLaIahqZLlJUYctv/
-         WKB+XsjCtlQKi+BDLJccoF84EEf5hSrNxduKCXLT+N4VrO0wJwOOd6QHQtL5k2HDW+
-         nB9sa6IBBB5EW80nIx8W2NDI7Z3skASzK/wljEI8=
+        s=default; t=1549007522;
+        bh=FnVYn8qF0+QeyMw1S+mh+0ro1ICT8cNf+QV/Kcx1Q2c=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=iNI3qUfiis0BVxEwUzdJNCHR0eDt/sHOPlPwV1ZjLl+ysEXS4G4Vm5VSBv30CaYOZ
+         rDcOpktSIpU9IF+NJ2AABTJmiLDMc/PT081mOIR+PDJscWOYukPeR4YhZf10ixR6i2
+         YFAUT8eTM9mg9cdTeASDzo5YNwDeaImKCKn4/Axk=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     linux-kernel@vger.kernel.org
-Subject: [PATCH v2 00/15] crypto: improved skcipher, aead, and hash tests
-Date:   Thu, 31 Jan 2019 23:51:35 -0800
-Message-Id: <20190201075150.18644-1-ebiggers@kernel.org>
+Cc:     linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+        Dave Watson <davejwatson@fb.com>
+Subject: [PATCH v2 05/15] crypto: x86/aesni-gcm - fix crash on empty plaintext
+Date:   Thu, 31 Jan 2019 23:51:40 -0800
+Message-Id: <20190201075150.18644-6-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190201075150.18644-1-ebiggers@kernel.org>
+References: <20190201075150.18644-1-ebiggers@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
@@ -53,102 +57,50 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello,
+From: Eric Biggers <ebiggers@google.com>
 
-Crypto algorithms must produce the same output for the same input
-regardless of data layout, i.e. how the src and dst scatterlists are
-divided into chunks and how each chunk is aligned.  Request flags such
-as CRYPTO_TFM_REQ_MAY_SLEEP must not affect the result either.
+gcmaes_crypt_by_sg() dereferences the NULL pointer returned by
+scatterwalk_ffwd() when encrypting an empty plaintext and the source
+scatterlist ends immediately after the associated data.
 
-However, testing of this currently has many gaps.  For example,
-individual algorithms are responsible for providing their own chunked
-test vectors.  But many don't bother to do this or test only one or two
-cases, providing poor test coverage.  Also, other things such as buffers
-spanning a page boundary, misaligned IVs, and CRYPTO_TFM_REQ_MAY_SLEEP
-are never tested at all.
+Fix it by only fast-forwarding to the src/dst data scatterlists if the
+data length is nonzero.
 
-Test code is also duplicated between the chunked and non-chunked cases,
-making it difficult to make other improvements.
+This bug is reproduced by the "rfc4543(gcm(aes))" test vectors when run
+with the new AEAD test manager.
 
-To improve the situation, this patch series basically moves the chunk
-descriptions into the testmgr itself so that they are shared by all
-algorithms.  However, it's done in an extensible way via a new struct
-'testvec_config', which describes not just the scaled chunk lengths but
-also all other aspects of the crypto operation besides the data itself
-such as the buffer alignments, the request flags, whether the operation
-is in-place or not, the IV alignment, and for hash algorithms when to do
-each update() and when to use finup() vs. final() vs. digest().
+Fixes: e845520707f8 ("crypto: aesni - Update aesni-intel_glue to use scatter/gather")
+Cc: <stable@vger.kernel.org> # v4.17+
+Cc: Dave Watson <davejwatson@fb.com>
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ arch/x86/crypto/aesni-intel_glue.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
 
-Then, this patch series makes skcipher, aead, and hash algorithms be
-tested against a list of default testvec_configs, replacing the current
-test code.  This improves overall test coverage, without reducing test
-performance too much.  Note that the test vectors themselves are not
-changed, except for removing the chunk lists.
-
-This series also adds randomized fuzz tests, enabled by a new kconfig
-option intended for developer use only, where skcipher, aead, and hash
-algorithms are tested against many randomly generated testvec_configs.
-This provides much more comprehensive test coverage.
-
-I've run these improved tests on x86, arm32, and arm64 with all crypto
-algorithms enabled, and they have already found many bugs.  Patches 1-7
-and the patches from Ard Biesheuvel fix most of the bugs found so far.
-A bug was also detected in the Rockchip crypto driver which remains to
-be fixed.  Also many AEADs incorrectly change aead_request::base.tfm,
-but for now I'm temporarily working around that in the tests as I plan
-to fix it later after the other types of bugs are addressed.
-
-If anyone reading this has access to systems with other architectures or
-crypto drivers that may not have been tested yet, you can help by
-applying these patches on your system, enabling
-CONFIG_CRYPTO_MANAGER_EXTRA_TESTS, and reporting or fixing any test
-failures.
-
-This patch series can also be found in git at
-https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git
-branch "testmgr-improvements".
-
-Changed since v1:
-
-- Made CONFIG_CRYPTO_MANAGER_EXTRA_TESTS depend on CONFIG_DEBUG_KERNEL.
-- Improved commit description of AEGIS and MORUS fixes.
-- A few very minor cleanups to the test code.
-
-Eric Biggers (15):
-  crypto: aegis - fix handling chunked inputs
-  crypto: morus - fix handling chunked inputs
-  crypto: x86/aegis - fix handling chunked inputs and MAY_SLEEP
-  crypto: x86/morus - fix handling chunked inputs and MAY_SLEEP
-  crypto: x86/aesni-gcm - fix crash on empty plaintext
-  crypto: ahash - fix another early termination in hash walk
-  crypto: arm64/aes-neonbs - fix returning final keystream block
-  crypto: testmgr - add testvec_config struct and helper functions
-  crypto: testmgr - introduce CONFIG_CRYPTO_MANAGER_EXTRA_TESTS
-  crypto: testmgr - implement random testvec_config generation
-  crypto: testmgr - convert skcipher testing to use testvec_configs
-  crypto: testmgr - convert aead testing to use testvec_configs
-  crypto: testmgr - convert hash testing to use testvec_configs
-  crypto: testmgr - check for skcipher_request corruption
-  crypto: testmgr - check for aead_request corruption
-
- arch/arm64/crypto/aes-neonbs-core.S    |    8 +-
- arch/x86/crypto/aegis128-aesni-glue.c  |   38 +-
- arch/x86/crypto/aegis128l-aesni-glue.c |   38 +-
- arch/x86/crypto/aegis256-aesni-glue.c  |   38 +-
- arch/x86/crypto/aesni-intel_glue.c     |   13 +-
- arch/x86/crypto/morus1280_glue.c       |   40 +-
- arch/x86/crypto/morus640_glue.c        |   39 +-
- crypto/Kconfig                         |   10 +
- crypto/aegis128.c                      |   14 +-
- crypto/aegis128l.c                     |   14 +-
- crypto/aegis256.c                      |   14 +-
- crypto/ahash.c                         |   14 +-
- crypto/morus1280.c                     |   13 +-
- crypto/morus640.c                      |   13 +-
- crypto/testmgr.c                       | 2549 +++++++++++++-----------
- crypto/testmgr.h                       |  407 +---
- 16 files changed, 1556 insertions(+), 1706 deletions(-)
-
+diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+index 9b5ccde3ef315..1e3d2102033a0 100644
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -813,11 +813,14 @@ static int gcmaes_crypt_by_sg(bool enc, struct aead_request *req,
+ 		scatterwalk_map_and_copy(assoc, req->src, 0, assoclen, 0);
+ 	}
+ 
+-	src_sg = scatterwalk_ffwd(src_start, req->src, req->assoclen);
+-	scatterwalk_start(&src_sg_walk, src_sg);
+-	if (req->src != req->dst) {
+-		dst_sg = scatterwalk_ffwd(dst_start, req->dst, req->assoclen);
+-		scatterwalk_start(&dst_sg_walk, dst_sg);
++	if (left) {
++		src_sg = scatterwalk_ffwd(src_start, req->src, req->assoclen);
++		scatterwalk_start(&src_sg_walk, src_sg);
++		if (req->src != req->dst) {
++			dst_sg = scatterwalk_ffwd(dst_start, req->dst,
++						  req->assoclen);
++			scatterwalk_start(&dst_sg_walk, dst_sg);
++		}
+ 	}
+ 
+ 	kernel_fpu_begin();
 -- 
 2.20.1
 
