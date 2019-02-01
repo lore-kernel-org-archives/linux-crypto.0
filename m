@@ -2,171 +2,314 @@ Return-Path: <SRS0=hzfm=QI=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32722C282D8
-	for <linux-crypto@archiver.kernel.org>; Fri,  1 Feb 2019 07:53:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89E7BC282D8
+	for <linux-crypto@archiver.kernel.org>; Fri,  1 Feb 2019 08:28:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F2F2220869
-	for <linux-crypto@archiver.kernel.org>; Fri,  1 Feb 2019 07:53:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1549007625;
-	bh=4as1W2dKHamG293eWiOgwTcudrNyOzzBEot+dZ1iHEc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=NBfFiiJpuesJYQzUCy97mJ43PeiYcxmRszlR+z5Tpi/95l1q/JrL+uTqXOAyaDfb3
-	 QYQdIzi6B8ab3kE/TV5UNG0eYRJXyMygZaWOiIeZGYl9HFHeMUjT0nc+bwyk2kIVsr
-	 81ltFK81R6vzAKMD/a+vuOHeMjdluzg/qSW13hNY=
+	by mail.kernel.org (Postfix) with ESMTP id 47F0820869
+	for <linux-crypto@archiver.kernel.org>; Fri,  1 Feb 2019 08:28:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=linaro.org header.i=@linaro.org header.b="iw9sVCdy"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726092AbfBAHxj (ORCPT
+        id S1728898AbfBAI2Q (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 1 Feb 2019 02:53:39 -0500
-Received: from mail.kernel.org ([198.145.29.99]:36640 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725837AbfBAHwB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 1 Feb 2019 02:52:01 -0500
-Received: from sol.localdomain (c-107-3-167-184.hsd1.ca.comcast.net [107.3.167.184])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8203220B1F;
-        Fri,  1 Feb 2019 07:52:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1549007520;
-        bh=4as1W2dKHamG293eWiOgwTcudrNyOzzBEot+dZ1iHEc=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=PECAh2aSeMDCPC3fx8NQaF/cwxlU5Nwj4y6zdT1GVLt8aXknDoFVE2qNNg0TQHLFG
-         ep0uUuikxBh1mAanureky1nHp4TVMpq92p3FSbXvc0jJIuttJ8PY0Fqzo00WsEtnd2
-         rCpW/Nhb5Gmp/PZnFgwnWwUBV4UCNM1CRO65EuTE=
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-        Ondrej Mosnacek <omosnace@redhat.com>
-Subject: [PATCH v2 01/15] crypto: aegis - fix handling chunked inputs
-Date:   Thu, 31 Jan 2019 23:51:36 -0800
-Message-Id: <20190201075150.18644-2-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190201075150.18644-1-ebiggers@kernel.org>
-References: <20190201075150.18644-1-ebiggers@kernel.org>
+        Fri, 1 Feb 2019 03:28:16 -0500
+Received: from mail-lj1-f195.google.com ([209.85.208.195]:37938 "EHLO
+        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727876AbfBAI2Q (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 1 Feb 2019 03:28:16 -0500
+Received: by mail-lj1-f195.google.com with SMTP id c19-v6so5050533lja.5
+        for <linux-crypto@vger.kernel.org>; Fri, 01 Feb 2019 00:28:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=foK+8CjtT2/xFNQZTp6Mx8q5LPpRtM43A4iBY31qJzU=;
+        b=iw9sVCdyFG4w7+jOsD1kaKgaG3tsZFJtlXSr/B87rH0YX8AWGC5YgRwaCl9yN7+G8h
+         aIKk2IiD/4qsBC0TL0SH7jUs4sEw9Z/D0U9IzxEt2XyzMjA23p5pP/SPFCd1XFESK6O/
+         BnrcMNPuRq8pDuf2HJP1zCL7wNM8Ho5Xww/OE=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=foK+8CjtT2/xFNQZTp6Mx8q5LPpRtM43A4iBY31qJzU=;
+        b=I1Nbfpwk/IdTXez7jGObds21C9yQYF+aENsaq10wPjuMWZ9W+iBm6Yc74JbbajxfyK
+         M5icjsWZNCVzGO39+ZgFgVmiqxAccJdHFcSddmE1wV56B7U+NOjZIVPf7aeRETEAci7W
+         wsfFHTtwzL+q29Q7NAi2jh/FkBAWBlt63hUrziH/kk9CVSuncqa3yXsc0veTLgzSpyY4
+         vfgIJMZthrKF6JhmoQ5fIxLbjvdpIrKlgSmkh127kIJEY6W5EiHdlD5vv8s/dUlDzCRU
+         rBqscSLc5Zn177T/5FFFgrY1Dpi/qjLgkVwX0qhfHHHzoZ9aslRzz3V2Y90XrmZIWccD
+         1u0g==
+X-Gm-Message-State: AJcUukcJFLiUEWohvxzn4tW4kSmQAH2lT5xOq5k8+ckt0N5NbFHgOmAG
+        8fruybrEtIAsqGiCmtKDcuGO4Q==
+X-Google-Smtp-Source: ALg8bN4j2IFUYY4b3aR1PzE3BT7NF5FDIQ2Vu4gFqNrL2mcTF7E+JdFRgLtVI1ZryAoRZ8JtRGgipA==
+X-Received: by 2002:a05:651c:14e:: with SMTP id c14mr31357748ljd.20.1549009693375;
+        Fri, 01 Feb 2019 00:28:13 -0800 (PST)
+Received: from jax.urgonet (h-84-105.A175.priv.bahnhof.se. [79.136.84.105])
+        by smtp.gmail.com with ESMTPSA id h3sm1239278lfj.25.2019.02.01.00.28.11
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 01 Feb 2019 00:28:12 -0800 (PST)
+Date:   Fri, 1 Feb 2019 09:28:10 +0100
+From:   Jens Wiklander <jens.wiklander@linaro.org>
+To:     Sumit Garg <sumit.garg@linaro.org>
+Cc:     herbert@gondor.apana.org.au, linux-arm-kernel@lists.infradead.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yamada.masahiro@socionext.com, michal.lkml@markovi.net,
+        mpm@selenic.com, robh+dt@kernel.org, mark.rutland@arm.com,
+        arnd@arndb.de, gregkh@linuxfoundation.org,
+        daniel.thompson@linaro.org, ard.biesheuvel@linaro.org,
+        bhsharma@redhat.com, tee-dev@lists.linaro.org
+Subject: Re: [PATCH v6 3/4] tee: optee: add TEE bus device enumeration support
+Message-ID: <20190201082809.GA5329@jax.urgonet>
+References: <1548740978-28495-1-git-send-email-sumit.garg@linaro.org>
+ <1548740978-28495-4-git-send-email-sumit.garg@linaro.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1548740978-28495-4-git-send-email-sumit.garg@linaro.org>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+On Tue, Jan 29, 2019 at 11:19:37AM +0530, Sumit Garg wrote:
+> OP-TEE provides a pseudo TA to enumerate TAs which can act as devices/
+> services for TEE bus. So implement device enumeration using invoke
+> function: PTA_CMD_GET_DEVICES provided by pseudo TA to fetch array of
+> device UUIDs. Also register these enumerated devices with TEE bus as
+> "optee-clntX" device.
+> 
+> Signed-off-by: Sumit Garg <sumit.garg@linaro.org>
+> Reviewed-by: Daniel Thompson <daniel.thompson@linaro.org>
+> ---
+>  drivers/tee/optee/Makefile        |   1 +
+>  drivers/tee/optee/core.c          |   4 +
+>  drivers/tee/optee/device.c        | 155 ++++++++++++++++++++++++++++++++++++++
+>  drivers/tee/optee/optee_private.h |   3 +
+>  4 files changed, 163 insertions(+)
+>  create mode 100644 drivers/tee/optee/device.c
+> 
+> diff --git a/drivers/tee/optee/Makefile b/drivers/tee/optee/Makefile
+> index 48d262a..56263ae 100644
+> --- a/drivers/tee/optee/Makefile
+> +++ b/drivers/tee/optee/Makefile
+> @@ -5,3 +5,4 @@ optee-objs += call.o
+>  optee-objs += rpc.o
+>  optee-objs += supp.o
+>  optee-objs += shm_pool.o
+> +optee-objs += device.o
+> diff --git a/drivers/tee/optee/core.c b/drivers/tee/optee/core.c
+> index e5efce3..ac59c77 100644
+> --- a/drivers/tee/optee/core.c
+> +++ b/drivers/tee/optee/core.c
+> @@ -634,6 +634,10 @@ static struct optee *optee_probe(struct device_node *np)
+>  	if (optee->sec_caps & OPTEE_SMC_SEC_CAP_DYNAMIC_SHM)
+>  		pr_info("dynamic shared memory is enabled\n");
+>  
+> +	rc = optee_enumerate_devices();
+> +	if (rc)
+> +		goto err;
+> +
+>  	pr_info("initialized driver\n");
+>  	return optee;
+>  err:
+> diff --git a/drivers/tee/optee/device.c b/drivers/tee/optee/device.c
+> new file mode 100644
+> index 0000000..c24c37f
+> --- /dev/null
+> +++ b/drivers/tee/optee/device.c
+> @@ -0,0 +1,155 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Copyright (C) 2019 Linaro Ltd.
+> + */
+> +
+> +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+> +
+> +#include <linux/kernel.h>
+> +#include <linux/slab.h>
+> +#include <linux/tee_drv.h>
+> +#include <linux/uuid.h>
+> +#include "optee_private.h"
+> +
+> +/*
+> + * Get device UUIDs
+> + *
+> + * [out]     memref[0]        Array of device UUIDs
+> + *
+> + * Return codes:
+> + * TEE_SUCCESS - Invoke command success
+> + * TEE_ERROR_BAD_PARAMETERS - Incorrect input param
+> + * TEE_ERROR_SHORT_BUFFER - Output buffer size less than required
+> + */
+> +#define PTA_CMD_GET_DEVICES		0x0
+> +
+> +static int optee_ctx_match(struct tee_ioctl_version_data *ver, const void *data)
+> +{
+> +	if (ver->impl_id == TEE_IMPL_ID_OPTEE)
+> +		return 1;
+> +	else
+> +		return 0;
+> +}
+> +
+> +static int get_devices(struct tee_context *ctx, u32 session,
+> +		       struct tee_shm *device_shm, u32 *shm_size)
+> +{
+> +	u32 ret = 0;
+> +	struct tee_ioctl_invoke_arg inv_arg = {0};
+> +	struct tee_param param[4] = {0};
+> +
+> +	/* Invoke PTA_CMD_GET_DEVICES function */
+> +	inv_arg.func = PTA_CMD_GET_DEVICES;
+> +	inv_arg.session = session;
+> +	inv_arg.num_params = 4;
+> +
+> +	/* Fill invoke cmd params */
+> +	param[0].attr = TEE_IOCTL_PARAM_ATTR_TYPE_MEMREF_OUTPUT;
+> +	param[0].u.memref.shm = device_shm;
+> +	param[0].u.memref.size = *shm_size;
+> +	param[0].u.memref.shm_offs = 0;
+> +
+> +	ret = tee_client_invoke_func(ctx, &inv_arg, param);
+> +	if ((ret < 0) || ((inv_arg.ret != TEEC_SUCCESS) &&
+> +			  (inv_arg.ret != TEEC_ERROR_SHORT_BUFFER))) {
+> +		pr_err("PTA_CMD_GET_DEVICES invoke function err: %x\n",
+> +		       inv_arg.ret);
+> +		return -EINVAL;
+> +	}
+> +
+> +	*shm_size = param[0].u.memref.size;
+> +
+> +	return 0;
+> +}
+> +
+> +static int optee_register_device(const uuid_t *device_uuid, u32 device_id)
+> +{
+> +	struct tee_client_device *optee_device = NULL;
+> +	int rc;
+> +
+> +	optee_device = kzalloc(sizeof(*optee_device), GFP_KERNEL);
+> +	if (!optee_device)
+> +		return -ENOMEM;
+> +
+> +	optee_device->dev.bus = &tee_bus_type;
+> +	dev_set_name(&optee_device->dev, "optee-clnt%u", device_id);
+> +	uuid_copy(&optee_device->id.uuid, device_uuid);
+> +
+> +	rc = device_register(&optee_device->dev);
+> +	if (rc) {
+> +		pr_err("device registration failed, err: %d\n", rc);
+> +		kfree(optee_device);
+> +	}
+> +
+> +	return rc;
+> +}
+> +
+> +int optee_enumerate_devices(void)
+> +{
+> +	const uuid_t pta_uuid =
+> +		UUID_INIT(0x7011a688, 0xddde, 0x4053,
+> +			  0xa5, 0xa9, 0x7b, 0x3c, 0x4d, 0xdf, 0x13, 0xb8);
+> +	struct tee_ioctl_open_session_arg sess_arg = {0};
+> +	struct tee_shm *device_shm = NULL;
+> +	const uuid_t *device_uuid = NULL;
+> +	struct tee_context *ctx = NULL;
+> +	u32 shm_size = 0, idx, num_devices = 0;
+> +	int rc;
+> +
+> +	/* Open context with OP-TEE driver */
+> +	ctx = tee_client_open_context(NULL, optee_ctx_match, NULL, NULL);
+> +	if (IS_ERR(ctx))
+> +		return -ENODEV;
+> +
+> +	/* Open session with device enumeration pseudo TA */
+> +	memcpy(sess_arg.uuid, pta_uuid.b, TEE_IOCTL_UUID_LEN);
+> +	sess_arg.clnt_login = TEE_IOCTL_LOGIN_PUBLIC;
+> +	sess_arg.num_params = 0;
+> +
+> +	rc = tee_client_open_session(ctx, &sess_arg, NULL);
+> +	if ((rc < 0) || (sess_arg.ret != TEEC_SUCCESS)) {
+> +		/* Device enumeration pseudo TA not found */
+> +		rc = 0;
+> +		goto out_ctx;
+> +	}
+> +
+> +	rc = get_devices(ctx, sess_arg.session, NULL, &shm_size);
+> +	if (rc < 0)
 
-The generic AEGIS implementations all fail the improved AEAD tests
-because they produce the wrong result with some data layouts.  The issue
-is that they assume that if the skcipher_walk API gives 'nbytes' not
-aligned to the walksize (a.k.a. walk.stride), then it is the end of the
-data.  In fact, this can happen before the end.  Fix them.
+While testing I discovered that this line should be:
+        if (rc < 0 || !shm_size)
 
-Fixes: f606a88e5823 ("crypto: aegis - Add generic AEGIS AEAD implementations")
-Cc: <stable@vger.kernel.org> # v4.18+
-Cc: Ondrej Mosnacek <omosnace@redhat.com>
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- crypto/aegis128.c  | 14 +++++++-------
- crypto/aegis128l.c | 14 +++++++-------
- crypto/aegis256.c  | 14 +++++++-------
- 3 files changed, 21 insertions(+), 21 deletions(-)
+to cover the common case where there's no devices. I'll fixup the commit
+with this trivial change.
 
-diff --git a/crypto/aegis128.c b/crypto/aegis128.c
-index 96e078a8a00a1..3718a83413032 100644
---- a/crypto/aegis128.c
-+++ b/crypto/aegis128.c
-@@ -286,19 +286,19 @@ static void crypto_aegis128_process_crypt(struct aegis_state *state,
- 					  const struct aegis128_ops *ops)
- {
- 	struct skcipher_walk walk;
--	u8 *src, *dst;
--	unsigned int chunksize;
- 
- 	ops->skcipher_walk_init(&walk, req, false);
- 
- 	while (walk.nbytes) {
--		src = walk.src.virt.addr;
--		dst = walk.dst.virt.addr;
--		chunksize = walk.nbytes;
-+		unsigned int nbytes = walk.nbytes;
- 
--		ops->crypt_chunk(state, dst, src, chunksize);
-+		if (nbytes < walk.total)
-+			nbytes = round_down(nbytes, walk.stride);
- 
--		skcipher_walk_done(&walk, 0);
-+		ops->crypt_chunk(state, walk.dst.virt.addr, walk.src.virt.addr,
-+				 nbytes);
-+
-+		skcipher_walk_done(&walk, walk.nbytes - nbytes);
- 	}
- }
- 
-diff --git a/crypto/aegis128l.c b/crypto/aegis128l.c
-index a210e779b911b..275a8616d71bd 100644
---- a/crypto/aegis128l.c
-+++ b/crypto/aegis128l.c
-@@ -349,19 +349,19 @@ static void crypto_aegis128l_process_crypt(struct aegis_state *state,
- 					   const struct aegis128l_ops *ops)
- {
- 	struct skcipher_walk walk;
--	u8 *src, *dst;
--	unsigned int chunksize;
- 
- 	ops->skcipher_walk_init(&walk, req, false);
- 
- 	while (walk.nbytes) {
--		src = walk.src.virt.addr;
--		dst = walk.dst.virt.addr;
--		chunksize = walk.nbytes;
-+		unsigned int nbytes = walk.nbytes;
- 
--		ops->crypt_chunk(state, dst, src, chunksize);
-+		if (nbytes < walk.total)
-+			nbytes = round_down(nbytes, walk.stride);
- 
--		skcipher_walk_done(&walk, 0);
-+		ops->crypt_chunk(state, walk.dst.virt.addr, walk.src.virt.addr,
-+				 nbytes);
-+
-+		skcipher_walk_done(&walk, walk.nbytes - nbytes);
- 	}
- }
- 
-diff --git a/crypto/aegis256.c b/crypto/aegis256.c
-index 49882a28e93e9..ecd6b7f34a2d2 100644
---- a/crypto/aegis256.c
-+++ b/crypto/aegis256.c
-@@ -299,19 +299,19 @@ static void crypto_aegis256_process_crypt(struct aegis_state *state,
- 					  const struct aegis256_ops *ops)
- {
- 	struct skcipher_walk walk;
--	u8 *src, *dst;
--	unsigned int chunksize;
- 
- 	ops->skcipher_walk_init(&walk, req, false);
- 
- 	while (walk.nbytes) {
--		src = walk.src.virt.addr;
--		dst = walk.dst.virt.addr;
--		chunksize = walk.nbytes;
-+		unsigned int nbytes = walk.nbytes;
- 
--		ops->crypt_chunk(state, dst, src, chunksize);
-+		if (nbytes < walk.total)
-+			nbytes = round_down(nbytes, walk.stride);
- 
--		skcipher_walk_done(&walk, 0);
-+		ops->crypt_chunk(state, walk.dst.virt.addr, walk.src.virt.addr,
-+				 nbytes);
-+
-+		skcipher_walk_done(&walk, walk.nbytes - nbytes);
- 	}
- }
- 
--- 
-2.20.1
+Cheers,
+Jens
 
+> +		goto out_sess;
+> +
+> +	device_shm = tee_shm_alloc(ctx, shm_size,
+> +				   TEE_SHM_MAPPED | TEE_SHM_DMA_BUF);
+> +	if (IS_ERR(device_shm)) {
+> +		pr_err("tee_shm_alloc failed\n");
+> +		rc = PTR_ERR(device_shm);
+> +		goto out_sess;
+> +	}
+> +
+> +	rc = get_devices(ctx, sess_arg.session, device_shm, &shm_size);
+> +	if (rc < 0)
+> +		goto out_shm;
+> +
+> +	device_uuid = tee_shm_get_va(device_shm, 0);
+> +	if (IS_ERR(device_uuid)) {
+> +		pr_err("tee_shm_get_va failed\n");
+> +		rc = PTR_ERR(device_uuid);
+> +		goto out_shm;
+> +	}
+> +
+> +	num_devices = shm_size / sizeof(uuid_t);
+> +
+> +	for (idx = 0; idx < num_devices; idx++) {
+> +		rc = optee_register_device(&device_uuid[idx], idx);
+> +		if (rc)
+> +			goto out_shm;
+> +	}
+> +
+> +out_shm:
+> +	tee_shm_free(device_shm);
+> +out_sess:
+> +	tee_client_close_session(ctx, sess_arg.session);
+> +out_ctx:
+> +	tee_client_close_context(ctx);
+> +
+> +	return rc;
+> +}
+> diff --git a/drivers/tee/optee/optee_private.h b/drivers/tee/optee/optee_private.h
+> index 35e7938..a5e84af 100644
+> --- a/drivers/tee/optee/optee_private.h
+> +++ b/drivers/tee/optee/optee_private.h
+> @@ -28,6 +28,7 @@
+>  #define TEEC_ERROR_BAD_PARAMETERS	0xFFFF0006
+>  #define TEEC_ERROR_COMMUNICATION	0xFFFF000E
+>  #define TEEC_ERROR_OUT_OF_MEMORY	0xFFFF000C
+> +#define TEEC_ERROR_SHORT_BUFFER		0xFFFF0010
+>  
+>  #define TEEC_ORIGIN_COMMS		0x00000002
+>  
+> @@ -181,6 +182,8 @@ void optee_free_pages_list(void *array, size_t num_entries);
+>  void optee_fill_pages_list(u64 *dst, struct page **pages, int num_pages,
+>  			   size_t page_offset);
+>  
+> +int optee_enumerate_devices(void);
+> +
+>  /*
+>   * Small helpers
+>   */
+> -- 
+> 2.7.4
+> 
