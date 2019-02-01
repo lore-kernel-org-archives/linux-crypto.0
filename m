@@ -6,46 +6,46 @@ X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EA33C282DA
-	for <linux-crypto@archiver.kernel.org>; Fri,  1 Feb 2019 07:53:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4538C282DB
+	for <linux-crypto@archiver.kernel.org>; Fri,  1 Feb 2019 07:53:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4EED520869
-	for <linux-crypto@archiver.kernel.org>; Fri,  1 Feb 2019 07:53:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A516320869
+	for <linux-crypto@archiver.kernel.org>; Fri,  1 Feb 2019 07:53:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1549007580;
-	bh=Gar+v92lcduTbv83Ih6+MRPRccKTVLzwxxoQbXTwXTQ=;
+	s=default; t=1549007582;
+	bh=DYDX/eWNZlZpLfWozLgd947T0LJGjepEmxpvmWGnCrw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=Nuy68QtwwX9c671VnCCSNaTKqS1/mKSAGCsJ5VDNnBBEC+oMi8NjDobE58YtcwPf0
-	 ariI/Ez+mKMu7VGXpUCu9jmiXE28fpW4ah04jIl+xUifTq++UFLuVkR704ODcWLbRo
-	 jALrMzTFCd0x8sSfrO68P1wHHslP6Rp7oRL6BvdE=
+	b=BGQ7APdcQSAu8lmXLCGafmj7CLgCCj9l0bnBvOGnT5nXdQgdTVvv3iJ/lUcU3ibeZ
+	 Fd/MvSN7WHk3z5f2PdQ8dkLhf7ORd6vl9bx2l0w6qSPbVobNCahrDXw/vz3FlnoDy9
+	 RvBMdmNu3+vwpFXnjkfdnG8OjFPlxJGGABw0qqig=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727290AbfBAHwF (ORCPT
+        id S1726528AbfBAHwE (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 1 Feb 2019 02:52:05 -0500
-Received: from mail.kernel.org ([198.145.29.99]:36664 "EHLO mail.kernel.org"
+        Fri, 1 Feb 2019 02:52:04 -0500
+Received: from mail.kernel.org ([198.145.29.99]:36656 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726691AbfBAHwC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 1 Feb 2019 02:52:02 -0500
+        id S1726270AbfBAHwD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 1 Feb 2019 02:52:03 -0500
 Received: from sol.localdomain (c-107-3-167-184.hsd1.ca.comcast.net [107.3.167.184])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 78C4321872;
+        by mail.kernel.org (Postfix) with ESMTPSA id 2B72C2184A;
         Fri,  1 Feb 2019 07:52:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=default; t=1549007521;
-        bh=Gar+v92lcduTbv83Ih6+MRPRccKTVLzwxxoQbXTwXTQ=;
+        bh=DYDX/eWNZlZpLfWozLgd947T0LJGjepEmxpvmWGnCrw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=zgwcA0KWDFgGt0SZOOvHdd0H7Oo5Yf1gf314Sde6ukjijJIRtqfYSqhEeGLc+50du
-         +8fqCWIKDf6mIsZrFLwzBHZ2K1YIsFIuXqewCvfCzl8MBviA4RWPJ+oHrG6iRoroPf
-         lexWV7U2cMmBfPd5Tc2ByjyH5f27eX9B3xUq+IlQ=
+        b=JuEH9vfB9JjwoVfQPZHB1jmuyKrPtIoaXL55aZ8zW9L+uvQgyWxgl51SAZA+IFSfD
+         qPPv9E06ZYc2dJnYUnof0r9PQkW9SyDAPrqQqSYWfoEv1chyoJxLXORh6A8j9ZvceO
+         8Ohft4W4yVnMxu1fiFuQ/0WhnmVaveUnGQZeHsgE=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>
 Cc:     linux-kernel@vger.kernel.org, stable@vger.kernel.org,
         Ondrej Mosnacek <omosnace@redhat.com>
-Subject: [PATCH v2 04/15] crypto: x86/morus - fix handling chunked inputs and MAY_SLEEP
-Date:   Thu, 31 Jan 2019 23:51:39 -0800
-Message-Id: <20190201075150.18644-5-ebiggers@kernel.org>
+Subject: [PATCH v2 03/15] crypto: x86/aegis - fix handling chunked inputs and MAY_SLEEP
+Date:   Thu, 31 Jan 2019 23:51:38 -0800
+Message-Id: <20190201075150.18644-4-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190201075150.18644-1-ebiggers@kernel.org>
 References: <20190201075150.18644-1-ebiggers@kernel.org>
@@ -58,7 +58,7 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-The x86 MORUS implementations all fail the improved AEAD tests because
+The x86 AEGIS implementations all fail the improved AEAD tests because
 they produce the wrong result with some data layouts.  The issue is that
 they assume that if the skcipher_walk API gives 'nbytes' not aligned to
 the walksize (a.k.a. walk.stride), then it is the end of the data.  In
@@ -70,142 +70,209 @@ has been disabled by kernel_fpu_begin().
 
 Fix these bugs.
 
-Fixes: 56e8e57fc3a7 ("crypto: morus - Add common SIMD glue code for MORUS")
+Fixes: 1d373d4e8e15 ("crypto: x86 - Add optimized AEGIS implementations")
 Cc: <stable@vger.kernel.org> # v4.18+
 Cc: Ondrej Mosnacek <omosnace@redhat.com>
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- arch/x86/crypto/morus1280_glue.c | 40 +++++++++++++-------------------
- arch/x86/crypto/morus640_glue.c  | 39 ++++++++++++-------------------
- 2 files changed, 31 insertions(+), 48 deletions(-)
+ arch/x86/crypto/aegis128-aesni-glue.c  | 38 ++++++++++----------------
+ arch/x86/crypto/aegis128l-aesni-glue.c | 38 ++++++++++----------------
+ arch/x86/crypto/aegis256-aesni-glue.c  | 38 ++++++++++----------------
+ 3 files changed, 45 insertions(+), 69 deletions(-)
 
-diff --git a/arch/x86/crypto/morus1280_glue.c b/arch/x86/crypto/morus1280_glue.c
-index 0dccdda1eb3a1..7e600f8bcdad8 100644
---- a/arch/x86/crypto/morus1280_glue.c
-+++ b/arch/x86/crypto/morus1280_glue.c
-@@ -85,31 +85,20 @@ static void crypto_morus1280_glue_process_ad(
+diff --git a/arch/x86/crypto/aegis128-aesni-glue.c b/arch/x86/crypto/aegis128-aesni-glue.c
+index 2a356b948720e..3ea71b8718135 100644
+--- a/arch/x86/crypto/aegis128-aesni-glue.c
++++ b/arch/x86/crypto/aegis128-aesni-glue.c
+@@ -119,31 +119,20 @@ static void crypto_aegis128_aesni_process_ad(
+ }
  
- static void crypto_morus1280_glue_process_crypt(struct morus1280_state *state,
- 						struct morus1280_ops ops,
--						struct aead_request *req)
-+						struct skcipher_walk *walk)
+ static void crypto_aegis128_aesni_process_crypt(
+-		struct aegis_state *state, struct aead_request *req,
++		struct aegis_state *state, struct skcipher_walk *walk,
+ 		const struct aegis_crypt_ops *ops)
  {
 -	struct skcipher_walk walk;
--	u8 *cursor_src, *cursor_dst;
+-	u8 *src, *dst;
 -	unsigned int chunksize, base;
 -
--	ops.skcipher_walk_init(&walk, req, false);
+-	ops->skcipher_walk_init(&walk, req, false);
 -
 -	while (walk.nbytes) {
--		cursor_src = walk.src.virt.addr;
--		cursor_dst = walk.dst.virt.addr;
+-		src = walk.src.virt.addr;
+-		dst = walk.dst.virt.addr;
 -		chunksize = walk.nbytes;
 -
--		ops.crypt_blocks(state, cursor_src, cursor_dst, chunksize);
+-		ops->crypt_blocks(state, chunksize, src, dst);
 -
--		base = chunksize & ~(MORUS1280_BLOCK_SIZE - 1);
--		cursor_src += base;
--		cursor_dst += base;
--		chunksize &= MORUS1280_BLOCK_SIZE - 1;
+-		base = chunksize & ~(AEGIS128_BLOCK_SIZE - 1);
+-		src += base;
+-		dst += base;
+-		chunksize &= AEGIS128_BLOCK_SIZE - 1;
 -
 -		if (chunksize > 0)
--			ops.crypt_tail(state, cursor_src, cursor_dst,
--				       chunksize);
-+	while (walk->nbytes >= MORUS1280_BLOCK_SIZE) {
-+		ops.crypt_blocks(state, walk->src.virt.addr,
-+				 walk->dst.virt.addr,
-+				 round_down(walk->nbytes,
-+					    MORUS1280_BLOCK_SIZE));
-+		skcipher_walk_done(walk, walk->nbytes % MORUS1280_BLOCK_SIZE);
+-			ops->crypt_tail(state, chunksize, src, dst);
++	while (walk->nbytes >= AEGIS128_BLOCK_SIZE) {
++		ops->crypt_blocks(state,
++				  round_down(walk->nbytes, AEGIS128_BLOCK_SIZE),
++				  walk->src.virt.addr, walk->dst.virt.addr);
++		skcipher_walk_done(walk, walk->nbytes % AEGIS128_BLOCK_SIZE);
 +	}
  
 -		skcipher_walk_done(&walk, 0);
 +	if (walk->nbytes) {
-+		ops.crypt_tail(state, walk->src.virt.addr, walk->dst.virt.addr,
-+			       walk->nbytes);
++		ops->crypt_tail(state, walk->nbytes, walk->src.virt.addr,
++				walk->dst.virt.addr);
 +		skcipher_walk_done(walk, 0);
  	}
  }
  
-@@ -147,12 +136,15 @@ static void crypto_morus1280_glue_crypt(struct aead_request *req,
+@@ -186,13 +175,16 @@ static void crypto_aegis128_aesni_crypt(struct aead_request *req,
+ {
  	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
- 	struct morus1280_ctx *ctx = crypto_aead_ctx(tfm);
- 	struct morus1280_state state;
+ 	struct aegis_ctx *ctx = crypto_aegis128_aesni_ctx(tfm);
 +	struct skcipher_walk walk;
-+
-+	ops.skcipher_walk_init(&walk, req, true);
+ 	struct aegis_state state;
  
++	ops->skcipher_walk_init(&walk, req, true);
++
  	kernel_fpu_begin();
  
- 	ctx->ops->init(&state, &ctx->key, req->iv);
- 	crypto_morus1280_glue_process_ad(&state, ctx->ops, req->src, req->assoclen);
--	crypto_morus1280_glue_process_crypt(&state, ops, req);
-+	crypto_morus1280_glue_process_crypt(&state, ops, &walk);
- 	ctx->ops->final(&state, tag_xor, req->assoclen, cryptlen);
+ 	crypto_aegis128_aesni_init(&state, ctx->key.bytes, req->iv);
+ 	crypto_aegis128_aesni_process_ad(&state, req->src, req->assoclen);
+-	crypto_aegis128_aesni_process_crypt(&state, req, ops);
++	crypto_aegis128_aesni_process_crypt(&state, &walk, ops);
+ 	crypto_aegis128_aesni_final(&state, tag_xor, req->assoclen, cryptlen);
  
  	kernel_fpu_end();
-diff --git a/arch/x86/crypto/morus640_glue.c b/arch/x86/crypto/morus640_glue.c
-index 7b58fe4d9bd1a..cb3a817320160 100644
---- a/arch/x86/crypto/morus640_glue.c
-+++ b/arch/x86/crypto/morus640_glue.c
-@@ -85,31 +85,19 @@ static void crypto_morus640_glue_process_ad(
+diff --git a/arch/x86/crypto/aegis128l-aesni-glue.c b/arch/x86/crypto/aegis128l-aesni-glue.c
+index dbe8bb980da15..1b1b39c66c5e2 100644
+--- a/arch/x86/crypto/aegis128l-aesni-glue.c
++++ b/arch/x86/crypto/aegis128l-aesni-glue.c
+@@ -119,31 +119,20 @@ static void crypto_aegis128l_aesni_process_ad(
+ }
  
- static void crypto_morus640_glue_process_crypt(struct morus640_state *state,
- 					       struct morus640_ops ops,
--					       struct aead_request *req)
-+					       struct skcipher_walk *walk)
+ static void crypto_aegis128l_aesni_process_crypt(
+-		struct aegis_state *state, struct aead_request *req,
++		struct aegis_state *state, struct skcipher_walk *walk,
+ 		const struct aegis_crypt_ops *ops)
  {
 -	struct skcipher_walk walk;
--	u8 *cursor_src, *cursor_dst;
+-	u8 *src, *dst;
 -	unsigned int chunksize, base;
 -
--	ops.skcipher_walk_init(&walk, req, false);
+-	ops->skcipher_walk_init(&walk, req, false);
 -
 -	while (walk.nbytes) {
--		cursor_src = walk.src.virt.addr;
--		cursor_dst = walk.dst.virt.addr;
+-		src = walk.src.virt.addr;
+-		dst = walk.dst.virt.addr;
 -		chunksize = walk.nbytes;
 -
--		ops.crypt_blocks(state, cursor_src, cursor_dst, chunksize);
+-		ops->crypt_blocks(state, chunksize, src, dst);
 -
--		base = chunksize & ~(MORUS640_BLOCK_SIZE - 1);
--		cursor_src += base;
--		cursor_dst += base;
--		chunksize &= MORUS640_BLOCK_SIZE - 1;
+-		base = chunksize & ~(AEGIS128L_BLOCK_SIZE - 1);
+-		src += base;
+-		dst += base;
+-		chunksize &= AEGIS128L_BLOCK_SIZE - 1;
 -
 -		if (chunksize > 0)
--			ops.crypt_tail(state, cursor_src, cursor_dst,
--				       chunksize);
-+	while (walk->nbytes >= MORUS640_BLOCK_SIZE) {
-+		ops.crypt_blocks(state, walk->src.virt.addr,
-+				 walk->dst.virt.addr,
-+				 round_down(walk->nbytes, MORUS640_BLOCK_SIZE));
-+		skcipher_walk_done(walk, walk->nbytes % MORUS640_BLOCK_SIZE);
+-			ops->crypt_tail(state, chunksize, src, dst);
++	while (walk->nbytes >= AEGIS128L_BLOCK_SIZE) {
++		ops->crypt_blocks(state, round_down(walk->nbytes,
++						    AEGIS128L_BLOCK_SIZE),
++				  walk->src.virt.addr, walk->dst.virt.addr);
++		skcipher_walk_done(walk, walk->nbytes % AEGIS128L_BLOCK_SIZE);
 +	}
  
 -		skcipher_walk_done(&walk, 0);
 +	if (walk->nbytes) {
-+		ops.crypt_tail(state, walk->src.virt.addr, walk->dst.virt.addr,
-+			       walk->nbytes);
++		ops->crypt_tail(state, walk->nbytes, walk->src.virt.addr,
++				walk->dst.virt.addr);
 +		skcipher_walk_done(walk, 0);
  	}
  }
  
-@@ -143,12 +131,15 @@ static void crypto_morus640_glue_crypt(struct aead_request *req,
+@@ -186,13 +175,16 @@ static void crypto_aegis128l_aesni_crypt(struct aead_request *req,
+ {
  	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
- 	struct morus640_ctx *ctx = crypto_aead_ctx(tfm);
- 	struct morus640_state state;
+ 	struct aegis_ctx *ctx = crypto_aegis128l_aesni_ctx(tfm);
 +	struct skcipher_walk walk;
-+
-+	ops.skcipher_walk_init(&walk, req, true);
+ 	struct aegis_state state;
  
++	ops->skcipher_walk_init(&walk, req, true);
++
  	kernel_fpu_begin();
  
- 	ctx->ops->init(&state, &ctx->key, req->iv);
- 	crypto_morus640_glue_process_ad(&state, ctx->ops, req->src, req->assoclen);
--	crypto_morus640_glue_process_crypt(&state, ops, req);
-+	crypto_morus640_glue_process_crypt(&state, ops, &walk);
- 	ctx->ops->final(&state, tag_xor, req->assoclen, cryptlen);
+ 	crypto_aegis128l_aesni_init(&state, ctx->key.bytes, req->iv);
+ 	crypto_aegis128l_aesni_process_ad(&state, req->src, req->assoclen);
+-	crypto_aegis128l_aesni_process_crypt(&state, req, ops);
++	crypto_aegis128l_aesni_process_crypt(&state, &walk, ops);
+ 	crypto_aegis128l_aesni_final(&state, tag_xor, req->assoclen, cryptlen);
+ 
+ 	kernel_fpu_end();
+diff --git a/arch/x86/crypto/aegis256-aesni-glue.c b/arch/x86/crypto/aegis256-aesni-glue.c
+index 8bebda2de92fe..6227ca3220a05 100644
+--- a/arch/x86/crypto/aegis256-aesni-glue.c
++++ b/arch/x86/crypto/aegis256-aesni-glue.c
+@@ -119,31 +119,20 @@ static void crypto_aegis256_aesni_process_ad(
+ }
+ 
+ static void crypto_aegis256_aesni_process_crypt(
+-		struct aegis_state *state, struct aead_request *req,
++		struct aegis_state *state, struct skcipher_walk *walk,
+ 		const struct aegis_crypt_ops *ops)
+ {
+-	struct skcipher_walk walk;
+-	u8 *src, *dst;
+-	unsigned int chunksize, base;
+-
+-	ops->skcipher_walk_init(&walk, req, false);
+-
+-	while (walk.nbytes) {
+-		src = walk.src.virt.addr;
+-		dst = walk.dst.virt.addr;
+-		chunksize = walk.nbytes;
+-
+-		ops->crypt_blocks(state, chunksize, src, dst);
+-
+-		base = chunksize & ~(AEGIS256_BLOCK_SIZE - 1);
+-		src += base;
+-		dst += base;
+-		chunksize &= AEGIS256_BLOCK_SIZE - 1;
+-
+-		if (chunksize > 0)
+-			ops->crypt_tail(state, chunksize, src, dst);
++	while (walk->nbytes >= AEGIS256_BLOCK_SIZE) {
++		ops->crypt_blocks(state,
++				  round_down(walk->nbytes, AEGIS256_BLOCK_SIZE),
++				  walk->src.virt.addr, walk->dst.virt.addr);
++		skcipher_walk_done(walk, walk->nbytes % AEGIS256_BLOCK_SIZE);
++	}
+ 
+-		skcipher_walk_done(&walk, 0);
++	if (walk->nbytes) {
++		ops->crypt_tail(state, walk->nbytes, walk->src.virt.addr,
++				walk->dst.virt.addr);
++		skcipher_walk_done(walk, 0);
+ 	}
+ }
+ 
+@@ -186,13 +175,16 @@ static void crypto_aegis256_aesni_crypt(struct aead_request *req,
+ {
+ 	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
+ 	struct aegis_ctx *ctx = crypto_aegis256_aesni_ctx(tfm);
++	struct skcipher_walk walk;
+ 	struct aegis_state state;
+ 
++	ops->skcipher_walk_init(&walk, req, true);
++
+ 	kernel_fpu_begin();
+ 
+ 	crypto_aegis256_aesni_init(&state, ctx->key, req->iv);
+ 	crypto_aegis256_aesni_process_ad(&state, req->src, req->assoclen);
+-	crypto_aegis256_aesni_process_crypt(&state, req, ops);
++	crypto_aegis256_aesni_process_crypt(&state, &walk, ops);
+ 	crypto_aegis256_aesni_final(&state, tag_xor, req->assoclen, cryptlen);
  
  	kernel_fpu_end();
 -- 
