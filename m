@@ -1,4 +1,4 @@
-Return-Path: <SRS0=5U1R=QL=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=AMvw=QM=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
@@ -6,122 +6,113 @@ X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 332A3C282C4
-	for <linux-crypto@archiver.kernel.org>; Mon,  4 Feb 2019 14:00:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65EE3C282CB
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Feb 2019 08:31:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0B6102082F
-	for <linux-crypto@archiver.kernel.org>; Mon,  4 Feb 2019 14:00:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3530220821
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Feb 2019 08:31:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728869AbfBDOAo (ORCPT
+        id S1725898AbfBEIbv (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 4 Feb 2019 09:00:44 -0500
-Received: from vmicros1.altlinux.org ([194.107.17.57]:44932 "EHLO
-        vmicros1.altlinux.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726242AbfBDOAo (ORCPT
+        Tue, 5 Feb 2019 03:31:51 -0500
+Received: from metis.ext.pengutronix.de ([85.220.165.71]:54345 "EHLO
+        metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726955AbfBEIbv (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 4 Feb 2019 09:00:44 -0500
-Received: from imap.altlinux.org (imap.altlinux.org [194.107.17.38])
-        by vmicros1.altlinux.org (Postfix) with ESMTP id 6C81C72CCAC;
-        Mon,  4 Feb 2019 17:00:41 +0300 (MSK)
-Received: from altlinux.org (sole.flsd.net [185.75.180.6])
-        by imap.altlinux.org (Postfix) with ESMTPSA id 4DE984A4A14;
-        Mon,  4 Feb 2019 17:00:41 +0300 (MSK)
-Date:   Mon, 4 Feb 2019 17:00:40 +0300
-From:   Vitaly Chikunov <vt@altlinux.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        David Howells <dhowells@redhat.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@st.com>,
-        Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Gary Hook <gary.hook@amd.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        keyrings@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org, qat-linux@intel.com
-Subject: Re: [RFC PATCH v4] akcipher: new verify API for public key algorithms
-Message-ID: <20190204140040.wpxoojf4rgx56ppu@altlinux.org>
-Mail-Followup-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        David Howells <dhowells@redhat.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@st.com>,
-        Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Gary Hook <gary.hook@amd.com>,
-        Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        keyrings@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org, qat-linux@intel.com
-References: <20190125180116.13702-1-vt@altlinux.org>
- <20190201062655.hmxeqo5hprhcgtfx@gondor.apana.org.au>
- <20190201070922.nvopn4kxz7jbcoey@altlinux.org>
+        Tue, 5 Feb 2019 03:31:51 -0500
+Received: from ptx.hi.pengutronix.de ([2001:67c:670:100:1d::c0])
+        by metis.ext.pengutronix.de with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.89)
+        (envelope-from <sha@pengutronix.de>)
+        id 1gqw8y-0002Wc-Bc; Tue, 05 Feb 2019 09:31:48 +0100
+Received: from sha by ptx.hi.pengutronix.de with local (Exim 4.89)
+        (envelope-from <sha@pengutronix.de>)
+        id 1gqw8w-000224-LS; Tue, 05 Feb 2019 09:31:46 +0100
+Date:   Tue, 5 Feb 2019 09:31:46 +0100
+From:   Sascha Hauer <s.hauer@pengutronix.de>
+To:     Horia Geanta <horia.geanta@nxp.com>
+Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "kernel@pengutronix.de" <kernel@pengutronix.de>,
+        "stable@vger.kernel.org" <stable@vger.kernel.org>
+Subject: Re: [PATCH] crypto: caam - Do not overwrite IV
+Message-ID: <20190205083146.icnk3y46vonpxsin@pengutronix.de>
+References: <20190131061225.15541-1-s.hauer@pengutronix.de>
+ <VI1PR0402MB3485ED41FE4B512C83271E0B986D0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=koi8-r
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190201070922.nvopn4kxz7jbcoey@altlinux.org>
-User-Agent: NeoMutt/20171215-106-ac61c7
+In-Reply-To: <VI1PR0402MB3485ED41FE4B512C83271E0B986D0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL:  http://www.pengutronix.de/
+X-IRC:  #ptxdist @freenode
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-Uptime: 08:31:20 up 14 days, 18:44, 70 users,  load average: 0.07, 0.07,
+ 0.09
+User-Agent: NeoMutt/20170113 (1.7.2)
+X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::c0
+X-SA-Exim-Mail-From: sha@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Herbert,
+Hi Horia,
 
-On Fri, Feb 01, 2019 at 10:09:23AM +0300, Vitaly Chikunov wrote:
-> On Fri, Feb 01, 2019 at 02:26:55PM +0800, Herbert Xu wrote:
-> > On Fri, Jan 25, 2019 at 09:01:16PM +0300, Vitaly Chikunov wrote:
-> > >
-> > > @@ -781,36 +780,17 @@ static int tpm_key_verify_signature(const struct key *key,
-> > >  	if (!req)
-> > >  		goto error_free_tfm;
-> > >  
-> > > -	ret = -ENOMEM;
-> > > -	outlen = crypto_akcipher_maxsize(tfm);
-> > > -	output = kmalloc(outlen, GFP_KERNEL);
-> > > -	if (!output)
-> > > -		goto error_free_req;
-> > > -
-> > > -	sg_init_one(&sig_sg, sig->s, sig->s_size);
-> > > -	sg_init_one(&digest_sg, output, outlen);
-> > > -	akcipher_request_set_crypt(req, &sig_sg, &digest_sg, sig->s_size,
-> > > -				   outlen);
-> > > +	sg_init_table(&src_sg, 2);
-> > > +	sg_set_buf(&src_sg[0], sig->s, sig->s_size);
-> > > +	sg_set_buf(&src_sg[1], sig->digest, sig->digest_size);
-> > > +	akcipher_request_set_crypt(req, &src_sg, NULL, sig->s_size,
-> > > +				   sig->digest_size);
+On Mon, Feb 04, 2019 at 12:26:26PM +0000, Horia Geanta wrote:
+> On 1/31/2019 8:12 AM, Sascha Hauer wrote:
+> > In skcipher_decrypt() the IV passed in by the caller is overwritten and
+> > the tcrypt module fails with:
 > > 
-> > It's not clear that sig->digest is guaranteed to be kmalloc memory.
-> > In any case, it's best not to mix unrelated changes in a single
-> > patch.  So please keep the kmalloc on output and then copy
-> > sig->digest into it and put output into the SG list.
-
-I will do that.
-
-Thanks,
-
-> It is not guaranteed that sig->s will be kmalloc memory either. (Except
-> we know it for sure like we know the same about sig->digest).
-> 
-> You can see in public_key_signature_free() that both fields are kfree'd
-> together.
-> 
-> So, I don't understand why we should treat sig->digest differently than
-> sig->s.
-> 
-> I was just removing kmalloc'ed output as crypto_akcipher_verify() does
-> not need any output anymore. So, it's not some sort of mixing unrelated
-> changes, from my point of view.
-> 
-> Thanks,
-> 
+> > alg: aead: decryption failed on test 1 for gcm_base(ctr-aes-caam,ghash-generic): ret=74
+> > alg: aead: Failed to load transform for gcm(aes): -2
 > > 
-> > Thanks,
-> > -- 
-> > Email: Herbert Xu <herbert@gondor.apana.org.au>
-> > Home Page: http://gondor.apana.org.au/~herbert/
-> > PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> > With this patch tcrypt runs without errors.
+> > 
+> This doesn't mean the patch is correct.
+> crypto API requires skcipher implementations to update the IV with the last
+> ciphertext block.
+> 
+> The root cause of the issue is cache line sharing.
+> 
+> struct crypto_gcm_req_priv_ctx {
+>         u8 iv[16];
+>         u8 auth_tag[16];
+> 	[...]
+> };
+> 
+> Since caam does not support ghash on i.MX6, only ctr skcipher part of the gcm is
+> offloaded.
+> The skcipher request received by caam has req->src pointing to auth_tag[16] (1st
+> S/G entry) and req->iv pointing to iv[16].
+> caam driver:
+> 1-DMA maps req->src
+> 2-copies original req->iv to internal buffer
+> 3-updates req->iv (scatterwalk_map_and_copy from last block in req->src)
+> 4-sends job to crypto engine
+> 
+> Problem is that operation 3 above is writing iv[16], which is on the same cache
+> line as auth_tag[16] that was previously DMA mapped.
+> 
+> I've checked that forcing auth_tag and iv to be on separate cache lines
+> -       u8 auth_tag[16];
+> +       u8 auth_tag[16] ____cacheline_aligned;
+> solves the issue.
+
+I can confirm that this solves it here on my side aswell.
+
+I have no idea what's best to do here, but I'd like to have that fixed.
+
+Is there some easy to reproduce testcase to show the issues that arise
+with my patch? Apparently tcrypt doesn't do chaining, right?
+
+Sascha
+
+-- 
+Pengutronix e.K.                           |                             |
+Industrial Linux Solutions                 | http://www.pengutronix.de/  |
+Peiner Str. 6-8, 31137 Hildesheim, Germany | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
