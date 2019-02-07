@@ -6,35 +6,33 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 320B8C282C2
-	for <linux-crypto@archiver.kernel.org>; Thu,  7 Feb 2019 13:36:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85EB1C282C2
+	for <linux-crypto@archiver.kernel.org>; Thu,  7 Feb 2019 13:44:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 09AD82146E
-	for <linux-crypto@archiver.kernel.org>; Thu,  7 Feb 2019 13:36:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5994121904
+	for <linux-crypto@archiver.kernel.org>; Thu,  7 Feb 2019 13:44:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727239AbfBGNgR (ORCPT
+        id S1726732AbfBGNoT (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 7 Feb 2019 08:36:17 -0500
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:37254 "EHLO
+        Thu, 7 Feb 2019 08:44:19 -0500
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:37324 "EHLO
         foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726750AbfBGNgR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 7 Feb 2019 08:36:17 -0500
+        id S1726558AbfBGNoT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 7 Feb 2019 08:44:19 -0500
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 655E5EBD;
-        Thu,  7 Feb 2019 05:36:16 -0800 (PST)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2C666EBD;
+        Thu,  7 Feb 2019 05:44:19 -0800 (PST)
 Received: from e110176-lin.kfn.arm.com (e110176-lin.kfn.arm.com [10.50.4.178])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7BC7F3F675;
-        Thu,  7 Feb 2019 05:36:14 -0800 (PST)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A6D383F675;
+        Thu,  7 Feb 2019 05:44:17 -0800 (PST)
 From:   Gilad Ben-Yossef <gilad@benyossef.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     Ofir Drag <ofir.drang@arm.com>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        stable@kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [BUGFIX PATCH] crypto: ccree: fix resume race condition on init
-Date:   Thu,  7 Feb 2019 15:36:11 +0200
-Message-Id: <20190207133612.31836-1-gilad@benyossef.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, Ofir Drag <ofir.drang@arm.com>
+Subject: [PATCH] MAINTAINERS: crypto: ccree: remove co-maintainer
+Date:   Thu,  7 Feb 2019 15:44:15 +0200
+Message-Id: <20190207134415.311-1-gilad@benyossef.com>
 X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -43,113 +41,26 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-We were enabling autosuspend, which is using data set by the
-hash module, prior to the hash module being inited, casuing
-a crash on resume as part of the startup sequence if the race
-was lost.
-
-This was never a real problem because the PM infra was using low
-res timers so we were always winning the race, until commit 8234f6734c5d
-("PM-runtime: Switch autosuspend over to using hrtimers") changed that :-)
-
-Fix this by seperating the PM setup and enablement and doing the
-latter only at the end of the init sequence.
+The best-laid plans of mice and men often go awry.
+Remove Yael C. as co-maintainer as she moved on to other endeavours.
 
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
-Cc: Vincent Guittot <vincent.guittot@linaro.org>
-Cc: stable@kernel.org # v4.20
 ---
-Herbert, could you please take this for 5.0-rc6 ? thanks.
+ MAINTAINERS | 1 -
+ 1 file changed, 1 deletion(-)
 
- drivers/crypto/ccree/cc_driver.c |  7 ++++---
- drivers/crypto/ccree/cc_pm.c     | 13 ++++++-------
- drivers/crypto/ccree/cc_pm.h     |  3 +++
- 3 files changed, 13 insertions(+), 10 deletions(-)
-
-diff --git a/drivers/crypto/ccree/cc_driver.c b/drivers/crypto/ccree/cc_driver.c
-index 210cc86605e9..3bcc6c76e090 100644
---- a/drivers/crypto/ccree/cc_driver.c
-+++ b/drivers/crypto/ccree/cc_driver.c
-@@ -380,7 +380,7 @@ static int init_cc_resources(struct platform_device *plat_dev)
- 	rc = cc_ivgen_init(new_drvdata);
- 	if (rc) {
- 		dev_err(dev, "cc_ivgen_init failed\n");
--		goto post_power_mgr_err;
-+		goto post_buf_mgr_err;
- 	}
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 8c68de3cfd80..45ea92863a05 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -3511,7 +3511,6 @@ F:	include/linux/spi/cc2520.h
+ F:	Documentation/devicetree/bindings/net/ieee802154/cc2520.txt
  
- 	/* Allocate crypto algs */
-@@ -403,6 +403,9 @@ static int init_cc_resources(struct platform_device *plat_dev)
- 		goto post_hash_err;
- 	}
- 
-+	/* All set, we can allow autosuspend */
-+	cc_pm_go(new_drvdata);
-+
- 	/* If we got here and FIPS mode is enabled
- 	 * it means all FIPS test passed, so let TEE
- 	 * know we're good.
-@@ -417,8 +420,6 @@ static int init_cc_resources(struct platform_device *plat_dev)
- 	cc_cipher_free(new_drvdata);
- post_ivgen_err:
- 	cc_ivgen_fini(new_drvdata);
--post_power_mgr_err:
--	cc_pm_fini(new_drvdata);
- post_buf_mgr_err:
- 	 cc_buffer_mgr_fini(new_drvdata);
- post_req_mgr_err:
-diff --git a/drivers/crypto/ccree/cc_pm.c b/drivers/crypto/ccree/cc_pm.c
-index d990f472e89f..6ff7e75ad90e 100644
---- a/drivers/crypto/ccree/cc_pm.c
-+++ b/drivers/crypto/ccree/cc_pm.c
-@@ -100,20 +100,19 @@ int cc_pm_put_suspend(struct device *dev)
- 
- int cc_pm_init(struct cc_drvdata *drvdata)
- {
--	int rc = 0;
- 	struct device *dev = drvdata_to_dev(drvdata);
- 
- 	/* must be before the enabling to avoid resdundent suspending */
- 	pm_runtime_set_autosuspend_delay(dev, CC_SUSPEND_TIMEOUT);
- 	pm_runtime_use_autosuspend(dev);
- 	/* activate the PM module */
--	rc = pm_runtime_set_active(dev);
--	if (rc)
--		return rc;
--	/* enable the PM module*/
--	pm_runtime_enable(dev);
-+	return pm_runtime_set_active(dev);
-+}
- 
--	return rc;
-+/* enable the PM module*/
-+void cc_pm_go(struct cc_drvdata *drvdata)
-+{
-+	pm_runtime_enable(drvdata_to_dev(drvdata));
- }
- 
- void cc_pm_fini(struct cc_drvdata *drvdata)
-diff --git a/drivers/crypto/ccree/cc_pm.h b/drivers/crypto/ccree/cc_pm.h
-index 020a5403c58b..f62624357020 100644
---- a/drivers/crypto/ccree/cc_pm.h
-+++ b/drivers/crypto/ccree/cc_pm.h
-@@ -16,6 +16,7 @@
- extern const struct dev_pm_ops ccree_pm;
- 
- int cc_pm_init(struct cc_drvdata *drvdata);
-+void cc_pm_go(struct cc_drvdata *drvdata);
- void cc_pm_fini(struct cc_drvdata *drvdata);
- int cc_pm_suspend(struct device *dev);
- int cc_pm_resume(struct device *dev);
-@@ -29,6 +30,8 @@ static inline int cc_pm_init(struct cc_drvdata *drvdata)
- 	return 0;
- }
- 
-+static void cc_pm_go(struct cc_drvdata *drvdata) {}
-+
- static inline void cc_pm_fini(struct cc_drvdata *drvdata) {}
- 
- static inline int cc_pm_suspend(struct device *dev)
+ CCREE ARM TRUSTZONE CRYPTOCELL REE DRIVER
+-M:	Yael Chemla <yael.chemla@foss.arm.com>
+ M:	Gilad Ben-Yossef <gilad@benyossef.com>
+ L:	linux-crypto@vger.kernel.org
+ S:	Supported
 -- 
 2.20.1
 
