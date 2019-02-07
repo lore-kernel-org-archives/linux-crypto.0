@@ -2,126 +2,154 @@ Return-Path: <SRS0=Jc5W=QO=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74BE2C282C2
-	for <linux-crypto@archiver.kernel.org>; Thu,  7 Feb 2019 12:58:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 320B8C282C2
+	for <linux-crypto@archiver.kernel.org>; Thu,  7 Feb 2019 13:36:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3F54F21904
-	for <linux-crypto@archiver.kernel.org>; Thu,  7 Feb 2019 12:58:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=benyossef-com.20150623.gappssmtp.com header.i=@benyossef-com.20150623.gappssmtp.com header.b="afbCQs+m"
+	by mail.kernel.org (Postfix) with ESMTP id 09AD82146E
+	for <linux-crypto@archiver.kernel.org>; Thu,  7 Feb 2019 13:36:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727413AbfBGM62 (ORCPT
+        id S1727239AbfBGNgR (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 7 Feb 2019 07:58:28 -0500
-Received: from mail-vs1-f66.google.com ([209.85.217.66]:37985 "EHLO
-        mail-vs1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727037AbfBGM62 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 7 Feb 2019 07:58:28 -0500
-Received: by mail-vs1-f66.google.com with SMTP id t7so3580043vsq.5
-        for <linux-crypto@vger.kernel.org>; Thu, 07 Feb 2019 04:58:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=benyossef-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=LnlcHpqzXyb8rUW2bmJkzF9pBzhkae9k8y/TMGidJ64=;
-        b=afbCQs+mlvsPtSnwUS2Cp3opEwKHWFTWcXoDh2D+f4p5kU4W9ewR8bxaEi4E5LxwuP
-         63E29/3iJeibnsl1N40zdSEH2HloKVouoY5+l0uapjniwpXyd+fx5mFurbCLG2tKHtkM
-         bO530SmEwUO6nP8S33Xv3YtqW6Lp3lCbm3ethbqBlGentUCmLQ0A21tftuJfUpE7+N0p
-         yvTlCoW34qsZVJ2E8qrHP578oxo96IvF+/pBYVT7e2oJM5lv/+dMpmgG+FdhEemaHRQq
-         qMmy1TwMf48UipOO1A8XlP7zaWSPrz1cRQlv5WEsGCIQE9ggXME1NnI8dV52LO0cQYIe
-         2iXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=LnlcHpqzXyb8rUW2bmJkzF9pBzhkae9k8y/TMGidJ64=;
-        b=Z7qrWC7r2xLPjfmubLxXXAB4T8gPMuOHYQvOyY4uioSsu/F8IQ0BO8bwB3OmRDIc9i
-         +ujVQV0h52ZahyoyfF+Rwk9qu40mOaIJLrGKrEOQiptjJqiMDkzrxCIEOXh9yfwbpFzY
-         dLVngl+phG7dOMDj/jjt6mQDeCjAMaIAEYbrl71cKsNtaBIbCQSxbc5btd4BrXbiD4ID
-         MDMqhOTSDm9GGpHn6e3i1BnNydYopBqsKfgyKA8cDVRKiYCPZcKYPeLjvrqSXGQICQ5G
-         YHZNeRiGlyUBDejqePmy6UBh+gmnrzHWbhVWV6dib2RO1du3Chn/zoa3z1Hq3LEGjv3K
-         8AUw==
-X-Gm-Message-State: AHQUAubajQ5wOOe1Gq+1XxBGnbEwvxOFrlNwRR4NNc/wN9PXglugk++u
-        l01kDr7xO/ncJSFHJS72XyvmsIIG+auCqti2jyTiHw==
-X-Google-Smtp-Source: AHgI3IZ/3jnwo8Ul00SlJ3zeSEVj25vn/kV5e6TUIG9V42N481M6IPLKVtO52mKIF2+7N83Nu/TD8xTu6DcGHdYwNwk=
-X-Received: by 2002:a67:f24d:: with SMTP id y13mr2050119vsm.164.1549544307228;
- Thu, 07 Feb 2019 04:58:27 -0800 (PST)
-MIME-Version: 1.0
-References: <CAOtvUMd-38BL1jJnHQY0J68mmtxW1WBQF2qGqyNpWtwsrwUcYg@mail.gmail.com>
- <CAKfTPtBaKbtfLMjLH1u20+ukhpm6i9qDK-3HiTPizSjKNCnw=w@mail.gmail.com> <CAOtvUMdRWjqp0sEZUQU6w6RcDFP26i3Gxzg5zsRvG2ej1LVSFg@mail.gmail.com>
-In-Reply-To: <CAOtvUMdRWjqp0sEZUQU6w6RcDFP26i3Gxzg5zsRvG2ej1LVSFg@mail.gmail.com>
+        Thu, 7 Feb 2019 08:36:17 -0500
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:37254 "EHLO
+        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726750AbfBGNgR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 7 Feb 2019 08:36:17 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 655E5EBD;
+        Thu,  7 Feb 2019 05:36:16 -0800 (PST)
+Received: from e110176-lin.kfn.arm.com (e110176-lin.kfn.arm.com [10.50.4.178])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7BC7F3F675;
+        Thu,  7 Feb 2019 05:36:14 -0800 (PST)
 From:   Gilad Ben-Yossef <gilad@benyossef.com>
-Date:   Thu, 7 Feb 2019 14:58:16 +0200
-Message-ID: <CAOtvUMdkC+v0R39OADF3R7Qpk+NPWW+JH0S6SUNXoHM3v+19Vg@mail.gmail.com>
-Subject: Re: Regression due to "PM-runtime: Switch autosuspend over to using hrtimers"
-To:     Vincent Guittot <vincent.guittot@linaro.org>
-Cc:     "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Pavel Machek <pavel@ucw.cz>, Len Brown <len.brown@intel.com>,
-        "open list:THERMAL" <linux-pm@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
-        Ofir Drang <Ofir.Drang@arm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Cc:     Ofir Drag <ofir.drang@arm.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        stable@kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [BUGFIX PATCH] crypto: ccree: fix resume race condition on init
+Date:   Thu,  7 Feb 2019 15:36:11 +0200
+Message-Id: <20190207133612.31836-1-gilad@benyossef.com>
+X-Mailer: git-send-email 2.20.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Feb 7, 2019 at 10:25 AM Gilad Ben-Yossef <gilad@benyossef.com> wrot=
-e:
+We were enabling autosuspend, which is using data set by the
+hash module, prior to the hash module being inited, casuing
+a crash on resume as part of the startup sequence if the race
+was lost.
 
-> >
-> > On Wed, 6 Feb 2019 at 17:40, Gilad Ben-Yossef <gilad@benyossef.com> wro=
-te:
-> > >
-> > > Hi all,
-> > >
-> > > A regression was spotted in the ccree driver running on Arm 32 bit
-> > > causing a kernel panic during the crypto API self test phase (panic
-> > > messages included with this message) happening in the PM resume
-> > > callback that was not happening before.
-> > >
-> > > I've bisected the change that caused this to commit 8234f6734c5d
-> > > ("PM-runtime: Switch autosuspend over to using hrtimers").
-> > >
-> > > I'm still trying to figure out what is going on inside the callback,
-> > > but as it was not happening before, I thought I'd give you a shout ou=
-t
-> > > to make you aware of this.
-> >
-> > Are you using autosuspend mode for this device ?
-> Yes.
->
->
-> > Also this happen in a platform specific function cc_init_hash_sram().
-> > I can't see anything related to pm runtime and autosuspend in it.
->
-> True. However, the function is called from the driver PM resume
-> callback and before that commit it did not fail.
-> My guess is that there is something related to the timing the callback
-> is called, probably some race condition the change exposed.
->
+This was never a real problem because the PM infra was using low
+res timers so we were always winning the race, until commit 8234f6734c5d
+("PM-runtime: Switch autosuspend over to using hrtimers") changed that :-)
 
-OK, I've found it. It was indeed a race condition in the ccree driver.
-We were doing something in the resume callback that relied on
-initialization sequence that happens after autosuspend was enabled for
-the device.
-It was never a problem because with the lower res timers we always got
-around to that initialization before auto suspend kicked in and we had
-to resume but with your change we started losing that race.... :-)
+Fix this by seperating the PM setup and enablement and doing the
+latter only at the end of the init sequence.
 
-Sorry for the noise and thanks for your help!
-Gilad
+Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+Cc: Vincent Guittot <vincent.guittot@linaro.org>
+Cc: stable@kernel.org # v4.20
+---
+Herbert, could you please take this for 5.0-rc6 ? thanks.
 
+ drivers/crypto/ccree/cc_driver.c |  7 ++++---
+ drivers/crypto/ccree/cc_pm.c     | 13 ++++++-------
+ drivers/crypto/ccree/cc_pm.h     |  3 +++
+ 3 files changed, 13 insertions(+), 10 deletions(-)
 
---=20
-Gilad Ben-Yossef
-Chief Coffee Drinker
+diff --git a/drivers/crypto/ccree/cc_driver.c b/drivers/crypto/ccree/cc_driver.c
+index 210cc86605e9..3bcc6c76e090 100644
+--- a/drivers/crypto/ccree/cc_driver.c
++++ b/drivers/crypto/ccree/cc_driver.c
+@@ -380,7 +380,7 @@ static int init_cc_resources(struct platform_device *plat_dev)
+ 	rc = cc_ivgen_init(new_drvdata);
+ 	if (rc) {
+ 		dev_err(dev, "cc_ivgen_init failed\n");
+-		goto post_power_mgr_err;
++		goto post_buf_mgr_err;
+ 	}
+ 
+ 	/* Allocate crypto algs */
+@@ -403,6 +403,9 @@ static int init_cc_resources(struct platform_device *plat_dev)
+ 		goto post_hash_err;
+ 	}
+ 
++	/* All set, we can allow autosuspend */
++	cc_pm_go(new_drvdata);
++
+ 	/* If we got here and FIPS mode is enabled
+ 	 * it means all FIPS test passed, so let TEE
+ 	 * know we're good.
+@@ -417,8 +420,6 @@ static int init_cc_resources(struct platform_device *plat_dev)
+ 	cc_cipher_free(new_drvdata);
+ post_ivgen_err:
+ 	cc_ivgen_fini(new_drvdata);
+-post_power_mgr_err:
+-	cc_pm_fini(new_drvdata);
+ post_buf_mgr_err:
+ 	 cc_buffer_mgr_fini(new_drvdata);
+ post_req_mgr_err:
+diff --git a/drivers/crypto/ccree/cc_pm.c b/drivers/crypto/ccree/cc_pm.c
+index d990f472e89f..6ff7e75ad90e 100644
+--- a/drivers/crypto/ccree/cc_pm.c
++++ b/drivers/crypto/ccree/cc_pm.c
+@@ -100,20 +100,19 @@ int cc_pm_put_suspend(struct device *dev)
+ 
+ int cc_pm_init(struct cc_drvdata *drvdata)
+ {
+-	int rc = 0;
+ 	struct device *dev = drvdata_to_dev(drvdata);
+ 
+ 	/* must be before the enabling to avoid resdundent suspending */
+ 	pm_runtime_set_autosuspend_delay(dev, CC_SUSPEND_TIMEOUT);
+ 	pm_runtime_use_autosuspend(dev);
+ 	/* activate the PM module */
+-	rc = pm_runtime_set_active(dev);
+-	if (rc)
+-		return rc;
+-	/* enable the PM module*/
+-	pm_runtime_enable(dev);
++	return pm_runtime_set_active(dev);
++}
+ 
+-	return rc;
++/* enable the PM module*/
++void cc_pm_go(struct cc_drvdata *drvdata)
++{
++	pm_runtime_enable(drvdata_to_dev(drvdata));
+ }
+ 
+ void cc_pm_fini(struct cc_drvdata *drvdata)
+diff --git a/drivers/crypto/ccree/cc_pm.h b/drivers/crypto/ccree/cc_pm.h
+index 020a5403c58b..f62624357020 100644
+--- a/drivers/crypto/ccree/cc_pm.h
++++ b/drivers/crypto/ccree/cc_pm.h
+@@ -16,6 +16,7 @@
+ extern const struct dev_pm_ops ccree_pm;
+ 
+ int cc_pm_init(struct cc_drvdata *drvdata);
++void cc_pm_go(struct cc_drvdata *drvdata);
+ void cc_pm_fini(struct cc_drvdata *drvdata);
+ int cc_pm_suspend(struct device *dev);
+ int cc_pm_resume(struct device *dev);
+@@ -29,6 +30,8 @@ static inline int cc_pm_init(struct cc_drvdata *drvdata)
+ 	return 0;
+ }
+ 
++static void cc_pm_go(struct cc_drvdata *drvdata) {}
++
+ static inline void cc_pm_fini(struct cc_drvdata *drvdata) {}
+ 
+ static inline int cc_pm_suspend(struct device *dev)
+-- 
+2.20.1
 
-values of =CE=B2 will give rise to dom!
