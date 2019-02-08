@@ -3,93 +3,79 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_NEOMUTT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE90EC169C4
-	for <linux-crypto@archiver.kernel.org>; Fri,  8 Feb 2019 07:46:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA9A2C169C4
+	for <linux-crypto@archiver.kernel.org>; Fri,  8 Feb 2019 07:46:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8FE9721917
-	for <linux-crypto@archiver.kernel.org>; Fri,  8 Feb 2019 07:46:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9BB6C21917
+	for <linux-crypto@archiver.kernel.org>; Fri,  8 Feb 2019 07:46:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726974AbfBHHqV (ORCPT
+        id S1726115AbfBHHqr (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 8 Feb 2019 02:46:21 -0500
-Received: from orcrist.hmeau.com ([104.223.48.154]:34172 "EHLO
+        Fri, 8 Feb 2019 02:46:47 -0500
+Received: from orcrist.hmeau.com ([104.223.48.154]:34200 "EHLO
         deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726004AbfBHHqV (ORCPT
+        with ESMTP id S1726004AbfBHHqq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 8 Feb 2019 02:46:21 -0500
+        Fri, 8 Feb 2019 02:46:46 -0500
 Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
         by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1gs0rb-0000k2-V3; Fri, 08 Feb 2019 15:46:20 +0800
+        id 1gs0rX-0000jx-H9; Fri, 08 Feb 2019 15:46:15 +0800
 Received: from herbert by gondobar with local (Exim 4.89)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1gs0ra-0002RR-EF; Fri, 08 Feb 2019 15:46:18 +0800
-Date:   Fri, 8 Feb 2019 15:46:18 +0800
+        id 1gs0rG-0002RD-5P; Fri, 08 Feb 2019 15:45:58 +0800
+Date:   Fri, 8 Feb 2019 15:45:58 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-crypto@vger.kernel.org,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Tim Chen <tim.c.chen@linux.intel.com>,
-        linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v4 0/3] crypto: crct10dif assembly cleanup and
- optimizations
-Message-ID: <20190208074618.bpass2jz3axu5fv2@gondor.apana.org.au>
-References: <20190131044242.31591-1-ebiggers@kernel.org>
+To:     Stephan Mueller <smueller@chronox.de>
+Cc:     Eric Biggers <ebiggers@kernel.org>,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        Andy Lutomirski <luto@amacapital.net>,
+        "Lee, Chun-Yi" <joeyli.kernel@gmail.com>,
+        "Rafael J . Wysocki" <rjw@rjwysocki.net>,
+        Pavel Machek <pavel@ucw.cz>, linux-kernel@vger.kernel.org,
+        linux-pm@vger.kernel.org, keyrings@vger.kernel.org,
+        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+        Chen Yu <yu.c.chen@intel.com>,
+        Oliver Neukum <oneukum@suse.com>,
+        Ryan Chen <yu.chen.surf@gmail.com>,
+        David Howells <dhowells@redhat.com>,
+        Giovanni Gherdovich <ggherdovich@suse.cz>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Jann Horn <jannh@google.com>,
+        Andy Lutomirski <luto@kernel.org>, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v2 0/6] General Key Derivation Function Support
+Message-ID: <20190208074558.j3k6gw66q4e2y2lv@gondor.apana.org.au>
+References: <20190103143227.9138-1-jlee@suse.com>
+ <5418064.ltLFQScYi2@tauon.chronox.de>
+ <20190130100854.iey2mbmz6777pn2n@gondor.apana.org.au>
+ <12103603.N4N57GesWC@tauon.chronox.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190131044242.31591-1-ebiggers@kernel.org>
+In-Reply-To: <12103603.N4N57GesWC@tauon.chronox.de>
 User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jan 30, 2019 at 08:42:39PM -0800, Eric Biggers wrote:
-> The x86, arm, and arm64 asm implementations of crct10dif are very
-> difficult to understand partly because many of the comments, labels, and
-> macros are named incorrectly: the lengths mentioned are usually off by a
-> factor of two from the actual code.  Many other things are unnecessarily
-> convoluted as well, e.g. there are many more fold constants than
-> actually needed and some aren't fully reduced.
+On Wed, Jan 30, 2019 at 03:39:10PM +0100, Stephan Mueller wrote:
+> Am Mittwoch, 30. Januar 2019, 11:08:54 CET schrieb Herbert Xu:
 > 
-> This series therefore cleans up all these implementations to be much
-> more maintainable.  I also made some small optimizations where I saw
-> opportunities, resulting in slightly better performance.
+> Hi Herbert,
 > 
-> This is based on top of the pending patches from Ard Biesheuvel.
+> > I'm still not convinced why this needs to go into the crypto API
+> > instead of being hosted in a helper which should achieve pretty
+> > much the same result.
 > 
-> These all pass the new extra self-tests.
-> 
-> Changed since v3:
-> - Added '.arch armv7-a' to arm32 assembly file to fix a build error.
-> - Removed support for len < 16 from the x86 assembly.
-> 
-> Changed since v2:
-> - Removed the unnecessary '__LINUX_ARM_ARCH__ < 7' case.
-> - Added Ard's Acked-by.
-> 
-> Changed since v1:
-> - Moved constants in arm implementation to .rodata.
-> - Eliminated a few instructions from the x86 implementation.
-> - Tweaked a few comments.
-> 
-> Eric Biggers (3):
->   crypto: x86/crct10dif-pcl - cleanup and optimizations
->   crypto: arm/crct10dif-ce - cleanup and optimizations
->   crypto: arm64/crct10dif-ce - cleanup and optimizations
-> 
->  arch/arm/crypto/crct10dif-ce-core.S     | 553 ++++++++---------
->  arch/arm/crypto/crct10dif-ce-glue.c     |   2 +-
->  arch/arm64/crypto/crct10dif-ce-core.S   | 496 +++++++--------
->  arch/arm64/crypto/crct10dif-ce-glue.c   |   4 +-
->  arch/x86/crypto/crct10dif-pcl-asm_64.S  | 782 +++++++-----------------
->  arch/x86/crypto/crct10dif-pclmul_glue.c |  12 +-
->  6 files changed, 729 insertions(+), 1120 deletions(-)
+> How do you propose to handle the FIPS 140-2 related requirements of enforcing 
+> the integrity test result and the known-answer self tests?
 
-All applied.  Thanks.
+We could easily add self-tests for the helper.
+
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
