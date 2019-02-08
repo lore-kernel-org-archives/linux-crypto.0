@@ -6,61 +6,62 @@ X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_NEOMUTT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF0BDC169C4
-	for <linux-crypto@archiver.kernel.org>; Fri,  8 Feb 2019 07:47:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95F65C282CC
+	for <linux-crypto@archiver.kernel.org>; Fri,  8 Feb 2019 07:47:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8504921917
-	for <linux-crypto@archiver.kernel.org>; Fri,  8 Feb 2019 07:47:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 71B5521925
+	for <linux-crypto@archiver.kernel.org>; Fri,  8 Feb 2019 07:47:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726977AbfBHHrH (ORCPT
+        id S1727250AbfBHHr3 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 8 Feb 2019 02:47:07 -0500
-Received: from orcrist.hmeau.com ([104.223.48.154]:34206 "EHLO
+        Fri, 8 Feb 2019 02:47:29 -0500
+Received: from orcrist.hmeau.com ([104.223.48.154]:34212 "EHLO
         deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726004AbfBHHrH (ORCPT
+        with ESMTP id S1726004AbfBHHr3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 8 Feb 2019 02:47:07 -0500
+        Fri, 8 Feb 2019 02:47:29 -0500
 Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
         by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1gs0sL-0000lc-73; Fri, 08 Feb 2019 15:47:05 +0800
+        id 1gs0sh-0000mU-9v; Fri, 08 Feb 2019 15:47:27 +0800
 Received: from herbert by gondobar with local (Exim 4.89)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1gs0sJ-0002SK-Qs; Fri, 08 Feb 2019 15:47:03 +0800
-Date:   Fri, 8 Feb 2019 15:47:03 +0800
+        id 1gs0sg-0002SY-6c; Fri, 08 Feb 2019 15:47:26 +0800
+Date:   Fri, 8 Feb 2019 15:47:26 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     "Singh, Brijesh" <brijesh.singh@amd.com>
-Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "Hook, Gary" <Gary.Hook@amd.com>
-Subject: Re: [PATCH] crypto: ccp - fix the SEV probe in kexec boot path
-Message-ID: <20190208074703.ydqn6u75bbtkurhg@gondor.apana.org.au>
-References: <20190130205710.14268-1-brijesh.singh@amd.com>
+To:     Pankaj Gupta <pankaj.gupta@nxp.com>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Horia Geanta <horia.geanta@nxp.com>,
+        Cristian Stoica <cristian.stoica@nxp.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "stable@vger.kernel.org" <stable@vger.kernel.org>,
+        Arun Pathak <arun.pathak@nxp.com>
+Subject: Re: [PATCH v3] crypto: caam - fixed handling of sg list
+Message-ID: <20190208074726.vusiichoysy5clzx@gondor.apana.org.au>
+References: <20190131070556.44832-1-pankaj.gupta@nxp.com>
+ <20190201070642.71800-1-pankaj.gupta@nxp.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190130205710.14268-1-brijesh.singh@amd.com>
+In-Reply-To: <20190201070642.71800-1-pankaj.gupta@nxp.com>
 User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jan 30, 2019 at 08:57:52PM +0000, Singh, Brijesh wrote:
-> A kexec reboot may leave the firmware in INIT or WORKING state.
-> Currently, we issue PLATFORM_INIT command during the probe without
-> checking the current state. The PLATFORM_INIT command fails if the
-> FW is already in INIT state. Lets check the current state, if FW
-> is not in UNINIT state then transition it to UNINIT before
-> initializing or upgrading the FW.
+On Fri, Feb 01, 2019 at 07:18:20AM +0000, Pankaj Gupta wrote:
+> when the source sg contains more than 1 fragment and
+> destination sg contains 1 fragment, the caam driver
+> mishandle the buffers to be sent to caam.
 > 
-> Signed-off-by: Brijesh Singh <brijesh.singh@amd.com>
-> Cc: Tom Lendacky <thomas.lendacky@amd.com>
-> Cc: Gary Hook <gary.hook@amd.com>
-> Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
+> Fixes: f2147b88b2b1 ("crypto: caam - Convert GCM to new AEAD interface")
+> Cc: <stable@vger.kernel.org> # 4.2+
+> Signed-off-by: Pankaj Gupta <pankaj.gupta@nxp.com>
+> Signed-off-by: Arun Pathak <arun.pathak@nxp.com>
+> Reviewed-by: Horia Geanta <horia.geanta@nxp.com>
 > ---
->  drivers/crypto/ccp/psp-dev.c | 16 ++++++++++++++++
->  1 file changed, 16 insertions(+)
+>  drivers/crypto/caam/caamalg.c | 1 +
+>  1 file changed, 1 insertion(+)
 
 Patch applied.  Thanks.
 -- 
