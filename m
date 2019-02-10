@@ -1,87 +1,137 @@
-Return-Path: <SRS0=cN3k=QQ=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=a+yV=QR=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11322C282C4
-	for <linux-crypto@archiver.kernel.org>; Sat,  9 Feb 2019 21:52:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD29DC282CC
+	for <linux-crypto@archiver.kernel.org>; Sun, 10 Feb 2019 18:46:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C9A292192C
-	for <linux-crypto@archiver.kernel.org>; Sat,  9 Feb 2019 21:52:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1549749143;
-	bh=692inXkzswiXqW3KwoY2XU39G+jQVkY33N0oUEuzNOQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=U5ymcnB+3f7CmJ4dgkDzFAHSRghWlNEkj/M4xW8dmINNMaEn4J6Tne4zA3nc3wk1m
-	 6SJcotbJVg7mgEpODySbL3RUoR0Q3RziAyMeZbnl5c/a/WSewnpC9lAFlPaFhk2pmG
-	 AWhLrupKuauYdtMq33dfXvnVR4cEQU9Ig4bT8GUM=
+	by mail.kernel.org (Postfix) with ESMTP id A973B20873
+	for <linux-crypto@archiver.kernel.org>; Sun, 10 Feb 2019 18:46:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726943AbfBIVwX (ORCPT
+        id S1726118AbfBJSqc (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 9 Feb 2019 16:52:23 -0500
-Received: from mail.kernel.org ([198.145.29.99]:59884 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726898AbfBIVwX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 9 Feb 2019 16:52:23 -0500
-Received: from sol.localdomain (c-107-3-167-184.hsd1.ca.comcast.net [107.3.167.184])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 3737621919;
-        Sat,  9 Feb 2019 21:52:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1549749142;
-        bh=692inXkzswiXqW3KwoY2XU39G+jQVkY33N0oUEuzNOQ=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=CXZRK0XMz/URVsgKX10ryZ78TJT97OlXEXrJI5pibcm91GNpRBEZOjLz9+nnIdFBA
-         Hs7WuGqRVzh9LOqYjo9ByZpm0K+ZCqLmUHneD4XxYFzaMqzdes9EllNCx1ieRF3VtZ
-         a3tksT4OTJkrlFxsFZSII898xIY/n5ljunFKulbk=
-Date:   Sat, 9 Feb 2019 13:52:20 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Iuliana Prodan <iuliana.prodan@nxp.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-imx <linux-imx@nxp.com>
-Subject: Re: [PATCH 0/4] crypto: caam - add ecb mode support
-Message-ID: <20190209215219.GA688@sol.localdomain>
-References: <1549633810-10380-1-git-send-email-iuliana.prodan@nxp.com>
+        Sun, 10 Feb 2019 13:46:32 -0500
+Received: from vmicros1.altlinux.org ([194.107.17.57]:50074 "EHLO
+        vmicros1.altlinux.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726000AbfBJSqc (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 10 Feb 2019 13:46:32 -0500
+Received: from imap.altlinux.org (imap.altlinux.org [194.107.17.38])
+        by vmicros1.altlinux.org (Postfix) with ESMTP id 2889472CC53;
+        Sun, 10 Feb 2019 21:46:29 +0300 (MSK)
+Received: from altlinux.org (sole.flsd.net [185.75.180.6])
+        by imap.altlinux.org (Postfix) with ESMTPSA id 0E3E34A4A14;
+        Sun, 10 Feb 2019 21:46:29 +0300 (MSK)
+Date:   Sun, 10 Feb 2019 21:46:28 +0300
+From:   Vitaly Chikunov <vt@altlinux.org>
+To:     David Howells <dhowells@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 1/4] X.509: Parse public key parameters from x509 for
+ akcipher
+Message-ID: <20190210184628.yupsxgjlaicwbxg6@altlinux.org>
+Mail-Followup-To: David Howells <dhowells@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Mimi Zohar <zohar@linux.vnet.ibm.com>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20190106133608.820-1-vt@altlinux.org>
+ <20190106133608.820-2-vt@altlinux.org>
+ <20190209214240.56gq7ivn3pw3bssf@altlinux.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=koi8-r
 Content-Disposition: inline
-In-Reply-To: <1549633810-10380-1-git-send-email-iuliana.prodan@nxp.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
+In-Reply-To: <20190209214240.56gq7ivn3pw3bssf@altlinux.org>
+User-Agent: NeoMutt/20171215-106-ac61c7
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Iuliana,
-
-On Fri, Feb 08, 2019 at 03:50:06PM +0200, Iuliana Prodan wrote:
-> This patch set adds ecb mode support for aes, des, 3des and arc4 ciphers.
-> skcipher implementation is reused, making sure to handle the no IV case.
+On Sun, Feb 10, 2019 at 12:42:40AM +0300, Vitaly Chikunov wrote:
+> On Sun, Jan 06, 2019 at 04:36:05PM +0300, Vitaly Chikunov wrote:
+> > Some public key algorithms (like ECDSA) keep in parameters field
+> > important data such as digest and curve OIDs (possibly more for
+> > different ECDSA variants). Thus, just setting a public key (as
+> > for RSA) is not enough.
+> > 
+> > Introduce set_params() callback for akcipher which will be used to
+> > pass DER encoded parameters array, with additional argument of
+> > algorithm OID.
+> > 
+> > This is done with the intent of adding support for EC-RDSA (ISO/IEC
+> > 14888-3:2018, RFC 7091, and basically ECDSA variant) public keys (which
+> > will be finally used in IMA subsystem). Thus, also oid_registry.h is
+> > updated.
+> > 
+> > Rationale:
+> > 
+> > - For such keys just setting public key without parameters is
+> >   meaningless, so it would be possible to add parameters in
+> >   crypto_akcipher_set_pub_key (and .set_pub_key) calls. But, this will
+> >   needlessly change API for RSA akcipher. Also, additional callback
+> >   making it possible to pass parameters after
+> >   crypto_akcipher_set_priv_key (and .set_priv_key) in the future.
+> >
+> > - Algorithm OID is passed to be validated in .set_params callback,
+> >   otherwise, it could have the wrong value.
+> > 
+> > - Particular algorithm OIDs are checked in x509_note_params, (because
+> >   this is called from AlgorithmIdentifier (ASN.1) parser, which is
+> >   called multiple times, as it's used multiple times in X.509
+> >   certificate), to distinguish a public key call from a signature call.
+> > 
+> > Signed-off-by: Vitaly Chikunov <vt@altlinux.org>
+> > ---
 > 
-> While here:
-> -fix a DMA API issue where initial src/dst_nents are used instead of nents
-> returned by dma_map_sg()
-> -export arc4 defines in a common header
-> -update cbc des and 3des to check for weak keys 
+> > @@ -263,6 +274,11 @@ int public_key_verify_signature(const struct public_key *pkey,
+> >        if (pkey->key_is_private)
+> >                ret = crypto_akcipher_set_priv_key(tfm,
+> >                                                   pkey->key, pkey->keylen);
+> >        else
+> >                ret = crypto_akcipher_set_pub_key(tfm,
+> >                                                  pkey->key, pkey->keylen);
+> >        if (ret)
+> >                goto error_free_req;
+> > +	ret = crypto_akcipher_set_params(tfm, pkey->algo, pkey->params,
+> > +					 pkey->paramlen);
 > 
-> Iuliana Prodan (4):
->   crypto: caam - use mapped_{src,dst}_nents for job descriptor
->   crypto: export arc4 defines
->   crypto: caam - add ecb(*) support
->   crypto: caam - weak key checking for cbc des, 3des
+> Nobody said anything if this is a good idea to call set_params after
+> set_{pub,priv}_key and not before.
 > 
+> When `struct crypto_akcipher' is allocated ctx data is never zeroed,
+> thus either call will be the first to zero ctx, making these calls not
+> swappable in the future.
+> 
+> Also, algorithm parameters could be interpreted without knowing the key,
+> but the key cannot be interpreted without knowing the parameters.
 
-Do you have an actual use case for adding more DES, 3DES, and ARC4
-implementations, or are you simply adding them because the hardware happens to
-supports it?  These old ciphers are insecure, so IMO more implementations should
-only be added if there is a real use case where they're absolutely needed.
+From the other point of view, set_params may never be called or
+implemented. So, making it called first and move memory zeroing
+into set_params may create more complications than simplicity.
 
-- Eric
+Making both callbacks callable in any order also will not make
+things simpler. (Need to be prepared to be called in different
+order.)
+
+Maybe it's better to make memzero in akcipher_request_alloc() and allow
+optional call to crypto_akcipher_set_params() strictly before
+crypto_akcipher_set_{pub,priv}_key(), so, set_{pub,priv}_key will
+already know everything to set the key properly. set_params may not be
+implemented if akcipher does not need it (as with RSA).
+
+> 
+> > +	if (ret)
+> > +		goto error_free_req;
+> > +
+> >  	ret = -ENOMEM;
+> >  	outlen = crypto_akcipher_maxsize(tfm);
+> >  	output = kmalloc(outlen, GFP_KERNEL);
