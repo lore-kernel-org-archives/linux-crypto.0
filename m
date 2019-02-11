@@ -2,93 +2,160 @@ Return-Path: <SRS0=2CiZ=QS=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE9CCC169C4
-	for <linux-crypto@archiver.kernel.org>; Mon, 11 Feb 2019 21:22:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 566AEC169C4
+	for <linux-crypto@archiver.kernel.org>; Mon, 11 Feb 2019 22:12:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7CB6E217D9
-	for <linux-crypto@archiver.kernel.org>; Mon, 11 Feb 2019 21:22:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1549920161;
-	bh=IyoANoqpk2wK3RkkQMa+VAM4vshcUiRxbNIODqVQ1x0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=bKJBAXiaoYhn5LK9TXAGvf7eYStSi96lWs2pagXp2WiunnsR8WZTRKEABnn89I5Oz
-	 pkxNxtjd4eh4EhYx3IdVOhAozflxGDXEPUcfr0Ciai2HncYvS5g3CDnX91g2XbihyY
-	 X7ytygM6Ktbsz/0YoewoiM7zLfaY7Dyrbn781/lo=
+	by mail.kernel.org (Postfix) with ESMTP id 2E06D218A3
+	for <linux-crypto@archiver.kernel.org>; Mon, 11 Feb 2019 22:12:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726827AbfBKVWk (ORCPT
+        id S1727213AbfBKWMy (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 11 Feb 2019 16:22:40 -0500
-Received: from mail.kernel.org ([198.145.29.99]:56100 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726228AbfBKVWk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 11 Feb 2019 16:22:40 -0500
-Received: from gmail.com (unknown [104.132.1.77])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id CD651214DA;
-        Mon, 11 Feb 2019 21:22:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1549920160;
-        bh=IyoANoqpk2wK3RkkQMa+VAM4vshcUiRxbNIODqVQ1x0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=AAwjxNT65dGgnaRnCDmkRIfNm/OySnExhuz9+l6vmrAa+9oHYb0tuqZWeQ9CtlEOo
-         CwL8pb8yW1aW4k5Jj+zSB5RjUt7SvJu4p1yztQqEchhCOWO4QsOZH8CPTc3TSvcNHW
-         19I5Z7o8vZNH0X0YyU7RGAyNYCl4oZOLULbP0LO0=
-Date:   Mon, 11 Feb 2019 13:22:38 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, tglx@linutronix.de,
-        Corentin Labbe <clabbe@baylibre.com>
-Subject: Re: [PATCH 2/2] crypto: user: remove crypto_cfg_mutex
-Message-ID: <20190211212237.GA226227@gmail.com>
-References: <20190211110251.17377-1-bigeasy@linutronix.de>
- <20190211110251.17377-2-bigeasy@linutronix.de>
+        Mon, 11 Feb 2019 17:12:54 -0500
+Received: from ipmail06.adl2.internode.on.net ([150.101.137.129]:47029 "EHLO
+        ipmail06.adl2.internode.on.net" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726173AbfBKWMy (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 11 Feb 2019 17:12:54 -0500
+Received: from ppp59-167-129-252.static.internode.on.net (HELO dastard) ([59.167.129.252])
+  by ipmail06.adl2.internode.on.net with ESMTP; 12 Feb 2019 08:42:51 +1030
+Received: from dave by dastard with local (Exim 4.80)
+        (envelope-from <david@fromorbit.com>)
+        id 1gtJon-0002HS-4g; Tue, 12 Feb 2019 09:12:49 +1100
+Date:   Tue, 12 Feb 2019 09:12:49 +1100
+From:   Dave Chinner <david@fromorbit.com>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-fscrypt@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net,
+        linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-api@vger.kernel.org,
+        keyrings@vger.kernel.org, Satya Tangirala <satyat@google.com>,
+        Paul Crowley <paulcrowley@google.com>
+Subject: Re: [RFC PATCH v2 11/20] fscrypt: add FS_IOC_REMOVE_ENCRYPTION_KEY
+ ioctl
+Message-ID: <20190211221249.GH20493@dastard>
+References: <20190211172738.4633-1-ebiggers@kernel.org>
+ <20190211172738.4633-12-ebiggers@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190211110251.17377-2-bigeasy@linutronix.de>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20190211172738.4633-12-ebiggers@kernel.org>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Feb 11, 2019 at 12:02:51PM +0100, Sebastian Andrzej Siewior wrote:
-> crypto_cfg_mutex was never used since it got introduced in commit
+On Mon, Feb 11, 2019 at 09:27:29AM -0800, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
 > 
->   cac5818c25d04 ("crypto: user - Implement a generic crypto statistics")
+> Add a new fscrypt ioctl, FS_IOC_REMOVE_ENCRYPTION_KEY.  This ioctl
+> removes an encryption key that was added by FS_IOC_ADD_ENCRYPTION_KEY.
+> It wipes the secret key itself, then "locks" the encrypted files and
+> directories that had been unlocked using that key -- implemented by
+> evicting the relevant dentries and inodes from the VFS caches.
 > 
-> Cc: Corentin Labbe <clabbe@baylibre.com>
-> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-> ---
->  crypto/crypto_user_stat.c | 2 --
->  1 file changed, 2 deletions(-)
+> The problem this solves is that many fscrypt users want the ability to
+> remove encryption keys, causing the corresponding encrypted directories
+> to appear "locked" (presented in ciphertext form) again.  Moreover,
+> users want removing an encryption key to *really* remove it, in the
+> sense that the removed keys cannot be recovered even if kernel memory is
+> compromised, e.g. by the exploit of a kernel security vulnerability or
+> by a physical attack.  This is desirable after a user logs out of the
+> system, for example.  In many cases users even already assume this to be
+> the case and are surprised to hear when it's not.
 > 
-> diff --git a/crypto/crypto_user_stat.c b/crypto/crypto_user_stat.c
-> index 3e9a53233d804..028be6a1ea781 100644
-> --- a/crypto/crypto_user_stat.c
-> +++ b/crypto/crypto_user_stat.c
-> @@ -20,8 +20,6 @@
->  
->  #define null_terminated(x)	(strnlen(x, sizeof(x)) < sizeof(x))
->  
-> -static DEFINE_MUTEX(crypto_cfg_mutex);
-> -
->  extern struct sock *crypto_nlsk;
->  
->  struct crypto_dump_info {
-> -- 
-> 2.20.1
+> It is not sufficient to simply unlink the master key from the keyring
+> (or to revoke or invalidate it), since the actual encryption transform
+> objects are still pinned in memory by their inodes.  Therefore, to
+> really remove a key we must also evict the relevant inodes.
 > 
+> Currently one workaround is to run 'sync && echo 2 >
+> /proc/sys/vm/drop_caches'.  But, that evicts all unused inodes in the
+> system rather than just the inodes associated with the key being
+> removed, causing severe performance problems.  Moreover, it requires
+> root privileges, so regular users can't "lock" their encrypted files.
+> 
+> Another workaround, used in Chromium OS kernels, is to add a new
+> VFS-level ioctl FS_IOC_DROP_CACHE which is a more restricted version of
+> drop_caches that operates on a single super_block.  It does:
+> 
+>         shrink_dcache_sb(sb);
+>         invalidate_inodes(sb, false);
+> 
+> But it's still a hack.  Yet, the major users of filesystem encryption
+> want this feature badly enough that they are actually using these hacks.
+> 
+> To properly solve the problem, start maintaining a list of the inodes
+> which have been "unlocked" using each master key.  Originally this
+> wasn't possible because the kernel didn't keep track of in-use master
+> keys at all.  But, with the ->s_master_keys keyring it is now possible.
+> 
+> Then, add an ioctl FS_IOC_REMOVE_ENCRYPTION_KEY.  It finds the specified
+> master key in ->s_master_keys, then wipes the secret key itself, which
+> prevents any additional inodes from being unlocked with the key.  Then,
+> it syncs the filesystem and evicts the inodes in the key's list.  The
+> normal inode eviction code will free and wipe the per-file keys (in
+> ->i_crypt_info).  Note that freeing ->i_crypt_info without evicting the
+> inodes was also considered, but would have been racy.
 
-Hi Sebastian, this is already removed by a patch queued in cryptodev:
-https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git/commit/?id=554557ce0001fc0371fb88db53d7dfe2a398c6de
+The solution is still so gross. Exporting all the inode cache
+internal functions so you can invalidate an external list of inodes
+is, IMO, not an appropriate solution for anything.
 
-- Eric
+Indeed, this is exactly what ->drop_inode() is for.
+
+Take this function:
+
+> +static void evict_dentries_for_decrypted_inodes(struct fscrypt_master_key *mk)
+> +{
+> +	struct fscrypt_info *ci;
+> +	struct inode *inode;
+> +	struct inode *toput_inode = NULL;
+> +
+> +	spin_lock(&mk->mk_decrypted_inodes_lock);
+> +
+> +	list_for_each_entry(ci, &mk->mk_decrypted_inodes, ci_master_key_link) {
+> +		inode = ci->ci_inode;
+> +		spin_lock(&inode->i_lock);
+> +		if (inode->i_state & (I_FREEING | I_WILL_FREE | I_NEW)) {
+> +			spin_unlock(&inode->i_lock);
+> +			continue;
+> +		}
+> +		__iget(inode);
+> +		spin_unlock(&inode->i_lock);
+> +		spin_unlock(&mk->mk_decrypted_inodes_lock);
+> +
+> +		shrink_dcache_inode(inode);
+> +		iput(toput_inode);
+> +		toput_inode = inode;
+> +
+> +		spin_lock(&mk->mk_decrypted_inodes_lock);
+> +	}
+> +
+> +	spin_unlock(&mk->mk_decrypted_inodes_lock);
+> +	iput(toput_inode);
+> +}
+
+It takes a new reference to each decrypted inode, and then drops it
+again after all the dentry cache references have been killed and
+we've got a reference to the next inode in the list.  Killing the
+dentry references to the inode means it should only have in-use
+references and the reference this function holds on it.
+
+If the inode is not in use then there will be only one, and so it
+will fall into iput_final() and the ->drop_inode() function
+determines if the inode should be evicted from the cache and
+destroyed immediately.  IOWs, implement fscrypt_drop_inode() to do
+the right thing when the key has been destroyed, and you can get rid
+of all this crazy inode cache walk-and-invalidate hackery.
+
+Cheers,
+
+Dave.
+-- 
+Dave Chinner
+david@fromorbit.com
