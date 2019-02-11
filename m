@@ -2,218 +2,99 @@ Return-Path: <SRS0=2CiZ=QS=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E3A3C169C4
-	for <linux-crypto@archiver.kernel.org>; Mon, 11 Feb 2019 11:46:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49952C169C4
+	for <linux-crypto@archiver.kernel.org>; Mon, 11 Feb 2019 12:51:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7914D2070B
-	for <linux-crypto@archiver.kernel.org>; Mon, 11 Feb 2019 11:46:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ED028214DA
+	for <linux-crypto@archiver.kernel.org>; Mon, 11 Feb 2019 12:51:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="Iv8RIXdz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726041AbfBKLqd (ORCPT
+        id S1727140AbfBKMvp (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 11 Feb 2019 06:46:33 -0500
-Received: from inva021.nxp.com ([92.121.34.21]:52530 "EHLO inva021.nxp.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726883AbfBKLqd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 11 Feb 2019 06:46:33 -0500
-Received: from inva021.nxp.com (localhost [127.0.0.1])
-        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 5224F2000CC;
-        Mon, 11 Feb 2019 12:46:30 +0100 (CET)
-Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
-        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 3FD25200009;
-        Mon, 11 Feb 2019 12:46:30 +0100 (CET)
-Received: from enigma.ea.freescale.net (enigma.ea.freescale.net [10.171.81.110])
-        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id E214B205FA;
-        Mon, 11 Feb 2019 12:46:29 +0100 (CET)
-From:   =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     "David S. Miller" <davem@davemloft.net>,
+        Mon, 11 Feb 2019 07:51:45 -0500
+Received: from mail-eopbgr60077.outbound.protection.outlook.com ([40.107.6.77]:32689
+        "EHLO EUR04-DB3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727106AbfBKMvo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 11 Feb 2019 07:51:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=qQ/A6SqaOspMG+ehvE2Je4+NCCnnoeB25UiVle5yn14=;
+ b=Iv8RIXdzAStHVGU6d+BoWLFo2gfByfT07njjccCezcGysqlsx1VZvdI+0Lk6KxkYR1Iq9CxeEilMSUD0OaqvdHzt3w4Qqy0aVPtYS6emcAnj4zdZTAbSsbOzcJD6JzsGTPjY/AvUoo/+6t2AoKbG+9qjfh9pGE6EXEr0BPgbLPk=
+Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
+ VI1PR0402MB3664.eurprd04.prod.outlook.com (52.134.15.18) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1601.21; Mon, 11 Feb 2019 12:51:40 +0000
+Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
+ ([fe80::f51e:1692:77db:b931]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
+ ([fe80::f51e:1692:77db:b931%6]) with mapi id 15.20.1601.023; Mon, 11 Feb 2019
+ 12:51:40 +0000
+From:   Horia Geanta <horia.geanta@nxp.com>
+To:     Wen Yang <yellowriver2010@hotmail.com>,
         Aymen Sghaier <aymen.sghaier@nxp.com>,
-        linux-crypto@vger.kernel.org, Leo Li <leoyang.li@nxp.com>,
-        Roy Pledge <roy.pledge@nxp.com>,
-        Vakul Garg <vakul.garg@nxp.com>
-Subject: [PATCH 1/3] crypto: caam/qi2 - use affine DPIOs
-Date:   Mon, 11 Feb 2019 13:46:12 +0200
-Message-Id: <20190211114614.24748-2-horia.geanta@nxp.com>
-X-Mailer: git-send-email 2.16.2
-In-Reply-To: <20190211114614.24748-1-horia.geanta@nxp.com>
-References: <20190211114614.24748-1-horia.geanta@nxp.com>
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>
+CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v3] crypto: caam - add missing put_device() call
+Thread-Topic: [PATCH v3] crypto: caam - add missing put_device() call
+Thread-Index: AQHUwgWo2AboFXVoTkSR17x7SBHQ9Q==
+Date:   Mon, 11 Feb 2019 12:51:40 +0000
+Message-ID: <VI1PR0402MB3485B70D86FA9D9A06C770C698640@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+References: <HK0PR02MB36344FD6A5ECF3B220D7B55CB2640@HK0PR02MB3634.apcprd02.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [86.34.165.90]
+x-ms-publictraffictype: Email
+x-microsoft-exchange-diagnostics: 1;VI1PR0402MB3664;6:Yn4oDGP3TVWjczR45/molD1EOf6ejeobxVqXk8nJ1wr/2yWOOuyLkGViog3AqDnOU5OR50vfIeewON5lEqfICQqWXFQQPnJhW5nAEgSZcOdA1pwQvXTNpoaycQm73dmHxMJzqQPoP9J9pivIXxeRZlxk/bY/aTNJQoBRAdhgGgsyMQMIiVhCnCURIkE0WVK/6ANRADcAqhD0lht9veF9GHjwkjodBTVkE41nSQLHCw4VM71xFLbBOkajKk1+33jV84CwiX5QrVTv0LGrR7tHYirmCQfGZxUin/26FLjXfoXBQTqj0MCRcpfw4o3CIxYQ2CuEkLqeRRLuQ5TS6ycJ88r54CvVq2Q6UGjOWsBCEHUryeNqemKwEaw2vOtCnYo96OCSbIg8g2hqzW56U0DsdPiTqLpWi0lPV6S88zdEZC4RT7s9hHJB6pfd8IbY25AW+PbbXV/d4joTLNlAAVLYEw==;5:KL1Eb+rj1iOJi2V4zE8QpXsPP81s+DehBitT4t2uduHhzUXZj+4i93iRcFtGpXe9B4H1uHYHS+t/cp9CNzlmWJmQ35dM0QvERd1D37bH8Dw8uBwXmYdBM04Eb8vbZVmtqWvjqyGdmIcJFi2HlngiDizeP/1iEB5XRpmoTqGyxLe+DxbulSDMmsjXf3PszTCIqYJUJvCoBvzLP5ORl6WHFQ==;7:zGCsYlC3Wd7csaifohZUOTjSdOqurheiLKuNvvE0lRtmIgPjzeg2pnCZF/MJMkYpcanLjyHIWvt6/AuBUh6xx5kGTLePaOfUrEkRfO91PzNX/JGdNGF+JM8u1szo5Ojoofr/HzfSJBybk0rkb5DfTw==
+x-ms-office365-filtering-correlation-id: b4ae3817-e0df-4b70-1685-08d6901fab0c
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(5600110)(711020)(4605077)(4618075)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7153060)(7193020);SRVR:VI1PR0402MB3664;
+x-ms-traffictypediagnostic: VI1PR0402MB3664:
+x-microsoft-antispam-prvs: <VI1PR0402MB3664B583059A499CFC5A086398640@VI1PR0402MB3664.eurprd04.prod.outlook.com>
+x-forefront-prvs: 0945B0CC72
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(366004)(396003)(39860400002)(346002)(136003)(376002)(199004)(189003)(9686003)(8936002)(106356001)(110136005)(99286004)(7696005)(33656002)(476003)(102836004)(446003)(186003)(26005)(54906003)(4744005)(71190400001)(53546011)(6506007)(6346003)(71200400001)(76176011)(55016002)(105586002)(68736007)(6436002)(8676002)(81166006)(81156014)(66066001)(229853002)(25786009)(6116002)(3846002)(74316002)(4326008)(2501003)(316002)(97736004)(7736002)(2906002)(44832011)(486006)(6246003)(305945005)(14454004)(478600001)(53936002)(256004)(86362001);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB3664;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: nxp.com does not designate
+ permitted sender hosts)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=horia.geanta@nxp.com; 
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: qWYwJ/SV9OlO3bUmCsAi2IHcq9zZxOeAPdq1dqwJI17lTcE7mM+ECaKZ52SoDX0yWbc//u9nlnENbyVl2aoTwUodAGoXA31G+/ZWKSzdDf4qkjTcdRSM/4ebJkTVb4xtkqA2fsyvvDiZkp5sDWe7xI7CnnrRFnWlBpAIesKBcVQ00Q0DOLmiOaOc1nNOOwE+VPlJuZ9rZT55cJM58QE+7P98eUTYMNS2bk4XiBYDmfOGyDiDLFaXtxSZv0vWQgX2jJPMQse5zWlnoSfCn0qBtYmpD9hui5nSDELWZGwp/r92YBagQ/TDMR/prwjaNQMo78sujp4TYaYur1CHWeLCC9Xou8CXewTUzB64DpjgZXC3sYPvNFOvAsOdzkhkssRXNHfxbxMTwti2PkiAG2f89mD9QCTHsWS4J6KDRg/JCJc=
+Content-Type: text/plain; charset="iso-8859-2"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: ClamAV using ClamSMTP
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b4ae3817-e0df-4b70-1685-08d6901fab0c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Feb 2019 12:51:40.5724
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3664
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Driver was relying on an older DPIO API, which provided a CPU-affine DPIO
-in case it was called with preemption disabled.
-
-Since this is no longer the case, save the CPU-affine DPIO in per-cpu
-private structure during setup and further use it on the hot path.
-
-Note that preemption is no longer disabled while trying to enqueue an
-FD. Thus it might be possible to run the enqueue on a different CPU
-(due to migration, when in process context), however this wouldn't be a
-functionality issue.
-Since we allow for all cores to enqueue, we take care of data
-structures setup to handle the case when number of (Rx, Tx) queue pairs
-is smaller than number of cores.
-
-Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
----
- drivers/crypto/caam/caamalg_qi2.c | 52 ++++++++++++++++++++++-----------------
- drivers/crypto/caam/caamalg_qi2.h |  2 ++
- 2 files changed, 31 insertions(+), 23 deletions(-)
-
-diff --git a/drivers/crypto/caam/caamalg_qi2.c b/drivers/crypto/caam/caamalg_qi2.c
-index 185365a35772..ce27c88e750f 100644
---- a/drivers/crypto/caam/caamalg_qi2.c
-+++ b/drivers/crypto/caam/caamalg_qi2.c
-@@ -4502,7 +4502,8 @@ static int __cold dpaa2_dpseci_dpio_setup(struct dpaa2_caam_priv *priv)
- 		nctx->cb = dpaa2_caam_fqdan_cb;
- 
- 		/* Register notification callbacks */
--		err = dpaa2_io_service_register(NULL, nctx, dev);
-+		ppriv->dpio = dpaa2_io_service_select(cpu);
-+		err = dpaa2_io_service_register(ppriv->dpio, nctx, dev);
- 		if (unlikely(err)) {
- 			dev_dbg(dev, "No affine DPIO for cpu %d\n", cpu);
- 			nctx->cb = NULL;
-@@ -4535,7 +4536,7 @@ static int __cold dpaa2_dpseci_dpio_setup(struct dpaa2_caam_priv *priv)
- 		ppriv = per_cpu_ptr(priv->ppriv, cpu);
- 		if (!ppriv->nctx.cb)
- 			break;
--		dpaa2_io_service_deregister(NULL, &ppriv->nctx, dev);
-+		dpaa2_io_service_deregister(ppriv->dpio, &ppriv->nctx, dev);
- 	}
- 
- 	for_each_online_cpu(cpu) {
-@@ -4555,7 +4556,8 @@ static void __cold dpaa2_dpseci_dpio_free(struct dpaa2_caam_priv *priv)
- 
- 	for_each_online_cpu(cpu) {
- 		ppriv = per_cpu_ptr(priv->ppriv, cpu);
--		dpaa2_io_service_deregister(NULL, &ppriv->nctx, priv->dev);
-+		dpaa2_io_service_deregister(ppriv->dpio, &ppriv->nctx,
-+					    priv->dev);
- 		dpaa2_io_store_destroy(ppriv->store);
- 
- 		if (++i == priv->num_pairs)
-@@ -4653,7 +4655,7 @@ static int dpaa2_caam_pull_fq(struct dpaa2_caam_priv_per_cpu *ppriv)
- 
- 	/* Retry while portal is busy */
- 	do {
--		err = dpaa2_io_service_pull_fq(NULL, ppriv->rsp_fqid,
-+		err = dpaa2_io_service_pull_fq(ppriv->dpio, ppriv->rsp_fqid,
- 					       ppriv->store);
- 	} while (err == -EBUSY);
- 
-@@ -4721,7 +4723,7 @@ static int dpaa2_dpseci_poll(struct napi_struct *napi, int budget)
- 
- 	if (cleaned < budget) {
- 		napi_complete_done(napi, cleaned);
--		err = dpaa2_io_service_rearm(NULL, &ppriv->nctx);
-+		err = dpaa2_io_service_rearm(ppriv->dpio, &ppriv->nctx);
- 		if (unlikely(err))
- 			dev_err(priv->dev, "Notification rearm failed: %d\n",
- 				err);
-@@ -4862,21 +4864,31 @@ static int __cold dpaa2_dpseci_setup(struct fsl_mc_device *ls_dev)
- 
- 	i = 0;
- 	for_each_online_cpu(cpu) {
--		dev_dbg(dev, "pair %d: rx queue %d, tx queue %d\n", i,
--			priv->rx_queue_attr[i].fqid,
--			priv->tx_queue_attr[i].fqid);
-+		u8 j;
-+
-+		j = i % priv->num_pairs;
- 
- 		ppriv = per_cpu_ptr(priv->ppriv, cpu);
--		ppriv->req_fqid = priv->tx_queue_attr[i].fqid;
--		ppriv->rsp_fqid = priv->rx_queue_attr[i].fqid;
--		ppriv->prio = i;
-+		ppriv->req_fqid = priv->tx_queue_attr[j].fqid;
-+
-+		/*
-+		 * Allow all cores to enqueue, while only some of them
-+		 * will take part in dequeuing.
-+		 */
-+		if (++i > priv->num_pairs)
-+			continue;
-+
-+		ppriv->rsp_fqid = priv->rx_queue_attr[j].fqid;
-+		ppriv->prio = j;
-+
-+		dev_dbg(dev, "pair %d: rx queue %d, tx queue %d\n", j,
-+			priv->rx_queue_attr[j].fqid,
-+			priv->tx_queue_attr[j].fqid);
- 
- 		ppriv->net_dev.dev = *dev;
- 		INIT_LIST_HEAD(&ppriv->net_dev.napi_list);
- 		netif_napi_add(&ppriv->net_dev, &ppriv->napi, dpaa2_dpseci_poll,
- 			       DPAA2_CAAM_NAPI_WEIGHT);
--		if (++i == priv->num_pairs)
--			break;
- 	}
- 
- 	return 0;
-@@ -5228,7 +5240,8 @@ int dpaa2_caam_enqueue(struct device *dev, struct caam_request *req)
- {
- 	struct dpaa2_fd fd;
- 	struct dpaa2_caam_priv *priv = dev_get_drvdata(dev);
--	int err = 0, i, id;
-+	struct dpaa2_caam_priv_per_cpu *ppriv;
-+	int err = 0, i;
- 
- 	if (IS_ERR(req))
- 		return PTR_ERR(req);
-@@ -5258,20 +5271,13 @@ int dpaa2_caam_enqueue(struct device *dev, struct caam_request *req)
- 	dpaa2_fd_set_len(&fd, dpaa2_fl_get_len(&req->fd_flt[1]));
- 	dpaa2_fd_set_flc(&fd, req->flc_dma);
- 
--	/*
--	 * There is no guarantee that preemption is disabled here,
--	 * thus take action.
--	 */
--	preempt_disable();
--	id = smp_processor_id() % priv->dpseci_attr.num_tx_queues;
-+	ppriv = this_cpu_ptr(priv->ppriv);
- 	for (i = 0; i < (priv->dpseci_attr.num_tx_queues << 1); i++) {
--		err = dpaa2_io_service_enqueue_fq(NULL,
--						  priv->tx_queue_attr[id].fqid,
-+		err = dpaa2_io_service_enqueue_fq(ppriv->dpio, ppriv->req_fqid,
- 						  &fd);
- 		if (err != -EBUSY)
- 			break;
- 	}
--	preempt_enable();
- 
- 	if (unlikely(err)) {
- 		dev_err(dev, "Error enqueuing frame: %d\n", err);
-diff --git a/drivers/crypto/caam/caamalg_qi2.h b/drivers/crypto/caam/caamalg_qi2.h
-index 9823bdefd029..20890780fb82 100644
---- a/drivers/crypto/caam/caamalg_qi2.h
-+++ b/drivers/crypto/caam/caamalg_qi2.h
-@@ -76,6 +76,7 @@ struct dpaa2_caam_priv {
-  * @nctx: notification context of response FQ
-  * @store: where dequeued frames are stored
-  * @priv: backpointer to dpaa2_caam_priv
-+ * @dpio: portal used for data path operations
-  */
- struct dpaa2_caam_priv_per_cpu {
- 	struct napi_struct napi;
-@@ -86,6 +87,7 @@ struct dpaa2_caam_priv_per_cpu {
- 	struct dpaa2_io_notification_ctx nctx;
- 	struct dpaa2_io_store *store;
- 	struct dpaa2_caam_priv *priv;
-+	struct dpaa2_io *dpio;
- };
- 
- /*
--- 
-2.16.2
-
+On 2/11/2019 2:31 PM, Wen Yang wrote:=0A=
+> The of_find_device_by_node() takes a reference to the underlying device=
+=0A=
+> structure, we should release that reference.=0A=
+> =0A=
+> Fixes: 35af64038623 ("crypto: caam - Check for CAAM block presence before=
+ registering with crypto layer")=0A=
+Fixes: b189817cf789 ("crypto: caam/qi - add ablkcipher and authenc algorith=
+ms")=0A=
+=0A=
+> Signed-off-by: Wen Yang <yellowriver2010@hotmail.com>=0A=
+Reviewed-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
+=0A=
+Thanks,=0A=
+Horia=0A=
