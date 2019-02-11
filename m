@@ -2,97 +2,93 @@ Return-Path: <SRS0=2CiZ=QS=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CEB6C169C4
-	for <linux-crypto@archiver.kernel.org>; Mon, 11 Feb 2019 18:55:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE9CCC169C4
+	for <linux-crypto@archiver.kernel.org>; Mon, 11 Feb 2019 21:22:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 33EBF21B69
-	for <linux-crypto@archiver.kernel.org>; Mon, 11 Feb 2019 18:55:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7CB6E217D9
+	for <linux-crypto@archiver.kernel.org>; Mon, 11 Feb 2019 21:22:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1549920161;
+	bh=IyoANoqpk2wK3RkkQMa+VAM4vshcUiRxbNIODqVQ1x0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=bKJBAXiaoYhn5LK9TXAGvf7eYStSi96lWs2pagXp2WiunnsR8WZTRKEABnn89I5Oz
+	 pkxNxtjd4eh4EhYx3IdVOhAozflxGDXEPUcfr0Ciai2HncYvS5g3CDnX91g2XbihyY
+	 X7ytygM6Ktbsz/0YoewoiM7zLfaY7Dyrbn781/lo=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728090AbfBKSzd (ORCPT
+        id S1726827AbfBKVWk (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 11 Feb 2019 13:55:33 -0500
-Received: from gateway24.websitewelcome.com ([192.185.50.252]:49165 "EHLO
-        gateway24.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726228AbfBKSzd (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 11 Feb 2019 13:55:33 -0500
-X-Greylist: delayed 1437 seconds by postgrey-1.27 at vger.kernel.org; Mon, 11 Feb 2019 13:55:32 EST
-Received: from cm16.websitewelcome.com (cm16.websitewelcome.com [100.42.49.19])
-        by gateway24.websitewelcome.com (Postfix) with ESMTP id 7B31E3AA409
-        for <linux-crypto@vger.kernel.org>; Mon, 11 Feb 2019 12:31:34 -0600 (CST)
-Received: from gator4166.hostgator.com ([108.167.133.22])
-        by cmsmtp with SMTP
-        id tGMggeVS94FKptGMggzPez; Mon, 11 Feb 2019 12:31:34 -0600
-X-Authority-Reason: nr=8
-Received: from [189.250.49.191] (port=42244 helo=embeddedor)
-        by gator4166.hostgator.com with esmtpa (Exim 4.91)
-        (envelope-from <gustavo@embeddedor.com>)
-        id 1gtGMf-0027zH-MN; Mon, 11 Feb 2019 12:31:33 -0600
-Date:   Mon, 11 Feb 2019 12:31:31 -0600
-From:   "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-To:     Gilad Ben-Yossef <gilad@benyossef.com>,
+        Mon, 11 Feb 2019 16:22:40 -0500
+Received: from mail.kernel.org ([198.145.29.99]:56100 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726228AbfBKVWk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 11 Feb 2019 16:22:40 -0500
+Received: from gmail.com (unknown [104.132.1.77])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id CD651214DA;
+        Mon, 11 Feb 2019 21:22:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1549920160;
+        bh=IyoANoqpk2wK3RkkQMa+VAM4vshcUiRxbNIODqVQ1x0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=AAwjxNT65dGgnaRnCDmkRIfNm/OySnExhuz9+l6vmrAa+9oHYb0tuqZWeQ9CtlEOo
+         CwL8pb8yW1aW4k5Jj+zSB5RjUt7SvJu4p1yztQqEchhCOWO4QsOZH8CPTc3TSvcNHW
+         19I5Z7o8vZNH0X0YyU7RGAyNYCl4oZOLULbP0LO0=
+Date:   Mon, 11 Feb 2019 13:22:38 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc:     linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        Kees Cook <keescook@chromium.org>
-Subject: [PATCH] crypto: ccree - fix missing break in switch statement
-Message-ID: <20190211183131.GA19193@embeddedor>
+        "David S. Miller" <davem@davemloft.net>, tglx@linutronix.de,
+        Corentin Labbe <clabbe@baylibre.com>
+Subject: Re: [PATCH 2/2] crypto: user: remove crypto_cfg_mutex
+Message-ID: <20190211212237.GA226227@gmail.com>
+References: <20190211110251.17377-1-bigeasy@linutronix.de>
+ <20190211110251.17377-2-bigeasy@linutronix.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - embeddedor.com
-X-BWhitelist: no
-X-Source-IP: 189.250.49.191
-X-Source-L: No
-X-Exim-ID: 1gtGMf-0027zH-MN
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: (embeddedor) [189.250.49.191]:42244
-X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 27
-X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
-X-Local-Domain: yes
+In-Reply-To: <20190211110251.17377-2-bigeasy@linutronix.de>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add missing break statement in order to prevent the code from falling
-through to case S_DIN_to_DES.
+On Mon, Feb 11, 2019 at 12:02:51PM +0100, Sebastian Andrzej Siewior wrote:
+> crypto_cfg_mutex was never used since it got introduced in commit
+> 
+>   cac5818c25d04 ("crypto: user - Implement a generic crypto statistics")
+> 
+> Cc: Corentin Labbe <clabbe@baylibre.com>
+> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> ---
+>  crypto/crypto_user_stat.c | 2 --
+>  1 file changed, 2 deletions(-)
+> 
+> diff --git a/crypto/crypto_user_stat.c b/crypto/crypto_user_stat.c
+> index 3e9a53233d804..028be6a1ea781 100644
+> --- a/crypto/crypto_user_stat.c
+> +++ b/crypto/crypto_user_stat.c
+> @@ -20,8 +20,6 @@
+>  
+>  #define null_terminated(x)	(strnlen(x, sizeof(x)) < sizeof(x))
+>  
+> -static DEFINE_MUTEX(crypto_cfg_mutex);
+> -
+>  extern struct sock *crypto_nlsk;
+>  
+>  struct crypto_dump_info {
+> -- 
+> 2.20.1
+> 
 
-This bug was found thanks to the ongoing efforts to enable
--Wimplicit-fallthrough.
+Hi Sebastian, this is already removed by a patch queued in cryptodev:
+https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git/commit/?id=554557ce0001fc0371fb88db53d7dfe2a398c6de
 
-Fixes: 63ee04c8b491 ("crypto: ccree - add skcipher support")
-Cc: stable@vger.kernel.org
-Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
----
- drivers/crypto/ccree/cc_cipher.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/crypto/ccree/cc_cipher.c b/drivers/crypto/ccree/cc_cipher.c
-index 5e3361a363b5..d9c17078517b 100644
---- a/drivers/crypto/ccree/cc_cipher.c
-+++ b/drivers/crypto/ccree/cc_cipher.c
-@@ -80,6 +80,7 @@ static int validate_keys_sizes(struct cc_cipher_ctx *ctx_p, u32 size)
- 		default:
- 			break;
- 		}
-+		break;
- 	case S_DIN_to_DES:
- 		if (size == DES3_EDE_KEY_SIZE || size == DES_KEY_SIZE)
- 			return 0;
--- 
-2.20.1
-
+- Eric
