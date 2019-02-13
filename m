@@ -1,203 +1,149 @@
-Return-Path: <SRS0=oCQ2=QT=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=2+RY=QU=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5D80C282CE
-	for <linux-crypto@archiver.kernel.org>; Tue, 12 Feb 2019 12:55:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B868AC282CE
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Feb 2019 08:32:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AF1302084E
-	for <linux-crypto@archiver.kernel.org>; Tue, 12 Feb 2019 12:55:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RhSFa4SB"
+	by mail.kernel.org (Postfix) with ESMTP id 93B2D222C0
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Feb 2019 08:32:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729140AbfBLMzY (ORCPT
+        id S2403804AbfBMIcE (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 12 Feb 2019 07:55:24 -0500
-Received: from mail-vs1-f65.google.com ([209.85.217.65]:44387 "EHLO
-        mail-vs1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727312AbfBLMzX (ORCPT
+        Wed, 13 Feb 2019 03:32:04 -0500
+Received: from regular1.263xmail.com ([211.150.99.134]:55360 "EHLO
+        regular1.263xmail.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1733179AbfBMIcE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 12 Feb 2019 07:55:23 -0500
-Received: by mail-vs1-f65.google.com with SMTP id r201so1467862vsc.11
-        for <linux-crypto@vger.kernel.org>; Tue, 12 Feb 2019 04:55:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=DIKige9dZTqFRJNAYb0OrMSYW+c/EwZN2KD7sQCZWWk=;
-        b=RhSFa4SBU71AwfbOX/ckWSqd1dgUUFcc5nU+Y1fM2ZFY09PPQSBu8JvXQ9IB15vtyR
-         FEr5zx8sf/niYS3KPCOXKURMizWaGwgRRODuX15K8z+jPV6Mfw2j9XIytne7mrj6wG73
-         +OPtMwZk/VzFzVduhu5lyWus85ODvwbFCNm65B6UGfh9GnatRF4Sib16XV1x4mf6rMNc
-         yaoDp7NUXNICrry8ivgjQzKd8odQjY0Nr16G8P0cvTSkOls/YlxgJ0KAhBvqGWhyYo8Z
-         T/Jtqiz/xadhFpsFP0DCYvB8SiE0fWRoz3x+k1fD5GtXvMPUUZmgmHCVywmWInxk+TnA
-         4iIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=DIKige9dZTqFRJNAYb0OrMSYW+c/EwZN2KD7sQCZWWk=;
-        b=RbALVYCU4FuAxT5BHGqOKSOhHDVRKuakq36EQXQS0rz4+5yJOX1u+h2E1jiQfWClHB
-         9LMYElyhKmFvVIR9/MZK1Y/v1eisyTEBaosp7f+0zy7CehudjR7fPtJWGZEzF4rjq9wh
-         ptraoIY0f1tpQhXEKne3ePhtSaVhjXzx9NwAKb4l4LTCwOJGtAn0M/sOujSMxeflzznm
-         Yty0XVQytwusMACvyTkKd9dRZzZ5I/mr0IraaUChjTfvNIVMxeeIIqdft8mak8iRFHeh
-         GItrpkIJ+czllc/bK+KZDeqrpcTfxrTwj1LB+LtTMBrRmYaBtzFuGTbcdTijiYYHc3/B
-         Towg==
-X-Gm-Message-State: AHQUAuZZMOc5qNvHo/ey3WXQXiZY0+vlMbD8JPqP1I3B1TZYJpHKWod3
-        DNqJVfyz5BQXjbwftKWmMbbRfRhHyUCOiiwPYH4GTg==
-X-Google-Smtp-Source: AHgI3IbDIthD0Ym9Rg/49mRggo17etucCnnaz65WXx6Em8M/NOOTNU5hTHN03iuXg7bvLt7l7QnzIbv1kTCc+LoiitU=
-X-Received: by 2002:a67:8cc2:: with SMTP id o185mr1384485vsd.55.1549976122034;
- Tue, 12 Feb 2019 04:55:22 -0800 (PST)
-MIME-Version: 1.0
-References: <1548740978-28495-1-git-send-email-sumit.garg@linaro.org>
- <CAKv+Gu_RJHb_FwTz+R1bXNQQMsoi0xxcKzn54NF5ib3z2xnH0w@mail.gmail.com>
- <CAFA6WYMXSZPz2qi9+g=EW3+Lm_vuNAOE_M2zWQ_RkfwLfkwjyQ@mail.gmail.com> <CAKv+Gu-aHENw3xO8E4UrxWONL+xccTt=no0o8xVWfCO0k35p0w@mail.gmail.com>
-In-Reply-To: <CAKv+Gu-aHENw3xO8E4UrxWONL+xccTt=no0o8xVWfCO0k35p0w@mail.gmail.com>
-From:   Sumit Garg <sumit.garg@linaro.org>
-Date:   Tue, 12 Feb 2019 18:25:11 +0530
-Message-ID: <CAFA6WYNbLMOdR6mQSC=ywS0EpfCTSGQ16Qr_xBc13AzW_d-FGA@mail.gmail.com>
-Subject: Re: [PATCH v6 0/4] Introduce TEE bus driver framework
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc:     Jens Wiklander <jens.wiklander@linaro.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Masahiro Yamada <yamada.masahiro@socionext.com>,
-        Michal Marek <michal.lkml@markovi.net>,
-        Matt Mackall <mpm@selenic.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Daniel Thompson <daniel.thompson@linaro.org>,
-        Bhupesh Sharma <bhsharma@redhat.com>, tee-dev@lists.linaro.org
-Content-Type: text/plain; charset="UTF-8"
+        Wed, 13 Feb 2019 03:32:04 -0500
+X-Greylist: delayed 388 seconds by postgrey-1.27 at vger.kernel.org; Wed, 13 Feb 2019 03:32:02 EST
+Received: from zhangzj?rock-chips.com (unknown [192.168.167.41])
+        by regular1.263xmail.com (Postfix) with ESMTP id 21788400;
+        Wed, 13 Feb 2019 16:25:45 +0800 (CST)
+X-263anti-spam: KSV:0;
+X-MAIL-GRAY: 0
+X-MAIL-DELIVERY: 1
+X-KSVirus-check: 0
+X-ABS-CHECKED: 4
+Received: from localhost.localdomain (unknown [58.22.7.114])
+        by smtp.263.net (postfix) whith ESMTP id P20138T140378590148352S1550046325362301_;
+        Wed, 13 Feb 2019 16:25:44 +0800 (CST)
+X-IP-DOMAINF: 1
+X-UNIQUE-TAG: <747d10dbc1b910663d1d01d3c6ce9de3>
+X-RL-SENDER: zhangzj@rock-chips.com
+X-SENDER: zhangzj@rock-chips.com
+X-LOGIN-NAME: zhangzj@rock-chips.com
+X-FST-TO: herbert@gondor.apana.org.au
+X-SENDER-IP: 58.22.7.114
+X-ATTACHMENT-NUM: 0
+X-DNS-TYPE: 0
+From:   zhangzj@rock-chips.com
+To:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
+Cc:     heiko@sntech.de, ebiggers@google.com, huangtao@rock-chips.com,
+        Zhang Zhijie <zhangzj@rock-chips.com>, stable@vger.kernel.org
+Subject: [PATCH 2/2] crypto: rockchip - update new iv to device in multiple operations
+Date:   Wed, 13 Feb 2019 16:24:39 +0800
+Message-Id: <20190213082439.22138-2-zhangzj@rock-chips.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190213082439.22138-1-zhangzj@rock-chips.com>
+References: <20190213082439.22138-1-zhangzj@rock-chips.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 12 Feb 2019 at 17:41, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
->
-> On Tue, 12 Feb 2019 at 13:09, Sumit Garg <sumit.garg@linaro.org> wrote:
-> >
-> > On Tue, 12 Feb 2019 at 16:35, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
-> > >
-> > > On Tue, 29 Jan 2019 at 06:50, Sumit Garg <sumit.garg@linaro.org> wrote:
-> > > >
-> > > > This series introduces a generic TEE bus driver concept for TEE based
-> > > > kernel drivers which would like to communicate with TEE based devices/
-> > > > services.
-> > > >
-> > > > Patch #1 adds TEE bus concept where devices/services are identified via
-> > > > Universally Unique Identifier (UUID) and drivers register a table of
-> > > > device UUIDs which they can support. This concept also allows for device
-> > > > enumeration to be specific to corresponding TEE implementation like
-> > > > OP-TEE etc.
-> > > >
-> > > > Patch #2 adds supp_nowait flag for non-blocking requests arising via
-> > > > TEE internal client interface.
-> > > >
-> > > > Patch #3 adds TEE bus device enumeration support for OP-TEE. OP-TEE
-> > > > provides a pseudo TA to enumerate TAs which can act as devices/services
-> > > > for TEE bus.
-> > > >
-> > > > Patch #4 adds OP-TEE based hwrng driver which act as TEE bus driver.
-> > > > On ARM SoC's with TrustZone enabled, peripherals like entropy sources
-> > > > might not be accessible to normal world (linux in this case) and rather
-> > > > accessible to secure world (OP-TEE in this case) only. So this driver
-> > > > aims to provides a generic interface to OP-TEE based random number
-> > > > generator service.
-> > > >
-> > > > Example case is Developerbox based on Socionext's Synquacer SoC [1]
-> > > > which provides 7 thermal sensors accessible from secure world only which
-> > > > could be used as entropy sources (thermal/measurement noise).
-> > > >
-> > > > [1] https://www.96boards.org/product/developerbox/
-> > > >
-> > > > Changes in v6:
-> > > >
-> > > > 1. Incorporate some nitpicks in patch #1 and #3.
-> > > > 2. Bundle all statics in a data structure in patch #4 and use dev_*
-> > > >    instead of pr_*.
-> > > > 3. Add reviewed-by tags for patch #1, #2 and #3.
-> > > >
-> > > > Changes in v5:
-> > > >
-> > > > 1. Add support in module device table for TEE bus devices.
-> > > > 2. Correct license for optee-rng module.
-> > > >
-> > > > Changes in v4:
-> > > >
-> > > > 1. Use typedef instead of single member tee_client_device_id struct.
-> > > > 2. Incorporate TEE bus nitpicks.
-> > > >
-> > > > Changes in v3:
-> > > >
-> > > > 1. Fixed bus error path in Patch #1.
-> > > > 2. Reversed order of Patch #2 and #3.
-> > > > 3. Fixed miscellaneous syntax comments and memory leak.
-> > > > 4. Added comments in Patch #2 for supp_nowait flag.
-> > > >
-> > > > Changes in v2:
-> > > >
-> > > > Based on review comments, the scope of this series has increased as
-> > > > follows:
-> > > >
-> > > > 1. Added TEE bus driver framework.
-> > > > 2. Added OP-TEE based device enumeration.
-> > > > 3. Register optee-rng driver as TEE bus driver.
-> > > > 4. Removed DT dependency for optee-rng device UUID.
-> > > > 5. Added supp_nowait flag.
-> > > >
-> > > > Sumit Garg (4):
-> > > >   tee: add bus driver framework for TEE based devices
-> > > >   tee: add supp_nowait flag in tee_context struct
-> > > >   tee: optee: add TEE bus device enumeration support
-> > > >   hwrng: add OP-TEE based rng driver
-> > > >
-> > >
-> > > For this series
-> > >
-> > > Tested-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> > >
-> >
-> > Thanks. BTW, Jens has created a GIT PULL[1] to incorporate this patch-set.
-> >
-> > > although I had to load optee.ko manually in order for the udev
-> > > autoload of optee_rng to trigger.
-> >
-> > Did you built OP-TEE module as out-of-tree? OP-TEE by-default is
-> > built-in kernel module as per following configs in default defconfig:
-> >
-> > CONFIG_TEE=y
-> > CONFIG_OPTEE=y
-> >
->
-> Yes, but the distros will carry it as a module.
->
+From: Zhang Zhijie <zhangzj@rock-chips.com>
 
-Hmm, I see. So in this case OP-TEE module needs to be loaded manually
-due to missing modalias for udev autoload.
+For chain mode in cipher(eg. AES-CBC/DES-CBC), the iv is continuously
+updated in the operation. The new iv value should be written to device
+register by software.
 
--Sumit
+Reported-by: Eric Biggers <ebiggers@google.com>
+Fixes: 433cd2c617bf ("crypto: rockchip - add crypto driver for rk3288")
+Cc: <stable@vger.kernel.org> # v4.5+
+Signed-off-by: Zhang Zhijie <zhangzj@rock-chips.com>
+---
+ drivers/crypto/rockchip/rk3288_crypto.h       |  1 +
+ .../rockchip/rk3288_crypto_ablkcipher.c       | 34 +++++++++++++++++++
+ 2 files changed, 35 insertions(+)
 
-> > > Not sure where the discussion went
-> > > last time, but could we please add "linaro,optee-tz" as a DT modalias
-> > > to the optee.ko module in any case?
-> > >
-> >
-> > This change is already part of your RFC patch [2] and I agree to make
-> > OP-TEE as platform driver.
-> >
-> > [1] https://lkml.org/lkml/2019/2/4/104
-> > [2] https://lkml.org/lkml/2018/12/27/196
-> >
->
-> Indeed, but iirc there was a question from Jens and I wasn't sure it
-> had been answered in the mean time.
+diff --git a/drivers/crypto/rockchip/rk3288_crypto.h b/drivers/crypto/rockchip/rk3288_crypto.h
+index 417c445d8dea..54ee5b3ed9db 100644
+--- a/drivers/crypto/rockchip/rk3288_crypto.h
++++ b/drivers/crypto/rockchip/rk3288_crypto.h
+@@ -245,6 +245,7 @@ struct rk_cipher_ctx {
+ 	struct rk_crypto_info		*dev;
+ 	unsigned int			keylen;
+ 	u32				mode;
++	u8				iv[AES_BLOCK_SIZE];
+ };
+ 
+ enum alg_type {
+diff --git a/drivers/crypto/rockchip/rk3288_crypto_ablkcipher.c b/drivers/crypto/rockchip/rk3288_crypto_ablkcipher.c
+index fe2fc6c7b51b..02dac6ae7e53 100644
+--- a/drivers/crypto/rockchip/rk3288_crypto_ablkcipher.c
++++ b/drivers/crypto/rockchip/rk3288_crypto_ablkcipher.c
+@@ -242,6 +242,17 @@ static void crypto_dma_start(struct rk_crypto_info *dev)
+ static int rk_set_data_start(struct rk_crypto_info *dev)
+ {
+ 	int err;
++	struct ablkcipher_request *req =
++		ablkcipher_request_cast(dev->async_req);
++	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(req);
++	struct rk_cipher_ctx *ctx = crypto_ablkcipher_ctx(tfm);
++	u32 ivsize = crypto_ablkcipher_ivsize(tfm);
++	u8 *src_last_blk = page_address(sg_page(dev->sg_src)) +
++		dev->sg_src->offset + dev->sg_src->length - ivsize;
++
++	/* store the iv that need to be updated in chain mode */
++	if (ctx->mode & RK_CRYPTO_DEC)
++		memcpy(ctx->iv, src_last_blk, ivsize);
+ 
+ 	err = dev->load_data(dev, dev->sg_src, dev->sg_dst);
+ 	if (!err)
+@@ -286,6 +297,28 @@ static void rk_iv_copyback(struct rk_crypto_info *dev)
+ 		memcpy_fromio(req->info, dev->reg + RK_CRYPTO_AES_IV_0, ivsize);
+ }
+ 
++static void rk_update_iv(struct rk_crypto_info *dev)
++{
++	struct ablkcipher_request *req =
++		ablkcipher_request_cast(dev->async_req);
++	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(req);
++	struct rk_cipher_ctx *ctx = crypto_ablkcipher_ctx(tfm);
++	u32 ivsize = crypto_ablkcipher_ivsize(tfm);
++	u8 *new_iv = NULL;
++
++	if (ctx->mode & RK_CRYPTO_DEC) {
++		new_iv = ctx->iv;
++	} else {
++		new_iv = page_address(sg_page(dev->sg_dst)) +
++			 dev->sg_dst->offset + dev->sg_dst->length - ivsize;
++	}
++
++	if (ivsize == DES_BLOCK_SIZE)
++		memcpy_toio(dev->reg + RK_CRYPTO_TDES_IV_0, new_iv, ivsize);
++	else if (ivsize == AES_BLOCK_SIZE)
++		memcpy_toio(dev->reg + RK_CRYPTO_AES_IV_0, new_iv, ivsize);
++}
++
+ /* return:
+  *	true	some err was occurred
+  *	fault	no err, continue
+@@ -307,6 +340,7 @@ static int rk_ablk_rx(struct rk_crypto_info *dev)
+ 		}
+ 	}
+ 	if (dev->left_bytes) {
++		rk_update_iv(dev);
+ 		if (dev->aligned) {
+ 			if (sg_is_last(dev->sg_src)) {
+ 				dev_err(dev->dev, "[%s:%d] Lack of data\n",
+-- 
+2.17.1
+
+
+
