@@ -2,145 +2,113 @@ Return-Path: <SRS0=W691=QV=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8923C10F06
-	for <linux-crypto@archiver.kernel.org>; Thu, 14 Feb 2019 08:04:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A1D4C43381
+	for <linux-crypto@archiver.kernel.org>; Thu, 14 Feb 2019 08:14:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A75C6222D2
-	for <linux-crypto@archiver.kernel.org>; Thu, 14 Feb 2019 08:04:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1550131462;
-	bh=WdK2r9YNHAgcRAnbkOKdnZHevIDhZNlCSMsQM2yzLd0=;
-	h=From:To:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=BGWkaFyy1zXB6yt8C+UU2jc9mMFHdVB418clP7Bo9eyMvQ3hwisR3xQWWrrbxJayM
-	 zvaXOfNWr+cf+M5UfENfvW6NhtA+9CWyyliqPTswr7pvAHtWWHC4Qat75lZLlefsFs
-	 3pRVDqyn+VlYT65DmP+/wUBgeoGT03LncD2I5gFY=
+	by mail.kernel.org (Postfix) with ESMTP id 07BDF2229F
+	for <linux-crypto@archiver.kernel.org>; Thu, 14 Feb 2019 08:14:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZqJctNLe"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391867AbfBNIEV (ORCPT
+        id S2393453AbfBNIO2 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 14 Feb 2019 03:04:21 -0500
-Received: from mail.kernel.org ([198.145.29.99]:59988 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727212AbfBNIES (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 14 Feb 2019 03:04:18 -0500
-Received: from sol.localdomain (c-107-3-167-184.hsd1.ca.comcast.net [107.3.167.184])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 240CB222D4;
-        Thu, 14 Feb 2019 08:04:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1550131457;
-        bh=WdK2r9YNHAgcRAnbkOKdnZHevIDhZNlCSMsQM2yzLd0=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=0A0lALhd569z6CCXzQnrqpE7siySMN7YvEJ4ueunYGpekMLfKq3fGOUu/Mu2CKPGk
-         wfbClce4A1fVnJq4ToG3VCZtRoetZVR/RjCXBKBoUPmVddCPgEQ38qNjiylnyPbIQH
-         HGbv9G45KxG6uhabP9tF3GDa3BQ51sx2gQmf6Ep4=
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 2/6] crypto: testmgr - support checking skcipher output IV
-Date:   Thu, 14 Feb 2019 00:03:51 -0800
-Message-Id: <20190214080355.8112-3-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190214080355.8112-1-ebiggers@kernel.org>
-References: <20190214080355.8112-1-ebiggers@kernel.org>
+        Thu, 14 Feb 2019 03:14:28 -0500
+Received: from mail-it1-f196.google.com ([209.85.166.196]:33104 "EHLO
+        mail-it1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388919AbfBNIO0 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 14 Feb 2019 03:14:26 -0500
+Received: by mail-it1-f196.google.com with SMTP id g137so3952954ita.0
+        for <linux-crypto@vger.kernel.org>; Thu, 14 Feb 2019 00:14:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ZnU/nplvs9KtQAwyGNAnufzBfBDfyOyTBB2Sx80Knr4=;
+        b=ZqJctNLeZ1hn6sljSLdQM5A8PzlLszGeCAqx3DzesvVx6VfEI2X0TaHslE6q48X6QW
+         dS+7TfQKDppDMPl0+TxYMWhBGWdZ45bqm6NCBFZimtztNs3za6EY/XFdEsRcQpaepV7Z
+         pxTNA+eLwH3qALbwHJ4QFTBxD93OlxEeDH3Jufp2HxQLLUnME0rBlm62ammwh6XkbrNj
+         2pXrA2fCHmyzhxm5jt8b25Exnm75saiRijWi72YxrAORLnX/iFx7wYdxcdj9at3qFwCO
+         tzXcyYo5HmJl8A/CssiR8ZSibWu893CTU4s4oXXFrPz5lMD8hqejT1C1+WUJJ0wEBI+v
+         fdEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ZnU/nplvs9KtQAwyGNAnufzBfBDfyOyTBB2Sx80Knr4=;
+        b=eI4tOw7pLR1b9x/GFCigLExt/7FAoihGtrKoHxrY/fix+eJGs6A89qFsadsnhztQUv
+         v5KbIofR78Oc+9uYuXYJnB9FJIel4cAq/k6CFSz+69y+HoBehVe1VvjLdCCz3WrmSemm
+         AvF18nMHQF+pCAB6jsBvrimIY7tgvCY0UsugF4hjO5moEjrAIQWg+t4UnE466vgBlff+
+         UFyq0HNXTyN0A/WvCMPq7W9CYe5ios7JVDxh1wOibQYpoi8lPxvT/jsmlh3eaRSWjenp
+         nbmruRF6QcAzyCbO8qCiMIhqlh+UPT/WP7W/aqNTnTJ4deHhYXDAwg55TBvoQWxwEJFs
+         nz2A==
+X-Gm-Message-State: AHQUAubvj19YCRoMALRvyCyH40fbLE0Pxok52MV3TlkrFzXVkor7Zt/a
+        m3JuShEzPk+to3jP+eBptSmh4fPl17Nk2C/45ACMQg==
+X-Google-Smtp-Source: AHgI3IZIWhnVNCrOykRu3YekT8+BD1+KkkIq74dDMn5ddM4SyXF3bJuDobeBSDo6pEyD2WXEG5Mtaw5r5aLsPTSEr2c=
+X-Received: by 2002:a5e:d609:: with SMTP id w9mr1335203iom.170.1550132065692;
+ Thu, 14 Feb 2019 00:14:25 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20190214080355.8112-1-ebiggers@kernel.org> <20190214080355.8112-6-ebiggers@kernel.org>
+In-Reply-To: <20190214080355.8112-6-ebiggers@kernel.org>
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date:   Thu, 14 Feb 2019 09:14:13 +0100
+Message-ID: <CAKv+Gu9J_PKP0MfScA+RTV3m7FPyVwD713fBeTjn9cA8sWSVAw@mail.gmail.com>
+Subject: Re: [PATCH 5/6] crypto: arm64/aes-blk - update IV after partial final
+ CTR block
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+On Thu, 14 Feb 2019 at 09:04, Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> From: Eric Biggers <ebiggers@google.com>
+>
+> Make the arm64 ctr-aes-neon and ctr-aes-ce algorithms update the IV
+> buffer to contain the next counter after processing a partial final
+> block, rather than leave it as the last counter.  This makes these
+> algorithms pass the updated AES-CTR tests.
+>
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 
-Allow skcipher test vectors to declare the value the IV buffer should be
-updated to at the end of the encryption or decryption operation.
+I take it this means we return an output IV even if the algorithm
+could never proceed in a meaningful way, given that we throw away some
+keystream bits that would be needed in that case.
 
-(This check actually used to be supported in testmgr, but it was never
-used and therefore got removed except for the AES-Keywrap special case.
-But it will be used by CBC and CTR now, so re-add it.)
+That means this change is strictly there to make the test framework
+happy, even for cases that can never appear in reality.
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- crypto/testmgr.c |  6 ++++--
- crypto/testmgr.h | 12 +++++++-----
- 2 files changed, 11 insertions(+), 7 deletions(-)
+Wouldn't it be better not to set out_iv for input buffers whose size
+is not a multiple of the block size?
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index d582a2758feb..8386038d67c7 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -1542,7 +1542,9 @@ static int test_skcipher_vec_cfg(const char *driver, int enc,
- 	if (ivsize) {
- 		if (WARN_ON(ivsize > MAX_IVLEN))
- 			return -EINVAL;
--		if (vec->iv && !(vec->generates_iv && enc))
-+		if (vec->generates_iv && !enc)
-+			memcpy(iv, vec->iv_out, ivsize);
-+		else if (vec->iv)
- 			memcpy(iv, vec->iv, ivsize);
- 		else
- 			memset(iv, 0, ivsize);
-@@ -1635,7 +1637,7 @@ static int test_skcipher_vec_cfg(const char *driver, int enc,
- 	}
- 
- 	/* If applicable, check that the algorithm generated the correct IV */
--	if (vec->generates_iv && enc && memcmp(iv, vec->iv, ivsize) != 0) {
-+	if (vec->iv_out && memcmp(iv, vec->iv_out, ivsize) != 0) {
- 		pr_err("alg: skcipher: %s %s test failed (wrong output IV) on test vector %u, cfg=\"%s\"\n",
- 		       driver, op, vec_num, cfg->name);
- 		hexdump(iv, ivsize);
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index e01c77eeded3..980f7abb6115 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -47,7 +47,8 @@ struct hash_testvec {
-  * cipher_testvec:	structure to describe a symmetric cipher test
-  * @key:	Pointer to key
-  * @klen:	Length of @key in bytes
-- * @iv:		Pointer to IV (optional for some ciphers)
-+ * @iv:		Pointer to IV.  If NULL, an all-zeroes IV is used.
-+ * @iv_out:	Pointer to output IV, if applicable for the cipher.
-  * @ptext:	Pointer to plaintext
-  * @ctext:	Pointer to ciphertext
-  * @len:	Length of @ptext and @ctext in bytes
-@@ -55,12 +56,13 @@ struct hash_testvec {
-  * @wk:		Does the test need CRYPTO_TFM_REQ_FORBID_WEAK_KEYS?
-  * 		( e.g. test needs to fail due to a weak key )
-  * @fips_skip:	Skip the test vector in FIPS mode
-- * @generates_iv: Encryption should ignore the given IV, and output @iv.
-- *		  Decryption takes @iv.  Needed for AES Keywrap ("kw(aes)").
-+ * @generates_iv: Encryption should ignore the given IV, and output @iv_out.
-+ *		  Decryption takes @iv_out.  Needed for AES Keywrap ("kw(aes)").
-  */
- struct cipher_testvec {
- 	const char *key;
- 	const char *iv;
-+	const char *iv_out;
- 	const char *ptext;
- 	const char *ctext;
- 	bool fail;
-@@ -21771,7 +21773,7 @@ static const struct cipher_testvec aes_kw_tv_template[] = {
- 		.ctext	= "\xf6\x85\x94\x81\x6f\x64\xca\xa3"
- 			  "\xf5\x6f\xab\xea\x25\x48\xf5\xfb",
- 		.len	= 16,
--		.iv	= "\x03\x1f\x6b\xd7\xe6\x1e\x64\x3d",
-+		.iv_out	= "\x03\x1f\x6b\xd7\xe6\x1e\x64\x3d",
- 		.generates_iv = true,
- 	}, {
- 		.key	= "\x80\xaa\x99\x73\x27\xa4\x80\x6b"
-@@ -21784,7 +21786,7 @@ static const struct cipher_testvec aes_kw_tv_template[] = {
- 		.ctext	= "\xd3\x3d\x3d\x97\x7b\xf0\xa9\x15"
- 			  "\x59\xf9\x9c\x8a\xcd\x29\x3d\x43",
- 		.len	= 16,
--		.iv	= "\x42\x3c\x96\x0d\x8a\x2a\xc4\xc1",
-+		.iv_out	= "\x42\x3c\x96\x0d\x8a\x2a\xc4\xc1",
- 		.generates_iv = true,
- 	},
- };
--- 
-2.20.1
 
+> ---
+>  arch/arm64/crypto/aes-modes.S | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+>
+> diff --git a/arch/arm64/crypto/aes-modes.S b/arch/arm64/crypto/aes-modes.S
+> index 67700045a0e0..4c7ce231963c 100644
+> --- a/arch/arm64/crypto/aes-modes.S
+> +++ b/arch/arm64/crypto/aes-modes.S
+> @@ -320,8 +320,7 @@ AES_ENTRY(aes_ctr_encrypt)
+>
+>  .Lctrtailblock:
+>         st1             {v0.16b}, [x0]
+> -       ldp             x29, x30, [sp], #16
+> -       ret
+> +       b               .Lctrout
+>
+>  .Lctrcarry:
+>         umov            x7, v4.d[0]             /* load upper word of ctr  */
+> --
+> 2.20.1
+>
