@@ -2,83 +2,85 @@ Return-Path: <SRS0=tWXW=QZ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0E28C43381
-	for <linux-crypto@archiver.kernel.org>; Mon, 18 Feb 2019 08:46:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A501C43381
+	for <linux-crypto@archiver.kernel.org>; Mon, 18 Feb 2019 08:48:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BDDF72084D
-	for <linux-crypto@archiver.kernel.org>; Mon, 18 Feb 2019 08:46:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6F3A021479
+	for <linux-crypto@archiver.kernel.org>; Mon, 18 Feb 2019 08:48:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728953AbfBRIqN (ORCPT
+        id S1728690AbfBRIsT (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 18 Feb 2019 03:46:13 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:3764 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727423AbfBRIqN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 18 Feb 2019 03:46:13 -0500
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id D4D8ECE0E8781D9C789D;
-        Mon, 18 Feb 2019 16:46:09 +0800 (CST)
-Received: from localhost.localdomain.localdomain (10.175.113.25) by
- DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
- 14.3.408.0; Mon, 18 Feb 2019 16:45:59 +0800
-From:   YueHaibing <yuehaibing@huawei.com>
-To:     Boris Brezillon <bbrezillon@kernel.org>,
-        Arnaud Ebalard <arno@natisbad.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-CC:     YueHaibing <yuehaibing@huawei.com>, <linux-crypto@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <kernel-janitors@vger.kernel.org>
-Subject: [PATCH -next] crypto: marvell - Remove set but not used variable 'ivsize'
-Date:   Mon, 18 Feb 2019 08:59:47 +0000
-Message-ID: <20190218085947.3800-1-yuehaibing@huawei.com>
-X-Mailer: git-send-email 2.20.1
+        Mon, 18 Feb 2019 03:48:19 -0500
+Received: from mail-vs1-f68.google.com ([209.85.217.68]:37120 "EHLO
+        mail-vs1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727423AbfBRIsT (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 18 Feb 2019 03:48:19 -0500
+Received: by mail-vs1-f68.google.com with SMTP id s16so9202586vsk.4;
+        Mon, 18 Feb 2019 00:48:19 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=EHl4v02YyC8ucW3zOPfnDXE8fKCHewZdmpg50OilTkA=;
+        b=MMRdOsgFRz6dMjv4o0CjjgjVQeLwTwQzCTfb+Rwfh9KBEGVgcHZbypIiiHc//swqzo
+         a35zCcxprQILgxV3JxadLzZgjVmrN7S1Zrrjd84HTAtRrPNcIHaun1KoECK2oAZ1wulg
+         URbwfKldOtJuCXqdUXr+snnrHfX99Gknk2gUH01XNeRXTevDOkA1Fn7aITA+vCm47bXN
+         Dk55vsuldzk3nWJqYJ3sHG9FxI44NyDXDiVE/E/Op5P57So4xormTCKSCm6jskn6QdYs
+         S9szEawwWgG/8qrTcRJA8TxioXaVh4GwFWenWcuCJTxB0RR1358XJmQ1X6rDgrnsr9w4
+         i+eA==
+X-Gm-Message-State: AHQUAuaAz0jnpIj+g/F7/YMSpE3clC7JxF7nj/9fnNWahbX9Sfwe/+Z+
+        O9eXP3vv/pO+A88g5fLw7Vtcwyfg9nqvIHKPHZU=
+X-Google-Smtp-Source: AHgI3Ibuz7PVLjPrRSCP05dVX++N0nnICcjU/7Xtw7YF229ArPLKOui0LaCbTMNZ5kxxpM/v55mtADJ8ucZU1pvO6+E=
+X-Received: by 2002:a67:e3d3:: with SMTP id k19mr10222097vsm.96.1550479698653;
+ Mon, 18 Feb 2019 00:48:18 -0800 (PST)
 MIME-Version: 1.0
-Content-Type:   text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
-X-Originating-IP: [10.175.113.25]
-X-CFilter-Loop: Reflected
+References: <20190211142758.16718-1-gilad@benyossef.com>
+In-Reply-To: <20190211142758.16718-1-gilad@benyossef.com>
+From:   Geert Uytterhoeven <geert@linux-m68k.org>
+Date:   Mon, 18 Feb 2019 09:48:07 +0100
+Message-ID: <CAMuHMdUXAY7wBjCYH94V2NV7+MXdOKufnWpi=B1vAWkNFysxpg@mail.gmail.com>
+Subject: Re: [PATCH] crypto: ccree: add missing inline qualifier
+To:     Gilad Ben-Yossef <gilad@benyossef.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Ofir Drag <ofir.drang@arm.com>, stable <stable@kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Fixes gcc '-Wunused-but-set-variable' warning:
+On Mon, Feb 11, 2019 at 3:29 PM Gilad Ben-Yossef <gilad@benyossef.com> wrote:
+> Commit 1358c13a48c4 ("crypto: ccree - fix resume race condition on init")
+> was missing a "inline" qualifier for stub function used when CONFIG_PM
+> is not set causing a build warning.
+>
+> Fixes: 1358c13a48c4 ("crypto: ccree - fix resume race condition on init")
+> Cc: stable@kernel.org # v4.20
 
-drivers/crypto/marvell/cipher.c: In function 'mv_cesa_skcipher_dma_req_init':
-drivers/crypto/marvell/cipher.c:325:15: warning:
- variable 'ivsize' set but not used [-Wunused-but-set-variable]
+# v5.0
 
-It's not used any more after 0c99620f0ac1 ("crypto: marvell - Use an unique
-pool to copy results of requests")
+However, I believe the version comment is not necessary, as the same
+version is indicated by the Fixes tag.
 
-Signed-off-by: YueHaibing <yuehaibing@huawei.com>
----
- drivers/crypto/marvell/cipher.c | 2 --
- 1 file changed, 2 deletions(-)
+> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 
-diff --git a/drivers/crypto/marvell/cipher.c b/drivers/crypto/marvell/cipher.c
-index 066830dcc53e..fb279b3a1ca1 100644
---- a/drivers/crypto/marvell/cipher.c
-+++ b/drivers/crypto/marvell/cipher.c
-@@ -322,7 +322,6 @@ static int mv_cesa_skcipher_dma_req_init(struct skcipher_request *req,
- 	struct mv_cesa_skcipher_dma_iter iter;
- 	bool skip_ctx = false;
- 	int ret;
--	unsigned int ivsize;
- 
- 	basereq->chain.first = NULL;
- 	basereq->chain.last = NULL;
-@@ -381,7 +380,6 @@ static int mv_cesa_skcipher_dma_req_init(struct skcipher_request *req,
- 	} while (mv_cesa_skcipher_req_iter_next_op(&iter));
- 
- 	/* Add output data for IV */
--	ivsize = crypto_skcipher_ivsize(crypto_skcipher_reqtfm(req));
- 	ret = mv_cesa_dma_add_result_op(&basereq->chain, CESA_SA_CFG_SRAM_OFFSET,
- 				    CESA_SA_DATA_SRAM_OFFSET,
- 				    CESA_TDMA_SRC_IN_SRAM, flags);
+Acked-by: Geert Uytterhoeven <geert@linux-m68k.org>
 
+Gr{oetje,eeting}s,
 
+                        Geert
 
+-- 
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
