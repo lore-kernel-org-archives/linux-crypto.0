@@ -1,151 +1,161 @@
-Return-Path: <SRS0=tWXW=QZ=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=4Nwj=Q2=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-13.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C948DC10F01
-	for <linux-crypto@archiver.kernel.org>; Mon, 18 Feb 2019 16:01:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8EBCC43381
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 Feb 2019 03:23:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 900C5217F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 18 Feb 2019 16:01:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 954D02147C
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 Feb 2019 03:23:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="WEZCFADl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rppNowcT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731897AbfBRQBR (ORCPT
+        id S1725771AbfBSDXB (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 18 Feb 2019 11:01:17 -0500
-Received: from mailout1.w1.samsung.com ([210.118.77.11]:59948 "EHLO
-        mailout1.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731800AbfBRQBR (ORCPT
+        Mon, 18 Feb 2019 22:23:01 -0500
+Received: from mail-ed1-f65.google.com ([209.85.208.65]:35647 "EHLO
+        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725770AbfBSDXA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 18 Feb 2019 11:01:17 -0500
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20190218160115euoutp01c1adcb67206b4e938ac894b744bdda88~EgLJYfP6k3035730357euoutp01C
-        for <linux-crypto@vger.kernel.org>; Mon, 18 Feb 2019 16:01:15 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20190218160115euoutp01c1adcb67206b4e938ac894b744bdda88~EgLJYfP6k3035730357euoutp01C
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1550505675;
-        bh=C3YyHPasrjcj0odMLNMtMAQKA6Z2cWZ4yPrw/Bg1liI=;
-        h=From:To:Cc:Subject:Date:References:From;
-        b=WEZCFADld8dZP+8be56ZMjB+nFcqjraTdpgqidO5FafE0f7m15lHWuh0T8a+RZxi6
-         oL2OJijAysNcexsXXDKe4eYa6WLjLEwiO+hM6yLv96SvvjjwY3UxHD6HiIyL+uNR4Z
-         2usTlVG9eKVCuGzSDMKx6Qi8TXcuSJ95WGY9N4KM=
-Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
-        20190218160114eucas1p12717be44f704370acb706727dee55e8b~EgLImCN1Q0407604076eucas1p1F;
-        Mon, 18 Feb 2019 16:01:14 +0000 (GMT)
-Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
-        eusmges3new.samsung.com (EUCPMTA) with SMTP id B3.E2.04806.9C6DA6C5; Mon, 18
-        Feb 2019 16:01:14 +0000 (GMT)
-Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-        20190218160113eucas1p2183a3620f8322ee33273d3bfe5f06486~EgLHutM-R2967929679eucas1p2Q;
-        Mon, 18 Feb 2019 16:01:13 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
-        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20190218160113eusmtrp100faad93c013dcd712bc460d407787c9~EgLHf2omU1405614056eusmtrp1o;
-        Mon, 18 Feb 2019 16:01:13 +0000 (GMT)
-X-AuditID: cbfec7f5-79db79c0000012c6-bd-5c6ad6c9c59b
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-        eusmgms2.samsung.com (EUCPMTA) with SMTP id EC.DE.04128.9C6DA6C5; Mon, 18
-        Feb 2019 16:01:13 +0000 (GMT)
-Received: from AMDC3218.DIGITAL.local (unknown [106.120.51.18]) by
-        eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-        20190218160112eusmtip201413564294153aa6434868d50ea1af6~EgLHDcaN50380003800eusmtip2s;
-        Mon, 18 Feb 2019 16:01:12 +0000 (GMT)
-From:   Kamil Konieczny <k.konieczny@partner.samsung.com>
-To:     k.konieczny@partner.samsung.com
-Cc:     Krzysztof Kozlowski <krzk@kernel.org>,
-        Vladimir Zapolskiy <vz@mleia.com>,
+        Mon, 18 Feb 2019 22:23:00 -0500
+Received: by mail-ed1-f65.google.com with SMTP id g19so6515283edp.2;
+        Mon, 18 Feb 2019 19:22:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=jl8mehWyrUBP556vhgCSLwlVFDpTSFATt786X/rXFy0=;
+        b=rppNowcTh7frIdWuG7SfdEhRYXnN6B9/ZLJWfNtcz1LccaZsL5AdjSi4ZvIwPULFqA
+         cKBOymYVgebWq1i7mItu5bW/+nA/WNfQDLm4TgfJn2GDeenpXUp9GNJeMdBIAtzxr883
+         hIR/onWd9CNv9U/G+15GFYhUCius83IDD2YaKpDJB3/zkfnK3oc63gT8cI/EaFWoE1Ey
+         vGB/SGTPeZAc7RlSUtXTLJolVJKvatap6LlSm5lSdQUe0hfz/EdRiVcChwmggdbzO8ew
+         sKOJyontu5csWIzylrVJdfGq8GGbo//m334+qHuwtrl2tXGtZdJSUL2tGOYoNJ7kcyCv
+         /cog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=jl8mehWyrUBP556vhgCSLwlVFDpTSFATt786X/rXFy0=;
+        b=PHAiSrPD8//NBhLo0l1Lt0sg+qK/49gMFeH568R1/LHnehmBJ6pVE45AS30i6n1jLa
+         WagrljRxaOqPK5goRpCHKtDF9Kx+eW2RiGYKpV2Judb6PmUnrJfksEFGnB6nntqfZruV
+         QCJflPyTjNTS1c9qZReimLeutFYE2NioMvHNdqaJN+YMdTZlp+n3IqvLhoPw7WW+P2FZ
+         pHWNH408a1MddJT+oBB+faZd+Vgh31BWS1QxQHxNS9/L23XSb34a5Fole4cQXCfF6her
+         JAA5V5FlG8NvCP02nTDwbZepQjrfhrIk18VNuSLMnmQJvHtOTN52nqNrM6T2BeCG5nQJ
+         VqWQ==
+X-Gm-Message-State: AHQUAuZChVzJRTUnmikmy4imDvJpaxxZXNl21kRzniJROyMmPBpV7+dX
+        aQWH4XaX7ApsXBsvXWNhoGI=
+X-Google-Smtp-Source: AHgI3Ib8DAK2epvilWIwyDk/cQcbtCyMyjAo8X7djRfiF/LivxlJuQv04wI3dLeDDobLcFrK7YHPOA==
+X-Received: by 2002:a17:906:1d0d:: with SMTP id n13mr11051396ejh.23.1550546578588;
+        Mon, 18 Feb 2019 19:22:58 -0800 (PST)
+Received: from localhost.localdomain ([2a01:4f9:2a:1fae::2])
+        by smtp.gmail.com with ESMTPSA id b9sm4649069ede.12.2019.02.18.19.22.56
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 18 Feb 2019 19:22:57 -0800 (PST)
+From:   Nathan Chancellor <natechancellor@gmail.com>
+To:     Sumit Garg <sumit.garg@linaro.org>,
+        Jens Wiklander <jens.wiklander@linaro.org>
+Cc:     Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Biggers <ebiggers@kernel.org>,
-        linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: s5p: update iv after AES op end
-Date:   Mon, 18 Feb 2019 17:00:46 +0100
-Message-Id: <20190218160046.6387-1-k.konieczny@partner.samsung.com>
-X-Mailer: git-send-email 2.20.1
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Daniel Thompson <daniel.thompson@linaro.org>,
+        Nathan Chancellor <natechancellor@gmail.com>
+Subject: [PATCH] hwrng: optee: Initialize some structs using memset instead of braces
+Date:   Mon, 18 Feb 2019 20:22:40 -0700
+Message-Id: <20190219032240.22935-1-natechancellor@gmail.com>
+X-Mailer: git-send-email 2.21.0.rc1
 MIME-Version: 1.0
+X-Patchwork-Bot: notify
 Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrNKsWRmVeSWpSXmKPExsWy7djP87qnrmXFGPR8ZrSYc76FxWLtnj/M
-        Ft2vZCz69v1ntDh/fgO7xf17P5ksLu+aw2Yx4/w+Jov/v5qZHTg9tqy8yeSx7YCqx6ZVnWwe
-        /xZOYfE4+G4Pk8fnTXIBbFFcNimpOZllqUX6dglcGQs2H2Qq2MFV8eXTSpYGxkccXYycHBIC
-        JhL3ni1k62Lk4hASWMEosX3Oa2YI5wujxIbHHYwQzmdGiRtnF7DDtMxoXARVtZxR4vC+x2xw
-        Ld3PprKAVLEJmEs82n6GCcQWEVCWmHxvOlgHs8AqJomNV36DJYQFLCR27foHNpZFQFXi2fIn
-        YHFeAWeJ3o/zGCHWyUuc713HDhEXlDg58wnYAmagePPW2WBDJQTa2SXufFoIdZ+LxI45j6Bs
-        YYlXx7dA2TISpyf3sEDY5RK7tz5jh2huYZSYO3kRE0TCWuLw8YusXYwcQBs0Jdbv0ocIO0pc
-        WriUDSQsIcAnceOtIMQNfBKTtoE8BhLmlehoE4Ko1pWY9/8MK4QtLdH1fx0rRImHxK1FwiCm
-        kECsxKKNihMYFWYh+WsWkr9mIVywgJF5FaN4amlxbnpqsXFearlecWJucWleul5yfu4mRmAS
-        Ov3v+NcdjPv+JB1iFOBgVOLhXbA8K0aINbGsuDL3EKMEB7OSCO+Ro0Ah3pTEyqrUovz4otKc
-        1OJDjNIcLErivNUMD6KFBNITS1KzU1MLUotgskwcnFINjPX8vPfWn63VbDzt0Oxg63wiImxn
-        e3aK46pH/SYLre3WH2Z+rZm72DCy1PKSctRatYNsT5exL3KeaFRgd4Q16sf9XVI8i178uNhd
-        ab6YqXDbzR9Rszpbvzuf38Y1dVbk9OPrbKYlan7utP11aFbVXuZzHSv0Ppu4Nq7pXvljRSvH
-        9KO3HaTr+pVYijMSDbWYi4oTAWoC4G0+AwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpmkeLIzCtJLcpLzFFi42I5/e/4Pd2T17JiDG5tYreYc76FxWLtnj/M
-        Ft2vZCz69v1ntDh/fgO7xf17P5ksLu+aw2Yx4/w+Jov/v5qZHTg9tqy8yeSx7YCqx6ZVnWwe
-        /xZOYfE4+G4Pk8fnTXIBbFF6NkX5pSWpChn5xSW2StGGFkZ6hpYWekYmlnqGxuaxVkamSvp2
-        NimpOZllqUX6dgl6GQs2H2Qq2MFV8eXTSpYGxkccXYycHBICJhIzGhcxdzFycQgJLGWUmP7q
-        PDNEQlqi8fRqJghbWOLPtS42iKJPjBIN97YxgiTYBMwlHm0/A1YkIqAsMfnedLBJzAIbmCT2
-        rrnLBpIQFrCQ2LXrHzuIzSKgKvFs+ROwBl4BZ4nej/MYITbIS5zvXccOEReUODnzCQuIzQwU
-        b946m3kCI98sJKlZSFILGJlWMYqklhbnpucWG+kVJ+YWl+al6yXn525iBEbAtmM/t+xg7HoX
-        fIhRgINRiYd3wfKsGCHWxLLiytxDjBIczEoivEeOAoV4UxIrq1KL8uOLSnNSiw8xmgIdO5FZ
-        SjQ5HxideSXxhqaG5haWhubG5sZmFkrivOcNKqOEBNITS1KzU1MLUotg+pg4OKUaGNXyrLhf
-        9lm2v3Od3XpT8X+Q/+Fjn1o+rZUxa1i139qh9pVf7+MlDAxPJtvvbWw4s+zo9dLyBzrbZb7s
-        XCHsb+kVwcmhXx22/Z1sfNbFQI8q9pZvL5fFe9r9cmRJWbSt7sv1N+uXOPnZF62bIvlNw6b4
-        /N/eZ+8sHf1fThI/Ixp7KuuT5cazu5VYijMSDbWYi4oTAaONEleWAgAA
-X-CMS-MailID: 20190218160113eucas1p2183a3620f8322ee33273d3bfe5f06486
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20190218160113eucas1p2183a3620f8322ee33273d3bfe5f06486
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20190218160113eucas1p2183a3620f8322ee33273d3bfe5f06486
-References: <CGME20190218160113eucas1p2183a3620f8322ee33273d3bfe5f06486@eucas1p2.samsung.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Fix bug "s5p-sss crypto driver doesn't set next AES-CBC IV". This should
-also fix AES-CTR mode. Tested on Odroid U3 with Eric Biggers branch
-"iv-out-testing".
+Clang warns:
 
-Signed-off-by: Kamil Konieczny <k.konieczny@partner.samsung.com>
+drivers/char/hw_random/optee-rng.c:80:31: warning: suggest braces around
+initialization of subobject [-Wmissing-braces]
+        struct tee_param param[4] = {0};
+                                     ^
+                                     {}
+drivers/char/hw_random/optee-rng.c:177:31: warning: suggest braces
+around initialization of subobject [-Wmissing-braces]
+        struct tee_param param[4] = {0};
+                                     ^
+                                     {}
+drivers/char/hw_random/optee-rng.c:212:48: warning: suggest braces
+around initialization of subobject [-Wmissing-braces]
+        struct tee_ioctl_open_session_arg sess_arg = {0};
+                                                      ^
+                                                      {}
+3 warnings generated.
+
+One way to fix these warnings is to add additional braces like Clang
+suggests; however, there has been a bit of push back from some
+maintainers, who just prefer memset as it is unambiguous, doesn't
+depend on a particular compiler version, and properly initializes all
+subobjects [1][2]. Do that here so there are no more warnings.
+
+[1]: https://lore.kernel.org/lkml/022e41c0-8465-dc7a-a45c-64187ecd9684@amd.com/
+[2]: https://lore.kernel.org/lkml/20181128.215241.702406654469517539.davem@davemloft.net/
+
+Fixes: 5fe8b1cc6a03 ("hwrng: add OP-TEE based rng driver")
+Link: https://github.com/ClangBuiltLinux/linux/issues/369
+Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
 ---
- drivers/crypto/s5p-sss.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ drivers/char/hw_random/optee-rng.c | 18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
-index 0064be0e3941..3ea058addad3 100644
---- a/drivers/crypto/s5p-sss.c
-+++ b/drivers/crypto/s5p-sss.c
-@@ -463,6 +463,9 @@ static void s5p_sg_copy_buf(void *buf, struct scatterlist *sg,
+diff --git a/drivers/char/hw_random/optee-rng.c b/drivers/char/hw_random/optee-rng.c
+index 2b9fc8ac5500..46f4bcd28c41 100644
+--- a/drivers/char/hw_random/optee-rng.c
++++ b/drivers/char/hw_random/optee-rng.c
+@@ -76,8 +76,11 @@ static size_t get_optee_rng_data(struct optee_rng_private *pvt_data,
+ 	u32 ret = 0;
+ 	u8 *rng_data = NULL;
+ 	size_t rng_size = 0;
+-	struct tee_ioctl_invoke_arg inv_arg = {0};
+-	struct tee_param param[4] = {0};
++	struct tee_ioctl_invoke_arg inv_arg;
++	struct tee_param param[4];
++
++	memset(&inv_arg, 0, sizeof(inv_arg));
++	memset(&param, 0, sizeof(param));
  
- static void s5p_sg_done(struct s5p_aes_dev *dev)
+ 	/* Invoke TA_CMD_GET_ENTROPY function of Trusted App */
+ 	inv_arg.func = TA_CMD_GET_ENTROPY;
+@@ -173,8 +176,11 @@ static struct optee_rng_private pvt_data = {
+ static int get_optee_rng_info(struct device *dev)
  {
-+	struct ablkcipher_request *req = dev->req;
-+	struct s5p_aes_reqctx *reqctx = ablkcipher_request_ctx(req);
+ 	u32 ret = 0;
+-	struct tee_ioctl_invoke_arg inv_arg = {0};
+-	struct tee_param param[4] = {0};
++	struct tee_ioctl_invoke_arg inv_arg;
++	struct tee_param param[4];
 +
- 	if (dev->sg_dst_cpy) {
- 		dev_dbg(dev->dev,
- 			"Copying %d bytes of output data back to original place\n",
-@@ -472,6 +475,11 @@ static void s5p_sg_done(struct s5p_aes_dev *dev)
- 	}
- 	s5p_free_sg_cpy(dev, &dev->sg_src_cpy);
- 	s5p_free_sg_cpy(dev, &dev->sg_dst_cpy);
-+	if (reqctx->mode & FLAGS_AES_CBC)
-+		memcpy_fromio(req->info, dev->aes_ioaddr + SSS_REG_AES_IV_DATA(0), 0x10);
-+
-+	if (reqctx->mode & FLAGS_AES_CTR)
-+		memcpy_fromio(req->info, dev->aes_ioaddr + SSS_REG_AES_CNT_DATA(0), 0x10);
- }
++	memset(&inv_arg, 0, sizeof(inv_arg));
++	memset(&param, 0, sizeof(param));
  
- /* Calls the completion. Cannot be called with dev->lock hold. */
+ 	/* Invoke TA_CMD_GET_RNG_INFO function of Trusted App */
+ 	inv_arg.func = TA_CMD_GET_RNG_INFO;
+@@ -209,7 +215,9 @@ static int optee_rng_probe(struct device *dev)
+ {
+ 	struct tee_client_device *rng_device = to_tee_client_device(dev);
+ 	int ret = 0, err = -ENODEV;
+-	struct tee_ioctl_open_session_arg sess_arg = {0};
++	struct tee_ioctl_open_session_arg sess_arg;
++
++	memset(&sess_arg, 0, sizeof(sess_arg));
+ 
+ 	/* Open context with TEE driver */
+ 	pvt_data.ctx = tee_client_open_context(NULL, optee_ctx_match, NULL,
 -- 
-2.20.1
+2.21.0.rc1
 
