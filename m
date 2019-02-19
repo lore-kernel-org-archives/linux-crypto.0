@@ -2,81 +2,85 @@ Return-Path: <SRS0=4Nwj=Q2=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_NEOMUTT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39300C43381
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 Feb 2019 05:46:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9165EC43381
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 Feb 2019 06:34:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1475C217D9
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 Feb 2019 05:46:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 63BE9217D7
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 Feb 2019 06:34:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725768AbfBSFqL (ORCPT
+        id S1725787AbfBSGep (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 19 Feb 2019 00:46:11 -0500
-Received: from orcrist.hmeau.com ([104.223.48.154]:35764 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725730AbfBSFqL (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 19 Feb 2019 00:46:11 -0500
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1gvyDf-0007Yn-2p; Tue, 19 Feb 2019 13:45:27 +0800
-Received: from herbert by gondobar with local (Exim 4.89)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1gvyDC-0007b8-Ah; Tue, 19 Feb 2019 13:44:58 +0800
-Date:   Tue, 19 Feb 2019 13:44:58 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Stephan Mueller <smueller@chronox.de>
-Cc:     Eric Biggers <ebiggers@kernel.org>,
-        James Bottomley <James.Bottomley@hansenpartnership.com>,
-        Andy Lutomirski <luto@amacapital.net>,
-        "Lee, Chun-Yi" <joeyli.kernel@gmail.com>,
-        "Rafael J . Wysocki" <rjw@rjwysocki.net>,
-        Pavel Machek <pavel@ucw.cz>, linux-kernel@vger.kernel.org,
-        linux-pm@vger.kernel.org, keyrings@vger.kernel.org,
-        "Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-        Chen Yu <yu.c.chen@intel.com>,
-        Oliver Neukum <oneukum@suse.com>,
-        Ryan Chen <yu.chen.surf@gmail.com>,
-        David Howells <dhowells@redhat.com>,
-        Giovanni Gherdovich <ggherdovich@suse.cz>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Jann Horn <jannh@google.com>,
-        Andy Lutomirski <luto@kernel.org>, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v2 0/6] General Key Derivation Function Support
-Message-ID: <20190219054458.ldwl26npnyg7ulic@gondor.apana.org.au>
-References: <20190103143227.9138-1-jlee@suse.com>
- <1798550.XZem68xxzE@tauon.chronox.de>
- <20190208080547.224fudg2m22d3a6d@gondor.apana.org.au>
- <2047284.dgeq8KlW64@tauon.chronox.de>
+        Tue, 19 Feb 2019 01:34:45 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:3778 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725730AbfBSGep (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 19 Feb 2019 01:34:45 -0500
+Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 341D99AE209194A88BEE;
+        Tue, 19 Feb 2019 14:34:41 +0800 (CST)
+Received: from localhost (10.177.31.96) by DGGEMS401-HUB.china.huawei.com
+ (10.3.19.201) with Microsoft SMTP Server id 14.3.408.0; Tue, 19 Feb 2019
+ 14:34:34 +0800
+From:   YueHaibing <yuehaibing@huawei.com>
+To:     <sumit.garg@linaro.org>, <mpm@selenic.com>,
+        <herbert@gondor.apana.org.au>, <arnd@arndb.de>,
+        <gregkh@linuxfoundation.org>
+CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        YueHaibing <yuehaibing@huawei.com>
+Subject: [PATCH -next] hwrng: Fix unsigned comparison with less than zero
+Date:   Tue, 19 Feb 2019 14:33:02 +0800
+Message-ID: <20190219063302.22888-1-yuehaibing@huawei.com>
+X-Mailer: git-send-email 2.10.2.windows.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2047284.dgeq8KlW64@tauon.chronox.de>
-User-Agent: NeoMutt/20170113 (1.7.2)
+Content-Type: text/plain
+X-Originating-IP: [10.177.31.96]
+X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Feb 08, 2019 at 09:17:50AM +0100, Stephan Mueller wrote:
-> > 
-> > > Also, shall we add the signature verification enforcemnt to the helper as
-> > > well?
-> > 
-> > What do you mean by that?
-> 
-> We need to invoke the function crypto_check_module_sig when the module is 
-> loaded. Do you have any concerns invoking it from the module init function?
+The return from the call to tee_client_invoke_func can be a
+negative error code however this is being assigned to an
+unsigned variable 'ret' hence the check is always false.
+Fix this by making 'ret' an int.
 
-Which module's signature are you going to check? If it's the
-underlying crypto API modules then wouldn't they have been
-checked already when they were registered?
+Detected by Coccinelle ("Unsigned expression compared with zero:
+ret < 0")
 
-Cheers,
+Fixes: 5fe8b1cc6a03 ("hwrng: add OP-TEE based rng driver")
+Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+---
+ drivers/char/hw_random/optee-rng.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/char/hw_random/optee-rng.c b/drivers/char/hw_random/optee-rng.c
+index 2b9fc8a..e9f4e10 100644
+--- a/drivers/char/hw_random/optee-rng.c
++++ b/drivers/char/hw_random/optee-rng.c
+@@ -73,7 +73,7 @@ struct optee_rng_private {
+ static size_t get_optee_rng_data(struct optee_rng_private *pvt_data,
+ 				 void *buf, size_t req_size)
+ {
+-	u32 ret = 0;
++	int ret = 0;
+ 	u8 *rng_data = NULL;
+ 	size_t rng_size = 0;
+ 	struct tee_ioctl_invoke_arg inv_arg = {0};
+@@ -172,7 +172,7 @@ static struct optee_rng_private pvt_data = {
+ 
+ static int get_optee_rng_info(struct device *dev)
+ {
+-	u32 ret = 0;
++	int ret = 0;
+ 	struct tee_ioctl_invoke_arg inv_arg = {0};
+ 	struct tee_param param[4] = {0};
+ 
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.7.0
+
+
