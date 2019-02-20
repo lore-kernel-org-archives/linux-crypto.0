@@ -2,99 +2,74 @@ Return-Path: <SRS0=bqmp=Q3=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3845C43381
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Feb 2019 07:54:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4FA6C43381
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Feb 2019 09:21:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 824A22183F
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Feb 2019 07:54:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1550649249;
-	bh=tLOAeQqo8uWF4VkUGKhfz71PVfoAaoBcFMjA2Hj/aW4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=cji7oudAr6C5grcCERAgX6OxbMfn2AzGejBqlOWYKvoqQiiWZY6QwxO/+cZAHeeaz
-	 1EENMNdVpEOwJSJ6LGRW8sW/vVTpEyf6NXElFQ8lIh7EUhV8xJAZ2BpUY/aTj+F4Rg
-	 0H/94dtyf0O2OS6+c1HhacXZStj/sQi91bFbeXEQ=
+	by mail.kernel.org (Postfix) with ESMTP id 7E7AF2086C
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Feb 2019 09:21:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726151AbfBTHyI (ORCPT
+        id S1726788AbfBTJV1 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 20 Feb 2019 02:54:08 -0500
-Received: from mail.kernel.org ([198.145.29.99]:59448 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725832AbfBTHyI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Feb 2019 02:54:08 -0500
-Received: from sol.localdomain (c-107-3-167-184.hsd1.ca.comcast.net [107.3.167.184])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 440E12083B;
-        Wed, 20 Feb 2019 07:54:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1550649247;
-        bh=tLOAeQqo8uWF4VkUGKhfz71PVfoAaoBcFMjA2Hj/aW4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=uKU7DBXp0Hq4FeA1WZfTzMFWadwa1LkoRF0dY1fWJnZzqaXsWKu0MxvnvLR4xhY/x
-         N4GzMOv6bJBGyoKjWblU/NQBBWCJVWZ3EjomIutqG/+Cp/IswqT1iNP09jb+GiEy1z
-         Px/6RiDKz01hM58Rv3p9YP2CEnzugDFeckUdhp8Q=
-Date:   Tue, 19 Feb 2019 23:54:05 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Andreas Dilger <adilger@dilger.ca>
-Cc:     linux-fscrypt@vger.kernel.org, Satya Tangirala <satyat@google.com>,
-        linux-api@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        keyrings@vger.kernel.org, linux-mtd@lists.infradead.org,
-        linux-crypto@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-ext4@vger.kernel.org, Paul Crowley <paulcrowley@google.com>
-Subject: Re: [RFC PATCH v3 00/18] fscrypt: key management improvements
-Message-ID: <20190220075404.GA974@sol.localdomain>
-References: <20190220065249.32099-1-ebiggers@kernel.org>
- <1660609D-3525-4485-9652-57976DB020F4@dilger.ca>
+        Wed, 20 Feb 2019 04:21:27 -0500
+Received: from szxga07-in.huawei.com ([45.249.212.35]:35020 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726776AbfBTJV1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 20 Feb 2019 04:21:27 -0500
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id C9D79DE2D9B7A9F91F51;
+        Wed, 20 Feb 2019 17:21:23 +0800 (CST)
+Received: from localhost.localdomain.localdomain (10.175.113.25) by
+ DGGEMS413-HUB.china.huawei.com (10.3.19.213) with Microsoft SMTP Server id
+ 14.3.408.0; Wed, 20 Feb 2019 17:21:17 +0800
+From:   Wei Yongjun <weiyongjun1@huawei.com>
+To:     Sumit Garg <sumit.garg@linaro.org>, Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Arnd Bergmann <arnd@arndb.de>,
+        "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>
+CC:     Wei Yongjun <weiyongjun1@huawei.com>,
+        <linux-crypto@vger.kernel.org>, <kernel-janitors@vger.kernel.org>
+Subject: [PATCH -next] hwrng: make symbol 'optee_rng_id_table' static
+Date:   Wed, 20 Feb 2019 09:34:58 +0000
+Message-ID: <20190220093458.159208-1-weiyongjun1@huawei.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1660609D-3525-4485-9652-57976DB020F4@dilger.ca>
-User-Agent: Mutt/1.11.3 (2019-02-01)
+Content-Type:   text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+X-Originating-IP: [10.175.113.25]
+X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Feb 19, 2019 at 11:18:21PM -0800, Andreas Dilger wrote:
-> On Feb 19, 2019, at 10:52 PM, Eric Biggers <ebiggers@kernel.org> wrote:
-> > 
-> > Hello,
-> > 
-> > This patchset makes major improvements to how keys are added, removed,
-> > and derived in fscrypt, aka ext4/f2fs/ubifs encryption.  It does this by
-> > adding new ioctls that add and remove encryption keys directly to/from
-> > the filesystem, and by adding a new encryption policy version ("v2")
-> > where the user-provided keys are only used as input to HKDF-SHA512 and
-> > are identified by their cryptographic hash.
-> 
-> Just to confirm for the layman reader - the fact that the crypto keys
-> are registered with the filesystem and not with the user process doesn't
-> prevent user(s) from having different crypto keys for different subdirs
-> in a single filesystem?
+Fixes the following sparse warning:
 
-Correct, that hasn't changed.  Different directories can use different keys.
+drivers/char/hw_random/optee-rng.c:265:35: warning:
+ symbol 'optee_rng_id_table' was not declared. Should it be static?
 
-> 
-> Secondly, does this progress fscrypt toward allowing multiple master keys
-> to decrypt a single per-file key?
-> 
+Fixes: 5fe8b1cc6a03 ("hwrng: add OP-TEE based rng driver")
+Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
+---
+ drivers/char/hw_random/optee-rng.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-It's not a goal of this patchset as no one has really been asking for it yet.
-Per-file keys are still derived from the master key.
+diff --git a/drivers/char/hw_random/optee-rng.c b/drivers/char/hw_random/optee-rng.c
+index 2b9fc8ac5500..3a4dd6fc9ff4 100644
+--- a/drivers/char/hw_random/optee-rng.c
++++ b/drivers/char/hw_random/optee-rng.c
+@@ -262,7 +262,7 @@ static int optee_rng_remove(struct device *dev)
+ 	return 0;
+ }
+ 
+-const struct tee_client_device_id optee_rng_id_table[] = {
++static const struct tee_client_device_id optee_rng_id_table[] = {
+ 	{UUID_INIT(0xab7a617c, 0xb8e7, 0x4d8f,
+ 		   0x83, 0x01, 0xd0, 0x9b, 0x61, 0x03, 0x6b, 0x64)},
+ 	{}
 
-Note that it's already possible to wrap the master keys in userspace.  Thus you
-can already have multiple passwords that unlock the same encrypted directory.
-You just can't do this with *individual files*.  Maybe that's good enough.
 
-However, this patchset does fix the denial of service vulnerabilities that
-currently exist when users share an encrypted directory.  Also, since it adds a
-real KDF, it makes it much easier to derive a wrapping key to wrap the per-file
-keys if that were to become a requirement.  (The master key could be used as the
-wrapping key directly, but that's inflexible and more error-prone.)
 
-- Eric
