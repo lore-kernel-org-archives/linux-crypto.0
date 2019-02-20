@@ -2,96 +2,89 @@ Return-Path: <SRS0=bqmp=Q3=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CAF1C43381
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Feb 2019 18:36:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1903C43381
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Feb 2019 19:36:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 27D4D21841
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Feb 2019 18:36:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1550687784;
-	bh=yyDVto/5qGBteLMWT92Jqi7x2n0brJDILjRi/mEhxKU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=FEkplIl9Tn3tjDv+b2XikHhqa0YAvvREeZs3Gl7Uw68mubMa+wxA02LOiliYqbox4
-	 R1SSvVgf03r+qU745VsWrWYqYtn5vkbPs1kVYTdbz4jVGoiO2xuZFBDjt5FO5qrP96
-	 BQLDsoB2fbpCOn2JVgvoInyEHWLpJTC8Cv32dbgU=
+	by mail.kernel.org (Postfix) with ESMTP id AD2802147A
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Feb 2019 19:36:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P7R3S4RE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726120AbfBTSgX (ORCPT
+        id S1725847AbfBTTgy (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 20 Feb 2019 13:36:23 -0500
-Received: from mail.kernel.org ([198.145.29.99]:46672 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725834AbfBTSgX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Feb 2019 13:36:23 -0500
-Received: from gmail.com (unknown [104.132.1.77])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 0BD5F2146E;
-        Wed, 20 Feb 2019 18:36:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1550687782;
-        bh=yyDVto/5qGBteLMWT92Jqi7x2n0brJDILjRi/mEhxKU=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=qYJU8vZf6BazayR2FnpgVdjIvZbnxDnnYgPiuCH+AQCJ+UYyHGeC81qpgcOegIACh
-         w3DRQBAGcB8AeqFtEbZBszvA4P3ddEU8wpLz0wHx6BrIIGSAWC5Yt1pbKMg1xZB3ho
-         yN5xqDY7gf0c7nVCUNxAK6QoxIw1D+X1UGfhEW1Q=
-Date:   Wed, 20 Feb 2019 10:36:20 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     David Howells <dhowells@redhat.com>
-Cc:     linux-fscrypt@vger.kernel.org, Satya Tangirala <satyat@google.com>,
-        linux-api@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        keyrings@vger.kernel.org, linux-mtd@lists.infradead.org,
-        linux-crypto@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-ext4@vger.kernel.org, Paul Crowley <paulcrowley@google.com>
-Subject: Re: [RFC PATCH v3 00/18] fscrypt: key management improvements
-Message-ID: <20190220183619.GA177939@gmail.com>
-References: <20190220065249.32099-1-ebiggers@kernel.org>
- <14023.1550686042@warthog.procyon.org.uk>
+        Wed, 20 Feb 2019 14:36:54 -0500
+Received: from mail-it1-f196.google.com ([209.85.166.196]:55976 "EHLO
+        mail-it1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725798AbfBTTgy (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 20 Feb 2019 14:36:54 -0500
+Received: by mail-it1-f196.google.com with SMTP id z131so18148174itf.5;
+        Wed, 20 Feb 2019 11:36:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:reply-to:from:date:message-id
+         :subject:to:cc;
+        bh=ppb/u3SFrXBWgwv2zbu2ul9dkfAm25vx2h3mzviuQGw=;
+        b=P7R3S4REPkyG1d2oGDfwI0WAyG7zSZPrnMeZuWEs2nbFg5KvscnkLk1cb/32y7he+q
+         saDBPZDelRIBlyNep7tl4x1VoRnM3h2XoG3BaH8i4/QSGy9ypMKLNc3X7nT0Y84iApjj
+         cClJzQdH3+ik/VYaGvcFQDkDj/Q5OkVZ7doHAhVziIEymJdJXCyyHCFt7S2zKIydPmlz
+         DQHBCgF0mPAqnlDy9lywakKsAMY/TLSvVK4aUjjHRV8uCICmljNbpriMZQ572r9U6zvf
+         NPjoWf3Ky8/Kg6C5fevmp0Ovaf1vdHRJPK0G6FKDfdfxrNPCRB+6EKAr2vs9Ph12Zgnt
+         bngg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
+         :from:date:message-id:subject:to:cc;
+        bh=ppb/u3SFrXBWgwv2zbu2ul9dkfAm25vx2h3mzviuQGw=;
+        b=S7VlfoynUsSX6fXWXoDxlUT/sYR7a7sboEfI4w3ly6jCNM42XAgf0iQSJTvTXXNNV7
+         3SQ9dwXShDU+O7xd5zUXUwXMeGhAnzwmPF79RE5tNHtgMgXlhcV/lWbnUtNj+85k63rg
+         KOu+vaJ1g1/smojq1HgBFktrJ+6KerL7WZSVso5Zi/HxWinoN10xuFneLqBwZyq+lQR/
+         UuMZDrUygPVGL3QmCZx1rjdcglxNQeS2Rk4gor4fMtFwjGsQOdIhVXkElV4N8eP+eitn
+         RmXPdRZG5V6GDgwtirU1Bl/3MkMARlOie32U4c/ncr2Hd6LcO052tC15ch1x5QuS9Cbr
+         fxBA==
+X-Gm-Message-State: AHQUAub11rDb8yVMXqKJYI+XtrIy6jjrDeiUpiKyLbsNJ9qa545cGJ1s
+        ZUsdets8ZVLIOTT/eQ5Ii7j9fkQyr2Yb5riSYh7xvw==
+X-Google-Smtp-Source: AHgI3IZNp4IYgwgoFpbfT1IIkLWeoKq7RVIDfrOS6rQ8gsEQCeJp5j4cmCzYx8Ma7EJucMQa5PQwP5PxRjlIkub5rjc=
+X-Received: by 2002:a24:3a12:: with SMTP id m18mr5843976itm.5.1550691413217;
+ Wed, 20 Feb 2019 11:36:53 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <14023.1550686042@warthog.procyon.org.uk>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <20190220093458.159208-1-weiyongjun1@huawei.com>
+In-Reply-To: <20190220093458.159208-1-weiyongjun1@huawei.com>
+Reply-To: noloader@gmail.com
+From:   Jeffrey Walton <noloader@gmail.com>
+Date:   Wed, 20 Feb 2019 14:36:40 -0500
+Message-ID: <CAH8yC8nBUUZHUrag9EDVrZ10vpFdiN5zxurdegxLo_u+RAH6AQ@mail.gmail.com>
+Subject: Re: [PATCH -next] hwrng: make symbol 'optee_rng_id_table' static
+To:     Wei Yongjun <weiyongjun1@huawei.com>
+Cc:     Sumit Garg <sumit.garg@linaro.org>, Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        kernel-janitors@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi David,
+On Wed, Feb 20, 2019 at 4:23 AM Wei Yongjun <weiyongjun1@huawei.com> wrote:
+>
+> Fixes the following sparse warning:
+>
+> drivers/char/hw_random/optee-rng.c:265:35: warning:
+>  symbol 'optee_rng_id_table' was not declared. Should it be static?
 
-On Wed, Feb 20, 2019 at 06:07:22PM +0000, David Howells wrote:
-> I have a couple of patches that add ACLs to keyrings, that you can find at the
-> top of the branch here:
-> 
-> 	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=keys-acl
-> 
-> I have other patches that allow tags to be used as subjects in the ACL, with a
-> container supplying a tag, e.g.:
-> 
-> 	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/commit/?h=container&id=e0fdc5613a32b9475b025f58e7a2267329b3f3a4
-> 
-> Might something similar be of use to you here, perhaps specifying a tag
-> referring to the blockdev of interest rather than the container?
-> 
-> David
+Static limits visibility to the current translation unit. Static is
+like private visibility.
 
-I don't think so.  The main point of adding keys directly to the filesystem is
-that it's generally inappropriate to apply OS-level access control or
-process-based visibility restrictions to fscrypt keys given that:
+Maybe you are thinking if it should be declared extern so other
+translation units can find the symbol. extern is like public
+visibility.
 
-- The unlocked/locked status of files is already filesystem-level.
-- The purpose of encryption is orthogonal to OS-level access control.
-
-The ioctl based interface also makes it *much* easier to implement all the
-semantics needed for removing fscrypt keys.
-
-I don't see how key ACLs would be appropriate here, except that key ACLs would
-allow userspace to opt-in to fixing the denial of service vulnerability where
-keyctl_invalidate() only requires Search permission.  But for fscrypt that's
-addressed by my proposal too, and is just one of many problems it addresses.
-
-- Eric
+Jeff
