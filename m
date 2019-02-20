@@ -3,72 +3,66 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D255C43381
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Feb 2019 04:06:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89F36C43381
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Feb 2019 04:10:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5024F2146E
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Feb 2019 04:06:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5DFDE2147A
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Feb 2019 04:10:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726312AbfBTEGe (ORCPT
+        id S1730339AbfBTEKR (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 19 Feb 2019 23:06:34 -0500
-Received: from orcrist.hmeau.com ([104.223.48.154]:40038 "EHLO
+        Tue, 19 Feb 2019 23:10:17 -0500
+Received: from orcrist.hmeau.com ([104.223.48.154]:40050 "EHLO
         deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725916AbfBTEGe (ORCPT
+        with ESMTP id S1729826AbfBTEKR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 19 Feb 2019 23:06:34 -0500
+        Tue, 19 Feb 2019 23:10:17 -0500
 Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
         by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1gwJ9U-0000Oi-Nh; Wed, 20 Feb 2019 12:06:32 +0800
+        id 1gwJD5-0000SN-JK; Wed, 20 Feb 2019 12:10:15 +0800
 Received: from herbert by gondobar with local (Exim 4.89)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1gwJ9Q-0001iV-NW; Wed, 20 Feb 2019 12:06:28 +0800
-Date:   Wed, 20 Feb 2019 12:06:28 +0800
+        id 1gwJD1-0001k1-Ov; Wed, 20 Feb 2019 12:10:11 +0800
+Date:   Wed, 20 Feb 2019 12:10:11 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Steffen Klassert <steffen.klassert@secunet.com>
-Cc:     Eric Biggers <ebiggers3@gmail.com>, linux-crypto@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com, Eric Biggers <ebiggers@google.com>
-Subject: Re: [RFC PATCH] crypto: pcrypt - forbid recursive instantiation
-Message-ID: <20190220040628.673rc2ffs7dxepu2@gondor.apana.org.au>
-References: <20171230083744.vuclnbs677tj7pi2@gauss3.secunet.de>
- <20180310232231.19191-1-ebiggers3@gmail.com>
- <20180323002152.GA30497@gondor.apana.org.au>
- <20180408225528.GH685@sol.localdomain>
- <20180409085807.2cwvr5cocz6gfbmv@gauss3.secunet.de>
- <20180409190739.GC203367@gmail.com>
- <20180418053533.wuo6bj2okqdu2hrf@gauss3.secunet.de>
+To:     Zhou Wang <wangzhou1@hisilicon.com>
+Cc:     "David S . Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linuxarm@huawei.com,
+        linux-kernel@vger.kernel.org, Kenneth Lee <liguozhu@hisilicon.com>,
+        Shiju Jose <shiju.jose@huawei.com>,
+        Hao Fang <fanghao11@huawei.com>
+Subject: Re: [PATCH v2 2/4] crypto: hisilicon: Add queue management driver
+ for HiSilicon QM module
+Message-ID: <20190220041011.oob4e7jk3fwoqjlg@gondor.apana.org.au>
+References: <1548248933-149853-1-git-send-email-wangzhou1@hisilicon.com>
+ <1548248933-149853-3-git-send-email-wangzhou1@hisilicon.com>
+ <20190201052229.wnjeirur6ephew7y@gondor.apana.org.au>
+ <5C53F22A.2020804@hisilicon.com>
+ <20190201153931.2k4yopm4akunpedg@gondor.apana.org.au>
+ <5C54FFA7.1080702@hisilicon.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20180418053533.wuo6bj2okqdu2hrf@gauss3.secunet.de>
+In-Reply-To: <5C54FFA7.1080702@hisilicon.com>
 User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Apr 18, 2018 at 07:35:33AM +0200, Steffen Klassert wrote:
+On Sat, Feb 02, 2019 at 10:25:43AM +0800, Zhou Wang wrote:
+>
+> In fact, I planned to register to acomp later.
 > 
-> Yes sure, I just wanted to know if it is worth to think about
-> preventing template recursions. If there is a valid usecase,
-> then we don't even need to think in this direction.
-> 
-> While I think each pcrypt instance should have it's own
-> padata instance on the long run, it would be good to have
-> a not so intrusive fix that can be backported to the stable
-> trees.
+> It also makes sense to use scomp if hardware engine is faster than CPU.
+> So how about registering to scomp firstly, then we register this engine to
+> acomp later?
 
-Steffen, has there been any progress on this work?
-
-We need to fix this soon or we'll have to disable pcrypt because
-it is a security issue.
-
-It's not just about nested templates either.  You can trigger
-the same issue where a pcrypt instance over an AEAD algorithm
-that uses a fallback which also happens to be pcrypt.
+Sorry, but the fact that you're doing a busy-wait for completion
+means that scomp is not an appropriate choice.
 
 Cheers,
 -- 
