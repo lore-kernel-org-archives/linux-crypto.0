@@ -2,109 +2,78 @@ Return-Path: <SRS0=bqmp=Q3=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C0CDC43381
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Feb 2019 11:42:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0B42C10F0B
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Feb 2019 15:25:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 276572086C
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Feb 2019 11:42:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 91DE42086A
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Feb 2019 15:25:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726430AbfBTLmQ (ORCPT
+        id S1726405AbfBTPZU (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 20 Feb 2019 06:42:16 -0500
-Received: from a.mx.secunet.com ([62.96.220.36]:60580 "EHLO a.mx.secunet.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726414AbfBTLmQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Feb 2019 06:42:16 -0500
-Received: from localhost (localhost [127.0.0.1])
-        by a.mx.secunet.com (Postfix) with ESMTP id 24E42201C6;
-        Wed, 20 Feb 2019 12:42:14 +0100 (CET)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-        by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id WMpVL7F_cdzT; Wed, 20 Feb 2019 12:42:08 +0100 (CET)
-Received: from mail-essen-01.secunet.de (mail-essen-01.secunet.de [10.53.40.204])
-        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by a.mx.secunet.com (Postfix) with ESMTPS id E78F220068;
-        Wed, 20 Feb 2019 12:42:08 +0100 (CET)
-Received: from gauss2.secunet.de (10.182.7.193) by mail-essen-01.secunet.de
- (10.53.40.204) with Microsoft SMTP Server id 14.3.439.0; Wed, 20 Feb 2019
- 12:42:08 +0100
-Received: by gauss2.secunet.de (Postfix, from userid 1000)      id 6C6503182665;
- Wed, 20 Feb 2019 12:42:08 +0100 (CET)
-Date:   Wed, 20 Feb 2019 12:42:08 +0100
-From:   Steffen Klassert <steffen.klassert@secunet.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-CC:     Eric Biggers <ebiggers3@gmail.com>, <linux-crypto@vger.kernel.org>,
-        <syzkaller-bugs@googlegroups.com>,
-        Eric Biggers <ebiggers@google.com>
-Subject: Re: [RFC PATCH] crypto: pcrypt - forbid recursive instantiation
-Message-ID: <20190220114208.GD3087@gauss3.secunet.de>
-References: <20171230083744.vuclnbs677tj7pi2@gauss3.secunet.de>
- <20180310232231.19191-1-ebiggers3@gmail.com>
- <20180323002152.GA30497@gondor.apana.org.au>
- <20180408225528.GH685@sol.localdomain>
- <20180409085807.2cwvr5cocz6gfbmv@gauss3.secunet.de>
- <20180409190739.GC203367@gmail.com>
- <20180418053533.wuo6bj2okqdu2hrf@gauss3.secunet.de>
- <20190220040628.673rc2ffs7dxepu2@gondor.apana.org.au>
+        Wed, 20 Feb 2019 10:25:20 -0500
+Received: from mail-qk1-f196.google.com ([209.85.222.196]:38785 "EHLO
+        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727107AbfBTPZU (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 20 Feb 2019 10:25:20 -0500
+Received: by mail-qk1-f196.google.com with SMTP id p15so2202783qkl.5;
+        Wed, 20 Feb 2019 07:25:19 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=PHFmPCfpFDSLjmOxBT4coUCppxIzjU/lbJI0xUw0R9k=;
+        b=Ic2IL+1SdYlpZtfe9XdgYqxiLlXJgpGS9tRzzheoDcJtFscMkDXJ5Omsui6Geo8BnW
+         OonygHNgRtzEADr/uWxqWWSkQ3jda17nvZ0oNvRwpm11hPNG3JWipUTQ3U5YyR51ZDad
+         steuSNFC/Ojxalm6Kkmmx50IoeVsyByfJqwC7DkBXqm0gG+M0Qpb4UsY5n40MZMGMJeL
+         40vPBsHBtP3gDdtCSfwP11AOv8i088hEXzyBhCeC7puthwaSlYJSbzCNWr7j0MrAYR/K
+         l+CdfYnQxI0RwAEgnRcjE545i55H7wmRy8G+LKXJsSXHEyWCG6LyZwWQpIneVfz0txVt
+         P2Zw==
+X-Gm-Message-State: AHQUAuZHhA7sGRS74LxJWNwKeqUB6hI2lxsuDULtrut/b86SlcOSOiBh
+        MbmzbxdLPVoPr/DHzl1ZEILnEEHewzAIBia+/S1H8w==
+X-Google-Smtp-Source: AHgI3IY36PuceNa8RAnsxICV6zr3k5FR0qqd++BZ2TYtG76Hx5vtZ4NQ4ZJTlX0hEqpCEetdp4pEAlOVVd8cvzxYDvQ=
+X-Received: by 2002:a37:7cf:: with SMTP id 198mr25294675qkh.173.1550676319414;
+ Wed, 20 Feb 2019 07:25:19 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20190220040628.673rc2ffs7dxepu2@gondor.apana.org.au>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-G-Data-MailSecurity-for-Exchange-State: 0
-X-G-Data-MailSecurity-for-Exchange-Error: 0
-X-G-Data-MailSecurity-for-Exchange-Sender: 23
-X-G-Data-MailSecurity-for-Exchange-Server: d65e63f7-5c15-413f-8f63-c0d707471c93
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
-X-G-Data-MailSecurity-for-Exchange-Guid: FD6684C0-7348-4FE6-BD15-5F195D739C50
-X-G-Data-MailSecurity-for-Exchange-ProcessedOnRouted: True
+References: <20190219032240.22935-1-natechancellor@gmail.com> <CAFA6WYNS3JckLR3=EzhbbO9G-emjXnQTGAzY2j8QoAJsteamSg@mail.gmail.com>
+In-Reply-To: <CAFA6WYNS3JckLR3=EzhbbO9G-emjXnQTGAzY2j8QoAJsteamSg@mail.gmail.com>
+From:   Arnd Bergmann <arnd@arndb.de>
+Date:   Wed, 20 Feb 2019 16:25:03 +0100
+Message-ID: <CAK8P3a11ZVxc803z2iRUiE3Q6oBYa4dVvFC343LyVLHHKT=gSg@mail.gmail.com>
+Subject: Re: [PATCH] hwrng: optee: Initialize some structs using memset
+ instead of braces
+To:     Sumit Garg <sumit.garg@linaro.org>
+Cc:     Nathan Chancellor <natechancellor@gmail.com>,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Daniel Thompson <daniel.thompson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Feb 20, 2019 at 12:06:28PM +0800, Herbert Xu wrote:
-> On Wed, Apr 18, 2018 at 07:35:33AM +0200, Steffen Klassert wrote:
-> > 
-> > Yes sure, I just wanted to know if it is worth to think about
-> > preventing template recursions. If there is a valid usecase,
-> > then we don't even need to think in this direction.
-> > 
-> > While I think each pcrypt instance should have it's own
-> > padata instance on the long run, it would be good to have
-> > a not so intrusive fix that can be backported to the stable
-> > trees.
-> 
-> Steffen, has there been any progress on this work?
+On Tue, Feb 19, 2019 at 6:11 AM Sumit Garg <sumit.garg@linaro.org> wrote:
+> On Tue, 19 Feb 2019 at 08:52, Nathan Chancellor
+> <natechancellor@gmail.com> wrote:
 
-I had a look on what we need to use separate padata
-instances for each pcrypt instance. But that's comlicated
-and will create incompatibilities on the sysfs cpuset
-configuration options. So that's not really a thing that
-could be a fix.
+> >
+> > Fixes: 5fe8b1cc6a03 ("hwrng: add OP-TEE based rng driver")
+> > Link: https://github.com/ClangBuiltLinux/linux/issues/369
+> > Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
+>
+> Reviewed-by: Sumit Garg <sumit.garg@linaro.org>
+>
 
-> 
-> We need to fix this soon or we'll have to disable pcrypt because
-> it is a security issue.
-> 
-> It's not just about nested templates either.  You can trigger
-> the same issue where a pcrypt instance over an AEAD algorithm
-> that uses a fallback which also happens to be pcrypt.
+Applied this one as well to arm/drivers, thanks for the fixes!
 
-Would it be possible to forbid pcrypt for algorithms
-that needs a fallback?
-
-If I see this correct, only crypto algorithms used by
-HW crypto accelerators need a fallback to software
-crypto. HW crypto can't benefit from pcrypt anyway,
-so it would be no loss to disable pcrypt in that case.
-
-We could use the initial fix from Eric in combination
-with disableing pcrypt for algorithms that need a fallback.
-
+      Arnd
