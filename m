@@ -2,117 +2,144 @@ Return-Path: <SRS0=phSf=Q6=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7667C43381
-	for <linux-crypto@archiver.kernel.org>; Sat, 23 Feb 2019 08:23:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D217C43381
+	for <linux-crypto@archiver.kernel.org>; Sat, 23 Feb 2019 09:21:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7E6F420850
-	for <linux-crypto@archiver.kernel.org>; Sat, 23 Feb 2019 08:23:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1550910230;
-	bh=jbzYxr7CkotKZJMA/lnfSwkGKMLjyxFeef/5h16kQ70=;
-	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=a3xaKttYAz2uiU3SRcMZc4lbSGbcbYIpUdi2EGEg1WXmFIoR/S8Hij8KJ7xLuX9E6
-	 ooQ092NHO52H97P2lYUeHVw/5AbLbTBzmcueVa95WBbMPva38R46hkeWtjC1G2Pz17
-	 s/+oxYS/uLrqppGZbztaslPHB5qEaMd3QWb/pMG0=
+	by mail.kernel.org (Postfix) with ESMTP id E32F9206BA
+	for <linux-crypto@archiver.kernel.org>; Sat, 23 Feb 2019 09:21:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yyKmattx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725915AbfBWIXt (ORCPT
+        id S1726189AbfBWJVh (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 23 Feb 2019 03:23:49 -0500
-Received: from mail.kernel.org ([198.145.29.99]:36588 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725785AbfBWIXt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 23 Feb 2019 03:23:49 -0500
-Received: from sol.localdomain (c-107-3-167-184.hsd1.ca.comcast.net [107.3.167.184])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 84B372084F;
-        Sat, 23 Feb 2019 08:23:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1550910228;
-        bh=jbzYxr7CkotKZJMA/lnfSwkGKMLjyxFeef/5h16kQ70=;
-        h=From:To:Cc:Subject:Date:From;
-        b=MZU2RDshG+eyxNjdzVGufSyWmO550VA5hsIvve/7CZr2VpHvFDxtCUxQdwvTGGpqs
-         SI7FU1Rjn2JQmlUqSzhpowSZRXYMfQga3JZtsLBM0bwhHat4jjdwSvsZDUeSq+nqUp
-         KAK5eS63rzSnK3bEAHGx8Axu5ELH8JyVSDULZL6k=
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Mahipal Challa <mahipalreddy2006@gmail.com>,
-        Jan Glauber <jglauber@cavium.com>
-Subject: [PATCH] crypto: cavium/zip - fix collision with generic cra_driver_name
-Date:   Sat, 23 Feb 2019 00:23:23 -0800
-Message-Id: <20190223082323.4126-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.20.1
+        Sat, 23 Feb 2019 04:21:37 -0500
+Received: from mail-it1-f194.google.com ([209.85.166.194]:54550 "EHLO
+        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726177AbfBWJVg (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 23 Feb 2019 04:21:36 -0500
+Received: by mail-it1-f194.google.com with SMTP id w18so5195995itj.4
+        for <linux-crypto@vger.kernel.org>; Sat, 23 Feb 2019 01:21:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=jO2yAy+2/DrGSuo8Mb/2diw4loSjrfq9Z9UTiFMxaQ4=;
+        b=yyKmattxVj5pg78ekQ65pQNhpw1n5/CyCPH/x00PTR341Vd8ivampTF3P4iw326cyQ
+         G/06KZbOriMDdU0Y3h4kMXA7Z44TAI/CPV4ykrEaNM0e1pdD0k8U2rRO6QGlhJiVndUY
+         qtomCIF0tqD0YnytekB/4dO+WLfsJ4O4NH7q8w6+WVk+l+om+OSPXocHIipm83t5Fo6J
+         YcTpOqvjSnPLBlWPrHAuBFmVq4SMpB3t0+j69BHsCTNJTXfw7J75qq5tn3QnedvcTzhR
+         rfeq45QZif5Ivl2JrPmT5+3NADVgi6FPn74jxkQXfas9vrdmY88v6Lwxq3Nvaq7LgodR
+         8KNA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=jO2yAy+2/DrGSuo8Mb/2diw4loSjrfq9Z9UTiFMxaQ4=;
+        b=AEFO8l3epS6nbyY8bjJbV9CeDXZ90tCAiVODGrGCYF17QgqBXJewCZKdpZenZIkAEU
+         ehdkaonTRQr5sSBH6/mu7ChpczwYnNmeCmYR9jrOCmCrsPdHb0AhAUbeF3uPDQyLgQRd
+         or+siIdpmgktyvAfrIVrZupCeDN+kWXi9+eGoXiM6bvuVSyF3njkJZcYsmTmZoea+8X9
+         Zn2dgZj+hRLmc/Ngb57l0s06dAb4aFJFEqipmJU9XSFA90aGMo6InSMTvv4fjpnMJhU1
+         7x3/Lk3PEk45czHZ4gcSwEp/A2f4WxP50Jfstyi6UpuuvosMpMJnZVOx+EeK4e5bC0I8
+         0Pfg==
+X-Gm-Message-State: AHQUAualFqEf3R8+JN5ehVuAHRLlFrUhzxByOuOXB+IqwZKqYDzsVGjK
+        AaQjg0Mx1qrlGi/ttzvhT7DIDDwiklrdFIjqXitzMsLn
+X-Google-Smtp-Source: AHgI3IaRcsHtDW03uNXc2vPh39oKd8T5aDPBY3IdBwUmNcWxxEeVF+l9ASj0wvdJKSBzqwcHUcuQRRW74/hyja/uC0Y=
+X-Received: by 2002:a02:3342:: with SMTP id k2mr4439773jak.62.1550913695492;
+ Sat, 23 Feb 2019 01:21:35 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20190223065408.6279-1-ebiggers@kernel.org> <20190223065408.6279-2-ebiggers@kernel.org>
+In-Reply-To: <20190223065408.6279-2-ebiggers@kernel.org>
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date:   Sat, 23 Feb 2019 10:21:22 +0100
+Message-ID: <CAKv+Gu-4dwMsukX9jf9U0GfCOtd7cGfaRfSeJ+xL+4cqBAsDmg@mail.gmail.com>
+Subject: Re: [PATCH 1/2] crypto: arm64/chacha - fix chacha_4block_xor_neon()
+ for big endian
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+On Sat, 23 Feb 2019 at 07:54, Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> From: Eric Biggers <ebiggers@google.com>
+>
+> The change to encrypt a fifth ChaCha block using scalar instructions
+> caused the chacha20-neon, xchacha20-neon, and xchacha12-neon self-tests
+> to start failing on big endian arm64 kernels.  The bug is that the
+> keystream block produced in 32-bit scalar registers is directly XOR'd
+> with the data words, which are loaded and stored in native endianness.
+> Thus in big endian mode the data bytes end up XOR'd with the wrong
+> bytes.  Fix it by byte-swapping the keystream words in big endian mode.
+>
+> Fixes: 2fe55987b262 ("crypto: arm64/chacha - use combined SIMD/ALU routine for more speed")
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 
-The cavium/zip implementation of the deflate compression algorithm is
-incorrectly being registered under the generic driver name, which
-prevents the generic implementation from being registered with the
-crypto API when CONFIG_CRYPTO_DEV_CAVIUM_ZIP=y.  Similarly the lzs
-algorithm (which does not currently have a generic implementation...)
-is incorrectly being registered as lzs-generic.
+Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-Fix the naming collision by adding a suffix "-cavium" to the
-cra_driver_name of the cavium/zip algorithms.
-
-Fixes: 640035a2dc55 ("crypto: zip - Add ThunderX ZIP driver core")
-Cc: Mahipal Challa <mahipalreddy2006@gmail.com>
-Cc: Jan Glauber <jglauber@cavium.com>
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- drivers/crypto/cavium/zip/zip_main.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/crypto/cavium/zip/zip_main.c b/drivers/crypto/cavium/zip/zip_main.c
-index e6b09e784e666..a8447a3cf3665 100644
---- a/drivers/crypto/cavium/zip/zip_main.c
-+++ b/drivers/crypto/cavium/zip/zip_main.c
-@@ -351,6 +351,7 @@ static struct pci_driver zip_driver = {
- 
- static struct crypto_alg zip_comp_deflate = {
- 	.cra_name		= "deflate",
-+	.cra_driver_name	= "deflate-cavium",
- 	.cra_flags		= CRYPTO_ALG_TYPE_COMPRESS,
- 	.cra_ctxsize		= sizeof(struct zip_kernel_ctx),
- 	.cra_priority           = 300,
-@@ -365,6 +366,7 @@ static struct crypto_alg zip_comp_deflate = {
- 
- static struct crypto_alg zip_comp_lzs = {
- 	.cra_name		= "lzs",
-+	.cra_driver_name	= "lzs-cavium",
- 	.cra_flags		= CRYPTO_ALG_TYPE_COMPRESS,
- 	.cra_ctxsize		= sizeof(struct zip_kernel_ctx),
- 	.cra_priority           = 300,
-@@ -384,7 +386,7 @@ static struct scomp_alg zip_scomp_deflate = {
- 	.decompress		= zip_scomp_decompress,
- 	.base			= {
- 		.cra_name		= "deflate",
--		.cra_driver_name	= "deflate-scomp",
-+		.cra_driver_name	= "deflate-scomp-cavium",
- 		.cra_module		= THIS_MODULE,
- 		.cra_priority           = 300,
- 	}
-@@ -397,7 +399,7 @@ static struct scomp_alg zip_scomp_lzs = {
- 	.decompress		= zip_scomp_decompress,
- 	.base			= {
- 		.cra_name		= "lzs",
--		.cra_driver_name	= "lzs-scomp",
-+		.cra_driver_name	= "lzs-scomp-cavium",
- 		.cra_module		= THIS_MODULE,
- 		.cra_priority           = 300,
- 	}
--- 
-2.20.1
-
+> ---
+>  arch/arm64/crypto/chacha-neon-core.S | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
+>
+> diff --git a/arch/arm64/crypto/chacha-neon-core.S b/arch/arm64/crypto/chacha-neon-core.S
+> index 021bb9e9784b2..bfb80e10ff7b0 100644
+> --- a/arch/arm64/crypto/chacha-neon-core.S
+> +++ b/arch/arm64/crypto/chacha-neon-core.S
+> @@ -532,6 +532,10 @@ ENTRY(chacha_4block_xor_neon)
+>         add             v3.4s, v3.4s, v19.4s
+>           add           a2, a2, w8
+>           add           a3, a3, w9
+> +CPU_BE(          rev           a0, a0          )
+> +CPU_BE(          rev           a1, a1          )
+> +CPU_BE(          rev           a2, a2          )
+> +CPU_BE(          rev           a3, a3          )
+>
+>         ld4r            {v24.4s-v27.4s}, [x0], #16
+>         ld4r            {v28.4s-v31.4s}, [x0]
+> @@ -552,6 +556,10 @@ ENTRY(chacha_4block_xor_neon)
+>         add             v7.4s, v7.4s, v23.4s
+>           add           a6, a6, w8
+>           add           a7, a7, w9
+> +CPU_BE(          rev           a4, a4          )
+> +CPU_BE(          rev           a5, a5          )
+> +CPU_BE(          rev           a6, a6          )
+> +CPU_BE(          rev           a7, a7          )
+>
+>         // x8[0-3] += s2[0]
+>         // x9[0-3] += s2[1]
+> @@ -569,6 +577,10 @@ ENTRY(chacha_4block_xor_neon)
+>         add             v11.4s, v11.4s, v27.4s
+>           add           a10, a10, w8
+>           add           a11, a11, w9
+> +CPU_BE(          rev           a8, a8          )
+> +CPU_BE(          rev           a9, a9          )
+> +CPU_BE(          rev           a10, a10        )
+> +CPU_BE(          rev           a11, a11        )
+>
+>         // x12[0-3] += s3[0]
+>         // x13[0-3] += s3[1]
+> @@ -586,6 +598,10 @@ ENTRY(chacha_4block_xor_neon)
+>         add             v15.4s, v15.4s, v31.4s
+>           add           a14, a14, w8
+>           add           a15, a15, w9
+> +CPU_BE(          rev           a12, a12        )
+> +CPU_BE(          rev           a13, a13        )
+> +CPU_BE(          rev           a14, a14        )
+> +CPU_BE(          rev           a15, a15        )
+>
+>         // interleave 32-bit words in state n, n+1
+>           ldp           w6, w7, [x2], #64
+> --
+> 2.20.1
+>
