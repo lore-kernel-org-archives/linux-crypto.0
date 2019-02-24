@@ -6,268 +6,127 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90B9AC43381
-	for <linux-crypto@archiver.kernel.org>; Sun, 24 Feb 2019 06:09:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3EA3C00319
+	for <linux-crypto@archiver.kernel.org>; Sun, 24 Feb 2019 06:09:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5F9D720663
-	for <linux-crypto@archiver.kernel.org>; Sun, 24 Feb 2019 06:09:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CE29920663
+	for <linux-crypto@archiver.kernel.org>; Sun, 24 Feb 2019 06:09:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728115AbfBXGJA (ORCPT
+        id S1727710AbfBXGI5 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 24 Feb 2019 01:09:00 -0500
-Received: from vmicros1.altlinux.org ([194.107.17.57]:43716 "EHLO
+        Sun, 24 Feb 2019 01:08:57 -0500
+Received: from vmicros1.altlinux.org ([194.107.17.57]:43672 "EHLO
         vmicros1.altlinux.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728071AbfBXGJA (ORCPT
+        with ESMTP id S1725817AbfBXGI5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 24 Feb 2019 01:09:00 -0500
+        Sun, 24 Feb 2019 01:08:57 -0500
 Received: from imap.altlinux.org (imap.altlinux.org [194.107.17.38])
-        by vmicros1.altlinux.org (Postfix) with ESMTP id DC01872CCAC;
-        Sun, 24 Feb 2019 09:08:57 +0300 (MSK)
+        by vmicros1.altlinux.org (Postfix) with ESMTP id F0E8772CCAF;
+        Sun, 24 Feb 2019 09:08:54 +0300 (MSK)
 Received: from beacon.altlinux.org (unknown [185.6.174.98])
-        by imap.altlinux.org (Postfix) with ESMTPSA id A80ED4A4AE7;
-        Sun, 24 Feb 2019 09:08:57 +0300 (MSK)
+        by imap.altlinux.org (Postfix) with ESMTPSA id B83D94A4AE7;
+        Sun, 24 Feb 2019 09:08:54 +0300 (MSK)
 From:   Vitaly Chikunov <vt@altlinux.org>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         David Howells <dhowells@redhat.com>,
         Mimi Zohar <zohar@linux.ibm.com>,
         linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>, qat-linux@intel.com,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Gary Hook <gary.hook@amd.com>,
-        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>
-Subject: [PATCH v5 03/10] crypto: rsa - unimplement sign/verify for raw RSA backends
-Date:   Sun, 24 Feb 2019 09:08:21 +0300
-Message-Id: <20190224060828.2527-4-vt@altlinux.org>
+Subject: [PATCH v5 02/10] crypto: akcipher - check the presence of callback before the call
+Date:   Sun, 24 Feb 2019 09:08:20 +0300
+Message-Id: <20190224060828.2527-3-vt@altlinux.org>
 X-Mailer: git-send-email 2.11.0
 In-Reply-To: <20190224060828.2527-1-vt@altlinux.org>
 References: <20190224060828.2527-1-vt@altlinux.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-In preparation for new akcipher verify call remove sign/verify callbacks
-from RSA backends and make PKCS1 driver call encrypt/decrypt instead.
+Because with introduction of EC-RDSA and change in workings of RSA in
+regard to sign/verify, akcipher could have not all callbacks defined,
+check the presence of callbacks before calling them to increase
+robustness.
 
-This also complies with the well-known idea that raw RSA should never be
-used for sign/verify. It only should be used with proper padding scheme
-such as PKCS1 driver provides.
-
-Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-Cc: qat-linux@intel.com
-Cc: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: Gary Hook <gary.hook@amd.com>
-Cc: Horia Geantă <horia.geanta@nxp.com>
-Cc: Aymen Sghaier <aymen.sghaier@nxp.com>
 Signed-off-by: Vitaly Chikunov <vt@altlinux.org>
 ---
- crypto/rsa-pkcs1pad.c                         |   4 +-
- crypto/rsa.c                                  | 109 --------------------------
- drivers/crypto/caam/caampkc.c                 |   2 -
- drivers/crypto/ccp/ccp-crypto-rsa.c           |   2 -
- drivers/crypto/qat/qat_common/qat_asym_algs.c |   2 -
- 5 files changed, 2 insertions(+), 117 deletions(-)
+ include/crypto/akcipher.h | 25 ++++++++++++++++---------
+ 1 file changed, 16 insertions(+), 9 deletions(-)
 
-diff --git a/crypto/rsa-pkcs1pad.c b/crypto/rsa-pkcs1pad.c
-index 0a6680ca8cb6..94382fa2c6ac 100644
---- a/crypto/rsa-pkcs1pad.c
-+++ b/crypto/rsa-pkcs1pad.c
-@@ -429,7 +429,7 @@ static int pkcs1pad_sign(struct akcipher_request *req)
- 	akcipher_request_set_crypt(&req_ctx->child_req, req_ctx->in_sg,
- 				   req->dst, ctx->key_size - 1, req->dst_len);
+diff --git a/include/crypto/akcipher.h b/include/crypto/akcipher.h
+index 2d690494568c..f537fad1989f 100644
+--- a/include/crypto/akcipher.h
++++ b/include/crypto/akcipher.h
+@@ -268,7 +268,10 @@ static inline unsigned int crypto_akcipher_maxsize(struct crypto_akcipher *tfm)
+ {
+ 	struct akcipher_alg *alg = crypto_akcipher_alg(tfm);
  
--	err = crypto_akcipher_sign(&req_ctx->child_req);
-+	err = crypto_akcipher_decrypt(&req_ctx->child_req);
- 	if (err != -EINPROGRESS && err != -EBUSY)
- 		return pkcs1pad_encrypt_sign_complete(req, err);
- 
-@@ -551,7 +551,7 @@ static int pkcs1pad_verify(struct akcipher_request *req)
- 				   req_ctx->out_sg, req->src_len,
- 				   ctx->key_size);
- 
--	err = crypto_akcipher_verify(&req_ctx->child_req);
-+	err = crypto_akcipher_encrypt(&req_ctx->child_req);
- 	if (err != -EINPROGRESS && err != -EBUSY)
- 		return pkcs1pad_verify_complete(req, err);
- 
-diff --git a/crypto/rsa.c b/crypto/rsa.c
-index 4167980c243d..5d427c1100d6 100644
---- a/crypto/rsa.c
-+++ b/crypto/rsa.c
-@@ -50,34 +50,6 @@ static int _rsa_dec(const struct rsa_mpi_key *key, MPI m, MPI c)
- 	return mpi_powm(m, c, key->d, key->n);
+-	return alg->max_size(tfm);
++	if (alg->max_size)
++		return alg->max_size(tfm);
++	else
++		return 0;
  }
  
--/*
-- * RSASP1 function [RFC3447 sec 5.2.1]
-- * s = m^d mod n
-- */
--static int _rsa_sign(const struct rsa_mpi_key *key, MPI s, MPI m)
--{
--	/* (1) Validate 0 <= m < n */
--	if (mpi_cmp_ui(m, 0) < 0 || mpi_cmp(m, key->n) >= 0)
--		return -EINVAL;
--
--	/* (2) s = m^d mod n */
--	return mpi_powm(s, m, key->d, key->n);
--}
--
--/*
-- * RSAVP1 function [RFC3447 sec 5.2.2]
-- * m = s^e mod n;
-- */
--static int _rsa_verify(const struct rsa_mpi_key *key, MPI m, MPI s)
--{
--	/* (1) Validate 0 <= s < n */
--	if (mpi_cmp_ui(s, 0) < 0 || mpi_cmp(s, key->n) >= 0)
--		return -EINVAL;
--
--	/* (2) m = s^e mod n */
--	return mpi_powm(m, s, key->e, key->n);
--}
--
- static inline struct rsa_mpi_key *rsa_get_key(struct crypto_akcipher *tfm)
- {
- 	return akcipher_tfm_ctx(tfm);
-@@ -160,85 +132,6 @@ static int rsa_dec(struct akcipher_request *req)
+ /**
+@@ -287,10 +290,11 @@ static inline int crypto_akcipher_encrypt(struct akcipher_request *req)
+ 	struct akcipher_alg *alg = crypto_akcipher_alg(tfm);
+ 	struct crypto_alg *calg = tfm->base.__crt_alg;
+ 	unsigned int src_len = req->src_len;
+-	int ret;
++	int ret = -ENOSYS;
+ 
+ 	crypto_stats_get(calg);
+-	ret = alg->encrypt(req);
++	if (alg->encrypt)
++		ret = alg->encrypt(req);
+ 	crypto_stats_akcipher_encrypt(src_len, ret, calg);
  	return ret;
  }
+@@ -311,10 +315,11 @@ static inline int crypto_akcipher_decrypt(struct akcipher_request *req)
+ 	struct akcipher_alg *alg = crypto_akcipher_alg(tfm);
+ 	struct crypto_alg *calg = tfm->base.__crt_alg;
+ 	unsigned int src_len = req->src_len;
+-	int ret;
++	int ret = -ENOSYS;
  
--static int rsa_sign(struct akcipher_request *req)
--{
--	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
--	const struct rsa_mpi_key *pkey = rsa_get_key(tfm);
--	MPI m, s = mpi_alloc(0);
--	int ret = 0;
--	int sign;
--
--	if (!s)
--		return -ENOMEM;
--
--	if (unlikely(!pkey->n || !pkey->d)) {
--		ret = -EINVAL;
--		goto err_free_s;
--	}
--
--	ret = -ENOMEM;
--	m = mpi_read_raw_from_sgl(req->src, req->src_len);
--	if (!m)
--		goto err_free_s;
--
--	ret = _rsa_sign(pkey, s, m);
--	if (ret)
--		goto err_free_m;
--
--	ret = mpi_write_to_sgl(s, req->dst, req->dst_len, &sign);
--	if (ret)
--		goto err_free_m;
--
--	if (sign < 0)
--		ret = -EBADMSG;
--
--err_free_m:
--	mpi_free(m);
--err_free_s:
--	mpi_free(s);
--	return ret;
--}
--
--static int rsa_verify(struct akcipher_request *req)
--{
--	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
--	const struct rsa_mpi_key *pkey = rsa_get_key(tfm);
--	MPI s, m = mpi_alloc(0);
--	int ret = 0;
--	int sign;
--
--	if (!m)
--		return -ENOMEM;
--
--	if (unlikely(!pkey->n || !pkey->e)) {
--		ret = -EINVAL;
--		goto err_free_m;
--	}
--
--	s = mpi_read_raw_from_sgl(req->src, req->src_len);
--	if (!s) {
--		ret = -ENOMEM;
--		goto err_free_m;
--	}
--
--	ret = _rsa_verify(pkey, m, s);
--	if (ret)
--		goto err_free_s;
--
--	ret = mpi_write_to_sgl(m, req->dst, req->dst_len, &sign);
--	if (ret)
--		goto err_free_s;
--
--	if (sign < 0)
--		ret = -EBADMSG;
--
--err_free_s:
--	mpi_free(s);
--err_free_m:
--	mpi_free(m);
--	return ret;
--}
--
- static void rsa_free_mpi_key(struct rsa_mpi_key *key)
- {
- 	mpi_free(key->d);
-@@ -353,8 +246,6 @@ static void rsa_exit_tfm(struct crypto_akcipher *tfm)
- static struct akcipher_alg rsa = {
- 	.encrypt = rsa_enc,
- 	.decrypt = rsa_dec,
--	.sign = rsa_sign,
--	.verify = rsa_verify,
- 	.set_priv_key = rsa_set_priv_key,
- 	.set_pub_key = rsa_set_pub_key,
- 	.max_size = rsa_max_size,
-diff --git a/drivers/crypto/caam/caampkc.c b/drivers/crypto/caam/caampkc.c
-index 77ab28a2811a..d7e1fc5bacc5 100644
---- a/drivers/crypto/caam/caampkc.c
-+++ b/drivers/crypto/caam/caampkc.c
-@@ -994,8 +994,6 @@ static void caam_rsa_exit_tfm(struct crypto_akcipher *tfm)
- static struct akcipher_alg caam_rsa = {
- 	.encrypt = caam_rsa_enc,
- 	.decrypt = caam_rsa_dec,
--	.sign = caam_rsa_dec,
--	.verify = caam_rsa_enc,
- 	.set_pub_key = caam_rsa_set_pub_key,
- 	.set_priv_key = caam_rsa_set_priv_key,
- 	.max_size = caam_rsa_max_size,
-diff --git a/drivers/crypto/ccp/ccp-crypto-rsa.c b/drivers/crypto/ccp/ccp-crypto-rsa.c
-index 05850dfd7940..71e40680c880 100644
---- a/drivers/crypto/ccp/ccp-crypto-rsa.c
-+++ b/drivers/crypto/ccp/ccp-crypto-rsa.c
-@@ -214,8 +214,6 @@ static void ccp_rsa_exit_tfm(struct crypto_akcipher *tfm)
- static struct akcipher_alg ccp_rsa_defaults = {
- 	.encrypt = ccp_rsa_encrypt,
- 	.decrypt = ccp_rsa_decrypt,
--	.sign = ccp_rsa_decrypt,
--	.verify = ccp_rsa_encrypt,
- 	.set_pub_key = ccp_rsa_setpubkey,
- 	.set_priv_key = ccp_rsa_setprivkey,
- 	.max_size = ccp_rsa_maxsize,
-diff --git a/drivers/crypto/qat/qat_common/qat_asym_algs.c b/drivers/crypto/qat/qat_common/qat_asym_algs.c
-index 320e7854b4ee..c05d03565e96 100644
---- a/drivers/crypto/qat/qat_common/qat_asym_algs.c
-+++ b/drivers/crypto/qat/qat_common/qat_asym_algs.c
-@@ -1300,8 +1300,6 @@ static void qat_rsa_exit_tfm(struct crypto_akcipher *tfm)
- static struct akcipher_alg rsa = {
- 	.encrypt = qat_rsa_enc,
- 	.decrypt = qat_rsa_dec,
--	.sign = qat_rsa_dec,
--	.verify = qat_rsa_enc,
- 	.set_pub_key = qat_rsa_setpubkey,
- 	.set_priv_key = qat_rsa_setprivkey,
- 	.max_size = qat_rsa_max_size,
+ 	crypto_stats_get(calg);
+-	ret = alg->decrypt(req);
++	if (alg->decrypt)
++		ret = alg->decrypt(req);
+ 	crypto_stats_akcipher_decrypt(src_len, ret, calg);
+ 	return ret;
+ }
+@@ -334,10 +339,11 @@ static inline int crypto_akcipher_sign(struct akcipher_request *req)
+ 	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
+ 	struct akcipher_alg *alg = crypto_akcipher_alg(tfm);
+ 	struct crypto_alg *calg = tfm->base.__crt_alg;
+-	int ret;
++	int ret = -ENOSYS;
+ 
+ 	crypto_stats_get(calg);
+-	ret = alg->sign(req);
++	if (alg->sign)
++		ret = alg->sign(req);
+ 	crypto_stats_akcipher_sign(ret, calg);
+ 	return ret;
+ }
+@@ -357,10 +363,11 @@ static inline int crypto_akcipher_verify(struct akcipher_request *req)
+ 	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
+ 	struct akcipher_alg *alg = crypto_akcipher_alg(tfm);
+ 	struct crypto_alg *calg = tfm->base.__crt_alg;
+-	int ret;
++	int ret = -ENOSYS;
+ 
+ 	crypto_stats_get(calg);
+-	ret = alg->verify(req);
++	if (alg->verify)
++		ret = alg->verify(req);
+ 	crypto_stats_akcipher_verify(ret, calg);
+ 	return ret;
+ }
 -- 
 2.11.0
 
