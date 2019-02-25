@@ -2,131 +2,136 @@ Return-Path: <SRS0=IhKu=RA=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 129CFC43381
-	for <linux-crypto@archiver.kernel.org>; Mon, 25 Feb 2019 19:29:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC801C43381
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 Feb 2019 21:57:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D34652083D
-	for <linux-crypto@archiver.kernel.org>; Mon, 25 Feb 2019 19:29:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eb6ymmbM"
+	by mail.kernel.org (Postfix) with ESMTP id C2DB72083D
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 Feb 2019 21:57:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726417AbfBYT3C (ORCPT
+        id S1730238AbfBYVVD (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 25 Feb 2019 14:29:02 -0500
-Received: from mail-ot1-f68.google.com ([209.85.210.68]:41813 "EHLO
-        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726377AbfBYT3C (ORCPT
+        Mon, 25 Feb 2019 16:21:03 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:56232 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1730544AbfBYVVD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 25 Feb 2019 14:29:02 -0500
-Received: by mail-ot1-f68.google.com with SMTP id t7so8871710otk.8
-        for <linux-crypto@vger.kernel.org>; Mon, 25 Feb 2019 11:29:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=TJilMqWf/gD0dHb936/E+CrdNR9SmkQ/zdhDKmWVW9Q=;
-        b=eb6ymmbMFNhrKBWf9Jhfy7o6I3H4PcP2fO8HFRbTVlk45ZFrR/02Fpw1S7opQrzjEN
-         bACqNjI49UgA9J9IvsvmMJMRu/ZPfW2EVRVxw0SbbB8AiQCAZCuFGJCB6jvTD8S9h+Fc
-         lhzN6d7Wf79dUIwbL2iA39gstv/gliir0gd2jLss2hHUy60oFIiMtFfb5++hwoUW2s47
-         fKEt8sE3W5b4oB5L/X2sZU/hK4JVRvF11IDwHNuCbemcrBjip0DqFY8qW0Wdm+Cwx5GP
-         xGWLsuzoajXmhWJbYKcDmYxI2hq1Ui9SUTAr86b2R2AKEY/pHSQRyKiB8Jp+u7qoMHrh
-         wnNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=TJilMqWf/gD0dHb936/E+CrdNR9SmkQ/zdhDKmWVW9Q=;
-        b=ZpmADI9d8/2saZZpifMiOvaT57WVnuL48lLFLqoQCk/pJ2aqHE28e4LWOyOMzUehCc
-         xyDdazLha7nhOjHf2zqJHVSxrcStQfroSR3lLYLMUzm2UtOjswdWP+c44uiRxAdCQH3T
-         R8u+AmMyJjAO0TVPRWed4sKLTh9otKYTuY3wTfLouHqZKDx24AIQ+gwvHDyR/QmtSJIg
-         jOORo0uINQG1V3WDtb7aSzjskas6gap9UqShGLW4pUpxZF2GVoVmu3L5nSzo5VWU4ZV3
-         5x68dFssrcs5z2ZN6DeX3+LtkDeqo719zAFEczQC3Br5+8iKSJA+m1N9vhldNqYp+/9P
-         7QOg==
-X-Gm-Message-State: AHQUAuaCjLyTel1+aldwooiXnKKQDjbHleZ+lFRPTg8pO2YoPmoRdeJY
-        0QyhHJp1n5NGW0VlGirZjtqjI1l/bTIovTq7W+0=
-X-Google-Smtp-Source: AHgI3IYdPgnwaaWmGEqE0WXL7fZ2+jL4qqUrxnngcJmfLIw1KeoV5PaBMgjzAY6Qt14CKynEwM7+EqFS38PFRwAI1TU=
-X-Received: by 2002:a9d:e92:: with SMTP id 18mr13239364otj.134.1551122940924;
- Mon, 25 Feb 2019 11:29:00 -0800 (PST)
+        Mon, 25 Feb 2019 16:21:03 -0500
+Received: from pps.filterd (m0098399.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x1PL4mFX147373
+        for <linux-crypto@vger.kernel.org>; Mon, 25 Feb 2019 16:21:02 -0500
+Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2qvq4aaxhd-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <linux-crypto@vger.kernel.org>; Mon, 25 Feb 2019 16:21:01 -0500
+Received: from localhost
+        by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-crypto@vger.kernel.org> from <bauerman@linux.ibm.com>;
+        Mon, 25 Feb 2019 21:21:00 -0000
+Received: from b01cxnp22034.gho.pok.ibm.com (9.57.198.24)
+        by e14.ny.us.ibm.com (146.89.104.201) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Mon, 25 Feb 2019 21:20:57 -0000
+Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
+        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x1PLKu5D24838388
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 25 Feb 2019 21:20:56 GMT
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 51C05AC05E;
+        Mon, 25 Feb 2019 21:20:56 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1A51CAC059;
+        Mon, 25 Feb 2019 21:20:54 +0000 (GMT)
+Received: from morokweng.localdomain (unknown [9.85.212.38])
+        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTPS;
+        Mon, 25 Feb 2019 21:20:53 +0000 (GMT)
+References: <20190224060828.2527-1-vt@altlinux.org> <20190224060828.2527-11-vt@altlinux.org>
+User-agent: mu4e 1.0; emacs 26.1
+From:   Thiago Jung Bauermann <bauerman@linux.ibm.com>
+To:     Vitaly Chikunov <vt@altlinux.org>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        David Howells <dhowells@redhat.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>
+Subject: Re: [PATCH v5 10/10] integrity: support EC-RDSA signatures for asymmetric_verify
+In-reply-to: <20190224060828.2527-11-vt@altlinux.org>
+Date:   Mon, 25 Feb 2019 18:20:49 -0300
 MIME-Version: 1.0
-References: <20190222100613.2290-1-christopher.spencer@sea.co.uk>
- <VI1PR0402MB348578FE91831D11CDCC91D5987A0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
- <CAGUNXRTe_G91TN-3qP-TAACB6kLXgJn-on5VGCJWbMqrv+rBWw@mail.gmail.com>
-In-Reply-To: <CAGUNXRTe_G91TN-3qP-TAACB6kLXgJn-on5VGCJWbMqrv+rBWw@mail.gmail.com>
-From:   Chris Spencer <spencercw@gmail.com>
-Date:   Mon, 25 Feb 2019 19:28:49 +0000
-Message-ID: <CAGUNXRSZRMj_DeMnV=4fKeqNKFaDhVeYJkZfE5T1yivVsz7APA@mail.gmail.com>
-Subject: Re: [RFC 0/4] crypto: caam - Add i.MX8MQ support
-To:     Horia Geanta <horia.geanta@nxp.com>
-Cc:     Aymen Sghaier <aymen.sghaier@nxp.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Chris Spencer <christopher.spencer@sea.co.uk>,
-        dl-linux-imx <linux-imx@nxp.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+X-TM-AS-GCONF: 00
+x-cbid: 19022521-0052-0000-0000-00000390BB6C
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00010663; HX=3.00000242; KW=3.00000007;
+ PH=3.00000004; SC=3.00000281; SDB=6.01166320; UDB=6.00609219; IPR=6.00946924;
+ MB=3.00025738; MTD=3.00000008; XFM=3.00000015; UTC=2019-02-25 21:20:59
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19022521-0053-0000-0000-00005FF81824
+Message-Id: <874l8rr2dq.fsf@morokweng.localdomain>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-02-25_11:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1902250151
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 25 Feb 2019 at 14:17, Chris Spencer <spencercw@gmail.com> wrote:
-> On Mon, 25 Feb 2019 at 14:03, Horia Geanta <horia.geanta@nxp.com> wrote:
-> > The code looks *very* similar to what was developed by NXP.
-> > Why have you stripped off the S-O-Bs?
+
+Hello Vitaly,
+
+Vitaly Chikunov <vt@altlinux.org> writes:
+
+> Allow to use EC-RDSA signatures for IMA by determining signature type by
+> the hash algorithm name. This works good for EC-RDSA since Streebog and
+> EC-RDSA should always be used together.
 >
-> Hi Horia,
+> Cc: Mimi Zohar <zohar@linux.ibm.com>
+> Cc: Dmitry Kasatkin <dmitry.kasatkin@gmail.com>
+> Cc: linux-integrity@vger.kernel.org
+> Signed-off-by: Vitaly Chikunov <vt@altlinux.org>
+> ---
+>  security/integrity/digsig_asymmetric.c | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
 >
-> Apologies, I was struggling to find any guidance about what to do with
-> the tags when upstreaming changes. I will add them in the next
-> version.
+> diff --git a/security/integrity/digsig_asymmetric.c b/security/integrity/digsig_asymmetric.c
+> index d775e03fbbcc..c4a3313e0210 100644
+> --- a/security/integrity/digsig_asymmetric.c
+> +++ b/security/integrity/digsig_asymmetric.c
+> @@ -104,9 +104,14 @@ int asymmetric_verify(struct key *keyring, const char *sig,
 >
-> Thanks,
-> Chris
+>  	memset(&pks, 0, sizeof(pks));
+>
+> -	pks.pkey_algo = "rsa";
+>  	pks.hash_algo = hash_algo_name[hdr->hash_algo];
+> -	pks.encoding = "pkcs1";
+> +	if (!strncmp(pks.hash_algo, "streebog", 8)) {
 
-Horia,
+Is it possible to test hdr->hash_algo instead of pkcs.hash_algo? IMHO if
+an integer value is available it's preferable to check it rather than
+doing a string comparison.
 
-Just want to clear this up a bit to make sure I'm doing the right
-thing (this is my first kernel patch so forgive my missteps). These
-are the origins of the patches and the SOBs I will add:
+Also, it would be good to have a comment here mentioning that Streebog
+and EC-RDSA should always be used together
 
-2/4 is based entirely on [1], except I have only applied the changes
-relevant to the i.MX8MQ. I will add:
-Signed-off-by: Aymen Sghaier <aymen.sghaier@nxp.com>
+> +		pks.pkey_algo = "ecrdsa";
+> +		pks.encoding = "raw";
+> +	} else {
+> +		pks.pkey_algo = "rsa";
+> +		pks.encoding = "pkcs1";
+> +	}
+>  	pks.digest = (u8 *)data;
+>  	pks.digest_size = datalen;
+>  	pks.s = hdr->sig;
 
-3/4 is an amalgamation of [2], [3] and [4], as well as a fix of my own
-(in the downstream version of pdb.h, rsa_priv_f2_pdb and
-rsa_priv_f3_pdb use dma_addr_t which causes a test failure; they
-should be using caam_dma_addr_t). I will add:
-Signed-off-by: Franck LENORMAND <franck.lenormand@nxp.com>
-Signed-off-by: Aymen Sghaier <aymen.sghaier@nxp.com>
+--
+Thiago Jung Bauermann
+IBM Linux Technology Center
 
-4/4 is an amalgamation of [5], [6] and [7], lightly modified to drop
-the i.MX8Q bits. I will add:
-Signed-off-by: Franck LENORMAND <franck.lenormand@nxp.com>
-Signed-off-by: Aymen Sghaier <aymen.sghaier@nxp.com>
-
-It's not really clear to me what the From address should be. They are
-all under my name in my repo, but the changes are almost entirely
-based on those authored by NXP, so I'm not sure whether that's
-ok/correct.
-
-Thanks,
-Chris
-
-[1] MLK-15473-1: crypto: caam: Add CAAM driver support for iMX8 soc family
-https://source.codeaurora.org/external/imx/linux-imx/commit/drivers/crypto/caam?h=imx_4.14.78_1.0.0_ga&id=afa53c2c96a54b4432a26372e3b5e7dbccbb9671
-[2] MLK-18082: crypto: caam: Fix DMA coherency configuration
-https://source.codeaurora.org/external/imx/linux-imx/commit/drivers/crypto/caam?h=imx_4.14.78_1.0.0_ga&id=d07274fcddde4258e63edf2a77dc29aef19a0d27
-[3] MLK-17233: Fix CAAM pointer size error for i.MX8
-https://source.codeaurora.org/external/imx/linux-imx/commit/drivers/crypto/caam?h=imx_4.14.78_1.0.0_ga&id=09a35f4ff6e7a6fb93db6f0b0ec30c1c6c25df34
-[4] MLK-18082: crypto: caam: Check ret value of dma_set_mask_and_coherent
-https://source.codeaurora.org/external/imx/linux-imx/commit/drivers/crypto/caam?h=imx_4.14.78_1.0.0_ga&id=278d4b127292943eaeb49f23d8a99598ea8954bd
-[5] MLK-18082: crypto: caam: Move RNG instantation
-https://source.codeaurora.org/external/imx/linux-imx/commit/drivers/crypto/caam?h=imx_4.14.78_1.0.0_ga&id=5fd8fe866172c38e8cd07741d98d79b995f05bc9
-[6] MLK-17111-1: crypto: caam: Fix RNG instantiation retry
-https://source.codeaurora.org/external/imx/linux-imx/commit/drivers/crypto/caam?h=imx_4.14.78_1.0.0_ga&id=031caf182221da24cd41d4cacf4c81fe1897249f
-[7] MLK-17227: crypto: caam: Update CAAM driver verbosity while RNG init
-https://source.codeaurora.org/external/imx/linux-imx/commit/drivers/crypto/caam?h=imx_4.14.78_1.0.0_ga&id=bc328d847a575082472d7aebbfe0610c5adde32a
