@@ -2,120 +2,138 @@ Return-Path: <SRS0=wbmp=RB=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BBF0C43381
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 Feb 2019 19:18:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B025FC43381
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 Feb 2019 22:28:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E554A21850
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 Feb 2019 19:18:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="EjuvqrEw"
+	by mail.kernel.org (Postfix) with ESMTP id 7D3BA21873
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 Feb 2019 22:28:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1551220106;
+	bh=6wiAA0plAefmA23D7uz9DQFUSxyjIU0oRPBZogV54fM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=SmXU0VfEiTx9NZ30odry6iirqa5E1W01RJG/IBKe9lhjYpKdbVCCWD6h2tRGiQXGE
+	 CPrgBiU8t37kzvMdmiIngD9drXDVj91g+2epmXgkml+sIGllnmppNN8zZu/W/sa2i9
+	 Lf0jF0umjfusBEuEbsRvS9RVzet+Qne585LlSnwY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727732AbfBZTS4 (ORCPT
+        id S1728989AbfBZW2Z (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 26 Feb 2019 14:18:56 -0500
-Received: from mail-eopbgr760085.outbound.protection.outlook.com ([40.107.76.85]:55904
-        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727731AbfBZTS4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 26 Feb 2019 14:18:56 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector1-amd-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=u5gjjYrgXl+wZ2Jn33X1LwUKGBbnN+B08FOaU/JTQf4=;
- b=EjuvqrEwgYnzwi8paJH3fp27+Uh1Nwz//MGUkEAgnyKXFyEhvJN6X5K3bezTNObtsRKgBy1k3wdl2qhTvZokYCBLQLqvJhHWq4WDxDuv3T7oR2NhPqasIWbxD4/Hyc3tz9gWFI3GHR5XH04B89QnP3BdRoKT8XQoqCnQo93pniQ=
-Received: from DM6PR12MB2682.namprd12.prod.outlook.com (20.176.116.31) by
- DM6PR12MB3098.namprd12.prod.outlook.com (20.178.30.220) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1643.18; Tue, 26 Feb 2019 19:18:53 +0000
-Received: from DM6PR12MB2682.namprd12.prod.outlook.com
- ([fe80::2073:3d8a:bf05:4686]) by DM6PR12MB2682.namprd12.prod.outlook.com
- ([fe80::2073:3d8a:bf05:4686%4]) with mapi id 15.20.1643.019; Tue, 26 Feb 2019
- 19:18:53 +0000
-From:   "Singh, Brijesh" <brijesh.singh@amd.com>
-To:     Nathaniel McCallum <npmccallum@redhat.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-CC:     "Singh, Brijesh" <brijesh.singh@amd.com>
-Subject: Re: SEV Command Privilege Separation
-Thread-Topic: SEV Command Privilege Separation
-Thread-Index: AQHUxKmADaYD3Hopbke/lwoL/D6HT6XyhuOA
-Date:   Tue, 26 Feb 2019 19:18:53 +0000
-Message-ID: <4db2f309-237f-240d-e7f7-290391274237@amd.com>
-References: <CAOASepP1+ZzGfy62jO5S4ZtpYzPJKqVZntTPp8Xn-zK8Kd2k8A@mail.gmail.com>
-In-Reply-To: <CAOASepP1+ZzGfy62jO5S4ZtpYzPJKqVZntTPp8Xn-zK8Kd2k8A@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: SN4PR0201CA0007.namprd02.prod.outlook.com
- (2603:10b6:803:2b::17) To DM6PR12MB2682.namprd12.prod.outlook.com
- (2603:10b6:5:4a::31)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=brijesh.singh@amd.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-originating-ip: [165.204.77.1]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: aa02b403-c50f-448b-6600-08d69c1f3ecb
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600127)(711020)(4605104)(4618075)(2017052603328)(7153060)(7193020);SRVR:DM6PR12MB3098;
-x-ms-traffictypediagnostic: DM6PR12MB3098:
-x-microsoft-exchange-diagnostics: 1;DM6PR12MB3098;20:JJJgFe4vcRUfW84cPLx5BhqpawyJumqQCucOfZFGFUFTsVs2HINMrSEAKAamYy9LygcT8BsGrkw2A2vJopuNG2DuFavyHm69VIE1DPreSobSkXnUX3HZNxFZl5BDfAxgi6Nruar51+h56Gm2IuZp9XtNMuPlfHfBjQifWeMcyQoZatJCZFwx6ZVG8SpCwucOdwrAydxQx5ZKhKsyiJQNTeQsHg3hDp2znwfc/W9PJRpVbGDAPzJ6LL1UTRV0Jea/
-x-microsoft-antispam-prvs: <DM6PR12MB3098612C1C98DD44324A5259E57B0@DM6PR12MB3098.namprd12.prod.outlook.com>
-x-forefront-prvs: 096029FF66
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(39860400002)(366004)(346002)(136003)(376002)(396003)(199004)(189003)(6246003)(14444005)(186003)(5660300002)(31696002)(386003)(8676002)(14454004)(86362001)(6436002)(316002)(6506007)(68736007)(256004)(2201001)(31686004)(53546011)(26005)(478600001)(3480700005)(66066001)(71190400001)(71200400001)(2906002)(3846002)(6116002)(102836004)(99286004)(6486002)(6512007)(76176011)(110136005)(7736002)(4326008)(105586002)(476003)(2501003)(97736004)(53936002)(25786009)(8936002)(2616005)(52116002)(305945005)(446003)(36756003)(486006)(81166006)(11346002)(81156014)(229853002)(106356001);DIR:OUT;SFP:1101;SCL:1;SRVR:DM6PR12MB3098;H:DM6PR12MB2682.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: amd.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: 5ioGmdEkQNoI33Usv9qCCD/uZaBGglqYDDHGDTPmbxMMjmWG9VGaiypvtR2UJtj4Z8HXhOHktV+s91YqsGNXNXrV45JYWNofkgR3hpfv65CcGLohchY8YvlefS6SsnngAqq3wZn343YiCqXWCuRYgnHdY9UYuleYq9ftSMEqMcnwnsFUKCwf92MQkjlhSarAUWuY+DtMWIFKp8Ef3Sh81htlIV0gOiC51bkUtHui1AmcEq4sSVWoyjSbXM/6UN1pKkcilgNQu1bZH7EEb7+6gS28eGkpVJ/UVhvuEdKbPvFiVtkpoqQan0sNtBDm5ZCODCVze+YjrDVp6efTfEeqpY/4AgCuYC3Lfb3iZ/mPPXegiB0QsgJwjLnpeU9z4o/KZFCgGozLq2MTCsZfg5FxGfmaruM+i9qL0g13uhAuU2s=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <72AE40C881D8A146BEC9E708C8D81FD2@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        Tue, 26 Feb 2019 17:28:25 -0500
+Received: from mail.kernel.org ([198.145.29.99]:47086 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728791AbfBZW2Z (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 26 Feb 2019 17:28:25 -0500
+Received: from gmail.com (unknown [104.132.1.77])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 1F21F2186A;
+        Tue, 26 Feb 2019 22:28:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1551220104;
+        bh=6wiAA0plAefmA23D7uz9DQFUSxyjIU0oRPBZogV54fM=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=atvh7ygBj06fUfwtSDhF4/rJxiBQ4N8V0h96ZYJ0b2bKetInAuvmt9plwWV1oXh88
+         9EXHYved2Ve595MndIHcFieJRQ+sQxG8MJZvM1QET2y9DF8rAmN3GFHXJrCVivKWcF
+         zVUq5ZTDk1dh3ZL9gQdFNDmNz417JUU6SlrXJ67E=
+Date:   Tue, 26 Feb 2019 14:28:22 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Jan Glauber <jglauber@marvell.com>
+Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Mahipal Challa <mahipalreddy2006@gmail.com>
+Subject: Re: [PATCH] crypto: cavium/zip - fix collision with generic
+ cra_driver_name
+Message-ID: <20190226222821.GD218103@gmail.com>
+References: <20190223082323.4126-1-ebiggers@kernel.org>
+ <20190226075545.GB15176@hc>
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: aa02b403-c50f-448b-6600-08d69c1f3ecb
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Feb 2019 19:18:52.8078
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3098
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190226075545.GB15176@hc>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-DQoNCk9uIDIvMTQvMTkgMzowOCBQTSwgTmF0aGFuaWVsIE1jQ2FsbHVtIHdyb3RlOg0KPiBJJ3Zl
-IGJlZW4gd29ya2luZyBvbiB3cmFwcGluZyB2YXJpb3VzIFNFViBrZXJuZWwgQVBJcyBmb3IgdXNl
-cnNwYWNlDQo+IGNvbnN1bXB0aW9uLiBUaGVyZSBkb2VzIG5vdCBhcHBlYXIgdG8gYmUgYW55IHBy
-aXZpbGVnZSBzZXBhcmF0aW9uIGZvcg0KPiB0aGVzZSBjb21tYW5kczogeW91IGNhbiBydW4gdGhl
-bSBhbGwgb3Igbm9uZSBvZiB0aGVtLiBUaGlzIGlzIGxlc3MNCj4gdGhhbiBpZGVhbCBiZWNhdXNl
-IGl0IG1lYW5zIHRoYXQgYSBjb21wcm9taXNlIG9mIHRoZSBjb2RlIHdoaWNoDQo+IGxhdW5jaGVz
-IFZNcyBjb3VsZCBtYWtlIHBlcm1hbmVudCBjaGFuZ2VzIHRvIHRoZSBTRVYgY2VydGlmaWNhdGUN
-Cj4gY2hhaW4uDQo+IA0KPiBUaGVzZSBjb21tYW5kcyBhcmUgcmVxdWlyZWQgdG8gYXR0ZXN0IHRo
-ZSBWTSBlbnZpcm9ubWVudDoNCj4gICAgU0VWX1BESF9DRVJUX0VYUE9SVA0KPiAgICBTRVZfUExB
-VEZPUk1fU1RBVFVTDQo+ICAgIFNFVl9HRVRfSUQNCj4gDQo+IFRoZXNlIGNvbW1hbmRzIG1hbmFn
-ZSB0aGUgU0VWIGNlcnRpZmljYXRlIGNoYWluOg0KPiAgICBTRVZfUEVLX0NFUlRfSU1QT1JUDQo+
-ICAgIFNFVl9GQUNUT1JZX1JFU0VUDQo+ICAgIFNFVl9QRUtfR0VODQo+ICAgIFNFVl9QRUtfQ1NS
-DQo+ICAgIFNFVl9QREhfR0VODQo+IA0KPiBJIHdvdWxkIGV4cGVjdCB0aGUgZmlyc3QgZ3JvdXAg
-b2YgY29tbWFuZHMgdG8gYmUgYWJsZSB0byBiZSBjYWxsZWQgYnkNCj4gd2hhdGV2ZXIgYWN0b3Ig
-bGF1bmNoZXMgVk1zLiBUaGUgbGF0dGVyIGdyb3VwIG9mIGNvbW1hbmRzIHNob3VsZCBiZQ0KPiBh
-YmxlIHRvIGJlIGNhbGxlZCBieSB3aGF0ZXZlciBhY3RvciBtYW5hZ2VzIHRoZSBTRVYgZW52aXJv
-bm1lbnQuDQo+IA0KPiBJIGRvbid0IGhhdmUgc3Ryb25nIG9waW5pb25zIG9uIGhvdyB0aGlzIHBy
-aXZpbGVnZSBzZXBhcmF0aW9uIHNob3VsZA0KPiBoYXBwZW4uIEl0IG1pZ2h0IGJlIHN1ZmZpY2ll
-bnQgdG8gZGlzdGluZ3Vpc2ggdGhlc2UgYmFzZWQgb24gdGhlIG1vZGUNCj4gb2YgdGhlIG9wZW4o
-KSBjYWxsLiBUaGlzIGNvdWxkIHRoZW4gYmUgbWFuYWdlZCB3aXRoIGZpbGVzeXN0ZW0NCj4gcGVy
-bWlzc2lvbnMuIEJ1dCBJJ20gb3BlbiB0byBvdGhlciBpZGVhcy4NCj4gDQoNCg0KV2UgaGFkIHNv
-bWV3aGF0IGEgc2ltaWxhciBkaXNjdXNzaW9uIG9uIGxpYnZpcnQgTUwsIGN1cnJlbnRseSB0aGUN
-CnVkZXYgcnVsZXMgZm9yIHRoZSAvZGV2L3NldiBpcyAwNjAwLiBBcyB5b3UgaGF2ZSBub3RpY2Vk
-IHRoZXJlDQppcyBubyBwcml2aWxlZ2Ugc2VwYXJhdGlvbiwgaWYgYWRtaW4gZ3JhbnRzIDA2NDQg
-dGhlbiB1c2VyL2dyb3VwDQp3aWxsIGFibGUgdG8gaXNzdWUgYSBjb21tYW5kIHdoaWNoIGNhbiBt
-b2RpZnkgIHRoZSBTRVYgY2VydGlmaWNhdGUNCmNoYWluLiBBdCB0aGUgdmVyeSBtaW5pbWFsIHdl
-IHNob3VsZCBwZXJmb3JtIHRoZSBtb2RlIGNoZWNrDQpiZWZvcmUgaXNzdWluZyB0aGUgY29tbWFu
-ZHMgdG8gUFNQLiBJZiB1c2VyIGRvZXMgbm90IGhhdmUgJ3dyaXRlJw0KYWNjZXNzIHRoZW4gYW55
-IGNvbW1hbmRzIHdoaWNoIG1vZGlmaWVzIHRoZSBjZXJ0LWNoYWluIHNob3VsZA0KZmFpbC4gSXRz
-IGluIG15IFRPRE8gbGlzdCwgdGhlIHBhdGNoZXMgYXJlIGFsd2F5cyB3ZWxjb21lIDopDQoNCi1C
-cmlqZXNoDQo=
+On Tue, Feb 26, 2019 at 07:55:54AM +0000, Jan Glauber wrote:
+> On Sat, Feb 23, 2019 at 12:23:23AM -0800, Eric Biggers wrote:
+> > From: Eric Biggers <ebiggers@google.com>
+> > 
+> > The cavium/zip implementation of the deflate compression algorithm is
+> > incorrectly being registered under the generic driver name, which
+> > prevents the generic implementation from being registered with the
+> > crypto API when CONFIG_CRYPTO_DEV_CAVIUM_ZIP=y.  Similarly the lzs
+> > algorithm (which does not currently have a generic implementation...)
+> > is incorrectly being registered as lzs-generic.
+> > 
+> > Fix the naming collision by adding a suffix "-cavium" to the
+> > cra_driver_name of the cavium/zip algorithms.
+> 
+> The patch is fine, basically the same as:
+> https://marc.info/?l=linux-crypto-vger&m=152968599829763&w=2
+> 
+> Shouldn't we also rename deflate to deflate generic?
+> 
+> --Jan
+> 
+
+It is already deflate-generic.  Since cra_driver_name is unset,
+crypto_set_driver_name() in crypto/algapi.c appends "-generic" to
+cra_name = "deflate", forming cra_driver_name = "deflate-generic".
+
+Personally I think that should be gotten rid of and the crypto API should
+require that cra_driver_name always be set, but that's what it does now.
+
+> > Fixes: 640035a2dc55 ("crypto: zip - Add ThunderX ZIP driver core")
+> > Cc: Mahipal Challa <mahipalreddy2006@gmail.com>
+> > Cc: Jan Glauber <jglauber@cavium.com>
+> > Signed-off-by: Eric Biggers <ebiggers@google.com>
+> > ---
+> >  drivers/crypto/cavium/zip/zip_main.c | 6 ++++--
+> >  1 file changed, 4 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/drivers/crypto/cavium/zip/zip_main.c b/drivers/crypto/cavium/zip/zip_main.c
+> > index e6b09e784e666..a8447a3cf3665 100644
+> > --- a/drivers/crypto/cavium/zip/zip_main.c
+> > +++ b/drivers/crypto/cavium/zip/zip_main.c
+> > @@ -351,6 +351,7 @@ static struct pci_driver zip_driver = {
+> > 
+> >  static struct crypto_alg zip_comp_deflate = {
+> >         .cra_name               = "deflate",
+> > +       .cra_driver_name        = "deflate-cavium",
+> >         .cra_flags              = CRYPTO_ALG_TYPE_COMPRESS,
+> >         .cra_ctxsize            = sizeof(struct zip_kernel_ctx),
+> >         .cra_priority           = 300,
+> > @@ -365,6 +366,7 @@ static struct crypto_alg zip_comp_deflate = {
+> > 
+> >  static struct crypto_alg zip_comp_lzs = {
+> >         .cra_name               = "lzs",
+> > +       .cra_driver_name        = "lzs-cavium",
+> >         .cra_flags              = CRYPTO_ALG_TYPE_COMPRESS,
+> >         .cra_ctxsize            = sizeof(struct zip_kernel_ctx),
+> >         .cra_priority           = 300,
+> > @@ -384,7 +386,7 @@ static struct scomp_alg zip_scomp_deflate = {
+> >         .decompress             = zip_scomp_decompress,
+> >         .base                   = {
+> >                 .cra_name               = "deflate",
+> > -               .cra_driver_name        = "deflate-scomp",
+> > +               .cra_driver_name        = "deflate-scomp-cavium",
+> >                 .cra_module             = THIS_MODULE,
+> >                 .cra_priority           = 300,
+> >         }
+> > @@ -397,7 +399,7 @@ static struct scomp_alg zip_scomp_lzs = {
+> >         .decompress             = zip_scomp_decompress,
+> >         .base                   = {
+> >                 .cra_name               = "lzs",
+> > -               .cra_driver_name        = "lzs-scomp",
+> > +               .cra_driver_name        = "lzs-scomp-cavium",
+> >                 .cra_module             = THIS_MODULE,
+> >                 .cra_priority           = 300,
+> >         }
+> > --
+> > 2.20.1
