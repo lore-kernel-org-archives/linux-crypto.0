@@ -2,92 +2,108 @@ Return-Path: <SRS0=wS1t=RC=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19F98C00319
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 Feb 2019 06:15:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA9F7C43381
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 Feb 2019 23:29:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DD4B6218D9
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 Feb 2019 06:15:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7F9C72133D
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 Feb 2019 23:29:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729800AbfB0GPp (ORCPT
+        id S1730310AbfB0X3A (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 27 Feb 2019 01:15:45 -0500
-Received: from vmicros1.altlinux.org ([194.107.17.57]:47146 "EHLO
-        vmicros1.altlinux.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729592AbfB0GPp (ORCPT
+        Wed, 27 Feb 2019 18:29:00 -0500
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39372 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729986AbfB0X3A (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 27 Feb 2019 01:15:45 -0500
-Received: from imap.altlinux.org (imap.altlinux.org [194.107.17.38])
-        by vmicros1.altlinux.org (Postfix) with ESMTP id C8C3272CCAD;
-        Wed, 27 Feb 2019 09:15:42 +0300 (MSK)
-Received: from beacon.altlinux.org (unknown [185.6.174.98])
-        by imap.altlinux.org (Postfix) with ESMTPSA id 9EC8D4A4AE7;
-        Wed, 27 Feb 2019 09:15:42 +0300 (MSK)
-From:   Vitaly Chikunov <vt@altlinux.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Wed, 27 Feb 2019 18:29:00 -0500
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x1RNJZXK088204
+        for <linux-crypto@vger.kernel.org>; Wed, 27 Feb 2019 18:28:55 -0500
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2qx1qhe4ah-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <linux-crypto@vger.kernel.org>; Wed, 27 Feb 2019 18:28:55 -0500
+Received: from localhost
+        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-crypto@vger.kernel.org> from <zohar@linux.ibm.com>;
+        Wed, 27 Feb 2019 23:28:53 -0000
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
+        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Wed, 27 Feb 2019 23:28:50 -0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x1RNSnQ058195990
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Wed, 27 Feb 2019 23:28:49 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5008D4278B;
+        Wed, 27 Feb 2019 23:28:49 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3EE3842790;
+        Wed, 27 Feb 2019 23:28:48 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.80.106.105])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 27 Feb 2019 23:28:48 +0000 (GMT)
+Subject: Re: [PATCH v5 04/10] crypto: akcipher - new verify API for public
+ key algorithms
+From:   Mimi Zohar <zohar@linux.ibm.com>
+To:     Vitaly Chikunov <vt@altlinux.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         David Howells <dhowells@redhat.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
         linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH RFC v6] integrity: support EC-RDSA signatures for asymmetric_verify
-Date:   Wed, 27 Feb 2019 09:15:33 +0300
-Message-Id: <20190227061533.1030-1-vt@altlinux.org>
-X-Mailer: git-send-email 2.11.0
-MIME-Version: 1.0
+Date:   Wed, 27 Feb 2019 18:28:37 -0500
+In-Reply-To: <20190224060828.2527-5-vt@altlinux.org>
+References: <20190224060828.2527-1-vt@altlinux.org>
+         <20190224060828.2527-5-vt@altlinux.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.20.5 (3.20.5-1.fc24) 
+Mime-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19022723-0020-0000-0000-0000031C18FD
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19022723-0021-0000-0000-0000216D87D5
+Message-Id: <1551310117.10911.108.camel@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-02-27_15:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1902270151
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Allow to use EC-RDSA signatures for IMA by determining signature type by
-the hash algorithm name. This works good for EC-RDSA since Streebog and
-EC-RDSA should always be used together.
+Hi Vitaly,
 
-Cc: Mimi Zohar <zohar@linux.ibm.com>
-Cc: Dmitry Kasatkin <dmitry.kasatkin@gmail.com>
-Cc: linux-integrity@vger.kernel.org
-Signed-off-by: Vitaly Chikunov <vt@altlinux.org>
----
-Changes since v5:
+On Sun, 2019-02-24 at 09:08 +0300, Vitaly Chikunov wrote:
+> Previous akcipher .verify() just `decrypts' (using RSA encrypt which is
+> using public key) signature to uncover message hash, which was then
+> compared in upper level public_key_verify_signature() with the expected
+> hash value, which itself was never passed into verify().
+> 
+> This approach was incompatible with EC-DSA family of algorithms,
+> because, to verify a signature EC-DSA algorithm also needs a hash value
+> as input; then it's used (together with a signature divided into halves
+> `r||s') to produce a witness value, which is then compared with `r' to
+> determine if the signature is correct. Thus, for EC-DSA, nor
+> requirements of .verify() itself, nor its output expectations in
+> public_key_verify_signature() wasn't sufficient.
+> 
+> Make improved .verify() call which gets hash value as input and produce
+> complete signature check without any output besides status.
+> 
+> Now for the top level verification only crypto_akcipher_verify() needs
+> to be called.
 
-- This should go over "[PATCH v5 00/10] crypto: add EC-RDSA (GOST 34.10)
-  algorithm" instead of "[PATCH v5 10/10] integrity: support EC-RDSA signatures
-  for asymmetric_verify."
+All but this patch apply.  Which branch is this patch based against?
 
-- Comparison of hash algo by enum id instead of text name, as suggested by
-  Thiago Jung Bauermann and Mimi Zohar.
-
- security/integrity/digsig_asymmetric.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
-
-diff --git a/security/integrity/digsig_asymmetric.c b/security/integrity/digsig_asymmetric.c
-index d775e03fbbcc..99080871eb9f 100644
---- a/security/integrity/digsig_asymmetric.c
-+++ b/security/integrity/digsig_asymmetric.c
-@@ -104,9 +104,16 @@ int asymmetric_verify(struct key *keyring, const char *sig,
- 
- 	memset(&pks, 0, sizeof(pks));
- 
--	pks.pkey_algo = "rsa";
- 	pks.hash_algo = hash_algo_name[hdr->hash_algo];
--	pks.encoding = "pkcs1";
-+	if (hdr->hash_algo == HASH_ALGO_STREEBOG_256 ||
-+	    hdr->hash_algo == HASH_ALGO_STREEBOG_512) {
-+		/* EC-RDSA and Streebog should go together. */
-+		pks.pkey_algo = "ecrdsa";
-+		pks.encoding = "raw";
-+	} else {
-+		pks.pkey_algo = "rsa";
-+		pks.encoding = "pkcs1";
-+	}
- 	pks.digest = (u8 *)data;
- 	pks.digest_size = datalen;
- 	pks.s = hdr->sig;
--- 
-2.11.0
+Mimi
 
