@@ -6,66 +6,82 @@ X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D27F4C43381
-	for <linux-crypto@archiver.kernel.org>; Thu, 28 Feb 2019 06:39:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21114C43381
+	for <linux-crypto@archiver.kernel.org>; Thu, 28 Feb 2019 06:39:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A17D220842
-	for <linux-crypto@archiver.kernel.org>; Thu, 28 Feb 2019 06:39:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E08B720842
+	for <linux-crypto@archiver.kernel.org>; Thu, 28 Feb 2019 06:39:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727020AbfB1GjH (ORCPT
+        id S1730679AbfB1GjU (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 28 Feb 2019 01:39:07 -0500
-Received: from orcrist.hmeau.com ([104.223.48.154]:40108 "EHLO
+        Thu, 28 Feb 2019 01:39:20 -0500
+Received: from orcrist.hmeau.com ([104.223.48.154]:40128 "EHLO
         deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725862AbfB1GjG (ORCPT
+        with ESMTP id S1725862AbfB1GjU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 28 Feb 2019 01:39:06 -0500
+        Thu, 28 Feb 2019 01:39:20 -0500
 Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
         by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1gzFLV-00061i-8w; Thu, 28 Feb 2019 14:39:05 +0800
+        id 1gzFLf-00062J-Hg; Thu, 28 Feb 2019 14:39:15 +0800
 Received: from herbert by gondobar with local (Exim 4.89)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1gzFLT-0001x4-Le; Thu, 28 Feb 2019 14:39:03 +0800
-Date:   Thu, 28 Feb 2019 14:39:03 +0800
+        id 1gzFLa-0001xQ-CZ; Thu, 28 Feb 2019 14:39:10 +0800
+Date:   Thu, 28 Feb 2019 14:39:10 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-crypto@vger.kernel.org,
-        Mahipal Challa <mahipalreddy2006@gmail.com>,
-        Jan Glauber <jglauber@cavium.com>
-Subject: Re: [PATCH] crypto: cavium/zip - fix collision with generic
- cra_driver_name
-Message-ID: <20190228063903.5vb3tas63z3dcwau@gondor.apana.org.au>
-References: <20190223082323.4126-1-ebiggers@kernel.org>
+To:     Julia Lawall <Julia.Lawall@lip6.fr>
+Cc:     kernel-janitors@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 08/12] crypto: add missing of_node_put after
+ of_device_is_available
+Message-ID: <20190228063910.yntbq4s7mdinp2ao@gondor.apana.org.au>
+References: <1550928043-14889-1-git-send-email-Julia.Lawall@lip6.fr>
+ <1550928043-14889-9-git-send-email-Julia.Lawall@lip6.fr>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190223082323.4126-1-ebiggers@kernel.org>
+In-Reply-To: <1550928043-14889-9-git-send-email-Julia.Lawall@lip6.fr>
 User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Feb 23, 2019 at 12:23:23AM -0800, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
+On Sat, Feb 23, 2019 at 02:20:39PM +0100, Julia Lawall wrote:
+> Add an of_node_put when a tested device node is not available.
 > 
-> The cavium/zip implementation of the deflate compression algorithm is
-> incorrectly being registered under the generic driver name, which
-> prevents the generic implementation from being registered with the
-> crypto API when CONFIG_CRYPTO_DEV_CAVIUM_ZIP=y.  Similarly the lzs
-> algorithm (which does not currently have a generic implementation...)
-> is incorrectly being registered as lzs-generic.
+> The semantic patch that fixes this problem is as follows
+> (http://coccinelle.lip6.fr):
 > 
-> Fix the naming collision by adding a suffix "-cavium" to the
-> cra_driver_name of the cavium/zip algorithms.
+> // <smpl>
+> @@
+> identifier f;
+> local idexpression e;
+> expression x;
+> @@
 > 
-> Fixes: 640035a2dc55 ("crypto: zip - Add ThunderX ZIP driver core")
-> Cc: Mahipal Challa <mahipalreddy2006@gmail.com>
-> Cc: Jan Glauber <jglauber@cavium.com>
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> e = f(...);
+> ... when != of_node_put(e)
+>     when != x = e
+>     when != e = x
+>     when any
+> if (<+...of_device_is_available(e)...+>) {
+>   ... when != of_node_put(e)
+> (
+>   return e;
+> |
+> + of_node_put(e);
+>   return ...;
+> )
+> }
+> // </smpl>
+> 
+> Fixes: 5343e674f32fb ("crypto4xx: integrate ppc4xx-rng into crypto4xx")
+> Signed-off-by: Julia Lawall <Julia.Lawall@lip6.fr>
+> 
 > ---
->  drivers/crypto/cavium/zip/zip_main.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
+>  drivers/crypto/amcc/crypto4xx_trng.c |    4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 
 Patch applied.  Thanks.
 -- 
