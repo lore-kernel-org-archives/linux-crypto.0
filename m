@@ -6,53 +6,55 @@ X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC7F9C43381
-	for <linux-crypto@archiver.kernel.org>; Thu, 28 Feb 2019 06:28:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BD30C43381
+	for <linux-crypto@archiver.kernel.org>; Thu, 28 Feb 2019 06:29:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7BCDD2083D
-	for <linux-crypto@archiver.kernel.org>; Thu, 28 Feb 2019 06:28:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 10F7920842
+	for <linux-crypto@archiver.kernel.org>; Thu, 28 Feb 2019 06:29:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725948AbfB1G2e (ORCPT
+        id S1725984AbfB1G3F (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 28 Feb 2019 01:28:34 -0500
-Received: from orcrist.hmeau.com ([104.223.48.154]:39734 "EHLO
+        Thu, 28 Feb 2019 01:29:05 -0500
+Received: from orcrist.hmeau.com ([104.223.48.154]:39744 "EHLO
         deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725899AbfB1G2d (ORCPT
+        with ESMTP id S1725899AbfB1G3F (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 28 Feb 2019 01:28:33 -0500
+        Thu, 28 Feb 2019 01:29:05 -0500
 Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
         by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1gzFBI-0005fJ-50; Thu, 28 Feb 2019 14:28:32 +0800
+        id 1gzFBn-0005gC-F2; Thu, 28 Feb 2019 14:29:03 +0800
 Received: from herbert by gondobar with local (Exim 4.89)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1gzFBG-0001b0-Nu; Thu, 28 Feb 2019 14:28:30 +0800
-Date:   Thu, 28 Feb 2019 14:28:30 +0800
+        id 1gzFBh-0001bu-Sz; Thu, 28 Feb 2019 14:28:57 +0800
+Date:   Thu, 28 Feb 2019 14:28:57 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Atul Gupta <atul.gupta@chelsio.com>
-Cc:     linux-crypto@vger.kernel.org, dt@chelsio.com
-Subject: Re: [PATCH] crypto/chelsio/chcr: Fixed Traffic Stall
-Message-ID: <20190228062830.mo64yoyzwc5aev5x@gondor.apana.org.au>
-References: <20190218100437.13077-1-atul.gupta@chelsio.com>
+To:     Mao Wenan <maowenan@huawei.com>
+Cc:     linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org,
+        mcoquelin.stm32@gmail.com, clabbe.montjoie@gmail.com,
+        gilad@benyossef.com, ebiggers@google.com, keescook@chromium.org,
+        alexandre.torgue@st.com
+Subject: Re: [PATCH] crypto: stm32 - drop pointless static qualifier in
+ stm32_hash_remove()
+Message-ID: <20190228062857.rtxuq6lwns4cqu6m@gondor.apana.org.au>
+References: <20190218144900.142544-1-maowenan@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190218100437.13077-1-atul.gupta@chelsio.com>
+In-Reply-To: <20190218144900.142544-1-maowenan@huawei.com>
 User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Feb 18, 2019 at 02:04:37AM -0800, Atul Gupta wrote:
-> Fixed Traffic Stall caused by
-> - Subcommands except last should have more bit set
-> - For esn case subcommand is required for linear skb only
-> - Also Optimized is_eth_imm usage
+On Mon, Feb 18, 2019 at 10:49:00PM +0800, Mao Wenan wrote:
+> There is no need to have the struct stm32_hash_dev *hdev static
+> since new value always be assigned before use it.
 > 
-> Signed-off-by: Atul Gupta <atul.gupta@chelsio.com>
+> Signed-off-by: Mao Wenan <maowenan@huawei.com>
 > ---
->  drivers/crypto/chelsio/chcr_ipsec.c | 33 ++++++++++++++++++++-------------
->  1 file changed, 20 insertions(+), 13 deletions(-)
+>  drivers/crypto/stm32/stm32-hash.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Patch applied.  Thanks.
 -- 
