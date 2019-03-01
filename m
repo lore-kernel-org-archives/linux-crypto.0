@@ -2,88 +2,316 @@ Return-Path: <SRS0=jX8O=RE=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_NEOMUTT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7861DC43381
-	for <linux-crypto@archiver.kernel.org>; Fri,  1 Mar 2019 16:06:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6872FC43381
+	for <linux-crypto@archiver.kernel.org>; Fri,  1 Mar 2019 17:19:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4EF082084F
-	for <linux-crypto@archiver.kernel.org>; Fri,  1 Mar 2019 16:06:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 38A6820850
+	for <linux-crypto@archiver.kernel.org>; Fri,  1 Mar 2019 17:19:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388971AbfCAQGn (ORCPT
+        id S1732514AbfCARTt (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 1 Mar 2019 11:06:43 -0500
-Received: from vmicros1.altlinux.org ([194.107.17.57]:49976 "EHLO
-        vmicros1.altlinux.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727952AbfCAQGn (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 1 Mar 2019 11:06:43 -0500
-Received: from imap.altlinux.org (imap.altlinux.org [194.107.17.38])
-        by vmicros1.altlinux.org (Postfix) with ESMTP id 86BFC72CA65;
-        Fri,  1 Mar 2019 19:06:39 +0300 (MSK)
-Received: from altlinux.org (sole.flsd.net [185.75.180.6])
-        by imap.altlinux.org (Postfix) with ESMTPSA id 63AC34A4AE7;
-        Fri,  1 Mar 2019 19:06:39 +0300 (MSK)
-Date:   Fri, 1 Mar 2019 19:06:38 +0300
-From:   Vitaly Chikunov <vt@altlinux.org>
+        Fri, 1 Mar 2019 12:19:49 -0500
+Received: from inva020.nxp.com ([92.121.34.13]:45504 "EHLO inva020.nxp.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728347AbfCARTt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 1 Mar 2019 12:19:49 -0500
+Received: from inva020.nxp.com (localhost [127.0.0.1])
+        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 5A1781A00CD;
+        Fri,  1 Mar 2019 18:19:47 +0100 (CET)
+Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
+        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 4C2C71A0085;
+        Fri,  1 Mar 2019 18:19:47 +0100 (CET)
+Received: from fsr-ub1864-014.ea.freescale.net (fsr-ub1864-014.ea.freescale.net [10.171.95.219])
+        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 021DC204B1;
+        Fri,  1 Mar 2019 18:19:46 +0100 (CET)
+From:   =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     David Howells <dhowells@redhat.com>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 1/4] X.509: Parse public key parameters from x509 for
- akcipher
-Message-ID: <20190301160638.z266z767m4ky3ohk@altlinux.org>
-Mail-Followup-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        David Howells <dhowells@redhat.com>,
-        Mimi Zohar <zohar@linux.vnet.ibm.com>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20190210184628.yupsxgjlaicwbxg6@altlinux.org>
- <20190219043732.x3sbwzqlz4ikntxo@gondor.apana.org.au>
- <20190224064840.hii4ccjksjdnewae@altlinux.org>
- <20190228061444.3escryzoit3idtwg@gondor.apana.org.au>
- <20190228070449.gjwoq4c2b3x5grie@altlinux.org>
- <20190228075141.s6mftb44yuylbzys@gondor.apana.org.au>
- <20190228082801.2aofw23r2shzwy4n@altlinux.org>
- <20190228090125.6n62v4oxpwl5yzv4@gondor.apana.org.au>
- <20190228103337.sbjujn27qkkgxqt2@altlinux.org>
- <20190228103715.ijvimcfysiguiwty@gondor.apana.org.au>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Wen Yang <yellowriver2010@hotmail.com>
+Subject: [PATCH RESEND v3] crypto: caam - add missing put_device() call
+Date:   Fri,  1 Mar 2019 19:19:25 +0200
+Message-Id: <20190301171925.22650-1-horia.geanta@nxp.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=koi8-r
-Content-Disposition: inline
-In-Reply-To: <20190228103715.ijvimcfysiguiwty@gondor.apana.org.au>
-User-Agent: NeoMutt/20171215-106-ac61c7
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Herbert,
+From: Wen Yang <yellowriver2010@hotmail.com>
 
-On Thu, Feb 28, 2019 at 06:37:15PM +0800, Herbert Xu wrote:
-> On Thu, Feb 28, 2019 at 01:33:37PM +0300, Vitaly Chikunov wrote:
-> >
-> > To make the same for set_{pub,priv}_key it will require patching RSA
-> > drivers anyway, since length of the key is stored just once as keylen
-> > argument.
-> 
-> No we don't need to use the same format for different algorithms.
-> RSA should stay as is.
+The of_find_device_by_node() takes a reference to the underlying device
+structure, we should release that reference.
 
-I will rework as you suggest. But, just want to state that I disagree
-with this approach of implicitly appending parameters data to the key
-stream without any argument signifying it or length covering it. This
-fitting into the old API is also somewhat disagree to your words that
-we could change internal API:
+Fixes: 35af64038623 ("crypto: caam - Check for CAAM block presence before registering with crypto layer")
+Fixes: b189817cf789 ("crypto: caam/qi - add ablkcipher and authenc algorithms")
+Reviewed-by: Horia Geantă <horia.geanta@nxp.com>
+Signed-off-by: Wen Yang <yellowriver2010@hotmail.com>
+---
 
-On Thu, Feb 28, 2019 at 02:14:44PM +0800, Herbert Xu wrote:
-> On Sun, Feb 24, 2019 at 09:48:40AM +0300, Vitaly Chikunov wrote:
-> ...
-> This compatibility does not matter.  We can always add translating
-> layers into the crypto API to deal with this.  The only ABI that
-> matters is the one to user-space.
+Looks like previous versions, for some unknown reason, did not reach
+the mailing lists.
+
+Resending v3 with the addition of a 2nd Fixes and Reviewed-by tags,
+cf. https://lkml.org/lkml/2019/2/11/383
+
+ drivers/crypto/caam/caamalg.c    | 12 +++++++-----
+ drivers/crypto/caam/caamalg_qi.c | 11 ++++++++---
+ drivers/crypto/caam/caamhash.c   | 18 +++++++++++-------
+ drivers/crypto/caam/caampkc.c    | 14 ++++++++++----
+ drivers/crypto/caam/caamrng.c    | 22 ++++++++++++++--------
+ 5 files changed, 50 insertions(+), 27 deletions(-)
+
+diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
+index 9eac5099098e..579578498deb 100644
+--- a/drivers/crypto/caam/caamalg.c
++++ b/drivers/crypto/caam/caamalg.c
+@@ -3455,7 +3455,6 @@ static int __init caam_algapi_init(void)
+ {
+ 	struct device_node *dev_node;
+ 	struct platform_device *pdev;
+-	struct device *ctrldev;
+ 	struct caam_drv_private *priv;
+ 	int i = 0, err = 0;
+ 	u32 aes_vid, aes_inst, des_inst, md_vid, md_inst, ccha_inst, ptha_inst;
+@@ -3476,16 +3475,17 @@ static int __init caam_algapi_init(void)
+ 		return -ENODEV;
+ 	}
+ 
+-	ctrldev = &pdev->dev;
+-	priv = dev_get_drvdata(ctrldev);
++	priv = dev_get_drvdata(&pdev->dev);
+ 	of_node_put(dev_node);
+ 
+ 	/*
+ 	 * If priv is NULL, it's probably because the caam driver wasn't
+ 	 * properly initialized (e.g. RNG4 init failed). Thus, bail out here.
+ 	 */
+-	if (!priv)
+-		return -ENODEV;
++	if (!priv) {
++		err = -ENODEV;
++		goto out_put_dev;
++	}
+ 
+ 
+ 	/*
+@@ -3626,6 +3626,8 @@ static int __init caam_algapi_init(void)
+ 	if (registered)
+ 		pr_info("caam algorithms registered in /proc/crypto\n");
+ 
++out_put_dev:
++	put_device(&pdev->dev);
+ 	return err;
+ }
+ 
+diff --git a/drivers/crypto/caam/caamalg_qi.c b/drivers/crypto/caam/caamalg_qi.c
+index a15ce9213310..c61921d32489 100644
+--- a/drivers/crypto/caam/caamalg_qi.c
++++ b/drivers/crypto/caam/caamalg_qi.c
+@@ -2492,12 +2492,15 @@ static int __init caam_qi_algapi_init(void)
+ 	 * If priv is NULL, it's probably because the caam driver wasn't
+ 	 * properly initialized (e.g. RNG4 init failed). Thus, bail out here.
+ 	 */
+-	if (!priv || !priv->qi_present)
+-		return -ENODEV;
++	if (!priv || !priv->qi_present) {
++		err = -ENODEV;
++		goto out_put_dev;
++	}
+ 
+ 	if (caam_dpaa2) {
+ 		dev_info(ctrldev, "caam/qi frontend driver not suitable for DPAA 2.x, aborting...\n");
+-		return -ENODEV;
++		err = -ENODEV;
++		goto out_put_dev;
+ 	}
+ 
+ 	/*
+@@ -2610,6 +2613,8 @@ static int __init caam_qi_algapi_init(void)
+ 	if (registered)
+ 		dev_info(priv->qidev, "algorithms registered in /proc/crypto\n");
+ 
++out_put_dev:
++	put_device(ctrldev);
+ 	return err;
+ }
+ 
+diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
+index d7483e4d0ce2..b1eadc6652b5 100644
+--- a/drivers/crypto/caam/caamhash.c
++++ b/drivers/crypto/caam/caamhash.c
+@@ -1993,7 +1993,6 @@ static int __init caam_algapi_hash_init(void)
+ {
+ 	struct device_node *dev_node;
+ 	struct platform_device *pdev;
+-	struct device *ctrldev;
+ 	int i = 0, err = 0;
+ 	struct caam_drv_private *priv;
+ 	unsigned int md_limit = SHA512_DIGEST_SIZE;
+@@ -2012,16 +2011,17 @@ static int __init caam_algapi_hash_init(void)
+ 		return -ENODEV;
+ 	}
+ 
+-	ctrldev = &pdev->dev;
+-	priv = dev_get_drvdata(ctrldev);
++	priv = dev_get_drvdata(&pdev->dev);
+ 	of_node_put(dev_node);
+ 
+ 	/*
+ 	 * If priv is NULL, it's probably because the caam driver wasn't
+ 	 * properly initialized (e.g. RNG4 init failed). Thus, bail out here.
+ 	 */
+-	if (!priv)
+-		return -ENODEV;
++	if (!priv) {
++		err = -ENODEV;
++		goto out_put_dev;
++	}
+ 
+ 	/*
+ 	 * Register crypto algorithms the device supports.  First, identify
+@@ -2043,8 +2043,10 @@ static int __init caam_algapi_hash_init(void)
+ 	 * Skip registration of any hashing algorithms if MD block
+ 	 * is not present.
+ 	 */
+-	if (!md_inst)
+-		return -ENODEV;
++	if (!md_inst) {
++		err = -ENODEV;
++		goto out_put_dev;
++	}
+ 
+ 	/* Limit digest size based on LP256 */
+ 	if (md_vid == CHA_VER_VID_MD_LP256)
+@@ -2101,6 +2103,8 @@ static int __init caam_algapi_hash_init(void)
+ 			list_add_tail(&t_alg->entry, &hash_list);
+ 	}
+ 
++out_put_dev:
++	put_device(&pdev->dev);
+ 	return err;
+ }
+ 
+diff --git a/drivers/crypto/caam/caampkc.c b/drivers/crypto/caam/caampkc.c
+index 77ab28a2811a..58285642306e 100644
+--- a/drivers/crypto/caam/caampkc.c
++++ b/drivers/crypto/caam/caampkc.c
+@@ -1042,8 +1042,10 @@ static int __init caam_pkc_init(void)
+ 	 * If priv is NULL, it's probably because the caam driver wasn't
+ 	 * properly initialized (e.g. RNG4 init failed). Thus, bail out here.
+ 	 */
+-	if (!priv)
+-		return -ENODEV;
++	if (!priv) {
++		err = -ENODEV;
++		goto out_put_dev;
++	}
+ 
+ 	/* Determine public key hardware accelerator presence. */
+ 	if (priv->era < 10)
+@@ -1053,8 +1055,10 @@ static int __init caam_pkc_init(void)
+ 		pk_inst = rd_reg32(&priv->ctrl->vreg.pkha) & CHA_VER_NUM_MASK;
+ 
+ 	/* Do not register algorithms if PKHA is not present. */
+-	if (!pk_inst)
+-		return -ENODEV;
++	if (!pk_inst) {
++		err =  -ENODEV;
++		goto out_put_dev;
++	}
+ 
+ 	err = crypto_register_akcipher(&caam_rsa);
+ 	if (err)
+@@ -1063,6 +1067,8 @@ static int __init caam_pkc_init(void)
+ 	else
+ 		dev_info(ctrldev, "caam pkc algorithms registered in /proc/crypto\n");
+ 
++out_put_dev:
++	put_device(ctrldev);
+ 	return err;
+ }
+ 
+diff --git a/drivers/crypto/caam/caamrng.c b/drivers/crypto/caam/caamrng.c
+index a387c8d49a62..95eb5402c59f 100644
+--- a/drivers/crypto/caam/caamrng.c
++++ b/drivers/crypto/caam/caamrng.c
+@@ -308,7 +308,6 @@ static int __init caam_rng_init(void)
+ 	struct device *dev;
+ 	struct device_node *dev_node;
+ 	struct platform_device *pdev;
+-	struct device *ctrldev;
+ 	struct caam_drv_private *priv;
+ 	u32 rng_inst;
+ 	int err;
+@@ -326,16 +325,17 @@ static int __init caam_rng_init(void)
+ 		return -ENODEV;
+ 	}
+ 
+-	ctrldev = &pdev->dev;
+-	priv = dev_get_drvdata(ctrldev);
++	priv = dev_get_drvdata(&pdev->dev);
+ 	of_node_put(dev_node);
+ 
+ 	/*
+ 	 * If priv is NULL, it's probably because the caam driver wasn't
+ 	 * properly initialized (e.g. RNG4 init failed). Thus, bail out here.
+ 	 */
+-	if (!priv)
+-		return -ENODEV;
++	if (!priv) {
++		err = -ENODEV;
++		goto out_put_dev;
++	}
+ 
+ 	/* Check for an instantiated RNG before registration */
+ 	if (priv->era < 10)
+@@ -344,13 +344,16 @@ static int __init caam_rng_init(void)
+ 	else
+ 		rng_inst = rd_reg32(&priv->ctrl->vreg.rng) & CHA_VER_NUM_MASK;
+ 
+-	if (!rng_inst)
+-		return -ENODEV;
++	if (!rng_inst) {
++		err = -ENODEV;
++		goto out_put_dev;
++	}
+ 
+ 	dev = caam_jr_alloc();
+ 	if (IS_ERR(dev)) {
+ 		pr_err("Job Ring Device allocation for transform failed\n");
+-		return PTR_ERR(dev);
++		err = PTR_ERR(dev);
++		goto out_put_dev;
+ 	}
+ 	rng_ctx = kmalloc(sizeof(*rng_ctx), GFP_DMA | GFP_KERNEL);
+ 	if (!rng_ctx) {
+@@ -361,6 +364,7 @@ static int __init caam_rng_init(void)
+ 	if (err)
+ 		goto free_rng_ctx;
+ 
++	put_device(&pdev->dev);
+ 	dev_info(dev, "registering rng-caam\n");
+ 	return hwrng_register(&caam_rng);
+ 
+@@ -368,6 +372,8 @@ static int __init caam_rng_init(void)
+ 	kfree(rng_ctx);
+ free_caam_alloc:
+ 	caam_jr_free(dev);
++out_put_dev:
++	put_device(&pdev->dev);
+ 	return err;
+ }
+ 
+-- 
+2.17.1
+
