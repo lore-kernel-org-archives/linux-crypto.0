@@ -6,26 +6,26 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7000AC10F03
-	for <linux-crypto@archiver.kernel.org>; Fri,  1 Mar 2019 18:00:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20D1AC43381
+	for <linux-crypto@archiver.kernel.org>; Fri,  1 Mar 2019 18:00:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4E21020842
-	for <linux-crypto@archiver.kernel.org>; Fri,  1 Mar 2019 18:00:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DCDDC20842
+	for <linux-crypto@archiver.kernel.org>; Fri,  1 Mar 2019 18:00:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389910AbfCASAO (ORCPT
+        id S2389815AbfCAR7e (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 1 Mar 2019 13:00:14 -0500
-Received: from vmicros1.altlinux.org ([194.107.17.57]:40380 "EHLO
+        Fri, 1 Mar 2019 12:59:34 -0500
+Received: from vmicros1.altlinux.org ([194.107.17.57]:40272 "EHLO
         vmicros1.altlinux.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389803AbfCAR7f (ORCPT
+        with ESMTP id S2389790AbfCAR7c (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 1 Mar 2019 12:59:35 -0500
+        Fri, 1 Mar 2019 12:59:32 -0500
 Received: from imap.altlinux.org (imap.altlinux.org [194.107.17.38])
-        by vmicros1.altlinux.org (Postfix) with ESMTP id 3122E72CCB8;
-        Fri,  1 Mar 2019 20:59:32 +0300 (MSK)
+        by vmicros1.altlinux.org (Postfix) with ESMTP id 803CF72CC53;
+        Fri,  1 Mar 2019 20:59:29 +0300 (MSK)
 Received: from beacon.altlinux.org (unknown [185.6.174.98])
-        by imap.altlinux.org (Postfix) with ESMTPSA id 5ACA94A4AE7;
-        Fri,  1 Mar 2019 20:59:31 +0300 (MSK)
+        by imap.altlinux.org (Postfix) with ESMTPSA id 488974A4AE7;
+        Fri,  1 Mar 2019 20:59:29 +0300 (MSK)
 From:   Vitaly Chikunov <vt@altlinux.org>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         David Howells <dhowells@redhat.com>,
@@ -33,9 +33,9 @@ To:     Herbert Xu <herbert@gondor.apana.org.au>,
         Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
         linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v7 08/11] crypto: ecc - make ecc into separate module
-Date:   Fri,  1 Mar 2019 20:59:15 +0300
-Message-Id: <20190301175918.29694-9-vt@altlinux.org>
+Subject: [PATCH v7 06/11] X.509: parse public key parameters from x509 for akcipher
+Date:   Fri,  1 Mar 2019 20:59:13 +0300
+Message-Id: <20190301175918.29694-7-vt@altlinux.org>
 X-Mailer: git-send-email 2.11.0
 In-Reply-To: <20190301175918.29694-1-vt@altlinux.org>
 References: <20190301175918.29694-1-vt@altlinux.org>
@@ -46,321 +46,540 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-ecc.c have algorithms that could be used togeter by ecdh and ecrdsa.
-Make it separate module. Add CRYPTO_ECC into Kconfig. EXPORT_SYMBOL and
-document to what seems appropriate. Move structs ecc_point and ecc_curve
-from ecc_curve_defs.h into ecc.h.
+Some public key algorithms (like EC-DSA) keep in parameters field
+important data such as digest and curve OIDs (possibly more for
+different EC-DSA variants). Thus, just setting a public key (as
+for RSA) is not enough.
 
-No code changes.
+Append parameters into the key stream for akcipher_set_{pub,priv}_key.
+Appended data is: (u32) algo OID, (u32) parameters length, parameters
+data.
 
+This does not affect current akcipher API nor RSA ciphers (they could
+ignore it). Idea of appending parameters to the key stream is by Herbert
+Xu.
+
+Cc: David Howells <dhowells@redhat.com>
+Cc: keyrings@vger.kernel.org
 Signed-off-by: Vitaly Chikunov <vt@altlinux.org>
 ---
- crypto/Kconfig          |  4 ++
- crypto/Makefile         |  2 +-
- crypto/ecc.c            | 25 +++++++++----
- crypto/ecc.h            | 99 +++++++++++++++++++++++++++++++++++++++++++++++++
- crypto/ecc_curve_defs.h | 15 --------
- 5 files changed, 122 insertions(+), 23 deletions(-)
+ crypto/asymmetric_keys/asym_tpm.c         | 43 ++++++++++++++++--
+ crypto/asymmetric_keys/public_key.c       | 72 ++++++++++++++++++++++++-------
+ crypto/asymmetric_keys/x509.asn1          |  2 +-
+ crypto/asymmetric_keys/x509_cert_parser.c | 31 +++++++++++++
+ crypto/testmgr.c                          | 24 +++++++++--
+ crypto/testmgr.h                          |  5 +++
+ include/crypto/akcipher.h                 | 18 ++++----
+ include/crypto/public_key.h               |  4 ++
+ 8 files changed, 168 insertions(+), 31 deletions(-)
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 370cbdca87a7..cf0bceee0ea5 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -248,8 +248,12 @@ config CRYPTO_DH
- 	help
- 	  Generic implementation of the Diffie-Hellman algorithm.
+diff --git a/crypto/asymmetric_keys/asym_tpm.c b/crypto/asymmetric_keys/asym_tpm.c
+index 402fc34ca044..d95d7ec50e5a 100644
+--- a/crypto/asymmetric_keys/asym_tpm.c
++++ b/crypto/asymmetric_keys/asym_tpm.c
+@@ -395,6 +395,12 @@ static int determine_akcipher(const char *encoding, const char *hash_algo,
+ 	return -ENOPKG;
+ }
  
-+config CRYPTO_ECC
-+	tristate
++static u8 *tpm_pack_u32(u8 *dst, u32 val)
++{
++	memcpy(dst, &val, sizeof(val));
++	return dst + sizeof(val);
++}
 +
- config CRYPTO_ECDH
- 	tristate "ECDH algorithm"
-+	select CRYPTO_ECC
- 	select CRYPTO_KPP
- 	select CRYPTO_RNG_DEFAULT
- 	help
-diff --git a/crypto/Makefile b/crypto/Makefile
-index 799ed5e94606..b660f078651a 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -147,8 +147,8 @@ obj-$(CONFIG_CRYPTO_USER_API_RNG) += algif_rng.o
- obj-$(CONFIG_CRYPTO_USER_API_AEAD) += algif_aead.o
- obj-$(CONFIG_CRYPTO_ZSTD) += zstd.o
- obj-$(CONFIG_CRYPTO_OFB) += ofb.o
-+obj-$(CONFIG_CRYPTO_ECC) += ecc.o
- 
--ecdh_generic-y := ecc.o
- ecdh_generic-y += ecdh.o
- ecdh_generic-y += ecdh_helper.o
- obj-$(CONFIG_CRYPTO_ECDH) += ecdh_generic.o
-diff --git a/crypto/ecc.c b/crypto/ecc.c
-index ed1237115066..5f36792d143d 100644
---- a/crypto/ecc.c
-+++ b/crypto/ecc.c
-@@ -24,6 +24,7 @@
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ /*
+  * Query information about a key.
   */
+@@ -407,6 +413,7 @@ static int tpm_key_query(const struct kernel_pkey_params *params,
+ 	struct crypto_akcipher *tfm;
+ 	uint8_t der_pub_key[PUB_KEY_BUF_SIZE];
+ 	uint32_t der_pub_key_len;
++	u8 *pkey, *ptr;
+ 	int len;
  
-+#include <linux/module.h>
- #include <linux/random.h>
- #include <linux/slab.h>
- #include <linux/swab.h>
-@@ -112,7 +113,7 @@ static void vli_clear(u64 *vli, unsigned int ndigits)
- }
+ 	/* TPM only works on private keys, public keys still done in software */
+@@ -421,7 +428,16 @@ static int tpm_key_query(const struct kernel_pkey_params *params,
+ 	der_pub_key_len = derive_pub_key(tk->pub_key, tk->pub_key_len,
+ 					 der_pub_key);
  
- /* Returns true if vli == 0, false otherwise. */
--static bool vli_is_zero(const u64 *vli, unsigned int ndigits)
-+bool vli_is_zero(const u64 *vli, unsigned int ndigits)
+-	ret = crypto_akcipher_set_pub_key(tfm, der_pub_key, der_pub_key_len);
++	pkey = kmalloc(der_pub_key_len + sizeof(u32) * 2, GFP_KERNEL);
++	if (!pkey)
++		goto error_free_tfm;
++	memcpy(pkey, der_pub_key, der_pub_key_len);
++	ptr = pkey + der_pub_key_len;
++	/* Set dummy parameters to satisfy set_pub_key ABI. */
++	ptr = tpm_pack_u32(ptr, 0); /* algo */
++	ptr = tpm_pack_u32(ptr, 0); /* parameter length */
++
++	ret = crypto_akcipher_set_pub_key(tfm, pkey, der_pub_key_len);
+ 	if (ret < 0)
+ 		goto error_free_tfm;
+ 
+@@ -440,6 +456,7 @@ static int tpm_key_query(const struct kernel_pkey_params *params,
+ 
+ 	ret = 0;
+ error_free_tfm:
++	kfree(pkey);
+ 	crypto_free_akcipher(tfm);
+ 	pr_devel("<==%s() = %d\n", __func__, ret);
+ 	return ret;
+@@ -460,6 +477,7 @@ static int tpm_key_encrypt(struct tpm_key *tk,
+ 	struct scatterlist in_sg, out_sg;
+ 	uint8_t der_pub_key[PUB_KEY_BUF_SIZE];
+ 	uint32_t der_pub_key_len;
++	u8 *pkey, *ptr;
+ 	int ret;
+ 
+ 	pr_devel("==>%s()\n", __func__);
+@@ -475,7 +493,15 @@ static int tpm_key_encrypt(struct tpm_key *tk,
+ 	der_pub_key_len = derive_pub_key(tk->pub_key, tk->pub_key_len,
+ 					 der_pub_key);
+ 
+-	ret = crypto_akcipher_set_pub_key(tfm, der_pub_key, der_pub_key_len);
++	pkey = kmalloc(der_pub_key_len + sizeof(u32) * 2, GFP_KERNEL);
++	if (!pkey)
++		goto error_free_tfm;
++	memcpy(pkey, der_pub_key, der_pub_key_len);
++	ptr = pkey + der_pub_key_len;
++	ptr = tpm_pack_u32(ptr, 0); /* algo */
++	ptr = tpm_pack_u32(ptr, 0); /* parameter length */
++
++	ret = crypto_akcipher_set_pub_key(tfm, pkey, der_pub_key_len);
+ 	if (ret < 0)
+ 		goto error_free_tfm;
+ 
+@@ -500,6 +526,7 @@ static int tpm_key_encrypt(struct tpm_key *tk,
+ 
+ 	akcipher_request_free(req);
+ error_free_tfm:
++	kfree(pkey);
+ 	crypto_free_akcipher(tfm);
+ 	pr_devel("<==%s() = %d\n", __func__, ret);
+ 	return ret;
+@@ -748,6 +775,7 @@ static int tpm_key_verify_signature(const struct key *key,
+ 	char alg_name[CRYPTO_MAX_ALG_NAME];
+ 	uint8_t der_pub_key[PUB_KEY_BUF_SIZE];
+ 	uint32_t der_pub_key_len;
++	u8 *pkey, *ptr;
+ 	int ret;
+ 
+ 	pr_devel("==>%s()\n", __func__);
+@@ -770,7 +798,15 @@ static int tpm_key_verify_signature(const struct key *key,
+ 	der_pub_key_len = derive_pub_key(tk->pub_key, tk->pub_key_len,
+ 					 der_pub_key);
+ 
+-	ret = crypto_akcipher_set_pub_key(tfm, der_pub_key, der_pub_key_len);
++	pkey = kmalloc(der_pub_key_len + sizeof(u32) * 2, GFP_KERNEL);
++	if (!pkey)
++		goto error_free_tfm;
++	memcpy(pkey, der_pub_key, der_pub_key_len);
++	ptr = pkey + der_pub_key_len;
++	ptr = tpm_pack_u32(ptr, 0); /* algo */
++	ptr = tpm_pack_u32(ptr, 0); /* parameter length */
++
++	ret = crypto_akcipher_set_pub_key(tfm, pkey, der_pub_key_len);
+ 	if (ret < 0)
+ 		goto error_free_tfm;
+ 
+@@ -792,6 +828,7 @@ static int tpm_key_verify_signature(const struct key *key,
+ 
+ 	akcipher_request_free(req);
+ error_free_tfm:
++	kfree(pkey);
+ 	crypto_free_akcipher(tfm);
+ 	pr_devel("<==%s() = %d\n", __func__, ret);
+ 	if (WARN_ON_ONCE(ret > 0))
+diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
+index 4dcfe281b898..0564951f8760 100644
+--- a/crypto/asymmetric_keys/public_key.c
++++ b/crypto/asymmetric_keys/public_key.c
+@@ -45,6 +45,7 @@ void public_key_free(struct public_key *key)
  {
- 	int i;
- 
-@@ -123,6 +124,7 @@ static bool vli_is_zero(const u64 *vli, unsigned int ndigits)
- 
- 	return true;
+ 	if (key) {
+ 		kfree(key->key);
++		kfree(key->params);
+ 		kfree(key);
+ 	}
  }
-+EXPORT_SYMBOL(vli_is_zero);
- 
- /* Returns nonzero if bit bit of vli is set. */
- static u64 vli_test_bit(const u64 *vli, unsigned int bit)
-@@ -171,7 +173,7 @@ static void vli_set(u64 *dest, const u64 *src, unsigned int ndigits)
+@@ -94,6 +95,12 @@ int software_key_determine_akcipher(const char *encoding,
+ 	return -ENOPKG;
  }
  
- /* Returns sign of left - right. */
--static int vli_cmp(const u64 *left, const u64 *right, unsigned int ndigits)
-+int vli_cmp(const u64 *left, const u64 *right, unsigned int ndigits)
- {
- 	int i;
- 
-@@ -184,6 +186,7 @@ static int vli_cmp(const u64 *left, const u64 *right, unsigned int ndigits)
- 
- 	return 0;
- }
-+EXPORT_SYMBOL(vli_cmp);
- 
- /* Computes result = in << c, returning carry. Can modify in place
-  * (if result == in). 0 < shift < 64.
-@@ -240,7 +243,7 @@ static u64 vli_add(u64 *result, const u64 *left, const u64 *right,
- }
- 
- /* Computes result = left - right, returning borrow. Can modify in place. */
--static u64 vli_sub(u64 *result, const u64 *left, const u64 *right,
-+u64 vli_sub(u64 *result, const u64 *left, const u64 *right,
- 		   unsigned int ndigits)
- {
- 	u64 borrow = 0;
-@@ -258,6 +261,7 @@ static u64 vli_sub(u64 *result, const u64 *left, const u64 *right,
- 
- 	return borrow;
- }
-+EXPORT_SYMBOL(vli_sub);
- 
- static uint128_t mul_64_64(u64 left, u64 right)
- {
-@@ -557,7 +561,7 @@ static void vli_mod_square_fast(u64 *result, const u64 *left,
-  * See "From Euclid's GCD to Montgomery Multiplication to the Great Divide"
-  * https://labs.oracle.com/techrep/2001/smli_tr-2001-95.pdf
++static u8 *pkey_pack_u32(u8 *dst, u32 val)
++{
++	memcpy(dst, &val, sizeof(val));
++	return dst + sizeof(val);
++}
++
+ /*
+  * Query information about a key.
   */
--static void vli_mod_inv(u64 *result, const u64 *input, const u64 *mod,
-+void vli_mod_inv(u64 *result, const u64 *input, const u64 *mod,
- 			unsigned int ndigits)
- {
- 	u64 a[ECC_MAX_DIGITS], b[ECC_MAX_DIGITS];
-@@ -630,6 +634,7 @@ static void vli_mod_inv(u64 *result, const u64 *input, const u64 *mod,
+@@ -103,6 +110,7 @@ static int software_key_query(const struct kernel_pkey_params *params,
+ 	struct crypto_akcipher *tfm;
+ 	struct public_key *pkey = params->key->payload.data[asym_crypto];
+ 	char alg_name[CRYPTO_MAX_ALG_NAME];
++	u8 *key, *ptr;
+ 	int ret, len;
  
- 	vli_set(result, u, ndigits);
+ 	ret = software_key_determine_akcipher(params->encoding,
+@@ -115,14 +123,22 @@ static int software_key_query(const struct kernel_pkey_params *params,
+ 	if (IS_ERR(tfm))
+ 		return PTR_ERR(tfm);
+ 
++	key = kmalloc(pkey->keylen + sizeof(u32) * 2 + pkey->paramlen,
++		      GFP_KERNEL);
++	if (!key)
++		goto error_free_tfm;
++	memcpy(key, pkey->key, pkey->keylen);
++	ptr = key + pkey->keylen;
++	ptr = pkey_pack_u32(ptr, pkey->algo);
++	ptr = pkey_pack_u32(ptr, pkey->paramlen);
++	memcpy(ptr, pkey->params, pkey->paramlen);
++
+ 	if (pkey->key_is_private)
+-		ret = crypto_akcipher_set_priv_key(tfm,
+-						   pkey->key, pkey->keylen);
++		ret = crypto_akcipher_set_priv_key(tfm, key, pkey->keylen);
+ 	else
+-		ret = crypto_akcipher_set_pub_key(tfm,
+-						  pkey->key, pkey->keylen);
++		ret = crypto_akcipher_set_pub_key(tfm, key, pkey->keylen);
+ 	if (ret < 0)
+-		goto error_free_tfm;
++		goto error_free_key;
+ 
+ 	len = crypto_akcipher_maxsize(tfm);
+ 	info->key_size = len * 8;
+@@ -143,6 +159,8 @@ static int software_key_query(const struct kernel_pkey_params *params,
+ 	}
+ 	ret = 0;
+ 
++error_free_key:
++	kfree(key);
+ error_free_tfm:
+ 	crypto_free_akcipher(tfm);
+ 	pr_devel("<==%s() = %d\n", __func__, ret);
+@@ -161,6 +179,7 @@ static int software_key_eds_op(struct kernel_pkey_params *params,
+ 	struct crypto_wait cwait;
+ 	struct scatterlist in_sg, out_sg;
+ 	char alg_name[CRYPTO_MAX_ALG_NAME];
++	char *key, *ptr;
+ 	int ret;
+ 
+ 	pr_devel("==>%s()\n", __func__);
+@@ -179,14 +198,23 @@ static int software_key_eds_op(struct kernel_pkey_params *params,
+ 	if (!req)
+ 		goto error_free_tfm;
+ 
++	key = kmalloc(pkey->keylen + sizeof(u32) * 2 + pkey->paramlen,
++		      GFP_KERNEL);
++	if (!key)
++		goto error_free_req;
++
++	memcpy(key, pkey->key, pkey->keylen);
++	ptr = key + pkey->keylen;
++	ptr = pkey_pack_u32(ptr, pkey->algo);
++	ptr = pkey_pack_u32(ptr, pkey->paramlen);
++	memcpy(ptr, pkey->params, pkey->paramlen);
++
+ 	if (pkey->key_is_private)
+-		ret = crypto_akcipher_set_priv_key(tfm,
+-						   pkey->key, pkey->keylen);
++		ret = crypto_akcipher_set_priv_key(tfm, key, pkey->keylen);
+ 	else
+-		ret = crypto_akcipher_set_pub_key(tfm,
+-						  pkey->key, pkey->keylen);
++		ret = crypto_akcipher_set_pub_key(tfm, key, pkey->keylen);
+ 	if (ret)
+-		goto error_free_req;
++		goto error_free_key;
+ 
+ 	sg_init_one(&in_sg, in, params->in_len);
+ 	sg_init_one(&out_sg, out, params->out_len);
+@@ -216,6 +244,8 @@ static int software_key_eds_op(struct kernel_pkey_params *params,
+ 	if (ret == 0)
+ 		ret = req->dst_len;
+ 
++error_free_key:
++	kfree(key);
+ error_free_req:
+ 	akcipher_request_free(req);
+ error_free_tfm:
+@@ -235,6 +265,7 @@ int public_key_verify_signature(const struct public_key *pkey,
+ 	struct akcipher_request *req;
+ 	struct scatterlist src_sg[2];
+ 	char alg_name[CRYPTO_MAX_ALG_NAME];
++	char *key, *ptr;
+ 	int ret;
+ 
+ 	pr_devel("==>%s()\n", __func__);
+@@ -258,14 +289,23 @@ int public_key_verify_signature(const struct public_key *pkey,
+ 	if (!req)
+ 		goto error_free_tfm;
+ 
++	key = kmalloc(pkey->keylen + sizeof(u32) * 2 + pkey->paramlen,
++		      GFP_KERNEL);
++	if (!key)
++		goto error_free_req;
++
++	memcpy(key, pkey->key, pkey->keylen);
++	ptr = key + pkey->keylen;
++	ptr = pkey_pack_u32(ptr, pkey->algo);
++	ptr = pkey_pack_u32(ptr, pkey->paramlen);
++	memcpy(ptr, pkey->params, pkey->paramlen);
++
+ 	if (pkey->key_is_private)
+-		ret = crypto_akcipher_set_priv_key(tfm,
+-						   pkey->key, pkey->keylen);
++		ret = crypto_akcipher_set_priv_key(tfm, key, pkey->keylen);
+ 	else
+-		ret = crypto_akcipher_set_pub_key(tfm,
+-						  pkey->key, pkey->keylen);
++		ret = crypto_akcipher_set_pub_key(tfm, key, pkey->keylen);
+ 	if (ret)
+-		goto error_free_req;
++		goto error_free_key;
+ 
+ 	sg_init_table(src_sg, 2);
+ 	sg_set_buf(&src_sg[0], sig->s, sig->s_size);
+@@ -278,6 +318,8 @@ int public_key_verify_signature(const struct public_key *pkey,
+ 				      crypto_req_done, &cwait);
+ 	ret = crypto_wait_req(crypto_akcipher_verify(req), &cwait);
+ 
++error_free_key:
++	kfree(key);
+ error_free_req:
+ 	akcipher_request_free(req);
+ error_free_tfm:
+diff --git a/crypto/asymmetric_keys/x509.asn1 b/crypto/asymmetric_keys/x509.asn1
+index aae0cde414e2..5c9f4e4a5231 100644
+--- a/crypto/asymmetric_keys/x509.asn1
++++ b/crypto/asymmetric_keys/x509.asn1
+@@ -22,7 +22,7 @@ CertificateSerialNumber ::= INTEGER
+ 
+ AlgorithmIdentifier ::= SEQUENCE {
+ 	algorithm		OBJECT IDENTIFIER ({ x509_note_OID }),
+-	parameters		ANY OPTIONAL
++	parameters		ANY OPTIONAL ({ x509_note_params })
  }
-+EXPORT_SYMBOL(vli_mod_inv);
  
- /* ------ Point operations ------ */
+ Name ::= SEQUENCE OF RelativeDistinguishedName
+diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetric_keys/x509_cert_parser.c
+index 991f4d735a4e..b2cdf2db1987 100644
+--- a/crypto/asymmetric_keys/x509_cert_parser.c
++++ b/crypto/asymmetric_keys/x509_cert_parser.c
+@@ -26,6 +26,9 @@ struct x509_parse_context {
+ 	const void	*cert_start;		/* Start of cert content */
+ 	const void	*key;			/* Key data */
+ 	size_t		key_size;		/* Size of key data */
++	const void	*params;		/* Key parameters */
++	size_t		params_size;		/* Size of key parameters */
++	enum OID	key_algo;		/* Public key algorithm */
+ 	enum OID	last_oid;		/* Last OID encountered */
+ 	enum OID	algo_oid;		/* Algorithm OID */
+ 	unsigned char	nr_mpi;			/* Number of MPIs stored */
+@@ -109,6 +112,13 @@ struct x509_certificate *x509_cert_parse(const void *data, size_t datalen)
  
-@@ -948,6 +953,7 @@ int ecc_is_key_valid(unsigned int curve_id, unsigned int ndigits,
+ 	cert->pub->keylen = ctx->key_size;
  
- 	return __ecc_is_key_valid(curve, private_key, ndigits);
++	cert->pub->params = kmemdup(ctx->params, ctx->params_size, GFP_KERNEL);
++	if (!cert->pub->params)
++		goto error_decode;
++
++	cert->pub->paramlen = ctx->params_size;
++	cert->pub->algo = ctx->key_algo;
++
+ 	/* Grab the signature bits */
+ 	ret = x509_get_sig_params(cert);
+ 	if (ret < 0)
+@@ -401,6 +411,27 @@ int x509_note_subject(void *context, size_t hdrlen,
  }
-+EXPORT_SYMBOL(ecc_is_key_valid);
  
  /*
-  * ECC private keys are generated using the method of extra random bits,
-@@ -1000,6 +1006,7 @@ int ecc_gen_privkey(unsigned int curve_id, unsigned int ndigits, u64 *privkey)
- 
- 	return 0;
++ * Extract the parameters for the public key
++ */
++int x509_note_params(void *context, size_t hdrlen,
++		     unsigned char tag,
++		     const void *value, size_t vlen)
++{
++	struct x509_parse_context *ctx = context;
++
++	/*
++	 * AlgorithmIdentifier is used three times in the x509, we should skip
++	 * first and ignore third, using second one which is after subject and
++	 * before subjectPublicKey.
++	 */
++	if (!ctx->cert->raw_subject || ctx->key)
++		return 0;
++	ctx->params = value - hdrlen;
++	ctx->params_size = vlen + hdrlen;
++	return 0;
++}
++
++/*
+  * Extract the data for the public key algorithm
+  */
+ int x509_extract_key_data(void *context, size_t hdrlen,
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 443d5b6f1045..50396b3a2a47 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -2493,6 +2493,12 @@ static int alg_test_kpp(const struct alg_test_desc *desc, const char *driver,
+ 	return err;
  }
-+EXPORT_SYMBOL(ecc_gen_privkey);
  
- int ecc_make_pub_key(unsigned int curve_id, unsigned int ndigits,
- 		     const u64 *private_key, u64 *public_key)
-@@ -1036,10 +1043,11 @@ int ecc_make_pub_key(unsigned int curve_id, unsigned int ndigits,
- out:
- 	return ret;
- }
-+EXPORT_SYMBOL(ecc_make_pub_key);
- 
- /* SP800-56A section 5.6.2.3.4 partial verification: ephemeral keys only */
--static int ecc_is_pubkey_valid_partial(const struct ecc_curve *curve,
--				       struct ecc_point *pk)
-+int ecc_is_pubkey_valid_partial(const struct ecc_curve *curve,
-+				struct ecc_point *pk)
++static u8 *test_pack_u32(u8 *dst, u32 val)
++{
++	memcpy(dst, &val, sizeof(val));
++	return dst + sizeof(val);
++}
++
+ static int test_akcipher_one(struct crypto_akcipher *tfm,
+ 			     const struct akcipher_testvec *vecs)
  {
- 	u64 yy[ECC_MAX_DIGITS], xxx[ECC_MAX_DIGITS], w[ECC_MAX_DIGITS];
+@@ -2507,6 +2513,7 @@ static int test_akcipher_one(struct crypto_akcipher *tfm,
+ 	const char *m, *c;
+ 	unsigned int m_size, c_size;
+ 	const char *op;
++	u8 *key, *ptr;
  
-@@ -1064,8 +1072,8 @@ static int ecc_is_pubkey_valid_partial(const struct ecc_curve *curve,
- 		return -EINVAL;
+ 	if (testmgr_alloc_buf(xbuf))
+ 		return err;
+@@ -2517,12 +2524,20 @@ static int test_akcipher_one(struct crypto_akcipher *tfm,
  
- 	return 0;
--
- }
-+EXPORT_SYMBOL(ecc_is_pubkey_valid_partial);
+ 	crypto_init_wait(&wait);
  
- int crypto_ecdh_shared_secret(unsigned int curve_id, unsigned int ndigits,
- 			      const u64 *private_key, const u64 *public_key,
-@@ -1121,3 +1129,6 @@ int crypto_ecdh_shared_secret(unsigned int curve_id, unsigned int ndigits,
- out:
- 	return ret;
- }
-+EXPORT_SYMBOL(crypto_ecdh_shared_secret);
++	key = kmalloc(vecs->key_len + sizeof(u32) * 2 + vecs->param_len,
++		      GFP_KERNEL);
++	if (!key)
++		goto free_xbuf;
++	memcpy(key, vecs->key, vecs->key_len);
++	ptr = key + vecs->key_len;
++	ptr = test_pack_u32(ptr, vecs->algo);
++	ptr = test_pack_u32(ptr, vecs->param_len);
++	memcpy(ptr, vecs->params, vecs->param_len);
 +
-+MODULE_LICENSE("Dual BSD/GPL");
-diff --git a/crypto/ecc.h b/crypto/ecc.h
-index f75a86baa3bd..3809dbeb699a 100644
---- a/crypto/ecc.h
-+++ b/crypto/ecc.h
-@@ -33,6 +33,41 @@
- #define ECC_DIGITS_TO_BYTES_SHIFT 3
+ 	if (vecs->public_key_vec)
+-		err = crypto_akcipher_set_pub_key(tfm, vecs->key,
+-						  vecs->key_len);
++		err = crypto_akcipher_set_pub_key(tfm, key, vecs->key_len);
+ 	else
+-		err = crypto_akcipher_set_priv_key(tfm, vecs->key,
+-						   vecs->key_len);
++		err = crypto_akcipher_set_priv_key(tfm, key, vecs->key_len);
+ 	if (err)
+ 		goto free_req;
  
- /**
-+ * struct ecc_point - elliptic curve point in affine coordinates
-+ *
-+ * @x:		X coordinate in vli form.
-+ * @y:		Y coordinate in vli form.
-+ * @ndigits:	Length of vlis in u64 qwords.
-+ */
-+struct ecc_point {
-+	u64 *x;
-+	u64 *y;
-+	u8 ndigits;
-+};
+@@ -2652,6 +2667,7 @@ static int test_akcipher_one(struct crypto_akcipher *tfm,
+ 	kfree(outbuf_enc);
+ free_req:
+ 	akcipher_request_free(req);
++	kfree(key);
+ free_xbuf:
+ 	testmgr_free_buf(xbuf);
+ 	return err;
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index f267633cf13a..75d8f8c3e203 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -25,6 +25,8 @@
+ #ifndef _CRYPTO_TESTMGR_H
+ #define _CRYPTO_TESTMGR_H
+ 
++#include <linux/oid_registry.h>
 +
-+/**
-+ * struct ecc_curve - definition of elliptic curve
-+ *
-+ * @name:	Short name of the curve.
-+ * @g:		Generator point of the curve.
-+ * @p:		Prime number, if Barrett's reduction is used for this curve
-+ *		pre-calculated value 'mu' is appended to the @p after ndigits.
-+ *		Use of Barrett's reduction is heuristically determined in
-+ *		vli_mmod_fast().
-+ * @n:		Order of the curve group.
-+ * @a:		Curve parameter a.
-+ * @b:		Curve parameter b.
-+ */
-+struct ecc_curve {
-+	char *name;
-+	struct ecc_point g;
-+	u64 *p;
-+	u64 *n;
-+	u64 *a;
-+	u64 *b;
-+};
-+
-+/**
-  * ecc_is_key_valid() - Validate a given ECDH private key
+ #define MAX_IVLEN		32
+ 
+ /*
+@@ -135,13 +137,16 @@ struct drbg_testvec {
+ 
+ struct akcipher_testvec {
+ 	const unsigned char *key;
++	const unsigned char *params;
+ 	const unsigned char *m;
+ 	const unsigned char *c;
+ 	unsigned int key_len;
++	unsigned int param_len;
+ 	unsigned int m_size;
+ 	unsigned int c_size;
+ 	bool public_key_vec;
+ 	bool siggen_sigver_test;
++	enum OID algo;
+ };
+ 
+ struct kpp_testvec {
+diff --git a/include/crypto/akcipher.h b/include/crypto/akcipher.h
+index 28ffa9ef03a9..4ecbedddd9a1 100644
+--- a/include/crypto/akcipher.h
++++ b/include/crypto/akcipher.h
+@@ -74,10 +74,10 @@ struct crypto_akcipher {
+  *		operation
+  * @set_pub_key: Function invokes the algorithm specific set public key
+  *		function, which knows how to decode and interpret
+- *		the BER encoded public key
++ *		the BER encoded public key and parameters
+  * @set_priv_key: Function invokes the algorithm specific set private key
+  *		function, which knows how to decode and interpret
+- *		the BER encoded private key
++ *		the BER encoded private key and parameters
+  * @max_size:	Function returns dest buffer size required for a given key.
+  * @init:	Initialize the cryptographic transformation object.
+  *		This function is used to initialize the cryptographic
+@@ -388,11 +388,12 @@ static inline int crypto_akcipher_verify(struct akcipher_request *req)
+  * crypto_akcipher_set_pub_key() - Invoke set public key operation
   *
-  * @curve_id:		id representing the curve to use
-@@ -91,4 +126,68 @@ int ecc_make_pub_key(const unsigned int curve_id, unsigned int ndigits,
- int crypto_ecdh_shared_secret(unsigned int curve_id, unsigned int ndigits,
- 			      const u64 *private_key, const u64 *public_key,
- 			      u64 *secret);
-+
-+/**
-+ * ecc_is_pubkey_valid_partial() - Partial public key validation
-+ *
-+ * @curve:		elliptic curve domain parameters
-+ * @pk:			public key as a point
-+ *
-+ * Valdiate public key according to SP800-56A section 5.6.2.3.4 ECC Partial
-+ * Public-Key Validation Routine.
-+ *
-+ * Note: There is no check that the public key is in the correct elliptic curve
-+ * subgroup.
-+ *
-+ * Return: 0 if validation is successful, -EINVAL if validation is failed.
-+ */
-+int ecc_is_pubkey_valid_partial(const struct ecc_curve *curve,
-+				struct ecc_point *pk);
-+
-+/**
-+ * vli_is_zero() - Determine is vli is zero
-+ *
-+ * @vli:		vli to check.
-+ * @ndigits:		length of the @vli
-+ */
-+bool vli_is_zero(const u64 *vli, unsigned int ndigits);
-+
-+/**
-+ * vli_cmp() - compare left and right vlis
-+ *
-+ * @left:		vli
-+ * @right:		vli
-+ * @ndigits:		length of both vlis
-+ *
-+ * Returns sign of @left - @right, i.e. -1 if @left < @right,
-+ * 0 if @left == @right, 1 if @left > @right.
-+ */
-+int vli_cmp(const u64 *left, const u64 *right, unsigned int ndigits);
-+
-+/**
-+ * vli_sub() - Subtracts right from left
-+ *
-+ * @result:		where to write result
-+ * @left:		vli
-+ * @right		vli
-+ * @ndigits:		length of all vlis
-+ *
-+ * Note: can modify in-place.
-+ *
-+ * Return: carry bit.
-+ */
-+u64 vli_sub(u64 *result, const u64 *left, const u64 *right,
-+	    unsigned int ndigits);
-+
-+/**
-+ * vli_mod_inv() - Modular inversion
-+ *
-+ * @result:		where to write vli number
-+ * @input:		vli value to operate on
-+ * @mod:		modulus
-+ * @ndigits:		length of all vlis
-+ */
-+void vli_mod_inv(u64 *result, const u64 *input, const u64 *mod,
-+		 unsigned int ndigits);
-+
- #endif
-diff --git a/crypto/ecc_curve_defs.h b/crypto/ecc_curve_defs.h
-index 336ab1805639..69be6c7d228f 100644
---- a/crypto/ecc_curve_defs.h
-+++ b/crypto/ecc_curve_defs.h
-@@ -2,21 +2,6 @@
- #ifndef _CRYTO_ECC_CURVE_DEFS_H
- #define _CRYTO_ECC_CURVE_DEFS_H
+  * Function invokes the algorithm specific set key function, which knows
+- * how to decode and interpret the encoded key
++ * how to decode and interpret the encoded key and parameters
+  *
+  * @tfm:	tfm handle
+- * @key:	BER encoded public key
+- * @keylen:	length of the key
++ * @key:	BER encoded public key, algo OID, paramlen, BER encoded
++ *		parameters
++ * @keylen:	length of the key (not including other data)
+  *
+  * Return: zero on success; error code in case of error
+  */
+@@ -409,11 +410,12 @@ static inline int crypto_akcipher_set_pub_key(struct crypto_akcipher *tfm,
+  * crypto_akcipher_set_priv_key() - Invoke set private key operation
+  *
+  * Function invokes the algorithm specific set key function, which knows
+- * how to decode and interpret the encoded key
++ * how to decode and interpret the encoded keya and parameters
+  *
+  * @tfm:	tfm handle
+- * @key:	BER encoded private key
+- * @keylen:	length of the key
++ * @key:	BER encoded private key, algo OID, paramlen, BER encoded
++ *		parameters
++ * @keylen:	length of the key (not including other data)
+  *
+  * Return: zero on success; error code in case of error
+  */
+diff --git a/include/crypto/public_key.h b/include/crypto/public_key.h
+index be626eac9113..712fe1214b5f 100644
+--- a/include/crypto/public_key.h
++++ b/include/crypto/public_key.h
+@@ -15,6 +15,7 @@
+ #define _LINUX_PUBLIC_KEY_H
  
--struct ecc_point {
--	u64 *x;
--	u64 *y;
--	u8 ndigits;
--};
--
--struct ecc_curve {
--	char *name;
--	struct ecc_point g;
--	u64 *p;
--	u64 *n;
--	u64 *a;
--	u64 *b;
--};
--
- /* NIST P-192: a = p - 3 */
- static u64 nist_p192_g_x[] = { 0xF4FF0AFD82FF1012ull, 0x7CBF20EB43A18800ull,
- 				0x188DA80EB03090F6ull };
+ #include <linux/keyctl.h>
++#include <linux/oid_registry.h>
+ 
+ /*
+  * Cryptographic data for the public-key subtype of the asymmetric key type.
+@@ -25,6 +26,9 @@
+ struct public_key {
+ 	void *key;
+ 	u32 keylen;
++	enum OID algo;
++	void *params;
++	u32 paramlen;
+ 	bool key_is_private;
+ 	const char *id_type;
+ 	const char *pkey_algo;
 -- 
 2.11.0
 
