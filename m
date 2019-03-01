@@ -2,224 +2,148 @@ Return-Path: <SRS0=jX8O=RE=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A3CAC43381
-	for <linux-crypto@archiver.kernel.org>; Fri,  1 Mar 2019 10:12:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D307C43381
+	for <linux-crypto@archiver.kernel.org>; Fri,  1 Mar 2019 14:03:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DAF682087E
-	for <linux-crypto@archiver.kernel.org>; Fri,  1 Mar 2019 10:12:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1551435155;
-	bh=4zI19HcoLDF46FyEYyPQI5PrixkUD2cR1vcwr2BbLb8=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=oGsY4AqA7/8yFGwwK+EV3+y65owi8xt0L5C9XFPTWE+mMVa8oky8pKpfCfDsf/d0B
-	 LX9wcb1pJo4ImxKZ1Lio3PW7Z1E64k6qu9GQ8DPK2WJoFzm7Z/meHETcj7D6hn3Dbh
-	 Sr79B+nvzPiyh6xYmD+YZ5MwHEikp/1KnQENM8BU=
+	by mail.kernel.org (Postfix) with ESMTP id BF1DE20851
+	for <linux-crypto@archiver.kernel.org>; Fri,  1 Mar 2019 14:03:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="MFobuByC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731675AbfCAKMe (ORCPT
+        id S1732808AbfCAODZ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 1 Mar 2019 05:12:34 -0500
-Received: from mail.kernel.org ([198.145.29.99]:58532 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728300AbfCAKMd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 1 Mar 2019 05:12:33 -0500
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 1CEA9218D8;
-        Fri,  1 Mar 2019 10:12:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1551435152;
-        bh=4zI19HcoLDF46FyEYyPQI5PrixkUD2cR1vcwr2BbLb8=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=TIKZttWMyUSKWYzS/Jwa9UOhiWDshtlkG9BJflpvEi3YyviUvB5zqNgZ7M1gz3h50
-         c7T8Uu0KNrdletRpET48bIuoXrlqTq+/ivL9lLSZcfXfQca2YaN3ULnCrWp+qtHd/P
-         W2DQ+18L1zl0Lo+QNXs1PRMkONvFVvxxuv3PkHVY=
-Received: by mail-lf1-f45.google.com with SMTP id m73so12039552lfa.2;
-        Fri, 01 Mar 2019 02:12:32 -0800 (PST)
-X-Gm-Message-State: APjAAAX5gbdhUp4S/ZD7SjNKlbK2a/CzcAbSyfViasICw9C7nj12ndHw
-        0KjBqPFrXwgH8IsdH7zElqMe/33BFVDRWaEuTHo=
-X-Google-Smtp-Source: APXvYqy7tg+SEugo+s55O6YAKzoyAn2XcSKVS9+1o1fZD8yNFFHtIcseQvqcrr2peKqeYxC6VZfwDXZbd3/CuDppWVI=
-X-Received: by 2002:a19:2396:: with SMTP id j144mr2440072lfj.159.1551435150160;
- Fri, 01 Mar 2019 02:12:30 -0800 (PST)
-MIME-Version: 1.0
-References: <CGME20190222122204eucas1p1ee66c9d937bdf328588ececb1f005526@eucas1p1.samsung.com>
- <20190222122144.19024-1-k.konieczny@partner.samsung.com> <20190222122144.19024-4-k.konieczny@partner.samsung.com>
- <CAJKOXPdgcQPriU7nT3K_DyB+NniLDf6b8993qu9zwW_dEuYogw@mail.gmail.com> <CAKv+Gu8EhppjBbBa3KDheb_YGFVZ0JBxe=mf8Fpq68PWazcyrQ@mail.gmail.com>
-In-Reply-To: <CAKv+Gu8EhppjBbBa3KDheb_YGFVZ0JBxe=mf8Fpq68PWazcyrQ@mail.gmail.com>
-From:   Krzysztof Kozlowski <krzk@kernel.org>
-Date:   Fri, 1 Mar 2019 11:12:18 +0100
-X-Gmail-Original-Message-ID: <CAJKOXPfzsPS1VT08SDR013a5Xz+m9sjVvEMNb-Q64Zr_nKG8kg@mail.gmail.com>
-Message-ID: <CAJKOXPfzsPS1VT08SDR013a5Xz+m9sjVvEMNb-Q64Zr_nKG8kg@mail.gmail.com>
-Subject: Re: [PATCH v4 3/3] crypto: s5p: add AES support for Exynos5433
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc:     Kamil Konieczny <k.konieczny@partner.samsung.com>,
-        Vladimir Zapolskiy <vz@mleia.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
+        Fri, 1 Mar 2019 09:03:25 -0500
+Received: from mailout1.w1.samsung.com ([210.118.77.11]:42091 "EHLO
+        mailout1.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728017AbfCAODY (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 1 Mar 2019 09:03:24 -0500
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20190301140323euoutp01a88b8462fad8f40fbc4577ec46a122cd~H2qYHWooM0525005250euoutp01P
+        for <linux-crypto@vger.kernel.org>; Fri,  1 Mar 2019 14:03:23 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20190301140323euoutp01a88b8462fad8f40fbc4577ec46a122cd~H2qYHWooM0525005250euoutp01P
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1551449003;
+        bh=bQPqFzz2fmJkWr/uClmGTOF0FqSo0MUh9CDopv6RO/4=;
+        h=From:To:Cc:Subject:Date:References:From;
+        b=MFobuByCDPg2mTEMh2mlLga4IwKi1TqWnH47fepvsgQZKMQEpFTh6np+4eM1Bgbew
+         RO34rWsDDV/WkP5SNVwZ0FAmjHbePE7dBXJtK85fqYhLyJtRoz4APB2EdbM337qO6L
+         oAHuTuvmMScXCZH3TSXKktPuvmggCOghhs+0wins=
+Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20190301140322eucas1p18c2e5f30802fd7ad16854b6eb521b7fb~H2qXqMMD62620126201eucas1p1O;
+        Fri,  1 Mar 2019 14:03:22 +0000 (GMT)
+Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
+        eusmges3new.samsung.com (EUCPMTA) with SMTP id BD.88.04806.AAB397C5; Fri,  1
+        Mar 2019 14:03:22 +0000 (GMT)
+Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+        20190301140321eucas1p2bf17a6e35d29e8d5f582a2d99fbf4c83~H2qW0Yp_o3213732137eucas1p2K;
+        Fri,  1 Mar 2019 14:03:21 +0000 (GMT)
+Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
+        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20190301140321eusmtrp2251ca495ae042e85682659bb93a9cb62~H2qWlrb9n1128711287eusmtrp2j;
+        Fri,  1 Mar 2019 14:03:21 +0000 (GMT)
+X-AuditID: cbfec7f5-34dff700000012c6-ec-5c793baa509d
+Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
+        eusmgms2.samsung.com (EUCPMTA) with SMTP id 85.09.04128.9AB397C5; Fri,  1
+        Mar 2019 14:03:21 +0000 (GMT)
+Received: from AMDC3218.DIGITAL.local (unknown [106.120.51.18]) by
+        eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+        20190301140321eusmtip2e3d60231d4f8627f339fede325a1f4ae~H2qWCTIkC0829808298eusmtip2n;
+        Fri,  1 Mar 2019 14:03:21 +0000 (GMT)
+From:   Kamil Konieczny <k.konieczny@partner.samsung.com>
+To:     k.konieczny@partner.samsung.com
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        "linux-samsung-soc@vger.kernel.org" 
-        <linux-samsung-soc@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Vladimir Zapolskiy <vz@mleia.com>,
         Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
-        Marek Szyprowski <m.szyprowski@samsung.com>
-Content-Type: text/plain; charset="UTF-8"
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: s5p-sss - fix AES support for Exynos5433
+Date:   Fri,  1 Mar 2019 15:02:54 +0100
+Message-Id: <20190301140254.19341-1-k.konieczny@partner.samsung.com>
+X-Mailer: git-send-email 2.21.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrMKsWRmVeSWpSXmKPExsWy7djP87qrrCtjDHZck7fYOGM9q8Wc8y0s
+        Ft2vZCz69v1ntDh/fgO7xf17P5ksLu+aw2Yx4/w+Jou1R+6yW/z/1czswOWxZeVNJo9tB1Q9
+        Nq3qZPP4t3AKi8fBd3uYPPq2rGL0+LxJLoA9issmJTUnsyy1SN8ugSvjzc7gggWcFZ2vr7A3
+        MD5l72Lk4JAQMJGYuEWoi5GLQ0hgBaPElH0rWCGcL4wSGxq/MUM4nxklmk9eZuxi5ATruHzw
+        JlRiOaPExNudLHAt706/BatiEzCXeLT9DBOILSKgLDH53nRmEJtZ4DWTRO+/LBBbWMBRYuXs
+        BewgNouAqsTtntdg9bwCLhKTru5jhdgmL/FzxSZ2iLigxMmZT1gg5shLNG+dDXaFhMBkdolt
+        yx+xQTS4SJyZ3c0EYQtLvDq+hR3ClpH4v3M+VLxcYvfWZ+wQzS2MEnMnL4JKWEscPn6RFRQy
+        zAKaEut36UOEHSXWvGljgwQYn8SNt4IQN/BJTNoG8hdImFeio00IolpXYt7/M1DnS0t0/V/H
+        ClHiIXH1rCtIWEggVuLw6+eMExgVZiF5bBaSx2YhnLCAkXkVo3hqaXFuemqxcV5quV5xYm5x
+        aV66XnJ+7iZGYFI6/e/41x2M+/4kHWIU4GBU4uGt0KqMEWJNLCuuzD3EKMHBrCTCO8MSKMSb
+        klhZlVqUH19UmpNafIhRmoNFSZy3muFBtJBAemJJanZqakFqEUyWiYNTqoFxfsTyPY++3Pxx
+        +FY2U+kOd85jKReXM5ncu1UQ6XZr2Z7PDtM/ulWa9r2a57X0nahKWZswB9fnyLTX0stnO+jM
+        //nsBFfLr5frJ2UvfXcx8FvYzb4Ixr+XPgUdr2bxjfkzrWaT2dMP/9RFuL4ucEmf+2vWOZmQ
+        LsM/yrdspytvvMr2T90lOMjpjhJLcUaioRZzUXEiAE1WWvVGAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFupmkeLIzCtJLcpLzFFi42I5/e/4Pd2V1pUxBi+nKlpsnLGe1WLO+RYW
+        i+5XMhZ9+/4zWpw/v4Hd4v69n0wWl3fNYbOYcX4fk8XaI3fZLf7/amZ24PLYsvImk8e2A6oe
+        m1Z1snn8WziFxePguz1MHn1bVjF6fN4kF8AepWdTlF9akqqQkV9cYqsUbWhhpGdoaaFnZGKp
+        Z2hsHmtlZKqkb2eTkpqTWZZapG+XoJfxZmdwwQLOis7XV9gbGJ+ydzFyckgImEhcPniTGcQW
+        EljKKLHpRCVEXFqi8fRqJghbWOLPtS62LkYuoJpPjBJ3PzwCa2YTMJd4tP0MWJGIgLLE5HvT
+        mUGKmAU+Mkk8PvmaFSQhLOAosXL2ArAGFgFVids9r8EaeAVcJCZd3ccKsUFe4ueKTewQcUGJ
+        kzOfsIDYzEDx5q2zmScw8s1CkpqFJLWAkWkVo0hqaXFuem6xkV5xYm5xaV66XnJ+7iZGYERs
+        O/Zzyw7GrnfBhxgFOBiVeHgrtCpjhFgTy4orcw8xSnAwK4nwzrAECvGmJFZWpRblxxeV5qQW
+        H2I0BTp2IrOUaHI+MFrzSuINTQ3NLSwNzY3Njc0slMR5zxtURgkJpCeWpGanphakFsH0MXFw
+        SjUwBlubqt4TCEz2sXrVtPHD9ZMic8yTJBo/7kvbsoVrkyBf4e7gRYoPPH8Ffq5Ln3Vu6e3z
+        QYrrd7VHuZld+mfryTHFbfWU1niWZ/yLMn8k/I6O++Rezb01c59LyvK1axILcyLU1sco7Uy3
+        CVpTuyP1zLxw1c/8vDmbORKycmJl/16uvLGhK+WzEktxRqKhFnNRcSIAy/QkKp4CAAA=
+X-CMS-MailID: 20190301140321eucas1p2bf17a6e35d29e8d5f582a2d99fbf4c83
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20190301140321eucas1p2bf17a6e35d29e8d5f582a2d99fbf4c83
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20190301140321eucas1p2bf17a6e35d29e8d5f582a2d99fbf4c83
+References: <CGME20190301140321eucas1p2bf17a6e35d29e8d5f582a2d99fbf4c83@eucas1p2.samsung.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 1 Mar 2019 at 11:07, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
->
-> On Fri, 1 Mar 2019 at 10:56, Krzysztof Kozlowski <krzk@kernel.org> wrote:
-> >
-> > On Fri, 22 Feb 2019 at 13:22, Kamil Konieczny
-> > <k.konieczny@partner.samsung.com> wrote:
-> > >
-> > > Add AES crypto HW acceleration for Exynos5433, with the help of SlimSSS IP.
-> > >
-> > > Reviewed-by: Krzysztof Kozlowski <krzk@kernel.org>
-> > > Signed-off-by: Kamil Konieczny <k.konieczny@partner.samsung.com>
-> > > ---
-> > >  drivers/crypto/s5p-sss.c | 50 ++++++++++++++++++++++++++++++++++++----
-> > >  1 file changed, 46 insertions(+), 4 deletions(-)
-> > > diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
-> > > index 0064be0e3941..3f45cc5cb94a 100644
-> > > --- a/drivers/crypto/s5p-sss.c
-> > > +++ b/drivers/crypto/s5p-sss.c
-> > > @@ -232,6 +232,7 @@
-> > >   * struct samsung_aes_variant - platform specific SSS driver data
-> > >   * @aes_offset: AES register offset from SSS module's base.
-> > >   * @hash_offset: HASH register offset from SSS module's base.
-> > > + * @clk_names: names of clocks needed to run SSS IP
-> > >   *
-> > >   * Specifies platform specific configuration of SSS module.
-> > >   * Note: A structure for driver specific platform data is used for future
-> > > @@ -240,6 +241,7 @@
-> > >  struct samsung_aes_variant {
-> > >         unsigned int                    aes_offset;
-> > >         unsigned int                    hash_offset;
-> > > +       const char                      *clk_names[];
-> > >  };
-> > >
-> > >  struct s5p_aes_reqctx {
-> > > @@ -296,6 +298,7 @@ struct s5p_aes_ctx {
-> > >  struct s5p_aes_dev {
-> > >         struct device                   *dev;
-> > >         struct clk                      *clk;
-> > > +       struct clk                      *pclk;
-> > >         void __iomem                    *ioaddr;
-> > >         void __iomem                    *aes_ioaddr;
-> > >         int                             irq_fc;
-> > > @@ -384,11 +387,19 @@ struct s5p_hash_ctx {
-> > >  static const struct samsung_aes_variant s5p_aes_data = {
-> > >         .aes_offset     = 0x4000,
-> > >         .hash_offset    = 0x6000,
-> > > +       .clk_names      = { "secss", },
-> > >  };
-> > >
-> > >  static const struct samsung_aes_variant exynos_aes_data = {
-> > >         .aes_offset     = 0x200,
-> > >         .hash_offset    = 0x400,
-> > > +       .clk_names      = { "secss", },
-> > > +};
-> > > +
-> > > +static const struct samsung_aes_variant exynos5433_slim_aes_data = {
-> > > +       .aes_offset     = 0x400,
-> > > +       .hash_offset    = 0x800,
-> > > +       .clk_names      = { "pclk", "aclk", },
-> > >  };
-> > >
-> > >  static const struct of_device_id s5p_sss_dt_match[] = {
-> > > @@ -400,6 +411,10 @@ static const struct of_device_id s5p_sss_dt_match[] = {
-> > >                 .compatible = "samsung,exynos4210-secss",
-> > >                 .data = &exynos_aes_data,
-> > >         },
-> > > +       {
-> > > +               .compatible = "samsung,exynos5433-slim-sss",
-> > > +               .data = &exynos5433_slim_aes_data,
-> > > +       },
-> > >         { },
-> > >  };
-> > >  MODULE_DEVICE_TABLE(of, s5p_sss_dt_match);
-> > > @@ -2208,18 +2223,39 @@ static int s5p_aes_probe(struct platform_device *pdev)
-> > >                         return PTR_ERR(pdata->ioaddr);
-> > >         }
-> > >
-> > > -       pdata->clk = devm_clk_get(dev, "secss");
-> > > +       pdata->clk = devm_clk_get(dev, variant->clk_names[0]);
-> > >         if (IS_ERR(pdata->clk)) {
-> > > -               dev_err(dev, "failed to find secss clock source\n");
-> > > +               dev_err(dev, "failed to find secss clock %s\n",
-> > > +                       variant->clk_names[0]);
-> > >                 return -ENOENT;
-> > >         }
-> > >
-> > >         err = clk_prepare_enable(pdata->clk);
-> > >         if (err < 0) {
-> > > -               dev_err(dev, "Enabling SSS clk failed, err %d\n", err);
-> > > +               dev_err(dev, "Enabling clock %s failed, err %d\n",
-> > > +                       variant->clk_names[0], err);
-> > >                 return err;
-> > >         }
-> > >
-> > > +       if (variant->clk_names[1]) {
-> > > +               pdata->pclk = devm_clk_get(dev, variant->clk_names[1]);
-> >
-> > I see on today's linux next:
-> > [ 6.391256] Unable to handle kernel paging request at virtual address 00004000
-> > on all my Exynos boards (U3, XU, XU3, HC1).
-> > I did not do a bisect yet but it might be connected with this commit.
-> >
-> > The call trace is:
-> > (strcmp) from [<c0774014>] (of_property_match_string+0x58/0xd0)
-> > (of_property_match_string) from [<c04d3d2c>] (__of_clk_get_by_name+0x5c/0x130)
-> > (__of_clk_get_by_name) from [<c04d3fa0>] (clk_get+0x34/0x70)
-> > (clk_get) from [<c04d3680>] (devm_clk_get+0x38/0x74)
-> > (devm_clk_get) from [<c075c248>] (s5p_aes_probe+0xd4/0x4a0)
-> > (s5p_aes_probe) from [<c059dbc4>] (platform_drv_probe+0x6c/0xa4)
-> > (platform_drv_probe) from [<c059b4c8>] (really_probe+0x280/0x414)
-> > (really_probe) from [<c059b810>] (driver_probe_device+0x78/0x1c0)
-> > (driver_probe_device) from [<c059bbb8>] (device_driver_attach+0x58/0x60)
-> > (device_driver_attach) from [<c059bcbc>] (__driver_attach+0xfc/0x160)
-> > (__driver_attach) from [<c059928c>] (bus_for_each_dev+0x68/0xb4)
-> > (bus_for_each_dev) from [<c059a5c4>] (bus_add_driver+0x158/0x214)
-> > (bus_add_driver) from [<c059cb94>] (driver_register+0x78/0x110)
-> > (driver_register) from [<c01031f8>] (do_one_initcall+0x8c/0x404)
-> >
-> > Full log:
-> > https://krzk.eu/#/builders/21/builds/1153/steps/12/logs/serial0
-> >
-> > The s5p_aes_probe address points here.
-> >
->
-> It seems that dereferencing clk_names[1] of struct samsung_aes_variant
-> exynos_aes_data
->
-> > > +       .clk_names      = { "secss", },
->
-> returns the first member of
->
-> > >  static const struct samsung_aes_variant s5p_aes_data = {
-> > >         .aes_offset     = 0x4000,
->
-> since the array has only one entry in this case, and so the second,
-> non-existing entry overlaps with the next data item in the object
-> file.
->
-> So the fix would be to use
->
-> .clk_names      = { "secss", NULL },
->
-> instead (or define the array to have 2 members)
+Commit 0918f18c7179 ("crypto: s5p - add AES support for Exynos5433")
+introduced bug in dereferencing clk_names[1] on platforms different from
+Exynos5433. On Exynos board XU3 call trace is:
 
-Ah yes, the size of the array is not fixed during definition. Probably
-having explicit size would be less error-prone in the future (if
-someone adds third clock).
+"Unable to handle kernel paging request at virtual address 00004000"
+(strcmp) from [<c0774014>] (of_property_match_string+0x58/0xd0)
+...
+(devm_clk_get) from [<c075c248>] (s5p_aes_probe+0xd4/0x4a0)
+(s5p_aes_probe) from [<c059dbc4>] (platform_drv_probe+0x6c/0xa4)
 
-Best regards,
-Krzysztof
+Fix this by setting array clk_names size to 2.
+
+Fixes: 0918f18c7179 ("crypto: s5p - add AES support for Exynos5433")
+Reported-by: Krzysztof Kozlowski <krzk@kernel.org>
+Signed-off-by: Kamil Konieczny <k.konieczny@partner.samsung.com>
+---
+ drivers/crypto/s5p-sss.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
+index 3f45cc5cb94a..2fb4ae459c45 100644
+--- a/drivers/crypto/s5p-sss.c
++++ b/drivers/crypto/s5p-sss.c
+@@ -241,7 +241,7 @@
+ struct samsung_aes_variant {
+ 	unsigned int			aes_offset;
+ 	unsigned int			hash_offset;
+-	const char			*clk_names[];
++	const char			*clk_names[2];
+ };
+ 
+ struct s5p_aes_reqctx {
+-- 
+2.21.0
+
