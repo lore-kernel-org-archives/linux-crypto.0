@@ -2,101 +2,76 @@ Return-Path: <SRS0=O2m6=RK=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC7FEC43381
-	for <linux-crypto@archiver.kernel.org>; Thu,  7 Mar 2019 07:30:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05212C43381
+	for <linux-crypto@archiver.kernel.org>; Thu,  7 Mar 2019 08:26:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8A53720675
-	for <linux-crypto@archiver.kernel.org>; Thu,  7 Mar 2019 07:30:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1551943847;
-	bh=bGuraxaXqIjN5gO7GwTh92jdQgB7IlTY5UNJt+0/ACE=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=0Q/+UQmDTDZsmLG2zhDsQo671VceCuF9MsNHFsTJXA/vyG300sp0UIYh1NZ2+HrE2
-	 ralWtsOrhLe0EcBxM0cXy2KDBTSji5h+RFzyTxutazQiXLUStMkXah4EgAVvRi8EZ3
-	 8QOTGUY+JqZLpeDRm7+TdkB5FsyIE5qLGCzEvDnM=
+	by mail.kernel.org (Postfix) with ESMTP id CDEA720675
+	for <linux-crypto@archiver.kernel.org>; Thu,  7 Mar 2019 08:26:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726293AbfCGHal (ORCPT
+        id S1726138AbfCGI0D (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 7 Mar 2019 02:30:41 -0500
-Received: from mail.kernel.org ([198.145.29.99]:47788 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726283AbfCGHal (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 7 Mar 2019 02:30:41 -0500
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 2FA782146E;
-        Thu,  7 Mar 2019 07:30:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1551943840;
-        bh=bGuraxaXqIjN5gO7GwTh92jdQgB7IlTY5UNJt+0/ACE=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=ZKHrw+iOUzCkdBWCg3R86SJDVA+niU6CvqwU3LPRMjwDW+OCHMINPwNHbGrTBMs+R
-         Ii2CQo7CjCLwp6yxiOsdMrAvUfdoFreQ4zD4RqXaIFtDESrFGgwBu1+3O/ma2Er0Bm
-         xaX+/DS5m4W2L6mdhE8bPpNRRbhh4ijtUYeK8ZbA=
-Received: by mail-lj1-f176.google.com with SMTP id z20so13292986ljj.10;
-        Wed, 06 Mar 2019 23:30:40 -0800 (PST)
-X-Gm-Message-State: APjAAAUlrn7smI19kbC/n7AKS1bkReyQzm5Zpbwy5HaPwSi2mxn3yb6D
-        de5wRgpl0GnkHnQvRzVMftZttY59/x65cDDl9t4=
-X-Google-Smtp-Source: APXvYqxpCSv0w8s10dF/gH4zRA/AqrBf1J/vOoPeb3jIiDlQ1h/wL35XN6tiS9Vyuljhsn/6b0C826ZIob44dbjW6mU=
-X-Received: by 2002:a2e:780a:: with SMTP id t10mr4231952ljc.19.1551943838262;
- Wed, 06 Mar 2019 23:30:38 -0800 (PST)
-MIME-Version: 1.0
-References: <5c80c49b.1c69fb81.605bf.26ea@mx.google.com>
-In-Reply-To: <5c80c49b.1c69fb81.605bf.26ea@mx.google.com>
-From:   Krzysztof Kozlowski <krzk@kernel.org>
-Date:   Thu, 7 Mar 2019 08:30:27 +0100
-X-Gmail-Original-Message-ID: <CAJKOXPfVxb+aQnqCePgF4EedH5vPtA3BWhqbTTNAa7pAOOYB_Q@mail.gmail.com>
-Message-ID: <CAJKOXPfVxb+aQnqCePgF4EedH5vPtA3BWhqbTTNAa7pAOOYB_Q@mail.gmail.com>
-Subject: Re: mainline/master boot bisection: v5.0-4854-g8dcd175bc3d5 on odroid-xu3
-To:     "kernelci.org bot" <bot@kernelci.org>
-Cc:     tomeu.vizoso@collabora.com, guillaume.tucker@collabora.com,
-        broonie@kernel.org, matthew.hart@linaro.org,
-        Herbert Xu <herbert@gondor.apana.org.au>, khilman@baylibre.com,
-        enric.balletbo@collabora.com,
-        Kamil Konieczny <k.konieczny@partner.samsung.com>,
-        linux-crypto@vger.kernel.org,
-        "linux-samsung-soc@vger.kernel.org" 
-        <linux-samsung-soc@vger.kernel.org>,
+        Thu, 7 Mar 2019 03:26:03 -0500
+Received: from orcrist.hmeau.com ([104.223.48.154]:55276 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726015AbfCGI0C (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 7 Mar 2019 03:26:02 -0500
+Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
+        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
+        id 1h1oLh-00048Y-Vp; Thu, 07 Mar 2019 16:25:54 +0800
+Received: from herbert by gondobar with local (Exim 4.89)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1h1oLe-0006AM-Er; Thu, 07 Mar 2019 16:25:50 +0800
+Date:   Thu, 7 Mar 2019 16:25:50 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Kamil Konieczny <k.konieczny@partner.samsung.com>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
         Vladimir Zapolskiy <vz@mleia.com>,
-        linux-kernel@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>
-Content-Type: text/plain; charset="UTF-8"
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Marek Szyprowski <m.szyprowski@samsung.com>,
+        linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: s5p-sss - fix AES support for Exynos5433
+Message-ID: <20190307082550.4ijrmlrupyvwdyl5@gondor.apana.org.au>
+References: <CGME20190301140321eucas1p2bf17a6e35d29e8d5f582a2d99fbf4c83@eucas1p2.samsung.com>
+ <20190301140254.19341-1-k.konieczny@partner.samsung.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190301140254.19341-1-k.konieczny@partner.samsung.com>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 7 Mar 2019 at 08:13, kernelci.org bot <bot@kernelci.org> wrote:
->
-> * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-> * This automated bisection report was sent to you on the basis  *
-> * that you may be involved with the breaking commit it has      *
-> * found.  No manual investigation has been done to verify it,   *
-> * and the root cause of the problem may be somewhere else.      *
-> * Hope this helps!                                              *
-> * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
->
-> mainline/master boot bisection: v5.0-4854-g8dcd175bc3d5 on odroid-xu3
->
-> Summary:
->   Start:      8dcd175bc3d5 Merge branch 'akpm' (patches from Andrew)
->   Details:    https://kernelci.org/boot/id/5c8052c159b5146b7bfe6018
->   Plain log:  https://storage.kernelci.org//mainline/master/v5.0-4854-g8dcd175bc3d5/arm/exynos_defconfig/gcc-7/lab-collabora/boot-exynos5422-odroidxu3.txt
->   HTML log:   https://storage.kernelci.org//mainline/master/v5.0-4854-g8dcd175bc3d5/arm/exynos_defconfig/gcc-7/lab-collabora/boot-exynos5422-odroidxu3.html
->   Result:     0918f18c7179 crypto: s5p - add AES support for Exynos5433
->
-> Checks:
->   revert:     PASS
->   verify:     PASS
+On Fri, Mar 01, 2019 at 03:02:54PM +0100, Kamil Konieczny wrote:
+> Commit 0918f18c7179 ("crypto: s5p - add AES support for Exynos5433")
+> introduced bug in dereferencing clk_names[1] on platforms different from
+> Exynos5433. On Exynos board XU3 call trace is:
+> 
+> "Unable to handle kernel paging request at virtual address 00004000"
+> (strcmp) from [<c0774014>] (of_property_match_string+0x58/0xd0)
+> ...
+> (devm_clk_get) from [<c075c248>] (s5p_aes_probe+0xd4/0x4a0)
+> (s5p_aes_probe) from [<c059dbc4>] (platform_drv_probe+0x6c/0xa4)
+> 
+> Fix this by setting array clk_names size to 2.
+> 
+> Fixes: 0918f18c7179 ("crypto: s5p - add AES support for Exynos5433")
+> Reported-by: Krzysztof Kozlowski <krzk@kernel.org>
+> Signed-off-by: Kamil Konieczny <k.konieczny@partner.samsung.com>
+> ---
+>  drivers/crypto/s5p-sss.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thanks bot!
-It is already known and patch is waiting to be applied:
-https://patchwork.kernel.org/patch/10835389/
-
-Best regards,
-Krzysztof
+Patch applied.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
