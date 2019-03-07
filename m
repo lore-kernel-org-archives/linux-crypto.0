@@ -7,66 +7,66 @@ X-Spam-Status: No, score=-12.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDF20C43381
-	for <linux-crypto@archiver.kernel.org>; Thu,  7 Mar 2019 07:13:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7411FC43381
+	for <linux-crypto@archiver.kernel.org>; Thu,  7 Mar 2019 07:17:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 860AF20835
-	for <linux-crypto@archiver.kernel.org>; Thu,  7 Mar 2019 07:13:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2845E20835
+	for <linux-crypto@archiver.kernel.org>; Thu,  7 Mar 2019 07:17:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernelci-org.20150623.gappssmtp.com header.i=@kernelci-org.20150623.gappssmtp.com header.b="lvqCzY4b"
+	dkim=pass (2048-bit key) header.d=kernelci-org.20150623.gappssmtp.com header.i=@kernelci-org.20150623.gappssmtp.com header.b="BU8ukJtP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726166AbfCGHNe (ORCPT
+        id S1726094AbfCGHRE (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 7 Mar 2019 02:13:34 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:33343 "EHLO
+        Thu, 7 Mar 2019 02:17:04 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:35341 "EHLO
         mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725747AbfCGHNe (ORCPT
+        with ESMTP id S1725788AbfCGHRE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 7 Mar 2019 02:13:34 -0500
-Received: by mail-wr1-f68.google.com with SMTP id i12so16099164wrw.0
-        for <linux-crypto@vger.kernel.org>; Wed, 06 Mar 2019 23:13:32 -0800 (PST)
+        Thu, 7 Mar 2019 02:17:04 -0500
+Received: by mail-wr1-f68.google.com with SMTP id t18so16128522wrx.2
+        for <linux-crypto@vger.kernel.org>; Wed, 06 Mar 2019 23:17:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernelci-org.20150623.gappssmtp.com; s=20150623;
         h=message-id:date:mime-version:content-transfer-encoding:subject:to
          :from:cc;
-        bh=sayuyPupiA3rjZBNEtk4HbXcZcRHfhMukjQTApU0hl4=;
-        b=lvqCzY4bF9MHP887P/FdvwlI4R1Sq7344uTDJfS56fi5uS3NmAQDxmy5VbvxWhjtL7
-         FE5p2f+/hwd59VkjKgXiNaE/sy/BzKrbj7U2hagx2unkbsnbgprvWX5yzwFn4S7ckKEB
-         zX3e4GnTzMhfwde8NVygS9bMtRTC9wSUEweVcG4W38lxe2lvQEyAVU6qtqrC5dG8rAGo
-         S2v1kBpjBAxNkcyw1GSiEXme6PZnfGSK9MX17uyrnKs1rnJvc7AXrU0qciXPqC1Cmw1+
-         LBBvPR8Jv76UmZtlrxEeuGCUJT/6cTCMMA0OyBxF03KAZwzkHxYN1I7J5BdZvBoBxkpb
-         i4jw==
+        bh=4R1khhukNgWrtC/jRBi9XwptUxQQEPtnXJOGboaJmjo=;
+        b=BU8ukJtPLobr4YXnFqet2lElM0UzQHVafCKBwPKHObzWDLlBdGnUaNdStsUnc+bGNj
+         JIbtw7goqjy6n4OpBQNiaus8Aaog1rFka7ulebXmalO2W2CrkXKu6Gd0BKMbng4ncKNW
+         IkavpkDnEh7ZFqQgc+RTiv+DJ1d+AfaXXXwvTUZbxxlEgVi68YGFZlJigk6UgeGb7Jx2
+         QjLA5/1Bv3CkHCKVWJcUvFDyxMFvDibPhPagW7yuoXT0Xh9NqwHHexIiYLCkQ5oIbq+S
+         LS4t6mcU0nUW1WRxNagQ5dlIxWooV3kX4PBenp4kEeXUy1D50yK/ahsr3eSsJnvn6ikq
+         jG5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:message-id:date:mime-version
          :content-transfer-encoding:subject:to:from:cc;
-        bh=sayuyPupiA3rjZBNEtk4HbXcZcRHfhMukjQTApU0hl4=;
-        b=jT1jo5Hr+zWZ9HGIHHTkJR4GybCXEUIlSaFG8zUXM11ad94ZRF38kNHhjq+Ug8mej4
-         DohhtiQUAd59pbt5fZEfF32E/gfnQLjqkztcuNu6s+9aARi9zt1gbYIs3QZ2Ip0nJBE8
-         AXxU194RA9H+MktG0xt6hJDzcKgem9QT5CcrCxAP//FfZV0x1HhAyfjRrmAGKTJF32HJ
-         3u5Xgmr1FYgk1HPo81yHvAFKOO4aZ4b2byKQ/LCxPgEUP75kfY98vF0m+gu3wLJjCm50
-         OboQpjYFFn+KFAVlRDNvhWyTF3l65JEeCGI50Z77oGP8/2aBLNjqgGEHS3J0HRof6obB
-         9HIQ==
-X-Gm-Message-State: APjAAAULB4cy91n5P1UN0Xpbmh5wJdMezHVtqpmoSul1bZ9bFpkKiHio
-        rpeky8MKzuSi6RUHqek9VtcfRg==
-X-Google-Smtp-Source: APXvYqwrcsuZkVA3EJLxEcM2ufKx9kiJ+TAK0dj88WIVfYWqAUYvUknxW+Bc0Gm5qaXakOPPij9Zbg==
-X-Received: by 2002:a5d:6682:: with SMTP id l2mr5422817wru.271.1551942811946;
-        Wed, 06 Mar 2019 23:13:31 -0800 (PST)
+        bh=4R1khhukNgWrtC/jRBi9XwptUxQQEPtnXJOGboaJmjo=;
+        b=fZLSJ2XgjhkgAlSRYyiQuHqWEjT2AJjqLVTIjlk1TyCu3pt5huA5WWYvtpY+2LhxGR
+         45Awr097Shj5w7PFPwMKpjGZ4IBhIkTfcQvq6nKxYmwm9VSmaOnAPcJnHw4+Y7guFXSB
+         La+x/2PWIgZhocE1xT1ibqzf6X4K8g1z9sdgCbuW6VzzYO9UUIgABMnylc9/mx5+FwqZ
+         YJF0YKgm42CSFeRD9snmYfW8fBzruhu8a9VI28N+zTXTRLhUa75OWumIExbZZ9EqUzB1
+         sa4E9i23l9JllwNoOw0LZdBzOYWQWKv9rTr3G4BOx21uPIV5WmP9pKe0LAmuI88bGyAt
+         APvg==
+X-Gm-Message-State: APjAAAX/Ld1soGrP3MVi6JvBCECVP6TBpa/t11zEEMMrs57A1fEbge71
+        5+jfaQq7VZoQ35Aw+xgo/hH+eQ==
+X-Google-Smtp-Source: APXvYqxIO0z6xnb/aoIa/Z9aKhmDGMySmxz9Gabph6x65F2VCPcRdvDDc8Yv24sKoGKoewTgIRd21A==
+X-Received: by 2002:adf:fdcd:: with SMTP id i13mr5358571wrs.212.1551943021712;
+        Wed, 06 Mar 2019 23:17:01 -0800 (PST)
 Received: from [148.251.42.114] ([2a01:4f8:201:9271::2])
-        by smtp.gmail.com with ESMTPSA id m16sm6730680wro.78.2019.03.06.23.13.30
+        by smtp.gmail.com with ESMTPSA id y5sm9265335wrd.97.2019.03.06.23.17.00
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 06 Mar 2019 23:13:31 -0800 (PST)
-Message-ID: <5c80c49b.1c69fb81.605bf.26ea@mx.google.com>
-Date:   Wed, 06 Mar 2019 23:13:31 -0800 (PST)
+        Wed, 06 Mar 2019 23:17:01 -0800 (PST)
+Message-ID: <5c80c56d.1c69fb81.e3d9f.d73a@mx.google.com>
+Date:   Wed, 06 Mar 2019 23:17:01 -0800 (PST)
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-Kernelci-Kernel: v5.0-4854-g8dcd175bc3d5
+X-Kernelci-Kernel: v5.0-5022-g542d0e583b7b
 X-Kernelci-Report-Type: bisect
 X-Kernelci-Tree: mainline
 X-Kernelci-Lab-Name: lab-collabora
 X-Kernelci-Branch: master
-Subject: mainline/master boot bisection: v5.0-4854-g8dcd175bc3d5 on odroid-xu3
+Subject: mainline/master boot bisection: v5.0-5022-g542d0e583b7b on odroid-xu3
 To:     tomeu.vizoso@collabora.com, guillaume.tucker@collabora.com,
         broonie@kernel.org, matthew.hart@linaro.org,
         Herbert Xu <herbert@gondor.apana.org.au>, khilman@baylibre.com,
@@ -91,16 +91,17 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 * Hope this helps!                                              *
 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-mainline/master boot bisection: v5.0-4854-g8dcd175bc3d5 on odroid-xu3
+mainline/master boot bisection: v5.0-5022-g542d0e583b7b on odroid-xu3
 
 Summary:
-  Start:      8dcd175bc3d5 Merge branch 'akpm' (patches from Andrew)
-  Details:    https://kernelci.org/boot/id/5c8052c159b5146b7bfe6018
-  Plain log:  https://storage.kernelci.org//mainline/master/v5.0-4854-g8dcd=
-175bc3d5/arm/exynos_defconfig/gcc-7/lab-collabora/boot-exynos5422-odroidxu3=
+  Start:      542d0e583b7b Merge tag 'devprop-5.1-rc1' of git://git.kernel.=
+org/pub/scm/linux/kernel/git/rafael/linux-pm
+  Details:    https://kernelci.org/boot/id/5c806c1d59b5148945fe6019
+  Plain log:  https://storage.kernelci.org//mainline/master/v5.0-5022-g542d=
+0e583b7b/arm/exynos_defconfig/gcc-7/lab-collabora/boot-exynos5422-odroidxu3=
 .txt
-  HTML log:   https://storage.kernelci.org//mainline/master/v5.0-4854-g8dcd=
-175bc3d5/arm/exynos_defconfig/gcc-7/lab-collabora/boot-exynos5422-odroidxu3=
+  HTML log:   https://storage.kernelci.org//mainline/master/v5.0-5022-g542d=
+0e583b7b/arm/exynos_defconfig/gcc-7/lab-collabora/boot-exynos5422-odroidxu3=
 .html
   Result:     0918f18c7179 crypto: s5p - add AES support for Exynos5433
 
@@ -290,42 +291,45 @@ git bisect start
 # good: [a215ce8f0e00c2d707080236f1aafec337371043] Merge tag 'iommu-fix-v5.=
 0-rc8' of git://git.kernel.org/pub/scm/linux/kernel/git/joro/iommu
 git bisect good a215ce8f0e00c2d707080236f1aafec337371043
-# bad: [8dcd175bc3d50b78413c56d5b17d4bddd77412ef] Merge branch 'akpm' (patc=
-hes from Andrew)
-git bisect bad 8dcd175bc3d50b78413c56d5b17d4bddd77412ef
-# good: [096461de96a94c856190ba892ebf62dfba5a38f1] net/sched: avoid unused-=
-label warning
-git bisect good 096461de96a94c856190ba892ebf62dfba5a38f1
-# bad: [3478588b5136966c80c571cf0006f08e9e5b8f04] Merge branch 'locking-cor=
-e-for-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip
-git bisect bad 3478588b5136966c80c571cf0006f08e9e5b8f04
-# good: [6456300356433873309a1cae6aa05e77d6b59153] Merge git://git.kernel.o=
-rg/pub/scm/linux/kernel/git/davem/net-next
-git bisect good 6456300356433873309a1cae6aa05e77d6b59153
-# bad: [8feed3efa8022107bcb3432ac3ec9917e078ae70] Merge branch 'parisc-5.1-=
-1' of git://git.kernel.org/pub/scm/linux/kernel/git/deller/parisc-linux
-git bisect bad 8feed3efa8022107bcb3432ac3ec9917e078ae70
-# good: [cf64e495fe221479866c1ea7c6f5cd9698d8a3af] crypto: caam - weak key =
-checking for cbc des, 3des
-git bisect good cf64e495fe221479866c1ea7c6f5cd9698d8a3af
-# good: [fcc082f35c6d565d351b5b89bb03a82333e9ffe8] Revert "s390/cpum_cf: Ad=
-d kernel message exaplanations"
-git bisect good fcc082f35c6d565d351b5b89bb03a82333e9ffe8
-# good: [d3ff9f851b7ad892df8dc168f0d589308fb42ac3] dt-bindings: crypto: doc=
-ument Exynos5433 SlimSSS
-git bisect good d3ff9f851b7ad892df8dc168f0d589308fb42ac3
-# good: [d578bf28cfc40375b4fc9f7571a3faf17bd2373c] parisc: Add constant for=
- PDC_PAT_COMPLEX firmware call
-git bisect good d578bf28cfc40375b4fc9f7571a3faf17bd2373c
-# good: [bf6341664ad16070bed675bec659aa54b161ed82] m68k/apollo: Fix comment=
- in Makefile
-git bisect good bf6341664ad16070bed675bec659aa54b161ed82
-# bad: [eac616557050737a8d6ef6fe0322d0980ff0ffde] x86: Deprecate a.out supp=
-ort
-git bisect bad eac616557050737a8d6ef6fe0322d0980ff0ffde
+# bad: [542d0e583b7b366527175b2b5fc0aad262fa33b0] Merge tag 'devprop-5.1-rc=
+1' of git://git.kernel.org/pub/scm/linux/kernel/git/rafael/linux-pm
+git bisect bad 542d0e583b7b366527175b2b5fc0aad262fa33b0
+# good: [18a4d8bf250a33c015955f0dec27259780ef6448] Merge git://git.kernel.o=
+rg/pub/scm/linux/kernel/git/davem/net
+git bisect good 18a4d8bf250a33c015955f0dec27259780ef6448
+# bad: [203b6609e0ede49eb0b97008b1150c69e9d2ffd3] Merge branch 'perf-core-f=
+or-linus' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip
+git bisect bad 203b6609e0ede49eb0b97008b1150c69e9d2ffd3
 # bad: [63bdf4284c38a48af21745ceb148a087b190cd21] Merge branch 'linus' of g=
 it://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6
 git bisect bad 63bdf4284c38a48af21745ceb148a087b190cd21
+# good: [32c0ac3af49d0cfa05c5d9d77db94e240502b5ef] Merge tag 'regulator-v5.=
+1' of git://git.kernel.org/pub/scm/linux/kernel/git/broonie/regulator
+git bisect good 32c0ac3af49d0cfa05c5d9d77db94e240502b5ef
+# good: [7629bac64204ff256d3b2415767a7acb1401047b] Merge tag 'hwmon-for-v5.=
+1' of git://git.kernel.org/pub/scm/linux/kernel/git/groeck/linux-staging
+git bisect good 7629bac64204ff256d3b2415767a7acb1401047b
+# good: [48ef0908b81cc6b92ec8b157bb78ce2c4eddd7c7] crypto: axis - support v=
+ariable AEAD tag length
+git bisect good 48ef0908b81cc6b92ec8b157bb78ce2c4eddd7c7
+# good: [cf64e495fe221479866c1ea7c6f5cd9698d8a3af] crypto: caam - weak key =
+checking for cbc des, 3des
+git bisect good cf64e495fe221479866c1ea7c6f5cd9698d8a3af
+# good: [7df5218d66750ff5f84413ea307391bf9bbace1e] crypto: ccp - Update dri=
+ver messages to remove some confusion
+git bisect good 7df5218d66750ff5f84413ea307391bf9bbace1e
+# good: [91e14842f8ea8dc35669bad3c3dcd72d4614e4d1] crypto: af_alg - use str=
+uct_size() in sock_kfree_s()
+git bisect good 91e14842f8ea8dc35669bad3c3dcd72d4614e4d1
+# good: [5ddb0869bfc1bca6cfc592c74c64a026f936638c] leds: lp55xx: fix null d=
+eref on firmware load failure
+git bisect good 5ddb0869bfc1bca6cfc592c74c64a026f936638c
+# good: [d3ff9f851b7ad892df8dc168f0d589308fb42ac3] dt-bindings: crypto: doc=
+ument Exynos5433 SlimSSS
+git bisect good d3ff9f851b7ad892df8dc168f0d589308fb42ac3
+# good: [6456300356433873309a1cae6aa05e77d6b59153] Merge git://git.kernel.o=
+rg/pub/scm/linux/kernel/git/davem/net-next
+git bisect good 6456300356433873309a1cae6aa05e77d6b59153
 # bad: [0918f18c7179e8cdf718d01531a81b28130b4217] crypto: s5p - add AES sup=
 port for Exynos5433
 git bisect bad 0918f18c7179e8cdf718d01531a81b28130b4217
