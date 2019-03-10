@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B727FC10F0D
-	for <linux-crypto@archiver.kernel.org>; Sun, 10 Mar 2019 19:02:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 849F7C43381
+	for <linux-crypto@archiver.kernel.org>; Sun, 10 Mar 2019 19:02:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 85B442087F
-	for <linux-crypto@archiver.kernel.org>; Sun, 10 Mar 2019 19:02:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4949E20657
+	for <linux-crypto@archiver.kernel.org>; Sun, 10 Mar 2019 19:02:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1552244532;
-	bh=C6zx/gF4vIXF28sfcfsxIKBGW0KqLDXNdShm1EaSfsY=;
+	s=default; t=1552244533;
+	bh=oJsb/MA/0e3ovjL816nRQmBJSWow4UBdaKg1NInXUOc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=pcF6bmQFNdnlVKWLKhvlQq0wRLITabxjvJSzg0iX3ojC1UFjSDj7b9wnn3c6fBV0A
-	 96N1PKA7hleIWjva9H2BAdn28hoLFp5tPupqG0RlP5kO5PTMJSYfS0G4vRlT3Ply2f
-	 TKK9vkeWcmJTIyfFsnFJd+/k5Vt5NTwYwaosGb3s=
+	b=mxIyOOhhulXGxbrZe0dliLvE/5/xYUN09Q+KrP1AHpTSjg8aKepudQqoCwF8abB2A
+	 VFkq8tpbJ1sA1jrUnNpJaqakSxSPJ/J1cxMJadmhtZwI7d2/eL04gSCiSPrRlKZ65f
+	 AEjIIRBN2ckX5vK5G0mBAJMNv5QaAz5H6ZWX3G58=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726546AbfCJTCL (ORCPT
+        id S1726505AbfCJTCM (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 10 Mar 2019 15:02:11 -0400
-Received: from mail.kernel.org ([198.145.29.99]:36928 "EHLO mail.kernel.org"
+        Sun, 10 Mar 2019 15:02:12 -0400
+Received: from mail.kernel.org ([198.145.29.99]:36944 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726613AbfCJTCL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 10 Mar 2019 15:02:11 -0400
+        id S1726789AbfCJTCM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 10 Mar 2019 15:02:12 -0400
 Received: from sol.localdomain (c-107-3-167-184.hsd1.ca.comcast.net [107.3.167.184])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id B04832084F;
-        Sun, 10 Mar 2019 19:02:09 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 8FA7420883;
+        Sun, 10 Mar 2019 19:02:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1552244529;
-        bh=C6zx/gF4vIXF28sfcfsxIKBGW0KqLDXNdShm1EaSfsY=;
+        s=default; t=1552244531;
+        bh=oJsb/MA/0e3ovjL816nRQmBJSWow4UBdaKg1NInXUOc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ym6kmoWwwfaraH0mmVDEVpLK//2n4iP8XzMQW/2LJVdYyTW2oJ+rR+ItM6/Q4uD59
-         CTaW6YuyFYJnVKfF359wiR1U+aJN5bUtC/adnsaxnnKSEUYtOqrjYrHxsv55EiAY9y
-         YWore1OXjUWdEVsnoOJuJkt4U5mXRKsrGXMnTTUs=
+        b=xp1yU/F596JUartuvhsej2hr3VpcDezHIsHO0GJnBj/4BF9eYzU4Q8Utjk/F7LvSh
+         uEh+CJVZSWwmBlS+Cc2+kM24GmQ/+kJJi9AtZl/atQrSDKMrm4ma/Y5SWMNp/1IrfO
+         0lfqpeHSCh2Mf4Kj2cYv9FbnH2kQ9Qm7xCZd8Uls=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>
 Cc:     Ondrej Mosnacek <omosnace@redhat.com>
-Subject: [PATCH 2/9] crypto: x86/aesni - convert to use skcipher SIMD bulk registration
-Date:   Sun, 10 Mar 2019 12:00:51 -0700
-Message-Id: <20190310190058.4912-3-ebiggers@kernel.org>
+Subject: [PATCH 9/9] crypto: testmgr - remove workaround for AEADs that modify aead_request
+Date:   Sun, 10 Mar 2019 12:00:58 -0700
+Message-Id: <20190310190058.4912-10-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190310190058.4912-1-ebiggers@kernel.org>
 References: <20190310190058.4912-1-ebiggers@kernel.org>
@@ -57,97 +57,30 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-Convert the AES-NI glue code to use simd_register_skciphers_compat() to
-create SIMD wrappers for all the internal skcipher algorithms at once,
-rather than wrapping each one individually.  This simplifies the code.
+Now that all AEAD algorithms (that I have the hardware to test, at
+least) have been fixed to not modify the user-provided aead_request,
+remove the workaround from testmgr that reset aead_request::tfm after
+each AEAD encryption/decryption.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- arch/x86/crypto/aesni-intel_glue.c | 43 +++++-------------------------
- 1 file changed, 7 insertions(+), 36 deletions(-)
+ crypto/testmgr.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-index 1e3d2102033a..451918cc5f73 100644
---- a/arch/x86/crypto/aesni-intel_glue.c
-+++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -1253,23 +1253,9 @@ static const struct x86_cpu_id aesni_cpu_id[] = {
- };
- MODULE_DEVICE_TABLE(x86cpu, aesni_cpu_id);
- 
--static void aesni_free_simds(void)
--{
--	int i;
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 8386038d67c7..5d56b2990762 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -1237,9 +1237,6 @@ static int test_aead_vec_cfg(const char *driver, int enc,
+ 	aead_request_set_ad(req, vec->alen);
+ 	err = crypto_wait_req(enc ? crypto_aead_encrypt(req) :
+ 			      crypto_aead_decrypt(req), &wait);
 -
--	for (i = 0; i < ARRAY_SIZE(aesni_simd_skciphers) &&
--		    aesni_simd_skciphers[i]; i++)
--		simd_skcipher_free(aesni_simd_skciphers[i]);
--}
+-	aead_request_set_tfm(req, tfm); /* TODO: get rid of this */
 -
- static int __init aesni_init(void)
- {
--	struct simd_skcipher_alg *simd;
--	const char *basename;
--	const char *algname;
--	const char *drvname;
- 	int err;
--	int i;
- 
- 	if (!x86_match_cpu(aesni_cpu_id))
- 		return -ENODEV;
-@@ -1304,8 +1290,9 @@ static int __init aesni_init(void)
- 	if (err)
- 		return err;
- 
--	err = crypto_register_skciphers(aesni_skciphers,
--					ARRAY_SIZE(aesni_skciphers));
-+	err = simd_register_skciphers_compat(aesni_skciphers,
-+					     ARRAY_SIZE(aesni_skciphers),
-+					     aesni_simd_skciphers);
- 	if (err)
- 		goto unregister_algs;
- 
-@@ -1314,26 +1301,11 @@ static int __init aesni_init(void)
- 	if (err)
- 		goto unregister_skciphers;
- 
--	for (i = 0; i < ARRAY_SIZE(aesni_skciphers); i++) {
--		algname = aesni_skciphers[i].base.cra_name + 2;
--		drvname = aesni_skciphers[i].base.cra_driver_name + 2;
--		basename = aesni_skciphers[i].base.cra_driver_name;
--		simd = simd_skcipher_create_compat(algname, drvname, basename);
--		err = PTR_ERR(simd);
--		if (IS_ERR(simd))
--			goto unregister_simds;
--
--		aesni_simd_skciphers[i] = simd;
--	}
--
- 	return 0;
- 
--unregister_simds:
--	aesni_free_simds();
--	crypto_unregister_aeads(aesni_aead_algs, ARRAY_SIZE(aesni_aead_algs));
- unregister_skciphers:
--	crypto_unregister_skciphers(aesni_skciphers,
--				    ARRAY_SIZE(aesni_skciphers));
-+	simd_unregister_skciphers(aesni_skciphers, ARRAY_SIZE(aesni_skciphers),
-+				  aesni_simd_skciphers);
- unregister_algs:
- 	crypto_unregister_algs(aesni_algs, ARRAY_SIZE(aesni_algs));
- 	return err;
-@@ -1341,10 +1313,9 @@ static int __init aesni_init(void)
- 
- static void __exit aesni_exit(void)
- {
--	aesni_free_simds();
- 	crypto_unregister_aeads(aesni_aead_algs, ARRAY_SIZE(aesni_aead_algs));
--	crypto_unregister_skciphers(aesni_skciphers,
--				    ARRAY_SIZE(aesni_skciphers));
-+	simd_unregister_skciphers(aesni_skciphers, ARRAY_SIZE(aesni_skciphers),
-+				  aesni_simd_skciphers);
- 	crypto_unregister_algs(aesni_algs, ARRAY_SIZE(aesni_algs));
- }
- 
+ 	if (err) {
+ 		if (err == -EBADMSG && vec->novrfy)
+ 			return 0;
 -- 
 2.21.0
 
