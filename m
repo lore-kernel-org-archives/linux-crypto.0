@@ -1,86 +1,81 @@
 Return-Path: <SRS0=5sM8=RP=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Level: *
+X-Spam-Status: No, score=1.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 839A3C43381
-	for <linux-crypto@archiver.kernel.org>; Tue, 12 Mar 2019 04:58:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8C09C43381
+	for <linux-crypto@archiver.kernel.org>; Tue, 12 Mar 2019 18:47:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5A09D2084F
-	for <linux-crypto@archiver.kernel.org>; Tue, 12 Mar 2019 04:58:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 68701206BA
+	for <linux-crypto@archiver.kernel.org>; Tue, 12 Mar 2019 18:47:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AgfTy5CU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726292AbfCLE61 (ORCPT
+        id S1726490AbfCLSrA (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 12 Mar 2019 00:58:27 -0400
-Received: from orcrist.hmeau.com ([104.223.48.154]:37292 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725832AbfCLE61 (ORCPT
+        Tue, 12 Mar 2019 14:47:00 -0400
+Received: from mail-ed1-f48.google.com ([209.85.208.48]:45026 "EHLO
+        mail-ed1-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726360AbfCLSrA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 12 Mar 2019 00:58:27 -0400
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1h3ZUc-0001lo-FF; Tue, 12 Mar 2019 12:58:22 +0800
-Received: from herbert by gondobar with local (Exim 4.89)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1h3ZUY-000496-Mf; Tue, 12 Mar 2019 12:58:18 +0800
-Date:   Tue, 12 Mar 2019 12:58:18 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [GIT] Crypto Fixes for 5.1
-Message-ID: <20190312045818.bgpiuxogmaxyscdv@gondor.apana.org.au>
-References: <20180105073808.GA14405@gondor.apana.org.au>
- <20180212031702.GA26153@gondor.apana.org.au>
- <20180428080517.haxgpvqrwgotakyo@gondor.apana.org.au>
- <20180622145403.6ltjip7che227fuo@gondor.apana.org.au>
- <20180829033353.agnzxra3jk2r2mzg@gondor.apana.org.au>
- <20181116063146.e7a3mep3ghnfltxe@gondor.apana.org.au>
- <20181207061409.xflg423nknleuddw@gondor.apana.org.au>
- <20190118104006.ye5amhxkgd4xrbmc@gondor.apana.org.au>
- <20190201054204.ehl7u7aaqmkdh5b6@gondor.apana.org.au>
- <20190215024738.fynl64d5u5htcy2l@gondor.apana.org.au>
+        Tue, 12 Mar 2019 14:47:00 -0400
+Received: by mail-ed1-f48.google.com with SMTP id b20so3191448edw.11;
+        Tue, 12 Mar 2019 11:46:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=SCi6tpE6CE+oDHDs6uNwg+g/KpfaHm6pqUvqq5nu1P0=;
+        b=AgfTy5CUObOTUHf3Gv870pXCCRYK555MubczC19t5tKT1CFT5+qitUNCTuUGeIRmLC
+         XQNSDKhPngr+wwWu0DxtiRRowOhuqpbaaWTMBVUXcrEqMSh+HUL9I8l8vnNzazrhx/Lz
+         rd/wujrNnHDutriHvRaipZcGRjCqEyOfU+/xHdras0stbK8PRWU0hDIG0BktSpnZNLD/
+         ANZv7gPK/Ayr/1TdjpuI0MmY7UGhoMJLputPWhLsgmnjlQx2C5xBhJEN45OdO5XccyZy
+         iOOSzednDiUFmSn6OrCYDc22B7u77BXKZxKzuBzCd7ER5QYPvBN9zX+ioE16ykv2y/NZ
+         vy0w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=SCi6tpE6CE+oDHDs6uNwg+g/KpfaHm6pqUvqq5nu1P0=;
+        b=bDu87wNqfm6y/kxdNUXYl/H899+e0H2By+Pvozp0gAXq2iHbkxdlSf041UZKQLl0NN
+         /mqX2Zzw6ttnrPDV8g+gyxdHi3flpxcgxv4p4ioTAgxvP593qM829LmzdntGInSFhxOB
+         GBCyHlYKmAuJtqmKTPLwF0jZwZoiL45/gaiiZL4FXx5kfs/hqG1K0bO33rHWz6r4xn7d
+         6rD2Qo382GItZ6cD671S+ebK9FYB4l0HLJGHJTj32J+0iHQ4ZVJfvQQPv7N9lY62qFGV
+         dLXXSj28NiOw9w2rLOBHipBWzVTmEcX5fcDqbmqOJs23v1bHLq4QoGxXLLZPZz/aLxz4
+         wdKA==
+X-Gm-Message-State: APjAAAWkLSGwZkziOqIOCI0dHubHGxbsU56/9MwLRnbr5qkzS/XG7iYo
+        69wfiZO/n5lbNqDJZYCUfTKdiRewUo1m3wlYnv9PnQKF
+X-Google-Smtp-Source: APXvYqx81btzgYfTrk86gZIPcNAOzN8oIlYRZSnu7/ziNGe0HU7nPU0orno/LySBltF0rbOU4YJKXdFmD6IrjLi4jx0=
+X-Received: by 2002:a50:971b:: with SMTP id c27mr4658048edb.171.1552416418554;
+ Tue, 12 Mar 2019 11:46:58 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190215024738.fynl64d5u5htcy2l@gondor.apana.org.au>
-User-Agent: NeoMutt/20170113 (1.7.2)
+Received: by 2002:a50:aa0a:0:0:0:0:0 with HTTP; Tue, 12 Mar 2019 11:46:57
+ -0700 (PDT)
+From:   Jari Ruusu <jari.ruusu@gmail.com>
+Date:   Tue, 12 Mar 2019 20:46:57 +0200
+Message-ID: <CACMCwJKuE0R_J46sFdDjUYSkBbUP_YqymTEcSL0m-xwmDWep_w@mail.gmail.com>
+Subject: Announce loop-AES-v3.7n file/swap crypto package
+To:     linux-crypto@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Linus: 
-
-This push fixes a bug in the newly added Exynos5433 AES code as well
-as an old one in the caam driver.
-
-
-Please pull from
-
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+loop-AES changes since previous release:
+- Worked around kernel interface changes on 5.0 kernels.
+- Some #ifdef spaghetti removed for 5.x kernels.
 
 
-Kamil Konieczny (1):
-      crypto: s5p-sss - fix AES support for Exynos5433
+bzip2 compressed tarball is here:
 
-Wen Yang (1):
-      crypto: caam - add missing put_device() call
+    http://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.7n.tar.bz2
+    md5sum 615393772cd9b51cfaad646265aa4f11
 
- drivers/crypto/caam/caamalg.c    | 12 +++++++-----
- drivers/crypto/caam/caamalg_qi.c | 11 ++++++++---
- drivers/crypto/caam/caamhash.c   | 18 +++++++++++-------
- drivers/crypto/caam/caampkc.c    | 14 ++++++++++----
- drivers/crypto/caam/caamrng.c    | 22 ++++++++++++++--------
- drivers/crypto/s5p-sss.c         |  2 +-
- 6 files changed, 51 insertions(+), 28 deletions(-)
+    http://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.7n.tar.bz2.sign
 
-Thanks,
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Jari Ruusu  4096R/8132F189 12D6 4C3A DCDA 0AA4 27BD  ACDF F073 3C80 8132 F189
