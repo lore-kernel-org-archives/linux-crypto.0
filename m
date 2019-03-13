@@ -6,46 +6,46 @@ X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E85EDC10F03
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Mar 2019 05:15:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94EDCC10F0F
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Mar 2019 05:15:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AAA8E21874
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Mar 2019 05:15:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4F99721874
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Mar 2019 05:15:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1552454139;
-	bh=edsI4P2A+j5OH1u930iSsYk0nQmkkbGDtx8/n5Q4xfQ=;
+	s=default; t=1552454140;
+	bh=cyapBt7M4Bzi+09na+L92Osp2bMFOqtEydBtlXm+Vtc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=rogi+qxRAFG0XBYgxoXk0lnB7xWWZb9QvQk783zlpPEGqDOCCT1SjqE9eT52Ba0n8
-	 gEr6oyH79pecSSQUy0erYbLUEzNiQwqloS8HY9To2SY/6Lo35ZSi+YZV2pHMSvhMQH
-	 nHXUd8pKexnlsU8T1SitFknsY66GziXSYinAI/go=
+	b=fVp5a1KXVO+NegiBIk1tSoe38BNEzwiPt4chf2MtBCHQBJIZKs8TuaH9bDPn71eC5
+	 Sl0XN5nUUAibPeKF21XVRcAifelLd58bWnCL3YDIfl6VI6wDHtk0wg9B5fapc/Vst7
+	 uvFBD0FdNY1AZr9rbms5Q7vWdFOyVjD+Jz4ugEI8=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726326AbfCMFPj (ORCPT
+        id S1726542AbfCMFPj (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Wed, 13 Mar 2019 01:15:39 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50276 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:50226 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726542AbfCMFPi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1725886AbfCMFPi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Wed, 13 Mar 2019 01:15:38 -0400
 Received: from sol.localdomain (c-107-3-167-184.hsd1.ca.comcast.net [107.3.167.184])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 9EF82218A2;
-        Wed, 13 Mar 2019 05:15:36 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id F3F9321871;
+        Wed, 13 Mar 2019 05:15:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=default; t=1552454136;
-        bh=edsI4P2A+j5OH1u930iSsYk0nQmkkbGDtx8/n5Q4xfQ=;
+        bh=cyapBt7M4Bzi+09na+L92Osp2bMFOqtEydBtlXm+Vtc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=lkCT0WHg3SA1+iMLbKUH4A4YzaKXCydMwLbJSkOvSO4UXIhBMHcmmCrFa+PEWmP7X
-         S4UYKxHIScvCDxwrr3vdkjuK4/vdgmd5WJzD0JiOz8JZHzk3mNOtWYXIJuR0MNiU3I
-         VQEvxLyLlNqtHYHzwTB0CcPYgtjxx/L8MCB7GJLM=
+        b=0nF60bKReAZovejhun/eyOWNjJzrXlSRnT1D7yc/Sf4qZmoMdNy62lk7Rjuo3LIQE
+         BmfWn1XME99c2FGxt613p+JpeuYyxFXGWONi887BIagy1exCj9nW/AGyqgWkLTJjdi
+         s8AiBhLtGWh8We9VyyMaV6fJ7MVdDq+St9c10+2E=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>
 Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         linux-arm-kernel@lists.infradead.org, x86@kernel.org
-Subject: [PATCH 8/8] crypto: testmgr - test the !may_use_simd() fallback code
-Date:   Tue, 12 Mar 2019 22:12:52 -0700
-Message-Id: <20190313051252.2917-9-ebiggers@kernel.org>
+Subject: [PATCH 6/8] crypto: arm64 - convert to use crypto_simd_usable()
+Date:   Tue, 12 Mar 2019 22:12:50 -0700
+Message-Id: <20190313051252.2917-7-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190313051252.2917-1-ebiggers@kernel.org>
 References: <20190313051252.2917-1-ebiggers@kernel.org>
@@ -58,319 +58,498 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-All crypto API algorithms are supposed to support the case where they
-are called in a context where SIMD instructions are unusable, e.g. IRQ
-context on some architectures.  However, this isn't tested for by the
-self-tests, causing bugs to go undetected.
-
-Now that all algorithms have been converted to use crypto_simd_usable(),
-update the self-tests to test the no-SIMD case.  First, a bool
-testvec_config::nosimd is added.  When set, the crypto operation is
-executed with preemption disabled and with crypto_simd_usable() mocked
-out to return false on the current CPU.
-
-A bool test_sg_division::nosimd is also added.  For hash algorithms it's
-honored by the corresponding ->update().  By setting just a subset of
-these bools, the case where some ->update()s are done in SIMD context
-and some are done in no-SIMD context is also tested.
-
-These bools are then randomly set by generate_random_testvec_config().
-
-For now, all no-SIMD testing is limited to the extra crypto self-tests,
-because it might be a bit too invasive for the regular self-tests.
-But this could be changed later.
-
-This has already found bugs in the arm64 AES-GCM and ChaCha algorithms.
-This would have found some past bugs as well.
+Replace all calls to may_use_simd() in the arm64 crypto code with
+crypto_simd_usable(), in order to allow testing the no-SIMD code paths.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/testmgr.c | 116 +++++++++++++++++++++++++++++++++++++----------
- 1 file changed, 92 insertions(+), 24 deletions(-)
+ arch/arm64/crypto/aes-ce-ccm-glue.c      | 7 ++++---
+ arch/arm64/crypto/aes-ce-glue.c          | 5 +++--
+ arch/arm64/crypto/aes-glue.c             | 4 ++--
+ arch/arm64/crypto/aes-neonbs-glue.c      | 2 +-
+ arch/arm64/crypto/chacha-neon-glue.c     | 5 +++--
+ arch/arm64/crypto/crct10dif-ce-glue.c    | 5 +++--
+ arch/arm64/crypto/ghash-ce-glue.c        | 7 ++++---
+ arch/arm64/crypto/nhpoly1305-neon-glue.c | 3 ++-
+ arch/arm64/crypto/sha1-ce-glue.c         | 7 ++++---
+ arch/arm64/crypto/sha2-ce-glue.c         | 7 ++++---
+ arch/arm64/crypto/sha256-glue.c          | 5 +++--
+ arch/arm64/crypto/sha3-ce-glue.c         | 5 +++--
+ arch/arm64/crypto/sha512-ce-glue.c       | 7 ++++---
+ arch/arm64/crypto/sm3-ce-glue.c          | 7 ++++---
+ arch/arm64/crypto/sm4-ce-glue.c          | 5 +++--
+ 15 files changed, 47 insertions(+), 34 deletions(-)
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 52417dde811f..2c2ddebb48d3 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -234,12 +234,14 @@ enum finalization_type {
-  *				  @offset
-  * @flush_type: for hashes, whether an update() should be done now vs.
-  *		continuing to accumulate data
-+ * @nosimd: if doing the pending update(), do it with SIMD disabled?
-  */
- struct test_sg_division {
- 	unsigned int proportion_of_total;
- 	unsigned int offset;
- 	bool offset_relative_to_alignmask;
- 	enum flush_type flush_type;
-+	bool nosimd;
- };
+diff --git a/arch/arm64/crypto/aes-ce-ccm-glue.c b/arch/arm64/crypto/aes-ce-ccm-glue.c
+index 5fc6f51908fd..9dc4110a2e61 100644
+--- a/arch/arm64/crypto/aes-ce-ccm-glue.c
++++ b/arch/arm64/crypto/aes-ce-ccm-glue.c
+@@ -14,6 +14,7 @@
+ #include <crypto/aes.h>
+ #include <crypto/scatterwalk.h>
+ #include <crypto/internal/aead.h>
++#include <crypto/internal/simd.h>
+ #include <crypto/internal/skcipher.h>
+ #include <linux/module.h>
  
- /**
-@@ -259,6 +261,7 @@ struct test_sg_division {
-  * @iv_offset_relative_to_alignmask: if true, add the algorithm's alignmask to
-  *				     the @iv_offset
-  * @finalization_type: what finalization function to use for hashes
-+ * @nosimd: execute with SIMD disabled?  Requires !CRYPTO_TFM_REQ_MAY_SLEEP.
-  */
- struct testvec_config {
- 	const char *name;
-@@ -269,6 +272,7 @@ struct testvec_config {
- 	unsigned int iv_offset;
- 	bool iv_offset_relative_to_alignmask;
- 	enum finalization_type finalization_type;
-+	bool nosimd;
- };
- 
- #define TESTVEC_CONFIG_NAMELEN	192
-@@ -420,8 +424,11 @@ static unsigned int count_test_sg_divisions(const struct test_sg_division *divs)
- 	return ndivs;
- }
- 
-+#define SGDIVS_HAVE_FLUSHES	BIT(0)
-+#define SGDIVS_HAVE_NOSIMD	BIT(1)
-+
- static bool valid_sg_divisions(const struct test_sg_division *divs,
--			       unsigned int count, bool *any_flushes_ret)
-+			       unsigned int count, int *flags_ret)
+@@ -109,7 +110,7 @@ static int ccm_init_mac(struct aead_request *req, u8 maciv[], u32 msglen)
+ static void ccm_update_mac(struct crypto_aes_ctx *key, u8 mac[], u8 const in[],
+ 			   u32 abytes, u32 *macp)
  {
- 	unsigned int total = 0;
- 	unsigned int i;
-@@ -432,7 +439,9 @@ static bool valid_sg_divisions(const struct test_sg_division *divs,
- 			return false;
- 		total += divs[i].proportion_of_total;
- 		if (divs[i].flush_type != FLUSH_TYPE_NONE)
--			*any_flushes_ret = true;
-+			*flags_ret |= SGDIVS_HAVE_FLUSHES;
-+		if (divs[i].nosimd)
-+			*flags_ret |= SGDIVS_HAVE_NOSIMD;
+-	if (may_use_simd()) {
++	if (crypto_simd_usable()) {
+ 		kernel_neon_begin();
+ 		ce_aes_ccm_auth_data(mac, in, abytes, macp, key->key_enc,
+ 				     num_rounds(key));
+@@ -255,7 +256,7 @@ static int ccm_encrypt(struct aead_request *req)
+ 
+ 	err = skcipher_walk_aead_encrypt(&walk, req, false);
+ 
+-	if (may_use_simd()) {
++	if (crypto_simd_usable()) {
+ 		while (walk.nbytes) {
+ 			u32 tail = walk.nbytes % AES_BLOCK_SIZE;
+ 
+@@ -313,7 +314,7 @@ static int ccm_decrypt(struct aead_request *req)
+ 
+ 	err = skcipher_walk_aead_decrypt(&walk, req, false);
+ 
+-	if (may_use_simd()) {
++	if (crypto_simd_usable()) {
+ 		while (walk.nbytes) {
+ 			u32 tail = walk.nbytes % AES_BLOCK_SIZE;
+ 
+diff --git a/arch/arm64/crypto/aes-ce-glue.c b/arch/arm64/crypto/aes-ce-glue.c
+index e6b3227bbf57..3213843fcb46 100644
+--- a/arch/arm64/crypto/aes-ce-glue.c
++++ b/arch/arm64/crypto/aes-ce-glue.c
+@@ -12,6 +12,7 @@
+ #include <asm/simd.h>
+ #include <asm/unaligned.h>
+ #include <crypto/aes.h>
++#include <crypto/internal/simd.h>
+ #include <linux/cpufeature.h>
+ #include <linux/crypto.h>
+ #include <linux/module.h>
+@@ -52,7 +53,7 @@ static void aes_cipher_encrypt(struct crypto_tfm *tfm, u8 dst[], u8 const src[])
+ {
+ 	struct crypto_aes_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
+-	if (!may_use_simd()) {
++	if (!crypto_simd_usable()) {
+ 		__aes_arm64_encrypt(ctx->key_enc, dst, src, num_rounds(ctx));
+ 		return;
  	}
- 	return total == TEST_SG_TOTAL &&
- 		memchr_inv(&divs[i], 0, (count - i) * sizeof(divs[0])) == NULL;
-@@ -445,19 +454,18 @@ static bool valid_sg_divisions(const struct test_sg_division *divs,
-  */
- static bool valid_testvec_config(const struct testvec_config *cfg)
+@@ -66,7 +67,7 @@ static void aes_cipher_decrypt(struct crypto_tfm *tfm, u8 dst[], u8 const src[])
  {
--	bool any_flushes = false;
-+	int flags = 0;
+ 	struct crypto_aes_ctx *ctx = crypto_tfm_ctx(tfm);
  
- 	if (cfg->name == NULL)
- 		return false;
+-	if (!may_use_simd()) {
++	if (!crypto_simd_usable()) {
+ 		__aes_arm64_decrypt(ctx->key_dec, dst, src, num_rounds(ctx));
+ 		return;
+ 	}
+diff --git a/arch/arm64/crypto/aes-glue.c b/arch/arm64/crypto/aes-glue.c
+index 1e676625ef33..692cb75f2ca2 100644
+--- a/arch/arm64/crypto/aes-glue.c
++++ b/arch/arm64/crypto/aes-glue.c
+@@ -405,7 +405,7 @@ static int ctr_encrypt_sync(struct skcipher_request *req)
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+ 	struct crypto_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
  
- 	if (!valid_sg_divisions(cfg->src_divs, ARRAY_SIZE(cfg->src_divs),
--				&any_flushes))
-+				&flags))
- 		return false;
+-	if (!may_use_simd())
++	if (!crypto_simd_usable())
+ 		return aes_ctr_encrypt_fallback(ctx, req);
  
- 	if (cfg->dst_divs[0].proportion_of_total) {
- 		if (!valid_sg_divisions(cfg->dst_divs,
--					ARRAY_SIZE(cfg->dst_divs),
--					&any_flushes))
-+					ARRAY_SIZE(cfg->dst_divs), &flags))
- 			return false;
- 	} else {
- 		if (memchr_inv(cfg->dst_divs, 0, sizeof(cfg->dst_divs)))
-@@ -470,7 +478,12 @@ static bool valid_testvec_config(const struct testvec_config *cfg)
- 	    MAX_ALGAPI_ALIGNMASK + 1)
- 		return false;
- 
--	if (any_flushes && cfg->finalization_type == FINALIZATION_TYPE_DIGEST)
-+	if ((flags & (SGDIVS_HAVE_FLUSHES | SGDIVS_HAVE_NOSIMD)) &&
-+	    cfg->finalization_type == FINALIZATION_TYPE_DIGEST)
-+		return false;
-+
-+	if ((cfg->nosimd || (flags & SGDIVS_HAVE_NOSIMD)) &&
-+	    (cfg->req_flags & CRYPTO_TFM_REQ_MAY_SLEEP))
- 		return false;
- 
- 	return true;
-@@ -731,13 +744,14 @@ static int build_cipher_test_sglists(struct cipher_test_sglists *tsgls,
- #ifdef CONFIG_CRYPTO_MANAGER_EXTRA_TESTS
- static char *generate_random_sgl_divisions(struct test_sg_division *divs,
- 					   size_t max_divs, char *p, char *end,
--					   bool gen_flushes)
-+					   bool gen_flushes, u32 req_flags)
+ 	return ctr_encrypt(req);
+@@ -642,7 +642,7 @@ static void mac_do_update(struct crypto_aes_ctx *ctx, u8 const in[], int blocks,
  {
- 	struct test_sg_division *div = divs;
- 	unsigned int remaining = TEST_SG_TOTAL;
+ 	int rounds = 6 + ctx->key_length / 4;
+ 
+-	if (may_use_simd()) {
++	if (crypto_simd_usable()) {
+ 		kernel_neon_begin();
+ 		aes_mac_update(in, ctx->key_enc, rounds, blocks, dg, enc_before,
+ 			       enc_after);
+diff --git a/arch/arm64/crypto/aes-neonbs-glue.c b/arch/arm64/crypto/aes-neonbs-glue.c
+index e7a95a566462..4737b6c6c5cf 100644
+--- a/arch/arm64/crypto/aes-neonbs-glue.c
++++ b/arch/arm64/crypto/aes-neonbs-glue.c
+@@ -288,7 +288,7 @@ static int ctr_encrypt_sync(struct skcipher_request *req)
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+ 	struct aesbs_ctr_ctx *ctx = crypto_skcipher_ctx(tfm);
+ 
+-	if (!may_use_simd())
++	if (!crypto_simd_usable())
+ 		return aes_ctr_encrypt_fallback(&ctx->fallback, req);
+ 
+ 	return ctr_encrypt(req);
+diff --git a/arch/arm64/crypto/chacha-neon-glue.c b/arch/arm64/crypto/chacha-neon-glue.c
+index bece1d85bd81..3a26a98a7e17 100644
+--- a/arch/arm64/crypto/chacha-neon-glue.c
++++ b/arch/arm64/crypto/chacha-neon-glue.c
+@@ -21,6 +21,7 @@
+ 
+ #include <crypto/algapi.h>
+ #include <crypto/chacha.h>
++#include <crypto/internal/simd.h>
+ #include <crypto/internal/skcipher.h>
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+@@ -90,7 +91,7 @@ static int chacha_neon(struct skcipher_request *req)
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+ 	struct chacha_ctx *ctx = crypto_skcipher_ctx(tfm);
+ 
+-	if (req->cryptlen <= CHACHA_BLOCK_SIZE || !may_use_simd())
++	if (req->cryptlen <= CHACHA_BLOCK_SIZE || !crypto_simd_usable())
+ 		return crypto_chacha_crypt(req);
+ 
+ 	return chacha_neon_stream_xor(req, ctx, req->iv);
+@@ -104,7 +105,7 @@ static int xchacha_neon(struct skcipher_request *req)
+ 	u32 state[16];
+ 	u8 real_iv[16];
+ 
+-	if (req->cryptlen <= CHACHA_BLOCK_SIZE || !may_use_simd())
++	if (req->cryptlen <= CHACHA_BLOCK_SIZE || !crypto_simd_usable())
+ 		return crypto_xchacha_crypt(req);
+ 
+ 	crypto_chacha_init(state, ctx, req->iv);
+diff --git a/arch/arm64/crypto/crct10dif-ce-glue.c b/arch/arm64/crypto/crct10dif-ce-glue.c
+index dd325829ee44..64e92ab70269 100644
+--- a/arch/arm64/crypto/crct10dif-ce-glue.c
++++ b/arch/arm64/crypto/crct10dif-ce-glue.c
+@@ -16,6 +16,7 @@
+ #include <linux/string.h>
+ 
+ #include <crypto/internal/hash.h>
++#include <crypto/internal/simd.h>
+ 
+ #include <asm/neon.h>
+ #include <asm/simd.h>
+@@ -38,7 +39,7 @@ static int crct10dif_update_pmull_p8(struct shash_desc *desc, const u8 *data,
+ {
+ 	u16 *crc = shash_desc_ctx(desc);
+ 
+-	if (length >= CRC_T10DIF_PMULL_CHUNK_SIZE && may_use_simd()) {
++	if (length >= CRC_T10DIF_PMULL_CHUNK_SIZE && crypto_simd_usable()) {
+ 		kernel_neon_begin();
+ 		*crc = crc_t10dif_pmull_p8(*crc, data, length);
+ 		kernel_neon_end();
+@@ -54,7 +55,7 @@ static int crct10dif_update_pmull_p64(struct shash_desc *desc, const u8 *data,
+ {
+ 	u16 *crc = shash_desc_ctx(desc);
+ 
+-	if (length >= CRC_T10DIF_PMULL_CHUNK_SIZE && may_use_simd()) {
++	if (length >= CRC_T10DIF_PMULL_CHUNK_SIZE && crypto_simd_usable()) {
+ 		kernel_neon_begin();
+ 		*crc = crc_t10dif_pmull_p64(*crc, data, length);
+ 		kernel_neon_end();
+diff --git a/arch/arm64/crypto/ghash-ce-glue.c b/arch/arm64/crypto/ghash-ce-glue.c
+index 089b09286da7..fcd458c83bc1 100644
+--- a/arch/arm64/crypto/ghash-ce-glue.c
++++ b/arch/arm64/crypto/ghash-ce-glue.c
+@@ -17,6 +17,7 @@
+ #include <crypto/gf128mul.h>
+ #include <crypto/internal/aead.h>
+ #include <crypto/internal/hash.h>
++#include <crypto/internal/simd.h>
+ #include <crypto/internal/skcipher.h>
+ #include <crypto/scatterwalk.h>
+ #include <linux/cpufeature.h>
+@@ -89,7 +90,7 @@ static void ghash_do_update(int blocks, u64 dg[], const char *src,
+ 						struct ghash_key const *k,
+ 						const char *head))
+ {
+-	if (likely(may_use_simd())) {
++	if (likely(crypto_simd_usable())) {
+ 		kernel_neon_begin();
+ 		simd_update(blocks, dg, src, key, head);
+ 		kernel_neon_end();
+@@ -441,7 +442,7 @@ static int gcm_encrypt(struct aead_request *req)
+ 
+ 	err = skcipher_walk_aead_encrypt(&walk, req, false);
+ 
+-	if (likely(may_use_simd() && walk.total >= 2 * AES_BLOCK_SIZE)) {
++	if (likely(crypto_simd_usable() && walk.total >= 2 * AES_BLOCK_SIZE)) {
+ 		u32 const *rk = NULL;
+ 
+ 		kernel_neon_begin();
+@@ -565,7 +566,7 @@ static int gcm_decrypt(struct aead_request *req)
+ 
+ 	err = skcipher_walk_aead_decrypt(&walk, req, false);
+ 
+-	if (likely(may_use_simd() && walk.total >= 2 * AES_BLOCK_SIZE)) {
++	if (likely(crypto_simd_usable() && walk.total >= 2 * AES_BLOCK_SIZE)) {
+ 		u32 const *rk = NULL;
+ 
+ 		kernel_neon_begin();
+diff --git a/arch/arm64/crypto/nhpoly1305-neon-glue.c b/arch/arm64/crypto/nhpoly1305-neon-glue.c
+index 22cc32ac9448..d15e872fa3f5 100644
+--- a/arch/arm64/crypto/nhpoly1305-neon-glue.c
++++ b/arch/arm64/crypto/nhpoly1305-neon-glue.c
+@@ -9,6 +9,7 @@
+ #include <asm/neon.h>
+ #include <asm/simd.h>
+ #include <crypto/internal/hash.h>
++#include <crypto/internal/simd.h>
+ #include <crypto/nhpoly1305.h>
+ #include <linux/module.h>
+ 
+@@ -25,7 +26,7 @@ static void _nh_neon(const u32 *key, const u8 *message, size_t message_len,
+ static int nhpoly1305_neon_update(struct shash_desc *desc,
+ 				  const u8 *src, unsigned int srclen)
+ {
+-	if (srclen < 64 || !may_use_simd())
++	if (srclen < 64 || !crypto_simd_usable())
+ 		return crypto_nhpoly1305_update(desc, src, srclen);
  
  	do {
- 		unsigned int this_len;
-+		const char *flushtype_str;
+diff --git a/arch/arm64/crypto/sha1-ce-glue.c b/arch/arm64/crypto/sha1-ce-glue.c
+index 17fac2889f56..eaa7a8258f1c 100644
+--- a/arch/arm64/crypto/sha1-ce-glue.c
++++ b/arch/arm64/crypto/sha1-ce-glue.c
+@@ -12,6 +12,7 @@
+ #include <asm/simd.h>
+ #include <asm/unaligned.h>
+ #include <crypto/internal/hash.h>
++#include <crypto/internal/simd.h>
+ #include <crypto/sha.h>
+ #include <crypto/sha1_base.h>
+ #include <linux/cpufeature.h>
+@@ -38,7 +39,7 @@ static int sha1_ce_update(struct shash_desc *desc, const u8 *data,
+ {
+ 	struct sha1_ce_state *sctx = shash_desc_ctx(desc);
  
- 		if (div == &divs[max_divs - 1] || prandom_u32() % 2 == 0)
- 			this_len = remaining;
-@@ -766,11 +780,31 @@ static char *generate_random_sgl_divisions(struct test_sg_division *divs,
- 			}
- 		}
+-	if (!may_use_simd())
++	if (!crypto_simd_usable())
+ 		return crypto_sha1_update(desc, data, len);
  
-+		if (div->flush_type != FLUSH_TYPE_NONE &&
-+		    !(req_flags & CRYPTO_TFM_REQ_MAY_SLEEP) &&
-+		    prandom_u32() % 2 == 0)
-+			div->nosimd = true;
-+
-+		switch (div->flush_type) {
-+		case FLUSH_TYPE_FLUSH:
-+			if (div->nosimd)
-+				flushtype_str = "<flush,nosimd>";
-+			else
-+				flushtype_str = "<flush>";
-+			break;
-+		case FLUSH_TYPE_REIMPORT:
-+			if (div->nosimd)
-+				flushtype_str = "<reimport,nosimd>";
-+			else
-+				flushtype_str = "<reimport>";
-+			break;
-+		default:
-+			flushtype_str = "";
-+			break;
-+		}
-+
- 		BUILD_BUG_ON(TEST_SG_TOTAL != 10000); /* for "%u.%u%%" */
--		p += scnprintf(p, end - p, "%s%u.%u%%@%s+%u%s",
--			       div->flush_type == FLUSH_TYPE_NONE ? "" :
--			       div->flush_type == FLUSH_TYPE_FLUSH ?
--			       "<flush> " : "<reimport> ",
-+		p += scnprintf(p, end - p, "%s%u.%u%%@%s+%u%s", flushtype_str,
- 			       this_len / 100, this_len % 100,
- 			       div->offset_relative_to_alignmask ?
- 					"alignmask" : "",
-@@ -820,18 +854,26 @@ static void generate_random_testvec_config(struct testvec_config *cfg,
- 		break;
- 	}
+ 	sctx->finalize = 0;
+@@ -56,7 +57,7 @@ static int sha1_ce_finup(struct shash_desc *desc, const u8 *data,
+ 	struct sha1_ce_state *sctx = shash_desc_ctx(desc);
+ 	bool finalize = !sctx->sst.count && !(len % SHA1_BLOCK_SIZE);
  
-+	if (!(cfg->req_flags & CRYPTO_TFM_REQ_MAY_SLEEP) &&
-+	    prandom_u32() % 2 == 0) {
-+		cfg->nosimd = true;
-+		p += scnprintf(p, end - p, " nosimd");
-+	}
-+
- 	p += scnprintf(p, end - p, " src_divs=[");
- 	p = generate_random_sgl_divisions(cfg->src_divs,
- 					  ARRAY_SIZE(cfg->src_divs), p, end,
- 					  (cfg->finalization_type !=
--					   FINALIZATION_TYPE_DIGEST));
-+					   FINALIZATION_TYPE_DIGEST),
-+					  cfg->req_flags);
- 	p += scnprintf(p, end - p, "]");
+-	if (!may_use_simd())
++	if (!crypto_simd_usable())
+ 		return crypto_sha1_finup(desc, data, len, out);
  
- 	if (!cfg->inplace && prandom_u32() % 2 == 0) {
- 		p += scnprintf(p, end - p, " dst_divs=[");
- 		p = generate_random_sgl_divisions(cfg->dst_divs,
- 						  ARRAY_SIZE(cfg->dst_divs),
--						  p, end, false);
-+						  p, end, false,
-+						  cfg->req_flags);
- 		p += scnprintf(p, end - p, "]");
- 	}
+ 	/*
+@@ -78,7 +79,7 @@ static int sha1_ce_final(struct shash_desc *desc, u8 *out)
+ {
+ 	struct sha1_ce_state *sctx = shash_desc_ctx(desc);
  
-@@ -864,6 +906,23 @@ static void crypto_reenable_simd_for_test(void)
- }
- #endif /* !CONFIG_CRYPTO_MANAGER_EXTRA_TESTS */
+-	if (!may_use_simd())
++	if (!crypto_simd_usable())
+ 		return crypto_sha1_finup(desc, NULL, 0, out);
  
-+static int do_ahash_op(int (*op)(struct ahash_request *req),
-+		       struct ahash_request *req,
-+		       struct crypto_wait *wait, bool nosimd)
-+{
-+	int err;
-+
-+	if (nosimd)
-+		crypto_disable_simd_for_test();
-+
-+	err = op(req);
-+
-+	if (nosimd)
-+		crypto_reenable_simd_for_test();
-+
-+	return crypto_wait_req(err, wait);
-+}
-+
- static int check_nonfinal_hash_op(const char *op, int err,
- 				  u8 *result, unsigned int digestsize,
- 				  const char *driver, unsigned int vec_num,
-@@ -938,7 +997,7 @@ static int test_hash_vec_cfg(const char *driver,
- 		ahash_request_set_callback(req, req_flags, crypto_req_done,
- 					   &wait);
- 		ahash_request_set_crypt(req, tsgl->sgl, result, vec->psize);
--		err = crypto_wait_req(crypto_ahash_digest(req), &wait);
-+		err = do_ahash_op(crypto_ahash_digest, req, &wait, cfg->nosimd);
- 		if (err) {
- 			pr_err("alg: hash: %s digest() failed with err %d on test vector %u, cfg=\"%s\"\n",
- 			       driver, err, vec_num, cfg->name);
-@@ -951,7 +1010,7 @@ static int test_hash_vec_cfg(const char *driver,
+ 	sctx->finalize = 0;
+diff --git a/arch/arm64/crypto/sha2-ce-glue.c b/arch/arm64/crypto/sha2-ce-glue.c
+index 261f5195cab7..a725997e55f2 100644
+--- a/arch/arm64/crypto/sha2-ce-glue.c
++++ b/arch/arm64/crypto/sha2-ce-glue.c
+@@ -12,6 +12,7 @@
+ #include <asm/simd.h>
+ #include <asm/unaligned.h>
+ #include <crypto/internal/hash.h>
++#include <crypto/internal/simd.h>
+ #include <crypto/sha.h>
+ #include <crypto/sha256_base.h>
+ #include <linux/cpufeature.h>
+@@ -42,7 +43,7 @@ static int sha256_ce_update(struct shash_desc *desc, const u8 *data,
+ {
+ 	struct sha256_ce_state *sctx = shash_desc_ctx(desc);
  
- 	ahash_request_set_callback(req, req_flags, crypto_req_done, &wait);
- 	ahash_request_set_crypt(req, NULL, result, 0);
--	err = crypto_wait_req(crypto_ahash_init(req), &wait);
-+	err = do_ahash_op(crypto_ahash_init, req, &wait, cfg->nosimd);
- 	err = check_nonfinal_hash_op("init", err, result, digestsize,
- 				     driver, vec_num, cfg);
- 	if (err)
-@@ -967,7 +1026,8 @@ static int test_hash_vec_cfg(const char *driver,
- 						   crypto_req_done, &wait);
- 			ahash_request_set_crypt(req, pending_sgl, result,
- 						pending_len);
--			err = crypto_wait_req(crypto_ahash_update(req), &wait);
-+			err = do_ahash_op(crypto_ahash_update, req, &wait,
-+					  divs[i]->nosimd);
- 			err = check_nonfinal_hash_op("update", err,
- 						     result, digestsize,
- 						     driver, vec_num, cfg);
-@@ -1010,12 +1070,12 @@ static int test_hash_vec_cfg(const char *driver,
- 	ahash_request_set_crypt(req, pending_sgl, result, pending_len);
- 	if (cfg->finalization_type == FINALIZATION_TYPE_FINAL) {
- 		/* finish with update() and final() */
--		err = crypto_wait_req(crypto_ahash_update(req), &wait);
-+		err = do_ahash_op(crypto_ahash_update, req, &wait, cfg->nosimd);
- 		err = check_nonfinal_hash_op("update", err, result, digestsize,
- 					     driver, vec_num, cfg);
- 		if (err)
- 			return err;
--		err = crypto_wait_req(crypto_ahash_final(req), &wait);
-+		err = do_ahash_op(crypto_ahash_final, req, &wait, cfg->nosimd);
- 		if (err) {
- 			pr_err("alg: hash: %s final() failed with err %d on test vector %u, cfg=\"%s\"\n",
- 			       driver, err, vec_num, cfg->name);
-@@ -1023,7 +1083,7 @@ static int test_hash_vec_cfg(const char *driver,
- 		}
+-	if (!may_use_simd())
++	if (!crypto_simd_usable())
+ 		return sha256_base_do_update(desc, data, len,
+ 				(sha256_block_fn *)sha256_block_data_order);
+ 
+@@ -61,7 +62,7 @@ static int sha256_ce_finup(struct shash_desc *desc, const u8 *data,
+ 	struct sha256_ce_state *sctx = shash_desc_ctx(desc);
+ 	bool finalize = !sctx->sst.count && !(len % SHA256_BLOCK_SIZE);
+ 
+-	if (!may_use_simd()) {
++	if (!crypto_simd_usable()) {
+ 		if (len)
+ 			sha256_base_do_update(desc, data, len,
+ 				(sha256_block_fn *)sha256_block_data_order);
+@@ -90,7 +91,7 @@ static int sha256_ce_final(struct shash_desc *desc, u8 *out)
+ {
+ 	struct sha256_ce_state *sctx = shash_desc_ctx(desc);
+ 
+-	if (!may_use_simd()) {
++	if (!crypto_simd_usable()) {
+ 		sha256_base_do_finalize(desc,
+ 				(sha256_block_fn *)sha256_block_data_order);
+ 		return sha256_base_finish(desc, out);
+diff --git a/arch/arm64/crypto/sha256-glue.c b/arch/arm64/crypto/sha256-glue.c
+index 4aedeaefd61f..54586e0be9fd 100644
+--- a/arch/arm64/crypto/sha256-glue.c
++++ b/arch/arm64/crypto/sha256-glue.c
+@@ -14,6 +14,7 @@
+ #include <asm/neon.h>
+ #include <asm/simd.h>
+ #include <crypto/internal/hash.h>
++#include <crypto/internal/simd.h>
+ #include <crypto/sha.h>
+ #include <crypto/sha256_base.h>
+ #include <linux/cryptohash.h>
+@@ -89,7 +90,7 @@ static int sha256_update_neon(struct shash_desc *desc, const u8 *data,
+ {
+ 	struct sha256_state *sctx = shash_desc_ctx(desc);
+ 
+-	if (!may_use_simd())
++	if (!crypto_simd_usable())
+ 		return sha256_base_do_update(desc, data, len,
+ 				(sha256_block_fn *)sha256_block_data_order);
+ 
+@@ -119,7 +120,7 @@ static int sha256_update_neon(struct shash_desc *desc, const u8 *data,
+ static int sha256_finup_neon(struct shash_desc *desc, const u8 *data,
+ 			     unsigned int len, u8 *out)
+ {
+-	if (!may_use_simd()) {
++	if (!crypto_simd_usable()) {
+ 		if (len)
+ 			sha256_base_do_update(desc, data, len,
+ 				(sha256_block_fn *)sha256_block_data_order);
+diff --git a/arch/arm64/crypto/sha3-ce-glue.c b/arch/arm64/crypto/sha3-ce-glue.c
+index a336feac0f59..9a4bbfc45f40 100644
+--- a/arch/arm64/crypto/sha3-ce-glue.c
++++ b/arch/arm64/crypto/sha3-ce-glue.c
+@@ -14,6 +14,7 @@
+ #include <asm/simd.h>
+ #include <asm/unaligned.h>
+ #include <crypto/internal/hash.h>
++#include <crypto/internal/simd.h>
+ #include <crypto/sha3.h>
+ #include <linux/cpufeature.h>
+ #include <linux/crypto.h>
+@@ -32,7 +33,7 @@ static int sha3_update(struct shash_desc *desc, const u8 *data,
+ 	struct sha3_state *sctx = shash_desc_ctx(desc);
+ 	unsigned int digest_size = crypto_shash_digestsize(desc->tfm);
+ 
+-	if (!may_use_simd())
++	if (!crypto_simd_usable())
+ 		return crypto_sha3_update(desc, data, len);
+ 
+ 	if ((sctx->partial + len) >= sctx->rsiz) {
+@@ -76,7 +77,7 @@ static int sha3_final(struct shash_desc *desc, u8 *out)
+ 	__le64 *digest = (__le64 *)out;
+ 	int i;
+ 
+-	if (!may_use_simd())
++	if (!crypto_simd_usable())
+ 		return crypto_sha3_final(desc, out);
+ 
+ 	sctx->buf[sctx->partial++] = 0x06;
+diff --git a/arch/arm64/crypto/sha512-ce-glue.c b/arch/arm64/crypto/sha512-ce-glue.c
+index f2c5f28c622a..2369540040aa 100644
+--- a/arch/arm64/crypto/sha512-ce-glue.c
++++ b/arch/arm64/crypto/sha512-ce-glue.c
+@@ -13,6 +13,7 @@
+ #include <asm/simd.h>
+ #include <asm/unaligned.h>
+ #include <crypto/internal/hash.h>
++#include <crypto/internal/simd.h>
+ #include <crypto/sha.h>
+ #include <crypto/sha512_base.h>
+ #include <linux/cpufeature.h>
+@@ -31,7 +32,7 @@ asmlinkage void sha512_block_data_order(u64 *digest, u8 const *src, int blocks);
+ static int sha512_ce_update(struct shash_desc *desc, const u8 *data,
+ 			    unsigned int len)
+ {
+-	if (!may_use_simd())
++	if (!crypto_simd_usable())
+ 		return sha512_base_do_update(desc, data, len,
+ 				(sha512_block_fn *)sha512_block_data_order);
+ 
+@@ -46,7 +47,7 @@ static int sha512_ce_update(struct shash_desc *desc, const u8 *data,
+ static int sha512_ce_finup(struct shash_desc *desc, const u8 *data,
+ 			   unsigned int len, u8 *out)
+ {
+-	if (!may_use_simd()) {
++	if (!crypto_simd_usable()) {
+ 		if (len)
+ 			sha512_base_do_update(desc, data, len,
+ 				(sha512_block_fn *)sha512_block_data_order);
+@@ -65,7 +66,7 @@ static int sha512_ce_finup(struct shash_desc *desc, const u8 *data,
+ 
+ static int sha512_ce_final(struct shash_desc *desc, u8 *out)
+ {
+-	if (!may_use_simd()) {
++	if (!crypto_simd_usable()) {
+ 		sha512_base_do_finalize(desc,
+ 				(sha512_block_fn *)sha512_block_data_order);
+ 		return sha512_base_finish(desc, out);
+diff --git a/arch/arm64/crypto/sm3-ce-glue.c b/arch/arm64/crypto/sm3-ce-glue.c
+index 88938a20d9b2..5d15533799a2 100644
+--- a/arch/arm64/crypto/sm3-ce-glue.c
++++ b/arch/arm64/crypto/sm3-ce-glue.c
+@@ -12,6 +12,7 @@
+ #include <asm/simd.h>
+ #include <asm/unaligned.h>
+ #include <crypto/internal/hash.h>
++#include <crypto/internal/simd.h>
+ #include <crypto/sm3.h>
+ #include <crypto/sm3_base.h>
+ #include <linux/cpufeature.h>
+@@ -28,7 +29,7 @@ asmlinkage void sm3_ce_transform(struct sm3_state *sst, u8 const *src,
+ static int sm3_ce_update(struct shash_desc *desc, const u8 *data,
+ 			 unsigned int len)
+ {
+-	if (!may_use_simd())
++	if (!crypto_simd_usable())
+ 		return crypto_sm3_update(desc, data, len);
+ 
+ 	kernel_neon_begin();
+@@ -40,7 +41,7 @@ static int sm3_ce_update(struct shash_desc *desc, const u8 *data,
+ 
+ static int sm3_ce_final(struct shash_desc *desc, u8 *out)
+ {
+-	if (!may_use_simd())
++	if (!crypto_simd_usable())
+ 		return crypto_sm3_finup(desc, NULL, 0, out);
+ 
+ 	kernel_neon_begin();
+@@ -53,7 +54,7 @@ static int sm3_ce_final(struct shash_desc *desc, u8 *out)
+ static int sm3_ce_finup(struct shash_desc *desc, const u8 *data,
+ 			unsigned int len, u8 *out)
+ {
+-	if (!may_use_simd())
++	if (!crypto_simd_usable())
+ 		return crypto_sm3_finup(desc, data, len, out);
+ 
+ 	kernel_neon_begin();
+diff --git a/arch/arm64/crypto/sm4-ce-glue.c b/arch/arm64/crypto/sm4-ce-glue.c
+index 0c4fc223f225..2754c875d39c 100644
+--- a/arch/arm64/crypto/sm4-ce-glue.c
++++ b/arch/arm64/crypto/sm4-ce-glue.c
+@@ -3,6 +3,7 @@
+ #include <asm/neon.h>
+ #include <asm/simd.h>
+ #include <crypto/sm4.h>
++#include <crypto/internal/simd.h>
+ #include <linux/module.h>
+ #include <linux/cpufeature.h>
+ #include <linux/crypto.h>
+@@ -20,7 +21,7 @@ static void sm4_ce_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+ {
+ 	const struct crypto_sm4_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
+-	if (!may_use_simd()) {
++	if (!crypto_simd_usable()) {
+ 		crypto_sm4_encrypt(tfm, out, in);
  	} else {
- 		/* finish with finup() */
--		err = crypto_wait_req(crypto_ahash_finup(req), &wait);
-+		err = do_ahash_op(crypto_ahash_finup, req, &wait, cfg->nosimd);
- 		if (err) {
- 			pr_err("alg: hash: %s finup() failed with err %d on test vector %u, cfg=\"%s\"\n",
- 			       driver, err, vec_num, cfg->name);
-@@ -1259,8 +1319,12 @@ static int test_aead_vec_cfg(const char *driver, int enc,
- 	aead_request_set_crypt(req, tsgls->src.sgl_ptr, tsgls->dst.sgl_ptr,
- 			       enc ? vec->plen : vec->clen, iv);
- 	aead_request_set_ad(req, vec->alen);
--	err = crypto_wait_req(enc ? crypto_aead_encrypt(req) :
--			      crypto_aead_decrypt(req), &wait);
-+	if (cfg->nosimd)
-+		crypto_disable_simd_for_test();
-+	err = enc ? crypto_aead_encrypt(req) : crypto_aead_decrypt(req);
-+	if (cfg->nosimd)
-+		crypto_reenable_simd_for_test();
-+	err = crypto_wait_req(err, &wait);
- 	if (err) {
- 		if (err == -EBADMSG && vec->novrfy)
- 			return 0;
-@@ -1594,8 +1658,12 @@ static int test_skcipher_vec_cfg(const char *driver, int enc,
- 	skcipher_request_set_callback(req, req_flags, crypto_req_done, &wait);
- 	skcipher_request_set_crypt(req, tsgls->src.sgl_ptr, tsgls->dst.sgl_ptr,
- 				   vec->len, iv);
--	err = crypto_wait_req(enc ? crypto_skcipher_encrypt(req) :
--			      crypto_skcipher_decrypt(req), &wait);
-+	if (cfg->nosimd)
-+		crypto_disable_simd_for_test();
-+	err = enc ? crypto_skcipher_encrypt(req) : crypto_skcipher_decrypt(req);
-+	if (cfg->nosimd)
-+		crypto_reenable_simd_for_test();
-+	err = crypto_wait_req(err, &wait);
- 	if (err) {
- 		pr_err("alg: skcipher: %s %s failed with err %d on test vector %u, cfg=\"%s\"\n",
- 		       driver, op, err, vec_num, cfg->name);
+ 		kernel_neon_begin();
+@@ -33,7 +34,7 @@ static void sm4_ce_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+ {
+ 	const struct crypto_sm4_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
+-	if (!may_use_simd()) {
++	if (!crypto_simd_usable()) {
+ 		crypto_sm4_decrypt(tfm, out, in);
+ 	} else {
+ 		kernel_neon_begin();
 -- 
 2.21.0
 
