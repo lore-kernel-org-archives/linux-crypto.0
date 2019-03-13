@@ -7,58 +7,58 @@ X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B02F7C43381
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Mar 2019 10:32:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 751B8C43381
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Mar 2019 10:33:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6CF502184C
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Mar 2019 10:32:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 39551214AE
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Mar 2019 10:33:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TyuxnYew"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TT0GFMQC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725907AbfCMKcs (ORCPT
+        id S1725893AbfCMKdW (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 13 Mar 2019 06:32:48 -0400
-Received: from mail-it1-f194.google.com ([209.85.166.194]:35721 "EHLO
-        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725893AbfCMKcr (ORCPT
+        Wed, 13 Mar 2019 06:33:22 -0400
+Received: from mail-io1-f65.google.com ([209.85.166.65]:37859 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725832AbfCMKdW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 13 Mar 2019 06:32:47 -0400
-Received: by mail-it1-f194.google.com with SMTP id 188so2039448itb.0
-        for <linux-crypto@vger.kernel.org>; Wed, 13 Mar 2019 03:32:46 -0700 (PDT)
+        Wed, 13 Mar 2019 06:33:22 -0400
+Received: by mail-io1-f65.google.com with SMTP id x7so1196734ioh.4
+        for <linux-crypto@vger.kernel.org>; Wed, 13 Mar 2019 03:33:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=hGl/+SCklJEv2WgjY1GFKVGeL52BkUbmmU7wBzR7cWc=;
-        b=TyuxnYew4rIEgHifTW4W1Ye4ZwyKw74Rp05NiAx1ZvOpJYhYQJiQ2Dy2WjYGXf4uTR
-         8tACZU/4TRoSZAY6w/IFnLVlo8uZON8H9Cjdp8CjcHkinZrwl1ONPjJ/36ctEno6oFZQ
-         ele2mLP2ARzFCnxzdHAEjM+kTwz2PruSgJEdlJ9TUFZyzEbo7+XaK8wtgcRk1VKCz9SP
-         uiMgQYSoCOA/H00m0MsGqtWfbo+2iFBMULrzopqCej7FH27QG3+qS+naa02Goa+XgWB7
-         /IeQJ7zUyBCbLJemrHnglBlINF3o2lOCRTYiOWGgRa0plVhZKsNx4LUqByQIwv+fpclh
-         9lMw==
+        bh=Dc0IG5H+DakIQFgVEIsEOyqBhKRLJWrwMh83ZWudukw=;
+        b=TT0GFMQCPQRLk8lUUszU7NRnTUqRweS/3rfJIZaug9udtH8WiV2ByjFjj+kX/axDZS
+         D5MosJ1+Y9Iv8rtG4jliL3K7qo541SEXKEGV4LTeciztihfqhmj8BHXVGlcLzMIMZrx4
+         HI2y1QNi7B+LsOXYsCLcTfzzXzgS/KUnfP/iq7EtkWDOX4n13WF0HaAJ1BdDcJs1cCHX
+         JkIZWDB81wwS7mkgcETajj03ez1vdCrar1UaGxFpwm1H2umcoEcELeq3tmEFpAitnn5q
+         KgJpi/K0TOX0zI+fVbQPpyvxlhkQtJoNwk8h33MdERXFexcyLZHbIA0CJEwGq/i3bpjO
+         C9Eg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=hGl/+SCklJEv2WgjY1GFKVGeL52BkUbmmU7wBzR7cWc=;
-        b=J33tqCVJJozwyHFDVD5X7Oe8K0kCjJ4WRU7E2UVtVqb6O5cjLPGQrOyaBD1XwJP3rO
-         Jvlyg/+lef6TSWCOT0b7lai+4CRKfC1nEDb7ptIRYR5b2ZD575FC2+ZckmvFE9GDmqPU
-         4GqNdfFqkJFhcUqDn74bWy8vEZow4FtlftjwSELBWccrumiDwkeCk+xodBZD9+0VdrnB
-         0CsGrec6qo7m9K1spe2NI6v5iAQU3vXEoobF/ycx2aY6412BPO0R5IWExnEWbv9Etidh
-         Eds2RCdreLX0sSe2ACI1Mq5troqjgKJPfGvIURHEQ1VLWcMrbvZvJDreaAxJ+675k0JU
-         lqyQ==
-X-Gm-Message-State: APjAAAV1cgWrZa/xIoGdVMmfP1Quq0zEteKrHWrbXCSmd/gMqVXMGQ3D
-        bZhZpikbIt4Hj+xDkUlkFJjcydLXBfCvl4AoLn1dvQ==
-X-Google-Smtp-Source: APXvYqyYe/jq3DsSQmGn4IGtfKmQmvv3bH1nHiWxyVuqf3DzlxMXXmVtX42G39yLt1Enzxycb9hYOzodWzAVFuBIfZg=
-X-Received: by 2002:a05:6638:2a1:: with SMTP id d1mr23306057jaq.2.1552473165690;
- Wed, 13 Mar 2019 03:32:45 -0700 (PDT)
+        bh=Dc0IG5H+DakIQFgVEIsEOyqBhKRLJWrwMh83ZWudukw=;
+        b=WEj12aa92vgCrvxhXmpD2EaTod+PnmCGtZLZYg810UKx5/WPKwJhdVQPsMSW3hxgPw
+         Gx6hUIlTG2rzFdoiqa0ChcW+azhIfapbhnLRGHOgbSutnspYKUSFHuopJtIP74t8JuXX
+         8b3wEx8pZiCTh/qbc2XMvfSUGyZTOgcLZS4O6KIzwtMdusMOUaRIYI/tm3uSfpM/K3ws
+         //qNAmBfG9xiCRUzKh5Aqu97ZJq7c9fpcNUWpyj23GubMBlzP3dHpE3gPSQdIBHXBElQ
+         XeECEqbjNinjstM/quhEAPVbWPLPfzRJXGwDS8QReNwcOhCaPZdnrZTXUUJ2yWLx8Xbu
+         JObg==
+X-Gm-Message-State: APjAAAXNEw8oOviTod6+Itat/bQhWy84ja/ai0/Lqqu0KyDdLAJofnk9
+        azXGESD3cB9Rbxzkuxsrz/0yEpsXvG+Fi2Ex/zjtRg==
+X-Google-Smtp-Source: APXvYqyZW0oowkXhrb9N+N+gtmWSDCQD0xbTu7tvkzCzWtyk8XZAmnM1dX/bpLZqFITV2cd2AI+W1CFt/aqFSL1iKmo=
+X-Received: by 2002:a6b:6511:: with SMTP id z17mr22996496iob.173.1552473199674;
+ Wed, 13 Mar 2019 03:33:19 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190313051252.2917-1-ebiggers@kernel.org> <20190313051252.2917-5-ebiggers@kernel.org>
-In-Reply-To: <20190313051252.2917-5-ebiggers@kernel.org>
+References: <20190313051252.2917-1-ebiggers@kernel.org> <20190313051252.2917-6-ebiggers@kernel.org>
+In-Reply-To: <20190313051252.2917-6-ebiggers@kernel.org>
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Wed, 13 Mar 2019 11:32:34 +0100
-Message-ID: <CAKv+Gu-quNQgB2-A-hQe5VAxUejkjjm85DmTFWB30bSkxUOwDw@mail.gmail.com>
-Subject: Re: [PATCH 4/8] crypto: x86 - convert to use crypto_simd_usable()
+Date:   Wed, 13 Mar 2019 11:33:08 +0100
+Message-ID: <CAKv+Gu9JEm2HFPb_pQT_H8iCRbBz9WCNitaL1sU3udSMsEevJw@mail.gmail.com>
+Subject: Re: [PATCH 5/8] crypto: arm - convert to use crypto_simd_usable()
 To:     Eric Biggers <ebiggers@kernel.org>
 Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
         <linux-crypto@vger.kernel.org>,
@@ -75,7 +75,7 @@ On Wed, 13 Mar 2019 at 06:15, Eric Biggers <ebiggers@kernel.org> wrote:
 >
 > From: Eric Biggers <ebiggers@google.com>
 >
-> Replace all calls to irq_fpu_usable() in the x86 crypto code with
+> Replace all calls to may_use_simd() in the arm crypto code with
 > crypto_simd_usable(), in order to allow testing the no-SIMD code paths.
 >
 > Signed-off-by: Eric Biggers <ebiggers@google.com>
@@ -83,66 +83,23 @@ On Wed, 13 Mar 2019 at 06:15, Eric Biggers <ebiggers@kernel.org> wrote:
 Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
 > ---
->  arch/x86/crypto/aesni-intel_glue.c         |  8 ++++----
->  arch/x86/crypto/chacha_glue.c              |  6 +++---
->  arch/x86/crypto/crc32-pclmul_glue.c        |  5 +++--
->  arch/x86/crypto/crc32c-intel_glue.c        |  7 ++++---
->  arch/x86/crypto/crct10dif-pclmul_glue.c    |  7 ++++---
->  arch/x86/crypto/ghash-clmulni-intel_glue.c |  9 +++++----
->  arch/x86/crypto/nhpoly1305-avx2-glue.c     |  5 +++--
->  arch/x86/crypto/nhpoly1305-sse2-glue.c     |  5 +++--
->  arch/x86/crypto/poly1305_glue.c            |  4 ++--
->  arch/x86/crypto/sha1_ssse3_glue.c          |  7 ++++---
->  arch/x86/crypto/sha256_ssse3_glue.c        |  7 ++++---
->  arch/x86/crypto/sha512_ssse3_glue.c        | 10 +++++-----
->  12 files changed, 44 insertions(+), 36 deletions(-)
+>  arch/arm/crypto/chacha-neon-glue.c     | 5 +++--
+>  arch/arm/crypto/crc32-ce-glue.c        | 5 +++--
+>  arch/arm/crypto/crct10dif-ce-glue.c    | 3 ++-
+>  arch/arm/crypto/ghash-ce-glue.c        | 7 ++++---
+>  arch/arm/crypto/nhpoly1305-neon-glue.c | 3 ++-
+>  arch/arm/crypto/sha1-ce-glue.c         | 5 +++--
+>  arch/arm/crypto/sha1_neon_glue.c       | 5 +++--
+>  arch/arm/crypto/sha2-ce-glue.c         | 5 +++--
+>  arch/arm/crypto/sha256_neon_glue.c     | 5 +++--
+>  arch/arm/crypto/sha512-neon-glue.c     | 5 +++--
+>  10 files changed, 29 insertions(+), 19 deletions(-)
 >
-> diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-> index 1466d59384ac..21c246799aa5 100644
-> --- a/arch/x86/crypto/aesni-intel_glue.c
-> +++ b/arch/x86/crypto/aesni-intel_glue.c
-> @@ -30,8 +30,8 @@
->  #include <crypto/gcm.h>
->  #include <crypto/xts.h>
->  #include <asm/cpu_device_id.h>
-> -#include <asm/fpu/api.h>
->  #include <asm/crypto/aes.h>
-> +#include <asm/simd.h>
->  #include <crypto/scatterwalk.h>
->  #include <crypto/internal/aead.h>
->  #include <crypto/internal/simd.h>
-> @@ -332,7 +332,7 @@ static int aes_set_key_common(struct crypto_tfm *tfm, void *raw_ctx,
->                 return -EINVAL;
->         }
->
-> -       if (!irq_fpu_usable())
-> +       if (!crypto_simd_usable())
->                 err = crypto_aes_expand_key(ctx, in_key, key_len);
->         else {
->                 kernel_fpu_begin();
-> @@ -353,7 +353,7 @@ static void aes_encrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
->  {
->         struct crypto_aes_ctx *ctx = aes_ctx(crypto_tfm_ctx(tfm));
->
-> -       if (!irq_fpu_usable())
-> +       if (!crypto_simd_usable())
->                 crypto_aes_encrypt_x86(ctx, dst, src);
->         else {
->                 kernel_fpu_begin();
-> @@ -366,7 +366,7 @@ static void aes_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
->  {
->         struct crypto_aes_ctx *ctx = aes_ctx(crypto_tfm_ctx(tfm));
->
-> -       if (!irq_fpu_usable())
-> +       if (!crypto_simd_usable())
->                 crypto_aes_decrypt_x86(ctx, dst, src);
->         else {
->                 kernel_fpu_begin();
-> diff --git a/arch/x86/crypto/chacha_glue.c b/arch/x86/crypto/chacha_glue.c
-> index 45c1c4143176..4967ad620775 100644
-> --- a/arch/x86/crypto/chacha_glue.c
-> +++ b/arch/x86/crypto/chacha_glue.c
-> @@ -12,10 +12,10 @@
+> diff --git a/arch/arm/crypto/chacha-neon-glue.c b/arch/arm/crypto/chacha-neon-glue.c
+> index 9d6fda81986d..48a89537b828 100644
+> --- a/arch/arm/crypto/chacha-neon-glue.c
+> +++ b/arch/arm/crypto/chacha-neon-glue.c
+> @@ -21,6 +21,7 @@
 >
 >  #include <crypto/algapi.h>
 >  #include <crypto/chacha.h>
@@ -150,365 +107,285 @@ Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 >  #include <crypto/internal/skcipher.h>
 >  #include <linux/kernel.h>
 >  #include <linux/module.h>
-> -#include <asm/fpu/api.h>
->  #include <asm/simd.h>
+> @@ -93,7 +94,7 @@ static int chacha_neon(struct skcipher_request *req)
+>         struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+>         struct chacha_ctx *ctx = crypto_skcipher_ctx(tfm);
 >
->  #define CHACHA_STATE_ALIGN 16
-> @@ -170,7 +170,7 @@ static int chacha_simd(struct skcipher_request *req)
->         struct skcipher_walk walk;
->         int err;
->
-> -       if (req->cryptlen <= CHACHA_BLOCK_SIZE || !irq_fpu_usable())
+> -       if (req->cryptlen <= CHACHA_BLOCK_SIZE || !may_use_simd())
 > +       if (req->cryptlen <= CHACHA_BLOCK_SIZE || !crypto_simd_usable())
 >                 return crypto_chacha_crypt(req);
 >
->         err = skcipher_walk_virt(&walk, req, true);
-> @@ -193,7 +193,7 @@ static int xchacha_simd(struct skcipher_request *req)
+>         return chacha_neon_stream_xor(req, ctx, req->iv);
+> @@ -107,7 +108,7 @@ static int xchacha_neon(struct skcipher_request *req)
+>         u32 state[16];
 >         u8 real_iv[16];
->         int err;
 >
-> -       if (req->cryptlen <= CHACHA_BLOCK_SIZE || !irq_fpu_usable())
+> -       if (req->cryptlen <= CHACHA_BLOCK_SIZE || !may_use_simd())
 > +       if (req->cryptlen <= CHACHA_BLOCK_SIZE || !crypto_simd_usable())
 >                 return crypto_xchacha_crypt(req);
 >
->         err = skcipher_walk_virt(&walk, req, true);
-> diff --git a/arch/x86/crypto/crc32-pclmul_glue.c b/arch/x86/crypto/crc32-pclmul_glue.c
-> index c8d9cdacbf10..cb4ab6645106 100644
-> --- a/arch/x86/crypto/crc32-pclmul_glue.c
-> +++ b/arch/x86/crypto/crc32-pclmul_glue.c
-> @@ -32,10 +32,11 @@
->  #include <linux/kernel.h>
->  #include <linux/crc32.h>
->  #include <crypto/internal/hash.h>
-> +#include <crypto/internal/simd.h>
->
->  #include <asm/cpufeatures.h>
->  #include <asm/cpu_device_id.h>
-> -#include <asm/fpu/api.h>
-> +#include <asm/simd.h>
->
->  #define CHKSUM_BLOCK_SIZE      1
->  #define CHKSUM_DIGEST_SIZE     4
-> @@ -54,7 +55,7 @@ static u32 __attribute__((pure))
->         unsigned int iremainder;
->         unsigned int prealign;
->
-> -       if (len < PCLMUL_MIN_LEN + SCALE_F_MASK || !irq_fpu_usable())
-> +       if (len < PCLMUL_MIN_LEN + SCALE_F_MASK || !crypto_simd_usable())
->                 return crc32_le(crc, p, len);
->
->         if ((long)p & SCALE_F_MASK) {
-> diff --git a/arch/x86/crypto/crc32c-intel_glue.c b/arch/x86/crypto/crc32c-intel_glue.c
-> index 5773e1161072..a58fe217c856 100644
-> --- a/arch/x86/crypto/crc32c-intel_glue.c
-> +++ b/arch/x86/crypto/crc32c-intel_glue.c
-> @@ -29,10 +29,11 @@
+>         crypto_chacha_init(state, ctx, req->iv);
+> diff --git a/arch/arm/crypto/crc32-ce-glue.c b/arch/arm/crypto/crc32-ce-glue.c
+> index cd9e93b46c2d..e712c2a7d387 100644
+> --- a/arch/arm/crypto/crc32-ce-glue.c
+> +++ b/arch/arm/crypto/crc32-ce-glue.c
+> @@ -16,6 +16,7 @@
 >  #include <linux/string.h>
->  #include <linux/kernel.h>
+>
 >  #include <crypto/internal/hash.h>
 > +#include <crypto/internal/simd.h>
 >
->  #include <asm/cpufeatures.h>
->  #include <asm/cpu_device_id.h>
-> -#include <asm/fpu/internal.h>
-> +#include <asm/simd.h>
+>  #include <asm/hwcap.h>
+>  #include <asm/neon.h>
+> @@ -113,7 +114,7 @@ static int crc32_pmull_update(struct shash_desc *desc, const u8 *data,
+>         u32 *crc = shash_desc_ctx(desc);
+>         unsigned int l;
 >
->  #define CHKSUM_BLOCK_SIZE      1
->  #define CHKSUM_DIGEST_SIZE     4
-> @@ -177,7 +178,7 @@ static int crc32c_pcl_intel_update(struct shash_desc *desc, const u8 *data,
->          * use faster PCL version if datasize is large enough to
->          * overcome kernel fpu state save/restore overhead
->          */
-> -       if (len >= CRC32C_PCL_BREAKEVEN && irq_fpu_usable()) {
-> +       if (len >= CRC32C_PCL_BREAKEVEN && crypto_simd_usable()) {
->                 kernel_fpu_begin();
->                 *crcp = crc_pcl(data, len, *crcp);
->                 kernel_fpu_end();
-> @@ -189,7 +190,7 @@ static int crc32c_pcl_intel_update(struct shash_desc *desc, const u8 *data,
->  static int __crc32c_pcl_intel_finup(u32 *crcp, const u8 *data, unsigned int len,
->                                 u8 *out)
->  {
-> -       if (len >= CRC32C_PCL_BREAKEVEN && irq_fpu_usable()) {
-> +       if (len >= CRC32C_PCL_BREAKEVEN && crypto_simd_usable()) {
->                 kernel_fpu_begin();
->                 *(__le32 *)out = ~cpu_to_le32(crc_pcl(data, len, *crcp));
->                 kernel_fpu_end();
-> diff --git a/arch/x86/crypto/crct10dif-pclmul_glue.c b/arch/x86/crypto/crct10dif-pclmul_glue.c
-> index 0e785c0b2354..64f17d2d8b67 100644
-> --- a/arch/x86/crypto/crct10dif-pclmul_glue.c
-> +++ b/arch/x86/crypto/crct10dif-pclmul_glue.c
-> @@ -26,12 +26,13 @@
->  #include <linux/module.h>
->  #include <linux/crc-t10dif.h>
->  #include <crypto/internal/hash.h>
-> +#include <crypto/internal/simd.h>
->  #include <linux/init.h>
+> -       if (may_use_simd()) {
+> +       if (crypto_simd_usable()) {
+>                 if ((u32)data % SCALE_F) {
+>                         l = min_t(u32, length, SCALE_F - ((u32)data % SCALE_F));
+>
+> @@ -147,7 +148,7 @@ static int crc32c_pmull_update(struct shash_desc *desc, const u8 *data,
+>         u32 *crc = shash_desc_ctx(desc);
+>         unsigned int l;
+>
+> -       if (may_use_simd()) {
+> +       if (crypto_simd_usable()) {
+>                 if ((u32)data % SCALE_F) {
+>                         l = min_t(u32, length, SCALE_F - ((u32)data % SCALE_F));
+>
+> diff --git a/arch/arm/crypto/crct10dif-ce-glue.c b/arch/arm/crypto/crct10dif-ce-glue.c
+> index 3d6b800b8396..3b24f2872592 100644
+> --- a/arch/arm/crypto/crct10dif-ce-glue.c
+> +++ b/arch/arm/crypto/crct10dif-ce-glue.c
+> @@ -15,6 +15,7 @@
 >  #include <linux/string.h>
->  #include <linux/kernel.h>
-> -#include <asm/fpu/api.h>
->  #include <asm/cpufeatures.h>
->  #include <asm/cpu_device_id.h>
-> +#include <asm/simd.h>
 >
->  asmlinkage u16 crc_t10dif_pcl(u16 init_crc, const u8 *buf, size_t len);
+>  #include <crypto/internal/hash.h>
+> +#include <crypto/internal/simd.h>
 >
-> @@ -53,7 +54,7 @@ static int chksum_update(struct shash_desc *desc, const u8 *data,
+>  #include <asm/neon.h>
+>  #include <asm/simd.h>
+> @@ -36,7 +37,7 @@ static int crct10dif_update(struct shash_desc *desc, const u8 *data,
 >  {
->         struct chksum_desc_ctx *ctx = shash_desc_ctx(desc);
+>         u16 *crc = shash_desc_ctx(desc);
 >
-> -       if (length >= 16 && irq_fpu_usable()) {
-> +       if (length >= 16 && crypto_simd_usable()) {
->                 kernel_fpu_begin();
->                 ctx->crc = crc_t10dif_pcl(ctx->crc, data, length);
->                 kernel_fpu_end();
-> @@ -73,7 +74,7 @@ static int chksum_final(struct shash_desc *desc, u8 *out)
->  static int __chksum_finup(__u16 *crcp, const u8 *data, unsigned int len,
->                         u8 *out)
->  {
-> -       if (len >= 16 && irq_fpu_usable()) {
-> +       if (len >= 16 && crypto_simd_usable()) {
->                 kernel_fpu_begin();
->                 *(__u16 *)out = crc_t10dif_pcl(*crcp, data, len);
->                 kernel_fpu_end();
-> diff --git a/arch/x86/crypto/ghash-clmulni-intel_glue.c b/arch/x86/crypto/ghash-clmulni-intel_glue.c
-> index 3582ae885ee1..4099a0ae17dd 100644
-> --- a/arch/x86/crypto/ghash-clmulni-intel_glue.c
-> +++ b/arch/x86/crypto/ghash-clmulni-intel_glue.c
-> @@ -19,8 +19,9 @@
+> -       if (length >= CRC_T10DIF_PMULL_CHUNK_SIZE && may_use_simd()) {
+> +       if (length >= CRC_T10DIF_PMULL_CHUNK_SIZE && crypto_simd_usable()) {
+>                 kernel_neon_begin();
+>                 *crc = crc_t10dif_pmull(*crc, data, length);
+>                 kernel_neon_end();
+> diff --git a/arch/arm/crypto/ghash-ce-glue.c b/arch/arm/crypto/ghash-ce-glue.c
+> index b7d30b6cf49c..60123e9ea9d8 100644
+> --- a/arch/arm/crypto/ghash-ce-glue.c
+> +++ b/arch/arm/crypto/ghash-ce-glue.c
+> @@ -14,6 +14,7 @@
+>  #include <asm/unaligned.h>
 >  #include <crypto/cryptd.h>
->  #include <crypto/gf128mul.h>
 >  #include <crypto/internal/hash.h>
-> -#include <asm/fpu/api.h>
 > +#include <crypto/internal/simd.h>
->  #include <asm/cpu_device_id.h>
-> +#include <asm/simd.h>
->
->  #define GHASH_BLOCK_SIZE       16
->  #define GHASH_DIGEST_SIZE      16
-> @@ -182,7 +183,7 @@ static int ghash_async_update(struct ahash_request *req)
+>  #include <crypto/gf128mul.h>
+>  #include <linux/cpufeature.h>
+>  #include <linux/crypto.h>
+> @@ -196,7 +197,7 @@ static int ghash_async_update(struct ahash_request *req)
 >         struct ghash_async_ctx *ctx = crypto_ahash_ctx(tfm);
 >         struct cryptd_ahash *cryptd_tfm = ctx->cryptd_tfm;
 >
-> -       if (!irq_fpu_usable() ||
+> -       if (!may_use_simd() ||
 > +       if (!crypto_simd_usable() ||
 >             (in_atomic() && cryptd_ahash_queued(cryptd_tfm))) {
 >                 memcpy(cryptd_req, req, sizeof(*req));
 >                 ahash_request_set_tfm(cryptd_req, &cryptd_tfm->base);
-> @@ -200,7 +201,7 @@ static int ghash_async_final(struct ahash_request *req)
+> @@ -214,7 +215,7 @@ static int ghash_async_final(struct ahash_request *req)
 >         struct ghash_async_ctx *ctx = crypto_ahash_ctx(tfm);
 >         struct cryptd_ahash *cryptd_tfm = ctx->cryptd_tfm;
 >
-> -       if (!irq_fpu_usable() ||
+> -       if (!may_use_simd() ||
 > +       if (!crypto_simd_usable() ||
 >             (in_atomic() && cryptd_ahash_queued(cryptd_tfm))) {
 >                 memcpy(cryptd_req, req, sizeof(*req));
 >                 ahash_request_set_tfm(cryptd_req, &cryptd_tfm->base);
-> @@ -241,7 +242,7 @@ static int ghash_async_digest(struct ahash_request *req)
+> @@ -232,7 +233,7 @@ static int ghash_async_digest(struct ahash_request *req)
 >         struct ahash_request *cryptd_req = ahash_request_ctx(req);
 >         struct cryptd_ahash *cryptd_tfm = ctx->cryptd_tfm;
 >
-> -       if (!irq_fpu_usable() ||
+> -       if (!may_use_simd() ||
 > +       if (!crypto_simd_usable() ||
 >             (in_atomic() && cryptd_ahash_queued(cryptd_tfm))) {
 >                 memcpy(cryptd_req, req, sizeof(*req));
 >                 ahash_request_set_tfm(cryptd_req, &cryptd_tfm->base);
-> diff --git a/arch/x86/crypto/nhpoly1305-avx2-glue.c b/arch/x86/crypto/nhpoly1305-avx2-glue.c
-> index 20d815ea4b6a..f7567cbd35b6 100644
-> --- a/arch/x86/crypto/nhpoly1305-avx2-glue.c
-> +++ b/arch/x86/crypto/nhpoly1305-avx2-glue.c
-> @@ -7,9 +7,10 @@
->   */
->
->  #include <crypto/internal/hash.h>
-> +#include <crypto/internal/simd.h>
->  #include <crypto/nhpoly1305.h>
->  #include <linux/module.h>
-> -#include <asm/fpu/api.h>
-> +#include <asm/simd.h>
->
->  asmlinkage void nh_avx2(const u32 *key, const u8 *message, size_t message_len,
->                         u8 hash[NH_HASH_BYTES]);
-> @@ -24,7 +25,7 @@ static void _nh_avx2(const u32 *key, const u8 *message, size_t message_len,
->  static int nhpoly1305_avx2_update(struct shash_desc *desc,
->                                   const u8 *src, unsigned int srclen)
->  {
-> -       if (srclen < 64 || !irq_fpu_usable())
-> +       if (srclen < 64 || !crypto_simd_usable())
->                 return crypto_nhpoly1305_update(desc, src, srclen);
->
->         do {
-> diff --git a/arch/x86/crypto/nhpoly1305-sse2-glue.c b/arch/x86/crypto/nhpoly1305-sse2-glue.c
-> index ed68d164ce14..a661ede3b5cf 100644
-> --- a/arch/x86/crypto/nhpoly1305-sse2-glue.c
-> +++ b/arch/x86/crypto/nhpoly1305-sse2-glue.c
-> @@ -7,9 +7,10 @@
->   */
->
->  #include <crypto/internal/hash.h>
-> +#include <crypto/internal/simd.h>
->  #include <crypto/nhpoly1305.h>
->  #include <linux/module.h>
-> -#include <asm/fpu/api.h>
-> +#include <asm/simd.h>
->
->  asmlinkage void nh_sse2(const u32 *key, const u8 *message, size_t message_len,
->                         u8 hash[NH_HASH_BYTES]);
-> @@ -24,7 +25,7 @@ static void _nh_sse2(const u32 *key, const u8 *message, size_t message_len,
->  static int nhpoly1305_sse2_update(struct shash_desc *desc,
->                                   const u8 *src, unsigned int srclen)
->  {
-> -       if (srclen < 64 || !irq_fpu_usable())
-> +       if (srclen < 64 || !crypto_simd_usable())
->                 return crypto_nhpoly1305_update(desc, src, srclen);
->
->         do {
-> diff --git a/arch/x86/crypto/poly1305_glue.c b/arch/x86/crypto/poly1305_glue.c
-> index 88cc01506c84..6eb65b237b3c 100644
-> --- a/arch/x86/crypto/poly1305_glue.c
-> +++ b/arch/x86/crypto/poly1305_glue.c
-> @@ -11,11 +11,11 @@
->
->  #include <crypto/algapi.h>
->  #include <crypto/internal/hash.h>
-> +#include <crypto/internal/simd.h>
->  #include <crypto/poly1305.h>
->  #include <linux/crypto.h>
->  #include <linux/kernel.h>
->  #include <linux/module.h>
-> -#include <asm/fpu/api.h>
+> diff --git a/arch/arm/crypto/nhpoly1305-neon-glue.c b/arch/arm/crypto/nhpoly1305-neon-glue.c
+> index 49aae87cb2bc..ae5aefc44a4d 100644
+> --- a/arch/arm/crypto/nhpoly1305-neon-glue.c
+> +++ b/arch/arm/crypto/nhpoly1305-neon-glue.c
+> @@ -9,6 +9,7 @@
+>  #include <asm/neon.h>
 >  #include <asm/simd.h>
+>  #include <crypto/internal/hash.h>
+> +#include <crypto/internal/simd.h>
+>  #include <crypto/nhpoly1305.h>
+>  #include <linux/module.h>
 >
->  struct poly1305_simd_desc_ctx {
-> @@ -126,7 +126,7 @@ static int poly1305_simd_update(struct shash_desc *desc,
->         unsigned int bytes;
+> @@ -25,7 +26,7 @@ static void _nh_neon(const u32 *key, const u8 *message, size_t message_len,
+>  static int nhpoly1305_neon_update(struct shash_desc *desc,
+>                                   const u8 *src, unsigned int srclen)
+>  {
+> -       if (srclen < 64 || !may_use_simd())
+> +       if (srclen < 64 || !crypto_simd_usable())
+>                 return crypto_nhpoly1305_update(desc, src, srclen);
 >
->         /* kernel_fpu_begin/end is costly, use fallback for small updates */
-> -       if (srclen <= 288 || !may_use_simd())
-> +       if (srclen <= 288 || !crypto_simd_usable())
->                 return crypto_poly1305_update(desc, src, srclen);
->
->         kernel_fpu_begin();
-> diff --git a/arch/x86/crypto/sha1_ssse3_glue.c b/arch/x86/crypto/sha1_ssse3_glue.c
-> index 7391c7de72c7..42f177afc33a 100644
-> --- a/arch/x86/crypto/sha1_ssse3_glue.c
-> +++ b/arch/x86/crypto/sha1_ssse3_glue.c
-> @@ -22,6 +22,7 @@
->  #define pr_fmt(fmt)    KBUILD_MODNAME ": " fmt
+>         do {
+> diff --git a/arch/arm/crypto/sha1-ce-glue.c b/arch/arm/crypto/sha1-ce-glue.c
+> index b732522e20f8..4c6c6900853c 100644
+> --- a/arch/arm/crypto/sha1-ce-glue.c
+> +++ b/arch/arm/crypto/sha1-ce-glue.c
+> @@ -9,6 +9,7 @@
+>   */
 >
 >  #include <crypto/internal/hash.h>
 > +#include <crypto/internal/simd.h>
->  #include <linux/init.h>
->  #include <linux/module.h>
->  #include <linux/mm.h>
-> @@ -29,7 +30,7 @@
->  #include <linux/types.h>
 >  #include <crypto/sha.h>
 >  #include <crypto/sha1_base.h>
-> -#include <asm/fpu/api.h>
-> +#include <asm/simd.h>
->
->  typedef void (sha1_transform_fn)(u32 *digest, const char *data,
->                                 unsigned int rounds);
-> @@ -39,7 +40,7 @@ static int sha1_update(struct shash_desc *desc, const u8 *data,
+>  #include <linux/cpufeature.h>
+> @@ -33,7 +34,7 @@ static int sha1_ce_update(struct shash_desc *desc, const u8 *data,
 >  {
 >         struct sha1_state *sctx = shash_desc_ctx(desc);
 >
-> -       if (!irq_fpu_usable() ||
+> -       if (!may_use_simd() ||
 > +       if (!crypto_simd_usable() ||
 >             (sctx->count % SHA1_BLOCK_SIZE) + len < SHA1_BLOCK_SIZE)
->                 return crypto_sha1_update(desc, data, len);
+>                 return sha1_update_arm(desc, data, len);
 >
-> @@ -57,7 +58,7 @@ static int sha1_update(struct shash_desc *desc, const u8 *data,
->  static int sha1_finup(struct shash_desc *desc, const u8 *data,
->                       unsigned int len, u8 *out, sha1_transform_fn *sha1_xform)
+> @@ -47,7 +48,7 @@ static int sha1_ce_update(struct shash_desc *desc, const u8 *data,
+>  static int sha1_ce_finup(struct shash_desc *desc, const u8 *data,
+>                          unsigned int len, u8 *out)
 >  {
-> -       if (!irq_fpu_usable())
+> -       if (!may_use_simd())
 > +       if (!crypto_simd_usable())
->                 return crypto_sha1_finup(desc, data, len, out);
+>                 return sha1_finup_arm(desc, data, len, out);
 >
->         kernel_fpu_begin();
-> diff --git a/arch/x86/crypto/sha256_ssse3_glue.c b/arch/x86/crypto/sha256_ssse3_glue.c
-> index 773a873d2b28..73867da3cbee 100644
-> --- a/arch/x86/crypto/sha256_ssse3_glue.c
-> +++ b/arch/x86/crypto/sha256_ssse3_glue.c
-> @@ -30,6 +30,7 @@
->  #define pr_fmt(fmt)    KBUILD_MODNAME ": " fmt
+>         kernel_neon_begin();
+> diff --git a/arch/arm/crypto/sha1_neon_glue.c b/arch/arm/crypto/sha1_neon_glue.c
+> index d15e0ea2c95e..d6c95c213d42 100644
+> --- a/arch/arm/crypto/sha1_neon_glue.c
+> +++ b/arch/arm/crypto/sha1_neon_glue.c
+> @@ -19,6 +19,7 @@
+>   */
 >
 >  #include <crypto/internal/hash.h>
 > +#include <crypto/internal/simd.h>
 >  #include <linux/init.h>
 >  #include <linux/module.h>
 >  #include <linux/mm.h>
-> @@ -37,8 +38,8 @@
->  #include <linux/types.h>
+> @@ -39,7 +40,7 @@ static int sha1_neon_update(struct shash_desc *desc, const u8 *data,
+>  {
+>         struct sha1_state *sctx = shash_desc_ctx(desc);
+>
+> -       if (!may_use_simd() ||
+> +       if (!crypto_simd_usable() ||
+>             (sctx->count % SHA1_BLOCK_SIZE) + len < SHA1_BLOCK_SIZE)
+>                 return sha1_update_arm(desc, data, len);
+>
+> @@ -54,7 +55,7 @@ static int sha1_neon_update(struct shash_desc *desc, const u8 *data,
+>  static int sha1_neon_finup(struct shash_desc *desc, const u8 *data,
+>                            unsigned int len, u8 *out)
+>  {
+> -       if (!may_use_simd())
+> +       if (!crypto_simd_usable())
+>                 return sha1_finup_arm(desc, data, len, out);
+>
+>         kernel_neon_begin();
+> diff --git a/arch/arm/crypto/sha2-ce-glue.c b/arch/arm/crypto/sha2-ce-glue.c
+> index 1211a5c129fc..a47a9d4b663e 100644
+> --- a/arch/arm/crypto/sha2-ce-glue.c
+> +++ b/arch/arm/crypto/sha2-ce-glue.c
+> @@ -9,6 +9,7 @@
+>   */
+>
+>  #include <crypto/internal/hash.h>
+> +#include <crypto/internal/simd.h>
 >  #include <crypto/sha.h>
 >  #include <crypto/sha256_base.h>
-> -#include <asm/fpu/api.h>
->  #include <linux/string.h>
-> +#include <asm/simd.h>
->
->  asmlinkage void sha256_transform_ssse3(u32 *digest, const char *data,
->                                        u64 rounds);
-> @@ -49,7 +50,7 @@ static int sha256_update(struct shash_desc *desc, const u8 *data,
+>  #include <linux/cpufeature.h>
+> @@ -34,7 +35,7 @@ static int sha2_ce_update(struct shash_desc *desc, const u8 *data,
 >  {
 >         struct sha256_state *sctx = shash_desc_ctx(desc);
 >
-> -       if (!irq_fpu_usable() ||
+> -       if (!may_use_simd() ||
 > +       if (!crypto_simd_usable() ||
 >             (sctx->count % SHA256_BLOCK_SIZE) + len < SHA256_BLOCK_SIZE)
->                 return crypto_sha256_update(desc, data, len);
+>                 return crypto_sha256_arm_update(desc, data, len);
 >
-> @@ -67,7 +68,7 @@ static int sha256_update(struct shash_desc *desc, const u8 *data,
->  static int sha256_finup(struct shash_desc *desc, const u8 *data,
->               unsigned int len, u8 *out, sha256_transform_fn *sha256_xform)
+> @@ -49,7 +50,7 @@ static int sha2_ce_update(struct shash_desc *desc, const u8 *data,
+>  static int sha2_ce_finup(struct shash_desc *desc, const u8 *data,
+>                          unsigned int len, u8 *out)
 >  {
-> -       if (!irq_fpu_usable())
+> -       if (!may_use_simd())
 > +       if (!crypto_simd_usable())
->                 return crypto_sha256_finup(desc, data, len, out);
+>                 return crypto_sha256_arm_finup(desc, data, len, out);
 >
->         kernel_fpu_begin();
-> diff --git a/arch/x86/crypto/sha512_ssse3_glue.c b/arch/x86/crypto/sha512_ssse3_glue.c
-> index f1b811b60ba6..458356a3f124 100644
-> --- a/arch/x86/crypto/sha512_ssse3_glue.c
-> +++ b/arch/x86/crypto/sha512_ssse3_glue.c
-> @@ -28,16 +28,16 @@
->  #define pr_fmt(fmt)    KBUILD_MODNAME ": " fmt
+>         kernel_neon_begin();
+> diff --git a/arch/arm/crypto/sha256_neon_glue.c b/arch/arm/crypto/sha256_neon_glue.c
+> index 1d82c6cd31a4..f3f6b1624fc3 100644
+> --- a/arch/arm/crypto/sha256_neon_glue.c
+> +++ b/arch/arm/crypto/sha256_neon_glue.c
+> @@ -15,6 +15,7 @@
+>   */
 >
 >  #include <crypto/internal/hash.h>
 > +#include <crypto/internal/simd.h>
->  #include <linux/init.h>
->  #include <linux/module.h>
->  #include <linux/mm.h>
 >  #include <linux/cryptohash.h>
-> +#include <linux/string.h>
 >  #include <linux/types.h>
+>  #include <linux/string.h>
+> @@ -34,7 +35,7 @@ static int sha256_update(struct shash_desc *desc, const u8 *data,
+>  {
+>         struct sha256_state *sctx = shash_desc_ctx(desc);
+>
+> -       if (!may_use_simd() ||
+> +       if (!crypto_simd_usable() ||
+>             (sctx->count % SHA256_BLOCK_SIZE) + len < SHA256_BLOCK_SIZE)
+>                 return crypto_sha256_arm_update(desc, data, len);
+>
+> @@ -49,7 +50,7 @@ static int sha256_update(struct shash_desc *desc, const u8 *data,
+>  static int sha256_finup(struct shash_desc *desc, const u8 *data,
+>                         unsigned int len, u8 *out)
+>  {
+> -       if (!may_use_simd())
+> +       if (!crypto_simd_usable())
+>                 return crypto_sha256_arm_finup(desc, data, len, out);
+>
+>         kernel_neon_begin();
+> diff --git a/arch/arm/crypto/sha512-neon-glue.c b/arch/arm/crypto/sha512-neon-glue.c
+> index 8a5642b41fd6..d33ab59c26c0 100644
+> --- a/arch/arm/crypto/sha512-neon-glue.c
+> +++ b/arch/arm/crypto/sha512-neon-glue.c
+> @@ -9,6 +9,7 @@
+>   */
+>
+>  #include <crypto/internal/hash.h>
+> +#include <crypto/internal/simd.h>
 >  #include <crypto/sha.h>
 >  #include <crypto/sha512_base.h>
-> -#include <asm/fpu/api.h>
-> -
-> -#include <linux/string.h>
-> +#include <asm/simd.h>
->
->  asmlinkage void sha512_transform_ssse3(u64 *digest, const char *data,
->                                        u64 rounds);
-> @@ -49,7 +49,7 @@ static int sha512_update(struct shash_desc *desc, const u8 *data,
+>  #include <linux/crypto.h>
+> @@ -30,7 +31,7 @@ static int sha512_neon_update(struct shash_desc *desc, const u8 *data,
 >  {
 >         struct sha512_state *sctx = shash_desc_ctx(desc);
 >
-> -       if (!irq_fpu_usable() ||
+> -       if (!may_use_simd() ||
 > +       if (!crypto_simd_usable() ||
 >             (sctx->count[0] % SHA512_BLOCK_SIZE) + len < SHA512_BLOCK_SIZE)
->                 return crypto_sha512_update(desc, data, len);
+>                 return sha512_arm_update(desc, data, len);
 >
-> @@ -67,7 +67,7 @@ static int sha512_update(struct shash_desc *desc, const u8 *data,
->  static int sha512_finup(struct shash_desc *desc, const u8 *data,
->               unsigned int len, u8 *out, sha512_transform_fn *sha512_xform)
+> @@ -45,7 +46,7 @@ static int sha512_neon_update(struct shash_desc *desc, const u8 *data,
+>  static int sha512_neon_finup(struct shash_desc *desc, const u8 *data,
+>                              unsigned int len, u8 *out)
 >  {
-> -       if (!irq_fpu_usable())
+> -       if (!may_use_simd())
 > +       if (!crypto_simd_usable())
->                 return crypto_sha512_finup(desc, data, len, out);
+>                 return sha512_arm_finup(desc, data, len, out);
 >
->         kernel_fpu_begin();
+>         kernel_neon_begin();
 > --
 > 2.21.0
 >
