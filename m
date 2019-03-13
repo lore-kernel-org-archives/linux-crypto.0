@@ -2,51 +2,53 @@ Return-Path: <SRS0=f6g1=RQ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27981C10F0B
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AED8FC4360F
 	for <linux-crypto@archiver.kernel.org>; Wed, 13 Mar 2019 05:15:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DEE9921874
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Mar 2019 05:15:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7D4F721874
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Mar 2019 05:15:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=default; t=1552454137;
-	bh=BqPvHNXBcRhNcwcIcSrdUJEo7We8vHaELp4KXksgxsc=;
-	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=AMfFuHog3TwBLo/j/SjyUoWXSNWyne6RG0ISl4liG+QrutmcEvrPVNGc+8F5m1KG4
-	 c4wHMUsgZ/DbDwjk0AEPqGZUdI0P7Np28iqPcVHmMP1ecMnJItWAkpM6guXYntmFsn
-	 cdSpPhvUa054aoRWV/gjjniS3t19b83yGR0Q2q1E=
+	bh=lzkvbYwAbu6mfSnM6YOnS1aqXWrT8fyKTWOJhCF764w=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=cG9Qfam2GHtP/Lm3pb6Uzf5YMH73nS3sQByKxRVeDLsbUbD1frDGf9b1a0qPegwKv
+	 PXwwdqBqou8xV3UkWaKDx/QFfGDbPs1tITdj/j2g+JX2zCaW1+tP6W9qnWd0h5oL/n
+	 DJQqXNEADB20j8WGBul3+YIfUqyIBYv+zPff78c8=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726336AbfCMFPg (ORCPT
+        id S1726528AbfCMFPg (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Wed, 13 Mar 2019 01:15:36 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50074 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:50154 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725886AbfCMFPf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 13 Mar 2019 01:15:35 -0400
+        id S1726183AbfCMFPg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 13 Mar 2019 01:15:36 -0400
 Received: from sol.localdomain (c-107-3-167-184.hsd1.ca.comcast.net [107.3.167.184])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E2D4B205C9;
-        Wed, 13 Mar 2019 05:15:33 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id E5B402184D;
+        Wed, 13 Mar 2019 05:15:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1552454134;
-        bh=BqPvHNXBcRhNcwcIcSrdUJEo7We8vHaELp4KXksgxsc=;
-        h=From:To:Cc:Subject:Date:From;
-        b=s2Yx8MYxZcp/bHGeZ7cVjpG6HlfSNsUFit276r/V40G/QJVw2MSpsbECchDDLUnaV
-         pBQ7Sy7BrSdRKNcwcssMqQojQIcRnVtDg1PJIm7MhYOvzmaCcuFafTRagSUnX8gBBJ
-         AG7z5TxwcJiQi2TUxGqIywG+4/6OQbX4yPuI4ExU=
+        s=default; t=1552454135;
+        bh=lzkvbYwAbu6mfSnM6YOnS1aqXWrT8fyKTWOJhCF764w=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=VJhFhqKzwsbnjcwlw6WhjSo+O9KOE/k6i3AOMjOimKnZyt2MJaUKeV8aiF9n645SQ
+         yaIgugpVpbQtqWHhF6gEoE8jBbF3QDOeFyod7wg547F8yUuvIsieNfu55RItVfdmwh
+         DKMDeK//xTUVHS08VKDzPy930GblsERB9h21PcEk=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>
 Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         linux-arm-kernel@lists.infradead.org, x86@kernel.org
-Subject: [PATCH 0/8] crypto: test the !may_use_simd() fallback code
-Date:   Tue, 12 Mar 2019 22:12:44 -0700
-Message-Id: <20190313051252.2917-1-ebiggers@kernel.org>
+Subject: [PATCH 3/8] crypto: simd,testmgr - introduce crypto_simd_usable()
+Date:   Tue, 12 Mar 2019 22:12:47 -0700
+Message-Id: <20190313051252.2917-4-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20190313051252.2917-1-ebiggers@kernel.org>
+References: <20190313051252.2917-1-ebiggers@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
@@ -54,83 +56,110 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-All crypto API algorithms are supposed to support the case where they
-are called in a context where SIMD instructions are unusable, e.g. IRQ
-context on some architectures.  However, this isn't tested for by the
-self-tests, causing bugs to go undetected.
+From: Eric Biggers <ebiggers@google.com>
 
-This patch series therefore updates the self-tests to test the no-SIMD
-code.  It works by converting all may_use_simd() checks to a new macro
-crypto_simd_usable(), which also returns false when the self-tests have
-disabled SIMD in crypto algorithms on the current CPU for test purposes.
+So that the no-SIMD fallback code can be tested by the crypto
+self-tests, add a macro crypto_simd_usable() which wraps may_use_simd(),
+but also returns false if the crypto self-tests have set a per-CPU bool
+to disable SIMD in crypto code on the current CPU.
 
-For now, all no-SIMD testing is limited to the extra crypto self-tests,
-because it might be a bit too invasive for the regular self-tests.
-But this could be changed later.
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ crypto/testmgr.c               | 26 +++++++++++++++++++++++++-
+ include/crypto/internal/simd.h | 24 ++++++++++++++++++++++++
+ 2 files changed, 49 insertions(+), 1 deletion(-)
 
-This already found bugs in the arm64 implementations of AES-GCM and
-ChaCha.  These are fixed by the first two patches.  Following this, the
-tests pass on x86, arm, and arm64.
-
-This patch series is based on top of my other pending patch series
-"crypto: add SIMD helpers for AEADs".  It can also be found in git at:
-
-    URL:     https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git
-    Branch:  crypto-nosimd-tests
-
-Eric Biggers (8):
-  crypto: chacha-generic - fix use as arm64 no-NEON fallback
-  crypto: arm64/gcm-aes-ce - fix no-NEON fallback code
-  crypto: simd,testmgr - introduce crypto_simd_usable()
-  crypto: x86 - convert to use crypto_simd_usable()
-  crypto: arm - convert to use crypto_simd_usable()
-  crypto: arm64 - convert to use crypto_simd_usable()
-  crypto: simd - convert to use crypto_simd_usable()
-  crypto: testmgr - test the !may_use_simd() fallback code
-
- arch/arm/crypto/chacha-neon-glue.c         |   5 +-
- arch/arm/crypto/crc32-ce-glue.c            |   5 +-
- arch/arm/crypto/crct10dif-ce-glue.c        |   3 +-
- arch/arm/crypto/ghash-ce-glue.c            |   7 +-
- arch/arm/crypto/nhpoly1305-neon-glue.c     |   3 +-
- arch/arm/crypto/sha1-ce-glue.c             |   5 +-
- arch/arm/crypto/sha1_neon_glue.c           |   5 +-
- arch/arm/crypto/sha2-ce-glue.c             |   5 +-
- arch/arm/crypto/sha256_neon_glue.c         |   5 +-
- arch/arm/crypto/sha512-neon-glue.c         |   5 +-
- arch/arm64/crypto/aes-ce-ccm-glue.c        |   7 +-
- arch/arm64/crypto/aes-ce-glue.c            |   5 +-
- arch/arm64/crypto/aes-glue.c               |   4 +-
- arch/arm64/crypto/aes-neonbs-glue.c        |   2 +-
- arch/arm64/crypto/chacha-neon-glue.c       |   5 +-
- arch/arm64/crypto/crct10dif-ce-glue.c      |   5 +-
- arch/arm64/crypto/ghash-ce-glue.c          |  17 ++-
- arch/arm64/crypto/nhpoly1305-neon-glue.c   |   3 +-
- arch/arm64/crypto/sha1-ce-glue.c           |   7 +-
- arch/arm64/crypto/sha2-ce-glue.c           |   7 +-
- arch/arm64/crypto/sha256-glue.c            |   5 +-
- arch/arm64/crypto/sha3-ce-glue.c           |   5 +-
- arch/arm64/crypto/sha512-ce-glue.c         |   7 +-
- arch/arm64/crypto/sm3-ce-glue.c            |   7 +-
- arch/arm64/crypto/sm4-ce-glue.c            |   5 +-
- arch/x86/crypto/aesni-intel_glue.c         |   8 +-
- arch/x86/crypto/chacha_glue.c              |   6 +-
- arch/x86/crypto/crc32-pclmul_glue.c        |   5 +-
- arch/x86/crypto/crc32c-intel_glue.c        |   7 +-
- arch/x86/crypto/crct10dif-pclmul_glue.c    |   7 +-
- arch/x86/crypto/ghash-clmulni-intel_glue.c |   9 +-
- arch/x86/crypto/nhpoly1305-avx2-glue.c     |   5 +-
- arch/x86/crypto/nhpoly1305-sse2-glue.c     |   5 +-
- arch/x86/crypto/poly1305_glue.c            |   4 +-
- arch/x86/crypto/sha1_ssse3_glue.c          |   7 +-
- arch/x86/crypto/sha256_ssse3_glue.c        |   7 +-
- arch/x86/crypto/sha512_ssse3_glue.c        |  10 +-
- crypto/chacha_generic.c                    |   2 +-
- crypto/simd.c                              |   8 +-
- crypto/testmgr.c                           | 142 +++++++++++++++++----
- include/crypto/internal/simd.h             |  24 ++++
- 41 files changed, 272 insertions(+), 123 deletions(-)
-
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 5d56b2990762..52417dde811f 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -37,6 +37,7 @@
+ #include <crypto/akcipher.h>
+ #include <crypto/kpp.h>
+ #include <crypto/acompress.h>
++#include <crypto/internal/simd.h>
+ 
+ #include "internal.h"
+ 
+@@ -52,6 +53,9 @@ MODULE_PARM_DESC(noextratests, "disable expensive crypto self-tests");
+ static unsigned int fuzz_iterations = 100;
+ module_param(fuzz_iterations, uint, 0644);
+ MODULE_PARM_DESC(fuzz_iterations, "number of fuzz test iterations");
++
++DEFINE_PER_CPU(bool, crypto_simd_disabled_for_test);
++EXPORT_PER_CPU_SYMBOL_GPL(crypto_simd_disabled_for_test);
+ #endif
+ 
+ #ifdef CONFIG_CRYPTO_MANAGER_DISABLE_TESTS
+@@ -838,7 +842,27 @@ static void generate_random_testvec_config(struct testvec_config *cfg,
+ 
+ 	WARN_ON_ONCE(!valid_testvec_config(cfg));
+ }
+-#endif /* CONFIG_CRYPTO_MANAGER_EXTRA_TESTS */
++
++static void crypto_disable_simd_for_test(void)
++{
++	preempt_disable();
++	__this_cpu_write(crypto_simd_disabled_for_test, true);
++}
++
++static void crypto_reenable_simd_for_test(void)
++{
++	__this_cpu_write(crypto_simd_disabled_for_test, false);
++	preempt_enable();
++}
++#else /* !CONFIG_CRYPTO_MANAGER_EXTRA_TESTS */
++static void crypto_disable_simd_for_test(void)
++{
++}
++
++static void crypto_reenable_simd_for_test(void)
++{
++}
++#endif /* !CONFIG_CRYPTO_MANAGER_EXTRA_TESTS */
+ 
+ static int check_nonfinal_hash_op(const char *op, int err,
+ 				  u8 *result, unsigned int digestsize,
+diff --git a/include/crypto/internal/simd.h b/include/crypto/internal/simd.h
+index a23b18b6ad61..d2316242a988 100644
+--- a/include/crypto/internal/simd.h
++++ b/include/crypto/internal/simd.h
+@@ -6,6 +6,9 @@
+ #ifndef _CRYPTO_INTERNAL_SIMD_H
+ #define _CRYPTO_INTERNAL_SIMD_H
+ 
++#include <linux/percpu.h>
++#include <linux/types.h>
++
+ /* skcipher support */
+ 
+ struct simd_skcipher_alg;
+@@ -42,4 +45,25 @@ int simd_register_aeads_compat(struct aead_alg *algs, int count,
+ void simd_unregister_aeads(struct aead_alg *algs, int count,
+ 			   struct simd_aead_alg **simd_algs);
+ 
++/*
++ * crypto_simd_usable() - is it allowed at this time to use SIMD instructions or
++ *			  access the SIMD register file?
++ *
++ * This delegates to may_use_simd(), except that this also returns false if SIMD
++ * in crypto code has been temporarily disabled on this CPU by the crypto
++ * self-tests, in order to test the no-SIMD fallback code.  This override is
++ * currently limited to configurations where the extra self-tests are enabled,
++ * because it might be a bit too invasive to be part of the regular self-tests.
++ *
++ * This is a macro so that <asm/simd.h>, which some architectures don't have,
++ * doesn't have to be included directly here.
++ */
++#ifdef CONFIG_CRYPTO_MANAGER_EXTRA_TESTS
++DECLARE_PER_CPU(bool, crypto_simd_disabled_for_test);
++#define crypto_simd_usable() \
++	(may_use_simd() && !this_cpu_read(crypto_simd_disabled_for_test))
++#else
++#define crypto_simd_usable() may_use_simd()
++#endif
++
+ #endif /* _CRYPTO_INTERNAL_SIMD_H */
 -- 
 2.21.0
 
