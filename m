@@ -2,53 +2,51 @@ Return-Path: <SRS0=f6g1=RQ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2690C10F03
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Mar 2019 05:15:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27981C10F0B
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Mar 2019 05:15:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B0640218A3
+	by mail.kernel.org (Postfix) with ESMTP id DEE9921874
 	for <linux-crypto@archiver.kernel.org>; Wed, 13 Mar 2019 05:15:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1552454136;
-	bh=vHRu0W9KwUGaloXhGjaFpSkQdr99+L7HhU0sp5EPj+s=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=k8kwXcvWiVJyB7VJaeXLZEC//x+yRuq7s1BviOnaakVyR32mQXPuf5mh0mQmW8+yW
-	 bIrYZVfnX5MWU5JHd89Wnt/bCHJj7rEZjlMLsUgjTEDmRXZq16QFAYbDrT0tWX3s/d
-	 SPHhrwnOoDkuU2/p5voi18JNeCozulr77iB1P82o=
+	s=default; t=1552454137;
+	bh=BqPvHNXBcRhNcwcIcSrdUJEo7We8vHaELp4KXksgxsc=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=AMfFuHog3TwBLo/j/SjyUoWXSNWyne6RG0ISl4liG+QrutmcEvrPVNGc+8F5m1KG4
+	 c4wHMUsgZ/DbDwjk0AEPqGZUdI0P7Np28iqPcVHmMP1ecMnJItWAkpM6guXYntmFsn
+	 cdSpPhvUa054aoRWV/gjjniS3t19b83yGR0Q2q1E=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726184AbfCMFPf (ORCPT
+        id S1726336AbfCMFPg (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 13 Mar 2019 01:15:35 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50104 "EHLO mail.kernel.org"
+        Wed, 13 Mar 2019 01:15:36 -0400
+Received: from mail.kernel.org ([198.145.29.99]:50074 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726043AbfCMFPf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1725886AbfCMFPf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Wed, 13 Mar 2019 01:15:35 -0400
 Received: from sol.localdomain (c-107-3-167-184.hsd1.ca.comcast.net [107.3.167.184])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 464F82183E;
-        Wed, 13 Mar 2019 05:15:34 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id E2D4B205C9;
+        Wed, 13 Mar 2019 05:15:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=default; t=1552454134;
-        bh=vHRu0W9KwUGaloXhGjaFpSkQdr99+L7HhU0sp5EPj+s=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=qU1LRDFUW97TFZ1BeNbXj7hLZ9eyZr7HZRg6/2fXtXeYvSmqalfxeUwvQchaDg8CP
-         QE0cxQGVVLQUvjAzptDVmZwrW9dpBZj6Xt+rYEu5CIhleXDDBoKZCwKF0f6IOQmms+
-         V6Sd/9yMLMJ1ByU/RfNLGZs1HfSDN9e2/5jvLomc=
+        bh=BqPvHNXBcRhNcwcIcSrdUJEo7We8vHaELp4KXksgxsc=;
+        h=From:To:Cc:Subject:Date:From;
+        b=s2Yx8MYxZcp/bHGeZ7cVjpG6HlfSNsUFit276r/V40G/QJVw2MSpsbECchDDLUnaV
+         pBQ7Sy7BrSdRKNcwcssMqQojQIcRnVtDg1PJIm7MhYOvzmaCcuFafTRagSUnX8gBBJ
+         AG7z5TxwcJiQi2TUxGqIywG+4/6OQbX4yPuI4ExU=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>
 Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         linux-arm-kernel@lists.infradead.org, x86@kernel.org
-Subject: [PATCH 1/8] crypto: chacha-generic - fix use as arm64 no-NEON fallback
-Date:   Tue, 12 Mar 2019 22:12:45 -0700
-Message-Id: <20190313051252.2917-2-ebiggers@kernel.org>
+Subject: [PATCH 0/8] crypto: test the !may_use_simd() fallback code
+Date:   Tue, 12 Mar 2019 22:12:44 -0700
+Message-Id: <20190313051252.2917-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190313051252.2917-1-ebiggers@kernel.org>
-References: <20190313051252.2917-1-ebiggers@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
@@ -56,58 +54,83 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+All crypto API algorithms are supposed to support the case where they
+are called in a context where SIMD instructions are unusable, e.g. IRQ
+context on some architectures.  However, this isn't tested for by the
+self-tests, causing bugs to go undetected.
 
-The arm64 implementations of ChaCha and XChaCha are failing the extra
-crypto self-tests following my patches to test the !may_use_simd() code
-paths, which previously were untested.  The problem is as follows:
+This patch series therefore updates the self-tests to test the no-SIMD
+code.  It works by converting all may_use_simd() checks to a new macro
+crypto_simd_usable(), which also returns false when the self-tests have
+disabled SIMD in crypto algorithms on the current CPU for test purposes.
 
-When !may_use_simd(), the arm64 NEON implementations fall back to the
-generic implementation, which uses the skcipher_walk API to iterate
-through the src/dst scatterlists.  Due to how the skcipher_walk API
-works, walk.stride is set from the skcipher_alg actually being used,
-which in this case is the arm64 NEON algorithm.  Thus walk.stride is
-5*CHACHA_BLOCK_SIZE, not CHACHA_BLOCK_SIZE.
+For now, all no-SIMD testing is limited to the extra crypto self-tests,
+because it might be a bit too invasive for the regular self-tests.
+But this could be changed later.
 
-This unnecessarily large stride shouldn't cause an actual problem.
-However, the generic implementation computes round_down(nbytes,
-walk.stride).  round_down() assumes the round amount is a power of 2,
-which 5*CHACHA_BLOCK_SIZE is not, so it gives the wrong result.
+This already found bugs in the arm64 implementations of AES-GCM and
+ChaCha.  These are fixed by the first two patches.  Following this, the
+tests pass on x86, arm, and arm64.
 
-This causes the following case in skcipher_walk_done() to be hit,
-causing a WARN() and failing the encryption operation:
+This patch series is based on top of my other pending patch series
+"crypto: add SIMD helpers for AEADs".  It can also be found in git at:
 
-	if (WARN_ON(err)) {
-		/* unexpected case; didn't process all bytes */
-		err = -EINVAL;
-		goto finish;
-	}
+    URL:     https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git
+    Branch:  crypto-nosimd-tests
 
-Fix it by rounding down to CHACHA_BLOCK_SIZE instead of walk.stride.
+Eric Biggers (8):
+  crypto: chacha-generic - fix use as arm64 no-NEON fallback
+  crypto: arm64/gcm-aes-ce - fix no-NEON fallback code
+  crypto: simd,testmgr - introduce crypto_simd_usable()
+  crypto: x86 - convert to use crypto_simd_usable()
+  crypto: arm - convert to use crypto_simd_usable()
+  crypto: arm64 - convert to use crypto_simd_usable()
+  crypto: simd - convert to use crypto_simd_usable()
+  crypto: testmgr - test the !may_use_simd() fallback code
 
-(Or we could replace round_down() with rounddown(), but that would add a
-slow division operation every time, which I think we should avoid.)
+ arch/arm/crypto/chacha-neon-glue.c         |   5 +-
+ arch/arm/crypto/crc32-ce-glue.c            |   5 +-
+ arch/arm/crypto/crct10dif-ce-glue.c        |   3 +-
+ arch/arm/crypto/ghash-ce-glue.c            |   7 +-
+ arch/arm/crypto/nhpoly1305-neon-glue.c     |   3 +-
+ arch/arm/crypto/sha1-ce-glue.c             |   5 +-
+ arch/arm/crypto/sha1_neon_glue.c           |   5 +-
+ arch/arm/crypto/sha2-ce-glue.c             |   5 +-
+ arch/arm/crypto/sha256_neon_glue.c         |   5 +-
+ arch/arm/crypto/sha512-neon-glue.c         |   5 +-
+ arch/arm64/crypto/aes-ce-ccm-glue.c        |   7 +-
+ arch/arm64/crypto/aes-ce-glue.c            |   5 +-
+ arch/arm64/crypto/aes-glue.c               |   4 +-
+ arch/arm64/crypto/aes-neonbs-glue.c        |   2 +-
+ arch/arm64/crypto/chacha-neon-glue.c       |   5 +-
+ arch/arm64/crypto/crct10dif-ce-glue.c      |   5 +-
+ arch/arm64/crypto/ghash-ce-glue.c          |  17 ++-
+ arch/arm64/crypto/nhpoly1305-neon-glue.c   |   3 +-
+ arch/arm64/crypto/sha1-ce-glue.c           |   7 +-
+ arch/arm64/crypto/sha2-ce-glue.c           |   7 +-
+ arch/arm64/crypto/sha256-glue.c            |   5 +-
+ arch/arm64/crypto/sha3-ce-glue.c           |   5 +-
+ arch/arm64/crypto/sha512-ce-glue.c         |   7 +-
+ arch/arm64/crypto/sm3-ce-glue.c            |   7 +-
+ arch/arm64/crypto/sm4-ce-glue.c            |   5 +-
+ arch/x86/crypto/aesni-intel_glue.c         |   8 +-
+ arch/x86/crypto/chacha_glue.c              |   6 +-
+ arch/x86/crypto/crc32-pclmul_glue.c        |   5 +-
+ arch/x86/crypto/crc32c-intel_glue.c        |   7 +-
+ arch/x86/crypto/crct10dif-pclmul_glue.c    |   7 +-
+ arch/x86/crypto/ghash-clmulni-intel_glue.c |   9 +-
+ arch/x86/crypto/nhpoly1305-avx2-glue.c     |   5 +-
+ arch/x86/crypto/nhpoly1305-sse2-glue.c     |   5 +-
+ arch/x86/crypto/poly1305_glue.c            |   4 +-
+ arch/x86/crypto/sha1_ssse3_glue.c          |   7 +-
+ arch/x86/crypto/sha256_ssse3_glue.c        |   7 +-
+ arch/x86/crypto/sha512_ssse3_glue.c        |  10 +-
+ crypto/chacha_generic.c                    |   2 +-
+ crypto/simd.c                              |   8 +-
+ crypto/testmgr.c                           | 142 +++++++++++++++++----
+ include/crypto/internal/simd.h             |  24 ++++
+ 41 files changed, 272 insertions(+), 123 deletions(-)
 
-Fixes: 2fe55987b262 ("crypto: arm64/chacha - use combined SIMD/ALU routine for more speed")
-Cc: <stable@vger.kernel.org> # v5.0+
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- crypto/chacha_generic.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/crypto/chacha_generic.c b/crypto/chacha_generic.c
-index 35b583101f4f..90ec0ec1b4f7 100644
---- a/crypto/chacha_generic.c
-+++ b/crypto/chacha_generic.c
-@@ -52,7 +52,7 @@ static int chacha_stream_xor(struct skcipher_request *req,
- 		unsigned int nbytes = walk.nbytes;
- 
- 		if (nbytes < walk.total)
--			nbytes = round_down(nbytes, walk.stride);
-+			nbytes = round_down(nbytes, CHACHA_BLOCK_SIZE);
- 
- 		chacha_docrypt(state, walk.dst.virt.addr, walk.src.virt.addr,
- 			       nbytes, ctx->nrounds);
 -- 
 2.21.0
 
