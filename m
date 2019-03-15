@@ -2,134 +2,105 @@ Return-Path: <SRS0=TeaG=RS=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70337C43381
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 Mar 2019 03:31:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24DA5C43381
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 Mar 2019 04:05:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 38016218A1
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 Mar 2019 03:31:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1552620705;
-	bh=uF01UR9y60givakqqMOf4UJOv7kIJvNN7F5TewuZEMk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=ZCUZ3Hl6NHF5SKsz1RGaF8AdaQgSnekFKIMzLUch8Mc7qil/HftwpxncvaHtL73i0
-	 U/TmwJJ0zozvux2QF8N1seF/mzQTs/FD8dq4T07KUcWqRIgr91c+3tFGxp5bGLAOzl
-	 ul4K9oiCmn4LxfHZbKVWhJIHjR6vcj2ijJxZsG/M=
+	by mail.kernel.org (Postfix) with ESMTP id E93CD2077B
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 Mar 2019 04:05:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="oLpfpoVz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726958AbfCODbo (ORCPT
+        id S1726479AbfCOEFZ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 14 Mar 2019 23:31:44 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54454 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726708AbfCODbo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 14 Mar 2019 23:31:44 -0400
-Received: from sol.localdomain (c-107-3-167-184.hsd1.ca.comcast.net [107.3.167.184])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 6B1E32186A;
-        Fri, 15 Mar 2019 03:31:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1552620702;
-        bh=uF01UR9y60givakqqMOf4UJOv7kIJvNN7F5TewuZEMk=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=c+st7HBbDCpBwqiKnKS3ZmUNYbT1nwvXWGrMzu6Mcd92r+dVytExP1iWl2VISWMTU
-         ZgLpJgieD6dPXNL9VGVY6sYwi82g7raAsz7gvbUD+pyGdmgVOLvNYt2jlGyftd2TTU
-         Cvae1d0XtpT1UIxFp31kc1rN8vQWyIdYn3OGEBvY=
-Date:   Thu, 14 Mar 2019 20:31:40 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Zhang Zhijie <zhangzj@rock-chips.com>
-Cc:     Heiko Stuebner <heiko@sntech.de>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Zain Wang <wzz@rock-chips.com>, Arnd Bergmann <arnd@arndb.de>,
-        linux-rockchip@lists.infradead.org,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>, Olof Johansson <olof@lixom.net>,
-        ezequiel@collabora.com,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        Tao Huang <huangtao@rock-chips.com>
-Subject: Re: [Bug] Rockchip crypto driver sometimes produces wrong ciphertext
-Message-ID: <20190315033140.GB1671@sol.localdomain>
-References: <20190126210530.GB709@sol.localdomain>
- <CAKv+Gu-RKu9jt+2FnV2529zqyLGR8RSu8r4B8eOs-7Om-pL0aQ@mail.gmail.com>
- <1894799.pWIprST79S@phil>
- <f7a0d04c-339e-d9f8-7188-a27d55ad8b4d@rock-chips.com>
+        Fri, 15 Mar 2019 00:05:25 -0400
+Received: from mail-eopbgr20056.outbound.protection.outlook.com ([40.107.2.56]:56206
+        "EHLO EUR02-VE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726315AbfCOEFY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 15 Mar 2019 00:05:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=49l1fhmwbY+QGfft/mE5s22Lw458YIifmpsL+rJviKA=;
+ b=oLpfpoVz8o5GbcJgrCabAR0SfQTu/J/HI2sIawQ9vTO6F/daGCH53BpLt8jG0ENuYS94zdDIDCfxpzdwhf96V7mLDAjA3d5I3509aB15bsNWKCMu/XgEWEsZ58zQfXcfKkPvJZLVP0vnRa1ftj4J009DrAwjqLsNYhfZaF8+RR4=
+Received: from DB7PR04MB4252.eurprd04.prod.outlook.com (52.135.131.26) by
+ DB7PR04MB5050.eurprd04.prod.outlook.com (20.176.234.222) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1709.13; Fri, 15 Mar 2019 04:05:21 +0000
+Received: from DB7PR04MB4252.eurprd04.prod.outlook.com
+ ([fe80::9ca:d78:c154:25b5]) by DB7PR04MB4252.eurprd04.prod.outlook.com
+ ([fe80::9ca:d78:c154:25b5%4]) with mapi id 15.20.1709.011; Fri, 15 Mar 2019
+ 04:05:21 +0000
+From:   Vakul Garg <vakul.garg@nxp.com>
+To:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
+CC:     Horia Geanta <horia.geanta@nxp.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Vakul Garg <vakul.garg@nxp.com>
+Subject: [PATCH 0/3] CAAM job ring driver cleanups
+Thread-Topic: [PATCH 0/3] CAAM job ring driver cleanups
+Thread-Index: AQHU2uRPZG2qMFNge0CuyALTTTfntw==
+Date:   Fri, 15 Mar 2019 04:05:21 +0000
+Message-ID: <20190315040239.24705-1-vakul.garg@nxp.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: BMXPR01CA0037.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:b00:c::23) To DB7PR04MB4252.eurprd04.prod.outlook.com
+ (2603:10a6:5:27::26)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vakul.garg@nxp.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-mailer: git-send-email 2.13.6
+x-originating-ip: [92.120.1.70]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 5e1ea9ed-b6d2-46a1-d4b8-08d6a8fb7143
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600127)(711020)(4605104)(4618075)(2017052603328)(7153060)(7193020);SRVR:DB7PR04MB5050;
+x-ms-traffictypediagnostic: DB7PR04MB5050:
+x-ms-exchange-purlcount: 1
+x-microsoft-antispam-prvs: <DB7PR04MB50501731256568FE2400CCD18B440@DB7PR04MB5050.eurprd04.prod.outlook.com>
+x-forefront-prvs: 09778E995A
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(376002)(366004)(39860400002)(346002)(396003)(136003)(189003)(199004)(2616005)(25786009)(54906003)(110136005)(66066001)(486006)(478600001)(476003)(6306002)(6512007)(1076003)(26005)(2906002)(71190400001)(6436002)(71200400001)(3846002)(106356001)(5660300002)(105586002)(86362001)(6116002)(6486002)(4326008)(4744005)(36756003)(8936002)(97736004)(186003)(81166006)(102836004)(966005)(2501003)(256004)(6506007)(52116002)(386003)(8676002)(81156014)(305945005)(7736002)(50226002)(316002)(68736007)(53936002)(44832011)(99286004)(14454004);DIR:OUT;SFP:1101;SCL:1;SRVR:DB7PR04MB5050;H:DB7PR04MB4252.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: nxp.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: GafnG1DJsT1BqkMS+NQXCOr30J52VylHMVQOHjT8rYbrNucX3GWLz2kVdtCazNGJFjEB4D1OkszVoy4GlH8Ukks0U60n9tttX1W6HATcdcT0lk4lLMzTJFZf2A8X1F0bga7PT/z1pp5RLhvxlkKt0gGqjzWR+zfa7Qi9UigSjbUwK70nWMWbotzjLLy9+7E8GoO9Bpk86PW74scll4FAgUe4v7TFGUokkLxHGBR9YuUiAETuns5HU6q/pePMoO5zXb52lWoWAjyb2I2vXwAyKVK68785A0WhR8MZOvGTIngGk3tRYvfGpmQZwa5WRZm6ea3fWKNKEc1pGnlVZnHGZtT0eWPSon+gNNyKDYQfaq8hChBFvJep+CPiOSCupFtTGQmtEhGRxli7kOWJebzRjRp5bnEzxgKjnWdn2KaSmcU=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f7a0d04c-339e-d9f8-7188-a27d55ad8b4d@rock-chips.com>
-User-Agent: Mutt/1.11.3 (2019-02-01)
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5e1ea9ed-b6d2-46a1-d4b8-08d6a8fb7143
+X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Mar 2019 04:05:21.4495
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB7PR04MB5050
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Zhang,
+This patchset cleans up caam job ring driver.
+The patch series needs to be applied after merging below mentioned
+patch.
 
-On Mon, Jan 28, 2019 at 11:14:32AM +0800, Tao Huang wrote:
-> Hi Eric and Heiko:
-> 
-> >> On Sat, 26 Jan 2019 at 22:05, Eric Biggers <ebiggers@kernel.org> wrote:
-> >>>
-> >>> Hello,
-> >>>
-> >>> I don't know whether anyone is actually maintaining the Rockchip crypto driver
-> >>> in drivers/crypto/rockchip/, but it's failing the improved crypto tests
-> >>> that I currently have out for review: https://patchwork.kernel.org/cover/10778089/
-> 
-> Zhang Zhijie, engineer from Rockchip, will try to fix this software bug.
-> 
-> >>>
-> >>> See the boot logs for RK3288 from the KernelCI job here:
-> >>>
-> >>> https://storage.kernelci.org/ardb/for-kernelci/v5.0-rc1-86-geaffe22db9d1/arm/multi_v7_defconfig/lab-collabora/boot-rk3288-rock2-square.txt
-> >>> https://storage.kernelci.org/ardb/for-kernelci/v5.0-rc1-86-geaffe22db9d1/arm/multi_v7_defconfig/lab-collabora/boot-rk3288-veyron-jaq.txt
-> >>>
-> >>> alg: skcipher: ecb-aes-rk encryption test failed (wrong result) on test vector 0, cfg=\"random: use_digest src_divs=[15.64%@+3258, 84.36%@+4059] dst_divs=[69.11%@+1796, 8.49%@+4027, 6.34%@+1, 16.6%@+4058] iv_offset=21\"
-> >>> alg: skcipher: cbc-aes-rk encryption test failed (wrong result) on test vector 0, cfg=\"random: may_sleep use_digest src_divs=[100.0%@alignmask+3993] dst_divs=[65.31%@alignmask+1435, 34.69%@+14]\"
-> >>> alg: skcipher: ecb-des-rk encryption test failed (wrong result) on test vector 0, cfg=\"random: may_sleep use_final src_divs=[<flush> 66.52%@+11, 33.48%@+1519] dst_divs=[58.82%@+1, 19.43%@+4082, 21.75%@+8]\"
-> >>> alg: skcipher: cbc-des-rk encryption test failed (wrong result) on test vector 0, cfg=\"random: may_sleep use_finup src_divs=[100.0%@+3980] dst_divs=[60.4%@+3763, 23.9%@+4011, 16.87%@+4046]\"
-> >>> alg: skcipher: ecb-des3-ede-rk encryption test failed (wrong result) on test vector 0, cfg=\"random: may_sleep use_digest src_divs=[100.0%@+4] dst_divs=[47.25%@+19, 14.83%@+22, 37.92%@+31]\"
-> >>> alg: skcipher: cbc-des3-ede-rk encryption test failed (wrong result) on test vector 0, cfg=\"two even aligned splits\"
-> >>>
-> >>> In other words: the ecb-aes-rk, cbc-aes-rk, ecb-des-rk, cbc-des-rk,
-> >>> ecb-des3-ede-rk, and cbc-des3-ede-rk algorithms are failing because they produce
-> >>> the wrong ciphertext on some scatterlist layouts.
-> >>>
-> >>> You can reproduce by pulling from
-> >>> https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git
-> >>> branch "testmgr-improvements", unsetting CONFIG_CRYPTO_MANAGER_DISABLE_TESTS,
-> >>> setting CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y, rebooting and checking dmesg.
-> >>>
-> >>> Note that I don't have this hardware myself, so if it turns out that no one is
-> >>> interested in fixing this anytime soon I'll instead have to propose disabling
-> >>> these algorithms until they can be fixed.
-> >>>
-> >>> Thanks,
-> >>>
-> >>> - Eric
-> >>
+https://www.mail-archive.com/linux-crypto@vger.kernel.org/msg37068.html
 
-Thanks for the fixes, but I've improved the self-tests more, and there is
-another bug.  See the KernelCI job here:
+Vakul Garg (3):
+  crypto: caam/jr - Remove spinlock for output job ring
+  crypto: caam/jr - Remove redundant vars from job ring private data
+  crypto: caam/jr - Remove extra memory barrier during job ring enqueue
 
-	https://kernelci.org/boot/all/job/ardb/branch/for-kernelci/kernel/v5.0-11071-g7d597cc3f0ef/
+ drivers/crypto/caam/intern.h |  3 ---
+ drivers/crypto/caam/jr.c     | 17 +++++------------
+ 2 files changed, 5 insertions(+), 15 deletions(-)
 
-The self-tests are failing on the rk3288-rock2-square platform:
+--=20
+2.13.6
 
-	alg: skcipher: cbc-aes-rk encryption test failed (wrong output IV) on test vector 0, cfg=\"in-place\"
-	alg: skcipher: cbc-des-rk encryption test failed (wrong output IV) on test vector 0, cfg=\"in-place\"
-	alg: skcipher: cbc-des3-ede-rk encryption test failed (wrong output IV) on test vector 0, cfg=\"in-place\"
-
-The issue is that the self-tests now verify that CBC implementations update the
-IV buffer to contain the next IV, aka the last ciphertext block.  But the
-Rockchip crypto driver doesn't do that, so it needs to be fixed.
-
-This has always been a requirement for CBC implementations so that users can
-chain CBC requests.  Unfortunately it was just never tested for...
-
-This should be easily reproducible using the mainline kernel.
-
-- Eric
