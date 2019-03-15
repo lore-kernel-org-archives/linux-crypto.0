@@ -1,125 +1,75 @@
 Return-Path: <SRS0=TeaG=RS=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Level: *
+X-Spam-Status: No, score=1.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,MAILING_LIST_MULTI,SPF_PASS,
+	USER_AGENT_MUTT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD2E7C43381
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 Mar 2019 11:25:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDE32C43381
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 Mar 2019 16:13:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7C6DF2184C
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 Mar 2019 11:25:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="badW8M1M"
+	by mail.kernel.org (Postfix) with ESMTP id AB5DE218A1
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 Mar 2019 16:13:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1552666425;
+	bh=reQyTHZwM4Y9KktK1ht8e2adzVEXBHMtrKNobmABwm0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=aAxG9+bx0sa1lNkZXScHPMkBUbq7UqL8D15LV4+3w2W7tKf3E36aipsXfQLfRvNTv
+	 Snvdsx0Bj2AYoUWo3j+PIsS+1C4bVfqCqfVkg0C8D9BcExD0AGH1H0322R+DU1t1jX
+	 hkSbmz8W2Iw2VbMrZYS5dfzb1IHjOz4QmX8ocqhM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728730AbfCOLZb (ORCPT
+        id S1729499AbfCOQNp (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 15 Mar 2019 07:25:31 -0400
-Received: from mail-eopbgr70058.outbound.protection.outlook.com ([40.107.7.58]:49846
-        "EHLO EUR04-HE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726785AbfCOLZa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 15 Mar 2019 07:25:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dGakhChNRo9dfWTUfS3cRzJ3fdqvF6SCppledGRgTHI=;
- b=badW8M1MHodCRb6qSAEQcMHXsb9XUAddCEtTlrDCM9k6zVUnNoPVY3ZjGIi6mwInTnspbHhMWtXlUnsicBDwZ1QEOvzBpnqZtVY7+3JdlTQtpLHHGgWuxUa+lW5McOC25iznWuwbk/mxx16n7SjyxZlWb0WWW2Da4ksLbGvf4ZQ=
-Received: from DB7PR04MB4252.eurprd04.prod.outlook.com (52.135.131.26) by
- DB7PR04MB4428.eurprd04.prod.outlook.com (52.135.137.154) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1709.13; Fri, 15 Mar 2019 11:25:25 +0000
-Received: from DB7PR04MB4252.eurprd04.prod.outlook.com
- ([fe80::9ca:d78:c154:25b5]) by DB7PR04MB4252.eurprd04.prod.outlook.com
- ([fe80::9ca:d78:c154:25b5%4]) with mapi id 15.20.1709.011; Fri, 15 Mar 2019
- 11:25:25 +0000
-From:   Vakul Garg <vakul.garg@nxp.com>
-To:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
-CC:     Horia Geanta <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Vakul Garg <vakul.garg@nxp.com>
-Subject: [PATCH v2 3/3] crypto: caam/jr - Remove extra memory barrier during
- job ring enqueue
-Thread-Topic: [PATCH v2 3/3] crypto: caam/jr - Remove extra memory barrier
- during job ring enqueue
-Thread-Index: AQHU2yHJ0NGh70TZ50KNYr94J5qJrA==
-Date:   Fri, 15 Mar 2019 11:25:25 +0000
-Message-ID: <20190315112238.24337-4-vakul.garg@nxp.com>
-References: <20190315112238.24337-1-vakul.garg@nxp.com>
-In-Reply-To: <20190315112238.24337-1-vakul.garg@nxp.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: PN1PR0101CA0018.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:c00:e::28) To DB7PR04MB4252.eurprd04.prod.outlook.com
- (2603:10a6:5:27::26)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vakul.garg@nxp.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-mailer: git-send-email 2.13.6
-x-originating-ip: [92.120.1.70]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 929f4936-fc2f-4bb6-7edf-08d6a938eb1e
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600127)(711020)(4605104)(4618075)(2017052603328)(7153060)(7193020);SRVR:DB7PR04MB4428;
-x-ms-traffictypediagnostic: DB7PR04MB4428:
-x-microsoft-antispam-prvs: <DB7PR04MB44287983CAE877F1300E049C8B440@DB7PR04MB4428.eurprd04.prod.outlook.com>
-x-forefront-prvs: 09778E995A
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(396003)(136003)(346002)(366004)(376002)(39860400002)(199004)(189003)(6436002)(6486002)(8676002)(316002)(8936002)(81156014)(81166006)(2906002)(50226002)(66066001)(2501003)(86362001)(6512007)(486006)(1076003)(256004)(14444005)(2616005)(14454004)(11346002)(476003)(25786009)(44832011)(71190400001)(71200400001)(99286004)(76176011)(4326008)(36756003)(68736007)(478600001)(105586002)(52116002)(446003)(53936002)(97736004)(186003)(6506007)(54906003)(386003)(110136005)(26005)(102836004)(6116002)(305945005)(7736002)(5660300002)(3846002)(106356001);DIR:OUT;SFP:1101;SCL:1;SRVR:DB7PR04MB4428;H:DB7PR04MB4252.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: nxp.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: kQyW3F+WHVQKTPs9k7+JGa3FqjIvv4YIg1DsQrIVhbraAWqVOALJ06/zX3l+7DdlbfACqLo5+omJJl2AyrYKLl5vuqFp53Cr0zSwAt1lW8KzK/PL4vM5lv+R43wYSYV/xLso7cpPd4qvzMpL3fGRMaz2FqcvUMZHl0TaDMCC+0mCEPt8Lh5ZeGA0wA21DkTQRcr/ji6arZSV0B1cJpB/dCdt3tNlZCTfl7OURZu1gsWv/Tb+1PiPMMxAoCsB7sKg/vRVJf4H+qEI6WYOIg42bsf5jxultyTfZhN3OG0lvwjxFF7UhG+jMVLKMfDa8O9V4v89miiF2d4ilX2OvHEU8iFa9UMKkQc2bszNQ8HPnMnDeEe3pDcW9QgSPNI32l2KS8uGWn5ANAd0hzOuRL7pZSiVuf2V1xjvi9uTn27VrnM=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+        Fri, 15 Mar 2019 12:13:45 -0400
+Received: from mail.kernel.org ([198.145.29.99]:45310 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729497AbfCOQNo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 15 Mar 2019 12:13:44 -0400
+Received: from gmail.com (unknown [104.132.1.77])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4651121871;
+        Fri, 15 Mar 2019 16:13:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1552666424;
+        bh=reQyTHZwM4Y9KktK1ht8e2adzVEXBHMtrKNobmABwm0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=E+zAfURDW3Ym1hJNvI1F3IcWKvxUoDhv1I3KP/DP4tBHxJ80paovn1J2kYWpi8X7v
+         cgVIRLTlIbEMDUTcZqIdsHDM/I60j6PA5DpoHkgh2QC3CwY5BB/5t9fB4bvd+59Ixq
+         TQM/Hgls/bopwOrMS4OnxmYNoQqVYRTUGySvgecc=
+Date:   Fri, 15 Mar 2019 09:13:42 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Petr Vorel <pvorel@suse.cz>
+Cc:     ltp@lists.linux.it, linux-crypto@vger.kernel.org
+Subject: Re: [LTP] [PATCH 4/6] crypto/af_alg03: new regression test for
+ rfc7539 hash alg validation
+Message-ID: <20190315161341.GA77949@gmail.com>
+References: <20190221053026.18489-1-ebiggers@kernel.org>
+ <20190221053026.18489-5-ebiggers@kernel.org>
+ <20190315092952.GA4990@dell5510>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 929f4936-fc2f-4bb6-7edf-08d6a938eb1e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Mar 2019 11:25:25.4946
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB7PR04MB4428
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190315092952.GA4990@dell5510>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-In caam_jr_enqueue(), a write barrier is needed to order stores to job
-ring slot before declaring addition of new job into input job ring.
-The register write is done using wr_reg32() which internally uses
-iowrite32() for write operation. The api iowrite32() issues a write
-barrier before issuing write operation. Therefore, the wmb() preceding
-wr_reg32() can be safely removed.
+Hi Petr,
 
-Signed-off-by: Vakul Garg <vakul.garg@nxp.com>
----
- drivers/crypto/caam/jr.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+On Fri, Mar 15, 2019 at 10:29:53AM +0100, Petr Vorel wrote:
+> Hi Eric,
+> 
+> you forget to add af_alg03 into runtest/cve.
+> The same applies to af_alg0{4,5}.
+> 
+> 
+> Kind regards,
+> Petr
 
-diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
-index e95f82778fa1..1de2562d0982 100644
---- a/drivers/crypto/caam/jr.c
-+++ b/drivers/crypto/caam/jr.c
-@@ -371,9 +371,11 @@ int caam_jr_enqueue(struct device *dev, u32 *desc,
-=20
- 	/*
- 	 * Ensure that all job information has been written before
--	 * notifying CAAM that a new job was added to the input ring.
-+	 * notifying CAAM that a new job was added to the input ring
-+	 * using a memory barrier. The wr_reg32() uses api iowrite32()
-+	 * to do the register write. iowrite32() issues a memory barrier
-+	 * before the write operation.
- 	 */
--	wmb();
-=20
- 	wr_reg32(&jrp->rregs->inpring_jobadd, 1);
-=20
---=20
-2.13.6
+As far as I know, there are no CVEs assigned for those bugs.
 
+- Eric
