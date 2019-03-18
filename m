@@ -2,136 +2,118 @@ Return-Path: <SRS0=sPcw=RV=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20512C43381
-	for <linux-crypto@archiver.kernel.org>; Mon, 18 Mar 2019 09:13:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88189C43381
+	for <linux-crypto@archiver.kernel.org>; Mon, 18 Mar 2019 14:45:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DF9F220811
-	for <linux-crypto@archiver.kernel.org>; Mon, 18 Mar 2019 09:13:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bKm6PagN"
+	by mail.kernel.org (Postfix) with ESMTP id 5829D20872
+	for <linux-crypto@archiver.kernel.org>; Mon, 18 Mar 2019 14:45:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1552920300;
+	bh=HwXCDnAmAfVpJA6mMpOMq52cSwatbsyVLSlmJQw+e3Q=;
+	h=Date:From:To:cc:Subject:In-Reply-To:References:List-ID:From;
+	b=uxgbF2qlYjySJt63T0gtFfEkdT5ZM9X4lNAi2YC2PPTSmuLp/K7aNEm3WMcizRiMr
+	 V78p1FypsqNnT1lRqv8LPXkNqUMGzXX1VlGcFwQG726lTd23rHMsU13q62SQniyOOq
+	 SDFExoVqh2pMS+igP1Dxuyq9O0ez2kTYAkeiDp1g=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726691AbfCRJNv (ORCPT
+        id S1726906AbfCROo7 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 18 Mar 2019 05:13:51 -0400
-Received: from mail-it1-f195.google.com ([209.85.166.195]:56283 "EHLO
-        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726594AbfCRJNv (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 18 Mar 2019 05:13:51 -0400
-Received: by mail-it1-f195.google.com with SMTP id z126so16515376itd.5
-        for <linux-crypto@vger.kernel.org>; Mon, 18 Mar 2019 02:13:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=8uE2320ZkGegzn6C2nz3VmLnLyOznFffq4WgiPNHhKg=;
-        b=bKm6PagNd6AosOHCCgPW2wXZrQ8BiO3G9j2acIddrVIegcMk9CkyWKvoDqwdsUpcnA
-         4/0+a1p6SfovX7GaexVFgTAOTV0mXiiSfWQ2T42MeUN14uNbJ6SYsVGU4RVdhce8zj7o
-         GKiExM/X9ULYMAz8zSKgto/jznFsQkOI7gQ9MSj7p9EepCnXDel063yh3ilkDKQTfJFa
-         GPSfJzP0A+QLIAZN3JWgTxsPPvps9t0HpaxBeEdf6BWMYY1d9Y4gjqDOiGb8Ff/S1x3W
-         8jqW7KTrlxonVaavSeYvSNOeyMCC+kTWvx7GvhJd7YeRHUgF2dNQ9Wxilragd+ZFAn7x
-         iDmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=8uE2320ZkGegzn6C2nz3VmLnLyOznFffq4WgiPNHhKg=;
-        b=mZggd8jERCe5z2x07pBhX8SFYUhXM/X9x5s0WmrgUTYXmEfJsjjs4Y28Fv2DZ181fU
-         /eIY1s77zA1787ZNOcimRc7B9c5O5rva3Yw1eOI/WeC/jXJY9jRKDmGPKXQVpjrO9a6H
-         KwbZwaNYAP9+MWvhtw6rb4g9Ikai6ptoYMG8wfcpf1z1XT81AHcrHkGM5qkLJKpHV2an
-         ke+mClTPK4l0B6QjKeJMR9jvDDsZPVpudO/FvP2abp9cnL0YI+iHE76sGp8grUEYNlT+
-         tXwIXtxwEI58oUWh7OI95gnXZKppKZD8Vm3TVJ1duj80Ne2D4CsnFgFIt6s4IFPGqrjF
-         mYLA==
-X-Gm-Message-State: APjAAAVmqk89O8jtFDzdaHjxHI52X3PspuJ/3u6FG4nCfKGnOnmgzQiq
-        QaFjYv7AcDeIsrsI4VKUp2y07IBt+ahUhboCLyoJIA==
-X-Google-Smtp-Source: APXvYqyN0p2A1jJRUW5/NfS5vOSEU8kd82YZzNZrq5nGnaSLkgKcrNgzdrRSmsJxzGRS03+WgjEhIxIfWK0oLp98XUU=
-X-Received: by 2002:a05:660c:a54:: with SMTP id j20mr550217itl.158.1552900430151;
- Mon, 18 Mar 2019 02:13:50 -0700 (PDT)
+        Mon, 18 Mar 2019 10:44:59 -0400
+Received: from mail.kernel.org ([198.145.29.99]:38968 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726846AbfCROo7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 18 Mar 2019 10:44:59 -0400
+Received: from pobox.suse.cz (prg-ext-pat.suse.com [213.151.95.130])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 072C320850;
+        Mon, 18 Mar 2019 14:44:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1552920298;
+        bh=HwXCDnAmAfVpJA6mMpOMq52cSwatbsyVLSlmJQw+e3Q=;
+        h=Date:From:To:cc:Subject:In-Reply-To:References:From;
+        b=1vNwvI52i00JZparX3X62xkkFJOAFiMQ/5aoQvs+dRDl2mya/UVN7b4oRILrhSBoE
+         o54lnpHIVxD4lUwf9T1bZ4noSmJEPO2VnbCIWY11VcvSnON8vYkgQKfP859l75TkMT
+         zb8EHh6FzCbCDvz0tPb6DMLdW/8Ne//qEaSGPZOE=
+Date:   Mon, 18 Mar 2019 15:44:55 +0100 (CET)
+From:   Jiri Kosina <jikos@kernel.org>
+To:     Andrej Shadura <andrew.shadura@collabora.co.uk>
+cc:     linux-input@vger.kernel.org, linux-usb@vger.kernel.org,
+        kernel@collabora.com, Theodore Ts'o <tytso@mit.edu>,
+        Vasily Khoruzhick <anarsoul@gmail.com>,
+        Nick Kossifidis <mickflemm@gmail.com>,
+        linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v2] HID: add driver for U2F Zero built-in LED and RNG
+In-Reply-To: <20190309183213.7598-1-andrew.shadura@collabora.co.uk>
+Message-ID: <nycvar.YFH.7.76.1903181542260.19912@cbobk.fhfr.pm>
+References: <20190309183213.7598-1-andrew.shadura@collabora.co.uk>
+User-Agent: Alpine 2.21 (LSU 202 2017-01-01)
 MIME-Version: 1.0
-References: <20190315020901.16509-1-dja@axtens.net> <20190315022414.GA1671@sol.localdomain>
- <875zsku5mk.fsf@dja-thinkpad.axtens.net> <20190315043433.GC1671@sol.localdomain>
- <87pnqo7ewp.fsf@concordia.ellerman.id.au>
-In-Reply-To: <87pnqo7ewp.fsf@concordia.ellerman.id.au>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Mon, 18 Mar 2019 10:13:39 +0100
-Message-ID: <CAKv+Gu_w_d5AbkYu=fdK1ver97G4O_rqu9o9tNy_-zNaAOnkkA@mail.gmail.com>
-Subject: Re: [PATCH] crypto: vmx - fix copy-paste error in CTR mode
-To:     Michael Ellerman <mpe@ellerman.id.au>
-Cc:     Eric Biggers <ebiggers@kernel.org>, Daniel Axtens <dja@axtens.net>,
-        leo.barbosa@canonical.com,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Stephan Mueller <smueller@chronox.de>, nayna@linux.ibm.com,
-        omosnacek@gmail.com, leitao@debian.org, pfsmorigo@gmail.com,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>, marcelo.cerri@canonical.com,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 18 Mar 2019 at 09:41, Michael Ellerman <mpe@ellerman.id.au> wrote:
->
-> Eric Biggers <ebiggers@kernel.org> writes:
-> > On Fri, Mar 15, 2019 at 03:24:35PM +1100, Daniel Axtens wrote:
-> ...
-> >> >> This leads to corruption of the IV, which leads to subsequent blocks
-> >> >> being corrupted.
-> >> >>
-> >> >> This can be detected with libkcapi test suite, which is available at
-> >> >> https://github.com/smuellerDD/libkcapi
-> >> >
-> >> > Is this also detected by the kernel's crypto self-tests, and if not why not?
-> >> > What about with the new option CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y?
-> >>
-> >> It seems the self-tests do not catch it. To catch it, there has to be a
-> >> test where the blkcipher_walk creates a walk.nbytes such that
-> >> [(the number of AES blocks) mod 8] is either 2 or 3. This happens with
-> >> AF_ALG pretty frequently, but when I booted with self-tests it only hit
-> >> 1, 4, 5, 6 and 7 - it missed 0, 2 and 3.
-> >>
-> >> I don't have the EXTRA_TESTS option - I'm testing with 5.0-rc6. Is it in
-> >> -next?
-> >
-> > The improvements I recently made to the self-tests are intended to catch exactly
-> > this sort of bug.  They were just merged for v5.1, so try the latest mainline.
-> > This almost certainly would be caught by EXTRA_TESTS (and if not I'd want to
-> > know), but it may be caught by the regular self-tests now too.
->
-> Enabling the crypto tests (CONFIG_CRYPTO_MANAGER_DISABLE_TESTS=n)
-> actually hides the bug for me.
->
-> By which I mean I can't trigger the bug via kcapi-enc-tests.sh, because
-> the VMX code is never called.
->
-> ie:
->   # zgrep -e CRYPTO_MANAGER -e VMX /proc/config.gz
->   CONFIG_CRYPTO_MANAGER=y
->   CONFIG_CRYPTO_MANAGER2=y
->   # CONFIG_CRYPTO_MANAGER_DISABLE_TESTS is not set
->   # CONFIG_CRYPTO_MANAGER_EXTRA_TESTS is not set
->   CONFIG_CRYPTO_DEV_VMX=y
->   CONFIG_CRYPTO_DEV_VMX_ENCRYPT=y
->
->   # echo "p:p8_aes_ctr_crypt p8_aes_ctr_crypt" > /sys/kernel/debug/tracing/kprobe_events
->   # echo 1 > /sys/kernel/debug/tracing/events/kprobes/enable
->   # ./kcapi-enc-test.sh
->   ...
->   Number of failures: 0
->   # grep -c p8_aes_ctr_crypt  /sys/kernel/debug/tracing/trace
->   0
->
->
-> I don't understand how the crypto core chooses which crypto_alg to use,
-> but I didn't expect enabling the tests to change it?
->
+On Sat, 9 Mar 2019, Andrej Shadura wrote:
 
-This is not entirely unexpected. Based on the tests, algos that are
-found to be broken are disregarded for further use, and you should see
-a warning in the kernel log about this.
+> U2F Zero supports custom commands for blinking the LED and getting data
+> from the internal hardware RNG. Expose the blinking function as a LED
+> device, and the internal hardware RNG as an HWRNG so that it can be used
+> to feed the enthropy pool.
+> 
+> Signed-off-by: Andrej Shadura <andrew.shadura@collabora.co.uk>
+> ---
+> 
+> This version of the patch sets the quality to 1.
+> 
+> ---
+>  drivers/hid/Kconfig       |  15 ++
+>  drivers/hid/Makefile      |   1 +
+>  drivers/hid/hid-ids.h     |   1 +
+>  drivers/hid/hid-u2fzero.c | 371 ++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 388 insertions(+)
+>  create mode 100644 drivers/hid/hid-u2fzero.c
+> 
+> diff --git a/drivers/hid/Kconfig b/drivers/hid/Kconfig
+> index 41e9935fc584..4f1b8939561d 100644
+> --- a/drivers/hid/Kconfig
+> +++ b/drivers/hid/Kconfig
+> @@ -989,6 +989,21 @@ config HID_UDRAW_PS3
+>  	  Say Y here if you want to use the THQ uDraw gaming tablet for
+>  	  the PS3.
+>  
+> +config HID_U2FZERO
+> +	tristate "U2F Zero LED and RNG support"
+> +	depends on HID
+> +	depends on LEDS_CLASS
+> +	help
+> +	  Support for the LED of the U2F Zero device.
+> +
+> +	  U2F Zero supports custom commands for blinking the LED
+> +	  and getting data from the internal hardware RNG.
+> +	  The internal hardware can be used to feed the enthropy pool.
+> +
+> +	  U2F Zero only supports blinking its LED, so this driver doesn't
+> +	  allow setting the brightness to anything but 1, which will
+> +	  trigger a single blink and immediately reset to back 0.
+> +
+
+This driver isn't really a generic (transport-agnostic) one (which also 
+means it's missing USB dependency in Kconfig btw).
+
+Is there a reason why it can't be abstracted that way so that it'd fit our 
+principal model in HID subsystem?
+
+Also, I've looked at it really briefly, but can't it be easily implemented 
+in userspace?
+
+Thanks,
+
+-- 
+Jiri Kosina
+SUSE Labs
+
