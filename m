@@ -6,32 +6,33 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 214A9C43381
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 Mar 2019 13:58:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A505FC4360F
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 Mar 2019 14:11:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EF9EC2075E
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 Mar 2019 13:58:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 80D7E20850
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 Mar 2019 14:11:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726717AbfCSN6I (ORCPT
+        id S1727218AbfCSOLj (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 19 Mar 2019 09:58:08 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:36132 "EHLO huawei.com"
+        Tue, 19 Mar 2019 10:11:39 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:48574 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726703AbfCSN6I (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 19 Mar 2019 09:58:08 -0400
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 4A18B6D76509E424B1DD;
-        Tue, 19 Mar 2019 21:58:04 +0800 (CST)
-Received: from localhost (10.177.31.96) by DGGEMS401-HUB.china.huawei.com
- (10.3.19.201) with Microsoft SMTP Server id 14.3.408.0; Tue, 19 Mar 2019
- 21:57:54 +0800
+        id S1727234AbfCSOLj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 19 Mar 2019 10:11:39 -0400
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 6D0DCE594D1B2554A3FB;
+        Tue, 19 Mar 2019 22:11:35 +0800 (CST)
+Received: from localhost (10.177.31.96) by DGGEMS412-HUB.china.huawei.com
+ (10.3.19.212) with Microsoft SMTP Server id 14.3.408.0; Tue, 19 Mar 2019
+ 22:11:26 +0800
 From:   Yue Haibing <yuehaibing@huawei.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <george.cherian@cavium.com>
 CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
         YueHaibing <yuehaibing@huawei.com>
-Subject: [PATCH -next] crypto: brcm - remove unused array tag_to_hash_idx
-Date:   Tue, 19 Mar 2019 21:57:49 +0800
-Message-ID: <20190319135749.3188-1-yuehaibing@huawei.com>
+Subject: [PATCH -next] crypto: cavium - Make cptvf_device_init static
+Date:   Tue, 19 Mar 2019 21:59:32 +0800
+Message-ID: <20190319135932.4764-1-yuehaibing@huawei.com>
 X-Mailer: git-send-email 2.10.2.windows.1
 MIME-Version: 1.0
 Content-Type: text/plain
@@ -44,27 +45,28 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: YueHaibing <yuehaibing@huawei.com>
 
-It's never used since introduction in commit
-9d12ba86f818 ("crypto: brcm - Add Broadcom SPU driver")
+Fix sparse warning:
+
+drivers/crypto/cavium/cpt/cptvf_main.c:644:6:
+ warning: symbol 'cptvf_device_init' was not declared. Should it be static?
 
 Signed-off-by: YueHaibing <yuehaibing@huawei.com>
 ---
- drivers/crypto/bcm/spu.c | 3 ---
- 1 file changed, 3 deletions(-)
+ drivers/crypto/cavium/cpt/cptvf_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/bcm/spu.c b/drivers/crypto/bcm/spu.c
-index dbb5c03..2baf6d7 100644
---- a/drivers/crypto/bcm/spu.c
-+++ b/drivers/crypto/bcm/spu.c
-@@ -22,9 +22,6 @@
- #include "spum.h"
- #include "cipher.h"
+diff --git a/drivers/crypto/cavium/cpt/cptvf_main.c b/drivers/crypto/cavium/cpt/cptvf_main.c
+index 2ca431e..88a0166 100644
+--- a/drivers/crypto/cavium/cpt/cptvf_main.c
++++ b/drivers/crypto/cavium/cpt/cptvf_main.c
+@@ -641,7 +641,7 @@ static void cptvf_write_vq_saddr(struct cpt_vf *cptvf, u64 val)
+ 	cpt_write_csr64(cptvf->reg_base, CPTX_VQX_SADDR(0, 0), vqx_saddr.u);
+ }
  
--/* This array is based on the hash algo type supported in spu.h */
--char *tag_to_hash_idx[] = { "none", "md5", "sha1", "sha224", "sha256" };
--
- char *hash_alg_name[] = { "None", "md5", "sha1", "sha224", "sha256", "aes",
- 	"sha384", "sha512", "sha3_224", "sha3_256", "sha3_384", "sha3_512" };
+-void cptvf_device_init(struct cpt_vf *cptvf)
++static void cptvf_device_init(struct cpt_vf *cptvf)
+ {
+ 	u64 base_addr = 0;
  
 -- 
 2.7.4
