@@ -2,70 +2,103 @@ Return-Path: <SRS0=fE7s=RX=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33CEBC43381
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Mar 2019 10:41:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD527C43381
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Mar 2019 13:26:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0BC692184E
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Mar 2019 10:41:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7348B213F2
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Mar 2019 13:26:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="Ctqbq4iC";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="XOLOBOma"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727028AbfCTKlI (ORCPT
+        id S1726239AbfCTN0R (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 20 Mar 2019 06:41:08 -0400
-Received: from baptiste.telenet-ops.be ([195.130.132.51]:40984 "EHLO
-        baptiste.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726006AbfCTKlH (ORCPT
+        Wed, 20 Mar 2019 09:26:17 -0400
+Received: from smtp.codeaurora.org ([198.145.29.96]:51334 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725905AbfCTN0R (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Mar 2019 06:41:07 -0400
-Received: from ramsan ([84.194.111.163])
-        by baptiste.telenet-ops.be with bizsmtp
-        id qAh51z0023XaVaC01Ah5ua; Wed, 20 Mar 2019 11:41:05 +0100
-Received: from rox.of.borg ([192.168.97.57])
-        by ramsan with esmtp (Exim 4.90_1)
-        (envelope-from <geert@linux-m68k.org>)
-        id 1h6Yee-0005M8-UF; Wed, 20 Mar 2019 11:41:04 +0100
-Received: from geert by rox.of.borg with local (Exim 4.90_1)
-        (envelope-from <geert@linux-m68k.org>)
-        id 1h6Yee-0005bb-R5; Wed, 20 Mar 2019 11:41:04 +0100
-From:   Geert Uytterhoeven <geert+renesas@glider.be>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Wed, 20 Mar 2019 09:26:17 -0400
+Received: by smtp.codeaurora.org (Postfix, from userid 1000)
+        id 4165C602F8; Wed, 20 Mar 2019 13:26:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1553088377;
+        bh=9T+9aiXF9SOsRPHXmnHvYnFf80F6j/O4VTxa8coK9Pw=;
+        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
+        b=Ctqbq4iCHYFLGk/iqaC7C2Ytwth1x3DJ8foNDzF/wDyWq+dxDGbyMZDdkVEgnxU8C
+         qr/PveEzgR6eKPBPWVvHpYRBrDtr6/9/MlSLFuVOPoY0tCjarb5NwCms30jGetycYD
+         PniihAvVemvzJM7rh7lWYPrRrXlDm8cb2713F+wI=
+Received: from [10.204.79.83] (blr-c-bdr-fw-01_globalnat_allzones-outside.qualcomm.com [103.229.19.19])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        (Authenticated sender: mojha@smtp.codeaurora.org)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id B034860312;
+        Wed, 20 Mar 2019 13:26:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1553088376;
+        bh=9T+9aiXF9SOsRPHXmnHvYnFf80F6j/O4VTxa8coK9Pw=;
+        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
+        b=XOLOBOma7MyztOZ8kjfYKaJASV4fj0eDefHCOBZqX6bd9uW2jyX+2DgEjfIflN90Z
+         AOg0EZsxQNS8IXo6kxd9ppT2yE4OnZ9iEQt/4Otr6UOKOEu/5/dAdW3psJ7MLm+qEG
+         HsL2TecWsmlxGKE2cj8bi8X84dVI1dz8wxIizQv8=
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org B034860312
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; spf=none smtp.mailfrom=mojha@codeaurora.org
+Subject: Re: [PATCH trivial] crypto: Grammar s/options/option/, s/to/the/
+To:     Geert Uytterhoeven <geert+renesas@glider.be>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         "David S . Miller" <davem@davemloft.net>,
         Jiri Kosina <trivial@kernel.org>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Geert Uytterhoeven <geert+renesas@glider.be>
-Subject: [PATCH trivial] crypto: Grammar s/options/option/, s/to/the/
-Date:   Wed, 20 Mar 2019 11:41:03 +0100
-Message-Id: <20190320104103.21506-1-geert+renesas@glider.be>
-X-Mailer: git-send-email 2.17.1
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20190320104103.21506-1-geert+renesas@glider.be>
+From:   Mukesh Ojha <mojha@codeaurora.org>
+Message-ID: <3333f63d-801c-d6c4-d6b1-5c871eee4282@codeaurora.org>
+Date:   Wed, 20 Mar 2019 18:56:09 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.4.0
+MIME-Version: 1.0
+In-Reply-To: <20190320104103.21506-1-geert+renesas@glider.be>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Fixes: ccb778e1841ce04b ("crypto: api - Add fips_enable flag")
-Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
----
- crypto/Kconfig | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index bbab6bf3351982c9..14f3a98e32f78d06 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -27,8 +27,8 @@ config CRYPTO_FIPS
- 	depends on (CRYPTO_ANSI_CPRNG || CRYPTO_DRBG) && !CRYPTO_MANAGER_DISABLE_TESTS
- 	depends on (MODULE_SIG || !MODULES)
- 	help
--	  This options enables the fips boot option which is
--	  required if you want to system to operate in a FIPS 200
-+	  This option enables the fips boot option which is
-+	  required if you want the system to operate in a FIPS 200
- 	  certification.  You should say no unless you know what
- 	  this is.
- 
--- 
-2.17.1
+On 3/20/2019 4:11 PM, Geert Uytterhoeven wrote:
+> Fixes: ccb778e1841ce04b ("crypto: api - Add fips_enable flag")
+> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> ---
+>   crypto/Kconfig | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/crypto/Kconfig b/crypto/Kconfig
+> index bbab6bf3351982c9..14f3a98e32f78d06 100644
+> --- a/crypto/Kconfig
+> +++ b/crypto/Kconfig
+> @@ -27,8 +27,8 @@ config CRYPTO_FIPS
+>   	depends on (CRYPTO_ANSI_CPRNG || CRYPTO_DRBG) && !CRYPTO_MANAGER_DISABLE_TESTS
+>   	depends on (MODULE_SIG || !MODULES)
+>   	help
+> -	  This options enables the fips boot option which is
+> -	  required if you want to system to operate in a FIPS 200
+> +	  This option enables the fips boot option which is
+> +	  required if you want the system to operate in a FIPS 200
 
+
+Reviewed-by: Mukesh Ojha <mojha@codeaurora.org>
+
+
+Thanks,
+Mukesh
+
+
+>   	  certification.  You should say no unless you know what
+>   	  this is.
+>   
