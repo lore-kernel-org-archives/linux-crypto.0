@@ -1,232 +1,90 @@
 Return-Path: <SRS0=fE7s=RX=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: *
-X-Spam-Status: No, score=1.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,MAILING_LIST_MULTI,SPF_PASS,
-	USER_AGENT_MUTT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38D45C10F05
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Mar 2019 18:57:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E048DC4360F
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Mar 2019 19:59:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 061FF21841
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Mar 2019 18:57:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A86542190A
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Mar 2019 19:59:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1553108245;
-	bh=jU9CC7/cwUq1tn+oMCzXLh4scS18THRBZAue4BKsS7g=;
+	s=default; t=1553111945;
+	bh=gp5n0il2dP3M7PXopfzX/0v2fTUPNCVmnzViLurpi2k=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=DgkPwKh89GKBS2CXGEU0v9kkiuzx8/54YQtFG9zqStoY5Lu1zQGvzWDor7UbWzkRy
-	 5riKCHoW92MKqBNvkIhnNlWJDwpcZZ+7QDTwOQNqRuzXYo7jMdv9iU/N6d+NvGxOOM
-	 +XleLcyCP5gix+kBOKFT7JKZnhn641v0yFHnYDmo=
+	b=khqsh7npU/V0alDsQnvDbsF9tjpIiYZbRou1CR4K+8OtHK3LnKMzSyrZo0k1zG9Ir
+	 tkSr85/RjQg6YxqKfYe03+Aa0sRPNKkOauXXCrrR3yG1NVVr6Pl9COAsJZZhSdaH56
+	 vywBNZoUszvQS3HUI0hYOa1MZWwXJ94UaMEEZ41c=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727103AbfCTS5Y (ORCPT
+        id S1726572AbfCTT7E (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 20 Mar 2019 14:57:24 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43828 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727062AbfCTS5X (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Mar 2019 14:57:23 -0400
-Received: from gmail.com (unknown [104.132.1.77])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 35C52206BA;
-        Wed, 20 Mar 2019 18:57:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1553108242;
-        bh=jU9CC7/cwUq1tn+oMCzXLh4scS18THRBZAue4BKsS7g=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=aWPdUEOCxrvBlwDE+7K2wdjzuuigEDqZTaAD+vsE1JIMwEnZkBxK0E6Tk8a7ZEGj6
-         IUXiiFPhx9crVD9zlnZpaBDlDWvI4qPTJlGJtoYALy7RJlA2xgYpcDNV5NOkWAwmlm
-         P1lYonc179XpoR+OPMvwkl92YibgKft0h7rTS7Ss=
-Date:   Wed, 20 Mar 2019 11:57:20 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     Geert Uytterhoeven <geert@linux-m68k.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-security-module@vger.kernel.org,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: crypto: Kernel memory overwrite attempt detected to spans
- multiple pages
-Message-ID: <20190320185719.GB180195@gmail.com>
-References: <CAMuHMdWhx0-kspDyLOgTp+9udiBpkMHULSGyMg9uPPV16=FWQg@mail.gmail.com>
- <20190319170911.GB202956@gmail.com>
+        Wed, 20 Mar 2019 15:59:04 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:46646 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726403AbfCTT7D (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 20 Mar 2019 15:59:03 -0400
+Received: by mail-wr1-f67.google.com with SMTP id o1so4140890wrs.13;
+        Wed, 20 Mar 2019 12:59:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=Set6nLx7VA7za62jApDxAnNgGkHuhZYBfmaEV0aRmkM=;
+        b=GdL/8oAE/I3x4rhT3XYRWeTznJggSd4B3uPHikrfqpHd4QL+aSUWNTrK4Cnv0822G0
+         qkg3+9NtKFm3WPJBB8wUMaUOSrSc1sxltPjwEu7d8UY8TR+aeHWb709vnlUBEodq3NpH
+         iUvgGlzKRlFs5otn4ik2eszWB1XgYjw9Lyv7uDCYtjKpkMB/jUfS57hOQWeOg0QQs/Ps
+         sizoDdMnSXZqb30wWJBKuOC9DgCfB/UK4aMghWfTaZ3n8dVPOZcEEhajTMajrKMp+lqS
+         kmIKv83f2wrofNY4ixywHUUFwojtAGIoOdvG5lRnetSLswQOv7wejiyEseJ4jlEdNxNl
+         VWXA==
+X-Gm-Message-State: APjAAAWlJTSjmMUAgcj4h2U3BmbduL3/H7n9AfdTPDUp4zKx6WlRDMOO
+        YRCOjcgDh3KGudfOu8oHgqM=
+X-Google-Smtp-Source: APXvYqxScdNZ9esBRpbCleJvja+bsu4THzGjS7Ri4GCl0bM0mHtB8jpo0pqOB+jhjzDwW2KrWvRYJQ==
+X-Received: by 2002:a5d:43c9:: with SMTP id v9mr4561108wrr.269.1553111941786;
+        Wed, 20 Mar 2019 12:59:01 -0700 (PDT)
+Received: from kozik-lap ([194.230.155.153])
+        by smtp.googlemail.com with ESMTPSA id n13sm4414450wrw.67.2019.03.20.12.59.00
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Wed, 20 Mar 2019 12:59:00 -0700 (PDT)
+Date:   Wed, 20 Mar 2019 20:58:58 +0100
+From:   Krzysztof Kozlowski <krzk@kernel.org>
+To:     Kamil Konieczny <k.konieczny@partner.samsung.com>
+Cc:     Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Kukjin Kim <kgene@kernel.org>, devicetree@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Marek Szyprowski <m.szyprowski@samsung.com>
+Subject: Re: [PATCH v4 1/3] arm64: dts: exynos: add SlimSSS for Exynos5433
+Message-ID: <20190320195858.GB9956@kozik-lap>
+References: <20190222122144.19024-1-k.konieczny@partner.samsung.com>
+ <CGME20190222122203eucas1p19a77c1cb72526ce36e99542926fd5a17@eucas1p1.samsung.com>
+ <20190222122144.19024-2-k.konieczny@partner.samsung.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190319170911.GB202956@gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20190222122144.19024-2-k.konieczny@partner.samsung.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Mar 19, 2019 at 10:09:13AM -0700, Eric Biggers wrote:
-> On Tue, Mar 19, 2019 at 12:54:23PM +0100, Geert Uytterhoeven wrote:
-> > When running the sha1-asm crypto selftest on arm with
-> > CONFIG_HARDENED_USERCOPY_PAGESPAN=y:
-> > 
-> >     usercopy: Kernel memory overwrite attempt detected to spans
-> > multiple pages (offset 0, size 42)!
-> >     ------------[ cut here ]------------
-> >     kernel BUG at mm/usercopy.c:102!
-> >     Internal error: Oops - BUG: 0 [#1] SMP ARM
-> >     Modules linked in:
-> >     CPU: 0 PID: 35 Comm: cryptomgr_test Not tainted
-> > 5.1.0-rc1-koelsch-01109-gbeb7d6376ecfbf07-dirty #397
-> >     Hardware name: Generic R-Car Gen2 (Flattened Device Tree)
-> >     PC is at usercopy_abort+0x68/0x90
-> >     LR is at usercopy_abort+0x68/0x90
-> >     pc : [<c030fd60>]    lr : [<c030fd60>]    psr: 60000013
-> >     sp : ea54bc60  ip : 00000010  fp : cccccccd
-> >     r10: 00000000  r9 : c0e0ce04  r8 : ea54d009
-> >     r7 : ea54d00a  r6 : 00000000  r5 : 0000002a  r4 : c09d1120
-> >     r3 : dd6cd422  r2 : dd6cd422  r1 : 2abb4000  r0 : 0000005f
-> >     Flags: nZCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment user
-> >     Control: 30c5387d  Table: 40003000  DAC: fffffffd
-> >     Process cryptomgr_test (pid: 35, stack limit = 0x(ptrval))
-> >     Stack: (0xea54bc60 to 0xea54c000)
-> >     bc60: c09d1120 c09d1120 c09d1120 00000000 0000002a 0000002a
-> > 00000000 c0310060
-> >     bc80: 0000002a 00000000 000001c0 00000000 00000000 c0eb11e8
-> > ea54cfe0 ea538c00
-> >     bca0: 00000000 ea54cfe0 ebef73e0 0000002a ea538c20 ea54bd84
-> > 0000003a c0427a30
-> >     bcc0: ea54bdbc 00000000 00000000 c081cf70 eb074280 c081cf70
-> > 0000002a c081cf80
-> >     bce0: 0000000e c07da138 ea54bd0c 00000000 c084061c c04248e8
-> > c0e0a408 eb074240
-> >     bd00: eb074200 c04253c8 eb074280 ea550000 00000012 dd6cd422
-> > ebef7480 eb074200
-> >     bd20: ea54bd84 c081cf64 ea537200 00000002 00000000 00000014
-> > c084061c c0428c38
-> >     bd40: ea54bd84 ea54bdbc c081cd34 00000000 c0e4e4b4 ea538c40
-> > 00000002 eabe4e80
-> >     bd60: ea538c00 00000400 ea4f7a00 ea4f7a60 eb074240 00000060
-> > 00000006 c09d544c
-> >     bd80: 00000038 00000003 00000000 00000038 ea54bd7c 00000001
-> > eb074200 00000000
-> >     bda0: 00000000 dead4ead ffffffff ffffffff ea54bdb0 ea54bdb0
-> > 00000000 c081cf70
-> >     bdc0: c081ce68 c081ce78 ea4f7480 eb000780 00000dc0 eb000780
-> > c0e4ee80 443e9884
-> >     bde0: 6ed23b1c a14aaeba e52951f9 f17046e5 fefefefe fefefefe
-> > fefefefe fefefefe
-> >     be00: eb000780 c04292c4 c0e0a638 60000013 60000013 c0305298
-> > ea4f7a00 c03062bc
-> >     be20: eb000780 00000cc0 ea4f7a00 dd6cd422 00000cc0 ea538c00
-> > 00000002 eabe4e40
-> >     be40: ea537200 00000007 00000000 ea4f7a00 eb074200 c0429314
-> > eb074200 ea538c00
-> >     be60: ea4f7a00 0000000a eabe4e80 c084061c c08405fc 00000006
-> > c04dace8 00000006
-> >     be80: 00000000 c084065c ea537200 0000000e 00000400 eb04de08
-> > ea4f71a8 c0429420
-> >     bea0: 00000400 ea537200 0000000e ea537200 0000000e c0429374
-> > 00000400 ffffffff
-> >     bec0: 000000a2 c042a414 00000103 c0e0a408 00000000 c0e0a438
-> > c0e5a2a0 c0e5a2a0
-> >     bee0: 00000001 00000001 00000017 ffffe000 00000000 60000013
-> > c0e5a2a0 c0269470
-> >     bf00: c09c9ed0 ea54bf5c 00000103 00000000 00000000 c0e0a408
-> > ea537280 0000000e
-> >     bf20: 00000400 c0426500 00000000 eb04de08 ea4f71a8 c02694f4
-> > c09c9ed0 ea54bf5c
-> >     bf40: ea54bf28 c02699d0 ea54bf5c dd6cd422 ea537200 dd6cd422
-> > c09c9ed0 ea537200
-> >     bf60: ea4af1c0 ea54a000 ea537200 c0426500 00000000 eb04de08
-> > ea4f71a8 c0426524
-> >     bf80: ea4f7180 c023dcec ea54a000 ea4af1c0 c023dbb4 00000000
-> > 00000000 00000000
-> >     bfa0: 00000000 00000000 00000000 c02010d8 00000000 00000000
-> > 00000000 00000000
-> >     bfc0: 00000000 00000000 00000000 00000000 00000000 00000000
-> > 00000000 00000000
-> >     bfe0: 00000000 00000000 00000000 00000000 00000013 00000000
-> > 00000000 00000000
-> >     [<c030fd60>] (usercopy_abort) from [<c0310060>]
-> > (__check_object_size+0x2d8/0x448)
-> >     [<c0310060>] (__check_object_size) from [<c0427a30>]
-> > (build_test_sglist+0x268/0x2d8)
-> >     [<c0427a30>] (build_test_sglist) from [<c0428c38>]
-> > (test_hash_vec_cfg+0x110/0x694)
-> >     [<c0428c38>] (test_hash_vec_cfg) from [<c0429314>]
-> > (__alg_test_hash+0x158/0x1b8)
-> >     [<c0429314>] (__alg_test_hash) from [<c0429420>] (alg_test_hash+0xac/0xf4)
-> >     [<c0429420>] (alg_test_hash) from [<c042a414>] (alg_test.part.4+0x264/0x2f8)
-> >     [<c042a414>] (alg_test.part.4) from [<c0426524>] (cryptomgr_test+0x24/0x44)
-> >     [<c0426524>] (cryptomgr_test) from [<c023dcec>] (kthread+0x138/0x150)
-> >     [<c023dcec>] (kthread) from [<c02010d8>] (ret_from_fork+0x14/0x3c)
-> >     Exception stack(0xea54bfb0 to 0xea54bff8)
-> >     bfa0:                                     00000000 00000000
-> > 00000000 00000000
-> >     bfc0: 00000000 00000000 00000000 00000000 00000000 00000000
-> > 00000000 00000000
-> >     bfe0: 00000000 00000000 00000000 00000000 00000013 00000000
-> >     Code: e58de000 e98d0012 e1a0100c ebfd6712 (e7f001f2)
-> >     ---[ end trace 190b3cf48e720f78 ]---
-> >     BUG: sleeping function called from invalid context at
-> > include/linux/percpu-rwsem.h:34
-> >     in_atomic(): 0, irqs_disabled(): 128, pid: 35, name: cryptomgr_test
-> >     CPU: 0 PID: 35 Comm: cryptomgr_test Tainted: G      D
-> > 5.1.0-rc1-koelsch-01109-gbeb7d6376ecfbf07-dirty #397
-> >     Hardware name: Generic R-Car Gen2 (Flattened Device Tree)
-> >     [<c020ec74>] (unwind_backtrace) from [<c020ae58>] (show_stack+0x10/0x14)
-> >     [<c020ae58>] (show_stack) from [<c07c3624>] (dump_stack+0x7c/0x9c)
-> >     [<c07c3624>] (dump_stack) from [<c0242e14>] (___might_sleep+0xf4/0x158)
-> >     [<c0242e14>] (___might_sleep) from [<c0230210>] (exit_signals+0x2c/0x258)
-> >     [<c0230210>] (exit_signals) from [<c0223d6c>] (do_exit+0x114/0xa20)
-> >     [<c0223d6c>] (do_exit) from [<c020b160>] (die+0x304/0x344)
-> >     [<c020b160>] (die) from [<c020b388>] (do_undefinstr+0x80/0x190)
-> >     [<c020b388>] (do_undefinstr) from [<c0201b24>] (__und_svc_finish+0x0/0x3c)
-> >     Exception stack(0xea54bc10 to 0xea54bc58)
-> >     bc00:                                     0000005f 2abb4000
-> > dd6cd422 dd6cd422
-> >     bc20: c09d1120 0000002a 00000000 ea54d00a ea54d009 c0e0ce04
-> > 00000000 cccccccd
-> >     bc40: 00000010 ea54bc60 c030fd60 c030fd60 60000013 ffffffff
-> >     [<c0201b24>] (__und_svc_finish) from [<c030fd60>] (usercopy_abort+0x68/0x90)
-> >     [<c030fd60>] (usercopy_abort) from [<c0310060>]
-> > (__check_object_size+0x2d8/0x448)
-> >     [<c0310060>] (__check_object_size) from [<c0427a30>]
-> > (build_test_sglist+0x268/0x2d8)
-> >     [<c0427a30>] (build_test_sglist) from [<c0428c38>]
-> > (test_hash_vec_cfg+0x110/0x694)
-> >     [<c0428c38>] (test_hash_vec_cfg) from [<c0429314>]
-> > (__alg_test_hash+0x158/0x1b8)
-> >     [<c0429314>] (__alg_test_hash) from [<c0429420>] (alg_test_hash+0xac/0xf4)
-> >     [<c0429420>] (alg_test_hash) from [<c042a414>] (alg_test.part.4+0x264/0x2f8)
-> >     [<c042a414>] (alg_test.part.4) from [<c0426524>] (cryptomgr_test+0x24/0x44)
-> >     [<c0426524>] (cryptomgr_test) from [<c023dcec>] (kthread+0x138/0x150)
-> >     [<c023dcec>] (kthread) from [<c02010d8>] (ret_from_fork+0x14/0x3c)
-> >     Exception stack(0xea54bfb0 to 0xea54bff8)
-> >     bfa0:                                     00000000 00000000
-> > 00000000 00000000
-> >     bfc0: 00000000 00000000 00000000 00000000 00000000 00000000
-> > 00000000 00000000
-> >     bfe0: 00000000 00000000 00000000 00000000 00000013 00000000
-> > 
+On Fri, Feb 22, 2019 at 01:21:42PM +0100, Kamil Konieczny wrote:
+> Add DT node for SlimSSS (aka Slim SecuritySubSystem) in Exynos5433 SoC.
+> The users can use compatibility "samsung,exynos5433-slim-sss".
 > 
-> Well, this must happen with the new (in 5.1) crypto self-tests implementation
-> for any crypto algorithm when CONFIG_HARDENED_USERCOPY_PAGESPAN=y.  I don't
-> understand why hardened usercopy considers it a bug though, as there's no buffer
-> overflow.  The crypto tests use copy_from_iter() to copy data into a 2-page
-> buffer that was allocated with __get_free_pages():
-> 
-> 	__get_free_pages(GFP_KERNEL, 1)
-> 
-> ... where 1 means an order-1 allocation.
-> 
-> If it copies to offset=4064 len=42, for example, then hardened usercopy
-> considers it a bug even though the buffer is 8192 bytes long.  Why?
-> 
-> It isn't actually copying anything to/from userspace, BTW; it's using iov_iter
-> with ITER_KVEC.
-> 
-> - Eric
+> Signed-off-by: Kamil Konieczny <k.konieczny@partner.samsung.com>
+> ---
+>  arch/arm64/boot/dts/exynos/exynos5433.dtsi | 9 +++++++++
 
-Kees, any thoughts on why hardened usercopy rejects copies spanning a page
-boundary when they seem to be fine?
+Thanks, applied.
 
-- Eric
+Best regards,
+Krzysztof
+
