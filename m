@@ -1,111 +1,135 @@
-Return-Path: <SRS0=OEQJ=RW=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=fE7s=RX=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3F67C43381
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 Mar 2019 18:39:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABA5CC43381
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Mar 2019 08:41:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B717220811
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 Mar 2019 18:39:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 75B0E21841
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Mar 2019 08:41:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="BPIH7qym"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D3cCxiYi"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726944AbfCSSjG (ORCPT
+        id S1726114AbfCTIlI (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 19 Mar 2019 14:39:06 -0400
-Received: from mail-eopbgr770077.outbound.protection.outlook.com ([40.107.77.77]:36233
-        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726707AbfCSSjG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 19 Mar 2019 14:39:06 -0400
+        Wed, 20 Mar 2019 04:41:08 -0400
+Received: from mail-lf1-f67.google.com ([209.85.167.67]:42524 "EHLO
+        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725996AbfCTIlH (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 20 Mar 2019 04:41:07 -0400
+Received: by mail-lf1-f67.google.com with SMTP id p1so1199827lfk.9
+        for <linux-crypto@vger.kernel.org>; Wed, 20 Mar 2019 01:41:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector1-amd-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dDWNT5ZqH82SeoEY+Q4G+44H2sk0nwdhJLWcgtYgzLE=;
- b=BPIH7qym84Si+nYt+rDUYpTnRWWzpmVpZuMuJHyoeacmnbhi7m03g7sbdWTvcJ3twYH07CSuXe8rJQJ+CrT4lsXJOmHqckONaGUj4L5/t1xtHxXBRP4htiyi2iEtmTwGRTg+uSpzha71w9qUp/Dvf8SdM71pFSA4GEP8GSi10xw=
-Received: from DM5PR12MB1449.namprd12.prod.outlook.com (10.172.38.138) by
- DM5PR12MB1609.namprd12.prod.outlook.com (10.172.40.15) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1709.14; Tue, 19 Mar 2019 18:39:03 +0000
-Received: from DM5PR12MB1449.namprd12.prod.outlook.com
- ([fe80::890d:8adb:6785:6ca1]) by DM5PR12MB1449.namprd12.prod.outlook.com
- ([fe80::890d:8adb:6785:6ca1%4]) with mapi id 15.20.1709.015; Tue, 19 Mar 2019
- 18:39:03 +0000
-From:   Gary R Hook <ghook@amd.com>
-To:     Yue Haibing <yuehaibing@huawei.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "Hook, Gary" <Gary.Hook@amd.com>,
-        "davem@davemloft.net" <davem@davemloft.net>
-CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH -next] crypto: ccp - Make ccp_register_rsa_alg static
-Thread-Topic: [PATCH -next] crypto: ccp - Make ccp_register_rsa_alg static
-Thread-Index: AQHU3lrX/0EQ9IIfOketOsF+tKHOnKYTSVMA
-Date:   Tue, 19 Mar 2019 18:39:03 +0000
-Message-ID: <595b4fe4-acf1-97fc-c49d-5d3be2d83284@amd.com>
-References: <20190319135035.22056-1-yuehaibing@huawei.com>
-In-Reply-To: <20190319135035.22056-1-yuehaibing@huawei.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: SN6PR06CA0019.namprd06.prod.outlook.com
- (2603:10b6:805:8e::32) To DM5PR12MB1449.namprd12.prod.outlook.com
- (2603:10b6:4:d::10)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Gary.Hook@amd.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-originating-ip: [165.204.78.1]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: bdacd4c4-0fc6-4f99-1bd9-08d6ac9a28b0
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600127)(711020)(4605104)(4618075)(2017052603328)(7153060)(7193020);SRVR:DM5PR12MB1609;
-x-ms-traffictypediagnostic: DM5PR12MB1609:
-x-microsoft-antispam-prvs: <DM5PR12MB1609ABD67E2522F6E4884984FD400@DM5PR12MB1609.namprd12.prod.outlook.com>
-x-forefront-prvs: 0981815F2F
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(346002)(376002)(396003)(366004)(39860400002)(136003)(189003)(199004)(2501003)(7736002)(53546011)(76176011)(36756003)(81166006)(26005)(81156014)(8676002)(8936002)(305945005)(110136005)(4326008)(97736004)(25786009)(102836004)(3846002)(186003)(6506007)(6116002)(54906003)(52116002)(316002)(386003)(14454004)(68736007)(53936002)(2906002)(105586002)(6246003)(99286004)(478600001)(446003)(66066001)(229853002)(486006)(72206003)(6486002)(31686004)(106356001)(4744005)(5660300002)(6512007)(71200400001)(6436002)(31696002)(14444005)(71190400001)(2616005)(256004)(476003)(11346002);DIR:OUT;SFP:1101;SCL:1;SRVR:DM5PR12MB1609;H:DM5PR12MB1449.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: amd.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: fvxyf9vWlev6ljOf6RR9WTFJW2YVhxvVaWks71uVg33v5N/rGjgaVyPqRF/4HnVMlRPyoQhM77B+K7cNrFwQSsIB+Wwd9PblvtK4vtF5hQsU1bBsKcebnBvy1BCrmx4uCV7T+VMkZppq/FprTEXas7LDZufeKGpQTj+7lAq+mH5Cm4u8FlP8jOSkvFK0gGtE4Kuf1v7sp1xxWTvZnhpPuKcXQdwhmsgzy7pP+zUzSLwqxh9ZHrF6+uszLqNXEH3aCg3nWmSf9xjlqSxMw1rAt6hz/pbe+0AvMKcL+oNCfmWnjwmjE5hWUgjeHozLkGKokevYhquTeHBHIrNHgPx4IjQ4gtE2HZ666Mvvg8CERveB5MWC4H0wYARRQktG6OCT+56JkEXlWzKxDzc3EPsufuI6zJx108Ou2cXOGJf7dWY=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <4E212AAE6B8538458CD8A73859BCB65C@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=avaSil1GRyz0VCmDiB3yq1bjN6KNstBnhCuDZzSeAzY=;
+        b=D3cCxiYix+3mzjRCPgsu3d6dyD6/CSsKCwHvXHzfljCPhv4av1wj1eHU5qIon/cBjA
+         G3xD3ZOmlhTV4H60VeDtF+t/GTJan8xZ3vTJ3b9ufP1ZDzsgZDqMfvL/h6w/cGEC7maH
+         JihSXGbaAagP3HtgmEE8VHVEvG3MTKi6g1PN2TjL9AyWqhhKCmcbs6+rQYfKB6w8znBc
+         G7lJcQdKvzLMZ23X883xtBZ98iM67rIzq98OFKEn9XmFkcQUVZ97bNnwf/1hjzsgCoVc
+         XHgOIIVQfRyHK3nRKoOXxMWPreHojbsMmKVRf9ZtHWiHizOM3sZDCwwpKvq2V10ry6z8
+         0jHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=avaSil1GRyz0VCmDiB3yq1bjN6KNstBnhCuDZzSeAzY=;
+        b=VnJaml+icwXCoyEM8zCkUerypqHJJArgp7TcrAqgKBi4hCdh2U0w7vFhk4yc/pimx0
+         g/HusipXe3DUkiWxHKLdAoD0dAbCjgfHaWC/gOtE2NB+8BFVpxtW8o3KZmrgfKY4+fj4
+         m7nbNmUkzwOK2L9omfUWOXKyedsMJ6M2ca8nAmjLVYDxa/R7EjcFXWstxVHkrTjVzHXg
+         1zS0JUjD+XHDT6oOgVZSDg0K8mV/xdp0ttSagNdJzc1YJErk0fCyVaiXNxI8WRKD93Sr
+         oCWcYnChs/p1V/oznVVWDsesTumI97Ivm6mhQEmgcEf2nlW55/l4okTZWf1uol8DJRxl
+         Oy6Q==
+X-Gm-Message-State: APjAAAVvlcpLX0z6fRPwNCQ0DG8DmHwiipdiJA/FQNpq2ORo8Xffv1AV
+        5ajwTawTspEPJ6vHKVlLlZwlx+NEqX7omaosFn8=
+X-Google-Smtp-Source: APXvYqyat5nQ8HlqQH7JKCWkZ/vTgXz//OfnE7K2GSLkdO96ucUAPRXfvtcIgkR15XdMa366h/P0QJ2s32OTRlkKOI8=
+X-Received: by 2002:ac2:530a:: with SMTP id c10mr13687465lfh.45.1553071265755;
+ Wed, 20 Mar 2019 01:41:05 -0700 (PDT)
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bdacd4c4-0fc6-4f99-1bd9-08d6ac9a28b0
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Mar 2019 18:39:03.3229
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1609
+References: <20190315020901.16509-1-dja@axtens.net>
+In-Reply-To: <20190315020901.16509-1-dja@axtens.net>
+From:   =?UTF-8?B?T25kcmVqIE1vc27DocSNZWs=?= <omosnacek@gmail.com>
+Date:   Wed, 20 Mar 2019 09:40:54 +0100
+Message-ID: <CAAUqJDs8kCc5CbFpf_oV_v1HOiLYd1TYyx_KATt8e3fbrJG_Nw@mail.gmail.com>
+Subject: Re: [PATCH] crypto: vmx - fix copy-paste error in CTR mode
+To:     Daniel Axtens <dja@axtens.net>
+Cc:     linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        marcelo.cerri@canonical.com, Stephan Mueller <smueller@chronox.de>,
+        leo.barbosa@canonical.com, linuxppc-dev@lists.ozlabs.org,
+        nayna@linux.ibm.com, Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
+        leitao@debian.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-T24gMy8xOS8xOSA4OjUwIEFNLCBZdWUgSGFpYmluZyB3cm90ZToNCj4gRnJvbTogWXVlSGFpYmlu
-ZyA8eXVlaGFpYmluZ0BodWF3ZWkuY29tPg0KPiANCj4gRml4IHNwYXJzZSB3YXJuaW5nOg0KPiAN
-Cj4gZHJpdmVycy9jcnlwdG8vY2NwL2NjcC1jcnlwdG8tcnNhLmM6MjUxOjU6DQo+ICAgd2Fybmlu
-Zzogc3ltYm9sICdjY3BfcmVnaXN0ZXJfcnNhX2FsZycgd2FzIG5vdCBkZWNsYXJlZC4gU2hvdWxk
-IGl0IGJlIHN0YXRpYz8NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IFl1ZUhhaWJpbmcgPHl1ZWhhaWJp
-bmdAaHVhd2VpLmNvbT4NCg0KQWNrZWQtYnk6IEdhcnkgUiBIb29rIDxnYXJ5Lmhvb2tAYW1kLmNv
-bS4NCg0KPiAtLS0NCj4gICBkcml2ZXJzL2NyeXB0by9jY3AvY2NwLWNyeXB0by1yc2EuYyB8IDMg
-KystDQo+ICAgMSBmaWxlIGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKSwgMSBkZWxldGlvbigtKQ0K
-PiANCj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvY3J5cHRvL2NjcC9jY3AtY3J5cHRvLXJzYS5jIGIv
-ZHJpdmVycy9jcnlwdG8vY2NwL2NjcC1jcnlwdG8tcnNhLmMNCj4gaW5kZXggMDU4NTBkZi4uMGI4
-YWFiMDAgMTAwNjQ0DQo+IC0tLSBhL2RyaXZlcnMvY3J5cHRvL2NjcC9jY3AtY3J5cHRvLXJzYS5j
-DQo+ICsrKyBiL2RyaXZlcnMvY3J5cHRvL2NjcC9jY3AtY3J5cHRvLXJzYS5jDQo+IEBAIC0yNDgs
-NyArMjQ4LDggQEAgc3RhdGljIHN0cnVjdCBjY3BfcnNhX2RlZiByc2FfYWxnc1tdID0gew0KPiAg
-IAl9DQo+ICAgfTsNCj4gICANCj4gLWludCBjY3BfcmVnaXN0ZXJfcnNhX2FsZyhzdHJ1Y3QgbGlz
-dF9oZWFkICpoZWFkLCBjb25zdCBzdHJ1Y3QgY2NwX3JzYV9kZWYgKmRlZikNCj4gK3N0YXRpYyBp
-bnQgY2NwX3JlZ2lzdGVyX3JzYV9hbGcoc3RydWN0IGxpc3RfaGVhZCAqaGVhZCwNCj4gKwkJCSAg
-ICAgICAgY29uc3Qgc3RydWN0IGNjcF9yc2FfZGVmICpkZWYpDQo+ICAgew0KPiAgIAlzdHJ1Y3Qg
-Y2NwX2NyeXB0b19ha2NpcGhlcl9hbGcgKmNjcF9hbGc7DQo+ICAgCXN0cnVjdCBha2NpcGhlcl9h
-bGcgKmFsZzsNCj4gDQoNCg==
+Hi Daniel,
+
+pi 15. 3. 2019 o 3:09 Daniel Axtens <dja@axtens.net> nap=C3=ADsal(a):
+> The original assembly imported from OpenSSL has two copy-paste
+> errors in handling CTR mode. When dealing with a 2 or 3 block tail,
+> the code branches to the CBC decryption exit path, rather than to
+> the CTR exit path.
+>
+> This leads to corruption of the IV, which leads to subsequent blocks
+> being corrupted.
+>
+> This can be detected with libkcapi test suite, which is available at
+> https://github.com/smuellerDD/libkcapi
+>
+> Reported-by: Ondrej Mosn=C3=A1=C4=8Dek <omosnacek@gmail.com>
+> Fixes: 5c380d623ed3 ("crypto: vmx - Add support for VMS instructions by A=
+SM")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Daniel Axtens <dja@axtens.net>
+
+Thank you for looking into this and for posting the patch(es)! I
+tested the patch yesterday and I can confirm that it makes the
+libkcapi tests/reproducer pass.
+
+Assuming you will want to cover the other failures from the new
+testmgr tests by a separate patch:
+
+Tested-by: Ondrej Mosnacek <omosnacek@gmail.com>
+
+> ---
+>  drivers/crypto/vmx/aesp8-ppc.pl | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/crypto/vmx/aesp8-ppc.pl b/drivers/crypto/vmx/aesp8-p=
+pc.pl
+> index d6a9f63d65ba..de78282b8f44 100644
+> --- a/drivers/crypto/vmx/aesp8-ppc.pl
+> +++ b/drivers/crypto/vmx/aesp8-ppc.pl
+> @@ -1854,7 +1854,7 @@ Lctr32_enc8x_three:
+>         stvx_u          $out1,$x10,$out
+>         stvx_u          $out2,$x20,$out
+>         addi            $out,$out,0x30
+> -       b               Lcbc_dec8x_done
+> +       b               Lctr32_enc8x_done
+>
+>  .align 5
+>  Lctr32_enc8x_two:
+> @@ -1866,7 +1866,7 @@ Lctr32_enc8x_two:
+>         stvx_u          $out0,$x00,$out
+>         stvx_u          $out1,$x10,$out
+>         addi            $out,$out,0x20
+> -       b               Lcbc_dec8x_done
+> +       b               Lctr32_enc8x_done
+>
+>  .align 5
+>  Lctr32_enc8x_one:
+> --
+> 2.19.1
+>
