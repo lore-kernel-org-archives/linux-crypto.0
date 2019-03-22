@@ -4,98 +4,291 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_NEOMUTT autolearn=unavailable autolearn_force=no version=3.4.0
+	USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57932C10F03
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 Mar 2019 19:15:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 712D7C43381
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 Mar 2019 19:21:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2A8FC2175B
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 Mar 2019 19:15:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3CB032183E
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 Mar 2019 19:21:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727419AbfCVTPF (ORCPT
+        id S1727436AbfCVTV4 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 22 Mar 2019 15:15:05 -0400
-Received: from vmicros1.altlinux.org ([194.107.17.57]:38746 "EHLO
+        Fri, 22 Mar 2019 15:21:56 -0400
+Received: from vmicros1.altlinux.org ([194.107.17.57]:44266 "EHLO
         vmicros1.altlinux.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727364AbfCVTPF (ORCPT
+        with ESMTP id S1727092AbfCVTV4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 22 Mar 2019 15:15:05 -0400
+        Fri, 22 Mar 2019 15:21:56 -0400
 Received: from imap.altlinux.org (imap.altlinux.org [194.107.17.38])
-        by vmicros1.altlinux.org (Postfix) with ESMTP id E1BD872CC53;
-        Fri, 22 Mar 2019 22:15:00 +0300 (MSK)
+        by vmicros1.altlinux.org (Postfix) with ESMTP id 3E76172CC53;
+        Fri, 22 Mar 2019 22:21:50 +0300 (MSK)
 Received: from altlinux.org (sole.flsd.net [185.75.180.6])
-        by imap.altlinux.org (Postfix) with ESMTPSA id C9DB74A4A16;
-        Fri, 22 Mar 2019 22:15:00 +0300 (MSK)
-Date:   Fri, 22 Mar 2019 22:15:00 +0300
+        by imap.altlinux.org (Postfix) with ESMTPSA id 2127E4A4A16;
+        Fri, 22 Mar 2019 22:21:50 +0300 (MSK)
+Date:   Fri, 22 Mar 2019 22:21:50 +0300
 From:   Vitaly Chikunov <vt@altlinux.org>
-To:     Mimi Zohar <zohar@linux.ibm.com>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org
+To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>, qat-linux@intel.com,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Gary Hook <gary.hook@amd.com>,
+        Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>
 Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v7 11/11] integrity: support EC-RDSA signatures for
- asymmetric_verify
-Message-ID: <20190322191500.wzkbqsij5jyndlxd@altlinux.org>
-Mail-Followup-To: Mimi Zohar <zohar@linux.ibm.com>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        linux-integrity@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v7 03/11] crypto: rsa - unimplement sign/verify for raw
+ RSA backends
+Message-ID: <20190322192149.5tceia2q6g62p4so@altlinux.org>
+Mail-Followup-To: Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
+        qat-linux@intel.com, Tom Lendacky <thomas.lendacky@amd.com>,
+        Gary Hook <gary.hook@amd.com>,
+        Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        David Howells <dhowells@redhat.com>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
 References: <20190301175918.29694-1-vt@altlinux.org>
- <20190301175918.29694-12-vt@altlinux.org>
+ <20190301175918.29694-4-vt@altlinux.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=koi8-r
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190301175918.29694-12-vt@altlinux.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190301175918.29694-4-vt@altlinux.org>
 User-Agent: NeoMutt/20171215-106-ac61c7
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Mimi, Dmitry,
+Giovanni Cabiddu,
 
-Can you Ack this patch?
+  Can you Ack this patch as it includes small change to QAT driver.
+
+Tom Lendacky, Gary Hook,
+
+  Can you Ack this patch as it includes small change to CCP driver.
+
+Horia Geantă, Aymen Sghaier,
+
+  Can you Ack this patch as it includes small change to CAAM driver.
 
 Thanks,
 
-On Fri, Mar 01, 2019 at 08:59:18PM +0300, Vitaly Chikunov wrote:
-> Allow to use EC-RDSA signatures for IMA by determining signature type by
-> the hash algorithm name. This works good for EC-RDSA since Streebog and
-> EC-RDSA should always be used together.
+On Fri, Mar 01, 2019 at 08:59:10PM +0300, Vitaly Chikunov wrote:
+> In preparation for new akcipher verify call remove sign/verify callbacks
+> from RSA backends and make PKCS1 driver call encrypt/decrypt instead.
 > 
-> Cc: Mimi Zohar <zohar@linux.ibm.com>
-> Cc: Dmitry Kasatkin <dmitry.kasatkin@gmail.com>
-> Cc: linux-integrity@vger.kernel.org
+> This also complies with the well-known idea that raw RSA should never be
+> used for sign/verify. It only should be used with proper padding scheme
+> such as PKCS1 driver provides.
+> 
+> Cc: Giovanni Cabiddu <giovanni.cabiddu@intel.com>
+> Cc: qat-linux@intel.com
+> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> Cc: Gary Hook <gary.hook@amd.com>
+> Cc: Horia Geantă <horia.geanta@nxp.com>
+> Cc: Aymen Sghaier <aymen.sghaier@nxp.com>
 > Signed-off-by: Vitaly Chikunov <vt@altlinux.org>
 > ---
->  security/integrity/digsig_asymmetric.c | 11 +++++++++--
->  1 file changed, 9 insertions(+), 2 deletions(-)
+>  crypto/rsa-pkcs1pad.c                         |   4 +-
+>  crypto/rsa.c                                  | 109 --------------------------
+>  drivers/crypto/caam/caampkc.c                 |   2 -
+>  drivers/crypto/ccp/ccp-crypto-rsa.c           |   2 -
+>  drivers/crypto/qat/qat_common/qat_asym_algs.c |   2 -
+>  5 files changed, 2 insertions(+), 117 deletions(-)
 > 
-> diff --git a/security/integrity/digsig_asymmetric.c b/security/integrity/digsig_asymmetric.c
-> index d775e03fbbcc..99080871eb9f 100644
-> --- a/security/integrity/digsig_asymmetric.c
-> +++ b/security/integrity/digsig_asymmetric.c
-> @@ -104,9 +104,16 @@ int asymmetric_verify(struct key *keyring, const char *sig,
+> diff --git a/crypto/rsa-pkcs1pad.c b/crypto/rsa-pkcs1pad.c
+> index 0a6680ca8cb6..94382fa2c6ac 100644
+> --- a/crypto/rsa-pkcs1pad.c
+> +++ b/crypto/rsa-pkcs1pad.c
+> @@ -429,7 +429,7 @@ static int pkcs1pad_sign(struct akcipher_request *req)
+>  	akcipher_request_set_crypt(&req_ctx->child_req, req_ctx->in_sg,
+>  				   req->dst, ctx->key_size - 1, req->dst_len);
 >  
->  	memset(&pks, 0, sizeof(pks));
+> -	err = crypto_akcipher_sign(&req_ctx->child_req);
+> +	err = crypto_akcipher_decrypt(&req_ctx->child_req);
+>  	if (err != -EINPROGRESS && err != -EBUSY)
+>  		return pkcs1pad_encrypt_sign_complete(req, err);
 >  
-> -	pks.pkey_algo = "rsa";
->  	pks.hash_algo = hash_algo_name[hdr->hash_algo];
-> -	pks.encoding = "pkcs1";
-> +	if (hdr->hash_algo == HASH_ALGO_STREEBOG_256 ||
-> +	    hdr->hash_algo == HASH_ALGO_STREEBOG_512) {
-> +		/* EC-RDSA and Streebog should go together. */
-> +		pks.pkey_algo = "ecrdsa";
-> +		pks.encoding = "raw";
-> +	} else {
-> +		pks.pkey_algo = "rsa";
-> +		pks.encoding = "pkcs1";
-> +	}
->  	pks.digest = (u8 *)data;
->  	pks.digest_size = datalen;
->  	pks.s = hdr->sig;
+> @@ -551,7 +551,7 @@ static int pkcs1pad_verify(struct akcipher_request *req)
+>  				   req_ctx->out_sg, req->src_len,
+>  				   ctx->key_size);
+>  
+> -	err = crypto_akcipher_verify(&req_ctx->child_req);
+> +	err = crypto_akcipher_encrypt(&req_ctx->child_req);
+>  	if (err != -EINPROGRESS && err != -EBUSY)
+>  		return pkcs1pad_verify_complete(req, err);
+>  
+> diff --git a/crypto/rsa.c b/crypto/rsa.c
+> index 4167980c243d..5d427c1100d6 100644
+> --- a/crypto/rsa.c
+> +++ b/crypto/rsa.c
+> @@ -50,34 +50,6 @@ static int _rsa_dec(const struct rsa_mpi_key *key, MPI m, MPI c)
+>  	return mpi_powm(m, c, key->d, key->n);
+>  }
+>  
+> -/*
+> - * RSASP1 function [RFC3447 sec 5.2.1]
+> - * s = m^d mod n
+> - */
+> -static int _rsa_sign(const struct rsa_mpi_key *key, MPI s, MPI m)
+> -{
+> -	/* (1) Validate 0 <= m < n */
+> -	if (mpi_cmp_ui(m, 0) < 0 || mpi_cmp(m, key->n) >= 0)
+> -		return -EINVAL;
+> -
+> -	/* (2) s = m^d mod n */
+> -	return mpi_powm(s, m, key->d, key->n);
+> -}
+> -
+> -/*
+> - * RSAVP1 function [RFC3447 sec 5.2.2]
+> - * m = s^e mod n;
+> - */
+> -static int _rsa_verify(const struct rsa_mpi_key *key, MPI m, MPI s)
+> -{
+> -	/* (1) Validate 0 <= s < n */
+> -	if (mpi_cmp_ui(s, 0) < 0 || mpi_cmp(s, key->n) >= 0)
+> -		return -EINVAL;
+> -
+> -	/* (2) m = s^e mod n */
+> -	return mpi_powm(m, s, key->e, key->n);
+> -}
+> -
+>  static inline struct rsa_mpi_key *rsa_get_key(struct crypto_akcipher *tfm)
+>  {
+>  	return akcipher_tfm_ctx(tfm);
+> @@ -160,85 +132,6 @@ static int rsa_dec(struct akcipher_request *req)
+>  	return ret;
+>  }
+>  
+> -static int rsa_sign(struct akcipher_request *req)
+> -{
+> -	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
+> -	const struct rsa_mpi_key *pkey = rsa_get_key(tfm);
+> -	MPI m, s = mpi_alloc(0);
+> -	int ret = 0;
+> -	int sign;
+> -
+> -	if (!s)
+> -		return -ENOMEM;
+> -
+> -	if (unlikely(!pkey->n || !pkey->d)) {
+> -		ret = -EINVAL;
+> -		goto err_free_s;
+> -	}
+> -
+> -	ret = -ENOMEM;
+> -	m = mpi_read_raw_from_sgl(req->src, req->src_len);
+> -	if (!m)
+> -		goto err_free_s;
+> -
+> -	ret = _rsa_sign(pkey, s, m);
+> -	if (ret)
+> -		goto err_free_m;
+> -
+> -	ret = mpi_write_to_sgl(s, req->dst, req->dst_len, &sign);
+> -	if (ret)
+> -		goto err_free_m;
+> -
+> -	if (sign < 0)
+> -		ret = -EBADMSG;
+> -
+> -err_free_m:
+> -	mpi_free(m);
+> -err_free_s:
+> -	mpi_free(s);
+> -	return ret;
+> -}
+> -
+> -static int rsa_verify(struct akcipher_request *req)
+> -{
+> -	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
+> -	const struct rsa_mpi_key *pkey = rsa_get_key(tfm);
+> -	MPI s, m = mpi_alloc(0);
+> -	int ret = 0;
+> -	int sign;
+> -
+> -	if (!m)
+> -		return -ENOMEM;
+> -
+> -	if (unlikely(!pkey->n || !pkey->e)) {
+> -		ret = -EINVAL;
+> -		goto err_free_m;
+> -	}
+> -
+> -	s = mpi_read_raw_from_sgl(req->src, req->src_len);
+> -	if (!s) {
+> -		ret = -ENOMEM;
+> -		goto err_free_m;
+> -	}
+> -
+> -	ret = _rsa_verify(pkey, m, s);
+> -	if (ret)
+> -		goto err_free_s;
+> -
+> -	ret = mpi_write_to_sgl(m, req->dst, req->dst_len, &sign);
+> -	if (ret)
+> -		goto err_free_s;
+> -
+> -	if (sign < 0)
+> -		ret = -EBADMSG;
+> -
+> -err_free_s:
+> -	mpi_free(s);
+> -err_free_m:
+> -	mpi_free(m);
+> -	return ret;
+> -}
+> -
+>  static void rsa_free_mpi_key(struct rsa_mpi_key *key)
+>  {
+>  	mpi_free(key->d);
+> @@ -353,8 +246,6 @@ static void rsa_exit_tfm(struct crypto_akcipher *tfm)
+>  static struct akcipher_alg rsa = {
+>  	.encrypt = rsa_enc,
+>  	.decrypt = rsa_dec,
+> -	.sign = rsa_sign,
+> -	.verify = rsa_verify,
+>  	.set_priv_key = rsa_set_priv_key,
+>  	.set_pub_key = rsa_set_pub_key,
+>  	.max_size = rsa_max_size,
+> diff --git a/drivers/crypto/caam/caampkc.c b/drivers/crypto/caam/caampkc.c
+> index 77ab28a2811a..d7e1fc5bacc5 100644
+> --- a/drivers/crypto/caam/caampkc.c
+> +++ b/drivers/crypto/caam/caampkc.c
+> @@ -994,8 +994,6 @@ static void caam_rsa_exit_tfm(struct crypto_akcipher *tfm)
+>  static struct akcipher_alg caam_rsa = {
+>  	.encrypt = caam_rsa_enc,
+>  	.decrypt = caam_rsa_dec,
+> -	.sign = caam_rsa_dec,
+> -	.verify = caam_rsa_enc,
+>  	.set_pub_key = caam_rsa_set_pub_key,
+>  	.set_priv_key = caam_rsa_set_priv_key,
+>  	.max_size = caam_rsa_max_size,
+> diff --git a/drivers/crypto/ccp/ccp-crypto-rsa.c b/drivers/crypto/ccp/ccp-crypto-rsa.c
+> index 05850dfd7940..71e40680c880 100644
+> --- a/drivers/crypto/ccp/ccp-crypto-rsa.c
+> +++ b/drivers/crypto/ccp/ccp-crypto-rsa.c
+> @@ -214,8 +214,6 @@ static void ccp_rsa_exit_tfm(struct crypto_akcipher *tfm)
+>  static struct akcipher_alg ccp_rsa_defaults = {
+>  	.encrypt = ccp_rsa_encrypt,
+>  	.decrypt = ccp_rsa_decrypt,
+> -	.sign = ccp_rsa_decrypt,
+> -	.verify = ccp_rsa_encrypt,
+>  	.set_pub_key = ccp_rsa_setpubkey,
+>  	.set_priv_key = ccp_rsa_setprivkey,
+>  	.max_size = ccp_rsa_maxsize,
+> diff --git a/drivers/crypto/qat/qat_common/qat_asym_algs.c b/drivers/crypto/qat/qat_common/qat_asym_algs.c
+> index 320e7854b4ee..c05d03565e96 100644
+> --- a/drivers/crypto/qat/qat_common/qat_asym_algs.c
+> +++ b/drivers/crypto/qat/qat_common/qat_asym_algs.c
+> @@ -1300,8 +1300,6 @@ static void qat_rsa_exit_tfm(struct crypto_akcipher *tfm)
+>  static struct akcipher_alg rsa = {
+>  	.encrypt = qat_rsa_enc,
+>  	.decrypt = qat_rsa_dec,
+> -	.sign = qat_rsa_dec,
+> -	.verify = qat_rsa_enc,
+>  	.set_pub_key = qat_rsa_setpubkey,
+>  	.set_priv_key = qat_rsa_setprivkey,
+>  	.max_size = qat_rsa_max_size,
 > -- 
 > 2.11.0
