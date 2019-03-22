@@ -1,137 +1,106 @@
-Return-Path: <SRS0=F/PC=RY=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=7kP/=RZ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 124F9C43381
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Mar 2019 22:59:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD4AEC43381
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 Mar 2019 02:00:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CB07D218D3
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Mar 2019 22:59:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 89783218FE
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 Mar 2019 02:00:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="OTqmwPaE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726247AbfCUW7t (ORCPT
+        id S1727636AbfCVCAg (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 21 Mar 2019 18:59:49 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:38179 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726957AbfCUW7t (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 Mar 2019 18:59:49 -0400
-Received: by mail-wr1-f67.google.com with SMTP id g12so344382wrm.5
-        for <linux-crypto@vger.kernel.org>; Thu, 21 Mar 2019 15:59:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition:user-agent;
-        bh=4H4cSRmG0KbWq4rrwNVrs7BVba10vKA2iOkxa0+3kOc=;
-        b=sU1nTmqu+vBR6/iT7AshfmukxxCV276GGEMcv3RvfbCMa/1iOlEvzu87FpqA9gHWW6
-         5q+BPjPG2RIsdb1JKLkwMNj/ardxw8Ca/bSTaVH9ON9/cKcWu7VxqJCjF8QYKeZ52TiG
-         ykLQw81wueOw4jBXGby2e6ZsU9bzBE/1+KM2x69BBG1xqOAP7zB8a7y3pnuP1cHJ5jzy
-         JYPQTnwYWZ2iPZE9S8zNK+x2YJUSic22/cXtzpFGXChczAGXdT6sqbPM5RU4Mk2AikDw
-         Z9Y4F7eg67gSivN66gzBbhSpeXU1wUqXGqQ/EIHrIkxUK4DGlbTFQD/lL0J9PUIN7Vxf
-         vR9g==
-X-Gm-Message-State: APjAAAVmer/olTQZcWRkiUl+S4AUGmZBHaNwxC5IZ++9nDvR8M59p3CL
-        bXmJu4ApWlli9SNCR3vnDMlbb0maEY0=
-X-Google-Smtp-Source: APXvYqzwCZmNEVgJpu5r4jbWQkZVDVd8IKAlOhpeZIpd+bsoEHaKCQ6/7fsTEKN/RuiNIzoYJYU5Xw==
-X-Received: by 2002:a5d:644a:: with SMTP id d10mr3997934wrw.308.1553209187498;
-        Thu, 21 Mar 2019 15:59:47 -0700 (PDT)
-Received: from pc-2.home (2a01cb05850ddf00045dd60e6368f84b.ipv6.abo.wanadoo.fr. [2a01:cb05:850d:df00:45d:d60e:6368:f84b])
-        by smtp.gmail.com with ESMTPSA id o20sm7681544wmh.21.2019.03.21.15.59.46
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Thu, 21 Mar 2019 15:59:46 -0700 (PDT)
-Date:   Thu, 21 Mar 2019 23:59:45 +0100
-From:   Guillaume Nault <gnault@redhat.com>
-To:     linux-crypto@vger.kernel.org
-Cc:     Atul Gupta <atul.gupta@chelsio.com>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Eric Dumazet <eric.dumazet@gmail.com>
-Subject: [RFC PATCH] crypto: chtls - handle inet_csk_reqsk_queue_add()
- failures
-Message-ID: <c96b622f873160880843766d62f4ccac08abd302.1553208186.git.gnault@redhat.com>
+        Thu, 21 Mar 2019 22:00:36 -0400
+Received: from mail-eopbgr00061.outbound.protection.outlook.com ([40.107.0.61]:26068
+        "EHLO EUR02-AM5-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727535AbfCVCAg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 21 Mar 2019 22:00:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=GFkG7tSR2Gjq1v9eDFNNIWBNTXgwgWOQ6FRDgh7ne18=;
+ b=OTqmwPaE2ypq1t8w7Q6imaNNMMnYPC65H4VUMJR14ma3AH5gtZTUsLDnZ607iOl4lIVtW0JHHzP2rOhW/5AsBYe81AHspWSND+TxLgWM/ALMugImgOePXHAyn/tbsL+6LGp6V5czEzLmVmXBL289pgcQ/RJNMeeIvzV74q0TOT4=
+Received: from DB7PR04MB4252.eurprd04.prod.outlook.com (52.135.131.26) by
+ DB7PR04MB4187.eurprd04.prod.outlook.com (52.135.130.160) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1730.16; Fri, 22 Mar 2019 02:00:33 +0000
+Received: from DB7PR04MB4252.eurprd04.prod.outlook.com
+ ([fe80::9ca:d78:c154:25b5]) by DB7PR04MB4252.eurprd04.prod.outlook.com
+ ([fe80::9ca:d78:c154:25b5%4]) with mapi id 15.20.1730.013; Fri, 22 Mar 2019
+ 02:00:33 +0000
+From:   Vakul Garg <vakul.garg@nxp.com>
+To:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
+CC:     Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Horia Geanta <horia.geanta@nxp.com>,
+        Vakul Garg <vakul.garg@nxp.com>
+Subject: [PATCH v3 0/3] CAAM job ring driver cleanups
+Thread-Topic: [PATCH v3 0/3] CAAM job ring driver cleanups
+Thread-Index: AQHU4FMI7cL4deuKsk+aqZy0MdGBEQ==
+Date:   Fri, 22 Mar 2019 02:00:32 +0000
+Message-ID: <20190322015746.27395-1-vakul.garg@nxp.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: PN1PR01CA0113.INDPRD01.PROD.OUTLOOK.COM (2603:1096:c00::29)
+ To DB7PR04MB4252.eurprd04.prod.outlook.com (2603:10a6:5:27::26)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=vakul.garg@nxp.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-mailer: git-send-email 2.13.6
+x-originating-ip: [92.120.1.70]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 81c98452-bef1-4fc7-4f15-08d6ae6a2aa4
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600127)(711020)(4605104)(4618075)(2017052603328)(7153060)(7193020);SRVR:DB7PR04MB4187;
+x-ms-traffictypediagnostic: DB7PR04MB4187:
+x-ms-exchange-purlcount: 1
+x-microsoft-antispam-prvs: <DB7PR04MB4187B8A2C38391DAC08D2C548B430@DB7PR04MB4187.eurprd04.prod.outlook.com>
+x-forefront-prvs: 09840A4839
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(136003)(396003)(366004)(376002)(39860400002)(346002)(189003)(199004)(86362001)(6436002)(81156014)(66066001)(97736004)(7736002)(99286004)(71190400001)(6116002)(8676002)(3846002)(4326008)(6486002)(2616005)(2501003)(476003)(81166006)(26005)(71200400001)(102836004)(52116002)(486006)(54906003)(386003)(6506007)(316002)(110136005)(305945005)(256004)(1076003)(4744005)(6306002)(2906002)(6512007)(44832011)(36756003)(25786009)(50226002)(53936002)(478600001)(105586002)(106356001)(186003)(68736007)(5660300002)(14454004)(966005)(8936002);DIR:OUT;SFP:1101;SCL:1;SRVR:DB7PR04MB4187;H:DB7PR04MB4252.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: nxp.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: f81NTfs2gkiBxq+ieAUtRV6/15a5wsL0ouNNFF7HU5ouvqu6L0JdZ1KX7aUzzNA03qV8In3adx8IC615sJ9u9osBZA9+y6lPyV5RJymujDDlmXu+hj7wykdCgflbPrv0JLYMsIShyrkfvVU7UgnsENghGCWK00vNoEDXzqzCh8pXNgne+IdndzBfZwARwAoVteeSJITmUWl0/3bmUBcDkfM2BGoq8xeYZq1ZWDXKMxdpNghOIggEeSUGnqoDbVmo8qFSNdYN80/EcRRjeVEKnyJgW6YydthwEz0F5uZ/jZER9/JD+QqMteU6GWIEDlg6rgBzwMUYqZyOVWpe+1gmR4d5fVPvtJ0RQwGQj0J+eZdjo+9xNA0yIe6dpNxoMXrnqyOdUS83WT/Wj5R7lsLrqsR7p3JkGbqXcJZTJf91o6Q=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.10.1 (2018-07-13)
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 81c98452-bef1-4fc7-4f15-08d6ae6a2aa4
+X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Mar 2019 02:00:32.8804
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB7PR04MB4187
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-While working on 9d3e1368bb45 ("tcp: handle inet_csk_reqsk_queue_add()
-failures"), I missed this usage of inet_csk_reqsk_queue_add().
+This patchset cleans up caam job ring driver.
+The patch series needs to be applied after merging below mentioned
+patch.
 
-inet_csk_reqsk_queue_add() can fail. In that case, the operation is
-aborted and inet_csk_destroy_sock() is called automatically, but we
-need to free the request socket manually.
+https://www.mail-archive.com/linux-crypto@vger.kernel.org/msg37068.html
 
-RFC:
-Sending as RFC because I'm unsure about how to handle 'child' in that
-case. I don't call add_to_reap_list(child) here, because
-inet_csk_destroy_sock() has already run. Therefore, most of the
-operations performed by add_to_reap_list()/process_reap_list() would be
-redundant (but harmless). Except for two things:
 
-  * process_reap_list() calls inet_csk_destroy_sock() if ->sk_state is
-    TCP_CLOSE. We have to avoid that. Socket's state should be
-    TCP_ESTABLISHED at the time of the call, but process_reap_list() is
-    run asynchronously and I couldn't find anything that would
-    prevent the rest of the system from accessing the socket before
-    process_reap_list() picks it up (the socket is still accessible
-    from cdev->tids). So I fear that calling add_to_reap_list() in the
-    error path would let process_reap_list() call
-    inet_csk_reqsk_queue_add() a second time if ->sk_state was
-    concurrently set to TCP_CLOSE. That looks like a good reason not to
-    call add_to_reap_list().
+Vakul Garg (3):
+  crypto: caam/jr - Remove spinlock for output job ring
+  crypto: caam/jr -  Removed redundant vars from job ring private data
+  crypto: caam/jr - Remove extra memory barrier during job ring enqueue
 
-  * The only operation that process_reap_list() does and isn't already
-    done by inet_csk_destroy_sock() is chtls_abort_conn(). This
-    function has no effect if its sk_buff allocation fails. So it might
-    be a no-op. That looks like another reason for not calling
-    add_to_reap_list()...
-    But what chtls_abort_conn() does when sk_buff allocation succeeds
-    looks actually important. IIUC, it sends a message to trigger the
-    removal of the socket (how would the socket be removed from ->tids
-    otherwise?). That would make chtls_abort_conn() quite important.
-    But then how do we avoid losing track of those defunct sockets when
-    sk_buff allocation fails?
+ drivers/crypto/caam/intern.h |  3 ---
+ drivers/crypto/caam/jr.c     | 19 ++++++-------------
+ 2 files changed, 6 insertions(+), 16 deletions(-)
 
-Compile-tested only.
-
-Fixes: cc35c88ae4db ("crypto : chtls - CPL handler definition")
-Reported-by: Paolo Abeni <pabeni@redhat.com>
-Signed-off-by: Guillaume Nault <gnault@redhat.com>
----
- drivers/crypto/chelsio/chtls/chtls_cm.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/crypto/chelsio/chtls/chtls_cm.c b/drivers/crypto/chelsio/chtls/chtls_cm.c
-index 59b75299fcbc..4bf1e3f65400 100644
---- a/drivers/crypto/chelsio/chtls/chtls_cm.c
-+++ b/drivers/crypto/chelsio/chtls/chtls_cm.c
-@@ -1384,11 +1384,16 @@ static void add_pass_open_to_parent(struct sock *child, struct sock *lsk,
- 	if (sk_acceptq_is_full(lsk)) {
- 		chtls_reqsk_free(oreq);
- 		add_to_reap_list(child);
--	} else {
--		refcount_set(&oreq->rsk_refcnt, 1);
--		inet_csk_reqsk_queue_add(lsk, oreq, child);
--		lsk->sk_data_ready(lsk);
-+		return;
-+	}
-+
-+	refcount_set(&oreq->rsk_refcnt, 1);
-+	if (!inet_csk_reqsk_queue_add(lsk, oreq, child)) {
-+		chtls_reqsk_free(oreq);
-+		/* child already dropped by inet_csk_destroy_sock() */
-+		return;
- 	}
-+	lsk->sk_data_ready(lsk);
- }
- 
- static void bl_add_pass_open_to_parent(struct sock *lsk, struct sk_buff *skb)
--- 
-2.20.1
+--=20
+2.13.6
 
