@@ -7,46 +7,47 @@ X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10600C43381
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 Mar 2019 02:00:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5373BC43381
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 Mar 2019 02:00:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D264D218FE
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 Mar 2019 02:00:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1FDF921900
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 Mar 2019 02:00:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="PZu4dAXg"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="ChnPKlkf"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727637AbfCVCAj (ORCPT
+        id S1727634AbfCVCAl (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 21 Mar 2019 22:00:39 -0400
+        Thu, 21 Mar 2019 22:00:41 -0400
 Received: from mail-eopbgr00061.outbound.protection.outlook.com ([40.107.0.61]:26068
         "EHLO EUR02-AM5-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727634AbfCVCAj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 Mar 2019 22:00:39 -0400
+        id S1727535AbfCVCAl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 21 Mar 2019 22:00:41 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XeHvvTjNsQRiwI7QWu+EFcUTDtW1FlqgCfi+0DngwBQ=;
- b=PZu4dAXgpExLyj50hOObZI6ewtxqJl0QNkzRY2W8kF2+LB3xuQpZQUVPklHJ1kbrDDMc7+jwXccGZxWKblV1OlB7bv95NJ8qCjRpthV5idZ/2DavUUVTSQwnJKfq3Xe+YL7JgjDdXP9aDVtw3oSSasdHCr3uQbX1+sM7IUOzKqE=
+ bh=MEgh6N0imG6rwGltZJIeFksqH71Fqs3/1ZJTDPlINXg=;
+ b=ChnPKlkfOnOzZwe96D2tFzqkCj2T9J2BuhFikDs1vO0OHmhiK2b1QSuQdyVeeMSJC7WcpRsOe/zP3MKDqHvGm4HjC2MphCDNdyMDhAbU5ICvxG/2bj/DMufbESPUOsW/N2fINPX+2tQhFtFOWvEGR17JyDlY0xwYH4vnsY5yJzA=
 Received: from DB7PR04MB4252.eurprd04.prod.outlook.com (52.135.131.26) by
  DB7PR04MB4187.eurprd04.prod.outlook.com (52.135.130.160) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1730.16; Fri, 22 Mar 2019 02:00:34 +0000
+ 15.20.1730.16; Fri, 22 Mar 2019 02:00:36 +0000
 Received: from DB7PR04MB4252.eurprd04.prod.outlook.com
  ([fe80::9ca:d78:c154:25b5]) by DB7PR04MB4252.eurprd04.prod.outlook.com
  ([fe80::9ca:d78:c154:25b5%4]) with mapi id 15.20.1730.013; Fri, 22 Mar 2019
- 02:00:34 +0000
+ 02:00:35 +0000
 From:   Vakul Garg <vakul.garg@nxp.com>
 To:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
 CC:     Aymen Sghaier <aymen.sghaier@nxp.com>,
         Horia Geanta <horia.geanta@nxp.com>,
         Vakul Garg <vakul.garg@nxp.com>
-Subject: [PATCH v3 1/3] crypto: caam/jr - Remove spinlock for output job ring
-Thread-Topic: [PATCH v3 1/3] crypto: caam/jr - Remove spinlock for output job
- ring
-Thread-Index: AQHU4FMJAfwFsHaPUEaSteo3gNdsOw==
-Date:   Fri, 22 Mar 2019 02:00:34 +0000
-Message-ID: <20190322015746.27395-2-vakul.garg@nxp.com>
+Subject: [PATCH v3 2/3] crypto: caam/jr -  Removed redundant vars from job
+ ring private data
+Thread-Topic: [PATCH v3 2/3] crypto: caam/jr -  Removed redundant vars from
+ job ring private data
+Thread-Index: AQHU4FMKMaY3C179wkGGTbaxpGbLpA==
+Date:   Fri, 22 Mar 2019 02:00:35 +0000
+Message-ID: <20190322015746.27395-3-vakul.garg@nxp.com>
 References: <20190322015746.27395-1-vakul.garg@nxp.com>
 In-Reply-To: <20190322015746.27395-1-vakul.garg@nxp.com>
 Accept-Language: en-US
@@ -61,23 +62,23 @@ x-ms-exchange-messagesentrepresentingtype: 1
 x-mailer: git-send-email 2.13.6
 x-originating-ip: [92.120.1.70]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 64dab7c6-ef65-43c0-f91c-08d6ae6a2ba6
+x-ms-office365-filtering-correlation-id: 82511711-7dfe-4559-cb07-08d6ae6a2c8a
 x-ms-office365-filtering-ht: Tenant
 x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600127)(711020)(4605104)(4618075)(2017052603328)(7153060)(7193020);SRVR:DB7PR04MB4187;
 x-ms-traffictypediagnostic: DB7PR04MB4187:
-x-microsoft-antispam-prvs: <DB7PR04MB4187831FA17A32241FA7B1CF8B430@DB7PR04MB4187.eurprd04.prod.outlook.com>
+x-microsoft-antispam-prvs: <DB7PR04MB4187447AF9E51F63CA0F00BA8B430@DB7PR04MB4187.eurprd04.prod.outlook.com>
 x-forefront-prvs: 09840A4839
 x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(136003)(396003)(366004)(376002)(39860400002)(346002)(189003)(199004)(446003)(86362001)(6436002)(81156014)(66066001)(97736004)(7736002)(99286004)(71190400001)(6116002)(8676002)(3846002)(4326008)(6486002)(2616005)(2501003)(476003)(81166006)(26005)(71200400001)(102836004)(52116002)(76176011)(486006)(54906003)(386003)(6506007)(316002)(110136005)(305945005)(14444005)(256004)(1076003)(2906002)(6512007)(44832011)(36756003)(25786009)(50226002)(53936002)(11346002)(478600001)(105586002)(106356001)(186003)(68736007)(5660300002)(14454004)(8936002);DIR:OUT;SFP:1101;SCL:1;SRVR:DB7PR04MB4187;H:DB7PR04MB4252.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
 received-spf: None (protection.outlook.com: nxp.com does not designate
  permitted sender hosts)
 x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: 7+98KMY6+KBnrjMSVc6qkwiScP7WGucfM6tB9+PM2w40fGTUQ3SFGLelOXpz/Ni4bHiRSgUzOy/fqfzd9iCNI1U+WzyFWFIVKvsGeERX7BIqSJ1umbnm5/IMoRHxyx7EBZCgZWxLqkgnIzGX8F8/oXnFIVVXt99qbG1Iw4ki/yvDD2F+Y8nXETRJLaK9zb24/L/LO+Gm6lbEGxi7QnR2puQM97/fcMvwktK6zY+hK1ZDxxuXuM9+poBY6fJmsfyjOdcMaU3f84u0Go5AhzNLy2+cEnh2VbOsHhsrqdJbowte6qmQM3JuSaoOJm+pD2TQy/YctXBl7kpFSz4HySYzBR0pQhddctCPuF5st8itn/2PItIlzUQSYisRcM2WPK7F8lRHO4qiWrqxHT40HycGo0RaI0vipG9nAkwwNWAuRdI=
+x-microsoft-antispam-message-info: xrn04bvj5nMPzknlVF7SWxjqgbRUtIsg1eV6ZsIxH5d1T1QuzFEJzq2fgoDSKje+FA+ZYSrtWj7AOUDJHDxWWQ+K9EtJo7qcV5QEmT0Savphb87G52NkthbZIslYSeO4OZw8p+YiGPUfkiZj4lvY7h1xBLP3llBL4kipIrVRhLYMA94aPQcEWfMbQPD8+G0QTAYG82b0phVMJSrNmiyjpUjGfuJutKM/JfrnrCM8suIfQfyPiYQBqQ8Q/mKZPet+3dH8r+Zztf9LhTX2OqGJ8qJzJrCOZftUyJ3hMMw+mKrokRJrXFG5/4nPne0hwuJZ2TfEIeO/Xj1pBOp7SyeWSoWj55hOvipvP3I2olM5XPisbZje2AAoVvMCnfNe/skiu/hCHHYN7QQwTg/1gVAy6P6vAjWo+cdow5vWqQASMAE=
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 64dab7c6-ef65-43c0-f91c-08d6ae6a2ba6
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Mar 2019 02:00:34.3714
+X-MS-Exchange-CrossTenant-Network-Message-Id: 82511711-7dfe-4559-cb07-08d6ae6a2c8a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Mar 2019 02:00:35.9045
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
@@ -88,69 +89,73 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-For each job ring pair, the output ring is processed exactly by one cpu
-at a time under a tasklet context (one per ring). Therefore, there is no
-need to protect a job ring's access & its private data structure using a
-lock. Hence the lock can be removed.
+For each job ring, the variable 'ringsize' is initialised but never
+used. Similarly variables 'inp_ring_write_index' and 'head' always track
+the same value and instead of 'inp_ring_write_index', caam_jr_enqueue()
+can use 'head' itself. Both these variables have been removed.
 
 Signed-off-by: Vakul Garg <vakul.garg@nxp.com>
-Reviewed-by: Horia Geanta <horia.geanta@nxp.com>
 ---
- drivers/crypto/caam/intern.h | 1 -
- drivers/crypto/caam/jr.c     | 7 +------
+v2->v3:
+Replaced inp_ring_read_index with inp_ring_write_index in commit msg.
+
+ drivers/crypto/caam/intern.h | 2 --
+ drivers/crypto/caam/jr.c     | 6 +-----
  2 files changed, 1 insertion(+), 7 deletions(-)
 
 diff --git a/drivers/crypto/caam/intern.h b/drivers/crypto/caam/intern.h
-index 30d5b6c5892f..48d62e020599 100644
+index 48d62e020599..3392615dc91b 100644
 --- a/drivers/crypto/caam/intern.h
 +++ b/drivers/crypto/caam/intern.h
-@@ -56,7 +56,6 @@ struct caam_drv_private_jr {
+@@ -49,10 +49,8 @@ struct caam_drv_private_jr {
+ 	atomic_t tfm_count ____cacheline_aligned;
+=20
+ 	/* Job ring info */
+-	int ringsize;	/* Size of rings (assume input =3D output) */
+ 	struct caam_jrentry_info *entinfo;	/* Alloc'ed 1 per ring entry */
+ 	spinlock_t inplock ____cacheline_aligned; /* Input ring index lock */
+-	int inp_ring_write_index;	/* Input index "tail" */
  	u32 inpring_avail;	/* Number of free entries in input ring */
  	int head;			/* entinfo (s/w ring) head index */
  	dma_addr_t *inpring;	/* Base of input ring, alloc DMA-safe */
--	spinlock_t outlock ____cacheline_aligned; /* Output ring index lock */
- 	int out_ring_read_index;	/* Output index "tail" */
- 	int tail;			/* entinfo (s/w ring) tail index */
- 	struct jr_outentry *outring;	/* Base of output ring, DMA-safe */
 diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
-index b9caa95755d1..d1021026f5b2 100644
+index d1021026f5b2..e95f82778fa1 100644
 --- a/drivers/crypto/caam/jr.c
 +++ b/drivers/crypto/caam/jr.c
-@@ -177,8 +177,6 @@ static void caam_jr_dequeue(unsigned long devarg)
+@@ -358,7 +358,7 @@ int caam_jr_enqueue(struct device *dev, u32 *desc,
+ 	head_entry->cbkarg =3D areq;
+ 	head_entry->desc_addr_dma =3D desc_dma;
 =20
- 		head =3D READ_ONCE(jrp->head);
+-	jrp->inpring[jrp->inp_ring_write_index] =3D cpu_to_caam_dma(desc_dma);
++	jrp->inpring[head] =3D cpu_to_caam_dma(desc_dma);
 =20
--		spin_lock(&jrp->outlock);
--
- 		sw_idx =3D tail =3D jrp->tail;
- 		hw_idx =3D jrp->out_ring_read_index;
+ 	/*
+ 	 * Guarantee that the descriptor's DMA address has been written to
+@@ -367,8 +367,6 @@ int caam_jr_enqueue(struct device *dev, u32 *desc,
+ 	 */
+ 	smp_wmb();
 =20
-@@ -201,7 +199,7 @@ static void caam_jr_dequeue(unsigned long devarg)
- 		/* mark completed, avoid matching on a recycled desc addr */
- 		jrp->entinfo[sw_idx].desc_addr_dma =3D 0;
+-	jrp->inp_ring_write_index =3D (jrp->inp_ring_write_index + 1) &
+-				    (JOBR_DEPTH - 1);
+ 	jrp->head =3D (head + 1) & (JOBR_DEPTH - 1);
 =20
--		/* Stash callback params for use outside of lock */
-+		/* Stash callback params */
- 		usercall =3D jrp->entinfo[sw_idx].callbk;
- 		userarg =3D jrp->entinfo[sw_idx].cbkarg;
- 		userdesc =3D jrp->entinfo[sw_idx].desc_addr_virt;
-@@ -234,8 +232,6 @@ static void caam_jr_dequeue(unsigned long devarg)
- 			jrp->tail =3D tail;
- 		}
+ 	/*
+@@ -434,7 +432,6 @@ static int caam_jr_init(struct device *dev)
+ 		jrp->entinfo[i].desc_addr_dma =3D !0;
 =20
--		spin_unlock(&jrp->outlock);
--
- 		/* Finally, execute user's callback */
- 		usercall(dev, userdesc, userstatus, userarg);
- 		outring_used--;
-@@ -452,7 +448,6 @@ static int caam_jr_init(struct device *dev)
+ 	/* Setup rings */
+-	jrp->inp_ring_write_index =3D 0;
+ 	jrp->out_ring_read_index =3D 0;
+ 	jrp->head =3D 0;
+ 	jrp->tail =3D 0;
+@@ -444,7 +441,6 @@ static int caam_jr_init(struct device *dev)
+ 	wr_reg32(&jrp->rregs->inpring_size, JOBR_DEPTH);
+ 	wr_reg32(&jrp->rregs->outring_size, JOBR_DEPTH);
+=20
+-	jrp->ringsize =3D JOBR_DEPTH;
  	jrp->inpring_avail =3D JOBR_DEPTH;
 =20
  	spin_lock_init(&jrp->inplock);
--	spin_lock_init(&jrp->outlock);
-=20
- 	/* Select interrupt coalescing parameters */
- 	clrsetbits_32(&jrp->rregs->rconfig_lo, 0, JOBR_INTC |
 --=20
 2.13.6
 
