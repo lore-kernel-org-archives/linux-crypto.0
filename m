@@ -7,41 +7,38 @@ X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54FDEC43381
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 Mar 2019 07:14:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36F61C43381
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 Mar 2019 07:14:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EC54120830
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 Mar 2019 07:14:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C0A2020830
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 Mar 2019 07:14:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="I7Y2NYF/"
+	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="FJS+T6FF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727839AbfCVHM1 (ORCPT
+        id S1727556AbfCVHO0 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 22 Mar 2019 03:12:27 -0400
+        Fri, 22 Mar 2019 03:14:26 -0400
 Received: from frisell.zx2c4.com ([192.95.5.64]:46903 "EHLO frisell.zx2c4.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727823AbfCVHM0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 22 Mar 2019 03:12:26 -0400
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id ce4ad937;
-        Fri, 22 Mar 2019 06:50:39 +0000 (UTC)
+        id S1727700AbfCVHMW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 22 Mar 2019 03:12:22 -0400
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 3b105359;
+        Fri, 22 Mar 2019 06:50:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=from:to:cc
         :subject:date:message-id:in-reply-to:references:mime-version
-        :content-transfer-encoding; s=mail; bh=YlUiaRWFdvuHxcrXMeEyo9DGC
-        04=; b=I7Y2NYF/6+UqOWqZpLcsNiFS9CfknMX+YFbk4cljS1xInRuazixOfT7yM
-        Fx2uJpQAiQDm/W6fgeCUdyJCpydZvBSXCbYv2xdNoJK2uX4PDspoRmt/vp0mbueV
-        70xuhSsw4FH56gVg5wxcIWBBimC2I8i6rM4CbJK4mId3OoVqIO+2q+B5+RTUDg6n
-        zANUXsaTtNoSla5FIfBOts2nx6rNleIad1Gura9FktwZr3QfFtpMKJYHCM5ZbagZ
-        pIOG63Zi+CHN0tjgtTp4BoiU3kPdBBWenN96hb6u9RnjWN+CBEj76bxlVNUJZhX0
-        /mMGrnpkIa0Yu2wCw/nmtGRTKkEAg==
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 2c1c84cf (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO);
-        Fri, 22 Mar 2019 06:50:38 +0000 (UTC)
+        :content-type:content-transfer-encoding; s=mail; bh=xumN9IBg+OgS
+        7K1Oyz8RrcEEajA=; b=FJS+T6FFv0hWScM3os3EbO8LTcEpIQKRmf8UeecK4Vcm
+        NcDxPtEOc1xQOMFYMzzKOoCSnZzy0+TER8RHP/YDDwl5HlwQVQc9RV1O0qhJ0GEa
+        N/RfhnWMcDbxpBKbrVQFNdzcBHme1ey8iu/eeFt86m6Q4hFDkIVTHoDPpWF8gBhu
+        nMTtXv3K+azWdLDgIx9mQQCzV20lTYVOpGtib8H2EmwOE4sOTHckf4lZypWB21pQ
+        t+OycDqZcTMJm9P0yHhsJSB2pfkk2TdeYIkAIZIzY+iptDM2m3M0/9hzNlTQ0psc
+        6S1nhWkd8HdPdY3zUy19EGzvDrNxCaWQnr7a05FYlw==
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id e2cbdecb (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO);
+        Fri, 22 Mar 2019 06:50:32 +0000 (UTC)
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
 To:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         netdev@vger.kernel.org
 Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Andy Polyakov <appro@openssl.org>,
-        Russell King <linux@armlinux.org.uk>,
-        linux-arm-kernel@lists.infradead.org,
         Samuel Neves <sneves@dei.uc.pt>,
         Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
         Andy Lutomirski <luto@kernel.org>,
@@ -49,41 +46,27 @@ Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
         Andrew Morton <akpm@linux-foundation.org>,
         Linus Torvalds <torvalds@linux-foundation.org>,
         kernel-hardening@lists.openwall.com
-Subject: [PATCH net-next v9 09/19] zinc: Poly1305 ARM and ARM64 implementations
-Date:   Fri, 22 Mar 2019 01:11:12 -0600
-Message-Id: <20190322071122.6677-10-Jason@zx2c4.com>
+Subject: [PATCH net-next v9 07/19] zinc: Poly1305 generic C implementations and selftest
+Date:   Fri, 22 Mar 2019 01:11:10 -0600
+Message-Id: <20190322071122.6677-8-Jason@zx2c4.com>
 In-Reply-To: <20190322071122.6677-1-Jason@zx2c4.com>
 References: <20190322071122.6677-1-Jason@zx2c4.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-These ARM implementations come from Andy Polyakov's implementations, and
-perform extremely well on ARMv4+, with optimized paths for NEON and
-non-NEON.
+These two C implementations -- a 32x32 one and a 64x64 one, depending on
+the platform -- come from Andrew Moon's public domain poly1305-donna
+portable code, modified for usage in the kernel and for usage with
+accelerated primitives.
 
-The NEON code uses base 2^26, while the scalar code uses base 2^64 on 64-bit
-and base 2^32 on 32-bit. If we hit the unfortunate situation of using NEON
-and then having to go back to scalar -- because the user is silly and has
-called the update function from two separate contexts -- then we need to
-convert back to the original base before proceeding. It is possible to
-reason that the initial reduction below is sufficient given the
-implementation invariants. However, for an avoidance of doubt and because
-this is not performance critical, we do the full reduction anyway. This
-conversion is found in the glue code, and a proof of correctness may be
-easily obtained from Z3: <https://xn--4db.cc/ltPtHCKN/py>.
-
-While this is CRYPTOGAMS code, the originating code for this happens to
-be the same as OpenSSL's commit 9925a82146f2503b4dd11423d0eba649b43450c0
+Information: https://cr.yp.to/mac.html
 
 Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-Co-developed-by: Andy Polyakov <appro@openssl.org>
-Cc: Andy Polyakov <appro@openssl.org>
-Cc: Russell King <linux@armlinux.org.uk>
-Cc: linux-arm-kernel@lists.infradead.org
 Cc: Samuel Neves <sneves@dei.uc.pt>
 Cc: Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
 Cc: Andy Lutomirski <luto@kernel.org>
@@ -93,2452 +76,1757 @@ Cc: Linus Torvalds <torvalds@linux-foundation.org>
 Cc: kernel-hardening@lists.openwall.com
 Cc: linux-crypto@vger.kernel.org
 ---
- lib/zinc/Makefile                     |    4 +-
- lib/zinc/poly1305/poly1305-arm-glue.c |  140 +++
- lib/zinc/poly1305/poly1305-arm.pl     | 1276 +++++++++++++++++++++++++
- lib/zinc/poly1305/poly1305-arm64.pl   |  974 +++++++++++++++++++
- lib/zinc/poly1305/poly1305.c          |    2 +
- 5 files changed, 2395 insertions(+), 1 deletion(-)
- create mode 100644 lib/zinc/poly1305/poly1305-arm-glue.c
- create mode 100644 lib/zinc/poly1305/poly1305-arm.pl
- create mode 100644 lib/zinc/poly1305/poly1305-arm64.pl
+ include/zinc/poly1305.h              |   31 +
+ lib/zinc/Kconfig                     |    3 +
+ lib/zinc/Makefile                    |    3 +
+ lib/zinc/poly1305/poly1305-donna32.c |  205 +++++
+ lib/zinc/poly1305/poly1305-donna64.c |  182 +++++
+ lib/zinc/poly1305/poly1305.c         |  154 ++++
+ lib/zinc/selftest/poly1305.c         | 1107 ++++++++++++++++++++++++++
+ 7 files changed, 1685 insertions(+)
+ create mode 100644 include/zinc/poly1305.h
+ create mode 100644 lib/zinc/poly1305/poly1305-donna32.c
+ create mode 100644 lib/zinc/poly1305/poly1305-donna64.c
+ create mode 100644 lib/zinc/poly1305/poly1305.c
+ create mode 100644 lib/zinc/selftest/poly1305.c
 
+diff --git a/include/zinc/poly1305.h b/include/zinc/poly1305.h
+new file mode 100644
+index 000000000000..8a16d19f8177
+--- /dev/null
++++ b/include/zinc/poly1305.h
+@@ -0,0 +1,31 @@
++/* SPDX-License-Identifier: GPL-2.0 OR MIT */
++/*
++ * Copyright (C) 2015-2019 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
++ */
++
++#ifndef _ZINC_POLY1305_H
++#define _ZINC_POLY1305_H
++
++#include <linux/simd.h>
++#include <linux/types.h>
++
++enum poly1305_lengths {
++	POLY1305_BLOCK_SIZE = 16,
++	POLY1305_KEY_SIZE = 32,
++	POLY1305_MAC_SIZE = 16
++};
++
++struct poly1305_ctx {
++	u8 opaque[24 * sizeof(u64)];
++	u32 nonce[4];
++	u8 data[POLY1305_BLOCK_SIZE];
++	size_t num;
++} __aligned(8);
++
++void poly1305_init(struct poly1305_ctx *ctx, const u8 key[POLY1305_KEY_SIZE]);
++void poly1305_update(struct poly1305_ctx *ctx, const u8 *input, size_t len,
++		     simd_context_t *simd_context);
++void poly1305_final(struct poly1305_ctx *ctx, u8 mac[POLY1305_MAC_SIZE],
++		    simd_context_t *simd_context);
++
++#endif /* _ZINC_POLY1305_H */
+diff --git a/lib/zinc/Kconfig b/lib/zinc/Kconfig
+index cdc8a28e9d99..88e57dc5865b 100644
+--- a/lib/zinc/Kconfig
++++ b/lib/zinc/Kconfig
+@@ -2,6 +2,9 @@ config ZINC_CHACHA20
+ 	tristate
+ 	select CRYPTO_ALGAPI
+ 
++config ZINC_POLY1305
++	tristate
++
+ config ZINC_SELFTEST
+ 	bool "Zinc cryptography library self-tests"
+ 	default y
 diff --git a/lib/zinc/Makefile b/lib/zinc/Makefile
-index 6ec02f65f96f..488c5f2e3078 100644
+index 213e305b699d..e73600fc3872 100644
 --- a/lib/zinc/Makefile
 +++ b/lib/zinc/Makefile
-@@ -13,7 +13,9 @@ obj-$(CONFIG_ZINC_CHACHA20) += zinc_chacha20.o
+@@ -11,6 +11,9 @@ AFLAGS_chacha20-mips.o += -O2 # This is required to fill the branch delay slots
+ perlasm-targets += chacha20/chacha20-x86_64.S chacha20/chacha20-arm.S chacha20/chacha20-arm64.S
+ obj-$(CONFIG_ZINC_CHACHA20) += zinc_chacha20.o
  
- zinc_poly1305-y := poly1305/poly1305.o
- zinc_poly1305-$(CONFIG_ZINC_ARCH_X86_64) += poly1305/poly1305-x86_64.o
--perlasm-targets += poly1305/poly1305-x86_64.S
-+zinc_poly1305-$(CONFIG_ZINC_ARCH_ARM) += poly1305/poly1305-arm.o
-+zinc_poly1305-$(CONFIG_ZINC_ARCH_ARM64) += poly1305/poly1305-arm64.o
-+perlasm-targets += poly1305/poly1305-x86_64.S poly1305/poly1305-arm.S poly1305/poly1305-arm64.S
- obj-$(CONFIG_ZINC_POLY1305) += zinc_poly1305.o
- 
++zinc_poly1305-y := poly1305/poly1305.o
++obj-$(CONFIG_ZINC_POLY1305) += zinc_poly1305.o
++
  quiet_cmd_perlasm = PERLASM $@
-diff --git a/lib/zinc/poly1305/poly1305-arm-glue.c b/lib/zinc/poly1305/poly1305-arm-glue.c
+       cmd_perlasm = $(PERL) $< > $@
+ $(addprefix $(obj)/,$(perlasm-targets)): $(obj)/%.S: $(src)/%.pl FORCE
+diff --git a/lib/zinc/poly1305/poly1305-donna32.c b/lib/zinc/poly1305/poly1305-donna32.c
 new file mode 100644
-index 000000000000..a80f0460ea13
+index 000000000000..527ccc3b59cc
 --- /dev/null
-+++ b/lib/zinc/poly1305/poly1305-arm-glue.c
-@@ -0,0 +1,140 @@
++++ b/lib/zinc/poly1305/poly1305-donna32.c
+@@ -0,0 +1,205 @@
++// SPDX-License-Identifier: GPL-2.0 OR MIT
++/*
++ * Copyright (C) 2015-2019 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
++ *
++ * This is based in part on Andrew Moon's poly1305-donna, which is in the
++ * public domain.
++ */
++
++struct poly1305_internal {
++	u32 h[5];
++	u32 r[5];
++	u32 s[4];
++};
++
++static void poly1305_init_generic(void *ctx, const u8 key[16])
++{
++	struct poly1305_internal *st = (struct poly1305_internal *)ctx;
++
++	/* r &= 0xffffffc0ffffffc0ffffffc0fffffff */
++	st->r[0] = (get_unaligned_le32(&key[0])) & 0x3ffffff;
++	st->r[1] = (get_unaligned_le32(&key[3]) >> 2) & 0x3ffff03;
++	st->r[2] = (get_unaligned_le32(&key[6]) >> 4) & 0x3ffc0ff;
++	st->r[3] = (get_unaligned_le32(&key[9]) >> 6) & 0x3f03fff;
++	st->r[4] = (get_unaligned_le32(&key[12]) >> 8) & 0x00fffff;
++
++	/* s = 5*r */
++	st->s[0] = st->r[1] * 5;
++	st->s[1] = st->r[2] * 5;
++	st->s[2] = st->r[3] * 5;
++	st->s[3] = st->r[4] * 5;
++
++	/* h = 0 */
++	st->h[0] = 0;
++	st->h[1] = 0;
++	st->h[2] = 0;
++	st->h[3] = 0;
++	st->h[4] = 0;
++}
++
++static void poly1305_blocks_generic(void *ctx, const u8 *input, size_t len,
++				    const u32 padbit)
++{
++	struct poly1305_internal *st = (struct poly1305_internal *)ctx;
++	const u32 hibit = padbit << 24;
++	u32 r0, r1, r2, r3, r4;
++	u32 s1, s2, s3, s4;
++	u32 h0, h1, h2, h3, h4;
++	u64 d0, d1, d2, d3, d4;
++	u32 c;
++
++	r0 = st->r[0];
++	r1 = st->r[1];
++	r2 = st->r[2];
++	r3 = st->r[3];
++	r4 = st->r[4];
++
++	s1 = st->s[0];
++	s2 = st->s[1];
++	s3 = st->s[2];
++	s4 = st->s[3];
++
++	h0 = st->h[0];
++	h1 = st->h[1];
++	h2 = st->h[2];
++	h3 = st->h[3];
++	h4 = st->h[4];
++
++	while (len >= POLY1305_BLOCK_SIZE) {
++		/* h += m[i] */
++		h0 += (get_unaligned_le32(&input[0])) & 0x3ffffff;
++		h1 += (get_unaligned_le32(&input[3]) >> 2) & 0x3ffffff;
++		h2 += (get_unaligned_le32(&input[6]) >> 4) & 0x3ffffff;
++		h3 += (get_unaligned_le32(&input[9]) >> 6) & 0x3ffffff;
++		h4 += (get_unaligned_le32(&input[12]) >> 8) | hibit;
++
++		/* h *= r */
++		d0 = ((u64)h0 * r0) + ((u64)h1 * s4) +
++		     ((u64)h2 * s3) + ((u64)h3 * s2) +
++		     ((u64)h4 * s1);
++		d1 = ((u64)h0 * r1) + ((u64)h1 * r0) +
++		     ((u64)h2 * s4) + ((u64)h3 * s3) +
++		     ((u64)h4 * s2);
++		d2 = ((u64)h0 * r2) + ((u64)h1 * r1) +
++		     ((u64)h2 * r0) + ((u64)h3 * s4) +
++		     ((u64)h4 * s3);
++		d3 = ((u64)h0 * r3) + ((u64)h1 * r2) +
++		     ((u64)h2 * r1) + ((u64)h3 * r0) +
++		     ((u64)h4 * s4);
++		d4 = ((u64)h0 * r4) + ((u64)h1 * r3) +
++		     ((u64)h2 * r2) + ((u64)h3 * r1) +
++		     ((u64)h4 * r0);
++
++		/* (partial) h %= p */
++		c = (u32)(d0 >> 26);
++		h0 = (u32)d0 & 0x3ffffff;
++		d1 += c;
++		c = (u32)(d1 >> 26);
++		h1 = (u32)d1 & 0x3ffffff;
++		d2 += c;
++		c = (u32)(d2 >> 26);
++		h2 = (u32)d2 & 0x3ffffff;
++		d3 += c;
++		c = (u32)(d3 >> 26);
++		h3 = (u32)d3 & 0x3ffffff;
++		d4 += c;
++		c = (u32)(d4 >> 26);
++		h4 = (u32)d4 & 0x3ffffff;
++		h0 += c * 5;
++		c = (h0 >> 26);
++		h0 = h0 & 0x3ffffff;
++		h1 += c;
++
++		input += POLY1305_BLOCK_SIZE;
++		len -= POLY1305_BLOCK_SIZE;
++	}
++
++	st->h[0] = h0;
++	st->h[1] = h1;
++	st->h[2] = h2;
++	st->h[3] = h3;
++	st->h[4] = h4;
++}
++
++static void poly1305_emit_generic(void *ctx, u8 mac[16], const u32 nonce[4])
++{
++	struct poly1305_internal *st = (struct poly1305_internal *)ctx;
++	u32 h0, h1, h2, h3, h4, c;
++	u32 g0, g1, g2, g3, g4;
++	u64 f;
++	u32 mask;
++
++	/* fully carry h */
++	h0 = st->h[0];
++	h1 = st->h[1];
++	h2 = st->h[2];
++	h3 = st->h[3];
++	h4 = st->h[4];
++
++	c = h1 >> 26;
++	h1 = h1 & 0x3ffffff;
++	h2 += c;
++	c = h2 >> 26;
++	h2 = h2 & 0x3ffffff;
++	h3 += c;
++	c = h3 >> 26;
++	h3 = h3 & 0x3ffffff;
++	h4 += c;
++	c = h4 >> 26;
++	h4 = h4 & 0x3ffffff;
++	h0 += c * 5;
++	c = h0 >> 26;
++	h0 = h0 & 0x3ffffff;
++	h1 += c;
++
++	/* compute h + -p */
++	g0 = h0 + 5;
++	c = g0 >> 26;
++	g0 &= 0x3ffffff;
++	g1 = h1 + c;
++	c = g1 >> 26;
++	g1 &= 0x3ffffff;
++	g2 = h2 + c;
++	c = g2 >> 26;
++	g2 &= 0x3ffffff;
++	g3 = h3 + c;
++	c = g3 >> 26;
++	g3 &= 0x3ffffff;
++	g4 = h4 + c - (1UL << 26);
++
++	/* select h if h < p, or h + -p if h >= p */
++	mask = (g4 >> ((sizeof(u32) * 8) - 1)) - 1;
++	g0 &= mask;
++	g1 &= mask;
++	g2 &= mask;
++	g3 &= mask;
++	g4 &= mask;
++	mask = ~mask;
++
++	h0 = (h0 & mask) | g0;
++	h1 = (h1 & mask) | g1;
++	h2 = (h2 & mask) | g2;
++	h3 = (h3 & mask) | g3;
++	h4 = (h4 & mask) | g4;
++
++	/* h = h % (2^128) */
++	h0 = ((h0) | (h1 << 26)) & 0xffffffff;
++	h1 = ((h1 >> 6) | (h2 << 20)) & 0xffffffff;
++	h2 = ((h2 >> 12) | (h3 << 14)) & 0xffffffff;
++	h3 = ((h3 >> 18) | (h4 << 8)) & 0xffffffff;
++
++	/* mac = (h + nonce) % (2^128) */
++	f = (u64)h0 + nonce[0];
++	h0 = (u32)f;
++	f = (u64)h1 + nonce[1] + (f >> 32);
++	h1 = (u32)f;
++	f = (u64)h2 + nonce[2] + (f >> 32);
++	h2 = (u32)f;
++	f = (u64)h3 + nonce[3] + (f >> 32);
++	h3 = (u32)f;
++
++	put_unaligned_le32(h0, &mac[0]);
++	put_unaligned_le32(h1, &mac[4]);
++	put_unaligned_le32(h2, &mac[8]);
++	put_unaligned_le32(h3, &mac[12]);
++}
+diff --git a/lib/zinc/poly1305/poly1305-donna64.c b/lib/zinc/poly1305/poly1305-donna64.c
+new file mode 100644
+index 000000000000..131f1dda1b1d
+--- /dev/null
++++ b/lib/zinc/poly1305/poly1305-donna64.c
+@@ -0,0 +1,182 @@
++// SPDX-License-Identifier: GPL-2.0 OR MIT
++/*
++ * Copyright (C) 2015-2019 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
++ *
++ * This is based in part on Andrew Moon's poly1305-donna, which is in the
++ * public domain.
++ */
++
++typedef __uint128_t u128;
++
++struct poly1305_internal {
++	u64 r[3];
++	u64 h[3];
++	u64 s[2];
++};
++
++static void poly1305_init_generic(void *ctx, const u8 key[16])
++{
++	struct poly1305_internal *st = (struct poly1305_internal *)ctx;
++	u64 t0, t1;
++
++	/* r &= 0xffffffc0ffffffc0ffffffc0fffffff */
++	t0 = get_unaligned_le64(&key[0]);
++	t1 = get_unaligned_le64(&key[8]);
++
++	st->r[0] = t0 & 0xffc0fffffffULL;
++	st->r[1] = ((t0 >> 44) | (t1 << 20)) & 0xfffffc0ffffULL;
++	st->r[2] = ((t1 >> 24)) & 0x00ffffffc0fULL;
++
++	/* s = 20*r */
++	st->s[0] = st->r[1] * 20;
++	st->s[1] = st->r[2] * 20;
++
++	/* h = 0 */
++	st->h[0] = 0;
++	st->h[1] = 0;
++	st->h[2] = 0;
++}
++
++static void poly1305_blocks_generic(void *ctx, const u8 *input, size_t len,
++				    const u32 padbit)
++{
++	struct poly1305_internal *st = (struct poly1305_internal *)ctx;
++	const u64 hibit = ((u64)padbit) << 40;
++	u64 r0, r1, r2;
++	u64 s1, s2;
++	u64 h0, h1, h2;
++	u64 c;
++	u128 d0, d1, d2, d;
++
++	r0 = st->r[0];
++	r1 = st->r[1];
++	r2 = st->r[2];
++
++	h0 = st->h[0];
++	h1 = st->h[1];
++	h2 = st->h[2];
++
++	s1 = st->s[0];
++	s2 = st->s[1];
++
++	while (len >= POLY1305_BLOCK_SIZE) {
++		u64 t0, t1;
++
++		/* h += m[i] */
++		t0 = get_unaligned_le64(&input[0]);
++		t1 = get_unaligned_le64(&input[8]);
++
++		h0 += t0 & 0xfffffffffffULL;
++		h1 += ((t0 >> 44) | (t1 << 20)) & 0xfffffffffffULL;
++		h2 += (((t1 >> 24)) & 0x3ffffffffffULL) | hibit;
++
++		/* h *= r */
++		d0 = (u128)h0 * r0;
++		d = (u128)h1 * s2;
++		d0 += d;
++		d = (u128)h2 * s1;
++		d0 += d;
++		d1 = (u128)h0 * r1;
++		d = (u128)h1 * r0;
++		d1 += d;
++		d = (u128)h2 * s2;
++		d1 += d;
++		d2 = (u128)h0 * r2;
++		d = (u128)h1 * r1;
++		d2 += d;
++		d = (u128)h2 * r0;
++		d2 += d;
++
++		/* (partial) h %= p */
++		c = (u64)(d0 >> 44);
++		h0 = (u64)d0 & 0xfffffffffffULL;
++		d1 += c;
++		c = (u64)(d1 >> 44);
++		h1 = (u64)d1 & 0xfffffffffffULL;
++		d2 += c;
++		c = (u64)(d2 >> 42);
++		h2 = (u64)d2 & 0x3ffffffffffULL;
++		h0 += c * 5;
++		c = h0 >> 44;
++		h0 = h0 & 0xfffffffffffULL;
++		h1 += c;
++
++		input += POLY1305_BLOCK_SIZE;
++		len -= POLY1305_BLOCK_SIZE;
++	}
++
++	st->h[0] = h0;
++	st->h[1] = h1;
++	st->h[2] = h2;
++}
++
++static void poly1305_emit_generic(void *ctx, u8 mac[16], const u32 nonce[4])
++{
++	struct poly1305_internal *st = (struct poly1305_internal *)ctx;
++	u64 h0, h1, h2, c;
++	u64 g0, g1, g2;
++	u64 t0, t1;
++
++	/* fully carry h */
++	h0 = st->h[0];
++	h1 = st->h[1];
++	h2 = st->h[2];
++
++	c = h1 >> 44;
++	h1 &= 0xfffffffffffULL;
++	h2 += c;
++	c = h2 >> 42;
++	h2 &= 0x3ffffffffffULL;
++	h0 += c * 5;
++	c = h0 >> 44;
++	h0 &= 0xfffffffffffULL;
++	h1 += c;
++	c = h1 >> 44;
++	h1 &= 0xfffffffffffULL;
++	h2 += c;
++	c = h2 >> 42;
++	h2 &= 0x3ffffffffffULL;
++	h0 += c * 5;
++	c = h0 >> 44;
++	h0 &= 0xfffffffffffULL;
++	h1 += c;
++
++	/* compute h + -p */
++	g0 = h0 + 5;
++	c  = g0 >> 44;
++	g0 &= 0xfffffffffffULL;
++	g1 = h1 + c;
++	c  = g1 >> 44;
++	g1 &= 0xfffffffffffULL;
++	g2 = h2 + c - (1ULL << 42);
++
++	/* select h if h < p, or h + -p if h >= p */
++	c = (g2 >> ((sizeof(u64) * 8) - 1)) - 1;
++	g0 &= c;
++	g1 &= c;
++	g2 &= c;
++	c  = ~c;
++	h0 = (h0 & c) | g0;
++	h1 = (h1 & c) | g1;
++	h2 = (h2 & c) | g2;
++
++	/* h = (h + nonce) */
++	t0 = ((u64)nonce[1] << 32) | nonce[0];
++	t1 = ((u64)nonce[3] << 32) | nonce[2];
++
++	h0 += t0 & 0xfffffffffffULL;
++	c = h0 >> 44;
++	h0 &= 0xfffffffffffULL;
++	h1 += (((t0 >> 44) | (t1 << 20)) & 0xfffffffffffULL) + c;
++	c = h1 >> 44;
++	h1 &= 0xfffffffffffULL;
++	h2 += (((t1 >> 24)) & 0x3ffffffffffULL) + c;
++	h2 &= 0x3ffffffffffULL;
++
++	/* mac = h % (2^128) */
++	h0 = h0 | (h1 << 44);
++	h1 = (h1 >> 20) | (h2 << 24);
++
++	put_unaligned_le64(h0, &mac[0]);
++	put_unaligned_le64(h1, &mac[8]);
++}
+diff --git a/lib/zinc/poly1305/poly1305.c b/lib/zinc/poly1305/poly1305.c
+new file mode 100644
+index 000000000000..10b42baf5341
+--- /dev/null
++++ b/lib/zinc/poly1305/poly1305.c
+@@ -0,0 +1,154 @@
++// SPDX-License-Identifier: GPL-2.0 OR MIT
++/*
++ * Copyright (C) 2015-2019 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
++ *
++ * Implementation of the Poly1305 message authenticator.
++ *
++ * Information: https://cr.yp.to/mac.html
++ */
++
++#include <zinc/poly1305.h>
++#include "../selftest/run.h"
++
++#include <asm/unaligned.h>
++#include <linux/kernel.h>
++#include <linux/string.h>
++#include <linux/module.h>
++#include <linux/init.h>
++
++static inline bool poly1305_init_arch(void *ctx,
++				      const u8 key[POLY1305_KEY_SIZE])
++{
++	return false;
++}
++static inline bool poly1305_blocks_arch(void *ctx, const u8 *input,
++					size_t len, const u32 padbit,
++					simd_context_t *simd_context)
++{
++	return false;
++}
++static inline bool poly1305_emit_arch(void *ctx, u8 mac[POLY1305_MAC_SIZE],
++				      const u32 nonce[4],
++				      simd_context_t *simd_context)
++{
++	return false;
++}
++static bool *const poly1305_nobs[] __initconst = { };
++static void __init poly1305_fpu_init(void)
++{
++}
++
++#if defined(CONFIG_ARCH_SUPPORTS_INT128) && defined(__SIZEOF_INT128__)
++#include "poly1305-donna64.c"
++#else
++#include "poly1305-donna32.c"
++#endif
++
++void poly1305_init(struct poly1305_ctx *ctx, const u8 key[POLY1305_KEY_SIZE])
++{
++	ctx->nonce[0] = get_unaligned_le32(&key[16]);
++	ctx->nonce[1] = get_unaligned_le32(&key[20]);
++	ctx->nonce[2] = get_unaligned_le32(&key[24]);
++	ctx->nonce[3] = get_unaligned_le32(&key[28]);
++
++	if (!poly1305_init_arch(ctx->opaque, key))
++		poly1305_init_generic(ctx->opaque, key);
++
++	ctx->num = 0;
++}
++EXPORT_SYMBOL(poly1305_init);
++
++static inline void poly1305_blocks(void *ctx, const u8 *input, const size_t len,
++				   const u32 padbit,
++				   simd_context_t *simd_context)
++{
++	if (!poly1305_blocks_arch(ctx, input, len, padbit, simd_context))
++		poly1305_blocks_generic(ctx, input, len, padbit);
++}
++
++static inline void poly1305_emit(void *ctx, u8 mac[POLY1305_KEY_SIZE],
++				 const u32 nonce[4],
++				 simd_context_t *simd_context)
++{
++	if (!poly1305_emit_arch(ctx, mac, nonce, simd_context))
++		poly1305_emit_generic(ctx, mac, nonce);
++}
++
++void poly1305_update(struct poly1305_ctx *ctx, const u8 *input, size_t len,
++		     simd_context_t *simd_context)
++{
++	const size_t num = ctx->num;
++	size_t rem;
++
++	if (num) {
++		rem = POLY1305_BLOCK_SIZE - num;
++		if (len < rem) {
++			memcpy(ctx->data + num, input, len);
++			ctx->num = num + len;
++			return;
++		}
++		memcpy(ctx->data + num, input, rem);
++		poly1305_blocks(ctx->opaque, ctx->data, POLY1305_BLOCK_SIZE, 1,
++				simd_context);
++		input += rem;
++		len -= rem;
++	}
++
++	rem = len % POLY1305_BLOCK_SIZE;
++	len -= rem;
++
++	if (len >= POLY1305_BLOCK_SIZE) {
++		poly1305_blocks(ctx->opaque, input, len, 1, simd_context);
++		input += len;
++	}
++
++	if (rem)
++		memcpy(ctx->data, input, rem);
++
++	ctx->num = rem;
++}
++EXPORT_SYMBOL(poly1305_update);
++
++void poly1305_final(struct poly1305_ctx *ctx, u8 mac[POLY1305_MAC_SIZE],
++		    simd_context_t *simd_context)
++{
++	size_t num = ctx->num;
++
++	if (num) {
++		ctx->data[num++] = 1;
++		while (num < POLY1305_BLOCK_SIZE)
++			ctx->data[num++] = 0;
++		poly1305_blocks(ctx->opaque, ctx->data, POLY1305_BLOCK_SIZE, 0,
++				simd_context);
++	}
++
++	poly1305_emit(ctx->opaque, mac, ctx->nonce, simd_context);
++
++	memzero_explicit(ctx, sizeof(*ctx));
++}
++EXPORT_SYMBOL(poly1305_final);
++
++#include "../selftest/poly1305.c"
++
++static bool nosimd __initdata = false;
++
++static int __init mod_init(void)
++{
++	if (!nosimd)
++		poly1305_fpu_init();
++	if (!selftest_run("poly1305", poly1305_selftest, poly1305_nobs,
++			  ARRAY_SIZE(poly1305_nobs)))
++		return -ENOTRECOVERABLE;
++	return 0;
++}
++
++static void __exit mod_exit(void)
++{
++}
++
++module_param(nosimd, bool, 0);
++module_init(mod_init);
++module_exit(mod_exit);
++MODULE_LICENSE("GPL v2");
++MODULE_DESCRIPTION("Poly1305 one-time authenticator");
++MODULE_AUTHOR("Jason A. Donenfeld <Jason@zx2c4.com>");
+diff --git a/lib/zinc/selftest/poly1305.c b/lib/zinc/selftest/poly1305.c
+new file mode 100644
+index 000000000000..b4d7a9c2f6ec
+--- /dev/null
++++ b/lib/zinc/selftest/poly1305.c
+@@ -0,0 +1,1107 @@
 +// SPDX-License-Identifier: GPL-2.0 OR MIT
 +/*
 + * Copyright (C) 2015-2019 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
 + */
 +
-+#include <asm/hwcap.h>
-+#include <asm/neon.h>
-+
-+asmlinkage void poly1305_init_arm(void *ctx, const u8 key[16]);
-+asmlinkage void poly1305_blocks_arm(void *ctx, const u8 *inp, const size_t len,
-+				    const u32 padbit);
-+asmlinkage void poly1305_emit_arm(void *ctx, u8 mac[16], const u32 nonce[4]);
-+asmlinkage void poly1305_blocks_neon(void *ctx, const u8 *inp, const size_t len,
-+				     const u32 padbit);
-+asmlinkage void poly1305_emit_neon(void *ctx, u8 mac[16], const u32 nonce[4]);
-+
-+static bool poly1305_use_neon __ro_after_init;
-+static bool *const poly1305_nobs[] __initconst = { &poly1305_use_neon };
-+
-+static void __init poly1305_fpu_init(void)
-+{
-+#if defined(CONFIG_ZINC_ARCH_ARM64)
-+	poly1305_use_neon = elf_hwcap & HWCAP_ASIMD;
-+#elif defined(CONFIG_ZINC_ARCH_ARM)
-+	poly1305_use_neon = elf_hwcap & HWCAP_NEON;
-+#endif
-+}
-+
-+#if defined(CONFIG_ZINC_ARCH_ARM64)
-+struct poly1305_arch_internal {
-+	union {
-+		u32 h[5];
-+		struct {
-+			u64 h0, h1, h2;
-+		};
-+	};
-+	u64 is_base2_26;
-+	u64 r[2];
++struct poly1305_testvec {
++	const u8 *input, *output, *key;
++	size_t ilen;
 +};
-+#elif defined(CONFIG_ZINC_ARCH_ARM)
-+struct poly1305_arch_internal {
-+	union {
-+		u32 h[5];
-+		struct {
-+			u64 h0, h1;
-+			u32 h2;
-+		} __packed;
-+	};
-+	u32 r[4];
-+	u32 is_base2_26;
++
++/* RFC7539 */
++static const u8 input01[] __initconst = {
++	0x43, 0x72, 0x79, 0x70, 0x74, 0x6f, 0x67, 0x72,
++	0x61, 0x70, 0x68, 0x69, 0x63, 0x20, 0x46, 0x6f,
++	0x72, 0x75, 0x6d, 0x20, 0x52, 0x65, 0x73, 0x65,
++	0x61, 0x72, 0x63, 0x68, 0x20, 0x47, 0x72, 0x6f,
++	0x75, 0x70
 +};
-+#endif
++static const u8 output01[] __initconst = {
++	0xa8, 0x06, 0x1d, 0xc1, 0x30, 0x51, 0x36, 0xc6,
++	0xc2, 0x2b, 0x8b, 0xaf, 0x0c, 0x01, 0x27, 0xa9
++};
++static const u8 key01[] __initconst = {
++	0x85, 0xd6, 0xbe, 0x78, 0x57, 0x55, 0x6d, 0x33,
++	0x7f, 0x44, 0x52, 0xfe, 0x42, 0xd5, 0x06, 0xa8,
++	0x01, 0x03, 0x80, 0x8a, 0xfb, 0x0d, 0xb2, 0xfd,
++	0x4a, 0xbf, 0xf6, 0xaf, 0x41, 0x49, 0xf5, 0x1b
++};
 +
-+/* The NEON code uses base 2^26, while the scalar code uses base 2^64 on 64-bit
-+ * and base 2^32 on 32-bit. If we hit the unfortunate situation of using NEON
-+ * and then having to go back to scalar -- because the user is silly and has
-+ * called the update function from two separate contexts -- then we need to
-+ * convert back to the original base before proceeding. The below function is
-+ * written for 64-bit integers, and so we have to swap words at the end on
-+ * big-endian 32-bit. It is possible to reason that the initial reduction below
-+ * is sufficient given the implementation invariants. However, for an avoidance
-+ * of doubt and because this is not performance critical, we do the full
-+ * reduction anyway.
-+ */
-+static void convert_to_base2_64(void *ctx)
++/* "The Poly1305-AES message-authentication code" */
++static const u8 input02[] __initconst = {
++	0xf3, 0xf6
++};
++static const u8 output02[] __initconst = {
++	0xf4, 0xc6, 0x33, 0xc3, 0x04, 0x4f, 0xc1, 0x45,
++	0xf8, 0x4f, 0x33, 0x5c, 0xb8, 0x19, 0x53, 0xde
++};
++static const u8 key02[] __initconst = {
++	0x85, 0x1f, 0xc4, 0x0c, 0x34, 0x67, 0xac, 0x0b,
++	0xe0, 0x5c, 0xc2, 0x04, 0x04, 0xf3, 0xf7, 0x00,
++	0x58, 0x0b, 0x3b, 0x0f, 0x94, 0x47, 0xbb, 0x1e,
++	0x69, 0xd0, 0x95, 0xb5, 0x92, 0x8b, 0x6d, 0xbc
++};
++
++static const u8 input03[] __initconst = { };
++static const u8 output03[] __initconst = {
++	0xdd, 0x3f, 0xab, 0x22, 0x51, 0xf1, 0x1a, 0xc7,
++	0x59, 0xf0, 0x88, 0x71, 0x29, 0xcc, 0x2e, 0xe7
++};
++static const u8 key03[] __initconst = {
++	0xa0, 0xf3, 0x08, 0x00, 0x00, 0xf4, 0x64, 0x00,
++	0xd0, 0xc7, 0xe9, 0x07, 0x6c, 0x83, 0x44, 0x03,
++	0xdd, 0x3f, 0xab, 0x22, 0x51, 0xf1, 0x1a, 0xc7,
++	0x59, 0xf0, 0x88, 0x71, 0x29, 0xcc, 0x2e, 0xe7
++};
++
++static const u8 input04[] __initconst = {
++	0x66, 0x3c, 0xea, 0x19, 0x0f, 0xfb, 0x83, 0xd8,
++	0x95, 0x93, 0xf3, 0xf4, 0x76, 0xb6, 0xbc, 0x24,
++	0xd7, 0xe6, 0x79, 0x10, 0x7e, 0xa2, 0x6a, 0xdb,
++	0x8c, 0xaf, 0x66, 0x52, 0xd0, 0x65, 0x61, 0x36
++};
++static const u8 output04[] __initconst = {
++	0x0e, 0xe1, 0xc1, 0x6b, 0xb7, 0x3f, 0x0f, 0x4f,
++	0xd1, 0x98, 0x81, 0x75, 0x3c, 0x01, 0xcd, 0xbe
++};
++static const u8 key04[] __initconst = {
++	0x48, 0x44, 0x3d, 0x0b, 0xb0, 0xd2, 0x11, 0x09,
++	0xc8, 0x9a, 0x10, 0x0b, 0x5c, 0xe2, 0xc2, 0x08,
++	0x83, 0x14, 0x9c, 0x69, 0xb5, 0x61, 0xdd, 0x88,
++	0x29, 0x8a, 0x17, 0x98, 0xb1, 0x07, 0x16, 0xef
++};
++
++static const u8 input05[] __initconst = {
++	0xab, 0x08, 0x12, 0x72, 0x4a, 0x7f, 0x1e, 0x34,
++	0x27, 0x42, 0xcb, 0xed, 0x37, 0x4d, 0x94, 0xd1,
++	0x36, 0xc6, 0xb8, 0x79, 0x5d, 0x45, 0xb3, 0x81,
++	0x98, 0x30, 0xf2, 0xc0, 0x44, 0x91, 0xfa, 0xf0,
++	0x99, 0x0c, 0x62, 0xe4, 0x8b, 0x80, 0x18, 0xb2,
++	0xc3, 0xe4, 0xa0, 0xfa, 0x31, 0x34, 0xcb, 0x67,
++	0xfa, 0x83, 0xe1, 0x58, 0xc9, 0x94, 0xd9, 0x61,
++	0xc4, 0xcb, 0x21, 0x09, 0x5c, 0x1b, 0xf9
++};
++static const u8 output05[] __initconst = {
++	0x51, 0x54, 0xad, 0x0d, 0x2c, 0xb2, 0x6e, 0x01,
++	0x27, 0x4f, 0xc5, 0x11, 0x48, 0x49, 0x1f, 0x1b
++};
++static const u8 key05[] __initconst = {
++	0x12, 0x97, 0x6a, 0x08, 0xc4, 0x42, 0x6d, 0x0c,
++	0xe8, 0xa8, 0x24, 0x07, 0xc4, 0xf4, 0x82, 0x07,
++	0x80, 0xf8, 0xc2, 0x0a, 0xa7, 0x12, 0x02, 0xd1,
++	0xe2, 0x91, 0x79, 0xcb, 0xcb, 0x55, 0x5a, 0x57
++};
++
++/* self-generated vectors exercise "significant" lengths, such that they
++ * are handled by different code paths */
++static const u8 input06[] __initconst = {
++	0xab, 0x08, 0x12, 0x72, 0x4a, 0x7f, 0x1e, 0x34,
++	0x27, 0x42, 0xcb, 0xed, 0x37, 0x4d, 0x94, 0xd1,
++	0x36, 0xc6, 0xb8, 0x79, 0x5d, 0x45, 0xb3, 0x81,
++	0x98, 0x30, 0xf2, 0xc0, 0x44, 0x91, 0xfa, 0xf0,
++	0x99, 0x0c, 0x62, 0xe4, 0x8b, 0x80, 0x18, 0xb2,
++	0xc3, 0xe4, 0xa0, 0xfa, 0x31, 0x34, 0xcb, 0x67,
++	0xfa, 0x83, 0xe1, 0x58, 0xc9, 0x94, 0xd9, 0x61,
++	0xc4, 0xcb, 0x21, 0x09, 0x5c, 0x1b, 0xf9, 0xaf
++};
++static const u8 output06[] __initconst = {
++	0x81, 0x20, 0x59, 0xa5, 0xda, 0x19, 0x86, 0x37,
++	0xca, 0xc7, 0xc4, 0xa6, 0x31, 0xbe, 0xe4, 0x66
++};
++static const u8 key06[] __initconst = {
++	0x12, 0x97, 0x6a, 0x08, 0xc4, 0x42, 0x6d, 0x0c,
++	0xe8, 0xa8, 0x24, 0x07, 0xc4, 0xf4, 0x82, 0x07,
++	0x80, 0xf8, 0xc2, 0x0a, 0xa7, 0x12, 0x02, 0xd1,
++	0xe2, 0x91, 0x79, 0xcb, 0xcb, 0x55, 0x5a, 0x57
++};
++
++static const u8 input07[] __initconst = {
++	0xab, 0x08, 0x12, 0x72, 0x4a, 0x7f, 0x1e, 0x34,
++	0x27, 0x42, 0xcb, 0xed, 0x37, 0x4d, 0x94, 0xd1,
++	0x36, 0xc6, 0xb8, 0x79, 0x5d, 0x45, 0xb3, 0x81,
++	0x98, 0x30, 0xf2, 0xc0, 0x44, 0x91, 0xfa, 0xf0,
++	0x99, 0x0c, 0x62, 0xe4, 0x8b, 0x80, 0x18, 0xb2,
++	0xc3, 0xe4, 0xa0, 0xfa, 0x31, 0x34, 0xcb, 0x67
++};
++static const u8 output07[] __initconst = {
++	0x5b, 0x88, 0xd7, 0xf6, 0x22, 0x8b, 0x11, 0xe2,
++	0xe2, 0x85, 0x79, 0xa5, 0xc0, 0xc1, 0xf7, 0x61
++};
++static const u8 key07[] __initconst = {
++	0x12, 0x97, 0x6a, 0x08, 0xc4, 0x42, 0x6d, 0x0c,
++	0xe8, 0xa8, 0x24, 0x07, 0xc4, 0xf4, 0x82, 0x07,
++	0x80, 0xf8, 0xc2, 0x0a, 0xa7, 0x12, 0x02, 0xd1,
++	0xe2, 0x91, 0x79, 0xcb, 0xcb, 0x55, 0x5a, 0x57
++};
++
++static const u8 input08[] __initconst = {
++	0xab, 0x08, 0x12, 0x72, 0x4a, 0x7f, 0x1e, 0x34,
++	0x27, 0x42, 0xcb, 0xed, 0x37, 0x4d, 0x94, 0xd1,
++	0x36, 0xc6, 0xb8, 0x79, 0x5d, 0x45, 0xb3, 0x81,
++	0x98, 0x30, 0xf2, 0xc0, 0x44, 0x91, 0xfa, 0xf0,
++	0x99, 0x0c, 0x62, 0xe4, 0x8b, 0x80, 0x18, 0xb2,
++	0xc3, 0xe4, 0xa0, 0xfa, 0x31, 0x34, 0xcb, 0x67,
++	0xfa, 0x83, 0xe1, 0x58, 0xc9, 0x94, 0xd9, 0x61,
++	0xc4, 0xcb, 0x21, 0x09, 0x5c, 0x1b, 0xf9, 0xaf,
++	0x66, 0x3c, 0xea, 0x19, 0x0f, 0xfb, 0x83, 0xd8,
++	0x95, 0x93, 0xf3, 0xf4, 0x76, 0xb6, 0xbc, 0x24,
++	0xd7, 0xe6, 0x79, 0x10, 0x7e, 0xa2, 0x6a, 0xdb,
++	0x8c, 0xaf, 0x66, 0x52, 0xd0, 0x65, 0x61, 0x36
++};
++static const u8 output08[] __initconst = {
++	0xbb, 0xb6, 0x13, 0xb2, 0xb6, 0xd7, 0x53, 0xba,
++	0x07, 0x39, 0x5b, 0x91, 0x6a, 0xae, 0xce, 0x15
++};
++static const u8 key08[] __initconst = {
++	0x12, 0x97, 0x6a, 0x08, 0xc4, 0x42, 0x6d, 0x0c,
++	0xe8, 0xa8, 0x24, 0x07, 0xc4, 0xf4, 0x82, 0x07,
++	0x80, 0xf8, 0xc2, 0x0a, 0xa7, 0x12, 0x02, 0xd1,
++	0xe2, 0x91, 0x79, 0xcb, 0xcb, 0x55, 0x5a, 0x57
++};
++
++static const u8 input09[] __initconst = {
++	0xab, 0x08, 0x12, 0x72, 0x4a, 0x7f, 0x1e, 0x34,
++	0x27, 0x42, 0xcb, 0xed, 0x37, 0x4d, 0x94, 0xd1,
++	0x36, 0xc6, 0xb8, 0x79, 0x5d, 0x45, 0xb3, 0x81,
++	0x98, 0x30, 0xf2, 0xc0, 0x44, 0x91, 0xfa, 0xf0,
++	0x99, 0x0c, 0x62, 0xe4, 0x8b, 0x80, 0x18, 0xb2,
++	0xc3, 0xe4, 0xa0, 0xfa, 0x31, 0x34, 0xcb, 0x67,
++	0xfa, 0x83, 0xe1, 0x58, 0xc9, 0x94, 0xd9, 0x61,
++	0xc4, 0xcb, 0x21, 0x09, 0x5c, 0x1b, 0xf9, 0xaf,
++	0x48, 0x44, 0x3d, 0x0b, 0xb0, 0xd2, 0x11, 0x09,
++	0xc8, 0x9a, 0x10, 0x0b, 0x5c, 0xe2, 0xc2, 0x08,
++	0x83, 0x14, 0x9c, 0x69, 0xb5, 0x61, 0xdd, 0x88,
++	0x29, 0x8a, 0x17, 0x98, 0xb1, 0x07, 0x16, 0xef,
++	0x66, 0x3c, 0xea, 0x19, 0x0f, 0xfb, 0x83, 0xd8,
++	0x95, 0x93, 0xf3, 0xf4, 0x76, 0xb6, 0xbc, 0x24
++};
++static const u8 output09[] __initconst = {
++	0xc7, 0x94, 0xd7, 0x05, 0x7d, 0x17, 0x78, 0xc4,
++	0xbb, 0xee, 0x0a, 0x39, 0xb3, 0xd9, 0x73, 0x42
++};
++static const u8 key09[] __initconst = {
++	0x12, 0x97, 0x6a, 0x08, 0xc4, 0x42, 0x6d, 0x0c,
++	0xe8, 0xa8, 0x24, 0x07, 0xc4, 0xf4, 0x82, 0x07,
++	0x80, 0xf8, 0xc2, 0x0a, 0xa7, 0x12, 0x02, 0xd1,
++	0xe2, 0x91, 0x79, 0xcb, 0xcb, 0x55, 0x5a, 0x57
++};
++
++static const u8 input10[] __initconst = {
++	0xab, 0x08, 0x12, 0x72, 0x4a, 0x7f, 0x1e, 0x34,
++	0x27, 0x42, 0xcb, 0xed, 0x37, 0x4d, 0x94, 0xd1,
++	0x36, 0xc6, 0xb8, 0x79, 0x5d, 0x45, 0xb3, 0x81,
++	0x98, 0x30, 0xf2, 0xc0, 0x44, 0x91, 0xfa, 0xf0,
++	0x99, 0x0c, 0x62, 0xe4, 0x8b, 0x80, 0x18, 0xb2,
++	0xc3, 0xe4, 0xa0, 0xfa, 0x31, 0x34, 0xcb, 0x67,
++	0xfa, 0x83, 0xe1, 0x58, 0xc9, 0x94, 0xd9, 0x61,
++	0xc4, 0xcb, 0x21, 0x09, 0x5c, 0x1b, 0xf9, 0xaf,
++	0x48, 0x44, 0x3d, 0x0b, 0xb0, 0xd2, 0x11, 0x09,
++	0xc8, 0x9a, 0x10, 0x0b, 0x5c, 0xe2, 0xc2, 0x08,
++	0x83, 0x14, 0x9c, 0x69, 0xb5, 0x61, 0xdd, 0x88,
++	0x29, 0x8a, 0x17, 0x98, 0xb1, 0x07, 0x16, 0xef,
++	0x66, 0x3c, 0xea, 0x19, 0x0f, 0xfb, 0x83, 0xd8,
++	0x95, 0x93, 0xf3, 0xf4, 0x76, 0xb6, 0xbc, 0x24,
++	0xd7, 0xe6, 0x79, 0x10, 0x7e, 0xa2, 0x6a, 0xdb,
++	0x8c, 0xaf, 0x66, 0x52, 0xd0, 0x65, 0x61, 0x36
++};
++static const u8 output10[] __initconst = {
++	0xff, 0xbc, 0xb9, 0xb3, 0x71, 0x42, 0x31, 0x52,
++	0xd7, 0xfc, 0xa5, 0xad, 0x04, 0x2f, 0xba, 0xa9
++};
++static const u8 key10[] __initconst = {
++	0x12, 0x97, 0x6a, 0x08, 0xc4, 0x42, 0x6d, 0x0c,
++	0xe8, 0xa8, 0x24, 0x07, 0xc4, 0xf4, 0x82, 0x07,
++	0x80, 0xf8, 0xc2, 0x0a, 0xa7, 0x12, 0x02, 0xd1,
++	0xe2, 0x91, 0x79, 0xcb, 0xcb, 0x55, 0x5a, 0x57
++};
++
++static const u8 input11[] __initconst = {
++	0xab, 0x08, 0x12, 0x72, 0x4a, 0x7f, 0x1e, 0x34,
++	0x27, 0x42, 0xcb, 0xed, 0x37, 0x4d, 0x94, 0xd1,
++	0x36, 0xc6, 0xb8, 0x79, 0x5d, 0x45, 0xb3, 0x81,
++	0x98, 0x30, 0xf2, 0xc0, 0x44, 0x91, 0xfa, 0xf0,
++	0x99, 0x0c, 0x62, 0xe4, 0x8b, 0x80, 0x18, 0xb2,
++	0xc3, 0xe4, 0xa0, 0xfa, 0x31, 0x34, 0xcb, 0x67,
++	0xfa, 0x83, 0xe1, 0x58, 0xc9, 0x94, 0xd9, 0x61,
++	0xc4, 0xcb, 0x21, 0x09, 0x5c, 0x1b, 0xf9, 0xaf,
++	0x48, 0x44, 0x3d, 0x0b, 0xb0, 0xd2, 0x11, 0x09,
++	0xc8, 0x9a, 0x10, 0x0b, 0x5c, 0xe2, 0xc2, 0x08,
++	0x83, 0x14, 0x9c, 0x69, 0xb5, 0x61, 0xdd, 0x88,
++	0x29, 0x8a, 0x17, 0x98, 0xb1, 0x07, 0x16, 0xef,
++	0x66, 0x3c, 0xea, 0x19, 0x0f, 0xfb, 0x83, 0xd8,
++	0x95, 0x93, 0xf3, 0xf4, 0x76, 0xb6, 0xbc, 0x24,
++	0xd7, 0xe6, 0x79, 0x10, 0x7e, 0xa2, 0x6a, 0xdb,
++	0x8c, 0xaf, 0x66, 0x52, 0xd0, 0x65, 0x61, 0x36,
++	0x81, 0x20, 0x59, 0xa5, 0xda, 0x19, 0x86, 0x37,
++	0xca, 0xc7, 0xc4, 0xa6, 0x31, 0xbe, 0xe4, 0x66
++};
++static const u8 output11[] __initconst = {
++	0x06, 0x9e, 0xd6, 0xb8, 0xef, 0x0f, 0x20, 0x7b,
++	0x3e, 0x24, 0x3b, 0xb1, 0x01, 0x9f, 0xe6, 0x32
++};
++static const u8 key11[] __initconst = {
++	0x12, 0x97, 0x6a, 0x08, 0xc4, 0x42, 0x6d, 0x0c,
++	0xe8, 0xa8, 0x24, 0x07, 0xc4, 0xf4, 0x82, 0x07,
++	0x80, 0xf8, 0xc2, 0x0a, 0xa7, 0x12, 0x02, 0xd1,
++	0xe2, 0x91, 0x79, 0xcb, 0xcb, 0x55, 0x5a, 0x57
++};
++
++static const u8 input12[] __initconst = {
++	0xab, 0x08, 0x12, 0x72, 0x4a, 0x7f, 0x1e, 0x34,
++	0x27, 0x42, 0xcb, 0xed, 0x37, 0x4d, 0x94, 0xd1,
++	0x36, 0xc6, 0xb8, 0x79, 0x5d, 0x45, 0xb3, 0x81,
++	0x98, 0x30, 0xf2, 0xc0, 0x44, 0x91, 0xfa, 0xf0,
++	0x99, 0x0c, 0x62, 0xe4, 0x8b, 0x80, 0x18, 0xb2,
++	0xc3, 0xe4, 0xa0, 0xfa, 0x31, 0x34, 0xcb, 0x67,
++	0xfa, 0x83, 0xe1, 0x58, 0xc9, 0x94, 0xd9, 0x61,
++	0xc4, 0xcb, 0x21, 0x09, 0x5c, 0x1b, 0xf9, 0xaf,
++	0x48, 0x44, 0x3d, 0x0b, 0xb0, 0xd2, 0x11, 0x09,
++	0xc8, 0x9a, 0x10, 0x0b, 0x5c, 0xe2, 0xc2, 0x08,
++	0x83, 0x14, 0x9c, 0x69, 0xb5, 0x61, 0xdd, 0x88,
++	0x29, 0x8a, 0x17, 0x98, 0xb1, 0x07, 0x16, 0xef,
++	0x66, 0x3c, 0xea, 0x19, 0x0f, 0xfb, 0x83, 0xd8,
++	0x95, 0x93, 0xf3, 0xf4, 0x76, 0xb6, 0xbc, 0x24,
++	0xd7, 0xe6, 0x79, 0x10, 0x7e, 0xa2, 0x6a, 0xdb,
++	0x8c, 0xaf, 0x66, 0x52, 0xd0, 0x65, 0x61, 0x36,
++	0x81, 0x20, 0x59, 0xa5, 0xda, 0x19, 0x86, 0x37,
++	0xca, 0xc7, 0xc4, 0xa6, 0x31, 0xbe, 0xe4, 0x66,
++	0x5b, 0x88, 0xd7, 0xf6, 0x22, 0x8b, 0x11, 0xe2,
++	0xe2, 0x85, 0x79, 0xa5, 0xc0, 0xc1, 0xf7, 0x61
++};
++static const u8 output12[] __initconst = {
++	0xcc, 0xa3, 0x39, 0xd9, 0xa4, 0x5f, 0xa2, 0x36,
++	0x8c, 0x2c, 0x68, 0xb3, 0xa4, 0x17, 0x91, 0x33
++};
++static const u8 key12[] __initconst = {
++	0x12, 0x97, 0x6a, 0x08, 0xc4, 0x42, 0x6d, 0x0c,
++	0xe8, 0xa8, 0x24, 0x07, 0xc4, 0xf4, 0x82, 0x07,
++	0x80, 0xf8, 0xc2, 0x0a, 0xa7, 0x12, 0x02, 0xd1,
++	0xe2, 0x91, 0x79, 0xcb, 0xcb, 0x55, 0x5a, 0x57
++};
++
++static const u8 input13[] __initconst = {
++	0xab, 0x08, 0x12, 0x72, 0x4a, 0x7f, 0x1e, 0x34,
++	0x27, 0x42, 0xcb, 0xed, 0x37, 0x4d, 0x94, 0xd1,
++	0x36, 0xc6, 0xb8, 0x79, 0x5d, 0x45, 0xb3, 0x81,
++	0x98, 0x30, 0xf2, 0xc0, 0x44, 0x91, 0xfa, 0xf0,
++	0x99, 0x0c, 0x62, 0xe4, 0x8b, 0x80, 0x18, 0xb2,
++	0xc3, 0xe4, 0xa0, 0xfa, 0x31, 0x34, 0xcb, 0x67,
++	0xfa, 0x83, 0xe1, 0x58, 0xc9, 0x94, 0xd9, 0x61,
++	0xc4, 0xcb, 0x21, 0x09, 0x5c, 0x1b, 0xf9, 0xaf,
++	0x48, 0x44, 0x3d, 0x0b, 0xb0, 0xd2, 0x11, 0x09,
++	0xc8, 0x9a, 0x10, 0x0b, 0x5c, 0xe2, 0xc2, 0x08,
++	0x83, 0x14, 0x9c, 0x69, 0xb5, 0x61, 0xdd, 0x88,
++	0x29, 0x8a, 0x17, 0x98, 0xb1, 0x07, 0x16, 0xef,
++	0x66, 0x3c, 0xea, 0x19, 0x0f, 0xfb, 0x83, 0xd8,
++	0x95, 0x93, 0xf3, 0xf4, 0x76, 0xb6, 0xbc, 0x24,
++	0xd7, 0xe6, 0x79, 0x10, 0x7e, 0xa2, 0x6a, 0xdb,
++	0x8c, 0xaf, 0x66, 0x52, 0xd0, 0x65, 0x61, 0x36,
++	0x81, 0x20, 0x59, 0xa5, 0xda, 0x19, 0x86, 0x37,
++	0xca, 0xc7, 0xc4, 0xa6, 0x31, 0xbe, 0xe4, 0x66,
++	0x5b, 0x88, 0xd7, 0xf6, 0x22, 0x8b, 0x11, 0xe2,
++	0xe2, 0x85, 0x79, 0xa5, 0xc0, 0xc1, 0xf7, 0x61,
++	0xab, 0x08, 0x12, 0x72, 0x4a, 0x7f, 0x1e, 0x34,
++	0x27, 0x42, 0xcb, 0xed, 0x37, 0x4d, 0x94, 0xd1,
++	0x36, 0xc6, 0xb8, 0x79, 0x5d, 0x45, 0xb3, 0x81,
++	0x98, 0x30, 0xf2, 0xc0, 0x44, 0x91, 0xfa, 0xf0,
++	0x99, 0x0c, 0x62, 0xe4, 0x8b, 0x80, 0x18, 0xb2,
++	0xc3, 0xe4, 0xa0, 0xfa, 0x31, 0x34, 0xcb, 0x67,
++	0xfa, 0x83, 0xe1, 0x58, 0xc9, 0x94, 0xd9, 0x61,
++	0xc4, 0xcb, 0x21, 0x09, 0x5c, 0x1b, 0xf9, 0xaf,
++	0x48, 0x44, 0x3d, 0x0b, 0xb0, 0xd2, 0x11, 0x09,
++	0xc8, 0x9a, 0x10, 0x0b, 0x5c, 0xe2, 0xc2, 0x08,
++	0x83, 0x14, 0x9c, 0x69, 0xb5, 0x61, 0xdd, 0x88,
++	0x29, 0x8a, 0x17, 0x98, 0xb1, 0x07, 0x16, 0xef,
++	0x66, 0x3c, 0xea, 0x19, 0x0f, 0xfb, 0x83, 0xd8,
++	0x95, 0x93, 0xf3, 0xf4, 0x76, 0xb6, 0xbc, 0x24,
++	0xd7, 0xe6, 0x79, 0x10, 0x7e, 0xa2, 0x6a, 0xdb,
++	0x8c, 0xaf, 0x66, 0x52, 0xd0, 0x65, 0x61, 0x36
++};
++static const u8 output13[] __initconst = {
++	0x53, 0xf6, 0xe8, 0x28, 0xa2, 0xf0, 0xfe, 0x0e,
++	0xe8, 0x15, 0xbf, 0x0b, 0xd5, 0x84, 0x1a, 0x34
++};
++static const u8 key13[] __initconst = {
++	0x12, 0x97, 0x6a, 0x08, 0xc4, 0x42, 0x6d, 0x0c,
++	0xe8, 0xa8, 0x24, 0x07, 0xc4, 0xf4, 0x82, 0x07,
++	0x80, 0xf8, 0xc2, 0x0a, 0xa7, 0x12, 0x02, 0xd1,
++	0xe2, 0x91, 0x79, 0xcb, 0xcb, 0x55, 0x5a, 0x57
++};
++
++static const u8 input14[] __initconst = {
++	0xab, 0x08, 0x12, 0x72, 0x4a, 0x7f, 0x1e, 0x34,
++	0x27, 0x42, 0xcb, 0xed, 0x37, 0x4d, 0x94, 0xd1,
++	0x36, 0xc6, 0xb8, 0x79, 0x5d, 0x45, 0xb3, 0x81,
++	0x98, 0x30, 0xf2, 0xc0, 0x44, 0x91, 0xfa, 0xf0,
++	0x99, 0x0c, 0x62, 0xe4, 0x8b, 0x80, 0x18, 0xb2,
++	0xc3, 0xe4, 0xa0, 0xfa, 0x31, 0x34, 0xcb, 0x67,
++	0xfa, 0x83, 0xe1, 0x58, 0xc9, 0x94, 0xd9, 0x61,
++	0xc4, 0xcb, 0x21, 0x09, 0x5c, 0x1b, 0xf9, 0xaf,
++	0x48, 0x44, 0x3d, 0x0b, 0xb0, 0xd2, 0x11, 0x09,
++	0xc8, 0x9a, 0x10, 0x0b, 0x5c, 0xe2, 0xc2, 0x08,
++	0x83, 0x14, 0x9c, 0x69, 0xb5, 0x61, 0xdd, 0x88,
++	0x29, 0x8a, 0x17, 0x98, 0xb1, 0x07, 0x16, 0xef,
++	0x66, 0x3c, 0xea, 0x19, 0x0f, 0xfb, 0x83, 0xd8,
++	0x95, 0x93, 0xf3, 0xf4, 0x76, 0xb6, 0xbc, 0x24,
++	0xd7, 0xe6, 0x79, 0x10, 0x7e, 0xa2, 0x6a, 0xdb,
++	0x8c, 0xaf, 0x66, 0x52, 0xd0, 0x65, 0x61, 0x36,
++	0x81, 0x20, 0x59, 0xa5, 0xda, 0x19, 0x86, 0x37,
++	0xca, 0xc7, 0xc4, 0xa6, 0x31, 0xbe, 0xe4, 0x66,
++	0x5b, 0x88, 0xd7, 0xf6, 0x22, 0x8b, 0x11, 0xe2,
++	0xe2, 0x85, 0x79, 0xa5, 0xc0, 0xc1, 0xf7, 0x61,
++	0xab, 0x08, 0x12, 0x72, 0x4a, 0x7f, 0x1e, 0x34,
++	0x27, 0x42, 0xcb, 0xed, 0x37, 0x4d, 0x94, 0xd1,
++	0x36, 0xc6, 0xb8, 0x79, 0x5d, 0x45, 0xb3, 0x81,
++	0x98, 0x30, 0xf2, 0xc0, 0x44, 0x91, 0xfa, 0xf0,
++	0x99, 0x0c, 0x62, 0xe4, 0x8b, 0x80, 0x18, 0xb2,
++	0xc3, 0xe4, 0xa0, 0xfa, 0x31, 0x34, 0xcb, 0x67,
++	0xfa, 0x83, 0xe1, 0x58, 0xc9, 0x94, 0xd9, 0x61,
++	0xc4, 0xcb, 0x21, 0x09, 0x5c, 0x1b, 0xf9, 0xaf,
++	0x48, 0x44, 0x3d, 0x0b, 0xb0, 0xd2, 0x11, 0x09,
++	0xc8, 0x9a, 0x10, 0x0b, 0x5c, 0xe2, 0xc2, 0x08,
++	0x83, 0x14, 0x9c, 0x69, 0xb5, 0x61, 0xdd, 0x88,
++	0x29, 0x8a, 0x17, 0x98, 0xb1, 0x07, 0x16, 0xef,
++	0x66, 0x3c, 0xea, 0x19, 0x0f, 0xfb, 0x83, 0xd8,
++	0x95, 0x93, 0xf3, 0xf4, 0x76, 0xb6, 0xbc, 0x24,
++	0xd7, 0xe6, 0x79, 0x10, 0x7e, 0xa2, 0x6a, 0xdb,
++	0x8c, 0xaf, 0x66, 0x52, 0xd0, 0x65, 0x61, 0x36,
++	0x81, 0x20, 0x59, 0xa5, 0xda, 0x19, 0x86, 0x37,
++	0xca, 0xc7, 0xc4, 0xa6, 0x31, 0xbe, 0xe4, 0x66,
++	0x5b, 0x88, 0xd7, 0xf6, 0x22, 0x8b, 0x11, 0xe2,
++	0xe2, 0x85, 0x79, 0xa5, 0xc0, 0xc1, 0xf7, 0x61
++};
++static const u8 output14[] __initconst = {
++	0xb8, 0x46, 0xd4, 0x4e, 0x9b, 0xbd, 0x53, 0xce,
++	0xdf, 0xfb, 0xfb, 0xb6, 0xb7, 0xfa, 0x49, 0x33
++};
++static const u8 key14[] __initconst = {
++	0x12, 0x97, 0x6a, 0x08, 0xc4, 0x42, 0x6d, 0x0c,
++	0xe8, 0xa8, 0x24, 0x07, 0xc4, 0xf4, 0x82, 0x07,
++	0x80, 0xf8, 0xc2, 0x0a, 0xa7, 0x12, 0x02, 0xd1,
++	0xe2, 0x91, 0x79, 0xcb, 0xcb, 0x55, 0x5a, 0x57
++};
++
++/* 4th power of the key spills to 131th bit in SIMD key setup */
++static const u8 input15[] __initconst = {
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
++};
++static const u8 output15[] __initconst = {
++	0x07, 0x14, 0x5a, 0x4c, 0x02, 0xfe, 0x5f, 0xa3,
++	0x20, 0x36, 0xde, 0x68, 0xfa, 0xbe, 0x90, 0x66
++};
++static const u8 key15[] __initconst = {
++	0xad, 0x62, 0x81, 0x07, 0xe8, 0x35, 0x1d, 0x0f,
++	0x2c, 0x23, 0x1a, 0x05, 0xdc, 0x4a, 0x41, 0x06,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++
++/* OpenSSL's poly1305_ieee754.c failed this in final stage */
++static const u8 input16[] __initconst = {
++	0x84, 0x23, 0x64, 0xe1, 0x56, 0x33, 0x6c, 0x09,
++	0x98, 0xb9, 0x33, 0xa6, 0x23, 0x77, 0x26, 0x18,
++	0x0d, 0x9e, 0x3f, 0xdc, 0xbd, 0xe4, 0xcd, 0x5d,
++	0x17, 0x08, 0x0f, 0xc3, 0xbe, 0xb4, 0x96, 0x14,
++	0xd7, 0x12, 0x2c, 0x03, 0x74, 0x63, 0xff, 0x10,
++	0x4d, 0x73, 0xf1, 0x9c, 0x12, 0x70, 0x46, 0x28,
++	0xd4, 0x17, 0xc4, 0xc5, 0x4a, 0x3f, 0xe3, 0x0d,
++	0x3c, 0x3d, 0x77, 0x14, 0x38, 0x2d, 0x43, 0xb0,
++	0x38, 0x2a, 0x50, 0xa5, 0xde, 0xe5, 0x4b, 0xe8,
++	0x44, 0xb0, 0x76, 0xe8, 0xdf, 0x88, 0x20, 0x1a,
++	0x1c, 0xd4, 0x3b, 0x90, 0xeb, 0x21, 0x64, 0x3f,
++	0xa9, 0x6f, 0x39, 0xb5, 0x18, 0xaa, 0x83, 0x40,
++	0xc9, 0x42, 0xff, 0x3c, 0x31, 0xba, 0xf7, 0xc9,
++	0xbd, 0xbf, 0x0f, 0x31, 0xae, 0x3f, 0xa0, 0x96,
++	0xbf, 0x8c, 0x63, 0x03, 0x06, 0x09, 0x82, 0x9f,
++	0xe7, 0x2e, 0x17, 0x98, 0x24, 0x89, 0x0b, 0xc8,
++	0xe0, 0x8c, 0x31, 0x5c, 0x1c, 0xce, 0x2a, 0x83,
++	0x14, 0x4d, 0xbb, 0xff, 0x09, 0xf7, 0x4e, 0x3e,
++	0xfc, 0x77, 0x0b, 0x54, 0xd0, 0x98, 0x4a, 0x8f,
++	0x19, 0xb1, 0x47, 0x19, 0xe6, 0x36, 0x35, 0x64,
++	0x1d, 0x6b, 0x1e, 0xed, 0xf6, 0x3e, 0xfb, 0xf0,
++	0x80, 0xe1, 0x78, 0x3d, 0x32, 0x44, 0x54, 0x12,
++	0x11, 0x4c, 0x20, 0xde, 0x0b, 0x83, 0x7a, 0x0d,
++	0xfa, 0x33, 0xd6, 0xb8, 0x28, 0x25, 0xff, 0xf4,
++	0x4c, 0x9a, 0x70, 0xea, 0x54, 0xce, 0x47, 0xf0,
++	0x7d, 0xf6, 0x98, 0xe6, 0xb0, 0x33, 0x23, 0xb5,
++	0x30, 0x79, 0x36, 0x4a, 0x5f, 0xc3, 0xe9, 0xdd,
++	0x03, 0x43, 0x92, 0xbd, 0xde, 0x86, 0xdc, 0xcd,
++	0xda, 0x94, 0x32, 0x1c, 0x5e, 0x44, 0x06, 0x04,
++	0x89, 0x33, 0x6c, 0xb6, 0x5b, 0xf3, 0x98, 0x9c,
++	0x36, 0xf7, 0x28, 0x2c, 0x2f, 0x5d, 0x2b, 0x88,
++	0x2c, 0x17, 0x1e, 0x74
++};
++static const u8 output16[] __initconst = {
++	0xf2, 0x48, 0x31, 0x2e, 0x57, 0x8d, 0x9d, 0x58,
++	0xf8, 0xb7, 0xbb, 0x4d, 0x19, 0x10, 0x54, 0x31
++};
++static const u8 key16[] __initconst = {
++	0x95, 0xd5, 0xc0, 0x05, 0x50, 0x3e, 0x51, 0x0d,
++	0x8c, 0xd0, 0xaa, 0x07, 0x2c, 0x4a, 0x4d, 0x06,
++	0x6e, 0xab, 0xc5, 0x2d, 0x11, 0x65, 0x3d, 0xf4,
++	0x7f, 0xbf, 0x63, 0xab, 0x19, 0x8b, 0xcc, 0x26
++};
++
++/* AVX2 in OpenSSL's poly1305-x86.pl failed this with 176+32 split */
++static const u8 input17[] __initconst = {
++	0x24, 0x8a, 0xc3, 0x10, 0x85, 0xb6, 0xc2, 0xad,
++	0xaa, 0xa3, 0x82, 0x59, 0xa0, 0xd7, 0x19, 0x2c,
++	0x5c, 0x35, 0xd1, 0xbb, 0x4e, 0xf3, 0x9a, 0xd9,
++	0x4c, 0x38, 0xd1, 0xc8, 0x24, 0x79, 0xe2, 0xdd,
++	0x21, 0x59, 0xa0, 0x77, 0x02, 0x4b, 0x05, 0x89,
++	0xbc, 0x8a, 0x20, 0x10, 0x1b, 0x50, 0x6f, 0x0a,
++	0x1a, 0xd0, 0xbb, 0xab, 0x76, 0xe8, 0x3a, 0x83,
++	0xf1, 0xb9, 0x4b, 0xe6, 0xbe, 0xae, 0x74, 0xe8,
++	0x74, 0xca, 0xb6, 0x92, 0xc5, 0x96, 0x3a, 0x75,
++	0x43, 0x6b, 0x77, 0x61, 0x21, 0xec, 0x9f, 0x62,
++	0x39, 0x9a, 0x3e, 0x66, 0xb2, 0xd2, 0x27, 0x07,
++	0xda, 0xe8, 0x19, 0x33, 0xb6, 0x27, 0x7f, 0x3c,
++	0x85, 0x16, 0xbc, 0xbe, 0x26, 0xdb, 0xbd, 0x86,
++	0xf3, 0x73, 0x10, 0x3d, 0x7c, 0xf4, 0xca, 0xd1,
++	0x88, 0x8c, 0x95, 0x21, 0x18, 0xfb, 0xfb, 0xd0,
++	0xd7, 0xb4, 0xbe, 0xdc, 0x4a, 0xe4, 0x93, 0x6a,
++	0xff, 0x91, 0x15, 0x7e, 0x7a, 0xa4, 0x7c, 0x54,
++	0x44, 0x2e, 0xa7, 0x8d, 0x6a, 0xc2, 0x51, 0xd3,
++	0x24, 0xa0, 0xfb, 0xe4, 0x9d, 0x89, 0xcc, 0x35,
++	0x21, 0xb6, 0x6d, 0x16, 0xe9, 0xc6, 0x6a, 0x37,
++	0x09, 0x89, 0x4e, 0x4e, 0xb0, 0xa4, 0xee, 0xdc,
++	0x4a, 0xe1, 0x94, 0x68, 0xe6, 0x6b, 0x81, 0xf2,
++	0x71, 0x35, 0x1b, 0x1d, 0x92, 0x1e, 0xa5, 0x51,
++	0x04, 0x7a, 0xbc, 0xc6, 0xb8, 0x7a, 0x90, 0x1f,
++	0xde, 0x7d, 0xb7, 0x9f, 0xa1, 0x81, 0x8c, 0x11,
++	0x33, 0x6d, 0xbc, 0x07, 0x24, 0x4a, 0x40, 0xeb
++};
++static const u8 output17[] __initconst = {
++	0xbc, 0x93, 0x9b, 0xc5, 0x28, 0x14, 0x80, 0xfa,
++	0x99, 0xc6, 0xd6, 0x8c, 0x25, 0x8e, 0xc4, 0x2f
++};
++static const u8 key17[] __initconst = {
++	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
++	0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++
++/* test vectors from Google */
++static const u8 input18[] __initconst = { };
++static const u8 output18[] __initconst = {
++	0x47, 0x10, 0x13, 0x0e, 0x9f, 0x6f, 0xea, 0x8d,
++	0x72, 0x29, 0x38, 0x50, 0xa6, 0x67, 0xd8, 0x6c
++};
++static const u8 key18[] __initconst = {
++	0xc8, 0xaf, 0xaa, 0xc3, 0x31, 0xee, 0x37, 0x2c,
++	0xd6, 0x08, 0x2d, 0xe1, 0x34, 0x94, 0x3b, 0x17,
++	0x47, 0x10, 0x13, 0x0e, 0x9f, 0x6f, 0xea, 0x8d,
++	0x72, 0x29, 0x38, 0x50, 0xa6, 0x67, 0xd8, 0x6c
++};
++
++static const u8 input19[] __initconst = {
++	0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x20, 0x77, 0x6f,
++	0x72, 0x6c, 0x64, 0x21
++};
++static const u8 output19[] __initconst = {
++	0xa6, 0xf7, 0x45, 0x00, 0x8f, 0x81, 0xc9, 0x16,
++	0xa2, 0x0d, 0xcc, 0x74, 0xee, 0xf2, 0xb2, 0xf0
++};
++static const u8 key19[] __initconst = {
++	0x74, 0x68, 0x69, 0x73, 0x20, 0x69, 0x73, 0x20,
++	0x33, 0x32, 0x2d, 0x62, 0x79, 0x74, 0x65, 0x20,
++	0x6b, 0x65, 0x79, 0x20, 0x66, 0x6f, 0x72, 0x20,
++	0x50, 0x6f, 0x6c, 0x79, 0x31, 0x33, 0x30, 0x35
++};
++
++static const u8 input20[] __initconst = {
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++static const u8 output20[] __initconst = {
++	0x49, 0xec, 0x78, 0x09, 0x0e, 0x48, 0x1e, 0xc6,
++	0xc2, 0x6b, 0x33, 0xb9, 0x1c, 0xcc, 0x03, 0x07
++};
++static const u8 key20[] __initconst = {
++	0x74, 0x68, 0x69, 0x73, 0x20, 0x69, 0x73, 0x20,
++	0x33, 0x32, 0x2d, 0x62, 0x79, 0x74, 0x65, 0x20,
++	0x6b, 0x65, 0x79, 0x20, 0x66, 0x6f, 0x72, 0x20,
++	0x50, 0x6f, 0x6c, 0x79, 0x31, 0x33, 0x30, 0x35
++};
++
++static const u8 input21[] __initconst = {
++	0x89, 0xda, 0xb8, 0x0b, 0x77, 0x17, 0xc1, 0xdb,
++	0x5d, 0xb4, 0x37, 0x86, 0x0a, 0x3f, 0x70, 0x21,
++	0x8e, 0x93, 0xe1, 0xb8, 0xf4, 0x61, 0xfb, 0x67,
++	0x7f, 0x16, 0xf3, 0x5f, 0x6f, 0x87, 0xe2, 0xa9,
++	0x1c, 0x99, 0xbc, 0x3a, 0x47, 0xac, 0xe4, 0x76,
++	0x40, 0xcc, 0x95, 0xc3, 0x45, 0xbe, 0x5e, 0xcc,
++	0xa5, 0xa3, 0x52, 0x3c, 0x35, 0xcc, 0x01, 0x89,
++	0x3a, 0xf0, 0xb6, 0x4a, 0x62, 0x03, 0x34, 0x27,
++	0x03, 0x72, 0xec, 0x12, 0x48, 0x2d, 0x1b, 0x1e,
++	0x36, 0x35, 0x61, 0x69, 0x8a, 0x57, 0x8b, 0x35,
++	0x98, 0x03, 0x49, 0x5b, 0xb4, 0xe2, 0xef, 0x19,
++	0x30, 0xb1, 0x7a, 0x51, 0x90, 0xb5, 0x80, 0xf1,
++	0x41, 0x30, 0x0d, 0xf3, 0x0a, 0xdb, 0xec, 0xa2,
++	0x8f, 0x64, 0x27, 0xa8, 0xbc, 0x1a, 0x99, 0x9f,
++	0xd5, 0x1c, 0x55, 0x4a, 0x01, 0x7d, 0x09, 0x5d,
++	0x8c, 0x3e, 0x31, 0x27, 0xda, 0xf9, 0xf5, 0x95
++};
++static const u8 output21[] __initconst = {
++	0xc8, 0x5d, 0x15, 0xed, 0x44, 0xc3, 0x78, 0xd6,
++	0xb0, 0x0e, 0x23, 0x06, 0x4c, 0x7b, 0xcd, 0x51
++};
++static const u8 key21[] __initconst = {
++	0x2d, 0x77, 0x3b, 0xe3, 0x7a, 0xdb, 0x1e, 0x4d,
++	0x68, 0x3b, 0xf0, 0x07, 0x5e, 0x79, 0xc4, 0xee,
++	0x03, 0x79, 0x18, 0x53, 0x5a, 0x7f, 0x99, 0xcc,
++	0xb7, 0x04, 0x0f, 0xb5, 0xf5, 0xf4, 0x3a, 0xea
++};
++
++static const u8 input22[] __initconst = {
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0b,
++	0x17, 0x03, 0x03, 0x02, 0x00, 0x00, 0x00, 0x00,
++	0x06, 0xdb, 0x1f, 0x1f, 0x36, 0x8d, 0x69, 0x6a,
++	0x81, 0x0a, 0x34, 0x9c, 0x0c, 0x71, 0x4c, 0x9a,
++	0x5e, 0x78, 0x50, 0xc2, 0x40, 0x7d, 0x72, 0x1a,
++	0xcd, 0xed, 0x95, 0xe0, 0x18, 0xd7, 0xa8, 0x52,
++	0x66, 0xa6, 0xe1, 0x28, 0x9c, 0xdb, 0x4a, 0xeb,
++	0x18, 0xda, 0x5a, 0xc8, 0xa2, 0xb0, 0x02, 0x6d,
++	0x24, 0xa5, 0x9a, 0xd4, 0x85, 0x22, 0x7f, 0x3e,
++	0xae, 0xdb, 0xb2, 0xe7, 0xe3, 0x5e, 0x1c, 0x66,
++	0xcd, 0x60, 0xf9, 0xab, 0xf7, 0x16, 0xdc, 0xc9,
++	0xac, 0x42, 0x68, 0x2d, 0xd7, 0xda, 0xb2, 0x87,
++	0xa7, 0x02, 0x4c, 0x4e, 0xef, 0xc3, 0x21, 0xcc,
++	0x05, 0x74, 0xe1, 0x67, 0x93, 0xe3, 0x7c, 0xec,
++	0x03, 0xc5, 0xbd, 0xa4, 0x2b, 0x54, 0xc1, 0x14,
++	0xa8, 0x0b, 0x57, 0xaf, 0x26, 0x41, 0x6c, 0x7b,
++	0xe7, 0x42, 0x00, 0x5e, 0x20, 0x85, 0x5c, 0x73,
++	0xe2, 0x1d, 0xc8, 0xe2, 0xed, 0xc9, 0xd4, 0x35,
++	0xcb, 0x6f, 0x60, 0x59, 0x28, 0x00, 0x11, 0xc2,
++	0x70, 0xb7, 0x15, 0x70, 0x05, 0x1c, 0x1c, 0x9b,
++	0x30, 0x52, 0x12, 0x66, 0x20, 0xbc, 0x1e, 0x27,
++	0x30, 0xfa, 0x06, 0x6c, 0x7a, 0x50, 0x9d, 0x53,
++	0xc6, 0x0e, 0x5a, 0xe1, 0xb4, 0x0a, 0xa6, 0xe3,
++	0x9e, 0x49, 0x66, 0x92, 0x28, 0xc9, 0x0e, 0xec,
++	0xb4, 0xa5, 0x0d, 0xb3, 0x2a, 0x50, 0xbc, 0x49,
++	0xe9, 0x0b, 0x4f, 0x4b, 0x35, 0x9a, 0x1d, 0xfd,
++	0x11, 0x74, 0x9c, 0xd3, 0x86, 0x7f, 0xcf, 0x2f,
++	0xb7, 0xbb, 0x6c, 0xd4, 0x73, 0x8f, 0x6a, 0x4a,
++	0xd6, 0xf7, 0xca, 0x50, 0x58, 0xf7, 0x61, 0x88,
++	0x45, 0xaf, 0x9f, 0x02, 0x0f, 0x6c, 0x3b, 0x96,
++	0x7b, 0x8f, 0x4c, 0xd4, 0xa9, 0x1e, 0x28, 0x13,
++	0xb5, 0x07, 0xae, 0x66, 0xf2, 0xd3, 0x5c, 0x18,
++	0x28, 0x4f, 0x72, 0x92, 0x18, 0x60, 0x62, 0xe1,
++	0x0f, 0xd5, 0x51, 0x0d, 0x18, 0x77, 0x53, 0x51,
++	0xef, 0x33, 0x4e, 0x76, 0x34, 0xab, 0x47, 0x43,
++	0xf5, 0xb6, 0x8f, 0x49, 0xad, 0xca, 0xb3, 0x84,
++	0xd3, 0xfd, 0x75, 0xf7, 0x39, 0x0f, 0x40, 0x06,
++	0xef, 0x2a, 0x29, 0x5c, 0x8c, 0x7a, 0x07, 0x6a,
++	0xd5, 0x45, 0x46, 0xcd, 0x25, 0xd2, 0x10, 0x7f,
++	0xbe, 0x14, 0x36, 0xc8, 0x40, 0x92, 0x4a, 0xae,
++	0xbe, 0x5b, 0x37, 0x08, 0x93, 0xcd, 0x63, 0xd1,
++	0x32, 0x5b, 0x86, 0x16, 0xfc, 0x48, 0x10, 0x88,
++	0x6b, 0xc1, 0x52, 0xc5, 0x32, 0x21, 0xb6, 0xdf,
++	0x37, 0x31, 0x19, 0x39, 0x32, 0x55, 0xee, 0x72,
++	0xbc, 0xaa, 0x88, 0x01, 0x74, 0xf1, 0x71, 0x7f,
++	0x91, 0x84, 0xfa, 0x91, 0x64, 0x6f, 0x17, 0xa2,
++	0x4a, 0xc5, 0x5d, 0x16, 0xbf, 0xdd, 0xca, 0x95,
++	0x81, 0xa9, 0x2e, 0xda, 0x47, 0x92, 0x01, 0xf0,
++	0xed, 0xbf, 0x63, 0x36, 0x00, 0xd6, 0x06, 0x6d,
++	0x1a, 0xb3, 0x6d, 0x5d, 0x24, 0x15, 0xd7, 0x13,
++	0x51, 0xbb, 0xcd, 0x60, 0x8a, 0x25, 0x10, 0x8d,
++	0x25, 0x64, 0x19, 0x92, 0xc1, 0xf2, 0x6c, 0x53,
++	0x1c, 0xf9, 0xf9, 0x02, 0x03, 0xbc, 0x4c, 0xc1,
++	0x9f, 0x59, 0x27, 0xd8, 0x34, 0xb0, 0xa4, 0x71,
++	0x16, 0xd3, 0x88, 0x4b, 0xbb, 0x16, 0x4b, 0x8e,
++	0xc8, 0x83, 0xd1, 0xac, 0x83, 0x2e, 0x56, 0xb3,
++	0x91, 0x8a, 0x98, 0x60, 0x1a, 0x08, 0xd1, 0x71,
++	0x88, 0x15, 0x41, 0xd5, 0x94, 0xdb, 0x39, 0x9c,
++	0x6a, 0xe6, 0x15, 0x12, 0x21, 0x74, 0x5a, 0xec,
++	0x81, 0x4c, 0x45, 0xb0, 0xb0, 0x5b, 0x56, 0x54,
++	0x36, 0xfd, 0x6f, 0x13, 0x7a, 0xa1, 0x0a, 0x0c,
++	0x0b, 0x64, 0x37, 0x61, 0xdb, 0xd6, 0xf9, 0xa9,
++	0xdc, 0xb9, 0x9b, 0x1a, 0x6e, 0x69, 0x08, 0x54,
++	0xce, 0x07, 0x69, 0xcd, 0xe3, 0x97, 0x61, 0xd8,
++	0x2f, 0xcd, 0xec, 0x15, 0xf0, 0xd9, 0x2d, 0x7d,
++	0x8e, 0x94, 0xad, 0xe8, 0xeb, 0x83, 0xfb, 0xe0
++};
++static const u8 output22[] __initconst = {
++	0x26, 0x37, 0x40, 0x8f, 0xe1, 0x30, 0x86, 0xea,
++	0x73, 0xf9, 0x71, 0xe3, 0x42, 0x5e, 0x28, 0x20
++};
++static const u8 key22[] __initconst = {
++	0x99, 0xe5, 0x82, 0x2d, 0xd4, 0x17, 0x3c, 0x99,
++	0x5e, 0x3d, 0xae, 0x0d, 0xde, 0xfb, 0x97, 0x74,
++	0x3f, 0xde, 0x3b, 0x08, 0x01, 0x34, 0xb3, 0x9f,
++	0x76, 0xe9, 0xbf, 0x8d, 0x0e, 0x88, 0xd5, 0x46
++};
++
++/* test vectors from Hanno Böck */
++static const u8 input23[] __initconst = {
++	0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc,
++	0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc,
++	0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc,
++	0xcc, 0x80, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc,
++	0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc,
++	0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc,
++	0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc,
++	0xcc, 0xcc, 0xcc, 0xcc, 0xce, 0xcc, 0xcc, 0xcc,
++	0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc,
++	0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xc5,
++	0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc,
++	0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc,
++	0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xe3, 0xcc, 0xcc,
++	0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc,
++	0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc,
++	0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc,
++	0xcc, 0xcc, 0xcc, 0xcc, 0xac, 0xcc, 0xcc, 0xcc,
++	0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xe6,
++	0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0x00, 0x00, 0x00,
++	0xaf, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc,
++	0xcc, 0xcc, 0xff, 0xff, 0xff, 0xf5, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0xff, 0xff, 0xff, 0xe7, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x71, 0x92, 0x05, 0xa8, 0x52, 0x1d,
++	0xfc
++};
++static const u8 output23[] __initconst = {
++	0x85, 0x59, 0xb8, 0x76, 0xec, 0xee, 0xd6, 0x6e,
++	0xb3, 0x77, 0x98, 0xc0, 0x45, 0x7b, 0xaf, 0xf9
++};
++static const u8 key23[] __initconst = {
++	0x7f, 0x1b, 0x02, 0x64, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc, 0xcc
++};
++
++static const u8 input24[] __initconst = {
++	0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
++	0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
++	0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
++	0xaa, 0xaa, 0xaa, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x80, 0x02, 0x64
++};
++static const u8 output24[] __initconst = {
++	0x00, 0xbd, 0x12, 0x58, 0x97, 0x8e, 0x20, 0x54,
++	0x44, 0xc9, 0xaa, 0xaa, 0x82, 0x00, 0x6f, 0xed
++};
++static const u8 key24[] __initconst = {
++	0xe0, 0x00, 0x16, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa,
++	0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa, 0xaa
++};
++
++static const u8 input25[] __initconst = {
++	0x02, 0xfc
++};
++static const u8 output25[] __initconst = {
++	0x06, 0x12, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c,
++	0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c
++};
++static const u8 key25[] __initconst = {
++	0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c,
++	0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c,
++	0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c,
++	0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c, 0x0c
++};
++
++static const u8 input26[] __initconst = {
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7a, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x5c, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x6e, 0x7b, 0x00, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7a, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x5c,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b, 0x7b,
++	0x7b, 0x6e, 0x7b, 0x00, 0x13, 0x00, 0x00, 0x00,
++	0x00, 0xb3, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0xf2, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x20, 0x00, 0xef, 0xff, 0x00,
++	0x09, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00, 0x00,
++	0x00, 0x00, 0x09, 0x00, 0x00, 0x00, 0x64, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x13, 0x00, 0x00, 0x00, 0x00,
++	0xb3, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xf2,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x20, 0x00, 0xef, 0xff, 0x00, 0x09,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x7a, 0x00, 0x00, 0x10, 0x00, 0x00, 0x00,
++	0x00, 0x09, 0x00, 0x00, 0x00, 0x64, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xfc
++};
++static const u8 output26[] __initconst = {
++	0x33, 0x20, 0x5b, 0xbf, 0x9e, 0x9f, 0x8f, 0x72,
++	0x12, 0xab, 0x9e, 0x2a, 0xb9, 0xb7, 0xe4, 0xa5
++};
++static const u8 key26[] __initconst = {
++	0x00, 0xff, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x1e, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x7b, 0x7b
++};
++
++static const u8 input27[] __initconst = {
++	0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77,
++	0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77,
++	0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77,
++	0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77,
++	0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77,
++	0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77,
++	0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77,
++	0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77,
++	0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77,
++	0x77, 0x77, 0x77, 0x77, 0xff, 0xff, 0xff, 0xe9,
++	0xe9, 0xac, 0xac, 0xac, 0xac, 0xac, 0xac, 0xac,
++	0xac, 0xac, 0xac, 0xac, 0x00, 0x00, 0xac, 0xac,
++	0xec, 0x01, 0x00, 0xac, 0xac, 0xac, 0x2c, 0xac,
++	0xa2, 0xac, 0xac, 0xac, 0xac, 0xac, 0xac, 0xac,
++	0xac, 0xac, 0xac, 0xac, 0x64, 0xf2
++};
++static const u8 output27[] __initconst = {
++	0x02, 0xee, 0x7c, 0x8c, 0x54, 0x6d, 0xde, 0xb1,
++	0xa4, 0x67, 0xe4, 0xc3, 0x98, 0x11, 0x58, 0xb9
++};
++static const u8 key27[] __initconst = {
++	0x00, 0x00, 0x00, 0x7f, 0x00, 0x00, 0x00, 0x7f,
++	0x01, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0xcf, 0x77, 0x77, 0x77, 0x77, 0x77,
++	0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77, 0x77
++};
++
++/* nacl */
++static const u8 input28[] __initconst = {
++	0x8e, 0x99, 0x3b, 0x9f, 0x48, 0x68, 0x12, 0x73,
++	0xc2, 0x96, 0x50, 0xba, 0x32, 0xfc, 0x76, 0xce,
++	0x48, 0x33, 0x2e, 0xa7, 0x16, 0x4d, 0x96, 0xa4,
++	0x47, 0x6f, 0xb8, 0xc5, 0x31, 0xa1, 0x18, 0x6a,
++	0xc0, 0xdf, 0xc1, 0x7c, 0x98, 0xdc, 0xe8, 0x7b,
++	0x4d, 0xa7, 0xf0, 0x11, 0xec, 0x48, 0xc9, 0x72,
++	0x71, 0xd2, 0xc2, 0x0f, 0x9b, 0x92, 0x8f, 0xe2,
++	0x27, 0x0d, 0x6f, 0xb8, 0x63, 0xd5, 0x17, 0x38,
++	0xb4, 0x8e, 0xee, 0xe3, 0x14, 0xa7, 0xcc, 0x8a,
++	0xb9, 0x32, 0x16, 0x45, 0x48, 0xe5, 0x26, 0xae,
++	0x90, 0x22, 0x43, 0x68, 0x51, 0x7a, 0xcf, 0xea,
++	0xbd, 0x6b, 0xb3, 0x73, 0x2b, 0xc0, 0xe9, 0xda,
++	0x99, 0x83, 0x2b, 0x61, 0xca, 0x01, 0xb6, 0xde,
++	0x56, 0x24, 0x4a, 0x9e, 0x88, 0xd5, 0xf9, 0xb3,
++	0x79, 0x73, 0xf6, 0x22, 0xa4, 0x3d, 0x14, 0xa6,
++	0x59, 0x9b, 0x1f, 0x65, 0x4c, 0xb4, 0x5a, 0x74,
++	0xe3, 0x55, 0xa5
++};
++static const u8 output28[] __initconst = {
++	0xf3, 0xff, 0xc7, 0x70, 0x3f, 0x94, 0x00, 0xe5,
++	0x2a, 0x7d, 0xfb, 0x4b, 0x3d, 0x33, 0x05, 0xd9
++};
++static const u8 key28[] __initconst = {
++	0xee, 0xa6, 0xa7, 0x25, 0x1c, 0x1e, 0x72, 0x91,
++	0x6d, 0x11, 0xc2, 0xcb, 0x21, 0x4d, 0x3c, 0x25,
++	0x25, 0x39, 0x12, 0x1d, 0x8e, 0x23, 0x4e, 0x65,
++	0x2d, 0x65, 0x1f, 0xa4, 0xc8, 0xcf, 0xf8, 0x80
++};
++
++/* wrap 2^130-5 */
++static const u8 input29[] __initconst = {
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
++};
++static const u8 output29[] __initconst = {
++	0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++static const u8 key29[] __initconst = {
++	0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++
++/* wrap 2^128 */
++static const u8 input30[] __initconst = {
++	0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++static const u8 output30[] __initconst = {
++	0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++static const u8 key30[] __initconst = {
++	0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
++};
++
++/* limb carry */
++static const u8 input31[] __initconst = {
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xf0, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0x11, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++static const u8 output31[] __initconst = {
++	0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++static const u8 key31[] __initconst = {
++	0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++
++/* 2^130-5 */
++static const u8 input32[] __initconst = {
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xfb, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe,
++	0xfe, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe,
++	0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
++	0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01
++};
++static const u8 output32[] __initconst = {
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++static const u8 key32[] __initconst = {
++	0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++
++/* 2^130-6 */
++static const u8 input33[] __initconst = {
++	0xfd, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
++};
++static const u8 output33[] __initconst = {
++	0xfa, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
++};
++static const u8 key33[] __initconst = {
++	0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++
++/* 5*H+L reduction intermediate */
++static const u8 input34[] __initconst = {
++	0xe3, 0x35, 0x94, 0xd7, 0x50, 0x5e, 0x43, 0xb9,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x33, 0x94, 0xd7, 0x50, 0x5e, 0x43, 0x79, 0xcd,
++	0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++static const u8 output34[] __initconst = {
++	0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x55, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++static const u8 key34[] __initconst = {
++	0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++
++/* 5*H+L reduction final */
++static const u8 input35[] __initconst = {
++	0xe3, 0x35, 0x94, 0xd7, 0x50, 0x5e, 0x43, 0xb9,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x33, 0x94, 0xd7, 0x50, 0x5e, 0x43, 0x79, 0xcd,
++	0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++static const u8 output35[] __initconst = {
++	0x13, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++static const u8 key35[] __initconst = {
++	0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
++};
++
++static const struct poly1305_testvec poly1305_testvecs[] __initconst = {
++	{ input01, output01, key01, sizeof(input01) },
++	{ input02, output02, key02, sizeof(input02) },
++	{ input03, output03, key03, sizeof(input03) },
++	{ input04, output04, key04, sizeof(input04) },
++	{ input05, output05, key05, sizeof(input05) },
++	{ input06, output06, key06, sizeof(input06) },
++	{ input07, output07, key07, sizeof(input07) },
++	{ input08, output08, key08, sizeof(input08) },
++	{ input09, output09, key09, sizeof(input09) },
++	{ input10, output10, key10, sizeof(input10) },
++	{ input11, output11, key11, sizeof(input11) },
++	{ input12, output12, key12, sizeof(input12) },
++	{ input13, output13, key13, sizeof(input13) },
++	{ input14, output14, key14, sizeof(input14) },
++	{ input15, output15, key15, sizeof(input15) },
++	{ input16, output16, key16, sizeof(input16) },
++	{ input17, output17, key17, sizeof(input17) },
++	{ input18, output18, key18, sizeof(input18) },
++	{ input19, output19, key19, sizeof(input19) },
++	{ input20, output20, key20, sizeof(input20) },
++	{ input21, output21, key21, sizeof(input21) },
++	{ input22, output22, key22, sizeof(input22) },
++	{ input23, output23, key23, sizeof(input23) },
++	{ input24, output24, key24, sizeof(input24) },
++	{ input25, output25, key25, sizeof(input25) },
++	{ input26, output26, key26, sizeof(input26) },
++	{ input27, output27, key27, sizeof(input27) },
++	{ input28, output28, key28, sizeof(input28) },
++	{ input29, output29, key29, sizeof(input29) },
++	{ input30, output30, key30, sizeof(input30) },
++	{ input31, output31, key31, sizeof(input31) },
++	{ input32, output32, key32, sizeof(input32) },
++	{ input33, output33, key33, sizeof(input33) },
++	{ input34, output34, key34, sizeof(input34) },
++	{ input35, output35, key35, sizeof(input35) }
++};
++
++static bool __init poly1305_selftest(void)
 +{
-+	struct poly1305_arch_internal *state = ctx;
-+	u32 cy;
++	simd_context_t simd_context;
++	bool success = true;
++	size_t i, j;
 +
-+	if (!IS_ENABLED(CONFIG_KERNEL_MODE_NEON) || !state->is_base2_26)
-+		return;
++	simd_get(&simd_context);
++	for (i = 0; i < ARRAY_SIZE(poly1305_testvecs); ++i) {
++		struct poly1305_ctx poly1305;
++		u8 out[POLY1305_MAC_SIZE];
 +
-+	cy = state->h[0] >> 26; state->h[0] &= 0x3ffffff; state->h[1] += cy;
-+	cy = state->h[1] >> 26; state->h[1] &= 0x3ffffff; state->h[2] += cy;
-+	cy = state->h[2] >> 26; state->h[2] &= 0x3ffffff; state->h[3] += cy;
-+	cy = state->h[3] >> 26; state->h[3] &= 0x3ffffff; state->h[4] += cy;
-+	state->h0 = ((u64)state->h[2] << 52) | ((u64)state->h[1] << 26) | state->h[0];
-+	state->h1 = ((u64)state->h[4] << 40) | ((u64)state->h[3] << 14) | (state->h[2] >> 12);
-+	state->h2 = state->h[4] >> 24;
-+	if (IS_ENABLED(CONFIG_ZINC_ARCH_ARM) && IS_ENABLED(CONFIG_CPU_BIG_ENDIAN)) {
-+		state->h0 = rol64(state->h0, 32);
-+		state->h1 = rol64(state->h1, 32);
++		memset(out, 0, sizeof(out));
++		memset(&poly1305, 0, sizeof(poly1305));
++		poly1305_init(&poly1305, poly1305_testvecs[i].key);
++		poly1305_update(&poly1305, poly1305_testvecs[i].input,
++				poly1305_testvecs[i].ilen, &simd_context);
++		poly1305_final(&poly1305, out, &simd_context);
++		if (memcmp(out, poly1305_testvecs[i].output,
++			   POLY1305_MAC_SIZE)) {
++			pr_err("poly1305 self-test %zu: FAIL\n", i + 1);
++			success = false;
++		}
++		simd_relax(&simd_context);
++
++		if (poly1305_testvecs[i].ilen <= 1)
++			continue;
++
++		for (j = 1; j < poly1305_testvecs[i].ilen - 1; ++j) {
++			memset(out, 0, sizeof(out));
++			memset(&poly1305, 0, sizeof(poly1305));
++			poly1305_init(&poly1305, poly1305_testvecs[i].key);
++			poly1305_update(&poly1305, poly1305_testvecs[i].input,
++					j, &simd_context);
++			poly1305_update(&poly1305,
++					poly1305_testvecs[i].input + j,
++					poly1305_testvecs[i].ilen - j,
++					&simd_context);
++			poly1305_final(&poly1305, out, &simd_context);
++			if (memcmp(out, poly1305_testvecs[i].output,
++				   POLY1305_MAC_SIZE)) {
++				pr_err("poly1305 self-test %zu (split %zu): FAIL\n",
++				       i + 1, j);
++				success = false;
++			}
++
++			memset(out, 0, sizeof(out));
++			memset(&poly1305, 0, sizeof(poly1305));
++			poly1305_init(&poly1305, poly1305_testvecs[i].key);
++			poly1305_update(&poly1305, poly1305_testvecs[i].input,
++					j, &simd_context);
++			poly1305_update(&poly1305,
++					poly1305_testvecs[i].input + j,
++					poly1305_testvecs[i].ilen - j,
++					DONT_USE_SIMD);
++			poly1305_final(&poly1305, out, &simd_context);
++			if (memcmp(out, poly1305_testvecs[i].output,
++				   POLY1305_MAC_SIZE)) {
++				pr_err("poly1305 self-test %zu (split %zu, mixed simd): FAIL\n",
++				       i + 1, j);
++				success = false;
++			}
++			simd_relax(&simd_context);
++		}
 +	}
-+#define ULT(a, b) ((a ^ ((a ^ b) | ((a - b) ^ b))) >> (sizeof(a) * 8 - 1))
-+	cy = (state->h2 >> 2) + (state->h2 & ~3ULL);
-+	state->h2 &= 3;
-+	state->h0 += cy;
-+	state->h1 += (cy = ULT(state->h0, cy));
-+	state->h2 += ULT(state->h1, cy);
-+#undef ULT
-+	state->is_base2_26 = 0;
++	simd_put(&simd_context);
++
++	return success;
 +}
-+
-+static inline bool poly1305_init_arch(void *ctx,
-+				      const u8 key[POLY1305_KEY_SIZE])
-+{
-+	poly1305_init_arm(ctx, key);
-+	return true;
-+}
-+
-+static inline bool poly1305_blocks_arch(void *ctx, const u8 *inp,
-+					size_t len, const u32 padbit,
-+					simd_context_t *simd_context)
-+{
-+	/* SIMD disables preemption, so relax after processing each page. */
-+	BUILD_BUG_ON(PAGE_SIZE < POLY1305_BLOCK_SIZE ||
-+		     PAGE_SIZE % POLY1305_BLOCK_SIZE);
-+
-+	if (!IS_ENABLED(CONFIG_KERNEL_MODE_NEON) || !poly1305_use_neon ||
-+	    !simd_use(simd_context)) {
-+		convert_to_base2_64(ctx);
-+		poly1305_blocks_arm(ctx, inp, len, padbit);
-+		return true;
-+	}
-+
-+	for (;;) {
-+		const size_t bytes = min_t(size_t, len, PAGE_SIZE);
-+
-+		poly1305_blocks_neon(ctx, inp, bytes, padbit);
-+		len -= bytes;
-+		if (!len)
-+			break;
-+		inp += bytes;
-+		simd_relax(simd_context);
-+	}
-+	return true;
-+}
-+
-+static inline bool poly1305_emit_arch(void *ctx, u8 mac[POLY1305_MAC_SIZE],
-+				      const u32 nonce[4],
-+				      simd_context_t *simd_context)
-+{
-+	if (!IS_ENABLED(CONFIG_KERNEL_MODE_NEON) || !poly1305_use_neon ||
-+	    !simd_use(simd_context)) {
-+		convert_to_base2_64(ctx);
-+		poly1305_emit_arm(ctx, mac, nonce);
-+	} else
-+		poly1305_emit_neon(ctx, mac, nonce);
-+	return true;
-+}
-diff --git a/lib/zinc/poly1305/poly1305-arm.pl b/lib/zinc/poly1305/poly1305-arm.pl
-new file mode 100644
-index 000000000000..468f41b76fbd
---- /dev/null
-+++ b/lib/zinc/poly1305/poly1305-arm.pl
-@@ -0,0 +1,1276 @@
-+#!/usr/bin/env perl
-+# SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
-+#
-+# This code is taken from the OpenSSL project but the author, Andy Polyakov,
-+# has relicensed it under the licenses specified in the SPDX header above.
-+# The original headers, including the original license headers, are
-+# included below for completeness.
-+#
-+# ====================================================================
-+# Written by Andy Polyakov <appro@openssl.org> for the OpenSSL
-+# project. The module is, however, dual licensed under OpenSSL and
-+# CRYPTOGAMS licenses depending on where you obtain it. For further
-+# details see http://www.openssl.org/~appro/cryptogams/.
-+# ====================================================================
-+#
-+#			IALU(*)/gcc-4.4		NEON
-+#
-+# ARM11xx(ARMv6)	7.78/+100%		-
-+# Cortex-A5		6.35/+130%		3.00
-+# Cortex-A8		6.25/+115%		2.36
-+# Cortex-A9		5.10/+95%		2.55
-+# Cortex-A15		3.85/+85%		1.25(**)
-+# Snapdragon S4		5.70/+100%		1.48(**)
-+#
-+# (*)	this is for -march=armv6, i.e. with bunch of ldrb loading data;
-+# (**)	these are trade-off results, they can be improved by ~8% but at
-+#	the cost of 15/12% regression on Cortex-A5/A7, it's even possible
-+#	to improve Cortex-A9 result, but then A5/A7 loose more than 20%;
-+
-+$flavour = shift;
-+if ($flavour=~/\w[\w\-]*\.\w+$/) { $output=$flavour; undef $flavour; }
-+else { while (($output=shift) && ($output!~/\w[\w\-]*\.\w+$/)) {} }
-+
-+if ($flavour && $flavour ne "void") {
-+    $0 =~ m/(.*[\/\\])[^\/\\]+$/; $dir=$1;
-+    ( $xlate="${dir}arm-xlate.pl" and -f $xlate ) or
-+    ( $xlate="${dir}../../perlasm/arm-xlate.pl" and -f $xlate) or
-+    die "can't locate arm-xlate.pl";
-+
-+    open STDOUT,"| \"$^X\" $xlate $flavour $output";
-+} else {
-+    open STDOUT,">$output";
-+}
-+
-+($ctx,$inp,$len,$padbit)=map("r$_",(0..3));
-+
-+$code.=<<___;
-+#ifndef	__KERNEL__
-+# include "arm_arch.h"
-+#else
-+# define __ARM_ARCH__ __LINUX_ARM_ARCH__
-+# define __ARM_MAX_ARCH__ __LINUX_ARM_ARCH__
-+# define poly1305_init   poly1305_init_arm
-+# define poly1305_blocks poly1305_blocks_arm
-+# define poly1305_emit   poly1305_emit_arm
-+#endif
-+
-+.text
-+#if defined(__thumb2__)
-+.syntax	unified
-+.thumb
-+#else
-+.code	32
-+#endif
-+
-+.globl	poly1305_emit
-+.globl	poly1305_blocks
-+.globl	poly1305_init
-+.type	poly1305_init,%function
-+.align	5
-+poly1305_init:
-+.Lpoly1305_init:
-+	stmdb	sp!,{r4-r11}
-+
-+	eor	r3,r3,r3
-+	cmp	$inp,#0
-+	str	r3,[$ctx,#0]		@ zero hash value
-+	str	r3,[$ctx,#4]
-+	str	r3,[$ctx,#8]
-+	str	r3,[$ctx,#12]
-+	str	r3,[$ctx,#16]
-+	str	r3,[$ctx,#36]		@ is_base2_26
-+	add	$ctx,$ctx,#20
-+
-+#ifdef	__thumb2__
-+	it	eq
-+#endif
-+	moveq	r0,#0
-+	beq	.Lno_key
-+
-+#if	__ARM_MAX_ARCH__>=7 && !defined(__KERNEL__)
-+	adr	r11,.Lpoly1305_init
-+	ldr	r12,.LOPENSSL_armcap
-+#endif
-+	ldrb	r4,[$inp,#0]
-+	mov	r10,#0x0fffffff
-+	ldrb	r5,[$inp,#1]
-+	and	r3,r10,#-4		@ 0x0ffffffc
-+	ldrb	r6,[$inp,#2]
-+	ldrb	r7,[$inp,#3]
-+	orr	r4,r4,r5,lsl#8
-+	ldrb	r5,[$inp,#4]
-+	orr	r4,r4,r6,lsl#16
-+	ldrb	r6,[$inp,#5]
-+	orr	r4,r4,r7,lsl#24
-+	ldrb	r7,[$inp,#6]
-+	and	r4,r4,r10
-+
-+#if	__ARM_MAX_ARCH__>=7 && !defined(__KERNEL__)
-+	ldr	r12,[r11,r12]		@ OPENSSL_armcap_P
-+# ifdef	__APPLE__
-+	ldr	r12,[r12]
-+# endif
-+#endif
-+	ldrb	r8,[$inp,#7]
-+	orr	r5,r5,r6,lsl#8
-+	ldrb	r6,[$inp,#8]
-+	orr	r5,r5,r7,lsl#16
-+	ldrb	r7,[$inp,#9]
-+	orr	r5,r5,r8,lsl#24
-+	ldrb	r8,[$inp,#10]
-+	and	r5,r5,r3
-+
-+#if	__ARM_MAX_ARCH__>=7 && !defined(__KERNEL__)
-+	tst	r12,#ARMV7_NEON		@ check for NEON
-+# ifdef	__APPLE__
-+	adr	r9,poly1305_blocks_neon
-+	adr	r11,poly1305_blocks
-+#  ifdef __thumb2__
-+	it	ne
-+#  endif
-+	movne	r11,r9
-+	adr	r12,poly1305_emit
-+	adr	r10,poly1305_emit_neon
-+#  ifdef __thumb2__
-+	it	ne
-+#  endif
-+	movne	r12,r10
-+# else
-+#  ifdef __thumb2__
-+	itete	eq
-+#  endif
-+	addeq	r12,r11,#(poly1305_emit-.Lpoly1305_init)
-+	addne	r12,r11,#(poly1305_emit_neon-.Lpoly1305_init)
-+	addeq	r11,r11,#(poly1305_blocks-.Lpoly1305_init)
-+	addne	r11,r11,#(poly1305_blocks_neon-.Lpoly1305_init)
-+# endif
-+# ifdef	__thumb2__
-+	orr	r12,r12,#1	@ thumb-ify address
-+	orr	r11,r11,#1
-+# endif
-+#endif
-+	ldrb	r9,[$inp,#11]
-+	orr	r6,r6,r7,lsl#8
-+	ldrb	r7,[$inp,#12]
-+	orr	r6,r6,r8,lsl#16
-+	ldrb	r8,[$inp,#13]
-+	orr	r6,r6,r9,lsl#24
-+	ldrb	r9,[$inp,#14]
-+	and	r6,r6,r3
-+
-+	ldrb	r10,[$inp,#15]
-+	orr	r7,r7,r8,lsl#8
-+	str	r4,[$ctx,#0]
-+	orr	r7,r7,r9,lsl#16
-+	str	r5,[$ctx,#4]
-+	orr	r7,r7,r10,lsl#24
-+	str	r6,[$ctx,#8]
-+	and	r7,r7,r3
-+	str	r7,[$ctx,#12]
-+#if	__ARM_MAX_ARCH__>=7 && !defined(__KERNEL__)
-+	stmia	r2,{r11,r12}		@ fill functions table
-+	mov	r0,#1
-+#else
-+	mov	r0,#0
-+#endif
-+.Lno_key:
-+	ldmia	sp!,{r4-r11}
-+#if	__ARM_ARCH__>=5
-+	ret				@ bx	lr
-+#else
-+	tst	lr,#1
-+	moveq	pc,lr			@ be binary compatible with V4, yet
-+	bx	lr			@ interoperable with Thumb ISA:-)
-+#endif
-+.size	poly1305_init,.-poly1305_init
-+___
-+{
-+my ($h0,$h1,$h2,$h3,$h4,$r0,$r1,$r2,$r3)=map("r$_",(4..12));
-+my ($s1,$s2,$s3)=($r1,$r2,$r3);
-+
-+$code.=<<___;
-+.type	poly1305_blocks,%function
-+.align	5
-+poly1305_blocks:
-+.Lpoly1305_blocks:
-+	stmdb	sp!,{r3-r11,lr}
-+
-+	ands	$len,$len,#-16
-+	beq	.Lno_data
-+
-+	cmp	$padbit,#0
-+	add	$len,$len,$inp		@ end pointer
-+	sub	sp,sp,#32
-+
-+	ldmia	$ctx,{$h0-$r3}		@ load context
-+
-+	str	$ctx,[sp,#12]		@ offload stuff
-+	mov	lr,$inp
-+	str	$len,[sp,#16]
-+	str	$r1,[sp,#20]
-+	str	$r2,[sp,#24]
-+	str	$r3,[sp,#28]
-+	b	.Loop
-+
-+.Loop:
-+#if __ARM_ARCH__<7
-+	ldrb	r0,[lr],#16		@ load input
-+# ifdef	__thumb2__
-+	it	hi
-+# endif
-+	addhi	$h4,$h4,#1		@ 1<<128
-+	ldrb	r1,[lr,#-15]
-+	ldrb	r2,[lr,#-14]
-+	ldrb	r3,[lr,#-13]
-+	orr	r1,r0,r1,lsl#8
-+	ldrb	r0,[lr,#-12]
-+	orr	r2,r1,r2,lsl#16
-+	ldrb	r1,[lr,#-11]
-+	orr	r3,r2,r3,lsl#24
-+	ldrb	r2,[lr,#-10]
-+	adds	$h0,$h0,r3		@ accumulate input
-+
-+	ldrb	r3,[lr,#-9]
-+	orr	r1,r0,r1,lsl#8
-+	ldrb	r0,[lr,#-8]
-+	orr	r2,r1,r2,lsl#16
-+	ldrb	r1,[lr,#-7]
-+	orr	r3,r2,r3,lsl#24
-+	ldrb	r2,[lr,#-6]
-+	adcs	$h1,$h1,r3
-+
-+	ldrb	r3,[lr,#-5]
-+	orr	r1,r0,r1,lsl#8
-+	ldrb	r0,[lr,#-4]
-+	orr	r2,r1,r2,lsl#16
-+	ldrb	r1,[lr,#-3]
-+	orr	r3,r2,r3,lsl#24
-+	ldrb	r2,[lr,#-2]
-+	adcs	$h2,$h2,r3
-+
-+	ldrb	r3,[lr,#-1]
-+	orr	r1,r0,r1,lsl#8
-+	str	lr,[sp,#8]		@ offload input pointer
-+	orr	r2,r1,r2,lsl#16
-+	add	$s1,$r1,$r1,lsr#2
-+	orr	r3,r2,r3,lsl#24
-+#else
-+	ldr	r0,[lr],#16		@ load input
-+# ifdef	__thumb2__
-+	it	hi
-+# endif
-+	addhi	$h4,$h4,#1		@ padbit
-+	ldr	r1,[lr,#-12]
-+	ldr	r2,[lr,#-8]
-+	ldr	r3,[lr,#-4]
-+# ifdef	__ARMEB__
-+	rev	r0,r0
-+	rev	r1,r1
-+	rev	r2,r2
-+	rev	r3,r3
-+# endif
-+	adds	$h0,$h0,r0		@ accumulate input
-+	str	lr,[sp,#8]		@ offload input pointer
-+	adcs	$h1,$h1,r1
-+	add	$s1,$r1,$r1,lsr#2
-+	adcs	$h2,$h2,r2
-+#endif
-+	add	$s2,$r2,$r2,lsr#2
-+	adcs	$h3,$h3,r3
-+	add	$s3,$r3,$r3,lsr#2
-+
-+	umull	r2,r3,$h1,$r0
-+	 adc	$h4,$h4,#0
-+	umull	r0,r1,$h0,$r0
-+	umlal	r2,r3,$h4,$s1
-+	umlal	r0,r1,$h3,$s1
-+	ldr	$r1,[sp,#20]		@ reload $r1
-+	umlal	r2,r3,$h2,$s3
-+	umlal	r0,r1,$h1,$s3
-+	umlal	r2,r3,$h3,$s2
-+	umlal	r0,r1,$h2,$s2
-+	umlal	r2,r3,$h0,$r1
-+	str	r0,[sp,#0]		@ future $h0
-+	 mul	r0,$s2,$h4
-+	ldr	$r2,[sp,#24]		@ reload $r2
-+	adds	r2,r2,r1		@ d1+=d0>>32
-+	 eor	r1,r1,r1
-+	adc	lr,r3,#0		@ future $h2
-+	str	r2,[sp,#4]		@ future $h1
-+
-+	mul	r2,$s3,$h4
-+	eor	r3,r3,r3
-+	umlal	r0,r1,$h3,$s3
-+	ldr	$r3,[sp,#28]		@ reload $r3
-+	umlal	r2,r3,$h3,$r0
-+	umlal	r0,r1,$h2,$r0
-+	umlal	r2,r3,$h2,$r1
-+	umlal	r0,r1,$h1,$r1
-+	umlal	r2,r3,$h1,$r2
-+	umlal	r0,r1,$h0,$r2
-+	umlal	r2,r3,$h0,$r3
-+	ldr	$h0,[sp,#0]
-+	mul	$h4,$r0,$h4
-+	ldr	$h1,[sp,#4]
-+
-+	adds	$h2,lr,r0		@ d2+=d1>>32
-+	ldr	lr,[sp,#8]		@ reload input pointer
-+	adc	r1,r1,#0
-+	adds	$h3,r2,r1		@ d3+=d2>>32
-+	ldr	r0,[sp,#16]		@ reload end pointer
-+	adc	r3,r3,#0
-+	add	$h4,$h4,r3		@ h4+=d3>>32
-+
-+	and	r1,$h4,#-4
-+	and	$h4,$h4,#3
-+	add	r1,r1,r1,lsr#2		@ *=5
-+	adds	$h0,$h0,r1
-+	adcs	$h1,$h1,#0
-+	adcs	$h2,$h2,#0
-+	adcs	$h3,$h3,#0
-+	adc	$h4,$h4,#0
-+
-+	cmp	r0,lr			@ done yet?
-+	bhi	.Loop
-+
-+	ldr	$ctx,[sp,#12]
-+	add	sp,sp,#32
-+	stmia	$ctx,{$h0-$h4}		@ store the result
-+
-+.Lno_data:
-+#if	__ARM_ARCH__>=5
-+	ldmia	sp!,{r3-r11,pc}
-+#else
-+	ldmia	sp!,{r3-r11,lr}
-+	tst	lr,#1
-+	moveq	pc,lr			@ be binary compatible with V4, yet
-+	bx	lr			@ interoperable with Thumb ISA:-)
-+#endif
-+.size	poly1305_blocks,.-poly1305_blocks
-+___
-+}
-+{
-+my ($ctx,$mac,$nonce)=map("r$_",(0..2));
-+my ($h0,$h1,$h2,$h3,$h4,$g0,$g1,$g2,$g3)=map("r$_",(3..11));
-+my $g4=$h4;
-+
-+$code.=<<___;
-+.type	poly1305_emit,%function
-+.align	5
-+poly1305_emit:
-+	stmdb	sp!,{r4-r11}
-+.Lpoly1305_emit_enter:
-+
-+	ldmia	$ctx,{$h0-$h4}
-+	adds	$g0,$h0,#5		@ compare to modulus
-+	adcs	$g1,$h1,#0
-+	adcs	$g2,$h2,#0
-+	adcs	$g3,$h3,#0
-+	adc	$g4,$h4,#0
-+	tst	$g4,#4			@ did it carry/borrow?
-+
-+#ifdef	__thumb2__
-+	it	ne
-+#endif
-+	movne	$h0,$g0
-+	ldr	$g0,[$nonce,#0]
-+#ifdef	__thumb2__
-+	it	ne
-+#endif
-+	movne	$h1,$g1
-+	ldr	$g1,[$nonce,#4]
-+#ifdef	__thumb2__
-+	it	ne
-+#endif
-+	movne	$h2,$g2
-+	ldr	$g2,[$nonce,#8]
-+#ifdef	__thumb2__
-+	it	ne
-+#endif
-+	movne	$h3,$g3
-+	ldr	$g3,[$nonce,#12]
-+
-+	adds	$h0,$h0,$g0
-+	adcs	$h1,$h1,$g1
-+	adcs	$h2,$h2,$g2
-+	adc	$h3,$h3,$g3
-+
-+#if __ARM_ARCH__>=7
-+# ifdef __ARMEB__
-+	rev	$h0,$h0
-+	rev	$h1,$h1
-+	rev	$h2,$h2
-+	rev	$h3,$h3
-+# endif
-+	str	$h0,[$mac,#0]
-+	str	$h1,[$mac,#4]
-+	str	$h2,[$mac,#8]
-+	str	$h3,[$mac,#12]
-+#else
-+	strb	$h0,[$mac,#0]
-+	mov	$h0,$h0,lsr#8
-+	strb	$h1,[$mac,#4]
-+	mov	$h1,$h1,lsr#8
-+	strb	$h2,[$mac,#8]
-+	mov	$h2,$h2,lsr#8
-+	strb	$h3,[$mac,#12]
-+	mov	$h3,$h3,lsr#8
-+
-+	strb	$h0,[$mac,#1]
-+	mov	$h0,$h0,lsr#8
-+	strb	$h1,[$mac,#5]
-+	mov	$h1,$h1,lsr#8
-+	strb	$h2,[$mac,#9]
-+	mov	$h2,$h2,lsr#8
-+	strb	$h3,[$mac,#13]
-+	mov	$h3,$h3,lsr#8
-+
-+	strb	$h0,[$mac,#2]
-+	mov	$h0,$h0,lsr#8
-+	strb	$h1,[$mac,#6]
-+	mov	$h1,$h1,lsr#8
-+	strb	$h2,[$mac,#10]
-+	mov	$h2,$h2,lsr#8
-+	strb	$h3,[$mac,#14]
-+	mov	$h3,$h3,lsr#8
-+
-+	strb	$h0,[$mac,#3]
-+	strb	$h1,[$mac,#7]
-+	strb	$h2,[$mac,#11]
-+	strb	$h3,[$mac,#15]
-+#endif
-+	ldmia	sp!,{r4-r11}
-+#if	__ARM_ARCH__>=5
-+	ret				@ bx	lr
-+#else
-+	tst	lr,#1
-+	moveq	pc,lr			@ be binary compatible with V4, yet
-+	bx	lr			@ interoperable with Thumb ISA:-)
-+#endif
-+.size	poly1305_emit,.-poly1305_emit
-+___
-+{
-+my ($R0,$R1,$S1,$R2,$S2,$R3,$S3,$R4,$S4) = map("d$_",(0..9));
-+my ($D0,$D1,$D2,$D3,$D4, $H0,$H1,$H2,$H3,$H4) = map("q$_",(5..14));
-+my ($T0,$T1,$MASK) = map("q$_",(15,4,0));
-+
-+my ($in2,$zeros,$tbl0,$tbl1) = map("r$_",(4..7));
-+
-+$code.=<<___;
-+#if (defined(__KERNEL__) && defined(CONFIG_KERNEL_MODE_NEON)) || (!defined(__KERNEL__) && __ARM_MAX_ARCH__>=7)
-+.fpu	neon
-+
-+.type	poly1305_init_neon,%function
-+.align	5
-+poly1305_init_neon:
-+.Lpoly1305_init_neon:
-+	ldr	r4,[$ctx,#20]		@ load key base 2^32
-+	ldr	r5,[$ctx,#24]
-+	ldr	r6,[$ctx,#28]
-+	ldr	r7,[$ctx,#32]
-+
-+	and	r2,r4,#0x03ffffff	@ base 2^32 -> base 2^26
-+	mov	r3,r4,lsr#26
-+	mov	r4,r5,lsr#20
-+	orr	r3,r3,r5,lsl#6
-+	mov	r5,r6,lsr#14
-+	orr	r4,r4,r6,lsl#12
-+	mov	r6,r7,lsr#8
-+	orr	r5,r5,r7,lsl#18
-+	and	r3,r3,#0x03ffffff
-+	and	r4,r4,#0x03ffffff
-+	and	r5,r5,#0x03ffffff
-+
-+	vdup.32	$R0,r2			@ r^1 in both lanes
-+	add	r2,r3,r3,lsl#2		@ *5
-+	vdup.32	$R1,r3
-+	add	r3,r4,r4,lsl#2
-+	vdup.32	$S1,r2
-+	vdup.32	$R2,r4
-+	add	r4,r5,r5,lsl#2
-+	vdup.32	$S2,r3
-+	vdup.32	$R3,r5
-+	add	r5,r6,r6,lsl#2
-+	vdup.32	$S3,r4
-+	vdup.32	$R4,r6
-+	vdup.32	$S4,r5
-+
-+	mov	$zeros,#2		@ counter
-+
-+.Lsquare_neon:
-+	@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-+	@ d0 = h0*r0 + h4*5*r1 + h3*5*r2 + h2*5*r3 + h1*5*r4
-+	@ d1 = h1*r0 + h0*r1   + h4*5*r2 + h3*5*r3 + h2*5*r4
-+	@ d2 = h2*r0 + h1*r1   + h0*r2   + h4*5*r3 + h3*5*r4
-+	@ d3 = h3*r0 + h2*r1   + h1*r2   + h0*r3   + h4*5*r4
-+	@ d4 = h4*r0 + h3*r1   + h2*r2   + h1*r3   + h0*r4
-+
-+	vmull.u32	$D0,$R0,${R0}[1]
-+	vmull.u32	$D1,$R1,${R0}[1]
-+	vmull.u32	$D2,$R2,${R0}[1]
-+	vmull.u32	$D3,$R3,${R0}[1]
-+	vmull.u32	$D4,$R4,${R0}[1]
-+
-+	vmlal.u32	$D0,$R4,${S1}[1]
-+	vmlal.u32	$D1,$R0,${R1}[1]
-+	vmlal.u32	$D2,$R1,${R1}[1]
-+	vmlal.u32	$D3,$R2,${R1}[1]
-+	vmlal.u32	$D4,$R3,${R1}[1]
-+
-+	vmlal.u32	$D0,$R3,${S2}[1]
-+	vmlal.u32	$D1,$R4,${S2}[1]
-+	vmlal.u32	$D3,$R1,${R2}[1]
-+	vmlal.u32	$D2,$R0,${R2}[1]
-+	vmlal.u32	$D4,$R2,${R2}[1]
-+
-+	vmlal.u32	$D0,$R2,${S3}[1]
-+	vmlal.u32	$D3,$R0,${R3}[1]
-+	vmlal.u32	$D1,$R3,${S3}[1]
-+	vmlal.u32	$D2,$R4,${S3}[1]
-+	vmlal.u32	$D4,$R1,${R3}[1]
-+
-+	vmlal.u32	$D3,$R4,${S4}[1]
-+	vmlal.u32	$D0,$R1,${S4}[1]
-+	vmlal.u32	$D1,$R2,${S4}[1]
-+	vmlal.u32	$D2,$R3,${S4}[1]
-+	vmlal.u32	$D4,$R0,${R4}[1]
-+
-+	@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-+	@ lazy reduction as discussed in "NEON crypto" by D.J. Bernstein
-+	@ and P. Schwabe
-+	@
-+	@ H0>>+H1>>+H2>>+H3>>+H4
-+	@ H3>>+H4>>*5+H0>>+H1
-+	@
-+	@ Trivia.
-+	@
-+	@ Result of multiplication of n-bit number by m-bit number is
-+	@ n+m bits wide. However! Even though 2^n is a n+1-bit number,
-+	@ m-bit number multiplied by 2^n is still n+m bits wide.
-+	@
-+	@ Sum of two n-bit numbers is n+1 bits wide, sum of three - n+2,
-+	@ and so is sum of four. Sum of 2^m n-m-bit numbers and n-bit
-+	@ one is n+1 bits wide.
-+	@
-+	@ >>+ denotes Hnext += Hn>>26, Hn &= 0x3ffffff. This means that
-+	@ H0, H2, H3 are guaranteed to be 26 bits wide, while H1 and H4
-+	@ can be 27. However! In cases when their width exceeds 26 bits
-+	@ they are limited by 2^26+2^6. This in turn means that *sum*
-+	@ of the products with these values can still be viewed as sum
-+	@ of 52-bit numbers as long as the amount of addends is not a
-+	@ power of 2. For example,
-+	@
-+	@ H4 = H4*R0 + H3*R1 + H2*R2 + H1*R3 + H0 * R4,
-+	@
-+	@ which can't be larger than 5 * (2^26 + 2^6) * (2^26 + 2^6), or
-+	@ 5 * (2^52 + 2*2^32 + 2^12), which in turn is smaller than
-+	@ 8 * (2^52) or 2^55. However, the value is then multiplied by
-+	@ by 5, so we should be looking at 5 * 5 * (2^52 + 2^33 + 2^12),
-+	@ which is less than 32 * (2^52) or 2^57. And when processing
-+	@ data we are looking at triple as many addends...
-+	@
-+	@ In key setup procedure pre-reduced H0 is limited by 5*4+1 and
-+	@ 5*H4 - by 5*5 52-bit addends, or 57 bits. But when hashing the
-+	@ input H0 is limited by (5*4+1)*3 addends, or 58 bits, while
-+	@ 5*H4 by 5*5*3, or 59[!] bits. How is this relevant? vmlal.u32
-+	@ instruction accepts 2x32-bit input and writes 2x64-bit result.
-+	@ This means that result of reduction have to be compressed upon
-+	@ loop wrap-around. This can be done in the process of reduction
-+	@ to minimize amount of instructions [as well as amount of
-+	@ 128-bit instructions, which benefits low-end processors], but
-+	@ one has to watch for H2 (which is narrower than H0) and 5*H4
-+	@ not being wider than 58 bits, so that result of right shift
-+	@ by 26 bits fits in 32 bits. This is also useful on x86,
-+	@ because it allows to use paddd in place for paddq, which
-+	@ benefits Atom, where paddq is ridiculously slow.
-+
-+	vshr.u64	$T0,$D3,#26
-+	vmovn.i64	$D3#lo,$D3
-+	 vshr.u64	$T1,$D0,#26
-+	 vmovn.i64	$D0#lo,$D0
-+	vadd.i64	$D4,$D4,$T0		@ h3 -> h4
-+	vbic.i32	$D3#lo,#0xfc000000	@ &=0x03ffffff
-+	 vadd.i64	$D1,$D1,$T1		@ h0 -> h1
-+	 vbic.i32	$D0#lo,#0xfc000000
-+
-+	vshrn.u64	$T0#lo,$D4,#26
-+	vmovn.i64	$D4#lo,$D4
-+	 vshr.u64	$T1,$D1,#26
-+	 vmovn.i64	$D1#lo,$D1
-+	 vadd.i64	$D2,$D2,$T1		@ h1 -> h2
-+	vbic.i32	$D4#lo,#0xfc000000
-+	 vbic.i32	$D1#lo,#0xfc000000
-+
-+	vadd.i32	$D0#lo,$D0#lo,$T0#lo
-+	vshl.u32	$T0#lo,$T0#lo,#2
-+	 vshrn.u64	$T1#lo,$D2,#26
-+	 vmovn.i64	$D2#lo,$D2
-+	vadd.i32	$D0#lo,$D0#lo,$T0#lo	@ h4 -> h0
-+	 vadd.i32	$D3#lo,$D3#lo,$T1#lo	@ h2 -> h3
-+	 vbic.i32	$D2#lo,#0xfc000000
-+
-+	vshr.u32	$T0#lo,$D0#lo,#26
-+	vbic.i32	$D0#lo,#0xfc000000
-+	 vshr.u32	$T1#lo,$D3#lo,#26
-+	 vbic.i32	$D3#lo,#0xfc000000
-+	vadd.i32	$D1#lo,$D1#lo,$T0#lo	@ h0 -> h1
-+	 vadd.i32	$D4#lo,$D4#lo,$T1#lo	@ h3 -> h4
-+
-+	subs		$zeros,$zeros,#1
-+	beq		.Lsquare_break_neon
-+
-+	add		$tbl0,$ctx,#(48+0*9*4)
-+	add		$tbl1,$ctx,#(48+1*9*4)
-+
-+	vtrn.32		$R0,$D0#lo		@ r^2:r^1
-+	vtrn.32		$R2,$D2#lo
-+	vtrn.32		$R3,$D3#lo
-+	vtrn.32		$R1,$D1#lo
-+	vtrn.32		$R4,$D4#lo
-+
-+	vshl.u32	$S2,$R2,#2		@ *5
-+	vshl.u32	$S3,$R3,#2
-+	vshl.u32	$S1,$R1,#2
-+	vshl.u32	$S4,$R4,#2
-+	vadd.i32	$S2,$S2,$R2
-+	vadd.i32	$S1,$S1,$R1
-+	vadd.i32	$S3,$S3,$R3
-+	vadd.i32	$S4,$S4,$R4
-+
-+	vst4.32		{${R0}[0],${R1}[0],${S1}[0],${R2}[0]},[$tbl0]!
-+	vst4.32		{${R0}[1],${R1}[1],${S1}[1],${R2}[1]},[$tbl1]!
-+	vst4.32		{${S2}[0],${R3}[0],${S3}[0],${R4}[0]},[$tbl0]!
-+	vst4.32		{${S2}[1],${R3}[1],${S3}[1],${R4}[1]},[$tbl1]!
-+	vst1.32		{${S4}[0]},[$tbl0,:32]
-+	vst1.32		{${S4}[1]},[$tbl1,:32]
-+
-+	b		.Lsquare_neon
-+
-+.align	4
-+.Lsquare_break_neon:
-+	add		$tbl0,$ctx,#(48+2*4*9)
-+	add		$tbl1,$ctx,#(48+3*4*9)
-+
-+	vmov		$R0,$D0#lo		@ r^4:r^3
-+	vshl.u32	$S1,$D1#lo,#2		@ *5
-+	vmov		$R1,$D1#lo
-+	vshl.u32	$S2,$D2#lo,#2
-+	vmov		$R2,$D2#lo
-+	vshl.u32	$S3,$D3#lo,#2
-+	vmov		$R3,$D3#lo
-+	vshl.u32	$S4,$D4#lo,#2
-+	vmov		$R4,$D4#lo
-+	vadd.i32	$S1,$S1,$D1#lo
-+	vadd.i32	$S2,$S2,$D2#lo
-+	vadd.i32	$S3,$S3,$D3#lo
-+	vadd.i32	$S4,$S4,$D4#lo
-+
-+	vst4.32		{${R0}[0],${R1}[0],${S1}[0],${R2}[0]},[$tbl0]!
-+	vst4.32		{${R0}[1],${R1}[1],${S1}[1],${R2}[1]},[$tbl1]!
-+	vst4.32		{${S2}[0],${R3}[0],${S3}[0],${R4}[0]},[$tbl0]!
-+	vst4.32		{${S2}[1],${R3}[1],${S3}[1],${R4}[1]},[$tbl1]!
-+	vst1.32		{${S4}[0]},[$tbl0]
-+	vst1.32		{${S4}[1]},[$tbl1]
-+
-+	ret				@ bx	lr
-+.size	poly1305_init_neon,.-poly1305_init_neon
-+
-+#ifdef __KERNEL__
-+.globl	poly1305_blocks_neon
-+#endif
-+.type	poly1305_blocks_neon,%function
-+.align	5
-+poly1305_blocks_neon:
-+	ldr	ip,[$ctx,#36]		@ is_base2_26
-+	ands	$len,$len,#-16
-+	beq	.Lno_data_neon
-+
-+	cmp	$len,#64
-+	bhs	.Lenter_neon
-+	tst	ip,ip			@ is_base2_26?
-+	beq	.Lpoly1305_blocks
-+
-+.Lenter_neon:
-+	stmdb	sp!,{r4-r7}
-+	vstmdb	sp!,{d8-d15}		@ ABI specification says so
-+
-+	tst	ip,ip			@ is_base2_26?
-+	bne	.Lbase2_26_neon
-+
-+	stmdb	sp!,{r1-r3,lr}
-+	bl	.Lpoly1305_init_neon
-+
-+	ldr	r4,[$ctx,#0]		@ load hash value base 2^32
-+	ldr	r5,[$ctx,#4]
-+	ldr	r6,[$ctx,#8]
-+	ldr	r7,[$ctx,#12]
-+	ldr	ip,[$ctx,#16]
-+
-+	and	r2,r4,#0x03ffffff	@ base 2^32 -> base 2^26
-+	mov	r3,r4,lsr#26
-+	 veor	$D0#lo,$D0#lo,$D0#lo
-+	mov	r4,r5,lsr#20
-+	orr	r3,r3,r5,lsl#6
-+	 veor	$D1#lo,$D1#lo,$D1#lo
-+	mov	r5,r6,lsr#14
-+	orr	r4,r4,r6,lsl#12
-+	 veor	$D2#lo,$D2#lo,$D2#lo
-+	mov	r6,r7,lsr#8
-+	orr	r5,r5,r7,lsl#18
-+	 veor	$D3#lo,$D3#lo,$D3#lo
-+	and	r3,r3,#0x03ffffff
-+	orr	r6,r6,ip,lsl#24
-+	 veor	$D4#lo,$D4#lo,$D4#lo
-+	and	r4,r4,#0x03ffffff
-+	mov	r1,#1
-+	and	r5,r5,#0x03ffffff
-+	str	r1,[$ctx,#36]		@ is_base2_26
-+
-+	vmov.32	$D0#lo[0],r2
-+	vmov.32	$D1#lo[0],r3
-+	vmov.32	$D2#lo[0],r4
-+	vmov.32	$D3#lo[0],r5
-+	vmov.32	$D4#lo[0],r6
-+	adr	$zeros,.Lzeros
-+
-+	ldmia	sp!,{r1-r3,lr}
-+	b	.Lbase2_32_neon
-+
-+.align	4
-+.Lbase2_26_neon:
-+	@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-+	@ load hash value
-+
-+	veor		$D0#lo,$D0#lo,$D0#lo
-+	veor		$D1#lo,$D1#lo,$D1#lo
-+	veor		$D2#lo,$D2#lo,$D2#lo
-+	veor		$D3#lo,$D3#lo,$D3#lo
-+	veor		$D4#lo,$D4#lo,$D4#lo
-+	vld4.32		{$D0#lo[0],$D1#lo[0],$D2#lo[0],$D3#lo[0]},[$ctx]!
-+	adr		$zeros,.Lzeros
-+	vld1.32		{$D4#lo[0]},[$ctx]
-+	sub		$ctx,$ctx,#16		@ rewind
-+
-+.Lbase2_32_neon:
-+	add		$in2,$inp,#32
-+	mov		$padbit,$padbit,lsl#24
-+	tst		$len,#31
-+	beq		.Leven
-+
-+	vld4.32		{$H0#lo[0],$H1#lo[0],$H2#lo[0],$H3#lo[0]},[$inp]!
-+	vmov.32		$H4#lo[0],$padbit
-+	sub		$len,$len,#16
-+	add		$in2,$inp,#32
-+
-+# ifdef	__ARMEB__
-+	vrev32.8	$H0,$H0
-+	vrev32.8	$H3,$H3
-+	vrev32.8	$H1,$H1
-+	vrev32.8	$H2,$H2
-+# endif
-+	vsri.u32	$H4#lo,$H3#lo,#8	@ base 2^32 -> base 2^26
-+	vshl.u32	$H3#lo,$H3#lo,#18
-+
-+	vsri.u32	$H3#lo,$H2#lo,#14
-+	vshl.u32	$H2#lo,$H2#lo,#12
-+	vadd.i32	$H4#hi,$H4#lo,$D4#lo	@ add hash value and move to #hi
-+
-+	vbic.i32	$H3#lo,#0xfc000000
-+	vsri.u32	$H2#lo,$H1#lo,#20
-+	vshl.u32	$H1#lo,$H1#lo,#6
-+
-+	vbic.i32	$H2#lo,#0xfc000000
-+	vsri.u32	$H1#lo,$H0#lo,#26
-+	vadd.i32	$H3#hi,$H3#lo,$D3#lo
-+
-+	vbic.i32	$H0#lo,#0xfc000000
-+	vbic.i32	$H1#lo,#0xfc000000
-+	vadd.i32	$H2#hi,$H2#lo,$D2#lo
-+
-+	vadd.i32	$H0#hi,$H0#lo,$D0#lo
-+	vadd.i32	$H1#hi,$H1#lo,$D1#lo
-+
-+	mov		$tbl1,$zeros
-+	add		$tbl0,$ctx,#48
-+
-+	cmp		$len,$len
-+	b		.Long_tail
-+
-+.align	4
-+.Leven:
-+	subs		$len,$len,#64
-+	it		lo
-+	movlo		$in2,$zeros
-+
-+	vmov.i32	$H4,#1<<24		@ padbit, yes, always
-+	vld4.32		{$H0#lo,$H1#lo,$H2#lo,$H3#lo},[$inp]	@ inp[0:1]
-+	add		$inp,$inp,#64
-+	vld4.32		{$H0#hi,$H1#hi,$H2#hi,$H3#hi},[$in2]	@ inp[2:3] (or 0)
-+	add		$in2,$in2,#64
-+	itt		hi
-+	addhi		$tbl1,$ctx,#(48+1*9*4)
-+	addhi		$tbl0,$ctx,#(48+3*9*4)
-+
-+# ifdef	__ARMEB__
-+	vrev32.8	$H0,$H0
-+	vrev32.8	$H3,$H3
-+	vrev32.8	$H1,$H1
-+	vrev32.8	$H2,$H2
-+# endif
-+	vsri.u32	$H4,$H3,#8		@ base 2^32 -> base 2^26
-+	vshl.u32	$H3,$H3,#18
-+
-+	vsri.u32	$H3,$H2,#14
-+	vshl.u32	$H2,$H2,#12
-+
-+	vbic.i32	$H3,#0xfc000000
-+	vsri.u32	$H2,$H1,#20
-+	vshl.u32	$H1,$H1,#6
-+
-+	vbic.i32	$H2,#0xfc000000
-+	vsri.u32	$H1,$H0,#26
-+
-+	vbic.i32	$H0,#0xfc000000
-+	vbic.i32	$H1,#0xfc000000
-+
-+	bls		.Lskip_loop
-+
-+	vld4.32		{${R0}[1],${R1}[1],${S1}[1],${R2}[1]},[$tbl1]!	@ load r^2
-+	vld4.32		{${R0}[0],${R1}[0],${S1}[0],${R2}[0]},[$tbl0]!	@ load r^4
-+	vld4.32		{${S2}[1],${R3}[1],${S3}[1],${R4}[1]},[$tbl1]!
-+	vld4.32		{${S2}[0],${R3}[0],${S3}[0],${R4}[0]},[$tbl0]!
-+	b		.Loop_neon
-+
-+.align	5
-+.Loop_neon:
-+	@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-+	@ ((inp[0]*r^4+inp[2]*r^2+inp[4])*r^4+inp[6]*r^2
-+	@ ((inp[1]*r^4+inp[3]*r^2+inp[5])*r^3+inp[7]*r
-+	@   \___________________/
-+	@ ((inp[0]*r^4+inp[2]*r^2+inp[4])*r^4+inp[6]*r^2+inp[8])*r^2
-+	@ ((inp[1]*r^4+inp[3]*r^2+inp[5])*r^4+inp[7]*r^2+inp[9])*r
-+	@   \___________________/ \____________________/
-+	@
-+	@ Note that we start with inp[2:3]*r^2. This is because it
-+	@ doesn't depend on reduction in previous iteration.
-+	@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-+	@ d4 = h4*r0 + h3*r1   + h2*r2   + h1*r3   + h0*r4
-+	@ d3 = h3*r0 + h2*r1   + h1*r2   + h0*r3   + h4*5*r4
-+	@ d2 = h2*r0 + h1*r1   + h0*r2   + h4*5*r3 + h3*5*r4
-+	@ d1 = h1*r0 + h0*r1   + h4*5*r2 + h3*5*r3 + h2*5*r4
-+	@ d0 = h0*r0 + h4*5*r1 + h3*5*r2 + h2*5*r3 + h1*5*r4
-+
-+	@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-+	@ inp[2:3]*r^2
-+
-+	vadd.i32	$H2#lo,$H2#lo,$D2#lo	@ accumulate inp[0:1]
-+	vmull.u32	$D2,$H2#hi,${R0}[1]
-+	vadd.i32	$H0#lo,$H0#lo,$D0#lo
-+	vmull.u32	$D0,$H0#hi,${R0}[1]
-+	vadd.i32	$H3#lo,$H3#lo,$D3#lo
-+	vmull.u32	$D3,$H3#hi,${R0}[1]
-+	vmlal.u32	$D2,$H1#hi,${R1}[1]
-+	vadd.i32	$H1#lo,$H1#lo,$D1#lo
-+	vmull.u32	$D1,$H1#hi,${R0}[1]
-+
-+	vadd.i32	$H4#lo,$H4#lo,$D4#lo
-+	vmull.u32	$D4,$H4#hi,${R0}[1]
-+	subs		$len,$len,#64
-+	vmlal.u32	$D0,$H4#hi,${S1}[1]
-+	it		lo
-+	movlo		$in2,$zeros
-+	vmlal.u32	$D3,$H2#hi,${R1}[1]
-+	vld1.32		${S4}[1],[$tbl1,:32]
-+	vmlal.u32	$D1,$H0#hi,${R1}[1]
-+	vmlal.u32	$D4,$H3#hi,${R1}[1]
-+
-+	vmlal.u32	$D0,$H3#hi,${S2}[1]
-+	vmlal.u32	$D3,$H1#hi,${R2}[1]
-+	vmlal.u32	$D4,$H2#hi,${R2}[1]
-+	vmlal.u32	$D1,$H4#hi,${S2}[1]
-+	vmlal.u32	$D2,$H0#hi,${R2}[1]
-+
-+	vmlal.u32	$D3,$H0#hi,${R3}[1]
-+	vmlal.u32	$D0,$H2#hi,${S3}[1]
-+	vmlal.u32	$D4,$H1#hi,${R3}[1]
-+	vmlal.u32	$D1,$H3#hi,${S3}[1]
-+	vmlal.u32	$D2,$H4#hi,${S3}[1]
-+
-+	vmlal.u32	$D3,$H4#hi,${S4}[1]
-+	vmlal.u32	$D0,$H1#hi,${S4}[1]
-+	vmlal.u32	$D4,$H0#hi,${R4}[1]
-+	vmlal.u32	$D1,$H2#hi,${S4}[1]
-+	vmlal.u32	$D2,$H3#hi,${S4}[1]
-+
-+	vld4.32		{$H0#hi,$H1#hi,$H2#hi,$H3#hi},[$in2]	@ inp[2:3] (or 0)
-+	add		$in2,$in2,#64
-+
-+	@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-+	@ (hash+inp[0:1])*r^4 and accumulate
-+
-+	vmlal.u32	$D3,$H3#lo,${R0}[0]
-+	vmlal.u32	$D0,$H0#lo,${R0}[0]
-+	vmlal.u32	$D4,$H4#lo,${R0}[0]
-+	vmlal.u32	$D1,$H1#lo,${R0}[0]
-+	vmlal.u32	$D2,$H2#lo,${R0}[0]
-+	vld1.32		${S4}[0],[$tbl0,:32]
-+
-+	vmlal.u32	$D3,$H2#lo,${R1}[0]
-+	vmlal.u32	$D0,$H4#lo,${S1}[0]
-+	vmlal.u32	$D4,$H3#lo,${R1}[0]
-+	vmlal.u32	$D1,$H0#lo,${R1}[0]
-+	vmlal.u32	$D2,$H1#lo,${R1}[0]
-+
-+	vmlal.u32	$D3,$H1#lo,${R2}[0]
-+	vmlal.u32	$D0,$H3#lo,${S2}[0]
-+	vmlal.u32	$D4,$H2#lo,${R2}[0]
-+	vmlal.u32	$D1,$H4#lo,${S2}[0]
-+	vmlal.u32	$D2,$H0#lo,${R2}[0]
-+
-+	vmlal.u32	$D3,$H0#lo,${R3}[0]
-+	vmlal.u32	$D0,$H2#lo,${S3}[0]
-+	vmlal.u32	$D4,$H1#lo,${R3}[0]
-+	vmlal.u32	$D1,$H3#lo,${S3}[0]
-+	vmlal.u32	$D3,$H4#lo,${S4}[0]
-+
-+	vmlal.u32	$D2,$H4#lo,${S3}[0]
-+	vmlal.u32	$D0,$H1#lo,${S4}[0]
-+	vmlal.u32	$D4,$H0#lo,${R4}[0]
-+	vmov.i32	$H4,#1<<24		@ padbit, yes, always
-+	vmlal.u32	$D1,$H2#lo,${S4}[0]
-+	vmlal.u32	$D2,$H3#lo,${S4}[0]
-+
-+	vld4.32		{$H0#lo,$H1#lo,$H2#lo,$H3#lo},[$inp]	@ inp[0:1]
-+	add		$inp,$inp,#64
-+# ifdef	__ARMEB__
-+	vrev32.8	$H0,$H0
-+	vrev32.8	$H1,$H1
-+	vrev32.8	$H2,$H2
-+	vrev32.8	$H3,$H3
-+# endif
-+
-+	@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-+	@ lazy reduction interleaved with base 2^32 -> base 2^26 of
-+	@ inp[0:3] previously loaded to $H0-$H3 and smashed to $H0-$H4.
-+
-+	vshr.u64	$T0,$D3,#26
-+	vmovn.i64	$D3#lo,$D3
-+	 vshr.u64	$T1,$D0,#26
-+	 vmovn.i64	$D0#lo,$D0
-+	vadd.i64	$D4,$D4,$T0		@ h3 -> h4
-+	vbic.i32	$D3#lo,#0xfc000000
-+	  vsri.u32	$H4,$H3,#8		@ base 2^32 -> base 2^26
-+	 vadd.i64	$D1,$D1,$T1		@ h0 -> h1
-+	  vshl.u32	$H3,$H3,#18
-+	 vbic.i32	$D0#lo,#0xfc000000
-+
-+	vshrn.u64	$T0#lo,$D4,#26
-+	vmovn.i64	$D4#lo,$D4
-+	 vshr.u64	$T1,$D1,#26
-+	 vmovn.i64	$D1#lo,$D1
-+	 vadd.i64	$D2,$D2,$T1		@ h1 -> h2
-+	  vsri.u32	$H3,$H2,#14
-+	vbic.i32	$D4#lo,#0xfc000000
-+	  vshl.u32	$H2,$H2,#12
-+	 vbic.i32	$D1#lo,#0xfc000000
-+
-+	vadd.i32	$D0#lo,$D0#lo,$T0#lo
-+	vshl.u32	$T0#lo,$T0#lo,#2
-+	  vbic.i32	$H3,#0xfc000000
-+	 vshrn.u64	$T1#lo,$D2,#26
-+	 vmovn.i64	$D2#lo,$D2
-+	vaddl.u32	$D0,$D0#lo,$T0#lo	@ h4 -> h0 [widen for a sec]
-+	  vsri.u32	$H2,$H1,#20
-+	 vadd.i32	$D3#lo,$D3#lo,$T1#lo	@ h2 -> h3
-+	  vshl.u32	$H1,$H1,#6
-+	 vbic.i32	$D2#lo,#0xfc000000
-+	  vbic.i32	$H2,#0xfc000000
-+
-+	vshrn.u64	$T0#lo,$D0,#26		@ re-narrow
-+	vmovn.i64	$D0#lo,$D0
-+	  vsri.u32	$H1,$H0,#26
-+	  vbic.i32	$H0,#0xfc000000
-+	 vshr.u32	$T1#lo,$D3#lo,#26
-+	 vbic.i32	$D3#lo,#0xfc000000
-+	vbic.i32	$D0#lo,#0xfc000000
-+	vadd.i32	$D1#lo,$D1#lo,$T0#lo	@ h0 -> h1
-+	 vadd.i32	$D4#lo,$D4#lo,$T1#lo	@ h3 -> h4
-+	  vbic.i32	$H1,#0xfc000000
-+
-+	bhi		.Loop_neon
-+
-+.Lskip_loop:
-+	@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-+	@ multiply (inp[0:1]+hash) or inp[2:3] by r^2:r^1
-+
-+	add		$tbl1,$ctx,#(48+0*9*4)
-+	add		$tbl0,$ctx,#(48+1*9*4)
-+	adds		$len,$len,#32
-+	it		ne
-+	movne		$len,#0
-+	bne		.Long_tail
-+
-+	vadd.i32	$H2#hi,$H2#lo,$D2#lo	@ add hash value and move to #hi
-+	vadd.i32	$H0#hi,$H0#lo,$D0#lo
-+	vadd.i32	$H3#hi,$H3#lo,$D3#lo
-+	vadd.i32	$H1#hi,$H1#lo,$D1#lo
-+	vadd.i32	$H4#hi,$H4#lo,$D4#lo
-+
-+.Long_tail:
-+	vld4.32		{${R0}[1],${R1}[1],${S1}[1],${R2}[1]},[$tbl1]!	@ load r^1
-+	vld4.32		{${R0}[0],${R1}[0],${S1}[0],${R2}[0]},[$tbl0]!	@ load r^2
-+
-+	vadd.i32	$H2#lo,$H2#lo,$D2#lo	@ can be redundant
-+	vmull.u32	$D2,$H2#hi,$R0
-+	vadd.i32	$H0#lo,$H0#lo,$D0#lo
-+	vmull.u32	$D0,$H0#hi,$R0
-+	vadd.i32	$H3#lo,$H3#lo,$D3#lo
-+	vmull.u32	$D3,$H3#hi,$R0
-+	vadd.i32	$H1#lo,$H1#lo,$D1#lo
-+	vmull.u32	$D1,$H1#hi,$R0
-+	vadd.i32	$H4#lo,$H4#lo,$D4#lo
-+	vmull.u32	$D4,$H4#hi,$R0
-+
-+	vmlal.u32	$D0,$H4#hi,$S1
-+	vld4.32		{${S2}[1],${R3}[1],${S3}[1],${R4}[1]},[$tbl1]!
-+	vmlal.u32	$D3,$H2#hi,$R1
-+	vld4.32		{${S2}[0],${R3}[0],${S3}[0],${R4}[0]},[$tbl0]!
-+	vmlal.u32	$D1,$H0#hi,$R1
-+	vmlal.u32	$D4,$H3#hi,$R1
-+	vmlal.u32	$D2,$H1#hi,$R1
-+
-+	vmlal.u32	$D3,$H1#hi,$R2
-+	vld1.32		${S4}[1],[$tbl1,:32]
-+	vmlal.u32	$D0,$H3#hi,$S2
-+	vld1.32		${S4}[0],[$tbl0,:32]
-+	vmlal.u32	$D4,$H2#hi,$R2
-+	vmlal.u32	$D1,$H4#hi,$S2
-+	vmlal.u32	$D2,$H0#hi,$R2
-+
-+	vmlal.u32	$D3,$H0#hi,$R3
-+	 it		ne
-+	 addne		$tbl1,$ctx,#(48+2*9*4)
-+	vmlal.u32	$D0,$H2#hi,$S3
-+	 it		ne
-+	 addne		$tbl0,$ctx,#(48+3*9*4)
-+	vmlal.u32	$D4,$H1#hi,$R3
-+	vmlal.u32	$D1,$H3#hi,$S3
-+	vmlal.u32	$D2,$H4#hi,$S3
-+
-+	vmlal.u32	$D3,$H4#hi,$S4
-+	 vorn		$MASK,$MASK,$MASK	@ all-ones, can be redundant
-+	vmlal.u32	$D0,$H1#hi,$S4
-+	 vshr.u64	$MASK,$MASK,#38
-+	vmlal.u32	$D4,$H0#hi,$R4
-+	vmlal.u32	$D1,$H2#hi,$S4
-+	vmlal.u32	$D2,$H3#hi,$S4
-+
-+	beq		.Lshort_tail
-+
-+	@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-+	@ (hash+inp[0:1])*r^4:r^3 and accumulate
-+
-+	vld4.32		{${R0}[1],${R1}[1],${S1}[1],${R2}[1]},[$tbl1]!	@ load r^3
-+	vld4.32		{${R0}[0],${R1}[0],${S1}[0],${R2}[0]},[$tbl0]!	@ load r^4
-+
-+	vmlal.u32	$D2,$H2#lo,$R0
-+	vmlal.u32	$D0,$H0#lo,$R0
-+	vmlal.u32	$D3,$H3#lo,$R0
-+	vmlal.u32	$D1,$H1#lo,$R0
-+	vmlal.u32	$D4,$H4#lo,$R0
-+
-+	vmlal.u32	$D0,$H4#lo,$S1
-+	vld4.32		{${S2}[1],${R3}[1],${S3}[1],${R4}[1]},[$tbl1]!
-+	vmlal.u32	$D3,$H2#lo,$R1
-+	vld4.32		{${S2}[0],${R3}[0],${S3}[0],${R4}[0]},[$tbl0]!
-+	vmlal.u32	$D1,$H0#lo,$R1
-+	vmlal.u32	$D4,$H3#lo,$R1
-+	vmlal.u32	$D2,$H1#lo,$R1
-+
-+	vmlal.u32	$D3,$H1#lo,$R2
-+	vld1.32		${S4}[1],[$tbl1,:32]
-+	vmlal.u32	$D0,$H3#lo,$S2
-+	vld1.32		${S4}[0],[$tbl0,:32]
-+	vmlal.u32	$D4,$H2#lo,$R2
-+	vmlal.u32	$D1,$H4#lo,$S2
-+	vmlal.u32	$D2,$H0#lo,$R2
-+
-+	vmlal.u32	$D3,$H0#lo,$R3
-+	vmlal.u32	$D0,$H2#lo,$S3
-+	vmlal.u32	$D4,$H1#lo,$R3
-+	vmlal.u32	$D1,$H3#lo,$S3
-+	vmlal.u32	$D2,$H4#lo,$S3
-+
-+	vmlal.u32	$D3,$H4#lo,$S4
-+	 vorn		$MASK,$MASK,$MASK	@ all-ones
-+	vmlal.u32	$D0,$H1#lo,$S4
-+	 vshr.u64	$MASK,$MASK,#38
-+	vmlal.u32	$D4,$H0#lo,$R4
-+	vmlal.u32	$D1,$H2#lo,$S4
-+	vmlal.u32	$D2,$H3#lo,$S4
-+
-+.Lshort_tail:
-+	@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-+	@ horizontal addition
-+
-+	vadd.i64	$D3#lo,$D3#lo,$D3#hi
-+	vadd.i64	$D0#lo,$D0#lo,$D0#hi
-+	vadd.i64	$D4#lo,$D4#lo,$D4#hi
-+	vadd.i64	$D1#lo,$D1#lo,$D1#hi
-+	vadd.i64	$D2#lo,$D2#lo,$D2#hi
-+
-+	@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-+	@ lazy reduction, but without narrowing
-+
-+	vshr.u64	$T0,$D3,#26
-+	vand.i64	$D3,$D3,$MASK
-+	 vshr.u64	$T1,$D0,#26
-+	 vand.i64	$D0,$D0,$MASK
-+	vadd.i64	$D4,$D4,$T0		@ h3 -> h4
-+	 vadd.i64	$D1,$D1,$T1		@ h0 -> h1
-+
-+	vshr.u64	$T0,$D4,#26
-+	vand.i64	$D4,$D4,$MASK
-+	 vshr.u64	$T1,$D1,#26
-+	 vand.i64	$D1,$D1,$MASK
-+	 vadd.i64	$D2,$D2,$T1		@ h1 -> h2
-+
-+	vadd.i64	$D0,$D0,$T0
-+	vshl.u64	$T0,$T0,#2
-+	 vshr.u64	$T1,$D2,#26
-+	 vand.i64	$D2,$D2,$MASK
-+	vadd.i64	$D0,$D0,$T0		@ h4 -> h0
-+	 vadd.i64	$D3,$D3,$T1		@ h2 -> h3
-+
-+	vshr.u64	$T0,$D0,#26
-+	vand.i64	$D0,$D0,$MASK
-+	 vshr.u64	$T1,$D3,#26
-+	 vand.i64	$D3,$D3,$MASK
-+	vadd.i64	$D1,$D1,$T0		@ h0 -> h1
-+	 vadd.i64	$D4,$D4,$T1		@ h3 -> h4
-+
-+	cmp		$len,#0
-+	bne		.Leven
-+
-+	@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-+	@ store hash value
-+
-+	vst4.32		{$D0#lo[0],$D1#lo[0],$D2#lo[0],$D3#lo[0]},[$ctx]!
-+	vst1.32		{$D4#lo[0]},[$ctx]
-+
-+	vldmia	sp!,{d8-d15}			@ epilogue
-+	ldmia	sp!,{r4-r7}
-+.Lno_data_neon:
-+	ret					@ bx	lr
-+.size	poly1305_blocks_neon,.-poly1305_blocks_neon
-+
-+#ifdef __KERNEL__
-+.globl	poly1305_emit_neon
-+#endif
-+.type	poly1305_emit_neon,%function
-+.align	5
-+poly1305_emit_neon:
-+	ldr	ip,[$ctx,#36]		@ is_base2_26
-+
-+	stmdb	sp!,{r4-r11}
-+
-+	tst	ip,ip
-+	beq	.Lpoly1305_emit_enter
-+
-+	ldmia	$ctx,{$h0-$h4}
-+	eor	$g0,$g0,$g0
-+
-+	adds	$h0,$h0,$h1,lsl#26	@ base 2^26 -> base 2^32
-+	mov	$h1,$h1,lsr#6
-+	adcs	$h1,$h1,$h2,lsl#20
-+	mov	$h2,$h2,lsr#12
-+	adcs	$h2,$h2,$h3,lsl#14
-+	mov	$h3,$h3,lsr#18
-+	adcs	$h3,$h3,$h4,lsl#8
-+	adc	$h4,$g0,$h4,lsr#24	@ can be partially reduced ...
-+
-+	and	$g0,$h4,#-4		@ ... so reduce
-+	and	$h4,$h3,#3
-+	add	$g0,$g0,$g0,lsr#2	@ *= 5
-+	adds	$h0,$h0,$g0
-+	adcs	$h1,$h1,#0
-+	adcs	$h2,$h2,#0
-+	adcs	$h3,$h3,#0
-+	adc	$h4,$h4,#0
-+
-+	adds	$g0,$h0,#5		@ compare to modulus
-+	adcs	$g1,$h1,#0
-+	adcs	$g2,$h2,#0
-+	adcs	$g3,$h3,#0
-+	adc	$g4,$h4,#0
-+	tst	$g4,#4			@ did it carry/borrow?
-+
-+	it	ne
-+	movne	$h0,$g0
-+	ldr	$g0,[$nonce,#0]
-+	it	ne
-+	movne	$h1,$g1
-+	ldr	$g1,[$nonce,#4]
-+	it	ne
-+	movne	$h2,$g2
-+	ldr	$g2,[$nonce,#8]
-+	it	ne
-+	movne	$h3,$g3
-+	ldr	$g3,[$nonce,#12]
-+
-+	adds	$h0,$h0,$g0		@ accumulate nonce
-+	adcs	$h1,$h1,$g1
-+	adcs	$h2,$h2,$g2
-+	adc	$h3,$h3,$g3
-+
-+# ifdef __ARMEB__
-+	rev	$h0,$h0
-+	rev	$h1,$h1
-+	rev	$h2,$h2
-+	rev	$h3,$h3
-+# endif
-+	str	$h0,[$mac,#0]		@ store the result
-+	str	$h1,[$mac,#4]
-+	str	$h2,[$mac,#8]
-+	str	$h3,[$mac,#12]
-+
-+	ldmia	sp!,{r4-r11}
-+	ret				@ bx	lr
-+.size	poly1305_emit_neon,.-poly1305_emit_neon
-+
-+.align	5
-+.Lzeros:
-+.long	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-+# ifndef __KERNEL__
-+.LOPENSSL_armcap:
-+.word	OPENSSL_armcap_P-.Lpoly1305_init
-+# endif
-+#endif
-+___
-+}	}
-+$code.=<<___;
-+.align	2
-+#if	__ARM_MAX_ARCH__>=7 && !defined(__KERNEL__)
-+.comm   OPENSSL_armcap_P,4,4
-+#endif
-+___
-+
-+open SELF,$0;
-+while(<SELF>) {
-+	next if (/^#!/);
-+	last if (!s/^#/@/ and !/^$/);
-+	print;
-+}
-+close SELF;
-+
-+foreach (split("\n",$code)) {
-+	s/\`([^\`]*)\`/eval $1/geo;
-+
-+	s/\bq([0-9]+)#(lo|hi)/sprintf "d%d",2*$1+($2 eq "hi")/geo	or
-+	s/\bret\b/bx	lr/go						or
-+	s/\bbx\s+lr\b/.word\t0xe12fff1e/go;	# make it possible to compile with -march=armv4
-+
-+	print $_,"\n";
-+}
-+close STDOUT; # enforce flush
-diff --git a/lib/zinc/poly1305/poly1305-arm64.pl b/lib/zinc/poly1305/poly1305-arm64.pl
-new file mode 100644
-index 000000000000..d513b45a149b
---- /dev/null
-+++ b/lib/zinc/poly1305/poly1305-arm64.pl
-@@ -0,0 +1,974 @@
-+#!/usr/bin/env perl
-+# SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
-+#
-+# This code is taken from the OpenSSL project but the author, Andy Polyakov,
-+# has relicensed it under the licenses specified in the SPDX header above.
-+# The original headers, including the original license headers, are
-+# included below for completeness.
-+#
-+# ====================================================================
-+# Written by Andy Polyakov <appro@openssl.org> for the OpenSSL
-+# project. The module is, however, dual licensed under OpenSSL and
-+# CRYPTOGAMS licenses depending on where you obtain it. For further
-+# details see http://www.openssl.org/~appro/cryptogams/.
-+# ====================================================================
-+#
-+# This module implements Poly1305 hash for ARMv8.
-+#
-+# June 2015
-+#
-+# Numbers are cycles per processed byte with poly1305_blocks alone.
-+#
-+#		IALU/gcc-4.9	NEON
-+#
-+# Apple A7	1.86/+5%	0.72
-+# Cortex-A53	2.69/+58%	1.47
-+# Cortex-A57	2.70/+7%	1.14
-+# Denver	1.64/+50%	1.18(*)
-+# X-Gene	2.13/+68%	2.27
-+# Mongoose	1.77/+75%	1.12
-+# Kryo		2.70/+55%	1.13
-+#
-+# (*)	estimate based on resources availability is less than 1.0,
-+#	i.e. measured result is worse than expected, presumably binary
-+#	translator is not almighty;
-+
-+$flavour=shift;
-+if ($flavour=~/\w[\w\-]*\.\w+$/) { $output=$flavour; undef $flavour; }
-+else { while (($output=shift) && ($output!~/\w[\w\-]*\.\w+$/)) {} }
-+
-+if ($flavour && $flavour ne "void") {
-+    $0 =~ m/(.*[\/\\])[^\/\\]+$/; $dir=$1;
-+    ( $xlate="${dir}arm-xlate.pl" and -f $xlate ) or
-+    ( $xlate="${dir}../../perlasm/arm-xlate.pl" and -f $xlate) or
-+    die "can't locate arm-xlate.pl";
-+
-+    open STDOUT,"| \"$^X\" $xlate $flavour $output";
-+} else {
-+    open STDOUT,">$output";
-+}
-+
-+my ($ctx,$inp,$len,$padbit) = map("x$_",(0..3));
-+my ($mac,$nonce)=($inp,$len);
-+
-+my ($h0,$h1,$h2,$r0,$r1,$s1,$t0,$t1,$d0,$d1,$d2) = map("x$_",(4..14));
-+
-+$code.=<<___;
-+#ifndef	__KERNEL__
-+# include "arm_arch.h"
-+.extern	OPENSSL_armcap_P
-+#else
-+# define poly1305_init   poly1305_init_arm
-+# define poly1305_blocks poly1305_blocks_arm
-+# define poly1305_emit   poly1305_emit_arm
-+#endif
-+
-+.text
-+
-+// forward "declarations" are required for Apple
-+.globl	poly1305_blocks
-+.globl	poly1305_emit
-+.globl	poly1305_init
-+.type	poly1305_init,%function
-+.align	5
-+poly1305_init:
-+	cmp	$inp,xzr
-+	stp	xzr,xzr,[$ctx]		// zero hash value
-+	stp	xzr,xzr,[$ctx,#16]	// [along with is_base2_26]
-+
-+	csel	x0,xzr,x0,eq
-+	b.eq	.Lno_key
-+
-+#ifndef	__KERNEL__
-+# ifdef	__ILP32__
-+	ldrsw	$t1,.LOPENSSL_armcap_P
-+# else
-+	ldr	$t1,.LOPENSSL_armcap_P
-+# endif
-+	adr	$t0,.LOPENSSL_armcap_P
-+	ldr	w17,[$t0,$t1]
-+#endif
-+
-+	ldp	$r0,$r1,[$inp]		// load key
-+	mov	$s1,#0xfffffffc0fffffff
-+	movk	$s1,#0x0fff,lsl#48
-+#ifdef	__AARCH64EB__
-+	rev	$r0,$r0			// flip bytes
-+	rev	$r1,$r1
-+#endif
-+	and	$r0,$r0,$s1		// &=0ffffffc0fffffff
-+	and	$s1,$s1,#-4
-+	and	$r1,$r1,$s1		// &=0ffffffc0ffffffc
-+	stp	$r0,$r1,[$ctx,#32]	// save key value
-+
-+#ifndef	__KERNEL__
-+	tst	w17,#ARMV7_NEON
-+
-+	adr	$d0,poly1305_blocks
-+	adr	$r0,poly1305_blocks_neon
-+	adr	$d1,poly1305_emit
-+	adr	$r1,poly1305_emit_neon
-+
-+	csel	$d0,$d0,$r0,eq
-+	csel	$d1,$d1,$r1,eq
-+
-+# ifdef	__ILP32__
-+	stp	w12,w13,[$len]
-+# else
-+	stp	$d0,$d1,[$len]
-+# endif
-+
-+	mov	x0,#1
-+#else
-+	mov	x0,#0
-+#endif
-+.Lno_key:
-+	ret
-+.size	poly1305_init,.-poly1305_init
-+
-+.type	poly1305_blocks,%function
-+.align	5
-+poly1305_blocks:
-+	ands	$len,$len,#-16
-+	b.eq	.Lno_data
-+
-+	ldp	$h0,$h1,[$ctx]		// load hash value
-+	ldp	$r0,$r1,[$ctx,#32]	// load key value
-+	ldr	$h2,[$ctx,#16]
-+	add	$s1,$r1,$r1,lsr#2	// s1 = r1 + (r1 >> 2)
-+	b	.Loop
-+
-+.align	5
-+.Loop:
-+	ldp	$t0,$t1,[$inp],#16	// load input
-+	sub	$len,$len,#16
-+#ifdef	__AARCH64EB__
-+	rev	$t0,$t0
-+	rev	$t1,$t1
-+#endif
-+	adds	$h0,$h0,$t0		// accumulate input
-+	adcs	$h1,$h1,$t1
-+
-+	mul	$d0,$h0,$r0		// h0*r0
-+	adc	$h2,$h2,$padbit
-+	umulh	$d1,$h0,$r0
-+
-+	mul	$t0,$h1,$s1		// h1*5*r1
-+	umulh	$t1,$h1,$s1
-+
-+	adds	$d0,$d0,$t0
-+	mul	$t0,$h0,$r1		// h0*r1
-+	adc	$d1,$d1,$t1
-+	umulh	$d2,$h0,$r1
-+
-+	adds	$d1,$d1,$t0
-+	mul	$t0,$h1,$r0		// h1*r0
-+	adc	$d2,$d2,xzr
-+	umulh	$t1,$h1,$r0
-+
-+	adds	$d1,$d1,$t0
-+	mul	$t0,$h2,$s1		// h2*5*r1
-+	adc	$d2,$d2,$t1
-+	mul	$t1,$h2,$r0		// h2*r0
-+
-+	adds	$d1,$d1,$t0
-+	adc	$d2,$d2,$t1
-+
-+	and	$t0,$d2,#-4		// final reduction
-+	and	$h2,$d2,#3
-+	add	$t0,$t0,$d2,lsr#2
-+	adds	$h0,$d0,$t0
-+	adcs	$h1,$d1,xzr
-+	adc	$h2,$h2,xzr
-+
-+	cbnz	$len,.Loop
-+
-+	stp	$h0,$h1,[$ctx]		// store hash value
-+	str	$h2,[$ctx,#16]
-+
-+.Lno_data:
-+	ret
-+.size	poly1305_blocks,.-poly1305_blocks
-+
-+.type	poly1305_emit,%function
-+.align	5
-+poly1305_emit:
-+	ldp	$h0,$h1,[$ctx]		// load hash base 2^64
-+	ldr	$h2,[$ctx,#16]
-+	ldp	$t0,$t1,[$nonce]	// load nonce
-+
-+	adds	$d0,$h0,#5		// compare to modulus
-+	adcs	$d1,$h1,xzr
-+	adc	$d2,$h2,xzr
-+
-+	tst	$d2,#-4			// see if it's carried/borrowed
-+
-+	csel	$h0,$h0,$d0,eq
-+	csel	$h1,$h1,$d1,eq
-+
-+#ifdef	__AARCH64EB__
-+	ror	$t0,$t0,#32		// flip nonce words
-+	ror	$t1,$t1,#32
-+#endif
-+	adds	$h0,$h0,$t0		// accumulate nonce
-+	adc	$h1,$h1,$t1
-+#ifdef	__AARCH64EB__
-+	rev	$h0,$h0			// flip output bytes
-+	rev	$h1,$h1
-+#endif
-+	stp	$h0,$h1,[$mac]		// write result
-+
-+	ret
-+.size	poly1305_emit,.-poly1305_emit
-+___
-+my ($R0,$R1,$S1,$R2,$S2,$R3,$S3,$R4,$S4) = map("v$_.4s",(0..8));
-+my ($IN01_0,$IN01_1,$IN01_2,$IN01_3,$IN01_4) = map("v$_.2s",(9..13));
-+my ($IN23_0,$IN23_1,$IN23_2,$IN23_3,$IN23_4) = map("v$_.2s",(14..18));
-+my ($ACC0,$ACC1,$ACC2,$ACC3,$ACC4) = map("v$_.2d",(19..23));
-+my ($H0,$H1,$H2,$H3,$H4) = map("v$_.2s",(24..28));
-+my ($T0,$T1,$MASK) = map("v$_",(29..31));
-+
-+my ($in2,$zeros)=("x16","x17");
-+my $is_base2_26 = $zeros;		# borrow
-+
-+$code.=<<___;
-+.type	__poly1305_mult,%function
-+.align	5
-+__poly1305_mult:
-+	mul	$d0,$h0,$r0		// h0*r0
-+	umulh	$d1,$h0,$r0
-+
-+	mul	$t0,$h1,$s1		// h1*5*r1
-+	umulh	$t1,$h1,$s1
-+
-+	adds	$d0,$d0,$t0
-+	mul	$t0,$h0,$r1		// h0*r1
-+	adc	$d1,$d1,$t1
-+	umulh	$d2,$h0,$r1
-+
-+	adds	$d1,$d1,$t0
-+	mul	$t0,$h1,$r0		// h1*r0
-+	adc	$d2,$d2,xzr
-+	umulh	$t1,$h1,$r0
-+
-+	adds	$d1,$d1,$t0
-+	mul	$t0,$h2,$s1		// h2*5*r1
-+	adc	$d2,$d2,$t1
-+	mul	$t1,$h2,$r0		// h2*r0
-+
-+	adds	$d1,$d1,$t0
-+	adc	$d2,$d2,$t1
-+
-+	and	$t0,$d2,#-4		// final reduction
-+	and	$h2,$d2,#3
-+	add	$t0,$t0,$d2,lsr#2
-+	adds	$h0,$d0,$t0
-+	adcs	$h1,$d1,xzr
-+	adc	$h2,$h2,xzr
-+
-+	ret
-+.size	__poly1305_mult,.-__poly1305_mult
-+
-+.type	__poly1305_splat,%function
-+.align	5
-+__poly1305_splat:
-+	and	x12,$h0,#0x03ffffff	// base 2^64 -> base 2^26
-+	ubfx	x13,$h0,#26,#26
-+	extr	x14,$h1,$h0,#52
-+	and	x14,x14,#0x03ffffff
-+	ubfx	x15,$h1,#14,#26
-+	extr	x16,$h2,$h1,#40
-+
-+	str	w12,[$ctx,#16*0]	// r0
-+	add	w12,w13,w13,lsl#2	// r1*5
-+	str	w13,[$ctx,#16*1]	// r1
-+	add	w13,w14,w14,lsl#2	// r2*5
-+	str	w12,[$ctx,#16*2]	// s1
-+	str	w14,[$ctx,#16*3]	// r2
-+	add	w14,w15,w15,lsl#2	// r3*5
-+	str	w13,[$ctx,#16*4]	// s2
-+	str	w15,[$ctx,#16*5]	// r3
-+	add	w15,w16,w16,lsl#2	// r4*5
-+	str	w14,[$ctx,#16*6]	// s3
-+	str	w16,[$ctx,#16*7]	// r4
-+	str	w15,[$ctx,#16*8]	// s4
-+
-+	ret
-+.size	__poly1305_splat,.-__poly1305_splat
-+
-+#if !defined(__KERNEL__) || defined(CONFIG_KERNEL_MODE_NEON)
-+#ifdef	__KERNEL__
-+.globl	poly1305_blocks_neon
-+.globl	poly1305_emit_neon
-+#endif
-+
-+.type	poly1305_blocks_neon,%function
-+.align	5
-+poly1305_blocks_neon:
-+	ldr	$is_base2_26,[$ctx,#24]
-+	cmp	$len,#128
-+	b.hs	.Lblocks_neon
-+	cbz	$is_base2_26,poly1305_blocks
-+
-+.Lblocks_neon:
-+	stp	x29,x30,[sp,#-80]!
-+	add	x29,sp,#0
-+
-+	ands	$len,$len,#-16
-+	b.eq	.Lno_data_neon
-+
-+	cbz	$is_base2_26,.Lbase2_64_neon
-+
-+	ldp	w10,w11,[$ctx]		// load hash value base 2^26
-+	ldp	w12,w13,[$ctx,#8]
-+	ldr	w14,[$ctx,#16]
-+
-+	tst	$len,#31
-+	b.eq	.Leven_neon
-+
-+	ldp	$r0,$r1,[$ctx,#32]	// load key value
-+
-+	add	$h0,x10,x11,lsl#26	// base 2^26 -> base 2^64
-+	lsr	$h1,x12,#12
-+	adds	$h0,$h0,x12,lsl#52
-+	add	$h1,$h1,x13,lsl#14
-+	adc	$h1,$h1,xzr
-+	lsr	$h2,x14,#24
-+	adds	$h1,$h1,x14,lsl#40
-+	adc	$d2,$h2,xzr		// can be partially reduced...
-+
-+	ldp	$d0,$d1,[$inp],#16	// load input
-+	sub	$len,$len,#16
-+	add	$s1,$r1,$r1,lsr#2	// s1 = r1 + (r1 >> 2)
-+
-+	and	$t0,$d2,#-4		// ... so reduce
-+	and	$h2,$d2,#3
-+	add	$t0,$t0,$d2,lsr#2
-+	adds	$h0,$h0,$t0
-+	adcs	$h1,$h1,xzr
-+	adc	$h2,$h2,xzr
-+
-+#ifdef	__AARCH64EB__
-+	rev	$d0,$d0
-+	rev	$d1,$d1
-+#endif
-+	adds	$h0,$h0,$d0		// accumulate input
-+	adcs	$h1,$h1,$d1
-+	adc	$h2,$h2,$padbit
-+
-+	bl	__poly1305_mult
-+	ldr	x30,[sp,#8]
-+
-+	cbz	$padbit,.Lstore_base2_64_neon
-+
-+	and	x10,$h0,#0x03ffffff	// base 2^64 -> base 2^26
-+	ubfx	x11,$h0,#26,#26
-+	extr	x12,$h1,$h0,#52
-+	and	x12,x12,#0x03ffffff
-+	ubfx	x13,$h1,#14,#26
-+	extr	x14,$h2,$h1,#40
-+
-+	cbnz	$len,.Leven_neon
-+
-+	stp	w10,w11,[$ctx]		// store hash value base 2^26
-+	stp	w12,w13,[$ctx,#8]
-+	str	w14,[$ctx,#16]
-+	b	.Lno_data_neon
-+
-+.align	4
-+.Lstore_base2_64_neon:
-+	stp	$h0,$h1,[$ctx]		// store hash value base 2^64
-+	stp	$h2,xzr,[$ctx,#16]	// note that is_base2_26 is zeroed
-+	b	.Lno_data_neon
-+
-+.align	4
-+.Lbase2_64_neon:
-+	ldp	$r0,$r1,[$ctx,#32]	// load key value
-+
-+	ldp	$h0,$h1,[$ctx]		// load hash value base 2^64
-+	ldr	$h2,[$ctx,#16]
-+
-+	tst	$len,#31
-+	b.eq	.Linit_neon
-+
-+	ldp	$d0,$d1,[$inp],#16	// load input
-+	sub	$len,$len,#16
-+	add	$s1,$r1,$r1,lsr#2	// s1 = r1 + (r1 >> 2)
-+#ifdef	__AARCH64EB__
-+	rev	$d0,$d0
-+	rev	$d1,$d1
-+#endif
-+	adds	$h0,$h0,$d0		// accumulate input
-+	adcs	$h1,$h1,$d1
-+	adc	$h2,$h2,$padbit
-+
-+	bl	__poly1305_mult
-+
-+.Linit_neon:
-+	and	x10,$h0,#0x03ffffff	// base 2^64 -> base 2^26
-+	ubfx	x11,$h0,#26,#26
-+	extr	x12,$h1,$h0,#52
-+	and	x12,x12,#0x03ffffff
-+	ubfx	x13,$h1,#14,#26
-+	extr	x14,$h2,$h1,#40
-+
-+	stp	d8,d9,[sp,#16]		// meet ABI requirements
-+	stp	d10,d11,[sp,#32]
-+	stp	d12,d13,[sp,#48]
-+	stp	d14,d15,[sp,#64]
-+
-+	fmov	${H0},x10
-+	fmov	${H1},x11
-+	fmov	${H2},x12
-+	fmov	${H3},x13
-+	fmov	${H4},x14
-+
-+	////////////////////////////////// initialize r^n table
-+	mov	$h0,$r0			// r^1
-+	add	$s1,$r1,$r1,lsr#2	// s1 = r1 + (r1 >> 2)
-+	mov	$h1,$r1
-+	mov	$h2,xzr
-+	add	$ctx,$ctx,#48+12
-+	bl	__poly1305_splat
-+
-+	bl	__poly1305_mult		// r^2
-+	sub	$ctx,$ctx,#4
-+	bl	__poly1305_splat
-+
-+	bl	__poly1305_mult		// r^3
-+	sub	$ctx,$ctx,#4
-+	bl	__poly1305_splat
-+
-+	bl	__poly1305_mult		// r^4
-+	sub	$ctx,$ctx,#4
-+	bl	__poly1305_splat
-+	ldr	x30,[sp,#8]
-+
-+	add	$in2,$inp,#32
-+	adr	$zeros,.Lzeros
-+	subs	$len,$len,#64
-+	csel	$in2,$zeros,$in2,lo
-+
-+	mov	x4,#1
-+	str	x4,[$ctx,#-24]		// set is_base2_26
-+	sub	$ctx,$ctx,#48		// restore original $ctx
-+	b	.Ldo_neon
-+
-+.align	4
-+.Leven_neon:
-+	add	$in2,$inp,#32
-+	adr	$zeros,.Lzeros
-+	subs	$len,$len,#64
-+	csel	$in2,$zeros,$in2,lo
-+
-+	stp	d8,d9,[sp,#16]		// meet ABI requirements
-+	stp	d10,d11,[sp,#32]
-+	stp	d12,d13,[sp,#48]
-+	stp	d14,d15,[sp,#64]
-+
-+	fmov	${H0},x10
-+	fmov	${H1},x11
-+	fmov	${H2},x12
-+	fmov	${H3},x13
-+	fmov	${H4},x14
-+
-+.Ldo_neon:
-+	ldp	x8,x12,[$in2],#16	// inp[2:3] (or zero)
-+	ldp	x9,x13,[$in2],#48
-+
-+	lsl	$padbit,$padbit,#24
-+	add	x15,$ctx,#48
-+
-+#ifdef	__AARCH64EB__
-+	rev	x8,x8
-+	rev	x12,x12
-+	rev	x9,x9
-+	rev	x13,x13
-+#endif
-+	and	x4,x8,#0x03ffffff	// base 2^64 -> base 2^26
-+	and	x5,x9,#0x03ffffff
-+	ubfx	x6,x8,#26,#26
-+	ubfx	x7,x9,#26,#26
-+	add	x4,x4,x5,lsl#32		// bfi	x4,x5,#32,#32
-+	extr	x8,x12,x8,#52
-+	extr	x9,x13,x9,#52
-+	add	x6,x6,x7,lsl#32		// bfi	x6,x7,#32,#32
-+	fmov	$IN23_0,x4
-+	and	x8,x8,#0x03ffffff
-+	and	x9,x9,#0x03ffffff
-+	ubfx	x10,x12,#14,#26
-+	ubfx	x11,x13,#14,#26
-+	add	x12,$padbit,x12,lsr#40
-+	add	x13,$padbit,x13,lsr#40
-+	add	x8,x8,x9,lsl#32		// bfi	x8,x9,#32,#32
-+	fmov	$IN23_1,x6
-+	add	x10,x10,x11,lsl#32	// bfi	x10,x11,#32,#32
-+	add	x12,x12,x13,lsl#32	// bfi	x12,x13,#32,#32
-+	fmov	$IN23_2,x8
-+	fmov	$IN23_3,x10
-+	fmov	$IN23_4,x12
-+
-+	ldp	x8,x12,[$inp],#16	// inp[0:1]
-+	ldp	x9,x13,[$inp],#48
-+
-+	ld1	{$R0,$R1,$S1,$R2},[x15],#64
-+	ld1	{$S2,$R3,$S3,$R4},[x15],#64
-+	ld1	{$S4},[x15]
-+
-+#ifdef	__AARCH64EB__
-+	rev	x8,x8
-+	rev	x12,x12
-+	rev	x9,x9
-+	rev	x13,x13
-+#endif
-+	and	x4,x8,#0x03ffffff	// base 2^64 -> base 2^26
-+	and	x5,x9,#0x03ffffff
-+	ubfx	x6,x8,#26,#26
-+	ubfx	x7,x9,#26,#26
-+	add	x4,x4,x5,lsl#32		// bfi	x4,x5,#32,#32
-+	extr	x8,x12,x8,#52
-+	extr	x9,x13,x9,#52
-+	add	x6,x6,x7,lsl#32		// bfi	x6,x7,#32,#32
-+	fmov	$IN01_0,x4
-+	and	x8,x8,#0x03ffffff
-+	and	x9,x9,#0x03ffffff
-+	ubfx	x10,x12,#14,#26
-+	ubfx	x11,x13,#14,#26
-+	add	x12,$padbit,x12,lsr#40
-+	add	x13,$padbit,x13,lsr#40
-+	add	x8,x8,x9,lsl#32		// bfi	x8,x9,#32,#32
-+	fmov	$IN01_1,x6
-+	add	x10,x10,x11,lsl#32	// bfi	x10,x11,#32,#32
-+	add	x12,x12,x13,lsl#32	// bfi	x12,x13,#32,#32
-+	movi	$MASK.2d,#-1
-+	fmov	$IN01_2,x8
-+	fmov	$IN01_3,x10
-+	fmov	$IN01_4,x12
-+	ushr	$MASK.2d,$MASK.2d,#38
-+
-+	b.ls	.Lskip_loop
-+
-+.align	4
-+.Loop_neon:
-+	////////////////////////////////////////////////////////////////
-+	// ((inp[0]*r^4+inp[2]*r^2+inp[4])*r^4+inp[6]*r^2
-+	// ((inp[1]*r^4+inp[3]*r^2+inp[5])*r^3+inp[7]*r
-+	//   \___________________/
-+	// ((inp[0]*r^4+inp[2]*r^2+inp[4])*r^4+inp[6]*r^2+inp[8])*r^2
-+	// ((inp[1]*r^4+inp[3]*r^2+inp[5])*r^4+inp[7]*r^2+inp[9])*r
-+	//   \___________________/ \____________________/
-+	//
-+	// Note that we start with inp[2:3]*r^2. This is because it
-+	// doesn't depend on reduction in previous iteration.
-+	////////////////////////////////////////////////////////////////
-+	// d4 = h0*r4 + h1*r3   + h2*r2   + h3*r1   + h4*r0
-+	// d3 = h0*r3 + h1*r2   + h2*r1   + h3*r0   + h4*5*r4
-+	// d2 = h0*r2 + h1*r1   + h2*r0   + h3*5*r4 + h4*5*r3
-+	// d1 = h0*r1 + h1*r0   + h2*5*r4 + h3*5*r3 + h4*5*r2
-+	// d0 = h0*r0 + h1*5*r4 + h2*5*r3 + h3*5*r2 + h4*5*r1
-+
-+	subs	$len,$len,#64
-+	umull	$ACC4,$IN23_0,${R4}[2]
-+	csel	$in2,$zeros,$in2,lo
-+	umull	$ACC3,$IN23_0,${R3}[2]
-+	umull	$ACC2,$IN23_0,${R2}[2]
-+	 ldp	x8,x12,[$in2],#16	// inp[2:3] (or zero)
-+	umull	$ACC1,$IN23_0,${R1}[2]
-+	 ldp	x9,x13,[$in2],#48
-+	umull	$ACC0,$IN23_0,${R0}[2]
-+#ifdef	__AARCH64EB__
-+	 rev	x8,x8
-+	 rev	x12,x12
-+	 rev	x9,x9
-+	 rev	x13,x13
-+#endif
-+
-+	umlal	$ACC4,$IN23_1,${R3}[2]
-+	 and	x4,x8,#0x03ffffff	// base 2^64 -> base 2^26
-+	umlal	$ACC3,$IN23_1,${R2}[2]
-+	 and	x5,x9,#0x03ffffff
-+	umlal	$ACC2,$IN23_1,${R1}[2]
-+	 ubfx	x6,x8,#26,#26
-+	umlal	$ACC1,$IN23_1,${R0}[2]
-+	 ubfx	x7,x9,#26,#26
-+	umlal	$ACC0,$IN23_1,${S4}[2]
-+	 add	x4,x4,x5,lsl#32		// bfi	x4,x5,#32,#32
-+
-+	umlal	$ACC4,$IN23_2,${R2}[2]
-+	 extr	x8,x12,x8,#52
-+	umlal	$ACC3,$IN23_2,${R1}[2]
-+	 extr	x9,x13,x9,#52
-+	umlal	$ACC2,$IN23_2,${R0}[2]
-+	 add	x6,x6,x7,lsl#32		// bfi	x6,x7,#32,#32
-+	umlal	$ACC1,$IN23_2,${S4}[2]
-+	 fmov	$IN23_0,x4
-+	umlal	$ACC0,$IN23_2,${S3}[2]
-+	 and	x8,x8,#0x03ffffff
-+
-+	umlal	$ACC4,$IN23_3,${R1}[2]
-+	 and	x9,x9,#0x03ffffff
-+	umlal	$ACC3,$IN23_3,${R0}[2]
-+	 ubfx	x10,x12,#14,#26
-+	umlal	$ACC2,$IN23_3,${S4}[2]
-+	 ubfx	x11,x13,#14,#26
-+	umlal	$ACC1,$IN23_3,${S3}[2]
-+	 add	x8,x8,x9,lsl#32		// bfi	x8,x9,#32,#32
-+	umlal	$ACC0,$IN23_3,${S2}[2]
-+	 fmov	$IN23_1,x6
-+
-+	add	$IN01_2,$IN01_2,$H2
-+	 add	x12,$padbit,x12,lsr#40
-+	umlal	$ACC4,$IN23_4,${R0}[2]
-+	 add	x13,$padbit,x13,lsr#40
-+	umlal	$ACC3,$IN23_4,${S4}[2]
-+	 add	x10,x10,x11,lsl#32	// bfi	x10,x11,#32,#32
-+	umlal	$ACC2,$IN23_4,${S3}[2]
-+	 add	x12,x12,x13,lsl#32	// bfi	x12,x13,#32,#32
-+	umlal	$ACC1,$IN23_4,${S2}[2]
-+	 fmov	$IN23_2,x8
-+	umlal	$ACC0,$IN23_4,${S1}[2]
-+	 fmov	$IN23_3,x10
-+
-+	////////////////////////////////////////////////////////////////
-+	// (hash+inp[0:1])*r^4 and accumulate
-+
-+	add	$IN01_0,$IN01_0,$H0
-+	 fmov	$IN23_4,x12
-+	umlal	$ACC3,$IN01_2,${R1}[0]
-+	 ldp	x8,x12,[$inp],#16	// inp[0:1]
-+	umlal	$ACC0,$IN01_2,${S3}[0]
-+	 ldp	x9,x13,[$inp],#48
-+	umlal	$ACC4,$IN01_2,${R2}[0]
-+	umlal	$ACC1,$IN01_2,${S4}[0]
-+	umlal	$ACC2,$IN01_2,${R0}[0]
-+#ifdef	__AARCH64EB__
-+	 rev	x8,x8
-+	 rev	x12,x12
-+	 rev	x9,x9
-+	 rev	x13,x13
-+#endif
-+
-+	add	$IN01_1,$IN01_1,$H1
-+	umlal	$ACC3,$IN01_0,${R3}[0]
-+	umlal	$ACC4,$IN01_0,${R4}[0]
-+	 and	x4,x8,#0x03ffffff	// base 2^64 -> base 2^26
-+	umlal	$ACC2,$IN01_0,${R2}[0]
-+	 and	x5,x9,#0x03ffffff
-+	umlal	$ACC0,$IN01_0,${R0}[0]
-+	 ubfx	x6,x8,#26,#26
-+	umlal	$ACC1,$IN01_0,${R1}[0]
-+	 ubfx	x7,x9,#26,#26
-+
-+	add	$IN01_3,$IN01_3,$H3
-+	 add	x4,x4,x5,lsl#32		// bfi	x4,x5,#32,#32
-+	umlal	$ACC3,$IN01_1,${R2}[0]
-+	 extr	x8,x12,x8,#52
-+	umlal	$ACC4,$IN01_1,${R3}[0]
-+	 extr	x9,x13,x9,#52
-+	umlal	$ACC0,$IN01_1,${S4}[0]
-+	 add	x6,x6,x7,lsl#32		// bfi	x6,x7,#32,#32
-+	umlal	$ACC2,$IN01_1,${R1}[0]
-+	 fmov	$IN01_0,x4
-+	umlal	$ACC1,$IN01_1,${R0}[0]
-+	 and	x8,x8,#0x03ffffff
-+
-+	add	$IN01_4,$IN01_4,$H4
-+	 and	x9,x9,#0x03ffffff
-+	umlal	$ACC3,$IN01_3,${R0}[0]
-+	 ubfx	x10,x12,#14,#26
-+	umlal	$ACC0,$IN01_3,${S2}[0]
-+	 ubfx	x11,x13,#14,#26
-+	umlal	$ACC4,$IN01_3,${R1}[0]
-+	 add	x8,x8,x9,lsl#32		// bfi	x8,x9,#32,#32
-+	umlal	$ACC1,$IN01_3,${S3}[0]
-+	 fmov	$IN01_1,x6
-+	umlal	$ACC2,$IN01_3,${S4}[0]
-+	 add	x12,$padbit,x12,lsr#40
-+
-+	umlal	$ACC3,$IN01_4,${S4}[0]
-+	 add	x13,$padbit,x13,lsr#40
-+	umlal	$ACC0,$IN01_4,${S1}[0]
-+	 add	x10,x10,x11,lsl#32	// bfi	x10,x11,#32,#32
-+	umlal	$ACC4,$IN01_4,${R0}[0]
-+	 add	x12,x12,x13,lsl#32	// bfi	x12,x13,#32,#32
-+	umlal	$ACC1,$IN01_4,${S2}[0]
-+	 fmov	$IN01_2,x8
-+	umlal	$ACC2,$IN01_4,${S3}[0]
-+	 fmov	$IN01_3,x10
-+	 fmov	$IN01_4,x12
-+
-+	/////////////////////////////////////////////////////////////////
-+	// lazy reduction as discussed in "NEON crypto" by D.J. Bernstein
-+	// and P. Schwabe
-+	//
-+	// [see discussion in poly1305-armv4 module]
-+
-+	ushr	$T0.2d,$ACC3,#26
-+	xtn	$H3,$ACC3
-+	 ushr	$T1.2d,$ACC0,#26
-+	 and	$ACC0,$ACC0,$MASK.2d
-+	add	$ACC4,$ACC4,$T0.2d	// h3 -> h4
-+	bic	$H3,#0xfc,lsl#24	// &=0x03ffffff
-+	 add	$ACC1,$ACC1,$T1.2d	// h0 -> h1
-+
-+	ushr	$T0.2d,$ACC4,#26
-+	xtn	$H4,$ACC4
-+	 ushr	$T1.2d,$ACC1,#26
-+	 xtn	$H1,$ACC1
-+	bic	$H4,#0xfc,lsl#24
-+	 add	$ACC2,$ACC2,$T1.2d	// h1 -> h2
-+
-+	add	$ACC0,$ACC0,$T0.2d
-+	shl	$T0.2d,$T0.2d,#2
-+	 shrn	$T1.2s,$ACC2,#26
-+	 xtn	$H2,$ACC2
-+	add	$ACC0,$ACC0,$T0.2d	// h4 -> h0
-+	 bic	$H1,#0xfc,lsl#24
-+	 add	$H3,$H3,$T1.2s		// h2 -> h3
-+	 bic	$H2,#0xfc,lsl#24
-+
-+	shrn	$T0.2s,$ACC0,#26
-+	xtn	$H0,$ACC0
-+	 ushr	$T1.2s,$H3,#26
-+	 bic	$H3,#0xfc,lsl#24
-+	 bic	$H0,#0xfc,lsl#24
-+	add	$H1,$H1,$T0.2s		// h0 -> h1
-+	 add	$H4,$H4,$T1.2s		// h3 -> h4
-+
-+	b.hi	.Loop_neon
-+
-+.Lskip_loop:
-+	dup	$IN23_2,${IN23_2}[0]
-+	add	$IN01_2,$IN01_2,$H2
-+
-+	////////////////////////////////////////////////////////////////
-+	// multiply (inp[0:1]+hash) or inp[2:3] by r^2:r^1
-+
-+	adds	$len,$len,#32
-+	b.ne	.Long_tail
-+
-+	dup	$IN23_2,${IN01_2}[0]
-+	add	$IN23_0,$IN01_0,$H0
-+	add	$IN23_3,$IN01_3,$H3
-+	add	$IN23_1,$IN01_1,$H1
-+	add	$IN23_4,$IN01_4,$H4
-+
-+.Long_tail:
-+	dup	$IN23_0,${IN23_0}[0]
-+	umull2	$ACC0,$IN23_2,${S3}
-+	umull2	$ACC3,$IN23_2,${R1}
-+	umull2	$ACC4,$IN23_2,${R2}
-+	umull2	$ACC2,$IN23_2,${R0}
-+	umull2	$ACC1,$IN23_2,${S4}
-+
-+	dup	$IN23_1,${IN23_1}[0]
-+	umlal2	$ACC0,$IN23_0,${R0}
-+	umlal2	$ACC2,$IN23_0,${R2}
-+	umlal2	$ACC3,$IN23_0,${R3}
-+	umlal2	$ACC4,$IN23_0,${R4}
-+	umlal2	$ACC1,$IN23_0,${R1}
-+
-+	dup	$IN23_3,${IN23_3}[0]
-+	umlal2	$ACC0,$IN23_1,${S4}
-+	umlal2	$ACC3,$IN23_1,${R2}
-+	umlal2	$ACC2,$IN23_1,${R1}
-+	umlal2	$ACC4,$IN23_1,${R3}
-+	umlal2	$ACC1,$IN23_1,${R0}
-+
-+	dup	$IN23_4,${IN23_4}[0]
-+	umlal2	$ACC3,$IN23_3,${R0}
-+	umlal2	$ACC4,$IN23_3,${R1}
-+	umlal2	$ACC0,$IN23_3,${S2}
-+	umlal2	$ACC1,$IN23_3,${S3}
-+	umlal2	$ACC2,$IN23_3,${S4}
-+
-+	umlal2	$ACC3,$IN23_4,${S4}
-+	umlal2	$ACC0,$IN23_4,${S1}
-+	umlal2	$ACC4,$IN23_4,${R0}
-+	umlal2	$ACC1,$IN23_4,${S2}
-+	umlal2	$ACC2,$IN23_4,${S3}
-+
-+	b.eq	.Lshort_tail
-+
-+	////////////////////////////////////////////////////////////////
-+	// (hash+inp[0:1])*r^4:r^3 and accumulate
-+
-+	add	$IN01_0,$IN01_0,$H0
-+	umlal	$ACC3,$IN01_2,${R1}
-+	umlal	$ACC0,$IN01_2,${S3}
-+	umlal	$ACC4,$IN01_2,${R2}
-+	umlal	$ACC1,$IN01_2,${S4}
-+	umlal	$ACC2,$IN01_2,${R0}
-+
-+	add	$IN01_1,$IN01_1,$H1
-+	umlal	$ACC3,$IN01_0,${R3}
-+	umlal	$ACC0,$IN01_0,${R0}
-+	umlal	$ACC4,$IN01_0,${R4}
-+	umlal	$ACC1,$IN01_0,${R1}
-+	umlal	$ACC2,$IN01_0,${R2}
-+
-+	add	$IN01_3,$IN01_3,$H3
-+	umlal	$ACC3,$IN01_1,${R2}
-+	umlal	$ACC0,$IN01_1,${S4}
-+	umlal	$ACC4,$IN01_1,${R3}
-+	umlal	$ACC1,$IN01_1,${R0}
-+	umlal	$ACC2,$IN01_1,${R1}
-+
-+	add	$IN01_4,$IN01_4,$H4
-+	umlal	$ACC3,$IN01_3,${R0}
-+	umlal	$ACC0,$IN01_3,${S2}
-+	umlal	$ACC4,$IN01_3,${R1}
-+	umlal	$ACC1,$IN01_3,${S3}
-+	umlal	$ACC2,$IN01_3,${S4}
-+
-+	umlal	$ACC3,$IN01_4,${S4}
-+	umlal	$ACC0,$IN01_4,${S1}
-+	umlal	$ACC4,$IN01_4,${R0}
-+	umlal	$ACC1,$IN01_4,${S2}
-+	umlal	$ACC2,$IN01_4,${S3}
-+
-+.Lshort_tail:
-+	////////////////////////////////////////////////////////////////
-+	// horizontal add
-+
-+	addp	$ACC3,$ACC3,$ACC3
-+	 ldp	d8,d9,[sp,#16]		// meet ABI requirements
-+	addp	$ACC0,$ACC0,$ACC0
-+	 ldp	d10,d11,[sp,#32]
-+	addp	$ACC4,$ACC4,$ACC4
-+	 ldp	d12,d13,[sp,#48]
-+	addp	$ACC1,$ACC1,$ACC1
-+	 ldp	d14,d15,[sp,#64]
-+	addp	$ACC2,$ACC2,$ACC2
-+
-+	////////////////////////////////////////////////////////////////
-+	// lazy reduction, but without narrowing
-+
-+	ushr	$T0.2d,$ACC3,#26
-+	and	$ACC3,$ACC3,$MASK.2d
-+	 ushr	$T1.2d,$ACC0,#26
-+	 and	$ACC0,$ACC0,$MASK.2d
-+
-+	add	$ACC4,$ACC4,$T0.2d	// h3 -> h4
-+	 add	$ACC1,$ACC1,$T1.2d	// h0 -> h1
-+
-+	ushr	$T0.2d,$ACC4,#26
-+	and	$ACC4,$ACC4,$MASK.2d
-+	 ushr	$T1.2d,$ACC1,#26
-+	 and	$ACC1,$ACC1,$MASK.2d
-+	 add	$ACC2,$ACC2,$T1.2d	// h1 -> h2
-+
-+	add	$ACC0,$ACC0,$T0.2d
-+	shl	$T0.2d,$T0.2d,#2
-+	 ushr	$T1.2d,$ACC2,#26
-+	 and	$ACC2,$ACC2,$MASK.2d
-+	add	$ACC0,$ACC0,$T0.2d	// h4 -> h0
-+	 add	$ACC3,$ACC3,$T1.2d	// h2 -> h3
-+
-+	ushr	$T0.2d,$ACC0,#26
-+	and	$ACC0,$ACC0,$MASK.2d
-+	 ushr	$T1.2d,$ACC3,#26
-+	 and	$ACC3,$ACC3,$MASK.2d
-+	add	$ACC1,$ACC1,$T0.2d	// h0 -> h1
-+	 add	$ACC4,$ACC4,$T1.2d	// h3 -> h4
-+
-+	////////////////////////////////////////////////////////////////
-+	// write the result, can be partially reduced
-+
-+	st4	{$ACC0,$ACC1,$ACC2,$ACC3}[0],[$ctx],#16
-+	st1	{$ACC4}[0],[$ctx]
-+
-+.Lno_data_neon:
-+	ldr	x29,[sp],#80
-+	ret
-+.size	poly1305_blocks_neon,.-poly1305_blocks_neon
-+
-+.type	poly1305_emit_neon,%function
-+.align	5
-+poly1305_emit_neon:
-+	ldr	$is_base2_26,[$ctx,#24]
-+	cbz	$is_base2_26,poly1305_emit
-+
-+	ldp	w10,w11,[$ctx]		// load hash value base 2^26
-+	ldp	w12,w13,[$ctx,#8]
-+	ldr	w14,[$ctx,#16]
-+
-+	add	$h0,x10,x11,lsl#26	// base 2^26 -> base 2^64
-+	lsr	$h1,x12,#12
-+	adds	$h0,$h0,x12,lsl#52
-+	add	$h1,$h1,x13,lsl#14
-+	adc	$h1,$h1,xzr
-+	lsr	$h2,x14,#24
-+	adds	$h1,$h1,x14,lsl#40
-+	adc	$h2,$h2,xzr		// can be partially reduced...
-+
-+	ldp	$t0,$t1,[$nonce]	// load nonce
-+
-+	and	$d0,$h2,#-4		// ... so reduce
-+	add	$d0,$d0,$h2,lsr#2
-+	and	$h2,$h2,#3
-+	adds	$h0,$h0,$d0
-+	adcs	$h1,$h1,xzr
-+	adc	$h2,$h2,xzr
-+
-+	adds	$d0,$h0,#5		// compare to modulus
-+	adcs	$d1,$h1,xzr
-+	adc	$d2,$h2,xzr
-+
-+	tst	$d2,#-4			// see if it's carried/borrowed
-+
-+	csel	$h0,$h0,$d0,eq
-+	csel	$h1,$h1,$d1,eq
-+
-+#ifdef	__AARCH64EB__
-+	ror	$t0,$t0,#32		// flip nonce words
-+	ror	$t1,$t1,#32
-+#endif
-+	adds	$h0,$h0,$t0		// accumulate nonce
-+	adc	$h1,$h1,$t1
-+#ifdef	__AARCH64EB__
-+	rev	$h0,$h0			// flip output bytes
-+	rev	$h1,$h1
-+#endif
-+	stp	$h0,$h1,[$mac]		// write result
-+
-+	ret
-+.size	poly1305_emit_neon,.-poly1305_emit_neon
-+#endif
-+
-+.align	5
-+.Lzeros:
-+.long	0,0,0,0,0,0,0,0
-+#ifndef __KERNEL__
-+.LOPENSSL_armcap_P:
-+#ifdef	__ILP32__
-+.long	OPENSSL_armcap_P-.
-+#else
-+.quad	OPENSSL_armcap_P-.
-+#endif
-+#endif
-+.align	2
-+___
-+
-+open SELF,$0;
-+while(<SELF>) {
-+	next if (/^#!/);
-+	last if (!s/^#/\/\// and !/^$/);
-+	print;
-+}
-+close SELF;
-+
-+foreach (split("\n",$code)) {
-+	s/\b(shrn\s+v[0-9]+)\.[24]d/$1.2s/			or
-+	s/\b(fmov\s+)v([0-9]+)[^,]*,\s*x([0-9]+)/$1d$2,x$3/	or
-+	(m/\bdup\b/ and (s/\.[24]s/.2d/g or 1))			or
-+	(m/\b(eor|and)/ and (s/\.[248][sdh]/.16b/g or 1))	or
-+	(m/\bum(ul|la)l\b/ and (s/\.4s/.2s/g or 1))		or
-+	(m/\bum(ul|la)l2\b/ and (s/\.2s/.4s/g or 1))		or
-+	(m/\bst[1-4]\s+{[^}]+}\[/ and (s/\.[24]d/.s/g or 1));
-+
-+	s/\.[124]([sd])\[/.$1\[/;
-+
-+	print $_,"\n";
-+}
-+close STDOUT;
-diff --git a/lib/zinc/poly1305/poly1305.c b/lib/zinc/poly1305/poly1305.c
-index 876a431a06f5..5cfe4a32514f 100644
---- a/lib/zinc/poly1305/poly1305.c
-+++ b/lib/zinc/poly1305/poly1305.c
-@@ -18,6 +18,8 @@
- 
- #if defined(CONFIG_ZINC_ARCH_X86_64)
- #include "poly1305-x86_64-glue.c"
-+#elif defined(CONFIG_ZINC_ARCH_ARM) || defined(CONFIG_ZINC_ARCH_ARM64)
-+#include "poly1305-arm-glue.c"
- #else
- static inline bool poly1305_init_arch(void *ctx,
- 				      const u8 key[POLY1305_KEY_SIZE])
 -- 
 2.21.0
 
