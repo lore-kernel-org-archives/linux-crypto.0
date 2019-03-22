@@ -7,51 +7,52 @@ X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41C42C4360F
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 Mar 2019 07:14:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14541C10F0E
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 Mar 2019 07:14:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B1B72218FE
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 Mar 2019 07:14:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A551D218FE
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 Mar 2019 07:14:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="T55OEFG7"
+	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="i3Ceyd+o"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727789AbfCVHMT (ORCPT
+        id S1727785AbfCVHMS (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 22 Mar 2019 03:12:19 -0400
-Received: from frisell.zx2c4.com ([192.95.5.64]:58951 "EHLO frisell.zx2c4.com"
+        Fri, 22 Mar 2019 03:12:18 -0400
+Received: from frisell.zx2c4.com ([192.95.5.64]:46903 "EHLO frisell.zx2c4.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727746AbfCVHMQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1727748AbfCVHMQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Fri, 22 Mar 2019 03:12:16 -0400
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 13dd9b8c;
-        Fri, 22 Mar 2019 06:50:26 +0000 (UTC)
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 990abb30;
+        Fri, 22 Mar 2019 06:50:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=from:to:cc
         :subject:date:message-id:in-reply-to:references:mime-version
-        :content-transfer-encoding; s=mail; bh=QmLpTPsjqyzBLBhStVXzYEDwR
-        CA=; b=T55OEFG7Dnz7ejPkGcbrzrnsaIS7k2xXHsL/xFB8MO762mfgSyoCnWTVL
-        YjZMttRbVEGYyRvoQogsPVsEN8ysshw19C3kDPy31uYA+qpV79/Ff0uigkvjPtod
-        nEaqtjKFPYgjNYTijao2PAlQtG66dIKHN5ecy+C9roJNALGpZahCLinym6yFhu+Y
-        E5IG/Jm5nY6+so96UR6jVdL92TkWpuB4tVNnFcKy+sK0WUQaGHyYgnAG+GZcheF0
-        +hJ3MfVv1wg6PqJLVFChycKTIkZjnKNT2Wqcg5X80iV492fvaoUiIfIj/Cn59/uH
-        fBD67YDy1C6BwaAkdfmk1NsyWxJxQ==
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id df71994a (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO);
-        Fri, 22 Mar 2019 06:50:24 +0000 (UTC)
+        :content-transfer-encoding; s=mail; bh=JC33XoDn3+XwtKIPIdCY8F3yk
+        JY=; b=i3Ceyd+oytpc5oTK/ZBzF0R5yPXGSSE5/Lkci6Z1ZjZ2EMQk94qh8deAR
+        +MrH3KbSqu2TY7bms7uN5cIGFSAKiAreuVBTow5uv4Ct1gDfZdlZr4U79jLSjk4n
+        rtKMJvr84DgXlQZQBSZwDnCZONQ8JzMHGfyAEHRv7eqaUfTcKSiaWtNjm14zZGff
+        VgIEFCdFVow0OGEJBJE341agk85idFbRWROhoMVAJGW0DR4SOd4A7/dR29YnNqPj
+        cTW+xfGcLP0lJcK8tcYLUM9YANzdVKnNYfTRfuYaoo9e9+W1T/yhFkMfd0c1nO2d
+        ITGQ8eWZyaqIua+BaZIlqnQ2g6WEg==
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 7449509f (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO);
+        Fri, 22 Mar 2019 06:50:27 +0000 (UTC)
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
 To:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         netdev@vger.kernel.org
 Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Samuel Neves <sneves@dei.uc.pt>,
         Andy Polyakov <appro@openssl.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, x86@kernel.org,
+        Eric Biggers <ebiggers@google.com>,
+        Russell King <linux@armlinux.org.uk>,
+        linux-arm-kernel@lists.infradead.org,
+        Samuel Neves <sneves@dei.uc.pt>,
         Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>,
         Andy Lutomirski <luto@kernel.org>,
         Greg KH <gregkh@linuxfoundation.org>,
         Andrew Morton <akpm@linux-foundation.org>,
         Linus Torvalds <torvalds@linux-foundation.org>,
         kernel-hardening@lists.openwall.com
-Subject: [PATCH net-next v9 04/19] zinc: ChaCha20 x86_64 implementation
-Date:   Fri, 22 Mar 2019 01:11:07 -0600
-Message-Id: <20190322071122.6677-5-Jason@zx2c4.com>
+Subject: [PATCH net-next v9 05/19] zinc: ChaCha20 ARM and ARM64 implementations
+Date:   Fri, 22 Mar 2019 01:11:08 -0600
+Message-Id: <20190322071122.6677-6-Jason@zx2c4.com>
 In-Reply-To: <20190322071122.6677-1-Jason@zx2c4.com>
 References: <20190322071122.6677-1-Jason@zx2c4.com>
 MIME-Version: 1.0
@@ -61,99 +62,39 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-These x86_64 vectorized implementations are based on Andy Polyakov's
-implementations, and support SSSE3, AVX-2, AVX-512F, and AVX-512VL.
-The AVX-512F implementation is disabled on Skylake, due to throttling,
-and the VL ymm implementation is used instead on that platform; other
-AVX-512 microarchitectures use AVX-512F.
+These ARM implementations come from Andy Polyakov's implementation, as
+well as an ultra-fast unrolled scalar version optimized for ARMv7 from
+Eric Biggers, which performs well on platforms with slow NEON like
+Cortex A7 and A5.
 
-On the left is cycle counts on a Core i7 6700HQ using the AVX-2 codepath,
-comparing this implementation ("new") to the implementation in the current
-crypto api ("old"). On the right are benchmarks on a Xeon Gold 5120 using
-the AVX-512 codepath. The difference is so stark, because the current
-crypto api's implementation does not support AVX-512 at all.
+This commit delivers approximately the same or much better performance than
+the existing crypto API's code and has been measured to do as such on:
 
-        AVX-2                  AVX-512
-      ---------              -----------
+  - ARM1176JZF-S [ARMv6]
+  - Cortex-A7    [ARMv7]
+  - Cortex-A8    [ARMv7]
+  - Cortex-A9    [ARMv7]
+  - Cortex-A17   [ARMv7]
+  - Cortex-A53   [ARMv8]
+  - Cortex-A55   [ARMv8]
+  - Cortex-A73   [ARMv8]
+  - Cortex-A75   [ARMv8]
 
-size	old	new       size	old	new
-----	----	----      ----	----	----
-0	62	52        0	64	54
-16	414	376       16	386	372
-32	410	400       32	388	396
-48	414	422       48	388	420
-64	362	356       64	366	350
-80	714	666       80	708	666
-96	714	700       96	708	692
-112	712	718       112	706	736
-128	692	646       128	692	648
-144	1042	674       144	1036	682
-160	1042	694       160	1036	708
-176	1042	726       176	1036	730
-192	1018	650       192	1016	658
-208	1366	686       208	1360	684
-224	1366	696       224	1362	708
-240	1366	722       240	1360	732
-256	640	656       256	644	500
-272	988	1246      272	990	526
-288	988	1276      288	988	556
-304	992	1296      304	988	576
-320	972	1222      320	972	500
-336	1318	1256      336	1314	532
-352	1318	1276      352	1316	558
-368	1316	1294      368	1318	578
-384	1294	1218      384	1308	506
-400	1642	1258      400	1644	532
-416	1642	1282      416	1644	556
-432	1642	1302      432	1644	594
-448	1628	1224      448	1624	508
-464	1970	1258      464	1970	534
-480	1970	1280      480	1970	556
-496	1970	1300      496	1968	582
-512	656	676       512	660	624
-528	1010	1290      528	1016	682
-544	1010	1306      544	1016	702
-560	1010	1332      560	1018	728
-576	986	1254      576	998	654
-592	1340	1284      592	1344	680
-608	1334	1310      608	1344	708
-624	1340	1334      624	1344	730
-640	1314	1254      640	1326	654
-656	1664	1282      656	1670	686
-672	1674	1306      672	1670	708
-688	1662	1336      688	1670	732
-704	1638	1250      704	1652	658
-720	1992	1292      720	1998	682
-736	1994	1308      736	1998	710
-752	1988	1334      752	1996	734
-768	1252	1254      768	1256	662
-784	1596	1290      784	1606	688
-800	1596	1314      800	1606	714
-816	1596	1330      816	1606	736
-832	1576	1256      832	1584	660
-848	1922	1286      848	1948	688
-864	1922	1314      864	1950	714
-880	1926	1338      880	1948	736
-896	1898	1258      896	1912	688
-912	2248	1288      912	2258	718
-928	2248	1320      928	2258	744
-944	2248	1338      944	2256	768
-960	2226	1268      960	2238	692
-976	2574	1288      976	2584	718
-992	2576	1312      992	2584	744
-1008	2574	1340      1008	2584	770
+Interestingly, Andy Polyakov's scalar code is slower than Eric Biggers',
+but is also significantly shorter. This has the advantage that it does
+not evict other code from L1 cache -- particularly on ARM11 chips -- and
+so in certain circumstances it can actually be faster. However, it wasn't
+found that this had an affect on any code existing in the kernel today.
 
 While this is CRYPTOGAMS code, the originating code for this happens to
-be derived from OpenSSL's commit cded951378069a478391843f5f8653c1eb5128da
+be the same as OpenSSL's commit 9925a82146f2503b4dd11423d0eba649b43450c0
 
 Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-Signed-off-by: Samuel Neves <sneves@dei.uc.pt>
-Co-developed-by: Samuel Neves <sneves@dei.uc.pt>
-Co-developed-by: Andy Polyakov <appro@openssl.org>
+Co-authored-by: Andy Polyakov <appro@openssl.org>
+Co-authored-by: Eric Biggers <ebiggers@google.com>
 Cc: Andy Polyakov <appro@openssl.org>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Ingo Molnar <mingo@redhat.com>
-Cc: x86@kernel.org
+Cc: Russell King <linux@armlinux.org.uk>
+Cc: linux-arm-kernel@lists.infradead.org
 Cc: Samuel Neves <sneves@dei.uc.pt>
 Cc: Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
 Cc: Andy Lutomirski <luto@kernel.org>
@@ -163,88 +104,76 @@ Cc: Linus Torvalds <torvalds@linux-foundation.org>
 Cc: kernel-hardening@lists.openwall.com
 Cc: linux-crypto@vger.kernel.org
 ---
- lib/zinc/Makefile                        |    8 +
- lib/zinc/chacha20/chacha20-x86_64-glue.c |  103 +
- lib/zinc/chacha20/chacha20-x86_64.pl     | 4106 ++++++++++++++++++++++
- lib/zinc/chacha20/chacha20.c             |    4 +
- 4 files changed, 4221 insertions(+)
- create mode 100644 lib/zinc/chacha20/chacha20-x86_64-glue.c
- create mode 100644 lib/zinc/chacha20/chacha20-x86_64.pl
+ lib/zinc/Makefile                         |    4 +-
+ lib/zinc/chacha20/chacha20-arm-glue.c     |   98 ++
+ lib/zinc/chacha20/chacha20-arm.pl         | 1227 +++++++++++++++++++++
+ lib/zinc/chacha20/chacha20-arm64.pl       | 1163 +++++++++++++++++++
+ lib/zinc/chacha20/chacha20-unrolled-arm.S |  461 ++++++++
+ lib/zinc/chacha20/chacha20.c              |    2 +
+ 6 files changed, 2954 insertions(+), 1 deletion(-)
+ create mode 100644 lib/zinc/chacha20/chacha20-arm-glue.c
+ create mode 100644 lib/zinc/chacha20/chacha20-arm.pl
+ create mode 100644 lib/zinc/chacha20/chacha20-arm64.pl
+ create mode 100644 lib/zinc/chacha20/chacha20-unrolled-arm.S
 
 diff --git a/lib/zinc/Makefile b/lib/zinc/Makefile
-index 3d80144d55a6..7eb3ed68a012 100644
+index 7eb3ed68a012..841029072542 100644
 --- a/lib/zinc/Makefile
 +++ b/lib/zinc/Makefile
-@@ -3,4 +3,12 @@ ccflags-y += -D'pr_fmt(fmt)="zinc: " fmt'
- ccflags-$(CONFIG_ZINC_DEBUG) += -DDEBUG
+@@ -4,7 +4,9 @@ ccflags-$(CONFIG_ZINC_DEBUG) += -DDEBUG
  
  zinc_chacha20-y := chacha20/chacha20.o
-+zinc_chacha20-$(CONFIG_ZINC_ARCH_X86_64) += chacha20/chacha20-x86_64.o
-+perlasm-targets += chacha20/chacha20-x86_64.S
+ zinc_chacha20-$(CONFIG_ZINC_ARCH_X86_64) += chacha20/chacha20-x86_64.o
+-perlasm-targets += chacha20/chacha20-x86_64.S
++zinc_chacha20-$(CONFIG_ZINC_ARCH_ARM) += chacha20/chacha20-arm.o chacha20/chacha20-unrolled-arm.o
++zinc_chacha20-$(CONFIG_ZINC_ARCH_ARM64) += chacha20/chacha20-arm64.o
++perlasm-targets += chacha20/chacha20-x86_64.S chacha20/chacha20-arm.S chacha20/chacha20-arm64.S
  obj-$(CONFIG_ZINC_CHACHA20) += zinc_chacha20.o
-+
-+quiet_cmd_perlasm = PERLASM $@
-+      cmd_perlasm = $(PERL) $< > $@
-+$(addprefix $(obj)/,$(perlasm-targets)): $(obj)/%.S: $(src)/%.pl FORCE
-+	$(call if_changed,perlasm)
-+targets += $(perlasm-targets)
-diff --git a/lib/zinc/chacha20/chacha20-x86_64-glue.c b/lib/zinc/chacha20/chacha20-x86_64-glue.c
+ 
+ quiet_cmd_perlasm = PERLASM $@
+diff --git a/lib/zinc/chacha20/chacha20-arm-glue.c b/lib/zinc/chacha20/chacha20-arm-glue.c
 new file mode 100644
-index 000000000000..6db499a9ea82
+index 000000000000..84c3bb7487b3
 --- /dev/null
-+++ b/lib/zinc/chacha20/chacha20-x86_64-glue.c
-@@ -0,0 +1,103 @@
++++ b/lib/zinc/chacha20/chacha20-arm-glue.c
+@@ -0,0 +1,98 @@
 +// SPDX-License-Identifier: GPL-2.0 OR MIT
 +/*
 + * Copyright (C) 2015-2019 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
 + */
 +
-+#include <asm/fpu/api.h>
-+#include <asm/cpufeature.h>
-+#include <asm/processor.h>
-+#include <asm/intel-family.h>
++#include <asm/hwcap.h>
++#include <asm/neon.h>
++#if defined(CONFIG_ZINC_ARCH_ARM)
++#include <asm/system_info.h>
++#include <asm/cputype.h>
++#endif
 +
-+asmlinkage void hchacha20_ssse3(u32 *derived_key, const u8 *nonce,
-+				const u8 *key);
-+asmlinkage void chacha20_ssse3(u8 *out, const u8 *in, const size_t len,
-+			       const u32 key[8], const u32 counter[4]);
-+asmlinkage void chacha20_avx2(u8 *out, const u8 *in, const size_t len,
++asmlinkage void chacha20_arm(u8 *out, const u8 *in, const size_t len,
++			     const u32 key[8], const u32 counter[4]);
++asmlinkage void hchacha20_arm(const u32 state[16], u32 out[8]);
++asmlinkage void chacha20_neon(u8 *out, const u8 *in, const size_t len,
 +			      const u32 key[8], const u32 counter[4]);
-+asmlinkage void chacha20_avx512(u8 *out, const u8 *in, const size_t len,
-+				const u32 key[8], const u32 counter[4]);
-+asmlinkage void chacha20_avx512vl(u8 *out, const u8 *in, const size_t len,
-+				  const u32 key[8], const u32 counter[4]);
 +
-+static bool chacha20_use_ssse3 __ro_after_init;
-+static bool chacha20_use_avx2 __ro_after_init;
-+static bool chacha20_use_avx512 __ro_after_init;
-+static bool chacha20_use_avx512vl __ro_after_init;
-+static bool *const chacha20_nobs[] __initconst = {
-+	&chacha20_use_ssse3, &chacha20_use_avx2, &chacha20_use_avx512,
-+	&chacha20_use_avx512vl };
-+
++static bool chacha20_use_neon __ro_after_init;
++static bool *const chacha20_nobs[] __initconst = { &chacha20_use_neon };
 +static void __init chacha20_fpu_init(void)
 +{
-+	chacha20_use_ssse3 = boot_cpu_has(X86_FEATURE_SSSE3);
-+	chacha20_use_avx2 =
-+		boot_cpu_has(X86_FEATURE_AVX) &&
-+		boot_cpu_has(X86_FEATURE_AVX2) &&
-+		cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM, NULL);
-+	chacha20_use_avx512 =
-+		boot_cpu_has(X86_FEATURE_AVX) &&
-+		boot_cpu_has(X86_FEATURE_AVX2) &&
-+		boot_cpu_has(X86_FEATURE_AVX512F) &&
-+		cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM |
-+				  XFEATURE_MASK_AVX512, NULL) &&
-+		/* Skylake downclocks unacceptably much when using zmm. */
-+		boot_cpu_data.x86_model != INTEL_FAM6_SKYLAKE_X;
-+	chacha20_use_avx512vl =
-+		boot_cpu_has(X86_FEATURE_AVX) &&
-+		boot_cpu_has(X86_FEATURE_AVX2) &&
-+		boot_cpu_has(X86_FEATURE_AVX512F) &&
-+		boot_cpu_has(X86_FEATURE_AVX512VL) &&
-+		cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM |
-+				  XFEATURE_MASK_AVX512, NULL);
++#if defined(CONFIG_ZINC_ARCH_ARM64)
++	chacha20_use_neon = elf_hwcap & HWCAP_ASIMD;
++#elif defined(CONFIG_ZINC_ARCH_ARM)
++	switch (read_cpuid_part()) {
++	case ARM_CPU_PART_CORTEX_A7:
++	case ARM_CPU_PART_CORTEX_A5:
++		/* The Cortex-A7 and Cortex-A5 do not perform well with the NEON
++		 * implementation but do incredibly with the scalar one and use
++		 * less power.
++		 */
++		break;
++	default:
++		chacha20_use_neon = elf_hwcap & HWCAP_NEON;
++	}
++#endif
 +}
 +
 +static inline bool chacha20_arch(struct chacha20_ctx *ctx, u8 *dst,
@@ -255,31 +184,24 @@ index 000000000000..6db499a9ea82
 +	BUILD_BUG_ON(PAGE_SIZE < CHACHA20_BLOCK_SIZE ||
 +		     PAGE_SIZE % CHACHA20_BLOCK_SIZE);
 +
-+	if (!IS_ENABLED(CONFIG_AS_SSSE3) || !chacha20_use_ssse3 ||
-+	    len <= CHACHA20_BLOCK_SIZE || !simd_use(simd_context))
-+		return false;
-+
 +	for (;;) {
-+		const size_t bytes = min_t(size_t, len, PAGE_SIZE);
++		if (IS_ENABLED(CONFIG_KERNEL_MODE_NEON) && chacha20_use_neon &&
++		    len >= CHACHA20_BLOCK_SIZE * 3 && simd_use(simd_context)) {
++			const size_t bytes = min_t(size_t, len, PAGE_SIZE);
 +
-+		if (IS_ENABLED(CONFIG_AS_AVX512) && chacha20_use_avx512 &&
-+		    len >= CHACHA20_BLOCK_SIZE * 8)
-+			chacha20_avx512(dst, src, bytes, ctx->key, ctx->counter);
-+		else if (IS_ENABLED(CONFIG_AS_AVX512) && chacha20_use_avx512vl &&
-+			 len >= CHACHA20_BLOCK_SIZE * 4)
-+			chacha20_avx512vl(dst, src, bytes, ctx->key, ctx->counter);
-+		else if (IS_ENABLED(CONFIG_AS_AVX2) && chacha20_use_avx2 &&
-+			 len >= CHACHA20_BLOCK_SIZE * 4)
-+			chacha20_avx2(dst, src, bytes, ctx->key, ctx->counter);
-+		else
-+			chacha20_ssse3(dst, src, bytes, ctx->key, ctx->counter);
-+		ctx->counter[0] += (bytes + 63) / 64;
-+		len -= bytes;
-+		if (!len)
++			chacha20_neon(dst, src, bytes, ctx->key, ctx->counter);
++			ctx->counter[0] += (bytes + 63) / 64;
++			len -= bytes;
++			if (!len)
++				break;
++			dst += bytes;
++			src += bytes;
++			simd_relax(simd_context);
++		} else {
++			chacha20_arm(dst, src, len, ctx->key, ctx->counter);
++			ctx->counter[0] += (len + 63) / 64;
 +			break;
-+		dst += bytes;
-+		src += bytes;
-+		simd_relax(simd_context);
++		}
 +	}
 +
 +	return true;
@@ -290,25 +212,37 @@ index 000000000000..6db499a9ea82
 +				  const u8 key[HCHACHA20_KEY_SIZE],
 +				  simd_context_t *simd_context)
 +{
-+	if (IS_ENABLED(CONFIG_AS_SSSE3) && chacha20_use_ssse3 &&
-+	    simd_use(simd_context)) {
-+		hchacha20_ssse3(derived_key, nonce, key);
++	if (IS_ENABLED(CONFIG_ZINC_ARCH_ARM)) {
++		u32 x[] = { CHACHA20_CONSTANT_EXPA,
++			    CHACHA20_CONSTANT_ND_3,
++			    CHACHA20_CONSTANT_2_BY,
++			    CHACHA20_CONSTANT_TE_K,
++			    get_unaligned_le32(key + 0),
++			    get_unaligned_le32(key + 4),
++			    get_unaligned_le32(key + 8),
++			    get_unaligned_le32(key + 12),
++			    get_unaligned_le32(key + 16),
++			    get_unaligned_le32(key + 20),
++			    get_unaligned_le32(key + 24),
++			    get_unaligned_le32(key + 28),
++			    get_unaligned_le32(nonce + 0),
++			    get_unaligned_le32(nonce + 4),
++			    get_unaligned_le32(nonce + 8),
++			    get_unaligned_le32(nonce + 12)
++			  };
++		hchacha20_arm(x, derived_key);
 +		return true;
 +	}
 +	return false;
 +}
-diff --git a/lib/zinc/chacha20/chacha20-x86_64.pl b/lib/zinc/chacha20/chacha20-x86_64.pl
+diff --git a/lib/zinc/chacha20/chacha20-arm.pl b/lib/zinc/chacha20/chacha20-arm.pl
 new file mode 100644
-index 000000000000..38532f87a754
+index 000000000000..6a7d62cfd2ae
 --- /dev/null
-+++ b/lib/zinc/chacha20/chacha20-x86_64.pl
-@@ -0,0 +1,4106 @@
++++ b/lib/zinc/chacha20/chacha20-arm.pl
+@@ -0,0 +1,1227 @@
 +#!/usr/bin/env perl
 +# SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
-+#
-+# Copyright (C) 2017-2018 Samuel Neves <sneves@dei.uc.pt>. All Rights Reserved.
-+# Copyright (C) 2017-2019 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
-+# Copyright (C) 2006-2017 CRYPTOGAMS by <appro@openssl.org>. All Rights Reserved.
 +#
 +# This code is taken from the OpenSSL project but the author, Andy Polyakov,
 +# has relicensed it under the licenses specified in the SPDX header above.
@@ -322,4070 +256,2366 @@ index 000000000000..38532f87a754
 +# details see http://www.openssl.org/~appro/cryptogams/.
 +# ====================================================================
 +#
-+# November 2014
++# December 2014
 +#
-+# ChaCha20 for x86_64.
++# ChaCha20 for ARMv4.
 +#
-+# December 2016
++# September 2018
 +#
-+# Add AVX512F code path.
-+#
-+# December 2017
-+#
-+# Add AVX512VL code path.
++# Improve scalar performance per Eric Biggers' suggestion to eliminate
++# separate rotates. This requires b[0..3] and d[0..3] to be maintained
++# pre-rotated, hence odd twists prior inner loop and when accumulating
++# key material. Since amount of instructions is reduced as result, even
++# NEON performance is improved somewhat, most notably by ~9% on low-end
++# Cortex-A5/A7. Full unroll was shown to provide even better scalar
++# performance on Cortex-A5/A7, naturally at the cost of manyfold size
++# increase. We let it be. Oversized code works in benchmarks, but is not
++# necessarily optimal in real life, when it's likely to be out-of-cache
++# upon entry and evict significant part of cache upon completion.
 +#
 +# Performance in cycles per byte out of large buffer.
 +#
-+#		IALU/gcc 4.8(i)	1x/2xSSSE3(ii)	4xSSSE3	    NxAVX(v)
++#			IALU/gcc-4.4    1xNEON      3xNEON+1xIALU
 +#
-+# P4		9.48/+99%	-		-
-+# Core2		7.83/+55%	7.90/5.76	4.35
-+# Westmere	7.19/+50%	5.60/4.50	3.00
-+# Sandy Bridge	8.31/+42%	5.45/4.00	2.72
-+# Ivy Bridge	6.71/+46%	5.40/?		2.41
-+# Haswell	5.92/+43%	5.20/3.45	2.42        1.23
-+# Skylake[-X]	5.87/+39%	4.70/3.22	2.31        1.19[0.80(vi)]
-+# Silvermont	12.0/+33%	7.75/6.90	7.03(iii)
-+# Knights L	11.7/-		?		9.60(iii)   0.80
-+# Goldmont	10.6/+17%	5.10/3.52	3.28
-+# Sledgehammer	7.28/+52%	-		-
-+# Bulldozer	9.66/+28%	9.85/5.35(iv)	3.06(iv)
-+# Ryzen		5.96/+50%	5.19/3.00	2.40        2.09
-+# VIA Nano	10.5/+46%	6.72/6.88	6.05
++# Cortex-A5		14.2(*)/+160%   21.8        12.9(**)
++# Cortex-A8		10.2(*)/+190%   13.9        6.10
++# Cortex-A9		10.8(*)/+150%   14.3        6.50
++# Cortex-A15		11.0/+40%       16.0        4.90
++# Snapdragon S4		13.9(***)/+90%  13.6        4.90
 +#
-+# (i)	compared to older gcc 3.x one can observe >2x improvement on
-+#	most platforms;
-+# (ii)	2xSSSE3 is code path optimized specifically for 128 bytes used
-+#	by chacha20_poly1305_tls_cipher, results are EVP-free;
-+# (iii)	this is not optimal result for Atom because of MSROM
-+#	limitations, SSE2 can do better, but gain is considered too
-+#	low to justify the [maintenance] effort;
-+# (iv)	Bulldozer actually executes 4xXOP code path that delivers 2.20
-+#	and 4.85 for 128-byte inputs;
-+# (v)	8xAVX2, 8xAVX512VL or 16xAVX512F, whichever best applicable;
-+# (vi)	even though Skylake-X can execute AVX512F code and deliver 0.57
-+#	cpb in single thread, the corresponding capability is suppressed;
++# (*)	most "favourable" result for aligned data on little-endian
++#	processor, result for misaligned data is 10-15% lower;
++# (**)	pure 4xNEON [with "vertical" layout] was shown to provide ~8%
++#	better performance on Cortex-A5/A7, but not on others;
++# (***)	it's 17% slower than original, trade-off is considered
++#	acceptable, because of improvement on others, specifically
++#	+36% on Cortex-A5/A7 and +20% on Cortex-A9;
 +
 +$flavour = shift;
-+$output  = shift;
-+if ($flavour =~ /\./) { $output = $flavour; undef $flavour; }
++if ($flavour=~/\w[\w\-]*\.\w+$/) { $output=$flavour; undef $flavour; }
++else { while (($output=shift) && ($output!~/\w[\w\-]*\.\w+$/)) {} }
 +
-+$win64=0; $win64=1 if ($flavour =~ /[nm]asm|mingw64/ || $output =~ /\.asm$/);
-+$kernel=0; $kernel=1 if (!$flavour && !$output);
++if ($flavour && $flavour ne "void") {
++    $0 =~ m/(.*[\/\\])[^\/\\]+$/; $dir=$1;
++    ( $xlate="${dir}arm-xlate.pl" and -f $xlate ) or
++    ( $xlate="${dir}../../perlasm/arm-xlate.pl" and -f $xlate) or
++    die "can't locate arm-xlate.pl";
 +
-+if (!$kernel) {
-+	$0 =~ m/(.*[\/\\])[^\/\\]+$/; $dir=$1;
-+	( $xlate="${dir}x86_64-xlate.pl" and -f $xlate ) or
-+	( $xlate="${dir}../../perlasm/x86_64-xlate.pl" and -f $xlate) or
-+	die "can't locate x86_64-xlate.pl";
-+
-+	open OUT,"| \"$^X\" \"$xlate\" $flavour \"$output\"";
-+	*STDOUT=*OUT;
-+
-+	if (`$ENV{CC} -Wa,-v -c -o /dev/null -x assembler /dev/null 2>&1`
-+	    =~ /GNU assembler version ([2-9]\.[0-9]+)/) {
-+		$avx = ($1>=2.19) + ($1>=2.22) + ($1>=2.25);
-+	}
-+
-+	if (!$avx && $win64 && ($flavour =~ /nasm/ || $ENV{ASM} =~ /nasm/) &&
-+	    `nasm -v 2>&1` =~ /NASM version ([2-9]\.[0-9]+)(?:\.([0-9]+))?/) {
-+		$avx = ($1>=2.09) + ($1>=2.10) + ($1>=2.12);
-+		$avx += 1 if ($1==2.11 && $2>=8);
-+	}
-+
-+	if (!$avx && $win64 && ($flavour =~ /masm/ || $ENV{ASM} =~ /ml64/) &&
-+	    `ml64 2>&1` =~ /Version ([0-9]+)\./) {
-+		$avx = ($1>=10) + ($1>=11);
-+	}
-+
-+	if (!$avx && `$ENV{CC} -v 2>&1` =~ /((?:^clang|LLVM) version|.*based on LLVM) ([3-9]\.[0-9]+)/) {
-+		$avx = ($2>=3.0) + ($2>3.0);
-+	}
++    open STDOUT,"| \"$^X\" $xlate $flavour $output";
 +} else {
-+	$avx = 4; # The kernel uses ifdefs for this.
++    open STDOUT,">$output";
 +}
 +
-+# input parameter block
-+($out,$inp,$len,$key,$counter)=("%rdi","%rsi","%rdx","%rcx","%r8");
-+
-+$code.=<<___ if $kernel;
-+#include <linux/linkage.h>
-+___
-+
-+sub declare_variable() {
-+	my ($name, $size, $type, $payload) = @_;
-+	if($kernel) {
-+		$code.=".section .rodata.cst$size.L$name, \"aM\", \@progbits, $size\n";
-+		$code.=".align $size\n";
-+		$code.=".L$name:\n";
-+		$code.=".$type $payload\n";
-+	} else {
-+		$code.=".L$name:\n";
-+		$code.=".$type $payload\n";
-+	}
-+}
-+
-+sub declare_function() {
-+	my ($name, $align, $nargs) = @_;
-+	if($kernel) {
-+		$code .= ".align $align\n";
-+		$code .= "ENTRY($name)\n";
-+		$code .= ".L$name:\n";
-+	} else {
-+		$code .= ".globl	$name\n";
-+		$code .= ".type	$name,\@function,$nargs\n";
-+		$code .= ".align	$align\n";
-+		$code .= "$name:\n";
-+	}
-+}
-+
-+sub end_function() {
-+	my ($name) = @_;
-+	if($kernel) {
-+		$code .= "ENDPROC($name)\n";
-+	} else {
-+		$code .= ".size   $name,.-$name\n";
-+	}
-+}
-+
-+if(!$kernel) {
-+	$code .= ".text\n";
-+}
-+&declare_variable('zero', 16, 'long', '0,0,0,0');
-+&declare_variable('one', 16, 'long', '1,0,0,0');
-+&declare_variable('inc', 16, 'long', '0,1,2,3');
-+&declare_variable('four', 16, 'long', '4,4,4,4');
-+&declare_variable('incy', 32, 'long', '0,2,4,6,1,3,5,7');
-+&declare_variable('eight', 32, 'long', '8,8,8,8,8,8,8,8');
-+&declare_variable('rot16', 16, 'byte', '0x2,0x3,0x0,0x1, 0x6,0x7,0x4,0x5, 0xa,0xb,0x8,0x9, 0xe,0xf,0xc,0xd');
-+&declare_variable('rot24', 16, 'byte', '0x3,0x0,0x1,0x2, 0x7,0x4,0x5,0x6, 0xb,0x8,0x9,0xa, 0xf,0xc,0xd,0xe');
-+&declare_variable('twoy', 32, 'long', '2,0,0,0, 2,0,0,0');
-+&declare_variable('zeroz', 64, 'long', '0,0,0,0, 1,0,0,0, 2,0,0,0, 3,0,0,0');
-+&declare_variable('fourz', 64, 'long', '4,0,0,0, 4,0,0,0, 4,0,0,0, 4,0,0,0');
-+&declare_variable('incz', 64, 'long', '0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15');
-+&declare_variable('sixteen', 64, 'long', '16,16,16,16,16,16,16,16,16,16,16,16,16,16,16,16');
-+&declare_variable('sigma', 16, 'ascii', '"expand 32-byte k"');
-+
-+$code.=<<___ if !$kernel;
-+.asciz "ChaCha20 for x86_64, CRYPTOGAMS by <appro\@openssl.org>"
-+___
-+$code.=".text\n";
-+
-+sub AUTOLOAD()          # thunk [simplified] 32-bit style perlasm
-+{ my $opcode = $AUTOLOAD; $opcode =~ s/.*:://;
++sub AUTOLOAD()		# thunk [simplified] x86-style perlasm
++{ my $opcode = $AUTOLOAD; $opcode =~ s/.*:://; $opcode =~ s/_/\./;
 +  my $arg = pop;
-+    $arg = "\$$arg" if ($arg*1 eq $arg);
-+    $code .= "\t$opcode\t".join(',',$arg,reverse @_)."\n";
++    $arg = "#$arg" if ($arg*1 eq $arg);
++    $code .= "\t$opcode\t".join(',',@_,$arg)."\n";
 +}
 +
-+@x=("%eax","%ebx","%ecx","%edx",map("%r${_}d",(8..11)),
-+    "%nox","%nox","%nox","%nox",map("%r${_}d",(12..15)));
-+@t=("%esi","%edi");
++my @x=map("r$_",(0..7,"x","x","x","x",12,"x",14,"x"));
++my @t=map("r$_",(8..11));
 +
-+sub ROUND {			# critical path is 24 cycles per round
++sub ROUND {
 +my ($a0,$b0,$c0,$d0)=@_;
 +my ($a1,$b1,$c1,$d1)=map(($_&~3)+(($_+1)&3),($a0,$b0,$c0,$d0));
 +my ($a2,$b2,$c2,$d2)=map(($_&~3)+(($_+1)&3),($a1,$b1,$c1,$d1));
 +my ($a3,$b3,$c3,$d3)=map(($_&~3)+(($_+1)&3),($a2,$b2,$c2,$d2));
-+my ($xc,$xc_)=map("\"$_\"",@t);
-+my @x=map("\"$_\"",@x);
++my $odd = $d0&1;
++my ($xc,$xc_) = (@t[0..1]);
++my ($xd,$xd_) = $odd ? (@t[2],@x[$d1]) : (@x[$d0],@t[2]);
++my @ret;
 +
 +	# Consider order in which variables are addressed by their
 +	# index:
 +	#
-+	#	a   b   c   d
++	#       a   b   c   d
 +	#
-+	#	0   4   8  12 < even round
-+	#	1   5   9  13
-+	#	2   6  10  14
-+	#	3   7  11  15
-+	#	0   5  10  15 < odd round
-+	#	1   6  11  12
-+	#	2   7   8  13
-+	#	3   4   9  14
++	#       0   4   8  12 < even round
++	#       1   5   9  13
++	#       2   6  10  14
++	#       3   7  11  15
++	#       0   5  10  15 < odd round
++	#       1   6  11  12
++	#       2   7   8  13
++	#       3   4   9  14
 +	#
-+	# 'a', 'b' and 'd's are permanently allocated in registers,
-+	# @x[0..7,12..15], while 'c's are maintained in memory. If
++	# 'a', 'b' are permanently allocated in registers, @x[0..7],
++	# while 'c's and pair of 'd's are maintained in memory. If
 +	# you observe 'c' column, you'll notice that pair of 'c's is
 +	# invariant between rounds. This means that we have to reload
 +	# them once per round, in the middle. This is why you'll see
 +	# bunch of 'c' stores and loads in the middle, but none in
-+	# the beginning or end.
++	# the beginning or end. If you observe 'd' column, you'll
++	# notice that 15 and 13 are reused in next pair of rounds.
++	# This is why these two are chosen for offloading to memory,
++	# to make loads count more.
++							push @ret,(
++	"&add	(@x[$a0],@x[$a0],@x[$b0],'ror#13')",
++	 "&add	(@x[$a1],@x[$a1],@x[$b1],'ror#13')",
++	"&eor	($xd,@x[$a0],$xd,'ror#24')",
++	 "&eor	($xd_,@x[$a1],$xd_,'ror#24')",
 +
-+	# Normally instructions would be interleaved to favour in-order
-+	# execution. Generally out-of-order cores manage it gracefully,
-+	# but not this time for some reason. As in-order execution
-+	# cores are dying breed, old Atom is the only one around,
-+	# instructions are left uninterleaved. Besides, Atom is better
-+	# off executing 1xSSSE3 code anyway...
++	"&add	($xc,$xc,$xd,'ror#16')",
++	 "&add	($xc_,$xc_,$xd_,'ror#16')",
++	"&eor	(@x[$b0],$xc, @x[$b0],'ror#13')",
++	 "&eor	(@x[$b1],$xc_,@x[$b1],'ror#13')",
 +
-+	(
-+	"&add	(@x[$a0],@x[$b0])",	# Q1
-+	"&xor	(@x[$d0],@x[$a0])",
-+	"&rol	(@x[$d0],16)",
-+	 "&add	(@x[$a1],@x[$b1])",	# Q2
-+	 "&xor	(@x[$d1],@x[$a1])",
-+	 "&rol	(@x[$d1],16)",
++	"&add	(@x[$a0],@x[$a0],@x[$b0],'ror#20')",
++	 "&add	(@x[$a1],@x[$a1],@x[$b1],'ror#20')",
++	"&eor	($xd,@x[$a0],$xd,'ror#16')",
++	 "&eor	($xd_,@x[$a1],$xd_,'ror#16')"		);
++							push @ret,(
++	"&str	($xd,'[sp,#4*(16+$d0)]')"		) if ($odd);
++							push @ret,(
++	"&add	($xc,$xc,$xd,'ror#24')"			);
++							push @ret,(
++	"&ldr	($xd,'[sp,#4*(16+$d2)]')"		) if ($odd);
++							push @ret,(
++	 "&str	($xd_,'[sp,#4*(16+$d1)]')"		) if (!$odd);
++							push @ret,(
++	 "&add	($xc_,$xc_,$xd_,'ror#24')"		);
++							push @ret,(
++	 "&ldr	($xd_,'[sp,#4*(16+$d3)]')"		) if (!$odd);
++							push @ret,(
++	"&str	($xc,'[sp,#4*(16+$c0)]')",
++	"&eor	(@x[$b0],@x[$b0],$xc,'ror#12')",
++	 "&str	($xc_,'[sp,#4*(16+$c1)]')",
++	 "&eor	(@x[$b1],@x[$b1],$xc_,'ror#12')"	);
 +
-+	"&add	($xc,@x[$d0])",
-+	"&xor	(@x[$b0],$xc)",
-+	"&rol	(@x[$b0],12)",
-+	 "&add	($xc_,@x[$d1])",
-+	 "&xor	(@x[$b1],$xc_)",
-+	 "&rol	(@x[$b1],12)",
++	$xd=@x[$d2]					if (!$odd);
++	$xd_=@x[$d3]					if ($odd);
++							push @ret,(
++	"&ldr	($xc,'[sp,#4*(16+$c2)]')",
++	"&add	(@x[$a2],@x[$a2],@x[$b2],'ror#13')",
++	 "&ldr	($xc_,'[sp,#4*(16+$c3)]')",
++	 "&add	(@x[$a3],@x[$a3],@x[$b3],'ror#13')",
++	"&eor	($xd,@x[$a2],$xd,'ror#24')",
++	 "&eor	($xd_,@x[$a3],$xd_,'ror#24')",
 +
-+	"&add	(@x[$a0],@x[$b0])",
-+	"&xor	(@x[$d0],@x[$a0])",
-+	"&rol	(@x[$d0],8)",
-+	 "&add	(@x[$a1],@x[$b1])",
-+	 "&xor	(@x[$d1],@x[$a1])",
-+	 "&rol	(@x[$d1],8)",
++	"&add	($xc,$xc,$xd,'ror#16')",
++	 "&add	($xc_,$xc_,$xd_,'ror#16')",
++	"&eor	(@x[$b2],$xc, @x[$b2],'ror#13')",
++	 "&eor	(@x[$b3],$xc_,@x[$b3],'ror#13')",
 +
-+	"&add	($xc,@x[$d0])",
-+	"&xor	(@x[$b0],$xc)",
-+	"&rol	(@x[$b0],7)",
-+	 "&add	($xc_,@x[$d1])",
-+	 "&xor	(@x[$b1],$xc_)",
-+	 "&rol	(@x[$b1],7)",
++	"&add	(@x[$a2],@x[$a2],@x[$b2],'ror#20')",
++	 "&add	(@x[$a3],@x[$a3],@x[$b3],'ror#20')",
++	"&eor	($xd,@x[$a2],$xd,'ror#16')",
++	 "&eor	($xd_,@x[$a3],$xd_,'ror#16')",
 +
-+	"&mov	(\"4*$c0(%rsp)\",$xc)",	# reload pair of 'c's
-+	 "&mov	(\"4*$c1(%rsp)\",$xc_)",
-+	"&mov	($xc,\"4*$c2(%rsp)\")",
-+	 "&mov	($xc_,\"4*$c3(%rsp)\")",
++	"&add	($xc,$xc,$xd,'ror#24')",
++	 "&add	($xc_,$xc_,$xd_,'ror#24')",
++	"&eor	(@x[$b2],@x[$b2],$xc,'ror#12')",
++	 "&eor	(@x[$b3],@x[$b3],$xc_,'ror#12')"	);
 +
-+	"&add	(@x[$a2],@x[$b2])",	# Q3
-+	"&xor	(@x[$d2],@x[$a2])",
-+	"&rol	(@x[$d2],16)",
-+	 "&add	(@x[$a3],@x[$b3])",	# Q4
-+	 "&xor	(@x[$d3],@x[$a3])",
-+	 "&rol	(@x[$d3],16)",
-+
-+	"&add	($xc,@x[$d2])",
-+	"&xor	(@x[$b2],$xc)",
-+	"&rol	(@x[$b2],12)",
-+	 "&add	($xc_,@x[$d3])",
-+	 "&xor	(@x[$b3],$xc_)",
-+	 "&rol	(@x[$b3],12)",
-+
-+	"&add	(@x[$a2],@x[$b2])",
-+	"&xor	(@x[$d2],@x[$a2])",
-+	"&rol	(@x[$d2],8)",
-+	 "&add	(@x[$a3],@x[$b3])",
-+	 "&xor	(@x[$d3],@x[$a3])",
-+	 "&rol	(@x[$d3],8)",
-+
-+	"&add	($xc,@x[$d2])",
-+	"&xor	(@x[$b2],$xc)",
-+	"&rol	(@x[$b2],7)",
-+	 "&add	($xc_,@x[$d3])",
-+	 "&xor	(@x[$b3],$xc_)",
-+	 "&rol	(@x[$b3],7)"
-+	);
++	@ret;
 +}
 +
-+########################################################################
-+# Generic code path that handles all lengths on pre-SSSE3 processors.
-+if(!$kernel) {
-+&declare_function("chacha20_ctr32", 64, 5);
 +$code.=<<___;
-+.cfi_startproc
-+	cmp	\$0,$len
-+	je	.Lno_data
-+	mov	OPENSSL_ia32cap_P+4(%rip),%r9
-+___
-+$code.=<<___	if ($avx>2);
-+	bt	\$48,%r9		# check for AVX512F
-+	jc	.Lchacha20_avx512
-+	test	%r9,%r9		# check for AVX512VL
-+	js	.Lchacha20_avx512vl
-+___
-+$code.=<<___;
-+	test	\$`1<<(41-32)`,%r9d
-+	jnz	.Lchacha20_ssse3
-+___
-+$code.=<<___;
-+	push	%rbx
-+.cfi_push	%rbx
-+	push	%rbp
-+.cfi_push	%rbp
-+	push	%r12
-+.cfi_push	%r12
-+	push	%r13
-+.cfi_push	%r13
-+	push	%r14
-+.cfi_push	%r14
-+	push	%r15
-+.cfi_push	%r15
-+	sub	\$64+24,%rsp
-+.cfi_adjust_cfa_offset	64+24
-+.Lctr32_body:
++#ifndef __KERNEL__
++# include "arm_arch.h"
++#else
++# define __ARM_ARCH__ __LINUX_ARM_ARCH__
++# define __ARM_MAX_ARCH__ __LINUX_ARM_ARCH__
++# define ChaCha20_ctr32 chacha20_arm_cryptogams
++# define ChaCha20_neon  chacha20_neon
++#endif
 +
-+	#movdqa	.Lsigma(%rip),%xmm0
-+	movdqu	($key),%xmm1
-+	movdqu	16($key),%xmm2
-+	movdqu	($counter),%xmm3
-+	movdqa	.Lone(%rip),%xmm4
++.text
++#if defined(__thumb2__) || defined(__clang__)
++.syntax	unified
++# define ldrhsb	ldrbhs
++#endif
++#if defined(__thumb2__)
++.thumb
++#else
++.code	32
++#endif
 +
-+	#movdqa	%xmm0,4*0(%rsp)		# key[0]
-+	movdqa	%xmm1,4*4(%rsp)		# key[1]
-+	movdqa	%xmm2,4*8(%rsp)		# key[2]
-+	movdqa	%xmm3,4*12(%rsp)	# key[3]
-+	mov	$len,%rbp		# reassign $len
-+	jmp	.Loop_outer
++.align	5
++.Lsigma:
++.long	0x61707865,0x3320646e,0x79622d32,0x6b206574	@ endian-neutral
++.Lone:
++.long	1,0,0,0
++.Lrot8:
++.long	0x02010003,0x06050407
++#if __ARM_MAX_ARCH__>=7 && !defined(__KERNEL__)
++.LOPENSSL_armcap:
++.word   OPENSSL_armcap_P-.LChaCha20_ctr32
++#else
++.word	-1
++#endif
 +
-+.align	32
++.globl	ChaCha20_ctr32
++.type	ChaCha20_ctr32,%function
++.align	5
++ChaCha20_ctr32:
++.LChaCha20_ctr32:
++	ldr	r12,[sp,#0]		@ pull pointer to counter and nonce
++	stmdb	sp!,{r0-r2,r4-r11,lr}
++#if __ARM_ARCH__<7 && !defined(__thumb2__)
++	sub	r14,pc,#16		@ ChaCha20_ctr32
++#else
++	adr	r14,.LChaCha20_ctr32
++#endif
++	cmp	r2,#0			@ len==0?
++#ifdef	__thumb2__
++	itt	eq
++#endif
++	addeq	sp,sp,#4*3
++	beq	.Lno_data
++#if __ARM_MAX_ARCH__>=7 && !defined(__KERNEL__)
++	cmp	r2,#192			@ test len
++	bls	.Lshort
++	ldr	r4,[r14,#-24]
++	ldr	r4,[r14,r4]
++# ifdef	__APPLE__
++	ldr	r4,[r4]
++# endif
++	tst	r4,#ARMV7_NEON
++	bne	.LChaCha20_neon
++.Lshort:
++#endif
++	ldmia	r12,{r4-r7}		@ load counter and nonce
++	sub	sp,sp,#4*(16)		@ off-load area
++	sub	r14,r14,#64		@ .Lsigma
++	stmdb	sp!,{r4-r7}		@ copy counter and nonce
++	ldmia	r3,{r4-r11}		@ load key
++	ldmia	r14,{r0-r3}		@ load sigma
++	stmdb	sp!,{r4-r11}		@ copy key
++	stmdb	sp!,{r0-r3}		@ copy sigma
++	str	r10,[sp,#4*(16+10)]	@ off-load "@x[10]"
++	str	r11,[sp,#4*(16+11)]	@ off-load "@x[11]"
++	b	.Loop_outer_enter
++
++.align	4
 +.Loop_outer:
-+	mov	\$0x61707865,@x[0]      # 'expa'
-+	mov	\$0x3320646e,@x[1]      # 'nd 3'
-+	mov	\$0x79622d32,@x[2]      # '2-by'
-+	mov	\$0x6b206574,@x[3]      # 'te k'
-+	mov	4*4(%rsp),@x[4]
-+	mov	4*5(%rsp),@x[5]
-+	mov	4*6(%rsp),@x[6]
-+	mov	4*7(%rsp),@x[7]
-+	movd	%xmm3,@x[12]
-+	mov	4*13(%rsp),@x[13]
-+	mov	4*14(%rsp),@x[14]
-+	mov	4*15(%rsp),@x[15]
++	ldmia	sp,{r0-r9}		@ load key material
++	str	@t[3],[sp,#4*(32+2)]	@ save len
++	str	r12,  [sp,#4*(32+1)]	@ save inp
++	str	r14,  [sp,#4*(32+0)]	@ save out
++.Loop_outer_enter:
++	ldr	@t[3], [sp,#4*(15)]
++	 mov	@x[4],@x[4],ror#19	@ twist b[0..3]
++	ldr	@x[12],[sp,#4*(12)]	@ modulo-scheduled load
++	 mov	@x[5],@x[5],ror#19
++	ldr	@t[2], [sp,#4*(13)]
++	 mov	@x[6],@x[6],ror#19
++	ldr	@x[14],[sp,#4*(14)]
++	 mov	@x[7],@x[7],ror#19
++	mov	@t[3],@t[3],ror#8	@ twist d[0..3]
++	mov	@x[12],@x[12],ror#8
++	mov	@t[2],@t[2],ror#8
++	mov	@x[14],@x[14],ror#8
++	str	@t[3], [sp,#4*(16+15)]
++	mov	@t[3],#10
++	b	.Loop
 +
-+	mov	%rbp,64+0(%rsp)		# save len
-+	mov	\$10,%ebp
-+	mov	$inp,64+8(%rsp)		# save inp
-+	movq	%xmm2,%rsi		# "@x[8]"
-+	mov	$out,64+16(%rsp)	# save out
-+	mov	%rsi,%rdi
-+	shr	\$32,%rdi		# "@x[9]"
-+	jmp	.Loop
-+
-+.align	32
++.align	4
 +.Loop:
++	subs	@t[3],@t[3],#1
 +___
-+	foreach (&ROUND (0, 4, 8,12)) { eval; }
-+	foreach (&ROUND	(0, 5,10,15)) { eval; }
-+	&dec	("%ebp");
-+	&jnz	(".Loop");
-+
++	foreach (&ROUND(0, 4, 8,12)) { eval; }
++	foreach (&ROUND(0, 5,10,15)) { eval; }
 +$code.=<<___;
-+	mov	@t[1],4*9(%rsp)		# modulo-scheduled
-+	mov	@t[0],4*8(%rsp)
-+	mov	64(%rsp),%rbp		# load len
-+	movdqa	%xmm2,%xmm1
-+	mov	64+8(%rsp),$inp		# load inp
-+	paddd	%xmm4,%xmm3		# increment counter
-+	mov	64+16(%rsp),$out	# load out
++	bne	.Loop
 +
-+	add	\$0x61707865,@x[0]      # 'expa'
-+	add	\$0x3320646e,@x[1]      # 'nd 3'
-+	add	\$0x79622d32,@x[2]      # '2-by'
-+	add	\$0x6b206574,@x[3]      # 'te k'
-+	add	4*4(%rsp),@x[4]
-+	add	4*5(%rsp),@x[5]
-+	add	4*6(%rsp),@x[6]
-+	add	4*7(%rsp),@x[7]
-+	add	4*12(%rsp),@x[12]
-+	add	4*13(%rsp),@x[13]
-+	add	4*14(%rsp),@x[14]
-+	add	4*15(%rsp),@x[15]
-+	paddd	4*8(%rsp),%xmm1
++	ldr	@t[3],[sp,#4*(32+2)]	@ load len
 +
-+	cmp	\$64,%rbp
-+	jb	.Ltail
++	str	@t[0], [sp,#4*(16+8)]	@ modulo-scheduled store
++	str	@t[1], [sp,#4*(16+9)]
++	str	@x[12],[sp,#4*(16+12)]
++	str	@t[2], [sp,#4*(16+13)]
++	str	@x[14],[sp,#4*(16+14)]
 +
-+	xor	4*0($inp),@x[0]		# xor with input
-+	xor	4*1($inp),@x[1]
-+	xor	4*2($inp),@x[2]
-+	xor	4*3($inp),@x[3]
-+	xor	4*4($inp),@x[4]
-+	xor	4*5($inp),@x[5]
-+	xor	4*6($inp),@x[6]
-+	xor	4*7($inp),@x[7]
-+	movdqu	4*8($inp),%xmm0
-+	xor	4*12($inp),@x[12]
-+	xor	4*13($inp),@x[13]
-+	xor	4*14($inp),@x[14]
-+	xor	4*15($inp),@x[15]
-+	lea	4*16($inp),$inp		# inp+=64
-+	pxor	%xmm1,%xmm0
++	@ at this point we have first half of 512-bit result in
++	@ @x[0-7] and second half at sp+4*(16+8)
 +
-+	movdqa	%xmm2,4*8(%rsp)
-+	movd	%xmm3,4*12(%rsp)
++	cmp	@t[3],#64		@ done yet?
++#ifdef	__thumb2__
++	itete	lo
++#endif
++	addlo	r12,sp,#4*(0)		@ shortcut or ...
++	ldrhs	r12,[sp,#4*(32+1)]	@ ... load inp
++	addlo	r14,sp,#4*(0)		@ shortcut or ...
++	ldrhs	r14,[sp,#4*(32+0)]	@ ... load out
 +
-+	mov	@x[0],4*0($out)		# write output
-+	mov	@x[1],4*1($out)
-+	mov	@x[2],4*2($out)
-+	mov	@x[3],4*3($out)
-+	mov	@x[4],4*4($out)
-+	mov	@x[5],4*5($out)
-+	mov	@x[6],4*6($out)
-+	mov	@x[7],4*7($out)
-+	movdqu	%xmm0,4*8($out)
-+	mov	@x[12],4*12($out)
-+	mov	@x[13],4*13($out)
-+	mov	@x[14],4*14($out)
-+	mov	@x[15],4*15($out)
-+	lea	4*16($out),$out		# out+=64
++	ldr	@t[0],[sp,#4*(0)]	@ load key material
++	ldr	@t[1],[sp,#4*(1)]
 +
-+	sub	\$64,%rbp
-+	jnz	.Loop_outer
++#if __ARM_ARCH__>=6 || !defined(__ARMEB__)
++# if __ARM_ARCH__<7
++	orr	@t[2],r12,r14
++	tst	@t[2],#3		@ are input and output aligned?
++	ldr	@t[2],[sp,#4*(2)]
++	bne	.Lunaligned
++	cmp	@t[3],#64		@ restore flags
++# else
++	ldr	@t[2],[sp,#4*(2)]
++# endif
++	ldr	@t[3],[sp,#4*(3)]
 +
-+	jmp	.Ldone
++	add	@x[0],@x[0],@t[0]	@ accumulate key material
++	add	@x[1],@x[1],@t[1]
++# ifdef	__thumb2__
++	itt	hs
++# endif
++	ldrhs	@t[0],[r12],#16		@ load input
++	ldrhs	@t[1],[r12,#-12]
 +
-+.align	16
++	add	@x[2],@x[2],@t[2]
++	add	@x[3],@x[3],@t[3]
++# ifdef	__thumb2__
++	itt	hs
++# endif
++	ldrhs	@t[2],[r12,#-8]
++	ldrhs	@t[3],[r12,#-4]
++# if __ARM_ARCH__>=6 && defined(__ARMEB__)
++	rev	@x[0],@x[0]
++	rev	@x[1],@x[1]
++	rev	@x[2],@x[2]
++	rev	@x[3],@x[3]
++# endif
++# ifdef	__thumb2__
++	itt	hs
++# endif
++	eorhs	@x[0],@x[0],@t[0]	@ xor with input
++	eorhs	@x[1],@x[1],@t[1]
++	 add	@t[0],sp,#4*(4)
++	str	@x[0],[r14],#16		@ store output
++# ifdef	__thumb2__
++	itt	hs
++# endif
++	eorhs	@x[2],@x[2],@t[2]
++	eorhs	@x[3],@x[3],@t[3]
++	 ldmia	@t[0],{@t[0]-@t[3]}	@ load key material
++	str	@x[1],[r14,#-12]
++	str	@x[2],[r14,#-8]
++	str	@x[3],[r14,#-4]
++
++	add	@x[4],@t[0],@x[4],ror#13 @ accumulate key material
++	add	@x[5],@t[1],@x[5],ror#13
++# ifdef	__thumb2__
++	itt	hs
++# endif
++	ldrhs	@t[0],[r12],#16		@ load input
++	ldrhs	@t[1],[r12,#-12]
++	add	@x[6],@t[2],@x[6],ror#13
++	add	@x[7],@t[3],@x[7],ror#13
++# ifdef	__thumb2__
++	itt	hs
++# endif
++	ldrhs	@t[2],[r12,#-8]
++	ldrhs	@t[3],[r12,#-4]
++# if __ARM_ARCH__>=6 && defined(__ARMEB__)
++	rev	@x[4],@x[4]
++	rev	@x[5],@x[5]
++	rev	@x[6],@x[6]
++	rev	@x[7],@x[7]
++# endif
++# ifdef	__thumb2__
++	itt	hs
++# endif
++	eorhs	@x[4],@x[4],@t[0]
++	eorhs	@x[5],@x[5],@t[1]
++	 add	@t[0],sp,#4*(8)
++	str	@x[4],[r14],#16		@ store output
++# ifdef	__thumb2__
++	itt	hs
++# endif
++	eorhs	@x[6],@x[6],@t[2]
++	eorhs	@x[7],@x[7],@t[3]
++	str	@x[5],[r14,#-12]
++	 ldmia	@t[0],{@t[0]-@t[3]}	@ load key material
++	str	@x[6],[r14,#-8]
++	 add	@x[0],sp,#4*(16+8)
++	str	@x[7],[r14,#-4]
++
++	ldmia	@x[0],{@x[0]-@x[7]}	@ load second half
++
++	add	@x[0],@x[0],@t[0]	@ accumulate key material
++	add	@x[1],@x[1],@t[1]
++# ifdef	__thumb2__
++	itt	hs
++# endif
++	ldrhs	@t[0],[r12],#16		@ load input
++	ldrhs	@t[1],[r12,#-12]
++# ifdef	__thumb2__
++	itt	hi
++# endif
++	 strhi	@t[2],[sp,#4*(16+10)]	@ copy "@x[10]" while at it
++	 strhi	@t[3],[sp,#4*(16+11)]	@ copy "@x[11]" while at it
++	add	@x[2],@x[2],@t[2]
++	add	@x[3],@x[3],@t[3]
++# ifdef	__thumb2__
++	itt	hs
++# endif
++	ldrhs	@t[2],[r12,#-8]
++	ldrhs	@t[3],[r12,#-4]
++# if __ARM_ARCH__>=6 && defined(__ARMEB__)
++	rev	@x[0],@x[0]
++	rev	@x[1],@x[1]
++	rev	@x[2],@x[2]
++	rev	@x[3],@x[3]
++# endif
++# ifdef	__thumb2__
++	itt	hs
++# endif
++	eorhs	@x[0],@x[0],@t[0]
++	eorhs	@x[1],@x[1],@t[1]
++	 add	@t[0],sp,#4*(12)
++	str	@x[0],[r14],#16		@ store output
++# ifdef	__thumb2__
++	itt	hs
++# endif
++	eorhs	@x[2],@x[2],@t[2]
++	eorhs	@x[3],@x[3],@t[3]
++	str	@x[1],[r14,#-12]
++	 ldmia	@t[0],{@t[0]-@t[3]}	@ load key material
++	str	@x[2],[r14,#-8]
++	str	@x[3],[r14,#-4]
++
++	add	@x[4],@t[0],@x[4],ror#24 @ accumulate key material
++	add	@x[5],@t[1],@x[5],ror#24
++# ifdef	__thumb2__
++	itt	hi
++# endif
++	 addhi	@t[0],@t[0],#1		@ next counter value
++	 strhi	@t[0],[sp,#4*(12)]	@ save next counter value
++# ifdef	__thumb2__
++	itt	hs
++# endif
++	ldrhs	@t[0],[r12],#16		@ load input
++	ldrhs	@t[1],[r12,#-12]
++	add	@x[6],@t[2],@x[6],ror#24
++	add	@x[7],@t[3],@x[7],ror#24
++# ifdef	__thumb2__
++	itt	hs
++# endif
++	ldrhs	@t[2],[r12,#-8]
++	ldrhs	@t[3],[r12,#-4]
++# if __ARM_ARCH__>=6 && defined(__ARMEB__)
++	rev	@x[4],@x[4]
++	rev	@x[5],@x[5]
++	rev	@x[6],@x[6]
++	rev	@x[7],@x[7]
++# endif
++# ifdef	__thumb2__
++	itt	hs
++# endif
++	eorhs	@x[4],@x[4],@t[0]
++	eorhs	@x[5],@x[5],@t[1]
++# ifdef	__thumb2__
++	 it	ne
++# endif
++	 ldrne	@t[0],[sp,#4*(32+2)]	@ re-load len
++# ifdef	__thumb2__
++	itt	hs
++# endif
++	eorhs	@x[6],@x[6],@t[2]
++	eorhs	@x[7],@x[7],@t[3]
++	str	@x[4],[r14],#16		@ store output
++	str	@x[5],[r14,#-12]
++# ifdef	__thumb2__
++	it	hs
++# endif
++	 subhs	@t[3],@t[0],#64		@ len-=64
++	str	@x[6],[r14,#-8]
++	str	@x[7],[r14,#-4]
++	bhi	.Loop_outer
++
++	beq	.Ldone
++# if __ARM_ARCH__<7
++	b	.Ltail
++
++.align	4
++.Lunaligned:				@ unaligned endian-neutral path
++	cmp	@t[3],#64		@ restore flags
++# endif
++#endif
++#if __ARM_ARCH__<7
++	ldr	@t[3],[sp,#4*(3)]
++___
++for ($i=0;$i<16;$i+=4) {
++my $j=$i&0x7;
++my $twist="";
++if ($i==4)     { $twist = ",ror#13"; }
++elsif ($i==12) { $twist = ",ror#24"; }
++
++$code.=<<___	if ($i==4);
++	add	@x[0],sp,#4*(16+8)
++___
++$code.=<<___	if ($i==8);
++	ldmia	@x[0],{@x[0]-@x[7]}		@ load second half
++# ifdef	__thumb2__
++	itt	hi
++# endif
++	strhi	@t[2],[sp,#4*(16+10)]		@ copy "@x[10]"
++	strhi	@t[3],[sp,#4*(16+11)]		@ copy "@x[11]"
++___
++$code.=<<___;
++	add	@x[$j+0],@t[0],@x[$j+0]$twist	@ accumulate key material
++___
++$code.=<<___	if ($i==12);
++# ifdef	__thumb2__
++	itt	hi
++# endif
++	addhi	@t[0],@t[0],#1			@ next counter value
++	strhi	@t[0],[sp,#4*(12)]		@ save next counter value
++___
++$code.=<<___;
++	add	@x[$j+1],@t[1],@x[$j+1]$twist
++	add	@x[$j+2],@t[2],@x[$j+2]$twist
++# ifdef	__thumb2__
++	itete	lo
++# endif
++	eorlo	@t[0],@t[0],@t[0]		@ zero or ...
++	ldrhsb	@t[0],[r12],#16			@ ... load input
++	eorlo	@t[1],@t[1],@t[1]
++	ldrhsb	@t[1],[r12,#-12]
++
++	add	@x[$j+3],@t[3],@x[$j+3]$twist
++# ifdef	__thumb2__
++	itete	lo
++# endif
++	eorlo	@t[2],@t[2],@t[2]
++	ldrhsb	@t[2],[r12,#-8]
++	eorlo	@t[3],@t[3],@t[3]
++	ldrhsb	@t[3],[r12,#-4]
++
++	eor	@x[$j+0],@t[0],@x[$j+0]		@ xor with input (or zero)
++	eor	@x[$j+1],@t[1],@x[$j+1]
++# ifdef	__thumb2__
++	itt	hs
++# endif
++	ldrhsb	@t[0],[r12,#-15]		@ load more input
++	ldrhsb	@t[1],[r12,#-11]
++	eor	@x[$j+2],@t[2],@x[$j+2]
++	 strb	@x[$j+0],[r14],#16		@ store output
++	eor	@x[$j+3],@t[3],@x[$j+3]
++# ifdef	__thumb2__
++	itt	hs
++# endif
++	ldrhsb	@t[2],[r12,#-7]
++	ldrhsb	@t[3],[r12,#-3]
++	 strb	@x[$j+1],[r14,#-12]
++	eor	@x[$j+0],@t[0],@x[$j+0],lsr#8
++	 strb	@x[$j+2],[r14,#-8]
++	eor	@x[$j+1],@t[1],@x[$j+1],lsr#8
++# ifdef	__thumb2__
++	itt	hs
++# endif
++	ldrhsb	@t[0],[r12,#-14]		@ load more input
++	ldrhsb	@t[1],[r12,#-10]
++	 strb	@x[$j+3],[r14,#-4]
++	eor	@x[$j+2],@t[2],@x[$j+2],lsr#8
++	 strb	@x[$j+0],[r14,#-15]
++	eor	@x[$j+3],@t[3],@x[$j+3],lsr#8
++# ifdef	__thumb2__
++	itt	hs
++# endif
++	ldrhsb	@t[2],[r12,#-6]
++	ldrhsb	@t[3],[r12,#-2]
++	 strb	@x[$j+1],[r14,#-11]
++	eor	@x[$j+0],@t[0],@x[$j+0],lsr#8
++	 strb	@x[$j+2],[r14,#-7]
++	eor	@x[$j+1],@t[1],@x[$j+1],lsr#8
++# ifdef	__thumb2__
++	itt	hs
++# endif
++	ldrhsb	@t[0],[r12,#-13]		@ load more input
++	ldrhsb	@t[1],[r12,#-9]
++	 strb	@x[$j+3],[r14,#-3]
++	eor	@x[$j+2],@t[2],@x[$j+2],lsr#8
++	 strb	@x[$j+0],[r14,#-14]
++	eor	@x[$j+3],@t[3],@x[$j+3],lsr#8
++# ifdef	__thumb2__
++	itt	hs
++# endif
++	ldrhsb	@t[2],[r12,#-5]
++	ldrhsb	@t[3],[r12,#-1]
++	 strb	@x[$j+1],[r14,#-10]
++	 strb	@x[$j+2],[r14,#-6]
++	eor	@x[$j+0],@t[0],@x[$j+0],lsr#8
++	 strb	@x[$j+3],[r14,#-2]
++	eor	@x[$j+1],@t[1],@x[$j+1],lsr#8
++	 strb	@x[$j+0],[r14,#-13]
++	eor	@x[$j+2],@t[2],@x[$j+2],lsr#8
++	 strb	@x[$j+1],[r14,#-9]
++	eor	@x[$j+3],@t[3],@x[$j+3],lsr#8
++	 strb	@x[$j+2],[r14,#-5]
++	 strb	@x[$j+3],[r14,#-1]
++___
++$code.=<<___	if ($i<12);
++	add	@t[0],sp,#4*(4+$i)
++	ldmia	@t[0],{@t[0]-@t[3]}		@ load key material
++___
++}
++$code.=<<___;
++# ifdef	__thumb2__
++	it	ne
++# endif
++	ldrne	@t[0],[sp,#4*(32+2)]		@ re-load len
++# ifdef	__thumb2__
++	it	hs
++# endif
++	subhs	@t[3],@t[0],#64			@ len-=64
++	bhi	.Loop_outer
++
++	beq	.Ldone
++#endif
++
 +.Ltail:
-+	mov	@x[0],4*0(%rsp)
-+	mov	@x[1],4*1(%rsp)
-+	xor	%rbx,%rbx
-+	mov	@x[2],4*2(%rsp)
-+	mov	@x[3],4*3(%rsp)
-+	mov	@x[4],4*4(%rsp)
-+	mov	@x[5],4*5(%rsp)
-+	mov	@x[6],4*6(%rsp)
-+	mov	@x[7],4*7(%rsp)
-+	movdqa	%xmm1,4*8(%rsp)
-+	mov	@x[12],4*12(%rsp)
-+	mov	@x[13],4*13(%rsp)
-+	mov	@x[14],4*14(%rsp)
-+	mov	@x[15],4*15(%rsp)
++	ldr	r12,[sp,#4*(32+1)]	@ load inp
++	add	@t[1],sp,#4*(0)
++	ldr	r14,[sp,#4*(32+0)]	@ load out
 +
 +.Loop_tail:
-+	movzb	($inp,%rbx),%eax
-+	movzb	(%rsp,%rbx),%edx
-+	lea	1(%rbx),%rbx
-+	xor	%edx,%eax
-+	mov	%al,-1($out,%rbx)
-+	dec	%rbp
-+	jnz	.Loop_tail
++	ldrb	@t[2],[@t[1]],#1	@ read buffer on stack
++	ldrb	@t[3],[r12],#1		@ read input
++	subs	@t[0],@t[0],#1
++	eor	@t[3],@t[3],@t[2]
++	strb	@t[3],[r14],#1		@ store output
++	bne	.Loop_tail
 +
 +.Ldone:
-+	add	\$64+24,%rsp
-+.cfi_adjust_cfa_offset	-64-24
-+	pop			%r15
-+.cfi_restore	%r15
-+	pop			%r14
-+.cfi_restore	%r14
-+	pop			%r13
-+.cfi_restore	%r13
-+	pop			%r12
-+.cfi_restore	%r12
-+	pop			%rbp
-+.cfi_restore	%rbp
-+	pop			%rbx
-+.cfi_restore	%rbx
++	add	sp,sp,#4*(32+3)
 +.Lno_data:
-+	ret
-+.cfi_endproc
++#if __ARM_ARCH__>=5
++	ldmia	sp!,{r4-r11,pc}
++#else
++	ldmia	sp!,{r4-r12,lr}
++	tst	lr,#1
++	moveq	pc,lr			@ be binary compatible with V4, yet
++	.long	0xe12fff1e		@ interoperable with Thumb ISA:-)
++#endif
++.size	ChaCha20_ctr32,.-ChaCha20_ctr32
 +___
-+&end_function("chacha20_ctr32");
++
++{{{
++my ($a0,$b0,$c0,$d0,$a1,$b1,$c1,$d1,$a2,$b2,$c2,$d2,$t0,$t1,$t2,$t3) =
++    map("q$_",(0..15));
++
++# This can replace vshr-by-24+vsli-by-8. It gives ~3% improvement on
++# Cortex-A5/A7, but hurts Cortex-A9 by 5% and Snapdragon S4 by 14%!
++sub vperm()
++{ my ($dst,$src,$tbl) = @_;
++    $code .= "	vtbl.8	$dst#lo,{$src#lo},$tbl#lo\n";
++    $code .= "	vtbl.8	$dst#hi,{$src#hi},$tbl#lo\n";
 +}
 +
-+########################################################################
-+# SSSE3 code path that handles shorter lengths
-+{
-+my ($a,$b,$c,$d,$t,$t1,$rot16,$rot24)=map("%xmm$_",(0..7));
-+
-+sub SSSE3ROUND {	# critical path is 20 "SIMD ticks" per round
-+	&paddd	($a,$b);
-+	&pxor	($d,$a);
-+	&pshufb	($d,$rot16);
-+
-+	&paddd	($c,$d);
-+	&pxor	($b,$c);
-+	&movdqa	($t,$b);
-+	&psrld	($b,20);
-+	&pslld	($t,12);
-+	&por	($b,$t);
-+
-+	&paddd	($a,$b);
-+	&pxor	($d,$a);
-+	&pshufb	($d,$rot24);
-+
-+	&paddd	($c,$d);
-+	&pxor	($b,$c);
-+	&movdqa	($t,$b);
-+	&psrld	($b,25);
-+	&pslld	($t,7);
-+	&por	($b,$t);
-+}
-+
-+my $xframe = $win64 ? 32+8 : 8;
-+
-+if($kernel) {
-+	$code .= "#ifdef CONFIG_AS_SSSE3\n";
-+}
-+
-+if($kernel) {
-+&declare_function("hchacha20_ssse3", 32, 5);
-+$code.=<<___;
-+	movdqa	.Lsigma(%rip),$a
-+	movdqu	($len),$b
-+	movdqu	16($len),$c
-+	movdqu	($inp),$d
-+	# This code is only used when targeting kernel.
-+	# If targeting win64, xmm{6,7} preserving needs to be added.
-+	movdqa	.Lrot16(%rip),$rot16
-+	movdqa	.Lrot24(%rip),$rot24
-+	mov	\$10,$counter		# reuse $counter
-+	jmp	1f
-+.align	32
-+1:
-+___
-+	&SSSE3ROUND();
-+	&pshufd	($c,$c,0b01001110);
-+	&pshufd	($b,$b,0b00111001);
-+	&pshufd	($d,$d,0b10010011);
-+	&nop	();
-+
-+	&SSSE3ROUND();
-+	&pshufd	($c,$c,0b01001110);
-+	&pshufd	($b,$b,0b10010011);
-+	&pshufd	($d,$d,0b00111001);
-+
-+	&dec	($counter);
-+	&jnz	("1b");
-+
-+$code.=<<___;
-+	movdqu $a, ($out)
-+	movdqu $d, 16($out)
-+	ret
-+___
-+&end_function("hchacha20_ssse3");
-+}
-+
-+&declare_function("chacha20_ssse3", 32, 5);
-+$code.=<<___;
-+.cfi_startproc
-+	lea	8(%rsp),%r10		# frame pointer
-+.cfi_def_cfa_register	%r10
-+___
-+$code.=<<___	if ($avx && !$kernel);
-+	test	\$`1<<(43-32)`,%r10d
-+	jnz	.Lchacha20_4xop		# XOP is fastest even if we use 1/4
-+___
-+$code.=<<___;
-+	cmp	\$128,$len		# we might throw away some data,
-+	je	.Lchacha20_128
-+	ja	.Lchacha20_4x		# but overall it won't be slower
-+
-+.Ldo_ssse3_after_all:
-+	sub	\$64+$xframe,%rsp
-+	and \$-16,%rsp
-+___
-+$code.=<<___	if ($win64);
-+	movaps	%xmm6,-0x30(%r10)
-+	movaps	%xmm7,-0x20(%r10)
-+.Lssse3_body:
-+___
-+$code.=<<___;
-+	movdqa	.Lsigma(%rip),$a
-+	movdqu	($key),$b
-+	movdqu	16($key),$c
-+	movdqu	($counter),$d
-+	movdqa	.Lrot16(%rip),$rot16
-+	movdqa	.Lrot24(%rip),$rot24
-+
-+	movdqa	$a,0x00(%rsp)
-+	movdqa	$b,0x10(%rsp)
-+	movdqa	$c,0x20(%rsp)
-+	movdqa	$d,0x30(%rsp)
-+	mov	\$10,$counter		# reuse $counter
-+	jmp	.Loop_ssse3
-+
-+.align	32
-+.Loop_outer_ssse3:
-+	movdqa	.Lone(%rip),$d
-+	movdqa	0x00(%rsp),$a
-+	movdqa	0x10(%rsp),$b
-+	movdqa	0x20(%rsp),$c
-+	paddd	0x30(%rsp),$d
-+	mov	\$10,$counter
-+	movdqa	$d,0x30(%rsp)
-+	jmp	.Loop_ssse3
-+
-+.align	32
-+.Loop_ssse3:
-+___
-+	&SSSE3ROUND();
-+	&pshufd	($c,$c,0b01001110);
-+	&pshufd	($b,$b,0b00111001);
-+	&pshufd	($d,$d,0b10010011);
-+	&nop	();
-+
-+	&SSSE3ROUND();
-+	&pshufd	($c,$c,0b01001110);
-+	&pshufd	($b,$b,0b10010011);
-+	&pshufd	($d,$d,0b00111001);
-+
-+	&dec	($counter);
-+	&jnz	(".Loop_ssse3");
-+
-+$code.=<<___;
-+	paddd	0x00(%rsp),$a
-+	paddd	0x10(%rsp),$b
-+	paddd	0x20(%rsp),$c
-+	paddd	0x30(%rsp),$d
-+
-+	cmp	\$64,$len
-+	jb	.Ltail_ssse3
-+
-+	movdqu	0x00($inp),$t
-+	movdqu	0x10($inp),$t1
-+	pxor	$t,$a			# xor with input
-+	movdqu	0x20($inp),$t
-+	pxor	$t1,$b
-+	movdqu	0x30($inp),$t1
-+	lea	0x40($inp),$inp		# inp+=64
-+	pxor	$t,$c
-+	pxor	$t1,$d
-+
-+	movdqu	$a,0x00($out)		# write output
-+	movdqu	$b,0x10($out)
-+	movdqu	$c,0x20($out)
-+	movdqu	$d,0x30($out)
-+	lea	0x40($out),$out		# out+=64
-+
-+	sub	\$64,$len
-+	jnz	.Loop_outer_ssse3
-+
-+	jmp	.Ldone_ssse3
-+
-+.align	16
-+.Ltail_ssse3:
-+	movdqa	$a,0x00(%rsp)
-+	movdqa	$b,0x10(%rsp)
-+	movdqa	$c,0x20(%rsp)
-+	movdqa	$d,0x30(%rsp)
-+	xor	$counter,$counter
-+
-+.Loop_tail_ssse3:
-+	movzb	($inp,$counter),%eax
-+	movzb	(%rsp,$counter),%ecx
-+	lea	1($counter),$counter
-+	xor	%ecx,%eax
-+	mov	%al,-1($out,$counter)
-+	dec	$len
-+	jnz	.Loop_tail_ssse3
-+
-+.Ldone_ssse3:
-+___
-+$code.=<<___	if ($win64);
-+	movaps	-0x30(%r10),%xmm6
-+	movaps	-0x20(%r10),%xmm7
-+___
-+$code.=<<___;
-+	lea	-8(%r10),%rsp
-+.cfi_def_cfa_register	%rsp
-+.Lssse3_epilogue:
-+	ret
-+.cfi_endproc
-+___
-+}
-+&end_function("chacha20_ssse3");
-+
-+########################################################################
-+# SSSE3 code path that handles 128-byte inputs
-+{
-+my ($a,$b,$c,$d,$t,$t1,$rot16,$rot24)=map("%xmm$_",(8,9,2..7));
-+my ($a1,$b1,$c1,$d1)=map("%xmm$_",(10,11,0,1));
-+
-+sub SSSE3ROUND_2x {
-+	&paddd	($a,$b);
-+	&pxor	($d,$a);
-+	 &paddd	($a1,$b1);
-+	 &pxor	($d1,$a1);
-+	&pshufb	($d,$rot16);
-+	 &pshufb($d1,$rot16);
-+
-+	&paddd	($c,$d);
-+	 &paddd	($c1,$d1);
-+	&pxor	($b,$c);
-+	 &pxor	($b1,$c1);
-+	&movdqa	($t,$b);
-+	&psrld	($b,20);
-+	 &movdqa($t1,$b1);
-+	&pslld	($t,12);
-+	 &psrld	($b1,20);
-+	&por	($b,$t);
-+	 &pslld	($t1,12);
-+	 &por	($b1,$t1);
-+
-+	&paddd	($a,$b);
-+	&pxor	($d,$a);
-+	 &paddd	($a1,$b1);
-+	 &pxor	($d1,$a1);
-+	&pshufb	($d,$rot24);
-+	 &pshufb($d1,$rot24);
-+
-+	&paddd	($c,$d);
-+	 &paddd	($c1,$d1);
-+	&pxor	($b,$c);
-+	 &pxor	($b1,$c1);
-+	&movdqa	($t,$b);
-+	&psrld	($b,25);
-+	 &movdqa($t1,$b1);
-+	&pslld	($t,7);
-+	 &psrld	($b1,25);
-+	&por	($b,$t);
-+	 &pslld	($t1,7);
-+	 &por	($b1,$t1);
-+}
-+
-+my $xframe = $win64 ? 0x68 : 8;
-+
-+$code.=<<___;
-+.type	chacha20_128,\@function,5
-+.align	32
-+chacha20_128:
-+.cfi_startproc
-+.Lchacha20_128:
-+	lea	8(%rsp),%r10		# frame pointer
-+.cfi_def_cfa_register	%r10
-+	sub	\$64+$xframe,%rsp
-+	and \$-16,%rsp
-+___
-+$code.=<<___	if ($win64);
-+	movaps	%xmm6,-0x70(%r10)
-+	movaps	%xmm7,-0x60(%r10)
-+	movaps	%xmm8,-0x50(%r10)
-+	movaps	%xmm9,-0x40(%r10)
-+	movaps	%xmm10,-0x30(%r10)
-+	movaps	%xmm11,-0x20(%r10)
-+.L128_body:
-+___
-+$code.=<<___;
-+	movdqa	.Lsigma(%rip),$a
-+	movdqu	($key),$b
-+	movdqu	16($key),$c
-+	movdqu	($counter),$d
-+	movdqa	.Lone(%rip),$d1
-+	movdqa	.Lrot16(%rip),$rot16
-+	movdqa	.Lrot24(%rip),$rot24
-+
-+	movdqa	$a,$a1
-+	movdqa	$a,0x00(%rsp)
-+	movdqa	$b,$b1
-+	movdqa	$b,0x10(%rsp)
-+	movdqa	$c,$c1
-+	movdqa	$c,0x20(%rsp)
-+	paddd	$d,$d1
-+	movdqa	$d,0x30(%rsp)
-+	mov	\$10,$counter		# reuse $counter
-+	jmp	.Loop_128
-+
-+.align	32
-+.Loop_128:
-+___
-+	&SSSE3ROUND_2x();
-+	&pshufd	($c,$c,0b01001110);
-+	&pshufd	($b,$b,0b00111001);
-+	&pshufd	($d,$d,0b10010011);
-+	&pshufd	($c1,$c1,0b01001110);
-+	&pshufd	($b1,$b1,0b00111001);
-+	&pshufd	($d1,$d1,0b10010011);
-+
-+	&SSSE3ROUND_2x();
-+	&pshufd	($c,$c,0b01001110);
-+	&pshufd	($b,$b,0b10010011);
-+	&pshufd	($d,$d,0b00111001);
-+	&pshufd	($c1,$c1,0b01001110);
-+	&pshufd	($b1,$b1,0b10010011);
-+	&pshufd	($d1,$d1,0b00111001);
-+
-+	&dec	($counter);
-+	&jnz	(".Loop_128");
-+
-+$code.=<<___;
-+	paddd	0x00(%rsp),$a
-+	paddd	0x10(%rsp),$b
-+	paddd	0x20(%rsp),$c
-+	paddd	0x30(%rsp),$d
-+	paddd	.Lone(%rip),$d1
-+	paddd	0x00(%rsp),$a1
-+	paddd	0x10(%rsp),$b1
-+	paddd	0x20(%rsp),$c1
-+	paddd	0x30(%rsp),$d1
-+
-+	movdqu	0x00($inp),$t
-+	movdqu	0x10($inp),$t1
-+	pxor	$t,$a			# xor with input
-+	movdqu	0x20($inp),$t
-+	pxor	$t1,$b
-+	movdqu	0x30($inp),$t1
-+	pxor	$t,$c
-+	movdqu	0x40($inp),$t
-+	pxor	$t1,$d
-+	movdqu	0x50($inp),$t1
-+	pxor	$t,$a1
-+	movdqu	0x60($inp),$t
-+	pxor	$t1,$b1
-+	movdqu	0x70($inp),$t1
-+	pxor	$t,$c1
-+	pxor	$t1,$d1
-+
-+	movdqu	$a,0x00($out)		# write output
-+	movdqu	$b,0x10($out)
-+	movdqu	$c,0x20($out)
-+	movdqu	$d,0x30($out)
-+	movdqu	$a1,0x40($out)
-+	movdqu	$b1,0x50($out)
-+	movdqu	$c1,0x60($out)
-+	movdqu	$d1,0x70($out)
-+___
-+$code.=<<___	if ($win64);
-+	movaps	-0x70(%r10),%xmm6
-+	movaps	-0x60(%r10),%xmm7
-+	movaps	-0x50(%r10),%xmm8
-+	movaps	-0x40(%r10),%xmm9
-+	movaps	-0x30(%r10),%xmm10
-+	movaps	-0x20(%r10),%xmm11
-+___
-+$code.=<<___;
-+	lea	-8(%r10),%rsp
-+.cfi_def_cfa_register	%rsp
-+.L128_epilogue:
-+	ret
-+.cfi_endproc
-+.size	chacha20_128,.-chacha20_128
-+___
-+}
-+
-+########################################################################
-+# SSSE3 code path that handles longer messages.
-+{
-+# assign variables to favor Atom front-end
-+my ($xd0,$xd1,$xd2,$xd3, $xt0,$xt1,$xt2,$xt3,
-+    $xa0,$xa1,$xa2,$xa3, $xb0,$xb1,$xb2,$xb3)=map("%xmm$_",(0..15));
-+my  @xx=($xa0,$xa1,$xa2,$xa3, $xb0,$xb1,$xb2,$xb3,
-+	"%nox","%nox","%nox","%nox", $xd0,$xd1,$xd2,$xd3);
-+
-+sub SSSE3_lane_ROUND {
-+my ($a0,$b0,$c0,$d0)=@_;
-+my ($a1,$b1,$c1,$d1)=map(($_&~3)+(($_+1)&3),($a0,$b0,$c0,$d0));
-+my ($a2,$b2,$c2,$d2)=map(($_&~3)+(($_+1)&3),($a1,$b1,$c1,$d1));
-+my ($a3,$b3,$c3,$d3)=map(($_&~3)+(($_+1)&3),($a2,$b2,$c2,$d2));
-+my ($xc,$xc_,$t0,$t1)=map("\"$_\"",$xt0,$xt1,$xt2,$xt3);
-+my @x=map("\"$_\"",@xx);
-+
-+	# Consider order in which variables are addressed by their
-+	# index:
-+	#
-+	#	a   b   c   d
-+	#
-+	#	0   4   8  12 < even round
-+	#	1   5   9  13
-+	#	2   6  10  14
-+	#	3   7  11  15
-+	#	0   5  10  15 < odd round
-+	#	1   6  11  12
-+	#	2   7   8  13
-+	#	3   4   9  14
-+	#
-+	# 'a', 'b' and 'd's are permanently allocated in registers,
-+	# @x[0..7,12..15], while 'c's are maintained in memory. If
-+	# you observe 'c' column, you'll notice that pair of 'c's is
-+	# invariant between rounds. This means that we have to reload
-+	# them once per round, in the middle. This is why you'll see
-+	# bunch of 'c' stores and loads in the middle, but none in
-+	# the beginning or end.
++sub NEONROUND {
++my $odd = pop;
++my ($a,$b,$c,$d,$t)=@_;
 +
 +	(
-+	"&paddd		(@x[$a0],@x[$b0])",	# Q1
-+	 "&paddd	(@x[$a1],@x[$b1])",	# Q2
-+	"&pxor		(@x[$d0],@x[$a0])",
-+	 "&pxor		(@x[$d1],@x[$a1])",
-+	"&pshufb	(@x[$d0],$t1)",
-+	 "&pshufb	(@x[$d1],$t1)",
++	"&vadd_i32	($a,$a,$b)",
++	"&veor		($d,$d,$a)",
++	"&vrev32_16	($d,$d)",	# vrot ($d,16)
 +
-+	"&paddd		($xc,@x[$d0])",
-+	 "&paddd	($xc_,@x[$d1])",
-+	"&pxor		(@x[$b0],$xc)",
-+	 "&pxor		(@x[$b1],$xc_)",
-+	"&movdqa	($t0,@x[$b0])",
-+	"&pslld		(@x[$b0],12)",
-+	"&psrld		($t0,20)",
-+	 "&movdqa	($t1,@x[$b1])",
-+	 "&pslld	(@x[$b1],12)",
-+	"&por		(@x[$b0],$t0)",
-+	 "&psrld	($t1,20)",
-+	"&movdqa	($t0,'(%r11)')",	# .Lrot24(%rip)
-+	 "&por		(@x[$b1],$t1)",
++	"&vadd_i32	($c,$c,$d)",
++	"&veor		($t,$b,$c)",
++	"&vshr_u32	($b,$t,20)",
++	"&vsli_32	($b,$t,12)",
 +
-+	"&paddd		(@x[$a0],@x[$b0])",
-+	 "&paddd	(@x[$a1],@x[$b1])",
-+	"&pxor		(@x[$d0],@x[$a0])",
-+	 "&pxor		(@x[$d1],@x[$a1])",
-+	"&pshufb	(@x[$d0],$t0)",
-+	 "&pshufb	(@x[$d1],$t0)",
++	"&vadd_i32	($a,$a,$b)",
++	"&veor		($t,$d,$a)",
++	"&vshr_u32	($d,$t,24)",
++	"&vsli_32	($d,$t,8)",
++	#"&vperm	($d,$t,$t3)",
 +
-+	"&paddd		($xc,@x[$d0])",
-+	 "&paddd	($xc_,@x[$d1])",
-+	"&pxor		(@x[$b0],$xc)",
-+	 "&pxor		(@x[$b1],$xc_)",
-+	"&movdqa	($t1,@x[$b0])",
-+	"&pslld		(@x[$b0],7)",
-+	"&psrld		($t1,25)",
-+	 "&movdqa	($t0,@x[$b1])",
-+	 "&pslld	(@x[$b1],7)",
-+	"&por		(@x[$b0],$t1)",
-+	 "&psrld	($t0,25)",
-+	"&movdqa	($t1,'(%r9)')",	# .Lrot16(%rip)
-+	 "&por		(@x[$b1],$t0)",
++	"&vadd_i32	($c,$c,$d)",
++	"&veor		($t,$b,$c)",
++	"&vshr_u32	($b,$t,25)",
++	"&vsli_32	($b,$t,7)",
 +
-+	"&movdqa	(\"`16*($c0-8)`(%rsp)\",$xc)",	# reload pair of 'c's
-+	 "&movdqa	(\"`16*($c1-8)`(%rsp)\",$xc_)",
-+	"&movdqa	($xc,\"`16*($c2-8)`(%rsp)\")",
-+	 "&movdqa	($xc_,\"`16*($c3-8)`(%rsp)\")",
-+
-+	"&paddd		(@x[$a2],@x[$b2])",	# Q3
-+	 "&paddd	(@x[$a3],@x[$b3])",	# Q4
-+	"&pxor		(@x[$d2],@x[$a2])",
-+	 "&pxor		(@x[$d3],@x[$a3])",
-+	"&pshufb	(@x[$d2],$t1)",
-+	 "&pshufb	(@x[$d3],$t1)",
-+
-+	"&paddd		($xc,@x[$d2])",
-+	 "&paddd	($xc_,@x[$d3])",
-+	"&pxor		(@x[$b2],$xc)",
-+	 "&pxor		(@x[$b3],$xc_)",
-+	"&movdqa	($t0,@x[$b2])",
-+	"&pslld		(@x[$b2],12)",
-+	"&psrld		($t0,20)",
-+	 "&movdqa	($t1,@x[$b3])",
-+	 "&pslld	(@x[$b3],12)",
-+	"&por		(@x[$b2],$t0)",
-+	 "&psrld	($t1,20)",
-+	"&movdqa	($t0,'(%r11)')",	# .Lrot24(%rip)
-+	 "&por		(@x[$b3],$t1)",
-+
-+	"&paddd		(@x[$a2],@x[$b2])",
-+	 "&paddd	(@x[$a3],@x[$b3])",
-+	"&pxor		(@x[$d2],@x[$a2])",
-+	 "&pxor		(@x[$d3],@x[$a3])",
-+	"&pshufb	(@x[$d2],$t0)",
-+	 "&pshufb	(@x[$d3],$t0)",
-+
-+	"&paddd		($xc,@x[$d2])",
-+	 "&paddd	($xc_,@x[$d3])",
-+	"&pxor		(@x[$b2],$xc)",
-+	 "&pxor		(@x[$b3],$xc_)",
-+	"&movdqa	($t1,@x[$b2])",
-+	"&pslld		(@x[$b2],7)",
-+	"&psrld		($t1,25)",
-+	 "&movdqa	($t0,@x[$b3])",
-+	 "&pslld	(@x[$b3],7)",
-+	"&por		(@x[$b2],$t1)",
-+	 "&psrld	($t0,25)",
-+	"&movdqa	($t1,'(%r9)')",	# .Lrot16(%rip)
-+	 "&por		(@x[$b3],$t0)"
++	"&vext_8	($c,$c,$c,8)",
++	"&vext_8	($b,$b,$b,$odd?12:4)",
++	"&vext_8	($d,$d,$d,$odd?4:12)"
 +	);
 +}
 +
-+my $xframe = $win64 ? 0xa8 : 8;
-+
 +$code.=<<___;
-+.type	chacha20_4x,\@function,5
-+.align	32
-+chacha20_4x:
-+.cfi_startproc
-+.Lchacha20_4x:
-+	lea		8(%rsp),%r10		# frame pointer
-+.cfi_def_cfa_register	%r10
-+___
-+$code.=<<___ if (!$kernel);
-+	mov		%r9,%r11
-+___
-+$code.=<<___	if ($avx>1 && !$kernel);
-+	shr		\$32,%r9		# OPENSSL_ia32cap_P+8
-+	test		\$`1<<5`,%r9		# test AVX2
-+	jnz		.Lchacha20_8x
-+___
-+$code.=<<___;
-+	cmp		\$192,$len
-+	ja		.Lproceed4x
-+___
-+$code.=<<___ if (!$kernel);
-+	and		\$`1<<26|1<<22`,%r11	# isolate XSAVE+MOVBE
-+	cmp		\$`1<<22`,%r11		# check for MOVBE without XSAVE
-+	je		.Ldo_ssse3_after_all	# to detect Atom
-+___
-+$code.=<<___;
-+.Lproceed4x:
-+	sub		\$0x140+$xframe,%rsp
-+	and		\$-16,%rsp
-+___
-+	################ stack layout
-+	# +0x00		SIMD equivalent of @x[8-12]
-+	# ...
-+	# +0x40		constant copy of key[0-2] smashed by lanes
-+	# ...
-+	# +0x100	SIMD counters (with nonce smashed by lanes)
-+	# ...
-+	# +0x140
-+$code.=<<___	if ($win64);
-+	movaps		%xmm6,-0xb0(%r10)
-+	movaps		%xmm7,-0xa0(%r10)
-+	movaps		%xmm8,-0x90(%r10)
-+	movaps		%xmm9,-0x80(%r10)
-+	movaps		%xmm10,-0x70(%r10)
-+	movaps		%xmm11,-0x60(%r10)
-+	movaps		%xmm12,-0x50(%r10)
-+	movaps		%xmm13,-0x40(%r10)
-+	movaps		%xmm14,-0x30(%r10)
-+	movaps		%xmm15,-0x20(%r10)
-+.L4x_body:
-+___
-+$code.=<<___;
-+	movdqa		.Lsigma(%rip),$xa3	# key[0]
-+	movdqu		($key),$xb3		# key[1]
-+	movdqu		16($key),$xt3		# key[2]
-+	movdqu		($counter),$xd3		# key[3]
-+	lea		0x100(%rsp),%rcx	# size optimization
-+	lea		.Lrot16(%rip),%r9
-+	lea		.Lrot24(%rip),%r11
++#if (defined(__KERNEL__) && defined(CONFIG_KERNEL_MODE_NEON)) || (!defined(__KERNEL__) && __ARM_MAX_ARCH__>=7)
++.arch	armv7-a
++.fpu	neon
++
++# ifdef __KERNEL__
++.globl	ChaCha20_neon
++@ For optimal performance it's appropriate for caller to enforce
++@ minimum input length, 193 bytes is suggested.
++# endif
++.type	ChaCha20_neon,%function
++.align	5
++ChaCha20_neon:
++	ldr		r12,[sp,#0]		@ pull pointer to counter and nonce
++	stmdb		sp!,{r0-r2,r4-r11,lr}
++.LChaCha20_neon:
++	adr		r14,.Lsigma
++	vstmdb		sp!,{d8-d15}		@ ABI spec says so
++	stmdb		sp!,{r0-r3}
++
++	vld1.32		{$b0-$c0},[r3]		@ load key
++	ldmia		r3,{r4-r11}		@ load key
++
++	sub		sp,sp,#4*(16+16)
++	vld1.32		{$d0},[r12]		@ load counter and nonce
++	add		r12,sp,#4*8
++	ldmia		r14,{r0-r3}		@ load sigma
++	vld1.32		{$a0},[r14]!		@ load sigma
++	vld1.32		{$t0},[r14]!		@ one
++	@ vld1.32	{$t3#lo},[r14]		@ rot8
++	vst1.32		{$c0-$d0},[r12]		@ copy 1/2key|counter|nonce
++	vst1.32		{$a0-$b0},[sp]		@ copy sigma|1/2key
++
++	str		r10,[sp,#4*(16+10)]	@ off-load "@x[10]"
++	str		r11,[sp,#4*(16+11)]	@ off-load "@x[11]"
++	vshl.i32	$t1#lo,$t0#lo,#1	@ two
++	vstr		$t0#lo,[sp,#4*(16+0)]
++	vshl.i32	$t2#lo,$t0#lo,#2	@ four
++	vstr		$t1#lo,[sp,#4*(16+2)]
++	vmov		$a1,$a0
++	vstr		$t2#lo,[sp,#4*(16+4)]
++	vmov		$a2,$a0
++	@ vstr		$t3#lo,[sp,#4*(16+6)]
++	vmov		$b1,$b0
++	vmov		$b2,$b0
++	b		.Loop_neon_enter
 +
-+	pshufd		\$0x00,$xa3,$xa0	# smash key by lanes...
-+	pshufd		\$0x55,$xa3,$xa1
-+	movdqa		$xa0,0x40(%rsp)		# ... and offload
-+	pshufd		\$0xaa,$xa3,$xa2
-+	movdqa		$xa1,0x50(%rsp)
-+	pshufd		\$0xff,$xa3,$xa3
-+	movdqa		$xa2,0x60(%rsp)
-+	movdqa		$xa3,0x70(%rsp)
-+
-+	pshufd		\$0x00,$xb3,$xb0
-+	pshufd		\$0x55,$xb3,$xb1
-+	movdqa		$xb0,0x80-0x100(%rcx)
-+	pshufd		\$0xaa,$xb3,$xb2
-+	movdqa		$xb1,0x90-0x100(%rcx)
-+	pshufd		\$0xff,$xb3,$xb3
-+	movdqa		$xb2,0xa0-0x100(%rcx)
-+	movdqa		$xb3,0xb0-0x100(%rcx)
-+
-+	pshufd		\$0x00,$xt3,$xt0	# "$xc0"
-+	pshufd		\$0x55,$xt3,$xt1	# "$xc1"
-+	movdqa		$xt0,0xc0-0x100(%rcx)
-+	pshufd		\$0xaa,$xt3,$xt2	# "$xc2"
-+	movdqa		$xt1,0xd0-0x100(%rcx)
-+	pshufd		\$0xff,$xt3,$xt3	# "$xc3"
-+	movdqa		$xt2,0xe0-0x100(%rcx)
-+	movdqa		$xt3,0xf0-0x100(%rcx)
-+
-+	pshufd		\$0x00,$xd3,$xd0
-+	pshufd		\$0x55,$xd3,$xd1
-+	paddd		.Linc(%rip),$xd0	# don't save counters yet
-+	pshufd		\$0xaa,$xd3,$xd2
-+	movdqa		$xd1,0x110-0x100(%rcx)
-+	pshufd		\$0xff,$xd3,$xd3
-+	movdqa		$xd2,0x120-0x100(%rcx)
-+	movdqa		$xd3,0x130-0x100(%rcx)
-+
-+	jmp		.Loop_enter4x
-+
-+.align	32
-+.Loop_outer4x:
-+	movdqa		0x40(%rsp),$xa0		# re-load smashed key
-+	movdqa		0x50(%rsp),$xa1
-+	movdqa		0x60(%rsp),$xa2
-+	movdqa		0x70(%rsp),$xa3
-+	movdqa		0x80-0x100(%rcx),$xb0
-+	movdqa		0x90-0x100(%rcx),$xb1
-+	movdqa		0xa0-0x100(%rcx),$xb2
-+	movdqa		0xb0-0x100(%rcx),$xb3
-+	movdqa		0xc0-0x100(%rcx),$xt0	# "$xc0"
-+	movdqa		0xd0-0x100(%rcx),$xt1	# "$xc1"
-+	movdqa		0xe0-0x100(%rcx),$xt2	# "$xc2"
-+	movdqa		0xf0-0x100(%rcx),$xt3	# "$xc3"
-+	movdqa		0x100-0x100(%rcx),$xd0
-+	movdqa		0x110-0x100(%rcx),$xd1
-+	movdqa		0x120-0x100(%rcx),$xd2
-+	movdqa		0x130-0x100(%rcx),$xd3
-+	paddd		.Lfour(%rip),$xd0	# next SIMD counters
-+
-+.Loop_enter4x:
-+	movdqa		$xt2,0x20(%rsp)		# SIMD equivalent of "@x[10]"
-+	movdqa		$xt3,0x30(%rsp)		# SIMD equivalent of "@x[11]"
-+	movdqa		(%r9),$xt3		# .Lrot16(%rip)
-+	mov		\$10,%eax
-+	movdqa		$xd0,0x100-0x100(%rcx)	# save SIMD counters
-+	jmp		.Loop4x
-+
-+.align	32
-+.Loop4x:
-+___
-+	foreach (&SSSE3_lane_ROUND(0, 4, 8,12)) { eval; }
-+	foreach (&SSSE3_lane_ROUND(0, 5,10,15)) { eval; }
-+$code.=<<___;
-+	dec		%eax
-+	jnz		.Loop4x
-+
-+	paddd		0x40(%rsp),$xa0		# accumulate key material
-+	paddd		0x50(%rsp),$xa1
-+	paddd		0x60(%rsp),$xa2
-+	paddd		0x70(%rsp),$xa3
-+
-+	movdqa		$xa0,$xt2		# "de-interlace" data
-+	punpckldq	$xa1,$xa0
-+	movdqa		$xa2,$xt3
-+	punpckldq	$xa3,$xa2
-+	punpckhdq	$xa1,$xt2
-+	punpckhdq	$xa3,$xt3
-+	movdqa		$xa0,$xa1
-+	punpcklqdq	$xa2,$xa0		# "a0"
-+	movdqa		$xt2,$xa3
-+	punpcklqdq	$xt3,$xt2		# "a2"
-+	punpckhqdq	$xa2,$xa1		# "a1"
-+	punpckhqdq	$xt3,$xa3		# "a3"
-+___
-+	($xa2,$xt2)=($xt2,$xa2);
-+$code.=<<___;
-+	paddd		0x80-0x100(%rcx),$xb0
-+	paddd		0x90-0x100(%rcx),$xb1
-+	paddd		0xa0-0x100(%rcx),$xb2
-+	paddd		0xb0-0x100(%rcx),$xb3
-+
-+	movdqa		$xa0,0x00(%rsp)		# offload $xaN
-+	movdqa		$xa1,0x10(%rsp)
-+	movdqa		0x20(%rsp),$xa0		# "xc2"
-+	movdqa		0x30(%rsp),$xa1		# "xc3"
-+
-+	movdqa		$xb0,$xt2
-+	punpckldq	$xb1,$xb0
-+	movdqa		$xb2,$xt3
-+	punpckldq	$xb3,$xb2
-+	punpckhdq	$xb1,$xt2
-+	punpckhdq	$xb3,$xt3
-+	movdqa		$xb0,$xb1
-+	punpcklqdq	$xb2,$xb0		# "b0"
-+	movdqa		$xt2,$xb3
-+	punpcklqdq	$xt3,$xt2		# "b2"
-+	punpckhqdq	$xb2,$xb1		# "b1"
-+	punpckhqdq	$xt3,$xb3		# "b3"
-+___
-+	($xb2,$xt2)=($xt2,$xb2);
-+	my ($xc0,$xc1,$xc2,$xc3)=($xt0,$xt1,$xa0,$xa1);
-+$code.=<<___;
-+	paddd		0xc0-0x100(%rcx),$xc0
-+	paddd		0xd0-0x100(%rcx),$xc1
-+	paddd		0xe0-0x100(%rcx),$xc2
-+	paddd		0xf0-0x100(%rcx),$xc3
-+
-+	movdqa		$xa2,0x20(%rsp)		# keep offloading $xaN
-+	movdqa		$xa3,0x30(%rsp)
-+
-+	movdqa		$xc0,$xt2
-+	punpckldq	$xc1,$xc0
-+	movdqa		$xc2,$xt3
-+	punpckldq	$xc3,$xc2
-+	punpckhdq	$xc1,$xt2
-+	punpckhdq	$xc3,$xt3
-+	movdqa		$xc0,$xc1
-+	punpcklqdq	$xc2,$xc0		# "c0"
-+	movdqa		$xt2,$xc3
-+	punpcklqdq	$xt3,$xt2		# "c2"
-+	punpckhqdq	$xc2,$xc1		# "c1"
-+	punpckhqdq	$xt3,$xc3		# "c3"
-+___
-+	($xc2,$xt2)=($xt2,$xc2);
-+	($xt0,$xt1)=($xa2,$xa3);		# use $xaN as temporary
-+$code.=<<___;
-+	paddd		0x100-0x100(%rcx),$xd0
-+	paddd		0x110-0x100(%rcx),$xd1
-+	paddd		0x120-0x100(%rcx),$xd2
-+	paddd		0x130-0x100(%rcx),$xd3
-+
-+	movdqa		$xd0,$xt2
-+	punpckldq	$xd1,$xd0
-+	movdqa		$xd2,$xt3
-+	punpckldq	$xd3,$xd2
-+	punpckhdq	$xd1,$xt2
-+	punpckhdq	$xd3,$xt3
-+	movdqa		$xd0,$xd1
-+	punpcklqdq	$xd2,$xd0		# "d0"
-+	movdqa		$xt2,$xd3
-+	punpcklqdq	$xt3,$xt2		# "d2"
-+	punpckhqdq	$xd2,$xd1		# "d1"
-+	punpckhqdq	$xt3,$xd3		# "d3"
-+___
-+	($xd2,$xt2)=($xt2,$xd2);
-+$code.=<<___;
-+	cmp		\$64*4,$len
-+	jb		.Ltail4x
-+
-+	movdqu		0x00($inp),$xt0		# xor with input
-+	movdqu		0x10($inp),$xt1
-+	movdqu		0x20($inp),$xt2
-+	movdqu		0x30($inp),$xt3
-+	pxor		0x00(%rsp),$xt0		# $xaN is offloaded, remember?
-+	pxor		$xb0,$xt1
-+	pxor		$xc0,$xt2
-+	pxor		$xd0,$xt3
-+
-+	 movdqu		$xt0,0x00($out)
-+	movdqu		0x40($inp),$xt0
-+	 movdqu		$xt1,0x10($out)
-+	movdqu		0x50($inp),$xt1
-+	 movdqu		$xt2,0x20($out)
-+	movdqu		0x60($inp),$xt2
-+	 movdqu		$xt3,0x30($out)
-+	movdqu		0x70($inp),$xt3
-+	lea		0x80($inp),$inp		# size optimization
-+	pxor		0x10(%rsp),$xt0
-+	pxor		$xb1,$xt1
-+	pxor		$xc1,$xt2
-+	pxor		$xd1,$xt3
-+
-+	 movdqu		$xt0,0x40($out)
-+	movdqu		0x00($inp),$xt0
-+	 movdqu		$xt1,0x50($out)
-+	movdqu		0x10($inp),$xt1
-+	 movdqu		$xt2,0x60($out)
-+	movdqu		0x20($inp),$xt2
-+	 movdqu		$xt3,0x70($out)
-+	 lea		0x80($out),$out		# size optimization
-+	movdqu		0x30($inp),$xt3
-+	pxor		0x20(%rsp),$xt0
-+	pxor		$xb2,$xt1
-+	pxor		$xc2,$xt2
-+	pxor		$xd2,$xt3
-+
-+	 movdqu		$xt0,0x00($out)
-+	movdqu		0x40($inp),$xt0
-+	 movdqu		$xt1,0x10($out)
-+	movdqu		0x50($inp),$xt1
-+	 movdqu		$xt2,0x20($out)
-+	movdqu		0x60($inp),$xt2
-+	 movdqu		$xt3,0x30($out)
-+	movdqu		0x70($inp),$xt3
-+	lea		0x80($inp),$inp		# inp+=64*4
-+	pxor		0x30(%rsp),$xt0
-+	pxor		$xb3,$xt1
-+	pxor		$xc3,$xt2
-+	pxor		$xd3,$xt3
-+	movdqu		$xt0,0x40($out)
-+	movdqu		$xt1,0x50($out)
-+	movdqu		$xt2,0x60($out)
-+	movdqu		$xt3,0x70($out)
-+	lea		0x80($out),$out		# out+=64*4
-+
-+	sub		\$64*4,$len
-+	jnz		.Loop_outer4x
-+
-+	jmp		.Ldone4x
-+
-+.Ltail4x:
-+	cmp		\$192,$len
-+	jae		.L192_or_more4x
-+	cmp		\$128,$len
-+	jae		.L128_or_more4x
-+	cmp		\$64,$len
-+	jae		.L64_or_more4x
-+
-+	#movdqa		0x00(%rsp),$xt0		# $xaN is offloaded, remember?
-+	xor		%r9,%r9
-+	#movdqa		$xt0,0x00(%rsp)
-+	movdqa		$xb0,0x10(%rsp)
-+	movdqa		$xc0,0x20(%rsp)
-+	movdqa		$xd0,0x30(%rsp)
-+	jmp		.Loop_tail4x
-+
-+.align	32
-+.L64_or_more4x:
-+	movdqu		0x00($inp),$xt0		# xor with input
-+	movdqu		0x10($inp),$xt1
-+	movdqu		0x20($inp),$xt2
-+	movdqu		0x30($inp),$xt3
-+	pxor		0x00(%rsp),$xt0		# $xaxN is offloaded, remember?
-+	pxor		$xb0,$xt1
-+	pxor		$xc0,$xt2
-+	pxor		$xd0,$xt3
-+	movdqu		$xt0,0x00($out)
-+	movdqu		$xt1,0x10($out)
-+	movdqu		$xt2,0x20($out)
-+	movdqu		$xt3,0x30($out)
-+	je		.Ldone4x
-+
-+	movdqa		0x10(%rsp),$xt0		# $xaN is offloaded, remember?
-+	lea		0x40($inp),$inp		# inp+=64*1
-+	xor		%r9,%r9
-+	movdqa		$xt0,0x00(%rsp)
-+	movdqa		$xb1,0x10(%rsp)
-+	lea		0x40($out),$out		# out+=64*1
-+	movdqa		$xc1,0x20(%rsp)
-+	sub		\$64,$len		# len-=64*1
-+	movdqa		$xd1,0x30(%rsp)
-+	jmp		.Loop_tail4x
-+
-+.align	32
-+.L128_or_more4x:
-+	movdqu		0x00($inp),$xt0		# xor with input
-+	movdqu		0x10($inp),$xt1
-+	movdqu		0x20($inp),$xt2
-+	movdqu		0x30($inp),$xt3
-+	pxor		0x00(%rsp),$xt0		# $xaN is offloaded, remember?
-+	pxor		$xb0,$xt1
-+	pxor		$xc0,$xt2
-+	pxor		$xd0,$xt3
-+
-+	 movdqu		$xt0,0x00($out)
-+	movdqu		0x40($inp),$xt0
-+	 movdqu		$xt1,0x10($out)
-+	movdqu		0x50($inp),$xt1
-+	 movdqu		$xt2,0x20($out)
-+	movdqu		0x60($inp),$xt2
-+	 movdqu		$xt3,0x30($out)
-+	movdqu		0x70($inp),$xt3
-+	pxor		0x10(%rsp),$xt0
-+	pxor		$xb1,$xt1
-+	pxor		$xc1,$xt2
-+	pxor		$xd1,$xt3
-+	movdqu		$xt0,0x40($out)
-+	movdqu		$xt1,0x50($out)
-+	movdqu		$xt2,0x60($out)
-+	movdqu		$xt3,0x70($out)
-+	je		.Ldone4x
-+
-+	movdqa		0x20(%rsp),$xt0		# $xaN is offloaded, remember?
-+	lea		0x80($inp),$inp		# inp+=64*2
-+	xor		%r9,%r9
-+	movdqa		$xt0,0x00(%rsp)
-+	movdqa		$xb2,0x10(%rsp)
-+	lea		0x80($out),$out		# out+=64*2
-+	movdqa		$xc2,0x20(%rsp)
-+	sub		\$128,$len		# len-=64*2
-+	movdqa		$xd2,0x30(%rsp)
-+	jmp		.Loop_tail4x
-+
-+.align	32
-+.L192_or_more4x:
-+	movdqu		0x00($inp),$xt0		# xor with input
-+	movdqu		0x10($inp),$xt1
-+	movdqu		0x20($inp),$xt2
-+	movdqu		0x30($inp),$xt3
-+	pxor		0x00(%rsp),$xt0		# $xaN is offloaded, remember?
-+	pxor		$xb0,$xt1
-+	pxor		$xc0,$xt2
-+	pxor		$xd0,$xt3
-+
-+	 movdqu		$xt0,0x00($out)
-+	movdqu		0x40($inp),$xt0
-+	 movdqu		$xt1,0x10($out)
-+	movdqu		0x50($inp),$xt1
-+	 movdqu		$xt2,0x20($out)
-+	movdqu		0x60($inp),$xt2
-+	 movdqu		$xt3,0x30($out)
-+	movdqu		0x70($inp),$xt3
-+	lea		0x80($inp),$inp		# size optimization
-+	pxor		0x10(%rsp),$xt0
-+	pxor		$xb1,$xt1
-+	pxor		$xc1,$xt2
-+	pxor		$xd1,$xt3
-+
-+	 movdqu		$xt0,0x40($out)
-+	movdqu		0x00($inp),$xt0
-+	 movdqu		$xt1,0x50($out)
-+	movdqu		0x10($inp),$xt1
-+	 movdqu		$xt2,0x60($out)
-+	movdqu		0x20($inp),$xt2
-+	 movdqu		$xt3,0x70($out)
-+	 lea		0x80($out),$out		# size optimization
-+	movdqu		0x30($inp),$xt3
-+	pxor		0x20(%rsp),$xt0
-+	pxor		$xb2,$xt1
-+	pxor		$xc2,$xt2
-+	pxor		$xd2,$xt3
-+	movdqu		$xt0,0x00($out)
-+	movdqu		$xt1,0x10($out)
-+	movdqu		$xt2,0x20($out)
-+	movdqu		$xt3,0x30($out)
-+	je		.Ldone4x
-+
-+	movdqa		0x30(%rsp),$xt0		# $xaN is offloaded, remember?
-+	lea		0x40($inp),$inp		# inp+=64*3
-+	xor		%r9,%r9
-+	movdqa		$xt0,0x00(%rsp)
-+	movdqa		$xb3,0x10(%rsp)
-+	lea		0x40($out),$out		# out+=64*3
-+	movdqa		$xc3,0x20(%rsp)
-+	sub		\$192,$len		# len-=64*3
-+	movdqa		$xd3,0x30(%rsp)
-+
-+.Loop_tail4x:
-+	movzb		($inp,%r9),%eax
-+	movzb		(%rsp,%r9),%ecx
-+	lea		1(%r9),%r9
-+	xor		%ecx,%eax
-+	mov		%al,-1($out,%r9)
-+	dec		$len
-+	jnz		.Loop_tail4x
-+
-+.Ldone4x:
-+___
-+$code.=<<___	if ($win64);
-+	movaps		-0xb0(%r10),%xmm6
-+	movaps		-0xa0(%r10),%xmm7
-+	movaps		-0x90(%r10),%xmm8
-+	movaps		-0x80(%r10),%xmm9
-+	movaps		-0x70(%r10),%xmm10
-+	movaps		-0x60(%r10),%xmm11
-+	movaps		-0x50(%r10),%xmm12
-+	movaps		-0x40(%r10),%xmm13
-+	movaps		-0x30(%r10),%xmm14
-+	movaps		-0x20(%r10),%xmm15
-+___
-+$code.=<<___;
-+	lea		-8(%r10),%rsp
-+.cfi_def_cfa_register	%rsp
-+.L4x_epilogue:
-+	ret
-+.cfi_endproc
-+.size	chacha20_4x,.-chacha20_4x
-+___
-+}
-+if($kernel) {
-+	$code .= "#endif\n";
-+}
-+
-+########################################################################
-+# XOP code path that handles all lengths.
-+if ($avx && !$kernel) {
-+# There is some "anomaly" observed depending on instructions' size or
-+# alignment. If you look closely at below code you'll notice that
-+# sometimes argument order varies. The order affects instruction
-+# encoding by making it larger, and such fiddling gives 5% performance
-+# improvement. This is on FX-4100...
-+
-+my ($xb0,$xb1,$xb2,$xb3, $xd0,$xd1,$xd2,$xd3,
-+    $xa0,$xa1,$xa2,$xa3, $xt0,$xt1,$xt2,$xt3)=map("%xmm$_",(0..15));
-+my  @xx=($xa0,$xa1,$xa2,$xa3, $xb0,$xb1,$xb2,$xb3,
-+	 $xt0,$xt1,$xt2,$xt3, $xd0,$xd1,$xd2,$xd3);
-+
-+sub XOP_lane_ROUND {
-+my ($a0,$b0,$c0,$d0)=@_;
-+my ($a1,$b1,$c1,$d1)=map(($_&~3)+(($_+1)&3),($a0,$b0,$c0,$d0));
-+my ($a2,$b2,$c2,$d2)=map(($_&~3)+(($_+1)&3),($a1,$b1,$c1,$d1));
-+my ($a3,$b3,$c3,$d3)=map(($_&~3)+(($_+1)&3),($a2,$b2,$c2,$d2));
-+my @x=map("\"$_\"",@xx);
-+
-+	(
-+	"&vpaddd	(@x[$a0],@x[$a0],@x[$b0])",	# Q1
-+	 "&vpaddd	(@x[$a1],@x[$a1],@x[$b1])",	# Q2
-+	  "&vpaddd	(@x[$a2],@x[$a2],@x[$b2])",	# Q3
-+	   "&vpaddd	(@x[$a3],@x[$a3],@x[$b3])",	# Q4
-+	"&vpxor		(@x[$d0],@x[$a0],@x[$d0])",
-+	 "&vpxor	(@x[$d1],@x[$a1],@x[$d1])",
-+	  "&vpxor	(@x[$d2],@x[$a2],@x[$d2])",
-+	   "&vpxor	(@x[$d3],@x[$a3],@x[$d3])",
-+	"&vprotd	(@x[$d0],@x[$d0],16)",
-+	 "&vprotd	(@x[$d1],@x[$d1],16)",
-+	  "&vprotd	(@x[$d2],@x[$d2],16)",
-+	   "&vprotd	(@x[$d3],@x[$d3],16)",
-+
-+	"&vpaddd	(@x[$c0],@x[$c0],@x[$d0])",
-+	 "&vpaddd	(@x[$c1],@x[$c1],@x[$d1])",
-+	  "&vpaddd	(@x[$c2],@x[$c2],@x[$d2])",
-+	   "&vpaddd	(@x[$c3],@x[$c3],@x[$d3])",
-+	"&vpxor		(@x[$b0],@x[$c0],@x[$b0])",
-+	 "&vpxor	(@x[$b1],@x[$c1],@x[$b1])",
-+	  "&vpxor	(@x[$b2],@x[$b2],@x[$c2])",	# flip
-+	   "&vpxor	(@x[$b3],@x[$b3],@x[$c3])",	# flip
-+	"&vprotd	(@x[$b0],@x[$b0],12)",
-+	 "&vprotd	(@x[$b1],@x[$b1],12)",
-+	  "&vprotd	(@x[$b2],@x[$b2],12)",
-+	   "&vprotd	(@x[$b3],@x[$b3],12)",
-+
-+	"&vpaddd	(@x[$a0],@x[$b0],@x[$a0])",	# flip
-+	 "&vpaddd	(@x[$a1],@x[$b1],@x[$a1])",	# flip
-+	  "&vpaddd	(@x[$a2],@x[$a2],@x[$b2])",
-+	   "&vpaddd	(@x[$a3],@x[$a3],@x[$b3])",
-+	"&vpxor		(@x[$d0],@x[$a0],@x[$d0])",
-+	 "&vpxor	(@x[$d1],@x[$a1],@x[$d1])",
-+	  "&vpxor	(@x[$d2],@x[$a2],@x[$d2])",
-+	   "&vpxor	(@x[$d3],@x[$a3],@x[$d3])",
-+	"&vprotd	(@x[$d0],@x[$d0],8)",
-+	 "&vprotd	(@x[$d1],@x[$d1],8)",
-+	  "&vprotd	(@x[$d2],@x[$d2],8)",
-+	   "&vprotd	(@x[$d3],@x[$d3],8)",
-+
-+	"&vpaddd	(@x[$c0],@x[$c0],@x[$d0])",
-+	 "&vpaddd	(@x[$c1],@x[$c1],@x[$d1])",
-+	  "&vpaddd	(@x[$c2],@x[$c2],@x[$d2])",
-+	   "&vpaddd	(@x[$c3],@x[$c3],@x[$d3])",
-+	"&vpxor		(@x[$b0],@x[$c0],@x[$b0])",
-+	 "&vpxor	(@x[$b1],@x[$c1],@x[$b1])",
-+	  "&vpxor	(@x[$b2],@x[$b2],@x[$c2])",	# flip
-+	   "&vpxor	(@x[$b3],@x[$b3],@x[$c3])",	# flip
-+	"&vprotd	(@x[$b0],@x[$b0],7)",
-+	 "&vprotd	(@x[$b1],@x[$b1],7)",
-+	  "&vprotd	(@x[$b2],@x[$b2],7)",
-+	   "&vprotd	(@x[$b3],@x[$b3],7)"
-+	);
-+}
-+
-+my $xframe = $win64 ? 0xa8 : 8;
-+
-+&declare_function("chacha20_xop", 32, 5);
-+$code.=<<___;
-+.cfi_startproc
-+.Lchacha20_4xop:
-+	lea		8(%rsp),%r10		# frame pointer
-+.cfi_def_cfa_register	%r10
-+	sub		\$0x140+$xframe,%rsp
-+	and 	\$-16,%rsp
-+___
-+	################ stack layout
-+	# +0x00		SIMD equivalent of @x[8-12]
-+	# ...
-+	# +0x40		constant copy of key[0-2] smashed by lanes
-+	# ...
-+	# +0x100	SIMD counters (with nonce smashed by lanes)
-+	# ...
-+	# +0x140
-+$code.=<<___	if ($win64);
-+	movaps		%xmm6,-0xb0(%r10)
-+	movaps		%xmm7,-0xa0(%r10)
-+	movaps		%xmm8,-0x90(%r10)
-+	movaps		%xmm9,-0x80(%r10)
-+	movaps		%xmm10,-0x70(%r10)
-+	movaps		%xmm11,-0x60(%r10)
-+	movaps		%xmm12,-0x50(%r10)
-+	movaps		%xmm13,-0x40(%r10)
-+	movaps		%xmm14,-0x30(%r10)
-+	movaps		%xmm15,-0x20(%r10)
-+.L4xop_body:
-+___
-+$code.=<<___;
-+	vzeroupper
-+
-+	vmovdqa		.Lsigma(%rip),$xa3	# key[0]
-+	vmovdqu		($key),$xb3		# key[1]
-+	vmovdqu		16($key),$xt3		# key[2]
-+	vmovdqu		($counter),$xd3		# key[3]
-+	lea		0x100(%rsp),%rcx	# size optimization
-+
-+	vpshufd		\$0x00,$xa3,$xa0	# smash key by lanes...
-+	vpshufd		\$0x55,$xa3,$xa1
-+	vmovdqa		$xa0,0x40(%rsp)		# ... and offload
-+	vpshufd		\$0xaa,$xa3,$xa2
-+	vmovdqa		$xa1,0x50(%rsp)
-+	vpshufd		\$0xff,$xa3,$xa3
-+	vmovdqa		$xa2,0x60(%rsp)
-+	vmovdqa		$xa3,0x70(%rsp)
-+
-+	vpshufd		\$0x00,$xb3,$xb0
-+	vpshufd		\$0x55,$xb3,$xb1
-+	vmovdqa		$xb0,0x80-0x100(%rcx)
-+	vpshufd		\$0xaa,$xb3,$xb2
-+	vmovdqa		$xb1,0x90-0x100(%rcx)
-+	vpshufd		\$0xff,$xb3,$xb3
-+	vmovdqa		$xb2,0xa0-0x100(%rcx)
-+	vmovdqa		$xb3,0xb0-0x100(%rcx)
-+
-+	vpshufd		\$0x00,$xt3,$xt0	# "$xc0"
-+	vpshufd		\$0x55,$xt3,$xt1	# "$xc1"
-+	vmovdqa		$xt0,0xc0-0x100(%rcx)
-+	vpshufd		\$0xaa,$xt3,$xt2	# "$xc2"
-+	vmovdqa		$xt1,0xd0-0x100(%rcx)
-+	vpshufd		\$0xff,$xt3,$xt3	# "$xc3"
-+	vmovdqa		$xt2,0xe0-0x100(%rcx)
-+	vmovdqa		$xt3,0xf0-0x100(%rcx)
-+
-+	vpshufd		\$0x00,$xd3,$xd0
-+	vpshufd		\$0x55,$xd3,$xd1
-+	vpaddd		.Linc(%rip),$xd0,$xd0	# don't save counters yet
-+	vpshufd		\$0xaa,$xd3,$xd2
-+	vmovdqa		$xd1,0x110-0x100(%rcx)
-+	vpshufd		\$0xff,$xd3,$xd3
-+	vmovdqa		$xd2,0x120-0x100(%rcx)
-+	vmovdqa		$xd3,0x130-0x100(%rcx)
-+
-+	jmp		.Loop_enter4xop
-+
-+.align	32
-+.Loop_outer4xop:
-+	vmovdqa		0x40(%rsp),$xa0		# re-load smashed key
-+	vmovdqa		0x50(%rsp),$xa1
-+	vmovdqa		0x60(%rsp),$xa2
-+	vmovdqa		0x70(%rsp),$xa3
-+	vmovdqa		0x80-0x100(%rcx),$xb0
-+	vmovdqa		0x90-0x100(%rcx),$xb1
-+	vmovdqa		0xa0-0x100(%rcx),$xb2
-+	vmovdqa		0xb0-0x100(%rcx),$xb3
-+	vmovdqa		0xc0-0x100(%rcx),$xt0	# "$xc0"
-+	vmovdqa		0xd0-0x100(%rcx),$xt1	# "$xc1"
-+	vmovdqa		0xe0-0x100(%rcx),$xt2	# "$xc2"
-+	vmovdqa		0xf0-0x100(%rcx),$xt3	# "$xc3"
-+	vmovdqa		0x100-0x100(%rcx),$xd0
-+	vmovdqa		0x110-0x100(%rcx),$xd1
-+	vmovdqa		0x120-0x100(%rcx),$xd2
-+	vmovdqa		0x130-0x100(%rcx),$xd3
-+	vpaddd		.Lfour(%rip),$xd0,$xd0	# next SIMD counters
-+
-+.Loop_enter4xop:
-+	mov		\$10,%eax
-+	vmovdqa		$xd0,0x100-0x100(%rcx)	# save SIMD counters
-+	jmp		.Loop4xop
-+
-+.align	32
-+.Loop4xop:
-+___
-+	foreach (&XOP_lane_ROUND(0, 4, 8,12)) { eval; }
-+	foreach (&XOP_lane_ROUND(0, 5,10,15)) { eval; }
-+$code.=<<___;
-+	dec		%eax
-+	jnz		.Loop4xop
-+
-+	vpaddd		0x40(%rsp),$xa0,$xa0	# accumulate key material
-+	vpaddd		0x50(%rsp),$xa1,$xa1
-+	vpaddd		0x60(%rsp),$xa2,$xa2
-+	vpaddd		0x70(%rsp),$xa3,$xa3
-+
-+	vmovdqa		$xt2,0x20(%rsp)		# offload $xc2,3
-+	vmovdqa		$xt3,0x30(%rsp)
-+
-+	vpunpckldq	$xa1,$xa0,$xt2		# "de-interlace" data
-+	vpunpckldq	$xa3,$xa2,$xt3
-+	vpunpckhdq	$xa1,$xa0,$xa0
-+	vpunpckhdq	$xa3,$xa2,$xa2
-+	vpunpcklqdq	$xt3,$xt2,$xa1		# "a0"
-+	vpunpckhqdq	$xt3,$xt2,$xt2		# "a1"
-+	vpunpcklqdq	$xa2,$xa0,$xa3		# "a2"
-+	vpunpckhqdq	$xa2,$xa0,$xa0		# "a3"
-+___
-+        ($xa0,$xa1,$xa2,$xa3,$xt2)=($xa1,$xt2,$xa3,$xa0,$xa2);
-+$code.=<<___;
-+	vpaddd		0x80-0x100(%rcx),$xb0,$xb0
-+	vpaddd		0x90-0x100(%rcx),$xb1,$xb1
-+	vpaddd		0xa0-0x100(%rcx),$xb2,$xb2
-+	vpaddd		0xb0-0x100(%rcx),$xb3,$xb3
-+
-+	vmovdqa		$xa0,0x00(%rsp)		# offload $xa0,1
-+	vmovdqa		$xa1,0x10(%rsp)
-+	vmovdqa		0x20(%rsp),$xa0		# "xc2"
-+	vmovdqa		0x30(%rsp),$xa1		# "xc3"
-+
-+	vpunpckldq	$xb1,$xb0,$xt2
-+	vpunpckldq	$xb3,$xb2,$xt3
-+	vpunpckhdq	$xb1,$xb0,$xb0
-+	vpunpckhdq	$xb3,$xb2,$xb2
-+	vpunpcklqdq	$xt3,$xt2,$xb1		# "b0"
-+	vpunpckhqdq	$xt3,$xt2,$xt2		# "b1"
-+	vpunpcklqdq	$xb2,$xb0,$xb3		# "b2"
-+	vpunpckhqdq	$xb2,$xb0,$xb0		# "b3"
-+___
-+	($xb0,$xb1,$xb2,$xb3,$xt2)=($xb1,$xt2,$xb3,$xb0,$xb2);
-+	my ($xc0,$xc1,$xc2,$xc3)=($xt0,$xt1,$xa0,$xa1);
-+$code.=<<___;
-+	vpaddd		0xc0-0x100(%rcx),$xc0,$xc0
-+	vpaddd		0xd0-0x100(%rcx),$xc1,$xc1
-+	vpaddd		0xe0-0x100(%rcx),$xc2,$xc2
-+	vpaddd		0xf0-0x100(%rcx),$xc3,$xc3
-+
-+	vpunpckldq	$xc1,$xc0,$xt2
-+	vpunpckldq	$xc3,$xc2,$xt3
-+	vpunpckhdq	$xc1,$xc0,$xc0
-+	vpunpckhdq	$xc3,$xc2,$xc2
-+	vpunpcklqdq	$xt3,$xt2,$xc1		# "c0"
-+	vpunpckhqdq	$xt3,$xt2,$xt2		# "c1"
-+	vpunpcklqdq	$xc2,$xc0,$xc3		# "c2"
-+	vpunpckhqdq	$xc2,$xc0,$xc0		# "c3"
-+___
-+	($xc0,$xc1,$xc2,$xc3,$xt2)=($xc1,$xt2,$xc3,$xc0,$xc2);
-+$code.=<<___;
-+	vpaddd		0x100-0x100(%rcx),$xd0,$xd0
-+	vpaddd		0x110-0x100(%rcx),$xd1,$xd1
-+	vpaddd		0x120-0x100(%rcx),$xd2,$xd2
-+	vpaddd		0x130-0x100(%rcx),$xd3,$xd3
-+
-+	vpunpckldq	$xd1,$xd0,$xt2
-+	vpunpckldq	$xd3,$xd2,$xt3
-+	vpunpckhdq	$xd1,$xd0,$xd0
-+	vpunpckhdq	$xd3,$xd2,$xd2
-+	vpunpcklqdq	$xt3,$xt2,$xd1		# "d0"
-+	vpunpckhqdq	$xt3,$xt2,$xt2		# "d1"
-+	vpunpcklqdq	$xd2,$xd0,$xd3		# "d2"
-+	vpunpckhqdq	$xd2,$xd0,$xd0		# "d3"
-+___
-+	($xd0,$xd1,$xd2,$xd3,$xt2)=($xd1,$xt2,$xd3,$xd0,$xd2);
-+	($xa0,$xa1)=($xt2,$xt3);
-+$code.=<<___;
-+	vmovdqa		0x00(%rsp),$xa0		# restore $xa0,1
-+	vmovdqa		0x10(%rsp),$xa1
-+
-+	cmp		\$64*4,$len
-+	jb		.Ltail4xop
-+
-+	vpxor		0x00($inp),$xa0,$xa0	# xor with input
-+	vpxor		0x10($inp),$xb0,$xb0
-+	vpxor		0x20($inp),$xc0,$xc0
-+	vpxor		0x30($inp),$xd0,$xd0
-+	vpxor		0x40($inp),$xa1,$xa1
-+	vpxor		0x50($inp),$xb1,$xb1
-+	vpxor		0x60($inp),$xc1,$xc1
-+	vpxor		0x70($inp),$xd1,$xd1
-+	lea		0x80($inp),$inp		# size optimization
-+	vpxor		0x00($inp),$xa2,$xa2
-+	vpxor		0x10($inp),$xb2,$xb2
-+	vpxor		0x20($inp),$xc2,$xc2
-+	vpxor		0x30($inp),$xd2,$xd2
-+	vpxor		0x40($inp),$xa3,$xa3
-+	vpxor		0x50($inp),$xb3,$xb3
-+	vpxor		0x60($inp),$xc3,$xc3
-+	vpxor		0x70($inp),$xd3,$xd3
-+	lea		0x80($inp),$inp		# inp+=64*4
-+
-+	vmovdqu		$xa0,0x00($out)
-+	vmovdqu		$xb0,0x10($out)
-+	vmovdqu		$xc0,0x20($out)
-+	vmovdqu		$xd0,0x30($out)
-+	vmovdqu		$xa1,0x40($out)
-+	vmovdqu		$xb1,0x50($out)
-+	vmovdqu		$xc1,0x60($out)
-+	vmovdqu		$xd1,0x70($out)
-+	lea		0x80($out),$out		# size optimization
-+	vmovdqu		$xa2,0x00($out)
-+	vmovdqu		$xb2,0x10($out)
-+	vmovdqu		$xc2,0x20($out)
-+	vmovdqu		$xd2,0x30($out)
-+	vmovdqu		$xa3,0x40($out)
-+	vmovdqu		$xb3,0x50($out)
-+	vmovdqu		$xc3,0x60($out)
-+	vmovdqu		$xd3,0x70($out)
-+	lea		0x80($out),$out		# out+=64*4
-+
-+	sub		\$64*4,$len
-+	jnz		.Loop_outer4xop
-+
-+	jmp		.Ldone4xop
-+
-+.align	32
-+.Ltail4xop:
-+	cmp		\$192,$len
-+	jae		.L192_or_more4xop
-+	cmp		\$128,$len
-+	jae		.L128_or_more4xop
-+	cmp		\$64,$len
-+	jae		.L64_or_more4xop
-+
-+	xor		%r9,%r9
-+	vmovdqa		$xa0,0x00(%rsp)
-+	vmovdqa		$xb0,0x10(%rsp)
-+	vmovdqa		$xc0,0x20(%rsp)
-+	vmovdqa		$xd0,0x30(%rsp)
-+	jmp		.Loop_tail4xop
-+
-+.align	32
-+.L64_or_more4xop:
-+	vpxor		0x00($inp),$xa0,$xa0	# xor with input
-+	vpxor		0x10($inp),$xb0,$xb0
-+	vpxor		0x20($inp),$xc0,$xc0
-+	vpxor		0x30($inp),$xd0,$xd0
-+	vmovdqu		$xa0,0x00($out)
-+	vmovdqu		$xb0,0x10($out)
-+	vmovdqu		$xc0,0x20($out)
-+	vmovdqu		$xd0,0x30($out)
-+	je		.Ldone4xop
-+
-+	lea		0x40($inp),$inp		# inp+=64*1
-+	vmovdqa		$xa1,0x00(%rsp)
-+	xor		%r9,%r9
-+	vmovdqa		$xb1,0x10(%rsp)
-+	lea		0x40($out),$out		# out+=64*1
-+	vmovdqa		$xc1,0x20(%rsp)
-+	sub		\$64,$len		# len-=64*1
-+	vmovdqa		$xd1,0x30(%rsp)
-+	jmp		.Loop_tail4xop
-+
-+.align	32
-+.L128_or_more4xop:
-+	vpxor		0x00($inp),$xa0,$xa0	# xor with input
-+	vpxor		0x10($inp),$xb0,$xb0
-+	vpxor		0x20($inp),$xc0,$xc0
-+	vpxor		0x30($inp),$xd0,$xd0
-+	vpxor		0x40($inp),$xa1,$xa1
-+	vpxor		0x50($inp),$xb1,$xb1
-+	vpxor		0x60($inp),$xc1,$xc1
-+	vpxor		0x70($inp),$xd1,$xd1
-+
-+	vmovdqu		$xa0,0x00($out)
-+	vmovdqu		$xb0,0x10($out)
-+	vmovdqu		$xc0,0x20($out)
-+	vmovdqu		$xd0,0x30($out)
-+	vmovdqu		$xa1,0x40($out)
-+	vmovdqu		$xb1,0x50($out)
-+	vmovdqu		$xc1,0x60($out)
-+	vmovdqu		$xd1,0x70($out)
-+	je		.Ldone4xop
-+
-+	lea		0x80($inp),$inp		# inp+=64*2
-+	vmovdqa		$xa2,0x00(%rsp)
-+	xor		%r9,%r9
-+	vmovdqa		$xb2,0x10(%rsp)
-+	lea		0x80($out),$out		# out+=64*2
-+	vmovdqa		$xc2,0x20(%rsp)
-+	sub		\$128,$len		# len-=64*2
-+	vmovdqa		$xd2,0x30(%rsp)
-+	jmp		.Loop_tail4xop
-+
-+.align	32
-+.L192_or_more4xop:
-+	vpxor		0x00($inp),$xa0,$xa0	# xor with input
-+	vpxor		0x10($inp),$xb0,$xb0
-+	vpxor		0x20($inp),$xc0,$xc0
-+	vpxor		0x30($inp),$xd0,$xd0
-+	vpxor		0x40($inp),$xa1,$xa1
-+	vpxor		0x50($inp),$xb1,$xb1
-+	vpxor		0x60($inp),$xc1,$xc1
-+	vpxor		0x70($inp),$xd1,$xd1
-+	lea		0x80($inp),$inp		# size optimization
-+	vpxor		0x00($inp),$xa2,$xa2
-+	vpxor		0x10($inp),$xb2,$xb2
-+	vpxor		0x20($inp),$xc2,$xc2
-+	vpxor		0x30($inp),$xd2,$xd2
-+
-+	vmovdqu		$xa0,0x00($out)
-+	vmovdqu		$xb0,0x10($out)
-+	vmovdqu		$xc0,0x20($out)
-+	vmovdqu		$xd0,0x30($out)
-+	vmovdqu		$xa1,0x40($out)
-+	vmovdqu		$xb1,0x50($out)
-+	vmovdqu		$xc1,0x60($out)
-+	vmovdqu		$xd1,0x70($out)
-+	lea		0x80($out),$out		# size optimization
-+	vmovdqu		$xa2,0x00($out)
-+	vmovdqu		$xb2,0x10($out)
-+	vmovdqu		$xc2,0x20($out)
-+	vmovdqu		$xd2,0x30($out)
-+	je		.Ldone4xop
-+
-+	lea		0x40($inp),$inp		# inp+=64*3
-+	vmovdqa		$xa3,0x00(%rsp)
-+	xor		%r9,%r9
-+	vmovdqa		$xb3,0x10(%rsp)
-+	lea		0x40($out),$out		# out+=64*3
-+	vmovdqa		$xc3,0x20(%rsp)
-+	sub		\$192,$len		# len-=64*3
-+	vmovdqa		$xd3,0x30(%rsp)
-+
-+.Loop_tail4xop:
-+	movzb		($inp,%r9),%eax
-+	movzb		(%rsp,%r9),%ecx
-+	lea		1(%r9),%r9
-+	xor		%ecx,%eax
-+	mov		%al,-1($out,%r9)
-+	dec		$len
-+	jnz		.Loop_tail4xop
-+
-+.Ldone4xop:
-+	vzeroupper
-+___
-+$code.=<<___	if ($win64);
-+	movaps		-0xb0(%r10),%xmm6
-+	movaps		-0xa0(%r10),%xmm7
-+	movaps		-0x90(%r10),%xmm8
-+	movaps		-0x80(%r10),%xmm9
-+	movaps		-0x70(%r10),%xmm10
-+	movaps		-0x60(%r10),%xmm11
-+	movaps		-0x50(%r10),%xmm12
-+	movaps		-0x40(%r10),%xmm13
-+	movaps		-0x30(%r10),%xmm14
-+	movaps		-0x20(%r10),%xmm15
-+___
-+$code.=<<___;
-+	lea		-8(%r10),%rsp
-+.cfi_def_cfa_register	%rsp
-+.L4xop_epilogue:
-+	ret
-+.cfi_endproc
-+___
-+&end_function("chacha20_xop");
-+}
-+
-+########################################################################
-+# AVX2 code path
-+if ($avx>1) {
-+
-+if($kernel) {
-+	$code .= "#ifdef CONFIG_AS_AVX2\n";
-+}
-+
-+my ($xb0,$xb1,$xb2,$xb3, $xd0,$xd1,$xd2,$xd3,
-+    $xa0,$xa1,$xa2,$xa3, $xt0,$xt1,$xt2,$xt3)=map("%ymm$_",(0..15));
-+my @xx=($xa0,$xa1,$xa2,$xa3, $xb0,$xb1,$xb2,$xb3,
-+	"%nox","%nox","%nox","%nox", $xd0,$xd1,$xd2,$xd3);
-+
-+sub AVX2_lane_ROUND {
-+my ($a0,$b0,$c0,$d0)=@_;
-+my ($a1,$b1,$c1,$d1)=map(($_&~3)+(($_+1)&3),($a0,$b0,$c0,$d0));
-+my ($a2,$b2,$c2,$d2)=map(($_&~3)+(($_+1)&3),($a1,$b1,$c1,$d1));
-+my ($a3,$b3,$c3,$d3)=map(($_&~3)+(($_+1)&3),($a2,$b2,$c2,$d2));
-+my ($xc,$xc_,$t0,$t1)=map("\"$_\"",$xt0,$xt1,$xt2,$xt3);
-+my @x=map("\"$_\"",@xx);
-+
-+	# Consider order in which variables are addressed by their
-+	# index:
-+	#
-+	#	a   b   c   d
-+	#
-+	#	0   4   8  12 < even round
-+	#	1   5   9  13
-+	#	2   6  10  14
-+	#	3   7  11  15
-+	#	0   5  10  15 < odd round
-+	#	1   6  11  12
-+	#	2   7   8  13
-+	#	3   4   9  14
-+	#
-+	# 'a', 'b' and 'd's are permanently allocated in registers,
-+	# @x[0..7,12..15], while 'c's are maintained in memory. If
-+	# you observe 'c' column, you'll notice that pair of 'c's is
-+	# invariant between rounds. This means that we have to reload
-+	# them once per round, in the middle. This is why you'll see
-+	# bunch of 'c' stores and loads in the middle, but none in
-+	# the beginning or end.
-+
-+	(
-+	"&vpaddd	(@x[$a0],@x[$a0],@x[$b0])",	# Q1
-+	"&vpxor		(@x[$d0],@x[$a0],@x[$d0])",
-+	"&vpshufb	(@x[$d0],@x[$d0],$t1)",
-+	 "&vpaddd	(@x[$a1],@x[$a1],@x[$b1])",	# Q2
-+	 "&vpxor	(@x[$d1],@x[$a1],@x[$d1])",
-+	 "&vpshufb	(@x[$d1],@x[$d1],$t1)",
-+
-+	"&vpaddd	($xc,$xc,@x[$d0])",
-+	"&vpxor		(@x[$b0],$xc,@x[$b0])",
-+	"&vpslld	($t0,@x[$b0],12)",
-+	"&vpsrld	(@x[$b0],@x[$b0],20)",
-+	"&vpor		(@x[$b0],$t0,@x[$b0])",
-+	"&vbroadcasti128($t0,'(%r11)')",		# .Lrot24(%rip)
-+	 "&vpaddd	($xc_,$xc_,@x[$d1])",
-+	 "&vpxor	(@x[$b1],$xc_,@x[$b1])",
-+	 "&vpslld	($t1,@x[$b1],12)",
-+	 "&vpsrld	(@x[$b1],@x[$b1],20)",
-+	 "&vpor		(@x[$b1],$t1,@x[$b1])",
-+
-+	"&vpaddd	(@x[$a0],@x[$a0],@x[$b0])",
-+	"&vpxor		(@x[$d0],@x[$a0],@x[$d0])",
-+	"&vpshufb	(@x[$d0],@x[$d0],$t0)",
-+	 "&vpaddd	(@x[$a1],@x[$a1],@x[$b1])",
-+	 "&vpxor	(@x[$d1],@x[$a1],@x[$d1])",
-+	 "&vpshufb	(@x[$d1],@x[$d1],$t0)",
-+
-+	"&vpaddd	($xc,$xc,@x[$d0])",
-+	"&vpxor		(@x[$b0],$xc,@x[$b0])",
-+	"&vpslld	($t1,@x[$b0],7)",
-+	"&vpsrld	(@x[$b0],@x[$b0],25)",
-+	"&vpor		(@x[$b0],$t1,@x[$b0])",
-+	"&vbroadcasti128($t1,'(%r9)')",		# .Lrot16(%rip)
-+	 "&vpaddd	($xc_,$xc_,@x[$d1])",
-+	 "&vpxor	(@x[$b1],$xc_,@x[$b1])",
-+	 "&vpslld	($t0,@x[$b1],7)",
-+	 "&vpsrld	(@x[$b1],@x[$b1],25)",
-+	 "&vpor		(@x[$b1],$t0,@x[$b1])",
-+
-+	"&vmovdqa	(\"`32*($c0-8)`(%rsp)\",$xc)",	# reload pair of 'c's
-+	 "&vmovdqa	(\"`32*($c1-8)`(%rsp)\",$xc_)",
-+	"&vmovdqa	($xc,\"`32*($c2-8)`(%rsp)\")",
-+	 "&vmovdqa	($xc_,\"`32*($c3-8)`(%rsp)\")",
-+
-+	"&vpaddd	(@x[$a2],@x[$a2],@x[$b2])",	# Q3
-+	"&vpxor		(@x[$d2],@x[$a2],@x[$d2])",
-+	"&vpshufb	(@x[$d2],@x[$d2],$t1)",
-+	 "&vpaddd	(@x[$a3],@x[$a3],@x[$b3])",	# Q4
-+	 "&vpxor	(@x[$d3],@x[$a3],@x[$d3])",
-+	 "&vpshufb	(@x[$d3],@x[$d3],$t1)",
-+
-+	"&vpaddd	($xc,$xc,@x[$d2])",
-+	"&vpxor		(@x[$b2],$xc,@x[$b2])",
-+	"&vpslld	($t0,@x[$b2],12)",
-+	"&vpsrld	(@x[$b2],@x[$b2],20)",
-+	"&vpor		(@x[$b2],$t0,@x[$b2])",
-+	"&vbroadcasti128($t0,'(%r11)')",		# .Lrot24(%rip)
-+	 "&vpaddd	($xc_,$xc_,@x[$d3])",
-+	 "&vpxor	(@x[$b3],$xc_,@x[$b3])",
-+	 "&vpslld	($t1,@x[$b3],12)",
-+	 "&vpsrld	(@x[$b3],@x[$b3],20)",
-+	 "&vpor		(@x[$b3],$t1,@x[$b3])",
-+
-+	"&vpaddd	(@x[$a2],@x[$a2],@x[$b2])",
-+	"&vpxor		(@x[$d2],@x[$a2],@x[$d2])",
-+	"&vpshufb	(@x[$d2],@x[$d2],$t0)",
-+	 "&vpaddd	(@x[$a3],@x[$a3],@x[$b3])",
-+	 "&vpxor	(@x[$d3],@x[$a3],@x[$d3])",
-+	 "&vpshufb	(@x[$d3],@x[$d3],$t0)",
-+
-+	"&vpaddd	($xc,$xc,@x[$d2])",
-+	"&vpxor		(@x[$b2],$xc,@x[$b2])",
-+	"&vpslld	($t1,@x[$b2],7)",
-+	"&vpsrld	(@x[$b2],@x[$b2],25)",
-+	"&vpor		(@x[$b2],$t1,@x[$b2])",
-+	"&vbroadcasti128($t1,'(%r9)')",		# .Lrot16(%rip)
-+	 "&vpaddd	($xc_,$xc_,@x[$d3])",
-+	 "&vpxor	(@x[$b3],$xc_,@x[$b3])",
-+	 "&vpslld	($t0,@x[$b3],7)",
-+	 "&vpsrld	(@x[$b3],@x[$b3],25)",
-+	 "&vpor		(@x[$b3],$t0,@x[$b3])"
-+	);
-+}
-+
-+my $xframe = $win64 ? 0xa8 : 8;
-+
-+&declare_function("chacha20_avx2", 32, 5);
-+$code.=<<___;
-+.cfi_startproc
-+.Lchacha20_8x:
-+	lea		8(%rsp),%r10		# frame register
-+.cfi_def_cfa_register	%r10
-+	sub		\$0x280+$xframe,%rsp
-+	and		\$-32,%rsp
-+___
-+$code.=<<___	if ($win64);
-+	movaps		%xmm6,-0xb0(%r10)
-+	movaps		%xmm7,-0xa0(%r10)
-+	movaps		%xmm8,-0x90(%r10)
-+	movaps		%xmm9,-0x80(%r10)
-+	movaps		%xmm10,-0x70(%r10)
-+	movaps		%xmm11,-0x60(%r10)
-+	movaps		%xmm12,-0x50(%r10)
-+	movaps		%xmm13,-0x40(%r10)
-+	movaps		%xmm14,-0x30(%r10)
-+	movaps		%xmm15,-0x20(%r10)
-+.L8x_body:
-+___
-+$code.=<<___;
-+	vzeroupper
-+
-+	################ stack layout
-+	# +0x00		SIMD equivalent of @x[8-12]
-+	# ...
-+	# +0x80		constant copy of key[0-2] smashed by lanes
-+	# ...
-+	# +0x200	SIMD counters (with nonce smashed by lanes)
-+	# ...
-+	# +0x280
-+
-+	vbroadcasti128	.Lsigma(%rip),$xa3	# key[0]
-+	vbroadcasti128	($key),$xb3		# key[1]
-+	vbroadcasti128	16($key),$xt3		# key[2]
-+	vbroadcasti128	($counter),$xd3		# key[3]
-+	lea		0x100(%rsp),%rcx	# size optimization
-+	lea		0x200(%rsp),%rax	# size optimization
-+	lea		.Lrot16(%rip),%r9
-+	lea		.Lrot24(%rip),%r11
-+
-+	vpshufd		\$0x00,$xa3,$xa0	# smash key by lanes...
-+	vpshufd		\$0x55,$xa3,$xa1
-+	vmovdqa		$xa0,0x80-0x100(%rcx)	# ... and offload
-+	vpshufd		\$0xaa,$xa3,$xa2
-+	vmovdqa		$xa1,0xa0-0x100(%rcx)
-+	vpshufd		\$0xff,$xa3,$xa3
-+	vmovdqa		$xa2,0xc0-0x100(%rcx)
-+	vmovdqa		$xa3,0xe0-0x100(%rcx)
-+
-+	vpshufd		\$0x00,$xb3,$xb0
-+	vpshufd		\$0x55,$xb3,$xb1
-+	vmovdqa		$xb0,0x100-0x100(%rcx)
-+	vpshufd		\$0xaa,$xb3,$xb2
-+	vmovdqa		$xb1,0x120-0x100(%rcx)
-+	vpshufd		\$0xff,$xb3,$xb3
-+	vmovdqa		$xb2,0x140-0x100(%rcx)
-+	vmovdqa		$xb3,0x160-0x100(%rcx)
-+
-+	vpshufd		\$0x00,$xt3,$xt0	# "xc0"
-+	vpshufd		\$0x55,$xt3,$xt1	# "xc1"
-+	vmovdqa		$xt0,0x180-0x200(%rax)
-+	vpshufd		\$0xaa,$xt3,$xt2	# "xc2"
-+	vmovdqa		$xt1,0x1a0-0x200(%rax)
-+	vpshufd		\$0xff,$xt3,$xt3	# "xc3"
-+	vmovdqa		$xt2,0x1c0-0x200(%rax)
-+	vmovdqa		$xt3,0x1e0-0x200(%rax)
-+
-+	vpshufd		\$0x00,$xd3,$xd0
-+	vpshufd		\$0x55,$xd3,$xd1
-+	vpaddd		.Lincy(%rip),$xd0,$xd0	# don't save counters yet
-+	vpshufd		\$0xaa,$xd3,$xd2
-+	vmovdqa		$xd1,0x220-0x200(%rax)
-+	vpshufd		\$0xff,$xd3,$xd3
-+	vmovdqa		$xd2,0x240-0x200(%rax)
-+	vmovdqa		$xd3,0x260-0x200(%rax)
-+
-+	jmp		.Loop_enter8x
-+
-+.align	32
-+.Loop_outer8x:
-+	vmovdqa		0x80-0x100(%rcx),$xa0	# re-load smashed key
-+	vmovdqa		0xa0-0x100(%rcx),$xa1
-+	vmovdqa		0xc0-0x100(%rcx),$xa2
-+	vmovdqa		0xe0-0x100(%rcx),$xa3
-+	vmovdqa		0x100-0x100(%rcx),$xb0
-+	vmovdqa		0x120-0x100(%rcx),$xb1
-+	vmovdqa		0x140-0x100(%rcx),$xb2
-+	vmovdqa		0x160-0x100(%rcx),$xb3
-+	vmovdqa		0x180-0x200(%rax),$xt0	# "xc0"
-+	vmovdqa		0x1a0-0x200(%rax),$xt1	# "xc1"
-+	vmovdqa		0x1c0-0x200(%rax),$xt2	# "xc2"
-+	vmovdqa		0x1e0-0x200(%rax),$xt3	# "xc3"
-+	vmovdqa		0x200-0x200(%rax),$xd0
-+	vmovdqa		0x220-0x200(%rax),$xd1
-+	vmovdqa		0x240-0x200(%rax),$xd2
-+	vmovdqa		0x260-0x200(%rax),$xd3
-+	vpaddd		.Leight(%rip),$xd0,$xd0	# next SIMD counters
-+
-+.Loop_enter8x:
-+	vmovdqa		$xt2,0x40(%rsp)		# SIMD equivalent of "@x[10]"
-+	vmovdqa		$xt3,0x60(%rsp)		# SIMD equivalent of "@x[11]"
-+	vbroadcasti128	(%r9),$xt3
-+	vmovdqa		$xd0,0x200-0x200(%rax)	# save SIMD counters
-+	mov		\$10,%eax
-+	jmp		.Loop8x
-+
-+.align	32
-+.Loop8x:
-+___
-+	foreach (&AVX2_lane_ROUND(0, 4, 8,12)) { eval; }
-+	foreach (&AVX2_lane_ROUND(0, 5,10,15)) { eval; }
-+$code.=<<___;
-+	dec		%eax
-+	jnz		.Loop8x
-+
-+	lea		0x200(%rsp),%rax	# size optimization
-+	vpaddd		0x80-0x100(%rcx),$xa0,$xa0	# accumulate key
-+	vpaddd		0xa0-0x100(%rcx),$xa1,$xa1
-+	vpaddd		0xc0-0x100(%rcx),$xa2,$xa2
-+	vpaddd		0xe0-0x100(%rcx),$xa3,$xa3
-+
-+	vpunpckldq	$xa1,$xa0,$xt2		# "de-interlace" data
-+	vpunpckldq	$xa3,$xa2,$xt3
-+	vpunpckhdq	$xa1,$xa0,$xa0
-+	vpunpckhdq	$xa3,$xa2,$xa2
-+	vpunpcklqdq	$xt3,$xt2,$xa1		# "a0"
-+	vpunpckhqdq	$xt3,$xt2,$xt2		# "a1"
-+	vpunpcklqdq	$xa2,$xa0,$xa3		# "a2"
-+	vpunpckhqdq	$xa2,$xa0,$xa0		# "a3"
-+___
-+	($xa0,$xa1,$xa2,$xa3,$xt2)=($xa1,$xt2,$xa3,$xa0,$xa2);
-+$code.=<<___;
-+	vpaddd		0x100-0x100(%rcx),$xb0,$xb0
-+	vpaddd		0x120-0x100(%rcx),$xb1,$xb1
-+	vpaddd		0x140-0x100(%rcx),$xb2,$xb2
-+	vpaddd		0x160-0x100(%rcx),$xb3,$xb3
-+
-+	vpunpckldq	$xb1,$xb0,$xt2
-+	vpunpckldq	$xb3,$xb2,$xt3
-+	vpunpckhdq	$xb1,$xb0,$xb0
-+	vpunpckhdq	$xb3,$xb2,$xb2
-+	vpunpcklqdq	$xt3,$xt2,$xb1		# "b0"
-+	vpunpckhqdq	$xt3,$xt2,$xt2		# "b1"
-+	vpunpcklqdq	$xb2,$xb0,$xb3		# "b2"
-+	vpunpckhqdq	$xb2,$xb0,$xb0		# "b3"
-+___
-+	($xb0,$xb1,$xb2,$xb3,$xt2)=($xb1,$xt2,$xb3,$xb0,$xb2);
-+$code.=<<___;
-+	vperm2i128	\$0x20,$xb0,$xa0,$xt3	# "de-interlace" further
-+	vperm2i128	\$0x31,$xb0,$xa0,$xb0
-+	vperm2i128	\$0x20,$xb1,$xa1,$xa0
-+	vperm2i128	\$0x31,$xb1,$xa1,$xb1
-+	vperm2i128	\$0x20,$xb2,$xa2,$xa1
-+	vperm2i128	\$0x31,$xb2,$xa2,$xb2
-+	vperm2i128	\$0x20,$xb3,$xa3,$xa2
-+	vperm2i128	\$0x31,$xb3,$xa3,$xb3
-+___
-+	($xa0,$xa1,$xa2,$xa3,$xt3)=($xt3,$xa0,$xa1,$xa2,$xa3);
-+	my ($xc0,$xc1,$xc2,$xc3)=($xt0,$xt1,$xa0,$xa1);
-+$code.=<<___;
-+	vmovdqa		$xa0,0x00(%rsp)		# offload $xaN
-+	vmovdqa		$xa1,0x20(%rsp)
-+	vmovdqa		0x40(%rsp),$xc2		# $xa0
-+	vmovdqa		0x60(%rsp),$xc3		# $xa1
-+
-+	vpaddd		0x180-0x200(%rax),$xc0,$xc0
-+	vpaddd		0x1a0-0x200(%rax),$xc1,$xc1
-+	vpaddd		0x1c0-0x200(%rax),$xc2,$xc2
-+	vpaddd		0x1e0-0x200(%rax),$xc3,$xc3
-+
-+	vpunpckldq	$xc1,$xc0,$xt2
-+	vpunpckldq	$xc3,$xc2,$xt3
-+	vpunpckhdq	$xc1,$xc0,$xc0
-+	vpunpckhdq	$xc3,$xc2,$xc2
-+	vpunpcklqdq	$xt3,$xt2,$xc1		# "c0"
-+	vpunpckhqdq	$xt3,$xt2,$xt2		# "c1"
-+	vpunpcklqdq	$xc2,$xc0,$xc3		# "c2"
-+	vpunpckhqdq	$xc2,$xc0,$xc0		# "c3"
-+___
-+	($xc0,$xc1,$xc2,$xc3,$xt2)=($xc1,$xt2,$xc3,$xc0,$xc2);
-+$code.=<<___;
-+	vpaddd		0x200-0x200(%rax),$xd0,$xd0
-+	vpaddd		0x220-0x200(%rax),$xd1,$xd1
-+	vpaddd		0x240-0x200(%rax),$xd2,$xd2
-+	vpaddd		0x260-0x200(%rax),$xd3,$xd3
-+
-+	vpunpckldq	$xd1,$xd0,$xt2
-+	vpunpckldq	$xd3,$xd2,$xt3
-+	vpunpckhdq	$xd1,$xd0,$xd0
-+	vpunpckhdq	$xd3,$xd2,$xd2
-+	vpunpcklqdq	$xt3,$xt2,$xd1		# "d0"
-+	vpunpckhqdq	$xt3,$xt2,$xt2		# "d1"
-+	vpunpcklqdq	$xd2,$xd0,$xd3		# "d2"
-+	vpunpckhqdq	$xd2,$xd0,$xd0		# "d3"
-+___
-+	($xd0,$xd1,$xd2,$xd3,$xt2)=($xd1,$xt2,$xd3,$xd0,$xd2);
-+$code.=<<___;
-+	vperm2i128	\$0x20,$xd0,$xc0,$xt3	# "de-interlace" further
-+	vperm2i128	\$0x31,$xd0,$xc0,$xd0
-+	vperm2i128	\$0x20,$xd1,$xc1,$xc0
-+	vperm2i128	\$0x31,$xd1,$xc1,$xd1
-+	vperm2i128	\$0x20,$xd2,$xc2,$xc1
-+	vperm2i128	\$0x31,$xd2,$xc2,$xd2
-+	vperm2i128	\$0x20,$xd3,$xc3,$xc2
-+	vperm2i128	\$0x31,$xd3,$xc3,$xd3
-+___
-+	($xc0,$xc1,$xc2,$xc3,$xt3)=($xt3,$xc0,$xc1,$xc2,$xc3);
-+	($xb0,$xb1,$xb2,$xb3,$xc0,$xc1,$xc2,$xc3)=
-+	($xc0,$xc1,$xc2,$xc3,$xb0,$xb1,$xb2,$xb3);
-+	($xa0,$xa1)=($xt2,$xt3);
-+$code.=<<___;
-+	vmovdqa		0x00(%rsp),$xa0		# $xaN was offloaded, remember?
-+	vmovdqa		0x20(%rsp),$xa1
-+
-+	cmp		\$64*8,$len
-+	jb		.Ltail8x
-+
-+	vpxor		0x00($inp),$xa0,$xa0	# xor with input
-+	vpxor		0x20($inp),$xb0,$xb0
-+	vpxor		0x40($inp),$xc0,$xc0
-+	vpxor		0x60($inp),$xd0,$xd0
-+	lea		0x80($inp),$inp		# size optimization
-+	vmovdqu		$xa0,0x00($out)
-+	vmovdqu		$xb0,0x20($out)
-+	vmovdqu		$xc0,0x40($out)
-+	vmovdqu		$xd0,0x60($out)
-+	lea		0x80($out),$out		# size optimization
-+
-+	vpxor		0x00($inp),$xa1,$xa1
-+	vpxor		0x20($inp),$xb1,$xb1
-+	vpxor		0x40($inp),$xc1,$xc1
-+	vpxor		0x60($inp),$xd1,$xd1
-+	lea		0x80($inp),$inp		# size optimization
-+	vmovdqu		$xa1,0x00($out)
-+	vmovdqu		$xb1,0x20($out)
-+	vmovdqu		$xc1,0x40($out)
-+	vmovdqu		$xd1,0x60($out)
-+	lea		0x80($out),$out		# size optimization
-+
-+	vpxor		0x00($inp),$xa2,$xa2
-+	vpxor		0x20($inp),$xb2,$xb2
-+	vpxor		0x40($inp),$xc2,$xc2
-+	vpxor		0x60($inp),$xd2,$xd2
-+	lea		0x80($inp),$inp		# size optimization
-+	vmovdqu		$xa2,0x00($out)
-+	vmovdqu		$xb2,0x20($out)
-+	vmovdqu		$xc2,0x40($out)
-+	vmovdqu		$xd2,0x60($out)
-+	lea		0x80($out),$out		# size optimization
-+
-+	vpxor		0x00($inp),$xa3,$xa3
-+	vpxor		0x20($inp),$xb3,$xb3
-+	vpxor		0x40($inp),$xc3,$xc3
-+	vpxor		0x60($inp),$xd3,$xd3
-+	lea		0x80($inp),$inp		# size optimization
-+	vmovdqu		$xa3,0x00($out)
-+	vmovdqu		$xb3,0x20($out)
-+	vmovdqu		$xc3,0x40($out)
-+	vmovdqu		$xd3,0x60($out)
-+	lea		0x80($out),$out		# size optimization
-+
-+	sub		\$64*8,$len
-+	jnz		.Loop_outer8x
-+
-+	jmp		.Ldone8x
-+
-+.Ltail8x:
-+	cmp		\$448,$len
-+	jae		.L448_or_more8x
-+	cmp		\$384,$len
-+	jae		.L384_or_more8x
-+	cmp		\$320,$len
-+	jae		.L320_or_more8x
-+	cmp		\$256,$len
-+	jae		.L256_or_more8x
-+	cmp		\$192,$len
-+	jae		.L192_or_more8x
-+	cmp		\$128,$len
-+	jae		.L128_or_more8x
-+	cmp		\$64,$len
-+	jae		.L64_or_more8x
-+
-+	xor		%r9,%r9
-+	vmovdqa		$xa0,0x00(%rsp)
-+	vmovdqa		$xb0,0x20(%rsp)
-+	jmp		.Loop_tail8x
-+
-+.align	32
-+.L64_or_more8x:
-+	vpxor		0x00($inp),$xa0,$xa0	# xor with input
-+	vpxor		0x20($inp),$xb0,$xb0
-+	vmovdqu		$xa0,0x00($out)
-+	vmovdqu		$xb0,0x20($out)
-+	je		.Ldone8x
-+
-+	lea		0x40($inp),$inp		# inp+=64*1
-+	xor		%r9,%r9
-+	vmovdqa		$xc0,0x00(%rsp)
-+	lea		0x40($out),$out		# out+=64*1
-+	sub		\$64,$len		# len-=64*1
-+	vmovdqa		$xd0,0x20(%rsp)
-+	jmp		.Loop_tail8x
-+
-+.align	32
-+.L128_or_more8x:
-+	vpxor		0x00($inp),$xa0,$xa0	# xor with input
-+	vpxor		0x20($inp),$xb0,$xb0
-+	vpxor		0x40($inp),$xc0,$xc0
-+	vpxor		0x60($inp),$xd0,$xd0
-+	vmovdqu		$xa0,0x00($out)
-+	vmovdqu		$xb0,0x20($out)
-+	vmovdqu		$xc0,0x40($out)
-+	vmovdqu		$xd0,0x60($out)
-+	je		.Ldone8x
-+
-+	lea		0x80($inp),$inp		# inp+=64*2
-+	xor		%r9,%r9
-+	vmovdqa		$xa1,0x00(%rsp)
-+	lea		0x80($out),$out		# out+=64*2
-+	sub		\$128,$len		# len-=64*2
-+	vmovdqa		$xb1,0x20(%rsp)
-+	jmp		.Loop_tail8x
-+
-+.align	32
-+.L192_or_more8x:
-+	vpxor		0x00($inp),$xa0,$xa0	# xor with input
-+	vpxor		0x20($inp),$xb0,$xb0
-+	vpxor		0x40($inp),$xc0,$xc0
-+	vpxor		0x60($inp),$xd0,$xd0
-+	vpxor		0x80($inp),$xa1,$xa1
-+	vpxor		0xa0($inp),$xb1,$xb1
-+	vmovdqu		$xa0,0x00($out)
-+	vmovdqu		$xb0,0x20($out)
-+	vmovdqu		$xc0,0x40($out)
-+	vmovdqu		$xd0,0x60($out)
-+	vmovdqu		$xa1,0x80($out)
-+	vmovdqu		$xb1,0xa0($out)
-+	je		.Ldone8x
-+
-+	lea		0xc0($inp),$inp		# inp+=64*3
-+	xor		%r9,%r9
-+	vmovdqa		$xc1,0x00(%rsp)
-+	lea		0xc0($out),$out		# out+=64*3
-+	sub		\$192,$len		# len-=64*3
-+	vmovdqa		$xd1,0x20(%rsp)
-+	jmp		.Loop_tail8x
-+
-+.align	32
-+.L256_or_more8x:
-+	vpxor		0x00($inp),$xa0,$xa0	# xor with input
-+	vpxor		0x20($inp),$xb0,$xb0
-+	vpxor		0x40($inp),$xc0,$xc0
-+	vpxor		0x60($inp),$xd0,$xd0
-+	vpxor		0x80($inp),$xa1,$xa1
-+	vpxor		0xa0($inp),$xb1,$xb1
-+	vpxor		0xc0($inp),$xc1,$xc1
-+	vpxor		0xe0($inp),$xd1,$xd1
-+	vmovdqu		$xa0,0x00($out)
-+	vmovdqu		$xb0,0x20($out)
-+	vmovdqu		$xc0,0x40($out)
-+	vmovdqu		$xd0,0x60($out)
-+	vmovdqu		$xa1,0x80($out)
-+	vmovdqu		$xb1,0xa0($out)
-+	vmovdqu		$xc1,0xc0($out)
-+	vmovdqu		$xd1,0xe0($out)
-+	je		.Ldone8x
-+
-+	lea		0x100($inp),$inp	# inp+=64*4
-+	xor		%r9,%r9
-+	vmovdqa		$xa2,0x00(%rsp)
-+	lea		0x100($out),$out	# out+=64*4
-+	sub		\$256,$len		# len-=64*4
-+	vmovdqa		$xb2,0x20(%rsp)
-+	jmp		.Loop_tail8x
-+
-+.align	32
-+.L320_or_more8x:
-+	vpxor		0x00($inp),$xa0,$xa0	# xor with input
-+	vpxor		0x20($inp),$xb0,$xb0
-+	vpxor		0x40($inp),$xc0,$xc0
-+	vpxor		0x60($inp),$xd0,$xd0
-+	vpxor		0x80($inp),$xa1,$xa1
-+	vpxor		0xa0($inp),$xb1,$xb1
-+	vpxor		0xc0($inp),$xc1,$xc1
-+	vpxor		0xe0($inp),$xd1,$xd1
-+	vpxor		0x100($inp),$xa2,$xa2
-+	vpxor		0x120($inp),$xb2,$xb2
-+	vmovdqu		$xa0,0x00($out)
-+	vmovdqu		$xb0,0x20($out)
-+	vmovdqu		$xc0,0x40($out)
-+	vmovdqu		$xd0,0x60($out)
-+	vmovdqu		$xa1,0x80($out)
-+	vmovdqu		$xb1,0xa0($out)
-+	vmovdqu		$xc1,0xc0($out)
-+	vmovdqu		$xd1,0xe0($out)
-+	vmovdqu		$xa2,0x100($out)
-+	vmovdqu		$xb2,0x120($out)
-+	je		.Ldone8x
-+
-+	lea		0x140($inp),$inp	# inp+=64*5
-+	xor		%r9,%r9
-+	vmovdqa		$xc2,0x00(%rsp)
-+	lea		0x140($out),$out	# out+=64*5
-+	sub		\$320,$len		# len-=64*5
-+	vmovdqa		$xd2,0x20(%rsp)
-+	jmp		.Loop_tail8x
-+
-+.align	32
-+.L384_or_more8x:
-+	vpxor		0x00($inp),$xa0,$xa0	# xor with input
-+	vpxor		0x20($inp),$xb0,$xb0
-+	vpxor		0x40($inp),$xc0,$xc0
-+	vpxor		0x60($inp),$xd0,$xd0
-+	vpxor		0x80($inp),$xa1,$xa1
-+	vpxor		0xa0($inp),$xb1,$xb1
-+	vpxor		0xc0($inp),$xc1,$xc1
-+	vpxor		0xe0($inp),$xd1,$xd1
-+	vpxor		0x100($inp),$xa2,$xa2
-+	vpxor		0x120($inp),$xb2,$xb2
-+	vpxor		0x140($inp),$xc2,$xc2
-+	vpxor		0x160($inp),$xd2,$xd2
-+	vmovdqu		$xa0,0x00($out)
-+	vmovdqu		$xb0,0x20($out)
-+	vmovdqu		$xc0,0x40($out)
-+	vmovdqu		$xd0,0x60($out)
-+	vmovdqu		$xa1,0x80($out)
-+	vmovdqu		$xb1,0xa0($out)
-+	vmovdqu		$xc1,0xc0($out)
-+	vmovdqu		$xd1,0xe0($out)
-+	vmovdqu		$xa2,0x100($out)
-+	vmovdqu		$xb2,0x120($out)
-+	vmovdqu		$xc2,0x140($out)
-+	vmovdqu		$xd2,0x160($out)
-+	je		.Ldone8x
-+
-+	lea		0x180($inp),$inp	# inp+=64*6
-+	xor		%r9,%r9
-+	vmovdqa		$xa3,0x00(%rsp)
-+	lea		0x180($out),$out	# out+=64*6
-+	sub		\$384,$len		# len-=64*6
-+	vmovdqa		$xb3,0x20(%rsp)
-+	jmp		.Loop_tail8x
-+
-+.align	32
-+.L448_or_more8x:
-+	vpxor		0x00($inp),$xa0,$xa0	# xor with input
-+	vpxor		0x20($inp),$xb0,$xb0
-+	vpxor		0x40($inp),$xc0,$xc0
-+	vpxor		0x60($inp),$xd0,$xd0
-+	vpxor		0x80($inp),$xa1,$xa1
-+	vpxor		0xa0($inp),$xb1,$xb1
-+	vpxor		0xc0($inp),$xc1,$xc1
-+	vpxor		0xe0($inp),$xd1,$xd1
-+	vpxor		0x100($inp),$xa2,$xa2
-+	vpxor		0x120($inp),$xb2,$xb2
-+	vpxor		0x140($inp),$xc2,$xc2
-+	vpxor		0x160($inp),$xd2,$xd2
-+	vpxor		0x180($inp),$xa3,$xa3
-+	vpxor		0x1a0($inp),$xb3,$xb3
-+	vmovdqu		$xa0,0x00($out)
-+	vmovdqu		$xb0,0x20($out)
-+	vmovdqu		$xc0,0x40($out)
-+	vmovdqu		$xd0,0x60($out)
-+	vmovdqu		$xa1,0x80($out)
-+	vmovdqu		$xb1,0xa0($out)
-+	vmovdqu		$xc1,0xc0($out)
-+	vmovdqu		$xd1,0xe0($out)
-+	vmovdqu		$xa2,0x100($out)
-+	vmovdqu		$xb2,0x120($out)
-+	vmovdqu		$xc2,0x140($out)
-+	vmovdqu		$xd2,0x160($out)
-+	vmovdqu		$xa3,0x180($out)
-+	vmovdqu		$xb3,0x1a0($out)
-+	je		.Ldone8x
-+
-+	lea		0x1c0($inp),$inp	# inp+=64*7
-+	xor		%r9,%r9
-+	vmovdqa		$xc3,0x00(%rsp)
-+	lea		0x1c0($out),$out	# out+=64*7
-+	sub		\$448,$len		# len-=64*7
-+	vmovdqa		$xd3,0x20(%rsp)
-+
-+.Loop_tail8x:
-+	movzb		($inp,%r9),%eax
-+	movzb		(%rsp,%r9),%ecx
-+	lea		1(%r9),%r9
-+	xor		%ecx,%eax
-+	mov		%al,-1($out,%r9)
-+	dec		$len
-+	jnz		.Loop_tail8x
-+
-+.Ldone8x:
-+	vzeroall
-+___
-+$code.=<<___	if ($win64);
-+	movaps		-0xb0(%r10),%xmm6
-+	movaps		-0xa0(%r10),%xmm7
-+	movaps		-0x90(%r10),%xmm8
-+	movaps		-0x80(%r10),%xmm9
-+	movaps		-0x70(%r10),%xmm10
-+	movaps		-0x60(%r10),%xmm11
-+	movaps		-0x50(%r10),%xmm12
-+	movaps		-0x40(%r10),%xmm13
-+	movaps		-0x30(%r10),%xmm14
-+	movaps		-0x20(%r10),%xmm15
-+___
-+$code.=<<___;
-+	lea		-8(%r10),%rsp
-+.cfi_def_cfa_register	%rsp
-+.L8x_epilogue:
-+	ret
-+.cfi_endproc
-+___
-+&end_function("chacha20_avx2");
-+if($kernel) {
-+	$code .= "#endif\n";
-+}
-+}
-+
-+########################################################################
-+# AVX512 code paths
-+if ($avx>2) {
-+# This one handles shorter inputs...
-+if($kernel) {
-+	$code .= "#ifdef CONFIG_AS_AVX512\n";
-+}
-+
-+my ($a,$b,$c,$d, $a_,$b_,$c_,$d_,$fourz) = map("%zmm$_",(0..3,16..20));
-+my ($t0,$t1,$t2,$t3) = map("%xmm$_",(4..7));
-+
-+sub vpxord()		# size optimization
-+{ my $opcode = "vpxor";	# adhere to vpxor when possible
-+
-+    foreach (@_) {
-+	if (/%([zy])mm([0-9]+)/ && ($1 eq "z" || $2>=16)) {
-+	    $opcode = "vpxord";
-+	    last;
-+	}
-+    }
-+
-+    $code .= "\t$opcode\t".join(',',reverse @_)."\n";
-+}
-+
-+sub AVX512ROUND {	# critical path is 14 "SIMD ticks" per round
-+	&vpaddd	($a,$a,$b);
-+	&vpxord	($d,$d,$a);
-+	&vprold	($d,$d,16);
-+
-+	&vpaddd	($c,$c,$d);
-+	&vpxord	($b,$b,$c);
-+	&vprold	($b,$b,12);
-+
-+	&vpaddd	($a,$a,$b);
-+	&vpxord	($d,$d,$a);
-+	&vprold	($d,$d,8);
-+
-+	&vpaddd	($c,$c,$d);
-+	&vpxord	($b,$b,$c);
-+	&vprold	($b,$b,7);
-+}
-+
-+my $xframe = $win64 ? 32+8 : 8;
-+
-+&declare_function("chacha20_avx512", 32, 5);
-+$code.=<<___;
-+.cfi_startproc
-+.Lchacha20_avx512:
-+	lea	8(%rsp),%r10		# frame pointer
-+.cfi_def_cfa_register	%r10
-+	cmp	\$512,$len
-+	ja	.Lchacha20_16x
-+
-+	sub	\$64+$xframe,%rsp
-+	and \$-64,%rsp
-+___
-+$code.=<<___	if ($win64);
-+	movaps	%xmm6,-0x30(%r10)
-+	movaps	%xmm7,-0x20(%r10)
-+.Lavx512_body:
-+___
-+$code.=<<___;
-+	vbroadcasti32x4	.Lsigma(%rip),$a
-+	vbroadcasti32x4	($key),$b
-+	vbroadcasti32x4	16($key),$c
-+	vbroadcasti32x4	($counter),$d
-+
-+	vmovdqa32	$a,$a_
-+	vmovdqa32	$b,$b_
-+	vmovdqa32	$c,$c_
-+	vpaddd		.Lzeroz(%rip),$d,$d
-+	vmovdqa32	.Lfourz(%rip),$fourz
-+	mov		\$10,$counter	# reuse $counter
-+	vmovdqa32	$d,$d_
-+	jmp		.Loop_avx512
-+
-+.align	16
-+.Loop_outer_avx512:
-+	vmovdqa32	$a_,$a
-+	vmovdqa32	$b_,$b
-+	vmovdqa32	$c_,$c
-+	vpaddd		$fourz,$d_,$d
-+	mov		\$10,$counter
-+	vmovdqa32	$d,$d_
-+	jmp		.Loop_avx512
-+
-+.align	32
-+.Loop_avx512:
-+___
-+	&AVX512ROUND();
-+	&vpshufd	($c,$c,0b01001110);
-+	&vpshufd	($b,$b,0b00111001);
-+	&vpshufd	($d,$d,0b10010011);
-+
-+	&AVX512ROUND();
-+	&vpshufd	($c,$c,0b01001110);
-+	&vpshufd	($b,$b,0b10010011);
-+	&vpshufd	($d,$d,0b00111001);
-+
-+	&dec		($counter);
-+	&jnz		(".Loop_avx512");
-+
-+$code.=<<___;
-+	vpaddd		$a_,$a,$a
-+	vpaddd		$b_,$b,$b
-+	vpaddd		$c_,$c,$c
-+	vpaddd		$d_,$d,$d
-+
-+	sub		\$64,$len
-+	jb		.Ltail64_avx512
-+
-+	vpxor		0x00($inp),%x#$a,$t0	# xor with input
-+	vpxor		0x10($inp),%x#$b,$t1
-+	vpxor		0x20($inp),%x#$c,$t2
-+	vpxor		0x30($inp),%x#$d,$t3
-+	lea		0x40($inp),$inp		# inp+=64
-+
-+	vmovdqu		$t0,0x00($out)		# write output
-+	vmovdqu		$t1,0x10($out)
-+	vmovdqu		$t2,0x20($out)
-+	vmovdqu		$t3,0x30($out)
-+	lea		0x40($out),$out		# out+=64
-+
-+	jz		.Ldone_avx512
-+
-+	vextracti32x4	\$1,$a,$t0
-+	vextracti32x4	\$1,$b,$t1
-+	vextracti32x4	\$1,$c,$t2
-+	vextracti32x4	\$1,$d,$t3
-+
-+	sub		\$64,$len
-+	jb		.Ltail_avx512
-+
-+	vpxor		0x00($inp),$t0,$t0	# xor with input
-+	vpxor		0x10($inp),$t1,$t1
-+	vpxor		0x20($inp),$t2,$t2
-+	vpxor		0x30($inp),$t3,$t3
-+	lea		0x40($inp),$inp		# inp+=64
-+
-+	vmovdqu		$t0,0x00($out)		# write output
-+	vmovdqu		$t1,0x10($out)
-+	vmovdqu		$t2,0x20($out)
-+	vmovdqu		$t3,0x30($out)
-+	lea		0x40($out),$out		# out+=64
-+
-+	jz		.Ldone_avx512
-+
-+	vextracti32x4	\$2,$a,$t0
-+	vextracti32x4	\$2,$b,$t1
-+	vextracti32x4	\$2,$c,$t2
-+	vextracti32x4	\$2,$d,$t3
-+
-+	sub		\$64,$len
-+	jb		.Ltail_avx512
-+
-+	vpxor		0x00($inp),$t0,$t0	# xor with input
-+	vpxor		0x10($inp),$t1,$t1
-+	vpxor		0x20($inp),$t2,$t2
-+	vpxor		0x30($inp),$t3,$t3
-+	lea		0x40($inp),$inp		# inp+=64
-+
-+	vmovdqu		$t0,0x00($out)		# write output
-+	vmovdqu		$t1,0x10($out)
-+	vmovdqu		$t2,0x20($out)
-+	vmovdqu		$t3,0x30($out)
-+	lea		0x40($out),$out		# out+=64
-+
-+	jz		.Ldone_avx512
-+
-+	vextracti32x4	\$3,$a,$t0
-+	vextracti32x4	\$3,$b,$t1
-+	vextracti32x4	\$3,$c,$t2
-+	vextracti32x4	\$3,$d,$t3
-+
-+	sub		\$64,$len
-+	jb		.Ltail_avx512
-+
-+	vpxor		0x00($inp),$t0,$t0	# xor with input
-+	vpxor		0x10($inp),$t1,$t1
-+	vpxor		0x20($inp),$t2,$t2
-+	vpxor		0x30($inp),$t3,$t3
-+	lea		0x40($inp),$inp		# inp+=64
-+
-+	vmovdqu		$t0,0x00($out)		# write output
-+	vmovdqu		$t1,0x10($out)
-+	vmovdqu		$t2,0x20($out)
-+	vmovdqu		$t3,0x30($out)
-+	lea		0x40($out),$out		# out+=64
-+
-+	jnz		.Loop_outer_avx512
-+
-+	jmp		.Ldone_avx512
-+
-+.align	16
-+.Ltail64_avx512:
-+	vmovdqa		%x#$a,0x00(%rsp)
-+	vmovdqa		%x#$b,0x10(%rsp)
-+	vmovdqa		%x#$c,0x20(%rsp)
-+	vmovdqa		%x#$d,0x30(%rsp)
-+	add		\$64,$len
-+	jmp		.Loop_tail_avx512
-+
-+.align	16
-+.Ltail_avx512:
-+	vmovdqa		$t0,0x00(%rsp)
-+	vmovdqa		$t1,0x10(%rsp)
-+	vmovdqa		$t2,0x20(%rsp)
-+	vmovdqa		$t3,0x30(%rsp)
-+	add		\$64,$len
-+
-+.Loop_tail_avx512:
-+	movzb		($inp,$counter),%eax
-+	movzb		(%rsp,$counter),%ecx
-+	lea		1($counter),$counter
-+	xor		%ecx,%eax
-+	mov		%al,-1($out,$counter)
-+	dec		$len
-+	jnz		.Loop_tail_avx512
-+
-+	vmovdqu32	$a_,0x00(%rsp)
-+
-+.Ldone_avx512:
-+	vzeroall
-+___
-+$code.=<<___	if ($win64);
-+	movaps	-0x30(%r10),%xmm6
-+	movaps	-0x20(%r10),%xmm7
-+___
-+$code.=<<___;
-+	lea	-8(%r10),%rsp
-+.cfi_def_cfa_register	%rsp
-+.Lavx512_epilogue:
-+	ret
-+.cfi_endproc
-+___
-+&end_function("chacha20_avx512");
-+
-+map(s/%z/%y/, $a,$b,$c,$d, $a_,$b_,$c_,$d_,$fourz);
-+
-+&declare_function("chacha20_avx512vl", 32, 5);
-+$code.=<<___;
-+.cfi_startproc
-+.Lchacha20_avx512vl:
-+	lea	8(%rsp),%r10		# frame pointer
-+.cfi_def_cfa_register	%r10
-+	cmp	\$128,$len
-+	ja	.Lchacha20_8xvl
-+
-+	sub	\$64+$xframe,%rsp
-+	and \$-32,%rsp
-+___
-+$code.=<<___	if ($win64);
-+	movaps	%xmm6,-0x30(%r10)
-+	movaps	%xmm7,-0x20(%r10)
-+.Lavx512vl_body:
-+___
-+$code.=<<___;
-+	vbroadcasti128	.Lsigma(%rip),$a
-+	vbroadcasti128	($key),$b
-+	vbroadcasti128	16($key),$c
-+	vbroadcasti128	($counter),$d
-+
-+	vmovdqa32	$a,$a_
-+	vmovdqa32	$b,$b_
-+	vmovdqa32	$c,$c_
-+	vpaddd		.Lzeroz(%rip),$d,$d
-+	vmovdqa32	.Ltwoy(%rip),$fourz
-+	mov		\$10,$counter	# reuse $counter
-+	vmovdqa32	$d,$d_
-+	jmp		.Loop_avx512vl
-+
-+.align	16
-+.Loop_outer_avx512vl:
-+	vmovdqa32	$c_,$c
-+	vpaddd		$fourz,$d_,$d
-+	mov		\$10,$counter
-+	vmovdqa32	$d,$d_
-+	jmp		.Loop_avx512vl
-+
-+.align	32
-+.Loop_avx512vl:
-+___
-+	&AVX512ROUND();
-+	&vpshufd	($c,$c,0b01001110);
-+	&vpshufd	($b,$b,0b00111001);
-+	&vpshufd	($d,$d,0b10010011);
-+
-+	&AVX512ROUND();
-+	&vpshufd	($c,$c,0b01001110);
-+	&vpshufd	($b,$b,0b10010011);
-+	&vpshufd	($d,$d,0b00111001);
-+
-+	&dec		($counter);
-+	&jnz		(".Loop_avx512vl");
-+
-+$code.=<<___;
-+	vpaddd		$a_,$a,$a
-+	vpaddd		$b_,$b,$b
-+	vpaddd		$c_,$c,$c
-+	vpaddd		$d_,$d,$d
-+
-+	sub		\$64,$len
-+	jb		.Ltail64_avx512vl
-+
-+	vpxor		0x00($inp),%x#$a,$t0	# xor with input
-+	vpxor		0x10($inp),%x#$b,$t1
-+	vpxor		0x20($inp),%x#$c,$t2
-+	vpxor		0x30($inp),%x#$d,$t3
-+	lea		0x40($inp),$inp		# inp+=64
-+
-+	vmovdqu		$t0,0x00($out)		# write output
-+	vmovdqu		$t1,0x10($out)
-+	vmovdqu		$t2,0x20($out)
-+	vmovdqu		$t3,0x30($out)
-+	lea		0x40($out),$out		# out+=64
-+
-+	jz		.Ldone_avx512vl
-+
-+	vextracti128	\$1,$a,$t0
-+	vextracti128	\$1,$b,$t1
-+	vextracti128	\$1,$c,$t2
-+	vextracti128	\$1,$d,$t3
-+
-+	sub		\$64,$len
-+	jb		.Ltail_avx512vl
-+
-+	vpxor		0x00($inp),$t0,$t0	# xor with input
-+	vpxor		0x10($inp),$t1,$t1
-+	vpxor		0x20($inp),$t2,$t2
-+	vpxor		0x30($inp),$t3,$t3
-+	lea		0x40($inp),$inp		# inp+=64
-+
-+	vmovdqu		$t0,0x00($out)		# write output
-+	vmovdqu		$t1,0x10($out)
-+	vmovdqu		$t2,0x20($out)
-+	vmovdqu		$t3,0x30($out)
-+	lea		0x40($out),$out		# out+=64
-+
-+	vmovdqa32	$a_,$a
-+	vmovdqa32	$b_,$b
-+	jnz		.Loop_outer_avx512vl
-+
-+	jmp		.Ldone_avx512vl
-+
-+.align	16
-+.Ltail64_avx512vl:
-+	vmovdqa		%x#$a,0x00(%rsp)
-+	vmovdqa		%x#$b,0x10(%rsp)
-+	vmovdqa		%x#$c,0x20(%rsp)
-+	vmovdqa		%x#$d,0x30(%rsp)
-+	add		\$64,$len
-+	jmp		.Loop_tail_avx512vl
-+
-+.align	16
-+.Ltail_avx512vl:
-+	vmovdqa		$t0,0x00(%rsp)
-+	vmovdqa		$t1,0x10(%rsp)
-+	vmovdqa		$t2,0x20(%rsp)
-+	vmovdqa		$t3,0x30(%rsp)
-+	add		\$64,$len
-+
-+.Loop_tail_avx512vl:
-+	movzb		($inp,$counter),%eax
-+	movzb		(%rsp,$counter),%ecx
-+	lea		1($counter),$counter
-+	xor		%ecx,%eax
-+	mov		%al,-1($out,$counter)
-+	dec		$len
-+	jnz		.Loop_tail_avx512vl
-+
-+	vmovdqu32	$a_,0x00(%rsp)
-+	vmovdqu32	$a_,0x20(%rsp)
-+
-+.Ldone_avx512vl:
-+	vzeroall
-+___
-+$code.=<<___	if ($win64);
-+	movaps	-0x30(%r10),%xmm6
-+	movaps	-0x20(%r10),%xmm7
-+___
-+$code.=<<___;
-+	lea	-8(%r10),%rsp
-+.cfi_def_cfa_register	%rsp
-+.Lavx512vl_epilogue:
-+	ret
-+.cfi_endproc
-+___
-+&end_function("chacha20_avx512vl");
-+
-+# This one handles longer inputs...
-+
-+my ($xa0,$xa1,$xa2,$xa3, $xb0,$xb1,$xb2,$xb3,
-+    $xc0,$xc1,$xc2,$xc3, $xd0,$xd1,$xd2,$xd3)=map("%zmm$_",(0..15));
-+my  @xx=($xa0,$xa1,$xa2,$xa3, $xb0,$xb1,$xb2,$xb3,
-+	 $xc0,$xc1,$xc2,$xc3, $xd0,$xd1,$xd2,$xd3);
-+my @key=map("%zmm$_",(16..31));
-+my ($xt0,$xt1,$xt2,$xt3)=@key[0..3];
-+
-+sub AVX512_lane_ROUND {
-+my ($a0,$b0,$c0,$d0)=@_;
-+my ($a1,$b1,$c1,$d1)=map(($_&~3)+(($_+1)&3),($a0,$b0,$c0,$d0));
-+my ($a2,$b2,$c2,$d2)=map(($_&~3)+(($_+1)&3),($a1,$b1,$c1,$d1));
-+my ($a3,$b3,$c3,$d3)=map(($_&~3)+(($_+1)&3),($a2,$b2,$c2,$d2));
-+my @x=map("\"$_\"",@xx);
-+
-+	(
-+	"&vpaddd	(@x[$a0],@x[$a0],@x[$b0])",	# Q1
-+	 "&vpaddd	(@x[$a1],@x[$a1],@x[$b1])",	# Q2
-+	  "&vpaddd	(@x[$a2],@x[$a2],@x[$b2])",	# Q3
-+	   "&vpaddd	(@x[$a3],@x[$a3],@x[$b3])",	# Q4
-+	"&vpxord	(@x[$d0],@x[$d0],@x[$a0])",
-+	 "&vpxord	(@x[$d1],@x[$d1],@x[$a1])",
-+	  "&vpxord	(@x[$d2],@x[$d2],@x[$a2])",
-+	   "&vpxord	(@x[$d3],@x[$d3],@x[$a3])",
-+	"&vprold	(@x[$d0],@x[$d0],16)",
-+	 "&vprold	(@x[$d1],@x[$d1],16)",
-+	  "&vprold	(@x[$d2],@x[$d2],16)",
-+	   "&vprold	(@x[$d3],@x[$d3],16)",
-+
-+	"&vpaddd	(@x[$c0],@x[$c0],@x[$d0])",
-+	 "&vpaddd	(@x[$c1],@x[$c1],@x[$d1])",
-+	  "&vpaddd	(@x[$c2],@x[$c2],@x[$d2])",
-+	   "&vpaddd	(@x[$c3],@x[$c3],@x[$d3])",
-+	"&vpxord	(@x[$b0],@x[$b0],@x[$c0])",
-+	 "&vpxord	(@x[$b1],@x[$b1],@x[$c1])",
-+	  "&vpxord	(@x[$b2],@x[$b2],@x[$c2])",
-+	   "&vpxord	(@x[$b3],@x[$b3],@x[$c3])",
-+	"&vprold	(@x[$b0],@x[$b0],12)",
-+	 "&vprold	(@x[$b1],@x[$b1],12)",
-+	  "&vprold	(@x[$b2],@x[$b2],12)",
-+	   "&vprold	(@x[$b3],@x[$b3],12)",
-+
-+	"&vpaddd	(@x[$a0],@x[$a0],@x[$b0])",
-+	 "&vpaddd	(@x[$a1],@x[$a1],@x[$b1])",
-+	  "&vpaddd	(@x[$a2],@x[$a2],@x[$b2])",
-+	   "&vpaddd	(@x[$a3],@x[$a3],@x[$b3])",
-+	"&vpxord	(@x[$d0],@x[$d0],@x[$a0])",
-+	 "&vpxord	(@x[$d1],@x[$d1],@x[$a1])",
-+	  "&vpxord	(@x[$d2],@x[$d2],@x[$a2])",
-+	   "&vpxord	(@x[$d3],@x[$d3],@x[$a3])",
-+	"&vprold	(@x[$d0],@x[$d0],8)",
-+	 "&vprold	(@x[$d1],@x[$d1],8)",
-+	  "&vprold	(@x[$d2],@x[$d2],8)",
-+	   "&vprold	(@x[$d3],@x[$d3],8)",
-+
-+	"&vpaddd	(@x[$c0],@x[$c0],@x[$d0])",
-+	 "&vpaddd	(@x[$c1],@x[$c1],@x[$d1])",
-+	  "&vpaddd	(@x[$c2],@x[$c2],@x[$d2])",
-+	   "&vpaddd	(@x[$c3],@x[$c3],@x[$d3])",
-+	"&vpxord	(@x[$b0],@x[$b0],@x[$c0])",
-+	 "&vpxord	(@x[$b1],@x[$b1],@x[$c1])",
-+	  "&vpxord	(@x[$b2],@x[$b2],@x[$c2])",
-+	   "&vpxord	(@x[$b3],@x[$b3],@x[$c3])",
-+	"&vprold	(@x[$b0],@x[$b0],7)",
-+	 "&vprold	(@x[$b1],@x[$b1],7)",
-+	  "&vprold	(@x[$b2],@x[$b2],7)",
-+	   "&vprold	(@x[$b3],@x[$b3],7)"
-+	);
-+}
-+
-+my $xframe = $win64 ? 0xa8 : 8;
-+
-+$code.=<<___;
-+.type	chacha20_16x,\@function,5
-+.align	32
-+chacha20_16x:
-+.cfi_startproc
-+.Lchacha20_16x:
-+	lea		8(%rsp),%r10		# frame register
-+.cfi_def_cfa_register	%r10
-+	sub		\$64+$xframe,%rsp
-+	and		\$-64,%rsp
-+___
-+$code.=<<___	if ($win64);
-+	movaps		%xmm6,-0xb0(%r10)
-+	movaps		%xmm7,-0xa0(%r10)
-+	movaps		%xmm8,-0x90(%r10)
-+	movaps		%xmm9,-0x80(%r10)
-+	movaps		%xmm10,-0x70(%r10)
-+	movaps		%xmm11,-0x60(%r10)
-+	movaps		%xmm12,-0x50(%r10)
-+	movaps		%xmm13,-0x40(%r10)
-+	movaps		%xmm14,-0x30(%r10)
-+	movaps		%xmm15,-0x20(%r10)
-+.L16x_body:
-+___
-+$code.=<<___;
-+	vzeroupper
-+
-+	lea		.Lsigma(%rip),%r9
-+	vbroadcasti32x4	(%r9),$xa3		# key[0]
-+	vbroadcasti32x4	($key),$xb3		# key[1]
-+	vbroadcasti32x4	16($key),$xc3		# key[2]
-+	vbroadcasti32x4	($counter),$xd3		# key[3]
-+
-+	vpshufd		\$0x00,$xa3,$xa0	# smash key by lanes...
-+	vpshufd		\$0x55,$xa3,$xa1
-+	vpshufd		\$0xaa,$xa3,$xa2
-+	vpshufd		\$0xff,$xa3,$xa3
-+	vmovdqa64	$xa0,@key[0]
-+	vmovdqa64	$xa1,@key[1]
-+	vmovdqa64	$xa2,@key[2]
-+	vmovdqa64	$xa3,@key[3]
-+
-+	vpshufd		\$0x00,$xb3,$xb0
-+	vpshufd		\$0x55,$xb3,$xb1
-+	vpshufd		\$0xaa,$xb3,$xb2
-+	vpshufd		\$0xff,$xb3,$xb3
-+	vmovdqa64	$xb0,@key[4]
-+	vmovdqa64	$xb1,@key[5]
-+	vmovdqa64	$xb2,@key[6]
-+	vmovdqa64	$xb3,@key[7]
-+
-+	vpshufd		\$0x00,$xc3,$xc0
-+	vpshufd		\$0x55,$xc3,$xc1
-+	vpshufd		\$0xaa,$xc3,$xc2
-+	vpshufd		\$0xff,$xc3,$xc3
-+	vmovdqa64	$xc0,@key[8]
-+	vmovdqa64	$xc1,@key[9]
-+	vmovdqa64	$xc2,@key[10]
-+	vmovdqa64	$xc3,@key[11]
-+
-+	vpshufd		\$0x00,$xd3,$xd0
-+	vpshufd		\$0x55,$xd3,$xd1
-+	vpshufd		\$0xaa,$xd3,$xd2
-+	vpshufd		\$0xff,$xd3,$xd3
-+	vpaddd		.Lincz(%rip),$xd0,$xd0	# don't save counters yet
-+	vmovdqa64	$xd0,@key[12]
-+	vmovdqa64	$xd1,@key[13]
-+	vmovdqa64	$xd2,@key[14]
-+	vmovdqa64	$xd3,@key[15]
-+
-+	mov		\$10,%eax
-+	jmp		.Loop16x
-+
-+.align	32
-+.Loop_outer16x:
-+	vpbroadcastd	0(%r9),$xa0		# reload key
-+	vpbroadcastd	4(%r9),$xa1
-+	vpbroadcastd	8(%r9),$xa2
-+	vpbroadcastd	12(%r9),$xa3
-+	vpaddd		.Lsixteen(%rip),@key[12],@key[12]	# next SIMD counters
-+	vmovdqa64	@key[4],$xb0
-+	vmovdqa64	@key[5],$xb1
-+	vmovdqa64	@key[6],$xb2
-+	vmovdqa64	@key[7],$xb3
-+	vmovdqa64	@key[8],$xc0
-+	vmovdqa64	@key[9],$xc1
-+	vmovdqa64	@key[10],$xc2
-+	vmovdqa64	@key[11],$xc3
-+	vmovdqa64	@key[12],$xd0
-+	vmovdqa64	@key[13],$xd1
-+	vmovdqa64	@key[14],$xd2
-+	vmovdqa64	@key[15],$xd3
-+
-+	vmovdqa64	$xa0,@key[0]
-+	vmovdqa64	$xa1,@key[1]
-+	vmovdqa64	$xa2,@key[2]
-+	vmovdqa64	$xa3,@key[3]
-+
-+	mov		\$10,%eax
-+	jmp		.Loop16x
-+
-+.align	32
-+.Loop16x:
-+___
-+	foreach (&AVX512_lane_ROUND(0, 4, 8,12)) { eval; }
-+	foreach (&AVX512_lane_ROUND(0, 5,10,15)) { eval; }
-+$code.=<<___;
-+	dec		%eax
-+	jnz		.Loop16x
-+
-+	vpaddd		@key[0],$xa0,$xa0	# accumulate key
-+	vpaddd		@key[1],$xa1,$xa1
-+	vpaddd		@key[2],$xa2,$xa2
-+	vpaddd		@key[3],$xa3,$xa3
-+
-+	vpunpckldq	$xa1,$xa0,$xt2		# "de-interlace" data
-+	vpunpckldq	$xa3,$xa2,$xt3
-+	vpunpckhdq	$xa1,$xa0,$xa0
-+	vpunpckhdq	$xa3,$xa2,$xa2
-+	vpunpcklqdq	$xt3,$xt2,$xa1		# "a0"
-+	vpunpckhqdq	$xt3,$xt2,$xt2		# "a1"
-+	vpunpcklqdq	$xa2,$xa0,$xa3		# "a2"
-+	vpunpckhqdq	$xa2,$xa0,$xa0		# "a3"
-+___
-+	($xa0,$xa1,$xa2,$xa3,$xt2)=($xa1,$xt2,$xa3,$xa0,$xa2);
-+$code.=<<___;
-+	vpaddd		@key[4],$xb0,$xb0
-+	vpaddd		@key[5],$xb1,$xb1
-+	vpaddd		@key[6],$xb2,$xb2
-+	vpaddd		@key[7],$xb3,$xb3
-+
-+	vpunpckldq	$xb1,$xb0,$xt2
-+	vpunpckldq	$xb3,$xb2,$xt3
-+	vpunpckhdq	$xb1,$xb0,$xb0
-+	vpunpckhdq	$xb3,$xb2,$xb2
-+	vpunpcklqdq	$xt3,$xt2,$xb1		# "b0"
-+	vpunpckhqdq	$xt3,$xt2,$xt2		# "b1"
-+	vpunpcklqdq	$xb2,$xb0,$xb3		# "b2"
-+	vpunpckhqdq	$xb2,$xb0,$xb0		# "b3"
-+___
-+	($xb0,$xb1,$xb2,$xb3,$xt2)=($xb1,$xt2,$xb3,$xb0,$xb2);
-+$code.=<<___;
-+	vshufi32x4	\$0x44,$xb0,$xa0,$xt3	# "de-interlace" further
-+	vshufi32x4	\$0xee,$xb0,$xa0,$xb0
-+	vshufi32x4	\$0x44,$xb1,$xa1,$xa0
-+	vshufi32x4	\$0xee,$xb1,$xa1,$xb1
-+	vshufi32x4	\$0x44,$xb2,$xa2,$xa1
-+	vshufi32x4	\$0xee,$xb2,$xa2,$xb2
-+	vshufi32x4	\$0x44,$xb3,$xa3,$xa2
-+	vshufi32x4	\$0xee,$xb3,$xa3,$xb3
-+___
-+	($xa0,$xa1,$xa2,$xa3,$xt3)=($xt3,$xa0,$xa1,$xa2,$xa3);
-+$code.=<<___;
-+	vpaddd		@key[8],$xc0,$xc0
-+	vpaddd		@key[9],$xc1,$xc1
-+	vpaddd		@key[10],$xc2,$xc2
-+	vpaddd		@key[11],$xc3,$xc3
-+
-+	vpunpckldq	$xc1,$xc0,$xt2
-+	vpunpckldq	$xc3,$xc2,$xt3
-+	vpunpckhdq	$xc1,$xc0,$xc0
-+	vpunpckhdq	$xc3,$xc2,$xc2
-+	vpunpcklqdq	$xt3,$xt2,$xc1		# "c0"
-+	vpunpckhqdq	$xt3,$xt2,$xt2		# "c1"
-+	vpunpcklqdq	$xc2,$xc0,$xc3		# "c2"
-+	vpunpckhqdq	$xc2,$xc0,$xc0		# "c3"
-+___
-+	($xc0,$xc1,$xc2,$xc3,$xt2)=($xc1,$xt2,$xc3,$xc0,$xc2);
-+$code.=<<___;
-+	vpaddd		@key[12],$xd0,$xd0
-+	vpaddd		@key[13],$xd1,$xd1
-+	vpaddd		@key[14],$xd2,$xd2
-+	vpaddd		@key[15],$xd3,$xd3
-+
-+	vpunpckldq	$xd1,$xd0,$xt2
-+	vpunpckldq	$xd3,$xd2,$xt3
-+	vpunpckhdq	$xd1,$xd0,$xd0
-+	vpunpckhdq	$xd3,$xd2,$xd2
-+	vpunpcklqdq	$xt3,$xt2,$xd1		# "d0"
-+	vpunpckhqdq	$xt3,$xt2,$xt2		# "d1"
-+	vpunpcklqdq	$xd2,$xd0,$xd3		# "d2"
-+	vpunpckhqdq	$xd2,$xd0,$xd0		# "d3"
-+___
-+	($xd0,$xd1,$xd2,$xd3,$xt2)=($xd1,$xt2,$xd3,$xd0,$xd2);
-+$code.=<<___;
-+	vshufi32x4	\$0x44,$xd0,$xc0,$xt3	# "de-interlace" further
-+	vshufi32x4	\$0xee,$xd0,$xc0,$xd0
-+	vshufi32x4	\$0x44,$xd1,$xc1,$xc0
-+	vshufi32x4	\$0xee,$xd1,$xc1,$xd1
-+	vshufi32x4	\$0x44,$xd2,$xc2,$xc1
-+	vshufi32x4	\$0xee,$xd2,$xc2,$xd2
-+	vshufi32x4	\$0x44,$xd3,$xc3,$xc2
-+	vshufi32x4	\$0xee,$xd3,$xc3,$xd3
-+___
-+	($xc0,$xc1,$xc2,$xc3,$xt3)=($xt3,$xc0,$xc1,$xc2,$xc3);
-+$code.=<<___;
-+	vshufi32x4	\$0x88,$xc0,$xa0,$xt0	# "de-interlace" further
-+	vshufi32x4	\$0xdd,$xc0,$xa0,$xa0
-+	 vshufi32x4	\$0x88,$xd0,$xb0,$xc0
-+	 vshufi32x4	\$0xdd,$xd0,$xb0,$xd0
-+	vshufi32x4	\$0x88,$xc1,$xa1,$xt1
-+	vshufi32x4	\$0xdd,$xc1,$xa1,$xa1
-+	 vshufi32x4	\$0x88,$xd1,$xb1,$xc1
-+	 vshufi32x4	\$0xdd,$xd1,$xb1,$xd1
-+	vshufi32x4	\$0x88,$xc2,$xa2,$xt2
-+	vshufi32x4	\$0xdd,$xc2,$xa2,$xa2
-+	 vshufi32x4	\$0x88,$xd2,$xb2,$xc2
-+	 vshufi32x4	\$0xdd,$xd2,$xb2,$xd2
-+	vshufi32x4	\$0x88,$xc3,$xa3,$xt3
-+	vshufi32x4	\$0xdd,$xc3,$xa3,$xa3
-+	 vshufi32x4	\$0x88,$xd3,$xb3,$xc3
-+	 vshufi32x4	\$0xdd,$xd3,$xb3,$xd3
-+___
-+	($xa0,$xa1,$xa2,$xa3,$xb0,$xb1,$xb2,$xb3)=
-+	($xt0,$xt1,$xt2,$xt3,$xa0,$xa1,$xa2,$xa3);
-+
-+	($xa0,$xb0,$xc0,$xd0, $xa1,$xb1,$xc1,$xd1,
-+	 $xa2,$xb2,$xc2,$xd2, $xa3,$xb3,$xc3,$xd3) =
-+	($xa0,$xa1,$xa2,$xa3, $xb0,$xb1,$xb2,$xb3,
-+	 $xc0,$xc1,$xc2,$xc3, $xd0,$xd1,$xd2,$xd3);
-+$code.=<<___;
-+	cmp		\$64*16,$len
-+	jb		.Ltail16x
-+
-+	vpxord		0x00($inp),$xa0,$xa0	# xor with input
-+	vpxord		0x40($inp),$xb0,$xb0
-+	vpxord		0x80($inp),$xc0,$xc0
-+	vpxord		0xc0($inp),$xd0,$xd0
-+	vmovdqu32	$xa0,0x00($out)
-+	vmovdqu32	$xb0,0x40($out)
-+	vmovdqu32	$xc0,0x80($out)
-+	vmovdqu32	$xd0,0xc0($out)
-+
-+	vpxord		0x100($inp),$xa1,$xa1
-+	vpxord		0x140($inp),$xb1,$xb1
-+	vpxord		0x180($inp),$xc1,$xc1
-+	vpxord		0x1c0($inp),$xd1,$xd1
-+	vmovdqu32	$xa1,0x100($out)
-+	vmovdqu32	$xb1,0x140($out)
-+	vmovdqu32	$xc1,0x180($out)
-+	vmovdqu32	$xd1,0x1c0($out)
-+
-+	vpxord		0x200($inp),$xa2,$xa2
-+	vpxord		0x240($inp),$xb2,$xb2
-+	vpxord		0x280($inp),$xc2,$xc2
-+	vpxord		0x2c0($inp),$xd2,$xd2
-+	vmovdqu32	$xa2,0x200($out)
-+	vmovdqu32	$xb2,0x240($out)
-+	vmovdqu32	$xc2,0x280($out)
-+	vmovdqu32	$xd2,0x2c0($out)
-+
-+	vpxord		0x300($inp),$xa3,$xa3
-+	vpxord		0x340($inp),$xb3,$xb3
-+	vpxord		0x380($inp),$xc3,$xc3
-+	vpxord		0x3c0($inp),$xd3,$xd3
-+	lea		0x400($inp),$inp
-+	vmovdqu32	$xa3,0x300($out)
-+	vmovdqu32	$xb3,0x340($out)
-+	vmovdqu32	$xc3,0x380($out)
-+	vmovdqu32	$xd3,0x3c0($out)
-+	lea		0x400($out),$out
-+
-+	sub		\$64*16,$len
-+	jnz		.Loop_outer16x
-+
-+	jmp		.Ldone16x
-+
-+.align	32
-+.Ltail16x:
-+	xor		%r9,%r9
-+	sub		$inp,$out
-+	cmp		\$64*1,$len
-+	jb		.Less_than_64_16x
-+	vpxord		($inp),$xa0,$xa0	# xor with input
-+	vmovdqu32	$xa0,($out,$inp)
-+	je		.Ldone16x
-+	vmovdqa32	$xb0,$xa0
-+	lea		64($inp),$inp
-+
-+	cmp		\$64*2,$len
-+	jb		.Less_than_64_16x
-+	vpxord		($inp),$xb0,$xb0
-+	vmovdqu32	$xb0,($out,$inp)
-+	je		.Ldone16x
-+	vmovdqa32	$xc0,$xa0
-+	lea		64($inp),$inp
-+
-+	cmp		\$64*3,$len
-+	jb		.Less_than_64_16x
-+	vpxord		($inp),$xc0,$xc0
-+	vmovdqu32	$xc0,($out,$inp)
-+	je		.Ldone16x
-+	vmovdqa32	$xd0,$xa0
-+	lea		64($inp),$inp
-+
-+	cmp		\$64*4,$len
-+	jb		.Less_than_64_16x
-+	vpxord		($inp),$xd0,$xd0
-+	vmovdqu32	$xd0,($out,$inp)
-+	je		.Ldone16x
-+	vmovdqa32	$xa1,$xa0
-+	lea		64($inp),$inp
-+
-+	cmp		\$64*5,$len
-+	jb		.Less_than_64_16x
-+	vpxord		($inp),$xa1,$xa1
-+	vmovdqu32	$xa1,($out,$inp)
-+	je		.Ldone16x
-+	vmovdqa32	$xb1,$xa0
-+	lea		64($inp),$inp
-+
-+	cmp		\$64*6,$len
-+	jb		.Less_than_64_16x
-+	vpxord		($inp),$xb1,$xb1
-+	vmovdqu32	$xb1,($out,$inp)
-+	je		.Ldone16x
-+	vmovdqa32	$xc1,$xa0
-+	lea		64($inp),$inp
-+
-+	cmp		\$64*7,$len
-+	jb		.Less_than_64_16x
-+	vpxord		($inp),$xc1,$xc1
-+	vmovdqu32	$xc1,($out,$inp)
-+	je		.Ldone16x
-+	vmovdqa32	$xd1,$xa0
-+	lea		64($inp),$inp
-+
-+	cmp		\$64*8,$len
-+	jb		.Less_than_64_16x
-+	vpxord		($inp),$xd1,$xd1
-+	vmovdqu32	$xd1,($out,$inp)
-+	je		.Ldone16x
-+	vmovdqa32	$xa2,$xa0
-+	lea		64($inp),$inp
-+
-+	cmp		\$64*9,$len
-+	jb		.Less_than_64_16x
-+	vpxord		($inp),$xa2,$xa2
-+	vmovdqu32	$xa2,($out,$inp)
-+	je		.Ldone16x
-+	vmovdqa32	$xb2,$xa0
-+	lea		64($inp),$inp
-+
-+	cmp		\$64*10,$len
-+	jb		.Less_than_64_16x
-+	vpxord		($inp),$xb2,$xb2
-+	vmovdqu32	$xb2,($out,$inp)
-+	je		.Ldone16x
-+	vmovdqa32	$xc2,$xa0
-+	lea		64($inp),$inp
-+
-+	cmp		\$64*11,$len
-+	jb		.Less_than_64_16x
-+	vpxord		($inp),$xc2,$xc2
-+	vmovdqu32	$xc2,($out,$inp)
-+	je		.Ldone16x
-+	vmovdqa32	$xd2,$xa0
-+	lea		64($inp),$inp
-+
-+	cmp		\$64*12,$len
-+	jb		.Less_than_64_16x
-+	vpxord		($inp),$xd2,$xd2
-+	vmovdqu32	$xd2,($out,$inp)
-+	je		.Ldone16x
-+	vmovdqa32	$xa3,$xa0
-+	lea		64($inp),$inp
-+
-+	cmp		\$64*13,$len
-+	jb		.Less_than_64_16x
-+	vpxord		($inp),$xa3,$xa3
-+	vmovdqu32	$xa3,($out,$inp)
-+	je		.Ldone16x
-+	vmovdqa32	$xb3,$xa0
-+	lea		64($inp),$inp
-+
-+	cmp		\$64*14,$len
-+	jb		.Less_than_64_16x
-+	vpxord		($inp),$xb3,$xb3
-+	vmovdqu32	$xb3,($out,$inp)
-+	je		.Ldone16x
-+	vmovdqa32	$xc3,$xa0
-+	lea		64($inp),$inp
-+
-+	cmp		\$64*15,$len
-+	jb		.Less_than_64_16x
-+	vpxord		($inp),$xc3,$xc3
-+	vmovdqu32	$xc3,($out,$inp)
-+	je		.Ldone16x
-+	vmovdqa32	$xd3,$xa0
-+	lea		64($inp),$inp
-+
-+.Less_than_64_16x:
-+	vmovdqa32	$xa0,0x00(%rsp)
-+	lea		($out,$inp),$out
-+	and		\$63,$len
-+
-+.Loop_tail16x:
-+	movzb		($inp,%r9),%eax
-+	movzb		(%rsp,%r9),%ecx
-+	lea		1(%r9),%r9
-+	xor		%ecx,%eax
-+	mov		%al,-1($out,%r9)
-+	dec		$len
-+	jnz		.Loop_tail16x
-+
-+	vpxord		$xa0,$xa0,$xa0
-+	vmovdqa32	$xa0,0(%rsp)
-+
-+.Ldone16x:
-+	vzeroall
-+___
-+$code.=<<___	if ($win64);
-+	movaps		-0xb0(%r10),%xmm6
-+	movaps		-0xa0(%r10),%xmm7
-+	movaps		-0x90(%r10),%xmm8
-+	movaps		-0x80(%r10),%xmm9
-+	movaps		-0x70(%r10),%xmm10
-+	movaps		-0x60(%r10),%xmm11
-+	movaps		-0x50(%r10),%xmm12
-+	movaps		-0x40(%r10),%xmm13
-+	movaps		-0x30(%r10),%xmm14
-+	movaps		-0x20(%r10),%xmm15
-+___
-+$code.=<<___;
-+	lea		-8(%r10),%rsp
-+.cfi_def_cfa_register	%rsp
-+.L16x_epilogue:
-+	ret
-+.cfi_endproc
-+.size	chacha20_16x,.-chacha20_16x
-+___
-+
-+# switch to %ymm domain
-+($xa0,$xa1,$xa2,$xa3, $xb0,$xb1,$xb2,$xb3,
-+ $xc0,$xc1,$xc2,$xc3, $xd0,$xd1,$xd2,$xd3)=map("%ymm$_",(0..15));
-+@xx=($xa0,$xa1,$xa2,$xa3, $xb0,$xb1,$xb2,$xb3,
-+     $xc0,$xc1,$xc2,$xc3, $xd0,$xd1,$xd2,$xd3);
-+@key=map("%ymm$_",(16..31));
-+($xt0,$xt1,$xt2,$xt3)=@key[0..3];
-+
-+$code.=<<___;
-+.type	chacha20_8xvl,\@function,5
-+.align	32
-+chacha20_8xvl:
-+.cfi_startproc
-+.Lchacha20_8xvl:
-+	lea		8(%rsp),%r10		# frame register
-+.cfi_def_cfa_register	%r10
-+	sub		\$64+$xframe,%rsp
-+	and		\$-64,%rsp
-+___
-+$code.=<<___	if ($win64);
-+	movaps		%xmm6,-0xb0(%r10)
-+	movaps		%xmm7,-0xa0(%r10)
-+	movaps		%xmm8,-0x90(%r10)
-+	movaps		%xmm9,-0x80(%r10)
-+	movaps		%xmm10,-0x70(%r10)
-+	movaps		%xmm11,-0x60(%r10)
-+	movaps		%xmm12,-0x50(%r10)
-+	movaps		%xmm13,-0x40(%r10)
-+	movaps		%xmm14,-0x30(%r10)
-+	movaps		%xmm15,-0x20(%r10)
-+.L8xvl_body:
-+___
-+$code.=<<___;
-+	vzeroupper
-+
-+	lea		.Lsigma(%rip),%r9
-+	vbroadcasti128	(%r9),$xa3		# key[0]
-+	vbroadcasti128	($key),$xb3		# key[1]
-+	vbroadcasti128	16($key),$xc3		# key[2]
-+	vbroadcasti128	($counter),$xd3		# key[3]
-+
-+	vpshufd		\$0x00,$xa3,$xa0	# smash key by lanes...
-+	vpshufd		\$0x55,$xa3,$xa1
-+	vpshufd		\$0xaa,$xa3,$xa2
-+	vpshufd		\$0xff,$xa3,$xa3
-+	vmovdqa64	$xa0,@key[0]
-+	vmovdqa64	$xa1,@key[1]
-+	vmovdqa64	$xa2,@key[2]
-+	vmovdqa64	$xa3,@key[3]
-+
-+	vpshufd		\$0x00,$xb3,$xb0
-+	vpshufd		\$0x55,$xb3,$xb1
-+	vpshufd		\$0xaa,$xb3,$xb2
-+	vpshufd		\$0xff,$xb3,$xb3
-+	vmovdqa64	$xb0,@key[4]
-+	vmovdqa64	$xb1,@key[5]
-+	vmovdqa64	$xb2,@key[6]
-+	vmovdqa64	$xb3,@key[7]
-+
-+	vpshufd		\$0x00,$xc3,$xc0
-+	vpshufd		\$0x55,$xc3,$xc1
-+	vpshufd		\$0xaa,$xc3,$xc2
-+	vpshufd		\$0xff,$xc3,$xc3
-+	vmovdqa64	$xc0,@key[8]
-+	vmovdqa64	$xc1,@key[9]
-+	vmovdqa64	$xc2,@key[10]
-+	vmovdqa64	$xc3,@key[11]
-+
-+	vpshufd		\$0x00,$xd3,$xd0
-+	vpshufd		\$0x55,$xd3,$xd1
-+	vpshufd		\$0xaa,$xd3,$xd2
-+	vpshufd		\$0xff,$xd3,$xd3
-+	vpaddd		.Lincy(%rip),$xd0,$xd0	# don't save counters yet
-+	vmovdqa64	$xd0,@key[12]
-+	vmovdqa64	$xd1,@key[13]
-+	vmovdqa64	$xd2,@key[14]
-+	vmovdqa64	$xd3,@key[15]
-+
-+	mov		\$10,%eax
-+	jmp		.Loop8xvl
-+
-+.align	32
-+.Loop_outer8xvl:
-+	#vpbroadcastd	0(%r9),$xa0		# reload key
-+	#vpbroadcastd	4(%r9),$xa1
-+	vpbroadcastd	8(%r9),$xa2
-+	vpbroadcastd	12(%r9),$xa3
-+	vpaddd		.Leight(%rip),@key[12],@key[12]	# next SIMD counters
-+	vmovdqa64	@key[4],$xb0
-+	vmovdqa64	@key[5],$xb1
-+	vmovdqa64	@key[6],$xb2
-+	vmovdqa64	@key[7],$xb3
-+	vmovdqa64	@key[8],$xc0
-+	vmovdqa64	@key[9],$xc1
-+	vmovdqa64	@key[10],$xc2
-+	vmovdqa64	@key[11],$xc3
-+	vmovdqa64	@key[12],$xd0
-+	vmovdqa64	@key[13],$xd1
-+	vmovdqa64	@key[14],$xd2
-+	vmovdqa64	@key[15],$xd3
-+
-+	vmovdqa64	$xa0,@key[0]
-+	vmovdqa64	$xa1,@key[1]
-+	vmovdqa64	$xa2,@key[2]
-+	vmovdqa64	$xa3,@key[3]
-+
-+	mov		\$10,%eax
-+	jmp		.Loop8xvl
-+
-+.align	32
-+.Loop8xvl:
-+___
-+	foreach (&AVX512_lane_ROUND(0, 4, 8,12)) { eval; }
-+	foreach (&AVX512_lane_ROUND(0, 5,10,15)) { eval; }
-+$code.=<<___;
-+	dec		%eax
-+	jnz		.Loop8xvl
-+
-+	vpaddd		@key[0],$xa0,$xa0	# accumulate key
-+	vpaddd		@key[1],$xa1,$xa1
-+	vpaddd		@key[2],$xa2,$xa2
-+	vpaddd		@key[3],$xa3,$xa3
-+
-+	vpunpckldq	$xa1,$xa0,$xt2		# "de-interlace" data
-+	vpunpckldq	$xa3,$xa2,$xt3
-+	vpunpckhdq	$xa1,$xa0,$xa0
-+	vpunpckhdq	$xa3,$xa2,$xa2
-+	vpunpcklqdq	$xt3,$xt2,$xa1		# "a0"
-+	vpunpckhqdq	$xt3,$xt2,$xt2		# "a1"
-+	vpunpcklqdq	$xa2,$xa0,$xa3		# "a2"
-+	vpunpckhqdq	$xa2,$xa0,$xa0		# "a3"
-+___
-+	($xa0,$xa1,$xa2,$xa3,$xt2)=($xa1,$xt2,$xa3,$xa0,$xa2);
-+$code.=<<___;
-+	vpaddd		@key[4],$xb0,$xb0
-+	vpaddd		@key[5],$xb1,$xb1
-+	vpaddd		@key[6],$xb2,$xb2
-+	vpaddd		@key[7],$xb3,$xb3
-+
-+	vpunpckldq	$xb1,$xb0,$xt2
-+	vpunpckldq	$xb3,$xb2,$xt3
-+	vpunpckhdq	$xb1,$xb0,$xb0
-+	vpunpckhdq	$xb3,$xb2,$xb2
-+	vpunpcklqdq	$xt3,$xt2,$xb1		# "b0"
-+	vpunpckhqdq	$xt3,$xt2,$xt2		# "b1"
-+	vpunpcklqdq	$xb2,$xb0,$xb3		# "b2"
-+	vpunpckhqdq	$xb2,$xb0,$xb0		# "b3"
-+___
-+	($xb0,$xb1,$xb2,$xb3,$xt2)=($xb1,$xt2,$xb3,$xb0,$xb2);
-+$code.=<<___;
-+	vshufi32x4	\$0,$xb0,$xa0,$xt3	# "de-interlace" further
-+	vshufi32x4	\$3,$xb0,$xa0,$xb0
-+	vshufi32x4	\$0,$xb1,$xa1,$xa0
-+	vshufi32x4	\$3,$xb1,$xa1,$xb1
-+	vshufi32x4	\$0,$xb2,$xa2,$xa1
-+	vshufi32x4	\$3,$xb2,$xa2,$xb2
-+	vshufi32x4	\$0,$xb3,$xa3,$xa2
-+	vshufi32x4	\$3,$xb3,$xa3,$xb3
-+___
-+	($xa0,$xa1,$xa2,$xa3,$xt3)=($xt3,$xa0,$xa1,$xa2,$xa3);
-+$code.=<<___;
-+	vpaddd		@key[8],$xc0,$xc0
-+	vpaddd		@key[9],$xc1,$xc1
-+	vpaddd		@key[10],$xc2,$xc2
-+	vpaddd		@key[11],$xc3,$xc3
-+
-+	vpunpckldq	$xc1,$xc0,$xt2
-+	vpunpckldq	$xc3,$xc2,$xt3
-+	vpunpckhdq	$xc1,$xc0,$xc0
-+	vpunpckhdq	$xc3,$xc2,$xc2
-+	vpunpcklqdq	$xt3,$xt2,$xc1		# "c0"
-+	vpunpckhqdq	$xt3,$xt2,$xt2		# "c1"
-+	vpunpcklqdq	$xc2,$xc0,$xc3		# "c2"
-+	vpunpckhqdq	$xc2,$xc0,$xc0		# "c3"
-+___
-+	($xc0,$xc1,$xc2,$xc3,$xt2)=($xc1,$xt2,$xc3,$xc0,$xc2);
-+$code.=<<___;
-+	vpaddd		@key[12],$xd0,$xd0
-+	vpaddd		@key[13],$xd1,$xd1
-+	vpaddd		@key[14],$xd2,$xd2
-+	vpaddd		@key[15],$xd3,$xd3
-+
-+	vpunpckldq	$xd1,$xd0,$xt2
-+	vpunpckldq	$xd3,$xd2,$xt3
-+	vpunpckhdq	$xd1,$xd0,$xd0
-+	vpunpckhdq	$xd3,$xd2,$xd2
-+	vpunpcklqdq	$xt3,$xt2,$xd1		# "d0"
-+	vpunpckhqdq	$xt3,$xt2,$xt2		# "d1"
-+	vpunpcklqdq	$xd2,$xd0,$xd3		# "d2"
-+	vpunpckhqdq	$xd2,$xd0,$xd0		# "d3"
-+___
-+	($xd0,$xd1,$xd2,$xd3,$xt2)=($xd1,$xt2,$xd3,$xd0,$xd2);
-+$code.=<<___;
-+	vperm2i128	\$0x20,$xd0,$xc0,$xt3	# "de-interlace" further
-+	vperm2i128	\$0x31,$xd0,$xc0,$xd0
-+	vperm2i128	\$0x20,$xd1,$xc1,$xc0
-+	vperm2i128	\$0x31,$xd1,$xc1,$xd1
-+	vperm2i128	\$0x20,$xd2,$xc2,$xc1
-+	vperm2i128	\$0x31,$xd2,$xc2,$xd2
-+	vperm2i128	\$0x20,$xd3,$xc3,$xc2
-+	vperm2i128	\$0x31,$xd3,$xc3,$xd3
-+___
-+	($xc0,$xc1,$xc2,$xc3,$xt3)=($xt3,$xc0,$xc1,$xc2,$xc3);
-+	($xb0,$xb1,$xb2,$xb3,$xc0,$xc1,$xc2,$xc3)=
-+	($xc0,$xc1,$xc2,$xc3,$xb0,$xb1,$xb2,$xb3);
-+$code.=<<___;
-+	cmp		\$64*8,$len
-+	jb		.Ltail8xvl
-+
-+	mov		\$0x80,%eax		# size optimization
-+	vpxord		0x00($inp),$xa0,$xa0	# xor with input
-+	vpxor		0x20($inp),$xb0,$xb0
-+	vpxor		0x40($inp),$xc0,$xc0
-+	vpxor		0x60($inp),$xd0,$xd0
-+	lea		($inp,%rax),$inp	# size optimization
-+	vmovdqu32	$xa0,0x00($out)
-+	vmovdqu		$xb0,0x20($out)
-+	vmovdqu		$xc0,0x40($out)
-+	vmovdqu		$xd0,0x60($out)
-+	lea		($out,%rax),$out	# size optimization
-+
-+	vpxor		0x00($inp),$xa1,$xa1
-+	vpxor		0x20($inp),$xb1,$xb1
-+	vpxor		0x40($inp),$xc1,$xc1
-+	vpxor		0x60($inp),$xd1,$xd1
-+	lea		($inp,%rax),$inp	# size optimization
-+	vmovdqu		$xa1,0x00($out)
-+	vmovdqu		$xb1,0x20($out)
-+	vmovdqu		$xc1,0x40($out)
-+	vmovdqu		$xd1,0x60($out)
-+	lea		($out,%rax),$out	# size optimization
-+
-+	vpxord		0x00($inp),$xa2,$xa2
-+	vpxor		0x20($inp),$xb2,$xb2
-+	vpxor		0x40($inp),$xc2,$xc2
-+	vpxor		0x60($inp),$xd2,$xd2
-+	lea		($inp,%rax),$inp	# size optimization
-+	vmovdqu32	$xa2,0x00($out)
-+	vmovdqu		$xb2,0x20($out)
-+	vmovdqu		$xc2,0x40($out)
-+	vmovdqu		$xd2,0x60($out)
-+	lea		($out,%rax),$out	# size optimization
-+
-+	vpxor		0x00($inp),$xa3,$xa3
-+	vpxor		0x20($inp),$xb3,$xb3
-+	vpxor		0x40($inp),$xc3,$xc3
-+	vpxor		0x60($inp),$xd3,$xd3
-+	lea		($inp,%rax),$inp	# size optimization
-+	vmovdqu		$xa3,0x00($out)
-+	vmovdqu		$xb3,0x20($out)
-+	vmovdqu		$xc3,0x40($out)
-+	vmovdqu		$xd3,0x60($out)
-+	lea		($out,%rax),$out	# size optimization
-+
-+	vpbroadcastd	0(%r9),%ymm0		# reload key
-+	vpbroadcastd	4(%r9),%ymm1
-+
-+	sub		\$64*8,$len
-+	jnz		.Loop_outer8xvl
-+
-+	jmp		.Ldone8xvl
-+
-+.align	32
-+.Ltail8xvl:
-+	vmovdqa64	$xa0,%ymm8		# size optimization
-+___
-+$xa0 = "%ymm8";
-+$code.=<<___;
-+	xor		%r9,%r9
-+	sub		$inp,$out
-+	cmp		\$64*1,$len
-+	jb		.Less_than_64_8xvl
-+	vpxor		0x00($inp),$xa0,$xa0	# xor with input
-+	vpxor		0x20($inp),$xb0,$xb0
-+	vmovdqu		$xa0,0x00($out,$inp)
-+	vmovdqu		$xb0,0x20($out,$inp)
-+	je		.Ldone8xvl
-+	vmovdqa		$xc0,$xa0
-+	vmovdqa		$xd0,$xb0
-+	lea		64($inp),$inp
-+
-+	cmp		\$64*2,$len
-+	jb		.Less_than_64_8xvl
-+	vpxor		0x00($inp),$xc0,$xc0
-+	vpxor		0x20($inp),$xd0,$xd0
-+	vmovdqu		$xc0,0x00($out,$inp)
-+	vmovdqu		$xd0,0x20($out,$inp)
-+	je		.Ldone8xvl
-+	vmovdqa		$xa1,$xa0
-+	vmovdqa		$xb1,$xb0
-+	lea		64($inp),$inp
-+
-+	cmp		\$64*3,$len
-+	jb		.Less_than_64_8xvl
-+	vpxor		0x00($inp),$xa1,$xa1
-+	vpxor		0x20($inp),$xb1,$xb1
-+	vmovdqu		$xa1,0x00($out,$inp)
-+	vmovdqu		$xb1,0x20($out,$inp)
-+	je		.Ldone8xvl
-+	vmovdqa		$xc1,$xa0
-+	vmovdqa		$xd1,$xb0
-+	lea		64($inp),$inp
-+
-+	cmp		\$64*4,$len
-+	jb		.Less_than_64_8xvl
-+	vpxor		0x00($inp),$xc1,$xc1
-+	vpxor		0x20($inp),$xd1,$xd1
-+	vmovdqu		$xc1,0x00($out,$inp)
-+	vmovdqu		$xd1,0x20($out,$inp)
-+	je		.Ldone8xvl
-+	vmovdqa32	$xa2,$xa0
-+	vmovdqa		$xb2,$xb0
-+	lea		64($inp),$inp
-+
-+	cmp		\$64*5,$len
-+	jb		.Less_than_64_8xvl
-+	vpxord		0x00($inp),$xa2,$xa2
-+	vpxor		0x20($inp),$xb2,$xb2
-+	vmovdqu32	$xa2,0x00($out,$inp)
-+	vmovdqu		$xb2,0x20($out,$inp)
-+	je		.Ldone8xvl
-+	vmovdqa		$xc2,$xa0
-+	vmovdqa		$xd2,$xb0
-+	lea		64($inp),$inp
-+
-+	cmp		\$64*6,$len
-+	jb		.Less_than_64_8xvl
-+	vpxor		0x00($inp),$xc2,$xc2
-+	vpxor		0x20($inp),$xd2,$xd2
-+	vmovdqu		$xc2,0x00($out,$inp)
-+	vmovdqu		$xd2,0x20($out,$inp)
-+	je		.Ldone8xvl
-+	vmovdqa		$xa3,$xa0
-+	vmovdqa		$xb3,$xb0
-+	lea		64($inp),$inp
-+
-+	cmp		\$64*7,$len
-+	jb		.Less_than_64_8xvl
-+	vpxor		0x00($inp),$xa3,$xa3
-+	vpxor		0x20($inp),$xb3,$xb3
-+	vmovdqu		$xa3,0x00($out,$inp)
-+	vmovdqu		$xb3,0x20($out,$inp)
-+	je		.Ldone8xvl
-+	vmovdqa		$xc3,$xa0
-+	vmovdqa		$xd3,$xb0
-+	lea		64($inp),$inp
-+
-+.Less_than_64_8xvl:
-+	vmovdqa		$xa0,0x00(%rsp)
-+	vmovdqa		$xb0,0x20(%rsp)
-+	lea		($out,$inp),$out
-+	and		\$63,$len
-+
-+.Loop_tail8xvl:
-+	movzb		($inp,%r9),%eax
-+	movzb		(%rsp,%r9),%ecx
-+	lea		1(%r9),%r9
-+	xor		%ecx,%eax
-+	mov		%al,-1($out,%r9)
-+	dec		$len
-+	jnz		.Loop_tail8xvl
-+
-+	vpxor		$xa0,$xa0,$xa0
-+	vmovdqa		$xa0,0x00(%rsp)
-+	vmovdqa		$xa0,0x20(%rsp)
-+
-+.Ldone8xvl:
-+	vzeroall
-+___
-+$code.=<<___	if ($win64);
-+	movaps		-0xb0(%r10),%xmm6
-+	movaps		-0xa0(%r10),%xmm7
-+	movaps		-0x90(%r10),%xmm8
-+	movaps		-0x80(%r10),%xmm9
-+	movaps		-0x70(%r10),%xmm10
-+	movaps		-0x60(%r10),%xmm11
-+	movaps		-0x50(%r10),%xmm12
-+	movaps		-0x40(%r10),%xmm13
-+	movaps		-0x30(%r10),%xmm14
-+	movaps		-0x20(%r10),%xmm15
-+___
-+$code.=<<___;
-+	lea		-8(%r10),%rsp
-+.cfi_def_cfa_register	%rsp
-+.L8xvl_epilogue:
-+	ret
-+.cfi_endproc
-+.size	chacha20_8xvl,.-chacha20_8xvl
-+___
-+if($kernel) {
-+	$code .= "#endif\n";
-+}
-+}
-+
-+# EXCEPTION_DISPOSITION handler (EXCEPTION_RECORD *rec,ULONG64 frame,
-+#		CONTEXT *context,DISPATCHER_CONTEXT *disp)
-+if ($win64) {
-+$rec="%rcx";
-+$frame="%rdx";
-+$context="%r8";
-+$disp="%r9";
-+
-+$code.=<<___;
-+.extern	__imp_RtlVirtualUnwind
-+.type	se_handler,\@abi-omnipotent
-+.align	16
-+se_handler:
-+	push	%rsi
-+	push	%rdi
-+	push	%rbx
-+	push	%rbp
-+	push	%r12
-+	push	%r13
-+	push	%r14
-+	push	%r15
-+	pushfq
-+	sub	\$64,%rsp
-+
-+	mov	120($context),%rax	# pull context->Rax
-+	mov	248($context),%rbx	# pull context->Rip
-+
-+	mov	8($disp),%rsi		# disp->ImageBase
-+	mov	56($disp),%r11		# disp->HandlerData
-+
-+	lea	.Lctr32_body(%rip),%r10
-+	cmp	%r10,%rbx		# context->Rip<.Lprologue
-+	jb	.Lcommon_seh_tail
-+
-+	mov	152($context),%rax	# pull context->Rsp
-+
-+	lea	.Lno_data(%rip),%r10	# epilogue label
-+	cmp	%r10,%rbx		# context->Rip>=.Lepilogue
-+	jae	.Lcommon_seh_tail
-+
-+	lea	64+24+48(%rax),%rax
-+
-+	mov	-8(%rax),%rbx
-+	mov	-16(%rax),%rbp
-+	mov	-24(%rax),%r12
-+	mov	-32(%rax),%r13
-+	mov	-40(%rax),%r14
-+	mov	-48(%rax),%r15
-+	mov	%rbx,144($context)	# restore context->Rbx
-+	mov	%rbp,160($context)	# restore context->Rbp
-+	mov	%r12,216($context)	# restore context->R12
-+	mov	%r13,224($context)	# restore context->R13
-+	mov	%r14,232($context)	# restore context->R14
-+	mov	%r15,240($context)	# restore context->R14
-+
-+.Lcommon_seh_tail:
-+	mov	8(%rax),%rdi
-+	mov	16(%rax),%rsi
-+	mov	%rax,152($context)	# restore context->Rsp
-+	mov	%rsi,168($context)	# restore context->Rsi
-+	mov	%rdi,176($context)	# restore context->Rdi
-+
-+	mov	40($disp),%rdi		# disp->ContextRecord
-+	mov	$context,%rsi		# context
-+	mov	\$154,%ecx		# sizeof(CONTEXT)
-+	.long	0xa548f3fc		# cld; rep movsq
-+
-+	mov	$disp,%rsi
-+	xor	%rcx,%rcx		# arg1, UNW_FLAG_NHANDLER
-+	mov	8(%rsi),%rdx		# arg2, disp->ImageBase
-+	mov	0(%rsi),%r8		# arg3, disp->ControlPc
-+	mov	16(%rsi),%r9		# arg4, disp->FunctionEntry
-+	mov	40(%rsi),%r10		# disp->ContextRecord
-+	lea	56(%rsi),%r11		# &disp->HandlerData
-+	lea	24(%rsi),%r12		# &disp->EstablisherFrame
-+	mov	%r10,32(%rsp)		# arg5
-+	mov	%r11,40(%rsp)		# arg6
-+	mov	%r12,48(%rsp)		# arg7
-+	mov	%rcx,56(%rsp)		# arg8, (NULL)
-+	call	*__imp_RtlVirtualUnwind(%rip)
-+
-+	mov	\$1,%eax		# ExceptionContinueSearch
-+	add	\$64,%rsp
-+	popfq
-+	pop	%r15
-+	pop	%r14
-+	pop	%r13
-+	pop	%r12
-+	pop	%rbp
-+	pop	%rbx
-+	pop	%rdi
-+	pop	%rsi
-+	ret
-+.size	se_handler,.-se_handler
-+
-+.type	simd_handler,\@abi-omnipotent
-+.align	16
-+simd_handler:
-+	push	%rsi
-+	push	%rdi
-+	push	%rbx
-+	push	%rbp
-+	push	%r12
-+	push	%r13
-+	push	%r14
-+	push	%r15
-+	pushfq
-+	sub	\$64,%rsp
-+
-+	mov	120($context),%rax	# pull context->Rax
-+	mov	248($context),%rbx	# pull context->Rip
-+
-+	mov	8($disp),%rsi		# disp->ImageBase
-+	mov	56($disp),%r11		# disp->HandlerData
-+
-+	mov	0(%r11),%r10d		# HandlerData[0]
-+	lea	(%rsi,%r10),%r10	# prologue label
-+	cmp	%r10,%rbx		# context->Rip<prologue label
-+	jb	.Lcommon_seh_tail
-+
-+	mov	192($context),%rax	# pull context->R9
-+
-+	mov	4(%r11),%r10d		# HandlerData[1]
-+	mov	8(%r11),%ecx		# HandlerData[2]
-+	lea	(%rsi,%r10),%r10	# epilogue label
-+	cmp	%r10,%rbx		# context->Rip>=epilogue label
-+	jae	.Lcommon_seh_tail
-+
-+	neg	%rcx
-+	lea	-8(%rax,%rcx),%rsi
-+	lea	512($context),%rdi	# &context.Xmm6
-+	neg	%ecx
-+	shr	\$3,%ecx
-+	.long	0xa548f3fc		# cld; rep movsq
-+
-+	jmp	.Lcommon_seh_tail
-+.size	simd_handler,.-simd_handler
-+
-+.section	.pdata
 +.align	4
-+	.rva	.LSEH_begin_chacha20_ctr32
-+	.rva	.LSEH_end_chacha20_ctr32
-+	.rva	.LSEH_info_chacha20_ctr32
++.Loop_neon_outer:
++	ldmia		sp,{r0-r9}		@ load key material
++	cmp		@t[3],#64*2		@ if len<=64*2
++	bls		.Lbreak_neon		@ switch to integer-only
++	@ vldr		$t3#lo,[sp,#4*(16+6)]	@ rot8
++	vmov		$a1,$a0
++	str		@t[3],[sp,#4*(32+2)]	@ save len
++	vmov		$a2,$a0
++	str		r12,  [sp,#4*(32+1)]	@ save inp
++	vmov		$b1,$b0
++	str		r14,  [sp,#4*(32+0)]	@ save out
++	vmov		$b2,$b0
++.Loop_neon_enter:
++	ldr		@t[3], [sp,#4*(15)]
++	 mov		@x[4],@x[4],ror#19	@ twist b[0..3]
++	vadd.i32	$d1,$d0,$t0		@ counter+1
++	ldr		@x[12],[sp,#4*(12)]	@ modulo-scheduled load
++	 mov		@x[5],@x[5],ror#19
++	vmov		$c1,$c0
++	ldr		@t[2], [sp,#4*(13)]
++	 mov		@x[6],@x[6],ror#19
++	vmov		$c2,$c0
++	ldr		@x[14],[sp,#4*(14)]
++	 mov		@x[7],@x[7],ror#19
++	vadd.i32	$d2,$d1,$t0		@ counter+2
++	add		@x[12],@x[12],#3	@ counter+3
++	mov		@t[3],@t[3],ror#8	@ twist d[0..3]
++	mov		@x[12],@x[12],ror#8
++	mov		@t[2],@t[2],ror#8
++	mov		@x[14],@x[14],ror#8
++	str		@t[3], [sp,#4*(16+15)]
++	mov		@t[3],#10
++	b		.Loop_neon
 +
-+	.rva	.LSEH_begin_chacha20_ssse3
-+	.rva	.LSEH_end_chacha20_ssse3
-+	.rva	.LSEH_info_chacha20_ssse3
-+
-+	.rva	.LSEH_begin_chacha20_128
-+	.rva	.LSEH_end_chacha20_128
-+	.rva	.LSEH_info_chacha20_128
-+
-+	.rva	.LSEH_begin_chacha20_4x
-+	.rva	.LSEH_end_chacha20_4x
-+	.rva	.LSEH_info_chacha20_4x
++.align	4
++.Loop_neon:
++	subs		@t[3],@t[3],#1
 +___
-+$code.=<<___ if ($avx);
-+	.rva	.LSEH_begin_chacha20_xop
-+	.rva	.LSEH_end_chacha20_xop
-+	.rva	.LSEH_info_chacha20_xop
-+___
-+$code.=<<___ if ($avx>1);
-+	.rva	.LSEH_begin_chacha20_avx2
-+	.rva	.LSEH_end_chacha20_avx2
-+	.rva	.LSEH_info_chacha20_avx2
-+___
-+$code.=<<___ if ($avx>2);
-+	.rva	.LSEH_begin_chacha20_avx512
-+	.rva	.LSEH_end_chacha20_avx512
-+	.rva	.LSEH_info_chacha20_avx512
++	my @thread0=&NEONROUND($a0,$b0,$c0,$d0,$t0,0);
++	my @thread1=&NEONROUND($a1,$b1,$c1,$d1,$t1,0);
++	my @thread2=&NEONROUND($a2,$b2,$c2,$d2,$t2,0);
++	my @thread3=&ROUND(0,4,8,12);
 +
-+	.rva	.LSEH_begin_chacha20_avx512vl
-+	.rva	.LSEH_end_chacha20_avx512vl
-+	.rva	.LSEH_info_chacha20_avx512vl
++	foreach (@thread0) {
++		eval;			eval(shift(@thread3));
++		eval(shift(@thread1));	eval(shift(@thread3));
++		eval(shift(@thread2));	eval(shift(@thread3));
++	}
 +
-+	.rva	.LSEH_begin_chacha20_16x
-+	.rva	.LSEH_end_chacha20_16x
-+	.rva	.LSEH_info_chacha20_16x
++	@thread0=&NEONROUND($a0,$b0,$c0,$d0,$t0,1);
++	@thread1=&NEONROUND($a1,$b1,$c1,$d1,$t1,1);
++	@thread2=&NEONROUND($a2,$b2,$c2,$d2,$t2,1);
++	@thread3=&ROUND(0,5,10,15);
 +
-+	.rva	.LSEH_begin_chacha20_8xvl
-+	.rva	.LSEH_end_chacha20_8xvl
-+	.rva	.LSEH_info_chacha20_8xvl
-+___
++	foreach (@thread0) {
++		eval;			eval(shift(@thread3));
++		eval(shift(@thread1));	eval(shift(@thread3));
++		eval(shift(@thread2));	eval(shift(@thread3));
++	}
 +$code.=<<___;
-+.section	.xdata
-+.align	8
-+.LSEH_info_chacha20_ctr32:
-+	.byte	9,0,0,0
-+	.rva	se_handler
++	bne		.Loop_neon
 +
-+.LSEH_info_chacha20_ssse3:
-+	.byte	9,0,0,0
-+	.rva	simd_handler
-+	.rva	.Lssse3_body,.Lssse3_epilogue
-+	.long	0x20,0
++	add		@t[3],sp,#32
++	vld1.32		{$t0-$t1},[sp]		@ load key material
++	vld1.32		{$t2-$t3},[@t[3]]
 +
-+.LSEH_info_chacha20_128:
-+	.byte	9,0,0,0
-+	.rva	simd_handler
-+	.rva	.L128_body,.L128_epilogue
-+	.long	0x60,0
++	ldr		@t[3],[sp,#4*(32+2)]	@ load len
 +
-+.LSEH_info_chacha20_4x:
-+	.byte	9,0,0,0
-+	.rva	simd_handler
-+	.rva	.L4x_body,.L4x_epilogue
-+	.long	0xa0,0
++	str		@t[0], [sp,#4*(16+8)]	@ modulo-scheduled store
++	str		@t[1], [sp,#4*(16+9)]
++	str		@x[12],[sp,#4*(16+12)]
++	str		@t[2], [sp,#4*(16+13)]
++	str		@x[14],[sp,#4*(16+14)]
++
++	@ at this point we have first half of 512-bit result in
++	@ @x[0-7] and second half at sp+4*(16+8)
++
++	ldr		r12,[sp,#4*(32+1)]	@ load inp
++	ldr		r14,[sp,#4*(32+0)]	@ load out
++
++	vadd.i32	$a0,$a0,$t0		@ accumulate key material
++	vadd.i32	$a1,$a1,$t0
++	vadd.i32	$a2,$a2,$t0
++	vldr		$t0#lo,[sp,#4*(16+0)]	@ one
++
++	vadd.i32	$b0,$b0,$t1
++	vadd.i32	$b1,$b1,$t1
++	vadd.i32	$b2,$b2,$t1
++	vldr		$t1#lo,[sp,#4*(16+2)]	@ two
++
++	vadd.i32	$c0,$c0,$t2
++	vadd.i32	$c1,$c1,$t2
++	vadd.i32	$c2,$c2,$t2
++	vadd.i32	$d1#lo,$d1#lo,$t0#lo	@ counter+1
++	vadd.i32	$d2#lo,$d2#lo,$t1#lo	@ counter+2
++
++	vadd.i32	$d0,$d0,$t3
++	vadd.i32	$d1,$d1,$t3
++	vadd.i32	$d2,$d2,$t3
++
++	cmp		@t[3],#64*4
++	blo		.Ltail_neon
++
++	vld1.8		{$t0-$t1},[r12]!	@ load input
++	 mov		@t[3],sp
++	vld1.8		{$t2-$t3},[r12]!
++	veor		$a0,$a0,$t0		@ xor with input
++	veor		$b0,$b0,$t1
++	vld1.8		{$t0-$t1},[r12]!
++	veor		$c0,$c0,$t2
++	veor		$d0,$d0,$t3
++	vld1.8		{$t2-$t3},[r12]!
++
++	veor		$a1,$a1,$t0
++	 vst1.8		{$a0-$b0},[r14]!	@ store output
++	veor		$b1,$b1,$t1
++	vld1.8		{$t0-$t1},[r12]!
++	veor		$c1,$c1,$t2
++	 vst1.8		{$c0-$d0},[r14]!
++	veor		$d1,$d1,$t3
++	vld1.8		{$t2-$t3},[r12]!
++
++	veor		$a2,$a2,$t0
++	 vld1.32	{$a0-$b0},[@t[3]]!	@ load for next iteration
++	 veor		$t0#hi,$t0#hi,$t0#hi
++	 vldr		$t0#lo,[sp,#4*(16+4)]	@ four
++	veor		$b2,$b2,$t1
++	 vld1.32	{$c0-$d0},[@t[3]]
++	veor		$c2,$c2,$t2
++	 vst1.8		{$a1-$b1},[r14]!
++	veor		$d2,$d2,$t3
++	 vst1.8		{$c1-$d1},[r14]!
++
++	vadd.i32	$d0#lo,$d0#lo,$t0#lo	@ next counter value
++	vldr		$t0#lo,[sp,#4*(16+0)]	@ one
++
++	ldmia		sp,{@t[0]-@t[3]}	@ load key material
++	add		@x[0],@x[0],@t[0]	@ accumulate key material
++	ldr		@t[0],[r12],#16		@ load input
++	 vst1.8		{$a2-$b2},[r14]!
++	add		@x[1],@x[1],@t[1]
++	ldr		@t[1],[r12,#-12]
++	 vst1.8		{$c2-$d2},[r14]!
++	add		@x[2],@x[2],@t[2]
++	ldr		@t[2],[r12,#-8]
++	add		@x[3],@x[3],@t[3]
++	ldr		@t[3],[r12,#-4]
++# ifdef	__ARMEB__
++	rev		@x[0],@x[0]
++	rev		@x[1],@x[1]
++	rev		@x[2],@x[2]
++	rev		@x[3],@x[3]
++# endif
++	eor		@x[0],@x[0],@t[0]	@ xor with input
++	 add		@t[0],sp,#4*(4)
++	eor		@x[1],@x[1],@t[1]
++	str		@x[0],[r14],#16		@ store output
++	eor		@x[2],@x[2],@t[2]
++	str		@x[1],[r14,#-12]
++	eor		@x[3],@x[3],@t[3]
++	 ldmia		@t[0],{@t[0]-@t[3]}	@ load key material
++	str		@x[2],[r14,#-8]
++	str		@x[3],[r14,#-4]
++
++	add		@x[4],@t[0],@x[4],ror#13 @ accumulate key material
++	ldr		@t[0],[r12],#16		@ load input
++	add		@x[5],@t[1],@x[5],ror#13
++	ldr		@t[1],[r12,#-12]
++	add		@x[6],@t[2],@x[6],ror#13
++	ldr		@t[2],[r12,#-8]
++	add		@x[7],@t[3],@x[7],ror#13
++	ldr		@t[3],[r12,#-4]
++# ifdef	__ARMEB__
++	rev		@x[4],@x[4]
++	rev		@x[5],@x[5]
++	rev		@x[6],@x[6]
++	rev		@x[7],@x[7]
++# endif
++	eor		@x[4],@x[4],@t[0]
++	 add		@t[0],sp,#4*(8)
++	eor		@x[5],@x[5],@t[1]
++	str		@x[4],[r14],#16		@ store output
++	eor		@x[6],@x[6],@t[2]
++	str		@x[5],[r14,#-12]
++	eor		@x[7],@x[7],@t[3]
++	 ldmia		@t[0],{@t[0]-@t[3]}	@ load key material
++	str		@x[6],[r14,#-8]
++	 add		@x[0],sp,#4*(16+8)
++	str		@x[7],[r14,#-4]
++
++	ldmia		@x[0],{@x[0]-@x[7]}	@ load second half
++
++	add		@x[0],@x[0],@t[0]	@ accumulate key material
++	ldr		@t[0],[r12],#16		@ load input
++	add		@x[1],@x[1],@t[1]
++	ldr		@t[1],[r12,#-12]
++# ifdef	__thumb2__
++	it	hi
++# endif
++	 strhi		@t[2],[sp,#4*(16+10)]	@ copy "@x[10]" while at it
++	add		@x[2],@x[2],@t[2]
++	ldr		@t[2],[r12,#-8]
++# ifdef	__thumb2__
++	it	hi
++# endif
++	 strhi		@t[3],[sp,#4*(16+11)]	@ copy "@x[11]" while at it
++	add		@x[3],@x[3],@t[3]
++	ldr		@t[3],[r12,#-4]
++# ifdef	__ARMEB__
++	rev		@x[0],@x[0]
++	rev		@x[1],@x[1]
++	rev		@x[2],@x[2]
++	rev		@x[3],@x[3]
++# endif
++	eor		@x[0],@x[0],@t[0]
++	 add		@t[0],sp,#4*(12)
++	eor		@x[1],@x[1],@t[1]
++	str		@x[0],[r14],#16		@ store output
++	eor		@x[2],@x[2],@t[2]
++	str		@x[1],[r14,#-12]
++	eor		@x[3],@x[3],@t[3]
++	 ldmia		@t[0],{@t[0]-@t[3]}	@ load key material
++	str		@x[2],[r14,#-8]
++	str		@x[3],[r14,#-4]
++
++	add		@x[4],@t[0],@x[4],ror#24 @ accumulate key material
++	 add		@t[0],@t[0],#4		@ next counter value
++	add		@x[5],@t[1],@x[5],ror#24
++	 str		@t[0],[sp,#4*(12)]	@ save next counter value
++	ldr		@t[0],[r12],#16		@ load input
++	add		@x[6],@t[2],@x[6],ror#24
++	 add		@x[4],@x[4],#3		@ counter+3
++	ldr		@t[1],[r12,#-12]
++	add		@x[7],@t[3],@x[7],ror#24
++	ldr		@t[2],[r12,#-8]
++	ldr		@t[3],[r12,#-4]
++# ifdef	__ARMEB__
++	rev		@x[4],@x[4]
++	rev		@x[5],@x[5]
++	rev		@x[6],@x[6]
++	rev		@x[7],@x[7]
++# endif
++	eor		@x[4],@x[4],@t[0]
++# ifdef	__thumb2__
++	it	hi
++# endif
++	 ldrhi		@t[0],[sp,#4*(32+2)]	@ re-load len
++	eor		@x[5],@x[5],@t[1]
++	eor		@x[6],@x[6],@t[2]
++	str		@x[4],[r14],#16		@ store output
++	eor		@x[7],@x[7],@t[3]
++	str		@x[5],[r14,#-12]
++	 sub		@t[3],@t[0],#64*4	@ len-=64*4
++	str		@x[6],[r14,#-8]
++	str		@x[7],[r14,#-4]
++	bhi		.Loop_neon_outer
++
++	b		.Ldone_neon
++
++.align	4
++.Lbreak_neon:
++	@ harmonize NEON and integer-only stack frames: load data
++	@ from NEON frame, but save to integer-only one; distance
++	@ between the two is 4*(32+4+16-32)=4*(20).
++
++	str		@t[3], [sp,#4*(20+32+2)]	@ save len
++	 add		@t[3],sp,#4*(32+4)
++	str		r12,   [sp,#4*(20+32+1)]	@ save inp
++	str		r14,   [sp,#4*(20+32+0)]	@ save out
++
++	ldr		@x[12],[sp,#4*(16+10)]
++	ldr		@x[14],[sp,#4*(16+11)]
++	 vldmia		@t[3],{d8-d15}			@ fulfill ABI requirement
++	str		@x[12],[sp,#4*(20+16+10)]	@ copy "@x[10]"
++	str		@x[14],[sp,#4*(20+16+11)]	@ copy "@x[11]"
++
++	ldr		@t[3], [sp,#4*(15)]
++	 mov		@x[4],@x[4],ror#19		@ twist b[0..3]
++	ldr		@x[12],[sp,#4*(12)]		@ modulo-scheduled load
++	 mov		@x[5],@x[5],ror#19
++	ldr		@t[2], [sp,#4*(13)]
++	 mov		@x[6],@x[6],ror#19
++	ldr		@x[14],[sp,#4*(14)]
++	 mov		@x[7],@x[7],ror#19
++	mov		@t[3],@t[3],ror#8		@ twist d[0..3]
++	mov		@x[12],@x[12],ror#8
++	mov		@t[2],@t[2],ror#8
++	mov		@x[14],@x[14],ror#8
++	str		@t[3], [sp,#4*(20+16+15)]
++	add		@t[3],sp,#4*(20)
++	vst1.32		{$a0-$b0},[@t[3]]!		@ copy key
++	add		sp,sp,#4*(20)			@ switch frame
++	vst1.32		{$c0-$d0},[@t[3]]
++	mov		@t[3],#10
++	b		.Loop				@ go integer-only
++
++.align	4
++.Ltail_neon:
++	cmp		@t[3],#64*3
++	bhs		.L192_or_more_neon
++	cmp		@t[3],#64*2
++	bhs		.L128_or_more_neon
++	cmp		@t[3],#64*1
++	bhs		.L64_or_more_neon
++
++	add		@t[0],sp,#4*(8)
++	vst1.8		{$a0-$b0},[sp]
++	add		@t[2],sp,#4*(0)
++	vst1.8		{$c0-$d0},[@t[0]]
++	b		.Loop_tail_neon
++
++.align	4
++.L64_or_more_neon:
++	vld1.8		{$t0-$t1},[r12]!
++	vld1.8		{$t2-$t3},[r12]!
++	veor		$a0,$a0,$t0
++	veor		$b0,$b0,$t1
++	veor		$c0,$c0,$t2
++	veor		$d0,$d0,$t3
++	vst1.8		{$a0-$b0},[r14]!
++	vst1.8		{$c0-$d0},[r14]!
++
++	beq		.Ldone_neon
++
++	add		@t[0],sp,#4*(8)
++	vst1.8		{$a1-$b1},[sp]
++	add		@t[2],sp,#4*(0)
++	vst1.8		{$c1-$d1},[@t[0]]
++	sub		@t[3],@t[3],#64*1	@ len-=64*1
++	b		.Loop_tail_neon
++
++.align	4
++.L128_or_more_neon:
++	vld1.8		{$t0-$t1},[r12]!
++	vld1.8		{$t2-$t3},[r12]!
++	veor		$a0,$a0,$t0
++	veor		$b0,$b0,$t1
++	vld1.8		{$t0-$t1},[r12]!
++	veor		$c0,$c0,$t2
++	veor		$d0,$d0,$t3
++	vld1.8		{$t2-$t3},[r12]!
++
++	veor		$a1,$a1,$t0
++	veor		$b1,$b1,$t1
++	 vst1.8		{$a0-$b0},[r14]!
++	veor		$c1,$c1,$t2
++	 vst1.8		{$c0-$d0},[r14]!
++	veor		$d1,$d1,$t3
++	vst1.8		{$a1-$b1},[r14]!
++	vst1.8		{$c1-$d1},[r14]!
++
++	beq		.Ldone_neon
++
++	add		@t[0],sp,#4*(8)
++	vst1.8		{$a2-$b2},[sp]
++	add		@t[2],sp,#4*(0)
++	vst1.8		{$c2-$d2},[@t[0]]
++	sub		@t[3],@t[3],#64*2	@ len-=64*2
++	b		.Loop_tail_neon
++
++.align	4
++.L192_or_more_neon:
++	vld1.8		{$t0-$t1},[r12]!
++	vld1.8		{$t2-$t3},[r12]!
++	veor		$a0,$a0,$t0
++	veor		$b0,$b0,$t1
++	vld1.8		{$t0-$t1},[r12]!
++	veor		$c0,$c0,$t2
++	veor		$d0,$d0,$t3
++	vld1.8		{$t2-$t3},[r12]!
++
++	veor		$a1,$a1,$t0
++	veor		$b1,$b1,$t1
++	vld1.8		{$t0-$t1},[r12]!
++	veor		$c1,$c1,$t2
++	 vst1.8		{$a0-$b0},[r14]!
++	veor		$d1,$d1,$t3
++	vld1.8		{$t2-$t3},[r12]!
++
++	veor		$a2,$a2,$t0
++	 vst1.8		{$c0-$d0},[r14]!
++	veor		$b2,$b2,$t1
++	 vst1.8		{$a1-$b1},[r14]!
++	veor		$c2,$c2,$t2
++	 vst1.8		{$c1-$d1},[r14]!
++	veor		$d2,$d2,$t3
++	vst1.8		{$a2-$b2},[r14]!
++	vst1.8		{$c2-$d2},[r14]!
++
++	beq		.Ldone_neon
++
++	ldmia		sp,{@t[0]-@t[3]}	@ load key material
++	add		@x[0],@x[0],@t[0]	@ accumulate key material
++	 add		@t[0],sp,#4*(4)
++	add		@x[1],@x[1],@t[1]
++	add		@x[2],@x[2],@t[2]
++	add		@x[3],@x[3],@t[3]
++	 ldmia		@t[0],{@t[0]-@t[3]}	@ load key material
++
++	add		@x[4],@t[0],@x[4],ror#13 @ accumulate key material
++	 add		@t[0],sp,#4*(8)
++	add		@x[5],@t[1],@x[5],ror#13
++	add		@x[6],@t[2],@x[6],ror#13
++	add		@x[7],@t[3],@x[7],ror#13
++	 ldmia		@t[0],{@t[0]-@t[3]}	@ load key material
++# ifdef	__ARMEB__
++	rev		@x[0],@x[0]
++	rev		@x[1],@x[1]
++	rev		@x[2],@x[2]
++	rev		@x[3],@x[3]
++	rev		@x[4],@x[4]
++	rev		@x[5],@x[5]
++	rev		@x[6],@x[6]
++	rev		@x[7],@x[7]
++# endif
++	stmia		sp,{@x[0]-@x[7]}
++	 add		@x[0],sp,#4*(16+8)
++
++	ldmia		@x[0],{@x[0]-@x[7]}	@ load second half
++
++	add		@x[0],@x[0],@t[0]	@ accumulate key material
++	 add		@t[0],sp,#4*(12)
++	add		@x[1],@x[1],@t[1]
++	add		@x[2],@x[2],@t[2]
++	add		@x[3],@x[3],@t[3]
++	 ldmia		@t[0],{@t[0]-@t[3]}	@ load key material
++
++	add		@x[4],@t[0],@x[4],ror#24 @ accumulate key material
++	 add		@t[0],sp,#4*(8)
++	add		@x[5],@t[1],@x[5],ror#24
++	 add		@x[4],@x[4],#3		@ counter+3
++	add		@x[6],@t[2],@x[6],ror#24
++	add		@x[7],@t[3],@x[7],ror#24
++	 ldr		@t[3],[sp,#4*(32+2)]	@ re-load len
++# ifdef	__ARMEB__
++	rev		@x[0],@x[0]
++	rev		@x[1],@x[1]
++	rev		@x[2],@x[2]
++	rev		@x[3],@x[3]
++	rev		@x[4],@x[4]
++	rev		@x[5],@x[5]
++	rev		@x[6],@x[6]
++	rev		@x[7],@x[7]
++# endif
++	stmia		@t[0],{@x[0]-@x[7]}
++	 add		@t[2],sp,#4*(0)
++	 sub		@t[3],@t[3],#64*3	@ len-=64*3
++
++.Loop_tail_neon:
++	ldrb		@t[0],[@t[2]],#1	@ read buffer on stack
++	ldrb		@t[1],[r12],#1		@ read input
++	subs		@t[3],@t[3],#1
++	eor		@t[0],@t[0],@t[1]
++	strb		@t[0],[r14],#1		@ store output
++	bne		.Loop_tail_neon
++
++.Ldone_neon:
++	add		sp,sp,#4*(32+4)
++	vldmia		sp,{d8-d15}
++	add		sp,sp,#4*(16+3)
++	ldmia		sp!,{r4-r11,pc}
++.size	ChaCha20_neon,.-ChaCha20_neon
++# ifndef __KERNEL__
++.comm	OPENSSL_armcap_P,4,4
++# endif
++#endif
 +___
-+$code.=<<___ if ($avx);
-+.LSEH_info_chacha20_xop:
-+	.byte	9,0,0,0
-+	.rva	simd_handler
-+	.rva	.L4xop_body,.L4xop_epilogue		# HandlerData[]
-+	.long	0xa0,0
++}}}
++
++open SELF,$0;
++while(<SELF>) {
++	next if (/^#!/);
++	last if (!s/^#/@/ and !/^$/);
++	print;
++}
++close SELF;
++
++foreach (split("\n",$code)) {
++	s/\`([^\`]*)\`/eval $1/geo;
++
++	s/\bq([0-9]+)#(lo|hi)/sprintf "d%d",2*$1+($2 eq "hi")/geo;
++
++	print $_,"\n";
++}
++close STDOUT;
+diff --git a/lib/zinc/chacha20/chacha20-arm64.pl b/lib/zinc/chacha20/chacha20-arm64.pl
+new file mode 100644
+index 000000000000..fc63cc818eca
+--- /dev/null
++++ b/lib/zinc/chacha20/chacha20-arm64.pl
+@@ -0,0 +1,1163 @@
++#!/usr/bin/env perl
++# SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
++#
++# This code is taken from the OpenSSL project but the author, Andy Polyakov,
++# has relicensed it under the licenses specified in the SPDX header above.
++# The original headers, including the original license headers, are
++# included below for completeness.
++#
++# ====================================================================
++# Written by Andy Polyakov <appro@openssl.org> for the OpenSSL
++# project. The module is, however, dual licensed under OpenSSL and
++# CRYPTOGAMS licenses depending on where you obtain it. For further
++# details see http://www.openssl.org/~appro/cryptogams/.
++# ====================================================================
++#
++# June 2015
++#
++# ChaCha20 for ARMv8.
++#
++# Performance in cycles per byte out of large buffer.
++#
++#			IALU/gcc-4.9    3xNEON+1xIALU	6xNEON+2xIALU(*)
++#
++# Apple A7		5.50/+49%       3.33            1.70
++# Cortex-A53		8.40/+80%       4.72		4.72(**)
++# Cortex-A57		8.06/+43%       4.90            4.43(***)
++# Denver		4.50/+82%       2.63		2.67(**)
++# X-Gene		9.50/+46%       8.82		8.89(**)
++# Mongoose		8.00/+44%	3.64		3.25(***)
++# Kryo			8.17/+50%	4.83		4.65(***)
++#
++# (*)	since no non-Apple processor exhibits significantly better
++#	performance, the code path is #ifdef __APPLE__-ed;
++# (**)	it's expected that doubling interleave factor doesn't help
++#	all processors, only those with higher NEON latency and
++#	higher instruction issue rate;
++# (***)	expected improvement was actually higher;
++
++$flavour=shift;
++if ($flavour=~/\w[\w\-]*\.\w+$/) { $output=$flavour; undef $flavour; }
++else { while (($output=shift) && ($output!~/\w[\w\-]*\.\w+$/)) {} }
++
++if ($flavour && $flavour ne "void") {
++    $0 =~ m/(.*[\/\\])[^\/\\]+$/; $dir=$1;
++    ( $xlate="${dir}arm-xlate.pl" and -f $xlate ) or
++    ( $xlate="${dir}../../perlasm/arm-xlate.pl" and -f $xlate) or
++    die "can't locate arm-xlate.pl";
++
++    open STDOUT,"| \"$^X\" $xlate $flavour $output";
++} else {
++    open STDOUT,">$output";
++}
++
++sub AUTOLOAD()		# thunk [simplified] x86-style perlasm
++{ my $opcode = $AUTOLOAD; $opcode =~ s/.*:://; $opcode =~ s/_/\./;
++  my $arg = pop;
++    $arg = "#$arg" if ($arg*1 eq $arg);
++    $code .= "\t$opcode\t".join(',',@_,$arg)."\n";
++}
++
++my ($out,$inp,$len,$key,$ctr) = map("x$_",(0..4));
++
++my @x=map("x$_",(5..17,19..21));
++my @d=map("x$_",(22..28,30));
++
++sub ROUND {
++my ($a0,$b0,$c0,$d0)=@_;
++my ($a1,$b1,$c1,$d1)=map(($_&~3)+(($_+1)&3),($a0,$b0,$c0,$d0));
++my ($a2,$b2,$c2,$d2)=map(($_&~3)+(($_+1)&3),($a1,$b1,$c1,$d1));
++my ($a3,$b3,$c3,$d3)=map(($_&~3)+(($_+1)&3),($a2,$b2,$c2,$d2));
++
++    (
++	"&add_32	(@x[$a0],@x[$a0],@x[$b0])",
++	 "&add_32	(@x[$a1],@x[$a1],@x[$b1])",
++	  "&add_32	(@x[$a2],@x[$a2],@x[$b2])",
++	   "&add_32	(@x[$a3],@x[$a3],@x[$b3])",
++	"&eor_32	(@x[$d0],@x[$d0],@x[$a0])",
++	 "&eor_32	(@x[$d1],@x[$d1],@x[$a1])",
++	  "&eor_32	(@x[$d2],@x[$d2],@x[$a2])",
++	   "&eor_32	(@x[$d3],@x[$d3],@x[$a3])",
++	"&ror_32	(@x[$d0],@x[$d0],16)",
++	 "&ror_32	(@x[$d1],@x[$d1],16)",
++	  "&ror_32	(@x[$d2],@x[$d2],16)",
++	   "&ror_32	(@x[$d3],@x[$d3],16)",
++
++	"&add_32	(@x[$c0],@x[$c0],@x[$d0])",
++	 "&add_32	(@x[$c1],@x[$c1],@x[$d1])",
++	  "&add_32	(@x[$c2],@x[$c2],@x[$d2])",
++	   "&add_32	(@x[$c3],@x[$c3],@x[$d3])",
++	"&eor_32	(@x[$b0],@x[$b0],@x[$c0])",
++	 "&eor_32	(@x[$b1],@x[$b1],@x[$c1])",
++	  "&eor_32	(@x[$b2],@x[$b2],@x[$c2])",
++	   "&eor_32	(@x[$b3],@x[$b3],@x[$c3])",
++	"&ror_32	(@x[$b0],@x[$b0],20)",
++	 "&ror_32	(@x[$b1],@x[$b1],20)",
++	  "&ror_32	(@x[$b2],@x[$b2],20)",
++	   "&ror_32	(@x[$b3],@x[$b3],20)",
++
++	"&add_32	(@x[$a0],@x[$a0],@x[$b0])",
++	 "&add_32	(@x[$a1],@x[$a1],@x[$b1])",
++	  "&add_32	(@x[$a2],@x[$a2],@x[$b2])",
++	   "&add_32	(@x[$a3],@x[$a3],@x[$b3])",
++	"&eor_32	(@x[$d0],@x[$d0],@x[$a0])",
++	 "&eor_32	(@x[$d1],@x[$d1],@x[$a1])",
++	  "&eor_32	(@x[$d2],@x[$d2],@x[$a2])",
++	   "&eor_32	(@x[$d3],@x[$d3],@x[$a3])",
++	"&ror_32	(@x[$d0],@x[$d0],24)",
++	 "&ror_32	(@x[$d1],@x[$d1],24)",
++	  "&ror_32	(@x[$d2],@x[$d2],24)",
++	   "&ror_32	(@x[$d3],@x[$d3],24)",
++
++	"&add_32	(@x[$c0],@x[$c0],@x[$d0])",
++	 "&add_32	(@x[$c1],@x[$c1],@x[$d1])",
++	  "&add_32	(@x[$c2],@x[$c2],@x[$d2])",
++	   "&add_32	(@x[$c3],@x[$c3],@x[$d3])",
++	"&eor_32	(@x[$b0],@x[$b0],@x[$c0])",
++	 "&eor_32	(@x[$b1],@x[$b1],@x[$c1])",
++	  "&eor_32	(@x[$b2],@x[$b2],@x[$c2])",
++	   "&eor_32	(@x[$b3],@x[$b3],@x[$c3])",
++	"&ror_32	(@x[$b0],@x[$b0],25)",
++	 "&ror_32	(@x[$b1],@x[$b1],25)",
++	  "&ror_32	(@x[$b2],@x[$b2],25)",
++	   "&ror_32	(@x[$b3],@x[$b3],25)"
++    );
++}
++
++$code.=<<___;
++#ifndef	__KERNEL__
++# include "arm_arch.h"
++.extern	OPENSSL_armcap_P
++#else
++# define ChaCha20_ctr32 chacha20_arm
++# define ChaCha20_neon  chacha20_neon
++#endif
++
++.text
++
++.align	5
++.Lsigma:
++.quad	0x3320646e61707865,0x6b20657479622d32		// endian-neutral
++.Lone:
++.long	1,0,0,0
++#ifndef	__KERNEL__
++.LOPENSSL_armcap_P:
++# ifdef	__ILP32__
++.long	OPENSSL_armcap_P-.
++# else
++.quad	OPENSSL_armcap_P-.
++# endif
++#endif
++
++.globl	ChaCha20_ctr32
++.type	ChaCha20_ctr32,%function
++.align	5
++ChaCha20_ctr32:
++	cbz	$len,.Labort
++#ifndef	__KERNEL__
++	adr	@x[0],.LOPENSSL_armcap_P
++	cmp	$len,#192
++	b.lo	.Lshort
++# ifdef	__ILP32__
++	ldrsw	@x[1],[@x[0]]
++# else
++	ldr	@x[1],[@x[0]]
++# endif
++	ldr	w17,[@x[1],@x[0]]
++	tst	w17,#ARMV7_NEON
++	b.ne	ChaCha20_neon
++
++.Lshort:
++#endif
++	stp	x29,x30,[sp,#-96]!
++	add	x29,sp,#0
++
++	adr	@x[0],.Lsigma
++	stp	x19,x20,[sp,#16]
++	stp	x21,x22,[sp,#32]
++	stp	x23,x24,[sp,#48]
++	stp	x25,x26,[sp,#64]
++	stp	x27,x28,[sp,#80]
++	sub	sp,sp,#64
++
++	ldp	@d[0],@d[1],[@x[0]]		// load sigma
++	ldp	@d[2],@d[3],[$key]		// load key
++	ldp	@d[4],@d[5],[$key,#16]
++	ldp	@d[6],@d[7],[$ctr]		// load counter
++#ifdef	__AARCH64EB__
++	ror	@d[2],@d[2],#32
++	ror	@d[3],@d[3],#32
++	ror	@d[4],@d[4],#32
++	ror	@d[5],@d[5],#32
++	ror	@d[6],@d[6],#32
++	ror	@d[7],@d[7],#32
++#endif
++
++.Loop_outer:
++	mov.32	@x[0],@d[0]			// unpack key block
++	lsr	@x[1],@d[0],#32
++	mov.32	@x[2],@d[1]
++	lsr	@x[3],@d[1],#32
++	mov.32	@x[4],@d[2]
++	lsr	@x[5],@d[2],#32
++	mov.32	@x[6],@d[3]
++	lsr	@x[7],@d[3],#32
++	mov.32	@x[8],@d[4]
++	lsr	@x[9],@d[4],#32
++	mov.32	@x[10],@d[5]
++	lsr	@x[11],@d[5],#32
++	mov.32	@x[12],@d[6]
++	lsr	@x[13],@d[6],#32
++	mov.32	@x[14],@d[7]
++	lsr	@x[15],@d[7],#32
++
++	mov	$ctr,#10
++	subs	$len,$len,#64
++.Loop:
++	sub	$ctr,$ctr,#1
 +___
-+$code.=<<___ if ($avx>1);
-+.LSEH_info_chacha20_avx2:
-+	.byte	9,0,0,0
-+	.rva	simd_handler
-+	.rva	.L8x_body,.L8x_epilogue			# HandlerData[]
-+	.long	0xa0,0
++	foreach (&ROUND(0, 4, 8,12)) { eval; }
++	foreach (&ROUND(0, 5,10,15)) { eval; }
++$code.=<<___;
++	cbnz	$ctr,.Loop
++
++	add.32	@x[0],@x[0],@d[0]		// accumulate key block
++	add	@x[1],@x[1],@d[0],lsr#32
++	add.32	@x[2],@x[2],@d[1]
++	add	@x[3],@x[3],@d[1],lsr#32
++	add.32	@x[4],@x[4],@d[2]
++	add	@x[5],@x[5],@d[2],lsr#32
++	add.32	@x[6],@x[6],@d[3]
++	add	@x[7],@x[7],@d[3],lsr#32
++	add.32	@x[8],@x[8],@d[4]
++	add	@x[9],@x[9],@d[4],lsr#32
++	add.32	@x[10],@x[10],@d[5]
++	add	@x[11],@x[11],@d[5],lsr#32
++	add.32	@x[12],@x[12],@d[6]
++	add	@x[13],@x[13],@d[6],lsr#32
++	add.32	@x[14],@x[14],@d[7]
++	add	@x[15],@x[15],@d[7],lsr#32
++
++	b.lo	.Ltail
++
++	add	@x[0],@x[0],@x[1],lsl#32	// pack
++	add	@x[2],@x[2],@x[3],lsl#32
++	ldp	@x[1],@x[3],[$inp,#0]		// load input
++	add	@x[4],@x[4],@x[5],lsl#32
++	add	@x[6],@x[6],@x[7],lsl#32
++	ldp	@x[5],@x[7],[$inp,#16]
++	add	@x[8],@x[8],@x[9],lsl#32
++	add	@x[10],@x[10],@x[11],lsl#32
++	ldp	@x[9],@x[11],[$inp,#32]
++	add	@x[12],@x[12],@x[13],lsl#32
++	add	@x[14],@x[14],@x[15],lsl#32
++	ldp	@x[13],@x[15],[$inp,#48]
++	add	$inp,$inp,#64
++#ifdef	__AARCH64EB__
++	rev	@x[0],@x[0]
++	rev	@x[2],@x[2]
++	rev	@x[4],@x[4]
++	rev	@x[6],@x[6]
++	rev	@x[8],@x[8]
++	rev	@x[10],@x[10]
++	rev	@x[12],@x[12]
++	rev	@x[14],@x[14]
++#endif
++	eor	@x[0],@x[0],@x[1]
++	eor	@x[2],@x[2],@x[3]
++	eor	@x[4],@x[4],@x[5]
++	eor	@x[6],@x[6],@x[7]
++	eor	@x[8],@x[8],@x[9]
++	eor	@x[10],@x[10],@x[11]
++	eor	@x[12],@x[12],@x[13]
++	eor	@x[14],@x[14],@x[15]
++
++	stp	@x[0],@x[2],[$out,#0]		// store output
++	 add	@d[6],@d[6],#1			// increment counter
++	stp	@x[4],@x[6],[$out,#16]
++	stp	@x[8],@x[10],[$out,#32]
++	stp	@x[12],@x[14],[$out,#48]
++	add	$out,$out,#64
++
++	b.hi	.Loop_outer
++
++	ldp	x19,x20,[x29,#16]
++	add	sp,sp,#64
++	ldp	x21,x22,[x29,#32]
++	ldp	x23,x24,[x29,#48]
++	ldp	x25,x26,[x29,#64]
++	ldp	x27,x28,[x29,#80]
++	ldp	x29,x30,[sp],#96
++.Labort:
++	ret
++
++.align	4
++.Ltail:
++	add	$len,$len,#64
++.Less_than_64:
++	sub	$out,$out,#1
++	add	$inp,$inp,$len
++	add	$out,$out,$len
++	add	$ctr,sp,$len
++	neg	$len,$len
++
++	add	@x[0],@x[0],@x[1],lsl#32	// pack
++	add	@x[2],@x[2],@x[3],lsl#32
++	add	@x[4],@x[4],@x[5],lsl#32
++	add	@x[6],@x[6],@x[7],lsl#32
++	add	@x[8],@x[8],@x[9],lsl#32
++	add	@x[10],@x[10],@x[11],lsl#32
++	add	@x[12],@x[12],@x[13],lsl#32
++	add	@x[14],@x[14],@x[15],lsl#32
++#ifdef	__AARCH64EB__
++	rev	@x[0],@x[0]
++	rev	@x[2],@x[2]
++	rev	@x[4],@x[4]
++	rev	@x[6],@x[6]
++	rev	@x[8],@x[8]
++	rev	@x[10],@x[10]
++	rev	@x[12],@x[12]
++	rev	@x[14],@x[14]
++#endif
++	stp	@x[0],@x[2],[sp,#0]
++	stp	@x[4],@x[6],[sp,#16]
++	stp	@x[8],@x[10],[sp,#32]
++	stp	@x[12],@x[14],[sp,#48]
++
++.Loop_tail:
++	ldrb	w10,[$inp,$len]
++	ldrb	w11,[$ctr,$len]
++	add	$len,$len,#1
++	eor	w10,w10,w11
++	strb	w10,[$out,$len]
++	cbnz	$len,.Loop_tail
++
++	stp	xzr,xzr,[sp,#0]
++	stp	xzr,xzr,[sp,#16]
++	stp	xzr,xzr,[sp,#32]
++	stp	xzr,xzr,[sp,#48]
++
++	ldp	x19,x20,[x29,#16]
++	add	sp,sp,#64
++	ldp	x21,x22,[x29,#32]
++	ldp	x23,x24,[x29,#48]
++	ldp	x25,x26,[x29,#64]
++	ldp	x27,x28,[x29,#80]
++	ldp	x29,x30,[sp],#96
++	ret
++.size	ChaCha20_ctr32,.-ChaCha20_ctr32
 +___
-+$code.=<<___ if ($avx>2);
-+.LSEH_info_chacha20_avx512:
-+	.byte	9,0,0,0
-+	.rva	simd_handler
-+	.rva	.Lavx512_body,.Lavx512_epilogue		# HandlerData[]
-+	.long	0x20,0
 +
-+.LSEH_info_chacha20_avx512vl:
-+	.byte	9,0,0,0
-+	.rva	simd_handler
-+	.rva	.Lavx512vl_body,.Lavx512vl_epilogue	# HandlerData[]
-+	.long	0x20,0
++{{{
++my ($A0,$B0,$C0,$D0,$A1,$B1,$C1,$D1,$A2,$B2,$C2,$D2,$T0,$T1,$T2,$T3) =
++    map("v$_.4s",(0..7,16..23));
++my (@K)=map("v$_.4s",(24..30));
++my $ONE="v31.4s";
 +
-+.LSEH_info_chacha20_16x:
-+	.byte	9,0,0,0
-+	.rva	simd_handler
-+	.rva	.L16x_body,.L16x_epilogue		# HandlerData[]
-+	.long	0xa0,0
++sub NEONROUND {
++my $odd = pop;
++my ($a,$b,$c,$d,$t)=@_;
 +
-+.LSEH_info_chacha20_8xvl:
-+	.byte	9,0,0,0
-+	.rva	simd_handler
-+	.rva	.L8xvl_body,.L8xvl_epilogue		# HandlerData[]
-+	.long	0xa0,0
++	(
++	"&add		('$a','$a','$b')",
++	"&eor		('$d','$d','$a')",
++	"&rev32_16	('$d','$d')",		# vrot ($d,16)
++
++	"&add		('$c','$c','$d')",
++	"&eor		('$t','$b','$c')",
++	"&ushr		('$b','$t',20)",
++	"&sli		('$b','$t',12)",
++
++	"&add		('$a','$a','$b')",
++	"&eor		('$t','$d','$a')",
++	"&ushr		('$d','$t',24)",
++	"&sli		('$d','$t',8)",
++
++	"&add		('$c','$c','$d')",
++	"&eor		('$t','$b','$c')",
++	"&ushr		('$b','$t',25)",
++	"&sli		('$b','$t',7)",
++
++	"&ext		('$c','$c','$c',8)",
++	"&ext		('$d','$d','$d',$odd?4:12)",
++	"&ext		('$b','$b','$b',$odd?12:4)"
++	);
++}
++
++$code.=<<___;
++#if !defined(__KERNEL__) || defined(CONFIG_KERNEL_MODE_NEON)
++#ifdef __KERNEL__
++.globl  ChaCha20_neon
++.type   ChaCha20_neon,%function
++#endif
++.type	ChaCha20_neon,%function
++.align	5
++ChaCha20_neon:
++	stp	x29,x30,[sp,#-96]!
++	add	x29,sp,#0
++
++	adr	@x[0],.Lsigma
++	stp	x19,x20,[sp,#16]
++	stp	x21,x22,[sp,#32]
++	stp	x23,x24,[sp,#48]
++	stp	x25,x26,[sp,#64]
++	stp	x27,x28,[sp,#80]
++#ifdef	__APPLE__
++	cmp	$len,#512
++	b.hs	.L512_or_more_neon
++#endif
++
++	sub	sp,sp,#64
++
++	ldp	@d[0],@d[1],[@x[0]]		// load sigma
++	ld1	{@K[0]},[@x[0]],#16
++	ldp	@d[2],@d[3],[$key]		// load key
++	ldp	@d[4],@d[5],[$key,#16]
++	ld1	{@K[1],@K[2]},[$key]
++	ldp	@d[6],@d[7],[$ctr]		// load counter
++	ld1	{@K[3]},[$ctr]
++	ld1	{$ONE},[@x[0]]
++#ifdef	__AARCH64EB__
++	rev64	@K[0],@K[0]
++	ror	@d[2],@d[2],#32
++	ror	@d[3],@d[3],#32
++	ror	@d[4],@d[4],#32
++	ror	@d[5],@d[5],#32
++	ror	@d[6],@d[6],#32
++	ror	@d[7],@d[7],#32
++#endif
++	add	@K[3],@K[3],$ONE		// += 1
++	add	@K[4],@K[3],$ONE
++	add	@K[5],@K[4],$ONE
++	shl	$ONE,$ONE,#2			// 1 -> 4
++
++.Loop_outer_neon:
++	mov.32	@x[0],@d[0]			// unpack key block
++	lsr	@x[1],@d[0],#32
++	 mov	$A0,@K[0]
++	mov.32	@x[2],@d[1]
++	lsr	@x[3],@d[1],#32
++	 mov	$A1,@K[0]
++	mov.32	@x[4],@d[2]
++	lsr	@x[5],@d[2],#32
++	 mov	$A2,@K[0]
++	mov.32	@x[6],@d[3]
++	 mov	$B0,@K[1]
++	lsr	@x[7],@d[3],#32
++	 mov	$B1,@K[1]
++	mov.32	@x[8],@d[4]
++	 mov	$B2,@K[1]
++	lsr	@x[9],@d[4],#32
++	 mov	$D0,@K[3]
++	mov.32	@x[10],@d[5]
++	 mov	$D1,@K[4]
++	lsr	@x[11],@d[5],#32
++	 mov	$D2,@K[5]
++	mov.32	@x[12],@d[6]
++	 mov	$C0,@K[2]
++	lsr	@x[13],@d[6],#32
++	 mov	$C1,@K[2]
++	mov.32	@x[14],@d[7]
++	 mov	$C2,@K[2]
++	lsr	@x[15],@d[7],#32
++
++	mov	$ctr,#10
++	subs	$len,$len,#256
++.Loop_neon:
++	sub	$ctr,$ctr,#1
++___
++	my @thread0=&NEONROUND($A0,$B0,$C0,$D0,$T0,0);
++	my @thread1=&NEONROUND($A1,$B1,$C1,$D1,$T1,0);
++	my @thread2=&NEONROUND($A2,$B2,$C2,$D2,$T2,0);
++	my @thread3=&ROUND(0,4,8,12);
++
++	foreach (@thread0) {
++		eval;			eval(shift(@thread3));
++		eval(shift(@thread1));	eval(shift(@thread3));
++		eval(shift(@thread2));	eval(shift(@thread3));
++	}
++
++	@thread0=&NEONROUND($A0,$B0,$C0,$D0,$T0,1);
++	@thread1=&NEONROUND($A1,$B1,$C1,$D1,$T1,1);
++	@thread2=&NEONROUND($A2,$B2,$C2,$D2,$T2,1);
++	@thread3=&ROUND(0,5,10,15);
++
++	foreach (@thread0) {
++		eval;			eval(shift(@thread3));
++		eval(shift(@thread1));	eval(shift(@thread3));
++		eval(shift(@thread2));	eval(shift(@thread3));
++	}
++$code.=<<___;
++	cbnz	$ctr,.Loop_neon
++
++	add.32	@x[0],@x[0],@d[0]		// accumulate key block
++	 add	$A0,$A0,@K[0]
++	add	@x[1],@x[1],@d[0],lsr#32
++	 add	$A1,$A1,@K[0]
++	add.32	@x[2],@x[2],@d[1]
++	 add	$A2,$A2,@K[0]
++	add	@x[3],@x[3],@d[1],lsr#32
++	 add	$C0,$C0,@K[2]
++	add.32	@x[4],@x[4],@d[2]
++	 add	$C1,$C1,@K[2]
++	add	@x[5],@x[5],@d[2],lsr#32
++	 add	$C2,$C2,@K[2]
++	add.32	@x[6],@x[6],@d[3]
++	 add	$D0,$D0,@K[3]
++	add	@x[7],@x[7],@d[3],lsr#32
++	add.32	@x[8],@x[8],@d[4]
++	 add	$D1,$D1,@K[4]
++	add	@x[9],@x[9],@d[4],lsr#32
++	add.32	@x[10],@x[10],@d[5]
++	 add	$D2,$D2,@K[5]
++	add	@x[11],@x[11],@d[5],lsr#32
++	add.32	@x[12],@x[12],@d[6]
++	 add	$B0,$B0,@K[1]
++	add	@x[13],@x[13],@d[6],lsr#32
++	add.32	@x[14],@x[14],@d[7]
++	 add	$B1,$B1,@K[1]
++	add	@x[15],@x[15],@d[7],lsr#32
++	 add	$B2,$B2,@K[1]
++
++	b.lo	.Ltail_neon
++
++	add	@x[0],@x[0],@x[1],lsl#32	// pack
++	add	@x[2],@x[2],@x[3],lsl#32
++	ldp	@x[1],@x[3],[$inp,#0]		// load input
++	add	@x[4],@x[4],@x[5],lsl#32
++	add	@x[6],@x[6],@x[7],lsl#32
++	ldp	@x[5],@x[7],[$inp,#16]
++	add	@x[8],@x[8],@x[9],lsl#32
++	add	@x[10],@x[10],@x[11],lsl#32
++	ldp	@x[9],@x[11],[$inp,#32]
++	add	@x[12],@x[12],@x[13],lsl#32
++	add	@x[14],@x[14],@x[15],lsl#32
++	ldp	@x[13],@x[15],[$inp,#48]
++	add	$inp,$inp,#64
++#ifdef	__AARCH64EB__
++	rev	@x[0],@x[0]
++	rev	@x[2],@x[2]
++	rev	@x[4],@x[4]
++	rev	@x[6],@x[6]
++	rev	@x[8],@x[8]
++	rev	@x[10],@x[10]
++	rev	@x[12],@x[12]
++	rev	@x[14],@x[14]
++#endif
++	ld1.8	{$T0-$T3},[$inp],#64
++	eor	@x[0],@x[0],@x[1]
++	eor	@x[2],@x[2],@x[3]
++	eor	@x[4],@x[4],@x[5]
++	eor	@x[6],@x[6],@x[7]
++	eor	@x[8],@x[8],@x[9]
++	 eor	$A0,$A0,$T0
++	eor	@x[10],@x[10],@x[11]
++	 eor	$B0,$B0,$T1
++	eor	@x[12],@x[12],@x[13]
++	 eor	$C0,$C0,$T2
++	eor	@x[14],@x[14],@x[15]
++	 eor	$D0,$D0,$T3
++	 ld1.8	{$T0-$T3},[$inp],#64
++
++	stp	@x[0],@x[2],[$out,#0]		// store output
++	 add	@d[6],@d[6],#4			// increment counter
++	stp	@x[4],@x[6],[$out,#16]
++	 add	@K[3],@K[3],$ONE		// += 4
++	stp	@x[8],@x[10],[$out,#32]
++	 add	@K[4],@K[4],$ONE
++	stp	@x[12],@x[14],[$out,#48]
++	 add	@K[5],@K[5],$ONE
++	add	$out,$out,#64
++
++	st1.8	{$A0-$D0},[$out],#64
++	ld1.8	{$A0-$D0},[$inp],#64
++
++	eor	$A1,$A1,$T0
++	eor	$B1,$B1,$T1
++	eor	$C1,$C1,$T2
++	eor	$D1,$D1,$T3
++	st1.8	{$A1-$D1},[$out],#64
++
++	eor	$A2,$A2,$A0
++	eor	$B2,$B2,$B0
++	eor	$C2,$C2,$C0
++	eor	$D2,$D2,$D0
++	st1.8	{$A2-$D2},[$out],#64
++
++	b.hi	.Loop_outer_neon
++
++	ldp	x19,x20,[x29,#16]
++	add	sp,sp,#64
++	ldp	x21,x22,[x29,#32]
++	ldp	x23,x24,[x29,#48]
++	ldp	x25,x26,[x29,#64]
++	ldp	x27,x28,[x29,#80]
++	ldp	x29,x30,[sp],#96
++	ret
++
++.Ltail_neon:
++	add	$len,$len,#256
++	cmp	$len,#64
++	b.lo	.Less_than_64
++
++	add	@x[0],@x[0],@x[1],lsl#32	// pack
++	add	@x[2],@x[2],@x[3],lsl#32
++	ldp	@x[1],@x[3],[$inp,#0]		// load input
++	add	@x[4],@x[4],@x[5],lsl#32
++	add	@x[6],@x[6],@x[7],lsl#32
++	ldp	@x[5],@x[7],[$inp,#16]
++	add	@x[8],@x[8],@x[9],lsl#32
++	add	@x[10],@x[10],@x[11],lsl#32
++	ldp	@x[9],@x[11],[$inp,#32]
++	add	@x[12],@x[12],@x[13],lsl#32
++	add	@x[14],@x[14],@x[15],lsl#32
++	ldp	@x[13],@x[15],[$inp,#48]
++	add	$inp,$inp,#64
++#ifdef	__AARCH64EB__
++	rev	@x[0],@x[0]
++	rev	@x[2],@x[2]
++	rev	@x[4],@x[4]
++	rev	@x[6],@x[6]
++	rev	@x[8],@x[8]
++	rev	@x[10],@x[10]
++	rev	@x[12],@x[12]
++	rev	@x[14],@x[14]
++#endif
++	eor	@x[0],@x[0],@x[1]
++	eor	@x[2],@x[2],@x[3]
++	eor	@x[4],@x[4],@x[5]
++	eor	@x[6],@x[6],@x[7]
++	eor	@x[8],@x[8],@x[9]
++	eor	@x[10],@x[10],@x[11]
++	eor	@x[12],@x[12],@x[13]
++	eor	@x[14],@x[14],@x[15]
++
++	stp	@x[0],@x[2],[$out,#0]		// store output
++	 add	@d[6],@d[6],#4			// increment counter
++	stp	@x[4],@x[6],[$out,#16]
++	stp	@x[8],@x[10],[$out,#32]
++	stp	@x[12],@x[14],[$out,#48]
++	add	$out,$out,#64
++	b.eq	.Ldone_neon
++	sub	$len,$len,#64
++	cmp	$len,#64
++	b.lo	.Less_than_128
++
++	ld1.8	{$T0-$T3},[$inp],#64
++	eor	$A0,$A0,$T0
++	eor	$B0,$B0,$T1
++	eor	$C0,$C0,$T2
++	eor	$D0,$D0,$T3
++	st1.8	{$A0-$D0},[$out],#64
++	b.eq	.Ldone_neon
++	sub	$len,$len,#64
++	cmp	$len,#64
++	b.lo	.Less_than_192
++
++	ld1.8	{$T0-$T3},[$inp],#64
++	eor	$A1,$A1,$T0
++	eor	$B1,$B1,$T1
++	eor	$C1,$C1,$T2
++	eor	$D1,$D1,$T3
++	st1.8	{$A1-$D1},[$out],#64
++	b.eq	.Ldone_neon
++	sub	$len,$len,#64
++
++	st1.8	{$A2-$D2},[sp]
++	b	.Last_neon
++
++.Less_than_128:
++	st1.8	{$A0-$D0},[sp]
++	b	.Last_neon
++.Less_than_192:
++	st1.8	{$A1-$D1},[sp]
++	b	.Last_neon
++
++.align	4
++.Last_neon:
++	sub	$out,$out,#1
++	add	$inp,$inp,$len
++	add	$out,$out,$len
++	add	$ctr,sp,$len
++	neg	$len,$len
++
++.Loop_tail_neon:
++	ldrb	w10,[$inp,$len]
++	ldrb	w11,[$ctr,$len]
++	add	$len,$len,#1
++	eor	w10,w10,w11
++	strb	w10,[$out,$len]
++	cbnz	$len,.Loop_tail_neon
++
++	stp	xzr,xzr,[sp,#0]
++	stp	xzr,xzr,[sp,#16]
++	stp	xzr,xzr,[sp,#32]
++	stp	xzr,xzr,[sp,#48]
++
++.Ldone_neon:
++	ldp	x19,x20,[x29,#16]
++	add	sp,sp,#64
++	ldp	x21,x22,[x29,#32]
++	ldp	x23,x24,[x29,#48]
++	ldp	x25,x26,[x29,#64]
++	ldp	x27,x28,[x29,#80]
++	ldp	x29,x30,[sp],#96
++	ret
++.size	ChaCha20_neon,.-ChaCha20_neon
++___
++{
++my ($T0,$T1,$T2,$T3,$T4,$T5)=@K;
++my ($A0,$B0,$C0,$D0,$A1,$B1,$C1,$D1,$A2,$B2,$C2,$D2,
++    $A3,$B3,$C3,$D3,$A4,$B4,$C4,$D4,$A5,$B5,$C5,$D5) = map("v$_.4s",(0..23));
++
++$code.=<<___;
++#ifdef	__APPLE__
++.type	ChaCha20_512_neon,%function
++.align	5
++ChaCha20_512_neon:
++	stp	x29,x30,[sp,#-96]!
++	add	x29,sp,#0
++
++	adr	@x[0],.Lsigma
++	stp	x19,x20,[sp,#16]
++	stp	x21,x22,[sp,#32]
++	stp	x23,x24,[sp,#48]
++	stp	x25,x26,[sp,#64]
++	stp	x27,x28,[sp,#80]
++
++.L512_or_more_neon:
++	sub	sp,sp,#128+64
++
++	ldp	@d[0],@d[1],[@x[0]]		// load sigma
++	ld1	{@K[0]},[@x[0]],#16
++	ldp	@d[2],@d[3],[$key]		// load key
++	ldp	@d[4],@d[5],[$key,#16]
++	ld1	{@K[1],@K[2]},[$key]
++	ldp	@d[6],@d[7],[$ctr]		// load counter
++	ld1	{@K[3]},[$ctr]
++	ld1	{$ONE},[@x[0]]
++# ifdef	__AARCH64EB__
++	rev64	@K[0],@K[0]
++	ror	@d[2],@d[2],#32
++	ror	@d[3],@d[3],#32
++	ror	@d[4],@d[4],#32
++	ror	@d[5],@d[5],#32
++	ror	@d[6],@d[6],#32
++	ror	@d[7],@d[7],#32
++# endif
++	add	@K[3],@K[3],$ONE		// += 1
++	stp	@K[0],@K[1],[sp,#0]		// off-load key block, invariant part
++	add	@K[3],@K[3],$ONE		// not typo
++	str	@K[2],[sp,#32]
++	add	@K[4],@K[3],$ONE
++	add	@K[5],@K[4],$ONE
++	add	@K[6],@K[5],$ONE
++	shl	$ONE,$ONE,#2			// 1 -> 4
++
++	stp	d8,d9,[sp,#128+0]		// meet ABI requirements
++	stp	d10,d11,[sp,#128+16]
++	stp	d12,d13,[sp,#128+32]
++	stp	d14,d15,[sp,#128+48]
++
++	sub	$len,$len,#512			// not typo
++
++.Loop_outer_512_neon:
++	 mov	$A0,@K[0]
++	 mov	$A1,@K[0]
++	 mov	$A2,@K[0]
++	 mov	$A3,@K[0]
++	 mov	$A4,@K[0]
++	 mov	$A5,@K[0]
++	 mov	$B0,@K[1]
++	mov.32	@x[0],@d[0]			// unpack key block
++	 mov	$B1,@K[1]
++	lsr	@x[1],@d[0],#32
++	 mov	$B2,@K[1]
++	mov.32	@x[2],@d[1]
++	 mov	$B3,@K[1]
++	lsr	@x[3],@d[1],#32
++	 mov	$B4,@K[1]
++	mov.32	@x[4],@d[2]
++	 mov	$B5,@K[1]
++	lsr	@x[5],@d[2],#32
++	 mov	$D0,@K[3]
++	mov.32	@x[6],@d[3]
++	 mov	$D1,@K[4]
++	lsr	@x[7],@d[3],#32
++	 mov	$D2,@K[5]
++	mov.32	@x[8],@d[4]
++	 mov	$D3,@K[6]
++	lsr	@x[9],@d[4],#32
++	 mov	$C0,@K[2]
++	mov.32	@x[10],@d[5]
++	 mov	$C1,@K[2]
++	lsr	@x[11],@d[5],#32
++	 add	$D4,$D0,$ONE			// +4
++	mov.32	@x[12],@d[6]
++	 add	$D5,$D1,$ONE			// +4
++	lsr	@x[13],@d[6],#32
++	 mov	$C2,@K[2]
++	mov.32	@x[14],@d[7]
++	 mov	$C3,@K[2]
++	lsr	@x[15],@d[7],#32
++	 mov	$C4,@K[2]
++	 stp	@K[3],@K[4],[sp,#48]		// off-load key block, variable part
++	 mov	$C5,@K[2]
++	 str	@K[5],[sp,#80]
++
++	mov	$ctr,#5
++	subs	$len,$len,#512
++.Loop_upper_neon:
++	sub	$ctr,$ctr,#1
++___
++	my @thread0=&NEONROUND($A0,$B0,$C0,$D0,$T0,0);
++	my @thread1=&NEONROUND($A1,$B1,$C1,$D1,$T1,0);
++	my @thread2=&NEONROUND($A2,$B2,$C2,$D2,$T2,0);
++	my @thread3=&NEONROUND($A3,$B3,$C3,$D3,$T3,0);
++	my @thread4=&NEONROUND($A4,$B4,$C4,$D4,$T4,0);
++	my @thread5=&NEONROUND($A5,$B5,$C5,$D5,$T5,0);
++	my @thread67=(&ROUND(0,4,8,12),&ROUND(0,5,10,15));
++	my $diff = ($#thread0+1)*6 - $#thread67 - 1;
++	my $i = 0;
++
++	foreach (@thread0) {
++		eval;			eval(shift(@thread67));
++		eval(shift(@thread1));	eval(shift(@thread67));
++		eval(shift(@thread2));	eval(shift(@thread67));
++		eval(shift(@thread3));	eval(shift(@thread67));
++		eval(shift(@thread4));	eval(shift(@thread67));
++		eval(shift(@thread5));	eval(shift(@thread67));
++	}
++
++	@thread0=&NEONROUND($A0,$B0,$C0,$D0,$T0,1);
++	@thread1=&NEONROUND($A1,$B1,$C1,$D1,$T1,1);
++	@thread2=&NEONROUND($A2,$B2,$C2,$D2,$T2,1);
++	@thread3=&NEONROUND($A3,$B3,$C3,$D3,$T3,1);
++	@thread4=&NEONROUND($A4,$B4,$C4,$D4,$T4,1);
++	@thread5=&NEONROUND($A5,$B5,$C5,$D5,$T5,1);
++	@thread67=(&ROUND(0,4,8,12),&ROUND(0,5,10,15));
++
++	foreach (@thread0) {
++		eval;			eval(shift(@thread67));
++		eval(shift(@thread1));	eval(shift(@thread67));
++		eval(shift(@thread2));	eval(shift(@thread67));
++		eval(shift(@thread3));	eval(shift(@thread67));
++		eval(shift(@thread4));	eval(shift(@thread67));
++		eval(shift(@thread5));	eval(shift(@thread67));
++	}
++$code.=<<___;
++	cbnz	$ctr,.Loop_upper_neon
++
++	add.32	@x[0],@x[0],@d[0]		// accumulate key block
++	add	@x[1],@x[1],@d[0],lsr#32
++	add.32	@x[2],@x[2],@d[1]
++	add	@x[3],@x[3],@d[1],lsr#32
++	add.32	@x[4],@x[4],@d[2]
++	add	@x[5],@x[5],@d[2],lsr#32
++	add.32	@x[6],@x[6],@d[3]
++	add	@x[7],@x[7],@d[3],lsr#32
++	add.32	@x[8],@x[8],@d[4]
++	add	@x[9],@x[9],@d[4],lsr#32
++	add.32	@x[10],@x[10],@d[5]
++	add	@x[11],@x[11],@d[5],lsr#32
++	add.32	@x[12],@x[12],@d[6]
++	add	@x[13],@x[13],@d[6],lsr#32
++	add.32	@x[14],@x[14],@d[7]
++	add	@x[15],@x[15],@d[7],lsr#32
++
++	add	@x[0],@x[0],@x[1],lsl#32	// pack
++	add	@x[2],@x[2],@x[3],lsl#32
++	ldp	@x[1],@x[3],[$inp,#0]		// load input
++	add	@x[4],@x[4],@x[5],lsl#32
++	add	@x[6],@x[6],@x[7],lsl#32
++	ldp	@x[5],@x[7],[$inp,#16]
++	add	@x[8],@x[8],@x[9],lsl#32
++	add	@x[10],@x[10],@x[11],lsl#32
++	ldp	@x[9],@x[11],[$inp,#32]
++	add	@x[12],@x[12],@x[13],lsl#32
++	add	@x[14],@x[14],@x[15],lsl#32
++	ldp	@x[13],@x[15],[$inp,#48]
++	add	$inp,$inp,#64
++# ifdef	__AARCH64EB__
++	rev	@x[0],@x[0]
++	rev	@x[2],@x[2]
++	rev	@x[4],@x[4]
++	rev	@x[6],@x[6]
++	rev	@x[8],@x[8]
++	rev	@x[10],@x[10]
++	rev	@x[12],@x[12]
++	rev	@x[14],@x[14]
++# endif
++	eor	@x[0],@x[0],@x[1]
++	eor	@x[2],@x[2],@x[3]
++	eor	@x[4],@x[4],@x[5]
++	eor	@x[6],@x[6],@x[7]
++	eor	@x[8],@x[8],@x[9]
++	eor	@x[10],@x[10],@x[11]
++	eor	@x[12],@x[12],@x[13]
++	eor	@x[14],@x[14],@x[15]
++
++	 stp	@x[0],@x[2],[$out,#0]		// store output
++	 add	@d[6],@d[6],#1			// increment counter
++	mov.32	@x[0],@d[0]			// unpack key block
++	lsr	@x[1],@d[0],#32
++	 stp	@x[4],@x[6],[$out,#16]
++	mov.32	@x[2],@d[1]
++	lsr	@x[3],@d[1],#32
++	 stp	@x[8],@x[10],[$out,#32]
++	mov.32	@x[4],@d[2]
++	lsr	@x[5],@d[2],#32
++	 stp	@x[12],@x[14],[$out,#48]
++	 add	$out,$out,#64
++	mov.32	@x[6],@d[3]
++	lsr	@x[7],@d[3],#32
++	mov.32	@x[8],@d[4]
++	lsr	@x[9],@d[4],#32
++	mov.32	@x[10],@d[5]
++	lsr	@x[11],@d[5],#32
++	mov.32	@x[12],@d[6]
++	lsr	@x[13],@d[6],#32
++	mov.32	@x[14],@d[7]
++	lsr	@x[15],@d[7],#32
++
++	mov	$ctr,#5
++.Loop_lower_neon:
++	sub	$ctr,$ctr,#1
++___
++	@thread0=&NEONROUND($A0,$B0,$C0,$D0,$T0,0);
++	@thread1=&NEONROUND($A1,$B1,$C1,$D1,$T1,0);
++	@thread2=&NEONROUND($A2,$B2,$C2,$D2,$T2,0);
++	@thread3=&NEONROUND($A3,$B3,$C3,$D3,$T3,0);
++	@thread4=&NEONROUND($A4,$B4,$C4,$D4,$T4,0);
++	@thread5=&NEONROUND($A5,$B5,$C5,$D5,$T5,0);
++	@thread67=(&ROUND(0,4,8,12),&ROUND(0,5,10,15));
++
++	foreach (@thread0) {
++		eval;			eval(shift(@thread67));
++		eval(shift(@thread1));	eval(shift(@thread67));
++		eval(shift(@thread2));	eval(shift(@thread67));
++		eval(shift(@thread3));	eval(shift(@thread67));
++		eval(shift(@thread4));	eval(shift(@thread67));
++		eval(shift(@thread5));	eval(shift(@thread67));
++	}
++
++	@thread0=&NEONROUND($A0,$B0,$C0,$D0,$T0,1);
++	@thread1=&NEONROUND($A1,$B1,$C1,$D1,$T1,1);
++	@thread2=&NEONROUND($A2,$B2,$C2,$D2,$T2,1);
++	@thread3=&NEONROUND($A3,$B3,$C3,$D3,$T3,1);
++	@thread4=&NEONROUND($A4,$B4,$C4,$D4,$T4,1);
++	@thread5=&NEONROUND($A5,$B5,$C5,$D5,$T5,1);
++	@thread67=(&ROUND(0,4,8,12),&ROUND(0,5,10,15));
++
++	foreach (@thread0) {
++		eval;			eval(shift(@thread67));
++		eval(shift(@thread1));	eval(shift(@thread67));
++		eval(shift(@thread2));	eval(shift(@thread67));
++		eval(shift(@thread3));	eval(shift(@thread67));
++		eval(shift(@thread4));	eval(shift(@thread67));
++		eval(shift(@thread5));	eval(shift(@thread67));
++	}
++$code.=<<___;
++	cbnz	$ctr,.Loop_lower_neon
++
++	add.32	@x[0],@x[0],@d[0]		// accumulate key block
++	 ldp	@K[0],@K[1],[sp,#0]
++	add	@x[1],@x[1],@d[0],lsr#32
++	 ldp	@K[2],@K[3],[sp,#32]
++	add.32	@x[2],@x[2],@d[1]
++	 ldp	@K[4],@K[5],[sp,#64]
++	add	@x[3],@x[3],@d[1],lsr#32
++	 add	$A0,$A0,@K[0]
++	add.32	@x[4],@x[4],@d[2]
++	 add	$A1,$A1,@K[0]
++	add	@x[5],@x[5],@d[2],lsr#32
++	 add	$A2,$A2,@K[0]
++	add.32	@x[6],@x[6],@d[3]
++	 add	$A3,$A3,@K[0]
++	add	@x[7],@x[7],@d[3],lsr#32
++	 add	$A4,$A4,@K[0]
++	add.32	@x[8],@x[8],@d[4]
++	 add	$A5,$A5,@K[0]
++	add	@x[9],@x[9],@d[4],lsr#32
++	 add	$C0,$C0,@K[2]
++	add.32	@x[10],@x[10],@d[5]
++	 add	$C1,$C1,@K[2]
++	add	@x[11],@x[11],@d[5],lsr#32
++	 add	$C2,$C2,@K[2]
++	add.32	@x[12],@x[12],@d[6]
++	 add	$C3,$C3,@K[2]
++	add	@x[13],@x[13],@d[6],lsr#32
++	 add	$C4,$C4,@K[2]
++	add.32	@x[14],@x[14],@d[7]
++	 add	$C5,$C5,@K[2]
++	add	@x[15],@x[15],@d[7],lsr#32
++	 add	$D4,$D4,$ONE			// +4
++	add	@x[0],@x[0],@x[1],lsl#32	// pack
++	 add	$D5,$D5,$ONE			// +4
++	add	@x[2],@x[2],@x[3],lsl#32
++	 add	$D0,$D0,@K[3]
++	ldp	@x[1],@x[3],[$inp,#0]		// load input
++	 add	$D1,$D1,@K[4]
++	add	@x[4],@x[4],@x[5],lsl#32
++	 add	$D2,$D2,@K[5]
++	add	@x[6],@x[6],@x[7],lsl#32
++	 add	$D3,$D3,@K[6]
++	ldp	@x[5],@x[7],[$inp,#16]
++	 add	$D4,$D4,@K[3]
++	add	@x[8],@x[8],@x[9],lsl#32
++	 add	$D5,$D5,@K[4]
++	add	@x[10],@x[10],@x[11],lsl#32
++	 add	$B0,$B0,@K[1]
++	ldp	@x[9],@x[11],[$inp,#32]
++	 add	$B1,$B1,@K[1]
++	add	@x[12],@x[12],@x[13],lsl#32
++	 add	$B2,$B2,@K[1]
++	add	@x[14],@x[14],@x[15],lsl#32
++	 add	$B3,$B3,@K[1]
++	ldp	@x[13],@x[15],[$inp,#48]
++	 add	$B4,$B4,@K[1]
++	add	$inp,$inp,#64
++	 add	$B5,$B5,@K[1]
++
++# ifdef	__AARCH64EB__
++	rev	@x[0],@x[0]
++	rev	@x[2],@x[2]
++	rev	@x[4],@x[4]
++	rev	@x[6],@x[6]
++	rev	@x[8],@x[8]
++	rev	@x[10],@x[10]
++	rev	@x[12],@x[12]
++	rev	@x[14],@x[14]
++# endif
++	ld1.8	{$T0-$T3},[$inp],#64
++	eor	@x[0],@x[0],@x[1]
++	eor	@x[2],@x[2],@x[3]
++	eor	@x[4],@x[4],@x[5]
++	eor	@x[6],@x[6],@x[7]
++	eor	@x[8],@x[8],@x[9]
++	 eor	$A0,$A0,$T0
++	eor	@x[10],@x[10],@x[11]
++	 eor	$B0,$B0,$T1
++	eor	@x[12],@x[12],@x[13]
++	 eor	$C0,$C0,$T2
++	eor	@x[14],@x[14],@x[15]
++	 eor	$D0,$D0,$T3
++	 ld1.8	{$T0-$T3},[$inp],#64
++
++	stp	@x[0],@x[2],[$out,#0]		// store output
++	 add	@d[6],@d[6],#7			// increment counter
++	stp	@x[4],@x[6],[$out,#16]
++	stp	@x[8],@x[10],[$out,#32]
++	stp	@x[12],@x[14],[$out,#48]
++	add	$out,$out,#64
++	st1.8	{$A0-$D0},[$out],#64
++
++	ld1.8	{$A0-$D0},[$inp],#64
++	eor	$A1,$A1,$T0
++	eor	$B1,$B1,$T1
++	eor	$C1,$C1,$T2
++	eor	$D1,$D1,$T3
++	st1.8	{$A1-$D1},[$out],#64
++
++	ld1.8	{$A1-$D1},[$inp],#64
++	eor	$A2,$A2,$A0
++	 ldp	@K[0],@K[1],[sp,#0]
++	eor	$B2,$B2,$B0
++	 ldp	@K[2],@K[3],[sp,#32]
++	eor	$C2,$C2,$C0
++	eor	$D2,$D2,$D0
++	st1.8	{$A2-$D2},[$out],#64
++
++	ld1.8	{$A2-$D2},[$inp],#64
++	eor	$A3,$A3,$A1
++	eor	$B3,$B3,$B1
++	eor	$C3,$C3,$C1
++	eor	$D3,$D3,$D1
++	st1.8	{$A3-$D3},[$out],#64
++
++	ld1.8	{$A3-$D3},[$inp],#64
++	eor	$A4,$A4,$A2
++	eor	$B4,$B4,$B2
++	eor	$C4,$C4,$C2
++	eor	$D4,$D4,$D2
++	st1.8	{$A4-$D4},[$out],#64
++
++	shl	$A0,$ONE,#1			// 4 -> 8
++	eor	$A5,$A5,$A3
++	eor	$B5,$B5,$B3
++	eor	$C5,$C5,$C3
++	eor	$D5,$D5,$D3
++	st1.8	{$A5-$D5},[$out],#64
++
++	add	@K[3],@K[3],$A0			// += 8
++	add	@K[4],@K[4],$A0
++	add	@K[5],@K[5],$A0
++	add	@K[6],@K[6],$A0
++
++	b.hs	.Loop_outer_512_neon
++
++	adds	$len,$len,#512
++	ushr	$A0,$ONE,#2			// 4 -> 1
++
++	ldp	d8,d9,[sp,#128+0]		// meet ABI requirements
++	ldp	d10,d11,[sp,#128+16]
++	ldp	d12,d13,[sp,#128+32]
++	ldp	d14,d15,[sp,#128+48]
++
++	stp	@K[0],$ONE,[sp,#0]		// wipe off-load area
++	stp	@K[0],$ONE,[sp,#32]
++	stp	@K[0],$ONE,[sp,#64]
++
++	b.eq	.Ldone_512_neon
++
++	cmp	$len,#192
++	sub	@K[3],@K[3],$A0			// -= 1
++	sub	@K[4],@K[4],$A0
++	sub	@K[5],@K[5],$A0
++	add	sp,sp,#128
++	b.hs	.Loop_outer_neon
++
++	eor	@K[1],@K[1],@K[1]
++	eor	@K[2],@K[2],@K[2]
++	eor	@K[3],@K[3],@K[3]
++	eor	@K[4],@K[4],@K[4]
++	eor	@K[5],@K[5],@K[5]
++	eor	@K[6],@K[6],@K[6]
++	b	.Loop_outer
++
++.Ldone_512_neon:
++	ldp	x19,x20,[x29,#16]
++	add	sp,sp,#128+64
++	ldp	x21,x22,[x29,#32]
++	ldp	x23,x24,[x29,#48]
++	ldp	x25,x26,[x29,#64]
++	ldp	x27,x28,[x29,#80]
++	ldp	x29,x30,[sp],#96
++	ret
++.size	ChaCha20_512_neon,.-ChaCha20_512_neon
++#endif
++#endif
 +___
 +}
++}}}
 +
 +open SELF,$0;
 +while(<SELF>) {
@@ -4396,41 +2626,497 @@ index 000000000000..38532f87a754
 +close SELF;
 +
 +foreach (split("\n",$code)) {
-+	s/\`([^\`]*)\`/eval $1/ge;
++	s/\`([^\`]*)\`/eval $1/geo;
 +
-+	s/%x#%[yz]/%x/g;	# "down-shift"
-+
-+	if ($kernel) {
-+		s/(^\.type.*),[0-9]+$/\1/;
-+		next if /^\.cfi.*/;
-+	}
++	(s/\b([a-z]+)\.32\b/$1/ and (s/x([0-9]+)/w$1/g or 1))	or
++	(m/\b(eor|ext|mov)\b/ and (s/\.4s/\.16b/g or 1))	or
++	(s/\b((?:ld|st)1)\.8\b/$1/ and (s/\.4s/\.16b/g or 1))	or
++	(m/\b(ld|st)[rp]\b/ and (s/v([0-9]+)\.4s/q$1/g or 1))	or
++	(s/\brev32\.16\b/rev32/ and (s/\.4s/\.8h/g or 1));
 +
 +	print $_,"\n";
 +}
++close STDOUT;	# flush
+diff --git a/lib/zinc/chacha20/chacha20-unrolled-arm.S b/lib/zinc/chacha20/chacha20-unrolled-arm.S
+new file mode 100644
+index 000000000000..2140319b64a0
+--- /dev/null
++++ b/lib/zinc/chacha20/chacha20-unrolled-arm.S
+@@ -0,0 +1,461 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Copyright (C) 2018 Google, Inc.
++ */
 +
-+close STDOUT;
++#include <linux/linkage.h>
++#include <asm/assembler.h>
++
++/*
++ * Design notes:
++ *
++ * 16 registers would be needed to hold the state matrix, but only 14 are
++ * available because 'sp' and 'pc' cannot be used.  So we spill the elements
++ * (x8, x9) to the stack and swap them out with (x10, x11).  This adds one
++ * 'ldrd' and one 'strd' instruction per round.
++ *
++ * All rotates are performed using the implicit rotate operand accepted by the
++ * 'add' and 'eor' instructions.  This is faster than using explicit rotate
++ * instructions.  To make this work, we allow the values in the second and last
++ * rows of the ChaCha state matrix (rows 'b' and 'd') to temporarily have the
++ * wrong rotation amount.  The rotation amount is then fixed up just in time
++ * when the values are used.  'brot' is the number of bits the values in row 'b'
++ * need to be rotated right to arrive at the correct values, and 'drot'
++ * similarly for row 'd'.  (brot, drot) start out as (0, 0) but we make it such
++ * that they end up as (25, 24) after every round.
++ */
++
++	// ChaCha state registers
++	X0	.req	r0
++	X1	.req	r1
++	X2	.req	r2
++	X3	.req	r3
++	X4	.req	r4
++	X5	.req	r5
++	X6	.req	r6
++	X7	.req	r7
++	X8_X10	.req	r8	// shared by x8 and x10
++	X9_X11	.req	r9	// shared by x9 and x11
++	X12	.req	r10
++	X13	.req	r11
++	X14	.req	r12
++	X15	.req	r14
++
++.Lexpand_32byte_k:
++	// "expand 32-byte k"
++	.word	0x61707865, 0x3320646e, 0x79622d32, 0x6b206574
++
++#ifdef __thumb2__
++#  define adrl adr
++#endif
++
++.macro __rev		out, in,  t0, t1, t2
++.if __LINUX_ARM_ARCH__ >= 6
++	rev		\out, \in
++.else
++	lsl		\t0, \in, #24
++	and		\t1, \in, #0xff00
++	and		\t2, \in, #0xff0000
++	orr		\out, \t0, \in, lsr #24
++	orr		\out, \out, \t1, lsl #8
++	orr		\out, \out, \t2, lsr #8
++.endif
++.endm
++
++.macro _le32_bswap	x,  t0, t1, t2
++#ifdef __ARMEB__
++	__rev		\x, \x,  \t0, \t1, \t2
++#endif
++.endm
++
++.macro _le32_bswap_4x	a, b, c, d,  t0, t1, t2
++	_le32_bswap	\a,  \t0, \t1, \t2
++	_le32_bswap	\b,  \t0, \t1, \t2
++	_le32_bswap	\c,  \t0, \t1, \t2
++	_le32_bswap	\d,  \t0, \t1, \t2
++.endm
++
++.macro __ldrd		a, b, src, offset
++#if __LINUX_ARM_ARCH__ >= 6
++	ldrd		\a, \b, [\src, #\offset]
++#else
++	ldr		\a, [\src, #\offset]
++	ldr		\b, [\src, #\offset + 4]
++#endif
++.endm
++
++.macro __strd		a, b, dst, offset
++#if __LINUX_ARM_ARCH__ >= 6
++	strd		\a, \b, [\dst, #\offset]
++#else
++	str		\a, [\dst, #\offset]
++	str		\b, [\dst, #\offset + 4]
++#endif
++.endm
++
++.macro _halfround	a1, b1, c1, d1,  a2, b2, c2, d2
++
++	// a += b; d ^= a; d = rol(d, 16);
++	add		\a1, \a1, \b1, ror #brot
++	add		\a2, \a2, \b2, ror #brot
++	eor		\d1, \a1, \d1, ror #drot
++	eor		\d2, \a2, \d2, ror #drot
++	// drot == 32 - 16 == 16
++
++	// c += d; b ^= c; b = rol(b, 12);
++	add		\c1, \c1, \d1, ror #16
++	add		\c2, \c2, \d2, ror #16
++	eor		\b1, \c1, \b1, ror #brot
++	eor		\b2, \c2, \b2, ror #brot
++	// brot == 32 - 12 == 20
++
++	// a += b; d ^= a; d = rol(d, 8);
++	add		\a1, \a1, \b1, ror #20
++	add		\a2, \a2, \b2, ror #20
++	eor		\d1, \a1, \d1, ror #16
++	eor		\d2, \a2, \d2, ror #16
++	// drot == 32 - 8 == 24
++
++	// c += d; b ^= c; b = rol(b, 7);
++	add		\c1, \c1, \d1, ror #24
++	add		\c2, \c2, \d2, ror #24
++	eor		\b1, \c1, \b1, ror #20
++	eor		\b2, \c2, \b2, ror #20
++	// brot == 32 - 7 == 25
++.endm
++
++.macro _doubleround
++
++	// column round
++
++	// quarterrounds: (x0, x4, x8, x12) and (x1, x5, x9, x13)
++	_halfround	X0, X4, X8_X10, X12,  X1, X5, X9_X11, X13
++
++	// save (x8, x9); restore (x10, x11)
++	__strd		X8_X10, X9_X11, sp, 0
++	__ldrd		X8_X10, X9_X11, sp, 8
++
++	// quarterrounds: (x2, x6, x10, x14) and (x3, x7, x11, x15)
++	_halfround	X2, X6, X8_X10, X14,  X3, X7, X9_X11, X15
++
++	.set brot, 25
++	.set drot, 24
++
++	// diagonal round
++
++	// quarterrounds: (x0, x5, x10, x15) and (x1, x6, x11, x12)
++	_halfround	X0, X5, X8_X10, X15,  X1, X6, X9_X11, X12
++
++	// save (x10, x11); restore (x8, x9)
++	__strd		X8_X10, X9_X11, sp, 8
++	__ldrd		X8_X10, X9_X11, sp, 0
++
++	// quarterrounds: (x2, x7, x8, x13) and (x3, x4, x9, x14)
++	_halfround	X2, X7, X8_X10, X13,  X3, X4, X9_X11, X14
++.endm
++
++.macro _chacha_permute	nrounds
++	.set brot, 0
++	.set drot, 0
++	.rept \nrounds / 2
++	 _doubleround
++	.endr
++.endm
++
++.macro _chacha		nrounds
++
++.Lnext_block\@:
++	// Stack: unused0-unused1 x10-x11 x0-x15 OUT IN LEN
++	// Registers contain x0-x9,x12-x15.
++
++	// Do the core ChaCha permutation to update x0-x15.
++	_chacha_permute	\nrounds
++
++	add		sp, #8
++	// Stack: x10-x11 orig_x0-orig_x15 OUT IN LEN
++	// Registers contain x0-x9,x12-x15.
++	// x4-x7 are rotated by 'brot'; x12-x15 are rotated by 'drot'.
++
++	// Free up some registers (r8-r12,r14) by pushing (x8-x9,x12-x15).
++	push		{X8_X10, X9_X11, X12, X13, X14, X15}
++
++	// Load (OUT, IN, LEN).
++	ldr		r14, [sp, #96]
++	ldr		r12, [sp, #100]
++	ldr		r11, [sp, #104]
++
++	orr		r10, r14, r12
++
++	// Use slow path if fewer than 64 bytes remain.
++	cmp		r11, #64
++	blt		.Lxor_slowpath\@
++
++	// Use slow path if IN and/or OUT isn't 4-byte aligned.  Needed even on
++	// ARMv6+, since ldmia and stmia (used below) still require alignment.
++	tst		r10, #3
++	bne		.Lxor_slowpath\@
++
++	// Fast path: XOR 64 bytes of aligned data.
++
++	// Stack: x8-x9 x12-x15 x10-x11 orig_x0-orig_x15 OUT IN LEN
++	// Registers: r0-r7 are x0-x7; r8-r11 are free; r12 is IN; r14 is OUT.
++	// x4-x7 are rotated by 'brot'; x12-x15 are rotated by 'drot'.
++
++	// x0-x3
++	__ldrd		r8, r9, sp, 32
++	__ldrd		r10, r11, sp, 40
++	add		X0, X0, r8
++	add		X1, X1, r9
++	add		X2, X2, r10
++	add		X3, X3, r11
++	_le32_bswap_4x	X0, X1, X2, X3,  r8, r9, r10
++	ldmia		r12!, {r8-r11}
++	eor		X0, X0, r8
++	eor		X1, X1, r9
++	eor		X2, X2, r10
++	eor		X3, X3, r11
++	stmia		r14!, {X0-X3}
++
++	// x4-x7
++	__ldrd		r8, r9, sp, 48
++	__ldrd		r10, r11, sp, 56
++	add		X4, r8, X4, ror #brot
++	add		X5, r9, X5, ror #brot
++	ldmia		r12!, {X0-X3}
++	add		X6, r10, X6, ror #brot
++	add		X7, r11, X7, ror #brot
++	_le32_bswap_4x	X4, X5, X6, X7,  r8, r9, r10
++	eor		X4, X4, X0
++	eor		X5, X5, X1
++	eor		X6, X6, X2
++	eor		X7, X7, X3
++	stmia		r14!, {X4-X7}
++
++	// x8-x15
++	pop		{r0-r7}			// (x8-x9,x12-x15,x10-x11)
++	__ldrd		r8, r9, sp, 32
++	__ldrd		r10, r11, sp, 40
++	add		r0, r0, r8		// x8
++	add		r1, r1, r9		// x9
++	add		r6, r6, r10		// x10
++	add		r7, r7, r11		// x11
++	_le32_bswap_4x	r0, r1, r6, r7,  r8, r9, r10
++	ldmia		r12!, {r8-r11}
++	eor		r0, r0, r8		// x8
++	eor		r1, r1, r9		// x9
++	eor		r6, r6, r10		// x10
++	eor		r7, r7, r11		// x11
++	stmia		r14!, {r0,r1,r6,r7}
++	ldmia		r12!, {r0,r1,r6,r7}
++	__ldrd		r8, r9, sp, 48
++	__ldrd		r10, r11, sp, 56
++	add		r2, r8, r2, ror #drot	// x12
++	add		r3, r9, r3, ror #drot	// x13
++	add		r4, r10, r4, ror #drot	// x14
++	add		r5, r11, r5, ror #drot	// x15
++	_le32_bswap_4x	r2, r3, r4, r5,  r9, r10, r11
++	  ldr		r9, [sp, #72]		// load LEN
++	eor		r2, r2, r0		// x12
++	eor		r3, r3, r1		// x13
++	eor		r4, r4, r6		// x14
++	eor		r5, r5, r7		// x15
++	  subs		r9, #64			// decrement and check LEN
++	stmia		r14!, {r2-r5}
++
++	beq		.Ldone\@
++
++.Lprepare_for_next_block\@:
++
++	// Stack: x0-x15 OUT IN LEN
++
++	// Increment block counter (x12)
++	add		r8, #1
++
++	// Store updated (OUT, IN, LEN)
++	str		r14, [sp, #64]
++	str		r12, [sp, #68]
++	str		r9, [sp, #72]
++
++	  mov		r14, sp
++
++	// Store updated block counter (x12)
++	str		r8, [sp, #48]
++
++	  sub		sp, #16
++
++	// Reload state and do next block
++	ldmia		r14!, {r0-r11}		// load x0-x11
++	__strd		r10, r11, sp, 8		// store x10-x11 before state
++	ldmia		r14, {r10-r12,r14}	// load x12-x15
++	b		.Lnext_block\@
++
++.Lxor_slowpath\@:
++	// Slow path: < 64 bytes remaining, or unaligned input or output buffer.
++	// We handle it by storing the 64 bytes of keystream to the stack, then
++	// XOR-ing the needed portion with the data.
++
++	// Allocate keystream buffer
++	sub		sp, #64
++	mov		r14, sp
++
++	// Stack: ks0-ks15 x8-x9 x12-x15 x10-x11 orig_x0-orig_x15 OUT IN LEN
++	// Registers: r0-r7 are x0-x7; r8-r11 are free; r12 is IN; r14 is &ks0.
++	// x4-x7 are rotated by 'brot'; x12-x15 are rotated by 'drot'.
++
++	// Save keystream for x0-x3
++	__ldrd		r8, r9, sp, 96
++	__ldrd		r10, r11, sp, 104
++	add		X0, X0, r8
++	add		X1, X1, r9
++	add		X2, X2, r10
++	add		X3, X3, r11
++	_le32_bswap_4x	X0, X1, X2, X3,  r8, r9, r10
++	stmia		r14!, {X0-X3}
++
++	// Save keystream for x4-x7
++	__ldrd		r8, r9, sp, 112
++	__ldrd		r10, r11, sp, 120
++	add		X4, r8, X4, ror #brot
++	add		X5, r9, X5, ror #brot
++	add		X6, r10, X6, ror #brot
++	add		X7, r11, X7, ror #brot
++	_le32_bswap_4x	X4, X5, X6, X7,  r8, r9, r10
++	  add		r8, sp, #64
++	stmia		r14!, {X4-X7}
++
++	// Save keystream for x8-x15
++	ldm		r8, {r0-r7}		// (x8-x9,x12-x15,x10-x11)
++	__ldrd		r8, r9, sp, 128
++	__ldrd		r10, r11, sp, 136
++	add		r0, r0, r8		// x8
++	add		r1, r1, r9		// x9
++	add		r6, r6, r10		// x10
++	add		r7, r7, r11		// x11
++	_le32_bswap_4x	r0, r1, r6, r7,  r8, r9, r10
++	stmia		r14!, {r0,r1,r6,r7}
++	__ldrd		r8, r9, sp, 144
++	__ldrd		r10, r11, sp, 152
++	add		r2, r8, r2, ror #drot	// x12
++	add		r3, r9, r3, ror #drot	// x13
++	add		r4, r10, r4, ror #drot	// x14
++	add		r5, r11, r5, ror #drot	// x15
++	_le32_bswap_4x	r2, r3, r4, r5,  r9, r10, r11
++	stmia		r14, {r2-r5}
++
++	// Stack: ks0-ks15 unused0-unused7 x0-x15 OUT IN LEN
++	// Registers: r8 is block counter, r12 is IN.
++
++	ldr		r9, [sp, #168]		// LEN
++	ldr		r14, [sp, #160]		// OUT
++	cmp		r9, #64
++	  mov		r0, sp
++	movle		r1, r9
++	movgt		r1, #64
++	// r1 is number of bytes to XOR, in range [1, 64]
++
++.if __LINUX_ARM_ARCH__ < 6
++	orr		r2, r12, r14
++	tst		r2, #3			// IN or OUT misaligned?
++	bne		.Lxor_next_byte\@
++.endif
++
++	// XOR a word at a time
++.rept 16
++	subs		r1, #4
++	blt		.Lxor_words_done\@
++	ldr		r2, [r12], #4
++	ldr		r3, [r0], #4
++	eor		r2, r2, r3
++	str		r2, [r14], #4
++.endr
++	b		.Lxor_slowpath_done\@
++.Lxor_words_done\@:
++	ands		r1, r1, #3
++	beq		.Lxor_slowpath_done\@
++
++	// XOR a byte at a time
++.Lxor_next_byte\@:
++	ldrb		r2, [r12], #1
++	ldrb		r3, [r0], #1
++	eor		r2, r2, r3
++	strb		r2, [r14], #1
++	subs		r1, #1
++	bne		.Lxor_next_byte\@
++
++.Lxor_slowpath_done\@:
++	subs		r9, #64
++	add		sp, #96
++	bgt		.Lprepare_for_next_block\@
++
++.Ldone\@:
++.endm	// _chacha
++
++/*
++ * void chacha20_arm(u8 *out, const u8 *in, size_t len, const u32 key[8],
++ *		     const u32 iv[4]);
++ */
++ENTRY(chacha20_arm)
++	cmp		r2, #0			// len == 0?
++	reteq		lr
++
++	push		{r0-r2,r4-r11,lr}
++
++	// Push state x0-x15 onto stack.
++	// Also store an extra copy of x10-x11 just before the state.
++
++	ldr		r4, [sp, #48]		// iv
++	mov		r0, sp
++	sub		sp, #80
++
++	// iv: x12-x15
++	ldm		r4, {X12,X13,X14,X15}
++	stmdb		r0!, {X12,X13,X14,X15}
++
++	// key: x4-x11
++	__ldrd		X8_X10, X9_X11, r3, 24
++	__strd		X8_X10, X9_X11, sp, 8
++	stmdb		r0!, {X8_X10, X9_X11}
++	ldm		r3, {X4-X9_X11}
++	stmdb		r0!, {X4-X9_X11}
++
++	// constants: x0-x3
++	adrl		X3, .Lexpand_32byte_k
++	ldm		X3, {X0-X3}
++	__strd		X0, X1, sp, 16
++	__strd		X2, X3, sp, 24
++
++	_chacha		20
++
++	add		sp, #76
++	pop		{r4-r11, pc}
++ENDPROC(chacha20_arm)
++
++/*
++ * void hchacha20_arm(const u32 state[16], u32 out[8]);
++ */
++ENTRY(hchacha20_arm)
++	push		{r1,r4-r11,lr}
++
++	mov		r14, r0
++	ldmia		r14!, {r0-r11}		// load x0-x11
++	push		{r10-r11}		// store x10-x11 to stack
++	ldm		r14, {r10-r12,r14}	// load x12-x15
++	sub		sp, #8
++
++	_chacha_permute	20
++
++	// Skip over (unused0-unused1, x10-x11)
++	add		sp, #16
++
++	// Fix up rotations of x12-x15
++	ror		X12, X12, #drot
++	ror		X13, X13, #drot
++	  pop		{r4}			// load 'out'
++	ror		X14, X14, #drot
++	ror		X15, X15, #drot
++
++	// Store (x0-x3,x12-x15) to 'out'
++	stm		r4, {X0,X1,X2,X3,X12,X13,X14,X15}
++
++	pop		{r4-r11,pc}
++ENDPROC(hchacha20_arm)
 diff --git a/lib/zinc/chacha20/chacha20.c b/lib/zinc/chacha20/chacha20.c
-index 6d3f62f0ef26..b47aefd65e80 100644
+index b47aefd65e80..d4e6316eb5a3 100644
 --- a/lib/zinc/chacha20/chacha20.c
 +++ b/lib/zinc/chacha20/chacha20.c
-@@ -16,6 +16,9 @@
- #include <linux/vmalloc.h>
- #include <crypto/algapi.h> // For crypto_xor_cpy.
+@@ -18,6 +18,8 @@
  
-+#if defined(CONFIG_ZINC_ARCH_X86_64)
-+#include "chacha20-x86_64-glue.c"
-+#else
+ #if defined(CONFIG_ZINC_ARCH_X86_64)
+ #include "chacha20-x86_64-glue.c"
++#elif defined(CONFIG_ZINC_ARCH_ARM) || defined(CONFIG_ZINC_ARCH_ARM64)
++#include "chacha20-arm-glue.c"
+ #else
  static bool *const chacha20_nobs[] __initconst = { };
  static void __init chacha20_fpu_init(void)
- {
-@@ -33,6 +36,7 @@ static inline bool hchacha20_arch(u32 derived_key[CHACHA20_KEY_WORDS],
- {
- 	return false;
- }
-+#endif
- 
- #define QUARTER_ROUND(x, a, b, c, d) ( \
- 	x[a] += x[b], \
 -- 
 2.21.0
 
