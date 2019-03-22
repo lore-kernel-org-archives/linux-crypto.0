@@ -2,71 +2,68 @@ Return-Path: <SRS0=7kP/=RZ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 060BBC43381
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 Mar 2019 13:04:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF300C43381
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 Mar 2019 13:04:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CB7E120693
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 Mar 2019 13:04:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9C7D220693
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 Mar 2019 13:04:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730915AbfCVNEc (ORCPT
+        id S1731009AbfCVNEg (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 22 Mar 2019 09:04:32 -0400
-Received: from orcrist.hmeau.com ([104.223.48.154]:49496 "EHLO
+        Fri, 22 Mar 2019 09:04:36 -0400
+Received: from orcrist.hmeau.com ([104.223.48.154]:49502 "EHLO
         deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730773AbfCVNEc (ORCPT
+        with ESMTP id S1730587AbfCVNEg (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 22 Mar 2019 09:04:32 -0400
+        Fri, 22 Mar 2019 09:04:36 -0400
 Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
         by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1h7JqX-0006JH-L9; Fri, 22 Mar 2019 21:04:29 +0800
+        id 1h7JqM-0006GC-LZ; Fri, 22 Mar 2019 21:04:18 +0800
 Received: from herbert by gondobar with local (Exim 4.89)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1h7JqS-0005en-TJ; Fri, 22 Mar 2019 21:04:24 +0800
-Date:   Fri, 22 Mar 2019 21:04:24 +0800
+        id 1h7JqK-0005eV-88; Fri, 22 Mar 2019 21:04:16 +0800
+Date:   Fri, 22 Mar 2019 21:04:16 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Daniel Axtens <dja@axtens.net>
-Cc:     omosnacek@gmail.com, linux-crypto@vger.kernel.org,
-        marcelo.cerri@canonical.com, Stephan Mueller <smueller@chronox.de>,
-        leo.barbosa@canonical.com, linuxppc-dev@lists.ozlabs.org,
-        nayna@linux.ibm.com, pfsmorigo@gmail.com, leitao@debian.org
-Subject: Re: [PATCH] crypto: vmx - fix copy-paste error in CTR mode
-Message-ID: <20190322130424.rtzrkcosziol4moi@gondor.apana.org.au>
-References: <20190315020901.16509-1-dja@axtens.net>
+To:     Arnd Bergmann <arnd@arndb.de>
+Cc:     Gilad Ben-Yossef <gilad@benyossef.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Biggers <ebiggers@google.com>,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: ccree - reduce kernel stack usage with clang
+Message-ID: <20190322130416.qxpznh6d3z6yhppx@gondor.apana.org.au>
+References: <20190314090951.840339-1-arnd@arndb.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190315020901.16509-1-dja@axtens.net>
+In-Reply-To: <20190314090951.840339-1-arnd@arndb.de>
 User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Mar 15, 2019 at 01:09:01PM +1100, Daniel Axtens wrote:
-> The original assembly imported from OpenSSL has two copy-paste
-> errors in handling CTR mode. When dealing with a 2 or 3 block tail,
-> the code branches to the CBC decryption exit path, rather than to
-> the CTR exit path.
+On Thu, Mar 14, 2019 at 10:09:44AM +0100, Arnd Bergmann wrote:
+> Building with clang for a 32-bit architecture runs over the stack
+> frame limit in the setkey function:
 > 
-> This leads to corruption of the IV, which leads to subsequent blocks
-> being corrupted.
+> drivers/crypto/ccree/cc_cipher.c:318:12: error: stack frame size of 1152 bytes in function 'cc_cipher_setkey' [-Werror,-Wframe-larger-than=]
 > 
-> This can be detected with libkcapi test suite, which is available at
-> https://github.com/smuellerDD/libkcapi
+> The problem is that there are two large variables: the temporary
+> 'tmp' array and the SHASH_DESC_ON_STACK() declaration. Moving
+> the first into the block in which it is used reduces the
+> total frame size to 768 bytes, which seems more reasonable
+> and is under the warning limit.
 > 
-> Reported-by: Ondrej Mosnáček <omosnacek@gmail.com>
-> Fixes: 5c380d623ed3 ("crypto: vmx - Add support for VMS instructions by ASM")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Daniel Axtens <dja@axtens.net>
+> Fixes: 63ee04c8b491 ("crypto: ccree - add skcipher support")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 > ---
->  drivers/crypto/vmx/aesp8-ppc.pl | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  drivers/crypto/ccree/cc_cipher.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Patch applied.  Thanks.
 -- 
