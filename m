@@ -2,236 +2,104 @@ Return-Path: <SRS0=7kP/=RZ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAFABC43381
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 Mar 2019 20:27:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A02CBC10F03
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 Mar 2019 22:02:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A546621841
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 Mar 2019 20:27:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="0VBtTT1Q"
+	by mail.kernel.org (Postfix) with ESMTP id 767EE2190A
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 Mar 2019 22:02:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727373AbfCVU1z (ORCPT
+        id S1727597AbfCVWCz convert rfc822-to-8bit (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 22 Mar 2019 16:27:55 -0400
-Received: from mail-eopbgr720056.outbound.protection.outlook.com ([40.107.72.56]:6176
-        "EHLO NAM05-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726910AbfCVU1z (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 22 Mar 2019 16:27:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector1-amd-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jdKpuzxAa0gA7+x0RzrUiKr5nW96UIslJrhhwwONmJ0=;
- b=0VBtTT1Q/Rt/mNIn+YRoIBQvs2RG7JWSSW00RorUwXkQsF/8e+wWu2S8Yi6erFT6488FvAGR5wB7aXYWiZbljh0dyN3mbHvBzv9Qg2zxxWVf7sJOYc7d7kWplqXpN+H23kDxsA9EBtrPXGDr4VfNFDRx6ONnb9VbL5QBfEol2T0=
-Received: from DM5PR12MB1449.namprd12.prod.outlook.com (10.172.38.138) by
- DM5PR12MB1466.namprd12.prod.outlook.com (10.172.38.143) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1709.14; Fri, 22 Mar 2019 20:27:47 +0000
-Received: from DM5PR12MB1449.namprd12.prod.outlook.com
- ([fe80::890d:8adb:6785:6ca1]) by DM5PR12MB1449.namprd12.prod.outlook.com
- ([fe80::890d:8adb:6785:6ca1%4]) with mapi id 15.20.1730.013; Fri, 22 Mar 2019
- 20:27:47 +0000
-From:   Gary R Hook <ghook@amd.com>
-To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        "qat-linux@intel.com" <qat-linux@intel.com>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "Hook, Gary" <Gary.Hook@amd.com>,
-        =?utf-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v7 03/11] crypto: rsa - unimplement sign/verify for raw
- RSA backends
-Thread-Topic: [PATCH v7 03/11] crypto: rsa - unimplement sign/verify for raw
- RSA backends
-Thread-Index: AQHU0FiFkj/mJIP80Eu1bh6/f0aqmaYYKE4AgAASWQA=
-Date:   Fri, 22 Mar 2019 20:27:47 +0000
-Message-ID: <90ebf1e1-b5a4-47ee-796d-99b6c91123ce@amd.com>
-References: <20190301175918.29694-1-vt@altlinux.org>
- <20190301175918.29694-4-vt@altlinux.org>
- <20190322192149.5tceia2q6g62p4so@altlinux.org>
-In-Reply-To: <20190322192149.5tceia2q6g62p4so@altlinux.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: SN4PR0501CA0082.namprd05.prod.outlook.com
- (2603:10b6:803:22::20) To DM5PR12MB1449.namprd12.prod.outlook.com
- (2603:10b6:4:d::10)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Gary.Hook@amd.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-originating-ip: [165.204.78.1]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 3287f568-3fa9-472b-52e0-08d6af04d8cd
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600127)(711020)(4605104)(4618075)(2017052603328)(7153060)(7193020);SRVR:DM5PR12MB1466;
-x-ms-traffictypediagnostic: DM5PR12MB1466:
-x-microsoft-antispam-prvs: <DM5PR12MB14668B5C84D8CE08B2AC3AAAFD430@DM5PR12MB1466.namprd12.prod.outlook.com>
-x-forefront-prvs: 09840A4839
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(376002)(136003)(346002)(366004)(396003)(39860400002)(189003)(199004)(31696002)(66066001)(6116002)(6486002)(6436002)(71190400001)(229853002)(68736007)(36756003)(2906002)(5660300002)(3846002)(97736004)(6512007)(76176011)(71200400001)(52116002)(316002)(2201001)(256004)(8936002)(6246003)(15650500001)(105586002)(72206003)(53936002)(386003)(486006)(53546011)(6506007)(26005)(102836004)(2501003)(110136005)(186003)(14444005)(476003)(305945005)(106356001)(14454004)(31686004)(2616005)(81156014)(446003)(7736002)(25786009)(81166006)(478600001)(99286004)(8676002)(11346002)(921003)(1121003);DIR:OUT;SFP:1101;SCL:1;SRVR:DM5PR12MB1466;H:DM5PR12MB1449.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: amd.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: qih5T/+AehfPxOxD4vKq+fiYfpkf91b65TPEKOj9W/LxCBY3vMpBTimiRtOoeTJH3+eTw61qpj3fMj/X9PoTu1zQLQv35cVTE6T/4ExjxLilKR9/npjq2oPoE5WkNkaQtaJUwZJQ+Lz+ukqIVFl85REjEfhqQsKVIAwmigQwN508DRI+SOkUHI6cZNZ1QRrQ6iy12kfKNtDT7UkdkqO9mOCvNaH5txqcy+30OvOQRX5LytwuvXZmzOXW/WWX5Gp9/TuZfvDqo7qTbDhGajek+ApClLYyE8DOZ3O5HCKWkggAkoyx+nNQqOl0RiZEWmb/D3P+sPia/nlum74Umjy6idT4BzFvph5BJ7QQdj1iyoVH6pZyD6Pd5uhMK1ER3Jf4Q+gQQ9lH+0+7j2QkBw6h4caBAk+P5XUIFw40FyuDv+g=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <0A5818E11C2FB94BB15AFF0B8EFEF8AA@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        Fri, 22 Mar 2019 18:02:55 -0400
+Received: from lithops.sigma-star.at ([195.201.40.130]:35062 "EHLO
+        lithops.sigma-star.at" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727440AbfCVWCz (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 22 Mar 2019 18:02:55 -0400
+Received: from localhost (localhost [127.0.0.1])
+        by lithops.sigma-star.at (Postfix) with ESMTP id 22AD4608A395;
+        Fri, 22 Mar 2019 23:02:52 +0100 (CET)
+Received: from lithops.sigma-star.at ([127.0.0.1])
+        by localhost (lithops.sigma-star.at [127.0.0.1]) (amavisd-new, port 10032)
+        with ESMTP id bxgElapSClzg; Fri, 22 Mar 2019 23:02:51 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+        by lithops.sigma-star.at (Postfix) with ESMTP id B507760F6D61;
+        Fri, 22 Mar 2019 23:02:51 +0100 (CET)
+Received: from lithops.sigma-star.at ([127.0.0.1])
+        by localhost (lithops.sigma-star.at [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id SkcTucd3wTxy; Fri, 22 Mar 2019 23:02:51 +0100 (CET)
+Received: from blindfold.localnet (213-47-184-186.cable.dynamic.surfer.at [213.47.184.186])
+        by lithops.sigma-star.at (Postfix) with ESMTPSA id 1D02D608A395;
+        Fri, 22 Mar 2019 23:02:51 +0100 (CET)
+From:   Richard Weinberger <richard@nod.at>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-fscrypt@vger.kernel.org, Satya Tangirala <satyat@google.com>,
+        "open list:ABI/API" <linux-api@vger.kernel.org>,
+        linux-f2fs-devel@lists.sourceforge.net, keyrings@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-ext4@vger.kernel.org, Paul Crowley <paulcrowley@google.com>
+Subject: Re: [RFC PATCH v3 07/18] fscrypt: add FS_IOC_ADD_ENCRYPTION_KEY ioctl
+Date:   Fri, 22 Mar 2019 23:02:49 +0100
+Message-ID: <4190811.5ckf3pJJgb@blindfold>
+In-Reply-To: <20190318230830.GA40545@gmail.com>
+References: <20190220065249.32099-1-ebiggers@kernel.org> <20190221184203.GB140206@gmail.com> <20190318230830.GA40545@gmail.com>
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3287f568-3fa9-472b-52e0-08d6af04d8cd
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Mar 2019 20:27:47.6282
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1466
+Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-T24gMy8yMi8xOSAyOjIxIFBNLCBWaXRhbHkgQ2hpa3Vub3Ygd3JvdGU6DQo+IEdpb3Zhbm5pIENh
-YmlkZHUsDQo+IA0KPiAgICBDYW4geW91IEFjayB0aGlzIHBhdGNoIGFzIGl0IGluY2x1ZGVzIHNt
-YWxsIGNoYW5nZSB0byBRQVQgZHJpdmVyLg0KPiANCj4gVG9tIExlbmRhY2t5LCBHYXJ5IEhvb2ss
-DQo+IA0KPiAgICBDYW4geW91IEFjayB0aGlzIHBhdGNoIGFzIGl0IGluY2x1ZGVzIHNtYWxsIGNo
-YW5nZSB0byBDQ1AgZHJpdmVyLg0KPiANCj4gSG9yaWEgR2VhbnTEgywgQXltZW4gU2doYWllciwN
-Cj4gDQo+ICAgIENhbiB5b3UgQWNrIHRoaXMgcGF0Y2ggYXMgaXQgaW5jbHVkZXMgc21hbGwgY2hh
-bmdlIHRvIENBQU0gZHJpdmVyLg0KPiANCj4gVGhhbmtzLA0KPiANCj4gT24gRnJpLCBNYXIgMDEs
-IDIwMTkgYXQgMDg6NTk6MTBQTSArMDMwMCwgVml0YWx5IENoaWt1bm92IHdyb3RlOg0KPj4gSW4g
-cHJlcGFyYXRpb24gZm9yIG5ldyBha2NpcGhlciB2ZXJpZnkgY2FsbCByZW1vdmUgc2lnbi92ZXJp
-ZnkgY2FsbGJhY2tzDQo+PiBmcm9tIFJTQSBiYWNrZW5kcyBhbmQgbWFrZSBQS0NTMSBkcml2ZXIg
-Y2FsbCBlbmNyeXB0L2RlY3J5cHQgaW5zdGVhZC4NCj4+DQo+PiBUaGlzIGFsc28gY29tcGxpZXMg
-d2l0aCB0aGUgd2VsbC1rbm93biBpZGVhIHRoYXQgcmF3IFJTQSBzaG91bGQgbmV2ZXIgYmUNCj4+
-IHVzZWQgZm9yIHNpZ24vdmVyaWZ5LiBJdCBvbmx5IHNob3VsZCBiZSB1c2VkIHdpdGggcHJvcGVy
-IHBhZGRpbmcgc2NoZW1lDQo+PiBzdWNoIGFzIFBLQ1MxIGRyaXZlciBwcm92aWRlcy4NCj4+DQo+
-PiBDYzogR2lvdmFubmkgQ2FiaWRkdSA8Z2lvdmFubmkuY2FiaWRkdUBpbnRlbC5jb20+DQo+PiBD
-YzogcWF0LWxpbnV4QGludGVsLmNvbQ0KPj4gQ2M6IFRvbSBMZW5kYWNreSA8dGhvbWFzLmxlbmRh
-Y2t5QGFtZC5jb20+DQo+PiBDYzogR2FyeSBIb29rIDxnYXJ5Lmhvb2tAYW1kLmNvbT4NCj4+IENj
-OiBIb3JpYSBHZWFudMSDIDxob3JpYS5nZWFudGFAbnhwLmNvbT4NCj4+IENjOiBBeW1lbiBTZ2hh
-aWVyIDxheW1lbi5zZ2hhaWVyQG54cC5jb20+DQo+PiBTaWduZWQtb2ZmLWJ5OiBWaXRhbHkgQ2hp
-a3Vub3YgPHZ0QGFsdGxpbnV4Lm9yZz4NCg0KQWNrZWQtYnk6IEdhcnkgUiBIb29rIDxnYXJ5Lmhv
-b2tAYW1kLmNvbT4NCg0KPj4gLS0tDQo+PiAgIGNyeXB0by9yc2EtcGtjczFwYWQuYyAgICAgICAg
-ICAgICAgICAgICAgICAgICB8ICAgNCArLQ0KPj4gICBjcnlwdG8vcnNhLmMgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgfCAxMDkgLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCj4+
-ICAgZHJpdmVycy9jcnlwdG8vY2FhbS9jYWFtcGtjLmMgICAgICAgICAgICAgICAgIHwgICAyIC0N
-Cj4+ICAgZHJpdmVycy9jcnlwdG8vY2NwL2NjcC1jcnlwdG8tcnNhLmMgICAgICAgICAgIHwgICAy
-IC0NCj4+ICAgZHJpdmVycy9jcnlwdG8vcWF0L3FhdF9jb21tb24vcWF0X2FzeW1fYWxncy5jIHwg
-ICAyIC0NCj4+ICAgNSBmaWxlcyBjaGFuZ2VkLCAyIGluc2VydGlvbnMoKyksIDExNyBkZWxldGlv
-bnMoLSkNCj4+DQo+PiBkaWZmIC0tZ2l0IGEvY3J5cHRvL3JzYS1wa2NzMXBhZC5jIGIvY3J5cHRv
-L3JzYS1wa2NzMXBhZC5jDQo+PiBpbmRleCAwYTY2ODBjYThjYjYuLjk0MzgyZmEyYzZhYyAxMDA2
-NDQNCj4+IC0tLSBhL2NyeXB0by9yc2EtcGtjczFwYWQuYw0KPj4gKysrIGIvY3J5cHRvL3JzYS1w
-a2NzMXBhZC5jDQo+PiBAQCAtNDI5LDcgKzQyOSw3IEBAIHN0YXRpYyBpbnQgcGtjczFwYWRfc2ln
-bihzdHJ1Y3QgYWtjaXBoZXJfcmVxdWVzdCAqcmVxKQ0KPj4gICAJYWtjaXBoZXJfcmVxdWVzdF9z
-ZXRfY3J5cHQoJnJlcV9jdHgtPmNoaWxkX3JlcSwgcmVxX2N0eC0+aW5fc2csDQo+PiAgIAkJCQkg
-ICByZXEtPmRzdCwgY3R4LT5rZXlfc2l6ZSAtIDEsIHJlcS0+ZHN0X2xlbik7DQo+PiAgIA0KPj4g
-LQllcnIgPSBjcnlwdG9fYWtjaXBoZXJfc2lnbigmcmVxX2N0eC0+Y2hpbGRfcmVxKTsNCj4+ICsJ
-ZXJyID0gY3J5cHRvX2FrY2lwaGVyX2RlY3J5cHQoJnJlcV9jdHgtPmNoaWxkX3JlcSk7DQo+PiAg
-IAlpZiAoZXJyICE9IC1FSU5QUk9HUkVTUyAmJiBlcnIgIT0gLUVCVVNZKQ0KPj4gICAJCXJldHVy
-biBwa2NzMXBhZF9lbmNyeXB0X3NpZ25fY29tcGxldGUocmVxLCBlcnIpOw0KPj4gICANCj4+IEBA
-IC01NTEsNyArNTUxLDcgQEAgc3RhdGljIGludCBwa2NzMXBhZF92ZXJpZnkoc3RydWN0IGFrY2lw
-aGVyX3JlcXVlc3QgKnJlcSkNCj4+ICAgCQkJCSAgIHJlcV9jdHgtPm91dF9zZywgcmVxLT5zcmNf
-bGVuLA0KPj4gICAJCQkJICAgY3R4LT5rZXlfc2l6ZSk7DQo+PiAgIA0KPj4gLQllcnIgPSBjcnlw
-dG9fYWtjaXBoZXJfdmVyaWZ5KCZyZXFfY3R4LT5jaGlsZF9yZXEpOw0KPj4gKwllcnIgPSBjcnlw
-dG9fYWtjaXBoZXJfZW5jcnlwdCgmcmVxX2N0eC0+Y2hpbGRfcmVxKTsNCj4+ICAgCWlmIChlcnIg
-IT0gLUVJTlBST0dSRVNTICYmIGVyciAhPSAtRUJVU1kpDQo+PiAgIAkJcmV0dXJuIHBrY3MxcGFk
-X3ZlcmlmeV9jb21wbGV0ZShyZXEsIGVycik7DQo+PiAgIA0KPj4gZGlmZiAtLWdpdCBhL2NyeXB0
-by9yc2EuYyBiL2NyeXB0by9yc2EuYw0KPj4gaW5kZXggNDE2Nzk4MGMyNDNkLi41ZDQyN2MxMTAw
-ZDYgMTAwNjQ0DQo+PiAtLS0gYS9jcnlwdG8vcnNhLmMNCj4+ICsrKyBiL2NyeXB0by9yc2EuYw0K
-Pj4gQEAgLTUwLDM0ICs1MCw2IEBAIHN0YXRpYyBpbnQgX3JzYV9kZWMoY29uc3Qgc3RydWN0IHJz
-YV9tcGlfa2V5ICprZXksIE1QSSBtLCBNUEkgYykNCj4+ICAgCXJldHVybiBtcGlfcG93bShtLCBj
-LCBrZXktPmQsIGtleS0+bik7DQo+PiAgIH0NCj4+ICAgDQo+PiAtLyoNCj4+IC0gKiBSU0FTUDEg
-ZnVuY3Rpb24gW1JGQzM0NDcgc2VjIDUuMi4xXQ0KPj4gLSAqIHMgPSBtXmQgbW9kIG4NCj4+IC0g
-Ki8NCj4+IC1zdGF0aWMgaW50IF9yc2Ffc2lnbihjb25zdCBzdHJ1Y3QgcnNhX21waV9rZXkgKmtl
-eSwgTVBJIHMsIE1QSSBtKQ0KPj4gLXsNCj4+IC0JLyogKDEpIFZhbGlkYXRlIDAgPD0gbSA8IG4g
-Ki8NCj4+IC0JaWYgKG1waV9jbXBfdWkobSwgMCkgPCAwIHx8IG1waV9jbXAobSwga2V5LT5uKSA+
-PSAwKQ0KPj4gLQkJcmV0dXJuIC1FSU5WQUw7DQo+PiAtDQo+PiAtCS8qICgyKSBzID0gbV5kIG1v
-ZCBuICovDQo+PiAtCXJldHVybiBtcGlfcG93bShzLCBtLCBrZXktPmQsIGtleS0+bik7DQo+PiAt
-fQ0KPj4gLQ0KPj4gLS8qDQo+PiAtICogUlNBVlAxIGZ1bmN0aW9uIFtSRkMzNDQ3IHNlYyA1LjIu
-Ml0NCj4+IC0gKiBtID0gc15lIG1vZCBuOw0KPj4gLSAqLw0KPj4gLXN0YXRpYyBpbnQgX3JzYV92
-ZXJpZnkoY29uc3Qgc3RydWN0IHJzYV9tcGlfa2V5ICprZXksIE1QSSBtLCBNUEkgcykNCj4+IC17
-DQo+PiAtCS8qICgxKSBWYWxpZGF0ZSAwIDw9IHMgPCBuICovDQo+PiAtCWlmIChtcGlfY21wX3Vp
-KHMsIDApIDwgMCB8fCBtcGlfY21wKHMsIGtleS0+bikgPj0gMCkNCj4+IC0JCXJldHVybiAtRUlO
-VkFMOw0KPj4gLQ0KPj4gLQkvKiAoMikgbSA9IHNeZSBtb2QgbiAqLw0KPj4gLQlyZXR1cm4gbXBp
-X3Bvd20obSwgcywga2V5LT5lLCBrZXktPm4pOw0KPj4gLX0NCj4+IC0NCj4+ICAgc3RhdGljIGlu
-bGluZSBzdHJ1Y3QgcnNhX21waV9rZXkgKnJzYV9nZXRfa2V5KHN0cnVjdCBjcnlwdG9fYWtjaXBo
-ZXIgKnRmbSkNCj4+ICAgew0KPj4gICAJcmV0dXJuIGFrY2lwaGVyX3RmbV9jdHgodGZtKTsNCj4+
-IEBAIC0xNjAsODUgKzEzMiw2IEBAIHN0YXRpYyBpbnQgcnNhX2RlYyhzdHJ1Y3QgYWtjaXBoZXJf
-cmVxdWVzdCAqcmVxKQ0KPj4gICAJcmV0dXJuIHJldDsNCj4+ICAgfQ0KPj4gICANCj4+IC1zdGF0
-aWMgaW50IHJzYV9zaWduKHN0cnVjdCBha2NpcGhlcl9yZXF1ZXN0ICpyZXEpDQo+PiAtew0KPj4g
-LQlzdHJ1Y3QgY3J5cHRvX2FrY2lwaGVyICp0Zm0gPSBjcnlwdG9fYWtjaXBoZXJfcmVxdGZtKHJl
-cSk7DQo+PiAtCWNvbnN0IHN0cnVjdCByc2FfbXBpX2tleSAqcGtleSA9IHJzYV9nZXRfa2V5KHRm
-bSk7DQo+PiAtCU1QSSBtLCBzID0gbXBpX2FsbG9jKDApOw0KPj4gLQlpbnQgcmV0ID0gMDsNCj4+
-IC0JaW50IHNpZ247DQo+PiAtDQo+PiAtCWlmICghcykNCj4+IC0JCXJldHVybiAtRU5PTUVNOw0K
-Pj4gLQ0KPj4gLQlpZiAodW5saWtlbHkoIXBrZXktPm4gfHwgIXBrZXktPmQpKSB7DQo+PiAtCQly
-ZXQgPSAtRUlOVkFMOw0KPj4gLQkJZ290byBlcnJfZnJlZV9zOw0KPj4gLQl9DQo+PiAtDQo+PiAt
-CXJldCA9IC1FTk9NRU07DQo+PiAtCW0gPSBtcGlfcmVhZF9yYXdfZnJvbV9zZ2wocmVxLT5zcmMs
-IHJlcS0+c3JjX2xlbik7DQo+PiAtCWlmICghbSkNCj4+IC0JCWdvdG8gZXJyX2ZyZWVfczsNCj4+
-IC0NCj4+IC0JcmV0ID0gX3JzYV9zaWduKHBrZXksIHMsIG0pOw0KPj4gLQlpZiAocmV0KQ0KPj4g
-LQkJZ290byBlcnJfZnJlZV9tOw0KPj4gLQ0KPj4gLQlyZXQgPSBtcGlfd3JpdGVfdG9fc2dsKHMs
-IHJlcS0+ZHN0LCByZXEtPmRzdF9sZW4sICZzaWduKTsNCj4+IC0JaWYgKHJldCkNCj4+IC0JCWdv
-dG8gZXJyX2ZyZWVfbTsNCj4+IC0NCj4+IC0JaWYgKHNpZ24gPCAwKQ0KPj4gLQkJcmV0ID0gLUVC
-QURNU0c7DQo+PiAtDQo+PiAtZXJyX2ZyZWVfbToNCj4+IC0JbXBpX2ZyZWUobSk7DQo+PiAtZXJy
-X2ZyZWVfczoNCj4+IC0JbXBpX2ZyZWUocyk7DQo+PiAtCXJldHVybiByZXQ7DQo+PiAtfQ0KPj4g
-LQ0KPj4gLXN0YXRpYyBpbnQgcnNhX3ZlcmlmeShzdHJ1Y3QgYWtjaXBoZXJfcmVxdWVzdCAqcmVx
-KQ0KPj4gLXsNCj4+IC0Jc3RydWN0IGNyeXB0b19ha2NpcGhlciAqdGZtID0gY3J5cHRvX2FrY2lw
-aGVyX3JlcXRmbShyZXEpOw0KPj4gLQljb25zdCBzdHJ1Y3QgcnNhX21waV9rZXkgKnBrZXkgPSBy
-c2FfZ2V0X2tleSh0Zm0pOw0KPj4gLQlNUEkgcywgbSA9IG1waV9hbGxvYygwKTsNCj4+IC0JaW50
-IHJldCA9IDA7DQo+PiAtCWludCBzaWduOw0KPj4gLQ0KPj4gLQlpZiAoIW0pDQo+PiAtCQlyZXR1
-cm4gLUVOT01FTTsNCj4+IC0NCj4+IC0JaWYgKHVubGlrZWx5KCFwa2V5LT5uIHx8ICFwa2V5LT5l
-KSkgew0KPj4gLQkJcmV0ID0gLUVJTlZBTDsNCj4+IC0JCWdvdG8gZXJyX2ZyZWVfbTsNCj4+IC0J
-fQ0KPj4gLQ0KPj4gLQlzID0gbXBpX3JlYWRfcmF3X2Zyb21fc2dsKHJlcS0+c3JjLCByZXEtPnNy
-Y19sZW4pOw0KPj4gLQlpZiAoIXMpIHsNCj4+IC0JCXJldCA9IC1FTk9NRU07DQo+PiAtCQlnb3Rv
-IGVycl9mcmVlX207DQo+PiAtCX0NCj4+IC0NCj4+IC0JcmV0ID0gX3JzYV92ZXJpZnkocGtleSwg
-bSwgcyk7DQo+PiAtCWlmIChyZXQpDQo+PiAtCQlnb3RvIGVycl9mcmVlX3M7DQo+PiAtDQo+PiAt
-CXJldCA9IG1waV93cml0ZV90b19zZ2wobSwgcmVxLT5kc3QsIHJlcS0+ZHN0X2xlbiwgJnNpZ24p
-Ow0KPj4gLQlpZiAocmV0KQ0KPj4gLQkJZ290byBlcnJfZnJlZV9zOw0KPj4gLQ0KPj4gLQlpZiAo
-c2lnbiA8IDApDQo+PiAtCQlyZXQgPSAtRUJBRE1TRzsNCj4+IC0NCj4+IC1lcnJfZnJlZV9zOg0K
-Pj4gLQltcGlfZnJlZShzKTsNCj4+IC1lcnJfZnJlZV9tOg0KPj4gLQltcGlfZnJlZShtKTsNCj4+
-IC0JcmV0dXJuIHJldDsNCj4+IC19DQo+PiAtDQo+PiAgIHN0YXRpYyB2b2lkIHJzYV9mcmVlX21w
-aV9rZXkoc3RydWN0IHJzYV9tcGlfa2V5ICprZXkpDQo+PiAgIHsNCj4+ICAgCW1waV9mcmVlKGtl
-eS0+ZCk7DQo+PiBAQCAtMzUzLDggKzI0Niw2IEBAIHN0YXRpYyB2b2lkIHJzYV9leGl0X3RmbShz
-dHJ1Y3QgY3J5cHRvX2FrY2lwaGVyICp0Zm0pDQo+PiAgIHN0YXRpYyBzdHJ1Y3QgYWtjaXBoZXJf
-YWxnIHJzYSA9IHsNCj4+ICAgCS5lbmNyeXB0ID0gcnNhX2VuYywNCj4+ICAgCS5kZWNyeXB0ID0g
-cnNhX2RlYywNCj4+IC0JLnNpZ24gPSByc2Ffc2lnbiwNCj4+IC0JLnZlcmlmeSA9IHJzYV92ZXJp
-ZnksDQo+PiAgIAkuc2V0X3ByaXZfa2V5ID0gcnNhX3NldF9wcml2X2tleSwNCj4+ICAgCS5zZXRf
-cHViX2tleSA9IHJzYV9zZXRfcHViX2tleSwNCj4+ICAgCS5tYXhfc2l6ZSA9IHJzYV9tYXhfc2l6
-ZSwNCj4+IGRpZmYgLS1naXQgYS9kcml2ZXJzL2NyeXB0by9jYWFtL2NhYW1wa2MuYyBiL2RyaXZl
-cnMvY3J5cHRvL2NhYW0vY2FhbXBrYy5jDQo+PiBpbmRleCA3N2FiMjhhMjgxMWEuLmQ3ZTFmYzVi
-YWNjNSAxMDA2NDQNCj4+IC0tLSBhL2RyaXZlcnMvY3J5cHRvL2NhYW0vY2FhbXBrYy5jDQo+PiAr
-KysgYi9kcml2ZXJzL2NyeXB0by9jYWFtL2NhYW1wa2MuYw0KPj4gQEAgLTk5NCw4ICs5OTQsNiBA
-QCBzdGF0aWMgdm9pZCBjYWFtX3JzYV9leGl0X3RmbShzdHJ1Y3QgY3J5cHRvX2FrY2lwaGVyICp0
-Zm0pDQo+PiAgIHN0YXRpYyBzdHJ1Y3QgYWtjaXBoZXJfYWxnIGNhYW1fcnNhID0gew0KPj4gICAJ
-LmVuY3J5cHQgPSBjYWFtX3JzYV9lbmMsDQo+PiAgIAkuZGVjcnlwdCA9IGNhYW1fcnNhX2RlYywN
-Cj4+IC0JLnNpZ24gPSBjYWFtX3JzYV9kZWMsDQo+PiAtCS52ZXJpZnkgPSBjYWFtX3JzYV9lbmMs
-DQo+PiAgIAkuc2V0X3B1Yl9rZXkgPSBjYWFtX3JzYV9zZXRfcHViX2tleSwNCj4+ICAgCS5zZXRf
-cHJpdl9rZXkgPSBjYWFtX3JzYV9zZXRfcHJpdl9rZXksDQo+PiAgIAkubWF4X3NpemUgPSBjYWFt
-X3JzYV9tYXhfc2l6ZSwNCj4+IGRpZmYgLS1naXQgYS9kcml2ZXJzL2NyeXB0by9jY3AvY2NwLWNy
-eXB0by1yc2EuYyBiL2RyaXZlcnMvY3J5cHRvL2NjcC9jY3AtY3J5cHRvLXJzYS5jDQo+PiBpbmRl
-eCAwNTg1MGRmZDc5NDAuLjcxZTQwNjgwYzg4MCAxMDA2NDQNCj4+IC0tLSBhL2RyaXZlcnMvY3J5
-cHRvL2NjcC9jY3AtY3J5cHRvLXJzYS5jDQo+PiArKysgYi9kcml2ZXJzL2NyeXB0by9jY3AvY2Nw
-LWNyeXB0by1yc2EuYw0KPj4gQEAgLTIxNCw4ICsyMTQsNiBAQCBzdGF0aWMgdm9pZCBjY3BfcnNh
-X2V4aXRfdGZtKHN0cnVjdCBjcnlwdG9fYWtjaXBoZXIgKnRmbSkNCj4+ICAgc3RhdGljIHN0cnVj
-dCBha2NpcGhlcl9hbGcgY2NwX3JzYV9kZWZhdWx0cyA9IHsNCj4+ICAgCS5lbmNyeXB0ID0gY2Nw
-X3JzYV9lbmNyeXB0LA0KPj4gICAJLmRlY3J5cHQgPSBjY3BfcnNhX2RlY3J5cHQsDQo+PiAtCS5z
-aWduID0gY2NwX3JzYV9kZWNyeXB0LA0KPj4gLQkudmVyaWZ5ID0gY2NwX3JzYV9lbmNyeXB0LA0K
-Pj4gICAJLnNldF9wdWJfa2V5ID0gY2NwX3JzYV9zZXRwdWJrZXksDQo+PiAgIAkuc2V0X3ByaXZf
-a2V5ID0gY2NwX3JzYV9zZXRwcml2a2V5LA0KPj4gICAJLm1heF9zaXplID0gY2NwX3JzYV9tYXhz
-aXplLA0KPj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvY3J5cHRvL3FhdC9xYXRfY29tbW9uL3FhdF9h
-c3ltX2FsZ3MuYyBiL2RyaXZlcnMvY3J5cHRvL3FhdC9xYXRfY29tbW9uL3FhdF9hc3ltX2FsZ3Mu
-Yw0KPj4gaW5kZXggMzIwZTc4NTRiNGVlLi5jMDVkMDM1NjVlOTYgMTAwNjQ0DQo+PiAtLS0gYS9k
-cml2ZXJzL2NyeXB0by9xYXQvcWF0X2NvbW1vbi9xYXRfYXN5bV9hbGdzLmMNCj4+ICsrKyBiL2Ry
-aXZlcnMvY3J5cHRvL3FhdC9xYXRfY29tbW9uL3FhdF9hc3ltX2FsZ3MuYw0KPj4gQEAgLTEzMDAs
-OCArMTMwMCw2IEBAIHN0YXRpYyB2b2lkIHFhdF9yc2FfZXhpdF90Zm0oc3RydWN0IGNyeXB0b19h
-a2NpcGhlciAqdGZtKQ0KPj4gICBzdGF0aWMgc3RydWN0IGFrY2lwaGVyX2FsZyByc2EgPSB7DQo+
-PiAgIAkuZW5jcnlwdCA9IHFhdF9yc2FfZW5jLA0KPj4gICAJLmRlY3J5cHQgPSBxYXRfcnNhX2Rl
-YywNCj4+IC0JLnNpZ24gPSBxYXRfcnNhX2RlYywNCj4+IC0JLnZlcmlmeSA9IHFhdF9yc2FfZW5j
-LA0KPj4gICAJLnNldF9wdWJfa2V5ID0gcWF0X3JzYV9zZXRwdWJrZXksDQo+PiAgIAkuc2V0X3By
-aXZfa2V5ID0gcWF0X3JzYV9zZXRwcml2a2V5LA0KPj4gICAJLm1heF9zaXplID0gcWF0X3JzYV9t
-YXhfc2l6ZSwNCj4+IC0tIA0KPj4gMi4xMS4wDQoNCg==
+Ericm
+
+Am Dienstag, 19. März 2019, 00:08:31 CET schrieb Eric Biggers:
+> I tried using sb->s_bdi->name, but it's still "ubifs" for all UBIFS filesystems.
+
+hmpf.
+ 
+> Perhaps there's a way you can make ->s_id for UBIFS unique?  There are already
+> existing places that log ->s_id, so perhaps you should do it anyway regardless
+> of this patchset?
+
+Yes, let me implement that.
+ubifs does:
+super_setup_bdi_name(sb, "ubifs_%d_%d", c->vi.ubi_num, c->vi.vol_id);
+
+So, I try to set ->s_id also to ubifs_%d_%d.
+
+> > > 
+> > > > Note that the keyring name isn't particularly important, since the ioctls will
+> > > > work regardless.  But we might as well choose something logical, since the
+> > > > keyring name will still show up in /proc/keys.
+> > > 
+> > > I'm not done with reviewing your patches, but will it be possible to use keyctl?
+> > > For the a unique name is helpful. :)
+> > > 
+> > 
+> > Not for adding keys, removing keys, or getting a key's status -- those are what
+> > the ioctls are for.
+> > 
+> > See e.g. the discussion in patch 7 ("fscrypt: add FS_IOC_ADD_ENCRYPTION_KEY
+> > ioctl") for why the keyrings syscalls are a poor fit for fscrypt.
+> > 
+> 
+> Anyway, perhaps I should reconsider whether fscrypt should even use the keyrings
+> subsystem at all, even just "internally", as its quirks still leak out a bit.
+> I'd prefer a nice clean API without any quirks like having to name the keyrings
+> and assign SELinux labels to the keys just to make the keyrings subsystem happy.
+
+IMHO the keys subsytem is a good fit. For example for stuff like this one:
+https://www.mail-archive.com/linux-kernel@vger.kernel.org/msg1945778.html
+
+We use UBIFS on many embedded systems with crypto hardware.
+
+Thanks,
+//richard
+
+
