@@ -2,32 +2,31 @@ Return-Path: <SRS0=7kP/=RZ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.0 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99989C4360F
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 Mar 2019 06:30:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 806DDC43381
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 Mar 2019 06:30:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5D584218FC
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 Mar 2019 06:30:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 43732218FC
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 Mar 2019 06:30:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726126AbfCVGae (ORCPT
+        id S1727105AbfCVGaz (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 22 Mar 2019 02:30:34 -0400
-Received: from orcrist.hmeau.com ([104.223.48.154]:44036 "EHLO
+        Fri, 22 Mar 2019 02:30:55 -0400
+Received: from orcrist.hmeau.com ([104.223.48.154]:44042 "EHLO
         deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726029AbfCVGae (ORCPT
+        with ESMTP id S1726029AbfCVGaz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 22 Mar 2019 02:30:34 -0400
+        Fri, 22 Mar 2019 02:30:55 -0400
 Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
         by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1h7DgT-0002Xp-8D; Fri, 22 Mar 2019 14:29:41 +0800
+        id 1h7DgT-0002Xl-8C; Fri, 22 Mar 2019 14:29:41 +0800
 Received: from herbert by gondobar with local (Exim 4.89)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1h7DgR-0001H9-UN; Fri, 22 Mar 2019 14:29:40 +0800
-Subject: [PATCH 3/17] zinc: introduce minimal cryptography library
+        id 1h7DgP-0001Gp-MP; Fri, 22 Mar 2019 14:29:37 +0800
+Subject: [PATCH 1/17] asm: simd context helper API
 References: <20190322062740.nrwfx2rvmt7lzotj@gondor.apana.org.au>
 To:     Linus Torvalds <torvalds@linux-foundation.org>,
         "David S. Miller" <davem@davemloft.net>,
@@ -43,9 +42,9 @@ To:     Linus Torvalds <torvalds@linux-foundation.org>,
         Samuel Neves <samuel.c.p.neves@gmail.com>,
         Tomer Ashur <tomer.ashur@esat.kuleuven.be>,
         Martin Willi <martin@strongswan.org>
-Message-Id: <E1h7DgR-0001H9-UN@gondobar>
+Message-Id: <E1h7DgP-0001Gp-MP@gondobar>
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-Date:   Fri, 22 Mar 2019 14:29:39 +0800
+Date:   Fri, 22 Mar 2019 14:29:37 +0800
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
@@ -53,263 +52,604 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Jason A. Donenfeld <Jason@zx2c4.com>
 
-Zinc stands for "Zinc Is Neat Crypto" or "Zinc as IN Crypto". It's also
-short, easy to type, and plays nicely with the recent trend of naming
-crypto libraries after elements. The guiding principle is "don't overdo
-it". It's less of a library and more of a directory tree for organizing
-well-curated direct implementations of cryptography primitives.
+Sometimes it's useful to amortize calls to XSAVE/XRSTOR and the related
+FPU/SIMD functions over a number of calls, because FPU restoration is
+quite expensive. This adds a simple header for carrying out this pattern:
 
-Zinc is a new cryptography API that is much more minimal and lower-level
-than the current one. It intends to complement it and provide a basis
-upon which the current crypto API might build, as the provider of
-software implementations of cryptographic primitives. It is motivated by
-three primary observations in crypto API design:
+    simd_context_t simd_context;
 
-  * Highly composable "cipher modes" and related abstractions from the
-    90s did not turn out to be as terrific an idea as hoped, leading to
-    a host of API misuse problems.
+    simd_get(&simd_context);
+    while ((item = get_item_from_queue()) != NULL) {
+        encrypt_item(item, &simd_context);
+        simd_relax(&simd_context);
+    }
+    simd_put(&simd_context);
 
-  * Most programmers are afraid of crypto code, and so prefer to
-    integrate it into libraries in a highly abstracted manner, so as to
-    shield themselves from implementation details. Cryptographers, on
-    the other hand, prefer simple direct implementations, which they're
-    able to verify for high assurance and optimize in accordance with
-    their expertise.
+The relaxation step ensures that we don't trample over preemption, and
+the get/put API should be a familiar paradigm in the kernel.
 
-  * Overly abstracted and flexible cryptography APIs lead to a host of
-    dangerous problems and performance issues. The kernel is in the
-    business usually not of coming up with new uses of crypto, but
-    rather implementing various constructions, which means it essentially
-    needs a library of primitives, not a highly abstracted enterprise-ready
-    pluggable system, with a few particular exceptions.
+On the other end, code that actually wants to use SIMD instructions can
+accept this as a parameter and check it via:
 
-This last observation has seen itself play out several times over and
-over again within the kernel:
+   void encrypt_item(struct item *item, simd_context_t *simd_context)
+   {
+       if (item->len > LARGE_FOR_SIMD && simd_use(simd_context))
+           wild_simd_code(item);
+       else
+           boring_scalar_code(item);
+   }
 
-  * The perennial move of actual primitives away from crypto/ and into
-    lib/, so that users can actually call these functions directly with
-    no overhead and without lots of allocations, function pointers,
-    string specifier parsing, and general clunkiness. For example:
-    sha256, chacha20, siphash, sha1, and so forth live in lib/ rather
-    than in crypto/. Zinc intends to stop the cluttering of lib/ and
-    introduce these direct primitives into their proper place, lib/zinc/.
-
-  * An abundance of misuse bugs with the present crypto API that have
-    been very unpleasant to clean up.
-
-  * A hesitance to even use cryptography, because of the overhead and
-    headaches involved in accessing the routines.
-
-Zinc goes in a rather different direction. Rather than providing a
-thoroughly designed and abstracted API, Zinc gives you simple functions,
-which implement some primitive, or some particular and specific
-construction of primitives. It is not dynamic in the least, though one
-could imagine implementing a complex dynamic dispatch mechanism (such as
-the current crypto API) on top of these basic functions. After all,
-dynamic dispatch is usually needed for applications with cipher agility,
-such as IPsec, dm-crypt, AF_ALG, and so forth, and the existing crypto
-API will continue to play that role. However, Zinc will provide a non-
-haphazard way of directly utilizing crypto routines in applications
-that do have neither the need nor desire for abstraction and dynamic
-dispatch.
-
-It also organizes the implementations in a simple, straight-forward,
-and direct manner, making it enjoyable and intuitive to work on.
-Rather than moving optimized assembly implementations into arch/, it
-keeps them all together in lib/zinc/, making it simple and obvious to
-compare and contrast what's happening. This is, notably, exactly what
-the lib/raid6/ tree does, and that seems to work out rather well. It's
-also the pattern of most successful crypto libraries. The architecture-
-specific glue-code is made a part of each translation unit, rather than
-being in a separate one, so that generic and architecture-optimized code
-are combined at compile-time, and incompatibility branches compiled out by
-the optimizer.
-
-All implementations have been extensively tested and fuzzed, and are
-selected for their quality, trustworthiness, and performance. Wherever
-possible and performant, formally verified implementations are used,
-such as those from HACL* [1] and Fiat-Crypto [2]. The routines also take
-special care to zero out secrets using memzero_explicit (and future work
-is planned to have gcc do this more reliably and performantly with
-compiler plugins). The performance of the selected implementations is
-state-of-the-art and unrivaled on a broad array of hardware, though of
-course we will continue to fine tune these to the hardware demands
-needed by kernel contributors. Each implementation also comes with
-extensive self-tests and crafted test vectors, pulled from various
-places such as Wycheproof [9].
-
-Regularity of function signatures is important, so that users can easily
-"guess" the name of the function they want. Though, individual
-primitives are oftentimes not trivially interchangeable, having been
-designed for different things and requiring different parameters and
-semantics, and so the function signatures they provide will directly
-reflect the realities of the primitives' usages, rather than hiding it
-behind (inevitably leaky) abstractions. Also, in contrast to the current
-crypto API, Zinc functions can work on stack buffers, and can be called
-with different keys, without requiring allocations or locking.
-
-SIMD is used automatically when available, though some routines may
-benefit from either having their SIMD disabled for particular
-invocations, or to have the SIMD initialization calls amortized over
-several invocations of the function, and so Zinc utilizes function
-signatures enabling that in conjunction with the recently introduced
-simd_context_t.
-
-More generally, Zinc provides function signatures that allow just what
-is required by the various callers. This isn't to say that users of the
-functions will be permitted to pollute the function semantics with weird
-particular needs, but we are trying very hard not to overdo it, and that
-means looking carefully at what's actually necessary, and doing just that,
-and not much more than that. Remember: practicality and cleanliness rather
-than over-zealous infrastructure.
-
-Zinc provides also an opening for the best implementers in academia to
-contribute their time and effort to the kernel, by being sufficiently
-simple and inviting. In discussing this commit with some of the best and
-brightest over the last few years, there are many who are eager to
-devote rare talent and energy to this effort.
-
-Following the merging of this, I expect for the primitives that
-currently exist in lib/ to work their way into lib/zinc/, after intense
-scrutiny of each implementation, potentially replacing them with either
-formally-verified implementations, or better studied and faster
-state-of-the-art implementations.
-
-Also following the merging of this, I expect for the old crypto API
-implementations to be ported over to use Zinc for their software-based
-implementations.
-
-As Zinc is simply library code, its config options are un-menued, with
-the exception of CONFIG_ZINC_SELFTEST and CONFIG_ZINC_DEBUG, which enables
-various selftests and debugging conditions.
-
-[1] https://github.com/project-everest/hacl-star
-[2] https://github.com/mit-plv/fiat-crypto
-[3] https://cr.yp.to/ecdh.html
-[4] https://cr.yp.to/chacha.html
-[5] https://cr.yp.to/snuffle/xsalsa-20081128.pdf
-[6] https://cr.yp.to/mac.html
-[7] https://blake2.net/
-[8] https://tools.ietf.org/html/rfc8439
-[9] https://github.com/google/wycheproof
+The actual XSAVE happens during simd_use (and only on the first time),
+so that if the context is never actually used, no performance penalty is
+hit.
 
 Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
 Cc: Samuel Neves <sneves@dei.uc.pt>
-Cc: Jean-Philippe Aumasson <jeanphilippe.aumasson@gmail.com>
 Cc: Andy Lutomirski <luto@kernel.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>
 Cc: Greg KH <gregkh@linuxfoundation.org>
-Cc: Andrew Morton <akpm@linux-foundation.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: kernel-hardening@lists.openwall.com
-Cc: linux-crypto@vger.kernel.org
+Cc: linux-arch@vger.kernel.org
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
 
- MAINTAINERS       |    8 ++++++++
- lib/Kconfig       |    2 ++
- lib/Makefile      |    2 ++
- lib/zinc/Kconfig  |   41 +++++++++++++++++++++++++++++++++++++++++
- lib/zinc/Makefile |    3 +++
- 5 files changed, 56 insertions(+)
+ arch/alpha/include/asm/Kbuild      |    1 
+ arch/arc/include/asm/Kbuild        |    1 
+ arch/arm/include/asm/Kbuild        |    1 
+ arch/arm/include/asm/simd.h        |   63 +++++++++++++++++++++++++++++++++++++
+ arch/arm64/include/asm/simd.h      |   51 ++++++++++++++++++++++++++---
+ arch/c6x/include/asm/Kbuild        |    1 
+ arch/h8300/include/asm/Kbuild      |    1 
+ arch/hexagon/include/asm/Kbuild    |    1 
+ arch/ia64/include/asm/Kbuild       |    1 
+ arch/m68k/include/asm/Kbuild       |    1 
+ arch/microblaze/include/asm/Kbuild |    1 
+ arch/mips/include/asm/Kbuild       |    1 
+ arch/nds32/include/asm/Kbuild      |    1 
+ arch/nios2/include/asm/Kbuild      |    1 
+ arch/openrisc/include/asm/Kbuild   |    1 
+ arch/parisc/include/asm/Kbuild     |    1 
+ arch/powerpc/include/asm/Kbuild    |    1 
+ arch/riscv/include/asm/Kbuild      |    1 
+ arch/s390/include/asm/Kbuild       |    1 
+ arch/sh/include/asm/Kbuild         |    1 
+ arch/sparc/include/asm/Kbuild      |    1 
+ arch/um/include/asm/Kbuild         |    1 
+ arch/unicore32/include/asm/Kbuild  |    1 
+ arch/x86/include/asm/simd.h        |   44 +++++++++++++++++++++++++
+ arch/xtensa/include/asm/Kbuild     |    1 
+ include/asm-generic/simd.h         |   20 +++++++++++
+ include/linux/simd.h               |   32 ++++++++++++++++++
+ 27 files changed, 224 insertions(+), 8 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index e17ebf70b548..0cd22cc5b0e5 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -17210,6 +17210,14 @@ Q:	https://patchwork.linuxtv.org/project/linux-media/list/
- S:	Maintained
- F:	drivers/media/dvb-frontends/zd1301_demod*
+diff --git a/arch/alpha/include/asm/Kbuild b/arch/alpha/include/asm/Kbuild
+index dc0ab28baca1..b385c2036290 100644
+--- a/arch/alpha/include/asm/Kbuild
++++ b/arch/alpha/include/asm/Kbuild
+@@ -13,3 +13,4 @@ generic-y += sections.h
+ generic-y += trace_clock.h
+ generic-y += current.h
+ generic-y += kprobes.h
++generic-y += simd.h
+diff --git a/arch/arc/include/asm/Kbuild b/arch/arc/include/asm/Kbuild
+index b41f8881ecc8..3028a2246ab4 100644
+--- a/arch/arc/include/asm/Kbuild
++++ b/arch/arc/include/asm/Kbuild
+@@ -19,6 +19,7 @@ generic-y += msi.h
+ generic-y += parport.h
+ generic-y += percpu.h
+ generic-y += preempt.h
++generic-y += simd.h
+ generic-y += topology.h
+ generic-y += trace_clock.h
+ generic-y += user.h
+diff --git a/arch/arm/include/asm/Kbuild b/arch/arm/include/asm/Kbuild
+index a8a4eb7f6dae..27ce7c7a795a 100644
+--- a/arch/arm/include/asm/Kbuild
++++ b/arch/arm/include/asm/Kbuild
+@@ -16,7 +16,6 @@ generic-y += rwsem.h
+ generic-y += seccomp.h
+ generic-y += segment.h
+ generic-y += serial.h
+-generic-y += simd.h
+ generic-y += sizes.h
+ generic-y += trace_clock.h
  
-+ZINC CRYPTOGRAPHY LIBRARY
-+M:	Jason A. Donenfeld <Jason@zx2c4.com>
-+M:	Samuel Neves <sneves@dei.uc.pt>
-+S:	Maintained
-+F:	lib/zinc/
-+F:	include/zinc/
-+L:	linux-crypto@vger.kernel.org
-+
- ZPOOL COMPRESSED PAGE STORAGE API
- M:	Dan Streetman <ddstreet@ieee.org>
- L:	linux-mm@kvack.org
-diff --git a/lib/Kconfig b/lib/Kconfig
-index a9e56539bd11..00670e26435a 100644
---- a/lib/Kconfig
-+++ b/lib/Kconfig
-@@ -496,6 +496,8 @@ config GLOB_SELFTEST
- 	  module load) by a small amount, so you're welcome to play with
- 	  it, but you probably don't need it.
- 
-+source "lib/zinc/Kconfig"
-+
- #
- # Netlink attribute parsing support is select'ed if needed
- #
-diff --git a/lib/Makefile b/lib/Makefile
-index 3b08673e8881..a2b86844b1e0 100644
---- a/lib/Makefile
-+++ b/lib/Makefile
-@@ -223,6 +223,8 @@ obj-$(CONFIG_PERCPU_TEST) += percpu_test.o
- 
- obj-$(CONFIG_ASN1) += asn1_decoder.o
- 
-+obj-y += zinc/
-+
- obj-$(CONFIG_FONT_SUPPORT) += fonts/
- 
- obj-$(CONFIG_PRIME_NUMBERS) += prime_numbers.o
-diff --git a/lib/zinc/Kconfig b/lib/zinc/Kconfig
+diff --git a/arch/arm/include/asm/simd.h b/arch/arm/include/asm/simd.h
 new file mode 100644
-index 000000000000..90e066ea93a0
+index 000000000000..264ed84b41d8
 --- /dev/null
-+++ b/lib/zinc/Kconfig
-@@ -0,0 +1,41 @@
-+config ZINC_SELFTEST
-+	bool "Zinc cryptography library self-tests"
-+	help
-+	  This builds a series of self-tests for the Zinc crypto library, which
-+	  help diagnose any cryptographic algorithm implementation issues that
-+	  might be at the root cause of potential bugs. It also adds various
-+	  traps for incorrect usage.
++++ b/arch/arm/include/asm/simd.h
+@@ -0,0 +1,63 @@
++/* SPDX-License-Identifier: GPL-2.0
++ *
++ * Copyright (C) 2015-2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
++ */
 +
-+	  Unless you are optimizing for machines without much disk space or for
-+	  very slow machines, it is probably a good idea to say Y here, so that
-+	  any potential cryptographic bugs translate into easy bug reports
-+	  rather than long-lasting security issues.
++#include <linux/simd.h>
++#ifndef _ASM_SIMD_H
++#define _ASM_SIMD_H
 +
-+config ZINC_DEBUG
-+	bool "Zinc cryptography library debugging"
-+	help
-+	  This turns on a series of additional checks and debugging options
-+	  that are useful for developers but probably will not provide much
-+	  benefit to end users.
++#ifdef CONFIG_KERNEL_MODE_NEON
++#include <asm/neon.h>
 +
-+	  Most people should say N here.
++static __must_check inline bool may_use_simd(void)
++{
++	return !in_nmi() && !in_irq() && !in_serving_softirq();
++}
 +
-+config ZINC_ARCH_ARM
-+	def_bool y
-+	depends on ARM
++static inline void simd_get(simd_context_t *ctx)
++{
++	*ctx = may_use_simd() ? HAVE_FULL_SIMD : HAVE_NO_SIMD;
++}
 +
-+config ZINC_ARCH_ARM64
-+	def_bool y
-+	depends on ARM64
++static inline void simd_put(simd_context_t *ctx)
++{
++	if (*ctx & HAVE_SIMD_IN_USE)
++		kernel_neon_end();
++	*ctx = HAVE_NO_SIMD;
++}
 +
-+config ZINC_ARCH_X86_64
-+	def_bool y
-+	depends on X86_64 && !UML
++static __must_check inline bool simd_use(simd_context_t *ctx)
++{
++	if (!(*ctx & HAVE_FULL_SIMD))
++		return false;
++	if (*ctx & HAVE_SIMD_IN_USE)
++		return true;
++	kernel_neon_begin();
++	*ctx |= HAVE_SIMD_IN_USE;
++	return true;
++}
 +
-+config ZINC_ARCH_MIPS
-+	def_bool y
-+	depends on MIPS && CPU_MIPS32_R2 && !64BIT
++#else
 +
-+config ZINC_ARCH_MIPS64
-+	def_bool y
-+	depends on MIPS && 64BIT
-diff --git a/lib/zinc/Makefile b/lib/zinc/Makefile
++static __must_check inline bool may_use_simd(void)
++{
++	return false;
++}
++
++static inline void simd_get(simd_context_t *ctx)
++{
++	*ctx = HAVE_NO_SIMD;
++}
++
++static inline void simd_put(simd_context_t *ctx)
++{
++}
++
++static __must_check inline bool simd_use(simd_context_t *ctx)
++{
++	return false;
++}
++#endif
++
++#endif /* _ASM_SIMD_H */
+diff --git a/arch/arm64/include/asm/simd.h b/arch/arm64/include/asm/simd.h
+index 6495cc51246f..a45ff1600040 100644
+--- a/arch/arm64/include/asm/simd.h
++++ b/arch/arm64/include/asm/simd.h
+@@ -1,11 +1,10 @@
+-/*
+- * Copyright (C) 2017 Linaro Ltd. <ard.biesheuvel@linaro.org>
++/* SPDX-License-Identifier: GPL-2.0
+  *
+- * This program is free software; you can redistribute it and/or modify it
+- * under the terms of the GNU General Public License version 2 as published
+- * by the Free Software Foundation.
++ * Copyright (C) 2017 Linaro Ltd. <ard.biesheuvel@linaro.org>
++ * Copyright (C) 2015-2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
+  */
+ 
++#include <linux/simd.h>
+ #ifndef __ASM_SIMD_H
+ #define __ASM_SIMD_H
+ 
+@@ -16,6 +15,8 @@
+ #include <linux/types.h>
+ 
+ #ifdef CONFIG_KERNEL_MODE_NEON
++#include <asm/neon.h>
++#include <asm/simd.h>
+ 
+ DECLARE_PER_CPU(bool, kernel_neon_busy);
+ 
+@@ -40,9 +41,47 @@ static __must_check inline bool may_use_simd(void)
+ 		!this_cpu_read(kernel_neon_busy);
+ }
+ 
++static inline void simd_get(simd_context_t *ctx)
++{
++	*ctx = may_use_simd() ? HAVE_FULL_SIMD : HAVE_NO_SIMD;
++}
++
++static inline void simd_put(simd_context_t *ctx)
++{
++	if (*ctx & HAVE_SIMD_IN_USE)
++		kernel_neon_end();
++	*ctx = HAVE_NO_SIMD;
++}
++
++static __must_check inline bool simd_use(simd_context_t *ctx)
++{
++	if (!(*ctx & HAVE_FULL_SIMD))
++		return false;
++	if (*ctx & HAVE_SIMD_IN_USE)
++		return true;
++	kernel_neon_begin();
++	*ctx |= HAVE_SIMD_IN_USE;
++	return true;
++}
++
+ #else /* ! CONFIG_KERNEL_MODE_NEON */
+ 
+-static __must_check inline bool may_use_simd(void) {
++static __must_check inline bool may_use_simd(void)
++{
++	return false;
++}
++
++static inline void simd_get(simd_context_t *ctx)
++{
++	*ctx = HAVE_NO_SIMD;
++}
++
++static inline void simd_put(simd_context_t *ctx)
++{
++}
++
++static __must_check inline bool simd_use(simd_context_t *ctx)
++{
+ 	return false;
+ }
+ 
+diff --git a/arch/c6x/include/asm/Kbuild b/arch/c6x/include/asm/Kbuild
+index 63b4a1705182..b0aa9d783d2b 100644
+--- a/arch/c6x/include/asm/Kbuild
++++ b/arch/c6x/include/asm/Kbuild
+@@ -31,6 +31,7 @@ generic-y += preempt.h
+ generic-y += segment.h
+ generic-y += serial.h
+ generic-y += shmparam.h
++generic-y += simd.h
+ generic-y += tlbflush.h
+ generic-y += topology.h
+ generic-y += trace_clock.h
+diff --git a/arch/h8300/include/asm/Kbuild b/arch/h8300/include/asm/Kbuild
+index 3e7c8ecf151e..a10bbf3c67e9 100644
+--- a/arch/h8300/include/asm/Kbuild
++++ b/arch/h8300/include/asm/Kbuild
+@@ -40,6 +40,7 @@ generic-y += scatterlist.h
+ generic-y += sections.h
+ generic-y += serial.h
+ generic-y += shmparam.h
++generic-y += simd.h
+ generic-y += sizes.h
+ generic-y += spinlock.h
+ generic-y += timex.h
+diff --git a/arch/hexagon/include/asm/Kbuild b/arch/hexagon/include/asm/Kbuild
+index b25fd42aa0f4..843ae8d5c4d9 100644
+--- a/arch/hexagon/include/asm/Kbuild
++++ b/arch/hexagon/include/asm/Kbuild
+@@ -31,6 +31,7 @@ generic-y += sections.h
+ generic-y += segment.h
+ generic-y += serial.h
+ generic-y += shmparam.h
++generic-y += simd.h
+ generic-y += sizes.h
+ generic-y += topology.h
+ generic-y += trace_clock.h
+diff --git a/arch/ia64/include/asm/Kbuild b/arch/ia64/include/asm/Kbuild
+index 43e21fe3499c..4f4a969c4611 100644
+--- a/arch/ia64/include/asm/Kbuild
++++ b/arch/ia64/include/asm/Kbuild
+@@ -5,6 +5,7 @@ generic-y += irq_work.h
+ generic-y += mcs_spinlock.h
+ generic-y += mm-arch-hooks.h
+ generic-y += preempt.h
++generic-y += simd.h
+ generic-y += trace_clock.h
+ generic-y += vtime.h
+ generic-y += word-at-a-time.h
+diff --git a/arch/m68k/include/asm/Kbuild b/arch/m68k/include/asm/Kbuild
+index 95f8f631c4df..d60a481e6f73 100644
+--- a/arch/m68k/include/asm/Kbuild
++++ b/arch/m68k/include/asm/Kbuild
+@@ -21,6 +21,7 @@ generic-y += percpu.h
+ generic-y += preempt.h
+ generic-y += sections.h
+ generic-y += shmparam.h
++generic-y += simd.h
+ generic-y += spinlock.h
+ generic-y += topology.h
+ generic-y += trace_clock.h
+diff --git a/arch/microblaze/include/asm/Kbuild b/arch/microblaze/include/asm/Kbuild
+index 791cc8d54d0a..103ed3592214 100644
+--- a/arch/microblaze/include/asm/Kbuild
++++ b/arch/microblaze/include/asm/Kbuild
+@@ -27,6 +27,7 @@ generic-y += percpu.h
+ generic-y += preempt.h
+ generic-y += serial.h
+ generic-y += shmparam.h
++generic-y += simd.h
+ generic-y += syscalls.h
+ generic-y += topology.h
+ generic-y += trace_clock.h
+diff --git a/arch/mips/include/asm/Kbuild b/arch/mips/include/asm/Kbuild
+index 87b86cdf126a..fb3345c870c6 100644
+--- a/arch/mips/include/asm/Kbuild
++++ b/arch/mips/include/asm/Kbuild
+@@ -20,6 +20,7 @@ generic-y += qrwlock.h
+ generic-y += qspinlock.h
+ generic-y += sections.h
+ generic-y += segment.h
++generic-y += simd.h
+ generic-y += trace_clock.h
+ generic-y += unaligned.h
+ generic-y += user.h
+diff --git a/arch/nds32/include/asm/Kbuild b/arch/nds32/include/asm/Kbuild
+index 64ceff7ab99b..887923fdbb65 100644
+--- a/arch/nds32/include/asm/Kbuild
++++ b/arch/nds32/include/asm/Kbuild
+@@ -38,6 +38,7 @@ generic-y += preempt.h
+ generic-y += sections.h
+ generic-y += segment.h
+ generic-y += serial.h
++generic-y += simd.h
+ generic-y += sizes.h
+ generic-y += switch_to.h
+ generic-y += timex.h
+diff --git a/arch/nios2/include/asm/Kbuild b/arch/nios2/include/asm/Kbuild
+index 8fde4fa2c34f..571a9d9ad107 100644
+--- a/arch/nios2/include/asm/Kbuild
++++ b/arch/nios2/include/asm/Kbuild
+@@ -33,6 +33,7 @@ generic-y += preempt.h
+ generic-y += sections.h
+ generic-y += segment.h
+ generic-y += serial.h
++generic-y += simd.h
+ generic-y += spinlock.h
+ generic-y += topology.h
+ generic-y += trace_clock.h
+diff --git a/arch/openrisc/include/asm/Kbuild b/arch/openrisc/include/asm/Kbuild
+index 5a73e2956ac4..f0abc1c93be0 100644
+--- a/arch/openrisc/include/asm/Kbuild
++++ b/arch/openrisc/include/asm/Kbuild
+@@ -34,6 +34,7 @@ generic-y += qrwlock.h
+ generic-y += sections.h
+ generic-y += segment.h
+ generic-y += shmparam.h
++generic-y += simd.h
+ generic-y += switch_to.h
+ generic-y += topology.h
+ generic-y += trace_clock.h
+diff --git a/arch/parisc/include/asm/Kbuild b/arch/parisc/include/asm/Kbuild
+index 6f49e77d82a2..8aec86fd5393 100644
+--- a/arch/parisc/include/asm/Kbuild
++++ b/arch/parisc/include/asm/Kbuild
+@@ -19,6 +19,7 @@ generic-y += percpu.h
+ generic-y += preempt.h
+ generic-y += seccomp.h
+ generic-y += segment.h
++generic-y += simd.h
+ generic-y += trace_clock.h
+ generic-y += user.h
+ generic-y += vga.h
+diff --git a/arch/powerpc/include/asm/Kbuild b/arch/powerpc/include/asm/Kbuild
+index a0c132bedfae..5ac3dead6952 100644
+--- a/arch/powerpc/include/asm/Kbuild
++++ b/arch/powerpc/include/asm/Kbuild
+@@ -11,3 +11,4 @@ generic-y += preempt.h
+ generic-y += rwsem.h
+ generic-y += vtime.h
+ generic-y += msi.h
++generic-y += simd.h
+diff --git a/arch/riscv/include/asm/Kbuild b/arch/riscv/include/asm/Kbuild
+index cccd12cf27d4..525bd8707c7d 100644
+--- a/arch/riscv/include/asm/Kbuild
++++ b/arch/riscv/include/asm/Kbuild
+@@ -28,6 +28,7 @@ generic-y += scatterlist.h
+ generic-y += sections.h
+ generic-y += serial.h
+ generic-y += shmparam.h
++generic-y += simd.h
+ generic-y += topology.h
+ generic-y += trace_clock.h
+ generic-y += unaligned.h
+diff --git a/arch/s390/include/asm/Kbuild b/arch/s390/include/asm/Kbuild
+index 12d77cb11fe5..6bc0fdc57783 100644
+--- a/arch/s390/include/asm/Kbuild
++++ b/arch/s390/include/asm/Kbuild
+@@ -21,6 +21,7 @@ generic-y += local64.h
+ generic-y += mcs_spinlock.h
+ generic-y += mm-arch-hooks.h
+ generic-y += rwsem.h
++generic-y += simd.h
+ generic-y += trace_clock.h
+ generic-y += unaligned.h
+ generic-y += word-at-a-time.h
+diff --git a/arch/sh/include/asm/Kbuild b/arch/sh/include/asm/Kbuild
+index a6ef3fee5f85..74b7bb3ba96a 100644
+--- a/arch/sh/include/asm/Kbuild
++++ b/arch/sh/include/asm/Kbuild
+@@ -18,6 +18,7 @@ generic-y += percpu.h
+ generic-y += preempt.h
+ generic-y += rwsem.h
+ generic-y += serial.h
++generic-y += simd.h
+ generic-y += sizes.h
+ generic-y += trace_clock.h
+ generic-y += xor.h
+diff --git a/arch/sparc/include/asm/Kbuild b/arch/sparc/include/asm/Kbuild
+index b82f64e28f55..d053d5bad630 100644
+--- a/arch/sparc/include/asm/Kbuild
++++ b/arch/sparc/include/asm/Kbuild
+@@ -19,5 +19,6 @@ generic-y += msi.h
+ generic-y += preempt.h
+ generic-y += rwsem.h
+ generic-y += serial.h
++generic-y += simd.h
+ generic-y += trace_clock.h
+ generic-y += word-at-a-time.h
+diff --git a/arch/um/include/asm/Kbuild b/arch/um/include/asm/Kbuild
+index 00bcbe2326d9..a4dfffb2c22b 100644
+--- a/arch/um/include/asm/Kbuild
++++ b/arch/um/include/asm/Kbuild
+@@ -20,6 +20,7 @@ generic-y += param.h
+ generic-y += pci.h
+ generic-y += percpu.h
+ generic-y += preempt.h
++generic-y += simd.h
+ generic-y += switch_to.h
+ generic-y += topology.h
+ generic-y += trace_clock.h
+diff --git a/arch/unicore32/include/asm/Kbuild b/arch/unicore32/include/asm/Kbuild
+index 1d1544b6ca74..c428158a3a19 100644
+--- a/arch/unicore32/include/asm/Kbuild
++++ b/arch/unicore32/include/asm/Kbuild
+@@ -29,6 +29,7 @@ generic-y += sections.h
+ generic-y += segment.h
+ generic-y += serial.h
+ generic-y += shmparam.h
++generic-y += simd.h
+ generic-y += sizes.h
+ generic-y += syscalls.h
+ generic-y += topology.h
+diff --git a/arch/x86/include/asm/simd.h b/arch/x86/include/asm/simd.h
+index a341c878e977..4aad7f158dcb 100644
+--- a/arch/x86/include/asm/simd.h
++++ b/arch/x86/include/asm/simd.h
+@@ -1,4 +1,11 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
++/* SPDX-License-Identifier: GPL-2.0
++ *
++ * Copyright (C) 2015-2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
++ */
++
++#include <linux/simd.h>
++#ifndef _ASM_SIMD_H
++#define _ASM_SIMD_H
+ 
+ #include <asm/fpu/api.h>
+ 
+@@ -10,3 +17,38 @@ static __must_check inline bool may_use_simd(void)
+ {
+ 	return irq_fpu_usable();
+ }
++
++static inline void simd_get(simd_context_t *ctx)
++{
++#if !defined(CONFIG_UML)
++	*ctx = may_use_simd() ? HAVE_FULL_SIMD : HAVE_NO_SIMD;
++#else
++	*ctx = HAVE_NO_SIMD;
++#endif
++}
++
++static inline void simd_put(simd_context_t *ctx)
++{
++#if !defined(CONFIG_UML)
++	if (*ctx & HAVE_SIMD_IN_USE)
++		kernel_fpu_end();
++#endif
++	*ctx = HAVE_NO_SIMD;
++}
++
++static __must_check inline bool simd_use(simd_context_t *ctx)
++{
++#if !defined(CONFIG_UML)
++	if (!(*ctx & HAVE_FULL_SIMD))
++		return false;
++	if (*ctx & HAVE_SIMD_IN_USE)
++		return true;
++	kernel_fpu_begin();
++	*ctx |= HAVE_SIMD_IN_USE;
++	return true;
++#else
++	return false;
++#endif
++}
++
++#endif /* _ASM_SIMD_H */
+diff --git a/arch/xtensa/include/asm/Kbuild b/arch/xtensa/include/asm/Kbuild
+index 42b6cb3d16f7..318cad148bea 100644
+--- a/arch/xtensa/include/asm/Kbuild
++++ b/arch/xtensa/include/asm/Kbuild
+@@ -26,6 +26,7 @@ generic-y += qrwlock.h
+ generic-y += qspinlock.h
+ generic-y += rwsem.h
+ generic-y += sections.h
++generic-y += simd.h
+ generic-y += socket.h
+ generic-y += topology.h
+ generic-y += trace_clock.h
+diff --git a/include/asm-generic/simd.h b/include/asm-generic/simd.h
+index d0343d58a74a..b3dd61ac010e 100644
+--- a/include/asm-generic/simd.h
++++ b/include/asm-generic/simd.h
+@@ -1,5 +1,9 @@
+ /* SPDX-License-Identifier: GPL-2.0 */
+ 
++#include <linux/simd.h>
++#ifndef _ASM_SIMD_H
++#define _ASM_SIMD_H
++
+ #include <linux/hardirq.h>
+ 
+ /*
+@@ -13,3 +17,19 @@ static __must_check inline bool may_use_simd(void)
+ {
+ 	return !in_interrupt();
+ }
++
++static inline void simd_get(simd_context_t *ctx)
++{
++	*ctx = HAVE_NO_SIMD;
++}
++
++static inline void simd_put(simd_context_t *ctx)
++{
++}
++
++static __must_check inline bool simd_use(simd_context_t *ctx)
++{
++	return false;
++}
++
++#endif /* _ASM_SIMD_H */
+diff --git a/include/linux/simd.h b/include/linux/simd.h
 new file mode 100644
-index 000000000000..a61c80d676cb
+index 000000000000..4e0b8a9bdc14
 --- /dev/null
-+++ b/lib/zinc/Makefile
-@@ -0,0 +1,3 @@
-+ccflags-y := -O2
-+ccflags-y += -D'pr_fmt(fmt)="zinc: " fmt'
-+ccflags-$(CONFIG_ZINC_DEBUG) += -DDEBUG
++++ b/include/linux/simd.h
+@@ -0,0 +1,32 @@
++/* SPDX-License-Identifier: GPL-2.0
++ *
++ * Copyright (C) 2015-2018 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
++ */
++
++#ifndef _SIMD_H
++#define _SIMD_H
++
++typedef enum {
++	HAVE_NO_SIMD = 1 << 0,
++	HAVE_FULL_SIMD = 1 << 1,
++	HAVE_SIMD_IN_USE = 1 << 31
++} simd_context_t;
++
++#define DONT_USE_SIMD ((simd_context_t []){ HAVE_NO_SIMD })
++
++#include <linux/sched.h>
++#include <asm/simd.h>
++
++static inline bool simd_relax(simd_context_t *ctx)
++{
++#ifdef CONFIG_PREEMPT
++	if ((*ctx & HAVE_SIMD_IN_USE) && need_resched()) {
++		simd_put(ctx);
++		simd_get(ctx);
++		return true;
++	}
++#endif
++	return false;
++}
++
++#endif /* _SIMD_H */
