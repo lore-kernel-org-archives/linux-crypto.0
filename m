@@ -1,111 +1,94 @@
-Return-Path: <SRS0=E3Xp=R2=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=1oRy=R4=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E2B5C43381
-	for <linux-crypto@archiver.kernel.org>; Sat, 23 Mar 2019 04:43:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 472FEC43381
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 Mar 2019 00:03:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 72615218B0
-	for <linux-crypto@archiver.kernel.org>; Sat, 23 Mar 2019 04:43:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 162A821019
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 Mar 2019 00:03:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726041AbfCWEnO (ORCPT
+        id S1729077AbfCYAC5 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 23 Mar 2019 00:43:14 -0400
-Received: from vmicros1.altlinux.org ([194.107.17.57]:58100 "EHLO
-        vmicros1.altlinux.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726038AbfCWEnO (ORCPT
+        Sun, 24 Mar 2019 20:02:57 -0400
+Received: from shards.monkeyblade.net ([23.128.96.9]:44492 "EHLO
+        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727275AbfCYAC5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 23 Mar 2019 00:43:14 -0400
-Received: from imap.altlinux.org (imap.altlinux.org [194.107.17.38])
-        by vmicros1.altlinux.org (Postfix) with ESMTP id EEFA972CCAC;
-        Sat, 23 Mar 2019 07:43:10 +0300 (MSK)
-Received: from beacon.altlinux.org (unknown [185.6.174.98])
-        by imap.altlinux.org (Postfix) with ESMTPSA id C89F04A4A16;
-        Sat, 23 Mar 2019 07:43:10 +0300 (MSK)
-From:   Vitaly Chikunov <vt@altlinux.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [RFC v7.1] crypto: akcipher - default implementations for request callbacks
-Date:   Sat, 23 Mar 2019 07:43:08 +0300
-Message-Id: <20190323044308.20935-1-vt@altlinux.org>
-X-Mailer: git-send-email 2.11.0
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Sun, 24 Mar 2019 20:02:57 -0400
+Received: from localhost (unknown [50.233.106.125])
+        (using TLSv1 with cipher AES256-SHA (256/256 bits))
+        (Client did not present a certificate)
+        (Authenticated sender: davem-davemloft)
+        by shards.monkeyblade.net (Postfix) with ESMTPSA id 0C83812DE5812;
+        Sun, 24 Mar 2019 17:02:57 -0700 (PDT)
+Date:   Sun, 24 Mar 2019 20:02:54 -0400 (EDT)
+Message-Id: <20190324.200254.1946143057733371048.davem@davemloft.net>
+To:     Jason@zx2c4.com
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, gregkh@linuxfoundation.org
+Subject: Re: [PATCH net-next v9 19/19] net: WireGuard secure network tunnel
+From:   David Miller <davem@davemloft.net>
+In-Reply-To: <20190322071122.6677-20-Jason@zx2c4.com>
+References: <20190322071122.6677-1-Jason@zx2c4.com>
+        <20190322071122.6677-20-Jason@zx2c4.com>
+X-Mailer: Mew version 6.8 on Emacs 26.1
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+X-Greylist: Sender succeeded SMTP AUTH, not delayed by milter-greylist-4.5.12 (shards.monkeyblade.net [149.20.54.216]); Sun, 24 Mar 2019 17:02:57 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Herbert,
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date: Fri, 22 Mar 2019 01:11:22 -0600
 
-This is reworked version of "[PATCH v7 02/11] crypto: akcipher - check the
-presence of callback before the call".
+> +static __always_inline void swap_endian(u8 *dst, const u8 *src, u8 bits)
+> +{
 
-All checks inside of akcipher wrappers for the callbacks handling
-akcipher_requests are removed and replaced with default akcipher_default_op()
-callback.
+Unless you have an absolutely requirement on inlining (if uninlined,
+the compilation would break), you must not use the __always_inline
+keyword and you must let the compiler decide what to do.
 
-Checks in crypto_akcipher_maxsize() are just removed altogether without any
-replacement, because this callback is always defined.
+Said another way: "The code isn't optimal with my compiler on my computer
+unless I force inline this" is not a valid reason to use __always_inline
 
-Also, sanity checks for (!req->dst && req->dst_len) which was introduced in
-"[PATCH v7 04/11] crypto: akcipher - new verify API for public key algorithms"
-are removed, assuming this should be checked in the drivers if needed.
+And for this reason we never use __inline in foo.c files, always let the
+compiler decide.
 
-Commit "PATCH v7 01/11] KEYS: report to keyctl only actually supported key ops"
-is also will be removed in the next patchset, as you agreed.
+This applies to your entire submission.
 
-Thanks,
+> +		((u64 *)dst)[0] = be64_to_cpu(((const __be64 *)src)[0]);
+> +		((u64 *)dst)[1] = be64_to_cpu(((const __be64 *)src)[1]);
 
---- commit ---
+Are 'dst' and 'src' both 64-bit aligned?  If not you'll get traps on some cpus.
 
-Because with the introduction of EC-RDSA and change in workings of RSA
-in regard to sign/verify, akcipher could have not all callbacks defined,
-check the presence of callbacks in crypto_register_akcipher() and
-provide default implementation if the callback is not implemented.
+> +	__skb_queue_head_init(&packets);
+> +	if (!skb_is_gso(skb)) {
+> +		skb->next = NULL;
 
-This is suggested by Herbert Xu instead of checking the presence of the
-callback on every request.
+Why?  Direct ->next and ->prev pointer accesses should never be used,
+along with anything that assumes what the implentation of skb lists
+looks like.
 
-Signed-off-by: Vitaly Chikunov <vt@altlinux.org>
----
- crypto/akcipher.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+Always use the helpers instead.
 
-diff --git a/crypto/akcipher.c b/crypto/akcipher.c
-index 0cbeae137e0a..780daa436dac 100644
---- a/crypto/akcipher.c
-+++ b/crypto/akcipher.c
-@@ -119,10 +119,24 @@ static void akcipher_prepare_alg(struct akcipher_alg *alg)
- 	base->cra_flags |= CRYPTO_ALG_TYPE_AKCIPHER;
- }
- 
-+static int akcipher_default_op(struct akcipher_request *req)
-+{
-+	return -ENOSYS;
-+}
-+
- int crypto_register_akcipher(struct akcipher_alg *alg)
- {
- 	struct crypto_alg *base = &alg->base;
- 
-+	if (!alg->sign)
-+		alg->sign = akcipher_default_op;
-+	if (!alg->verify)
-+		alg->verify = akcipher_default_op;
-+	if (!alg->encrypt)
-+		alg->encrypt = akcipher_default_op;
-+	if (!alg->decrypt)
-+		alg->decrypt = akcipher_default_op;
-+
- 	akcipher_prepare_alg(alg);
- 	return crypto_register_alg(base);
- }
--- 
-2.11.0
+> diff --git a/drivers/net/wireguard/hashtables.c b/drivers/net/wireguard/hashtables.c
+> new file mode 100644
+> index 000000000000..8aedc17b85f9
+> --- /dev/null
+> +++ b/drivers/net/wireguard/hashtables.c
 
+No way.
+
+Do not invent your own hashtables, we have several generic versions in
+tree and in particular rhashtable.
+
+If the generic kernel facilities have a weakness, fix that instead of
+rolling an entire new hashtable implementation.
