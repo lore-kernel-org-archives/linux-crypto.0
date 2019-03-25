@@ -2,97 +2,99 @@ Return-Path: <SRS0=1oRy=R4=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10A53C43381
-	for <linux-crypto@archiver.kernel.org>; Mon, 25 Mar 2019 11:52:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C6E3C43381
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 Mar 2019 11:57:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DAD6F20850
-	for <linux-crypto@archiver.kernel.org>; Mon, 25 Mar 2019 11:52:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 58A2620850
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 Mar 2019 11:57:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="2yr4VexP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730899AbfCYLwH (ORCPT
+        id S1731021AbfCYL5g (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 25 Mar 2019 07:52:07 -0400
-Received: from orcrist.hmeau.com ([104.223.48.154]:51386 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730605AbfCYLwH (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 25 Mar 2019 07:52:07 -0400
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1h8O96-000159-O0; Mon, 25 Mar 2019 19:52:04 +0800
-Received: from herbert by gondobar with local (Exim 4.89)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1h8O8y-0000Ok-TE; Mon, 25 Mar 2019 19:51:56 +0800
-Date:   Mon, 25 Mar 2019 19:51:56 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, Jason@zx2c4.com,
-        torvalds@linux-foundation.org, davem@davemloft.net,
-        gregkh@linuxfoundation.org, ebiggers@kernel.org,
-        ard.biesheuvel@linaro.org, samuel.c.p.neves@gmail.com
-Subject: Re: [PATCH net-next v9 00/19] WireGuard: Secure Network Tunnel
-Message-ID: <20190325115156.wj4verbfdd2rspo5@gondor.apana.org.au>
+        Mon, 25 Mar 2019 07:57:36 -0400
+Received: from frisell.zx2c4.com ([192.95.5.64]:43551 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730730AbfCYL5f (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 25 Mar 2019 07:57:35 -0400
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 3409dd19;
+        Mon, 25 Mar 2019 11:35:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=mime-version
+        :references:in-reply-to:from:date:message-id:subject:to:cc
+        :content-type; s=mail; bh=DBwobPcp+XLi0JlgbvkNQ17mcME=; b=2yr4Ve
+        xPiz3LpBl2Bhgzo7jdpsaP1//wQjyutECetZ1BPl3xzFRQGrciVGNwzVBLaFdK7a
+        4DNxcgJ57h9zF5ebfQkd1ilzV0Um4H0rdhrRPd8MMlslVMWxo83eXYrLp97VwJu0
+        fIjDW6xI54faIoP8iXePRAPFmXnVpvi4885BI3j+7croJE5vlY43182yiAbO8eKH
+        GHD9AlE/N3/VU6BLfJif8jOuzZDskQpe2RXORNqE+5QUZ1Ol2Tt7tnjYKlxY2y4r
+        etUtfGoor7mfX2xKLfS2mjZiX2TvqRmIxTmnxC5ECN/BzTxyx324wNwpDx2E57tp
+        aXj+cUKz+MY9K55w==
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id f598297d (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO);
+        Mon, 25 Mar 2019 11:35:25 +0000 (UTC)
+Received: by mail-oi1-f176.google.com with SMTP id i21so6661336oib.11;
+        Mon, 25 Mar 2019 04:57:32 -0700 (PDT)
+X-Gm-Message-State: APjAAAWaho2e5zd2vKL4K08I13U9ihb+N4NXaALTzpPTkTMvY2e9FjiB
+        EWHRy+CleSwjpW6IGLDglJH3keuAh0w+VBIWaDw=
+X-Google-Smtp-Source: APXvYqwsR4oRu/q5zmvku3tlrxsPBR4U8hytDrtQpHuYbuiN+CKKpHpvCTmm0QeH44olD5ncivfvHGnqzKxKivEVpSM=
+X-Received: by 2002:aca:61d6:: with SMTP id v205mr6056387oib.122.1553515052019;
+ Mon, 25 Mar 2019 04:57:32 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190322071122.6677-1-Jason@zx2c4.com>
-X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel,apana.lists.os.linux.netdev
-Organization: Core
-User-Agent: NeoMutt/20170113 (1.7.2)
+References: <20190322071122.6677-1-Jason@zx2c4.com> <20190325115156.wj4verbfdd2rspo5@gondor.apana.org.au>
+In-Reply-To: <20190325115156.wj4verbfdd2rspo5@gondor.apana.org.au>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Mon, 25 Mar 2019 12:57:20 +0100
+X-Gmail-Original-Message-ID: <CAHmME9pAgi=Li_C5xEq7EfmNq5p4BRc3rDxXjiz+xz0rSYikXA@mail.gmail.com>
+Message-ID: <CAHmME9pAgi=Li_C5xEq7EfmNq5p4BRc3rDxXjiz+xz0rSYikXA@mail.gmail.com>
+Subject: Re: [PATCH net-next v9 00/19] WireGuard: Secure Network Tunnel
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Netdev <netdev@vger.kernel.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        David Miller <davem@davemloft.net>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Samuel Neves <samuel.c.p.neves@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Jason A. Donenfeld <Jason@zx2c4.com> wrote:
-> Changes v8->v9, along with who suggested it.
-> --------------------------------------------
-> - [EVERYBODY] Zinc no longer ships generated assembly code. Rather, we now
->  bundle in the original perlasm generator for it. This is ongoing joint work
->  with Andy Polyakov upstream, so that the same .pl files can live in our tree
->  as well as in the CRYPTOGAMS tree. I personally find that the code required
->  to share this in both repositories to be a tiny bit ugly. I think there would
->  be some degree of an advantage to removing that and making the .pl
->  kernel-only, and then carefully tracking Andy's changes (as we already
->  do). Previous opinions on the list, though, were that there's also
->  significant advantage to being able to share the exact same code in both.
->  And I think there's a decent amount of wisdom in that too. Since that
->  appeared to be the prevailing view, and since it also has good reasons
->  arguments, we'll go with that for now.
+Hey Herbert,
 
-Thanks for the update.
- 
-> - Following the Adiantum merge, the two commits that port the old crypto API
->  over to use Zinc have been removed from this series. We can certainly add
->  them back in at some point, but I thought it'd be favorable to at least
->  begin to receive some sign-offs on the Zinc-specific commits, now that
->  (hopefully all of) the previous feedback has been taken care of. The two
->  commits porting it over are fairly standalone as well, so that shouldn't
->  impact the ability to review this. For now those are living in the
->  jd/with-cryptoapi-port branch of kernel.org's zx2c4/linux.git tree. This
->  also allows us to move this all forward a little bit.
+On Mon, Mar 25, 2019 at 12:52 PM Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> Sorry but adding new implementations of chacha20/poly1305 without
+> removing the existing ones is not acceptable.  I really think
+> we ought to separate the zinc interface from these new crypto
+> implementations.  They have nothing to do with each other.
+>
+> As we've been stuck on this point for so long, let's get the
+> ball rolling by first merging just the zinc interface itself
+> with the existing chacha20/poly1305 code.  Then we can replace
+> these implementations with your implementations without getting
+> bogged down by all these other discussions.
+>
+> AFAICS once we resolve Thomas's concerns with regards to the simd
+> patch, then we can merge the zinc interface right away and go from
+> there.
 
-Sorry but adding new implementations of chacha20/poly1305 without
-removing the existing ones is not acceptable.  I really think
-we ought to separate the zinc interface from these new crypto
-implementations.  They have nothing to do with each other.
+I think we're slightly closer to being same page, but I haven't
+followed up here yet because I was waiting for something else first.
 
-As we've been stuck on this point for so long, let's get the
-ball rolling by first merging just the zinc interface itself
-with the existing chacha20/poly1305 code.  Then we can replace
-these implementations with your implementations without getting
-bogged down by all these other discussions.
+Your previous patchset left out a few implementations and wasn't
+totally complete with regards to the glue code. I'm going to whip
+something up now that is Zinc, but where there's already an existing
+assembly implementation in the tree (i.e. Martin's code), it uses that
+instead of what I've been posting until now. Then, after that lands, I
+can post stand-alone patches for replacing the various
+implementations, and we can discuss those separately, alongside all
+the various discussion of verification and benchmarks and so forth.
 
-AFAICS once we resolve Thomas's concerns with regards to the simd
-patch, then we can merge the zinc interface right away and go from
-there.
+So, I'll have something to examine somewhat soon. Working on it now.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Jason
