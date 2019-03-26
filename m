@@ -2,242 +2,131 @@ Return-Path: <SRS0=ouVC=R5=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B3D1C10F05
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 Mar 2019 13:00:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95AC6C10F05
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 Mar 2019 16:00:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5C3B320863
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 Mar 2019 13:00:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 644B92070D
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 Mar 2019 16:00:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TlNWQ6Bm"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731711AbfCZM77 (ORCPT
+        id S1729693AbfCZQAr (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 26 Mar 2019 08:59:59 -0400
-Received: from vmicros1.altlinux.org ([194.107.17.57]:46064 "EHLO
-        vmicros1.altlinux.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727492AbfCZM7z (ORCPT
+        Tue, 26 Mar 2019 12:00:47 -0400
+Received: from mail-ot1-f68.google.com ([209.85.210.68]:33579 "EHLO
+        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729633AbfCZQAr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 26 Mar 2019 08:59:55 -0400
-Received: from imap.altlinux.org (imap.altlinux.org [194.107.17.38])
-        by vmicros1.altlinux.org (Postfix) with ESMTP id E4D7F72CCAD;
-        Tue, 26 Mar 2019 15:59:51 +0300 (MSK)
-Received: from beacon.altlinux.org (unknown [185.6.174.98])
-        by imap.altlinux.org (Postfix) with ESMTPSA id 417644A4AE9;
-        Tue, 26 Mar 2019 15:59:50 +0300 (MSK)
-From:   Vitaly Chikunov <vt@altlinux.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Tue, 26 Mar 2019 12:00:47 -0400
+Received: by mail-ot1-f68.google.com with SMTP id j10so5477147otq.0;
+        Tue, 26 Mar 2019 09:00:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:references:from:message-id:date:user-agent:mime-version
+         :in-reply-to:content-language:content-transfer-encoding;
+        bh=+X3y/qDiVyUZ6FE5er9C1/c3UdsMGx/nk0qkW7aHZhA=;
+        b=TlNWQ6BmIrIz4ymM0k93Yp1tnJX1lqZA7Zzkst1AIVWpJPqNzD11PHm/Jaen/jXUIL
+         vg0KQMo/mccl/la3CYRkYXqsoqbSrfv8IgLlEL2E8BKbNMWYFsInxvTNdxEY9TdEA/K1
+         Wu5dkgug6LbAsOEIOTlCZ2gDR4Y9Jn55sYoJnfdRiL6FVzOHsuBVrQsJES30a88Ck4lk
+         2I1h8kEY+vjpEuISwN5rARfbVlSzMP8dz9BZU66lpJEIyWkgtHhcsQS8rgxmc5gNxQXZ
+         A5hBw3KabKOJk24TJWCB1s6JEe6Hxd+KiN1xHgHPDlCACI2Lk+9Nufi+VeqkIflha9xq
+         P3+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=+X3y/qDiVyUZ6FE5er9C1/c3UdsMGx/nk0qkW7aHZhA=;
+        b=b37G/DLWnQoGywavd7Pmb/EXxzz8/ymyxTOw4COKJrXwksGx2qROKrmttMo/YvAz8B
+         ZZYiDFui67NGv7ZAJybzAABhZR2WGk9cMsN1Hm3yVPlCj19bBb4yo3TBgTiPljFEABJG
+         pd+Gf3gkA2xAGGwnaFvIz+G9fvvMhZJDvgiUccxeAqq5KeS9rmtb2D8DUniPhbBnx4td
+         4pGtoUf5hCwgcZ/3xn8esxYQ/IbU7dMRcNzA7Bz/g4E0dhQx0m3s+0jEAdBBARjjt8/1
+         2XNSV4JNppxGm7+bwqTnDlG7RUsLzRKz5x2uPoA458107IWUHD03tjQXZm38uQP2gS8S
+         OB1g==
+X-Gm-Message-State: APjAAAVG17QvqdC9j124dii1NgmI/QeRmMpteQ0rKLgSPrrCyC+/AZ0p
+        rjnccMQ3/NaDPeA4ztGTc1qIQogm
+X-Google-Smtp-Source: APXvYqyZZwzSy1oMFCnWCyoBfM7ZWaT8w0fP+fx+5EipKTkzROWHiBhtzqXP2btg6Y0jQZDMpLIIDw==
+X-Received: by 2002:a9d:5509:: with SMTP id l9mr21901554oth.195.1553616046287;
+        Tue, 26 Mar 2019 09:00:46 -0700 (PDT)
+Received: from [192.168.1.249] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
+        by smtp.googlemail.com with ESMTPSA id f26sm7591795otl.20.2019.03.26.09.00.41
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 26 Mar 2019 09:00:41 -0700 (PDT)
+Subject: Re: [PATCH v8 03/10] crypto: akcipher - new verify API for public key
+ algorithms
+To:     Vitaly Chikunov <vt@altlinux.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         David Howells <dhowells@redhat.com>,
         Mimi Zohar <zohar@linux.ibm.com>,
         Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
         linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v8 09/10] crypto: ecrdsa - add EC-RDSA test vectors to testmgr
-Date:   Tue, 26 Mar 2019 15:58:41 +0300
-Message-Id: <20190326125842.24110-10-vt@altlinux.org>
-X-Mailer: git-send-email 2.11.0
-In-Reply-To: <20190326125842.24110-1-vt@altlinux.org>
 References: <20190326125842.24110-1-vt@altlinux.org>
+ <20190326125842.24110-4-vt@altlinux.org>
+From:   Denis Kenzior <denkenz@gmail.com>
+Message-ID: <ed78154e-2491-8e3e-3362-e45df4fda011@gmail.com>
+Date:   Tue, 26 Mar 2019 11:00:40 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.3.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190326125842.24110-4-vt@altlinux.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add testmgr test vectors for EC-RDSA algorithm for every of five
-supported parameters (curves). Because there are no officially published
-test vectors for the curves, the vectors are generated by gost-engine.
+Hi Vitaly,
 
-Signed-off-by: Vitaly Chikunov <vt@altlinux.org>
----
- crypto/testmgr.c |   6 +++
- crypto/testmgr.h | 154 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 160 insertions(+)
+On 03/26/2019 07:58 AM, Vitaly Chikunov wrote:
+> Previous akcipher .verify() just `decrypts' (using RSA encrypt which is
+> using public key) signature to uncover message hash, which was then
+> compared in upper level public_key_verify_signature() with the expected
+> hash value, which itself was never passed into verify().
+> 
+> This approach was incompatible with EC-DSA family of algorithms,
+> because, to verify a signature EC-DSA algorithm also needs a hash value
+> as input; then it's used (together with a signature divided into halves
+> `r||s') to produce a witness value, which is then compared with `r' to
+> determine if the signature is correct. Thus, for EC-DSA, nor
+> requirements of .verify() itself, nor its output expectations in
+> public_key_verify_signature() wasn't sufficient.
+> 
+> Make improved .verify() call which gets hash value as input and produce
+> complete signature check without any output besides status.
+> 
+> Now for the top level verification only crypto_akcipher_verify() needs
+> to be called and its return value inspected.
+> 
+> Make sure that `digest' is in kmalloc'd memory (in place of `output`) in
+> {public,tpm}_key_verify_signature() as insisted by Herbert Xu, and will
+> be changed in the following commit.
+> 
+> Cc: David Howells <dhowells@redhat.com>
+> Cc: keyrings@vger.kernel.org
+> Signed-off-by: Vitaly Chikunov <vt@altlinux.org>
+> ---
+>   crypto/asymmetric_keys/asym_tpm.c   | 34 ++++++++-----------------
+>   crypto/asymmetric_keys/public_key.c | 34 ++++++++-----------------
+>   crypto/rsa-pkcs1pad.c               | 29 +++++++++++++--------
+>   crypto/testmgr.c                    | 50 ++++++++++++++++++++++---------------
+>   include/crypto/akcipher.h           | 36 ++++++++++++++++----------
+>   5 files changed, 92 insertions(+), 91 deletions(-)
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index b1a94b05b9b6..7d30bc498c4b 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -3473,6 +3473,12 @@ static const struct alg_test_desc alg_test_descs[] = {
- 			.kpp = __VECS(ecdh_tv_template)
- 		}
- 	}, {
-+		.alg = "ecrdsa",
-+		.test = alg_test_akcipher,
-+		.suite = {
-+			.akcipher = __VECS(ecrdsa_tv_template)
-+		}
-+	}, {
- 		.alg = "gcm(aes)",
- 		.test = alg_test_aead,
- 		.fips_allowed = 1,
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 75d8f8c3e203..120531b0a86d 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -556,6 +556,160 @@ static const struct akcipher_testvec rsa_tv_template[] = {
- };
- 
- /*
-+ * EC-RDSA test vectors are generated by gost-engine.
-+ */
-+static const struct akcipher_testvec ecrdsa_tv_template[] = {
-+	{
-+	.key =
-+	"\x04\x40\xd5\xa7\x77\xf9\x26\x2f\x8c\xbd\xcc\xe3\x1f\x01\x94\x05"
-+	"\x3d\x2f\xec\xb5\x00\x34\xf5\x51\x6d\x3b\x90\x4b\x23\x28\x6f\x1d"
-+	"\xc8\x36\x61\x60\x36\xec\xbb\xb4\x0b\x95\x4e\x54\x4f\x15\x21\x05"
-+	"\xd8\x52\x66\x44\x31\x7e\x5d\xc5\xd1\x26\x00\x5f\x60\xd8\xf0\xc7"
-+	"\x27\xfc",
-+	.key_len = 66,
-+	.params = /* OID_gostCPSignA */
-+	"\x30\x13\x06\x07\x2a\x85\x03\x02\x02\x23\x01\x06\x08\x2a\x85\x03"
-+	"\x07\x01\x01\x02\x02",
-+	.param_len = 21,
-+	.c =
-+	"\x41\x32\x09\x73\xa4\xc1\x38\xd6\x63\x7d\x8b\xf7\x50\x3f\xda\x9f"
-+	"\x68\x48\xc1\x50\xe3\x42\x3a\x9b\x2b\x28\x12\x2a\xa7\xc2\x75\x31"
-+	"\x65\x77\x8c\x3c\x9e\x0d\x56\xb2\xf9\xdc\x04\x33\x3e\xb0\x9e\xf9"
-+	"\x74\x4e\x59\xb3\x83\xf2\x91\x27\xda\x5e\xc7\x33\xc0\xc1\x8f\x41",
-+	.c_size = 64,
-+	.algo = OID_gost2012PKey256,
-+	.m =
-+	"\x75\x1b\x9b\x40\x25\xb9\x96\xd2\x9b\x00\x41\xb3\x58\xbf\x23\x14"
-+	"\x79\xd2\x76\x64\xa3\xbd\x66\x10\x79\x05\x5a\x06\x42\xec\xb9\xc9",
-+	.m_size = 32,
-+	.public_key_vec = true,
-+	.siggen_sigver_test = true,
-+	},
-+	{
-+	.key =
-+	"\x04\x40\x66\x6f\xd6\xb7\x06\xd0\xf5\xa5\x6f\x69\x5c\xa5\x13\x45"
-+	"\x14\xdd\xcb\x12\x9c\x1b\xf5\x28\x64\x7a\x49\x48\x29\x14\x66\x42"
-+	"\xb8\x1b\x5c\xf9\x56\x6d\x08\x3b\xce\xbb\x62\x2f\xc2\x3c\xc5\x49"
-+	"\x93\x27\x70\x20\xcc\x79\xeb\xdc\x76\x8e\x48\x6e\x04\x96\xc3\x29"
-+	"\xa0\x73",
-+	.key_len = 66,
-+	.params = /* OID_gostCPSignB */
-+	"\x30\x13\x06\x07\x2a\x85\x03\x02\x02\x23\x02\x06\x08\x2a\x85\x03"
-+	"\x07\x01\x01\x02\x02",
-+	.param_len = 21,
-+	.c =
-+	"\x45\x6d\x4a\x03\x1d\x5c\x0b\x17\x79\xe7\x19\xdb\xbf\x81\x9f\x82"
-+	"\xae\x06\xda\xf5\x47\x00\x05\x80\xc3\x16\x06\x9a\x8e\x7c\xb2\x8e"
-+	"\x7f\x74\xaa\xec\x6b\x7b\x7f\x8b\xc6\x0b\x10\x42\x4e\x91\x2c\xdf"
-+	"\x7b\x8b\x15\xf4\x9e\x59\x0f\xc7\xa4\x68\x2e\xce\x89\xdf\x84\xe9",
-+	.c_size = 64,
-+	.algo = OID_gost2012PKey256,
-+	.m =
-+	"\xd0\x54\x00\x27\x6a\xeb\xce\x6c\xf5\xf6\xfb\x57\x18\x18\x21\x13"
-+	"\x11\x23\x4a\x70\x43\x52\x7a\x68\x11\x65\x45\x37\xbb\x25\xb7\x40",
-+	.m_size = 32,
-+	.public_key_vec = true,
-+	.siggen_sigver_test = true,
-+	},
-+	{
-+	.key =
-+	"\x04\x40\x05\x91\xa9\x7d\xcb\x87\xdc\x98\xa1\xbf\xff\xdd\x20\x61"
-+	"\xaa\x58\x3b\x2d\x8e\x9c\x41\x9d\x4f\xc6\x23\x17\xf9\xca\x60\x65"
-+	"\xbc\x97\x97\xf6\x6b\x24\xe8\xac\xb1\xa7\x61\x29\x3c\x71\xdc\xad"
-+	"\xcb\x20\xbe\x96\xe8\xf4\x44\x2e\x49\xd5\x2c\xb9\xc9\x3b\x9c\xaa"
-+	"\xba\x15",
-+	.key_len = 66,
-+	.params = /* OID_gostCPSignC */
-+	"\x30\x13\x06\x07\x2a\x85\x03\x02\x02\x23\x03\x06\x08\x2a\x85\x03"
-+	"\x07\x01\x01\x02\x02",
-+	.param_len = 21,
-+	.c =
-+	"\x3b\x2e\x2e\x74\x74\x47\xda\xea\x93\x90\x6a\xe2\xf5\xf5\xe6\x46"
-+	"\x11\xfc\xab\xdc\x52\xbc\x58\xdb\x45\x44\x12\x4a\xf7\xd0\xab\xc9"
-+	"\x73\xba\x64\xab\x0d\xac\x4e\x72\x10\xa8\x04\xf6\x1e\xe0\x48\x6a"
-+	"\xcd\xe8\xe3\x78\x73\x77\x82\x24\x8d\xf1\xd3\xeb\x4c\x25\x7e\xc0",
-+	.c_size = 64,
-+	.algo = OID_gost2012PKey256,
-+	.m =
-+	"\x52\x33\xf4\x3f\x7b\x5d\xcf\x20\xee\xe4\x5c\xab\x0b\x3f\x14\xd6"
-+	"\x9f\x16\xc6\x1c\xb1\x3f\x84\x41\x69\xec\x34\xfd\xf1\xf9\xa3\x39",
-+	.m_size = 32,
-+	.public_key_vec = true,
-+	.siggen_sigver_test = true,
-+	},
-+	{
-+	.key =
-+	"\x04\x81\x80\x85\x46\x8f\x16\xf8\x7a\x7e\x4a\xc3\x81\x9e\xf1\x6e"
-+	"\x94\x1e\x5d\x02\x87\xea\xfa\xa0\x0a\x17\x70\x49\x64\xad\x95\x68"
-+	"\x60\x0a\xf0\x57\x29\x41\x79\x30\x3c\x61\x69\xf2\xa6\x94\x87\x17"
-+	"\x54\xfa\x97\x2c\xe6\x1e\x0a\xbb\x55\x10\x57\xbe\xf7\xc1\x77\x2b"
-+	"\x11\x74\x0a\x50\x37\x14\x10\x2a\x45\xfc\x7a\xae\x1c\x4c\xce\x08"
-+	"\x05\xb7\xa4\x50\xc8\x3d\x39\x3d\xdc\x5c\x8f\x96\x6c\xe7\xfc\x21"
-+	"\xc3\x2d\x1e\x9f\x11\xb3\xec\x22\x18\x8a\x8c\x08\x6b\x8b\xed\xf5"
-+	"\xc5\x47\x3c\x7e\x73\x59\x44\x1e\x77\x83\x84\x52\x9e\x3b\x7d\xff"
-+	"\x9d\x86\x1a",
-+	.key_len = 131,
-+	.params = /* OID_gostTC26Sign512A */
-+	"\x30\x0b\x06\x09\x2a\x85\x03\x07\x01\x02\x01\x02\x01",
-+	.param_len = 13,
-+	.c =
-+	"\x92\x81\x74\x5f\x95\x48\x38\x87\xd9\x8f\x5e\xc8\x8a\xbb\x01\x4e"
-+	"\xb0\x75\x3c\x2f\xc7\x5a\x08\x4c\x68\xab\x75\x01\x32\x75\x75\xb5"
-+	"\x37\xe0\x74\x6d\x94\x84\x31\x2a\x6b\xf4\xf7\xb7\xa7\x39\x7b\x46"
-+	"\x07\xf0\x98\xbd\x33\x18\xa1\x72\xb2\x6d\x54\xe3\xde\x91\xc2\x2e"
-+	"\x4f\x6a\xf8\xb7\xec\xa8\x83\xc9\x8f\xd9\xce\x7c\x45\x06\x02\xf4"
-+	"\x4f\x21\xb5\x24\x3d\xb4\xb5\xd8\x58\x42\xbe\x2d\x29\xae\x93\xc0"
-+	"\x13\x41\x96\x35\x08\x69\xe8\x36\xc7\xd1\x83\x81\xd7\xca\xfb\xc0"
-+	"\xd2\xb7\x78\x32\x3e\x30\x1a\x1e\xce\xdc\x34\x35\xc6\xad\x68\x24",
-+	.c_size = 128,
-+	.algo = OID_gost2012PKey512,
-+	.m =
-+	"\x1f\x70\xb5\xe9\x55\x12\xd6\x88\xcc\x55\xb9\x0c\x7f\xc4\x94\xf2"
-+	"\x04\x77\x41\x12\x02\xd6\xf1\x1f\x83\x56\xe9\xd6\x5a\x6a\x72\xb9"
-+	"\x6e\x8e\x24\x2a\x84\xf1\xba\x67\xe8\xbf\xff\xc1\xd3\xde\xfb\xc6"
-+	"\xa8\xf6\x80\x01\xb9\x27\xac\xd8\x45\x96\x66\xa1\xee\x48\x08\x3f",
-+	.m_size = 64,
-+	.public_key_vec = true,
-+	.siggen_sigver_test = true,
-+	},
-+	{
-+	.key =
-+	"\x04\x81\x80\x28\xf3\x2b\x92\x04\x32\xea\x66\x20\xde\xa0\x2f\x74"
-+	"\xbf\x2d\xf7\xb5\x30\x76\xb1\xc8\xee\x38\x9f\xea\xe5\xad\xc6\xa3"
-+	"\x28\x1e\x51\x3d\x67\xa3\x41\xcc\x6b\x81\xe2\xe2\x9e\x82\xf3\x78"
-+	"\x56\xd7\x2e\xb2\xb5\xbe\xb4\x50\x21\x05\xe5\x29\x82\xef\x15\x1b"
-+	"\xc0\xd7\x30\xd6\x2f\x96\xe8\xff\x99\x4c\x25\xcf\x9a\xfc\x54\x30"
-+	"\xce\xdf\x59\xe9\xc6\x45\xce\xe4\x22\xe8\x01\xd5\xcd\x2f\xaa\x78"
-+	"\x99\xc6\x04\x1e\x6f\x4c\x25\x6a\x76\xad\xff\x48\xf3\xb3\xb4\xd6"
-+	"\x14\x5c\x2c\x0e\xea\xa2\x4b\xb9\x7e\x89\x77\x02\x3a\x29\xc8\x16"
-+	"\x8e\x78\x48",
-+	.key_len = 131,
-+	.params = /* OID_gostTC26Sign512B */
-+	"\x30\x0b\x06\x09\x2a\x85\x03\x07\x01\x02\x01\x02\x02",
-+	.param_len = 13,
-+	.c =
-+	"\x0a\xed\xb6\x27\xea\xa7\xa6\x7e\x2f\xc1\x02\x21\x74\xce\x27\xd2"
-+	"\xee\x8a\x92\x4d\xa9\x43\x2d\xa4\x5b\xdc\x23\x02\xfc\x3a\xf3\xb2"
-+	"\x10\x93\x0b\x40\x1b\x75\x95\x3e\x39\x41\x37\xb9\xab\x51\x09\xeb"
-+	"\xf1\xb9\x49\x58\xec\x58\xc7\xf9\x2e\xb9\xc9\x40\xf2\x00\x39\x7e"
-+	"\x3f\xde\x72\xe3\x85\x67\x06\xbe\xd8\xb8\xc1\x81\x1e\xe3\x0a\xfe"
-+	"\xce\xd3\x77\x92\x56\x8c\x58\xf9\x37\x60\x2d\xe6\x8b\x66\xa3\xdd"
-+	"\xd2\xf0\xf8\xda\x1b\x20\xbc\x9c\xec\x29\x5d\xd1\x8f\xcc\x37\xd1"
-+	"\x3b\x8d\xb7\xc1\xe0\xb8\x3b\xef\x14\x1b\x87\xbc\xc1\x03\x9a\x93",
-+	.c_size = 128,
-+	.algo = OID_gost2012PKey512,
-+	.m =
-+	"\x11\x24\x21\x27\xf2\x42\x9f\xce\x5a\xf9\x01\x70\xe0\x07\x2b\x57"
-+	"\xfb\x7d\x77\x5e\x74\x66\xe6\xa5\x40\x4c\x1a\x85\x18\xff\xd0\x63"
-+	"\xe0\x39\xd3\xd6\xe5\x17\xf8\xc3\x4b\xc6\x1c\x33\x1a\xca\xa6\x66"
-+	"\x6d\xf4\xd2\x45\xc2\x83\xa0\x42\x95\x05\x9d\x89\x8e\x0a\xca\xcc",
-+	.m_size = 64,
-+	.public_key_vec = true,
-+	.siggen_sigver_test = true,
-+	},
-+};
-+
-+/*
-  * PKCS#1 RSA test vectors. Obtained from CAVS testing.
-  */
- static const struct akcipher_testvec pkcs1pad_rsa_tv_template[] = {
--- 
-2.11.0
+The TPM bits, public_key and akcipher changes look good to me.  Didn't 
+look into testmgr.
 
+Feel free to add
+Reviewed-by: Denis Kenzior <denkenz@gmail.com>
+
+to this and patch 4.
+
+Regards,
+-Denis
