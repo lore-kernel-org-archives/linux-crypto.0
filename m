@@ -2,246 +2,72 @@ Return-Path: <SRS0=ouVC=R5=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04FAFC4360F
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 Mar 2019 16:14:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8130CC43381
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 Mar 2019 16:15:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BE9342070D
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 Mar 2019 16:14:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KdhTapfN"
+	by mail.kernel.org (Postfix) with ESMTP id 577852070D
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 Mar 2019 16:15:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731516AbfCZQOl (ORCPT
+        id S1729800AbfCZQPV (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 26 Mar 2019 12:14:41 -0400
-Received: from mail-it1-f194.google.com ([209.85.166.194]:55349 "EHLO
-        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726175AbfCZQOl (ORCPT
+        Tue, 26 Mar 2019 12:15:21 -0400
+Received: from vmicros1.altlinux.org ([194.107.17.57]:50708 "EHLO
+        vmicros1.altlinux.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729440AbfCZQPV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 26 Mar 2019 12:14:41 -0400
-Received: by mail-it1-f194.google.com with SMTP id z126so20451234itd.5;
-        Tue, 26 Mar 2019 09:14:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=rFvBXRm8WNqPtkRNcJevgn2xUqxaLWFWWjeD/B7vNEg=;
-        b=KdhTapfNMHGa3J4SsWfoesRU8ipCQdxcbDflanC1iTlHTuE+p1WGcBAwI7FrX1P7Li
-         fUr7eqjC3+G0flYrlhxj5LjBAMuZK3aUg/KC/7Gsqv5gMOSOFq+BDbBIX9AUVsHoDtJo
-         wPOiuWhfTYAzvLv8TTXJNvLFCUntyNn7G+/abu3FJFbffXgFN/xS4KWgROLYjmfbp9U6
-         Or2UIbTW8kbUAQzUdYYNp6pIUOJt6tul/Jq47ZOQsIRCXhTopzABnuQbLeKE9hbavp3+
-         7dgrMMVsui5gUP2U3ViIPU47ykPYPxgMji5nE6sZhxVGBoQjadXdcL7P1eRYhHPOcUbi
-         E0GQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=rFvBXRm8WNqPtkRNcJevgn2xUqxaLWFWWjeD/B7vNEg=;
-        b=DlWNIGlKUsq443IBxT2/5Pmm06l4YVUsNavdQ1ZK1oELdQqpaDXgIT2FwlxKWLXRZU
-         q8NVNb295DbciMq8W/vvv68aE6vrRhoQHNMzdjzLogrGYZUjyVUFjxnREzRcpjKRXtQ/
-         nWsYjnSAMP1nBjQrotbS2d6PHaUesGkPYfG9FKkC1X/yDBta/nEJB1jzGQNRCP6hg1Zk
-         tLJ45vHCEIqjPOj1rWRdyAhPDsDQRHAiMXu2CNc38voQ8u8bIBzSQWV2CW/dagOo07H5
-         DbvWCzmD05iagQGzcY1zjPLC3Tmg69Ulqk74Gi8Np1qIFbSZsm04d5kyS6oe1nAHTy7H
-         W6Pg==
-X-Gm-Message-State: APjAAAWzJ5sc/QZX+763+uhGwMVZnWQEif9+omYlfGHVRgMyq7kCUTKx
-        v0T6+Nv5Dn6SvvbrMlT4/1PNFVQq
-X-Google-Smtp-Source: APXvYqwF9RDUq+Uz00PHgN3w9HPsJ3PtBQBo1GV8iNuPErkdxBPqhousBFZvW/W/wasM4i0j7qFOSw==
-X-Received: by 2002:a24:2e0a:: with SMTP id i10mr860313ita.162.1553616879920;
-        Tue, 26 Mar 2019 09:14:39 -0700 (PDT)
-Received: from [192.168.1.249] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id u197sm7563003itb.9.2019.03.26.09.14.38
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 26 Mar 2019 09:14:38 -0700 (PDT)
-Subject: Re: [PATCH v8 05/10] X.509: parse public key parameters from x509 for
- akcipher
-To:     Vitaly Chikunov <vt@altlinux.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        David Howells <dhowells@redhat.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+        Tue, 26 Mar 2019 12:15:21 -0400
+Received: from imap.altlinux.org (imap.altlinux.org [194.107.17.38])
+        by vmicros1.altlinux.org (Postfix) with ESMTP id A6D5772CCAC
+        for <linux-crypto@vger.kernel.org>; Tue, 26 Mar 2019 19:15:19 +0300 (MSK)
+Received: from altlinux.org (sole.flsd.net [185.75.180.6])
+        by imap.altlinux.org (Postfix) with ESMTPSA id 7749A4A4AE9
+        for <linux-crypto@vger.kernel.org>; Tue, 26 Mar 2019 19:15:19 +0300 (MSK)
+Date:   Tue, 26 Mar 2019 19:15:19 +0300
+From:   Vitaly Chikunov <vt@altlinux.org>
+To:     linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v8 04/10] KEYS: do not kmemdup digest in
+ {public,tpm}_key_verify_signature
+Message-ID: <20190326161519.ptp7z2xa7r6tvn56@altlinux.org>
+Mail-Followup-To: linux-crypto@vger.kernel.org
 References: <20190326125842.24110-1-vt@altlinux.org>
- <20190326125842.24110-6-vt@altlinux.org>
-From:   Denis Kenzior <denkenz@gmail.com>
-Message-ID: <e302ad90-98c7-1e82-4d49-8ad214fd6ee7@gmail.com>
-Date:   Tue, 26 Mar 2019 11:14:37 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.3.0
+ <20190326125842.24110-5-vt@altlinux.org>
 MIME-Version: 1.0
-In-Reply-To: <20190326125842.24110-6-vt@altlinux.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=koi8-r
+Content-Disposition: inline
+In-Reply-To: <20190326125842.24110-5-vt@altlinux.org>
+User-Agent: NeoMutt/20171215-106-ac61c7
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Vitaly,
-
-On 03/26/2019 07:58 AM, Vitaly Chikunov wrote:
-> Some public key algorithms (like EC-DSA) keep in parameters field
-> important data such as digest and curve OIDs (possibly more for
-> different EC-DSA variants). Thus, just setting a public key (as
-> for RSA) is not enough.
+On Tue, Mar 26, 2019 at 03:58:36PM +0300, Vitaly Chikunov wrote:
+> Treat (struct public_key_signature)'s digest same as its signature (s).
+> Since digest should be already in the kmalloc'd memory do not kmemdup
+> digest value before calling {public,tpm}_key_verify_signature.
 > 
-> Append parameters into the key stream for akcipher_set_{pub,priv}_key.
-> Appended data is: (u32) algo OID, (u32) parameters length, parameters
-> data.
+> Patch is split from the previous as suggested by Herbert Xu.
 > 
-> This does not affect current akcipher API nor RSA ciphers (they could
-> ignore it). Idea of appending parameters to the key stream is by Herbert
-> Xu.
-> 
+> Suggested-by: David Howells <dhowells@redhat.com>
 > Cc: David Howells <dhowells@redhat.com>
 > Cc: keyrings@vger.kernel.org
 > Signed-off-by: Vitaly Chikunov <vt@altlinux.org>
-> ---
->   crypto/asymmetric_keys/asym_tpm.c         | 43 ++++++++++++++++--
->   crypto/asymmetric_keys/public_key.c       | 72 ++++++++++++++++++++++++-------
->   crypto/asymmetric_keys/x509.asn1          |  2 +-
->   crypto/asymmetric_keys/x509_cert_parser.c | 31 +++++++++++++
->   crypto/testmgr.c                          | 24 +++++++++--
->   crypto/testmgr.h                          |  5 +++
->   include/crypto/akcipher.h                 | 18 ++++----
->   include/crypto/public_key.h               |  4 ++
->   8 files changed, 168 insertions(+), 31 deletions(-)
+
+For Patchwork auto-tagging, based on Message-ID: <ed78154e-2491-8e3e-3362-e45df4fda011@gmail.com>
+
+Reviewed-by: Denis Kenzior <denkenz@gmail.com>
+
+On Tue, Mar 26, 2019 at 11:00:40AM -0500, Denis Kenzior wrote:
+> Feel free to add
+> Reviewed-by: Denis Kenzior <denkenz@gmail.com>
 > 
-> diff --git a/crypto/asymmetric_keys/asym_tpm.c b/crypto/asymmetric_keys/asym_tpm.c
-> index 402fc34ca044..d95d7ec50e5a 100644
-> --- a/crypto/asymmetric_keys/asym_tpm.c
-> +++ b/crypto/asymmetric_keys/asym_tpm.c
-> @@ -395,6 +395,12 @@ static int determine_akcipher(const char *encoding, const char *hash_algo,
->   	return -ENOPKG;
->   }
->   
-> +static u8 *tpm_pack_u32(u8 *dst, u32 val)
-> +{
-> +	memcpy(dst, &val, sizeof(val));
-> +	return dst + sizeof(val);
-> +}
-> +
->   /*
->    * Query information about a key.
->    */
-> @@ -407,6 +413,7 @@ static int tpm_key_query(const struct kernel_pkey_params *params,
->   	struct crypto_akcipher *tfm;
->   	uint8_t der_pub_key[PUB_KEY_BUF_SIZE];
->   	uint32_t der_pub_key_len;
-> +	u8 *pkey, *ptr;
->   	int len;
->   
->   	/* TPM only works on private keys, public keys still done in software */
-> @@ -421,7 +428,16 @@ static int tpm_key_query(const struct kernel_pkey_params *params,
->   	der_pub_key_len = derive_pub_key(tk->pub_key, tk->pub_key_len,
->   					 der_pub_key);
->   
-> -	ret = crypto_akcipher_set_pub_key(tfm, der_pub_key, der_pub_key_len);
-> +	pkey = kmalloc(der_pub_key_len + sizeof(u32) * 2, GFP_KERNEL);
-> +	if (!pkey)
-> +		goto error_free_tfm;
-> +	memcpy(pkey, der_pub_key, der_pub_key_len);
-> +	ptr = pkey + der_pub_key_len;
-> +	/* Set dummy parameters to satisfy set_pub_key ABI. */
-> +	ptr = tpm_pack_u32(ptr, 0); /* algo */
-> +	ptr = tpm_pack_u32(ptr, 0); /* parameter length */
-> +
+> to this and patch 4.
+> 
+> Regards,
+> -Denis
 
-Why not do all of this inside derive_pub_key?  The only reason for that 
-function is to take a TPM-blob formatted public key and convert it to 
-ASN.1 format understood by crypto_akcipher_set_pub_key.  So if you're 
-changing the format, might as well update that function.
-
-> +	ret = crypto_akcipher_set_pub_key(tfm, pkey, der_pub_key_len);
->   	if (ret < 0)
->   		goto error_free_tfm;
->   
-> @@ -440,6 +456,7 @@ static int tpm_key_query(const struct kernel_pkey_params *params,
->   
->   	ret = 0;
->   error_free_tfm:
-> +	kfree(pkey);
->   	crypto_free_akcipher(tfm);
->   	pr_devel("<==%s() = %d\n", __func__, ret);
->   	return ret;
-> @@ -460,6 +477,7 @@ static int tpm_key_encrypt(struct tpm_key *tk,
->   	struct scatterlist in_sg, out_sg;
->   	uint8_t der_pub_key[PUB_KEY_BUF_SIZE];
->   	uint32_t der_pub_key_len;
-> +	u8 *pkey, *ptr;
->   	int ret;
->   
->   	pr_devel("==>%s()\n", __func__);
-> @@ -475,7 +493,15 @@ static int tpm_key_encrypt(struct tpm_key *tk,
->   	der_pub_key_len = derive_pub_key(tk->pub_key, tk->pub_key_len,
->   					 der_pub_key);
->   
-> -	ret = crypto_akcipher_set_pub_key(tfm, der_pub_key, der_pub_key_len);
-> +	pkey = kmalloc(der_pub_key_len + sizeof(u32) * 2, GFP_KERNEL);
-> +	if (!pkey)
-> +		goto error_free_tfm;
-> +	memcpy(pkey, der_pub_key, der_pub_key_len);
-> +	ptr = pkey + der_pub_key_len;
-> +	ptr = tpm_pack_u32(ptr, 0); /* algo */
-> +	ptr = tpm_pack_u32(ptr, 0); /* parameter length */
-> +
-
-Same comment as above
-
-> +	ret = crypto_akcipher_set_pub_key(tfm, pkey, der_pub_key_len);
->   	if (ret < 0)
->   		goto error_free_tfm;
->   
-> @@ -500,6 +526,7 @@ static int tpm_key_encrypt(struct tpm_key *tk,
->   
->   	akcipher_request_free(req);
->   error_free_tfm:
-> +	kfree(pkey);
->   	crypto_free_akcipher(tfm);
->   	pr_devel("<==%s() = %d\n", __func__, ret);
->   	return ret;
-> @@ -748,6 +775,7 @@ static int tpm_key_verify_signature(const struct key *key,
->   	char alg_name[CRYPTO_MAX_ALG_NAME];
->   	uint8_t der_pub_key[PUB_KEY_BUF_SIZE];
->   	uint32_t der_pub_key_len;
-> +	u8 *pkey, *ptr;
->   	int ret;
->   
->   	pr_devel("==>%s()\n", __func__);
-> @@ -770,7 +798,15 @@ static int tpm_key_verify_signature(const struct key *key,
->   	der_pub_key_len = derive_pub_key(tk->pub_key, tk->pub_key_len,
->   					 der_pub_key);
->   
-> -	ret = crypto_akcipher_set_pub_key(tfm, der_pub_key, der_pub_key_len);
-> +	pkey = kmalloc(der_pub_key_len + sizeof(u32) * 2, GFP_KERNEL);
-> +	if (!pkey)
-> +		goto error_free_tfm;
-> +	memcpy(pkey, der_pub_key, der_pub_key_len);
-> +	ptr = pkey + der_pub_key_len;
-> +	ptr = tpm_pack_u32(ptr, 0); /* algo */
-> +	ptr = tpm_pack_u32(ptr, 0); /* parameter length */
-> +
-
-And here
-
-> +	ret = crypto_akcipher_set_pub_key(tfm, pkey, der_pub_key_len);
->   	if (ret < 0)
->   		goto error_free_tfm;
->   
-> @@ -792,6 +828,7 @@ static int tpm_key_verify_signature(const struct key *key,
->   
->   	akcipher_request_free(req);
->   error_free_tfm:
-> +	kfree(pkey);
->   	crypto_free_akcipher(tfm);
->   	pr_devel("<==%s() = %d\n", __func__, ret);
->   	if (WARN_ON_ONCE(ret > 0))
-
-Regards,
--Denis
+Thanks!
