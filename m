@@ -3,84 +3,150 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7B6FC43381
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 Mar 2019 09:51:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67DF6C10F05
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 Mar 2019 12:58:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B97E420830
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 Mar 2019 09:51:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3F2E12064A
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 Mar 2019 12:58:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727956AbfCZJvo (ORCPT
+        id S1731457AbfCZM6x (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 26 Mar 2019 05:51:44 -0400
-Received: from stretch.kos.to ([51.15.203.87]:56032 "EHLO pilvi.kos.to"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725776AbfCZJvo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 26 Mar 2019 05:51:44 -0400
-X-Greylist: delayed 338 seconds by postgrey-1.27 at vger.kernel.org; Tue, 26 Mar 2019 05:51:43 EDT
-Received: from 08efd375aeba (unknown [172.17.0.1])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by pilvi.kos.to (Postfix) with ESMTPSA id B0AE62411D2;
-        Tue, 26 Mar 2019 09:46:03 +0000 (UTC)
-Received: (nullmailer pid 32707 invoked by uid 1000);
-        Tue, 26 Mar 2019 09:46:03 -0000
-Date:   Tue, 26 Mar 2019 09:46:03 +0000
-From:   Riku Voipio <riku.voipio@iki.fi>
-To:     Pascal Van Leeuwen <pvanleeuwen@insidesecure.com>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        "linux-fscrypt@vger.kernel.org" <linux-fscrypt@vger.kernel.org>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 0/17] Add zinc using existing algorithm implementations
-Message-ID: <20190326094603.nyfi2dsnt6a6u57f@08efd375aeba>
-References: <20190322062740.nrwfx2rvmt7lzotj@gondor.apana.org.au>
- <CAKv+Gu_mgyzqUCeb+wke--8Gn8YbjOb8jyrSgFr3-tcNP8ccEQ@mail.gmail.com>
- <CAHk-=wg2LJ5qQ0B2y+_6Ue62SBP4h9MLxLvn89bfcP7Cp2ac6A@mail.gmail.com>
- <AM5PR0901MB1155FD05113D6DC79A6274CED25E0@AM5PR0901MB1155.eurprd09.prod.outlook.com>
+        Tue, 26 Mar 2019 08:58:53 -0400
+Received: from vmicros1.altlinux.org ([194.107.17.57]:44348 "EHLO
+        vmicros1.altlinux.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726258AbfCZM6v (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 26 Mar 2019 08:58:51 -0400
+Received: from imap.altlinux.org (imap.altlinux.org [194.107.17.38])
+        by vmicros1.altlinux.org (Postfix) with ESMTP id 8BD3072CCAC;
+        Tue, 26 Mar 2019 15:58:48 +0300 (MSK)
+Received: from beacon.altlinux.org (unknown [185.6.174.98])
+        by imap.altlinux.org (Postfix) with ESMTPSA id 3EFA64A4AF1;
+        Tue, 26 Mar 2019 15:58:47 +0300 (MSK)
+From:   Vitaly Chikunov <vt@altlinux.org>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        David Howells <dhowells@redhat.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v8 00/10] crypto: add EC-RDSA (GOST 34.10) algorithm
+Date:   Tue, 26 Mar 2019 15:58:32 +0300
+Message-Id: <20190326125842.24110-1-vt@altlinux.org>
+X-Mailer: git-send-email 2.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <AM5PR0901MB1155FD05113D6DC79A6274CED25E0@AM5PR0901MB1155.eurprd09.prod.outlook.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Mar 25, 2019 at 09:10:08AM +0000, Pascal Van Leeuwen wrote:
-> As someone who has been working on crypto acceleration hardware for the better
-> part of the past 20 years, I feel compelled to respond to this, in defence of
-> the crypto API (which we're really happy with ...).
+This patchset changes akcipher API to support ECDSA style signature
+verification, augments x509 parser to make it work with EC-RDSA certificates,
+and, finally, implements EC-RDSA (GOST 34.10) signature verification and its
+integration with IMA.
 
-Thanks for joining in.
+Special request to Mimi Zohar and David Howells to Ack relevant commits, please.
 
-> We have done plenty of measurements, on both power and performance, to prove
-> you wrong there. Typically our HW needs *at least* a full order of a magnitude
-> less power to do the actual work. The CPU load for handing the interrupts etc.
-> tends to be around 20%. So assuming the CPU goes to sleep for the other 80%
-> of the time,  the combined solution would need about 1/3rd of the power of a
-> CPU only solution. It's one of our biggest selling points.
+---
+This patchset should be applied over cryptodev tree commit 4e5180eb3d4f
 
-I actually have the kind of (relatively) low-power system with your crypto
-accelerator IP. But it doesn't matter how great performance or energy saving
-I would get from using crypto offloading. I will continue to use CPU only
-solution for the foreseeable future.
+Changes since v7:
+- Do not check callback validity in akcipher requests, instead define default
+  callbacks on register, suggested by Herbert Xu.
+- Sanity checks in crypto_akcipher_maxsize are removed (not needed).
+- Sanity checks for `dst' and `dst_len' are removed from verify op (not
+  needed in akcipher API and should be checked by a driver).
+- Patch "KEYS: report to keyctl only actually supported key ops" is removed,
+  as it would affect user-space API.
 
-Because of one tiny problem:
+Changes since (v5-v6):
+- set_params API is removed in favor of appending parameters into a key stream,
+  as requested by Herbert Xu.
+- verify op signature de-kmemdup'ed (as requested by David Howells) in separate
+  patch (as requested by Herbert Xu).
+- Add forgotten ASN.1 parser files to EC-RDSA patch.
+- Tested on x86_64.
 
-The firmware files for eip197(?) crypto accelerator are secrets we are not
-allowed download anywhere from.
+Changes since v5:
+- Comparison of hash algo by enum id instead of text name, as suggested by
+  Thiago Jung Bauermann and Mimi Zohar.
 
-> Pascal van Leeuwen,
-> Silicon IP Architect @ Inside Secure
+Changes since RFC (v1-v4):
+- akcipher set_max_size, encrypt, decrypt, sign, verify callbacks may be
+  undefined by the drivers, so their crypto_akcipher_* frontends check for
+  their presence before passing the call.
+- supported_ops flags are set for keyctl, based on the presence of implemented
+  akcipher callbacks.
+- Transition to verify2 API is abandoned because raw RSA does not need
+  sign/verify ops at all, and we can switch to the new verify in one step.
+  For this RSA backends have sign/verify ops removed as they should only
+  be used (and actually used only) via PKCS1 driver.
+- Verify callback requires digest as the input parameter in src SGL, as
+  suggested by Herbert Xu, (instead of a separate parameter, as it was in
+  verify2).
+- For verify op signature is moved into kmalloc'd memory as suggested by
+  Herbert Xu.
+- set_params API should be called before set_{pub,priv}_key, thus set_*_key
+  knows everything it needs to set they key properly. Also, set_params made
+  optional for back compatibility with RSA drivers.
+- Public-key cryptography section is created in Kconfig.
+- ecc.c is made into separate module object, to be used together by ECDH and
+  EC-RDSA.
+- EC-RDSA parameters and public key are parsed using asn1_ber_decoder as
+  suggested by Stephan Mueller and David Howells.
+- Test vectors are added and tests are passing.
+- Curves/parameters definitions are split from ecrdsa.c into ecrdsa_defs.h.
+- Integration with IMA in asymmetric_verify(). Userspace ima-evm-utils already
+  have a patch in the queue to support this. Tested on x86_64.
 
-Riku
+Vitaly Chikunov (10):
+  crypto: akcipher - default implementations for request callbacks
+  crypto: rsa - unimplement sign/verify for raw RSA backends
+  crypto: akcipher - new verify API for public key algorithms
+  KEYS: do not kmemdup digest in {public,tpm}_key_verify_signature
+  X.509: parse public key parameters from x509 for akcipher
+  crypto: Kconfig - create Public-key cryptography section
+  crypto: ecc - make ecc into separate module
+  crypto: ecrdsa - add EC-RDSA (GOST 34.10) algorithm
+  crypto: ecrdsa - add EC-RDSA test vectors to testmgr
+  integrity: support EC-RDSA signatures for asymmetric_verify
+
+ crypto/Kconfig                                |  63 ++--
+ crypto/Makefile                               |  10 +-
+ crypto/akcipher.c                             |  14 +
+ crypto/asymmetric_keys/asym_tpm.c             |  77 +++--
+ crypto/asymmetric_keys/public_key.c           | 105 ++++---
+ crypto/asymmetric_keys/x509.asn1              |   2 +-
+ crypto/asymmetric_keys/x509_cert_parser.c     |  57 +++-
+ crypto/ecc.c                                  | 417 +++++++++++++++++++++++++-
+ crypto/ecc.h                                  | 153 +++++++++-
+ crypto/ecc_curve_defs.h                       |  15 -
+ crypto/ecrdsa.c                               | 296 ++++++++++++++++++
+ crypto/ecrdsa_defs.h                          | 225 ++++++++++++++
+ crypto/ecrdsa_params.asn1                     |   4 +
+ crypto/ecrdsa_pub_key.asn1                    |   1 +
+ crypto/rsa-pkcs1pad.c                         |  33 +-
+ crypto/rsa.c                                  | 109 -------
+ crypto/testmgr.c                              |  80 +++--
+ crypto/testmgr.h                              | 159 ++++++++++
+ drivers/crypto/caam/caampkc.c                 |   2 -
+ drivers/crypto/ccp/ccp-crypto-rsa.c           |   2 -
+ drivers/crypto/qat/qat_common/qat_asym_algs.c |   2 -
+ include/crypto/akcipher.h                     |  54 ++--
+ include/crypto/public_key.h                   |   4 +
+ include/linux/oid_registry.h                  |  18 ++
+ security/integrity/digsig_asymmetric.c        |  11 +-
+ 25 files changed, 1606 insertions(+), 307 deletions(-)
+ create mode 100644 crypto/ecrdsa.c
+ create mode 100644 crypto/ecrdsa_defs.h
+ create mode 100644 crypto/ecrdsa_params.asn1
+ create mode 100644 crypto/ecrdsa_pub_key.asn1
+
+-- 
+2.11.0
+
