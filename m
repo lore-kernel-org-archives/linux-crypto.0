@@ -2,155 +2,110 @@ Return-Path: <SRS0=PdDN=R6=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_NEOMUTT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 145D6C43381
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 Mar 2019 19:36:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 427B9C10F00
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 Mar 2019 20:14:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D11C920700
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 Mar 2019 19:36:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1F02B2087C
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 Mar 2019 20:14:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727885AbfC0TgQ (ORCPT
+        id S1727451AbfC0UOr (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 27 Mar 2019 15:36:16 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36450 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728203AbfC0TgP (ORCPT
+        Wed, 27 Mar 2019 16:14:47 -0400
+Received: from vmicros1.altlinux.org ([194.107.17.57]:44754 "EHLO
+        vmicros1.altlinux.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727089AbfC0UOr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 27 Mar 2019 15:36:15 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x2RJZDJf138002
-        for <linux-crypto@vger.kernel.org>; Wed, 27 Mar 2019 15:36:14 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2rgc3egjt7-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <linux-crypto@vger.kernel.org>; Wed, 27 Mar 2019 15:36:13 -0400
-Received: from localhost
-        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-crypto@vger.kernel.org> from <zohar@linux.ibm.com>;
-        Wed, 27 Mar 2019 19:36:10 -0000
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
-        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 27 Mar 2019 19:36:06 -0000
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x2RJa5ND34537692
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 27 Mar 2019 19:36:05 GMT
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 79DECA4062;
-        Wed, 27 Mar 2019 19:36:05 +0000 (GMT)
-Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7D8ADA405C;
-        Wed, 27 Mar 2019 19:36:04 +0000 (GMT)
-Received: from dhcp-9-31-103-153.watson.ibm.com (unknown [9.31.103.153])
-        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 27 Mar 2019 19:36:04 +0000 (GMT)
-Subject: Re: [PATCH] X.509: Add messages for obsolete OIDs
-From:   Mimi Zohar <zohar@linux.ibm.com>
-To:     "Lee, Chun-Yi" <joeyli.kernel@gmail.com>,
+        Wed, 27 Mar 2019 16:14:47 -0400
+Received: from imap.altlinux.org (imap.altlinux.org [194.107.17.38])
+        by vmicros1.altlinux.org (Postfix) with ESMTP id 5470572CC64;
+        Wed, 27 Mar 2019 23:14:43 +0300 (MSK)
+Received: from altlinux.org (sole.flsd.net [185.75.180.6])
+        by imap.altlinux.org (Postfix) with ESMTPSA id 1B15B4A4AE9;
+        Wed, 27 Mar 2019 23:14:43 +0300 (MSK)
+Date:   Wed, 27 Mar 2019 23:14:41 +0300
+From:   Vitaly Chikunov <vt@altlinux.org>
+To:     Mimi Zohar <zohar@linux.ibm.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
         David Howells <dhowells@redhat.com>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v8 10/10] integrity: support EC-RDSA signatures for
+ asymmetric_verify
+Message-ID: <20190327201441.ikw76qzpgzm6t35b@altlinux.org>
+Mail-Followup-To: Mimi Zohar <zohar@linux.ibm.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>
-Cc:     keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, "Lee, Chun-Yi" <jlee@suse.com>
-Date:   Wed, 27 Mar 2019 15:36:04 -0400
-In-Reply-To: <20190322062738.19852-1-jlee@suse.com>
-References: <20190322062738.19852-1-jlee@suse.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.20.5 (3.20.5-1.fc24) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19032719-0008-0000-0000-000002D24959
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19032719-0009-0000-0000-0000223E7BBC
-Message-Id: <1553715364.4608.36.camel@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-03-27_12:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1903270138
+        David Howells <dhowells@redhat.com>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20190326125842.24110-1-vt@altlinux.org>
+ <20190326125842.24110-11-vt@altlinux.org>
+ <1553710220.4608.9.camel@linux.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=koi8-r
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1553710220.4608.9.camel@linux.ibm.com>
+User-Agent: NeoMutt/20171215-106-ac61c7
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 2019-03-22 at 14:27 +0800, Lee, Chun-Yi wrote:
-> We found that the db in Acer machine has self signed certificates
-> (CN=DisablePW or CN=ABO) that they used obsolete OID 1.3.14.3.2.29
-> sha1WithRSASignature and 2.5.29.1 subjectKeyIdentifier. Kernel
-> emits -65 error code when loading those certificates to platform
-> keyring:
+On Wed, Mar 27, 2019 at 02:10:20PM -0400, Mimi Zohar wrote:
+> On Tue, 2019-03-26 at 15:58 +0300, Vitaly Chikunov wrote:
+> > Allow to use EC-RDSA signatures for IMA by determining signature type by
+> > the hash algorithm name. This works good for EC-RDSA since Streebog and
+> > EC-RDSA should always be used together.
+> > 
+> > Cc: Mimi Zohar <zohar@linux.ibm.com>
+> > Cc: Dmitry Kasatkin <dmitry.kasatkin@gmail.com>
+> > Cc: linux-integrity@vger.kernel.org
+> > Signed-off-by: Vitaly Chikunov <vt@altlinux.org>
+> > ---
+> >  security/integrity/digsig_asymmetric.c | 11 +++++++++--
+> >  1 file changed, 9 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/security/integrity/digsig_asymmetric.c b/security/integrity/digsig_asymmetric.c
+> > index d775e03fbbcc..99080871eb9f 100644
+> > --- a/security/integrity/digsig_asymmetric.c
+> > +++ b/security/integrity/digsig_asymmetric.c
+> > @@ -104,9 +104,16 @@ int asymmetric_verify(struct key *keyring, const char *sig,
+> >  
+> >  	memset(&pks, 0, sizeof(pks));
+> >  
+> > -	pks.pkey_algo = "rsa";
+> >  	pks.hash_algo = hash_algo_name[hdr->hash_algo];
+> > -	pks.encoding = "pkcs1";
+> > +	if (hdr->hash_algo == HASH_ALGO_STREEBOG_256 ||
+> > +	    hdr->hash_algo == HASH_ALGO_STREEBOG_512) {
+> > +		/* EC-RDSA and Streebog should go together. */
+> > +		pks.pkey_algo = "ecrdsa";
+> > +		pks.encoding = "raw";
 > 
-> [    1.484388] integrity: Loading X.509 certificate: UEFI:MokListRT
-> [    1.485557] integrity: Problem loading X.509 certificate -65
-> [    1.486100] Error adding keys to platform keyring UEFI:MokListRT
-> 
-> Because the -65 error code is not enough for appeasing user when
-> loading a outdated certificate. This patch add messages against
-> 1.3.14.3.2.29 and 2.5.29.1 OIDs.
-> 
-> Link: https://bugzilla.opensuse.org/show_bug.cgi?id=1129471
-> Cc: David Howells <dhowells@redhat.com> 
-> Cc: Herbert Xu <herbert@gondor.apana.org.au> 
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Signed-off-by: "Lee, Chun-Yi" <jlee@suse.com>
+> IMA signatures are stored as xattrs, making them persistent. šSupport
+> for streebog was upstreamed in linux-5.0. šThis change would break
+> existing systems using streebog. šAs long as this is not yet a concern
 
-Reviewed-by: Mimi Zohar <zohar@linux.ibm.com>
+In what sense it would break systems?
 
-> ---
->  crypto/asymmetric_keys/x509_cert_parser.c | 7 +++++++
->  include/linux/oid_registry.h              | 2 ++
->  2 files changed, 9 insertions(+)
-> 
-> diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetric_keys/x509_cert_parser.c
-> index 991f4d735a4e..bbd22d5c5b5d 100644
-> --- a/crypto/asymmetric_keys/x509_cert_parser.c
-> +++ b/crypto/asymmetric_keys/x509_cert_parser.c
-> @@ -192,6 +192,8 @@ int x509_note_pkey_algo(void *context, size_t hdrlen,
->  	pr_debug("PubKey Algo: %u\n", ctx->last_oid);
-> 
->  	switch (ctx->last_oid) {
-> +	case OID_sha1WithRSASignature:
-> +		pr_info("1.3.14.3.2.29 sha1WithRSASignature is obsolete.\n");
->  	case OID_md2WithRSAEncryption:
->  	case OID_md3WithRSAEncryption:
->  	default:
-> @@ -464,6 +466,11 @@ int x509_process_extension(void *context, size_t hdrlen,
->  		return 0;
->  	}
-> 
-> +	if (ctx->last_oid == OID_subjectKeyIdentifier_obsolete) {
-> +		pr_info("2.5.29.1 subjectKeyIdentifier OID is obsolete.\n");
-> +		return -ENOPKG;
-> +	}
-> +
->  	return 0;
->  }
-> 
-> diff --git a/include/linux/oid_registry.h b/include/linux/oid_registry.h
-> index d2fa9ca42e9a..0641d5aa2251 100644
-> --- a/include/linux/oid_registry.h
-> +++ b/include/linux/oid_registry.h
-> @@ -62,6 +62,7 @@ enum OID {
-> 
->  	OID_certAuthInfoAccess,		/* 1.3.6.1.5.5.7.1.1 */
->  	OID_sha1,			/* 1.3.14.3.2.26 */
-> +	OID_sha1WithRSASignature,	/* 1.3.14.3.2.29 */
->  	OID_sha256,			/* 2.16.840.1.101.3.4.2.1 */
->  	OID_sha384,			/* 2.16.840.1.101.3.4.2.2 */
->  	OID_sha512,			/* 2.16.840.1.101.3.4.2.3 */
-> @@ -83,6 +84,7 @@ enum OID {
->  	OID_generationalQualifier,	/* 2.5.4.44 */
-> 
->  	/* Certificate extension IDs */
-> +	OID_subjectKeyIdentifier_obsolete,	/* 2.5.29.1 */
->  	OID_subjectKeyIdentifier,	/* 2.5.29.14 */
->  	OID_keyUsage,			/* 2.5.29.15 */
->  	OID_subjectAltName,		/* 2.5.29.17 */
+Unless kernel crashes or signature is recognized as valid, I think, it should
+not be called a break.
 
+> Reviewed-by: šMimi Zohar <zohar@linux.ibm.com>
+
+Thanks!
+
+> 
+> > +	} else {
+> > +		pks.pkey_algo = "rsa";
+> > +		pks.encoding = "pkcs1";
+> > +	}
+> >  	pks.digest = (u8 *)data;
+> >  	pks.digest_size = datalen;
+> >  	pks.s = hdr->sig;
