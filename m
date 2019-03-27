@@ -4,52 +4,51 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83EC5C43381
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 Mar 2019 18:52:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5C41C10F00
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 Mar 2019 18:58:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 48D882075C
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 Mar 2019 18:52:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9886E2075C
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 Mar 2019 18:58:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1553712775;
-	bh=kvkCwcHxhjJCvdDnaatwvmnKYzQOI7wCcLz8mpqrU+M=;
+	s=default; t=1553713122;
+	bh=C+m6dDbr8RtFbwiDPqHtgWLlpOXUXxJZlReMOk2cRm0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=MH3uoPVSxnZwLGzK64NgBQgmzFbXPEHUgEemxCPXGb2TT2YAnYDASxBtRPKHeW5DG
-	 gmNII4UmXIuYsofyD0E/VOggP0Dx4HvdCKwGvxlAghj1cDPCcd8Y4ayxuSLWXOQlbj
-	 4QA3e5xVDd2VCPr2CZgYEilsA3YirUXmtzAFgog0=
+	b=ZXiiB+ktdLhxS6US/FsPD0kcmTKMj3ngA/ejed6XifYqRYDKiEW6Jb1YhoQcG48sN
+	 kK6wX2ITt9Esdw0kHYnJMVKT/vNnVynSkZmx6ZOXQCDo2iOoJZSoFa/K972xbPFM0v
+	 t6EV8zmW4bpdi25Wz7cRpXIxEGqLK0WIDfQ2BE3s=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390331AbfC0SRi (ORCPT
+        id S2389829AbfC0SPi (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 27 Mar 2019 14:17:38 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33998 "EHLO mail.kernel.org"
+        Wed, 27 Mar 2019 14:15:38 -0400
+Received: from mail.kernel.org ([198.145.29.99]:59144 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388074AbfC0SRe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 27 Mar 2019 14:17:34 -0400
+        id S2389594AbfC0SPc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 27 Mar 2019 14:15:32 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id A50A420449;
-        Wed, 27 Mar 2019 18:17:32 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id B393D217D9;
+        Wed, 27 Mar 2019 18:15:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1553710653;
-        bh=kvkCwcHxhjJCvdDnaatwvmnKYzQOI7wCcLz8mpqrU+M=;
+        s=default; t=1553710531;
+        bh=C+m6dDbr8RtFbwiDPqHtgWLlpOXUXxJZlReMOk2cRm0=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=OsOU4GczQaVCbBSDcHBAAQY9npV0AMUQ8Uom1NPXX79h1+NfePEjK8/DochSKBect
-         hqhXvf+oGA97vwEHvBbrdIokRFlG7JORKOe4yjkjc9pgHZ7FgAfu6kApkmvKpw9dyq
-         be+9CGHQuZbpsXMsi529Xuzre4FQAkufbHdPeAsQ=
+        b=iWtigCfv6/YVW3U4eGRyMecWWk1ui9jONaa2qq886rAoidp0LXpAd2c56hQtkt5Ry
+         vlnF+c35CppA8V2WG4NZUHWhII2t53fbN5Hqd7MdyBlx2/7/FF81Dqh58n2KmRvrYl
+         oD2eQfcztkpM7XGUvnutnv6NjS02MRQ1O0oF4+eY=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Julia Lawall <Julia.Lawall@lip6.fr>,
+Cc:     David Tolnay <dtolnay@gmail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 034/123] crypto: crypto4xx - add missing of_node_put after of_device_is_available
-Date:   Wed, 27 Mar 2019 14:14:58 -0400
-Message-Id: <20190327181628.15899-34-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 160/192] hwrng: virtio - Avoid repeated init of completion
+Date:   Wed, 27 Mar 2019 14:09:52 -0400
+Message-Id: <20190327181025.13507-160-sashal@kernel.org>
 X-Mailer: git-send-email 2.19.1
-In-Reply-To: <20190327181628.15899-1-sashal@kernel.org>
-References: <20190327181628.15899-1-sashal@kernel.org>
+In-Reply-To: <20190327181025.13507-1-sashal@kernel.org>
+References: <20190327181025.13507-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
@@ -58,62 +57,57 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Julia Lawall <Julia.Lawall@lip6.fr>
+From: David Tolnay <dtolnay@gmail.com>
 
-[ Upstream commit 8c2b43d2d85b48a97d2f8279278a4aac5b45f925 ]
+[ Upstream commit aef027db48da56b6f25d0e54c07c8401ada6ce21 ]
 
-Add an of_node_put when a tested device node is not available.
+The virtio-rng driver uses a completion called have_data to wait for a
+virtio read to be fulfilled by the hypervisor. The completion is reset
+before placing a buffer on the virtio queue and completed by the virtio
+callback once data has been written into the buffer.
 
-The semantic patch that fixes this problem is as follows
-(http://coccinelle.lip6.fr):
+Prior to this commit, the driver called init_completion on this
+completion both during probe as well as when registering virtio buffers
+as part of a hwrng read operation. The second of these init_completion
+calls should instead be reinit_completion because the have_data
+completion has already been inited by probe. As described in
+Documentation/scheduler/completion.txt, "Calling init_completion() twice
+on the same completion object is most likely a bug".
 
-// <smpl>
-@@
-identifier f;
-local idexpression e;
-expression x;
-@@
+This bug was present in the initial implementation of virtio-rng in
+f7f510ec1957 ("virtio: An entropy device, as suggested by hpa"). Back
+then the have_data completion was a single static completion rather than
+a member of one of potentially multiple virtrng_info structs as
+implemented later by 08e53fbdb85c ("virtio-rng: support multiple
+virtio-rng devices"). The original driver incorrectly used
+init_completion rather than INIT_COMPLETION to reset have_data during
+read.
 
-e = f(...);
-... when != of_node_put(e)
-    when != x = e
-    when != e = x
-    when any
-if (<+...of_device_is_available(e)...+>) {
-  ... when != of_node_put(e)
-(
-  return e;
-|
-+ of_node_put(e);
-  return ...;
-)
-}
-// </smpl>
+Tested by running `head -c48 /dev/random | hexdump` within crosvm, the
+Chrome OS virtual machine monitor, and confirming that the virtio-rng
+driver successfully produces random bytes from the host.
 
-Fixes: 5343e674f32fb ("crypto4xx: integrate ppc4xx-rng into crypto4xx")
-Signed-off-by: Julia Lawall <Julia.Lawall@lip6.fr>
+Signed-off-by: David Tolnay <dtolnay@gmail.com>
+Tested-by: David Tolnay <dtolnay@gmail.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/amcc/crypto4xx_trng.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ drivers/char/hw_random/virtio-rng.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/amcc/crypto4xx_trng.c b/drivers/crypto/amcc/crypto4xx_trng.c
-index 677ca17fd223..368c5599515e 100644
---- a/drivers/crypto/amcc/crypto4xx_trng.c
-+++ b/drivers/crypto/amcc/crypto4xx_trng.c
-@@ -80,8 +80,10 @@ void ppc4xx_trng_probe(struct crypto4xx_core_device *core_dev)
+diff --git a/drivers/char/hw_random/virtio-rng.c b/drivers/char/hw_random/virtio-rng.c
+index b89df66ea1ae..7abd604e938c 100644
+--- a/drivers/char/hw_random/virtio-rng.c
++++ b/drivers/char/hw_random/virtio-rng.c
+@@ -73,7 +73,7 @@ static int virtio_read(struct hwrng *rng, void *buf, size_t size, bool wait)
  
- 	/* Find the TRNG device node and map it */
- 	trng = of_find_matching_node(NULL, ppc4xx_trng_match);
--	if (!trng || !of_device_is_available(trng))
-+	if (!trng || !of_device_is_available(trng)) {
-+		of_node_put(trng);
- 		return;
-+	}
+ 	if (!vi->busy) {
+ 		vi->busy = true;
+-		init_completion(&vi->have_data);
++		reinit_completion(&vi->have_data);
+ 		register_buffer(vi, buf, size);
+ 	}
  
- 	dev->trng_base = of_iomap(trng, 0);
- 	of_node_put(trng);
 -- 
 2.19.1
 
