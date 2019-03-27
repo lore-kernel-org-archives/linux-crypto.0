@@ -4,50 +4,49 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36CA7C10F00
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 Mar 2019 19:29:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C11FC10F00
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 Mar 2019 19:29:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 05C8A21734
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 Mar 2019 19:29:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 443A621734
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 Mar 2019 19:29:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1553714949;
-	bh=nY+eHoxEhyDZlB54lIOyeUi9JPcqzwmLIWIwepUcsRk=;
+	s=default; t=1553714951;
+	bh=1DoeZeAmhz5vnmPgc0iStjhMBU9n/Iennb9MIbXakDg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=xvHmInKwZ56mC/qOsMxfc89jfov62OZ09irc+w2VPBNltHVU0trMPSEeDougQpQTs
-	 ljBP5pYrQ6cOCOLIMnMEzCE1nG+jFxWa0XOwvdnUsYdA8w/BLUddB0FOhHzWUlWy1/
-	 YZRpyDIviRXT3OcYEKpBNCW4aMsSQlO4z5wAEg/8=
+	b=vOIGq/M4BL3SW7Mi8f7s6ZZADCI7AwvHi4c87F1SQJ+gypa+5YxaBSsJrDRT9NsWs
+	 CIo3d0MCzpPgmdXIcQxhbeJCXlF5iSAqFDnxMlVUUrttNrUaNB7WeLX+J7X3jU24Eq
+	 SJQqd9TvedcYd9N5ZbMiTFxzjXX6MpooF9D80PYU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733089AbfC0SEB (ORCPT
+        id S1730381AbfC0SEA (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 27 Mar 2019 14:04:01 -0400
-Received: from mail.kernel.org ([198.145.29.99]:44502 "EHLO mail.kernel.org"
+        Wed, 27 Mar 2019 14:04:00 -0400
+Received: from mail.kernel.org ([198.145.29.99]:44416 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1733068AbfC0SEB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 27 Mar 2019 14:04:01 -0400
+        id S1730385AbfC0SD6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 27 Mar 2019 14:03:58 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id AC9E92063F;
-        Wed, 27 Mar 2019 18:03:59 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 488EA2075C;
+        Wed, 27 Mar 2019 18:03:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1553709840;
-        bh=nY+eHoxEhyDZlB54lIOyeUi9JPcqzwmLIWIwepUcsRk=;
+        s=default; t=1553709838;
+        bh=1DoeZeAmhz5vnmPgc0iStjhMBU9n/Iennb9MIbXakDg=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=UAFLSKrCUh1HWMuBlcO5/OrJ+qOEqYBQ6BeWJ9bcfnTJpEYZm5bgxQE6mCaE01OGT
-         GEHacJtXnF5YykZ6lOrab3zsoOpjAYECtvZFOiesLS7F9WtLwzXlCwcQAfylM++3z3
-         ztRoqx26qkTDtukFNzU655nArdU2AVGdmUmzrVto=
+        b=z5+2twr5Pf05DyBdQzH4iiEJaalQAJHWBbGpnyvWlx3qjrUqckBlZ/K936PA9T0K3
+         pLeTKSEk1FGBirSO9liU7YoKwmaMoVcHazJ857qWHIf8cnGiB8WvW/jwIBnrmNd6ut
+         hoChlp9z7T+vfFCpvkm/shhYxvGugWMlafO5Sv4g=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Eric Biggers <ebiggers@google.com>,
-        Mahipal Challa <mahipalreddy2006@gmail.com>,
-        Jan Glauber <jglauber@cavium.com>,
+Cc:     Julia Lawall <Julia.Lawall@lip6.fr>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.0 068/262] crypto: cavium/zip - fix collision with generic cra_driver_name
-Date:   Wed, 27 Mar 2019 13:58:43 -0400
-Message-Id: <20190327180158.10245-68-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.0 067/262] crypto: crypto4xx - add missing of_node_put after of_device_is_available
+Date:   Wed, 27 Mar 2019 13:58:42 -0400
+Message-Id: <20190327180158.10245-67-sashal@kernel.org>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20190327180158.10245-1-sashal@kernel.org>
 References: <20190327180158.10245-1-sashal@kernel.org>
@@ -59,68 +58,62 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+From: Julia Lawall <Julia.Lawall@lip6.fr>
 
-[ Upstream commit 41798036430015ad45137db2d4c213cd77fd0251 ]
+[ Upstream commit 8c2b43d2d85b48a97d2f8279278a4aac5b45f925 ]
 
-The cavium/zip implementation of the deflate compression algorithm is
-incorrectly being registered under the generic driver name, which
-prevents the generic implementation from being registered with the
-crypto API when CONFIG_CRYPTO_DEV_CAVIUM_ZIP=y.  Similarly the lzs
-algorithm (which does not currently have a generic implementation...)
-is incorrectly being registered as lzs-generic.
+Add an of_node_put when a tested device node is not available.
 
-Fix the naming collision by adding a suffix "-cavium" to the
-cra_driver_name of the cavium/zip algorithms.
+The semantic patch that fixes this problem is as follows
+(http://coccinelle.lip6.fr):
 
-Fixes: 640035a2dc55 ("crypto: zip - Add ThunderX ZIP driver core")
-Cc: Mahipal Challa <mahipalreddy2006@gmail.com>
-Cc: Jan Glauber <jglauber@cavium.com>
-Signed-off-by: Eric Biggers <ebiggers@google.com>
+// <smpl>
+@@
+identifier f;
+local idexpression e;
+expression x;
+@@
+
+e = f(...);
+... when != of_node_put(e)
+    when != x = e
+    when != e = x
+    when any
+if (<+...of_device_is_available(e)...+>) {
+  ... when != of_node_put(e)
+(
+  return e;
+|
++ of_node_put(e);
+  return ...;
+)
+}
+// </smpl>
+
+Fixes: 5343e674f32fb ("crypto4xx: integrate ppc4xx-rng into crypto4xx")
+Signed-off-by: Julia Lawall <Julia.Lawall@lip6.fr>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/cavium/zip/zip_main.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ drivers/crypto/amcc/crypto4xx_trng.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/cavium/zip/zip_main.c b/drivers/crypto/cavium/zip/zip_main.c
-index be055b9547f6..6183f9128a8a 100644
---- a/drivers/crypto/cavium/zip/zip_main.c
-+++ b/drivers/crypto/cavium/zip/zip_main.c
-@@ -351,6 +351,7 @@ static struct pci_driver zip_driver = {
+diff --git a/drivers/crypto/amcc/crypto4xx_trng.c b/drivers/crypto/amcc/crypto4xx_trng.c
+index 5e63742b0d22..53ab1f140a26 100644
+--- a/drivers/crypto/amcc/crypto4xx_trng.c
++++ b/drivers/crypto/amcc/crypto4xx_trng.c
+@@ -80,8 +80,10 @@ void ppc4xx_trng_probe(struct crypto4xx_core_device *core_dev)
  
- static struct crypto_alg zip_comp_deflate = {
- 	.cra_name		= "deflate",
-+	.cra_driver_name	= "deflate-cavium",
- 	.cra_flags		= CRYPTO_ALG_TYPE_COMPRESS,
- 	.cra_ctxsize		= sizeof(struct zip_kernel_ctx),
- 	.cra_priority           = 300,
-@@ -365,6 +366,7 @@ static struct crypto_alg zip_comp_deflate = {
+ 	/* Find the TRNG device node and map it */
+ 	trng = of_find_matching_node(NULL, ppc4xx_trng_match);
+-	if (!trng || !of_device_is_available(trng))
++	if (!trng || !of_device_is_available(trng)) {
++		of_node_put(trng);
+ 		return;
++	}
  
- static struct crypto_alg zip_comp_lzs = {
- 	.cra_name		= "lzs",
-+	.cra_driver_name	= "lzs-cavium",
- 	.cra_flags		= CRYPTO_ALG_TYPE_COMPRESS,
- 	.cra_ctxsize		= sizeof(struct zip_kernel_ctx),
- 	.cra_priority           = 300,
-@@ -384,7 +386,7 @@ static struct scomp_alg zip_scomp_deflate = {
- 	.decompress		= zip_scomp_decompress,
- 	.base			= {
- 		.cra_name		= "deflate",
--		.cra_driver_name	= "deflate-scomp",
-+		.cra_driver_name	= "deflate-scomp-cavium",
- 		.cra_module		= THIS_MODULE,
- 		.cra_priority           = 300,
- 	}
-@@ -397,7 +399,7 @@ static struct scomp_alg zip_scomp_lzs = {
- 	.decompress		= zip_scomp_decompress,
- 	.base			= {
- 		.cra_name		= "lzs",
--		.cra_driver_name	= "lzs-scomp",
-+		.cra_driver_name	= "lzs-scomp-cavium",
- 		.cra_module		= THIS_MODULE,
- 		.cra_priority           = 300,
- 	}
+ 	dev->trng_base = of_iomap(trng, 0);
+ 	of_node_put(trng);
 -- 
 2.19.1
 
