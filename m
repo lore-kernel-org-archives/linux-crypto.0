@@ -7,46 +7,46 @@ X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2911EC43381
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0223C4360F
 	for <linux-crypto@archiver.kernel.org>; Sat, 30 Mar 2019 01:39:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EB389217F5
-	for <linux-crypto@archiver.kernel.org>; Sat, 30 Mar 2019 01:39:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B33AA2184C
+	for <linux-crypto@archiver.kernel.org>; Sat, 30 Mar 2019 01:39:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=default; t=1553909946;
-	bh=CrnHpAHWMsIKEIV0V4z+LoVRE7CGIO/twZsBgN/VmP4=;
+	bh=a8CQwWBNAjrS4TGdu/OOSPN3ezFGsYexYg1Gq0r3XSw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=ueW9mH7Lx+c2GmYO4Gq/MkGFcljNPqymU0KordUTjv/In/TZc7pNwKcsFKvOLmddB
-	 2YUyH3ATy7mKZX6YaSU5cpRRi7Ka8hsslWxaWQKAeKeS9qFLc9Q8L3DY446HnaL3Ys
-	 UfiUCu1cdPeDlnoKystzBK6Y4c8YKqgfcbKNN+qo=
+	b=JB8V4VCIDfZqDpAr2kf/f0jKFKncPS8BfxtDG6wRvNLHLtE506D4tdKK5ROu9uN1v
+	 nTZRDnaRjj37tOwDFz0dcmDS4ECHttpB40SIwF0GHxxFJNzltEGK3U89rqXY4SSJvD
+	 Tb/bS8xE1MrPLgD15OsgZYsoAnri0n5MLr/V+xkg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730863AbfC3Bi5 (ORCPT
+        id S1730574AbfC3BaJ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 29 Mar 2019 21:38:57 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37226 "EHLO mail.kernel.org"
+        Fri, 29 Mar 2019 21:30:09 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37180 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730621AbfC3BaK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 29 Mar 2019 21:30:10 -0400
+        id S1731327AbfC3BaI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 29 Mar 2019 21:30:08 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 1A826217F5;
-        Sat, 30 Mar 2019 01:30:08 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id EFA3621773;
+        Sat, 30 Mar 2019 01:30:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1553909408;
-        bh=CrnHpAHWMsIKEIV0V4z+LoVRE7CGIO/twZsBgN/VmP4=;
+        s=default; t=1553909407;
+        bh=a8CQwWBNAjrS4TGdu/OOSPN3ezFGsYexYg1Gq0r3XSw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Cr0onx27gyLiMFto14IIxR/7FLHLNEwM03OpBVUI7/I/vG+2pNnggSmgJkBl4eN8A
-         CP45IIN4jIC1IoQT5qPgG4/5gntunzMWPTwP9QwJ5M/5pI7gNJFac2kuNfepB09+4y
-         cHrk/PlRTrPmiR/b1Whnp+v0gg4qJ5DxSwWET4Ag=
+        b=Fh4XpgAMVPq92/FCtRvUx6haYk78fsjwXzX4xnxMTCRxRD0t18wtcOESoFcCZuk0C
+         ldWyK/XLQdXFYtncO9TpWpMVzG9vCnKNWB/1c1EIwKleFL1O4Y2uoFD88SNQQ6swXH
+         hT0AChK5IKwjomWDanDi8txz2SpNwdIGovJ7sWKo=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 36/57] crypto: sha512/arm - fix crash bug in Thumb2 build
-Date:   Fri, 29 Mar 2019 21:28:29 -0400
-Message-Id: <20190330012854.32212-36-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 35/57] crypto: sha256/arm - fix crash bug in Thumb2 build
+Date:   Fri, 29 Mar 2019 21:28:28 -0400
+Message-Id: <20190330012854.32212-35-sashal@kernel.org>
 X-Mailer: git-send-email 2.19.1
 In-Reply-To: <20190330012854.32212-1-sashal@kernel.org>
 References: <20190330012854.32212-1-sashal@kernel.org>
@@ -61,9 +61,9 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-[ Upstream commit c64316502008064c158fa40cc250665e461b0f2a ]
+[ Upstream commit 69216a545cf81b2b32d01948f7039315abaf75a0 ]
 
-The SHA512 code we adopted from the OpenSSL project uses a rather
+The SHA256 code we adopted from the OpenSSL project uses a rather
 peculiar way to take the address of the round constant table: it
 takes the address of the sha256_block_data_order() routine, and
 substracts a constant known quantity to arrive at the base of the
@@ -112,41 +112,41 @@ Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- arch/arm/crypto/sha512-armv4.pl       | 3 ++-
- arch/arm/crypto/sha512-core.S_shipped | 3 ++-
+ arch/arm/crypto/sha256-armv4.pl       | 3 ++-
+ arch/arm/crypto/sha256-core.S_shipped | 3 ++-
  2 files changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm/crypto/sha512-armv4.pl b/arch/arm/crypto/sha512-armv4.pl
-index fb5d15048c0b..788c17b56ecc 100644
---- a/arch/arm/crypto/sha512-armv4.pl
-+++ b/arch/arm/crypto/sha512-armv4.pl
-@@ -274,10 +274,11 @@ WORD64(0x5fcb6fab,0x3ad6faec, 0x6c44198c,0x4a475817)
- .global	sha512_block_data_order
- .type	sha512_block_data_order,%function
- sha512_block_data_order:
-+.Lsha512_block_data_order:
+diff --git a/arch/arm/crypto/sha256-armv4.pl b/arch/arm/crypto/sha256-armv4.pl
+index b9ec44060ed3..a03cf4dfb781 100644
+--- a/arch/arm/crypto/sha256-armv4.pl
++++ b/arch/arm/crypto/sha256-armv4.pl
+@@ -212,10 +212,11 @@ K256:
+ .global	sha256_block_data_order
+ .type	sha256_block_data_order,%function
+ sha256_block_data_order:
++.Lsha256_block_data_order:
  #if __ARM_ARCH__<7
- 	sub	r3,pc,#8		@ sha512_block_data_order
+ 	sub	r3,pc,#8		@ sha256_block_data_order
  #else
--	adr	r3,sha512_block_data_order
-+	adr	r3,.Lsha512_block_data_order
+-	adr	r3,sha256_block_data_order
++	adr	r3,.Lsha256_block_data_order
  #endif
  #if __ARM_MAX_ARCH__>=7 && !defined(__KERNEL__)
  	ldr	r12,.LOPENSSL_armcap
-diff --git a/arch/arm/crypto/sha512-core.S_shipped b/arch/arm/crypto/sha512-core.S_shipped
-index b1c334a49cda..710ea309769e 100644
---- a/arch/arm/crypto/sha512-core.S_shipped
-+++ b/arch/arm/crypto/sha512-core.S_shipped
-@@ -141,10 +141,11 @@ WORD64(0x5fcb6fab,0x3ad6faec, 0x6c44198c,0x4a475817)
- .global	sha512_block_data_order
- .type	sha512_block_data_order,%function
- sha512_block_data_order:
-+.Lsha512_block_data_order:
+diff --git a/arch/arm/crypto/sha256-core.S_shipped b/arch/arm/crypto/sha256-core.S_shipped
+index 3b58300d611c..054aae0edfce 100644
+--- a/arch/arm/crypto/sha256-core.S_shipped
++++ b/arch/arm/crypto/sha256-core.S_shipped
+@@ -93,10 +93,11 @@ K256:
+ .global	sha256_block_data_order
+ .type	sha256_block_data_order,%function
+ sha256_block_data_order:
++.Lsha256_block_data_order:
  #if __ARM_ARCH__<7
- 	sub	r3,pc,#8		@ sha512_block_data_order
+ 	sub	r3,pc,#8		@ sha256_block_data_order
  #else
--	adr	r3,sha512_block_data_order
-+	adr	r3,.Lsha512_block_data_order
+-	adr	r3,sha256_block_data_order
++	adr	r3,.Lsha256_block_data_order
  #endif
  #if __ARM_MAX_ARCH__>=7 && !defined(__KERNEL__)
  	ldr	r12,.LOPENSSL_armcap
