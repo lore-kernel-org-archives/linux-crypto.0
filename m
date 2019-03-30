@@ -1,77 +1,125 @@
-Return-Path: <SRS0=TS5y=SA=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=3MGL=SB=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74E8AC43381
-	for <linux-crypto@archiver.kernel.org>; Fri, 29 Mar 2019 17:47:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5604C43381
+	for <linux-crypto@archiver.kernel.org>; Sat, 30 Mar 2019 00:46:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 516C521871
-	for <linux-crypto@archiver.kernel.org>; Fri, 29 Mar 2019 17:47:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BDFB22070B
+	for <linux-crypto@archiver.kernel.org>; Sat, 30 Mar 2019 00:46:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729925AbfC2Rrw (ORCPT
+        id S1730367AbfC3Aqf (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 29 Mar 2019 13:47:52 -0400
-Received: from smtp.nue.novell.com ([195.135.221.5]:36696 "EHLO
-        smtp.nue.novell.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729646AbfC2Rrw (ORCPT
-        <rfc822;groupwise-linux-crypto@vger.kernel.org:0:0>);
-        Fri, 29 Mar 2019 13:47:52 -0400
-Received: from emea4-mta.ukb.novell.com ([10.120.13.87])
-        by smtp.nue.novell.com with ESMTP (TLS encrypted); Fri, 29 Mar 2019 18:47:50 +0100
-Received: from localhost (nwb-a10-snat.microfocus.com [10.120.13.202])
-        by emea4-mta.ukb.novell.com with ESMTP (TLS encrypted); Fri, 29 Mar 2019 17:47:13 +0000
-Date:   Sat, 30 Mar 2019 01:47:07 +0800
-From:   jlee@suse.com
-To:     Mimi Zohar <zohar@linux.ibm.com>
-Cc:     "Lee, Chun-Yi" <joeyli.kernel@gmail.com>,
-        David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] X.509: Add messages for obsolete OIDs
-Message-ID: <20190329174707.GC3701@localhost>
-References: <20190322062738.19852-1-jlee@suse.com>
- <1553715364.4608.36.camel@linux.ibm.com>
+        Fri, 29 Mar 2019 20:46:35 -0400
+Received: from mga01.intel.com ([192.55.52.88]:1223 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730082AbfC3Aqe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 29 Mar 2019 20:46:34 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 29 Mar 2019 17:46:34 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.60,286,1549958400"; 
+   d="scan'208";a="287157510"
+Received: from tassilo.jf.intel.com (HELO tassilo.localdomain) ([10.7.201.137])
+  by orsmga004.jf.intel.com with ESMTP; 29 Mar 2019 17:46:34 -0700
+Received: by tassilo.localdomain (Postfix, from userid 1000)
+        id 18747301BE3; Fri, 29 Mar 2019 17:46:34 -0700 (PDT)
+From:   Andi Kleen <andi@firstfloor.org>
+To:     linux-crypto@vger.kernel.org
+Cc:     Andi Kleen <ak@linux.intel.com>, herbert@gondor.apana.org.au,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Subject: [PATCH] crypto: Use ___cacheline_aligned for aes data
+Date:   Fri, 29 Mar 2019 17:46:29 -0700
+Message-Id: <20190330004629.29394-1-andi@firstfloor.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1553715364.4608.36.camel@linux.ibm.com>
-User-Agent: Mutt/1.11.2 (2019-01-07)
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Mimi,
+From: Andi Kleen <ak@linux.intel.com>
 
-On Wed, Mar 27, 2019 at 03:36:04PM -0400, Mimi Zohar wrote:
-> On Fri, 2019-03-22 at 14:27 +0800, Lee, Chun-Yi wrote:
-> > We found that the db in Acer machine has self signed certificates
-> > (CN=DisablePW or CN=ABO) that they used obsolete OID 1.3.14.3.2.29
-> > sha1WithRSASignature and 2.5.29.1 subjectKeyIdentifier. Kernel
-> > emits -65 error code when loading those certificates to platform
-> > keyring:
-> > 
-> > [    1.484388] integrity: Loading X.509 certificate: UEFI:MokListRT
-> > [    1.485557] integrity: Problem loading X.509 certificate -65
-> > [    1.486100] Error adding keys to platform keyring UEFI:MokListRT
-> > 
-> > Because the -65 error code is not enough for appeasing user when
-> > loading a outdated certificate. This patch add messages against
-> > 1.3.14.3.2.29 and 2.5.29.1 OIDs.
-> > 
-> > Link: https://bugzilla.opensuse.org/show_bug.cgi?id=1129471
-> > Cc: David Howells <dhowells@redhat.com> 
-> > Cc: Herbert Xu <herbert@gondor.apana.org.au> 
-> > Cc: "David S. Miller" <davem@davemloft.net>
-> > Signed-off-by: "Lee, Chun-Yi" <jlee@suse.com>
-> 
-> Reviewed-by: Mimi Zohar <zohar@linux.ibm.com>
+cacheline_aligned is a special section. It cannot be const at the same
+time because it's not read-only. It doesn't give any MMU protection.
 
-Thanks for your review!
+Mark it ____cacheline_aligned to not place it in a special section,
+but just align it in .rodata
 
-Joey Lee
+Cc: herbert@gondor.apana.org.au
+Suggested-by: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Signed-off-by: Andi Kleen <ak@linux.intel.com>
+---
+ crypto/aes_generic.c | 8 ++++----
+ include/crypto/aes.h | 8 ++++----
+ 2 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/crypto/aes_generic.c b/crypto/aes_generic.c
+index 13df33aca463..fddcbe3edb0a 100644
+--- a/crypto/aes_generic.c
++++ b/crypto/aes_generic.c
+@@ -64,7 +64,7 @@ static inline u8 byte(const u32 x, const unsigned n)
+ static const u32 rco_tab[10] = { 1, 2, 4, 8, 16, 32, 64, 128, 27, 54 };
+ 
+ /* cacheline-aligned to facilitate prefetching into cache */
+-__visible const u32 crypto_ft_tab[4][256] __cacheline_aligned = {
++__visible const u32 crypto_ft_tab[4][256] ____cacheline_aligned = {
+ 	{
+ 		0xa56363c6, 0x847c7cf8, 0x997777ee, 0x8d7b7bf6,
+ 		0x0df2f2ff, 0xbd6b6bd6, 0xb16f6fde, 0x54c5c591,
+@@ -328,7 +328,7 @@ __visible const u32 crypto_ft_tab[4][256] __cacheline_aligned = {
+ 	}
+ };
+ 
+-__visible const u32 crypto_fl_tab[4][256] __cacheline_aligned = {
++__visible const u32 crypto_fl_tab[4][256] ____cacheline_aligned = {
+ 	{
+ 		0x00000063, 0x0000007c, 0x00000077, 0x0000007b,
+ 		0x000000f2, 0x0000006b, 0x0000006f, 0x000000c5,
+@@ -592,7 +592,7 @@ __visible const u32 crypto_fl_tab[4][256] __cacheline_aligned = {
+ 	}
+ };
+ 
+-__visible const u32 crypto_it_tab[4][256] __cacheline_aligned = {
++__visible const u32 crypto_it_tab[4][256] ____cacheline_aligned = {
+ 	{
+ 		0x50a7f451, 0x5365417e, 0xc3a4171a, 0x965e273a,
+ 		0xcb6bab3b, 0xf1459d1f, 0xab58faac, 0x9303e34b,
+@@ -856,7 +856,7 @@ __visible const u32 crypto_it_tab[4][256] __cacheline_aligned = {
+ 	}
+ };
+ 
+-__visible const u32 crypto_il_tab[4][256] __cacheline_aligned = {
++__visible const u32 crypto_il_tab[4][256] ____cacheline_aligned = {
+ 	{
+ 		0x00000052, 0x00000009, 0x0000006a, 0x000000d5,
+ 		0x00000030, 0x00000036, 0x000000a5, 0x00000038,
+diff --git a/include/crypto/aes.h b/include/crypto/aes.h
+index 852eaa9cd4db..0fdb542c70cd 100644
+--- a/include/crypto/aes.h
++++ b/include/crypto/aes.h
+@@ -28,10 +28,10 @@ struct crypto_aes_ctx {
+ 	u32 key_length;
+ };
+ 
+-extern const u32 crypto_ft_tab[4][256];
+-extern const u32 crypto_fl_tab[4][256];
+-extern const u32 crypto_it_tab[4][256];
+-extern const u32 crypto_il_tab[4][256];
++extern const u32 crypto_ft_tab[4][256] ____cacheline_aligned;
++extern const u32 crypto_fl_tab[4][256] ____cacheline_aligned;
++extern const u32 crypto_it_tab[4][256] ____cacheline_aligned;
++extern const u32 crypto_il_tab[4][256] ____cacheline_aligned;
+ 
+ int crypto_aes_set_key(struct crypto_tfm *tfm, const u8 *in_key,
+ 		unsigned int key_len);
+-- 
+2.20.1
+
