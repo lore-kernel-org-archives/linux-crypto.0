@@ -6,43 +6,43 @@ X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E265DC10F06
-	for <linux-crypto@archiver.kernel.org>; Sun, 31 Mar 2019 20:06:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81329C43381
+	for <linux-crypto@archiver.kernel.org>; Sun, 31 Mar 2019 20:06:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 98C0120866
-	for <linux-crypto@archiver.kernel.org>; Sun, 31 Mar 2019 20:06:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4AEA820872
+	for <linux-crypto@archiver.kernel.org>; Sun, 31 Mar 2019 20:06:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1554062762;
-	bh=ZPv5oRIvjl5hE87uO9fxp7oTfh8Lr1mBQH8jm7RCZUU=;
+	s=default; t=1554062763;
+	bh=7/Yp7C6h4zi00JNRcvWZDSuYy4SQJfIpOeFVnacUKMQ=;
 	h=From:To:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=u9+k9mTG8+ahiw2ja4/ZLh6oxtP+oU7lHje9J1lt9hmjHrm+TihievDgNs2KYZyZt
-	 vuNvUc2BlE8aFSx1xw8PSujvw+H6mNc9qjBS4Mfd2x4zHECyMfnPHBtmfCaMZC4eIu
-	 C6AufdeCXpiae+VOIgH5c8U+lLl+/cJ+3FyCn3K8=
+	b=xJmN2Cn5mV1fWsvvRJE9He34dcQuzlyKSVlC9JvCmL0HfuCjP6aOrfZNwmg6KDQ3T
+	 Yp6qrNUG79H95VNi5nubWVfZLhsyDD7v4c485eaxkhPANlVrk9PGmsGfCS5nfBHmqJ
+	 JBqJc7YT/c/d9997kCFYqbwnmuCSQjxwNu9uVx1Y=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731506AbfCaUGB (ORCPT
+        id S1731481AbfCaUGB (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Sun, 31 Mar 2019 16:06:01 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42186 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:42182 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731496AbfCaUGB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 31 Mar 2019 16:06:01 -0400
+        id S1731283AbfCaUGA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 31 Mar 2019 16:06:00 -0400
 Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8ED0920872
+        by mail.kernel.org (Postfix) with ESMTPSA id 5C76320882
         for <linux-crypto@vger.kernel.org>; Sun, 31 Mar 2019 20:05:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=default; t=1554062759;
-        bh=ZPv5oRIvjl5hE87uO9fxp7oTfh8Lr1mBQH8jm7RCZUU=;
+        bh=7/Yp7C6h4zi00JNRcvWZDSuYy4SQJfIpOeFVnacUKMQ=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=sN+IOWyb7DDLH/Ha/fp4O6drU0LU83wjkmGZvRUBusZgNgHfACbfAD7prIkNmb6o+
-         HPLVlyII3aJPTWWxN88jfwbKMNb6aMo8GmDNS0hHdoJJa15U44jlGzVRrb5cEQhgAA
-         tPxFWwVF9haAJJqkxfm5Dq/XrO3qF8A9dF8fsyvQ=
+        b=RtUkybTBRrHdmoKthvvKtuvhxqCsA5YeMRGxabw/1dE9ESODhr6WEHuxx9bKtMSBH
+         TM4lp+X+Oy5nAc4/YsgROJr99Lz+9PTtZMu3fTZBggKnYOUx9l8VZ1OjJIyScVrLQ/
+         T2ynUxIsviA4reA6Fl8Dfv4rBaTtXoXEwyyvXC1w=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org
-Subject: [RFC/RFT PATCH 15/18] crypto: testmgr - fuzz hashes against their generic implementation
-Date:   Sun, 31 Mar 2019 13:04:25 -0700
-Message-Id: <20190331200428.26597-16-ebiggers@kernel.org>
+Subject: [RFC/RFT PATCH 14/18] crypto: testmgr - add helpers for fuzzing against generic implementation
+Date:   Sun, 31 Mar 2019 13:04:24 -0700
+Message-Id: <20190331200428.26597-15-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190331200428.26597-1-ebiggers@kernel.org>
 References: <20190331200428.26597-1-ebiggers@kernel.org>
@@ -55,237 +55,167 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-When the extra crypto self-tests are enabled, test each hash algorithm
-against its generic implementation when one is available.  This
-involves: checking the algorithm properties for consistency, then
-randomly generating test vectors using the generic implementation and
-running them against the implementation under test.  Both bad and good
-inputs are tested.
-
-This has already detected a bug in the x86 implementation of poly1305,
-bugs in crct10dif, and an inconsistency in cbcmac.
+Add some helper functions in preparation for fuzz testing algorithms
+against their generic implementation.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/testmgr.c | 174 +++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 170 insertions(+), 4 deletions(-)
+ crypto/testmgr.c | 128 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 128 insertions(+)
 
 diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index edbb5001cad58..6f5e85b3d17db 100644
+index fcdb891b9b357..edbb5001cad58 100644
 --- a/crypto/testmgr.c
 +++ b/crypto/testmgr.c
-@@ -1286,9 +1286,169 @@ static int test_hash_vec(const char *driver, const struct hash_testvec *vec,
- 	return 0;
+@@ -125,6 +125,7 @@ struct kpp_test_suite {
+ 
+ struct alg_test_desc {
+ 	const char *alg;
++	const char *generic_driver;
+ 	int (*test)(const struct alg_test_desc *desc, const char *driver,
+ 		    u32 type, u32 mask);
+ 	int fips_allowed;	/* set if alg is allowed in fips mode */
+@@ -742,6 +743,91 @@ static int build_cipher_test_sglists(struct cipher_test_sglists *tsgls,
  }
  
-+#ifdef CONFIG_CRYPTO_MANAGER_EXTRA_TESTS
-+/*
-+ * Generate a hash test vector from the given implementation.
-+ * Assumes the buffers in 'vec' were already allocated.
-+ */
-+static void generate_random_hash_testvec(struct crypto_shash *tfm,
-+					 struct hash_testvec *vec,
-+					 unsigned int maxkeysize,
-+					 unsigned int maxdatasize,
-+					 char *name, size_t max_namelen)
+ #ifdef CONFIG_CRYPTO_MANAGER_EXTRA_TESTS
++
++/* Generate a random length in range [0, max_len], but prefer smaller values */
++static unsigned int generate_random_length(unsigned int max_len)
 +{
-+	SHASH_DESC_ON_STACK(desc, tfm);
++	unsigned int len = prandom_u32() % (max_len + 1);
 +
-+	/* Data */
-+	vec->psize = generate_random_length(maxdatasize);
-+	generate_random_bytes((u8 *)vec->plaintext, vec->psize);
-+
-+	/*
-+	 * Key: length in range [1, maxkeysize], but usually choose maxkeysize.
-+	 * If algorithm is unkeyed, then maxkeysize == 0 and set ksize = 0.
-+	 */
-+	vec->setkey_error = 0;
-+	vec->ksize = 0;
-+	if (maxkeysize) {
-+		vec->ksize = maxkeysize;
-+		if (prandom_u32() % 4 == 0)
-+			vec->ksize = 1 + (prandom_u32() % maxkeysize);
-+		generate_random_bytes((u8 *)vec->key, vec->ksize);
-+
-+		vec->setkey_error = crypto_shash_setkey(tfm, vec->key,
-+							vec->ksize);
-+		/* If the key couldn't be set, no need to continue to digest. */
-+		if (vec->setkey_error)
-+			goto done;
++	switch (prandom_u32() % 4) {
++	case 0:
++		return len % 64;
++	case 1:
++		return len % 256;
++	case 2:
++		return len % 1024;
++	default:
++		return len;
 +	}
-+
-+	/* Digest */
-+	desc->tfm = tfm;
-+	desc->flags = 0;
-+	vec->digest_error = crypto_shash_digest(desc, vec->plaintext,
-+						vec->psize, (u8 *)vec->digest);
-+done:
-+	snprintf(name, max_namelen, "\"random: psize=%u ksize=%u\"",
-+		 vec->psize, vec->ksize);
 +}
 +
-+/*
-+ * Test the hash algorithm represented by @req against the corresponding generic
-+ * implementation, if one is available.
-+ */
-+static int test_hash_vs_generic_impl(const char *driver,
-+				     const char *generic_driver,
-+				     unsigned int maxkeysize,
-+				     struct ahash_request *req,
-+				     struct test_sglist *tsgl,
-+				     u8 *hashstate)
++/* Sometimes make some random changes to the given data buffer */
++static void mutate_buffer(u8 *buf, size_t count)
 +{
-+	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
-+	const unsigned int digestsize = crypto_ahash_digestsize(tfm);
-+	const unsigned int blocksize = crypto_ahash_blocksize(tfm);
-+	const unsigned int maxdatasize = (2 * PAGE_SIZE) - TESTMGR_POISON_LEN;
-+	const char *algname = tfm->base.__crt_alg->cra_name;
-+	char _generic_driver[CRYPTO_MAX_ALG_NAME];
-+	struct crypto_shash *generic_tfm = NULL;
-+	unsigned int i;
-+	struct hash_testvec vec = { 0 };
-+	char vec_name[64];
-+	struct testvec_config cfg;
-+	char cfgname[TESTVEC_CONFIG_NAMELEN];
-+	int err;
++	size_t num_flips;
++	size_t i;
++	size_t pos;
 +
-+	if (noextratests)
-+		return 0;
-+
-+	if (!generic_driver) { /* Use default naming convention? */
-+		err = build_generic_driver_name(algname, _generic_driver);
-+		if (err)
-+			return err;
-+		generic_driver = _generic_driver;
-+	}
-+
-+	if (strcmp(generic_driver, driver) == 0) /* Already the generic impl? */
-+		return 0;
-+
-+	generic_tfm = crypto_alloc_shash(generic_driver, 0, 0);
-+	if (IS_ERR(generic_tfm)) {
-+		err = PTR_ERR(generic_tfm);
-+		if (err == -ENOENT) {
-+			pr_warn("alg: hash: skipping comparison tests for %s because %s is unavailable\n",
-+				driver, generic_driver);
-+			return 0;
++	/* Sometimes flip some bits */
++	if (prandom_u32() % 4 == 0) {
++		num_flips = min_t(size_t, 1 << (prandom_u32() % 8), count * 8);
++		for (i = 0; i < num_flips; i++) {
++			pos = prandom_u32() % (count * 8);
++			buf[pos / 8] ^= 1 << (pos % 8);
 +		}
-+		pr_err("alg: hash: error allocating %s (generic impl of %s): %d\n",
-+		       generic_driver, algname, err);
-+		return err;
 +	}
 +
-+	/* Check the algorithm properties for consistency. */
-+
-+	if (digestsize != crypto_shash_digestsize(generic_tfm)) {
-+		pr_err("alg: hash: digestsize for %s (%u) doesn't match generic impl (%u)\n",
-+		       driver, digestsize,
-+		       crypto_shash_digestsize(generic_tfm));
-+		err = -EINVAL;
-+		goto out;
++	/* Sometimes flip some bytes */
++	if (prandom_u32() % 4 == 0) {
++		num_flips = min_t(size_t, 1 << (prandom_u32() % 8), count);
++		for (i = 0; i < num_flips; i++)
++			buf[prandom_u32() % count] ^= 0xff;
 +	}
-+
-+	if (blocksize != crypto_shash_blocksize(generic_tfm)) {
-+		pr_err("alg: hash: blocksize for %s (%u) doesn't match generic impl (%u)\n",
-+		       driver, blocksize, crypto_shash_blocksize(generic_tfm));
-+		err = -EINVAL;
-+		goto out;
-+	}
-+
-+	/*
-+	 * Now generate test vectors using the generic implementation, and test
-+	 * the other implementation against them.
-+	 */
-+
-+	vec.key = kmalloc(maxkeysize, GFP_KERNEL);
-+	vec.plaintext = kmalloc(maxdatasize, GFP_KERNEL);
-+	vec.digest = kmalloc(digestsize, GFP_KERNEL);
-+	if (!vec.key || !vec.plaintext || !vec.digest) {
-+		err = -ENOMEM;
-+		goto out;
-+	}
-+
-+	for (i = 0; i < fuzz_iterations * 8; i++) {
-+		generate_random_hash_testvec(generic_tfm, &vec,
-+					     maxkeysize, maxdatasize,
-+					     vec_name, sizeof(vec_name));
-+		generate_random_testvec_config(&cfg, cfgname, sizeof(cfgname));
-+
-+		err = test_hash_vec_cfg(driver, &vec, vec_name, &cfg,
-+					req, tsgl, hashstate);
-+		if (err)
-+			goto out;
-+		cond_resched();
-+	}
-+	err = 0;
-+out:
-+	kfree(vec.key);
-+	kfree(vec.plaintext);
-+	kfree(vec.digest);
-+	crypto_free_shash(generic_tfm);
-+	return err;
 +}
-+#else /* !CONFIG_CRYPTO_MANAGER_EXTRA_TESTS */
-+static int test_hash_vs_generic_impl(const char *driver,
-+				     const char *generic_driver,
-+				     unsigned int maxkeysize,
-+				     struct ahash_request *req,
-+				     struct test_sglist *tsgl,
-+				     u8 *hashstate)
++
++/* Randomly generate 'count' bytes, but sometimes make them "interesting" */
++static void generate_random_bytes(u8 *buf, size_t count)
 +{
-+	return 0;
-+}
-+#endif /* !CONFIG_CRYPTO_MANAGER_EXTRA_TESTS */
++	u8 b;
++	int increment;
++	size_t i;
 +
- static int __alg_test_hash(const struct hash_testvec *vecs,
- 			   unsigned int num_vecs, const char *driver,
--			   u32 type, u32 mask)
-+			   u32 type, u32 mask,
-+			   const char *generic_driver, unsigned int maxkeysize)
- {
- 	struct crypto_ahash *tfm;
- 	struct ahash_request *req = NULL;
-@@ -1336,7 +1496,8 @@ static int __alg_test_hash(const struct hash_testvec *vecs,
- 		if (err)
- 			goto out;
- 	}
--	err = 0;
-+	err = test_hash_vs_generic_impl(driver, generic_driver, maxkeysize, req,
-+					tsgl, hashstate);
- out:
- 	kfree(hashstate);
- 	if (tsgl) {
-@@ -1354,6 +1515,7 @@ static int alg_test_hash(const struct alg_test_desc *desc, const char *driver,
- 	const struct hash_testvec *template = desc->suite.hash.vecs;
- 	unsigned int tcount = desc->suite.hash.count;
- 	unsigned int nr_unkeyed, nr_keyed;
-+	unsigned int maxkeysize = 0;
- 	int err;
- 
- 	/*
-@@ -1372,16 +1534,20 @@ static int alg_test_hash(const struct alg_test_desc *desc, const char *driver,
- 			       "unkeyed ones must come first\n", desc->alg);
- 			return -EINVAL;
- 		}
-+		maxkeysize = max_t(unsigned int, maxkeysize,
-+				   template[nr_unkeyed + nr_keyed].ksize);
- 	}
- 
- 	err = 0;
- 	if (nr_unkeyed) {
--		err = __alg_test_hash(template, nr_unkeyed, driver, type, mask);
-+		err = __alg_test_hash(template, nr_unkeyed, driver, type, mask,
-+				      desc->generic_driver, maxkeysize);
- 		template += nr_unkeyed;
- 	}
- 
- 	if (!err && nr_keyed)
--		err = __alg_test_hash(template, nr_keyed, driver, type, mask);
-+		err = __alg_test_hash(template, nr_keyed, driver, type, mask,
-+				      desc->generic_driver, maxkeysize);
- 
- 	return err;
++	if (count == 0)
++		return;
++
++	switch (prandom_u32() % 8) { /* Choose a generation strategy */
++	case 0:
++	case 1:
++		/* All the same byte, plus optional mutations */
++		switch (prandom_u32() % 4) {
++		case 0:
++			b = 0x00;
++			break;
++		case 1:
++			b = 0xff;
++			break;
++		default:
++			b = (u8)prandom_u32();
++			break;
++		}
++		memset(buf, b, count);
++		mutate_buffer(buf, count);
++		break;
++	case 2:
++		/* Ascending or descending bytes, plus optional mutations */
++		increment = (int)(u8)prandom_u32() - 128;
++		b = (u8)prandom_u32();
++		for (i = 0; i < count; i++, b += increment)
++			buf[i] = b;
++		mutate_buffer(buf, count);
++		break;
++	default:
++		/* Fully random bytes */
++		for (i = 0; i < count; i++)
++			buf[i] = (u8)prandom_u32();
++	}
++}
++
+ static char *generate_random_sgl_divisions(struct test_sg_division *divs,
+ 					   size_t max_divs, char *p, char *end,
+ 					   bool gen_flushes, u32 req_flags)
+@@ -896,6 +982,48 @@ static void crypto_reenable_simd_for_test(void)
+ 	__this_cpu_write(crypto_simd_disabled_for_test, false);
+ 	preempt_enable();
  }
++
++/*
++ * Given an algorithm name, build the name of the generic implementation of that
++ * algorithm, assuming the usual naming convention.  Specifically, this appends
++ * "-generic" to every part of the name that is not a template name.  Examples:
++ *
++ *	aes => aes-generic
++ *	cbc(aes) => cbc(aes-generic)
++ *	cts(cbc(aes)) => cts(cbc(aes-generic))
++ *	rfc7539(chacha20,poly1305) => rfc7539(chacha20-generic,poly1305-generic)
++ *
++ * Return: 0 on success, or -ENAMETOOLONG if the generic name would be too long
++ */
++static int build_generic_driver_name(const char *algname,
++				     char driver_name[CRYPTO_MAX_ALG_NAME])
++{
++	const char *in = algname;
++	char *out = driver_name;
++	size_t len = strlen(algname);
++
++	if (len >= CRYPTO_MAX_ALG_NAME)
++		goto too_long;
++	do {
++		const char *in_saved = in;
++
++		while (*in && *in != '(' && *in != ')' && *in != ',')
++			*out++ = *in++;
++		if (*in != '(' && in > in_saved) {
++			len += 8;
++			if (len >= CRYPTO_MAX_ALG_NAME)
++				goto too_long;
++			memcpy(out, "-generic", 8);
++			out += 8;
++		}
++	} while ((*out++ = *in++) != '\0');
++	return 0;
++
++too_long:
++	pr_err("alg: generic driver name for \"%s\" would be too long\n",
++	       algname);
++	return -ENAMETOOLONG;
++}
+ #else /* !CONFIG_CRYPTO_MANAGER_EXTRA_TESTS */
+ static void crypto_disable_simd_for_test(void)
+ {
 -- 
 2.21.0
 
