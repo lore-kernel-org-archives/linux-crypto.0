@@ -2,103 +2,153 @@ Return-Path: <SRS0=ISqn=SC=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_NEOMUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5359C43381
-	for <linux-crypto@archiver.kernel.org>; Sun, 31 Mar 2019 20:09:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7E0CC43381
+	for <linux-crypto@archiver.kernel.org>; Sun, 31 Mar 2019 21:47:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7872C20872
-	for <linux-crypto@archiver.kernel.org>; Sun, 31 Mar 2019 20:09:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1554062994;
-	bh=hStNqJG9HVwuSv4CBq6zRg0EIZvgnvWy4flgzyWx88I=;
-	h=From:To:Subject:Date:List-ID:From;
-	b=y29LFWb8AnNa/ukM1IAWGubMyg4gU+F6LVmDu5+MoeZANl9dqyySRM61bAGm1GlCJ
-	 7uf6LrG5px39FY1k3U344cjsNnDU9cy9lrzZWe5CINotUJTaCGq7xChy4mqurOyJne
-	 P6192CDfIVHEacvz7NYN44zve0A+bQeG8tBRaAq4=
+	by mail.kernel.org (Postfix) with ESMTP id 883B820857
+	for <linux-crypto@archiver.kernel.org>; Sun, 31 Mar 2019 21:47:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726931AbfCaUJx (ORCPT
+        id S1731324AbfCaVrX (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 31 Mar 2019 16:09:53 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42562 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731432AbfCaUJx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 31 Mar 2019 16:09:53 -0400
-Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E9BD32086C;
-        Sun, 31 Mar 2019 20:09:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1554062993;
-        bh=hStNqJG9HVwuSv4CBq6zRg0EIZvgnvWy4flgzyWx88I=;
-        h=From:To:Subject:Date:From;
-        b=d64iMKcr3dWCwFLUXWx0jWfSf1d96kFn2mHBSmM884bsbXHpVE1EtEPh+HqX0Vh9r
-         QWhpzT9yzS5ge/58VvedtE4KRd70iDOHxp0rZsGAfl2DtILeHS01FQA1gRcjhr3ZZ+
-         ivttVqe+mSrOgCDz/5RLjk2nYpv0X3ytxtofXhjw=
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH] crypto: testmgr - add panic_on_fail module parameter
-Date:   Sun, 31 Mar 2019 13:09:14 -0700
-Message-Id: <20190331200914.27341-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.21.0
+        Sun, 31 Mar 2019 17:47:23 -0400
+Received: from vmicros1.altlinux.org ([194.107.17.57]:51522 "EHLO
+        vmicros1.altlinux.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731172AbfCaVrX (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 31 Mar 2019 17:47:23 -0400
+Received: from imap.altlinux.org (imap.altlinux.org [194.107.17.38])
+        by vmicros1.altlinux.org (Postfix) with ESMTP id 8E60172CCC5;
+        Mon,  1 Apr 2019 00:47:19 +0300 (MSK)
+Received: from altlinux.org (sole.flsd.net [185.75.180.6])
+        by imap.altlinux.org (Postfix) with ESMTPSA id 25E5A4A4A16;
+        Mon,  1 Apr 2019 00:47:19 +0300 (MSK)
+Date:   Mon, 1 Apr 2019 00:47:19 +0300
+From:   Vitaly Chikunov <vt@altlinux.org>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-crypto@vger.kernel.org
+Subject: Re: [RFC/RFT PATCH 09/18] crypto: streebog - fix unaligned memory
+ accesses
+Message-ID: <20190331214717.4erxk2racxphfbha@altlinux.org>
+Mail-Followup-To: Eric Biggers <ebiggers@kernel.org>,
+        linux-crypto@vger.kernel.org
+References: <20190331200428.26597-1-ebiggers@kernel.org>
+ <20190331200428.26597-10-ebiggers@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=koi8-r
+Content-Disposition: inline
+In-Reply-To: <20190331200428.26597-10-ebiggers@kernel.org>
+User-Agent: NeoMutt/20171215-106-ac61c7
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+Eric,
 
-Add a module parameter cryptomgr.panic_on_fail which causes the kernel
-to panic if any crypto self-tests fail.
+On Sun, Mar 31, 2019 at 01:04:19PM -0700, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
+> 
+> Don't cast the data buffer directly to streebog_uint512, as this
+> violates alignment rules.
+> 
+> Fixes: fe18957e8e87 ("crypto: streebog - add Streebog hash function")
+> Cc: Vitaly Chikunov <vt@altlinux.org>
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
+>  crypto/streebog_generic.c | 25 +++++++++++++------------
+>  include/crypto/streebog.h |  5 ++++-
+>  2 files changed, 17 insertions(+), 13 deletions(-)
+> 
+> diff --git a/crypto/streebog_generic.c b/crypto/streebog_generic.c
+> index 5a2eafed9c29f..b82fc3d79aa15 100644
+> --- a/crypto/streebog_generic.c
+> +++ b/crypto/streebog_generic.c
+> @@ -996,7 +996,7 @@ static void streebog_add512(const struct streebog_uint512 *x,
+>  
+>  static void streebog_g(struct streebog_uint512 *h,
+>  		       const struct streebog_uint512 *N,
+> -		       const u8 *m)
+> +		       const struct streebog_uint512 *m)
+>  {
+>  	struct streebog_uint512 Ki, data;
+>  	unsigned int i;
+> @@ -1005,7 +1005,7 @@ static void streebog_g(struct streebog_uint512 *h,
+>  
+>  	/* Starting E() */
+>  	Ki = data;
+> -	streebog_xlps(&Ki, (const struct streebog_uint512 *)&m[0], &data);
+> +	streebog_xlps(&Ki, m, &data);
+>  
+>  	for (i = 0; i < 11; i++)
+>  		streebog_round(i, &Ki, &data);
+> @@ -1015,16 +1015,19 @@ static void streebog_g(struct streebog_uint512 *h,
+>  	/* E() done */
+>  
+>  	streebog_xor(&data, h, &data);
+> -	streebog_xor(&data, (const struct streebog_uint512 *)&m[0], h);
+> +	streebog_xor(&data, m, h);
+>  }
+>  
+>  static void streebog_stage2(struct streebog_state *ctx, const u8 *data)
+>  {
+> -	streebog_g(&ctx->h, &ctx->N, data);
+> +	struct streebog_uint512 m;
+> +
+> +	memcpy(&m, data, sizeof(m));
+> +
+> +	streebog_g(&ctx->h, &ctx->N, &m);
+>  
+>  	streebog_add512(&ctx->N, &buffer512, &ctx->N);
+> -	streebog_add512(&ctx->Sigma, (const struct streebog_uint512 *)data,
+> -			&ctx->Sigma);
+> +	streebog_add512(&ctx->Sigma, &m, &ctx->Sigma);
+>  }
 
-Use cases:
+As I understand, this is the actual fix.
 
-- More easily detect crypto self-test failures by boot testing,
-  e.g. on KernelCI.
-- Get a bug report if syzkaller manages to use the template system to
-  instantiate an algorithm that fails its self-tests.
+Reviewed-by: Vitaly Chikunov <vt@altlinux.org>
 
-The command-line option "fips=1" already does this, but it also makes
-other changes not wanted for general testing, such as disabling
-"unapproved" algorithms.  panic_on_fail just does what it says.
+Thanks much!
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- crypto/testmgr.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 2c2ddebb48d37..0f6bfb6ce6a46 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -45,6 +45,9 @@ static bool notests;
- module_param(notests, bool, 0644);
- MODULE_PARM_DESC(notests, "disable crypto self-tests");
- 
-+static bool panic_on_fail;
-+module_param(panic_on_fail, bool, 0444);
-+
- #ifdef CONFIG_CRYPTO_MANAGER_EXTRA_TESTS
- static bool noextratests;
- module_param(noextratests, bool, 0644);
-@@ -4109,8 +4112,9 @@ int alg_test(const char *driver, const char *alg, u32 type, u32 mask)
- 					     type, mask);
- 
- test_done:
--	if (fips_enabled && rc)
--		panic("%s: %s alg self test failed in fips mode!\n", driver, alg);
-+	if (rc && (fips_enabled || panic_on_fail))
-+		panic("alg: self-tests for %s (%s) failed in %s mode!\n",
-+		      driver, alg, fips_enabled ? "fips" : "panic_on_fail");
- 
- 	if (fips_enabled && !rc)
- 		pr_info("alg: self-tests for %s (%s) passed\n", driver, alg);
--- 
-2.21.0
-
+>  
+>  static void streebog_stage3(struct streebog_state *ctx)
+> @@ -1034,13 +1037,11 @@ static void streebog_stage3(struct streebog_state *ctx)
+>  	buf.qword[0] = cpu_to_le64(ctx->fillsize << 3);
+>  	streebog_pad(ctx);
+>  
+> -	streebog_g(&ctx->h, &ctx->N, (const u8 *)&ctx->buffer);
+> +	streebog_g(&ctx->h, &ctx->N, &ctx->m);
+>  	streebog_add512(&ctx->N, &buf, &ctx->N);
+> -	streebog_add512(&ctx->Sigma,
+> -			(const struct streebog_uint512 *)&ctx->buffer[0],
+> -			&ctx->Sigma);
+> -	streebog_g(&ctx->h, &buffer0, (const u8 *)&ctx->N);
+> -	streebog_g(&ctx->h, &buffer0, (const u8 *)&ctx->Sigma);
+> +	streebog_add512(&ctx->Sigma, &ctx->m, &ctx->Sigma);
+> +	streebog_g(&ctx->h, &buffer0, &ctx->N);
+> +	streebog_g(&ctx->h, &buffer0, &ctx->Sigma);
+>  	memcpy(&ctx->hash, &ctx->h, sizeof(struct streebog_uint512));
+>  }
+>  
+> diff --git a/include/crypto/streebog.h b/include/crypto/streebog.h
+> index 856e32af86574..cae1b4a019713 100644
+> --- a/include/crypto/streebog.h
+> +++ b/include/crypto/streebog.h
+> @@ -23,7 +23,10 @@ struct streebog_uint512 {
+>  };
+>  
+>  struct streebog_state {
+> -	u8 buffer[STREEBOG_BLOCK_SIZE];
+> +	union {
+> +		u8 buffer[STREEBOG_BLOCK_SIZE];
+> +		struct streebog_uint512 m;
+> +	};
+>  	struct streebog_uint512 hash;
+>  	struct streebog_uint512 h;
+>  	struct streebog_uint512 N;
+> -- 
+> 2.21.0
