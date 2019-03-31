@@ -6,43 +6,44 @@ X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CF5CC10F11
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EF86C43381
 	for <linux-crypto@archiver.kernel.org>; Sun, 31 Mar 2019 20:06:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1C3DA20866
-	for <linux-crypto@archiver.kernel.org>; Sun, 31 Mar 2019 20:06:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E3EB620872
+	for <linux-crypto@archiver.kernel.org>; Sun, 31 Mar 2019 20:06:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=default; t=1554062766;
-	bh=FwyJZ5Wqr6znCHEpoos5DguWellKh9TCb+s+2wMl3WA=;
-	h=From:To:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=ahf0sAP/H9jwUC7F+HLEYY9OMsxt4iDMCCADegc8nuKbe28n6j7P3EK28h+BTnGk/
-	 TKJd6q6xrgd0krM46+yV8C0RuWvGCKJ3L2tPxcJgk2buDJVd5O6N90Gx+AeMfSk3Nr
-	 BCCS5ICDtLkR/p7TS7YviJvWWEGNUDJMdGppufok=
+	bh=Jh8j4zjiReptQsFK+NxyfGkFFOLBP05AU5lo/XXKvZo=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=azXTlzcctZp6ebCxC3oLwvn17K6PdphK1mBaECnGkFws+GIHOd94+nKss1kpa4OwZ
+	 w4sIa7IT3Y/1kldzOBV7cGvW/ELMqifB0WERm6kPgAjZMgnX3n2WT9nm82G6pyFFKI
+	 920Gu/SZhjPUcVBaFDBGvWPyD8xrxMo34fHLdPKA=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731283AbfCaUGC (ORCPT
+        id S1731467AbfCaUGD (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 31 Mar 2019 16:06:02 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42190 "EHLO mail.kernel.org"
+        Sun, 31 Mar 2019 16:06:03 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42108 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731498AbfCaUGA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 31 Mar 2019 16:06:00 -0400
+        id S1731444AbfCaUF7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 31 Mar 2019 16:05:59 -0400
 Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 009DB218FC
-        for <linux-crypto@vger.kernel.org>; Sun, 31 Mar 2019 20:05:59 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4113C218A1;
+        Sun, 31 Mar 2019 20:05:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1554062760;
-        bh=FwyJZ5Wqr6znCHEpoos5DguWellKh9TCb+s+2wMl3WA=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=EV9ooGR4Jim4r02vUUYB7z3wrLdVRtLCqAEZ/ipI2f4LTqSQYh6J3swP5r1rH5fik
-         ZWfQHMnQtq+V1iHMBSfCdGW0tWTTxteGcxo5VDECCMu7s+7ynNgXqRNRPSr/PJjrx8
-         3PYr0wBueaptxZKeqMVeUOWiluBWe1T9RiBwvnNQ=
+        s=default; t=1554062758;
+        bh=Jh8j4zjiReptQsFK+NxyfGkFFOLBP05AU5lo/XXKvZo=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=MBmSX47IFMjiFni5iBSksinOPjfrd8AefXh7tOd3GNk92+F717lH5ra/PvPAyIb25
+         iSoEcpwpycGQHy7pQDIuBSrFrnZIxciNM2YKKKgpF80ZpPHzhq+/m1aS/+tWSLnwFI
+         U2O36UrhnjE0YQsLsWGGUWzi+3Iof8+cmAVDMLWU=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org
-Subject: [RFC/RFT PATCH 17/18] crypto: testmgr - fuzz AEADs against their generic implementation
-Date:   Sun, 31 Mar 2019 13:04:27 -0700
-Message-Id: <20190331200428.26597-18-ebiggers@kernel.org>
+Cc:     Vitaly Chikunov <vt@altlinux.org>
+Subject: [RFC/RFT PATCH 09/18] crypto: streebog - fix unaligned memory accesses
+Date:   Sun, 31 Mar 2019 13:04:19 -0700
+Message-Id: <20190331200428.26597-10-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190331200428.26597-1-ebiggers@kernel.org>
 References: <20190331200428.26597-1-ebiggers@kernel.org>
@@ -55,297 +56,97 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-When the extra crypto self-tests are enabled, test each AEAD algorithm
-against its generic implementation when one is available.  This
-involves: checking the algorithm properties for consistency, then
-randomly generating test vectors using the generic implementation and
-running them against the implementation under test.  Both bad and good
-inputs are tested.
+Don't cast the data buffer directly to streebog_uint512, as this
+violates alignment rules.
 
+Fixes: fe18957e8e87 ("crypto: streebog - add Streebog hash function")
+Cc: Vitaly Chikunov <vt@altlinux.org>
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/testmgr.c | 226 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 226 insertions(+)
+ crypto/streebog_generic.c | 25 +++++++++++++------------
+ include/crypto/streebog.h |  5 ++++-
+ 2 files changed, 17 insertions(+), 13 deletions(-)
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 3fe178e32b0fe..5cb93ce4e7ed0 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -1759,6 +1759,223 @@ static int test_aead_vec(const char *driver, int enc,
- 	return 0;
+diff --git a/crypto/streebog_generic.c b/crypto/streebog_generic.c
+index 5a2eafed9c29f..b82fc3d79aa15 100644
+--- a/crypto/streebog_generic.c
++++ b/crypto/streebog_generic.c
+@@ -996,7 +996,7 @@ static void streebog_add512(const struct streebog_uint512 *x,
+ 
+ static void streebog_g(struct streebog_uint512 *h,
+ 		       const struct streebog_uint512 *N,
+-		       const u8 *m)
++		       const struct streebog_uint512 *m)
+ {
+ 	struct streebog_uint512 Ki, data;
+ 	unsigned int i;
+@@ -1005,7 +1005,7 @@ static void streebog_g(struct streebog_uint512 *h,
+ 
+ 	/* Starting E() */
+ 	Ki = data;
+-	streebog_xlps(&Ki, (const struct streebog_uint512 *)&m[0], &data);
++	streebog_xlps(&Ki, m, &data);
+ 
+ 	for (i = 0; i < 11; i++)
+ 		streebog_round(i, &Ki, &data);
+@@ -1015,16 +1015,19 @@ static void streebog_g(struct streebog_uint512 *h,
+ 	/* E() done */
+ 
+ 	streebog_xor(&data, h, &data);
+-	streebog_xor(&data, (const struct streebog_uint512 *)&m[0], h);
++	streebog_xor(&data, m, h);
  }
  
-+#ifdef CONFIG_CRYPTO_MANAGER_EXTRA_TESTS
-+/*
-+ * Generate an AEAD test vector from the given implementation.
-+ * Assumes the buffers in 'vec' were already allocated.
-+ */
-+static void generate_random_aead_testvec(struct aead_request *req,
-+					 struct aead_testvec *vec,
-+					 unsigned int maxkeysize,
-+					 unsigned int maxdatasize,
-+					 char *name, size_t max_namelen)
-+{
-+	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
-+	const unsigned int ivsize = crypto_aead_ivsize(tfm);
-+	unsigned int maxauthsize = crypto_aead_alg(tfm)->maxauthsize;
-+	unsigned int authsize;
-+	unsigned int total_len;
-+	int i;
-+	struct scatterlist src[2], dst;
-+	u8 iv[MAX_IVLEN];
-+	DECLARE_CRYPTO_WAIT(wait);
+ static void streebog_stage2(struct streebog_state *ctx, const u8 *data)
+ {
+-	streebog_g(&ctx->h, &ctx->N, data);
++	struct streebog_uint512 m;
 +
-+	/* Key: length in [0, maxkeysize], but usually choose maxkeysize */
-+	vec->klen = maxkeysize;
-+	if (prandom_u32() % 4 == 0)
-+		vec->klen = prandom_u32() % (maxkeysize + 1);
-+	generate_random_bytes((u8 *)vec->key, vec->klen);
-+	vec->setkey_error = crypto_aead_setkey(tfm, vec->key, vec->klen);
++	memcpy(&m, data, sizeof(m));
 +
-+	/* IV */
-+	generate_random_bytes((u8 *)vec->iv, ivsize);
-+
-+	/* Tag length: in [0, maxauthsize], but usually choose maxauthsize */
-+	authsize = maxauthsize;
-+	if (prandom_u32() % 4 == 0)
-+		authsize = prandom_u32() % (maxauthsize + 1);
-+	if (WARN_ON(authsize > maxdatasize))
-+		authsize = maxdatasize;
-+	maxdatasize -= authsize;
-+	vec->setauthsize_error = crypto_aead_setauthsize(tfm, authsize);
-+
-+	/* Plaintext and associated data */
-+	total_len = generate_random_length(maxdatasize);
-+	vec->alen = generate_random_length(total_len);
-+	vec->plen = total_len - vec->alen;
-+	generate_random_bytes((u8 *)vec->assoc, vec->alen);
-+	generate_random_bytes((u8 *)vec->ptext, vec->plen);
-+
-+	vec->clen = vec->plen + authsize;
-+
-+	/*
-+	 * If the key or authentication tag size couldn't be set, no need to
-+	 * continue to encrypt.
-+	 */
-+	if (vec->setkey_error || vec->setauthsize_error)
-+		goto done;
-+
-+	/* Ciphertext */
-+	sg_init_table(src, 2);
-+	i = 0;
-+	if (vec->alen)
-+		sg_set_buf(&src[i++], vec->assoc, vec->alen);
-+	if (vec->plen)
-+		sg_set_buf(&src[i++], vec->ptext, vec->plen);
-+	sg_init_one(&dst, vec->ctext, vec->alen + vec->clen);
-+	memcpy(iv, vec->iv, ivsize);
-+	aead_request_set_callback(req, 0, crypto_req_done, &wait);
-+	aead_request_set_crypt(req, src, &dst, vec->plen, iv);
-+	aead_request_set_ad(req, vec->alen);
-+	vec->crypt_error = crypto_wait_req(crypto_aead_encrypt(req), &wait);
-+	if (vec->crypt_error == 0)
-+		memmove((u8 *)vec->ctext, vec->ctext + vec->alen, vec->clen);
-+done:
-+	snprintf(name, max_namelen,
-+		 "\"random: alen=%u plen=%u authsize=%u klen=%u\"",
-+		 vec->alen, vec->plen, authsize, vec->klen);
-+}
-+
-+/*
-+ * Test the AEAD algorithm represented by @req against the corresponding generic
-+ * implementation, if one is available.
-+ */
-+static int test_aead_vs_generic_impl(const char *driver,
-+				     const struct alg_test_desc *test_desc,
-+				     struct aead_request *req,
-+				     struct cipher_test_sglists *tsgls)
-+{
-+	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
-+	const unsigned int ivsize = crypto_aead_ivsize(tfm);
-+	const unsigned int maxauthsize = crypto_aead_alg(tfm)->maxauthsize;
-+	const unsigned int blocksize = crypto_aead_blocksize(tfm);
-+	const unsigned int maxdatasize = (2 * PAGE_SIZE) - TESTMGR_POISON_LEN;
-+	const char *algname = tfm->base.__crt_alg->cra_name;
-+	const char *generic_driver = test_desc->generic_driver;
-+	char _generic_driver[CRYPTO_MAX_ALG_NAME];
-+	struct crypto_aead *generic_tfm = NULL;
-+	struct aead_request *generic_req = NULL;
-+	unsigned int maxkeysize;
-+	unsigned int i;
-+	struct aead_testvec vec = { 0 };
-+	char vec_name[64];
-+	struct testvec_config cfg;
-+	char cfgname[TESTVEC_CONFIG_NAMELEN];
-+	int err;
-+
-+	if (noextratests)
-+		return 0;
-+
-+	if (!generic_driver) { /* Use default naming convention? */
-+		err = build_generic_driver_name(algname, _generic_driver);
-+		if (err)
-+			return err;
-+		generic_driver = _generic_driver;
-+	}
-+
-+	if (strcmp(generic_driver, driver) == 0) /* Already the generic impl? */
-+		return 0;
-+
-+	generic_tfm = crypto_alloc_aead(generic_driver, 0, 0);
-+	if (IS_ERR(generic_tfm)) {
-+		err = PTR_ERR(generic_tfm);
-+		if (err == -ENOENT) {
-+			pr_warn("alg: aead: skipping comparison tests for %s because %s is unavailable\n",
-+				driver, generic_driver);
-+			return 0;
-+		}
-+		pr_err("alg: aead: error allocating %s (generic impl of %s): %d\n",
-+		       generic_driver, algname, err);
-+		return err;
-+	}
-+
-+	generic_req = aead_request_alloc(generic_tfm, GFP_KERNEL);
-+	if (!generic_req) {
-+		err = -ENOMEM;
-+		goto out;
-+	}
-+
-+	/* Check the algorithm properties for consistency. */
-+
-+	if (maxauthsize != crypto_aead_alg(generic_tfm)->maxauthsize) {
-+		pr_err("alg: aead: maxauthsize for %s (%u) doesn't match generic impl (%u)\n",
-+		       driver, maxauthsize,
-+		       crypto_aead_alg(generic_tfm)->maxauthsize);
-+		err = -EINVAL;
-+		goto out;
-+	}
-+
-+	if (ivsize != crypto_aead_ivsize(generic_tfm)) {
-+		pr_err("alg: aead: ivsize for %s (%u) doesn't match generic impl (%u)\n",
-+		       driver, ivsize, crypto_aead_ivsize(generic_tfm));
-+		err = -EINVAL;
-+		goto out;
-+	}
-+
-+	if (blocksize != crypto_aead_blocksize(generic_tfm)) {
-+		pr_err("alg: aead: blocksize for %s (%u) doesn't match generic impl (%u)\n",
-+		       driver, blocksize, crypto_aead_blocksize(generic_tfm));
-+		err = -EINVAL;
-+		goto out;
-+	}
-+
-+	/*
-+	 * Now generate test vectors using the generic implementation, and test
-+	 * the other implementation against them.
-+	 */
-+
-+	maxkeysize = 0;
-+	for (i = 0; i < test_desc->suite.aead.count; i++)
-+		maxkeysize = max_t(unsigned int, maxkeysize,
-+				   test_desc->suite.aead.vecs[i].klen);
-+
-+	vec.key = kmalloc(maxkeysize, GFP_KERNEL);
-+	vec.iv = kmalloc(ivsize, GFP_KERNEL);
-+	vec.assoc = kmalloc(maxdatasize, GFP_KERNEL);
-+	vec.ptext = kmalloc(maxdatasize, GFP_KERNEL);
-+	vec.ctext = kmalloc(maxdatasize, GFP_KERNEL);
-+	if (!vec.key || !vec.iv || !vec.assoc || !vec.ptext || !vec.ctext) {
-+		err = -ENOMEM;
-+		goto out;
-+	}
-+
-+	for (i = 0; i < fuzz_iterations * 8; i++) {
-+		generate_random_aead_testvec(generic_req, &vec,
-+					     maxkeysize, maxdatasize,
-+					     vec_name, sizeof(vec_name));
-+		generate_random_testvec_config(&cfg, cfgname, sizeof(cfgname));
-+
-+		err = test_aead_vec_cfg(driver, ENCRYPT, &vec, vec_name, &cfg,
-+					req, tsgls);
-+		if (err)
-+			goto out;
-+		err = test_aead_vec_cfg(driver, DECRYPT, &vec, vec_name, &cfg,
-+					req, tsgls);
-+		if (err)
-+			goto out;
-+		cond_resched();
-+	}
-+	err = 0;
-+out:
-+	kfree(vec.key);
-+	kfree(vec.iv);
-+	kfree(vec.assoc);
-+	kfree(vec.ptext);
-+	kfree(vec.ctext);
-+	crypto_free_aead(generic_tfm);
-+	aead_request_free(generic_req);
-+	return err;
-+}
-+#else /* !CONFIG_CRYPTO_MANAGER_EXTRA_TESTS */
-+static int test_aead_vs_generic_impl(const char *driver,
-+				     const struct alg_test_desc *test_desc,
-+				     struct aead_request *req,
-+				     struct cipher_test_sglists *tsgls)
-+{
-+	return 0;
-+}
-+#endif /* !CONFIG_CRYPTO_MANAGER_EXTRA_TESTS */
-+
- static int test_aead(const char *driver, int enc,
- 		     const struct aead_test_suite *suite,
- 		     struct aead_request *req,
-@@ -1818,6 +2035,10 @@ static int alg_test_aead(const struct alg_test_desc *desc, const char *driver,
- 		goto out;
++	streebog_g(&ctx->h, &ctx->N, &m);
  
- 	err = test_aead(driver, DECRYPT, suite, req, tsgls);
-+	if (err)
-+		goto out;
-+
-+	err = test_aead_vs_generic_impl(driver, desc, req, tsgls);
- out:
- 	free_cipher_test_sglists(tsgls);
- 	aead_request_free(req);
-@@ -3562,6 +3783,7 @@ static const struct alg_test_desc alg_test_descs[] = {
- 		}
- 	}, {
- 		.alg = "ccm(aes)",
-+		.generic_driver = "ccm_base(ctr(aes-generic),cbcmac(aes-generic))",
- 		.test = alg_test_aead,
- 		.fips_allowed = 1,
- 		.suite = {
-@@ -3974,6 +4196,7 @@ static const struct alg_test_desc alg_test_descs[] = {
- 		}
- 	}, {
- 		.alg = "gcm(aes)",
-+		.generic_driver = "gcm_base(ctr(aes-generic),ghash-generic)",
- 		.test = alg_test_aead,
- 		.fips_allowed = 1,
- 		.suite = {
-@@ -4245,6 +4468,7 @@ static const struct alg_test_desc alg_test_descs[] = {
- 		}
- 	}, {
- 		.alg = "rfc4106(gcm(aes))",
-+		.generic_driver = "rfc4106(gcm_base(ctr(aes-generic),ghash-generic))",
- 		.test = alg_test_aead,
- 		.fips_allowed = 1,
- 		.suite = {
-@@ -4252,6 +4476,7 @@ static const struct alg_test_desc alg_test_descs[] = {
- 		}
- 	}, {
- 		.alg = "rfc4309(ccm(aes))",
-+		.generic_driver = "rfc4309(ccm_base(ctr(aes-generic),cbcmac(aes-generic)))",
- 		.test = alg_test_aead,
- 		.fips_allowed = 1,
- 		.suite = {
-@@ -4259,6 +4484,7 @@ static const struct alg_test_desc alg_test_descs[] = {
- 		}
- 	}, {
- 		.alg = "rfc4543(gcm(aes))",
-+		.generic_driver = "rfc4543(gcm_base(ctr(aes-generic),ghash-generic))",
- 		.test = alg_test_aead,
- 		.suite = {
- 			.aead = __VECS(aes_gcm_rfc4543_tv_template)
+ 	streebog_add512(&ctx->N, &buffer512, &ctx->N);
+-	streebog_add512(&ctx->Sigma, (const struct streebog_uint512 *)data,
+-			&ctx->Sigma);
++	streebog_add512(&ctx->Sigma, &m, &ctx->Sigma);
+ }
+ 
+ static void streebog_stage3(struct streebog_state *ctx)
+@@ -1034,13 +1037,11 @@ static void streebog_stage3(struct streebog_state *ctx)
+ 	buf.qword[0] = cpu_to_le64(ctx->fillsize << 3);
+ 	streebog_pad(ctx);
+ 
+-	streebog_g(&ctx->h, &ctx->N, (const u8 *)&ctx->buffer);
++	streebog_g(&ctx->h, &ctx->N, &ctx->m);
+ 	streebog_add512(&ctx->N, &buf, &ctx->N);
+-	streebog_add512(&ctx->Sigma,
+-			(const struct streebog_uint512 *)&ctx->buffer[0],
+-			&ctx->Sigma);
+-	streebog_g(&ctx->h, &buffer0, (const u8 *)&ctx->N);
+-	streebog_g(&ctx->h, &buffer0, (const u8 *)&ctx->Sigma);
++	streebog_add512(&ctx->Sigma, &ctx->m, &ctx->Sigma);
++	streebog_g(&ctx->h, &buffer0, &ctx->N);
++	streebog_g(&ctx->h, &buffer0, &ctx->Sigma);
+ 	memcpy(&ctx->hash, &ctx->h, sizeof(struct streebog_uint512));
+ }
+ 
+diff --git a/include/crypto/streebog.h b/include/crypto/streebog.h
+index 856e32af86574..cae1b4a019713 100644
+--- a/include/crypto/streebog.h
++++ b/include/crypto/streebog.h
+@@ -23,7 +23,10 @@ struct streebog_uint512 {
+ };
+ 
+ struct streebog_state {
+-	u8 buffer[STREEBOG_BLOCK_SIZE];
++	union {
++		u8 buffer[STREEBOG_BLOCK_SIZE];
++		struct streebog_uint512 m;
++	};
+ 	struct streebog_uint512 hash;
+ 	struct streebog_uint512 h;
+ 	struct streebog_uint512 N;
 -- 
 2.21.0
 
