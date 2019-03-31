@@ -6,43 +6,43 @@ X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16205C10F0A
-	for <linux-crypto@archiver.kernel.org>; Sun, 31 Mar 2019 20:06:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E265DC10F06
+	for <linux-crypto@archiver.kernel.org>; Sun, 31 Mar 2019 20:06:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CF67D20872
+	by mail.kernel.org (Postfix) with ESMTP id 98C0120866
 	for <linux-crypto@archiver.kernel.org>; Sun, 31 Mar 2019 20:06:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=default; t=1554062762;
-	bh=4ulg24gBHUuJWlAbOmjarE/vMqdnfRBLnAWPD/ELOu4=;
+	bh=ZPv5oRIvjl5hE87uO9fxp7oTfh8Lr1mBQH8jm7RCZUU=;
 	h=From:To:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=YnmSd0YPC0fkTpP8E0Zcfo2/QlS7EbnOxqQe6OALujQS0LasdIE0agwR9BqYlEJ+A
-	 2tuhm9h78vu6Ni4Q7o75K7j47NtUNQTehVJfHyMhtB7Yc//s7XqBe514RIf4xsAnwP
-	 iO2rk0BWp3ZckLPpSHx3TUs4OqsuQETzTxfje7j8=
+	b=u9+k9mTG8+ahiw2ja4/ZLh6oxtP+oU7lHje9J1lt9hmjHrm+TihievDgNs2KYZyZt
+	 vuNvUc2BlE8aFSx1xw8PSujvw+H6mNc9qjBS4Mfd2x4zHECyMfnPHBtmfCaMZC4eIu
+	 C6AufdeCXpiae+VOIgH5c8U+lLl+/cJ+3FyCn3K8=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731496AbfCaUGB (ORCPT
+        id S1731506AbfCaUGB (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Sun, 31 Mar 2019 16:06:01 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42188 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:42186 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731497AbfCaUGB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1731496AbfCaUGB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Sun, 31 Mar 2019 16:06:01 -0400
 Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id C0ACA218EA
+        by mail.kernel.org (Postfix) with ESMTPSA id 8ED0920872
         for <linux-crypto@vger.kernel.org>; Sun, 31 Mar 2019 20:05:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=default; t=1554062759;
-        bh=4ulg24gBHUuJWlAbOmjarE/vMqdnfRBLnAWPD/ELOu4=;
+        bh=ZPv5oRIvjl5hE87uO9fxp7oTfh8Lr1mBQH8jm7RCZUU=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=2QTA9YsM/nscHojTPctMuxux0EVGW6tSUQiPPgl7+xBFvtPbaYG7OAuc28e18C3f3
-         mdqlBBr36ZBYjTGIrvpxbIT53vUPQKyb1HnE28mnLw1rjIu02dRrT0v9W2x6afZXBp
-         TZM1MgI+c/CFugrMXSktSpY+EHjMJ/TxsigpvEqA=
+        b=sN+IOWyb7DDLH/Ha/fp4O6drU0LU83wjkmGZvRUBusZgNgHfACbfAD7prIkNmb6o+
+         HPLVlyII3aJPTWWxN88jfwbKMNb6aMo8GmDNS0hHdoJJa15U44jlGzVRrb5cEQhgAA
+         tPxFWwVF9haAJJqkxfm5Dq/XrO3qF8A9dF8fsyvQ=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org
-Subject: [RFC/RFT PATCH 16/18] crypto: testmgr - fuzz skciphers against their generic implementation
-Date:   Sun, 31 Mar 2019 13:04:26 -0700
-Message-Id: <20190331200428.26597-17-ebiggers@kernel.org>
+Subject: [RFC/RFT PATCH 15/18] crypto: testmgr - fuzz hashes against their generic implementation
+Date:   Sun, 31 Mar 2019 13:04:25 -0700
+Message-Id: <20190331200428.26597-16-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190331200428.26597-1-ebiggers@kernel.org>
 References: <20190331200428.26597-1-ebiggers@kernel.org>
@@ -55,107 +55,101 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-When the extra crypto self-tests are enabled, test each skcipher
-algorithm against its generic implementation when one is available.
-This involves: checking the algorithm properties for consistency, then
+When the extra crypto self-tests are enabled, test each hash algorithm
+against its generic implementation when one is available.  This
+involves: checking the algorithm properties for consistency, then
 randomly generating test vectors using the generic implementation and
 running them against the implementation under test.  Both bad and good
 inputs are tested.
 
-This has already detected bugs in the skcipher_walk API, including one
-that caused a use-after free read in the lrw template and other places.
-It also detected an inconsistency in the cts implementations.
+This has already detected a bug in the x86 implementation of poly1305,
+bugs in crct10dif, and an inconsistency in cbcmac.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/testmgr.c | 197 +++++++++++++++++++++++++++++++++++++++++++++++
- crypto/testmgr.h |   2 +-
- 2 files changed, 198 insertions(+), 1 deletion(-)
+ crypto/testmgr.c | 174 +++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 170 insertions(+), 4 deletions(-)
 
 diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 6f5e85b3d17db..3fe178e32b0fe 100644
+index edbb5001cad58..6f5e85b3d17db 100644
 --- a/crypto/testmgr.c
 +++ b/crypto/testmgr.c
-@@ -2113,6 +2113,186 @@ static int test_skcipher_vec(const char *driver, int enc,
+@@ -1286,9 +1286,169 @@ static int test_hash_vec(const char *driver, const struct hash_testvec *vec,
  	return 0;
  }
  
 +#ifdef CONFIG_CRYPTO_MANAGER_EXTRA_TESTS
 +/*
-+ * Generate a symmetric cipher test vector from the given implementation.
++ * Generate a hash test vector from the given implementation.
 + * Assumes the buffers in 'vec' were already allocated.
 + */
-+static void generate_random_cipher_testvec(struct skcipher_request *req,
-+					   struct cipher_testvec *vec,
-+					   unsigned int maxdatasize,
-+					   char *name, size_t max_namelen)
++static void generate_random_hash_testvec(struct crypto_shash *tfm,
++					 struct hash_testvec *vec,
++					 unsigned int maxkeysize,
++					 unsigned int maxdatasize,
++					 char *name, size_t max_namelen)
 +{
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	const unsigned int maxkeysize = tfm->keysize;
-+	const unsigned int ivsize = crypto_skcipher_ivsize(tfm);
-+	struct scatterlist src, dst;
-+	u8 iv[MAX_IVLEN];
-+	DECLARE_CRYPTO_WAIT(wait);
++	SHASH_DESC_ON_STACK(desc, tfm);
 +
-+	/* Key: length in [0, maxkeysize], but usually choose maxkeysize */
-+	vec->klen = maxkeysize;
-+	if (prandom_u32() % 4 == 0)
-+		vec->klen = prandom_u32() % (maxkeysize + 1);
-+	generate_random_bytes((u8 *)vec->key, vec->klen);
-+	vec->setkey_error = crypto_skcipher_setkey(tfm, vec->key, vec->klen);
++	/* Data */
++	vec->psize = generate_random_length(maxdatasize);
++	generate_random_bytes((u8 *)vec->plaintext, vec->psize);
 +
-+	/* IV */
-+	generate_random_bytes((u8 *)vec->iv, ivsize);
++	/*
++	 * Key: length in range [1, maxkeysize], but usually choose maxkeysize.
++	 * If algorithm is unkeyed, then maxkeysize == 0 and set ksize = 0.
++	 */
++	vec->setkey_error = 0;
++	vec->ksize = 0;
++	if (maxkeysize) {
++		vec->ksize = maxkeysize;
++		if (prandom_u32() % 4 == 0)
++			vec->ksize = 1 + (prandom_u32() % maxkeysize);
++		generate_random_bytes((u8 *)vec->key, vec->ksize);
 +
-+	/* Plaintext */
-+	vec->len = generate_random_length(maxdatasize);
-+	generate_random_bytes((u8 *)vec->ptext, vec->len);
++		vec->setkey_error = crypto_shash_setkey(tfm, vec->key,
++							vec->ksize);
++		/* If the key couldn't be set, no need to continue to digest. */
++		if (vec->setkey_error)
++			goto done;
++	}
 +
-+	/* If the key couldn't be set, no need to continue to encrypt. */
-+	if (vec->setkey_error)
-+		goto done;
-+
-+	/* Ciphertext */
-+	sg_init_one(&src, vec->ptext, vec->len);
-+	sg_init_one(&dst, vec->ctext, vec->len);
-+	memcpy(iv, vec->iv, ivsize);
-+	skcipher_request_set_callback(req, 0, crypto_req_done, &wait);
-+	skcipher_request_set_crypt(req, &src, &dst, vec->len, iv);
-+	vec->crypt_error = crypto_wait_req(crypto_skcipher_encrypt(req), &wait);
++	/* Digest */
++	desc->tfm = tfm;
++	desc->flags = 0;
++	vec->digest_error = crypto_shash_digest(desc, vec->plaintext,
++						vec->psize, (u8 *)vec->digest);
 +done:
-+	snprintf(name, max_namelen, "\"random: len=%u klen=%u\"",
-+		 vec->len, vec->klen);
++	snprintf(name, max_namelen, "\"random: psize=%u ksize=%u\"",
++		 vec->psize, vec->ksize);
 +}
 +
 +/*
-+ * Test the skcipher algorithm represented by @req against the corresponding
-+ * generic implementation, if one is available.
++ * Test the hash algorithm represented by @req against the corresponding generic
++ * implementation, if one is available.
 + */
-+static int test_skcipher_vs_generic_impl(const char *driver,
-+					 const char *generic_driver,
-+					 struct skcipher_request *req,
-+					 struct cipher_test_sglists *tsgls)
++static int test_hash_vs_generic_impl(const char *driver,
++				     const char *generic_driver,
++				     unsigned int maxkeysize,
++				     struct ahash_request *req,
++				     struct test_sglist *tsgl,
++				     u8 *hashstate)
 +{
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	const unsigned int ivsize = crypto_skcipher_ivsize(tfm);
-+	const unsigned int blocksize = crypto_skcipher_blocksize(tfm);
++	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
++	const unsigned int digestsize = crypto_ahash_digestsize(tfm);
++	const unsigned int blocksize = crypto_ahash_blocksize(tfm);
 +	const unsigned int maxdatasize = (2 * PAGE_SIZE) - TESTMGR_POISON_LEN;
 +	const char *algname = tfm->base.__crt_alg->cra_name;
 +	char _generic_driver[CRYPTO_MAX_ALG_NAME];
-+	struct crypto_skcipher *generic_tfm = NULL;
-+	struct skcipher_request *generic_req = NULL;
++	struct crypto_shash *generic_tfm = NULL;
 +	unsigned int i;
-+	struct cipher_testvec vec = { 0 };
++	struct hash_testvec vec = { 0 };
 +	char vec_name[64];
 +	struct testvec_config cfg;
 +	char cfgname[TESTVEC_CONFIG_NAMELEN];
 +	int err;
 +
 +	if (noextratests)
-+		return 0;
-+
-+	/* Keywrap isn't supported here yet as it handles its IV differently. */
-+	if (strncmp(algname, "kw(", 3) == 0)
 +		return 0;
 +
 +	if (!generic_driver) { /* Use default naming convention? */
@@ -168,45 +162,32 @@ index 6f5e85b3d17db..3fe178e32b0fe 100644
 +	if (strcmp(generic_driver, driver) == 0) /* Already the generic impl? */
 +		return 0;
 +
-+	generic_tfm = crypto_alloc_skcipher(generic_driver, 0, 0);
++	generic_tfm = crypto_alloc_shash(generic_driver, 0, 0);
 +	if (IS_ERR(generic_tfm)) {
 +		err = PTR_ERR(generic_tfm);
 +		if (err == -ENOENT) {
-+			pr_warn("alg: skcipher: skipping comparison tests for %s because %s is unavailable\n",
++			pr_warn("alg: hash: skipping comparison tests for %s because %s is unavailable\n",
 +				driver, generic_driver);
 +			return 0;
 +		}
-+		pr_err("alg: skcipher: error allocating %s (generic impl of %s): %d\n",
++		pr_err("alg: hash: error allocating %s (generic impl of %s): %d\n",
 +		       generic_driver, algname, err);
 +		return err;
 +	}
 +
-+	generic_req = skcipher_request_alloc(generic_tfm, GFP_KERNEL);
-+	if (!generic_req) {
-+		err = -ENOMEM;
-+		goto out;
-+	}
-+
 +	/* Check the algorithm properties for consistency. */
 +
-+	if (tfm->keysize != generic_tfm->keysize) {
-+		pr_err("alg: skcipher: max keysize for %s (%u) doesn't match generic impl (%u)\n",
-+		       driver, tfm->keysize, generic_tfm->keysize);
++	if (digestsize != crypto_shash_digestsize(generic_tfm)) {
++		pr_err("alg: hash: digestsize for %s (%u) doesn't match generic impl (%u)\n",
++		       driver, digestsize,
++		       crypto_shash_digestsize(generic_tfm));
 +		err = -EINVAL;
 +		goto out;
 +	}
 +
-+	if (ivsize != crypto_skcipher_ivsize(generic_tfm)) {
-+		pr_err("alg: skcipher: ivsize for %s (%u) doesn't match generic impl (%u)\n",
-+		       driver, ivsize, crypto_skcipher_ivsize(generic_tfm));
-+		err = -EINVAL;
-+		goto out;
-+	}
-+
-+	if (blocksize != crypto_skcipher_blocksize(generic_tfm)) {
-+		pr_err("alg: skcipher: blocksize for %s (%u) doesn't match generic impl (%u)\n",
-+		       driver, blocksize,
-+		       crypto_skcipher_blocksize(generic_tfm));
++	if (blocksize != crypto_shash_blocksize(generic_tfm)) {
++		pr_err("alg: hash: blocksize for %s (%u) doesn't match generic impl (%u)\n",
++		       driver, blocksize, crypto_shash_blocksize(generic_tfm));
 +		err = -EINVAL;
 +		goto out;
 +	}
@@ -216,26 +197,22 @@ index 6f5e85b3d17db..3fe178e32b0fe 100644
 +	 * the other implementation against them.
 +	 */
 +
-+	vec.key = kmalloc(tfm->keysize, GFP_KERNEL);
-+	vec.iv = kmalloc(ivsize, GFP_KERNEL);
-+	vec.ptext = kmalloc(maxdatasize, GFP_KERNEL);
-+	vec.ctext = kmalloc(maxdatasize, GFP_KERNEL);
-+	if (!vec.key || !vec.iv || !vec.ptext || !vec.ctext) {
++	vec.key = kmalloc(maxkeysize, GFP_KERNEL);
++	vec.plaintext = kmalloc(maxdatasize, GFP_KERNEL);
++	vec.digest = kmalloc(digestsize, GFP_KERNEL);
++	if (!vec.key || !vec.plaintext || !vec.digest) {
 +		err = -ENOMEM;
 +		goto out;
 +	}
 +
 +	for (i = 0; i < fuzz_iterations * 8; i++) {
-+		generate_random_cipher_testvec(generic_req, &vec, maxdatasize,
-+					       vec_name, sizeof(vec_name));
++		generate_random_hash_testvec(generic_tfm, &vec,
++					     maxkeysize, maxdatasize,
++					     vec_name, sizeof(vec_name));
 +		generate_random_testvec_config(&cfg, cfgname, sizeof(cfgname));
 +
-+		err = test_skcipher_vec_cfg(driver, ENCRYPT, &vec, vec_name,
-+					    &cfg, req, tsgls);
-+		if (err)
-+			goto out;
-+		err = test_skcipher_vec_cfg(driver, DECRYPT, &vec, vec_name,
-+					    &cfg, req, tsgls);
++		err = test_hash_vec_cfg(driver, &vec, vec_name, &cfg,
++					req, tsgl, hashstate);
 +		if (err)
 +			goto out;
 +		cond_resched();
@@ -243,140 +220,72 @@ index 6f5e85b3d17db..3fe178e32b0fe 100644
 +	err = 0;
 +out:
 +	kfree(vec.key);
-+	kfree(vec.iv);
-+	kfree(vec.ptext);
-+	kfree(vec.ctext);
-+	crypto_free_skcipher(generic_tfm);
-+	skcipher_request_free(generic_req);
++	kfree(vec.plaintext);
++	kfree(vec.digest);
++	crypto_free_shash(generic_tfm);
 +	return err;
 +}
 +#else /* !CONFIG_CRYPTO_MANAGER_EXTRA_TESTS */
-+static int test_skcipher_vs_generic_impl(const char *driver,
-+					 const char *generic_driver,
-+					 struct skcipher_request *req,
-+					 struct cipher_test_sglists *tsgls)
++static int test_hash_vs_generic_impl(const char *driver,
++				     const char *generic_driver,
++				     unsigned int maxkeysize,
++				     struct ahash_request *req,
++				     struct test_sglist *tsgl,
++				     u8 *hashstate)
 +{
 +	return 0;
 +}
 +#endif /* !CONFIG_CRYPTO_MANAGER_EXTRA_TESTS */
 +
- static int test_skcipher(const char *driver, int enc,
- 			 const struct cipher_test_suite *suite,
- 			 struct skcipher_request *req,
-@@ -2172,6 +2352,11 @@ static int alg_test_skcipher(const struct alg_test_desc *desc,
- 		goto out;
- 
- 	err = test_skcipher(driver, DECRYPT, suite, req, tsgls);
-+	if (err)
-+		goto out;
-+
-+	err = test_skcipher_vs_generic_impl(driver, desc->generic_driver, req,
-+					    tsgls);
+ static int __alg_test_hash(const struct hash_testvec *vecs,
+ 			   unsigned int num_vecs, const char *driver,
+-			   u32 type, u32 mask)
++			   u32 type, u32 mask,
++			   const char *generic_driver, unsigned int maxkeysize)
+ {
+ 	struct crypto_ahash *tfm;
+ 	struct ahash_request *req = NULL;
+@@ -1336,7 +1496,8 @@ static int __alg_test_hash(const struct hash_testvec *vecs,
+ 		if (err)
+ 			goto out;
+ 	}
+-	err = 0;
++	err = test_hash_vs_generic_impl(driver, generic_driver, maxkeysize, req,
++					tsgl, hashstate);
  out:
- 	free_cipher_test_sglists(tsgls);
- 	skcipher_request_free(req);
-@@ -3127,12 +3312,14 @@ static int alg_test_null(const struct alg_test_desc *desc,
- static const struct alg_test_desc alg_test_descs[] = {
- 	{
- 		.alg = "adiantum(xchacha12,aes)",
-+		.generic_driver = "adiantum(xchacha12-generic,aes-generic,nhpoly1305-generic)",
- 		.test = alg_test_skcipher,
- 		.suite = {
- 			.cipher = __VECS(adiantum_xchacha12_aes_tv_template)
- 		},
- 	}, {
- 		.alg = "adiantum(xchacha20,aes)",
-+		.generic_driver = "adiantum(xchacha20-generic,aes-generic,nhpoly1305-generic)",
- 		.test = alg_test_skcipher,
- 		.suite = {
- 			.cipher = __VECS(adiantum_xchacha20_aes_tv_template)
-@@ -3905,30 +4092,35 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 	kfree(hashstate);
+ 	if (tsgl) {
+@@ -1354,6 +1515,7 @@ static int alg_test_hash(const struct alg_test_desc *desc, const char *driver,
+ 	const struct hash_testvec *template = desc->suite.hash.vecs;
+ 	unsigned int tcount = desc->suite.hash.count;
+ 	unsigned int nr_unkeyed, nr_keyed;
++	unsigned int maxkeysize = 0;
+ 	int err;
+ 
+ 	/*
+@@ -1372,16 +1534,20 @@ static int alg_test_hash(const struct alg_test_desc *desc, const char *driver,
+ 			       "unkeyed ones must come first\n", desc->alg);
+ 			return -EINVAL;
  		}
- 	}, {
- 		.alg = "lrw(aes)",
-+		.generic_driver = "lrw(ecb(aes-generic))",
- 		.test = alg_test_skcipher,
- 		.suite = {
- 			.cipher = __VECS(aes_lrw_tv_template)
- 		}
- 	}, {
- 		.alg = "lrw(camellia)",
-+		.generic_driver = "lrw(ecb(camellia-generic))",
- 		.test = alg_test_skcipher,
- 		.suite = {
- 			.cipher = __VECS(camellia_lrw_tv_template)
- 		}
- 	}, {
- 		.alg = "lrw(cast6)",
-+		.generic_driver = "lrw(ecb(cast6-generic))",
- 		.test = alg_test_skcipher,
- 		.suite = {
- 			.cipher = __VECS(cast6_lrw_tv_template)
- 		}
- 	}, {
- 		.alg = "lrw(serpent)",
-+		.generic_driver = "lrw(ecb(serpent-generic))",
- 		.test = alg_test_skcipher,
- 		.suite = {
- 			.cipher = __VECS(serpent_lrw_tv_template)
- 		}
- 	}, {
- 		.alg = "lrw(twofish)",
-+		.generic_driver = "lrw(ecb(twofish-generic))",
- 		.test = alg_test_skcipher,
- 		.suite = {
- 			.cipher = __VECS(tf_lrw_tv_template)
-@@ -4263,6 +4455,7 @@ static const struct alg_test_desc alg_test_descs[] = {
- 		},
- 	}, {
- 		.alg = "xts(aes)",
-+		.generic_driver = "xts(ecb(aes-generic))",
- 		.test = alg_test_skcipher,
- 		.fips_allowed = 1,
- 		.suite = {
-@@ -4270,12 +4463,14 @@ static const struct alg_test_desc alg_test_descs[] = {
- 		}
- 	}, {
- 		.alg = "xts(camellia)",
-+		.generic_driver = "xts(ecb(camellia-generic))",
- 		.test = alg_test_skcipher,
- 		.suite = {
- 			.cipher = __VECS(camellia_xts_tv_template)
- 		}
- 	}, {
- 		.alg = "xts(cast6)",
-+		.generic_driver = "xts(ecb(cast6-generic))",
- 		.test = alg_test_skcipher,
- 		.suite = {
- 			.cipher = __VECS(cast6_xts_tv_template)
-@@ -4289,12 +4484,14 @@ static const struct alg_test_desc alg_test_descs[] = {
- 		.fips_allowed = 1,
- 	}, {
- 		.alg = "xts(serpent)",
-+		.generic_driver = "xts(ecb(serpent-generic))",
- 		.test = alg_test_skcipher,
- 		.suite = {
- 			.cipher = __VECS(serpent_xts_tv_template)
- 		}
- 	}, {
- 		.alg = "xts(twofish)",
-+		.generic_driver = "xts(ecb(twofish-generic))",
- 		.test = alg_test_skcipher,
- 		.suite = {
- 			.cipher = __VECS(tf_xts_tv_template)
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index beb9bd79fe1fa..e03f4f72723b1 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -71,7 +71,7 @@ struct cipher_testvec {
- 	const char *ptext;
- 	const char *ctext;
- 	unsigned char wk; /* weak key flag */
--	unsigned char klen;
-+	unsigned short klen;
- 	unsigned short len;
- 	bool fips_skip;
- 	bool generates_iv;
++		maxkeysize = max_t(unsigned int, maxkeysize,
++				   template[nr_unkeyed + nr_keyed].ksize);
+ 	}
+ 
+ 	err = 0;
+ 	if (nr_unkeyed) {
+-		err = __alg_test_hash(template, nr_unkeyed, driver, type, mask);
++		err = __alg_test_hash(template, nr_unkeyed, driver, type, mask,
++				      desc->generic_driver, maxkeysize);
+ 		template += nr_unkeyed;
+ 	}
+ 
+ 	if (!err && nr_keyed)
+-		err = __alg_test_hash(template, nr_keyed, driver, type, mask);
++		err = __alg_test_hash(template, nr_keyed, driver, type, mask,
++				      desc->generic_driver, maxkeysize);
+ 
+ 	return err;
+ }
 -- 
 2.21.0
 
