@@ -2,84 +2,75 @@ Return-Path: <SRS0=dn2r=SD=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	FREEMAIL_REPLYTO_END_DIGIT,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59F37C43381
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Apr 2019 10:31:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B926C43381
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Apr 2019 10:51:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2B6D620693
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Apr 2019 10:31:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F419C2086C
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Apr 2019 10:51:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=protonmail.ch header.i=@protonmail.ch header.b="sPxW0CTo"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726409AbfDAKbi (ORCPT
+        id S1725882AbfDAKvT (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 1 Apr 2019 06:31:38 -0400
-Received: from mx07-00178001.pphosted.com ([62.209.51.94]:57090 "EHLO
-        mx07-00178001.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726163AbfDAKbi (ORCPT
+        Mon, 1 Apr 2019 06:51:19 -0400
+Received: from mail-40136.protonmail.ch ([185.70.40.136]:23676 "EHLO
+        mail-40136.protonmail.ch" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725868AbfDAKvS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 1 Apr 2019 06:31:38 -0400
-Received: from pps.filterd (m0046668.ppops.net [127.0.0.1])
-        by mx07-00178001.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x31AQKcD024153;
-        Mon, 1 Apr 2019 12:31:13 +0200
-Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-        by mx07-00178001.pphosted.com with ESMTP id 2rhxt4j2tm-1
-        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT);
-        Mon, 01 Apr 2019 12:31:13 +0200
-Received: from zeta.dmz-eu.st.com (zeta.dmz-eu.st.com [164.129.230.9])
-        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 7B96F34;
-        Mon,  1 Apr 2019 10:31:11 +0000 (GMT)
-Received: from Webmail-eu.st.com (Safex1hubcas21.st.com [10.75.90.44])
-        by zeta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 41D7F25E8;
-        Mon,  1 Apr 2019 10:31:11 +0000 (GMT)
-Received: from SAFEX1HUBCAS23.st.com (10.75.90.47) by SAFEX1HUBCAS21.st.com
- (10.75.90.44) with Microsoft SMTP Server (TLS) id 14.3.361.1; Mon, 1 Apr 2019
- 12:31:11 +0200
-Received: from localhost (10.201.23.65) by webmail-ga.st.com (10.75.90.48)
- with Microsoft SMTP Server (TLS) id 14.3.435.0; Mon, 1 Apr 2019 12:31:08
- +0200
-From:   Lionel Debieve <lionel.debieve@st.com>
-To:     Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@st.com>,
-        Rob Herring <rob.herring@linaro.org>,
-        <linux-crypto@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>
-CC:     Benjamin Gaignard <benjamin.gaignard@st.com>,
-        Ludovic Barre <ludovic.barre@st.com>,
-        <linux-stm32@st-md-mailman.stormreply.com>
-Subject: [PATCH 0/2] hwrng: stm32 - Fix issue and add default quality level
-Date:   Mon, 1 Apr 2019 12:30:44 +0200
-Message-ID: <1554114646-18791-1-git-send-email-lionel.debieve@st.com>
-X-Mailer: git-send-email 2.7.4
+        Mon, 1 Apr 2019 06:51:18 -0400
+Date:   Mon, 01 Apr 2019 10:51:11 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.ch;
+        s=default; t=1554115875;
+        bh=CCZn8bOyNqrgx3fwNQqpHv1QiduLLDmeLTfHAW7nXws=;
+        h=Date:To:From:Cc:Reply-To:Subject:In-Reply-To:References:
+         Feedback-ID:From;
+        b=sPxW0CToNcyuiprk9gzOUy6TXevgSdmvYpP7f3D2bALzkupwq8BkbgqfGJ589YysR
+         gsrN/rRoumec+/hObch4aFl3z6C19Ablli2/dJq0a1h6LtWO6E9QmhsqO0ydRBdm/S
+         3onTtMuE0SPfzv/LtkXblpXElsGlsWFSx6AReXzo=
+To:     Vitaly Chikunov <vt@altlinux.org>
+From:   Jordan Glover <Golden_Miller83@protonmail.ch>
+Cc:     Eric Biggers <ebiggers@kernel.org>, Theodore Ts'o <tytso@mit.edu>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Reply-To: Jordan Glover <Golden_Miller83@protonmail.ch>
+Subject: Re: Should we consider removing Streebog from the Linux Kernel?
+Message-ID: <LTLnFwnutvaWrlb3nFL9UEbwFqGlQPrULSlMM7Wli53B65WOofk1Vpp_ycEazJ3ore49c12K7UsDVHIOf8xuN5tepSyH0b-8zmP4gELpaVo=@protonmail.ch>
+In-Reply-To: <20190401100437.6tivlvp53zjprda6@altlinux.org>
+References: <20190325044550.GI5675@mit.edu>
+ <20190325060041.wl23bncqjab7dj5c@altlinux.org>
+ <20190331224329.GA681@sol.localdomain>
+ <20190401100437.6tivlvp53zjprda6@altlinux.org>
+Feedback-ID: QEdvdaLhFJaqnofhWA-dldGwsuoeDdDw7vz0UPs8r8sanA3bIt8zJdf4aDqYKSy4gJuZ0WvFYJtvq21y6ge_uQ==:Ext:ProtonMail
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.201.23.65]
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-04-01_04:,,
- signatures=0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This series will fix two missing parts in the current driver.
-The first one will fix a missing function in the rng driver that
-need to call a proper removal to notify the pm_runtime framework.
+On Monday, April 1, 2019 10:04 AM, Vitaly Chikunov <vt@altlinux.org> wrote:
 
-Second is an improvement for driver to be used as default entropy
-source early in the boot processing.
+> >
+> > Can you elaborate on why you want to use Streebog? When we added Speck,=
+ we
+> > explained in great detail why it was useful from a technical perspectiv=
+e (before
+> > Adiantum was ready). I don't see any such explanation for Streebog.
+>
+> Our users demand that file integrity is implemented using their national
+> standard algorithm.
+>
+> Thanks,
 
-Lionel Debieve (2):
-  hwrng: stm32 - fix unbalanced pm_runtime_enable
-  hwrng: stm32 - set default random quality
+Does it mean that every state can demand from Linux kernel to carrying cryp=
+to
+algorithms of their choice?
 
- drivers/char/hw_random/stm32-rng.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
-
--- 
-2.7.4
+Jordan
