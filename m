@@ -6,38 +6,38 @@ X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92AF1C10F0E
-	for <linux-crypto@archiver.kernel.org>; Tue,  2 Apr 2019 15:48:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40FC3C10F0B
+	for <linux-crypto@archiver.kernel.org>; Tue,  2 Apr 2019 15:49:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 615B92146E
-	for <linux-crypto@archiver.kernel.org>; Tue,  2 Apr 2019 15:48:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0F24120856
+	for <linux-crypto@archiver.kernel.org>; Tue,  2 Apr 2019 15:49:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1554220138;
-	bh=41GP8Yjo0+8dQSPM4iw7HW6C6zzvGO0pLKV+NuTF9s8=;
+	s=default; t=1554220146;
+	bh=No3yfIQYvQbNAxm366pcajxAnEE1z10+tSOuqrDVVDw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=AHAoeVpUnjWa0Kn+5LKQarc2291eOEpnW9CQU2ywVqHDWWe1JxhYwMbqJrc9LOlPB
-	 8dWl5fFqJOndE/lwabPJ62DDJYb+LJONC13o30KWzuxUU/Yv6NeRZjYTfsrb6HbCv9
-	 yiZXA/Rn2T9X723WegL6eUp68r2VjEZHPsM3Tpd4=
+	b=AQwGVd7YdzPTpemwwpHBDjBzhCH0Rwk3ztk9275U+Jd0gIiLgcd8qohpfMD/pm0wr
+	 fLOe7FAACTDOMuOCstrUU3UCuVkCf48uD/jrvO7i7urKEGEBDc5bQnGC3nhVnY1+bh
+	 4I2sUQq43p7jtkpOPCQbxHOvCCDRKrEKRCJPGk60=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731474AbfDBPst (ORCPT
+        id S1731482AbfDBPs7 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 2 Apr 2019 11:48:49 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37158 "EHLO mail.kernel.org"
+        Tue, 2 Apr 2019 11:48:59 -0400
+Received: from mail.kernel.org ([198.145.29.99]:36870 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729212AbfDBPsk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 2 Apr 2019 11:48:40 -0400
+        id S1731342AbfDBPsi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 2 Apr 2019 11:48:38 -0400
 Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 57EBA20857;
-        Tue,  2 Apr 2019 15:48:38 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 65FDD21734;
+        Tue,  2 Apr 2019 15:48:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1554220118;
-        bh=41GP8Yjo0+8dQSPM4iw7HW6C6zzvGO0pLKV+NuTF9s8=;
+        s=default; t=1554220117;
+        bh=No3yfIQYvQbNAxm366pcajxAnEE1z10+tSOuqrDVVDw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=YG7XC8W9V997ZoH5DN6+mEANCrE0ICM8BzrXRiftyUfaEYHTpqmHCg2TTaerajB4d
-         TrEJVbR2xA4A8P6/6D7xyersephTYeaYVy52+hweySesJNHY/7hzRMM4ZBW3x8u2rp
-         9ogcy218bkDv9lQPpMjRgpW7h7O7J8Yb9lhU3epA=
+        b=HB+m6lb5CqeujWLWM1VctPE6ZFeTgRo/rvRqMycX1ptcjcSjzDalOMClAenIzekjm
+         QCx4K32vl9C3tHTbjUzsFWZeO+CxjW8hB3frvhNSmP3275fNnvsCLL45HzOkS4qw7N
+         o4aOr54sze2X8Gj7Z5/wvPWfZzTML4N8Lkhctp8I=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-fscrypt@vger.kernel.org
 Cc:     linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
@@ -46,9 +46,9 @@ Cc:     linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
         linux-crypto@vger.kernel.org, keyrings@vger.kernel.org,
         Paul Crowley <paulcrowley@google.com>,
         Satya Tangirala <satyat@google.com>
-Subject: [PATCH v4 16/17] ubifs: wire up new fscrypt ioctls
-Date:   Tue,  2 Apr 2019 08:45:59 -0700
-Message-Id: <20190402154600.32432-17-ebiggers@kernel.org>
+Subject: [PATCH v4 14/17] ext4: wire up new fscrypt ioctls
+Date:   Tue,  2 Apr 2019 08:45:57 -0700
+Message-Id: <20190402154600.32432-15-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190402154600.32432-1-ebiggers@kernel.org>
 References: <20190402154600.32432-1-ebiggers@kernel.org>
@@ -64,7 +64,7 @@ From: Eric Biggers <ebiggers@google.com>
 Wire up the new ioctls for adding and removing fscrypt keys to/from the
 filesystem, and the new ioctl for retrieving v2 encryption policies.
 
-FS_IOC_REMOVE_ENCRYPTION_KEY also required making UBIFS use
+FS_IOC_REMOVE_ENCRYPTION_KEY also required making ext4_drop_inode() call
 fscrypt_drop_inode().
 
 For more details see Documentation/filesystems/fscrypt.rst, as well as
@@ -72,81 +72,66 @@ the fscrypt patches that added the implementation of these ioctls.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- fs/ubifs/ioctl.c | 23 +++++++++++++++++------
- fs/ubifs/super.c | 11 +++++++++++
- 2 files changed, 28 insertions(+), 6 deletions(-)
+ fs/ext4/ioctl.c | 24 ++++++++++++++++++++++++
+ fs/ext4/super.c |  3 +++
+ 2 files changed, 27 insertions(+)
 
-diff --git a/fs/ubifs/ioctl.c b/fs/ubifs/ioctl.c
-index 82e4e6a30b044..3c640a7e937f4 100644
---- a/fs/ubifs/ioctl.c
-+++ b/fs/ubifs/ioctl.c
-@@ -205,13 +205,20 @@ long ubifs_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
- 		return -EOPNOTSUPP;
- #endif
- 	}
--	case FS_IOC_GET_ENCRYPTION_POLICY: {
--#ifdef CONFIG_FS_ENCRYPTION
-+	case FS_IOC_GET_ENCRYPTION_POLICY:
- 		return fscrypt_ioctl_get_policy(file, (void __user *)arg);
--#else
--		return -EOPNOTSUPP;
--#endif
--	}
-+
+diff --git a/fs/ext4/ioctl.c b/fs/ext4/ioctl.c
+index bab3da4f1e0d3..3ed66628e9301 100644
+--- a/fs/ext4/ioctl.c
++++ b/fs/ext4/ioctl.c
+@@ -1074,6 +1074,26 @@ long ext4_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
+ 	case EXT4_IOC_GET_ENCRYPTION_POLICY:
+ 		return fscrypt_ioctl_get_policy(filp, (void __user *)arg);
+ 
 +	case FS_IOC_GET_ENCRYPTION_POLICY_EX:
-+		return fscrypt_ioctl_get_policy_ex(file, (void __user *)arg);
++		if (!ext4_has_feature_encrypt(sb))
++			return -EOPNOTSUPP;
++		return fscrypt_ioctl_get_policy_ex(filp, (void __user *)arg);
 +
 +	case FS_IOC_ADD_ENCRYPTION_KEY:
-+		return fscrypt_ioctl_add_key(file, (void __user *)arg);
++		if (!ext4_has_feature_encrypt(sb))
++			return -EOPNOTSUPP;
++		return fscrypt_ioctl_add_key(filp, (void __user *)arg);
 +
 +	case FS_IOC_REMOVE_ENCRYPTION_KEY:
-+		return fscrypt_ioctl_remove_key(file, (const void __user *)arg);
++		if (!ext4_has_feature_encrypt(sb))
++			return -EOPNOTSUPP;
++		return fscrypt_ioctl_remove_key(filp, (const void __user *)arg);
 +
 +	case FS_IOC_GET_ENCRYPTION_KEY_STATUS:
-+		return fscrypt_ioctl_get_key_status(file, (void __user *)arg);
- 
- 	default:
- 		return -ENOTTY;
-@@ -230,6 +237,10 @@ long ubifs_compat_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
- 		break;
- 	case FS_IOC_SET_ENCRYPTION_POLICY:
- 	case FS_IOC_GET_ENCRYPTION_POLICY:
++		if (!ext4_has_feature_encrypt(sb))
++			return -EOPNOTSUPP;
++		return fscrypt_ioctl_get_key_status(filp, (void __user *)arg);
++
+ 	case EXT4_IOC_FSGETXATTR:
+ 	{
+ 		struct fsxattr fa;
+@@ -1192,6 +1212,10 @@ long ext4_compat_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
+ 	case EXT4_IOC_SET_ENCRYPTION_POLICY:
+ 	case EXT4_IOC_GET_ENCRYPTION_PWSALT:
+ 	case EXT4_IOC_GET_ENCRYPTION_POLICY:
 +	case FS_IOC_GET_ENCRYPTION_POLICY_EX:
 +	case FS_IOC_ADD_ENCRYPTION_KEY:
 +	case FS_IOC_REMOVE_ENCRYPTION_KEY:
 +	case FS_IOC_GET_ENCRYPTION_KEY_STATUS:
+ 	case EXT4_IOC_SHUTDOWN:
+ 	case FS_IOC_GETFSMAP:
  		break;
- 	default:
- 		return -ENOIOCTLCMD;
-diff --git a/fs/ubifs/super.c b/fs/ubifs/super.c
-index 8dc2818fdd849..cd4a3e2be2043 100644
---- a/fs/ubifs/super.c
-+++ b/fs/ubifs/super.c
-@@ -334,6 +334,16 @@ static int ubifs_write_inode(struct inode *inode, struct writeback_control *wbc)
- 	return err;
- }
+diff --git a/fs/ext4/super.c b/fs/ext4/super.c
+index 6ed4eb81e6743..624543a3f4d3e 100644
+--- a/fs/ext4/super.c
++++ b/fs/ext4/super.c
+@@ -1103,6 +1103,9 @@ static int ext4_drop_inode(struct inode *inode)
+ {
+ 	int drop = generic_drop_inode(inode);
  
-+static int ubifs_drop_inode(struct inode *inode)
-+{
-+	int drop = generic_drop_inode(inode);
-+
 +	if (!drop)
 +		drop = fscrypt_drop_inode(inode);
 +
-+	return drop;
-+}
-+
- static void ubifs_evict_inode(struct inode *inode)
- {
- 	int err;
-@@ -1982,6 +1992,7 @@ const struct super_operations ubifs_super_operations = {
- 	.destroy_inode = ubifs_destroy_inode,
- 	.put_super     = ubifs_put_super,
- 	.write_inode   = ubifs_write_inode,
-+	.drop_inode    = ubifs_drop_inode,
- 	.evict_inode   = ubifs_evict_inode,
- 	.statfs        = ubifs_statfs,
- 	.dirty_inode   = ubifs_dirty_inode,
+ 	trace_ext4_drop_inode(inode, drop);
+ 	return drop;
+ }
 -- 
 2.21.0
 
