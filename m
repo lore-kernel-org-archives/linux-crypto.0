@@ -1,44 +1,49 @@
 Return-Path: <SRS0=rTfc=SG=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Level: *
+X-Spam-Status: No, score=1.5 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,MAILING_LIST_MULTI,SPF_PASS,
+	USER_AGENT_MUTT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC4C7C4360F
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Apr 2019 13:41:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7808C4360F
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Apr 2019 17:12:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 77DDA2171F
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Apr 2019 13:41:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=insidesecure.onmicrosoft.com header.i=@insidesecure.onmicrosoft.com header.b="QYQNm9pA"
+	by mail.kernel.org (Postfix) with ESMTP id 7D7192075E
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Apr 2019 17:12:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1554397929;
+	bh=aXS/er4HBQNFf3E7MTT4ZdaWtvRrMiEkXol7ICiOn0M=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=lClVyUIcxDf+xOLBYt0euvzyakPd1o8TO3I6era/GZQX1cvxpxHyw1aaNQaIvwflu
+	 DXGndF2AHZTT546Xo5gY9iz1ryv7hlScakinXr/iKmLSogNtLvb/qVMTqTwX3MJ5YR
+	 XqkZaEzf111k0256dnFHn780AWoEp3N3z4mBlzKc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727108AbfDDNl5 (ORCPT
+        id S1728724AbfDDRMI (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 4 Apr 2019 09:41:57 -0400
-Received: from mail-eopbgr30104.outbound.protection.outlook.com ([40.107.3.104]:38960
-        "EHLO EUR03-AM5-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726790AbfDDNl5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 4 Apr 2019 09:41:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=insidesecure.onmicrosoft.com; s=selector1-insidesecure-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BZNOowWTrxGz5Kw/wCml6cvTxdxP5S11Gp0KP/Gidg0=;
- b=QYQNm9pA4oVbthFeKKLUwAlK0DeKamnEiuMuDZ6/dVC0DWk1cYqN8jqqzMt/eQRNlVxlxPSwx5HGypnh4Pj77q7fL2EcysTMAZs8/JVSviW9LJK1ZbmKg+4N9C7TibPY2U8idJ6UmKU1CswAvZySotp28nVgt2Mie5dw8nKFCVs=
-Received: from AM5PR0901MB1155.eurprd09.prod.outlook.com (10.167.221.149) by
- AM5PR0901MB1156.eurprd09.prod.outlook.com (10.167.221.150) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1750.17; Thu, 4 Apr 2019 13:41:50 +0000
-Received: from AM5PR0901MB1155.eurprd09.prod.outlook.com
- ([fe80::1474:595e:39d3:b62b]) by AM5PR0901MB1155.eurprd09.prod.outlook.com
- ([fe80::1474:595e:39d3:b62b%4]) with mapi id 15.20.1771.014; Thu, 4 Apr 2019
- 13:41:50 +0000
-From:   Pascal Van Leeuwen <pvanleeuwen@insidesecure.com>
-To:     Eric Biggers <ebiggers@kernel.org>,
-        Zhang Zhijie <zhangzj@rock-chips.com>
-CC:     Heiko Stuebner <heiko@sntech.de>,
+        Thu, 4 Apr 2019 13:12:08 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49854 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726698AbfDDRMI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 4 Apr 2019 13:12:08 -0400
+Received: from gmail.com (unknown [104.132.1.77])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id E987D206BA;
+        Thu,  4 Apr 2019 17:12:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1554397927;
+        bh=aXS/er4HBQNFf3E7MTT4ZdaWtvRrMiEkXol7ICiOn0M=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=l15YJtid7VbR0t6Rh/c0DNOrL0+xMvIlmSbUVaq04pDH2MbSqqKjostr+5rLzpT9V
+         Xb6xJNGxIqEq6dwaEbRGegiE5uS2T7B6OpSejTjkcPr1KYOV0K5Gc34mlCW6fZeJ5I
+         SJqDvJnWhioUPm7LBWZBeLcAzlfwsgUT6hvHjnJc=
+Date:   Thu, 4 Apr 2019 10:12:05 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Pascal Van Leeuwen <pvanleeuwen@insidesecure.com>,
+        Zhang Zhijie <zhangzj@rock-chips.com>,
+        Heiko Stuebner <heiko@sntech.de>,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         Zain Wang <wzz@rock-chips.com>, Arnd Bergmann <arnd@arndb.de>,
         "linux-rockchip@lists.infradead.org" 
@@ -48,87 +53,55 @@ CC:     Heiko Stuebner <heiko@sntech.de>,
         "ezequiel@collabora.com" <ezequiel@collabora.com>,
         linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
         Tao Huang <huangtao@rock-chips.com>
-Subject: RE: [Bug] Rockchip crypto driver sometimes produces wrong ciphertext
-Thread-Topic: [Bug] Rockchip crypto driver sometimes produces wrong ciphertext
-Thread-Index: AQHU2t+fclaO8KhrhESirEuEC3Q5mqYsHxyQ
-Date:   Thu, 4 Apr 2019 13:41:50 +0000
-Message-ID: <AM5PR0901MB115570ABE89DC1285AE07E60D2500@AM5PR0901MB1155.eurprd09.prod.outlook.com>
+Subject: Re: [Bug] Rockchip crypto driver sometimes produces wrong ciphertext
+Message-ID: <20190404171204.GA121392@gmail.com>
 References: <20190126210530.GB709@sol.localdomain>
  <CAKv+Gu-RKu9jt+2FnV2529zqyLGR8RSu8r4B8eOs-7Om-pL0aQ@mail.gmail.com>
  <1894799.pWIprST79S@phil>
  <f7a0d04c-339e-d9f8-7188-a27d55ad8b4d@rock-chips.com>
  <20190315033140.GB1671@sol.localdomain>
-In-Reply-To: <20190315033140.GB1671@sol.localdomain>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=pvanleeuwen@insidesecure.com; 
-x-originating-ip: [188.204.2.113]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 6a0457de-10a9-4768-12aa-08d6b9034a86
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(5600139)(711020)(4605104)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);SRVR:AM5PR0901MB1156;
-x-ms-traffictypediagnostic: AM5PR0901MB1156:
-x-microsoft-antispam-prvs: <AM5PR0901MB11567160E8C87E5283C83A3FD2500@AM5PR0901MB1156.eurprd09.prod.outlook.com>
-x-forefront-prvs: 0997523C40
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(396003)(136003)(39840400004)(376002)(366004)(346002)(52314003)(199004)(189003)(26005)(186003)(6506007)(110136005)(102836004)(54906003)(305945005)(25786009)(52536014)(8676002)(81166006)(14444005)(229853002)(55016002)(476003)(256004)(86362001)(76176011)(33656002)(478600001)(446003)(6246003)(9686003)(11346002)(7696005)(68736007)(105586002)(99286004)(8936002)(53936002)(316002)(74316002)(97736004)(3846002)(81156014)(4326008)(6436002)(14454004)(6116002)(7736002)(71190400001)(71200400001)(486006)(5660300002)(2906002)(106356001)(66066001)(7416002)(93886005);DIR:OUT;SFP:1102;SCL:1;SRVR:AM5PR0901MB1156;H:AM5PR0901MB1155.eurprd09.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: insidesecure.com does not
- designate permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: z/tjVWRf5yceqiotwxSEUgC5xzf/p9Muggz03REruRnx9ytn378zyqZ8W+A8bybDiat5bipmGwfgMZy+jHwYEiDTR9mMlQAjgV92ame9A9pTujf4ILBGZT7DsPMEuX7Q/q+Ia3HtLBgCukSEc5x4u6O1Me0shTWXz+nPOJBdisIUW/D4iFfLy2BhT5VFoP06bOjgt/1mTbYN+zJde58Te8T+eEWARULNSL66qb+TJOeV06Tv06Fhp+sL2bF+B9rPXFpeg5NU+usoWLovDAThK802ovpuK5RVb4bxYJqibT9Wxqx5un/0VAqN3du5ywo0y7HjnOPCv4xsHVacdpO0yALLgHQgY+rdCJij8qF6KTNRXX+fl0b59YLDWA1lItTmDTjnkDnkyyrjdyNuo5ZVX9VA2d+NjVNg6j8WjhfylwY=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ <AM5PR0901MB115570ABE89DC1285AE07E60D2500@AM5PR0901MB1155.eurprd09.prod.outlook.com>
 MIME-Version: 1.0
-X-OriginatorOrg: insidesecure.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6a0457de-10a9-4768-12aa-08d6b9034a86
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Apr 2019 13:41:50.3682
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3c07df58-7760-4e85-afd5-84803eac70ce
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM5PR0901MB1156
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <AM5PR0901MB115570ABE89DC1285AE07E60D2500@AM5PR0901MB1155.eurprd09.prod.outlook.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-> The issue is that the self-tests now verify that CBC implementations upda=
-te the
-> IV buffer to contain the next IV, aka the last ciphertext block.  But the=
- Rockchip
-> crypto driver doesn't do that, so it needs to be fixed.
->
-> This has always been a requirement for CBC implementations so that users =
-can
-> chain CBC requests.  Unfortunately it was just never tested for...
->
-This did not immediately trigger me when it came flying past a couple of we=
-eks
-ago, but I ran into the same issue today with the inside_secure driver I'm =
-playing
-with: it does NOT return correct IV outputs for CBC modes.
+On Thu, Apr 04, 2019 at 01:41:50PM +0000, Pascal Van Leeuwen wrote:
+> > The issue is that the self-tests now verify that CBC implementations update the
+> > IV buffer to contain the next IV, aka the last ciphertext block.  But the Rockchip
+> > crypto driver doesn't do that, so it needs to be fixed.
+> >
+> > This has always been a requirement for CBC implementations so that users can
+> > chain CBC requests.  Unfortunately it was just never tested for...
+> >
+> This did not immediately trigger me when it came flying past a couple of weeks
+> ago, but I ran into the same issue today with the inside_secure driver I'm playing
+> with: it does NOT return correct IV outputs for CBC modes.
+> 
+> However ... I'd like to question that very requirement ... if I may :-)
+> 
+> My reasoning is that this IV output *is* available as the last block of either the
+> output (for encrypt) or input (for decrypt) datastream. So requiring it to be
+> updated in the IV buffer as well seems redundant to me. It burdens the driver
+> with an extra data copy operation, while in the majority of practicle use cases
+> you would not even *need* this output IV. (chaining IV's would not work on
+> a hardware accelerator anyway, because you would need to serialize the
+> datastream, meaning you run at the speed of the round-trip latency instead
+> of the throughput, which is typically one to two orders of a magnitude slower)
+> 
+> And in the odd case you do need it, you can just grab it from the data buffer
+> yourself.
+> 
+> Pascal van Leeuwen
+> Silicon IP Architect, Multi-Protocol Engines
+> 
 
-However ... I'd like to question that very requirement ... if I may :-)
+Herbert, can you explain what users actually rely on the next IV being returned?
+I don't know all the historical context behind this.
 
-My reasoning is that this IV output *is* available as the last block of eit=
-her the
-output (for encrypt) or input (for decrypt) datastream. So requiring it to =
-be
-updated in the IV buffer as well seems redundant to me. It burdens the driv=
-er
-with an extra data copy operation, while in the majority of practicle use c=
-ases
-you would not even *need* this output IV. (chaining IV's would not work on
-a hardware accelerator anyway, because you would need to serialize the
-datastream, meaning you run at the speed of the round-trip latency instead
-of the throughput, which is typically one to two orders of a magnitude slow=
-er)
-
-And in the odd case you do need it, you can just grab it from the data buff=
-er
-yourself.
-
-Pascal van Leeuwen
-Silicon IP Architect, Multi-Protocol Engines
-
+- Eric
