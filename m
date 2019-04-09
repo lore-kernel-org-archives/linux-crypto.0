@@ -3,75 +3,74 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9148BC10F0E
-	for <linux-crypto@archiver.kernel.org>; Tue,  9 Apr 2019 14:03:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69B6DC282DA
+	for <linux-crypto@archiver.kernel.org>; Tue,  9 Apr 2019 15:23:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5A70E2084F
-	for <linux-crypto@archiver.kernel.org>; Tue,  9 Apr 2019 14:03:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3978320883
+	for <linux-crypto@archiver.kernel.org>; Tue,  9 Apr 2019 15:23:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726112AbfDIODB (ORCPT
+        id S1726456AbfDIPXZ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 9 Apr 2019 10:03:01 -0400
-Received: from vmicros1.altlinux.org ([194.107.17.57]:53596 "EHLO
-        vmicros1.altlinux.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726035AbfDIODB (ORCPT
+        Tue, 9 Apr 2019 11:23:25 -0400
+Received: from stargate.chelsio.com ([12.32.117.8]:48108 "EHLO
+        stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726372AbfDIPXY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 9 Apr 2019 10:03:01 -0400
-Received: from imap.altlinux.org (imap.altlinux.org [194.107.17.38])
-        by vmicros1.altlinux.org (Postfix) with ESMTP id 2C27972CC61;
-        Tue,  9 Apr 2019 17:02:59 +0300 (MSK)
-Received: from altlinux.org (sole.flsd.net [185.75.180.6])
-        by imap.altlinux.org (Postfix) with ESMTPSA id 10F584A4A2A;
-        Tue,  9 Apr 2019 17:02:59 +0300 (MSK)
-Date:   Tue, 9 Apr 2019 17:02:58 +0300
-From:   Vitaly Chikunov <vt@altlinux.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v8 00/10] crypto: add EC-RDSA (GOST 34.10) algorithm
-Message-ID: <20190409140258.edqnpzr3ghuq5p7g@altlinux.org>
-Mail-Followup-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20190326125842.24110-1-vt@altlinux.org>
- <20190408160516.wvpcnvrmask56b2g@altlinux.org>
- <20190409061756.iyja4535fsu7xrqo@gondor.apana.org.au>
+        Tue, 9 Apr 2019 11:23:24 -0400
+Received: from beagle7.asicdesigners.com (beagle7.asicdesigners.com [10.192.192.157])
+        by stargate.chelsio.com (8.13.8/8.13.8) with ESMTP id x39FMxNq003408;
+        Tue, 9 Apr 2019 08:22:59 -0700
+From:   Atul Gupta <atul.gupta@chelsio.com>
+To:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
+        dt@chelsio.com, atul.gupta@chelsio.com
+Subject: [crypto 0/4] Inline TLS client and v6 support
+Date:   Tue,  9 Apr 2019 08:22:34 -0700
+Message-Id: <20190409152234.11100-1-atul.gupta@chelsio.com>
+X-Mailer: git-send-email 2.20.0.rc2.7.g965798d
 MIME-Version: 1.0
-Content-Type: text/plain; charset=koi8-r
-Content-Disposition: inline
-In-Reply-To: <20190409061756.iyja4535fsu7xrqo@gondor.apana.org.au>
-User-Agent: NeoMutt/20171215-106-ac61c7
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Herbert,
+Extends Inline TLS record processing to TLS client. connect
+API is added to tls_context to setup hardware for TLS
+connection and handshake. Functionality wise, this makes the solution
+end-to-end Inline TLS capable. TLS server and client
+can operate in Inline mode and leverage hardware for complete
+TLS record offload.
+[0004] Adds the IPv6 support for Inline TLS server/client.
 
-On Tue, Apr 09, 2019 at 02:17:56PM +0800, Herbert Xu wrote:
-> On Mon, Apr 08, 2019 at 07:05:16PM +0300, Vitaly Chikunov wrote:
-> > Herbert,
-> > 
-> > On Tue, Mar 26, 2019 at 03:58:32PM +0300, Vitaly Chikunov wrote:
-> > > This patchset changes akcipher API to support ECDSA style signature
-> > > verification, augments x509 parser to make it work with EC-RDSA certificates,
-> > > and, finally, implements EC-RDSA (GOST 34.10) signature verification and its
-> > > integration with IMA.
-> > 
-> > Can you please explain what changes are requested?
-> 
-> Please see
-> 
-> https://patchwork.kernel.org/patch/10870987/
+RFC series for this patch was created against net-next and 
+submitted on 18 Jan'2019.
+This series is created against Herbert branch.
 
-Ah, thanks. I somehow mixed it up with other tagged patch.
+Atul Gupta (4):
+  net/tls: connect routine for Inine TLS Client
+  crypto/chelsio/chtls: hardware connect API
+  crypto/chelsio/chtls: CPL for TLS client
+  IPv6 changes for Inline TLS
 
-Vitaly,
+ drivers/crypto/chelsio/chtls/chtls.h          |   18 +-
+ drivers/crypto/chelsio/chtls/chtls_cm.c       | 1263 ++++++++++++++++++++++---
+ drivers/crypto/chelsio/chtls/chtls_cm.h       |   12 +-
+ drivers/crypto/chelsio/chtls/chtls_hw.c       |    7 +-
+ drivers/crypto/chelsio/chtls/chtls_io.c       |   51 +-
+ drivers/crypto/chelsio/chtls/chtls_main.c     |  164 +++-
+ drivers/net/ethernet/chelsio/cxgb4/t4_msg.h   |   18 +
+ drivers/net/ethernet/chelsio/cxgb4/t4fw_api.h |    2 +
+ include/net/tls.h                             |    6 +
+ include/net/transp_v6.h                       |    7 +
+ net/core/secure_seq.c                         |    1 +
+ net/ipv6/tcp_ipv6.c                           |   26 +-
+ net/tls/tls_main.c                            |   23 +
+ 13 files changed, 1442 insertions(+), 156 deletions(-)
 
-> 
-> Thanks,
-> -- 
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+-- 
+1.8.3.1
+
