@@ -2,90 +2,94 @@ Return-Path: <SRS0=n6OX=SL=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,MAILING_LIST_MULTI,SPF_PASS,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0FC3C282DA
-	for <linux-crypto@archiver.kernel.org>; Tue,  9 Apr 2019 18:01:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB7E0C10F0E
+	for <linux-crypto@archiver.kernel.org>; Tue,  9 Apr 2019 18:16:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 70D402084F
-	for <linux-crypto@archiver.kernel.org>; Tue,  9 Apr 2019 18:01:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=netronome-com.20150623.gappssmtp.com header.i=@netronome-com.20150623.gappssmtp.com header.b="LVkvVWEV"
+	by mail.kernel.org (Postfix) with ESMTP id 87B092133D
+	for <linux-crypto@archiver.kernel.org>; Tue,  9 Apr 2019 18:16:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1554833773;
+	bh=q1GH865rjht60RquOpvj6oNRViyP48EwO5zhIz8OLQQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=m9C8DqWCavkyOE5w0qb6T1R5hsiN0DybDNUShaHj7EeCAjo99DSGopUO9QItVEBdG
+	 RPuLBAj/ukL+FUnH1uWKDOH1d3X6inzBNWXOo8fAo9n36BwzEwPMHIam0+eSU024da
+	 D8g6B/qkyS4C7IMfKCbidLE2laKhiVj88SIoMis4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726415AbfDISBm (ORCPT
+        id S1726532AbfDISQM (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 9 Apr 2019 14:01:42 -0400
-Received: from mail-qt1-f196.google.com ([209.85.160.196]:33815 "EHLO
-        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726383AbfDISBm (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 9 Apr 2019 14:01:42 -0400
-Received: by mail-qt1-f196.google.com with SMTP id k2so20959187qtm.1
-        for <linux-crypto@vger.kernel.org>; Tue, 09 Apr 2019 11:01:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=netronome-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:in-reply-to:references
-         :organization:mime-version:content-transfer-encoding;
-        bh=eYjRAHK5WMbQ9cp3sAvRFJmb7++D9UrqdEGMRhTwWjg=;
-        b=LVkvVWEVGHtY1owaoBTcnMZUpgZinrVZiYuSJoFua0FWjlu+LBoRjh4Yd42S2oWvkw
-         x8kuYiua/uAK2+Hor9MXLgtUwF11WG/p3V6S4uGJjjrZ23BSGjCrTgei65PIw04bBgCH
-         j581C1nPBfChJPRXrjhdNqNVPyyIzUihZXK0UUYUckPhxoZ1My6TLdKcv9BUMHSsbywk
-         4VI6KY2mNeHaL9gt9sDhc/GRpCHqkWENAQwBjQulmv+Z8zJHJi0GmdIGkQ1wPv0nPCzg
-         6ZXALaHxpDDMUSHW7FFBAqiamvc3RXaGUGUpC+jlizKMtK7IHPtqTgKw4CBoa9/VxzX2
-         i4eg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=eYjRAHK5WMbQ9cp3sAvRFJmb7++D9UrqdEGMRhTwWjg=;
-        b=clYquwDqPxLa7KBZXn0YbBi/qoBQY/7ciCMC1AC2M7eeKR5ix6r5GAEkLMTvCDJBYO
-         wI67WXbP3I49ISlqNU5tytBdpZMaFjv5txwgJ/XB5KiTtI8Bs4Cl0hqn/01TgdPkIVlw
-         2oINo6Gw/Z604SNZ/VUY0bXDVhd3loahfdCap3qSbOxCG7uDiUF5RXp/M9fuV/oitNDd
-         MxIDkhQUQkCLQafTA/E2eDPqKYhiFjXY7DfSEMMSM/MNNm7YkGthcfFWecpQg/OV6dPv
-         OFSQJYqguu/0WIRHJDyBon4UVzxsng0D9N3/s0urZgonfsscYENF9CbZfPEfrbVaRugB
-         Drjg==
-X-Gm-Message-State: APjAAAWgZeGVjBGnpKgmRRmq5krrAdOwnu9qUc8lTZQV9wFfOeJFNX8F
-        kDAG85ZaqL4JGQhzkUnFwGCr/A==
-X-Google-Smtp-Source: APXvYqyimp5h2exvfMMHqWm3C0ZWhJz83FCzXvJCEPUG9avX0h3bjJYXdf+gdQS2Gl0Hp98m6/KOZA==
-X-Received: by 2002:a0c:871a:: with SMTP id 26mr31062444qvh.203.1554832901403;
-        Tue, 09 Apr 2019 11:01:41 -0700 (PDT)
-Received: from cakuba.netronome.com ([66.60.152.14])
-        by smtp.gmail.com with ESMTPSA id 50sm9414080qtq.7.2019.04.09.11.01.40
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 09 Apr 2019 11:01:41 -0700 (PDT)
-Date:   Tue, 9 Apr 2019 11:01:37 -0700
-From:   Jakub Kicinski <jakub.kicinski@netronome.com>
-To:     Atul Gupta <atul.gupta@chelsio.com>
-Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
-        dt@chelsio.com
-Subject: Re: [crypto 0/4] Inline TLS client and v6 support
-Message-ID: <20190409110137.1ff359e0@cakuba.netronome.com>
-In-Reply-To: <20190409152234.11100-1-atul.gupta@chelsio.com>
-References: <20190409152234.11100-1-atul.gupta@chelsio.com>
-Organization: Netronome Systems, Ltd.
+        Tue, 9 Apr 2019 14:16:12 -0400
+Received: from mail.kernel.org ([198.145.29.99]:44040 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726513AbfDISQM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 9 Apr 2019 14:16:12 -0400
+Received: from gmail.com (unknown [104.132.1.77])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 2CAEE20857;
+        Tue,  9 Apr 2019 18:16:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1554833771;
+        bh=q1GH865rjht60RquOpvj6oNRViyP48EwO5zhIz8OLQQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=tJ9PVBRebbkSC23e+nw1nbc2T+St3XmtQiEsVYiYGRnhZfUj/CYFihCAHPSjRVeDr
+         T3/Jln7Tc8Q8kcyMI0OfKZH55xNwuoh5r1YPH5mFHaAxR0SiALu9azmxG/aFlmkDLl
+         jF0WweWq9xyLoH+aPrLhliY+PTR4Eh5tDJGvVRNw=
+Date:   Tue, 9 Apr 2019 11:16:09 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     linux-crypto@vger.kernel.org
+Subject: Re: [RFC/RFT PATCH 18/18] crypto: run initcalls for generic
+ implementations earlier
+Message-ID: <20190409181608.GA122471@gmail.com>
+References: <20190331200428.26597-19-ebiggers@kernel.org>
+ <20190408055322.kke6emtixhhbkppn@gondor.apana.org.au>
+ <20190408174402.GB9145@gmail.com>
+ <20190409062409.gs5a6o2kuxeuztt2@gondor.apana.org.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190409062409.gs5a6o2kuxeuztt2@gondor.apana.org.au>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue,  9 Apr 2019 08:22:34 -0700, Atul Gupta wrote:
-> Extends Inline TLS record processing to TLS client. connect
-> API is added to tls_context to setup hardware for TLS
-> connection and handshake. Functionality wise, this makes the solution
-> end-to-end Inline TLS capable. TLS server and client
-> can operate in Inline mode and leverage hardware for complete
-> TLS record offload.
-> [0004] Adds the IPv6 support for Inline TLS server/client.
-> 
-> RFC series for this patch was created against net-next and 
-> submitted on 18 Jan'2019.
-> This series is created against Herbert branch.
+Hi Herbert,
 
-Sorry if someone already asked this, but is your HW doing full ToE 
-for all this TLS "record offload" stuff?
+On Tue, Apr 09, 2019 at 02:24:09PM +0800, Herbert Xu wrote:
+> 
+> > BTW, I found another problem caused by allocating the generic implementation
+> > during the self-tests, which is that the generic implementation will fulfill any
+> > outstanding allocation requests before the other implementation has finished
+> > testing.  E.g. on x86_64, the first call to
+> > 
+> > 	crypto_alloc_skcipher("adiantum(xchacha12,aes)", 0, 0)
+> > 
+> > will get "adiantum(xchacha12-generic,aes-generic,nhpoly1305-generic)" rather
+> > than "adiantum(xchacha12-simd,aes-aesni,nhpoly1305-avx2)" as expected.  Do you
+> > have any suggestion on the best way to fix this?
+> 
+> Well this is to be expected.  Normally we don't start the allocation
+> until all probing is done.  That is, all modules should have been
+> loaded before (or rather during) the first allocation call.  If it
+> occurs during the first allocation call then a larval algorithm will
+> hold any subsequent allocations until the testing is done.
+> 
+> So the question is who is doing the allocation prior the registration
+> of the accelerated algorithms? Is it the fuzzing test?
+> 
+
+All modules are already loaded, but there's no "adiantum(xchacha12,aes)"
+algorithm directly available so it has be instantiated using the template.
+
+Then with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y, the self-tests for the
+accelerated instance will allocate a generic instance to compare it against.
+This causes the generic instance to be tested and registered first, so the first
+user will get the generic instance, not the accelerated one as expected.
+
+- Eric
