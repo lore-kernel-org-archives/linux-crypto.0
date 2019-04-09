@@ -3,69 +3,61 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97F9AC10F0E
-	for <linux-crypto@archiver.kernel.org>; Tue,  9 Apr 2019 15:53:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45FCCC282DA
+	for <linux-crypto@archiver.kernel.org>; Tue,  9 Apr 2019 16:14:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4E88F2084C
-	for <linux-crypto@archiver.kernel.org>; Tue,  9 Apr 2019 15:53:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 17ABB21473
+	for <linux-crypto@archiver.kernel.org>; Tue,  9 Apr 2019 16:14:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=insidesecure.onmicrosoft.com header.i=@insidesecure.onmicrosoft.com header.b="D9mCvQEO"
+	dkim=pass (1024-bit key) header.d=insidesecure.onmicrosoft.com header.i=@insidesecure.onmicrosoft.com header.b="tyD4Cexw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726456AbfDIPx0 (ORCPT
+        id S1726499AbfDIQOP (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 9 Apr 2019 11:53:26 -0400
-Received: from mail-eopbgr10113.outbound.protection.outlook.com ([40.107.1.113]:13542
-        "EHLO EUR02-HE1-obe.outbound.protection.outlook.com"
+        Tue, 9 Apr 2019 12:14:15 -0400
+Received: from mail-eopbgr80133.outbound.protection.outlook.com ([40.107.8.133]:63711
+        "EHLO EUR04-VI1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726396AbfDIPxZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 9 Apr 2019 11:53:25 -0400
+        id S1726446AbfDIQOP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 9 Apr 2019 12:14:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=insidesecure.onmicrosoft.com; s=selector1-insidesecure-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=n/3KsBq0XPIt4Gfyu0rnB9gdrgu5/35iGZQOG3A/c0U=;
- b=D9mCvQEOvzwV/6d6VKvPvlwqoK24zpq1jjqAXijWKTsSgw8lbpLuS4nVkjfH8BZ/Rf0sNBO18DimFaBvy0RD+LGswGQGD7vsqV5DnXqiaHbII3ULZorfljbytumCWV9rywgkOu3IyYPX3vthpSdqKqNCdpC2zsvKvcK/Ddbx9Ag=
+ bh=U6pX0q9rqDn8KC70hMkqJAoif8SKrsMOziDjqp8xBWc=;
+ b=tyD4CexwT/S63f5zgKlcJ6SpEm7M7e9s9MpWcciuk5UjKX1rCgInFcFOgVJu+x9qLeVD1I50q8zSWjcV885jLXf2lZqIqMuDApgqSCf8pVLNxaQZmW9sWq+aTTnTKzGsQjZcoOKRii0vCkG3PwI5IKHycaBXq1xKKCQ8MSKRL3E=
 Received: from AM6PR09MB3523.eurprd09.prod.outlook.com (10.255.99.206) by
- AM6PR09MB2277.eurprd09.prod.outlook.com (20.177.113.82) with Microsoft SMTP
+ AM6PR09MB3336.eurprd09.prod.outlook.com (20.179.245.89) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1771.16; Tue, 9 Apr 2019 15:53:21 +0000
+ 15.20.1792.14; Tue, 9 Apr 2019 16:14:10 +0000
 Received: from AM6PR09MB3523.eurprd09.prod.outlook.com
  ([fe80::6112:a401:331e:a9b9]) by AM6PR09MB3523.eurprd09.prod.outlook.com
  ([fe80::6112:a401:331e:a9b9%6]) with mapi id 15.20.1792.009; Tue, 9 Apr 2019
- 15:53:20 +0000
+ 16:14:10 +0000
 From:   Pascal Van Leeuwen <pvanleeuwen@insidesecure.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-CC:     Eric Biggers <ebiggers@kernel.org>,
-        Zhang Zhijie <zhangzj@rock-chips.com>,
-        Heiko Stuebner <heiko@sntech.de>,
+To:     Riku Voipio <riku.voipio@iki.fi>
+CC:     Linus Torvalds <torvalds@linux-foundation.org>,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Zain Wang <wzz@rock-chips.com>, Arnd Bergmann <arnd@arndb.de>,
-        "linux-rockchip@lists.infradead.org" 
-        <linux-rockchip@lists.infradead.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>, Olof Johansson <olof@lixom.net>,
-        "ezequiel@collabora.com" <ezequiel@collabora.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        "linux-fscrypt@vger.kernel.org" <linux-fscrypt@vger.kernel.org>,
         linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        Tao Huang <huangtao@rock-chips.com>
-Subject: RE: [Bug] Rockchip crypto driver sometimes produces wrong ciphertext
-Thread-Topic: [Bug] Rockchip crypto driver sometimes produces wrong ciphertext
-Thread-Index: AQHU2t+fclaO8KhrhESirEuEC3Q5mqYsHxyQgAA+MoCABGuWgIAAZ0FggAC6V4CAAAzmIIAAJ3UAgAICEXA=
-Date:   Tue, 9 Apr 2019 15:53:20 +0000
-Message-ID: <AM6PR09MB3523A3BE7DE29F55520341C4D22D0@AM6PR09MB3523.eurprd09.prod.outlook.com>
-References: <CAKv+Gu-RKu9jt+2FnV2529zqyLGR8RSu8r4B8eOs-7Om-pL0aQ@mail.gmail.com>
- <1894799.pWIprST79S@phil>
- <f7a0d04c-339e-d9f8-7188-a27d55ad8b4d@rock-chips.com>
- <20190315033140.GB1671@sol.localdomain>
- <AM5PR0901MB115570ABE89DC1285AE07E60D2500@AM5PR0901MB1155.eurprd09.prod.outlook.com>
- <20190404171204.GA121392@gmail.com>
- <20190407124211.fv7pjsozxhnhw56i@gondor.apana.org.au>
- <AM6PR09MB352377D3A58CE6C12464414ED2530@AM6PR09MB3523.eurprd09.prod.outlook.com>
- <20190408055841.xa5dof4e5xqgaitv@gondor.apana.org.au>
- <AM6PR09MB35238739075B080390C11341D22C0@AM6PR09MB3523.eurprd09.prod.outlook.com>
- <20190408090604.7v7s5xhfvwthknio@gondor.apana.org.au>
-In-Reply-To: <20190408090604.7v7s5xhfvwthknio@gondor.apana.org.au>
+        LKML <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH 0/17] Add zinc using existing algorithm implementations
+Thread-Topic: [PATCH 0/17] Add zinc using existing algorithm implementations
+Thread-Index: AQHU4HhqZ0R+rbz2UECo8a5sYsqDyKYXSJ6AgAClUACABAkE8IABuZCAgBZqocA=
+Date:   Tue, 9 Apr 2019 16:14:10 +0000
+Message-ID: <AM6PR09MB352310B03190FD2454DA259FD22D0@AM6PR09MB3523.eurprd09.prod.outlook.com>
+References: <20190322062740.nrwfx2rvmt7lzotj@gondor.apana.org.au>
+ <CAKv+Gu_mgyzqUCeb+wke--8Gn8YbjOb8jyrSgFr3-tcNP8ccEQ@mail.gmail.com>
+ <CAHk-=wg2LJ5qQ0B2y+_6Ue62SBP4h9MLxLvn89bfcP7Cp2ac6A@mail.gmail.com>
+ <AM5PR0901MB1155FD05113D6DC79A6274CED25E0@AM5PR0901MB1155.eurprd09.prod.outlook.com>
+ <20190326094603.nyfi2dsnt6a6u57f@08efd375aeba>
+In-Reply-To: <20190326094603.nyfi2dsnt6a6u57f@08efd375aeba>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -74,51 +66,42 @@ authentication-results: spf=none (sender IP is )
  smtp.mailfrom=pvanleeuwen@insidesecure.com; 
 x-originating-ip: [188.204.2.113]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: c5354703-09d4-471b-e5da-08d6bd037da1
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600139)(711020)(4605104)(2017052603328)(7193020);SRVR:AM6PR09MB2277;
-x-ms-traffictypediagnostic: AM6PR09MB2277:
-x-microsoft-antispam-prvs: <AM6PR09MB227735BDBFBF79BAE3FF60AAD22D0@AM6PR09MB2277.eurprd09.prod.outlook.com>
+x-ms-office365-filtering-correlation-id: a98d13bc-3bd0-4588-bd56-08d6bd06664e
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600139)(711020)(4605104)(2017052603328)(7193020);SRVR:AM6PR09MB3336;
+x-ms-traffictypediagnostic: AM6PR09MB3336:
+x-microsoft-antispam-prvs: <AM6PR09MB3336088A3705629BCD0D2214D22D0@AM6PR09MB3336.eurprd09.prod.outlook.com>
 x-forefront-prvs: 000227DA0C
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(136003)(346002)(366004)(376002)(39840400004)(396003)(189003)(199004)(256004)(14454004)(52536014)(7736002)(186003)(26005)(2906002)(6246003)(86362001)(68736007)(6116002)(53936002)(102836004)(316002)(305945005)(9686003)(55016002)(25786009)(6506007)(97736004)(5660300002)(7416002)(3846002)(99286004)(74316002)(486006)(54906003)(8936002)(71200400001)(6916009)(81166006)(71190400001)(7696005)(4744005)(105586002)(446003)(4326008)(106356001)(66066001)(476003)(11346002)(6436002)(8676002)(81156014)(33656002)(229853002)(93886005)(76176011)(478600001);DIR:OUT;SFP:1102;SCL:1;SRVR:AM6PR09MB2277;H:AM6PR09MB3523.eurprd09.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(396003)(366004)(376002)(136003)(39850400004)(346002)(189003)(199004)(55016002)(74316002)(86362001)(8936002)(6246003)(6916009)(53936002)(9686003)(76176011)(7696005)(54906003)(25786009)(229853002)(7416002)(81166006)(186003)(102836004)(14454004)(6506007)(478600001)(4326008)(7736002)(81156014)(305945005)(68736007)(26005)(106356001)(6436002)(316002)(33656002)(8676002)(105586002)(93886005)(486006)(2906002)(71190400001)(71200400001)(66066001)(476003)(97736004)(446003)(11346002)(99286004)(6116002)(3846002)(256004)(14444005)(52536014)(558084003)(5660300002);DIR:OUT;SFP:1102;SCL:1;SRVR:AM6PR09MB3336;H:AM6PR09MB3523.eurprd09.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
 received-spf: None (protection.outlook.com: insidesecure.com does not
  designate permitted sender hosts)
 x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: wOJxXJ97r9L/UFs5xIWX2ObukztTURMKV9DMv2zKX7SyEnEaIj8Udwq8qL+tqI5MUHwoQ5ryT3FFdsYxWWRsVyJW7UpvhkgHaBDTbR5QOQ4pkZCIAt4qMhRG/6H8lWacO1jhEAGMDDOf5T8MFhbc59LxymLaBz5RCv8WiuRT3PyXsuUGw2JCKPXgUOKapz84KYZhkRrwWRRqWA/tXN0m3Jo9avh9L71WJDDotC+7giUmuRTsvwiFEzm/5nMjIC2fy1GvxdeNwOqVBmqU7fNuOAAXRJ1ygAFVZUtoejaTM3VHZW3gnFWqz7ruMnHyXwHCnJlODCS8PLF5Li4id9AnhTbbbsQqve4y7/4KQyNg6QyWCp3igLUbHXXi5+qQ9QvmRWjcROhiWIbJXwj6OUv1PqVDLxYCvCD8zxi2GCfuy1k=
+x-microsoft-antispam-message-info: PhlPfZYBUwnDCuI5nnlYr166HpZ4MRq0fXPSneYltAccIUwM4EeVfbtzCWzDbV3Uup0jGWsB4xx3aYOLz/XifHO/nwKdMvP+PRlPDjTlxsg+qwQ4JAEHZS2WdYs2bVXoVfvmUgO2r066uNzhlwB3Z91y1Q5zjW44MXX8+pcejfE5nG8H+lwTeg7RChW2JNFODMaxOA9WUOQb65Xdslt5NlCbHc31JScKz5JGXuTPcE9UHP5K7A2dRi+AxUuJbSA1iUhW75HBW1muD6GXlBtLnsWkb5Y6l9moAQCJ1VasDvTog4BBDgKYPNLIYbpSLTsPCaRYCOScqa5z285nwfOu4gZ9g6h2jh6o/lCMFcvEftrZ4lof0Jndiq8JvGhxADpY3OgrsdIKK1r2Yij2DdsEKf/Zkw4valvp693KyOqiLPs=
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: insidesecure.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c5354703-09d4-471b-e5da-08d6bd037da1
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Apr 2019 15:53:20.8796
+X-MS-Exchange-CrossTenant-Network-Message-Id: a98d13bc-3bd0-4588-bd56-08d6bd06664e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Apr 2019 16:14:10.2312
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 3c07df58-7760-4e85-afd5-84803eac70ce
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR09MB2277
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR09MB3336
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
->
-> What we could do is have the user specify an explicit flag saying
-> that they do not care about the output IV.  You could then skip the
-> output IV step in your driver.
->
-That would work for me, if the maintainers would be OK with adding
-such flags.
-Also, as a heads up - just to get other peoples opinion here - I
-might prefer responding to such a flag by selecting the fallback
-cipher instead of actually implementing a workaround for my hardware
-in case such a workaround would be detrimental to the performance.
 
-> But you'll have to code this up, including the bit on the user-side
-> to actually set the flag.
+> The firmware files for eip197(?) crypto accelerator are secrets we are
+> not
+> allowed download anywhere from.
 >
-Since that user side probably lives in the kernel tree too, I could
-do that. This would then apply to testmgr as well though, as I need
-to ensure it disables features for tests that don't require them.
-(otherwise you'd be verifying only the fallback cipher)
+Riku,
+
+The driver update I'm working on will fix that issue for you ;-)
+I'm planning to upstream my changes but I still need to find the right
+approach for doing so.
 
 Regards,
 Pascal
