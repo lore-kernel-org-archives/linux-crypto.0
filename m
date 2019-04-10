@@ -6,44 +6,44 @@ X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80232C282DE
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Apr 2019 06:48:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29BEAC10F11
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Apr 2019 06:48:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4DC7A21841
+	by mail.kernel.org (Postfix) with ESMTP id E521F217D6
 	for <linux-crypto@archiver.kernel.org>; Wed, 10 Apr 2019 06:48:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1554878932;
-	bh=XtbcAfD4X6f5TVPRHGxFRL2Qg/zb9DIuNRWW2Fqv5gI=;
+	s=default; t=1554878933;
+	bh=U8XMb5XBzsDgxfH9TV1QVq2N0dYg0CmuZps41VfC8mY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=f5E2+NzqxvQFR8jIhTh4/7WskudvU0pBZCa0FBJ9l0QJJ0zVDwtRCepsekpGgcgm7
-	 ffRNkOrirD5k4pG5fpLHu5WLt3f5u2jx1/+QcfQvjIw270stuW20EJGZrn4qyIxJMV
-	 zL+VmHQt9HgiJr77zTPuUL7iRvcJ2AZPzY/jg+vU=
+	b=bqfXjtLrHE/5mcEROdhJ5Yk7HPPJe05DjSgOWjfIegwQP9x9rzLBaOBedh5bgZrw/
+	 scMT8VgvURkM8lZoP7omPLM2NwopOoKMqGxVgTiiPeOo8Vpcs/OC7gcdnwL/tWbs0/
+	 JTjAMoVKDeefF5ON2Vaxv8tuRxkYPgc3rTKpsZvU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728723AbfDJGsr (ORCPT
+        id S1728722AbfDJGsr (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Wed, 10 Apr 2019 02:48:47 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53352 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:53342 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728710AbfDJGsr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1728708AbfDJGsr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Wed, 10 Apr 2019 02:48:47 -0400
 Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id B9078217F4;
+        by mail.kernel.org (Postfix) with ESMTPSA id 802A2217D9;
         Wed, 10 Apr 2019 06:48:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=default; t=1554878926;
-        bh=XtbcAfD4X6f5TVPRHGxFRL2Qg/zb9DIuNRWW2Fqv5gI=;
+        bh=U8XMb5XBzsDgxfH9TV1QVq2N0dYg0CmuZps41VfC8mY=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=sG9VL2kR4v3cKhDbTrQmSwONlSI/BtNMHx34rN0D7Rn7wRyi+qXIEfkBU5HOGoOds
-         HC1vU24W38fU4mbJjChNhQcl8ON63k+HV2yzR8r4zQ9q6ALkk3gq4YWtdP5nzOz9Wh
-         mVpOn1OPqqTWplffBw0no2URkV+R3MtQVEVSL3z0=
+        b=0DjnRC8NvZCI+ZWPdJCpwvbJ6/+Y8VlHyBYK1dgZ0w6OFgI3vy7GVmQSgjdKqDHqA
+         0Vdr+Uyx/KxVH6x+OtuPqUR3dY8AfIVNEtTqlIc9osv99Q02mILG4WhvzNqNj8xNm/
+         9jWkHO2g07Im2LFnp5gjZx2L5r97rnVVOOPyHTws=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     stable@vger.kernel.org
-Subject: [PATCH v2 3/7] crypto: arm/aes-neonbs - don't access already-freed walk.iv
-Date:   Tue,  9 Apr 2019 23:46:31 -0700
-Message-Id: <20190410064635.11813-4-ebiggers@kernel.org>
+Subject: [PATCH v2 2/7] crypto: salsa20 - don't access already-freed walk.iv
+Date:   Tue,  9 Apr 2019 23:46:30 -0700
+Message-Id: <20190410064635.11813-3-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190410064635.11813-1-ebiggers@kernel.org>
 References: <20190410064635.11813-1-ebiggers@kernel.org>
@@ -61,33 +61,35 @@ alignmask, then skcipher_walk_virt() copies the IV into a new aligned
 buffer walk.iv.  But skcipher_walk_virt() can fail afterwards, and then
 if the caller unconditionally accesses walk.iv, it's a use-after-free.
 
-arm32 xts-aes-neonbs doesn't set an alignmask, so currently it isn't
-affected by this despite unconditionally accessing walk.iv.  However
-this is more subtle than desired, and it was actually broken prior to
-the alignmask being removed by commit cc477bf64573 ("crypto: arm/aes -
-replace bit-sliced OpenSSL NEON code").  Thus, update xts-aes-neonbs to
-start checking the return value of skcipher_walk_virt().
+salsa20-generic doesn't set an alignmask, so currently it isn't affected
+by this despite unconditionally accessing walk.iv.  However this is more
+subtle than desired, and it was actually broken prior to the alignmask
+being removed by commit b62b3db76f73 ("crypto: salsa20-generic - cleanup
+and convert to skcipher API").
 
-Fixes: e4e7f10bfc40 ("ARM: add support for bit sliced AES using NEON instructions")
-Cc: <stable@vger.kernel.org> # v3.13+
+Since salsa20-generic does not update the IV and does not need any IV
+alignment, update it to use req->iv instead of walk.iv.
+
+Fixes: 2407d60872dd ("[CRYPTO] salsa20: Salsa20 stream cipher")
+Cc: stable@vger.kernel.org
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- arch/arm/crypto/aes-neonbs-glue.c | 2 ++
- 1 file changed, 2 insertions(+)
+ crypto/salsa20_generic.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm/crypto/aes-neonbs-glue.c b/arch/arm/crypto/aes-neonbs-glue.c
-index 07e31941dc674..617c2c99ebfb3 100644
---- a/arch/arm/crypto/aes-neonbs-glue.c
-+++ b/arch/arm/crypto/aes-neonbs-glue.c
-@@ -278,6 +278,8 @@ static int __xts_crypt(struct skcipher_request *req,
- 	int err;
+diff --git a/crypto/salsa20_generic.c b/crypto/salsa20_generic.c
+index 443fba09cbed7..faed244be316f 100644
+--- a/crypto/salsa20_generic.c
++++ b/crypto/salsa20_generic.c
+@@ -160,7 +160,7 @@ static int salsa20_crypt(struct skcipher_request *req)
  
- 	err = skcipher_walk_virt(&walk, req, true);
-+	if (err)
-+		return err;
+ 	err = skcipher_walk_virt(&walk, req, false);
  
- 	crypto_cipher_encrypt_one(ctx->tweak_tfm, walk.iv, walk.iv);
+-	salsa20_init(state, ctx, walk.iv);
++	salsa20_init(state, ctx, req->iv);
  
+ 	while (walk.nbytes > 0) {
+ 		unsigned int nbytes = walk.nbytes;
 -- 
 2.21.0
 
