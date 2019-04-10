@@ -2,110 +2,140 @@ Return-Path: <SRS0=kwSW=SM=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEE8DC10F11
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Apr 2019 18:08:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D3F3C282CE
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Apr 2019 18:31:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 83CD220830
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Apr 2019 18:08:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2207F20830
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Apr 2019 18:31:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tRVXxfaU"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="ChsrIjTR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731122AbfDJSIU (ORCPT
+        id S1731564AbfDJSbM (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 10 Apr 2019 14:08:20 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:43652 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729439AbfDJSIU (ORCPT
+        Wed, 10 Apr 2019 14:31:12 -0400
+Received: from mail-ua1-f67.google.com ([209.85.222.67]:36786 "EHLO
+        mail-ua1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731527AbfDJSbL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 10 Apr 2019 14:08:20 -0400
-Received: by mail-io1-f68.google.com with SMTP id x3so2949850iol.10
-        for <linux-crypto@vger.kernel.org>; Wed, 10 Apr 2019 11:08:19 -0700 (PDT)
+        Wed, 10 Apr 2019 14:31:11 -0400
+Received: by mail-ua1-f67.google.com with SMTP id k32so1128638uae.3
+        for <linux-crypto@vger.kernel.org>; Wed, 10 Apr 2019 11:31:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
+        d=chromium.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=owKLFD4p/ewisZpQXc+TRYyqAmJwxjt/PR/5jJ/den4=;
-        b=tRVXxfaUx6yqbOV+EjXkKuFKRLYsWbcD1r9ClergnWWTlWNqdU+qqRD3Er+4tMboZ3
-         ltugMhB2xqsm1eH2N5EFDPVCAe5MLTFJtzBcpQSoADJFgSh5WuVXS3qfU/2jL9QDhYs5
-         sPuND0SinBkgiAPdxrmMk8s94b9OA+sojxcODQULUpHcb0bRQfMhySHHkmNq1O++9mZA
-         AHY8s7KTNysMRVOmJtrvqMFPu/R+S77PnXSqQJ6laXaaukQZ/1QpkIkXe1HSIuH/U8nF
-         KjGsLilTb1ly4bB5UrKQky3X+P4mIsP4VLzrWiRb/rWOLghadzvHDR+rFMh+fXbYqnGQ
-         wgig==
+        bh=HZrouuH6qDcbcN0Xir61EX//r5Pvf+jE6u/Bex0vtPA=;
+        b=ChsrIjTR2XUXY98NFeP4EYidlDto2ZP21YpmNICKQthef5L3chA1evffBlGc7f5Cpd
+         AVLdt06zVihsEe31IHJ9/S+3AZeljeUHUhTc1c2zEZwWOWJ77/kz5jXchKIL0j3RJt7Z
+         q8y86gbdDx/7EpkMgNN0PhF3sbVnMJ0w/ySFg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=owKLFD4p/ewisZpQXc+TRYyqAmJwxjt/PR/5jJ/den4=;
-        b=Yzyf96nCkzJiCJltupW5jDtTX87bP+u2AypCN5Eva8LfnZIWBj0k9SMRBamY4cIpG8
-         oZvK6UPkLkyLj25fS1sYQaWsAWJHiPqSqofRRYt9iQcG6IYGx1x9ocWQVCCL0Spsp2Il
-         C/wHvNeQA9F2MG5CH79/D2PBJhAn8UoxKbwwVpO01LPyoMzkjcG/tjtBxAjJLNC2XW1C
-         vOsLWmZVco/8wh/fxUBEVRf0lMTc0WGQg9eRg++x6MGOv2Pjcx7+VUg+DLBl3uKQ4q4l
-         S9n8LM9AxbvYCWzdPRmKLc/7IjULsa0BJuwbD3dnPCx2jaRgR3KWxjkFl0rILkYBv2o5
-         br6Q==
-X-Gm-Message-State: APjAAAUNsdKNRK2TFtfoOvsSwcvalQk1215K88A4cn3xgqVKZtsVvdaD
-        PoyadoYfGfSfjq72Qd6THEJ/z78VQF+WTuqALpF+Ag==
-X-Google-Smtp-Source: APXvYqxisy8AJDTJkvcOg8hPFA0NiN+zVDZq+bZDiHCpCKiI35qA82ns3PyLUbaAFZKArdEiZUfdCl0lN95hOo8qtOo=
-X-Received: by 2002:a5d:840d:: with SMTP id i13mr22442354ion.186.1554919699276;
- Wed, 10 Apr 2019 11:08:19 -0700 (PDT)
+        bh=HZrouuH6qDcbcN0Xir61EX//r5Pvf+jE6u/Bex0vtPA=;
+        b=qBRmIJ7BpgKwYHHNGeo/XJjjDXbS10CNvgmHZ217vGvU651+S8sJSx9fppGZGw64r4
+         ZYeAuWb2fvttMbZ9a04HMBkvpaW/XMvv8SY5UztUgnxOB2OrQfOGO9WS+5kCuZpWNV5w
+         tSp5Xp0aJszRx/LjCCdaxAP2ZpW1YT9ayOcUoM6TnpMMoB7oioPmLbWXzBJsdWUnZi3I
+         0jVaPIHZZZzTIguprLuJ2OZ0jUIburOQ0Q1DuTFAwLABkw/YXUZNa8aZuVxtte/32RJM
+         KhEhSweThaWJHa2Cylb6V/XqkR36zRYfzKsvWd6ANFk2aaC1tcyZYAJ8TmE+75MEDH5Y
+         p1LQ==
+X-Gm-Message-State: APjAAAU3EDDT0rnGIdmLBQgfCqO3yGgTqZYQ/oL/USPAtF8MI+ScvY31
+        W0RKoQw4sV8JeEbw6XiGyYE06IgYgD8=
+X-Google-Smtp-Source: APXvYqyT1XtIrmspW40R1CKyXq7blOOrLhReeQ8HqMyJKxXBd7u9jWX34T+jjBe61Bpgh3QOoZpBtw==
+X-Received: by 2002:ab0:208d:: with SMTP id r13mr21317287uak.128.1554921069959;
+        Wed, 10 Apr 2019 11:31:09 -0700 (PDT)
+Received: from mail-vs1-f50.google.com (mail-vs1-f50.google.com. [209.85.217.50])
+        by smtp.gmail.com with ESMTPSA id t11sm5749775vkc.53.2019.04.10.11.31.08
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 10 Apr 2019 11:31:09 -0700 (PDT)
+Received: by mail-vs1-f50.google.com with SMTP id d8so1969819vsp.2
+        for <linux-crypto@vger.kernel.org>; Wed, 10 Apr 2019 11:31:08 -0700 (PDT)
+X-Received: by 2002:a67:7816:: with SMTP id t22mr24108905vsc.115.1554921068268;
+ Wed, 10 Apr 2019 11:31:08 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190410064635.11813-1-ebiggers@kernel.org>
-In-Reply-To: <20190410064635.11813-1-ebiggers@kernel.org>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Wed, 10 Apr 2019 11:08:08 -0700
-Message-ID: <CAKv+Gu83UP3xYPPN22dnDJyZ=CjONiGUXteXuBgxPVwh2_L-zQ@mail.gmail.com>
-Subject: Re: [PATCH v2 0/7] crypto: fixes in preparation of new fuzz tests
+References: <CAMuHMdWhx0-kspDyLOgTp+9udiBpkMHULSGyMg9uPPV16=FWQg@mail.gmail.com>
+ <20190319170911.GB202956@gmail.com> <20190320185719.GB180195@gmail.com>
+ <CAGXu5jL-5C1ZGZ1JgaNFqK-z1Pp1N1X8gD3_ysKTCa=omD+_VQ@mail.gmail.com>
+ <20190321175122.GA1587@sol.localdomain> <20190410031734.GB7140@sol.localdomain>
+In-Reply-To: <20190410031734.GB7140@sol.localdomain>
+From:   Kees Cook <keescook@chromium.org>
+Date:   Wed, 10 Apr 2019 11:30:57 -0700
+X-Gmail-Original-Message-ID: <CAGXu5j+SZ2+Zkc=Vp5CXQUHhiR9f_OOnca684JTRW3T0yXdaNQ@mail.gmail.com>
+Message-ID: <CAGXu5j+SZ2+Zkc=Vp5CXQUHhiR9f_OOnca684JTRW3T0yXdaNQ@mail.gmail.com>
+Subject: Re: crypto: Kernel memory overwrite attempt detected to spans
+ multiple pages
 To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>
+Cc:     Geert Uytterhoeven <geert@linux-m68k.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-security-module <linux-security-module@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 9 Apr 2019 at 23:48, Eric Biggers <ebiggers@kernel.org> wrote:
+On Tue, Apr 9, 2019 at 8:17 PM Eric Biggers <ebiggers@kernel.org> wrote:
 >
-> This series contains the remaining fixes in preparation of the
-> comparison fuzz tests I've proposed in the series
-> "crypto: fuzz algorithms against their generic implementation".
+> On Thu, Mar 21, 2019 at 10:51:22AM -0700, Eric Biggers wrote:
+> > On Thu, Mar 21, 2019 at 10:45:31AM -0700, Kees Cook wrote:
+> > > On Wed, Mar 20, 2019 at 11:57 AM Eric Biggers <ebiggers@kernel.org> wrote:
+> > > >
+> > > > On Tue, Mar 19, 2019 at 10:09:13AM -0700, Eric Biggers wrote:
+> > > > > On Tue, Mar 19, 2019 at 12:54:23PM +0100, Geert Uytterhoeven wrote:
+> > > > > > When running the sha1-asm crypto selftest on arm with
+> > > > > > CONFIG_HARDENED_USERCOPY_PAGESPAN=y:
+> > > > > >
+> > > > > >     usercopy: Kernel memory overwrite attempt detected to spans
+> > > > > > multiple pages (offset 0, size 42)!
+> > > > >
+> > > > > Well, this must happen with the new (in 5.1) crypto self-tests implementation
+> > > > > for any crypto algorithm when CONFIG_HARDENED_USERCOPY_PAGESPAN=y.  I don't
+> > > > > understand why hardened usercopy considers it a bug though, as there's no buffer
+> > > > > overflow.  The crypto tests use copy_from_iter() to copy data into a 2-page
+> > > > > buffer that was allocated with __get_free_pages():
+> > > > >
+> > > > >       __get_free_pages(GFP_KERNEL, 1)
+> > > > >
+> > > > > ... where 1 means an order-1 allocation.
+> > > > >
+> > > > > If it copies to offset=4064 len=42, for example, then hardened usercopy
+> > > > > considers it a bug even though the buffer is 8192 bytes long.  Why?
+> > > > >
+> > > > > It isn't actually copying anything to/from userspace, BTW; it's using iov_iter
+> > > > > with ITER_KVEC.
+> > > > >
+> > > > > - Eric
+> > > >
+> > > > Kees, any thoughts on why hardened usercopy rejects copies spanning a page
+> > > > boundary when they seem to be fine?
+> > >
+> > > This is due to missing the compound page marking, if I remember
+> > > correctly. However, I tend to leave the pagespan test disabled: it
+> > > really isn't ready for production use -- there are a lot of missing
+> > > annotations still.
+> > >
+> >
+> > So do I need to add __GFP_COMP?  Is there any actual reason to do so?
+> > Why does hardened usercopy check for it?
+> >
+> > - Eric
 >
-> I will send a new version of the testmgr patches separately.
->
-> These fixes and my latest tests can also be retrieved from git at:
->
->         Repository: https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git
->         Branch: cryptofuzz-vs-generic
->
-> Eric Biggers (7):
->   crypto: lrw - don't access already-freed walk.iv
->   crypto: salsa20 - don't access already-freed walk.iv
->   crypto: arm/aes-neonbs - don't access already-freed walk.iv
->   crypto: arm64/aes-neonbs - don't access already-freed walk.iv
->   crypto: gcm - fix incompatibility between "gcm" and "gcm_base"
->   crypto: ccm - fix incompatibility between "ccm" and "ccm_base"
->   crypto: vmx - return correct error code on failed setkey
->
+> Hi Kees, any answer to this question?
 
-For the series
+Hi! Sorry, this got lost in my inbox. Yes, if you can add __GFP_COMP,
+that would fix this case. No one has had time lately to track down all
+these cases, but avoiding adding new ones would be wonderful. :)
 
-Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
+It's in there because it's a state I'd like to get to in the kernel,
+but it'll require a lot more work to get there.
 
->  arch/arm/crypto/aes-neonbs-glue.c   |  2 ++
->  arch/arm64/crypto/aes-neonbs-glue.c |  2 ++
->  crypto/ccm.c                        | 43 ++++++++++++-----------------
->  crypto/gcm.c                        | 32 ++++++---------------
->  crypto/lrw.c                        |  4 ++-
->  crypto/salsa20_generic.c            |  2 +-
->  drivers/crypto/vmx/aes.c            |  7 +++--
->  drivers/crypto/vmx/aes_cbc.c        |  7 +++--
->  drivers/crypto/vmx/aes_ctr.c        |  5 ++--
->  drivers/crypto/vmx/aes_xts.c        |  9 +++---
->  10 files changed, 50 insertions(+), 63 deletions(-)
->
-> --
-> 2.21.0
->
+-- 
+Kees Cook
