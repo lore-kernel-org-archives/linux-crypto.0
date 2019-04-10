@@ -3,104 +3,107 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65843C282CE
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Apr 2019 19:18:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77A58C282CE
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Apr 2019 21:58:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 36BF720820
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Apr 2019 19:18:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1554923891;
-	bh=6CHeT8CtEU6ZlQLlYG5BL3sJ8bnD6Tgddy+A4EHsRRw=;
-	h=Date:From:To:To:To:To:Cc:Cc:Subject:In-Reply-To:References:
-	 List-ID:From;
-	b=Co2lmvSuSCPrOwCpkNULCi3yqqbM/2z18EpJdPvWsFPR88sQ8Fo4/OitQiiUIEJT1
-	 Sh+Z3IXI7fqqvR3i8yUwOhgtC0T8VI7g98XtZzCfopJuDwsdeKcTxe8NuJJXPFHKZm
-	 Qy7+Dtf76V+SmZ3G8U4KFB7FfjGT+rLq2mP8mDIc=
+	by mail.kernel.org (Postfix) with ESMTP id 42D8A2082A
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Apr 2019 21:58:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="gv1MQ9tG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726096AbfDJTSK (ORCPT
+        id S1726022AbfDJV6D (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 10 Apr 2019 15:18:10 -0400
-Received: from mail.kernel.org ([198.145.29.99]:40148 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726562AbfDJTSJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 10 Apr 2019 15:18:09 -0400
-Received: from localhost (unknown [23.100.24.84])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id A9F302082A;
-        Wed, 10 Apr 2019 19:18:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1554923888;
-        bh=6CHeT8CtEU6ZlQLlYG5BL3sJ8bnD6Tgddy+A4EHsRRw=;
-        h=Date:From:To:To:To:To:Cc:Cc:Subject:In-Reply-To:References:From;
-        b=2wTG6EA4mRZEr1XP+s9GOkfCghVn3ICjhAo7zx1wvjHTVxGwP6V0JYZfqXF0w0RDz
-         9t5OReZ4ZCS75KYd38KoLduqkrGfvb7K7ZQTRvZdXKg37agzjoFHXrVXW6SMKSHIca
-         P5BvC8Y08YIC2lYTze3WgSSk52mqrbbH6W19V5os=
-Date:   Wed, 10 Apr 2019 19:18:07 +0000
-From:   Sasha Levin <sashal@kernel.org>
-To:     Sasha Levin <sashal@kernel.org>
+        Wed, 10 Apr 2019 17:58:03 -0400
+Received: from mail-vs1-f53.google.com ([209.85.217.53]:35024 "EHLO
+        mail-vs1-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726023AbfDJV6C (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 10 Apr 2019 17:58:02 -0400
+Received: by mail-vs1-f53.google.com with SMTP id d8so2307580vsp.2
+        for <linux-crypto@vger.kernel.org>; Wed, 10 Apr 2019 14:58:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=zQ6wwUQrK1NqHrZtbqa5TkZR4Gt0ENtEbKzfcyHpppE=;
+        b=gv1MQ9tGqukjy1cxAUfCcBksLGw3OlCHJEx6K+6Mj+1qUsoKucc/YgqMNaG86eMB1D
+         WTZemX8QDCe1WFlW0Juf+fhQeN08D7xVWNfo88NerKEYK9jpXnm7gPmG9WLWOA3Q0qGA
+         0Zf/bWUhqXgosvN7oHj639aOLqJscqb1wUEVI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=zQ6wwUQrK1NqHrZtbqa5TkZR4Gt0ENtEbKzfcyHpppE=;
+        b=r7vn6Fr8eW/+yHLYlfL3CmeO6EPj9JOZAuO/FzosC1xGyksSrXpiRDnMSnQLp9JNR9
+         v+RlhoNZdj9VHeitOBxZzTV3SklKxoqhjTOyRH0O5py3VMt1RHhAzTBymmhQCVrg997e
+         nQpp8JJaVP5KEUQ5CAj3UmGSiv7lrfPQvKJAUaOq+D5sBLGKUSL8ltQaTQ4rdLJjYArn
+         Y5GXpw0MIlekr/vqPWXbJixpD+6xgr9I9vDbYaYAwa4Upt/AUoLPddNmdX4XcyHgd6lj
+         W/FNrSmBj3uxyq9Ny/OVR9R4/yx3vhiZvB7Wge1b1jn3frKMyhlejFPxygb5XaSp8h4b
+         i68g==
+X-Gm-Message-State: APjAAAVLDCaKSqgQwL6zscjVjxgUqllU530HzYw2TwuDVin7zJzMsCeJ
+        GVFFM+4RMGod4me/Twth/hZuZNqxsZg=
+X-Google-Smtp-Source: APXvYqwJ2Ex/j02OTC6hr9VAzvTRVxAY7kegpO2wbI/8x0EKDXjh4XjUJA/+W+R+z3Y1nd96Ha0LGQ==
+X-Received: by 2002:a67:fdc4:: with SMTP id l4mr25204581vsq.1.1554933481108;
+        Wed, 10 Apr 2019 14:58:01 -0700 (PDT)
+Received: from mail-vs1-f49.google.com (mail-vs1-f49.google.com. [209.85.217.49])
+        by smtp.gmail.com with ESMTPSA id 110sm26070959uaq.7.2019.04.10.14.57.59
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 10 Apr 2019 14:57:59 -0700 (PDT)
+Received: by mail-vs1-f49.google.com with SMTP id e2so2266252vsc.13
+        for <linux-crypto@vger.kernel.org>; Wed, 10 Apr 2019 14:57:59 -0700 (PDT)
+X-Received: by 2002:a67:1345:: with SMTP id 66mr24870637vst.30.1554933478741;
+ Wed, 10 Apr 2019 14:57:58 -0700 (PDT)
+MIME-Version: 1.0
+References: <CAMuHMdWhx0-kspDyLOgTp+9udiBpkMHULSGyMg9uPPV16=FWQg@mail.gmail.com>
+ <20190319170911.GB202956@gmail.com> <20190320185719.GB180195@gmail.com>
+ <CAGXu5jL-5C1ZGZ1JgaNFqK-z1Pp1N1X8gD3_ysKTCa=omD+_VQ@mail.gmail.com>
+ <20190321175122.GA1587@sol.localdomain> <20190410031734.GB7140@sol.localdomain>
+ <CAGXu5j+SZ2+Zkc=Vp5CXQUHhiR9f_OOnca684JTRW3T0yXdaNQ@mail.gmail.com> <20190410190729.GA120258@gmail.com>
+In-Reply-To: <20190410190729.GA120258@gmail.com>
+From:   Kees Cook <keescook@chromium.org>
+Date:   Wed, 10 Apr 2019 14:57:46 -0700
+X-Gmail-Original-Message-ID: <CAGXu5j+Gfvj9G6s_UQTw6hE11gJb1edt3BXzpbDQdc_dpcHgag@mail.gmail.com>
+Message-ID: <CAGXu5j+Gfvj9G6s_UQTw6hE11gJb1edt3BXzpbDQdc_dpcHgag@mail.gmail.com>
+Subject: Re: crypto: Kernel memory overwrite attempt detected to spans
+ multiple pages
 To:     Eric Biggers <ebiggers@kernel.org>
-To:     Eric Biggers <ebiggers@google.com>
-To:     linux-crypto@vger.kernel.org
-Cc:     stable@vger.kernel.org
-Cc:     stable@vger.kernel.org
-Subject: Re: [PATCH v2 3/7] crypto: arm/aes-neonbs - don't access already-freed walk.iv
-In-Reply-To: <20190410064635.11813-4-ebiggers@kernel.org>
-References: <20190410064635.11813-4-ebiggers@kernel.org>
-Message-Id: <20190410191808.A9F302082A@mail.kernel.org>
+Cc:     Geert Uytterhoeven <geert@linux-m68k.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-security-module <linux-security-module@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Laura Abbott <labbott@redhat.com>,
+        Rik van Riel <riel@surriel.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi,
+On Wed, Apr 10, 2019 at 12:07 PM Eric Biggers <ebiggers@kernel.org> wrote:
+> That didn't answer my question.  My question is what is the purpose of this?  If
+> there was actual buffer overflow when __GFP_COMP isn't specified that would make
+> perfect sense, but AFAICS there isn't.  So why does hardened usercopy consider
+> it broken when __GFP_COMP isn't specified?
 
-[This is an automated email]
+The goal of CONFIG_HARDENED_USERCOPY_PAGESPAN was to detect copies
+across page boundaries in memory allocated by the page allocator.
+There appear to be enough cases of allocations that span pages but do
+not mark them with __GFP_COMP, so this logic hasn't proven useful in
+the real world (which is why no one should use the ..._PAGESPAN config
+in production). I'd like to get the kernel to the point where hardened
+usercopy can correctly do these checks (right now it's mainly only
+useful at checking for overflows in slub and slab), but it'll take
+time/focus for a while. No one has had time yet to track all of these
+down and fix them. (I defer to Laura and Rik on the design of the
+pagespan checks; they did the bulk of the work there.)
 
-This commit has been processed because it contains a "Fixes:" tag,
-fixing commit: e4e7f10bfc40 ARM: add support for bit sliced AES using NEON instructions.
+Does that help explain it, or am I still missing your question?
 
-The bot has tested the following trees: v5.0.7, v4.19.34, v4.14.111, v4.9.168, v4.4.178, v3.18.138.
-
-v5.0.7: Build OK!
-v4.19.34: Build OK!
-v4.14.111: Build OK!
-v4.9.168: Failed to apply! Possible dependencies:
-    211f41af534a ("crypto: aesbs - Convert to skcipher")
-    585b5fa63da9 ("crypto: arm/aes - Select SIMD in Kconfig")
-    6fdf436fd854 ("crypto: arm/aes - Add missing SIMD select for aesbs")
-    81126d1a8bc2 ("crypto: arm/aesbs - fix brokenness after skcipher conversion")
-    81edb4262975 ("crypto: arm/aes - replace scalar AES cipher")
-    cc477bf64573 ("crypto: arm/aes - replace bit-sliced OpenSSL NEON code")
-
-v4.4.178: Failed to apply! Possible dependencies:
-    211f41af534a ("crypto: aesbs - Convert to skcipher")
-    28856a9e52c7 ("crypto: xts - consolidate sanity check for keys")
-    49abc0d2e19b ("crypto: xts - fix compile errors")
-    585b5fa63da9 ("crypto: arm/aes - Select SIMD in Kconfig")
-    6fdf436fd854 ("crypto: arm/aes - Add missing SIMD select for aesbs")
-    81126d1a8bc2 ("crypto: arm/aesbs - fix brokenness after skcipher conversion")
-    81edb4262975 ("crypto: arm/aes - replace scalar AES cipher")
-    cc477bf64573 ("crypto: arm/aes - replace bit-sliced OpenSSL NEON code")
-
-v3.18.138: Failed to apply! Possible dependencies:
-    006d0624fa0d ("crypto: arm - add support for SHA-224/256 using ARMv8 Crypto Extensions")
-    12ac3efe74f8 ("arm64/crypto: use crypto instructions to generate AES key schedule")
-    504c6143c53d ("crypto: powerpc/aes - kernel config")
-    585b5fa63da9 ("crypto: arm/aes - Select SIMD in Kconfig")
-    652ccae5cc4e ("crypto: arm - move ARM specific Kconfig definitions to a dedicated file")
-    6fdf436fd854 ("crypto: arm/aes - Add missing SIMD select for aesbs")
-    81edb4262975 ("crypto: arm/aes - replace scalar AES cipher")
-    86464859cc77 ("crypto: arm - AES in ECB/CBC/CTR/XTS modes using ARMv8 Crypto Extensions")
-    864cbeed4ab2 ("crypto: arm - add support for SHA1 using ARMv8 Crypto Instructions")
-    cc477bf64573 ("crypto: arm/aes - replace bit-sliced OpenSSL NEON code")
-
-
-How should we proceed with this patch?
-
---
-Thanks,
-Sasha
+-- 
+Kees Cook
