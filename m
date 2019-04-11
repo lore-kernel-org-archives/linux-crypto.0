@@ -2,168 +2,118 @@ Return-Path: <SRS0=9Mwu=SN=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF860C10F13
-	for <linux-crypto@archiver.kernel.org>; Thu, 11 Apr 2019 18:33:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2DBCC10F13
+	for <linux-crypto@archiver.kernel.org>; Thu, 11 Apr 2019 18:45:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 94EAA2083E
-	for <linux-crypto@archiver.kernel.org>; Thu, 11 Apr 2019 18:33:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 801032083E
+	for <linux-crypto@archiver.kernel.org>; Thu, 11 Apr 2019 18:45:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Dys1RAc3"
+	dkim=pass (2048-bit key) header.d=netronome-com.20150623.gappssmtp.com header.i=@netronome-com.20150623.gappssmtp.com header.b="hGlsp2xY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726771AbfDKSdU (ORCPT
+        id S1726690AbfDKSpN (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 11 Apr 2019 14:33:20 -0400
-Received: from mail-vs1-f68.google.com ([209.85.217.68]:43650 "EHLO
-        mail-vs1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726536AbfDKSdU (ORCPT
+        Thu, 11 Apr 2019 14:45:13 -0400
+Received: from mail-qk1-f195.google.com ([209.85.222.195]:36179 "EHLO
+        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726661AbfDKSpM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 11 Apr 2019 14:33:20 -0400
-Received: by mail-vs1-f68.google.com with SMTP id t23so1638583vso.10
-        for <linux-crypto@vger.kernel.org>; Thu, 11 Apr 2019 11:33:19 -0700 (PDT)
+        Thu, 11 Apr 2019 14:45:12 -0400
+Received: by mail-qk1-f195.google.com with SMTP id k130so4133242qke.3
+        for <linux-crypto@vger.kernel.org>; Thu, 11 Apr 2019 11:45:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ETxANaq/Qz0wt53H7RU5QOss/NV8wuC5HeoYqujoieY=;
-        b=Dys1RAc35JFj8zWrj0l62FRQghB7NP9SOfxts6YK8syiZCLqNpDAUG/vOkkS904C5R
-         U4IEA/OVQXpfpZo/c9a3ITJDCl/OCA7Q4ICIdj4Qaen233iTKgQdGdWHKStS/v6R9NGK
-         nRCiZpTKqHiHEBQ+hwOEXRcU5+Ad/a9bsS3Ho=
+        d=netronome-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:in-reply-to:references
+         :organization:mime-version:content-transfer-encoding;
+        bh=kiA/7S6DW255WaRhu3W/fMMpQt2zzRI8YFlJQJv1HKM=;
+        b=hGlsp2xYJJEW5dM6f4cH0r8VwaS5a5Y/OMTpmVMhteDJNWi7aYPsutbQ2aW9yMbpfa
+         virsx6+J4MrBXi2KMOCZLfskwbHjClkjC5fC4w0X8yVMoaautirxqQQ4nY5VvwduoGoH
+         bMAQeEfnLPGmIfv38uO4z8kd/o25/Qk2Q9v3qpdPS8H3Yr4r7E9Lnpe0nVIEqexromVn
+         JQoqbcNmubI3DUqoQHS7yDSWZHBgQahalHr7nNYeFDDMBreYPyxybLgotVY/mm4ylnbn
+         UUJlkK25Tw/XOwL8XvZz8M4DPNgAWBI/NNl2z87h4NA7k6BU2aOaTx0BNJR3kdMaZjp2
+         eKtw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ETxANaq/Qz0wt53H7RU5QOss/NV8wuC5HeoYqujoieY=;
-        b=AI+ex7oNW1928nZpRbYr1/Ed5WqEzWnHeS+8wG+wmMp/kQD2XCacTp5fp10yLUCNsi
-         W6s7P+mSuurpcn0Q2naEl+9LT5dgLSamQMZgUGOa2eK0hacrkwch4aydcz2+sNNENfAB
-         FERrh9jJhbMG+0IAOeCO7J6hHi6XphGv/+SKi3yoy9g8pAQGZwUoYCPH7w6iBUCOQJsU
-         SLahS06zFfvSKseDSqh3hdi6gZk9NwvHRgvRa/mk1O0jqxYGzyVAhmllmIU+lTxbi28/
-         yYq2u2EiwpVNPBSWYdTIGBuJM5YFC/mF8CWwz8ACCD9KI9ZPMXmLwbhbbFRLpbPQPPb2
-         cV7Q==
-X-Gm-Message-State: APjAAAUsasA0lYDD6b23FL24h5C9SHsVXH0GRzxLJn35FZTvwsYFdoWK
-        Akfwx0NoJRRsa/x7u+2T46JmO7a1fWw=
-X-Google-Smtp-Source: APXvYqyiMHX1ShmluiuOaDsJJK/05SxM4uMK5F4g6t5XHjlfTG1ZEecAHNpPJO2UdGzQwzK6OqMX+Q==
-X-Received: by 2002:a67:ed55:: with SMTP id m21mr28088925vsp.201.1555007597894;
-        Thu, 11 Apr 2019 11:33:17 -0700 (PDT)
-Received: from mail-ua1-f49.google.com (mail-ua1-f49.google.com. [209.85.222.49])
-        by smtp.gmail.com with ESMTPSA id 110sm28544744uaq.7.2019.04.11.11.33.16
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 11 Apr 2019 11:33:17 -0700 (PDT)
-Received: by mail-ua1-f49.google.com with SMTP id g8so2386602uaj.0
-        for <linux-crypto@vger.kernel.org>; Thu, 11 Apr 2019 11:33:16 -0700 (PDT)
-X-Received: by 2002:ab0:4eaa:: with SMTP id l42mr22631556uah.80.1555007596300;
- Thu, 11 Apr 2019 11:33:16 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=kiA/7S6DW255WaRhu3W/fMMpQt2zzRI8YFlJQJv1HKM=;
+        b=BwIOIg9OGAvz/6ef3MBh/CoqgRDFIz6d1msrT2equLTQxjQpvRfH74HNMPuejvQwCC
+         F7DbK8GWOAhVz8tYrwzgMs/09xHPeuczdkkk1BqPBpMe2p6X/PoKb+5FmqP2pOHGOXey
+         /fHHjZhzGKhpRUzUYVVzhqZluzIUFmEXXzzFdOWh/G2VlVyu2EfVWWnbaydu8z4FbCg8
+         X14QqNPFj5ucGc1bzGAlHoJafCOt5NPMKyRB4Pcq9Jw67NdiP2eT1Xqp9yafw4fRKFxc
+         aYiyshDC5wvPqiMhAuZrTR4FIk6DAH5yKJxxTUsZZVxk+Mz2Fo7fryLwoVEhwJb5Ftcm
+         5aaQ==
+X-Gm-Message-State: APjAAAXo69fZ6S6uP2Oa56vZMT/nHXdozQHG0yxkZ+EIBPvRSYHq/jTU
+        eSH+OyAby5PGUIIFhmyrO/L5tA==
+X-Google-Smtp-Source: APXvYqwWAzXcM4XHK69VqcHiN+qxuqbMw3ANLSVyydV8yo4SDsNyzLHLLeQnioKXqAgHncvLvPk0WA==
+X-Received: by 2002:a37:acc:: with SMTP id 195mr41068173qkk.231.1555008310801;
+        Thu, 11 Apr 2019 11:45:10 -0700 (PDT)
+Received: from cakuba.netronome.com ([66.60.152.14])
+        by smtp.gmail.com with ESMTPSA id g12sm21862501qkk.85.2019.04.11.11.45.09
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Thu, 11 Apr 2019 11:45:10 -0700 (PDT)
+Date:   Thu, 11 Apr 2019 11:45:06 -0700
+From:   Jakub Kicinski <jakub.kicinski@netronome.com>
+To:     Atul Gupta <atul.gupta@chelsio.com>
+Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
+        dt@chelsio.com
+Subject: Re: [crypto 0/4] Inline TLS client and v6 support
+Message-ID: <20190411114506.10d19a40@cakuba.netronome.com>
+In-Reply-To: <ae56c100-d072-bf6b-465a-5136d29b84be@chelsio.com>
+References: <20190409152234.11100-1-atul.gupta@chelsio.com>
+        <20190409110137.1ff359e0@cakuba.netronome.com>
+        <a443baa3-a192-2d3d-d3bf-20b0f12e53a4@chelsio.com>
+        <20190410085842.687f2d2f@cakuba.netronome.com>
+        <601354bc-10b7-f008-c3d2-88d715eba812@chelsio.com>
+        <20190411094010.61f93a25@cakuba.netronome.com>
+        <ae56c100-d072-bf6b-465a-5136d29b84be@chelsio.com>
+Organization: Netronome Systems, Ltd.
 MIME-Version: 1.0
-References: <20190319170911.GB202956@gmail.com> <20190320185719.GB180195@gmail.com>
- <CAGXu5jL-5C1ZGZ1JgaNFqK-z1Pp1N1X8gD3_ysKTCa=omD+_VQ@mail.gmail.com>
- <20190321175122.GA1587@sol.localdomain> <20190410031734.GB7140@sol.localdomain>
- <CAGXu5j+SZ2+Zkc=Vp5CXQUHhiR9f_OOnca684JTRW3T0yXdaNQ@mail.gmail.com>
- <20190410190729.GA120258@gmail.com> <CAGXu5j+Gfvj9G6s_UQTw6hE11gJb1edt3BXzpbDQdc_dpcHgag@mail.gmail.com>
- <20190410231156.GB120258@gmail.com> <CAGXu5jKg+oN7yUY=N69U93afOVHBPgwz6Osf=eMDPfiwbzEqmw@mail.gmail.com>
- <20190411175823.GC225654@gmail.com>
-In-Reply-To: <20190411175823.GC225654@gmail.com>
-From:   Kees Cook <keescook@chromium.org>
-Date:   Thu, 11 Apr 2019 11:33:04 -0700
-X-Gmail-Original-Message-ID: <CAGXu5j+u3f3qUVkQO+zYLN7BDh3r7w-W3k3aa+qdAP11k7A1dw@mail.gmail.com>
-Message-ID: <CAGXu5j+u3f3qUVkQO+zYLN7BDh3r7w-W3k3aa+qdAP11k7A1dw@mail.gmail.com>
-Subject: Re: crypto: Kernel memory overwrite attempt detected to spans
- multiple pages
-To:     Eric Biggers <ebiggers@kernel.org>,
-        Dmitry Vyukov <dvyukov@google.com>
-Cc:     Geert Uytterhoeven <geert@linux-m68k.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-security-module <linux-security-module@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Laura Abbott <labbott@redhat.com>,
-        Rik van Riel <riel@surriel.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Apr 11, 2019 at 10:58 AM Eric Biggers <ebiggers@kernel.org> wrote:
+On Thu, 11 Apr 2019 23:13:08 +0530, Atul Gupta wrote:
+> On 4/11/2019 10:10 PM, Jakub Kicinski wrote:
+> > On Thu, 11 Apr 2019 09:47:09 +0530, Atul Gupta wrote:  
+> >> On 4/10/2019 9:28 PM, Jakub Kicinski wrote:  
+> >>> On Wed, 10 Apr 2019 10:56:37 +0530, Atul Gupta wrote:    
+> >>>> On 4/9/2019 11:31 PM, Jakub Kicinski wrote:    
+> >>>>> On Tue,  9 Apr 2019 08:22:34 -0700, Atul Gupta wrote:      
+> >>>>>> Extends Inline TLS record processing to TLS client. connect
+> >>>>>> API is added to tls_context to setup hardware for TLS
+> >>>>>> connection and handshake. Functionality wise, this makes the solution
+> >>>>>> end-to-end Inline TLS capable. TLS server and client
+> >>>>>> can operate in Inline mode and leverage hardware for complete
+> >>>>>> TLS record offload.
+> >>>>>> [0004] Adds the IPv6 support for Inline TLS server/client.
+> >>>>>>
+> >>>>>> RFC series for this patch was created against net-next and 
+> >>>>>> submitted on 18 Jan'2019.
+> >>>>>> This series is created against Herbert branch.      
+> >>>>> Sorry if someone already asked this, but is your HW doing full ToE 
+> >>>>> for all this TLS "record offload" stuff?      
+> >>>> Yes Jakub    
+> >>> So from what I grok you already feed all the data directly to the
+> >>> socket completely bypassing the lower layers of the networking stack,
+> >>> and with this patch set you'd also move 3WHS into the FW?    
+> >> Yes, that's correct.  
+> > I believe then it's a no-go from netdev perspective.  
 >
-> On Wed, Apr 10, 2019 at 04:27:28PM -0700, Kees Cook wrote:
-> > On Wed, Apr 10, 2019 at 4:12 PM Eric Biggers <ebiggers@kernel.org> wrote:
-> > > You've explained *what* it does again, but not *why*.  *Why* do you want
-> > > hardened usercopy to detect copies across page boundaries, when there is no
-> > > actual buffer overflow?
-> >
-> > But that *is* how it determines it was a buffer overflow: "if you
-> > cross page boundaries (of a non-compound allocation), it *is* a buffer
-> > overflow". This assertion, however, is flawed because many contiguous
-> > allocations are not marked as being grouped together when it reality
-> > they were. It was an attempt to get allocation size information out of
-> > the page allocator, similar to how slab can be queries about
-> > allocation size. I'm open to improvements here, since it's obviously
-> > broken in its current state. :)
-> >
-> > --
-> > Kees Cook
->
-> Well, I'm still at a loss as to whether I'm actually supposed to "fix" this by
-> adding __GFP_COMP, or whether you're saying the option is broken anyway so I
+> Inline TLS record offload path is kept out of netdev and leverages
+> offload capabilities for crypto
 
-I would love it if you could fix it, yes.
+Inline TLS record offload path bypasses the networking stack and feeds
+data directly into the socket.  If we also allow offloading 3WHS the
+connection will become invisible to the stack, queueing, packet
+filtering etc.
 
-> shouldn't bother doing anything.  IIUC, even the kernel stack is still not
-> marked __GFP_COMP, so copies to/from the stack can trigger this too, despite
-> this being reported over 2 years ago
-> (http://lkml.iu.edu/hypermail/linux/kernel/1701.2/01450.html)?
-> CONFIG_HARDENED_USERCOPY_PAGESPAN is even disabled in syzbot because you already
-> said the option is broken and should not be used.
-
-stacks are checked before PAGESPAN, so that particular problem should
-no longer be present since commit 7bff3c069973 ("mm/usercopy.c: no
-check page span for stack objects").
-
-> I worry that people will enable all the hardened usercopy options "because
-> security", then when the pagespan check breaks something they will disable all
-> hardened usercopy options, because they don't understand the individual options.
-> Providing broken options is actively harmful, IMO.
-
-It's behind EXPERT, default-n, and says:
-
-          When a multi-page allocation is done without __GFP_COMP,
-          hardened usercopy will reject attempts to copy it. There are,
-          however, several cases of this in the kernel that have not all
-          been removed. This config is intended to be used only while
-          trying to find such users.
-
-I'd rather leave it since it's still useful.
-
-Perhaps it could be switched to WARN by default and we reenable it in
-syzbot to improve its utility there?
-
-diff --git a/mm/usercopy.c b/mm/usercopy.c
-index 14faadcedd06..6e7e28fe062b 100644
---- a/mm/usercopy.c
-+++ b/mm/usercopy.c
-@@ -208,8 +208,13 @@ static inline void check_page_span(const void
-*ptr, unsigned long n,
-         */
-        is_reserved = PageReserved(page);
-        is_cma = is_migrate_cma_page(page);
--       if (!is_reserved && !is_cma)
--               usercopy_abort("spans multiple pages", NULL, to_user, 0, n);
-+       if (!is_reserved && !is_cma) {
-+               usercopy_warn("spans multiple pages without __GFP_COMP",
-+                               NULL, to_user,
-+                               (unsigned long)ptr & (unsigned long)PAGE_MASK,
-+                               n);
-+               return;
-+       }
-
-        for (ptr += PAGE_SIZE; ptr <= end; ptr += PAGE_SIZE) {
-                page = virt_to_head_page(ptr);
-
-
--- 
-Kees Cook
+I think the "netdev community" feels pretty strongly about preventing
+protocol ossification and bypassing crucial parts of the infrastructure.
