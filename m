@@ -2,296 +2,144 @@ Return-Path: <SRS0=9Mwu=SN=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7303C10F14
-	for <linux-crypto@archiver.kernel.org>; Thu, 11 Apr 2019 08:51:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCE6BC10F13
+	for <linux-crypto@archiver.kernel.org>; Thu, 11 Apr 2019 09:28:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B717E2184B
-	for <linux-crypto@archiver.kernel.org>; Thu, 11 Apr 2019 08:51:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EBF1D20850
+	for <linux-crypto@archiver.kernel.org>; Thu, 11 Apr 2019 09:28:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="ZwPdiGXZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727097AbfDKIvY (ORCPT
+        id S1726106AbfDKJ2B (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 11 Apr 2019 04:51:24 -0400
-Received: from orcrist.hmeau.com ([104.223.48.154]:41280 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727110AbfDKIvX (ORCPT
+        Thu, 11 Apr 2019 05:28:01 -0400
+Received: from mo4-p00-ob.smtp.rzone.de ([81.169.146.219]:18484 "EHLO
+        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725783AbfDKJ2A (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 11 Apr 2019 04:51:23 -0400
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1hEVQX-0003Sv-Hl
-        for <linux-crypto@vger.kernel.org>; Thu, 11 Apr 2019 16:51:21 +0800
-Received: from herbert by gondobar with local (Exim 4.89)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1hEVQX-0006ow-7P; Thu, 11 Apr 2019 16:51:21 +0800
-Subject: [PATCH 23/24] crypto: talitos - Forbid 2-key 3DES in FIPS mode
-References: <20190411084707.h56mz2z7jxusnr7u@gondor.apana.org.au>
-To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Message-Id: <E1hEVQX-0006ow-7P@gondobar>
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-Date:   Thu, 11 Apr 2019 16:51:21 +0800
+        Thu, 11 Apr 2019 05:28:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1554974875;
+        s=strato-dkim-0002; d=chronox.de;
+        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
+        bh=kmndxOeXQUvS9+uIy/B/SNrWvaFypAxwZKTCnGJj7gs=;
+        b=ZwPdiGXZgPmhSWDnfluXlv8OpKNmPuqUs8Qx64eZq1VmPBvamCd8Yr6eT1zCXjBTbl
+        ARxc6iCntRl9cqXyLSC/l4wXePvJ+xr2iWyQ28yhqpIT6nhAzYOKibhy3cJyUkVA5ixv
+        238ZLgg5MxCbSr8ISarkIoeCb7XkJmwRdwTAqsGc3o3LYO3zm9k+jfdvKxRMSbjoE3s/
+        Mirl3hEikgsmwEWq6vlJZ/XFo7rSW3XD4D7hos2qEeCYraFU+BVWG3YPBc9wEsSQ/mzU
+        VirUFB1rlWxNdNBNsmlkruOPeETvv6JS6c1w7b0qQAk2tz1io9A7Ub0inOu9lRT+QXet
+        nfbg==
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9zmcHKf2haCKHXPG347ZF"
+X-RZG-CLASS-ID: mo00
+Received: from tauon.chronox.de
+        by smtp.strato.de (RZmta 44.18 DYNA|AUTH)
+        with ESMTPSA id R0373fv3B9RsCDv
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (curve secp521r1 with 521 ECDH bits, eq. 15360 bits RSA))
+        (Client did not present a certificate);
+        Thu, 11 Apr 2019 11:27:54 +0200 (CEST)
+From:   Stephan Mueller <smueller@chronox.de>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: Re: [PATCH 10/24] crypto: ccree - Forbid 2-key 3DES in FIPS mode
+Date:   Thu, 11 Apr 2019 11:27:54 +0200
+Message-ID: <2919231.mFyek56I8j@tauon.chronox.de>
+In-Reply-To: <E1hEVQI-0006mq-Kd@gondobar>
+References: <20190411084707.h56mz2z7jxusnr7u@gondor.apana.org.au> <E1hEVQI-0006mq-Kd@gondobar>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch forbids the use of 2-key 3DES (K1 == K3) in FIPS mode.
-   
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
----
+Am Donnerstag, 11. April 2019, 10:51:06 CEST schrieb Herbert Xu:
 
- drivers/crypto/talitos.c |  108 +++++++++++++++++++++++++++++++++++++++++------
- 1 file changed, 95 insertions(+), 13 deletions(-)
+Hi Herbert,
 
-diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index de78b54bcfb1..1d429fc073d1 100644
---- a/drivers/crypto/talitos.c
-+++ b/drivers/crypto/talitos.c
-@@ -913,6 +913,54 @@ static int aead_setkey(struct crypto_aead *authenc,
- 	return -EINVAL;
- }
- 
-+static int aead_des3_setkey(struct crypto_aead *authenc,
-+			    const u8 *key, unsigned int keylen)
-+{
-+	struct talitos_ctx *ctx = crypto_aead_ctx(authenc);
-+	struct device *dev = ctx->dev;
-+	struct crypto_authenc_keys keys;
-+	u32 flags;
-+	int err;
-+
-+	err = crypto_authenc_extractkeys(&keys, key, keylen);
-+	if (unlikely(err))
-+		goto badkey;
-+
-+	err = -EINVAL;
-+	if (keys.authkeylen + keys.enckeylen > TALITOS_MAX_KEY_SIZE)
-+		goto badkey;
-+
-+	if (keys.enckeylen != DES3_EDE_KEY_SIZE)
-+		goto badkey;
-+
-+	flags = crypto_aead_get_flags(authenc);
-+	err = __des3_verify_key(&flags, keys.enckey);
-+	if (unlikely(err)) {
-+		crypto_aead_set_flags(authenc, flags);
-+		goto out;
-+	}
-+
-+	if (ctx->keylen)
-+		dma_unmap_single(dev, ctx->dma_key, ctx->keylen, DMA_TO_DEVICE);
-+
-+	memcpy(ctx->key, keys.authkey, keys.authkeylen);
-+	memcpy(&ctx->key[keys.authkeylen], keys.enckey, keys.enckeylen);
-+
-+	ctx->keylen = keys.authkeylen + keys.enckeylen;
-+	ctx->enckeylen = keys.enckeylen;
-+	ctx->authkeylen = keys.authkeylen;
-+	ctx->dma_key = dma_map_single(dev, ctx->key, ctx->keylen,
-+				      DMA_TO_DEVICE);
-+
-+out:
-+	memzero_explicit(&keys, sizeof(keys));
-+	return err;
-+
-+badkey:
-+	crypto_aead_set_flags(authenc, CRYPTO_TFM_RES_BAD_KEY_LEN);
-+	goto out;
-+}
-+
- /*
-  * talitos_edesc - s/w-extended descriptor
-  * @src_nents: number of segments in input scatterlist
-@@ -1527,12 +1575,22 @@ static int ablkcipher_setkey(struct crypto_ablkcipher *cipher,
- {
- 	struct talitos_ctx *ctx = crypto_ablkcipher_ctx(cipher);
- 	struct device *dev = ctx->dev;
--	u32 tmp[DES_EXPKEY_WORDS];
- 
--	if (keylen > TALITOS_MAX_KEY_SIZE) {
--		crypto_ablkcipher_set_flags(cipher, CRYPTO_TFM_RES_BAD_KEY_LEN);
--		return -EINVAL;
--	}
-+	if (ctx->keylen)
-+		dma_unmap_single(dev, ctx->dma_key, ctx->keylen, DMA_TO_DEVICE);
-+
-+	memcpy(&ctx->key, key, keylen);
-+	ctx->keylen = keylen;
-+
-+	ctx->dma_key = dma_map_single(dev, ctx->key, keylen, DMA_TO_DEVICE);
-+
-+	return 0;
-+}
-+
-+static int ablkcipher_des_setkey(struct crypto_ablkcipher *cipher,
-+				 const u8 *key, unsigned int keylen)
-+{
-+	u32 tmp[DES_EXPKEY_WORDS];
- 
- 	if (unlikely(crypto_ablkcipher_get_flags(cipher) &
- 		     CRYPTO_TFM_REQ_FORBID_WEAK_KEYS) &&
-@@ -1541,15 +1599,23 @@ static int ablkcipher_setkey(struct crypto_ablkcipher *cipher,
- 		return -EINVAL;
- 	}
- 
--	if (ctx->keylen)
--		dma_unmap_single(dev, ctx->dma_key, ctx->keylen, DMA_TO_DEVICE);
-+	return ablkcipher_setkey(cipher, key, keylen);
-+}
- 
--	memcpy(&ctx->key, key, keylen);
--	ctx->keylen = keylen;
-+static int ablkcipher_des3_setkey(struct crypto_ablkcipher *cipher,
-+				  const u8 *key, unsigned int keylen)
-+{
-+	u32 flags;
-+	int err;
- 
--	ctx->dma_key = dma_map_single(dev, ctx->key, keylen, DMA_TO_DEVICE);
-+	flags = crypto_ablkcipher_get_flags(cipher);
-+	err = __des3_verify_key(&flags, key);
-+	if (unlikely(err)) {
-+		crypto_ablkcipher_set_flags(cipher, flags);
-+		return err;
-+	}
- 
--	return 0;
-+	return ablkcipher_setkey(cipher, key, keylen);
- }
- 
- static void common_nonsnoop_unmap(struct device *dev,
-@@ -2313,6 +2379,7 @@ static struct talitos_alg_template driver_algs[] = {
- 			},
- 			.ivsize = DES3_EDE_BLOCK_SIZE,
- 			.maxauthsize = SHA1_DIGEST_SIZE,
-+			.setkey = aead_des3_setkey,
- 		},
- 		.desc_hdr_template = DESC_HDR_TYPE_IPSEC_ESP |
- 			             DESC_HDR_SEL0_DEU |
-@@ -2336,6 +2403,7 @@ static struct talitos_alg_template driver_algs[] = {
- 			},
- 			.ivsize = DES3_EDE_BLOCK_SIZE,
- 			.maxauthsize = SHA1_DIGEST_SIZE,
-+			.setkey = aead_des3_setkey,
- 		},
- 		.desc_hdr_template = DESC_HDR_TYPE_HMAC_SNOOP_NO_AFEU |
- 				     DESC_HDR_SEL0_DEU |
-@@ -2399,6 +2467,7 @@ static struct talitos_alg_template driver_algs[] = {
- 			},
- 			.ivsize = DES3_EDE_BLOCK_SIZE,
- 			.maxauthsize = SHA224_DIGEST_SIZE,
-+			.setkey = aead_des3_setkey,
- 		},
- 		.desc_hdr_template = DESC_HDR_TYPE_IPSEC_ESP |
- 			             DESC_HDR_SEL0_DEU |
-@@ -2422,6 +2491,7 @@ static struct talitos_alg_template driver_algs[] = {
- 			},
- 			.ivsize = DES3_EDE_BLOCK_SIZE,
- 			.maxauthsize = SHA224_DIGEST_SIZE,
-+			.setkey = aead_des3_setkey,
- 		},
- 		.desc_hdr_template = DESC_HDR_TYPE_HMAC_SNOOP_NO_AFEU |
- 				     DESC_HDR_SEL0_DEU |
-@@ -2485,6 +2555,7 @@ static struct talitos_alg_template driver_algs[] = {
- 			},
- 			.ivsize = DES3_EDE_BLOCK_SIZE,
- 			.maxauthsize = SHA256_DIGEST_SIZE,
-+			.setkey = aead_des3_setkey,
- 		},
- 		.desc_hdr_template = DESC_HDR_TYPE_IPSEC_ESP |
- 			             DESC_HDR_SEL0_DEU |
-@@ -2508,6 +2579,7 @@ static struct talitos_alg_template driver_algs[] = {
- 			},
- 			.ivsize = DES3_EDE_BLOCK_SIZE,
- 			.maxauthsize = SHA256_DIGEST_SIZE,
-+			.setkey = aead_des3_setkey,
- 		},
- 		.desc_hdr_template = DESC_HDR_TYPE_HMAC_SNOOP_NO_AFEU |
- 				     DESC_HDR_SEL0_DEU |
-@@ -2550,6 +2622,7 @@ static struct talitos_alg_template driver_algs[] = {
- 			},
- 			.ivsize = DES3_EDE_BLOCK_SIZE,
- 			.maxauthsize = SHA384_DIGEST_SIZE,
-+			.setkey = aead_des3_setkey,
- 		},
- 		.desc_hdr_template = DESC_HDR_TYPE_IPSEC_ESP |
- 			             DESC_HDR_SEL0_DEU |
-@@ -2592,6 +2665,7 @@ static struct talitos_alg_template driver_algs[] = {
- 			},
- 			.ivsize = DES3_EDE_BLOCK_SIZE,
- 			.maxauthsize = SHA512_DIGEST_SIZE,
-+			.setkey = aead_des3_setkey,
- 		},
- 		.desc_hdr_template = DESC_HDR_TYPE_IPSEC_ESP |
- 			             DESC_HDR_SEL0_DEU |
-@@ -2654,6 +2728,7 @@ static struct talitos_alg_template driver_algs[] = {
- 			},
- 			.ivsize = DES3_EDE_BLOCK_SIZE,
- 			.maxauthsize = MD5_DIGEST_SIZE,
-+			.setkey = aead_des3_setkey,
- 		},
- 		.desc_hdr_template = DESC_HDR_TYPE_IPSEC_ESP |
- 			             DESC_HDR_SEL0_DEU |
-@@ -2676,6 +2751,7 @@ static struct talitos_alg_template driver_algs[] = {
- 			},
- 			.ivsize = DES3_EDE_BLOCK_SIZE,
- 			.maxauthsize = MD5_DIGEST_SIZE,
-+			.setkey = aead_des3_setkey,
- 		},
- 		.desc_hdr_template = DESC_HDR_TYPE_HMAC_SNOOP_NO_AFEU |
- 				     DESC_HDR_SEL0_DEU |
-@@ -2748,6 +2824,7 @@ static struct talitos_alg_template driver_algs[] = {
- 				.min_keysize = DES_KEY_SIZE,
- 				.max_keysize = DES_KEY_SIZE,
- 				.ivsize = DES_BLOCK_SIZE,
-+				.setkey = ablkcipher_des_setkey,
- 			}
- 		},
- 		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
-@@ -2764,6 +2841,7 @@ static struct talitos_alg_template driver_algs[] = {
- 				.min_keysize = DES_KEY_SIZE,
- 				.max_keysize = DES_KEY_SIZE,
- 				.ivsize = DES_BLOCK_SIZE,
-+				.setkey = ablkcipher_des_setkey,
- 			}
- 		},
- 		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
-@@ -2781,6 +2859,7 @@ static struct talitos_alg_template driver_algs[] = {
- 				.min_keysize = DES3_EDE_KEY_SIZE,
- 				.max_keysize = DES3_EDE_KEY_SIZE,
- 				.ivsize = DES3_EDE_BLOCK_SIZE,
-+				.setkey = ablkcipher_des3_setkey,
- 			}
- 		},
- 		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
-@@ -2798,6 +2877,7 @@ static struct talitos_alg_template driver_algs[] = {
- 				.min_keysize = DES3_EDE_KEY_SIZE,
- 				.max_keysize = DES3_EDE_KEY_SIZE,
- 				.ivsize = DES3_EDE_BLOCK_SIZE,
-+				.setkey = ablkcipher_des3_setkey,
- 			}
- 		},
- 		.desc_hdr_template = DESC_HDR_TYPE_COMMON_NONSNOOP_NO_AFEU |
-@@ -3144,7 +3224,8 @@ static struct talitos_crypto_alg *talitos_alg_alloc(struct device *dev,
- 		alg->cra_init = talitos_cra_init;
- 		alg->cra_exit = talitos_cra_exit;
- 		alg->cra_type = &crypto_ablkcipher_type;
--		alg->cra_ablkcipher.setkey = ablkcipher_setkey;
-+		alg->cra_ablkcipher.setkey = alg->cra_ablkcipher.setkey ?:
-+					     ablkcipher_setkey;
- 		alg->cra_ablkcipher.encrypt = ablkcipher_encrypt;
- 		alg->cra_ablkcipher.decrypt = ablkcipher_decrypt;
- 		break;
-@@ -3152,7 +3233,8 @@ static struct talitos_crypto_alg *talitos_alg_alloc(struct device *dev,
- 		alg = &t_alg->algt.alg.aead.base;
- 		alg->cra_exit = talitos_cra_exit;
- 		t_alg->algt.alg.aead.init = talitos_cra_init_aead;
--		t_alg->algt.alg.aead.setkey = aead_setkey;
-+		t_alg->algt.alg.aead.setkey = t_alg->algt.alg.aead.setkey ?:
-+					      aead_setkey;
- 		t_alg->algt.alg.aead.encrypt = aead_encrypt;
- 		t_alg->algt.alg.aead.decrypt = aead_decrypt;
- 		if (!(priv->features & TALITOS_FTR_SHA224_HWINIT) &&
+> This patch forbids the use of 2-key 3DES (K1 == K3) in FIPS mode.
+> 
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> ---
+> 
+>  drivers/crypto/ccree/cc_aead.c |   37 +++++++++++++++++++++++++++++++++++--
+> 1 file changed, 35 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/crypto/ccree/cc_aead.c b/drivers/crypto/ccree/cc_aead.c
+> index a3527c00b29a..c5cde327cf1f 100644
+> --- a/drivers/crypto/ccree/cc_aead.c
+> +++ b/drivers/crypto/ccree/cc_aead.c
+> @@ -650,6 +650,39 @@ static int cc_aead_setkey(struct crypto_aead *tfm,
+> const u8 *key, return rc;
+>  }
+> 
+> +static int cc_des3_aead_setkey(struct crypto_aead *aead, const u8 *key,
+> +			       unsigned int keylen)
+
+This function looks very similar to des3_aead_setkey in the different caam 
+code changes.
+
+Thus, wouldn't it be better to have common service function?
+> +{
+> +	struct crypto_authenc_keys keys;
+> +	u32 flags;
+> +	int err;
+> +
+> +	err = crypto_authenc_extractkeys(&keys, key, keylen);
+> +	if (unlikely(err))
+> +		goto badkey;
+> +
+> +	err = -EINVAL;
+> +	if (keys.enckeylen != DES3_EDE_KEY_SIZE)
+> +		goto badkey;
+> +
+> +	flags = crypto_aead_get_flags(aead);
+> +	err = __des3_verify_key(&flags, keys.enckey);
+> +	if (unlikely(err)) {
+> +		crypto_aead_set_flags(aead, flags);
+> +		goto out;
+> +	}
+> +
+> +	err = cc_aead_setkey(aead, key, keylen);
+> +
+> +out:
+> +	memzero_explicit(&keys, sizeof(keys));
+> +	return err;
+> +
+> +badkey:
+> +	crypto_aead_set_flags(aead, CRYPTO_TFM_RES_BAD_KEY_LEN);
+> +	goto out;
+> +}
+> +
+>  static int cc_rfc4309_ccm_setkey(struct crypto_aead *tfm, const u8 *key,
+>  				 unsigned int keylen)
+>  {
+> @@ -2372,7 +2405,7 @@ static struct cc_alg_template aead_algs[] = {
+>  		.driver_name = "authenc-hmac-sha1-cbc-des3-ccree",
+>  		.blocksize = DES3_EDE_BLOCK_SIZE,
+>  		.template_aead = {
+> -			.setkey = cc_aead_setkey,
+> +			.setkey = cc_des3_aead_setkey,
+>  			.setauthsize = cc_aead_setauthsize,
+>  			.encrypt = cc_aead_encrypt,
+>  			.decrypt = cc_aead_decrypt,
+> @@ -2412,7 +2445,7 @@ static struct cc_alg_template aead_algs[] = {
+>  		.driver_name = "authenc-hmac-sha256-cbc-des3-ccree",
+>  		.blocksize = DES3_EDE_BLOCK_SIZE,
+>  		.template_aead = {
+> -			.setkey = cc_aead_setkey,
+> +			.setkey = cc_des3_aead_setkey,
+>  			.setauthsize = cc_aead_setauthsize,
+>  			.encrypt = cc_aead_encrypt,
+>  			.decrypt = cc_aead_decrypt,
+
+
+
+Ciao
+Stephan
+
+
