@@ -2,129 +2,110 @@ Return-Path: <SRS0=9Mwu=SN=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,UNPARSEABLE_RELAY autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BF41C10F13
-	for <linux-crypto@archiver.kernel.org>; Thu, 11 Apr 2019 11:52:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2427C10F13
+	for <linux-crypto@archiver.kernel.org>; Thu, 11 Apr 2019 13:51:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1548C21850
-	for <linux-crypto@archiver.kernel.org>; Thu, 11 Apr 2019 11:52:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A44E52133D
+	for <linux-crypto@archiver.kernel.org>; Thu, 11 Apr 2019 13:51:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lAASYvx5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726635AbfDKLww (ORCPT
+        id S1726145AbfDKNvR (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 11 Apr 2019 07:52:52 -0400
-Received: from bhuna.collabora.co.uk ([46.235.227.227]:58492 "EHLO
-        bhuna.collabora.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726215AbfDKLwv (ORCPT
+        Thu, 11 Apr 2019 09:51:17 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:37133 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726106AbfDKNvR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 11 Apr 2019 07:52:51 -0400
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-        (Authenticated sender: andrewsh)
-        with ESMTPSA id 62FB9281A86
-Subject: Re: [PATCH v3] HID: add driver for U2F Zero built-in LED and RNG
-To:     Jiri Kosina <jikos@kernel.org>,
-        Benjamin Tissoires <benjamin.tissoires@gmail.com>
-Cc:     linux-input <linux-input@vger.kernel.org>,
-        linux-usb@vger.kernel.org,
-        Andrzej Pietrasiewicz <andrzej.p@collabora.com>,
-        kernel@collabora.com, linux-crypto@vger.kernel.org
-References: <20190401124200.17331-1-andrew.shadura@collabora.co.uk>
- <nycvar.YFH.7.76.1904101400520.9803@cbobk.fhfr.pm>
- <CAN+gG=H6TGtB68-XJ+Pg53EhL_M2m8MG1z33Yenvd9PhXJ=Oqw@mail.gmail.com>
- <nycvar.YFH.7.76.1904111234080.9803@cbobk.fhfr.pm>
-From:   Andrej Shadura <andrew.shadura@collabora.co.uk>
-Openpgp: preference=signencrypt
-Autocrypt: addr=andrew.shadura@collabora.co.uk; prefer-encrypt=mutual;
- keydata=
- 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
- Ooa/yj03j5gtPgECL7c=
-Organization: Collabora
-Message-ID: <d33b8772-bae6-1d20-8ff0-3397095f6e4b@collabora.co.uk>
-Date:   Thu, 11 Apr 2019 13:52:45 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.4.0
+        Thu, 11 Apr 2019 09:51:17 -0400
+Received: by mail-wm1-f65.google.com with SMTP id v14so6794787wmf.2
+        for <linux-crypto@vger.kernel.org>; Thu, 11 Apr 2019 06:51:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=3cTG+32X3hwLJuAUcOtOVdwPRqp+lk0Kw6TfocH7Y4E=;
+        b=lAASYvx55zPCD5eIxCDQgotvWxK2FHIBBtmBt8lzuPN/b/hoVxi2cr6G7EZtat5dSZ
+         4+jkYLcoMOvPb3bGH0Zht+uyNWPPDhjVokabUMPRP1IaSjc2FAi7BoQxALkyLEES2iWg
+         RKQt6FT9TKU2nOTIDufWiRSHHCPoZuy3OhlVjk+Ukr2P674NkLVsu6qBsoGFoZnPuuHH
+         AlR8zBq6uJSkA58CBQL/F9vCLsD3pg71v1DJIkeU3bWefWxQrGXwaZe5BtdGADS408bP
+         3caW6AOig3Q/kdEEBrbNwMtoVI/IuQYueNwUp1Jy2rpxcRret5eeN4F7/6vaybn6+D5X
+         g4ng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=3cTG+32X3hwLJuAUcOtOVdwPRqp+lk0Kw6TfocH7Y4E=;
+        b=OASmY1w4hzlsKVw2GxHKoNloPFPF5BOQG5RLzCFpexA9l6COA0CA0jQTJN9IoHM4pt
+         oidMu5GtD3pjvD80B4lZ7V8KhuuT1vcY3xFm532Ph9qXcwWhIEkhNLTgKkgvtl9xjeKR
+         bFYvdYPzjYyKZI5Z64wAet4v0KXXOURvT4SlAXtfSht59zwqPBxerIt29rcqvzf/iQgH
+         2tWk8OZ8HiU47wixVEskes5yKY+MeCyUJ20cHX5qGmeYh1Tg39bBIF8q6JN0I7vSTaDY
+         B4ObwY/0JMdJ9ZRfH1Scfvs5pbe/y0Nr/pdLnpB60KispcyVBJ6N8mdpCdRVl8/8pBOv
+         cO4A==
+X-Gm-Message-State: APjAAAWmw8DHE4Cpy+hV9D22l1YfvkpfRvRSnYya1NAp6gyuaL+F0T/7
+        LcLyITI5RAsKeb+aJIxKszXzqkJl
+X-Google-Smtp-Source: APXvYqzhRd7Fmc0/Cji3j2schLTFsWsHrYBToTpWrT/PIDzwdwdd8s/EgVkIOFM4yoZTBXmZi2jg8Q==
+X-Received: by 2002:a1c:be0e:: with SMTP id o14mr6325362wmf.11.1554990675715;
+        Thu, 11 Apr 2019 06:51:15 -0700 (PDT)
+Received: from Red ([2a01:cb1d:147:7200:2e56:dcff:fed2:c6d6])
+        by smtp.googlemail.com with ESMTPSA id n4sm37484918wrx.39.2019.04.11.06.51.14
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 11 Apr 2019 06:51:15 -0700 (PDT)
+Date:   Thu, 11 Apr 2019 15:51:13 +0200
+From:   Corentin Labbe <clabbe.montjoie@gmail.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: Re: [PATCH 22/24] crypto: sun4i-ss - Forbid 2-key 3DES in FIPS mode
+Message-ID: <20190411135113.GB4876@Red>
+References: <20190411084707.h56mz2z7jxusnr7u@gondor.apana.org.au>
+ <E1hEVQW-0006om-09@gondobar>
 MIME-Version: 1.0
-In-Reply-To: <nycvar.YFH.7.76.1904111234080.9803@cbobk.fhfr.pm>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <E1hEVQW-0006om-09@gondobar>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 11/04/2019 12:35, Jiri Kosina wrote:
-> On Thu, 11 Apr 2019, Benjamin Tissoires wrote:
+On Thu, Apr 11, 2019 at 04:51:19PM +0800, Herbert Xu wrote:
+> This patch forbids the use of 2-key 3DES (K1 == K3) in FIPS mode.
+>    
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> ---
 > 
->>> So I still am not really happy about this being wired up into generic HID
->>> although it's really a USB driver, but we've discussed that already, and I
->>> don't see any option that'd work substantially better in this case,
->>> especially from the UX point of view. Oh well. Applied to for-5.2/u2fzero,
->>> thanks!
->>>
->>
->> Hi wish I were CC-ed on these threads.
+>  drivers/crypto/sunxi-ss/sun4i-ss-cipher.c |   11 +++++------
+>  1 file changed, 5 insertions(+), 6 deletions(-)
 > 
-> Gah, for some reason I was convinced you were.
-> 
->> My CI script now fails because hid-u2fzero.ko needs devm_hwrng_register 
->> and the Kconfig doesn't force pulling the right dependency.
+> diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c b/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
+> index 54fd714d53ca..06df336488fb 100644
+> --- a/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
+> +++ b/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
+> @@ -533,13 +533,12 @@ int sun4i_ss_des3_setkey(struct crypto_skcipher *tfm, const u8 *key,
+>  			 unsigned int keylen)
+>  {
+>  	struct sun4i_tfm_ctx *op = crypto_skcipher_ctx(tfm);
+> -	struct sun4i_ss_ctx *ss = op->ss;
+> +	int err;
+> +
+> +	err = des3_verify_key(tfm, key);
+> +	if (unlikely(err))
+> +		return err;
+>  
+> -	if (unlikely(keylen != 3 * DES_KEY_SIZE)) {
+> -		dev_err(ss->dev, "Invalid keylen %u\n", keylen);
+> -		crypto_skcipher_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
+> -		return -EINVAL;
+> -	}
+>  	op->keylen = keylen;
+>  	memcpy(op->key, key, keylen);
+>  	return 0;
 
->> Also, you probably want to add in .probe() a check for the actual 
->> transport driver (`hid_is_using_ll_driver(hdev, &usb_hid_driver)`) or 
->> you can not use the usbhid functions without crashing the kernel.
-
-Thanks, that’s very useful.
-
-> Benjamin, I love your CI :)
-> 
-> Andrej, could you please send fixups on top of the applied patch?
-
-Sure, will do.
-
--- 
-Cheers,
-  Andrej
+Acked-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+Tested-by: Corentin Labbe <clabbe.montjoie@gmail.com>
