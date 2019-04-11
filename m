@@ -2,133 +2,112 @@ Return-Path: <SRS0=9Mwu=SN=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C9A4C10F13
-	for <linux-crypto@archiver.kernel.org>; Thu, 11 Apr 2019 17:18:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69D83C10F13
+	for <linux-crypto@archiver.kernel.org>; Thu, 11 Apr 2019 17:41:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1EA0320693
-	for <linux-crypto@archiver.kernel.org>; Thu, 11 Apr 2019 17:18:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rY1aYdap"
+	by mail.kernel.org (Postfix) with ESMTP id 4AB502084D
+	for <linux-crypto@archiver.kernel.org>; Thu, 11 Apr 2019 17:41:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726603AbfDKRSj (ORCPT
+        id S1726646AbfDKRlA (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 11 Apr 2019 13:18:39 -0400
-Received: from mail-ot1-f65.google.com ([209.85.210.65]:34470 "EHLO
-        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726391AbfDKRSj (ORCPT
+        Thu, 11 Apr 2019 13:41:00 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51976 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726633AbfDKRlA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 11 Apr 2019 13:18:39 -0400
-Received: by mail-ot1-f65.google.com with SMTP id k21so5946878otf.1;
-        Thu, 11 Apr 2019 10:18:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:references:from:message-id:date:user-agent:mime-version
-         :in-reply-to:content-language:content-transfer-encoding;
-        bh=7Ki5J1hlR1CKmSVR40eUi0RlHc65Eh3Ti4NIk/5ozpw=;
-        b=rY1aYdapKEu++r6F+HvBd7YGdCWjEWFqygiTsolAG6Y85TMn80tup2IDd++pd2OB74
-         ylaQHV0SobbRHNJ+63KD2DJXmARALDqB9Xt8LqCN+Ml+popV1Kvd6G5FwInRQeEUJKJl
-         v6Ytt1BOOHtiDPgDjo5897toxSTP/m/Ni/41qGiraLCbcK7zCG40Eyd6ibL5B6pbvb4W
-         X0tB7WvYhwREw40yZIgO6uKRtLOoWzgj5dlcbiierLBGDbOpMtfdHMNngznNEQFmUrX/
-         KYl4vxULHQ6kmaQDnH7f2Z5nxqOIr5PZEhh/z80JNjyNmnjf2JvVvrHB8MvY5ZQkY9jn
-         XzSw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=7Ki5J1hlR1CKmSVR40eUi0RlHc65Eh3Ti4NIk/5ozpw=;
-        b=nAZ8sF5VuAOwZtRzBkx3a4T57xq4AIyTZksQ4V9v7FjyYXtVE2TCTKqbuvDbJkgxw+
-         yLkgBj0eBvh1XYFxB3cbuz39bb2KSlwlgWsy6L5yH9vAyc7qqgHLwmwQuOBGkujGhUFp
-         a6xFvJNEM+TwpOLo6okMCTyrTls/bWOshWT161R2OUdGxxN2ZT8QoP2i2cdsX0K5FLwl
-         d8zUscDM7yTBRc0AWTPCDw+S7yuf5efd1HNYMKWbEt1ISz6FzRYlN3bS6E7naScP3vel
-         YqgaopoWIdAjB/ON3N8nqL4Zc3MfVW69qLHGSsym4TcYlVAiIVMRtgMDxlZ9YZ3pb3h5
-         mrng==
-X-Gm-Message-State: APjAAAXxBVnnprAuME1EHg3G0wZWtElvJqNU9BjYIzrr2SyJZ8K/6jNd
-        wCqLplrG5tDrLFjgyWipMxN4N74+
-X-Google-Smtp-Source: APXvYqwZ+R6HEAGJPHmj+sI4c8YTSYl797qPL9IgJ3zojoXJDhL0+WPylrCcJJUZC7K67aakGGmeRw==
-X-Received: by 2002:a9d:3b04:: with SMTP id z4mr31321999otb.1.1555003118598;
-        Thu, 11 Apr 2019 10:18:38 -0700 (PDT)
-Received: from [192.168.1.249] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id x202sm15357183oix.54.2019.04.11.10.18.37
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 11 Apr 2019 10:18:37 -0700 (PDT)
-Subject: Re: [PATCH v9 05/10] X.509: parse public key parameters from x509 for
- akcipher
-To:     Vitaly Chikunov <vt@altlinux.org>,
+        Thu, 11 Apr 2019 13:41:00 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x3BHeICb123038
+        for <linux-crypto@vger.kernel.org>; Thu, 11 Apr 2019 13:40:59 -0400
+Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2rt7ymfy1f-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <linux-crypto@vger.kernel.org>; Thu, 11 Apr 2019 13:40:58 -0400
+Received: from localhost
+        by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-crypto@vger.kernel.org> from <nayna@linux.vnet.ibm.com>;
+        Thu, 11 Apr 2019 18:40:57 +0100
+Received: from b03cxnp08027.gho.boulder.ibm.com (9.17.130.19)
+        by e34.co.us.ibm.com (192.168.1.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 11 Apr 2019 18:40:53 +0100
+Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
+        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x3BHeqf658458334
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 11 Apr 2019 17:40:52 GMT
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EA3E2136061;
+        Thu, 11 Apr 2019 17:40:51 +0000 (GMT)
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 03B7E136063;
+        Thu, 11 Apr 2019 17:40:49 +0000 (GMT)
+Received: from swastik.ibm.com (unknown [9.80.221.85])
+        by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Thu, 11 Apr 2019 17:40:49 +0000 (GMT)
+Subject: Re: [PATCH] crypto: vmx - fix copy-paste error in CTR mode
+To:     Daniel Axtens <dja@axtens.net>, Eric Biggers <ebiggers@kernel.org>
+Cc:     omosnacek@gmail.com, linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        David Howells <dhowells@redhat.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        linux-integrity@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20190411155122.13245-1-vt@altlinux.org>
- <20190411155122.13245-6-vt@altlinux.org>
-From:   Denis Kenzior <denkenz@gmail.com>
-Message-ID: <48828e0e-0aef-dece-e7ad-4c0ea9cefbe7@gmail.com>
-Date:   Thu, 11 Apr 2019 12:18:36 -0500
+        marcelo.cerri@canonical.com, Stephan Mueller <smueller@chronox.de>,
+        leo.barbosa@canonical.com, linuxppc-dev@lists.ozlabs.org,
+        nayna@linux.ibm.com, pfsmorigo@gmail.com, leitao@debian.org,
+        George Wilson <gcwilson@linux.ibm.com>
+References: <20190315020901.16509-1-dja@axtens.net>
+ <20190315022414.GA1671@sol.localdomain>
+ <875zsku5mk.fsf@dja-thinkpad.axtens.net>
+ <20190315043433.GC1671@sol.localdomain>
+ <8736nou2x5.fsf@dja-thinkpad.axtens.net>
+ <20190410070234.GA12406@sol.localdomain>
+ <87imvkwqdh.fsf@dja-thinkpad.axtens.net>
+From:   Nayna <nayna@linux.vnet.ibm.com>
+Date:   Thu, 11 Apr 2019 13:40:49 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.3.0
+ Thunderbird/52.9.1
 MIME-Version: 1.0
-In-Reply-To: <20190411155122.13245-6-vt@altlinux.org>
+In-Reply-To: <87imvkwqdh.fsf@dja-thinkpad.axtens.net>
 Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19041117-0016-0000-0000-0000099F7DBD
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00010910; HX=3.00000242; KW=3.00000007;
+ PH=3.00000004; SC=3.00000284; SDB=6.01187630; UDB=6.00622104; IPR=6.00968393;
+ MB=3.00026396; MTD=3.00000008; XFM=3.00000015; UTC=2019-04-11 17:40:56
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19041117-0017-0000-0000-000042C712BD
+Message-Id: <2c8b042f-c7df-cb8b-3fcd-15d6bb274d08@linux.vnet.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-04-11_11:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1904110118
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Vitaly,
 
-On 04/11/2019 10:51 AM, Vitaly Chikunov wrote:
-> Some public key algorithms (like EC-DSA) keep in parameters field
-> important data such as digest and curve OIDs (possibly more for
-> different EC-DSA variants). Thus, just setting a public key (as
-> for RSA) is not enough.
-> 
-> Append parameters into the key stream for akcipher_set_{pub,priv}_key.
-> Appended data is: (u32) algo OID, (u32) parameters length, parameters
-> data.
-> 
-> This does not affect current akcipher API nor RSA ciphers (they could
-> ignore it). Idea of appending parameters to the key stream is by Herbert
-> Xu.
-> 
-> Cc: David Howells <dhowells@redhat.com>
-> Cc: Denis Kenzior <denkenz@gmail.com>
-> Cc: keyrings@vger.kernel.org
-> Signed-off-by: Vitaly Chikunov <vt@altlinux.org>
-> ---
->   crypto/asymmetric_keys/asym_tpm.c         |  9 +++-
->   crypto/asymmetric_keys/public_key.c       | 72 ++++++++++++++++++++++++-------
->   crypto/asymmetric_keys/x509.asn1          |  2 +-
->   crypto/asymmetric_keys/x509_cert_parser.c | 31 +++++++++++++
->   crypto/testmgr.c                          | 24 +++++++++--
->   crypto/testmgr.h                          |  5 +++
->   include/crypto/akcipher.h                 | 18 ++++----
->   include/crypto/public_key.h               |  4 ++
->   8 files changed, 136 insertions(+), 29 deletions(-)
-> 
+On 04/11/2019 10:47 AM, Daniel Axtens wrote:
+> Eric Biggers <ebiggers@kernel.org> writes:
+>
+>> Are you still planning to fix the remaining bug?  I booted a ppc64le VM, and I
+>> see the same test failure (I think) you were referring to:
+>>
+>> alg: skcipher: p8_aes_ctr encryption test failed (wrong result) on test vector 3, cfg="uneven misaligned splits, may sleep"
+>>
+> Yes, that's the one I saw. I don't have time to follow it up at the
+> moment, but Nayna is aware of it.
+>
 
-Looks good to me.
+Yes Eric, we identified this as a separate issue of misalignment and 
+plan to post a separate patch to address it.
 
-Reviewed-by: Denis Kenzior <denkenz@gmail.com>
+Thanks & Regards,
+       - Nayna
 
-By the way:
-
-> @@ -400,11 +401,12 @@ static inline int crypto_akcipher_set_pub_key(struct crypto_akcipher *tfm,
->    * crypto_akcipher_set_priv_key() - Invoke set private key operation
->    *
->    * Function invokes the algorithm specific set key function, which knows
-> - * how to decode and interpret the encoded key
-> + * how to decode and interpret the encoded keya and parameters
-
-Seems to be a stray 'a' after 'key'?
-
-Regards,
--Denis
