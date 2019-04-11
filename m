@@ -2,108 +2,111 @@ Return-Path: <SRS0=9Mwu=SN=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,MAILING_LIST_MULTI,SPF_PASS,
-	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05558C10F14
-	for <linux-crypto@archiver.kernel.org>; Thu, 11 Apr 2019 21:04:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9345C282CE
+	for <linux-crypto@archiver.kernel.org>; Thu, 11 Apr 2019 21:09:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C0DFA2070D
-	for <linux-crypto@archiver.kernel.org>; Thu, 11 Apr 2019 21:04:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1555016649;
-	bh=rBrc//Q8zkoBO+A9SsRSKoG9WGpSqk/8v99bH2iG5No=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=i+U8qo+JWu75akFMFJi+EpVoLmMyecNjZ88Ihdf/NSYrdQIkDIWE+SI6NSxU9PBMD
-	 5gyGomH4Zl47ejtI2OYDKA1gV+Cyaj2B8qIfMIwYbjXvo0rQxOTRcTfb0SICGi275n
-	 yB7VPfEMmAXA3RjPguTxUtoSx7HOBO+ytn5AWvG0=
+	by mail.kernel.org (Postfix) with ESMTP id 8430F20850
+	for <linux-crypto@archiver.kernel.org>; Thu, 11 Apr 2019 21:09:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726640AbfDKVED (ORCPT
+        id S1727160AbfDKVJB (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 11 Apr 2019 17:04:03 -0400
-Received: from mail.kernel.org ([198.145.29.99]:40388 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726723AbfDKVED (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 11 Apr 2019 17:04:03 -0400
-Received: from gmail.com (unknown [104.132.1.77])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 3FE532146F;
-        Thu, 11 Apr 2019 20:56:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1555016203;
-        bh=rBrc//Q8zkoBO+A9SsRSKoG9WGpSqk/8v99bH2iG5No=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=wPDQirIsuHS5B2351kVZEj22FJLGqwUYvVMz4uKk743DHmbgBnRF3JgLtTuw8ph0E
-         WaCg0I1PWscaFjRPzGnAO/jGP47dAx4wE2onubgeXY7SL0OS/HYT/Aj0ka7jk2z81K
-         BEUUBQOqppvUjGPpabEkBIQe13AjAl2n+O5HhqSI=
-Date:   Thu, 11 Apr 2019 13:56:41 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Kees Cook <keescook@chromium.org>
-Cc:     Dmitry Vyukov <dvyukov@google.com>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Thu, 11 Apr 2019 17:09:01 -0400
+Received: from vmicros1.altlinux.org ([194.107.17.57]:38818 "EHLO
+        vmicros1.altlinux.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726694AbfDKVJA (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 11 Apr 2019 17:09:00 -0400
+Received: from imap.altlinux.org (imap.altlinux.org [194.107.17.38])
+        by vmicros1.altlinux.org (Postfix) with ESMTP id A79A672CC58;
+        Fri, 12 Apr 2019 00:08:57 +0300 (MSK)
+Received: from altlinux.org (sole.flsd.net [185.75.180.6])
+        by imap.altlinux.org (Postfix) with ESMTPSA id 727D54A4A2A;
+        Fri, 12 Apr 2019 00:08:57 +0300 (MSK)
+Date:   Fri, 12 Apr 2019 00:08:57 +0300
+From:   Vitaly Chikunov <vt@altlinux.org>
+To:     Denis Kenzior <denkenz@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v9 05/10] X.509: parse public key parameters from x509
+ for akcipher
+Message-ID: <20190411210856.sy3qagw6nhjpebbo@altlinux.org>
+Mail-Followup-To: Denis Kenzior <denkenz@gmail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-security-module <linux-security-module@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Laura Abbott <labbott@redhat.com>,
-        Rik van Riel <riel@surriel.com>
-Subject: Re: crypto: Kernel memory overwrite attempt detected to spans
- multiple pages
-Message-ID: <20190411205640.GE225654@gmail.com>
-References: <20190410031734.GB7140@sol.localdomain>
- <CAGXu5j+SZ2+Zkc=Vp5CXQUHhiR9f_OOnca684JTRW3T0yXdaNQ@mail.gmail.com>
- <20190410190729.GA120258@gmail.com>
- <CAGXu5j+Gfvj9G6s_UQTw6hE11gJb1edt3BXzpbDQdc_dpcHgag@mail.gmail.com>
- <20190410231156.GB120258@gmail.com>
- <CAGXu5jKg+oN7yUY=N69U93afOVHBPgwz6Osf=eMDPfiwbzEqmw@mail.gmail.com>
- <20190411175823.GC225654@gmail.com>
- <CAGXu5j+u3f3qUVkQO+zYLN7BDh3r7w-W3k3aa+qdAP11k7A1dw@mail.gmail.com>
- <20190411192607.GD225654@gmail.com>
- <CAGXu5jJo0jXhB5Xy0fryrYPy7zN2RhSsMb0r0DPQ91dNR0zPCA@mail.gmail.com>
+        linux-crypto@vger.kernel.org
+References: <20190411155122.13245-1-vt@altlinux.org>
+ <20190411155122.13245-6-vt@altlinux.org>
+ <48828e0e-0aef-dece-e7ad-4c0ea9cefbe7@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=koi8-r
 Content-Disposition: inline
-In-Reply-To: <CAGXu5jJo0jXhB5Xy0fryrYPy7zN2RhSsMb0r0DPQ91dNR0zPCA@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <48828e0e-0aef-dece-e7ad-4c0ea9cefbe7@gmail.com>
+User-Agent: NeoMutt/20171215-106-ac61c7
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Apr 11, 2019 at 01:36:37PM -0700, Kees Cook wrote:
-> On Thu, Apr 11, 2019 at 12:26 PM Eric Biggers <ebiggers@kernel.org> wrote:
-> > Well, I guess I'll just add __GFP_COMP so I at least don't get spammed with
-> > useless bug reports.
+Denis, Herbert,
+
+On Thu, Apr 11, 2019 at 12:18:36PM -0500, Denis Kenzior wrote:
+> Hi Vitaly,
 > 
-> Thanks, I appreciate it.
+> On 04/11/2019 10:51 AM, Vitaly Chikunov wrote:
+> > Some public key algorithms (like EC-DSA) keep in parameters field
+> > important data such as digest and curve OIDs (possibly more for
+> > different EC-DSA variants). Thus, just setting a public key (as
+> > for RSA) is not enough.
+> > 
+> > Append parameters into the key stream for akcipher_set_{pub,priv}_key.
+> > Appended data is: (u32) algo OID, (u32) parameters length, parameters
+> > data.
+> > 
+> > This does not affect current akcipher API nor RSA ciphers (they could
+> > ignore it). Idea of appending parameters to the key stream is by Herbert
+> > Xu.
+> > 
+> > Cc: David Howells <dhowells@redhat.com>
+> > Cc: Denis Kenzior <denkenz@gmail.com>
+> > Cc: keyrings@vger.kernel.org
+> > Signed-off-by: Vitaly Chikunov <vt@altlinux.org>
+> > ---
+> >   crypto/asymmetric_keys/asym_tpm.c         |  9 +++-
+> >   crypto/asymmetric_keys/public_key.c       | 72 ++++++++++++++++++++++++-------
+> >   crypto/asymmetric_keys/x509.asn1          |  2 +-
+> >   crypto/asymmetric_keys/x509_cert_parser.c | 31 +++++++++++++
+> >   crypto/testmgr.c                          | 24 +++++++++--
+> >   crypto/testmgr.h                          |  5 +++
+> >   include/crypto/akcipher.h                 | 18 ++++----
+> >   include/crypto/public_key.h               |  4 ++
+> >   8 files changed, 136 insertions(+), 29 deletions(-)
+> > 
 > 
-> > But I don't think it's in any way acceptable to change the semantics of the
-> > kernel's page allocator but only under some obscure config option, don't
-> > document it anywhere, ignore the known problems for years, say that the option
-> > is broken anyway so it shouldn't be used, and have to exchange 15 emails to get
-> > anything resembling an explanation.
+> Looks good to me.
 > 
-> I understand what you mean, yeah. I'm sorry I wasn't clear about it
-> earlier. What do you think might help the situation as far as
-> documentation?
+> Reviewed-by: Denis Kenzior <denkenz@gmail.com>
+
+Thanks!
+
+> By the way:
 > 
+> > @@ -400,11 +401,12 @@ static inline int crypto_akcipher_set_pub_key(struct crypto_akcipher *tfm,
+> >    * crypto_akcipher_set_priv_key() - Invoke set private key operation
+> >    *
+> >    * Function invokes the algorithm specific set key function, which knows
+> > - * how to decode and interpret the encoded key
+> > + * how to decode and interpret the encoded keya and parameters
+> 
+> Seems to be a stray 'a' after 'key'?
 
-Explanation in Documentation/core-api/memory-allocation.rst of when to use
-__GFP_COMP and why.  Where "why" includes the real underlying reason why it's
-designed the way it is, not just "you now need to provide this flag in order to
-stop the hardened usercopy thing from crashing, even though previously it meant
-something else, because that's the way it is."
+Ah! Herbert, should I resend the whole patchset with this typo fix, or
+you could apply small change if you going to accept it?
 
-Also a brief, improved explanation of __GFP_COMP in include/linux/gfp.h.
+Thanks,
 
-Also get Documentation/security/self-protection.rst up to date with what's
-actually in the kernel.  Currently it doesn't mention hardened usercopy at all,
-and it's unclear about what's supported now vs. what is future work.
-
-And actually fix the known problems with the pagespan check, not ignore them for
-years.  If not feasible, remove the option.
-
-- Eric
+> 
+> Regards,
+> -Denis
