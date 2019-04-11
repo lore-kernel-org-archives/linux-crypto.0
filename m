@@ -2,112 +2,106 @@ Return-Path: <SRS0=9Mwu=SN=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,MAILING_LIST_MULTI,SPF_PASS,
+	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69D83C10F13
-	for <linux-crypto@archiver.kernel.org>; Thu, 11 Apr 2019 17:41:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05887C282CE
+	for <linux-crypto@archiver.kernel.org>; Thu, 11 Apr 2019 17:58:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4AB502084D
-	for <linux-crypto@archiver.kernel.org>; Thu, 11 Apr 2019 17:41:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CBADA2146F
+	for <linux-crypto@archiver.kernel.org>; Thu, 11 Apr 2019 17:58:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1555005513;
+	bh=pDhoCNdjeWrX/vbXMoWNxoXMBQ5uWIGVajVGVcqJMWQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=KpZ/ABk9BuEM/VTlfTiCHxxe+lu65k4kDX5sAJ8C3QDVUEvfS1KxlGIfX+DDHANJ/
+	 chpKzh5Tl6RVjxrDELnVy4u7b4XuxoTn8LKv52GtyATBz8L6NoLtFOG+ne5eOFn7Cp
+	 U7ViWW8Y+47luk501ca6zR8DZepgv9J+bTS2nDpM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726646AbfDKRlA (ORCPT
+        id S1726630AbfDKR61 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 11 Apr 2019 13:41:00 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51976 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726633AbfDKRlA (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 11 Apr 2019 13:41:00 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x3BHeICb123038
-        for <linux-crypto@vger.kernel.org>; Thu, 11 Apr 2019 13:40:59 -0400
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2rt7ymfy1f-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <linux-crypto@vger.kernel.org>; Thu, 11 Apr 2019 13:40:58 -0400
-Received: from localhost
-        by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-crypto@vger.kernel.org> from <nayna@linux.vnet.ibm.com>;
-        Thu, 11 Apr 2019 18:40:57 +0100
-Received: from b03cxnp08027.gho.boulder.ibm.com (9.17.130.19)
-        by e34.co.us.ibm.com (192.168.1.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 11 Apr 2019 18:40:53 +0100
-Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
-        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x3BHeqf658458334
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 11 Apr 2019 17:40:52 GMT
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EA3E2136061;
-        Thu, 11 Apr 2019 17:40:51 +0000 (GMT)
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 03B7E136063;
-        Thu, 11 Apr 2019 17:40:49 +0000 (GMT)
-Received: from swastik.ibm.com (unknown [9.80.221.85])
-        by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Thu, 11 Apr 2019 17:40:49 +0000 (GMT)
-Subject: Re: [PATCH] crypto: vmx - fix copy-paste error in CTR mode
-To:     Daniel Axtens <dja@axtens.net>, Eric Biggers <ebiggers@kernel.org>
-Cc:     omosnacek@gmail.com, linux-crypto@vger.kernel.org,
+        Thu, 11 Apr 2019 13:58:27 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60214 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726577AbfDKR61 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 11 Apr 2019 13:58:27 -0400
+Received: from gmail.com (unknown [104.132.1.77])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 2A37F2070D;
+        Thu, 11 Apr 2019 17:58:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1555005506;
+        bh=pDhoCNdjeWrX/vbXMoWNxoXMBQ5uWIGVajVGVcqJMWQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=TqRT/D2bY+vD2/ipEBuIR7EhPIJZ1dyOdUd1PhF/ZbNz1X2+KRuqX4zrziUuz9cOB
+         uTT0Xr1mikQiwpDMnAwdPiA3W4KqXFwtWOzwrjpiHfke0Dw2OoA9d4XEs2qFwSrj+W
+         15+Z2cp/nX6yoafj5Xgw7D4l9bqFSqf4r4T8hvIk=
+Date:   Thu, 11 Apr 2019 10:58:24 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Kees Cook <keescook@chromium.org>
+Cc:     Geert Uytterhoeven <geert@linux-m68k.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        marcelo.cerri@canonical.com, Stephan Mueller <smueller@chronox.de>,
-        leo.barbosa@canonical.com, linuxppc-dev@lists.ozlabs.org,
-        nayna@linux.ibm.com, pfsmorigo@gmail.com, leitao@debian.org,
-        George Wilson <gcwilson@linux.ibm.com>
-References: <20190315020901.16509-1-dja@axtens.net>
- <20190315022414.GA1671@sol.localdomain>
- <875zsku5mk.fsf@dja-thinkpad.axtens.net>
- <20190315043433.GC1671@sol.localdomain>
- <8736nou2x5.fsf@dja-thinkpad.axtens.net>
- <20190410070234.GA12406@sol.localdomain>
- <87imvkwqdh.fsf@dja-thinkpad.axtens.net>
-From:   Nayna <nayna@linux.vnet.ibm.com>
-Date:   Thu, 11 Apr 2019 13:40:49 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+        linux-security-module <linux-security-module@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Laura Abbott <labbott@redhat.com>,
+        Rik van Riel <riel@surriel.com>
+Subject: Re: crypto: Kernel memory overwrite attempt detected to spans
+ multiple pages
+Message-ID: <20190411175823.GC225654@gmail.com>
+References: <20190319170911.GB202956@gmail.com>
+ <20190320185719.GB180195@gmail.com>
+ <CAGXu5jL-5C1ZGZ1JgaNFqK-z1Pp1N1X8gD3_ysKTCa=omD+_VQ@mail.gmail.com>
+ <20190321175122.GA1587@sol.localdomain>
+ <20190410031734.GB7140@sol.localdomain>
+ <CAGXu5j+SZ2+Zkc=Vp5CXQUHhiR9f_OOnca684JTRW3T0yXdaNQ@mail.gmail.com>
+ <20190410190729.GA120258@gmail.com>
+ <CAGXu5j+Gfvj9G6s_UQTw6hE11gJb1edt3BXzpbDQdc_dpcHgag@mail.gmail.com>
+ <20190410231156.GB120258@gmail.com>
+ <CAGXu5jKg+oN7yUY=N69U93afOVHBPgwz6Osf=eMDPfiwbzEqmw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <87imvkwqdh.fsf@dja-thinkpad.axtens.net>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-x-cbid: 19041117-0016-0000-0000-0000099F7DBD
-X-IBM-SpamModules-Scores: 
-X-IBM-SpamModules-Versions: BY=3.00010910; HX=3.00000242; KW=3.00000007;
- PH=3.00000004; SC=3.00000284; SDB=6.01187630; UDB=6.00622104; IPR=6.00968393;
- MB=3.00026396; MTD=3.00000008; XFM=3.00000015; UTC=2019-04-11 17:40:56
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19041117-0017-0000-0000-000042C712BD
-Message-Id: <2c8b042f-c7df-cb8b-3fcd-15d6bb274d08@linux.vnet.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-04-11_11:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1904110118
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAGXu5jKg+oN7yUY=N69U93afOVHBPgwz6Osf=eMDPfiwbzEqmw@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Wed, Apr 10, 2019 at 04:27:28PM -0700, Kees Cook wrote:
+> On Wed, Apr 10, 2019 at 4:12 PM Eric Biggers <ebiggers@kernel.org> wrote:
+> > You've explained *what* it does again, but not *why*.  *Why* do you want
+> > hardened usercopy to detect copies across page boundaries, when there is no
+> > actual buffer overflow?
+> 
+> But that *is* how it determines it was a buffer overflow: "if you
+> cross page boundaries (of a non-compound allocation), it *is* a buffer
+> overflow". This assertion, however, is flawed because many contiguous
+> allocations are not marked as being grouped together when it reality
+> they were. It was an attempt to get allocation size information out of
+> the page allocator, similar to how slab can be queries about
+> allocation size. I'm open to improvements here, since it's obviously
+> broken in its current state. :)
+> 
+> -- 
+> Kees Cook
 
-On 04/11/2019 10:47 AM, Daniel Axtens wrote:
-> Eric Biggers <ebiggers@kernel.org> writes:
->
->> Are you still planning to fix the remaining bug?  I booted a ppc64le VM, and I
->> see the same test failure (I think) you were referring to:
->>
->> alg: skcipher: p8_aes_ctr encryption test failed (wrong result) on test vector 3, cfg="uneven misaligned splits, may sleep"
->>
-> Yes, that's the one I saw. I don't have time to follow it up at the
-> moment, but Nayna is aware of it.
->
+Well, I'm still at a loss as to whether I'm actually supposed to "fix" this by
+adding __GFP_COMP, or whether you're saying the option is broken anyway so I
+shouldn't bother doing anything.  IIUC, even the kernel stack is still not
+marked __GFP_COMP, so copies to/from the stack can trigger this too, despite
+this being reported over 2 years ago
+(http://lkml.iu.edu/hypermail/linux/kernel/1701.2/01450.html)?
+CONFIG_HARDENED_USERCOPY_PAGESPAN is even disabled in syzbot because you already
+said the option is broken and should not be used.
 
-Yes Eric, we identified this as a separate issue of misalignment and 
-plan to post a separate patch to address it.
+I worry that people will enable all the hardened usercopy options "because
+security", then when the pagespan check breaks something they will disable all
+hardened usercopy options, because they don't understand the individual options.
+Providing broken options is actively harmful, IMO.
 
-Thanks & Regards,
-       - Nayna
-
+- Eric
