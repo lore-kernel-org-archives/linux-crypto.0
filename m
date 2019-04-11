@@ -2,92 +2,79 @@ Return-Path: <SRS0=9Mwu=SN=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1661CC10F13
-	for <linux-crypto@archiver.kernel.org>; Thu, 11 Apr 2019 10:35:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5993C10F13
+	for <linux-crypto@archiver.kernel.org>; Thu, 11 Apr 2019 11:08:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D0D442084D
-	for <linux-crypto@archiver.kernel.org>; Thu, 11 Apr 2019 10:35:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1554978907;
-	bh=BPu15EQCXncytuJ/klWU193XERiuL7U21XWAChE20MI=;
-	h=Date:From:To:cc:Subject:In-Reply-To:References:List-ID:From;
-	b=GGs/hjO3CngDQthY4avn+d7zWaleyy0foRVahLQ0C4VL01Uo+vbwgdiK2CdxNkl87
-	 vlcFhhxFW09kLRcHWgLfLpXw6RaKTsSiQ9ZNAmu6SBh2IHO2y6LpxITGJwv82HXaPn
-	 tUg7xTlMhpzOqSRpta2zU8n70YNBBmPZqPDYA5D4=
+	by mail.kernel.org (Postfix) with ESMTP id 962E62133D
+	for <linux-crypto@archiver.kernel.org>; Thu, 11 Apr 2019 11:08:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=benyossef-com.20150623.gappssmtp.com header.i=@benyossef-com.20150623.gappssmtp.com header.b="fppicgAR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726723AbfDKKfG (ORCPT
+        id S1726494AbfDKLII (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 11 Apr 2019 06:35:06 -0400
-Received: from mail.kernel.org ([198.145.29.99]:45180 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726026AbfDKKfG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 11 Apr 2019 06:35:06 -0400
-Received: from pobox.suse.cz (prg-ext-pat.suse.com [213.151.95.130])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 40AB82084D;
-        Thu, 11 Apr 2019 10:35:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1554978906;
-        bh=BPu15EQCXncytuJ/klWU193XERiuL7U21XWAChE20MI=;
-        h=Date:From:To:cc:Subject:In-Reply-To:References:From;
-        b=t56eLH2gN7y1l9Ra3JxcOYyTnQn9Ab5RtTKrMmOablfO1vRBlJ34HHnLS2zqausMj
-         kvPuVjrF+m3q3fepiT8ZxKWygVeXLA57JRsjI1Lyej+R25CQ1BV0073BLDJ7QQ/4xC
-         VxsBF2ibjallHaXq5nnXErjFgOzfs0mLXiv+/I3g=
-Date:   Thu, 11 Apr 2019 12:35:02 +0200 (CEST)
-From:   Jiri Kosina <jikos@kernel.org>
-To:     Benjamin Tissoires <benjamin.tissoires@gmail.com>
-cc:     Andrej Shadura <andrew.shadura@collabora.co.uk>,
-        linux-input <linux-input@vger.kernel.org>,
-        linux-usb@vger.kernel.org,
-        Andrzej Pietrasiewicz <andrzej.p@collabora.com>,
-        kernel@collabora.com, Theodore Ts'o <tytso@mit.edu>,
-        Vasily Khoruzhick <anarsoul@gmail.com>,
-        Nick Kossifidis <mickflemm@gmail.com>,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v3] HID: add driver for U2F Zero built-in LED and RNG
-In-Reply-To: <CAN+gG=H6TGtB68-XJ+Pg53EhL_M2m8MG1z33Yenvd9PhXJ=Oqw@mail.gmail.com>
-Message-ID: <nycvar.YFH.7.76.1904111234080.9803@cbobk.fhfr.pm>
-References: <20190401124200.17331-1-andrew.shadura@collabora.co.uk> <nycvar.YFH.7.76.1904101400520.9803@cbobk.fhfr.pm> <CAN+gG=H6TGtB68-XJ+Pg53EhL_M2m8MG1z33Yenvd9PhXJ=Oqw@mail.gmail.com>
-User-Agent: Alpine 2.21 (LSU 202 2017-01-01)
+        Thu, 11 Apr 2019 07:08:08 -0400
+Received: from mail-vs1-f67.google.com ([209.85.217.67]:35018 "EHLO
+        mail-vs1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726121AbfDKLII (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 11 Apr 2019 07:08:08 -0400
+Received: by mail-vs1-f67.google.com with SMTP id d8so3231112vsp.2
+        for <linux-crypto@vger.kernel.org>; Thu, 11 Apr 2019 04:08:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=benyossef-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=c9Qj+ChkJP2yKNlvd72cgUvQFhtEvP3Mx6WmQtUDTCA=;
+        b=fppicgARMOmSKRyt6cxfMCYlK20oRzQYt0nvNMWq0Wd7TRlbyxAYLHyBrPDY8oypYM
+         +WHnm8N45GTJAxQWvayLu8JTAv8/kgOR6/OgnryLHqC7yPE1XRrnblU5cDCEjoKskwKw
+         FwgAEu3F6TIXFlQjppIfGOnVM/yn5tVey8hU6avbBIBMdQ+Dz55ZQA0tV7iNuEEXQjQa
+         W9NNvNhuqIxQgYWSoYGIRDHptk/FOmR4iFTJ2HfEiUM4htIqdT4lLPO9DJX5e0BEW3lR
+         XJ02K91VSEqa9jqWzNPkKZgGaUWZXAXn2p5ClltpVCrf9nr1WPVeqO37o4oDOwK0zqAv
+         oS/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=c9Qj+ChkJP2yKNlvd72cgUvQFhtEvP3Mx6WmQtUDTCA=;
+        b=QfvP+l+UC3gjmjQjg0EMF7SkES3kmNNUEPQnatr3008mL/cZOtEfIhU6GYTe55ZzAY
+         vb2M/aGP6dEjdrGeOAmP6kYOatLfZyHHoD6zuriDBdw+utTY7xfA333wm1rQDQuvs6tL
+         aWjyd0FXEiExxrxGJ71wFxde3jNcdJzThTSbaGiJ/iU9igRPnEAMwaJ8To0O1FzqCkK+
+         1d5fs3UWcmsfx+IIeONzi9muc7ZYXXlUip+qJc8LFlLhk8tiHTu/3uZU/K1YcdB8XB4Q
+         MQwdTnkpjxlq66Pd2aQL5Mp4n7Txk4Z3ADBob/HoI9jeDzC0E2rXTHPY9EV6TAJvaVqb
+         pzCQ==
+X-Gm-Message-State: APjAAAVn9tU3Z+KdJN6EDJ0UNGfEdlZFVoy95DsB12kRXz1FwNLf0WW9
+        /AYclnjFtGwFxW9rpik+cfuqjYVxj+HWKE0o4KAFj44nzfg=
+X-Google-Smtp-Source: APXvYqzphDnga6YZdorcu6nTSkbIHp+4qDNDvyLNwsJiHW5MeZq3EXt8/CHh+IU7GVQyp9IuTSV6e/XeVnBO2RUfsdQ=
+X-Received: by 2002:a67:f256:: with SMTP id y22mr11189697vsm.19.1554980886963;
+ Thu, 11 Apr 2019 04:08:06 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+References: <20190411084707.h56mz2z7jxusnr7u@gondor.apana.org.au> <E1hEVQI-0006mq-Kd@gondobar>
+In-Reply-To: <E1hEVQI-0006mq-Kd@gondobar>
+From:   Gilad Ben-Yossef <gilad@benyossef.com>
+Date:   Thu, 11 Apr 2019 14:07:56 +0300
+Message-ID: <CAOtvUMfXxEy1Jz351MKyriMjOVByZgATCjudB0rL7DrGBEHCHg@mail.gmail.com>
+Subject: Re: [PATCH 10/24] crypto: ccree - Forbid 2-key 3DES in FIPS mode
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 11 Apr 2019, Benjamin Tissoires wrote:
+[ Resent because gmail decided suddenly to send HTML email... ]
 
-> > So I still am not really happy about this being wired up into generic HID
-> > although it's really a USB driver, but we've discussed that already, and I
-> > don't see any option that'd work substantially better in this case,
-> > especially from the UX point of view. Oh well. Applied to for-5.2/u2fzero,
-> > thanks!
-> >
-> 
-> Hi wish I were CC-ed on these threads.
+On Thu, Apr 11, 2019 at 11:51 AM Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>
+> This patch forbids the use of 2-key 3DES (K1 == K3) in FIPS mode.
+>
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Gah, for some reason I was convinced you were.
+Acked-by: Gilad Ben-Yossef <gilad@benyossef.com>
 
-> My CI script now fails because hid-u2fzero.ko needs devm_hwrng_register 
-> and the Kconfig doesn't force pulling the right dependency.
-> 
-> Also, you probably want to add in .probe() a check for the actual 
-> transport driver (`hid_is_using_ll_driver(hdev, &usb_hid_driver)`) or 
-> you can not use the usbhid functions without crashing the kernel.
-
-Benjamin, I love your CI :)
-
-Andrej, could you please send fixups on top of the applied patch?
-
-Thanks,
-
--- 
-Jiri Kosina
-SUSE Labs
-
+Thank you Herbert!
+Gilad
