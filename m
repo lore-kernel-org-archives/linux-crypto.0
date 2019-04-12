@@ -2,95 +2,202 @@ Return-Path: <SRS0=860h=SO=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81FACC10F0E
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Apr 2019 04:59:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF129C10F0E
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Apr 2019 05:00:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5A45020652
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Apr 2019 04:59:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BBF86218D2
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Apr 2019 05:00:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1555045251;
+	bh=yqwpHOGSQv4z5BLMB47rzKcGkok3PF2Ot/U+VJCY1j8=;
+	h=From:To:Subject:Date:List-ID:From;
+	b=rQjlijacUv5VuSzABoNjh+7T+Ui/XZfGtDoP36MOQo5oLfwp+8DqrEMlYb14eGLTH
+	 tMXvEtaSVBKbf7CZOIIyYc2BfB8hqFzoPGB4K6uvLY8fqwqdDWCsWVifXlMq9uL6sO
+	 nrqjd8RiuqDg4kXols3phpWZCEkbgFRi0wu8xgos=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725799AbfDLE6d (ORCPT
+        id S1726850AbfDLFAu (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 12 Apr 2019 00:58:33 -0400
-Received: from mga11.intel.com ([192.55.52.93]:11639 "EHLO mga11.intel.com"
+        Fri, 12 Apr 2019 01:00:50 -0400
+Received: from mail.kernel.org ([198.145.29.99]:55588 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726061AbfDLE6c (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 12 Apr 2019 00:58:32 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 11 Apr 2019 21:58:30 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.60,340,1549958400"; 
-   d="scan'208";a="336090036"
-Received: from lkp-server01.sh.intel.com (HELO lkp-server01) ([10.239.97.150])
-  by fmsmga006.fm.intel.com with ESMTP; 11 Apr 2019 21:58:29 -0700
-Received: from kbuild by lkp-server01 with local (Exim 4.89)
-        (envelope-from <lkp@intel.com>)
-        id 1hEoGi-000Ebm-Ii; Fri, 12 Apr 2019 12:58:28 +0800
-Date:   Fri, 12 Apr 2019 12:57:40 +0800
-From:   kbuild test robot <lkp@intel.com>
-To:     Atul Gupta <atul.gupta@chelsio.com>
-Cc:     kbuild-all@01.org, herbert@gondor.apana.org.au,
-        davem@davemloft.net, linux-crypto@vger.kernel.org,
-        netdev@vger.kernel.org, dt@chelsio.com, atul.gupta@chelsio.com
-Subject: Re: [crypto 3/4] crypto/chelsio/chtls: CPL for TLS client
-Message-ID: <201904121250.wVjn3cFV%lkp@intel.com>
-References: <20190409152441.11256-1-atul.gupta@chelsio.com>
+        id S1726730AbfDLFAu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 12 Apr 2019 01:00:50 -0400
+Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 65D4A20652;
+        Fri, 12 Apr 2019 05:00:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1555045249;
+        bh=yqwpHOGSQv4z5BLMB47rzKcGkok3PF2Ot/U+VJCY1j8=;
+        h=From:To:Subject:Date:From;
+        b=FbBe4l9WkbejYhCoWO4k/OqAqJwP2ovckmeq4ad700PqEbow5f6Rxt74jGVNaqXsH
+         ltUIla6WKHKxhHiuhgj0UzkRNY4UUhaXTx26r/VZReuDh39vkH0pT/fg0O+GGjC1Cm
+         AL6qX0E7FINHIP2guqKrm4TAFRV/TGsc1VymbGA4=
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [PATCH v2 0/7] crypto: fuzz algorithms against their generic implementation
+Date:   Thu, 11 Apr 2019 21:57:35 -0700
+Message-Id: <20190412045742.1725-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190409152441.11256-1-atul.gupta@chelsio.com>
-X-Patchwork-Hint: ignore
-User-Agent: Mutt/1.5.23 (2014-03-12)
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Atul,
+Hello,
 
-Thank you for the patch! Perhaps something to improve:
+In the crypto API, all implementations of each algorithm are supposed to
+produce the same results.  However, testing of this is currently limited
+to the list of test vectors hardcoded for each algorithm.  Although
+after recent improvements the self-tests do much more with each test
+vector, hardcoded test vectors can never cover all cases.
 
-[auto build test WARNING on crypto/master]
+This series improves the situation by making the self-tests
+automatically generate random test vectors using the corresponding
+generic implementation, then run them against the algorithm under test.
+This detects bugs where the implementations don't match.
 
-url:    https://github.com/0day-ci/linux/commits/Atul-Gupta/Inline-TLS-client-and-v6-support/20190412-034407
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git master
-reproduce:
-        # apt-get install sparse
-        make ARCH=x86_64 allmodconfig
-        make C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__'
+This has already found many bugs and inconsistencies, including an
+integer overflow bug in the x86_64 implementation of Poly1305.
 
+These new fuzz tests are behind CONFIG_CRYPTO_MANAGER_EXTRA_TESTS.
 
-sparse warnings: (new ones prefixed by >>)
+Patch 1-6 are the testmgr changes themselves.  Patch 7 makes the generic
+implementations be registered earlier so that they're available when
+optimized implementations are being tested, when both are built-in.
+Note that even after this, for many algorithms it's still possible to
+make the generic implementation unset or modular.  Thus a missing
+generic implementation just causes the comparison tests to be skipped
+with a warning; they aren't failed.
 
-   drivers/crypto/chelsio/chtls/chtls_cm.c:1333:42: sparse: incorrect type in assignment (different base types) @@    expected restricted __be32 [usertype] atid_status @@    got e] atid_status @@
-   drivers/crypto/chelsio/chtls/chtls_cm.c:1333:42:    expected restricted __be32 [usertype] atid_status
-   drivers/crypto/chelsio/chtls/chtls_cm.c:1333:42:    got int
->> drivers/crypto/chelsio/chtls/chtls_cm.c:54:6: sparse: symbol 'chtls_sock_release' was not declared. Should it be static?
-   drivers/crypto/chelsio/chtls/chtls_cm.c:1155:17: sparse: expression using sizeof(void)
->> drivers/crypto/chelsio/chtls/chtls_cm.c:1342:6: sparse: symbol 'chtls_handshake_work' was not declared. Should it be static?
->> drivers/crypto/chelsio/chtls/chtls_cm.c:1362:6: sparse: symbol 'chtls_fix_pending_tx_buffers' was not declared. Should it be static?
->> drivers/crypto/chelsio/chtls/chtls_cm.c:1389:23: sparse: incorrect type in argument 1 (different address spaces) @@    expected struct dst_entry *dst @@    got struct dst_entry struct dst_entry *dst @@
-   drivers/crypto/chelsio/chtls/chtls_cm.c:1389:23:    expected struct dst_entry *dst
-   drivers/crypto/chelsio/chtls/chtls_cm.c:1389:23:    got struct dst_entry [noderef] <asn:4>*sk_dst_cache
-   drivers/crypto/chelsio/chtls/chtls_cm.c:1500:40: sparse: incorrect type in argument 1 (different address spaces) @@    expected struct socket_wq *wq @@    got struct socket_wq struct socket_wq *wq @@
-   drivers/crypto/chelsio/chtls/chtls_cm.c:1500:40:    expected struct socket_wq *wq
-   drivers/crypto/chelsio/chtls/chtls_cm.c:1500:40:    got struct socket_wq [noderef] <asn:4>*sk_wq
-   drivers/crypto/chelsio/chtls/chtls_cm.c:1501:25: sparse: cast to restricted __poll_t
-   drivers/crypto/chelsio/chtls/chtls_cm.c:1548:16: sparse: expression using sizeof(void)
-   drivers/crypto/chelsio/chtls/chtls_cm.c:1698:60: sparse: Using plain integer as NULL pointer
-   drivers/crypto/chelsio/chtls/chtls_cm.c:2795:39: sparse: incorrect type in argument 1 (different address spaces) @@    expected struct dst_entry *dst @@    got struct dst_entry struct dst_entry *dst @@
-   drivers/crypto/chelsio/chtls/chtls_cm.c:2795:39:    expected struct dst_entry *dst
-   drivers/crypto/chelsio/chtls/chtls_cm.c:2795:39:    got struct dst_entry [noderef] <asn:4>*sk_dst_cache
-   drivers/crypto/chelsio/chtls/chtls_cm.c:1801:22: sparse: context imbalance in 'chtls_recv_sock' - unexpected unlock
+So far I've tested all generic, x86, arm, and arm64 algorithms, plus
+some PowerPC algorithms.  I have not tested hardware drivers.  I
+encourage people to run the tests on drivers and other architectures, as
+they will find more bugs.
 
-Please review and possibly fold the followup patch.
+This can also be found in git at:
 
----
-0-DAY kernel test infrastructure                Open Source Technology Center
-https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
+	URL: https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git
+	Branch: cryptofuzz-vs-generic
+
+Changed since v1:
+
+    - Make cryptomgr use arch_initcall(), so we don't rely on the order
+      in which the object files are linked.
+
+    - Show the expected error code when a test fails due to the wrong
+      error code being returned.
+
+    - Generate zero-length associated data more often for AEADs
+      (about 1/4 of the time rather than about 1/256 of the time).
+
+    - A few other minor cleanups.
+
+Eric Biggers (7):
+  crypto: testmgr - expand ability to test for errors
+  crypto: testmgr - identify test vectors by name rather than number
+  crypto: testmgr - add helpers for fuzzing against generic
+    implementation
+  crypto: testmgr - fuzz hashes against their generic implementation
+  crypto: testmgr - fuzz skciphers against their generic implementation
+  crypto: testmgr - fuzz AEADs against their generic implementation
+  crypto: run initcalls for generic implementations earlier
+
+ crypto/842.c                 |   2 +-
+ crypto/adiantum.c            |   2 +-
+ crypto/aegis128.c            |   2 +-
+ crypto/aegis128l.c           |   2 +-
+ crypto/aegis256.c            |   2 +-
+ crypto/aes_generic.c         |   2 +-
+ crypto/algboss.c             |   8 +-
+ crypto/ansi_cprng.c          |   2 +-
+ crypto/anubis.c              |   2 +-
+ crypto/arc4.c                |   2 +-
+ crypto/authenc.c             |   2 +-
+ crypto/authencesn.c          |   2 +-
+ crypto/blowfish_generic.c    |   2 +-
+ crypto/camellia_generic.c    |   2 +-
+ crypto/cast5_generic.c       |   2 +-
+ crypto/cast6_generic.c       |   2 +-
+ crypto/cbc.c                 |   2 +-
+ crypto/ccm.c                 |   2 +-
+ crypto/cfb.c                 |   2 +-
+ crypto/chacha20poly1305.c    |   2 +-
+ crypto/chacha_generic.c      |   2 +-
+ crypto/cmac.c                |   2 +-
+ crypto/crc32_generic.c       |   2 +-
+ crypto/crc32c_generic.c      |   2 +-
+ crypto/crct10dif_generic.c   |   2 +-
+ crypto/crypto_null.c         |   2 +-
+ crypto/ctr.c                 |   2 +-
+ crypto/cts.c                 |   2 +-
+ crypto/deflate.c             |   2 +-
+ crypto/des_generic.c         |   2 +-
+ crypto/dh.c                  |   2 +-
+ crypto/drbg.c                |   2 +-
+ crypto/ecb.c                 |   2 +-
+ crypto/ecdh.c                |   2 +-
+ crypto/echainiv.c            |   2 +-
+ crypto/fcrypt.c              |   2 +-
+ crypto/fips.c                |   2 +-
+ crypto/gcm.c                 |   2 +-
+ crypto/ghash-generic.c       |   2 +-
+ crypto/hmac.c                |   2 +-
+ crypto/jitterentropy-kcapi.c |   2 +-
+ crypto/keywrap.c             |   2 +-
+ crypto/khazad.c              |   2 +-
+ crypto/lrw.c                 |   2 +-
+ crypto/lz4.c                 |   2 +-
+ crypto/lz4hc.c               |   2 +-
+ crypto/lzo-rle.c             |   2 +-
+ crypto/lzo.c                 |   2 +-
+ crypto/md4.c                 |   2 +-
+ crypto/md5.c                 |   2 +-
+ crypto/michael_mic.c         |   2 +-
+ crypto/morus1280.c           |   2 +-
+ crypto/morus640.c            |   2 +-
+ crypto/nhpoly1305.c          |   2 +-
+ crypto/ofb.c                 |   2 +-
+ crypto/pcbc.c                |   2 +-
+ crypto/pcrypt.c              |   2 +-
+ crypto/poly1305_generic.c    |   2 +-
+ crypto/rmd128.c              |   2 +-
+ crypto/rmd160.c              |   2 +-
+ crypto/rmd256.c              |   2 +-
+ crypto/rmd320.c              |   2 +-
+ crypto/rsa.c                 |   2 +-
+ crypto/salsa20_generic.c     |   2 +-
+ crypto/seed.c                |   2 +-
+ crypto/seqiv.c               |   2 +-
+ crypto/serpent_generic.c     |   2 +-
+ crypto/sha1_generic.c        |   2 +-
+ crypto/sha256_generic.c      |   2 +-
+ crypto/sha3_generic.c        |   2 +-
+ crypto/sha512_generic.c      |   2 +-
+ crypto/sm3_generic.c         |   2 +-
+ crypto/sm4_generic.c         |   2 +-
+ crypto/streebog_generic.c    |   2 +-
+ crypto/tcrypt.c              |   2 +-
+ crypto/tea.c                 |   2 +-
+ crypto/testmgr.c             | 989 +++++++++++++++++++++++++++++++----
+ crypto/testmgr.h             |  22 +-
+ crypto/tgr192.c              |   2 +-
+ crypto/twofish_generic.c     |   2 +-
+ crypto/vmac.c                |   2 +-
+ crypto/wp512.c               |   2 +-
+ crypto/xcbc.c                |   2 +-
+ crypto/xts.c                 |   2 +-
+ crypto/zstd.c                |   2 +-
+ 85 files changed, 986 insertions(+), 197 deletions(-)
+
+-- 
+2.21.0
+
