@@ -2,137 +2,107 @@ Return-Path: <SRS0=860h=SO=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFDCAC10F0E
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Apr 2019 13:37:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66239C10F0E
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Apr 2019 13:43:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 508CD2084D
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Apr 2019 13:37:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2E9772084D
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Apr 2019 13:43:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=st.com header.i=@st.com header.b="PSP0xJzi"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q5iDy6mM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726765AbfDLNg7 (ORCPT
+        id S1726826AbfDLNnf (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 12 Apr 2019 09:36:59 -0400
-Received: from mx08-00178001.pphosted.com ([91.207.212.93]:12058 "EHLO
-        mx07-00178001.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726755AbfDLNg6 (ORCPT
+        Fri, 12 Apr 2019 09:43:35 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:33722 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726825AbfDLNnf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 12 Apr 2019 09:36:58 -0400
-Received: from pps.filterd (m0046660.ppops.net [127.0.0.1])
-        by mx08-00178001.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x3CDYuT6025603;
-        Fri, 12 Apr 2019 15:36:45 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=st.com; h=from : to : subject :
- date : message-id : references : in-reply-to : content-type : content-id :
- content-transfer-encoding : mime-version; s=STMicroelectronics;
- bh=U22Rdy9cYH5n9zmQMcQ8mu2jBRdCAG1yX3S/KA6/hAQ=;
- b=PSP0xJziOPC8XCKVwn6r12papWIhfr39kccPaS3gneo6hMmsZfFSb/VJeQtekgQGGG8m
- eO30hLLbj1QUHzwhwAdqtMRNs4C6Oa2QxyB6YhBj+70ZCyhcielJAtx1UfUyeDa0hv+n
- udSsskyULXlphN87MA8dy2lpke7MjmNT+Gol3PIgSrHm095uWGsego91ji7Bwh8GbSqj
- VcH96anKol+KWfk674AnWkj3frjV2cBlVpLdRg0GXHPUMSzJmScHVDvsnqhRtXvkF1OJ
- 7iwYxiIxlpCO7E/HVvlrR/rAG+WNz0vILp1vOePKbWommIG0raoaqEgR9SzbafRaDrIF 4g== 
-Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-        by mx08-00178001.pphosted.com with ESMTP id 2rprcfvr4a-1
-        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT);
-        Fri, 12 Apr 2019 15:36:45 +0200
-Received: from zeta.dmz-eu.st.com (zeta.dmz-eu.st.com [164.129.230.9])
-        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 5380E38;
-        Fri, 12 Apr 2019 13:36:45 +0000 (GMT)
-Received: from Webmail-eu.st.com (sfhdag7node2.st.com [10.75.127.20])
-        by zeta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 3EC8F2610;
-        Fri, 12 Apr 2019 13:36:45 +0000 (GMT)
-Received: from SFHDAG7NODE2.st.com (10.75.127.20) by SFHDAG7NODE2.st.com
- (10.75.127.20) with Microsoft SMTP Server (TLS) id 15.0.1347.2; Fri, 12 Apr
- 2019 15:36:44 +0200
-Received: from SFHDAG7NODE2.st.com ([fe80::d548:6a8f:2ca4:2090]) by
- SFHDAG7NODE2.st.com ([fe80::d548:6a8f:2ca4:2090%20]) with mapi id
- 15.00.1347.000; Fri, 12 Apr 2019 15:36:44 +0200
-From:   Lionel DEBIEVE <lionel.debieve@st.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH 21/24] crypto: stm32 - Forbid 2-key 3DES in FIPS mode
-Thread-Topic: [PATCH 21/24] crypto: stm32 - Forbid 2-key 3DES in FIPS mode
-Thread-Index: AQHU8TTFCRuds6k4ekSq1IliwMtfUA==
-Date:   Fri, 12 Apr 2019 13:36:44 +0000
-Message-ID: <a0be98ce-da8e-8b86-59a3-4fc837496f9b@st.com>
-References: <20190411084707.h56mz2z7jxusnr7u@gondor.apana.org.au>
- <E1hEVQU-0006oc-Sr@gondobar>
-In-Reply-To: <E1hEVQU-0006oc-Sr@gondobar>
-Accept-Language: fr-FR, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+        Fri, 12 Apr 2019 09:43:35 -0400
+Received: by mail-pf1-f195.google.com with SMTP id h5so5200873pfo.0
+        for <linux-crypto@vger.kernel.org>; Fri, 12 Apr 2019 06:43:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=L6/dPNArMhjVKiC7n5nd+HpKPbstszmpc1vCV4HIjfY=;
+        b=Q5iDy6mM/926pKWnGxnkDb+FgAfHiprj+cFc3WAMKEZgZO5K5KHK9hm9QG50QR+KRl
+         UXqFF+Y3FUPYYD3YFPBCWDmelt9k2kkGC5WEzrAGqO54MVg8N6cDqCYQpBGR7M9xjDbI
+         VvhLy7Mxl8HsenG7gk3P4sKeSK3GlYtR6BpCYxXDMciy9pU+n5aDpd5l/PXPAUkzAgAd
+         h5ADFw8JFX/3zjAfEhq9MpJPMa7SQIoovyG+mivU51m+OfEz79gJ59ce7YuipZPe2CPm
+         A8Bqu3f9xY/KXvoNGkulB+1PW1fmQkTa6n0DCHL6O+O6Ev/gxTZyhYKW47ZD5tZzM3uc
+         Lvzg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=L6/dPNArMhjVKiC7n5nd+HpKPbstszmpc1vCV4HIjfY=;
+        b=Fx13p0Wr+qrPC3kfxUnFgfZ2hpqy5KhDGFJxo/cXKXu/8KDy6AUtiCgpOY0hNcagIz
+         4W295EAiLD2y5i5PQtpcfUO8Xc4/1ImUKvc0r4T+98RIH5F4WFZ8etSQ+XqDBl2Y49iz
+         MHBtnX/xnfzgPBwE4orIIKgpOqRogw54fuhp3rYo2Mf9JhwCsD/zYBsEcbs88cLYefqS
+         zHLV4kpD7orxn5EN5C1YHktMRd8O92ZZwJkuEHUtLlU+MbakAg9QXyX9D0ekIpG/x8mv
+         9KEzyjqDTAptLwZ6W4H/X3bIa4JoYMxh+30nyuNEBWU4oePt+WSNFd25PrSQdPSTVA8e
+         aVKw==
+X-Gm-Message-State: APjAAAU8bU95ZWwWOpLkwhQ6Lc5fr/29y/g9SiRGqUbAZOvHSnpLR7ic
+        8DDKgM4hjYGecpi497acvCF6LBR2
+X-Google-Smtp-Source: APXvYqzD5OFVb1nMkqoOL5Q3uUtNPBvev3KsuR6JiBr7E6lgiVaZ4udPEQ1tDA4U9kpXWsX/SKgDxg==
+X-Received: by 2002:aa7:8e55:: with SMTP id d21mr15357038pfr.62.1555076614139;
+        Fri, 12 Apr 2019 06:43:34 -0700 (PDT)
+Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+        by smtp.gmail.com with ESMTPSA id b19sm48250858pgb.51.2019.04.12.06.43.32
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 12 Apr 2019 06:43:33 -0700 (PDT)
+Subject: Re: [PATCH 2/2] crypto: scompress: Use per-CPU struct instead
+ multiple variables
+To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc:     linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>, tglx@linutronix.de
+References: <20190329130956.15935-1-bigeasy@linutronix.de>
+ <20190329130956.15935-2-bigeasy@linutronix.de>
+ <20190411040734.GA2292@roeck-us.net>
+ <20190412084228.lrf2c6r54xsqknhf@linutronix.de>
+From:   Guenter Roeck <linux@roeck-us.net>
+Message-ID: <ac7fb436-2286-1eb2-662b-e2236ad02718@roeck-us.net>
+Date:   Fri, 12 Apr 2019 06:43:31 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.6.1
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.75.127.51]
-Content-Type: text/plain; charset="Windows-1252"
-Content-ID: <4D6988D287F7BD45836700CB567BCEBE@st.com>
-Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-04-12_08:,,
- signatures=0
+In-Reply-To: <20190412084228.lrf2c6r54xsqknhf@linutronix.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Herbert,
+On 4/12/19 1:42 AM, Sebastian Andrzej Siewior wrote:
+> On 2019-04-10 21:07:35 [-0700], Guenter Roeck wrote:
+>> Hi Sebastian,
+> Hi Guenter,
+> 
+>> Unfortunately, this patch causes random crashes.
+> …
+>> This is seen with an arm64 image running on qemu with machine xlnx-zcu102
+>> and two CPUs, and crypto test options enabled. It happens roughly every
+>> other boot. Reverting the patch fixes the problem. Bisect log (from
+>> crypto/master) is attached.
+> 
+> What is it that you are doing? I had it tcrypt tested on x86-64 before
+> posting. Let me check it again with the next tree on qemu…
+> 
 
-On 4/11/19 10:51 AM, Herbert Xu wrote:
+Nothing special. Booting arm64:defconfig+various debug and test options in qemu.
+It does not seem to depend on specific boot options. Crash failure rate, based
+on the last three of days testing, seems to be roughly 20%. The problem is only
+seen if there is more than one CPU. I have seen it with 2, 4, and 6 CPUs active,
+but it seems to be most likely to happen with 2 CPUs. I don't have enough data
+yet to be sure, though.
 
-> This patch forbids the use of 2-key 3DES (K1 =3D=3D K3) in FIPS mode.
->    =20
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> ---
->
->   drivers/crypto/stm32/stm32-cryp.c |   15 +++++++++++----
->   1 file changed, 11 insertions(+), 4 deletions(-)
->
-> diff --git a/drivers/crypto/stm32/stm32-cryp.c b/drivers/crypto/stm32/stm=
-32-cryp.c
-> index 23b0b7bd64c7..5785f3e235ce 100644
-> --- a/drivers/crypto/stm32/stm32-cryp.c
-> +++ b/drivers/crypto/stm32/stm32-cryp.c
-> @@ -762,10 +762,17 @@ static int stm32_cryp_des_setkey(struct crypto_ablk=
-cipher *tfm, const u8 *key,
->   static int stm32_cryp_tdes_setkey(struct crypto_ablkcipher *tfm, const =
-u8 *key,
->   				  unsigned int keylen)
->   {
-> -	if (keylen !=3D (3 * DES_KEY_SIZE))
-> -		return -EINVAL;
-> -	else
-> -		return stm32_cryp_setkey(tfm, key, keylen);
-> +	u32 flags;
-> +	int err;
-> +
-> +	flags =3D crypto_ablkcipher_get_flags(tfm);
-> +	err =3D __des3_verify_key(&flags, key);
-> +	if (unlikely(err)) {
-> +		crypto_ablkcipher_set_flags(tfm, flags);
-> +		return err;
-> +	}
-> +
-> +	return stm32_cryp_setkey(tfm, key, keylen);
->   }
->  =20
->   static int stm32_cryp_aes_aead_setkey(struct crypto_aead *tfm, const u8=
- *key,
->
-I was currently going to send patches around des and tdes key verification.=
- Is there any plan
-to do the same factorization on des key check?
+The problem is only seen with arm64, at least in my tests.
 
-Regarding this patch, ok for me.
-
-- Lionel
-
-Acked-by: Lionel Debieve<lionel.debieve@st.com>
-Tested-by: Lionel Debieve<lionel.debieve@st.com>
-
+Guenter
