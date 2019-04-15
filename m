@@ -2,74 +2,104 @@ Return-Path: <SRS0=EtZ3=SR=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94985C10F0E
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Apr 2019 09:41:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D02F7C10F0E
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Apr 2019 09:45:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6AB9E206BA
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Apr 2019 09:41:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 923A220833
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Apr 2019 09:45:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=st.com header.i=@st.com header.b="I68OXgkD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726556AbfDOJlt (ORCPT
+        id S1726287AbfDOJpf (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 Apr 2019 05:41:49 -0400
-Received: from orcrist.hmeau.com ([104.223.48.154]:33716 "EHLO
-        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725816AbfDOJlt (ORCPT
+        Mon, 15 Apr 2019 05:45:35 -0400
+Received: from mx07-00178001.pphosted.com ([62.209.51.94]:65248 "EHLO
+        mx07-00178001.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725939AbfDOJpf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Apr 2019 05:41:49 -0400
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1hFy7P-0007Z7-4l; Mon, 15 Apr 2019 17:41:39 +0800
-Received: from herbert by gondobar with local (Exim 4.89)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1hFy7G-0006Tu-Pk; Mon, 15 Apr 2019 17:41:30 +0800
-Date:   Mon, 15 Apr 2019 17:41:30 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Lionel Debieve <lionel.debieve@st.com>
-Cc:     Matt Mackall <mpm@selenic.com>, Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@st.com>,
-        Rob Herring <rob.herring@linaro.org>,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org,
-        Benjamin Gaignard <benjamin.gaignard@st.com>,
-        Ludovic Barre <ludovic.barre@st.com>,
-        linux-stm32@st-md-mailman.stormreply.com
-Subject: Re: [PATCH 0/2] hwrng: stm32 - Fix issue and add default quality
- level
-Message-ID: <20190415094130.lfelvgmkwyonkub5@gondor.apana.org.au>
-References: <1554114646-18791-1-git-send-email-lionel.debieve@st.com>
+        Mon, 15 Apr 2019 05:45:35 -0400
+Received: from pps.filterd (m0046668.ppops.net [127.0.0.1])
+        by mx07-00178001.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x3F9g0v1007436;
+        Mon, 15 Apr 2019 11:45:26 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=st.com; h=from : to : cc : subject
+ : date : message-id : references : in-reply-to : content-type : content-id
+ : content-transfer-encoding : mime-version; s=STMicroelectronics;
+ bh=rhnaL51MjEAfzdpqmPJd2H3gyloX9bknSdJyCUcRBuQ=;
+ b=I68OXgkDaxU+cgAfb3Uxk4NQTc63ZD+rYDrpx8+0Unyq0owuIai9+skZo4MK5zsdWDg+
+ j/Msa2GSn9z1KQQQmEqa05LyNTkh5Pw6HCp+1sQMrba/ThG9WS8BDeydcrwoEii7scYQ
+ SlG7r46dx9U6eu9VRiZGTAYS/QlN7hP0DM0ckWKJoWEo2ds3/ZVT8m0QS4ynP0pNu4pv
+ PrRuTRrBp78UpquL/BMCwRD/loop9Ga3LSdSWdqtSrBUNmqZ4BtQtcpxFLO48CRLGhbb
+ mRA2pYxmLm96xKwYd4AAtHtKmE5ycrVjUTy64+R8EI4cbgXPIrDXJRr8Umta5ugtPk+1 AQ== 
+Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
+        by mx07-00178001.pphosted.com with ESMTP id 2ru57ysfrb-1
+        (version=TLSv1 cipher=ECDHE-RSA-AES256-SHA bits=256 verify=NOT);
+        Mon, 15 Apr 2019 11:45:26 +0200
+Received: from zeta.dmz-eu.st.com (zeta.dmz-eu.st.com [164.129.230.9])
+        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 747F964;
+        Mon, 15 Apr 2019 09:45:25 +0000 (GMT)
+Received: from Webmail-eu.st.com (sfhdag7node1.st.com [10.75.127.19])
+        by zeta.dmz-eu.st.com (STMicroelectronics) with ESMTP id A5E8C121A;
+        Mon, 15 Apr 2019 09:45:25 +0000 (GMT)
+Received: from SFHDAG7NODE2.st.com (10.75.127.20) by SFHDAG7NODE1.st.com
+ (10.75.127.19) with Microsoft SMTP Server (TLS) id 15.0.1347.2; Mon, 15 Apr
+ 2019 11:45:25 +0200
+Received: from SFHDAG7NODE2.st.com ([fe80::d548:6a8f:2ca4:2090]) by
+ SFHDAG7NODE2.st.com ([fe80::d548:6a8f:2ca4:2090%20]) with mapi id
+ 15.00.1347.000; Mon, 15 Apr 2019 11:45:25 +0200
+From:   Lionel DEBIEVE <lionel.debieve@st.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+CC:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: Re: [PATCH 21/24] crypto: stm32 - Forbid 2-key 3DES in FIPS mode
+Thread-Topic: [PATCH 21/24] crypto: stm32 - Forbid 2-key 3DES in FIPS mode
+Thread-Index: AQHU8TTFCRuds6k4ekSq1IliwMtfUA==
+Date:   Mon, 15 Apr 2019 09:45:25 +0000
+Message-ID: <5e71be34-7d60-cd8b-b07f-aada7964f0b3@st.com>
+References: <20190411084707.h56mz2z7jxusnr7u@gondor.apana.org.au>
+ <E1hEVQU-0006oc-Sr@gondobar> <a0be98ce-da8e-8b86-59a3-4fc837496f9b@st.com>
+ <20190413135058.el26hvw7y7bcldm3@gondor.apana.org.au>
+In-Reply-To: <20190413135058.el26hvw7y7bcldm3@gondor.apana.org.au>
+Accept-Language: fr-FR, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.75.127.49]
+Content-Type: text/plain; charset="Windows-1252"
+Content-ID: <68A04D6019AC6D42AEFF2DAE9D125327@st.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1554114646-18791-1-git-send-email-lionel.debieve@st.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-04-15_04:,,
+ signatures=0
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Apr 01, 2019 at 12:30:44PM +0200, Lionel Debieve wrote:
-> This series will fix two missing parts in the current driver.
-> The first one will fix a missing function in the rng driver that
-> need to call a proper removal to notify the pm_runtime framework.
-> 
-> Second is an improvement for driver to be used as default entropy
-> source early in the boot processing.
-> 
-> Lionel Debieve (2):
->   hwrng: stm32 - fix unbalanced pm_runtime_enable
->   hwrng: stm32 - set default random quality
-> 
->  drivers/char/hw_random/stm32-rng.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
+On 4/13/19 3:50 PM, Herbert Xu wrote:
 
-All applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> On Fri, Apr 12, 2019 at 01:36:44PM +0000, Lionel DEBIEVE wrote:
+>> I was currently going to send patches around des and tdes key verificati=
+on. Is there any plan
+>> to do the same factorization on des key check?
+> If you have the time please do because I think some single DES
+> drivers are missing the weak key check.  The existing des_ekey
+> function should be sufficient for the check.
+
+ok, will try to do it in the same way you've done it for 3des using existin=
+g des_ekey function.
+Trying to push it this week for all impacted drivers.
+
+- Lionel
+
+>
+>> Acked-by: Lionel Debieve<lionel.debieve@st.com>
+>> Tested-by: Lionel Debieve<lionel.debieve@st.com>
+> Thanks,
+>=
