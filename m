@@ -2,60 +2,79 @@ Return-Path: <SRS0=EtZ3=SR=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_NEOMUTT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F1CFC10F0E
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Apr 2019 05:12:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17A1EC10F0E
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Apr 2019 06:35:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 56FC6206B7
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Apr 2019 05:12:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DBD6620825
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Apr 2019 06:35:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725794AbfDOFMy (ORCPT
+        id S1726069AbfDOGf3 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 Apr 2019 01:12:54 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:47613 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725779AbfDOFMx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Apr 2019 01:12:53 -0400
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 44jGpq4m4lz9s4V;
-        Mon, 15 Apr 2019 15:12:51 +1000 (AEST)
-From:   Michael Ellerman <mpe@ellerman.id.au>
-To:     Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org
-Cc:     linuxppc-dev@lists.ozlabs.org
-Subject: Re: [RFC PATCH 2/3] crypto: nx - don't abuse shash MAY_SLEEP flag
-In-Reply-To: <20190415003709.1531-3-ebiggers@kernel.org>
-References: <20190415003709.1531-1-ebiggers@kernel.org> <20190415003709.1531-3-ebiggers@kernel.org>
-Date:   Mon, 15 Apr 2019 15:12:51 +1000
-Message-ID: <87wojvua0c.fsf@concordia.ellerman.id.au>
+        Mon, 15 Apr 2019 02:35:29 -0400
+Received: from orcrist.hmeau.com ([104.223.48.154]:59608 "EHLO
+        deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725798AbfDOGf3 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 15 Apr 2019 02:35:29 -0400
+Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
+        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
+        id 1hFvD9-0003RD-Vl; Mon, 15 Apr 2019 14:35:24 +0800
+Received: from herbert by gondobar with local (Exim 4.89)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1hFvD5-0003pg-41; Mon, 15 Apr 2019 14:35:19 +0800
+Date:   Mon, 15 Apr 2019 14:35:19 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     syzbot <syzbot+6f72c20560060c98b566@syzkaller.appspotmail.com>
+Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com,
+        Ondrej Mosnacek <omosnace@redhat.com>,
+        Eric Biggers <ebiggers@kernel.org>
+Subject: [v2 PATCH] crypto: xts - Fix atomic sleep when walking skcipher
+Message-ID: <20190415063519.fs3li4h5i6yiycm6@gondor.apana.org.au>
+References: <0000000000002bb2b105867bcd11@google.com>
+ <20190414120338.edioq25dkafp2m7h@gondor.apana.org.au>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190414120338.edioq25dkafp2m7h@gondor.apana.org.au>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Eric Biggers <ebiggers@kernel.org> writes:
-> From: Eric Biggers <ebiggers@google.com>
->
-> The nx driver uses the MAY_SLEEP flag in shash_desc::flags as an
-> indicator to not retry sending the operation to the hardware as many
-> times before returning -EBUSY.  This is bogus because (1) that's not
-> what the MAY_SLEEP flag is for, and (2) the shash API doesn't allow
-> failing if the hardware is busy anyway.
+When we perform a walk in the completion function, we need to ensure
+that it is atomic.
 
-Can you elaborate a bit on that 2nd point? What is the driver meant to
-do if the hardware is busy or out to lunch? Retry forever?
+Reported-by: syzbot+6f72c20560060c98b566@syzkaller.appspotmail.com
+Fixes: 78105c7e769b ("crypto: xts - Drop use of auxiliary buffer")
+Cc: <stable@vger.kernel.org>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-> For now, just make it always retry the larger number of times.  This
-> doesn't actually fix this driver, but it at least makes it not use the
-> shash_desc::flags field anymore.  Then this field can be removed, as no
-> other drivers use it.
-
-This looks fine to me, thanks for fixing it up.
-
-cheers
+diff --git a/crypto/xts.c b/crypto/xts.c
+index 847f54f76789..2f948328cabb 100644
+--- a/crypto/xts.c
++++ b/crypto/xts.c
+@@ -137,8 +137,12 @@ static void crypt_done(struct crypto_async_request *areq, int err)
+ {
+ 	struct skcipher_request *req = areq->data;
+ 
+-	if (!err)
++	if (!err) {
++		struct rctx *rctx = skcipher_request_ctx(req);
++
++		rctx->subreq.base.flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
+ 		err = xor_tweak_post(req);
++	}
+ 
+ 	skcipher_request_complete(req, err);
+ }
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
