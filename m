@@ -3,63 +3,72 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE060C10F0E
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Apr 2019 09:36:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94985C10F0E
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Apr 2019 09:41:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B40C420675
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Apr 2019 09:36:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6AB9E206BA
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Apr 2019 09:41:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725939AbfDOJgl (ORCPT
+        id S1726556AbfDOJlt (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 Apr 2019 05:36:41 -0400
-Received: from orcrist.hmeau.com ([104.223.48.154]:33658 "EHLO
+        Mon, 15 Apr 2019 05:41:49 -0400
+Received: from orcrist.hmeau.com ([104.223.48.154]:33716 "EHLO
         deadmen.hmeau.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725779AbfDOJgl (ORCPT
+        with ESMTP id S1725816AbfDOJlt (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Apr 2019 05:36:41 -0400
+        Mon, 15 Apr 2019 05:41:49 -0400
 Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
         by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1hFy2Y-0007Sb-8C; Mon, 15 Apr 2019 17:36:38 +0800
+        id 1hFy7P-0007Z7-4l; Mon, 15 Apr 2019 17:41:39 +0800
 Received: from herbert by gondobar with local (Exim 4.89)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1hFy2W-0004SO-4G; Mon, 15 Apr 2019 17:36:36 +0800
-Date:   Mon, 15 Apr 2019 17:36:36 +0800
+        id 1hFy7G-0006Tu-Pk; Mon, 15 Apr 2019 17:41:30 +0800
+Date:   Mon, 15 Apr 2019 17:41:30 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Atul Gupta <atul.gupta@chelsio.com>
-Cc:     David Miller <davem@davemloft.net>, jakub.kicinski@netronome.com,
-        linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
-        dt@chelsio.com
-Subject: Re: [crypto 0/4] Inline TLS client and v6 support
-Message-ID: <20190415093636.3pvrlv5jugzlcd32@gondor.apana.org.au>
-References: <20190411094010.61f93a25@cakuba.netronome.com>
- <ae56c100-d072-bf6b-465a-5136d29b84be@chelsio.com>
- <20190411114506.10d19a40@cakuba.netronome.com>
- <20190411.115228.894374097382770159.davem@davemloft.net>
- <11ea3b48-4b50-3384-4e43-81248ec812b3@chelsio.com>
+To:     Lionel Debieve <lionel.debieve@st.com>
+Cc:     Matt Mackall <mpm@selenic.com>, Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@st.com>,
+        Rob Herring <rob.herring@linaro.org>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org,
+        Benjamin Gaignard <benjamin.gaignard@st.com>,
+        Ludovic Barre <ludovic.barre@st.com>,
+        linux-stm32@st-md-mailman.stormreply.com
+Subject: Re: [PATCH 0/2] hwrng: stm32 - Fix issue and add default quality
+ level
+Message-ID: <20190415094130.lfelvgmkwyonkub5@gondor.apana.org.au>
+References: <1554114646-18791-1-git-send-email-lionel.debieve@st.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <11ea3b48-4b50-3384-4e43-81248ec812b3@chelsio.com>
+In-Reply-To: <1554114646-18791-1-git-send-email-lionel.debieve@st.com>
 User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Apr 15, 2019 at 02:40:03PM +0530, Atul Gupta wrote:
->
-> Have taken care to keep code out of netdev into crypto driver
-> and allow user to choose record offload capability.
+On Mon, Apr 01, 2019 at 12:30:44PM +0200, Lionel Debieve wrote:
+> This series will fix two missing parts in the current driver.
+> The first one will fix a missing function in the rng driver that
+> need to call a proper removal to notify the pm_runtime framework.
+> 
+> Second is an improvement for driver to be used as default entropy
+> source early in the boot processing.
+> 
+> Lionel Debieve (2):
+>   hwrng: stm32 - fix unbalanced pm_runtime_enable
+>   hwrng: stm32 - set default random quality
+> 
+>  drivers/char/hw_random/stm32-rng.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
 
-Excuse me but the crypto driver is not a dumping ground for code
-that is unacceptable for the network stack.  If it's unacceptable
-for netdev then it's unacceptable to include them in your crypto
-driver.
-
-Cheers,
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
