@@ -1,154 +1,111 @@
-Return-Path: <SRS0=EtZ3=SR=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=uro5=SS=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4DC8C10F0E
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Apr 2019 16:05:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C409C10F0E
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Apr 2019 02:19:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B32D020880
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Apr 2019 16:05:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D1E4E204EC
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Apr 2019 02:19:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="egV7tTkp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727186AbfDOQFH (ORCPT
+        id S1725796AbfDPCS5 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 Apr 2019 12:05:07 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51482 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726034AbfDOQFH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Apr 2019 12:05:07 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id C6CB5307D868;
-        Mon, 15 Apr 2019 16:05:05 +0000 (UTC)
-Received: from [10.36.112.50] (ovpn-112-50.ams2.redhat.com [10.36.112.50])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id C18FB5D710;
-        Mon, 15 Apr 2019 16:04:48 +0000 (UTC)
-Subject: Re: [PATCH 0/6] Add Hygon SEV support
-To:     Pascal Van Leeuwen <pvanleeuwen@insidesecure.com>,
-        Hao Feng <fenghao@hygon.cn>,
-        'Tom Lendacky ' <thomas.lendacky@amd.com>,
-        'Gary Hook ' <gary.hook@amd.com>,
-        'Herbert Xu ' <herbert@gondor.apana.org.au>,
-        "' David S. Miller '" <davem@davemloft.net>,
-        'Janakarajan Natarajan ' <Janakarajan.Natarajan@amd.com>,
-        'Joerg Roedel ' <joro@8bytes.org>,
-        =?UTF-8?B?JyBSYWRpbSBLcsSNbcOhxZkgJw==?= <rkrcmar@redhat.com>,
-        'Thomas Gleixner ' <tglx@linutronix.de>,
-        'Ingo Molnar ' <mingo@redhat.com>,
-        'Borislav Petkov ' <bp@alien8.de>,
-        "' H. Peter Anvin '" <hpa@zytor.com>
-Cc:     'Zhaohui Du ' <duzhaohui@hygon.cn>,
-        'Zhiwei Ying ' <yingzhiwei@hygon.cn>,
-        'Wen Pu ' <puwen@hygon.cn>,
-        "x86@kernel.org" <x86@kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <1555329868-17895-1-git-send-email-fenghao@hygon.cn>
- <3a1288ab-8e18-5421-05b4-4f4ef2fc531c@redhat.com>
- <AM6PR09MB35237F925CF4C82FBBA53862D22B0@AM6PR09MB3523.eurprd09.prod.outlook.com>
-From:   Paolo Bonzini <pbonzini@redhat.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=pbonzini@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- uUHgL9dKIfvpm+rNXRn9wAwGjk0X/A==
-Message-ID: <fda47663-9536-0d36-5a0e-c6da77e21209@redhat.com>
-Date:   Mon, 15 Apr 2019 18:04:46 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        Mon, 15 Apr 2019 22:18:57 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:40842 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725308AbfDPCS5 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 15 Apr 2019 22:18:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=UCqn4xJsfn6LSF38geTP0GiT3GQOfaOQ+QhzCgzo1co=; b=egV7tTkpiN9UWTV3PXo4mGfLW
+        tbeL71ZPBs4HFrlSAHPfvTx5o1bsD58ovucaD2v+AGmrP7XvuU7izDvOhAY3sqSPXU42U8Gb3pycu
+        wXJ3K6Vbk/xXJ/HQYyn/Gwpw5kM8HAqi3pC7vlMBhzuPKGe5T9e9FP5ZkfxJ25pivvxM5iwZqz9jd
+        ZHZ6gy1YHEIcLju7XgZkwVQMjQCOOBqM9z3F+MXW/gnUI1bRcGIBJr83/OlHMDhbi4wTOaFHLYIRc
+        meSEFn5Bbi+peV/JaPozGSUudMpsq8SkY17MhfLYr+A6jeSyE/r2AzgFz9MxL4aYdkeFilGuP/jN3
+        YBRDv9a/A==;
+Received: from willy by bombadil.infradead.org with local (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1hGDgS-0004Ef-Gw; Tue, 16 Apr 2019 02:18:52 +0000
+Date:   Mon, 15 Apr 2019 19:18:52 -0700
+From:   Matthew Wilcox <willy@infradead.org>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Kees Cook <keescook@chromium.org>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Rik van Riel <riel@surriel.com>,
+        linux-crypto <linux-crypto@vger.kernel.org>,
+        Dmitry Vyukov <dvyukov@google.com>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        linux-security-module <linux-security-module@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Laura Abbott <labbott@redhat.com>, linux-mm@kvack.org
+Subject: Re: [PATCH] crypto: testmgr - allocate buffers with __GFP_COMP
+Message-ID: <20190416021852.GA18616@bombadil.infradead.org>
+References: <20190411192607.GD225654@gmail.com>
+ <20190411192827.72551-1-ebiggers@kernel.org>
+ <CAGXu5jJ8k7fP5Vb=ygmQ0B45GfrK2PeaV04bPWmcZ6Vb+swgyA@mail.gmail.com>
+ <20190415022412.GA29714@bombadil.infradead.org>
+ <20190415024615.f765e7oagw26ezam@gondor.apana.org.au>
 MIME-Version: 1.0
-In-Reply-To: <AM6PR09MB35237F925CF4C82FBBA53862D22B0@AM6PR09MB3523.eurprd09.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.48]); Mon, 15 Apr 2019 16:05:06 +0000 (UTC)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190415024615.f765e7oagw26ezam@gondor.apana.org.au>
+User-Agent: Mutt/1.9.2 (2017-12-15)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 15/04/19 17:51, Pascal Van Leeuwen wrote:
-> I don't know about SM2, but both SM3 and SM4 are already implemented in
-> the kernel tree as generic C code and covered by the testmgr.
-
-I stand corrected.
-
-> There also has been quite some analysis done on them (Google is your
-> friend) and they are generally considered secure.
-
-Good.
-
-> Besides that, they are
-> in heavy practical use in mainland China, usually as direct replacements
-> for SHA2-256 and AES in whatever protocol or use case you need: IPsec,
-> TLS, WPA2, XTS for disk encryption, you name it.
-
-How should that mean anything?
-
->> Because as far as I know, they could be just as secure as double rot13.
+On Mon, Apr 15, 2019 at 10:46:15AM +0800, Herbert Xu wrote:
+> On Sun, Apr 14, 2019 at 07:24:12PM -0700, Matthew Wilcox wrote:
+> > On Thu, Apr 11, 2019 at 01:32:32PM -0700, Kees Cook wrote:
+> > > > @@ -156,7 +156,8 @@ static int __testmgr_alloc_buf(char *buf[XBUFSIZE], int order)
+> > > >         int i;
+> > > >
+> > > >         for (i = 0; i < XBUFSIZE; i++) {
+> > > > -               buf[i] = (char *)__get_free_pages(GFP_KERNEL, order);
+> > > > +               buf[i] = (char *)__get_free_pages(GFP_KERNEL | __GFP_COMP,
+> > > > +                                                 order);
+> > > 
+> > > Is there a reason __GFP_COMP isn't automatically included in all page
+> > > allocations? (Or rather, it seems like the exception is when things
+> > > should NOT be considered part of the same allocation, so something
+> > > like __GFP_SINGLE should exist?.)
+> > 
+> > The question is not whether or not things should be considered part of the
+> > same allocation.  The question is whether the allocation is of a compound
+> > page or of N consecutive pages.  Now you're asking what the difference is,
+> > and it's whether you need to be able to be able to call compound_head(),
+> > compound_order(), PageTail() or use a compound_dtor.  If you don't, then
+> > you can save some time at allocation & free by not specifying __GFP_COMP.
 > 
-> You could educate yourself first instead of just making assumptions?
-I did educate myself a bit, but I'm not an expert in cryptography, so I
-would like to be sure that these are not another Speck or DUAL-EC-DRBG.
- "SM2 is based on ECC(Elliptic Curve Cryptography), and uses a special
-curve" is enough for me to see warning signs, at least without further
-explanations, and so does the fact that the initial SM3 values were
-changed from SHA-2 and AFAICT there is no public justification for that.
+> Thanks for clarifying Matthew.
+> 
+> Eric, this means that we should not use __GFP_COMP here just to
+> silent what is clearly a broken warning.
 
-Paolo
+I agree; if the crypto code is never going to try to go from the address of
+a byte in the allocation back to the head page, then there's no need to
+specify GFP_COMP.
+
+But that leaves us in the awkward situation where
+HARDENED_USERCOPY_PAGESPAN does need to be able to figure out whether
+'ptr + n - 1' lies within the same allocation as ptr.  Without using
+a compound page, there's no indication in the VM structures that these
+two pages were allocated as part of the same allocation.
+
+We could force all multi-page allocations to be compound pages if
+HARDENED_USERCOPY_PAGESPAN is enabled, but I worry that could break
+something.  We could make it catch fewer problems by succeeding if the
+page is not compound.  I don't know, these all seem like bad choices
+to me.
