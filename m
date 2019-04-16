@@ -2,115 +2,126 @@ Return-Path: <SRS0=uro5=SS=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCE42C282DA
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Apr 2019 03:15:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 727BDC10F14
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Apr 2019 06:58:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AE5022086A
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Apr 2019 03:15:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3FED82075B
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Apr 2019 06:58:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Y8xqOZaS"
+	dkim=pass (1024-bit key) header.d=insidesecure.onmicrosoft.com header.i=@insidesecure.onmicrosoft.com header.b="3bUygWCf"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726215AbfDPDPH (ORCPT
+        id S1728502AbfDPG60 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 Apr 2019 23:15:07 -0400
-Received: from mail-ua1-f65.google.com ([209.85.222.65]:45319 "EHLO
-        mail-ua1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726094AbfDPDPH (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Apr 2019 23:15:07 -0400
-Received: by mail-ua1-f65.google.com with SMTP id c13so6238383uao.12
-        for <linux-crypto@vger.kernel.org>; Mon, 15 Apr 2019 20:15:06 -0700 (PDT)
+        Tue, 16 Apr 2019 02:58:26 -0400
+Received: from mail-eopbgr30118.outbound.protection.outlook.com ([40.107.3.118]:36677
+        "EHLO EUR03-AM5-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727424AbfDPG60 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 16 Apr 2019 02:58:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Mk6BIBLLGO0U80tLWMVE0489EqA725xprr9VtegXBQw=;
-        b=Y8xqOZaS7jkwKovka8QtC0wCgsNCE4WBE8pK3EDq4eKI6sO+T80f/S1bmRcL3mxz/l
-         Cvk05b4RCyjWoI0j+pNA99L3vDReq81bLIvF4e378eH+fFvsHhaQpkt9P2QwQ9zEhlaW
-         p792GG7NkrUjaFmz8u13GMr+5hDAtUDZo0rY4=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Mk6BIBLLGO0U80tLWMVE0489EqA725xprr9VtegXBQw=;
-        b=eVu/DlW2BnoSZA/WUJq/50FC1TBfkNhBxgGdAeqg5Y3IGk/KYTz3rZ0FE/i+LkalON
-         5A0oy/OSqoE9srnbselSegwvpCY7D5srKskXEsdHNRUIjY4BMfbdanWS6JMFsxs/QVwl
-         cAK6heElvDLwCCeOxyeuemymCk92JrfiB37s0GaZ47AW8bdZ3uoVrQyiMIzbQzHaYuY+
-         09Fnt70VMb7Jwv5wRaxayXPBm32f1nmpbiydPwZlKENuCJD7LcGJgIGkW9kijTD7gHTb
-         4KGb6o7ajj97PEQGeRF+mgStjqfqg24Ktz6ybSdMVpQgE3AHzy7h4MVEtSqshyjR/gXU
-         Zipg==
-X-Gm-Message-State: APjAAAXEp78wdzylhhnZXdO5DAKPG0vZJzSLdmGm9nBq3kbIIvPCX5wV
-        VR4xD4vspf5JK3TJe2xgsyRdskbeI20=
-X-Google-Smtp-Source: APXvYqzs4NwRh1LRchuLa48awkhpmbX0REJ6/tnuTG2AARHVKWTmNG0OZNTynl9STwGqlPv/knvC+Q==
-X-Received: by 2002:ab0:2b98:: with SMTP id q24mr4139431uar.122.1555384506115;
-        Mon, 15 Apr 2019 20:15:06 -0700 (PDT)
-Received: from mail-vs1-f49.google.com (mail-vs1-f49.google.com. [209.85.217.49])
-        by smtp.gmail.com with ESMTPSA id q12sm960681vsr.13.2019.04.15.20.15.04
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 15 Apr 2019 20:15:04 -0700 (PDT)
-Received: by mail-vs1-f49.google.com with SMTP id e2so10689474vsc.13
-        for <linux-crypto@vger.kernel.org>; Mon, 15 Apr 2019 20:15:04 -0700 (PDT)
-X-Received: by 2002:a67:f04e:: with SMTP id q14mr43541834vsm.133.1555384503717;
- Mon, 15 Apr 2019 20:15:03 -0700 (PDT)
+ d=insidesecure.onmicrosoft.com; s=selector1-insidesecure-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0pcxuRUGFYpuWCy9LVeAu6MHodIDEAykPnUOUrfu6Jw=;
+ b=3bUygWCfXS4YYj8gHZs2c+8GvVHq61bqk4p61DXmjoXxFEIBMbtYjZBV6wO3xX5oynlw15S5NLD2G67e/N10V4UagtoJ4H4PB9gMFEb+9qM2OhTEPrFc4UpZzS5TE8Z/j2u/uIKpG44NEyrtIXAS4CWJ6PrHzrlMQe5P+JysQLQ=
+Received: from AM6PR09MB3523.eurprd09.prod.outlook.com (10.255.99.206) by
+ AM6PR09MB2824.eurprd09.prod.outlook.com (20.179.1.90) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1792.19; Tue, 16 Apr 2019 06:58:20 +0000
+Received: from AM6PR09MB3523.eurprd09.prod.outlook.com
+ ([fe80::6112:a401:331e:a9b9]) by AM6PR09MB3523.eurprd09.prod.outlook.com
+ ([fe80::6112:a401:331e:a9b9%6]) with mapi id 15.20.1792.018; Tue, 16 Apr 2019
+ 06:58:20 +0000
+From:   Pascal Van Leeuwen <pvanleeuwen@insidesecure.com>
+To:     Paolo Bonzini <pbonzini@redhat.com>, Hao Feng <fenghao@hygon.cn>,
+        'Tom Lendacky ' <thomas.lendacky@amd.com>,
+        'Gary Hook ' <gary.hook@amd.com>,
+        'Herbert Xu ' <herbert@gondor.apana.org.au>,
+        "' David S. Miller '" <davem@davemloft.net>,
+        'Janakarajan Natarajan ' <Janakarajan.Natarajan@amd.com>,
+        'Joerg Roedel ' <joro@8bytes.org>,
+        =?utf-8?B?JyBSYWRpbSBLcsSNbcOhxZkgJw==?= <rkrcmar@redhat.com>,
+        'Thomas Gleixner ' <tglx@linutronix.de>,
+        'Ingo Molnar ' <mingo@redhat.com>,
+        'Borislav Petkov ' <bp@alien8.de>,
+        "' H. Peter Anvin '" <hpa@zytor.com>
+CC:     'Zhaohui Du ' <duzhaohui@hygon.cn>,
+        'Zhiwei Ying ' <yingzhiwei@hygon.cn>,
+        'Wen Pu ' <puwen@hygon.cn>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH 0/6] Add Hygon SEV support
+Thread-Topic: [PATCH 0/6] Add Hygon SEV support
+Thread-Index: AQHU84f0k/ZyPbZSmUmrONQ4OcgLtKY9W0yAgAABiZCAAAX+AIAA9LCg
+Date:   Tue, 16 Apr 2019 06:58:20 +0000
+Message-ID: <AM6PR09MB35234C86C0502E1FAAB3A305D2240@AM6PR09MB3523.eurprd09.prod.outlook.com>
+References: <1555329868-17895-1-git-send-email-fenghao@hygon.cn>
+ <3a1288ab-8e18-5421-05b4-4f4ef2fc531c@redhat.com>
+ <AM6PR09MB35237F925CF4C82FBBA53862D22B0@AM6PR09MB3523.eurprd09.prod.outlook.com>
+ <fda47663-9536-0d36-5a0e-c6da77e21209@redhat.com>
+In-Reply-To: <fda47663-9536-0d36-5a0e-c6da77e21209@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=pvanleeuwen@insidesecure.com; 
+x-originating-ip: [188.204.2.113]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 6292bfae-2506-41e3-4fe7-08d6c238e964
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(5600140)(711020)(4605104)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);SRVR:AM6PR09MB2824;
+x-ms-traffictypediagnostic: AM6PR09MB2824:
+x-microsoft-antispam-prvs: <AM6PR09MB28247A97563CFB629F2433F4D2240@AM6PR09MB2824.eurprd09.prod.outlook.com>
+x-forefront-prvs: 000947967F
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(396003)(366004)(376002)(39850400004)(136003)(346002)(189003)(199004)(99286004)(97736004)(9686003)(33656002)(25786009)(7416002)(81166006)(74316002)(14454004)(86362001)(8676002)(5660300002)(3846002)(2906002)(4326008)(68736007)(305945005)(81156014)(71200400001)(52536014)(6116002)(7736002)(6246003)(8936002)(14444005)(256004)(76176011)(71190400001)(229853002)(110136005)(53936002)(6506007)(55016002)(93886005)(106356001)(7696005)(54906003)(316002)(446003)(486006)(6436002)(478600001)(476003)(26005)(186003)(66066001)(102836004)(105586002)(11346002)(921003)(1121003);DIR:OUT;SFP:1102;SCL:1;SRVR:AM6PR09MB2824;H:AM6PR09MB3523.eurprd09.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: insidesecure.com does not
+ designate permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: SwZWRDpKyuBy3V1M4hrKYsQE37f+fkWxzp9vx11lHTq59/Mj6PRfBVGRf75IpQyG/gTQ27gHKJrZ8dKjyN5PVwJMJYRNqjpyXrAd63P5M+1ASH3Du3AdwLua3L5+tR7D5A5VWFTATkk7UvUYTkdcveFcR80OJ/ILEFyG9jId1JrDqhw74Yn5ksQ7r+K3MYtTDQtx4Xu5jsPpKQbCG4cVEvrHfCss4aACS45QCzAe+IMLS8k6uQpdckhhf16q5upUGbO/MIY6iW+Zi9HPASyXZNniHfFhgeF7MekFcJMkwY0FbjcbT3bk2ae75I7ntAu3enP/u/84xjy+9lUIaolwysovGkgtbVrdmREYEeFrqy7w56tABhVBO3ft+JQuyL5uWV6pZkSe0gc/+gIdJkVroLgZZmAm/i5LDRQZSOBC1cw=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20190411192607.GD225654@gmail.com> <20190411192827.72551-1-ebiggers@kernel.org>
- <CAGXu5jJ8k7fP5Vb=ygmQ0B45GfrK2PeaV04bPWmcZ6Vb+swgyA@mail.gmail.com>
- <20190415022412.GA29714@bombadil.infradead.org> <20190415024615.f765e7oagw26ezam@gondor.apana.org.au>
- <20190416021852.GA18616@bombadil.infradead.org>
-In-Reply-To: <20190416021852.GA18616@bombadil.infradead.org>
-From:   Kees Cook <keescook@chromium.org>
-Date:   Mon, 15 Apr 2019 22:14:51 -0500
-X-Gmail-Original-Message-ID: <CAGXu5jKaVB=bTJCBWhsxAny7-OkzXQ+8KCd5O+_-7hKcJFiqKw@mail.gmail.com>
-Message-ID: <CAGXu5jKaVB=bTJCBWhsxAny7-OkzXQ+8KCd5O+_-7hKcJFiqKw@mail.gmail.com>
-Subject: Re: [PATCH] crypto: testmgr - allocate buffers with __GFP_COMP
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Kees Cook <keescook@chromium.org>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Rik van Riel <riel@surriel.com>,
-        linux-crypto <linux-crypto@vger.kernel.org>,
-        Dmitry Vyukov <dvyukov@google.com>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        linux-security-module <linux-security-module@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Laura Abbott <labbott@redhat.com>,
-        Linux-MM <linux-mm@kvack.org>
-Content-Type: text/plain; charset="UTF-8"
+X-OriginatorOrg: insidesecure.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6292bfae-2506-41e3-4fe7-08d6c238e964
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Apr 2019 06:58:20.8355
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3c07df58-7760-4e85-afd5-84803eac70ce
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR09MB2824
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Apr 15, 2019 at 9:18 PM Matthew Wilcox <willy@infradead.org> wrote:
-> I agree; if the crypto code is never going to try to go from the address of
-> a byte in the allocation back to the head page, then there's no need to
-> specify GFP_COMP.
->
-> But that leaves us in the awkward situation where
-> HARDENED_USERCOPY_PAGESPAN does need to be able to figure out whether
-> 'ptr + n - 1' lies within the same allocation as ptr.  Without using
-> a compound page, there's no indication in the VM structures that these
-> two pages were allocated as part of the same allocation.
->
-> We could force all multi-page allocations to be compound pages if
-> HARDENED_USERCOPY_PAGESPAN is enabled, but I worry that could break
-> something.  We could make it catch fewer problems by succeeding if the
-> page is not compound.  I don't know, these all seem like bad choices
-> to me.
-
-If GFP_COMP is _not_ the correct signal about adjacent pages being
-part of the same allocation, then I agree: we need to drop this check
-entirely from PAGESPAN. Is there anything else that indicates this
-property? (Or where might we be able to store that info?)
-
-There are other pagespan checks, though, so those could stay. But I'd
-really love to gain page allocator allocation size checking ...
-
--- 
-Kees Cook
+PiA+IEJlc2lkZXMgdGhhdCwgdGhleSBhcmUNCj4gPiBpbiBoZWF2eSBwcmFjdGljYWwgdXNlIGlu
+IG1haW5sYW5kIENoaW5hLCB1c3VhbGx5IGFzIGRpcmVjdA0KPiByZXBsYWNlbWVudHMNCj4gPiBm
+b3IgU0hBMi0yNTYgYW5kIEFFUyBpbiB3aGF0ZXZlciBwcm90b2NvbCBvciB1c2UgY2FzZSB5b3Ug
+bmVlZDoNCj4gSVBzZWMsDQo+ID4gVExTLCBXUEEyLCBYVFMgZm9yIGRpc2sgZW5jcnlwdGlvbiwg
+eW91IG5hbWUgaXQuDQo+DQo+IEhvdyBzaG91bGQgdGhhdCBtZWFuIGFueXRoaW5nPw0KPg0KVWht
+IC4uLiBubywgdGhlIGZhY3QgdGhhdCBzb21ldGhpbmcgaXMgYWN0dWFsbHkgKnVzZWZ1bCogdG8g
+cG90ZW50aWFsbHkNCmEgYmlsbGlvbiBwbHVzIHBlb3BsZSBkb2Vzbid0IG1lYW4gYW55dGhpbmcg
+Li4uDQoNCj4gSSBkaWQgZWR1Y2F0ZSBteXNlbGYgYSBiaXQsIGJ1dCBJJ20gbm90IGFuIGV4cGVy
+dCBpbiBjcnlwdG9ncmFwaHksIHNvIEkNCj4gd291bGQgbGlrZSB0byBiZSBzdXJlIHRoYXQgdGhl
+c2UgYXJlIG5vdCBhbm90aGVyIFNwZWNrIG9yIERVQUwtRUMtRFJCRy4NCj4NCklubm9jZW50IHVu
+dGlsIHByb3ZlbiBndWlsdHkgbWVhbiBhbnl0aGluZyB0byB5b3U/DQoNCj4gICJTTTIgaXMgYmFz
+ZWQgb24gRUNDKEVsbGlwdGljIEN1cnZlIENyeXB0b2dyYXBoeSksIGFuZCB1c2VzIGEgc3BlY2lh
+bA0KPiBjdXJ2ZSIgaXMgZW5vdWdoIGZvciBtZSB0byBzZWUgd2FybmluZyBzaWducywgYXQgbGVh
+c3Qgd2l0aG91dCBmdXJ0aGVyDQo+IGV4cGxhbmF0aW9ucywNCj4NClRoZSBzcGVjaWZpY2F0aW9u
+IGlzIHB1YmxpYyAoaWYgeW91IGNhbiByZWFkIENoaW5lc2UsIGFueXdheSksIHNvIG9wZW4gdG8N
+CmFuYWx5c2lzLiBFaXRoZXIgd2F5LCBpdCdzIHF1aXRlIGlycmVsZXZhbnQgdG8gQ2hpbmVzZSBv
+cmdhbmlzYXRpb25zIHRoYXQNCkhBVkUgdG8gdXNlIFNNMi4gQW5kIGFueW9uZSBlbHNlIGNhbiBq
+dXN0IGRlY2lkZSBOT1QgdG8gdXNlIGl0LCB5b3UgZG9uJ3QNCmV2ZW4gaGF2ZSB0byBjb21waWxl
+IGl0IGludG8geW91ciBrZXJuZWwuIEl0J3MgY2FsbGVkIGZyZWVkb20uDQoNCj4gYW5kIHNvIGRv
+ZXMgdGhlIGZhY3QgdGhhdCB0aGUgaW5pdGlhbCBTTTMgdmFsdWVzIHdlcmUNCj4gY2hhbmdlZCBm
+cm9tIFNIQS0yIGFuZCBBRkFJQ1QgdGhlcmUgaXMgbm8gcHVibGljIGp1c3RpZmljYXRpb24gZm9y
+DQo+IHRoYXQuDQo+DQpBY3R1YWxseSwgU00zIGlzIGFuICppbXByb3ZlbWVudCogb24gU0hBLTIs
+IGFuZCB0aGVyZSBoYXMgYmVlbiBhbXBsZQ0KYW5hbHlzaXMgZG9uZSBvbiB0aGF0IHRvLCBpbiBm
+YWN0LCBjb25maXJtIGl0J3MgKHNsaWdodGx5KSBiZXR0ZXIuDQpTbyB0aGVyZSBJUyBwdWJsaWMg
+anVzdGlmaWNhdGlvbi4gRG9uJ3Qgc2hvdXQgaWYgeW91IGRvbid0IGtub3cgdGhlDQpmYWN0cy4N
+Cg0KUmVnYXJkcywNClBhc2NhbA0K
