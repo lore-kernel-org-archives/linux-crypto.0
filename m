@@ -2,95 +2,88 @@ Return-Path: <SRS0=uro5=SS=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 969EBC10F14
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Apr 2019 10:35:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 491C7C10F13
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Apr 2019 12:53:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6505720693
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Apr 2019 10:35:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0FBCA205ED
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Apr 2019 12:53:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="x3zXdmN8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728328AbfDPKfT (ORCPT
+        id S1727691AbfDPMxA (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 16 Apr 2019 06:35:19 -0400
-Received: from [110.188.70.11] ([110.188.70.11]:40646 "EHLO spam2.hygon.cn"
-        rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727783AbfDPKfT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 Apr 2019 06:35:19 -0400
-Received: from MK-DB.hygon.cn ([172.23.18.60])
-        by spam2.hygon.cn with ESMTP id x3GAScAS069530;
-        Tue, 16 Apr 2019 18:28:38 +0800 (GMT-8)
-        (envelope-from fenghao@hygon.cn)
-Received: from cncheex02.Hygon.cn ([172.23.18.12])
-        by MK-DB.hygon.cn with ESMTP id x3GASTDC034698;
-        Tue, 16 Apr 2019 18:28:29 +0800 (GMT-8)
-        (envelope-from fenghao@hygon.cn)
-Received: from [172.30.20.134] (172.23.18.44) by cncheex02.Hygon.cn
- (172.23.18.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1466.3; Tue, 16 Apr
- 2019 18:28:34 +0800
-Subject: Re: [PATCH 0/6] Add Hygon SEV support
-To:     Paolo Bonzini <pbonzini@redhat.com>,
-        Pascal Van Leeuwen <pvanleeuwen@insidesecure.com>,
-        "'Tom Lendacky '" <thomas.lendacky@amd.com>,
-        "'Gary Hook '" <gary.hook@amd.com>,
-        "'Herbert Xu '" <herbert@gondor.apana.org.au>,
-        "' David S. Miller '" <davem@davemloft.net>,
-        "'Janakarajan Natarajan '" <Janakarajan.Natarajan@amd.com>,
-        "'Joerg Roedel '" <joro@8bytes.org>,
-        =?UTF-8?B?JyBSYWRpbSBLcsSNbcOhxZkgJw==?= <rkrcmar@redhat.com>,
-        "'Thomas Gleixner '" <tglx@linutronix.de>,
-        "'Ingo Molnar '" <mingo@redhat.com>,
-        "'Borislav Petkov '" <bp@alien8.de>,
-        "' H. Peter Anvin '" <hpa@zytor.com>
-CC:     "'Zhaohui Du '" <duzhaohui@hygon.cn>,
-        "'Zhiwei Ying '" <yingzhiwei@hygon.cn>,
-        "'Wen Pu '" <puwen@hygon.cn>, "x86@kernel.org" <x86@kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <1555329868-17895-1-git-send-email-fenghao@hygon.cn>
- <3a1288ab-8e18-5421-05b4-4f4ef2fc531c@redhat.com>
- <AM6PR09MB35237F925CF4C82FBBA53862D22B0@AM6PR09MB3523.eurprd09.prod.outlook.com>
- <fda47663-9536-0d36-5a0e-c6da77e21209@redhat.com>
- <AM6PR09MB35234C86C0502E1FAAB3A305D2240@AM6PR09MB3523.eurprd09.prod.outlook.com>
- <985108b1-6d51-4458-48de-c5b96c5f14f9@redhat.com>
-From:   Hao Feng <fenghao@hygon.cn>
-Message-ID: <992c3a3f-8eb2-5286-c9f7-7940fc5ccf55@hygon.cn>
-Date:   Tue, 16 Apr 2019 18:28:33 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <985108b1-6d51-4458-48de-c5b96c5f14f9@redhat.com>
-Content-Type: text/plain; charset="utf-8"
+        Tue, 16 Apr 2019 08:53:00 -0400
+Received: from mail-eopbgr30051.outbound.protection.outlook.com ([40.107.3.51]:55428
+        "EHLO EUR03-AM5-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726907AbfDPMw7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 16 Apr 2019 08:52:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=iukaT7Z6++yyXm0IaZt51Ws21DKaUj0HHE+/2n4adPQ=;
+ b=x3zXdmN8sDOqGv6snVTbuSzCuQnkKLldvVAClT9fd35i33buR028kexm0Xf6dCZ4Zwq9gGSiPNP50NbbAucnd2iVMasUVDyiON8cyLgRaZ3vM1GGBZfT8XJDH7oS46pYRbF6kj5zxs5HLUdiAhQlXVjVJosGfrh5CDd8/jYbAPA=
+Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
+ VI1PR0402MB3565.eurprd04.prod.outlook.com (52.134.4.150) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1813.11; Tue, 16 Apr 2019 12:52:54 +0000
+Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
+ ([fe80::484c:ab68:81c4:51be]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
+ ([fe80::484c:ab68:81c4:51be%5]) with mapi id 15.20.1792.020; Tue, 16 Apr 2019
+ 12:52:54 +0000
+From:   Horia Geanta <horia.geanta@nxp.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: Re: [PATCH 6/24] crypto: caam - Forbid 2-key 3DES in FIPS mode
+Thread-Topic: [PATCH 6/24] crypto: caam - Forbid 2-key 3DES in FIPS mode
+Thread-Index: AQHU9FNO+WpXRZBCEkm7LQIIWA/sKA==
+Date:   Tue, 16 Apr 2019 12:52:54 +0000
+Message-ID: <VI1PR0402MB3485E82FDF2C54E98F32FDA398240@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+References: <20190411084707.h56mz2z7jxusnr7u@gondor.apana.org.au>
+ <E1hEVQE-0006mC-7q@gondobar>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [172.23.18.44]
-X-ClientProxiedBy: cncheex01.Hygon.cn (172.23.18.10) To cncheex02.Hygon.cn
- (172.23.18.12)
-X-MAIL: spam2.hygon.cn x3GAScAS069530
-X-DNSRBL: 
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=horia.geanta@nxp.com; 
+x-originating-ip: [212.146.100.6]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 41b1d1be-dc50-4465-fea0-08d6c26a716e
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600140)(711020)(4605104)(4618075)(2017052603328)(7193020);SRVR:VI1PR0402MB3565;
+x-ms-traffictypediagnostic: VI1PR0402MB3565:
+x-microsoft-antispam-prvs: <VI1PR0402MB3565072702E76C26F92E7F7A98240@VI1PR0402MB3565.eurprd04.prod.outlook.com>
+x-forefront-prvs: 000947967F
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(376002)(39860400002)(136003)(396003)(366004)(346002)(189003)(199004)(478600001)(2906002)(76176011)(14454004)(25786009)(86362001)(71200400001)(71190400001)(33656002)(55016002)(9686003)(66066001)(53936002)(7696005)(5660300002)(97736004)(52536014)(81156014)(81166006)(8676002)(8936002)(6246003)(99286004)(229853002)(6436002)(44832011)(486006)(446003)(476003)(256004)(186003)(6506007)(53546011)(3846002)(6116002)(102836004)(316002)(7736002)(110136005)(105586002)(26005)(106356001)(305945005)(558084003)(68736007)(74316002);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB3565;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: nxp.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: RDUh8QaiqhNShgSadGW/2+Ig/JQKSbfrnMbcTtbY6jjhxXnpqJz7BqEwNfu/nz3R4VNYZJEeghppDhHDJokoNnKbcOTAO9WzwJ8C/tzcdB3VA5E6LUduTKn+aU8fZHTA4NLZHb7uPQSbwVGm88eYrsBFEXbUv7DS2ePBDnv5xMFU0A8uRv2L7Y4tZ593R1GJzf/KTTqSRH5qbKvy6hZY6fmjCZ/ys8QugS145fxAMlfauJtfhmLDbPXoe0gY/gZUxUtdRJjaeNsSqJ+YUzQxmIDb7hGUF3OEXxBhH7xabsFATC6uvvy+Qtl3rGACXi1xTjt3mmLVbP5fO34Po1aERoq9XyX2AXkkzWrC455ikF47lTJy5lluundnWcNagBqIsIJ7Fljrp5JjcTzrbvdWuhyPXVSlKnJz2k3Th6vC4Ts=
+Content-Type: text/plain; charset="iso-8859-2"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 41b1d1be-dc50-4465-fea0-08d6c26a716e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Apr 2019 12:52:54.3334
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3565
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 4/16/19 4:09 PM, Paolo Bonzini wrote:
-> Useful does not mean secure, does it?  PKZIP encryption was certainly
-> useful back in the day, but it was not secure.
-> 
-
-Thanks for the comments, quite understand the concern about security
-because it is indeed so important. Many people may not hear about
-SM2, so it is natural to doubt its security. Actually SM2 is not just China
-standard, it is also ISO/IEC standard, this fact should give us some
-confidence about its security.
-
-You can get more information about SM2 from below ISO/IEC specification.
-https://www.iso.org/obp/ui/#iso:std:iso-iec:14888:-3:ed-4:v1:en
-
--- 
-Thanks
-Harry
+On 4/11/2019 11:51 AM, Herbert Xu wrote:=0A=
+> This patch forbids the use of 2-key 3DES (K1 =3D=3D K3) in FIPS mode.=0A=
+> =0A=
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>=0A=
+Reviewed-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
+=0A=
+Thanks,=0A=
+Horia=0A=
