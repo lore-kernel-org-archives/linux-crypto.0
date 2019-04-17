@@ -2,65 +2,76 @@ Return-Path: <SRS0=UJZd=ST=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,MAILING_LIST_MULTI,SPF_PASS,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C303C282DA
-	for <linux-crypto@archiver.kernel.org>; Wed, 17 Apr 2019 21:43:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A15B8C282DC
+	for <linux-crypto@archiver.kernel.org>; Wed, 17 Apr 2019 21:43:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E1FA821850
-	for <linux-crypto@archiver.kernel.org>; Wed, 17 Apr 2019 21:43:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1555537386;
-	bh=ZDYF9MmkDwVXPLD9tGwvHjnwgVWR7XCwLmA+c6IwAYE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=qP/5ctsTGh2l+1ledGfD5SMhRRlIT5PYtAH1khUgNbTJHuCMni/uTbIzqv9KopbrV
-	 tL4EDSylW125swh2eeHd8VOQxRKcdzHpGwst6H9GEkLnwwGL7jCDd/EoJiaLu4fGWl
-	 rPPrsC4r2IAYCgEW3p44aWSag0rdSGjl5tLPh71w=
+	by mail.kernel.org (Postfix) with ESMTP id 61AE621850
+	for <linux-crypto@archiver.kernel.org>; Wed, 17 Apr 2019 21:43:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tVFA7q38"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387577AbfDQVnE (ORCPT
+        id S2387797AbfDQVnX (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 17 Apr 2019 17:43:04 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53042 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387761AbfDQVnB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 17 Apr 2019 17:43:01 -0400
-Received: from gmail.com (unknown [104.132.1.77])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id A1C9B2183F;
-        Wed, 17 Apr 2019 21:43:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1555537380;
-        bh=ZDYF9MmkDwVXPLD9tGwvHjnwgVWR7XCwLmA+c6IwAYE=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=bC02v1jMImpWuwZsb/JUm4KuO6p/F9JOo8dg77oQ9Mr/vuswvdDytQjRVHtdX0Oly
-         uRE2jXHv0jGOBXwKF3OUNjxL4ejD8VMkXIG7aue9z2d8WrD41NU9pmUvCR9EmFCWkJ
-         fZcXh5nRQXUn2+RqfQPhnNgQBjWALVYxYBkziwNE=
-Date:   Wed, 17 Apr 2019 14:42:59 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Pascal Van Leeuwen <pvanleeuwen@insidesecure.com>
-Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Question regarding crypto scatterlists / testmgr
-Message-ID: <20190417214257.GB96242@gmail.com>
-References: <AM6PR09MB352386B26E3F632D6FE2FDDDD2250@AM6PR09MB3523.eurprd09.prod.outlook.com>
- <20190417202407.GA96242@gmail.com>
- <AM6PR09MB3523FD88FE64E10B78B555F4D2250@AM6PR09MB3523.eurprd09.prod.outlook.com>
+        Wed, 17 Apr 2019 17:43:23 -0400
+Received: from mail-it1-f193.google.com ([209.85.166.193]:36067 "EHLO
+        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387792AbfDQVnW (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 17 Apr 2019 17:43:22 -0400
+Received: by mail-it1-f193.google.com with SMTP id y10so220987itc.1
+        for <linux-crypto@vger.kernel.org>; Wed, 17 Apr 2019 14:43:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Vj7CxloxlcVufAsUkWs/c66CTnAWrEgC8z8/84E1x0k=;
+        b=tVFA7q380yABsNaOlIBJUMVcvCcAHyTFnAtUReKW1+z1Tm//P7hLZqhFbhDZkCJv0u
+         E1kNY6VWFHtRmiALt0AnJeYpb2O2KhrWZA5o5/Vu9MX0TuLVqVDtFvv3C6asGJ9vTqtN
+         xGlH4k1ALN5b2SIMgg0D0YyyaMcvJ39/qccQaxE/is5eCRNh9ugTv6TCTWFbufvoXqE0
+         pZmc4crEYmslU+YS7Z+rQWAtGun7VIMBk0B7FeaHCZs7jsbZSYFYeIpzsHcIvLAqwlMw
+         OcM9d8TE1jSYn8ml1yM0ies9j+drhqIXs3JmocsKMm/CwOoWNHg428AiAQwiMnhAUWIc
+         dSkw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Vj7CxloxlcVufAsUkWs/c66CTnAWrEgC8z8/84E1x0k=;
+        b=sGyir5TkdE2nAWGfP6aangCTt9f7EO39T1+IpSL7IGJtHzrAaToZfVcBN+VJUHoS2H
+         GNobxpB+DjjKstTocK0noDw0a06wA2epx+ypu0ANLbzyr9AdlYpYmYr+z8tRSR4PJn6+
+         IjFDXbcOczRPAsfQc0WxYy4AxOsBbs3msaD/dV0G6W69u4xqaTrNnFcJXB1w9aS8MxIS
+         anBRVcDYJu7lNNyBszSAUWHJzN/HbvF+MRpetbCCqwASiuFgNqVAU2cN+zirlV1gGX1+
+         JYOl6uStVcdJwjBeccAo4wYEfzru2pXlfooRUYbGxY+7wQlMqcU29nASEv7M8nHAoMx4
+         ZdZQ==
+X-Gm-Message-State: APjAAAWdA0DikXfP8HSEj3qR///G7IjD+H4YyNWLTrsOTlyrEWMlDttT
+        BAx3PgBkzlRYgAF5QsHHnGLRg/qOhVE+Pge6cTnLmw==
+X-Google-Smtp-Source: APXvYqzVES8/xCQiB7Ss65nWhHoe905HspZYDglFq87hqwFEentCFru63ILkQY1WiIPcvZ4bV/8yT179GN7fJPaBy7M=
+X-Received: by 2002:a24:1312:: with SMTP id 18mr589995itz.121.1555537401703;
+ Wed, 17 Apr 2019 14:43:21 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <AM6PR09MB352386B26E3F632D6FE2FDDDD2250@AM6PR09MB3523.eurprd09.prod.outlook.com>
+ <20190417202407.GA96242@gmail.com> <AM6PR09MB3523FD88FE64E10B78B555F4D2250@AM6PR09MB3523.eurprd09.prod.outlook.com>
 In-Reply-To: <AM6PR09MB3523FD88FE64E10B78B555F4D2250@AM6PR09MB3523.eurprd09.prod.outlook.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date:   Wed, 17 Apr 2019 14:43:10 -0700
+Message-ID: <CAKv+Gu9AztOdP2GfR-DBTfTcgjJrjMJ7HbApWG-EpPjpSfn16A@mail.gmail.com>
+Subject: Re: Question regarding crypto scatterlists / testmgr
+To:     Pascal Van Leeuwen <pvanleeuwen@insidesecure.com>
+Cc:     Eric Biggers <ebiggers@kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Pascal,
-
-On Wed, Apr 17, 2019 at 09:16:54PM +0000, Pascal Van Leeuwen wrote:
+On Wed, 17 Apr 2019 at 14:17, Pascal Van Leeuwen
+<pvanleeuwen@insidesecure.com> wrote:
+>
 > > -----Original Message-----
 > > From: Eric Biggers [mailto:ebiggers@kernel.org]
 > > Sent: Wednesday, April 17, 2019 10:24 PM
@@ -117,13 +128,16 @@ On Wed, Apr 17, 2019 at 09:16:54PM +0000, Pascal Van Leeuwen wrote:
 > So I think it just ensures the pages are actually flushed to memory
 > and accessible by the device (in case an IOMMU interferes) and not
 > much than that.
-> 
+>
 > In any case, scatter particles to be used by hardware should *not*
 > cross any physical page boundaries.
 > But also see the thread I had on this with Ard - seems like the crypto
 > API already has some mechanism for enforcing this but it's not enabled
 > for AEAD ciphers?
-> 
+>
+
+It has simply never been implemented because nobody had a need for it.
+
 > >
 > > BTW, this isn't just a theoretical case.  Many crypto API users do
 > > crypto on
@@ -138,7 +152,17 @@ On Wed, Apr 17, 2019 at 09:16:54PM +0000, Pascal Van Leeuwen wrote:
 > So for hardware, you need to break down your buffers until individual
 > pages and stitch those together. That's the main use case of a scatter
 > list and it requires the particles to NOT cross physical pages.
-> 
+>
+
+kmalloc() is guaranteed to return physically contiguous memory, but
+assuming that this results in contiguous DMA memory requires the DMA
+map call to cover the whole thing, or the IOMMU may end up mapping it
+in some other way.
+
+The safe approach (which the async walk seems to take) is just to
+carve up each scatterlist entry so it does not cross any page
+boundaries, and return it as discrete steps in the walk.
+
 > > The fact that these types of issues are just being considered now
 > > certainly
 > > isn't raising my confidence in the hardware crypto drivers in the
@@ -147,14 +171,14 @@ On Wed, Apr 17, 2019 at 09:16:54PM +0000, Pascal Van Leeuwen wrote:
 > Actually, this is *not* a problem with the hardware drivers. It's a
 > problem with the API and/or how you are trying to use it. Hardware
 > does NOT see the nice contiguous virtual memory that SW sees.
-> 
+>
+> If the driver may expect to receive particles that cross page
+> boundaries - if that's the spec - fine, but then it will have to
+> break those down into individual pages by itself. However, whomever
+> created the inside-secure driver was under the impression that this
+> was not supposed to be the case. And I don't know who's right or
+> wrong there, but from a side discussion with Ard I got the impression
+> that the Crypto API should fix this up before it reaches the driver.
+>
 
-I don't understand why you keep talking about virtual memory.  The memory in
-each scatterlist element is referenced by struct page, not by virtual address.
-It may cross page boundaries; however, all pages referenced by each element are
-guaranteed to be adjacent, i.e. physically contiguous.  Am I missing something?
-
-Note that memory allocated by kmalloc() is both virtually and physically
-contigious.  That's why it works to use sg_init_one() on a kmalloc()'ed buffer.
-
-- Eric
+To be clear, is that driver upstream? And if so, where does it reside?
