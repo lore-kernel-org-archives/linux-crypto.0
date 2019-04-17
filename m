@@ -2,175 +2,111 @@ Return-Path: <SRS0=UJZd=ST=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B3E7C282DA
-	for <linux-crypto@archiver.kernel.org>; Wed, 17 Apr 2019 14:48:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9D0EC282DA
+	for <linux-crypto@archiver.kernel.org>; Wed, 17 Apr 2019 19:51:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DD3E22173C
-	for <linux-crypto@archiver.kernel.org>; Wed, 17 Apr 2019 14:48:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 756FF205C9
+	for <linux-crypto@archiver.kernel.org>; Wed, 17 Apr 2019 19:51:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=insidesecure.onmicrosoft.com header.i=@insidesecure.onmicrosoft.com header.b="ekW8lWBS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732105AbfDQOsA (ORCPT
+        id S1730037AbfDQTvM (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 17 Apr 2019 10:48:00 -0400
-Received: from bhuna.collabora.co.uk ([46.235.227.227]:55720 "EHLO
-        bhuna.collabora.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729940AbfDQOr7 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 17 Apr 2019 10:47:59 -0400
-Received: from [IPv6:2a02:ab04:3b9:5e00::3] (2a02-ab04-03b9-5e00-0000-0000-0000-0003.dynamic.v6.chello.sk [IPv6:2a02:ab04:3b9:5e00::3])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        (Authenticated sender: andrewsh)
-        by bhuna.collabora.co.uk (Postfix) with ESMTPSA id 05E1627D805;
-        Wed, 17 Apr 2019 15:47:56 +0100 (BST)
-Subject: Re: [PATCH v3] HID: add driver for U2F Zero built-in LED and RNG
-To:     Jiri Kosina <jikos@kernel.org>
-Cc:     Benjamin Tissoires <benjamin.tissoires@gmail.com>,
-        linux-input <linux-input@vger.kernel.org>,
-        linux-usb@vger.kernel.org,
-        Andrzej Pietrasiewicz <andrzej.p@collabora.com>,
-        kernel@collabora.com, linux-crypto@vger.kernel.org
-References: <20190401124200.17331-1-andrew.shadura@collabora.co.uk>
- <nycvar.YFH.7.76.1904101400520.9803@cbobk.fhfr.pm>
- <CAN+gG=H6TGtB68-XJ+Pg53EhL_M2m8MG1z33Yenvd9PhXJ=Oqw@mail.gmail.com>
- <nycvar.YFH.7.76.1904111234080.9803@cbobk.fhfr.pm>
- <d33b8772-bae6-1d20-8ff0-3397095f6e4b@collabora.co.uk>
- <nycvar.YFH.7.76.1904171642020.9803@cbobk.fhfr.pm>
-From:   Andrej Shadura <andrew.shadura@collabora.co.uk>
-Openpgp: preference=signencrypt
-Autocrypt: addr=andrew.shadura@collabora.co.uk; prefer-encrypt=mutual;
- keydata=
- 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
- Ooa/yj03j5gtPgECL7c=
-Organization: Collabora
-Message-ID: <3d07beba-2cd7-8d84-947e-095897fb3e0c@collabora.co.uk>
-Date:   Wed, 17 Apr 2019 16:47:54 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        Wed, 17 Apr 2019 15:51:12 -0400
+Received: from mail-eopbgr80098.outbound.protection.outlook.com ([40.107.8.98]:5186
+        "EHLO EUR04-VI1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729291AbfDQTvM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 17 Apr 2019 15:51:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=insidesecure.onmicrosoft.com; s=selector1-insidesecure-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=1urD/FJKz+EyoqgdDDHfBmFKXCGsFPYsT1rIgT0vT6k=;
+ b=ekW8lWBSaVbdi2tV2QzDR7ZCW8dCdGYO/exEn9kcZ02kkAuIEO6D9VmMnMx4D8lcELd8M0fO5SEmal8fkDA3n7fQYldmZlnByfSks9ZZo+caywjK1Cfz4/iea9161NTbPNWY/iOvGihh5nxNeuRPytA86YyWDjygUfrgnlII2/c=
+Received: from AM6PR09MB3523.eurprd09.prod.outlook.com (10.255.99.206) by
+ AM6SPR01MB01.eurprd09.prod.outlook.com (52.133.25.28) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1813.11; Wed, 17 Apr 2019 19:51:08 +0000
+Received: from AM6PR09MB3523.eurprd09.prod.outlook.com
+ ([fe80::94e3:32d7:8d9e:6fbd]) by AM6PR09MB3523.eurprd09.prod.outlook.com
+ ([fe80::94e3:32d7:8d9e:6fbd%5]) with mapi id 15.20.1813.011; Wed, 17 Apr 2019
+ 19:51:08 +0000
+From:   Pascal Van Leeuwen <pvanleeuwen@insidesecure.com>
+To:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Question regarding crypto scatterlists / testmgr
+Thread-Topic: Question regarding crypto scatterlists / testmgr
+Thread-Index: AdT1UrNnwXz5dYegQq+/zS0mWvhdgA==
+Date:   Wed, 17 Apr 2019 19:51:08 +0000
+Message-ID: <AM6PR09MB352386B26E3F632D6FE2FDDDD2250@AM6PR09MB3523.eurprd09.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=pvanleeuwen@insidesecure.com; 
+x-originating-ip: [188.204.2.113]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 7fe0c836-0e93-43b7-d378-08d6c36e0905
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(5600141)(711020)(4605104)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);SRVR:AM6SPR01MB01;
+x-ms-traffictypediagnostic: AM6SPR01MB01:
+x-microsoft-antispam-prvs: <AM6SPR01MB01289BB672273F71C4C9EAD2250@AM6SPR01MB01.eurprd09.prod.outlook.com>
+x-forefront-prvs: 0010D93EFE
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(396003)(136003)(376002)(346002)(366004)(39850400004)(52314003)(199004)(189003)(8676002)(26005)(81166006)(81156014)(5660300002)(256004)(14444005)(7736002)(52536014)(8936002)(25786009)(97736004)(102836004)(305945005)(71190400001)(186003)(33656002)(53936002)(68736007)(476003)(74316002)(9686003)(486006)(55016002)(6436002)(6506007)(2906002)(99286004)(66066001)(86362001)(478600001)(6116002)(3846002)(71200400001)(105586002)(106356001)(110136005)(7696005)(316002)(14454004)(2501003);DIR:OUT;SFP:1102;SCL:1;SRVR:AM6SPR01MB01;H:AM6PR09MB3523.eurprd09.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: insidesecure.com does not
+ designate permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: CVq0lJRGEOizGSyPVg1xXQ/DZDOKdJcMbGVzSy8YKtagFUeVIgSrVzuNboUcwy4VkhHWsdpN+9UZthE1Dppjxv7QOlFQUSMzpI7VRsq2dXvU1mK9gE8JZ059jr5AexkvRCUWmcolSv0IrTzxmFp/V9D0kHiS+S03WCwvsyycnVignmYkrdpkDN+6GglUiKbaHsQqAEYg5wDU4F51m8BE05DtPkd1O6CPMgZ/v3Ir0FstjeVhgRv/JhK9E3pq+y9hf5UqcQO6BWZ6qBUGcribZR1vmiDJ5JfjgTs3i7JI7hmN6Ci9JUyhSh2J0c0B/Ah4RA4Qky8IrRtdhCja3BOY4HaHiVS8SQbBmSRCE34jeS0XKNqSV2un+11QRPMMvDTXjorNDtqay+DQTEJFNs5NEUXQvT++yezhguPkFDyGbo4=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <nycvar.YFH.7.76.1904171642020.9803@cbobk.fhfr.pm>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: insidesecure.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7fe0c836-0e93-43b7-d378-08d6c36e0905
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Apr 2019 19:51:08.3748
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3c07df58-7760-4e85-afd5-84803eac70ce
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6SPR01MB01
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 17/04/2019 16:43, Jiri Kosina wrote:
-> On Thu, 11 Apr 2019, Andrej Shadura wrote:
-> 
->>>>> So I still am not really happy about this being wired up into generic HID
->>>>> although it's really a USB driver, but we've discussed that already, and I
->>>>> don't see any option that'd work substantially better in this case,
->>>>> especially from the UX point of view. Oh well. Applied to for-5.2/u2fzero,
->>>>> thanks!
->>>>>
->>>>
->>>> Hi wish I were CC-ed on these threads.
->>>
->>> Gah, for some reason I was convinced you were.
->>>
->>>> My CI script now fails because hid-u2fzero.ko needs devm_hwrng_register 
->>>> and the Kconfig doesn't force pulling the right dependency.
->>
->>>> Also, you probably want to add in .probe() a check for the actual 
->>>> transport driver (`hid_is_using_ll_driver(hdev, &usb_hid_driver)`) or 
->>>> you can not use the usbhid functions without crashing the kernel.
->>
->> Thanks, that’s very useful.
->>
->>> Benjamin, I love your CI :)
->>>
->>> Andrej, could you please send fixups on top of the applied patch?
->>
->> Sure, will do.
-> 
-> I didn't receive any followup; the Kconfig dependency has already been 
-> fixed by Mao Wenan, and I've just queued the patch below on top of that as 
-> well.
+Hi,
 
-Sorry, I’ve had too much on my plate in the recent days, so I’ve
-unfortunately been pushing this task off a bit. Thanks to both of you,
-Mao and Jiří, both things should have really been done by me. I’ll try
-to get those things right from the beginning the next time.
+I'm trying to fix the inside-secure driver to pass all testmgr
+tests and I have one final issue remaining with the AEAD ciphers.
+As it was not clear at all what the exact problem was, I spent
+some time reverse engineering testmgr and I got the distinct
+impression that it is using scatter particles that cross page
+boundaries. On purpose, even.
 
-> From: Jiri Kosina <jkosina@suse.cz>
-> Subject: [PATCH] HID: u2fzero: fail probe if not using USB transport
-> 
-> u2fzero driver is USB-only. Therefore we have to give up in ->probe()
-> callback in case we're called with non-USB transport driver bound,
-> otherwise the kernel will crash trying to use USBHID API on a non-USB
-> transport.
-> 
-> Fixes: 42337b9d4d958("HID: add driver for U2F Zero built-in LED and RNG")
-> Reported-by: Benjamin Tissoires <benjamin.tissoires@redhat.com>
-> Signed-off-by: Jiri Kosina <jkosina@suse.cz>
-> ---
->  drivers/hid/hid-u2fzero.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/drivers/hid/hid-u2fzero.c b/drivers/hid/hid-u2fzero.c
-> index d11a5cb56a0d..95e0807878c7 100644
-> --- a/drivers/hid/hid-u2fzero.c
-> +++ b/drivers/hid/hid-u2fzero.c
-> @@ -286,6 +286,9 @@ static int u2fzero_probe(struct hid_device *hdev,
->  	unsigned int minor;
->  	int ret;
->  
-> +	if (!hid_is_using_ll_driver(hdev, &usb_hid_driver))
-> +		return -EINVAL;
-> +
->  	dev = devm_kzalloc(&hdev->dev, sizeof(*dev), GFP_KERNEL);
->  	if (dev == NULL)
->  		return -ENOMEM;
-> 
+While the inside-secure driver is built on the premise that
+scatter particles are continuous in device space. As I can't
+think of any reason why you would want to scatter/gather other
+than to handle virtual-to-physical address translation ...
+In any case, this should affect all other other operations as
+well, but maybe those just got "lucky" by getting particles
+that were still contiguous in device space, despite the page
+crossing (to *really* verify this, you would have to fully
+randomize your page allocation!)
 
+Anyway, assuming that I *should* be able to handle particles
+that are *not* contiguous in device space, then there should
+probably already exist some function in the kernel API that
+converts a scatterlist with non-contiguous particles into a
+scatterlist with contiguous particles, taking into account the
+presence of an IOMMU? Considering pretty much every device
+driver would need to do that?
+Does anyone know which function(s) to use for that?
 
--- 
-Cheers,
-  Andrej
+Regards,
+Pascal van Leeuwen
+Silicon IP Architect, Multi-Protocol Engines @ Inside Secure
+
