@@ -2,162 +2,130 @@ Return-Path: <SRS0=UJZd=ST=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AD4DC282DA
-	for <linux-crypto@archiver.kernel.org>; Wed, 17 Apr 2019 11:17:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A77AC282DC
+	for <linux-crypto@archiver.kernel.org>; Wed, 17 Apr 2019 14:43:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5A99A206BA
-	for <linux-crypto@archiver.kernel.org>; Wed, 17 Apr 2019 11:17:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="hNk8654g";
-	dkim=pass (1024-bit key) header.d=marvell.onmicrosoft.com header.i=@marvell.onmicrosoft.com header.b="ojjdhiCk"
+	by mail.kernel.org (Postfix) with ESMTP id 3BC37206BA
+	for <linux-crypto@archiver.kernel.org>; Wed, 17 Apr 2019 14:43:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1555512203;
+	bh=TjoCet4SUdHLl6Wp5fPXa7Tc/ci7wKaxu5Nvv2sWkj8=;
+	h=Date:From:To:cc:Subject:In-Reply-To:References:List-ID:From;
+	b=KxbDrjGWxpj2cFB0h/NCy7e4FHOUb7K7lavOVVL0OTKnK3BZzRz1aLnwxemQ5I7nM
+	 jX4xzva3vjOlQdlFVd9fCvVSgsbGSqywa5fFCotSc3X1JM1UT914xtdj4ninF5Wq/b
+	 CntCGLKHLrxW9MGxAlTzgpQzPXwIjDVGpj8yGkO4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731601AbfDQLRy (ORCPT
+        id S1731996AbfDQOnW (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 17 Apr 2019 07:17:54 -0400
-Received: from mx0b-0016f401.pphosted.com ([67.231.156.173]:59492 "EHLO
-        mx0b-0016f401.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1731108AbfDQLRx (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 17 Apr 2019 07:17:53 -0400
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-        by mx0b-0016f401.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x3HBFK9a016365;
-        Wed, 17 Apr 2019 04:15:39 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : content-type : content-transfer-encoding :
- mime-version; s=pfpt0818; bh=xutHkC9rmvRNWAymcQZxVGPhajg7YcYk8ZX59U+l3xM=;
- b=hNk8654ggxhLeF6TFu4HnYYdKfBf8JiGEDFY/b4x6okHj7FThJvv+TpU9fJH7hPczen0
- qJ9saeOoIY9X2OmFkKGR5OedNLLQKcrN8B/DOoeUNmYM9I4lJbD5gBusG6mfd++E55GP
- NGcM9trwpbhznAjDqpC9BY7LM6EvmvTN2PK702p7mxzjVO66lx5OsQfzfEGD88ADliWR
- YYSaAI0wmV2wTRDXoZmmPP/gzi+TlBKMID3KPX6LXqduMj0oN9gPk88DJyLxZUd9K5z5
- RsvVPTkTCNRVCrrtS+uvJK+sEcsQVeaR2AKk7s3KQAiBqAmJma3/gjWKuJDhNYyRy/BT tQ== 
-Received: from sc-exch03.marvell.com ([199.233.58.183])
-        by mx0b-0016f401.pphosted.com with ESMTP id 2rwyuf0n93-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-        Wed, 17 Apr 2019 04:15:39 -0700
-Received: from SC-EXCH04.marvell.com (10.93.176.84) by SC-EXCH03.marvell.com
- (10.93.176.83) with Microsoft SMTP Server (TLS) id 15.0.1367.3; Wed, 17 Apr
- 2019 04:15:38 -0700
-Received: from NAM01-BY2-obe.outbound.protection.outlook.com (104.47.34.55) by
- SC-EXCH04.marvell.com (10.93.176.84) with Microsoft SMTP Server (TLS) id
- 15.0.1367.3 via Frontend Transport; Wed, 17 Apr 2019 04:15:38 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=marvell.onmicrosoft.com; s=selector1-marvell-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xutHkC9rmvRNWAymcQZxVGPhajg7YcYk8ZX59U+l3xM=;
- b=ojjdhiCkpY1kVPywyP+HpuRoJSBJLFGkqQhjRsFXeDrcODaaeJZ7EBaFQOJCvImr1xDixOMLGhVE5lBvdZ50fS6jdeO6Bp+yxjhfyEckJCfrxjR0ryUJdMzEaxd83KnouBv6Lw6bPY5S1DKLqgTaLkwgXMRZPj9TjydXrQFA4Kw=
-Received: from MN2PR18MB2797.namprd18.prod.outlook.com (20.179.22.16) by
- MN2PR18MB2686.namprd18.prod.outlook.com (20.179.81.94) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1792.19; Wed, 17 Apr 2019 11:15:33 +0000
-Received: from MN2PR18MB2797.namprd18.prod.outlook.com
- ([fe80::b044:72d8:78:7c02]) by MN2PR18MB2797.namprd18.prod.outlook.com
- ([fe80::b044:72d8:78:7c02%2]) with mapi id 15.20.1813.011; Wed, 17 Apr 2019
- 11:15:33 +0000
-From:   Nagadheeraj Rottela <rnagadheeraj@marvell.com>
-To:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>
-CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "Srikanth Jampala" <jsrikanth@marvell.com>,
-        Nagadheeraj Rottela <rnagadheeraj@marvell.com>
-Subject: [PATCH] crypto: cavium/nitrox - Fix HW family part name format
-Thread-Topic: [PATCH] crypto: cavium/nitrox - Fix HW family part name format
-Thread-Index: AQHU9Q7fqhqTzsK8q0iLLC/zvoPvKw==
-Date:   Wed, 17 Apr 2019 11:15:33 +0000
-Message-ID: <20190417111503.16618-1-rnagadheeraj@marvell.com>
-Accept-Language: en-IN, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: BMXPR01CA0070.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:b00:2c::34) To MN2PR18MB2797.namprd18.prod.outlook.com
- (2603:10b6:208:a0::16)
-x-ms-exchange-messagesentrepresentingtype: 1
-x-mailer: git-send-email 2.13.6
-x-originating-ip: [115.113.156.2]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: c136fdf5-8b59-42aa-75b5-08d6c326020e
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(5600140)(711020)(4605104)(2017052603328)(7193020);SRVR:MN2PR18MB2686;
-x-ms-traffictypediagnostic: MN2PR18MB2686:
-x-microsoft-antispam-prvs: <MN2PR18MB268651AF7F4572E69CF8574BD6250@MN2PR18MB2686.namprd18.prod.outlook.com>
-x-forefront-prvs: 0010D93EFE
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(376002)(346002)(396003)(366004)(39860400002)(136003)(189003)(199004)(106356001)(305945005)(102836004)(26005)(53936002)(6512007)(7736002)(107886003)(105586002)(4326008)(71200400001)(71190400001)(186003)(99286004)(256004)(2616005)(476003)(1076003)(486006)(6436002)(6486002)(110136005)(54906003)(316002)(66066001)(55236004)(2906002)(5660300002)(25786009)(97736004)(14454004)(478600001)(3846002)(6116002)(2501003)(36756003)(8936002)(81166006)(52116002)(68736007)(86362001)(386003)(6506007)(50226002)(81156014)(8676002);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR18MB2686;H:MN2PR18MB2797.namprd18.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: marvell.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: hVXz5mLCWs4r+JrEpkgRVfq7+GXHPSOcRatyhEuZJakFI5ydK8ZSHcCYK02xUF0YQ7DT1FEO6oHIuU6/tzTMMcMbFUjEOzJusFJkL9fL9mioP/hPNvvdIFw4nmP7fc1j7p8QtQ/7AEI668qilc99uQXgMvcPFHzIr04Hy8JmcnGCkpgJwFbKb7AHY0I4MqikbEAq4nrfr0kdX9dkk9OXFpy37kSK9KoNHn+0l+VSGYGNQ+OqfgwlP/moKgEyk+oZM6YeIUZbwMmG16DxK1i0OxM9zUlkJ7j3FZ+1+TvcM2/K302cWxBub4Hwlu++4mSOMa+eZFLbSDCfoXbtn76MckNKn6jlpRcoEp2gPjqGQ2rDiTIFSPpZeuvhup2wCUnhjdk7Leg0eYe8ZZr5+7UH9GHovtX0O8VIWZqkiM6QQ8k=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        Wed, 17 Apr 2019 10:43:22 -0400
+Received: from mail.kernel.org ([198.145.29.99]:51590 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731454AbfDQOnV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 17 Apr 2019 10:43:21 -0400
+Received: from pobox.suse.cz (prg-ext-pat.suse.com [213.151.95.130])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id AA54620663;
+        Wed, 17 Apr 2019 14:43:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1555512201;
+        bh=TjoCet4SUdHLl6Wp5fPXa7Tc/ci7wKaxu5Nvv2sWkj8=;
+        h=Date:From:To:cc:Subject:In-Reply-To:References:From;
+        b=WnaCyzlw0hAvSgdL1MzzxITKhZ3vts2t96vM199i1eCTWcs4e//mw6QGi6O5iFBQm
+         shr+3smuIDFQ9MJMjHzEZJnIr+mLPX9ouXoh+gCDwdeQqdQcbArjqxkLpkftV8SiHy
+         4xs6v5LrPDuFfdwRAPH94QC+mduniFqR0XDggbno=
+Date:   Wed, 17 Apr 2019 16:43:17 +0200 (CEST)
+From:   Jiri Kosina <jikos@kernel.org>
+To:     Andrej Shadura <andrew.shadura@collabora.co.uk>
+cc:     Benjamin Tissoires <benjamin.tissoires@gmail.com>,
+        linux-input <linux-input@vger.kernel.org>,
+        linux-usb@vger.kernel.org,
+        Andrzej Pietrasiewicz <andrzej.p@collabora.com>,
+        kernel@collabora.com, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v3] HID: add driver for U2F Zero built-in LED and RNG
+In-Reply-To: <d33b8772-bae6-1d20-8ff0-3397095f6e4b@collabora.co.uk>
+Message-ID: <nycvar.YFH.7.76.1904171642020.9803@cbobk.fhfr.pm>
+References: <20190401124200.17331-1-andrew.shadura@collabora.co.uk> <nycvar.YFH.7.76.1904101400520.9803@cbobk.fhfr.pm> <CAN+gG=H6TGtB68-XJ+Pg53EhL_M2m8MG1z33Yenvd9PhXJ=Oqw@mail.gmail.com> <nycvar.YFH.7.76.1904111234080.9803@cbobk.fhfr.pm>
+ <d33b8772-bae6-1d20-8ff0-3397095f6e4b@collabora.co.uk>
+User-Agent: Alpine 2.21 (LSU 202 2017-01-01)
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-Network-Message-Id: c136fdf5-8b59-42aa-75b5-08d6c326020e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Apr 2019 11:15:33.2741
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR18MB2686
-X-OriginatorOrg: marvell.com
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-04-17_05:,,
- signatures=0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-VGhpcyBwYXRjaCBmaXhlcyB0aGUgTklUUk9YLVYgZmFtaWx5IHBhcnQgbmFtZSBmb3JtYXQuIFRo
-ZSBmaXggaW5jbHVkZXMNClpJUCBjb3JlIHBlcmZvcm1hbmNlIChmZWF0dXJlIG9wdGlvbikgaW4g
-dGhlIHBhcnQgbmFtZSB0byBkaWZmZXJlbnRpYXRlDQp2YXJpb3VzIEhXIGRldmljZXMuIFRoZSBj
-b21wbGV0ZSBIVyBwYXJ0IG5hbWUgZm9ybWF0IGlzIG1lbnRpb25lZCBiZWxvdw0KDQpQYXJ0IG5h
-bWU6IENOTjU1PGNvcmUgb3B0aW9uPi08ZnJlcT5CRzY3Ni08ZmVhdHVyZSBvcHRpb24+LTxyZXY+
-DQoNClNpZ25lZC1vZmYtYnk6IE5hZ2FkaGVlcmFqIFJvdHRlbGEgPHJuYWdhZGhlZXJhakBtYXJ2
-ZWxsLmNvbT4NClJldmlld2VkLWJ5OiBTcmlrYW50aCBKYW1wYWxhIDxqc3Jpa2FudGhAbWFydmVs
-bC5jb20+DQotLS0NCiBkcml2ZXJzL2NyeXB0by9jYXZpdW0vbml0cm94L25pdHJveF9oYWwuYyB8
-IDY1ICsrKysrKysrKysrKysrKysrKysrKystLS0tLS0tLS0NCiAxIGZpbGUgY2hhbmdlZCwgNDcg
-aW5zZXJ0aW9ucygrKSwgMTggZGVsZXRpb25zKC0pDQoNCmRpZmYgLS1naXQgYS9kcml2ZXJzL2Ny
-eXB0by9jYXZpdW0vbml0cm94L25pdHJveF9oYWwuYyBiL2RyaXZlcnMvY3J5cHRvL2Nhdml1bS9u
-aXRyb3gvbml0cm94X2hhbC5jDQppbmRleCBjMDhkOWYzM2EzYjEuLjNmMGRmNjAyNjdhOSAxMDA2
-NDQNCi0tLSBhL2RyaXZlcnMvY3J5cHRvL2Nhdml1bS9uaXRyb3gvbml0cm94X2hhbC5jDQorKysg
-Yi9kcml2ZXJzL2NyeXB0by9jYXZpdW0vbml0cm94L25pdHJveF9oYWwuYw0KQEAgLTQzNyw2ICs0
-MzcsNDUgQEAgdm9pZCBjb25maWdfbnBzX2NvcmVfdmZjZmdfbW9kZShzdHJ1Y3Qgbml0cm94X2Rl
-dmljZSAqbmRldiwgZW51bSB2Zl9tb2RlIG1vZGUpDQogCW5pdHJveF93cml0ZV9jc3IobmRldiwg
-TlBTX0NPUkVfR0JMX1ZGQ0ZHLCB2ZmNmZy52YWx1ZSk7DQogfQ0KIA0KK3N0YXRpYyBjb25zdCBj
-aGFyICpnZXRfY29yZV9vcHRpb24odTggc2VfY29yZXMsIHU4IGFlX2NvcmVzKQ0KK3sNCisJY29u
-c3QgY2hhciAqb3B0aW9uID0gIiI7DQorDQorCWlmIChhZV9jb3JlcyA9PSBBRV9NQVhfQ09SRVMp
-IHsNCisJCXN3aXRjaCAoc2VfY29yZXMpIHsNCisJCWNhc2UgU0VfTUFYX0NPUkVTOg0KKwkJCW9w
-dGlvbiA9ICI2MCI7DQorCQkJYnJlYWs7DQorCQljYXNlIDQwOg0KKwkJCW9wdGlvbiA9ICI2MHMi
-Ow0KKwkJCWJyZWFrOw0KKwkJfQ0KKwl9IGVsc2UgaWYgKGFlX2NvcmVzID09IChBRV9NQVhfQ09S
-RVMgLyAyKSkgew0KKwkJb3B0aW9uID0gIjMwIjsNCisJfSBlbHNlIHsNCisJCW9wdGlvbiA9ICI2
-MGkiOw0KKwl9DQorDQorCXJldHVybiBvcHRpb247DQorfQ0KKw0KK3N0YXRpYyBjb25zdCBjaGFy
-ICpnZXRfZmVhdHVyZV9vcHRpb24odTggemlwX2NvcmVzLCBpbnQgY29yZV9mcmVxKQ0KK3sNCisJ
-aWYgKHppcF9jb3JlcyA9PSAwKQ0KKwkJcmV0dXJuICIiOw0KKwllbHNlIGlmICh6aXBfY29yZXMg
-PCBaSVBfTUFYX0NPUkVTKQ0KKwkJcmV0dXJuICItQzE1IjsNCisNCisJaWYgKGNvcmVfZnJlcSA+
-PSA4NTApDQorCQlyZXR1cm4gIi1DNDUiOw0KKwllbHNlIGlmIChjb3JlX2ZyZXEgPj0gNzUwKQ0K
-KwkJcmV0dXJuICItQzM1IjsNCisJZWxzZSBpZiAoY29yZV9mcmVxID49IDU1MCkNCisJCXJldHVy
-biAiLUMyNSI7DQorDQorCXJldHVybiAiIjsNCit9DQorDQogdm9pZCBuaXRyb3hfZ2V0X2h3aW5m
-byhzdHJ1Y3Qgbml0cm94X2RldmljZSAqbmRldikNCiB7DQogCXVuaW9uIGVtdV9mdXNlX21hcCBl
-bXVfZnVzZTsNCkBAIC00NjksMjQgKzUwOCwxNCBAQCB2b2lkIG5pdHJveF9nZXRfaHdpbmZvKHN0
-cnVjdCBuaXRyb3hfZGV2aWNlICpuZGV2KQ0KIAkJbmRldi0+aHcuemlwX2NvcmVzID0gWklQX01B
-WF9DT1JFUyAtIGRlYWRfY29yZXM7DQogCX0NCiANCi0JLyogZGV0ZXJtaW5lIHRoZSBwYXJ0bmFt
-ZSBDTk41NTxjb3Jlcz4tPGZyZXE+PHBpbmNvdW50Pi08cmV2PiovDQotCWlmIChuZGV2LT5ody5h
-ZV9jb3JlcyA9PSBBRV9NQVhfQ09SRVMpIHsNCi0JCXN3aXRjaCAobmRldi0+aHcuc2VfY29yZXMp
-IHsNCi0JCWNhc2UgU0VfTUFYX0NPUkVTOg0KLQkJCWkgPSBzbnByaW50ZihuYW1lLCBzaXplb2Yo
-bmFtZSksICJDTk41NTYwIik7DQotCQkJYnJlYWs7DQotCQljYXNlIDQwOg0KLQkJCWkgPSBzbnBy
-aW50ZihuYW1lLCBzaXplb2YobmFtZSksICJDTk41NTYwcyIpOw0KLQkJCWJyZWFrOw0KLQkJfQ0K
-LQl9IGVsc2UgaWYgKG5kZXYtPmh3LmFlX2NvcmVzID09IChBRV9NQVhfQ09SRVMgLyAyKSkgew0K
-LQkJaSA9IHNucHJpbnRmKG5hbWUsIHNpemVvZihuYW1lKSwgIkNOTjU1MzAiKTsNCi0JfSBlbHNl
-IHsNCi0JCWkgPSBzbnByaW50ZihuYW1lLCBzaXplb2YobmFtZSksICJDTk41NTYwaSIpOw0KLQl9
-DQotDQotCXNucHJpbnRmKG5hbWUgKyBpLCBzaXplb2YobmFtZSkgLSBpLCAiLSUzZEJHNjc2LTEu
-JXUiLA0KLQkJIG5kZXYtPmh3LmZyZXEsIG5kZXYtPmh3LnJldmlzaW9uX2lkKTsNCisJLyogZGV0
-ZXJtaW5lIHRoZSBwYXJ0bmFtZQ0KKwkgKiBDTk41NTxjb3JlIG9wdGlvbj4tPGZyZXE+PHBpbmNv
-dW50Pi08ZmVhdHVyZSBvcHRpb24+LTxyZXY+DQorCSAqLw0KKwlzbnByaW50ZihuYW1lLCBzaXpl
-b2YobmFtZSksICJDTk41NSVzLSUzZEJHNjc2JXMtMS4ldSIsDQorCQkgZ2V0X2NvcmVfb3B0aW9u
-KG5kZXYtPmh3LnNlX2NvcmVzLCBuZGV2LT5ody5hZV9jb3JlcyksDQorCQkgbmRldi0+aHcuZnJl
-cSwNCisJCSBnZXRfZmVhdHVyZV9vcHRpb24obmRldi0+aHcuemlwX2NvcmVzLCBuZGV2LT5ody5m
-cmVxKSwNCisJCSBuZGV2LT5ody5yZXZpc2lvbl9pZCk7DQogDQogCS8qIGNvcHkgcGFydG5hbWUg
-Ki8NCiAJc3RybmNweShuZGV2LT5ody5wYXJ0bmFtZSwgbmFtZSwgc2l6ZW9mKG5kZXYtPmh3LnBh
-cnRuYW1lKSk7DQotLSANCjIuMTMuNg0KDQo=
+On Thu, 11 Apr 2019, Andrej Shadura wrote:
+
+> >>> So I still am not really happy about this being wired up into generic HID
+> >>> although it's really a USB driver, but we've discussed that already, and I
+> >>> don't see any option that'd work substantially better in this case,
+> >>> especially from the UX point of view. Oh well. Applied to for-5.2/u2fzero,
+> >>> thanks!
+> >>>
+> >>
+> >> Hi wish I were CC-ed on these threads.
+> > 
+> > Gah, for some reason I was convinced you were.
+> > 
+> >> My CI script now fails because hid-u2fzero.ko needs devm_hwrng_register 
+> >> and the Kconfig doesn't force pulling the right dependency.
+> 
+> >> Also, you probably want to add in .probe() a check for the actual 
+> >> transport driver (`hid_is_using_ll_driver(hdev, &usb_hid_driver)`) or 
+> >> you can not use the usbhid functions without crashing the kernel.
+> 
+> Thanks, that’s very useful.
+> 
+> > Benjamin, I love your CI :)
+> > 
+> > Andrej, could you please send fixups on top of the applied patch?
+> 
+> Sure, will do.
+
+I didn't receive any followup; the Kconfig dependency has already been 
+fixed by Mao Wenan, and I've just queued the patch below on top of that as 
+well.
+
+
+
+
+From: Jiri Kosina <jkosina@suse.cz>
+Subject: [PATCH] HID: u2fzero: fail probe if not using USB transport
+
+u2fzero driver is USB-only. Therefore we have to give up in ->probe()
+callback in case we're called with non-USB transport driver bound,
+otherwise the kernel will crash trying to use USBHID API on a non-USB
+transport.
+
+Fixes: 42337b9d4d958("HID: add driver for U2F Zero built-in LED and RNG")
+Reported-by: Benjamin Tissoires <benjamin.tissoires@redhat.com>
+Signed-off-by: Jiri Kosina <jkosina@suse.cz>
+---
+ drivers/hid/hid-u2fzero.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/hid/hid-u2fzero.c b/drivers/hid/hid-u2fzero.c
+index d11a5cb56a0d..95e0807878c7 100644
+--- a/drivers/hid/hid-u2fzero.c
++++ b/drivers/hid/hid-u2fzero.c
+@@ -286,6 +286,9 @@ static int u2fzero_probe(struct hid_device *hdev,
+ 	unsigned int minor;
+ 	int ret;
+ 
++	if (!hid_is_using_ll_driver(hdev, &usb_hid_driver))
++		return -EINVAL;
++
+ 	dev = devm_kzalloc(&hdev->dev, sizeof(*dev), GFP_KERNEL);
+ 	if (dev == NULL)
+ 		return -ENOMEM;
+
+-- 
+Jiri Kosina
+SUSE Labs
+
