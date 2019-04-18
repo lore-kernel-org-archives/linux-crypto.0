@@ -4,35 +4,35 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 921B7C10F0E
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Apr 2019 13:39:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C3E3C282DD
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Apr 2019 13:39:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4DAF7217FA
+	by mail.kernel.org (Postfix) with ESMTP id DFF81217FA
 	for <linux-crypto@archiver.kernel.org>; Thu, 18 Apr 2019 13:39:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389220AbfDRNjv (ORCPT
+        id S2389235AbfDRNj5 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 18 Apr 2019 09:39:51 -0400
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:33492 "EHLO
+        Thu, 18 Apr 2019 09:39:57 -0400
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:33512 "EHLO
         foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389005AbfDRNju (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 Apr 2019 09:39:50 -0400
+        id S2389005AbfDRNj4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 18 Apr 2019 09:39:56 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2DB3980D;
-        Thu, 18 Apr 2019 06:39:50 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 25F4380D;
+        Thu, 18 Apr 2019 06:39:56 -0700 (PDT)
 Received: from e110176-lin.kfn.arm.com (e110176-lin.kfn.arm.com [10.50.4.178])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 827DC3F5AF;
-        Thu, 18 Apr 2019 06:39:48 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7DDFC3F5AF;
+        Thu, 18 Apr 2019 06:39:54 -0700 (PDT)
 From:   Gilad Ben-Yossef <gilad@benyossef.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>
 Cc:     Ofir Drang <ofir.drang@arm.com>, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 05/35] crypto: ccree: add CPP completion handling
-Date:   Thu, 18 Apr 2019 16:38:40 +0300
-Message-Id: <20190418133913.9122-6-gilad@benyossef.com>
+Subject: [PATCH 06/35] crypto: ccree: add remaining logic for CPP
+Date:   Thu, 18 Apr 2019 16:38:41 +0300
+Message-Id: <20190418133913.9122-7-gilad@benyossef.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190418133913.9122-1-gilad@benyossef.com>
 References: <20190418133913.9122-1-gilad@benyossef.com>
@@ -43,436 +43,419 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add the logic needed to track and report CPP operation rejection.
-The new logic will be used by the CPP feature introduced later.
+Add the missing logic to set usage policy protections for keys.
+This enables key policy protection for AES.
 
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/crypto/ccree/cc_crypto_ctx.h  |   8 ++
- drivers/crypto/ccree/cc_driver.c      |  25 +++++--
- drivers/crypto/ccree/cc_driver.h      |  28 +++++++
- drivers/crypto/ccree/cc_host_regs.h   |  75 ++++++++++++++++++-
- drivers/crypto/ccree/cc_request_mgr.c | 103 +++++++++++++++++++-------
- 5 files changed, 200 insertions(+), 39 deletions(-)
+ drivers/crypto/ccree/cc_cipher.c        | 186 +++++++++++++++++-------
+ drivers/crypto/ccree/cc_hw_queue_defs.h |  37 +++++
+ drivers/crypto/ccree/cc_kernel_regs.h   |   6 +
+ 3 files changed, 178 insertions(+), 51 deletions(-)
 
-diff --git a/drivers/crypto/ccree/cc_crypto_ctx.h b/drivers/crypto/ccree/cc_crypto_ctx.h
-index c8dac273c563..97e56e9af01e 100644
---- a/drivers/crypto/ccree/cc_crypto_ctx.h
-+++ b/drivers/crypto/ccree/cc_crypto_ctx.h
-@@ -55,6 +55,14 @@
+diff --git a/drivers/crypto/ccree/cc_cipher.c b/drivers/crypto/ccree/cc_cipher.c
+index 8a9c664390f0..d1754d1156ee 100644
+--- a/drivers/crypto/ccree/cc_cipher.c
++++ b/drivers/crypto/ccree/cc_cipher.c
+@@ -34,6 +34,18 @@ struct cc_hw_key_info {
+ 	enum cc_hw_crypto_key key2_slot;
+ };
  
- #define CC_DRV_ALG_MAX_BLOCK_SIZE CC_HASH_BLOCK_SIZE_MAX
- 
-+#define CC_CPP_NUM_SLOTS	8
-+#define CC_CPP_NUM_ALGS		2
-+
-+enum cc_cpp_alg {
-+	CC_CPP_SM4 = 1,
-+	CC_CPP_AES = 0
-+};
-+
- enum drv_engine_type {
- 	DRV_ENGINE_NULL = 0,
- 	DRV_ENGINE_AES = 1,
-diff --git a/drivers/crypto/ccree/cc_driver.c b/drivers/crypto/ccree/cc_driver.c
-index 255d2367bfa8..1cded418f223 100644
---- a/drivers/crypto/ccree/cc_driver.c
-+++ b/drivers/crypto/ccree/cc_driver.c
-@@ -118,12 +118,12 @@ static irqreturn_t cc_isr(int irq, void *dev_id)
- 
- 	drvdata->irq = irr;
- 	/* Completion interrupt - most probable */
--	if (irr & CC_COMP_IRQ_MASK) {
--		/* Mask AXI completion interrupt - will be unmasked in
--		 * Deferred service handler
-+	if (irr & drvdata->comp_mask) {
-+		/* Mask all completion interrupts - will be unmasked in
-+		 * deferred service handler
- 		 */
--		cc_iowrite(drvdata, CC_REG(HOST_IMR), imr | CC_COMP_IRQ_MASK);
--		irr &= ~CC_COMP_IRQ_MASK;
-+		cc_iowrite(drvdata, CC_REG(HOST_IMR), imr | drvdata->comp_mask);
-+		irr &= ~drvdata->comp_mask;
- 		complete_request(drvdata);
- 	}
- #ifdef CONFIG_CRYPTO_FIPS
-@@ -175,7 +175,7 @@ int init_cc_regs(struct cc_drvdata *drvdata, bool is_probe)
- 	cc_iowrite(drvdata, CC_REG(HOST_ICR), val);
- 
- 	/* Unmask relevant interrupt cause */
--	val = CC_COMP_IRQ_MASK | CC_AXI_ERR_IRQ_MASK;
-+	val = drvdata->comp_mask | CC_AXI_ERR_IRQ_MASK;
- 
- 	if (drvdata->hw_rev >= CC_HW_REV_712)
- 		val |= CC_GPR0_IRQ_MASK;
-@@ -235,6 +235,8 @@ static int init_cc_resources(struct platform_device *plat_dev)
- 		new_drvdata->ver_offset = CC_REG(HOST_VERSION_630);
- 	}
- 
-+	new_drvdata->comp_mask = CC_COMP_IRQ_MASK;
-+
- 	platform_set_drvdata(plat_dev, new_drvdata);
- 	new_drvdata->plat_dev = plat_dev;
- 
-@@ -315,6 +317,8 @@ static int init_cc_resources(struct platform_device *plat_dev)
- 		return rc;
- 	}
- 
-+	new_drvdata->sec_disabled = cc_sec_disable;
-+
- 	if (hw_rev->rev <= CC_HW_REV_712) {
- 		/* Verify correct mapping */
- 		val = cc_ioread(new_drvdata, new_drvdata->sig_offset);
-@@ -328,10 +332,15 @@ static int init_cc_resources(struct platform_device *plat_dev)
- 	} else {
- 		val = cc_ioread(new_drvdata, CC_REG(SECURITY_DISABLED));
- 		val &= CC_SECURITY_DISABLED_MASK;
--		new_drvdata->sec_disabled = !!val;
-+		new_drvdata->sec_disabled |= !!val;
-+
-+		if (!new_drvdata->sec_disabled) {
-+			new_drvdata->comp_mask |= CC_CPP_SM4_ABORT_MASK;
-+			if (new_drvdata->std_bodies & CC_STD_NIST)
-+				new_drvdata->comp_mask |= CC_CPP_AES_ABORT_MASK;
-+		}
- 	}
- 
--	new_drvdata->sec_disabled |= cc_sec_disable;
- 	if (new_drvdata->sec_disabled)
- 		dev_info(dev, "Security Disabled mode is in effect. Security functions disabled.\n");
- 
-diff --git a/drivers/crypto/ccree/cc_driver.h b/drivers/crypto/ccree/cc_driver.h
-index b4273f1aec62..10439ce27b3b 100644
---- a/drivers/crypto/ccree/cc_driver.h
-+++ b/drivers/crypto/ccree/cc_driver.h
-@@ -76,6 +76,26 @@ enum cc_std_body {
- 				    CC_AXIM_MON_COMP_VALUE_BIT_SHIFT, \
- 				    CC_AXIM_MON_COMP_VALUE_BIT_SHIFT)
- 
-+#define CC_CPP_AES_ABORT_MASK ( \
-+	BIT(CC_HOST_IMR_REE_OP_ABORTED_AES_0_MASK_BIT_SHIFT) | \
-+	BIT(CC_HOST_IMR_REE_OP_ABORTED_AES_1_MASK_BIT_SHIFT) | \
-+	BIT(CC_HOST_IMR_REE_OP_ABORTED_AES_2_MASK_BIT_SHIFT) | \
-+	BIT(CC_HOST_IMR_REE_OP_ABORTED_AES_3_MASK_BIT_SHIFT) | \
-+	BIT(CC_HOST_IMR_REE_OP_ABORTED_AES_4_MASK_BIT_SHIFT) | \
-+	BIT(CC_HOST_IMR_REE_OP_ABORTED_AES_5_MASK_BIT_SHIFT) | \
-+	BIT(CC_HOST_IMR_REE_OP_ABORTED_AES_6_MASK_BIT_SHIFT) | \
-+	BIT(CC_HOST_IMR_REE_OP_ABORTED_AES_7_MASK_BIT_SHIFT))
-+
-+#define CC_CPP_SM4_ABORT_MASK ( \
-+	BIT(CC_HOST_IMR_REE_OP_ABORTED_SM_0_MASK_BIT_SHIFT) | \
-+	BIT(CC_HOST_IMR_REE_OP_ABORTED_SM_1_MASK_BIT_SHIFT) | \
-+	BIT(CC_HOST_IMR_REE_OP_ABORTED_SM_2_MASK_BIT_SHIFT) | \
-+	BIT(CC_HOST_IMR_REE_OP_ABORTED_SM_3_MASK_BIT_SHIFT) | \
-+	BIT(CC_HOST_IMR_REE_OP_ABORTED_SM_4_MASK_BIT_SHIFT) | \
-+	BIT(CC_HOST_IMR_REE_OP_ABORTED_SM_5_MASK_BIT_SHIFT) | \
-+	BIT(CC_HOST_IMR_REE_OP_ABORTED_SM_6_MASK_BIT_SHIFT) | \
-+	BIT(CC_HOST_IMR_REE_OP_ABORTED_SM_7_MASK_BIT_SHIFT))
-+
- /* Register name mangling macro */
- #define CC_REG(reg_name) CC_ ## reg_name ## _REG_OFFSET
- 
-@@ -97,6 +117,12 @@ enum cc_std_body {
-  * field in the HW descriptor. The DMA engine +8 that value.
-  */
- 
-+struct cc_cpp_req {
-+	bool is_cpp;
-+	enum cc_cpp_alg alg;
++struct cc_cpp_key_info {
 +	u8 slot;
++	enum cc_cpp_alg alg;
 +};
 +
- #define CC_MAX_IVGEN_DMA_ADDRESSES	3
- struct cc_crypto_req {
- 	void (*user_cb)(struct device *dev, void *req, int err);
-@@ -111,6 +137,7 @@ struct cc_crypto_req {
- 	/* The generated IV size required, 8/16 B allowed. */
- 	unsigned int ivgen_size;
- 	struct completion seq_compl; /* request completion */
-+	struct cc_cpp_req cpp;
- };
- 
- /**
-@@ -144,6 +171,7 @@ struct cc_drvdata {
- 	u32 ver_offset;
- 	int std_bodies;
- 	bool sec_disabled;
-+	u32 comp_mask;
- };
- 
- struct cc_crypto_alg {
-diff --git a/drivers/crypto/ccree/cc_host_regs.h b/drivers/crypto/ccree/cc_host_regs.h
-index c1be372a5bfe..6124b97680ac 100644
---- a/drivers/crypto/ccree/cc_host_regs.h
-+++ b/drivers/crypto/ccree/cc_host_regs.h
-@@ -7,33 +7,102 @@
- // --------------------------------------
- // BLOCK: HOST_P
- // --------------------------------------
-+
-+
-+/* IRR */
- #define CC_HOST_IRR_REG_OFFSET	0xA00UL
-+#define CC_HOST_IRR_REE_OP_ABORTED_AES_0_INT_BIT_SHIFT	0x1UL
-+#define CC_HOST_IRR_REE_OP_ABORTED_AES_0_INT_BIT_SIZE	0x1UL
- #define CC_HOST_IRR_DSCRPTR_COMPLETION_LOW_INT_BIT_SHIFT	0x2UL
- #define CC_HOST_IRR_DSCRPTR_COMPLETION_LOW_INT_BIT_SIZE	0x1UL
-+#define CC_HOST_IRR_REE_OP_ABORTED_AES_1_INT_BIT_SHIFT	0x3UL
-+#define CC_HOST_IRR_REE_OP_ABORTED_AES_1_INT_BIT_SIZE	0x1UL
-+#define CC_HOST_IRR_REE_OP_ABORTED_AES_2_INT_BIT_SHIFT	0x4UL
-+#define CC_HOST_IRR_REE_OP_ABORTED_AES_2_INT_BIT_SIZE	0x1UL
-+#define CC_HOST_IRR_REE_OP_ABORTED_AES_3_INT_BIT_SHIFT	0x5UL
-+#define CC_HOST_IRR_REE_OP_ABORTED_AES_3_INT_BIT_SIZE	0x1UL
-+#define CC_HOST_IRR_REE_OP_ABORTED_AES_4_INT_BIT_SHIFT	0x6UL
-+#define CC_HOST_IRR_REE_OP_ABORTED_AES_4_INT_BIT_SIZE	0x1UL
-+#define CC_HOST_IRR_REE_OP_ABORTED_AES_5_INT_BIT_SHIFT	0x7UL
-+#define CC_HOST_IRR_REE_OP_ABORTED_AES_5_INT_BIT_SIZE	0x1UL
- #define CC_HOST_IRR_AXI_ERR_INT_BIT_SHIFT	0x8UL
- #define CC_HOST_IRR_AXI_ERR_INT_BIT_SIZE	0x1UL
-+#define CC_HOST_IRR_REE_OP_ABORTED_AES_6_INT_BIT_SHIFT	0x9UL
-+#define CC_HOST_IRR_REE_OP_ABORTED_AES_6_INT_BIT_SIZE	0x1UL
-+#define CC_HOST_IRR_REE_OP_ABORTED_AES_7_INT_BIT_SHIFT	0xAUL
-+#define CC_HOST_IRR_REE_OP_ABORTED_AES_7_INT_BIT_SIZE	0x1UL
- #define CC_HOST_IRR_GPR0_BIT_SHIFT	0xBUL
- #define CC_HOST_IRR_GPR0_BIT_SIZE	0x1UL
-+#define CC_HOST_IRR_REE_OP_ABORTED_SM_0_INT_BIT_SHIFT	0xCUL
-+#define CC_HOST_IRR_REE_OP_ABORTED_SM_0_INT_BIT_SIZE	0x1UL
-+#define CC_HOST_IRR_REE_OP_ABORTED_SM_1_INT_BIT_SHIFT	0xDUL
-+#define CC_HOST_IRR_REE_OP_ABORTED_SM_1_INT_BIT_SIZE	0x1UL
-+#define CC_HOST_IRR_REE_OP_ABORTED_SM_2_INT_BIT_SHIFT	0xEUL
-+#define CC_HOST_IRR_REE_OP_ABORTED_SM_2_INT_BIT_SIZE	0x1UL
-+#define CC_HOST_IRR_REE_OP_ABORTED_SM_3_INT_BIT_SHIFT	0xFUL
-+#define CC_HOST_IRR_REE_OP_ABORTED_SM_3_INT_BIT_SIZE	0x1UL
-+#define CC_HOST_IRR_REE_OP_ABORTED_SM_4_INT_BIT_SHIFT	0x10UL
-+#define CC_HOST_IRR_REE_OP_ABORTED_SM_4_INT_BIT_SIZE	0x1UL
-+#define CC_HOST_IRR_REE_OP_ABORTED_SM_5_INT_BIT_SHIFT	0x11UL
-+#define CC_HOST_IRR_REE_OP_ABORTED_SM_5_INT_BIT_SIZE	0x1UL
-+#define CC_HOST_IRR_REE_OP_ABORTED_SM_6_INT_BIT_SHIFT	0x12UL
-+#define CC_HOST_IRR_REE_OP_ABORTED_SM_6_INT_BIT_SIZE	0x1UL
- #define CC_HOST_IRR_DSCRPTR_WATERMARK_INT_BIT_SHIFT	0x13UL
- #define CC_HOST_IRR_DSCRPTR_WATERMARK_INT_BIT_SIZE	0x1UL
-+#define CC_HOST_IRR_REE_OP_ABORTED_SM_7_INT_BIT_SHIFT	0x14UL
-+#define CC_HOST_IRR_REE_OP_ABORTED_SM_7_INT_BIT_SIZE	0x1UL
- #define CC_HOST_IRR_AXIM_COMP_INT_BIT_SHIFT	0x17UL
- #define CC_HOST_IRR_AXIM_COMP_INT_BIT_SIZE	0x1UL
- #define CC_HOST_SEP_SRAM_THRESHOLD_REG_OFFSET	0xA10UL
- #define CC_HOST_SEP_SRAM_THRESHOLD_VALUE_BIT_SHIFT	0x0UL
- #define CC_HOST_SEP_SRAM_THRESHOLD_VALUE_BIT_SIZE	0xCUL
--#define CC_HOST_IMR_REG_OFFSET	0xA04UL
--#define CC_HOST_IMR_NOT_USED_MASK_BIT_SHIFT	0x1UL
--#define CC_HOST_IMR_NOT_USED_MASK_BIT_SIZE	0x1UL
-+
-+/* IMR */
-+#define CC_HOST_IMR_REG_OFFSET	0x0A04UL
-+#define CC_HOST_IMR_REE_OP_ABORTED_AES_0_MASK_BIT_SHIFT	0x1UL
-+#define CC_HOST_IMR_REE_OP_ABORTED_AES_0_MASK_BIT_SIZE	0x1UL
- #define CC_HOST_IMR_DSCRPTR_COMPLETION_MASK_BIT_SHIFT	0x2UL
- #define CC_HOST_IMR_DSCRPTR_COMPLETION_MASK_BIT_SIZE	0x1UL
-+#define CC_HOST_IMR_REE_OP_ABORTED_AES_1_MASK_BIT_SHIFT	0x3UL
-+#define CC_HOST_IMR_REE_OP_ABORTED_AES_1_MASK_BIT_SIZE	0x1UL
-+#define CC_HOST_IMR_REE_OP_ABORTED_AES_2_MASK_BIT_SHIFT	0x4UL
-+#define CC_HOST_IMR_REE_OP_ABORTED_AES_2_MASK_BIT_SIZE	0x1UL
-+#define CC_HOST_IMR_REE_OP_ABORTED_AES_3_MASK_BIT_SHIFT	0x5UL
-+#define CC_HOST_IMR_REE_OP_ABORTED_AES_3_MASK_BIT_SIZE	0x1UL
-+#define CC_HOST_IMR_REE_OP_ABORTED_AES_4_MASK_BIT_SHIFT	0x6UL
-+#define CC_HOST_IMR_REE_OP_ABORTED_AES_4_MASK_BIT_SIZE	0x1UL
-+#define CC_HOST_IMR_REE_OP_ABORTED_AES_5_MASK_BIT_SHIFT	0x7UL
-+#define CC_HOST_IMR_REE_OP_ABORTED_AES_5_MASK_BIT_SIZE	0x1UL
- #define CC_HOST_IMR_AXI_ERR_MASK_BIT_SHIFT	0x8UL
- #define CC_HOST_IMR_AXI_ERR_MASK_BIT_SIZE	0x1UL
-+#define CC_HOST_IMR_REE_OP_ABORTED_AES_6_MASK_BIT_SHIFT	0x9UL
-+#define CC_HOST_IMR_REE_OP_ABORTED_AES_6_MASK_BIT_SIZE	0x1UL
-+#define CC_HOST_IMR_REE_OP_ABORTED_AES_7_MASK_BIT_SHIFT	0xAUL
-+#define CC_HOST_IMR_REE_OP_ABORTED_AES_7_MASK_BIT_SIZE	0x1UL
- #define CC_HOST_IMR_GPR0_BIT_SHIFT	0xBUL
- #define CC_HOST_IMR_GPR0_BIT_SIZE	0x1UL
-+#define CC_HOST_IMR_REE_OP_ABORTED_SM_0_MASK_BIT_SHIFT	0xCUL
-+#define CC_HOST_IMR_REE_OP_ABORTED_SM_0_MASK_BIT_SIZE	0x1UL
-+#define CC_HOST_IMR_REE_OP_ABORTED_SM_1_MASK_BIT_SHIFT	0xDUL
-+#define CC_HOST_IMR_REE_OP_ABORTED_SM_1_MASK_BIT_SIZE	0x1UL
-+#define CC_HOST_IMR_REE_OP_ABORTED_SM_2_MASK_BIT_SHIFT	0xEUL
-+#define CC_HOST_IMR_REE_OP_ABORTED_SM_2_MASK_BIT_SIZE	0x1UL
-+#define CC_HOST_IMR_REE_OP_ABORTED_SM_3_MASK_BIT_SHIFT	0xFUL
-+#define CC_HOST_IMR_REE_OP_ABORTED_SM_3_MASK_BIT_SIZE	0x1UL
-+#define CC_HOST_IMR_REE_OP_ABORTED_SM_4_MASK_BIT_SHIFT	0x10UL
-+#define CC_HOST_IMR_REE_OP_ABORTED_SM_4_MASK_BIT_SIZE	0x1UL
-+#define CC_HOST_IMR_REE_OP_ABORTED_SM_5_MASK_BIT_SHIFT	0x11UL
-+#define CC_HOST_IMR_REE_OP_ABORTED_SM_5_MASK_BIT_SIZE	0x1UL
-+#define CC_HOST_IMR_REE_OP_ABORTED_SM_6_MASK_BIT_SHIFT	0x12UL
-+#define CC_HOST_IMR_REE_OP_ABORTED_SM_6_MASK_BIT_SIZE	0x1UL
- #define CC_HOST_IMR_DSCRPTR_WATERMARK_MASK0_BIT_SHIFT	0x13UL
- #define CC_HOST_IMR_DSCRPTR_WATERMARK_MASK0_BIT_SIZE	0x1UL
-+#define CC_HOST_IMR_REE_OP_ABORTED_SM_7_MASK_BIT_SHIFT	0x14UL
-+#define CC_HOST_IMR_REE_OP_ABORTED_SM_7_MASK_BIT_SIZE	0x1UL
- #define CC_HOST_IMR_AXIM_COMP_INT_MASK_BIT_SHIFT	0x17UL
- #define CC_HOST_IMR_AXIM_COMP_INT_MASK_BIT_SIZE	0x1UL
-+
-+/* ICR */
- #define CC_HOST_ICR_REG_OFFSET	0xA08UL
- #define CC_HOST_ICR_DSCRPTR_COMPLETION_BIT_SHIFT	0x2UL
- #define CC_HOST_ICR_DSCRPTR_COMPLETION_BIT_SIZE	0x1UL
-diff --git a/drivers/crypto/ccree/cc_request_mgr.c b/drivers/crypto/ccree/cc_request_mgr.c
-index 83a8aaae61c7..88c97a580dd8 100644
---- a/drivers/crypto/ccree/cc_request_mgr.c
-+++ b/drivers/crypto/ccree/cc_request_mgr.c
-@@ -2,6 +2,7 @@
- /* Copyright (C) 2012-2018 ARM Limited or its affiliates. */
- 
- #include <linux/kernel.h>
-+#include <linux/nospec.h>
- #include "cc_driver.h"
- #include "cc_buffer_mgr.h"
- #include "cc_request_mgr.h"
-@@ -52,11 +53,38 @@ struct cc_bl_item {
- 	bool notif;
- };
- 
-+static const u32 cc_cpp_int_masks[CC_CPP_NUM_ALGS][CC_CPP_NUM_SLOTS] = {
-+	{ BIT(CC_HOST_IRR_REE_OP_ABORTED_AES_0_INT_BIT_SHIFT),
-+	  BIT(CC_HOST_IRR_REE_OP_ABORTED_AES_1_INT_BIT_SHIFT),
-+	  BIT(CC_HOST_IRR_REE_OP_ABORTED_AES_2_INT_BIT_SHIFT),
-+	  BIT(CC_HOST_IRR_REE_OP_ABORTED_AES_3_INT_BIT_SHIFT),
-+	  BIT(CC_HOST_IRR_REE_OP_ABORTED_AES_4_INT_BIT_SHIFT),
-+	  BIT(CC_HOST_IRR_REE_OP_ABORTED_AES_5_INT_BIT_SHIFT),
-+	  BIT(CC_HOST_IRR_REE_OP_ABORTED_AES_6_INT_BIT_SHIFT),
-+	  BIT(CC_HOST_IRR_REE_OP_ABORTED_AES_7_INT_BIT_SHIFT) },
-+	{ BIT(CC_HOST_IRR_REE_OP_ABORTED_SM_0_INT_BIT_SHIFT),
-+	  BIT(CC_HOST_IRR_REE_OP_ABORTED_SM_1_INT_BIT_SHIFT),
-+	  BIT(CC_HOST_IRR_REE_OP_ABORTED_SM_2_INT_BIT_SHIFT),
-+	  BIT(CC_HOST_IRR_REE_OP_ABORTED_SM_3_INT_BIT_SHIFT),
-+	  BIT(CC_HOST_IRR_REE_OP_ABORTED_SM_4_INT_BIT_SHIFT),
-+	  BIT(CC_HOST_IRR_REE_OP_ABORTED_SM_5_INT_BIT_SHIFT),
-+	  BIT(CC_HOST_IRR_REE_OP_ABORTED_SM_6_INT_BIT_SHIFT),
-+	  BIT(CC_HOST_IRR_REE_OP_ABORTED_SM_7_INT_BIT_SHIFT) }
++enum cc_key_type {
++	CC_UNPROTECTED_KEY,		/* User key */
++	CC_HW_PROTECTED_KEY,		/* HW (FDE) key */
++	CC_POLICY_PROTECTED_KEY,	/* CPP key */
++	CC_INVALID_PROTECTED_KEY	/* Invalid key */
 +};
 +
- static void comp_handler(unsigned long devarg);
- #ifdef COMP_IN_WQ
- static void comp_work_handler(struct work_struct *work);
- #endif
+ struct cc_cipher_ctx {
+ 	struct cc_drvdata *drvdata;
+ 	int keylen;
+@@ -41,19 +53,22 @@ struct cc_cipher_ctx {
+ 	int cipher_mode;
+ 	int flow_mode;
+ 	unsigned int flags;
+-	bool hw_key;
++	enum cc_key_type key_type;
+ 	struct cc_user_key_info user;
+-	struct cc_hw_key_info hw;
++	union {
++		struct cc_hw_key_info hw;
++		struct cc_cpp_key_info cpp;
++	};
+ 	struct crypto_shash *shash_tfm;
+ };
  
-+static inline u32 cc_cpp_int_mask(enum cc_cpp_alg alg, int slot)
-+{
-+	alg = array_index_nospec(alg, CC_CPP_NUM_ALGS);
-+	slot = array_index_nospec(slot, CC_CPP_NUM_SLOTS);
-+
-+	return cc_cpp_int_masks[alg][slot];
-+}
-+
- void cc_req_mgr_fini(struct cc_drvdata *drvdata)
+ static void cc_cipher_complete(struct device *dev, void *cc_req, int err);
+ 
+-static inline bool cc_is_hw_key(struct crypto_tfm *tfm)
++static inline enum cc_key_type cc_key_type(struct crypto_tfm *tfm)
  {
- 	struct cc_req_mgr_handle *req_mgr_h = drvdata->request_mgr_handle;
-@@ -579,6 +607,8 @@ static void proc_completions(struct cc_drvdata *drvdata)
- 						drvdata->request_mgr_handle;
- 	unsigned int *tail = &request_mgr_handle->req_queue_tail;
- 	unsigned int *head = &request_mgr_handle->req_queue_head;
-+	int rc;
-+	u32 mask;
+ 	struct cc_cipher_ctx *ctx_p = crypto_tfm_ctx(tfm);
  
- 	while (request_mgr_handle->axi_completed) {
- 		request_mgr_handle->axi_completed--;
-@@ -596,8 +626,22 @@ static void proc_completions(struct cc_drvdata *drvdata)
- 
- 		cc_req = &request_mgr_handle->req_queue[*tail];
- 
-+		if (cc_req->cpp.is_cpp) {
-+
-+			dev_dbg(dev, "CPP request completion slot: %d alg:%d\n",
-+				cc_req->cpp.slot, cc_req->cpp.alg);
-+			mask = cc_cpp_int_mask(cc_req->cpp.alg,
-+					       cc_req->cpp.slot);
-+			rc = (drvdata->irq & mask ? -EPERM : 0);
-+			dev_dbg(dev, "Got mask: %x irq: %x rc: %d\n", mask,
-+				drvdata->irq, rc);
-+		} else {
-+			dev_dbg(dev, "None CPP request completion\n");
-+			rc = 0;
-+		}
-+
- 		if (cc_req->user_cb)
--			cc_req->user_cb(dev, cc_req->user_arg, 0);
-+			cc_req->user_cb(dev, cc_req->user_arg, rc);
- 		*tail = (*tail + 1) & (MAX_REQUEST_QUEUE_SIZE - 1);
- 		dev_dbg(dev, "Dequeue request tail=%u\n", *tail);
- 		dev_dbg(dev, "Request completed. axi_completed=%d\n",
-@@ -618,47 +662,50 @@ static void comp_handler(unsigned long devarg)
- 	struct cc_drvdata *drvdata = (struct cc_drvdata *)devarg;
- 	struct cc_req_mgr_handle *request_mgr_handle =
- 						drvdata->request_mgr_handle;
--
-+	struct device *dev = drvdata_to_dev(drvdata);
- 	u32 irq;
- 
--	irq = (drvdata->irq & CC_COMP_IRQ_MASK);
-+	dev_dbg(dev, "Completion handler called!\n");
-+	irq = (drvdata->irq & drvdata->comp_mask);
- 
--	if (irq & CC_COMP_IRQ_MASK) {
--		/* To avoid the interrupt from firing as we unmask it,
--		 * we clear it now
--		 */
--		cc_iowrite(drvdata, CC_REG(HOST_ICR), CC_COMP_IRQ_MASK);
-+	/* To avoid the interrupt from firing as we unmask it,
-+	 * we clear it now
-+	 */
-+	cc_iowrite(drvdata, CC_REG(HOST_ICR), irq);
- 
--		/* Avoid race with above clear: Test completion counter
--		 * once more
--		 */
--		request_mgr_handle->axi_completed +=
--				cc_axi_comp_count(drvdata);
--
--		while (request_mgr_handle->axi_completed) {
--			do {
--				proc_completions(drvdata);
--				/* At this point (after proc_completions()),
--				 * request_mgr_handle->axi_completed is 0.
--				 */
--				request_mgr_handle->axi_completed =
--						cc_axi_comp_count(drvdata);
--			} while (request_mgr_handle->axi_completed > 0);
-+	/* Avoid race with above clear: Test completion counter once more */
- 
--			cc_iowrite(drvdata, CC_REG(HOST_ICR),
--				   CC_COMP_IRQ_MASK);
-+	request_mgr_handle->axi_completed += cc_axi_comp_count(drvdata);
-+
-+	dev_dbg(dev, "AXI completion after updated: %d\n",
-+		request_mgr_handle->axi_completed);
-+
-+	while (request_mgr_handle->axi_completed) {
-+		do {
-+			drvdata->irq |= cc_ioread(drvdata, CC_REG(HOST_IRR));
-+			irq = (drvdata->irq & drvdata->comp_mask);
-+			proc_completions(drvdata);
- 
-+			/* At this point (after proc_completions()),
-+			 * request_mgr_handle->axi_completed is 0.
-+			 */
- 			request_mgr_handle->axi_completed +=
--					cc_axi_comp_count(drvdata);
--		}
-+						cc_axi_comp_count(drvdata);
-+		} while (request_mgr_handle->axi_completed > 0);
-+
-+		cc_iowrite(drvdata, CC_REG(HOST_ICR), irq);
-+
-+		request_mgr_handle->axi_completed += cc_axi_comp_count(drvdata);
- 	}
-+
- 	/* after verifing that there is nothing to do,
- 	 * unmask AXI completion interrupt
- 	 */
- 	cc_iowrite(drvdata, CC_REG(HOST_IMR),
--		   cc_ioread(drvdata, CC_REG(HOST_IMR)) & ~irq);
-+		   cc_ioread(drvdata, CC_REG(HOST_IMR)) & ~drvdata->comp_mask);
- 
- 	cc_proc_backlog(drvdata);
-+	dev_dbg(dev, "Comp. handler done.\n");
+-	return ctx_p->hw_key;
++	return ctx_p->key_type;
  }
  
+ static int validate_keys_sizes(struct cc_cipher_ctx *ctx_p, u32 size)
+@@ -232,7 +247,7 @@ struct tdes_keys {
+ 	u8	key3[DES_KEY_SIZE];
+ };
+ 
+-static enum cc_hw_crypto_key cc_slot_to_hw_key(int slot_num)
++static enum cc_hw_crypto_key cc_slot_to_hw_key(u8 slot_num)
+ {
+ 	switch (slot_num) {
+ 	case 0:
+@@ -247,6 +262,22 @@ static enum cc_hw_crypto_key cc_slot_to_hw_key(int slot_num)
+ 	return END_OF_KEYS;
+ }
+ 
++static u8 cc_slot_to_cpp_key(u8 slot_num)
++{
++	return (slot_num - CC_FIRST_CPP_KEY_SLOT);
++}
++
++static inline enum cc_key_type cc_slot_to_key_type(u8 slot_num)
++{
++	if (slot_num >= CC_FIRST_HW_KEY_SLOT && slot_num <= CC_LAST_HW_KEY_SLOT)
++		return CC_HW_PROTECTED_KEY;
++	else if (slot_num >=  CC_FIRST_CPP_KEY_SLOT &&
++		 slot_num <=  CC_LAST_CPP_KEY_SLOT)
++		return CC_POLICY_PROTECTED_KEY;
++	else
++		return CC_INVALID_PROTECTED_KEY;
++}
++
+ static int cc_cipher_sethkey(struct crypto_skcipher *sktfm, const u8 *key,
+ 			     unsigned int keylen)
+ {
+@@ -261,18 +292,13 @@ static int cc_cipher_sethkey(struct crypto_skcipher *sktfm, const u8 *key,
+ 
+ 	/* STAT_PHASE_0: Init and sanity checks */
+ 
+-	/* This check the size of the hardware key token */
++	/* This check the size of the protected key token */
+ 	if (keylen != sizeof(hki)) {
+-		dev_err(dev, "Unsupported HW key size %d.\n", keylen);
++		dev_err(dev, "Unsupported protected key size %d.\n", keylen);
+ 		crypto_tfm_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
+ 		return -EINVAL;
+ 	}
+ 
+-	if (ctx_p->flow_mode != S_DIN_to_AES) {
+-		dev_err(dev, "HW key not supported for non-AES flows\n");
+-		return -EINVAL;
+-	}
+-
+ 	memcpy(&hki, key, keylen);
+ 
+ 	/* The real key len for crypto op is the size of the HW key
+@@ -286,31 +312,70 @@ static int cc_cipher_sethkey(struct crypto_skcipher *sktfm, const u8 *key,
+ 		return -EINVAL;
+ 	}
+ 
+-	ctx_p->hw.key1_slot = cc_slot_to_hw_key(hki.hw_key1);
+-	if (ctx_p->hw.key1_slot == END_OF_KEYS) {
+-		dev_err(dev, "Unsupported hw key1 number (%d)\n", hki.hw_key1);
+-		return -EINVAL;
+-	}
++	ctx_p->keylen = keylen;
+ 
+-	if (ctx_p->cipher_mode == DRV_CIPHER_XTS ||
+-	    ctx_p->cipher_mode == DRV_CIPHER_ESSIV ||
+-	    ctx_p->cipher_mode == DRV_CIPHER_BITLOCKER) {
+-		if (hki.hw_key1 == hki.hw_key2) {
+-			dev_err(dev, "Illegal hw key numbers (%d,%d)\n",
+-				hki.hw_key1, hki.hw_key2);
++	switch (cc_slot_to_key_type(hki.hw_key1)) {
++	case CC_HW_PROTECTED_KEY:
++		if (ctx_p->flow_mode == S_DIN_to_SM4) {
++			dev_err(dev, "Only AES HW protected keys are supported\n");
+ 			return -EINVAL;
+ 		}
+-		ctx_p->hw.key2_slot = cc_slot_to_hw_key(hki.hw_key2);
+-		if (ctx_p->hw.key2_slot == END_OF_KEYS) {
+-			dev_err(dev, "Unsupported hw key2 number (%d)\n",
+-				hki.hw_key2);
++
++		ctx_p->hw.key1_slot = cc_slot_to_hw_key(hki.hw_key1);
++		if (ctx_p->hw.key1_slot == END_OF_KEYS) {
++			dev_err(dev, "Unsupported hw key1 number (%d)\n",
++				hki.hw_key1);
+ 			return -EINVAL;
+ 		}
+-	}
+ 
+-	ctx_p->keylen = keylen;
+-	ctx_p->hw_key = true;
+-	dev_dbg(dev, "cc_is_hw_key ret 0");
++		if (ctx_p->cipher_mode == DRV_CIPHER_XTS ||
++		    ctx_p->cipher_mode == DRV_CIPHER_ESSIV ||
++		    ctx_p->cipher_mode == DRV_CIPHER_BITLOCKER) {
++			if (hki.hw_key1 == hki.hw_key2) {
++				dev_err(dev, "Illegal hw key numbers (%d,%d)\n",
++					hki.hw_key1, hki.hw_key2);
++				return -EINVAL;
++			}
++
++			ctx_p->hw.key2_slot = cc_slot_to_hw_key(hki.hw_key2);
++			if (ctx_p->hw.key2_slot == END_OF_KEYS) {
++				dev_err(dev, "Unsupported hw key2 number (%d)\n",
++					hki.hw_key2);
++				return -EINVAL;
++			}
++		}
++
++		ctx_p->key_type = CC_HW_PROTECTED_KEY;
++		dev_dbg(dev, "HW protected key  %d/%d set\n.",
++			ctx_p->hw.key1_slot, ctx_p->hw.key2_slot);
++		break;
++
++	case CC_POLICY_PROTECTED_KEY:
++		if (ctx_p->drvdata->hw_rev < CC_HW_REV_713) {
++			dev_err(dev, "CPP keys not supported in this hardware revision.\n");
++			return -EINVAL;
++		}
++
++		if (ctx_p->cipher_mode != DRV_CIPHER_CBC &&
++		    ctx_p->cipher_mode != DRV_CIPHER_CTR) {
++			dev_err(dev, "CPP keys only supported in CBC or CTR modes.\n");
++			return -EINVAL;
++		}
++
++		ctx_p->cpp.slot = cc_slot_to_cpp_key(hki.hw_key1);
++		if (ctx_p->flow_mode == S_DIN_to_AES)
++			ctx_p->cpp.alg = CC_CPP_AES;
++		else /* Must be SM4 since due to sethkey registration */
++			ctx_p->cpp.alg = CC_CPP_SM4;
++		ctx_p->key_type = CC_POLICY_PROTECTED_KEY;
++		dev_dbg(dev, "policy protedcted key alg: %d slot: %d.\n",
++			ctx_p->cpp.alg, ctx_p->cpp.slot);
++		break;
++
++	default:
++		dev_err(dev, "Unsupported protected key (%d)\n", hki.hw_key1);
++		return -EINVAL;
++	}
+ 
+ 	return 0;
+ }
+@@ -338,7 +403,7 @@ static int cc_cipher_setkey(struct crypto_skcipher *sktfm, const u8 *key,
+ 		return -EINVAL;
+ 	}
+ 
+-	ctx_p->hw_key = false;
++	ctx_p->key_type = CC_UNPROTECTED_KEY;
+ 
+ 	/*
+ 	 * Verify DES weak keys
+@@ -451,7 +516,7 @@ static void cc_setup_state_desc(struct crypto_tfm *tfm,
+ 		hw_desc_init(&desc[*seq_size]);
+ 		set_cipher_mode(&desc[*seq_size], cipher_mode);
+ 		set_cipher_config0(&desc[*seq_size], direction);
+-		if (cc_is_hw_key(tfm)) {
++		if (cc_key_type(tfm) == CC_HW_PROTECTED_KEY) {
+ 			set_hw_crypto_key(&desc[*seq_size],
+ 					  ctx_p->hw.key2_slot);
+ 		} else {
+@@ -495,6 +560,7 @@ static void cc_setup_key_desc(struct crypto_tfm *tfm,
+ 	dma_addr_t key_dma_addr = ctx_p->user.key_dma_addr;
+ 	unsigned int key_len = ctx_p->keylen;
+ 	unsigned int du_size = nbytes;
++	unsigned int din_size;
+ 
+ 	struct cc_crypto_alg *cc_alg =
+ 		container_of(tfm->__crt_alg, struct cc_crypto_alg,
+@@ -511,27 +577,38 @@ static void cc_setup_key_desc(struct crypto_tfm *tfm,
+ 	case DRV_CIPHER_ECB:
+ 		/* Load key */
+ 		hw_desc_init(&desc[*seq_size]);
+-		set_cipher_mode(&desc[*seq_size], cipher_mode);
+-		set_cipher_config0(&desc[*seq_size], direction);
+-		if (flow_mode == S_DIN_to_AES) {
+-			if (cc_is_hw_key(tfm)) {
+-				set_hw_crypto_key(&desc[*seq_size],
+-						  ctx_p->hw.key1_slot);
++		if (cc_key_type(tfm) == CC_POLICY_PROTECTED_KEY) {
++			set_cpp_crypto_key(&desc[*seq_size], ctx_p->cpp.alg,
++					   cipher_mode, ctx_p->cpp.slot);
++		} else {
++			set_cipher_mode(&desc[*seq_size], cipher_mode);
++			set_cipher_config0(&desc[*seq_size], direction);
++			if (flow_mode == S_DIN_to_AES) {
++				if (cc_key_type(tfm) == CC_HW_PROTECTED_KEY) {
++					set_hw_crypto_key(&desc[*seq_size],
++							  ctx_p->hw.key1_slot);
++				} else {
++					/* CC_POLICY_UNPROTECTED_KEY
++					 * Invalid keys are filtered out in
++					 * sethkey()
++					 */
++					din_size = (key_len == 24) ?
++						AES_MAX_KEY_SIZE : key_len;
++
++					set_din_type(&desc[*seq_size], DMA_DLLI,
++						     key_dma_addr, din_size,
++						     NS_BIT);
++				}
++				set_key_size_aes(&desc[*seq_size], key_len);
+ 			} else {
++				/*des*/
+ 				set_din_type(&desc[*seq_size], DMA_DLLI,
+-					     key_dma_addr, ((key_len == 24) ?
+-							    AES_MAX_KEY_SIZE :
+-							    key_len), NS_BIT);
++					     key_dma_addr, key_len, NS_BIT);
++				set_key_size_des(&desc[*seq_size], key_len);
+ 			}
+-			set_key_size_aes(&desc[*seq_size], key_len);
+-		} else {
+-			/*des*/
+-			set_din_type(&desc[*seq_size], DMA_DLLI, key_dma_addr,
+-				     key_len, NS_BIT);
+-			set_key_size_des(&desc[*seq_size], key_len);
++			set_flow_mode(&desc[*seq_size], flow_mode);
++			set_setup_mode(&desc[*seq_size], SETUP_LOAD_KEY0);
+ 		}
+-		set_flow_mode(&desc[*seq_size], flow_mode);
+-		set_setup_mode(&desc[*seq_size], SETUP_LOAD_KEY0);
+ 		(*seq_size)++;
+ 		break;
+ 	case DRV_CIPHER_XTS:
+@@ -541,7 +618,7 @@ static void cc_setup_key_desc(struct crypto_tfm *tfm,
+ 		hw_desc_init(&desc[*seq_size]);
+ 		set_cipher_mode(&desc[*seq_size], cipher_mode);
+ 		set_cipher_config0(&desc[*seq_size], direction);
+-		if (cc_is_hw_key(tfm)) {
++		if (cc_key_type(tfm) == CC_HW_PROTECTED_KEY) {
+ 			set_hw_crypto_key(&desc[*seq_size],
+ 					  ctx_p->hw.key1_slot);
+ 		} else {
+@@ -789,6 +866,13 @@ static int cc_cipher_process(struct skcipher_request *req,
+ 	cc_req.user_cb = (void *)cc_cipher_complete;
+ 	cc_req.user_arg = (void *)req;
+ 
++	/* Setup CPP operation details */
++	if (ctx_p->key_type == CC_POLICY_PROTECTED_KEY) {
++		cc_req.cpp.is_cpp = true;
++		cc_req.cpp.alg = ctx_p->cpp.alg;
++		cc_req.cpp.slot = ctx_p->cpp.slot;
++	}
++
+ 	/* Setup request context */
+ 	req_ctx->gen_ctx.op_type = direction;
+ 
+diff --git a/drivers/crypto/ccree/cc_hw_queue_defs.h b/drivers/crypto/ccree/cc_hw_queue_defs.h
+index 7a9b90db7db7..2c8cd907d8db 100644
+--- a/drivers/crypto/ccree/cc_hw_queue_defs.h
++++ b/drivers/crypto/ccree/cc_hw_queue_defs.h
+@@ -28,11 +28,13 @@
+ 	GENMASK(CC_REG_HIGH(word, name), CC_REG_LOW(word, name))
+ 
+ #define WORD0_VALUE		CC_GENMASK(0, VALUE)
++#define	WORD0_CPP_CIPHER_MODE	CC_GENMASK(0, CPP_CIPHER_MODE)
+ #define WORD1_DIN_CONST_VALUE	CC_GENMASK(1, DIN_CONST_VALUE)
+ #define WORD1_DIN_DMA_MODE	CC_GENMASK(1, DIN_DMA_MODE)
+ #define WORD1_DIN_SIZE		CC_GENMASK(1, DIN_SIZE)
+ #define WORD1_NOT_LAST		CC_GENMASK(1, NOT_LAST)
+ #define WORD1_NS_BIT		CC_GENMASK(1, NS_BIT)
++#define WORD1_LOCK_QUEUE	CC_GENMASK(1, LOCK_QUEUE)
+ #define WORD2_VALUE		CC_GENMASK(2, VALUE)
+ #define WORD3_DOUT_DMA_MODE	CC_GENMASK(3, DOUT_DMA_MODE)
+ #define WORD3_DOUT_LAST_IND	CC_GENMASK(3, DOUT_LAST_IND)
+@@ -53,6 +55,8 @@
+ #define WORD4_DATA_FLOW_MODE	CC_GENMASK(4, DATA_FLOW_MODE)
+ #define WORD4_KEY_SIZE		CC_GENMASK(4, KEY_SIZE)
+ #define WORD4_SETUP_OPERATION	CC_GENMASK(4, SETUP_OPERATION)
++#define WORD4_CPP_ALG		CC_GENMASK(4, CPP_ALG)
++#define WORD4_CPP_SLOT		CC_GENMASK(4, CPP_SLOT)
+ #define WORD5_DIN_ADDR_HIGH	CC_GENMASK(5, DIN_ADDR_HIGH)
+ #define WORD5_DOUT_ADDR_HIGH	CC_GENMASK(5, DOUT_ADDR_HIGH)
+ 
+@@ -176,6 +180,15 @@ enum cc_hw_crypto_key {
+ 	END_OF_KEYS = S32_MAX,
+ };
+ 
++#define CC_NUM_HW_KEY_SLOTS	4
++#define CC_FIRST_HW_KEY_SLOT	0
++#define CC_LAST_HW_KEY_SLOT	(CC_FIRST_HW_KEY_SLOT + CC_NUM_HW_KEY_SLOTS - 1)
++
++#define CC_NUM_CPP_KEY_SLOTS	8
++#define CC_FIRST_CPP_KEY_SLOT	16
++#define CC_LAST_CPP_KEY_SLOT	(CC_FIRST_CPP_KEY_SLOT + \
++					CC_NUM_CPP_KEY_SLOTS - 1)
++
+ enum cc_hw_aes_key_size {
+ 	AES_128_KEY = 0,
+ 	AES_192_KEY = 1,
+@@ -189,6 +202,8 @@ enum cc_hash_cipher_pad {
+ 	HASH_CIPHER_DO_PADDING_RESERVE32 = S32_MAX,
+ };
+ 
++#define CC_CPP_DESC_INDICATOR	0xFF0000UL
++
+ /*****************************/
+ /* Descriptor packing macros */
+ /*****************************/
+@@ -248,6 +263,28 @@ static inline void set_din_no_dma(struct cc_hw_desc *pdesc, u32 addr, u32 size)
+ 	pdesc->word[1] |= FIELD_PREP(WORD1_DIN_SIZE, size);
+ }
+ 
++/*
++ * Setup the special CPP descriptor
++ *
++ * @pdesc: pointer HW descriptor struct
++ * @alg: cipher used (AES / SM4)
++ * @mode: mode used (CTR or CBC)
++ * @slot: slot number
++ * @ksize: key size
++ */
++static inline void set_cpp_crypto_key(struct cc_hw_desc *pdesc,
++				      enum cc_cpp_alg alg,
++				      enum drv_cipher_mode mode, u8 slot)
++{
++	u8 mode_val = (mode == DRV_CIPHER_CBC ? 0 : 1);
++
++	pdesc->word[1] |= FIELD_PREP(WORD1_DIN_SIZE, CC_CPP_DESC_INDICATOR);
++	pdesc->word[1] |= FIELD_PREP(WORD1_LOCK_QUEUE, 1);
++	pdesc->word[0] |= FIELD_PREP(WORD0_CPP_CIPHER_MODE, mode_val);
++	pdesc->word[4] |= FIELD_PREP(WORD4_CPP_ALG, alg);
++	pdesc->word[4] |= FIELD_PREP(WORD4_CPP_SLOT, slot);
++}
++
  /*
+  * Set the DIN field of a HW descriptors to SRAM mode.
+  * Note: No need to check SRAM alignment since host requests do not use SRAM and
+diff --git a/drivers/crypto/ccree/cc_kernel_regs.h b/drivers/crypto/ccree/cc_kernel_regs.h
+index 8d7262a35156..f148d13c4b65 100644
+--- a/drivers/crypto/ccree/cc_kernel_regs.h
++++ b/drivers/crypto/ccree/cc_kernel_regs.h
+@@ -31,6 +31,8 @@
+ #define CC_DSCRPTR_QUEUE_WORD0_REG_OFFSET	0xE80UL
+ #define CC_DSCRPTR_QUEUE_WORD0_VALUE_BIT_SHIFT	0x0UL
+ #define CC_DSCRPTR_QUEUE_WORD0_VALUE_BIT_SIZE	0x20UL
++#define CC_DSCRPTR_QUEUE_WORD0_CPP_CIPHER_MODE_BIT_SHIFT	0x5UL
++#define CC_DSCRPTR_QUEUE_WORD0_CPP_CIPHER_MODE_BIT_SIZE	0x3UL
+ #define CC_DSCRPTR_QUEUE_WORD1_REG_OFFSET	0xE84UL
+ #define CC_DSCRPTR_QUEUE_WORD1_DIN_DMA_MODE_BIT_SHIFT	0x0UL
+ #define CC_DSCRPTR_QUEUE_WORD1_DIN_DMA_MODE_BIT_SIZE	0x2UL
+@@ -97,6 +99,10 @@
+ #define CC_DSCRPTR_QUEUE_WORD4_WORD_SWAP_BIT_SIZE	0x1UL
+ #define CC_DSCRPTR_QUEUE_WORD4_BYTES_SWAP_BIT_SHIFT	0x1FUL
+ #define CC_DSCRPTR_QUEUE_WORD4_BYTES_SWAP_BIT_SIZE	0x1UL
++#define CC_DSCRPTR_QUEUE_WORD4_CPP_SLOT_BIT_SHIFT	0xAUL
++#define CC_DSCRPTR_QUEUE_WORD4_CPP_SLOT_BIT_SIZE	0x3UL
++#define CC_DSCRPTR_QUEUE_WORD4_CPP_ALG_BIT_SHIFT	0xDUL
++#define CC_DSCRPTR_QUEUE_WORD4_CPP_ALG_BIT_SIZE	0x1UL
+ #define CC_DSCRPTR_QUEUE_WORD5_REG_OFFSET	0xE94UL
+ #define CC_DSCRPTR_QUEUE_WORD5_DIN_ADDR_HIGH_BIT_SHIFT	0x0UL
+ #define CC_DSCRPTR_QUEUE_WORD5_DIN_ADDR_HIGH_BIT_SIZE	0x10UL
 -- 
 2.21.0
 
