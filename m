@@ -2,198 +2,245 @@ Return-Path: <SRS0=uowK=SU=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0B73C282DA
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Apr 2019 03:18:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B774C282DA
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Apr 2019 03:30:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 74E0A2183E
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Apr 2019 03:18:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F0284217F4
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Apr 2019 03:30:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=insidesecure.onmicrosoft.com header.i=@insidesecure.onmicrosoft.com header.b="dMcRz2xx"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QiD/qlHo"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732737AbfDRDSU (ORCPT
+        id S1732737AbfDRDaM (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 17 Apr 2019 23:18:20 -0400
-Received: from mail-eopbgr150137.outbound.protection.outlook.com ([40.107.15.137]:18080
-        "EHLO EUR01-DB5-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1731985AbfDRDSU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 17 Apr 2019 23:18:20 -0400
+        Wed, 17 Apr 2019 23:30:12 -0400
+Received: from mail-it1-f196.google.com ([209.85.166.196]:40559 "EHLO
+        mail-it1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732325AbfDRDaM (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 17 Apr 2019 23:30:12 -0400
+Received: by mail-it1-f196.google.com with SMTP id k64so1211261itb.5
+        for <linux-crypto@vger.kernel.org>; Wed, 17 Apr 2019 20:30:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=insidesecure.onmicrosoft.com; s=selector1-insidesecure-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Q5KZin+l5vzy4XHSFS88NycBSTRUWHt/dsyEa34jFvE=;
- b=dMcRz2xxZ4TNEefP/u52AH+gutBHxZobxEsrYlVwzc5FcUKk4+eHJlsbkgCW91FhXn8WhtEKb7KRbj7q3MIZgjg6NW9rcAAE8dBBgD0jWuHgmQZnDshaAmeC48oExC0rsLnFCLXcsqGqbS6XqtT9UMvQ0tQToO+aDD2rU98Si7I=
-Received: from AM6PR09MB3523.eurprd09.prod.outlook.com (10.255.99.206) by
- AM6PR09MB3026.eurprd09.prod.outlook.com (10.255.96.81) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1792.19; Thu, 18 Apr 2019 03:16:35 +0000
-Received: from AM6PR09MB3523.eurprd09.prod.outlook.com
- ([fe80::94e3:32d7:8d9e:6fbd]) by AM6PR09MB3523.eurprd09.prod.outlook.com
- ([fe80::94e3:32d7:8d9e:6fbd%5]) with mapi id 15.20.1813.013; Thu, 18 Apr 2019
- 03:16:35 +0000
-From:   Pascal Van Leeuwen <pvanleeuwen@insidesecure.com>
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-CC:     Eric Biggers <ebiggers@kernel.org>,
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=h4rNPpX/j4GUK9ij0QO9lMdaE4KefH15AE6eaO3AjlI=;
+        b=QiD/qlHoPh5LfnCD3MbBL5DIF9hJkxD4VC1u609WUCvZ26vcSc3Vv9PRDTT58TOfQk
+         VIiizLVKFhaSpr5d4euocJ7lod085RAJwgyOUXm7g7zCWXPmzNa2YZIT5TZyWyj8bp2N
+         4U5rALoG3zDPrrjwJPTZkX/h3L/+LdWDFRAf3atndmUevpWARLUpaDTxP43179MqKN61
+         wa3SG3I/kKwSSYQsSVjcokNiy1endfivlpjzzb2dgabZjtDee8JtnC4JT8Ony2n1QzgM
+         Hnft/WJFl2hZqnm16D5k2/92jIJtZlg5K13Qv0l7A1YB7wyA/cTizjdV+4aVSDLSWHCT
+         afPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=h4rNPpX/j4GUK9ij0QO9lMdaE4KefH15AE6eaO3AjlI=;
+        b=IU6pxphjybilAIfcXMBhhc9YUhdXzTR/H1kCMdDfDJw+VVSoFBObnqXzvqt2kW7QWV
+         /iO7ZC2cGg9G8RReXIPQnBoOQ1jqMEH6JB8obhdSuLKr3R27Q+H+C2/6MTXPtLa+bNVc
+         JNCvTkmWCdLt599sxK+Z40e1cck//7Pg6C589V83otoiyCk6zDAbagiK9A7xnqUcgMe5
+         3MJkhwX8/KJqqxX2PXjAGSoZUm8tjVFq5Sh4QsH7YyPvYJa2cm6sXiSJswhGeiFoc9X3
+         JQZsVHnheRYBRY5V6RPb4BQ0Ag60fY/8EnGThh9+MDXSfHLu3OoeAcUSR0jypoeb6hRE
+         P6Gg==
+X-Gm-Message-State: APjAAAVGfQhCswRrdpmN+g7vyRDkJ1G0UfEnSC1+xUHFA0lGZkDgqrPt
+        CACzgDYKTntQkKZgEAqrb2Y1Tfg+bq3FAu9XL8ZhtQ==
+X-Google-Smtp-Source: APXvYqx4AcwZ1CctbPkOCAa9dFMwC+r2ajN/eb2sutE/2D2BmT7z8mmVX12Uq1gzg8+2pzt77uutaVa7ZwKazqHuhO4=
+X-Received: by 2002:a05:660c:4c2:: with SMTP id v2mr1722036itk.71.1555558211484;
+ Wed, 17 Apr 2019 20:30:11 -0700 (PDT)
+MIME-Version: 1.0
+References: <AM6PR09MB352386B26E3F632D6FE2FDDDD2250@AM6PR09MB3523.eurprd09.prod.outlook.com>
+ <20190417202407.GA96242@gmail.com> <AM6PR09MB3523FD88FE64E10B78B555F4D2250@AM6PR09MB3523.eurprd09.prod.outlook.com>
+ <CAKv+Gu9AztOdP2GfR-DBTfTcgjJrjMJ7HbApWG-EpPjpSfn16A@mail.gmail.com> <AM6PR09MB3523EFFDD4FF6910B4AA12C3D2260@AM6PR09MB3523.eurprd09.prod.outlook.com>
+In-Reply-To: <AM6PR09MB3523EFFDD4FF6910B4AA12C3D2260@AM6PR09MB3523.eurprd09.prod.outlook.com>
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date:   Wed, 17 Apr 2019 20:29:59 -0700
+Message-ID: <CAKv+Gu9_8DgmNhzVqXbkrv7y-7++a-yYxXkaYNzV-yDArDtyZQ@mail.gmail.com>
+Subject: Re: Question regarding crypto scatterlists / testmgr
+To:     Pascal Van Leeuwen <pvanleeuwen@insidesecure.com>
+Cc:     Eric Biggers <ebiggers@kernel.org>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>
-Subject: RE: Question regarding crypto scatterlists / testmgr
-Thread-Topic: Question regarding crypto scatterlists / testmgr
-Thread-Index: AdT1UrNnwXz5dYegQq+/zS0mWvhdgAACM8MAAAEghoAAAaIWAAALb3wQ
-Date:   Thu, 18 Apr 2019 03:16:35 +0000
-Message-ID: <AM6PR09MB3523EFFDD4FF6910B4AA12C3D2260@AM6PR09MB3523.eurprd09.prod.outlook.com>
-References: <AM6PR09MB352386B26E3F632D6FE2FDDDD2250@AM6PR09MB3523.eurprd09.prod.outlook.com>
- <20190417202407.GA96242@gmail.com>
- <AM6PR09MB3523FD88FE64E10B78B555F4D2250@AM6PR09MB3523.eurprd09.prod.outlook.com>
- <CAKv+Gu9AztOdP2GfR-DBTfTcgjJrjMJ7HbApWG-EpPjpSfn16A@mail.gmail.com>
-In-Reply-To: <CAKv+Gu9AztOdP2GfR-DBTfTcgjJrjMJ7HbApWG-EpPjpSfn16A@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=pvanleeuwen@insidesecure.com; 
-x-originating-ip: [188.204.2.113]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: b8891da1-216e-4fec-87b9-08d6c3ac43b5
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(5600141)(711020)(4605104)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);SRVR:AM6PR09MB3026;
-x-ms-traffictypediagnostic: AM6PR09MB3026:
-x-microsoft-antispam-prvs: <AM6PR09MB3026625B342DCDE98DB20787D2260@AM6PR09MB3026.eurprd09.prod.outlook.com>
-x-forefront-prvs: 0011612A55
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(376002)(396003)(366004)(346002)(136003)(39850400004)(13464003)(52314003)(199004)(189003)(486006)(6116002)(25786009)(186003)(3846002)(53546011)(99286004)(93886005)(71200400001)(102836004)(6506007)(53936002)(71190400001)(26005)(52536014)(54906003)(5660300002)(74316002)(7736002)(229853002)(305945005)(66066001)(4326008)(76176011)(68736007)(316002)(2906002)(9686003)(8936002)(7696005)(446003)(256004)(476003)(86362001)(6246003)(6436002)(81166006)(478600001)(14454004)(11346002)(81156014)(33656002)(6916009)(8676002)(14444005)(55016002)(97736004);DIR:OUT;SFP:1102;SCL:1;SRVR:AM6PR09MB3026;H:AM6PR09MB3523.eurprd09.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: insidesecure.com does not
- designate permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: iDYQjaGsXyiFoKU+G0TBNYtx0OfAFkIKNp7CNz7+zxsvOOwR4NMBLW4HzOr3GDoGOeepYl6p3MMLYg6TpizbcItupegs/3Lz33EZYL58BcMQgpzxRPn3YMUK+tA65llOu1FY+e8LayRa8qMY+a4vbDd59RCsb3XkgNrQiTlWI3GUhhpnb1DB9AnJ2n6oTd9ytEuAVP7DOeFDkUSSiVMpeBCKKIzLLzwCsJhOfD/jgI1tRMVhfU6rcwv0ajtxnx9PFvZzRI4PMyyLZvIah3tKnzgZg8+emFGfChrL2H18jtwf9ydY+PYLsaHA9rOxWojMEQDn2wLAqswsCXg3FjU6SB1qhz/dbe74jJt4dqyFSeai62/z7eM9JKWqkgcOGhKF68oTcU6vMPGJUXaYEIthPlXNJmnQAh0akcfyDFi9Uzo=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-OriginatorOrg: insidesecure.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b8891da1-216e-4fec-87b9-08d6c3ac43b5
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Apr 2019 03:16:35.6254
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3c07df58-7760-4e85-afd5-84803eac70ce
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR09MB3026
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBBcmQgQmllc2hldXZlbCBbbWFp
-bHRvOmFyZC5iaWVzaGV1dmVsQGxpbmFyby5vcmddDQo+IFNlbnQ6IFdlZG5lc2RheSwgQXByaWwg
-MTcsIDIwMTkgMTE6NDMgUE0NCj4gVG86IFBhc2NhbCBWYW4gTGVldXdlbiA8cHZhbmxlZXV3ZW5A
-aW5zaWRlc2VjdXJlLmNvbT4NCj4gQ2M6IEVyaWMgQmlnZ2VycyA8ZWJpZ2dlcnNAa2VybmVsLm9y
-Zz47IGxpbnV4LWNyeXB0b0B2Z2VyLmtlcm5lbC5vcmc7DQo+IEhlcmJlcnQgWHUgPGhlcmJlcnRA
-Z29uZG9yLmFwYW5hLm9yZy5hdT4NCj4gU3ViamVjdDogUmU6IFF1ZXN0aW9uIHJlZ2FyZGluZyBj
-cnlwdG8gc2NhdHRlcmxpc3RzIC8gdGVzdG1ncg0KPg0KPiBPbiBXZWQsIDE3IEFwciAyMDE5IGF0
-IDE0OjE3LCBQYXNjYWwgVmFuIExlZXV3ZW4NCj4gPHB2YW5sZWV1d2VuQGluc2lkZXNlY3VyZS5j
-b20+IHdyb3RlOg0KPiA+DQo+ID4gPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiA+ID4g
-RnJvbTogRXJpYyBCaWdnZXJzIFttYWlsdG86ZWJpZ2dlcnNAa2VybmVsLm9yZ10NCj4gPiA+IFNl
-bnQ6IFdlZG5lc2RheSwgQXByaWwgMTcsIDIwMTkgMTA6MjQgUE0NCj4gPiA+IFRvOiBQYXNjYWwg
-VmFuIExlZXV3ZW4gPHB2YW5sZWV1d2VuQGluc2lkZXNlY3VyZS5jb20+DQo+ID4gPiBDYzogbGlu
-dXgtY3J5cHRvQHZnZXIua2VybmVsLm9yZzsgSGVyYmVydCBYdQ0KPiA+ID4gPGhlcmJlcnRAZ29u
-ZG9yLmFwYW5hLm9yZy5hdT4NCj4gPiA+IFN1YmplY3Q6IFJlOiBRdWVzdGlvbiByZWdhcmRpbmcg
-Y3J5cHRvIHNjYXR0ZXJsaXN0cyAvIHRlc3RtZ3INCj4gPiA+DQo+ID4gPiBIaSBQYXNjYWwsDQo+
-ID4gPg0KPiA+ID4gT24gV2VkLCBBcHIgMTcsIDIwMTkgYXQgMDc6NTE6MDhQTSArMDAwMCwgUGFz
-Y2FsIFZhbiBMZWV1d2VuIHdyb3RlOg0KPiA+ID4gPiBIaSwNCj4gPiA+ID4NCj4gPiA+ID4gSSdt
-IHRyeWluZyB0byBmaXggdGhlIGluc2lkZS1zZWN1cmUgZHJpdmVyIHRvIHBhc3MgYWxsIHRlc3Rt
-Z3INCj4gPiA+ID4gdGVzdHMgYW5kIEkgaGF2ZSBvbmUgZmluYWwgaXNzdWUgcmVtYWluaW5nIHdp
-dGggdGhlIEFFQUQgY2lwaGVycy4NCj4gPiA+ID4gQXMgaXQgd2FzIG5vdCBjbGVhciBhdCBhbGwg
-d2hhdCB0aGUgZXhhY3QgcHJvYmxlbSB3YXMsIEkgc3BlbnQNCj4gPiA+ID4gc29tZSB0aW1lIHJl
-dmVyc2UgZW5naW5lZXJpbmcgdGVzdG1nciBhbmQgSSBnb3QgdGhlIGRpc3RpbmN0DQo+ID4gPiA+
-IGltcHJlc3Npb24gdGhhdCBpdCBpcyB1c2luZyBzY2F0dGVyIHBhcnRpY2xlcyB0aGF0IGNyb3Nz
-IHBhZ2UNCj4gPiA+ID4gYm91bmRhcmllcy4gT24gcHVycG9zZSwgZXZlbi4NCj4gPiA+ID4NCj4g
-PiA+ID4gV2hpbGUgdGhlIGluc2lkZS1zZWN1cmUgZHJpdmVyIGlzIGJ1aWx0IG9uIHRoZSBwcmVt
-aXNlIHRoYXQNCj4gPiA+ID4gc2NhdHRlciBwYXJ0aWNsZXMgYXJlIGNvbnRpbnVvdXMgaW4gZGV2
-aWNlIHNwYWNlLiBBcyBJIGNhbid0DQo+ID4gPiA+IHRoaW5rIG9mIGFueSByZWFzb24gd2h5IHlv
-dSB3b3VsZCB3YW50IHRvIHNjYXR0ZXIvZ2F0aGVyIG90aGVyDQo+ID4gPiA+IHRoYW4gdG8gaGFu
-ZGxlIHZpcnR1YWwtdG8tcGh5c2ljYWwgYWRkcmVzcyB0cmFuc2xhdGlvbiAuLi4NCj4gPiA+ID4g
-SW4gYW55IGNhc2UsIHRoaXMgc2hvdWxkIGFmZmVjdCBhbGwgb3RoZXIgb3RoZXIgb3BlcmF0aW9u
-cyBhcw0KPiA+ID4gPiB3ZWxsLCBidXQgbWF5YmUgdGhvc2UganVzdCBnb3QgImx1Y2t5IiBieSBn
-ZXR0aW5nIHBhcnRpY2xlcw0KPiA+ID4gPiB0aGF0IHdlcmUgc3RpbGwgY29udGlndW91cyBpbiBk
-ZXZpY2Ugc3BhY2UsIGRlc3BpdGUgdGhlIHBhZ2UNCj4gPiA+ID4gY3Jvc3NpbmcgKHRvICpyZWFs
-bHkqIHZlcmlmeSB0aGlzLCB5b3Ugd291bGQgaGF2ZSB0byBmdWxseQ0KPiA+ID4gPiByYW5kb21p
-emUgeW91ciBwYWdlIGFsbG9jYXRpb24hKQ0KPiA+ID4gPg0KPiA+ID4gPiBBbnl3YXksIGFzc3Vt
-aW5nIHRoYXQgSSAqc2hvdWxkKiBiZSBhYmxlIHRvIGhhbmRsZSBwYXJ0aWNsZXMNCj4gPiA+ID4g
-dGhhdCBhcmUgKm5vdCogY29udGlndW91cyBpbiBkZXZpY2Ugc3BhY2UsIHRoZW4gdGhlcmUgc2hv
-dWxkDQo+ID4gPiA+IHByb2JhYmx5IGFscmVhZHkgZXhpc3Qgc29tZSBmdW5jdGlvbiBpbiB0aGUg
-a2VybmVsIEFQSSB0aGF0DQo+ID4gPiA+IGNvbnZlcnRzIGEgc2NhdHRlcmxpc3Qgd2l0aCBub24t
-Y29udGlndW91cyBwYXJ0aWNsZXMgaW50byBhDQo+ID4gPiA+IHNjYXR0ZXJsaXN0IHdpdGggY29u
-dGlndW91cyBwYXJ0aWNsZXMsIHRha2luZyBpbnRvIGFjY291bnQgdGhlDQo+ID4gPiA+IHByZXNl
-bmNlIG9mIGFuIElPTU1VPyBDb25zaWRlcmluZyBwcmV0dHkgbXVjaCBldmVyeSBkZXZpY2UNCj4g
-PiA+ID4gZHJpdmVyIHdvdWxkIG5lZWQgdG8gZG8gdGhhdD8NCj4gPiA+ID4gRG9lcyBhbnlvbmUg
-a25vdyB3aGljaCBmdW5jdGlvbihzKSB0byB1c2UgZm9yIHRoYXQ/DQo+ID4gPiA+DQo+ID4gPiA+
-IFJlZ2FyZHMsDQo+ID4gPiA+IFBhc2NhbCB2YW4gTGVldXdlbg0KPiA+ID4gPiBTaWxpY29uIElQ
-IEFyY2hpdGVjdCwgTXVsdGktUHJvdG9jb2wgRW5naW5lcyBAIEluc2lkZSBTZWN1cmUNCj4gPiA+
-ID4NCj4gPiA+DQo+ID4gPiBJbmRlZWQsIHNpbmNlIHY1LjEsIHRlc3RtZ3IgdGVzdHMgc2NhdHRl
-cmxpc3QgZWxlbWVudHMgdGhhdCBjcm9zcyBhDQo+ID4gPiBwYWdlLg0KPiA+ID4gSG93ZXZlciwg
-dGhlIHBhZ2VzIGFyZSBndWFyYW50ZWVkIHRvIGJlICpwaHlzaWNhbGx5KiBjb250aWd1b3VzLg0K
-PiBEb2VzDQo+ID4gPiBkbWFfbWFwX3NnKCkgbm90IGhhbmRsZSB0aGlzPw0KPiA+ID4NCj4gPiBJ
-J20gbm90IGVudGlyZWx5IHN1cmUgYW5kIHRoZSBBUEkgZG9jdW1lbnRhdGlvbiBpcyBub3QgcGFy
-dGljdWxhcmx5DQo+ID4gY2xlYXIgb24gKndoYXQqIGRtYV9tYXBfc2coKSBhY3R1YWxseSBkb2Vz
-LCBidXQgSSBoaWdobHkgZG91YnQgaXQNCj4gPiBjb25zaWRlcmluZyB0aGUgcGFydGljbGUgY291
-bnQgaXMgb25seSBhbiBpbnB1dCBwYXJhbWV0ZXIgKGkuZS4gaXQNCj4gPiBjYW4ndCBvdXRwdXQg
-YW4gaW5jcmVhc2UgaW4gcGFydGljbGVzIHRoYXQgd291bGQgYmUgcmVxdWlyZWQpLg0KPiA+IFNv
-IEkgdGhpbmsgaXQganVzdCBlbnN1cmVzIHRoZSBwYWdlcyBhcmUgYWN0dWFsbHkgZmx1c2hlZCB0
-byBtZW1vcnkNCj4gPiBhbmQgYWNjZXNzaWJsZSBieSB0aGUgZGV2aWNlIChpbiBjYXNlIGFuIElP
-TU1VIGludGVyZmVyZXMpIGFuZCBub3QNCj4gPiBtdWNoIHRoYW4gdGhhdC4NCj4gPg0KPiA+IElu
-IGFueSBjYXNlLCBzY2F0dGVyIHBhcnRpY2xlcyB0byBiZSB1c2VkIGJ5IGhhcmR3YXJlIHNob3Vs
-ZCAqbm90Kg0KPiA+IGNyb3NzIGFueSBwaHlzaWNhbCBwYWdlIGJvdW5kYXJpZXMuDQo+ID4gQnV0
-IGFsc28gc2VlIHRoZSB0aHJlYWQgSSBoYWQgb24gdGhpcyB3aXRoIEFyZCAtIHNlZW1zIGxpa2Ug
-dGhlDQo+IGNyeXB0bw0KPiA+IEFQSSBhbHJlYWR5IGhhcyBzb21lIG1lY2hhbmlzbSBmb3IgZW5m
-b3JjaW5nIHRoaXMgYnV0IGl0J3Mgbm90DQo+IGVuYWJsZWQNCj4gPiBmb3IgQUVBRCBjaXBoZXJz
-Pw0KPiA+DQo+DQo+IEl0IGhhcyBzaW1wbHkgbmV2ZXIgYmVlbiBpbXBsZW1lbnRlZCBiZWNhdXNl
-IG5vYm9keSBoYWQgYSBuZWVkIGZvciBpdC4NCj4NCj4gPiA+DQo+ID4gPiBCVFcsIHRoaXMgaXNu
-J3QganVzdCBhIHRoZW9yZXRpY2FsIGNhc2UuICBNYW55IGNyeXB0byBBUEkgdXNlcnMgZG8NCj4g
-PiA+IGNyeXB0byBvbg0KPiA+ID4ga21hbGxvY2VkIGJ1ZmZlcnMsIGFuZCB0aG9zZSBjYW4gY3Jv
-c3MgYSBwYWdlIGJvdW5kYXJ5LCBlc3BlY2lhbGx5DQo+IGlmDQo+ID4gPiB0aGV5IGFyZQ0KPiA+
-ID4gbGFyZ2UuICBBbGwgc29mdHdhcmUgY3J5cHRvIGFsZ29yaXRobXMgaGFuZGxlIHRoaXMgY2Fz
-ZS4NCj4gPiA+DQo+ID4gU29mdHdhcmUgc2l0cyBiZWhpbmQgdGhlIENQVSdzIE1NVSBhbmQgc2Vl
-cyB2aXJ0dWFsIG1lbW9yeSBhcw0KPiA+IGNvbnRpZ3VvdXMuIEl0IGRvZXMgbm90IG5lZWQgdG8g
-ImhhbmRsZSIgYW55dGhpbmcsIGl0IGdldHMgaXQgZm9yDQo+IGZyZWUuDQo+ID4gSGFyZHdhcmUg
-ZG9lcyBub3QgaGF2ZSB0aGF0IGx1eHVyeSwgdW5sZXNzIHlvdSBoYXZlIGEgZnVuY3Rpb25pbmcN
-Cj4gSU9NTVUNCj4gPiBidXQgdGhhdCBpcyBzdGlsbCBwcmV0dHkgcmFyZS4NCj4gPiBTbyBmb3Ig
-aGFyZHdhcmUsIHlvdSBuZWVkIHRvIGJyZWFrIGRvd24geW91ciBidWZmZXJzIHVudGlsIGluZGl2
-aWR1YWwNCj4gPiBwYWdlcyBhbmQgc3RpdGNoIHRob3NlIHRvZ2V0aGVyLiBUaGF0J3MgdGhlIG1h
-aW4gdXNlIGNhc2Ugb2YgYQ0KPiBzY2F0dGVyDQo+ID4gbGlzdCBhbmQgaXQgcmVxdWlyZXMgdGhl
-IHBhcnRpY2xlcyB0byBOT1QgY3Jvc3MgcGh5c2ljYWwgcGFnZXMuDQo+ID4NCj4NCj4ga21hbGxv
-YygpIGlzIGd1YXJhbnRlZWQgdG8gcmV0dXJuIHBoeXNpY2FsbHkgY29udGlndW91cyBtZW1vcnks
-IGJ1dA0KPiBhc3N1bWluZyB0aGF0IHRoaXMgcmVzdWx0cyBpbiBjb250aWd1b3VzIERNQSBtZW1v
-cnkgcmVxdWlyZXMgdGhlIERNQQ0KPiBtYXAgY2FsbCB0byBjb3ZlciB0aGUgd2hvbGUgdGhpbmcs
-IG9yIHRoZSBJT01NVSBtYXkgZW5kIHVwIG1hcHBpbmcgaXQNCj4gaW4gc29tZSBvdGhlciB3YXku
-DQo+DQo+IFRoZSBzYWZlIGFwcHJvYWNoICh3aGljaCB0aGUgYXN5bmMgd2FsayBzZWVtcyB0byB0
-YWtlKSBpcyBqdXN0IHRvDQo+IGNhcnZlIHVwIGVhY2ggc2NhdHRlcmxpc3QgZW50cnkgc28gaXQg
-ZG9lcyBub3QgY3Jvc3MgYW55IHBhZ2UNCj4gYm91bmRhcmllcywgYW5kIHJldHVybiBpdCBhcyBk
-aXNjcmV0ZSBzdGVwcyBpbiB0aGUgd2Fsay4NCj4NClRoYXQncyBpbnRlcmVzdGluZy4gSXMgdGhh
-dCBhY3R1YWxseSB0cnVlIHRob3VnaCBvciBqdXN0IGFzc3VtcHRpb24/DQpJZiB0aGUgcGFnZXMg
-YXJlIGd1YXJhbnRlZWQgdG8gYmUgY29udGlndW91cywgdGhlbiB3aHkgYnJlYWsgdXAgdGhlDQpz
-Y2F0dGVyIGNoYWluIGZ1cnRoZXIgaW50byBpbmRpdmlkdWFsIHBhZ2VzPw0KRm9yIG91ciBoYXJk
-d2FyZSwgdGhlIG51bWJlciBvZiBwYXJ0aWNsZXMgbWF5IGJlY29tZSBhIHBlcmZvcm1hbmNlDQpi
-b3R0bGVuZWNrLCBzbyB0aGUgbGVzcyBwYXJ0aWNsZXMgdGhlIGJldHRlci4gQWxzbywgdGhlIHdv
-cmsgdG8gd2Fsaw0KdGhlIGNoYWluIGFuZCBicmVhayBpdCB1cCB3b3VsZCB0YWtlIHVwIHByZWNp
-b3VzIENQVSBjeWNsZXMuDQoNCj4NCj4gPiA+IFRoZSBmYWN0IHRoYXQgdGhlc2UgdHlwZXMgb2Yg
-aXNzdWVzIGFyZSBqdXN0IGJlaW5nIGNvbnNpZGVyZWQgbm93DQo+ID4gPiBjZXJ0YWlubHkNCj4g
-PiA+IGlzbid0IHJhaXNpbmcgbXkgY29uZmlkZW5jZSBpbiB0aGUgaGFyZHdhcmUgY3J5cHRvIGRy
-aXZlcnMgaW4gdGhlDQo+ID4gPiBrZXJuZWwuLi4NCj4gPiA+DQo+ID4gQWN0dWFsbHksIHRoaXMg
-aXMgKm5vdCogYSBwcm9ibGVtIHdpdGggdGhlIGhhcmR3YXJlIGRyaXZlcnMuIEl0J3MgYQ0KPiA+
-IHByb2JsZW0gd2l0aCB0aGUgQVBJIGFuZC9vciBob3cgeW91IGFyZSB0cnlpbmcgdG8gdXNlIGl0
-LiBIYXJkd2FyZQ0KPiA+IGRvZXMgTk9UIHNlZSB0aGUgbmljZSBjb250aWd1b3VzIHZpcnR1YWwg
-bWVtb3J5IHRoYXQgU1cgc2Vlcy4NCj4gPg0KPiA+IElmIHRoZSBkcml2ZXIgbWF5IGV4cGVjdCB0
-byByZWNlaXZlIHBhcnRpY2xlcyB0aGF0IGNyb3NzIHBhZ2UNCj4gPiBib3VuZGFyaWVzIC0gaWYg
-dGhhdCdzIHRoZSBzcGVjIC0gZmluZSwgYnV0IHRoZW4gaXQgd2lsbCBoYXZlIHRvDQo+ID4gYnJl
-YWsgdGhvc2UgZG93biBpbnRvIGluZGl2aWR1YWwgcGFnZXMgYnkgaXRzZWxmLiBIb3dldmVyLCB3
-aG9tZXZlcg0KPiA+IGNyZWF0ZWQgdGhlIGluc2lkZS1zZWN1cmUgZHJpdmVyIHdhcyB1bmRlciB0
-aGUgaW1wcmVzc2lvbiB0aGF0IHRoaXMNCj4gPiB3YXMgbm90IHN1cHBvc2VkIHRvIGJlIHRoZSBj
-YXNlLiBBbmQgSSBkb24ndCBrbm93IHdobydzIHJpZ2h0IG9yDQo+ID4gd3JvbmcgdGhlcmUsIGJ1
-dCBmcm9tIGEgc2lkZSBkaXNjdXNzaW9uIHdpdGggQXJkIEkgZ290IHRoZSBpbXByZXNzaW9uDQo+
-ID4gdGhhdCB0aGUgQ3J5cHRvIEFQSSBzaG91bGQgZml4IHRoaXMgdXAgYmVmb3JlIGl0IHJlYWNo
-ZXMgdGhlIGRyaXZlci4NCj4gPg0KPg0KPiBUbyBiZSBjbGVhciwgaXMgdGhhdCBkcml2ZXIgdXBz
-dHJlYW0/IEFuZCBpZiBzbywgd2hlcmUgZG9lcyBpdCByZXNpZGU/DQo+DQpGWUk6IHRoZSBvcmln
-aW5hbCBkcml2ZXIgSSBzdGFydGVkIHdpdGggaXMgdXBzdHJlYW06DQpkcml2ZXJzL2NyeXB0by9p
-bnNpZGUtc2VjdXJlDQoNClJlZ2FyZHMsDQoNClBhc2NhbCB2YW4gTGVldXdlbg0KU2lsaWNvbiBJ
-UCBBcmNoaXRlY3QsIE11bHRpLVByb3RvY29sIEVuZ2luZXMgQCBJbnNpZGUgU2VjdXJlDQo=
+On Wed, 17 Apr 2019 at 20:16, Pascal Van Leeuwen
+<pvanleeuwen@insidesecure.com> wrote:
+>
+> > -----Original Message-----
+> > From: Ard Biesheuvel [mailto:ard.biesheuvel@linaro.org]
+> > Sent: Wednesday, April 17, 2019 11:43 PM
+> > To: Pascal Van Leeuwen <pvanleeuwen@insidesecure.com>
+> > Cc: Eric Biggers <ebiggers@kernel.org>; linux-crypto@vger.kernel.org;
+> > Herbert Xu <herbert@gondor.apana.org.au>
+> > Subject: Re: Question regarding crypto scatterlists / testmgr
+> >
+> > On Wed, 17 Apr 2019 at 14:17, Pascal Van Leeuwen
+> > <pvanleeuwen@insidesecure.com> wrote:
+> > >
+> > > > -----Original Message-----
+> > > > From: Eric Biggers [mailto:ebiggers@kernel.org]
+> > > > Sent: Wednesday, April 17, 2019 10:24 PM
+> > > > To: Pascal Van Leeuwen <pvanleeuwen@insidesecure.com>
+> > > > Cc: linux-crypto@vger.kernel.org; Herbert Xu
+> > > > <herbert@gondor.apana.org.au>
+> > > > Subject: Re: Question regarding crypto scatterlists / testmgr
+> > > >
+> > > > Hi Pascal,
+> > > >
+> > > > On Wed, Apr 17, 2019 at 07:51:08PM +0000, Pascal Van Leeuwen wrote:
+> > > > > Hi,
+> > > > >
+> > > > > I'm trying to fix the inside-secure driver to pass all testmgr
+> > > > > tests and I have one final issue remaining with the AEAD ciphers.
+> > > > > As it was not clear at all what the exact problem was, I spent
+> > > > > some time reverse engineering testmgr and I got the distinct
+> > > > > impression that it is using scatter particles that cross page
+> > > > > boundaries. On purpose, even.
+> > > > >
+> > > > > While the inside-secure driver is built on the premise that
+> > > > > scatter particles are continuous in device space. As I can't
+> > > > > think of any reason why you would want to scatter/gather other
+> > > > > than to handle virtual-to-physical address translation ...
+> > > > > In any case, this should affect all other other operations as
+> > > > > well, but maybe those just got "lucky" by getting particles
+> > > > > that were still contiguous in device space, despite the page
+> > > > > crossing (to *really* verify this, you would have to fully
+> > > > > randomize your page allocation!)
+> > > > >
+> > > > > Anyway, assuming that I *should* be able to handle particles
+> > > > > that are *not* contiguous in device space, then there should
+> > > > > probably already exist some function in the kernel API that
+> > > > > converts a scatterlist with non-contiguous particles into a
+> > > > > scatterlist with contiguous particles, taking into account the
+> > > > > presence of an IOMMU? Considering pretty much every device
+> > > > > driver would need to do that?
+> > > > > Does anyone know which function(s) to use for that?
+> > > > >
+> > > > > Regards,
+> > > > > Pascal van Leeuwen
+> > > > > Silicon IP Architect, Multi-Protocol Engines @ Inside Secure
+> > > > >
+> > > >
+> > > > Indeed, since v5.1, testmgr tests scatterlist elements that cross a
+> > > > page.
+> > > > However, the pages are guaranteed to be *physically* contiguous.
+> > Does
+> > > > dma_map_sg() not handle this?
+> > > >
+> > > I'm not entirely sure and the API documentation is not particularly
+> > > clear on *what* dma_map_sg() actually does, but I highly doubt it
+> > > considering the particle count is only an input parameter (i.e. it
+> > > can't output an increase in particles that would be required).
+> > > So I think it just ensures the pages are actually flushed to memory
+> > > and accessible by the device (in case an IOMMU interferes) and not
+> > > much than that.
+> > >
+> > > In any case, scatter particles to be used by hardware should *not*
+> > > cross any physical page boundaries.
+> > > But also see the thread I had on this with Ard - seems like the
+> > crypto
+> > > API already has some mechanism for enforcing this but it's not
+> > enabled
+> > > for AEAD ciphers?
+> > >
+> >
+> > It has simply never been implemented because nobody had a need for it.
+> >
+> > > >
+> > > > BTW, this isn't just a theoretical case.  Many crypto API users do
+> > > > crypto on
+> > > > kmalloced buffers, and those can cross a page boundary, especially
+> > if
+> > > > they are
+> > > > large.  All software crypto algorithms handle this case.
+> > > >
+> > > Software sits behind the CPU's MMU and sees virtual memory as
+> > > contiguous. It does not need to "handle" anything, it gets it for
+> > free.
+> > > Hardware does not have that luxury, unless you have a functioning
+> > IOMMU
+> > > but that is still pretty rare.
+> > > So for hardware, you need to break down your buffers until individual
+> > > pages and stitch those together. That's the main use case of a
+> > scatter
+> > > list and it requires the particles to NOT cross physical pages.
+> > >
+> >
+> > kmalloc() is guaranteed to return physically contiguous memory, but
+> > assuming that this results in contiguous DMA memory requires the DMA
+> > map call to cover the whole thing, or the IOMMU may end up mapping it
+> > in some other way.
+> >
+> > The safe approach (which the async walk seems to take) is just to
+> > carve up each scatterlist entry so it does not cross any page
+> > boundaries, and return it as discrete steps in the walk.
+> >
+> That's interesting. Is that actually true though or just assumption?
+> If the pages are guaranteed to be contiguous, then why break up the
+> scatter chain further into individual pages?
+> For our hardware, the number of particles may become a performance
+> bottleneck, so the less particles the better. Also, the work to walk
+> the chain and break it up would take up precious CPU cycles.
+>
+
+Seems like I was misreading the code: we have the following code in
+skcipher_walk_next
+
+if (!err && (walk->flags & SKCIPHER_WALK_PHYS)) {
+    walk->src.phys.page = virt_to_page(walk->src.virt.addr);
+    walk->dst.phys.page = virt_to_page(walk->dst.virt.addr);
+    walk->src.phys.offset &= PAGE_SIZE - 1;
+    walk->dst.phys.offset &= PAGE_SIZE - 1;
+}
+
+but all that does is normalize the offset. In fact, this code looks
+slightly dodgy to me, given that, if the offset /does/ exceed
+PAGE_SIZE, it normalizes the offset but does not advance the page
+pointers accordingly.
+
+The thing to be aware of is that struct pages are not guaranteed to be
+mapped on the CPU, and so a lot of the virt handling deals with
+mapping/unmapping on the *cpu* side rather than the device side. So a
+phys walk gives you each physically contiguous entry in turn, and it
+is up to the device driver to map it for DMA if needed.
+
+To satisfy my curiosity, I looked at the existing async drivers, and
+very few actually appear to be using any of this stuff. So perhaps my
+attempt to clarify things ended up achieving the opposite, and we are
+really only interested in whether dma_map_sg() does what you expect in
+your driver.
+
+> >
+> > > > The fact that these types of issues are just being considered now
+> > > > certainly
+> > > > isn't raising my confidence in the hardware crypto drivers in the
+> > > > kernel...
+> > > >
+> > > Actually, this is *not* a problem with the hardware drivers. It's a
+> > > problem with the API and/or how you are trying to use it. Hardware
+> > > does NOT see the nice contiguous virtual memory that SW sees.
+> > >
+> > > If the driver may expect to receive particles that cross page
+> > > boundaries - if that's the spec - fine, but then it will have to
+> > > break those down into individual pages by itself. However, whomever
+> > > created the inside-secure driver was under the impression that this
+> > > was not supposed to be the case. And I don't know who's right or
+> > > wrong there, but from a side discussion with Ard I got the impression
+> > > that the Crypto API should fix this up before it reaches the driver.
+> > >
+> >
+> > To be clear, is that driver upstream? And if so, where does it reside?
+> >
+> FYI: the original driver I started with is upstream:
+> drivers/crypto/inside-secure
+>
+
+OK, so indeed, you are using dma_map_sg(), which seems absolutely fine
+if your hardware supports that model. So apologies for the noise ...
