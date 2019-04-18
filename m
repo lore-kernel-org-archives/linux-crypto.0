@@ -2,48 +2,52 @@ Return-Path: <SRS0=uowK=SU=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21EE0C10F0E
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Apr 2019 21:44:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27D3BC282DD
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Apr 2019 23:30:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E6AAD217F9
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Apr 2019 21:44:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E423821872
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Apr 2019 23:30:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1555623895;
-	bh=iBDUW+B83dPAnn3BG1+dIDS8eyYKJkgWTtvYYntRtZ0=;
-	h=From:To:Subject:Date:List-ID:From;
-	b=k4VgQAxWGNuqMihDTFg3GTtD0+Gnqq8feDybC4RndkHcSOQ73o+h0sqDHMLQQoiKR
-	 7+qnpfd4kRxplDs+UvsR+nBDimlnObhkPkQsvWsGiETPJ/GOZQU6NAgoXXb8lFPRGC
-	 rs0DY4brIpjYOlv0KbqffsGy0I994bQXuf5OGgmU=
+	s=default; t=1555630228;
+	bh=hQSbgXdPN1jKdvOoXqPyTOeeeGiJCJPzArhQyDxDc/4=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=ozW5fZFPWhW5TDkcP4nj+2WskZACnQFMrBBE3np0zT3FQ7K6r1o07T9kHWKrjv5kM
+	 TXwOZ4B0wE9pP9HxXx6qLO01T262VSBn8xh57OCnUxKqY+OeqS86BSl2z8JBOpNQEL
+	 ZS7XM7Kp9X67Hs2YOjnBvjfTHqaEs4lKt0V+tx4U=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725975AbfDRVoy (ORCPT
+        id S1726406AbfDRXa0 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 18 Apr 2019 17:44:54 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50442 "EHLO mail.kernel.org"
+        Thu, 18 Apr 2019 19:30:26 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58914 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725815AbfDRVoy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 Apr 2019 17:44:54 -0400
+        id S1725887AbfDRXa0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 18 Apr 2019 19:30:26 -0400
 Received: from ebiggers-linuxstation.mtv.corp.google.com (unknown [104.132.1.77])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id BEF94217D7;
-        Thu, 18 Apr 2019 21:44:52 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 77FD8214DA;
+        Thu, 18 Apr 2019 23:30:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1555623892;
-        bh=iBDUW+B83dPAnn3BG1+dIDS8eyYKJkgWTtvYYntRtZ0=;
-        h=From:To:Subject:Date:From;
-        b=P5z24gxiriD11Wb636XoObxUpZTT0Yigdp2DqHf7ChCh79Y10JvU937nBZFT4yInb
-         cI8xNBMCF7o6NtdoGi6ezEHi4BRmf3HfX7XDD28QyqlkjvhfYD4riIq55bIn8u10fF
-         i1GDHyLn05XZByKfhL9r2NBb2BW5ZG5lvpK7oI3o=
+        s=default; t=1555630224;
+        bh=hQSbgXdPN1jKdvOoXqPyTOeeeGiJCJPzArhQyDxDc/4=;
+        h=From:To:Cc:Subject:Date:From;
+        b=VWetfSG2f9LNCp4isk6+Dzq633enA777XqvJsPYsSTkotg+2dwH1ckZCqnozT0Muo
+         slSWM2bthyGTPOnIgxfBQ+qY2Mtr3ynAbzTEEvDaAbpa0yXcH2HVS5wxKoN35hC+7p
+         MSW/bTB3vb5jBstZKXr+ETGb0pp/ztXzKv+D4fXI=
 From:   Eric Biggers <ebiggers@kernel.org>
-To:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH v3] crypto: ccm - fix incompatibility between "ccm" and "ccm_base"
-Date:   Thu, 18 Apr 2019 14:44:27 -0700
-Message-Id: <20190418214427.137933-1-ebiggers@kernel.org>
+To:     linux-fscrypt@vger.kernel.org
+Cc:     Satya Tangirala <satyat@google.com>, linux-api@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, keyrings@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+        Paul Crowley <paulcrowley@google.com>
+Subject: [PATCH v5 00/16] fscrypt: key management improvements
+Date:   Thu, 18 Apr 2019 16:29:07 -0700
+Message-Id: <20190418232923.250800-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.21.0.392.gf8f6787159e-goog
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -52,152 +56,190 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+Hello,
 
-CCM instances can be created by either the "ccm" template, which only
-allows choosing the block cipher, e.g. "ccm(aes)"; or by "ccm_base",
-which allows choosing the ctr and cbcmac implementations, e.g.
-"ccm_base(ctr(aes-generic),cbcmac(aes-generic))".
+This patchset makes major improvements to how keys are added, removed,
+and derived in fscrypt, aka ext4/f2fs/ubifs encryption.  It does this by
+adding new ioctls that add and remove encryption keys directly to/from
+the filesystem, and by adding a new encryption policy version ("v2")
+where the user-provided keys are only used as input to HKDF-SHA512 and
+are identified by their cryptographic hash.
 
-However, a "ccm_base" instance prevents a "ccm" instance from being
-registered using the same implementations.  Nor will the instance be
-found by lookups of "ccm".  This can be used as a denial of service.
-Moreover, "ccm_base" instances are never tested by the crypto
-self-tests, even if there are compatible "ccm" tests.
+All new APIs and all cryptosystem changes are documented in
+Documentation/filesystems/fscrypt.rst.  Userspace can use the new key
+management ioctls with existing encrypted directories, but migrating to
+v2 encryption policies is needed for the full benefits.
 
-The root cause of these problems is that instances of the two templates
-use different cra_names.  Therefore, fix these problems by making
-"ccm_base" instances set the same cra_name as "ccm" instances, e.g.
-"ccm(aes)" instead of "ccm_base(ctr(aes-generic),cbcmac(aes-generic))".
+These changes solve four interrelated problems:
 
-This requires extracting the block cipher name from the name of the ctr
-and cbcmac algorithms.  It also requires starting to verify that the
-algorithms are really ctr and cbcmac using the same block cipher, not
-something else entirely.  But it would be bizarre if anyone were
-actually using non-ccm-compatible algorithms with ccm_base, so this
-shouldn't break anyone in practice.
+(1) Providing fscrypt keys via process-subscribed keyrings is abusing
+    encryption as an OS-level access control mechanism, causing many
+    bugs where processes don't get access to the keys they need -- e.g.,
+    when a 'sudo' command or a system service needs to access encrypted
+    files.  It's also inconsistent with the filesystem/VFS "view" of
+    encrypted files which is global, so sometimes things randomly happen
+    to work anyway due to caching.  Regardless, currently almost all
+    fscrypt users actually do need global keys, so they're having to use
+    workarounds that heavily abuse the session or user keyrings, e.g.
+    Android and Chromium OS both use a systemwide "session keyring" and
+    the 'fscrypt' tool links all user keyrings into root's user keyring.
 
-Fixes: 4a49b499dfa0 ("[CRYPTO] ccm: Added CCM mode")
-Cc: stable@vger.kernel.org
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
+(2) Currently there's no way to securely and efficiently remove a
+    fscrypt key such that not only is the original key wiped, but also
+    all files and directories protected by that key are "locked" and
+    their per-file keys wiped.  Many users want this and are using
+    'echo 2 > /proc/sys/vm/drop_caches' as a workaround, but this is
+    root-only, and also is overkill so can be a performance disaster.
 
-Changed since v2:
-	- Leave check for ctr cra_blocksize == 1.
+(3) The key derivation function (KDF) that fscrypt uses to derive
+    per-file keys is nonstandard, inflexible, and has some weaknesses
+    such as being reversible and not evenly distributing the entropy
+    from the user-provided keys.
 
-Changed since v1:
-	- Verify that cbcmac is really cbcmac (based on name).
-	- Improved commit message.
+(4) fscrypt doesn't check that the correct key was supplied.  This can
+    be a security vulnerability, since it allows malicious local users
+    to associate the wrong key with files to which they have read-only
+    access, causing other users' processes to read/write the wrong data.
 
- crypto/ccm.c | 44 ++++++++++++++++++--------------------------
- 1 file changed, 18 insertions(+), 26 deletions(-)
+Ultimately, the solutions to these problems all tie into each other.  By
+adding a filesystem-level encryption keyring with ioctls to add/remove
+keys to/from it, the keys are made usable filesystem-wide (solves
+problem #1).  It also becomes easy to track the inodes that were
+"unlocked" with each key, so they can be evicted when the key is removed
+(solves problem #2).  Moreover, the filesystem-level keyring is a
+natural place to store an HMAC transform keyed by each key, thus making
+it easy and efficient to switch the KDF to HKDF (solves problem #3).
 
-diff --git a/crypto/ccm.c b/crypto/ccm.c
-index 3d036df0f4d4a..c1ef9d0b4271a 100644
---- a/crypto/ccm.c
-+++ b/crypto/ccm.c
-@@ -458,7 +458,6 @@ static void crypto_ccm_free(struct aead_instance *inst)
- 
- static int crypto_ccm_create_common(struct crypto_template *tmpl,
- 				    struct rtattr **tb,
--				    const char *full_name,
- 				    const char *ctr_name,
- 				    const char *mac_name)
- {
-@@ -486,7 +485,8 @@ static int crypto_ccm_create_common(struct crypto_template *tmpl,
- 
- 	mac = __crypto_hash_alg_common(mac_alg);
- 	err = -EINVAL;
--	if (mac->digestsize != 16)
-+	if (strncmp(mac->base.cra_name, "cbcmac(", 7) != 0 ||
-+	    mac->digestsize != 16)
- 		goto out_put_mac;
- 
- 	inst = kzalloc(sizeof(*inst) + sizeof(*ictx), GFP_KERNEL);
-@@ -509,23 +509,27 @@ static int crypto_ccm_create_common(struct crypto_template *tmpl,
- 
- 	ctr = crypto_spawn_skcipher_alg(&ictx->ctr);
- 
--	/* Not a stream cipher? */
-+	/* The skcipher algorithm must be CTR mode, using 16-byte blocks. */
- 	err = -EINVAL;
--	if (ctr->base.cra_blocksize != 1)
-+	if (strncmp(ctr->base.cra_name, "ctr(", 4) != 0 ||
-+	    crypto_skcipher_alg_ivsize(ctr) != 16 ||
-+	    ctr->base.cra_blocksize != 1)
- 		goto err_drop_ctr;
- 
--	/* We want the real thing! */
--	if (crypto_skcipher_alg_ivsize(ctr) != 16)
-+	/* ctr and cbcmac must use the same underlying block cipher. */
-+	if (strcmp(ctr->base.cra_name + 4, mac->base.cra_name + 7) != 0)
- 		goto err_drop_ctr;
- 
- 	err = -ENAMETOOLONG;
-+	if (snprintf(inst->alg.base.cra_name, CRYPTO_MAX_ALG_NAME,
-+		     "ccm(%s", ctr->base.cra_name + 4) >= CRYPTO_MAX_ALG_NAME)
-+		goto err_drop_ctr;
-+
- 	if (snprintf(inst->alg.base.cra_driver_name, CRYPTO_MAX_ALG_NAME,
- 		     "ccm_base(%s,%s)", ctr->base.cra_driver_name,
- 		     mac->base.cra_driver_name) >= CRYPTO_MAX_ALG_NAME)
- 		goto err_drop_ctr;
- 
--	memcpy(inst->alg.base.cra_name, full_name, CRYPTO_MAX_ALG_NAME);
--
- 	inst->alg.base.cra_flags = ctr->base.cra_flags & CRYPTO_ALG_ASYNC;
- 	inst->alg.base.cra_priority = (mac->base.cra_priority +
- 				       ctr->base.cra_priority) / 2;
-@@ -567,7 +571,6 @@ static int crypto_ccm_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	const char *cipher_name;
- 	char ctr_name[CRYPTO_MAX_ALG_NAME];
- 	char mac_name[CRYPTO_MAX_ALG_NAME];
--	char full_name[CRYPTO_MAX_ALG_NAME];
- 
- 	cipher_name = crypto_attr_alg_name(tb[1]);
- 	if (IS_ERR(cipher_name))
-@@ -581,35 +584,24 @@ static int crypto_ccm_create(struct crypto_template *tmpl, struct rtattr **tb)
- 		     cipher_name) >= CRYPTO_MAX_ALG_NAME)
- 		return -ENAMETOOLONG;
- 
--	if (snprintf(full_name, CRYPTO_MAX_ALG_NAME, "ccm(%s)", cipher_name) >=
--	    CRYPTO_MAX_ALG_NAME)
--		return -ENAMETOOLONG;
--
--	return crypto_ccm_create_common(tmpl, tb, full_name, ctr_name,
--					mac_name);
-+	return crypto_ccm_create_common(tmpl, tb, ctr_name, mac_name);
- }
- 
- static int crypto_ccm_base_create(struct crypto_template *tmpl,
- 				  struct rtattr **tb)
- {
- 	const char *ctr_name;
--	const char *cipher_name;
--	char full_name[CRYPTO_MAX_ALG_NAME];
-+	const char *mac_name;
- 
- 	ctr_name = crypto_attr_alg_name(tb[1]);
- 	if (IS_ERR(ctr_name))
- 		return PTR_ERR(ctr_name);
- 
--	cipher_name = crypto_attr_alg_name(tb[2]);
--	if (IS_ERR(cipher_name))
--		return PTR_ERR(cipher_name);
--
--	if (snprintf(full_name, CRYPTO_MAX_ALG_NAME, "ccm_base(%s,%s)",
--		     ctr_name, cipher_name) >= CRYPTO_MAX_ALG_NAME)
--		return -ENAMETOOLONG;
-+	mac_name = crypto_attr_alg_name(tb[2]);
-+	if (IS_ERR(mac_name))
-+		return PTR_ERR(mac_name);
- 
--	return crypto_ccm_create_common(tmpl, tb, full_name, ctr_name,
--					cipher_name);
-+	return crypto_ccm_create_common(tmpl, tb, ctr_name, mac_name);
- }
- 
- static int crypto_rfc4309_setkey(struct crypto_aead *parent, const u8 *key,
+Finally, to check that the correct key was supplied, I use HKDF to
+derive a cryptographically secure key_identifier for each key (solves
+problem #4).  This in combination with key quotas and other careful
+precautions also makes it safe to allow non-root users to add and remove
+keys to/from the filesystem-level keyring.  Thus, all problems are
+solved without having to restrict the fscrypt API to root only.
+
+The patchset is organized as follows:
+
+- Patches 1-8 add new ioctls FS_IOC_ADD_ENCRYPTION_KEY,
+  FS_IOC_REMOVE_ENCRYPTION_KEY, and FS_IOC_GET_ENCRYPTION_KEY_STATUS.
+  Adding a key logically "unlocks" all files on the filesystem that are
+  protected by that key; removing a key "locks" them again.
+
+- Patches 9-12 add support for v2 encryption policies.
+
+- Patches 13-15 wire up the new ioctls to ext4, f2fs, and ubifs.
+
+- Patch 16 updates the fscrypt documentation for all the changes.
+
+Changes v4 => v5:
+    - Simplify shrink_dcache_inode(), as suggested by Al Viro.
+      Also move it into fs/crypto/.
+    - Fix a build error on some architectures by calling
+      copy_from_user() rather than get_user() with a __u64 pointer.
+
+Changes v3 => v4:
+    - Introduce fscrypt_sb_free() to avoid an extra #ifdef.
+    - Fix UBIFS's ->drop_inode().
+    - Add 'version' to union fscrypt_policy and union fscrypt_context.
+
+Changes v2 => v3:
+    - Use ->drop_inode() to trigger the inode eviction during/after
+      FS_IOC_REMOVE_ENCRYPTION_KEY, as suggested by Dave Chinner.
+    - A few small cleanups.
+
+v1 of this patchset was sent in October 2017 with title "fscrypt:
+filesystem-level keyring and v2 policy support".  This revived version
+follows the same basic design but incorporates numerous improvements,
+such as splitting keyinfo.c into multiple files for much better
+understandability, and introducing "per-mode" encryption keys to
+implement the semantics of the DIRECT_KEY encryption policy flag.
+
+This patchset applies to the fscrypt tree with the additional patch
+"[PATCH v2 2/2] fscrypt: cache decrypted symlink target in ->i_link"
+(https://patchwork.kernel.org/patch/10894743/) applied.  You can also
+get this patchset from git at:
+
+	Repository:   https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git
+	Branch:       fscrypt-key-mgmt-improvements-v5
+
+I've started writing xfstests for the new APIs.  So far they cover basic
+functionality.  They can be found at:
+
+	Repository:   https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/xfstests-dev.git
+	Branch:       fscrypt-key-mgmt-improvements
+
+The xfstests depend on new xfs_io commands which can be found at:
+
+	Repository:   https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/xfsprogs-dev.git
+	Branch:       fscrypt-key-mgmt-improvements
+
+I've also made proof-of-concept changes to the 'fscrypt' userspace
+program (https://github.com/google/fscrypt) to make it support v2
+encryption policies.  You can find these changes in git at:
+
+	Repository:   https://github.com/ebiggers/fscrypt.git
+	Branch:       fscrypt-key-mgmt-improvements
+
+To make the 'fscrypt' userspace program experimentally use v2 encryption
+policies on new encrypted directories, add the following to
+/etc/fscrypt.conf within the "options" section:
+
+	"policy_version": "2"
+
+It's also planned for Android and Chromium OS to switch to the new
+ioctls and eventually to v2 encryption policies.  Work-in-progress,
+proof-of-concept changes by Satya Tangirala for AOSP can be found at
+https://android-review.googlesource.com/q/topic:fscrypt-key-mgmt-improvements
+
+Eric Biggers (16):
+  fs, fscrypt: move uapi definitions to new header <linux/fscrypt.h>
+  fscrypt: use FSCRYPT_ prefix for uapi constants
+  fscrypt: use FSCRYPT_* definitions, not FS_*
+  fscrypt: add ->ci_inode to fscrypt_info
+  fscrypt: refactor v1 policy key setup into keysetup_legacy.c
+  fscrypt: add FS_IOC_ADD_ENCRYPTION_KEY ioctl
+  fscrypt: add FS_IOC_REMOVE_ENCRYPTION_KEY ioctl
+  fscrypt: add FS_IOC_GET_ENCRYPTION_KEY_STATUS ioctl
+  fscrypt: add an HKDF-SHA512 implementation
+  fscrypt: v2 encryption policy support
+  fscrypt: allow unprivileged users to add/remove keys for v2 policies
+  fscrypt: require that key be added when setting a v2 encryption policy
+  ext4: wire up new fscrypt ioctls
+  f2fs: wire up new fscrypt ioctls
+  ubifs: wire up new fscrypt ioctls
+  fscrypt: document the new ioctls and policy version
+
+ Documentation/filesystems/fscrypt.rst | 670 ++++++++++++++----
+ MAINTAINERS                           |   1 +
+ fs/crypto/Kconfig                     |   2 +
+ fs/crypto/Makefile                    |  10 +-
+ fs/crypto/crypto.c                    |  14 +-
+ fs/crypto/fname.c                     |   5 +-
+ fs/crypto/fscrypt_private.h           | 366 ++++++++--
+ fs/crypto/hkdf.c                      | 188 ++++++
+ fs/crypto/keyinfo.c                   | 613 -----------------
+ fs/crypto/keyring.c                   | 931 ++++++++++++++++++++++++++
+ fs/crypto/keysetup.c                  | 561 ++++++++++++++++
+ fs/crypto/keysetup_legacy.c           | 340 ++++++++++
+ fs/crypto/policy.c                    | 392 ++++++++---
+ fs/ext4/ioctl.c                       |  24 +
+ fs/ext4/super.c                       |   3 +
+ fs/f2fs/file.c                        |  46 ++
+ fs/f2fs/super.c                       |   2 +
+ fs/super.c                            |   2 +
+ fs/ubifs/ioctl.c                      |  16 +
+ fs/ubifs/super.c                      |  11 +
+ include/linux/fs.h                    |   1 +
+ include/linux/fscrypt.h               |  49 +-
+ include/uapi/linux/fs.h               |  54 +-
+ include/uapi/linux/fscrypt.h          | 163 +++++
+ 24 files changed, 3521 insertions(+), 943 deletions(-)
+ create mode 100644 fs/crypto/hkdf.c
+ delete mode 100644 fs/crypto/keyinfo.c
+ create mode 100644 fs/crypto/keyring.c
+ create mode 100644 fs/crypto/keysetup.c
+ create mode 100644 fs/crypto/keysetup_legacy.c
+ create mode 100644 include/uapi/linux/fscrypt.h
+
 -- 
 2.21.0.392.gf8f6787159e-goog
 
