@@ -2,78 +2,79 @@ Return-Path: <SRS0=uowK=SU=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BB96C10F0E
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Apr 2019 14:38:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D88D9C10F14
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Apr 2019 15:20:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EFFF221479
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Apr 2019 14:38:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9DB822083D
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Apr 2019 15:20:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1555600816;
+	bh=uw1EPQGXOUv+9daVdEBorMMcvRB8V5nG5bjqGFF9GKQ=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
+	b=Mv+l2BG8zkabSIB/J6IdJr3mpAsTl1QVQUPq7n1VknwvSUjoH2yt4Mtd76rpyhteF
+	 vF7mSVrmBxaX7QZNhCPR75qPY0nBw5fYG9vytukdPMdsVsB2gtvrRAK7yAEwa8FWhG
+	 QpvmuFOBz3+vInsGtANXvAxr1z1LFUptFe0j97aU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388457AbfDROiF (ORCPT
+        id S2389540AbfDRPUG (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 18 Apr 2019 10:38:05 -0400
-Received: from [5.180.42.13] ([5.180.42.13]:55344 "EHLO deadmen.hmeau.com"
-        rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1731317AbfDROiF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 Apr 2019 10:38:05 -0400
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1hH7dq-0004aR-2P; Thu, 18 Apr 2019 22:03:54 +0800
-Received: from herbert by gondobar with local (Exim 4.89)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1hH7do-0008Js-Lr; Thu, 18 Apr 2019 22:03:52 +0800
-Date:   Thu, 18 Apr 2019 22:03:52 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v2 6/7] crypto: ccm - fix incompatibility between "ccm"
- and "ccm_base"
-Message-ID: <20190418140352.2mhpzee5nfgly7ka@gondor.apana.org.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190410064635.11813-7-ebiggers@kernel.org>
-X-Newsgroups: apana.lists.os.linux.cryptoapi
-Organization: Core
-User-Agent: NeoMutt/20170113 (1.7.2)
+        Thu, 18 Apr 2019 11:20:06 -0400
+Received: from mail.kernel.org ([198.145.29.99]:53322 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2388842AbfDRPUF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 18 Apr 2019 11:20:05 -0400
+Subject: Re: [GIT] Crypto Fixes for 5.1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1555600804;
+        bh=uw1EPQGXOUv+9daVdEBorMMcvRB8V5nG5bjqGFF9GKQ=;
+        h=From:In-Reply-To:References:Date:To:Cc:From;
+        b=T91EB+CHTqltw82POP1Ov2h+amkA7Y8KAx30108+GMSOwNRRvKfuP83fUKGvfB41s
+         CBE1jkSrYgV7pe35296D8C+MqfboHFFVJ1xJyEPCWQhqIfjxCF5JwON8RVxXli+xmL
+         BppTBAYK1DE2gfM1xH0eLQ0tAU4yG+k6H+zXA+XE=
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <20190418051741.rveqa67qhh5trj7w@gondor.apana.org.au>
+References: <20180428080517.haxgpvqrwgotakyo@gondor.apana.org.au>
+ <20180622145403.6ltjip7che227fuo@gondor.apana.org.au>
+ <20180829033353.agnzxra3jk2r2mzg@gondor.apana.org.au>
+ <20181116063146.e7a3mep3ghnfltxe@gondor.apana.org.au>
+ <20181207061409.xflg423nknleuddw@gondor.apana.org.au>
+ <20190118104006.ye5amhxkgd4xrbmc@gondor.apana.org.au>
+ <20190201054204.ehl7u7aaqmkdh5b6@gondor.apana.org.au>
+ <20190215024738.fynl64d5u5htcy2l@gondor.apana.org.au>
+ <20190312045818.bgpiuxogmaxyscdv@gondor.apana.org.au>
+ <20190408054823.4jedcfql7woverqb@gondor.apana.org.au>
+ <20190418051741.rveqa67qhh5trj7w@gondor.apana.org.au>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20190418051741.rveqa67qhh5trj7w@gondor.apana.org.au>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+X-PR-Tracked-Commit-Id: 678cce4019d746da6c680c48ba9e6d417803e127
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: d3ce3b1879ffb991d3894b57cda8610827fbdef3
+Message-Id: <155560080468.14770.10265401303042368404.pr-tracker-bot@kernel.org>
+Date:   Thu, 18 Apr 2019 15:20:04 +0000
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Eric Biggers <ebiggers@kernel.org> wrote:
->
-> @@ -486,7 +485,8 @@ static int crypto_ccm_create_common(struct crypto_template *tmpl,
-> 
->        mac = __crypto_hash_alg_common(mac_alg);
->        err = -EINVAL;
-> -       if (mac->digestsize != 16)
-> +       if (strncmp(mac->base.cra_name, "cbcmac(", 7) != 0 ||
-> +           mac->digestsize != 16)
->                goto out_put_mac;
+The pull request you sent on Thu, 18 Apr 2019 13:17:41 +0800:
 
-Keeping the digestsize check is good because names don't mean
-much when self-tests are disabled.
+> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
 
-> @@ -509,23 +509,26 @@ static int crypto_ccm_create_common(struct crypto_template *tmpl,
-> 
->        ctr = crypto_spawn_skcipher_alg(&ictx->ctr);
-> 
-> -       /* Not a stream cipher? */
-> +       /* The skcipher algorithm must be CTR mode, using 16-byte blocks. */
->        err = -EINVAL;
-> -       if (ctr->base.cra_blocksize != 1)
-> +       if (strncmp(ctr->base.cra_name, "ctr(", 4) != 0 ||
-> +           crypto_skcipher_alg_ivsize(ctr) != 16)
->                goto err_drop_ctr;
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/d3ce3b1879ffb991d3894b57cda8610827fbdef3
 
-So we should keep the cra_blocksize test here as well.
+Thank you!
 
-Cheers,
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Deet-doot-dot, I am a bot.
+https://korg.wiki.kernel.org/userdoc/prtracker
