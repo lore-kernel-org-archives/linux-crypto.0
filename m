@@ -3,51 +3,51 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2D49C282DD
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Apr 2019 03:52:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C822C10F0E
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Apr 2019 03:52:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C824621850
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Apr 2019 03:52:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 32D902184B
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Apr 2019 03:52:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388028AbfDRDwF (ORCPT
+        id S2388058AbfDRDwQ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 17 Apr 2019 23:52:05 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:57658 "EHLO
+        Wed, 17 Apr 2019 23:52:16 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33770 "EHLO
         mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2388020AbfDRDwF (ORCPT
+        by vger.kernel.org with ESMTP id S2388060AbfDRDwQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 17 Apr 2019 23:52:05 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x3I3oA4q116893
-        for <linux-crypto@vger.kernel.org>; Wed, 17 Apr 2019 23:52:04 -0400
+        Wed, 17 Apr 2019 23:52:16 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x3I3oAfE116114
+        for <linux-crypto@vger.kernel.org>; Wed, 17 Apr 2019 23:52:15 -0400
 Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2rxhdb8h5k-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2rxee6p32u-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <linux-crypto@vger.kernel.org>; Wed, 17 Apr 2019 23:52:04 -0400
+        for <linux-crypto@vger.kernel.org>; Wed, 17 Apr 2019 23:52:15 -0400
 Received: from localhost
         by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <linux-crypto@vger.kernel.org> from <bauerman@linux.ibm.com>;
-        Thu, 18 Apr 2019 04:52:03 +0100
-Received: from b03cxnp08025.gho.boulder.ibm.com (9.17.130.17)
+        Thu, 18 Apr 2019 04:52:14 +0100
+Received: from b03cxnp07029.gho.boulder.ibm.com (9.17.130.16)
         by e34.co.us.ibm.com (192.168.1.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 18 Apr 2019 04:51:57 +0100
+        Thu, 18 Apr 2019 04:52:09 +0100
 Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
-        by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x3I3pun326083470
+        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x3I3q7m127066604
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 18 Apr 2019 03:51:56 GMT
+        Thu, 18 Apr 2019 03:52:07 GMT
 Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 05D8178067;
-        Thu, 18 Apr 2019 03:51:56 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 9513D7805E;
+        Thu, 18 Apr 2019 03:52:07 +0000 (GMT)
 Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9B69E7805C;
-        Thu, 18 Apr 2019 03:51:51 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 241AD7805C;
+        Thu, 18 Apr 2019 03:52:03 +0000 (GMT)
 Received: from morokweng.localdomain.com (unknown [9.85.230.182])
         by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Thu, 18 Apr 2019 03:51:51 +0000 (GMT)
+        Thu, 18 Apr 2019 03:52:02 +0000 (GMT)
 From:   Thiago Jung Bauermann <bauerman@linux.ibm.com>
 To:     linux-integrity@vger.kernel.org
 Cc:     linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
@@ -65,127 +65,55 @@ Cc:     linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
         Jonathan Corbet <corbet@lwn.net>,
         "AKASHI, Takahiro" <takahiro.akashi@linaro.org>,
         Thiago Jung Bauermann <bauerman@linux.ibm.com>
-Subject: [PATCH v10 03/12] PKCS#7: Introduce pkcs7_get_digest()
-Date:   Thu, 18 Apr 2019 00:51:11 -0300
+Subject: [PATCH v10 05/12] integrity: Select CONFIG_KEYS instead of depending on it
+Date:   Thu, 18 Apr 2019 00:51:13 -0300
 X-Mailer: git-send-email 2.17.2
 In-Reply-To: <20190418035120.2354-1-bauerman@linux.ibm.com>
 References: <20190418035120.2354-1-bauerman@linux.ibm.com>
 X-TM-AS-GCONF: 00
-x-cbid: 19041803-0016-0000-0000-000009A21AC0
+x-cbid: 19041803-0016-0000-0000-000009A21AC3
 X-IBM-SpamModules-Scores: 
 X-IBM-SpamModules-Versions: BY=3.00010947; HX=3.00000242; KW=3.00000007;
  PH=3.00000004; SC=3.00000284; SDB=6.01190666; UDB=6.00623948; IPR=6.00971462;
- MB=3.00026492; MTD=3.00000008; XFM=3.00000015; UTC=2019-04-18 03:52:02
+ MB=3.00026492; MTD=3.00000008; XFM=3.00000015; UTC=2019-04-18 03:52:13
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19041803-0017-0000-0000-000042DB3460
-Message-Id: <20190418035120.2354-4-bauerman@linux.ibm.com>
+x-cbparentid: 19041803-0017-0000-0000-000042DB347D
+Message-Id: <20190418035120.2354-6-bauerman@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-04-18_03:,,
  signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
  malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
  clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ mlxlogscore=978 adultscore=0 classifier=spam adjust=0 reason=mlx
  scancount=1 engine=8.0.1-1810050000 definitions=main-1904180023
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-IMA will need to access the digest of the PKCS7 message (as calculated by
-the kernel) before the signature is verified, so introduce
-pkcs7_get_digest() for that purpose.
-
-Also, modify pkcs7_digest() to detect when the digest was already
-calculated so that it doesn't have to do redundant work. Verifying that
-sinfo->sig->digest isn't NULL is sufficient because both places which
-allocate sinfo->sig (pkcs7_parse_message() and pkcs7_note_signed_info())
-use kzalloc() so sig->digest is always initialized to zero.
+This avoids a dependency cycle in soon-to-be-introduced
+CONFIG_IMA_APPRAISE_MODSIG: it will select CONFIG_MODULE_SIG_FORMAT
+which in turn selects CONFIG_KEYS. Kconfig then complains that
+CONFIG_INTEGRITY_SIGNATURE depends on CONFIG_KEYS.
 
 Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
-Cc: David Howells <dhowells@redhat.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
+Signed-off-by: Mimi Zohar <zohar@linux.ibm.com>
 ---
- crypto/asymmetric_keys/pkcs7_verify.c | 33 +++++++++++++++++++++++++++
- include/crypto/pkcs7.h                |  4 ++++
- 2 files changed, 37 insertions(+)
+ security/integrity/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/crypto/asymmetric_keys/pkcs7_verify.c b/crypto/asymmetric_keys/pkcs7_verify.c
-index 97c77f66b20d..5c3de46b0b73 100644
---- a/crypto/asymmetric_keys/pkcs7_verify.c
-+++ b/crypto/asymmetric_keys/pkcs7_verify.c
-@@ -16,6 +16,7 @@
- #include <linux/err.h>
- #include <linux/asn1.h>
- #include <crypto/hash.h>
-+#include <crypto/hash_info.h>
- #include <crypto/public_key.h>
- #include "pkcs7_parser.h"
+diff --git a/security/integrity/Kconfig b/security/integrity/Kconfig
+index 2ea4ec9991d5..bf76f842fcb8 100644
+--- a/security/integrity/Kconfig
++++ b/security/integrity/Kconfig
+@@ -17,8 +17,8 @@ if INTEGRITY
  
-@@ -33,6 +34,10 @@ static int pkcs7_digest(struct pkcs7_message *pkcs7,
- 
- 	kenter(",%u,%s", sinfo->index, sinfo->sig->hash_algo);
- 
-+	/* The digest was calculated already. */
-+	if (sig->digest)
-+		return 0;
-+
- 	if (!sinfo->sig->hash_algo)
- 		return -ENOPKG;
- 
-@@ -122,6 +127,34 @@ static int pkcs7_digest(struct pkcs7_message *pkcs7,
- 	return ret;
- }
- 
-+int pkcs7_get_digest(struct pkcs7_message *pkcs7, const u8 **buf, u32 *len,
-+		     enum hash_algo *hash_algo)
-+{
-+	struct pkcs7_signed_info *sinfo = pkcs7->signed_infos;
-+	int i, ret;
-+
-+	/*
-+	 * This function doesn't support messages with more than one signature.
-+	 */
-+	if (sinfo == NULL || sinfo->next != NULL)
-+		return -EBADMSG;
-+
-+	ret = pkcs7_digest(pkcs7, sinfo);
-+	if (ret)
-+		return ret;
-+
-+	*buf = sinfo->sig->digest;
-+	*len = sinfo->sig->digest_size;
-+
-+	for (i = 0; i < HASH_ALGO__LAST; i++)
-+		if (!strcmp(hash_algo_name[i], sinfo->sig->hash_algo)) {
-+			*hash_algo = i;
-+			break;
-+		}
-+
-+	return 0;
-+}
-+
- /*
-  * Find the key (X.509 certificate) to use to verify a PKCS#7 message.  PKCS#7
-  * uses the issuer's name and the issuing certificate serial number for
-diff --git a/include/crypto/pkcs7.h b/include/crypto/pkcs7.h
-index 583f199400a3..3bfe6829eaae 100644
---- a/include/crypto/pkcs7.h
-+++ b/include/crypto/pkcs7.h
-@@ -13,6 +13,7 @@
- #define _CRYPTO_PKCS7_H
- 
- #include <linux/verification.h>
-+#include <linux/hash_info.h>
- #include <crypto/public_key.h>
- 
- struct key;
-@@ -44,4 +45,7 @@ extern int pkcs7_verify(struct pkcs7_message *pkcs7,
- extern int pkcs7_supply_detached_data(struct pkcs7_message *pkcs7,
- 				      const void *data, size_t datalen);
- 
-+extern int pkcs7_get_digest(struct pkcs7_message *pkcs7, const u8 **buf,
-+			    u32 *len, enum hash_algo *hash_algo);
-+
- #endif /* _CRYPTO_PKCS7_H */
+ config INTEGRITY_SIGNATURE
+ 	bool "Digital signature verification using multiple keyrings"
+-	depends on KEYS
+ 	default n
++	select KEYS
+ 	select SIGNATURE
+ 	help
+ 	  This option enables digital signature verification support
 
