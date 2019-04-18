@@ -6,33 +6,33 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60D84C10F14
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Apr 2019 13:41:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F60EC10F0E
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Apr 2019 13:41:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3C07C20675
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Apr 2019 13:41:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 47C6C20675
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Apr 2019 13:41:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389167AbfDRNlQ (ORCPT
+        id S2389404AbfDRNlV (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 18 Apr 2019 09:41:16 -0400
-Received: from foss.arm.com ([217.140.101.70]:33656 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388375AbfDRNlP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 Apr 2019 09:41:15 -0400
+        Thu, 18 Apr 2019 09:41:21 -0400
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:33664 "EHLO
+        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2388375AbfDRNlV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 18 Apr 2019 09:41:21 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 938DF1688;
-        Thu, 18 Apr 2019 06:41:15 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4BE451688;
+        Thu, 18 Apr 2019 06:41:21 -0700 (PDT)
 Received: from e110176-lin.kfn.arm.com (e110176-lin.kfn.arm.com [10.50.4.178])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 27D743F5AF;
-        Thu, 18 Apr 2019 06:41:13 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D47323F5AF;
+        Thu, 18 Apr 2019 06:41:19 -0700 (PDT)
 From:   Gilad Ben-Yossef <gilad@benyossef.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>
 Cc:     Ofir Drang <ofir.drang@arm.com>, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 20/35] crypto: ccree: do not copy zero size MLLI table
-Date:   Thu, 18 Apr 2019 16:38:55 +0300
-Message-Id: <20190418133913.9122-21-gilad@benyossef.com>
+Subject: [PATCH 21/35] crypto: ccree: remove unused defines
+Date:   Thu, 18 Apr 2019 16:38:56 +0300
+Message-Id: <20190418133913.9122-22-gilad@benyossef.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190418133913.9122-1-gilad@benyossef.com>
 References: <20190418133913.9122-1-gilad@benyossef.com>
@@ -43,32 +43,30 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-When we are given a 0 sized cryptlen and assoclen in
-a scatterlist with two entries we were falsely trying to
-create a zero length MLLI table, causing the HW to choke.
-Don't try to copy a zero sized MLLI table.
+Remove unused definitions from AEAD driver code.
 
 Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/crypto/ccree/cc_aead.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/crypto/ccree/cc_aead.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
 diff --git a/drivers/crypto/ccree/cc_aead.c b/drivers/crypto/ccree/cc_aead.c
-index 0fa676b5603c..0e8d2381c175 100644
+index 0e8d2381c175..f9e410de66a8 100644
 --- a/drivers/crypto/ccree/cc_aead.c
 +++ b/drivers/crypto/ccree/cc_aead.c
-@@ -1163,9 +1163,9 @@ static void cc_mlli_to_sram(struct aead_request *req,
- 	struct cc_aead_ctx *ctx = crypto_aead_ctx(tfm);
- 	struct device *dev = drvdata_to_dev(ctx->drvdata);
+@@ -23,12 +23,8 @@
+ #define MAX_HMAC_DIGEST_SIZE (SHA256_DIGEST_SIZE)
+ #define MAX_HMAC_BLOCK_SIZE (SHA256_BLOCK_SIZE)
  
--	if (req_ctx->assoc_buff_type == CC_DMA_BUF_MLLI ||
-+	if ((req_ctx->assoc_buff_type == CC_DMA_BUF_MLLI ||
- 	    req_ctx->data_buff_type == CC_DMA_BUF_MLLI ||
--	    !req_ctx->is_single_pass) {
-+	    !req_ctx->is_single_pass) && req_ctx->mlli_params.mlli_len) {
- 		dev_dbg(dev, "Copy-to-sram: mlli_dma=%08x, mlli_size=%u\n",
- 			(unsigned int)ctx->drvdata->mlli_sram_addr,
- 			req_ctx->mlli_params.mlli_len);
+-#define AES_CCM_RFC4309_NONCE_SIZE 3
+ #define MAX_NONCE_SIZE CTR_RFC3686_NONCE_SIZE
+ 
+-/* Value of each ICV_CMP byte (of 8) in case of success */
+-#define ICV_VERIF_OK 0x01
+-
+ struct cc_aead_handle {
+ 	cc_sram_addr_t sram_workspace_addr;
+ 	struct list_head aead_list;
 -- 
 2.21.0
 
