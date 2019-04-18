@@ -6,66 +6,60 @@ X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE249C10F14
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Apr 2019 14:27:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1426C10F0E
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Apr 2019 14:28:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8EF3321479
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Apr 2019 14:27:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A898220835
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Apr 2019 14:28:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733192AbfDRO1u (ORCPT
+        id S2389146AbfDRO2R (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 18 Apr 2019 10:27:50 -0400
-Received: from [5.180.42.13] ([5.180.42.13]:55230 "EHLO deadmen.hmeau.com"
+        Thu, 18 Apr 2019 10:28:17 -0400
+Received: from [5.180.42.13] ([5.180.42.13]:55246 "EHLO deadmen.hmeau.com"
         rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2388850AbfDRO1u (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 Apr 2019 10:27:50 -0400
+        id S2389135AbfDRO2R (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 18 Apr 2019 10:28:17 -0400
 Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
         by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1hH80y-0004pE-5M; Thu, 18 Apr 2019 22:27:48 +0800
+        id 1hH7wv-0004kN-SE; Thu, 18 Apr 2019 22:23:37 +0800
 Received: from herbert by gondobar with local (Exim 4.89)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1hH80n-0004Ez-GG; Thu, 18 Apr 2019 22:27:37 +0800
-Date:   Thu, 18 Apr 2019 22:27:37 +0800
+        id 1hH7wm-0004B7-WD; Thu, 18 Apr 2019 22:23:29 +0800
+Date:   Thu, 18 Apr 2019 22:23:28 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        Daniel Axtens <dja@axtens.net>,
-        Nayna <nayna@linux.vnet.ibm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>
-Subject: Re: [PATCH] crypto: powerpc - convert to use crypto_simd_usable()
-Message-ID: <20190418142737.ks6csnjjcfluacnz@gondor.apana.org.au>
-References: <20190413053312.8783-1-ebiggers@kernel.org>
+To:     Lionel Debieve <lionel.debieve@st.com>
+Cc:     "David S . Miller" <davem@davemloft.net>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@st.com>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org,
+        Benjamin Gaignard <benjamin.gaignard@st.com>,
+        Fabien Dessenne <fabien.dessenne@st.com>,
+        Ludovic Barre <ludovic.barre@st.com>,
+        linux-stm32@st-md-mailman.stormreply.com
+Subject: Re: [PATCH 1/1] crypto: stm32/hash - Fix self test issue during
+ export
+Message-ID: <20190418142328.g2wmr3kueaj6h55g@gondor.apana.org.au>
+References: <1554709318-25389-1-git-send-email-lionel.debieve@st.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190413053312.8783-1-ebiggers@kernel.org>
+In-Reply-To: <1554709318-25389-1-git-send-email-lionel.debieve@st.com>
 User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Apr 12, 2019 at 10:33:12PM -0700, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
+On Mon, Apr 08, 2019 at 09:41:58AM +0200, Lionel Debieve wrote:
+> Change the wait condition to check if the hash is busy.
+> Context can be saved as soon as hash has finishing processing
+> data. Remove unused lock in the device structure.
 > 
-> Replace all calls to in_interrupt() in the PowerPC crypto code with
-> !crypto_simd_usable().  This causes the crypto self-tests to test the
-> no-SIMD code paths when CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y.
-> 
-> The p8_ghash algorithm is currently failing and needs to be fixed, as it
-> produces the wrong digest when no-SIMD updates are mixed with SIMD ones.
-> 
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> Signed-off-by: Lionel Debieve <lionel.debieve@st.com>
 > ---
->  arch/powerpc/crypto/crc32c-vpmsum_glue.c    | 4 +++-
->  arch/powerpc/crypto/crct10dif-vpmsum_glue.c | 4 +++-
->  arch/powerpc/include/asm/Kbuild             | 1 +
->  drivers/crypto/vmx/aes.c                    | 7 ++++---
->  drivers/crypto/vmx/aes_cbc.c                | 7 ++++---
->  drivers/crypto/vmx/aes_ctr.c                | 5 +++--
->  drivers/crypto/vmx/aes_xts.c                | 5 +++--
->  drivers/crypto/vmx/ghash.c                  | 9 ++++-----
->  8 files changed, 25 insertions(+), 17 deletions(-)
+>  drivers/crypto/stm32/stm32-hash.c | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
 
 Patch applied.  Thanks.
 -- 
