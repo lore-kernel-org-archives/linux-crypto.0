@@ -5,71 +5,72 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3559FC282CE
-	for <linux-crypto@archiver.kernel.org>; Mon, 22 Apr 2019 11:26:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73B6EC282E3
+	for <linux-crypto@archiver.kernel.org>; Mon, 22 Apr 2019 11:26:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 06C9A206A3
-	for <linux-crypto@archiver.kernel.org>; Mon, 22 Apr 2019 11:26:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 420B22075A
+	for <linux-crypto@archiver.kernel.org>; Mon, 22 Apr 2019 11:26:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QwIlOCwx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OVna7Czt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726619AbfDVL0I (ORCPT
+        id S1727014AbfDVL0J (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 22 Apr 2019 07:26:08 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:33989 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726761AbfDVL0H (ORCPT
+        Mon, 22 Apr 2019 07:26:09 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:52765 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726900AbfDVL0I (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 22 Apr 2019 07:26:07 -0400
-Received: by mail-wm1-f68.google.com with SMTP id r186so13918318wmf.1
-        for <linux-crypto@vger.kernel.org>; Mon, 22 Apr 2019 04:26:05 -0700 (PDT)
+        Mon, 22 Apr 2019 07:26:08 -0400
+Received: by mail-wm1-f67.google.com with SMTP id a184so14045365wma.2;
+        Mon, 22 Apr 2019 04:26:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=45OIqyxPhSR1GPiehZv11C5FocNohr7VYhj0ZCDPs8s=;
-        b=QwIlOCwxa8hMFIGDnq1zPSJ1Ym2JkB67kE+/xzj0LyDU/QKlxtqfxlV2lU2TRZOtAS
-         KZRHvfpzWH6x7Tihe+cYGdaQT4WEsPttOHJwSrzkiKshd7W380DvFIAt16nwz6y2+P2C
-         nQCarDjHPTMrBkCO7Dv5YGi9P9Ru1lvhmMcmamp54Jqzx1BHYrQ2cynRRB71BeKIt15B
-         6k/NDPRe5X9vemcOoyJ8Qcj2YMZYr9kBeORCdKfai1vFKXe6FxZNqFwMZrTlDbNN2Jcv
-         K49Kh5obiWVk56UAzyD8DQXpA8H7u2d6LVLQadzvsBsr9deWFDiypbFpUYobGKtQC+Ej
-         iksQ==
+        bh=+XVwqdd74qmNagFrB1WCVK88NxDfUzRVSLDeS0Nb5rI=;
+        b=OVna7CztEp+7ApCTsemI8/wTEWaY6To7OYrbR0JLpxbxnfrC7KPBMvNKYX6S/EZG8A
+         jxN8amQfaia4isGOUjO1WrpV5iLhDMDhBLxrR65TSPQf5gKHR/YmbFjcgWDGlTlN67q2
+         IdTtp/Oswl0hFaCV/0LavWS45dWMUopa7jHGT1csFACBdeOAUOW2yvo7FUwubTxFFKZh
+         34TIZyNQKWEl735G51pUTdK5/949anvcH1W3xy6F/+0JaWJVuamelcQFSULqY/72Jg0A
+         s/fpLeQ8JLMHi8n3xsfajktFZc1xKpP+kRm6GDUL8Nt8PI1w5raNWM/ub7B+4JbsIynI
+         rnyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=45OIqyxPhSR1GPiehZv11C5FocNohr7VYhj0ZCDPs8s=;
-        b=W6SMNQmVz8DgDfQsdUSMj5YFv9xkGybwfhBB8ne1YM5ZwGI0/NhJ1ZjNTqlWH/WKZf
-         z16BJjJ6X7gFhDd5dQwShzpouY9CXH0fD9Gek+wFp7uuuTKx/Sd0Uv+14DC9Cp+R4KD/
-         9CfQwiLdHaV9QC1nrdMiugELvSd/+5dMAu6Fk6m4MlPVpappjNO2YfG7/O4ZR88xXYZL
-         q3JR8/vJ0vCJGEMneCrnIjw2YaTRvS5uL8QsL+z6f9CszkNhtNUIIp6RRIqh9KNy88kg
-         bWPucY24lxpMeRT7jhkE+hXP2tl1DcQka5sTds3N0S3964QypbD7RF1PuVFoW+ZZZBis
-         TbLg==
-X-Gm-Message-State: APjAAAVWuFJ5zx4r0XrLUuD5TdjpgrxSTyi4Ge1AfHYi6/aq3zWFObrk
-        zq9Kj+yuH6DF4wzdnoA1uy8l9bFQ
-X-Google-Smtp-Source: APXvYqxBMjhqBoyXNbvKJK9JKa+KpHJF+vEjIDFlMxqWvLEXeWaHXL2aG3JOaBpgPSf1xoCFcj4BTw==
-X-Received: by 2002:a1c:e90f:: with SMTP id q15mr12511551wmc.1.1555932364765;
-        Mon, 22 Apr 2019 04:26:04 -0700 (PDT)
+        bh=+XVwqdd74qmNagFrB1WCVK88NxDfUzRVSLDeS0Nb5rI=;
+        b=koLHnyq7jxPWXUjQtg7yMTxnduIGiCmln5jLa4I/UkEFA2J/sXjnvjagZHRHfAOKHX
+         Wg+QX6/7m3UckobBI740p3KFUSyC62sFZJW/wZ/Iw31wB2O3lAmUQSuG+YzHnxbIKLoC
+         degq2SpRz+S85nEIpS0kGujqZ/6YapCUgAU0efeWpYPPFA4SBk/AvtCbn8sFbEEe4Jh6
+         aksCQzaVDe5LNO49V71l0ec0IN+Dxu7dvLq2yDG2xef2AepM0+tlMF0Rj8gvOGRsUjcj
+         4mnWXBVX5AW4XOWemJtF3nEnW2bi+gyxrB5rq/2q8vWYsec+FduNp3EPsHiKiDeUnMbB
+         84OA==
+X-Gm-Message-State: APjAAAXS/ZLInxsmwY+ep/nZIHdDSaLiZsKlJAZoEG0VuBpJdkBhLwWg
+        b6d6MUTNFWRimWzF2guiEAk=
+X-Google-Smtp-Source: APXvYqy1wB13HD+ocOSubdoe3q+qmQeO9im6LrNojyGDO7kszwiC754RNfqeieDojb3xZerzAFG8uA==
+X-Received: by 2002:a1c:1aca:: with SMTP id a193mr12365084wma.40.1555932365977;
+        Mon, 22 Apr 2019 04:26:05 -0700 (PDT)
 Received: from debian64.daheim (p5B0D75EE.dip0.t-ipconnect.de. [91.13.117.238])
-        by smtp.gmail.com with ESMTPSA id z63sm17909571wme.30.2019.04.22.04.26.02
+        by smtp.gmail.com with ESMTPSA id y133sm13478793wmd.2.2019.04.22.04.26.02
         (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
         Mon, 22 Apr 2019 04:26:03 -0700 (PDT)
 Received: from chuck by debian64.daheim with local (Exim 4.92)
         (envelope-from <chunkeey@gmail.com>)
-        id 1hIX5F-0001VV-IV; Mon, 22 Apr 2019 13:26:01 +0200
+        id 1hIX5F-0001VQ-HV; Mon, 22 Apr 2019 13:26:01 +0200
 From:   Christian Lamparter <chunkeey@gmail.com>
 To:     linux-crypto@vger.kernel.org
 Cc:     Kees Cook <keescook@chromium.org>,
         Eric Biggers <ebiggers@google.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH 3/4] crypto4xx: use sync skcipher for fallback
-Date:   Mon, 22 Apr 2019 13:26:00 +0200
-Message-Id: <f2832f561a239db6dff6da5550e6c97913a70b02.1555932334.git.chunkeey@gmail.com>
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        stable@vger.kernel.org
+Subject: [PATCH 2/4] crypto4xx: fix cfb and ofb "overran dst buffer" issues
+Date:   Mon, 22 Apr 2019 13:25:59 +0200
+Message-Id: <4d8f4f483feb713126bbdb789b095936819d9804.1555932334.git.chunkeey@gmail.com>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <4d8f4f483feb713126bbdb789b095936819d9804.1555932334.git.chunkeey@gmail.com>
-References: <4c860f87b9339da1d1f700ba6a56a7a5e2eb14da.1555932334.git.chunkeey@gmail.com> <4d8f4f483feb713126bbdb789b095936819d9804.1555932334.git.chunkeey@gmail.com>
+In-Reply-To: <4c860f87b9339da1d1f700ba6a56a7a5e2eb14da.1555932334.git.chunkeey@gmail.com>
+References: <4c860f87b9339da1d1f700ba6a56a7a5e2eb14da.1555932334.git.chunkeey@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
@@ -77,97 +78,123 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This replaces struct crypto_skcipher and the extra request size
-with struct crypto_sync_skcipher and SYNC_SKCIPHER_REQUEST_ON_STACK(),
-which uses a fixed stack size.
+Currently, crypto4xx CFB and OFB AES ciphers are
+failing testmgr's test vectors.
 
+|cfb-aes-ppc4xx encryption overran dst buffer on test vector 3, cfg="in-place"
+|ofb-aes-ppc4xx encryption overran dst buffer on test vector 1, cfg="in-place"
+
+This is because of a very subtile "bug" in the hardware that
+gets indirectly mentioned in 18.1.3.5 Encryption/Decryption
+of the hardware spec:
+
+the OFB and CFB modes for AES are listed there as operation
+modes for >>> "Block ciphers" <<<. Which kind of makes sense,
+but we would like them to be considered as stream ciphers just
+like the CTR mode.
+
+To workaround this issue and stop the hardware from causing
+"overran dst buffer" on crypttexts that are not a multiple
+of 16 (AES_BLOCK_SIZE), we force the driver to use the scatter
+buffers as the go-between.
+
+As a bonus this patch also kills redundant pd_uinfo->num_gd
+and pd_uinfo->num_sd setters since the value has already been
+set before.
+
+Cc: stable@vger.kernel.org
 Signed-off-by: Christian Lamparter <chunkeey@gmail.com>
 ---
- drivers/crypto/amcc/crypto4xx_alg.c  | 12 ++++++------
- drivers/crypto/amcc/crypto4xx_core.c | 11 +++--------
- drivers/crypto/amcc/crypto4xx_core.h |  2 +-
- 3 files changed, 10 insertions(+), 15 deletions(-)
+ drivers/crypto/amcc/crypto4xx_core.c | 31 +++++++++++++++++++---------
+ 1 file changed, 21 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/crypto/amcc/crypto4xx_alg.c b/drivers/crypto/amcc/crypto4xx_alg.c
-index 3458c5a085d9..307f5cfa9ba4 100644
---- a/drivers/crypto/amcc/crypto4xx_alg.c
-+++ b/drivers/crypto/amcc/crypto4xx_alg.c
-@@ -264,10 +264,10 @@ crypto4xx_ctr_crypt(struct skcipher_request *req, bool encrypt)
- 	 * overlow.
- 	 */
- 	if (counter + nblks < counter) {
--		struct skcipher_request *subreq = skcipher_request_ctx(req);
-+		SYNC_SKCIPHER_REQUEST_ON_STACK(subreq, ctx->sw_cipher.cipher);
- 		int ret;
- 
--		skcipher_request_set_tfm(subreq, ctx->sw_cipher.cipher);
-+		skcipher_request_set_sync_tfm(subreq, ctx->sw_cipher.cipher);
- 		skcipher_request_set_callback(subreq, req->base.flags,
- 			NULL, NULL);
- 		skcipher_request_set_crypt(subreq, req->src, req->dst,
-@@ -289,14 +289,14 @@ static int crypto4xx_sk_setup_fallback(struct crypto4xx_ctx *ctx,
- {
- 	int rc;
- 
--	crypto_skcipher_clear_flags(ctx->sw_cipher.cipher,
-+	crypto_sync_skcipher_clear_flags(ctx->sw_cipher.cipher,
- 				    CRYPTO_TFM_REQ_MASK);
--	crypto_skcipher_set_flags(ctx->sw_cipher.cipher,
-+	crypto_sync_skcipher_set_flags(ctx->sw_cipher.cipher,
- 		crypto_skcipher_get_flags(cipher) & CRYPTO_TFM_REQ_MASK);
--	rc = crypto_skcipher_setkey(ctx->sw_cipher.cipher, key, keylen);
-+	rc = crypto_sync_skcipher_setkey(ctx->sw_cipher.cipher, key, keylen);
- 	crypto_skcipher_clear_flags(cipher, CRYPTO_TFM_RES_MASK);
- 	crypto_skcipher_set_flags(cipher,
--		crypto_skcipher_get_flags(ctx->sw_cipher.cipher) &
-+		crypto_sync_skcipher_get_flags(ctx->sw_cipher.cipher) &
- 			CRYPTO_TFM_RES_MASK);
- 
- 	return rc;
 diff --git a/drivers/crypto/amcc/crypto4xx_core.c b/drivers/crypto/amcc/crypto4xx_core.c
-index 920bd5e720b2..3e7d24ff3fa6 100644
+index 06574a884715..920bd5e720b2 100644
 --- a/drivers/crypto/amcc/crypto4xx_core.c
 +++ b/drivers/crypto/amcc/crypto4xx_core.c
-@@ -965,15 +965,10 @@ static int crypto4xx_sk_init(struct crypto_skcipher *sk)
+@@ -714,7 +714,23 @@ int crypto4xx_build_pd(struct crypto_async_request *req,
+ 	size_t offset_to_sr_ptr;
+ 	u32 gd_idx = 0;
+ 	int tmp;
+-	bool is_busy;
++	bool is_busy, force_sd;
++
++	/*
++	 * There's a very subtile/disguised "bug" in the hardware that
++	 * gets indirectly mentioned in 18.1.3.5 Encryption/Decryption
++	 * of the hardware spec:
++	 * *drum roll* the AES/(T)DES OFB and CFB modes are listed as
++	 * operation modes for >>> "Block ciphers" <<<.
++	 *
++	 * To workaround this issue and stop the hardware from causing
++	 * "overran dst buffer" on crypttexts that are not a multiple
++	 * of 16 (AES_BLOCK_SIZE), we force the driver to use the
++	 * scatter buffers.
++	 */
++	force_sd = (req_sa->sa_command_1.bf.crypto_mode9_8 == CRYPTO_MODE_CFB
++		|| req_sa->sa_command_1.bf.crypto_mode9_8 == CRYPTO_MODE_OFB)
++		&& (datalen % AES_BLOCK_SIZE);
  
- 	if (alg->base.cra_flags & CRYPTO_ALG_NEED_FALLBACK) {
- 		ctx->sw_cipher.cipher =
--			crypto_alloc_skcipher(alg->base.cra_name, 0,
--					      CRYPTO_ALG_NEED_FALLBACK |
--					      CRYPTO_ALG_ASYNC);
-+			crypto_alloc_sync_skcipher(alg->base.cra_name, 0,
-+					      CRYPTO_ALG_NEED_FALLBACK);
- 		if (IS_ERR(ctx->sw_cipher.cipher))
- 			return PTR_ERR(ctx->sw_cipher.cipher);
--
--		crypto_skcipher_set_reqsize(sk,
--			sizeof(struct skcipher_request) + 32 +
--			crypto_skcipher_reqsize(ctx->sw_cipher.cipher));
+ 	/* figure how many gd are needed */
+ 	tmp = sg_nents_for_len(src, assoclen + datalen);
+@@ -732,7 +748,7 @@ int crypto4xx_build_pd(struct crypto_async_request *req,
  	}
  
- 	amcc_alg = container_of(alg, struct crypto4xx_alg, alg.u.cipher);
-@@ -992,7 +987,7 @@ static void crypto4xx_sk_exit(struct crypto_skcipher *sk)
+ 	/* figure how many sd are needed */
+-	if (sg_is_last(dst)) {
++	if (sg_is_last(dst) && force_sd == false) {
+ 		num_sd = 0;
+ 	} else {
+ 		if (datalen > PPC4XX_SD_BUFFER_SIZE) {
+@@ -807,9 +823,10 @@ int crypto4xx_build_pd(struct crypto_async_request *req,
+ 	pd->sa_len = sa_len;
  
- 	crypto4xx_common_exit(ctx);
- 	if (ctx->sw_cipher.cipher)
--		crypto_free_skcipher(ctx->sw_cipher.cipher);
-+		crypto_free_sync_skcipher(ctx->sw_cipher.cipher);
- }
+ 	pd_uinfo = &dev->pdr_uinfo[pd_entry];
+-	pd_uinfo->async_req = req;
+ 	pd_uinfo->num_gd = num_gd;
+ 	pd_uinfo->num_sd = num_sd;
++	pd_uinfo->dest_va = dst;
++	pd_uinfo->async_req = req;
  
- static int crypto4xx_aead_init(struct crypto_aead *tfm)
-diff --git a/drivers/crypto/amcc/crypto4xx_core.h b/drivers/crypto/amcc/crypto4xx_core.h
-index 18df695ca6b1..4ecc34fa8ebd 100644
---- a/drivers/crypto/amcc/crypto4xx_core.h
-+++ b/drivers/crypto/amcc/crypto4xx_core.h
-@@ -131,7 +131,7 @@ struct crypto4xx_ctx {
- 	__le32 iv_nonce;
- 	u32 sa_len;
- 	union {
--		struct crypto_skcipher *cipher;
-+		struct crypto_sync_skcipher *cipher;
- 		struct crypto_aead *aead;
- 	} sw_cipher;
- };
+ 	if (iv_len)
+ 		memcpy(pd_uinfo->sr_va->save_iv, iv, iv_len);
+@@ -828,7 +845,6 @@ int crypto4xx_build_pd(struct crypto_async_request *req,
+ 		/* get first gd we are going to use */
+ 		gd_idx = fst_gd;
+ 		pd_uinfo->first_gd = fst_gd;
+-		pd_uinfo->num_gd = num_gd;
+ 		gd = crypto4xx_get_gdp(dev, &gd_dma, gd_idx);
+ 		pd->src = gd_dma;
+ 		/* enable gather */
+@@ -865,17 +881,14 @@ int crypto4xx_build_pd(struct crypto_async_request *req,
+ 		 * Indicate gather array is not used
+ 		 */
+ 		pd_uinfo->first_gd = 0xffffffff;
+-		pd_uinfo->num_gd = 0;
+ 	}
+-	if (sg_is_last(dst)) {
++	if (!num_sd) {
+ 		/*
+ 		 * we know application give us dst a whole piece of memory
+ 		 * no need to use scatter ring.
+ 		 */
+ 		pd_uinfo->using_sd = 0;
+ 		pd_uinfo->first_sd = 0xffffffff;
+-		pd_uinfo->num_sd = 0;
+-		pd_uinfo->dest_va = dst;
+ 		sa->sa_command_0.bf.scatter = 0;
+ 		pd->dest = (u32)dma_map_page(dev->core_dev->device,
+ 					     sg_page(dst), dst->offset,
+@@ -889,9 +902,7 @@ int crypto4xx_build_pd(struct crypto_async_request *req,
+ 		nbytes = datalen;
+ 		sa->sa_command_0.bf.scatter = 1;
+ 		pd_uinfo->using_sd = 1;
+-		pd_uinfo->dest_va = dst;
+ 		pd_uinfo->first_sd = fst_sd;
+-		pd_uinfo->num_sd = num_sd;
+ 		sd = crypto4xx_get_sdp(dev, &sd_dma, sd_idx);
+ 		pd->dest = sd_dma;
+ 		/* setup scatter descriptor */
 -- 
 2.20.1
 
