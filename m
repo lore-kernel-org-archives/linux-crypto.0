@@ -2,157 +2,142 @@ Return-Path: <SRS0=cKin=SY=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1FD0C282E1
-	for <linux-crypto@archiver.kernel.org>; Mon, 22 Apr 2019 09:18:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3497EC282E1
+	for <linux-crypto@archiver.kernel.org>; Mon, 22 Apr 2019 11:26:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8FC6B20674
-	for <linux-crypto@archiver.kernel.org>; Mon, 22 Apr 2019 09:18:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 03E94206A3
+	for <linux-crypto@archiver.kernel.org>; Mon, 22 Apr 2019 11:26:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="ZSdJHnz/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Tjp8SXOz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726790AbfDVJSC (ORCPT
+        id S1726995AbfDVL0H (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 22 Apr 2019 05:18:02 -0400
-Received: from mail-eopbgr700065.outbound.protection.outlook.com ([40.107.70.65]:60195
-        "EHLO NAM04-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726724AbfDVJSC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 22 Apr 2019 05:18:02 -0400
+        Mon, 22 Apr 2019 07:26:07 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:51675 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726698AbfDVL0G (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 22 Apr 2019 07:26:06 -0400
+Received: by mail-wm1-f68.google.com with SMTP id 4so14069856wmf.1;
+        Mon, 22 Apr 2019 04:26:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=xilinx.onmicrosoft.com; s=selector1-xilinx-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=I0da4zLEbnUEpwPyC3syt7+VkVPZBGg4DglIAousTk0=;
- b=ZSdJHnz/u7zyuY5N/UpbDebIi+gR6Y4Kt49ag9ip/10qKyHSBphF4WYg0ZjFYxLCOhbUgNwjgSGI0J1Z5j4+UTH1jt7UjrupgM1hFvVw5nuj167ZB/TCXElz+h8jlbE5qxFIKM3h7m2i+FA8gZRB1P5EyUVdO5j5K9gkyiamT+0=
-Received: from BN7PR02MB5124.namprd02.prod.outlook.com (20.176.26.153) by
- BN7PR02MB5250.namprd02.prod.outlook.com (20.176.176.160) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1813.14; Mon, 22 Apr 2019 09:17:55 +0000
-Received: from BN7PR02MB5124.namprd02.prod.outlook.com
- ([fe80::fc20:6339:ab53:378e]) by BN7PR02MB5124.namprd02.prod.outlook.com
- ([fe80::fc20:6339:ab53:378e%2]) with mapi id 15.20.1813.017; Mon, 22 Apr 2019
- 09:17:55 +0000
-From:   Kalyani Akula <kalyania@xilinx.com>
-To:     Stephan Mueller <smueller@chronox.de>
-CC:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [RFC PATCH 4/5] crypto: Adds user space interface for
- ALG_SET_KEY_TYPE
-Thread-Topic: [RFC PATCH 4/5] crypto: Adds user space interface for
- ALG_SET_KEY_TYPE
-Thread-Index: AQHUrjLRC0KQY4vUUEiutylzuXEA7qWzVM+AgJUjQyA=
-Date:   Mon, 22 Apr 2019 09:17:55 +0000
-Message-ID: <BN7PR02MB5124AC0C75B15E5FB66DF2B6AF220@BN7PR02MB5124.namprd02.prod.outlook.com>
-References: <1547708541-23730-1-git-send-email-kalyani.akula@xilinx.com>
- <1547708541-23730-5-git-send-email-kalyani.akula@xilinx.com>
- <4735882.YQOrfzxm5S@tauon.chronox.de>
-In-Reply-To: <4735882.YQOrfzxm5S@tauon.chronox.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=kalyania@xilinx.com; 
-x-originating-ip: [149.199.50.133]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: b62a2f20-8cb3-4f95-3865-08d6c7036796
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(4618075)(2017052603328)(7193020);SRVR:BN7PR02MB5250;
-x-ms-traffictypediagnostic: BN7PR02MB5250:
-x-microsoft-antispam-prvs: <BN7PR02MB52504DDC11E340152FC9D543AF220@BN7PR02MB5250.namprd02.prod.outlook.com>
-x-forefront-prvs: 00159D1518
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(396003)(366004)(136003)(39860400002)(346002)(376002)(189003)(199004)(13464003)(33656002)(66066001)(6916009)(7696005)(229853002)(6436002)(6116002)(3846002)(97736004)(2906002)(478600001)(14454004)(305945005)(14444005)(66446008)(74316002)(66476007)(71200400001)(71190400001)(9686003)(256004)(26005)(6506007)(186003)(53546011)(8936002)(81156014)(8676002)(81166006)(102836004)(68736007)(64756008)(66946007)(476003)(66556008)(53936002)(86362001)(76176011)(25786009)(316002)(4326008)(54906003)(5660300002)(99286004)(6246003)(52536014)(486006)(73956011)(11346002)(446003)(55016002)(76116006)(7736002);DIR:OUT;SFP:1101;SCL:1;SRVR:BN7PR02MB5250;H:BN7PR02MB5124.namprd02.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: xilinx.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: uzTaSN8PIYBhCp1dwQk4+fYOMI+VVvrjqs6ouyVKykNNUCCQByJYgd9QMv/JexJg9u5vWh67YIHqojB1w8g8DKOUa93AmucPjq5QD5vcxMeaCp7SAZXvo4Mw7WSDG4uK5UMXTJ+uYla5mZicIoY+dUEWly8cMynXejRNbgdueopZelQHOrN0c8G9gTuVvK3fMdFNb/DBGSMMDN4m129Oo2k68lTvl95iQIY8YIf5PKh83WuN8fbEj79ZNT8++p2HHLctqxy0+NtDFeUIAqHHiF9H+tUkkZKoMK8CtDBcyzQEtMpwjstIU7kGqXxtAPrvE6yBUCOBjUnNMoVsO7W9BcXry8GPuKGj126FykHhi2sfZ++m7NsXhooXo8SxY+9YeCEtJnduJeGtGkR/EMPhDctFNCPt0+qk87NtYKoJrtc=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=QTvdBrVDEPSw1Qe1gZEOJsxviDk6CdfjxJvT+L/zDAA=;
+        b=Tjp8SXOzrMESpmxjlBPjr3ZbIqxFoV5dI4A2R49YmaUMkmo5XTqIvoaLt3j2gnFW7Q
+         FiqtF2mOn3RIfF5P4uhhJfsrSgif4nnfcQ57caQfrYCYa0hZJwrl88P2fRJw4xkyhdCB
+         V7bDBYjlep5jdNvBWVpOT0IOjZNvc8QslBdqXxgAi5xb/ncfLVO55CBsXqGD8/4xDK6q
+         VTlDYkltDB2NUAuQ3qlnyzcnvzksQrw4RkgjRrV2IQPnzIL0WxIBWjqSo0alfhxg6/L+
+         3iRBtK2sSxyw7VEWqQ+KjEUfd50TtX0bd2TkEBOux+cqihmeKcpxkeEjvLPrfE6h6f/i
+         fr/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=QTvdBrVDEPSw1Qe1gZEOJsxviDk6CdfjxJvT+L/zDAA=;
+        b=MngrBttMrYesfzcGRB65wddCn/JIH1+iL0xTJ/n4oK0Psk0g0JPUFG4ecWokV8SXIc
+         IxJZOGMyQO2r8tZ6wc8J2WWHlRGp/O1XUmhyilvvB4VAo4japzc6K7fwqXPW8PqUgXM8
+         YQ92qrnoJYxhX8Zr8zBx5g0EFmofj39k9beWZZqhyLIKmGqWdvSYZC9XLaofX5gZOhUo
+         a0Qzi3mkWG1Kl6g65nkC37ETIY65wYQeFqdWMcd+axssDMODs3YzZLRFHi+7DnPCAcUg
+         QypCX+ryqGsFpHrH84eG4pVx0ygXhbUOU/0Pu0cZrWQhVSoVi4urpY/KwoCotfHIsw4L
+         UCIg==
+X-Gm-Message-State: APjAAAXGy2B4XnNBo1XzvTjMTO17tnFJ/Sv0XMeVP5kE7J+sOo7ZripC
+        L79S+q8eXmeJGXE2iQ8z29A=
+X-Google-Smtp-Source: APXvYqwyluy6sBFqh6a9nIS4RkaQ7W1hpfM68JaIex4+YwlQy+dH7BEEuLhZS0/F5Zrnc5P6Hu4nQw==
+X-Received: by 2002:a1c:6c04:: with SMTP id h4mr11985333wmc.135.1555932364322;
+        Mon, 22 Apr 2019 04:26:04 -0700 (PDT)
+Received: from debian64.daheim (p5B0D75EE.dip0.t-ipconnect.de. [91.13.117.238])
+        by smtp.gmail.com with ESMTPSA id f1sm9964774wrt.87.2019.04.22.04.26.02
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Mon, 22 Apr 2019 04:26:03 -0700 (PDT)
+Received: from chuck by debian64.daheim with local (Exim 4.92)
+        (envelope-from <chunkeey@gmail.com>)
+        id 1hIX5F-0001VN-GW; Mon, 22 Apr 2019 13:26:01 +0200
+From:   Christian Lamparter <chunkeey@gmail.com>
+To:     linux-crypto@vger.kernel.org
+Cc:     Kees Cook <keescook@chromium.org>,
+        Eric Biggers <ebiggers@google.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        stable@vger.kernel.org
+Subject: [PATCH 1/4] crypto4xx: fix ctr-aes missing output IV
+Date:   Mon, 22 Apr 2019 13:25:58 +0200
+Message-Id: <4c860f87b9339da1d1f700ba6a56a7a5e2eb14da.1555932334.git.chunkeey@gmail.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-X-OriginatorOrg: xilinx.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b62a2f20-8cb3-4f95-3865-08d6c7036796
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Apr 2019 09:17:55.4289
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 657af505-d5df-48d0-8300-c31994686c5c
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN7PR02MB5250
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Stephan,
+Commit 8efd972ef96a ("crypto: testmgr - support checking skcipher output IV")
+caused the crypto4xx driver to produce the following error:
 
-Sorry for the delayed response.
+| ctr-aes-ppc4xx encryption test failed (wrong output IV)
+| on test vector 0, cfg="in-place"
 
-Please find my response/doubts inline.
+This patch fixes this by reworking the crypto4xx_setkey_aes()
+function to:
 
-> -----Original Message-----
-> From: Stephan Mueller <smueller@chronox.de>
-> Sent: Thursday, January 17, 2019 5:04 PM
-> To: Kalyani Akula <kalyania@xilinx.com>
-> Cc: herbert@gondor.apana.org.au; davem@davemloft.net; linux-
-> crypto@vger.kernel.org; linux-kernel@vger.kernel.org; Kalyani Akula
-> <kalyania@xilinx.com>; Sarat Chand Savitala <saratcha@xilinx.com>
-> Subject: Re: [RFC PATCH 4/5] crypto: Adds user space interface for
-> ALG_SET_KEY_TYPE
->=20
-> Am Donnerstag, 17. Januar 2019, 08:02:20 CET schrieb Kalyani Akula:
->=20
-> Hi Kalyani,
->=20
-> > ALG_SET_KEY_TYPE requires caller to pass the key_type to be used for
-> > AES encryption/decryption.
-> >
-> > Sometimes the cipher key will be stored in the device's hardware. So,
-> > there is a need to specify the information about the key to use for
-> > AES operations.
-> >
-> > In Xilinx ZynqMP SoC, below key types are available
-> >
-> > 1. Device key, which is flashed in the HW.
-> >
-> > 2. PUF KEK, which can be regenerated using the
-> >    helper data programmed in the HW.
-> >
-> > 3. User supplied key.
-> >
-> > So to choose the AES key to be used, this patch adds key-type attribute=
-.
->=20
-> You expose your particular driver interface to user space. So, user space
-> would need the details of you driver to know what to set. If another driv=
-er
-> has such key type support, user space would need to know about that, too.=
- I
-> do not think this is a wise idea.
->=20
-> If we are going to have such a keytype selection, there must be a common
-> user space interface for all drivers. I.e. define common key types the dr=
-ivers
-> then can map to their particular key type interface.
-[kalyani] Agree, now we have 3 basic key types and we can define them as be=
-low
-eFuse key
-PUF KEK
-User supplied key
-But for our upcoming platform there are multiple flavors of above keys,=20
-those may not be common for other drivers.=20
-I will check on this further and update.
->=20
-> Besides, seem to be more a key handling issue. Wouldn't it make sense to
-> rather have such issue solved with key rings than in the kernel crypto AP=
-I?
-[kalyani] Can you please elaborate on this further ?
->=20
-> Ciao
-> Stephan
->=20
+ - not save the iv for ECB (as per 18.2.38 CRYP0_SA_CMD_0:
+   "This bit mut be cleared for DES ECB mode or AES ECB mode,
+   when no IV is used.")
+
+ - instruct the hardware to save the generated IV for all
+   other modes of operations that have IV and then supply
+   it back to the callee in pretty much the same way as we
+   do it for cbc-aes already.
+
+ - make it clear that the DIR_(IN|OUT)BOUND is the important
+   bit that tells the hardware to encrypt or decrypt the data.
+   (this is cosmetic - but it hopefully prevents me from
+    getting confused again).
+
+ - don't load any bogus hash when we don't use any hash
+   operation to begin with.
+
+Cc: stable@vger.kernel.org
+Signed-off-by: Christian Lamparter <chunkeey@gmail.com>
+---
+ drivers/crypto/amcc/crypto4xx_alg.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/crypto/amcc/crypto4xx_alg.c b/drivers/crypto/amcc/crypto4xx_alg.c
+index 4092c2aad8e2..3458c5a085d9 100644
+--- a/drivers/crypto/amcc/crypto4xx_alg.c
++++ b/drivers/crypto/amcc/crypto4xx_alg.c
+@@ -141,9 +141,10 @@ static int crypto4xx_setkey_aes(struct crypto_skcipher *cipher,
+ 	/* Setup SA */
+ 	sa = ctx->sa_in;
+ 
+-	set_dynamic_sa_command_0(sa, SA_NOT_SAVE_HASH, (cm == CRYPTO_MODE_CBC ?
+-				 SA_SAVE_IV : SA_NOT_SAVE_IV),
+-				 SA_LOAD_HASH_FROM_SA, SA_LOAD_IV_FROM_STATE,
++	set_dynamic_sa_command_0(sa, SA_NOT_SAVE_HASH, (cm == CRYPTO_MODE_ECB ?
++				 SA_NOT_SAVE_IV : SA_SAVE_IV),
++				 SA_NOT_LOAD_HASH, (cm == CRYPTO_MODE_ECB ?
++				 SA_LOAD_IV_FROM_SA : SA_LOAD_IV_FROM_STATE),
+ 				 SA_NO_HEADER_PROC, SA_HASH_ALG_NULL,
+ 				 SA_CIPHER_ALG_AES, SA_PAD_TYPE_ZERO,
+ 				 SA_OP_GROUP_BASIC, SA_OPCODE_DECRYPT,
+@@ -162,6 +163,11 @@ static int crypto4xx_setkey_aes(struct crypto_skcipher *cipher,
+ 	memcpy(ctx->sa_out, ctx->sa_in, ctx->sa_len * 4);
+ 	sa = ctx->sa_out;
+ 	sa->sa_command_0.bf.dir = DIR_OUTBOUND;
++	/*
++	 * SA_OPCODE_ENCRYPT is the same value as SA_OPCODE_DECRYPT.
++	 * it's the DIR_(IN|OUT)BOUND that matters
++	 */
++	sa->sa_command_0.bf.opcode = SA_OPCODE_ENCRYPT;
+ 
+ 	return 0;
+ }
+-- 
+2.20.1
 
