@@ -6,74 +6,78 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB6F7C10F03
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 Apr 2019 01:33:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 693A9C10F11
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Apr 2019 07:54:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 90C0F218D2
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 Apr 2019 01:33:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4102B206BA
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Apr 2019 07:54:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729013AbfDXBdE (ORCPT
+        id S1730007AbfDXHyU (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 23 Apr 2019 21:33:04 -0400
-Received: from vmicros1.altlinux.org ([194.107.17.57]:41506 "EHLO
-        vmicros1.altlinux.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728918AbfDXBdE (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 23 Apr 2019 21:33:04 -0400
-Received: from imap.altlinux.org (imap.altlinux.org [194.107.17.38])
-        by vmicros1.altlinux.org (Postfix) with ESMTP id 00CDD72CC58;
-        Wed, 24 Apr 2019 04:33:02 +0300 (MSK)
-Received: from beacon.altlinux.org (unknown [185.6.174.98])
-        by imap.altlinux.org (Postfix) with ESMTPSA id CE4414A4A14;
-        Wed, 24 Apr 2019 04:33:01 +0300 (MSK)
-From:   Vitaly Chikunov <vt@altlinux.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Randy Dunlap <rdunlap@infradead.org>,
-        Stephen Rothwell <sfr@canb.auug.org.au>
-Subject: [PATCH v2] crypto: ecrdsa - select ASN1 and OID_REGISTRY for EC-RDSA
-Date:   Wed, 24 Apr 2019 04:32:40 +0300
-Message-Id: <20190424013240.26854-1-vt@altlinux.org>
-X-Mailer: git-send-email 2.11.0
+        Wed, 24 Apr 2019 03:54:20 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:57944 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729767AbfDXHyT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 24 Apr 2019 03:54:19 -0400
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 85B58C3B0CB00916E3E4;
+        Wed, 24 Apr 2019 15:54:17 +0800 (CST)
+Received: from localhost (10.177.31.96) by DGGEMS408-HUB.china.huawei.com
+ (10.3.19.208) with Microsoft SMTP Server id 14.3.439.0; Wed, 24 Apr 2019
+ 15:54:08 +0800
+From:   Yue Haibing <yuehaibing@huawei.com>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <nicolas.ferre@microchip.com>, <alexandre.belloni@bootlin.com>,
+        <ludovic.desroches@microchip.com>
+CC:     <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-crypto@vger.kernel.org>, YueHaibing <yuehaibing@huawei.com>
+Subject: [PATCH -next] crypto: atmel - remove set but not used variable 'alg_name'
+Date:   Wed, 24 Apr 2019 15:53:52 +0800
+Message-ID: <20190424075352.22828-1-yuehaibing@huawei.com>
+X-Mailer: git-send-email 2.10.2.windows.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.177.31.96]
+X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Fix undefined symbol issue in ecrdsa_generic module when ASN1
-or OID_REGISTRY aren't enabled in the config by selecting these
-options for CRYPTO_ECRDSA.
+From: YueHaibing <yuehaibing@huawei.com>
 
-ERROR: "asn1_ber_decoder" [crypto/ecrdsa_generic.ko] undefined!
-ERROR: "look_up_OID" [crypto/ecrdsa_generic.ko] undefined!
+Fixes gcc '-Wunused-but-set-variable' warning:
 
-Reported-by: Randy Dunlap <rdunlap@infradead.org>
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>
-Signed-off-by: Vitaly Chikunov <vt@altlinux.org>
-Acked-by: Randy Dunlap <rdunlap@infradead.org> # build-tested
+drivers/crypto/atmel-tdes.c: In function 'atmel_tdes_setkey':
+drivers/crypto/atmel-tdes.c:803:14: warning: variable 'alg_name' set but not used [-Wunused-but-set-variable]
+
+It is not used any more since
+commit 52ea3cd2917b ("crypto: atmel - Forbid 2-key 3DES in FIPS mode")
+
+Signed-off-by: YueHaibing <yuehaibing@huawei.com>
 ---
-Changes since v1:
-- Undo diff.noprefix from the patch.
+ drivers/crypto/atmel-tdes.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
- crypto/Kconfig | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 4446833f6eca..3d056e7da65f 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -264,6 +264,8 @@ config CRYPTO_ECRDSA
- 	select CRYPTO_ECC
- 	select CRYPTO_AKCIPHER
- 	select CRYPTO_STREEBOG
-+	select OID_REGISTRY
-+	select ASN1
- 	help
- 	  Elliptic Curve Russian Digital Signature Algorithm (GOST R 34.10-2012,
- 	  RFC 7091, ISO/IEC 14888-3:2018) is one of the Russian cryptographic
+diff --git a/drivers/crypto/atmel-tdes.c b/drivers/crypto/atmel-tdes.c
+index 12492d9..fa76620 100644
+--- a/drivers/crypto/atmel-tdes.c
++++ b/drivers/crypto/atmel-tdes.c
+@@ -800,12 +800,9 @@ static int atmel_tdes_setkey(struct crypto_ablkcipher *tfm, const u8 *key,
+ 			   unsigned int keylen)
+ {
+ 	struct atmel_tdes_ctx *ctx = crypto_ablkcipher_ctx(tfm);
+-	const char *alg_name;
+ 	u32 flags;
+ 	int err;
+ 
+-	alg_name = crypto_tfm_alg_name(crypto_ablkcipher_tfm(tfm));
+-
+ 	flags = crypto_ablkcipher_get_flags(tfm);
+ 	err = __des3_verify_key(&flags, key);
+ 	if (unlikely(err)) {
 -- 
-2.11.0
+2.7.4
+
 
