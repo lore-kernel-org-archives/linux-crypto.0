@@ -2,92 +2,110 @@ Return-Path: <SRS0=5M5o=S3=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5243DC43219
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Apr 2019 20:12:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B59BC43218
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Apr 2019 21:27:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 585BF2077C
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Apr 2019 20:12:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1556223178;
-	bh=88RpeUBzb0X1D03/gg6kKwn4xLH8iqQsz0Sllw+D5TQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=gMGcDQ0oY3nuh90eyhUzmWPjxSrf1pwXIeTEQ2C24Dp0YBpJZEMMFk9kB9PGmjeyi
-	 7O8zNcOudGbuFQuNg4UNkhj3lnbXaEz8vPhiK/UehZkz7fTOMucsFsI89rcggKEjHF
-	 rtL3Bcm7cEXdK0hctyjDVH22bRObOTw8uagKEMsc=
+	by mail.kernel.org (Postfix) with ESMTP id 4C80520717
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Apr 2019 21:27:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729259AbfDYUM5 (ORCPT
+        id S1726628AbfDYV1O (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 25 Apr 2019 16:12:57 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49824 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726490AbfDYUM4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 Apr 2019 16:12:56 -0400
-Received: from localhost (62-193-50-229.as16211.net [62.193.50.229])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id BA71720717;
-        Thu, 25 Apr 2019 20:12:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1556223176;
-        bh=88RpeUBzb0X1D03/gg6kKwn4xLH8iqQsz0Sllw+D5TQ=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=exR8pLk4Vz7pcfsTDSson1gAT5LG70NZbynyKGrMl3s3PRBMmWbkUmoKlzIY3q9Mh
-         tIA+mjIGU6WxSNtWxnEkbxbocBnNa4jAF4zktKu4feJi0IL3fmQIuQ3tr3nUaQfkoc
-         nE4MhcQGjWshDVORN+Mf/gPYGPLAyrf8APngKCBY=
-Date:   Thu, 25 Apr 2019 22:12:53 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Kimberly Brown <kimbrownkd@gmail.com>
-Cc:     "Rafael J. Wysocki" <rafael@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        linux-crypto@vger.kernel.org, Ingo Molnar <mingo@redhat.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        Jiri Kosina <jikos@kernel.org>,
-        Miroslav Benes <mbenes@suse.cz>,
-        Petr Mladek <pmladek@suse.com>,
-        Joe Lawrence <joe.lawrence@redhat.com>,
-        live-patching@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 0/8] kobject: Add default group support to kobj_type
- and replace subsystem uses
-Message-ID: <20190425201253.GA12131@kroah.com>
-References: <20190322201440.GA30814@ubu-Virtual-Machine>
- <cover.1554151487.git.kimbrownkd@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1554151487.git.kimbrownkd@gmail.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+        Thu, 25 Apr 2019 17:27:14 -0400
+Received: from s3.sipsolutions.net ([144.76.43.62]:40516 "EHLO
+        sipsolutions.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726586AbfDYV1N (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 25 Apr 2019 17:27:13 -0400
+Received: by sipsolutions.net with esmtpsa (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <johannes@sipsolutions.net>)
+        id 1hJlsJ-0000g8-4C; Thu, 25 Apr 2019 23:25:47 +0200
+Message-ID: <5511420228cb38d08a67c0f6a614b7671d7d23d4.camel@sipsolutions.net>
+Subject: Re: [PATCH v3 12/26] compat_ioctl: move more drivers to
+ compat_ptr_ioctl
+From:   Johannes Berg <johannes@sipsolutions.net>
+To:     Arnd Bergmann <arnd@arndb.de>, Al Viro <viro@zeniv.linux.org.uk>
+Cc:     Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
+        Linux FS-devel Mailing List <linux-fsdevel@vger.kernel.org>,
+        y2038 Mailman List <y2038@lists.linaro.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Jason Gunthorpe <jgg@mellanox.com>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        David Sterba <dsterba@suse.com>,
+        Darren Hart <dvhart@infradead.org>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        driverdevel <devel@driverdev.osuosl.org>, qat-linux@intel.com,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        Linux Media Mailing List <linux-media@vger.kernel.org>,
+        dri-devel <dri-devel@lists.freedesktop.org>,
+        linaro-mm-sig@lists.linaro.org, amd-gfx@lists.freedesktop.org,
+        "open list:HID CORE LAYER" <linux-input@vger.kernel.org>,
+        linux-iio@vger.kernel.org, linux-rdma <linux-rdma@vger.kernel.org>,
+        linux-nvdimm@lists.01.org, linux-nvme@lists.infradead.org,
+        linux-pci <linux-pci@vger.kernel.org>,
+        Platform Driver <platform-driver-x86@vger.kernel.org>,
+        linux-remoteproc@vger.kernel.org,
+        sparclinux <sparclinux@vger.kernel.org>,
+        linux-scsi <linux-scsi@vger.kernel.org>,
+        USB list <linux-usb@vger.kernel.org>,
+        linux-btrfs <linux-btrfs@vger.kernel.org>,
+        ceph-devel <ceph-devel@vger.kernel.org>,
+        linux-wireless <linux-wireless@vger.kernel.org>,
+        Networking <netdev@vger.kernel.org>, Sean Young <sean@mess.org>
+Date:   Thu, 25 Apr 2019 23:25:43 +0200
+In-Reply-To: <CAK8P3a2HmiYQJ2FV2FgLiFsD8M9UKteC9Jetx7ja06PQVZWYfA@mail.gmail.com> (sfid-20190425_175600_668610_93FA972E)
+References: <20190416202013.4034148-1-arnd@arndb.de>
+         <20190416202701.127745-1-arnd@arndb.de> <20190425122153.450fc094@coco.lan>
+         <20190425153534.GS2217@ZenIV.linux.org.uk>
+         <CAK8P3a2HmiYQJ2FV2FgLiFsD8M9UKteC9Jetx7ja06PQVZWYfA@mail.gmail.com>
+         (sfid-20190425_175600_668610_93FA972E)
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-2.fc28) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Apr 01, 2019 at 10:51:10PM -0400, Kimberly Brown wrote:
-> This patchset adds support for default attribute groups to kobj_type.
-> Also, the uses of kobj_type's default_attrs field are replaced with
-> default_groups in the following subsystems:
->  - samples
->  - block
->  - net
->  - irq
->  - padata
->  - cpufreq
->  - livepatch
+On Thu, 2019-04-25 at 17:55 +0200, Arnd Bergmann wrote:
+> On Thu, Apr 25, 2019 at 5:35 PM Al Viro <viro@zeniv.linux.org.uk> wrote:
+> > 
+> > On Thu, Apr 25, 2019 at 12:21:53PM -0300, Mauro Carvalho Chehab wrote:
+> > 
+> > > If I understand your patch description well, using compat_ptr_ioctl
+> > > only works if the driver is not for s390, right?
+> > 
+> > No; s390 is where "oh, just set ->compat_ioctl same as ->unlocked_ioctl
+> > and be done with that; compat_ptr() is a no-op anyway" breaks.  IOW,
+> > s390 is the reason for having compat_ptr_ioctl() in the first place;
+> > that thing works on all biarch architectures, as long as all stuff
+> > handled by ->ioctl() takes pointer to arch-independent object as
+> > argument.  IOW,
+> >         argument ignored => OK
+> >         any arithmetical type => no go, compat_ptr() would bugger it
+> >         pointer to int => OK
+> >         pointer to string => OK
+> >         pointer to u64 => OK
+> >         pointer to struct {u64 addr; char s[11];} => OK
 > 
-> The subsystem maintainers and lists will be copied on the subsystem
-> patches.
-> 
-> The uses of kobj_type's default_attrs field in the other subsystems will
-> be replaced in future patchsets.
+> To be extra pedantic, the 'struct {u64 addr; char s[11];} '
+> case is also broken on x86, because sizeof (obj) is smaller
+> on i386, even though the location of the members are
+> the same. i.e. you can copy_from_user() this
 
-Thanks for all of these, now queued up.  Patches to fix up the other
-subsystems are always welcome :)
+Actually, you can't even do that because the struct might sit at the end
+of a page and then you'd erroneously fault in this case.
 
-greg k-h
+We had this a while ago with struct ifreq, see commit 98406133dd and its
+parents.
+
+johannes
+
