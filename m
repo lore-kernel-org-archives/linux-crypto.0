@@ -6,28 +6,28 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33EF0C43218
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7E22C43219
 	for <linux-crypto@archiver.kernel.org>; Thu, 25 Apr 2019 16:25:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 983082077C
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Apr 2019 16:25:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 275442077C
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Apr 2019 16:25:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726026AbfDYQZV (ORCPT
+        id S1726434AbfDYQZV (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Thu, 25 Apr 2019 12:25:21 -0400
-Received: from inva020.nxp.com ([92.121.34.13]:33034 "EHLO inva020.nxp.com"
+Received: from inva021.nxp.com ([92.121.34.21]:35766 "EHLO inva021.nxp.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726434AbfDYQZU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 Apr 2019 12:25:20 -0400
-Received: from inva020.nxp.com (localhost [127.0.0.1])
-        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 626511A02AB;
+        id S1729013AbfDYQZV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 25 Apr 2019 12:25:21 -0400
+Received: from inva021.nxp.com (localhost [127.0.0.1])
+        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id E59A62003FF;
         Thu, 25 Apr 2019 18:25:18 +0200 (CEST)
 Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
-        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 5646E1A02A8;
+        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id D7F072003F3;
         Thu, 25 Apr 2019 18:25:18 +0200 (CEST)
 Received: from fsr-ub1864-014.ea.freescale.net (fsr-ub1864-014.ea.freescale.net [10.171.95.219])
-        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id DBEB82061F;
-        Thu, 25 Apr 2019 18:25:17 +0200 (CEST)
+        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 66C172061F;
+        Thu, 25 Apr 2019 18:25:18 +0200 (CEST)
 From:   =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>
 Cc:     "David S. Miller" <davem@davemloft.net>,
@@ -38,9 +38,9 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         Iuliana Prodan <iuliana.prodan@nxp.com>,
         Marcin Niestroj <m.niestroj@grinn-global.com>,
         linux-crypto@vger.kernel.org, NXP Linux Team <linux-imx@nxp.com>
-Subject: [PATCH 5/7] crypto: caam/qi - fix address translations with IOMMU enabled
-Date:   Thu, 25 Apr 2019 19:24:59 +0300
-Message-Id: <20190425162501.4565-6-horia.geanta@nxp.com>
+Subject: [PATCH 6/7] crypto: caam/qi - DMA map keys using proper device
+Date:   Thu, 25 Apr 2019 19:25:00 +0300
+Message-Id: <20190425162501.4565-7-horia.geanta@nxp.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190425162501.4565-1-horia.geanta@nxp.com>
 References: <20190425162501.4565-1-horia.geanta@nxp.com>
@@ -53,96 +53,130 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-When IOMMU is enabled, iova -> phys address translation should be
-performed using iommu_ops, not dma_to_phys().
+Currently there is a mismatch b/w the ICID (Isolation Context ID) used
+for DMA mapping keys and ICID used for accessing them.
+-keys are DMA mapped using a job ring device, thus a job ring ICID
+-keys are accessed from descriptors enqueued via Queue Interface,
+thus using QI ICID
+
+[Note: ICIDs of JRs, QI are configured by U-boot / other entity by:
+-fixing up the corresponding job ring and controller DT nodes
+-setting up corresponding caam ICID registers]
+
+In order to avoid IOMMU faults, DMA map the key using the controller
+device instead of a job ring device.
 
 Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
 ---
- drivers/crypto/caam/ctrl.c   |  1 +
- drivers/crypto/caam/intern.h |  2 ++
- drivers/crypto/caam/qi.c     | 16 ++++++++++++++--
- 3 files changed, 17 insertions(+), 2 deletions(-)
+ drivers/crypto/caam/caamalg_qi.c | 33 ++++++++++++++++++--------------
+ 1 file changed, 19 insertions(+), 14 deletions(-)
 
-diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-index 38bcbbccdfda..bbde6efce8af 100644
---- a/drivers/crypto/caam/ctrl.c
-+++ b/drivers/crypto/caam/ctrl.c
-@@ -702,6 +702,7 @@ static int caam_probe(struct platform_device *pdev)
- 	}
+diff --git a/drivers/crypto/caam/caamalg_qi.c b/drivers/crypto/caam/caamalg_qi.c
+index fd38200dbc1c..912d86afa99b 100644
+--- a/drivers/crypto/caam/caamalg_qi.c
++++ b/drivers/crypto/caam/caamalg_qi.c
+@@ -236,7 +236,7 @@ static int aead_setkey(struct crypto_aead *aead, const u8 *key,
+ 		memcpy(ctx->key, keys.authkey, keys.authkeylen);
+ 		memcpy(ctx->key + ctx->adata.keylen_pad, keys.enckey,
+ 		       keys.enckeylen);
+-		dma_sync_single_for_device(jrdev, ctx->key_dma,
++		dma_sync_single_for_device(jrdev->parent, ctx->key_dma,
+ 					   ctx->adata.keylen_pad +
+ 					   keys.enckeylen, ctx->dir);
+ 		goto skip_split_key;
+@@ -250,8 +250,9 @@ static int aead_setkey(struct crypto_aead *aead, const u8 *key,
  
- 	ctrlpriv->era = caam_get_era(ctrl);
-+	ctrlpriv->domain = iommu_get_domain_for_dev(dev);
+ 	/* postpend encryption key to auth split key */
+ 	memcpy(ctx->key + ctx->adata.keylen_pad, keys.enckey, keys.enckeylen);
+-	dma_sync_single_for_device(jrdev, ctx->key_dma, ctx->adata.keylen_pad +
+-				   keys.enckeylen, ctx->dir);
++	dma_sync_single_for_device(jrdev->parent, ctx->key_dma,
++				   ctx->adata.keylen_pad + keys.enckeylen,
++				   ctx->dir);
+ #ifdef DEBUG
+ 	print_hex_dump(KERN_ERR, "ctx.key@" __stringify(__LINE__)": ",
+ 		       DUMP_PREFIX_ADDRESS, 16, 4, ctx->key,
+@@ -391,7 +392,8 @@ static int gcm_setkey(struct crypto_aead *aead,
+ #endif
  
- #ifdef CONFIG_DEBUG_FS
- 	/*
-diff --git a/drivers/crypto/caam/intern.h b/drivers/crypto/caam/intern.h
-index c9089da5dbaf..6af84bbc612c 100644
---- a/drivers/crypto/caam/intern.h
-+++ b/drivers/crypto/caam/intern.h
-@@ -70,6 +70,8 @@ struct caam_drv_private {
- 	struct caam_queue_if __iomem *qi; /* QI control region */
- 	struct caam_job_ring __iomem *jr[4];	/* JobR's register space */
+ 	memcpy(ctx->key, key, keylen);
+-	dma_sync_single_for_device(jrdev, ctx->key_dma, keylen, ctx->dir);
++	dma_sync_single_for_device(jrdev->parent, ctx->key_dma, keylen,
++				   ctx->dir);
+ 	ctx->cdata.keylen = keylen;
  
-+	struct iommu_domain *domain;
-+
- 	/*
- 	 * Detected geometry block. Filled in from device tree if powerpc,
- 	 * or from register-based version detection code
-diff --git a/drivers/crypto/caam/qi.c b/drivers/crypto/caam/qi.c
-index 46fca2c9fb24..0fe618e3804a 100644
---- a/drivers/crypto/caam/qi.c
-+++ b/drivers/crypto/caam/qi.c
-@@ -94,6 +94,16 @@ static u64 times_congested;
-  */
- static struct kmem_cache *qi_cache;
+ 	ret = gcm_set_sh_desc(aead);
+@@ -495,8 +497,8 @@ static int rfc4106_setkey(struct crypto_aead *aead,
+ 	 * in the nonce. Update the AES key length.
+ 	 */
+ 	ctx->cdata.keylen = keylen - 4;
+-	dma_sync_single_for_device(jrdev, ctx->key_dma, ctx->cdata.keylen,
+-				   ctx->dir);
++	dma_sync_single_for_device(jrdev->parent, ctx->key_dma,
++				   ctx->cdata.keylen, ctx->dir);
  
-+static void *caam_iova_to_virt(struct iommu_domain *domain,
-+			       dma_addr_t iova_addr)
-+{
-+	phys_addr_t phys_addr;
-+
-+	phys_addr = domain ? iommu_iova_to_phys(domain, iova_addr) : iova_addr;
-+
-+	return phys_to_virt(phys_addr);
-+}
-+
- int caam_qi_enqueue(struct device *qidev, struct caam_drv_req *req)
+ 	ret = rfc4106_set_sh_desc(aead);
+ 	if (ret)
+@@ -599,8 +601,8 @@ static int rfc4543_setkey(struct crypto_aead *aead,
+ 	 * in the nonce. Update the AES key length.
+ 	 */
+ 	ctx->cdata.keylen = keylen - 4;
+-	dma_sync_single_for_device(jrdev, ctx->key_dma, ctx->cdata.keylen,
+-				   ctx->dir);
++	dma_sync_single_for_device(jrdev->parent, ctx->key_dma,
++				   ctx->cdata.keylen, ctx->dir);
+ 
+ 	ret = rfc4543_set_sh_desc(aead);
+ 	if (ret)
+@@ -2410,6 +2412,7 @@ static int caam_init_common(struct caam_ctx *ctx, struct caam_alg_entry *caam,
+ 			    bool uses_dkp)
  {
- 	struct qm_fd fd;
-@@ -134,6 +144,7 @@ static void caam_fq_ern_cb(struct qman_portal *qm, struct qman_fq *fq,
- 	const struct qm_fd *fd;
- 	struct caam_drv_req *drv_req;
- 	struct device *qidev = &(raw_cpu_ptr(&pcpu_qipriv)->net_dev.dev);
-+	struct caam_drv_private *priv = dev_get_drvdata(qidev);
+ 	struct caam_drv_private *priv;
++	struct device *dev;
  
- 	fd = &msg->ern.fd;
- 
-@@ -142,7 +153,7 @@ static void caam_fq_ern_cb(struct qman_portal *qm, struct qman_fq *fq,
- 		return;
+ 	/*
+ 	 * distribute tfms across job rings to ensure in-order
+@@ -2421,16 +2424,17 @@ static int caam_init_common(struct caam_ctx *ctx, struct caam_alg_entry *caam,
+ 		return PTR_ERR(ctx->jrdev);
  	}
  
--	drv_req = (struct caam_drv_req *)phys_to_virt(qm_fd_addr_get64(fd));
-+	drv_req = caam_iova_to_virt(priv->domain, qm_fd_addr_get64(fd));
- 	if (!drv_req) {
- 		dev_err(qidev,
- 			"Can't find original request for CAAM response\n");
-@@ -549,6 +560,7 @@ static enum qman_cb_dqrr_result caam_rsp_fq_dqrr_cb(struct qman_portal *p,
- 	struct caam_drv_req *drv_req;
- 	const struct qm_fd *fd;
- 	struct device *qidev = &(raw_cpu_ptr(&pcpu_qipriv)->net_dev.dev);
-+	struct caam_drv_private *priv = dev_get_drvdata(qidev);
- 	u32 status;
+-	priv = dev_get_drvdata(ctx->jrdev->parent);
++	dev = ctx->jrdev->parent;
++	priv = dev_get_drvdata(dev);
+ 	if (priv->era >= 6 && uses_dkp)
+ 		ctx->dir = DMA_BIDIRECTIONAL;
+ 	else
+ 		ctx->dir = DMA_TO_DEVICE;
  
- 	if (caam_qi_napi_schedule(p, caam_napi))
-@@ -571,7 +583,7 @@ static enum qman_cb_dqrr_result caam_rsp_fq_dqrr_cb(struct qman_portal *p,
- 		return qman_cb_dqrr_consume;
+-	ctx->key_dma = dma_map_single(ctx->jrdev, ctx->key, sizeof(ctx->key),
++	ctx->key_dma = dma_map_single(dev, ctx->key, sizeof(ctx->key),
+ 				      ctx->dir);
+-	if (dma_mapping_error(ctx->jrdev, ctx->key_dma)) {
+-		dev_err(ctx->jrdev, "unable to map key\n");
++	if (dma_mapping_error(dev, ctx->key_dma)) {
++		dev_err(dev, "unable to map key\n");
+ 		caam_jr_free(ctx->jrdev);
+ 		return -ENOMEM;
  	}
+@@ -2439,7 +2443,7 @@ static int caam_init_common(struct caam_ctx *ctx, struct caam_alg_entry *caam,
+ 	ctx->cdata.algtype = OP_TYPE_CLASS1_ALG | caam->class1_alg_type;
+ 	ctx->adata.algtype = OP_TYPE_CLASS2_ALG | caam->class2_alg_type;
  
--	drv_req = (struct caam_drv_req *)phys_to_virt(qm_fd_addr_get64(fd));
-+	drv_req = caam_iova_to_virt(priv->domain, qm_fd_addr_get64(fd));
- 	if (unlikely(!drv_req)) {
- 		dev_err(qidev,
- 			"Can't find original request for caam response\n");
+-	ctx->qidev = ctx->jrdev->parent;
++	ctx->qidev = dev;
+ 
+ 	spin_lock_init(&ctx->lock);
+ 	ctx->drv_ctx[ENCRYPT] = NULL;
+@@ -2474,7 +2478,8 @@ static void caam_exit_common(struct caam_ctx *ctx)
+ 	caam_drv_ctx_rel(ctx->drv_ctx[ENCRYPT]);
+ 	caam_drv_ctx_rel(ctx->drv_ctx[DECRYPT]);
+ 
+-	dma_unmap_single(ctx->jrdev, ctx->key_dma, sizeof(ctx->key), ctx->dir);
++	dma_unmap_single(ctx->jrdev->parent, ctx->key_dma, sizeof(ctx->key),
++			 ctx->dir);
+ 
+ 	caam_jr_free(ctx->jrdev);
+ }
 -- 
 2.17.1
 
