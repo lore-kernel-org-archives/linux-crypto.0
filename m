@@ -2,31 +2,31 @@ Return-Path: <SRS0=5M5o=S3=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD252C43219
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Apr 2019 16:25:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C995C43218
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Apr 2019 16:25:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 16DEB2077C
+	by mail.kernel.org (Postfix) with ESMTP id 6FF3E2077C
 	for <linux-crypto@archiver.kernel.org>; Thu, 25 Apr 2019 16:25:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729494AbfDYQZS (ORCPT
+        id S1729791AbfDYQZT (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 25 Apr 2019 12:25:18 -0400
-Received: from inva021.nxp.com ([92.121.34.21]:35684 "EHLO inva021.nxp.com"
+        Thu, 25 Apr 2019 12:25:19 -0400
+Received: from inva021.nxp.com ([92.121.34.21]:35698 "EHLO inva021.nxp.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726434AbfDYQZS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1729013AbfDYQZS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Thu, 25 Apr 2019 12:25:18 -0400
 Received: from inva021.nxp.com (localhost [127.0.0.1])
-        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id C4B16200204;
-        Thu, 25 Apr 2019 18:25:15 +0200 (CEST)
+        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 46623200080;
+        Thu, 25 Apr 2019 18:25:16 +0200 (CEST)
 Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
-        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id AD120200080;
-        Thu, 25 Apr 2019 18:25:15 +0200 (CEST)
+        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 3834A20000F;
+        Thu, 25 Apr 2019 18:25:16 +0200 (CEST)
 Received: from fsr-ub1864-014.ea.freescale.net (fsr-ub1864-014.ea.freescale.net [10.171.95.219])
-        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 3D1B22061F;
+        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id BD7F82061F;
         Thu, 25 Apr 2019 18:25:15 +0200 (CEST)
 From:   =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>
@@ -38,10 +38,12 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         Iuliana Prodan <iuliana.prodan@nxp.com>,
         Marcin Niestroj <m.niestroj@grinn-global.com>,
         linux-crypto@vger.kernel.org, NXP Linux Team <linux-imx@nxp.com>
-Subject: [PATCH 0/7] crypto: caam - IOMMU support
-Date:   Thu, 25 Apr 2019 19:24:54 +0300
-Message-Id: <20190425162501.4565-1-horia.geanta@nxp.com>
+Subject: [PATCH 1/7] crypto: caam - avoid S/G table fetching for AEAD zero-length output
+Date:   Thu, 25 Apr 2019 19:24:55 +0300
+Message-Id: <20190425162501.4565-2-horia.geanta@nxp.com>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190425162501.4565-1-horia.geanta@nxp.com>
+References: <20190425162501.4565-1-horia.geanta@nxp.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -51,79 +53,128 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch set adds support in caam drivers (caam/jr, caam/qi, caam/qi2)
-for the crypto engine to work behind an IOMMU.
+When enabling IOMMU support, the following issue becomes visible
+in the AEAD zero-length case.
 
-The changes consist in:
+Even though the output sequence length is set to zero, the crypto engine
+tries to prefetch 4 S/G table entries (since SGF bit is set
+in SEQ OUT PTR command - which is either generated in SW in case of
+caam/jr or in HW in case of caam/qi, caam/qi2).
+The DMA read operation will trigger an IOMMU fault since the address in
+the SEQ OUT PTR is "dummy" (set to zero / not obtained via DMA API
+mapping).
 
-1. Deferred probing support
--caam/jr - top level drivers are converted to "libraries"; this also fixes
-the issue reported previously by Marcin:
-https://patchwork.kernel.org/cover/10558409/
--caam/qi - use the newly added QBMan functions (*) to decide whether to defer
-caam controller probing or not
+1. In case of caam/jr, avoid the IOMMU fault by clearing the SGF bit
+in SEQ OUT PTR command.
 
-2. Fixing spurios memory accesses, that lead to IOMMU access faults
--crypto engine prefetches S/G table entries in chunks of 4 (64 bytes),
-and driver has to make sure memory is allocated and mapped
--crypto engine tries to prefetch S/G table entries when input / output
-is marked as scattered, even though length is zero
+2. In case of caam/qi - setting address, bpid, length to zero for output
+entry in the compound frame has a special meaning (cf. CAAM RM):
+"Output frame = Unspecified, Input address = Y. A unspecified frame is
+indicated by an unused SGT entry (an entry in which the Address, Length,
+and BPID fields are all zero). SEC obtains output buffers from BMan as
+prescribed by the preheader."
 
-3. Getting rid of platform device created by caam/qi
-There are inherent problems with platform device being created dynamically
-(and not relying on the existence of a DT node).
+Since no output buffers are needed, modify the preheader by setting
+(ABS = 1, ADDBUF = 0):
+-"ABS = 1 means obtain the number of buffers in ADDBUF (0 or 1) from
+the pool POOL ID"
+-ADDBUF: "If ABS is set, ADD BUF specifies whether to allocate
+a buffer or not"
 
-4. Update phys -> virt address translation in case IOMMU is present
-iova -> phys -> virt
+3. In case of caam/qi2, since engine:
+-does not support FLE[FMT]=2'b11 ("unused" entry) mentioned in DPAA2 RM
+-requires output entry to be present, even if not used
+the solution chosen is to leave output frame list entry zeroized.
 
-5. Fix the device used for key buffers DMA mapping
-Key buffers are incorrectly DMA mapped using a job ring device, since they
-are accessed eventually by the QI - this creating an ICID / stream ID
-mismatch at IOMMU level.
+Fixes: 763069ba49d3 ("crypto: caam - handle zero-length AEAD output")
+Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
+---
+ drivers/crypto/caam/caamalg.c     | 1 +
+ drivers/crypto/caam/caamalg_qi.c  | 2 +-
+ drivers/crypto/caam/caamalg_qi2.c | 9 +++++++++
+ drivers/crypto/caam/qi.c          | 3 +++
+ 4 files changed, 14 insertions(+), 1 deletion(-)
 
-Tests were performed on:
--LS1046A - caam/jr and caam/qi - job ring and queue interface
--LS1088A - caam/jr and caam/qi2 - job ring and dpsec interface
-
-There are some dependencies (see below).
-While not everything is in place, I would like at least to patches 1-8/9
-being reviewed & merged.
-
-i. Patch 9/9 (crypto: caam - defer probing until QMan is available) should
-NOT be merged, since there are compilation dependencies on the patch series:
-(*) Prerequisites for NXP LS104xA SMMU enablement
-https://patchwork.kernel.org/project/linux-arm-kernel/list/?series=98625
-
-ii. U-boot updates for LS1088A (needed for caam/jr ICID programming)
-[U-Boot,1/2] armv8: fsl-layerscape: add missing sec jr base address defines
-https://patchwork.ozlabs.org/patch/1059256/
-[U-Boot,2/2] armv8: ls1088a: add icid setup for platform devices
-https://patchwork.ozlabs.org/patch/1059259/
-
-Horia Geantă (7):
-  crypto: caam - avoid S/G table fetching for AEAD zero-length output
-  crypto: caam - fix S/G table passing page boundary
-  crypto: caam - convert top level drivers to libraries
-  crypto: caam/qi - don't allocate an extra platform device
-  crypto: caam/qi - fix address translations with IOMMU enabled
-  crypto: caam/qi - DMA map keys using proper device
-  crypto: caam - defer probing until QMan is available
-
- drivers/crypto/caam/Kconfig       |  46 ++++-------
- drivers/crypto/caam/Makefile      |  18 ++---
- drivers/crypto/caam/caamalg.c     |  72 ++++++++---------
- drivers/crypto/caam/caamalg_qi.c  | 124 +++++++++++++++---------------
- drivers/crypto/caam/caamalg_qi2.c |  72 +++++++++++++----
- drivers/crypto/caam/caamhash.c    |  81 ++++++-------------
- drivers/crypto/caam/caampkc.c     |  57 +++-----------
- drivers/crypto/caam/caamrng.c     |  54 ++-----------
- drivers/crypto/caam/ctrl.c        | 124 ++++++++++++++++++------------
- drivers/crypto/caam/desc_constr.h |  11 +++
- drivers/crypto/caam/intern.h      | 102 ++++++++++++++++++++++--
- drivers/crypto/caam/jr.c          |  43 +++++++++++
- drivers/crypto/caam/qi.c          |  52 ++++++-------
- 13 files changed, 465 insertions(+), 391 deletions(-)
-
+diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
+index 3e23d4b2cce2..e8f8be396796 100644
+--- a/drivers/crypto/caam/caamalg.c
++++ b/drivers/crypto/caam/caamalg.c
+@@ -1105,6 +1105,7 @@ static void init_aead_job(struct aead_request *req,
+ 	if (unlikely(req->src != req->dst)) {
+ 		if (!edesc->mapped_dst_nents) {
+ 			dst_dma = 0;
++			out_options = 0;
+ 		} else if (edesc->mapped_dst_nents == 1) {
+ 			dst_dma = sg_dma_address(req->dst);
+ 			out_options = 0;
+diff --git a/drivers/crypto/caam/caamalg_qi.c b/drivers/crypto/caam/caamalg_qi.c
+index 70af211d2d01..992c498879a4 100644
+--- a/drivers/crypto/caam/caamalg_qi.c
++++ b/drivers/crypto/caam/caamalg_qi.c
+@@ -1108,7 +1108,7 @@ static struct aead_edesc *aead_edesc_alloc(struct aead_request *req,
+ 			dma_to_qm_sg_one_ext(&fd_sgt[0], qm_sg_dma +
+ 					     (1 + !!ivsize) * sizeof(*sg_table),
+ 					     out_len, 0);
+-	} else if (mapped_dst_nents == 1) {
++	} else if (mapped_dst_nents <= 1) {
+ 		dma_to_qm_sg_one(&fd_sgt[0], sg_dma_address(req->dst), out_len,
+ 				 0);
+ 	} else {
+diff --git a/drivers/crypto/caam/caamalg_qi2.c b/drivers/crypto/caam/caamalg_qi2.c
+index 33a4df6b81de..627cf0fd37f1 100644
+--- a/drivers/crypto/caam/caamalg_qi2.c
++++ b/drivers/crypto/caam/caamalg_qi2.c
+@@ -558,6 +558,14 @@ static struct aead_edesc *aead_edesc_alloc(struct aead_request *req,
+ 			dpaa2_fl_set_addr(out_fle, qm_sg_dma +
+ 					  (1 + !!ivsize) * sizeof(*sg_table));
+ 		}
++	} else if (!mapped_dst_nents) {
++		/*
++		 * crypto engine requires the output entry to be present when
++		 * "frame list" FD is used.
++		 * Since engine does not support FMT=2'b11 (unused entry type),
++		 * leaving out_fle zeroized is the best option.
++		 */
++		goto skip_out_fle;
+ 	} else if (mapped_dst_nents == 1) {
+ 		dpaa2_fl_set_format(out_fle, dpaa2_fl_single);
+ 		dpaa2_fl_set_addr(out_fle, sg_dma_address(req->dst));
+@@ -569,6 +577,7 @@ static struct aead_edesc *aead_edesc_alloc(struct aead_request *req,
+ 
+ 	dpaa2_fl_set_len(out_fle, out_len);
+ 
++skip_out_fle:
+ 	return edesc;
+ }
+ 
+diff --git a/drivers/crypto/caam/qi.c b/drivers/crypto/caam/qi.c
+index 9f08f84cca59..2d9b0485141f 100644
+--- a/drivers/crypto/caam/qi.c
++++ b/drivers/crypto/caam/qi.c
+@@ -18,6 +18,7 @@
+ #include "desc_constr.h"
+ 
+ #define PREHDR_RSLS_SHIFT	31
++#define PREHDR_ABS		BIT(25)
+ 
+ /*
+  * Use a reasonable backlog of frames (per CPU) as congestion threshold,
+@@ -346,6 +347,7 @@ int caam_drv_ctx_update(struct caam_drv_ctx *drv_ctx, u32 *sh_desc)
+ 	 */
+ 	drv_ctx->prehdr[0] = cpu_to_caam32((1 << PREHDR_RSLS_SHIFT) |
+ 					   num_words);
++	drv_ctx->prehdr[1] = cpu_to_caam32(PREHDR_ABS);
+ 	memcpy(drv_ctx->sh_desc, sh_desc, desc_bytes(sh_desc));
+ 	dma_sync_single_for_device(qidev, drv_ctx->context_a,
+ 				   sizeof(drv_ctx->sh_desc) +
+@@ -401,6 +403,7 @@ struct caam_drv_ctx *caam_drv_ctx_init(struct device *qidev,
+ 	 */
+ 	drv_ctx->prehdr[0] = cpu_to_caam32((1 << PREHDR_RSLS_SHIFT) |
+ 					   num_words);
++	drv_ctx->prehdr[1] = cpu_to_caam32(PREHDR_ABS);
+ 	memcpy(drv_ctx->sh_desc, sh_desc, desc_bytes(sh_desc));
+ 	size = sizeof(drv_ctx->prehdr) + sizeof(drv_ctx->sh_desc);
+ 	hwdesc = dma_map_single(qidev, drv_ctx->prehdr, size,
 -- 
 2.17.1
 
