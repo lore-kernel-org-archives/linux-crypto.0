@@ -3,31 +3,31 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C995C43218
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE2ABC4321A
 	for <linux-crypto@archiver.kernel.org>; Thu, 25 Apr 2019 16:25:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6FF3E2077C
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Apr 2019 16:25:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 309FC2077C
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Apr 2019 16:25:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729791AbfDYQZT (ORCPT
+        id S1729798AbfDYQZU (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 25 Apr 2019 12:25:19 -0400
-Received: from inva021.nxp.com ([92.121.34.21]:35698 "EHLO inva021.nxp.com"
+        Thu, 25 Apr 2019 12:25:20 -0400
+Received: from inva020.nxp.com ([92.121.34.13]:33002 "EHLO inva020.nxp.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729013AbfDYQZS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 Apr 2019 12:25:18 -0400
-Received: from inva021.nxp.com (localhost [127.0.0.1])
-        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 46623200080;
-        Thu, 25 Apr 2019 18:25:16 +0200 (CEST)
+        id S1729151AbfDYQZT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 25 Apr 2019 12:25:19 -0400
+Received: from inva020.nxp.com (localhost [127.0.0.1])
+        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id D88C21A006E;
+        Thu, 25 Apr 2019 18:25:17 +0200 (CEST)
 Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
-        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 3834A20000F;
-        Thu, 25 Apr 2019 18:25:16 +0200 (CEST)
+        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id CB6751A0012;
+        Thu, 25 Apr 2019 18:25:17 +0200 (CEST)
 Received: from fsr-ub1864-014.ea.freescale.net (fsr-ub1864-014.ea.freescale.net [10.171.95.219])
-        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id BD7F82061F;
-        Thu, 25 Apr 2019 18:25:15 +0200 (CEST)
+        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 5CD6F2061F;
+        Thu, 25 Apr 2019 18:25:17 +0200 (CEST)
 From:   =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>
 Cc:     "David S. Miller" <davem@davemloft.net>,
@@ -38,9 +38,9 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         Iuliana Prodan <iuliana.prodan@nxp.com>,
         Marcin Niestroj <m.niestroj@grinn-global.com>,
         linux-crypto@vger.kernel.org, NXP Linux Team <linux-imx@nxp.com>
-Subject: [PATCH 1/7] crypto: caam - avoid S/G table fetching for AEAD zero-length output
-Date:   Thu, 25 Apr 2019 19:24:55 +0300
-Message-Id: <20190425162501.4565-2-horia.geanta@nxp.com>
+Subject: [PATCH 4/7] crypto: caam/qi - don't allocate an extra platform device
+Date:   Thu, 25 Apr 2019 19:24:58 +0300
+Message-Id: <20190425162501.4565-5-horia.geanta@nxp.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190425162501.4565-1-horia.geanta@nxp.com>
 References: <20190425162501.4565-1-horia.geanta@nxp.com>
@@ -53,128 +53,214 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-When enabling IOMMU support, the following issue becomes visible
-in the AEAD zero-length case.
+Use the controller device for caam/qi instead of allocating
+a new platform device.
+This is needed as a preparation to add support for working behind an
+SMMU. A platform device allocated using platform_device_register_full()
+is not completely set up - most importantly .dma_configure()
+is not called.
 
-Even though the output sequence length is set to zero, the crypto engine
-tries to prefetch 4 S/G table entries (since SGF bit is set
-in SEQ OUT PTR command - which is either generated in SW in case of
-caam/jr or in HW in case of caam/qi, caam/qi2).
-The DMA read operation will trigger an IOMMU fault since the address in
-the SEQ OUT PTR is "dummy" (set to zero / not obtained via DMA API
-mapping).
-
-1. In case of caam/jr, avoid the IOMMU fault by clearing the SGF bit
-in SEQ OUT PTR command.
-
-2. In case of caam/qi - setting address, bpid, length to zero for output
-entry in the compound frame has a special meaning (cf. CAAM RM):
-"Output frame = Unspecified, Input address = Y. A unspecified frame is
-indicated by an unused SGT entry (an entry in which the Address, Length,
-and BPID fields are all zero). SEC obtains output buffers from BMan as
-prescribed by the preheader."
-
-Since no output buffers are needed, modify the preheader by setting
-(ABS = 1, ADDBUF = 0):
--"ABS = 1 means obtain the number of buffers in ADDBUF (0 or 1) from
-the pool POOL ID"
--ADDBUF: "If ABS is set, ADD BUF specifies whether to allocate
-a buffer or not"
-
-3. In case of caam/qi2, since engine:
--does not support FLE[FMT]=2'b11 ("unused" entry) mentioned in DPAA2 RM
--requires output entry to be present, even if not used
-the solution chosen is to leave output frame list entry zeroized.
-
-Fixes: 763069ba49d3 ("crypto: caam - handle zero-length AEAD output")
 Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
 ---
- drivers/crypto/caam/caamalg.c     | 1 +
- drivers/crypto/caam/caamalg_qi.c  | 2 +-
- drivers/crypto/caam/caamalg_qi2.c | 9 +++++++++
- drivers/crypto/caam/qi.c          | 3 +++
- 4 files changed, 14 insertions(+), 1 deletion(-)
+ drivers/crypto/caam/caamalg_qi.c |  6 +++---
+ drivers/crypto/caam/ctrl.c       |  8 ++++----
+ drivers/crypto/caam/intern.h     |  7 +++----
+ drivers/crypto/caam/qi.c         | 33 +++++---------------------------
+ 4 files changed, 15 insertions(+), 39 deletions(-)
 
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index 3e23d4b2cce2..e8f8be396796 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -1105,6 +1105,7 @@ static void init_aead_job(struct aead_request *req,
- 	if (unlikely(req->src != req->dst)) {
- 		if (!edesc->mapped_dst_nents) {
- 			dst_dma = 0;
-+			out_options = 0;
- 		} else if (edesc->mapped_dst_nents == 1) {
- 			dst_dma = sg_dma_address(req->dst);
- 			out_options = 0;
 diff --git a/drivers/crypto/caam/caamalg_qi.c b/drivers/crypto/caam/caamalg_qi.c
-index 70af211d2d01..992c498879a4 100644
+index b2e29be79d41..fd38200dbc1c 100644
 --- a/drivers/crypto/caam/caamalg_qi.c
 +++ b/drivers/crypto/caam/caamalg_qi.c
-@@ -1108,7 +1108,7 @@ static struct aead_edesc *aead_edesc_alloc(struct aead_request *req,
- 			dma_to_qm_sg_one_ext(&fd_sgt[0], qm_sg_dma +
- 					     (1 + !!ivsize) * sizeof(*sg_table),
- 					     out_len, 0);
--	} else if (mapped_dst_nents == 1) {
-+	} else if (mapped_dst_nents <= 1) {
- 		dma_to_qm_sg_one(&fd_sgt[0], sg_dma_address(req->dst), out_len,
- 				 0);
- 	} else {
-diff --git a/drivers/crypto/caam/caamalg_qi2.c b/drivers/crypto/caam/caamalg_qi2.c
-index 33a4df6b81de..627cf0fd37f1 100644
---- a/drivers/crypto/caam/caamalg_qi2.c
-+++ b/drivers/crypto/caam/caamalg_qi2.c
-@@ -558,6 +558,14 @@ static struct aead_edesc *aead_edesc_alloc(struct aead_request *req,
- 			dpaa2_fl_set_addr(out_fle, qm_sg_dma +
- 					  (1 + !!ivsize) * sizeof(*sg_table));
+@@ -2439,7 +2439,7 @@ static int caam_init_common(struct caam_ctx *ctx, struct caam_alg_entry *caam,
+ 	ctx->cdata.algtype = OP_TYPE_CLASS1_ALG | caam->class1_alg_type;
+ 	ctx->adata.algtype = OP_TYPE_CLASS2_ALG | caam->class2_alg_type;
+ 
+-	ctx->qidev = priv->qidev;
++	ctx->qidev = ctx->jrdev->parent;
+ 
+ 	spin_lock_init(&ctx->lock);
+ 	ctx->drv_ctx[ENCRYPT] = NULL;
+@@ -2599,7 +2599,7 @@ int caam_qi_algapi_init(struct device *ctrldev)
+ 
+ 		err = crypto_register_skcipher(&t_alg->skcipher);
+ 		if (err) {
+-			dev_warn(priv->qidev, "%s alg registration failed\n",
++			dev_warn(ctrldev, "%s alg registration failed\n",
+ 				 t_alg->skcipher.base.cra_driver_name);
+ 			continue;
  		}
-+	} else if (!mapped_dst_nents) {
-+		/*
-+		 * crypto engine requires the output entry to be present when
-+		 * "frame list" FD is used.
-+		 * Since engine does not support FMT=2'b11 (unused entry type),
-+		 * leaving out_fle zeroized is the best option.
-+		 */
-+		goto skip_out_fle;
- 	} else if (mapped_dst_nents == 1) {
- 		dpaa2_fl_set_format(out_fle, dpaa2_fl_single);
- 		dpaa2_fl_set_addr(out_fle, sg_dma_address(req->dst));
-@@ -569,6 +577,7 @@ static struct aead_edesc *aead_edesc_alloc(struct aead_request *req,
+@@ -2655,7 +2655,7 @@ int caam_qi_algapi_init(struct device *ctrldev)
+ 	}
  
- 	dpaa2_fl_set_len(out_fle, out_len);
+ 	if (registered)
+-		dev_info(priv->qidev, "algorithms registered in /proc/crypto\n");
++		dev_info(ctrldev, "algorithms registered in /proc/crypto\n");
  
-+skip_out_fle:
- 	return edesc;
+ 	return err;
  }
+diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
+index 36c2f15100a4..38bcbbccdfda 100644
+--- a/drivers/crypto/caam/ctrl.c
++++ b/drivers/crypto/caam/ctrl.c
+@@ -323,8 +323,8 @@ static int caam_remove(struct platform_device *pdev)
+ 	of_platform_depopulate(ctrldev);
  
+ #ifdef CONFIG_CAAM_QI
+-	if (ctrlpriv->qidev)
+-		caam_qi_shutdown(ctrlpriv->qidev);
++	if (ctrlpriv->qi_init)
++		caam_qi_shutdown(ctrldev);
+ #endif
+ 
+ 	/*
+@@ -900,8 +900,8 @@ static int caam_probe(struct platform_device *pdev)
+ 
+ shutdown_qi:
+ #ifdef CONFIG_CAAM_QI
+-	if (ctrlpriv->qidev)
+-		caam_qi_shutdown(ctrlpriv->qidev);
++	if (ctrlpriv->qi_init)
++		caam_qi_shutdown(dev);
+ #endif
+ iounmap_ctrl:
+ 	iounmap(ctrl);
+diff --git a/drivers/crypto/caam/intern.h b/drivers/crypto/caam/intern.h
+index 50e24ebc533b..c9089da5dbaf 100644
+--- a/drivers/crypto/caam/intern.h
++++ b/drivers/crypto/caam/intern.h
+@@ -63,10 +63,6 @@ struct caam_drv_private_jr {
+  * Driver-private storage for a single CAAM block instance
+  */
+ struct caam_drv_private {
+-#ifdef CONFIG_CAAM_QI
+-	struct device *qidev;
+-#endif
+-
+ 	/* Physical-presence section */
+ 	struct caam_ctrl __iomem *ctrl; /* controller region */
+ 	struct caam_deco __iomem *deco; /* DECO/CCB views */
+@@ -80,6 +76,9 @@ struct caam_drv_private {
+ 	 */
+ 	u8 total_jobrs;		/* Total Job Rings in device */
+ 	u8 qi_present;		/* Nonzero if QI present in device */
++#ifdef CONFIG_CAAM_QI
++	u8 qi_init;		/* Nonzero if QI has been initialized */
++#endif
+ 	u8 mc_en;		/* Nonzero if MC f/w is active */
+ 	int secvio_irq;		/* Security violation interrupt number */
+ 	int virt_en;		/* Virtualization enabled in CAAM */
 diff --git a/drivers/crypto/caam/qi.c b/drivers/crypto/caam/qi.c
-index 9f08f84cca59..2d9b0485141f 100644
+index 2d9b0485141f..46fca2c9fb24 100644
 --- a/drivers/crypto/caam/qi.c
 +++ b/drivers/crypto/caam/qi.c
-@@ -18,6 +18,7 @@
- #include "desc_constr.h"
+@@ -4,7 +4,7 @@
+  * Queue Interface backend functionality
+  *
+  * Copyright 2013-2016 Freescale Semiconductor, Inc.
+- * Copyright 2016-2017 NXP
++ * Copyright 2016-2017, 2019 NXP
+  */
  
- #define PREHDR_RSLS_SHIFT	31
-+#define PREHDR_ABS		BIT(25)
- 
+ #include <linux/cpumask.h>
+@@ -59,11 +59,9 @@ static DEFINE_PER_CPU(int, last_cpu);
  /*
-  * Use a reasonable backlog of frames (per CPU) as congestion threshold,
-@@ -346,6 +347,7 @@ int caam_drv_ctx_update(struct caam_drv_ctx *drv_ctx, u32 *sh_desc)
- 	 */
- 	drv_ctx->prehdr[0] = cpu_to_caam32((1 << PREHDR_RSLS_SHIFT) |
- 					   num_words);
-+	drv_ctx->prehdr[1] = cpu_to_caam32(PREHDR_ABS);
- 	memcpy(drv_ctx->sh_desc, sh_desc, desc_bytes(sh_desc));
- 	dma_sync_single_for_device(qidev, drv_ctx->context_a,
- 				   sizeof(drv_ctx->sh_desc) +
-@@ -401,6 +403,7 @@ struct caam_drv_ctx *caam_drv_ctx_init(struct device *qidev,
- 	 */
- 	drv_ctx->prehdr[0] = cpu_to_caam32((1 << PREHDR_RSLS_SHIFT) |
- 					   num_words);
-+	drv_ctx->prehdr[1] = cpu_to_caam32(PREHDR_ABS);
- 	memcpy(drv_ctx->sh_desc, sh_desc, desc_bytes(sh_desc));
- 	size = sizeof(drv_ctx->prehdr) + sizeof(drv_ctx->sh_desc);
- 	hwdesc = dma_map_single(qidev, drv_ctx->prehdr, size,
+  * caam_qi_priv - CAAM QI backend private params
+  * @cgr: QMan congestion group
+- * @qi_pdev: platform device for QI backend
+  */
+ struct caam_qi_priv {
+ 	struct qman_cgr cgr;
+-	struct platform_device *qi_pdev;
+ };
+ 
+ static struct caam_qi_priv qipriv ____cacheline_aligned;
+@@ -491,7 +489,7 @@ EXPORT_SYMBOL(caam_drv_ctx_rel);
+ void caam_qi_shutdown(struct device *qidev)
+ {
+ 	int i;
+-	struct caam_qi_priv *priv = dev_get_drvdata(qidev);
++	struct caam_qi_priv *priv = &qipriv;
+ 	const cpumask_t *cpus = qman_affine_cpus();
+ 
+ 	for_each_cpu(i, cpus) {
+@@ -509,8 +507,6 @@ void caam_qi_shutdown(struct device *qidev)
+ 	qman_release_cgrid(priv->cgr.cgrid);
+ 
+ 	kmem_cache_destroy(qi_cache);
+-
+-	platform_device_unregister(priv->qi_pdev);
+ }
+ 
+ static void cgr_cb(struct qman_portal *qm, struct qman_cgr *cgr, int congested)
+@@ -695,33 +691,17 @@ static void free_rsp_fqs(void)
+ int caam_qi_init(struct platform_device *caam_pdev)
+ {
+ 	int err, i;
+-	struct platform_device *qi_pdev;
+ 	struct device *ctrldev = &caam_pdev->dev, *qidev;
+ 	struct caam_drv_private *ctrlpriv;
+ 	const cpumask_t *cpus = qman_affine_cpus();
+-	static struct platform_device_info qi_pdev_info = {
+-		.name = "caam_qi",
+-		.id = PLATFORM_DEVID_NONE
+-	};
+-
+-	qi_pdev_info.parent = ctrldev;
+-	qi_pdev_info.dma_mask = dma_get_mask(ctrldev);
+-	qi_pdev = platform_device_register_full(&qi_pdev_info);
+-	if (IS_ERR(qi_pdev))
+-		return PTR_ERR(qi_pdev);
+-	set_dma_ops(&qi_pdev->dev, get_dma_ops(ctrldev));
+ 
+ 	ctrlpriv = dev_get_drvdata(ctrldev);
+-	qidev = &qi_pdev->dev;
+-
+-	qipriv.qi_pdev = qi_pdev;
+-	dev_set_drvdata(qidev, &qipriv);
++	qidev = ctrldev;
+ 
+ 	/* Initialize the congestion detection */
+ 	err = init_cgr(qidev);
+ 	if (err) {
+ 		dev_err(qidev, "CGR initialization failed: %d\n", err);
+-		platform_device_unregister(qi_pdev);
+ 		return err;
+ 	}
+ 
+@@ -730,7 +710,6 @@ int caam_qi_init(struct platform_device *caam_pdev)
+ 	if (err) {
+ 		dev_err(qidev, "Can't allocate CAAM response FQs: %d\n", err);
+ 		free_rsp_fqs();
+-		platform_device_unregister(qi_pdev);
+ 		return err;
+ 	}
+ 
+@@ -753,15 +732,11 @@ int caam_qi_init(struct platform_device *caam_pdev)
+ 		napi_enable(irqtask);
+ 	}
+ 
+-	/* Hook up QI device to parent controlling caam device */
+-	ctrlpriv->qidev = qidev;
+-
+ 	qi_cache = kmem_cache_create("caamqicache", CAAM_QI_MEMCACHE_SIZE, 0,
+ 				     SLAB_CACHE_DMA, NULL);
+ 	if (!qi_cache) {
+ 		dev_err(qidev, "Can't allocate CAAM cache\n");
+ 		free_rsp_fqs();
+-		platform_device_unregister(qi_pdev);
+ 		return -ENOMEM;
+ 	}
+ 
+@@ -769,6 +744,8 @@ int caam_qi_init(struct platform_device *caam_pdev)
+ 	debugfs_create_file("qi_congested", 0444, ctrlpriv->ctl,
+ 			    &times_congested, &caam_fops_u64_ro);
+ #endif
++
++	ctrlpriv->qi_init = 1;
+ 	dev_info(qidev, "Linux CAAM Queue I/F driver initialised\n");
+ 	return 0;
+ }
 -- 
 2.17.1
 
