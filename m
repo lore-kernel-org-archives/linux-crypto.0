@@ -2,66 +2,40 @@ Return-Path: <SRS0=5M5o=S3=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=0.4 required=3.0 tests=DATE_IN_PAST_03_06,
+	MAILING_LIST_MULTI,PLING_QUERY,SPF_PASS,TVD_SPACE_RATIO autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 926BCC10F03
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Apr 2019 07:52:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2BABC10F03
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Apr 2019 11:36:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6BF86217D7
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Apr 2019 07:52:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 814C420811
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Apr 2019 11:36:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728526AbfDYHwJ (ORCPT
+        id S1726295AbfDYLgz (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 25 Apr 2019 03:52:09 -0400
-Received: from [5.180.42.13] ([5.180.42.13]:52402 "EHLO deadmen.hmeau.com"
-        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S1726213AbfDYHwJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 Apr 2019 03:52:09 -0400
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1hJZAs-0002MZ-L2; Thu, 25 Apr 2019 15:52:06 +0800
-Received: from herbert by gondobar with local (Exim 4.89)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1hJZAp-00027S-Ey; Thu, 25 Apr 2019 15:52:03 +0800
-Date:   Thu, 25 Apr 2019 15:52:03 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Vitaly Chikunov <vt@altlinux.org>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Stephen Rothwell <sfr@canb.auug.org.au>
-Subject: Re: [PATCH] crypto: ecrdsa - select ASN1 and OID_REGISTRY for EC-RDSA
-Message-ID: <20190425075203.a2h5w2d45i2wdxdf@gondor.apana.org.au>
-References: <20190423162954.7859-1-vt@altlinux.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190423162954.7859-1-vt@altlinux.org>
-User-Agent: NeoMutt/20170113 (1.7.2)
+        Thu, 25 Apr 2019 07:36:55 -0400
+Received: from [111.177.169.233] ([111.177.169.233]:47308 "EHLO
+        localhost.localdomain" rhost-flags-FAIL-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726223AbfDYLgz (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 25 Apr 2019 07:36:55 -0400
+X-Greylist: delayed 16803 seconds by postgrey-1.27 at vger.kernel.org; Thu, 25 Apr 2019 07:36:54 EDT
+Received: from localhost (localhost [IPv6:::1])
+        by localhost.localdomain (Postfix) with SMTP id 17CE619C759
+        for <linux-crypto@vger.kernel.org>; Thu, 25 Apr 2019 13:53:22 +0800 (CST)
+From:   linux-crypto@vger.kernel.org
+To:     linux-crypto@vger.kernel.org
+Reply-To: prodawez@armyspy.com
+Subject: Zdravstvuyte! Vas interesuyut kliyentskiye bazy dannykh?
+Message-Id: <20190425055323.17CE619C759@localhost.localdomain>
+Date:   Thu, 25 Apr 2019 13:53:22 +0800 (CST)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Apr 23, 2019 at 07:29:54PM +0300, Vitaly Chikunov wrote:
-> Fix undefined symbol issue in ecrdsa_generic module when ASN1
-> or OID_REGISTRY aren't enabled in the config by selecting these
-> options for CRYPTO_ECRDSA.
-> 
-> ERROR: "asn1_ber_decoder" [crypto/ecrdsa_generic.ko] undefined!
-> ERROR: "look_up_OID" [crypto/ecrdsa_generic.ko] undefined!
-> 
-> Reported-by: Randy Dunlap <rdunlap@infradead.org>
-> Cc: Stephen Rothwell <sfr@canb.auug.org.au>
-> Signed-off-by: Vitaly Chikunov <vt@altlinux.org>
-> ---
->  crypto/Kconfig | 2 ++
->  1 file changed, 2 insertions(+)
+Zdravstvuyte! Vas interesuyut kliyentskiye bazy dannykh?
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
+
