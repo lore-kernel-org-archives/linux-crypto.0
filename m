@@ -2,29 +2,49 @@ Return-Path: <SRS0=5M5o=S3=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 504EFC43219
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Apr 2019 15:36:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94DEEC43218
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Apr 2019 15:53:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7EE29206C0
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Apr 2019 15:36:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D41AE2067D
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Apr 2019 15:53:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1556207630;
+	bh=ho5TyauY3lJuFVAthLKFJ6Y7hIL31mARg19a8JCHiUk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:List-ID:From;
+	b=wrHKC2KV6hagsYpPQ/N+7dt0eVLIy1eRLyUCVNA63e1AbTmjBRr8+2FBh4AUk3Oi8
+	 QsUX/0wFVzmqfELHOx1RNN5571D7T7gouSt/o04yCRqNl8lohE4kz1BRfxEdNC9jW3
+	 S6UaHVuW4u03mzlO5YkiqDd4fINTlyy1L+AAkYG8=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727259AbfDYPfs (ORCPT
+        id S1728857AbfDYPxW (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 25 Apr 2019 11:35:48 -0400
-Received: from zeniv.linux.org.uk ([195.92.253.2]:47236 "EHLO
-        ZenIV.linux.org.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726229AbfDYPfr (ORCPT
+        Thu, 25 Apr 2019 11:53:22 -0400
+Received: from casper.infradead.org ([85.118.1.10]:44084 "EHLO
+        casper.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726020AbfDYPxV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 Apr 2019 11:35:47 -0400
-Received: from viro by ZenIV.linux.org.uk with local (Exim 4.92 #3 (Red Hat Linux))
-        id 1hJgPO-0002EI-Tp; Thu, 25 Apr 2019 15:35:35 +0000
-Date:   Thu, 25 Apr 2019 16:35:34 +0100
-From:   Al Viro <viro@zeniv.linux.org.uk>
-To:     Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
+        Thu, 25 Apr 2019 11:53:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:Content-Type:
+        MIME-Version:References:In-Reply-To:Message-ID:Subject:Cc:To:From:Date:Sender
+        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=E3NXYmNospchyn56GjhuUUM3hrUac73tHVKaHCldfOk=; b=Bonx4HPMYcr3a2nktGqFVhvpkC
+        Lm7Jv3Ti63Kv4EMBUFae5lI4ptDC5RAI5ElUhwvqH9DfP8HL3oLak9sqkNi1SrdMbInWhlezS4ZQv
+        TaB3dxTt/lLAd7hovrVYa5w4+CCJd72lsXCzDbUllvhVuoJLaU1Hl5+LKJVzv+MI7D167ykTh2GZK
+        d6OPs3hXZSnLAXf1R6CrpdOPA9x9rme1ywi76UowaMUx1f609U55StEwsjKOyqNJVxN4cMGncdYB6
+        KnVvdda0AmWSEMwWetcrVOOCMdnwjzCP88m9Y10yNoScW0lTGYk+7ZUQxJpbglecBDUogb5ukJzjR
+        1L7XLtaQ==;
+Received: from [179.95.39.209] (helo=coco.lan)
+        by casper.infradead.org with esmtpsa (Exim 4.90_1 #2 (Red Hat Linux))
+        id 1hJggS-0007pK-Bs; Thu, 25 Apr 2019 15:53:12 +0000
+Date:   Thu, 25 Apr 2019 12:53:01 -0300
+From:   Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
+To:     Al Viro <viro@zeniv.linux.org.uk>
 Cc:     Arnd Bergmann <arnd@arndb.de>, linux-fsdevel@vger.kernel.org,
         y2038@lists.linaro.org, linux-kernel@vger.kernel.org,
         Jason Gunthorpe <jgg@mellanox.com>,
@@ -48,45 +68,58 @@ Cc:     Arnd Bergmann <arnd@arndb.de>, linux-fsdevel@vger.kernel.org,
         Sean Young <sean@mess.org>
 Subject: Re: [PATCH v3 12/26] compat_ioctl: move more drivers to
  compat_ptr_ioctl
-Message-ID: <20190425153534.GS2217@ZenIV.linux.org.uk>
+Message-ID: <20190425125301.5165cf15@coco.lan>
+In-Reply-To: <20190425153534.GS2217@ZenIV.linux.org.uk>
 References: <20190416202013.4034148-1-arnd@arndb.de>
- <20190416202701.127745-1-arnd@arndb.de>
- <20190425122153.450fc094@coco.lan>
+        <20190416202701.127745-1-arnd@arndb.de>
+        <20190425122153.450fc094@coco.lan>
+        <20190425153534.GS2217@ZenIV.linux.org.uk>
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190425122153.450fc094@coco.lan>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Apr 25, 2019 at 12:21:53PM -0300, Mauro Carvalho Chehab wrote:
+Em Thu, 25 Apr 2019 16:35:34 +0100
+Al Viro <viro@zeniv.linux.org.uk> escreveu:
 
-> If I understand your patch description well, using compat_ptr_ioctl
-> only works if the driver is not for s390, right?
+> On Thu, Apr 25, 2019 at 12:21:53PM -0300, Mauro Carvalho Chehab wrote:
+> 
+> > If I understand your patch description well, using compat_ptr_ioctl
+> > only works if the driver is not for s390, right?  
+> 
+> No; s390 is where "oh, just set ->compat_ioctl same as ->unlocked_ioctl
+> and be done with that; compat_ptr() is a no-op anyway" breaks.  IOW,
+> s390 is the reason for having compat_ptr_ioctl() in the first place;
+> that thing works on all biarch architectures, as long as all stuff
+> handled by ->ioctl() takes pointer to arch-independent object as
+> argument.  IOW,
+> 	argument ignored => OK
+> 	any arithmetical type => no go, compat_ptr() would bugger it
+> 	pointer to int => OK
 
-No; s390 is where "oh, just set ->compat_ioctl same as ->unlocked_ioctl
-and be done with that; compat_ptr() is a no-op anyway" breaks.  IOW,
-s390 is the reason for having compat_ptr_ioctl() in the first place;
-that thing works on all biarch architectures, as long as all stuff
-handled by ->ioctl() takes pointer to arch-independent object as
-argument.  IOW,
-	argument ignored => OK
-	any arithmetical type => no go, compat_ptr() would bugger it
-	pointer to int => OK
-	pointer to string => OK
-	pointer to u64 => OK
-	pointer to struct {u64 addr; char s[11];} => OK
-	pointer to long => needs explicit handler
-	pointer to struct {void *addr; char s[11];} => needs explicit handler
-	pointer to struct {int x; u64 y;} => needs explicit handler on amd64
-For "just use ->unlocked_ioctl for ->ioctl" we have
-	argument ignored => OK
-	any arithmetical type => OK
-	any pointer => instant breakage on s390, in addtion to cases that break
-with compat_ptr_ioctl().
+That's the case for all LIRC ioctls: they all use a pointer to u32
+argument.
 
-Probably some form of that ought to go into commit message for compat_ptr_ioctl()
-introduction...
+> 	pointer to string => OK
+> 	pointer to u64 => OK
+> 	pointer to struct {u64 addr; char s[11];} => OK
+> 	pointer to long => needs explicit handler
+> 	pointer to struct {void *addr; char s[11];} => needs explicit handler
+> 	pointer to struct {int x; u64 y;} => needs explicit handler on amd64
+> For "just use ->unlocked_ioctl for ->ioctl" we have
+> 	argument ignored => OK
+> 	any arithmetical type => OK
+> 	any pointer => instant breakage on s390, in addtion to cases that break
+> with compat_ptr_ioctl().
+> 
+> Probably some form of that ought to go into commit message for compat_ptr_ioctl()
+> introduction...
+
+Agreed.
+
+Thanks,
+Mauro
