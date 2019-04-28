@@ -6,62 +6,64 @@ X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15D46C43219
-	for <linux-crypto@archiver.kernel.org>; Sun, 28 Apr 2019 07:11:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E197C43218
+	for <linux-crypto@archiver.kernel.org>; Sun, 28 Apr 2019 07:11:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CB20620881
-	for <linux-crypto@archiver.kernel.org>; Sun, 28 Apr 2019 07:10:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 131A720881
+	for <linux-crypto@archiver.kernel.org>; Sun, 28 Apr 2019 07:11:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=benyossef-com.20150623.gappssmtp.com header.i=@benyossef-com.20150623.gappssmtp.com header.b="GKPFYjuo"
+	dkim=pass (2048-bit key) header.d=benyossef-com.20150623.gappssmtp.com header.i=@benyossef-com.20150623.gappssmtp.com header.b="JZ7uyOa7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726466AbfD1HK6 (ORCPT
+        id S1726472AbfD1HL5 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 28 Apr 2019 03:10:58 -0400
-Received: from mail-ua1-f65.google.com ([209.85.222.65]:42792 "EHLO
-        mail-ua1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726450AbfD1HK6 (ORCPT
+        Sun, 28 Apr 2019 03:11:57 -0400
+Received: from mail-vs1-f66.google.com ([209.85.217.66]:42418 "EHLO
+        mail-vs1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726450AbfD1HL5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 28 Apr 2019 03:10:58 -0400
-Received: by mail-ua1-f65.google.com with SMTP id h4so2533226uaj.9
-        for <linux-crypto@vger.kernel.org>; Sun, 28 Apr 2019 00:10:57 -0700 (PDT)
+        Sun, 28 Apr 2019 03:11:57 -0400
+Received: by mail-vs1-f66.google.com with SMTP id b74so1085477vsd.9
+        for <linux-crypto@vger.kernel.org>; Sun, 28 Apr 2019 00:11:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=benyossef-com.20150623.gappssmtp.com; s=20150623;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=r5eRwTKZfVVdEmjNT8x1sCtdarNdR8EkiGmNv5UodMQ=;
-        b=GKPFYjuoo26gYJ5wNDY9J5RSbR1781K56iLTYnfM0fcPwH6uqo+DWUPO+Ne6s/Tht4
-         tV2+VDhaFqdaMdwYqP6g3CQCHUePtiPNLH1sW9lF1JmtuP31F5fc8K60L3XfEOZmNcZR
-         A1QpX2i9EiwDQhm44skY7qSK4GAaluSOVuZCDjVSXqZavUjl5sDN9OJqO3Qt3JFfiALJ
-         Augj5wGAh1JqnitIekep/XP8DpVhi8bTyh/t6qXhX47qSp9cUDdYporhCeeZV7XRfIb1
-         Qfy5l2mp5GtSjYnYLes7zy25l+5UHd71Tb8777UeRv0Pq313z4bE474bwW8Ix8HkKwuG
-         F2FQ==
+        bh=0/S6B6NWgBdbisjBXWpRt6zfXJMqlxYauy0OrhI+WGI=;
+        b=JZ7uyOa7qj8XncuBu2COdGhfC4Yv3Mnc3/GPLsqtGxe1PdKdB4wRy8YLQdvN1V1SRM
+         88l/dqEearUqRDRfsN4c2z7uR9wwhlgGzssINQSME7c0ZhDm9khr/gSKNDnU3llmGZCK
+         Q7vBHD/VBO5vq4IXDnPCtlOYuGuVmGqZhXCrGgIpc9l6ov/r9ztZrziXyKcUEoejao21
+         eC3QS5zgykOPh7UcmFw3imiHWW7qXfnhbgZYxMCiHx+oHIVKQ9cyA1iHLyBpBsoKoRLZ
+         tsaojAzUozJ4FugbHm8/X1uqyS8vPxR5EATRsYdvLg9hoUuC9O6m14FKBwCDtLh5rZEH
+         FWEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=r5eRwTKZfVVdEmjNT8x1sCtdarNdR8EkiGmNv5UodMQ=;
-        b=AUppsLtRLeljbNkP3QUTcwC5kfbhpCKRYLlvEq8ATCGgX5ktbio5sXcS1TFjzzusfT
-         51XA2p2CBN14KnXicJgV7vehAxWyM6YsxejyChlSTQ/gtTJ1EKWe/Df7Jmxkd0gEKNRV
-         OzZSPfSmj0vyJePBmseGBHUv080LGHClVunKG4e3pgTG5ilPYxpxEaPucwQBzsK5r5fO
-         g4sO4p0MSBf1tSCYEKoSGJoyHDxewz8PNfiNMIoj8xPWZTw6pTtMOu+JCA2Q78hNPGJR
-         oQWnPLA4zbleUY6Xm5/sB+sBbkKpbb4fVnJIUCGra404nFoX8khDp1xF67VGIwOPtiLv
-         8AHw==
-X-Gm-Message-State: APjAAAWzGqFmxv55Wm5wOdCVdWBie9myCKkX2Nq9XNl2IXijxVGnv6sK
-        LKNOGGttboHXa38gFpmbVfvs5Qu3PuvC1hw0vluPjg==
-X-Google-Smtp-Source: APXvYqzgYHK3XIKaal8P+h3+kjrSWHq1gJ0X3ACC3FHNew6teibPWU9m1+kjOZ8QlHW7VlGvEUaN9YHkpAKzCWNO+NE=
-X-Received: by 2002:ab0:340c:: with SMTP id z12mr897714uap.4.1556435457047;
- Sun, 28 Apr 2019 00:10:57 -0700 (PDT)
+        bh=0/S6B6NWgBdbisjBXWpRt6zfXJMqlxYauy0OrhI+WGI=;
+        b=VkOja0Y/C/KdLLOdbkzlJMziIsYo4NkNpxFT25FDoodz4fP/GJLkDm5YF6dqSRS/Yi
+         bHcKmSdKboIPRAy2XmK7TdamLNhT9inFPb7mvCqnitJQ7X6c2EWH+Z9sEKptVV1u7OzW
+         8OCBLrLNpnaIB5ENvtv17HG6T6f9TVl247wmF6VbLGT26WjlRLixZUl909G4SOEWQpnh
+         CungZDAnrfXOlmITTAQv+TK5fFifiXd6LUYQlCgggqxrJdBlKbpX8MycoHIGw8CD7XDD
+         ZU6QfwYSeH4FAgT1AiWyF2BgXvxkkuY3jc3NNkJ1gkwnb8FYqAAu6BW2bLgcImayuXaq
+         1b8A==
+X-Gm-Message-State: APjAAAXn1+uWCmAXQi6zQU45vbUqJPmzzrXImnb/gp4FR63ACe/NcY9A
+        d6nc/XjSld2jDqN/Kr0+C+gopP+8AJKIzVKLpLF44qPhdlY=
+X-Google-Smtp-Source: APXvYqzO1gESEeXWppboA4chvYTcglgRF5LNuAbKekOMh6nWsT4upCekcBujfd2WDRfxftVcxeeW73pXSGj66el3zns=
+X-Received: by 2002:a67:6f07:: with SMTP id k7mr3886602vsc.117.1556435516192;
+ Sun, 28 Apr 2019 00:11:56 -0700 (PDT)
 MIME-Version: 1.0
-References: <201904260948.KwQ0CBJd%lkp@intel.com> <20190426010309.GA57833@ivb42>
-In-Reply-To: <20190426010309.GA57833@ivb42>
+References: <20190426131835.27258-1-colin.king@canonical.com>
+In-Reply-To: <20190426131835.27258-1-colin.king@canonical.com>
 From:   Gilad Ben-Yossef <gilad@benyossef.com>
-Date:   Sun, 28 Apr 2019 10:10:45 +0300
-Message-ID: <CAOtvUMf4T8V2XHLnpZx_q=LKuFruYATRu-bRX=MBMLXAS26pxw@mail.gmail.com>
-Subject: Re: [RFC PATCH cryptodev] crypto: cc_sec_disable can be static
-To:     kbuild test robot <lkp@intel.com>
-Cc:     kbuild-all@01.org,
+Date:   Sun, 28 Apr 2019 10:11:44 +0300
+Message-ID: <CAOtvUMdHx4SK6CceCxfHOXic=bymA13HZMviuto98GysDwasMw@mail.gmail.com>
+Subject: Re: [PATCH] crypto: ccree: fix spelling mistake "protedcted" -> "protected"
+To:     Colin King <colin.king@canonical.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>
+        kernel-janitors@vger.kernel.org,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
@@ -69,18 +71,23 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Apr 26, 2019 at 4:03 AM kbuild test robot <lkp@intel.com> wrote:
+On Fri, Apr 26, 2019 at 4:18 PM Colin King <colin.king@canonical.com> wrote=
+:
 >
+> From: Colin Ian King <colin.king@canonical.com>
 >
-> Fixes: f98f6e2134bd ("crypto: ccree - add support for sec disabled mode")
-> Signed-off-by: kbuild test robot <lkp@intel.com>
+> There is a spelling mistake in a dev_dbg message, fix it.
+>
+> Signed-off-by: Colin Ian King <colin.king@canonical.com>
 
 Acked-By: Gilad Ben-Yossef <gilad@benyossef.com>
 
 Thanks!
+
 Gilad
 
---=20
+
+--
 Gilad Ben-Yossef
 Chief Coffee Drinker
 
