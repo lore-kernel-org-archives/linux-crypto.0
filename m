@@ -6,64 +6,63 @@ X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E197C43218
-	for <linux-crypto@archiver.kernel.org>; Sun, 28 Apr 2019 07:11:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 921D1C43218
+	for <linux-crypto@archiver.kernel.org>; Sun, 28 Apr 2019 07:57:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 131A720881
-	for <linux-crypto@archiver.kernel.org>; Sun, 28 Apr 2019 07:11:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 56E9E20881
+	for <linux-crypto@archiver.kernel.org>; Sun, 28 Apr 2019 07:57:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=benyossef-com.20150623.gappssmtp.com header.i=@benyossef-com.20150623.gappssmtp.com header.b="JZ7uyOa7"
+	dkim=pass (2048-bit key) header.d=benyossef-com.20150623.gappssmtp.com header.i=@benyossef-com.20150623.gappssmtp.com header.b="XbbFf/ep"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726472AbfD1HL5 (ORCPT
+        id S1726472AbfD1H5F (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 28 Apr 2019 03:11:57 -0400
-Received: from mail-vs1-f66.google.com ([209.85.217.66]:42418 "EHLO
-        mail-vs1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726450AbfD1HL5 (ORCPT
+        Sun, 28 Apr 2019 03:57:05 -0400
+Received: from mail-vk1-f195.google.com ([209.85.221.195]:39459 "EHLO
+        mail-vk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726133AbfD1H5E (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 28 Apr 2019 03:11:57 -0400
-Received: by mail-vs1-f66.google.com with SMTP id b74so1085477vsd.9
-        for <linux-crypto@vger.kernel.org>; Sun, 28 Apr 2019 00:11:56 -0700 (PDT)
+        Sun, 28 Apr 2019 03:57:04 -0400
+Received: by mail-vk1-f195.google.com with SMTP id s80so1661500vke.6
+        for <linux-crypto@vger.kernel.org>; Sun, 28 Apr 2019 00:57:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=benyossef-com.20150623.gappssmtp.com; s=20150623;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=0/S6B6NWgBdbisjBXWpRt6zfXJMqlxYauy0OrhI+WGI=;
-        b=JZ7uyOa7qj8XncuBu2COdGhfC4Yv3Mnc3/GPLsqtGxe1PdKdB4wRy8YLQdvN1V1SRM
-         88l/dqEearUqRDRfsN4c2z7uR9wwhlgGzssINQSME7c0ZhDm9khr/gSKNDnU3llmGZCK
-         Q7vBHD/VBO5vq4IXDnPCtlOYuGuVmGqZhXCrGgIpc9l6ov/r9ztZrziXyKcUEoejao21
-         eC3QS5zgykOPh7UcmFw3imiHWW7qXfnhbgZYxMCiHx+oHIVKQ9cyA1iHLyBpBsoKoRLZ
-         tsaojAzUozJ4FugbHm8/X1uqyS8vPxR5EATRsYdvLg9hoUuC9O6m14FKBwCDtLh5rZEH
-         FWEA==
+        bh=VyYDCLck5MXh4xMkAw8CfYXVHyW1jbr6E3dsZXs4xrM=;
+        b=XbbFf/epY0ivJbBTcgJv0aSg/z2Te6gGPfnzVtw1YvlTq8/bJvKqEQb4QlRhHkKjIi
+         bFHi4KWIF5SM5mn/y2KHQgfYNch09UMT/+ks2Lv0mvgszmAFhTD610JugQ6JvzcRoDGo
+         vT5SdgHufDMjfasAo665lxHW+W2TgRdSyge7w+oRiPXmtReBryA2X0Z6y34KaEegAqu2
+         0upUW/2jyLNfHBdYswAQ4bTLJ32tcJ/r/+xQpRU7k4PyevPNTIj5OzWM4y+oMEhRLQj6
+         LDVgfz0HKgQxtzvRA1ZrKRBA/ziYgka0L1yPGm6s4rI92zDuemeBO0r2NOvEhetk1jAN
+         iZXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=0/S6B6NWgBdbisjBXWpRt6zfXJMqlxYauy0OrhI+WGI=;
-        b=VkOja0Y/C/KdLLOdbkzlJMziIsYo4NkNpxFT25FDoodz4fP/GJLkDm5YF6dqSRS/Yi
-         bHcKmSdKboIPRAy2XmK7TdamLNhT9inFPb7mvCqnitJQ7X6c2EWH+Z9sEKptVV1u7OzW
-         8OCBLrLNpnaIB5ENvtv17HG6T6f9TVl247wmF6VbLGT26WjlRLixZUl909G4SOEWQpnh
-         CungZDAnrfXOlmITTAQv+TK5fFifiXd6LUYQlCgggqxrJdBlKbpX8MycoHIGw8CD7XDD
-         ZU6QfwYSeH4FAgT1AiWyF2BgXvxkkuY3jc3NNkJ1gkwnb8FYqAAu6BW2bLgcImayuXaq
-         1b8A==
-X-Gm-Message-State: APjAAAXn1+uWCmAXQi6zQU45vbUqJPmzzrXImnb/gp4FR63ACe/NcY9A
-        d6nc/XjSld2jDqN/Kr0+C+gopP+8AJKIzVKLpLF44qPhdlY=
-X-Google-Smtp-Source: APXvYqzO1gESEeXWppboA4chvYTcglgRF5LNuAbKekOMh6nWsT4upCekcBujfd2WDRfxftVcxeeW73pXSGj66el3zns=
-X-Received: by 2002:a67:6f07:: with SMTP id k7mr3886602vsc.117.1556435516192;
- Sun, 28 Apr 2019 00:11:56 -0700 (PDT)
+        bh=VyYDCLck5MXh4xMkAw8CfYXVHyW1jbr6E3dsZXs4xrM=;
+        b=IVN/qGJJP4kN3RBvL0eP/Hersk3PMW9k8GbzhovNn/dUs9VBbCe+hmhubuonOL5iXC
+         kyTyiimeRwNVrDi/tZgafRhO1hEvKTC6dSSFxJeN8VczcfSh/9txIHhmtykuhNCd5Cr3
+         oiGQEMUKICwX4zBh8Mo4Vor3db/2h+HdHtYKWUoVVpF8LWvYgdOPBnzWlmaxpn4NVrB9
+         mum0vbPeSY/VwyLHmL47AKgEkkdUvPN+n4NcLvvIAlKF3oE9NuDX/56NyBl11n6YONUV
+         kT7OSGObuK+XHRTE5GPxuvXLIdR8HQJQ/fe5MAlfi8428V+F0QqfV4nBR5LtunCS95rF
+         3Fng==
+X-Gm-Message-State: APjAAAUFtOGCogeMdngZqR+VsKIWhR1WAzthoCwJIldjPWTqt27SliTR
+        7sswuXrbxGIqL+cZ3OrkgkELR4mCTUXVWsayBIW6mg==
+X-Google-Smtp-Source: APXvYqxUir29y0XD4+4tv8nFVzMkaxDlh63X1GX7VkiJTfKxWPC6XsjDX4A6NsSvMdbSGLSOhZBHc2bEs3sKkYbXJZo=
+X-Received: by 2002:a1f:b654:: with SMTP id g81mr2917648vkf.18.1556438223479;
+ Sun, 28 Apr 2019 00:57:03 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190426131835.27258-1-colin.king@canonical.com>
-In-Reply-To: <20190426131835.27258-1-colin.king@canonical.com>
+References: <20190426164313.32308-1-yuehaibing@huawei.com>
+In-Reply-To: <20190426164313.32308-1-yuehaibing@huawei.com>
 From:   Gilad Ben-Yossef <gilad@benyossef.com>
-Date:   Sun, 28 Apr 2019 10:11:44 +0300
-Message-ID: <CAOtvUMdHx4SK6CceCxfHOXic=bymA13HZMviuto98GysDwasMw@mail.gmail.com>
-Subject: Re: [PATCH] crypto: ccree: fix spelling mistake "protedcted" -> "protected"
-To:     Colin King <colin.king@canonical.com>
+Date:   Sun, 28 Apr 2019 10:56:51 +0300
+Message-ID: <CAOtvUMfO1jvU6_Y7=otKQt0t9o_At0QBg7eqwV4SbeD9srbAqg@mail.gmail.com>
+Subject: Re: [PATCH -next] crypto: ccree - Make cc_sec_disable static
+To:     Yue Haibing <yuehaibing@huawei.com>
 Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        kernel-janitors@vger.kernel.org,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>
+        David Miller <davem@davemloft.net>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
@@ -71,20 +70,24 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Apr 26, 2019 at 4:18 PM Colin King <colin.king@canonical.com> wrote=
-:
+On Fri, Apr 26, 2019 at 7:43 PM Yue Haibing <yuehaibing@huawei.com> wrote:
 >
-> From: Colin Ian King <colin.king@canonical.com>
+> From: YueHaibing <yuehaibing@huawei.com>
 >
-> There is a spelling mistake in a dev_dbg message, fix it.
+> Fix sparse warning:
 >
-> Signed-off-by: Colin Ian King <colin.king@canonical.com>
+> drivers/crypto/ccree/cc_driver.c:37:6: warning:
+>  symbol 'cc_sec_disable' was not declared. Should it be static?
+>
+> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
 
-Acked-By: Gilad Ben-Yossef <gilad@benyossef.com>
+Thank you!
 
-Thanks!
+The kbuit test robot already sent the same fix, which I acked.
+It's hard competing with the bots... :-)
 
 Gilad
+
 
 
 --
