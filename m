@@ -3,84 +3,68 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCFB8C43218
-	for <linux-crypto@archiver.kernel.org>; Sun, 28 Apr 2019 08:32:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90403C43219
+	for <linux-crypto@archiver.kernel.org>; Sun, 28 Apr 2019 08:33:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A0C95206BF
-	for <linux-crypto@archiver.kernel.org>; Sun, 28 Apr 2019 08:32:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 67854206BF
+	for <linux-crypto@archiver.kernel.org>; Sun, 28 Apr 2019 08:33:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726532AbfD1I3o (ORCPT
+        id S1726553AbfD1Idb (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 28 Apr 2019 04:29:44 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:59386 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726530AbfD1I3o (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 28 Apr 2019 04:29:44 -0400
-Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id AAD47B8DB16C0FEDA5A5;
-        Sun, 28 Apr 2019 16:29:42 +0800 (CST)
-Received: from localhost (10.177.31.96) by DGGEMS406-HUB.china.huawei.com
- (10.3.19.206) with Microsoft SMTP Server id 14.3.439.0; Sun, 28 Apr 2019
- 16:29:36 +0800
-From:   Yue Haibing <yuehaibing@huawei.com>
-To:     <gilad@benyossef.com>, <herbert@gondor.apana.org.au>
-CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <davem@davemloft.net>, YueHaibing <yuehaibing@huawei.com>
-Subject: [PATCH v2 -next] crypto: ccree - remove set but not used variable 'du_size'
-Date:   Sun, 28 Apr 2019 16:28:27 +0800
-Message-ID: <20190428082827.38184-1-yuehaibing@huawei.com>
-X-Mailer: git-send-email 2.10.2.windows.1
-In-Reply-To: <20190426151821.36944-1-yuehaibing@huawei.com>
-References: <20190426151821.36944-1-yuehaibing@huawei.com>
+        Sun, 28 Apr 2019 04:33:31 -0400
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:53870 "EHLO
+        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726466AbfD1Idb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 28 Apr 2019 04:33:31 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 39B89374;
+        Sun, 28 Apr 2019 01:33:31 -0700 (PDT)
+Received: from e110176-lin.kfn.arm.com (unknown [10.50.4.178])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8E0CE3F5AF;
+        Sun, 28 Apr 2019 01:33:29 -0700 (PDT)
+From:   Gilad Ben-Yossef <gilad@benyossef.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Cc:     Ofir Drang <ofir.drang@arm.com>, kbuild test robot <lkp@intel.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: ccree: use a proper le32 type for le32 val
+Date:   Sun, 28 Apr 2019 11:33:22 +0300
+Message-Id: <20190428083322.26175-1-gilad@benyossef.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.177.31.96]
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: YueHaibing <yuehaibing@huawei.com>
+We build an explicit little endian value from the IDR register
+values. Use a proper le32 type to mark the var as such to
+satisfy Sparse.
 
-Fixes gcc '-Wunused-but-set-variable' warning:
-
-drivers/crypto/ccree/cc_cipher.c: In function cc_setup_key_desc:
-drivers/crypto/ccree/cc_cipher.c:645:15: warning: variable du_size set but not used [-Wunused-but-set-variable]
-
-It is never used since introduction in
-commit dd8486c75085 ("crypto: ccree - move key load desc. before flow desc.")
-
-Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+Reported-by: kbuild test robot <lkp@intel.com>
+Fixes: dcf6285d18ea1 ("crypto: ccree - add CID and PID support")
 ---
- drivers/crypto/ccree/cc_cipher.c | 8 --------
- 1 file changed, 8 deletions(-)
+ drivers/crypto/ccree/cc_driver.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/ccree/cc_cipher.c b/drivers/crypto/ccree/cc_cipher.c
-index d9f8cd5..9116626 100644
---- a/drivers/crypto/ccree/cc_cipher.c
-+++ b/drivers/crypto/ccree/cc_cipher.c
-@@ -642,16 +642,8 @@ static void cc_setup_key_desc(struct crypto_tfm *tfm,
- 	int direction = req_ctx->gen_ctx.op_type;
- 	dma_addr_t key_dma_addr = ctx_p->user.key_dma_addr;
- 	unsigned int key_len = ctx_p->keylen;
--	unsigned int du_size = nbytes;
- 	unsigned int din_size;
+diff --git a/drivers/crypto/ccree/cc_driver.c b/drivers/crypto/ccree/cc_driver.c
+index 902f196d4be1..208957726cff 100644
+--- a/drivers/crypto/ccree/cc_driver.c
++++ b/drivers/crypto/ccree/cc_driver.c
+@@ -103,7 +103,7 @@ static u32 cc_read_idr(struct cc_drvdata *drvdata, const u32 *idr_offsets)
+ 	int i;
+ 	union {
+ 		u8 regs[CC_NUM_IDRS];
+-		u32 val;
++		__le32 val;
+ 	} idr;
  
--	struct cc_crypto_alg *cc_alg =
--		container_of(tfm->__crt_alg, struct cc_crypto_alg,
--			     skcipher_alg.base);
--
--	if (cc_alg->data_unit)
--		du_size = cc_alg->data_unit;
--
- 	switch (cipher_mode) {
- 	case DRV_CIPHER_CBC:
- 	case DRV_CIPHER_CBC_CTS:
+ 	for (i = 0; i < CC_NUM_IDRS; ++i)
 -- 
-2.7.4
-
+2.21.0
 
