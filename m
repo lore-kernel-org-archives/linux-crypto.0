@@ -1,393 +1,143 @@
-Return-Path: <SRS0=YET+=TA=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=fwhM=TB=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B46DCC04AA6
-	for <linux-crypto@archiver.kernel.org>; Tue, 30 Apr 2019 16:29:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C343C43219
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 May 2019 05:49:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 83D6320645
-	for <linux-crypto@archiver.kernel.org>; Tue, 30 Apr 2019 16:29:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FGEyivk0"
+	by mail.kernel.org (Postfix) with ESMTP id 0E2E421734
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 May 2019 05:49:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726706AbfD3Q3w (ORCPT
+        id S1726066AbfEAFtt (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 30 Apr 2019 12:29:52 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:55681 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726698AbfD3Q3w (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 30 Apr 2019 12:29:52 -0400
-Received: by mail-wm1-f66.google.com with SMTP id o25so4497037wmf.5
-        for <linux-crypto@vger.kernel.org>; Tue, 30 Apr 2019 09:29:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=itoYXLY0qE+ThxcYSqGsicVXex5g/IXdD9HmYKoxPew=;
-        b=FGEyivk0RaQ9D4pFAwIzdCny3eiHOixy20MzQYhQfkkz3blNodYBYZHMrUuy+/Ohhs
-         MEgpkRXZMkKVMiEXPr/Z5N/LChzW4LlunO41LN+ZhCr5Ob+9RgD1IfeG0ODhUeeHuvds
-         qK6dHyeiA4DF8oxl0nBThqB8E/1/IIUjuora4XydKUcgQCbDiX6Y1naOUNCZ6r5Ame+F
-         V924j1bKt5IKubL8oG9u37wb61Dqjmk8Rqd+Gfl6A8LaTrorgb9+xVjHduFIhUMowqo4
-         izZ0KyJVX4AhwbtZ88myyKbyi2PZEljTJE3M2aGW7IGkiZoSP33XCVTbIti7eoNbF3us
-         CFYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=itoYXLY0qE+ThxcYSqGsicVXex5g/IXdD9HmYKoxPew=;
-        b=ctbSamKQYEHdk7Ktusl3pm/TVVKTQrrdGVihSlMdXknTTfF1SQ9FgMonDxQHr6SnAu
-         /sW9oFFul9ns7VS4xIKCyzD5HiFj8qq3X+eKjXlzTQRxRspyyOn6QtkrfVjumBxJxvJ1
-         WWoYMNtqNnuzFMGrz5t2mOR3sQoCFnm2awkClydwC71sfT8SlR9Qu9nZfyep/jcEk0Xv
-         LC//G8yJ22kJ172di6FKXPERjcFSlrgSQgS/4j/QX3frLquYV8GmsIO+e/ZlGiHnYUpP
-         DngXGurGl43znjxIE5EftfPHfisd9Qcc/4krIM2B0farmIv5+0/xRZ23DqFFQf4fMBmH
-         +dBg==
-X-Gm-Message-State: APjAAAUUhosGv0h16wTfxF+8qq86wUiccNzepG2yK7l8gb67BTX+QU+z
-        wHabqeaqYjtITVrhxJQHtKZe7LbE3RFJYQ==
-X-Google-Smtp-Source: APXvYqyNVC0pizV1lUNjkQ9pjQV0ZPJvdBq/9bUeOSrV1j/3DV8sCrArM8VRKUZPizpMU8Qeq/CpnA==
-X-Received: by 2002:a1c:b782:: with SMTP id h124mr3948711wmf.5.1556641789118;
-        Tue, 30 Apr 2019 09:29:49 -0700 (PDT)
-Received: from sudo.home ([2a01:cb1d:112:6f00:1ca3:6afc:30c:1068])
-        by smtp.gmail.com with ESMTPSA id t67sm5848890wmg.0.2019.04.30.09.29.47
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 30 Apr 2019 09:29:48 -0700 (PDT)
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To:     linux-crypto@vger.kernel.org
-Cc:     linux-arm-kernel@lists.infradead.org, linus.walleij@linaro.org,
-        joakim.bech@linaro.org, Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH 4/5] crypto: atmel-i2c: add support for SHA204A random number generator
-Date:   Tue, 30 Apr 2019 18:29:08 +0200
-Message-Id: <20190430162910.16771-5-ard.biesheuvel@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190430162910.16771-1-ard.biesheuvel@linaro.org>
-References: <20190430162910.16771-1-ard.biesheuvel@linaro.org>
+        Wed, 1 May 2019 01:49:49 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:55457 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725298AbfEAFtt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 1 May 2019 01:49:49 -0400
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 44v6t10X4Rz9s9T;
+        Wed,  1 May 2019 15:49:44 +1000 (AEST)
+From:   Michael Ellerman <mpe@ellerman.id.au>
+To:     vakul.garg@nxp.com
+Cc:     linux-crypto@vger.kernel.org, aymen.sghaier@nxp.com,
+        davem@davemloft.net, herbert@gondor.apana.org.au,
+        horia.geanta@nxp.com, linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH] crypto: caam/jr - Remove extra memory barrier during job ring dequeue
+In-Reply-To: 20190409063505.16664-1-vakul.garg@nxp.com
+Date:   Wed, 01 May 2019 15:49:44 +1000
+Message-ID: <87pnp2aflz.fsf@concordia.ellerman.id.au>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The Linaro/96boards Secure96 mezzanine contains (among other things)
-an Atmel SHA204A symmetric crypto processor. This chip implements a
-number of different functionalities, but one that is highly useful
-for many different 96boards platforms is the random number generator.
+Vakul Garg wrote:
+> In function caam_jr_dequeue(), a full memory barrier is used before
+> writing response job ring's register to signal removal of the completed
+> job. Therefore for writing the register, we do not need another write
+> memory barrier. Hence it is removed by replacing the call to wr_reg32()
+> with a newly defined function wr_reg32_relaxed().
+> 
+> Signed-off-by: Vakul Garg <vakul.garg@nxp.com>
+> ---
+>  drivers/crypto/caam/jr.c   | 2 +-
+>  drivers/crypto/caam/regs.h | 8 ++++++++
+>  2 files changed, 9 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
+> index 4e9b3fca5627..2ce6d7d2ad72 100644
+> --- a/drivers/crypto/caam/jr.c
+> +++ b/drivers/crypto/caam/jr.c
+> @@ -266,7 +266,7 @@ static void caam_jr_dequeue(unsigned long devarg)
+>  		mb();
+>  
+>  		/* set done */
+> -		wr_reg32(&jrp->rregs->outring_rmvd, 1);
+> +		wr_reg32_relaxed(&jrp->rregs->outring_rmvd, 1);
+>  
+>  		jrp->out_ring_read_index = (jrp->out_ring_read_index + 1) &
+>  					   (JOBR_DEPTH - 1);
+> diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h
+> index 3cd0822ea819..9e912c722e33 100644
+> --- a/drivers/crypto/caam/regs.h
+> +++ b/drivers/crypto/caam/regs.h
+> @@ -96,6 +96,14 @@ cpu_to_caam(16)
+>  cpu_to_caam(32)
+>  cpu_to_caam(64)
+>  
+> +static inline void wr_reg32_relaxed(void __iomem *reg, u32 data)
+> +{
+> +	if (caam_little_end)
+> +		writel_relaxed(data, reg);
+> +	else
+> +		writel_relaxed(cpu_to_be32(data), reg);
+> +}
+> +
+>  static inline void wr_reg32(void __iomem *reg, u32 data)
+>  {
+>  	if (caam_little_end)
 
-So let's implement a driver for the SHA204A, and for the time being,
-implement support for the random number generator only.
+This crashes on my p5020ds. Did you test on powerpc?
 
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
----
- drivers/crypto/Kconfig         |  14 ++
- drivers/crypto/Makefile        |   1 +
- drivers/crypto/atmel-i2c.c     |  15 ++
- drivers/crypto/atmel-i2c.h     |  10 ++
- drivers/crypto/atmel-sha204a.c | 171 ++++++++++++++++++++
- 5 files changed, 211 insertions(+)
+# first bad commit: [bbfcac5ff5f26aafa51935a62eb86b6eacfe8a49] crypto: caam/jr - Remove extra memory barrier during job ring dequeue
 
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index 11b0de15a99d..fe143d6c6050 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -545,6 +545,20 @@ config CRYPTO_DEV_ATMEL_ECC
- 	  To compile this driver as a module, choose M here: the module
- 	  will be called atmel-ecc.
- 
-+config CRYPTO_DEV_ATMEL_SHA204A
-+	tristate "Support for Microchip / Atmel SHA accelerator and RNG"
-+	depends on I2C
-+	select CRYPTO_DEV_ATMEL_I2C
-+	select HW_RANDOM
-+	help
-+	  Microhip / Atmel SHA accelerator and RNG.
-+	  Select this if you want to use the Microchip / Atmel SHA204A
-+	  module as a random number generator. (Other functions of the
-+	  chip are currently not exposed by this driver)
-+
-+	  To compile this driver as a module, choose M here: the module
-+	  will be called atmel-sha204a.
-+
- config CRYPTO_DEV_CCP
- 	bool "Support for AMD Secure Processor"
- 	depends on ((X86 && PCI) || (ARM64 && (OF_ADDRESS || ACPI))) && HAS_IOMEM
-diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
-index 85be01afcc41..5d054ffa8814 100644
---- a/drivers/crypto/Makefile
-+++ b/drivers/crypto/Makefile
-@@ -4,6 +4,7 @@ obj-$(CONFIG_CRYPTO_DEV_ATMEL_SHA) += atmel-sha.o
- obj-$(CONFIG_CRYPTO_DEV_ATMEL_TDES) += atmel-tdes.o
- obj-$(CONFIG_CRYPTO_DEV_ATMEL_I2C) += atmel-i2c.o
- obj-$(CONFIG_CRYPTO_DEV_ATMEL_ECC) += atmel-ecc.o
-+obj-$(CONFIG_CRYPTO_DEV_ATMEL_SHA204A) += atmel-sha204a.o
- obj-$(CONFIG_CRYPTO_DEV_CAVIUM_ZIP) += cavium/
- obj-$(CONFIG_CRYPTO_DEV_CCP) += ccp/
- obj-$(CONFIG_CRYPTO_DEV_CCREE) += ccree/
-diff --git a/drivers/crypto/atmel-i2c.c b/drivers/crypto/atmel-i2c.c
-index 5e099368d120..be49ab7f4338 100644
---- a/drivers/crypto/atmel-i2c.c
-+++ b/drivers/crypto/atmel-i2c.c
-@@ -58,6 +58,21 @@ void atmel_i2c_init_read_cmd(struct atmel_i2c_cmd *cmd)
- }
- EXPORT_SYMBOL(atmel_i2c_init_read_cmd);
- 
-+void atmel_i2c_init_random_cmd(struct atmel_i2c_cmd *cmd)
-+{
-+	cmd->word_addr = COMMAND;
-+	cmd->opcode = OPCODE_RANDOM;
-+	cmd->param1 = 0;
-+	cmd->param2 = 0;
-+	cmd->count = RANDOM_COUNT;
-+
-+	atmel_i2c_checksum(cmd);
-+
-+	cmd->msecs = MAX_EXEC_TIME_RANDOM;
-+	cmd->rxsize = RANDOM_RSP_SIZE;
-+}
-+EXPORT_SYMBOL(atmel_i2c_init_random_cmd);
-+
- void atmel_i2c_init_genkey_cmd(struct atmel_i2c_cmd *cmd, u16 keyid)
- {
- 	cmd->word_addr = COMMAND;
-diff --git a/drivers/crypto/atmel-i2c.h b/drivers/crypto/atmel-i2c.h
-index 82de5166acfa..c6bd43b78f33 100644
---- a/drivers/crypto/atmel-i2c.h
-+++ b/drivers/crypto/atmel-i2c.h
-@@ -7,6 +7,8 @@
- #ifndef __ATMEL_I2C_H__
- #define __ATMEL_I2C_H__
- 
-+#include <linux/hw_random.h>
-+
- #define ATMEL_ECC_PRIORITY		300
- 
- #define COMMAND				0x03 /* packet function */
-@@ -28,6 +30,7 @@
- #define GENKEY_RSP_SIZE			(ATMEL_ECC_PUBKEY_SIZE + \
- 					 CMD_OVERHEAD_SIZE)
- #define READ_RSP_SIZE			(4 + CMD_OVERHEAD_SIZE)
-+#define RANDOM_RSP_SIZE			(32 + CMD_OVERHEAD_SIZE)
- #define MAX_RSP_SIZE			GENKEY_RSP_SIZE
- 
- /**
-@@ -96,15 +99,20 @@ static const struct {
- #define MAX_EXEC_TIME_ECDH		58
- #define MAX_EXEC_TIME_GENKEY		115
- #define MAX_EXEC_TIME_READ		1
-+#define MAX_EXEC_TIME_RANDOM		50
- 
- /* Command opcode */
- #define OPCODE_ECDH			0x43
- #define OPCODE_GENKEY			0x40
- #define OPCODE_READ			0x02
-+#define OPCODE_RANDOM			0x1b
- 
- /* Definitions for the READ Command */
- #define READ_COUNT			7
- 
-+/* Definitions for the RANDOM Command */
-+#define RANDOM_COUNT			7
-+
- /* Definitions for the GenKey Command */
- #define GENKEY_COUNT			7
- #define GENKEY_MODE_PRIVATE		0x04
-@@ -142,6 +150,7 @@ struct atmel_i2c_client_priv {
- 	u8 wake_token[WAKE_TOKEN_MAX_SIZE];
- 	size_t wake_token_sz;
- 	atomic_t tfm_count ____cacheline_aligned;
-+	struct hwrng hwrng;
- };
- 
- /**
-@@ -179,6 +188,7 @@ void atmel_i2c_enqueue(struct atmel_i2c_work_data *work_data,
- int atmel_i2c_send_receive(struct i2c_client *client, struct atmel_i2c_cmd *cmd);
- 
- void atmel_i2c_init_read_cmd(struct atmel_i2c_cmd *cmd);
-+void atmel_i2c_init_random_cmd(struct atmel_i2c_cmd *cmd);
- void atmel_i2c_init_genkey_cmd(struct atmel_i2c_cmd *cmd, u16 keyid);
- int atmel_i2c_init_ecdh_cmd(struct atmel_i2c_cmd *cmd,
- 			    struct scatterlist *pubkey);
-diff --git a/drivers/crypto/atmel-sha204a.c b/drivers/crypto/atmel-sha204a.c
-new file mode 100644
-index 000000000000..ea0d2068ea4f
---- /dev/null
-+++ b/drivers/crypto/atmel-sha204a.c
-@@ -0,0 +1,171 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Microchip / Atmel SHA204A (I2C) driver.
-+ *
-+ * Copyright (c) 2019 Linaro, Ltd. <ard.biesheuvel@linaro.org>
-+ */
-+
-+#include <linux/delay.h>
-+#include <linux/device.h>
-+#include <linux/err.h>
-+#include <linux/errno.h>
-+#include <linux/i2c.h>
-+#include <linux/init.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/scatterlist.h>
-+#include <linux/slab.h>
-+#include <linux/workqueue.h>
-+#include "atmel-i2c.h"
-+
-+static void atmel_sha204a_rng_done(struct atmel_i2c_work_data *work_data,
-+				   void *areq, int status)
-+{
-+	struct atmel_i2c_client_priv *i2c_priv = work_data->ctx;
-+	struct hwrng *rng = areq;
-+
-+	if (status)
-+		dev_warn_ratelimited(&i2c_priv->client->dev,
-+				     "i2c transaction failed (%d)\n",
-+				     status);
-+
-+	rng->priv = (unsigned long)work_data;
-+	atomic_dec(&i2c_priv->tfm_count);
-+}
-+
-+static int atmel_sha204a_rng_read_nonblocking(struct hwrng *rng, void *data,
-+					      size_t max)
-+{
-+	struct atmel_i2c_client_priv *i2c_priv;
-+	struct atmel_i2c_work_data *work_data;
-+
-+	i2c_priv = container_of(rng, struct atmel_i2c_client_priv, hwrng);
-+
-+	/* keep maximum 1 asynchronous read in flight at any time */
-+	if (!atomic_add_unless(&i2c_priv->tfm_count, 1, 1))
-+		return 0;
-+
-+	if (rng->priv) {
-+		work_data = (struct atmel_i2c_work_data *)rng->priv;
-+		max = min(sizeof(work_data->cmd.data), max);
-+		memcpy(data, &work_data->cmd.data, max);
-+		rng->priv = 0;
-+	} else {
-+		work_data = kmalloc(sizeof(*work_data), GFP_ATOMIC);
-+		if (!work_data)
-+			return -ENOMEM;
-+
-+		work_data->ctx = i2c_priv;
-+		work_data->client = i2c_priv->client;
-+
-+		max = 0;
-+	}
-+
-+	atmel_i2c_init_random_cmd(&work_data->cmd);
-+	atmel_i2c_enqueue(work_data, atmel_sha204a_rng_done, rng);
-+
-+	return max;
-+}
-+
-+static int atmel_sha204a_rng_read(struct hwrng *rng, void *data, size_t max,
-+				  bool wait)
-+{
-+	struct atmel_i2c_client_priv *i2c_priv;
-+	struct atmel_i2c_cmd cmd;
-+	int ret;
-+
-+	if (!wait)
-+		return atmel_sha204a_rng_read_nonblocking(rng, data, max);
-+
-+	i2c_priv = container_of(rng, struct atmel_i2c_client_priv, hwrng);
-+
-+	atmel_i2c_init_random_cmd(&cmd);
-+
-+	ret = atmel_i2c_send_receive(i2c_priv->client, &cmd);
-+	if (ret)
-+		return ret;
-+
-+	max = min(sizeof(cmd.data), max);
-+	memcpy(data, cmd.data, max);
-+
-+	return max;
-+}
-+
-+static int atmel_sha204a_probe(struct i2c_client *client,
-+			       const struct i2c_device_id *id)
-+{
-+	struct atmel_i2c_client_priv *i2c_priv;
-+	int ret;
-+
-+	ret = atmel_i2c_probe(client, id);
-+	if (ret)
-+		return ret;
-+
-+	i2c_priv = i2c_get_clientdata(client);
-+
-+	memset(&i2c_priv->hwrng, 0, sizeof(i2c_priv->hwrng));
-+
-+	i2c_priv->hwrng.name = dev_name(&client->dev);
-+	i2c_priv->hwrng.read = atmel_sha204a_rng_read;
-+	i2c_priv->hwrng.quality = 1024;
-+
-+	ret = hwrng_register(&i2c_priv->hwrng);
-+	if (ret)
-+		dev_warn(&client->dev, "failed to register RNG (%d)\n", ret);
-+
-+	return ret;
-+}
-+
-+static int atmel_sha204a_remove(struct i2c_client *client)
-+{
-+	struct atmel_i2c_client_priv *i2c_priv = i2c_get_clientdata(client);
-+
-+	if (atomic_read(&i2c_priv->tfm_count)) {
-+		dev_err(&client->dev, "Device is busy\n");
-+		return -EBUSY;
-+	}
-+
-+	if (i2c_priv->hwrng.priv)
-+		kfree((void *)i2c_priv->hwrng.priv);
-+	hwrng_unregister(&i2c_priv->hwrng);
-+
-+	return 0;
-+}
-+
-+static const struct of_device_id atmel_sha204a_dt_ids[] = {
-+	{ .compatible = "atmel,atsha204a", },
-+	{ /* sentinel */ }
-+};
-+MODULE_DEVICE_TABLE(of, atmel_sha204a_dt_ids);
-+
-+static const struct i2c_device_id atmel_sha204a_id[] = {
-+	{ "atsha204a", 0 },
-+	{ /* sentinel */ }
-+};
-+MODULE_DEVICE_TABLE(i2c, atmel_sha204a_id);
-+
-+static struct i2c_driver atmel_sha204a_driver = {
-+	.probe			= atmel_sha204a_probe,
-+	.remove			= atmel_sha204a_remove,
-+	.id_table		= atmel_sha204a_id,
-+
-+	.driver.name		= "atmel-sha204a",
-+	.driver.of_match_table	= of_match_ptr(atmel_sha204a_dt_ids),
-+};
-+
-+static int __init atmel_sha204a_init(void)
-+{
-+	return i2c_add_driver(&atmel_sha204a_driver);
-+}
-+
-+static void __exit atmel_sha204a_exit(void)
-+{
-+	flush_scheduled_work();
-+	i2c_del_driver(&atmel_sha204a_driver);
-+}
-+
-+module_init(atmel_sha204a_init);
-+module_exit(atmel_sha204a_exit);
-+
-+MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
-+MODULE_LICENSE("GPL v2");
--- 
-2.20.1
+Log:
 
+  ------------[ cut here ]------------
+  kernel BUG at drivers/crypto/caam/jr.c:191!
+  Oops: Exception in kernel mode, sig: 5 [#1]
+  BE PAGE_SIZE=4K SMP NR_CPUS=24 CoreNet Generic
+  Modules linked in:
+  CPU: 1 PID: 0 Comm: swapper/1 Not tainted 5.1.0-rc1-gcc-8.2.0-00060-gbbfcac5ff5f2 #31
+  NIP:  c00000000079d704 LR: c00000000079d498 CTR: c000000000086914
+  REGS: c0000000fffc7970 TRAP: 0700   Not tainted  (5.1.0-rc1-gcc-8.2.0-00060-gbbfcac5ff5f2)
+  MSR:  0000000080029000 <CE,EE,ME>  CR: 28008484  XER: 00000000
+  IRQMASK: 0
+  GPR00: c00000000079d6b0 c0000000fffc7c00 c000000000fbc800 0000000000000001
+  GPR04: 000000007e080080 000000000000ffc0 0000000000000001 00000000000067d7
+  GPR08: 00000000880401a9 0000000000000000 0000000000000001 00000000fa83b2da
+  GPR12: 0000000028008224 c00000003ffff800 c000000000fc20b0 0000000000000100
+  GPR16: 8920f09520bea117 c000000000def480 0000000000000000 0000000000000001
+  GPR20: c000000000fc3940 c0000000f3537e18 0000000000000001 c000000001026cc5
+  GPR24: 0000000000000001 c0000000f3328000 0000000000000001 c0000000f3451010
+  GPR28: 0000000000000000 0000000000000001 0000000000000000 0000000000000000
+  NIP [c00000000079d704] .caam_jr_dequeue+0x2f0/0x410
+  LR [c00000000079d498] .caam_jr_dequeue+0x84/0x410
+  Call Trace:
+  [c0000000fffc7c00] [c00000000079d6b0] .caam_jr_dequeue+0x29c/0x410 (unreliable)
+  [c0000000fffc7cd0] [c00000000004fef0] .tasklet_action_common.isra.3+0xac/0x180
+  [c0000000fffc7d80] [c000000000a2f99c] .__do_softirq+0x174/0x3f8
+  [c0000000fffc7e90] [c00000000004fb94] .irq_exit+0xc4/0xdc
+  [c0000000fffc7f00] [c000000000007348] .__do_irq+0x8c/0x1b0
+  [c0000000fffc7f90] [c0000000000150c4] .call_do_irq+0x14/0x24
+  [c0000000f3137930] [c0000000000074e4] .do_IRQ+0x78/0xd4
+  [c0000000f31379c0] [c000000000019998] exc_0x500_common+0xfc/0x100
+  --- interrupt: 501 at .book3e_idle+0x24/0x5c
+      LR = .book3e_idle+0x24/0x5c
+  [c0000000f3137cc0] [c00000000000a6a4] .arch_cpu_idle+0x34/0xa0 (unreliable)
+  [c0000000f3137d30] [c000000000a2f2e8] .default_idle_call+0x5c/0x70
+  [c0000000f3137da0] [c000000000084210] .do_idle+0x1b0/0x1f4
+  [c0000000f3137e40] [c000000000084434] .cpu_startup_entry+0x28/0x30
+  [c0000000f3137eb0] [c000000000021538] .start_secondary+0x59c/0x5b0
+  [c0000000f3137f90] [c00000000000045c] start_secondary_prolog+0x10/0x14
+  Instruction dump:
+  7d284a14 e9290018 2fa90000 40de001c 3bbd0001 57bd05fe 7d3db050 712901ff
+  7fbd07b4 40e2ffcc 93b500dc 4bffff94 <0fe00000> 78890022 79270020 41d600ec
+  ---[ end trace 7bedbdf37a95ab35 ]---
+
+That's hitting:
+
+		/* we should never fail to find a matching descriptor */
+		BUG_ON(CIRC_CNT(head, tail + i, JOBR_DEPTH) <= 0);
+
+cheers
