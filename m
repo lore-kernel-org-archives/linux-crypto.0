@@ -2,40 +2,39 @@ Return-Path: <SRS0=RoNa=TC=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 183A4C43219
-	for <linux-crypto@archiver.kernel.org>; Thu,  2 May 2019 10:35:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9011C43219
+	for <linux-crypto@archiver.kernel.org>; Thu,  2 May 2019 10:36:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CCF5520873
-	for <linux-crypto@archiver.kernel.org>; Thu,  2 May 2019 10:35:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8D92C2085A
+	for <linux-crypto@archiver.kernel.org>; Thu,  2 May 2019 10:36:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="S3TulYjZ"
+	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="b92kOuk4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726553AbfEBKfm (ORCPT
+        id S1726242AbfEBKfw (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 2 May 2019 06:35:42 -0400
-Received: from mail-eopbgr820048.outbound.protection.outlook.com ([40.107.82.48]:12682
-        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
+        Thu, 2 May 2019 06:35:52 -0400
+Received: from mail-eopbgr760045.outbound.protection.outlook.com ([40.107.76.45]:13075
+        "EHLO NAM02-CY1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726283AbfEBKfJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1726231AbfEBKfJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Thu, 2 May 2019 06:35:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=xilinx.onmicrosoft.com; s=selector1-xilinx-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jR/LNIOTd2fCWb9/fg0Ro3npe1DDyBRNXisE4JEmh3k=;
- b=S3TulYjZet+4oeW0WZld4KTpgjLJHVC946BBg0Rtt8EVNI/75T8ikL1JQ649YI3TiT0+UdwDUu0UP/99beykam1Q2U7cb1PXlw54hYzax3vRkm4ot7FAcJEXRNjoTyYCR80mLlrDblFBahVI3KG/lAGeNCTwdJtBrgqJEc55qIs=
-Received: from MWHPR02CA0001.namprd02.prod.outlook.com (2603:10b6:300:4b::11)
- by MWHPR0201MB3404.namprd02.prod.outlook.com (2603:10b6:301:76::13) with
+ bh=oHpWHxqskoSlSadAMLt09ozUUUgZ3kzHN+8B/ee8fbI=;
+ b=b92kOuk44jUwOEIF/CSUz8pg7uEBY77AMrMhfc7C63ffuXL10DsdVB81CRy7c6MD8lFlTy1B1ImXecnfQl84r1GdbziK0jYWprULykxdnEwBRtlaL6l3X3hs8U6YrujYO+1QFrnm/p9NJ61yaiy8qAd6vDfqfvs5JqK7iJox9nk=
+Received: from BN6PR02CA0030.namprd02.prod.outlook.com (2603:10b6:404:5f::16)
+ by CY4PR0201MB3396.namprd02.prod.outlook.com (2603:10b6:910:8b::13) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.1856.10; Thu, 2 May
- 2019 10:35:03 +0000
-Received: from SN1NAM02FT011.eop-nam02.prod.protection.outlook.com
- (2a01:111:f400:7e44::208) by MWHPR02CA0001.outlook.office365.com
- (2603:10b6:300:4b::11) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.1856.11; Thu, 2 May
+ 2019 10:35:04 +0000
+Received: from CY1NAM02FT024.eop-nam02.prod.protection.outlook.com
+ (2a01:111:f400:7e45::204) by BN6PR02CA0030.outlook.office365.com
+ (2603:10b6:404:5f::16) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.20.1856.10 via Frontend
  Transport; Thu, 2 May 2019 10:35:03 +0000
 Authentication-Results: spf=pass (sender IP is 149.199.60.83)
@@ -46,26 +45,26 @@ Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
  149.199.60.83 as permitted sender) receiver=protection.outlook.com;
  client-ip=149.199.60.83; helo=xsj-pvapsmtpgw01;
 Received: from xsj-pvapsmtpgw01 (149.199.60.83) by
- SN1NAM02FT011.mail.protection.outlook.com (10.152.72.82) with Microsoft SMTP
+ CY1NAM02FT024.mail.protection.outlook.com (10.152.74.210) with Microsoft SMTP
  Server (version=TLS1_0, cipher=TLS_RSA_WITH_AES_256_CBC_SHA) id 15.20.1856.11
  via Frontend Transport; Thu, 2 May 2019 10:35:02 +0000
 Received: from unknown-38-66.xilinx.com ([149.199.38.66] helo=xsj-pvapsmtp01)
         by xsj-pvapsmtpgw01 with esmtp (Exim 4.63)
         (envelope-from <kalyani.akula@xilinx.com>)
-        id 1hM93O-0004iV-EL; Thu, 02 May 2019 03:35:02 -0700
+        id 1hM93O-0004iW-Fl; Thu, 02 May 2019 03:35:02 -0700
 Received: from [127.0.0.1] (helo=localhost)
         by xsj-pvapsmtp01 with smtp (Exim 4.63)
         (envelope-from <kalyani.akula@xilinx.com>)
-        id 1hM93J-0007Vo-B1; Thu, 02 May 2019 03:34:57 -0700
-Received: from xsj-pvapsmtp01 (maildrop.xilinx.com [149.199.38.66])
-        by xsj-smtp-dlp2.xlnx.xilinx.com (8.13.8/8.13.1) with ESMTP id x42AYtm8031033;
+        id 1hM93J-0007Vo-CX; Thu, 02 May 2019 03:34:57 -0700
+Received: from xsj-pvapsmtp01 (xsj-smtp.xilinx.com [149.199.38.66])
+        by xsj-smtp-dlp2.xlnx.xilinx.com (8.13.8/8.13.1) with ESMTP id x42AYsY9031031;
         Thu, 2 May 2019 03:34:55 -0700
 Received: from [172.23.155.80] (helo=xhdengvm155080.xilinx.com)
         by xsj-pvapsmtp01 with esmtp (Exim 4.63)
         (envelope-from <kalyania@xilinx.com>)
-        id 1hM93G-0007VG-Nz; Thu, 02 May 2019 03:34:54 -0700
+        id 1hM93G-0007VC-ML; Thu, 02 May 2019 03:34:54 -0700
 Received: by xhdengvm155080.xilinx.com (Postfix, from userid 23151)
-        id E81F28141F; Thu,  2 May 2019 16:04:53 +0530 (IST)
+        id DA45D81340; Thu,  2 May 2019 16:04:53 +0530 (IST)
 From:   Kalyani Akula <kalyani.akula@xilinx.com>
 To:     <herbert@gondor.apana.org.au>, <kstewart@linuxfoundation.org>,
         <gregkh@linuxfoundation.org>, <tglx@linutronix.de>,
@@ -74,65 +73,83 @@ To:     <herbert@gondor.apana.org.au>, <kstewart@linuxfoundation.org>,
         <saratcha@xilinx.com>
 CC:     Kalyani Akula <kalyania@xilinx.com>,
         Kalyani Akula <kalyani.akula@xilinx.com>
-Subject: [RFC PATCH V3 4/4] ARM64: zynqmp: Add Xilinix SHA-384 node.
-Date:   Thu, 2 May 2019 16:04:42 +0530
-Message-ID: <1556793282-17346-5-git-send-email-kalyani.akula@xilinx.com>
+Subject: [RFC PATCH V3 0/4] Add Xilinx's ZynqMP SHA3 driver support
+Date:   Thu, 2 May 2019 16:04:38 +0530
+Message-ID: <1556793282-17346-1-git-send-email-kalyani.akula@xilinx.com>
 X-Mailer: git-send-email 1.9.5
-In-Reply-To: <1556793282-17346-1-git-send-email-kalyani.akula@xilinx.com>
-References: <1556793282-17346-1-git-send-email-kalyani.akula@xilinx.com>
 X-RCIS-Action: ALLOW
 X-TM-AS-Product-Ver: IMSS-7.1.0.1224-8.2.0.1013-23620.005
 X-TM-AS-User-Approved-Sender: Yes;Yes
 X-EOPAttributedMessage: 0
 X-MS-Office365-Filtering-HT: Tenant
-X-Forefront-Antispam-Report: CIP:149.199.60.83;IPV:NLI;CTRY:US;EFV:NLI;SFV:NSPM;SFS:(10009020)(376002)(346002)(136003)(39860400002)(396003)(2980300002)(199004)(189003)(16586007)(316002)(305945005)(90966002)(70206006)(478600001)(186003)(47776003)(36756003)(4326008)(52956003)(51416003)(5660300002)(6266002)(2906002)(8936002)(42186006)(110136005)(107886003)(8676002)(63266004)(106002)(48376002)(103686004)(356004)(4744005)(54906003)(6666004)(50226002)(81156014)(76176011)(81166006)(486006)(44832011)(336012)(426003)(2201001)(446003)(26005)(476003)(70586007)(50466002)(11346002)(2616005)(36386004)(126002)(6636002);DIR:OUT;SFP:1101;SCL:1;SRVR:MWHPR0201MB3404;H:xsj-pvapsmtpgw01;FPR:;SPF:Pass;LANG:en;PTR:unknown-60-83.xilinx.com;A:1;MX:1;
+X-Forefront-Antispam-Report: CIP:149.199.60.83;IPV:NLI;CTRY:US;EFV:NLI;SFV:NSPM;SFS:(10009020)(376002)(346002)(396003)(136003)(39860400002)(2980300002)(189003)(199004)(81166006)(8936002)(81156014)(110136005)(54906003)(16586007)(36756003)(4326008)(6306002)(103686004)(8676002)(42186006)(36386004)(50226002)(44832011)(2906002)(26005)(478600001)(52956003)(51416003)(48376002)(966005)(50466002)(70586007)(70206006)(106002)(2616005)(336012)(486006)(126002)(476003)(6266002)(426003)(186003)(316002)(107886003)(305945005)(90966002)(2201001)(47776003)(5660300002)(356004)(63266004)(6636002)(6666004);DIR:OUT;SFP:1101;SCL:1;SRVR:CY4PR0201MB3396;H:xsj-pvapsmtpgw01;FPR:;SPF:Pass;LANG:en;PTR:unknown-60-83.xilinx.com;MX:1;A:1;
 MIME-Version: 1.0
 Content-Type: text/plain
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: b3b1bfd8-d9a9-40c3-24d4-08d6cee9d5fb
-X-Microsoft-Antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(4709054)(2017052603328);SRVR:MWHPR0201MB3404;
-X-MS-TrafficTypeDiagnostic: MWHPR0201MB3404:
+X-MS-Office365-Filtering-Correlation-Id: 25eaa23a-e9aa-498e-725b-08d6cee9d61b
+X-Microsoft-Antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(4709054)(2017052603328);SRVR:CY4PR0201MB3396;
+X-MS-TrafficTypeDiagnostic: CY4PR0201MB3396:
+X-MS-Exchange-PUrlCount: 2
 X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
-X-Microsoft-Antispam-PRVS: <MWHPR0201MB3404CD11589C72C5C2B1C1BBAF340@MWHPR0201MB3404.namprd02.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1079;
+X-Microsoft-Antispam-PRVS: <CY4PR0201MB33966B386B1474B385E8564CAF340@CY4PR0201MB3396.namprd02.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:4125;
 X-Forefront-PRVS: 0025434D2D
 X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam-Message-Info: p1zcu/vSpgKTZRadwi/nHVp1Rv0OJh61/awokMIxKB3DK9tv7A8sj+uXsvtGNyLR3dVUMjM0cTvEz7V+SlrS2RGiiuO4T7A31LyFsV/sfkP+1z0E8odDQN+xS2gQrVLYjCwtcJw3PbqbWJuu5UARa3UMfX0NbobU1TRDXp5hz16x7KJIwRU71J3Cei1LTMyqOkWCRRp2EiiQU968TWlvyKbIzJo78UpbDPPv+2OuCVMj6cCx2JvF13nG92vnxZTM7uW/bkHK9RgNgUx3T55ojEadnGQ9fcIc/dnnSsMSgrMLL/qnYUSYlupsis5xZE9+i40FrndoBaA8JX8/JYZ5JRLr/4eSXNHtIQ8BIRSNOC9FRREHdIXQ51jgpN60yulnyi9kGuXUgXuAMErH+0+J11OqMDoD1arVo9lCPukqgao=
+X-Microsoft-Antispam-Message-Info: 4RyCrrkXPpIRmpPbdRFn/IRL2i3Lkg5jzb87VJRzwCl5SqHSehbGqXTdagJkSgMODCviKXYky4EZ3ep8JcOtgGC9+0u2x/YJr5ItSW3aWVrlkRD851phoU6BaiJkJYct3048SN6s7byWWVatNdVvHN8pfxVXOM1/mTvmi6ruAJB5vwPgcPKWyRv4OAofXsmfaW/PxMcMtimo4Hu7oipFmELlZlbFejFyg9qif+sk4EBDD3D67RFreIMLQtjsZtH5fC9A3gktWhtTFXAoPzjwNZ1FOJixdH5BOTHr83vPhMMYD2Uk2RaSMaG5L1xqQtuj0zrfvwGnJJ3EtRgEfPcPVMGwpaOtD8Yagv9e/EHJIWfdh9vnL4rljOmGeQkN62WIYtQwhAUjGpatkg4SO+VJ4XDIGhAmPVXlyJB810wsFzo=
 X-OriginatorOrg: xilinx.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 May 2019 10:35:02.8268
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 May 2019 10:35:02.9474
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: b3b1bfd8-d9a9-40c3-24d4-08d6cee9d5fb
+X-MS-Exchange-CrossTenant-Network-Message-Id: 25eaa23a-e9aa-498e-725b-08d6cee9d61b
 X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c;Ip=[149.199.60.83];Helo=[xsj-pvapsmtpgw01]
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR0201MB3404
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR0201MB3396
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch adds a SHA3 DT node for Xilinx ZynqMP SoC.
+This patch set adds support for
+- dt-binding docs for Xilinx ZynqMP SHA3 driver
+- Adds communication layer support for sha_hash in zynqmp.c
+- Adds Xilinx ZynqMP driver for SHA3 Algorithm
+- Adds device tree node for ZynqMP SHA3 driver
 
-Signed-off-by: Kalyani Akula <kalyani.akula@xilinx.com>
----
- arch/arm64/boot/dts/xilinx/zynqmp.dtsi | 4 ++++
- 1 file changed, 4 insertions(+)
+V3 Changes :
+- Removed zynqmp_sha_import and export APIs.The reason as follows
+The user space code does an accept on an already accepted FD
+when we create AF_ALG socket and call accept on it,
+it calls af_alg_accept and not hash_accept.
+import and export APIs are called from hash_accept.
+The flow is as below
+accept--> af_alg_accept-->hash_accept_parent-->hash_accept_parent_nokey
+for hash salg_type.
+- Resolved comments from 
+        https://patchwork.kernel.org/patch/10753719/
 
-diff --git a/arch/arm64/boot/dts/xilinx/zynqmp.dtsi b/arch/arm64/boot/dts/xilinx/zynqmp.dtsi
-index 9aa6734..0532de7 100644
---- a/arch/arm64/boot/dts/xilinx/zynqmp.dtsi
-+++ b/arch/arm64/boot/dts/xilinx/zynqmp.dtsi
-@@ -124,6 +124,10 @@
- 			     <1 10 0xf08>;
- 	};
- 
-+	xlnx_sha3_384: sha384 {
-+		compatible = "xlnx,zynqmp-sha3-384";
-+	};
-+
- 	amba_apu: amba-apu@0 {
- 		compatible = "simple-bus";
- 		#address-cells = <2>;
+V2 Changes :
+- Added new patch (2/4) for sha_hash zynqmp API support
+- Incorporated code review comments from v1 patch series. Discussed below:
+        https://lore.kernel.org/patchwork/patch/1029433/
+
+
+Kalyani Akula (4):
+  dt-bindings: crypto: Add bindings for ZynqMP SHA3 driver
+  firmware: xilinx: Add ZynqMP sha_hash API for SHA3 functionality
+  crypto: Add Xilinx SHA3 driver
+  ARM64: zynqmp: Add Xilinix SHA-384 node.
+
+ .../devicetree/bindings/crypto/zynqmp-sha.txt      |  12 ++
+ arch/arm64/boot/dts/xilinx/zynqmp.dtsi             |   4 +
+ drivers/crypto/Kconfig                             |  10 +
+ drivers/crypto/Makefile                            |   1 +
+ drivers/crypto/zynqmp-sha.c                        | 240 +++++++++++++++++++++
+ drivers/firmware/xilinx/zynqmp.c                   |  27 +++
+ include/linux/firmware/xlnx-zynqmp.h               |   2 +
+ 7 files changed, 296 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/zynqmp-sha.txt
+ create mode 100644 drivers/crypto/zynqmp-sha.c
+
 -- 
 1.9.5
 
