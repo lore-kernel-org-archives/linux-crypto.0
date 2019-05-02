@@ -2,101 +2,183 @@ Return-Path: <SRS0=RoNa=TC=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2440CC43219
-	for <linux-crypto@archiver.kernel.org>; Thu,  2 May 2019 08:08:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3A1BC43219
+	for <linux-crypto@archiver.kernel.org>; Thu,  2 May 2019 10:35:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EF5D121670
-	for <linux-crypto@archiver.kernel.org>; Thu,  2 May 2019 08:08:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 621172085A
+	for <linux-crypto@archiver.kernel.org>; Thu,  2 May 2019 10:35:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="5BCi+hdH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726326AbfEBIIZ (ORCPT
+        id S1726300AbfEBKfJ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 2 May 2019 04:08:25 -0400
-Received: from mga02.intel.com ([134.134.136.20]:61127 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726393AbfEBIIY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 May 2019 04:08:24 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 02 May 2019 01:08:22 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.60,421,1549958400"; 
-   d="scan'208";a="169842708"
-Received: from lahna.fi.intel.com (HELO lahna) ([10.237.72.157])
-  by fmsmga001.fm.intel.com with SMTP; 02 May 2019 01:08:19 -0700
-Received: by lahna (sSMTP sendmail emulation); Thu, 02 May 2019 11:08:18 +0300
-Date:   Thu, 2 May 2019 11:08:18 +0300
-From:   Mika Westerberg <mika.westerberg@linux.intel.com>
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linus.walleij@linaro.org, joakim.bech@linaro.org,
-        Jarkko Nikula <jarkko.nikula@linux.intel.com>
-Subject: Re: [PATCH 1/5] i2c: acpi: permit bus speed to be discovered after
- enumeration
-Message-ID: <20190502080818.GT26516@lahna.fi.intel.com>
-References: <20190430162910.16771-1-ard.biesheuvel@linaro.org>
- <20190430162910.16771-2-ard.biesheuvel@linaro.org>
+        Thu, 2 May 2019 06:35:09 -0400
+Received: from mail-eopbgr710041.outbound.protection.outlook.com ([40.107.71.41]:9683
+        "EHLO NAM05-BY2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726289AbfEBKfI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 2 May 2019 06:35:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=xilinx.onmicrosoft.com; s=selector1-xilinx-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=f94YMxikbA1iu7DB/qLaywMCKnwwT1mUfUgS1qM7Hjw=;
+ b=5BCi+hdHM4OUnHjE/RGJ5ohyIakpRFNCT2jPuOVqbGMfx6sIKlcfzo303H+L0IBNBNRW8A99G7ebRT6Mm39n4hLgW/TcPTQ0YlSSy6Q14Ec6zdIzG2oHcJ2fXIxLDX0iwgaXmVaItUCQMgqDev5UVF10JTPKFsCpsxVvW8J6/A0=
+Received: from BN6PR02CA0074.namprd02.prod.outlook.com (2603:10b6:405:60::15)
+ by BYAPR02MB5239.namprd02.prod.outlook.com (2603:10b6:a03:68::28) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.1835.14; Thu, 2 May
+ 2019 10:35:04 +0000
+Received: from CY1NAM02FT009.eop-nam02.prod.protection.outlook.com
+ (2a01:111:f400:7e45::203) by BN6PR02CA0074.outlook.office365.com
+ (2603:10b6:405:60::15) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.20.1856.11 via Frontend
+ Transport; Thu, 2 May 2019 10:35:03 +0000
+Authentication-Results: spf=pass (sender IP is 149.199.60.100)
+ smtp.mailfrom=xilinx.com; vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=bestguesspass action=none
+ header.from=xilinx.com;
+Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
+ 149.199.60.100 as permitted sender) receiver=protection.outlook.com;
+ client-ip=149.199.60.100; helo=xsj-pvapsmtpgw02;
+Received: from xsj-pvapsmtpgw02 (149.199.60.100) by
+ CY1NAM02FT009.mail.protection.outlook.com (10.152.75.12) with Microsoft SMTP
+ Server (version=TLS1_0, cipher=TLS_RSA_WITH_AES_256_CBC_SHA) id 15.20.1856.11
+ via Frontend Transport; Thu, 2 May 2019 10:35:03 +0000
+Received: from unknown-38-66.xilinx.com ([149.199.38.66]:33460 helo=xsj-pvapsmtp01)
+        by xsj-pvapsmtpgw02 with esmtp (Exim 4.63)
+        (envelope-from <kalyani.akula@xilinx.com>)
+        id 1hM93O-0006ri-LO; Thu, 02 May 2019 03:35:02 -0700
+Received: from [127.0.0.1] (helo=localhost)
+        by xsj-pvapsmtp01 with smtp (Exim 4.63)
+        (envelope-from <kalyani.akula@xilinx.com>)
+        id 1hM93J-0007Vo-IW; Thu, 02 May 2019 03:34:57 -0700
+Received: from xsj-pvapsmtp01 (mailhost.xilinx.com [149.199.38.66])
+        by xsj-smtp-dlp1.xlnx.xilinx.com (8.13.8/8.13.1) with ESMTP id x42AYtt9032631;
+        Thu, 2 May 2019 03:34:55 -0700
+Received: from [172.23.155.80] (helo=xhdengvm155080.xilinx.com)
+        by xsj-pvapsmtp01 with esmtp (Exim 4.63)
+        (envelope-from <kalyania@xilinx.com>)
+        id 1hM93G-0007VE-Mo; Thu, 02 May 2019 03:34:54 -0700
+Received: by xhdengvm155080.xilinx.com (Postfix, from userid 23151)
+        id DFCA381417; Thu,  2 May 2019 16:04:53 +0530 (IST)
+From:   Kalyani Akula <kalyani.akula@xilinx.com>
+To:     <herbert@gondor.apana.org.au>, <kstewart@linuxfoundation.org>,
+        <gregkh@linuxfoundation.org>, <tglx@linutronix.de>,
+        <pombredanne@nexb.com>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <saratcha@xilinx.com>
+CC:     Kalyani Akula <kalyania@xilinx.com>,
+        Kalyani Akula <kalyani.akula@xilinx.com>
+Subject: [RFC PATCH V3 2/4] firmware: xilinx: Add ZynqMP sha_hash API for SHA3 functionality
+Date:   Thu, 2 May 2019 16:04:40 +0530
+Message-ID: <1556793282-17346-3-git-send-email-kalyani.akula@xilinx.com>
+X-Mailer: git-send-email 1.9.5
+In-Reply-To: <1556793282-17346-1-git-send-email-kalyani.akula@xilinx.com>
+References: <1556793282-17346-1-git-send-email-kalyani.akula@xilinx.com>
+X-RCIS-Action: ALLOW
+X-TM-AS-Product-Ver: IMSS-7.1.0.1224-8.2.0.1013-23620.005
+X-TM-AS-User-Approved-Sender: Yes;Yes
+X-EOPAttributedMessage: 0
+X-MS-Office365-Filtering-HT: Tenant
+X-Forefront-Antispam-Report: CIP:149.199.60.100;IPV:NLI;CTRY:US;EFV:NLI;SFV:NSPM;SFS:(10009020)(376002)(396003)(136003)(346002)(39860400002)(2980300002)(189003)(199004)(446003)(478600001)(11346002)(6266002)(336012)(426003)(90966002)(26005)(51416003)(305945005)(107886003)(4326008)(14444005)(110136005)(106002)(76176011)(54906003)(47776003)(186003)(63266004)(5660300002)(36756003)(103686004)(42186006)(316002)(16586007)(50466002)(52956003)(48376002)(70586007)(70206006)(476003)(126002)(356004)(6636002)(36386004)(6666004)(50226002)(486006)(8936002)(44832011)(2616005)(81156014)(81166006)(2906002)(8676002)(2201001)(5001870100001);DIR:OUT;SFP:1101;SCL:1;SRVR:BYAPR02MB5239;H:xsj-pvapsmtpgw02;FPR:;SPF:Pass;LANG:en;PTR:unknown-60-100.xilinx.com,xapps1.xilinx.com;MX:1;A:1;
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190430162910.16771-2-ard.biesheuvel@linaro.org>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-User-Agent: Mutt/1.11.3 (2019-02-01)
+Content-Type: text/plain
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 2ded1e9d-6871-474f-790e-08d6cee9d633
+X-Microsoft-Antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(4709054)(2017052603328);SRVR:BYAPR02MB5239;
+X-MS-TrafficTypeDiagnostic: BYAPR02MB5239:
+X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
+X-Microsoft-Antispam-PRVS: <BYAPR02MB5239B59778B4D6803D95AD4AAF340@BYAPR02MB5239.namprd02.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:4125;
+X-Forefront-PRVS: 0025434D2D
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam-Message-Info: c0u5DmQJXZ5c19kN9MZEj9kVbiAZaudmv3JVMemSKy4qzzxfbkyIZBqlL9MBHKVH/GHslzYi2h259chsV6uHhnkXU/CQMcPALzbrpHmv82D9Du3o07yJa9VxtrzcUtoDBffOiXkcIMk02gxMCSokQoAazzYOcS6gIRdotke6F2ZDL+pWIhpCtRQ6LK9+v3k0QmJWI3txHD/stvaWbghxsDzujMh/P6IsveL0BV23JSAT0XHxFz1LmAvlNMIFKRlzW8Dat3FmPXKbl6hCb6cpYqC3qFj5kp4MIGF5+H512sp1bWeUmAuYte5vzZMpMvJEYJBXcnuWoYrDGJUt1IQwaULNmo7l/oOJBauhUbNMv0ULmlqmDZDdkcvZyIKqasbnSbIwlc3dwjFziqidipnWZufj3eoWHGf3uC32Vka1IwE=
+X-OriginatorOrg: xilinx.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 May 2019 10:35:03.1279
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2ded1e9d-6871-474f-790e-08d6cee9d633
+X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c;Ip=[149.199.60.100];Helo=[xsj-pvapsmtpgw02]
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR02MB5239
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Apr 30, 2019 at 06:29:05PM +0200, Ard Biesheuvel wrote:
-> Currently, the I2C ACPI enumeration code only permits the max bus rate
-> to be discovered before enumerating the slaves on the bus. In some
-> cases, drivers for slave devices may require this information, e.g.,
-> some ATmel crypto drivers need to generate a so-called wake token
-> of a fixed duration, regardless of the bus rate.
-> 
-> So tweak the code so i2c_acpi_lookup_speed() is able to obtain this
-> information after enumeration as well.
-> 
-> Cc: Mika Westerberg <mika.westerberg@linux.intel.com>
+Add ZynqMP firmware SHA_HASH API to compute SHA3 hash of given data.
 
-Looks fine by me,
+Signed-off-by: Kalyani Akula <kalyani.akula@xilinx.com>
+---
+ drivers/firmware/xilinx/zynqmp.c     | 27 +++++++++++++++++++++++++++
+ include/linux/firmware/xlnx-zynqmp.h |  2 ++
+ 2 files changed, 29 insertions(+)
 
-Acked-by: Mika Westerberg <mika.westerberg@linux.intel.com>
+diff --git a/drivers/firmware/xilinx/zynqmp.c b/drivers/firmware/xilinx/zynqmp.c
+index 98f9361..22a062a 100644
+--- a/drivers/firmware/xilinx/zynqmp.c
++++ b/drivers/firmware/xilinx/zynqmp.c
+@@ -619,9 +619,36 @@ static int zynqmp_pm_set_requirement(const u32 node, const u32 capabilities,
+ 				   qos, ack, NULL);
+ }
+ 
++/**
++ * zynqmp_pm_sha_hash - Access the SHA engine to calculate the hash
++ * @address:	Address of the data/ Address of output buffer where
++ *		hash should be stored.
++ * @size:	Size of the data.
++ * @flags:
++ *	BIT(0) - for initializing csudma driver and SHA3(Here address
++ *		 and size inputs can be NULL).
++ *	BIT(1) - to call Sha3_Update API which can be called multiple
++ *		 times when data is not contiguous.
++ *	BIT(2) - to get final hash of the whole updated data.
++ *		 Hash will be overwritten at provided address with
++ *		 48 bytes.
++ *
++ * Return:	Returns status, either success or error code.
++ */
++static int zynqmp_pm_sha_hash(const u64 address, const u32 size,
++			      const u32 flags)
++{
++	u32 lower_32_bits = (u32)address;
++	u32 upper_32_bits = (u32)(address >> 32);
++
++	return zynqmp_pm_invoke_fn(PM_SECURE_SHA, upper_32_bits, lower_32_bits,
++				   size, flags, NULL);
++}
++
+ static const struct zynqmp_eemi_ops eemi_ops = {
+ 	.get_api_version = zynqmp_pm_get_api_version,
+ 	.get_chipid = zynqmp_pm_get_chipid,
++	.sha_hash = zynqmp_pm_sha_hash,
+ 	.query_data = zynqmp_pm_query_data,
+ 	.clock_enable = zynqmp_pm_clock_enable,
+ 	.clock_disable = zynqmp_pm_clock_disable,
+diff --git a/include/linux/firmware/xlnx-zynqmp.h b/include/linux/firmware/xlnx-zynqmp.h
+index 642dab1..124e5f0 100644
+--- a/include/linux/firmware/xlnx-zynqmp.h
++++ b/include/linux/firmware/xlnx-zynqmp.h
+@@ -57,6 +57,7 @@ enum pm_api_id {
+ 	PM_RESET_GET_STATUS,
+ 	PM_PM_INIT_FINALIZE = 21,
+ 	PM_GET_CHIPID = 24,
++	PM_SECURE_SHA = 26,
+ 	PM_IOCTL = 34,
+ 	PM_QUERY_DATA,
+ 	PM_CLOCK_ENABLE,
+@@ -283,6 +284,7 @@ struct zynqmp_eemi_ops {
+ 			       const u32 capabilities,
+ 			       const u32 qos,
+ 			       const enum zynqmp_pm_request_ack ack);
++	int (*sha_hash)(const u64 address, const u32 size, const u32 flags);
+ };
+ 
+ int zynqmp_pm_invoke_fn(u32 pm_api_id, u32 arg0, u32 arg1,
+-- 
+1.9.5
 
-Adding Jarkko just in case I missed something.
-
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> ---
->  drivers/i2c/i2c-core-acpi.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/i2c/i2c-core-acpi.c b/drivers/i2c/i2c-core-acpi.c
-> index 272800692088..7240cc07abb4 100644
-> --- a/drivers/i2c/i2c-core-acpi.c
-> +++ b/drivers/i2c/i2c-core-acpi.c
-> @@ -115,8 +115,7 @@ static int i2c_acpi_do_lookup(struct acpi_device *adev,
->  	struct list_head resource_list;
->  	int ret;
->  
-> -	if (acpi_bus_get_status(adev) || !adev->status.present ||
-> -	    acpi_device_enumerated(adev))
-> +	if (acpi_bus_get_status(adev) || !adev->status.present)
->  		return -EINVAL;
->  
->  	if (acpi_match_device_ids(adev, i2c_acpi_ignored_device_ids) == 0)
-> @@ -151,6 +150,9 @@ static int i2c_acpi_get_info(struct acpi_device *adev,
->  	lookup.info = info;
->  	lookup.index = -1;
->  
-> +	if (acpi_device_enumerated(adev))
-> +		return -EINVAL;
-> +
->  	ret = i2c_acpi_do_lookup(adev, &lookup);
->  	if (ret)
->  		return ret;
-> -- 
-> 2.20.1
