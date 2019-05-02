@@ -6,49 +6,51 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4E76C43219
-	for <linux-crypto@archiver.kernel.org>; Thu,  2 May 2019 15:49:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D103CC43219
+	for <linux-crypto@archiver.kernel.org>; Thu,  2 May 2019 16:38:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0B5F5204EC
-	for <linux-crypto@archiver.kernel.org>; Thu,  2 May 2019 15:49:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1D11C20651
+	for <linux-crypto@archiver.kernel.org>; Thu,  2 May 2019 16:38:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="e1Q8ZWAI"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="aewiqKwU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726302AbfEBPtk (ORCPT
+        id S1726377AbfEBQiP (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 2 May 2019 11:49:40 -0400
-Received: from mo4-p00-ob.smtp.rzone.de ([81.169.146.218]:33118 "EHLO
+        Thu, 2 May 2019 12:38:15 -0400
+Received: from mo4-p00-ob.smtp.rzone.de ([85.215.255.22]:10778 "EHLO
         mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726525AbfEBPtj (ORCPT
+        with ESMTP id S1726338AbfEBQiO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 May 2019 11:49:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1556812176;
+        Thu, 2 May 2019 12:38:14 -0400
+X-Greylist: delayed 3288 seconds by postgrey-1.27 at vger.kernel.org; Thu, 02 May 2019 12:38:13 EDT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1556815092;
         s=strato-dkim-0002; d=chronox.de;
         h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
         X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-        bh=LWj3It0eJBKXcu+QCUNuQLe3Q1OJuYx1z7uAwZwJerg=;
-        b=e1Q8ZWAIsbfNoN8KysjO/JUrVqAbti6m6XzvToyvSbKfv29YKE+uAypHaRR24BLV1k
-        p70AP6dSYsJgAu88w1NMe77UP2tqRrnUdn+Q/VoCwUi2FAvmvU5M/TqQRwCI05PNJJ3c
-        vqQBjX6zibUQHxCi01RDVyqV/8DyKwoZlg2vHsignvglam+Puo2iQ50GQ67x9B4gFu8P
-        1K9/MrZ+ZGmQBwi4Q9LMTLW/S6hnR7PblKOTbYuykMn9lXs/onjbIKjB6tqnS7w5A7hU
-        56hVceXPaZQQexlb0HyHzbxqIX4rEAYxFzUdPtlRMh6JoB629Ela2nR/692Tkecj/Wlk
-        ul4g==
+        bh=dAD2GXsuDExtyzGyEuryuBWuY7GXnkDyKBAoqKiZ8Fg=;
+        b=aewiqKwUdNAjpdfgVBQ1K5d0kSkEDLNi+gdq3vVqmvFXn/0tM+rHQ6USclj2twtu5w
+        ljtWbVM0VGhqOf0dDCfdKP+tZK+8aLv6p1dnNPRxRkLkHEPi/eCPSITdxRYmTIhrLTV+
+        EzsvjxiCSXevOA1Lx9UhYSbIxQ+mvgv7WFgVohsleTUx/bEcps/DLflVtyErXBW6DA+j
+        r0nQm7NZBRZ3oFyjxF3eyoLqIS0+k0bW4kHNI00nlonsXZedAZG1z/D/L2O1lm/vntXk
+        0FvxmtS0VxSsLEJLG7e6Drvc443FAaS86XthBhzREx6ZqNQuB10k6cJWYxbmg4OVzk/C
+        jxpw==
 X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPaJfSd/cc="
 X-RZG-CLASS-ID: mo00
 Received: from positron.chronox.de
         by smtp.strato.de (RZmta 44.18 DYNA|AUTH)
-        with ESMTPSA id R0373fv42FhMjjq
+        with ESMTPSA id R0373fv42GcCjvh
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (curve secp521r1 with 521 ECDH bits, eq. 15360 bits RSA))
         (Client did not present a certificate);
-        Thu, 2 May 2019 17:43:22 +0200 (CEST)
+        Thu, 2 May 2019 18:38:12 +0200 (CEST)
 From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     linux-crypto@vger.kernel.org
-Subject: [PATCH v2] crypto: DRBG - add FIPS 140-2 CTRNG for noise source
-Date:   Thu, 02 May 2019 17:43:22 +0200
-Message-ID: <10683686.8DmOGYbKhJ@positron.chronox.de>
-In-Reply-To: <20190502124811.l4yozv4llqtdvozx@gondor.apana.org.au>
-References: <1852500.fyBc0DU23F@positron.chronox.de> <20190502124811.l4yozv4llqtdvozx@gondor.apana.org.au>
+To:     Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org
+Subject: [PATCH v3] crypto: DRBG - add FIPS 140-2 CTRNG for noise source
+Date:   Thu, 02 May 2019 18:38:12 +0200
+Message-ID: <5352150.0CmBXKFm2E@positron.chronox.de>
+In-Reply-To: <10683686.8DmOGYbKhJ@positron.chronox.de>
+References: <1852500.fyBc0DU23F@positron.chronox.de> <20190502124811.l4yozv4llqtdvozx@gondor.apana.org.au> <10683686.8DmOGYbKhJ@positron.chronox.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7Bit
 Content-Type: text/plain; charset="us-ascii"
@@ -57,9 +59,8 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Changes v2:
-* use IS_ENABLED macro
-* small fix in comment
+Changes v3:
+ * fix return code of drbg_fips_continuous_test in non-FIPS mode
 
 ---8<---
 
@@ -120,10 +121,10 @@ index 2a5b16bb000c..d6261262fda4 100644
 +
 +	/* skip test if we test the overall system */
 +	if (list_empty(&drbg->test_data.list))
-+		return true;
++		return 0;
 +	/* only perform test in FIPS mode */
 +	if (!fips_enabled)
-+		return true;
++		return 0;
 +
 +	if (!drbg->fips_primed) {
 +		/* Priming of FIPS test */
