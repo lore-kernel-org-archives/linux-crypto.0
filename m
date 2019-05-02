@@ -2,186 +2,169 @@ Return-Path: <SRS0=RoNa=TC=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF3B8C43219
-	for <linux-crypto@archiver.kernel.org>; Thu,  2 May 2019 13:20:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE6A1C43219
+	for <linux-crypto@archiver.kernel.org>; Thu,  2 May 2019 15:13:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A257F2063F
-	for <linux-crypto@archiver.kernel.org>; Thu,  2 May 2019 13:20:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AA3B320675
+	for <linux-crypto@archiver.kernel.org>; Thu,  2 May 2019 15:13:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="i9DeDAIz"
+	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="au183SU2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726270AbfEBNT7 (ORCPT
+        id S1726372AbfEBPNB (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 2 May 2019 09:19:59 -0400
-Received: from mail-eopbgr60071.outbound.protection.outlook.com ([40.107.6.71]:47886
-        "EHLO EUR04-DB3-obe.outbound.protection.outlook.com"
+        Thu, 2 May 2019 11:13:01 -0400
+Received: from mail-eopbgr710078.outbound.protection.outlook.com ([40.107.71.78]:54784
+        "EHLO NAM05-BY2-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726197AbfEBNT7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 May 2019 09:19:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+        id S1726370AbfEBPNB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 2 May 2019 11:13:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=xilinx.onmicrosoft.com; s=selector1-xilinx-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gZRAmgmYKa1BVMeIJI5p9zcWXjkKWkN3651YHyZHEgM=;
- b=i9DeDAIzs5+rOcG+sN/VhKzZLrmIHKUNGwrjIyp46eZaE8xjb1hy+28s+B6ERUl8y1ix5ggHhVXKzebv4RWjNCRnuKlMYcQQxghma0mpFCCv2oaqj4rSf/P/NM6HsM8WY8P3rOZWyWYJLjU0d7miz6ods/dxHbWksa73vGp31v4=
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
- VI1PR0402MB3677.eurprd04.prod.outlook.com (52.134.15.19) with Microsoft SMTP
+ bh=jBSjZC2wxTuWVNV36/ryoUBIhXFbwmAJOS7ExayD94A=;
+ b=au183SU2eryBBNioxJxkkhYHaRR3DxUXh69X0sKVn0OFOUVe0OKMxlGjWovjTKFuMfhqXulcAZQPvYroa/cu457l7/fmu6UL7fQupQ6wcXw5iwF48bGFsS3p+RetdAWT08vVE69ZwTdmE1iSFAnTW1wjaH2QG9OY1dX1R6M+VM8=
+Received: from BN7PR02MB5124.namprd02.prod.outlook.com (20.176.26.153) by
+ BN7PR02MB4099.namprd02.prod.outlook.com (52.132.223.141) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1856.10; Thu, 2 May 2019 13:19:16 +0000
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::484c:ab68:81c4:51be]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::484c:ab68:81c4:51be%5]) with mapi id 15.20.1835.018; Thu, 2 May 2019
- 13:19:16 +0000
-From:   Horia Geanta <horia.geanta@nxp.com>
-To:     Eric Biggers <ebiggers@kernel.org>
-CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v2 0/7] crypto: fuzz algorithms against their generic
- implementation
-Thread-Topic: [PATCH v2 0/7] crypto: fuzz algorithms against their generic
- implementation
-Thread-Index: AQHU/E4B9cUiZnJ1EEuei1pU1G4SaA==
-Date:   Thu, 2 May 2019 13:19:16 +0000
-Message-ID: <VI1PR0402MB3485B519CE1932874ACABEB298340@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-References: <20190412045742.1725-1-ebiggers@kernel.org>
- <VI1PR0402MB3485A6BE1840DD5B060FACB7983E0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
- <20190426165406.GA691@sol.localdomain>
- <VI1PR0402MB34857CA032C0134714BE9A61983F0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
- <20190427170254.GA652@sol.localdomain>
+ 15.20.1835.14; Thu, 2 May 2019 15:12:56 +0000
+Received: from BN7PR02MB5124.namprd02.prod.outlook.com
+ ([fe80::4155:72d9:c5a:70ef]) by BN7PR02MB5124.namprd02.prod.outlook.com
+ ([fe80::4155:72d9:c5a:70ef%7]) with mapi id 15.20.1856.008; Thu, 2 May 2019
+ 15:12:55 +0000
+From:   Kalyani Akula <kalyania@xilinx.com>
+To:     Corentin Labbe <clabbe.montjoie@gmail.com>
+CC:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "kstewart@linuxfoundation.org" <kstewart@linuxfoundation.org>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "pombredanne@nexb.com" <pombredanne@nexb.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        Sarat Chand Savitala <saratcha@xilinx.com>
+Subject: RE: [RFC PATCH V3 0/4] Add Xilinx's ZynqMP SHA3 driver support
+Thread-Topic: [RFC PATCH V3 0/4] Add Xilinx's ZynqMP SHA3 driver support
+Thread-Index: AQHVANLEhtzBTB57XkuBybCTxm8h4qZXu4sAgAAyTOA=
+Date:   Thu, 2 May 2019 15:12:55 +0000
+Message-ID: <BN7PR02MB512413C534A8EFA925105441AF340@BN7PR02MB5124.namprd02.prod.outlook.com>
+References: <1556793282-17346-1-git-send-email-kalyani.akula@xilinx.com>
+ <20190502120012.GA19008@Red>
+In-Reply-To: <20190502120012.GA19008@Red>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
+X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
 X-MS-TNEF-Correlator: 
 authentication-results: spf=none (sender IP is )
- smtp.mailfrom=horia.geanta@nxp.com; 
-x-originating-ip: [212.146.100.6]
+ smtp.mailfrom=kalyania@xilinx.com; 
+x-originating-ip: [123.201.77.56]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 0e0ef8e8-9138-4d7f-e900-08d6cf00c6d7
+x-ms-office365-filtering-correlation-id: 41c7f480-5f35-4302-928b-08d6cf10a7a9
 x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(4618075)(2017052603328)(7193020);SRVR:VI1PR0402MB3677;
-x-ms-traffictypediagnostic: VI1PR0402MB3677:
-x-microsoft-antispam-prvs: <VI1PR0402MB3677D6EC64EE2F27E3612B9B98340@VI1PR0402MB3677.eurprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(4618075)(2017052603328)(7193020);SRVR:BN7PR02MB4099;
+x-ms-traffictypediagnostic: BN7PR02MB4099:
+x-ms-exchange-purlcount: 1
+x-microsoft-antispam-prvs: <BN7PR02MB4099B436E6AE1A8A88D6DB57AF340@BN7PR02MB4099.namprd02.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
 x-forefront-prvs: 0025434D2D
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(366004)(136003)(396003)(376002)(346002)(39860400002)(54094003)(199004)(189003)(476003)(486006)(68736007)(102836004)(229853002)(6506007)(53546011)(446003)(25786009)(186003)(52536014)(7736002)(478600001)(6116002)(3846002)(305945005)(66446008)(14444005)(256004)(73956011)(66946007)(66476007)(66556008)(64756008)(26005)(76176011)(2906002)(7696005)(99286004)(44832011)(55016002)(4326008)(76116006)(66066001)(74316002)(6916009)(54906003)(14454004)(316002)(81156014)(81166006)(33656002)(53936002)(8676002)(71200400001)(71190400001)(6246003)(6436002)(86362001)(9686003)(5660300002)(8936002)(41533002);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB3677;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: nxp.com does not designate
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(136003)(366004)(346002)(396003)(376002)(39860400002)(13464003)(189003)(199004)(68736007)(81166006)(14444005)(6436002)(186003)(476003)(7696005)(81156014)(8676002)(53936002)(107886003)(76116006)(966005)(71190400001)(71200400001)(486006)(316002)(2906002)(14454004)(8936002)(54906003)(55016002)(6916009)(9686003)(74316002)(305945005)(76176011)(11346002)(3846002)(99286004)(73956011)(478600001)(6116002)(52536014)(256004)(229853002)(6306002)(102836004)(26005)(5660300002)(86362001)(25786009)(6506007)(33656002)(4326008)(66556008)(64756008)(66446008)(66476007)(446003)(53546011)(7736002)(66946007)(6246003)(66066001);DIR:OUT;SFP:1101;SCL:1;SRVR:BN7PR02MB4099;H:BN7PR02MB5124.namprd02.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: xilinx.com does not designate
  permitted sender hosts)
 x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: 3AamkvfIyCORWK2u1My8tGBi6UBR82MzXf8V60rGY+7BVoY7+CQ+TkTk4xN1NQm0FyUbpvY56bit3VGvqboVAnJ1riPzuflH3QMHFAeYpA1JqXZyqBgjRcl1UkV4o1Ijgyp43vwTBO4XmybURda9zAi/Z3ruNk7j+D9G8RXTJeWU5/RUzwnilAjiKEdrHzXu8F6AWiA1DvVbp4BY+CgWEdgb91U0G85H6is7juO7A+o+sfu035dYtPkIyaT8uE3uly+K8na84jDvVeoOTbx3MUPwaf3YM2Kusg2OcCRUBo4mbfqyLXF1xVtyRfAOEv6ED8Bx4jAN46hsJUzOI+Oc2eyXqWuhYy8FiUXybfxS+XxffdETMLwz2eA5Fzoe1DuKEQeTOLNKczMk8AOlFYyxBSlzGWtqCByggDPQN+HhOdQ=
+x-microsoft-antispam-message-info: G/dumqUMbhxOu2A1WpzKE2A9u254WhClmjfJ/iS+lK8W8uWZ1x/UNiANqLHbFbF6wwlJ3vouqkFpjL8LK828JylmOX7hdRtRlqFPJk8GbSjZRhA6sGoxFpAKjN+CQxYgSumfTIOmXv9Cvm5AolGX0BmbhvawReW5O+eqDHS2RlhmDh/IQPjcGiasKyxvv8+wQxefZh5IMio1bmksj/Skv1oe01NbkixgB5umvXHjQ63MQ/rQNesdECT5X8lGSQz1XeZeLgor/li75uYIej4Tzw4LL/0+TR+RinzSSNAMpoOaIIkOKVPsi0Z6g/AZ+W0MdZjLQ9w2NgVOoBIh77/N6n39rGw5pJlyXUVa/PEgL0kGQvL0QVd5tYuDX0tEvwMEONfq8vtI/ORf1Wd4dNf7Yba9oUhD7/z5t+9RkWAAS5U=
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0e0ef8e8-9138-4d7f-e900-08d6cf00c6d7
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 May 2019 13:19:16.1441
+X-OriginatorOrg: xilinx.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 41c7f480-5f35-4302-928b-08d6cf10a7a9
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 May 2019 15:12:55.5740
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-id: 657af505-d5df-48d0-8300-c31994686c5c
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3677
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN7PR02MB4099
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 4/27/2019 8:03 PM, Eric Biggers wrote:=0A=
-> On Sat, Apr 27, 2019 at 03:24:38PM +0000, Horia Geanta wrote:=0A=
->> On 4/26/2019 7:54 PM, Eric Biggers wrote:=0A=
->>> Hi Horia,=0A=
->>>=0A=
->>> On Fri, Apr 26, 2019 at 04:35:05PM +0000, Horia Geanta wrote:=0A=
->>>> On 4/12/2019 8:00 AM, Eric Biggers wrote:=0A=
->>>>> So far I've tested all generic, x86, arm, and arm64 algorithms, plus=
-=0A=
->>>>> some PowerPC algorithms.  I have not tested hardware drivers.  I=0A=
->>>>> encourage people to run the tests on drivers and other architectures,=
- as=0A=
->>>>> they will find more bugs.=0A=
->>>>>=0A=
->>>> I am seeing some errors in caam hardware driver.=0A=
->>>> They are due to error code mismatch b/w generic algorithm implementati=
-on and=0A=
->>>> what caam driver returns.=0A=
->>>>=0A=
->>>> Random skcipher tests for block cipher algorithms are expected to fail=
- when=0A=
->>>> input size is not a multiple of algorithm block size.=0A=
->>>> Generic implementation returns -EINVAL.=0A=
->>>> caam driver returns the status received from HW.=0A=
->>>>=0A=
->>>> This probably has to be fixed in caam driver, but I wonder if there's =
-an=0A=
->>>> agreement on what error code should be returned in every single case (=
-since I'll=0A=
->>>> have to do a N:M mapping b/w errors returned by HW and errors expected=
- by crypto=0A=
->>>> API).=0A=
->>>> Should I take the generic S/W implementation as reference?=0A=
->>>>=0A=
->>>> Thanks,=0A=
->>>> Horia=0A=
->>>=0A=
->>> Yes, use the generic driver as a reference.  I don't understand why you=
-'re=0A=
->>> saying there are so many cases to handle, though.  The only error cases=
- I'd=0A=
->>> expect to actually be encountered during the tests are invalid input le=
-ngths and=0A=
->>> invalid key lengths, where you should return -EINVAL.  There may be oth=
-er errors=0A=
->> There's at least one more in testmgr: -EBADMSG.=0A=
-> =0A=
-> AEADs must return -EBADMSG when the authentication tag is wrong, but you =
-said it=0A=
-> was an skcipher algorithm.  Which algorithm are you talking about, exactl=
-y?=0A=
-> =0A=
-The context in which I started the discussion was indeed skcipher failure.=
-=0A=
-However, now I am trying to make sure all types of algorithm implementation=
-s are=0A=
-returning the expected error codes.=0A=
-=0A=
->>=0A=
->>> your driver could theoretically produce, but I wouldn't expect them to =
-be=0A=
->>> encountered during the tests unless there are testmgr, driver, or hardw=
-are bugs.=0A=
->>>=0A=
->> Is the error code matching a crypto API requirement or a testmgr require=
-ment?=0A=
->>=0A=
->> I think testmgr doesn't cover all possible failures. Thus if somebody wa=
-nts to=0A=
->> make sure the implementation is _fully_ compliant (and not only passing =
-testmgr=0A=
->> tests), a lot of effort will be required.=0A=
->>=0A=
-> =0A=
-> Everything testmgr tests for is an "API requirement".  There are also API=
-=0A=
-> requirements that testmgr doen't yet test for, e.g. for skciphers that th=
-e=0A=
-> source data is not modified unless it coincides with the destination data=
-.=0A=
-> =0A=
-> However with regards to failures, as I see it the only failures which *mu=
-st* be=0A=
-> handled consistently are those that apply to every implementation.  I thi=
-nk this=0A=
-> only includes cases where the input is bad, e.g. invalid key or message l=
-ength,=0A=
-> or authentication tag mismatch.  If you also have implementation specific=
-=0A=
-Ok, the list is not as long as I suspected.=0A=
-=0A=
-> failures, e.g. your hardware randomly stopped working or something, then =
-for=0A=
-> them you may choose appropriate error codes from errno.h.=0A=
-> =0A=
-This makes sense.=0A=
-=0A=
-Thanks,=0A=
-Horia=0A=
+Hi Corentin,
+
+Please find my response inline.
+
+> -----Original Message-----
+> From: Corentin Labbe <clabbe.montjoie@gmail.com>
+> Sent: Thursday, May 2, 2019 5:30 PM
+> To: Kalyani Akula <kalyania@xilinx.com>
+> Cc: herbert@gondor.apana.org.au; kstewart@linuxfoundation.org;
+> gregkh@linuxfoundation.org; tglx@linutronix.de; pombredanne@nexb.com;
+> linux-crypto@vger.kernel.org; linux-kernel@vger.kernel.org;
+> netdev@vger.kernel.org; Sarat Chand Savitala <saratcha@xilinx.com>; Kalya=
+ni
+> Akula <kalyania@xilinx.com>
+> Subject: Re: [RFC PATCH V3 0/4] Add Xilinx's ZynqMP SHA3 driver support
+>=20
+> On Thu, May 02, 2019 at 04:04:38PM +0530, Kalyani Akula wrote:
+> > This patch set adds support for
+> > - dt-binding docs for Xilinx ZynqMP SHA3 driver
+> > - Adds communication layer support for sha_hash in zynqmp.c
+> > - Adds Xilinx ZynqMP driver for SHA3 Algorithm
+> > - Adds device tree node for ZynqMP SHA3 driver
+> >
+> > V3 Changes :
+> > - Removed zynqmp_sha_import and export APIs.The reason as follows The
+> > user space code does an accept on an already accepted FD when we
+> > create AF_ALG socket and call accept on it, it calls af_alg_accept and
+> > not hash_accept.
+> > import and export APIs are called from hash_accept.
+> > The flow is as below
+> > accept--> af_alg_accept-->hash_accept_parent-->hash_accept_parent_noke
+> > accept--> y
+> > for hash salg_type.
+> > - Resolved comments from
+> >         https://patchwork.kernel.org/patch/10753719/
+> >
+>=20
+>=20
+> Your driver still doesnt handle the case where two hash are done in paral=
+lel.
+>=20
+
+Our Firmware uses IPI protocol to send this SHA3 requests to SHA3 HW engine=
+, which doesn't support parallel processing of 2 hash requests.
+The flow is=20
+SHA3 request from App -> SHA3 driver-> ZynqMp driver-> Firmware (which does=
+n't support parallel processing of 2 requests) -> SHA3 HW Engine
+
+
+> Furthermore, you miss the export/import functions.
+>=20
+
+When user space code does an accept on an already accepted FD as below
+sockfd =3D socket(AF_ALG, SOCK_SEQPACKET, 0);
+bind(sockfd, (struct sockaddr *)&sa, sizeof(sa));
+fd =3D accept(sockfd, NULL, 0);
+
+where my sockaddr is=20
+struct sockaddr_alg sa =3D {
+        .salg_family =3D AF_ALG,
+        .salg_type =3D "hash",
+        .salg_name =3D "xilinx-sha3-384"
+ };
+
+Upon calling accept the flow in the kernel is as mentioned
+accept--> af_alg_accept-->hash_accept_parent-->hash_accept_parent_nokey
+for hash salg_type.
+
+And where import and export functions are called from hash_accept. hence, t=
+hese functions never be called from the application.
+So, I removed those from the driver.
+
+Regards
+Kalyani.
+
+> Regards
