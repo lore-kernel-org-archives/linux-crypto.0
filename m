@@ -2,146 +2,185 @@ Return-Path: <SRS0=RoNa=TC=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C306C04AA9
-	for <linux-crypto@archiver.kernel.org>; Thu,  2 May 2019 04:12:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CB03C43219
+	for <linux-crypto@archiver.kernel.org>; Thu,  2 May 2019 05:00:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EAD21208C4
-	for <linux-crypto@archiver.kernel.org>; Thu,  2 May 2019 04:12:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="laCfQZS8"
+	by mail.kernel.org (Postfix) with ESMTP id 31DF42075E
+	for <linux-crypto@archiver.kernel.org>; Thu,  2 May 2019 05:00:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725730AbfEBEMM (ORCPT
+        id S1725681AbfEBFAT (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 2 May 2019 00:12:12 -0400
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:34175 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725497AbfEBEMM (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 May 2019 00:12:12 -0400
-Received: by mail-pg1-f195.google.com with SMTP id c13so458789pgt.1;
-        Wed, 01 May 2019 21:12:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=dIv8FRXTY10P9mlrJhJL2tE1BwddhSlT1j6qFQ98cH8=;
-        b=laCfQZS847M3G3LHl6IzbEDT6FW2/EkyHMa3qnyIVY299oV0Qxy+YsnZP88AyDsDVg
-         V8tqKC/aRCfXvq0SbiXJKlIt+YEed3DHxU8cLyyC/7M/ciodnGosFjjj9C82pJ3ghzag
-         HVLGOykeinKcnO1whKsaluLM0rhGf6NZXOzF5ERp2WIVScKL5M3EdMQr2HcdGpagJjns
-         KyJMFbUmMzlDG87JXjHVUXFzxdZ/sm9Wp+sXv9fgF4PYHKbwZGyYG2GS37rw2O46g1Hg
-         h8P9HZCVlodPL04SJ4XRFmpdP1JPbdolaBxXKKRGnJ4eHJeguBTq/8Oz9l4OxI9xZ6ye
-         uNjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=dIv8FRXTY10P9mlrJhJL2tE1BwddhSlT1j6qFQ98cH8=;
-        b=Z9IZc65khZYbskL2wUiwQL5SXwfoRIEsn8HhXtNUsdlvytqVkJAgiOarK0qJwjm/dJ
-         LflB0VJOEAt9cTDSjBjgiU6U9+x2ZBpQ3c+aPgY8knU1NTRyMXEiVlVeYovOoVlXrkH0
-         zM7xA9rXbqUdXvlwTi3ASjxJUzSpIDQYaweihFoRkVlD753ZakU5lhNVmzwyRvhS7MvJ
-         9eL115Bn97Ln3yWL5WxAxO4lHAnYMasHrI0bRri4RGOA97g+DaprtIRiy8J8t6i48xVe
-         +FBQpUDpe2w94GUT+l1H/5RE+r7L8r4YKzD9SK4+g9DdWDVdWIhZ/UrmY9tSvoR4ANuX
-         XZag==
-X-Gm-Message-State: APjAAAUeLiMPazznzqRdYxAg83W00eTitlCXBQ6W+eWrWCFOSLMUO/vg
-        vOYZCkkWdtdR46KBCC1THTE=
-X-Google-Smtp-Source: APXvYqxXQL0RhphtVgXiI4dna9UR9DZXTlG5t0Myw94oESlVS8h3h93XqhCZOibemCYMZaB7BMbqMg==
-X-Received: by 2002:a65:43c3:: with SMTP id n3mr1592865pgp.375.1556770331828;
-        Wed, 01 May 2019 21:12:11 -0700 (PDT)
-Received: from linux-l9pv.suse ([202.47.205.198])
-        by smtp.gmail.com with ESMTPSA id y6sm15677373pfm.160.2019.05.01.21.12.08
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Wed, 01 May 2019 21:12:11 -0700 (PDT)
-From:   "Lee, Chun-Yi" <joeyli.kernel@gmail.com>
-X-Google-Original-From: "Lee, Chun-Yi" <jlee@suse.com>
-To:     David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Mimi Zohar <zohar@linux.ibm.com>
-Cc:     keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, "Lee, Chun-Yi" <jlee@suse.com>
-Subject: [PATCH] X.509: Add messages for obsolete OIDs
-Date:   Thu,  2 May 2019 12:12:02 +0800
-Message-Id: <20190502041202.30753-1-jlee@suse.com>
-X-Mailer: git-send-email 2.12.3
+        Thu, 2 May 2019 01:00:19 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:41275 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725616AbfEBFAT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 2 May 2019 01:00:19 -0400
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 44vjkS1Hszz9s3l;
+        Thu,  2 May 2019 15:00:15 +1000 (AEST)
+From:   Michael Ellerman <mpe@ellerman.id.au>
+To:     Vakul Garg <vakul.garg@nxp.com>
+Cc:     "linux-crypto\@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        "davem\@davemloft.net" <davem@davemloft.net>,
+        "herbert\@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        Horia Geanta <horia.geanta@nxp.com>,
+        "linuxppc-dev\@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
+Subject: RE: [PATCH] crypto: caam/jr - Remove extra memory barrier during job ring dequeue
+In-Reply-To: <VE1PR04MB667093258EC804912EFAE6A18B3B0@VE1PR04MB6670.eurprd04.prod.outlook.com>
+References: <87pnp2aflz.fsf@concordia.ellerman.id.au> <VE1PR04MB667093258EC804912EFAE6A18B3B0@VE1PR04MB6670.eurprd04.prod.outlook.com>
+Date:   Thu, 02 May 2019 15:00:10 +1000
+Message-ID: <87d0l1a1t1.fsf@concordia.ellerman.id.au>
+MIME-Version: 1.0
+Content-Type: text/plain
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-We found that the db in Acer machine has self signed certificates
-(CN=DisablePW or CN=ABO) that they used obsolete OID 1.3.14.3.2.29
-sha1WithRSASignature and 2.5.29.1 subjectKeyIdentifier. Kernel
-emits -65 error code when loading those certificates to platform
-keyring:
+Vakul Garg <vakul.garg@nxp.com> writes:
+>> -----Original Message-----
+>> From: Michael Ellerman <mpe@ellerman.id.au>
+>> Sent: Wednesday, May 1, 2019 11:20 AM
+>> To: Vakul Garg <vakul.garg@nxp.com>
+>> Cc: linux-crypto@vger.kernel.org; Aymen Sghaier
+>> <aymen.sghaier@nxp.com>; davem@davemloft.net;
+>> herbert@gondor.apana.org.au; Horia Geanta <horia.geanta@nxp.com>;
+>> linuxppc-dev@lists.ozlabs.org
+>> Subject: Re: [PATCH] crypto: caam/jr - Remove extra memory barrier during
+>> job ring dequeue
+>> 
+>> Vakul Garg wrote:
+>> > In function caam_jr_dequeue(), a full memory barrier is used before
+>> > writing response job ring's register to signal removal of the
+>> > completed job. Therefore for writing the register, we do not need
+>> > another write memory barrier. Hence it is removed by replacing the
+>> > call to wr_reg32() with a newly defined function wr_reg32_relaxed().
+>> >
+>> > Signed-off-by: Vakul Garg <vakul.garg@nxp.com>
+>> > ---
+>> >  drivers/crypto/caam/jr.c   | 2 +-
+>> >  drivers/crypto/caam/regs.h | 8 ++++++++
+>> >  2 files changed, 9 insertions(+), 1 deletion(-)
+>> >
+>> > diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c index
+>> > 4e9b3fca5627..2ce6d7d2ad72 100644
+>> > --- a/drivers/crypto/caam/jr.c
+>> > +++ b/drivers/crypto/caam/jr.c
+>> > @@ -266,7 +266,7 @@ static void caam_jr_dequeue(unsigned long
+>> devarg)
+>> >  		mb();
+>> >
+>> >  		/* set done */
+>> > -		wr_reg32(&jrp->rregs->outring_rmvd, 1);
+>> > +		wr_reg32_relaxed(&jrp->rregs->outring_rmvd, 1);
+>> >
+>> >  		jrp->out_ring_read_index = (jrp->out_ring_read_index + 1) &
+>> >  					   (JOBR_DEPTH - 1);
+>> > diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h
+>> > index 3cd0822ea819..9e912c722e33 100644
+>> > --- a/drivers/crypto/caam/regs.h
+>> > +++ b/drivers/crypto/caam/regs.h
+>> > @@ -96,6 +96,14 @@ cpu_to_caam(16)
+>> >  cpu_to_caam(32)
+>> >  cpu_to_caam(64)
+>> >
+>> > +static inline void wr_reg32_relaxed(void __iomem *reg, u32 data) {
+>> > +	if (caam_little_end)
+>> > +		writel_relaxed(data, reg);
+>> > +	else
+>> > +		writel_relaxed(cpu_to_be32(data), reg); }
+>> > +
+>> >  static inline void wr_reg32(void __iomem *reg, u32 data)  {
+>> >  	if (caam_little_end)
+>> 
+>> This crashes on my p5020ds. Did you test on powerpc?
+>> 
+> I did not test on powerpc.
 
-[    1.484388] integrity: Loading X.509 certificate: UEFI:MokListRT
-[    1.485557] integrity: Problem loading X.509 certificate -65
-[    1.486100] Error adding keys to platform keyring UEFI:MokListRT
+OK, so I might be the first person who has :)
 
-Because the -65 error code is not enough for appeasing user when
-loading a outdated certificate. This patch add messages against
-1.3.14.3.2.29 and 2.5.29.1 OIDs.
+>> # first bad commit: [bbfcac5ff5f26aafa51935a62eb86b6eacfe8a49] crypto:
+>> caam/jr - Remove extra memory barrier during job ring dequeue
+>> 
+>> Log:
+>> 
+>>   ------------[ cut here ]------------
+>>   kernel BUG at drivers/crypto/caam/jr.c:191!
+>>   Oops: Exception in kernel mode, sig: 5 [#1]
+>>   BE PAGE_SIZE=4K SMP NR_CPUS=24 CoreNet Generic
+>>   Modules linked in:
+>>   CPU: 1 PID: 0 Comm: swapper/1 Not tainted 5.1.0-rc1-gcc-8.2.0-00060-
+>> gbbfcac5ff5f2 #31
+>>   NIP:  c00000000079d704 LR: c00000000079d498 CTR: c000000000086914
+>>   REGS: c0000000fffc7970 TRAP: 0700   Not tainted  (5.1.0-rc1-gcc-8.2.0-
+>> 00060-gbbfcac5ff5f2)
+>>   MSR:  0000000080029000 <CE,EE,ME>  CR: 28008484  XER: 00000000
+>>   IRQMASK: 0
+>>   GPR00: c00000000079d6b0 c0000000fffc7c00 c000000000fbc800
+>> 0000000000000001
+>>   GPR04: 000000007e080080 000000000000ffc0 0000000000000001
+>> 00000000000067d7
+>>   GPR08: 00000000880401a9 0000000000000000 0000000000000001
+>> 00000000fa83b2da
+>>   GPR12: 0000000028008224 c00000003ffff800 c000000000fc20b0
+>> 0000000000000100
+>>   GPR16: 8920f09520bea117 c000000000def480 0000000000000000
+>> 0000000000000001
+>>   GPR20: c000000000fc3940 c0000000f3537e18 0000000000000001
+>> c000000001026cc5
+>>   GPR24: 0000000000000001 c0000000f3328000 0000000000000001
+>> c0000000f3451010
+>>   GPR28: 0000000000000000 0000000000000001 0000000000000000
+>> 0000000000000000
+>>   NIP [c00000000079d704] .caam_jr_dequeue+0x2f0/0x410
+>>   LR [c00000000079d498] .caam_jr_dequeue+0x84/0x410
+>>   Call Trace:
+>>   [c0000000fffc7c00] [c00000000079d6b0] .caam_jr_dequeue+0x29c/0x410
+>> (unreliable)
+>>   [c0000000fffc7cd0] [c00000000004fef0]
+>> .tasklet_action_common.isra.3+0xac/0x180
+>>   [c0000000fffc7d80] [c000000000a2f99c] .__do_softirq+0x174/0x3f8
+>>   [c0000000fffc7e90] [c00000000004fb94] .irq_exit+0xc4/0xdc
+>>   [c0000000fffc7f00] [c000000000007348] .__do_irq+0x8c/0x1b0
+>>   [c0000000fffc7f90] [c0000000000150c4] .call_do_irq+0x14/0x24
+>>   [c0000000f3137930] [c0000000000074e4] .do_IRQ+0x78/0xd4
+>>   [c0000000f31379c0] [c000000000019998]
+>> exc_0x500_common+0xfc/0x100
+>>   --- interrupt: 501 at .book3e_idle+0x24/0x5c
+>>       LR = .book3e_idle+0x24/0x5c
+>>   [c0000000f3137cc0] [c00000000000a6a4] .arch_cpu_idle+0x34/0xa0
+>> (unreliable)
+>>   [c0000000f3137d30] [c000000000a2f2e8] .default_idle_call+0x5c/0x70
+>>   [c0000000f3137da0] [c000000000084210] .do_idle+0x1b0/0x1f4
+>>   [c0000000f3137e40] [c000000000084434] .cpu_startup_entry+0x28/0x30
+>>   [c0000000f3137eb0] [c000000000021538] .start_secondary+0x59c/0x5b0
+>>   [c0000000f3137f90] [c00000000000045c]
+>> start_secondary_prolog+0x10/0x14
+>>   Instruction dump:
+>>   7d284a14 e9290018 2fa90000 40de001c 3bbd0001 57bd05fe 7d3db050
+>> 712901ff
+>>   7fbd07b4 40e2ffcc 93b500dc 4bffff94 <0fe00000> 78890022 79270020
+>> 41d600ec
+>>   ---[ end trace 7bedbdf37a95ab35 ]---
+>> 
+>> That's hitting:
+>> 
+>> 		/* we should never fail to find a matching descriptor */
+>> 		BUG_ON(CIRC_CNT(head, tail + i, JOBR_DEPTH) <= 0);
+>> 
+>
+> Is it hitting under high traffic to caam?
+> How to reproduce it?
 
-Link: https://bugzilla.opensuse.org/show_bug.cgi?id=1129471
-Cc: David Howells <dhowells@redhat.com> 
-Cc: Herbert Xu <herbert@gondor.apana.org.au> 
-Cc: "David S. Miller" <davem@davemloft.net>
-Reviewed-by: Mimi Zohar <zohar@linux.ibm.com>
-Signed-off-by: "Lee, Chun-Yi" <jlee@suse.com>
----
- crypto/asymmetric_keys/x509_cert_parser.c | 7 +++++++
- include/linux/oid_registry.h              | 2 ++
- 2 files changed, 9 insertions(+)
+No that's just booting the system. I don't even have the crypto
+selftests enabled.
 
-diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetric_keys/x509_cert_parser.c
-index 991f4d735a4e..bbd22d5c5b5d 100644
---- a/crypto/asymmetric_keys/x509_cert_parser.c
-+++ b/crypto/asymmetric_keys/x509_cert_parser.c
-@@ -192,6 +192,8 @@ int x509_note_pkey_algo(void *context, size_t hdrlen,
- 	pr_debug("PubKey Algo: %u\n", ctx->last_oid);
- 
- 	switch (ctx->last_oid) {
-+	case OID_sha1WithRSASignature:
-+		pr_info("1.3.14.3.2.29 sha1WithRSASignature is obsolete.\n");
- 	case OID_md2WithRSAEncryption:
- 	case OID_md3WithRSAEncryption:
- 	default:
-@@ -464,6 +466,11 @@ int x509_process_extension(void *context, size_t hdrlen,
- 		return 0;
- 	}
- 
-+	if (ctx->last_oid == OID_subjectKeyIdentifier_obsolete) {
-+		pr_info("2.5.29.1 subjectKeyIdentifier OID is obsolete.\n");
-+		return -ENOPKG;
-+	}
-+
- 	return 0;
- }
- 
-diff --git a/include/linux/oid_registry.h b/include/linux/oid_registry.h
-index d2fa9ca42e9a..0641d5aa2251 100644
---- a/include/linux/oid_registry.h
-+++ b/include/linux/oid_registry.h
-@@ -62,6 +62,7 @@ enum OID {
- 
- 	OID_certAuthInfoAccess,		/* 1.3.6.1.5.5.7.1.1 */
- 	OID_sha1,			/* 1.3.14.3.2.26 */
-+	OID_sha1WithRSASignature,	/* 1.3.14.3.2.29 */
- 	OID_sha256,			/* 2.16.840.1.101.3.4.2.1 */
- 	OID_sha384,			/* 2.16.840.1.101.3.4.2.2 */
- 	OID_sha512,			/* 2.16.840.1.101.3.4.2.3 */
-@@ -83,6 +84,7 @@ enum OID {
- 	OID_generationalQualifier,	/* 2.5.4.44 */
- 
- 	/* Certificate extension IDs */
-+	OID_subjectKeyIdentifier_obsolete,	/* 2.5.29.1 */
- 	OID_subjectKeyIdentifier,	/* 2.5.29.14 */
- 	OID_keyUsage,			/* 2.5.29.15 */
- 	OID_subjectAltName,		/* 2.5.29.17 */
--- 
-2.16.4
-
+cheers
