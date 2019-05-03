@@ -3,31 +3,31 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73C36C43219
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA6AEC04AAA
 	for <linux-crypto@archiver.kernel.org>; Fri,  3 May 2019 14:17:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 443932075E
+	by mail.kernel.org (Postfix) with ESMTP id A35242075E
 	for <linux-crypto@archiver.kernel.org>; Fri,  3 May 2019 14:17:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728107AbfECORx (ORCPT
+        id S1728108AbfECORy (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 3 May 2019 10:17:53 -0400
-Received: from inva020.nxp.com ([92.121.34.13]:56626 "EHLO inva020.nxp.com"
+        Fri, 3 May 2019 10:17:54 -0400
+Received: from inva020.nxp.com ([92.121.34.13]:56494 "EHLO inva020.nxp.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728104AbfECORx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1728079AbfECORx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Fri, 3 May 2019 10:17:53 -0400
 Received: from inva020.nxp.com (localhost [127.0.0.1])
-        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 2A4971A03C9;
-        Fri,  3 May 2019 16:17:51 +0200 (CEST)
-Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
-        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 1E40B1A03BC;
-        Fri,  3 May 2019 16:17:51 +0200 (CEST)
-Received: from fsr-ub1864-014.ea.freescale.net (fsr-ub1864-014.ea.freescale.net [10.171.95.219])
-        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id A5565205F4;
+        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 26EBB1A03C1;
         Fri,  3 May 2019 16:17:50 +0200 (CEST)
+Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
+        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 18F191A03AC;
+        Fri,  3 May 2019 16:17:50 +0200 (CEST)
+Received: from fsr-ub1864-014.ea.freescale.net (fsr-ub1864-014.ea.freescale.net [10.171.95.219])
+        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 9FC04205F4;
+        Fri,  3 May 2019 16:17:49 +0200 (CEST)
 From:   =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>
 Cc:     "David S. Miller" <davem@davemloft.net>,
@@ -38,9 +38,9 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         Iuliana Prodan <iuliana.prodan@nxp.com>,
         Marcin Niestroj <m.niestroj@grinn-global.com>,
         linux-crypto@vger.kernel.org, NXP Linux Team <linux-imx@nxp.com>
-Subject: [PATCH v2 4/7] crypto: caam/qi - don't allocate an extra platform device
-Date:   Fri,  3 May 2019 17:17:40 +0300
-Message-Id: <20190503141743.27129-5-horia.geanta@nxp.com>
+Subject: [PATCH v2 2/7] crypto: caam - fix S/G table passing page boundary
+Date:   Fri,  3 May 2019 17:17:38 +0300
+Message-Id: <20190503141743.27129-3-horia.geanta@nxp.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190503141743.27129-1-horia.geanta@nxp.com>
 References: <20190503141743.27129-1-horia.geanta@nxp.com>
@@ -53,214 +53,455 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Use the controller device for caam/qi instead of allocating
-a new platform device.
-This is needed as a preparation to add support for working behind an
-SMMU. A platform device allocated using platform_device_register_full()
-is not completely set up - most importantly .dma_configure()
-is not called.
+According to CAAM RM:
+-crypto engine reads 4 S/G entries (64 bytes) at a time,
+even if the S/G table has fewer entries
+-it's the responsibility of the user / programmer to make sure
+this HW behaviour has no side effect
+
+The drivers do not take care of this currently, leading to IOMMU faults
+when the S/G table ends close to a page boundary - since only one page
+is DMA mapped, while CAAM's DMA engine accesses two pages.
+
+Fix this by rounding up the number of allocated S/G table entries
+to a multiple of 4.
+Note that in case of two *contiguous* S/G tables, only the last table
+might needs extra entries.
 
 Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
 ---
- drivers/crypto/caam/caamalg_qi.c |  6 +++---
- drivers/crypto/caam/ctrl.c       |  8 ++++----
- drivers/crypto/caam/intern.h     |  7 +++----
- drivers/crypto/caam/qi.c         | 33 +++++---------------------------
- 4 files changed, 15 insertions(+), 39 deletions(-)
+ drivers/crypto/caam/caamalg.c     | 30 ++++++++++++++-
+ drivers/crypto/caam/caamalg_qi.c  | 40 ++++++++++++++++++--
+ drivers/crypto/caam/caamalg_qi2.c | 63 ++++++++++++++++++++++++-------
+ drivers/crypto/caam/caamhash.c    | 33 ++++++++--------
+ drivers/crypto/caam/caampkc.c     |  7 +++-
+ drivers/crypto/caam/desc_constr.h | 11 ++++++
+ 6 files changed, 147 insertions(+), 37 deletions(-)
 
-diff --git a/drivers/crypto/caam/caamalg_qi.c b/drivers/crypto/caam/caamalg_qi.c
-index b2e29be79d41..fd38200dbc1c 100644
---- a/drivers/crypto/caam/caamalg_qi.c
-+++ b/drivers/crypto/caam/caamalg_qi.c
-@@ -2439,7 +2439,7 @@ static int caam_init_common(struct caam_ctx *ctx, struct caam_alg_entry *caam,
- 	ctx->cdata.algtype = OP_TYPE_CLASS1_ALG | caam->class1_alg_type;
- 	ctx->adata.algtype = OP_TYPE_CLASS2_ALG | caam->class2_alg_type;
- 
--	ctx->qidev = priv->qidev;
-+	ctx->qidev = ctx->jrdev->parent;
- 
- 	spin_lock_init(&ctx->lock);
- 	ctx->drv_ctx[ENCRYPT] = NULL;
-@@ -2599,7 +2599,7 @@ int caam_qi_algapi_init(struct device *ctrldev)
- 
- 		err = crypto_register_skcipher(&t_alg->skcipher);
- 		if (err) {
--			dev_warn(priv->qidev, "%s alg registration failed\n",
-+			dev_warn(ctrldev, "%s alg registration failed\n",
- 				 t_alg->skcipher.base.cra_driver_name);
- 			continue;
+diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
+index e8f8be396796..ecb33644a085 100644
+--- a/drivers/crypto/caam/caamalg.c
++++ b/drivers/crypto/caam/caamalg.c
+@@ -1380,8 +1380,16 @@ static struct aead_edesc *aead_edesc_alloc(struct aead_request *req,
  		}
-@@ -2655,7 +2655,7 @@ int caam_qi_algapi_init(struct device *ctrldev)
  	}
  
- 	if (registered)
--		dev_info(priv->qidev, "algorithms registered in /proc/crypto\n");
-+		dev_info(ctrldev, "algorithms registered in /proc/crypto\n");
++	/*
++	 * HW reads 4 S/G entries at a time; make sure the reads don't go beyond
++	 * the end of the table by allocating more S/G entries.
++	 */
+ 	sec4_sg_len = mapped_src_nents > 1 ? mapped_src_nents : 0;
+-	sec4_sg_len += mapped_dst_nents > 1 ? mapped_dst_nents : 0;
++	if (mapped_dst_nents > 1)
++		sec4_sg_len += pad_sg_nents(mapped_dst_nents);
++	else
++		sec4_sg_len = pad_sg_nents(sec4_sg_len);
++
+ 	sec4_sg_bytes = sec4_sg_len * sizeof(struct sec4_sg_entry);
  
- 	return err;
- }
-diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-index 36c2f15100a4..38bcbbccdfda 100644
---- a/drivers/crypto/caam/ctrl.c
-+++ b/drivers/crypto/caam/ctrl.c
-@@ -323,8 +323,8 @@ static int caam_remove(struct platform_device *pdev)
- 	of_platform_depopulate(ctrldev);
- 
- #ifdef CONFIG_CAAM_QI
--	if (ctrlpriv->qidev)
--		caam_qi_shutdown(ctrlpriv->qidev);
-+	if (ctrlpriv->qi_init)
-+		caam_qi_shutdown(ctrldev);
- #endif
+ 	/* allocate space for base edesc and hw desc commands, link tables */
+@@ -1719,7 +1727,25 @@ static struct skcipher_edesc *skcipher_edesc_alloc(struct skcipher_request *req,
+ 	else
+ 		sec4_sg_ents = mapped_src_nents + !!ivsize;
+ 	dst_sg_idx = sec4_sg_ents;
+-	sec4_sg_ents += mapped_dst_nents > 1 ? mapped_dst_nents : 0;
++
++	/*
++	 * HW reads 4 S/G entries at a time; make sure the reads don't go beyond
++	 * the end of the table by allocating more S/G entries. Logic:
++	 * if (src != dst && output S/G)
++	 *      pad output S/G, if needed
++	 * else if (src == dst && S/G)
++	 *      overlapping S/Gs; pad one of them
++	 * else if (input S/G) ...
++	 *      pad input S/G, if needed
++	 */
++	if (mapped_dst_nents > 1)
++		sec4_sg_ents += pad_sg_nents(mapped_dst_nents);
++	else if ((req->src == req->dst) && (mapped_src_nents > 1))
++		sec4_sg_ents = max(pad_sg_nents(sec4_sg_ents),
++				   !!ivsize + pad_sg_nents(mapped_src_nents));
++	else
++		sec4_sg_ents = pad_sg_nents(sec4_sg_ents);
++
+ 	sec4_sg_bytes = sec4_sg_ents * sizeof(struct sec4_sg_entry);
  
  	/*
-@@ -900,8 +900,8 @@ static int caam_probe(struct platform_device *pdev)
- 
- shutdown_qi:
- #ifdef CONFIG_CAAM_QI
--	if (ctrlpriv->qidev)
--		caam_qi_shutdown(ctrlpriv->qidev);
-+	if (ctrlpriv->qi_init)
-+		caam_qi_shutdown(dev);
- #endif
- iounmap_ctrl:
- 	iounmap(ctrl);
-diff --git a/drivers/crypto/caam/intern.h b/drivers/crypto/caam/intern.h
-index 50e24ebc533b..c9089da5dbaf 100644
---- a/drivers/crypto/caam/intern.h
-+++ b/drivers/crypto/caam/intern.h
-@@ -63,10 +63,6 @@ struct caam_drv_private_jr {
-  * Driver-private storage for a single CAAM block instance
-  */
- struct caam_drv_private {
--#ifdef CONFIG_CAAM_QI
--	struct device *qidev;
--#endif
--
- 	/* Physical-presence section */
- 	struct caam_ctrl __iomem *ctrl; /* controller region */
- 	struct caam_deco __iomem *deco; /* DECO/CCB views */
-@@ -80,6 +76,9 @@ struct caam_drv_private {
- 	 */
- 	u8 total_jobrs;		/* Total Job Rings in device */
- 	u8 qi_present;		/* Nonzero if QI present in device */
-+#ifdef CONFIG_CAAM_QI
-+	u8 qi_init;		/* Nonzero if QI has been initialized */
-+#endif
- 	u8 mc_en;		/* Nonzero if MC f/w is active */
- 	int secvio_irq;		/* Security violation interrupt number */
- 	int virt_en;		/* Virtualization enabled in CAAM */
-diff --git a/drivers/crypto/caam/qi.c b/drivers/crypto/caam/qi.c
-index 2d9b0485141f..46fca2c9fb24 100644
---- a/drivers/crypto/caam/qi.c
-+++ b/drivers/crypto/caam/qi.c
+diff --git a/drivers/crypto/caam/caamalg_qi.c b/drivers/crypto/caam/caamalg_qi.c
+index 992c498879a4..a1ed6a721834 100644
+--- a/drivers/crypto/caam/caamalg_qi.c
++++ b/drivers/crypto/caam/caamalg_qi.c
 @@ -4,7 +4,7 @@
-  * Queue Interface backend functionality
+  * Based on caamalg.c
   *
   * Copyright 2013-2016 Freescale Semiconductor, Inc.
-- * Copyright 2016-2017 NXP
-+ * Copyright 2016-2017, 2019 NXP
+- * Copyright 2016-2018 NXP
++ * Copyright 2016-2019 NXP
   */
  
- #include <linux/cpumask.h>
-@@ -59,11 +59,9 @@ static DEFINE_PER_CPU(int, last_cpu);
- /*
-  * caam_qi_priv - CAAM QI backend private params
-  * @cgr: QMan congestion group
-- * @qi_pdev: platform device for QI backend
-  */
- struct caam_qi_priv {
- 	struct qman_cgr cgr;
--	struct platform_device *qi_pdev;
- };
- 
- static struct caam_qi_priv qipriv ____cacheline_aligned;
-@@ -491,7 +489,7 @@ EXPORT_SYMBOL(caam_drv_ctx_rel);
- void caam_qi_shutdown(struct device *qidev)
- {
- 	int i;
--	struct caam_qi_priv *priv = dev_get_drvdata(qidev);
-+	struct caam_qi_priv *priv = &qipriv;
- 	const cpumask_t *cpus = qman_affine_cpus();
- 
- 	for_each_cpu(i, cpus) {
-@@ -509,8 +507,6 @@ void caam_qi_shutdown(struct device *qidev)
- 	qman_release_cgrid(priv->cgr.cgrid);
- 
- 	kmem_cache_destroy(qi_cache);
--
--	platform_device_unregister(priv->qi_pdev);
- }
- 
- static void cgr_cb(struct qman_portal *qm, struct qman_cgr *cgr, int congested)
-@@ -695,33 +691,17 @@ static void free_rsp_fqs(void)
- int caam_qi_init(struct platform_device *caam_pdev)
- {
- 	int err, i;
--	struct platform_device *qi_pdev;
- 	struct device *ctrldev = &caam_pdev->dev, *qidev;
- 	struct caam_drv_private *ctrlpriv;
- 	const cpumask_t *cpus = qman_affine_cpus();
--	static struct platform_device_info qi_pdev_info = {
--		.name = "caam_qi",
--		.id = PLATFORM_DEVID_NONE
--	};
--
--	qi_pdev_info.parent = ctrldev;
--	qi_pdev_info.dma_mask = dma_get_mask(ctrldev);
--	qi_pdev = platform_device_register_full(&qi_pdev_info);
--	if (IS_ERR(qi_pdev))
--		return PTR_ERR(qi_pdev);
--	set_dma_ops(&qi_pdev->dev, get_dma_ops(ctrldev));
- 
- 	ctrlpriv = dev_get_drvdata(ctrldev);
--	qidev = &qi_pdev->dev;
--
--	qipriv.qi_pdev = qi_pdev;
--	dev_set_drvdata(qidev, &qipriv);
-+	qidev = ctrldev;
- 
- 	/* Initialize the congestion detection */
- 	err = init_cgr(qidev);
- 	if (err) {
- 		dev_err(qidev, "CGR initialization failed: %d\n", err);
--		platform_device_unregister(qi_pdev);
- 		return err;
- 	}
- 
-@@ -730,7 +710,6 @@ int caam_qi_init(struct platform_device *caam_pdev)
- 	if (err) {
- 		dev_err(qidev, "Can't allocate CAAM response FQs: %d\n", err);
- 		free_rsp_fqs();
--		platform_device_unregister(qi_pdev);
- 		return err;
- 	}
- 
-@@ -753,15 +732,11 @@ int caam_qi_init(struct platform_device *caam_pdev)
- 		napi_enable(irqtask);
- 	}
- 
--	/* Hook up QI device to parent controlling caam device */
--	ctrlpriv->qidev = qidev;
--
- 	qi_cache = kmem_cache_create("caamqicache", CAAM_QI_MEMCACHE_SIZE, 0,
- 				     SLAB_CACHE_DMA, NULL);
- 	if (!qi_cache) {
- 		dev_err(qidev, "Can't allocate CAAM cache\n");
- 		free_rsp_fqs();
--		platform_device_unregister(qi_pdev);
- 		return -ENOMEM;
- 	}
- 
-@@ -769,6 +744,8 @@ int caam_qi_init(struct platform_device *caam_pdev)
- 	debugfs_create_file("qi_congested", 0444, ctrlpriv->ctl,
- 			    &times_congested, &caam_fops_u64_ro);
- #endif
+ #include "compat.h"
+@@ -1018,9 +1018,24 @@ static struct aead_edesc *aead_edesc_alloc(struct aead_request *req,
+ 	/*
+ 	 * Create S/G table: req->assoclen, [IV,] req->src [, req->dst].
+ 	 * Input is not contiguous.
++	 * HW reads 4 S/G entries at a time; make sure the reads don't go beyond
++	 * the end of the table by allocating more S/G entries. Logic:
++	 * if (src != dst && output S/G)
++	 *      pad output S/G, if needed
++	 * else if (src == dst && S/G)
++	 *      overlapping S/Gs; pad one of them
++	 * else if (input S/G) ...
++	 *      pad input S/G, if needed
+ 	 */
+-	qm_sg_ents = 1 + !!ivsize + mapped_src_nents +
+-		     (mapped_dst_nents > 1 ? mapped_dst_nents : 0);
++	qm_sg_ents = 1 + !!ivsize + mapped_src_nents;
++	if (mapped_dst_nents > 1)
++		qm_sg_ents += pad_sg_nents(mapped_dst_nents);
++	else if ((req->src == req->dst) && (mapped_src_nents > 1))
++		qm_sg_ents = max(pad_sg_nents(qm_sg_ents),
++				 1 + !!ivsize + pad_sg_nents(mapped_src_nents));
++	else
++		qm_sg_ents = pad_sg_nents(qm_sg_ents);
 +
-+	ctrlpriv->qi_init = 1;
- 	dev_info(qidev, "Linux CAAM Queue I/F driver initialised\n");
- 	return 0;
- }
+ 	sg_table = &edesc->sgt[0];
+ 	qm_sg_bytes = qm_sg_ents * sizeof(*sg_table);
+ 	if (unlikely(offsetof(struct aead_edesc, sgt) + qm_sg_bytes + ivsize >
+@@ -1275,7 +1290,24 @@ static struct skcipher_edesc *skcipher_edesc_alloc(struct skcipher_request *req,
+ 	qm_sg_ents = 1 + mapped_src_nents;
+ 	dst_sg_idx = qm_sg_ents;
+ 
+-	qm_sg_ents += mapped_dst_nents > 1 ? mapped_dst_nents : 0;
++	/*
++	 * HW reads 4 S/G entries at a time; make sure the reads don't go beyond
++	 * the end of the table by allocating more S/G entries. Logic:
++	 * if (src != dst && output S/G)
++	 *      pad output S/G, if needed
++	 * else if (src == dst && S/G)
++	 *      overlapping S/Gs; pad one of them
++	 * else if (input S/G) ...
++	 *      pad input S/G, if needed
++	 */
++	if (mapped_dst_nents > 1)
++		qm_sg_ents += pad_sg_nents(mapped_dst_nents);
++	else if ((req->src == req->dst) && (mapped_src_nents > 1))
++		qm_sg_ents = max(pad_sg_nents(qm_sg_ents),
++				 1 + pad_sg_nents(mapped_src_nents));
++	else
++		qm_sg_ents = pad_sg_nents(qm_sg_ents);
++
+ 	qm_sg_bytes = qm_sg_ents * sizeof(struct qm_sg_entry);
+ 	if (unlikely(offsetof(struct skcipher_edesc, sgt) + qm_sg_bytes +
+ 		     ivsize > CAAM_QI_MEMCACHE_SIZE)) {
+diff --git a/drivers/crypto/caam/caamalg_qi2.c b/drivers/crypto/caam/caamalg_qi2.c
+index 627cf0fd37f1..148ad92c16a5 100644
+--- a/drivers/crypto/caam/caamalg_qi2.c
++++ b/drivers/crypto/caam/caamalg_qi2.c
+@@ -1,7 +1,7 @@
+ // SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
+ /*
+  * Copyright 2015-2016 Freescale Semiconductor Inc.
+- * Copyright 2017-2018 NXP
++ * Copyright 2017-2019 NXP
+  */
+ 
+ #include "compat.h"
+@@ -459,9 +459,25 @@ static struct aead_edesc *aead_edesc_alloc(struct aead_request *req,
+ 	/*
+ 	 * Create S/G table: req->assoclen, [IV,] req->src [, req->dst].
+ 	 * Input is not contiguous.
++	 * HW reads 4 S/G entries at a time; make sure the reads don't go beyond
++	 * the end of the table by allocating more S/G entries. Logic:
++	 * if (src != dst && output S/G)
++	 *      pad output S/G, if needed
++	 * else if (src == dst && S/G)
++	 *      overlapping S/Gs; pad one of them
++	 * else if (input S/G) ...
++	 *      pad input S/G, if needed
+ 	 */
+-	qm_sg_nents = 1 + !!ivsize + mapped_src_nents +
+-		      (mapped_dst_nents > 1 ? mapped_dst_nents : 0);
++	qm_sg_nents = 1 + !!ivsize + mapped_src_nents;
++	if (mapped_dst_nents > 1)
++		qm_sg_nents += pad_sg_nents(mapped_dst_nents);
++	else if ((req->src == req->dst) && (mapped_src_nents > 1))
++		qm_sg_nents = max(pad_sg_nents(qm_sg_nents),
++				  1 + !!ivsize +
++				  pad_sg_nents(mapped_src_nents));
++	else
++		qm_sg_nents = pad_sg_nents(qm_sg_nents);
++
+ 	sg_table = &edesc->sgt[0];
+ 	qm_sg_bytes = qm_sg_nents * sizeof(*sg_table);
+ 	if (unlikely(offsetof(struct aead_edesc, sgt) + qm_sg_bytes + ivsize >
+@@ -1085,7 +1101,24 @@ static struct skcipher_edesc *skcipher_edesc_alloc(struct skcipher_request *req)
+ 	qm_sg_ents = 1 + mapped_src_nents;
+ 	dst_sg_idx = qm_sg_ents;
+ 
+-	qm_sg_ents += mapped_dst_nents > 1 ? mapped_dst_nents : 0;
++	/*
++	 * HW reads 4 S/G entries at a time; make sure the reads don't go beyond
++	 * the end of the table by allocating more S/G entries. Logic:
++	 * if (src != dst && output S/G)
++	 *      pad output S/G, if needed
++	 * else if (src == dst && S/G)
++	 *      overlapping S/Gs; pad one of them
++	 * else if (input S/G) ...
++	 *      pad input S/G, if needed
++	 */
++	if (mapped_dst_nents > 1)
++		qm_sg_ents += pad_sg_nents(mapped_dst_nents);
++	else if ((req->src == req->dst) && (mapped_src_nents > 1))
++		qm_sg_ents = max(pad_sg_nents(qm_sg_ents),
++				 1 + pad_sg_nents(mapped_src_nents));
++	else
++		qm_sg_ents = pad_sg_nents(qm_sg_ents);
++
+ 	qm_sg_bytes = qm_sg_ents * sizeof(struct dpaa2_sg_entry);
+ 	if (unlikely(offsetof(struct skcipher_edesc, sgt) + qm_sg_bytes +
+ 		     ivsize > CAAM_QI_MEMCACHE_SIZE)) {
+@@ -3412,7 +3445,7 @@ static int ahash_update_ctx(struct ahash_request *req)
+ 
+ 		edesc->src_nents = src_nents;
+ 		qm_sg_src_index = 1 + (*buflen ? 1 : 0);
+-		qm_sg_bytes = (qm_sg_src_index + mapped_nents) *
++		qm_sg_bytes = pad_sg_nents(qm_sg_src_index + mapped_nents) *
+ 			      sizeof(*sg_table);
+ 		sg_table = &edesc->sgt[0];
+ 
+@@ -3497,7 +3530,7 @@ static int ahash_final_ctx(struct ahash_request *req)
+ 	gfp_t flags = (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
+ 		      GFP_KERNEL : GFP_ATOMIC;
+ 	int buflen = *current_buflen(state);
+-	int qm_sg_bytes, qm_sg_src_index;
++	int qm_sg_bytes;
+ 	int digestsize = crypto_ahash_digestsize(ahash);
+ 	struct ahash_edesc *edesc;
+ 	struct dpaa2_sg_entry *sg_table;
+@@ -3508,8 +3541,7 @@ static int ahash_final_ctx(struct ahash_request *req)
+ 	if (!edesc)
+ 		return -ENOMEM;
+ 
+-	qm_sg_src_index = 1 + (buflen ? 1 : 0);
+-	qm_sg_bytes = qm_sg_src_index * sizeof(*sg_table);
++	qm_sg_bytes = pad_sg_nents(1 + (buflen ? 1 : 0)) * sizeof(*sg_table);
+ 	sg_table = &edesc->sgt[0];
+ 
+ 	ret = ctx_map_to_qm_sg(ctx->dev, state, ctx->ctx_len, sg_table,
+@@ -3521,7 +3553,7 @@ static int ahash_final_ctx(struct ahash_request *req)
+ 	if (ret)
+ 		goto unmap_ctx;
+ 
+-	dpaa2_sg_set_final(sg_table + qm_sg_src_index - 1, true);
++	dpaa2_sg_set_final(sg_table + (buflen ? 1 : 0), true);
+ 
+ 	edesc->qm_sg_dma = dma_map_single(ctx->dev, sg_table, qm_sg_bytes,
+ 					  DMA_TO_DEVICE);
+@@ -3602,7 +3634,8 @@ static int ahash_finup_ctx(struct ahash_request *req)
+ 
+ 	edesc->src_nents = src_nents;
+ 	qm_sg_src_index = 1 + (buflen ? 1 : 0);
+-	qm_sg_bytes = (qm_sg_src_index + mapped_nents) * sizeof(*sg_table);
++	qm_sg_bytes = pad_sg_nents(qm_sg_src_index + mapped_nents) *
++		      sizeof(*sg_table);
+ 	sg_table = &edesc->sgt[0];
+ 
+ 	ret = ctx_map_to_qm_sg(ctx->dev, state, ctx->ctx_len, sg_table,
+@@ -3699,7 +3732,7 @@ static int ahash_digest(struct ahash_request *req)
+ 		int qm_sg_bytes;
+ 		struct dpaa2_sg_entry *sg_table = &edesc->sgt[0];
+ 
+-		qm_sg_bytes = mapped_nents * sizeof(*sg_table);
++		qm_sg_bytes = pad_sg_nents(mapped_nents) * sizeof(*sg_table);
+ 		sg_to_qm_sg_last(req->src, mapped_nents, sg_table, 0);
+ 		edesc->qm_sg_dma = dma_map_single(ctx->dev, sg_table,
+ 						  qm_sg_bytes, DMA_TO_DEVICE);
+@@ -3871,7 +3904,8 @@ static int ahash_update_no_ctx(struct ahash_request *req)
+ 		}
+ 
+ 		edesc->src_nents = src_nents;
+-		qm_sg_bytes = (1 + mapped_nents) * sizeof(*sg_table);
++		qm_sg_bytes = pad_sg_nents(1 + mapped_nents) *
++			      sizeof(*sg_table);
+ 		sg_table = &edesc->sgt[0];
+ 
+ 		ret = buf_map_to_qm_sg(ctx->dev, sg_table, state);
+@@ -3990,7 +4024,7 @@ static int ahash_finup_no_ctx(struct ahash_request *req)
+ 	}
+ 
+ 	edesc->src_nents = src_nents;
+-	qm_sg_bytes = (2 + mapped_nents) * sizeof(*sg_table);
++	qm_sg_bytes = pad_sg_nents(2 + mapped_nents) * sizeof(*sg_table);
+ 	sg_table = &edesc->sgt[0];
+ 
+ 	ret = buf_map_to_qm_sg(ctx->dev, sg_table, state);
+@@ -4105,7 +4139,8 @@ static int ahash_update_first(struct ahash_request *req)
+ 			int qm_sg_bytes;
+ 
+ 			sg_to_qm_sg_last(req->src, mapped_nents, sg_table, 0);
+-			qm_sg_bytes = mapped_nents * sizeof(*sg_table);
++			qm_sg_bytes = pad_sg_nents(mapped_nents) *
++				      sizeof(*sg_table);
+ 			edesc->qm_sg_dma = dma_map_single(ctx->dev, sg_table,
+ 							  qm_sg_bytes,
+ 							  DMA_TO_DEVICE);
+diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
+index b1eadc6652b5..200e533794c8 100644
+--- a/drivers/crypto/caam/caamhash.c
++++ b/drivers/crypto/caam/caamhash.c
+@@ -759,7 +759,8 @@ static int ahash_edesc_add_src(struct caam_hash_ctx *ctx,
+ 
+ 	if (nents > 1 || first_sg) {
+ 		struct sec4_sg_entry *sg = edesc->sec4_sg;
+-		unsigned int sgsize = sizeof(*sg) * (first_sg + nents);
++		unsigned int sgsize = sizeof(*sg) *
++				      pad_sg_nents(first_sg + nents);
+ 
+ 		sg_to_sec4_sg_last(req->src, nents, sg + first_sg, 0);
+ 
+@@ -819,6 +820,8 @@ static int ahash_update_ctx(struct ahash_request *req)
+ 	}
+ 
+ 	if (to_hash) {
++		int pad_nents;
++
+ 		src_nents = sg_nents_for_len(req->src,
+ 					     req->nbytes - (*next_buflen));
+ 		if (src_nents < 0) {
+@@ -838,15 +841,14 @@ static int ahash_update_ctx(struct ahash_request *req)
+ 		}
+ 
+ 		sec4_sg_src_index = 1 + (*buflen ? 1 : 0);
+-		sec4_sg_bytes = (sec4_sg_src_index + mapped_nents) *
+-				 sizeof(struct sec4_sg_entry);
++		pad_nents = pad_sg_nents(sec4_sg_src_index + mapped_nents);
++		sec4_sg_bytes = pad_nents * sizeof(struct sec4_sg_entry);
+ 
+ 		/*
+ 		 * allocate space for base edesc and hw desc commands,
+ 		 * link tables
+ 		 */
+-		edesc = ahash_edesc_alloc(ctx, sec4_sg_src_index + mapped_nents,
+-					  ctx->sh_desc_update,
++		edesc = ahash_edesc_alloc(ctx, pad_nents, ctx->sh_desc_update,
+ 					  ctx->sh_desc_update_dma, flags);
+ 		if (!edesc) {
+ 			dma_unmap_sg(jrdev, req->src, src_nents, DMA_TO_DEVICE);
+@@ -936,18 +938,17 @@ static int ahash_final_ctx(struct ahash_request *req)
+ 		       GFP_KERNEL : GFP_ATOMIC;
+ 	int buflen = *current_buflen(state);
+ 	u32 *desc;
+-	int sec4_sg_bytes, sec4_sg_src_index;
++	int sec4_sg_bytes;
+ 	int digestsize = crypto_ahash_digestsize(ahash);
+ 	struct ahash_edesc *edesc;
+ 	int ret;
+ 
+-	sec4_sg_src_index = 1 + (buflen ? 1 : 0);
+-	sec4_sg_bytes = sec4_sg_src_index * sizeof(struct sec4_sg_entry);
++	sec4_sg_bytes = pad_sg_nents(1 + (buflen ? 1 : 0)) *
++			sizeof(struct sec4_sg_entry);
+ 
+ 	/* allocate space for base edesc and hw desc commands, link tables */
+-	edesc = ahash_edesc_alloc(ctx, sec4_sg_src_index,
+-				  ctx->sh_desc_fin, ctx->sh_desc_fin_dma,
+-				  flags);
++	edesc = ahash_edesc_alloc(ctx, 4, ctx->sh_desc_fin,
++				  ctx->sh_desc_fin_dma, flags);
+ 	if (!edesc)
+ 		return -ENOMEM;
+ 
+@@ -964,7 +965,7 @@ static int ahash_final_ctx(struct ahash_request *req)
+ 	if (ret)
+ 		goto unmap_ctx;
+ 
+-	sg_to_sec4_set_last(edesc->sec4_sg + sec4_sg_src_index - 1);
++	sg_to_sec4_set_last(edesc->sec4_sg + (buflen ? 1 : 0));
+ 
+ 	edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
+ 					    sec4_sg_bytes, DMA_TO_DEVICE);
+@@ -1247,6 +1248,8 @@ static int ahash_update_no_ctx(struct ahash_request *req)
+ 	}
+ 
+ 	if (to_hash) {
++		int pad_nents;
++
+ 		src_nents = sg_nents_for_len(req->src,
+ 					     req->nbytes - *next_buflen);
+ 		if (src_nents < 0) {
+@@ -1265,14 +1268,14 @@ static int ahash_update_no_ctx(struct ahash_request *req)
+ 			mapped_nents = 0;
+ 		}
+ 
+-		sec4_sg_bytes = (1 + mapped_nents) *
+-				sizeof(struct sec4_sg_entry);
++		pad_nents = pad_sg_nents(1 + mapped_nents);
++		sec4_sg_bytes = pad_nents * sizeof(struct sec4_sg_entry);
+ 
+ 		/*
+ 		 * allocate space for base edesc and hw desc commands,
+ 		 * link tables
+ 		 */
+-		edesc = ahash_edesc_alloc(ctx, 1 + mapped_nents,
++		edesc = ahash_edesc_alloc(ctx, pad_nents,
+ 					  ctx->sh_desc_update_first,
+ 					  ctx->sh_desc_update_first_dma,
+ 					  flags);
+diff --git a/drivers/crypto/caam/caampkc.c b/drivers/crypto/caam/caampkc.c
+index fe24485274e1..d97ffb03afc0 100644
+--- a/drivers/crypto/caam/caampkc.c
++++ b/drivers/crypto/caam/caampkc.c
+@@ -3,7 +3,7 @@
+  * caam - Freescale FSL CAAM support for Public Key Cryptography
+  *
+  * Copyright 2016 Freescale Semiconductor, Inc.
+- * Copyright 2018 NXP
++ * Copyright 2018-2019 NXP
+  *
+  * There is no Shared Descriptor for PKC so that the Job Descriptor must carry
+  * all the desired key parameters, input and output pointers.
+@@ -239,8 +239,11 @@ static struct rsa_edesc *rsa_edesc_alloc(struct akcipher_request *req,
+ 
+ 	if (src_nents > 1)
+ 		sec4_sg_len = src_nents;
++
+ 	if (dst_nents > 1)
+-		sec4_sg_len += dst_nents;
++		sec4_sg_len += pad_sg_nents(dst_nents);
++	else
++		sec4_sg_len = pad_sg_nents(sec4_sg_len);
+ 
+ 	sec4_sg_bytes = sec4_sg_len * sizeof(struct sec4_sg_entry);
+ 
+diff --git a/drivers/crypto/caam/desc_constr.h b/drivers/crypto/caam/desc_constr.h
+index 2980b8ef1fb1..5988a26a2441 100644
+--- a/drivers/crypto/caam/desc_constr.h
++++ b/drivers/crypto/caam/desc_constr.h
+@@ -3,6 +3,7 @@
+  * caam descriptor construction helper functions
+  *
+  * Copyright 2008-2012 Freescale Semiconductor, Inc.
++ * Copyright 2019 NXP
+  */
+ 
+ #ifndef DESC_CONSTR_H
+@@ -37,6 +38,16 @@
+ 
+ extern bool caam_little_end;
+ 
++/*
++ * HW fetches 4 S/G table entries at a time, irrespective of how many entries
++ * are in the table. It's SW's responsibility to make sure these accesses
++ * do not have side effects.
++ */
++static inline int pad_sg_nents(int sg_nents)
++{
++	return ALIGN(sg_nents, 4);
++}
++
+ static inline int desc_len(u32 * const desc)
+ {
+ 	return caam32_to_cpu(*desc) & HDR_DESCLEN_MASK;
 -- 
 2.17.1
 
