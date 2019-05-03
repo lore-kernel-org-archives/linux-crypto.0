@@ -1,171 +1,85 @@
-Return-Path: <SRS0=RoNa=TC=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=LfhG=TD=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B7D6C43219
-	for <linux-crypto@archiver.kernel.org>; Thu,  2 May 2019 16:38:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06BD0C43219
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 May 2019 01:42:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 08CC320651
-	for <linux-crypto@archiver.kernel.org>; Thu,  2 May 2019 16:38:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lNHVBPlA"
+	by mail.kernel.org (Postfix) with ESMTP id C5C06206C3
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 May 2019 01:42:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726381AbfEBQig (ORCPT
+        id S1726138AbfECBmo (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 2 May 2019 12:38:36 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:44077 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726338AbfEBQig (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 May 2019 12:38:36 -0400
-Received: by mail-wr1-f65.google.com with SMTP id c5so4255660wrs.11;
-        Thu, 02 May 2019 09:38:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=WCg55UBvofcQY30vp8bMKEAotS2TiPrUJ6KwYRg11YI=;
-        b=lNHVBPlAVsb+yxpdWN5v/UhJVOtaNgJFPQb2sQSuiYfFLlL2CrW5ZDWAQ9KiMpdF0K
-         nDjQNufIYiyVlwikLnJiauBUAeae84SvldowG/xD9BUW5UA2GjCEaQ5myb9AdvnZODFw
-         oY1q96dW8qRCBcHYb9Q/qGSlorHE+N4cVdBc26ooXCamWDGQVUc7QP3z/vuT8UEsiTYY
-         UqxpuUWz+hYCOI4c7pdsK7Iwhbaac0Oi1MJj3ddun33u7ROsbegX8W7I7A1nmzdEKBFv
-         lqnmGGhaXJMoMN17uv48NVzE9uOiChHXUhFVLG02nYoYlNwwz+BcLKbQOzgW5hnYO83A
-         Mnqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=WCg55UBvofcQY30vp8bMKEAotS2TiPrUJ6KwYRg11YI=;
-        b=eyTdecZoLpaVQXfPOT/24bHYQ/F2En3SuN39BJfN3uuXtlCAZngcETyX8WsvvDGvpg
-         aXe7d3aDXPXavEOoYaqeaC2NxFq1gbSGqjpzoKpxn6eUASJKvWjM4OdjjAcBmTt/qwxj
-         qJN2lOlvY/zzeryr199Jnilq9zXjLlSfTs3b090xMne4LaXu+ro7HZ/yWqWHWEdUv89K
-         jIy4paoqMCF/pZzWpq4bQHNNNVNlLIsAmmDY3o9FYqrbU3RiZtmjsYut7gzfyPYhsEv0
-         D17buyUndBp7ZpUSqLvNFQxYVJoLnFbVCmYKLnfrk1OMPWOD5QNv8UYltpMvIpeWQPAd
-         +tiw==
-X-Gm-Message-State: APjAAAWNSPA3Y8qHtSZ8hNWi337XaU3ZPIHFMPbRU6rIAMRcPTfACCuR
-        Qr/y9ikOlp2PgbjNaHNWnYu6go+z
-X-Google-Smtp-Source: APXvYqxgguvaBA/sLmAZwJGt4LrBldv5la5wkWpKEvQwNY1Z/EXq01oe4B3DJzXGTQ0gN+7LJNy+rw==
-X-Received: by 2002:adf:dd46:: with SMTP id u6mr3355658wrm.228.1556815113954;
-        Thu, 02 May 2019 09:38:33 -0700 (PDT)
-Received: from Red ([2a01:cb1d:147:7200:2e56:dcff:fed2:c6d6])
-        by smtp.googlemail.com with ESMTPSA id u64sm1122347wmg.23.2019.05.02.09.38.22
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 02 May 2019 09:38:23 -0700 (PDT)
-Date:   Thu, 2 May 2019 18:38:21 +0200
-From:   Corentin Labbe <clabbe.montjoie@gmail.com>
-To:     Kalyani Akula <kalyania@xilinx.com>
-Cc:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "kstewart@linuxfoundation.org" <kstewart@linuxfoundation.org>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "pombredanne@nexb.com" <pombredanne@nexb.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        Sarat Chand Savitala <saratcha@xilinx.com>
-Subject: Re: [RFC PATCH V3 0/4] Add Xilinx's ZynqMP SHA3 driver support
-Message-ID: <20190502163821.GA22561@Red>
-References: <1556793282-17346-1-git-send-email-kalyani.akula@xilinx.com>
- <20190502120012.GA19008@Red>
- <BN7PR02MB512413C534A8EFA925105441AF340@BN7PR02MB5124.namprd02.prod.outlook.com>
+        Thu, 2 May 2019 21:42:44 -0400
+Received: from [5.180.42.13] ([5.180.42.13]:35788 "EHLO deadmen.hmeau.com"
+        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
+        id S1726128AbfECBmo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 2 May 2019 21:42:44 -0400
+Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
+        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
+        id 1hMNDn-0003tx-71; Fri, 03 May 2019 09:42:43 +0800
+Received: from herbert by gondobar with local (Exim 4.89)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1hMNDl-0007pO-J8; Fri, 03 May 2019 09:42:41 +0800
+Date:   Fri, 3 May 2019 09:42:41 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Cc:     linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v3] crypto: DRBG - add FIPS 140-2 CTRNG for noise source
+Message-ID: <20190503014241.cy35pjinezhapga7@gondor.apana.org.au>
+References: <1852500.fyBc0DU23F@positron.chronox.de>
+ <20190502124811.l4yozv4llqtdvozx@gondor.apana.org.au>
+ <10683686.8DmOGYbKhJ@positron.chronox.de>
+ <5352150.0CmBXKFm2E@positron.chronox.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <BN7PR02MB512413C534A8EFA925105441AF340@BN7PR02MB5124.namprd02.prod.outlook.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <5352150.0CmBXKFm2E@positron.chronox.de>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, May 02, 2019 at 03:12:55PM +0000, Kalyani Akula wrote:
-> Hi Corentin,
-> 
-> Please find my response inline.
-> 
-> > -----Original Message-----
-> > From: Corentin Labbe <clabbe.montjoie@gmail.com>
-> > Sent: Thursday, May 2, 2019 5:30 PM
-> > To: Kalyani Akula <kalyania@xilinx.com>
-> > Cc: herbert@gondor.apana.org.au; kstewart@linuxfoundation.org;
-> > gregkh@linuxfoundation.org; tglx@linutronix.de; pombredanne@nexb.com;
-> > linux-crypto@vger.kernel.org; linux-kernel@vger.kernel.org;
-> > netdev@vger.kernel.org; Sarat Chand Savitala <saratcha@xilinx.com>; Kalyani
-> > Akula <kalyania@xilinx.com>
-> > Subject: Re: [RFC PATCH V3 0/4] Add Xilinx's ZynqMP SHA3 driver support
-> > 
-> > On Thu, May 02, 2019 at 04:04:38PM +0530, Kalyani Akula wrote:
-> > > This patch set adds support for
-> > > - dt-binding docs for Xilinx ZynqMP SHA3 driver
-> > > - Adds communication layer support for sha_hash in zynqmp.c
-> > > - Adds Xilinx ZynqMP driver for SHA3 Algorithm
-> > > - Adds device tree node for ZynqMP SHA3 driver
-> > >
-> > > V3 Changes :
-> > > - Removed zynqmp_sha_import and export APIs.The reason as follows The
-> > > user space code does an accept on an already accepted FD when we
-> > > create AF_ALG socket and call accept on it, it calls af_alg_accept and
-> > > not hash_accept.
-> > > import and export APIs are called from hash_accept.
-> > > The flow is as below
-> > > accept--> af_alg_accept-->hash_accept_parent-->hash_accept_parent_noke
-> > > accept--> y
-> > > for hash salg_type.
-> > > - Resolved comments from
-> > >         https://patchwork.kernel.org/patch/10753719/
-> > >
-> > 
-> > 
-> > Your driver still doesnt handle the case where two hash are done in parallel.
-> > 
-> 
-> Our Firmware uses IPI protocol to send this SHA3 requests to SHA3 HW engine, which doesn't support parallel processing of 2 hash requests.
-> The flow is 
-> SHA3 request from App -> SHA3 driver-> ZynqMp driver-> Firmware (which doesn't support parallel processing of 2 requests) -> SHA3 HW Engine
-> 
-> 
+On Thu, May 02, 2019 at 06:38:12PM +0200, Stephan Müller wrote:
+> +static int drbg_fips_continuous_test(struct drbg_state *drbg,
+> +				     const unsigned char *entropy)
+> +{
+> +#if IS_ENABLED(CONFIG_CRYPTO_FIPS)
 
-So your driver will just send bad result in that case.
+This should look like
 
-You need to export and store the intermediate result in a request context.
+	if (IS_ENABLED(CONFIG_CRYPTO_FIPS)) {
+		...
+	} else {
+		...
+	}
 
-> > Furthermore, you miss the export/import functions.
-> > 
-> 
-> When user space code does an accept on an already accepted FD as below
-> sockfd = socket(AF_ALG, SOCK_SEQPACKET, 0);
-> bind(sockfd, (struct sockaddr *)&sa, sizeof(sa));
-> fd = accept(sockfd, NULL, 0);
-> 
-> where my sockaddr is 
-> struct sockaddr_alg sa = {
->         .salg_family = AF_ALG,
->         .salg_type = "hash",
->         .salg_name = "xilinx-sha3-384"
->  };
-> 
-> Upon calling accept the flow in the kernel is as mentioned
-> accept--> af_alg_accept-->hash_accept_parent-->hash_accept_parent_nokey
-> for hash salg_type.
-> 
-> And where import and export functions are called from hash_accept. hence, these functions never be called from the application.
-> So, I removed those from the driver.
-> 
-> Regards
-> Kalyani.
-> 
+This way the compiler will see everything regardless of whether
+FIPS is enabled or not.
 
-Handling your own worflow is not enough.
+> diff --git a/include/crypto/drbg.h b/include/crypto/drbg.h
+> index 3fb581bf3b87..939051480c83 100644
+> --- a/include/crypto/drbg.h
+> +++ b/include/crypto/drbg.h
+> @@ -129,6 +129,10 @@ struct drbg_state {
+>  
+>  	bool seeded;		/* DRBG fully seeded? */
+>  	bool pr;		/* Prediction resistance enabled? */
+> +#if IS_ENABLED(CONFIG_CRYPTO_FIPS)
+> +	bool fips_primed;	/* Continuous test primed? */
+> +	unsigned char *prev;	/* FIPS 140-2 continuous test value */
+> +#endif
 
-You need to support two client doing multiple update in parallel.
-It seems that your driver is bugged in that case.
+You can still use #ifdef here.
 
-Furthermore, i am pretty sure that export and import are mandatory, and without them self-test should fail.
-Do you have self test enabled and tryed to load the tcrypt module ?
-
-Regards
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
