@@ -2,66 +2,133 @@ Return-Path: <SRS0=LfhG=TD=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham
+X-Spam-Status: No, score=-8.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4372C43219
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 May 2019 13:26:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D16D1C43219
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 May 2019 14:17:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A13CA2075E
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 May 2019 13:26:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AE5532075E
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 May 2019 14:17:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727639AbfECN0R (ORCPT
+        id S1728103AbfECORv (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 3 May 2019 09:26:17 -0400
-Received: from [5.180.42.13] ([5.180.42.13]:38112 "EHLO deadmen.hmeau.com"
-        rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S1727282AbfECN0R (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 3 May 2019 09:26:17 -0400
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1hMYCY-00015w-HA; Fri, 03 May 2019 21:26:10 +0800
-Received: from herbert by gondobar with local (Exim 4.89)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1hMYCV-0003tG-Qd; Fri, 03 May 2019 21:26:07 +0800
-Date:   Fri, 3 May 2019 21:26:07 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Horia Geanta <horia.geanta@nxp.com>
-Cc:     Laurentiu Tudor <laurentiu.tudor@nxp.com>,
-        "David S. Miller" <davem@davemloft.net>,
+        Fri, 3 May 2019 10:17:51 -0400
+Received: from inva021.nxp.com ([92.121.34.21]:37320 "EHLO inva021.nxp.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726679AbfECORv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 3 May 2019 10:17:51 -0400
+Received: from inva021.nxp.com (localhost [127.0.0.1])
+        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 22F092001F9;
+        Fri,  3 May 2019 16:17:49 +0200 (CEST)
+Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
+        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 157002001D9;
+        Fri,  3 May 2019 16:17:49 +0200 (CEST)
+Received: from fsr-ub1864-014.ea.freescale.net (fsr-ub1864-014.ea.freescale.net [10.171.95.219])
+        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 9C3EF2061E;
+        Fri,  3 May 2019 16:17:48 +0200 (CEST)
+From:   =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     "David S. Miller" <davem@davemloft.net>,
         Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
         Vakul Garg <vakul.garg@nxp.com>,
         Franck Lenormand <franck.lenormand@nxp.com>,
         Iuliana Prodan <iuliana.prodan@nxp.com>,
         Marcin Niestroj <m.niestroj@grinn-global.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        dl-linux-imx <linux-imx@nxp.com>
-Subject: Re: [PATCH 0/7] crypto: caam - IOMMU support
-Message-ID: <20190503132607.ffesimwe4wtpqrjq@gondor.apana.org.au>
-References: <20190425162501.4565-1-horia.geanta@nxp.com>
- <VI1PR04MB513455960753AA04259CBAA4EC3F0@VI1PR04MB5134.eurprd04.prod.outlook.com>
- <VI1PR0402MB3485EAD0CC9D3CF8C91E9F7098350@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+        linux-crypto@vger.kernel.org, NXP Linux Team <linux-imx@nxp.com>
+Subject: [PATCH v2 0/7] crypto: caam - IOMMU support
+Date:   Fri,  3 May 2019 17:17:36 +0300
+Message-Id: <20190503141743.27129-1-horia.geanta@nxp.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <VI1PR0402MB3485EAD0CC9D3CF8C91E9F7098350@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, May 03, 2019 at 01:00:46PM +0000, Horia Geanta wrote:
->
-> I've noticed the patchwork status is "Changes requested".
-> I am not aware of any other comment requesting modifications.
+This patch set adds support in caam drivers (caam/jr, caam/qi, caam/qi2)
+for the crypto engine to work behind an IOMMU.
 
-My mail server was having some issues.  You should get the emails
-soon.
+v2:
+Fixed compilation warnings (unused variables) in patch 3/7.
 
-Cheers,
+v1:
+
+The changes consist in:
+
+1. Deferred probing support
+-caam/jr - top level drivers are converted to "libraries"; this also fixes
+the issue reported previously by Marcin:
+https://patchwork.kernel.org/cover/10558409/
+-caam/qi - use the newly added QBMan functions (*) to decide whether to defer
+caam controller probing or not
+
+2. Fixing spurios memory accesses, that lead to IOMMU access faults
+-crypto engine prefetches S/G table entries in chunks of 4 (64 bytes),
+and driver has to make sure memory is allocated and mapped
+-crypto engine tries to prefetch S/G table entries when input / output
+is marked as scattered, even though length is zero
+
+3. Getting rid of platform device created by caam/qi
+There are inherent problems with platform device being created dynamically
+(and not relying on the existence of a DT node).
+
+4. Update phys -> virt address translation in case IOMMU is present
+iova -> phys -> virt
+
+5. Fix the device used for key buffers DMA mapping
+Key buffers are incorrectly DMA mapped using a job ring device, since they
+are accessed eventually by the QI - this creating an ICID / stream ID
+mismatch at IOMMU level.
+
+Tests were performed on:
+-LS1046A - caam/jr and caam/qi - job ring and queue interface
+-LS1088A - caam/jr and caam/qi2 - job ring and dpsec interface
+
+There are some dependencies (see below).
+While not everything is in place, I would like at least to patches 1-6/7
+being reviewed & merged.
+
+i. Patch 7/7 (crypto: caam - defer probing until QMan is available) depends
+on commit 1c8f39946c03 ("soc: fsl: qbman_portals: add APIs to retrieve the probing status")
+from Leo's tree: git://git.kernel.org/pub/scm/linux/kernel/git/leo/linux.git
+and should not be merged.
+
+ii. U-boot updates for LS1088A (needed for caam/jr ICID programming)
+[U-Boot,1/2] armv8: fsl-layerscape: add missing sec jr base address defines
+https://patchwork.ozlabs.org/patch/1059256/
+[U-Boot,2/2] armv8: ls1088a: add icid setup for platform devices
+https://patchwork.ozlabs.org/patch/1059259/
+
+Horia Geantă (7):
+  crypto: caam - avoid S/G table fetching for AEAD zero-length output
+  crypto: caam - fix S/G table passing page boundary
+  crypto: caam - convert top level drivers to libraries
+  crypto: caam/qi - don't allocate an extra platform device
+  crypto: caam/qi - fix address translations with IOMMU enabled
+  crypto: caam/qi - DMA map keys using proper device
+  crypto: caam - defer probing until QMan is available
+
+ drivers/crypto/caam/Kconfig       |  46 ++++-------
+ drivers/crypto/caam/Makefile      |  18 ++---
+ drivers/crypto/caam/caamalg.c     |  74 ++++++++----------
+ drivers/crypto/caam/caamalg_qi.c  | 124 +++++++++++++++---------------
+ drivers/crypto/caam/caamalg_qi2.c |  72 +++++++++++++----
+ drivers/crypto/caam/caamhash.c    |  81 ++++++-------------
+ drivers/crypto/caam/caampkc.c     |  57 +++-----------
+ drivers/crypto/caam/caamrng.c     |  54 ++-----------
+ drivers/crypto/caam/ctrl.c        | 124 ++++++++++++++++++------------
+ drivers/crypto/caam/desc_constr.h |  11 +++
+ drivers/crypto/caam/intern.h      | 102 ++++++++++++++++++++++--
+ drivers/crypto/caam/jr.c          |  43 +++++++++++
+ drivers/crypto/caam/qi.c          |  52 ++++++-------
+ 13 files changed, 465 insertions(+), 393 deletions(-)
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.17.1
+
