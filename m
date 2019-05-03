@@ -2,103 +2,189 @@ Return-Path: <SRS0=LfhG=TD=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90FF2C43219
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 May 2019 05:11:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2BE6C04AAA
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 May 2019 11:46:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B882C2075C
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 May 2019 05:11:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B35FE2075E
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 May 2019 11:46:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="UNt9lJnZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BLYsTAEQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726229AbfECFL1 (ORCPT
+        id S1727725AbfECLqw (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 3 May 2019 01:11:27 -0400
-Received: from mo4-p00-ob.smtp.rzone.de ([81.169.146.161]:18319 "EHLO
-        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726220AbfECFL1 (ORCPT
+        Fri, 3 May 2019 07:46:52 -0400
+Received: from mail-ed1-f67.google.com ([209.85.208.67]:38818 "EHLO
+        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726377AbfECLqv (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 3 May 2019 01:11:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1556860285;
-        s=strato-dkim-0002; d=chronox.de;
-        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
-        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-        bh=qqMvg8+ahBhu4uOS+PFySGC3mA76mH3N/mKxfGy11/w=;
-        b=UNt9lJnZo1e7UedcUWuNyEAzk7bB/XtmQ6rEr4xMPM1NmjHv3Z0Txs4bnzicNA9xPn
-        z6jV+kmHd2KED/+yxRSe1BbeZafx0S9eKMKmZi+K3SE/MzpS4Kbl88t7I58YVor1wDDa
-        jZ4OCmZjzAQLaiD4f+AVjBvzjPIlBC0C9143ruutt08dai3U3PJI7+ESybqtTcrk5vd8
-        GRPsEu85iKZiqYpqu/GMaKZFuhUs3NLIoHDOTGrjQLbpx8L47kpwNHcjyEwTBL+AE6kV
-        4ViFBpXdNRDwvFSbhBhn4TgA3sHzRQFKGkdF149g+QoNOHGZvFZmXK1z280Wue5ytPRB
-        oXJQ==
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPaJfSd/cc="
-X-RZG-CLASS-ID: mo00
-Received: from tauon.chronox.de
-        by smtp.strato.de (RZmta 44.18 DYNA|AUTH)
-        with ESMTPSA id R0373fv435BOlv8
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (curve secp521r1 with 521 ECDH bits, eq. 15360 bits RSA))
-        (Client did not present a certificate);
-        Fri, 3 May 2019 07:11:24 +0200 (CEST)
-From:   Stephan Mueller <smueller@chronox.de>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v3] crypto: DRBG - add FIPS 140-2 CTRNG for noise source
-Date:   Fri, 03 May 2019 07:11:23 +0200
-Message-ID: <2145637.ukeSOrXKR8@tauon.chronox.de>
-In-Reply-To: <20190503014241.cy35pjinezhapga7@gondor.apana.org.au>
-References: <1852500.fyBc0DU23F@positron.chronox.de> <5352150.0CmBXKFm2E@positron.chronox.de> <20190503014241.cy35pjinezhapga7@gondor.apana.org.au>
+        Fri, 3 May 2019 07:46:51 -0400
+Received: by mail-ed1-f67.google.com with SMTP id w11so5654656edl.5;
+        Fri, 03 May 2019 04:46:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to
+         :content-transfer-encoding;
+        bh=SUzz8Pj0c+WsqXtdVpJDOr7+714Bl6dV3H6hlHSl0LM=;
+        b=BLYsTAEQbWzcmkgKtrINtG//3ZRMga0gWmXJLigpWRHQ4USXwWTqw1l8wD0qzh20hD
+         JUWYn3ZkWjxkO3haBqi9UEgZM/jGJ4aL284bYTv3yHTW05lXjfANyUaMCCxUVghy2eCL
+         iLpfJWRFUZM9wKRYuBwNlEK80YYvdiwcK1atJ47vspLKa6HLVWE+n19owJq/CiSWA5v6
+         WjH9Qa/LnMokZmyzka7CrERdr2lXN4c1Q4ItUKc7ttZeUTAAhycVcuzp9EbPny+52X/m
+         doMI6moqWm6T+8oSWhSHB6c30bMPctIaTjxqwmV1OyJ/2EaXDWhrEZxBNGVxCfCePzCn
+         whIQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to
+         :content-transfer-encoding;
+        bh=SUzz8Pj0c+WsqXtdVpJDOr7+714Bl6dV3H6hlHSl0LM=;
+        b=bql5bwZvQqeWh7673VRmM4U2mTVgvfDK5kSkoXiG32I0QQrtMhhZBpnw7CKem7owQv
+         1U9FHOpyj/FXkwbLr0vyEfSW+iEm1CNFZ1vj/Icc07XgaSWfja8WAQVtVDAvAqLGXw4n
+         2ncPyKM3uESdj52zCQzz3uv83Nc3kG93kEgjRRAR5X8RqrBCX/iEtqIUCQZE+LEshVP7
+         08UPelbS3F1RBy9oit6D5jOs8OFuOf45Qh5PFlNau8WLL8b57XA5es8JNCTYpC4b8Pa0
+         f4XBy76kFk743mlLXqER4lr5KtCcDkBZ9Felf4f3lMiaFoxQPeaAkh6hB1nsUvsTg2MA
+         7psg==
+X-Gm-Message-State: APjAAAVFXiYpRPlcHLwMh4AeUaDJm3SGzSe6NF6hUQpysd2x2IfAoJiH
+        ueZovU70rq5Z3+BldCrHtYLHk8n93Xm4nVavLxs4skT4A8aorg==
+X-Google-Smtp-Source: APXvYqzI2yRSX1xo2ruyfnRuglypC4T2+7PoJVl/qekpcw1bEuTrwQXLJp0KS8WKs2z1Ktr2lHiCBJTu5Koglbaa7kc=
+X-Received: by 2002:a50:9785:: with SMTP id e5mr7740641edb.94.1556884009023;
+ Fri, 03 May 2019 04:46:49 -0700 (PDT)
 MIME-Version: 1.0
+From:   Elena Reshetova <elena.reshetova@gmail.com>
+Date:   Fri, 3 May 2019 14:46:38 +0300
+Message-ID: <CALrft9-KhB8WZpZHoyd3uDN-ryX=pnSV6=5QEvZAe2YCV9aBYA@mail.gmail.com>
+Subject: [ANNOUNCE][CFP] Linux Security Summit Europe 2019
+To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        selinux@vger.kernel.org, linux-security-module@vger.kernel.org,
+        linux-integrity@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="iso-8859-1"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Freitag, 3. Mai 2019, 03:42:41 CEST schrieb Herbert Xu:
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D
+                            ANNOUNCEMENT AND CALL FOR PARTICIPATION
+                                LINUX SECURITY SUMMIT EUROPE 2019
 
-Hi Herbert,
+                                        31 October =E2=80=93 1 November
+                                                Lyon, France
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D
 
-> On Thu, May 02, 2019 at 06:38:12PM +0200, Stephan M=FCller wrote:
-> > +static int drbg_fips_continuous_test(struct drbg_state *drbg,
-> > +				     const unsigned char *entropy)
-> > +{
-> > +#if IS_ENABLED(CONFIG_CRYPTO_FIPS)
->=20
-> This should look like
->=20
-> 	if (IS_ENABLED(CONFIG_CRYPTO_FIPS)) {
-> 		...
-> 	} else {
-> 		...
-> 	}
->=20
-> This way the compiler will see everything regardless of whether
-> FIPS is enabled or not.
->=20
-> > diff --git a/include/crypto/drbg.h b/include/crypto/drbg.h
-> > index 3fb581bf3b87..939051480c83 100644
-> > --- a/include/crypto/drbg.h
-> > +++ b/include/crypto/drbg.h
-> > @@ -129,6 +129,10 @@ struct drbg_state {
-> >=20
-> >  	bool seeded;		/* DRBG fully seeded? */
-> >  	bool pr;		/* Prediction resistance enabled? */
-> >=20
-> > +#if IS_ENABLED(CONFIG_CRYPTO_FIPS)
-> > +	bool fips_primed;	/* Continuous test primed? */
-> > +	unsigned char *prev;	/* FIPS 140-2 continuous test value */
-> > +#endif
->=20
-> You can still use #ifdef here.
+DESCRIPTION
 
-The variables would need to be defined unconditionally if we use a runtime=
-=20
-check in the C code. Is that what you want me to do?
+The Linux Security Summit (LSS) is a technical forum for collaboration
+between Linux developers, researchers, and end users. Its primary aim is to
+foster community efforts in analyzing and solving Linux security challenges=
+.
 
-Ciao
-Stephan
+This year, for the second time, the Linux Security Summit is going to
+be also held in Europe (LSS-EU) in order to facilitate broader participatio=
+n
+in Linux security development.
+Similar to LSS-North America, LSS-EU provides a unique opportunity for to h=
+ave
+discussions and networking opportunities with key people in the Linux kerne=
+l
+security community, present your work and ideas and affect the future direc=
+tion
+of Linux security.
+
+The program committee currently seeks proposals for:
+
+    * Refereed Presentations:
+        45 minutes in length.
+
+    * Panel Discussion Topics:
+        45 minutes in length.
+
+    * Short Topics:
+        30 minutes in total, including at least 10 minutes discussion.
+
+    * BoF Sessions.
+
+    * Tutorials *NEW for 2019*:
+        90 minutes in length.
+        Tutorial sessions should be focused on advanced Linux security defe=
+nse
+        topics within areas such as the kernel, compiler, and security-rela=
+ted
+        libraries. Priority will be given to tutorials created for
+this conference.
+
+Topic areas include, but are not limited to:
+
+    * Kernel self-protection
+    * Access control
+    * Cryptography and key management
+    * Integrity control
+    * Hardware Security
+    * Iot and embedded security
+    * Virtualization and containers
+    * System-specific system hardening
+    * Case studies
+    * Security tools
+    * Security UX
+    * Emerging technologies, threats & techniques
+
+Proposals should be submitted via:
+ https://linuxfoundation.smapply.io/prog/lss_eu_2019/
+
+DATES
+
+ * CFP Close: Wednesday , July 31, 2019
+ * CFP Notifications: Friday, August 9, 2019
+ * Schedule Announced: Monday, August 19, 2019
+ * Event: October 31 =E2=80=93 November 1, 2019
 
 
+WHO SHOULD ATTEND
+
+ We're seeking a diverse range of attendees, and welcome participation by
+ people involved in Linux security development, operations, and research.
+
+ The LSS is a unique global event which provides the opportunity to present
+ and discuss your work or research with key Linux security community member=
+s
+ and maintainers. It?s also useful for those who wish to keep up with the
+ latest in Linux security development, and to provide input to the
+ development process.
+
+WEB SITE
+
+ https://events.linuxfoundation.org/events/linux-security-summit-europe-201=
+9/
+
+TWITTER
+
+ For event updates and announcements, follow:
+
+ https://twitter.com/LinuxSecSummit
+
+PROGRAM COMMITTEE
+
+ The program committee for LSS-EU 2019 is:
+
+    * Elena Reshetova, Intel
+    * James Morris, Microsoft
+    * Serge Hallyn, Cisco
+    * Paul Moore, Cisco
+    * Stephen Smalley, NSA
+    * John Johansen, Canonical
+    * Kees Cook, Google
+    * Casey Schaufler, Intel
+    * Mimi Zohar, IBM
+    * David A. Wheeler, Institute for Defense Analyses
+
+The program committee may be contacted as a group via email:
+ lss-pc () lists.linuxfoundation.org
