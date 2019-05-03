@@ -3,65 +3,80 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_NEOMUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5208C43219
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 May 2019 13:25:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 399E0C43219
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 May 2019 13:25:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 81C5A2075E
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 May 2019 13:25:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0E4942075E
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 May 2019 13:25:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727173AbfECNZe (ORCPT
+        id S1727914AbfECNZl (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 3 May 2019 09:25:34 -0400
+        Fri, 3 May 2019 09:25:41 -0400
 Received: from [5.180.42.13] ([5.180.42.13]:38092 "EHLO deadmen.hmeau.com"
         rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S1726289AbfECNZd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 3 May 2019 09:25:33 -0400
+        id S1727892AbfECNZk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 3 May 2019 09:25:40 -0400
 Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
         by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1hMRPb-0005pD-0A; Fri, 03 May 2019 14:11:11 +0800
+        id 1hMRNL-0005m0-P4; Fri, 03 May 2019 14:08:51 +0800
 Received: from herbert by gondobar with local (Exim 4.89)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1hMRPa-0003EY-SN; Fri, 03 May 2019 14:11:10 +0800
-Date:   Fri, 3 May 2019 14:11:10 +0800
+        id 1hMRNI-0003By-3L; Fri, 03 May 2019 14:08:48 +0800
+Date:   Fri, 3 May 2019 14:08:48 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Yue Haibing <yuehaibing@huawei.com>
-Cc:     gilad@benyossef.com, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, davem@davemloft.net
-Subject: Re: [PATCH v2 -next] crypto: ccree - remove set but not used
- variable 'du_size'
-Message-ID: <20190503061110.sknqnrr3gsqiynnc@gondor.apana.org.au>
-References: <20190426151821.36944-1-yuehaibing@huawei.com>
- <20190428082827.38184-1-yuehaibing@huawei.com>
+To:     Christian Lamparter <chunkeey@gmail.com>
+Cc:     linux-crypto@vger.kernel.org, Kees Cook <keescook@chromium.org>,
+        Eric Biggers <ebiggers@google.com>, stable@vger.kernel.org
+Subject: Re: [PATCH 1/4] crypto4xx: fix ctr-aes missing output IV
+Message-ID: <20190503060847.egfmvu2heoq62hsr@gondor.apana.org.au>
+References: <4c860f87b9339da1d1f700ba6a56a7a5e2eb14da.1555932334.git.chunkeey@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190428082827.38184-1-yuehaibing@huawei.com>
+In-Reply-To: <4c860f87b9339da1d1f700ba6a56a7a5e2eb14da.1555932334.git.chunkeey@gmail.com>
 User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Apr 28, 2019 at 04:28:27PM +0800, Yue Haibing wrote:
-> From: YueHaibing <yuehaibing@huawei.com>
+On Mon, Apr 22, 2019 at 01:25:58PM +0200, Christian Lamparter wrote:
+> Commit 8efd972ef96a ("crypto: testmgr - support checking skcipher output IV")
+> caused the crypto4xx driver to produce the following error:
 > 
-> Fixes gcc '-Wunused-but-set-variable' warning:
+> | ctr-aes-ppc4xx encryption test failed (wrong output IV)
+> | on test vector 0, cfg="in-place"
 > 
-> drivers/crypto/ccree/cc_cipher.c: In function cc_setup_key_desc:
-> drivers/crypto/ccree/cc_cipher.c:645:15: warning: variable du_size set but not used [-Wunused-but-set-variable]
+> This patch fixes this by reworking the crypto4xx_setkey_aes()
+> function to:
 > 
-> It is never used since introduction in
-> commit dd8486c75085 ("crypto: ccree - move key load desc. before flow desc.")
+>  - not save the iv for ECB (as per 18.2.38 CRYP0_SA_CMD_0:
+>    "This bit mut be cleared for DES ECB mode or AES ECB mode,
+>    when no IV is used.")
 > 
-> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+>  - instruct the hardware to save the generated IV for all
+>    other modes of operations that have IV and then supply
+>    it back to the callee in pretty much the same way as we
+>    do it for cbc-aes already.
+> 
+>  - make it clear that the DIR_(IN|OUT)BOUND is the important
+>    bit that tells the hardware to encrypt or decrypt the data.
+>    (this is cosmetic - but it hopefully prevents me from
+>     getting confused again).
+> 
+>  - don't load any bogus hash when we don't use any hash
+>    operation to begin with.
+> 
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Christian Lamparter <chunkeey@gmail.com>
 > ---
->  drivers/crypto/ccree/cc_cipher.c | 8 --------
->  1 file changed, 8 deletions(-)
+>  drivers/crypto/amcc/crypto4xx_alg.c | 12 +++++++++---
+>  1 file changed, 9 insertions(+), 3 deletions(-)
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
