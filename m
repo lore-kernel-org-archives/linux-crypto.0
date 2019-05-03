@@ -2,189 +2,112 @@ Return-Path: <SRS0=LfhG=TD=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2BE6C04AAA
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 May 2019 11:46:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3AD4C43219
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 May 2019 12:06:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B35FE2075E
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 May 2019 11:46:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BLYsTAEQ"
+	by mail.kernel.org (Postfix) with ESMTP id 7F77C206C3
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 May 2019 12:06:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727725AbfECLqw (ORCPT
+        id S1727022AbfECMGA (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 3 May 2019 07:46:52 -0400
-Received: from mail-ed1-f67.google.com ([209.85.208.67]:38818 "EHLO
-        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726377AbfECLqv (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 3 May 2019 07:46:51 -0400
-Received: by mail-ed1-f67.google.com with SMTP id w11so5654656edl.5;
-        Fri, 03 May 2019 04:46:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=SUzz8Pj0c+WsqXtdVpJDOr7+714Bl6dV3H6hlHSl0LM=;
-        b=BLYsTAEQbWzcmkgKtrINtG//3ZRMga0gWmXJLigpWRHQ4USXwWTqw1l8wD0qzh20hD
-         JUWYn3ZkWjxkO3haBqi9UEgZM/jGJ4aL284bYTv3yHTW05lXjfANyUaMCCxUVghy2eCL
-         iLpfJWRFUZM9wKRYuBwNlEK80YYvdiwcK1atJ47vspLKa6HLVWE+n19owJq/CiSWA5v6
-         WjH9Qa/LnMokZmyzka7CrERdr2lXN4c1Q4ItUKc7ttZeUTAAhycVcuzp9EbPny+52X/m
-         doMI6moqWm6T+8oSWhSHB6c30bMPctIaTjxqwmV1OyJ/2EaXDWhrEZxBNGVxCfCePzCn
-         whIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=SUzz8Pj0c+WsqXtdVpJDOr7+714Bl6dV3H6hlHSl0LM=;
-        b=bql5bwZvQqeWh7673VRmM4U2mTVgvfDK5kSkoXiG32I0QQrtMhhZBpnw7CKem7owQv
-         1U9FHOpyj/FXkwbLr0vyEfSW+iEm1CNFZ1vj/Icc07XgaSWfja8WAQVtVDAvAqLGXw4n
-         2ncPyKM3uESdj52zCQzz3uv83Nc3kG93kEgjRRAR5X8RqrBCX/iEtqIUCQZE+LEshVP7
-         08UPelbS3F1RBy9oit6D5jOs8OFuOf45Qh5PFlNau8WLL8b57XA5es8JNCTYpC4b8Pa0
-         f4XBy76kFk743mlLXqER4lr5KtCcDkBZ9Felf4f3lMiaFoxQPeaAkh6hB1nsUvsTg2MA
-         7psg==
-X-Gm-Message-State: APjAAAVFXiYpRPlcHLwMh4AeUaDJm3SGzSe6NF6hUQpysd2x2IfAoJiH
-        ueZovU70rq5Z3+BldCrHtYLHk8n93Xm4nVavLxs4skT4A8aorg==
-X-Google-Smtp-Source: APXvYqzI2yRSX1xo2ruyfnRuglypC4T2+7PoJVl/qekpcw1bEuTrwQXLJp0KS8WKs2z1Ktr2lHiCBJTu5Koglbaa7kc=
-X-Received: by 2002:a50:9785:: with SMTP id e5mr7740641edb.94.1556884009023;
- Fri, 03 May 2019 04:46:49 -0700 (PDT)
+        Fri, 3 May 2019 08:06:00 -0400
+Received: from inva021.nxp.com ([92.121.34.21]:57670 "EHLO inva021.nxp.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726047AbfECMGA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 3 May 2019 08:06:00 -0400
+Received: from inva021.nxp.com (localhost [127.0.0.1])
+        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 9B1A82001BF;
+        Fri,  3 May 2019 14:05:58 +0200 (CEST)
+Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
+        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 8ED7820011D;
+        Fri,  3 May 2019 14:05:58 +0200 (CEST)
+Received: from fsr-ub1864-014.ea.freescale.net (fsr-ub1864-014.ea.freescale.net [10.171.95.219])
+        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 4525E205F4;
+        Fri,  3 May 2019 14:05:58 +0200 (CEST)
+From:   =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        linux-crypto@vger.kernel.org, NXP Linux Team <linux-imx@nxp.com>,
+        Iuliana Prodan <iuliana.prodan@nxp.com>
+Subject: [PATCH] crypto: caam - fix DKP detection logic
+Date:   Fri,  3 May 2019 15:05:48 +0300
+Message-Id: <20190503120548.5576-1-horia.geanta@nxp.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-From:   Elena Reshetova <elena.reshetova@gmail.com>
-Date:   Fri, 3 May 2019 14:46:38 +0300
-Message-ID: <CALrft9-KhB8WZpZHoyd3uDN-ryX=pnSV6=5QEvZAe2YCV9aBYA@mail.gmail.com>
-Subject: [ANNOUNCE][CFP] Linux Security Summit Europe 2019
-To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        selinux@vger.kernel.org, linux-security-module@vger.kernel.org,
-        linux-integrity@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D
-                            ANNOUNCEMENT AND CALL FOR PARTICIPATION
-                                LINUX SECURITY SUMMIT EUROPE 2019
+The detection whether DKP (Derived Key Protocol) is used relies on
+the setkey callback.
+Since "aead_setkey" was replaced in some cases with "des3_aead_setkey"
+(for 3DES weak key checking), the logic has to be updated - otherwise
+the DMA mapping direction is incorrect (leading to faults in case caam
+is behind an IOMMU).
 
-                                        31 October =E2=80=93 1 November
-                                                Lyon, France
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D
+Fixes: 1b52c40919e6 ("crypto: caam - Forbid 2-key 3DES in FIPS mode")
+Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
+---
 
-DESCRIPTION
+This issue was noticed when testing with previously submitted IOMMU support:
+https://patchwork.kernel.org/project/linux-crypto/list/?series=110277&state=*
 
-The Linux Security Summit (LSS) is a technical forum for collaboration
-between Linux developers, researchers, and end users. Its primary aim is to
-foster community efforts in analyzing and solving Linux security challenges=
-.
+ drivers/crypto/caam/caamalg.c     | 3 ++-
+ drivers/crypto/caam/caamalg_qi.c  | 3 ++-
+ drivers/crypto/caam/caamalg_qi2.c | 3 ++-
+ 3 files changed, 6 insertions(+), 3 deletions(-)
 
-This year, for the second time, the Linux Security Summit is going to
-be also held in Europe (LSS-EU) in order to facilitate broader participatio=
-n
-in Linux security development.
-Similar to LSS-North America, LSS-EU provides a unique opportunity for to h=
-ave
-discussions and networking opportunities with key people in the Linux kerne=
-l
-security community, present your work and ideas and affect the future direc=
-tion
-of Linux security.
+diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
+index 0030cee3e75d..015fca99d867 100644
+--- a/drivers/crypto/caam/caamalg.c
++++ b/drivers/crypto/caam/caamalg.c
+@@ -3418,7 +3418,8 @@ static int caam_aead_init(struct crypto_aead *tfm)
+ 	struct caam_ctx *ctx = crypto_aead_ctx(tfm);
+ 
+ 	return caam_init_common(ctx, &caam_alg->caam,
+-				alg->setkey == aead_setkey);
++				alg->setkey == aead_setkey ||
++				alg->setkey == des3_aead_setkey);
+ }
+ 
+ static void caam_exit_common(struct caam_ctx *ctx)
+diff --git a/drivers/crypto/caam/caamalg_qi.c b/drivers/crypto/caam/caamalg_qi.c
+index 70af211d2d01..4d98f5664d3e 100644
+--- a/drivers/crypto/caam/caamalg_qi.c
++++ b/drivers/crypto/caam/caamalg_qi.c
+@@ -2434,7 +2434,8 @@ static int caam_aead_init(struct crypto_aead *tfm)
+ 	struct caam_ctx *ctx = crypto_aead_ctx(tfm);
+ 
+ 	return caam_init_common(ctx, &caam_alg->caam,
+-				alg->setkey == aead_setkey);
++				alg->setkey == aead_setkey ||
++				alg->setkey == des3_aead_setkey);
+ }
+ 
+ static void caam_exit_common(struct caam_ctx *ctx)
+diff --git a/drivers/crypto/caam/caamalg_qi2.c b/drivers/crypto/caam/caamalg_qi2.c
+index 33a4df6b81de..5977e615ff10 100644
+--- a/drivers/crypto/caam/caamalg_qi2.c
++++ b/drivers/crypto/caam/caamalg_qi2.c
+@@ -1480,7 +1480,8 @@ static int caam_cra_init_aead(struct crypto_aead *tfm)
+ 
+ 	crypto_aead_set_reqsize(tfm, sizeof(struct caam_request));
+ 	return caam_cra_init(crypto_aead_ctx(tfm), &caam_alg->caam,
+-			     alg->setkey == aead_setkey);
++			     alg->setkey == aead_setkey ||
++			     alg->setkey == des3_aead_setkey);
+ }
+ 
+ static void caam_exit_common(struct caam_ctx *ctx)
+-- 
+2.17.1
 
-The program committee currently seeks proposals for:
-
-    * Refereed Presentations:
-        45 minutes in length.
-
-    * Panel Discussion Topics:
-        45 minutes in length.
-
-    * Short Topics:
-        30 minutes in total, including at least 10 minutes discussion.
-
-    * BoF Sessions.
-
-    * Tutorials *NEW for 2019*:
-        90 minutes in length.
-        Tutorial sessions should be focused on advanced Linux security defe=
-nse
-        topics within areas such as the kernel, compiler, and security-rela=
-ted
-        libraries. Priority will be given to tutorials created for
-this conference.
-
-Topic areas include, but are not limited to:
-
-    * Kernel self-protection
-    * Access control
-    * Cryptography and key management
-    * Integrity control
-    * Hardware Security
-    * Iot and embedded security
-    * Virtualization and containers
-    * System-specific system hardening
-    * Case studies
-    * Security tools
-    * Security UX
-    * Emerging technologies, threats & techniques
-
-Proposals should be submitted via:
- https://linuxfoundation.smapply.io/prog/lss_eu_2019/
-
-DATES
-
- * CFP Close: Wednesday , July 31, 2019
- * CFP Notifications: Friday, August 9, 2019
- * Schedule Announced: Monday, August 19, 2019
- * Event: October 31 =E2=80=93 November 1, 2019
-
-
-WHO SHOULD ATTEND
-
- We're seeking a diverse range of attendees, and welcome participation by
- people involved in Linux security development, operations, and research.
-
- The LSS is a unique global event which provides the opportunity to present
- and discuss your work or research with key Linux security community member=
-s
- and maintainers. It?s also useful for those who wish to keep up with the
- latest in Linux security development, and to provide input to the
- development process.
-
-WEB SITE
-
- https://events.linuxfoundation.org/events/linux-security-summit-europe-201=
-9/
-
-TWITTER
-
- For event updates and announcements, follow:
-
- https://twitter.com/LinuxSecSummit
-
-PROGRAM COMMITTEE
-
- The program committee for LSS-EU 2019 is:
-
-    * Elena Reshetova, Intel
-    * James Morris, Microsoft
-    * Serge Hallyn, Cisco
-    * Paul Moore, Cisco
-    * Stephen Smalley, NSA
-    * John Johansen, Canonical
-    * Kees Cook, Google
-    * Casey Schaufler, Intel
-    * Mimi Zohar, IBM
-    * David A. Wheeler, Institute for Defense Analyses
-
-The program committee may be contacted as a group via email:
- lss-pc () lists.linuxfoundation.org
