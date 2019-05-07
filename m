@@ -2,79 +2,209 @@ Return-Path: <SRS0=09OG=TH=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_PASS,
-	T_DKIMWL_WL_HIGH autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
+	T_DKIMWL_WL_HIGH,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4D4EC04A6B
-	for <linux-crypto@archiver.kernel.org>; Tue,  7 May 2019 03:25:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDEA7C004C9
+	for <linux-crypto@archiver.kernel.org>; Tue,  7 May 2019 05:49:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 789D521019
-	for <linux-crypto@archiver.kernel.org>; Tue,  7 May 2019 03:25:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AE50F205ED
+	for <linux-crypto@archiver.kernel.org>; Tue,  7 May 2019 05:49:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1557199520;
-	bh=A5GABfHaZbrF7j5aDHnPitrUiAk9/KZEsOuCCMwR9AQ=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
-	b=Tv1v5WbPermULDfA8C/Pj2s8DyJceMzPfr2evoKgGXMMdAZDrtaPR3jLdE7qZW5ea
-	 foenZiCG8QnKgQ4ID2LXHyd1L0cvcMx17GRvYz/r2lxERGPKtRjAh5cX1zHW3R+GgM
-	 9hzrNBlsIMzdEOQdUxeMbQN8P5G+lUoU9sH7HXOE=
+	s=default; t=1557208173;
+	bh=vHZe3uduaFSrPSwGHGXSIurZ6mFW3HgdPpMWiMpWwxs=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=ZuiyReRcXMI5nQ4hb5YI8gmjZckcQyi2ihUxZgUwq51GsGQgH7M8fYu3GoCHXjMEg
+	 unQXMbXc9ul87ERL156D0VOYRSXrteJH3lkFe8umaaqY3D1josX4l/GS5FZjmXxy8C
+	 uov7HCpvw7WeY1V8+xiY+PPlgi8N85v/UcaHYLJ8=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726878AbfEGDZE (ORCPT
+        id S1728314AbfEGFk1 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 6 May 2019 23:25:04 -0400
-Received: from mail.kernel.org ([198.145.29.99]:55208 "EHLO mail.kernel.org"
+        Tue, 7 May 2019 01:40:27 -0400
+Received: from mail.kernel.org ([198.145.29.99]:59926 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726863AbfEGDZE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 6 May 2019 23:25:04 -0400
-Subject: Re: [GIT] Crypto Update for 5.2
+        id S1728317AbfEGFk1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 7 May 2019 01:40:27 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id B489B214AE;
+        Tue,  7 May 2019 05:40:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1557199503;
-        bh=A5GABfHaZbrF7j5aDHnPitrUiAk9/KZEsOuCCMwR9AQ=;
-        h=From:In-Reply-To:References:Date:To:Cc:From;
-        b=J+ztFMQOqVfeYWertxPkjoL3J/vkPR9cKeik+427L9NiF3uTN/MkJz2h4Vi9/sDhS
-         ozRLxf4LNrDMzORF/U1axGAVz8BsVoHAEnfyj+5wsxSIsOVwsRswcyD4ugtKQ/i4w8
-         Waxrg3dmiCRUu13boKIiJdndDvIvl5wsvzyPk/AY=
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20190506032938.fgyw2qupyktvsx7w@gondor.apana.org.au>
-References: <20180212031702.GA26153@gondor.apana.org.au>
- <20180428080517.haxgpvqrwgotakyo@gondor.apana.org.au>
- <20180622145403.6ltjip7che227fuo@gondor.apana.org.au>
- <20180829033353.agnzxra3jk2r2mzg@gondor.apana.org.au>
- <20181116063146.e7a3mep3ghnfltxe@gondor.apana.org.au>
- <20181207061409.xflg423nknleuddw@gondor.apana.org.au>
- <20190118104006.ye5amhxkgd4xrbmc@gondor.apana.org.au>
- <20190201054204.ehl7u7aaqmkdh5b6@gondor.apana.org.au>
- <20190215024738.fynl64d5u5htcy2l@gondor.apana.org.au>
- <20190305081155.7rpkydnc4ipm43o6@gondor.apana.org.au>
- <20190506032938.fgyw2qupyktvsx7w@gondor.apana.org.au>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20190506032938.fgyw2qupyktvsx7w@gondor.apana.org.au>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
-X-PR-Tracked-Commit-Id: e59f755ceb6d6f39f90899d2a4e39c3e05837e12
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 81ff5d2cba4f86cd850b9ee4a530cd221ee45aa3
-Message-Id: <155719950316.20841.8532149559553493918.pr-tracker-bot@kernel.org>
-Date:   Tue, 07 May 2019 03:25:03 +0000
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+        s=default; t=1557207626;
+        bh=vHZe3uduaFSrPSwGHGXSIurZ6mFW3HgdPpMWiMpWwxs=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=tH46lFajqXfjyVjNf+etMMQ2e+VLoAoOPtxPS8HSJ58k3IzvESr4n84VpxlsfZ0SJ
+         nqXuvNoHQ0qa5BVXS8jDSF7WOg/tLZUkoxJmntSjgLJfEzHDHcvGDMSmoUwTiJvJa0
+         esJGHb1XH7adwPDAlSxjCtzihYSqVuMUH9I8PzR0=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Sasha Levin <alexander.levin@microsoft.com>,
+        linux-crypto@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.14 64/95] crypto: testmgr - add AES-CFB tests
+Date:   Tue,  7 May 2019 01:37:53 -0400
+Message-Id: <20190507053826.31622-64-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190507053826.31622-1-sashal@kernel.org>
+References: <20190507053826.31622-1-sashal@kernel.org>
+MIME-Version: 1.0
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The pull request you sent on Mon, 6 May 2019 11:29:38 +0800:
+From: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+[ Upstream commit 7da66670775d201f633577f5b15a4bbeebaaa2b0 ]
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/81ff5d2cba4f86cd850b9ee4a530cd221ee45aa3
+Add AES128/192/256-CFB testvectors from NIST SP800-38A.
 
-Thank you!
+Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Cc: stable@vger.kernel.org
+Signed-off-by: Dmitry Eremin-Solenikov <dbaryshkov@gmail.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Sasha Levin <alexander.levin@microsoft.com>
+---
+ crypto/tcrypt.c  |  5 ++++
+ crypto/testmgr.c |  7 +++++
+ crypto/testmgr.h | 76 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 88 insertions(+)
 
+diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
+index f7affe7cf0b4..76df552f099b 100644
+--- a/crypto/tcrypt.c
++++ b/crypto/tcrypt.c
+@@ -1099,6 +1099,7 @@ static int do_test(const char *alg, u32 type, u32 mask, int m)
+ 		ret += tcrypt_test("xts(aes)");
+ 		ret += tcrypt_test("ctr(aes)");
+ 		ret += tcrypt_test("rfc3686(ctr(aes))");
++		ret += tcrypt_test("cfb(aes)");
+ 		break;
+ 
+ 	case 11:
+@@ -1422,6 +1423,10 @@ static int do_test(const char *alg, u32 type, u32 mask, int m)
+ 				speed_template_16_24_32);
+ 		test_cipher_speed("ctr(aes)", DECRYPT, sec, NULL, 0,
+ 				speed_template_16_24_32);
++		test_cipher_speed("cfb(aes)", ENCRYPT, sec, NULL, 0,
++				speed_template_16_24_32);
++		test_cipher_speed("cfb(aes)", DECRYPT, sec, NULL, 0,
++				speed_template_16_24_32);
+ 		break;
+ 
+ 	case 201:
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index d91278c01ea8..e65c8228ea47 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -2631,6 +2631,13 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 				.dec = __VECS(aes_ccm_dec_tv_template)
+ 			}
+ 		}
++	}, {
++		.alg = "cfb(aes)",
++		.test = alg_test_skcipher,
++		.fips_allowed = 1,
++		.suite = {
++			.cipher = __VECS(aes_cfb_tv_template)
++		},
+ 	}, {
+ 		.alg = "chacha20",
+ 		.test = alg_test_skcipher,
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index 12835f072614..5bd9c1400fee 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -16071,6 +16071,82 @@ static const struct cipher_testvec aes_cbc_dec_tv_template[] = {
+ 	},
+ };
+ 
++static const struct cipher_testvec aes_cfb_tv_template[] = {
++	{ /* From NIST SP800-38A */
++		.key	= "\x2b\x7e\x15\x16\x28\xae\xd2\xa6"
++			  "\xab\xf7\x15\x88\x09\xcf\x4f\x3c",
++		.klen	= 16,
++		.iv	= "\x00\x01\x02\x03\x04\x05\x06\x07"
++			  "\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f",
++		.ptext	= "\x6b\xc1\xbe\xe2\x2e\x40\x9f\x96"
++			  "\xe9\x3d\x7e\x11\x73\x93\x17\x2a"
++			  "\xae\x2d\x8a\x57\x1e\x03\xac\x9c"
++			  "\x9e\xb7\x6f\xac\x45\xaf\x8e\x51"
++			  "\x30\xc8\x1c\x46\xa3\x5c\xe4\x11"
++			  "\xe5\xfb\xc1\x19\x1a\x0a\x52\xef"
++			  "\xf6\x9f\x24\x45\xdf\x4f\x9b\x17"
++			  "\xad\x2b\x41\x7b\xe6\x6c\x37\x10",
++		.ctext	= "\x3b\x3f\xd9\x2e\xb7\x2d\xad\x20"
++			  "\x33\x34\x49\xf8\xe8\x3c\xfb\x4a"
++			  "\xc8\xa6\x45\x37\xa0\xb3\xa9\x3f"
++			  "\xcd\xe3\xcd\xad\x9f\x1c\xe5\x8b"
++			  "\x26\x75\x1f\x67\xa3\xcb\xb1\x40"
++			  "\xb1\x80\x8c\xf1\x87\xa4\xf4\xdf"
++			  "\xc0\x4b\x05\x35\x7c\x5d\x1c\x0e"
++			  "\xea\xc4\xc6\x6f\x9f\xf7\xf2\xe6",
++		.len	= 64,
++	}, {
++		.key	= "\x8e\x73\xb0\xf7\xda\x0e\x64\x52"
++			  "\xc8\x10\xf3\x2b\x80\x90\x79\xe5"
++			  "\x62\xf8\xea\xd2\x52\x2c\x6b\x7b",
++		.klen	= 24,
++		.iv	= "\x00\x01\x02\x03\x04\x05\x06\x07"
++			  "\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f",
++		.ptext	= "\x6b\xc1\xbe\xe2\x2e\x40\x9f\x96"
++			  "\xe9\x3d\x7e\x11\x73\x93\x17\x2a"
++			  "\xae\x2d\x8a\x57\x1e\x03\xac\x9c"
++			  "\x9e\xb7\x6f\xac\x45\xaf\x8e\x51"
++			  "\x30\xc8\x1c\x46\xa3\x5c\xe4\x11"
++			  "\xe5\xfb\xc1\x19\x1a\x0a\x52\xef"
++			  "\xf6\x9f\x24\x45\xdf\x4f\x9b\x17"
++			  "\xad\x2b\x41\x7b\xe6\x6c\x37\x10",
++		.ctext	= "\xcd\xc8\x0d\x6f\xdd\xf1\x8c\xab"
++			  "\x34\xc2\x59\x09\xc9\x9a\x41\x74"
++			  "\x67\xce\x7f\x7f\x81\x17\x36\x21"
++			  "\x96\x1a\x2b\x70\x17\x1d\x3d\x7a"
++			  "\x2e\x1e\x8a\x1d\xd5\x9b\x88\xb1"
++			  "\xc8\xe6\x0f\xed\x1e\xfa\xc4\xc9"
++			  "\xc0\x5f\x9f\x9c\xa9\x83\x4f\xa0"
++			  "\x42\xae\x8f\xba\x58\x4b\x09\xff",
++		.len	= 64,
++	}, {
++		.key	= "\x60\x3d\xeb\x10\x15\xca\x71\xbe"
++			  "\x2b\x73\xae\xf0\x85\x7d\x77\x81"
++			  "\x1f\x35\x2c\x07\x3b\x61\x08\xd7"
++			  "\x2d\x98\x10\xa3\x09\x14\xdf\xf4",
++		.klen	= 32,
++		.iv	= "\x00\x01\x02\x03\x04\x05\x06\x07"
++			  "\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f",
++		.ptext	= "\x6b\xc1\xbe\xe2\x2e\x40\x9f\x96"
++			  "\xe9\x3d\x7e\x11\x73\x93\x17\x2a"
++			  "\xae\x2d\x8a\x57\x1e\x03\xac\x9c"
++			  "\x9e\xb7\x6f\xac\x45\xaf\x8e\x51"
++			  "\x30\xc8\x1c\x46\xa3\x5c\xe4\x11"
++			  "\xe5\xfb\xc1\x19\x1a\x0a\x52\xef"
++			  "\xf6\x9f\x24\x45\xdf\x4f\x9b\x17"
++			  "\xad\x2b\x41\x7b\xe6\x6c\x37\x10",
++		.ctext	= "\xdc\x7e\x84\xbf\xda\x79\x16\x4b"
++			  "\x7e\xcd\x84\x86\x98\x5d\x38\x60"
++			  "\x39\xff\xed\x14\x3b\x28\xb1\xc8"
++			  "\x32\x11\x3c\x63\x31\xe5\x40\x7b"
++			  "\xdf\x10\x13\x24\x15\xe5\x4b\x92"
++			  "\xa1\x3e\xd0\xa8\x26\x7a\xe2\xf9"
++			  "\x75\xa3\x85\x74\x1a\xb9\xce\xf8"
++			  "\x20\x31\x62\x3d\x55\xb1\xe4\x71",
++		.len	= 64,
++	},
++};
++
+ static const struct aead_testvec hmac_md5_ecb_cipher_null_enc_tv_template[] = {
+ 	{ /* Input data from RFC 2410 Case 1 */
+ #ifdef __LITTLE_ENDIAN
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.wiki.kernel.org/userdoc/prtracker
+2.20.1
+
