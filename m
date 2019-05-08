@@ -2,271 +2,148 @@ Return-Path: <SRS0=esIh=TI=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,
+	T_DKIMWL_WL_HIGH autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3695C04A6B
-	for <linux-crypto@archiver.kernel.org>; Wed,  8 May 2019 14:19:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AECE0C04A6B
+	for <linux-crypto@archiver.kernel.org>; Wed,  8 May 2019 21:08:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C82CA20656
-	for <linux-crypto@archiver.kernel.org>; Wed,  8 May 2019 14:19:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7C81A20989
+	for <linux-crypto@archiver.kernel.org>; Wed,  8 May 2019 21:08:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="gCvNDGw2"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="UwXq7RG5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726803AbfEHOTe (ORCPT
+        id S1727306AbfEHVIn (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 8 May 2019 10:19:34 -0400
-Received: from mo4-p00-ob.smtp.rzone.de ([85.215.255.21]:16472 "EHLO
-        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725910AbfEHOTe (ORCPT
+        Wed, 8 May 2019 17:08:43 -0400
+Received: from mail-ua1-f67.google.com ([209.85.222.67]:34637 "EHLO
+        mail-ua1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726709AbfEHVIn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 8 May 2019 10:19:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1557325166;
-        s=strato-dkim-0002; d=chronox.de;
-        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
-        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-        bh=RKbfp2ss0Hv6XDqI9q2Nse6jbX3OOO1p2WuS3sB56PQ=;
-        b=gCvNDGw2WkxqhQgakPa98suEaPMe83yHYNJ+aWY1OVW9U5cMmiFAgwBy+KgczIcGA2
-        S3kbJSPLvwHH9cGAM0LntePjLraF6cIBjQ7uWa2xz6SYz8CUmB3Mt6QgOqKmyRp5w1Yb
-        lkrdLlUpM2aq1+QMo6Rqm9K7Vzh1CzyR/9klFwBvRWlPCWCGrx/BzMy3p9vwd9PqfxRY
-        FLjmJJuQaIZ4hFsmiMv6Oly1Zqk/I5jzRD6GLvk5odsXDCJABqi4sdlx2uWdaiM+C72d
-        11q4XUejNKPa04DuJ0n/rajrafKt1BqyVPY3TN9/r5LWOV0EZhEYmvidjLC8fQYnbGzj
-        NR+w==
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9zT8DNpa83PTIPmvqWZCjR6sTOEFYGrr6fYEWtj50iTqrxGYH8peQ"
-X-RZG-CLASS-ID: mo00
-Received: from tauon.chronox.de
-        by smtp.strato.de (RZmta 44.18 AUTH)
-        with ESMTPSA id R0373fv48EJPBvT
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (curve secp521r1 with 521 ECDH bits, eq. 15360 bits RSA))
-        (Client did not present a certificate);
-        Wed, 8 May 2019 16:19:25 +0200 (CEST)
-From:   Stephan Mueller <smueller@chronox.de>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Yann Droneaud <ydroneaud@opteya.com>, linux-crypto@vger.kernel.org
-Subject: [PATCH v6] crypto: DRBG - add FIPS 140-2 CTRNG for noise source
-Date:   Wed, 08 May 2019 16:19:24 +0200
-Message-ID: <1778495.GGYfhorZbc@tauon.chronox.de>
-In-Reply-To: <74c517ac2c654a7372af731a67e24743c843e157.camel@opteya.com>
-References: <1852500.fyBc0DU23F@positron.chronox.de> <1654549.mqJkfNR9fV@positron.chronox.de> <74c517ac2c654a7372af731a67e24743c843e157.camel@opteya.com>
+        Wed, 8 May 2019 17:08:43 -0400
+Received: by mail-ua1-f67.google.com with SMTP id f9so7937707ual.1
+        for <linux-crypto@vger.kernel.org>; Wed, 08 May 2019 14:08:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=85jAqiZ3rdqGfRvDGF/DUutEfAhFjbADqQZ1rKThcjI=;
+        b=UwXq7RG5GbFeEc83Dhtk4yt40YEVN6o9JoBGv+9ERexPqq8oo2r5vW6MQbaxvQJruM
+         qVzsMwdsJFIKh1gnJ1TchbHrGKlvv65iFVA+AjaqqHluvK1ywrlFGVWuNt/JOMxqwlQU
+         IDVJi+FZd3XpMZTQkuqI4l6ltLywx1nG4LFLI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=85jAqiZ3rdqGfRvDGF/DUutEfAhFjbADqQZ1rKThcjI=;
+        b=btajeKV+uCmn8WPUkIh3IuMqSGlV9JBF1yAXtxRgGHqN2MNkS307/5GfBS/jCoGYRx
+         hGh++1lq4AgI9ypkKs192SqvBH6ASFDDJb5pp4apBkznK8rYEemxHy/jFk1Oj8PfxlXY
+         1XWK7qhkS20ve7dyy/wSB5dsCIBMxfp/PA4N9JgyXoXJI4+p/XgPxHKZc3IcOseU+N+x
+         XTvn/z2Q8sldfQpngJ04TJTnowILb4Qg0geJdjQjfqLri3O1U6/aVG3DPusL8cUTySry
+         bEJiihDoDP4cE3LR++p7RYibibDsxXH/IoLlbSfsHP07D1w1TuJQ/0JdBS1oX1t3RkQ7
+         TxNA==
+X-Gm-Message-State: APjAAAX6LqME9HB9fMGPigsbh53GFmBRisvGqMXANyiJreUUkaGuJyRA
+        YqreVb2G5GVXi6/95gKCTVbBymYQjOE=
+X-Google-Smtp-Source: APXvYqy9duICY0mMwmVOzpuT7DaPSlJGEUJhchDTqWbPEhmkk3UnCOG/poR7FWtWFiCaOUp8EgTZHw==
+X-Received: by 2002:a9f:204a:: with SMTP id 68mr22105059uam.19.1557349721492;
+        Wed, 08 May 2019 14:08:41 -0700 (PDT)
+Received: from mail-vs1-f46.google.com (mail-vs1-f46.google.com. [209.85.217.46])
+        by smtp.gmail.com with ESMTPSA id 69sm6019vkl.6.2019.05.08.14.08.39
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Wed, 08 May 2019 14:08:40 -0700 (PDT)
+Received: by mail-vs1-f46.google.com with SMTP id g187so19372vsc.8
+        for <linux-crypto@vger.kernel.org>; Wed, 08 May 2019 14:08:39 -0700 (PDT)
+X-Received: by 2002:a67:7c8a:: with SMTP id x132mr251877vsc.172.1557349719455;
+ Wed, 08 May 2019 14:08:39 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+References: <20190507161321.34611-1-keescook@chromium.org> <20190507170039.GB1399@sol.localdomain>
+ <CAGXu5jL7pWWXuJMinghn+3GjQLLBYguEtwNdZSQy++XGpGtsHQ@mail.gmail.com>
+ <20190507215045.GA7528@sol.localdomain> <20190508133606.nsrzthbad5kynavp@gondor.apana.org.au>
+In-Reply-To: <20190508133606.nsrzthbad5kynavp@gondor.apana.org.au>
+From:   Kees Cook <keescook@chromium.org>
+Date:   Wed, 8 May 2019 14:08:25 -0700
+X-Gmail-Original-Message-ID: <CAGXu5jKdsuzX6KF74zAYw3PpEf8DExS9P0Y_iJrJVS+goHFbcA@mail.gmail.com>
+Message-ID: <CAGXu5jKdsuzX6KF74zAYw3PpEf8DExS9P0Y_iJrJVS+goHFbcA@mail.gmail.com>
+Subject: Re: [PATCH v3 0/7] crypto: x86: Fix indirect function call casts
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Eric Biggers <ebiggers@kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        Joao Moreira <jmoreira@suse.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>, X86 ML <x86@kernel.org>,
+        linux-crypto <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Kernel Hardening <kernel-hardening@lists.openwall.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-FIPS 140-2 section 4.9.2 requires a continuous self test of the noise
-source. Up to kernel 4.8 drivers/char/random.c provided this continuous
-self test. Afterwards it was moved to a location that is inconsistent
-with the FIPS 140-2 requirements. The relevant patch was
-e192be9d9a30555aae2ca1dc3aad37cba484cd4a .
+On Wed, May 8, 2019 at 6:36 AM Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> On Tue, May 07, 2019 at 02:50:46PM -0700, Eric Biggers wrote:
+> >
+> > I don't know yet.  It's difficult to read the code with 2 layers of macros.
+> >
+> > Hence why I asked why you didn't just change the prototypes to be compatible.
+>
+> I agree.  Kees, since you're changing this anyway please make it
+> look better not worse.
 
-Thus, the FIPS 140-2 CTRNG is added to the DRBG when it obtains the
-seed. This patch resurrects the function drbg_fips_continous_test that
-existed some time ago and applies it to the noise sources. The patch
-that removed the drbg_fips_continous_test was
-b3614763059b82c26bdd02ffcb1c016c1132aad0 .
+Do you mean I should use the typedefs in the new macros? I'm not aware
+of a way to use a typedef to declare a function body, so I had to
+repeat them. I'm open to suggestions!
 
-The Jitter RNG implements its own FIPS 140-2 self test and thus does not
-need to be subjected to the test in the DRBG.
+As far as "fixing the prototypes", the API is agnostic of the context
+type, and uses void *. And also it provides a way to call the same
+function with different pointer types on the other arguments:
 
-The patch contains a tiny fix to ensure proper zeroization in case of an
-error during the Jitter RNG data gathering.
+For example, quoting the existing code:
 
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
----
- crypto/drbg.c         | 94 +++++++++++++++++++++++++++++++++++++++++--
- include/crypto/drbg.h |  2 +
- 2 files changed, 93 insertions(+), 3 deletions(-)
+asmlinkage void twofish_dec_blk(struct twofish_ctx *ctx, u8 *dst,
+                                const u8 *src);
 
-diff --git a/crypto/drbg.c b/crypto/drbg.c
-index 2a5b16bb000c..b6929eb5f565 100644
---- a/crypto/drbg.c
-+++ b/crypto/drbg.c
-@@ -219,6 +219,57 @@ static inline unsigned short drbg_sec_strength(drbg_flag_t flags)
- 	}
- }
- 
-+/*
-+ * FIPS 140-2 continuous self test for the noise source
-+ * The test is performed on the noise source input data. Thus, the function
-+ * implicitly knows the size of the buffer to be equal to the security
-+ * strength.
-+ *
-+ * Note, this function disregards the nonce trailing the entropy data during
-+ * initial seeding.
-+ *
-+ * drbg->drbg_mutex must have been taken.
-+ *
-+ * @drbg DRBG handle
-+ * @entropy buffer of seed data to be checked
-+ *
-+ * return:
-+ *	0 on success
-+ *	-EAGAIN on when the CTRNG is not yet primed
-+ *	< 0 on error
-+ */
-+static int drbg_fips_continuous_test(struct drbg_state *drbg,
-+				     const unsigned char *entropy)
-+{
-+	unsigned short entropylen = drbg_sec_strength(drbg->core->flags);
-+	int ret = 0;
-+
-+	if (!IS_ENABLED(CONFIG_CRYPTO_FIPS))
-+		return 0;
-+
-+	/* skip test if we test the overall system */
-+	if (list_empty(&drbg->test_data.list))
-+		return 0;
-+	/* only perform test in FIPS mode */
-+	if (!fips_enabled)
-+		return 0;
-+
-+	if (!drbg->fips_primed) {
-+		/* Priming of FIPS test */
-+		memcpy(drbg->prev, entropy, entropylen);
-+		drbg->fips_primed = true;
-+		/* priming: another round is needed */
-+		return -EAGAIN;
-+	}
-+	ret = memcmp(drbg->prev, entropy, entropylen);
-+	if (!ret)
-+		panic("DRBG continuous self test failed\n");
-+	memcpy(drbg->prev, entropy, entropylen);
-+
-+	/* the test shall pass when the two values are not equal */
-+	return 0;
-+}
-+
- /*
-  * Convert an integer into a byte representation of this integer.
-  * The byte representation is big-endian
-@@ -998,6 +1049,22 @@ static inline int __drbg_seed(struct drbg_state *drbg, struct list_head *seed,
- 	return ret;
- }
- 
-+static inline int drbg_get_random_bytes(struct drbg_state *drbg,
-+					unsigned char *entropy,
-+					unsigned int entropylen)
-+{
-+	int ret;
-+
-+	do {
-+		get_random_bytes(entropy, entropylen);
-+		ret = drbg_fips_continuous_test(drbg, entropy);
-+		if (ret && ret != -EAGAIN)
-+			return ret;
-+	} while (ret);
-+
-+	return 0;
-+}
-+
- static void drbg_async_seed(struct work_struct *work)
- {
- 	struct drbg_string data;
-@@ -1006,16 +1073,20 @@ static void drbg_async_seed(struct work_struct *work)
- 					       seed_work);
- 	unsigned int entropylen = drbg_sec_strength(drbg->core->flags);
- 	unsigned char entropy[32];
-+	int ret;
- 
- 	BUG_ON(!entropylen);
- 	BUG_ON(entropylen > sizeof(entropy));
--	get_random_bytes(entropy, entropylen);
- 
- 	drbg_string_fill(&data, entropy, entropylen);
- 	list_add_tail(&data.list, &seedlist);
- 
- 	mutex_lock(&drbg->drbg_mutex);
- 
-+	ret = drbg_get_random_bytes(drbg, entropy, entropylen);
-+	if (ret)
-+		goto unlock;
-+
- 	/* If nonblocking pool is initialized, deactivate Jitter RNG */
- 	crypto_free_rng(drbg->jent);
- 	drbg->jent = NULL;
-@@ -1030,6 +1101,7 @@ static void drbg_async_seed(struct work_struct *work)
- 	if (drbg->seeded)
- 		drbg->reseed_threshold = drbg_max_requests(drbg);
- 
-+unlock:
- 	mutex_unlock(&drbg->drbg_mutex);
- 
- 	memzero_explicit(entropy, entropylen);
-@@ -1081,7 +1153,9 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
- 		BUG_ON((entropylen * 2) > sizeof(entropy));
- 
- 		/* Get seed from in-kernel /dev/urandom */
--		get_random_bytes(entropy, entropylen);
-+		ret = drbg_get_random_bytes(drbg, entropy, entropylen);
-+		if (ret)
-+			goto out;
- 
- 		if (!drbg->jent) {
- 			drbg_string_fill(&data1, entropy, entropylen);
-@@ -1094,7 +1168,7 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
- 						   entropylen);
- 			if (ret) {
- 				pr_devel("DRBG: jent failed with %d\n", ret);
--				return ret;
-+				goto out;
- 			}
- 
- 			drbg_string_fill(&data1, entropy, entropylen * 2);
-@@ -1121,6 +1195,7 @@ static int drbg_seed(struct drbg_state *drbg, struct drbg_string *pers,
- 
- 	ret = __drbg_seed(drbg, &seedlist, reseed);
- 
-+out:
- 	memzero_explicit(entropy, entropylen * 2);
- 
- 	return ret;
-@@ -1142,6 +1217,11 @@ static inline void drbg_dealloc_state(struct drbg_state *drbg)
- 	drbg->reseed_ctr = 0;
- 	drbg->d_ops = NULL;
- 	drbg->core = NULL;
-+	if (IS_ENABLED(CONFIG_CRYPTO_FIPS)) {
-+		kzfree(drbg->prev);
-+		drbg->prev = NULL;
-+		drbg->fips_primed = false;
-+	}
- }
- 
- /*
-@@ -1211,6 +1291,14 @@ static inline int drbg_alloc_state(struct drbg_state *drbg)
- 		drbg->scratchpad = PTR_ALIGN(drbg->scratchpadbuf, ret + 1);
- 	}
- 
-+	if (IS_ENABLED(CONFIG_CRYPTO_FIPS)) {
-+		drbg->prev = kzalloc(drbg_sec_strength(drbg->core->flags),
-+				     GFP_KERNEL);
-+		if (!drbg->prev)
-+			goto fini;
-+		drbg->fips_primed = false;
-+	}
-+
- 	return 0;
- 
- fini:
-diff --git a/include/crypto/drbg.h b/include/crypto/drbg.h
-index 3fb581bf3b87..8c9af21efce1 100644
---- a/include/crypto/drbg.h
-+++ b/include/crypto/drbg.h
-@@ -129,6 +129,8 @@ struct drbg_state {
- 
- 	bool seeded;		/* DRBG fully seeded? */
- 	bool pr;		/* Prediction resistance enabled? */
-+	bool fips_primed;	/* Continuous test primed? */
-+	unsigned char *prev;	/* FIPS 140-2 continuous test value */
- 	struct work_struct seed_work;	/* asynchronous seeding support */
- 	struct crypto_rng *jent;
- 	const struct drbg_state_ops *d_ops;
+Which is used for ecb and cbc:
+
+#define GLUE_FUNC_CAST(fn) ((common_glue_func_t)(fn))
+#define GLUE_CBC_FUNC_CAST(fn) ((common_glue_cbc_func_t)(fn))
+...
+static const struct common_glue_ctx twofish_dec = {
+...
+                .fn_u = { .ecb = GLUE_FUNC_CAST(twofish_dec_blk) }
+
+static const struct common_glue_ctx twofish_dec_cbc = {
+...
+                .fn_u = { .cbc = GLUE_CBC_FUNC_CAST(twofish_dec_blk) }
+
+which have different prototypes:
+
+typedef void (*common_glue_func_t)(void *ctx, u8 *dst, const u8 *src);
+typedef void (*common_glue_cbc_func_t)(void *ctx, u128 *dst, const u128 *src);
+...
+struct common_glue_func_entry {
+        unsigned int num_blocks; /* number of blocks that @fn will process */
+        union {
+                common_glue_func_t ecb;
+                common_glue_cbc_func_t cbc;
+                common_glue_ctr_func_t ctr;
+                common_glue_xts_func_t xts;
+        } fn_u;
+};
+
+What CFI dislikes is calling a func(void *ctx, ...) when the actual
+function is, for example, func(struct twofish_ctx *ctx, ...).
+
+This needs to be fixed at the call site, not the static initializers,
+and since the call site is void, there needs to be a static inline
+that will satisfy the types.
+
+I'm open to suggestions! :)
+
+Thanks,
+
 -- 
-2.21.0
-
-
-
-
+Kees Cook
