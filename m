@@ -2,121 +2,132 @@ Return-Path: <SRS0=8ziv=TJ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS,T_DKIMWL_WL_HIGH,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76D15C04AB1
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 May 2019 22:46:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1108AC04AB1
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 May 2019 23:01:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 447A8217D7
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 May 2019 22:46:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1557441971;
-	bh=i/UMiMU6i3kh02Y5CMeawWXg7Uk/18fTEcz2/cBnt1o=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:List-ID:From;
-	b=DxsXSb1Vdme3Ttn4E7xogatxkMXKOFUDcqo8DurlDUCrpgIGtmmy24OqPt5YV0m4I
-	 n1Lfb2jYdnZCdhAR3hlSXX5erPvaN9jfXpkUskhQsUnJhzPYKOth+9IAgWQwhti4H+
-	 aZ7E6MQ+FDGxZWLN4/Yn1B6PD2LmR0GrHEJ3UXr8=
+	by mail.kernel.org (Postfix) with ESMTP id D72A920850
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 May 2019 23:01:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726716AbfEIWqK (ORCPT
+        id S1726704AbfEIXBU (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 9 May 2019 18:46:10 -0400
-Received: from mail.kernel.org ([198.145.29.99]:51828 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726704AbfEIWqK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 9 May 2019 18:46:10 -0400
-Received: from localhost.localdomain (c-73-223-200-170.hsd1.ca.comcast.net [73.223.200.170])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 0482D21744;
-        Thu,  9 May 2019 22:46:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1557441969;
-        bh=i/UMiMU6i3kh02Y5CMeawWXg7Uk/18fTEcz2/cBnt1o=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=v1zS6auFvajq57Rx08XepDS9+BxKlnAsfiJE6vEXu1AOkb2uPx15xcbYvKsrlAt61
-         2KbSU8w3piMDzHLYya3gfgRlCAooT0BMWJyKLVa8zOfVzG64PpEkzZXL5emg0mrPQQ
-         WTnXS9rg037jj5nNdwWL1J3kIJfNwRA3+udzWj4w=
-Date:   Thu, 9 May 2019 15:46:08 -0700
-From:   Andrew Morton <akpm@linux-foundation.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     bugzilla-daemon@bugzilla.kernel.org, linux-crypto@vger.kernel.org,
-        mihai.dontu@gmail.com
-Subject: Re: [Bug 203559] New: usercopy_abort triggered by build_test_sglist
-Message-Id: <20190509154608.6bf58b45ac6492c8bd7fddeb@linux-foundation.org>
-In-Reply-To: <bug-203559-27@https.bugzilla.kernel.org/>
-References: <bug-203559-27@https.bugzilla.kernel.org/>
-X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.31; x86_64-pc-linux-gnu)
+        Thu, 9 May 2019 19:01:20 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41508 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726219AbfEIXBU (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 9 May 2019 19:01:20 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x49Mpfb5136440
+        for <linux-crypto@vger.kernel.org>; Thu, 9 May 2019 19:01:19 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2scuyktud4-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <linux-crypto@vger.kernel.org>; Thu, 09 May 2019 19:01:19 -0400
+Received: from localhost
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-crypto@vger.kernel.org> from <zohar@linux.ibm.com>;
+        Fri, 10 May 2019 00:01:16 +0100
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Fri, 10 May 2019 00:01:11 +0100
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x49N1AMv42991828
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 9 May 2019 23:01:10 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 53B33A405C;
+        Thu,  9 May 2019 23:01:10 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 904E9A406B;
+        Thu,  9 May 2019 23:01:08 +0000 (GMT)
+Received: from dhcp-9-31-103-88.watson.ibm.com (unknown [9.31.103.88])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu,  9 May 2019 23:01:08 +0000 (GMT)
+Subject: Re: [PATCH v10 09/12] ima: Implement support for module-style
+ appended signatures
+From:   Mimi Zohar <zohar@linux.ibm.com>
+To:     Thiago Jung Bauermann <bauerman@linux.ibm.com>,
+        linux-integrity@vger.kernel.org
+Cc:     linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Jessica Yu <jeyu@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jonathan Corbet <corbet@lwn.net>,
+        "AKASHI, Takahiro" <takahiro.akashi@linaro.org>
+Date:   Thu, 09 May 2019 19:01:08 -0400
+In-Reply-To: <20190418035120.2354-10-bauerman@linux.ibm.com>
+References: <20190418035120.2354-1-bauerman@linux.ibm.com>
+         <20190418035120.2354-10-bauerman@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.20.5 (3.20.5-1.fc24) 
 Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19050923-0008-0000-0000-000002E51248
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19050923-0009-0000-0000-000022519B3D
+Message-Id: <1557442868.10635.87.camel@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-09_02:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=3 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=956 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1905090130
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Hi Thiago,
 
-(switched to email.  Please respond via emailed reply-to-all, not via the
-bugzilla web interface).
+> diff --git a/security/integrity/ima/ima_policy.c b/security/integrity/ima/ima_policy.c
+> index fca7a3f23321..a7a20a8c15c1 100644
+> --- a/security/integrity/ima/ima_policy.c
+> +++ b/security/integrity/ima/ima_policy.c
+> @@ -1144,6 +1144,12 @@ void ima_delete_rules(void)
+>  	}
+>  }
+>  
+> +#define __ima_hook_stringify(str)	(#str),
+> +
+> +const char *const func_tokens[] = {
+> +	__ima_hooks(__ima_hook_stringify)
+> +};
+> +
+>  #ifdef	CONFIG_IMA_READ_POLICY
+>  enum {
+>  	mask_exec = 0, mask_write, mask_read, mask_append
+> @@ -1156,12 +1162,6 @@ static const char *const mask_tokens[] = {
+>  	"MAY_APPEND"
+>  };
+>  
+> -#define __ima_hook_stringify(str)	(#str),
+> -
+> -static const char *const func_tokens[] = {
+> -	__ima_hooks(__ima_hook_stringify)
+> -};
+> -
+>  void *ima_policy_start(struct seq_file *m, loff_t *pos)
+>  {
+>  	loff_t l = *pos;
 
-On Thu, 09 May 2019 09:37:08 +0000 bugzilla-daemon@bugzilla.kernel.org wrote:
+Is moving this something left over from previous versions or there is
+a need for this change?
 
-> https://bugzilla.kernel.org/show_bug.cgi?id=203559
-> 
->             Bug ID: 203559
->            Summary: usercopy_abort triggered by build_test_sglist
->            Product: Memory Management
->            Version: 2.5
->     Kernel Version: 5.1
->           Hardware: x86-64
->                 OS: Linux
->               Tree: Mainline
->             Status: NEW
->           Severity: low
->           Priority: P1
->          Component: Other
->           Assignee: akpm@linux-foundation.org
->           Reporter: mihai.dontu@gmail.com
->         Regression: No
-> 
-> Created attachment 282687
->   --> https://bugzilla.kernel.org/attachment.cgi?id=282687&action=edit
-> kernel config
-> 
-> I have CONFIG_CRYPTO_FIPS and CONFIG_HARDENED_USERCOPY_PAGESPAN enabled from an
-> experiment I forgot about, that started triggering a crash very early at boot
-> with kernel 5.1:
-> 
-> usercopy: Kernel memory overwrite attempt detected to spans multiple pages
-> (offset 0, size 372)!
-> ------------[ cut here]------------
-> kernel BUG at mm/usercopy.c:102!
-> invalid opcode: 0000 [#1] PREEMPT SMP PTI
-> CPU: 0 PID: 42 Comm: cryptomgr_test Trainted: G        T 5.1.0-gentoo #1
-> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.11.0-1.fc28
-> 04/01/2014
-> RIP: 0010:usercopy_abort+0x87/0x89
-> Code: c3 ae 48 c7 c6 c9 9c ba ae 41 55 48 c7 c7 38 9e bb ae 48 0f 45 d1 48 c7
-> c1 51
->       9d bb ae 50 48 0f 45 f1 4c 89 e1 e8 fb 50 e8 ff <0f> 0b 49 89 d8 31 c9 44
-> 89
->       ea 31 f6 48 c7 c7 9a 9d bb ae e8 61 ff
-> ...
-> Call Trace:
->  __check_object_size.cold+0x16/0xa6
->  build_test_sglist+0x283/0x370
->  ? skcipher_walk_done+0x105/0x220
->  ? ecb_crypt+0xa5/0x110
->  build_cipher_test_sglist+0xa0/0x120
->  test_skcipher_vec_cfg+0x1c4/0x6e0
-> ...
-> 
-> The information above is from a screenshot, thus some opcodes or offsets might
-> be wrong.
-> 
-> The 5.0.13 kernel does not have this issue.
-> 
-> -- 
-> You are receiving this mail because:
-> You are the assignee for the bug.
+Other than this, the patch looks good.
+
+Mimi
+
