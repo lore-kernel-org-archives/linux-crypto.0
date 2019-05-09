@@ -3,69 +3,83 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0747BC04AB1
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 May 2019 14:48:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9E30C04AB1
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 May 2019 14:54:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CFF3820644
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 May 2019 14:48:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 87EF120989
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 May 2019 14:54:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726597AbfEIOsz (ORCPT
+        id S1726674AbfEIOyy (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 9 May 2019 10:48:55 -0400
-Received: from ozlabs.org ([203.11.71.1]:47237 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726426AbfEIOsy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 9 May 2019 10:48:54 -0400
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 450GSL6vWcz9s4Y;
-        Fri, 10 May 2019 00:48:50 +1000 (AEST)
-From:   Michael Ellerman <mpe@ellerman.id.au>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Horia Geanta <horia.geanta@nxp.com>
-Cc:     Vakul Garg <vakul.garg@nxp.com>,
-        "linux-crypto\@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        "davem\@davemloft.net" <davem@davemloft.net>,
-        "linuxppc-dev\@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
-Subject: Re: [PATCH] crypto: caam/jr - Remove extra memory barrier during job ring dequeue
-In-Reply-To: <20190509052352.nje7a4niuc2n6c57@gondor.apana.org.au>
-References: <87pnp2aflz.fsf@concordia.ellerman.id.au> <VI1PR0402MB34851F6AB9FE68A2322EB09E98340@VI1PR0402MB3485.eurprd04.prod.outlook.com> <20190509052352.nje7a4niuc2n6c57@gondor.apana.org.au>
-Date:   Fri, 10 May 2019 00:48:50 +1000
-Message-ID: <87r297vg31.fsf@concordia.ellerman.id.au>
+        Thu, 9 May 2019 10:54:54 -0400
+Received: from mailgw02.mediatek.com ([210.61.82.184]:57765 "EHLO
+        mailgw02.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726192AbfEIOyy (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 9 May 2019 10:54:54 -0400
+X-UUID: 4d68c5eb26f54662a2d978ecfc2af531-20190509
+X-UUID: 4d68c5eb26f54662a2d978ecfc2af531-20190509
+Received: from mtkmrs01.mediatek.inc [(172.21.131.159)] by mailgw02.mediatek.com
+        (envelope-from <neal.liu@mediatek.com>)
+        (mhqrelay.mediatek.com ESMTP with TLS)
+        with ESMTP id 1440209227; Thu, 09 May 2019 22:54:49 +0800
+Received: from mtkcas07.mediatek.inc (172.21.101.84) by
+ mtkmbs03n2.mediatek.inc (172.21.101.182) with Microsoft SMTP Server (TLS) id
+ 15.0.1395.4; Thu, 9 May 2019 22:54:46 +0800
+Received: from [172.21.77.33] (172.21.77.33) by mtkcas07.mediatek.inc
+ (172.21.101.73) with Microsoft SMTP Server id 15.0.1395.4 via Frontend
+ Transport; Thu, 9 May 2019 22:54:46 +0800
+Message-ID: <1557413686.23445.6.camel@mtkswgap22>
+Subject: Re: [PATCH 3/3] hwrng: add mt67xx-rng driver
+From:   Neal Liu <neal.liu@mediatek.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+CC:     Stephan Mueller <smueller@chronox.de>, <mpm@selenic.com>,
+        <robh+dt@kernel.org>, <mark.rutland@arm.com>,
+        <matthias.bgg@gmail.com>, <wsd_upstream@mediatek.com>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-mediatek@lists.infradead.org>,
+        <Crystal.Guo@mediatek.com>
+Date:   Thu, 9 May 2019 22:54:46 +0800
+In-Reply-To: <20190509052649.xfkgb3qd7rhcgktj@gondor.apana.org.au>
+References: <1557287937-2410-1-git-send-email-neal.liu@mediatek.com>
+         <1557287937-2410-4-git-send-email-neal.liu@mediatek.com>
+         <12193108.aNnqf5ydOJ@tauon.chronox.de>
+         <1557311737.11818.11.camel@mtkswgap22>
+         <20190509052649.xfkgb3qd7rhcgktj@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.2.3-0ubuntu6 
+Content-Transfer-Encoding: 7bit
 MIME-Version: 1.0
-Content-Type: text/plain
+X-TM-SNTS-SMTP: DAF1C2FB982B2A5BC6E4832EA14731AB2E44B177010654C3FE819CDBF77FEEAE2000:8
+X-MTK:  N
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Herbert Xu <herbert@gondor.apana.org.au> writes:
-> On Thu, May 02, 2019 at 11:08:55AM +0000, Horia Geanta wrote:
->> >> +
->> >>  static inline void wr_reg32(void __iomem *reg, u32 data)
->> >>  {
->> >>  	if (caam_little_end)
->> > 
->> > This crashes on my p5020ds. Did you test on powerpc?
->> > 
->> > # first bad commit: [bbfcac5ff5f26aafa51935a62eb86b6eacfe8a49] crypto: caam/jr - Remove extra memory barrier during job ring dequeue
->> 
->> Thanks for the report Michael.
->> 
->> Any hint what would be the proper approach here - to have relaxed I/O accessors
->> that would work both for ARM and PPC, and avoid ifdeffery etc.?
->
-> Since no fix has been found I'm reverting the commit in question.
+On Thu, 2019-05-09 at 13:26 +0800, Herbert Xu wrote:
+> On Wed, May 08, 2019 at 06:35:37PM +0800, Neal Liu wrote:
+> > Hi Stephan,
+> > 	We think the cast is fine, and it cannot guarantee the buf is
+> > word-align.
+> > 	I reference multiple rng driver's implementation and found it's common
+> > usage for this. So it might be general usage for community. Is there any
+> > suggestion that is more appropriate?
+> 
+> If you don't know whether it's unaligned or not then you should
+> do an unaligned operation.
 
-Thanks.
+Hi Stephan/Herbert,
+	My mistake. This buffer is allocated by kmalloc with larger than 32
+bytes. So yes, it's word-align for sure.
+	reference:
+https://elixir.bootlin.com/linux/latest/source/drivers/char/hw_random/core.c#L590
 
-Sorry I haven't had time to look into it with everything else going on
-during the merge window.
+	Thanks
+Best Regards,
+-Neal Liu
 
-cheers
+
