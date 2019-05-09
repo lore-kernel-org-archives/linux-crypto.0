@@ -6,56 +6,58 @@ X-Spam-Status: No, score=-5.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88F50C04AAF
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 May 2019 05:25:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34DE0C04AAF
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 May 2019 05:25:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 647D220850
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 May 2019 05:25:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 128FD20850
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 May 2019 05:25:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726179AbfEIFZB (ORCPT
+        id S1726557AbfEIFZi (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 9 May 2019 01:25:01 -0400
-Received: from [5.180.42.13] ([5.180.42.13]:53930 "EHLO deadmen.hmeau.com"
+        Thu, 9 May 2019 01:25:38 -0400
+Received: from [5.180.42.13] ([5.180.42.13]:53938 "EHLO deadmen.hmeau.com"
         rhost-flags-FAIL-FAIL-OK-OK) by vger.kernel.org with ESMTP
-        id S1725936AbfEIFZB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 9 May 2019 01:25:01 -0400
+        id S1725936AbfEIFZi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 9 May 2019 01:25:38 -0400
 Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
         by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1hObY8-0001Ck-7P; Thu, 09 May 2019 13:24:56 +0800
+        id 1hObYk-0001DJ-Iq; Thu, 09 May 2019 13:25:34 +0800
 Received: from herbert by gondobar with local (Exim 4.89)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1hObY7-0001Zz-4D; Thu, 09 May 2019 13:24:55 +0800
-Date:   Thu, 9 May 2019 13:24:55 +0800
+        id 1hObYj-0001ao-Cl; Thu, 09 May 2019 13:25:33 +0800
+Date:   Thu, 9 May 2019 13:25:33 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Atul Gupta <atul.gupta@chelsio.com>
-Cc:     linux-crypto@vger.kernel.org, davem@davemloft.net, dt@chelsio.com
-Subject: Re: [PATCH 1/4] crypto:chelsio Fix NULL pointer dereference
-Message-ID: <20190509052455.rdfmk3qut777b6mr@gondor.apana.org.au>
-References: <20190502104655.21690-1-atul.gupta@chelsio.com>
+To:     Iuliana Prodan <iuliana.prodan@nxp.com>
+Cc:     Horia Geanta <horia.geanta@nxp.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-imx <linux-imx@nxp.com>
+Subject: Re: [PATCH] crypto: caam: fix caam_dump_sg that iterates through
+ scatterlist
+Message-ID: <20190509052533.rqodnozdaescixqz@gondor.apana.org.au>
+References: <1557236223-31492-1-git-send-email-iuliana.prodan@nxp.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190502104655.21690-1-atul.gupta@chelsio.com>
+In-Reply-To: <1557236223-31492-1-git-send-email-iuliana.prodan@nxp.com>
 User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, May 02, 2019 at 03:46:55AM -0700, Atul Gupta wrote:
-> Do not request FW to generate cidx update if there is less
-> space in tx queue to post new request.
-> SGE DBP 1 pidx increment too large
-> BUG: unable to handle kernel NULL pointer dereference at
-> 0000000000000124
-> SGE error for queue 101
+On Tue, May 07, 2019 at 04:37:03PM +0300, Iuliana Prodan wrote:
+> Fix caam_dump_sg by correctly determining the next scatterlist
+> entry in the list.
 > 
-> Signed-off-by: Atul Gupta <atul.gupta@chelsio.com>
+> Fixes: 5ecf8ef9103c ("crypto: caam - fix sg dump")
+> Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>
 > ---
->  drivers/crypto/chelsio/chcr_ipsec.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+>  drivers/crypto/caam/error.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
