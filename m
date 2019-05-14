@@ -2,130 +2,68 @@ Return-Path: <SRS0=wJ3R=TO=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 501F9C04AB6
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 May 2019 12:09:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A975C04AB7
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 May 2019 16:32:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2D1082147A
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 May 2019 12:09:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 75C462086A
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 May 2019 16:32:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726283AbfENMJt (ORCPT
+        id S1726109AbfENQct (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 14 May 2019 08:09:49 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44382 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726272AbfENMJt (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 14 May 2019 08:09:49 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4EC3nMg033694
-        for <linux-crypto@vger.kernel.org>; Tue, 14 May 2019 08:09:48 -0400
-Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2sftyh6kuv-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <linux-crypto@vger.kernel.org>; Tue, 14 May 2019 08:09:47 -0400
-Received: from localhost
-        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-crypto@vger.kernel.org> from <zohar@linux.ibm.com>;
-        Tue, 14 May 2019 13:09:44 +0100
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
-        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 14 May 2019 13:09:39 +0100
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4EC9c1l55050322
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 14 May 2019 12:09:38 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3DD0C42052;
-        Tue, 14 May 2019 12:09:38 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 175C14204B;
-        Tue, 14 May 2019 12:09:36 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.80.80.29])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 14 May 2019 12:09:35 +0000 (GMT)
-Subject: Re: [PATCH v10 09/12] ima: Implement support for module-style
- appended signatures
-From:   Mimi Zohar <zohar@linux.ibm.com>
-To:     Thiago Jung Bauermann <bauerman@linux.ibm.com>,
-        linux-integrity@vger.kernel.org
-Cc:     linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Jessica Yu <jeyu@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jonathan Corbet <corbet@lwn.net>,
-        "AKASHI, Takahiro" <takahiro.akashi@linaro.org>
-Date:   Tue, 14 May 2019 08:09:25 -0400
-In-Reply-To: <20190418035120.2354-10-bauerman@linux.ibm.com>
-References: <20190418035120.2354-1-bauerman@linux.ibm.com>
-         <20190418035120.2354-10-bauerman@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.20.5 (3.20.5-1.fc24) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19051412-0020-0000-0000-0000033C871A
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19051412-0021-0000-0000-0000218F42B3
-Message-Id: <1557835765.4139.9.camel@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-14_08:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=991 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1905140089
+        Tue, 14 May 2019 12:32:49 -0400
+Received: from mx2.suse.de ([195.135.220.15]:55236 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726044AbfENQct (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 14 May 2019 12:32:49 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id D67C7AEF3;
+        Tue, 14 May 2019 16:32:47 +0000 (UTC)
+Received: by ds.suse.cz (Postfix, from userid 10065)
+        id 8A58ADA866; Tue, 14 May 2019 18:33:48 +0200 (CEST)
+Date:   Tue, 14 May 2019 18:33:48 +0200
+From:   David Sterba <dsterba@suse.cz>
+To:     linux-crypto@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org
+Subject: Can crypto API provide information about hw acceleration?
+Message-ID: <20190514163348.GM3138@twin.jikos.cz>
+Reply-To: dsterba@suse.cz
+Mail-Followup-To: dsterba@suse.cz, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.5.23.1 (2014-03-12)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Thiago,
+Hi,
 
-On Thu, 2019-04-18 at 00:51 -0300, Thiago Jung Bauermann wrote:
-> 
-> @@ -326,6 +356,10 @@ int ima_appraise_measurement(enum ima_hooks func,
->         case INTEGRITY_UNKNOWN:
->                 break;
->         case INTEGRITY_NOXATTRS:        /* No EVM protected xattrs. */
-> +               /* It's fine not to have xattrs when using a modsig. */
-> +               if (try_modsig)
-> +                       break;
-> +               /* fall through */
->         case INTEGRITY_NOLABEL:         /* No security.evm xattr. */
->                 cause = "missing-HMAC";
->                 goto out;
-> @@ -340,6 +374,14 @@ int ima_appraise_measurement(enum ima_hooks func,
->                 rc = xattr_verify(func, iint, xattr_value, xattr_len, &status,
->                                   &cause);
->  
-> +       /*
-> +        * If we have a modsig and either no imasig or the imasig's key isn't
-> +        * known, then try verifying the modsig.
-> +        */
-> +       if (status != INTEGRITY_PASS && try_modsig &&
-> +           (!xattr_value || rc == -ENOKEY))
-> +               rc = modsig_verify(func, modsig, &status, &cause);
+Q: is there a way to query the crypto layer whether a given algorithm
+(digest, crypto) is accelerated by the driver?
 
-EVM protects other security xattrs, not just security.ima, if they
-exist.  As a result, evm_verifyxattr() could pass based on the other
-security xattrs.
+This information can be used to decide if eg. a checksum should can be
+calculated right away or offloaded to a thread. This is done in btrfs,
+(fs/btrfs/disk-io.c:check_async_write).
 
-Mimi
+At this moment it contains a static check for a cpu feature, and only
+for x86. I briefly searched the arch/ directory for implementations of
+crc32c that possibly use hw aid and there are several of them. Adding a
+static check a-la x86 for the other architectures (arm, ppc, mips,
+sparc, s390) is wrong, so I'm looking for a clean solution.
 
-> +
->  out:
->         /*
->          * File signatures on some filesystems can not be properly verified.
+The struct shash_alg definition of the algorithms does not say anything
+about the acceleration. The closest thing is the cra_priority, but I
+don't know if this is reliable information. The default implementations
+seem to have 100, and acceleated 200 or 300.
 
+This would be probably sufficient, but I'd like a confirmation from
+crypto people.
+
+Thanks.
