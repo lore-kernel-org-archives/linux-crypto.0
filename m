@@ -2,102 +2,83 @@ Return-Path: <SRS0=YWhG=TP=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 678CAC04E53
-	for <linux-crypto@archiver.kernel.org>; Wed, 15 May 2019 12:45:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A751EC04E53
+	for <linux-crypto@archiver.kernel.org>; Wed, 15 May 2019 12:54:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3BF452084E
-	for <linux-crypto@archiver.kernel.org>; Wed, 15 May 2019 12:45:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="C6MlpCQK"
+	by mail.kernel.org (Postfix) with ESMTP id 7FF842082E
+	for <linux-crypto@archiver.kernel.org>; Wed, 15 May 2019 12:54:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726533AbfEOMpg (ORCPT
+        id S1726773AbfEOMyG (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 15 May 2019 08:45:36 -0400
-Received: from mail-eopbgr20046.outbound.protection.outlook.com ([40.107.2.46]:8260
-        "EHLO EUR02-VE1-obe.outbound.protection.outlook.com"
+        Wed, 15 May 2019 08:54:06 -0400
+Received: from mx2.suse.de ([195.135.220.15]:60302 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726594AbfEOMpg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 15 May 2019 08:45:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6vjulWNtFIuDzzZVLB3YmibWuEZ93u2o20N7TkbUFrI=;
- b=C6MlpCQK0Iisv09AcfN36zfMyjdZL4TvMbwhtXMuiq8NIfAwq0C2qlxqBvI850YmhrD3tbwDpydzikblt5zecYbo+Lbl5a4PbSk/6Ki5HfxcaCcoQakMYpnJIk0vvFI0oNEEY/UcQ1Fh8+Jl0P8BkRKMmaUgSBtd0RiE7Nu//JI=
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
- VI1PR0402MB2896.eurprd04.prod.outlook.com (10.175.24.10) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1900.16; Wed, 15 May 2019 12:45:32 +0000
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::dd3c:969d:89b9:f422]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::dd3c:969d:89b9:f422%4]) with mapi id 15.20.1878.024; Wed, 15 May 2019
- 12:45:32 +0000
-From:   Horia Geanta <horia.geanta@nxp.com>
-To:     Iuliana Prodan <iuliana.prodan@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>
-CC:     "David S. Miller" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        dl-linux-imx <linux-imx@nxp.com>
-Subject: Re: [PATCH v2 1/2] crypto: caam - fix pkcs1pad(rsa-caam, sha256)
- failure because of invalid input
-Thread-Topic: [PATCH v2 1/2] crypto: caam - fix pkcs1pad(rsa-caam, sha256)
- failure because of invalid input
-Thread-Index: AQHVCxD13Q1EOIwSiEGsSCDp99Uy8Q==
-Date:   Wed, 15 May 2019 12:45:32 +0000
-Message-ID: <VI1PR0402MB348554352CD4DF0A451A5CBC98090@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-References: <1557919546-360-1-git-send-email-iuliana.prodan@nxp.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=horia.geanta@nxp.com; 
-x-originating-ip: [212.146.100.6]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: fce0594e-26df-43c3-1075-08d6d93337f7
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(4618075)(2017052603328)(7193020);SRVR:VI1PR0402MB2896;
-x-ms-traffictypediagnostic: VI1PR0402MB2896:
-x-microsoft-antispam-prvs: <VI1PR0402MB289666C30C360F65D56A43B198090@VI1PR0402MB2896.eurprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:7691;
-x-forefront-prvs: 0038DE95A2
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(346002)(39860400002)(396003)(366004)(136003)(376002)(189003)(199004)(8936002)(256004)(81156014)(6116002)(33656002)(2906002)(66476007)(86362001)(68736007)(8676002)(3846002)(66066001)(76116006)(73956011)(71200400001)(71190400001)(66946007)(66556008)(64756008)(66446008)(53936002)(102836004)(26005)(9686003)(52536014)(6246003)(186003)(99286004)(81166006)(5660300002)(53546011)(6506007)(7696005)(76176011)(55016002)(74316002)(476003)(6436002)(4326008)(305945005)(6636002)(44832011)(14454004)(7736002)(229853002)(446003)(478600001)(486006)(25786009)(4744005)(316002)(110136005)(54906003)(32563001);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB2896;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: nxp.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: DcDUpBmAazVTfpJFjmckR6N/61PsPr/3XlRDsfVnDVVEkPs3+wC+vnHr6I8z7tBdRtu2bVNhn/pOXntMB9NyS8DRchwrZdRFXyDnuwPkGaPL3M9f/eNulBIXV67E7Kh1mEcU2AqOjvz2e6zyJ1Fldn9AsWPM89P5eExPSJqfJPvwi8mlbDo6oqRYDmnvMWfn8DC37uC9xhqmN1niCgU1AF7gl6vUFDbC109VA0/FgC6QJmWYfWH28OhsgBecIMqGaO2NGynjuOkv8LIESkhoHmHMfN+tHV7prdHBMpktGBQXiERHw7CqudzNgpPsu6VV6rGQi8PX/XjBQ2epvXCDpNuk0QtNfYzyWqarOm3mMrUWKAh/4TwXyoaIhfpTbu95Qflvaob5KarQChQ9fTN6SBEMs/z82xQRWQArQkMpOmk=
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
+        id S1726677AbfEOMyG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 15 May 2019 08:54:06 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 585B1AC8E;
+        Wed, 15 May 2019 12:54:05 +0000 (UTC)
+Received: by ds.suse.cz (Postfix, from userid 10065)
+        id B7B24DA866; Wed, 15 May 2019 14:55:05 +0200 (CEST)
+Date:   Wed, 15 May 2019 14:55:05 +0200
+From:   David Sterba <dsterba@suse.cz>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: Can crypto API provide information about hw acceleration?
+Message-ID: <20190515125505.GP3138@suse.cz>
+Reply-To: dsterba@suse.cz
+Mail-Followup-To: dsterba@suse.cz, Eric Biggers <ebiggers@kernel.org>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20190514163348.GM3138@twin.jikos.cz>
+ <20190514213409.GA115510@gmail.com>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fce0594e-26df-43c3-1075-08d6d93337f7
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 May 2019 12:45:32.3130
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB2896
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190514213409.GA115510@gmail.com>
+User-Agent: Mutt/1.5.23.1 (2014-03-12)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 5/15/2019 2:25 PM, Iuliana Prodan wrote:=0A=
-> The problem is with the input data size sent to CAAM for encrypt/decrypt.=
-=0A=
-> Pkcs1pad is failing due to pkcs1 padding done in SW starting with0x01=0A=
-> instead of 0x00 0x01.=0A=
-> CAAM expects an input of modulus size. For this we strip the leading=0A=
-> zeros in case the size is more than modulus or pad the input with zeros=
-=0A=
-> until the modulus size is reached.=0A=
-> =0A=
-> Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>=0A=
-Reviewed-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
-=0A=
-Thanks,=0A=
-Horia=0A=
+On Tue, May 14, 2019 at 02:34:10PM -0700, Eric Biggers wrote:
+> On Tue, May 14, 2019 at 06:33:48PM +0200, David Sterba wrote:
+> > Hi,
+> > 
+> > Q: is there a way to query the crypto layer whether a given algorithm
+> > (digest, crypto) is accelerated by the driver?
+> > 
+> > This information can be used to decide if eg. a checksum should can be
+> > calculated right away or offloaded to a thread. This is done in btrfs,
+> > (fs/btrfs/disk-io.c:check_async_write).
+> > 
+> > At this moment it contains a static check for a cpu feature, and only
+> > for x86. I briefly searched the arch/ directory for implementations of
+> > crc32c that possibly use hw aid and there are several of them. Adding a
+> > static check a-la x86 for the other architectures (arm, ppc, mips,
+> > sparc, s390) is wrong, so I'm looking for a clean solution.
+> > 
+> > The struct shash_alg definition of the algorithms does not say anything
+> > about the acceleration. The closest thing is the cra_priority, but I
+> > don't know if this is reliable information. The default implementations
+> > seem to have 100, and acceleated 200 or 300.
+> > 
+> > This would be probably sufficient, but I'd like a confirmation from
+> > crypto people.
+> > 
+> 
+> There's only one default implementation of crc32c, not multiple, and it has
+> priority 100.  All other crc32c implementations have priority > 100.  So yes,
+> you can check the priority (which would require adding a function to
+> lib/libcrc32c.c to get it).  Alternatively you could check whether the driver
+> name is "crc32c-generic" or not.
+
+Thanks, the driver name check seems to be ok for my needs. At mount time
+the struct crypto_shash is initialized and this provides the driver
+name, then a bit is set whether it's generic or not and later used to
+decide whether to offload.
