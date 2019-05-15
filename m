@@ -2,120 +2,94 @@ Return-Path: <SRS0=YWhG=TP=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74FDFC04E53
-	for <linux-crypto@archiver.kernel.org>; Wed, 15 May 2019 11:58:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5756C04E87
+	for <linux-crypto@archiver.kernel.org>; Wed, 15 May 2019 12:08:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4776720843
-	for <linux-crypto@archiver.kernel.org>; Wed, 15 May 2019 11:58:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A4AAC20843
+	for <linux-crypto@archiver.kernel.org>; Wed, 15 May 2019 12:08:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=c-s.fr header.i=@c-s.fr header.b="Xu2Fb7+V"
+	dkim=pass (1024-bit key) header.d=insidesecure.onmicrosoft.com header.i=@insidesecure.onmicrosoft.com header.b="yKkL2Wsk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728835AbfEOL6U (ORCPT
+        id S1726465AbfEOMIu (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 15 May 2019 07:58:20 -0400
-Received: from pegase1.c-s.fr ([93.17.236.30]:56475 "EHLO pegase1.c-s.fr"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727222AbfEOL6T (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 15 May 2019 07:58:19 -0400
-Received: from localhost (mailhub1-int [192.168.12.234])
-        by localhost (Postfix) with ESMTP id 453tNm5Dq2z9vDbV;
-        Wed, 15 May 2019 13:58:16 +0200 (CEST)
-Authentication-Results: localhost; dkim=pass
-        reason="1024-bit key; insecure key"
-        header.d=c-s.fr header.i=@c-s.fr header.b=Xu2Fb7+V; dkim-adsp=pass;
-        dkim-atps=neutral
-X-Virus-Scanned: Debian amavisd-new at c-s.fr
-Received: from pegase1.c-s.fr ([192.168.12.234])
-        by localhost (pegase1.c-s.fr [192.168.12.234]) (amavisd-new, port 10024)
-        with ESMTP id MqTJTkSxMsQw; Wed, 15 May 2019 13:58:16 +0200 (CEST)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-        by pegase1.c-s.fr (Postfix) with ESMTP id 453tNm49NMz9vDbT;
-        Wed, 15 May 2019 13:58:16 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=c-s.fr; s=mail;
-        t=1557921496; bh=+73gT6NA6NW2DnlTlmM/3gPkuFToS2cIKSvZcSZ7FvQ=;
-        h=From:Subject:To:Cc:Date:From;
-        b=Xu2Fb7+VYB3DeD/mZBpLLa7d/2fJklNODkR+354e8kNLVh6u9Ayy6cU2PVeLvG9l8
-         RwC5B0vK7T8AiWnbMKhafVMQ6LU3KVECbIJWCZmo+7dFz6tVHud9HZzqSgeZySN+pG
-         Jg2fpJsqHEIsNASsqdml/MZMF+xs0aM/SzauTf1c=
-Received: from localhost (localhost [127.0.0.1])
-        by messagerie.si.c-s.fr (Postfix) with ESMTP id E19048B902;
-        Wed, 15 May 2019 13:58:17 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-        by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-        with ESMTP id k0XBLXGVxpgI; Wed, 15 May 2019 13:58:17 +0200 (CEST)
-Received: from PO15451 (po15451.idsi0.si.c-s.fr [172.25.231.1])
-        by messagerie.si.c-s.fr (Postfix) with ESMTP id BEEA58B8F7;
-        Wed, 15 May 2019 13:58:17 +0200 (CEST)
-From:   Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: Can scatterlist elements cross page boundary ?
-To:     Eric Biggers <ebiggers@google.com>,
+        Wed, 15 May 2019 08:08:50 -0400
+Received: from mail-eopbgr00125.outbound.protection.outlook.com ([40.107.0.125]:16712
+        "EHLO EUR02-AM5-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729013AbfEOMIt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 15 May 2019 08:08:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=insidesecure.onmicrosoft.com; s=selector1-insidesecure-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Ok6L14Y9/R5DwRnQNKHtnEVy3k7yr6CNuBBSCjYBDmQ=;
+ b=yKkL2Wskb6YEEkEUgMhC2mssHH5uwWULB8aTs/HecwuOliA7Y2BXSseTsUo2hlX5v8OSpsx4e20QekwuggZTCMSMNfuO42G7L3RpxoBWPVYS6HrbFlIGjH6lb0rb0C05YsmfLH0nAc40P4I9xYTmOnTUz911dXHymiUteWxBcT0=
+Received: from AM6PR09MB3523.eurprd09.prod.outlook.com (10.255.99.206) by
+ AM6PR09MB2343.eurprd09.prod.outlook.com (20.177.113.140) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1878.25; Wed, 15 May 2019 12:08:45 +0000
+Received: from AM6PR09MB3523.eurprd09.prod.outlook.com
+ ([fe80::8c11:e692:3a44:a3a9]) by AM6PR09MB3523.eurprd09.prod.outlook.com
+ ([fe80::8c11:e692:3a44:a3a9%6]) with mapi id 15.20.1878.024; Wed, 15 May 2019
+ 12:08:45 +0000
+From:   Pascal Van Leeuwen <pvanleeuwen@insidesecure.com>
+To:     Christophe Leroy <christophe.leroy@c-s.fr>,
+        Eric Biggers <ebiggers@google.com>,
         Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Message-ID: <798a42c9-bcda-6612-088c-cb90c35a578f@c-s.fr>
-Date:   Wed, 15 May 2019 13:58:13 +0200
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Subject: RE: Can scatterlist elements cross page boundary ?
+Thread-Topic: Can scatterlist elements cross page boundary ?
+Thread-Index: AQHVCxWZM8QdxfEMKUaZKL/grh3qu6ZsFtDw
+Date:   Wed, 15 May 2019 12:08:45 +0000
+Message-ID: <AM6PR09MB35234E6A537053A542A65E4AD2090@AM6PR09MB3523.eurprd09.prod.outlook.com>
+References: <798a42c9-bcda-6612-088c-cb90c35a578f@c-s.fr>
+In-Reply-To: <798a42c9-bcda-6612-088c-cb90c35a578f@c-s.fr>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=pvanleeuwen@insidesecure.com; 
+x-originating-ip: [188.204.2.113]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 2bbab9e1-4819-42fb-15e3-08d6d92e147e
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(2017052603328)(7193020);SRVR:AM6PR09MB2343;
+x-ms-traffictypediagnostic: AM6PR09MB2343:
+x-ms-exchange-purlcount: 1
+x-microsoft-antispam-prvs: <AM6PR09MB234343ED9BB87DFB9805E9FCD2090@AM6PR09MB2343.eurprd09.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-forefront-prvs: 0038DE95A2
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(396003)(346002)(366004)(39850400004)(136003)(376002)(189003)(199004)(73956011)(102836004)(64756008)(66476007)(305945005)(66446008)(7736002)(4744005)(6506007)(186003)(110136005)(6246003)(66946007)(33656002)(478600001)(229853002)(55016002)(6116002)(3846002)(4326008)(99286004)(26005)(74316002)(446003)(76176011)(7696005)(9686003)(66556008)(81156014)(76116006)(8676002)(476003)(8936002)(86362001)(15974865002)(6436002)(66066001)(316002)(256004)(53936002)(14454004)(11346002)(52536014)(5660300002)(2906002)(81166006)(71200400001)(71190400001)(25786009)(486006)(68736007)(18886075002);DIR:OUT;SFP:1102;SCL:1;SRVR:AM6PR09MB2343;H:AM6PR09MB3523.eurprd09.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: insidesecure.com does not
+ designate permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: /UPGDd1oC27/xO0Ua7ApE/mzCfAPf2YzeCV7kizXpFE9JPzJypZpLQlWy9JZAPUG8E3yowPNXQC9wS8r150cEXSmLGRXNDCKmUYRs7IvT1togNwphlYyvGVRrjhuEtjNhTxFfuexmvTc1T3/tj81dZwjA8Pm5yEvV0NkPxbeva9zGuQjzPDFA+SCwyQMFxWUJECGtdXNuFAqp/14LHzHpeLg4b8Kozb2iiH8GOUY6R5sanE2hM577xhlYYFpQcxitGHzLCmGvk3PfRuqQvYpdhKeXx2suTA9qfXXfL0mxzTfgQlhBdf6jywEj3kGKXqA9HMvmKglvsutw/SJhZvUzDV4OftkaW4+fvJf/bCATqP2P0ule5+ttBoyBtSyIgbdlI6G9JZqnZ5mcT5tcDNaamBQw840xnCl8c8hkVCnlTI=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: fr
-Content-Transfer-Encoding: 7bit
+X-OriginatorOrg: insidesecure.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2bbab9e1-4819-42fb-15e3-08d6d92e147e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 15 May 2019 12:08:45.3505
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3c07df58-7760-4e85-afd5-84803eac70ce
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR09MB2343
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi,
-
-I had understood that scatterlists where lists of buffers, each buffer 
-being enclosed within a single memory PAGE. Isn't that right ?
-
-As far as I understand, dma_map_sg() expects each entry to be DMA mapable.
-
-But at the time being, I'm getting the following errors on the Talitos 
-algorithmes:
-
-[    2.382845] alg: aead: authenc-hmac-sha1-cbc-aes-talitos encryption 
-test failed (wrong result) on test vector 0, cfg="misaligned splits 
-crossing pages, inplace"
-
-[    2.430178] alg: aead: authenc-hmac-sha1-cbc-aes-talitos encryption 
-test failed (wrong result) on test vector 1, cfg="misaligned splits 
-crossing pages, inplace"
-
-[    2.509270] alg: aead: authenc-hmac-sha256-cbc-aes-talitos encryption 
-test failed (wrong result) on test vector 0, cfg="uneven misaligned 
-splits, may sleep"
-
-When comparing the expected and actual results, I see (respectively for 
-the 3 fails above tests) :
-
-[    2.362271] 00000000: e3 53 77 9c 10 79 ae b8 27 08 94 2d be 77 18 1a
-[    2.368529] 00000010: 1b 13 cb af 89 5e e1
-[    2.372429] 00000000: e3 53 77 9c 10 79 ae b8 27 08 94 2d be 77 18 1a
-[    2.378924] 00000010: fe fe fe fe fe fe fe
-
-[    2.398908] 00000000: d2 96 cd 94 c2 cc cf 8a 3a 86 30 28 b5 e1 dc 0a
-[    2.405185] 00000010: 75 86 60 2d 25 3c ff f9 1b 82 66 be a6 d6 1a b1
-[    2.411407] 00000020: ad 9b 4c
-[    2.414427] 00000000: d2 96 cd 94 c2 cc cf 8a 3a 86 30 28 b5 e1 dc 0a
-[    2.420926] 00000010: 75 86 60 2d 25 3c ff f9 1b 82 66 be a6 d6 1a b1
-[    2.427287] 00000020: fe fe fe
-
-[    2.491701] 00000000: e3 53 77 9c 10 79 ae b8 27 08 94 2d be 77 18 1a
-[    2.498125] 00000010: cc
-[    2.500403] 00000000: e3 53 77 9c 10 79 ae b8 27 08 94 2d be 77 18 1a
-[    2.507012] 00000010: fe
-
-
-Looking at the test manager, I understand that it builds scatterlists 
-with buffers that are using 2 pages. Am I correct ?
-
-Then how do we expect the driver to behave ?
-
-Thanks
-Christophe
+SGkgQ2hyaXN0b3BoZSwNCg0KSSByYW4gaW50byBhIHNpbWlsYXIgaXNzdWUgd2l0aCB0aGUgSW5z
+aWRlIFNlY3VyZSBkcml2ZXIuDQoNCklmIEkgdW5kZXJzdG9vZCBjb3JyZWN0bHksIHNjYXR0ZXIg
+YnVmZmVycyBkbyBub3QgbmVlZCB0byBiZSBlbmNsb3NlZCBpbiBhIHNpbmdsZSBwYWdlIGFzIGxv
+bmcgYXMgdGhlIHNjYXR0ZXIgYnVmZmVyIGFzIGEgd2hvbGUgaXMgY29udGlndW91cyBpbiBtZW1v
+cnkuIFNvIGl0IGNhbiBiZSBtdWx0aXBsZSBwYWdlcywgYnV0IHRoZW4gdGhleSBoYXZlIHRvIGJl
+IGJhY2stdG8tYmFjayBpbiBwaHlzaWNhbC9kZXZpY2UgbWVtb3J5Lg0KDQpUaGUgbGF0dGVyIHNo
+b3VsZCBiZSBndWFyYW50ZWVkIGJ5IHRoZSBrZXJuZWwgYWxsb2NhdG9yLg0KDQpSZWdhcmRzLA0K
+DQpQYXNjYWwgdmFuIExlZXV3ZW4NClNpbGljb24gSVAgQXJjaGl0ZWN0LCBNdWx0aS1Qcm90b2Nv
+bCBFbmdpbmVzLCBJbnNpZGUgU2VjdXJlDQoNClRlbC4gOiArMzEgKDApNzMgNjUgODEgOTAwDQoN
+Cnd3dy5pbnNpZGVzZWN1cmUuY29tDQoNCg0K
