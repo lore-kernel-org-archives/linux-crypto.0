@@ -2,144 +2,125 @@ Return-Path: <SRS0=YWhG=TP=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0835AC04E87
-	for <linux-crypto@archiver.kernel.org>; Wed, 15 May 2019 09:16:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 427D9C04E53
+	for <linux-crypto@archiver.kernel.org>; Wed, 15 May 2019 10:24:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CEEB320881
-	for <linux-crypto@archiver.kernel.org>; Wed, 15 May 2019 09:16:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 151C42084F
+	for <linux-crypto@archiver.kernel.org>; Wed, 15 May 2019 10:24:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YtxdamWc"
+	dkim=pass (1024-bit key) header.d=axtens.net header.i=@axtens.net header.b="LNFk3SYq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725954AbfEOJQk (ORCPT
+        id S1725953AbfEOKY5 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 15 May 2019 05:16:40 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:39105 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725912AbfEOJQk (ORCPT
+        Wed, 15 May 2019 06:24:57 -0400
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:40172 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725939AbfEOKY5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 15 May 2019 05:16:40 -0400
-Received: by mail-wr1-f65.google.com with SMTP id w8so1794652wrl.6;
-        Wed, 15 May 2019 02:16:39 -0700 (PDT)
+        Wed, 15 May 2019 06:24:57 -0400
+Received: by mail-pl1-f194.google.com with SMTP id g69so1123898plb.7
+        for <linux-crypto@vger.kernel.org>; Wed, 15 May 2019 03:24:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=de5WSELj4gSXjf9AoL3U1UDofSw6C63nGgYMrSnkT2g=;
-        b=YtxdamWcmi6YX/fdouZCcul6AKXXkilhYp/DWKeBaUtOIls15/USE03WxOE9P78rPX
-         xhxAOLE3CHaWNx7YcBpH/3FKKze+xIdvzjBX/cI+kjn+GdkhM5oTiK/Pt0EQTD/m1S0s
-         PNYRMCXJ9AmkquApHv7+WzMKxTzkyXIDDtqoGrWWB4hb74su1gIeIUa5mRvbQwl2TYrM
-         FCHZknXOcQOZdkY+FhBNVEEBR5FACvvwXvG8P3wcGlrtf/dGK9aaj34gepxjg575lP8x
-         vRwnEe4y0AFtvT0h+AOc/ze+G37ShPxMvQGBqlP7QBw+ZAZdMALN2wJG8oJ+cPstQWw6
-         LeHA==
+        d=axtens.net; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Sb4pV1d5lxWRP204NVfZBomUvfE6MxP49E2mX7dS5Bc=;
+        b=LNFk3SYqazir1mtooOos9X27csivCVSHkilxBtbcBBTJ57MuXcN0CJAkFjXJKhnyzh
+         0+HbVTAkpr6A5iI97f9dQH1bAk6JEdmmVWs6tLeIhjuNw7t0FG1iR8HKNUTvK89fS+wr
+         18lIAFxVcfHTtTnfVth8z84az/irEcPIUU+zI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=de5WSELj4gSXjf9AoL3U1UDofSw6C63nGgYMrSnkT2g=;
-        b=P7utLkS7xDIquwP7DnxvL4ZjjYTM+7K2E3M9PDG6zbummmgTrXCe81UC6cDT4l2Qoe
-         oYi02uRibv7wlXWMcS4uAchR1usr2GKAQfqS4WlBxiO33ZTl4eQI9Z4eG5PWjhbfB7GF
-         OddL7kSkiq14Li/CfWJU5Lk5/Rs6dWmcpfMnHmXogFtkbyEWi8nTF/ziIm33XsRlm/dj
-         zAyXYYHj5NS+mmwnyMdTxt2QKPXp5YoT4GJ+vr7N0ufbaL/jxq3Mmc1DY+F4SQZzbm1t
-         y44cD+zFwNpdJV2yyp4rwP5icwm93ZzTxuq/O1viuSrNrqxdvl5ihxk4Cna4upCKyqmf
-         NqUw==
-X-Gm-Message-State: APjAAAVXIKaqwMubnlqCCpB2dOJGz7XE/dRUOUSGz0RIpJLyD+ybCXZt
-        3fXWVYPCEE9g3kAmjM4YZojut6OA
-X-Google-Smtp-Source: APXvYqy3X742I9KwcUqRd14IjC9LZoC8p7iNPBq0GYsUZJvygitoYc8BfVa1Ds+RFfjKHLH0gFI+ZA==
-X-Received: by 2002:adf:fa4e:: with SMTP id y14mr13380749wrr.149.1557911798704;
-        Wed, 15 May 2019 02:16:38 -0700 (PDT)
-Received: from Red ([2a01:cb1d:147:7200:2e56:dcff:fed2:c6d6])
-        by smtp.googlemail.com with ESMTPSA id a128sm1589710wma.23.2019.05.15.02.16.37
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 15 May 2019 02:16:37 -0700 (PDT)
-Date:   Wed, 15 May 2019 11:16:35 +0200
-From:   Corentin Labbe <clabbe.montjoie@gmail.com>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        stable@vger.kernel.org, Kees Cook <keescook@chromium.org>
-Subject: Re: [PATCH] crypto: hash - fix incorrect HASH_MAX_DESCSIZE
-Message-ID: <20190515091635.GA4140@Red>
-References: <20190514231315.7729-1-ebiggers@kernel.org>
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Sb4pV1d5lxWRP204NVfZBomUvfE6MxP49E2mX7dS5Bc=;
+        b=PhFCaFgezShdmVYVhkebh/DDmGaI/F8TY07GZHzHV4OPAQOlueQgpAR/8Dn3+Gizrt
+         uTfebFegn8M+2hI5Qf5CGX90P+karbuoiZzPnHyTqoTqAjOxRgD24xRpeP9CCAvbqJ8G
+         oDPrudlf4bk+HXfkA/Jr02u0BidGkf6D/g9cmqsGBcz2i/D3L07/kyggTTb1nJ9cvwUb
+         g5chYDo3kqavumoao8OGTRV2inT0AYTELg5I1CYlJjL5in+QfN2V22V95Gl6ERORlhKs
+         kaoTa4K7wFQHjhL0NxlN0WK8YtGQzNhKoAWL4GguRuFLc0xyhQfAhB8NvHAjI0z54YEI
+         pXzw==
+X-Gm-Message-State: APjAAAU73UpTw2UzmsvNpVbgQz2B0UWRAH9Rt7dibT2T+Ov5+MGgAkGM
+        bf4dGNyncBRPV10r2Jz2K3eKMQ==
+X-Google-Smtp-Source: APXvYqyjLExp8dImFftLMhrdYyBWBoJDEuAc+MBp5wYkorCb8rPwgnHl5nUDBpqX3DRe2bDSKOSMwQ==
+X-Received: by 2002:a17:902:868c:: with SMTP id g12mr25668785plo.323.1557915897147;
+        Wed, 15 May 2019 03:24:57 -0700 (PDT)
+Received: from localhost (dip-220-235-49-186.wa.westnet.com.au. [220.235.49.186])
+        by smtp.gmail.com with ESMTPSA id 194sm4367930pfb.125.2019.05.15.03.24.55
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Wed, 15 May 2019 03:24:56 -0700 (PDT)
+From:   Daniel Axtens <dja@axtens.net>
+To:     mpe@ellerman.id.au, ebiggers@kernel.org,
+        linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     marcelo.cerri@canonical.com, Stephan Mueller <smueller@chronox.de>,
+        leo.barbosa@canonical.com, linuxppc-dev@lists.ozlabs.org,
+        nayna@linux.ibm.com, pfsmorigo@gmail.com, leitao@debian.org,
+        gcwilson@linux.ibm.com, omosnacek@gmail.com
+Subject: [PATCH] crypto: vmx - CTR: always increment IV as quadword
+Date:   Wed, 15 May 2019 20:24:50 +1000
+Message-Id: <20190515102450.30557-1-dja@axtens.net>
+X-Mailer: git-send-email 2.19.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190514231315.7729-1-ebiggers@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, May 14, 2019 at 04:13:15PM -0700, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
-> 
-> The "hmac(sha3-224-generic)" algorithm has a descsize of 368 bytes,
-> which is greater than HASH_MAX_DESCSIZE (360) which is only enough for
-> sha3-224-generic.  The check in shash_prepare_alg() doesn't catch this
-> because the HMAC template doesn't set descsize on the algorithms, but
-> rather sets it on each individual HMAC transform.
-> 
-> This causes a stack buffer overflow when SHASH_DESC_ON_STACK() is used
-> with hmac(sha3-224-generic).
-> 
-> Fix it by increasing HASH_MAX_DESCSIZE to the real maximum.  Also add a
-> sanity check to hmac_init().
-> 
-> This was detected by the improved crypto self-tests in v5.2, by loading
-> the tcrypt module with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y enabled.  I
-> didn't notice this bug when I ran the self-tests by requesting the
-> algorithms via AF_ALG (i.e., not using tcrypt), probably because the
-> stack layout differs in the two cases and that made a difference here.
-> 
-> KASAN report:
-> 
->     BUG: KASAN: stack-out-of-bounds in memcpy include/linux/string.h:359 [inline]
->     BUG: KASAN: stack-out-of-bounds in shash_default_import+0x52/0x80 crypto/shash.c:223
->     Write of size 360 at addr ffff8880651defc8 by task insmod/3689
-> 
->     CPU: 2 PID: 3689 Comm: insmod Tainted: G            E     5.1.0-10741-g35c99ffa20edd #11
->     Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1 04/01/2014
->     Call Trace:
->      __dump_stack lib/dump_stack.c:77 [inline]
->      dump_stack+0x86/0xc5 lib/dump_stack.c:113
->      print_address_description+0x7f/0x260 mm/kasan/report.c:188
->      __kasan_report+0x144/0x187 mm/kasan/report.c:317
->      kasan_report+0x12/0x20 mm/kasan/common.c:614
->      check_memory_region_inline mm/kasan/generic.c:185 [inline]
->      check_memory_region+0x137/0x190 mm/kasan/generic.c:191
->      memcpy+0x37/0x50 mm/kasan/common.c:125
->      memcpy include/linux/string.h:359 [inline]
->      shash_default_import+0x52/0x80 crypto/shash.c:223
->      crypto_shash_import include/crypto/hash.h:880 [inline]
->      hmac_import+0x184/0x240 crypto/hmac.c:102
->      hmac_init+0x96/0xc0 crypto/hmac.c:107
->      crypto_shash_init include/crypto/hash.h:902 [inline]
->      shash_digest_unaligned+0x9f/0xf0 crypto/shash.c:194
->      crypto_shash_digest+0xe9/0x1b0 crypto/shash.c:211
->      generate_random_hash_testvec.constprop.11+0x1ec/0x5b0 crypto/testmgr.c:1331
->      test_hash_vs_generic_impl+0x3f7/0x5c0 crypto/testmgr.c:1420
->      __alg_test_hash+0x26d/0x340 crypto/testmgr.c:1502
->      alg_test_hash+0x22e/0x330 crypto/testmgr.c:1552
->      alg_test.part.7+0x132/0x610 crypto/testmgr.c:4931
->      alg_test+0x1f/0x40 crypto/testmgr.c:4952
-> 
-> Fixes: b68a7ec1e9a3 ("crypto: hash - Remove VLA usage")
-> Reported-by: Corentin Labbe <clabbe.montjoie@gmail.com>
-> Cc: <stable@vger.kernel.org> # v4.20+
-> Cc: Kees Cook <keescook@chromium.org>
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-> ---
+The kernel self-tests picked up an issue with CTR mode:
+alg: skcipher: p8_aes_ctr encryption test failed (wrong result) on test vector 3, cfg="uneven misaligned splits, may sleep"
 
-Hello
+Test vector 3 has an IV of FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD, so
+after 3 increments it should wrap around to 0.
 
-Thanks for the fix.
+In the aesp8-ppc code from OpenSSL, there are two paths that
+increment IVs: the bulk (8 at a time) path, and the individual
+path which is used when there are fewer than 8 AES blocks to
+process.
 
-Tested-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+In the bulk path, the IV is incremented with vadduqm: "Vector
+Add Unsigned Quadword Modulo", which does 128-bit addition.
 
-Regards
+In the individual path, however, the IV is incremented with
+vadduwm: "Vector Add Unsigned Word Modulo", which instead
+does 4 32-bit additions. Thus the IV would instead become
+FFFFFFFFFFFFFFFFFFFFFFFF00000000, throwing off the result.
+
+Use vadduqm.
+
+This was probably a typo originally, what with q and w being
+adjacent. It is a pretty narrow edge case: I am really
+impressed by the quality of the kernel self-tests!
+
+Fixes: 5c380d623ed3 ("crypto: vmx - Add support for VMS instructions by ASM")
+Cc: stable@vger.kernel.org
+Signed-off-by: Daniel Axtens <dja@axtens.net>
+
+---
+
+I'll pass this along internally to get it into OpenSSL as well.
+---
+ drivers/crypto/vmx/aesp8-ppc.pl | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/vmx/aesp8-ppc.pl b/drivers/crypto/vmx/aesp8-ppc.pl
+index de78282b8f44..9c6b5c1d6a1a 100644
+--- a/drivers/crypto/vmx/aesp8-ppc.pl
++++ b/drivers/crypto/vmx/aesp8-ppc.pl
+@@ -1357,7 +1357,7 @@ Loop_ctr32_enc:
+ 	addi		$idx,$idx,16
+ 	bdnz		Loop_ctr32_enc
+ 
+-	vadduwm		$ivec,$ivec,$one
++	vadduqm		$ivec,$ivec,$one
+ 	 vmr		$dat,$inptail
+ 	 lvx		$inptail,0,$inp
+ 	 addi		$inp,$inp,16
+-- 
+2.19.1
+
