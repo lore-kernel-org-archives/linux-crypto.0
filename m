@@ -2,117 +2,62 @@ Return-Path: <SRS0=YWhG=TP=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF27EC04E53
-	for <linux-crypto@archiver.kernel.org>; Wed, 15 May 2019 14:05:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A3B6C04E53
+	for <linux-crypto@archiver.kernel.org>; Wed, 15 May 2019 14:08:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7B26D20873
-	for <linux-crypto@archiver.kernel.org>; Wed, 15 May 2019 14:05:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="rYNRVOFX"
+	by mail.kernel.org (Postfix) with ESMTP id 3481C2084E
+	for <linux-crypto@archiver.kernel.org>; Wed, 15 May 2019 14:08:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726702AbfEOOFP (ORCPT
+        id S1726999AbfEOOIC (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 15 May 2019 10:05:15 -0400
-Received: from mail-eopbgr20081.outbound.protection.outlook.com ([40.107.2.81]:4622
-        "EHLO EUR02-VE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726646AbfEOOFO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 15 May 2019 10:05:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZuWhjNo0yAfWVBkZhdwfp7qUe2X1r9MNjzX2ykJy+2M=;
- b=rYNRVOFXJ0KMJqnGQb3lXawAj2BfeP352mGNyuZ2C5tK+X12b+4a9dYrqhnoquaezy8ptsYYqJfM9MFdlR7KjGsCVWCPI45UYjTj9h9+Qrqs+al4woqKFwqe0n10/48Bsu0IWlRHd386h0stkqQugv0lzjP2ZtC582Z1+jeOrvc=
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
- VI1PR0402MB3533.eurprd04.prod.outlook.com (52.134.4.26) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1900.16; Wed, 15 May 2019 14:05:11 +0000
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::dd3c:969d:89b9:f422]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::dd3c:969d:89b9:f422%4]) with mapi id 15.20.1878.024; Wed, 15 May 2019
- 14:05:11 +0000
-From:   Horia Geanta <horia.geanta@nxp.com>
-To:     Christophe Leroy <christophe.leroy@c-s.fr>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
-Subject: Re: [PATCH] crypto: talitos - fix skcipher failure due to wrong
- output IV
-Thread-Topic: [PATCH] crypto: talitos - fix skcipher failure due to wrong
- output IV
-Thread-Index: AQHVCxnMCzIthJlccEajEJwlNrxcew==
-Date:   Wed, 15 May 2019 14:05:11 +0000
-Message-ID: <VI1PR0402MB34858D80A15D4B55F64570E398090@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-References: <a5b0d31d8fc9fc9bc2b69baa5330466090825a39.1557923113.git.christophe.leroy@c-s.fr>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=horia.geanta@nxp.com; 
-x-originating-ip: [212.146.100.6]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: f7fdb8af-9fd2-46b4-c1e6-08d6d93e5888
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(4618075)(2017052603328)(7193020);SRVR:VI1PR0402MB3533;
-x-ms-traffictypediagnostic: VI1PR0402MB3533:
-x-microsoft-antispam-prvs: <VI1PR0402MB353302E4E36E8C6ADAF3DDE698090@VI1PR0402MB3533.eurprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
-x-forefront-prvs: 0038DE95A2
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(346002)(366004)(136003)(376002)(396003)(39860400002)(199004)(189003)(53546011)(81156014)(81166006)(8936002)(6506007)(8676002)(76176011)(74316002)(54906003)(316002)(7696005)(305945005)(7736002)(33656002)(3846002)(102836004)(2906002)(99286004)(229853002)(110136005)(256004)(14444005)(6116002)(6436002)(55016002)(9686003)(66476007)(52536014)(5660300002)(44832011)(71190400001)(66066001)(68736007)(26005)(71200400001)(66446008)(66556008)(64756008)(186003)(4326008)(53936002)(86362001)(476003)(6246003)(478600001)(14454004)(25786009)(486006)(66946007)(446003)(76116006)(73956011);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB3533;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: nxp.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: tqRKJ8tn+veTogvMVEoaMg8qQ++6AsiP2XHRa2EwSnXCvbywl8PLczPTwZFA8hrZ3VeWGGxLBVGWhfP89SHEfOQ6NoQjU1Njse/DfmVq3LHNMxRZL7R54W+9xJ54rjUQ2faCGwJRIM6XR1+eyMieuvpOe74TlcpKIrAhkIFnekkIfPhrDFwOy4BKDyraR1AXrWz+UjucDSV6sAC4eM559kHOQe7/kyTClYDKwRGJ9dHb9+E/pi+GekeTIu+O15ORskuf7biBhXLhEzyEY6YYV8CC8C8EtQ+4XnuZlbsTm1TlAmbK+nfzMN9icSX3RV48nwGEHKjkWwcOrzGZuYNbUr9lJP/OkQNtIrhQVikWtnRLiNKdKS4DJYrzI0hA+SxRD/5V5QYZuc3hjz7foG8ReuPKSlv1KgrE4j+n9hkpDK0=
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
+        Wed, 15 May 2019 10:08:02 -0400
+Received: from orcrist.hmeau.com ([5.180.42.13]:37002 "EHLO deadmen.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726646AbfEOOIC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 15 May 2019 10:08:02 -0400
+Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
+        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
+        id 1hQu9A-0004bO-Py; Wed, 15 May 2019 21:40:40 +0800
+Received: from herbert by gondobar with local (Exim 4.89)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1hQu95-00054E-FJ; Wed, 15 May 2019 21:40:35 +0800
+Date:   Wed, 15 May 2019 21:40:35 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Pascal Van Leeuwen <pvanleeuwen@insidesecure.com>
+Cc:     Christophe Leroy <christophe.leroy@c-s.fr>,
+        Eric Biggers <ebiggers@google.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Subject: Re: Can scatterlist elements cross page boundary ?
+Message-ID: <20190515134035.uu3gpmruq5fijnh5@gondor.apana.org.au>
+References: <798a42c9-bcda-6612-088c-cb90c35a578f@c-s.fr>
+ <AM6PR09MB35234E6A537053A542A65E4AD2090@AM6PR09MB3523.eurprd09.prod.outlook.com>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f7fdb8af-9fd2-46b4-c1e6-08d6d93e5888
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 May 2019 14:05:11.4920
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3533
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <AM6PR09MB35234E6A537053A542A65E4AD2090@AM6PR09MB3523.eurprd09.prod.outlook.com>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 5/15/2019 3:29 PM, Christophe Leroy wrote:=0A=
-> Selftests report the following:=0A=
-> =0A=
-> [    2.984845] alg: skcipher: cbc-aes-talitos encryption test failed (wro=
-ng output IV) on test vector 0, cfg=3D"in-place"=0A=
-> [    2.995377] 00000000: 3d af ba 42 9d 9e b4 30 b4 22 da 80 2c 9f ac 41=
-=0A=
-> [    3.032673] alg: skcipher: cbc-des-talitos encryption test failed (wro=
-ng output IV) on test vector 0, cfg=3D"in-place"=0A=
-> [    3.043185] 00000000: fe dc ba 98 76 54 32 10=0A=
-> [    3.063238] alg: skcipher: cbc-3des-talitos encryption test failed (wr=
-ong output IV) on test vector 0, cfg=3D"in-place"=0A=
-> [    3.073818] 00000000: 7d 33 88 93 0f 93 b2 42=0A=
-> =0A=
-> This above dumps show that the actual output IV is indeed the input IV.=
-=0A=
-> This is due to the IV not being copied back into the request.=0A=
-> =0A=
-> This patch fixes that.=0A=
-> =0A=
-> Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>=0A=
-Reviewed-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
-=0A=
-While here, could you please check ecb mode (which by definition does not h=
-ave=0A=
-an IV) is behaving correctly?=0A=
-Looking in driver_algs[] list of crypto algorithms supported by talitos,=0A=
-ecb(aes,des,3des) are declared with ivsize !=3D 0.=0A=
-=0A=
-Thanks,=0A=
-Horia=0A=
+On Wed, May 15, 2019 at 12:08:45PM +0000, Pascal Van Leeuwen wrote:
+> Hi Christophe,
+> 
+> I ran into a similar issue with the Inside Secure driver.
+> 
+> If I understood correctly, scatter buffers do not need to be enclosed in a single page as long as the scatter buffer as a whole is contiguous in memory. So it can be multiple pages, but then they have to be back-to-back in physical/device memory.
+> 
+> The latter should be guaranteed by the kernel allocator.
+
+Yes this is correct.
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
