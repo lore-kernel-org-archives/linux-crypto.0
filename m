@@ -2,109 +2,144 @@ Return-Path: <SRS0=YWhG=TP=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3356C04E53
-	for <linux-crypto@archiver.kernel.org>; Wed, 15 May 2019 09:02:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0835AC04E87
+	for <linux-crypto@archiver.kernel.org>; Wed, 15 May 2019 09:16:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B311520862
-	for <linux-crypto@archiver.kernel.org>; Wed, 15 May 2019 09:02:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CEEB320881
+	for <linux-crypto@archiver.kernel.org>; Wed, 15 May 2019 09:16:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=insidesecure.onmicrosoft.com header.i=@insidesecure.onmicrosoft.com header.b="V011aUFb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YtxdamWc"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725933AbfEOJCu (ORCPT
+        id S1725954AbfEOJQk (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 15 May 2019 05:02:50 -0400
-Received: from mail-eopbgr20122.outbound.protection.outlook.com ([40.107.2.122]:15520
-        "EHLO EUR02-VE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725929AbfEOJCu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 15 May 2019 05:02:50 -0400
+        Wed, 15 May 2019 05:16:40 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:39105 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725912AbfEOJQk (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 15 May 2019 05:16:40 -0400
+Received: by mail-wr1-f65.google.com with SMTP id w8so1794652wrl.6;
+        Wed, 15 May 2019 02:16:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=insidesecure.onmicrosoft.com; s=selector1-insidesecure-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uCbafZCjBDYg0wBkjY4yRoQTxPYcqrhujQpw0mJGJY4=;
- b=V011aUFbhm2HUAu+dhc+HNqY5bSeAUV2u4P+6DznLLB1fwlJ9dNaxlUE9uA2j9l3v6UG/PDUmwCQu95/x5J3A9mwxVsd6oYpKCKvgT5Xp7meJvQOBNXgq2m8ZUgzkRu9t2ucaoN/N7jjvLJ2KUBAwyfrqklIv9SCCvKfJ3OD004=
-Received: from AM6PR09MB3523.eurprd09.prod.outlook.com (10.255.99.206) by
- AM6PR09MB2422.eurprd09.prod.outlook.com (20.177.113.159) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1878.21; Wed, 15 May 2019 09:02:42 +0000
-Received: from AM6PR09MB3523.eurprd09.prod.outlook.com
- ([fe80::8c11:e692:3a44:a3a9]) by AM6PR09MB3523.eurprd09.prod.outlook.com
- ([fe80::8c11:e692:3a44:a3a9%6]) with mapi id 15.20.1878.024; Wed, 15 May 2019
- 09:02:42 +0000
-From:   Pascal Van Leeuwen <pvanleeuwen@insidesecure.com>
-To:     "antoine.tenart@bootlin.com" <antoine.tenart@bootlin.com>,
-        Riku Voipio <riku.voipio@linaro.org>
-CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Subject: RE: crypto: inside_secure - call for volunteers
-Thread-Topic: crypto: inside_secure - call for volunteers
-Thread-Index: AdT/U6NOlHK52506RKGw2EuTDrqaWQABLx+AAAA8mJAAAMUMAALn8IMw
-Date:   Wed, 15 May 2019 09:02:42 +0000
-Message-ID: <AM6PR09MB3523E393D4EA082FDDBC9251D2090@AM6PR09MB3523.eurprd09.prod.outlook.com>
-References: <DBBPR09MB352627DA3C425CECC763B99FD23A0@DBBPR09MB3526.eurprd09.prod.outlook.com>
- <20190430132653.GB3508@kwain>
- <DBBPR09MB352652D305657569DCA6E436D23A0@DBBPR09MB3526.eurprd09.prod.outlook.com>
- <20190430135542.GC3508@kwain>
-In-Reply-To: <20190430135542.GC3508@kwain>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=pvanleeuwen@insidesecure.com; 
-x-originating-ip: [188.204.2.113]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: aaccfc97-7d66-4380-cb87-08d6d91416bb
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(2017052603328)(7193020);SRVR:AM6PR09MB2422;
-x-ms-traffictypediagnostic: AM6PR09MB2422:
-x-ms-exchange-purlcount: 1
-x-microsoft-antispam-prvs: <AM6PR09MB24227DC22FAE4399CFDC1699D2090@AM6PR09MB2422.eurprd09.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:4303;
-x-forefront-prvs: 0038DE95A2
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(376002)(366004)(396003)(39850400004)(346002)(136003)(199004)(189003)(3846002)(74316002)(305945005)(6116002)(7736002)(33656002)(8676002)(81156014)(2906002)(15974865002)(110136005)(81166006)(2501003)(68736007)(4744005)(446003)(256004)(186003)(316002)(99286004)(66066001)(102836004)(6506007)(73956011)(4326008)(71200400001)(71190400001)(66946007)(7696005)(76116006)(486006)(478600001)(26005)(8936002)(6246003)(76176011)(6436002)(86362001)(53936002)(14454004)(476003)(66446008)(64756008)(5660300002)(66476007)(52536014)(55016002)(9686003)(25786009)(11346002)(66556008)(229853002)(18886075002);DIR:OUT;SFP:1102;SCL:1;SRVR:AM6PR09MB2422;H:AM6PR09MB3523.eurprd09.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: insidesecure.com does not
- designate permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: uKfqgAvwUU7j/2J2+1IaJOb2ouBaAuH+yESK5zEqOEnsWypksE+xLZ2V/2XTFmxUoSHvMWvO3KJTzTqIR5vrEyPmSR97Yv2Aqq1pqQdwo4xp5FOixn7hrFxK+2VkKV5jLvPLAOq5XCbD2K/Lu+EvXlblXJj+QWctoC9Stcv9+0IuQfFILXCn6GsLiIhnIDwoxhVNcAtwP8VhCU3+s8vm8ASECGDavNp3XsgrRg3C3iwVIyn+9BeaDudC8QsWdGQRPkFwdP0B48E+716CJM052ia74oNzXu2M8a58G5ljomwQV91/q/YX2az53wB3ycUsp41zjIV7U3QsrCHO6fjBaSjcq4T2714268RUxg63EVhlInWD1bpLsvRR4sB6CSoIL2AtdTKj0Tpjh+QjHkGLF15sZcCqlUnaFsyvJb20RA8=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=de5WSELj4gSXjf9AoL3U1UDofSw6C63nGgYMrSnkT2g=;
+        b=YtxdamWcmi6YX/fdouZCcul6AKXXkilhYp/DWKeBaUtOIls15/USE03WxOE9P78rPX
+         xhxAOLE3CHaWNx7YcBpH/3FKKze+xIdvzjBX/cI+kjn+GdkhM5oTiK/Pt0EQTD/m1S0s
+         PNYRMCXJ9AmkquApHv7+WzMKxTzkyXIDDtqoGrWWB4hb74su1gIeIUa5mRvbQwl2TYrM
+         FCHZknXOcQOZdkY+FhBNVEEBR5FACvvwXvG8P3wcGlrtf/dGK9aaj34gepxjg575lP8x
+         vRwnEe4y0AFtvT0h+AOc/ze+G37ShPxMvQGBqlP7QBw+ZAZdMALN2wJG8oJ+cPstQWw6
+         LeHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=de5WSELj4gSXjf9AoL3U1UDofSw6C63nGgYMrSnkT2g=;
+        b=P7utLkS7xDIquwP7DnxvL4ZjjYTM+7K2E3M9PDG6zbummmgTrXCe81UC6cDT4l2Qoe
+         oYi02uRibv7wlXWMcS4uAchR1usr2GKAQfqS4WlBxiO33ZTl4eQI9Z4eG5PWjhbfB7GF
+         OddL7kSkiq14Li/CfWJU5Lk5/Rs6dWmcpfMnHmXogFtkbyEWi8nTF/ziIm33XsRlm/dj
+         zAyXYYHj5NS+mmwnyMdTxt2QKPXp5YoT4GJ+vr7N0ufbaL/jxq3Mmc1DY+F4SQZzbm1t
+         y44cD+zFwNpdJV2yyp4rwP5icwm93ZzTxuq/O1viuSrNrqxdvl5ihxk4Cna4upCKyqmf
+         NqUw==
+X-Gm-Message-State: APjAAAVXIKaqwMubnlqCCpB2dOJGz7XE/dRUOUSGz0RIpJLyD+ybCXZt
+        3fXWVYPCEE9g3kAmjM4YZojut6OA
+X-Google-Smtp-Source: APXvYqy3X742I9KwcUqRd14IjC9LZoC8p7iNPBq0GYsUZJvygitoYc8BfVa1Ds+RFfjKHLH0gFI+ZA==
+X-Received: by 2002:adf:fa4e:: with SMTP id y14mr13380749wrr.149.1557911798704;
+        Wed, 15 May 2019 02:16:38 -0700 (PDT)
+Received: from Red ([2a01:cb1d:147:7200:2e56:dcff:fed2:c6d6])
+        by smtp.googlemail.com with ESMTPSA id a128sm1589710wma.23.2019.05.15.02.16.37
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 15 May 2019 02:16:37 -0700 (PDT)
+Date:   Wed, 15 May 2019 11:16:35 +0200
+From:   Corentin Labbe <clabbe.montjoie@gmail.com>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        stable@vger.kernel.org, Kees Cook <keescook@chromium.org>
+Subject: Re: [PATCH] crypto: hash - fix incorrect HASH_MAX_DESCSIZE
+Message-ID: <20190515091635.GA4140@Red>
+References: <20190514231315.7729-1-ebiggers@kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: insidesecure.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: aaccfc97-7d66-4380-cb87-08d6d91416bb
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 May 2019 09:02:42.1854
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3c07df58-7760-4e85-afd5-84803eac70ce
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR09MB2422
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190514231315.7729-1-ebiggers@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Riku, Antoine,
+On Tue, May 14, 2019 at 04:13:15PM -0700, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
+> 
+> The "hmac(sha3-224-generic)" algorithm has a descsize of 368 bytes,
+> which is greater than HASH_MAX_DESCSIZE (360) which is only enough for
+> sha3-224-generic.  The check in shash_prepare_alg() doesn't catch this
+> because the HMAC template doesn't set descsize on the algorithms, but
+> rather sets it on each individual HMAC transform.
+> 
+> This causes a stack buffer overflow when SHASH_DESC_ON_STACK() is used
+> with hmac(sha3-224-generic).
+> 
+> Fix it by increasing HASH_MAX_DESCSIZE to the real maximum.  Also add a
+> sanity check to hmac_init().
+> 
+> This was detected by the improved crypto self-tests in v5.2, by loading
+> the tcrypt module with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y enabled.  I
+> didn't notice this bug when I ran the self-tests by requesting the
+> algorithms via AF_ALG (i.e., not using tcrypt), probably because the
+> stack layout differs in the two cases and that made a difference here.
+> 
+> KASAN report:
+> 
+>     BUG: KASAN: stack-out-of-bounds in memcpy include/linux/string.h:359 [inline]
+>     BUG: KASAN: stack-out-of-bounds in shash_default_import+0x52/0x80 crypto/shash.c:223
+>     Write of size 360 at addr ffff8880651defc8 by task insmod/3689
+> 
+>     CPU: 2 PID: 3689 Comm: insmod Tainted: G            E     5.1.0-10741-g35c99ffa20edd #11
+>     Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1 04/01/2014
+>     Call Trace:
+>      __dump_stack lib/dump_stack.c:77 [inline]
+>      dump_stack+0x86/0xc5 lib/dump_stack.c:113
+>      print_address_description+0x7f/0x260 mm/kasan/report.c:188
+>      __kasan_report+0x144/0x187 mm/kasan/report.c:317
+>      kasan_report+0x12/0x20 mm/kasan/common.c:614
+>      check_memory_region_inline mm/kasan/generic.c:185 [inline]
+>      check_memory_region+0x137/0x190 mm/kasan/generic.c:191
+>      memcpy+0x37/0x50 mm/kasan/common.c:125
+>      memcpy include/linux/string.h:359 [inline]
+>      shash_default_import+0x52/0x80 crypto/shash.c:223
+>      crypto_shash_import include/crypto/hash.h:880 [inline]
+>      hmac_import+0x184/0x240 crypto/hmac.c:102
+>      hmac_init+0x96/0xc0 crypto/hmac.c:107
+>      crypto_shash_init include/crypto/hash.h:902 [inline]
+>      shash_digest_unaligned+0x9f/0xf0 crypto/shash.c:194
+>      crypto_shash_digest+0xe9/0x1b0 crypto/shash.c:211
+>      generate_random_hash_testvec.constprop.11+0x1ec/0x5b0 crypto/testmgr.c:1331
+>      test_hash_vs_generic_impl+0x3f7/0x5c0 crypto/testmgr.c:1420
+>      __alg_test_hash+0x26d/0x340 crypto/testmgr.c:1502
+>      alg_test_hash+0x22e/0x330 crypto/testmgr.c:1552
+>      alg_test.part.7+0x132/0x610 crypto/testmgr.c:4931
+>      alg_test+0x1f/0x40 crypto/testmgr.c:4952
+> 
+> Fixes: b68a7ec1e9a3 ("crypto: hash - Remove VLA usage")
+> Reported-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+> Cc: <stable@vger.kernel.org> # v4.20+
+> Cc: Kees Cook <keescook@chromium.org>
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
 
-It's been 2 weeks already so I'm kind of curious if either one of you
-managed to try anything with my modified Inside Secure driver yet?
-Note that if you experience any issues at all that:
+Hello
 
-a) I'd be very interested to hear about them
-b) I'm fully willing to help resolve those issues
+Thanks for the fix.
 
-BTW: if there are no issues and everything worked fine I'm also
-interested to hear about that :-)
+Tested-by: Corentin Labbe <clabbe.montjoie@gmail.com>
 
-Regards,
-Pascal
-
-
-Pascal van Leeuwen
-Silicon IP Architect, Multi-Protocol Engines @ Inside Secure
-
-Tel. : +31 (0)73 65 81 900
-
-www.insidesecure.com
-
+Regards
