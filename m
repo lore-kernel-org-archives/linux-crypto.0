@@ -2,155 +2,119 @@ Return-Path: <SRS0=FyHQ=TQ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B8DEC04AB4
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 May 2019 13:32:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01D09C04AAF
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 May 2019 14:24:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2ED4A21743
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 May 2019 13:32:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=c-s.fr header.i=@c-s.fr header.b="NYTHLKBb"
+	by mail.kernel.org (Postfix) with ESMTP id CF14320833
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 May 2019 14:24:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727539AbfEPNcl (ORCPT
+        id S1726692AbfEPOYp (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 May 2019 09:32:41 -0400
-Received: from pegase1.c-s.fr ([93.17.236.30]:34384 "EHLO pegase1.c-s.fr"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727069AbfEPNcl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 May 2019 09:32:41 -0400
-Received: from localhost (mailhub1-int [192.168.12.234])
-        by localhost (Postfix) with ESMTP id 454XRB1clVz9v6X8;
-        Thu, 16 May 2019 15:32:38 +0200 (CEST)
-Authentication-Results: localhost; dkim=pass
-        reason="1024-bit key; insecure key"
-        header.d=c-s.fr header.i=@c-s.fr header.b=NYTHLKBb; dkim-adsp=pass;
-        dkim-atps=neutral
-X-Virus-Scanned: Debian amavisd-new at c-s.fr
-Received: from pegase1.c-s.fr ([192.168.12.234])
-        by localhost (pegase1.c-s.fr [192.168.12.234]) (amavisd-new, port 10024)
-        with ESMTP id YJ2fH7KAqsev; Thu, 16 May 2019 15:32:38 +0200 (CEST)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-        by pegase1.c-s.fr (Postfix) with ESMTP id 454XRB0P2lz9v6Ws;
-        Thu, 16 May 2019 15:32:38 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=c-s.fr; s=mail;
-        t=1558013558; bh=nnbDu0Oncip1B1EfAee0nXXH/Y+D1kJM8P3yAxFONt8=;
-        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
-        b=NYTHLKBbYT+1AyjfBvVrBs+aVvT0yZrGdfDLlEw5m4ZSeWGjsy+j5C8Rusba+uXOC
-         09reBIj2aW5astgucBs6dszCpYVWDkiKv45TJDO8zpM3srgNKS6m2t+8G0AO9TDr7d
-         IHd0d8/WPeVC1xcTGhPFZEP3SMAbOwY5Zqi5GKIY=
-Received: from localhost (localhost [127.0.0.1])
-        by messagerie.si.c-s.fr (Postfix) with ESMTP id 743F98B831;
-        Thu, 16 May 2019 15:32:39 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-        by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-        with ESMTP id MI1hq9bTdmn3; Thu, 16 May 2019 15:32:39 +0200 (CEST)
-Received: from PO15451 (unknown [192.168.4.90])
-        by messagerie.si.c-s.fr (Postfix) with ESMTP id D33418B82A;
-        Thu, 16 May 2019 15:32:38 +0200 (CEST)
-Subject: Re: [PATCH] crypto: talitos - fix skcipher failure due to wrong
- output IV
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Horia Geanta <horia.geanta@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
-References: <a5b0d31d8fc9fc9bc2b69baa5330466090825a39.1557923113.git.christophe.leroy@c-s.fr>
- <VI1PR0402MB34858D80A15D4B55F64570E398090@VI1PR0402MB3485.eurprd04.prod.outlook.com>
- <29db3f20-f931-efc6-02a8-fe160ab8b484@c-s.fr>
- <20190516023050.GA23200@sol.localdomain>
-From:   Christophe Leroy <christophe.leroy@c-s.fr>
-Message-ID: <593f51b1-8c51-1994-623d-f5a591891d8a@c-s.fr>
-Date:   Thu, 16 May 2019 15:32:38 +0200
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        Thu, 16 May 2019 10:24:45 -0400
+Received: from metis.ext.pengutronix.de ([85.220.165.71]:56247 "EHLO
+        metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727121AbfEPOYp (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 16 May 2019 10:24:45 -0400
+Received: from dude.hi.pengutronix.de ([2001:67c:670:100:1d::7])
+        by metis.ext.pengutronix.de with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.89)
+        (envelope-from <sha@pengutronix.de>)
+        id 1hRHJL-0003eS-P0; Thu, 16 May 2019 16:24:43 +0200
+Received: from sha by dude.hi.pengutronix.de with local (Exim 4.92)
+        (envelope-from <sha@pengutronix.de>)
+        id 1hRHJL-0008Tb-EH; Thu, 16 May 2019 16:24:43 +0200
+From:   Sascha Hauer <s.hauer@pengutronix.de>
+To:     linux-crypto@vger.kernel.org
+Cc:     =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+        kernel@pengutronix.de, Sascha Hauer <s.hauer@pengutronix.de>
+Subject: [PATCH] crypto: caam: print debugging hex dumps after unmapping
+Date:   Thu, 16 May 2019 16:24:42 +0200
+Message-Id: <20190516142442.32537-1-s.hauer@pengutronix.de>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20190516023050.GA23200@sol.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: fr
 Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::7
+X-SA-Exim-Mail-From: sha@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+For encryption the destination pointer was still mapped, so the hex dump
+may be wrong. The IV still contained the input IV while printing instead
+of the output IV as intended.
 
+For decryption the destination pointer was still mapped, so the hex dump
+may be wrong. The IV dump was correct.
 
-Le 16/05/2019 à 04:30, Eric Biggers a écrit :
-> On Wed, May 15, 2019 at 08:49:48PM +0200, Christophe Leroy wrote:
->>
->>
->> Le 15/05/2019 à 16:05, Horia Geanta a écrit :
->>> On 5/15/2019 3:29 PM, Christophe Leroy wrote:
->>>> Selftests report the following:
->>>>
->>>> [    2.984845] alg: skcipher: cbc-aes-talitos encryption test failed (wrong output IV) on test vector 0, cfg="in-place"
->>>> [    2.995377] 00000000: 3d af ba 42 9d 9e b4 30 b4 22 da 80 2c 9f ac 41
->>>> [    3.032673] alg: skcipher: cbc-des-talitos encryption test failed (wrong output IV) on test vector 0, cfg="in-place"
->>>> [    3.043185] 00000000: fe dc ba 98 76 54 32 10
->>>> [    3.063238] alg: skcipher: cbc-3des-talitos encryption test failed (wrong output IV) on test vector 0, cfg="in-place"
->>>> [    3.073818] 00000000: 7d 33 88 93 0f 93 b2 42
->>>>
->>>> This above dumps show that the actual output IV is indeed the input IV.
->>>> This is due to the IV not being copied back into the request.
->>>>
->>>> This patch fixes that.
->>>>
->>>> Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
->>> Reviewed-by: Horia Geantă <horia.geanta@nxp.com>
->>
->> It's missing a Fixes: tag and a Cc: to stable.
->>
->> I'll resend tomorrow.
->>
->>>
->>> While here, could you please check ecb mode (which by definition does not have
->>> an IV) is behaving correctly?
->>> Looking in driver_algs[] list of crypto algorithms supported by talitos,
->>> ecb(aes,des,3des) are declared with ivsize != 0.
->>
->> According to /proc/crypto, test are passed for ecb.
->>
-> 
-> Did you try enabling CONFIG_CRYPTO_MANAGER_EXTRA_TESTS?  There is now a check
-> that the driver's ivsize matches the generic implementation's:
-> 
->          if (ivsize != crypto_skcipher_ivsize(generic_tfm)) {
->                  pr_err("alg: skcipher: ivsize for %s (%u) doesn't match generic impl (%u)\n",
->                         driver, ivsize, crypto_skcipher_ivsize(generic_tfm));
->                  err = -EINVAL;
->                  goto out;
->          }
-> 
-> For ECB that means the ivsize must be 0.
-> 
-> AFAICS the talitos driver even accesses the IV for ECB, which is wrong; and the
-> only reason this isn't crashing the self-tests already is that they are confused
-> by the declared ivsize being nonzero so they don't pass NULL as they should.
-> 
+Do the hex dumps consistenly after the buffers have been unmapped and
+in case of IV copied to their final destination.
 
-Ok, thanks. I'll try and run EXTRA TESTS as soon as I get the current 
-test all fixed.
+Signed-off-by: Sascha Hauer <s.hauer@pengutronix.de>
+---
+ drivers/crypto/caam/caamalg.c | 21 +++++++++++----------
+ 1 file changed, 11 insertions(+), 10 deletions(-)
 
-For the time being, I'm having a problem that I'm a bit lost with:
+diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
+index 3e23d4b2cce2..a992ff56fd15 100644
+--- a/drivers/crypto/caam/caamalg.c
++++ b/drivers/crypto/caam/caamalg.c
+@@ -1009,15 +1009,6 @@ static void skcipher_encrypt_done(struct device *jrdev, u32 *desc, u32 err,
+ 	if (err)
+ 		caam_jr_strstatus(jrdev, err);
+ 
+-#ifdef DEBUG
+-	print_hex_dump(KERN_ERR, "dstiv  @"__stringify(__LINE__)": ",
+-		       DUMP_PREFIX_ADDRESS, 16, 4, req->iv,
+-		       edesc->src_nents > 1 ? 100 : ivsize, 1);
+-#endif
+-	caam_dump_sg(KERN_ERR, "dst    @" __stringify(__LINE__)": ",
+-		     DUMP_PREFIX_ADDRESS, 16, 4, req->dst,
+-		     edesc->dst_nents > 1 ? 100 : req->cryptlen, 1);
+-
+ 	skcipher_unmap(jrdev, edesc, req);
+ 
+ 	/*
+@@ -1028,6 +1019,15 @@ static void skcipher_encrypt_done(struct device *jrdev, u32 *desc, u32 err,
+ 		scatterwalk_map_and_copy(req->iv, req->dst, req->cryptlen -
+ 					 ivsize, ivsize, 0);
+ 
++#ifdef DEBUG
++	print_hex_dump(KERN_ERR, "dstiv  @"__stringify(__LINE__)": ",
++		       DUMP_PREFIX_ADDRESS, 16, 4, req->iv,
++		       edesc->src_nents > 1 ? 100 : ivsize, 1);
++#endif
++	caam_dump_sg(KERN_ERR, "dst    @" __stringify(__LINE__)": ",
++		     DUMP_PREFIX_ADDRESS, 16, 4, req->dst,
++		     edesc->dst_nents > 1 ? 100 : req->cryptlen, 1);
++
+ 	kfree(edesc);
+ 
+ 	skcipher_request_complete(req, err);
+@@ -1049,6 +1049,8 @@ static void skcipher_decrypt_done(struct device *jrdev, u32 *desc, u32 err,
+ 	if (err)
+ 		caam_jr_strstatus(jrdev, err);
+ 
++	skcipher_unmap(jrdev, edesc, req);
++
+ #ifdef DEBUG
+ 	print_hex_dump(KERN_ERR, "dstiv  @"__stringify(__LINE__)": ",
+ 		       DUMP_PREFIX_ADDRESS, 16, 4, req->iv, ivsize, 1);
+@@ -1057,7 +1059,6 @@ static void skcipher_decrypt_done(struct device *jrdev, u32 *desc, u32 err,
+ 		     DUMP_PREFIX_ADDRESS, 16, 4, req->dst,
+ 		     edesc->dst_nents > 1 ? 100 : req->cryptlen, 1);
+ 
+-	skcipher_unmap(jrdev, edesc, req);
+ 	kfree(edesc);
+ 
+ 	skcipher_request_complete(req, err);
+-- 
+2.20.1
 
-AEAD decryption fails at the moment for out-of-line tests, and the 
-reason is that the ICV (used to do the SW compare with the expected one) 
-is generated after the decrypted data.
-It works perfectly when src == dst, because the src has space for it, 
-but when the dst is different, the dst length is smaller so the ICV is 
-generated outside the sg list, and the comparison fails because the 
-comparison is done with the last bytes of the last segment of dst sg 
-list (which corresponds to the end of decrypted data in that case).
-
-What I'm having hard time with it that it seems that when the sg list 
-has several elements, it uses an out of line area for generating the ICV 
-but not when the sg list has only one element. I'm really wondering why.
-
-Thanks
-Christophe
