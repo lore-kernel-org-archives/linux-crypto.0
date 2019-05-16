@@ -2,117 +2,93 @@ Return-Path: <SRS0=FyHQ=TQ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_PASS,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B277C04E84
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 May 2019 02:30:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF8F0C04E84
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 May 2019 02:56:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EB90220873
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 May 2019 02:30:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B7E7320873
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 May 2019 02:56:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1557973856;
-	bh=wM9TNClsZacWcRgk7xTDNK0BYza1+wzkgKUWbX29yrM=;
+	s=default; t=1557975368;
+	bh=TQQOh+GWzjppP/yoefvWnQUIY57aNXLvaCVcxSM4Cos=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=w4a3gFcjQ2CSl+qXANU1jC64eqcc3oYYgGUxGz4vXbbAW6maNqvhmKir8fsUZXPgg
-	 y1d0Ur/3P4KiYKXsbj437hMIgTfS4cv/xRJZL5CoCVpZgYzpq8nI538r/UZ0jMFcwk
-	 k4tRTDV9p2GhrKwDLDRPJFj9Yo/qs1FIcH4zgVPI=
+	b=Z74mj5Dl3gSzi1jy20Zqdw1s51/acp1jFLBEf/tGdBz8QwRZWCVvOkDYa0GfYK/z6
+	 PHgCPcNoKv9+8Bv1iXQnjDvSXEo997/QvIai387PSiZcJk3eUg9gzO5mX+3fk+gmJ+
+	 +rHkiDR4DG9lpbFdzN7mHFNwsyjGk20ClghjNYLU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725977AbfEPCay (ORCPT
+        id S1726188AbfEPC4H (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 15 May 2019 22:30:54 -0400
-Received: from mail.kernel.org ([198.145.29.99]:45876 "EHLO mail.kernel.org"
+        Wed, 15 May 2019 22:56:07 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56234 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725974AbfEPCay (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 15 May 2019 22:30:54 -0400
+        id S1725977AbfEPC4H (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 15 May 2019 22:56:07 -0400
 Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id ACA6720843;
-        Thu, 16 May 2019 02:30:53 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 6762520848;
+        Thu, 16 May 2019 02:56:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1557973853;
-        bh=wM9TNClsZacWcRgk7xTDNK0BYza1+wzkgKUWbX29yrM=;
+        s=default; t=1557975366;
+        bh=TQQOh+GWzjppP/yoefvWnQUIY57aNXLvaCVcxSM4Cos=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=MxuvneykuaKmPMU593+C93QcL9NYo0U3hIQ3jPbZUw9YVhW3okQwsdkSF23jGw6Vs
-         E47HWjp4V2AI4tkf9BtC9jDKrM3vOeIuB5S4G1NQveQFaD7L9HQKfCIvLEr7cqAVpo
-         Sa9VmLheapfklWiIY0Pu9I17VSa/syzd6uR1jgC8=
-Date:   Wed, 15 May 2019 19:30:52 -0700
+        b=f8xAWetoxViGqcLLrXE1ZBoxuj5LXHi+Y3NQ0zuqiKCzm80F58a3w5bUE5CJx6LM/
+         Y0mtyMb19YeFXtRsO8JaRBMX63pIyDl1Lel6Lft9oy7jwqcEVmsn3Gqe5+33Bx0APv
+         3NOCsjwtmxfPokAtzdTUsHHw+nKK0TIV0YFF5nc8=
+Date:   Wed, 15 May 2019 19:56:04 -0700
 From:   Eric Biggers <ebiggers@kernel.org>
-To:     Christophe Leroy <christophe.leroy@c-s.fr>
-Cc:     Horia Geanta <horia.geanta@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
-Subject: Re: [PATCH] crypto: talitos - fix skcipher failure due to wrong
- output IV
-Message-ID: <20190516023050.GA23200@sol.localdomain>
-References: <a5b0d31d8fc9fc9bc2b69baa5330466090825a39.1557923113.git.christophe.leroy@c-s.fr>
- <VI1PR0402MB34858D80A15D4B55F64570E398090@VI1PR0402MB3485.eurprd04.prod.outlook.com>
- <29db3f20-f931-efc6-02a8-fe160ab8b484@c-s.fr>
+To:     Daniel Axtens <dja@axtens.net>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Nayna <nayna@linux.vnet.ibm.com>, leo.barbosa@canonical.com,
+        Stephan Mueller <smueller@chronox.de>, nayna@linux.ibm.com,
+        omosnacek@gmail.com, leitao@debian.org, pfsmorigo@gmail.com,
+        linux-crypto@vger.kernel.org, marcelo.cerri@canonical.com,
+        George Wilson <gcwilson@linux.ibm.com>,
+        linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH] crypto: vmx - fix copy-paste error in CTR mode
+Message-ID: <20190516025603.GB23200@sol.localdomain>
+References: <87imvkwqdh.fsf@dja-thinkpad.axtens.net>
+ <2c8b042f-c7df-cb8b-3fcd-15d6bb274d08@linux.vnet.ibm.com>
+ <8736mmvafj.fsf@concordia.ellerman.id.au>
+ <20190506155315.GA661@sol.localdomain>
+ <20190513005901.tsop4lz26vusr6o4@gondor.apana.org.au>
+ <87pnomtwgh.fsf@concordia.ellerman.id.au>
+ <877eat0wi0.fsf@dja-thinkpad.axtens.net>
+ <20190515035336.y42wzhs3wzqdpwzn@gondor.apana.org.au>
+ <874l5w1axv.fsf@dja-thinkpad.axtens.net>
+ <871s0z171b.fsf@dja-thinkpad.axtens.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <29db3f20-f931-efc6-02a8-fe160ab8b484@c-s.fr>
+In-Reply-To: <871s0z171b.fsf@dja-thinkpad.axtens.net>
 User-Agent: Mutt/1.11.4 (2019-03-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, May 15, 2019 at 08:49:48PM +0200, Christophe Leroy wrote:
+On Thu, May 16, 2019 at 12:12:48PM +1000, Daniel Axtens wrote:
 > 
+> I'm also seeing issues with ghash with the extended tests:
 > 
-> Le 15/05/2019 à 16:05, Horia Geanta a écrit :
-> > On 5/15/2019 3:29 PM, Christophe Leroy wrote:
-> > > Selftests report the following:
-> > > 
-> > > [    2.984845] alg: skcipher: cbc-aes-talitos encryption test failed (wrong output IV) on test vector 0, cfg="in-place"
-> > > [    2.995377] 00000000: 3d af ba 42 9d 9e b4 30 b4 22 da 80 2c 9f ac 41
-> > > [    3.032673] alg: skcipher: cbc-des-talitos encryption test failed (wrong output IV) on test vector 0, cfg="in-place"
-> > > [    3.043185] 00000000: fe dc ba 98 76 54 32 10
-> > > [    3.063238] alg: skcipher: cbc-3des-talitos encryption test failed (wrong output IV) on test vector 0, cfg="in-place"
-> > > [    3.073818] 00000000: 7d 33 88 93 0f 93 b2 42
-> > > 
-> > > This above dumps show that the actual output IV is indeed the input IV.
-> > > This is due to the IV not being copied back into the request.
-> > > 
-> > > This patch fixes that.
-> > > 
-> > > Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
-> > Reviewed-by: Horia Geantă <horia.geanta@nxp.com>
+> [    7.582926] alg: hash: p8_ghash test failed (wrong result) on test vector 0, cfg="random: use_final src_divs=[<reimport>9.72%@+39832, <reimport>18.2%@+65504, <reimport,nosimd>45.57%@alignmask+18, <reimport,nosimd>15.6%@+65496, 6.83%@+65514, <reimport,nosimd>1.2%@+25, <reim"
 > 
-> It's missing a Fixes: tag and a Cc: to stable.
-> 
-> I'll resend tomorrow.
-> 
-> > 
-> > While here, could you please check ecb mode (which by definition does not have
-> > an IV) is behaving correctly?
-> > Looking in driver_algs[] list of crypto algorithms supported by talitos,
-> > ecb(aes,des,3des) are declared with ivsize != 0.
-> 
-> According to /proc/crypto, test are passed for ecb.
+> It seems to happen when one of the source divisions has nosimd and the
+> final result uses the simd finaliser, so that's interesting.
 > 
 
-Did you try enabling CONFIG_CRYPTO_MANAGER_EXTRA_TESTS?  There is now a check
-that the driver's ivsize matches the generic implementation's:
+The bug is that p8_ghash uses different shash_descs for the SIMD and no-SIMD
+cases.  So if you start out doing the hash in SIMD context but then switch to
+no-SIMD context or vice versa, the digest will be wrong.  Note that there can be
+an ->export() and ->import() in between, so it's not quite as obscure a case as
+one might think.
 
-        if (ivsize != crypto_skcipher_ivsize(generic_tfm)) {
-                pr_err("alg: skcipher: ivsize for %s (%u) doesn't match generic impl (%u)\n",
-                       driver, ivsize, crypto_skcipher_ivsize(generic_tfm));
-                err = -EINVAL;
-                goto out;
-        }
-
-For ECB that means the ivsize must be 0.
-
-AFAICS the talitos driver even accesses the IV for ECB, which is wrong; and the
-only reason this isn't crashing the self-tests already is that they are confused
-by the declared ivsize being nonzero so they don't pass NULL as they should.
+To fix it I think you'll need to make p8_ghash use 'struct ghash_desc_ctx' just
+like ghash-generic so that the two code paths can share the same shash_desc.
+That's similar to what the various SHA hash algorithms do.
 
 - Eric
