@@ -7,44 +7,44 @@ X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 470F1C04E84
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 May 2019 17:46:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6CD1C04E87
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 May 2019 17:51:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0F1D720848
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 May 2019 17:46:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A032020815
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 May 2019 17:51:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1558115197;
-	bh=/UdeNLzzUtcGnPoJK/QKdak2Jz/errYOGKQrhPH1zH8=;
+	s=default; t=1558115506;
+	bh=ysAIbo/22ozqU8DB1szPTRAK2KFlDqa+HCqb4lufk5A=;
 	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=h8CyuRVs7iWz/DakEn9NA9NOEqCUsQSMQMSAnRQZ0wRM1m5263LfAfV1xpOi21mNs
-	 Koa65MpKcOAAHNICdUG3SjfRRzMvWQAICZbHkrCBbdZXycpjs7d3Gb3Z+0DFdB3ait
-	 AUScSjMz5UUpbROfZ/71jPlgk+6Dnfg3UgZLADrc=
+	b=qcWzlLAi6IOTQi4+szzuJeUZ8/y48hRcQzN7Q/Ijqe0D1ifgr89d0GRjdeWlwZ0jr
+	 NjJp5FrRGM9/xT+265g7kxUyOUPEUXfxIdx84DQDrKOXK1Gbs+mJTED2cgeYMgabEz
+	 FdBW0fIcpCpQ76RtFQCzDBdlyFwmRPQYsvXTVxA8=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726078AbfEQRqg (ORCPT
+        id S1728177AbfEQRvq (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 17 May 2019 13:46:36 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47794 "EHLO mail.kernel.org"
+        Fri, 17 May 2019 13:51:46 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49518 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725932AbfEQRqg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 17 May 2019 13:46:36 -0400
+        id S1725932AbfEQRvp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 17 May 2019 13:51:45 -0400
 Received: from ebiggers-linuxstation.mtv.corp.google.com (unknown [104.132.1.77])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 09B6220848;
-        Fri, 17 May 2019 17:46:35 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 0D1CC20815;
+        Fri, 17 May 2019 17:51:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1558115195;
-        bh=/UdeNLzzUtcGnPoJK/QKdak2Jz/errYOGKQrhPH1zH8=;
+        s=default; t=1558115505;
+        bh=ysAIbo/22ozqU8DB1szPTRAK2KFlDqa+HCqb4lufk5A=;
         h=From:To:Cc:Subject:Date:From;
-        b=vacxOagJ1ZDNw1xHYb+6EZkI3mV4NZ4nWnc6WevZXCANMJzGeQzn1mQnxhAuFOvzi
-         uXMiN0PzdLLXtjUjzemN3QRl0I3WdUZpE7cZZEAfzFcTdAk4y32Y4xkUxoXzCmuiHh
-         sA9aFcqJBUwqQu7DHRFQ2mbndcM1Q5MKwlaDIMjE=
+        b=r/XUfiWlIhqNrq6uyoowbF0shQOsxUh0DR3VRokSFz/k+2ZVjrIs/+6yAr/mYJ5W3
+         ZNR+kYD45gBoyTOkBbP4vnknYcRIxmVBOObZOAg8++06fg/qM27Gql7Q0exEw5snP3
+         Yf2Umahud9bF9++A0gZUE+5uzk6fp/yVofXlOXO0=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     stable@vger.kernel.org
 Cc:     linux-crypto@vger.kernel.org
-Subject: [PATCH 4.4,4.9] crypto: arm/aes-neonbs - don't access already-freed walk.iv
-Date:   Fri, 17 May 2019 10:44:58 -0700
-Message-Id: <20190517174458.93755-1-ebiggers@kernel.org>
+Subject: [PATCH 4.4] crypto: chacha20poly1305 - set cra_name correctly
+Date:   Fri, 17 May 2019 10:50:03 -0700
+Message-Id: <20190517175003.118301-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.21.0.1020.gf2820cf01a-goog
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -55,51 +55,46 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-commit 767f015ea0b7ab9d60432ff6cd06b664fd71f50f upstream.
-[Please apply to 4.9-stable and earlier.]
+commit 5e27f38f1f3f45a0c938299c3a34a2d2db77165a upstream.
+[Please apply to 4.4-stable.]
 
-If the user-provided IV needs to be aligned to the algorithm's
-alignmask, then skcipher_walk_virt() copies the IV into a new aligned
-buffer walk.iv.  But skcipher_walk_virt() can fail afterwards, and then
-if the caller unconditionally accesses walk.iv, it's a use-after-free.
+If the rfc7539 template is instantiated with specific implementations,
+e.g. "rfc7539(chacha20-generic,poly1305-generic)" rather than
+"rfc7539(chacha20,poly1305)", then the implementation names end up
+included in the instance's cra_name.  This is incorrect because it then
+prevents all users from allocating "rfc7539(chacha20,poly1305)", if the
+highest priority implementations of chacha20 and poly1305 were selected.
+Also, the self-tests aren't run on an instance allocated in this way.
 
-arm32 xts-aes-neonbs doesn't set an alignmask, so currently it isn't
-affected by this despite unconditionally accessing walk.iv.  However
-this is more subtle than desired, and it was actually broken prior to
-the alignmask being removed by commit cc477bf64573 ("crypto: arm/aes -
-replace bit-sliced OpenSSL NEON code").  Thus, update xts-aes-neonbs to
-start checking the return value of skcipher_walk_virt().
+Fix it by setting the instance's cra_name from the underlying
+algorithms' actual cra_names, rather than from the requested names.
+This matches what other templates do.
 
-Fixes: e4e7f10bfc40 ("ARM: add support for bit sliced AES using NEON instructions")
-Cc: <stable@vger.kernel.org> # v3.13+
+Fixes: 71ebc4d1b27d ("crypto: chacha20poly1305 - Add a ChaCha20-Poly1305 AEAD construction, RFC7539")
+Cc: <stable@vger.kernel.org> # v4.2+
+Cc: Martin Willi <martin@strongswan.org>
 Signed-off-by: Eric Biggers <ebiggers@google.com>
+Reviewed-by: Martin Willi <martin@strongswan.org>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- arch/arm/crypto/aesbs-glue.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ crypto/chacha20poly1305.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm/crypto/aesbs-glue.c b/arch/arm/crypto/aesbs-glue.c
-index 5d934a0039d76..cb2486a526e66 100644
---- a/arch/arm/crypto/aesbs-glue.c
-+++ b/arch/arm/crypto/aesbs-glue.c
-@@ -265,6 +265,8 @@ static int aesbs_xts_encrypt(struct blkcipher_desc *desc,
+diff --git a/crypto/chacha20poly1305.c b/crypto/chacha20poly1305.c
+index 0214600ba071e..6c4724222e3a0 100644
+--- a/crypto/chacha20poly1305.c
++++ b/crypto/chacha20poly1305.c
+@@ -637,8 +637,8 @@ static int chachapoly_create(struct crypto_template *tmpl, struct rtattr **tb,
  
- 	blkcipher_walk_init(&walk, dst, src, nbytes);
- 	err = blkcipher_walk_virt_block(desc, &walk, 8 * AES_BLOCK_SIZE);
-+	if (err)
-+		return err;
- 
- 	/* generate the initial tweak */
- 	AES_encrypt(walk.iv, walk.iv, &ctx->twkey);
-@@ -289,6 +291,8 @@ static int aesbs_xts_decrypt(struct blkcipher_desc *desc,
- 
- 	blkcipher_walk_init(&walk, dst, src, nbytes);
- 	err = blkcipher_walk_virt_block(desc, &walk, 8 * AES_BLOCK_SIZE);
-+	if (err)
-+		return err;
- 
- 	/* generate the initial tweak */
- 	AES_encrypt(walk.iv, walk.iv, &ctx->twkey);
+ 	err = -ENAMETOOLONG;
+ 	if (snprintf(inst->alg.base.cra_name, CRYPTO_MAX_ALG_NAME,
+-		     "%s(%s,%s)", name, chacha_name,
+-		     poly_name) >= CRYPTO_MAX_ALG_NAME)
++		     "%s(%s,%s)", name, chacha->cra_name,
++		     poly->cra_name) >= CRYPTO_MAX_ALG_NAME)
+ 		goto out_drop_chacha;
+ 	if (snprintf(inst->alg.base.cra_driver_name, CRYPTO_MAX_ALG_NAME,
+ 		     "%s(%s,%s)", name, chacha->cra_driver_name,
 -- 
 2.21.0.1020.gf2820cf01a-goog
 
