@@ -4,47 +4,47 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42D96C46470
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 May 2019 17:30:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 470F1C04E84
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 May 2019 17:46:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0BDF721734
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 May 2019 17:30:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0F1D720848
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 May 2019 17:46:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1558114205;
-	bh=Nt2Knl7gnzVXrvFhFCn/ByrnRw+DIxvw9ac34fmgmjk=;
+	s=default; t=1558115197;
+	bh=/UdeNLzzUtcGnPoJK/QKdak2Jz/errYOGKQrhPH1zH8=;
 	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=zuYJVzUJZ19Txfr0bmQod1WASYwJlJZql8N7TbSGnie8/Ev9d6CBTCe10WeIftUQn
-	 5UXeoO0OIiqjp/Gt+Z1Y/dHacVu4J6cSAqScxCXqMo/YIMULJq/6gyzH2NEdAdnJFs
-	 mPZw2Si8GK8RJF5VqqM/UwYzd8e4D7TkaW0kc4Z4=
+	b=h8CyuRVs7iWz/DakEn9NA9NOEqCUsQSMQMSAnRQZ0wRM1m5263LfAfV1xpOi21mNs
+	 Koa65MpKcOAAHNICdUG3SjfRRzMvWQAICZbHkrCBbdZXycpjs7d3Gb3Z+0DFdB3ait
+	 AUScSjMz5UUpbROfZ/71jPlgk+6Dnfg3UgZLADrc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728528AbfEQRaE (ORCPT
+        id S1726078AbfEQRqg (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 17 May 2019 13:30:04 -0400
-Received: from mail.kernel.org ([198.145.29.99]:40448 "EHLO mail.kernel.org"
+        Fri, 17 May 2019 13:46:36 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47794 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726078AbfEQRaE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 17 May 2019 13:30:04 -0400
+        id S1725932AbfEQRqg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 17 May 2019 13:46:36 -0400
 Received: from ebiggers-linuxstation.mtv.corp.google.com (unknown [104.132.1.77])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id A347F216C4;
-        Fri, 17 May 2019 17:30:03 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 09B6220848;
+        Fri, 17 May 2019 17:46:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1558114203;
-        bh=Nt2Knl7gnzVXrvFhFCn/ByrnRw+DIxvw9ac34fmgmjk=;
+        s=default; t=1558115195;
+        bh=/UdeNLzzUtcGnPoJK/QKdak2Jz/errYOGKQrhPH1zH8=;
         h=From:To:Cc:Subject:Date:From;
-        b=R6qxW9p33gQrIQ5QRSaFqxG/tvZJ1vqjdH0NjlB9Ftr7s7iz2FWZd8FvxRtSBoYz4
-         2x3OLgHiC6QhJb93mtxjeq4RvRtpeFShSJvjGfc5ljhSp9ZbVXd/S3Qpj+Clf7l2tj
-         9ZIb11x70DPwiSLjb+1dbopw96xyXcnEwUEjgkFU=
+        b=vacxOagJ1ZDNw1xHYb+6EZkI3mV4NZ4nWnc6WevZXCANMJzGeQzn1mQnxhAuFOvzi
+         uXMiN0PzdLLXtjUjzemN3QRl0I3WdUZpE7cZZEAfzFcTdAk4y32Y4xkUxoXzCmuiHh
+         sA9aFcqJBUwqQu7DHRFQ2mbndcM1Q5MKwlaDIMjE=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     stable@vger.kernel.org
 Cc:     linux-crypto@vger.kernel.org
-Subject: [PATCH 4.14] crypto: arm64/aes-neonbs - don't access already-freed walk.iv
-Date:   Fri, 17 May 2019 10:29:51 -0700
-Message-Id: <20190517172951.58312-1-ebiggers@kernel.org>
+Subject: [PATCH 4.4,4.9] crypto: arm/aes-neonbs - don't access already-freed walk.iv
+Date:   Fri, 17 May 2019 10:44:58 -0700
+Message-Id: <20190517174458.93755-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.21.0.1020.gf2820cf01a-goog
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -55,41 +55,51 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-commit 4a8108b70508df0b6c4ffa4a3974dab93dcbe851 upstream.
-[Please apply to 4.14-stable.]
+commit 767f015ea0b7ab9d60432ff6cd06b664fd71f50f upstream.
+[Please apply to 4.9-stable and earlier.]
 
 If the user-provided IV needs to be aligned to the algorithm's
 alignmask, then skcipher_walk_virt() copies the IV into a new aligned
 buffer walk.iv.  But skcipher_walk_virt() can fail afterwards, and then
 if the caller unconditionally accesses walk.iv, it's a use-after-free.
 
-xts-aes-neonbs doesn't set an alignmask, so currently it isn't affected
-by this despite unconditionally accessing walk.iv.  However this is more
-subtle than desired, and unconditionally accessing walk.iv has caused a
-real problem in other algorithms.  Thus, update xts-aes-neonbs to start
-checking the return value of skcipher_walk_virt().
+arm32 xts-aes-neonbs doesn't set an alignmask, so currently it isn't
+affected by this despite unconditionally accessing walk.iv.  However
+this is more subtle than desired, and it was actually broken prior to
+the alignmask being removed by commit cc477bf64573 ("crypto: arm/aes -
+replace bit-sliced OpenSSL NEON code").  Thus, update xts-aes-neonbs to
+start checking the return value of skcipher_walk_virt().
 
-Fixes: 1abee99eafab ("crypto: arm64/aes - reimplement bit-sliced ARM/NEON implementation for arm64")
-Cc: <stable@vger.kernel.org> # v4.11+
+Fixes: e4e7f10bfc40 ("ARM: add support for bit sliced AES using NEON instructions")
+Cc: <stable@vger.kernel.org> # v3.13+
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- arch/arm64/crypto/aes-neonbs-glue.c | 2 ++
- 1 file changed, 2 insertions(+)
+ arch/arm/crypto/aesbs-glue.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/arch/arm64/crypto/aes-neonbs-glue.c b/arch/arm64/crypto/aes-neonbs-glue.c
-index c55d68ccb89f8..52975817fdb66 100644
---- a/arch/arm64/crypto/aes-neonbs-glue.c
-+++ b/arch/arm64/crypto/aes-neonbs-glue.c
-@@ -307,6 +307,8 @@ static int __xts_crypt(struct skcipher_request *req,
- 	int err;
+diff --git a/arch/arm/crypto/aesbs-glue.c b/arch/arm/crypto/aesbs-glue.c
+index 5d934a0039d76..cb2486a526e66 100644
+--- a/arch/arm/crypto/aesbs-glue.c
++++ b/arch/arm/crypto/aesbs-glue.c
+@@ -265,6 +265,8 @@ static int aesbs_xts_encrypt(struct blkcipher_desc *desc,
  
- 	err = skcipher_walk_virt(&walk, req, true);
+ 	blkcipher_walk_init(&walk, dst, src, nbytes);
+ 	err = blkcipher_walk_virt_block(desc, &walk, 8 * AES_BLOCK_SIZE);
 +	if (err)
 +		return err;
  
- 	kernel_neon_begin();
+ 	/* generate the initial tweak */
+ 	AES_encrypt(walk.iv, walk.iv, &ctx->twkey);
+@@ -289,6 +291,8 @@ static int aesbs_xts_decrypt(struct blkcipher_desc *desc,
  
+ 	blkcipher_walk_init(&walk, dst, src, nbytes);
+ 	err = blkcipher_walk_virt_block(desc, &walk, 8 * AES_BLOCK_SIZE);
++	if (err)
++		return err;
+ 
+ 	/* generate the initial tweak */
+ 	AES_encrypt(walk.iv, walk.iv, &ctx->twkey);
 -- 
 2.21.0.1020.gf2820cf01a-goog
 
