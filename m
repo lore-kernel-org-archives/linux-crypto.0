@@ -6,106 +6,83 @@ X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDC41C04AB4
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 May 2019 06:00:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15C21C04AB4
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 May 2019 06:00:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B6A4A2083E
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 May 2019 06:00:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E225B2083E
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 May 2019 06:00:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727481AbfEQGAb (ORCPT
+        id S1727517AbfEQGAu (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 17 May 2019 02:00:31 -0400
-Received: from [128.1.224.119] ([128.1.224.119]:54052 "EHLO deadmen.hmeau.com"
+        Fri, 17 May 2019 02:00:50 -0400
+Received: from [128.1.224.119] ([128.1.224.119]:54072 "EHLO deadmen.hmeau.com"
         rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727242AbfEQGAa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 17 May 2019 02:00:30 -0400
+        id S1727242AbfEQGAu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 17 May 2019 02:00:50 -0400
 Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
         by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1hRVuv-0007s9-76; Fri, 17 May 2019 14:00:29 +0800
+        id 1hRVv9-0007sG-Jh; Fri, 17 May 2019 14:00:43 +0800
 Received: from herbert by gondobar with local (Exim 4.89)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1hRVut-0000YN-9B; Fri, 17 May 2019 14:00:27 +0800
-Date:   Fri, 17 May 2019 14:00:27 +0800
+        id 1hRVv3-0000Yj-Jw; Fri, 17 May 2019 14:00:37 +0800
+Date:   Fri, 17 May 2019 14:00:37 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-crypto@vger.kernel.org,
-        Corentin Labbe <clabbe.montjoie@gmail.com>,
-        stable@vger.kernel.org, Kees Cook <keescook@chromium.org>
-Subject: Re: [PATCH] crypto: hash - fix incorrect HASH_MAX_DESCSIZE
-Message-ID: <20190517060027.wqowv4aazpcrr6pv@gondor.apana.org.au>
-References: <20190514231315.7729-1-ebiggers@kernel.org>
+To:     Daniel Axtens <dja@axtens.net>
+Cc:     mpe@ellerman.id.au, ebiggers@kernel.org,
+        linux-crypto@vger.kernel.org, marcelo.cerri@canonical.com,
+        Stephan Mueller <smueller@chronox.de>,
+        leo.barbosa@canonical.com, linuxppc-dev@lists.ozlabs.org,
+        nayna@linux.ibm.com, pfsmorigo@gmail.com, leitao@debian.org,
+        gcwilson@linux.ibm.com, omosnacek@gmail.com
+Subject: Re: [PATCH] crypto: vmx - CTR: always increment IV as quadword
+Message-ID: <20190517060037.obxagoes7fdfftuj@gondor.apana.org.au>
+References: <20190515102450.30557-1-dja@axtens.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190514231315.7729-1-ebiggers@kernel.org>
+In-Reply-To: <20190515102450.30557-1-dja@axtens.net>
 User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, May 14, 2019 at 04:13:15PM -0700, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
+On Wed, May 15, 2019 at 08:24:50PM +1000, Daniel Axtens wrote:
+> The kernel self-tests picked up an issue with CTR mode:
+> alg: skcipher: p8_aes_ctr encryption test failed (wrong result) on test vector 3, cfg="uneven misaligned splits, may sleep"
 > 
-> The "hmac(sha3-224-generic)" algorithm has a descsize of 368 bytes,
-> which is greater than HASH_MAX_DESCSIZE (360) which is only enough for
-> sha3-224-generic.  The check in shash_prepare_alg() doesn't catch this
-> because the HMAC template doesn't set descsize on the algorithms, but
-> rather sets it on each individual HMAC transform.
+> Test vector 3 has an IV of FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD, so
+> after 3 increments it should wrap around to 0.
 > 
-> This causes a stack buffer overflow when SHASH_DESC_ON_STACK() is used
-> with hmac(sha3-224-generic).
+> In the aesp8-ppc code from OpenSSL, there are two paths that
+> increment IVs: the bulk (8 at a time) path, and the individual
+> path which is used when there are fewer than 8 AES blocks to
+> process.
 > 
-> Fix it by increasing HASH_MAX_DESCSIZE to the real maximum.  Also add a
-> sanity check to hmac_init().
+> In the bulk path, the IV is incremented with vadduqm: "Vector
+> Add Unsigned Quadword Modulo", which does 128-bit addition.
 > 
-> This was detected by the improved crypto self-tests in v5.2, by loading
-> the tcrypt module with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y enabled.  I
-> didn't notice this bug when I ran the self-tests by requesting the
-> algorithms via AF_ALG (i.e., not using tcrypt), probably because the
-> stack layout differs in the two cases and that made a difference here.
+> In the individual path, however, the IV is incremented with
+> vadduwm: "Vector Add Unsigned Word Modulo", which instead
+> does 4 32-bit additions. Thus the IV would instead become
+> FFFFFFFFFFFFFFFFFFFFFFFF00000000, throwing off the result.
 > 
-> KASAN report:
+> Use vadduqm.
 > 
->     BUG: KASAN: stack-out-of-bounds in memcpy include/linux/string.h:359 [inline]
->     BUG: KASAN: stack-out-of-bounds in shash_default_import+0x52/0x80 crypto/shash.c:223
->     Write of size 360 at addr ffff8880651defc8 by task insmod/3689
+> This was probably a typo originally, what with q and w being
+> adjacent. It is a pretty narrow edge case: I am really
+> impressed by the quality of the kernel self-tests!
 > 
->     CPU: 2 PID: 3689 Comm: insmod Tainted: G            E     5.1.0-10741-g35c99ffa20edd #11
->     Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1 04/01/2014
->     Call Trace:
->      __dump_stack lib/dump_stack.c:77 [inline]
->      dump_stack+0x86/0xc5 lib/dump_stack.c:113
->      print_address_description+0x7f/0x260 mm/kasan/report.c:188
->      __kasan_report+0x144/0x187 mm/kasan/report.c:317
->      kasan_report+0x12/0x20 mm/kasan/common.c:614
->      check_memory_region_inline mm/kasan/generic.c:185 [inline]
->      check_memory_region+0x137/0x190 mm/kasan/generic.c:191
->      memcpy+0x37/0x50 mm/kasan/common.c:125
->      memcpy include/linux/string.h:359 [inline]
->      shash_default_import+0x52/0x80 crypto/shash.c:223
->      crypto_shash_import include/crypto/hash.h:880 [inline]
->      hmac_import+0x184/0x240 crypto/hmac.c:102
->      hmac_init+0x96/0xc0 crypto/hmac.c:107
->      crypto_shash_init include/crypto/hash.h:902 [inline]
->      shash_digest_unaligned+0x9f/0xf0 crypto/shash.c:194
->      crypto_shash_digest+0xe9/0x1b0 crypto/shash.c:211
->      generate_random_hash_testvec.constprop.11+0x1ec/0x5b0 crypto/testmgr.c:1331
->      test_hash_vs_generic_impl+0x3f7/0x5c0 crypto/testmgr.c:1420
->      __alg_test_hash+0x26d/0x340 crypto/testmgr.c:1502
->      alg_test_hash+0x22e/0x330 crypto/testmgr.c:1552
->      alg_test.part.7+0x132/0x610 crypto/testmgr.c:4931
->      alg_test+0x1f/0x40 crypto/testmgr.c:4952
+> Fixes: 5c380d623ed3 ("crypto: vmx - Add support for VMS instructions by ASM")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Daniel Axtens <dja@axtens.net>
 > 
-> Fixes: b68a7ec1e9a3 ("crypto: hash - Remove VLA usage")
-> Reported-by: Corentin Labbe <clabbe.montjoie@gmail.com>
-> Cc: <stable@vger.kernel.org> # v4.20+
-> Cc: Kees Cook <keescook@chromium.org>
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
 > ---
->  crypto/hmac.c         | 2 ++
->  include/crypto/hash.h | 8 +++++++-
->  2 files changed, 9 insertions(+), 1 deletion(-)
+> 
+> I'll pass this along internally to get it into OpenSSL as well.
+> ---
+>  drivers/crypto/vmx/aesp8-ppc.pl | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Patch applied.  Thanks.
 -- 
