@@ -2,101 +2,115 @@ Return-Path: <SRS0=1tzS=TR=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 667B4C04AB4
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 May 2019 06:11:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59B4BC04AB4
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 May 2019 07:33:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3318620848
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 May 2019 06:11:14 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="CTAbbyiT"
+	by mail.kernel.org (Postfix) with ESMTP id 3502A206A3
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 May 2019 07:33:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727500AbfEQGLN (ORCPT
+        id S1727573AbfEQHdt (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 17 May 2019 02:11:13 -0400
-Received: from mail-eopbgr80040.outbound.protection.outlook.com ([40.107.8.40]:39413
-        "EHLO EUR04-VI1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727106AbfEQGLM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 17 May 2019 02:11:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fxkJdwOFopavm+ZyUxZ4encVoL+uCEP5Lo0ZQ76BADI=;
- b=CTAbbyiT5cCI7DKkCgtiMtQ4L1KgY8Ev/fJSWcZH0ooXHzdPtAphvbv4q/+6Z+LRGINrlWTYvvf8Ys8TP0d2lsqZTwbieC7m4wsZVh1jpxaqKq096UJp7bb78Po15loXK8d4xiUmyDvbWdpwrHKnn9Nr+JoRAdeQ5pAtG1Slqw0=
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
- VI1PR0402MB3373.eurprd04.prod.outlook.com (52.134.1.22) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1900.16; Fri, 17 May 2019 06:11:09 +0000
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::a450:3c13:d7af:7451]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::a450:3c13:d7af:7451%3]) with mapi id 15.20.1900.010; Fri, 17 May 2019
- 06:11:09 +0000
-From:   Horia Geanta <horia.geanta@nxp.com>
-To:     Sascha Hauer <s.hauer@pengutronix.de>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-CC:     "kernel@pengutronix.de" <kernel@pengutronix.de>
-Subject: Re: [PATCH] crypto: caam: print debugging hex dumps after unmapping
-Thread-Topic: [PATCH] crypto: caam: print debugging hex dumps after unmapping
-Thread-Index: AQHVDHdRrXIrKim4f0WfWBBm7eUFjw==
-Date:   Fri, 17 May 2019 06:11:09 +0000
-Message-ID: <VI1PR0402MB348565B9C2A68E7694B9B041980B0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-References: <20190516142442.32537-1-s.hauer@pengutronix.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=horia.geanta@nxp.com; 
-x-originating-ip: [212.146.100.6]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: e065a260-9229-4726-cfd5-08d6da8e7498
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(4618075)(2017052603328)(7193020);SRVR:VI1PR0402MB3373;
-x-ms-traffictypediagnostic: VI1PR0402MB3373:
-x-microsoft-antispam-prvs: <VI1PR0402MB3373003954F1BEADDC9AB02D980B0@VI1PR0402MB3373.eurprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8273;
-x-forefront-prvs: 0040126723
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(136003)(346002)(39860400002)(376002)(366004)(396003)(189003)(199004)(5660300002)(446003)(74316002)(53546011)(66946007)(66556008)(64756008)(66476007)(486006)(66446008)(76116006)(6436002)(476003)(73956011)(25786009)(33656002)(6506007)(52536014)(2501003)(110136005)(102836004)(66066001)(26005)(186003)(6116002)(229853002)(99286004)(316002)(7696005)(7736002)(86362001)(305945005)(71190400001)(4326008)(53936002)(81166006)(8936002)(3846002)(6246003)(44832011)(68736007)(4744005)(14454004)(55016002)(2906002)(256004)(478600001)(76176011)(9686003)(8676002)(81156014)(71200400001);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB3373;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: nxp.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: KuyKA0JH6MnfxhOHT2nvMVjeaNWrdujslV3kH+epVwzGsuu+iqeh0WzS4JOfN29S/G7ofW4qDTJ0D2J92gcWvP6/sOaPFq4Se/9kbgrKKeDHLpwES+fcYrCAZ2PrCK5WujHHH38FscXVfN2mNfByDLwPOKnwAOQ9eo1OlcfUlEr+fBgEYZp3kAdFuKosMAbkGwuFtmWjHNshhZp8cgORLp5r+wjsT17PEQIB0x5DlB2U6tYce30DNmxthlHpufk3DCd/HEBkR/0OcoIaMjNM7C8XbPZi7oiCfXO4kg56DFRusFoT8dAwihj6hCBVBrSrNtmY6GNj/cVvfR7Fb5BDw1mgDV9Rrba6+J2Onld+VpRXMdeGeuQ+6gJNG8Vp8mqXP7J/Ij+IEWYzx11yMtQM2CbjCqCiz7+92eLQnQ7jZeM=
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
+        Fri, 17 May 2019 03:33:49 -0400
+Received: from metis.ext.pengutronix.de ([85.220.165.71]:46881 "EHLO
+        metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727528AbfEQHdt (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 17 May 2019 03:33:49 -0400
+Received: from ptx.hi.pengutronix.de ([2001:67c:670:100:1d::c0])
+        by metis.ext.pengutronix.de with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.89)
+        (envelope-from <sha@pengutronix.de>)
+        id 1hRXNC-00016p-Oo; Fri, 17 May 2019 09:33:46 +0200
+Received: from sha by ptx.hi.pengutronix.de with local (Exim 4.89)
+        (envelope-from <sha@pengutronix.de>)
+        id 1hRXNC-0001as-98; Fri, 17 May 2019 09:33:46 +0200
+Date:   Fri, 17 May 2019 09:33:46 +0200
+From:   Sascha Hauer <s.hauer@pengutronix.de>
+To:     Horia Geanta <horia.geanta@nxp.com>
+Cc:     Fabio Estevam <festevam@gmail.com>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        Sascha Hauer <kernel@pengutronix.de>
+Subject: Re: ctr(aes) broken in CAAM driver
+Message-ID: <20190517073346.2rdy5pz73hwonw5b@pengutronix.de>
+References: <20190515130746.cvhkxxffrmmynfq3@pengutronix.de>
+ <CAOMZO5CJvcipPNY6TXnwwET2fc=zaP3Dj3HPT-zfZpzfqHkeHQ@mail.gmail.com>
+ <20190515132225.oczgouglycuhqo4l@pengutronix.de>
+ <VI1PR0402MB3485ED478A2A3E0087E81F7C98090@VI1PR0402MB3485.eurprd04.prod.outlook.com>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e065a260-9229-4726-cfd5-08d6da8e7498
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 May 2019 06:11:09.4797
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3373
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <VI1PR0402MB3485ED478A2A3E0087E81F7C98090@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL:  http://www.pengutronix.de/
+X-IRC:  #ptxdist @freenode
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-Uptime: 09:32:51 up 59 days, 18:43, 86 users,  load average: 1.09, 1.12,
+ 1.12
+User-Agent: NeoMutt/20170113 (1.7.2)
+X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::c0
+X-SA-Exim-Mail-From: sha@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 5/16/2019 5:24 PM, Sascha Hauer wrote:=0A=
-> For encryption the destination pointer was still mapped, so the hex dump=
-=0A=
-> may be wrong. The IV still contained the input IV while printing instead=
-=0A=
-> of the output IV as intended.=0A=
-> =0A=
-> For decryption the destination pointer was still mapped, so the hex dump=
-=0A=
-> may be wrong. The IV dump was correct.=0A=
-> =0A=
-> Do the hex dumps consistenly after the buffers have been unmapped and=0A=
-> in case of IV copied to their final destination.=0A=
-> =0A=
-> Signed-off-by: Sascha Hauer <s.hauer@pengutronix.de>=0A=
-Reviewed-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
-=0A=
-Thanks,=0A=
-Horia=0A=
+On Wed, May 15, 2019 at 01:35:16PM +0000, Horia Geanta wrote:
+> On 5/15/2019 4:22 PM, Sascha Hauer wrote:
+> > Hi Fabio,
+> > 
+> > On Wed, May 15, 2019 at 10:17:19AM -0300, Fabio Estevam wrote:
+> >> Hi Sascha,
+> >>
+> >> On Wed, May 15, 2019 at 10:09 AM Sascha Hauer <s.hauer@pengutronix.de> wrote:
+> >>>
+> >>> Hi,
+> >>>
+> >>> ctr(aes) is broken in current kernel (v5.1+). It may have been broken
+> >>> for longer, but the crypto tests now check for a correct output IV. The
+> >>> testmgr answers with:
+> >>>
+> >>> alg: skcipher: ctr-aes-caam encryption test failed (wrong output IV) on test vector 0, cfg="in-place"
+> >>>
+> >>> output IV is this, which is the last 16 bytes of the encrypted message:
+> >>> 00000000: 1e 03 1d da 2f be 03 d1 79 21 70 a0 f3 00 9c ee
+> >>>
+> >>> It should look like this instead, which is input IV + 4:
+> >>> 00000000: f0 f1 f2 f3 f4 f5 f6 f7 f8 f9 fa fb fc fd ff 03
+> >>>
+> >>> I have no idea how to fix this as I don't know how to get the output IV
+> >>> back from the CAAM. Any ideas?
+> >>
+> >> Is this problem similar to this one?
+> >> https://www.mail-archive.com/linux-crypto@vger.kernel.org/msg37512.html
+> > 
+> > Different algo, different hardware, but yes, it seems to be the same
+> > type of failure.
+> > 
+> For talitos, the problem is the lack of IV update.
+> 
+> For caam, the problem is incorrect IV update (output IV is equal to last
+> ciphertext block, which is correect for cbc, but not for ctr mode).
+> 
+> I am working at a fix, but it takes longer since I would like to program the
+> accelerator to the save the IV (and not do counter increment in SW, which
+> created problems for many other implementations).
+
+Thanks for working on it. I'd be glad to test it once you have
+something.
+
+Thanks
+ Sascha
+
+-- 
+Pengutronix e.K.                           |                             |
+Industrial Linux Solutions                 | http://www.pengutronix.de/  |
+Peiner Str. 6-8, 31137 Hildesheim, Germany | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
