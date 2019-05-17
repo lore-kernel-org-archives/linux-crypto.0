@@ -2,58 +2,45 @@ Return-Path: <SRS0=1tzS=TR=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59B4BC04AB4
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 May 2019 07:33:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6759C04E87
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 May 2019 09:29:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3502A206A3
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 May 2019 07:33:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 89E8E20848
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 May 2019 09:29:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727573AbfEQHdt (ORCPT
+        id S1727984AbfEQJ3K (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 17 May 2019 03:33:49 -0400
-Received: from metis.ext.pengutronix.de ([85.220.165.71]:46881 "EHLO
+        Fri, 17 May 2019 05:29:10 -0400
+Received: from metis.ext.pengutronix.de ([85.220.165.71]:57047 "EHLO
         metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727528AbfEQHdt (ORCPT
+        with ESMTP id S1727689AbfEQJ3K (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 17 May 2019 03:33:49 -0400
-Received: from ptx.hi.pengutronix.de ([2001:67c:670:100:1d::c0])
+        Fri, 17 May 2019 05:29:10 -0400
+Received: from dude.hi.pengutronix.de ([2001:67c:670:100:1d::7])
         by metis.ext.pengutronix.de with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
         (Exim 4.89)
         (envelope-from <sha@pengutronix.de>)
-        id 1hRXNC-00016p-Oo; Fri, 17 May 2019 09:33:46 +0200
-Received: from sha by ptx.hi.pengutronix.de with local (Exim 4.89)
+        id 1hRZAp-00056R-Q5; Fri, 17 May 2019 11:29:07 +0200
+Received: from sha by dude.hi.pengutronix.de with local (Exim 4.92)
         (envelope-from <sha@pengutronix.de>)
-        id 1hRXNC-0001as-98; Fri, 17 May 2019 09:33:46 +0200
-Date:   Fri, 17 May 2019 09:33:46 +0200
+        id 1hRZAp-0004Go-2u; Fri, 17 May 2019 11:29:07 +0200
 From:   Sascha Hauer <s.hauer@pengutronix.de>
-To:     Horia Geanta <horia.geanta@nxp.com>
-Cc:     Fabio Estevam <festevam@gmail.com>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        Sascha Hauer <kernel@pengutronix.de>
-Subject: Re: ctr(aes) broken in CAAM driver
-Message-ID: <20190517073346.2rdy5pz73hwonw5b@pengutronix.de>
-References: <20190515130746.cvhkxxffrmmynfq3@pengutronix.de>
- <CAOMZO5CJvcipPNY6TXnwwET2fc=zaP3Dj3HPT-zfZpzfqHkeHQ@mail.gmail.com>
- <20190515132225.oczgouglycuhqo4l@pengutronix.de>
- <VI1PR0402MB3485ED478A2A3E0087E81F7C98090@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+To:     linux-crypto@vger.kernel.org
+Cc:     =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+        kernel@pengutronix.de, Sascha Hauer <s.hauer@pengutronix.de>
+Subject: [PATCH 1/3] crypto: caam: remove unused defines
+Date:   Fri, 17 May 2019 11:29:03 +0200
+Message-Id: <20190517092905.1264-2-s.hauer@pengutronix.de>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190517092905.1264-1-s.hauer@pengutronix.de>
+References: <20190517092905.1264-1-s.hauer@pengutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <VI1PR0402MB3485ED478A2A3E0087E81F7C98090@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL:  http://www.pengutronix.de/
-X-IRC:  #ptxdist @freenode
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-Uptime: 09:32:51 up 59 days, 18:43, 86 users,  load average: 1.09, 1.12,
- 1.12
-User-Agent: NeoMutt/20170113 (1.7.2)
-X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::c0
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::7
 X-SA-Exim-Mail-From: sha@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
 X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
@@ -62,55 +49,52 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, May 15, 2019 at 01:35:16PM +0000, Horia Geanta wrote:
-> On 5/15/2019 4:22 PM, Sascha Hauer wrote:
-> > Hi Fabio,
-> > 
-> > On Wed, May 15, 2019 at 10:17:19AM -0300, Fabio Estevam wrote:
-> >> Hi Sascha,
-> >>
-> >> On Wed, May 15, 2019 at 10:09 AM Sascha Hauer <s.hauer@pengutronix.de> wrote:
-> >>>
-> >>> Hi,
-> >>>
-> >>> ctr(aes) is broken in current kernel (v5.1+). It may have been broken
-> >>> for longer, but the crypto tests now check for a correct output IV. The
-> >>> testmgr answers with:
-> >>>
-> >>> alg: skcipher: ctr-aes-caam encryption test failed (wrong output IV) on test vector 0, cfg="in-place"
-> >>>
-> >>> output IV is this, which is the last 16 bytes of the encrypted message:
-> >>> 00000000: 1e 03 1d da 2f be 03 d1 79 21 70 a0 f3 00 9c ee
-> >>>
-> >>> It should look like this instead, which is input IV + 4:
-> >>> 00000000: f0 f1 f2 f3 f4 f5 f6 f7 f8 f9 fa fb fc fd ff 03
-> >>>
-> >>> I have no idea how to fix this as I don't know how to get the output IV
-> >>> back from the CAAM. Any ideas?
-> >>
-> >> Is this problem similar to this one?
-> >> https://www.mail-archive.com/linux-crypto@vger.kernel.org/msg37512.html
-> > 
-> > Different algo, different hardware, but yes, it seems to be the same
-> > type of failure.
-> > 
-> For talitos, the problem is the lack of IV update.
-> 
-> For caam, the problem is incorrect IV update (output IV is equal to last
-> ciphertext block, which is correect for cbc, but not for ctr mode).
-> 
-> I am working at a fix, but it takes longer since I would like to program the
-> accelerator to the save the IV (and not do counter increment in SW, which
-> created problems for many other implementations).
+The CAAM driver defines its own debug() macro, but it is unused. Remove
+it.
 
-Thanks for working on it. I'd be glad to test it once you have
-something.
+Signed-off-by: Sascha Hauer <s.hauer@pengutronix.de>
+---
+ drivers/crypto/caam/caamalg.c  | 7 -------
+ drivers/crypto/caam/caamhash.c | 8 --------
+ 2 files changed, 15 deletions(-)
 
-Thanks
- Sascha
-
+diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
+index 3e23d4b2cce2..007c35cfc670 100644
+--- a/drivers/crypto/caam/caamalg.c
++++ b/drivers/crypto/caam/caamalg.c
+@@ -77,13 +77,6 @@
+ #define DESC_MAX_USED_BYTES		(CAAM_DESC_BYTES_MAX - DESC_JOB_IO_LEN)
+ #define DESC_MAX_USED_LEN		(DESC_MAX_USED_BYTES / CAAM_CMD_SZ)
+ 
+-#ifdef DEBUG
+-/* for print_hex_dumps with line references */
+-#define debug(format, arg...) printk(format, arg)
+-#else
+-#define debug(format, arg...)
+-#endif
+-
+ struct caam_alg_entry {
+ 	int class1_alg_type;
+ 	int class2_alg_type;
+diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
+index 7205d9f4029e..8aee7c9bf862 100644
+--- a/drivers/crypto/caam/caamhash.c
++++ b/drivers/crypto/caam/caamhash.c
+@@ -82,14 +82,6 @@
+ #define HASH_MSG_LEN			8
+ #define MAX_CTX_LEN			(HASH_MSG_LEN + SHA512_DIGEST_SIZE)
+ 
+-#ifdef DEBUG
+-/* for print_hex_dumps with line references */
+-#define debug(format, arg...) printk(format, arg)
+-#else
+-#define debug(format, arg...)
+-#endif
+-
+-
+ static struct list_head hash_list;
+ 
+ /* ahash per-session context */
 -- 
-Pengutronix e.K.                           |                             |
-Industrial Linux Solutions                 | http://www.pengutronix.de/  |
-Peiner Str. 6-8, 31137 Hildesheim, Germany | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+2.20.1
+
