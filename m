@@ -2,99 +2,81 @@ Return-Path: <SRS0=1tzS=TR=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.5 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6253C04AB4
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 May 2019 09:50:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79B34C04AB4
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 May 2019 14:52:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BCBF720833
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 May 2019 09:50:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 49CAE216FD
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 May 2019 14:52:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1558104763;
+	bh=GWPQahVBLc9oCB8wTxBcTd3TyO8Alw8wwia+iCLmYwM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=G11LZvOuEzIHKcrqy3h6DXoiAROMLK6DXcZ/SgH/EJU0/LEBD0EgZOOLydZU8NW/3
+	 ZYj8AJNie6pjzOPBP9kNCc1bejlgOm5wBH7DHGhRQOuePyn9KiJD2IKkpcA531jSoa
+	 xyg+EqW5scAYqO308/6SMSLEYRpGONHdIgASRjxU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727826AbfEQJuX (ORCPT
+        id S1728978AbfEQOwi (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 17 May 2019 05:50:23 -0400
-Received: from metis.ext.pengutronix.de ([85.220.165.71]:42201 "EHLO
-        metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727309AbfEQJuX (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 17 May 2019 05:50:23 -0400
-Received: from ptx.hi.pengutronix.de ([2001:67c:670:100:1d::c0])
-        by metis.ext.pengutronix.de with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.89)
-        (envelope-from <sha@pengutronix.de>)
-        id 1hRZVO-00075Q-6W; Fri, 17 May 2019 11:50:22 +0200
-Received: from sha by ptx.hi.pengutronix.de with local (Exim 4.89)
-        (envelope-from <sha@pengutronix.de>)
-        id 1hRZVK-00081u-R7; Fri, 17 May 2019 11:50:18 +0200
-Date:   Fri, 17 May 2019 11:50:18 +0200
-From:   Sascha Hauer <s.hauer@pengutronix.de>
-To:     linux-crypto@vger.kernel.org
-Cc:     kernel@pengutronix.de,
-        Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
-Subject: Re: [PATCH 2/3] crypto: caam: print debug messages at debug level
-Message-ID: <20190517095018.7qcufwb77nu3owb4@pengutronix.de>
-References: <20190517092905.1264-1-s.hauer@pengutronix.de>
- <20190517092905.1264-3-s.hauer@pengutronix.de>
+        Fri, 17 May 2019 10:52:38 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49830 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728968AbfEQOwi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 17 May 2019 10:52:38 -0400
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 3B7762168B;
+        Fri, 17 May 2019 14:52:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1558104757;
+        bh=GWPQahVBLc9oCB8wTxBcTd3TyO8Alw8wwia+iCLmYwM=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=XzPSRxhuJeAU0NHHV0zUbVzWRB26FRuJ/3AltD4zUgMHCwRuVLwCoWXsvnh/f1M/o
+         zor7FnbIyNhmgAh76jLylIBoBb9qObAWRu4IZRSyEVun2kZ4aIagQw1TQQ6FAUkjC5
+         deQwi1Z9KDUB+G5K/cvajvAYivqjJKJjCFCC0Jv4=
+Date:   Fri, 17 May 2019 16:52:35 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Gilad Ben-Yossef <gilad@benyossef.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, stable@vger.kernel.org,
+        Ofir Drang <ofir.drang@arm.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 00/35] crypto: ccree: features and bug fixes for 5.2
+Message-ID: <20190517145235.GB10613@kroah.com>
+References: <20190418133913.9122-1-gilad@benyossef.com>
+ <CAOtvUMd9WUZAFgTqVH0U2ZZp8bbHXNg9Ae_ZFvGKJTSKNct8JA@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190517092905.1264-3-s.hauer@pengutronix.de>
-X-Sent-From: Pengutronix Hildesheim
-X-URL:  http://www.pengutronix.de/
-X-IRC:  #ptxdist @freenode
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-Uptime: 11:45:58 up 59 days, 20:56, 97 users,  load average: 1.21, 1.16,
- 1.11
-User-Agent: NeoMutt/20170113 (1.7.2)
-X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::c0
-X-SA-Exim-Mail-From: sha@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+In-Reply-To: <CAOtvUMd9WUZAFgTqVH0U2ZZp8bbHXNg9Ae_ZFvGKJTSKNct8JA@mail.gmail.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, May 17, 2019 at 11:29:04AM +0200, Sascha Hauer wrote:
-> The CAAM driver used to put its debug messages inside #ifdef DEBUG and
-> then prints the messages at KERN_ERR level. Replace this with proper
-> functions printing at KERN_DEBUG level. The #ifdef DEBUG gets
-> unnecessary when the right functions are used.
+On Sun, Apr 21, 2019 at 11:52:55AM +0300, Gilad Ben-Yossef wrote:
+> On Thu, Apr 18, 2019 at 4:39 PM Gilad Ben-Yossef <gilad@benyossef.com> wrote:
+> >
+> > A set of new features, mostly support for CryptoCell 713
+> > features including protected keys, security disable mode and
+> > new HW revision indetification interface alongside many bug fixes.
 > 
-> This replaces:
+> FYI,
 > 
-> - print_hex_dump(KERN_ERR ...) inside #ifdef DEBUG with
->   print_hex_dump_debug(...)
-> - dev_err() inside #ifdef DEBUG with dev_dbg()
-> - printk(KERN_ERR ...) inside #ifdef DEBUG with dev_dbg()
-> 
-> Some parts of the driver use these functions already, so it is only
-> consequent to use the debug function consistently.
-> 
-> @@ -993,20 +978,17 @@ static void skcipher_encrypt_done(struct device *jrdev, u32 *desc, u32 err,
->  	struct crypto_skcipher *skcipher = crypto_skcipher_reqtfm(req);
->  	int ivsize = crypto_skcipher_ivsize(skcipher);
->  
-> -#ifdef DEBUG
-> -	print_hex_dump(KERN_ERR, "dstiv  @"__stringify(__LINE__)": ",
-> +	print_hex_dump_debug("dstiv  @"__stringify(__LINE__)": ",
->  		       DUMP_PREFIX_ADDRESS, 16, 4, req->iv,
->  		       edesc->src_nents > 1 ? 100 : ivsize, 1);
-> -#endif
-> +
+> A port of those patches from this patch series which have been marked
+> for stable is available at
+> https://github.com/gby/linux/tree/4.19-ccree
 
-I just realized that this print_hex_dump_debug() needs to be inside if (ivsize)
-because since eaed71a44ad9 ("crypto: caam - add ecb(*) support") req->iv
-can be NULL. This is broken with or without this patch, I can include a
-patch fixing this up when doing a v2.
+Hm, all I seem to need are 2 patches that failed to apply.  Can you just
+provide backports for them?
 
-Sascha
+thanks,
 
--- 
-Pengutronix e.K.                           |                             |
-Industrial Linux Solutions                 | http://www.pengutronix.de/  |
-Peiner Str. 6-8, 31137 Hildesheim, Germany | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+greg k-h
