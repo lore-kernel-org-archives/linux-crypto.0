@@ -2,52 +2,71 @@ Return-Path: <SRS0=1tzS=TR=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B780C04E87
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 May 2019 18:08:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29039C04AB4
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 May 2019 21:16:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4F58D21734
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 May 2019 18:08:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1558116505;
-	bh=5Ew+E+QsKnGbZmIQ7J2JyXTF+hrb3561edsMdbhZlGo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=bjF6AvUh4WpUcdLee2mzfOFB4+4sDaBb2t3m9whOZNtp+9qvnlCbR7dpGZueD41lw
-	 IPBetAoWTjc16ky0dqOlThgdXPc9pn2r+eT/aFIEOTE+C/8K8ndgoAnjQB/88K15Au
-	 uLDPIA/+x51qTMo6jKsAuFdYCyWIiVqkpF1nqpBY=
+	by mail.kernel.org (Postfix) with ESMTP id E99662087B
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 May 2019 21:16:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B4u2+YL0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727909AbfEQSIY (ORCPT
+        id S1727132AbfEQVQC (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 17 May 2019 14:08:24 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60896 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727818AbfEQSIY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 17 May 2019 14:08:24 -0400
-Received: from ebiggers-linuxstation.mtv.corp.google.com (unknown [104.132.1.77])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 141DE21734;
-        Fri, 17 May 2019 18:08:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1558116503;
-        bh=5Ew+E+QsKnGbZmIQ7J2JyXTF+hrb3561edsMdbhZlGo=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=B4zCSXPDgrzcXEopM6HNmJpMPRe26lLLbj6ZiVLRuWoMR/3atLJ1Wz1kuYf1BJXJF
-         tbvHqOjI3cMcMvnuAIu2rVotQCj0v8Tv1bLvLoZgbXHkT0D6DxIm5mxpp5E9UX1tKe
-         GG+u78vPYtCjDt/eTdlYO47rdf3zVTlmGHDEStMU=
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     stable@vger.kernel.org
-Cc:     linux-crypto@vger.kernel.org
-Subject: [PATCH 4.4 2/2] crypto: gcm - fix incompatibility between "gcm" and "gcm_base"
-Date:   Fri, 17 May 2019 11:06:10 -0700
-Message-Id: <20190517180610.150453-2-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.21.0.1020.gf2820cf01a-goog
-In-Reply-To: <20190517180610.150453-1-ebiggers@kernel.org>
-References: <20190517180610.150453-1-ebiggers@kernel.org>
+        Fri, 17 May 2019 17:16:02 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:53846 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726771AbfEQVQB (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 17 May 2019 17:16:01 -0400
+Received: by mail-wm1-f67.google.com with SMTP id 198so8124674wme.3
+        for <linux-crypto@vger.kernel.org>; Fri, 17 May 2019 14:16:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=fmI1crTCuQke733ZI5hEHjLhSTAYDc+7zfcaIv/jgP4=;
+        b=B4u2+YL0YWO1taeH4tpE2TMORwAJdVm593tcxXlowNyPHFG9kPXgr+7ZSv3qA+z4XO
+         FTgL0PFh+bofxgZmnZDrNtoKzJCovhL6YjQ8ZECqXyafqvyKtQV/uIJjphZmdSaLxeW3
+         afdaMA7CB3F2POPFqidGqbAd5SO5C0Uic+taI5ZfKUw1iPIIyJ00R0e7ECByNRgD3edJ
+         LTcUSfi99V59ryE48eRoCma5tEwH36yhw55tMZVWfYaEIh9O1nlkBTa9cjSIuawwP6Sa
+         ijHxLZ2makMgpd2YK7AjwaIAog+zuu4KFp14Nlolnk4B5QWOWYjxVPS7NU/DPPLuipe+
+         mnSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=fmI1crTCuQke733ZI5hEHjLhSTAYDc+7zfcaIv/jgP4=;
+        b=iHElv0ywvwRvSS9eP6qNo9eqcCVtdbM/ygqABPVoX+m8kzxzPTRYkIgA8Dy2St3Cy0
+         6ODDqLHzQlchxoYkbcUs8UfMEW31mst8KeGnuWwd+e89C32ZMkznCGpsFnkVK9ZF8RdN
+         XxEC6VnBRy6HwJ7MK8XGW8nu76KEx6z4OIj2QA1gH3sQeXpZTtNHsVb4s5gqCy1759As
+         wUhrBtcFrytTUPwjlYp8vR6lviZYkd+zUKXS7glTQ2FQbH8L+JguGpkjAkZcY4Utubve
+         WH6ryYl8hZw/C+5WMPqDLCR5ltXRBgYy9sKmkzTDUHbuWkpS+nsZRIXXYT08gL8JrorA
+         INqg==
+X-Gm-Message-State: APjAAAWbV8riPGweHwSFItcV4HOCnjVUZhUFn0PIG0mTTinLCpsN70ld
+        8UDlbHDRki49t+3LEOrcl6NfZd0T
+X-Google-Smtp-Source: APXvYqwUKisBdMWFnDFWk3kgAPAb0iOu29c4UkBSWk6BkqfTSvwsHHL9wDflcdixriOo/zE56axNpQ==
+X-Received: by 2002:a05:600c:254e:: with SMTP id e14mr22042577wma.70.1558127759301;
+        Fri, 17 May 2019 14:15:59 -0700 (PDT)
+Received: from debian64.daheim (p4FD09697.dip0.t-ipconnect.de. [79.208.150.151])
+        by smtp.gmail.com with ESMTPSA id n2sm14292933wra.89.2019.05.17.14.15.58
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Fri, 17 May 2019 14:15:58 -0700 (PDT)
+Received: from chuck by debian64.daheim with local (Exim 4.92)
+        (envelope-from <chunkeey@gmail.com>)
+        id 1hRkCr-0006j7-PQ; Fri, 17 May 2019 23:15:57 +0200
+From:   Christian Lamparter <chunkeey@gmail.com>
+To:     linux-crypto@vger.kernel.org
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [PATCH] crypto: crypto4xx - fix AES CTR blocksize value
+Date:   Fri, 17 May 2019 23:15:57 +0200
+Message-Id: <20190517211557.25815-1-chunkeey@gmail.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
@@ -55,139 +74,62 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+This patch fixes a issue with crypto4xx's ctr(aes) that was
+discovered by libcapi's kcapi-enc-test.sh test.
 
-commit f699594d436960160f6d5ba84ed4a222f20d11cd upstream.
-[Please apply to 4.4-stable.]
+The some of the ctr(aes) encryptions test were failing on the
+non-power-of-two test:
 
-GCM instances can be created by either the "gcm" template, which only
-allows choosing the block cipher, e.g. "gcm(aes)"; or by "gcm_base",
-which allows choosing the ctr and ghash implementations, e.g.
-"gcm_base(ctr(aes-generic),ghash-generic)".
+kcapi-enc - Error: encryption failed with error 0
+kcapi-enc - Error: decryption failed with error 0
+[FAILED: 32-bit - 5.1.0-rc1+] 15 bytes: STDIN / STDOUT enc test (128 bits):
+original file (1d100e..cc96184c) and generated file (e3b0c442..1b7852b855)
+[FAILED: 32-bit - 5.1.0-rc1+] 15 bytes: STDIN / STDOUT enc test (128 bits)
+(openssl generated CT): original file (e3b0..5) and generated file (3..8e)
+[PASSED: 32-bit - 5.1.0-rc1+] 15 bytes: STDIN / STDOUT enc test (128 bits)
+(openssl generated PT)
+[FAILED: 32-bit - 5.1.0-rc1+] 15 bytes: STDIN / STDOUT enc test (password):
+original file (1d1..84c) and generated file (e3b..852b855)
 
-However, a "gcm_base" instance prevents a "gcm" instance from being
-registered using the same implementations.  Nor will the instance be
-found by lookups of "gcm".  This can be used as a denial of service.
-Moreover, "gcm_base" instances are never tested by the crypto
-self-tests, even if there are compatible "gcm" tests.
+But the 16, 32, 512, 65536 tests always worked.
 
-The root cause of these problems is that instances of the two templates
-use different cra_names.  Therefore, fix these problems by making
-"gcm_base" instances set the same cra_name as "gcm" instances, e.g.
-"gcm(aes)" instead of "gcm_base(ctr(aes-generic),ghash-generic)".
+Thankfully, this isn't a hidden hardware problem like previously,
+instead this turned out to be a copy and paste issue.
 
-This requires extracting the block cipher name from the name of the ctr
-algorithm.  It also requires starting to verify that the algorithms are
-really ctr and ghash, not something else entirely.  But it would be
-bizarre if anyone were actually using non-gcm-compatible algorithms with
-gcm_base, so this shouldn't break anyone in practice.
+With this patch, all the tests are passing with and
+kcapi-enc-test.sh gives crypto4xx's a clean bill of health:
+ "Number of failures: 0" :).
 
-Fixes: d00aa19b507b ("[CRYPTO] gcm: Allow block cipher parameter")
 Cc: stable@vger.kernel.org
-Signed-off-by: Eric Biggers <ebiggers@google.com>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Fixes: 98e87e3d933b ("crypto: crypto4xx - add aes-ctr support")
+Fixes: f2a13e7cba9e ("crypto: crypto4xx - enable AES RFC3686, ECB, CFB and OFB offloads")
+Signed-off-by: Christian Lamparter <chunkeey@gmail.com>
 ---
- crypto/gcm.c | 34 +++++++++++-----------------------
- 1 file changed, 11 insertions(+), 23 deletions(-)
+ drivers/crypto/amcc/crypto4xx_core.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/crypto/gcm.c b/crypto/gcm.c
-index f1c16589af8bb..9d3bffc0238f0 100644
---- a/crypto/gcm.c
-+++ b/crypto/gcm.c
-@@ -616,7 +616,6 @@ static void crypto_gcm_free(struct aead_instance *inst)
- 
- static int crypto_gcm_create_common(struct crypto_template *tmpl,
- 				    struct rtattr **tb,
--				    const char *full_name,
- 				    const char *ctr_name,
- 				    const char *ghash_name)
- {
-@@ -657,7 +656,8 @@ static int crypto_gcm_create_common(struct crypto_template *tmpl,
- 		goto err_free_inst;
- 
- 	err = -EINVAL;
--	if (ghash->digestsize != 16)
-+	if (strcmp(ghash->base.cra_name, "ghash") != 0 ||
-+	    ghash->digestsize != 16)
- 		goto err_drop_ghash;
- 
- 	crypto_set_skcipher_spawn(&ctx->ctr, aead_crypto_instance(inst));
-@@ -669,24 +669,24 @@ static int crypto_gcm_create_common(struct crypto_template *tmpl,
- 
- 	ctr = crypto_skcipher_spawn_alg(&ctx->ctr);
- 
--	/* We only support 16-byte blocks. */
-+	/* The skcipher algorithm must be CTR mode, using 16-byte blocks. */
- 	err = -EINVAL;
--	if (ctr->cra_ablkcipher.ivsize != 16)
-+	if (strncmp(ctr->cra_name, "ctr(", 4) != 0 ||
-+	    ctr->cra_ablkcipher.ivsize != 16 ||
-+	    ctr->cra_blocksize != 1)
- 		goto out_put_ctr;
- 
--	/* Not a stream cipher? */
--	if (ctr->cra_blocksize != 1)
-+	err = -ENAMETOOLONG;
-+	if (snprintf(inst->alg.base.cra_name, CRYPTO_MAX_ALG_NAME,
-+		     "gcm(%s", ctr->cra_name + 4) >= CRYPTO_MAX_ALG_NAME)
- 		goto out_put_ctr;
- 
--	err = -ENAMETOOLONG;
- 	if (snprintf(inst->alg.base.cra_driver_name, CRYPTO_MAX_ALG_NAME,
- 		     "gcm_base(%s,%s)", ctr->cra_driver_name,
- 		     ghash_alg->cra_driver_name) >=
- 	    CRYPTO_MAX_ALG_NAME)
- 		goto out_put_ctr;
- 
--	memcpy(inst->alg.base.cra_name, full_name, CRYPTO_MAX_ALG_NAME);
--
- 	inst->alg.base.cra_flags = (ghash->base.cra_flags | ctr->cra_flags) &
- 				   CRYPTO_ALG_ASYNC;
- 	inst->alg.base.cra_priority = (ghash->base.cra_priority +
-@@ -727,7 +727,6 @@ static int crypto_gcm_create(struct crypto_template *tmpl, struct rtattr **tb)
- {
- 	const char *cipher_name;
- 	char ctr_name[CRYPTO_MAX_ALG_NAME];
--	char full_name[CRYPTO_MAX_ALG_NAME];
- 
- 	cipher_name = crypto_attr_alg_name(tb[1]);
- 	if (IS_ERR(cipher_name))
-@@ -737,12 +736,7 @@ static int crypto_gcm_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	    CRYPTO_MAX_ALG_NAME)
- 		return -ENAMETOOLONG;
- 
--	if (snprintf(full_name, CRYPTO_MAX_ALG_NAME, "gcm(%s)", cipher_name) >=
--	    CRYPTO_MAX_ALG_NAME)
--		return -ENAMETOOLONG;
--
--	return crypto_gcm_create_common(tmpl, tb, full_name,
--					ctr_name, "ghash");
-+	return crypto_gcm_create_common(tmpl, tb, ctr_name, "ghash");
- }
- 
- static struct crypto_template crypto_gcm_tmpl = {
-@@ -756,7 +750,6 @@ static int crypto_gcm_base_create(struct crypto_template *tmpl,
- {
- 	const char *ctr_name;
- 	const char *ghash_name;
--	char full_name[CRYPTO_MAX_ALG_NAME];
- 
- 	ctr_name = crypto_attr_alg_name(tb[1]);
- 	if (IS_ERR(ctr_name))
-@@ -766,12 +759,7 @@ static int crypto_gcm_base_create(struct crypto_template *tmpl,
- 	if (IS_ERR(ghash_name))
- 		return PTR_ERR(ghash_name);
- 
--	if (snprintf(full_name, CRYPTO_MAX_ALG_NAME, "gcm_base(%s,%s)",
--		     ctr_name, ghash_name) >= CRYPTO_MAX_ALG_NAME)
--		return -ENAMETOOLONG;
--
--	return crypto_gcm_create_common(tmpl, tb, full_name,
--					ctr_name, ghash_name);
-+	return crypto_gcm_create_common(tmpl, tb, ctr_name, ghash_name);
- }
- 
- static struct crypto_template crypto_gcm_base_tmpl = {
+diff --git a/drivers/crypto/amcc/crypto4xx_core.c b/drivers/crypto/amcc/crypto4xx_core.c
+index 3934c2523762..0322ae8ac466 100644
+--- a/drivers/crypto/amcc/crypto4xx_core.c
++++ b/drivers/crypto/amcc/crypto4xx_core.c
+@@ -1252,7 +1252,7 @@ static struct crypto4xx_alg_common crypto4xx_alg[] = {
+ 			.cra_flags = CRYPTO_ALG_NEED_FALLBACK |
+ 				CRYPTO_ALG_ASYNC |
+ 				CRYPTO_ALG_KERN_DRIVER_ONLY,
+-			.cra_blocksize = AES_BLOCK_SIZE,
++			.cra_blocksize = 1,
+ 			.cra_ctxsize = sizeof(struct crypto4xx_ctx),
+ 			.cra_module = THIS_MODULE,
+ 		},
+@@ -1272,7 +1272,7 @@ static struct crypto4xx_alg_common crypto4xx_alg[] = {
+ 			.cra_priority = CRYPTO4XX_CRYPTO_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
+ 				CRYPTO_ALG_KERN_DRIVER_ONLY,
+-			.cra_blocksize = AES_BLOCK_SIZE,
++			.cra_blocksize = 1,
+ 			.cra_ctxsize = sizeof(struct crypto4xx_ctx),
+ 			.cra_module = THIS_MODULE,
+ 		},
 -- 
-2.21.0.1020.gf2820cf01a-goog
+2.20.1
 
