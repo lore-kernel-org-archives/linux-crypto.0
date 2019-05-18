@@ -2,105 +2,119 @@ Return-Path: <SRS0=YBhh=TS=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0AE8C04AAF
-	for <linux-crypto@archiver.kernel.org>; Sat, 18 May 2019 07:36:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04BE9C04AAF
+	for <linux-crypto@archiver.kernel.org>; Sat, 18 May 2019 21:28:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6648E2087E
-	for <linux-crypto@archiver.kernel.org>; Sat, 18 May 2019 07:36:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C430320675
+	for <linux-crypto@archiver.kernel.org>; Sat, 18 May 2019 21:28:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=benyossef-com.20150623.gappssmtp.com header.i=@benyossef-com.20150623.gappssmtp.com header.b="vIa7qd4s"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jqwsd98C"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726808AbfERHgZ (ORCPT
+        id S1729603AbfERV2P (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 18 May 2019 03:36:25 -0400
-Received: from mail-ua1-f67.google.com ([209.85.222.67]:44238 "EHLO
-        mail-ua1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725950AbfERHgZ (ORCPT
+        Sat, 18 May 2019 17:28:15 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:37727 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728283AbfERV2P (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 18 May 2019 03:36:25 -0400
-Received: by mail-ua1-f67.google.com with SMTP id p13so3585568uaa.11
-        for <linux-crypto@vger.kernel.org>; Sat, 18 May 2019 00:36:24 -0700 (PDT)
+        Sat, 18 May 2019 17:28:15 -0400
+Received: by mail-wr1-f68.google.com with SMTP id e15so10524964wrs.4
+        for <linux-crypto@vger.kernel.org>; Sat, 18 May 2019 14:28:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=benyossef-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=A5RwhDAP7/J1pDvTAiUDBR+MHgpw4LlKX0b6CEjmItY=;
-        b=vIa7qd4so/Vd21TmmtOdwuMHc3kXNhGCSCPFnGLt8oHHd6zkIXgQGmuQRaLELWbU3q
-         Wg702o/CWej3i12w0EGiMyO6YyJEt2qbM4pyTV0Q5FOG5WlKLlbybEd0DMnrOVcWS8fp
-         DuzJECGhlpP5RykRyvIx/LwIPn3buQd8dt1QTeUIZQ9KRHdMrztYgAePkFE1bhKTieCw
-         wUgeCC/BOoSImurLRiQ8ST0/pmSL8zlgoZ+q9LqqPH0Cj7/KIXixUrLtz9XRl4e+69xr
-         9OdRSxVxrJBxaW5PMZ0appMng0Hkv5m4evgETN+YLvibsg0mcQRAFmHhSH5zrK3Al1N2
-         dmzQ==
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=LR0/tiq4ddUgfYUX6hacaYLf6IMLrXRZI5ELFE1jzoc=;
+        b=jqwsd98C4kebn39BeYA4RMN0gAgI0zfIg9aRelBXGFvjrqrRMrDdLZCeMFvYIxVSeg
+         vX6/hCOSw/j9L6iZgmWi5xAumJb7ZCIN7TTAF6kIMy1n7yZMDVO0gbpEa8q77x/pcyRr
+         UUsTvVpEzx77giFv3d/S4bLJUrxbIuo+TZpLzvSTs9ZiTWoQ79tJTqEl70FYg3li0hbk
+         fBJo76vgins+RC5SlgAA9U2z8Z2Uz18qCRbXT7ZCiVdcdRLjfU++fTziHDPlzHvoBuBr
+         NQWhK9EgYJwtfDLjbiGxNaXjwDmDZKPMozdbyHZD+EtiEVYQDfl+8vXtB5EG6pgBgWGq
+         46VQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=A5RwhDAP7/J1pDvTAiUDBR+MHgpw4LlKX0b6CEjmItY=;
-        b=ODzZ/NjTOByvLAbVZehit0sd65ScdQDD9/lEQp/oyTKcujK282EItTfQmFC25AhffL
-         3gj3qYmw+WXjYlPHuJkFw5dXdiv87cYwCtcNypDe/oZTh5xO9/VvYs+44yMax+i3W2hU
-         yn26BEvfEfxv7URl8VDqTZyynYtkKXiP3Ec+dnlrC+q0hYBv9wgN+o0zbFc1BtgUYCsA
-         UsRNR323HqtPEkxD6WGGVr24qiNIP7Eo4phA2TlU3qG3W6jQO1xSq9gSr59Q8ZvdjVe7
-         Rz5jFpFGrOtYsx/hOSkWdd0u5EK7zx/se7Hac5OQ8PtrXqeflg5EFdEvbEFQa4HUAzm9
-         v/QQ==
-X-Gm-Message-State: APjAAAVgDw2JaOO2ivf58+l+zx9Jj1Yz8SU5wjSNDmkasTkLlVZi/kHY
-        ThDL7Y+gs/Fq6+0pNijmTXBCynmUNFCnLrjOxFrQZMlE
-X-Google-Smtp-Source: APXvYqyQ3Z9FjlYf6e3EPpIIi/tS6QFWFUTVOX/BEDU6KhGJZajaaWWHlUvyLoVOQlW3V24I5M8CcgwGTrjbgRPwPfg=
-X-Received: by 2002:ab0:5930:: with SMTP id n45mr17287080uad.87.1558164983986;
- Sat, 18 May 2019 00:36:23 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=LR0/tiq4ddUgfYUX6hacaYLf6IMLrXRZI5ELFE1jzoc=;
+        b=R7CFyVEGv6D4fbCp58FDWHLeOHobN4wic2HrLwYIf6J8FYEfrviuhiyj69psyb3KgX
+         yqegvbv1PZ+OpZCDLvCeSx0T3PGovEhH77aTReryjsFQt95pCls2rwVLjMR3iYN4rUzu
+         8sQFBzkKHfR9/g78YTdCiGRQ+NnWALh0AwjIV7YwGviJrafEBeQqD5ElpBc3Hx+bx1Ch
+         gv7jzWqvERz5mOMRfq8z9EN1hEtoE1Vwlr3Ub8YKsoIiRe4xA3qYckuaG8hKzGDJa3ge
+         DflGx2qR/fiMblGd15dD9F04L8ezYQhlB3r7pfNRpN3apAWlsy5BSR2raUgverOpOEe4
+         DeDA==
+X-Gm-Message-State: APjAAAU2zMKqmo8gJJaK4LKV9tsq6GAZhs6iCe/4rLj664L39sPT63ac
+        QyA77rKv2njNKhWMkzLAO/CU/61F
+X-Google-Smtp-Source: APXvYqzwzqAmWWfr91hV6VWSiCZK3jWAKV9gke44CUAf4awu8NbWHH2oqPHfJATtA2fHxf7ilhfgAA==
+X-Received: by 2002:a5d:54cc:: with SMTP id x12mr3109675wrv.303.1558214893559;
+        Sat, 18 May 2019 14:28:13 -0700 (PDT)
+Received: from debian64.daheim (p4FD0962E.dip0.t-ipconnect.de. [79.208.150.46])
+        by smtp.gmail.com with ESMTPSA id y18sm13304227wmd.29.2019.05.18.14.28.12
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Sat, 18 May 2019 14:28:12 -0700 (PDT)
+Received: from chuck by debian64.daheim with local (Exim 4.92)
+        (envelope-from <chunkeey@gmail.com>)
+        id 1hS6sG-0005a8-14; Sat, 18 May 2019 23:28:12 +0200
+From:   Christian Lamparter <chunkeey@gmail.com>
+To:     linux-crypto@vger.kernel.org
+Cc:     Eric Biggers <ebiggers@google.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [PATCH 1/2] crypto: crypto4xx - fix blocksize for cfb and ofb
+Date:   Sat, 18 May 2019 23:28:11 +0200
+Message-Id: <20190518212812.21414-1-chunkeey@gmail.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-References: <20190418133913.9122-1-gilad@benyossef.com> <CAOtvUMd9WUZAFgTqVH0U2ZZp8bbHXNg9Ae_ZFvGKJTSKNct8JA@mail.gmail.com>
- <20190517145235.GB10613@kroah.com>
-In-Reply-To: <20190517145235.GB10613@kroah.com>
-From:   Gilad Ben-Yossef <gilad@benyossef.com>
-Date:   Sat, 18 May 2019 10:36:11 +0300
-Message-ID: <CAOtvUMc++UtTP3fvXofuJA4JpdT86s5gbSx6WRtDK=sWnuUZrg@mail.gmail.com>
-Subject: Re: [PATCH 00/35] crypto: ccree: features and bug fixes for 5.2
-To:     Greg KH <gregkh@linuxfoundation.org>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, stable@vger.kernel.org,
-        Ofir Drang <ofir.drang@arm.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi
+While the hardware consider them to be blockciphers, the
+reference implementation defines them as streamciphers.
 
-On Fri, May 17, 2019 at 5:52 PM Greg KH <gregkh@linuxfoundation.org> wrote:
->
-> On Sun, Apr 21, 2019 at 11:52:55AM +0300, Gilad Ben-Yossef wrote:
-> > On Thu, Apr 18, 2019 at 4:39 PM Gilad Ben-Yossef <gilad@benyossef.com> =
-wrote:
-> > >
-> > > A set of new features, mostly support for CryptoCell 713
-> > > features including protected keys, security disable mode and
-> > > new HW revision indetification interface alongside many bug fixes.
-> >
-> > FYI,
-> >
-> > A port of those patches from this patch series which have been marked
-> > for stable is available at
-> > https://github.com/gby/linux/tree/4.19-ccree
->
-> Hm, all I seem to need are 2 patches that failed to apply.  Can you just
-> provide backports for them?
+Do the right thing and set the blocksize to 1. This
+was found by CONFIG_CRYPTO_MANAGER_EXTRA_TESTS.
 
-Sure, I'll send them early next week.
+This fixes the following issues:
+skcipher: blocksize for ofb-aes-ppc4xx (16) doesn't match generic impl (1)
+skcipher: blocksize for cfb-aes-ppc4xx (16) doesn't match generic impl (1)
 
-Thanks,
-Gilad
+Cc: Eric Biggers <ebiggers@kernel.org>
+Cc: stable@vger.kernel.org
+Fixes: f2a13e7cba9e ("crypto: crypto4xx - enable AES RFC3686, ECB, CFB and OFB offloads")
+Signed-off-by: Christian Lamparter <chunkeey@gmail.com>
+---
+ drivers/crypto/amcc/crypto4xx_core.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
---=20
-Gilad Ben-Yossef
-Chief Coffee Drinker
+diff --git a/drivers/crypto/amcc/crypto4xx_core.c b/drivers/crypto/amcc/crypto4xx_core.c
+index 0322ae8ac466..5f2709cffc5b 100644
+--- a/drivers/crypto/amcc/crypto4xx_core.c
++++ b/drivers/crypto/amcc/crypto4xx_core.c
+@@ -1231,7 +1231,7 @@ static struct crypto4xx_alg_common crypto4xx_alg[] = {
+ 			.cra_priority = CRYPTO4XX_CRYPTO_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
+ 				CRYPTO_ALG_KERN_DRIVER_ONLY,
+-			.cra_blocksize = AES_BLOCK_SIZE,
++			.cra_blocksize = 1,
+ 			.cra_ctxsize = sizeof(struct crypto4xx_ctx),
+ 			.cra_module = THIS_MODULE,
+ 		},
+@@ -1311,7 +1311,7 @@ static struct crypto4xx_alg_common crypto4xx_alg[] = {
+ 			.cra_priority = CRYPTO4XX_CRYPTO_PRIORITY,
+ 			.cra_flags = CRYPTO_ALG_ASYNC |
+ 				CRYPTO_ALG_KERN_DRIVER_ONLY,
+-			.cra_blocksize = AES_BLOCK_SIZE,
++			.cra_blocksize = 1,
+ 			.cra_ctxsize = sizeof(struct crypto4xx_ctx),
+ 			.cra_module = THIS_MODULE,
+ 		},
+-- 
+2.20.1
 
-values of =CE=B2 will give rise to dom!
