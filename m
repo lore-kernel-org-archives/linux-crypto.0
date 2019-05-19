@@ -1,123 +1,118 @@
-Return-Path: <SRS0=YBhh=TS=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=TGnC=TT=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.9 required=3.0 tests=DATE_IN_PAST_06_12,
+	DKIM_SIGNED,DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21FE3C04AAF
-	for <linux-crypto@archiver.kernel.org>; Sat, 18 May 2019 22:20:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2660DC04AB4
+	for <linux-crypto@archiver.kernel.org>; Sun, 19 May 2019 17:24:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E068C2087B
-	for <linux-crypto@archiver.kernel.org>; Sat, 18 May 2019 22:20:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1558218050;
-	bh=FWB8o9hJXRs9/f3k+SAZiT620GgvbBJxzutwvrug9lA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=0qaqTFHcYZcuwjbYI6wKk5EnGuy1LVrVXuGxw+SjJgmOMqOCSzC43tZfmR65T22aG
-	 VVF/cRB25qQNzzkasz8ArBk49U8K5yomexMX7JM+PFlbkAtrEofVe9FX78tldQbWYI
-	 ACzhyMYqlHW9E2f3kgFUIzPCBG6YzTfdVIwseErQ=
+	by mail.kernel.org (Postfix) with ESMTP id F1409204EC
+	for <linux-crypto@archiver.kernel.org>; Sun, 19 May 2019 17:24:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=benyossef-com.20150623.gappssmtp.com header.i=@benyossef-com.20150623.gappssmtp.com header.b="1DhIF28L"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727008AbfERWUt (ORCPT
+        id S1726741AbfESRYx (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 18 May 2019 18:20:49 -0400
-Received: from mail.kernel.org ([198.145.29.99]:41786 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726777AbfERWUs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 18 May 2019 18:20:48 -0400
-Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E4FC120848;
-        Sat, 18 May 2019 22:20:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1558218048;
-        bh=FWB8o9hJXRs9/f3k+SAZiT620GgvbBJxzutwvrug9lA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=BzsYIlJll0Drj/jsErYq00QuhkHcL93qP4q7thB0YHMm4JVARe7FGRxgiKr3EB0lN
-         yOR4WfAt+Lzmj5QZ4yUr9m5R5SWzVvgXfV14Um+jUmbnMCJK2e08thpKAVte2k+myj
-         +jwcw636lpOOAnQV/SInS5FksSC9mXdMdFz38OlM=
-Date:   Sat, 18 May 2019 15:20:46 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Christian Lamparter <chunkeey@gmail.com>
-Cc:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [RFC PATCH] crypto: skcipher - perform len fits into blocksize
- check at the top
-Message-ID: <20190518222045.GA3119@sol.localdomain>
-References: <20190518213035.21699-1-chunkeey@gmail.com>
+        Sun, 19 May 2019 13:24:53 -0400
+Received: from mail-ua1-f65.google.com ([209.85.222.65]:37274 "EHLO
+        mail-ua1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726079AbfESRYw (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 19 May 2019 13:24:52 -0400
+Received: by mail-ua1-f65.google.com with SMTP id t18so4495022uar.4
+        for <linux-crypto@vger.kernel.org>; Sun, 19 May 2019 10:24:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=benyossef-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=AfDkIx67EU0wHyEHueagVJG3HjlBgao6rt8wR4bAwCY=;
+        b=1DhIF28LSxz9G4Jti5KhSzI2A498eFkjxXbUEErOX1gKxjcvF3EMRfFWX96+lmzwcD
+         fGvVxDpQtkgu3dWJ5nq8aU1Kr6JSCO6dLbYcyy4c/PROtsxHewnBXjXV4syDCpl5FmSu
+         TFIxNikyIl0/Ap2KvZYY8YRKaJ08ZIVqssKvUChqhdFdV2dStlsVgXIe3ym265I93TV3
+         m2I4a8dW0tBEuZUJFkzWvLKpMp2S52pgWaGBSYD9+CcFIivJ1CbaDA8ki7Bypi9Kj3Rh
+         +oAFCbDfdYHFRGoZlQcH9jjLaeP6JTQszMmBujWo4o+uAkicK3R2yZAbew2VQsxBqGNS
+         IGfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=AfDkIx67EU0wHyEHueagVJG3HjlBgao6rt8wR4bAwCY=;
+        b=Pi1dJXH1goOw9PsWXLrmfoYGodhYsB2yXH0npficmL4EgC03krgyB5/hne18OS8zjb
+         ZEcVMVBDdS1+cI0rM90WPIkRnMb5OULJCb0h/sakS/ShubfiQbZQnuGePX0nPmtwe4Dl
+         31j2Ruk3PKSe1dRH8QXtfVgwgeLKUoqmdUiihpZrVgabm6HnvMnhmQgyGxV66U94CdSO
+         /dJ4JLGcLhpAKhIEsRNj/kvg1fbBxM+BFgJZakbmB0EQFB2gV9GINO4NyjF+wGR/9CKx
+         4O1NHnO+X2auhobS0bk/mwUCAXUt3pwWmuXhEd2w0fseeJfpmUV1kQJrK8YCvPqg2ufH
+         N4Ew==
+X-Gm-Message-State: APjAAAUeCangSqi80ES2qMUTqmUxbfrzf/J/tDjeMasyMlnKAsnRFk5Z
+        CdAyUkWmE2MqukKoM4FqGHpvPAZ9QzzYytPjJ1Gwsg==
+X-Google-Smtp-Source: APXvYqy1ewDvtB4MUYqX6DuUZZ1vmwzclPcymjYyA39Wh+ycaaWGioENThJloKTmGBQNyKMpenvKzhxknWL/lJFLasE=
+X-Received: by 2002:ab0:5930:: with SMTP id n45mr19721206uad.87.1558254498292;
+ Sun, 19 May 2019 01:28:18 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190518213035.21699-1-chunkeey@gmail.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+References: <20190418133913.9122-1-gilad@benyossef.com> <CAOtvUMd9WUZAFgTqVH0U2ZZp8bbHXNg9Ae_ZFvGKJTSKNct8JA@mail.gmail.com>
+ <20190517145235.GB10613@kroah.com> <CAOtvUMc++UtTP3fvXofuJA4JpdT86s5gbSx6WRtDK=sWnuUZrg@mail.gmail.com>
+In-Reply-To: <CAOtvUMc++UtTP3fvXofuJA4JpdT86s5gbSx6WRtDK=sWnuUZrg@mail.gmail.com>
+From:   Gilad Ben-Yossef <gilad@benyossef.com>
+Date:   Sun, 19 May 2019 11:28:05 +0300
+Message-ID: <CAOtvUMcfXHv0UxytEEdGJG5LM-SfyyVHbnbE0RNALMfBD1zuEQ@mail.gmail.com>
+Subject: Re: [PATCH 00/35] crypto: ccree: features and bug fixes for 5.2
+To:     Greg KH <gregkh@linuxfoundation.org>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, stable@vger.kernel.org,
+        Ofir Drang <ofir.drang@arm.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Christian,
+On Sat, May 18, 2019 at 10:36 AM Gilad Ben-Yossef <gilad@benyossef.com> wro=
+te:
+>
+> Hi
+>
+> On Fri, May 17, 2019 at 5:52 PM Greg KH <gregkh@linuxfoundation.org> wrot=
+e:
+> >
+> > On Sun, Apr 21, 2019 at 11:52:55AM +0300, Gilad Ben-Yossef wrote:
+> > > On Thu, Apr 18, 2019 at 4:39 PM Gilad Ben-Yossef <gilad@benyossef.com=
+> wrote:
+> > > >
+> > > > A set of new features, mostly support for CryptoCell 713
+> > > > features including protected keys, security disable mode and
+> > > > new HW revision indetification interface alongside many bug fixes.
+> > >
+> > > FYI,
+> > >
+> > > A port of those patches from this patch series which have been marked
+> > > for stable is available at
+> > > https://github.com/gby/linux/tree/4.19-ccree
+> >
+> > Hm, all I seem to need are 2 patches that failed to apply.  Can you jus=
+t
+> > provide backports for them?
+>
+> Sure, I'll send them early next week.
 
-On Sat, May 18, 2019 at 11:30:35PM +0200, Christian Lamparter wrote:
-> This patch adds early check to test the given data length
-> is aligned with the supported ciphers blocksize, or abort
-> with -EINVAL in case the supplied chunk size does not fit
-> without padding into the blocksize for block ciphers.
-> 
-> Signed-off-by: Christian Lamparter <chunkeey@gmail.com>
-> 
-> ---
-> 
-> This will also work instead of the
-> "crypto: crypto4xx - blockciphers should only accept complete blocks"
-> It will fix all potential driver issues in other drivers as well as
-> break the drivers that don't have the correct blocksize set. it will
-> also make the extra checks scattered around in the drivers make
-> redundand as well as the extra tests that do send incomplete blocks
-> to the hardware drivers.
-> ---
->  include/crypto/skcipher.h | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
-> index e555294ed77f..971294602a41 100644
-> --- a/include/crypto/skcipher.h
-> +++ b/include/crypto/skcipher.h
-> @@ -494,6 +494,8 @@ static inline int crypto_skcipher_encrypt(struct skcipher_request *req)
->  	crypto_stats_get(alg);
->  	if (crypto_skcipher_get_flags(tfm) & CRYPTO_TFM_NEED_KEY)
->  		ret = -ENOKEY;
-> +	else if (!IS_ALIGNED(cryptlen, crypto_skcipher_blocksize(tfm)))
-> +		ret = -EINVAL;
->  	else
->  		ret = tfm->encrypt(req);
->  	crypto_stats_skcipher_encrypt(cryptlen, ret, alg);
-> @@ -521,6 +523,8 @@ static inline int crypto_skcipher_decrypt(struct skcipher_request *req)
->  	crypto_stats_get(alg);
->  	if (crypto_skcipher_get_flags(tfm) & CRYPTO_TFM_NEED_KEY)
->  		ret = -ENOKEY;
-> +	else if (!IS_ALIGNED(cryptlen, crypto_skcipher_blocksize(tfm)))
-> +		ret = -EINVAL;
->  	else
->  		ret = tfm->decrypt(req);
->  	crypto_stats_skcipher_decrypt(cryptlen, ret, alg);
-> -- 
+hm...  I've just fetched the latest from
+git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git,
+rebased that branch against the linux-4.19.y branch and it all went
+smooth.
 
-Unfortunately this doesn't work because there are some skcipher algorithms
-("cts" and "adiantum") that set cra_blocksize to their minimum message length
-(16) rather than their length alignment requirement (1).  I.e., these algorithms
-support all messages with length >= 16 bytes.
+What am I'm missing? is there some other tree I should be doing this on?
 
-So before we can add this check, we need to get this straightened out.
+Thanks,
+Gilad
 
-I actually don't think "block size" should be a property of all crypto
-algorithms at all, e.g. for skciphers we should instead have "min_msgsize" and
-"msgsize_alignment".  The notion of "block size" is not meaningful for
-length-preserving encryption algorithms in general, let alone all crypto
-algorithms.  But unfortunately "block size" is pretty deeply embedded into the
-crypto API, so it doesn't look easy to fix this...  Maybe for skciphers we could
-get away with it always meaning the msgsize_alignment, though.
+--=20
+Gilad Ben-Yossef
+Chief Coffee Drinker
 
-- Eric
+values of =CE=B2 will give rise to dom!
