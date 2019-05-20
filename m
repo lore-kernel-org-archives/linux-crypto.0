@@ -2,104 +2,145 @@ Return-Path: <SRS0=w/0I=TU=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E64C1C04AAC
-	for <linux-crypto@archiver.kernel.org>; Mon, 20 May 2019 12:53:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 231E8C04E87
+	for <linux-crypto@archiver.kernel.org>; Mon, 20 May 2019 13:59:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AE40620645
-	for <linux-crypto@archiver.kernel.org>; Mon, 20 May 2019 12:53:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E959C216C4
+	for <linux-crypto@archiver.kernel.org>; Mon, 20 May 2019 13:59:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=benyossef-com.20150623.gappssmtp.com header.i=@benyossef-com.20150623.gappssmtp.com header.b="Yx6LH/QB"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="awR0zC0C"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733119AbfETMxA (ORCPT
+        id S1732489AbfETN7c (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 20 May 2019 08:53:00 -0400
-Received: from mail-vk1-f194.google.com ([209.85.221.194]:36871 "EHLO
-        mail-vk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1733219AbfETMSC (ORCPT
+        Mon, 20 May 2019 09:59:32 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:35905 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732382AbfETN7c (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 20 May 2019 08:18:02 -0400
-Received: by mail-vk1-f194.google.com with SMTP id j124so297905vkb.4
-        for <linux-crypto@vger.kernel.org>; Mon, 20 May 2019 05:18:01 -0700 (PDT)
+        Mon, 20 May 2019 09:59:32 -0400
+Received: by mail-wm1-f65.google.com with SMTP id j187so13172689wmj.1
+        for <linux-crypto@vger.kernel.org>; Mon, 20 May 2019 06:59:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=benyossef-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=5kXQ6vS4Br8b/GkN8FOpSIOl9zcEW2Y4KrZy5M2Bkl4=;
-        b=Yx6LH/QBl9AFZ1DfZ3Mwi+k36+t6Xj5HfRu5wUC6OlUof7wTBotOL3t1bRiVkZ1XTr
-         kBXZTpQ/OMpZ0PkZskacBuBO2xAWvS17siok2nvGgnQD5AxPW+ZcXuad/XakbtWYtZvo
-         T1belaPyupntkOEmLZRAwYRX7ttz5yM5rcFeASiVLucqVMNXDoWD60wcCK1JRV2Pt33l
-         zTQckKj8Ho2tFI8GH4rgB1WREuRPozYS2ZflbTJOLmVCHoaMvQ6tA5n6eZCAc0iirkSi
-         ObdBdoTbsVEk3SwqddZ7u53K3WRIyN+H/ew9oeBvwTVzKBwPOh4O2bJOTNJWfTDGWCms
-         QOKw==
+        d=baylibre-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=q5ikjbPSCHRQAZ8XpjIGvp4CtMI7esI83aWB/BOoRdA=;
+        b=awR0zC0C6HFr9b+KPaXLWOpAnbu221RHYXarKhSh5QVhQCIUpOl/GvA2qPQ5L33p2P
+         o5CRGqdQnMiBe5rWjcK/rDcppaRl5MlkbFNYiZ6KaYYEsLNFUxxzHUrQXFOae4LcVx2M
+         PC01GUr1oAb9WU8U3d9XUUo5ShpD0g7H+HmcFkd8o72S1FIAVGAeRTOKO8CyzVcS+u4c
+         55qW8yPjKPP3YV2pR6eypGCux9OJbg0jybdRC5N7JUAZ3L687pG4GyQdXV/0dRVORR+Y
+         MP2ecLHwImCRUSqrQ3w7N7wtSi0GEe2K8d8Ibf5v3LczhihtxlM8neeFRX4hFgPDY22c
+         o53A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=5kXQ6vS4Br8b/GkN8FOpSIOl9zcEW2Y4KrZy5M2Bkl4=;
-        b=kBxiEbyuELVmVjbtZ3WkiG8+7uAqI9dHM6dSfLU55Vu1pvYlkt4hZFfqIX6klYfv+Z
-         EZhsrVvayOB5gQVhX9kWJTHFZqQRgOdpD+rRpWVlnow/9q71DrDG/9hw8HX14up5Gl4K
-         wRKl4e2pZ89FHj2iJO9WqRUDIH4tGdMcrchkNvuGgs6BQaHCFD+VYjEQzJgKQOBLyfiK
-         jnAAE6E3FxnqkwA3nSo/ApJ74UaICaH+H8/9amSh6Mv6I9Mkwm/+ClfhjJgZ81wnfX8H
-         L8bu7Y6ZRttsl/NLTELkY3kPwEcOq5bxrW5H+D5Cvg8J4CYYoxzx/H+m53aQiuzKwXop
-         bXJA==
-X-Gm-Message-State: APjAAAWnkScCxEjkB5WGkw6q6Fx7kOSAhwD29A9WUagKafDVXGWNZvPE
-        9j8zk5h6LjE+qraD1a34K6D3L+BCsmlpYNjlTOUnIw==
-X-Google-Smtp-Source: APXvYqz3r+hI9oibZ9dmSgzGJipU45wIDIXpfO13g+0ueygZn7O/8r1kzEQ38a+qqAQTN6Mb/8jTggg0KGPxm80/Rh8=
-X-Received: by 2002:a1f:2e8e:: with SMTP id u136mr6454712vku.1.1558354681339;
- Mon, 20 May 2019 05:18:01 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=q5ikjbPSCHRQAZ8XpjIGvp4CtMI7esI83aWB/BOoRdA=;
+        b=Ho5MtDT0mYrtEjhir7Gq7SBv/m1nlZr31GYgfgpaguFV5taYISOEO2bsskXrWNkkcv
+         HkwNKhWpcmvyoQI4ypz94grZMan2LxCjPgmAL+l74vIgsFTzc0y24D4kQTbfBDXZiYXC
+         wIRMl1Y8HCSwOR4vNIoNguYO2d+6C64ItDYOSOnJ3kZwlfH5cfjEPB6jpEJw/p6HWpBx
+         d/k+tc2rBex/4Y6ZB/ugZLUIHK/TZQTAR5C3nvRZYEr8jt5is7cLPU6Eyx5Kg1i2ttn3
+         5qZ99xnwVvM4c0kKNf4s2P5Xd+XREGdWSJqaodUPJ57EdFyZdvwUbLNHnpqsrW/v2nut
+         QGWQ==
+X-Gm-Message-State: APjAAAV+vgTchg4mBN4T7SjGHhy3nYqsitA7Pel//aibXUOyr9jahJ5Q
+        tqE3JdUi14kIKifBlaIiKx1LDg==
+X-Google-Smtp-Source: APXvYqwrDN1EXgltWlHOS1575AFZtbDm/X11UixJxY9eQPsiyR3/VBNmZ9AXkQgbylxOmR70AcvHyA==
+X-Received: by 2002:a1c:cf4f:: with SMTP id f76mr9385856wmg.18.1558360769988;
+        Mon, 20 May 2019 06:59:29 -0700 (PDT)
+Received: from bender.baylibre.local (lmontsouris-657-1-212-31.w90-63.abo.wanadoo.fr. [90.63.244.31])
+        by smtp.gmail.com with ESMTPSA id s124sm20858819wmf.42.2019.05.20.06.59.29
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Mon, 20 May 2019 06:59:29 -0700 (PDT)
+From:   Neil Armstrong <narmstrong@baylibre.com>
+To:     mpm@selenic.com, herbert@gondor.apana.org.au
+Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-amlogic@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Neil Armstrong <narmstrong@baylibre.com>
+Subject: [PATCH] char: hw_random: meson-rng: update with SPDX Licence identifier
+Date:   Mon, 20 May 2019 15:59:19 +0200
+Message-Id: <20190520135919.28946-1-narmstrong@baylibre.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-References: <20190520115025.16457-1-gilad@benyossef.com> <20190520115025.16457-2-gilad@benyossef.com>
- <20190520120903.GB13524@kroah.com>
-In-Reply-To: <20190520120903.GB13524@kroah.com>
-From:   Gilad Ben-Yossef <gilad@benyossef.com>
-Date:   Mon, 20 May 2019 15:17:48 +0300
-Message-ID: <CAOtvUMedfV_Zb4Y7YW7nmv2LUfQPfgGixmaOj7VFasHKmApwkg@mail.gmail.com>
-Subject: Re: [STABLE PATCH 1/2] crypto: ccree: zap entire sg on aead request unmap
-To:     Greg KH <gregkh@linuxfoundation.org>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, stable@vger.kernel.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, May 20, 2019 at 3:09 PM Greg KH <gregkh@linuxfoundation.org> wrote:
->
-> On Mon, May 20, 2019 at 02:50:23PM +0300, Gilad Ben-Yossef wrote:
-> > We were trying to be clever zapping out of the cache only the required
-> > length out of scatter list on AEAD request completion and getting it
-> > wrong.
-> >
-> > As Knuth said: "when in douby, use brute force". Zap the whole length o=
-f
-> > the scatter list.
-> >
-> > Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
-> > ---
-> >  drivers/crypto/ccree/cc_buffer_mgr.c | 18 ++----------------
-> >  1 file changed, 2 insertions(+), 16 deletions(-)
->
-> This does not apply on top of my latest 4.19 tree with the current
-> pending queue applied, nor does it apply to 5.1 or 5.0.
->
-> How about waiting a few days and resending after I do the next round of
-> stable updates, so you can rebase on top of them easier?
+Signed-off-by: Neil Armstrong <narmstrong@baylibre.com>
+---
+ drivers/char/hw_random/meson-rng.c | 52 +-----------------------------
+ 1 file changed, 1 insertion(+), 51 deletions(-)
 
-Yes, will do.
+diff --git a/drivers/char/hw_random/meson-rng.c b/drivers/char/hw_random/meson-rng.c
+index 2e23be802a62..76e693da5dde 100644
+--- a/drivers/char/hw_random/meson-rng.c
++++ b/drivers/char/hw_random/meson-rng.c
+@@ -1,58 +1,8 @@
++// SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
+ /*
+- * This file is provided under a dual BSD/GPLv2 license.  When using or
+- * redistributing this file, you may do so under either license.
+- *
+- * GPL LICENSE SUMMARY
+- *
+  * Copyright (c) 2016 BayLibre, SAS.
+  * Author: Neil Armstrong <narmstrong@baylibre.com>
+  * Copyright (C) 2014 Amlogic, Inc.
+- *
+- * This program is free software; you can redistribute it and/or modify
+- * it under the terms of version 2 of the GNU General Public License as
+- * published by the Free Software Foundation.
+- *
+- * This program is distributed in the hope that it will be useful, but
+- * WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * General Public License for more details.
+- *
+- * You should have received a copy of the GNU General Public License
+- * along with this program; if not, see <http://www.gnu.org/licenses/>.
+- * The full GNU General Public License is included in this distribution
+- * in the file called COPYING.
+- *
+- * BSD LICENSE
+- *
+- * Copyright (c) 2016 BayLibre, SAS.
+- * Author: Neil Armstrong <narmstrong@baylibre.com>
+- * Copyright (C) 2014 Amlogic, Inc.
+- *
+- * Redistribution and use in source and binary forms, with or without
+- * modification, are permitted provided that the following conditions
+- * are met:
+- *
+- *   * Redistributions of source code must retain the above copyright
+- *     notice, this list of conditions and the following disclaimer.
+- *   * Redistributions in binary form must reproduce the above copyright
+- *     notice, this list of conditions and the following disclaimer in
+- *     the documentation and/or other materials provided with the
+- *     distribution.
+- *   * Neither the name of Intel Corporation nor the names of its
+- *     contributors may be used to endorse or promote products derived
+- *     from this software without specific prior written permission.
+- *
+- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  */
+ #include <linux/err.h>
+ #include <linux/module.h>
+-- 
+2.21.0
 
-Thanks,
-Gilad
-
---=20
-Gilad Ben-Yossef
-Chief Coffee Drinker
-
-values of =CE=B2 will give rise to dom!
