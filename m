@@ -2,144 +2,106 @@ Return-Path: <SRS0=w/0I=TU=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.5 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D737BC04AB4
-	for <linux-crypto@archiver.kernel.org>; Mon, 20 May 2019 01:59:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2BAAC04AAF
+	for <linux-crypto@archiver.kernel.org>; Mon, 20 May 2019 09:30:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AD802206B6
-	for <linux-crypto@archiver.kernel.org>; Mon, 20 May 2019 01:59:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=axtens.net header.i=@axtens.net header.b="DgtPfu3o"
+	by mail.kernel.org (Postfix) with ESMTP id BB31A20675
+	for <linux-crypto@archiver.kernel.org>; Mon, 20 May 2019 09:30:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1558344618;
+	bh=5Ih4ArUAWK//Nx2oUT0KcJI/at5Zl82NJS59rQmq708=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=yw5vL827Qp/wLELsCZVgpdscPAvkcppz1VF9fQAtzz9aaVqpYmcq62rr1bzA8esor
+	 Qgy94mbGUOcddvLe1fGlKwLLcCoTCKvOWRThomVsAR2sEva1Ayx2GNUtgta5Z6nGLv
+	 sZ+Hf0KCEdNKwbBALb3PXpZAJkOumgsJNzfYTEZ4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726010AbfETB7M (ORCPT
+        id S1731554AbfETJaO (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 19 May 2019 21:59:12 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:40585 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725769AbfETB7M (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 19 May 2019 21:59:12 -0400
-Received: by mail-pf1-f194.google.com with SMTP id u17so6396574pfn.7
-        for <linux-crypto@vger.kernel.org>; Sun, 19 May 2019 18:59:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=axtens.net; s=google;
-        h=from:to:cc:subject:in-reply-to:references:date:message-id
-         :mime-version;
-        bh=cfMVUA9OHUdd5CDYIB9t/NcZ2QxAx68ucJtfg3HumEY=;
-        b=DgtPfu3otLiv9qY9QtIMym29sEKjSBgirtSpoBV3ktnaE57i/3Pa82u6EsNSHZFw4Y
-         CQkBjaP6LY6wF+XBomC4uPNQZgcGBQ0+sx0gOss35QFw71IwpRwR+kU0jSzYo2JcbFrU
-         QKj6iC2q2AQaOj6sgFLGL0CZUj3xBZuOaxFXQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=cfMVUA9OHUdd5CDYIB9t/NcZ2QxAx68ucJtfg3HumEY=;
-        b=SIjQyKMfyxGFBHYk6SVYQwPgdwIA9BMYsImeln/DOD+EXX+vTwixAP24SwzhPSyXiX
-         huZOepfFnAcS1gAgpAuR1ZKsCZdW72VhVpiFa3Mid1ipjPdhoQu7yIlDFC4CK7wbuims
-         NkWIcDkqkmQekttz6SA/HL6TdfNFkyDna/ARpCDOfj44kletvox1i0sogxsqEqijxWT0
-         uGur3W7vRonSOe9kn4CtSPGVIeK5rfV5VZm/bGASdhgO5oDkNh1zhVBmnOst1Jd/mwNQ
-         O16dgesXC1QtuFaR3lIXnEe0/P5OssY6fXj8yPNYvPE03UStVYn3bTutRgf5UgR06KIs
-         MtlQ==
-X-Gm-Message-State: APjAAAWWLt3pPrZW8wpT47y+rYaea7A0snhgCw0SSA+V/RDMUByv+Hkr
-        dDTuEsqTFDSDciEpmSYTNKEq6g==
-X-Google-Smtp-Source: APXvYqwiinPVc2YzhEDXGip4I/nfanOcL+4bEKa+BGmzUf0Y6zIMqM/QDPYW/hfRPIPv1BgkhwnIzA==
-X-Received: by 2002:a63:2d87:: with SMTP id t129mr72619662pgt.451.1558317551425;
-        Sun, 19 May 2019 18:59:11 -0700 (PDT)
-Received: from localhost (ppp167-251-205.static.internode.on.net. [59.167.251.205])
-        by smtp.gmail.com with ESMTPSA id h123sm24653201pfe.80.2019.05.19.18.59.09
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Sun, 19 May 2019 18:59:10 -0700 (PDT)
-From:   Daniel Axtens <dja@axtens.net>
-To:     mpe@ellerman.id.au, ebiggers@kernel.org,
-        linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     marcelo.cerri@canonical.com, Stephan Mueller <smueller@chronox.de>,
-        leo.barbosa@canonical.com, linuxppc-dev@lists.ozlabs.org,
-        nayna@linux.ibm.com, pfsmorigo@gmail.com, leitao@debian.org,
-        gcwilson@linux.ibm.com, omosnacek@gmail.com
-Subject: Re: [PATCH] crypto: vmx - CTR: always increment IV as quadword
-In-Reply-To: <20190515102450.30557-1-dja@axtens.net>
-References: <20190515102450.30557-1-dja@axtens.net>
-Date:   Mon, 20 May 2019 11:59:05 +1000
-Message-ID: <87r28tzy1i.fsf@dja-thinkpad.axtens.net>
+        Mon, 20 May 2019 05:30:14 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42982 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730966AbfETJaO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 20 May 2019 05:30:14 -0400
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9557320675;
+        Mon, 20 May 2019 09:30:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1558344611;
+        bh=5Ih4ArUAWK//Nx2oUT0KcJI/at5Zl82NJS59rQmq708=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=h7HLue19It3sE0XIVt6GtgiE9KZ2l5YsIdaLSMqP9udJvHgM1W/3D2zY7CLEJ59gS
+         qPKXq5wbOocvjHpSxckWlgpcp4KmkMWWpHaFn+yFq41YKgtBHcNZGYy2pWcSjLuMIo
+         bvcHMothVb+eikfwlgUSqoqp+36a4/20aU94Sd4Q=
+Date:   Mon, 20 May 2019 11:30:08 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Gilad Ben-Yossef <gilad@benyossef.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, stable@vger.kernel.org,
+        Ofir Drang <ofir.drang@arm.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 00/35] crypto: ccree: features and bug fixes for 5.2
+Message-ID: <20190520093008.GA4476@kroah.com>
+References: <20190418133913.9122-1-gilad@benyossef.com>
+ <CAOtvUMd9WUZAFgTqVH0U2ZZp8bbHXNg9Ae_ZFvGKJTSKNct8JA@mail.gmail.com>
+ <20190517145235.GB10613@kroah.com>
+ <CAOtvUMc++UtTP3fvXofuJA4JpdT86s5gbSx6WRtDK=sWnuUZrg@mail.gmail.com>
+ <CAOtvUMcfXHv0UxytEEdGJG5LM-SfyyVHbnbE0RNALMfBD1zuEQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAOtvUMcfXHv0UxytEEdGJG5LM-SfyyVHbnbE0RNALMfBD1zuEQ@mail.gmail.com>
+User-Agent: Mutt/1.11.4 (2019-03-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Daniel Axtens <dja@axtens.net> writes:
+On Sun, May 19, 2019 at 11:28:05AM +0300, Gilad Ben-Yossef wrote:
+> On Sat, May 18, 2019 at 10:36 AM Gilad Ben-Yossef <gilad@benyossef.com> wrote:
+> >
+> > Hi
+> >
+> > On Fri, May 17, 2019 at 5:52 PM Greg KH <gregkh@linuxfoundation.org> wrote:
+> > >
+> > > On Sun, Apr 21, 2019 at 11:52:55AM +0300, Gilad Ben-Yossef wrote:
+> > > > On Thu, Apr 18, 2019 at 4:39 PM Gilad Ben-Yossef <gilad@benyossef.com> wrote:
+> > > > >
+> > > > > A set of new features, mostly support for CryptoCell 713
+> > > > > features including protected keys, security disable mode and
+> > > > > new HW revision indetification interface alongside many bug fixes.
+> > > >
+> > > > FYI,
+> > > >
+> > > > A port of those patches from this patch series which have been marked
+> > > > for stable is available at
+> > > > https://github.com/gby/linux/tree/4.19-ccree
+> > >
+> > > Hm, all I seem to need are 2 patches that failed to apply.  Can you just
+> > > provide backports for them?
+> >
+> > Sure, I'll send them early next week.
+> 
+> hm...  I've just fetched the latest from
+> git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git,
+> rebased that branch against the linux-4.19.y branch and it all went
+> smooth.
+> 
+> What am I'm missing? is there some other tree I should be doing this on?
 
-> The kernel self-tests picked up an issue with CTR mode:
-> alg: skcipher: p8_aes_ctr encryption test failed (wrong result) on test vector 3, cfg="uneven misaligned splits, may sleep"
->
-> Test vector 3 has an IV of FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFD, so
-> after 3 increments it should wrap around to 0.
->
-> In the aesp8-ppc code from OpenSSL, there are two paths that
-> increment IVs: the bulk (8 at a time) path, and the individual
-> path which is used when there are fewer than 8 AES blocks to
-> process.
->
-> In the bulk path, the IV is incremented with vadduqm: "Vector
-> Add Unsigned Quadword Modulo", which does 128-bit addition.
->
-> In the individual path, however, the IV is incremented with
-> vadduwm: "Vector Add Unsigned Word Modulo", which instead
-> does 4 32-bit additions. Thus the IV would instead become
-> FFFFFFFFFFFFFFFFFFFFFFFF00000000, throwing off the result.
->
-> Use vadduqm.
->
-> This was probably a typo originally, what with q and w being
-> adjacent. It is a pretty narrow edge case: I am really
-> impressed by the quality of the kernel self-tests!
->
-> Fixes: 5c380d623ed3 ("crypto: vmx - Add support for VMS instructions by ASM")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Daniel Axtens <dja@axtens.net>
->
-> ---
->
-> I'll pass this along internally to get it into OpenSSL as well.
+I do not know, can you just send the 2 patches that I said failed for
+me?  Those are the only ones that I need here.
 
-I passed this along to OpenSSL and got pretty comprehensively schooled:
-https://github.com/openssl/openssl/pull/8942
+I can't use random github trees, sorry, let's stick to email for patches
+please.
 
-It seems we tweak the openssl code to use a 128-bit counter, whereas
-the original code was in fact designed for a 32-bit counter. We must
-have changed the vaddu instruction in the bulk path but not in the
-individual path, as they're both vadduwm (4x32-bit) upstream.
+thanks,
 
-I think this change is still correct with regards to the kernel,
-but I guess it's probably something where I should have done a more
-thorough read of the documentation before diving in to the code, and
-perhaps we should note it in the code somewhere too. Ah well.
-
-Regards,
-Daniel
-
-> ---
->  drivers/crypto/vmx/aesp8-ppc.pl | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/drivers/crypto/vmx/aesp8-ppc.pl b/drivers/crypto/vmx/aesp8-ppc.pl
-> index de78282b8f44..9c6b5c1d6a1a 100644
-> --- a/drivers/crypto/vmx/aesp8-ppc.pl
-> +++ b/drivers/crypto/vmx/aesp8-ppc.pl
-> @@ -1357,7 +1357,7 @@ Loop_ctr32_enc:
->  	addi		$idx,$idx,16
->  	bdnz		Loop_ctr32_enc
->  
-> -	vadduwm		$ivec,$ivec,$one
-> +	vadduqm		$ivec,$ivec,$one
->  	 vmr		$dat,$inptail
->  	 lvx		$inptail,0,$inp
->  	 addi		$inp,$inp,16
-> -- 
-> 2.19.1
+greg k-h
