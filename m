@@ -7,44 +7,44 @@ X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0690EC04AAC
-	for <linux-crypto@archiver.kernel.org>; Mon, 20 May 2019 16:49:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C28CBC04AAC
+	for <linux-crypto@archiver.kernel.org>; Mon, 20 May 2019 16:49:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D17702171F
-	for <linux-crypto@archiver.kernel.org>; Mon, 20 May 2019 16:49:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9A26A2171F
+	for <linux-crypto@archiver.kernel.org>; Mon, 20 May 2019 16:49:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1558370964;
-	bh=sbBvPwQrTC5x5PztZUie3inpeJhVaH4xSOzv5uVo8Lc=;
+	s=default; t=1558370994;
+	bh=EjQjHNtMC6jZpaYoZytHwycdIN/+hh8iA33Z9hqsjcQ=;
 	h=From:To:Subject:Date:List-ID:From;
-	b=WVsU3L8gWBld7sjYi7d9wPshvHujyqMi04WmYqtJrAWsboLR+r/4BHD55RM8+iR1L
-	 IKfF932rRV1m9Ppdt1XMIC11e31kKGGIHuIqB41EU8s9V+9t0+GesSua/FISPWKx5w
-	 QHCkkHA51d6Gzw+9fKQYoDXpqS6D+YEMEwnYpvSA=
+	b=EskQue1zy4yuka5BJ18gxpEZaGhkrKa9h3pq5RTJeWcxNqQKtNY9hpzviQHvEC3lJ
+	 k0HzNEkQ7L7qv2MrsrwEVYK7dy72TXmg7DHtUdET5eVI8bP7bCZD3EJuRPBQIramop
+	 bNnIo9nsQX4bV6ljcWbQaG1V5Efxy4P+d8oedmJw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390055AbfETQtX (ORCPT
+        id S2389585AbfETQty (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 20 May 2019 12:49:23 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53104 "EHLO mail.kernel.org"
+        Mon, 20 May 2019 12:49:54 -0400
+Received: from mail.kernel.org ([198.145.29.99]:53372 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2390047AbfETQtX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 20 May 2019 12:49:23 -0400
+        id S2388598AbfETQtx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 20 May 2019 12:49:53 -0400
 Received: from ebiggers-linuxstation.mtv.corp.google.com (unknown [104.132.1.77])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8720F214DA;
-        Mon, 20 May 2019 16:49:22 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 37BB9214DA;
+        Mon, 20 May 2019 16:49:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1558370962;
-        bh=sbBvPwQrTC5x5PztZUie3inpeJhVaH4xSOzv5uVo8Lc=;
+        s=default; t=1558370993;
+        bh=EjQjHNtMC6jZpaYoZytHwycdIN/+hh8iA33Z9hqsjcQ=;
         h=From:To:Subject:Date:From;
-        b=X/h/1uWBwPQrMYIo5CG/yBlZpBt70HBry+3FpFCR7WwfXjsVmHxEKPRXHPqzNrJVA
-         px1/wybarVyGDTdwZgsNKB+8L3Aj2URTKA4V1wkxG11+QlsXt8Q23KpjqlxwaSxndR
-         IlUlachohS6p3VeRXJOD1fhn1dk/qa7u3L11uGF0=
+        b=lOQynqbhbnUXWbtJt3dVcqVzSw/h99OA6SKmNXSU+wJBEB7evg0p2whqPhPPCcTbp
+         ieOH16XGcxXaj57kRW3QW1+g6NtrFWuvmhJSFl6dqNfSi/WCjAngc9LLUouytGCNh7
+         KLSL43+WsH1KA5irqt6sS/hi1W47gniKrWIqS7Wc=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH] crypto: testmgr - make extra tests depend on cryptomgr
-Date:   Mon, 20 May 2019 09:48:29 -0700
-Message-Id: <20190520164829.167433-1-ebiggers@kernel.org>
+Subject: [PATCH] crypto: make all templates select CRYPTO_MANAGER
+Date:   Mon, 20 May 2019 09:49:46 -0700
+Message-Id: <20190520164946.167582-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.21.0.1020.gf2820cf01a-goog
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -55,45 +55,82 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-The crypto self-tests are part of the "cryptomgr" module, which can
-technically be disabled (though it rarely is).  If you do so, currently
-you can still enable CRYPTO_MANAGER_EXTRA_TESTS, which doesn't make
-sense since in that case testmgr.c isn't compiled at all.  Fix it by
-making it CRYPTO_MANAGER_EXTRA_TESTS depend on CRYPTO_MANAGER2, like
-CRYPTO_MANAGER_DISABLE_TESTS already does.
+The "cryptomgr" module is required for templates to be used.  Many
+templates select it, but others don't.  Make all templates select it.
 
-Fixes: 5b2706a4d459 ("crypto: testmgr - introduce CONFIG_CRYPTO_MANAGER_EXTRA_TESTS")
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/Kconfig | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ crypto/Kconfig | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
 diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 3d056e7da65f6..7009aff745cb7 100644
+index 7009aff745cb7..af8c6b4e6a83a 100644
 --- a/crypto/Kconfig
 +++ b/crypto/Kconfig
-@@ -137,10 +137,11 @@ config CRYPTO_USER
- 	  Userspace configuration for cryptographic instantiations such as
- 	  cbc(aes).
- 
-+if CRYPTO_MANAGER2
-+
- config CRYPTO_MANAGER_DISABLE_TESTS
- 	bool "Disable run-time self tests"
- 	default y
--	depends on CRYPTO_MANAGER2
+@@ -282,6 +282,7 @@ config CRYPTO_CCM
+ 	select CRYPTO_CTR
+ 	select CRYPTO_HASH
+ 	select CRYPTO_AEAD
++	select CRYPTO_MANAGER
  	help
- 	  Disable run-time self tests that normally take place at
- 	  algorithm registration.
-@@ -155,6 +156,8 @@ config CRYPTO_MANAGER_EXTRA_TESTS
- 	  This is intended for developer use only, as these tests take much
- 	  longer to run than the normal self tests.
+ 	  Support for Counter with CBC MAC. Required for IPsec.
  
-+endif	# if CRYPTO_MANAGER2
-+
- config CRYPTO_GF128MUL
- 	tristate "GF(2^128) multiplication functions"
+@@ -291,6 +292,7 @@ config CRYPTO_GCM
+ 	select CRYPTO_AEAD
+ 	select CRYPTO_GHASH
+ 	select CRYPTO_NULL
++	select CRYPTO_MANAGER
  	help
+ 	  Support for Galois/Counter Mode (GCM) and Galois Message
+ 	  Authentication Code (GMAC). Required for IPSec.
+@@ -300,6 +302,7 @@ config CRYPTO_CHACHA20POLY1305
+ 	select CRYPTO_CHACHA20
+ 	select CRYPTO_POLY1305
+ 	select CRYPTO_AEAD
++	select CRYPTO_MANAGER
+ 	help
+ 	  ChaCha20-Poly1305 AEAD support, RFC7539.
+ 
+@@ -414,6 +417,7 @@ config CRYPTO_SEQIV
+ 	select CRYPTO_BLKCIPHER
+ 	select CRYPTO_NULL
+ 	select CRYPTO_RNG_DEFAULT
++	select CRYPTO_MANAGER
+ 	help
+ 	  This IV generator generates an IV based on a sequence number by
+ 	  xoring it with a salt.  This algorithm is mainly useful for CTR
+@@ -423,6 +427,7 @@ config CRYPTO_ECHAINIV
+ 	select CRYPTO_AEAD
+ 	select CRYPTO_NULL
+ 	select CRYPTO_RNG_DEFAULT
++	select CRYPTO_MANAGER
+ 	default m
+ 	help
+ 	  This IV generator generates an IV based on the encryption of
+@@ -459,6 +464,7 @@ config CRYPTO_CTR
+ config CRYPTO_CTS
+ 	tristate "CTS support"
+ 	select CRYPTO_BLKCIPHER
++	select CRYPTO_MANAGER
+ 	help
+ 	  CTS: Cipher Text Stealing
+ 	  This is the Cipher Text Stealing mode as described by
+@@ -524,6 +530,7 @@ config CRYPTO_XTS
+ config CRYPTO_KEYWRAP
+ 	tristate "Key wrapping support"
+ 	select CRYPTO_BLKCIPHER
++	select CRYPTO_MANAGER
+ 	help
+ 	  Support for key wrapping (NIST SP800-38F / RFC3394) without
+ 	  padding.
+@@ -554,6 +561,7 @@ config CRYPTO_ADIANTUM
+ 	select CRYPTO_CHACHA20
+ 	select CRYPTO_POLY1305
+ 	select CRYPTO_NHPOLY1305
++	select CRYPTO_MANAGER
+ 	help
+ 	  Adiantum is a tweakable, length-preserving encryption mode
+ 	  designed for fast and secure disk encryption, especially on
 -- 
 2.21.0.1020.gf2820cf01a-goog
 
