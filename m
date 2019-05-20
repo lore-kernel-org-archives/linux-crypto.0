@@ -2,106 +2,60 @@ Return-Path: <SRS0=w/0I=TU=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
+X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2BAAC04AAF
-	for <linux-crypto@archiver.kernel.org>; Mon, 20 May 2019 09:30:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3F12C04AAC
+	for <linux-crypto@archiver.kernel.org>; Mon, 20 May 2019 11:50:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BB31A20675
-	for <linux-crypto@archiver.kernel.org>; Mon, 20 May 2019 09:30:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1558344618;
-	bh=5Ih4ArUAWK//Nx2oUT0KcJI/at5Zl82NJS59rQmq708=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=yw5vL827Qp/wLELsCZVgpdscPAvkcppz1VF9fQAtzz9aaVqpYmcq62rr1bzA8esor
-	 Qgy94mbGUOcddvLe1fGlKwLLcCoTCKvOWRThomVsAR2sEva1Ayx2GNUtgta5Z6nGLv
-	 sZ+Hf0KCEdNKwbBALb3PXpZAJkOumgsJNzfYTEZ4=
+	by mail.kernel.org (Postfix) with ESMTP id A4A9B20645
+	for <linux-crypto@archiver.kernel.org>; Mon, 20 May 2019 11:50:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731554AbfETJaO (ORCPT
+        id S1731339AbfETLuf (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 20 May 2019 05:30:14 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42982 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730966AbfETJaO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 20 May 2019 05:30:14 -0400
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 9557320675;
-        Mon, 20 May 2019 09:30:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1558344611;
-        bh=5Ih4ArUAWK//Nx2oUT0KcJI/at5Zl82NJS59rQmq708=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=h7HLue19It3sE0XIVt6GtgiE9KZ2l5YsIdaLSMqP9udJvHgM1W/3D2zY7CLEJ59gS
-         qPKXq5wbOocvjHpSxckWlgpcp4KmkMWWpHaFn+yFq41YKgtBHcNZGYy2pWcSjLuMIo
-         bvcHMothVb+eikfwlgUSqoqp+36a4/20aU94Sd4Q=
-Date:   Mon, 20 May 2019 11:30:08 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Gilad Ben-Yossef <gilad@benyossef.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, stable@vger.kernel.org,
-        Ofir Drang <ofir.drang@arm.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 00/35] crypto: ccree: features and bug fixes for 5.2
-Message-ID: <20190520093008.GA4476@kroah.com>
-References: <20190418133913.9122-1-gilad@benyossef.com>
- <CAOtvUMd9WUZAFgTqVH0U2ZZp8bbHXNg9Ae_ZFvGKJTSKNct8JA@mail.gmail.com>
- <20190517145235.GB10613@kroah.com>
- <CAOtvUMc++UtTP3fvXofuJA4JpdT86s5gbSx6WRtDK=sWnuUZrg@mail.gmail.com>
- <CAOtvUMcfXHv0UxytEEdGJG5LM-SfyyVHbnbE0RNALMfBD1zuEQ@mail.gmail.com>
+        Mon, 20 May 2019 07:50:35 -0400
+Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:43972 "EHLO
+        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730606AbfETLuf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 20 May 2019 07:50:35 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9C50980D;
+        Mon, 20 May 2019 04:50:34 -0700 (PDT)
+Received: from e110176-lin.kfn.arm.com (unknown [10.50.4.178])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F27B43F5AF;
+        Mon, 20 May 2019 04:50:32 -0700 (PDT)
+From:   Gilad Ben-Yossef <gilad@benyossef.com>
+To:     gregkh@linuxfoundation.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Cc:     stable@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [STABLE PATCH 0/2] crypto: ccree: fixes backport to 4.19
+Date:   Mon, 20 May 2019 14:50:22 +0300
+Message-Id: <20190520115025.16457-1-gilad@benyossef.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAOtvUMcfXHv0UxytEEdGJG5LM-SfyyVHbnbE0RNALMfBD1zuEQ@mail.gmail.com>
-User-Agent: Mutt/1.11.4 (2019-03-13)
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, May 19, 2019 at 11:28:05AM +0300, Gilad Ben-Yossef wrote:
-> On Sat, May 18, 2019 at 10:36 AM Gilad Ben-Yossef <gilad@benyossef.com> wrote:
-> >
-> > Hi
-> >
-> > On Fri, May 17, 2019 at 5:52 PM Greg KH <gregkh@linuxfoundation.org> wrote:
-> > >
-> > > On Sun, Apr 21, 2019 at 11:52:55AM +0300, Gilad Ben-Yossef wrote:
-> > > > On Thu, Apr 18, 2019 at 4:39 PM Gilad Ben-Yossef <gilad@benyossef.com> wrote:
-> > > > >
-> > > > > A set of new features, mostly support for CryptoCell 713
-> > > > > features including protected keys, security disable mode and
-> > > > > new HW revision indetification interface alongside many bug fixes.
-> > > >
-> > > > FYI,
-> > > >
-> > > > A port of those patches from this patch series which have been marked
-> > > > for stable is available at
-> > > > https://github.com/gby/linux/tree/4.19-ccree
-> > >
-> > > Hm, all I seem to need are 2 patches that failed to apply.  Can you just
-> > > provide backports for them?
-> >
-> > Sure, I'll send them early next week.
-> 
-> hm...  I've just fetched the latest from
-> git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable.git,
-> rebased that branch against the linux-4.19.y branch and it all went
-> smooth.
-> 
-> What am I'm missing? is there some other tree I should be doing this on?
+Backport of upstream fixes to 4.19.y, which also applies to 5.0.y
+and 5.1.y.
 
-I do not know, can you just send the 2 patches that I said failed for
-me?  Those are the only ones that I need here.
+Gilad Ben-Yossef (2):
+  crypto: ccree: zap entire sg on aead request unmap
+  crypto: ccree: fix backlog notifications
 
-I can't use random github trees, sorry, let's stick to email for patches
-please.
+ drivers/crypto/ccree/cc_aead.c        |  4 ++++
+ drivers/crypto/ccree/cc_buffer_mgr.c  | 18 ++---------------
+ drivers/crypto/ccree/cc_cipher.c      |  4 ++++
+ drivers/crypto/ccree/cc_hash.c        | 28 +++++++++++++++++++--------
+ drivers/crypto/ccree/cc_request_mgr.c | 11 ++++++++---
+ 5 files changed, 38 insertions(+), 27 deletions(-)
 
-thanks,
+-- 
+2.21.0
 
-greg k-h
