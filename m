@@ -2,99 +2,79 @@ Return-Path: <SRS0=VBnc=TV=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1023C04AAF
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 May 2019 19:15:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D1BDC04AAF
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 May 2019 19:55:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 31154217D7
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 May 2019 19:15:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="Cs0qK8vK"
+	by mail.kernel.org (Postfix) with ESMTP id 62FC32184E
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 May 2019 19:55:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1558468522;
+	bh=eIpOw3kyNjsuf9y4SGhbSEns7aKrJ+UZytUElm9znZU=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
+	b=kqQokHg07+fQeY8M9Z1vz4TA7wRze2FehQSyfwGY5nrM0hSogWptTWuWv0fV6SWl7
+	 26vhJcC8pA+UY9wfPisWgb94Gw9ICcSpG3/WtFa2tKm2e8cjQYqFc8idGSHZ22S880
+	 iD/dU39ModcmoOq8dYkbvl5swLzY+MfX6XK7kmGA=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727179AbfEUTPl (ORCPT
+        id S1727493AbfEUTzV (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 21 May 2019 15:15:41 -0400
-Received: from mo4-p01-ob.smtp.rzone.de ([81.169.146.164]:14238 "EHLO
-        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726419AbfEUTPl (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 May 2019 15:15:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1558466139;
-        s=strato-dkim-0002; d=chronox.de;
-        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
-        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-        bh=kCFO7SFB1HIUkXfd5v11/uS2m0Wg3ahQcV3NTGljcV4=;
-        b=Cs0qK8vKj2ekolMKQpcUyL0N9eRfBjYUhREmVhIXKkDykrTdUKxC0hwYG91JKke7hN
-        bbmuM0N8NRmdxUAC0frCW0Q0Id4WffscMxrZ3L1dWv3AzYy7CT0NgFp/+G6Ej2jIsdg2
-        Ys6pw3pd2hQPFoCjpEDD0VHPBS4mE1ecL4FpWn8NI3dgcQOVwf16BaW64phUk69u3fTW
-        vIzhKOL0Jp5ir1E5iR46QsLlhfswYlBRzD9jVU40YXtbsJaywtTSCnVb3AfngI/i9lH1
-        s61MOO0bEUteZ+Kw29GEsguv6eePQsDQx3UTdhJaIGxads8TQTn8AAf6C1lQVSEqJz5f
-        s/KA==
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPbIvSffTKU"
-X-RZG-CLASS-ID: mo00
-Received: from positron.chronox.de
-        by smtp.strato.de (RZmta 44.18 DYNA|AUTH)
-        with ESMTPSA id R0373fv4LJFTCQs
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (curve secp521r1 with 521 ECDH bits, eq. 15360 bits RSA))
-        (Client did not present a certificate);
-        Tue, 21 May 2019 21:15:29 +0200 (CEST)
-From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-To:     Ondrej Mosnacek <omosnace@redhat.com>
-Cc:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        keyrings@vger.kernel.org, David Howells <dhowells@redhat.com>,
-        Milan Broz <gmazyland@gmail.com>,
-        Ondrej Kozina <okozina@redhat.com>,
-        Daniel Zatovic <dzatovic@redhat.com>
-Subject: Re: [PATCH] crypto: af_alg - implement keyring support
-Date:   Tue, 21 May 2019 21:15:29 +0200
-Message-ID: <8758550.T3OrFO1o5E@positron.chronox.de>
-In-Reply-To: <20190521100034.9651-1-omosnace@redhat.com>
-References: <20190521100034.9651-1-omosnace@redhat.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="iso-8859-1"
+        Tue, 21 May 2019 15:55:21 -0400
+Received: from mail.kernel.org ([198.145.29.99]:53574 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727464AbfEUTzV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 21 May 2019 15:55:21 -0400
+Subject: Re: [GIT] Crypto Fixes for 5.2
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1558468520;
+        bh=eIpOw3kyNjsuf9y4SGhbSEns7aKrJ+UZytUElm9znZU=;
+        h=From:In-Reply-To:References:Date:To:Cc:From;
+        b=gGRR9Gx1Ek4KdX5fyqO+cxnBd1DI9RHmWYkrycIIbdOGBRffnf+o0WAUlwF3TBXzE
+         TBY5JJcEVb6gUNoIKfgl7fX+MqfclfhJbA2QFCJjGSjVsaI+jo8+mDa3Y9poBtlESw
+         c3R6T6ek6fEazcfcEZoMv3EKU1StG3r1VO7izTUw=
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <20190521125817.6lqknb2kztxddi4p@gondor.apana.org.au>
+References: <20180428080517.haxgpvqrwgotakyo@gondor.apana.org.au>
+ <20180622145403.6ltjip7che227fuo@gondor.apana.org.au>
+ <20180829033353.agnzxra3jk2r2mzg@gondor.apana.org.au>
+ <20181116063146.e7a3mep3ghnfltxe@gondor.apana.org.au>
+ <20181207061409.xflg423nknleuddw@gondor.apana.org.au>
+ <20190118104006.ye5amhxkgd4xrbmc@gondor.apana.org.au>
+ <20190201054204.ehl7u7aaqmkdh5b6@gondor.apana.org.au>
+ <20190215024738.fynl64d5u5htcy2l@gondor.apana.org.au>
+ <20190312045818.bgpiuxogmaxyscdv@gondor.apana.org.au>
+ <20190515060552.ecfwhazt2fnthepg@gondor.apana.org.au>
+ <20190521125817.6lqknb2kztxddi4p@gondor.apana.org.au>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20190521125817.6lqknb2kztxddi4p@gondor.apana.org.au>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+X-PR-Tracked-Commit-Id: 357d065a44cdd77ed5ff35155a989f2a763e96ef
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: d53e860fd46f3d95c437bb67518f7374500de467
+Message-Id: <155846852069.2650.10220458600061142386.pr-tracker-bot@kernel.org>
+Date:   Tue, 21 May 2019 19:55:20 +0000
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Dienstag, 21. Mai 2019, 12:00:34 CEST schrieb Ondrej Mosnacek:
+The pull request you sent on Tue, 21 May 2019 20:58:17 +0800:
 
-Hi Ondrej,
+> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
 
-> This patch adds new socket options to AF_ALG that allow setting key from
-> kernel keyring. For simplicity, each keyring key type (logon, user,
-> trusted, encrypted) has its own socket option name and the value is just
-> the key description string that identifies the key to be used. The key
-> description doesn't need to be NULL-terminated, but bytes after the
-> first zero byte are ignored.
->=20
-> Note that this patch also adds three socket option names that are
-> already defined and used in libkcapi [1], but have never been added to
-> the kernel...
->=20
-> Tested via libkcapi with keyring patches [2] applied (user and logon key
-> types only).
->=20
-> [1] https://github.com/smuellerDD/libkcapi
-> [2] https://github.com/WOnder93/libkcapi/compare/f283458...1fb501c
->=20
-> Signed-off-by: Ondrej Mosnacek <omosnace@redhat.com>
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/d53e860fd46f3d95c437bb67518f7374500de467
 
 Thank you!
 
-Reviewed-by: Stephan M=FCller <smueller@chronox.de>
-
-If the patch goes in, I will merge the libkcapi patch set and create a new=
-=20
-release.
-
-Ciao
-Stephan
-
-
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.wiki.kernel.org/userdoc/prtracker
