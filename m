@@ -2,79 +2,67 @@ Return-Path: <SRS0=VBnc=TV=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D1BDC04AAF
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 May 2019 19:55:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75728C072B5
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 May 2019 21:18:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 62FC32184E
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 May 2019 19:55:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1558468522;
-	bh=eIpOw3kyNjsuf9y4SGhbSEns7aKrJ+UZytUElm9znZU=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
-	b=kqQokHg07+fQeY8M9Z1vz4TA7wRze2FehQSyfwGY5nrM0hSogWptTWuWv0fV6SWl7
-	 26vhJcC8pA+UY9wfPisWgb94Gw9ICcSpG3/WtFa2tKm2e8cjQYqFc8idGSHZ22S880
-	 iD/dU39ModcmoOq8dYkbvl5swLzY+MfX6XK7kmGA=
+	by mail.kernel.org (Postfix) with ESMTP id 4F2792182B
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 May 2019 21:18:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727493AbfEUTzV (ORCPT
+        id S1727453AbfEUVSh (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 21 May 2019 15:55:21 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53574 "EHLO mail.kernel.org"
+        Tue, 21 May 2019 17:18:37 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:53522 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727464AbfEUTzV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 May 2019 15:55:21 -0400
-Subject: Re: [GIT] Crypto Fixes for 5.2
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1558468520;
-        bh=eIpOw3kyNjsuf9y4SGhbSEns7aKrJ+UZytUElm9znZU=;
-        h=From:In-Reply-To:References:Date:To:Cc:From;
-        b=gGRR9Gx1Ek4KdX5fyqO+cxnBd1DI9RHmWYkrycIIbdOGBRffnf+o0WAUlwF3TBXzE
-         TBY5JJcEVb6gUNoIKfgl7fX+MqfclfhJbA2QFCJjGSjVsaI+jo8+mDa3Y9poBtlESw
-         c3R6T6ek6fEazcfcEZoMv3EKU1StG3r1VO7izTUw=
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20190521125817.6lqknb2kztxddi4p@gondor.apana.org.au>
-References: <20180428080517.haxgpvqrwgotakyo@gondor.apana.org.au>
- <20180622145403.6ltjip7che227fuo@gondor.apana.org.au>
- <20180829033353.agnzxra3jk2r2mzg@gondor.apana.org.au>
- <20181116063146.e7a3mep3ghnfltxe@gondor.apana.org.au>
- <20181207061409.xflg423nknleuddw@gondor.apana.org.au>
- <20190118104006.ye5amhxkgd4xrbmc@gondor.apana.org.au>
- <20190201054204.ehl7u7aaqmkdh5b6@gondor.apana.org.au>
- <20190215024738.fynl64d5u5htcy2l@gondor.apana.org.au>
- <20190312045818.bgpiuxogmaxyscdv@gondor.apana.org.au>
- <20190515060552.ecfwhazt2fnthepg@gondor.apana.org.au>
- <20190521125817.6lqknb2kztxddi4p@gondor.apana.org.au>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20190521125817.6lqknb2kztxddi4p@gondor.apana.org.au>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
-X-PR-Tracked-Commit-Id: 357d065a44cdd77ed5ff35155a989f2a763e96ef
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: d53e860fd46f3d95c437bb67518f7374500de467
-Message-Id: <155846852069.2650.10220458600061142386.pr-tracker-bot@kernel.org>
-Date:   Tue, 21 May 2019 19:55:20 +0000
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+        id S1727156AbfEUVSh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 21 May 2019 17:18:37 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id B02A33079B93;
+        Tue, 21 May 2019 21:18:36 +0000 (UTC)
+Received: from warthog.procyon.org.uk (ovpn-120-170.rdu2.redhat.com [10.10.120.170])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 44D3260FE1;
+        Tue, 21 May 2019 21:18:30 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+        Kingdom.
+        Registered in England and Wales under Company Registration No. 3798903
+From:   David Howells <dhowells@redhat.com>
+In-Reply-To: <A3BC3B07-6446-4631-862A-F661FB9D63B9@holtmann.org>
+References: <A3BC3B07-6446-4631-862A-F661FB9D63B9@holtmann.org> <20190521100034.9651-1-omosnace@redhat.com>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     dhowells@redhat.com, Ondrej Mosnacek <omosnace@redhat.com>,
+        linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        keyrings@vger.kernel.org, Stephan Mueller <smueller@chronox.de>,
+        Milan Broz <gmazyland@gmail.com>,
+        Ondrej Kozina <okozina@redhat.com>,
+        Daniel Zatovic <dzatovic@redhat.com>
+Subject: Re: [PATCH] crypto: af_alg - implement keyring support
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <29982.1558473509.1@warthog.procyon.org.uk>
+Date:   Tue, 21 May 2019 22:18:29 +0100
+Message-ID: <29983.1558473509@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Tue, 21 May 2019 21:18:37 +0000 (UTC)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The pull request you sent on Tue, 21 May 2019 20:58:17 +0800:
+Marcel Holtmann <marcel@holtmann.org> wrote:
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+> why use the description instead the actual key id? I wonder if a single
+> socket option and a struct providing the key type and key id might be more
+> useful.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/d53e860fd46f3d95c437bb67518f7374500de467
+If the key becomes invalid in some way, you can call request_key() again if
+you have the description to get a new key.  This is how afs and af_rxrpc do
+things on the client side.
 
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.wiki.kernel.org/userdoc/prtracker
+David
