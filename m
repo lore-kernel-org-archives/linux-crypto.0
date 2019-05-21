@@ -2,93 +2,98 @@ Return-Path: <SRS0=VBnc=TV=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A803C04AAF
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 May 2019 11:30:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23254C04AAF
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 May 2019 13:34:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 58D45217D4
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 May 2019 11:30:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E9425217D9
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 May 2019 13:34:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=c-s.fr header.i=@c-s.fr header.b="v5L0ne9l"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727883AbfEULar (ORCPT
+        id S1728357AbfEUNeI (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 21 May 2019 07:30:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:2593 "EHLO mx1.redhat.com"
+        Tue, 21 May 2019 09:34:08 -0400
+Received: from pegase1.c-s.fr ([93.17.236.30]:51174 "EHLO pegase1.c-s.fr"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726296AbfEULao (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 May 2019 07:30:44 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 399FB3082200;
-        Tue, 21 May 2019 11:30:39 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.43.17.30])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id EC4F9176D4;
-        Tue, 21 May 2019 11:30:35 +0000 (UTC)
-Subject: Re: [PATCH] crypto: af_alg - implement keyring support
-To:     Ondrej Mosnacek <omosnace@redhat.com>,
-        Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        keyrings@vger.kernel.org, David Howells <dhowells@redhat.com>,
-        Stephan Mueller <smueller@chronox.de>,
-        Milan Broz <gmazyland@gmail.com>,
-        Daniel Zatovic <dzatovic@redhat.com>
-References: <20190521100034.9651-1-omosnace@redhat.com>
- <A3BC3B07-6446-4631-862A-F661FB9D63B9@holtmann.org>
- <CAFqZXNtCNG2s_Rk_v332HJA5HVXsJYXDsyzfTNgSU_MJ-mMByA@mail.gmail.com>
-From:   Ondrej Kozina <okozina@redhat.com>
-Message-ID: <265b6c1b-3ea9-15f6-29d4-3e5988248db1@redhat.com>
-Date:   Tue, 21 May 2019 13:30:34 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <CAFqZXNtCNG2s_Rk_v332HJA5HVXsJYXDsyzfTNgSU_MJ-mMByA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-MW
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.47]); Tue, 21 May 2019 11:30:44 +0000 (UTC)
+        id S1727986AbfEUNeI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 21 May 2019 09:34:08 -0400
+Received: from localhost (mailhub1-int [192.168.12.234])
+        by localhost (Postfix) with ESMTP id 457cDY6p7wz9v1nn;
+        Tue, 21 May 2019 15:34:05 +0200 (CEST)
+Authentication-Results: localhost; dkim=pass
+        reason="1024-bit key; insecure key"
+        header.d=c-s.fr header.i=@c-s.fr header.b=v5L0ne9l; dkim-adsp=pass;
+        dkim-atps=neutral
+X-Virus-Scanned: Debian amavisd-new at c-s.fr
+Received: from pegase1.c-s.fr ([192.168.12.234])
+        by localhost (pegase1.c-s.fr [192.168.12.234]) (amavisd-new, port 10024)
+        with ESMTP id n2tkmpse9POB; Tue, 21 May 2019 15:34:05 +0200 (CEST)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+        by pegase1.c-s.fr (Postfix) with ESMTP id 457cDY5mh8z9v1nh;
+        Tue, 21 May 2019 15:34:05 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=c-s.fr; s=mail;
+        t=1558445645; bh=4k6PLmXdY0SvqmTbZLBIzVnywVWKh7ktdtBKLg7zhR0=;
+        h=From:Subject:To:Cc:Date:From;
+        b=v5L0ne9l7IeJ6j1RlEtDlB3tznGmL91nYxqqzqAQ9628UCkLw7a61V7lU7BlOMeaI
+         b0O1Pfn3sC/WTzObfEfPlukMzbiQDm5GZ/6SBtxI8+0WZYgmM+uRDgWxmfFVG8vyhS
+         VJTPMoNWaUD4+epVtwrFHblur8GZGQQvo7qCoHJ0=
+Received: from localhost (localhost [127.0.0.1])
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id 455248B80D;
+        Tue, 21 May 2019 15:34:07 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+        by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+        with ESMTP id 45QZsARu0znr; Tue, 21 May 2019 15:34:07 +0200 (CEST)
+Received: from po16846vm.idsi0.si.c-s.fr (unknown [192.168.4.90])
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id 0F4598B803;
+        Tue, 21 May 2019 15:34:07 +0200 (CEST)
+Received: by po16846vm.idsi0.si.c-s.fr (Postfix, from userid 0)
+        id A260268458; Tue, 21 May 2019 13:34:06 +0000 (UTC)
+Message-Id: <cover.1558445259.git.christophe.leroy@c-s.fr>
+From:   Christophe Leroy <christophe.leroy@c-s.fr>
+Subject: [PATCH v1 00/15] Fixing selftests failure on Talitos driver
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, horia.geanta@nxp.com
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org
+Date:   Tue, 21 May 2019 13:34:06 +0000 (UTC)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 5/21/19 1:02 PM, Ondrej Mosnacek wrote:
-> Hi Marcel,
-> 
-> On Tue, May 21, 2019 at 12:48 PM Marcel Holtmann <marcel@holtmann.org> wrote:
->> Hi Ondrej,
->>
->>> This patch adds new socket options to AF_ALG that allow setting key from
->>> kernel keyring. For simplicity, each keyring key type (logon, user,
->>> trusted, encrypted) has its own socket option name and the value is just
->>> the key description string that identifies the key to be used. The key
->>> description doesn't need to be NULL-terminated, but bytes after the
->>> first zero byte are ignored.
->>
->> why use the description instead the actual key id? I wonder if a single socket option and a struct providing the key type and key id might be more useful.
-> 
-> I was basing this on the approach taken by dm-crypt/cryptsetup, which
-> is actually the main target consumer for this feature (cryptsetup
-> needs to be able to encrypt/decrypt data using a keyring key (possibly
-> unreadable by userspace) without having to create a temporary dm-crypt
-> mapping, which requires CAP_SYSADMIN). I'm not sure why they didn't
-> just use key IDs there... @Milan/Ondrej, what was you motivation for
-> using key descriptions rather than key IDs?
-> 
-We decided to use key descriptions so that we could identify more 
-clearly devices managed by cryptsetup (thus 'cryptsetup:' prefix in our 
-descriptions put in dm-crypt table). I understood numeric ids were too 
-generic for this purpose. Also cryptsetup uses by default thread keyring 
-to upload keys in kernel. Such keys are obsolete the moment cryptsetup 
-process finishes.
+Several test failures have popped up following recent changes to crypto
+selftests.
 
-I don't think it's any problem to go with IDs for your patch. IIUC, as 
-long as process has permission to access key metadata it can obtain also 
-current key id so it's not a big problem for as to adapt when we use kcapi.
+This series fixes (most of) them.
 
-Regards
-O.
+The last three patches are trivial cleanups.
+
+Christophe Leroy (15):
+  crypto: talitos - fix skcipher failure due to wrong output IV
+  crypto: talitos - rename alternative AEAD algos.
+  crypto: talitos - reduce max key size for SEC1
+  crypto: talitos - check AES key size
+  crypto: talitos - fix CTR alg blocksize
+  crypto: talitos - check data blocksize in ablkcipher.
+  crypto: talitos - fix ECB algs ivsize
+  crypto: talitos - Do not modify req->cryptlen on decryption.
+  crypto: talitos - HMAC SNOOP NO AFEU mode requires SW icv checking.
+  crypto: talitos - properly handle split ICV.
+  crypto: talitos - Align SEC1 accesses to 32 bits boundaries.
+  crypto: talitos - fix AEAD processing.
+  Revert "crypto: talitos - export the talitos_submit function"
+  crypto: talitos - use IS_ENABLED() in has_ftr_sec1()
+  crypto: talitos - use SPDX-License-Identifier
+
+ drivers/crypto/talitos.c | 281 ++++++++++++++++++++++-------------------------
+ drivers/crypto/talitos.h |  45 ++------
+ 2 files changed, 139 insertions(+), 187 deletions(-)
+
+-- 
+2.13.3
+
