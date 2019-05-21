@@ -2,133 +2,200 @@ Return-Path: <SRS0=VBnc=TV=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1071DC04AAF
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 May 2019 16:39:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69CFBC04AAF
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 May 2019 17:56:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E25ED2173E
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 May 2019 16:39:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 356E7217D7
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 May 2019 17:56:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=c-s.fr header.i=@c-s.fr header.b="A6sdd7VZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728104AbfEUQjN (ORCPT
+        id S1727898AbfEUR4B (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 21 May 2019 12:39:13 -0400
-Received: from mail-vs1-f67.google.com ([209.85.217.67]:35130 "EHLO
-        mail-vs1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727946AbfEUQjN (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 May 2019 12:39:13 -0400
-Received: by mail-vs1-f67.google.com with SMTP id q13so11537973vso.2;
-        Tue, 21 May 2019 09:39:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=d3r+vtHOni2ql6K8KUyHYDwXA6dbsBBCMW+a9jJjXY0=;
-        b=ptSGQht4/1Z682C+yPxpLx8zmsnzKrrvEctI3mcXgdYD5nxhJ3QzrJfKHBGlZlNGQw
-         Kq3u596/OJ1U3gXi50oj4mBNLD0X5CJbDyj5WpUIE9bo/mCNICw7oBjr+wejRs7abfhv
-         KLp8TZzGOP8k7czbRIRZkCfRRms1phJe9jN9OH9yjKlbKAeiJMZsOhK+Bh76zdYNxNr+
-         XwlgnHrFo8DxRzPveBpf9FHO83WY/pVIb7Aw5j7Avszp71P6HtPfjwBE7U9hNChjlVDQ
-         y0dZ/o2WeCf/Dm1TY1h3mr5pApM99jobAu3trlhOAXEs481+V6Vu0v6LYSTe0nE4ilCa
-         2FFA==
-X-Gm-Message-State: APjAAAVy0ZYDzHKUrB3yR+8AFbHeJ2sQ2lbDoyYN7rafdU/9o2r93GsF
-        2s162tCYlKoYRmSN/WVEaOj598kS9QwiykJzviQFhbAq
-X-Google-Smtp-Source: APXvYqwCQIckTpeBswbXwCcMWkbVVy9WAUMEJsw8Zbz08S2CXrenseFMa2ivFFBrrmH68j06jfFotolazbcgC2VSxME=
-X-Received: by 2002:a67:f589:: with SMTP id i9mr9021336vso.152.1558456752226;
- Tue, 21 May 2019 09:39:12 -0700 (PDT)
+        Tue, 21 May 2019 13:56:01 -0400
+Received: from pegase1.c-s.fr ([93.17.236.30]:9450 "EHLO pegase1.c-s.fr"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728175AbfEUR4B (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 21 May 2019 13:56:01 -0400
+Received: from localhost (mailhub1-int [192.168.12.234])
+        by localhost (Postfix) with ESMTP id 457k2l0XyYz9txsZ;
+        Tue, 21 May 2019 19:55:59 +0200 (CEST)
+Authentication-Results: localhost; dkim=pass
+        reason="1024-bit key; insecure key"
+        header.d=c-s.fr header.i=@c-s.fr header.b=A6sdd7VZ; dkim-adsp=pass;
+        dkim-atps=neutral
+X-Virus-Scanned: Debian amavisd-new at c-s.fr
+Received: from pegase1.c-s.fr ([192.168.12.234])
+        by localhost (pegase1.c-s.fr [192.168.12.234]) (amavisd-new, port 10024)
+        with ESMTP id D8j8zh3LvLfO; Tue, 21 May 2019 19:55:59 +0200 (CEST)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+        by pegase1.c-s.fr (Postfix) with ESMTP id 457k2k6Vgjz9txsY;
+        Tue, 21 May 2019 19:55:58 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=c-s.fr; s=mail;
+        t=1558461358; bh=rPRJB17D3wA1CcMFmT+QLbr4H/GkCMjO8jlqLd5EAXY=;
+        h=Subject:From:To:Cc:References:Date:In-Reply-To:From;
+        b=A6sdd7VZ6YXmMK8C3m5hleP1Rq4YYgrehXYedp67BnOsg2KWTDgHOEu8VyTYHVy8e
+         884T8xkn7OA7BJCb1lGJRF2SI62gVukwuxL6qtjPyp9lSzHMwMY9q1ZeBjwhQC0h+A
+         CJmpESWlTLRV/P5uIMgVe8NocOPt96iwG/20Z/Vg=
+Received: from localhost (localhost [127.0.0.1])
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id DBD878B815;
+        Tue, 21 May 2019 19:55:58 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+        by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+        with ESMTP id JJXzrbF143zy; Tue, 21 May 2019 19:55:58 +0200 (CEST)
+Received: from po16846vm.idsi0.si.c-s.fr (unknown [192.168.4.90])
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id 795D58B811;
+        Tue, 21 May 2019 19:55:58 +0200 (CEST)
+Subject: Re: [PATCH v1 02/15] crypto: talitos - rename alternative AEAD algos.
+From:   Christophe Leroy <christophe.leroy@c-s.fr>
+To:     Andy Whitcroft <apw@canonical.com>, Joe Perches <joe@perches.com>
+Cc:     linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <cover.1558445259.git.christophe.leroy@c-s.fr>
+ <1449c1a24e2e06ac6c8c2e1b7f73feedfd51894c.1558445259.git.christophe.leroy@c-s.fr>
+Message-ID: <3ac55e59-a75c-0b9a-be24-148007bb522e@c-s.fr>
+Date:   Tue, 21 May 2019 17:54:21 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
+ Thunderbird/52.7.0
 MIME-Version: 1.0
-References: <git-mailbomb-linux-master-c4741b23059794bd99beef0f700103b0d983b3fd@kernel.org>
-In-Reply-To: <git-mailbomb-linux-master-c4741b23059794bd99beef0f700103b0d983b3fd@kernel.org>
-From:   Geert Uytterhoeven <geert@linux-m68k.org>
-Date:   Tue, 21 May 2019 18:39:00 +0200
-Message-ID: <CAMuHMdWSUMOh1uG1g+cipup86ZpiVYuHDpPJtp+gSmmUyjB6eA@mail.gmail.com>
-Subject: Re: crypto: run initcalls for generic implementations earlier
-To:     Eric Biggers <ebiggers@google.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <1449c1a24e2e06ac6c8c2e1b7f73feedfd51894c.1558445259.git.christophe.leroy@c-s.fr>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Eric,
+Hi Joe & Andy
 
-On Tue, May 7, 2019 at 5:26 AM Linux Kernel Mailing List
-<linux-kernel@vger.kernel.org> wrote:
-> Commit:     c4741b23059794bd99beef0f700103b0d983b3fd
-> Parent:     40153b10d91c9e25f912344ba6ce1f0874400659
-> Refname:    refs/heads/master
-> Web:        https://git.kernel.org/torvalds/c/c4741b23059794bd99beef0f700103b0d983b3fd
-> Author:     Eric Biggers <ebiggers@google.com>
-> AuthorDate: Thu Apr 11 21:57:42 2019 -0700
-> Committer:  Herbert Xu <herbert@gondor.apana.org.au>
-> CommitDate: Thu Apr 18 22:15:03 2019 +0800
->
->     crypto: run initcalls for generic implementations earlier
->
->     Use subsys_initcall for registration of all templates and generic
->     algorithm implementations, rather than module_init.  Then change
->     cryptomgr to use arch_initcall, to place it before the subsys_initcalls.
->
->     This is needed so that when both a generic and optimized implementation
->     of an algorithm are built into the kernel (not loadable modules), the
->     generic implementation is registered before the optimized one.
->     Otherwise, the self-tests for the optimized implementation are unable to
->     allocate the generic implementation for the new comparison fuzz tests.
->
->     Note that on arm, a side effect of this change is that self-tests for
->     generic implementations may run before the unaligned access handler has
->     been installed.  So, unaligned accesses will crash the kernel.  This is
->     arguably a good thing as it makes it easier to detect that type of bug.
->
->     Signed-off-by: Eric Biggers <ebiggers@google.com>
->     Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+On 05/21/2019 01:34 PM, Christophe Leroy wrote:
+> The talitos driver has two ways to perform AEAD depending on the
+> HW capability. Some HW support both. It is needed to give them
+> different names to distingish which one it is for instance when
+> a test fails.
+> 
+> Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+> Fixes: 7405c8d7ff97 ("crypto: talitos - templates for AEAD using HMAC_SNOOP_NO_AFEU")
+> Cc: stable@vger.kernel.org
+> ---
+>   drivers/crypto/talitos.c | 16 ++++++++--------
+>   1 file changed, 8 insertions(+), 8 deletions(-)
+> 
+> diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+> index f443cbe7da80..6f8bc6467706 100644
+> --- a/drivers/crypto/talitos.c
+> +++ b/drivers/crypto/talitos.c
+> @@ -2356,7 +2356,7 @@ static struct talitos_alg_template driver_algs[] = {
+>   			.base = {
+>   				.cra_name = "authenc(hmac(sha1),cbc(aes))",
+>   				.cra_driver_name = "authenc-hmac-sha1-"
+> -						   "cbc-aes-talitos",
+> +						   "cbc-aes-talitos-hsna",
 
-> --- a/crypto/jitterentropy-kcapi.c
-> +++ b/crypto/jitterentropy-kcapi.c
-> @@ -198,7 +198,7 @@ static void __exit jent_mod_exit(void)
->         crypto_unregister_rng(&jent_alg);
->  }
->
-> -module_init(jent_mod_init);
-> +subsys_initcall(jent_mod_init);
->  module_exit(jent_mod_exit);
->
->  MODULE_LICENSE("Dual BSD/GPL");
+checkpatch reports the following warning on the above:
 
-This change causes jitterentropy to fail on Renesas SoCs based on
-single-core Cortex A9 with:
+WARNING: quoted string split across lines
+#27: FILE: drivers/crypto/talitos.c:2359:
+  				.cra_driver_name = "authenc-hmac-sha1-"
++						   "cbc-aes-talitos-hsna",
 
-    jitterentropy: Initialization failed with host not compliant with
-requirements: 2
 
-This happens because jitterentropy is now initialized before the main
-clocksource is activated, i.e. before
+But when I fixes the patch as follows, I get another warning:
 
-    clocksource: Switched to clocksource ostm timer (on RZ/A1)
-    clocksource: Switched to clocksource fff80000.timer (on R-Mobile A1)
+@@ -2355,8 +2355,7 @@ static struct talitos_alg_template driver_algs[] = {
+  		.alg.aead = {
+  			.base = {
+  				.cra_name = "authenc(hmac(sha1),cbc(aes))",
+-				.cra_driver_name = "authenc-hmac-sha1-"
+-						   "cbc-aes-talitos",
++				.cra_driver_name = "authenc-hmac-sha1-cbc-aes-talitos-hsna",
+  				.cra_blocksize = AES_BLOCK_SIZE,
+  				.cra_flags = CRYPTO_ALG_ASYNC,
+  			},
 
-is printed.
-RZ/A1 and R-Mobile A1 SoCs rely on the OSTM resp. TMU timers.
 
-The issue does not happen on SoCs with Cortex A15 cores (with ARM
-architectured timer) or Cortex A9 multicore (with ARM global timer).
 
-Gr{oetje,eeting}s,
+WARNING: line over 80 characters
+#28: FILE: drivers/crypto/talitos.c:2358:
++				.cra_driver_name = "authenc-hmac-sha1-cbc-aes-talitos-hsna",
 
-                        Geert
 
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+So, how should this be fixed ?
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+Thanks
+Christophe
+
+>   				.cra_blocksize = AES_BLOCK_SIZE,
+>   				.cra_flags = CRYPTO_ALG_ASYNC,
+>   			},
+> @@ -2401,7 +2401,7 @@ static struct talitos_alg_template driver_algs[] = {
+>   				.cra_name = "authenc(hmac(sha1),"
+>   					    "cbc(des3_ede))",
+>   				.cra_driver_name = "authenc-hmac-sha1-"
+> -						   "cbc-3des-talitos",
+> +						   "cbc-3des-talitos-hsna",
+>   				.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+>   				.cra_flags = CRYPTO_ALG_ASYNC,
+>   			},
+> @@ -2444,7 +2444,7 @@ static struct talitos_alg_template driver_algs[] = {
+>   			.base = {
+>   				.cra_name = "authenc(hmac(sha224),cbc(aes))",
+>   				.cra_driver_name = "authenc-hmac-sha224-"
+> -						   "cbc-aes-talitos",
+> +						   "cbc-aes-talitos-hsna",
+>   				.cra_blocksize = AES_BLOCK_SIZE,
+>   				.cra_flags = CRYPTO_ALG_ASYNC,
+>   			},
+> @@ -2489,7 +2489,7 @@ static struct talitos_alg_template driver_algs[] = {
+>   				.cra_name = "authenc(hmac(sha224),"
+>   					    "cbc(des3_ede))",
+>   				.cra_driver_name = "authenc-hmac-sha224-"
+> -						   "cbc-3des-talitos",
+> +						   "cbc-3des-talitos-hsna",
+>   				.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+>   				.cra_flags = CRYPTO_ALG_ASYNC,
+>   			},
+> @@ -2532,7 +2532,7 @@ static struct talitos_alg_template driver_algs[] = {
+>   			.base = {
+>   				.cra_name = "authenc(hmac(sha256),cbc(aes))",
+>   				.cra_driver_name = "authenc-hmac-sha256-"
+> -						   "cbc-aes-talitos",
+> +						   "cbc-aes-talitos-hsna",
+>   				.cra_blocksize = AES_BLOCK_SIZE,
+>   				.cra_flags = CRYPTO_ALG_ASYNC,
+>   			},
+> @@ -2577,7 +2577,7 @@ static struct talitos_alg_template driver_algs[] = {
+>   				.cra_name = "authenc(hmac(sha256),"
+>   					    "cbc(des3_ede))",
+>   				.cra_driver_name = "authenc-hmac-sha256-"
+> -						   "cbc-3des-talitos",
+> +						   "cbc-3des-talitos-hsna",
+>   				.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+>   				.cra_flags = CRYPTO_ALG_ASYNC,
+>   			},
+> @@ -2706,7 +2706,7 @@ static struct talitos_alg_template driver_algs[] = {
+>   			.base = {
+>   				.cra_name = "authenc(hmac(md5),cbc(aes))",
+>   				.cra_driver_name = "authenc-hmac-md5-"
+> -						   "cbc-aes-talitos",
+> +						   "cbc-aes-talitos-hsna",
+>   				.cra_blocksize = AES_BLOCK_SIZE,
+>   				.cra_flags = CRYPTO_ALG_ASYNC,
+>   			},
+> @@ -2749,7 +2749,7 @@ static struct talitos_alg_template driver_algs[] = {
+>   			.base = {
+>   				.cra_name = "authenc(hmac(md5),cbc(des3_ede))",
+>   				.cra_driver_name = "authenc-hmac-md5-"
+> -						   "cbc-3des-talitos",
+> +						   "cbc-3des-talitos-hsna",
+>   				.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+>   				.cra_flags = CRYPTO_ALG_ASYNC,
+>   			},
+> 
