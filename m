@@ -2,96 +2,99 @@ Return-Path: <SRS0=VBnc=TV=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F813C04AB4
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 May 2019 18:46:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1023C04AAF
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 May 2019 19:15:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7140E217F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 May 2019 18:46:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1558464393;
-	bh=c2/Vk86BeZ4DWmvggGGHr/xonfHRq7UPwimX1ebxIYY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=yD8PgZjOM0l/y9ydlUiwNFYpohGIILaF1vyt//aMPlEhzOVRQ6hECain/4qJynzcp
-	 E3YADqkNA4cgOoFMo+oDFEh3RTteYMbbMdQW/6COHsrxDg4YU8zm8IJOK2spCon0MZ
-	 dthu/HylYsvP76bw9mvd7JIYETmfpn8SqgWT6j7Q=
+	by mail.kernel.org (Postfix) with ESMTP id 31154217D7
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 May 2019 19:15:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="Cs0qK8vK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728103AbfEUSqc (ORCPT
+        id S1727179AbfEUTPl (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 21 May 2019 14:46:32 -0400
-Received: from mail.kernel.org ([198.145.29.99]:34148 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727969AbfEUSqc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 May 2019 14:46:32 -0400
-Received: from ebiggers-linuxstation.mtv.corp.google.com (unknown [104.132.1.77])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 91473217D9;
-        Tue, 21 May 2019 18:46:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1558464391;
-        bh=c2/Vk86BeZ4DWmvggGGHr/xonfHRq7UPwimX1ebxIYY=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=KiftFtsOit+ddvqoHrePibxUCR0KdVwQmlajT/K2EZ9wyF09RqWbVCyYqDpd+f7nB
-         m5I7W7pCfaTBJhsVY6C0Ll1sDiZ8I9TKFlLLPD9jcf52ALvU1yZQfoqjRdanC/t1vg
-         Vb+NUES5/Ua+pI8n8KZ1OlzIpvVus9zWvn5zd38Y=
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Geert Uytterhoeven <geert@linux-m68k.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>
-Subject: [PATCH] crypto: jitterentropy - change back to module_init()
-Date:   Tue, 21 May 2019 11:46:22 -0700
-Message-Id: <20190521184622.37202-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.21.0.1020.gf2820cf01a-goog
-In-Reply-To: <20190521183417.GA121164@gmail.com>
-References: <20190521183417.GA121164@gmail.com>
+        Tue, 21 May 2019 15:15:41 -0400
+Received: from mo4-p01-ob.smtp.rzone.de ([81.169.146.164]:14238 "EHLO
+        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726419AbfEUTPl (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 21 May 2019 15:15:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1558466139;
+        s=strato-dkim-0002; d=chronox.de;
+        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
+        bh=kCFO7SFB1HIUkXfd5v11/uS2m0Wg3ahQcV3NTGljcV4=;
+        b=Cs0qK8vKj2ekolMKQpcUyL0N9eRfBjYUhREmVhIXKkDykrTdUKxC0hwYG91JKke7hN
+        bbmuM0N8NRmdxUAC0frCW0Q0Id4WffscMxrZ3L1dWv3AzYy7CT0NgFp/+G6Ej2jIsdg2
+        Ys6pw3pd2hQPFoCjpEDD0VHPBS4mE1ecL4FpWn8NI3dgcQOVwf16BaW64phUk69u3fTW
+        vIzhKOL0Jp5ir1E5iR46QsLlhfswYlBRzD9jVU40YXtbsJaywtTSCnVb3AfngI/i9lH1
+        s61MOO0bEUteZ+Kw29GEsguv6eePQsDQx3UTdhJaIGxads8TQTn8AAf6C1lQVSEqJz5f
+        s/KA==
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPbIvSffTKU"
+X-RZG-CLASS-ID: mo00
+Received: from positron.chronox.de
+        by smtp.strato.de (RZmta 44.18 DYNA|AUTH)
+        with ESMTPSA id R0373fv4LJFTCQs
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (curve secp521r1 with 521 ECDH bits, eq. 15360 bits RSA))
+        (Client did not present a certificate);
+        Tue, 21 May 2019 21:15:29 +0200 (CEST)
+From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+To:     Ondrej Mosnacek <omosnace@redhat.com>
+Cc:     linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        keyrings@vger.kernel.org, David Howells <dhowells@redhat.com>,
+        Milan Broz <gmazyland@gmail.com>,
+        Ondrej Kozina <okozina@redhat.com>,
+        Daniel Zatovic <dzatovic@redhat.com>
+Subject: Re: [PATCH] crypto: af_alg - implement keyring support
+Date:   Tue, 21 May 2019 21:15:29 +0200
+Message-ID: <8758550.T3OrFO1o5E@positron.chronox.de>
+In-Reply-To: <20190521100034.9651-1-omosnace@redhat.com>
+References: <20190521100034.9651-1-omosnace@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+Am Dienstag, 21. Mai 2019, 12:00:34 CEST schrieb Ondrej Mosnacek:
 
-"jitterentropy_rng" doesn't have any other implementations, nor is it
-tested by the crypto self-tests.  So it was unnecessary to change it to
-subsys_initcall.  Also it depends on the main clocksource being
-initialized, which may happen after subsys_initcall, causing this error:
+Hi Ondrej,
 
-    jitterentropy: Initialization failed with host not compliant with requirements: 2
+> This patch adds new socket options to AF_ALG that allow setting key from
+> kernel keyring. For simplicity, each keyring key type (logon, user,
+> trusted, encrypted) has its own socket option name and the value is just
+> the key description string that identifies the key to be used. The key
+> description doesn't need to be NULL-terminated, but bytes after the
+> first zero byte are ignored.
+>=20
+> Note that this patch also adds three socket option names that are
+> already defined and used in libkcapi [1], but have never been added to
+> the kernel...
+>=20
+> Tested via libkcapi with keyring patches [2] applied (user and logon key
+> types only).
+>=20
+> [1] https://github.com/smuellerDD/libkcapi
+> [2] https://github.com/WOnder93/libkcapi/compare/f283458...1fb501c
+>=20
+> Signed-off-by: Ondrej Mosnacek <omosnace@redhat.com>
 
-Change it back to module_init().
+Thank you!
 
-Fixes: c4741b230597 ("crypto: run initcalls for generic implementations earlier")
-Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- crypto/jitterentropy-kcapi.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Reviewed-by: Stephan M=FCller <smueller@chronox.de>
 
-diff --git a/crypto/jitterentropy-kcapi.c b/crypto/jitterentropy-kcapi.c
-index 6ea1a270b8dc2..787dccca37159 100644
---- a/crypto/jitterentropy-kcapi.c
-+++ b/crypto/jitterentropy-kcapi.c
-@@ -198,7 +198,7 @@ static void __exit jent_mod_exit(void)
- 	crypto_unregister_rng(&jent_alg);
- }
- 
--subsys_initcall(jent_mod_init);
-+module_init(jent_mod_init);
- module_exit(jent_mod_exit);
- 
- MODULE_LICENSE("Dual BSD/GPL");
--- 
-2.21.0.1020.gf2820cf01a-goog
+If the patch goes in, I will merge the libkcapi patch set and create a new=
+=20
+release.
+
+Ciao
+Stephan
+
 
