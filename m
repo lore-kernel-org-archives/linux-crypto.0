@@ -4,83 +4,95 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4960EC282CE
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 May 2019 19:43:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF28FC282DE
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 May 2019 19:44:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 100D82081C
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 May 2019 19:43:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A93822081C
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 May 2019 19:44:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1558554200;
-	bh=Eu5uL8cehpI9lUHeQu0RY/lyRyhIwPZeIGqy8mq0Q/U=;
-	h=From:To:Subject:Date:List-ID:From;
-	b=CMQ8uT0IuIbNRbWqt0+8QEjgAnkuZBCnBN8sPgKjlsT7ZrrOttGtISE4lIsOLH/Zu
-	 UFFtWUzldRt5kih+/lrYfLT6uq87l6dQimfh5dN39k1GbC3XaFvj5oVY/5832lvog/
-	 iIfLoYxFW5Mza74fvIhHVkJfBUJS/6P9R/oANmx4=
+	s=default; t=1558554266;
+	bh=pO38k8VhxEzdquYnHIYEk/3gJ31kyCzgKZhOtvkygOk=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=vLKEgjq3Qd5x8quHTUE3kjSgo7h675fGTP9h0whEW8mots2bDGs1jD7YwEeMVW9fn
+	 bJZL6G18hK4sDjo7IrFkh3cIv7XNMZlWMfTd3MF2MD8lNjIFvKSX29O6xX36MLJZdk
+	 +4hR9HAwTHnspw+AzBa4UaaR1KQ+xbgtHAym/VBk=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732083AbfEVTnT (ORCPT
+        id S1732582AbfEVToH (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 22 May 2019 15:43:19 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37416 "EHLO mail.kernel.org"
+        Wed, 22 May 2019 15:44:07 -0400
+Received: from mail.kernel.org ([198.145.29.99]:50822 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730495AbfEVTnS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 May 2019 15:43:18 -0400
-Received: from ebiggers-linuxstation.mtv.corp.google.com (unknown [104.132.1.77])
+        id S1732502AbfEVT2O (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 22 May 2019 15:28:14 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 5BC1B20856;
-        Wed, 22 May 2019 19:43:18 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id E677E2177E;
+        Wed, 22 May 2019 19:28:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1558554198;
-        bh=Eu5uL8cehpI9lUHeQu0RY/lyRyhIwPZeIGqy8mq0Q/U=;
-        h=From:To:Subject:Date:From;
-        b=QrTQY/4uvadf3vyKhdLWkDjQOvLKWx0M0yoIqc3WCb+rAuBEK/Rr++xBtr+JCsUwd
-         wUMP0erGXJ1YQgE/SmaQhZZUMit1P4lLkyDSO3C1NpoElq/xHVfwNTLKtxu8rcvsby
-         dCzTxtjL+Po4y+zmr5PfiHsiFoDxA+5/eoLRV6vM=
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [PATCH] crypto: hmac - fix memory leak in hmac_init_tfm()
-Date:   Wed, 22 May 2019 12:42:29 -0700
-Message-Id: <20190522194229.101989-1-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.22.0.rc1.257.g3120a18244-goog
+        s=default; t=1558553293;
+        bh=pO38k8VhxEzdquYnHIYEk/3gJ31kyCzgKZhOtvkygOk=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=exIMuKYEDkbuW3aUqk0IwkmOzFQpNUfZAUYGcUQzYGTQvV3uN9KtZUP9xu3592qFG
+         ila6G0jOI6CIHDVhV6XolpPvLQd3DfxyCND3S9t//pbVjCeGF0mtceryZFGgwWuFtI
+         UxfhgSO+YNXWYaCKNC79CpJ7dldVjgz/jVIBJNZ4=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Corentin Labbe <clabbe.montjoie@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.19 065/244] crypto: sun4i-ss - Fix invalid calculation of hash end
+Date:   Wed, 22 May 2019 15:23:31 -0400
+Message-Id: <20190522192630.24917-65-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190522192630.24917-1-sashal@kernel.org>
+References: <20190522192630.24917-1-sashal@kernel.org>
 MIME-Version: 1.0
+X-stable: review
+X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+From: Corentin Labbe <clabbe.montjoie@gmail.com>
 
-When I added the sanity check of 'descsize', I missed that the child
-hash tfm needs to be freed if the sanity check fails.  Of course this
-should never happen, hence the use of WARN_ON(), but it should be fixed.
+[ Upstream commit f87391558acf816b48f325a493d81d45dec40da0 ]
 
-Fixes: e1354400b25d ("crypto: hash - fix incorrect HASH_MAX_DESCSIZE")
-Signed-off-by: Eric Biggers <ebiggers@google.com>
+When nbytes < 4, end is wronlgy set to a negative value which, due to
+uint, is then interpreted to a large value leading to a deadlock in the
+following code.
+
+This patch fix this problem.
+
+Fixes: 6298e948215f ("crypto: sunxi-ss - Add Allwinner Security System crypto accelerator")
+Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- crypto/hmac.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ drivers/crypto/sunxi-ss/sun4i-ss-hash.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/crypto/hmac.c b/crypto/hmac.c
-index 241b1868c1d01..ac8c611ee33e4 100644
---- a/crypto/hmac.c
-+++ b/crypto/hmac.c
-@@ -157,8 +157,10 @@ static int hmac_init_tfm(struct crypto_tfm *tfm)
+diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-hash.c b/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
+index a4b5ff2b72f87..f6936bb3b7be4 100644
+--- a/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
++++ b/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
+@@ -240,7 +240,10 @@ static int sun4i_hash(struct ahash_request *areq)
+ 		}
+ 	} else {
+ 		/* Since we have the flag final, we can go up to modulo 4 */
+-		end = ((areq->nbytes + op->len) / 4) * 4 - op->len;
++		if (areq->nbytes < 4)
++			end = 0;
++		else
++			end = ((areq->nbytes + op->len) / 4) * 4 - op->len;
+ 	}
  
- 	parent->descsize = sizeof(struct shash_desc) +
- 			   crypto_shash_descsize(hash);
--	if (WARN_ON(parent->descsize > HASH_MAX_DESCSIZE))
-+	if (WARN_ON(parent->descsize > HASH_MAX_DESCSIZE)) {
-+		crypto_free_shash(hash);
- 		return -EINVAL;
-+	}
- 
- 	ctx->hash = hash;
- 	return 0;
+ 	/* TODO if SGlen % 4 and !op->len then DMA */
 -- 
-2.22.0.rc1.257.g3120a18244-goog
+2.20.1
 
