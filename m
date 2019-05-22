@@ -1,68 +1,89 @@
-Return-Path: <SRS0=VBnc=TV=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=1Zye=TW=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75728C072B5
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 May 2019 21:18:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63A4FC18E7C
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 May 2019 07:21:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4F2792182B
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 May 2019 21:18:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3994F2173C
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 May 2019 07:21:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727453AbfEUVSh (ORCPT
+        id S1728609AbfEVHVw (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 21 May 2019 17:18:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:53522 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727156AbfEUVSh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 May 2019 17:18:37 -0400
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id B02A33079B93;
-        Tue, 21 May 2019 21:18:36 +0000 (UTC)
-Received: from warthog.procyon.org.uk (ovpn-120-170.rdu2.redhat.com [10.10.120.170])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 44D3260FE1;
-        Tue, 21 May 2019 21:18:30 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-        Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-        Kingdom.
-        Registered in England and Wales under Company Registration No. 3798903
-From:   David Howells <dhowells@redhat.com>
-In-Reply-To: <A3BC3B07-6446-4631-862A-F661FB9D63B9@holtmann.org>
-References: <A3BC3B07-6446-4631-862A-F661FB9D63B9@holtmann.org> <20190521100034.9651-1-omosnace@redhat.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     dhowells@redhat.com, Ondrej Mosnacek <omosnace@redhat.com>,
-        linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        keyrings@vger.kernel.org, Stephan Mueller <smueller@chronox.de>,
-        Milan Broz <gmazyland@gmail.com>,
-        Ondrej Kozina <okozina@redhat.com>,
-        Daniel Zatovic <dzatovic@redhat.com>
-Subject: Re: [PATCH] crypto: af_alg - implement keyring support
+        Wed, 22 May 2019 03:21:52 -0400
+Received: from mail-vs1-f68.google.com ([209.85.217.68]:33664 "EHLO
+        mail-vs1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728424AbfEVHVw (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 22 May 2019 03:21:52 -0400
+Received: by mail-vs1-f68.google.com with SMTP id y6so816043vsb.0;
+        Wed, 22 May 2019 00:21:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=X+htciVyJCEETZZh8S6dmdJOka2sEukH39ojlwyB7Oo=;
+        b=s1Ssr5L4oTKzRpfy3s09mZYfbx7sHO7zHEg4ARpRd/LxRUnX76mlQ4U9oTdXEMXMzM
+         cOIDD9CpHI3eUjeYVW5P49g9DDeh/0qJlruVN5Z+xa6gslLR8uiYMC4Gl9b5sSrKKbHA
+         xk+K9ubfr8csNavcSA6xrDILDA4+TYMxISyvLpa3++LDzCvgU1ePDk2hU6OouqcckiTL
+         NTMsPwZs05ztjaJSX4EH1YBgNMPzq40Oeg4YzZT/klA+o5QEhrtXdghJsgdNnLDmJftW
+         A54AokdZfNhXiPw+zSJFPYeskVI3GgQG5c1+KwH2A0Xy2ZeuC8zSyj+mrlRwR963ToRw
+         nF5Q==
+X-Gm-Message-State: APjAAAWnB+EQcrp3SDCcj5ssyo2KSGDwfoop0qMmbQC5KwSME7N3EDrF
+        TEHLDlF3wP0KLRMNyMsxEJ3eT+cn7flSZWLqvZU=
+X-Google-Smtp-Source: APXvYqyQWgSr/qxroftXFiBMDk9QtVTkDfbjkkGC0tsQ+POzeNBI2O6cxaSDGVpEMoedTLvddEa+4B3wqd+csUnkUxA=
+X-Received: by 2002:a67:f303:: with SMTP id p3mr31460348vsf.166.1558509710862;
+ Wed, 22 May 2019 00:21:50 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <29982.1558473509.1@warthog.procyon.org.uk>
-Date:   Tue, 21 May 2019 22:18:29 +0100
-Message-ID: <29983.1558473509@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.41]); Tue, 21 May 2019 21:18:37 +0000 (UTC)
+References: <20190521183417.GA121164@gmail.com> <20190521184622.37202-1-ebiggers@kernel.org>
+In-Reply-To: <20190521184622.37202-1-ebiggers@kernel.org>
+From:   Geert Uytterhoeven <geert@linux-m68k.org>
+Date:   Wed, 22 May 2019 09:21:38 +0200
+Message-ID: <CAMuHMdVgryYRq7XJ6a_80DNO3fuO363tC_1Tdonr2GcTFO1fUw@mail.gmail.com>
+Subject: Re: [PATCH] crypto: jitterentropy - change back to module_init()
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Marcel Holtmann <marcel@holtmann.org> wrote:
+On Tue, May 21, 2019 at 8:46 PM Eric Biggers <ebiggers@kernel.org> wrote:
+> From: Eric Biggers <ebiggers@google.com>
+>
+> "jitterentropy_rng" doesn't have any other implementations, nor is it
+> tested by the crypto self-tests.  So it was unnecessary to change it to
+> subsys_initcall.  Also it depends on the main clocksource being
+> initialized, which may happen after subsys_initcall, causing this error:
+>
+>     jitterentropy: Initialization failed with host not compliant with requirements: 2
+>
+> Change it back to module_init().
+>
+> Fixes: c4741b230597 ("crypto: run initcalls for generic implementations earlier")
+> Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 
-> why use the description instead the actual key id? I wonder if a single
-> socket option and a struct providing the key type and key id might be more
-> useful.
+Tested-by: Geert Uytterhoeven <geert+renesas@glider.be>
 
-If the key becomes invalid in some way, you can call request_key() again if
-you have the description to get a new key.  This is how afs and af_rxrpc do
-things on the client side.
+Gr{oetje,eeting}s,
 
-David
+                        Geert
+
+-- 
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
