@@ -2,103 +2,97 @@ Return-Path: <SRS0=1Zye=TW=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.2 required=3.0 tests=FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7224DC18E7D
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 May 2019 10:07:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1A49C282CE
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 May 2019 19:35:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 526242075E
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 May 2019 10:07:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AB6A620675
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 May 2019 19:35:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1558553753;
+	bh=M61L/6BGJAO/b4IL2zPrUUeO5cdIEunpER62ILyu/fI=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=ZZLWvIuyPavgcnKU2fpXXVcbErHjlBoHcf779WbBkHyxw1EngEYAigNpVAZI4nvK1
+	 WvfpL//J4PXCegUlIggCN9vUVwijPCfiTsOiNBZPlSIv0S7w6xlAnX1Hzdua29dQdV
+	 +Lgp/MVsJ7FXVxcqSYZJq0HGh4OLX9FVnVIPtkso=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728869AbfEVKHR (ORCPT
+        id S1731163AbfEVTfi (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 22 May 2019 06:07:17 -0400
-Received: from mail-oln040092071063.outbound.protection.outlook.com ([40.92.71.63]:37395
-        "EHLO EUR03-DB5-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728424AbfEVKHQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 May 2019 06:07:16 -0400
-Received: from DB5EUR03FT027.eop-EUR03.prod.protection.outlook.com
- (10.152.20.52) by DB5EUR03HT031.eop-EUR03.prod.protection.outlook.com
- (10.152.21.117) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.20.1900.16; Wed, 22 May
- 2019 10:07:14 +0000
-Received: from VI1PR07MB4432.eurprd07.prod.outlook.com (10.152.20.52) by
- DB5EUR03FT027.mail.protection.outlook.com (10.152.20.121) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.1922.16 via Frontend Transport; Wed, 22 May 2019 10:07:14 +0000
-Received: from VI1PR07MB4432.eurprd07.prod.outlook.com
- ([fe80::91f:b1bb:a60a:fdc3]) by VI1PR07MB4432.eurprd07.prod.outlook.com
- ([fe80::91f:b1bb:a60a:fdc3%7]) with mapi id 15.20.1922.013; Wed, 22 May 2019
- 10:07:14 +0000
-From:   Philippe Mazenauer <philippe.mazenauer@outlook.de>
-CC:     Philippe Mazenauer <philippe.mazenauer@outlook.de>,
+        Wed, 22 May 2019 15:35:38 -0400
+Received: from mail.kernel.org ([198.145.29.99]:54510 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731851AbfEVTbA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 22 May 2019 15:31:00 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 28D9B20675;
+        Wed, 22 May 2019 19:30:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1558553459;
+        bh=M61L/6BGJAO/b4IL2zPrUUeO5cdIEunpER62ILyu/fI=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=l/pD/prmw/Wnp3JpbUHi0stwBNwt6i6EbcIEn5/tdwvW9+l53UGc3QSmPJ+Ddp3hA
+         wzc7acWEFEVuyIqSbd+fff1dacN5BVI5FMQ8xnRG6Wcp2Uw2RDl+x2+4loceJJvqq3
+         H8UIF9qzhqM9gy/mVV/cs3KGXnkyAwaDxP0Tcieg=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Corentin Labbe <clabbe.montjoie@gmail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Russell King <linux@armlinux.org.uk>,
-        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
-        "moderated list:ARM PORT" <linux-arm-kernel@lists.infradead.org>,
-        open list <linux-kernel@vger.kernel.org>
-Subject: [PATCH] crypto: arm/sha512 - make function static
-Thread-Topic: [PATCH] crypto: arm/sha512 - make function static
-Thread-Index: AQHVEIYg0/n17GVM/0WrI34N1yB+nw==
-Date:   Wed, 22 May 2019 10:07:14 +0000
-Message-ID: <VI1PR07MB44324EFEF57062FCCA758358FD000@VI1PR07MB4432.eurprd07.prod.outlook.com>
-Accept-Language: de-CH, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: CO2PR05CA0079.namprd05.prod.outlook.com
- (2603:10b6:102:2::47) To VI1PR07MB4432.eurprd07.prod.outlook.com
- (2603:10a6:802:67::17)
-x-incomingtopheadermarker: OriginalChecksum:93E2A0D80A89EB0FBAA122ADC242ADBB36D5B9329F2929AEE227FBF289682C1E;UpperCasedChecksum:364AF332B8014653A71F9C05F8B8F4EA0A2873242A451BC0C99AFF3C41216965;SizeAsReceived:7591;Count:47
-x-ms-exchange-messagesentrepresentingtype: 1
-x-mailer: git-send-email 2.17.1
-x-tmn:  [omNYMT9E9m9SRgFtDZrK8qFeDf5ZrQAu]
-x-microsoft-original-message-id: <20190522100649.158063-1-philippe.mazenauer@outlook.de>
-x-ms-publictraffictype: Email
-x-incomingheadercount: 47
-x-eopattributedmessage: 0
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(5050001)(7020095)(20181119110)(201702061078)(5061506573)(5061507331)(1603103135)(2017031320274)(2017031323274)(2017031324274)(2017031322404)(1601125500)(1603101475)(1701031045);SRVR:DB5EUR03HT031;
-x-ms-traffictypediagnostic: DB5EUR03HT031:
-x-microsoft-antispam-message-info: k9zPpgcEv+Y35MFMFfvUzP1JUpTutQyXOJSTCm07G3tj/aMDswjt7vN8KPYP1JgguXFtAGC7tO959slhAHC5k2dMcOhJS/6LSMPO/3rpSSETjlzJBnkTKqT3e2Dtt+u1WerN/kf1O+nsxg8bLh8M3hj1mY9gW/VoSp5beddeGsZx1tb4ByhnqNwk14ET2DtT
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <73AB4A9B5F272D408CC901F2856F9BDD@eurprd07.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.9 027/114] crypto: sun4i-ss - Fix invalid calculation of hash end
+Date:   Wed, 22 May 2019 15:28:50 -0400
+Message-Id: <20190522193017.26567-27-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190522193017.26567-1-sashal@kernel.org>
+References: <20190522193017.26567-1-sashal@kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-Network-Message-Id: 43087c09-cd2d-4f59-444e-08d6de9d4342
-X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 May 2019 10:07:14.2749
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Internet
-X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB5EUR03HT031
-To:     unlisted-recipients:; (no To-header on input)
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-RnVuY3Rpb24gc2hhNTEyX2FybV9maW5hbCgpIGlzIG9ubHkgdXNlZCBpbiB0aGlzIGZpbGUsIHRo
-ZXJlZm9yZSBzaG91bGQNCmJlIHN0YXRpYw0KDQouLi9hcmNoL2FybS9jcnlwdG8vc2hhNTEyLWds
-dWUuYzo0MDo1OiB3YXJuaW5nOiBubyBwcmV2aW91cyBwcm90b3R5cGUgZm9yIOKAmHNoYTUxMl9h
-cm1fZmluYWzigJkgWy1XbWlzc2luZy1wcm90b3R5cGVzXQ0KIGludCBzaGE1MTJfYXJtX2ZpbmFs
-KHN0cnVjdCBzaGFzaF9kZXNjICpkZXNjLCB1OCAqb3V0KQ0KICAgICBefn5+fn5+fn5+fn5+fn5+
-DQoNClNpZ25lZC1vZmYtYnk6IFBoaWxpcHBlIE1hemVuYXVlciA8cGhpbGlwcGUubWF6ZW5hdWVy
-QG91dGxvb2suZGU+DQotLS0NCiBhcmNoL2FybS9jcnlwdG8vc2hhNTEyLWdsdWUuYyB8IDIgKy0N
-CiAxIGZpbGUgY2hhbmdlZCwgMSBpbnNlcnRpb24oKyksIDEgZGVsZXRpb24oLSkNCg0KZGlmZiAt
-LWdpdCBhL2FyY2gvYXJtL2NyeXB0by9zaGE1MTItZ2x1ZS5jIGIvYXJjaC9hcm0vY3J5cHRvL3No
-YTUxMi1nbHVlLmMNCmluZGV4IDg2NTQwY2Q0YTZmYS4uMjNmYzM4MTNhOTFiIDEwMDY0NA0KLS0t
-IGEvYXJjaC9hcm0vY3J5cHRvL3NoYTUxMi1nbHVlLmMNCisrKyBiL2FyY2gvYXJtL2NyeXB0by9z
-aGE1MTItZ2x1ZS5jDQpAQCAtMzcsNyArMzcsNyBAQCBpbnQgc2hhNTEyX2FybV91cGRhdGUoc3Ry
-dWN0IHNoYXNoX2Rlc2MgKmRlc2MsIGNvbnN0IHU4ICpkYXRhLA0KIAkJKHNoYTUxMl9ibG9ja19m
-biAqKXNoYTUxMl9ibG9ja19kYXRhX29yZGVyKTsNCiB9DQogDQotaW50IHNoYTUxMl9hcm1fZmlu
-YWwoc3RydWN0IHNoYXNoX2Rlc2MgKmRlc2MsIHU4ICpvdXQpDQorc3RhdGljIGludCBzaGE1MTJf
-YXJtX2ZpbmFsKHN0cnVjdCBzaGFzaF9kZXNjICpkZXNjLCB1OCAqb3V0KQ0KIHsNCiAJc2hhNTEy
-X2Jhc2VfZG9fZmluYWxpemUoZGVzYywNCiAJCShzaGE1MTJfYmxvY2tfZm4gKilzaGE1MTJfYmxv
-Y2tfZGF0YV9vcmRlcik7DQotLSANCjIuMTcuMQ0KDQo=
+From: Corentin Labbe <clabbe.montjoie@gmail.com>
+
+[ Upstream commit f87391558acf816b48f325a493d81d45dec40da0 ]
+
+When nbytes < 4, end is wronlgy set to a negative value which, due to
+uint, is then interpreted to a large value leading to a deadlock in the
+following code.
+
+This patch fix this problem.
+
+Fixes: 6298e948215f ("crypto: sunxi-ss - Add Allwinner Security System crypto accelerator")
+Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/crypto/sunxi-ss/sun4i-ss-hash.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-hash.c b/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
+index 0de2f62d51ff7..ec16ec2e284d0 100644
+--- a/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
++++ b/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
+@@ -250,7 +250,10 @@ static int sun4i_hash(struct ahash_request *areq)
+ 		}
+ 	} else {
+ 		/* Since we have the flag final, we can go up to modulo 4 */
+-		end = ((areq->nbytes + op->len) / 4) * 4 - op->len;
++		if (areq->nbytes < 4)
++			end = 0;
++		else
++			end = ((areq->nbytes + op->len) / 4) * 4 - op->len;
+ 	}
+ 
+ 	/* TODO if SGlen % 4 and op->len == 0 then DMA */
+-- 
+2.20.1
+
