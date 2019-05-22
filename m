@@ -4,52 +4,52 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF28FC282DE
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 May 2019 19:44:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFB7AC282CE
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 May 2019 19:53:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A93822081C
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 May 2019 19:44:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C15F020856
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 May 2019 19:53:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1558554266;
+	s=default; t=1558554791;
 	bh=pO38k8VhxEzdquYnHIYEk/3gJ31kyCzgKZhOtvkygOk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=vLKEgjq3Qd5x8quHTUE3kjSgo7h675fGTP9h0whEW8mots2bDGs1jD7YwEeMVW9fn
-	 bJZL6G18hK4sDjo7IrFkh3cIv7XNMZlWMfTd3MF2MD8lNjIFvKSX29O6xX36MLJZdk
-	 +4hR9HAwTHnspw+AzBa4UaaR1KQ+xbgtHAym/VBk=
+	b=yAo8y9x2SHgdvuSNOG0A/FOxaGhDwA4VCVVGcPV133AIwqgcd0vH/9WkPmC0NaPpZ
+	 SAQMplVhNun6WsjFPoqcXXcdrwzGFDIFHEnDTyE0CU+6OtXO8PJDisXhtolKkYzgFd
+	 bmBnrse7UAit+XyDB9gTyfnWyAgR2i99HK0vwElY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732582AbfEVToH (ORCPT
+        id S1731305AbfEVTxG (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 22 May 2019 15:44:07 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50822 "EHLO mail.kernel.org"
+        Wed, 22 May 2019 15:53:06 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47314 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732502AbfEVT2O (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 May 2019 15:28:14 -0400
+        id S1731790AbfEVTZz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 22 May 2019 15:25:55 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E677E2177E;
-        Wed, 22 May 2019 19:28:12 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9453F20675;
+        Wed, 22 May 2019 19:25:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1558553293;
+        s=default; t=1558553155;
         bh=pO38k8VhxEzdquYnHIYEk/3gJ31kyCzgKZhOtvkygOk=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=exIMuKYEDkbuW3aUqk0IwkmOzFQpNUfZAUYGcUQzYGTQvV3uN9KtZUP9xu3592qFG
-         ila6G0jOI6CIHDVhV6XolpPvLQd3DfxyCND3S9t//pbVjCeGF0mtceryZFGgwWuFtI
-         UxfhgSO+YNXWYaCKNC79CpJ7dldVjgz/jVIBJNZ4=
+        b=Y9eyxvYY4/vQQCFTyH/+oJn1yA0U8RWTNKbOhaAeZeecNsEgEjCOGuEoSvIK4yL3o
+         Evmv4DRXz0bsLxKfWspTW4/tH/i41sbrLhQaJsgJUyUDh/gbwG5UKlvS+qib1Ugv3J
+         7ppqClsS3YBoD/nRYTKeSUn59WlC+q9ESh83j8l8=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Corentin Labbe <clabbe.montjoie@gmail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 065/244] crypto: sun4i-ss - Fix invalid calculation of hash end
-Date:   Wed, 22 May 2019 15:23:31 -0400
-Message-Id: <20190522192630.24917-65-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.0 082/317] crypto: sun4i-ss - Fix invalid calculation of hash end
+Date:   Wed, 22 May 2019 15:19:43 -0400
+Message-Id: <20190522192338.23715-82-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190522192630.24917-1-sashal@kernel.org>
-References: <20190522192630.24917-1-sashal@kernel.org>
+In-Reply-To: <20190522192338.23715-1-sashal@kernel.org>
+References: <20190522192338.23715-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
