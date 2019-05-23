@@ -2,120 +2,101 @@ Return-Path: <SRS0=BTb3=TX=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 423DBC282DE
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 May 2019 08:08:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E4CEC04AAC
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 May 2019 08:50:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 03F4F204EC
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 May 2019 08:08:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="mGGvxHny"
+	by mail.kernel.org (Postfix) with ESMTP id 1CD9420675
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 May 2019 08:50:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726385AbfEWIIy (ORCPT
+        id S1726309AbfEWIuj (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 23 May 2019 04:08:54 -0400
-Received: from mail-eopbgr40054.outbound.protection.outlook.com ([40.107.4.54]:27552
-        "EHLO EUR03-DB5-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726070AbfEWIIy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 23 May 2019 04:08:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=s7TW7SrGZyFu1JjCdwNDBFdcM4EAzwrJk58onsTZD0g=;
- b=mGGvxHnyjYxFd3dxTFWM7DJADIkjyO8kXDeyA/TQ5oFH2VQcJFfZ0NKdUQQv7oQIhhQbb/tILqB/wrn22Mm6OHk98zqISllbBaHgqWk6Q1iNGygBEKj3dWE/lmpctuGI9cl5T51/6tOFy1k+1C/eVVVLB3NoM8hyADIrGA+Ovc0=
-Received: from VI1PR04MB4445.eurprd04.prod.outlook.com (20.177.55.161) by
- VI1PR04MB5150.eurprd04.prod.outlook.com (20.177.50.203) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1922.15; Thu, 23 May 2019 08:08:50 +0000
-Received: from VI1PR04MB4445.eurprd04.prod.outlook.com
- ([fe80::39fd:f3c3:46fc:f872]) by VI1PR04MB4445.eurprd04.prod.outlook.com
- ([fe80::39fd:f3c3:46fc:f872%7]) with mapi id 15.20.1922.018; Thu, 23 May 2019
- 08:08:50 +0000
-From:   Iuliana Prodan <iuliana.prodan@nxp.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-CC:     Horia Geanta <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        dl-linux-imx <linux-imx@nxp.com>
-Subject: Re: [PATCH v2 1/2] crypto: caam - fix pkcs1pad(rsa-caam, sha256)
- failure because of invalid input
-Thread-Topic: [PATCH v2 1/2] crypto: caam - fix pkcs1pad(rsa-caam, sha256)
- failure because of invalid input
-Thread-Index: AQHVCxD1/1xcZwH7eE+osRH9ZRl26A==
-Date:   Thu, 23 May 2019 08:08:50 +0000
-Message-ID: <VI1PR04MB44452D9C82BB8835DDF759298C010@VI1PR04MB4445.eurprd04.prod.outlook.com>
-References: <1557919546-360-1-git-send-email-iuliana.prodan@nxp.com>
- <20190523061202.ic2vgimgzvvm6dzc@gondor.apana.org.au>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=iuliana.prodan@nxp.com; 
-x-originating-ip: [212.146.100.6]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: cf0ff7c2-6cf7-49e6-1d45-08d6df55e3b4
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(4618075)(2017052603328)(7193020);SRVR:VI1PR04MB5150;
-x-ms-traffictypediagnostic: VI1PR04MB5150:
-x-microsoft-antispam-prvs: <VI1PR04MB515086496B62B865F41A2D5E8C010@VI1PR04MB5150.eurprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:3173;
-x-forefront-prvs: 00462943DE
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(39860400002)(376002)(136003)(366004)(346002)(396003)(199004)(189003)(66066001)(52536014)(99286004)(8676002)(25786009)(55016002)(316002)(4744005)(478600001)(76116006)(229853002)(73956011)(7696005)(64756008)(66446008)(66476007)(66946007)(66556008)(33656002)(26005)(74316002)(76176011)(186003)(5660300002)(68736007)(6116002)(6916009)(3846002)(6506007)(102836004)(53546011)(7736002)(4326008)(6436002)(486006)(44832011)(2906002)(305945005)(71190400001)(6246003)(14454004)(71200400001)(53936002)(9686003)(81166006)(81156014)(476003)(86362001)(8936002)(54906003)(446003)(256004)(32563001);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR04MB5150;H:VI1PR04MB4445.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: nxp.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: AZFoy4EQkloD8QRcbg92lvtDMtkHRhRg/iOCa9DeOqOmfVchKcIf4rnDuF4Vrew2lYGSNdrQKZoT7eDiOMojHFp/OGLPYzCz5PV0F7K9BFwdvtwtI4YTK4vPofAn6yBY1BWEapHZ2qLLbl+JG6pmf1/ucV8J3GDeZ7pwzIhitiO7tVgmAvSC2AHLYd5bbM9CB4upxo3dTKIBEP0Ct4x906YWxKBIdNSzWhTO52ZexeQfu97EFKqb5cRthHrsSfCzVpRc4zDIHAg7ZFyS3Aixlzmpoaxd9/z/AxLjFpcawmao4kkM2xf0Ae2TUfCGBk+/94/UjGUPAVEcI3lg1KXvgxBH+9axN6LvoydUmxpDyJ37TYBKFqc9HBpYMznCGjrHPIcPZWZbb1pWWjlvluCGjBj5kj1VGgmxnH8Bk3A0Csg=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Thu, 23 May 2019 04:50:39 -0400
+Received: from metis.ext.pengutronix.de ([85.220.165.71]:35671 "EHLO
+        metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726299AbfEWIuj (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 23 May 2019 04:50:39 -0400
+Received: from dude.hi.pengutronix.de ([2001:67c:670:100:1d::7])
+        by metis.ext.pengutronix.de with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.89)
+        (envelope-from <sha@pengutronix.de>)
+        id 1hTjQq-0002wx-Ro; Thu, 23 May 2019 10:50:36 +0200
+Received: from sha by dude.hi.pengutronix.de with local (Exim 4.92)
+        (envelope-from <sha@pengutronix.de>)
+        id 1hTjQq-0001fL-65; Thu, 23 May 2019 10:50:36 +0200
+From:   Sascha Hauer <s.hauer@pengutronix.de>
+To:     linux-crypto@vger.kernel.org
+Cc:     =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+        kernel@pengutronix.de, Sascha Hauer <s.hauer@pengutronix.de>
+Subject: [PATCH 2/4] crypto: caam: remove unused defines
+Date:   Thu, 23 May 2019 10:50:28 +0200
+Message-Id: <20190523085030.4969-3-s.hauer@pengutronix.de>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190523085030.4969-1-s.hauer@pengutronix.de>
+References: <20190523085030.4969-1-s.hauer@pengutronix.de>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cf0ff7c2-6cf7-49e6-1d45-08d6df55e3b4
-X-MS-Exchange-CrossTenant-originalarrivaltime: 23 May 2019 08:08:50.3430
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: iuliana.prodan@nxp.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB5150
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::7
+X-SA-Exim-Mail-From: sha@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 5/23/2019 9:12 AM, Herbert Xu wrote:=0A=
-> On Wed, May 15, 2019 at 02:25:45PM +0300, Iuliana Prodan wrote:=0A=
->>=0A=
->> @@ -1058,6 +1105,14 @@ static int __init caam_pkc_init(void)=0A=
->>   		goto out_put_dev;=0A=
->>   	}=0A=
->>   =0A=
->> +	/* allocate zero buffer, used for padding input */=0A=
->> +	zero_buffer =3D kzalloc(CAAM_RSA_MAX_INPUT_SIZE - 1, GFP_DMA |=0A=
->> +			      GFP_KERNEL);=0A=
->> +	if (!zero_buffer) {=0A=
->> +		err =3D -ENOMEM;=0A=
->> +		goto out_put_dev;=0A=
->> +	}=0A=
->> +=0A=
->>   	err =3D crypto_register_akcipher(&caam_rsa);=0A=
->>   	if (err)=0A=
->>   		dev_warn(ctrldev, "%s alg registration failed\n",=0A=
-> =0A=
-> This patch does not apply on top of the caam patch-series from Horia.=0A=
-> You're also going to leak zero_buffer if crypto_register_akcipher=0A=
-> fails.=0A=
-> =0A=
-> Cheers,=0A=
-> =0A=
-=0A=
-I'll fix the conflicts and also the leak of zero_buffer if =0A=
-crypto_register_akcipher fails and send a new version.=0A=
-=0A=
-Regards,=0A=
-Iulia=0A=
+The CAAM driver defines its own debug() macro, but it is unused. Remove
+it.
+
+Signed-off-by: Sascha Hauer <s.hauer@pengutronix.de>
+Reviewed-by: Horia Geantă <horia.geanta@nxp.com>
+---
+ drivers/crypto/caam/caamalg.c  | 7 -------
+ drivers/crypto/caam/caamhash.c | 8 --------
+ 2 files changed, 15 deletions(-)
+
+diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
+index bffff5415c74..fb2994f3b18f 100644
+--- a/drivers/crypto/caam/caamalg.c
++++ b/drivers/crypto/caam/caamalg.c
+@@ -77,13 +77,6 @@
+ #define DESC_MAX_USED_BYTES		(CAAM_DESC_BYTES_MAX - DESC_JOB_IO_LEN)
+ #define DESC_MAX_USED_LEN		(DESC_MAX_USED_BYTES / CAAM_CMD_SZ)
+ 
+-#ifdef DEBUG
+-/* for print_hex_dumps with line references */
+-#define debug(format, arg...) printk(format, arg)
+-#else
+-#define debug(format, arg...)
+-#endif
+-
+ struct caam_alg_entry {
+ 	int class1_alg_type;
+ 	int class2_alg_type;
+diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
+index 7205d9f4029e..8aee7c9bf862 100644
+--- a/drivers/crypto/caam/caamhash.c
++++ b/drivers/crypto/caam/caamhash.c
+@@ -82,14 +82,6 @@
+ #define HASH_MSG_LEN			8
+ #define MAX_CTX_LEN			(HASH_MSG_LEN + SHA512_DIGEST_SIZE)
+ 
+-#ifdef DEBUG
+-/* for print_hex_dumps with line references */
+-#define debug(format, arg...) printk(format, arg)
+-#else
+-#define debug(format, arg...)
+-#endif
+-
+-
+ static struct list_head hash_list;
+ 
+ /* ahash per-session context */
+-- 
+2.20.1
+
