@@ -1,158 +1,208 @@
 Return-Path: <SRS0=BTb3=TX=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: *
-X-Spam-Status: No, score=1.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FSL_HELO_FAKE,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	T_DKIMWL_WL_HIGH,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A695C282DD
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 May 2019 20:18:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71472C282DD
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 May 2019 21:44:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DF23720881
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 May 2019 20:18:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1558642736;
-	bh=GAo+Q2CUwnl22M0qwci3DAHS2xF/lB7jyKGsm+hwa6U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=sYjYj9V430Bp42btiYCDuE7Evt/7pNPfi9BtXBn2UV1uyxJcJRtskIe4Mez0yQeE3
-	 TgdWeq+BcjKVC/7aF/SAn5U8x/egEX7nX8bty8bLrmiu060RAcS5bKwgzdY0l40ALo
-	 0pfCKqipyup+C366HNjF4R2fvWlEm/f2rgPnnzyk=
+	by mail.kernel.org (Postfix) with ESMTP id 313212168B
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 May 2019 21:44:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=insidesecure.onmicrosoft.com header.i=@insidesecure.onmicrosoft.com header.b="EQU4aUJf"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387454AbfEWUSy (ORCPT
+        id S2388219AbfEWVn7 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 23 May 2019 16:18:54 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43278 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726451AbfEWUSy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 23 May 2019 16:18:54 -0400
-Received: from gmail.com (unknown [104.132.1.77])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 6CB8620644;
-        Thu, 23 May 2019 20:18:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1558642733;
-        bh=GAo+Q2CUwnl22M0qwci3DAHS2xF/lB7jyKGsm+hwa6U=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ReiaMxf8ZRVVqrw8GLnl8QSU5plezKSx9XCVXnVFvIiakFCPevsjMvaR5Eww6HXXr
-         OUEUZqr8utVFE5911RYQ6dYTDx6Dp9i0w4DZPOIx7vSlPmJbiVzpkiYAoSP9B972Cb
-         n8AjfhSgQ3o3Lj72WHC0wphKo7YXnFGv3gwVCdYA=
-Date:   Thu, 23 May 2019 13:18:52 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Pascal Van Leeuwen <pvanleeuwen@insidesecure.com>
-Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: testmgr question
-Message-ID: <20190523201851.GB248378@gmail.com>
-References: <AM6PR09MB3523DA127897A981C9E0074FD2000@AM6PR09MB3523.eurprd09.prod.outlook.com>
- <20190522162737.GA132972@google.com>
- <AM6PR09MB3523F1C423891763D4B3BF7CD2010@AM6PR09MB3523.eurprd09.prod.outlook.com>
- <20190523190534.GB243994@google.com>
- <AM6PR09MB3523BE1CDAE2E25AC47A3FD6D2010@AM6PR09MB3523.eurprd09.prod.outlook.com>
+        Thu, 23 May 2019 17:43:59 -0400
+Received: from mail-eopbgr20106.outbound.protection.outlook.com ([40.107.2.106]:24484
+        "EHLO EUR02-VE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S2387709AbfEWVn6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 23 May 2019 17:43:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=insidesecure.onmicrosoft.com; s=selector1-insidesecure-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=7RGeybYcFbvFsYEM3x6Rje5P0BKU1W9mqRevrXwSFBs=;
+ b=EQU4aUJfbqdZVKjj2Oxr5nscAOLLHs5uNQMt4ms5UzEylhWX2DrtSeaj9DG3C4JcXLw3vPiSm7+OQ04g1PogjYG4SZrxaQSYmMKdaXr0SjIhbIke/1Woub60bfyxG4XgsuQdHauCcCehc8X76GEhknfVjqsuevHZx8E5n5QabMc=
+Received: from AM6PR09MB3523.eurprd09.prod.outlook.com (10.255.99.206) by
+ AM6PR09MB3508.eurprd09.prod.outlook.com (10.255.99.203) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1900.16; Thu, 23 May 2019 21:43:54 +0000
+Received: from AM6PR09MB3523.eurprd09.prod.outlook.com
+ ([fe80::8c11:e692:3a44:a3a9]) by AM6PR09MB3523.eurprd09.prod.outlook.com
+ ([fe80::8c11:e692:3a44:a3a9%6]) with mapi id 15.20.1922.018; Thu, 23 May 2019
+ 21:43:54 +0000
+From:   Pascal Van Leeuwen <pvanleeuwen@insidesecure.com>
+To:     Eric Biggers <ebiggers@kernel.org>
+CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Subject: RE: another testmgr question
+Thread-Topic: another testmgr question
+Thread-Index: AQHVEZmK2bzdbrfsm0iVWRutGLPeSaZ5GFjggAAKVYCAAAs7wA==
+Date:   Thu, 23 May 2019 21:43:53 +0000
+Message-ID: <AM6PR09MB3523DB255516D35B595AEA50D2010@AM6PR09MB3523.eurprd09.prod.outlook.com>
+References: <AM6PR09MB3523CED0B1587FCBDE4095A0D2010@AM6PR09MB3523.eurprd09.prod.outlook.com>
+ <20190523185833.GA243994@google.com>
+ <AM6PR09MB3523749B0306103E8D2D8315D2010@AM6PR09MB3523.eurprd09.prod.outlook.com>
+ <20190523200557.GA248378@gmail.com>
+In-Reply-To: <20190523200557.GA248378@gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=pvanleeuwen@insidesecure.com; 
+x-originating-ip: [188.204.2.113]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 253953c8-3b7f-4773-05ee-08d6dfc7c08f
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(2017052603328)(7193020);SRVR:AM6PR09MB3508;
+x-ms-traffictypediagnostic: AM6PR09MB3508:
+x-ms-exchange-purlcount: 1
+x-microsoft-antispam-prvs: <AM6PR09MB3508885239A66A3DE5446375D2010@AM6PR09MB3508.eurprd09.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-forefront-prvs: 00462943DE
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(39850400004)(376002)(366004)(136003)(396003)(346002)(13464003)(51914003)(199004)(189003)(52314003)(8936002)(186003)(3480700005)(55016002)(8676002)(26005)(7736002)(81166006)(53546011)(6916009)(7116003)(6436002)(5660300002)(305945005)(102836004)(74316002)(6506007)(76116006)(52536014)(486006)(86362001)(476003)(64756008)(229853002)(446003)(73956011)(66946007)(66556008)(7696005)(25786009)(81156014)(71190400001)(71200400001)(11346002)(66476007)(66066001)(68736007)(9686003)(14444005)(6246003)(99286004)(316002)(76176011)(14454004)(6116002)(256004)(53936002)(2906002)(66446008)(33656002)(478600001)(3846002)(4326008)(15974865002)(18886075002);DIR:OUT;SFP:1102;SCL:1;SRVR:AM6PR09MB3508;H:AM6PR09MB3523.eurprd09.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: insidesecure.com does not
+ designate permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: yCubog1hMa8FMb/PIhLnYSxlJc+kw+Tiir9beyoLiXgnGeXwfz/++/1VeMOPgLlvT4fAeGdQ2vn6VzhHQSymVOHv/f0Rx52RQDfD8sziI8SHThlJQ37gEZaT8TwYX0zf+3p9klyDqKHlCXiM9BY8fRsSapg5TAO/ezw46QpK2VVN6mjsMo8QU2A7lvJcFR3LRRB1wnhJrxvzOmA9mQ+9UUkkc83NG4LiTqv5jtMwCXqKfkMofvkHa5KPeQvu0EfrvpZPugVNPP+qGmLCHC3NWIi2CC+nLiMt7ix1MF7p8753VAM8WIT2nbfHcRBk3DMqq17W5kJUrPHN994/SSWhoNRtesNDrY3Rbw2TA+c80MWYHm6k17ftQ3INWyVj8tb8iesESlb6v0X8wdeU0vgR4P57zwrE3Fq88KtGRt6v+oM=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <AM6PR09MB3523BE1CDAE2E25AC47A3FD6D2010@AM6PR09MB3523.eurprd09.prod.outlook.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+X-OriginatorOrg: insidesecure.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 253953c8-3b7f-4773-05ee-08d6dfc7c08f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 May 2019 21:43:54.0838
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3c07df58-7760-4e85-afd5-84803eac70ce
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR09MB3508
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, May 23, 2019 at 07:44:08PM +0000, Pascal Van Leeuwen wrote:
-> > -----Original Message-----
-> > From: Eric Biggers [mailto:ebiggers@google.com]
-> > Sent: Thursday, May 23, 2019 9:06 PM
-> > To: Pascal Van Leeuwen <pvanleeuwen@insidesecure.com>
-> > Cc: linux-crypto-owner@vger.kernel.org; Herbert Xu
-> > <herbert@gondor.apana.org.au>
-> > Subject: Re: testmgr question
+> -----Original Message-----
+> From: Eric Biggers [mailto:ebiggers@kernel.org]
+> Sent: Thursday, May 23, 2019 10:06 PM
+> To: Pascal Van Leeuwen <pvanleeuwen@insidesecure.com>
+> Cc: linux-crypto@vger.kernel.org
+> Subject: Re: another testmgr question
+>
+> On Thu, May 23, 2019 at 01:07:25PM +0000, Pascal Van Leeuwen wrote:
+> > Eric,
 > >
-> > On Thu, May 23, 2019 at 07:01:46AM +0000, Pascal Van Leeuwen wrote:
-> > > > -----Original Message-----
-> > > > From: Eric Biggers [mailto:ebiggers@google.com]
-> > > > Sent: Wednesday, May 22, 2019 6:28 PM
-> > > > To: Pascal Van Leeuwen <pvanleeuwen@insidesecure.com>
-> > > > Cc: linux-crypto-owner@vger.kernel.org; Herbert Xu
-> > > > <herbert@gondor.apana.org.au>
-> > > > Subject: Re: testmgr question
-> > > >
-> > > > On Wed, May 22, 2019 at 01:32:43PM +0000, Pascal Van Leeuwen wrote:
-> > > > > Ugh,
-> > > > >
-> > > > > I just synced my development branch with Linus' mainline tree (5.2-rc1)
-> > and
-> > > > > apparently inherited some new testmgr tests that are now failing on the
-> > > > Inside
-> > > > > Secure driver. I managed to fix some trivial ones related to non-zero
-> > IV
-> > > > size
-> > > > > on ECB modes and error codes that differed from the expected ones, but
-> > now
-> > > > I'm
-> > > > > rather stuck with a hang case ... and I don't have a clue which
-> > particular
-> > > > test
-> > > > > is hanging or even which algorithm is being tested :-(
-> > > > >
-> > > > > Is there, by any chance, some magical debug switch available to make
-> > > > testmgr
-> > > > > print out which test it is actually *starting* to run?
-> > > > >
-> > > > > Regards,
-> > > > >
-> > > > > Pascal van Leeuwen
-> > > > > Silicon IP Architect, Multi-Protocol Engines @ Inside Secure
-> > > > > www.insidesecure.com
-> > > > >
-> > > >
-> > > > Not currently, but you can easily add some debugging messages to testmgr
-> > > > yourself.  E.g.,
-> > > >
-> > > > Print 'alg' and 'driver' at beginning of alg_test() to see which
-> > algorithm is
-> > > > starting to be tested.
-> > > >
-> > > > Print 'vec_name' and 'cfg->name' at beginning of test_hash_vec_cfg(),
-> > > > test_skcipher_vec_cfg(), and test_aead_vec_cfg() to see which test vector
-> > is
-> > > > starting to be tested and under what configuration.
-> > > >
-> > > Thanks. I guess adding such debugging statements to testmgr is what I've
-> > been
-> > > doing all along. Like everyone else having to debug these issues, I guess
-> > ...
-> > > Therefore I assumed by now, there might have been some standard
-> > infrastructure
-> > > for that. Or maybe it was just a hint that such a thing might be useful ;-)
-> > >
+> > I'm running into some trouble with some random vectors that do *zero*
+> > length operations. Now you can go all formal about how the API does
+> > not explictly disallow this, but how much sense does it really make
+> > to essentially encrypt, hash or authenticate absolutely *nothing*?
 > >
-> > testmgr already prints information when a test fails which is enough for most
-> > cases, and in my experience when it's not I need to add messages specific to
-> > tracking down the particular issue anyway.  So that's why I haven't
-> > personally
-> > added more messages.  Feel free to send a patch, though.  Also, please
-> > continue
-> > any further discussion of this on linux-crypto.
+> > It makes so little sense that we never bothered to support it in any
+> > of our hardware developed over the past two decades ... and no
+> > customer has ever complained about this, to the best of my knowledge.
 > >
-> When developing hardware drivers, when things go wrong, odds are fairly
-> significant that the whole thing just hangs (or is that just me? :-).
-> So I can imagine I'm not the only one adding these debug print statements,
-> which means effort is probably wasted here. But I do notice that I keep
-> adding and removing them/commenting them out as they're pretty annoying when
-> things don't actually hang ...
-> 
-> Usually just knowing which specific case fails is enough for me  to reason about
-> why it's failing. I rarely need more debugging information than that. Following
-> a hash/HMAC operation is pretty impossible anyway unless you have a reference
-> implementation standing by to compare with.
-> 
+> > Can't you just remove those zero length tests?
+> >
+>
+> For hashes this is absolutely a valid case.  Try this:
+>
+> $ touch file
+> $ sha256sum file
+> e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  file
+>
+> That shows the SHA-256 digest of the empty message.
+>
+Valid? A totally fabricated case, if you ask me. Yes, you could do that,
+but is it *useful* at all? Really?
+No, it's not because a file of length 0 is a file of length 0, the length
+in itself is sufficient guarantee of its contents. The hash does not add
+*anything* in this case. It's a constant anyway, the same value for *any*
+zero-length file. It doesn't tell you anything you didn't already know.
+IMHO the tool should just return a message stating "hashing an empty file
+does not make any sense at all ...".
 
-The verbose debugging messages could be behind a Kconfig option, or just printed
-with pr_debug() so that they could be turned on with dynamic debug
-(https://www.kernel.org/doc/html/latest/admin-guide/dynamic-debug-howto.html).
-Again, feel free to send a patch.
+>
+> For AEADs it's a valid case too.  You still get an authenticated cipherte=
+xt
+> even
+> if the plaintext and/or AAD are empty, telling you that the (plaintext, A=
+AD)
+> pair is authentically from someone with the key.
+>
+Again, you could *theoretically* do that, but I don't know of any *practicl=
+e*
+use  case (protocol, application) where you can have *and* 0 length AAD *an=
+d*
+0 length payload (but do correct me when I'm wrong there!)
+In any case, that would result in a value *only* depending on the key (same
+thing applies to zero-length HMAC), which is likely some sort of security
+risk anyway.
 
-- Eric
+As I mentioned before, we made a lot of hashing and authentication hardware
+over the past 20+ years that has never been capable of doing zero-length
+operations and this has *never* proved to be a problem to *anyone*. Not a
+single support question has *ever* been raised on the subject.
+
+>
+> It's really only skciphers (length preserving encryption) where it's
+> questionable, since for those an empty input can only map to an empty out=
+put.
+>
+True, although that's also the least problematic case to handle.
+Doing nothing at all is not so hard ...
+
+> Regardless of what we do, I think it's really important that the behavior=
+ is
+> *consistent*, so users see the same behavior no matter what implementatio=
+n of
+> the algorithm is used.
+>
+Consistency should only be required for *legal* ranges of input parameters.
+Which then obviously need to be properly specified somewhere.
+It should be fair to put some reasonable restrictions on these inputs as to
+not burden implementions with potentially difficult to handle fringe cases.
+
+> Allowing empty messages works out naturally for most skcipher
+> implementations,
+> and it also conceptually simplifies the length restrictions of the API (e=
+.g.
+> for
+> most block cipher modes: just need nbytes % blocksize =3D=3D 0, as oppose=
+d to
+> that
+> *and* nbytes !=3D 0).  So that seems to be how we ended up with it.
+>
+I fail to see the huge burden of the extra len>0 restriction.
+Especially if you compare it to the burden of adding all the code for
+handling such useless exception cases to all individual drivers.
+
+> If we do change this, IMO we need to make it the behavior for all
+> implementations, not make it implementation-defined.
+>
+I don't see how disallowing 0 length inputs would affect implementations th=
+at
+ARE capable of processing them. Unless you would require them to start
+throwing errors for these cases, which I'm not suggesting.
+
+> Note that it's not necessary that your *hardware* supports empty messages=
+,
+> since you can simply do this in the driver instead:
+>
+>       if (req->cryptlen =3D=3D 0)
+>               return 0;
+>
+For skciphers, yes, it's not such a problem. Neither for basic hash.
+(And thanks for the code suggestion BTW, this will be a lot more efficient
+then what I'm doing now for this particular case :-)
+For HMAC, however, where you would have to return a value depending on the
+key ... not so easy to solve. I don't have a solution for that yet :-(
+
+And I'm pretty sure this affects all Inside Secure HW drivers in the tree:
+inside-secure, amcc, mediatek and omap ...
+
+Regards,
+Pascal van Leeuwen
+Silicon IP Architect, Multi-Protocol Engines, Inside Secure
+www.insidesecure.com
