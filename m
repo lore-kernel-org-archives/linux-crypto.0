@@ -2,220 +2,127 @@ Return-Path: <SRS0=IzQh=TY=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C07B1C072B5
-	for <linux-crypto@archiver.kernel.org>; Fri, 24 May 2019 14:47:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75EDAC072B5
+	for <linux-crypto@archiver.kernel.org>; Fri, 24 May 2019 16:27:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9E02C204EC
-	for <linux-crypto@archiver.kernel.org>; Fri, 24 May 2019 14:47:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4A55B2075D
+	for <linux-crypto@archiver.kernel.org>; Fri, 24 May 2019 16:27:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JlhIiBr0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2403997AbfEXOrQ (ORCPT
+        id S2390646AbfEXQ1j (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 24 May 2019 10:47:16 -0400
-Received: from inva021.nxp.com ([92.121.34.21]:48706 "EHLO inva021.nxp.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2403911AbfEXOrQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 24 May 2019 10:47:16 -0400
-Received: from inva021.nxp.com (localhost [127.0.0.1])
-        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 10392200464;
-        Fri, 24 May 2019 16:47:13 +0200 (CEST)
-Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
-        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 020FE20009E;
-        Fri, 24 May 2019 16:47:13 +0200 (CEST)
-Received: from lorenz.ea.freescale.net (lorenz.ea.freescale.net [10.171.71.5])
-        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id A928E205EF;
-        Fri, 24 May 2019 16:47:12 +0200 (CEST)
-From:   Iuliana Prodan <iuliana.prodan@nxp.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-imx <linux-imx@nxp.com>
-Subject: [PATCH v4] crypto: caam - strip input without changing crypto request
-Date:   Fri, 24 May 2019 17:46:29 +0300
-Message-Id: <1558709189-7237-2-git-send-email-iuliana.prodan@nxp.com>
-X-Mailer: git-send-email 2.1.0
-In-Reply-To: <1558709189-7237-1-git-send-email-iuliana.prodan@nxp.com>
-References: <1558709189-7237-1-git-send-email-iuliana.prodan@nxp.com>
-X-Virus-Scanned: ClamAV using ClamSMTP
+        Fri, 24 May 2019 12:27:39 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:55155 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390605AbfEXQ1j (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 24 May 2019 12:27:39 -0400
+Received: by mail-wm1-f67.google.com with SMTP id i3so9992195wml.4
+        for <linux-crypto@vger.kernel.org>; Fri, 24 May 2019 09:27:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=PW1SRGUIIosnHzTIT8oKHW+BHMniX6kJc68l082Nb68=;
+        b=JlhIiBr0LN+EnwR1yra8h8TfNP6AP5PihbHAG9CnLQaVbccxa0gL7XOEb/qPhw6xw2
+         21kLfpqUhTCojwj+D/mGusUKs1jjVDGZkz3LyvpjNo1f2NpWouYSEFgNjb88fjsgv8mL
+         DFLkoc+BPr3wl3/HYo7l/01oJB4c4rb0UtJ6Qy/7LkGxaxf+dyC5mTwsnvKUy3b/Dtsh
+         /P9qWaIzy+l2zGV3aFtyeAOq9GU001faEsS2NFsTAZDM0A978menzvnuZlzVr5h3mazT
+         i5FN0VuhV+N5XaldGyHhNDVl648ByGwe16b4tRcdlbaVE3pVIcTICNpEb3pCFCJ0ByCv
+         ygkw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=PW1SRGUIIosnHzTIT8oKHW+BHMniX6kJc68l082Nb68=;
+        b=GTmVvK3C3ar1TOecUVB6pKkUvQ9XooL0e9Rah463vnclCMlfxyw8/vUX86rihLUe55
+         FwdYXE0v24IPZc3oGVNzsy0yxqtBt1mrTQ5yoT5ULmSRHTT8sufsyKm47Bn0MaWTR4Eu
+         F0cAgBH+DSoH9qI2TsChF1Ij5s35bawLHlluAoKsqHaj0/gX0ztNx/y+w8xqmWNaMnaG
+         wn632SoPwv416R2pl2eA/x9ddrGOUMIkO+lSbdcF9E3AbfI5RT4rRdlW75c1rMg3g1dg
+         lCfVlqyva40QtLLrDqiNgIPoc+4ALY+fbkqUB727o8irbnAKQzFO3Ak8c4kSGH5X5JT2
+         1fKg==
+X-Gm-Message-State: APjAAAUKP10OJFi+pZU2tOSj6ZAobT/m0UBm8rxwGqrwIl7AQ6JJvjM5
+        tKrd8dz57nYkpE+1yXcUtmXAfOMK7v4jF6dl
+X-Google-Smtp-Source: APXvYqzFigln+kJPy+/t7Xbc8DEEH5LN8284rdnJjkHyVa5UHTzba6b6EgaPOigSNNHqYBAD5qkMHg==
+X-Received: by 2002:a1c:38c5:: with SMTP id f188mr507266wma.9.1558715256725;
+        Fri, 24 May 2019 09:27:36 -0700 (PDT)
+Received: from sudo.home ([2a01:cb1d:112:6f00:2042:d8f2:ded8:fa95])
+        by smtp.gmail.com with ESMTPSA id l6sm2200320wmi.24.2019.05.24.09.27.34
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 24 May 2019 09:27:35 -0700 (PDT)
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To:     linux-crypto@vger.kernel.org
+Cc:     devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Tudor Ambarus <tudor.ambarus@microchip.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Mika Westerberg <mika.westerberg@linux.intel.com>
+Subject: [PATCH v2 0/6] crypto - wire up Atmel SHA204A as RNG in DT and ACPI mode
+Date:   Fri, 24 May 2019 18:26:45 +0200
+Message-Id: <20190524162651.28189-1-ard.biesheuvel@linaro.org>
+X-Mailer: git-send-email 2.20.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-For rsa and pkcs1pad, CAAM expects an input of modulus size.
-For this we strip the leading zeros in case the size is more than modulus.
-This commit avoids modifying the crypto request while stripping zeros from
-input, to comply with the crypto API requirement. This is done by adding
-a fixup input pointer and length.
+The Socionext SynQuacer based 96boards DeveloperBox platform does not
+incorporate a random number generator, but it does have a 96boards low
+speed connector which supports extension boards such as the Secure96,
+which has a TPM and some crypto accelerators, one of which incorporates
+a random number generator.
 
-Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>
----
-Changes since V3:
-	- no changes.
----
- drivers/crypto/caam/caampkc.c | 39 ++++++++++++++++++++++++++-------------
- drivers/crypto/caam/caampkc.h |  7 ++++++-
- 2 files changed, 32 insertions(+), 14 deletions(-)
+This series implements support for the RNG part, which is one of several
+functions of the Atmel SHA204A I2C crypto accelerator, and wires it up so
+both DT and ACPI based boot methods can use the device.
 
-diff --git a/drivers/crypto/caam/caampkc.c b/drivers/crypto/caam/caampkc.c
-index 3878fcb..0120d26 100644
---- a/drivers/crypto/caam/caampkc.c
-+++ b/drivers/crypto/caam/caampkc.c
-@@ -32,8 +32,10 @@ static u8 *zero_buffer;
- static void rsa_io_unmap(struct device *dev, struct rsa_edesc *edesc,
- 			 struct akcipher_request *req)
- {
-+	struct caam_rsa_req_ctx *req_ctx = akcipher_request_ctx(req);
-+
- 	dma_unmap_sg(dev, req->dst, edesc->dst_nents, DMA_FROM_DEVICE);
--	dma_unmap_sg(dev, req->src, edesc->src_nents, DMA_TO_DEVICE);
-+	dma_unmap_sg(dev, req_ctx->fixup_src, edesc->src_nents, DMA_TO_DEVICE);
- 
- 	if (edesc->sec4_sg_bytes)
- 		dma_unmap_single(dev, edesc->sec4_sg_dma, edesc->sec4_sg_bytes,
-@@ -251,17 +253,21 @@ static struct rsa_edesc *rsa_edesc_alloc(struct akcipher_request *req,
- 		if (lzeros < 0)
- 			return ERR_PTR(lzeros);
- 
--		req->src_len -= lzeros;
--		req->src = scatterwalk_ffwd(req_ctx->src, req->src, lzeros);
-+		req_ctx->fixup_src = scatterwalk_ffwd(req_ctx->src, req->src,
-+						      lzeros);
-+		req_ctx->fixup_src_len = req->src_len - lzeros;
- 	} else {
- 		/*
- 		 * input src is less then n key modulus,
- 		 * so there will be zero padding
- 		 */
- 		diff_size = key->n_sz - req->src_len;
-+		req_ctx->fixup_src = req->src;
-+		req_ctx->fixup_src_len = req->src_len;
- 	}
- 
--	src_nents = sg_nents_for_len(req->src, req->src_len);
-+	src_nents = sg_nents_for_len(req_ctx->fixup_src,
-+				     req_ctx->fixup_src_len);
- 	dst_nents = sg_nents_for_len(req->dst, req->dst_len);
- 
- 	if (!diff_size && src_nents == 1)
-@@ -282,7 +288,7 @@ static struct rsa_edesc *rsa_edesc_alloc(struct akcipher_request *req,
- 	if (!edesc)
- 		return ERR_PTR(-ENOMEM);
- 
--	sgc = dma_map_sg(dev, req->src, src_nents, DMA_TO_DEVICE);
-+	sgc = dma_map_sg(dev, req_ctx->fixup_src, src_nents, DMA_TO_DEVICE);
- 	if (unlikely(!sgc)) {
- 		dev_err(dev, "unable to map source\n");
- 		goto src_fail;
-@@ -300,8 +306,8 @@ static struct rsa_edesc *rsa_edesc_alloc(struct akcipher_request *req,
- 				   0);
- 
- 	if (sec4_sg_index)
--		sg_to_sec4_sg_last(req->src, src_nents, edesc->sec4_sg +
--				   !!diff_size, 0);
-+		sg_to_sec4_sg_last(req_ctx->fixup_src, src_nents,
-+				   edesc->sec4_sg + !!diff_size, 0);
- 
- 	if (dst_nents > 1)
- 		sg_to_sec4_sg_last(req->dst, dst_nents,
-@@ -332,7 +338,7 @@ static struct rsa_edesc *rsa_edesc_alloc(struct akcipher_request *req,
- sec4_sg_fail:
- 	dma_unmap_sg(dev, req->dst, dst_nents, DMA_FROM_DEVICE);
- dst_fail:
--	dma_unmap_sg(dev, req->src, src_nents, DMA_TO_DEVICE);
-+	dma_unmap_sg(dev, req_ctx->fixup_src, src_nents, DMA_TO_DEVICE);
- src_fail:
- 	kfree(edesc);
- 	return ERR_PTR(-ENOMEM);
-@@ -342,6 +348,7 @@ static int set_rsa_pub_pdb(struct akcipher_request *req,
- 			   struct rsa_edesc *edesc)
- {
- 	struct crypto_akcipher *tfm = crypto_akcipher_reqtfm(req);
-+	struct caam_rsa_req_ctx *req_ctx = akcipher_request_ctx(req);
- 	struct caam_rsa_ctx *ctx = akcipher_tfm_ctx(tfm);
- 	struct caam_rsa_key *key = &ctx->key;
- 	struct device *dev = ctx->dev;
-@@ -366,7 +373,7 @@ static int set_rsa_pub_pdb(struct akcipher_request *req,
- 		pdb->f_dma = edesc->sec4_sg_dma;
- 		sec4_sg_index += edesc->src_nents;
- 	} else {
--		pdb->f_dma = sg_dma_address(req->src);
-+		pdb->f_dma = sg_dma_address(req_ctx->fixup_src);
- 	}
- 
- 	if (edesc->dst_nents > 1) {
-@@ -378,7 +385,7 @@ static int set_rsa_pub_pdb(struct akcipher_request *req,
- 	}
- 
- 	pdb->sgf |= (key->e_sz << RSA_PDB_E_SHIFT) | key->n_sz;
--	pdb->f_len = req->src_len;
-+	pdb->f_len = req_ctx->fixup_src_len;
- 
- 	return 0;
- }
-@@ -411,7 +418,9 @@ static int set_rsa_priv_f1_pdb(struct akcipher_request *req,
- 		pdb->g_dma = edesc->sec4_sg_dma;
- 		sec4_sg_index += edesc->src_nents;
- 	} else {
--		pdb->g_dma = sg_dma_address(req->src);
-+		struct caam_rsa_req_ctx *req_ctx = akcipher_request_ctx(req);
-+
-+		pdb->g_dma = sg_dma_address(req_ctx->fixup_src);
- 	}
- 
- 	if (edesc->dst_nents > 1) {
-@@ -474,7 +483,9 @@ static int set_rsa_priv_f2_pdb(struct akcipher_request *req,
- 		pdb->g_dma = edesc->sec4_sg_dma;
- 		sec4_sg_index += edesc->src_nents;
- 	} else {
--		pdb->g_dma = sg_dma_address(req->src);
-+		struct caam_rsa_req_ctx *req_ctx = akcipher_request_ctx(req);
-+
-+		pdb->g_dma = sg_dma_address(req_ctx->fixup_src);
- 	}
- 
- 	if (edesc->dst_nents > 1) {
-@@ -561,7 +572,9 @@ static int set_rsa_priv_f3_pdb(struct akcipher_request *req,
- 		pdb->g_dma = edesc->sec4_sg_dma;
- 		sec4_sg_index += edesc->src_nents;
- 	} else {
--		pdb->g_dma = sg_dma_address(req->src);
-+		struct caam_rsa_req_ctx *req_ctx = akcipher_request_ctx(req);
-+
-+		pdb->g_dma = sg_dma_address(req_ctx->fixup_src);
- 	}
- 
- 	if (edesc->dst_nents > 1) {
-diff --git a/drivers/crypto/caam/caampkc.h b/drivers/crypto/caam/caampkc.h
-index 5ac7201..2c488c9 100644
---- a/drivers/crypto/caam/caampkc.h
-+++ b/drivers/crypto/caam/caampkc.h
-@@ -95,14 +95,19 @@ struct caam_rsa_ctx {
- 	struct caam_rsa_key key;
- 	struct device *dev;
- 	dma_addr_t padding_dma;
-+
- };
- 
- /**
-  * caam_rsa_req_ctx - per request context.
-- * @src: input scatterlist (stripped of leading zeros)
-+ * @src           : input scatterlist (stripped of leading zeros)
-+ * @fixup_src     : input scatterlist (that might be stripped of leading zeros)
-+ * @fixup_src_len : length of the fixup_src input scatterlist
-  */
- struct caam_rsa_req_ctx {
- 	struct scatterlist src[2];
-+	struct scatterlist *fixup_src;
-+	unsigned int fixup_src_len;
- };
- 
- /**
+v2:
+- update DT binding patches so the SHA204A and ECC508A module bindings are
+  in trivial-devices.yaml.
+- add acks from Linus and Mika
+
+Assuming Rob is ok now with the DT binding patches, can we please take
+this through the crypto tree?
+
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Tudor Ambarus <tudor.ambarus@microchip.com>
+Cc: Linus Walleij <linus.walleij@linaro.org>
+Cc: Mika Westerberg <mika.westerberg@linux.intel.com>
+
+Ard Biesheuvel (6):
+  i2c: acpi: permit bus speed to be discovered after enumeration
+  crypto: atmel-ecc: add support for ACPI probing on non-AT91 platforms
+  crypto: atmel-ecc: factor out code that can be shared
+  crypto: atmel-i2c: add support for SHA204A random number generator
+  dt-bindings: add Atmel SHA204A I2C crypto processor
+  dt-bindings: move Atmel ECC508A I2C crypto processor to
+    trivial-devices
+
+ Documentation/devicetree/bindings/crypto/atmel-crypto.txt |  13 -
+ Documentation/devicetree/bindings/trivial-devices.yaml    |   4 +
+ drivers/crypto/Kconfig                                    |  19 +-
+ drivers/crypto/Makefile                                   |   2 +
+ drivers/crypto/atmel-ecc.c                                | 403 ++------------------
+ drivers/crypto/atmel-ecc.h                                | 116 ------
+ drivers/crypto/atmel-i2c.c                                | 364 ++++++++++++++++++
+ drivers/crypto/atmel-i2c.h                                | 196 ++++++++++
+ drivers/crypto/atmel-sha204a.c                            | 171 +++++++++
+ drivers/i2c/i2c-core-acpi.c                               |   6 +-
+ 10 files changed, 781 insertions(+), 513 deletions(-)
+ delete mode 100644 drivers/crypto/atmel-ecc.h
+ create mode 100644 drivers/crypto/atmel-i2c.c
+ create mode 100644 drivers/crypto/atmel-i2c.h
+ create mode 100644 drivers/crypto/atmel-sha204a.c
+
 -- 
-2.1.0
+2.20.1
 
