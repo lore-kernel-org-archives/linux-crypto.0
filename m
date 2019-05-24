@@ -7,55 +7,55 @@ X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9268CC072B5
-	for <linux-crypto@archiver.kernel.org>; Fri, 24 May 2019 16:27:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9359C072B5
+	for <linux-crypto@archiver.kernel.org>; Fri, 24 May 2019 16:27:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6B7762075D
-	for <linux-crypto@archiver.kernel.org>; Fri, 24 May 2019 16:27:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ADDD5217D7
+	for <linux-crypto@archiver.kernel.org>; Fri, 24 May 2019 16:27:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HTvI2d+K"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xkOIhFq0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390354AbfEXQ1m (ORCPT
+        id S2390689AbfEXQ1p (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 24 May 2019 12:27:42 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:38762 "EHLO
+        Fri, 24 May 2019 12:27:45 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:33574 "EHLO
         mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390623AbfEXQ1l (ORCPT
+        with ESMTP id S2390720AbfEXQ1o (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 24 May 2019 12:27:41 -0400
-Received: by mail-wr1-f68.google.com with SMTP id d18so10633831wrs.5
-        for <linux-crypto@vger.kernel.org>; Fri, 24 May 2019 09:27:40 -0700 (PDT)
+        Fri, 24 May 2019 12:27:44 -0400
+Received: by mail-wr1-f68.google.com with SMTP id d9so10645685wrx.0
+        for <linux-crypto@vger.kernel.org>; Fri, 24 May 2019 09:27:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=OpsVci6NS0D6Bf/3Go8WTx/jss3RyzyovCrA3zpdENw=;
-        b=HTvI2d+KNikWYtCfyv9ErbQwk9U7SN4mNO0FU31r9IcRKjdCFOiEcfX3ljB4rfrA7R
-         yNGT8C22B7n34+vtuGrX0SE/9+OZk7/YSy95mqEufDiSS3QtYDIWRpn06g5wDqHGarzk
-         VuJ8l5PyKvcxzI+r0snAiTATtmCo0eQ1MjuCyGnc2IOntuJCoLmTOVwwxUzP7T+UZ2/w
-         cKka3JVXHe4l873jUF1KaU6L2vm+jRkc1Abj3aOtTx4wDUfleGbOcmdq29+P0kMlfTtZ
-         bnAErkDLh1l1nPQaT/eKmolaXaddGRqUPRn2sgqfrP9tT+UPY2slGZ8DoELeVWsyuHTu
-         +DYQ==
+        bh=BDVCH2sHIJOl3oTxOH2Xw8NSMYpE4DumvzxW/scZEI8=;
+        b=xkOIhFq0XHfmFE1n3FRXs6JDt2lQu5s66J2ADnAbAa6G2kZ+fdlzQ6RAtv2nlGhsyM
+         R1rf+nYHj8/njLWYLvOIXVxdniD8av3d/k/Pg2GCmUlhTOEeVlsr2y1JaK/4roNGmv8Q
+         NxZ/oitIzGsyzysXL7SpXZWRuERubYmKXWV1S3WM1WxnKiqVxVODCo70sO5Gu3QvaDSX
+         vFUPndyRzLKABkHMXXtWLuPUTiMH2UM5PqOREsziEIhZtW6wx12xwFyl3imoHDy5EFqg
+         gM3CC7Te/YcQRp+VUJvX3mr3oZKOCbJF94ooJFH83CtwHuTJM1vKWOGqAttr+T3YCxoK
+         UvHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=OpsVci6NS0D6Bf/3Go8WTx/jss3RyzyovCrA3zpdENw=;
-        b=g1IwkvkgCd2xXHyPPu3hxxPt1cvIrbdJiH8e7/e9zMIbBxKroSiS1/1Jg5WPVGi7k1
-         ZN6J1EWPNOGsurpp3jpdOjKQvEayHlrLyHZkPgvyk/fYrvae49rM4S66oIVm7StDkrrj
-         2o1QDqb0q5D3TrP7lZvN3woOV1JjW8Yu2OBauNrkMZwwawOUm655itT8guZZdLTqg5Wt
-         udKgVu47WIWA5BBdFG3l8ReytPiI9JkXLNlaD+s31dWCtfBdIaU3tGGKiM9TbKFGFNK9
-         hWLDQItt361hftUKDBbFyxH1hO7NebiQ+HP62vmo6MZB+hktwPI12akNu2qQCwSy1uby
-         t3Zg==
-X-Gm-Message-State: APjAAAUdIBoWyHJ6iyT+zrH0mBrUZKOWqWT6UXuaSEEQ5LD6K+ACswjQ
-        SgQ93dyODqpmLfNbs8JF/rIitlTn7Hfn+UxD
-X-Google-Smtp-Source: APXvYqxRYQNMM2ILDaTxPlZrMk+NmwszppDLWVn4iyYwh8pn7KIzGpqZNUrsEYDpGPRnbbFmLAxWHQ==
-X-Received: by 2002:adf:edce:: with SMTP id v14mr59665675wro.94.1558715259395;
-        Fri, 24 May 2019 09:27:39 -0700 (PDT)
+        bh=BDVCH2sHIJOl3oTxOH2Xw8NSMYpE4DumvzxW/scZEI8=;
+        b=ZlVdk15tMFwlR6YWXtOde9jtVMlZDUTC+ohijV1twu8l+H4pKzO8HM8eik3RZwHciw
+         PFYoHqESYHN48QVdP0rslsOUrlF43R57cwBW3T7o3bhpSE4/YmZ1DLwTs+eqGwa0vW9j
+         3bqO7dUvk7K8lDlqN66QY650BHNXGFyxabmKsD+h9J/iGfKCEwv7SwhcnAubC27UGMlm
+         cmTcJ0oM6mv7T50wBTva3kpe2Vs5pgjDwq8mdPVkX/Uv1+Ym9pyFvSi4KE9cCM0x5D/H
+         rp+/ms8K6+oobPH31h6clCH1NxEqbnjXoUs50DyWqTgrk9uRiz88STQrV1yWT9DEvOW5
+         +rdg==
+X-Gm-Message-State: APjAAAXLRkaQzxyB2xpZYIqCLXeQkXzzBBbl9jEIl0Nh9Jl3Oy9eWvMK
+        6S+E873Ypk31q7A8BzB9eZbGtGe8uFnctHAr
+X-Google-Smtp-Source: APXvYqxUvB1wZ5HmkiCejCPEp/9BFe7k2AxZDdmzViyasNUYn8c87N7Yp9bXOdxE1FhkAFbci5NyWA==
+X-Received: by 2002:a5d:61c4:: with SMTP id q4mr53273464wrv.295.1558715263199;
+        Fri, 24 May 2019 09:27:43 -0700 (PDT)
 Received: from sudo.home ([2a01:cb1d:112:6f00:2042:d8f2:ded8:fa95])
-        by smtp.gmail.com with ESMTPSA id l6sm2200320wmi.24.2019.05.24.09.27.38
+        by smtp.gmail.com with ESMTPSA id l6sm2200320wmi.24.2019.05.24.09.27.42
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 24 May 2019 09:27:38 -0700 (PDT)
+        Fri, 24 May 2019 09:27:42 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
@@ -64,9 +64,9 @@ Cc:     devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         Tudor Ambarus <tudor.ambarus@microchip.com>,
         Linus Walleij <linus.walleij@linaro.org>,
         Mika Westerberg <mika.westerberg@linux.intel.com>
-Subject: [PATCH v2 2/6] crypto: atmel-ecc: add support for ACPI probing on non-AT91 platforms
-Date:   Fri, 24 May 2019 18:26:47 +0200
-Message-Id: <20190524162651.28189-3-ard.biesheuvel@linaro.org>
+Subject: [PATCH v2 5/6] dt-bindings: add Atmel SHA204A I2C crypto processor
+Date:   Fri, 24 May 2019 18:26:50 +0200
+Message-Id: <20190524162651.28189-6-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190524162651.28189-1-ard.biesheuvel@linaro.org>
 References: <20190524162651.28189-1-ard.biesheuvel@linaro.org>
@@ -77,61 +77,26 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The Atmel/Microchip EC508A is a I2C device that could be wired into
-any platform, and is being used on the Linaro/96boards Secure96
-mezzanine adapter. This means it could be found on any platform, even
-on ones that use ACPI enumeration (via PRP0001 devices). So update the
-code to enable this use case.
-
-This involves tweaking the bus rate discovery code to take ACPI probing
-into account, which records the maximum bus rate as a property of the
-slave device. For the atmel-ecc code, this means that the effective bus
-rate should never exceed the maximum rate, unless we are dealing with
-buggy firmware. Nonetheless, let's just use the existing plumbing to
-discover the bus rate and keep the existing logic intact.
+Add a compatible string for the Atmel SHA204A I2C crypto processor.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- drivers/crypto/Kconfig     |  1 -
- drivers/crypto/atmel-ecc.c | 13 ++++++++-----
- 2 files changed, 8 insertions(+), 6 deletions(-)
+ Documentation/devicetree/bindings/trivial-devices.yaml | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index 0af08081e305..97ec8107eeef 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -522,7 +522,6 @@ config CRYPTO_DEV_ATMEL_SHA
- 
- config CRYPTO_DEV_ATMEL_ECC
- 	tristate "Support for Microchip / Atmel ECC hw accelerator"
--	depends on ARCH_AT91 || COMPILE_TEST
- 	depends on I2C
- 	select CRYPTO_ECDH
- 	select CRC16
-diff --git a/drivers/crypto/atmel-ecc.c b/drivers/crypto/atmel-ecc.c
-index ba00e4563ca0..5705348f540f 100644
---- a/drivers/crypto/atmel-ecc.c
-+++ b/drivers/crypto/atmel-ecc.c
-@@ -657,11 +657,14 @@ static int atmel_ecc_probe(struct i2c_client *client,
- 		return -ENODEV;
- 	}
- 
--	ret = of_property_read_u32(client->adapter->dev.of_node,
--				   "clock-frequency", &bus_clk_rate);
--	if (ret) {
--		dev_err(dev, "of: failed to read clock-frequency property\n");
--		return ret;
-+	clk_rate = i2c_acpi_find_bus_speed(&client->adapter->dev);
-+	if (!clk_rate) {
-+		ret = device_property_read_u32(&client->adapter->dev,
-+					       "clock-frequency", &bus_clk_rate);
-+		if (ret) {
-+			dev_err(dev, "failed to read clock-frequency property\n");
-+			return ret;
-+		}
- 	}
- 
- 	if (bus_clk_rate > 1000000L) {
+diff --git a/Documentation/devicetree/bindings/trivial-devices.yaml b/Documentation/devicetree/bindings/trivial-devices.yaml
+index 747fd3f689dc..a572c3468226 100644
+--- a/Documentation/devicetree/bindings/trivial-devices.yaml
++++ b/Documentation/devicetree/bindings/trivial-devices.yaml
+@@ -52,6 +52,8 @@ properties:
+           - at,24c08
+             # i2c trusted platform module (TPM)
+           - atmel,at97sc3204t
++            # i2c h/w symmetric crypto module
++          - atmel,atsha204a
+             # CM32181: Ambient Light Sensor
+           - capella,cm32181
+             # CM3232: Ambient Light Sensor
 -- 
 2.20.1
 
