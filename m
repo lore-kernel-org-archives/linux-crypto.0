@@ -3,131 +3,135 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	T_DKIMWL_WL_HIGH autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B05BC072B5
-	for <linux-crypto@archiver.kernel.org>; Fri, 24 May 2019 10:13:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A72A0C072B5
+	for <linux-crypto@archiver.kernel.org>; Fri, 24 May 2019 10:43:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F00552175B
-	for <linux-crypto@archiver.kernel.org>; Fri, 24 May 2019 10:13:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4A09E217D7
+	for <linux-crypto@archiver.kernel.org>; Fri, 24 May 2019 10:43:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=insidesecure.onmicrosoft.com header.i=@insidesecure.onmicrosoft.com header.b="lJiC23Vs"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="oDEQbAZL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390106AbfEXKN1 (ORCPT
+        id S2390657AbfEXKnq (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 24 May 2019 06:13:27 -0400
-Received: from mail-eopbgr130094.outbound.protection.outlook.com ([40.107.13.94]:28482
-        "EHLO EUR01-HE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2389806AbfEXKN0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 24 May 2019 06:13:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=insidesecure.onmicrosoft.com; s=selector1-insidesecure-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xVzd26HQXPo53uc5D1JL5RKSHzUuwrSWJ69nPRCjo5E=;
- b=lJiC23VsEAy1bGGMZZYMbyrKAnlUC6CCZOmNfDSR2DkpDvW4jMHIPG6CjzQmzj33KZG6eEEi8GVY5BGwesqMC7gB6stU6pmfU4jW/oi5LMzkvZgojpmJAQcsa/dxx7LhCm33yFgKAyxoldPRaCBfYwrCUr86pbCnRUDBwtYNs4k=
-Received: from AM6PR09MB3523.eurprd09.prod.outlook.com (10.255.99.206) by
- AM6PR09MB2407.eurprd09.prod.outlook.com (20.177.113.156) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1922.17; Fri, 24 May 2019 10:13:22 +0000
-Received: from AM6PR09MB3523.eurprd09.prod.outlook.com
- ([fe80::8c11:e692:3a44:a3a9]) by AM6PR09MB3523.eurprd09.prod.outlook.com
- ([fe80::8c11:e692:3a44:a3a9%6]) with mapi id 15.20.1922.018; Fri, 24 May 2019
- 10:13:22 +0000
-From:   Pascal Van Leeuwen <pvanleeuwen@insidesecure.com>
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-CC:     Christophe Leroy <christophe.leroy@c-s.fr>,
+        Fri, 24 May 2019 06:43:46 -0400
+Received: from mailout1.w1.samsung.com ([210.118.77.11]:59091 "EHLO
+        mailout1.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390578AbfEXKnq (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 24 May 2019 06:43:46 -0400
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20190524104344euoutp013ad230e46aceacc68a7d2eb471aa262d~hmIDAdpHa2786127861euoutp01J
+        for <linux-crypto@vger.kernel.org>; Fri, 24 May 2019 10:43:44 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20190524104344euoutp013ad230e46aceacc68a7d2eb471aa262d~hmIDAdpHa2786127861euoutp01J
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1558694624;
+        bh=Co3KwE6OhgnHBO2mjrKcI196rNeBY2o1NPtUjUIXoGQ=;
+        h=Subject:To:Cc:From:Date:In-Reply-To:References:From;
+        b=oDEQbAZLm5+Kh9H2a4qV5fXlI2jtDpvyLZbIBQoOBiiFkNipLdsQF9sEGd+25kbjX
+         5md0JXNDLdyoDujbtRmG7W5OS9HmEvnbal1JoQp8ojJ8keTmEG6FNXRMB7rad4v6vy
+         Pt7RQhMzEwffSKEjNmO5CuinpOPCPmFAjZEZlZx0=
+Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
+        20190524104344eucas1p2d39cb3daa38f0e74fc3d2b0efac0d52c~hmICin3QA1736317363eucas1p2J;
+        Fri, 24 May 2019 10:43:44 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+        eusmges2new.samsung.com (EUCPMTA) with SMTP id ED.8E.04377.0EAC7EC5; Fri, 24
+        May 2019 11:43:44 +0100 (BST)
+Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+        20190524104343eucas1p2035c2f0223826189ad0550ca18304e0d~hmIB32ubC1130611306eucas1p2a;
+        Fri, 24 May 2019 10:43:43 +0000 (GMT)
+Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
+        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20190524104343eusmtrp168707c7ecba40ab6af1b3876cf0e7948~hmIBp4qHm1053010530eusmtrp1g;
+        Fri, 24 May 2019 10:43:43 +0000 (GMT)
+X-AuditID: cbfec7f4-12dff70000001119-02-5ce7cae09063
+Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
+        eusmgms2.samsung.com (EUCPMTA) with SMTP id C0.C9.04140.FDAC7EC5; Fri, 24
+        May 2019 11:43:43 +0100 (BST)
+Received: from [106.120.51.18] (unknown [106.120.51.18]) by
+        eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
+        20190524104343eusmtip104e4756c6aa13f15a6d2d397876dfcef~hmIBb3Qnq1836618366eusmtip1e;
+        Fri, 24 May 2019 10:43:43 +0000 (GMT)
+Subject: Re: another testmgr question
+To:     Pascal Van Leeuwen <pvanleeuwen@insidesecure.com>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     Christophe Leroy <christophe.leroy@c-s.fr>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Subject: RE: another testmgr question
-Thread-Topic: another testmgr question
-Thread-Index: AQHVEZmK2bzdbrfsm0iVWRutGLPeSaZ5GFjggAAKVYCAAAs7wIAAMw6AgACM6vCAAAlSgIAAAtPQgAAIJACAAAD1MIAABH2AgAAAYtCAAATFsA==
-Date:   Fri, 24 May 2019 10:13:22 +0000
-Message-ID: <AM6PR09MB3523E18FC16E2FFA117127D2D2020@AM6PR09MB3523.eurprd09.prod.outlook.com>
-References: <AM6PR09MB3523CED0B1587FCBDE4095A0D2010@AM6PR09MB3523.eurprd09.prod.outlook.com>
- <20190523185833.GA243994@google.com>
- <AM6PR09MB3523749B0306103E8D2D8315D2010@AM6PR09MB3523.eurprd09.prod.outlook.com>
- <20190523200557.GA248378@gmail.com>
- <AM6PR09MB3523DB255516D35B595AEA50D2010@AM6PR09MB3523.eurprd09.prod.outlook.com>
- <20190523234853.GC248378@gmail.com>
- <AM6PR09MB3523CFCFE42A33621FE4ACC3D2020@AM6PR09MB3523.eurprd09.prod.outlook.com>
- <907eb6a5-dc76-d5ee-eccf-e7bd426a0868@c-s.fr>
- <AM6PR09MB3523D9D6D249701D020A3D74D2020@AM6PR09MB3523.eurprd09.prod.outlook.com>
- <CAKv+Gu_Pxv97rpt7Ju0EdtFnXqp3zoYfHtm1Q51oJSGEAZmyDA@mail.gmail.com>
- <AM6PR09MB3523A8A4BEDDF2B59A7B9A09D2020@AM6PR09MB3523.eurprd09.prod.outlook.com>
- <CAKv+Gu-4c-zoRfMyL8wjQWO2BWNBR=Q8o3=CjNDarNcda-DvFQ@mail.gmail.com> 
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=pvanleeuwen@insidesecure.com; 
-x-originating-ip: [188.204.2.113]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 4cf8f54a-bbd4-4592-5f55-08d6e03073b8
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(2017052603328)(7193020);SRVR:AM6PR09MB2407;
-x-ms-traffictypediagnostic: AM6PR09MB2407:
-x-ms-exchange-purlcount: 1
-x-microsoft-antispam-prvs: <AM6PR09MB2407CDA6562610AFF92F2121D2020@AM6PR09MB2407.eurprd09.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 0047BC5ADE
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(366004)(136003)(396003)(376002)(39850400004)(346002)(199004)(189003)(8936002)(6916009)(68736007)(316002)(52536014)(8676002)(7116003)(15974865002)(33656002)(86362001)(256004)(71200400001)(71190400001)(81166006)(74316002)(6436002)(81156014)(6506007)(73956011)(7696005)(102836004)(76116006)(99286004)(66446008)(54906003)(229853002)(66476007)(7736002)(66946007)(66556008)(64756008)(76176011)(26005)(55016002)(305945005)(3480700005)(486006)(186003)(446003)(25786009)(9686003)(66066001)(476003)(4326008)(53936002)(478600001)(14454004)(6246003)(5660300002)(3846002)(6116002)(2906002)(18886075002);DIR:OUT;SFP:1102;SCL:1;SRVR:AM6PR09MB2407;H:AM6PR09MB3523.eurprd09.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: insidesecure.com does not
- designate permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: 9pSmaYSmmDsNDwhmhKGbiLkNCNY2Fhp71ChVmocDUJDwUT0FXuw7xc2vblyimAbZsIAe3oXLtrwmxLiq9D5DUC1vb3K2/PAL40zg2FBjEfOnNfFEgandSVcXFsV0RL3GZH0sTRazLfhplb6qYf5OL4zzsH02XuwEwBILMDwLDDvUtSzOJgV82SrXCYo6TfxbsAcPXSel57T9oVPb0kA9aLRv8Cj1UDmXtQaYd00Lu4NTCJdsh5gtjPt3XJu1OEXqc6KQzgk1HftAbNZKJyv1RDJaB4fmQcQ2D1E4ktnlcVIQ5aeVDdPCc4n0VealCBNLcsKQ5OrXIl/WqSO6l3sLNzOvU3X7wf2sh+teHVnLE3NFV++6k4hE+x7SxTB/wiERjfMQ1wxy84udcqpN1s5cM6//leTmZmUDBn+0WO1+pJE=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+From:   Kamil Konieczny <k.konieczny@partner.samsung.com>
+Message-ID: <1786cc8d-187d-e3ce-376b-e728263b1e68@partner.samsung.com>
+Date:   Fri, 24 May 2019 12:43:42 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+        Thunderbird/60.6.1
 MIME-Version: 1.0
-X-OriginatorOrg: insidesecure.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4cf8f54a-bbd4-4592-5f55-08d6e03073b8
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 May 2019 10:13:22.2789
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3c07df58-7760-4e85-afd5-84803eac70ce
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: pvanleeuwen@insidesecure.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR09MB2407
+In-Reply-To: <AM6PR09MB3523E18FC16E2FFA117127D2D2020@AM6PR09MB3523.eurprd09.prod.outlook.com>
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprKKsWRmVeSWpSXmKPExsWy7djPc7oPTj2PMXjwlsni/4fdjBYdzUwW
+        9+/9ZLLo2n2MxYHFo7X/B5tH55udrB53ru1h8/i8SS6AJYrLJiU1J7MstUjfLoEr49eWftaC
+        LpaK69NXsTcwLmDuYuTkkBAwkXh0bhNTFyMXh5DACkaJM2+mskI4Xxgl1nSvZoFwPjNKzP/e
+        zgTTsvrIRHaIxHJGiavzJzJDOG8ZJe5cPsQIUiUsoCpxcNpmFhBbRCBZ4mTbD7CFzAL5EkuO
+        LgeLswmYSzzafgZsKq+Am8TnY+2sIDYLUO/yhhXsILaoQITE/WMbWCFqBCVOznwC1sspECtx
+        deoyFoiZ4hK3nsxngrDlJba/nQN2kIRAN7vE5pc7WCHOdpH43nMF6mthiVfHt7BD2DISpyf3
+        sEDY5RJPF/axQzS3MEo8aP8IlbCWOHz8ItAgDqANmhLrd+mDmBICjhL7myUgTD6JG28FIU7g
+        k5i0bTozRJhXoqNNCGKGrsS8/2egjpGW6Pq/jnUCo9IsJI/NQvLMLCTPzEJYu4CRZRWjeGpp
+        cW56arFRXmq5XnFibnFpXrpecn7uJkZgYjn97/iXHYy7/iQdYhTgYFTi4X3Q+CxGiDWxrLgy
+        9xCjBAezkghv7H6gEG9KYmVValF+fFFpTmrxIUZpDhYlcd5qhgfRQgLpiSWp2ampBalFMFkm
+        Dk6pBkZm7sVfbvQc2SC/3L8o7hGHur7ebg7FdQIixxh6DeTTj2mLbVXbsFFyZcC9+rRHa7Wi
+        Hj5MnFfLxfvINeot35G/1yY2Fn2dnyzwYoplnLDthtKesIjgO3dn/vnz1ktk2fI407qnP6U/
+        bpqzpfuwpNcpbi7F6ODOt/OzLjX5W5pKTvkkLzDp6yYlluKMREMt5qLiRAB7OXppKAMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrJIsWRmVeSWpSXmKPExsVy+t/xu7r3Tz2PMehoF7H4/2E3o0VHM5PF
+        /Xs/mSy6dh9jcWDxaO3/webR+WYnq8eda3vYPD5vkgtgidKzKcovLUlVyMgvLrFVija0MNIz
+        tLTQMzKx1DM0No+1MjJV0rezSUnNySxLLdK3S9DL+LWln7Wgi6Xi+vRV7A2MC5i7GDk5JARM
+        JFYfmcjexcjFISSwlFHiSGsjO0RCWqLx9GomCFtY4s+1LjaIoteMElN2TQLrFhZQlTg4bTML
+        iC0ikCwxc/I2sDizQL7E69etUA2X2SVmH1sHNpVNwFzi0fYzYFN5BdwkPh9rZwWxWYAGLW9Y
+        AVYjKhAhceb9ChaIGkGJkzOfgNmcArESV6cuY4FYoC7xZ94lqGXiEreezGeCsOUltr+dwzyB
+        UWgWkvZZSFpmIWmZhaRlASPLKkaR1NLi3PTcYiO94sTc4tK8dL3k/NxNjMBo2nbs55YdjF3v
+        gg8xCnAwKvHwPmh8FiPEmlhWXJl7iFGCg1lJhDd2P1CINyWxsiq1KD++qDQntfgQoynQcxOZ
+        pUST84GRnlcSb2hqaG5haWhubG5sZqEkztshcDBGSCA9sSQ1OzW1ILUIpo+Jg1OqgdG4q0Am
+        7XC13Pb9e92aFn7uTb8ZvMyJk9/sS5V4w/olaU2Hgs/MqVzp8OrHFj/ZGY3HZ73as0b3QqhP
+        lc3MrhVXUzzecM36pb/mzzoZuZM7Tv+rL3Q/ptCe4/z/enhTdfqliyuv+4vmX1/ntaTntJyD
+        vf/fE5ZNhm37JN9ksBzmX8N3x687/7USS3FGoqEWc1FxIgAP5IonvAIAAA==
+X-CMS-MailID: 20190524104343eucas1p2035c2f0223826189ad0550ca18304e0d
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20190524101331epcas3p2f26e2f0abe56056992646e798a26470c
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20190524101331epcas3p2f26e2f0abe56056992646e798a26470c
+References: <AM6PR09MB3523CED0B1587FCBDE4095A0D2010@AM6PR09MB3523.eurprd09.prod.outlook.com>
+        <20190523185833.GA243994@google.com>
+        <AM6PR09MB3523749B0306103E8D2D8315D2010@AM6PR09MB3523.eurprd09.prod.outlook.com>
+        <20190523200557.GA248378@gmail.com>
+        <AM6PR09MB3523DB255516D35B595AEA50D2010@AM6PR09MB3523.eurprd09.prod.outlook.com>
+        <20190523234853.GC248378@gmail.com>
+        <AM6PR09MB3523CFCFE42A33621FE4ACC3D2020@AM6PR09MB3523.eurprd09.prod.outlook.com>
+        <907eb6a5-dc76-d5ee-eccf-e7bd426a0868@c-s.fr>
+        <AM6PR09MB3523D9D6D249701D020A3D74D2020@AM6PR09MB3523.eurprd09.prod.outlook.com>
+        <CAKv+Gu_Pxv97rpt7Ju0EdtFnXqp3zoYfHtm1Q51oJSGEAZmyDA@mail.gmail.com>
+        <AM6PR09MB3523A8A4BEDDF2B59A7B9A09D2020@AM6PR09MB3523.eurprd09.prod.outlook.com>
+        <CAKv+Gu-4c-zoRfMyL8wjQWO2BWNBR=Q8o3=CjNDarNcda-DvFQ@mail.gmail.com>
+        <CGME20190524101331epcas3p2f26e2f0abe56056992646e798a26470c@epcas3p2.samsung.com>
+        <AM6PR09MB3523E18FC16E2FFA117127D2D2020@AM6PR09MB3523.eurprd09.prod.outlook.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-PiBUcnVlLiBUaG9zZSBhcmUgdGhlICJvdGhlciIgcmVhc29ucyAtIGJlc2lkZXMgYWNjZWxlcmF0
-aW9uIC0gdG8gdXNlIGhhcmR3YXJlDQo+IG9mZmxvYWQgd2hpY2ggd2Ugb2Z0ZW4gdXNlIHRvIHNl
-bGwgb3VyIElQLg0KPiBCdXQgdGhlIGhvbmVzdCBzdG9yeSB0aGVyZSBpcyB0aGF0IHRoYXQgb25s
-eSB3b3JrcyBvdXQgZm9yIHNpdHVhdGlvbnMNCj4gd2hlcmUgdGhlcmUncyBlbm91Z2ggd29yayB0
-byBkbyB0byBtYWtlIHRoZSBzb2Z0d2FyZSBvdmVyaGVhZCBmb3IgYWN0dWFsbHkNCj4gc3RhcnRp
-bmcgYW5kIG1hbmFnaW5nIHRoYXQgd29yayBpbnNpZ25pZmljYW50Lg0KPg0KPiBBbmQgZXZlbiB0
-aGVuLCBpdCdzIG9ubHkgYSB2YWxpZCB1c2UgY2FzZSBpZiB0aGF0IGlzIHlvdXIgKmludGVudGlv
-biouDQo+IElmIHlvdSAqanVzdCogbmVlZGVkIHRoZSBoaWdoZXN0IHBlcmZvcm1hbmNlLCB5b3Ug
-ZG9uJ3Qgd2FudCB0byBnbyB0aHJvdWdoDQo+IHRoZSBIVyBpbiB0aGlzIGNhc2UgKHVubGVzcyB5
-b3UgaGF2ZSBhICp2ZXJ5KiB3ZWFrIENQVSBwZXJoYXBzLCBvciBhDQo+IGh1Z2UgYW1vdW50IG9m
-IGRhdGEgdG8gcHJvY2VzcyBpbiBvbmUgZ28pLg0KPg0KPiBUaGUgY2F0Y2ggaXMgaW4gdGhlICJh
-bHdheXMiLiBCdXQgaG93IGRvIHlvdSBtYWtlIGFuIGluZm9ybWVkIGRlY2lzaW9uDQo+IGhlcmU/
-IFRoZSBjdXJyZW50IENyeXB0byBBUEkgZG9lcyBub3QgcmVhbGx5IHNlZW0gdG8gcHJvdmlkZSBh
-IG1lY2hhbmlzbQ0KPiBmb3IgZG9pbmcgc28uIEluIHdoaWNoIGNhc2UgTVkgYXBwcm9hY2ggd291
-bGQgYmUgImlmIEknbSBub3QgU1VSRSB0aGF0DQo+IHRoZSBIVyBjYW4gZG8gaXQgYmV0dGVyLCB0
-aGVuIEkgcHJvYmFibHkgc2hvdWxkbid0IGJlIGRvaW5nIGluIG9uIHRoZSBIVyIuDQo+DQo+ID4g
-LSBzZXZlcmFsIHVzZXJsYW5kIHByb2dyYW1zIGFuZCBpbi1rZXJuZWwgdXNlcnMgbWF5IGJlIGFj
-dGl2ZSBhdCB0aGUNCj4gPiBzYW1lIHRpbWUsIHNvIHRoZSBmYWN0IHRoYXQgYSBzaW5nbGUgdXNl
-ciBzbGVlcHMgZG9lc24ndCBtZWFuIHRoZQ0KPiA+IGhhcmR3YXJlIGlzIHVzZWQgaW5lZmZpY2ll
-bnRseQ0KPiA+DQo+IEknbSBub3Qgd29ycmllZCBhYm91dCB0aGUgKkhXKiBiZWluZyB1c2VkIGlu
-ZWZmaWNpZW50bHkuDQo+IEknbSB3b3JyaWVkIGFib3V0IHVzaW5nIHRoZSBIVyBub3QgYmVpbmcg
-YW4gaW1wcm92ZW1lbnQuDQo+DQoNCkluIGxpZ2h0IG9mIHRoaXMgZGlzY3Vzc2lvbjogSSd2ZSBi
-ZWVuIHBvbmRlcmluZyBhYm91dCB0aGlzIGEgbG90IGFuZA0KSSB0aGluayB0aGUgYmVzdCBhcHBy
-b2FjaCB3b3VsZCBiZSB0aGF0IHRoZSBkZWZhdWx0IGRyaXZlciBmb3IgYSBjZXJ0YWluDQpjaXBo
-ZXIgc3VpdGUgc2hvdWxkIGFsd2F5cyBiZSB0aGUgZmFzdGVzdCAqc29mdHdhcmUqIHNvbHV0aW9u
-IHVubGVzcyB0aGUNCmNvbnN1bWVyIGV4cGxpY2l0bHkgcmVxdWVzdHMgLSBpLmUuIGJlY2F1c2Ug
-dGhlIHVzZXIgY29uZmlndXJlZCBpdCB0byBkbw0Kc28gLSBhIGNlcnRhaW4gc3BlY2lmaWMgKGhh
-cmR3YXJlIGFjY2VsZXJhdGVkKSBpbXBsZW1lbnRhdGlvbi4NCg0KVG8gcmVsaWV2ZSB0aGUgYnVy
-ZGVuIG9mIHNlbGVjdGluZyBhIHZlcnkgc3BlY2lmaWMgaW1wbGVtZW50YXRpb24geW91DQpjb3Vs
-ZCBjb25zaWRlciBhZGRpbmcgc29tZSBmbGFnIHJlcXVlc3RpbmcgdGhlICJiZXN0IiBoYXJkd2Fy
-ZQ0KYWNjZWxlcmF0ZWQgaW1wbGVtZW50YXRpb24sIGV4cGxpY3RseS4gV2l0aCB0aGUgZGVmYXVs
-dCBzdGlsbCBiZWluZyB0aGUNCmJlc3Qgc29mdHdhcmUgaW1wbGVtZW50YXRpb24gaWYgdGhlIGZs
-YWcgaXMgbm90IHNldC4NCg0KVGhlIGRvd25zaWRlIG9mIHRoYXQsIHRob3VnaCwgaXMgdGhhdCBl
-eGlzdGluZyBDcnlwdG8gQVBJIGNvbnN1bWVycyB0aGF0DQpkbyBub3QgbWFrZSB0aGUgIGVmZm9y
-dCB0byBhZGFwdCB0byB0aGlzIHNjaGVtZSBuZXZlciBiZW5lZml0IGZyb20gYW55DQpoYXJkd2Fy
-ZSBhY2NlbGVyYXRpb24uDQoNClJlZ2FyZHMsDQpQYXNjYWwgdmFuIExlZXV3ZW4NClNpbGljb24g
-SVAgQXJjaGl0ZWN0LCBNdWx0aS1Qcm90b2NvbCBFbmdpbmVzIEAgSW5zaWRlIFNlY3VyZQ0Kd3d3
-Lmluc2lkZXNlY3VyZS5jb20NCg==
+On 24.05.2019 12:13, Pascal Van Leeuwen wrote:
+>> True. Those are the "other" reasons - besides acceleration - to use hardware
+>> offload which we often use to sell our IP.
+>> But the honest story there is that that only works out for situations
+>> where there's enough work to do to make the software overhead for actually
+>> starting and managing that work insignificant. [...]
+
+Hmm, is there any HW which support hash of zero-len message ?
+
+-- 
+Best regards,
+Kamil Konieczny
+Samsung R&D Institute Poland
+
