@@ -2,128 +2,113 @@ Return-Path: <SRS0=IzQh=TY=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DF5FC282E3
-	for <linux-crypto@archiver.kernel.org>; Fri, 24 May 2019 07:20:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECA1AC282E3
+	for <linux-crypto@archiver.kernel.org>; Fri, 24 May 2019 07:42:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F399B2184E
-	for <linux-crypto@archiver.kernel.org>; Fri, 24 May 2019 07:20:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="qCk/j1xz"
+	by mail.kernel.org (Postfix) with ESMTP id BEAEA217F9
+	for <linux-crypto@archiver.kernel.org>; Fri, 24 May 2019 07:42:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388974AbfEXHUZ (ORCPT
+        id S2389030AbfEXHmv (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 24 May 2019 03:20:25 -0400
-Received: from mo4-p01-ob.smtp.rzone.de ([85.215.255.54]:10079 "EHLO
-        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388979AbfEXHUZ (ORCPT
+        Fri, 24 May 2019 03:42:51 -0400
+Received: from mailgw01.mediatek.com ([210.61.82.183]:27286 "EHLO
+        mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2388960AbfEXHmv (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 24 May 2019 03:20:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1558682420;
-        s=strato-dkim-0002; d=chronox.de;
-        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
-        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-        bh=pwDJiBeaj+t4RmLWFQQ2ZThZEzCnUpWhfbbPnBxxLRE=;
-        b=qCk/j1xzUVorKPPvQeWe/EcJJkbLkrIkV7a5qINiv8+v9/fUE0izVTVFt6Y+lqXC1n
-        VXhmOIK/t5BJeMma+eiZu5NwK2uL67ZZu5866HOsGkHlOy3yytnKuS16/FfeZcAJCEJa
-        laxScPccz9RFL9iPmn0hJb/XkBx63NWyKm06cxrOiUIskdGX07nf07D4ebRYGaWEkKQN
-        zXfIu02mm2pRcP/ViIoJxtxJDyPbTzsqcwgGK9MEvEKpAtAd8J8mQvU+02khu5Nm5AdV
-        sFKfkkK/aRG8Eu2kLn2JME2v6LvbUU56Bnotf3OgVgHMPPIya4e5rv5sLE0yh02u+NPi
-        /NHQ==
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPbL/Sf94Hg"
-X-RZG-CLASS-ID: mo00
-Received: from tauon.chronox.de
-        by smtp.strato.de (RZmta 44.18 DYNA|AUTH)
-        with ESMTPSA id R0373fv4O7JvSyw
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (curve secp521r1 with 521 ECDH bits, eq. 15360 bits RSA))
-        (Client did not present a certificate);
-        Fri, 24 May 2019 09:19:57 +0200 (CEST)
-From:   Stephan Mueller <smueller@chronox.de>
-To:     Kalyani Akula <kalyania@xilinx.com>, keyrings@vger.kernel.org
-Cc:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Fri, 24 May 2019 03:42:51 -0400
+X-UUID: d50e7404e6a24342ab317cff1f4924c2-20190524
+X-UUID: d50e7404e6a24342ab317cff1f4924c2-20190524
+Received: from mtkcas09.mediatek.inc [(172.21.101.178)] by mailgw01.mediatek.com
+        (envelope-from <neal.liu@mediatek.com>)
+        (mhqrelay.mediatek.com ESMTP with TLS)
+        with ESMTP id 1760047958; Fri, 24 May 2019 15:42:37 +0800
+Received: from mtkcas08.mediatek.inc (172.21.101.126) by
+ mtkmbs01n2.mediatek.inc (172.21.101.79) with Microsoft SMTP Server (TLS) id
+ 15.0.1395.4; Fri, 24 May 2019 15:42:34 +0800
+Received: from [172.21.77.33] (172.21.77.33) by mtkcas08.mediatek.inc
+ (172.21.101.73) with Microsoft SMTP Server id 15.0.1395.4 via Frontend
+ Transport; Fri, 24 May 2019 15:42:34 +0800
+Message-ID: <1558683754.5671.4.camel@mtkswgap22>
+Subject: Re: [PATCH 3/3] hwrng: add mt67xx-rng driver
+From:   Neal Liu <neal.liu@mediatek.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+CC:     "mark.rutland@arm.com" <mark.rutland@arm.com>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        wsd_upstream <wsd_upstream@mediatek.com>,
+        Stephan Mueller <smueller@chronox.de>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Sarat Chand Savitala <saratcha@xilinx.com>
-Subject: Re: [RFC PATCH 4/5] crypto: Adds user space interface for ALG_SET_KEY_TYPE
-Date:   Fri, 24 May 2019 09:19:56 +0200
-Message-ID: <2554415.t45IJDmies@tauon.chronox.de>
-In-Reply-To: <SN6PR02MB5135CE53C3E3FB34CA5E6BA8AF320@SN6PR02MB5135.namprd02.prod.outlook.com>
-References: <1547708541-23730-1-git-send-email-kalyani.akula@xilinx.com> <18759853.IUaQuE38eh@tauon.chronox.de> <SN6PR02MB5135CE53C3E3FB34CA5E6BA8AF320@SN6PR02MB5135.namprd02.prod.outlook.com>
+        "robh+dt@kernel.org" <robh+dt@kernel.org>,
+        "linux-mediatek@lists.infradead.org" 
+        <linux-mediatek@lists.infradead.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "mpm@selenic.com" <mpm@selenic.com>,
+        "matthias.bgg@gmail.com" <matthias.bgg@gmail.com>,
+        Crystal Guo =?UTF-8?Q?=28=E9=83=AD=E6=99=B6=29?= 
+        <Crystal.Guo@mediatek.com>, Neal Liu <neal.liu@mediatek.com>
+Date:   Fri, 24 May 2019 15:42:34 +0800
+In-Reply-To: <20190510063915.kwqy3e5urs6j7ity@gondor.apana.org.au>
+References: <1557287937-2410-1-git-send-email-neal.liu@mediatek.com>
+         <1557287937-2410-4-git-send-email-neal.liu@mediatek.com>
+         <12193108.aNnqf5ydOJ@tauon.chronox.de>
+         <1557311737.11818.11.camel@mtkswgap22>
+         <20190509052649.xfkgb3qd7rhcgktj@gondor.apana.org.au>
+         <1557413686.23445.6.camel@mtkswgap22>
+         <20190510063915.kwqy3e5urs6j7ity@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.2.3-0ubuntu6 
+Content-Transfer-Encoding: 7bit
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+X-TM-SNTS-SMTP: 89ED3B40815DB6F837B8DBB2E0E3948F37DDFAA36A07D69CF4F4116AD8AC13F82000:8
+X-MTK:  N
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Mittwoch, 8. Mai 2019, 11:31:08 CEST schrieb Kalyani Akula:
+Hi Herbert,
+	Could you kindly help to review our patches?
+	Thanks
 
-Hi Kalyani,
+From	Neal Liu <>
+Subject	[PATCH 0/3] MT67XX random number generator support
+Date	Wed, 8 May 2019 11:58:54 +0800
+share
+These patch series introduce a generic rng driver for Trustzone
+based kernel driver which would like to communicate with ATF
+SIP services.
 
-> Hi Stephan,
-> 
-> Keyrings is in-kernel key-management and retention facility. User can use it
-> to manage keys used for applications.
-> 
-> Xilinx cryptographic hardware has a mechanism to store keys in its internal
-> hardware and do not have mechanism to read it back due to security reasons.
-> It stores key internally in different forms like simple key, key encrypted
-> with unique hardware DNA, key encrypted with hardware family key, key
-> stored in eFUSEs/BBRAM etc.
-> Based on security level expected, user can select one of the key for AES
-> operation. Since AES hardware internally has access to these keys, user do
-> not require to provide key to hardware, but need to tell which internal
-> hardware key user application like to use for AES operation.
-> 
-> Basic need is to pass information to AES hardware about which internal
-> hardware key to be used for AES operation.
-> 
-> I agree that from general use case perspective we are not selecting key type
-> but selecting internal hardware keys provided by user. How about providing
-> option to select custom hardware keys provided by hardware
-> (AES_SEL_HW_KEY)?
+Patch #1 initials SMC fid table for Mediatek SIP interfaces and
+adds HWRNG related SMC call.
 
-I am not intimately familiary with the keyring facility. Thus, let us ask the 
-experts at the keyring mailing list :-)
+Patch #2..3 adds mt67xx-rng kernel driver for Trustzone based SoCs.
+For Mediatek SoCs on ARMv8 with TrustZone enabled, peripherals like
+entropy sources is not accessible from normal world (linux) and
+rather accessible from secure world (ATF/TEE) only. This driver aims
+to provide a generic interface to ATF rng service.
 
-> 
-> Thanks
-> kalyani
-> 
-> > -----Original Message-----
-> > From: Stephan Mueller <smueller@chronox.de>
-> > Sent: Thursday, April 25, 2019 12:01 AM
-> > To: Kalyani Akula <kalyania@xilinx.com>
-> > Cc: herbert@gondor.apana.org.au; davem@davemloft.net; linux-
-> > crypto@vger.kernel.org; linux-kernel@vger.kernel.org
-> > Subject: Re: [RFC PATCH 4/5] crypto: Adds user space interface for
-> > ALG_SET_KEY_TYPE
-> > 
-> > Am Montag, 22. April 2019, 11:17:55 CEST schrieb Kalyani Akula:
-> > 
-> > Hi Kalyani,
-> > 
-> > > > Besides, seem to be more a key handling issue. Wouldn't it make
-> > > > sense to rather have such issue solved with key rings than in the
-> > > > kernel crypto API?
-> > > 
-> > > [kalyani] Can you please elaborate on this further ?
-> > 
-> > The kernel has a keyring support in security/keys which has a user space
-> > interface with keyutils. That interface is commonly used for any sort of
-> > key manipulation.
-> > 
-> > Ciao
-> > Stephan
+Neal Liu (3):
+  soc: mediatek: add SMC fid table for SIP interface
+  dt-bindings: rng: update bindings for MT67xx SoCs
+  hwrng: add mt67xx-rng driver
 
+ Documentation/devicetree/bindings/rng/mtk-rng.txt |   13 ++-
+ drivers/char/hw_random/Kconfig                    |   16 ++++
+ drivers/char/hw_random/Makefile                   |    1 +
+ drivers/char/hw_random/mt67xx-rng.c               |  104
++++++++++++++++++++++
+ include/linux/soc/mediatek/mtk_sip_svc.h          |   55 +++++++++++
+ 5 files changed, 186 insertions(+), 3 deletions(-)
+ create mode 100644 drivers/char/hw_random/mt67xx-rng.c
+ create mode 100644 include/linux/soc/mediatek/mtk_sip_svc.h
 
+-- 
+1.7.9.5
 
-Ciao
-Stephan
+Best Regards,
+-Neal Liu
 
 
