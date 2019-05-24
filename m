@@ -2,113 +2,168 @@ Return-Path: <SRS0=IzQh=TY=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7D24C072B5
-	for <linux-crypto@archiver.kernel.org>; Fri, 24 May 2019 06:21:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B89EC46470
+	for <linux-crypto@archiver.kernel.org>; Fri, 24 May 2019 06:50:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 77F7E2175B
-	for <linux-crypto@archiver.kernel.org>; Fri, 24 May 2019 06:21:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 20E5E20868
+	for <linux-crypto@archiver.kernel.org>; Fri, 24 May 2019 06:50:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=c-s.fr header.i=@c-s.fr header.b="ULwrlH1K"
+	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="WLR6SJnQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388176AbfEXGVG (ORCPT
+        id S2388985AbfEXGua (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 24 May 2019 02:21:06 -0400
-Received: from pegase1.c-s.fr ([93.17.236.30]:22769 "EHLO pegase1.c-s.fr"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387936AbfEXGVG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 24 May 2019 02:21:06 -0400
-Received: from localhost (mailhub1-int [192.168.12.234])
-        by localhost (Postfix) with ESMTP id 459GTX42qqzB09ZK;
-        Fri, 24 May 2019 08:21:04 +0200 (CEST)
-Authentication-Results: localhost; dkim=pass
-        reason="1024-bit key; insecure key"
-        header.d=c-s.fr header.i=@c-s.fr header.b=ULwrlH1K; dkim-adsp=pass;
-        dkim-atps=neutral
-X-Virus-Scanned: Debian amavisd-new at c-s.fr
-Received: from pegase1.c-s.fr ([192.168.12.234])
-        by localhost (pegase1.c-s.fr [192.168.12.234]) (amavisd-new, port 10024)
-        with ESMTP id fK8K6824bS2b; Fri, 24 May 2019 08:21:04 +0200 (CEST)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-        by pegase1.c-s.fr (Postfix) with ESMTP id 459GTX31F3zB09ZH;
-        Fri, 24 May 2019 08:21:04 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=c-s.fr; s=mail;
-        t=1558678864; bh=0kNON5XTeKK4o7LieIj9N9uE6W9s+0vmPCSwsAjAG70=;
-        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
-        b=ULwrlH1K0ASETy0giF4mNwBV1Rhlz++Eh6YKI2BTX80Jr3WXh8cCQeFhMuKotoYrz
-         HjCn18qzYS87Ryzp7d84Yo+YLnpXR9wABuP5JfUTq2jNELidjJOdkgyLkyIbHucxXT
-         u06Orb7132NVnEwaK/datac9eT9KE99APGspfsS8=
-Received: from localhost (localhost [127.0.0.1])
-        by messagerie.si.c-s.fr (Postfix) with ESMTP id 585AC8B790;
-        Fri, 24 May 2019 08:21:05 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-        by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-        with ESMTP id Nh7rH7RRI6wZ; Fri, 24 May 2019 08:21:05 +0200 (CEST)
-Received: from PO15451 (po15451.idsi0.si.c-s.fr [172.25.231.1])
-        by messagerie.si.c-s.fr (Postfix) with ESMTP id 3C7D48B76F;
-        Fri, 24 May 2019 08:21:05 +0200 (CEST)
-Subject: Re: another testmgr question
-To:     Pascal Van Leeuwen <pvanleeuwen@insidesecure.com>
-Cc:     Eric Biggers <ebiggers@kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-References: <AM6PR09MB3523CED0B1587FCBDE4095A0D2010@AM6PR09MB3523.eurprd09.prod.outlook.com>
- <20190523185833.GA243994@google.com>
- <AM6PR09MB3523749B0306103E8D2D8315D2010@AM6PR09MB3523.eurprd09.prod.outlook.com>
- <20190523200557.GA248378@gmail.com>
- <AM6PR09MB3523DB255516D35B595AEA50D2010@AM6PR09MB3523.eurprd09.prod.outlook.com>
-From:   Christophe Leroy <christophe.leroy@c-s.fr>
-Message-ID: <6e5a9618-fc54-f649-6ca3-5c8ced027630@c-s.fr>
-Date:   Fri, 24 May 2019 08:21:05 +0200
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        Fri, 24 May 2019 02:50:30 -0400
+Received: from mail-eopbgr690065.outbound.protection.outlook.com ([40.107.69.65]:5550
+        "EHLO NAM04-CO1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S2388897AbfEXGua (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 24 May 2019 02:50:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=xilinx.onmicrosoft.com; s=selector1-xilinx-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9SPJBlQgqp9ZQIH4CMnVK6tleeQfxUvzNPpuE6U7Ib0=;
+ b=WLR6SJnQ7rCCfnpEo3mGB3U9KnGB63pEQeBMHwe6w7oGkYPrQqvDYKlBz7MpA/FIL6Q+AWQ6uu90gBtNMICiS9yKWd/Y5yl4REzjgzshTF67L7nEqrkdKu+uayPiUFtGxJu6elJnzlYtx5jDdns100LqmGTPYrnT2wYSFI1SdpU=
+Received: from BN7PR02MB5124.namprd02.prod.outlook.com (20.176.26.153) by
+ BN7PR02MB5300.namprd02.prod.outlook.com (20.176.176.214) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1922.15; Fri, 24 May 2019 06:50:25 +0000
+Received: from BN7PR02MB5124.namprd02.prod.outlook.com
+ ([fe80::4155:72d9:c5a:70ef]) by BN7PR02MB5124.namprd02.prod.outlook.com
+ ([fe80::4155:72d9:c5a:70ef%7]) with mapi id 15.20.1922.018; Fri, 24 May 2019
+ 06:50:25 +0000
+From:   Kalyani Akula <kalyania@xilinx.com>
+To:     Stephan Mueller <smueller@chronox.de>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+CC:     Sarat Chand Savitala <saratcha@xilinx.com>
+Subject: RE: [RFC PATCH 4/5] crypto: Adds user space interface for
+ ALG_SET_KEY_TYPE
+Thread-Topic: [RFC PATCH 4/5] crypto: Adds user space interface for
+ ALG_SET_KEY_TYPE
+Thread-Index: AQHUrjLRC0KQY4vUUEiutylzuXEA7qWzVM+AgJUjQyCAA8MlgIAVaNiQgBj4rpA=
+Date:   Fri, 24 May 2019 06:50:25 +0000
+Message-ID: <BN7PR02MB5124B0CB55A5B86D35752240AF020@BN7PR02MB5124.namprd02.prod.outlook.com>
+References: <1547708541-23730-1-git-send-email-kalyani.akula@xilinx.com>
+ <4735882.YQOrfzxm5S@tauon.chronox.de>
+ <BN7PR02MB5124AC0C75B15E5FB66DF2B6AF220@BN7PR02MB5124.namprd02.prod.outlook.com>
+ <18759853.IUaQuE38eh@tauon.chronox.de>
+ <SN6PR02MB5135CE53C3E3FB34CA5E6BA8AF320@SN6PR02MB5135.namprd02.prod.outlook.com>
+In-Reply-To: <SN6PR02MB5135CE53C3E3FB34CA5E6BA8AF320@SN6PR02MB5135.namprd02.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=kalyania@xilinx.com; 
+x-originating-ip: [149.199.50.133]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 328d49e7-7a1e-4876-baea-08d6e01419d6
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(4618075)(2017052603328)(7193020);SRVR:BN7PR02MB5300;
+x-ms-traffictypediagnostic: BN7PR02MB5300:
+x-microsoft-antispam-prvs: <BN7PR02MB53003B022799292E1636A1C2AF020@BN7PR02MB5300.namprd02.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-forefront-prvs: 0047BC5ADE
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(376002)(39860400002)(366004)(346002)(136003)(396003)(13464003)(199004)(189003)(478600001)(186003)(9686003)(256004)(76176011)(11346002)(476003)(486006)(52536014)(446003)(7696005)(102836004)(26005)(74316002)(55016002)(14454004)(14444005)(110136005)(4326008)(107886003)(71190400001)(71200400001)(53936002)(66446008)(229853002)(76116006)(33656002)(66946007)(66476007)(6436002)(6246003)(73956011)(66556008)(64756008)(6506007)(25786009)(2201001)(53546011)(86362001)(66066001)(8936002)(8676002)(2501003)(2906002)(81156014)(81166006)(316002)(7736002)(305945005)(5660300002)(6116002)(3846002)(68736007)(99286004);DIR:OUT;SFP:1101;SCL:1;SRVR:BN7PR02MB5300;H:BN7PR02MB5124.namprd02.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: xilinx.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: MaixsdFDt9lz1vFBVWgEnGF2BXdTRvm9HkDoaOa8K3iT20PmH1pJKikYI934sn1Z1ujDPqUCnyiBk/xFExAm4oATjw5BQF2bDLxmFIkEh0hvhhRQHBBgXggSeTmrRBFk04Ri6g5D3XFLppHFMFa0/h3o+hnr3pahk2FxDQQG0qhuyjSCfCyIC1mpMKZrcdahhFCYWSxzZQS/5j+WUdSFX9cAUMxDGUtKOubPZ7+5IFEsEHnd/WBPrs6Er2ZJLoR3/X/2xHiKA3SI6yxMGgR3p5In3DdvsD90d6ZIMgm1RHt9EAJmcQ6EvoyGkhF/Me9r8jvlQ+sjNZuB/EH7CQRlBeNRVQ78nwTGuWtENoCHA2R0dMYdBFxgJu83HmMmO377+HBzjF6wD2Di0Y/niUmgreUc9feVCcjDX544M3lkWTA=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <AM6PR09MB3523DB255516D35B595AEA50D2010@AM6PR09MB3523.eurprd09.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: xilinx.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 328d49e7-7a1e-4876-baea-08d6e01419d6
+X-MS-Exchange-CrossTenant-originalarrivaltime: 24 May 2019 06:50:25.4955
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 657af505-d5df-48d0-8300-c31994686c5c
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: kalyania@xilinx.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN7PR02MB5300
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Pascal,
+Ping!!
 
-Le 23/05/2019 à 23:43, Pascal Van Leeuwen a écrit :
->> -----Original Message-----
->> From: Eric Biggers [mailto:ebiggers@kernel.org]
+> -----Original Message-----
+> From: Kalyani Akula
+> Sent: Wednesday, May 8, 2019 3:01 PM
+> To: Stephan Mueller <smueller@chronox.de>
+> Cc: herbert@gondor.apana.org.au; davem@davemloft.net; linux-
+> crypto@vger.kernel.org; linux-kernel@vger.kernel.org; Sarat Chand Savital=
+a
+> <saratcha@xilinx.com>
+> Subject: RE: [RFC PATCH 4/5] crypto: Adds user space interface for
+> ALG_SET_KEY_TYPE
+>=20
+> Hi Stephan,
+>=20
+> Keyrings is in-kernel key-management and retention facility. User can use=
+ it to
+> manage keys used for applications.
+>=20
+> Xilinx cryptographic hardware has a mechanism to store keys in its intern=
+al
+> hardware and do not have mechanism to read it back due to security reason=
+s.
+> It stores key internally in different forms like simple key, key encrypte=
+d with
+> unique hardware DNA, key encrypted with hardware family key, key stored i=
+n
+> eFUSEs/BBRAM etc.
+> Based on security level expected, user can select one of the key for AES
+> operation. Since AES hardware internally has access to these keys, user d=
+o not
+> require to provide key to hardware, but need to tell which internal hardw=
+are key
+> user application like to use for AES operation.
+>=20
+> Basic need is to pass information to AES hardware about which internal
+> hardware key to be used for AES operation.
+>=20
+> I agree that from general use case perspective we are not selecting key t=
+ype but
+> selecting internal hardware keys provided by user.
+> How about providing option to select custom hardware keys provided by
+> hardware (AES_SEL_HW_KEY)?
+>=20
+> Thanks
+> kalyani
+>=20
+> > -----Original Message-----
+> > From: Stephan Mueller <smueller@chronox.de>
+> > Sent: Thursday, April 25, 2019 12:01 AM
+> > To: Kalyani Akula <kalyania@xilinx.com>
+> > Cc: herbert@gondor.apana.org.au; davem@davemloft.net; linux-
+> > crypto@vger.kernel.org; linux-kernel@vger.kernel.org
+> > Subject: Re: [RFC PATCH 4/5] crypto: Adds user space interface for
+> > ALG_SET_KEY_TYPE
+> >
+> > Am Montag, 22. April 2019, 11:17:55 CEST schrieb Kalyani Akula:
+> >
+> > Hi Kalyani,
+> >
+> > > > Besides, seem to be more a key handling issue. Wouldn't it make
+> > > > sense to rather have such issue solved with key rings than in the
+> > > > kernel crypto API?
+> > >
+> > > [kalyani] Can you please elaborate on this further ?
+> >
+> > The kernel has a keyring support in security/keys which has a user
+> > space interface with keyutils. That interface is commonly used for any
+> > sort of key manipulation.
+> >
+> > Ciao
+> > Stephan
+> >
 
-[...]
-
->> Note that it's not necessary that your *hardware* supports empty messages,
->> since you can simply do this in the driver instead:
->>
->>        if (req->cryptlen == 0)
->>                return 0;
->>
-> For skciphers, yes, it's not such a problem. Neither for basic hash.
-> (And thanks for the code suggestion BTW, this will be a lot more efficient
-> then what I'm doing now for this particular case :-)
-> For HMAC, however, where you would have to return a value depending on the
-> key ... not so easy to solve. I don't have a solution for that yet :-(
-
-I had the same issue when porting the SEC2 Talitos driver to also 
-support SEC1. See following commit to see the way it has been fixed:
-
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=2d02905ebd22c0271a25e424ab209c8b7067be67
-
-Christophe
-
-> 
-> And I'm pretty sure this affects all Inside Secure HW drivers in the tree:
-> inside-secure, amcc, mediatek and omap ...
-> 
-> Regards,
-> Pascal van Leeuwen
-> Silicon IP Architect, Multi-Protocol Engines, Inside Secure
-> www.insidesecure.com
-> 
