@@ -2,112 +2,113 @@ Return-Path: <SRS0=IzQh=TY=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FF01C072B5
-	for <linux-crypto@archiver.kernel.org>; Fri, 24 May 2019 09:42:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA796C072B5
+	for <linux-crypto@archiver.kernel.org>; Fri, 24 May 2019 09:45:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E2DCA20644
-	for <linux-crypto@archiver.kernel.org>; Fri, 24 May 2019 09:42:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9DEA720645
+	for <linux-crypto@archiver.kernel.org>; Fri, 24 May 2019 09:45:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=insidesecure.onmicrosoft.com header.i=@insidesecure.onmicrosoft.com header.b="fmOsR4ey"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="InVIjS4g"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390268AbfEXJmf (ORCPT
+        id S2389776AbfEXJph (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 24 May 2019 05:42:35 -0400
-Received: from mail-eopbgr10128.outbound.protection.outlook.com ([40.107.1.128]:37925
-        "EHLO EUR02-HE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2389677AbfEXJme (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 24 May 2019 05:42:34 -0400
+        Fri, 24 May 2019 05:45:37 -0400
+Received: from mail-it1-f170.google.com ([209.85.166.170]:54869 "EHLO
+        mail-it1-f170.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389582AbfEXJpg (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 24 May 2019 05:45:36 -0400
+Received: by mail-it1-f170.google.com with SMTP id h20so14722937itk.4
+        for <linux-crypto@vger.kernel.org>; Fri, 24 May 2019 02:45:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=insidesecure.onmicrosoft.com; s=selector1-insidesecure-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=beCnDuwjVJgZ5gahakgwmh50wqVxdYEaBZwq6L6lMBM=;
- b=fmOsR4eyRBcUvxErCw/128HGT6noY4GTm1rRvHbCR6fMgMdgTGTxA+4oZW1/9LBH6jakuh8CkveZb95Z2dDSYCizDDHTDx1ldSY7iLjmi6AkIw8YZP2jJiWcPk93THxNOfIyk2qZf8bivbgcNMTAYMmb2wlNUBIfjC6bTyRSWsA=
-Received: from AM6PR09MB3523.eurprd09.prod.outlook.com (10.255.99.206) by
- AM6PR09MB3368.eurprd09.prod.outlook.com (20.179.245.209) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1922.16; Fri, 24 May 2019 09:42:31 +0000
-Received: from AM6PR09MB3523.eurprd09.prod.outlook.com
- ([fe80::8c11:e692:3a44:a3a9]) by AM6PR09MB3523.eurprd09.prod.outlook.com
- ([fe80::8c11:e692:3a44:a3a9%6]) with mapi id 15.20.1922.018; Fri, 24 May 2019
- 09:42:31 +0000
-From:   Pascal Van Leeuwen <pvanleeuwen@insidesecure.com>
-To:     "noloader@gmail.com" <noloader@gmail.com>,
-        Christophe Leroy <christophe.leroy@c-s.fr>
-CC:     Eric Biggers <ebiggers@kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Subject: RE: another testmgr question
-Thread-Topic: another testmgr question
-Thread-Index: AQHVEZmK2bzdbrfsm0iVWRutGLPeSaZ5GFjggAAKVYCAAAs7wIAAMw6AgACM6vCAAAlSgIAAALWAgAANgcA=
-Date:   Fri, 24 May 2019 09:42:31 +0000
-Message-ID: <AM6PR09MB352306D397F46D5FB5880999D2020@AM6PR09MB3523.eurprd09.prod.outlook.com>
-References: <AM6PR09MB3523CED0B1587FCBDE4095A0D2010@AM6PR09MB3523.eurprd09.prod.outlook.com>
- <20190523185833.GA243994@google.com>
- <AM6PR09MB3523749B0306103E8D2D8315D2010@AM6PR09MB3523.eurprd09.prod.outlook.com>
- <20190523200557.GA248378@gmail.com>
- <AM6PR09MB3523DB255516D35B595AEA50D2010@AM6PR09MB3523.eurprd09.prod.outlook.com>
- <20190523234853.GC248378@gmail.com>
- <AM6PR09MB3523CFCFE42A33621FE4ACC3D2020@AM6PR09MB3523.eurprd09.prod.outlook.com>
- <907eb6a5-dc76-d5ee-eccf-e7bd426a0868@c-s.fr>
- <CAH8yC8nBDa438QsJvs91CGV-e+-j9UxnB2pQ6-KAy0jV3EXj-w@mail.gmail.com>
-In-Reply-To: <CAH8yC8nBDa438QsJvs91CGV-e+-j9UxnB2pQ6-KAy0jV3EXj-w@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=pvanleeuwen@insidesecure.com; 
-x-originating-ip: [188.204.2.113]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: b4d56b1f-174f-45e6-4d87-08d6e02c244f
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600141)(711020)(4605104)(2017052603328)(7193020);SRVR:AM6PR09MB3368;
-x-ms-traffictypediagnostic: AM6PR09MB3368:
-x-ms-exchange-purlcount: 2
-x-microsoft-antispam-prvs: <AM6PR09MB3368FB4A6AFE3BE9618E0622D2020@AM6PR09MB3368.eurprd09.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:7691;
-x-forefront-prvs: 0047BC5ADE
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(979002)(346002)(366004)(39850400004)(396003)(376002)(136003)(189003)(199004)(7116003)(8676002)(66946007)(73956011)(229853002)(74316002)(2906002)(68736007)(3480700005)(486006)(478600001)(14454004)(316002)(66066001)(64756008)(305945005)(446003)(81166006)(186003)(5660300002)(7736002)(11346002)(102836004)(53546011)(8936002)(256004)(6506007)(86362001)(71200400001)(71190400001)(52536014)(81156014)(26005)(54906003)(110136005)(4326008)(6246003)(476003)(66446008)(66476007)(25786009)(2501003)(6306002)(99286004)(6436002)(66556008)(9686003)(55016002)(76116006)(7696005)(33656002)(76176011)(53936002)(3846002)(6116002)(15974865002)(18886075002)(969003)(989001)(999001)(1009001)(1019001);DIR:OUT;SFP:1102;SCL:1;SRVR:AM6PR09MB3368;H:AM6PR09MB3523.eurprd09.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: insidesecure.com does not
- designate permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: 3nZv9ZY8pq94Z/dAhl/d1xThD3b4SsN94d6COv5CKsPuNelb55vyNwaVmm0D3t/BLCvo6KlIf1E5V4fS2JI+m5moFBoXt+XY5Mma3Eil5qEqpCic9JVd6Ab8rYEqUqV4JIKdnHvDvdVWJ2wS2cjkkwGggbe+bC52kOA/TQbORwIaGd8GF3QOoDCHGuqUUmy6ipOpP7wLdnOdDstnBpLThoqh5n6ZCHHQ6QDMO3x6CnIhndefp/QJUPvBtdptqux6Zmi8rr0ZKZ6JLWgZSZmocDgI3Or8v6yFTr406DRPe450Z4N+ddSSCahCJpZuj6Q1lEYLsoNYrfGt/aw8rKhUDVw1RE4fu/GM1FOhNNpBZ5byS4UNplQ2A4t9L+aJo2pDXBdCf5BecCBYGMtS+/pBdGZg7OcP/OXQUALLO8l63nI=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=mm7u6ZMplwJx3ZNg0k2j2OUTMi4snU1dJyY1vDxWWsA=;
+        b=InVIjS4gIzLlaEssKpThQZA9ClkW6K7hAzv+B52Bgr1MJo5CD/2ThaGgdDcdjWWjVt
+         IXG0vAxXB0n6PJ4gTaDnUH9L+t+hhccKI8WILBpIVTu3ioWeoCVmuqgVLd81cs2CXPjd
+         loT1mu+HIGoqrC3tETY1xCu3IyRE4NaVca0CmKt1/E7DT1cyc2TbzF2Fh/BpmXW6jgg4
+         BX41NivGsrK/6eskMAO+5JxhDWLjj9LQ7zKXxmALFRxXUJNbJsOlCqDEW0KrYyOScVHL
+         Ck2P3VEZxaXyapekOWFoJeeR4lhFkgXwWT48JJwSVvNLgGEYm0TcncF4HyKmbD3wAvNd
+         oXFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=mm7u6ZMplwJx3ZNg0k2j2OUTMi4snU1dJyY1vDxWWsA=;
+        b=jMDcxkyw/5eaG2y6F9/HBmqCALxOjRm6kQErA631YfELMpYfzCs+R42p2yTDJA1LyD
+         jIp7HDT5IygrfoPI6oo+btHav6hfgqm9nNb/svGkJlbNUj7ddhC7bKc1VcGbn7DBz0o5
+         qXSARxcWet5Nd3hwSCOPR1OvhAoTyDk78U5RVcGOso+jDcCWbOWJ/JEKzXex13hMvlp0
+         3dHcWf8TLR4oD9jPEuslYgmL30LIC4Uvnb+thKGnAB2r8PRy/87Uv0FGB6IDsAJxLHOr
+         fefxXfl+9G6EbTSK48EJi5f86465k4ZK4uGctUBNG3QPd7mLiKTufnDXudYTHpbJ8H1a
+         LlpQ==
+X-Gm-Message-State: APjAAAUnQUMOj8NdazOevdsiJBucge3XC3jXMrGFqppwopE65AUb+sdU
+        eFiI4vRBaBLLZcpGr+pklQMVPj1wOIpRJYBKDCJuj5SIWrpnCg==
+X-Google-Smtp-Source: APXvYqzvEkTBcF66ezXzfZgB8DoaeyT7Dsc2VnzrPl5qIhKHCde4kIOaPrNIR0hOccPCKjbK2gZdsr2RMsiQyUIMX4o=
+X-Received: by 2002:a24:910b:: with SMTP id i11mr18345668ite.76.1558691135997;
+ Fri, 24 May 2019 02:45:35 -0700 (PDT)
 MIME-Version: 1.0
-X-OriginatorOrg: insidesecure.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b4d56b1f-174f-45e6-4d87-08d6e02c244f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 May 2019 09:42:31.0904
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3c07df58-7760-4e85-afd5-84803eac70ce
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: pvanleeuwen@insidesecure.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR09MB3368
+References: <AM6PR09MB3523CED0B1587FCBDE4095A0D2010@AM6PR09MB3523.eurprd09.prod.outlook.com>
+ <20190523185833.GA243994@google.com> <AM6PR09MB3523749B0306103E8D2D8315D2010@AM6PR09MB3523.eurprd09.prod.outlook.com>
+ <20190523200557.GA248378@gmail.com> <AM6PR09MB3523DB255516D35B595AEA50D2010@AM6PR09MB3523.eurprd09.prod.outlook.com>
+ <20190523234853.GC248378@gmail.com> <AM6PR09MB3523CFCFE42A33621FE4ACC3D2020@AM6PR09MB3523.eurprd09.prod.outlook.com>
+ <907eb6a5-dc76-d5ee-eccf-e7bd426a0868@c-s.fr> <AM6PR09MB3523D9D6D249701D020A3D74D2020@AM6PR09MB3523.eurprd09.prod.outlook.com>
+ <CAKv+Gu_Pxv97rpt7Ju0EdtFnXqp3zoYfHtm1Q51oJSGEAZmyDA@mail.gmail.com> <AM6PR09MB3523A8A4BEDDF2B59A7B9A09D2020@AM6PR09MB3523.eurprd09.prod.outlook.com>
+In-Reply-To: <AM6PR09MB3523A8A4BEDDF2B59A7B9A09D2020@AM6PR09MB3523.eurprd09.prod.outlook.com>
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date:   Fri, 24 May 2019 11:45:21 +0200
+Message-ID: <CAKv+Gu-4c-zoRfMyL8wjQWO2BWNBR=Q8o3=CjNDarNcda-DvFQ@mail.gmail.com>
+Subject: Re: another testmgr question
+To:     Pascal Van Leeuwen <pvanleeuwen@insidesecure.com>
+Cc:     Christophe Leroy <christophe.leroy@c-s.fr>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-PiBPbiBGcmksIE1heSAyNCwgMjAxOSBhdCA0OjQ3IEFNIENocmlzdG9waGUgTGVyb3kNCj4gPGNo
-cmlzdG9waGUubGVyb3lAYy1zLmZyPiB3cm90ZToNCj4gPiAuLi4NCj4gPiA+IEFzIEkgYWxyZWFk
-eSBtZW50aW9uZWQgaW4gYW5vdGhlciB0aHJlYWQgc29tZXdoZXJlLCB0aGlzIG1vcm5pbmcgaW4g
-dGhlDQo+ID4gPiBzaG93ZXIgSSByZWFsaXNlZCB0aGF0IHRoaXMgbWF5IGJlIHVzZWZ1bCBpZiB5
-b3UgaGF2ZSBubyBleHBlY3RhdGlvbiBvZg0KPiA+ID4gdGhlIGxlbmd0aCBpdHNlbGYuIEJ1dCBp
-dCdzIHN0aWxsIGEgcHJldHR5IHNwZWNpZmljIHVzZSBjYXNlIHdoaWNoIHdhcw0KPiA+ID4gbmV2
-ZXIgY29uc2lkZXJlZCBmb3Igb3VyIGhhcmR3YXJlLiBBbmQgb3VyIEhXIGRvZXNuJ3Qgc2VlbSB0
-byBiZSBhbG9uZSBpbg0KPiA+ID4gdGhpcy4NCj4gPiA+IERvZXMgc2hhWFhYc3VtIG9yIG1kNXN1
-bSB1c2UgdGhlIGtlcm5lbCBjcnlwdG8gQVBJIHRob3VnaD8NCj4gPg0KPiA+IFRoZSBvbmVzIGZy
-b20gbGlia2NhcGkgZG8gKGh0dHA6Ly93d3cuY2hyb25veC5kZS9saWJrY2FwaS5odG1sKQ0KPg0K
-PiBBbmQgdGhleSBjYW4gYmUgbG9hZGVkIGludG8gT3BlblNTTCB0aHJvdWdoIHRoZSBhZmFsZyBp
-bnRlcmZhY2UuDQo+DQoNCkhtbSAuLi4geWVhaCAuLi4gT3BlblNTTCAuLi4geWV0IGFub3RoZXIg
-c3luY2hyb25vdXMgQVBJIHRoYXQgZG9lc24ndCBzdGFuZCBhDQpjaGFuY2Ugb2YgYmVpbmcgSFcg
-YWNjZWxlcmF0ZWQgKGFsdGhvdWdoIEludGVsIGNvbnRyaWJ1dGVkIHNvbWUgYXN5bmMgQVBJDQpm
-YWlybHkgcmVjZW50bHkgLSBidXQgSSBkb24ndCBrbm93IG9mIGFueSBhcHBsaWNhdGlvbiBhY3R1
-YWxseSBwb3J0ZWQgdG8gdXNlDQp0aGF0IC0gd291bGQgbG92ZSB0byBoZWFyIGFib3V0IGFueSBp
-ZiB0aGV5IGRvIGV4aXN0KS4NCg0KU29ycnksIG9wZW4gd291bmQgLi4uDQoNClJlZ2FyZHMsDQpQ
-YXNjYWwgdmFuIExlZXV3ZW4NClNpbGljb24gSVAgQXJjaGl0ZWN0LCBNdWx0aS1Qcm90b2NvbCBF
-bmdpbmVzIEAgSW5zaWRlIFNlY3VyZQ0Kd3d3Lmluc2lkZXNlY3VyZS5jb20NCg==
+On Fri, 24 May 2019 at 11:34, Pascal Van Leeuwen
+<pvanleeuwen@insidesecure.com> wrote:
+>
+> > All userland clients of the in-kernel crypto use it specifically to
+> > access h/w accelerators, given that software crypto doesn't require
+> > the higher privilege level (no point in issuing those AES CPU
+> > instructions from the kernel if you can issue them in your program
+> > directly)
+> >
+> > Basically, what is used is a socket interface that can block on
+> > read()/write(). So the userspace program doesn't need to be aware of
+> > the asynchronous nature, it is just frozen while the calls are being
+> > handled by the hardware.
+> >
+> With all due respect, but if the userland application is indeed
+> *frozen* while the calls are being handled, then that seems like its
+> pretty useless - for symmetric crypto, anyway - as performance would be
+> dominated by latency, not throughput.
+> Hardware acceleration would almost always lose that compared to a local
+> software implementation.
+> I certainly wouldn't want such an operation to end up at my driver!
+>
+
+Again, you are making assumptions here that don't always hold. Note that
+- a frozen process frees up the CPU to do other things while the
+crypto is in progress;
+- h/w crypto is typically more power efficient than CPU crypto;
+- several userland programs and in-kernel users may be active at the
+same time, so the fact that a single user sleeps doesn't mean the
+hardware is used inefficiently
+
+> Which brings up a question: is there some way for a driver to indicate
+> something like "don't use me unless you can seriously pipeline your
+> requests"?
+>
+> Regards,
+> Pascal van Leeuwen
+> Silicon IP Architect, Multi-Protocol Engines @ Inside Secure
+> www.insidesecure.com
+>
