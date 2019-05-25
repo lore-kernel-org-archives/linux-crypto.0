@@ -2,80 +2,99 @@ Return-Path: <SRS0=62CE=TZ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,T_DKIMWL_WL_HIGH,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,T_DKIMWL_WL_HIGH,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6215C282E1
-	for <linux-crypto@archiver.kernel.org>; Sat, 25 May 2019 01:23:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56B1DC282E1
+	for <linux-crypto@archiver.kernel.org>; Sat, 25 May 2019 03:10:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B678821848
-	for <linux-crypto@archiver.kernel.org>; Sat, 25 May 2019 01:23:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 200502133D
+	for <linux-crypto@archiver.kernel.org>; Sat, 25 May 2019 03:10:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1558747383;
-	bh=n6cPJCtjp3TydMggbMsgaNK5Gjn/YqNDKIWPN8zQbSI=;
+	s=default; t=1558753835;
+	bh=U2oRTOcpkeVM7qIcjKuc6xKoiUqB+srYHDRhihvQ3B0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=2Jq+RdD70D3HDiCiTWoAN4EUoemMI8sKqUGCisPX48EngHq6c4UBFGdDaV+7A17Rh
-	 NUvvLW7jYeYyEXgi/v0MPNtTp+8VKS6EC3a201FM/qCca1MVPCAUlPSwy5Woc+LXEV
-	 UuM2t5UuDDxdGq6MN4Q3ounRLLDcTNVHS07/8b3A=
+	b=prGXkI1IRMtXCDpjWnEF5VpV05siVAN1K9oH5AqmNuXD0r5catEaijxu1y0j1j3ZV
+	 w++Ql+S+Ld2iWMEezSoFoej35k/2zUvmAT4qiIVzpdraws4EYGtJ3gWOFdcSu+5Pi6
+	 gWZimiK74TD/clL2vp7OcKABFpg0kN/3NvNaPI5A=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726267AbfEYBXC (ORCPT
+        id S1726511AbfEYDKc (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 24 May 2019 21:23:02 -0400
-Received: from mail.kernel.org ([198.145.29.99]:35774 "EHLO mail.kernel.org"
+        Fri, 24 May 2019 23:10:32 -0400
+Received: from mail.kernel.org ([198.145.29.99]:54324 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726220AbfEYBXC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 24 May 2019 21:23:02 -0400
+        id S1726452AbfEYDKc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 24 May 2019 23:10:32 -0400
 Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 68EA5217D7;
-        Sat, 25 May 2019 01:23:01 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 23B7D2133D;
+        Sat, 25 May 2019 03:10:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1558747381;
-        bh=n6cPJCtjp3TydMggbMsgaNK5Gjn/YqNDKIWPN8zQbSI=;
+        s=default; t=1558753831;
+        bh=U2oRTOcpkeVM7qIcjKuc6xKoiUqB+srYHDRhihvQ3B0=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=wBXFmcLZ1o4VWkDU6nBoT5MUFQkLZkusQ/mgPfnT9Hxd1j3IYUIdJHNr0IOzQk+v3
-         zY+zDfHXFUW2hGqac4qlw8oEyd4DkMyP7t9TRd2Vfy509/+yfdTcL5dilqvLkVZK/s
-         PdU/zfNuJAdBrRXJFuHPxHYwhAmyHS/kPSOsLC+w=
-Date:   Fri, 24 May 2019 18:22:59 -0700
+        b=qNHcMjSckav4mHS8pZXNIED0vHg+x3wwyIbWA0r7pFLJ9ysyjHOC+RbncO5dHPLX3
+         EXbgROYyBQQFuQowh9qLwWcU2Cc4gHKeNMas23+cxDQrJmJ1A+C3ckQ4LbdOcRKIgD
+         4plqUmHAdjCpN+T8oARhjBYO4d1tnGYYnZ6YMBWo=
+Date:   Fri, 24 May 2019 20:10:29 -0700
 From:   Eric Biggers <ebiggers@kernel.org>
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc:     Pascal Van Leeuwen <pvanleeuwen@insidesecure.com>,
-        Christophe Leroy <christophe.leroy@c-s.fr>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Subject: Re: another testmgr question
-Message-ID: <20190525012258.GC713@sol.localdomain>
-References: <AM6PR09MB3523CED0B1587FCBDE4095A0D2010@AM6PR09MB3523.eurprd09.prod.outlook.com>
- <20190523185833.GA243994@google.com>
- <AM6PR09MB3523749B0306103E8D2D8315D2010@AM6PR09MB3523.eurprd09.prod.outlook.com>
- <20190523200557.GA248378@gmail.com>
- <AM6PR09MB3523DB255516D35B595AEA50D2010@AM6PR09MB3523.eurprd09.prod.outlook.com>
- <20190523234853.GC248378@gmail.com>
- <AM6PR09MB3523CFCFE42A33621FE4ACC3D2020@AM6PR09MB3523.eurprd09.prod.outlook.com>
- <907eb6a5-dc76-d5ee-eccf-e7bd426a0868@c-s.fr>
- <AM6PR09MB3523D9D6D249701D020A3D74D2020@AM6PR09MB3523.eurprd09.prod.outlook.com>
- <CAKv+Gu_Pxv97rpt7Ju0EdtFnXqp3zoYfHtm1Q51oJSGEAZmyDA@mail.gmail.com>
+To:     Ondrej Mosnacek <omosnace@redhat.com>
+Cc:     linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        keyrings@vger.kernel.org, David Howells <dhowells@redhat.com>,
+        Stephan Mueller <smueller@chronox.de>,
+        Milan Broz <gmazyland@gmail.com>,
+        Ondrej Kozina <okozina@redhat.com>,
+        Daniel Zatovic <dzatovic@redhat.com>
+Subject: Re: [PATCH] crypto: af_alg - implement keyring support
+Message-ID: <20190525031028.GA18491@sol.localdomain>
+References: <20190521100034.9651-1-omosnace@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAKv+Gu_Pxv97rpt7Ju0EdtFnXqp3zoYfHtm1Q51oJSGEAZmyDA@mail.gmail.com>
+In-Reply-To: <20190521100034.9651-1-omosnace@redhat.com>
 User-Agent: Mutt/1.11.4 (2019-03-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, May 24, 2019 at 11:25:52AM +0200, Ard Biesheuvel wrote:
+On Tue, May 21, 2019 at 12:00:34PM +0200, Ondrej Mosnacek wrote:
+> This patch adds new socket options to AF_ALG that allow setting key from
+> kernel keyring. For simplicity, each keyring key type (logon, user,
+> trusted, encrypted) has its own socket option name and the value is just
+> the key description string that identifies the key to be used. The key
+> description doesn't need to be NULL-terminated, but bytes after the
+> first zero byte are ignored.
 > 
-> All userland clients of the in-kernel crypto use it specifically to
-> access h/w accelerators, given that software crypto doesn't require
-> the higher privilege level (no point in issuing those AES CPU
-> instructions from the kernel if you can issue them in your program
-> directly)
+> Note that this patch also adds three socket option names that are
+> already defined and used in libkcapi [1], but have never been added to
+> the kernel...
+> 
+> Tested via libkcapi with keyring patches [2] applied (user and logon key
+> types only).
+> 
+> [1] https://github.com/smuellerDD/libkcapi
+> [2] https://github.com/WOnder93/libkcapi/compare/f283458...1fb501c
+> 
+> Signed-off-by: Ondrej Mosnacek <omosnace@redhat.com>
 
-Unfortunately people also use AF_ALG because they're too lazy to use a userspace
-crypto library, e.g. systemd uses it for HMAC-SHA256, and iproute2 uses it for
-SHA-1.
+The "interesting" thing about this is that given a key to which you have only
+Search permission, you can request plaintext-ciphertext pairs with it using any
+algorithm from the kernel's crypto API.  So if there are any really broken
+algorithms and they happen to take the correct length key, you can effectively
+read the key.  That's true even if you don't have Read permission on the key
+and/or the key is of the "logon" type which doesn't have a ->read() method.
+
+Since this is already also true for dm-crypt and maybe some other features in
+the kernel, and there will be a new API for fscrypt that doesn't rely on "logon"
+keys with Search access thus avoiding this problem and many others
+(https://patchwork.kernel.org/cover/10951999/), I don't really care much whether
+this patch is applied.  But I wonder whether this is something you've actually
+considered, and what security properties you think you are achieving by using
+the Linux keyrings.
 
 - Eric
