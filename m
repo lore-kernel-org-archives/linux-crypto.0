@@ -2,57 +2,61 @@ Return-Path: <SRS0=ER81=T3=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,LOTS_OF_MONEY,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,LOTS_OF_MONEY,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 732EFC04AB3
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 May 2019 15:56:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6198C04AB3
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 May 2019 16:21:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2F6CF206C1
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 May 2019 15:56:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ABF052147A
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 May 2019 16:21:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=insidesecure.onmicrosoft.com header.i=@insidesecure.onmicrosoft.com header.b="KYui4m9d"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VKHvqlqM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726329AbfE0P40 (ORCPT
+        id S1726432AbfE0QVT (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 27 May 2019 11:56:26 -0400
-Received: from mail-eopbgr50111.outbound.protection.outlook.com ([40.107.5.111]:9287
-        "EHLO EUR03-VE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726274AbfE0P40 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 27 May 2019 11:56:26 -0400
+        Mon, 27 May 2019 12:21:19 -0400
+Received: from mail-it1-f178.google.com ([209.85.166.178]:37300 "EHLO
+        mail-it1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725991AbfE0QVT (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 27 May 2019 12:21:19 -0400
+Received: by mail-it1-f178.google.com with SMTP id m140so27310itg.2
+        for <linux-crypto@vger.kernel.org>; Mon, 27 May 2019 09:21:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=insidesecure.onmicrosoft.com; s=selector1-insidesecure-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=neT4+n/gqPAPX7KdW5deBtAdr6jdQeRCYhT+NruTFh8=;
- b=KYui4m9d/OVKXmzJiPEdwWl2WP5s+i6CFZEOlUEyLsTB1td4o7srBHVew2OGyMugAM/mZrWVXjVwcePIo3zVjgcOUSKwH7eh24vnGxiRqUp6Igf9RnZudvzEWiycSSPbp64ynv0f1s8ZwPVpnYuBwUcZN04F7sHy7zzezIHvxz0=
-Received: from AM6PR09MB3523.eurprd09.prod.outlook.com (10.255.99.206) by
- AM6PR09MB2901.eurprd09.prod.outlook.com (20.179.3.21) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1922.17; Mon, 27 May 2019 15:56:15 +0000
-Received: from AM6PR09MB3523.eurprd09.prod.outlook.com
- ([fe80::8c11:e692:3a44:a3a9]) by AM6PR09MB3523.eurprd09.prod.outlook.com
- ([fe80::8c11:e692:3a44:a3a9%6]) with mapi id 15.20.1922.021; Mon, 27 May 2019
- 15:56:15 +0000
-From:   Pascal Van Leeuwen <pvanleeuwen@insidesecure.com>
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-CC:     Christophe Leroy <christophe.leroy@c-s.fr>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Subject: RE: another testmgr question
-Thread-Topic: another testmgr question
-Thread-Index: AQHVEZmK2bzdbrfsm0iVWRutGLPeSaZ5GFjggAAKVYCAAAs7wIAAMw6AgACM6vCAAAlSgIAAAtPQgAAIJACAAAD1MIAABH2AgAS0FFCAAAQtAIAAAZkAgAAJO4CAAADysIAABwUAgAAHPfCAADyaAIAABnvw
-Date:   Mon, 27 May 2019 15:56:15 +0000
-Message-ID: <AM6PR09MB35235BD86DCE54760EB14C49D21D0@AM6PR09MB3523.eurprd09.prod.outlook.com>
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=q26DC+ECiEMQ+pVFE4cWiNt/ySl4lct5yteKh5807c4=;
+        b=VKHvqlqMnFcbA8ZYQkNyQpbLX7ksTFk+v/BhT8ZPyIxk9pn4mSfteROI+We8DnR8OM
+         Dn3jZyuQheQzjnR9Ih4V0Tio/j/j9yt042/l7NMjzEsES7qThfg6ZQVQ+rkYY8cxjFKJ
+         t+y+Auf1eVrLkGWLn4CirNPbe0ZFrujIvSq8GYV4XPKsn8oafKJLTqAeY+MdPygJdQpg
+         c3moN9LYAzPmzfE4Ui3dwq4GayVn/l5+CtIaK0vVpEHYOFYov1VzIOuL8Cze/gCpoxkI
+         rkkHy4QxPNoKYb0dFWXQ8BnS7ugLT4AsFadx/VL6mYAE033xzqzbLK7sQzs8/Bng8/j3
+         xwXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=q26DC+ECiEMQ+pVFE4cWiNt/ySl4lct5yteKh5807c4=;
+        b=lhBk6rqbxrmGJpwpIiRKWtc09IrTIkDQ7Rh3Aj3Lc/MypIR5z7T8MGs0QlPjPEmQDf
+         eE0PwV5+neQsBcZL2boR5Z/wUo22eJN7L0RUoVhQ8m+rCz9Fnlfc3SSQ0AbQiM/V8vDS
+         Y328A6yEFJPydVOW/bQs/4AXzP+meUzKM5/eqoCZ7xBhA98p+zzQSfwnnk19KqWU4yd8
+         RBFYzJq86w2asBLtvFfCEgg5ydrsUad2DhOvb3qdlCkBk70M0hkz0m1hdQIlugF3cjOP
+         oFa5Q/nnTfibZDqoOy38Au9D696/yWfzvHdwYEfcOMKlEJYmTT6EGmQmTwP1JxSjvw85
+         c0Dg==
+X-Gm-Message-State: APjAAAXHbLgCz8o2x4Tim7MZS6cwQOFw2jBa7Mhg3RtqBmR/qG2vz6KB
+        4ResO6g+LbUovu5EGvlOsGXnS0bDMzWeHpf+8uju5BB5Ibo=
+X-Google-Smtp-Source: APXvYqzkRTXiWJuMj3jgfuUbp5P5YWDoUSQdKHFmEliXEmRnhCEzqcZUCdf3GR6dc0TGY0mekDozkdiWwCui1uHAwVA=
+X-Received: by 2002:a24:d00e:: with SMTP id m14mr26941052itg.153.1558974078191;
+ Mon, 27 May 2019 09:21:18 -0700 (PDT)
+MIME-Version: 1.0
 References: <AM6PR09MB3523CED0B1587FCBDE4095A0D2010@AM6PR09MB3523.eurprd09.prod.outlook.com>
- <20190523185833.GA243994@google.com>
- <AM6PR09MB3523749B0306103E8D2D8315D2010@AM6PR09MB3523.eurprd09.prod.outlook.com>
- <20190523200557.GA248378@gmail.com>
- <AM6PR09MB3523DB255516D35B595AEA50D2010@AM6PR09MB3523.eurprd09.prod.outlook.com>
- <20190523234853.GC248378@gmail.com>
- <AM6PR09MB3523CFCFE42A33621FE4ACC3D2020@AM6PR09MB3523.eurprd09.prod.outlook.com>
- <907eb6a5-dc76-d5ee-eccf-e7bd426a0868@c-s.fr>
- <AM6PR09MB3523D9D6D249701D020A3D74D2020@AM6PR09MB3523.eurprd09.prod.outlook.com>
+ <20190523185833.GA243994@google.com> <AM6PR09MB3523749B0306103E8D2D8315D2010@AM6PR09MB3523.eurprd09.prod.outlook.com>
+ <20190523200557.GA248378@gmail.com> <AM6PR09MB3523DB255516D35B595AEA50D2010@AM6PR09MB3523.eurprd09.prod.outlook.com>
+ <20190523234853.GC248378@gmail.com> <AM6PR09MB3523CFCFE42A33621FE4ACC3D2020@AM6PR09MB3523.eurprd09.prod.outlook.com>
+ <907eb6a5-dc76-d5ee-eccf-e7bd426a0868@c-s.fr> <AM6PR09MB3523D9D6D249701D020A3D74D2020@AM6PR09MB3523.eurprd09.prod.outlook.com>
  <CAKv+Gu_Pxv97rpt7Ju0EdtFnXqp3zoYfHtm1Q51oJSGEAZmyDA@mail.gmail.com>
  <AM6PR09MB3523A8A4BEDDF2B59A7B9A09D2020@AM6PR09MB3523.eurprd09.prod.outlook.com>
  <CAKv+Gu-4c-zoRfMyL8wjQWO2BWNBR=Q8o3=CjNDarNcda-DvFQ@mail.gmail.com>
@@ -63,189 +67,251 @@ References: <AM6PR09MB3523CED0B1587FCBDE4095A0D2010@AM6PR09MB3523.eurprd09.prod.
  <AM6PR09MB3523090454E4FB6825797A0FD21D0@AM6PR09MB3523.eurprd09.prod.outlook.com>
  <CAKv+Gu85qp44C9Leydz=ES+ByWYoYSWMC-Kiv2Gw403sYBGkcw@mail.gmail.com>
  <AM6PR09MB352345877965022A77586DEED21D0@AM6PR09MB3523.eurprd09.prod.outlook.com>
- <CAKv+Gu8W67CDJp3ifWF-wfa47aD4Aim_RnrY9sRxyifnD_KO2g@mail.gmail.com>
-In-Reply-To: <CAKv+Gu8W67CDJp3ifWF-wfa47aD4Aim_RnrY9sRxyifnD_KO2g@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=pvanleeuwen@insidesecure.com; 
-x-originating-ip: [188.204.2.113]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 4c947ba8-5ed0-4db2-dab1-08d6e2bbd976
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:AM6PR09MB2901;
-x-ms-traffictypediagnostic: AM6PR09MB2901:
-x-ms-exchange-purlcount: 1
-x-microsoft-antispam-prvs: <AM6PR09MB2901C6B99B81C61E0C390285D21D0@AM6PR09MB2901.eurprd09.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
-x-forefront-prvs: 0050CEFE70
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(376002)(346002)(366004)(396003)(39850400004)(136003)(199004)(189003)(54014002)(6916009)(478600001)(7116003)(7736002)(6246003)(99286004)(102836004)(81166006)(4326008)(305945005)(7696005)(68736007)(25786009)(9686003)(86362001)(6506007)(76176011)(55016002)(8936002)(66066001)(15974865002)(14444005)(256004)(66946007)(6436002)(229853002)(73956011)(66476007)(76116006)(66556008)(64756008)(66446008)(316002)(74316002)(2906002)(52536014)(3846002)(6116002)(53936002)(5660300002)(81156014)(186003)(446003)(11346002)(8676002)(3480700005)(14454004)(33656002)(54906003)(71190400001)(71200400001)(476003)(26005)(486006)(18886075002);DIR:OUT;SFP:1102;SCL:1;SRVR:AM6PR09MB2901;H:AM6PR09MB3523.eurprd09.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: insidesecure.com does not
- designate permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: yIbeva0KN/TwMai/3fH0GJVPTp7TtUOu8VS8Y+vSakZFELiRLp1rDRTT8w92t+fw1aHoCoL9dQEb+ySSChHGSfivwFFvzC7JS3qTAyt2Lx5szlf3hfXYu7kUDbfJQIT3C2ZRpmRxXQSyzd+baF0sg4kTGm+EpqzXSUuZlmk0IIyHnBiPI+igCDLZXigyx84U6l27ThoiM9twvwjPfyn0EguRMRww2cvrtFQ6H/hIg5H+ZTAxUMkHV35dyS4FYVS6+kfbXuEGzz9U2mVEiHPPI01bx2Jmf6xC154rLqQYQ9sj54tCzoOqc45K3spDu5qZGozvgT0dPKZB7qn+3DAa/Td+dfAJiIhkE76eEgNVWyN1HNBvbbUUKYS2G6jGZJLNjmWUV4HKhWbSNwNxmJ39CMsQ3cXcZnIuSYZHVIv8Xyo=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-OriginatorOrg: insidesecure.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4c947ba8-5ed0-4db2-dab1-08d6e2bbd976
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 May 2019 15:56:15.3351
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3c07df58-7760-4e85-afd5-84803eac70ce
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: pvanleeuwen@insidesecure.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR09MB2901
+ <CAKv+Gu8W67CDJp3ifWF-wfa47aD4Aim_RnrY9sRxyifnD_KO2g@mail.gmail.com> <AM6PR09MB35235BD86DCE54760EB14C49D21D0@AM6PR09MB3523.eurprd09.prod.outlook.com>
+In-Reply-To: <AM6PR09MB35235BD86DCE54760EB14C49D21D0@AM6PR09MB3523.eurprd09.prod.outlook.com>
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date:   Mon, 27 May 2019 18:21:06 +0200
+Message-ID: <CAKv+Gu-LuwaXsbU=cp24513p+t=SPtvkSbSs9bTE5=ds-=wmbA@mail.gmail.com>
+Subject: Re: another testmgr question
+To:     Pascal Van Leeuwen <pvanleeuwen@insidesecure.com>
+Cc:     Christophe Leroy <christophe.leroy@c-s.fr>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-PiA+IEkgdW5kZXJzdGFuZCB0aGF0IGFzIHdlbGwuIEJ1dCB0aGF0IGRvZXNuJ3QgY2hhbmdlIHRo
-ZSBmYWN0IHRoYXQgdGhlDQo+ID4gYXBwbGljYXRpb24gbWF5IGJlIHdhaXRpbmcgZm9yIGEgbG9v
-b29vb25nIChyZWxhdGl2ZWx5IHNwZWFraW5nKSB0aW1lDQo+ID4gZm9yIGl0J3MgcmVzdWx0cy4g
-QXMgbGF0ZW5jeSB0aHJvdWdoIGhhcmR3YXJlIG1heSBiZSBzZXZlcmFsIG9yZGVycyBvZg0KPiA+
-IGEgbWFnbml0dWRlIGxhcmdlciB0aGFuIHRoZSB0aW1lIGl0IGFjdHVhbGx5IHRha2VzIHRvICpw
-cm9jZXNzKiB0aGUNCj4gPiByZXF1ZXN0LiAgU28gd2hlbiB1c2VkIHN5bmNocm9ub3VzbHkgdGhl
-IEhXIG1heSBhcHBlYXIgdG8gd29yayBhdCBhIG1lcmUNCj4gPiBmcmFjdGlvbiBvZiBpdHMgdHJ1
-ZSBwZXJmb3JtYW5jZS4NCj4gPg0KPg0KPiBPZiBjb3Vyc2UuIFNvbWV0aW1lcyB5b3UgY2FyZSBh
-Ym91dCB0aGF0LCBhbmQgc29tZXRpbWVzIHlvdSBkb24ndC4NCj4NCj4gPiBBbmQgaWYgeW91ciBt
-YWluIGludGVyZXN0IGlzIGluIHRoYXQgYXBwbGljYXRpb24sIHlvdSBtYXkgbm90IGNhcmUgc28N
-Cj4gPiBtdWNoIGFib3V0IHdoYXQgdGhlIHJlc3Qgb2YgdGhlIHN5c3RlbSBkb2VzLCBldmVuIGlm
-IGl0IGNhbiB1c2UgdGhlDQo+ID4gcmVtYWluaW5nIGJhbmR3aWR0aCBvZiB0aGUgYWNjZWxlcmF0
-b3IuDQo+ID4NCj4NCj4gMTAwcyBvZiBpbnN0YW5jZXMgb2YgdGhhdCBhcHBsaWNhdGlvbiwgdGhy
-ZWFkLCBldGMgY291bGQgYmUgcnVubmluZyBhdA0KPiB0aGUgc2FtZSB0aW1lLCBhbmQgdGhyb3Vn
-aHB1dCBtYXkgYmUgbW9yZSBpbXBvcnRhbnQgdGhhbiBsYXRlbmN5Lg0KPg0KPiA+IEluIHdoaWNo
-IGNhc2UgaXQgbWF5IGJlIGRlc2lyYWJsZSAqbm90KiB0byB1c2UgdGhlIGFjY2VsZXJhdG9yIGZv
-ciB0aGF0DQo+ID4gYXBwbGljYXRpb24gYXQgYWxsIGR1ZSB0byAqdmVyeSogcG9vciBwZXJmb3Jt
-YW5jZSAoZm9yIHRoYXQgYXBwbGljYXRpb24pLg0KPiA+DQo+ID4gV2hpY2ggd291bGQgbWFrZSBl
-dmVuIG1vcmUgY3ljbGVzIG9uIHRoZSBhY2NlbGVyYXRvciBhdmFpbGFibGUgdG8gdGhlDQo+ID4g
-b3RoZXIgYXBwbGljYXRpb25zIGluIHRoZSBzeXN0ZW0sIHNvIHRoYXQga25pZmUgY3V0cyBib3Ro
-IHdheXMgLi4uDQo+ID4NCj4NCj4gU2luZ2xlIHRocmVhZCBwZXJmb21hbmNlIGlzIG9ubHkgb25l
-IG1ldHJpYywgYW5kIGl0IG1heSBub3QgYmUgdGhlIG9uZQ0KPiB5b3UgY2FyZSBhYm91dCBtb3N0
-Lg0KPg0KDQpIb3cgcmVsZXZhbnQgaXMgdGhlIGZhY3QgdGhhdCB0aGVyZSBtYXkgYmUgKG90aGVy
-KSBzaXR1YXRpb25zIHdoZXJlIGxhdGVuY3kNCmlzIG5vdCByZWxldmFudCBmb3Igc29tZW9uZSBi
-ZWluZyBpbiBhIHNpdHVhdGlvbiB3aGVyZSBpdCBpcyByZWxldmFudD8NCg0KSSB3YXMganVzdCB0
-YWxraW5nIGFib3V0IHRoYXQgc2l0dWF0aW9uIHdoZXJlIGl0IGFjdHVhbGx5IGlzIHJlbGV2YW50
-IGFuZA0KdGhlcmVmb3JlIHlvdSBkbyAqbm90KiB3aXNoIHRoZSBoYXJkd2FyZSBkcml2ZXIgdG8g
-YmUgdXNlZC4NCg0KT2ssIGxldCdzIHBocmFzZSBpdCBzdWNoIHRoYXQgY2FuIGJlIG5vIGZ1cnRo
-ZXIgbWlzdW5kZXJzdGFuZGluZ3M6DQoNCklmIHlvdSB3YW50IHBlcmZvcm1hbmNlIGZyb20gYSBz
-aW5nbGUtdGhyZWFkZWQgc2luZ2xlIGFwcGxpY2F0aW9uIHRoYXQgZG9lcw0Kc3luY2hyb25vdXMs
-IGJsb2NraW5nLCBjcnlwdG8gQVBJIGNhbGxzLCB0aGVuIHlvdSBkbyBub3Qgd2FudCB0aG9zZSB0
-byBlbmQNCnVwIGF0IG91ciBoYXJkd2FyZS4gT3IsIHZlcnkgbGlrZWx5LCBwcmV0dHkgbXVjaCBh
-bnkgb3RoZXIgaGFyZHdhcmUuDQpUaGUgY3JhX3ByaW9yaXR5IG1lY2hhbmlzbSBkb2VzIG5vdCBh
-bGxvdyB0aGUgZHJpdmVyIHRvIGNvbnZleSBzdWNoIGEgdGhpbmcuDQoNCj4gPiBBZGRpbmcgdG9u
-cyBvZiB3b3JrYXJvdW5kcyB0byBkcml2ZXJzLCBmb3IgZXhhbXBsZSwgc2xvd3MgdGhlbSBkb3du
-LCBtYWtlcw0KPiB0aGVtDQo+ID4gdXNlIG1vcmUgQ1BVIGN5Y2xlcyBhbmQgbW9yZSBwb3dlciwg
-YW5kIHVsdGltYXRlbHkgZGVmZWF0cyB0aGUgcHVycG9zZSBvZg0KPiBoYXZpbmcNCj4gPiBhIGhh
-cmR3YXJlIGFjY2VsZXJhdG9yIGF0IGFsbC4gVGhhdCBpcyBhY3R1YWxseSBteSBjb25jZXJuLg0K
-Pg0KPiBJZiB0aGUgd29ya2Fyb3VuZCBpcyBpbiBhIGRyaXZlciBhbmQgbm90IG9uIGEgaG90IHBh
-dGgsIHdlIGRvbid0DQo+IHJlYWxseSBjYXJlIGFib3V0IHRoZSBtZW1vcnkgZm9vdHByaW50Lg0K
-Pg0KVGhlc2Ugd29ya2Fyb3VuZHMgYXJlIG9uIGEgaG90IHBhdGggYnkgZGVmaW5pdGlvbiwgYXMg
-dGhleSBoYXZlIHRvIGZpbHRlcg0Kb3V0IHNwZWNpZmljIHJlcXVlc3RzIGNvbWluZyBpbiwgaS5l
-LiBpdCBhZmZlY3RzIGV2ZXJ5IHNpbmdsZSByZXF1ZXN0IGRvbmUNCnRvIHRoZSBkcml2ZXIuIEFz
-IGZvciBtZW1vcnkgZm9vdHByaW50OiB0aGF0IGlzIHN0aWxsIHJlbGV2YW50IGZvciBlbWJlZGRl
-ZA0Kc3lzdGVtcyBldmVuIHRvZGF5LiBCZXNpZGVzLCBtZW1vcnkgZm9vdHByaW50IGFmZmVjdHMg
-aW5zdHJ1Y3Rpb24gY2FjaGUgaGl0DQpyYXRpbyBhbmQgdGhlcmVmb3JlLCBpbmRpcmVjdGx5LCBw
-ZXJmb3JtYW5jZSBhcyB3ZWxsLg0KDQo+ID4gQW5kIGFzIGFuIGFzaWRlLCBvbmNlIHdvcmthcm91
-bmRzIGhhdmUgYmVlbiBpbXBsZW1lbnRlZCBhbmQgcHJvdmVuIHRvDQo+ICJ3b3JrIiwgdGhlDQo+
-ID4gdW5kZXJseWluZyBpc3N1ZSByYXJlbHkgbWFrZXMgaXQgdG8gdGhlIEhXIGd1eXMgc28gd2Un
-cmUgc3R1Y2sgd2l0aCBpdA0KPiBmb3JldmVyLg0KPiA+DQo+DQo+IFdlbGwsIHRoZSBzdGFydGlu
-ZyBwb2ludCBvZiB0aGUgYXJndW1lbnQgd2FzIHRoYXQgeW91IGRlbGliZXJhdGVseQ0KPiBvbWl0
-dGVkIGhhbmRsaW5nIG9mIHplcm8gbGVuZ3RoIGlucHV0cyB0byBzYXZlIHNpbGljb24gYXJlYS4N
-Cj4NCldoZXJlIGRpZCBJIGV2ZXIgc2F5IHRoYXQgd2Ugb21pdHRlZCB0aGF0IHRvIHNhdmUgc2ls
-aWNvbiBhcmVhPw0KWW91J3JlIHB1dHRpbmcgd29yZHMgaW4gbXkgbW91dGggKG9yIGZpbmdlcnMp
-IG5vdy4gSSBuZXZlciBzYWlkIHRoYXQsDQp0aGF0IGlzIG5vdCB0aGUgcmVhc29uIGF0IGFsbC4N
-Cg0KPiBTbyB0aGUNCj4gaXNzdWUgd291bGQgYWxyZWFkeSBiZSBrbm93biB0byB0aGUgaC93IGd1
-eXMsIGFuZCB0aGV5IGRlY2lkZWQgaXQgd2FzDQo+IHNvbWV0aGluZyB0aGV5J2QgcHVudCB0byB0
-aGUgc29mdHdhcmUgaW5zdGVhZC4NCj4NCk5PLiBXZSBuZXZlciBkZWNpZGVkIGFueSBzdWNoIHRo
-aW5nLiBXZSBkZWNpZGVkIHRoYXQgaXQgd2FzIG5vdCBhIHJlbGV2YW50DQp1c2UgY2FzZSB0aGF0
-IHdlIG5lZWRlZCB0byBzdXBwb3J0IGF0IGFsbC4gTmVpdGhlciBpbiB0aGUgaGFyZHdhcmUgbm9y
-IGluDQp0aGUgZHJpdmVyLiBPdXIgb3duIGdlbmVyaWMgT1MgZHJpdmVyIGRvZXMgbm90IGNvbnRh
-aW4gYW55IHN1Y2ggd29ya2Fyb3VuZHMuDQpJbiBmYWN0LCBiYXNlZCBvbiB0aGlzIExpbnV4IGRy
-aXZlciB0aGluZyB3ZSBoYWQgYSBuZXcgaW50ZXJuYWwgZGlzY3Vzc2lvbg0Kb24gaXQgYW5kIHRo
-ZSBvdXRjb21lIGRpZCBub3QgY2hhbmdlOiBub3QgYSByZWxldmFudCB1c2UgY2FzZSBmb3IgdXMu
-DQoNCj4gPiBOTy4gSGFyZHdhcmUgaXMgYnJva2VuIGlmIGl0IGRvZXNuJ3QgY29tcGx5IHRvIGl0
-cyBvd24gc3BlY2lmaWNhdGlvbnMgLQ0KPiA+IHdoaWNoICptYXkqIGluY2x1ZGUgcmVmZXJlbmNl
-cyB0byBpbmR1c3RyeSBzdGFuZGFyZHMgaXQgbXVzdCBjb21wbHkgd2l0aC4NCj4gPiBJZiBJIGlu
-dGVudGlvbmFsbHkgc3BlY2lmeSB0aGF0IHplcm8gbGVuZ3RoIGhhc2hlcyBhcmUgbm90IHN1cHBv
-cnRlZCwgYW5kDQo+ID4gSSBkb24ndCBwcmV0ZW5kIHRvIGNvbXBseSB3aXRoIGFueSBpbmR1c3Ry
-eSBzdGFuZGFyZCB0aGF0IHJlcXVpcmVzIHRoZW0sDQo+ID4gdGhlbiB0aGF0J3MganVzdCBhICps
-aW1pdGF0aW9uKiBvZiB0aGUgaGFyZHdhcmUsIG1vc3QgY2VydGFpbmx5IG5vdCBhIGJ1Zy4NCj4N
-Cj4gRmFpciBlbm91Z2guIEJ1dCBpZiB5b3Ugd2FudCB0byBpbnRlZ3JhdGUgdGhhdCBoL3cgaW4g
-YSBzeXN0ZW0gdGhhdA0KPiBkb2VzIGFpbSB0byBjb21wbHksIGl0IGlzIHVwIHRvIHRoZSBzb2Z0
-d2FyZSB0byBmaXggdGhlIGltcGVkYW5jZQ0KPiBtaXNtYXRjaC4NCj4NCkNvbXBseSB3aXRoIHdo
-YXQgZXhhY3RseT8gWW91IGNhbid0ICJjb21wbHkiIHdpdGggYWxnb3JpdGhtcyAuLi4geW91IGp1
-c3QNCmltcGxlbWVudCB3aGF0ZXZlciBzdWJzZXQgbWFrZXMgc2Vuc2UgYW5kIHNwZWNpZnkgdGhl
-IGNvbnN0cmFpbnRzLiBZb3UgY2FuDQpjb21wbHkgd2l0aCBwcm90b2NvbCBzcGVjaWZpY2F0aW9u
-cywgYW5kIHRoYXQncyB3aGF0IHdlIGRvLiBOb25lIG9mIHRob3NlDQpyZXF1aXJlcyB6ZXJvIGxl
-bmd0aCBoYXNoaW5nLCBITUFDLCBjaXBoZXIgb3IgQUVBRCBvcGVyYXRpb25zLg0KTWFueSBhbGdv
-cml0aG1zIGFyZSB1bmJvdW5kZWQgYW55d2F5IGFuZCBoYXJkd2FyZSBpcyBib3VuZGVkIGJ5IGRl
-ZmluaXRpb24uDQoNCj4gPiBIYXJkd2FyZSBuZWNlc3NhcmlseSAqYWx3YXlzKiBoYXMgbGltaXRh
-dGlvbnMgYmVjYXVzZSBvZiBhbGwga2luZHMgb2YNCj4gPiBjb25zdHJhaW50czogYXJlYSwgcG93
-ZXIsIGNvbXBsZXhpdHkuIEFuZCBldmVuIHNvbWV0aGluZyBhcyBtdW5kYW5lIGFzIGENCj4gPiBz
-Y2hlZHVsZSBjb25zdHJhaW50IHdoZXJlIHlvdSBzaW1wbHkgY2FuJ3QgZml0IGFsbCBkZXNpcmVk
-IGZlYXR1cmVzIGluIHRoZQ0KPiA+IGRlc2lyZWQgc2NoZWR1bGUuIFdoaWNoIGlzIHVzdWFsbHkg
-dmVyeSBzb2xpZCBkdWUgdG8gdGltZXNsb3RzIGJlaW5nDQo+ID4gcGxhbm5lZCBpbiBhIGZhYiBl
-dGMuIFdlIGRvbid0IGhhdmUgdGhlIGx1eHVyeSBvZiBleHRlbmRpbmcgb3VyIHNjaGVkdWxlDQo+
-ID4gZm9yZXZlciBsaWtlIFNXIGd1eXMgdGVuZCB0byBkbyAuLi4gd2UncmUgdmVyeSBwcm91ZCBv
-ZiBvdXIgdHJhY2sgcmVjb3JkDQo+ID4gb2YgYWx3YXlzIG1lZXRpbmcgb3VyIHByb21pc2VkIHNj
-aGVkdWxlcy4gUGx1cyAtIHNpbGljb24gY2FuJ3QgYmUgcGF0Y2hlZCwNCj4gPiBzbyB3aGF0J3Mg
-ZG9uZSBpcyBkb25lIGFuZCB5b3UgaGF2ZSB0byBsaXZlIHdpdGggaXQuIEZvciBtYW55IHllYXJz
-IHRvDQo+ID4gY29tZSwgdXN1YWxseS4NCj4gPg0KPg0KPiBUaGlzIGlzIGFsbCBwcmV0dHkgd2Vs
-bCB1bmRlcnN0b29kLiBXZSBhbGwgaGF2ZSBkaWZmZXJlbnQgaW50ZXJlc3RzIHRvDQo+IGJhbGFu
-Y2UgYWdhaW5zdCBlYWNoIG90aGVyLCB3aGljaCBpcyB3aHkgd2UgYXJlIHBlcmZlY3RseSBmaW5l
-IHdpdGgNCj4gaGFuZGxpbmcgc29tZSBjb3JuZXIgY2FzZXMgaW4gdGhlIGRyaXZlci4gV2hhdCB3
-ZSBhcmUgbm90IHByZXBhcmVkIHRvDQo+IGRvIGlzIGxldCB0aG9zZSBjb3JuZXIgY2FzZXMgbGVh
-ayBpbnRvIHRoZSBjb3JlIGNyeXB0byBsYXllciBhcyBjYXNlcw0KPiB0aGF0IHJlcXVpcmUgc3Bl
-Y2lhbCBoYW5kbGluZy4NCj4NCldoaWNoIGNhbiBiZSBhdm9pZGVkIGJ5IG5vdCBzZWxlY3Rpbmcg
-YSBkcml2ZXIgZm9yIGFuIGFwcGxpY2F0aW9uIGl0DQpkb2VzIG5vdCBzdXBwb3J0IC4uLiBpZiB0
-aGUgY29ybmVyIGNhc2UgaXMgbm90IGV4ZXJjaXNlZCwgdGhlbiBubyBoYXJtIGlzDQpkb25lLiBO
-byBuZWVkIGZvciBhbnkgImxlYWtpbmciIHRocm91Z2ggdGhlIGNyeXB0byBsYXllcnMuDQoNCj4g
-PiA+IEkga25vdyB0aGVyZSBpcyBhIGdyYWRpZW50IGhlcmUgZ29pbmcNCj4gPiA+IGZyb20gaGFz
-aGVzLCBBRUFEcyB0byBzeW1tZXRyaWMgY2lwaGVycywgYnV0IEkgdGhpbmsgdGhpcyBhcHBsaWVz
-IHRvDQo+ID4gPiBhbGwgb2YgdGhlbS4NCj4gPiA+DQo+ID4gPiA+IFBsZWFzZSBrZWVwIGluIG1p
-bmQgdGhhdCBleGlzdGluZyBoYXJkd2FyZSBjYW5ub3QgYmUgY2hhbmdlZC4gU28gd2h5DQo+ID4g
-PiA+IHdhc24ndCB0aGUgQVBJIGRlc2lnbmVkIGFyb3VuZCB0aGUgbGltaXRhdGlvbnMgb2YgKmV4
-aXN0aW5nKiBoYXJkd2FyZT8NCj4gPiA+DQo+ID4gPiBGcm9tIGEgc29mdHdhcmUgcG9pbnQgb2Yg
-dmlldywgYWRkaW5nIHNwZWNpYWwgY2FzZXMgZm9yIHplcm8gbGVuZ3RoDQo+ID4gPiBpbnB1dHMg
-YW1vdW50cyB0byB3aGF0IHlvdSBhcmUgdHJ5aW5nIHRvIGF2b2lkOiB1c2luZyBtb3JlICdzaWxp
-Y29uDQo+ID4gPiBhcmVhJy4NCj4gPiA+DQo+ID4gTm8sIHRoYXQncyBhY3R1YWxseSBub3QgdGhl
-IHJlYXNvbiBhdCBhbGwgaW4gdGhpcyBjYXNlLiBXZSdyZSB0cnlpbmcgdG8NCj4gPiBhdm9pZCBz
-aWduaWZpY2FudCBleHRyYSBjb21wbGV4aXR5IGFuZCBlZmZvcnQgb24gYm90aCB0aGUgaGFyZHdh
-cmUgaXRzZWxmDQo+ID4gYW5kIHRoZSB2ZXJpZmljYXRpb24gdGhlcmVvZi4gU2lsaWNvbiBhcmVh
-IGlzIG5vdCBldmVuIGluIHRoZSBwaWN0dXJlIGFzDQo+ID4gYSBjb25jZXJuIGZvciBzb21ldGhp
-bmcgYXMgInNtYWxsIiBhcyB0aGlzLg0KPiA+DQo+ID4gQWRkaW5nIHplcm8gbGVuZ3RoIHN1cHBv
-cnQgdG8gb3VyIGhhcmR3YXJlIGFyY2hpdGVjdHVyZSBpcyBub3QgYSB0cml2aWFsDQo+ID4gZXhl
-cmNpc2UuIEFuZCB0aGVuIHlvdSBoYXZlIHRvIHdlaWdoIGFkZGVkIGNvbXBsZXhpdHkgLSA9YWRk
-ZWQgcmlzaywgd2hlbg0KPiA+IHlvdSB0YWxrIGFib3V0IGhhcmR3YXJlIHdpdGggbXVsdGktbWls
-bGlvbiBkb2xsYXIgbWFzayBzZXRzIGluIHBsYXkgLQ0KPiA+IGFnYWluc3QgdXNlZnVsbmVzcy4g
-WmVyby1sZW5ndGggc3VwcG9ydCB3YXMgLSBhbmQgc3RpbGwgaXMhIC0gc2ltcGx5IG5vdA0KPiA+
-IHdvcnRoIHRoZSBhZGRlZCByaXNrIGFuZCBlZmZvcnQuDQo+ID4NCj4NCj4gT2YgY291cnNlLiBU
-aGF0IGlzIHdoeSBpdCBpcyBwZXJmZWN0bHkgZmluZSB0byBoYW5kbGUgdGhpcyBpbiB5b3VyIGRy
-aXZlci4NCj4NClBlcmZlY3RseSBmaW5lIGZvciB5b3UsIG1heWJlLCBidXQgbm90IHNvIG11Y2gg
-Zm9yIG1lLg0KDQpXaHk6DQpQZXJmb3JtYW5jZSBsb3NzLiBEcml2ZXIgY29tcGxleGl0eSB2cyBt
-YWludGVuYW5jZS4NCldhc3RlZCBlZmZvcnQgaW1wbGVtZW50aW5nIHRvdGFsbHkgaXJyZWxldmFu
-dCBjYXNlcy4NCg0KPiA+IEFuZCBpZiB5b3UgZ28gdGhhdCBuYWl2ZSByb3V0ZSwganVzdCBmaXgg
-ZXZlcnl0aGluZyBpbiB0aGUgZHJpdmVyLCB0aGVuDQo+ID4geW91IHNpbXBseSBlbmQgdXAgd2l0
-aCBzb21ldGhpbmcgdGVycmlibHkgaW5lZmZpY2llbnQgYmVjYXVzZSBhbGwgdGhvc2UNCj4gPiBj
-b3JuZXIgY2FzZSBjaGVja3MgZW5kIHVwIGluIHRoZSBmYXN0IHBhdGggYW5kIGVhdGluZyB1cCBj
-b2RlIHNwYWNlLg0KPiA+DQo+DQo+IFRoaXMgaXMgKmV4YWN0bHkqIHRoZSByZWFzb24gd2h5IHdl
-IHdhbnQgdGhpcyB3b3JrYXJvdW5kIGluIHlvdXINCj4gZHJpdmVyLCBiZWNhdXNlIGlmIGl0IGlz
-IG5vdCBpbiB5b3VyIGRyaXZlciwgd2Ugd2lsbCBoYXZlIHRvIHB1dCBpdCBpbg0KPiBnZW5lcmlj
-IGNvZGUgd2hlcmUgaXQgYWZmZWN0cyBldmVyeWJvZHkuDQo+DQo+ID4gRm9yIGEgc29tZW9uZSBj
-bGFpbWluZyB0byAibWVldCBpbiB0aGUgbWlkZGxlIHRvIGNvbXByb21pc2UiIHlvdSdyZQ0KPiA+
-IHN1cmVseSBub3QgY29tcHJvbWlzaW5nIGFueXRoaW5nIGF0IGFsbCAuLi4gTm8gb2ZmZW5zZS4N
-Cj4gPg0KPg0KPiBOb25lIHRha2VuLiBJIGFtIHJlYWxseSB0cnlpbmcgdG8gd29yayB3aXRoIHlv
-dSBoZXJlLCBidXQgY2hhbmdpbmcNCj4gY29yZSBjb2RlIHRvIGFkZHJlc3MgdGhlIGxpbWl0YXRp
-b25zIG9mIG9uZSBwYXJ0aWN1bGFyIGgvdw0KPiBpbXBsZW1lbnRhdGlvbiBpcyBub3Qgc29tZXRo
-aW5nIHdlIGRvIGxpZ2h0bHkuDQo+DQpXZWxsLCBmb3Igb25lIHRoaW5nIGl0IGlzIG5vdCAib25l
-IHBhcnRpY3VsYXIgaC93IGltcGxlbWVudGF0aW9uIi4NCkFzIGZvciB0aGUgemVybyBsZW5ndGgg
-dGhpbmcsIEkgYmVsaWV2ZSBpdCdzIGFsbW9zdCBhbGwgb2YgdGhlbSwgYmFzZWQNCm9uIGNvbW1l
-bnRzIGZyb20gb3RoZXIgZHJpdmVyIG1haW50YWluZXJzLiBJJ3ZlIG9ubHkgc2VlbiAxIGNvbW1l
-bnQgc2F5aW5nDQp0aGF0IHRoZSBIVyAqZGlkKiBzdXBwb3J0IGl0LiBBbmQgdGhhdCB3YXMgYSAi
-bWF5YmUiLg0KDQpBbmQgbXkgbWFpbiBzdWdnZXN0aW9uIGRvZXMgbm90IHJlcXVpcmUgYW55IGNv
-cmUgY29kZSBjaGFuZ2VzIGF0IGFsbC4NCg0KDQpSZWdhcmRzLA0KUGFzY2FsIHZhbiBMZWV1d2Vu
-DQpTaWxpY29uIElQIEFyY2hpdGVjdCwgTXVsdGktUHJvdG9jb2wgRW5naW5lcw0Kd3d3Lmluc2lk
-ZXNlY3VyZS5jb20NCg==
+On Mon, 27 May 2019 at 17:56, Pascal Van Leeuwen
+<pvanleeuwen@insidesecure.com> wrote:
+>
+> > > I understand that as well. But that doesn't change the fact that the
+> > > application may be waiting for a loooooong (relatively speaking) time
+> > > for it's results. As latency through hardware may be several orders of
+> > > a magnitude larger than the time it actually takes to *process* the
+> > > request.  So when used synchronously the HW may appear to work at a mere
+> > > fraction of its true performance.
+> > >
+> >
+> > Of course. Sometimes you care about that, and sometimes you don't.
+> >
+> > > And if your main interest is in that application, you may not care so
+> > > much about what the rest of the system does, even if it can use the
+> > > remaining bandwidth of the accelerator.
+> > >
+> >
+> > 100s of instances of that application, thread, etc could be running at
+> > the same time, and throughput may be more important than latency.
+> >
+> > > In which case it may be desirable *not* to use the accelerator for that
+> > > application at all due to *very* poor performance (for that application).
+> > >
+> > > Which would make even more cycles on the accelerator available to the
+> > > other applications in the system, so that knife cuts both ways ...
+> > >
+> >
+> > Single thread perfomance is only one metric, and it may not be the one
+> > you care about most.
+> >
+>
+> How relevant is the fact that there may be (other) situations where latency
+> is not relevant for someone being in a situation where it is relevant?
+>
+> I was just talking about that situation where it actually is relevant and
+> therefore you do *not* wish the hardware driver to be used.
+>
+> Ok, let's phrase it such that can be no further misunderstandings:
+>
+> If you want performance from a single-threaded single application that does
+> synchronous, blocking, crypto API calls, then you do not want those to end
+> up at our hardware. Or, very likely, pretty much any other hardware.
+> The cra_priority mechanism does not allow the driver to convey such a thing.
+>
+
+Agreed.
+
+But we came to this point in response to your assertion that a
+userland application can only make meaningful use of the hardware
+accelerator if it uses some kind of asynchronous API like AIO, and I
+tried to explain that this is not the case.
+
+> > > Adding tons of workarounds to drivers, for example, slows them down, makes
+> > them
+> > > use more CPU cycles and more power, and ultimately defeats the purpose of
+> > having
+> > > a hardware accelerator at all. That is actually my concern.
+> >
+> > If the workaround is in a driver and not on a hot path, we don't
+> > really care about the memory footprint.
+> >
+> These workarounds are on a hot path by definition, as they have to filter
+> out specific requests coming in, i.e. it affects every single request done
+> to the driver. As for memory footprint: that is still relevant for embedded
+> systems even today. Besides, memory footprint affects instruction cache hit
+> ratio and therefore, indirectly, performance as well.
+>
+
+Of course. But what appears on the actual hot path is a single 'cbz'
+instruction that is always predicted correctly, and the actual code
+lives somewhere else in the binary. That is why I said *memory*
+footprint not *cache* footprint, since it only affects the former and
+not the latter.
+
+> > > And as an aside, once workarounds have been implemented and proven to
+> > "work", the
+> > > underlying issue rarely makes it to the HW guys so we're stuck with it
+> > forever.
+> > >
+> >
+> > Well, the starting point of the argument was that you deliberately
+> > omitted handling of zero length inputs to save silicon area.
+> >
+> Where did I ever say that we omitted that to save silicon area?
+> You're putting words in my mouth (or fingers) now. I never said that,
+> that is not the reason at all.
+>
+
+Fair enough. But I did understand correctly that this was a deliberate
+decision, no?
+
+> > So the
+> > issue would already be known to the h/w guys, and they decided it was
+> > something they'd punt to the software instead.
+> >
+> NO. We never decided any such thing. We decided that it was not a relevant
+> use case that we needed to support at all. Neither in the hardware nor in
+> the driver. Our own generic OS driver does not contain any such workarounds.
+> In fact, based on this Linux driver thing we had a new internal discussion
+> on it and the outcome did not change: not a relevant use case for us.
+>
+
+RIght. So how does this this relate to your remark above that working
+workarounds prevent issues from being known to the h/w guys?
+
+> > > NO. Hardware is broken if it doesn't comply to its own specifications -
+> > > which *may* include references to industry standards it must comply with.
+> > > If I intentionally specify that zero length hashes are not supported, and
+> > > I don't pretend to comply with any industry standard that requires them,
+> > > then that's just a *limitation* of the hardware, most certainly not a bug.
+> >
+> > Fair enough. But if you want to integrate that h/w in a system that
+> > does aim to comply, it is up to the software to fix the impedance
+> > mismatch.
+> >
+> Comply with what exactly? You can't "comply" with algorithms ... you just
+> implement whatever subset makes sense and specify the constraints. You can
+> comply with protocol specifications, and that's what we do. None of those
+> requires zero length hashing, HMAC, cipher or AEAD operations.
+> Many algorithms are unbounded anyway and hardware is bounded by definition.
+>
+
+I'll ignore the remark about boundedness since it has no bearing
+whatsoever on this discussion.
+
+As for compliance, many of the zero length test vectors were sourced
+from FIPS or NIST documents, so i don't care what you call it, but it
+is a perfectly reasonable requirement that new implementations work as
+expected for test vectors that have been published along with the
+algorithm.
+
+Again, I am not saying your hardware should do this. I am only saying
+that, from a software engineering perspective, your driver is where we
+fix up the differences, not anywhere else.
+
+
+> > > Hardware necessarily *always* has limitations because of all kinds of
+> > > constraints: area, power, complexity. And even something as mundane as a
+> > > schedule constraint where you simply can't fit all desired features in the
+> > > desired schedule. Which is usually very solid due to timeslots being
+> > > planned in a fab etc. We don't have the luxury of extending our schedule
+> > > forever like SW guys tend to do ... we're very proud of our track record
+> > > of always meeting our promised schedules. Plus - silicon can't be patched,
+> > > so what's done is done and you have to live with it. For many years to
+> > > come, usually.
+> > >
+> >
+> > This is all pretty well understood. We all have different interests to
+> > balance against each other, which is why we are perfectly fine with
+> > handling some corner cases in the driver. What we are not prepared to
+> > do is let those corner cases leak into the core crypto layer as cases
+> > that require special handling.
+> >
+> Which can be avoided by not selecting a driver for an application it
+> does not support ... if the corner case is not exercised, then no harm is
+> done. No need for any "leaking" through the crypto layers.
+>
+
+True. So again, if you choose to support your hardware as part of a
+subsystem that does not have these requirements, I am perfectly fine
+with that.
+
+> > > > I know there is a gradient here going
+> > > > from hashes, AEADs to symmetric ciphers, but I think this applies to
+> > > > all of them.
+> > > >
+> > > > > Please keep in mind that existing hardware cannot be changed. So why
+> > > > > wasn't the API designed around the limitations of *existing* hardware?
+> > > >
+> > > > From a software point of view, adding special cases for zero length
+> > > > inputs amounts to what you are trying to avoid: using more 'silicon
+> > > > area'.
+> > > >
+> > > No, that's actually not the reason at all in this case. We're trying to
+> > > avoid significant extra complexity and effort on both the hardware itself
+> > > and the verification thereof. Silicon area is not even in the picture as
+> > > a concern for something as "small" as this.
+> > >
+> > > Adding zero length support to our hardware architecture is not a trivial
+> > > exercise. And then you have to weigh added complexity - =added risk, when
+> > > you talk about hardware with multi-million dollar mask sets in play -
+> > > against usefulness. Zero-length support was - and still is! - simply not
+> > > worth the added risk and effort.
+> > >
+> >
+> > Of course. That is why it is perfectly fine to handle this in your driver.
+> >
+> Perfectly fine for you, maybe, but not so much for me.
+>
+> Why:
+> Performance loss.
+
+Negligible
+
+> Driver complexity vs maintenance.
+
+Yes, but again, this complexity has to live *somewhere*, and we don't
+want it in the generic code.
+
+> Wasted effort implementing totally irrelevant cases.
+>
+
+I agree that it is unfortunate that we have to spend time on this.
+
+> > > And if you go that naive route, just fix everything in the driver, then
+> > > you simply end up with something terribly inefficient because all those
+> > > corner case checks end up in the fast path and eating up code space.
+> > >
+> >
+> > This is *exactly* the reason why we want this workaround in your
+> > driver, because if it is not in your driver, we will have to put it in
+> > generic code where it affects everybody.
+> >
+> > > For a someone claiming to "meet in the middle to compromise" you're
+> > > surely not compromising anything at all ... No offense.
+> > >
+> >
+> > None taken. I am really trying to work with you here, but changing
+> > core code to address the limitations of one particular h/w
+> > implementation is not something we do lightly.
+> >
+> Well, for one thing it is not "one particular h/w implementation".
+> As for the zero length thing, I believe it's almost all of them, based
+> on comments from other driver maintainers. I've only seen 1 comment saying
+> that the HW *did* support it. And that was a "maybe".
+>
+> And my main suggestion does not require any core code changes at all.
+>
+
+So what exactly are you proposing? Mind you, we cannot optimize this
+away, so we will have to add checks /somewhere/ that we are not
+calling into the crypto code with length values it doesn't support.
