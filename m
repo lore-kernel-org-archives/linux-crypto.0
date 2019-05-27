@@ -2,138 +2,145 @@ Return-Path: <SRS0=ER81=T3=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BD12C04AB3
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 May 2019 10:05:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7422C04AB3
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 May 2019 10:28:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DE10E208CA
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 May 2019 10:05:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6D8B7208CA
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 May 2019 10:28:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=insidesecure.onmicrosoft.com header.i=@insidesecure.onmicrosoft.com header.b="eApgvg9m"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xhpfgQXD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726560AbfE0KE7 (ORCPT
+        id S1725996AbfE0K2v (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 27 May 2019 06:04:59 -0400
-Received: from mail-eopbgr130102.outbound.protection.outlook.com ([40.107.13.102]:1921
-        "EHLO EUR01-HE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725991AbfE0KE7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 27 May 2019 06:04:59 -0400
+        Mon, 27 May 2019 06:28:51 -0400
+Received: from mail-it1-f182.google.com ([209.85.166.182]:36277 "EHLO
+        mail-it1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725814AbfE0K2v (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 27 May 2019 06:28:51 -0400
+Received: by mail-it1-f182.google.com with SMTP id e184so23460106ite.1
+        for <linux-crypto@vger.kernel.org>; Mon, 27 May 2019 03:28:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=insidesecure.onmicrosoft.com; s=selector1-insidesecure-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ox/rkZT/tJ3Lp8kq5r4+v7xwkST+s6WFD3+fKTRu4O4=;
- b=eApgvg9mm9xZtWiXNhRcYXPBJBG41AH5RQVlHKr6Y+KbN6NAnBeM+C1/nm0XqKprp5u0OLV0ZsTlRG5iaPM1jMuVKawhzeTS4wPOI02AbL6WT48mehDGPg58UkPQC13R7mTTawUy8n+WV5LhcCTNMq6mQgcLdmAOHBeS/Nq2gYI=
-Received: from AM6PR09MB3523.eurprd09.prod.outlook.com (10.255.99.206) by
- AM6PR09MB3271.eurprd09.prod.outlook.com (20.179.244.144) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1922.15; Mon, 27 May 2019 10:04:51 +0000
-Received: from AM6PR09MB3523.eurprd09.prod.outlook.com
- ([fe80::8c11:e692:3a44:a3a9]) by AM6PR09MB3523.eurprd09.prod.outlook.com
- ([fe80::8c11:e692:3a44:a3a9%6]) with mapi id 15.20.1922.021; Mon, 27 May 2019
- 10:04:51 +0000
-From:   Pascal Van Leeuwen <pvanleeuwen@insidesecure.com>
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-CC:     Christophe Leroy <christophe.leroy@c-s.fr>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Subject: RE: another testmgr question
-Thread-Topic: another testmgr question
-Thread-Index: AQHVEZmK2bzdbrfsm0iVWRutGLPeSaZ5GFjggAAKVYCAAAs7wIAAMw6AgACM6vCAAAlSgIAAAtPQgAAIJACAAAD1MIAABH2AgAS0FFCAAAQtAIAAAZkA
-Date:   Mon, 27 May 2019 10:04:51 +0000
-Message-ID: <AM6PR09MB352398BD645902A305C680C9D21D0@AM6PR09MB3523.eurprd09.prod.outlook.com>
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=S+y8Z+9vEThSyppBMbyLMZw4ZHnA9acMBrBgNYPw8nU=;
+        b=xhpfgQXD7x8fXmlfiVu9Lb6QrfGRCLpD7NwVfehZnwpxG11lHr+OPLqp1WBqegr4tD
+         Y1yxA9c0awOl9RYtqrdDOZAZJKnYtGJ6ZpXDx0b5NMYx1bthBs8Fr7GZe1PoiouCdqfC
+         UrJ17UoYfeDVbCusHtND1STRyBfnThWk3Mfh/zq9/vOIMLconoDaWGJIczJX0BcxOSz2
+         jGAulCwrVl2AzuA797rIIBkafzRP3h5niJE6lqHwEnVUpNcm262GgBM/NnnNkbQr6iry
+         80W3iX3iDnMJ1GufeVSR4wbk3PpcAAxjcComwiCZJ/FM5PswJ1cvILzilmN/6wIDRl3P
+         1/Cg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=S+y8Z+9vEThSyppBMbyLMZw4ZHnA9acMBrBgNYPw8nU=;
+        b=Qr9SNLhwyBv/fG7/5kEWuV5pgXXbndQM2WhDrrpZABHDuHB/wIQXFgXj5/gLWSG7BH
+         IJrDfnSmieFq5vWayj+ME5w1CfXyeYswR04WC3qS0ZmV2g9ytpb4GPdp07Dz+mJ61Es1
+         9kDH9kTQFYtMsJZpsuihsj6oDhlpy+AjKrjjyu9Vm3XRXUejPcsF0KECK70ryM4yb6LB
+         Hqm15F1YA8yv/4Trs88j744BJVTUJ5MAhYW7NX5s1Bb1MQ+7uF/GYs91+jqTOv539kR9
+         lG5LX+1vi8SMzBhl6/tVxtcn9kEUBpbXVmbgb9HrC0L8rYdciUB7GyY6ZTjal8CoDNFv
+         yCnA==
+X-Gm-Message-State: APjAAAUWj9tLwd6olO9grLtPCbSyJr8kIOpKxsjRfAOpnngQx+Wr0LDV
+        tCGvFedo0fFN9/VmGu5DpnNhIVXzO/2rR9JQd0ZhnQ==
+X-Google-Smtp-Source: APXvYqyl7TexkbZcgvCIXgD7Ivf0/tdBU3bU2I+F1iamtJLb4t/x2fEHubQWzFCDuENkPlFIXBRm0mbJgTjvSz2JJ7I=
+X-Received: by 2002:a24:ca84:: with SMTP id k126mr26310714itg.104.1558952930137;
+ Mon, 27 May 2019 03:28:50 -0700 (PDT)
+MIME-Version: 1.0
 References: <AM6PR09MB3523CED0B1587FCBDE4095A0D2010@AM6PR09MB3523.eurprd09.prod.outlook.com>
- <20190523185833.GA243994@google.com>
- <AM6PR09MB3523749B0306103E8D2D8315D2010@AM6PR09MB3523.eurprd09.prod.outlook.com>
- <20190523200557.GA248378@gmail.com>
- <AM6PR09MB3523DB255516D35B595AEA50D2010@AM6PR09MB3523.eurprd09.prod.outlook.com>
- <20190523234853.GC248378@gmail.com>
- <AM6PR09MB3523CFCFE42A33621FE4ACC3D2020@AM6PR09MB3523.eurprd09.prod.outlook.com>
- <907eb6a5-dc76-d5ee-eccf-e7bd426a0868@c-s.fr>
- <AM6PR09MB3523D9D6D249701D020A3D74D2020@AM6PR09MB3523.eurprd09.prod.outlook.com>
+ <20190523185833.GA243994@google.com> <AM6PR09MB3523749B0306103E8D2D8315D2010@AM6PR09MB3523.eurprd09.prod.outlook.com>
+ <20190523200557.GA248378@gmail.com> <AM6PR09MB3523DB255516D35B595AEA50D2010@AM6PR09MB3523.eurprd09.prod.outlook.com>
+ <20190523234853.GC248378@gmail.com> <AM6PR09MB3523CFCFE42A33621FE4ACC3D2020@AM6PR09MB3523.eurprd09.prod.outlook.com>
+ <907eb6a5-dc76-d5ee-eccf-e7bd426a0868@c-s.fr> <AM6PR09MB3523D9D6D249701D020A3D74D2020@AM6PR09MB3523.eurprd09.prod.outlook.com>
  <CAKv+Gu_Pxv97rpt7Ju0EdtFnXqp3zoYfHtm1Q51oJSGEAZmyDA@mail.gmail.com>
  <AM6PR09MB3523A8A4BEDDF2B59A7B9A09D2020@AM6PR09MB3523.eurprd09.prod.outlook.com>
  <CAKv+Gu-4c-zoRfMyL8wjQWO2BWNBR=Q8o3=CjNDarNcda-DvFQ@mail.gmail.com>
  <AM6PR09MB35235BFCE71343986251E163D21D0@AM6PR09MB3523.eurprd09.prod.outlook.com>
- <CAKv+Gu-q2ETftN=S_biUmamxeXFe=CHMWGd=xeZT+w4Zx0Ou2w@mail.gmail.com>
-In-Reply-To: <CAKv+Gu-q2ETftN=S_biUmamxeXFe=CHMWGd=xeZT+w4Zx0Ou2w@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=pvanleeuwen@insidesecure.com; 
-x-originating-ip: [188.204.2.113]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: a2416e68-dbda-45dd-326c-08d6e28ac25e
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:AM6PR09MB3271;
-x-ms-traffictypediagnostic: AM6PR09MB3271:
-x-ms-exchange-purlcount: 1
-x-microsoft-antispam-prvs: <AM6PR09MB3271DCB16BAD0FB06E160DA7D21D0@AM6PR09MB3271.eurprd09.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-forefront-prvs: 0050CEFE70
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(396003)(136003)(346002)(376002)(39840400004)(366004)(199004)(189003)(66556008)(66476007)(73956011)(64756008)(305945005)(66446008)(486006)(6246003)(53936002)(4326008)(15974865002)(9686003)(476003)(99286004)(11346002)(229853002)(7696005)(446003)(6116002)(3846002)(33656002)(76176011)(66946007)(55016002)(7736002)(6436002)(74316002)(186003)(5660300002)(76116006)(8936002)(66066001)(7116003)(6916009)(26005)(71190400001)(71200400001)(478600001)(316002)(54906003)(52536014)(14454004)(81156014)(6506007)(2906002)(3480700005)(25786009)(256004)(86362001)(14444005)(81166006)(102836004)(68736007)(8676002)(21314003)(18886075002);DIR:OUT;SFP:1102;SCL:1;SRVR:AM6PR09MB3271;H:AM6PR09MB3523.eurprd09.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: insidesecure.com does not
- designate permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: dkI0kHfTQ1iZ7Uqe/t3j4gNB14zccQHqFM1VzcyxvWfZ15nTz/hXZ2ihFzKkvYawGqwHLHLE7J3pxYulbm6NrBdCQQxgiw9aVcC6cnioVFIXqhvJT8PxUmWWig+ZaM84uSbt7P2wQdD5i/OV8+XbkdHAg8maTg6n3+Vlf2YXCXq3RxtSZYBM2DCer1GblaV88hfUNxFeQgSIhfZ/1bCCIZa9H0RgqGA5VcNbkF8loa4jYMuLsN8+lh/8wsy2kix4yp06D/PEeGfOX8tAQrGuyXQhvyzByLOucH8Iw9KEX+lj5hFnHuWduYCgwOFgdto2LXXLAc243jbvNhhq8a/aIXUEoYyieYLXBL1njvhJ/5D8ZpALycRwqL1Ta7rY7o2mr1QgL4tSnGeZkmW1J0LtEIzerFy0XImZmrYTsRT7p/4=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-OriginatorOrg: insidesecure.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a2416e68-dbda-45dd-326c-08d6e28ac25e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 May 2019 10:04:51.1992
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3c07df58-7760-4e85-afd5-84803eac70ce
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: pvanleeuwen@insidesecure.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR09MB3271
+ <CAKv+Gu-q2ETftN=S_biUmamxeXFe=CHMWGd=xeZT+w4Zx0Ou2w@mail.gmail.com> <AM6PR09MB352398BD645902A305C680C9D21D0@AM6PR09MB3523.eurprd09.prod.outlook.com>
+In-Reply-To: <AM6PR09MB352398BD645902A305C680C9D21D0@AM6PR09MB3523.eurprd09.prod.outlook.com>
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date:   Mon, 27 May 2019 12:28:37 +0200
+Message-ID: <CAKv+Gu8ScTXM2qxrG__RW6SLKZYrevjfCi_HxpSOJRH5+9Knzg@mail.gmail.com>
+Subject: Re: another testmgr question
+To:     Pascal Van Leeuwen <pvanleeuwen@insidesecure.com>
+Cc:     Christophe Leroy <christophe.leroy@c-s.fr>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-PiA+IFdpdGggYWxsIGR1ZSByZXNwZWN0LCBidXQgeW91IGFyZSBtYWtpbmcgYXNzdW1wdGlvbnMg
-YXMgd2VsbC4gWW91IGFyZQ0KPiA+IG1ha2luZyB0aGUgYXNzdW1wdGlvbiB0aGF0IHJlZHVjaW5n
-IENQVSBsb2FkIGFuZC9vciByZWR1Y2luZyBwb3dlcg0KPiA+IGNvbnN1bXB0aW9uIGlzICptb3Jl
-KiBpbXBvcnRhbnQgdGhhbiBhYnNvbHV0ZSBhcHBsaWNhdGlvbiBwZXJmb3JtYW5jZSBvcg0KPiA+
-IGxhdGVuY3kuIFdoaWNoIGlzIGNlcnRhaW5seSBub3QgYWx3YXlzIHRoZSBjYXNlLg0KPiA+DQo+
-DQo+IEkgbmV2ZXIgc2FpZCBwb3dlciBjb25zdW1wdGlvbiBpcyAqYWx3YXlzKiBtb3JlIGltcG9y
-dGFudC4gWW91IHdlcmUNCj4gYXNzdW1pbmcgaXQgbmV2ZXIgaXMuDQo+DQpOb29vb28gSSB3YXNu
-J3QuIE5vdCBvbiBwdXJwb3NlLCBhbnl3YXkuIFBvd2VyIGNvbnN1bXB0aW9uIGlzIGEgbWFqb3Ig
-c2VsbGluZw0KcG9pbnQgZm9yIHVzLiBJZiB5b3UgZ290IHRoYXQgaW1wcmVzc2lvbiwgdGhlbiB0
-aGF0J3Mgc29tZSBtaXN1bmRlcnN0YW5kaW5nLg0KTXkgYXJndW1lbnQgd2FzIHNpbXBseSB0aGF0
-IHRoZXJlICptYXkqIGJlIG90aGVyIHJlcXVpcmVtZW50cy4gWW91IGRvbid0IGtub3csDQpzbyB5
-b3Ugc2hvdWxkbid0IG1ha2UgYXNzdW1wdGlvbnMgaW4gdGhlIG90aGVyIGRpcmVjdGlvbiBlaXRo
-ZXIuDQoNCj4gPiBJbiBtYW55IGNhc2VzIHdoZXJlIG9ubHkgc21hbGwgYW1vdW50cyBvZiBkYXRh
-IGFyZSBwcm9jZXNzZWQgc2VxdWVudGlhbGx5LA0KPiA+IHRoZSBoYXJkd2FyZSB3aWxsIHNpbXBs
-eSBsb3NlIG9uIGFsbCBhY2NvdW50cyAuLi4gU28gTGludXMgYWN0dWFsbHkgZGlkDQo+ID4gaGF2
-ZSBhIHBvaW50IHRoZXJlLiBIYXJkd2FyZSBvbmx5IHdpbnMgZm9yIHNwZWNpZmljIHVzZSBjYXNl
-cy4gSXQncw0KPiA+IGltcG9ydGFudCB0byByZWFsaXplIHRoYXQgYW5kIG5vdCB0cnkgYW5kIHVz
-ZSBoYXJkd2FyZSBmb3IgZXZlcnl0aGluZy4NCj4gPg0KPg0KPiBUcnVlLiBCdXQgd2UgaGF2ZSBh
-bHJlYWR5IHBhaW50ZWQgb3Vyc2VsdmVzIGludG8gYSBjb3JuZXIgaGVyZSwgc2luY2UNCj4gd2hh
-dGV2ZXIgd2UgZXhwb3NlIHRvIHVzZXJsYW5kIHRvZGF5IGNhbm5vdCBzaW1wbHkgYmUgcmV2b2tl
-ZC4NCj4NCj4gSSBndWVzcyB5b3UgY291bGQgYXJndWUgdGhhdCB5b3VyIHBhcnRpY3VsYXIgZHJp
-dmVyIHNob3VsZCBub3QgYmUNCj4gZXhwb3NlZCB0byB1c2VybGFuZCwgYW5kIEkgdGhpbmsgd2Ug
-bWF5IGV2ZW4gaGF2ZSBhIENSWVBUT19BTEdfeHh4DQo+DQpXZWxsLCBJIHVuZGVyc3Rvb2QgZnJv
-bSBzb21lb25lIGVsc2Ugb24gdGhpcyBsaXN0IHRoYXQgQ1JZUFRPX0FMRyBjYW4NCmRvIGFzeW5j
-IG9wZXJhdGlvbnMgaW4gd2hpY2ggY2FzZSBJIHdvdWxkIGFzc3VtZSBpdCBkb2Vzbid0IGJsb2Nr
-Pz8NCg0KSSB3b3VsZCByYXRoZXIgc2VlIGEgZmxhZyBkZW5vdGluZyAiZG8gbm90IHVzZSBtZSBp
-biBhIHN5bmNocm9ub3VzDQpmYXNoaW9uIG9uIHJlbGF0aXZlbHkgc21hbGwgZGF0YWJsb2Nrcywg
-b25seSB1c2UgbWUgaWYgeW91IGludGVuZCB0bw0Kc2VyaW91c2x5IHBpcGVsaW5lIHlvdXIgcmVx
-dWVzdHMiLiBPciBzb21lc3VjaC4NCg0KQnV0IHRoZW4gYWdhaW4gdGhhdCB3b3VsZCBzdGlsbCBi
-ZSB0b28gc2ltcGxpc3RpYyB0byBzZWxlY3QgdG8gYmVzdA0KZHJpdmVyIHVuZGVyIGFsbCBwb3Nz
-aWJsZSBjaXJjdW1zdGFuY2VzIC4uLiBzbyB3aHkgZXZlbiBib3RoZXIuDQoNCj4gZmxhZyBmb3Ig
-dGhhdC4gQnV0IGV2ZW4gaWYgdGhhdCBkb2VzIGhhcHBlbiwgaXQgZG9lc24ndCBtZWFuIHlvdSBj
-YW4NCj4gc3RvcCBjYXJpbmcgYWJvdXQgemVybyBsZW5ndGggaW5wdXRzIDotKQ0KPg0KSWYgdGhl
-IHNlbGVjdGlvbiBvZiB0aGUgaGFyZHdhcmUgZHJpdmVyIGJlY29tZXMgZXhwbGljaXQgYW5kIG5v
-dA0KYXV0b21hdGljLCB5b3UgY291bGQgYXJndWUgZm9yIGEgY2FzZSB3aGVyZSB0aGUgZHJpdmVy
-IGRvZXMgTk9UIGhhdmUNCnRvIGltcGxlbWVudCBhbGwgZGFyayBjb3JuZXJzIG9mIHRoZSBBUEku
-IEFzLCBhcyBhIGhhcmR3YXJlIHZlbmRvciwNCndlIGNvdWxkIHNpbXBseSByZWNvbW1lbmQgTk9U
-IHRvIHVzZSBpdCBmb3IgYXBwbGljYXRpb24gWFlaICBiZWNhdXNlDQppdCBkb2VzIHRoaW5ncyAt
-IGxpa2UgemVybyBsZW5ndGggbWVzc2FnZXMgLSB3ZSBkb24ndCBzdXBwb3J0Lg0KDQpSZWdhcmRz
-LA0KUGFzY2FsIHZhbiBMZWV1d2VuDQpTaWxpY29uIElQIEFyY2hpdGVjdCwgTXVsdGktUHJvdG9j
-b2wgRW5naW5lcyBAIEluc2lkZSBTZWN1cmUNCnd3dy5pbnNpZGVzZWN1cmUuY29tDQo=
+On Mon, 27 May 2019 at 12:04, Pascal Van Leeuwen
+<pvanleeuwen@insidesecure.com> wrote:
+>
+> > > With all due respect, but you are making assumptions as well. You are
+> > > making the assumption that reducing CPU load and/or reducing power
+> > > consumption is *more* important than absolute application performance or
+> > > latency. Which is certainly not always the case.
+> > >
+> >
+> > I never said power consumption is *always* more important. You were
+> > assuming it never is.
+> >
+> Nooooo I wasn't. Not on purpose, anyway. Power consumption is a major selling
+> point for us. If you got that impression, then that's some misunderstanding.
+> My argument was simply that there *may* be other requirements. You don't know,
+> so you shouldn't make assumptions in the other direction either.
+>
+
+That was basically *my* point. But you're welcome to use it :-)
+
+> > > In many cases where only small amounts of data are processed sequentially,
+> > > the hardware will simply lose on all accounts ... So Linus actually did
+> > > have a point there. Hardware only wins for specific use cases. It's
+> > > important to realize that and not try and use hardware for everything.
+> > >
+> >
+> > True. But we have already painted ourselves into a corner here, since
+> > whatever we expose to userland today cannot simply be revoked.
+> >
+> > I guess you could argue that your particular driver should not be
+> > exposed to userland, and I think we may even have a CRYPTO_ALG_xxx
+> >
+> Well, I understood from someone else on this list that CRYPTO_ALG can
+> do async operations in which case I would assume it doesn't block??
+>
+> I would rather see a flag denoting "do not use me in a synchronous
+> fashion on relatively small datablocks, only use me if you intend to
+> seriously pipeline your requests". Or somesuch.
+>
+
+As I explained before, what appears synchronous to a single userland
+process may look very differently from the OS and h/w perspective. But
+of course, I take your point that h/w is not faster than the CPU in
+the general case, and so care must be taken.
+
+This is made worse by the priority scheme, which does not really
+convery information like this.
+
+> But then again that would still be too simplistic to select to best
+> driver under all possible circumstances ... so why even bother.
+>
+> > flag for that. But even if that does happen, it doesn't mean you can
+> > stop caring about zero length inputs :-)
+> >
+> If the selection of the hardware driver becomes explicit and not
+> automatic, you could argue for a case where the driver does NOT have
+> to implement all dark corners of the API. As, as a hardware vendor,
+> we could simply recommend NOT to use it for application XYZ  because
+> it does things - like zero length messages - we don't support.
+>
+
+Spoken like a true h/w guy :-)
+
+Our crypto s/w stack and the storage, networking and other subsystems
+that are layered on top of it are complex enough that we shouldn't try
+to cater for non-compliant hardware. This is why you need to fix this
+in your driver: to prevent the issue from leaking into other layers,
+making it even more difficult to do testing and validation.
