@@ -4,29 +4,29 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB76FC28CBF
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 May 2019 08:39:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D7C8C07542
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 May 2019 08:39:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A70232173C
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 May 2019 08:39:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 505092173B
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 May 2019 08:39:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725940AbfE0IjQ (ORCPT
+        id S1726501AbfE0Ij3 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 27 May 2019 04:39:16 -0400
-Received: from mailgw02.mediatek.com ([210.61.82.184]:48638 "EHLO
-        mailgw02.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1725869AbfE0IjQ (ORCPT
+        Mon, 27 May 2019 04:39:29 -0400
+Received: from mailgw01.mediatek.com ([210.61.82.183]:33853 "EHLO
+        mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726282AbfE0Ij2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 27 May 2019 04:39:16 -0400
-X-UUID: bc8897b2a22f41efb805b7ea54e38a29-20190527
-X-UUID: bc8897b2a22f41efb805b7ea54e38a29-20190527
-Received: from mtkmrs01.mediatek.inc [(172.21.131.159)] by mailgw02.mediatek.com
+        Mon, 27 May 2019 04:39:28 -0400
+X-UUID: bf1d95354e3543b588a19fde8c97c38b-20190527
+X-UUID: bf1d95354e3543b588a19fde8c97c38b-20190527
+Received: from mtkcas08.mediatek.inc [(172.21.101.126)] by mailgw01.mediatek.com
         (envelope-from <neal.liu@mediatek.com>)
         (mhqrelay.mediatek.com ESMTP with TLS)
-        with ESMTP id 1564028708; Mon, 27 May 2019 16:39:11 +0800
+        with ESMTP id 1882384691; Mon, 27 May 2019 16:39:09 +0800
 Received: from mtkcas07.mediatek.inc (172.21.101.84) by
  mtkmbs01n1.mediatek.inc (172.21.101.68) with Microsoft SMTP Server (TLS) id
  15.0.1395.4; Mon, 27 May 2019 16:39:08 +0800
@@ -46,9 +46,9 @@ CC:     Neal Liu <neal.liu@mediatek.com>, <linux-crypto@vger.kernel.org>,
         <linux-mediatek@lists.infradead.org>,
         lkml <linux-kernel@vger.kernel.org>, <wsd_upstream@mediatek.com>,
         Crystal Guo <Crystal.Guo@mediatek.com>
-Subject: [PATCH v2 2/3] dt-bindings: rng: update bindings for MediaTek ARMv8 SoCs
-Date:   Mon, 27 May 2019 16:38:45 +0800
-Message-ID: <1558946326-13630-3-git-send-email-neal.liu@mediatek.com>
+Subject: [PATCH v2 1/3] soc: mediatek: add SMC fid table for SIP interface
+Date:   Mon, 27 May 2019 16:38:44 +0800
+Message-ID: <1558946326-13630-2-git-send-email-neal.liu@mediatek.com>
 X-Mailer: git-send-email 1.7.9.5
 In-Reply-To: <1558946326-13630-1-git-send-email-neal.liu@mediatek.com>
 References: <1558946326-13630-1-git-send-email-neal.liu@mediatek.com>
@@ -60,42 +60,73 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Document the binding used by the MediaTek ARMv8 SoCs random
-number generator with TrustZone enabled.
+1. Add a header file to provide SIP interface to ARM Trusted
+Firmware(ATF)
+2. Add hwrng SMC fid
 
 Signed-off-by: Neal Liu <neal.liu@mediatek.com>
 ---
- Documentation/devicetree/bindings/rng/mtk-rng.txt |   13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+ include/linux/soc/mediatek/mtk_sip_svc.h |   51 ++++++++++++++++++++++++++++++
+ 1 file changed, 51 insertions(+)
+ create mode 100644 include/linux/soc/mediatek/mtk_sip_svc.h
 
-diff --git a/Documentation/devicetree/bindings/rng/mtk-rng.txt b/Documentation/devicetree/bindings/rng/mtk-rng.txt
-index 2bc89f1..1fb9b1d 100644
---- a/Documentation/devicetree/bindings/rng/mtk-rng.txt
-+++ b/Documentation/devicetree/bindings/rng/mtk-rng.txt
-@@ -3,9 +3,12 @@ found in MediaTek SoC family
- 
- Required properties:
- - compatible	    : Should be
--			"mediatek,mt7622-rng", 	"mediatek,mt7623-rng" : for MT7622
--			"mediatek,mt7629-rng",  "mediatek,mt7623-rng" : for MT7629
--			"mediatek,mt7623-rng" : for MT7623
-+			"mediatek,mt7622-rng", "mediatek,mt7623-rng" for MT7622
-+			"mediatek,mt7629-rng", "mediatek,mt7623-rng" for MT7629
-+			"mediatek,mt7623-rng" for MT7623
-+			"mediatek,mtk-sec-rng" for MediaTek ARMv8 SoCs
+diff --git a/include/linux/soc/mediatek/mtk_sip_svc.h b/include/linux/soc/mediatek/mtk_sip_svc.h
+new file mode 100644
+index 0000000..f65d403
+--- /dev/null
++++ b/include/linux/soc/mediatek/mtk_sip_svc.h
+@@ -0,0 +1,51 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Copyright (c) 2019 MediaTek Inc.
++ */
 +
-+Optional properties:
- - clocks	    : list of clock specifiers, corresponding to
- 		      entries in clock-names property;
- - clock-names	    : Should contain "rng" entries;
-@@ -19,3 +22,7 @@ rng: rng@1020f000 {
- 	clocks = <&infracfg CLK_INFRA_TRNG>;
- 	clock-names = "rng";
- };
++#ifndef _MTK_SECURE_API_H_
++#define _MTK_SECURE_API_H_
 +
-+hwrng: hwrng {
-+	compatible = "mediatek,mtk-sec-rng";
-+};
++#include <linux/kernel.h>
++
++/* Error Code */
++#define SIP_SVC_E_SUCCESS			0
++#define SIP_SVC_E_NOT_SUPPORTED			-1
++#define SIP_SVC_E_INVALID_PARAMS		-2
++#define SIP_SVC_E_INVALID_RANGE			-3
++#define SIP_SVC_E_PERMISSION_DENY		-4
++
++#ifdef CONFIG_ARM64
++#define MTK_SIP_SMC_AARCH_BIT			0x40000000
++#else
++#define MTK_SIP_SMC_AARCH_BIT			0x00000000
++#endif
++
++/*******************************************************************************
++ * Defines for Mediatek runtime services func ids
++ ******************************************************************************/
++
++/* Debug feature and ATF related SMC call */
++
++/* CPU operations related SMC call */
++
++/* SPM related SMC call */
++
++/* Low power related SMC call */
++
++/* AMMS related SMC call */
++
++/* Security related SMC call */
++/* HWRNG */
++#define MTK_SIP_KERNEL_GET_RND \
++	(0x82000206 | MTK_SIP_SMC_AARCH_BIT)
++
++/* Storage Encryption related SMC call */
++
++/* Platform related SMC call */
++
++/* Pheripheral related SMC call */
++
++/* MM related SMC call */
++
++#endif /* _MTK_SECURE_API_H_ */
 -- 
 1.7.9.5
 
