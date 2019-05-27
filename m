@@ -2,260 +2,114 @@ Return-Path: <SRS0=ER81=T3=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E90A1C04AB3
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 May 2019 14:28:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC184C04AB3
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 May 2019 14:45:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C6E6721721
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 May 2019 14:28:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AECDE2070D
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 May 2019 14:45:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CfG4ait1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726202AbfE0O2Q (ORCPT
+        id S1726165AbfE0OpW (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 27 May 2019 10:28:16 -0400
-Received: from mx2.suse.de ([195.135.220.15]:42116 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726115AbfE0O2Q (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 27 May 2019 10:28:16 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 0D33BACE5;
-        Mon, 27 May 2019 14:28:13 +0000 (UTC)
-From:   Nikolay Borisov <nborisov@suse.com>
-To:     herbert@gondor.apana.org.au
-Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org, terrelln@fb.com,
-        jthumshirn@suse.de, Nikolay Borisov <nborisov@suse.com>
-Subject: [PATCH] crypto: xxhash - Implement xxhash support
-Date:   Mon, 27 May 2019 17:28:10 +0300
-Message-Id: <20190527142810.31472-1-nborisov@suse.com>
-X-Mailer: git-send-email 2.17.1
+        Mon, 27 May 2019 10:45:22 -0400
+Received: from mail-it1-f175.google.com ([209.85.166.175]:54454 "EHLO
+        mail-it1-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726094AbfE0OpW (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 27 May 2019 10:45:22 -0400
+Received: by mail-it1-f175.google.com with SMTP id h20so27201755itk.4
+        for <linux-crypto@vger.kernel.org>; Mon, 27 May 2019 07:45:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=4hbCSQCK4ocM7KeKUEQJnR/igGMxr2D4lwXxSdDADMw=;
+        b=CfG4ait18ZloKqxdvQkVEkSLLxbX/JX5ppAPdAlMfYgYtKssYljr0y2f0njNQKU8/I
+         pUcb/ewTZcHZdBTsLoaIHvidWV4ZF6vHyJYDn/1yDyFiH1esATg2paroDERJxuxQCW0a
+         u4C4oRFUsFr4xpeLgRM619CU902dpURycS1Lwrrmun1pE2j+LfJ0TiVEwizbtyYsDwaS
+         Wgtp/3syyRGw3UOzwSANltzzsz5e89k/szjXL8k/f0SzbKkUyW8Z73gJWQJEdBVEjc+O
+         doCPdhor1fJbhtUCXQTRlxTAL8E4bC46fDCm2yVS3LMgEx7LgVYO2ei0e8zNRCOEQq22
+         msCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=4hbCSQCK4ocM7KeKUEQJnR/igGMxr2D4lwXxSdDADMw=;
+        b=Uc9tnZckQiJQh8jHiBdWA+XO/HGhi73GPYG98EprEgACErlN0gOco99jPJvKBmDPvS
+         eNY/AjXeJXd2BqNKCURwAkhYlaSZB/nOg7aWvonKXqQX0BdNJWjmwJcVGFtWqhE2rURg
+         c46qHoBCTGcgUfWXvNa0dR/4L7zPnDQlemPdAI0H4LPm9YaIISMKNWD8lwCIltMSSMbI
+         0RjpuELcX5zWPPWBKIfiJDs330E1L8J21EtBhyD4UkzCA7I+nieEHK+lMlDnZzQWI++8
+         GyIsRKGiad6mFsVTBMBRSafL44FKKGqFVPRxa3ZBwHym5SNj8QMKuCg9HZG1907cGT1+
+         8UWQ==
+X-Gm-Message-State: APjAAAXWFhH+meTNkItUJUJXLogHlyoO7t3f4F+1964igcWHMM4ZFTgq
+        SW9WG7iQjbAj1osO8qvUIz2nngWoMF2/T+UUbdExyg==
+X-Google-Smtp-Source: APXvYqyJXpAxTJ+MxBHnNSaA0MVxgd5JumBjDZECju19ewsu5Thvxeec2aImTfo9WUyHSfCud/KypT1ixD5PkHpb7H8=
+X-Received: by 2002:a24:ca84:: with SMTP id k126mr27079188itg.104.1558968321851;
+ Mon, 27 May 2019 07:45:21 -0700 (PDT)
+MIME-Version: 1.0
+References: <AM6PR09MB3523CED0B1587FCBDE4095A0D2010@AM6PR09MB3523.eurprd09.prod.outlook.com>
+ <20190523185833.GA243994@google.com> <AM6PR09MB3523749B0306103E8D2D8315D2010@AM6PR09MB3523.eurprd09.prod.outlook.com>
+ <20190523200557.GA248378@gmail.com> <AM6PR09MB3523DB255516D35B595AEA50D2010@AM6PR09MB3523.eurprd09.prod.outlook.com>
+ <20190523234853.GC248378@gmail.com> <AM6PR09MB3523CFCFE42A33621FE4ACC3D2020@AM6PR09MB3523.eurprd09.prod.outlook.com>
+ <907eb6a5-dc76-d5ee-eccf-e7bd426a0868@c-s.fr> <AM6PR09MB3523D9D6D249701D020A3D74D2020@AM6PR09MB3523.eurprd09.prod.outlook.com>
+ <CAKv+Gu_Pxv97rpt7Ju0EdtFnXqp3zoYfHtm1Q51oJSGEAZmyDA@mail.gmail.com>
+ <AM6PR09MB3523A8A4BEDDF2B59A7B9A09D2020@AM6PR09MB3523.eurprd09.prod.outlook.com>
+ <CAKv+Gu-4c-zoRfMyL8wjQWO2BWNBR=Q8o3=CjNDarNcda-DvFQ@mail.gmail.com>
+ <AM6PR09MB35235BFCE71343986251E163D21D0@AM6PR09MB3523.eurprd09.prod.outlook.com>
+ <CAKv+Gu-q2ETftN=S_biUmamxeXFe=CHMWGd=xeZT+w4Zx0Ou2w@mail.gmail.com>
+ <AM6PR09MB352398BD645902A305C680C9D21D0@AM6PR09MB3523.eurprd09.prod.outlook.com>
+ <CAKv+Gu8ScTXM2qxrG__RW6SLKZYrevjfCi_HxpSOJRH5+9Knzg@mail.gmail.com>
+ <AM6PR09MB3523090454E4FB6825797A0FD21D0@AM6PR09MB3523.eurprd09.prod.outlook.com>
+ <CAKv+Gu85qp44C9Leydz=ES+ByWYoYSWMC-Kiv2Gw403sYBGkcw@mail.gmail.com> <AM6PR09MB35236E55357F5FA41AF47146D21D0@AM6PR09MB3523.eurprd09.prod.outlook.com>
+In-Reply-To: <AM6PR09MB35236E55357F5FA41AF47146D21D0@AM6PR09MB3523.eurprd09.prod.outlook.com>
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date:   Mon, 27 May 2019 16:45:10 +0200
+Message-ID: <CAKv+Gu86f-JuU23igrxRSkWOfXhQVUO8pA0FaY=n7pxQ3r5poA@mail.gmail.com>
+Subject: Re: another testmgr question
+To:     Pascal Van Leeuwen <pvanleeuwen@insidesecure.com>
+Cc:     Christophe Leroy <christophe.leroy@c-s.fr>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-xxhash is currently implemented as a self-contained module in /lib.
-This patch enables that module to be used as part of the generic kernel
-crypto framework. It adds a simple wrapper to the 64bit version. I've
-also added a couple of simplistic test vectors to ensure I haven't
-screwed up anything doing the plumbing.
+On Mon, 27 May 2019 at 14:41, Pascal Van Leeuwen
+<pvanleeuwen@insidesecure.com> wrote:
+>
+> > And if you go that naive route, just fix everything in the driver, then
+> > you simply end up with something terribly inefficient because all those
+> > corner case checks end up in the fast path and eating up code space.
+> >
+> One thing I forgot to mention here that should especially interest you:
+> you add a lot of complexity to the *driver* that needs to verified and
+> maintained (by the kernel community?!). Some of these workarounds I had to
+> implement are really quite a convoluted mess and it's starting to take up
+> a significant portion of the driver's code base as well ... just to support
+> some fringe cases that are not even relevant to the hardware's main use
+> cases (as "we" as the "hardware vendor" see it) at all.
+>
+> Note that I actually *have* implemented all these workarounds and my
+> driver is fully passing all fuzzing tests etc. I'm just not happy with it.
+>
 
-Signed-off-by: Nikolay Borisov <nborisov@suse.com>
----
- crypto/Kconfig          |   8 +++
- crypto/Makefile         |   1 +
- crypto/testmgr.c        |   7 +++
- crypto/testmgr.h        |  26 ++++++++++
- crypto/xxhash_generic.c | 112 ++++++++++++++++++++++++++++++++++++++++
- 5 files changed, 154 insertions(+)
- create mode 100644 crypto/xxhash_generic.c
+Good, glad to hear that. I would test it myself if my MacchiatoBin
+hadn't self combusted recently (for the second time!) but there are
+some others that volunteered IIUC?
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index bbab6bf33519..c56cc450ffc0 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -665,6 +665,14 @@ config CRYPTO_CRC32_MIPS
- 	  instructions, when available.
- 
- 
-+config CRYPTO_XXHASH
-+	tristate "xxHash hash algorithm"
-+	select CRYPTO_HASH
-+	select XXHASH
-+	help
-+	  xxHash non-cryptographic hash algorithm. Extremely fast, working at
-+	  speeds close to RAM limits.
-+
- config CRYPTO_CRCT10DIF
- 	tristate "CRCT10DIF algorithm"
- 	select CRYPTO_HASH
-diff --git a/crypto/Makefile b/crypto/Makefile
-index fb5bf2a3a666..4dc6c45d026e 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -135,6 +135,7 @@ obj-$(CONFIG_CRYPTO_842) += 842.o
- obj-$(CONFIG_CRYPTO_RNG2) += rng.o
- obj-$(CONFIG_CRYPTO_ANSI_CPRNG) += ansi_cprng.o
- obj-$(CONFIG_CRYPTO_DRBG) += drbg.o
-+obj-$(CONFIG_CRYPTO_XXHASH) += xxhash_generic.o
- obj-$(CONFIG_CRYPTO_JITTERENTROPY) += jitterentropy_rng.o
- CFLAGS_jitterentropy.o = -O0
- jitterentropy_rng-y := jitterentropy.o jitterentropy-kcapi.o
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 8386038d67c7..322e906b6b6a 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -3879,6 +3879,13 @@ static const struct alg_test_desc alg_test_descs[] = {
- 		.alg = "xts512(paes)",
- 		.test = alg_test_null,
- 		.fips_allowed = 1,
-+	}, {
-+		.alg = "xxhash64",
-+		.test = alg_test_hash,
-+		.fips_allowed = 1,
-+		.suite = {
-+			.hash = __VECS(xxhash64_tv_template)
-+		}
- 	}, {
- 		.alg = "zlib-deflate",
- 		.test = alg_test_comp,
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index d18a37629f05..8e0a9385ee5d 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -33218,6 +33218,32 @@ static const struct hash_testvec crc32c_tv_template[] = {
- 	}
- };
- 
-+static const struct hash_testvec xxhash64_tv_template[] = {
-+	{
-+		.psize = 0,
-+		.digest = "\x99\xe9\xd8\x51\x37\xdb\x46\xef",
-+	},
-+	{
-+		.plaintext = "abcdefg",
-+		.psize = 7,
-+		.digest = "\x2d\x82\x02\x29\x0e\x94\x60\x18",
-+	},
-+	{
-+		.plaintext = "0123456789abcdef0123456789abcdef0123456789"
-+			     "abcdef0123456789abcdef",
-+		.psize = 64,
-+		.digest = "\x85\x2f\xfe\x60\x47\xac\xf3\x1a",
-+	},
-+	{
-+		.key = "\xd2\x02\x96\x49\x00\x00\x00\x00",
-+		.ksize = 8,
-+		.plaintext = "0123456789abcdef0123456789abcdef0123456789"
-+			     "abcdef0123456789abcdef",
-+		.psize = 64,
-+		.digest = "\xab\xea\xc2\x48\x1a\x80\x4e\x7b",
-+	},
-+};
-+
- static const struct comp_testvec lz4_comp_tv_template[] = {
- 	{
- 		.inlen	= 255,
-diff --git a/crypto/xxhash_generic.c b/crypto/xxhash_generic.c
-new file mode 100644
-index 000000000000..aedaabe55d45
---- /dev/null
-+++ b/crypto/xxhash_generic.c
-@@ -0,0 +1,112 @@
-+#include <crypto/internal/hash.h>
-+#include <linux/init.h>
-+#include <linux/module.h>
-+#include <linux/xxhash.h>
-+
-+#define XXHASH_BLOCK_SIZE	1
-+#define XXHASH64_DIGEST_SIZE	8
-+
-+struct xxhash64_crypto_ctx {
-+	u64 seed;
-+};
-+
-+struct xxhash64_desc_ctx {
-+	struct xxh64_state xxhstate;
-+	u64 seed;
-+};
-+
-+static int xxhash64_init(struct shash_desc *desc)
-+{
-+	struct xxhash64_crypto_ctx *cctx = crypto_shash_ctx(desc->tfm);
-+	struct xxhash64_desc_ctx *dctx = shash_desc_ctx(desc);
-+
-+	dctx->seed = cctx->seed;
-+	xxh64_reset(&dctx->xxhstate, dctx->seed);
-+
-+	return 0;
-+}
-+
-+static int xxhash64_setkey(struct crypto_shash *tfm, const u8 *key,
-+			 unsigned int keylen)
-+{
-+	struct xxhash64_crypto_ctx *ctx = crypto_shash_ctx(tfm);
-+
-+	if (keylen != sizeof(ctx->seed)) {
-+		crypto_shash_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
-+		return -EINVAL;
-+	}
-+	ctx->seed = *(u64 *)key;
-+	return 0;
-+}
-+
-+static int xxhash64_update(struct shash_desc *desc, const u8 *data,
-+			 unsigned int length)
-+{
-+	struct xxhash64_desc_ctx *ctx = shash_desc_ctx(desc);
-+
-+	xxh64_update(&ctx->xxhstate, data, length);
-+
-+	return 0;
-+}
-+
-+static int xxhash64_final(struct shash_desc *desc, u8 *out)
-+{
-+	struct xxhash64_desc_ctx *ctx = shash_desc_ctx(desc);
-+
-+	*(u64 *)out = xxh64_digest(&ctx->xxhstate);
-+
-+	return 0;
-+}
-+
-+static int xxhash64_finup(struct shash_desc *desc, const u8 *data,
-+			unsigned int len, u8 *out)
-+{
-+	xxhash64_update(desc, data, len);
-+	xxhash64_final(desc, out);
-+
-+	return 0;
-+}
-+
-+static int xxhash64_digest(struct shash_desc *desc, const u8 *data,
-+			 unsigned int length, u8 *out)
-+{
-+	return xxhash64_finup(desc, data, length, out);
-+}
-+
-+static struct shash_alg alg = {
-+	.digestsize		=	XXHASH64_DIGEST_SIZE,
-+	.setkey			= xxhash64_setkey,
-+	.init		=	xxhash64_init,
-+	.update		=	xxhash64_update,
-+	.final		=	xxhash64_final,
-+	.finup		=	xxhash64_finup,
-+	.digest		=	xxhash64_digest,
-+	.descsize		=	sizeof(struct xxhash64_desc_ctx),
-+	.base			=	{
-+		.cra_name		=	"xxhash64",
-+		.cra_driver_name	=	"xxhash64-generic",
-+		.cra_priority		=	100,
-+		.cra_flags		=	CRYPTO_ALG_OPTIONAL_KEY,
-+		.cra_blocksize		=	XXHASH_BLOCK_SIZE,
-+		.cra_ctxsize		=	sizeof(struct xxhash64_crypto_ctx),
-+		.cra_module		=	THIS_MODULE,
-+	}
-+};
-+
-+static int __init xxhash_mod_init(void)
-+{
-+	return crypto_register_shash(&alg);
-+}
-+
-+static void __exit xxhash_mod_fini(void)
-+{
-+	crypto_unregister_shash(&alg);
-+}
-+
-+module_init(xxhash_mod_init);
-+module_exit(xxhash_mod_fini);
-+
-+MODULE_AUTHOR("Nikolay Borisov <nborisov@suse.com>");
-+MODULE_DESCRIPTION("xxhash  calculations wrapper for lib/xxhash.c");
-+MODULE_LICENSE("GPL");
-+MODULE_ALIAS_CRYPTO("xxhash-generic");
--- 
-2.17.1
+I think nobody is happy that we are adding code like that to the
+kernel, but it seems we will have to agree to disagree on the
+alternatives, since teaching the upper layers about zero length inputs
+being special cases is simply not acceptable (and it would result in
+those workarounds to be added to generic code where it would be
+affecting everyone instead of only the users of your IP)
 
+But I fully understand that dealing with this case in hardware is not
+feasible either, and so this approach is what we will have to live
+with.
