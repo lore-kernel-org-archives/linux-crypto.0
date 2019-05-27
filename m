@@ -1,144 +1,103 @@
-Return-Path: <SRS0=62CE=TZ=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=ER81=T3=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1463C282CE
-	for <linux-crypto@archiver.kernel.org>; Sat, 25 May 2019 07:04:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9888C07542
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 May 2019 07:56:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BB9D52175B
-	for <linux-crypto@archiver.kernel.org>; Sat, 25 May 2019 07:04:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A8A182070D
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 May 2019 07:56:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N/pznNj/"
+	dkim=pass (1024-bit key) header.d=insidesecure.onmicrosoft.com header.i=@insidesecure.onmicrosoft.com header.b="bA0QJJ9z"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726712AbfEYHEI (ORCPT
+        id S1725943AbfE0H4f (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 25 May 2019 03:04:08 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:36021 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726145AbfEYHEH (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 25 May 2019 03:04:07 -0400
-Received: by mail-wm1-f66.google.com with SMTP id v22so3885210wml.1;
-        Sat, 25 May 2019 00:04:06 -0700 (PDT)
+        Mon, 27 May 2019 03:56:35 -0400
+Received: from mail-eopbgr30125.outbound.protection.outlook.com ([40.107.3.125]:17467
+        "EHLO EUR03-AM5-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725940AbfE0H4f (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 27 May 2019 03:56:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=kWX+OUUqcyi03f+v1lZPgwPHwQ/bqqsdh7duztuN6mA=;
-        b=N/pznNj/05VqqqSIBQYaQQOixwKnGQQOGi0anJ2tE2CXrTRFZwTd3nkzJiRy13Fq/Z
-         lEw3+SW0m+XL+mrvKRZVdRmbfvbYMdm+5iutJfrbM0JJaAIAes/Bw74oA2qBjV/L7dYn
-         yAjSANJ+kQLGMDaVUWyYl87gV02JGgLMc8Os9UGpTYo6v92rly8mmmyDssp+aigRIGoa
-         fIznu1lL4a+IbMv+rYjJ9fNnMlXQmThU8NhIbzzjaFgiQrSTG2o+RXVzjLDicZ7MA3/9
-         kSlIRkhh4dGpB4CV+1knGkgqN5/yQCwK1PUYYzsYHjIOZnbFt16EbJ4Jq/ec4YXkLwKo
-         l4GA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=kWX+OUUqcyi03f+v1lZPgwPHwQ/bqqsdh7duztuN6mA=;
-        b=Xdf8CQMQ351b9V2uR0zflk5o26XrzJ7S7T4ttOkqmcSR81U0wk8nlCCdN5YH02nnWn
-         v4PIToQD3DAvBvcubOwfM8vQ/fdWjFzzeNORwhN+fp3nNPE9O3vr0VFTdOK3UNsy6ECk
-         1kPhB4JDmGehgL1k+0izjZX7/JLt3S3NGDLwBq69AnA7f+RgjUb0d9umEn4g6nzu9u+A
-         YYhFeMR/vPNE4AyX/yGKXdJ5DkKjcUelJT4ZcsMij1FqZCRpbS5ehaGOCiPHdp78gs3o
-         NP0CcQxA6lWKFRXM9cv8kfYFQ4MzMrrElZt5k0wC75gALV2/5FgYrxApi5AKK63S7V1C
-         PG5Q==
-X-Gm-Message-State: APjAAAUE4pfbufTwTDbkY3nTDKSBsyTdbX2DVopZPtOCP9EtVZl9QHba
-        Ph+OqW+CcgGtZjA8ZX+Ehlw=
-X-Google-Smtp-Source: APXvYqwG4rbkCjL3f62lCmqSBdQlhxHZg2VnvoSqRe53Xd9AUZisyLgi2roYlnWpx/Ufo4ntnVT9mQ==
-X-Received: by 2002:a1c:9602:: with SMTP id y2mr10738166wmd.115.1558767845384;
-        Sat, 25 May 2019 00:04:05 -0700 (PDT)
-Received: from [192.168.8.100] (89-24-56-202.nat.epc.tmcz.cz. [89.24.56.202])
-        by smtp.gmail.com with ESMTPSA id h6sm4131631wrm.47.2019.05.25.00.04.03
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 25 May 2019 00:04:04 -0700 (PDT)
-Subject: Re: [PATCH] crypto: af_alg - implement keyring support
-To:     Eric Biggers <ebiggers@kernel.org>,
-        Ondrej Mosnacek <omosnace@redhat.com>
-Cc:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        keyrings@vger.kernel.org, David Howells <dhowells@redhat.com>,
-        Stephan Mueller <smueller@chronox.de>,
-        Milan Broz <gmazyland@gmail.com>,
-        Ondrej Kozina <okozina@redhat.com>,
-        Daniel Zatovic <dzatovic@redhat.com>
-References: <20190521100034.9651-1-omosnace@redhat.com>
- <20190525031028.GA18491@sol.localdomain>
-From:   Milan Broz <gmazyland@gmail.com>
-Openpgp: preference=signencrypt
-Message-ID: <217993a6-529a-804a-3212-588fb1ccd8e0@gmail.com>
-Date:   Sat, 25 May 2019 09:04:02 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <20190525031028.GA18491@sol.localdomain>
-Content-Type: text/plain; charset=utf-8
+ d=insidesecure.onmicrosoft.com; s=selector1-insidesecure-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=eIweVhRbkV2xHkrz57pzC3pHL8zWdf29j9Twp4LoCZc=;
+ b=bA0QJJ9zQteP4pVL0md9szIDOvBdbxBPUqGcHJoapnG5GEMulJSq0uE4Ni8QKfRQ8xD5VnZ+beBVsdpcLOX+8Q2RrchV9FVkagRzdcvOM5Q00uCPHPyEBQBC9xwzOT0Mh0SE51j/M8SucYhDZ3UQCFXTtE3I8xz+4hYOfbAAf7I=
+Received: from AM6PR09MB3523.eurprd09.prod.outlook.com (10.255.99.206) by
+ AM6PR09MB2503.eurprd09.prod.outlook.com (20.177.115.80) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1922.22; Mon, 27 May 2019 07:56:30 +0000
+Received: from AM6PR09MB3523.eurprd09.prod.outlook.com
+ ([fe80::8c11:e692:3a44:a3a9]) by AM6PR09MB3523.eurprd09.prod.outlook.com
+ ([fe80::8c11:e692:3a44:a3a9%6]) with mapi id 15.20.1922.021; Mon, 27 May 2019
+ 07:56:30 +0000
+From:   Pascal Van Leeuwen <pvanleeuwen@insidesecure.com>
+To:     "antoine.tenart@bootlin.com" <antoine.tenart@bootlin.com>,
+        Riku Voipio <riku.voipio@linaro.org>
+CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Subject: inside secure driver update
+Thread-Topic: inside secure driver update
+Thread-Index: AdUUYKB8aXCt+peVQbyXh2fG0AcXnw==
+Date:   Mon, 27 May 2019 07:56:30 +0000
+Message-ID: <AM6PR09MB35239325EAB9CF6CF1692142D21D0@AM6PR09MB3523.eurprd09.prod.outlook.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=pvanleeuwen@insidesecure.com; 
+x-originating-ip: [188.204.2.113]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: f8069ee3-e584-4ece-e33d-08d6e278d482
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(5600148)(711020)(4605104)(1401327)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);SRVR:AM6PR09MB2503;
+x-ms-traffictypediagnostic: AM6PR09MB2503:
+x-ms-exchange-purlcount: 2
+x-microsoft-antispam-prvs: <AM6PR09MB2503D19E203E0CC3D6B49576D21D0@AM6PR09MB2503.eurprd09.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:7219;
+x-forefront-prvs: 0050CEFE70
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(396003)(366004)(376002)(39840400004)(136003)(346002)(189003)(199004)(2906002)(15974865002)(26005)(316002)(3480700005)(52536014)(66066001)(64756008)(66446008)(66476007)(476003)(6116002)(186003)(3846002)(486006)(256004)(66556008)(2501003)(86362001)(71200400001)(71190400001)(66946007)(73956011)(76116006)(7736002)(305945005)(25786009)(4744005)(5660300002)(14454004)(15650500001)(99286004)(33656002)(966005)(8936002)(478600001)(4326008)(55016002)(81166006)(53936002)(9686003)(6306002)(8676002)(68736007)(81156014)(110136005)(7696005)(102836004)(6506007)(6436002)(74316002)(158833001)(18886075002);DIR:OUT;SFP:1102;SCL:1;SRVR:AM6PR09MB2503;H:AM6PR09MB3523.eurprd09.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: insidesecure.com does not
+ designate permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: GXEC0O8TN6kbDSqpf5XJ6pmJLIGQCCQBhIb7QFTYiCZbwNqw09057zfATbfGezMYS/qsIFehC+gCqNOGnM3ALtt3ilcHOOvpCfjGTM6RhBfT7++paLE/y9qJitxTtZZ1nXEf1POB1ICC1FyhOoEzzi+O0zFrQBnzhDp62AC0LfLx8OjH48VFdXS5rdeOGlhS/fsHqtJscslCKN06P7NSqeYanNhdU/q1Bkk+ejHIhv1L1l6J3nBQPE/95jdXIKypp9mEZ+Fmz5D5O3ci3jtqenZme/AnYXsPjlmO7q1QHWrBKXlqrQoxPRMMEcxyiJyaxBYUbeIffak0LFjMS6JjSpk2WJznvbcDmrgwEokaa13R5s8cuP9vErcOUVXKveWnO2PEXZepWlc2lkH5P/u3YdRm1amwp3zYaQYbeD50em8=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: insidesecure.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f8069ee3-e584-4ece-e33d-08d6e278d482
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 May 2019 07:56:30.7325
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3c07df58-7760-4e85-afd5-84803eac70ce
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: pvanleeuwen@insidesecure.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR09MB2503
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 25/05/2019 05:10, Eric Biggers wrote:
-> On Tue, May 21, 2019 at 12:00:34PM +0200, Ondrej Mosnacek wrote:
->> This patch adds new socket options to AF_ALG that allow setting key from
->> kernel keyring. For simplicity, each keyring key type (logon, user,
->> trusted, encrypted) has its own socket option name and the value is just
->> the key description string that identifies the key to be used. The key
->> description doesn't need to be NULL-terminated, but bytes after the
->> first zero byte are ignored.
->>
->> Note that this patch also adds three socket option names that are
->> already defined and used in libkcapi [1], but have never been added to
->> the kernel...
->>
->> Tested via libkcapi with keyring patches [2] applied (user and logon key
->> types only).
->>
->> [1] https://github.com/smuellerDD/libkcapi
->> [2] https://github.com/WOnder93/libkcapi/compare/f283458...1fb501c
->>
->> Signed-off-by: Ondrej Mosnacek <omosnace@redhat.com>
-> 
-> The "interesting" thing about this is that given a key to which you have only
-> Search permission, you can request plaintext-ciphertext pairs with it using any
-> algorithm from the kernel's crypto API.  So if there are any really broken
-> algorithms and they happen to take the correct length key, you can effectively
-> read the key.  That's true even if you don't have Read permission on the key
-> and/or the key is of the "logon" type which doesn't have a ->read() method.
+Antoine, Riku,
 
-Yes, also if non-root user has access to some key in keyring, he can effectively
-use it from another context (for example simulate dmcrypt and decrypt an image
-of another user). But this is about policy of storing keys in keyrings.
+This is just to inform you that I made some updates to the Inside Secure dr=
+iver
+to fix some issues with the testmgr fuzzing tests:
+- ivsize for ECB (3)DES set to 0, not blocksize
+- return -EINVAL instead of -EIO for blocksize violations
+- fixed zero payload cipher hang case
+- fixed zero length HMAC hang case, now returns correct value
 
-> Since this is already also true for dm-crypt and maybe some other features in
-> the kernel, and there will be a new API for fscrypt that doesn't rely on "logon"
-> keys with Search access thus avoiding this problem and many others
-> (https://patchwork.kernel.org/cover/10951999/), I don't really care much whether
-> this patch is applied.  But I wonder whether this is something you've actually
-> considered, and what security properties you think you are achieving by using
-> the Linux keyrings.
+These changes can be obtained from the usual GitHub branch:
+https://github.com/pvanleeuwen/linux.git, branch "is_driver_armada_fix".
 
-We use what kernel provides now. If there is a better way, we can switch to it.
+I can also provide patch files, if you prefer that, just let me know.
 
-The reason for using keyring for dmcrypt was to avoid sending key in plain
-in every device-mapper ioctl structure. We use process keyring here, so
-the key in keyring actually disappears after the setup utility finished its job.
+Regards,
 
-The patch for crypto API is needed mainly for the "trusted" key type, that we
-would like to support in dmcrypt as well. For integration in LUKS we need
-to somehow validate that the key for particular dm-crypt device is valid.
-If we cannot calculate a key digest directly (as LUKS does), we need to provide
-some operation with the key from userspace (like HMAC) and compare known output.
-
-This was the main reason for this patch. But I can imagine a lot of other
-use cases where key in keyring actually simplifies things.
-
-Milan
+Pascal van Leeuwen
+Silicon IP Architect, Multi-Protocol Engines @ Inside Secure
+www.insidesecure.com
