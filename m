@@ -6,84 +6,142 @@ X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CCFCC04AB6
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 May 2019 16:48:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96B34C072B1
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 May 2019 16:50:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7C5D021734
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 May 2019 16:48:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 79BEC216FD
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 May 2019 16:50:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726841AbfE1QsN convert rfc822-to-8bit (ORCPT
+        id S1726576AbfE1QuC (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 28 May 2019 12:48:13 -0400
-Received: from pegase1.c-s.fr ([93.17.236.30]:56506 "EHLO pegase1.c-s.fr"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726371AbfE1QsN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 28 May 2019 12:48:13 -0400
-Received: from localhost (mailhub1-int [192.168.12.234])
-        by localhost (Postfix) with ESMTP id 45D0CG3N1Kz9tyRP;
-        Tue, 28 May 2019 18:48:10 +0200 (CEST)
-X-Virus-Scanned: Debian amavisd-new at c-s.fr
-Received: from pegase1.c-s.fr ([192.168.12.234])
-        by localhost (pegase1.c-s.fr [192.168.12.234]) (amavisd-new, port 10024)
-        with ESMTP id 667rjOW_1YQx; Tue, 28 May 2019 18:48:10 +0200 (CEST)
-Received: from vm-hermes.si.c-s.fr (vm-hermes.si.c-s.fr [192.168.25.253])
-        by pegase1.c-s.fr (Postfix) with ESMTP id 45D0CG2Q0Zz9tyRN;
-        Tue, 28 May 2019 18:48:10 +0200 (CEST)
-Received: by vm-hermes.si.c-s.fr (Postfix, from userid 33)
-        id 1E81174B; Tue, 28 May 2019 18:48:10 +0200 (CEST)
-Received: from 37-170-84-163.coucou-networks.fr
- (37-170-84-163.coucou-networks.fr [37.170.84.163]) by messagerie.si.c-s.fr
- (Horde Framework) with HTTP; Tue, 28 May 2019 18:48:10 +0200
-Date:   Tue, 28 May 2019 18:48:10 +0200
-Message-ID: <20190528184810.Horde.kzboSxOzA1nukNNnhCIE7g1@messagerie.si.c-s.fr>
-From:   Christophe Leroy <christophe.leroy@c-s.fr>
-To:     Horia Geanta <horia.geanta@nxp.com>
-Cc:     linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v1 00/15] Fixing selftests failure on Talitos driver
-References: <cover.1558445259.git.christophe.leroy@c-s.fr>
- <VI1PR0402MB34850975FDD8F5F1CE366A9C981E0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-In-Reply-To: <VI1PR0402MB34850975FDD8F5F1CE366A9C981E0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-User-Agent: Internet Messaging Program (IMP) H5 (6.2.3)
-Content-Type: text/plain; charset=UTF-8; format=flowed; DelSp=Yes
+        Tue, 28 May 2019 12:50:02 -0400
+Received: from mx2.suse.de ([195.135.220.15]:36098 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726515AbfE1QuB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 28 May 2019 12:50:01 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id C943FAEFE;
+        Tue, 28 May 2019 16:49:59 +0000 (UTC)
+Subject: Re: [PATCH v2] crypto: xxhash - Implement xxhash support
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, terrelln@fb.com, jthumshirn@suse.de
+References: <20190528121451.5954-1-nborisov@suse.com>
+ <20190528152248.GB739@sol.localdomain>
+From:   Nikolay Borisov <nborisov@suse.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=nborisov@suse.com; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <e7f5ac70-ff22-4471-2682-52c8cd246bf0@suse.com>
+Date:   Tue, 28 May 2019 19:49:58 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Disposition: inline
-Content-Transfer-Encoding: 8BIT
+In-Reply-To: <20190528152248.GB739@sol.localdomain>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Horia Geanta <horia.geanta@nxp.com> a écrit :
 
-> On 5/21/2019 4:34 PM, Christophe Leroy wrote:
->> Several test failures have popped up following recent changes to crypto
->> selftests.
+
+On 28.05.19 г. 18:22 ч., Eric Biggers wrote:
+> On Tue, May 28, 2019 at 03:14:51PM +0300, Nikolay Borisov wrote:
+>> xxhash is currently implemented as a self-contained module in /lib.
+>> This patch enables that module to be used as part of the generic kernel
+>> crypto framework. It adds a simple wrapper to the 64bit version.
 >>
->> This series fixes (most of) them.
->>
->> The last three patches are trivial cleanups.
->>
-> Thanks Christophe.
->
-> For the series:
-> Reviewed-by: Horia Geantă <horia.geanta@nxp.com>
->
-> Have you validated the changes also on SEC 2.x+?
-> Asking since IIRC you mentioned having only HW with SEC 1 and  
-> changes in patch
-> "crypto: talitos - fix AEAD processing." look quite complex.
+> 
+> Thanks, this looks a lot better.  A couple minor comments below.
+> 
+>> +static int xxhash64_init(struct shash_desc *desc)
+>> +{
+>> +	struct xxhash64_tfm_ctx *tctx = crypto_shash_ctx(desc->tfm);
+>> +	struct xxhash64_desc_ctx *dctx = shash_desc_ctx(desc);
+>> +
+>> +	xxh64_reset(&dctx->xxhstate, tctx->seed);
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +static int xxhash64_setkey(struct crypto_shash *tfm, const u8 *key,
+>> +			 unsigned int keylen)
+>> +{
+>> +	struct xxhash64_tfm_ctx *tctx = crypto_shash_ctx(tfm);
+>> +
+>> +	if (keylen != sizeof(tctx->seed)) {
+>> +		crypto_shash_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
+>> +		return -EINVAL;
+>> +	}
+>> +	tctx->seed = get_unaligned_le64(key);
+>> +	return 0;
+>> +}
+> 
+> Can you please move xxhash64_setkey() to before xxhash64_init() to match the
+> order in which the functions get called?
+> 
+> Sometimes people get confused and think that crypto_shash_init() comes before
+> crypto_shash_setkey(), so it's helpful to keep definitions in order.
+> 
+>> +module_init(xxhash_mod_init);
+> 
+> Can you change this to subsys_initcall?  We're using subsys_initcall for the
+> generic implementations of crypto algorithms now, so that when other
+> implementations (e.g. assembly language implementations) are added, the crypto
+> self-tests can compare them to the generic implementations.
 
-When I ported the driver to SEC1 some years ago I only had a SEC 1.2  
-(mpc885) but I now have also a board with a mpc8321E which embeds a  
-SEC 2.2 so I also tested the changes on it.
+Will fix those but wanted to ask you whether it's really necessary to
+use get_unaligned in setkey given generic code guarantees the buffer is
+going to be aligned. E.g. wouldn't cpu_to_le64(*(u64 *)key)) be
+"cheaper"? In any case this is a minor point but just want to be sure I
+have correctly understood the generic code?
 
-Christophe
-
->
+> 
 > Thanks,
-> Horia
-
-
+> 
+> - Eric
+> 
