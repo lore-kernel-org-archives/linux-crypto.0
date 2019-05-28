@@ -2,110 +2,175 @@ Return-Path: <SRS0=c5Ty=T4=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F1DFC04AB6
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 May 2019 18:51:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94CB2C072B1
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 May 2019 19:03:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 303EA20B7C
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 May 2019 18:51:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=insidesecure.onmicrosoft.com header.i=@insidesecure.onmicrosoft.com header.b="JHhsVkRg"
+	by mail.kernel.org (Postfix) with ESMTP id 7C2A620717
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 May 2019 19:03:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726845AbfE1SvK (ORCPT
+        id S1726610AbfE1TDc (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 28 May 2019 14:51:10 -0400
-Received: from mail-eopbgr150112.outbound.protection.outlook.com ([40.107.15.112]:41811
-        "EHLO EUR01-DB5-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726481AbfE1SvK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 28 May 2019 14:51:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=insidesecure.onmicrosoft.com; s=selector1-insidesecure-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RPRs8qrVbIxPkBpOkxDhzp7ka49Ka5X1CxgSptVFus0=;
- b=JHhsVkRgtvel3fnWWOOeDoMRd0bJA436wg89fBUUn5J8Rz+I157torHPw0B7VUqOFJYh8LhJrzMVAycAFW1UC3OvNi7f1aHpOhC2w32UCaxAty9qGpEEZ0eZn3jnhFXHjHGlimGROwK7GmxVV75w8O5S5Lp6yqhVF3HMzUf+/vM=
-Received: from AM6PR09MB3523.eurprd09.prod.outlook.com (10.255.99.206) by
- AM6PR09MB2247.eurprd09.prod.outlook.com (20.177.113.76) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1922.16; Tue, 28 May 2019 18:51:07 +0000
-Received: from AM6PR09MB3523.eurprd09.prod.outlook.com
- ([fe80::8c11:e692:3a44:a3a9]) by AM6PR09MB3523.eurprd09.prod.outlook.com
- ([fe80::8c11:e692:3a44:a3a9%6]) with mapi id 15.20.1922.021; Tue, 28 May 2019
- 18:51:07 +0000
-From:   Pascal Van Leeuwen <pvanleeuwen@insidesecure.com>
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Subject: RE: Conding style question regarding configuration
-Thread-Topic: Conding style question regarding configuration
-Thread-Index: AdUVadXkEfSYWnL2TvyyCw6EdJwBbwAA23iAAAYjRWA=
-Date:   Tue, 28 May 2019 18:51:07 +0000
-Message-ID: <AM6PR09MB3523B77DE66DD5353F08A687D21E0@AM6PR09MB3523.eurprd09.prod.outlook.com>
-References: <AM6PR09MB3523ADF4617CB97D59904616D21E0@AM6PR09MB3523.eurprd09.prod.outlook.com>
- <CAKv+Gu8bReGWAUm4GrCg7kefVR7U0Z8XBt_GVV4WEvgOpCtjpA@mail.gmail.com>
-In-Reply-To: <CAKv+Gu8bReGWAUm4GrCg7kefVR7U0Z8XBt_GVV4WEvgOpCtjpA@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=pvanleeuwen@insidesecure.com; 
-x-originating-ip: [188.204.2.113]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: ddfaceb8-52cc-4aff-852e-08d6e39d7183
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(5600148)(711020)(4605104)(1401327)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);SRVR:AM6PR09MB2247;
-x-ms-traffictypediagnostic: AM6PR09MB2247:
-x-ms-exchange-purlcount: 1
-x-microsoft-antispam-prvs: <AM6PR09MB22479330086D1DE54CEA5DD6D21E0@AM6PR09MB2247.eurprd09.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8273;
-x-forefront-prvs: 00514A2FE6
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(136003)(346002)(376002)(39850400004)(366004)(396003)(189003)(199004)(25786009)(33656002)(99286004)(5660300002)(66556008)(53936002)(76116006)(6246003)(73956011)(14444005)(66946007)(52536014)(66476007)(64756008)(66446008)(26005)(256004)(186003)(86362001)(102836004)(76176011)(11346002)(6506007)(446003)(7696005)(486006)(476003)(6436002)(2906002)(229853002)(14454004)(68736007)(305945005)(6916009)(66066001)(81156014)(8676002)(7736002)(6116002)(478600001)(74316002)(71190400001)(71200400001)(3846002)(15974865002)(4326008)(316002)(9686003)(55016002)(8936002)(81166006)(21314003)(18886075002);DIR:OUT;SFP:1102;SCL:1;SRVR:AM6PR09MB2247;H:AM6PR09MB3523.eurprd09.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: insidesecure.com does not
- designate permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: 2TZXEUgKP5LCCl8iCtCgJ6CsDgvMWVaC9BB20cA1/D9tppBXzxn/QXJVIq8B50wNbCycjAac+2MEM+3Qq5BozFn1zAgr856pMvkVeNjL1AD/pdDaoHQ0oDrtjsJNdornPnTwqttmFKFVV+t/EXw+J+exEeeEzsTiZpKtHgsd+KEB+dWGw3RfDBUvLie1m8fjCoKelnRPJxTntYjyairxMJTC7xyDEUY2ySi342gDpuz9t7nirLPisY7eIhdz1bkvfWWOpxAD/y2/HOkr9vXvS0gDCGVGkTjhdwoo+whb4lPypkzRy6P6f8SckyolFRxMpgbK+6spPAEKCYlbAbIjC9mm2KU1wsimj44D02G3dfEb+q/IhtKa5xNbQT7SZyGKZH5RRxPqx83MBrNJwJn5s+YS/ekNfbftNJYXQjrvHts=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        Tue, 28 May 2019 15:03:32 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:57246 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726515AbfE1TDc (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 28 May 2019 15:03:32 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4SJ2vXC143564
+        for <linux-crypto@vger.kernel.org>; Tue, 28 May 2019 15:03:30 -0400
+Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2ss8r55u3y-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <linux-crypto@vger.kernel.org>; Tue, 28 May 2019 15:03:30 -0400
+Received: from localhost
+        by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-crypto@vger.kernel.org> from <bauerman@linux.ibm.com>;
+        Tue, 28 May 2019 20:03:30 +0100
+Received: from b01cxnp22033.gho.pok.ibm.com (9.57.198.23)
+        by e13.ny.us.ibm.com (146.89.104.200) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Tue, 28 May 2019 20:03:25 +0100
+Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
+        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4SJ3OtQ34996472
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 28 May 2019 19:03:24 GMT
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1F409AC059;
+        Tue, 28 May 2019 19:03:24 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8FD62AC064;
+        Tue, 28 May 2019 19:03:20 +0000 (GMT)
+Received: from morokweng.localdomain (unknown [9.85.218.160])
+        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTPS;
+        Tue, 28 May 2019 19:03:20 +0000 (GMT)
+References: <20190418035120.2354-1-bauerman@linux.ibm.com> <20190418035120.2354-2-bauerman@linux.ibm.com> <1557416528.10635.62.camel@linux.ibm.com>
+User-agent: mu4e 1.0; emacs 26.2
+From:   Thiago Jung Bauermann <bauerman@linux.ibm.com>
+To:     Mimi Zohar <zohar@linux.ibm.com>
+Cc:     linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Jessica Yu <jeyu@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jonathan Corbet <corbet@lwn.net>,
+        "AKASHI\, Takahiro" <takahiro.akashi@linaro.org>
+Subject: Re: [PATCH v10 01/12] MODSIGN: Export module signature definitions
+In-reply-to: <1557416528.10635.62.camel@linux.ibm.com>
+Date:   Tue, 28 May 2019 16:03:15 -0300
 MIME-Version: 1.0
-X-OriginatorOrg: insidesecure.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ddfaceb8-52cc-4aff-852e-08d6e39d7183
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 May 2019 18:51:07.2139
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3c07df58-7760-4e85-afd5-84803eac70ce
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: pvanleeuwen@insidesecure.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR09MB2247
+Content-Type: text/plain
+X-TM-AS-GCONF: 00
+x-cbid: 19052819-0064-0000-0000-000003E60CE6
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011176; HX=3.00000242; KW=3.00000007;
+ PH=3.00000004; SC=3.00000286; SDB=6.01209913; UDB=6.00635630; IPR=6.00990943;
+ MB=3.00027089; MTD=3.00000008; XFM=3.00000015; UTC=2019-05-28 19:03:29
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19052819-0065-0000-0000-00003DA623F4
+Message-Id: <875zpu766k.fsf@morokweng.localdomain>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-28_08:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1905280119
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-PiA+IFF1aWNrIHF1ZXN0aW9uIHJlZ2FyZGluZyBob3cgdG8gY29uZmlndXJlIG91dCBjb2RlIGRl
-cGVuZGluZyBvbiBhDQo+IENPTkZJR194eHgNCj4gPiBzd2l0Y2guIEFzIGZhciBhcyBJIHVuZGVy
-c3Rvb2Qgc28gZmFyLCB0aGUgcHJvcGVyIHdheSB0byBkbyB0aGlzIGlzDQo+IG5vdCBieQ0KPiA+
-IGRvaW5nIGFuICNpZmRlZiBidXQgYnkgdXNpbmcgYSByZWd1bGFyIGlmIHdpdGggSVNfRU5BQkxF
-RCBsaWtlIHNvOg0KPiA+DQo+ID4gaWYgKElTX0VOQUJMRUQoQ09ORklHX1BDSSkpIHsNCj4gPiB9
-DQo+ID4NCj4gPiBTdWNoIHRoYXQgdGhlIGNvbXBpbGVyIGNhbiBzdGlsbCBjaGVjayB0aGUgY29k
-ZSBldmVuIGlmIHRoZSBzd2l0Y2ggaXMNCj4gPiBkaXNhYmxlZC4gTm93IHRoYXQgYWxsIHdvcmtz
-IGZpbmUgYW5kIGRhbmR5IGZvciBzdGF0ZW1lbnRzIHdpdGhpbiBhDQo+ID4gZnVuY3Rpb24sIGJ1
-dCBob3cgZG8geW91IGNvbmZpZ3VyZSBvdXQsIHNheSwgZ2xvYmFsIHZhcmlhYmxlDQo+IGRlZmlu
-aXRpb25zDQo+ID4gcmVmZXJlbmNpbmcgdHlwZXMgdGhhdCBhcmUgdGllZCB0byB0aGlzIGNvbmZp
-Z3VyYXRpb24gc3dpdGNoPyBPcg0KPiBzaG91bGQNCj4gPiBJIGp1c3QgbGVhdmUgdGhlbSBpbiwg
-ZGVwZW5kaW5nIG9uIHRoZSBjb21waWxlciB0byBvcHRpbWl6ZSB0aGVtIGF3YXk/DQo+ID4NCj4g
-PiBPYnZpb3VzbHkgdGhlIGNvZGUgZGVwZW5kcyBvbiB0aG9zZSB2YXJpYWJsZXMgYWdhaW4sIHNv
-IGlmIGl0J3Mgbm90DQo+ID4gZG9uZSBjb25zaXN0ZW50bHkgdGhlIGNvbXBpbGVyIHdpbGwgY29t
-cGxhaW4gc29tZWhvdyBpZiB0aGUgc3dpdGNoIGlzDQo+IG5vdA0KPiA+IGRlZmluZWQgLi4uDQo+
-ID4NCj4gPiBBbHNvLCB3aXRoIGlmIChJU19FTkFCTEVEKCkpIEkgY2Fubm90IHJlbW92ZSBteSBm
-dW5jdGlvbiBwcm90b3R5cGVzLA0KPiA+IGp1c3QgdGhlIGZ1bmN0aW9uIGJvZHkuIElzIHRoYXQg
-cmVhbGx5IGhvdyBpdCdzIHN1cHBvc2VkIHRvIGJlIGRvbmU/DQo+ID4NCj4gDQo+IFllcy4gQ29k
-ZSBhbmQgZGF0YSB3aXRoIHN0YXRpYyBsaW5rYWdlIHdpbGwganVzdCBiZSBvcHRpbWl6ZWQgYXdh
-eSBieQ0KPiB0aGUgY29tcGlsZXIgaWYgdGhlIENPTkZJR194eCBvcHRpb24gaXMgbm90IGVuYWJs
-ZWQsIHNvIGFsbCB5b3UgbmVlZA0KPiB0byBndWFyZCBhcmUgdGhlIGFjdHVhbCBzdGF0ZW1lbnRz
-LCBmdW5jdGlvbiBjYWxscyBldGMuDQo+DQpPaywgbWFrZXMgc2Vuc2UuIFRoZW4gSSdsbCBqdXN0
-IGNvbmZpZyBvdXQgdGhlIHJlbGV2YW50IGZ1bmN0aW9uIGJvZGllcw0KYW5kIGFzc3VtZSB0aGUg
-Y29tcGlsZXIgd2lsbCBkbyB0aGUgcmVzdCAuLi4NCg0KVGhhbmtzLA0KUGFzY2FsIHZhbiBMZWV1
-d2VuDQpTaWxpY29uIElQIEFyY2hpdGVjdCwgTXVsdGktUHJvdG9jb2wgRW5naW5lcyBAIEluc2lk
-ZSBTZWN1cmUNCnd3dy5pbnNpZGVzZWN1cmUuY29tDQoNCg0KDQo=
+
+Mimi Zohar <zohar@linux.ibm.com> writes:
+
+> On Thu, 2019-04-18 at 00:51 -0300, Thiago Jung Bauermann wrote:
+>> IMA will use the module_signature format for append signatures, so export
+>> the relevant definitions and factor out the code which verifies that the
+>> appended signature trailer is valid.
+>> 
+>> Also, create a CONFIG_MODULE_SIG_FORMAT option so that IMA can select it
+>> and be able to use mod_check_sig() without having to depend on either
+>> CONFIG_MODULE_SIG or CONFIG_MODULES.
+>> 
+>> Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+>> Cc: Jessica Yu <jeyu@kernel.org>
+>
+> Just a couple minor questions/comments below.
+>
+> Reviewed-by: Mimi Zohar <zohar@linux.ibm.com>
+
+Thanks for your review and your comments!
+
+>> diff --git a/init/Kconfig b/init/Kconfig
+>> index 4592bf7997c0..a71019553ee1 100644
+>> --- a/init/Kconfig
+>> +++ b/init/Kconfig
+>> @@ -1906,7 +1906,7 @@ config MODULE_SRCVERSION_ALL
+>>  config MODULE_SIG
+>>  	bool "Module signature verification"
+>>  	depends on MODULES
+>> -	select SYSTEM_DATA_VERIFICATION
+>> +	select MODULE_SIG_FORMAT
+>>  	help
+>>  	  Check modules for valid signatures upon load: the signature
+>>  	  is simply appended to the module. For more information see
+>> @@ -2036,6 +2036,10 @@ config TRIM_UNUSED_KSYMS
+>>  
+>>  endif # MODULES
+>>  
+>> +config MODULE_SIG_FORMAT
+>> +	def_bool n
+>> +	select SYSTEM_DATA_VERIFICATION
+>
+> Normally Kconfigs, in the same file, are defined before they are used.
+>  I'm not sure if that is required or just a convention.
+
+I think it's a convention, because it seemed to work in the current way.
+For the next version I moved the config MODULE_SIG_FORMAT definition to
+just before "menuconfig MODULES"
+
+>> diff --git a/kernel/module_signature.c b/kernel/module_signature.c
+>> new file mode 100644
+>> index 000000000000..6d5e59f27f55
+>> --- /dev/null
+>> +++ b/kernel/module_signature.c
+>> @@ -0,0 +1,45 @@
+>> +// SPDX-License-Identifier: GPL-2.0+
+>> +/*
+>> + * Module signature checker
+>> + *
+>> + * Copyright (C) 2012 Red Hat, Inc. All Rights Reserved.
+>> + * Written by David Howells (dhowells@redhat.com)
+>> + */
+>> +
+>> +#include <linux/errno.h>
+>> +#include <linux/printk.h>
+>> +#include <linux/module_signature.h>
+>> +#include <asm/byteorder.h>
+>> +
+>> +/**
+>> + * mod_check_sig - check that the given signature is sane
+>> + *
+>> + * @ms:		Signature to check.
+>> + * @file_len:	Size of the file to which @ms is appended.
+>
+> "name" is missing.
+
+Fixed.
+
+-- 
+Thiago Jung Bauermann
+IBM Linux Technology Center
+
