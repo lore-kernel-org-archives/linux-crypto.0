@@ -2,112 +2,143 @@ Return-Path: <SRS0=c5Ty=T4=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80CF4C072B1
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 May 2019 13:03:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82D8AC04E84
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 May 2019 14:10:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5A33D20717
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 May 2019 13:03:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ibi1V5DB"
+	by mail.kernel.org (Postfix) with ESMTP id 662A5206E0
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 May 2019 14:10:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727445AbfE1ND6 (ORCPT
+        id S1726371AbfE1OKL (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 28 May 2019 09:03:58 -0400
-Received: from mail-io1-f65.google.com ([209.85.166.65]:47069 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726988AbfE1ND6 (ORCPT
+        Tue, 28 May 2019 10:10:11 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:36322 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726553AbfE1OKK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 28 May 2019 09:03:58 -0400
-Received: by mail-io1-f65.google.com with SMTP id u25so83870iot.13
-        for <linux-crypto@vger.kernel.org>; Tue, 28 May 2019 06:03:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Bh/N/QZBC3xi2c5BZMAnemmNFxYJ1TErCB/6n5Xk+X8=;
-        b=ibi1V5DBVgTanDaBzc4vcpKjo+uo+gzCpXxoaw5Whec0p10xNV17ytUzJg/eNgvVD+
-         yk1exn2HIfQiZpiTpBj6Sbw+Z3H8Acrybi01M4v2THSkE+mhkqB3Sn2iPaXRqqUDMRQ4
-         GMjDH3iCH3Md1pQU7zHViowF+TQrXnOVgsSwmLCBypcxquDdXIVfDKVawDdiiu7MGjLR
-         101gfrwONUcqOjIQS8n4lZXZTzL7vrWu5g15Ak5siJtxip71JvvJowxhJ2HNEXBXmNMy
-         HBXcxiXAH7OKZqgx9F0fLEg/d7QTc2vl8+upTAqv9XtUb6wgkZE3/uGyEE51RYe1eRPj
-         8Y8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Bh/N/QZBC3xi2c5BZMAnemmNFxYJ1TErCB/6n5Xk+X8=;
-        b=IyfYHeSLazDd2RkYX4mEYALsy1IM6wKkZaY9oE1w+zFrppib2LjIclLZ5Wnzxw75QJ
-         usOANgSdok9JDFfLOGb0wapAkiovB0JqCnEaITsw9uaUTeW+Amtuz7xPvQ28q8f0dtJK
-         r0VADQqxSSK/2q36OtBkkr8AjJYaagMA7pFeCumqCow+NhEYSo2PJtOlaPCbx8LjYMK9
-         bByHuCVoxl4HtuT+V8HKTQXzjqWZ7IdnvYx506JbI/jzKSgh1Hp3i7mZLGGK5Yt5Wy8l
-         C+yoPRtSSelkN95GeY3KA2YhWjJ1qwIgPdhpOIQpIxtc1vsj6kkVJnycmOJyDfyUmfmL
-         3fLQ==
-X-Gm-Message-State: APjAAAXHB4m+wV8TB5RPRuVl+TAzm4ppTfC54LgngP+0fGbbyPAOqidF
-        tWl2bObh9V4xohIVlxVk2InWd+XYMQWQ0vlXM+mHgg==
-X-Google-Smtp-Source: APXvYqzf4TrvLUejClAo8NVy1VBfMi99WrxFDIKSZqyoOc05Ou/81VFSFQDwd6zFRZwhRu1SUnmsIi8HcbEYv9hknos=
-X-Received: by 2002:a05:6602:2109:: with SMTP id x9mr393129iox.128.1559048637409;
- Tue, 28 May 2019 06:03:57 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190528124152.191773-1-lenaptr@google.com>
-In-Reply-To: <20190528124152.191773-1-lenaptr@google.com>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Tue, 28 May 2019 15:03:44 +0200
-Message-ID: <CAKv+Gu-Bzb6bucFXgW+EgU2bh9Kp-rAJWq5TSNrk7n_rMGkx9g@mail.gmail.com>
-Subject: Re: [PATCH] arm64 sha1-ce finup: correct digest for empty data
-To:     Elena Petrova <lenaptr@google.com>
-Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>, stable <stable@vger.kernel.org>
+        Tue, 28 May 2019 10:10:10 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x4SE9qo9065762
+        for <linux-crypto@vger.kernel.org>; Tue, 28 May 2019 10:10:09 -0400
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2ss5ktjthf-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <linux-crypto@vger.kernel.org>; Tue, 28 May 2019 10:09:58 -0400
+Received: from localhost
+        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-crypto@vger.kernel.org> from <zohar@linux.ibm.com>;
+        Tue, 28 May 2019 15:09:39 +0100
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Tue, 28 May 2019 15:09:34 +0100
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x4SE9XAf34406474
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 28 May 2019 14:09:33 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 606A0AE053;
+        Tue, 28 May 2019 14:09:33 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 4FED4AE051;
+        Tue, 28 May 2019 14:09:31 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.80.109.224])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 28 May 2019 14:09:31 +0000 (GMT)
+Subject: Re: [PATCH v10 12/12] ima: Store the measurement again when
+ appraising a modsig
+From:   Mimi Zohar <zohar@linux.ibm.com>
+To:     Thiago Jung Bauermann <bauerman@linux.ibm.com>,
+        linux-integrity@vger.kernel.org
+Cc:     linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Jessica Yu <jeyu@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jonathan Corbet <corbet@lwn.net>,
+        "AKASHI, Takahiro" <takahiro.akashi@linaro.org>
+Date:   Tue, 28 May 2019 10:09:20 -0400
+In-Reply-To: <20190418035120.2354-13-bauerman@linux.ibm.com>
+References: <20190418035120.2354-1-bauerman@linux.ibm.com>
+         <20190418035120.2354-13-bauerman@linux.ibm.com>
 Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.20.5 (3.20.5-1.fc24) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19052814-4275-0000-0000-0000033962A2
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19052814-4276-0000-0000-000038490AD0
+Message-Id: <1559052560.4090.14.camel@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-05-28_06:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1905280092
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 28 May 2019 at 14:42, Elena Petrova <lenaptr@google.com> wrote:
->
-> The sha1-ce finup implementation for ARM64 produces wrong digest
-> for empty input (len=0). Expected: da39a3ee..., result: 67452301...
-> (initial value of SHA internal state). The error is in sha1_ce_finup:
-> for empty data `finalize` will be 1, so the code is relying on
-> sha1_ce_transform to make the final round. However, in
-> sha1_base_do_update, the block function will not be called when
-> len == 0.
->
-> Fix it by setting finalize to 0 if data is empty.
->
-> Fixes: 07eb54d306f4 ("crypto: arm64/sha1-ce - move SHA-1 ARMv8 implementation to base layer")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Elena Petrova <lenaptr@google.com>
+Hi Thiago,
 
-Thanks for the fix
+On Thu, 2019-04-18 at 00:51 -0300, Thiago Jung Bauermann wrote:
+> If the IMA template contains the "modsig" or "d-modsig" field, then the
+> modsig should be added to the measurement list when the file is appraised.
+> 
+> And that is what normally happens, but if a measurement rule caused a file
+> containing a modsig to be measured before a different rule causes it to be
+> appraised, the resulting measurement entry will not contain the modsig
+> because it is only fetched during appraisal. When the appraisal rule
+> triggers, it won't store a new measurement containing the modsig because
+> the file was already measured.
+> 
+> We need to detect that situation and store an additional measurement with
+> the modsig. This is done by adding an IMA_MEASURE action flag if we read a
+> modsig and the IMA template contains a modsig field.
 
-Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+With the new per policy rule "template" support being added, this
+patch needs to be modified so that the per policy "template" format is
+checked.  ima_template_has_modsig() should be called with the
+template_desc being used.
 
-It looks like the sha224/256 suffers from the same issue. Would you
-mind sending out a fix for that as well? Thanks.
+thanks,
 
-> ---
->  arch/arm64/crypto/sha1-ce-glue.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/arch/arm64/crypto/sha1-ce-glue.c b/arch/arm64/crypto/sha1-ce-glue.c
-> index eaa7a8258f1c..0652f5f07ed1 100644
-> --- a/arch/arm64/crypto/sha1-ce-glue.c
-> +++ b/arch/arm64/crypto/sha1-ce-glue.c
-> @@ -55,7 +55,7 @@ static int sha1_ce_finup(struct shash_desc *desc, const u8 *data,
->                          unsigned int len, u8 *out)
->  {
->         struct sha1_ce_state *sctx = shash_desc_ctx(desc);
-> -       bool finalize = !sctx->sst.count && !(len % SHA1_BLOCK_SIZE);
-> +       bool finalize = !sctx->sst.count && !(len % SHA1_BLOCK_SIZE) && len;
->
->         if (!crypto_simd_usable())
->                 return crypto_sha1_finup(desc, data, len, out);
-> --
-> 2.22.0.rc1.257.g3120a18244-goog
->
+Mimi
+
+
+> diff --git a/security/integrity/ima/ima_main.c b/security/integrity/ima/ima_main.c
+> index 8e6475854351..f91ed4189f98 100644
+> --- a/security/integrity/ima/ima_main.c
+> +++ b/security/integrity/ima/ima_main.c
+> @@ -282,9 +282,17 @@ static int process_measurement(struct file *file, const struct cred *cred,
+>  		/* read 'security.ima' */
+>  		xattr_len = ima_read_xattr(file_dentry(file), &xattr_value);
+>  
+> -		/* Read the appended modsig if allowed by the policy. */
+> -		if (iint->flags & IMA_MODSIG_ALLOWED)
+> -			ima_read_modsig(func, buf, size, &modsig);
+> +		/*
+> +		 * Read the appended modsig, if allowed by the policy, and allow
+> +		 * an additional measurement list entry, if needed, based on the
+> +		 * template format.
+> +		 */
+> +		if (iint->flags & IMA_MODSIG_ALLOWED) {
+> +			rc = ima_read_modsig(func, buf, size, &modsig);
+> +
+> +			if (!rc && ima_template_has_modsig())
+> +				action |= IMA_MEASURE;
+> +		}
+> 
+
