@@ -2,103 +2,147 @@ Return-Path: <SRS0=c5Ty=T4=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,T_DKIMWL_WL_HIGH,UNPARSEABLE_RELAY,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADF7AC04AB6
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 May 2019 10:58:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BB2DC04AB6
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 May 2019 10:59:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5941C2070D
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 May 2019 10:58:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D26F72070D
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 May 2019 10:59:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="lYumoZui"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="yGLBRGFH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726591AbfE1K6l (ORCPT
+        id S1726557AbfE1K7W (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 28 May 2019 06:58:41 -0400
-Received: from mail-eopbgr50060.outbound.protection.outlook.com ([40.107.5.60]:30238
-        "EHLO EUR03-VE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726305AbfE1K6l (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 28 May 2019 06:58:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=IZThu+XCpRZBM8jaMCMQA5O0s2CzjGyjWNprWfR641o=;
- b=lYumoZuinJW9odDtFTw2+rrlfQ29IVpmYkFHafTx8IfBeAe5grzBLk8IJXLECI8kS6qQeq9CXqEzbxBbJJWtmc50mWU09k/nz2Iw+6XImZI5Rp5kW+/xSgR/M4+hEf5etG2gWcTAZVit70sf93r3qUmgmsfvujgzdAdbM/VdfCc=
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
- VI1PR0402MB3661.eurprd04.prod.outlook.com (52.134.14.153) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1922.19; Tue, 28 May 2019 10:58:37 +0000
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::ccaf:f4a1:704a:e745]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::ccaf:f4a1:704a:e745%4]) with mapi id 15.20.1922.021; Tue, 28 May 2019
- 10:58:37 +0000
-From:   Horia Geanta <horia.geanta@nxp.com>
-To:     Iuliana Prodan <iuliana.prodan@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>
-CC:     "David S. Miller" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        dl-linux-imx <linux-imx@nxp.com>
-Subject: Re: [PATCH v5 1/2] crypto: caam - fix pkcs1pad(rsa-caam, sha256)
- failure because of invalid input
-Thread-Topic: [PATCH v5 1/2] crypto: caam - fix pkcs1pad(rsa-caam, sha256)
- failure because of invalid input
-Thread-Index: AQHVFTsIqleeE9MbU0ezlG/eKoEFfg==
-Date:   Tue, 28 May 2019 10:58:36 +0000
-Message-ID: <VI1PR0402MB348536AFAAE417EC5F541D74981E0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-References: <1559037131-4601-1-git-send-email-iuliana.prodan@nxp.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=horia.geanta@nxp.com; 
-x-originating-ip: [212.146.100.6]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: a240b2f9-a078-4688-4ef8-08d6e35b6f77
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:VI1PR0402MB3661;
-x-ms-traffictypediagnostic: VI1PR0402MB3661:
-x-microsoft-antispam-prvs: <VI1PR0402MB3661BE3E530E23222FDEF595981E0@VI1PR0402MB3661.eurprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:7691;
-x-forefront-prvs: 00514A2FE6
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(376002)(136003)(39860400002)(366004)(346002)(396003)(199004)(189003)(33656002)(478600001)(68736007)(6436002)(8676002)(305945005)(476003)(14454004)(52536014)(4326008)(186003)(53936002)(7736002)(74316002)(316002)(44832011)(99286004)(102836004)(3846002)(6116002)(73956011)(486006)(446003)(6246003)(7696005)(6636002)(2906002)(76116006)(4744005)(25786009)(71190400001)(71200400001)(26005)(86362001)(66556008)(66446008)(64756008)(66476007)(8936002)(66946007)(54906003)(110136005)(256004)(81166006)(76176011)(53546011)(81156014)(6506007)(5660300002)(66066001)(9686003)(229853002)(55016002)(32563001);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB3661;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: nxp.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: oEYu/mSVeN3n5rE1eqHLyQmF+LPXDWhAWynP5L64cJO+orGB1IZ/etXU9Q09k7VUz7j7T7YL1byikrs+sCBasF7nqGvVH3vJyczilYJmk+c2jwAJR0Q6M0zN0Rcd6FYrAqRB6Aum67KqsEhuF4CSBkehw/fgWUD4SYIR2H0KTALsbCbIOscJMRnMACgLz/NFTXm+dkj4zSp3+HxrJaYfFv1Yluh4FRCh/ANYJUrk21B5cwcGZnxm9tiCQJQlx5d0WlD9H9Kj5tW71NK/bYyJCMUjsEvjHVEJeRF4IPa+z/mk5npRB+KR7/h/cHLC+0xRf0ZFq3oiuBDR7VMjKwyMBWAjdFVb5odnJtD2dfZqp0Lm4i0KuH16qd5t0GNafkrhJyroLtmrRafVvpLyktSlqr2lfIO3tejVJsSY7zm1Nw0=
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
+        Tue, 28 May 2019 06:59:22 -0400
+Received: from aserp2130.oracle.com ([141.146.126.79]:58998 "EHLO
+        aserp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726305AbfE1K7V (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 28 May 2019 06:59:21 -0400
+Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
+        by aserp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4SAmnFc051794;
+        Tue, 28 May 2019 10:59:18 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : mime-version : content-type; s=corp-2018-07-02;
+ bh=Xrr8dZjVVWPnemFqGgwt1Gdv0kDCsmuTR340Iy0CgXs=;
+ b=yGLBRGFHoyPVyCjHUcnlTIeYJEzeCcz4BXC/I/r1AzBkjti+IWc+J7FAyVEg0YFBJ9vu
+ /+LkdpDWE0I/h3d+Y39dlf5/NivDaqpW3womAShH7Pfdjz0CKWF3/gVrNqdn2bNx1g74
+ RIbcVCTxHViYKzd/mqy2rkfZJl3FsAZopz/sryGILmHe287zokqIA5wSH6hgooy3Neas
+ QZyMu5+y3vpMjI4tkEhtnqVIplk65zv5x6e3/we6LVnnvqYjmFyQcTDVR8F/MqPqP0Hz
+ uM6rag6wZLbJW0Sd5yLMgt8DDObxzLYMxMI+VsGF1FRQIG47VzHBaYzbMBEgNtYkVWy8 YQ== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by aserp2130.oracle.com with ESMTP id 2spu7dae8c-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 28 May 2019 10:59:18 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x4SAu1c6058593;
+        Tue, 28 May 2019 10:57:17 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3020.oracle.com with ESMTP id 2sr31ukdp9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 28 May 2019 10:57:17 +0000
+Received: from abhmp0006.oracle.com (abhmp0006.oracle.com [141.146.116.12])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x4SAvGZq013216;
+        Tue, 28 May 2019 10:57:16 GMT
+Received: from mwanda (/41.57.98.10)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 28 May 2019 03:57:16 -0700
+Date:   Tue, 28 May 2019 13:57:10 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     tadeusz.struk@intel.com
+Cc:     qat-linux@intel.com, linux-crypto@vger.kernel.org
+Subject: [bug report] crypto: qat - Intel(R) QAT driver framework
+Message-ID: <20190528105709.GA3643@mwanda>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a240b2f9-a078-4688-4ef8-08d6e35b6f77
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 May 2019 10:58:36.9893
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: horia.geanta@nxp.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3661
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9270 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1905280072
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9270 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1905280072
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 5/28/2019 12:52 PM, Iuliana Prodan wrote:=0A=
-> The problem is with the input data size sent to CAAM for encrypt/decrypt.=
-=0A=
-> Pkcs1pad is failing due to pkcs1 padding done in SW starting with0x01=0A=
-> instead of 0x00 0x01.=0A=
-> CAAM expects an input of modulus size. For this we strip the leading=0A=
-> zeros in case the size is more than modulus or pad the input with zeros=
-=0A=
-> until the modulus size is reached.=0A=
-> =0A=
-> Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>=0A=
-Reviewed-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
-=0A=
-Thanks,=0A=
-Horia=0A=
+Hello Tadeusz Struk,
+
+The patch d8cba25d2c68: "crypto: qat - Intel(R) QAT driver framework"
+from Jun 5, 2014, leads to the following static checker warning:
+
+	drivers/crypto/qat/qat_common/adf_ctl_drv.c:159 adf_add_key_value_data()
+	warn: 'adf_cfg_add_key_value_param' unterminated user string 'key_val->key'
+
+drivers/crypto/qat/qat_common/adf_ctl_drv.c
+   151  static int adf_add_key_value_data(struct adf_accel_dev *accel_dev,
+   152                                    const char *section,
+   153                                    const struct adf_user_cfg_key_val *key_val)
+   154  {
+   155          if (key_val->type == ADF_HEX) {
+   156                  long *ptr = (long *)key_val->val;
+   157                  long val = *ptr;
+   158  
+   159                  if (adf_cfg_add_key_value_param(accel_dev, section,
+   160                                                  key_val->key, (void *)val,
+                                                        ^^^^^^^^^^^^
+Not terminated.  We end up adding the named item into a list.  Then we
+look it up but when we're looking it up, we don't ensure that those
+strings are NUL terminated either so there is a potential that it
+overflows beyond the end of the array.
+
+   161                                                  key_val->type)) {
+   162                          dev_err(&GET_DEV(accel_dev),
+   163                                  "failed to add hex keyvalue.\n");
+   164                          return -EFAULT;
+   165                  }
+   166          } else {
+   167                  if (adf_cfg_add_key_value_param(accel_dev, section,
+   168                                                  key_val->key, key_val->val,
+   169                                                  key_val->type)) {
+   170                          dev_err(&GET_DEV(accel_dev),
+   171                                  "failed to add keyvalue.\n");
+   172                          return -EFAULT;
+   173                  }
+   174          }
+   175          return 0;
+   176  }
+
+[ snip ]
+
+   203                  while (params_head) {
+   204                          if (copy_from_user(&key_val, (void __user *)params_head,
+                                                   ^^^^^^^^
+Gets set here.
+
+   205                                             sizeof(key_val))) {
+   206                                  dev_err(&GET_DEV(accel_dev),
+   207                                          "Failed to copy keyvalue.\n");
+   208                                  goto out_err;
+   209                          }
+   210                          if (adf_add_key_value_data(accel_dev, section.name,
+   211                                                     &key_val)) {
+   212                                  goto out_err;
+   213                          }
+   214                          params_head = key_val.next;
+   215                  }
+
+See also:
+drivers/crypto/qat/qat_common/adf_ctl_drv.c:159 adf_add_key_value_data() warn: 'adf_cfg_add_key_value_param' unterminated user string 'key_val->key'
+drivers/crypto/qat/qat_common/adf_ctl_drv.c:167 adf_add_key_value_data() warn: 'adf_cfg_add_key_value_param' unterminated user string 'key_val->key'
+drivers/crypto/qat/qat_common/adf_ctl_drv.c:167 adf_add_key_value_data() warn: 'adf_cfg_add_key_value_param' unterminated user string 'key_val->val'
+drivers/crypto/qat/qat_common/adf_ctl_drv.c:195 adf_copy_key_value_data() warn: 'adf_cfg_section_add' unterminated user string 'section.name'
+
+regards,
+dan carpenter
