@@ -2,262 +2,103 @@ Return-Path: <SRS0=c5Ty=T4=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F15D5C04E84
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 May 2019 09:52:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADF7AC04AB6
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 May 2019 10:58:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C9B3E204FD
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 May 2019 09:52:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5941C2070D
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 May 2019 10:58:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="lYumoZui"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726711AbfE1JwS (ORCPT
+        id S1726591AbfE1K6l (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 28 May 2019 05:52:18 -0400
-Received: from inva021.nxp.com ([92.121.34.21]:58686 "EHLO inva021.nxp.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726203AbfE1JwS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 28 May 2019 05:52:18 -0400
-Received: from inva021.nxp.com (localhost [127.0.0.1])
-        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 114BE200DED;
-        Tue, 28 May 2019 11:52:15 +0200 (CEST)
-Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
-        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 03288200123;
-        Tue, 28 May 2019 11:52:15 +0200 (CEST)
-Received: from lorenz.ea.freescale.net (lorenz.ea.freescale.net [10.171.71.5])
-        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id AC472205F4;
-        Tue, 28 May 2019 11:52:14 +0200 (CEST)
-From:   Iuliana Prodan <iuliana.prodan@nxp.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Horia Geanta <horia.geanta@nxp.com>,
+        Tue, 28 May 2019 06:58:41 -0400
+Received: from mail-eopbgr50060.outbound.protection.outlook.com ([40.107.5.60]:30238
+        "EHLO EUR03-VE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726305AbfE1K6l (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 28 May 2019 06:58:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=IZThu+XCpRZBM8jaMCMQA5O0s2CzjGyjWNprWfR641o=;
+ b=lYumoZuinJW9odDtFTw2+rrlfQ29IVpmYkFHafTx8IfBeAe5grzBLk8IJXLECI8kS6qQeq9CXqEzbxBbJJWtmc50mWU09k/nz2Iw+6XImZI5Rp5kW+/xSgR/M4+hEf5etG2gWcTAZVit70sf93r3qUmgmsfvujgzdAdbM/VdfCc=
+Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
+ VI1PR0402MB3661.eurprd04.prod.outlook.com (52.134.14.153) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1922.19; Tue, 28 May 2019 10:58:37 +0000
+Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
+ ([fe80::ccaf:f4a1:704a:e745]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
+ ([fe80::ccaf:f4a1:704a:e745%4]) with mapi id 15.20.1922.021; Tue, 28 May 2019
+ 10:58:37 +0000
+From:   Horia Geanta <horia.geanta@nxp.com>
+To:     Iuliana Prodan <iuliana.prodan@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         Aymen Sghaier <aymen.sghaier@nxp.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-imx <linux-imx@nxp.com>
-Subject: [PATCH v5 1/2] crypto: caam - fix pkcs1pad(rsa-caam, sha256) failure because of invalid input
-Date:   Tue, 28 May 2019 12:52:10 +0300
-Message-Id: <1559037131-4601-1-git-send-email-iuliana.prodan@nxp.com>
-X-Mailer: git-send-email 2.1.0
-X-Virus-Scanned: ClamAV using ClamSMTP
+CC:     "David S. Miller" <davem@davemloft.net>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        dl-linux-imx <linux-imx@nxp.com>
+Subject: Re: [PATCH v5 1/2] crypto: caam - fix pkcs1pad(rsa-caam, sha256)
+ failure because of invalid input
+Thread-Topic: [PATCH v5 1/2] crypto: caam - fix pkcs1pad(rsa-caam, sha256)
+ failure because of invalid input
+Thread-Index: AQHVFTsIqleeE9MbU0ezlG/eKoEFfg==
+Date:   Tue, 28 May 2019 10:58:36 +0000
+Message-ID: <VI1PR0402MB348536AFAAE417EC5F541D74981E0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+References: <1559037131-4601-1-git-send-email-iuliana.prodan@nxp.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=horia.geanta@nxp.com; 
+x-originating-ip: [212.146.100.6]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: a240b2f9-a078-4688-4ef8-08d6e35b6f77
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:VI1PR0402MB3661;
+x-ms-traffictypediagnostic: VI1PR0402MB3661:
+x-microsoft-antispam-prvs: <VI1PR0402MB3661BE3E530E23222FDEF595981E0@VI1PR0402MB3661.eurprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:7691;
+x-forefront-prvs: 00514A2FE6
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(376002)(136003)(39860400002)(366004)(346002)(396003)(199004)(189003)(33656002)(478600001)(68736007)(6436002)(8676002)(305945005)(476003)(14454004)(52536014)(4326008)(186003)(53936002)(7736002)(74316002)(316002)(44832011)(99286004)(102836004)(3846002)(6116002)(73956011)(486006)(446003)(6246003)(7696005)(6636002)(2906002)(76116006)(4744005)(25786009)(71190400001)(71200400001)(26005)(86362001)(66556008)(66446008)(64756008)(66476007)(8936002)(66946007)(54906003)(110136005)(256004)(81166006)(76176011)(53546011)(81156014)(6506007)(5660300002)(66066001)(9686003)(229853002)(55016002)(32563001);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB3661;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: nxp.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: oEYu/mSVeN3n5rE1eqHLyQmF+LPXDWhAWynP5L64cJO+orGB1IZ/etXU9Q09k7VUz7j7T7YL1byikrs+sCBasF7nqGvVH3vJyczilYJmk+c2jwAJR0Q6M0zN0Rcd6FYrAqRB6Aum67KqsEhuF4CSBkehw/fgWUD4SYIR2H0KTALsbCbIOscJMRnMACgLz/NFTXm+dkj4zSp3+HxrJaYfFv1Yluh4FRCh/ANYJUrk21B5cwcGZnxm9tiCQJQlx5d0WlD9H9Kj5tW71NK/bYyJCMUjsEvjHVEJeRF4IPa+z/mk5npRB+KR7/h/cHLC+0xRf0ZFq3oiuBDR7VMjKwyMBWAjdFVb5odnJtD2dfZqp0Lm4i0KuH16qd5t0GNafkrhJyroLtmrRafVvpLyktSlqr2lfIO3tejVJsSY7zm1Nw0=
+Content-Type: text/plain; charset="iso-8859-2"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a240b2f9-a078-4688-4ef8-08d6e35b6f77
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 May 2019 10:58:36.9893
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: horia.geanta@nxp.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3661
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The problem is with the input data size sent to CAAM for encrypt/decrypt.
-Pkcs1pad is failing due to pkcs1 padding done in SW starting with0x01
-instead of 0x00 0x01.
-CAAM expects an input of modulus size. For this we strip the leading
-zeros in case the size is more than modulus or pad the input with zeros
-until the modulus size is reached.
-
-Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>
----
-Changes since V4:
-	- return -ENOMEM in case zero_buffer cannot be allocated.
----
- drivers/crypto/caam/caampkc.c | 89 ++++++++++++++++++++++++++++++++++---------
- drivers/crypto/caam/caampkc.h |  2 +
- 2 files changed, 74 insertions(+), 17 deletions(-)
-
-diff --git a/drivers/crypto/caam/caampkc.c b/drivers/crypto/caam/caampkc.c
-index 34e37f9..2bd3a17 100644
---- a/drivers/crypto/caam/caampkc.c
-+++ b/drivers/crypto/caam/caampkc.c
-@@ -24,6 +24,10 @@
- 				 sizeof(struct rsa_priv_f2_pdb))
- #define DESC_RSA_PRIV_F3_LEN	(2 * CAAM_CMD_SZ + \
- 				 sizeof(struct rsa_priv_f3_pdb))
-+#define CAAM_RSA_MAX_INPUT_SIZE	512 /* for a 4096-bit modulus */
-+
-+/* buffer filled with zeros, used for padding */
-+static u8 *zero_buffer;
- 
- static void rsa_io_unmap(struct device *dev, struct rsa_edesc *edesc,
- 			 struct akcipher_request *req)
-@@ -168,6 +172,13 @@ static void rsa_priv_f3_done(struct device *dev, u32 *desc, u32 err,
- 	akcipher_request_complete(req, err);
- }
- 
-+/**
-+ * Count leading zeros, need it to strip, from a given scatterlist
-+ *
-+ * @sgl   : scatterlist to count zeros from
-+ * @nbytes: number of zeros, in bytes, to strip
-+ * @flags : operation flags
-+ */
- static int caam_rsa_count_leading_zeros(struct scatterlist *sgl,
- 					unsigned int nbytes,
- 					unsigned int flags)
-@@ -187,7 +198,8 @@ static int caam_rsa_count_leading_zeros(struct scatterlist *sgl,
- 	lzeros = 0;
- 	len = 0;
- 	while (nbytes > 0) {
--		while (len && !*buff) {
-+		/* do not strip more than given bytes */
-+		while (len && !*buff && lzeros < nbytes) {
- 			lzeros++;
- 			len--;
- 			buff++;
-@@ -218,6 +230,7 @@ static struct rsa_edesc *rsa_edesc_alloc(struct akcipher_request *req,
- 	struct caam_rsa_ctx *ctx = akcipher_tfm_ctx(tfm);
- 	struct device *dev = ctx->dev;
- 	struct caam_rsa_req_ctx *req_ctx = akcipher_request_ctx(req);
-+	struct caam_rsa_key *key = &ctx->key;
- 	struct rsa_edesc *edesc;
- 	gfp_t flags = (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
- 		       GFP_KERNEL : GFP_ATOMIC;
-@@ -225,21 +238,37 @@ static struct rsa_edesc *rsa_edesc_alloc(struct akcipher_request *req,
- 	int sgc;
- 	int sec4_sg_index, sec4_sg_len = 0, sec4_sg_bytes;
- 	int src_nents, dst_nents;
-+	unsigned int diff_size = 0;
- 	int lzeros;
- 
--	lzeros = caam_rsa_count_leading_zeros(req->src, req->src_len, sg_flags);
--	if (lzeros < 0)
--		return ERR_PTR(lzeros);
--
--	req->src_len -= lzeros;
--	req->src = scatterwalk_ffwd(req_ctx->src, req->src, lzeros);
-+	if (req->src_len > key->n_sz) {
-+		/*
-+		 * strip leading zeros and
-+		 * return the number of zeros to skip
-+		 */
-+		lzeros = caam_rsa_count_leading_zeros(req->src, req->src_len -
-+						      key->n_sz, sg_flags);
-+		if (lzeros < 0)
-+			return ERR_PTR(lzeros);
-+
-+		req->src_len -= lzeros;
-+		req->src = scatterwalk_ffwd(req_ctx->src, req->src, lzeros);
-+	} else {
-+		/*
-+		 * input src is less then n key modulus,
-+		 * so there will be zero padding
-+		 */
-+		diff_size = key->n_sz - req->src_len;
-+	}
- 
- 	src_nents = sg_nents_for_len(req->src, req->src_len);
- 	dst_nents = sg_nents_for_len(req->dst, req->dst_len);
- 
--	if (src_nents > 1)
--		sec4_sg_len = src_nents;
--
-+	if (!diff_size && src_nents == 1)
-+		sec4_sg_len = 0; /* no need for an input hw s/g table */
-+	else
-+		sec4_sg_len = src_nents + !!diff_size;
-+	sec4_sg_index = sec4_sg_len;
- 	if (dst_nents > 1)
- 		sec4_sg_len += pad_sg_nents(dst_nents);
- 	else
-@@ -266,12 +295,14 @@ static struct rsa_edesc *rsa_edesc_alloc(struct akcipher_request *req,
- 	}
- 
- 	edesc->sec4_sg = (void *)edesc + sizeof(*edesc) + desclen;
-+	if (diff_size)
-+		dma_to_sec4_sg_one(edesc->sec4_sg, ctx->padding_dma, diff_size,
-+				   0);
-+
-+	if (sec4_sg_index)
-+		sg_to_sec4_sg_last(req->src, src_nents, edesc->sec4_sg +
-+				   !!diff_size, 0);
- 
--	sec4_sg_index = 0;
--	if (src_nents > 1) {
--		sg_to_sec4_sg_last(req->src, src_nents, edesc->sec4_sg, 0);
--		sec4_sg_index += src_nents;
--	}
- 	if (dst_nents > 1)
- 		sg_to_sec4_sg_last(req->dst, dst_nents,
- 				   edesc->sec4_sg + sec4_sg_index, 0);
-@@ -292,6 +323,10 @@ static struct rsa_edesc *rsa_edesc_alloc(struct akcipher_request *req,
- 
- 	edesc->sec4_sg_bytes = sec4_sg_bytes;
- 
-+	print_hex_dump_debug("caampkc sec4_sg@" __stringify(__LINE__) ": ",
-+			     DUMP_PREFIX_ADDRESS, 16, 4, edesc->sec4_sg,
-+			     edesc->sec4_sg_bytes, 1);
-+
- 	return edesc;
- 
- sec4_sg_fail:
-@@ -981,6 +1016,15 @@ static int caam_rsa_init_tfm(struct crypto_akcipher *tfm)
- 		return PTR_ERR(ctx->dev);
- 	}
- 
-+	ctx->padding_dma = dma_map_single(ctx->dev, zero_buffer,
-+					  CAAM_RSA_MAX_INPUT_SIZE - 1,
-+					  DMA_TO_DEVICE);
-+	if (dma_mapping_error(ctx->dev, ctx->padding_dma)) {
-+		dev_err(ctx->dev, "unable to map padding\n");
-+		caam_jr_free(ctx->dev);
-+		return -ENOMEM;
-+	}
-+
- 	return 0;
- }
- 
-@@ -990,6 +1034,8 @@ static void caam_rsa_exit_tfm(struct crypto_akcipher *tfm)
- 	struct caam_rsa_ctx *ctx = akcipher_tfm_ctx(tfm);
- 	struct caam_rsa_key *key = &ctx->key;
- 
-+	dma_unmap_single(ctx->dev, ctx->padding_dma, CAAM_RSA_MAX_INPUT_SIZE -
-+			 1, DMA_TO_DEVICE);
- 	caam_rsa_free_key(key);
- 	caam_jr_free(ctx->dev);
- }
-@@ -1030,17 +1076,26 @@ int caam_pkc_init(struct device *ctrldev)
- 	if (!pk_inst)
- 		return 0;
- 
-+	/* allocate zero buffer, used for padding input */
-+	zero_buffer = kzalloc(CAAM_RSA_MAX_INPUT_SIZE - 1, GFP_DMA |
-+			      GFP_KERNEL);
-+	if (!zero_buffer)
-+		return -ENOMEM;
-+
- 	err = crypto_register_akcipher(&caam_rsa);
--	if (err)
-+	if (err) {
-+		kfree(zero_buffer);
- 		dev_warn(ctrldev, "%s alg registration failed\n",
- 			 caam_rsa.base.cra_driver_name);
--	else
-+	} else {
- 		dev_info(ctrldev, "caam pkc algorithms registered in /proc/crypto\n");
-+	}
- 
- 	return err;
- }
- 
- void caam_pkc_exit(void)
- {
-+	kfree(zero_buffer);
- 	crypto_unregister_akcipher(&caam_rsa);
- }
-diff --git a/drivers/crypto/caam/caampkc.h b/drivers/crypto/caam/caampkc.h
-index 82645bc..5ac7201 100644
---- a/drivers/crypto/caam/caampkc.h
-+++ b/drivers/crypto/caam/caampkc.h
-@@ -89,10 +89,12 @@ struct caam_rsa_key {
-  * caam_rsa_ctx - per session context.
-  * @key         : RSA key in DMA zone
-  * @dev         : device structure
-+ * @padding_dma : dma address of padding, for adding it to the input
-  */
- struct caam_rsa_ctx {
- 	struct caam_rsa_key key;
- 	struct device *dev;
-+	dma_addr_t padding_dma;
- };
- 
- /**
--- 
-2.1.0
-
+On 5/28/2019 12:52 PM, Iuliana Prodan wrote:=0A=
+> The problem is with the input data size sent to CAAM for encrypt/decrypt.=
+=0A=
+> Pkcs1pad is failing due to pkcs1 padding done in SW starting with0x01=0A=
+> instead of 0x00 0x01.=0A=
+> CAAM expects an input of modulus size. For this we strip the leading=0A=
+> zeros in case the size is more than modulus or pad the input with zeros=
+=0A=
+> until the modulus size is reached.=0A=
+> =0A=
+> Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>=0A=
+Reviewed-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
+=0A=
+Thanks,=0A=
+Horia=0A=
