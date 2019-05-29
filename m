@@ -2,183 +2,219 @@ Return-Path: <SRS0=BCrf=T5=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FSL_HELO_FAKE,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,T_DKIMWL_WL_HIGH,URIBL_BLOCKED,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DD08C28CC0
-	for <linux-crypto@archiver.kernel.org>; Wed, 29 May 2019 20:27:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 636F7C28CC0
+	for <linux-crypto@archiver.kernel.org>; Wed, 29 May 2019 20:36:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 36EEC24169
-	for <linux-crypto@archiver.kernel.org>; Wed, 29 May 2019 20:27:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1559161652;
-	bh=L8h2IoFAWDipnv/lvbb9bdY6ESNQY9JFCL26yJfVOT8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=E6AyH7bbLbnx4ecnjy2J5BE5hSCo7kZ4QEhiHSffN/Yy8AUkAt6fXJtLeBwIiVBif
-	 UxIwqHM4fjFEn1W+RRFo994EIBANc9j9diIj74I/PpmUIVn5Rb1EsVjFs3/3OTlsNG
-	 fMtiZI95AXbzi+AwV11d16sPn7n8fLcfWaE9svWE=
+	by mail.kernel.org (Postfix) with ESMTP id 3873B24171
+	for <linux-crypto@archiver.kernel.org>; Wed, 29 May 2019 20:36:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726576AbfE2U1b (ORCPT
+        id S1726240AbfE2UgG (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 29 May 2019 16:27:31 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49720 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725990AbfE2U1b (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 29 May 2019 16:27:31 -0400
-Received: from gmail.com (unknown [104.132.1.77])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 61C3424168;
-        Wed, 29 May 2019 20:27:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1559161650;
-        bh=L8h2IoFAWDipnv/lvbb9bdY6ESNQY9JFCL26yJfVOT8=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=0mfqRccY09gmih0Dw2ejbDdKRKJQaa0uPvjwsC/WZFqRAXgvKAmo4GRKv6FKj7a9x
-         qTLV0v3pN/dqea4zonxE7EPeeUhiDb6sXIOFQf3q+6tOczkip6rZpHgPstwK4txNDp
-         VoPkTpX8qMKZXGG4pQr3PKT1JV9OZCMU9DgM85RE=
-Date:   Wed, 29 May 2019 13:27:28 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Iuliana Prodan <iuliana.prodan@nxp.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-imx <linux-imx@nxp.com>
-Subject: Re: [PATCH] crypto: gcm - fix cacheline sharing
-Message-ID: <20190529202728.GA35103@gmail.com>
-References: <1559149856-7938-1-git-send-email-iuliana.prodan@nxp.com>
+        Wed, 29 May 2019 16:36:06 -0400
+Received: from mx2.suse.de ([195.135.220.15]:49674 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726155AbfE2UgF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 29 May 2019 16:36:05 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 53D75AE08;
+        Wed, 29 May 2019 20:36:04 +0000 (UTC)
+Subject: Re: [PATCH v3] crypto: xxhash - Implement xxhash support
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, terrelln@fb.com, jthumshirn@suse.de
+References: <20190529154826.12147-1-nborisov@suse.com>
+ <20190529195512.GA141639@gmail.com>
+From:   Nikolay Borisov <nborisov@suse.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=nborisov@suse.com; prefer-encrypt=mutual; keydata=
+ mQINBFiKBz4BEADNHZmqwhuN6EAzXj9SpPpH/nSSP8YgfwoOqwrP+JR4pIqRK0AWWeWCSwmZ
+ T7g+RbfPFlmQp+EwFWOtABXlKC54zgSf+uulGwx5JAUFVUIRBmnHOYi/lUiE0yhpnb1KCA7f
+ u/W+DkwGerXqhhe9TvQoGwgCKNfzFPZoM+gZrm+kWv03QLUCr210n4cwaCPJ0Nr9Z3c582xc
+ bCUVbsjt7BN0CFa2BByulrx5xD9sDAYIqfLCcZetAqsTRGxM7LD0kh5WlKzOeAXj5r8DOrU2
+ GdZS33uKZI/kZJZVytSmZpswDsKhnGzRN1BANGP8sC+WD4eRXajOmNh2HL4P+meO1TlM3GLl
+ EQd2shHFY0qjEo7wxKZI1RyZZ5AgJnSmehrPCyuIyVY210CbMaIKHUIsTqRgY5GaNME24w7h
+ TyyVCy2qAM8fLJ4Vw5bycM/u5xfWm7gyTb9V1TkZ3o1MTrEsrcqFiRrBY94Rs0oQkZvunqia
+ c+NprYSaOG1Cta14o94eMH271Kka/reEwSZkC7T+o9hZ4zi2CcLcY0DXj0qdId7vUKSJjEep
+ c++s8ncFekh1MPhkOgNj8pk17OAESanmDwksmzh1j12lgA5lTFPrJeRNu6/isC2zyZhTwMWs
+ k3LkcTa8ZXxh0RfWAqgx/ogKPk4ZxOXQEZetkEyTFghbRH2BIwARAQABtCNOaWtvbGF5IEJv
+ cmlzb3YgPG5ib3Jpc292QHN1c2UuY29tPokCOAQTAQIAIgUCWIo48QIbAwYLCQgHAwIGFQgC
+ CQoLBBYCAwECHgECF4AACgkQcb6CRuU/KFc0eg/9GLD3wTQz9iZHMFbjiqTCitD7B6dTLV1C
+ ddZVlC8Hm/TophPts1bWZORAmYIihHHI1EIF19+bfIr46pvfTu0yFrJDLOADMDH+Ufzsfy2v
+ HSqqWV/nOSWGXzh8bgg/ncLwrIdEwBQBN9SDS6aqsglagvwFD91UCg/TshLlRxD5BOnuzfzI
+ Leyx2c6YmH7Oa1R4MX9Jo79SaKwdHt2yRN3SochVtxCyafDlZsE/efp21pMiaK1HoCOZTBp5
+ VzrIP85GATh18pN7YR9CuPxxN0V6IzT7IlhS4Jgj0NXh6vi1DlmKspr+FOevu4RVXqqcNTSS
+ E2rycB2v6cttH21UUdu/0FtMBKh+rv8+yD49FxMYnTi1jwVzr208vDdRU2v7Ij/TxYt/v4O8
+ V+jNRKy5Fevca/1xroQBICXsNoFLr10X5IjmhAhqIH8Atpz/89ItS3+HWuE4BHB6RRLM0gy8
+ T7rN6ja+KegOGikp/VTwBlszhvfLhyoyjXI44Tf3oLSFM+8+qG3B7MNBHOt60CQlMkq0fGXd
+ mm4xENl/SSeHsiomdveeq7cNGpHi6i6ntZK33XJLwvyf00PD7tip/GUj0Dic/ZUsoPSTF/mG
+ EpuQiUZs8X2xjK/AS/l3wa4Kz2tlcOKSKpIpna7V1+CMNkNzaCOlbv7QwprAerKYywPCoOSC
+ 7P25Ag0EWIoHPgEQAMiUqvRBZNvPvki34O/dcTodvLSyOmK/MMBDrzN8Cnk302XfnGlW/YAQ
+ csMWISKKSpStc6tmD+2Y0z9WjyRqFr3EGfH1RXSv9Z1vmfPzU42jsdZn667UxrRcVQXUgoKg
+ QYx055Q2FdUeaZSaivoIBD9WtJq/66UPXRRr4H/+Y5FaUZx+gWNGmBT6a0S/GQnHb9g3nonD
+ jmDKGw+YO4P6aEMxyy3k9PstaoiyBXnzQASzdOi39BgWQuZfIQjN0aW+Dm8kOAfT5i/yk59h
+ VV6v3NLHBjHVw9kHli3jwvsizIX9X2W8tb1SefaVxqvqO1132AO8V9CbE1DcVT8fzICvGi42
+ FoV/k0QOGwq+LmLf0t04Q0csEl+h69ZcqeBSQcIMm/Ir+NorfCr6HjrB6lW7giBkQl6hhomn
+ l1mtDP6MTdbyYzEiBFcwQD4terc7S/8ELRRybWQHQp7sxQM/Lnuhs77MgY/e6c5AVWnMKd/z
+ MKm4ru7A8+8gdHeydrRQSWDaVbfy3Hup0Ia76J9FaolnjB8YLUOJPdhI2vbvNCQ2ipxw3Y3c
+ KhVIpGYqwdvFIiz0Fej7wnJICIrpJs/+XLQHyqcmERn3s/iWwBpeogrx2Lf8AGezqnv9woq7
+ OSoWlwXDJiUdaqPEB/HmGfqoRRN20jx+OOvuaBMPAPb+aKJyle8zABEBAAGJAh8EGAECAAkF
+ AliKBz4CGwwACgkQcb6CRuU/KFdacg/+M3V3Ti9JYZEiIyVhqs+yHb6NMI1R0kkAmzsGQ1jU
+ zSQUz9AVMR6T7v2fIETTT/f5Oout0+Hi9cY8uLpk8CWno9V9eR/B7Ifs2pAA8lh2nW43FFwp
+ IDiSuDbH6oTLmiGCB206IvSuaQCp1fed8U6yuqGFcnf0ZpJm/sILG2ECdFK9RYnMIaeqlNQm
+ iZicBY2lmlYFBEaMXHoy+K7nbOuizPWdUKoKHq+tmZ3iA+qL5s6Qlm4trH28/fPpFuOmgP8P
+ K+7LpYLNSl1oQUr+WlqilPAuLcCo5Vdl7M7VFLMq4xxY/dY99aZx0ZJQYFx0w/6UkbDdFLzN
+ upT7NIN68lZRucImffiWyN7CjH23X3Tni8bS9ubo7OON68NbPz1YIaYaHmnVQCjDyDXkQoKC
+ R82Vf9mf5slj0Vlpf+/Wpsv/TH8X32ajva37oEQTkWNMsDxyw3aPSps6MaMafcN7k60y2Wk/
+ TCiLsRHFfMHFY6/lq/c0ZdOsGjgpIK0G0z6et9YU6MaPuKwNY4kBdjPNBwHreucrQVUdqRRm
+ RcxmGC6ohvpqVGfhT48ZPZKZEWM+tZky0mO7bhZYxMXyVjBn4EoNTsXy1et9Y1dU3HVJ8fod
+ 5UqrNrzIQFbdeM0/JqSLrtlTcXKJ7cYFa9ZM2AP7UIN9n1UWxq+OPY9YMOewVfYtL8M=
+Message-ID: <842f6363-8ca5-2eca-a618-90385935c820@suse.com>
+Date:   Wed, 29 May 2019 23:36:02 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1559149856-7938-1-git-send-email-iuliana.prodan@nxp.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20190529195512.GA141639@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, May 29, 2019 at 08:10:56PM +0300, Iuliana Prodan wrote:
-> The generic GCM driver should ensure that whatever it passes into
-> scatterlists is safe for non-cache coherent DMA.
-> The issue was seen while running GCM on CAAM driver. But, since CAAM
-> does not support GHASH on i.MX6, only CTR skcipher part of the GCM is
-> offloaded.
-> The skcipher request received by CAAM has req->src pointing to
-> auth_tag[16] and req->iv pointing to iv[16]. Problem is that when
-> the iv is updated (crypto API requires skcipher implementations to
-> update the IV with the last ciphertext block) is written in iv[16],
-> which is on the same cacheline as auth_tag[16] that was previously
-> DMA mapped.
-> Solution is to use a pointer, aligned to cache line, instead of auth_tag
-> buffer, for encryption/decryption and then free it on completion.
+
+
+On 29.05.19 г. 22:55 ч., Eric Biggers wrote:
+> Hi Nikolay, some more comments from another read through.  Sorry for not
+> noticing these in v2.
 > 
-> Link: https://lore.kernel.org/linux-crypto/20190208114459.5nixe76xmmkhur75@gondor.apana.org.au/
-> Cc: <stable@vger.kernel.org> # v4.19+
-> Fixes: adcbc688fe2f ("crypto: gcm - Convert to new AEAD interface")
-> Suggested-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>
+> On Wed, May 29, 2019 at 06:48:26PM +0300, Nikolay Borisov wrote:
+>> +static int xxhash64_update(struct shash_desc *desc, const u8 *data,
+>> +			 unsigned int length)
+>> +{
+>> +	struct xxhash64_desc_ctx *tctx = shash_desc_ctx(desc);
 > 
-> ---
-> I've checked the reproducibility of this issue starting with 4.19.y.
-> ---
->  crypto/gcm.c         | 26 +++++++++++++++++---------
->  include/crypto/gcm.h |  1 +
->  2 files changed, 18 insertions(+), 9 deletions(-)
+> This variable should be named 'dctx' (for desc_ctx), not 'tctx' (for tfm_ctx).>
+>> +
+>> +	xxh64_update(&tctx->xxhstate, data, length);
+>> +
+>> +	return 0;
+>> +}
 > 
-> diff --git a/crypto/gcm.c b/crypto/gcm.c
-> index 33f45a9..53e3ce5 100644
-> --- a/crypto/gcm.c
-> +++ b/crypto/gcm.c
-> @@ -66,7 +66,7 @@ struct crypto_gcm_ghash_ctx {
->  
->  struct crypto_gcm_req_priv_ctx {
->  	u8 iv[16];
-> -	u8 auth_tag[16];
-> +	u8 *auth_tag;
->  	u8 iauth_tag[16];
->  	struct scatterlist src[3];
->  	struct scatterlist dst[3];
-> @@ -177,19 +177,23 @@ static void crypto_gcm_init_common(struct aead_request *req)
->  	__be32 counter = cpu_to_be32(1);
->  	struct scatterlist *sg;
->  
-> -	memset(pctx->auth_tag, 0, sizeof(pctx->auth_tag));
-> +	/*
-> +	 * kzalloc alignment is at least the cache line size
-> +	 * for non-cache coherent architectures.
-> +	 */
-> +	pctx->auth_tag = kzalloc(GCM_MAX_AUTH_SIZE, GFP_KERNEL);
->  	memcpy(pctx->iv, req->iv, GCM_AES_IV_SIZE);
->  	memcpy(pctx->iv + GCM_AES_IV_SIZE, &counter, 4);
->  
->  	sg_init_table(pctx->src, 3);
-> -	sg_set_buf(pctx->src, pctx->auth_tag, sizeof(pctx->auth_tag));
-> +	sg_set_buf(pctx->src, pctx->auth_tag, GCM_MAX_AUTH_SIZE);
->  	sg = scatterwalk_ffwd(pctx->src + 1, req->src, req->assoclen);
->  	if (sg != pctx->src + 1)
->  		sg_chain(pctx->src, 2, sg);
->  
->  	if (req->src != req->dst) {
->  		sg_init_table(pctx->dst, 3);
-> -		sg_set_buf(pctx->dst, pctx->auth_tag, sizeof(pctx->auth_tag));
-> +		sg_set_buf(pctx->dst, pctx->auth_tag, GCM_MAX_AUTH_SIZE);
->  		sg = scatterwalk_ffwd(pctx->dst + 1, req->dst, req->assoclen);
->  		if (sg != pctx->dst + 1)
->  			sg_chain(pctx->dst, 2, sg);
-> @@ -208,9 +212,8 @@ static void crypto_gcm_init_crypt(struct aead_request *req,
->  	dst = req->src == req->dst ? pctx->src : pctx->dst;
->  
->  	skcipher_request_set_tfm(skreq, ctx->ctr);
-> -	skcipher_request_set_crypt(skreq, pctx->src, dst,
-> -				     cryptlen + sizeof(pctx->auth_tag),
-> -				     pctx->iv);
-> +	skcipher_request_set_crypt(skreq, pctx->src, dst, cryptlen +
-> +				   GCM_MAX_AUTH_SIZE, pctx->iv);
->  }
->  
->  static inline unsigned int gcm_remain(unsigned int len)
-> @@ -440,6 +443,7 @@ static int gcm_enc_copy_hash(struct aead_request *req, u32 flags)
->  	scatterwalk_map_and_copy(auth_tag, req->dst,
->  				 req->assoclen + req->cryptlen,
->  				 crypto_aead_authsize(aead), 1);
-> +	kfree(auth_tag);
->  	return 0;
->  }
->  
-> @@ -492,11 +496,15 @@ static int crypto_gcm_verify(struct aead_request *req)
->  	u8 *iauth_tag = pctx->iauth_tag;
->  	unsigned int authsize = crypto_aead_authsize(aead);
->  	unsigned int cryptlen = req->cryptlen - authsize;
-> +	int err;
->  
->  	crypto_xor(auth_tag, iauth_tag, 16);
->  	scatterwalk_map_and_copy(iauth_tag, req->src,
->  				 req->assoclen + cryptlen, authsize, 0);
-> -	return crypto_memneq(iauth_tag, auth_tag, authsize) ? -EBADMSG : 0;
-> +	err = crypto_memneq(iauth_tag, auth_tag, authsize) ? -EBADMSG : 0;
-> +	kfree(auth_tag);
-> +
-> +	return err;
->  }
->  
+> xxh64_update() has a return value (0 or -errno) which is not being checked,
+> which at first glance seems to be a bug.
+> 
+> However, it only returns an error in this case:
+> 
+>         if (input == NULL)
+>                 return -EINVAL;
+> 
+> But data=NULL, length=0 are valid parameters to xxhash64_update(), so if you did
+> check the return value, xxhash64_update() would break.  So it's fine as-is.
+> 
+> However, if anyone changed xxh64_update() to an error in any other case,
+> xxhash64_update() would break since it ignores the error.
+> 
+> I suggest avoiding this complexity around error codes by changing xxh64_update()
+> to return void.  It can be a separate patch.
+> 
+>> +
+>> +static int xxhash64_final(struct shash_desc *desc, u8 *out)
+>> +{
+>> +	struct xxhash64_desc_ctx *ctx = shash_desc_ctx(desc);
+>> +
+> 
+> For consistency it should be 'dctx' here too.
+> 
+>> +	put_unaligned_le64(xxh64_digest(&ctx->xxhstate), out);
+>> +
+>> +	return 0;
+>> +}
+>> +
+> 
+>> +static int xxhash64_finup(struct shash_desc *desc, const u8 *data,
+>> +			unsigned int len, u8 *out)
+>> +{
+>> +	xxhash64_update(desc, data, len);
+>> +	xxhash64_final(desc, out);
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +static int xxhash64_digest(struct shash_desc *desc, const u8 *data,
+>> +			 unsigned int length, u8 *out)
+>> +{
+>> +	xxhash64_init(desc);
+>> +	return xxhash64_finup(desc, data, length, out);
+>> +}
+>> +
+> 
+> The purpose of the ->finup() and ->digest() methods is to allow the algorithm to
+> work more efficiently than it could if ->init(), ->update(), and ->final() were
+> called separately.  So, implementing them on top of xxhash64_init(),
+> xxhash64_update(), and xxhash64_final() is mostly pointless.
+> 
+> lib/xxhash.c already provides a function xxh64() which does a digest in one
+> step, so that should be used to implement xxhash64_digest():
+> 
+> static int xxhash64_digest(struct shash_desc *desc, const u8 *data,
+> 			 unsigned int length, u8 *out)
+> {
+> 	struct xxhash64_tfm_ctx *tctx = crypto_shash_ctx(desc->tfm);
+> 
+> 	put_unaligned_le64(xxh64(data, length, tctx->seed), out);
+> 
+> 	return 0;
+> }
+> 
+> I suggest just deleting xxhash64_finup().
+> 
+>> +static struct shash_alg alg = {
+>> +	.digestsize	= XXHASH64_DIGEST_SIZE,
+>> +	.setkey		= xxhash64_setkey,
+>> +	.init		= xxhash64_init,
+>> +	.update		= xxhash64_update,
+>> +	.final		= xxhash64_final,
+>> +	.finup		= xxhash64_finup,
+>> +	.digest		= xxhash64_digest,
+>> +	.descsize	= sizeof(struct xxhash64_desc_ctx),
+>> +	.base		= {
+>> +		.cra_name	 = "xxhash64",
+>> +		.cra_driver_name = "xxhash64-generic",
+>> +		.cra_priority	 = 100,
+>> +		.cra_flags	 = CRYPTO_ALG_OPTIONAL_KEY,
+>> +		.cra_blocksize	 = XXHASH64_BLOCK_SIZE,
+>> +		.cra_ctxsize	 = sizeof(struct xxhash64_tfm_ctx),
+>> +		.cra_module	 = THIS_MODULE,
+>> +	}
+>> +};
+> 
+> Note that because .export() and .import() aren't set, if someone calls
+> crypto_shash_export() and crypto_shash_import() on an xxhash64 descriptor, the
+> crypto API will export and import the state by memcpy().
+> 
+> That's perfectly fine, but it also means that the xxh64_copy_state() function
+> won't be called.  Since it exists, one might assume that all state copies go
+> through that function.  But it's actually pointless as it just does a memcpy, so
+> I suggest removing it.  (As a separate patch, which you don't necessarily have
+> to do now.  BTW, another thing that should be cleaned up is the random
+> unnecessary local variable in xxh32_reset() and xxh64_reset()...)
 
-So what about the other places that also pass an IV located next to the data,
-like crypto/ccm.c and crypto/adiantum.c?  If we're actually going to make this a
-new API requirement, then we need to add a debugging option that makes the API
-detect this violation so that the other places can be fixed too.
+Good suggestion, however they stretch beyond what I'm currently
+comfortable doing. I will do a v4 which deals with the minor
+inconsistencies in the crypto  module (variable naming, removing finup,
+implementing digest via xxh64), however I will definitely won't be doing
+any changes in lib/xxhash.c now. I don't think any of the things you
+mentioned in that regard are a blockers towards merging crypto layer
+support for xxhash.
 
-Also, doing a kmalloc() per requset is inefficient and very error-prone.  In
-fact there are at least 3 bugs here: (1) not checking the return value, (2)
-incorrectly using GFP_KERNEL when it may be atomic context, and (3) not always
-freeing the memory.  Why not use cacheline-aligned memory within the request
-context, so that a separate kmalloc() isn't needed?
-
-Also, did you consider whether there's any way to make the crypto API handle
-this automatically, so that all the individual users don't have to?
-
-- Eric
+> 
+> Thanks,
+> 
+> - Eric
+> 
