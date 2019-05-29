@@ -1,177 +1,81 @@
 Return-Path: <SRS0=BCrf=T5=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: *
-X-Spam-Status: No, score=1.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FSL_HELO_FAKE,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	T_DKIMWL_WL_HIGH,USER_AGENT_MUTT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B934C28CC0
-	for <linux-crypto@archiver.kernel.org>; Wed, 29 May 2019 19:55:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61C70C28CC2
+	for <linux-crypto@archiver.kernel.org>; Wed, 29 May 2019 20:21:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1223F24119
-	for <linux-crypto@archiver.kernel.org>; Wed, 29 May 2019 19:55:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1559159718;
-	bh=oKIO8KHJNy76KLf2vqlbbpVQteGYBCiP2fF+2FS05w0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=DRnL+MUl+z6wVMA0j9WbzStIAJK600Be0czs8W5PUzUcjfDjFmUkf7OwchArK0IhE
-	 pm5N/hr9WvyPbDK2zovtTUvA6+QLQZQenA3ic5NnkPNnE67slBLq66QXFwQNbOn3wf
-	 QXskmvAjhDKsYh/H8Vb1gskIANv9M6TDIhCV77Zg=
+	by mail.kernel.org (Postfix) with ESMTP id 381212414B
+	for <linux-crypto@archiver.kernel.org>; Wed, 29 May 2019 20:21:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726323AbfE2TzR (ORCPT
+        id S1726547AbfE2UVx convert rfc822-to-8bit (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 29 May 2019 15:55:17 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38702 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725990AbfE2TzQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 29 May 2019 15:55:16 -0400
-Received: from gmail.com (unknown [104.132.1.77])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 2DF4524118;
-        Wed, 29 May 2019 19:55:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1559159715;
-        bh=oKIO8KHJNy76KLf2vqlbbpVQteGYBCiP2fF+2FS05w0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=hrgWqUzkaxrCENYVuwlxOZao8FUQ6A+l9RLQesbyuzGb45vd+6PX9jO4QVndFYdC1
-         ONzHhJFTkrD1iMkAxULT3+GDhQFwg1eaew7HACCdyLw0qYwobhfr2BmQajl+o2oQh9
-         UyKpmJ7u5qUR94kA9isReZHrAhMRN5q35VQMHCdI=
-Date:   Wed, 29 May 2019 12:55:13 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Nikolay Borisov <nborisov@suse.com>
-Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, terrelln@fb.com, jthumshirn@suse.de
-Subject: Re: [PATCH v3] crypto: xxhash - Implement xxhash support
-Message-ID: <20190529195512.GA141639@gmail.com>
-References: <20190529154826.12147-1-nborisov@suse.com>
+        Wed, 29 May 2019 16:21:53 -0400
+Received: from lithops.sigma-star.at ([195.201.40.130]:51094 "EHLO
+        lithops.sigma-star.at" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725990AbfE2UVx (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 29 May 2019 16:21:53 -0400
+Received: from localhost (localhost [127.0.0.1])
+        by lithops.sigma-star.at (Postfix) with ESMTP id 88A716094C2D;
+        Wed, 29 May 2019 22:21:51 +0200 (CEST)
+Received: from lithops.sigma-star.at ([127.0.0.1])
+        by localhost (lithops.sigma-star.at [127.0.0.1]) (amavisd-new, port 10032)
+        with ESMTP id 24hfumFRIBin; Wed, 29 May 2019 22:21:50 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+        by lithops.sigma-star.at (Postfix) with ESMTP id C61C1608F45A;
+        Wed, 29 May 2019 22:21:50 +0200 (CEST)
+Received: from lithops.sigma-star.at ([127.0.0.1])
+        by localhost (lithops.sigma-star.at [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id Kr72C4w85Hpw; Wed, 29 May 2019 22:21:50 +0200 (CEST)
+Received: from lithops.sigma-star.at (lithops.sigma-star.at [195.201.40.130])
+        by lithops.sigma-star.at (Postfix) with ESMTP id 91789608310E;
+        Wed, 29 May 2019 22:21:50 +0200 (CEST)
+Date:   Wed, 29 May 2019 22:21:50 +0200 (CEST)
+From:   Richard Weinberger <richard@nod.at>
+To:     Stephan Mueller <smueller@chronox.de>
+Cc:     david <david@sigma-star.at>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Message-ID: <1331220190.73461.1559161310462.JavaMail.zimbra@nod.at>
+In-Reply-To: <4256916.YlTHG9RRyR@tauon.chronox.de>
+References: <729A4150-93A0-456B-B7AB-6D3A446E600E@sigma-star.at> <4256916.YlTHG9RRyR@tauon.chronox.de>
+Subject: Re: Can an ahash driver be used through shash API?
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190529154826.12147-1-nborisov@suse.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
+X-Originating-IP: [195.201.40.130]
+X-Mailer: Zimbra 8.8.8_GA_3025 (ZimbraWebClient - FF60 (Linux)/8.8.8_GA_1703)
+Thread-Topic: Can an ahash driver be used through shash API?
+Thread-Index: fv0HWCAwwyF4N+CFCRcqKsO36yU5mA==
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Nikolay, some more comments from another read through.  Sorry for not
-noticing these in v2.
+Stephan,
 
-On Wed, May 29, 2019 at 06:48:26PM +0300, Nikolay Borisov wrote:
-> +static int xxhash64_update(struct shash_desc *desc, const u8 *data,
-> +			 unsigned int length)
-> +{
-> +	struct xxhash64_desc_ctx *tctx = shash_desc_ctx(desc);
+----- Ursprüngliche Mail -----
+>> I've seen that it does actually work the other way around, since
+>> crypto_init_shash_ops_async() in crypto/shash.c takes care of translating
+>> calls from ahash to shash and that's how the *-generic drivers are usable
+>> through the ahash API.
+> 
+> The crypto_alloc_shash will only identify cipher implementations that were
+> registered with the CRYPTO_ALG_TYPE_SHASH flag. That flag is set when a cipher
+> is registered using crypto_register_shash.
+> 
+> Thus, ciphers registered with crypto_register_ahash will not bear this flag
+> and thus will not be found by the allocation function.
 
-This variable should be named 'dctx' (for desc_ctx), not 'tctx' (for tfm_ctx).
+is there a reason why we don't emulate the synchronous functionality
+in the crypto API layer if a driver implements only the async interface?
 
-> +
-> +	xxh64_update(&tctx->xxhstate, data, length);
-> +
-> +	return 0;
-> +}
-
-xxh64_update() has a return value (0 or -errno) which is not being checked,
-which at first glance seems to be a bug.
-
-However, it only returns an error in this case:
-
-        if (input == NULL)
-                return -EINVAL;
-
-But data=NULL, length=0 are valid parameters to xxhash64_update(), so if you did
-check the return value, xxhash64_update() would break.  So it's fine as-is.
-
-However, if anyone changed xxh64_update() to an error in any other case,
-xxhash64_update() would break since it ignores the error.
-
-I suggest avoiding this complexity around error codes by changing xxh64_update()
-to return void.  It can be a separate patch.
-
-> +
-> +static int xxhash64_final(struct shash_desc *desc, u8 *out)
-> +{
-> +	struct xxhash64_desc_ctx *ctx = shash_desc_ctx(desc);
-> +
-
-For consistency it should be 'dctx' here too.
-
-> +	put_unaligned_le64(xxh64_digest(&ctx->xxhstate), out);
-> +
-> +	return 0;
-> +}
-> +
-
-> +static int xxhash64_finup(struct shash_desc *desc, const u8 *data,
-> +			unsigned int len, u8 *out)
-> +{
-> +	xxhash64_update(desc, data, len);
-> +	xxhash64_final(desc, out);
-> +
-> +	return 0;
-> +}
-> +
-> +static int xxhash64_digest(struct shash_desc *desc, const u8 *data,
-> +			 unsigned int length, u8 *out)
-> +{
-> +	xxhash64_init(desc);
-> +	return xxhash64_finup(desc, data, length, out);
-> +}
-> +
-
-The purpose of the ->finup() and ->digest() methods is to allow the algorithm to
-work more efficiently than it could if ->init(), ->update(), and ->final() were
-called separately.  So, implementing them on top of xxhash64_init(),
-xxhash64_update(), and xxhash64_final() is mostly pointless.
-
-lib/xxhash.c already provides a function xxh64() which does a digest in one
-step, so that should be used to implement xxhash64_digest():
-
-static int xxhash64_digest(struct shash_desc *desc, const u8 *data,
-			 unsigned int length, u8 *out)
-{
-	struct xxhash64_tfm_ctx *tctx = crypto_shash_ctx(desc->tfm);
-
-	put_unaligned_le64(xxh64(data, length, tctx->seed), out);
-
-	return 0;
-}
-
-I suggest just deleting xxhash64_finup().
-
-> +static struct shash_alg alg = {
-> +	.digestsize	= XXHASH64_DIGEST_SIZE,
-> +	.setkey		= xxhash64_setkey,
-> +	.init		= xxhash64_init,
-> +	.update		= xxhash64_update,
-> +	.final		= xxhash64_final,
-> +	.finup		= xxhash64_finup,
-> +	.digest		= xxhash64_digest,
-> +	.descsize	= sizeof(struct xxhash64_desc_ctx),
-> +	.base		= {
-> +		.cra_name	 = "xxhash64",
-> +		.cra_driver_name = "xxhash64-generic",
-> +		.cra_priority	 = 100,
-> +		.cra_flags	 = CRYPTO_ALG_OPTIONAL_KEY,
-> +		.cra_blocksize	 = XXHASH64_BLOCK_SIZE,
-> +		.cra_ctxsize	 = sizeof(struct xxhash64_tfm_ctx),
-> +		.cra_module	 = THIS_MODULE,
-> +	}
-> +};
-
-Note that because .export() and .import() aren't set, if someone calls
-crypto_shash_export() and crypto_shash_import() on an xxhash64 descriptor, the
-crypto API will export and import the state by memcpy().
-
-That's perfectly fine, but it also means that the xxh64_copy_state() function
-won't be called.  Since it exists, one might assume that all state copies go
-through that function.  But it's actually pointless as it just does a memcpy, so
-I suggest removing it.  (As a separate patch, which you don't necessarily have
-to do now.  BTW, another thing that should be cleaned up is the random
-unnecessary local variable in xxh32_reset() and xxh64_reset()...)
+Or is it just a matter of -ENOPATCH? :)
 
 Thanks,
-
-- Eric
+//richard
