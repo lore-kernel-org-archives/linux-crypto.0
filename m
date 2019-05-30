@@ -2,185 +2,183 @@ Return-Path: <SRS0=uqbH=T6=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA419C46460
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 May 2019 08:08:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 193F1C28CC0
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 May 2019 09:12:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B06CE25706
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 May 2019 08:08:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D3EA72522E
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 May 2019 09:12:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FJU2ZnF7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TCI9NGbo"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727447AbfE3IIh (ORCPT
+        id S1727057AbfE3JMr (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 30 May 2019 04:08:37 -0400
-Received: from mail-it1-f196.google.com ([209.85.166.196]:39221 "EHLO
-        mail-it1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727038AbfE3IIh (ORCPT
+        Thu, 30 May 2019 05:12:47 -0400
+Received: from mail-it1-f173.google.com ([209.85.166.173]:52198 "EHLO
+        mail-it1-f173.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725913AbfE3JMr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 30 May 2019 04:08:37 -0400
-Received: by mail-it1-f196.google.com with SMTP id j204so2681885ite.4
-        for <linux-crypto@vger.kernel.org>; Thu, 30 May 2019 01:08:36 -0700 (PDT)
+        Thu, 30 May 2019 05:12:47 -0400
+Received: by mail-it1-f173.google.com with SMTP id m3so8735166itl.1
+        for <linux-crypto@vger.kernel.org>; Thu, 30 May 2019 02:12:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=uhATQPJSNTCMowVFk8RS0eyAucGgi+lBjsF7DlqvU5Y=;
-        b=FJU2ZnF7rvCzqS2ruJWUcu1tibbF9MfXHIVsy5ZkhxzKE2PduyDwe0nqDS886Ruo4Q
-         0Xf348dXwhUflq4MaHxWgLJbNeov2ZUxnfBaB2N6IgR+kjGOUA5+T/8Ne3LvwtSK4xO9
-         gcj+OQl5IYSKWxU/m0dzEsLX2I3HolzCkGoibrn0qRmBub9NR1nC0B3NiJ+eMTwjMm2c
-         n8dhAWfVS9vKjnSbhKC+0U35ZpHpl+Js046GLpyRBQcxBOwQR15FgYgx6bxUbTCRNs7k
-         YTVUgWunpGYv445IvEgxE0QFpXA9N2x92xuARuDMWjNxwhP2dQCw6Bz03FRUskJDSfSo
-         ge6Q==
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=SkOH+2aVMTTrn2aPrwV+avRtSnS97B7YiqC7EyHZCRc=;
+        b=TCI9NGbogYuqDno5cy65AIc2Y5JkjdFNJqV71CEsJJCAon6miJH79zy2P40eKudu/2
+         EPQlgKlXXMSHo1FV26GklmDadqYqsfaYRfm6LLksyfGgJFH35XArEI4wRdByueS18Lgd
+         LQX7bwaAPZIAlvv0YuQT6jOodxaxii0HNhI0MWflYISsEjFtw8gCkNkvVFeYiHqVg9iO
+         DX05D0ZvNy2VxeIGXsov9Nn5nokbN4emZAYYdsp9kk46fPr28fPkeykZW4ucNRnHR8H4
+         iryO1Gnt65DueE3Qh3UiDcMd3aD0kkrvLpPPov9+9qgx7cQ39z88lu6v46QPrsuZO91O
+         KUpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=uhATQPJSNTCMowVFk8RS0eyAucGgi+lBjsF7DlqvU5Y=;
-        b=T1rrMILD+7hkhz8fEY5ZXUH9Isb6OvFV5xhkVt2Na69lbBOTqeFbTwNrFnOG9304Ec
-         0t2iPVphlWzCypS8gBv6jfvhZsDR+docQ/606sLKhBTLdJHE8eRxwNTKrUoKiL2MtrvJ
-         TkA4mH+c6HWo8VKlFQY44Pa5F46xHjbVa4gNWX2EO4lATw8GBAD4EwvmjoVG9ZGaB75E
-         ION+om5K3nyK/g5k++r6zGRv2n4njrGCOrS10xgTpPe3WM6rqzbQYNK7WOc4npQLEmwn
-         PLUPfKAuuBnJNvtAsx9X3rKRy6S+y4958TTNw3DYpDERPDqWSB/oCZaEgGVjHzAvfWHC
-         JOZw==
-X-Gm-Message-State: APjAAAUPYD/jOUPLa0pKHyShOdBhHxMKUDlZY2r7ZNYPGYZLAgDlRi3E
-        MsMutTHGXJZ0Bn0P5Q9MXAusqWpvEgo5oJXCTpTsng==
-X-Google-Smtp-Source: APXvYqy4+Xt68oesIIciXkhTP1lixxkoR9l+Brf6z52pkjk12vcRFS7olRf0M3doNsE9oTywISw01h9vnhNupOD11nQ=
-X-Received: by 2002:a24:910b:: with SMTP id i11mr2065671ite.76.1559203715644;
- Thu, 30 May 2019 01:08:35 -0700 (PDT)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=SkOH+2aVMTTrn2aPrwV+avRtSnS97B7YiqC7EyHZCRc=;
+        b=NWqCw8qQF0wv7WIbthg2hiOmVzRwAClkBJA7KFjJnZyWXR75G4pTj/T8Ga4nABLRbe
+         I7NsPaU5oBP1Xy3d5JM5tXp91Zacx2IqZxJKEjUwwPwttbojOqtrnkZy02HWo583rh6d
+         r0GbW0AeDTsHgxgKQPennA4QD53CVkr82VMSPQQKBEq6v5VxsXtEArastpBEzCp3D7ir
+         drhyMopvODy/UFlGaTeUMal/jyESVQU3PX5Rw9Bt+sqRbJz2SIA4oHxD63dn8yrPWH0C
+         7vGcBq0KTZHYd2dHmFoR/0y5koulc8g8V5DIOW5KjE4d5H7Fo+hUxxYXMyPcEY+wp56A
+         TT9Q==
+X-Gm-Message-State: APjAAAWcQwhnHtpMw5vhSjtRDpnw8ifbvaBf1ZGA/D5kBdtx5SkJOSmf
+        DqMjF02clPbi5ZLpk5HpwoTm874tK6FsEgnd9zNWi/dZ
+X-Google-Smtp-Source: APXvYqzsOH5kpkE91pnnv4EmlCnOH0RsbgadxKuzo2pVvZfhSHd5sOWD7cYrTuC5IsafHDZ063NUcUmcQDWWpzSsnAk=
+X-Received: by 2002:a02:b47:: with SMTP id 68mr1549165jad.66.1559207566318;
+ Thu, 30 May 2019 02:12:46 -0700 (PDT)
 MIME-Version: 1.0
-References: <1559149856-7938-1-git-send-email-iuliana.prodan@nxp.com>
- <20190529202728.GA35103@gmail.com> <20190530053421.keesqb54yu5w7hgk@gondor.apana.org.au>
- <VI1PR0402MB3485ADA3C4410D61191582A498180@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-In-Reply-To: <VI1PR0402MB3485ADA3C4410D61191582A498180@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Thu, 30 May 2019 10:08:22 +0200
-Message-ID: <CAKv+Gu84HndAnkn7DU=ykjCokw_+bAHEcF0Rm12-hnXhVy2u_Q@mail.gmail.com>
-Subject: Re: [PATCH] crypto: gcm - fix cacheline sharing
-To:     Horia Geanta <horia.geanta@nxp.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Iuliana Prodan <iuliana.prodan@nxp.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        dl-linux-imx <linux-imx@nxp.com>
+From:   Peter Robinson <pbrobinson@gmail.com>
+Date:   Thu, 30 May 2019 10:12:34 +0100
+Message-ID: <CALeDE9Owj-y6CEfjwjavkdCEcTGenMJoKBvDzR+nVMrKVFQmMw@mail.gmail.com>
+Subject: Issues with initialising generic crypto implementations earlier on ARMv7
+To:     Eric Biggers <ebiggers@google.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 30 May 2019 at 09:46, Horia Geanta <horia.geanta@nxp.com> wrote:
->
-> On 5/30/2019 8:34 AM, Herbert Xu wrote:
-> > On Wed, May 29, 2019 at 01:27:28PM -0700, Eric Biggers wrote:
-> >>
-> >> So what about the other places that also pass an IV located next to the data,
-> >> like crypto/ccm.c and crypto/adiantum.c?  If we're actually going to make this a
-> Fix for ccm is WIP.
-> We were not aware of adiantum since our crypto engine does not accelerate it.
->
-> >> new API requirement, then we need to add a debugging option that makes the API
-> >> detect this violation so that the other places can be fixed too.
-> >>
-> IMO this is not a new crypto API requirement.
-> crypto API and its users must follow DMA API rules, besides crypto-specific ones.
->
-> In this particular case, crypto/gcm.c is both an implementation and a crypto API
-> user, since it uses underneath ctr(aes) (and ghash).
-> Currently generic gcm implementation is breaking DMA API, since part of the dst
-> buffer (auth_tag) provided to ctr(aes) is sharing a cache line with some other
-> data structure (iv).
->
-> The DMA API rule is mentioned in Documentation/DMA-API.txt
->
-> .. warning::
->
->         Memory coherency operates at a granularity called the cache
->         line width.  In order for memory mapped by this API to operate
->         correctly, the mapped region must begin exactly on a cache line
->         boundary and end exactly on one (to prevent two separately mapped
->         regions from sharing a single cache line).
->
->
+Hi Eric,
 
-This is overly restrictive, and not in line with reality. The whole
-networking stack operates on buffers shifted by 2 bytes if
-NET_IP_ALIGN is left at its default value of 2. There are numerous
-examples in other places as well.
+I'm seeing the crash below on ARMv7 devices, at least the Raspberry Pi
+and UDoo Neo (i.MX6SX), with your "crypto: run initcalls for generic
+implementations earlier" patch. It's causing the boot to fail very
+early on across the ARMv7 devices I've tested on Fedora (I'm the Arm
+lead for Fedora. Reverting the patch makes the problem go away. I'm
+unsure why initialising it earlier in the boot would cause issues, any
+chance you could assist in sorting the issue out? Tested on 5.2 rc1
+and rc2.
 
-Given that kmalloc() will take the cacheline granularity into account
-if necessary, the only way this issue can hit is when a single kmalloc
-buffer is written to by two different masters.
+Regards,
+Peter
 
-> >> Also, doing a kmalloc() per requset is inefficient and very error-prone.  In
-> >> fact there are at least 3 bugs here: (1) not checking the return value, (2)
-> >> incorrectly using GFP_KERNEL when it may be atomic context, and (3) not always
-> For (2) I assume this means checking for CRYPTO_TFM_REQ_MAY_SLEEP flag.
->
-> >> freeing the memory.  Why not use cacheline-aligned memory within the request
-> >> context, so that a separate kmalloc() isn't needed?
-> >>
-> If you check previous discussion referenced in the commit message:
-> Link:
-> https://lore.kernel.org/linux-crypto/20190208114459.5nixe76xmmkhur75@gondor.apana.org.au/
->
-> or (probably easier) look at the full thread:
-> https://patchwork.kernel.org/patch/10789697/
->
-> you'll see that at some point I proposed changing crypto_gcm_req_priv_ctx struct
-> as follows:
-> -       u8 auth_tag[16];
-> +       u8 auth_tag[16] ____cacheline_aligned;
->
-> Ard suggested it would be better to kmalloc the auth_tag.
->
-> I am open to changing the fix, however I don't think the problem is in the
-> implementation (caam driver).
->
+[1] c4741b23059794bd99beef0f700103b0d983b3fd
 
-I remember that. But in the discussion that followed, I did ask about
-accessing the memory while the buffer is mapped for DMA, and I
-misunderstood the response. The scatterwalk_map_and_copy writes to the
-request while it is mapped for DMA.
-
-> >> Also, did you consider whether there's any way to make the crypto API handle
-> >> this automatically, so that all the individual users don't have to?
-> That would probably work, but I guess it would come up with a big overhead.
->
-> I am thinking crypto API would have to check each buffer used by src, dst
-> scatterlists is correctly aligned - starting and ending on cache line boundaries.
->
-> >
-> > You're absolutely right Eric.
-> >
-> > What I suggested in the old thread is non-sense.  While you can
-> > force GCM to provide the right pointers you cannot force all the
-> > other crypto API users to do this.
-> >
-> Whose problem is that crypto API users don't follow the DMA API requirements?
->
-> > It would appear that Ard's latest suggestion should fix the problem
-> > and is the correct approach.
-> >
-> I disagree.
-> We shouldn't force crypto implementations to be aware of such inconsistencies in
-> the I/O data buffers (pointed to by src/dst scatterlists) that are supposed to
-> be safely DMA mapped.
->
-
-I'm on the fence here. On the one hand, it is slightly dodgy for the
-GCM driver to pass a scatterlist referencing a buffer that shares a
-cacheline with another buffer passed by an ordinary pointer, and for
-which an explicit requirement exists that the callee should update it
-before returning.
-
-On the other hand, I think it is reasonable to require drivers not to
-perform such updates while the scatterlist is mapped for DMA, since
-fixing it in the callers puts a disproportionate burden on them, given
-that non-coherent DMA only represents a small minority of use cases.
+[    2.239276] cryptd: max_cpu_qlen set to 1000
+[    2.257316] alg: No test for lzo-rle (lzo-rle-generic)
+[    2.262883] alg: No test for lzo-rle (lzo-rle-scomp)
+[    2.268303] alg: No test for 842 (842-generic)
+[    2.273154] alg: No test for 842 (842-scomp)
+[    2.299763] Unhandled fault: alignment fault (0x221) at 0xc0eb987e
+[    2.306015] pgd = (ptrval)
+[    2.308746] [c0eb987e] *pgd=80000000207003, *pmd=00e0071d(bad)
+[    2.314650] Internal error: : 221 [#1] SMP ARM
+[    2.319137] Modules linked in:
+[    2.322228] CPU: 0 PID: 142 Comm: cryptomgr_test Not tainted
+5.2.0-0.rc2.git0.1.fc31.armv7hl+lpae #1
+[    2.331455] Hardware name: BCM2835
+[    2.334902] PC is at gf128mul_init_4k_lle+0x2c/0xa0
+[    2.339834] LR is at kmem_cache_alloc_trace+0xc0/0x14c
+[    2.345024] pc : [<c071ec8c>]    lr : [<c05d0ab0>]    psr: a0000013
+[    2.351355] sp : eafcfcf8  ip : ead04000  fp : ead71dc0
+[    2.356632] r10: 00000000  r9 : 00000000  r8 : c0eb987e
+[    2.361910] r7 : c0eb987e  r6 : c12576c0  r5 : c0eb987e  r4 : ead03000
+[    2.368506] r3 : 00001000  r2 : 00001000  r1 : ead03000  r0 : ead03000
+[    2.375103] Flags: NzCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment user
+[    2.382313] Control: 30c5383d  Table: 00203000  DAC: fffffffd
+[    2.388118] Process cryptomgr_test (pid: 142, stack limit = 0x(ptrval))
+[    2.394801] Stack: (0xeafcfcf8 to 0xeafd0000)
+[    2.399203] fce0:
+    ead71600 c0eb987e
+[    2.407472] fd00: c12576c0 c0eb987e c0eb987e 00000000 00000000
+c0729434 00000010 ead71600
+[    2.415742] fd20: c12576c0 c0713f90 ead71d80 00000010 c0bf55c4
+c0eb987e 00000000 00000010
+[    2.424012] fd40: 00000000 c07134a4 00000000 ead71540 c0bf55c4
+eaef5400 eafcfe80 c071aa1c
+[    2.432282] fd60: 00000000 00000001 eaef5400 ead71d80 c0c1a89c
+ffffffff 00000073 00000400
+[    2.440550] fd80: 00000000 00000000 00000000 00000014 00000000
+00000000 00000cc0 00000000
+[    2.448820] fda0: 00000000 eafcfda4 eafcfda4 00000000 eac01c00
+00000000 00000000 eac01c00
+[    2.457090] fdc0: 00000084 c070d15c eafcfd30 c05d0824 00000dc0
+00000dc0 00000004 c0bf4a14
+[    2.465360] fde0: 00000040 eafcfe5c eafcfe80 eafcfe58 ffffffff
+eafcfe80 eafcfe18 1503017f
+[    2.473630] fe00: c0f3bf27 c0bb9d5c ffffff0f ffff0a00 eac01e00
+eadcb180 ffffff0f ffff0a00
+[    2.481901] fe20: 00000024 00000000 eae96c00 ead71540 eaef5400
+ead71d80 eadcb180 00000000
+[    2.490171] fe40: eae96c00 ead71540 eaef5400 ead71d80 eadcb180
+00000000 00000000 c071b144
+[    2.498441] fe60: ead71540 eae96c00 eadcb180 87c8332f ead71dc0
+c0c1a89c c0c1a89c 00000006
+[    2.506710] fe80: eafc0030 c0483f9c 0000407f c048610c 0000407f
+00000006 eaef5400 0000000e
+[    2.514980] fea0: 00000400 c0c1a89c c071b1a0 ffffffff 00000073
+c071b250 00000400 eaef5400
+[    2.523250] fec0: eaef5400 0000000e eaef5480 c137ae08 00000400
+c071a0a4 00000000 eb3c8704
+[    2.531519] fee0: 00000001 eafcff50 00000004 c0bbe504 00000009
+c121d158 eafcff0c c047aaf0
+[    2.539790] ff00: c120a000 eafacb00 eafcff3c c047ac74 c1200018
+eafacb00 c120a000 24854451
+[    2.548061] ff20: eb3d3140 eafacb00 c120a000 c1236200 eb3d3140
+eafacf68 eafcff7c c0bbe3d8
+[    2.556331] ff40: ead0de24 00000000 00000001 ead0de20 ead0de24
+00000004 ead0de20 eafacb00
+[    2.564602] ff60: eafce000 eaef5400 eaeea4c0 eafce000 ead0de20
+eaef5400 c0716c34 eadcb35c
+[    2.572871] ff80: 00000000 c0716c60 eadcb340 c0473000 eaeea4c0
+c0472ef4 00000000 00000000
+[    2.581140] ffa0: 00000000 00000000 00000000 c04011f8 00000000
+00000000 00000000 00000000
+[    2.589408] ffc0: 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000
+[    2.597676] ffe0: 00000000 00000000 00000000 00000000 00000013
+00000000 00000000 00000000
+[    2.605961] [<c071ec8c>] (gf128mul_init_4k_lle) from [<c0729434>]
+(ghash_setkey+0x48/0x5c)
+[    2.614325] [<c0729434>] (ghash_setkey) from [<c0713f90>]
+(crypto_shash_setkey+0xbc/0xd8)
+[    2.622599] [<c0713f90>] (crypto_shash_setkey) from [<c07134a4>]
+(crypto_ahash_setkey+0xbc/0xd8)
+[    2.631486] [<c07134a4>] (crypto_ahash_setkey) from [<c071aa1c>]
+(test_hash_vec_cfg+0x74/0x60c)
+[    2.640286] [<c071aa1c>] (test_hash_vec_cfg) from [<c071b144>]
+(__alg_test_hash.constprop.0+0x190/0x1ec)
+[    2.649875] [<c071b144>] (__alg_test_hash.constprop.0) from
+[<c071b250>] (alg_test_hash+0xb0/0xf8)
+[    2.658936] [<c071b250>] (alg_test_hash) from [<c071a0a4>]
+(alg_test+0x330/0x3f8)
+[    2.666504] [<c071a0a4>] (alg_test) from [<c0716c60>]
+(cryptomgr_test+0x2c/0x4c)
+[    2.673988] [<c0716c60>] (cryptomgr_test) from [<c0473000>]
+(kthread+0x10c/0x118)
+[    2.681559] [<c0473000>] (kthread) from [<c04011f8>]
+(ret_from_fork+0x14/0x3c)
+[    2.688856] Exception stack(0xeafcffb0 to 0xeafcfff8)
+[    2.693960] ffa0:                                     00000000
+00000000 00000000 00000000
+[    2.702228] ffc0: 00000000 00000000 00000000 00000000 00000000
+00000000 00000000 00000000
+[    2.710494] ffe0: 00000000 00000000 00000000 00000000 00000013 00000000
+[    2.717185] Code: e5930030 ebfac75a e2504000 0a000019 (e895000f)
+[    2.723350] ---[ end trace 9839f43693f21333 ]---
