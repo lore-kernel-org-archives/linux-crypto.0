@@ -2,135 +2,209 @@ Return-Path: <SRS0=uqbH=T6=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89B30C28CC0
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 May 2019 13:06:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9B31C28CC0
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 May 2019 13:18:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 69A7A25945
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 May 2019 13:06:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6835A2596C
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 May 2019 13:18:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="LitPmtS7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726100AbfE3NGo (ORCPT
+        id S1726676AbfE3NSk (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 30 May 2019 09:06:44 -0400
-Received: from mga03.intel.com ([134.134.136.65]:50325 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726031AbfE3NGo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 30 May 2019 09:06:44 -0400
-X-Amp-Result: UNSCANNABLE
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 30 May 2019 06:06:43 -0700
-X-ExtLoop1: 1
-Received: from lkp-server01.sh.intel.com (HELO lkp-server01) ([10.239.97.150])
-  by fmsmga004.fm.intel.com with ESMTP; 30 May 2019 06:06:42 -0700
-Received: from kbuild by lkp-server01 with local (Exim 4.89)
-        (envelope-from <lkp@intel.com>)
-        id 1hWKlV-000B80-Q9; Thu, 30 May 2019 21:06:41 +0800
-Date:   Thu, 30 May 2019 21:05:53 +0800
-From:   kbuild test robot <lkp@intel.com>
+        Thu, 30 May 2019 09:18:40 -0400
+Received: from mail-eopbgr00072.outbound.protection.outlook.com ([40.107.0.72]:8581
+        "EHLO EUR02-AM5-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726604AbfE3NSk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 30 May 2019 09:18:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nzHTjjGMQ7qmVqzFecLmtDF2Uh/ikca8qYIM4maCJvc=;
+ b=LitPmtS71ELvRU+E9tJ2euqGBadL5fiRMSu5vW0wCgsu4SQYj+0+dRz4g+39oWoh91eFBopKf2kextsu3r6PLQ3882udL4tV+TKc+93S3a6cZEMKM97PukGaJZPcBVPYDVB9Nb8D3fuExI7x2iKbUmGlDNpsLAsbQ0kn5RHFCyQ=
+Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
+ VI1PR0402MB2703.eurprd04.prod.outlook.com (10.172.255.137) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1922.20; Thu, 30 May 2019 13:18:34 +0000
+Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
+ ([fe80::ccaf:f4a1:704a:e745]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
+ ([fe80::ccaf:f4a1:704a:e745%4]) with mapi id 15.20.1922.021; Thu, 30 May 2019
+ 13:18:34 +0000
+From:   Horia Geanta <horia.geanta@nxp.com>
 To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc:     kbuild-all@01.org, linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Linus Walleij <linus.walleij@linaro.org>
-Subject: [cryptodev:master 56/59] drivers/crypto/atmel-i2c.c:39:18: sparse:
- sparse: incorrect type in assignment (different base types)
-Message-ID: <201905302147.hxqMVXTS%lkp@intel.com>
+CC:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Iuliana Prodan <iuliana.prodan@nxp.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Sascha Hauer <s.hauer@pengutronix.de>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        dl-linux-imx <linux-imx@nxp.com>
+Subject: Re: [PATCH] crypto: gcm - fix cacheline sharing
+Thread-Topic: [PATCH] crypto: gcm - fix cacheline sharing
+Thread-Index: AQHVFkF+dOvdDzZqYUSH856vNqfARw==
+Date:   Thu, 30 May 2019 13:18:34 +0000
+Message-ID: <VI1PR0402MB34859577A96645E890BD8F3198180@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+References: <1559149856-7938-1-git-send-email-iuliana.prodan@nxp.com>
+ <20190529202728.GA35103@gmail.com>
+ <20190530053421.keesqb54yu5w7hgk@gondor.apana.org.au>
+ <VI1PR0402MB3485ADA3C4410D61191582A498180@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+ <CAKv+Gu84HndAnkn7DU=ykjCokw_+bAHEcF0Rm12-hnXhVy2u_Q@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=horia.geanta@nxp.com; 
+x-originating-ip: [78.96.98.22]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: f2c41088-e5a5-4a51-bc99-08d6e50151bf
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:VI1PR0402MB2703;
+x-ms-traffictypediagnostic: VI1PR0402MB2703:
+x-microsoft-antispam-prvs: <VI1PR0402MB27035776B5AD5C93CFD25A6F98180@VI1PR0402MB2703.eurprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-forefront-prvs: 00531FAC2C
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(136003)(396003)(366004)(39860400002)(376002)(346002)(189003)(199004)(66066001)(55016002)(9686003)(25786009)(6116002)(44832011)(3846002)(71190400001)(71200400001)(6506007)(6246003)(476003)(14444005)(6436002)(74316002)(5660300002)(229853002)(4326008)(316002)(2906002)(54906003)(446003)(256004)(53936002)(478600001)(86362001)(73956011)(33656002)(14454004)(8676002)(52536014)(102836004)(486006)(53546011)(99286004)(186003)(81166006)(26005)(81156014)(7696005)(7736002)(305945005)(76116006)(68736007)(91956017)(66476007)(66556008)(64756008)(66446008)(76176011)(6916009)(8936002)(66946007);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB2703;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: nxp.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: VZj4TsGM4JMHhhNsCnE0ZXfFfaMqNS9qh0IB4UKOTIY6sbqkCwOfT738mF/7ux+VXLdK/csXdhsrUMrxL2pYXvVyKeJ+XuDSE2Sitq79ZQ78acE+jDOBIn0l7oKaKk1HT1SwGVODvqsNrEmZYJpzb2PeN/OcbXmM0hK8jP5JZ/ia/EvjB3IMfbLfJ3wCZfocQr8iJmnGrtoDZwdiLAdClvUHibBPacUMPqzIn1bNr8mdNjawaVpAjWXqHhnrhYFdLsUGcA7CeytsFmfun9g4uTRU4ouO5SROb3XEKQ+C1Pmu/Fz0bqWESDhjgIVtPu0lbMxKEvcsrUWtSU53vnYNjjDyCf4zGqlvC4rL6DtxmJwy9BjQFYB97Mne36rH3ndmHXVq4PJECQoOKCeMH2SB8PN7b2dM8GITYJ/U89KveE4=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Patchwork-Hint: ignore
-User-Agent: Mutt/1.5.23 (2014-03-12)
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f2c41088-e5a5-4a51-bc99-08d6e50151bf
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 May 2019 13:18:34.7402
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: horia.geanta@nxp.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB2703
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-head:   0adb0c99594b73844cf9a5714faa6553ea04ba04
-commit: c34a320176a59445d76783e5ee043d6ecd22d011 [56/59] crypto: atmel-ecc - factor out code that can be shared
-reproduce:
-        # apt-get install sparse
-        # sparse version: v0.6.1-rc1-7-g2b96cd8-dirty
-        git checkout c34a320176a59445d76783e5ee043d6ecd22d011
-        make ARCH=x86_64 allmodconfig
-        make C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__'
-
-If you fix the issue, kindly add following tag
-Reported-by: kbuild test robot <lkp@intel.com>
-
-
-sparse warnings: (new ones prefixed by >>)
-
->> drivers/crypto/atmel-i2c.c:39:18: sparse: sparse: incorrect type in assignment (different base types) @@    expected unsigned short [usertype] @@    got resunsigned short [usertype] @@
->> drivers/crypto/atmel-i2c.c:39:18: sparse:    expected unsigned short [usertype]
->> drivers/crypto/atmel-i2c.c:39:18: sparse:    got restricted __le16 [usertype]
->> drivers/crypto/atmel-i2c.c:68:21: sparse: sparse: incorrect type in assignment (different base types) @@    expected unsigned short [usertype] param2 @@    got resunsigned short [usertype] param2 @@
->> drivers/crypto/atmel-i2c.c:68:21: sparse:    expected unsigned short [usertype] param2
-   drivers/crypto/atmel-i2c.c:68:21: sparse:    got restricted __le16 [usertype]
-   drivers/crypto/atmel-i2c.c:87:21: sparse: sparse: incorrect type in assignment (different base types) @@    expected unsigned short [usertype] param2 @@    got resunsigned short [usertype] param2 @@
-   drivers/crypto/atmel-i2c.c:87:21: sparse:    expected unsigned short [usertype] param2
-   drivers/crypto/atmel-i2c.c:87:21: sparse:    got restricted __le16 [usertype]
-
-vim +39 drivers/crypto/atmel-i2c.c
-
-    23	
-    24	/**
-    25	 * atmel_i2c_checksum() - Generate 16-bit CRC as required by ATMEL ECC.
-    26	 * CRC16 verification of the count, opcode, param1, param2 and data bytes.
-    27	 * The checksum is saved in little-endian format in the least significant
-    28	 * two bytes of the command. CRC polynomial is 0x8005 and the initial register
-    29	 * value should be zero.
-    30	 *
-    31	 * @cmd : structure used for communicating with the device.
-    32	 */
-    33	static void atmel_i2c_checksum(struct atmel_i2c_cmd *cmd)
-    34	{
-    35		u8 *data = &cmd->count;
-    36		size_t len = cmd->count - CRC_SIZE;
-    37		u16 *__crc16 = (u16 *)(data + len);
-    38	
-  > 39		*__crc16 = cpu_to_le16(bitrev16(crc16(0, data, len)));
-    40	}
-    41	
-    42	void atmel_i2c_init_read_cmd(struct atmel_i2c_cmd *cmd)
-    43	{
-    44		cmd->word_addr = COMMAND;
-    45		cmd->opcode = OPCODE_READ;
-    46		/*
-    47		 * Read the word from Configuration zone that contains the lock bytes
-    48		 * (UserExtra, Selector, LockValue, LockConfig).
-    49		 */
-    50		cmd->param1 = CONFIG_ZONE;
-    51		cmd->param2 = DEVICE_LOCK_ADDR;
-    52		cmd->count = READ_COUNT;
-    53	
-    54		atmel_i2c_checksum(cmd);
-    55	
-    56		cmd->msecs = MAX_EXEC_TIME_READ;
-    57		cmd->rxsize = READ_RSP_SIZE;
-    58	}
-    59	EXPORT_SYMBOL(atmel_i2c_init_read_cmd);
-    60	
-    61	void atmel_i2c_init_genkey_cmd(struct atmel_i2c_cmd *cmd, u16 keyid)
-    62	{
-    63		cmd->word_addr = COMMAND;
-    64		cmd->count = GENKEY_COUNT;
-    65		cmd->opcode = OPCODE_GENKEY;
-    66		cmd->param1 = GENKEY_MODE_PRIVATE;
-    67		/* a random private key will be generated and stored in slot keyID */
-  > 68		cmd->param2 = cpu_to_le16(keyid);
-    69	
-    70		atmel_i2c_checksum(cmd);
-    71	
-    72		cmd->msecs = MAX_EXEC_TIME_GENKEY;
-    73		cmd->rxsize = GENKEY_RSP_SIZE;
-    74	}
-    75	EXPORT_SYMBOL(atmel_i2c_init_genkey_cmd);
-    76	
-
----
-0-DAY kernel test infrastructure                Open Source Technology Center
-https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
+On 5/30/2019 11:08 AM, Ard Biesheuvel wrote:=0A=
+> On Thu, 30 May 2019 at 09:46, Horia Geanta <horia.geanta@nxp.com> wrote:=
+=0A=
+>>=0A=
+>> On 5/30/2019 8:34 AM, Herbert Xu wrote:=0A=
+>>> On Wed, May 29, 2019 at 01:27:28PM -0700, Eric Biggers wrote:=0A=
+>>>>=0A=
+>>>> So what about the other places that also pass an IV located next to th=
+e data,=0A=
+>>>> like crypto/ccm.c and crypto/adiantum.c?  If we're actually going to m=
+ake this a=0A=
+>> Fix for ccm is WIP.=0A=
+>> We were not aware of adiantum since our crypto engine does not accelerat=
+e it.=0A=
+>>=0A=
+>>>> new API requirement, then we need to add a debugging option that makes=
+ the API=0A=
+>>>> detect this violation so that the other places can be fixed too.=0A=
+>>>>=0A=
+>> IMO this is not a new crypto API requirement.=0A=
+>> crypto API and its users must follow DMA API rules, besides crypto-speci=
+fic ones.=0A=
+>>=0A=
+>> In this particular case, crypto/gcm.c is both an implementation and a cr=
+ypto API=0A=
+>> user, since it uses underneath ctr(aes) (and ghash).=0A=
+>> Currently generic gcm implementation is breaking DMA API, since part of =
+the dst=0A=
+>> buffer (auth_tag) provided to ctr(aes) is sharing a cache line with some=
+ other=0A=
+>> data structure (iv).=0A=
+>>=0A=
+>> The DMA API rule is mentioned in Documentation/DMA-API.txt=0A=
+>>=0A=
+>> .. warning::=0A=
+>>=0A=
+>>         Memory coherency operates at a granularity called the cache=0A=
+>>         line width.  In order for memory mapped by this API to operate=
+=0A=
+>>         correctly, the mapped region must begin exactly on a cache line=
+=0A=
+>>         boundary and end exactly on one (to prevent two separately mappe=
+d=0A=
+>>         regions from sharing a single cache line).=0A=
+>>=0A=
+>>=0A=
+> =0A=
+> This is overly restrictive, and not in line with reality. The whole=0A=
+> networking stack operates on buffers shifted by 2 bytes if=0A=
+> NET_IP_ALIGN is left at its default value of 2. There are numerous=0A=
+> examples in other places as well.=0A=
+> =0A=
+> Given that kmalloc() will take the cacheline granularity into account=0A=
+> if necessary, the only way this issue can hit is when a single kmalloc=0A=
+> buffer is written to by two different masters.=0A=
+> =0A=
+I guess there are only two options:=0A=
+-either cache line sharing is avoided OR=0A=
+-users need to be *aware* they are sharing the cache line and some rules /=
+=0A=
+assumptions are in place on how to safely work on the data=0A=
+=0A=
+What you are probably saying is that 2nd option is sometimes the way to go.=
+=0A=
+=0A=
+>>>> Also, did you consider whether there's any way to make the crypto API =
+handle=0A=
+>>>> this automatically, so that all the individual users don't have to?=0A=
+>> That would probably work, but I guess it would come up with a big overhe=
+ad.=0A=
+>>=0A=
+>> I am thinking crypto API would have to check each buffer used by src, ds=
+t=0A=
+>> scatterlists is correctly aligned - starting and ending on cache line bo=
+undaries.=0A=
+>>=0A=
+>>>=0A=
+>>> You're absolutely right Eric.=0A=
+>>>=0A=
+>>> What I suggested in the old thread is non-sense.  While you can=0A=
+>>> force GCM to provide the right pointers you cannot force all the=0A=
+>>> other crypto API users to do this.=0A=
+>>>=0A=
+>> Whose problem is that crypto API users don't follow the DMA API requirem=
+ents?=0A=
+>>=0A=
+>>> It would appear that Ard's latest suggestion should fix the problem=0A=
+>>> and is the correct approach.=0A=
+>>>=0A=
+>> I disagree.=0A=
+>> We shouldn't force crypto implementations to be aware of such inconsiste=
+ncies in=0A=
+>> the I/O data buffers (pointed to by src/dst scatterlists) that are suppo=
+sed to=0A=
+>> be safely DMA mapped.=0A=
+>>=0A=
+> =0A=
+> I'm on the fence here. On the one hand, it is slightly dodgy for the=0A=
+> GCM driver to pass a scatterlist referencing a buffer that shares a=0A=
+> cacheline with another buffer passed by an ordinary pointer, and for=0A=
+> which an explicit requirement exists that the callee should update it=0A=
+> before returning.=0A=
+> =0A=
+> On the other hand, I think it is reasonable to require drivers not to=0A=
+> perform such updates while the scatterlist is mapped for DMA, since=0A=
+> fixing it in the callers puts a disproportionate burden on them, given=0A=
+> that non-coherent DMA only represents a small minority of use cases.=0A=
+> =0A=
+The problem with this approach is that the buffers in the scatterlist could=
+=0A=
+hypothetically share cache lines with *any* other CPU-updated data, not jus=
+t the=0A=
+IV in the crypto request (as it happens here).=0A=
+How could a non-coherent DMA implementation cope with this?=0A=
+=0A=
+Thanks,=0A=
+Horia=0A=
