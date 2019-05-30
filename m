@@ -4,194 +4,183 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2049AC28CC0
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 May 2019 07:47:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA419C46460
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 May 2019 08:08:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DB6C025694
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 May 2019 07:47:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B06CE25706
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 May 2019 08:08:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="G6ik2JFt"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FJU2ZnF7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726408AbfE3HrO (ORCPT
+        id S1727447AbfE3IIh (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 30 May 2019 03:47:14 -0400
-Received: from mail-eopbgr70048.outbound.protection.outlook.com ([40.107.7.48]:1933
-        "EHLO EUR04-HE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726027AbfE3HrN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 30 May 2019 03:47:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Vu8ody0B788MoHcMObvsSRBH5BL87/RrxpClRusCouE=;
- b=G6ik2JFtgPa30ylK/By+7Zrhr6WlZkPjGG37vfT9IC4meXmW2GvH+tSGUIJCuUWo+a1lhBm840e26xn+xVnJpeI3S3TKZipFv/7xvAqV9ys7rcsfbxcmjD0YqY6C+JUSQbutIy8Bbh6ZdlXtLwmi+NrnRBXuckJIu9vCEAiQC1g=
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
- VI1PR0402MB3503.eurprd04.prod.outlook.com (52.134.4.20) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1922.17; Thu, 30 May 2019 07:46:29 +0000
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::ccaf:f4a1:704a:e745]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::ccaf:f4a1:704a:e745%4]) with mapi id 15.20.1922.021; Thu, 30 May 2019
- 07:46:29 +0000
-From:   Horia Geanta <horia.geanta@nxp.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Eric Biggers <ebiggers@kernel.org>
-CC:     Iuliana Prodan <iuliana.prodan@nxp.com>,
+        Thu, 30 May 2019 04:08:37 -0400
+Received: from mail-it1-f196.google.com ([209.85.166.196]:39221 "EHLO
+        mail-it1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727038AbfE3IIh (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 30 May 2019 04:08:37 -0400
+Received: by mail-it1-f196.google.com with SMTP id j204so2681885ite.4
+        for <linux-crypto@vger.kernel.org>; Thu, 30 May 2019 01:08:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=uhATQPJSNTCMowVFk8RS0eyAucGgi+lBjsF7DlqvU5Y=;
+        b=FJU2ZnF7rvCzqS2ruJWUcu1tibbF9MfXHIVsy5ZkhxzKE2PduyDwe0nqDS886Ruo4Q
+         0Xf348dXwhUflq4MaHxWgLJbNeov2ZUxnfBaB2N6IgR+kjGOUA5+T/8Ne3LvwtSK4xO9
+         gcj+OQl5IYSKWxU/m0dzEsLX2I3HolzCkGoibrn0qRmBub9NR1nC0B3NiJ+eMTwjMm2c
+         n8dhAWfVS9vKjnSbhKC+0U35ZpHpl+Js046GLpyRBQcxBOwQR15FgYgx6bxUbTCRNs7k
+         YTVUgWunpGYv445IvEgxE0QFpXA9N2x92xuARuDMWjNxwhP2dQCw6Bz03FRUskJDSfSo
+         ge6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=uhATQPJSNTCMowVFk8RS0eyAucGgi+lBjsF7DlqvU5Y=;
+        b=T1rrMILD+7hkhz8fEY5ZXUH9Isb6OvFV5xhkVt2Na69lbBOTqeFbTwNrFnOG9304Ec
+         0t2iPVphlWzCypS8gBv6jfvhZsDR+docQ/606sLKhBTLdJHE8eRxwNTKrUoKiL2MtrvJ
+         TkA4mH+c6HWo8VKlFQY44Pa5F46xHjbVa4gNWX2EO4lATw8GBAD4EwvmjoVG9ZGaB75E
+         ION+om5K3nyK/g5k++r6zGRv2n4njrGCOrS10xgTpPe3WM6rqzbQYNK7WOc4npQLEmwn
+         PLUPfKAuuBnJNvtAsx9X3rKRy6S+y4958TTNw3DYpDERPDqWSB/oCZaEgGVjHzAvfWHC
+         JOZw==
+X-Gm-Message-State: APjAAAUPYD/jOUPLa0pKHyShOdBhHxMKUDlZY2r7ZNYPGYZLAgDlRi3E
+        MsMutTHGXJZ0Bn0P5Q9MXAusqWpvEgo5oJXCTpTsng==
+X-Google-Smtp-Source: APXvYqy4+Xt68oesIIciXkhTP1lixxkoR9l+Brf6z52pkjk12vcRFS7olRf0M3doNsE9oTywISw01h9vnhNupOD11nQ=
+X-Received: by 2002:a24:910b:: with SMTP id i11mr2065671ite.76.1559203715644;
+ Thu, 30 May 2019 01:08:35 -0700 (PDT)
+MIME-Version: 1.0
+References: <1559149856-7938-1-git-send-email-iuliana.prodan@nxp.com>
+ <20190529202728.GA35103@gmail.com> <20190530053421.keesqb54yu5w7hgk@gondor.apana.org.au>
+ <VI1PR0402MB3485ADA3C4410D61191582A498180@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+In-Reply-To: <VI1PR0402MB3485ADA3C4410D61191582A498180@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date:   Thu, 30 May 2019 10:08:22 +0200
+Message-ID: <CAKv+Gu84HndAnkn7DU=ykjCokw_+bAHEcF0Rm12-hnXhVy2u_Q@mail.gmail.com>
+Subject: Re: [PATCH] crypto: gcm - fix cacheline sharing
+To:     Horia Geanta <horia.geanta@nxp.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Iuliana Prodan <iuliana.prodan@nxp.com>,
         "David S. Miller" <davem@davemloft.net>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         Sascha Hauer <s.hauer@pengutronix.de>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         dl-linux-imx <linux-imx@nxp.com>
-Subject: Re: [PATCH] crypto: gcm - fix cacheline sharing
-Thread-Topic: [PATCH] crypto: gcm - fix cacheline sharing
-Thread-Index: AQHVFkF+dOvdDzZqYUSH856vNqfARw==
-Date:   Thu, 30 May 2019 07:46:29 +0000
-Message-ID: <VI1PR0402MB3485ADA3C4410D61191582A498180@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-References: <1559149856-7938-1-git-send-email-iuliana.prodan@nxp.com>
- <20190529202728.GA35103@gmail.com>
- <20190530053421.keesqb54yu5w7hgk@gondor.apana.org.au>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=horia.geanta@nxp.com; 
-x-originating-ip: [78.96.98.22]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 7e22427a-0e4f-493c-4701-08d6e4d2ed6d
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(5600148)(711020)(4605104)(1401327)(4618075)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);SRVR:VI1PR0402MB3503;
-x-ms-traffictypediagnostic: VI1PR0402MB3503:
-x-ms-exchange-purlcount: 2
-x-microsoft-antispam-prvs: <VI1PR0402MB35033ACF36CE4AE3B0F946F298180@VI1PR0402MB3503.eurprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 00531FAC2C
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(366004)(396003)(136003)(376002)(39860400002)(346002)(199004)(189003)(66066001)(26005)(53936002)(305945005)(6246003)(55016002)(44832011)(5660300002)(7736002)(71200400001)(86362001)(486006)(25786009)(4326008)(52536014)(9686003)(71190400001)(14444005)(6306002)(73956011)(64756008)(110136005)(66556008)(66476007)(66946007)(476003)(33656002)(14454004)(66446008)(2906002)(256004)(54906003)(68736007)(74316002)(99286004)(186003)(8936002)(76116006)(91956017)(316002)(6436002)(229853002)(478600001)(102836004)(8676002)(81156014)(81166006)(3846002)(53546011)(6506007)(966005)(6116002)(76176011)(446003)(7696005);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB3503;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: nxp.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: LHYPDfIx1oic4LXVX2Axv5zsf4doEGTwqD5xSlHpthVNZS4vpu1kAvQnYIeLjOS+lVQTslWoQBvpD7amh7F3DTx3tvoSVuwLV7hC4kq6pBomtp1HCcv/DjRiOZ1arRshspYzCROVFDGdxn6PGsOFycXsXr4Prpk7QF5v9J5wGAVvm0qQ/BuqXm4xB68oC2ndi+VhCuqWWSzXuCxXfSsS/pxj9DUrmiVXLlJ0fyft5iX3WWLBshJGCQ9+USRVva4nz7dR5TtCwXxDpUCLy2z1LqLbDer0lCWJN2NuhYvAE/7yfelinvCOnHiWVweFlqEQNY2OsQZ0V08Q3dQawLVz7nmBCXYvKvh3vTh5/vOvZM0R0tmE9MtNIgSRU36WIdee6G1UKO4jgoI9RetYJwlDTMC/a7nCYdE4xRwhffKto5A=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7e22427a-0e4f-493c-4701-08d6e4d2ed6d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 30 May 2019 07:46:29.5981
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: horia.geanta@nxp.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3503
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 5/30/2019 8:34 AM, Herbert Xu wrote:=0A=
-> On Wed, May 29, 2019 at 01:27:28PM -0700, Eric Biggers wrote:=0A=
->>=0A=
->> So what about the other places that also pass an IV located next to the =
-data,=0A=
->> like crypto/ccm.c and crypto/adiantum.c?  If we're actually going to mak=
-e this a=0A=
-Fix for ccm is WIP.=0A=
-We were not aware of adiantum since our crypto engine does not accelerate i=
-t.=0A=
-=0A=
->> new API requirement, then we need to add a debugging option that makes t=
-he API=0A=
->> detect this violation so that the other places can be fixed too.=0A=
->>=0A=
-IMO this is not a new crypto API requirement.=0A=
-crypto API and its users must follow DMA API rules, besides crypto-specific=
- ones.=0A=
-=0A=
-In this particular case, crypto/gcm.c is both an implementation and a crypt=
-o API=0A=
-user, since it uses underneath ctr(aes) (and ghash).=0A=
-Currently generic gcm implementation is breaking DMA API, since part of the=
- dst=0A=
-buffer (auth_tag) provided to ctr(aes) is sharing a cache line with some ot=
-her=0A=
-data structure (iv).=0A=
-=0A=
-The DMA API rule is mentioned in Documentation/DMA-API.txt=0A=
-=0A=
-.. warning::=0A=
-=0A=
-        Memory coherency operates at a granularity called the cache=0A=
-        line width.  In order for memory mapped by this API to operate=0A=
-        correctly, the mapped region must begin exactly on a cache line=0A=
-        boundary and end exactly on one (to prevent two separately mapped=
-=0A=
-        regions from sharing a single cache line).=0A=
-=0A=
-=0A=
->> Also, doing a kmalloc() per requset is inefficient and very error-prone.=
-  In=0A=
->> fact there are at least 3 bugs here: (1) not checking the return value, =
-(2)=0A=
->> incorrectly using GFP_KERNEL when it may be atomic context, and (3) not =
-always=0A=
-For (2) I assume this means checking for CRYPTO_TFM_REQ_MAY_SLEEP flag.=0A=
-=0A=
->> freeing the memory.  Why not use cacheline-aligned memory within the req=
-uest=0A=
->> context, so that a separate kmalloc() isn't needed?=0A=
->>=0A=
-If you check previous discussion referenced in the commit message:=0A=
-Link:=0A=
-https://lore.kernel.org/linux-crypto/20190208114459.5nixe76xmmkhur75@gondor=
-.apana.org.au/=0A=
-=0A=
-or (probably easier) look at the full thread:=0A=
-https://patchwork.kernel.org/patch/10789697/=0A=
-=0A=
-you'll see that at some point I proposed changing crypto_gcm_req_priv_ctx s=
-truct=0A=
-as follows:=0A=
--       u8 auth_tag[16];=0A=
-+       u8 auth_tag[16] ____cacheline_aligned;=0A=
-=0A=
-Ard suggested it would be better to kmalloc the auth_tag.=0A=
-=0A=
-I am open to changing the fix, however I don't think the problem is in the=
-=0A=
-implementation (caam driver).=0A=
-=0A=
->> Also, did you consider whether there's any way to make the crypto API ha=
-ndle=0A=
->> this automatically, so that all the individual users don't have to?=0A=
-That would probably work, but I guess it would come up with a big overhead.=
-=0A=
-=0A=
-I am thinking crypto API would have to check each buffer used by src, dst=
-=0A=
-scatterlists is correctly aligned - starting and ending on cache line bound=
-aries.=0A=
-=0A=
-> =0A=
-> You're absolutely right Eric.=0A=
-> =0A=
-> What I suggested in the old thread is non-sense.  While you can=0A=
-> force GCM to provide the right pointers you cannot force all the=0A=
-> other crypto API users to do this.=0A=
-> =0A=
-Whose problem is that crypto API users don't follow the DMA API requirement=
-s?=0A=
-=0A=
-> It would appear that Ard's latest suggestion should fix the problem=0A=
-> and is the correct approach.=0A=
-> =0A=
-I disagree.=0A=
-We shouldn't force crypto implementations to be aware of such inconsistenci=
-es in=0A=
-the I/O data buffers (pointed to by src/dst scatterlists) that are supposed=
- to=0A=
-be safely DMA mapped.=0A=
-=0A=
-Thanks,=0A=
-Horia=0A=
+On Thu, 30 May 2019 at 09:46, Horia Geanta <horia.geanta@nxp.com> wrote:
+>
+> On 5/30/2019 8:34 AM, Herbert Xu wrote:
+> > On Wed, May 29, 2019 at 01:27:28PM -0700, Eric Biggers wrote:
+> >>
+> >> So what about the other places that also pass an IV located next to the data,
+> >> like crypto/ccm.c and crypto/adiantum.c?  If we're actually going to make this a
+> Fix for ccm is WIP.
+> We were not aware of adiantum since our crypto engine does not accelerate it.
+>
+> >> new API requirement, then we need to add a debugging option that makes the API
+> >> detect this violation so that the other places can be fixed too.
+> >>
+> IMO this is not a new crypto API requirement.
+> crypto API and its users must follow DMA API rules, besides crypto-specific ones.
+>
+> In this particular case, crypto/gcm.c is both an implementation and a crypto API
+> user, since it uses underneath ctr(aes) (and ghash).
+> Currently generic gcm implementation is breaking DMA API, since part of the dst
+> buffer (auth_tag) provided to ctr(aes) is sharing a cache line with some other
+> data structure (iv).
+>
+> The DMA API rule is mentioned in Documentation/DMA-API.txt
+>
+> .. warning::
+>
+>         Memory coherency operates at a granularity called the cache
+>         line width.  In order for memory mapped by this API to operate
+>         correctly, the mapped region must begin exactly on a cache line
+>         boundary and end exactly on one (to prevent two separately mapped
+>         regions from sharing a single cache line).
+>
+>
+
+This is overly restrictive, and not in line with reality. The whole
+networking stack operates on buffers shifted by 2 bytes if
+NET_IP_ALIGN is left at its default value of 2. There are numerous
+examples in other places as well.
+
+Given that kmalloc() will take the cacheline granularity into account
+if necessary, the only way this issue can hit is when a single kmalloc
+buffer is written to by two different masters.
+
+> >> Also, doing a kmalloc() per requset is inefficient and very error-prone.  In
+> >> fact there are at least 3 bugs here: (1) not checking the return value, (2)
+> >> incorrectly using GFP_KERNEL when it may be atomic context, and (3) not always
+> For (2) I assume this means checking for CRYPTO_TFM_REQ_MAY_SLEEP flag.
+>
+> >> freeing the memory.  Why not use cacheline-aligned memory within the request
+> >> context, so that a separate kmalloc() isn't needed?
+> >>
+> If you check previous discussion referenced in the commit message:
+> Link:
+> https://lore.kernel.org/linux-crypto/20190208114459.5nixe76xmmkhur75@gondor.apana.org.au/
+>
+> or (probably easier) look at the full thread:
+> https://patchwork.kernel.org/patch/10789697/
+>
+> you'll see that at some point I proposed changing crypto_gcm_req_priv_ctx struct
+> as follows:
+> -       u8 auth_tag[16];
+> +       u8 auth_tag[16] ____cacheline_aligned;
+>
+> Ard suggested it would be better to kmalloc the auth_tag.
+>
+> I am open to changing the fix, however I don't think the problem is in the
+> implementation (caam driver).
+>
+
+I remember that. But in the discussion that followed, I did ask about
+accessing the memory while the buffer is mapped for DMA, and I
+misunderstood the response. The scatterwalk_map_and_copy writes to the
+request while it is mapped for DMA.
+
+> >> Also, did you consider whether there's any way to make the crypto API handle
+> >> this automatically, so that all the individual users don't have to?
+> That would probably work, but I guess it would come up with a big overhead.
+>
+> I am thinking crypto API would have to check each buffer used by src, dst
+> scatterlists is correctly aligned - starting and ending on cache line boundaries.
+>
+> >
+> > You're absolutely right Eric.
+> >
+> > What I suggested in the old thread is non-sense.  While you can
+> > force GCM to provide the right pointers you cannot force all the
+> > other crypto API users to do this.
+> >
+> Whose problem is that crypto API users don't follow the DMA API requirements?
+>
+> > It would appear that Ard's latest suggestion should fix the problem
+> > and is the correct approach.
+> >
+> I disagree.
+> We shouldn't force crypto implementations to be aware of such inconsistencies in
+> the I/O data buffers (pointed to by src/dst scatterlists) that are supposed to
+> be safely DMA mapped.
+>
+
+I'm on the fence here. On the one hand, it is slightly dodgy for the
+GCM driver to pass a scatterlist referencing a buffer that shares a
+cacheline with another buffer passed by an ordinary pointer, and for
+which an explicit requirement exists that the callee should update it
+before returning.
+
+On the other hand, I think it is reasonable to require drivers not to
+perform such updates while the scatterlist is mapped for DMA, since
+fixing it in the callers puts a disproportionate burden on them, given
+that non-coherent DMA only represents a small minority of use cases.
