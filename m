@@ -2,183 +2,114 @@ Return-Path: <SRS0=uqbH=T6=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39F48C28CC0
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 May 2019 09:47:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D48EC28CC3
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 May 2019 10:03:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0B2D224891
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 May 2019 09:47:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 75C37256D0
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 May 2019 10:03:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=insidesecure.onmicrosoft.com header.i=@insidesecure.onmicrosoft.com header.b="gif+x5rk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727423AbfE3Jr1 (ORCPT
+        id S1726275AbfE3KDB (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 30 May 2019 05:47:27 -0400
-Received: from usa-sjc-mx-foss1.foss.arm.com ([217.140.101.70]:33576 "EHLO
-        foss.arm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727418AbfE3Jr1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 30 May 2019 05:47:27 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3491C374;
-        Thu, 30 May 2019 02:47:26 -0700 (PDT)
-Received: from [10.37.12.226] (unknown [10.37.12.226])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 025B83F59C;
-        Thu, 30 May 2019 02:47:24 -0700 (PDT)
-Subject: Re: Issues with initialising generic crypto implementations earlier
- on ARMv7
-To:     Peter Robinson <pbrobinson@gmail.com>,
-        Eric Biggers <ebiggers@google.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-References: <CALeDE9Owj-y6CEfjwjavkdCEcTGenMJoKBvDzR+nVMrKVFQmMw@mail.gmail.com>
-From:   Robin Murphy <robin.murphy@arm.com>
-Message-ID: <39a3fea0-efec-2103-6e8a-1a3fff31f856@arm.com>
-Date:   Thu, 30 May 2019 10:47:18 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        Thu, 30 May 2019 06:03:01 -0400
+Received: from mail-eopbgr40125.outbound.protection.outlook.com ([40.107.4.125]:34786
+        "EHLO EUR03-DB5-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725440AbfE3KDB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 30 May 2019 06:03:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=insidesecure.onmicrosoft.com; s=selector1-insidesecure-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=W1YYFxLS/dhsnjJRkEPefWdv3tIDakqRKeHwex3lOBw=;
+ b=gif+x5rkzvcktgsU6LGgZ+cf6o487KcPkJo5IfR0HpC2zN+14y5E5QPOfBl6WqeeK3BEky5ftBDTIAKeZhaLBpyCjmPqJEWQKjC1RjY3vjp105hwH4tyhLys3qoxz12SNnTziXb0GsuQW2DIVkgfBUMn5758EuZuJBqglr4+4ug=
+Received: from AM6PR09MB3523.eurprd09.prod.outlook.com (10.255.99.206) by
+ AM6PR09MB2344.eurprd09.prod.outlook.com (20.177.113.141) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1922.18; Thu, 30 May 2019 10:02:58 +0000
+Received: from AM6PR09MB3523.eurprd09.prod.outlook.com
+ ([fe80::8c11:e692:3a44:a3a9]) by AM6PR09MB3523.eurprd09.prod.outlook.com
+ ([fe80::8c11:e692:3a44:a3a9%6]) with mapi id 15.20.1922.021; Thu, 30 May 2019
+ 10:02:57 +0000
+From:   Pascal Van Leeuwen <pvanleeuwen@insidesecure.com>
+To:     Richard Weinberger <richard@nod.at>,
+        Stephan Mueller <smueller@chronox.de>
+CC:     david <david@sigma-star.at>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Subject: RE: Can an ahash driver be used through shash API?
+Thread-Topic: Can an ahash driver be used through shash API?
+Thread-Index: AQHVFihP88/NJMXnyUClc8VyHvQMd6aCJmgAgABlkgCAAOLFEA==
+Date:   Thu, 30 May 2019 10:02:57 +0000
+Message-ID: <AM6PR09MB3523027D7045FD96E9FE4C33D2180@AM6PR09MB3523.eurprd09.prod.outlook.com>
+References: <729A4150-93A0-456B-B7AB-6D3A446E600E@sigma-star.at>
+ <4256916.YlTHG9RRyR@tauon.chronox.de>
+ <1331220190.73461.1559161310462.JavaMail.zimbra@nod.at>
+In-Reply-To: <1331220190.73461.1559161310462.JavaMail.zimbra@nod.at>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=pvanleeuwen@insidesecure.com; 
+x-originating-ip: [188.204.2.113]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 3c174e36-7ec7-4a01-facc-08d6e4e5fdf0
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:AM6PR09MB2344;
+x-ms-traffictypediagnostic: AM6PR09MB2344:
+x-ms-exchange-purlcount: 1
+x-microsoft-antispam-prvs: <AM6PR09MB2344578E5F88ECE3265AD2EED2180@AM6PR09MB2344.eurprd09.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-forefront-prvs: 00531FAC2C
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(376002)(346002)(39850400004)(396003)(136003)(366004)(199004)(189003)(186003)(68736007)(26005)(54906003)(3846002)(476003)(446003)(11346002)(110136005)(486006)(6506007)(2906002)(76176011)(8936002)(316002)(86362001)(81156014)(8676002)(52536014)(66066001)(7736002)(305945005)(81166006)(102836004)(74316002)(6116002)(64756008)(5660300002)(76116006)(14454004)(6436002)(71190400001)(71200400001)(53936002)(55016002)(6246003)(7696005)(99286004)(256004)(66476007)(66946007)(4326008)(229853002)(66556008)(66446008)(33656002)(73956011)(25786009)(14444005)(15974865002)(478600001)(9686003)(18886075002);DIR:OUT;SFP:1102;SCL:1;SRVR:AM6PR09MB2344;H:AM6PR09MB3523.eurprd09.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: insidesecure.com does not
+ designate permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: eUXdyixJRljCTsrfU9NmTVxYew1lHBia4DJ8R/rx/Aq/OSNBIP9YSWwz225aCXP6kP1GGfReKRQPJi7BBxtgMtXEbEIuEW+PlH0AiwmJYrBRl1AmcaHvN7PV0BH1vkefTPg2NKgbs6yB8ITPLGTqwI5KzjljPXp8kulMlEpEvon1UcE79v6hd1gdKR+vuK7iNX2t6dU82rsgY4t2PYWbuHsMsMX8yWZ3lP7g/i1BZsNsqOrfGB2tyffARwkpaV/PzuAOsI+T4XoZNk3/VUmRS63qkA5JVOKgGn99Vz7zA/6hbNadBFAD47FjzZ1H8q8yJqvbJhy4Snx5yJnIGpkMIfNILF4GGlsR8wQSzCb9gGUNWyO4Nd0g3FUDPJkA8u6Y+VbXScRIoMITUiXtgtyrIxtt9O67CjsLAqSAXcc6eHA=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <CALeDE9Owj-y6CEfjwjavkdCEcTGenMJoKBvDzR+nVMrKVFQmMw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+X-OriginatorOrg: insidesecure.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3c174e36-7ec7-4a01-facc-08d6e4e5fdf0
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 May 2019 10:02:57.4388
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3c07df58-7760-4e85-afd5-84803eac70ce
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: pvanleeuwen@insidesecure.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR09MB2344
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2019-05-30 10:12 am, Peter Robinson wrote:
-> Hi Eric,
-> 
-> I'm seeing the crash below on ARMv7 devices, at least the Raspberry Pi
-> and UDoo Neo (i.MX6SX), with your "crypto: run initcalls for generic
-> implementations earlier" patch. It's causing the boot to fail very
-> early on across the ARMv7 devices I've tested on Fedora (I'm the Arm
-> lead for Fedora. Reverting the patch makes the problem go away. I'm
-> unsure why initialising it earlier in the boot would cause issues, any
-> chance you could assist in sorting the issue out? Tested on 5.2 rc1
-> and rc2.
-
-It looks like this would now run before the alignment fault handler has 
-been installed at fs_initcall - that might explain the difference in 
-behaviour, but the real question would be why this code is making an 
-unsupported unaligned access in the first place, especially on v7. That 
-smells like a problem which may have just been masked by the fixup 
-handler before.
-
-Robin.
-
-> 
-> Regards,
-> Peter
-> 
-> [1] c4741b23059794bd99beef0f700103b0d983b3fd
-> 
-> [    2.239276] cryptd: max_cpu_qlen set to 1000
-> [    2.257316] alg: No test for lzo-rle (lzo-rle-generic)
-> [    2.262883] alg: No test for lzo-rle (lzo-rle-scomp)
-> [    2.268303] alg: No test for 842 (842-generic)
-> [    2.273154] alg: No test for 842 (842-scomp)
-> [    2.299763] Unhandled fault: alignment fault (0x221) at 0xc0eb987e
-> [    2.306015] pgd = (ptrval)
-> [    2.308746] [c0eb987e] *pgd=80000000207003, *pmd=00e0071d(bad)
-> [    2.314650] Internal error: : 221 [#1] SMP ARM
-> [    2.319137] Modules linked in:
-> [    2.322228] CPU: 0 PID: 142 Comm: cryptomgr_test Not tainted
-> 5.2.0-0.rc2.git0.1.fc31.armv7hl+lpae #1
-> [    2.331455] Hardware name: BCM2835
-> [    2.334902] PC is at gf128mul_init_4k_lle+0x2c/0xa0
-> [    2.339834] LR is at kmem_cache_alloc_trace+0xc0/0x14c
-> [    2.345024] pc : [<c071ec8c>]    lr : [<c05d0ab0>]    psr: a0000013
-> [    2.351355] sp : eafcfcf8  ip : ead04000  fp : ead71dc0
-> [    2.356632] r10: 00000000  r9 : 00000000  r8 : c0eb987e
-> [    2.361910] r7 : c0eb987e  r6 : c12576c0  r5 : c0eb987e  r4 : ead03000
-> [    2.368506] r3 : 00001000  r2 : 00001000  r1 : ead03000  r0 : ead03000
-> [    2.375103] Flags: NzCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment user
-> [    2.382313] Control: 30c5383d  Table: 00203000  DAC: fffffffd
-> [    2.388118] Process cryptomgr_test (pid: 142, stack limit = 0x(ptrval))
-> [    2.394801] Stack: (0xeafcfcf8 to 0xeafd0000)
-> [    2.399203] fce0:
->      ead71600 c0eb987e
-> [    2.407472] fd00: c12576c0 c0eb987e c0eb987e 00000000 00000000
-> c0729434 00000010 ead71600
-> [    2.415742] fd20: c12576c0 c0713f90 ead71d80 00000010 c0bf55c4
-> c0eb987e 00000000 00000010
-> [    2.424012] fd40: 00000000 c07134a4 00000000 ead71540 c0bf55c4
-> eaef5400 eafcfe80 c071aa1c
-> [    2.432282] fd60: 00000000 00000001 eaef5400 ead71d80 c0c1a89c
-> ffffffff 00000073 00000400
-> [    2.440550] fd80: 00000000 00000000 00000000 00000014 00000000
-> 00000000 00000cc0 00000000
-> [    2.448820] fda0: 00000000 eafcfda4 eafcfda4 00000000 eac01c00
-> 00000000 00000000 eac01c00
-> [    2.457090] fdc0: 00000084 c070d15c eafcfd30 c05d0824 00000dc0
-> 00000dc0 00000004 c0bf4a14
-> [    2.465360] fde0: 00000040 eafcfe5c eafcfe80 eafcfe58 ffffffff
-> eafcfe80 eafcfe18 1503017f
-> [    2.473630] fe00: c0f3bf27 c0bb9d5c ffffff0f ffff0a00 eac01e00
-> eadcb180 ffffff0f ffff0a00
-> [    2.481901] fe20: 00000024 00000000 eae96c00 ead71540 eaef5400
-> ead71d80 eadcb180 00000000
-> [    2.490171] fe40: eae96c00 ead71540 eaef5400 ead71d80 eadcb180
-> 00000000 00000000 c071b144
-> [    2.498441] fe60: ead71540 eae96c00 eadcb180 87c8332f ead71dc0
-> c0c1a89c c0c1a89c 00000006
-> [    2.506710] fe80: eafc0030 c0483f9c 0000407f c048610c 0000407f
-> 00000006 eaef5400 0000000e
-> [    2.514980] fea0: 00000400 c0c1a89c c071b1a0 ffffffff 00000073
-> c071b250 00000400 eaef5400
-> [    2.523250] fec0: eaef5400 0000000e eaef5480 c137ae08 00000400
-> c071a0a4 00000000 eb3c8704
-> [    2.531519] fee0: 00000001 eafcff50 00000004 c0bbe504 00000009
-> c121d158 eafcff0c c047aaf0
-> [    2.539790] ff00: c120a000 eafacb00 eafcff3c c047ac74 c1200018
-> eafacb00 c120a000 24854451
-> [    2.548061] ff20: eb3d3140 eafacb00 c120a000 c1236200 eb3d3140
-> eafacf68 eafcff7c c0bbe3d8
-> [    2.556331] ff40: ead0de24 00000000 00000001 ead0de20 ead0de24
-> 00000004 ead0de20 eafacb00
-> [    2.564602] ff60: eafce000 eaef5400 eaeea4c0 eafce000 ead0de20
-> eaef5400 c0716c34 eadcb35c
-> [    2.572871] ff80: 00000000 c0716c60 eadcb340 c0473000 eaeea4c0
-> c0472ef4 00000000 00000000
-> [    2.581140] ffa0: 00000000 00000000 00000000 c04011f8 00000000
-> 00000000 00000000 00000000
-> [    2.589408] ffc0: 00000000 00000000 00000000 00000000 00000000
-> 00000000 00000000 00000000
-> [    2.597676] ffe0: 00000000 00000000 00000000 00000000 00000013
-> 00000000 00000000 00000000
-> [    2.605961] [<c071ec8c>] (gf128mul_init_4k_lle) from [<c0729434>]
-> (ghash_setkey+0x48/0x5c)
-> [    2.614325] [<c0729434>] (ghash_setkey) from [<c0713f90>]
-> (crypto_shash_setkey+0xbc/0xd8)
-> [    2.622599] [<c0713f90>] (crypto_shash_setkey) from [<c07134a4>]
-> (crypto_ahash_setkey+0xbc/0xd8)
-> [    2.631486] [<c07134a4>] (crypto_ahash_setkey) from [<c071aa1c>]
-> (test_hash_vec_cfg+0x74/0x60c)
-> [    2.640286] [<c071aa1c>] (test_hash_vec_cfg) from [<c071b144>]
-> (__alg_test_hash.constprop.0+0x190/0x1ec)
-> [    2.649875] [<c071b144>] (__alg_test_hash.constprop.0) from
-> [<c071b250>] (alg_test_hash+0xb0/0xf8)
-> [    2.658936] [<c071b250>] (alg_test_hash) from [<c071a0a4>]
-> (alg_test+0x330/0x3f8)
-> [    2.666504] [<c071a0a4>] (alg_test) from [<c0716c60>]
-> (cryptomgr_test+0x2c/0x4c)
-> [    2.673988] [<c0716c60>] (cryptomgr_test) from [<c0473000>]
-> (kthread+0x10c/0x118)
-> [    2.681559] [<c0473000>] (kthread) from [<c04011f8>]
-> (ret_from_fork+0x14/0x3c)
-> [    2.688856] Exception stack(0xeafcffb0 to 0xeafcfff8)
-> [    2.693960] ffa0:                                     00000000
-> 00000000 00000000 00000000
-> [    2.702228] ffc0: 00000000 00000000 00000000 00000000 00000000
-> 00000000 00000000 00000000
-> [    2.710494] ffe0: 00000000 00000000 00000000 00000000 00000013 00000000
-> [    2.717185] Code: e5930030 ebfac75a e2504000 0a000019 (e895000f)
-> [    2.723350] ---[ end trace 9839f43693f21333 ]---
-> 
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
-> 
+PiA+DQo+ID4gVGhlIGNyeXB0b19hbGxvY19zaGFzaCB3aWxsIG9ubHkgaWRlbnRpZnkgY2lwaGVy
+IGltcGxlbWVudGF0aW9ucyB0aGF0DQo+IHdlcmUNCj4gPiByZWdpc3RlcmVkIHdpdGggdGhlIENS
+WVBUT19BTEdfVFlQRV9TSEFTSCBmbGFnLiBUaGF0IGZsYWcgaXMgc2V0IHdoZW4gYQ0KPiBjaXBo
+ZXINCj4gPiBpcyByZWdpc3RlcmVkIHVzaW5nIGNyeXB0b19yZWdpc3Rlcl9zaGFzaC4NCj4gPg0K
+PiA+IFRodXMsIGNpcGhlcnMgcmVnaXN0ZXJlZCB3aXRoIGNyeXB0b19yZWdpc3Rlcl9haGFzaCB3
+aWxsIG5vdCBiZWFyIHRoaXMNCj4gZmxhZw0KPiA+IGFuZCB0aHVzIHdpbGwgbm90IGJlIGZvdW5k
+IGJ5IHRoZSBhbGxvY2F0aW9uIGZ1bmN0aW9uLg0KPiANCj4gaXMgdGhlcmUgYSByZWFzb24gd2h5
+IHdlIGRvbid0IGVtdWxhdGUgdGhlIHN5bmNocm9ub3VzIGZ1bmN0aW9uYWxpdHkNCj4gaW4gdGhl
+IGNyeXB0byBBUEkgbGF5ZXIgaWYgYSBkcml2ZXIgaW1wbGVtZW50cyBvbmx5IHRoZSBhc3luYyBp
+bnRlcmZhY2U/DQo+IA0KPiBPciBpcyBpdCBqdXN0IGEgbWF0dGVyIG9mIC1FTk9QQVRDSD8gOikN
+Cj4gDQpXZWxsLCBvbmUgcmVhc29uIG1pZ2h0IGJlIHRoYXQgYXN5bmNocm9ub3VzIGltcGxlbWVu
+dGF0aW9ucyBhcmUgdXN1YWxseQ0KaGFyZHdhcmUgYWNjZWxlcmF0b3JzIHRoYXQgcmVseSBvbiBt
+YW55IG9wZXJhdGlvbnMgYmVpbmcgYmF0Y2ggcXVldWVkIGluDQpvcmRlciB0byBhY3R1YWxseSB1
+c2VmdWxseSBhY2NlbGVyYXRlIGFueXRoaW5nIChkdWUgdG8gbGFyZ2UgbGF0ZW5jaWVzKS4NCldo
+aWNoIHlvdSBjYW4ndCBkbyBmcm9tIHRoZSBzeW5jaHJvbm91cyBpbnRlcmZhY2UsIHNvIHlvdSdk
+IGdldCBhIHNsb3cgZG93biwgDQpub3QgYSBzcGVlZCB1cC4gDQooQnV0IHNvbWUgcGVvcGxlIC0g
+QWQgOi0pIC0gbWlnaHQgYXJndWUgdGhhdCB1c2luZyB0aGUgYWNjZWxlcmF0b3IgbWF5IHN0aWxs
+DQpiZSB1c2VmdWwgdG8gb2ZmbG9hZCB0aGUgQ1BVLCByZWR1Y2UgcG93ZXIgY29uc3VtcHRpb24s
+IGV0Yy4pDQoNCkluIGFueSBjYXNlLCBJIGRpZG4ndCByZWFsbHkga25vdyB0aGlzIGJ1dCBJJ20g
+cXVpdGUgaGFwcHkgd2l0aCBpdC4gSWYgeW91DQp3YW50ICpwZXJmb3JtYW5jZSosIHlvdSBzaG91
+bGRuJ3QgZW5kIHVwIGF0IGEgaC93IGFjY2VsZXJhdG9yIHdpdGggYSANCnN5bmNocm9ub3VzIEFQ
+SS4gSWYgeW91IGRvIHdhbnQgdGhlIGgvdyBhY2NlbGVyYXRpb24sIHlvdSBjYW4gYWx3YXlzIHVz
+ZQ0KdGhlIGFzeW5jaHJvbm91cyBBUEksIHNvIG5vdGhpbmcgbG9zdCB0aGVyZSwgeW91IGRvIGhh
+dmUgYSBjaG9pY2UuDQoNClJlZ2FyZHMsDQpQYXNjYWwgdmFuIExlZXV3ZW4NClNpbGljb24gSVAg
+QXJjaGl0ZWN0LCBNdWx0aS1Qcm90b2NvbCBFbmdpbmVzIEAgSW5zaWRlIFNlY3VyZQ0Kd3d3Lmlu
+c2lkZXNlY3VyZS5jb20NCg==
