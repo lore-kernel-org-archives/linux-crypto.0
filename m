@@ -2,41 +2,67 @@ Return-Path: <SRS0=uqbH=T6=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC36EC28CC0
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 May 2019 13:45:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E9DCC28CC0
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 May 2019 13:53:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 98FD7259CC
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 May 2019 13:45:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E916425982
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 May 2019 13:53:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="a4w65cG1"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aV3a3Qtp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726829AbfE3Npw (ORCPT
+        id S1726628AbfE3Nxr (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 30 May 2019 09:45:52 -0400
-Received: from mail-eopbgr20089.outbound.protection.outlook.com ([40.107.2.89]:27968
-        "EHLO EUR02-VE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726851AbfE3Npv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 30 May 2019 09:45:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TNuPzzuKwevPJZO0nIXfqNwbwVit452pWgKVnnPz04c=;
- b=a4w65cG1JtTVNOGrwhcdpml1TQraoPKn0kPH4vUJZJ1JoZFDCLV6Pp9KzaKjHLIgD8z8X0HHatx0/e7n9jYXGnKZaXmBb2/WwvDRMCLSVdYjXcLpaqTYGIMtVSMlcXK0ousD9VEpu2AEApcC4oHqA5yeicBH0cODwi8Y1LF7dz4=
-Received: from VI1PR04MB4445.eurprd04.prod.outlook.com (20.177.55.161) by
- VI1PR04MB6304.eurprd04.prod.outlook.com (20.179.28.148) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1922.18; Thu, 30 May 2019 13:45:47 +0000
-Received: from VI1PR04MB4445.eurprd04.prod.outlook.com
- ([fe80::39fd:f3c3:46fc:f872]) by VI1PR04MB4445.eurprd04.prod.outlook.com
- ([fe80::39fd:f3c3:46fc:f872%7]) with mapi id 15.20.1922.021; Thu, 30 May 2019
- 13:45:47 +0000
-From:   Iuliana Prodan <iuliana.prodan@nxp.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-CC:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Thu, 30 May 2019 09:53:47 -0400
+Received: from mail-io1-f68.google.com ([209.85.166.68]:33480 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726454AbfE3Nxr (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 30 May 2019 09:53:47 -0400
+Received: by mail-io1-f68.google.com with SMTP id u13so5138508iop.0
+        for <linux-crypto@vger.kernel.org>; Thu, 30 May 2019 06:53:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=o1cBK1xetXKqPQsIIl75xlp+mHn3/szubtAs7P5Ucrg=;
+        b=aV3a3QtpMLNViDLENhBHXiInGoHjqzPYoqVjaHiako1F0ud6Zv8vgIPbnzMFJf6oRU
+         Tu/eQUXbTUUrKaA3CfD0sYTQhYGA+YvZ7or472tod4QzEQVq1/uX0qCm0ixiKXRQ59JY
+         +9yhmdudR0wefvU88p3HkWSGJpRXAUmBoRtwrpXN/eonDDUasHf3zt76jqNJIKNCWLef
+         WzO5/mRt2LLTszN1YyFdnXoKlqkaM6AZ9DHPKz5xIm1Vzo1aVei2Q8ruz8r098ec1Nyb
+         CiFJ9DYnI04MYcLr0XTiplqRxa3ypbYB7DeiKb/DFrbTROK1pRnhSmsUdPkt7NNraiLE
+         Ku4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=o1cBK1xetXKqPQsIIl75xlp+mHn3/szubtAs7P5Ucrg=;
+        b=DchYx+AMfKCTetgfZr6/tQLAh4c67wyhQb1r5JX3siMREMUaRbEKBEOW8sQn9ufVPA
+         s3OX1iwj7QeHMSF9bhSOwpAZYwmIDl3J8pZUIhIEuuqtWgIGGmNiqjLjZSzbaVWy7OQd
+         oZcCRxzQgHJx+rXCJVTYp81wUXDBT+/38NA4GsjrK5EzHKgfyJIVe5M+YXOGlA/sMo71
+         VoaOXaIpKofcKe8SEebncPDpA/ii6ZX/ZBQI5X/EG84wMxNNSim/S0XqbIqVQX+Sd6jn
+         xctpURUziGUmlvPhYoLBP4WLplHK6A9v5IzsEOv+pYiXPHyoCNThIAunomSidzrOlKm5
+         6wJw==
+X-Gm-Message-State: APjAAAV8pNMyoxLYsPzpo52uocbGEbg50LlSn3IR1tBfpDOz2OZqm0dg
+        BrOMBCCdYKB8y3sRwUYqCwEwTWUYPDwjWzV2nB/Hwxn27HnYww==
+X-Google-Smtp-Source: APXvYqxaz4GV5Y25t4/1krn0WhJBfKXcPRD9UUG155gKE/opIPm5E72E9h3/aLPqygECtWX9Ke/4tfms6QNF36/k2gM=
+X-Received: by 2002:a5d:968e:: with SMTP id m14mr2702733ion.49.1559224426119;
+ Thu, 30 May 2019 06:53:46 -0700 (PDT)
+MIME-Version: 1.0
+References: <1559149856-7938-1-git-send-email-iuliana.prodan@nxp.com>
+ <20190529202728.GA35103@gmail.com> <CAKv+Gu-4KqcY=WhwY98JigTzeXaL5ggYEcu7+kNzNtpO2FLQXg@mail.gmail.com>
+ <VI1PR04MB44459EEF7BCD3458BB3D143D8C180@VI1PR04MB4445.eurprd04.prod.outlook.com>
+ <20190530133427.qrwjzctac2x6nsby@gondor.apana.org.au> <VI1PR04MB444562A2352FE4BAD7F681258C180@VI1PR04MB4445.eurprd04.prod.outlook.com>
+In-Reply-To: <VI1PR04MB444562A2352FE4BAD7F681258C180@VI1PR04MB4445.eurprd04.prod.outlook.com>
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date:   Thu, 30 May 2019 15:53:32 +0200
+Message-ID: <CAKv+Gu-jTWQP0Zp=QpuzX41v8Eb5Bvd0O9ajwSnFkDO-ijBf_A@mail.gmail.com>
+Subject: Re: [PATCH] crypto: gcm - fix cacheline sharing
+To:     Iuliana Prodan <iuliana.prodan@nxp.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
         Eric Biggers <ebiggers@kernel.org>,
         "David S. Miller" <davem@davemloft.net>,
         Horia Geanta <horia.geanta@nxp.com>,
@@ -45,75 +71,71 @@ CC:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         <linux-crypto@vger.kernel.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         dl-linux-imx <linux-imx@nxp.com>
-Subject: Re: [PATCH] crypto: gcm - fix cacheline sharing
-Thread-Topic: [PATCH] crypto: gcm - fix cacheline sharing
-Thread-Index: AQHVFkF/PjPULMOhfkiEXDJZ6fiBzQ==
-Date:   Thu, 30 May 2019 13:45:47 +0000
-Message-ID: <VI1PR04MB444562A2352FE4BAD7F681258C180@VI1PR04MB4445.eurprd04.prod.outlook.com>
-References: <1559149856-7938-1-git-send-email-iuliana.prodan@nxp.com>
- <20190529202728.GA35103@gmail.com>
- <CAKv+Gu-4KqcY=WhwY98JigTzeXaL5ggYEcu7+kNzNtpO2FLQXg@mail.gmail.com>
- <VI1PR04MB44459EEF7BCD3458BB3D143D8C180@VI1PR04MB4445.eurprd04.prod.outlook.com>
- <20190530133427.qrwjzctac2x6nsby@gondor.apana.org.au>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=iuliana.prodan@nxp.com; 
-x-originating-ip: [212.146.100.6]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: fdc518eb-467f-48d6-18bc-08d6e5051ecb
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:VI1PR04MB6304;
-x-ms-traffictypediagnostic: VI1PR04MB6304:
-x-microsoft-antispam-prvs: <VI1PR04MB6304CFA91476FBC72E9929E08C180@VI1PR04MB6304.eurprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-forefront-prvs: 00531FAC2C
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(396003)(366004)(136003)(376002)(39860400002)(346002)(189003)(199004)(55016002)(66066001)(5660300002)(6116002)(3846002)(54906003)(256004)(66446008)(8676002)(81166006)(9686003)(86362001)(64756008)(81156014)(68736007)(2906002)(25786009)(74316002)(14454004)(76176011)(52536014)(316002)(8936002)(71190400001)(446003)(99286004)(6436002)(7696005)(478600001)(6506007)(102836004)(53546011)(305945005)(4326008)(186003)(26005)(73956011)(476003)(66946007)(486006)(53936002)(71200400001)(66556008)(66476007)(6916009)(7736002)(6246003)(44832011)(229853002)(4744005)(33656002)(76116006);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR04MB6304;H:VI1PR04MB4445.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: nxp.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: aVa2+YfeH68Fjdmp3lt1TeFEjGJH8+w2aYa9VHrnwzb1Ci2xTZKvwxHyp6L8OWPtfWm8xx0EA4w4JU9QOukuPsF3q5BxWwicWkhfopSmObzPUKUDrmg6Rfr/ToL+GCbCjpHVWQu5Qwc5IiApxQ8aTgptR0gFxtOy8tK71IMnS3nmpe0P64QVmlf3OyUEqaHfHn77pYFDwLwfw0k9KUwoHT1AaLNjZzPH1RMtKAwlZAyfzLXgrpjnbdbcXwVcHKm7tV5JNqpXCK+W0LOR6qqkBbWkbXx/caDxm/jH+/81rhnAAFVBpUgBaml3CQA4E3a9N9ZcnE/M/z7D9/JCz7fcxiktOuvJjxplsbYO8qe5cXXWqG/HvMYjMLyDN3gkTyhOjIZorXN/6OEBSR9ekAOcbPoz8DdgnLNYq4lbfIg3CuY=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fdc518eb-467f-48d6-18bc-08d6e5051ecb
-X-MS-Exchange-CrossTenant-originalarrivaltime: 30 May 2019 13:45:47.2378
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: iuliana.prodan@nxp.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB6304
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 5/30/2019 4:34 PM, Herbert Xu wrote:=0A=
-> On Thu, May 30, 2019 at 01:29:41PM +0000, Iuliana Prodan wrote:=0A=
->>=0A=
->> I've tried coping the IV before the extended descriptor allocation, but=
-=0A=
->> is not working and to make it work will need to make more changes in=0A=
->> CAAM. We need the original iv, and if we move it before=0A=
->> skcipher_edesc_alloc we lose it.=0A=
->> The fix exclusively in CAAM drv, to copy iv before DMA map, is more comp=
-lex.=0A=
-> =0A=
-> Why doesn't it work (apart from the fact that this only makes sense=0A=
-> for CBC and yet you're doing it for everything including CTR)?=0A=
-> =0A=
-> Cheers,=0A=
-> =0A=
-=0A=
-On the current structure of caamalg, to work, iv needs to be copied =0A=
-before memcpy(iv, req->iv, ivsize), from skcipher_edesc_alloc function. =0A=
-For this we need edesc, but this cannot be allocated before knowing how =0A=
-much memory we need. So, to make it work, we'll need to modify more in CAAM=
-.=0A=
-=0A=
-Thanks,=0A=
-Iulia=0A=
+On Thu, 30 May 2019 at 15:45, Iuliana Prodan <iuliana.prodan@nxp.com> wrote:
+>
+> On 5/30/2019 4:34 PM, Herbert Xu wrote:
+> > On Thu, May 30, 2019 at 01:29:41PM +0000, Iuliana Prodan wrote:
+> >>
+> >> I've tried coping the IV before the extended descriptor allocation, but
+> >> is not working and to make it work will need to make more changes in
+> >> CAAM. We need the original iv, and if we move it before
+> >> skcipher_edesc_alloc we lose it.
+> >> The fix exclusively in CAAM drv, to copy iv before DMA map, is more complex.
+> >
+> > Why doesn't it work (apart from the fact that this only makes sense
+> > for CBC and yet you're doing it for everything including CTR)?
+> >
+> > Cheers,
+> >
+>
+> On the current structure of caamalg, to work, iv needs to be copied
+> before memcpy(iv, req->iv, ivsize), from skcipher_edesc_alloc function.
+> For this we need edesc, but this cannot be allocated before knowing how
+> much memory we need. So, to make it work, we'll need to modify more in CAAM.
+>
+
+Would this work?
+
+diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
+index c0ece44f303b..2ef2f76a3cb8 100644
+--- a/drivers/crypto/caam/caamalg.c
++++ b/drivers/crypto/caam/caamalg.c
+@@ -1832,22 +1832,25 @@ static int skcipher_decrypt(struct
+skcipher_request *req)
+        struct caam_ctx *ctx = crypto_skcipher_ctx(skcipher);
+        int ivsize = crypto_skcipher_ivsize(skcipher);
+        struct device *jrdev = ctx->jrdev;
++       u8 out_iv[AES_BLOCK_SIZE];
+        u32 *desc;
+        int ret = 0;
+
+-       /* allocate extended descriptor */
+-       edesc = skcipher_edesc_alloc(req, DESC_JOB_IO_LEN * CAAM_CMD_SZ);
+-       if (IS_ERR(edesc))
+-               return PTR_ERR(edesc);
+-
+        /*
+         * The crypto API expects us to set the IV (req->iv) to the last
+         * ciphertext block.
+         */
+        if (ivsize)
+-               scatterwalk_map_and_copy(req->iv, req->src, req->cryptlen -
++               scatterwalk_map_and_copy(out_iv, req->src, req->cryptlen -
+                                         ivsize, ivsize, 0);
+
++       /* allocate extended descriptor */
++       edesc = skcipher_edesc_alloc(req, DESC_JOB_IO_LEN * CAAM_CMD_SZ);
++       if (IS_ERR(edesc))
++               return PTR_ERR(edesc);
++
++       memcpy(req->iv, out_iv, ivsize);
++
+        /* Create and submit job descriptor*/
+        init_skcipher_job(req, edesc, false);
+        desc = edesc->hw_desc;
