@@ -2,144 +2,135 @@ Return-Path: <SRS0=uqbH=T6=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63E33C28CC3
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 May 2019 11:36:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89B30C28CC0
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 May 2019 13:06:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3D57F25866
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 May 2019 11:36:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="mfi66sUr"
+	by mail.kernel.org (Postfix) with ESMTP id 69A7A25945
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 May 2019 13:06:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726386AbfE3Lga (ORCPT
+        id S1726100AbfE3NGo (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 30 May 2019 07:36:30 -0400
-Received: from mail-eopbgr00060.outbound.protection.outlook.com ([40.107.0.60]:53127
-        "EHLO EUR02-AM5-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726065AbfE3Lga (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 30 May 2019 07:36:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4ZJGGSH0+d6IrAW7guS93/lvz2bAdA1RpLKWlAimzZ8=;
- b=mfi66sUrbopM1nqJlk1fIO1Ei93xET+plNKalM7qsU75iqyBCNAcF7l/UiYc8JxKBBgdbHvfempiL38C7a+LI8piDhvWEAi3TRf4mvFTmzs5F4ZzgOz8gWPDkRke7mzJhs/dwdErnIq2Gm9+kxJrutgx7Z0dfDqG1x8Kl/VhH/c=
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
- VI1PR0402MB3534.eurprd04.prod.outlook.com (52.134.4.27) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1922.16; Thu, 30 May 2019 11:36:26 +0000
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::ccaf:f4a1:704a:e745]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::ccaf:f4a1:704a:e745%4]) with mapi id 15.20.1922.021; Thu, 30 May 2019
- 11:36:25 +0000
-From:   Horia Geanta <horia.geanta@nxp.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-CC:     "David S. Miller" <davem@davemloft.net>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        dl-linux-imx <linux-imx@nxp.com>,
-        Iuliana Prodan <iuliana.prodan@nxp.com>,
-        Valentin Ciocoi Radulescu <valentin.ciocoi@nxp.com>,
-        "stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: Re: [v2 PATCH] crypto: caam - fix DKP detection logic
-Thread-Topic: [v2 PATCH] crypto: caam - fix DKP detection logic
-Thread-Index: AQHVFtvp6L+GVTG2yEe9n6uchO0tWg==
-Date:   Thu, 30 May 2019 11:36:25 +0000
-Message-ID: <VI1PR0402MB348596A1F9AF7B547DC6AB2C98180@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-References: <20190503120548.5576-1-horia.geanta@nxp.com>
- <20190506063944.enwkbljhy42rcaqq@gondor.apana.org.au>
- <VI1PR0402MB3485B440F9D3F033F021307298300@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=horia.geanta@nxp.com; 
-x-originating-ip: [78.96.98.22]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 3100dcc8-73eb-4d30-435a-08d6e4f30ca3
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:VI1PR0402MB3534;
-x-ms-traffictypediagnostic: VI1PR0402MB3534:
-x-ms-exchange-purlcount: 1
-x-microsoft-antispam-prvs: <VI1PR0402MB3534214C3A4767DDD01D302798180@VI1PR0402MB3534.eurprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8273;
-x-forefront-prvs: 00531FAC2C
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(376002)(39860400002)(136003)(366004)(396003)(346002)(199004)(189003)(186003)(99286004)(8676002)(966005)(256004)(316002)(8936002)(53546011)(44832011)(81166006)(81156014)(74316002)(476003)(53936002)(66446008)(66556008)(7736002)(6246003)(102836004)(76176011)(305945005)(6506007)(26005)(7696005)(110136005)(446003)(33656002)(486006)(6436002)(54906003)(229853002)(9686003)(91956017)(68736007)(64756008)(66066001)(14454004)(71190400001)(4326008)(5660300002)(6306002)(71200400001)(73956011)(55016002)(76116006)(478600001)(86362001)(25786009)(3846002)(66946007)(66476007)(2906002)(6116002)(52536014);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB3534;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: nxp.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: qGJIeW1qc7JqJNlOOBpHepKhrJiCsPbMJQhP4Y1fXkrMM960pLOzltAu6Ib+fGVQEvtmAxsxqUJZTnO9F7K2sSm+7spT0GNiFVHyfu3E/lpyGTjwZdfIrTcLino+3oKOp4MzR2fgk3Wylpawwcyvk5GVQJde8ijw5LCcKIqHPnsbfIpRnlyFWCjE6D1/fMGeHOMmVfY5j+K+KQvRq6O/IlDAA1LO/vd8ND1KJblTiUFL9gIA8Dw76ZSA9V89AY4v094RJfDHEEDrIJVz93MewKQCjXWaYDZBhCquB5BcJPk0blA1yHXzwNo9fBW6Ga8JBbt89kuj0OL9oq30N5Mb+cTZQbSMf/iqO3+Dqk6cVWHdQOuisNH1yzP7ltepmq8XO2Tylci9k27vkdub536JPxfJvQSXFFr0835qEtWlYr8=
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
+        Thu, 30 May 2019 09:06:44 -0400
+Received: from mga03.intel.com ([134.134.136.65]:50325 "EHLO mga03.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726031AbfE3NGo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 30 May 2019 09:06:44 -0400
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga103.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 30 May 2019 06:06:43 -0700
+X-ExtLoop1: 1
+Received: from lkp-server01.sh.intel.com (HELO lkp-server01) ([10.239.97.150])
+  by fmsmga004.fm.intel.com with ESMTP; 30 May 2019 06:06:42 -0700
+Received: from kbuild by lkp-server01 with local (Exim 4.89)
+        (envelope-from <lkp@intel.com>)
+        id 1hWKlV-000B80-Q9; Thu, 30 May 2019 21:06:41 +0800
+Date:   Thu, 30 May 2019 21:05:53 +0800
+From:   kbuild test robot <lkp@intel.com>
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     kbuild-all@01.org, linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Linus Walleij <linus.walleij@linaro.org>
+Subject: [cryptodev:master 56/59] drivers/crypto/atmel-i2c.c:39:18: sparse:
+ sparse: incorrect type in assignment (different base types)
+Message-ID: <201905302147.hxqMVXTS%lkp@intel.com>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3100dcc8-73eb-4d30-435a-08d6e4f30ca3
-X-MS-Exchange-CrossTenant-originalarrivaltime: 30 May 2019 11:36:25.8626
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: horia.geanta@nxp.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3534
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Patchwork-Hint: ignore
+User-Agent: Mutt/1.5.23 (2014-03-12)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 5/6/2019 11:06 AM, Horia Geanta wrote:=0A=
-> On 5/6/2019 9:40 AM, Herbert Xu wrote:=0A=
->> On Fri, May 03, 2019 at 03:05:48PM +0300, Horia Geant=E3 wrote:=0A=
->>> The detection whether DKP (Derived Key Protocol) is used relies on=0A=
->>> the setkey callback.=0A=
->>> Since "aead_setkey" was replaced in some cases with "des3_aead_setkey"=
-=0A=
->>> (for 3DES weak key checking), the logic has to be updated - otherwise=
-=0A=
->>> the DMA mapping direction is incorrect (leading to faults in case caam=
-=0A=
->>> is behind an IOMMU).=0A=
->>>=0A=
->>> Fixes: 1b52c40919e6 ("crypto: caam - Forbid 2-key 3DES in FIPS mode")=
-=0A=
->>> Signed-off-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
->>> ---=0A=
->>>=0A=
->>> This issue was noticed when testing with previously submitted IOMMU sup=
-port:=0A=
->>> https://patchwork.kernel.org/project/linux-crypto/list/?series=3D110277=
-&state=3D*=0A=
->>=0A=
->> Thanks for catching this Horia!=0A=
->>=0A=
->> My preference would be to encode this logic separately rather than=0A=
->> relying on the setkey test.  How about this patch?=0A=
->>=0A=
-> This is probably more reliable.=0A=
-> =0A=
->> ---8<---=0A=
->> The detection for DKP (Derived Key Protocol) relied on the value=0A=
->> of the setkey function.  This was broken by the recent change which=0A=
->> added des3_aead_setkey.=0A=
->>=0A=
->> This patch fixes this by introducing a new flag for DKP and setting=0A=
->> that where needed.=0A=
->>=0A=
->> Reported-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
->> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>=0A=
-> Tested-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
-> =0A=
-Unfortunately the commit message dropped the tag provided in v1:=0A=
-Fixes: 1b52c40919e6 ("crypto: caam - Forbid 2-key 3DES in FIPS mode")=0A=
-=0A=
-This fix was merged in v5.2-rc1 (commit 24586b5feaf17ecf85ae6259fe3ea7815de=
-e432d=0A=
-upstream) but should also be queued up for 5.1.y.=0A=
-=0A=
-Thanks,=0A=
-Horia=0A=
-=0A=
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+head:   0adb0c99594b73844cf9a5714faa6553ea04ba04
+commit: c34a320176a59445d76783e5ee043d6ecd22d011 [56/59] crypto: atmel-ecc - factor out code that can be shared
+reproduce:
+        # apt-get install sparse
+        # sparse version: v0.6.1-rc1-7-g2b96cd8-dirty
+        git checkout c34a320176a59445d76783e5ee043d6ecd22d011
+        make ARCH=x86_64 allmodconfig
+        make C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__'
+
+If you fix the issue, kindly add following tag
+Reported-by: kbuild test robot <lkp@intel.com>
+
+
+sparse warnings: (new ones prefixed by >>)
+
+>> drivers/crypto/atmel-i2c.c:39:18: sparse: sparse: incorrect type in assignment (different base types) @@    expected unsigned short [usertype] @@    got resunsigned short [usertype] @@
+>> drivers/crypto/atmel-i2c.c:39:18: sparse:    expected unsigned short [usertype]
+>> drivers/crypto/atmel-i2c.c:39:18: sparse:    got restricted __le16 [usertype]
+>> drivers/crypto/atmel-i2c.c:68:21: sparse: sparse: incorrect type in assignment (different base types) @@    expected unsigned short [usertype] param2 @@    got resunsigned short [usertype] param2 @@
+>> drivers/crypto/atmel-i2c.c:68:21: sparse:    expected unsigned short [usertype] param2
+   drivers/crypto/atmel-i2c.c:68:21: sparse:    got restricted __le16 [usertype]
+   drivers/crypto/atmel-i2c.c:87:21: sparse: sparse: incorrect type in assignment (different base types) @@    expected unsigned short [usertype] param2 @@    got resunsigned short [usertype] param2 @@
+   drivers/crypto/atmel-i2c.c:87:21: sparse:    expected unsigned short [usertype] param2
+   drivers/crypto/atmel-i2c.c:87:21: sparse:    got restricted __le16 [usertype]
+
+vim +39 drivers/crypto/atmel-i2c.c
+
+    23	
+    24	/**
+    25	 * atmel_i2c_checksum() - Generate 16-bit CRC as required by ATMEL ECC.
+    26	 * CRC16 verification of the count, opcode, param1, param2 and data bytes.
+    27	 * The checksum is saved in little-endian format in the least significant
+    28	 * two bytes of the command. CRC polynomial is 0x8005 and the initial register
+    29	 * value should be zero.
+    30	 *
+    31	 * @cmd : structure used for communicating with the device.
+    32	 */
+    33	static void atmel_i2c_checksum(struct atmel_i2c_cmd *cmd)
+    34	{
+    35		u8 *data = &cmd->count;
+    36		size_t len = cmd->count - CRC_SIZE;
+    37		u16 *__crc16 = (u16 *)(data + len);
+    38	
+  > 39		*__crc16 = cpu_to_le16(bitrev16(crc16(0, data, len)));
+    40	}
+    41	
+    42	void atmel_i2c_init_read_cmd(struct atmel_i2c_cmd *cmd)
+    43	{
+    44		cmd->word_addr = COMMAND;
+    45		cmd->opcode = OPCODE_READ;
+    46		/*
+    47		 * Read the word from Configuration zone that contains the lock bytes
+    48		 * (UserExtra, Selector, LockValue, LockConfig).
+    49		 */
+    50		cmd->param1 = CONFIG_ZONE;
+    51		cmd->param2 = DEVICE_LOCK_ADDR;
+    52		cmd->count = READ_COUNT;
+    53	
+    54		atmel_i2c_checksum(cmd);
+    55	
+    56		cmd->msecs = MAX_EXEC_TIME_READ;
+    57		cmd->rxsize = READ_RSP_SIZE;
+    58	}
+    59	EXPORT_SYMBOL(atmel_i2c_init_read_cmd);
+    60	
+    61	void atmel_i2c_init_genkey_cmd(struct atmel_i2c_cmd *cmd, u16 keyid)
+    62	{
+    63		cmd->word_addr = COMMAND;
+    64		cmd->count = GENKEY_COUNT;
+    65		cmd->opcode = OPCODE_GENKEY;
+    66		cmd->param1 = GENKEY_MODE_PRIVATE;
+    67		/* a random private key will be generated and stored in slot keyID */
+  > 68		cmd->param2 = cpu_to_le16(keyid);
+    69	
+    70		atmel_i2c_checksum(cmd);
+    71	
+    72		cmd->msecs = MAX_EXEC_TIME_GENKEY;
+    73		cmd->rxsize = GENKEY_RSP_SIZE;
+    74	}
+    75	EXPORT_SYMBOL(atmel_i2c_init_genkey_cmd);
+    76	
+
+---
+0-DAY kernel test infrastructure                Open Source Technology Center
+https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
