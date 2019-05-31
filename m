@@ -4,94 +4,115 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97CE2C28CC3
-	for <linux-crypto@archiver.kernel.org>; Fri, 31 May 2019 14:28:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A007CC04AB6
+	for <linux-crypto@archiver.kernel.org>; Fri, 31 May 2019 14:29:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6BB7A2476F
-	for <linux-crypto@archiver.kernel.org>; Fri, 31 May 2019 14:28:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7071126AA4
+	for <linux-crypto@archiver.kernel.org>; Fri, 31 May 2019 14:29:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="rqMkatPx"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="id5zSz0z"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726842AbfEaO1x (ORCPT
+        id S1726579AbfEaO34 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 31 May 2019 10:27:53 -0400
-Received: from mail-eopbgr10089.outbound.protection.outlook.com ([40.107.1.89]:29187
-        "EHLO EUR02-HE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726418AbfEaO1w (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 31 May 2019 10:27:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1DaOTHPwWxFGu5pFSFNw74JHIu+6LpxvcwpSaDxOi8Y=;
- b=rqMkatPxMLicE6X4D9J4ema92D2GAwY/ArORX8akzxYkknLgCWORecd5mH00IDhYeJ9oshwtXf1vxPI/bQno0Fwe6UP7oRT4sClgXa0JBDVmOIYSkc2g2nJ92ByIgiyTMSRRvqJIiqBU3yvqY79doLNuePsAInBgNnt6xlG8+Y4=
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
- VI1PR0402MB3645.eurprd04.prod.outlook.com (52.134.14.149) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1922.18; Fri, 31 May 2019 14:27:46 +0000
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::ccaf:f4a1:704a:e745]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::ccaf:f4a1:704a:e745%4]) with mapi id 15.20.1922.021; Fri, 31 May 2019
- 14:27:46 +0000
-From:   Horia Geanta <horia.geanta@nxp.com>
-To:     Iuliana Prodan <iuliana.prodan@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>
-CC:     "David S. Miller" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        dl-linux-imx <linux-imx@nxp.com>
-Subject: Re: [PATCH] crypto: caam - disable some clock checks for iMX7ULP
-Thread-Topic: [PATCH] crypto: caam - disable some clock checks for iMX7ULP
-Thread-Index: AQHVF6DscUjseuTf80KtUeNJyp6zSQ==
-Date:   Fri, 31 May 2019 14:27:46 +0000
-Message-ID: <VI1PR0402MB3485BC76A33F8A81C73184E398190@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-References: <20190531110634.2967-1-iuliana.prodan@nxp.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=horia.geanta@nxp.com; 
-x-originating-ip: [212.146.100.6]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: c12826dc-12fa-4aa6-8d68-08d6e5d426e3
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(5600148)(711020)(4605104)(1401327)(4618075)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);SRVR:VI1PR0402MB3645;
-x-ms-traffictypediagnostic: VI1PR0402MB3645:
-x-microsoft-antispam-prvs: <VI1PR0402MB3645A1CD4B1383C90E7B77A398190@VI1PR0402MB3645.eurprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:3826;
-x-forefront-prvs: 00540983E2
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(346002)(39860400002)(396003)(136003)(366004)(376002)(189003)(199004)(14444005)(256004)(7736002)(6116002)(53936002)(74316002)(66556008)(3846002)(6436002)(71200400001)(66066001)(64756008)(186003)(76116006)(305945005)(71190400001)(66476007)(558084003)(4326008)(478600001)(5660300002)(66946007)(73956011)(66446008)(8676002)(76176011)(54906003)(8936002)(86362001)(446003)(6246003)(25786009)(33656002)(2906002)(68736007)(55016002)(110136005)(9686003)(102836004)(99286004)(6636002)(52536014)(81166006)(26005)(14454004)(44832011)(7696005)(476003)(6506007)(229853002)(486006)(316002)(53546011)(81156014);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB3645;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: nxp.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: WVUFRfyYMl6tXBmNjd1fESH2KGSDEGeNui7i2dvjCDr1lfDDHUmZUDlNCzAHzN/dD9+ldmGv79dUMLQgtLd4T8ZvzGZsgOJRGCHrsKH1OjnmJvpKTygI/KVi8ZC48Om/B1Tiq7RW1ryt7p61eDXOotnh7kgil7Ryhd3Bt/FOv2U4uOBXWkCFCOGSWRcp9EZhgkTyVotmcsUQAZS/xxRar/vIyxbQ5zM/VbGX/QmEgCcXd3GsGV22v6Nc2AgtCP9ICCh5KB3wl2PZfkLQHn+KCW+TA9fV3rzo+Q77+J1w3xU4fQAZvp5/Caec6VBRp+hXKW3tqZMdRTTz50oxXVglaGf+RkkKev2tC10mmtbR5awOYE4kTIprAeuRqP15Ca3T6RECi4yee/WpPiQeG842LnIxMW9Tn+y5OCvawpzsYV0=
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
+        Fri, 31 May 2019 10:29:56 -0400
+Received: from mail-it1-f194.google.com ([209.85.166.194]:38172 "EHLO
+        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726563AbfEaO3z (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 31 May 2019 10:29:55 -0400
+Received: by mail-it1-f194.google.com with SMTP id h9so1385255itk.3
+        for <linux-crypto@vger.kernel.org>; Fri, 31 May 2019 07:29:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=dhU2mOPoFLwGA2dOvDV8attpdhaq15eRfh1ymXW+2tY=;
+        b=id5zSz0zQXoYHEWjEZTJQ5GIS/tjA6keKA79RRGHOersZjuUkEcIV6yQlwYaIXp7i4
+         AUxbwBsXGAOUOQiP2GTyJ+a9caIN29GjZsDdnCuH/DNJ3C2muxi8bYFBKL3XHRmC2ATD
+         5eGjQab/czc+uuIMHnbs3ygTH849tyhnptQzET29pGVgWZDtEFoOshlk0PqWtWYlhxbU
+         96qrICrdrS32cefsRc1CFZMAdzlUY+O5SCNfi0ze+SSBz+4IBj7X3Kg7SdhU9JKZEM5J
+         13kYxPUsisCunDgmwCRnw0v1h6W2PbyTpb3CbiqNn5xzIBthtfgvlcmqt6LDxljrAzjy
+         Ah+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=dhU2mOPoFLwGA2dOvDV8attpdhaq15eRfh1ymXW+2tY=;
+        b=FQEe294lMyP/9DgAXhdrrh2IybISvZGJzIyXmtqOY6OkdGpA9+3uMA7MoGY8zddDo1
+         ypxLYCZA/bDqsb+G4V5LePFC6VXPnz98YbVQLYLe+noEIEg3CXlC40ir9g8ApiKf59n6
+         zKVMfFMwKCqgZJsJ6rjqPXoCCeiNZW88h8T+ZebjzOFMwHF8qLaJJBI2X94mzwWHlCRv
+         SgN1PwN1KS0zwp89/FxqwUsZHa9l56mhIwkzFo+8hwHeXZAoNjKHFy33VkIAbk1qxsvK
+         LD7saixoO3CmSl9Knqh6iYOYQf0ElcWWJfGIP+BUNXrImEWLyBynBBgBY/OA6UMIkApZ
+         MwKg==
+X-Gm-Message-State: APjAAAWSMcqQzGs2sbNQC8TRbMWo6/N08cSc3WYLksi08iAHKTg1qeLc
+        dZ6vLRF7WErC0ai/xnB1RKU9HvHTtXam6kimP+FP02CY
+X-Google-Smtp-Source: APXvYqzCCB094jX2Vz7Y7xqjyjsJ+NPteYMrow9ibyZEwWVZBMDKaeS3vf6FZEUURp1by+nVSmQIvMjUNrsRYG8f/2c=
+X-Received: by 2002:a24:1614:: with SMTP id a20mr6828380ita.153.1559312994839;
+ Fri, 31 May 2019 07:29:54 -0700 (PDT)
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c12826dc-12fa-4aa6-8d68-08d6e5d426e3
-X-MS-Exchange-CrossTenant-originalarrivaltime: 31 May 2019 14:27:46.7008
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: horia.geanta@nxp.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3645
+References: <20190531081306.30359-1-ard.biesheuvel@linaro.org> <VI1PR0402MB348583A318B3AD13881745E198190@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+In-Reply-To: <VI1PR0402MB348583A318B3AD13881745E198190@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date:   Fri, 31 May 2019 16:29:42 +0200
+Message-ID: <CAKv+Gu8r5gF24hCDDppjvDsPFgoqOHFNgWZ2VG0mMeg3ggo8_A@mail.gmail.com>
+Subject: Re: [PATCH] crypto: caam - limit output IV to CBC to work around CTR
+ mode DMA issue
+To:     Horia Geanta <horia.geanta@nxp.com>
+Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "ebiggers@kernel.org" <ebiggers@kernel.org>,
+        "pvanleeuwen@insidesecure.com" <pvanleeuwen@insidesecure.com>,
+        dl-linux-imx <linux-imx@nxp.com>,
+        Iuliana Prodan <iuliana.prodan@nxp.com>,
+        Sascha Hauer <s.hauer@pengutronix.de>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 5/31/2019 2:06 PM, Iuliana Prodan wrote:=0A=
-> Disabled the check and set of 'mem' and 'emi_slow'=0A=
-> clocks, since these are not available for iMX7ULP.=0A=
-> =0A=
-> Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>=0A=
-Reviewed-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
-=0A=
-Thanks,=0A=
-Horia=0A=
+On Fri, 31 May 2019 at 16:21, Horia Geanta <horia.geanta@nxp.com> wrote:
+>
+> On 5/31/2019 11:14 AM, Ard Biesheuvel wrote:
+> > The CAAM driver currently violates an undocumented and slightly
+> > controversial requirement imposed by the crypto stack that a buffer
+> > referred to by the request structure via its virtual address may not
+> > be modified while any scatterlists passed via the same request
+> > structure are mapped for inbound DMA.
+> >
+> IMO this requirement developed while discussing current issue,
+> it did not exist a priori.
+>
+
+I won't argue with that.
+
+> > This may result in errors like
+> >
+> >   alg: aead: decryption failed on test 1 for gcm_base(ctr-aes-caam,ghash-generic): ret=74
+> >   alg: aead: Failed to load transform for gcm(aes): -2
+> >
+> > on non-cache coherent systems, due to the fact that the GCM driver
+> > passes an IV buffer by virtual address which shares a cacheline with
+> > the auth_tag buffer passed via a scatterlist, resulting in corruption
+> > of the auth_tag when the IV is updated while the DMA mapping is live.
+> >
+> > Since the IV that is returned to the caller is only valid for CBC mode,
+> > and given that the in-kernel users of CBC (such as CTS) don't trigger the
+> > same issue as the GCM driver, let's just disable the output IV generation
+> > for all modes except CBC for the time being.
+> >
+> > Cc: Horia Geanta <horia.geanta@nxp.com>
+> > Cc: Iuliana Prodan <iuliana.prodan@nxp.com>
+> > Reported-by: Sascha Hauer <s.hauer@pengutronix.de>
+> > Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> Link: https://lore.kernel.org/linux-crypto/1559149856-7938-1-git-send-email-iuliana.prodan@nxp.com/
+> Reviewed-by: Horia Geanta <horia.geanta@nxp.com>
+>
+> Unfortunately this does not apply cleanly to -stable, I'll send a backport
+> once it hits mainline.
+>
+
+Thanks.
