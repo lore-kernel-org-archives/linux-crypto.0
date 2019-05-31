@@ -1,239 +1,120 @@
-Return-Path: <SRS0=uqbH=T6=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=BYd+=T7=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,T_DKIMWL_WL_HIGH,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCDD2C28CC0
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 May 2019 22:59:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0288C04AB6
+	for <linux-crypto@archiver.kernel.org>; Fri, 31 May 2019 05:22:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8979B262C9
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 May 2019 22:59:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1559257190;
-	bh=G5YV9O22/1UxV1YJU/dGvKTsjODYWPEfxn4+6TUmwRM=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=1iCj1BhPBCa3tQ3jzyXBUWQgiTK3qqGqJL0EZ66Aq0j05CZcJ6ICTL5kPnXMP81Uu
-	 b0rrLb9My6YT+b8KrNNY1eWOaHzaIxEwn/5LHEFxm2YNMHRXH7S7Hz+d/PMeb3ASvA
-	 PcbuYv6S+GlivgbTe/Lr/zvxMK1yVX5Um0SbjRkQ=
+	by mail.kernel.org (Postfix) with ESMTP id 84CD72640B
+	for <linux-crypto@archiver.kernel.org>; Fri, 31 May 2019 05:22:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="C7ROTWir"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726540AbfE3W7u (ORCPT
+        id S1725988AbfEaFWz (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 30 May 2019 18:59:50 -0400
-Received: from mail.kernel.org ([198.145.29.99]:34696 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726326AbfE3W7t (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 30 May 2019 18:59:49 -0400
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 28926262D3;
-        Thu, 30 May 2019 22:59:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1559257188;
-        bh=G5YV9O22/1UxV1YJU/dGvKTsjODYWPEfxn4+6TUmwRM=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=1+7zl0SfC/X2D0gNL1k3wm1QWcK2VPavqXVccW8VYlMSMzZ11QgWzoGfKWYnj8Ofe
-         QoYRlo6TQzJScsYRkpScQuH57s2k9mXuB4353Mxc7Wq569GXOnr5+wWw8i5SizCylG
-         QhpPPWgzTjIOeQFXVtPXYVdRQVCzDqzSYNv50D2c=
-Received: by mail-wm1-f50.google.com with SMTP id d17so4894387wmb.3;
-        Thu, 30 May 2019 15:59:48 -0700 (PDT)
-X-Gm-Message-State: APjAAAWXzYnIw/0OuyGxpE9T8O5+7wkowkK680aL1T7qWrrmfdzUILuU
-        I3Tf9f7ZQdDXYYBq668O0h1/Zn9jJEB79tmUuwM=
-X-Google-Smtp-Source: APXvYqwClGtyBz+ZnXOQGQAF7++JFFoH2RLfaSB7q56mYro/VASYaiqO81qOsisdoVlT8WS2G26HMrA07OjDSwr8tAg=
-X-Received: by 2002:a7b:c0d5:: with SMTP id s21mr3656544wmh.152.1559257186685;
- Thu, 30 May 2019 15:59:46 -0700 (PDT)
+        Fri, 31 May 2019 01:22:55 -0400
+Received: from mail-eopbgr00040.outbound.protection.outlook.com ([40.107.0.40]:19173
+        "EHLO EUR02-AM5-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725955AbfEaFWz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 31 May 2019 01:22:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=cNSW2W2IBW6qOqSspZzlI4/HnOUsOpeZusH+vOpm54E=;
+ b=C7ROTWirApeHmQBs90qH+92AylcHh5xrInTaJQKLmlCx31P/zsgGBDGSf1l9Uy15IGAQEzwsO/VtGUXHbVLQBEymxIwKlB28G8dvMNaK0ve6lY+0I/s1sJt78yYssKTI/YcUSrSq5AX5Yi5xD39/Qz8x6qh6dQanPPB5pFp05Vo=
+Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
+ VI1PR0402MB2863.eurprd04.prod.outlook.com (10.175.20.18) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1943.18; Fri, 31 May 2019 05:22:50 +0000
+Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
+ ([fe80::ccaf:f4a1:704a:e745]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
+ ([fe80::ccaf:f4a1:704a:e745%4]) with mapi id 15.20.1922.021; Fri, 31 May 2019
+ 05:22:50 +0000
+From:   Horia Geanta <horia.geanta@nxp.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+CC:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Iuliana Prodan <iuliana.prodan@nxp.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Sascha Hauer <s.hauer@pengutronix.de>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        dl-linux-imx <linux-imx@nxp.com>
+Subject: Re: [PATCH] crypto: gcm - fix cacheline sharing
+Thread-Topic: [PATCH] crypto: gcm - fix cacheline sharing
+Thread-Index: AQHVFkF+dOvdDzZqYUSH856vNqfARw==
+Date:   Fri, 31 May 2019 05:22:50 +0000
+Message-ID: <VI1PR0402MB3485D7664F87D8C38FA8FD5C98190@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+References: <1559149856-7938-1-git-send-email-iuliana.prodan@nxp.com>
+ <20190529202728.GA35103@gmail.com>
+ <20190530053421.keesqb54yu5w7hgk@gondor.apana.org.au>
+ <VI1PR0402MB3485ADA3C4410D61191582A498180@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+ <CAKv+Gu84HndAnkn7DU=ykjCokw_+bAHEcF0Rm12-hnXhVy2u_Q@mail.gmail.com>
+ <VI1PR0402MB34859577A96645E890BD8F3198180@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+ <20190530132623.4h3y2bymv4uvfnms@gondor.apana.org.au>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=horia.geanta@nxp.com; 
+x-originating-ip: [212.146.100.6]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 5204a36d-7f14-4f9e-e7ac-08d6e5880682
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(5600148)(711020)(4605104)(1401327)(4618075)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);SRVR:VI1PR0402MB2863;
+x-ms-traffictypediagnostic: VI1PR0402MB2863:
+x-microsoft-antispam-prvs: <VI1PR0402MB286387D77F94757340DE627098190@VI1PR0402MB2863.eurprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:7691;
+x-forefront-prvs: 00540983E2
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(366004)(376002)(396003)(136003)(39860400002)(346002)(189003)(199004)(81156014)(81166006)(8676002)(305945005)(7736002)(99286004)(4744005)(316002)(8936002)(186003)(9686003)(26005)(476003)(66066001)(446003)(486006)(14444005)(256004)(52536014)(71200400001)(71190400001)(3846002)(6116002)(5660300002)(2906002)(86362001)(66446008)(64756008)(53546011)(6506007)(4326008)(478600001)(66946007)(66556008)(66476007)(73956011)(76116006)(33656002)(44832011)(6246003)(53936002)(7696005)(55016002)(74316002)(6436002)(14454004)(6916009)(54906003)(229853002)(25786009)(102836004)(76176011)(68736007);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB2863;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: nxp.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: HxjhNHwiAS16SFq5HHoTtIotQdZs8DFhb9CoXgzwZ7Idh+hO9Gh8Tb4Spc6319YnDeT1vVD0R4oPK9SYuVtGK9t6okj3eSFwFOxkSwBoBxhwdbLT+DPBa3ADOmg9SqWHSJMCu7xPL/RDO2yYT2VuL3uqzRLg7rLv2rapDZESYyH2o9peeoQH3sm3o3tcnDkrD+QCbwv8dCrkDiTPSYpltsZM6O5qy9NFUjEONRIDe3Rx1RPpj89WEyOHNDvO51ztcTpkmbBqRXzJpLqCksuhc/tyzVCCPmdhiFPuwqKhP/YMy2mwQjhNpjA7u9qE2cZ29HfeDOxn2+F0tpDOCUgrGxy8bydpBI5qX2Kv3SQDLEX4T8JhImkJDDELBI5tQI9HVkXL/UXATnUTegJhLGb3H3zXPjhRDGsWVvMF37iq2x0=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <1558946326-13630-1-git-send-email-neal.liu@mediatek.com> <1558946326-13630-4-git-send-email-neal.liu@mediatek.com>
-In-Reply-To: <1558946326-13630-4-git-send-email-neal.liu@mediatek.com>
-From:   Sean Wang <sean.wang@kernel.org>
-Date:   Thu, 30 May 2019 15:59:36 -0700
-X-Gmail-Original-Message-ID: <CAGp9LzoC7d9MaCv4OSm5yEGP845zeoQ=Fas_MgZGzSUCeWZ=ww@mail.gmail.com>
-Message-ID: <CAGp9LzoC7d9MaCv4OSm5yEGP845zeoQ=Fas_MgZGzSUCeWZ=ww@mail.gmail.com>
-Subject: Re: [PATCH v2 3/3] hwrng: add mtk-sec-rng driver
-To:     Neal Liu <neal.liu@mediatek.com>
-Cc:     Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-arm Mailing List <linux-arm-kernel@lists.infradead.org>,
-        "moderated list:ARM/Mediatek SoC support" 
-        <linux-mediatek@lists.infradead.org>,
-        lkml <linux-kernel@vger.kernel.org>, wsd_upstream@mediatek.com,
-        Crystal Guo <Crystal.Guo@mediatek.com>
-Content-Type: text/plain; charset="UTF-8"
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5204a36d-7f14-4f9e-e7ac-08d6e5880682
+X-MS-Exchange-CrossTenant-originalarrivaltime: 31 May 2019 05:22:50.5110
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: horia.geanta@nxp.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB2863
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi, Neal
-
-On Mon, May 27, 2019 at 1:39 AM Neal Liu <neal.liu@mediatek.com> wrote:
->
-> For MediaTek SoCs on ARMv8 with TrustZone enabled, peripherals like
-> entropy sources is not accessible from normal world (linux) and
-> rather accessible from secure world (ATF/TEE) only. This driver aims
-> to provide a generic interface to ATF rng service.
->
-> Signed-off-by: Neal Liu <neal.liu@mediatek.com>
-> ---
->  drivers/char/hw_random/Kconfig       |   16 ++++++
->  drivers/char/hw_random/Makefile      |    1 +
->  drivers/char/hw_random/mtk-sec-rng.c |   97 ++++++++++++++++++++++++++++++++++
->  3 files changed, 114 insertions(+)
->  create mode 100644 drivers/char/hw_random/mtk-sec-rng.c
->
-> diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
-> index 25a7d8f..6c82a3b 100644
-> --- a/drivers/char/hw_random/Kconfig
-> +++ b/drivers/char/hw_random/Kconfig
-> @@ -398,6 +398,22 @@ config HW_RANDOM_MTK
->
->           If unsure, say Y.
->
-> +config HW_RANDOM_MTK_SEC
-> +       tristate "MediaTek Security Random Number Generator support"
-> +       depends on HW_RANDOM
-> +       depends on ARCH_MEDIATEK || COMPILE_TEST
-> +       default HW_RANDOM
-> +       help
-> +         This driver provides kernel-side support for the Random Number
-> +         Generator hardware found on MediaTek SoCs. The difference with
-> +         mtk-rng is the Random Number Generator hardware is secure
-> +         access only.
-> +
-> +         To compile this driver as a module, choose M here. the
-> +         module will be called mtk-sec-rng.
-> +
-> +         If unsure, say Y.
-> +
->  config HW_RANDOM_S390
->         tristate "S390 True Random Number Generator support"
->         depends on S390
-> diff --git a/drivers/char/hw_random/Makefile b/drivers/char/hw_random/Makefile
-> index 7c9ef4a..0ae4993 100644
-> --- a/drivers/char/hw_random/Makefile
-> +++ b/drivers/char/hw_random/Makefile
-> @@ -36,6 +36,7 @@ obj-$(CONFIG_HW_RANDOM_PIC32) += pic32-rng.o
->  obj-$(CONFIG_HW_RANDOM_MESON) += meson-rng.o
->  obj-$(CONFIG_HW_RANDOM_CAVIUM) += cavium-rng.o cavium-rng-vf.o
->  obj-$(CONFIG_HW_RANDOM_MTK)    += mtk-rng.o
-> +obj-$(CONFIG_HW_RANDOM_MTK_SEC) += mtk-sec-rng.o
->  obj-$(CONFIG_HW_RANDOM_S390) += s390-trng.o
->  obj-$(CONFIG_HW_RANDOM_KEYSTONE) += ks-sa-rng.o
->  obj-$(CONFIG_HW_RANDOM_OPTEE) += optee-rng.o
-> diff --git a/drivers/char/hw_random/mtk-sec-rng.c b/drivers/char/hw_random/mtk-sec-rng.c
-> new file mode 100644
-> index 0000000..4c6e5bf
-> --- /dev/null
-> +++ b/drivers/char/hw_random/mtk-sec-rng.c
-> @@ -0,0 +1,97 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Copyright (C) 2019 MediaTek Inc.
-> + */
-> +
-> +#include <linux/arm-smccc.h>
-> +#include <linux/hw_random.h>
-> +#include <linux/module.h>
-> +#include <linux/of.h>
-> +#include <linux/platform_device.h>
-> +#include <linux/soc/mediatek/mtk_sip_svc.h>
-> +
-> +#define MT67XX_RNG_MAGIC       0x74726e67
-> +#define SMC_RET_NUM            4
-> +#define MTK_SEC_RND_SIZE       (sizeof(u32) * SMC_RET_NUM)
-> +
-> +struct mtk_sec_rng_priv {
-> +       struct hwrng rng;
-> +};
-> +
-> +static void mtk_sec_get_rnd(uint32_t *val)
-> +{
-> +       struct arm_smccc_res res;
-> +
-> +       arm_smccc_smc(MTK_SIP_KERNEL_GET_RND,
-> +                     MT67XX_RNG_MAGIC, 0, 0, 0, 0, 0, 0, &res);
-> +
-> +       val[0] = res.a0;
-> +       val[1] = res.a1;
-> +       val[2] = res.a2;
-> +       val[3] = res.a3;
-> +}
-> +
-> +static int mtk_sec_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
-> +{
-> +       size_t get_rnd_size = MTK_SEC_RND_SIZE;
-
-the variable get_rnd_size can be further eliminated
-
-> +       u32 val[4] = {0};
-> +       int i, retval = 0;
-> +
-> +       while (max >= get_rnd_size) {
-> +               mtk_sec_get_rnd(val);
-> +
-> +               for (i = 0; i < SMC_RET_NUM; i++) {
-> +                       *(u32 *)buf = val[i];
-> +                       buf += sizeof(u32);
-> +               }
-> +
-> +               retval += get_rnd_size;
-> +               max -= get_rnd_size;
-> +       }
-> +
-> +       return retval;
-> +}
-> +
-> +static int mtk_sec_rng_probe(struct platform_device *pdev)
-> +{
-> +       struct mtk_sec_rng_priv *priv;
-> +       int ret;
-> +
-> +       priv = devm_kzalloc(&pdev->dev, sizeof(*priv), GFP_KERNEL);
-> +       if (!priv)
-> +               return -ENOMEM;
-> +
-> +       priv->rng.name = pdev->name;
-> +       priv->rng.read = mtk_sec_rng_read;
-> +       priv->rng.priv = (unsigned long)&pdev->dev;
-> +       priv->rng.quality = 900;
-> +
-> +       ret = devm_hwrng_register(&pdev->dev, &priv->rng);
-> +       if (ret) {
-> +               dev_err(&pdev->dev, "failed to register rng device: %d\n", ret);
-> +               return ret;
-> +       }
-> +
-> +       return 0;
-> +}
-> +
-> +static const struct of_device_id mtk_sec_rng_match[] = {
-> +       { .compatible = "mediatek,mtk-sec-rng", },
-> +       {}
-> +};
-> +MODULE_DEVICE_TABLE(of, mtk_sec_rng_match);
-> +
-> +static struct platform_driver mtk_sec_rng_driver = {
-> +       .probe = mtk_sec_rng_probe,
-> +       .driver = {
-> +               .name = KBUILD_MODNAME,
-> +               .owner = THIS_MODULE,
-> +               .of_match_table = mtk_sec_rng_match,
-> +       },
-> +};
-> +
-> +module_platform_driver(mtk_sec_rng_driver);
-> +
-> +MODULE_DESCRIPTION("MediaTek Security Random Number Generator Driver");
-> +MODULE_AUTHOR("Neal Liu <neal.liu@mediatek.com>");
-> +MODULE_LICENSE("GPL");
-> --
-> 1.7.9.5
->
+On 5/30/2019 4:26 PM, Herbert Xu wrote:=0A=
+> On Thu, May 30, 2019 at 01:18:34PM +0000, Horia Geanta wrote:=0A=
+>>=0A=
+>> I guess there are only two options:=0A=
+>> -either cache line sharing is avoided OR=0A=
+>> -users need to be *aware* they are sharing the cache line and some rules=
+ /=0A=
+>> assumptions are in place on how to safely work on the data=0A=
+> =0A=
+> No there is a third option and it's very simple:=0A=
+> =0A=
+I see this as the 2nd option.=0A=
+=0A=
+> You must only access the virtual addresses given to you before DMA=0A=
+> mapping or after DMA unmapping.=0A=
+> =0A=
+Unless it's clearly defined *which* virtual addresses mustn't be accessed,=
+=0A=
+things won't work properly.=0A=
+In theory, any two objects could share a cache line. We can't just stop all=
+=0A=
+memory accesses from CPU while a peripheral is busy.=0A=
+=0A=
+Thanks,=0A=
+Horia=0A=
