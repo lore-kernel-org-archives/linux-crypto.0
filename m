@@ -2,79 +2,121 @@ Return-Path: <SRS0=BYd+=T7=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA69FC04AB6
-	for <linux-crypto@archiver.kernel.org>; Fri, 31 May 2019 06:14:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 704E5C04AB6
+	for <linux-crypto@archiver.kernel.org>; Fri, 31 May 2019 06:40:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A634926438
-	for <linux-crypto@archiver.kernel.org>; Fri, 31 May 2019 06:14:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 45161264A0
+	for <linux-crypto@archiver.kernel.org>; Fri, 31 May 2019 06:40:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725963AbfEaGOM (ORCPT
+        id S1726693AbfEaGkC (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 31 May 2019 02:14:12 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:45856 "EHLO deadmen.hmeau.com"
+        Fri, 31 May 2019 02:40:02 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:46096 "EHLO deadmen.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725955AbfEaGOL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 31 May 2019 02:14:11 -0400
+        id S1726386AbfEaGkC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 31 May 2019 02:40:02 -0400
 Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
         by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1hWanm-00047N-Ga; Fri, 31 May 2019 14:14:06 +0800
+        id 1hWbCn-0004ZY-PA; Fri, 31 May 2019 14:39:57 +0800
 Received: from herbert by gondobar with local (Exim 4.89)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1hWank-00055C-3G; Fri, 31 May 2019 14:14:04 +0800
-Date:   Fri, 31 May 2019 14:14:04 +0800
+        id 1hWbCh-0006Ds-B8; Fri, 31 May 2019 14:39:51 +0800
+Date:   Fri, 31 May 2019 14:39:51 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Horia Geanta <horia.geanta@nxp.com>
-Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Iuliana Prodan <iuliana.prodan@nxp.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        dl-linux-imx <linux-imx@nxp.com>
-Subject: Re: [PATCH] crypto: gcm - fix cacheline sharing
-Message-ID: <20190531061403.3lzvddt3r2mrn2g2@gondor.apana.org.au>
-References: <1559149856-7938-1-git-send-email-iuliana.prodan@nxp.com>
- <20190529202728.GA35103@gmail.com>
- <20190530053421.keesqb54yu5w7hgk@gondor.apana.org.au>
- <VI1PR0402MB3485ADA3C4410D61191582A498180@VI1PR0402MB3485.eurprd04.prod.outlook.com>
- <CAKv+Gu84HndAnkn7DU=ykjCokw_+bAHEcF0Rm12-hnXhVy2u_Q@mail.gmail.com>
- <VI1PR0402MB34859577A96645E890BD8F3198180@VI1PR0402MB3485.eurprd04.prod.outlook.com>
- <20190530132623.4h3y2bymv4uvfnms@gondor.apana.org.au>
- <VI1PR0402MB3485D7664F87D8C38FA8FD5C98190@VI1PR0402MB3485.eurprd04.prod.outlook.com>
- <20190531054250.p2bc3igiu4s7dmvk@gondor.apana.org.au>
- <VI1PR0402MB348582411F826968EBC59A8B98190@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+To:     kbuild test robot <lkp@intel.com>
+Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>, kbuild-all@01.org,
+        linux-crypto@vger.kernel.org,
+        Linus Walleij <linus.walleij@linaro.org>
+Subject: crypto: atmel - Fix sparse endianness warnings
+Message-ID: <20190531063951.2utw5ms32ph7aik4@gondor.apana.org.au>
+References: <201905302147.hxqMVXTS%lkp@intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <VI1PR0402MB348582411F826968EBC59A8B98190@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+In-Reply-To: <201905302147.hxqMVXTS%lkp@intel.com>
 User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, May 31, 2019 at 06:10:51AM +0000, Horia Geanta wrote:
->
-> Driver is not touching the DMA mapped areas, the DMA API conventions are
-> carefully followed.
-> It's touching a virtual pointer that is not DMA mapped, that just happens to be
-> on the same cache line with a DMA mapped buffer.
+On Thu, May 30, 2019 at 09:05:53PM +0800, kbuild test robot wrote:
+> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+> head:   0adb0c99594b73844cf9a5714faa6553ea04ba04
+> commit: c34a320176a59445d76783e5ee043d6ecd22d011 [56/59] crypto: atmel-ecc - factor out code that can be shared
+> reproduce:
+>         # apt-get install sparse
+>         # sparse version: v0.6.1-rc1-7-g2b96cd8-dirty
+>         git checkout c34a320176a59445d76783e5ee043d6ecd22d011
+>         make ARCH=x86_64 allmodconfig
+>         make C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__'
+> 
+> If you fix the issue, kindly add following tag
+> Reported-by: kbuild test robot <lkp@intel.com>
 
-Well you can't control what the users give you so you must assume
-that the virtual address always share a cacheline with the DMA
-buffer.
+Thanks for the report.  Ard, can you please check this patch
+please? Thanks!
 
-That's why you must only operate on that virtual address either
-before you DMA map or after you DMA unmap.  Virtual addresses
-that you allocate yourself (including ones on the stack) are
-obviously not subject to this restriction.
+---8<---
+The param2 member in atmel_i2c_cmd is supposed to be little-endian
+but was marked as u16.  This patch changes it to a __le16 which
+reveals a missing endian swap in atmel_i2c_init_read_cmd.
 
-Cheers,
+Another missing little-endian marking is also added in
+atmel_i2c_checksum.
+
+Fixes: 11105693fa05 ("crypto: atmel-ecc - introduce Microchip...")
+Reported-by: kbuild test robot <lkp@intel.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/drivers/crypto/atmel-i2c.c b/drivers/crypto/atmel-i2c.c
+index be49ab7f4338..dc876fab2882 100644
+--- a/drivers/crypto/atmel-i2c.c
++++ b/drivers/crypto/atmel-i2c.c
+@@ -34,7 +34,7 @@ static void atmel_i2c_checksum(struct atmel_i2c_cmd *cmd)
+ {
+ 	u8 *data = &cmd->count;
+ 	size_t len = cmd->count - CRC_SIZE;
+-	u16 *__crc16 = (u16 *)(data + len);
++	__le16 *__crc16 = (__le16 *)(data + len);
+ 
+ 	*__crc16 = cpu_to_le16(bitrev16(crc16(0, data, len)));
+ }
+@@ -48,7 +48,7 @@ void atmel_i2c_init_read_cmd(struct atmel_i2c_cmd *cmd)
+ 	 * (UserExtra, Selector, LockValue, LockConfig).
+ 	 */
+ 	cmd->param1 = CONFIG_ZONE;
+-	cmd->param2 = DEVICE_LOCK_ADDR;
++	cmd->param2 = cpu_to_le16(DEVICE_LOCK_ADDR);
+ 	cmd->count = READ_COUNT;
+ 
+ 	atmel_i2c_checksum(cmd);
+diff --git a/drivers/crypto/atmel-i2c.h b/drivers/crypto/atmel-i2c.h
+index c6bd43b78f33..21860b99c3e3 100644
+--- a/drivers/crypto/atmel-i2c.h
++++ b/drivers/crypto/atmel-i2c.h
+@@ -8,6 +8,7 @@
+ #define __ATMEL_I2C_H__
+ 
+ #include <linux/hw_random.h>
++#include <linux/types.h>
+ 
+ #define ATMEL_ECC_PRIORITY		300
+ 
+@@ -50,7 +51,7 @@ struct atmel_i2c_cmd {
+ 	u8 count;
+ 	u8 opcode;
+ 	u8 param1;
+-	u16 param2;
++	__le16 param2;
+ 	u8 data[MAX_RSP_SIZE];
+ 	u8 msecs;
+ 	u16 rxsize;
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
