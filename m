@@ -2,103 +2,99 @@ Return-Path: <SRS0=xfQ5=UA=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36148C28CC3
-	for <linux-crypto@archiver.kernel.org>; Sat,  1 Jun 2019 13:53:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BD2DC28CC5
+	for <linux-crypto@archiver.kernel.org>; Sat,  1 Jun 2019 13:53:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 109692771C
-	for <linux-crypto@archiver.kernel.org>; Sat,  1 Jun 2019 13:53:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3E21827724
+	for <linux-crypto@archiver.kernel.org>; Sat,  1 Jun 2019 13:53:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726075AbfFANx3 (ORCPT
+        id S1726009AbfFANxd (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 1 Jun 2019 09:53:29 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:58567 "EHLO
+        Sat, 1 Jun 2019 09:53:33 -0400
+Received: from mout.kundenserver.de ([212.227.126.187]:58773 "EHLO
         mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725965AbfFANx3 (ORCPT
+        with ESMTP id S1727275AbfFANxd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 1 Jun 2019 09:53:29 -0400
+        Sat, 1 Jun 2019 09:53:33 -0400
 Received: from orion.localdomain ([95.114.112.19]) by mrelayeu.kundenserver.de
  (mreue012 [212.227.15.167]) with ESMTPSA (Nemesis) id
- 1MIbzB-1hLIkZ45gL-00EggC; Sat, 01 Jun 2019 15:53:07 +0200
+ 1MDN3O-1hOrFU0BKY-00AZwR; Sat, 01 Jun 2019 15:53:06 +0200
 From:   "Enrico Weigelt, metux IT consult" <info@metux.net>
 To:     linux-kernel@vger.kernel.org
 Cc:     vireshk@kernel.org, b.zolnierkie@samsung.com, axboe@kernel.dk,
         herbert@gondor.apana.org.au, davem@davemloft.net,
         linux-ide@vger.kernel.org, linux-block@vger.kernel.org,
         linux-crypto@vger.kernel.org
-Subject: [PATCH 2/4] drivers: block: xsysace: use MODULE_DECLARE_OF_TABLE() and of_match_ptr()
-Date:   Sat,  1 Jun 2019 15:52:57 +0200
-Message-Id: <1559397179-5833-3-git-send-email-info@metux.net>
+Subject: RFC: declaring DT match tables (2nd take)
+Date:   Sat,  1 Jun 2019 15:52:55 +0200
+Message-Id: <1559397179-5833-1-git-send-email-info@metux.net>
 X-Mailer: git-send-email 1.9.1
-In-Reply-To: <1559397179-5833-1-git-send-email-info@metux.net>
-References: <1559397179-5833-1-git-send-email-info@metux.net>
-X-Provags-ID: V03:K1:Qws35knXlKzgk+L1gebf0oiijncZZPU9G9DE2m8RHGqmAPjbRcA
- Mhq4EwWUM8vDnhRs6XarGCNQPHg6hZyZ7kcJCkdTNrgJRZ+rUXDDMCTmXZAUMQvrMAsgDgD
- Xmbr8eVRjoviX/kCBksWZDgdHED/Yc0cP1wq0ZUPTixMb6eH0QV0J4twNfGrYthAysMDTSH
- Q1fTYPAaZFaorgEw5bxZg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:uuKrLSRJacE=:/7Ki9GCY77ZmN88TKQhAtt
- OlRRVthFBqWQJJtOLa9CHRGORp/PxILNq7x+jDsxD45M8HWtb/EHWkwRBECt/k/BVvhQB5goE
- QaXRsWqDMr87XXz9NMqtt4zM8niABNYY7txVkcDvy0mOiAuxHj3Po1z7tfkIs2z8xdVjh0d8z
- hfkAFxOsXD219fiMLJuzP+9NCvaL9wjfroU2bZmjZKG//NDuOiQWAWvpXoA4s5IQMrR2dtuJ3
- BVV0Tx6h0v3z6NFymIUK9RwqswD5U+Y1/GzaVMauszPTIk+NS2j1HrgPZBF0S5ezaeJQp8YX2
- IFMnzIeUurxUOBLq/q6/MH73k4RQuBzAYd8hxhufWNtkMC5yTW4hq1MX726KwH4PHq5INhjXt
- VBF2h8KzhM4SuGzjz5ZwTPSFOFLXskBZTZkDzA5Jzt5xT852IPa9r8DKlKdvj4VMwG6+eN8hw
- qTGp2H9U8MpJn9Npz8bwvcpWGo1t/smXEeZNgwFLHokhPt5VYFX7ltnCsEQcz+h/SjORPwV2a
- FgVCwG9YFxN10hD4m/09MX5d559OsSE+oAIVgjuv3l3TDcEsH7LS/8pjGCYdTNxzat83zhV7M
- 7pMxKeEScVm2NMwNXd/r9/RAdwG96EmbzZjp5oVugHypMTiX/k8plpmwCLlgWloCsS56fQii+
- 0202TEScVy8oHaWwDy7EzHwmg9Oh9S27R00vzngmJiyx9Z3/Qs3ExQSo7L9DFf7lJSdPHyHmE
- uuvuuvmgtJoiRLxpOUMqcCPdlnLmZsbKVel1qw==
+X-Provags-ID: V03:K1:6eR5FuObvStzaTwaSeJMTXjT3YTabwPEW7ElLE9COJw4VhtMuUe
+ 7klRWzxM0qEKRYASBKKWOgd4JLRnOW9D8256GOrsBf2kwpkGP/oPYI/+dYEax0EGgqLzyVL
+ wQvba3P8HARfrEU/VyV/vXPdPJd8HBurS3F0nasiuGJJfc1om5av0pwSQpw1Fd/IHLPPMAk
+ Fs6A8S0bThYHnX7m5zbHA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:2taVwbVMVbk=:xHjxX+T6hP9V71LkUfGcf+
+ VZ6QpOwcS0hJuPHuZPfabEXDMz5mHZ1Y3FPMF/EtfV4Y3Wen2q4h/xi5TNS/NrhCg5SFg3BX6
+ SuuDgzklm8/fh2hvz9/sov7v6tOBTQfdnz+VBdrpP1Ht5butdbR0lMEk8M3S/ep/uQ+irkd78
+ B5MI8ehPCY7d0NF2Mm1cX5cnH5DhimHJFeVLZP/Kxg0OorhwduACcspyYVVwZGoKUwY1Epkcr
+ 5I9Qz05WNjwLRmTb33wjmx3xgw4uwAEI2NBT9lAkeGpctR3wADBpiVIQX17f1aJbaluFGj0dj
+ 5A0UZeWTTktaeytgznjBLu8NKrKkrAEKylBCX74HYODKWa9GPOIYIh1Q/cGXrxV2DqbqQgb2J
+ bud+gSdtrXrssHchBHaXXXVZM5CNJ+T4Qi3Mi3SJQTnSYjTbeF0s/A7aHPBSDXilZ+IHrtJoh
+ AHw67RUWzf1xVYBU4/t42NQb2ymJ9ixcwE5ANhRM6w1gDRGhbuiiVNwAfnFCZvlf8OVpwp/Nv
+ Sa7KJ78kIYpiVUngrSSO8wdH6FTsoDCc+Ys2/mVL1tqQvKcB0I0RtgMCuJbhslLxJfk4r4QxQ
+ SIDcLZVAQYiROiPo8APmfafWXWfWBH280GbQaC2aRSkxI3gVnQfazSzEbr6qnPepXxQX2qQ77
+ 8lI19iP599vJkXawWpWEBePEUuD4E7ayBh2WfSNpAc007dEd0RTysmor1cKfz35P7KLPUWAyj
+ oORAMyfac7fd2ctBb/bYPyNleMUvomnZojFIdQ==
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Using MODULE_DECLARE_OF_TABLE() and of_match_ptr() macros to get
-rid of some #ifdef CONFIG_OF and thus make the code a bit slimmer.
+Hi folks,
 
-Signed-off-by: Enrico Weigelt, metux IT consult <info@metux.net>
----
- drivers/block/xsysace.c | 14 +++-----------
- 1 file changed, 3 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/block/xsysace.c b/drivers/block/xsysace.c
-index 464c9092..d8e5dd7 100644
---- a/drivers/block/xsysace.c
-+++ b/drivers/block/xsysace.c
-@@ -1219,26 +1219,18 @@ static int ace_remove(struct platform_device *dev)
- 	return 0;
- }
- 
--#if defined(CONFIG_OF)
--/* Match table for of_platform binding */
--static const struct of_device_id ace_of_match[] = {
-+MODULE_DECLARE_OF_TABLE(ace_of_match,
- 	{ .compatible = "xlnx,opb-sysace-1.00.b", },
- 	{ .compatible = "xlnx,opb-sysace-1.00.c", },
- 	{ .compatible = "xlnx,xps-sysace-1.00.a", },
--	{ .compatible = "xlnx,sysace", },
--	{},
--};
--MODULE_DEVICE_TABLE(of, ace_of_match);
--#else /* CONFIG_OF */
--#define ace_of_match NULL
--#endif /* CONFIG_OF */
-+	{ .compatible = "xlnx,sysace", });
- 
- static struct platform_driver ace_platform_driver = {
- 	.probe = ace_probe,
- 	.remove = ace_remove,
- 	.driver = {
- 		.name = "xsysace",
--		.of_match_table = ace_of_match,
-+		.of_match_table = of_match_ptr(ace_of_match),
- 	},
- };
- 
--- 
-1.9.1
+few days ago I've posted a RFC for getting rid of many #ifdef CONFIG_OF
+cases by using a macro that checks for it on its own.
+(see: "RFC: get rid of #ifdef CONFIG_OF's around of match tables")
+
+I've already mentioned I'm working on another approach that not just
+cares about adding the table to the module, but the also the declaration
+of the table itself. Here it is:
+
+Introducing a macro MODULE_DECLARE_OF_TABLE(foo, entries), which declares
+a static struct of_device_id array, fills in the entries (automatically
+adds the sentinel) and calls MODULE_DEVICE_TABLE() - if CONFIG_OF is
+enabled.
+
+The current version isn't fully noop in absence of CONFIG_OF, but also
+declares a static const *pointer* variable, initialized NULL, with the
+same name. The idea behind: we don't need to use of_match_ptr() anymore.
+
+I believe, the compiler should be clever enough to find out that this
+field is always NULL and can't ever change, so it can be easily optimized
+away. (correct me if I'm wrong).
+
+
+Please have a look at the following example patches and let me know,
+whether we can go that way. If you're okay w/ that, I'll continue
+w/ converting the whole tree to using this approach. I've already did
+most of it, yet needs to be sorted out into easily digestable patches :)
+And I'd also do the same w/ the other table types (ACPI, PCI, I2C, ...)
+
+By the way: an interesting question arises: shall that conversion be
+done *everywhere*, or just those sites where explicit CONFIG_OF's are
+involved ?
+
+
+have fun,
+
+--mtx
+
+
+
+
 
