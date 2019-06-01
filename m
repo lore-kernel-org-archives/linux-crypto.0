@@ -7,99 +7,106 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F0ADC46470
-	for <linux-crypto@archiver.kernel.org>; Sat,  1 Jun 2019 13:53:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B569CC28CC4
+	for <linux-crypto@archiver.kernel.org>; Sat,  1 Jun 2019 13:53:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 633DB27729
-	for <linux-crypto@archiver.kernel.org>; Sat,  1 Jun 2019 13:53:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9961D27729
+	for <linux-crypto@archiver.kernel.org>; Sat,  1 Jun 2019 13:53:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726715AbfFANxa (ORCPT
+        id S1726496AbfFANxa (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Sat, 1 Jun 2019 09:53:30 -0400
-Received: from mout.kundenserver.de ([212.227.126.133]:57031 "EHLO
+Received: from mout.kundenserver.de ([212.227.126.134]:40515 "EHLO
         mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726009AbfFANx3 (ORCPT
+        with ESMTP id S1726044AbfFANx3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Sat, 1 Jun 2019 09:53:29 -0400
 Received: from orion.localdomain ([95.114.112.19]) by mrelayeu.kundenserver.de
  (mreue012 [212.227.15.167]) with ESMTPSA (Nemesis) id
- 1MyvFC-1gbGrY29eE-00vthP; Sat, 01 Jun 2019 15:53:06 +0200
+ 1MY5XR-1h5yn83lFt-00YPOK; Sat, 01 Jun 2019 15:53:08 +0200
 From:   "Enrico Weigelt, metux IT consult" <info@metux.net>
 To:     linux-kernel@vger.kernel.org
 Cc:     vireshk@kernel.org, b.zolnierkie@samsung.com, axboe@kernel.dk,
         herbert@gondor.apana.org.au, davem@davemloft.net,
         linux-ide@vger.kernel.org, linux-block@vger.kernel.org,
         linux-crypto@vger.kernel.org
-Subject: [PATCH 1/4] mod_devicetable: helper macro for declaring oftree module device table
-Date:   Sat,  1 Jun 2019 15:52:56 +0200
-Message-Id: <1559397179-5833-2-git-send-email-info@metux.net>
+Subject: [PATCH 4/4] drivers: ata: use MODULE_DECLARE_OF_TABLE()
+Date:   Sat,  1 Jun 2019 15:52:59 +0200
+Message-Id: <1559397179-5833-5-git-send-email-info@metux.net>
 X-Mailer: git-send-email 1.9.1
 In-Reply-To: <1559397179-5833-1-git-send-email-info@metux.net>
 References: <1559397179-5833-1-git-send-email-info@metux.net>
-X-Provags-ID: V03:K1:/pQ0SiB+S9YxYbrQ1XDQRcGrtuLOnVkDVszipfecYxl03iwuOl4
- nYqF4l9YRJDBlJV317mF4FCdWTOJux6+BnyF1DOVm3yoiR3red/00RFsrZhmKqIYrFVXynW
- sQyQm3T9sIpBhlmVtpgoiq+r+9LDdRGEsM0cuWRtoycGb2U3vMt0Rf8ol5EBGlGW85uLeXH
- VHrD64bfJFZA6+B0hT02Q==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:UsEKdqu8eJQ=:yn1djYVny2lJ9uswl5IQxH
- sLk9xJQBvb48x0/GWC8ISyDjZ8465go8tSn5FEniZ8L4ZterG3xoJoF3NJb+TQMhI/Rj3TKjj
- jh0lHrIwPqTK1Wo54G3kbdjTy1PSGRZs0qg26IxbwzndjW7560milp3WbSbUXI1pDalE/WJLu
- njiRw9MdBhcqHLUvmLRi1jxUDgi+R8M2/9bSmtpMEFMmvppDZGzKiVQVIMDlS06Wm+m5IMiIx
- w6w9HQK2qwFjM25ARbWpD/KuBETbmg3lLg2ofERSqw8NiF4+UrAoYWAZb0MMLvn3fYtEO/Yi1
- +lJ/4ztM1qGIU+bYgKeYpGLW0YX8kb7g4UYrFEQh9LGnXgVCpbWVm+MbkPXkC5GXTRkQHUTcj
- pSyIzS+sZD7LlR7PZ4RCyWE/xIxc27fIRuJA3XDYrKnLJlp6vG7Blsm+CgbSKPPu1vH/7+4iE
- fAt789Ct3T0ND3BaKqyxCOoox/igriu0IIl9MwXOugQwESQ3TJ/vTLWTCW5zlSOzknnL/8imU
- Sd+dqPQgBnq0ivNe6RNv3ezAUAxHsovJM6105rtuWI2Xc9p+vzfs5mwYC/0/VpVOHFzkVg4F/
- nYcLHODNl6JBfs6go7p/3vxExXhVOnz566rH9T31dQT9fWjWxoFP2tIYcALNZIrYSZu8LfKJY
- f3Ddw/k0Pehm0DQDpUrU/wOjk/IY2Rde5SPHlK0+APA6dWGV3FbZIyYIAjBfFqncZtxqYp9Dx
- P3/uCvIh0KB/R4pXy+2mht1zZokaB/5lMJ/JgA==
+X-Provags-ID: V03:K1:zlZQLw/7X/h00DT4khIXd7jjS4solJe6AYqFAW61yXbLkxP/FKv
+ 2SIn8J4GncUnBymImySqQuvaZ6hc0os0iWfIgCYSLkrsfUdlrbRZOWW+Dl7RYMVd8VtAlXe
+ VyYoxafCnE4KHfCkp85GNni5xN9+R3q29+pht6cYEC0WNM/q4+t9Ayqgq8oiA4+JHqz4sft
+ Nv7++ZTKqDPO13S9DkX5Q==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:NL9r01+H0YU=:N9E0t5e+9MRvzhoQBaW1lK
+ 2gvx90Ty9dQwzFrFOja096OXdWC9vhoccvHP0T1R4HLpjjFAj+hHa4RG/4Z863q3jMBUuQ2W5
+ +Fkbk4bjIaJPzGkhJdF4zRYwYXu/J28mKstKoTVXJ7aEsMt7C6mjiEZDTLZgVEsqIfl2IxZKT
+ uqx9WH6/nF4LXEA0+Ck2EB8+nUWQd+oOxPxw9FvKEZ2CmNCkQckNZEDXUoz1JwWhnb0gcaRcU
+ STNGY/HBIagnYyn8oZIls5tyGMOpwBovXMObz5AOfQb33Nj8yQLujlm6FS5B7E+kUoVnCkhnq
+ qwiVfQO0VBim3JEienuGW7r+XIwoFSmGopFRY5yRYey6o5/y32LQIIokN5ZGa9nFPVIYlWd51
+ xn67VKtNP3M0s2p8M/Oaq4cHMo/kz50dbY8KAnmZrtQYfNSuCxtpbmd2oJR2mk3nCIlAhZUrN
+ VgUD6JhJ37Ar78pM7GBEQ3VOUaVf7kHv0pZAjdLmjLsiEH7SHzyRTtaOL6zpFLmzpfg2LTuyU
+ DPFlrxpVztGS93UxY8MEWC8MJv6sq6xKklUEEQVUts0YtQ9FyOCqVZZDpjg+j/WryUVTJU0MU
+ 0ieMX09LWeQlnBuy4WEKgDmCkvokafurb7anxKTuHlxWoP0ms4DxAn9fjhWZnSrWP4nNSSkVJ
+ l0ZipRPqvrF/t5hZ/9l0XLiL5kxLl8vFpAtiQUKELnhfN56e8pmJjcSCZsLQgPKaLsxh5i+jM
+ XievQ5ggM51mt1gbSjWdKm1FclP3k5m0dDHWAQ==
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Little helper macros that declares an oftree module device table,
-if CONFIG_OF is enabled. Otherwise it's just noop. Helpful for
-reducing the number of #ifdef's.
-
-Instead of:
-    MODULE_DEVICE_TABLE(of, foo);
-now use:
-    MODULE_OF_TABLE(foo);
-
-Or declare the whole table via:
-    MODULE_DECLARE_OF_TABLE(foo,
-        { .compatible = "foo" },
-        { .compatible = "bar" });
+Using MODULE_DECLARE_OF_TABLE() macro to get rid of some #ifdef CONFIG_OF
+and make the code a bit slimmer.
 
 Signed-off-by: Enrico Weigelt, metux IT consult <info@metux.net>
 ---
- include/linux/mod_devicetable.h | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ drivers/ata/pata_arasan_cf.c | 9 ++-------
+ drivers/ata/sata_mv.c        | 9 ++-------
+ 2 files changed, 4 insertions(+), 14 deletions(-)
 
-diff --git a/include/linux/mod_devicetable.h b/include/linux/mod_devicetable.h
-index 448621c..5f4f2dc8 100644
---- a/include/linux/mod_devicetable.h
-+++ b/include/linux/mod_devicetable.h
-@@ -245,6 +245,19 @@ struct of_device_id {
- 	const void *data;
- };
+diff --git a/drivers/ata/pata_arasan_cf.c b/drivers/ata/pata_arasan_cf.c
+index ebecab8..22de61f 100644
+--- a/drivers/ata/pata_arasan_cf.c
++++ b/drivers/ata/pata_arasan_cf.c
+@@ -943,13 +943,8 @@ static int arasan_cf_resume(struct device *dev)
  
-+/*
-+ * macro for adding the of module device table only if CONFIG_OF enabled
-+ */
-+#ifdef CONFIG_OF
-+#define MODULE_OF_TABLE(name)	MODULE_DEVICE_TABLE(of,name)
-+#define MODULE_DECLARE_OF_TABLE(name,entries...) \
-+static const struct of_device_id name[] = { entries, {} };
-+#else
-+#define MODULE_OF_TABLE(name)
-+#define MODULE_DECLARE_OF_TABLE(name,entries...) \
-+static const struct of_device_id *name = NULL;
-+#endif /* CONFIG_OF */
-+
- /* VIO */
- struct vio_device_id {
- 	char type[32];
+ static SIMPLE_DEV_PM_OPS(arasan_cf_pm_ops, arasan_cf_suspend, arasan_cf_resume);
+ 
+-#ifdef CONFIG_OF
+-static const struct of_device_id arasan_cf_id_table[] = {
+-	{ .compatible = "arasan,cf-spear1340" },
+-	{}
+-};
+-MODULE_DEVICE_TABLE(of, arasan_cf_id_table);
+-#endif
++MODULE_DECLARE_OF_TABLE(arasan_cf_id_table,
++	{ .compatible = "arasan,cf-spear1340" });
+ 
+ static struct platform_driver arasan_cf_driver = {
+ 	.probe		= arasan_cf_probe,
+diff --git a/drivers/ata/sata_mv.c b/drivers/ata/sata_mv.c
+index da585d2..bac48cd 100644
+--- a/drivers/ata/sata_mv.c
++++ b/drivers/ata/sata_mv.c
+@@ -4273,14 +4273,9 @@ static int mv_platform_resume(struct platform_device *pdev)
+ #define mv_platform_resume NULL
+ #endif
+ 
+-#ifdef CONFIG_OF
+-static const struct of_device_id mv_sata_dt_ids[] = {
++MODULE_DECLARE_OF_TABLE(mv_sata_dt_ids,
+ 	{ .compatible = "marvell,armada-370-sata", },
+-	{ .compatible = "marvell,orion-sata", },
+-	{},
+-};
+-MODULE_DEVICE_TABLE(of, mv_sata_dt_ids);
+-#endif
++	{ .compatible = "marvell,orion-sata", });
+ 
+ static struct platform_driver mv_platform_driver = {
+ 	.probe		= mv_platform_probe,
 -- 
 1.9.1
 
