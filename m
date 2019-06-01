@@ -2,90 +2,92 @@ Return-Path: <SRS0=xfQ5=UA=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65836C28CC1
-	for <linux-crypto@archiver.kernel.org>; Sat,  1 Jun 2019 13:53:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35939C28CC4
+	for <linux-crypto@archiver.kernel.org>; Sat,  1 Jun 2019 14:51:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3829327729
-	for <linux-crypto@archiver.kernel.org>; Sat,  1 Jun 2019 13:53:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0F4EE2773A
+	for <linux-crypto@archiver.kernel.org>; Sat,  1 Jun 2019 14:51:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=yahoo.ca header.i=@yahoo.ca header.b="inLolirg"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726179AbfFANxa (ORCPT
+        id S1726211AbfFAOt5 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 1 Jun 2019 09:53:30 -0400
-Received: from mout.kundenserver.de ([212.227.126.187]:54109 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725946AbfFANx3 (ORCPT
+        Sat, 1 Jun 2019 10:49:57 -0400
+Received: from sonic306-20.consmr.mail.gq1.yahoo.com ([98.137.68.83]:38617
+        "EHLO sonic306-20.consmr.mail.gq1.yahoo.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725965AbfFAOt5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 1 Jun 2019 09:53:29 -0400
-Received: from orion.localdomain ([95.114.112.19]) by mrelayeu.kundenserver.de
- (mreue012 [212.227.15.167]) with ESMTPSA (Nemesis) id
- 1MTw02-1h6Dtx1pq6-00R0rf; Sat, 01 Jun 2019 15:53:07 +0200
-From:   "Enrico Weigelt, metux IT consult" <info@metux.net>
-To:     linux-kernel@vger.kernel.org
-Cc:     vireshk@kernel.org, b.zolnierkie@samsung.com, axboe@kernel.dk,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-ide@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH 3/4] drivers: crypto: picoxcell_crypto: use MODULE_DECLARE_OF_TABLE()
-Date:   Sat,  1 Jun 2019 15:52:58 +0200
-Message-Id: <1559397179-5833-4-git-send-email-info@metux.net>
-X-Mailer: git-send-email 1.9.1
-In-Reply-To: <1559397179-5833-1-git-send-email-info@metux.net>
-References: <1559397179-5833-1-git-send-email-info@metux.net>
-X-Provags-ID: V03:K1:qwswbfsbvcAggPFe5jRUevX7/A5BbeCTENYHWUVjYy9ksEyQhA9
- OxftUN0YxwjGzkm7dnhtXTUp4VGMvBnf5s5uog1bOvoNoVDeRjKjdu7UV3ggR7tWzI0551l
- BIBn0W+KoFTrEnrQZVvGHDj4GV3aOZujsZQIwmjD9tLRLjIaGjQ74hOvn/gpoLukASgwrCP
- EfVLAfcbVALxSiQBDuciQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:OXM7CkWxg4A=:poWmuNctcuGgq2p8sHSagT
- YncLYj93yDEF5hQ7MYor5eLIrYS3v44+0x6m3HysZGCWoSMC9gOc1ZKxwWG4xrlyTD4GfeXik
- pifkdZ0wiGov9BdsXRlyh28txjb7ZkCAq69j0Y9wp/I40GXD/3bLDM6awSisE5alWDGEeMjks
- CgD0YzIdYNbpvtPEl3qfAvRn4JIu0Z89u+lrccoLDzIHC+Q+cgy4xY783Za2M2wi5s/lPPRwU
- GtH4tbDZFJv3z4YOtxHloeg1oN+dADDqT5+3hq4mIbEcJHI58yVOO2CnofVNlaV1+W80ES3Gn
- WPjPdv9FD1EbAiZBF6Lzo3+Xy32Ioqr1logauTJBL8RMTO43shroi0fKtIwedj5Rf4JeXxuwm
- BFayYW9PQ9Knuahc6Bzi1p7YYx5ddJFkO+/KgmV1kiOmOZAOMm32EDBXS73l2h3vgA9u9NdgZ
- yXVYYpvrIZNuigM3VvYUB560uCK0XhOb8ibNvtkGFBwX2dvHfnMpji0O1b6c0OQcwPJstus7q
- 72+6qWjcLu/7LnOnniO1NQMLR6WKsMJGjbpV5NmkQzfaWx8/J6Bj6HoUCc+VmdRWt/9oJ46/O
- CvX2Gtpw4K4n0npAyc7YHASxqSIPzvE//nBE41GusxWshI3RwnTOM/7wRDwkzIx81wwZNFao9
- f3mr0CZapnBAJhlfFqe7wCQiwW8e/ppajAtRPyPH/PztxfVv39+ifnN6zm41lNguzHngvBfs8
- CS/lifrJCPXnTVqoSiyD97FNNMQF4Z+cw5reCw==
+        Sat, 1 Jun 2019 10:49:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.ca; s=s2048; t=1559400594; bh=+FzsEswF8TO/uXcnNYhQmpuXhgJ4Ib1a9HuuWhRst2M=; h=From:To:Cc:Subject:Date:From:Subject; b=inLolirgV5LNclRrIx8nzdggEuMyGfPUi3HjN7gCB+4lp7VLU78RORfFU7MCjfuWP0tzq+pfEdFaMcaLsO08BXWESlyENEg2QhJw1zwkSZFY0NruJhnzGee8Uzobc/dON4+y80QH+4Ei5+9H38YTUV9BpOG6NyEitCpr/QPy0WUH88j2SZa6nZl//Krl6pWkSEDqyx0caQn4e9uK/v8TB2FcQ4VVGHvzQJ7IfEt2TfmKLmp/SCBNhgHC8K1Zha9SaDkM1w66nWVflvWlikKrCEjuLoIvholXxI3oyUZWVyL30ArVzqPsY9B2Oz1K1oc07DXN13DIuWeSmicXw4vcJA==
+X-YMail-OSG: bs9eEw4VM1k_cUQemsl_R7K6eSi11LXPHCsKKbXcZ19749GV2DjRjlelFP0SS4N
+ csgAxnXCLiGltmqAefoFiuIvU0mlxpBix7.oG2yBfRs6I10VjLnxbAeLvYdwAfNezE.TEKoMbG3W
+ gR9.9tHD9lKe3mu7eOj9ewK20Fke7KnZZ9jgJPIk_9Q70AtHKBFpzzCVbM6OV4bDYWccxyOe5H8c
+ Zo0UP0yOdNRHzNsLN5nK0xshAfXmuw0puDqctvl1PFVRqLTleOy0rh.fS4wGHPM0L5cwHJRb0ZuU
+ 7VVgv.NFsYiWAFqfZiju7xDyEKM7RUurtF_g47lSNdYf4WSYzTsS_9YvNRhmMIDiOmPLldgpZlnn
+ hkZNCh6J9HjqgjOXTsueyVhFULAfjafnktpyg3Ln5jz9YU8JlFatUcA6S6v8.GTI_CJDJM9j7Y4h
+ WaykDdXiHb0i28nnVGGs8ytTKacjHAgzQbuMucY2KcQhrBPn0GRuUa0OftPVqUI0dMOiy4fIwiNB
+ GRunGnDoVixRv8vOFGogdjbkW0nn4DaAs.pg2nM9dpWQSsT.H99SoRD7004I4q96uPvxUtM7qUaR
+ sffA4AX4Y3qU20ixgw2VgdetGEDYTbW1RnphDhd_rlhiCAWDnwdbYzEH7Hwv10j5UzVyhy2GD8lS
+ LwkDD3ofzt7Jw36r7Lo3E.t20tkE9hlbT5cDcJLbjKHJY337.jCJoeP..rmgYgr2mTk8Kw2UCx2.
+ hXaYllIYahsElF8YsK_t_vcgO1rF2f8QUEntfp4cEQa4i83Ij8EC8tLJD463T5rVf6N.J5rWZ0LI
+ adsxPXaLWO9Dno2hu4eckJ9CZbd516XgEXKp9Bh5iE67SeVvrGJJApOKHKwrwDofX3LcGgdw3ReK
+ Hi_FslLLL1O0mtMeNPHTV5xnRL7y8a0_pArdmsNntccGHzCdNecXlf.JyMUyi7FeH_Z7Iz3e9KPR
+ MmTEO.duYZ5gUORst73Wm0fnLYMpwetiMMM4BZ_YL6Pa.K1m0UmshtzLRpCc43LT2wd7rBfZi9.i
+ Z6.Ns1ylT6nm2To23xxEIAUhnXHatoZLabsm20nl.PgBpQu8r5Dz3ax0o0D8QdD_zxf.KVoRT525
+ oL7XQuTx0_mCyPF3s6BlHN7lDzfmdRaQIR_uQHqEOSOsuHqy_x6LFhcv.cQogvw5Hbk7AoPboUAw
+ kil6h.l6yXZWM87MWGZys7_WAIRYU
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic306.consmr.mail.gq1.yahoo.com with HTTP; Sat, 1 Jun 2019 14:49:54 +0000
+Received: from CPE00fc8de26033-CM00fc8de26030.cpe.net.cable.rogers.com (EHLO localhost) ([99.228.156.240])
+          by smtp424.mail.gq1.yahoo.com (Oath Hermes SMTP Server) with ESMTPA ID 0c5696934456779ae32f2b5029b3dd5e;
+          Sat, 01 Jun 2019 14:49:52 +0000 (UTC)
+From:   "Alex Xu (Hello71)" <alex_y_xu@yahoo.ca>
+To:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        tglx@linutronix.de
+Cc:     allison@lohutok.net, alexios.zavras@intel.com, swinslow@gmail.com,
+        rfontana@redhat.com, gregkh@linuxfoundation.org,
+        linux-spdx@vger.kernel.org, torvalds@linux-foundation.org,
+        "Alex Xu (Hello71)" <alex_y_xu@yahoo.ca>
+Subject: [PATCH] crypto: ux500 - fix license comment syntax error
+Date:   Sat,  1 Jun 2019 10:49:43 -0400
+Message-Id: <20190601144943.126995-1-alex_y_xu@yahoo.ca>
+X-Mailer: git-send-email 2.21.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Using MODULE_DECLARE_OF_TABLE() macro to get rid of some #ifdef CONFIG_OF
-and make the code a bit slimmer.
+Causes error: drivers/crypto/ux500/cryp/Makefile:5: *** missing
+separator.  Stop.
 
-Signed-off-by: Enrico Weigelt, metux IT consult <info@metux.net>
+Fixes: af873fcecef5 ("treewide: Replace GPLv2 boilerplate/reference with
+SPDX - rule 194")
+
+Signed-off-by: Alex Xu (Hello71) <alex_y_xu@yahoo.ca>
 ---
- drivers/crypto/picoxcell_crypto.c | 9 ++-------
- 1 file changed, 2 insertions(+), 7 deletions(-)
+ drivers/crypto/ux500/cryp/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/picoxcell_crypto.c b/drivers/crypto/picoxcell_crypto.c
-index b985cb85..3c299f2 100644
---- a/drivers/crypto/picoxcell_crypto.c
-+++ b/drivers/crypto/picoxcell_crypto.c
-@@ -1612,14 +1612,9 @@ static DEVICE_ATTR(stat_irq_thresh, 0644, spacc_stat_irq_thresh_show,
- 	},
- };
+diff --git a/drivers/crypto/ux500/cryp/Makefile b/drivers/crypto/ux500/cryp/Makefile
+index a90b50597e5c..3e67531f484c 100644
+--- a/drivers/crypto/ux500/cryp/Makefile
++++ b/drivers/crypto/ux500/cryp/Makefile
+@@ -2,7 +2,7 @@
+ #/*
+ # * Copyright (C) ST-Ericsson SA 2010
+ # * Author: shujuan.chen@stericsson.com for ST-Ericsson.
+- */
++# */
  
--#ifdef CONFIG_OF
--static const struct of_device_id spacc_of_id_table[] = {
-+MODULE_DECLARE_OF_TABLE(spacc_of_id_table,
- 	{ .compatible = "picochip,spacc-ipsec" },
--	{ .compatible = "picochip,spacc-l2" },
--	{}
--};
--MODULE_DEVICE_TABLE(of, spacc_of_id_table);
--#endif /* CONFIG_OF */
-+	{ .compatible = "picochip,spacc-l2" });
+ ccflags-$(CONFIG_CRYPTO_DEV_UX500_DEBUG) += -DDEBUG
  
- static int spacc_probe(struct platform_device *pdev)
- {
 -- 
-1.9.1
+2.21.0
 
