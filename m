@@ -7,51 +7,51 @@ X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B569CC28CC4
-	for <linux-crypto@archiver.kernel.org>; Sat,  1 Jun 2019 13:53:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65836C28CC1
+	for <linux-crypto@archiver.kernel.org>; Sat,  1 Jun 2019 13:53:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9961D27729
-	for <linux-crypto@archiver.kernel.org>; Sat,  1 Jun 2019 13:53:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3829327729
+	for <linux-crypto@archiver.kernel.org>; Sat,  1 Jun 2019 13:53:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726496AbfFANxa (ORCPT
+        id S1726179AbfFANxa (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Sat, 1 Jun 2019 09:53:30 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:40515 "EHLO
+Received: from mout.kundenserver.de ([212.227.126.187]:54109 "EHLO
         mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726044AbfFANx3 (ORCPT
+        with ESMTP id S1725946AbfFANx3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Sat, 1 Jun 2019 09:53:29 -0400
 Received: from orion.localdomain ([95.114.112.19]) by mrelayeu.kundenserver.de
  (mreue012 [212.227.15.167]) with ESMTPSA (Nemesis) id
- 1MY5XR-1h5yn83lFt-00YPOK; Sat, 01 Jun 2019 15:53:08 +0200
+ 1MTw02-1h6Dtx1pq6-00R0rf; Sat, 01 Jun 2019 15:53:07 +0200
 From:   "Enrico Weigelt, metux IT consult" <info@metux.net>
 To:     linux-kernel@vger.kernel.org
 Cc:     vireshk@kernel.org, b.zolnierkie@samsung.com, axboe@kernel.dk,
         herbert@gondor.apana.org.au, davem@davemloft.net,
         linux-ide@vger.kernel.org, linux-block@vger.kernel.org,
         linux-crypto@vger.kernel.org
-Subject: [PATCH 4/4] drivers: ata: use MODULE_DECLARE_OF_TABLE()
-Date:   Sat,  1 Jun 2019 15:52:59 +0200
-Message-Id: <1559397179-5833-5-git-send-email-info@metux.net>
+Subject: [PATCH 3/4] drivers: crypto: picoxcell_crypto: use MODULE_DECLARE_OF_TABLE()
+Date:   Sat,  1 Jun 2019 15:52:58 +0200
+Message-Id: <1559397179-5833-4-git-send-email-info@metux.net>
 X-Mailer: git-send-email 1.9.1
 In-Reply-To: <1559397179-5833-1-git-send-email-info@metux.net>
 References: <1559397179-5833-1-git-send-email-info@metux.net>
-X-Provags-ID: V03:K1:zlZQLw/7X/h00DT4khIXd7jjS4solJe6AYqFAW61yXbLkxP/FKv
- 2SIn8J4GncUnBymImySqQuvaZ6hc0os0iWfIgCYSLkrsfUdlrbRZOWW+Dl7RYMVd8VtAlXe
- VyYoxafCnE4KHfCkp85GNni5xN9+R3q29+pht6cYEC0WNM/q4+t9Ayqgq8oiA4+JHqz4sft
- Nv7++ZTKqDPO13S9DkX5Q==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:NL9r01+H0YU=:N9E0t5e+9MRvzhoQBaW1lK
- 2gvx90Ty9dQwzFrFOja096OXdWC9vhoccvHP0T1R4HLpjjFAj+hHa4RG/4Z863q3jMBUuQ2W5
- +Fkbk4bjIaJPzGkhJdF4zRYwYXu/J28mKstKoTVXJ7aEsMt7C6mjiEZDTLZgVEsqIfl2IxZKT
- uqx9WH6/nF4LXEA0+Ck2EB8+nUWQd+oOxPxw9FvKEZ2CmNCkQckNZEDXUoz1JwWhnb0gcaRcU
- STNGY/HBIagnYyn8oZIls5tyGMOpwBovXMObz5AOfQb33Nj8yQLujlm6FS5B7E+kUoVnCkhnq
- qwiVfQO0VBim3JEienuGW7r+XIwoFSmGopFRY5yRYey6o5/y32LQIIokN5ZGa9nFPVIYlWd51
- xn67VKtNP3M0s2p8M/Oaq4cHMo/kz50dbY8KAnmZrtQYfNSuCxtpbmd2oJR2mk3nCIlAhZUrN
- VgUD6JhJ37Ar78pM7GBEQ3VOUaVf7kHv0pZAjdLmjLsiEH7SHzyRTtaOL6zpFLmzpfg2LTuyU
- DPFlrxpVztGS93UxY8MEWC8MJv6sq6xKklUEEQVUts0YtQ9FyOCqVZZDpjg+j/WryUVTJU0MU
- 0ieMX09LWeQlnBuy4WEKgDmCkvokafurb7anxKTuHlxWoP0ms4DxAn9fjhWZnSrWP4nNSSkVJ
- l0ZipRPqvrF/t5hZ/9l0XLiL5kxLl8vFpAtiQUKELnhfN56e8pmJjcSCZsLQgPKaLsxh5i+jM
- XievQ5ggM51mt1gbSjWdKm1FclP3k5m0dDHWAQ==
+X-Provags-ID: V03:K1:qwswbfsbvcAggPFe5jRUevX7/A5BbeCTENYHWUVjYy9ksEyQhA9
+ OxftUN0YxwjGzkm7dnhtXTUp4VGMvBnf5s5uog1bOvoNoVDeRjKjdu7UV3ggR7tWzI0551l
+ BIBn0W+KoFTrEnrQZVvGHDj4GV3aOZujsZQIwmjD9tLRLjIaGjQ74hOvn/gpoLukASgwrCP
+ EfVLAfcbVALxSiQBDuciQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:OXM7CkWxg4A=:poWmuNctcuGgq2p8sHSagT
+ YncLYj93yDEF5hQ7MYor5eLIrYS3v44+0x6m3HysZGCWoSMC9gOc1ZKxwWG4xrlyTD4GfeXik
+ pifkdZ0wiGov9BdsXRlyh28txjb7ZkCAq69j0Y9wp/I40GXD/3bLDM6awSisE5alWDGEeMjks
+ CgD0YzIdYNbpvtPEl3qfAvRn4JIu0Z89u+lrccoLDzIHC+Q+cgy4xY783Za2M2wi5s/lPPRwU
+ GtH4tbDZFJv3z4YOtxHloeg1oN+dADDqT5+3hq4mIbEcJHI58yVOO2CnofVNlaV1+W80ES3Gn
+ WPjPdv9FD1EbAiZBF6Lzo3+Xy32Ioqr1logauTJBL8RMTO43shroi0fKtIwedj5Rf4JeXxuwm
+ BFayYW9PQ9Knuahc6Bzi1p7YYx5ddJFkO+/KgmV1kiOmOZAOMm32EDBXS73l2h3vgA9u9NdgZ
+ yXVYYpvrIZNuigM3VvYUB560uCK0XhOb8ibNvtkGFBwX2dvHfnMpji0O1b6c0OQcwPJstus7q
+ 72+6qWjcLu/7LnOnniO1NQMLR6WKsMJGjbpV5NmkQzfaWx8/J6Bj6HoUCc+VmdRWt/9oJ46/O
+ CvX2Gtpw4K4n0npAyc7YHASxqSIPzvE//nBE41GusxWshI3RwnTOM/7wRDwkzIx81wwZNFao9
+ f3mr0CZapnBAJhlfFqe7wCQiwW8e/ppajAtRPyPH/PztxfVv39+ifnN6zm41lNguzHngvBfs8
+ CS/lifrJCPXnTVqoSiyD97FNNMQF4Z+cw5reCw==
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
@@ -62,51 +62,30 @@ and make the code a bit slimmer.
 
 Signed-off-by: Enrico Weigelt, metux IT consult <info@metux.net>
 ---
- drivers/ata/pata_arasan_cf.c | 9 ++-------
- drivers/ata/sata_mv.c        | 9 ++-------
- 2 files changed, 4 insertions(+), 14 deletions(-)
+ drivers/crypto/picoxcell_crypto.c | 9 ++-------
+ 1 file changed, 2 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/ata/pata_arasan_cf.c b/drivers/ata/pata_arasan_cf.c
-index ebecab8..22de61f 100644
---- a/drivers/ata/pata_arasan_cf.c
-+++ b/drivers/ata/pata_arasan_cf.c
-@@ -943,13 +943,8 @@ static int arasan_cf_resume(struct device *dev)
- 
- static SIMPLE_DEV_PM_OPS(arasan_cf_pm_ops, arasan_cf_suspend, arasan_cf_resume);
+diff --git a/drivers/crypto/picoxcell_crypto.c b/drivers/crypto/picoxcell_crypto.c
+index b985cb85..3c299f2 100644
+--- a/drivers/crypto/picoxcell_crypto.c
++++ b/drivers/crypto/picoxcell_crypto.c
+@@ -1612,14 +1612,9 @@ static DEVICE_ATTR(stat_irq_thresh, 0644, spacc_stat_irq_thresh_show,
+ 	},
+ };
  
 -#ifdef CONFIG_OF
--static const struct of_device_id arasan_cf_id_table[] = {
--	{ .compatible = "arasan,cf-spear1340" },
+-static const struct of_device_id spacc_of_id_table[] = {
++MODULE_DECLARE_OF_TABLE(spacc_of_id_table,
+ 	{ .compatible = "picochip,spacc-ipsec" },
+-	{ .compatible = "picochip,spacc-l2" },
 -	{}
 -};
--MODULE_DEVICE_TABLE(of, arasan_cf_id_table);
--#endif
-+MODULE_DECLARE_OF_TABLE(arasan_cf_id_table,
-+	{ .compatible = "arasan,cf-spear1340" });
+-MODULE_DEVICE_TABLE(of, spacc_of_id_table);
+-#endif /* CONFIG_OF */
++	{ .compatible = "picochip,spacc-l2" });
  
- static struct platform_driver arasan_cf_driver = {
- 	.probe		= arasan_cf_probe,
-diff --git a/drivers/ata/sata_mv.c b/drivers/ata/sata_mv.c
-index da585d2..bac48cd 100644
---- a/drivers/ata/sata_mv.c
-+++ b/drivers/ata/sata_mv.c
-@@ -4273,14 +4273,9 @@ static int mv_platform_resume(struct platform_device *pdev)
- #define mv_platform_resume NULL
- #endif
- 
--#ifdef CONFIG_OF
--static const struct of_device_id mv_sata_dt_ids[] = {
-+MODULE_DECLARE_OF_TABLE(mv_sata_dt_ids,
- 	{ .compatible = "marvell,armada-370-sata", },
--	{ .compatible = "marvell,orion-sata", },
--	{},
--};
--MODULE_DEVICE_TABLE(of, mv_sata_dt_ids);
--#endif
-+	{ .compatible = "marvell,orion-sata", });
- 
- static struct platform_driver mv_platform_driver = {
- 	.probe		= mv_platform_probe,
+ static int spacc_probe(struct platform_device *pdev)
+ {
 -- 
 1.9.1
 
