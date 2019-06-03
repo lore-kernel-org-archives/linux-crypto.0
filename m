@@ -2,184 +2,181 @@ Return-Path: <SRS0=YB2u=UC=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,T_DKIMWL_WL_HIGH,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46132C04AB6
-	for <linux-crypto@archiver.kernel.org>; Mon,  3 Jun 2019 09:07:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81C7DC28CC6
+	for <linux-crypto@archiver.kernel.org>; Mon,  3 Jun 2019 12:07:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 139D226E72
-	for <linux-crypto@archiver.kernel.org>; Mon,  3 Jun 2019 09:07:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4FCDB253EC
+	for <linux-crypto@archiver.kernel.org>; Mon,  3 Jun 2019 12:07:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="STX+aLua"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="gwfrZ3Jb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727264AbfFCJHg (ORCPT
+        id S1726991AbfFCMHc (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 3 Jun 2019 05:07:36 -0400
-Received: from mailout1.samsung.com ([203.254.224.24]:20980 "EHLO
-        mailout1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727209AbfFCJHg (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 3 Jun 2019 05:07:36 -0400
-Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
-        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20190603090733epoutp016649bbefbabcd9da470d378fd5420e8b~kpQ62may90169001690epoutp01-
-        for <linux-crypto@vger.kernel.org>; Mon,  3 Jun 2019 09:07:33 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20190603090733epoutp016649bbefbabcd9da470d378fd5420e8b~kpQ62may90169001690epoutp01-
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1559552853;
-        bh=Yd2cOToR+vjJ86ocOT/jMyRteAv9ma3tL/lsMJSLD4s=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=STX+aLuaNPGbq7+PbrBO3l4jAdufXhm5RsRnLstLg1MXQ7/8ld814RFKt8YH/Wqdw
-         CgUjca8gmEqZfGb+KqSRTHzFRsXXUBGUvE9lEY8U4I72j7dLuXIVzgsm/yo7kF/T4j
-         vHzx4Uqvjh+MEXXDXv4H/03J7q8RbFRI1x8AMQ4k=
-Received: from epsmges5p3new.samsung.com (unknown [182.195.40.194]) by
-        epcas5p2.samsung.com (KnoxPortal) with ESMTP id
-        20190603090731epcas5p24e9d86df21e3125b4458c9a00eb67360~kpQ48kC8T2256922569epcas5p2b;
-        Mon,  3 Jun 2019 09:07:31 +0000 (GMT)
-Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
-        epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        7F.0A.04067.F43E4FC5; Mon,  3 Jun 2019 18:07:27 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-        epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
-        20190603090245epcas5p4a6cdfdb7ef72bfd36472f43bb4e1e0f1~kpMu6zcfz1942819428epcas5p4_;
-        Mon,  3 Jun 2019 09:02:45 +0000 (GMT)
-Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
-        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20190603090245epsmtrp252984807868b80dae3cd04524c3bc792~kpMu56t3B2094820948epsmtrp2P;
-        Mon,  3 Jun 2019 09:02:45 +0000 (GMT)
-X-AuditID: b6c32a4b-7a3ff70000000fe3-38-5cf4e34f75ca
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-        epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        97.FB.03662.532E4FC5; Mon,  3 Jun 2019 18:02:45 +0900 (KST)
-Received: from localhost.localdomain (unknown [107.109.224.135]) by
-        epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-        20190603090243epsmtip20bcdb3e867cc32a6eed2c77935413a53~kpMs7JybS1194011940epsmtip2U;
-        Mon,  3 Jun 2019 09:02:43 +0000 (GMT)
-From:   Maninder Singh <maninder1.s@samsung.com>
-To:     akpm@linux-foundation.org, herbert@gondor.apana.org.au,
-        davem@davemloft.net, keescook@chromium.org, gustavo@embeddedor.com
-Cc:     joe@perches.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, a.sahrawat@samsung.com,
-        pankaj.m@samsung.com, v.narang@samsung.com,
-        Maninder Singh <maninder1.s@samsung.com>
-Subject: [PATCH 4/4] zstd: change structure variable from int to char
-Date:   Mon,  3 Jun 2019 14:32:06 +0530
-Message-Id: <1559552526-4317-5-git-send-email-maninder1.s@samsung.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1559552526-4317-1-git-send-email-maninder1.s@samsung.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAA01Sa0hTYRjm2znOYzk7TKsvqyEnJmipZ9bWybQCUw8YZQgWIazD/FBpO1s7
-        0zL6IXgplS5mhfd1IcNLGuJlTSNTLLspw6ysULtYIVHqNLAy29yk/j3v877P9zy830tg0hKx
-        P5HOm5CR57SUeBne1hMUHLLvw0wyXfxlFWPrQExlU4OYqRzIxZnWTjlTNLGOqRj9gDNPi3TM
-        6MiciBm0VoqZHnM+zox8bRUx3Y+qwC5vtiLbhrMttcMitvG+nG3rkrN9pb9wdqbuBcaebakD
-        rL1ZlkAc0kamIS4FGQMQr9GnpPOpUVR8ojparVTRihDFNmYrFcBzOhRF7d6TEBKbrnUEpQIy
-        OW2Gg0rgBIEK2xFp1GeYUECaXjBFUciQojUowg2hAqcTMvjUUI1eF6Gg6XClY/KwNq2koQYY
-        Hvgd75l/7JkNFshC4EVAcgs0v7aDQrCMkJIdAFp+nvVwFdMADkz2uosfALa9f+OxJBk8l+Nu
-        3AXwt7kKOBtSchbAhrcrnFhMhsI6ayfuHPIjswEcGSpeNMHI+wCO519fVPiSMfBavxl3YpyU
-        w2d984sWEjIW9s6fw112MjjcX4AVAoLwIuPgk3txzncgOSiGfXcq3JF2wzFbuacL+8KJhy1u
-        7A/t3+6KXYJTAL4se4G7iosAFnyvdU/thGOvej2dDhgZBJusYS56Pbz0uFHkxBjpA8/8+ihy
-        8RJoqV7Ccpg7fNsdYi20T025Q7NwvL1e5NpROYB3qvM9zwNZ+T+LKwDUgTXIIOhSkaA0bObR
-        sf8/rhksHmRwvAU09+/pBiQBKG/JpNdMstSDyxSydN0AEhjlJ+HeOChJCpd1Ahn1amOGFgnd
-        QOlYZzHmv1Kjd5w3b1IrlOEqFb2NVm5mVApqteSCx1CylEzlTOgIQgZkXNKJCC//bHAgfuHV
-        XNzY9uVleTExSWFAZcGvFvCqgczIGGvRBdrmm2hWmyLi64cWfP5cvhaCLDepvunScTwh9Jn3
-        mVuj0dbLtq+n4975FZn3Rrduoj9rB0sPtW/0kZ1cHijLqu7qKpk9GvjuY3nSXOuUpuSnIqfm
-        Rtbwp97nURMb8g5OD6zYT+FCGqcIxowC9xfSEB3+pgMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrGLMWRmVeSWpSXmKPExsWy7bCSvK7poy8xBj0/jC0u7k61mLN+DZvF
-        nPMtLBZb96hadL+SsZh9/zGLxZnuXIv7934yWVzeNYfN4vD8NhaLe2+2MlkcOjmX0YHHY3bD
-        RRaPLStvMnmsO6jqse2AqseJGb9ZPL6susbs0bdlFaPH501yARxRXDYpqTmZZalF+nYJXBmT
-        1yxjLDgmUnH47yn2Bsb/Al2MnBwSAiYSl/ubWUFsIYHdjBJXlyRAxKUlfv57zwJhC0us/Pec
-        vYuRC6jmM6NEb9c+dpAEm4CexKpde1hAEiICbYwS/Rv/s4I4zAInGSXudn5gBqkSFnCVWHRu
-        PtgoFgFVibMn/oKt4xVwkzj6tx9qhZzEzXOdQPUcHJwC7hKn97tDXOQmsettE+sERr4FjAyr
-        GCVTC4pz03OLDQuM8lLL9YoTc4tL89L1kvNzNzGCQ1dLawfjiRPxhxgFOBiVeHhnsH+JEWJN
-        LCuuzD3EKMHBrCTCm3gbKMSbklhZlVqUH19UmpNafIhRmoNFSZxXPv9YpJBAemJJanZqakFq
-        EUyWiYNTqoGx69uEWZ/S7FWPGYmtUu24sXFVe8Fb+Q3dT2eKNHP+v8iT5LbEyFAvLDMh27Q2
-        Ztqi91diHknFpO2Ki9k716nv3eWHHtI6fw6yGLrrhDmG51zewRAqwJG7VDP9pzD3ZZZTUr93
-        tRxUrOfYe+t65OGuyrZZay9cmbE4I5l9Z5/L2u8/bgcfzS9UYinOSDTUYi4qTgQA5mQnyFkC
-        AAA=
-X-CMS-MailID: 20190603090245epcas5p4a6cdfdb7ef72bfd36472f43bb4e1e0f1
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20190603090245epcas5p4a6cdfdb7ef72bfd36472f43bb4e1e0f1
-References: <1559552526-4317-1-git-send-email-maninder1.s@samsung.com>
-        <CGME20190603090245epcas5p4a6cdfdb7ef72bfd36472f43bb4e1e0f1@epcas5p4.samsung.com>
+        Mon, 3 Jun 2019 08:07:32 -0400
+Received: from mail-eopbgr20043.outbound.protection.outlook.com ([40.107.2.43]:29348
+        "EHLO EUR02-VE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726996AbfFCMHc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 3 Jun 2019 08:07:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=qagzcxISTwrZW6qAv2VJG86x+G+EYNVbGEFGV8lt4bI=;
+ b=gwfrZ3Jbq+XwQObS825x6YsK+5rAKrNWG4xZVvqB59IywUP4wODMacu8q3rnzGn5B4rAD19gpHZ+9PwCP06vWDuINt0M0KZ6n2YVh1cMfJH5DSe7z/51rGjZCvnOuLSHLKpPC10GIQk6HjlgDUZ26va+nn4snKOPTyzXTW2eoRI=
+Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
+ VI1SPR00MB110.eurprd04.prod.outlook.com (10.173.72.151) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1943.20; Mon, 3 Jun 2019 12:07:28 +0000
+Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
+ ([fe80::ccaf:f4a1:704a:e745]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
+ ([fe80::ccaf:f4a1:704a:e745%4]) with mapi id 15.20.1943.018; Mon, 3 Jun 2019
+ 12:07:28 +0000
+From:   Horia Geanta <horia.geanta@nxp.com>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+CC:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        dl-linux-imx <linux-imx@nxp.com>,
+        Iuliana Prodan <iuliana.prodan@nxp.com>,
+        Valentin Ciocoi Radulescu <valentin.ciocoi@nxp.com>,
+        "stable@vger.kernel.org" <stable@vger.kernel.org>
+Subject: Re: [v2 PATCH] crypto: caam - fix DKP detection logic
+Thread-Topic: [v2 PATCH] crypto: caam - fix DKP detection logic
+Thread-Index: AQHVGeFGHEC21fvWy0uWA6SVPYo83g==
+Date:   Mon, 3 Jun 2019 12:07:28 +0000
+Message-ID: <VI1PR0402MB3485776F44CA3D034F66821798140@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+References: <20190503120548.5576-1-horia.geanta@nxp.com>
+ <20190506063944.enwkbljhy42rcaqq@gondor.apana.org.au>
+ <VI1PR0402MB3485B440F9D3F033F021307298300@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+ <VI1PR0402MB348596A1F9AF7B547DC6AB2C98180@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+ <20190603075215.GA7814@kroah.com>
+ <VI1PR0402MB3485DFE0BB41351836D4BF3598140@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+ <20190603084257.GA13673@kroah.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=horia.geanta@nxp.com; 
+x-originating-ip: [212.146.100.6]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 18cf3e19-a1e8-4c05-c356-08d6e81c0c63
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:VI1SPR00MB110;
+x-ms-traffictypediagnostic: VI1SPR00MB110:
+x-ms-exchange-purlcount: 1
+x-microsoft-antispam-prvs: <VI1SPR00MB1108BD62E41238742719D5498140@VI1SPR00MB110.eurprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8273;
+x-forefront-prvs: 0057EE387C
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(346002)(39860400002)(376002)(396003)(366004)(136003)(189003)(199004)(102836004)(6916009)(73956011)(99286004)(76116006)(66946007)(26005)(14444005)(256004)(316002)(6506007)(7696005)(66476007)(186003)(54906003)(53546011)(74316002)(446003)(44832011)(476003)(71200400001)(71190400001)(486006)(5660300002)(66556008)(76176011)(64756008)(68736007)(52536014)(66446008)(14454004)(8936002)(86362001)(25786009)(966005)(45080400002)(8676002)(478600001)(6436002)(229853002)(4326008)(9686003)(6246003)(53936002)(305945005)(7736002)(55016002)(6306002)(81156014)(81166006)(2906002)(66066001)(33656002)(3846002)(6116002);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1SPR00MB110;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: nxp.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: 2xIEduWZ6R+N6su4LGgWSqdCNmxZ8GWyVlwHYsQidQjzoCfVQt4YXNt8RA8YEAFkxIvt2ujeAgmoGG6Fw+goYIk8YuDoW11l16686i44djthNyFt+LB69HWQAMT6voHwHk0PsI7UF93XiPq8UkIXjsCBKdNVw3aKm6UpdXRa7Cx32rLBxatd5oOpJ+4TO6s1rtqJz1P5WxVAKWXfJy0QyNyh0we116FiP5WQNFNrRUSLT3EKyLyVMmdo+dRTH/v9kd5C5eRiuHTxKv4bX1+B58/CS4koZ8hreI9YSoZ4WbCft78vi1+pJnJwB/mcsGadjuVJp5ucYHy9JfbXvR2DF6WLZQTyDoraicVqphf1PKWIWLU41Chh/ye8OUNs6Yd0V7B/mKiJ1XzH52ST7vhVCbGecLazRk7Q5KOOKSOJ5pE=
+Content-Type: text/plain; charset="iso-8859-2"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 18cf3e19-a1e8-4c05-c356-08d6e81c0c63
+X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Jun 2019 12:07:28.2417
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: horia.geanta@nxp.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1SPR00MB110
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Elements of ZSTD_frameParameters structure are used as flag, so
-just declare them as char. ZSTD_frameParameters structure is used by
-ZSTD_parameters.
-
-Before:
-======
-sizeof(ZSTD_parameters)
-$1 = 40
-
-After:
-=====
-sizeof(ZSTD_parameters)
-$1 = 32
-
-Signed-off-by: Maninder Singh <maninder1.s@samsung.com>
-Signed-off-by: Vaneet Narang <v.narang@samsung.com>
----
- include/linux/zstd.h  | 6 +++---
- lib/zstd/compress.c   | 4 ++--
- lib/zstd/decompress.c | 2 +-
- 3 files changed, 6 insertions(+), 6 deletions(-)
-
-diff --git a/include/linux/zstd.h b/include/linux/zstd.h
-index 5103efa..a1e3483 100644
---- a/include/linux/zstd.h
-+++ b/include/linux/zstd.h
-@@ -164,9 +164,9 @@ typedef struct {
-  * The default value is all fields set to 0.
-  */
- typedef struct {
--	unsigned int contentSizeFlag;
--	unsigned int checksumFlag;
--	unsigned int noDictIDFlag;
-+	unsigned char contentSizeFlag;
-+	unsigned char checksumFlag;
-+	unsigned char noDictIDFlag;
- } ZSTD_frameParameters;
- 
- /**
-diff --git a/lib/zstd/compress.c b/lib/zstd/compress.c
-index 306e31b..7e0cea2 100644
---- a/lib/zstd/compress.c
-+++ b/lib/zstd/compress.c
-@@ -2435,9 +2435,9 @@ static size_t ZSTD_writeFrameHeader(void *dst, size_t dstCapacity, ZSTD_paramete
- {
- 	BYTE *const op = (BYTE *)dst;
- 	U32 const dictIDSizeCode = (dictID > 0) + (dictID >= 256) + (dictID >= 65536); /* 0-3 */
--	U32 const checksumFlag = params->fParams.checksumFlag > 0;
-+	BYTE const checksumFlag = params->fParams.checksumFlag > 0;
- 	U32 const windowSize = 1U << params->cParams.windowLog;
--	U32 const singleSegment = params->fParams.contentSizeFlag && (windowSize >= pledgedSrcSize);
-+	BYTE const singleSegment = params->fParams.contentSizeFlag && (windowSize >= pledgedSrcSize);
- 	BYTE const windowLogByte = (BYTE)((params->cParams.windowLog - ZSTD_WINDOWLOG_ABSOLUTEMIN) << 3);
- 	U32 const fcsCode =
- 	    params->fParams.contentSizeFlag ? (pledgedSrcSize >= 256) + (pledgedSrcSize >= 65536 + 256) + (pledgedSrcSize >= 0xFFFFFFFFU) : 0; /* 0-3 */
-diff --git a/lib/zstd/decompress.c b/lib/zstd/decompress.c
-index 269ee9a..7828264 100644
---- a/lib/zstd/decompress.c
-+++ b/lib/zstd/decompress.c
-@@ -233,7 +233,7 @@ size_t ZSTD_getFrameParams(ZSTD_frameParams *fparamsPtr, const void *src, size_t
- 		BYTE const fhdByte = ip[4];
- 		size_t pos = 5;
- 		U32 const dictIDSizeCode = fhdByte & 3;
--		U32 const checksumFlag = (fhdByte >> 2) & 1;
-+		BYTE const checksumFlag = (fhdByte >> 2) & 1;
- 		U32 const singleSegment = (fhdByte >> 5) & 1;
- 		U32 const fcsID = fhdByte >> 6;
- 		U32 const windowSizeMax = 1U << ZSTD_WINDOWLOG_MAX;
--- 
-2.7.4
-
+On 6/3/2019 11:43 AM, Greg Kroah-Hartman wrote:=0A=
+> On Mon, Jun 03, 2019 at 08:10:15AM +0000, Horia Geanta wrote:=0A=
+>> On 6/3/2019 10:52 AM, Greg Kroah-Hartman wrote:=0A=
+>>> On Thu, May 30, 2019 at 11:36:25AM +0000, Horia Geanta wrote:=0A=
+>>>> On 5/6/2019 11:06 AM, Horia Geanta wrote:=0A=
+>>>>> On 5/6/2019 9:40 AM, Herbert Xu wrote:=0A=
+>>>>>> On Fri, May 03, 2019 at 03:05:48PM +0300, Horia Geant=E3 wrote:=0A=
+>>>>>>> The detection whether DKP (Derived Key Protocol) is used relies on=
+=0A=
+>>>>>>> the setkey callback.=0A=
+>>>>>>> Since "aead_setkey" was replaced in some cases with "des3_aead_setk=
+ey"=0A=
+>>>>>>> (for 3DES weak key checking), the logic has to be updated - otherwi=
+se=0A=
+>>>>>>> the DMA mapping direction is incorrect (leading to faults in case c=
+aam=0A=
+>>>>>>> is behind an IOMMU).=0A=
+>>>>>>>=0A=
+>>>>>>> Fixes: 1b52c40919e6 ("crypto: caam - Forbid 2-key 3DES in FIPS mode=
+")=0A=
+>>>>>>> Signed-off-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
+>>>>>>> ---=0A=
+>>>>>>>=0A=
+>>>>>>> This issue was noticed when testing with previously submitted IOMMU=
+ support:=0A=
+>>>>>>> https://eur01.safelinks.protection.outlook.com/?url=3Dhttps%3A%2F%2=
+Fpatchwork.kernel.org%2Fproject%2Flinux-crypto%2Flist%2F%3Fseries%3D110277%=
+26state%3D*&amp;data=3D02%7C01%7Choria.geanta%40nxp.com%7C0531d21296e1471cd=
+12708d6e7ff7ed1%7C686ea1d3bc2b4c6fa92cd99c5c301635%7C0%7C0%7C63695148186750=
+9241&amp;sdata=3DvpeK41WQcINZTn4REHwk1Zgh5kIwPJNqiB75sT3ABV0%3D&amp;reserve=
+d=3D0=0A=
+>>>>>>=0A=
+>>>>>> Thanks for catching this Horia!=0A=
+>>>>>>=0A=
+>>>>>> My preference would be to encode this logic separately rather than=
+=0A=
+>>>>>> relying on the setkey test.  How about this patch?=0A=
+>>>>>>=0A=
+>>>>> This is probably more reliable.=0A=
+>>>>>=0A=
+>>>>>> ---8<---=0A=
+>>>>>> The detection for DKP (Derived Key Protocol) relied on the value=0A=
+>>>>>> of the setkey function.  This was broken by the recent change which=
+=0A=
+>>>>>> added des3_aead_setkey.=0A=
+>>>>>>=0A=
+>>>>>> This patch fixes this by introducing a new flag for DKP and setting=
+=0A=
+>>>>>> that where needed.=0A=
+>>>>>>=0A=
+>>>>>> Reported-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
+>>>>>> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>=0A=
+>>>>> Tested-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
+>>>>>=0A=
+>>>> Unfortunately the commit message dropped the tag provided in v1:=0A=
+>>>> Fixes: 1b52c40919e6 ("crypto: caam - Forbid 2-key 3DES in FIPS mode")=
+=0A=
+>>>>=0A=
+>>>> This fix was merged in v5.2-rc1 (commit 24586b5feaf17ecf85ae6259fe3ea7=
+815dee432d=0A=
+>>>> upstream) but should also be queued up for 5.1.y.=0A=
+>>>=0A=
+>>> I do not understand, sorry.  What exact patches need to be applied to=
+=0A=
+>>> 5.1.y?=0A=
+>>>=0A=
+>> Commit 24586b5feaf1 ("crypto: caam - fix DKP detection logic").=0A=
+> =0A=
+> But that commit says:=0A=
+> 	Fixes: 1b52c40919e6 ("crypto: caam - Forbid 2-key 3DES in FIPS mode")=0A=
+> which is only contained in 5.2-rc1, so why would I want to apply the=0A=
+> first one to 5.1.y?=0A=
+> =0A=
+Sorry, my bad.=0A=
+=0A=
+I've looked at the failing kernel version: 5.1.0-09365-g8ea5b2abd07e=0A=
+and seeing that commit 1b52c40919e6 ("crypto: caam - Forbid 2-key 3DES in F=
+IPS=0A=
+mode") is in the tree, concluded it was delivered in 5.1 and would need the=
+ fix.=0A=
+=0A=
+Please disregard the request.=0A=
+=0A=
+Thanks,=0A=
+Horia=0A=
