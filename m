@@ -7,58 +7,58 @@ X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 546E2C04AB6
-	for <linux-crypto@archiver.kernel.org>; Mon,  3 Jun 2019 06:49:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 929BEC04AB6
+	for <linux-crypto@archiver.kernel.org>; Mon,  3 Jun 2019 06:50:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1F0F8267DF
-	for <linux-crypto@archiver.kernel.org>; Mon,  3 Jun 2019 06:49:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5D58826E66
+	for <linux-crypto@archiver.kernel.org>; Mon,  3 Jun 2019 06:50:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ueQlyx/a"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Cq+jJelV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726921AbfFCGtb (ORCPT
+        id S1726713AbfFCGue (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 3 Jun 2019 02:49:31 -0400
-Received: from mail-it1-f193.google.com ([209.85.166.193]:39156 "EHLO
-        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726618AbfFCGtb (ORCPT
+        Mon, 3 Jun 2019 02:50:34 -0400
+Received: from mail-it1-f194.google.com ([209.85.166.194]:50358 "EHLO
+        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726383AbfFCGue (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 3 Jun 2019 02:49:31 -0400
-Received: by mail-it1-f193.google.com with SMTP id j204so19600890ite.4
-        for <linux-crypto@vger.kernel.org>; Sun, 02 Jun 2019 23:49:30 -0700 (PDT)
+        Mon, 3 Jun 2019 02:50:34 -0400
+Received: by mail-it1-f194.google.com with SMTP id a186so25610717itg.0
+        for <linux-crypto@vger.kernel.org>; Sun, 02 Jun 2019 23:50:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=/cJG2Dbrl0jj0kRFd00s3RmB1IC1rLB65btpppcNvBo=;
-        b=ueQlyx/ahuJDXrK5pJxaHVYZ78GyvnhaBOQ7NKhOk7fejcMVhDvG88InQ4yEXDIGuU
-         uwCffp36WWdM7HtqP3O8yfD0eecI+e2HKOV43Ys0+yT6c74b1R0s4ah41pWHgtOFxsnN
-         fDW9rOaLFpDOmAJicNVLKZcZbqiHah1mlhIkuXNUDZvi7MULGXImY+c1AnwrVyTk5Eyz
-         T1yMdDg6zNVevlLQW024Vz2eMfGdV2Rt4NtnKta8+SvMZQSrgjIQ/FF29W5jqrrqMSdY
-         GdsKzDZqT+LOiLFLgEzjQrd/rGx8W12bfNRoQMKVCy8T0phdxXaZ83Eix9u7AMi4LuJg
-         nMMA==
+        bh=hHb5yojwbJQybGGvYA68Ct0nFyRWaeQ/WiYQHJZyD7Q=;
+        b=Cq+jJelVNt8/fYGOSR3WUB3xk3jG9SZNoT5EDMh1U0hFm7FT6yHo8eXnrBuWGmaAOQ
+         bu+v5pLwv6BDE1TXVKcyEpANxoKEvYp8jTIU3lP5LYbycbkqEk8AdQXvh/wzygOXImk1
+         IfAj0RVvRwEuieJ6fDPzjp1l/bGPv+SBj0UJapFC1ATyxxtgldeBmBFF9CgjsTgtbtO2
+         WaIeXwyY9RDVpkiWOE/oqWuRi88bJ0j7+lUbgi3MWuRfFQcq1A+4r3MOcSe4p2v5OIon
+         bKWfs00jEvJGpiuR/r8tCoXFwDIkYYnwYo/mSNF0eGs/cFvUE8+DQ0nBhIk+ZR9iLqx7
+         g5NQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=/cJG2Dbrl0jj0kRFd00s3RmB1IC1rLB65btpppcNvBo=;
-        b=mwOd5uPSPhdBCTgE3quKUlWE9lpsFagv10+wiZCViNUwEN/o440a/DhufyHkZdRdWg
-         ro+zM4qrnKyupV0upeGIRXsNRH+ucysiO0xUja1yz2R4RdZceuwLfGCwvDaPhslynskh
-         gIWGj+mf5NH3/40ld/s00oQxZGJqu7oXoQDf6lOoqEeJOwE4Xn+5DJI15lt1jG5g+h3P
-         hEwB7PzsYb3K2dArIyMJBDwH8rUt1Et9jmMER8Hi2dzsuz14E0nBT4vkRQTV8HgjO6tv
-         bSmqnmZaHcpf53KGVKSgjUROpzlqhzgpZlzyuNG/aCArXWma+uZxjEupeaRLJqgh49UD
-         Xoow==
-X-Gm-Message-State: APjAAAWvGHokGSZiUDDci4Yi9wXF6/EdRD37wlYghjh1zdGRz4KL4WBw
-        v861j+Bb643L0E8L1OH8iguB2rcrzRh5tl8h2IMN7g==
-X-Google-Smtp-Source: APXvYqz3gamNoWPvUcEDK8XZPpXw0UbW27TGApZ5WDDsxlPxZ//u7Z3OWUaZCJrQ0fO4T9kYGO0seCVPdn33heBJlKU=
-X-Received: by 2002:a02:ce37:: with SMTP id v23mr15771599jar.2.1559544570193;
- Sun, 02 Jun 2019 23:49:30 -0700 (PDT)
+        bh=hHb5yojwbJQybGGvYA68Ct0nFyRWaeQ/WiYQHJZyD7Q=;
+        b=IrFDUYKeMgrSyhHOIWAVae75DFMb5aED7heiQqjVjrs9JStRtFyAbt7EovZhW8wgR5
+         VuiNPprPrgptyHLhHJlG3uF4eXpEgluSFXOXDxv4MvoApakP7UP9UNp4zMp8hh3UCWR6
+         KWxdyTbljmCy4CxgOLub5+ECv63q+uPQ9spqq/cEDjLekjk17mFWxrwu1vnmN2tyLM9e
+         vnxKZ7ZxkdouwB0imt7UsK8L8CfuXXn0rnUntCB14MlNz25oJA+jbM0/U9hnok+MU4AG
+         C28lWoby23DELU4ziU0/+/4g1Ej5h76mWKWTk/jfBZJy0cArBoy4sBqzFCrcWUOkEwHv
+         7gLA==
+X-Gm-Message-State: APjAAAUi9e2ChEjLf6SiEdgC+RUwwxRKIROF7UaCf+Qac+KB1JDXXAfp
+        72UWrpmkw0hZU33CEanFTCVkrdI0+lWRU1BewTkXhnBgkIXFxUor
+X-Google-Smtp-Source: APXvYqwGZR7gFadVGuFWYfuTcv6x2YK32pm/1lbg6JHiLUs7e/dHAkowy7DmfxeoxWbrmG58eetORpoQlVNYkbPtDeE=
+X-Received: by 2002:a24:740f:: with SMTP id o15mr59943itc.76.1559544633310;
+ Sun, 02 Jun 2019 23:50:33 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190603054516.6080-1-ebiggers@kernel.org>
-In-Reply-To: <20190603054516.6080-1-ebiggers@kernel.org>
+References: <20190603054450.5993-1-ebiggers@kernel.org>
+In-Reply-To: <20190603054450.5993-1-ebiggers@kernel.org>
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Mon, 3 Jun 2019 08:49:15 +0200
-Message-ID: <CAKv+Gu-ESAdTrnHCYEV_GJcqK4_Qh4ZhF2ovWH4xzbFecEnVFA@mail.gmail.com>
-Subject: Re: [PATCH] crypto: aead - un-inline encrypt and decrypt functions
+Date:   Mon, 3 Jun 2019 08:50:20 +0200
+Message-ID: <CAKv+Gu8dUTKwYDR7uNHSBaPp_Xf8gj7zP_wCDdHthRX6uTfDSQ@mail.gmail.com>
+Subject: Re: [PATCH] crypto: x86/aesni - remove unused internal cipher algorithm
 To:     Eric Biggers <ebiggers@kernel.org>
 Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
         <linux-crypto@vger.kernel.org>
@@ -72,124 +72,116 @@ On Mon, 3 Jun 2019 at 07:45, Eric Biggers <ebiggers@kernel.org> wrote:
 >
 > From: Eric Biggers <ebiggers@google.com>
 >
-> crypto_aead_encrypt() and crypto_aead_decrypt() have grown to be more
-> than a single indirect function call.  They now also check whether a key
-> has been set, the decryption side checks whether the input is at least
-> as long as the authentication tag length, and with CONFIG_CRYPTO_STATS=y
-> they also update the crypto statistics.  That can add up to a lot of
-> bloat at every call site.  Moreover, these always involve a function
-> call anyway, which greatly limits the benefits of inlining.
->
-> So change them to be non-inline.
+> Since commit 944585a64f5e ("crypto: x86/aes-ni - remove special handling
+> of AES in PCBC mode"), the "__aes-aesni" internal cipher algorithm is no
+> longer used.  So remove it too.
 >
 > Signed-off-by: Eric Biggers <ebiggers@google.com>
 
 Acked-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
 > ---
->  crypto/aead.c         | 36 ++++++++++++++++++++++++++++++++++++
->  include/crypto/aead.h | 34 ++--------------------------------
->  2 files changed, 38 insertions(+), 32 deletions(-)
+>  arch/x86/crypto/aesni-intel_glue.c | 45 +++++-------------------------
+>  1 file changed, 7 insertions(+), 38 deletions(-)
 >
-> diff --git a/crypto/aead.c b/crypto/aead.c
-> index 4908b5e846f0e..fc1d7ad8a487d 100644
-> --- a/crypto/aead.c
-> +++ b/crypto/aead.c
-> @@ -89,6 +89,42 @@ int crypto_aead_setauthsize(struct crypto_aead *tfm, unsigned int authsize)
+> diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+> index 21c246799aa58..c95bd397dc076 100644
+> --- a/arch/x86/crypto/aesni-intel_glue.c
+> +++ b/arch/x86/crypto/aesni-intel_glue.c
+> @@ -375,20 +375,6 @@ static void aes_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
+>         }
 >  }
->  EXPORT_SYMBOL_GPL(crypto_aead_setauthsize);
 >
-> +int crypto_aead_encrypt(struct aead_request *req)
-> +{
-> +       struct crypto_aead *aead = crypto_aead_reqtfm(req);
-> +       struct crypto_alg *alg = aead->base.__crt_alg;
-> +       unsigned int cryptlen = req->cryptlen;
-> +       int ret;
-> +
-> +       crypto_stats_get(alg);
-> +       if (crypto_aead_get_flags(aead) & CRYPTO_TFM_NEED_KEY)
-> +               ret = -ENOKEY;
-> +       else
-> +               ret = crypto_aead_alg(aead)->encrypt(req);
-> +       crypto_stats_aead_encrypt(cryptlen, alg, ret);
-> +       return ret;
-> +}
-> +EXPORT_SYMBOL_GPL(crypto_aead_encrypt);
-> +
-> +int crypto_aead_decrypt(struct aead_request *req)
-> +{
-> +       struct crypto_aead *aead = crypto_aead_reqtfm(req);
-> +       struct crypto_alg *alg = aead->base.__crt_alg;
-> +       unsigned int cryptlen = req->cryptlen;
-> +       int ret;
-> +
-> +       crypto_stats_get(alg);
-> +       if (crypto_aead_get_flags(aead) & CRYPTO_TFM_NEED_KEY)
-> +               ret = -ENOKEY;
-> +       else if (req->cryptlen < crypto_aead_authsize(aead))
-> +               ret = -EINVAL;
-> +       else
-> +               ret = crypto_aead_alg(aead)->decrypt(req);
-> +       crypto_stats_aead_decrypt(cryptlen, alg, ret);
-> +       return ret;
-> +}
-> +EXPORT_SYMBOL_GPL(crypto_aead_decrypt);
-> +
->  static void crypto_aead_exit_tfm(struct crypto_tfm *tfm)
+> -static void __aes_encrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
+> -{
+> -       struct crypto_aes_ctx *ctx = aes_ctx(crypto_tfm_ctx(tfm));
+> -
+> -       aesni_enc(ctx, dst, src);
+> -}
+> -
+> -static void __aes_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
+> -{
+> -       struct crypto_aes_ctx *ctx = aes_ctx(crypto_tfm_ctx(tfm));
+> -
+> -       aesni_dec(ctx, dst, src);
+> -}
+> -
+>  static int aesni_skcipher_setkey(struct crypto_skcipher *tfm, const u8 *key,
+>                                  unsigned int len)
 >  {
->         struct crypto_aead *aead = __crypto_aead_cast(tfm);
-> diff --git a/include/crypto/aead.h b/include/crypto/aead.h
-> index 9ad595f97c65a..020d581373abd 100644
-> --- a/include/crypto/aead.h
-> +++ b/include/crypto/aead.h
-> @@ -322,21 +322,7 @@ static inline struct crypto_aead *crypto_aead_reqtfm(struct aead_request *req)
->   *
->   * Return: 0 if the cipher operation was successful; < 0 if an error occurred
->   */
-> -static inline int crypto_aead_encrypt(struct aead_request *req)
-> -{
-> -       struct crypto_aead *aead = crypto_aead_reqtfm(req);
-> -       struct crypto_alg *alg = aead->base.__crt_alg;
-> -       unsigned int cryptlen = req->cryptlen;
-> -       int ret;
-> -
-> -       crypto_stats_get(alg);
-> -       if (crypto_aead_get_flags(aead) & CRYPTO_TFM_NEED_KEY)
-> -               ret = -ENOKEY;
-> -       else
-> -               ret = crypto_aead_alg(aead)->encrypt(req);
-> -       crypto_stats_aead_encrypt(cryptlen, alg, ret);
-> -       return ret;
-> -}
-> +int crypto_aead_encrypt(struct aead_request *req);
+> @@ -924,7 +910,7 @@ static int helper_rfc4106_decrypt(struct aead_request *req)
+>  }
+>  #endif
 >
->  /**
->   * crypto_aead_decrypt() - decrypt ciphertext
-> @@ -360,23 +346,7 @@ static inline int crypto_aead_encrypt(struct aead_request *req)
->   *        integrity of the ciphertext or the associated data was violated);
->   *        < 0 if an error occurred.
->   */
-> -static inline int crypto_aead_decrypt(struct aead_request *req)
-> -{
-> -       struct crypto_aead *aead = crypto_aead_reqtfm(req);
-> -       struct crypto_alg *alg = aead->base.__crt_alg;
-> -       unsigned int cryptlen = req->cryptlen;
-> -       int ret;
-> -
-> -       crypto_stats_get(alg);
-> -       if (crypto_aead_get_flags(aead) & CRYPTO_TFM_NEED_KEY)
-> -               ret = -ENOKEY;
-> -       else if (req->cryptlen < crypto_aead_authsize(aead))
-> -               ret = -EINVAL;
-> -       else
-> -               ret = crypto_aead_alg(aead)->decrypt(req);
-> -       crypto_stats_aead_decrypt(cryptlen, alg, ret);
-> -       return ret;
-> -}
-> +int crypto_aead_decrypt(struct aead_request *req);
+> -static struct crypto_alg aesni_algs[] = { {
+> +static struct crypto_alg aesni_cipher_alg = {
+>         .cra_name               = "aes",
+>         .cra_driver_name        = "aes-aesni",
+>         .cra_priority           = 300,
+> @@ -941,24 +927,7 @@ static struct crypto_alg aesni_algs[] = { {
+>                         .cia_decrypt            = aes_decrypt
+>                 }
+>         }
+> -}, {
+> -       .cra_name               = "__aes",
+> -       .cra_driver_name        = "__aes-aesni",
+> -       .cra_priority           = 300,
+> -       .cra_flags              = CRYPTO_ALG_TYPE_CIPHER | CRYPTO_ALG_INTERNAL,
+> -       .cra_blocksize          = AES_BLOCK_SIZE,
+> -       .cra_ctxsize            = CRYPTO_AES_CTX_SIZE,
+> -       .cra_module             = THIS_MODULE,
+> -       .cra_u  = {
+> -               .cipher = {
+> -                       .cia_min_keysize        = AES_MIN_KEY_SIZE,
+> -                       .cia_max_keysize        = AES_MAX_KEY_SIZE,
+> -                       .cia_setkey             = aes_set_key,
+> -                       .cia_encrypt            = __aes_encrypt,
+> -                       .cia_decrypt            = __aes_decrypt
+> -               }
+> -       }
+> -} };
+> +};
 >
->  /**
->   * DOC: Asynchronous AEAD Request Handle
+>  static struct skcipher_alg aesni_skciphers[] = {
+>         {
+> @@ -1154,7 +1123,7 @@ static int __init aesni_init(void)
+>  #endif
+>  #endif
+>
+> -       err = crypto_register_algs(aesni_algs, ARRAY_SIZE(aesni_algs));
+> +       err = crypto_register_alg(&aesni_cipher_alg);
+>         if (err)
+>                 return err;
+>
+> @@ -1162,7 +1131,7 @@ static int __init aesni_init(void)
+>                                              ARRAY_SIZE(aesni_skciphers),
+>                                              aesni_simd_skciphers);
+>         if (err)
+> -               goto unregister_algs;
+> +               goto unregister_cipher;
+>
+>         err = simd_register_aeads_compat(aesni_aeads, ARRAY_SIZE(aesni_aeads),
+>                                          aesni_simd_aeads);
+> @@ -1174,8 +1143,8 @@ static int __init aesni_init(void)
+>  unregister_skciphers:
+>         simd_unregister_skciphers(aesni_skciphers, ARRAY_SIZE(aesni_skciphers),
+>                                   aesni_simd_skciphers);
+> -unregister_algs:
+> -       crypto_unregister_algs(aesni_algs, ARRAY_SIZE(aesni_algs));
+> +unregister_cipher:
+> +       crypto_unregister_alg(&aesni_cipher_alg);
+>         return err;
+>  }
+>
+> @@ -1185,7 +1154,7 @@ static void __exit aesni_exit(void)
+>                               aesni_simd_aeads);
+>         simd_unregister_skciphers(aesni_skciphers, ARRAY_SIZE(aesni_skciphers),
+>                                   aesni_simd_skciphers);
+> -       crypto_unregister_algs(aesni_algs, ARRAY_SIZE(aesni_algs));
+> +       crypto_unregister_alg(&aesni_cipher_alg);
+>  }
+>
+>  late_initcall(aesni_init);
 > --
 > 2.21.0
 >
