@@ -2,131 +2,152 @@ Return-Path: <SRS0=YB2u=UC=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03E3AC04AB6
-	for <linux-crypto@archiver.kernel.org>; Mon,  3 Jun 2019 08:00:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A9CBC28CC7
+	for <linux-crypto@archiver.kernel.org>; Mon,  3 Jun 2019 08:10:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D552127D04
-	for <linux-crypto@archiver.kernel.org>; Mon,  3 Jun 2019 08:00:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 63B9924CD4
+	for <linux-crypto@archiver.kernel.org>; Mon,  3 Jun 2019 08:10:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="qNTgRv6K"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726715AbfFCIAD (ORCPT
+        id S1726502AbfFCIKU (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 3 Jun 2019 04:00:03 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:52334 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725856AbfFCIAD (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 3 Jun 2019 04:00:03 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x537vSKo139405
-        for <linux-crypto@vger.kernel.org>; Mon, 3 Jun 2019 04:00:01 -0400
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2svvpeec88-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <linux-crypto@vger.kernel.org>; Mon, 03 Jun 2019 04:00:01 -0400
-Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-crypto@vger.kernel.org> from <freude@linux.ibm.com>;
-        Mon, 3 Jun 2019 08:59:59 +0100
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
-        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Mon, 3 Jun 2019 08:59:55 +0100
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x537xsA146989420
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 3 Jun 2019 07:59:54 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0CEC342045;
-        Mon,  3 Jun 2019 07:59:54 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 870E642042;
-        Mon,  3 Jun 2019 07:59:53 +0000 (GMT)
-Received: from [10.0.2.15] (unknown [9.152.224.114])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Mon,  3 Jun 2019 07:59:53 +0000 (GMT)
-Subject: Re: [RFC PATCH 1/2] crypto: Allow working with key references
-To:     Richard Weinberger <richard@nod.at>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-arm-kernel@lists.infradead.org,
-        linux-kernel <linux-kernel@vger.kernel.org>, linux-imx@nxp.com,
-        festevam@gmail.com, kernel <kernel@pengutronix.de>,
-        Sascha Hauer <s.hauer@pengutronix.de>, shawnguo@kernel.org,
-        davem@davemloft.net, david <david@sigma-star.at>
-References: <20190529224844.25203-1-richard@nod.at>
- <20190530023357.2mrjtslnka4i6dbl@gondor.apana.org.au>
- <2084969721.73871.1559201016164.JavaMail.zimbra@nod.at>
-From:   Harald Freudenberger <freude@linux.ibm.com>
-Date:   Mon, 3 Jun 2019 09:59:53 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <2084969721.73871.1559201016164.JavaMail.zimbra@nod.at>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+        Mon, 3 Jun 2019 04:10:20 -0400
+Received: from mail-eopbgr60086.outbound.protection.outlook.com ([40.107.6.86]:54048
+        "EHLO EUR04-DB3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726292AbfFCIKU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 3 Jun 2019 04:10:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=thiX5AixHvQdoHiKdTe/DrVmr+bPYqYWO9Sb1/osHyc=;
+ b=qNTgRv6KuN40FzMZlNPHvb2Ymv8MLJet7C68OJv4TnTRffQ4EuqfFBX58nWxNr0V7o7QhqhLuxIJwglkymhoWyxW5d5bKEEDQOcb5urndxKiqQUp7oO+T5ghupvI5tb4fdcesT0UoLWkDIfcfUqprdan6JeP3/jqjODxOiJElDo=
+Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
+ VI1PR0402MB2941.eurprd04.prod.outlook.com (10.175.24.135) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1943.18; Mon, 3 Jun 2019 08:10:15 +0000
+Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
+ ([fe80::ccaf:f4a1:704a:e745]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
+ ([fe80::ccaf:f4a1:704a:e745%4]) with mapi id 15.20.1943.018; Mon, 3 Jun 2019
+ 08:10:15 +0000
+From:   Horia Geanta <horia.geanta@nxp.com>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+CC:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        dl-linux-imx <linux-imx@nxp.com>,
+        Iuliana Prodan <iuliana.prodan@nxp.com>,
+        Valentin Ciocoi Radulescu <valentin.ciocoi@nxp.com>,
+        "stable@vger.kernel.org" <stable@vger.kernel.org>
+Subject: Re: [v2 PATCH] crypto: caam - fix DKP detection logic
+Thread-Topic: [v2 PATCH] crypto: caam - fix DKP detection logic
+Thread-Index: AQHVGeFGHEC21fvWy0uWA6SVPYo83g==
+Date:   Mon, 3 Jun 2019 08:10:15 +0000
+Message-ID: <VI1PR0402MB3485DFE0BB41351836D4BF3598140@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+References: <20190503120548.5576-1-horia.geanta@nxp.com>
+ <20190506063944.enwkbljhy42rcaqq@gondor.apana.org.au>
+ <VI1PR0402MB3485B440F9D3F033F021307298300@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+ <VI1PR0402MB348596A1F9AF7B547DC6AB2C98180@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+ <20190603075215.GA7814@kroah.com>
+Accept-Language: en-US
 Content-Language: en-US
-X-TM-AS-GCONF: 00
-x-cbid: 19060307-0016-0000-0000-000002830744
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19060307-0017-0000-0000-000032E00F2A
-Message-Id: <14ffcdf2-ed9f-be07-fde5-62dfb1fce4f9@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-03_06:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1906030059
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=horia.geanta@nxp.com; 
+x-originating-ip: [212.146.100.6]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 95286d7c-acb1-443c-6e88-08d6e7fae8f2
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:VI1PR0402MB2941;
+x-ms-traffictypediagnostic: VI1PR0402MB2941:
+x-ms-exchange-purlcount: 1
+x-microsoft-antispam-prvs: <VI1PR0402MB29418F8936836B4FEC3FE30E98140@VI1PR0402MB2941.eurprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8273;
+x-forefront-prvs: 0057EE387C
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(366004)(136003)(376002)(39860400002)(396003)(346002)(199004)(189003)(486006)(476003)(102836004)(53936002)(4326008)(6246003)(53546011)(6506007)(478600001)(64756008)(446003)(66446008)(229853002)(66556008)(66476007)(66946007)(256004)(76116006)(44832011)(54906003)(2906002)(25786009)(7696005)(6916009)(76176011)(68736007)(73956011)(86362001)(3846002)(6116002)(316002)(52536014)(6306002)(6436002)(99286004)(55016002)(26005)(8936002)(8676002)(5660300002)(81156014)(81166006)(33656002)(9686003)(74316002)(186003)(14454004)(966005)(305945005)(7736002)(66066001)(71200400001)(71190400001);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB2941;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: nxp.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: AYbpxPbVv1MYMDJth5uHGXKMBX58w7JaCasO8SrXB5YZdL3ywuqjDJPcUIUIy6HjOvJdg3wzjrxgxU+ECbcR5pWQ9qJQhG/vJ4b0qmZ2ePVuqi2Gk0wrmE2lmUH835oi2c34qcjrMSedI9oN7NtP81I2nzqzIjYfIPf/iraeL7lKIvfZrW1YoGO9lOuDyNfmFIqINvqOiOfhgSLk208jPLQ40x1uD7yimgqzaldTnP+mSCrJ7JpRWO+f2eAQdyBosnnlnK48lDaDLH/ckGECw6DjfP7oa90MYovgX2W9PrjeETWs/iPe1DYxbow29i0GpzQf2ezfBuXH6mCnMGH6Opu2/WoBAH9Y8lwDC5mkjsaCdY8UzgfpUs9WHL55BKD2xA/PNpoXeu3qYMcAKQoC/3LgL40XApqDzghKjgkK0RU=
+Content-Type: text/plain; charset="iso-8859-2"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 95286d7c-acb1-443c-6e88-08d6e7fae8f2
+X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Jun 2019 08:10:15.4466
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: horia.geanta@nxp.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB2941
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 30.05.19 09:23, Richard Weinberger wrote:
-> ----- Ursprüngliche Mail -----
->> Von: "Herbert Xu" <herbert@gondor.apana.org.au>
->> An: "richard" <richard@nod.at>
->> CC: "Linux Crypto Mailing List" <linux-crypto@vger.kernel.org>, linux-arm-kernel@lists.infradead.org, "linux-kernel"
->> <linux-kernel@vger.kernel.org>, linux-imx@nxp.com, festevam@gmail.com, "kernel" <kernel@pengutronix.de>, "Sascha Hauer"
->> <s.hauer@pengutronix.de>, shawnguo@kernel.org, davem@davemloft.net, "david" <david@sigma-star.at>
->> Gesendet: Donnerstag, 30. Mai 2019 04:33:57
->> Betreff: Re: [RFC PATCH 1/2] crypto: Allow working with key references
->> On Thu, May 30, 2019 at 12:48:43AM +0200, Richard Weinberger wrote:
->>> Some crypto accelerators allow working with secure or hidden keys.
->>> This keys are not exposed to Linux nor main memory. To use them
->>> for a crypto operation they are referenced with a device specific id.
->>>
->>> This patch adds a new flag, CRYPTO_TFM_REQ_REF_KEY.
->>> If this flag is set, crypto drivers should tread the key as
->>> specified via setkey as reference and not as regular key.
->>> Since we reuse the key data structure such a reference is limited
->>> by the key size of the chiper and is chip specific.
->>>
->>> TODO: If the cipher implementation or the driver does not
->>> support reference keys, we need a way to detect this an fail
->>> upon setkey.
->>> How should the driver indicate that it supports this feature?
->>>
->>> Signed-off-by: Richard Weinberger <richard@nod.at>
->> We already have existing drivers doing this.  Please have a look
->> at how they're doing it and use the same paradigm.  You can grep
->> for paes under drivers/crypto.
-> Thanks for the pointer.
-> So the preferred way is defining a new crypto algorithm prefixed with
-> "p" and reusing setkey to provide the key reference.
-The "p" in paes is because we call it "protected key aes". I think you are not limited
-to the "p". What Herbert tries to point out is that you may define your own
-cipher with an unique name and there you can handle your secure key references
-as you like. You may use the s390 paes implementation as a starting point.
-
-regards Harald Freudenberger <freude@linux.ibm.com>
-
->
-> Thanks,
-> //richard
->
-
+On 6/3/2019 10:52 AM, Greg Kroah-Hartman wrote:=0A=
+> On Thu, May 30, 2019 at 11:36:25AM +0000, Horia Geanta wrote:=0A=
+>> On 5/6/2019 11:06 AM, Horia Geanta wrote:=0A=
+>>> On 5/6/2019 9:40 AM, Herbert Xu wrote:=0A=
+>>>> On Fri, May 03, 2019 at 03:05:48PM +0300, Horia Geant=E3 wrote:=0A=
+>>>>> The detection whether DKP (Derived Key Protocol) is used relies on=0A=
+>>>>> the setkey callback.=0A=
+>>>>> Since "aead_setkey" was replaced in some cases with "des3_aead_setkey=
+"=0A=
+>>>>> (for 3DES weak key checking), the logic has to be updated - otherwise=
+=0A=
+>>>>> the DMA mapping direction is incorrect (leading to faults in case caa=
+m=0A=
+>>>>> is behind an IOMMU).=0A=
+>>>>>=0A=
+>>>>> Fixes: 1b52c40919e6 ("crypto: caam - Forbid 2-key 3DES in FIPS mode")=
+=0A=
+>>>>> Signed-off-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
+>>>>> ---=0A=
+>>>>>=0A=
+>>>>> This issue was noticed when testing with previously submitted IOMMU s=
+upport:=0A=
+>>>>> https://patchwork.kernel.org/project/linux-crypto/list/?series=3D1102=
+77&state=3D*=0A=
+>>>>=0A=
+>>>> Thanks for catching this Horia!=0A=
+>>>>=0A=
+>>>> My preference would be to encode this logic separately rather than=0A=
+>>>> relying on the setkey test.  How about this patch?=0A=
+>>>>=0A=
+>>> This is probably more reliable.=0A=
+>>>=0A=
+>>>> ---8<---=0A=
+>>>> The detection for DKP (Derived Key Protocol) relied on the value=0A=
+>>>> of the setkey function.  This was broken by the recent change which=0A=
+>>>> added des3_aead_setkey.=0A=
+>>>>=0A=
+>>>> This patch fixes this by introducing a new flag for DKP and setting=0A=
+>>>> that where needed.=0A=
+>>>>=0A=
+>>>> Reported-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
+>>>> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>=0A=
+>>> Tested-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
+>>>=0A=
+>> Unfortunately the commit message dropped the tag provided in v1:=0A=
+>> Fixes: 1b52c40919e6 ("crypto: caam - Forbid 2-key 3DES in FIPS mode")=0A=
+>>=0A=
+>> This fix was merged in v5.2-rc1 (commit 24586b5feaf17ecf85ae6259fe3ea781=
+5dee432d=0A=
+>> upstream) but should also be queued up for 5.1.y.=0A=
+> =0A=
+> I do not understand, sorry.  What exact patches need to be applied to=0A=
+> 5.1.y?=0A=
+> =0A=
+Commit 24586b5feaf1 ("crypto: caam - fix DKP detection logic").=0A=
+=0A=
+Thanks,=0A=
+Horia=0A=
