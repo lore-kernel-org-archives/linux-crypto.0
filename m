@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_PASS,T_DKIMWL_WL_HIGH,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75D04C04AB6
-	for <linux-crypto@archiver.kernel.org>; Mon,  3 Jun 2019 05:46:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 954A5C04AB6
+	for <linux-crypto@archiver.kernel.org>; Mon,  3 Jun 2019 05:46:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4B46D27739
-	for <linux-crypto@archiver.kernel.org>; Mon,  3 Jun 2019 05:46:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5FBCF27739
+	for <linux-crypto@archiver.kernel.org>; Mon,  3 Jun 2019 05:46:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1559540760;
-	bh=uIgFIySqBY2+hXBL3fX7uSdcRh4/a/PAY2vsQY86zzs=;
+	s=default; t=1559540777;
+	bh=pjSNR5X41mpDszanLzLqqmQy0W//PwYWGRKDzC9PV7k=;
 	h=From:To:Subject:Date:List-ID:From;
-	b=cZ92IYy3FyhQ4Swf17bfearAq7pTFIIGz30vEsmKPSRCN9y95OZBQ0TxAiAZrcE/t
-	 EulO4fpbZLD87TcWyXaSnAB/1OjpBbf5hXrsOWm9bwoCMq3Orkz/q+vLxsPpURDcjO
-	 8HVLYEkigmnH6azQycHqeCvp77wqyPj7HRShGlGQ=
+	b=r2J6KCl3BCD6MR2hwgSoIcTSNWdgx7YdOj821aqUP6OhmRRjUECDOT8xINKKk7huM
+	 Ujb3lab2geEH6isgnJmGfhafJkvoGCq9kbBMrNFi9IME42L3UcWrbiCP5Bql4JciWA
+	 /HlbKQV+WV6gEoBxnbo+C9c+7tn4/z7JoXNWHh7w=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726535AbfFCFp7 (ORCPT
+        id S1726550AbfFCFqR (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 3 Jun 2019 01:45:59 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58378 "EHLO mail.kernel.org"
+        Mon, 3 Jun 2019 01:46:17 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58566 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726314AbfFCFp7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 3 Jun 2019 01:45:59 -0400
+        id S1726314AbfFCFqQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 3 Jun 2019 01:46:16 -0400
 Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4C21927739
-        for <linux-crypto@vger.kernel.org>; Mon,  3 Jun 2019 05:45:58 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 91DEE27739
+        for <linux-crypto@vger.kernel.org>; Mon,  3 Jun 2019 05:46:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1559540758;
-        bh=uIgFIySqBY2+hXBL3fX7uSdcRh4/a/PAY2vsQY86zzs=;
+        s=default; t=1559540775;
+        bh=pjSNR5X41mpDszanLzLqqmQy0W//PwYWGRKDzC9PV7k=;
         h=From:To:Subject:Date:From;
-        b=fgUxB7SjnAEfvRQlXkXHdg3o7J+AZtaExDFV+moNtF1z469ZfVALzzJBm6rLvBOo/
-         cwCzc8OpSLHKp9j8NGhfOqL9uriEOPNsUIOZzmx1uJQejX+LS4rRZ3mAr6e8T1rRqP
-         4LE3xTS6udq+Rle3fKe+lv1HCdw/XkpqGyMxzN+U=
+        b=mzdI9UvsOPWEUVKk9a4g2vEBAiac4lX6/oo7V0XVZSD/jL/gvSMAGaufs9lUwu20g
+         MzY/KJY40qUo3IvAFXQgK8nRwC1chCi8Bo1vQOBJZmBt/TWced1VyMZjKV4FFXgBEd
+         E+nSL8PAtmB0CJuEcpsXCQAYuECXVTA80/96N92Q=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org
-Subject: [PATCH] crypto: skcipher - un-inline encrypt and decrypt functions
-Date:   Sun,  2 Jun 2019 22:45:51 -0700
-Message-Id: <20190603054551.6182-1-ebiggers@kernel.org>
+Subject: [PATCH] crypto: skcipher - make chunksize and walksize accessors internal
+Date:   Sun,  2 Jun 2019 22:46:11 -0700
+Message-Id: <20190603054611.6257-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -54,116 +54,159 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-crypto_skcipher_encrypt() and crypto_skcipher_decrypt() have grown to be
-more than a single indirect function call.  They now also check whether
-a key has been set, and with CONFIG_CRYPTO_STATS=y they also update the
-crypto statistics.  That can add up to a lot of bloat at every call
-site.  Moreover, these always involve a function call anyway, which
-greatly limits the benefits of inlining.
-
-So change them to be non-inline.
+The 'chunksize' and 'walksize' properties of skcipher algorithms are
+implementation details that users of the skcipher API should not be
+looking at.  So move their accessor functions from <crypto/skcipher.h>
+to <crypto/internal/skcipher.h>.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/skcipher.c         | 34 ++++++++++++++++++++++++++++++++++
- include/crypto/skcipher.h | 32 ++------------------------------
- 2 files changed, 36 insertions(+), 30 deletions(-)
+ include/crypto/internal/skcipher.h | 60 ++++++++++++++++++++++++++++++
+ include/crypto/skcipher.h          | 60 ------------------------------
+ 2 files changed, 60 insertions(+), 60 deletions(-)
 
-diff --git a/crypto/skcipher.c b/crypto/skcipher.c
-index 2e66f312e2c4f..2828e27d7fbc0 100644
---- a/crypto/skcipher.c
-+++ b/crypto/skcipher.c
-@@ -842,6 +842,40 @@ static int skcipher_setkey(struct crypto_skcipher *tfm, const u8 *key,
- 	return 0;
+diff --git a/include/crypto/internal/skcipher.h b/include/crypto/internal/skcipher.h
+index 9de6032209cb1..abb1096495c2f 100644
+--- a/include/crypto/internal/skcipher.h
++++ b/include/crypto/internal/skcipher.h
+@@ -205,6 +205,66 @@ static inline unsigned int crypto_skcipher_alg_max_keysize(
+ 	return alg->max_keysize;
  }
  
-+int crypto_skcipher_encrypt(struct skcipher_request *req)
++static inline unsigned int crypto_skcipher_alg_chunksize(
++	struct skcipher_alg *alg)
 +{
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	struct crypto_alg *alg = tfm->base.__crt_alg;
-+	unsigned int cryptlen = req->cryptlen;
-+	int ret;
++	if ((alg->base.cra_flags & CRYPTO_ALG_TYPE_MASK) ==
++	    CRYPTO_ALG_TYPE_BLKCIPHER)
++		return alg->base.cra_blocksize;
 +
-+	crypto_stats_get(alg);
-+	if (crypto_skcipher_get_flags(tfm) & CRYPTO_TFM_NEED_KEY)
-+		ret = -ENOKEY;
-+	else
-+		ret = tfm->encrypt(req);
-+	crypto_stats_skcipher_encrypt(cryptlen, ret, alg);
-+	return ret;
++	if (alg->base.cra_ablkcipher.encrypt)
++		return alg->base.cra_blocksize;
++
++	return alg->chunksize;
 +}
-+EXPORT_SYMBOL_GPL(crypto_skcipher_encrypt);
 +
-+int crypto_skcipher_decrypt(struct skcipher_request *req)
++static inline unsigned int crypto_skcipher_alg_walksize(
++	struct skcipher_alg *alg)
 +{
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	struct crypto_alg *alg = tfm->base.__crt_alg;
-+	unsigned int cryptlen = req->cryptlen;
-+	int ret;
++	if ((alg->base.cra_flags & CRYPTO_ALG_TYPE_MASK) ==
++	    CRYPTO_ALG_TYPE_BLKCIPHER)
++		return alg->base.cra_blocksize;
 +
-+	crypto_stats_get(alg);
-+	if (crypto_skcipher_get_flags(tfm) & CRYPTO_TFM_NEED_KEY)
-+		ret = -ENOKEY;
-+	else
-+		ret = tfm->decrypt(req);
-+	crypto_stats_skcipher_decrypt(cryptlen, ret, alg);
-+	return ret;
++	if (alg->base.cra_ablkcipher.encrypt)
++		return alg->base.cra_blocksize;
++
++	return alg->walksize;
 +}
-+EXPORT_SYMBOL_GPL(crypto_skcipher_decrypt);
 +
- static void crypto_skcipher_exit_tfm(struct crypto_tfm *tfm)
- {
- 	struct crypto_skcipher *skcipher = __crypto_skcipher_cast(tfm);
++/**
++ * crypto_skcipher_chunksize() - obtain chunk size
++ * @tfm: cipher handle
++ *
++ * The block size is set to one for ciphers such as CTR.  However,
++ * you still need to provide incremental updates in multiples of
++ * the underlying block size as the IV does not have sub-block
++ * granularity.  This is known in this API as the chunk size.
++ *
++ * Return: chunk size in bytes
++ */
++static inline unsigned int crypto_skcipher_chunksize(
++	struct crypto_skcipher *tfm)
++{
++	return crypto_skcipher_alg_chunksize(crypto_skcipher_alg(tfm));
++}
++
++/**
++ * crypto_skcipher_walksize() - obtain walk size
++ * @tfm: cipher handle
++ *
++ * In some cases, algorithms can only perform optimally when operating on
++ * multiple blocks in parallel. This is reflected by the walksize, which
++ * must be a multiple of the chunksize (or equal if the concern does not
++ * apply)
++ *
++ * Return: walk size in bytes
++ */
++static inline unsigned int crypto_skcipher_walksize(
++	struct crypto_skcipher *tfm)
++{
++	return crypto_skcipher_alg_walksize(crypto_skcipher_alg(tfm));
++}
++
+ /* Helpers for simple block cipher modes of operation */
+ struct skcipher_ctx_simple {
+ 	struct crypto_cipher *cipher;	/* underlying block cipher */
 diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
-index e555294ed77fe..98547d1f18c53 100644
+index 98547d1f18c53..694397fb0faab 100644
 --- a/include/crypto/skcipher.h
 +++ b/include/crypto/skcipher.h
-@@ -484,21 +484,7 @@ static inline struct crypto_sync_skcipher *crypto_sync_skcipher_reqtfm(
-  *
-  * Return: 0 if the cipher operation was successful; < 0 if an error occurred
-  */
--static inline int crypto_skcipher_encrypt(struct skcipher_request *req)
--{
--	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
--	struct crypto_alg *alg = tfm->base.__crt_alg;
--	unsigned int cryptlen = req->cryptlen;
--	int ret;
--
--	crypto_stats_get(alg);
--	if (crypto_skcipher_get_flags(tfm) & CRYPTO_TFM_NEED_KEY)
--		ret = -ENOKEY;
--	else
--		ret = tfm->encrypt(req);
--	crypto_stats_skcipher_encrypt(cryptlen, ret, alg);
--	return ret;
--}
-+int crypto_skcipher_encrypt(struct skcipher_request *req);
+@@ -293,66 +293,6 @@ static inline unsigned int crypto_sync_skcipher_ivsize(
+ 	return crypto_skcipher_ivsize(&tfm->base);
+ }
  
- /**
-  * crypto_skcipher_decrypt() - decrypt ciphertext
-@@ -511,21 +497,7 @@ static inline int crypto_skcipher_encrypt(struct skcipher_request *req)
-  *
-  * Return: 0 if the cipher operation was successful; < 0 if an error occurred
-  */
--static inline int crypto_skcipher_decrypt(struct skcipher_request *req)
+-static inline unsigned int crypto_skcipher_alg_chunksize(
+-	struct skcipher_alg *alg)
 -{
--	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
--	struct crypto_alg *alg = tfm->base.__crt_alg;
--	unsigned int cryptlen = req->cryptlen;
--	int ret;
+-	if ((alg->base.cra_flags & CRYPTO_ALG_TYPE_MASK) ==
+-	    CRYPTO_ALG_TYPE_BLKCIPHER)
+-		return alg->base.cra_blocksize;
 -
--	crypto_stats_get(alg);
--	if (crypto_skcipher_get_flags(tfm) & CRYPTO_TFM_NEED_KEY)
--		ret = -ENOKEY;
--	else
--		ret = tfm->decrypt(req);
--	crypto_stats_skcipher_decrypt(cryptlen, ret, alg);
--	return ret;
+-	if (alg->base.cra_ablkcipher.encrypt)
+-		return alg->base.cra_blocksize;
+-
+-	return alg->chunksize;
 -}
-+int crypto_skcipher_decrypt(struct skcipher_request *req);
- 
+-
+-static inline unsigned int crypto_skcipher_alg_walksize(
+-	struct skcipher_alg *alg)
+-{
+-	if ((alg->base.cra_flags & CRYPTO_ALG_TYPE_MASK) ==
+-	    CRYPTO_ALG_TYPE_BLKCIPHER)
+-		return alg->base.cra_blocksize;
+-
+-	if (alg->base.cra_ablkcipher.encrypt)
+-		return alg->base.cra_blocksize;
+-
+-	return alg->walksize;
+-}
+-
+-/**
+- * crypto_skcipher_chunksize() - obtain chunk size
+- * @tfm: cipher handle
+- *
+- * The block size is set to one for ciphers such as CTR.  However,
+- * you still need to provide incremental updates in multiples of
+- * the underlying block size as the IV does not have sub-block
+- * granularity.  This is known in this API as the chunk size.
+- *
+- * Return: chunk size in bytes
+- */
+-static inline unsigned int crypto_skcipher_chunksize(
+-	struct crypto_skcipher *tfm)
+-{
+-	return crypto_skcipher_alg_chunksize(crypto_skcipher_alg(tfm));
+-}
+-
+-/**
+- * crypto_skcipher_walksize() - obtain walk size
+- * @tfm: cipher handle
+- *
+- * In some cases, algorithms can only perform optimally when operating on
+- * multiple blocks in parallel. This is reflected by the walksize, which
+- * must be a multiple of the chunksize (or equal if the concern does not
+- * apply)
+- *
+- * Return: walk size in bytes
+- */
+-static inline unsigned int crypto_skcipher_walksize(
+-	struct crypto_skcipher *tfm)
+-{
+-	return crypto_skcipher_alg_walksize(crypto_skcipher_alg(tfm));
+-}
+-
  /**
-  * DOC: Symmetric Key Cipher Request Handle
+  * crypto_skcipher_blocksize() - obtain block size of cipher
+  * @tfm: cipher handle
 -- 
 2.21.0
 
