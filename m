@@ -2,100 +2,152 @@ Return-Path: <SRS0=6z3H=UD=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,T_DKIMWL_WL_HIGH,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAC48C282CE
-	for <linux-crypto@archiver.kernel.org>; Tue,  4 Jun 2019 20:31:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A61EC46460
+	for <linux-crypto@archiver.kernel.org>; Tue,  4 Jun 2019 22:43:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B017F208CB
-	for <linux-crypto@archiver.kernel.org>; Tue,  4 Jun 2019 20:31:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Ta7hdhGD"
+	by mail.kernel.org (Postfix) with ESMTP id 6193120859
+	for <linux-crypto@archiver.kernel.org>; Tue,  4 Jun 2019 22:43:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1559688209;
+	bh=McnH01l012LgpITPnazCqRJYDfp8SFNlTpLeOyd0rDk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:List-ID:From;
+	b=tS3J0r7BrUAXzE5P/saHgM8ccuNUjZjlmXh7Iuxo5ANZk69p+/zlt/zyoKfX1ZSq4
+	 5Y8I/yaU3D4S5nzg+NPMo2AFFWxr4NZykrQGeVbfOxJqeoZmmPrFa6MYyPAA8VbQ45
+	 7rOS4VpBkUu6kXvmgqIbNSiiEeUG1zUSi8IMzCmQ=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726573AbfFDUbz (ORCPT
+        id S1726293AbfFDWn2 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 4 Jun 2019 16:31:55 -0400
-Received: from smtp-fw-6001.amazon.com ([52.95.48.154]:10746 "EHLO
-        smtp-fw-6001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726312AbfFDUbd (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 4 Jun 2019 16:31:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1559680292; x=1591216292;
-  h=from:to:cc:subject:date:message-id:mime-version;
-  bh=Qvgi9EebcCKTkJL3XH6n75abRSmA+1KjL0uPQ7HHAeo=;
-  b=Ta7hdhGDoJNbDuzf92aEfFIfqNN7443vpBk8sGQTF9UWGhbUKN9ieR59
-   gsOnxsL2GrXJiVmfPM2HkOzhTY9q92lesBR/VXMUAM+pHEjrLOA09O8jI
-   BKOzdV6ci24zWxs9CLvPCpUGLHq9Yr61HX8G6106erqcQDVO2MscpDLhF
-   o=;
-X-IronPort-AV: E=Sophos;i="5.60,550,1549929600"; 
-   d="scan'208";a="399352827"
-Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-2a-e7be2041.us-west-2.amazon.com) ([10.124.125.6])
-  by smtp-border-fw-out-6001.iad6.amazon.com with ESMTP; 04 Jun 2019 20:31:30 +0000
-Received: from EX13MTAUEB001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-        by email-inbound-relay-2a-e7be2041.us-west-2.amazon.com (Postfix) with ESMTPS id 4FA1CA21DD;
-        Tue,  4 Jun 2019 20:31:29 +0000 (UTC)
-Received: from EX13D08UEB001.ant.amazon.com (10.43.60.245) by
- EX13MTAUEB001.ant.amazon.com (10.43.60.96) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Tue, 4 Jun 2019 20:31:28 +0000
-Received: from EX13MTAUEB001.ant.amazon.com (10.43.60.96) by
- EX13D08UEB001.ant.amazon.com (10.43.60.245) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Tue, 4 Jun 2019 20:31:28 +0000
-Received: from dev-dsk-alisaidi-i31e-4ac69482.us-east-1.amazon.com
- (10.200.136.151) by mail-relay.amazon.com (10.43.60.129) with Microsoft SMTP
- Server id 15.0.1367.3 via Frontend Transport; Tue, 4 Jun 2019 20:31:28 +0000
-Received: by dev-dsk-alisaidi-i31e-4ac69482.us-east-1.amazon.com (Postfix, from userid 5131138)
-        id 9A8BA47DE4; Tue,  4 Jun 2019 20:31:28 +0000 (UTC)
-From:   Ali Saidi <alisaidi@amazon.com>
-To:     <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-crypto@vger.kernel.org>
-CC:     Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will.deacon@arm.com>,
-        Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Arnd Bergmann <arnd@arndb.de>,
-        "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
-        Ali Saidi <alisaidi@amazon.com>,
-        Ron Rindjunsky <ronrindj@amazon.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        David Woodhouse <dwmw@amazon.co.uk>
-Subject: [PATCH 0/3] Add support for Graviton TRNG
-Date:   Tue, 4 Jun 2019 20:30:57 +0000
-Message-ID: <20190604203100.15050-1-alisaidi@amazon.com>
-X-Mailer: git-send-email 2.15.3.AMZN
-MIME-Version: 1.0
-Content-Type: text/plain
+        Tue, 4 Jun 2019 18:43:28 -0400
+Received: from mail.kernel.org ([198.145.29.99]:44768 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726179AbfFDWn2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 4 Jun 2019 18:43:28 -0400
+Received: from localhost.localdomain (c-73-231-172-41.hsd1.ca.comcast.net [73.231.172.41])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 92F10206B8;
+        Tue,  4 Jun 2019 22:43:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1559688207;
+        bh=McnH01l012LgpITPnazCqRJYDfp8SFNlTpLeOyd0rDk=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=iMpvIC1KpLUBc26GINzifM0DVnm8whlDtaLjgjFzkGsUuxLi4URKQ7Kz86LO1axJb
+         ROYDLOE5iJKCfO3e/mDuVFq36lJWgmDFCC1r7h0nwP2pLpHpITo/a8kmnu+8Xlf8E5
+         EsXgRa+o7Hse3+A4mDjXy7HiDjwS37jUW3oVHF+8=
+Date:   Tue, 4 Jun 2019 15:43:26 -0700
+From:   Andrew Morton <akpm@linux-foundation.org>
+To:     Maninder Singh <maninder1.s@samsung.com>
+Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        keescook@chromium.org, gustavo@embeddedor.com, joe@perches.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        a.sahrawat@samsung.com, pankaj.m@samsung.com, v.narang@samsung.com,
+        Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org
+Subject: Re: [PATCH 1/4] zstd: pass pointer rathen than structure to
+ functions
+Message-Id: <20190604154326.8868a10f896c148a0ce804d1@linux-foundation.org>
+In-Reply-To: <1559552526-4317-2-git-send-email-maninder1.s@samsung.com>
+References: <1559552526-4317-1-git-send-email-maninder1.s@samsung.com>
+        <CGME20190603090232epcas5p1630d0584e8a1aa9495edc819605664fc@epcas5p1.samsung.com>
+        <1559552526-4317-2-git-send-email-maninder1.s@samsung.com>
+X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.31; x86_64-pc-linux-gnu)
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-AWS Graviton based systems provide an Arm SMC call in the vendor defined
-hypervisor region to read random numbers from a HW TRNG and return them to the
-guest. 
+On Mon,  3 Jun 2019 14:32:03 +0530 Maninder Singh <maninder1.s@samsung.com> wrote:
 
-We've observed slower guest boot and especially reboot times due to lack of
-entropy and providing access to a TRNG is meant to address this. 
+> currently params structure is passed in all functions, which increases
+> stack usage in all the function and lead to stack overflow on target like
+> ARM with kernel stack size of 8 KB so better to pass pointer.
+> 
+> Checked for ARM:
+> 
+>                                 Original               Patched
+> Call FLow Size:                  1264                   1040
+> ....
+> (HUF_sort)                      -> 296
+> (HUF_buildCTable_wksp)          -> 144
+> (HUF_compress4X_repeat)         -> 88
+> (ZSTD_compressBlock_internal)   -> 200
+> (ZSTD_compressContinue_internal)-> 136                  -> 88
+> (ZSTD_compressCCtx)             -> 192                  -> 64
+> (zstd_compress)                 -> 144                  -> 96
+> (crypto_compress)               -> 32
+> (zcomp_compress)                -> 32
+> ....
+> 
+> Signed-off-by: Maninder Singh <maninder1.s@samsung.com>
+> Signed-off-by: Vaneet Narang <v.narang@samsung.com>
+> 
 
-Ali Saidi (3):
-  arm/arm64: Add smccc hypervisor service identifiers
-  arm64: export acpi_psci_use_hvc
-  hwrng: Add support for AWS Graviton TRNG
+You missed btrfs.  This needs review, please - particularly the
+kernel-wide static ZSTD_parameters in zstd_get_btrfs_parameters().
 
- MAINTAINERS                           |   6 ++
- arch/arm64/kernel/acpi.c              |   1 +
- drivers/char/hw_random/Kconfig        |  13 ++++
- drivers/char/hw_random/Makefile       |   1 +
- drivers/char/hw_random/graviton-rng.c | 123 ++++++++++++++++++++++++++++++++++
- include/linux/arm-smccc.h             |   2 +
- 6 files changed, 146 insertions(+)
- create mode 100644 drivers/char/hw_random/graviton-rng.c
+The base patch is here:
 
--- 
-2.15.3.AMZN
+http://lkml.kernel.org/r/1559552526-4317-2-git-send-email-maninder1.s@samsung.com  
+
+--- a/fs/btrfs/zstd.c~zstd-pass-pointer-rathen-than-structure-to-functions-fix
++++ a/fs/btrfs/zstd.c
+@@ -27,15 +27,17 @@
+ /* 307s to avoid pathologically clashing with transaction commit */
+ #define ZSTD_BTRFS_RECLAIM_JIFFIES (307 * HZ)
+ 
+-static ZSTD_parameters zstd_get_btrfs_parameters(unsigned int level,
++static ZSTD_parameters *zstd_get_btrfs_parameters(unsigned int level,
+ 						 size_t src_len)
+ {
+-	ZSTD_parameters params = ZSTD_getParams(level, src_len, 0);
++	static ZSTD_parameters params;
++
++	params = ZSTD_getParams(level, src_len, 0);
+ 
+ 	if (params.cParams.windowLog > ZSTD_BTRFS_MAX_WINDOWLOG)
+ 		params.cParams.windowLog = ZSTD_BTRFS_MAX_WINDOWLOG;
+ 	WARN_ON(src_len > ZSTD_BTRFS_MAX_INPUT);
+-	return params;
++	return &params;
+ }
+ 
+ struct workspace {
+@@ -155,11 +157,12 @@ static void zstd_calc_ws_mem_sizes(void)
+ 	unsigned int level;
+ 
+ 	for (level = 1; level <= ZSTD_BTRFS_MAX_LEVEL; level++) {
+-		ZSTD_parameters params =
+-			zstd_get_btrfs_parameters(level, ZSTD_BTRFS_MAX_INPUT);
+-		size_t level_size =
+-			max_t(size_t,
+-			      ZSTD_CStreamWorkspaceBound(params.cParams),
++		ZSTD_parameters *params;
++		size_t level_size;
++
++		params = zstd_get_btrfs_parameters(level, ZSTD_BTRFS_MAX_INPUT);
++		level_size = max_t(size_t,
++			      ZSTD_CStreamWorkspaceBound(params->cParams),
+ 			      ZSTD_DStreamWorkspaceBound(ZSTD_BTRFS_MAX_INPUT));
+ 
+ 		max_size = max_t(size_t, max_size, level_size);
+@@ -385,8 +388,9 @@ static int zstd_compress_pages(struct li
+ 	unsigned long len = *total_out;
+ 	const unsigned long nr_dest_pages = *out_pages;
+ 	unsigned long max_out = nr_dest_pages * PAGE_SIZE;
+-	ZSTD_parameters params = zstd_get_btrfs_parameters(workspace->req_level,
+-							   len);
++	ZSTD_parameters *params;
++
++	params = zstd_get_btrfs_parameters(workspace->req_level, len);
+ 
+ 	*out_pages = 0;
+ 	*total_out = 0;
+_
 
