@@ -2,112 +2,137 @@ Return-Path: <SRS0=6z3H=UD=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,T_DKIMWL_WL_HIGH autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEF45C282CE
-	for <linux-crypto@archiver.kernel.org>; Tue,  4 Jun 2019 13:33:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C18FBC28CC6
+	for <linux-crypto@archiver.kernel.org>; Tue,  4 Jun 2019 14:54:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7E23C2251C
-	for <linux-crypto@archiver.kernel.org>; Tue,  4 Jun 2019 13:33:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="q+llcIgm"
+	by mail.kernel.org (Postfix) with ESMTP id A632024A3B
+	for <linux-crypto@archiver.kernel.org>; Tue,  4 Jun 2019 14:54:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727212AbfFDNdV (ORCPT
+        id S1727608AbfFDOyS (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 4 Jun 2019 09:33:21 -0400
-Received: from mailout4.samsung.com ([203.254.224.34]:14395 "EHLO
-        mailout4.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727229AbfFDNdV (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 4 Jun 2019 09:33:21 -0400
-Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
-        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20190604133318epoutp04a83719748429dd02fd9db9d31b415d53~lAiO-ihlq0515305153epoutp044
-        for <linux-crypto@vger.kernel.org>; Tue,  4 Jun 2019 13:33:18 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20190604133318epoutp04a83719748429dd02fd9db9d31b415d53~lAiO-ihlq0515305153epoutp044
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1559655198;
-        bh=1aLsXVY/wr2CuW5Tk9MkhyWV/LeW13egcTyA8RW2iMM=;
-        h=Subject:Reply-To:From:To:CC:In-Reply-To:Date:References:From;
-        b=q+llcIgmIE+nKyEDth0vGJXSKXjwIqcmCCtAk3njiGlG1Zcjo+KbhmDs46qiWA1Ip
-         VFw9TC0LpBOkTs1G52XMVguAPaPl4nJmo4zCxHitr5uK/SJ9H6HhAydGQGAJQyO8xh
-         ltM9eRTLDnk/uBBAFpTwycgde84/r1BGFStb8chY=
-Received: from epsmges5p1new.samsung.com (unknown [182.195.40.193]) by
-        epcas5p3.samsung.com (KnoxPortal) with ESMTP id
-        20190604133316epcas5p3b088c59033d7fd46263f8507907a9ba2~lAiM63HyX2076420764epcas5p3r;
-        Tue,  4 Jun 2019 13:33:16 +0000 (GMT)
-X-AuditID: b6c32a49-5b7ff70000000fe7-3f-5cf6731c2aaf
-Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
-        epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        AF.03.04071.C1376FC5; Tue,  4 Jun 2019 22:33:16 +0900 (KST)
-Mime-Version: 1.0
-Subject: RE:(2) [PATCH 1/4] zstd: pass pointer rathen than structure to
- functions
-Reply-To: v.narang@samsung.com
-From:   Vaneet Narang <v.narang@samsung.com>
-To:     Andrew Morton <akpm@linux-foundation.org>,
-        Maninder Singh <maninder1.s@samsung.com>
-CC:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "keescook@chromium.org" <keescook@chromium.org>,
-        "gustavo@embeddedor.com" <gustavo@embeddedor.com>,
-        "joe@perches.com" <joe@perches.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        AMIT SAHRAWAT <a.sahrawat@samsung.com>,
-        PANKAJ MISHRA <pankaj.m@samsung.com>,
-        Vaneet Narang <v.narang@samsung.com>
-X-Priority: 3
-X-Content-Kind-Code: NORMAL
-In-Reply-To: <20190603144132.7611b8fe3cf6928d8391a24a@linux-foundation.org>
-X-Drm-Type: N,general
-X-Msg-Generator: Mail
-X-Msg-Type: PERSONAL
-X-Reply-Demand: N
-Message-ID: <20190604131935epcms5p1c4a375fca57e4df5d233fd2769a3c2be@epcms5p1>
-Date:   Tue, 04 Jun 2019 18:49:35 +0530
-X-CMS-MailID: 20190604131935epcms5p1c4a375fca57e4df5d233fd2769a3c2be
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrBJsWRmVeSWpSXmKPExsWy7bCmpq5M8bcYg/u/eS0u7k61mLN+DZvF
-        nPMtLBZb96hadL+SsZh9/zGLxZnuXIv7934yWVzeNYfN4vD8NhaLe2+2MlkcOjmX0YHHY3bD
-        RRaPLStvMnmsO6jqse2AqseJGb9ZPL6susbs0bdlFaPH501yARxROTYZqYkpqUUKqXnJ+SmZ
-        eem2St7B8c7xpmYGhrqGlhbmSgp5ibmptkouPgG6bpk5QIcqKZQl5pQChQISi4uV9O1sivJL
-        S1IVMvKLS2yVUgtScgoMjQr0ihNzi0vz0vWS83OtDA0MjEyBKhNyMq73XmYpaGet6Pq2ia2B
-        8RNLFyMnh4SAiUTnhtesXYxcHEICuxkllh9eC+RwcPAKCEr83SEMYgoLBEvM/5MBUi4kICdx
-        /MZuRhBbWEBH4sS8NYwgJWwCWhIfW8JBTBGBSIlbq9RBBjILfGaWaD/ziRFiE6/EjPanUFul
-        JbYv3woW5xTwlri5bi87RFxU4ubqt3D2+2PzoXpFJFrvnWWGsAUlHvzcDbZWQkBGYtdbcZBd
-        EgLdjBITzi1nhXBmMEqc6n0D1WAucf7kfDCbV8BXYtGaq0wgNouAqsSLx+fZIQa5SPx+Vg4S
-        ZhbQlli28DUzSJhZQFNi/S59iCmyElNPrWOCKOGT6P39hAnmrR3zYGwliXMHd7JB2BISTzpn
-        Ql3gIfFobRs0kHuYJI5MPc08gVFhFiKcZyHZPAth8wJG5lWMkqkFxbnpqcWmBYZ5qeXIsbuJ
-        EZxqtTx3MM4653OIUYCDUYmHd0b8txgh1sSy4srcQ4wSHMxKIryJt7/ECPGmJFZWpRblxxeV
-        5qQWH2I0BQbBRGYp0eR8YB7IK4k3NDUyMzOwNDA1tjAzVBLnncR6NUZIID2xJDU7NbUgtQim
-        j4mDU6qBMXaV5hbHVOMPv5IOpYrc6VrwflfeDQ1btS8C1Wde/uK6qSF/56lU9cHVV158Kn1s
-        c36hcEQ/h0XvFZl5r86svsQjvO6hktDe2yeln4rFF27vNF0YVMap8POD7MWAzZZB2w8YTMvb
-        dLZxsZOWecOU+xPXPSnYY65gzJMRE2S0JPq+yukN+36vF1ViKc5INNRiLipOBACEjAf6ywMA
-        AA==
-DLP-Filter: Pass
+        Tue, 4 Jun 2019 10:54:18 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:17665 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727563AbfFDOyS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 4 Jun 2019 10:54:18 -0400
+Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 5E0234E8820ACC109B4F;
+        Tue,  4 Jun 2019 22:54:14 +0800 (CST)
+Received: from localhost (10.133.213.239) by DGGEMS402-HUB.china.huawei.com
+ (10.3.19.202) with Microsoft SMTP Server id 14.3.439.0; Tue, 4 Jun 2019
+ 22:54:04 +0800
+From:   YueHaibing <yuehaibing@huawei.com>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <ebiggers@google.com>, <rob.rice@broadcom.com>
+CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        YueHaibing <yuehaibing@huawei.com>
+Subject: [PATCH -next] crypto: bcm - Make some symbols static
+Date:   Tue, 4 Jun 2019 22:53:51 +0800
+Message-ID: <20190604145351.19392-1-yuehaibing@huawei.com>
+X-Mailer: git-send-email 2.10.2.windows.1
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Originating-IP: [10.133.213.239]
 X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20190603090232epcas5p1630d0584e8a1aa9495edc819605664fc
-References: <20190603144132.7611b8fe3cf6928d8391a24a@linux-foundation.org>
-        <1559552526-4317-1-git-send-email-maninder1.s@samsung.com>
-        <1559552526-4317-2-git-send-email-maninder1.s@samsung.com>
-        <CGME20190603090232epcas5p1630d0584e8a1aa9495edc819605664fc@epcms5p1>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Andrew,
-=C2=A0=0D=0A>But=C2=A0struct=C2=A0ZSTD_CCtx_s.params=C2=A0is=C2=A0still=C2=
-=A0a=C2=A0copied=C2=A0structure.=C2=A0=C2=A0Could=C2=A0we=0D=0A>make=C2=A0i=
-t=C2=A0=60const=C2=A0ZSTD_parameters=C2=A0*params'?=C2=A0=C2=A0Probably=C2=
-=A0not,=C2=A0due=C2=A0to=C2=A0lifetime=0D=0A>issues?=0D=0A=0D=0AZSTD=20main=
-tains=20its=20own=20ctxt.=20Yes=20we=20can=20avoid=20storing=20pointers=20o=
-f=20other=20modules=0D=0Abecause=20of=20lifetime=20issues.=20We=20should=20=
-keep=20ZSTD_CCtx_s.params=20as=20structure=20instead=20of=20pointer.=0D=0A=
-=0D=0A=0D=0AThanks=20&=20Regards,=0D=0AVaneet=20Narang=20=0D=0A=0D=0A=C2=A0=
-=0D=0A=C2=A0
+Fix sparse warnings:
+
+drivers/crypto/bcm/cipher.c:99:6: warning: symbol 'BCMHEADER' was not declared. Should it be static?
+drivers/crypto/bcm/cipher.c:2096:6: warning: symbol 'spu_no_incr_hash' was not declared. Should it be static?
+drivers/crypto/bcm/cipher.c:4823:5: warning: symbol 'bcm_spu_probe' was not declared. Should it be static?
+drivers/crypto/bcm/cipher.c:4867:5: warning: symbol 'bcm_spu_remove' was not declared. Should it be static?
+drivers/crypto/bcm/spu2.c:52:6: warning: symbol 'spu2_cipher_type_names' was not declared. Should it be static?
+drivers/crypto/bcm/spu2.c:56:6: warning: symbol 'spu2_cipher_mode_names' was not declared. Should it be static?
+drivers/crypto/bcm/spu2.c:60:6: warning: symbol 'spu2_hash_type_names' was not declared. Should it be static?
+drivers/crypto/bcm/spu2.c:66:6: warning: symbol 'spu2_hash_mode_names' was not declared. Should it be static?
+
+Reported-by: Hulk Robot <hulkci@huawei.com>
+Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+---
+ drivers/crypto/bcm/cipher.c |  8 ++++----
+ drivers/crypto/bcm/spu2.c   | 10 +++++-----
+ 2 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/crypto/bcm/cipher.c b/drivers/crypto/bcm/cipher.c
+index 25f8d39..d972ffa 100644
+--- a/drivers/crypto/bcm/cipher.c
++++ b/drivers/crypto/bcm/cipher.c
+@@ -96,7 +96,7 @@ MODULE_PARM_DESC(aead_pri, "Priority for AEAD algos");
+  * 0x70 - ring 2
+  * 0x78 - ring 3
+  */
+-char BCMHEADER[] = { 0x60, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x28 };
++static char BCMHEADER[] = { 0x60, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x28 };
+ /*
+  * Some SPU hw does not use BCM header on SPU messages. So BCM_HDR_LEN
+  * is set dynamically after reading SPU type from device tree.
+@@ -2094,7 +2094,7 @@ static int __ahash_init(struct ahash_request *req)
+  * Return: true if incremental hashing is not supported
+  *         false otherwise
+  */
+-bool spu_no_incr_hash(struct iproc_ctx_s *ctx)
++static bool spu_no_incr_hash(struct iproc_ctx_s *ctx)
+ {
+ 	struct spu_hw *spu = &iproc_priv.spu;
+ 
+@@ -4820,7 +4820,7 @@ static int spu_dt_read(struct platform_device *pdev)
+ 	return 0;
+ }
+ 
+-int bcm_spu_probe(struct platform_device *pdev)
++static int bcm_spu_probe(struct platform_device *pdev)
+ {
+ 	struct device *dev = &pdev->dev;
+ 	struct spu_hw *spu = &iproc_priv.spu;
+@@ -4864,7 +4864,7 @@ int bcm_spu_probe(struct platform_device *pdev)
+ 	return err;
+ }
+ 
+-int bcm_spu_remove(struct platform_device *pdev)
++static int bcm_spu_remove(struct platform_device *pdev)
+ {
+ 	int i;
+ 	struct device *dev = &pdev->dev;
+diff --git a/drivers/crypto/bcm/spu2.c b/drivers/crypto/bcm/spu2.c
+index bf7ac62..960b472 100644
+--- a/drivers/crypto/bcm/spu2.c
++++ b/drivers/crypto/bcm/spu2.c
+@@ -49,21 +49,21 @@ enum spu2_proto_sel {
+ 	SPU2_DTLS_AEAD = 10
+ };
+ 
+-char *spu2_cipher_type_names[] = { "None", "AES128", "AES192", "AES256",
++static char *spu2_cipher_type_names[] = { "None", "AES128", "AES192", "AES256",
+ 	"DES", "3DES"
+ };
+ 
+-char *spu2_cipher_mode_names[] = { "ECB", "CBC", "CTR", "CFB", "OFB", "XTS",
+-	"CCM", "GCM"
++static char *spu2_cipher_mode_names[] = { "ECB", "CBC", "CTR", "CFB", "OFB",
++	"XTS", "CCM", "GCM"
+ };
+ 
+-char *spu2_hash_type_names[] = { "None", "AES128", "AES192", "AES256",
++static char *spu2_hash_type_names[] = { "None", "AES128", "AES192", "AES256",
+ 	"Reserved", "Reserved", "MD5", "SHA1", "SHA224", "SHA256", "SHA384",
+ 	"SHA512", "SHA512/224", "SHA512/256", "SHA3-224", "SHA3-256",
+ 	"SHA3-384", "SHA3-512"
+ };
+ 
+-char *spu2_hash_mode_names[] = { "CMAC", "CBC-MAC", "XCBC-MAC", "HMAC",
++static char *spu2_hash_mode_names[] = { "CMAC", "CBC-MAC", "XCBC-MAC", "HMAC",
+ 	"Rabin", "CCM", "GCM", "Reserved"
+ };
+ 
+-- 
+2.7.4
+
+
