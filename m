@@ -2,98 +2,122 @@ Return-Path: <SRS0=6z3H=UD=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,T_DKIMWL_WL_HIGH autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08620C282CE
-	for <linux-crypto@archiver.kernel.org>; Tue,  4 Jun 2019 06:45:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D82AC282CE
+	for <linux-crypto@archiver.kernel.org>; Tue,  4 Jun 2019 12:30:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D838F24BAE
-	for <linux-crypto@archiver.kernel.org>; Tue,  4 Jun 2019 06:45:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 034F523E30
+	for <linux-crypto@archiver.kernel.org>; Tue,  4 Jun 2019 12:30:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="fHogesG7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726713AbfFDGpe (ORCPT
+        id S1727689AbfFDMaO (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 4 Jun 2019 02:45:34 -0400
-Received: from a.mx.secunet.com ([62.96.220.36]:51674 "EHLO a.mx.secunet.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726410AbfFDGpe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 4 Jun 2019 02:45:34 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by a.mx.secunet.com (Postfix) with ESMTP id 3795C201D6;
-        Tue,  4 Jun 2019 08:45:32 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-        by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id TGvq5BVqSfeq; Tue,  4 Jun 2019 08:45:31 +0200 (CEST)
-Received: from mail-essen-01.secunet.de (mail-essen-01.secunet.de [10.53.40.204])
-        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by a.mx.secunet.com (Postfix) with ESMTPS id 7601920068;
-        Tue,  4 Jun 2019 08:45:31 +0200 (CEST)
-Received: from gauss2.secunet.de (10.182.7.193) by mail-essen-01.secunet.de
- (10.53.40.204) with Microsoft SMTP Server id 14.3.439.0; Tue, 4 Jun 2019
- 08:45:31 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)      id 5885A3180550;
- Tue,  4 Jun 2019 08:45:30 +0200 (CEST)
-Date:   Tue, 4 Jun 2019 08:45:30 +0200
-From:   Steffen Klassert <steffen.klassert@secunet.com>
-To:     Daniel Jordan <daniel.m.jordan@oracle.com>
-CC:     <peterz@infradead.org>, <akpm@linux-foundation.org>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: Question about padata's callback cpu
-Message-ID: <20190604064530.GP17989@gauss3.secunet.de>
-References: <20190528233707.gc4xomnlcuiszqht@ca-dmjordan1.us.oracle.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20190528233707.gc4xomnlcuiszqht@ca-dmjordan1.us.oracle.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+        Tue, 4 Jun 2019 08:30:14 -0400
+Received: from mailout4.samsung.com ([203.254.224.34]:54965 "EHLO
+        mailout4.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727542AbfFDMaN (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 4 Jun 2019 08:30:13 -0400
+Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
+        by mailout4.samsung.com (KnoxPortal) with ESMTP id 20190604123011epoutp04d0c3feadd387aece3934269972470c93~k-rHzsUwr2241722417epoutp04H
+        for <linux-crypto@vger.kernel.org>; Tue,  4 Jun 2019 12:30:11 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20190604123011epoutp04d0c3feadd387aece3934269972470c93~k-rHzsUwr2241722417epoutp04H
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1559651411;
+        bh=kmF2T/PAVQuwoEHZhBFuwtSSbS8VE1iD9MRWghRfsFI=;
+        h=Subject:Reply-To:From:To:CC:In-Reply-To:Date:References:From;
+        b=fHogesG76Rr5mXCpPSTuODgzvXKaBhhXyZNchRiFvFcbt6o8WJsbCrnAIC2qAuwvZ
+         6ao9uUmoNdbk2kd6gvI5SDvgOJcXz42453ViJuZzf7i/TUH9GJ+fv2xMPMuE37BX5N
+         aCxEYjoYXPxLruUW5sJ6rS600pKQkK5Rqe6V0PME=
+Received: from epsmges5p1new.samsung.com (unknown [182.195.40.195]) by
+        epcas5p2.samsung.com (KnoxPortal) with ESMTP id
+        20190604123008epcas5p26455592843801a04196d8fd161f1400e~k-rFRwsi40160501605epcas5p2D;
+        Tue,  4 Jun 2019 12:30:08 +0000 (GMT)
+X-AuditID: b6c32a49-5b7ff70000000fe7-f9-5cf66450b68f
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+        epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        90.8C.04071.05466FC5; Tue,  4 Jun 2019 21:30:08 +0900 (KST)
+Mime-Version: 1.0
+Subject: RE:(2) [PATCH 0/4] zstd: reduce stack usage
+Reply-To: v.narang@samsung.com
+From:   Vaneet Narang <v.narang@samsung.com>
+To:     Andrew Morton <akpm@linux-foundation.org>,
+        Maninder Singh <maninder1.s@samsung.com>
+CC:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "keescook@chromium.org" <keescook@chromium.org>,
+        "gustavo@embeddedor.com" <gustavo@embeddedor.com>,
+        "joe@perches.com" <joe@perches.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        AMIT SAHRAWAT <a.sahrawat@samsung.com>,
+        PANKAJ MISHRA <pankaj.m@samsung.com>,
+        Vaneet Narang <v.narang@samsung.com>
+X-Priority: 3
+X-Content-Kind-Code: NORMAL
+In-Reply-To: <20190603144912.34e1414376e07c7b1af53205@linux-foundation.org>
+X-Drm-Type: N,general
+X-Msg-Generator: Mail
+X-Msg-Type: PERSONAL
+X-Reply-Demand: N
+Message-ID: <20190604120623epcms5p3fc13e98047e7b44d6da144425213b4fe@epcms5p3>
+Date:   Tue, 04 Jun 2019 17:36:23 +0530
+X-CMS-MailID: 20190604120623epcms5p3fc13e98047e7b44d6da144425213b4fe
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrJJsWRmVeSWpSXmKPExsWy7bCmhm5AyrcYg2NrpSwu7k61mLN+DZvF
+        nPMtLBZb96hadL+SsZh9/zGLxZnuXIv7934yWVzeNYfN4vD8NhaLe2+2MlkcOjmX0YHHY3bD
+        RRaPLStvMnmsO6jqse2AqseJGb9ZPL6susbs0bdlFaPH501yARxROTYZqYkpqUUKqXnJ+SmZ
+        eem2St7B8c7xpmYGhrqGlhbmSgp5ibmptkouPgG6bpk5QIcqKZQl5pQChQISi4uV9O1sivJL
+        S1IVMvKLS2yVUgtScgoMjQr0ihNzi0vz0vWS83OtDA0MjEyBKhNyMnYd3MtWsIWtYu6yj4wN
+        jFNZuxg5OCQETCTeP7fsYuTiEBLYzSjRfuIWG0icV0BQ4u8O4S5GTg5hoJIVm88ygdhCAnIS
+        x2/sZoSI60icmLeGEaScTUBL4mNLOIgpIhApcWuVOshEZoHPzBLtZz6BlUsI8ErMaH/KAmFL
+        S2xfvhUszingLbFu62uouKjEzdVv2WHs98fmQ/WKSLTeO8sMYQtKPPi5mxHiehmJXW/FQXZJ
+        CHQzSkw4t5wVwpnBKHGq9w1Ug7nE+ZPzwWxeAV+Je49ngC1jEVCV+HPwMCtEjYvE5Y+vwRYz
+        C2hLLFv4mhlkAbOApsT6XfoQJbISU0+tY4Io4ZPo/f2ECeavHfNgbCWJcwd3skHYEhJPOmdC
+        neAh8WTrSkZIMJ9nlFh06Aj7BEaFWYiQnoVk8yyEzQsYmVcxSqYWFOempxabFhjmpZYjR+8m
+        RnCy1fLcwTjrnM8hRgEORiUe3hnx32KEWBPLiitzDzFKcDArifAm3v4SI8SbklhZlVqUH19U
+        mpNafIjRFBgGE5mlRJPzgZkgryTe0NTIzMzA0sDU2MLMUEmcdxLr1RghgfTEktTs1NSC1CKY
+        PiYOTqkGRomzCvYV6s/DTxoneDdOK+Y8VsWfr7WjqWH33MBdc0Qs4ryP781/H8iXPs9LVWzO
+        qZLLS2ed0sn8m/HZy//xRO7ykKTyp07xBroqN9kF3nSunN7/JOzJu6MfzCq4lr+Yue6k29kJ
+        avfMom+pzpxbvf2VlIGO4v/CHVNnfi+euE/24p/7P5o7nyixFGckGmoxFxUnAgA5QNF2zAMA
+        AA==
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20190603090227epcas5p348327061a3facbb9dfcf662bf2bc196e
+References: <20190603144912.34e1414376e07c7b1af53205@linux-foundation.org>
+        <1559552526-4317-1-git-send-email-maninder1.s@samsung.com>
+        <CGME20190603090227epcas5p348327061a3facbb9dfcf662bf2bc196e@epcms5p3>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Daniel,
+Hi Andrew,
 
-On Tue, May 28, 2019 at 07:37:07PM -0400, Daniel Jordan wrote:
-> Hi Steffen,
-> 
-> I'm working on some padata patches and stumbled across this thread about the
-> purpose of the callback CPU in padata_do_parallel.
-> 
->     https://lore.kernel.org/lkml/20100402112326.GA19502@secunet.com/
+>> This patch set reduces stack usage for zstd code, because target like AR=
+M has
+>> limited 8KB kernel stack, which is getting overflowed due to hight stack=
+ usage
+>> of zstd code with call flow like:
+=20
+>That's rather bad behaviour.  I assume the patchset actually fixes this?
 
-Well, that's quite long ago :)
+Yes, patchset tries to reduce around 300 bytes of stack usage of zstd compr=
+ession path.=20
+We faced high stack usage issue on switching compression algo from LZO/LZ4 =
+to zstd algo.
+zstd compression uses around 1200 bytes of stack which is huge as compared=
+=20
+to LZO/LZ4 which uses negligible stack (< 200 bytes).
 
-> 
-> The relevant part is,
-> 
->   andrew> - Why would I want to specify which CPU the parallel completion
->   andrew>   callback is to be executed on?
->   
->     steffen> Well, for IPsec for example it is quite interesting to separate the
->     steffen> different flows to different cpus. pcrypt does this by choosing different
->     steffen> callback cpus for the requests belonging to different transforms.
->     steffen> Others might want to see the object on the same cpu as it was before
->     steffen> the parallel codepath.
-> 
-> Not too familiar with IPsec, but I'm guessing it's interesting to separate the
-> flows for performance reasons.  Is the goal to keep multiple flows from
-> interfering with each other (ensuring they run on different CPUs), or maybe to
-> get better locality (ensuring each always runs on the same CPU)?  It'd be
-> helpful if you could expand on this.
-
-Yes, separating flows is for performance reasons. In networking, the packet
-order inside a flow is very important. If network packets get reordered,
-performance will drop down. So packets of the same flow should always
-stay on the same cpu, otherwise you can't ensure the packet order. But to
-process the network packets as parallel as possible, you can move different
-flows to different cpus by choosing a callback cpu for each flow.
-
-> By the way, the padata patches extend the code to parallelize more places
-> around the kernel, as Peter suggested.
-
-That's great, go ahead!
-
+=20
+>I think I'll schedule the patchset for 5.2-rcX so that zstd is actually
+>usable on arm in 5.2.  Does that sound OK?=C2=A0=0D=0AOK=0D=0A=0D=0ARegard=
+s,=0D=0AVaneet=20Narang=0D=0A
