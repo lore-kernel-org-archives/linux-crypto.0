@@ -1,72 +1,99 @@
-Return-Path: <SRS0=YB2u=UC=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=6z3H=UD=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	T_DKIMWL_WL_HIGH,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92629C04AB5
-	for <linux-crypto@archiver.kernel.org>; Mon,  3 Jun 2019 21:49:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08620C282CE
+	for <linux-crypto@archiver.kernel.org>; Tue,  4 Jun 2019 06:45:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5D05823A5C
-	for <linux-crypto@archiver.kernel.org>; Mon,  3 Jun 2019 21:49:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1559598554;
-	bh=roe7k85B1WBARYVkgdFOauIjF/htR4Atr22VzMKxNss=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:List-ID:From;
-	b=VuGCCceOMFY/fu/ltMqz943e0huiNSEd67Ywk37izSlbRK718cYEsFcrby1T7TWmK
-	 qlwyh0KfmQYqzf3iWxsCj0LN5PHnudSpq/w7bWbKd02tCraaaJ2lOmXPzSCZP27LII
-	 ZXb1+rwKMuFaKc2Vm5AqQrQwInYevOPCnNlFH7Vk=
+	by mail.kernel.org (Postfix) with ESMTP id D838F24BAE
+	for <linux-crypto@archiver.kernel.org>; Tue,  4 Jun 2019 06:45:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726238AbfFCVtN (ORCPT
+        id S1726713AbfFDGpe (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 3 Jun 2019 17:49:13 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42264 "EHLO mail.kernel.org"
+        Tue, 4 Jun 2019 02:45:34 -0400
+Received: from a.mx.secunet.com ([62.96.220.36]:51674 "EHLO a.mx.secunet.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726076AbfFCVtN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 3 Jun 2019 17:49:13 -0400
-Received: from akpm3.svl.corp.google.com (unknown [104.133.8.65])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1726410AbfFDGpe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 4 Jun 2019 02:45:34 -0400
+Received: from localhost (localhost [127.0.0.1])
+        by a.mx.secunet.com (Postfix) with ESMTP id 3795C201D6;
+        Tue,  4 Jun 2019 08:45:32 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from a.mx.secunet.com ([127.0.0.1])
+        by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id TGvq5BVqSfeq; Tue,  4 Jun 2019 08:45:31 +0200 (CEST)
+Received: from mail-essen-01.secunet.de (mail-essen-01.secunet.de [10.53.40.204])
+        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 07C4A23A48;
-        Mon,  3 Jun 2019 21:49:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1559598553;
-        bh=roe7k85B1WBARYVkgdFOauIjF/htR4Atr22VzMKxNss=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=aHoSjDuYs+ZX4i6zuooI42FjZrBT6jsYBTiyfvLT8vIiE2+NJ4cpctPy3uJslHaoD
-         DuOAqey1CzPQxtM6n7R7knkOHI2Tkhnh2bGu84jZ9Qjh9Br1aMTrU9/qB0sRq8fZ+B
-         ZZBE8Z1SJPdqOtoBIHdsiJwu9Lv1ZaysBitSi/AU=
-Date:   Mon, 3 Jun 2019 14:49:12 -0700
-From:   Andrew Morton <akpm@linux-foundation.org>
-To:     Maninder Singh <maninder1.s@samsung.com>
-Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        keescook@chromium.org, gustavo@embeddedor.com, joe@perches.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        a.sahrawat@samsung.com, pankaj.m@samsung.com, v.narang@samsung.com
-Subject: Re: [PATCH 0/4] zstd: reduce stack usage
-Message-Id: <20190603144912.34e1414376e07c7b1af53205@linux-foundation.org>
-In-Reply-To: <1559552526-4317-1-git-send-email-maninder1.s@samsung.com>
-References: <CGME20190603090227epcas5p348327061a3facbb9dfcf662bf2bc196e@epcas5p3.samsung.com>
-        <1559552526-4317-1-git-send-email-maninder1.s@samsung.com>
-X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.31; x86_64-pc-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        by a.mx.secunet.com (Postfix) with ESMTPS id 7601920068;
+        Tue,  4 Jun 2019 08:45:31 +0200 (CEST)
+Received: from gauss2.secunet.de (10.182.7.193) by mail-essen-01.secunet.de
+ (10.53.40.204) with Microsoft SMTP Server id 14.3.439.0; Tue, 4 Jun 2019
+ 08:45:31 +0200
+Received: by gauss2.secunet.de (Postfix, from userid 1000)      id 5885A3180550;
+ Tue,  4 Jun 2019 08:45:30 +0200 (CEST)
+Date:   Tue, 4 Jun 2019 08:45:30 +0200
+From:   Steffen Klassert <steffen.klassert@secunet.com>
+To:     Daniel Jordan <daniel.m.jordan@oracle.com>
+CC:     <peterz@infradead.org>, <akpm@linux-foundation.org>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: Question about padata's callback cpu
+Message-ID: <20190604064530.GP17989@gauss3.secunet.de>
+References: <20190528233707.gc4xomnlcuiszqht@ca-dmjordan1.us.oracle.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20190528233707.gc4xomnlcuiszqht@ca-dmjordan1.us.oracle.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon,  3 Jun 2019 14:32:02 +0530 Maninder Singh <maninder1.s@samsung.com> wrote:
+Hi Daniel,
 
-> This patch set reduces stack usage for zstd code, because target like ARM has
-> limited 8KB kernel stack, which is getting overflowed due to hight stack usage
-> of zstd code with call flow like:
+On Tue, May 28, 2019 at 07:37:07PM -0400, Daniel Jordan wrote:
+> Hi Steffen,
+> 
+> I'm working on some padata patches and stumbled across this thread about the
+> purpose of the callback CPU in padata_do_parallel.
+> 
+>     https://lore.kernel.org/lkml/20100402112326.GA19502@secunet.com/
 
-That's rather bad behaviour.  I assume the patchset actually fixes this?
+Well, that's quite long ago :)
 
-I think I'll schedule the patchset for 5.2-rcX so that zstd is actually
-usable on arm in 5.2.  Does that sound OK?
+> 
+> The relevant part is,
+> 
+>   andrew> - Why would I want to specify which CPU the parallel completion
+>   andrew>   callback is to be executed on?
+>   
+>     steffen> Well, for IPsec for example it is quite interesting to separate the
+>     steffen> different flows to different cpus. pcrypt does this by choosing different
+>     steffen> callback cpus for the requests belonging to different transforms.
+>     steffen> Others might want to see the object on the same cpu as it was before
+>     steffen> the parallel codepath.
+> 
+> Not too familiar with IPsec, but I'm guessing it's interesting to separate the
+> flows for performance reasons.  Is the goal to keep multiple flows from
+> interfering with each other (ensuring they run on different CPUs), or maybe to
+> get better locality (ensuring each always runs on the same CPU)?  It'd be
+> helpful if you could expand on this.
+
+Yes, separating flows is for performance reasons. In networking, the packet
+order inside a flow is very important. If network packets get reordered,
+performance will drop down. So packets of the same flow should always
+stay on the same cpu, otherwise you can't ensure the packet order. But to
+process the network packets as parallel as possible, you can move different
+flows to different cpus by choosing a callback cpu for each flow.
+
+> By the way, the padata patches extend the code to parallelize more places
+> around the kernel, as Peter suggested.
+
+That's great, go ahead!
 
