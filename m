@@ -2,130 +2,119 @@ Return-Path: <SRS0=VkFO=UE=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E6E7C28D18
-	for <linux-crypto@archiver.kernel.org>; Wed,  5 Jun 2019 12:32:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADD42C28CC5
+	for <linux-crypto@archiver.kernel.org>; Wed,  5 Jun 2019 13:22:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 11F3B206BA
-	for <linux-crypto@archiver.kernel.org>; Wed,  5 Jun 2019 12:32:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7FD9B20866
+	for <linux-crypto@archiver.kernel.org>; Wed,  5 Jun 2019 13:22:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vAcs7pC2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727589AbfFEMcG (ORCPT
+        id S1727914AbfFENWC (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 5 Jun 2019 08:32:06 -0400
-Received: from mx2.suse.de ([195.135.220.15]:41920 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727461AbfFEMcF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 5 Jun 2019 08:32:05 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 8D62CAE8B;
-        Wed,  5 Jun 2019 12:32:03 +0000 (UTC)
-Received: by ds.suse.cz (Postfix, from userid 10065)
-        id 1D58EDA843; Wed,  5 Jun 2019 14:32:54 +0200 (CEST)
-Date:   Wed, 5 Jun 2019 14:32:53 +0200
-From:   David Sterba <dsterba@suse.cz>
-To:     Andrew Morton <akpm@linux-foundation.org>,
-        Maninder Singh <maninder1.s@samsung.com>,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        keescook@chromium.org, gustavo@embeddedor.com, joe@perches.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        a.sahrawat@samsung.com, pankaj.m@samsung.com, v.narang@samsung.com,
-        Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org,
-        terrelln@fb.com
-Subject: Re: [PATCH 1/4] zstd: pass pointer rathen than structure to functions
-Message-ID: <20190605123253.GZ15290@suse.cz>
-Reply-To: dsterba@suse.cz
-Mail-Followup-To: dsterba@suse.cz,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Maninder Singh <maninder1.s@samsung.com>,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        keescook@chromium.org, gustavo@embeddedor.com, joe@perches.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        a.sahrawat@samsung.com, pankaj.m@samsung.com, v.narang@samsung.com,
-        Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org,
-        terrelln@fb.com
-References: <1559552526-4317-1-git-send-email-maninder1.s@samsung.com>
- <CGME20190603090232epcas5p1630d0584e8a1aa9495edc819605664fc@epcas5p1.samsung.com>
- <1559552526-4317-2-git-send-email-maninder1.s@samsung.com>
- <20190604154326.8868a10f896c148a0ce804d1@linux-foundation.org>
- <20190605115703.GY15290@twin.jikos.cz>
+        Wed, 5 Jun 2019 09:22:02 -0400
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:33424 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726442AbfFENWB (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 5 Jun 2019 09:22:01 -0400
+Received: by mail-pl1-f196.google.com with SMTP id g21so9695475plq.0;
+        Wed, 05 Jun 2019 06:22:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:mime-version:content-disposition
+         :user-agent;
+        bh=hXsQr/OkSzH/u4JLYwMI74MVQvCM/DsvMDlyfR8YPSs=;
+        b=vAcs7pC2kqhFsFdLMdboV71PC8Al8p5Fqgrp92x24xcLKrspdV3OUmr94JSM7zHNWH
+         UJpI+hKMpr1bC7hxlNuwVIn3NFxeqATaHm3lbTVOYLA3KMw4fZol2lRcwDxqSi07FKOJ
+         jsn4zOPQ/EbGXeqm9Ze1nw49PjZAyG6azwChEvZ09uXbvyAGipkJioxdlPyENZ2WdlMG
+         Mw7JB+4kDzjCo4VdSGO3Qj6l2ODva8Dh2YwWpK7WkIlgX/Ufd4Wek6h9PRUuFO5LlSqo
+         +CvOsEHO4LCeLTIOsDmZlUVOeIwcUJEqfvJ9RzaX0QaGmggeWQe4KxWOSo0Zm/ZPsVn3
+         XpCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition:user-agent;
+        bh=hXsQr/OkSzH/u4JLYwMI74MVQvCM/DsvMDlyfR8YPSs=;
+        b=KqfT+a+n1jGa9S+D19z7LKdrgu+Bwff+VJPZsG+1utfegFvGkHZdsNY9/d76C6Xh44
+         QybgSugm3ThM5VL5HoPjHxEaKq/Mp1XRKZmdo3+up8GfPNR2jEkF0xZU+iXlhFiWBhYl
+         bj4pxHAHKmmzCZnTdxH5lmY8qRNSHBzWw9gl8k7Tf+y6lzSthpd1eG5NVwwRKN4A9BeA
+         s9egZakqlvXDw7OX9qPTQRRJx43S4e072QvLUm8mc6bkIY9xGIt2LzvrEkmE8qDSQbRc
+         hECD80WcWqefxBaxGEQJL9g+rnScJ0QsdgdGxM75aUu5lhR3g5hF9EwTJ/1WXTVNC1j5
+         p5qw==
+X-Gm-Message-State: APjAAAWGXxz2SGrISB/pgFCVnCX5e+8anmUqLSR6yTuu+ZaBg8pRWoqm
+        trOtaT6E8l2+maOHPNJwACk=
+X-Google-Smtp-Source: APXvYqy3yOZ8VjiWRMUeMtJatt8B5MqTPmZEf84WUyyqZ00JqPIqt8WpUbID9fsep+oJRJqxX4KoJA==
+X-Received: by 2002:a17:902:28c9:: with SMTP id f67mr43935186plb.19.1559740921154;
+        Wed, 05 Jun 2019 06:22:01 -0700 (PDT)
+Received: from nishad (p3261240-ipngn21201hodogaya.kanagawa.ocn.ne.jp. [153.202.122.240])
+        by smtp.gmail.com with ESMTPSA id i3sm22254201pfa.175.2019.06.05.06.21.57
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Wed, 05 Jun 2019 06:22:00 -0700 (PDT)
+Date:   Wed, 5 Jun 2019 18:51:53 +0530
+From:   Nishad Kamdar <nishadkamdar@gmail.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Joe Perches <joe@perches.com>,
+        Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= 
+        <u.kleine-koenig@pengutronix.de>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: cavium/nitrox - Use the correct style for SPDX
+ License Identifier
+Message-ID: <20190605132149.GA5589@nishad>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190605115703.GY15290@twin.jikos.cz>
-User-Agent: Mutt/1.5.23.1 (2014-03-12)
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jun 05, 2019 at 01:57:03PM +0200, David Sterba wrote:
-> On Tue, Jun 04, 2019 at 03:43:26PM -0700, Andrew Morton wrote:
-> > On Mon,  3 Jun 2019 14:32:03 +0530 Maninder Singh <maninder1.s@samsung.com> wrote:
-> > 
-> > > currently params structure is passed in all functions, which increases
-> > > stack usage in all the function and lead to stack overflow on target like
-> > > ARM with kernel stack size of 8 KB so better to pass pointer.
-> > > 
-> > > Checked for ARM:
-> > > 
-> > >                                 Original               Patched
-> > > Call FLow Size:                  1264                   1040
-> > > ....
-> > > (HUF_sort)                      -> 296
-> > > (HUF_buildCTable_wksp)          -> 144
-> > > (HUF_compress4X_repeat)         -> 88
-> > > (ZSTD_compressBlock_internal)   -> 200
-> > > (ZSTD_compressContinue_internal)-> 136                  -> 88
-> > > (ZSTD_compressCCtx)             -> 192                  -> 64
-> > > (zstd_compress)                 -> 144                  -> 96
-> > > (crypto_compress)               -> 32
-> > > (zcomp_compress)                -> 32
-> > > ....
-> > > 
-> > > Signed-off-by: Maninder Singh <maninder1.s@samsung.com>
-> > > Signed-off-by: Vaneet Narang <v.narang@samsung.com>
-> > > 
-> > 
-> > You missed btrfs.  This needs review, please - particularly the
-> > kernel-wide static ZSTD_parameters in zstd_get_btrfs_parameters().
-> 
-> > 
-> > The base patch is here:
-> > 
-> > http://lkml.kernel.org/r/1559552526-4317-2-git-send-email-maninder1.s@samsung.com  
-> > 
-> > --- a/fs/btrfs/zstd.c~zstd-pass-pointer-rathen-than-structure-to-functions-fix
-> > +++ a/fs/btrfs/zstd.c
-> > @@ -27,15 +27,17 @@
-> >  /* 307s to avoid pathologically clashing with transaction commit */
-> >  #define ZSTD_BTRFS_RECLAIM_JIFFIES (307 * HZ)
-> >  
-> > -static ZSTD_parameters zstd_get_btrfs_parameters(unsigned int level,
-> > +static ZSTD_parameters *zstd_get_btrfs_parameters(unsigned int level,
-> >  						 size_t src_len)
-> >  {
-> > -	ZSTD_parameters params = ZSTD_getParams(level, src_len, 0);
-> > +	static ZSTD_parameters params;
-> 
-> > +
-> > +	params = ZSTD_getParams(level, src_len, 0);
-> 
-> No thats' broken, the params can't be static as it depends on level and
-> src_len. What happens if there are several requests in parallel with
-> eg. different levels?
-> 
-> Would be really great if the mailinglist is CCed when the code is
-> changed in a non-trivial way.
+This patch corrects the SPDX License Identifier style
+in header files related to Crypto Drivers for Cavium Nitrox
+family CNN55XX devices.
+For C header files Documentation/process/license-rules.rst
+mandates C-like comments (opposed to C source files where
+C++ style should be used)
 
-So this does not compile fs/btrfs/zstd.o which Andrew probably found
-too, otherwise btrfs is the only in-tree user of the function outside of
-lib/ and crypto/.
+Changes made by using a script provided by Joe Perches here:
+https://lkml.org/lkml/2019/2/7/46
 
-I think that Nick Terrell should have been CCed too, as he ported zstd
-to linux.
+Suggested-by: Joe Perches <joe@perches.com>
+Signed-off-by: Nishad Kamdar <nishadkamdar@gmail.com>
+---
+ drivers/crypto/cavium/nitrox/nitrox_debugfs.h | 2 +-
+ drivers/crypto/cavium/nitrox/nitrox_mbx.h     | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/crypto/cavium/nitrox/nitrox_debugfs.h b/drivers/crypto/cavium/nitrox/nitrox_debugfs.h
+index f177b79bbab0..09c4cf2513fb 100644
+--- a/drivers/crypto/cavium/nitrox/nitrox_debugfs.h
++++ b/drivers/crypto/cavium/nitrox/nitrox_debugfs.h
+@@ -1,4 +1,4 @@
+-// SPDX-License-Identifier: GPL-2.0
++/* SPDX-License-Identifier: GPL-2.0 */
+ #ifndef __NITROX_DEBUGFS_H
+ #define __NITROX_DEBUGFS_H
+ 
+diff --git a/drivers/crypto/cavium/nitrox/nitrox_mbx.h b/drivers/crypto/cavium/nitrox/nitrox_mbx.h
+index 5008399775a9..7c93d0282174 100644
+--- a/drivers/crypto/cavium/nitrox/nitrox_mbx.h
++++ b/drivers/crypto/cavium/nitrox/nitrox_mbx.h
+@@ -1,4 +1,4 @@
+-// SPDX-License-Identifier: GPL-2.0
++/* SPDX-License-Identifier: GPL-2.0 */
+ #ifndef __NITROX_MBX_H
+ #define __NITROX_MBX_H
+ 
+-- 
+2.17.1
+
