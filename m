@@ -2,63 +2,130 @@ Return-Path: <SRS0=VkFO=UE=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31F14C46470
-	for <linux-crypto@archiver.kernel.org>; Wed,  5 Jun 2019 12:20:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E6E7C28D18
+	for <linux-crypto@archiver.kernel.org>; Wed,  5 Jun 2019 12:32:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 10C03206BA
-	for <linux-crypto@archiver.kernel.org>; Wed,  5 Jun 2019 12:20:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 11F3B206BA
+	for <linux-crypto@archiver.kernel.org>; Wed,  5 Jun 2019 12:32:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727559AbfFEMUg (ORCPT
+        id S1727589AbfFEMcG (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 5 Jun 2019 08:20:36 -0400
-Received: from foss.arm.com ([217.140.101.70]:58906 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727553AbfFEMUf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 5 Jun 2019 08:20:35 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.72.51.249])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8788E80D;
-        Wed,  5 Jun 2019 05:20:35 -0700 (PDT)
-Received: from fuggles.cambridge.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.72.51.249])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 732363F246;
-        Wed,  5 Jun 2019 05:20:33 -0700 (PDT)
-Date:   Wed, 5 Jun 2019 13:20:31 +0100
-From:   Will Deacon <will.deacon@arm.com>
-To:     Ali Saidi <alisaidi@amazon.com>
-Cc:     linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-crypto@vger.kernel.org,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Ron Rindjunsky <ronrindj@amazon.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        David Woodhouse <dwmw@amazon.co.uk>
-Subject: Re: [PATCH 0/3] Add support for Graviton TRNG
-Message-ID: <20190605122031.GK15030@fuggles.cambridge.arm.com>
-References: <20190604203100.15050-1-alisaidi@amazon.com>
+        Wed, 5 Jun 2019 08:32:06 -0400
+Received: from mx2.suse.de ([195.135.220.15]:41920 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727461AbfFEMcF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 5 Jun 2019 08:32:05 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 8D62CAE8B;
+        Wed,  5 Jun 2019 12:32:03 +0000 (UTC)
+Received: by ds.suse.cz (Postfix, from userid 10065)
+        id 1D58EDA843; Wed,  5 Jun 2019 14:32:54 +0200 (CEST)
+Date:   Wed, 5 Jun 2019 14:32:53 +0200
+From:   David Sterba <dsterba@suse.cz>
+To:     Andrew Morton <akpm@linux-foundation.org>,
+        Maninder Singh <maninder1.s@samsung.com>,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        keescook@chromium.org, gustavo@embeddedor.com, joe@perches.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        a.sahrawat@samsung.com, pankaj.m@samsung.com, v.narang@samsung.com,
+        Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org,
+        terrelln@fb.com
+Subject: Re: [PATCH 1/4] zstd: pass pointer rathen than structure to functions
+Message-ID: <20190605123253.GZ15290@suse.cz>
+Reply-To: dsterba@suse.cz
+Mail-Followup-To: dsterba@suse.cz,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Maninder Singh <maninder1.s@samsung.com>,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        keescook@chromium.org, gustavo@embeddedor.com, joe@perches.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        a.sahrawat@samsung.com, pankaj.m@samsung.com, v.narang@samsung.com,
+        Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org,
+        terrelln@fb.com
+References: <1559552526-4317-1-git-send-email-maninder1.s@samsung.com>
+ <CGME20190603090232epcas5p1630d0584e8a1aa9495edc819605664fc@epcas5p1.samsung.com>
+ <1559552526-4317-2-git-send-email-maninder1.s@samsung.com>
+ <20190604154326.8868a10f896c148a0ce804d1@linux-foundation.org>
+ <20190605115703.GY15290@twin.jikos.cz>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190604203100.15050-1-alisaidi@amazon.com>
-User-Agent: Mutt/1.11.1+86 (6f28e57d73f2) ()
+In-Reply-To: <20190605115703.GY15290@twin.jikos.cz>
+User-Agent: Mutt/1.5.23.1 (2014-03-12)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jun 04, 2019 at 08:30:57PM +0000, Ali Saidi wrote:
-> AWS Graviton based systems provide an Arm SMC call in the vendor defined
-> hypervisor region to read random numbers from a HW TRNG and return them to the
-> guest. 
+On Wed, Jun 05, 2019 at 01:57:03PM +0200, David Sterba wrote:
+> On Tue, Jun 04, 2019 at 03:43:26PM -0700, Andrew Morton wrote:
+> > On Mon,  3 Jun 2019 14:32:03 +0530 Maninder Singh <maninder1.s@samsung.com> wrote:
+> > 
+> > > currently params structure is passed in all functions, which increases
+> > > stack usage in all the function and lead to stack overflow on target like
+> > > ARM with kernel stack size of 8 KB so better to pass pointer.
+> > > 
+> > > Checked for ARM:
+> > > 
+> > >                                 Original               Patched
+> > > Call FLow Size:                  1264                   1040
+> > > ....
+> > > (HUF_sort)                      -> 296
+> > > (HUF_buildCTable_wksp)          -> 144
+> > > (HUF_compress4X_repeat)         -> 88
+> > > (ZSTD_compressBlock_internal)   -> 200
+> > > (ZSTD_compressContinue_internal)-> 136                  -> 88
+> > > (ZSTD_compressCCtx)             -> 192                  -> 64
+> > > (zstd_compress)                 -> 144                  -> 96
+> > > (crypto_compress)               -> 32
+> > > (zcomp_compress)                -> 32
+> > > ....
+> > > 
+> > > Signed-off-by: Maninder Singh <maninder1.s@samsung.com>
+> > > Signed-off-by: Vaneet Narang <v.narang@samsung.com>
+> > > 
+> > 
+> > You missed btrfs.  This needs review, please - particularly the
+> > kernel-wide static ZSTD_parameters in zstd_get_btrfs_parameters().
 > 
-> We've observed slower guest boot and especially reboot times due to lack of
-> entropy and providing access to a TRNG is meant to address this. 
+> > 
+> > The base patch is here:
+> > 
+> > http://lkml.kernel.org/r/1559552526-4317-2-git-send-email-maninder1.s@samsung.com  
+> > 
+> > --- a/fs/btrfs/zstd.c~zstd-pass-pointer-rathen-than-structure-to-functions-fix
+> > +++ a/fs/btrfs/zstd.c
+> > @@ -27,15 +27,17 @@
+> >  /* 307s to avoid pathologically clashing with transaction commit */
+> >  #define ZSTD_BTRFS_RECLAIM_JIFFIES (307 * HZ)
+> >  
+> > -static ZSTD_parameters zstd_get_btrfs_parameters(unsigned int level,
+> > +static ZSTD_parameters *zstd_get_btrfs_parameters(unsigned int level,
+> >  						 size_t src_len)
+> >  {
+> > -	ZSTD_parameters params = ZSTD_getParams(level, src_len, 0);
+> > +	static ZSTD_parameters params;
+> 
+> > +
+> > +	params = ZSTD_getParams(level, src_len, 0);
+> 
+> No thats' broken, the params can't be static as it depends on level and
+> src_len. What happens if there are several requests in parallel with
+> eg. different levels?
+> 
+> Would be really great if the mailinglist is CCed when the code is
+> changed in a non-trivial way.
 
-Curious, but why this over something like virtio-rng?
+So this does not compile fs/btrfs/zstd.o which Andrew probably found
+too, otherwise btrfs is the only in-tree user of the function outside of
+lib/ and crypto/.
 
-Will
+I think that Nick Terrell should have been CCed too, as he ported zstd
+to linux.
