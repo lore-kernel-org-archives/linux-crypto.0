@@ -4,62 +4,62 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_NEOMUTT autolearn=unavailable autolearn_force=no version=3.4.0
+	USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11A7EC28D1B
-	for <linux-crypto@archiver.kernel.org>; Thu,  6 Jun 2019 06:52:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63752C28D1B
+	for <linux-crypto@archiver.kernel.org>; Thu,  6 Jun 2019 06:52:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E823020872
-	for <linux-crypto@archiver.kernel.org>; Thu,  6 Jun 2019 06:52:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 450342083D
+	for <linux-crypto@archiver.kernel.org>; Thu,  6 Jun 2019 06:52:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726633AbfFFGwP (ORCPT
+        id S1726637AbfFFGwU (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 6 Jun 2019 02:52:15 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:38788 "EHLO deadmen.hmeau.com"
+        Thu, 6 Jun 2019 02:52:20 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:38804 "EHLO deadmen.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725267AbfFFGwP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 6 Jun 2019 02:52:15 -0400
+        id S1725267AbfFFGwU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 6 Jun 2019 02:52:20 -0400
 Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
         by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1hYmFy-0006uS-1E; Thu, 06 Jun 2019 14:52:14 +0800
+        id 1hYmG3-0006v0-6O; Thu, 06 Jun 2019 14:52:19 +0800
 Received: from herbert by gondobar with local (Exim 4.89)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1hYmFx-0006iu-Cw; Thu, 06 Jun 2019 14:52:13 +0800
-Date:   Thu, 6 Jun 2019 14:52:13 +0800
+        id 1hYmG3-0006j8-2N; Thu, 06 Jun 2019 14:52:19 +0800
+Date:   Thu, 6 Jun 2019 14:52:19 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
 To:     Elena Petrova <lenaptr@google.com>
 Cc:     linux-crypto@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH] crypto: arm64/sha1-ce - correct digest for empty data in
+Subject: Re: [PATCH] crypto: arm64/sha2-ce - correct digest for empty data in
  finup
-Message-ID: <20190606065213.t2hd5jbk36i77n4i@gondor.apana.org.au>
-References: <20190528124152.191773-1-lenaptr@google.com>
+Message-ID: <20190606065219.cgwxy3rcnzzux3zc@gondor.apana.org.au>
+References: <20190528143506.212198-1-lenaptr@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190528124152.191773-1-lenaptr@google.com>
+In-Reply-To: <20190528143506.212198-1-lenaptr@google.com>
 User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, May 28, 2019 at 01:41:52PM +0100, Elena Petrova wrote:
-> The sha1-ce finup implementation for ARM64 produces wrong digest
-> for empty input (len=0). Expected: da39a3ee..., result: 67452301...
-> (initial value of SHA internal state). The error is in sha1_ce_finup:
+On Tue, May 28, 2019 at 03:35:06PM +0100, Elena Petrova wrote:
+> The sha256-ce finup implementation for ARM64 produces wrong digest
+> for empty input (len=0). Expected: the actual digest, result: initial
+> value of SHA internal state. The error is in sha256_ce_finup:
 > for empty data `finalize` will be 1, so the code is relying on
-> sha1_ce_transform to make the final round. However, in
-> sha1_base_do_update, the block function will not be called when
+> sha2_ce_transform to make the final round. However, in
+> sha256_base_do_update, the block function will not be called when
 > len == 0.
 > 
 > Fix it by setting finalize to 0 if data is empty.
 > 
-> Fixes: 07eb54d306f4 ("crypto: arm64/sha1-ce - move SHA-1 ARMv8 implementation to base layer")
+> Fixes: 03802f6a80b3a ("crypto: arm64/sha2-ce - move SHA-224/256 ARMv8 implementation to base layer")
 > Cc: stable@vger.kernel.org
 > Signed-off-by: Elena Petrova <lenaptr@google.com>
 > Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 > ---
->  arch/arm64/crypto/sha1-ce-glue.c | 2 +-
+>  arch/arm64/crypto/sha2-ce-glue.c | 2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Patch applied.  Thanks.
