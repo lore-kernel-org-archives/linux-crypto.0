@@ -1,105 +1,79 @@
-Return-Path: <SRS0=VkFO=UE=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=NolZ=UF=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	T_DKIMWL_WL_HIGH,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_NEOMUTT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D74A9C28D18
-	for <linux-crypto@archiver.kernel.org>; Wed,  5 Jun 2019 21:32:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF2A9C28D1A
+	for <linux-crypto@archiver.kernel.org>; Thu,  6 Jun 2019 06:03:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AF9E22083E
-	for <linux-crypto@archiver.kernel.org>; Wed,  5 Jun 2019 21:32:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1559770343;
-	bh=fWMGopypMZ/7C4dAWZ6+0bN8QYRsGAbzaarmqrg6gxM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:List-ID:From;
-	b=Rmb+hEsVwg2aIzLvfJ756eT6XHYSz/vDjYoA3HTDCcrChX6l8rgct0bYqbta4+u0n
-	 ZGa0q7QhB3KfuWgIftmIxgt+KDJAv6YQJtnKETmqTKLjVjz/UD+k7Xe58E9bVgYjr4
-	 e4NImj60TP/5rDyqvteONOGtSo5Yt3jlEkf2V534=
+	by mail.kernel.org (Postfix) with ESMTP id 981DE2070B
+	for <linux-crypto@archiver.kernel.org>; Thu,  6 Jun 2019 06:03:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726510AbfFEVcW (ORCPT
+        id S1725769AbfFFGD3 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 5 Jun 2019 17:32:22 -0400
-Received: from mail.kernel.org ([198.145.29.99]:46806 "EHLO mail.kernel.org"
+        Thu, 6 Jun 2019 02:03:29 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:35226 "EHLO deadmen.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726502AbfFEVcV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 5 Jun 2019 17:32:21 -0400
-Received: from akpm3.svl.corp.google.com (unknown [104.133.8.65])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 68B9320872;
-        Wed,  5 Jun 2019 21:32:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1559770341;
-        bh=fWMGopypMZ/7C4dAWZ6+0bN8QYRsGAbzaarmqrg6gxM=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=tbj8Y7g23X5waBqWUHzub6be7yKGuSeBV4+Bs+ago5RmjFq2q6I5ahJCu1mPAbJFM
-         Ar16J1Rb7r4Aft+hncFL0s/xR5cO1l1G+6faP47VBAZlbz0SGJrdNG7NYX3AdnO8iq
-         gNRLxeirFnRVtKmsWgMUvCBS9NeZJ53GJ2o9u2Rc=
-Date:   Wed, 5 Jun 2019 14:32:19 -0700
-From:   Andrew Morton <akpm@linux-foundation.org>
-To:     dsterba@suse.cz
-Cc:     Maninder Singh <maninder1.s@samsung.com>,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        keescook@chromium.org, gustavo@embeddedor.com, joe@perches.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        a.sahrawat@samsung.com, pankaj.m@samsung.com, v.narang@samsung.com,
-        Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>, linux-btrfs@vger.kernel.org,
-        terrelln@fb.com
-Subject: Re: [PATCH 1/4] zstd: pass pointer rathen than structure to
- functions
-Message-Id: <20190605143219.248ca514546f69946aa2e07e@linux-foundation.org>
-In-Reply-To: <20190605123253.GZ15290@suse.cz>
-References: <1559552526-4317-1-git-send-email-maninder1.s@samsung.com>
-        <CGME20190603090232epcas5p1630d0584e8a1aa9495edc819605664fc@epcas5p1.samsung.com>
-        <1559552526-4317-2-git-send-email-maninder1.s@samsung.com>
-        <20190604154326.8868a10f896c148a0ce804d1@linux-foundation.org>
-        <20190605115703.GY15290@twin.jikos.cz>
-        <20190605123253.GZ15290@suse.cz>
-X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.31; x86_64-pc-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        id S1725766AbfFFGD3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 6 Jun 2019 02:03:29 -0400
+Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
+        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
+        id 1hYlUk-0006Af-LR; Thu, 06 Jun 2019 14:03:26 +0800
+Received: from herbert by gondobar with local (Exim 4.89)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1hYlUi-0003gA-7I; Thu, 06 Jun 2019 14:03:24 +0800
+Date:   Thu, 6 Jun 2019 14:03:24 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [GIT] Crypto Fixes for 5.2
+Message-ID: <20190606060324.du5zbk3ju5djkhfe@gondor.apana.org.au>
+References: <20180428080517.haxgpvqrwgotakyo@gondor.apana.org.au>
+ <20180622145403.6ltjip7che227fuo@gondor.apana.org.au>
+ <20180829033353.agnzxra3jk2r2mzg@gondor.apana.org.au>
+ <20181116063146.e7a3mep3ghnfltxe@gondor.apana.org.au>
+ <20181207061409.xflg423nknleuddw@gondor.apana.org.au>
+ <20190118104006.ye5amhxkgd4xrbmc@gondor.apana.org.au>
+ <20190201054204.ehl7u7aaqmkdh5b6@gondor.apana.org.au>
+ <20190215024738.fynl64d5u5htcy2l@gondor.apana.org.au>
+ <20190312045818.bgpiuxogmaxyscdv@gondor.apana.org.au>
+ <20190515060552.ecfwhazt2fnthepg@gondor.apana.org.au>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190515060552.ecfwhazt2fnthepg@gondor.apana.org.au>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 5 Jun 2019 14:32:53 +0200 David Sterba <dsterba@suse.cz> wrote:
+Hi Linus: 
 
-> > >  
-> > > -static ZSTD_parameters zstd_get_btrfs_parameters(unsigned int level,
-> > > +static ZSTD_parameters *zstd_get_btrfs_parameters(unsigned int level,
-> > >  						 size_t src_len)
-> > >  {
-> > > -	ZSTD_parameters params = ZSTD_getParams(level, src_len, 0);
-> > > +	static ZSTD_parameters params;
-> > 
-> > > +
-> > > +	params = ZSTD_getParams(level, src_len, 0);
-> > 
-> > No thats' broken, the params can't be static as it depends on level and
-> > src_len. What happens if there are several requests in parallel with
-> > eg. different levels?
+This push fixes a regression that breaks the jitterentropy RNG and
+a potential memory leak in hmac.
 
-I wondered.  I'll drop the patch series as some more serious thinking
-is needed.
 
-> > Would be really great if the mailinglist is CCed when the code is
-> > changed in a non-trivial way.
+Please pull from
 
-Well we didn't actually change btrfs until I discovered that Maninder
-had missed it.
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
 
-> So this does not compile fs/btrfs/zstd.o which Andrew probably found
-> too, otherwise btrfs is the only in-tree user of the function outside of
-> lib/ and crypto/.
 
-Worked for me - I might have sent the wrong version.
+Eric Biggers (2):
+      crypto: jitterentropy - change back to module_init()
+      crypto: hmac - fix memory leak in hmac_init_tfm()
 
-> I think that Nick Terrell should have been CCed too, as he ported zstd
-> to linux.
+ crypto/hmac.c                | 4 +++-
+ crypto/jitterentropy-kcapi.c | 2 +-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
