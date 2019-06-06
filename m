@@ -2,154 +2,108 @@ Return-Path: <SRS0=NolZ=UF=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,T_DKIMWL_WL_HIGH autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9F37C04AB5
-	for <linux-crypto@archiver.kernel.org>; Thu,  6 Jun 2019 14:22:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8A70C04AB5
+	for <linux-crypto@archiver.kernel.org>; Thu,  6 Jun 2019 15:06:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8628420673
-	for <linux-crypto@archiver.kernel.org>; Thu,  6 Jun 2019 14:22:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8E41C2083D
+	for <linux-crypto@archiver.kernel.org>; Thu,  6 Jun 2019 15:06:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="TH/8VoQz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lLrdVkmK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729062AbfFFOWh (ORCPT
+        id S1729162AbfFFPGZ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 6 Jun 2019 10:22:37 -0400
-Received: from mailout3.samsung.com ([203.254.224.33]:64231 "EHLO
-        mailout3.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729058AbfFFOWg (ORCPT
+        Thu, 6 Jun 2019 11:06:25 -0400
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:34617 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727309AbfFFPGY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 6 Jun 2019 10:22:36 -0400
-Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
-        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20190606142233epoutp0387fac31e5af5914d4c41f0e4607975da~lofzgW4kK1877218772epoutp03I
-        for <linux-crypto@vger.kernel.org>; Thu,  6 Jun 2019 14:22:33 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20190606142233epoutp0387fac31e5af5914d4c41f0e4607975da~lofzgW4kK1877218772epoutp03I
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1559830953;
-        bh=o26+u579wDsd8MOvWNPCpXlg+PYIMQU4Ow6RM7p975c=;
-        h=Subject:Reply-To:From:To:CC:In-Reply-To:Date:References:From;
-        b=TH/8VoQzYaXX+wk7+1mrGZcUkwtXLZDLPRniSYALcnf/ORVrYGuOPQT3rquBGT1kA
-         9sqCI0uFymXryZu069ag4J3ZszXLIROTdCsPhKY9feROAz/4SJntZHLA9uYXGVj5lV
-         7R0X+hVu3bfcuetkVR5S4KoGCIjat98PC3NyTqYk=
-Received: from epsmges5p1new.samsung.com (unknown [182.195.40.192]) by
-        epcas5p3.samsung.com (KnoxPortal) with ESMTP id
-        20190606142230epcas5p393c19e211d4324b8c8c8291a2b3b2b13~lofxDsG6k2622226222epcas5p3m;
-        Thu,  6 Jun 2019 14:22:30 +0000 (GMT)
-X-AuditID: b6c32a49-5b7ff70000000fe7-f4-5cf921a6715b
-Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
-        epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        DB.03.04071.6A129FC5; Thu,  6 Jun 2019 23:22:30 +0900 (KST)
-Mime-Version: 1.0
-Subject: RE:(2) [PATCH 1/4] zstd: pass pointer rathen than structure to
- functions
-Reply-To: v.narang@samsung.com
-From:   Vaneet Narang <v.narang@samsung.com>
-To:     Andrew Morton <akpm@linux-foundation.org>,
-        "dsterba@suse.cz" <dsterba@suse.cz>
-CC:     Maninder Singh <maninder1.s@samsung.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "keescook@chromium.org" <keescook@chromium.org>,
-        "gustavo@embeddedor.com" <gustavo@embeddedor.com>,
-        "joe@perches.com" <joe@perches.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        AMIT SAHRAWAT <a.sahrawat@samsung.com>,
-        PANKAJ MISHRA <pankaj.m@samsung.com>,
-        Vaneet Narang <v.narang@samsung.com>, Chris Mason <clm@fb.com>,
-        Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>,
-        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
-        "terrelln@fb.com" <terrelln@fb.com>
-X-Priority: 3
-X-Content-Kind-Code: NORMAL
-In-Reply-To: <20190605143219.248ca514546f69946aa2e07e@linux-foundation.org>
-X-Drm-Type: N,general
-X-Msg-Generator: Mail
-X-Msg-Type: PERSONAL
-X-Reply-Demand: N
-Message-ID: <20190606141019epcms5p1e9c394d2c2ef37506c8004fe48edd29f@epcms5p1>
-Date:   Thu, 06 Jun 2019 19:40:19 +0530
-X-CMS-MailID: 20190606141019epcms5p1e9c394d2c2ef37506c8004fe48edd29f
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrBJsWRmVeSWpSXmKPExsWy7bCmuu4yxZ8xBovXaFlc3J1qMWf9GjaL
-        Sf0z2C3mnG9hsbjwo5HJYvHv7ywWW/eoWnS/krGYff8xi8Wfh4YWZ7pzLS49XsFucf/eTyaL
-        y7vmsFkcnt/GYnHvzVYmi1f/rrFZHDo5l9FByGN2w0UWjy0rbzJ5rDuo6jGx+R27x7YDqh4n
-        Zvxm8fiy6hqzR9+WVYwe67dcZfE4s+AIu8eEzRtZPT5vkgvgicqxyUhNTEktUkjNS85PycxL
-        t1XyDo53jjc1MzDUNbS0MFdSyEvMTbVVcvEJ0HXLzAH6TEmhLDGnFCgUkFhcrKRvZ1OUX1qS
-        qpCRX1xiq5RakJJTYGhUoFecmFtcmpeul5yfa2VoYGBkClSZkJPx8vl+9oLbEhWTV7k3MDZJ
-        dDFyckgImEisWt3B2sXIxSEksJtR4vqZZqYuRg4OXgFBib87hEFMYYFgifl/MkDKhQTkJI7f
-        2M0IYgsL6EicmLeGEaSETUBL4mNLOEhYRCBE4s7HCywgE5kFnrFKHDi/hRViFa/EjPanLBC2
-        tMT25VvBejkFvCUWfK+GCItK3Fz9lh3Gfn9sPiOELSLReu8sM4QtKPHg526wVgkBGYldb8VB
-        VkkIdDNKTDi3nBXCmcEocar3DVSDucT5k/PBbF4BX4n504+C2SwCqhJLGz6xQgxykbj4lAck
-        zCygLbFs4WtmkDCzgKbE+l36EFNkJaaeWscEUcIn0fv7CRPMVzvmwdhKEucO7mSDsCUknnTO
-        hLrAQ+LR2jZoIE9nlpi64hDbBEaFWYhwnoVk8yyEzQsYmVcxSqYWFOempxabFhjmpZYjR+4m
-        RnAq1/LcwTjrnM8hRgEORiUe3hlMP2OEWBPLiitzDzFKcDArifCWXfgRI8SbklhZlVqUH19U
-        mpNafIjRFBgEE5mlRJPzgXkmryTe0NTIzMzA0sDU2MLMUEmcdxLr1RghgfTEktTs1NSC1CKY
-        PiYOTqkGRvMjX2/oip50mrshhvkaw9VntaX19+dsefYnpOTEZ77Oom6RA7r/lV4ds3HJ57jK
-        oH60zfr8ZtXwrWXbbi08YmHxmoH3RJHJyk2q5xt7Ds4uXnxAc56URU2Ytb+oymax/YytIp7x
-        ImJfDY/Jc51dtHz9xPXZPn7fDptenbLz1Ow/e8tOMNlt2aTEUpyRaKjFXFScCACaZWMH+wMA
-        AA==
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20190603090232epcas5p1630d0584e8a1aa9495edc819605664fc
-References: <20190605143219.248ca514546f69946aa2e07e@linux-foundation.org>
-        <1559552526-4317-1-git-send-email-maninder1.s@samsung.com>
-        <1559552526-4317-2-git-send-email-maninder1.s@samsung.com>
-        <20190604154326.8868a10f896c148a0ce804d1@linux-foundation.org>
-        <20190605115703.GY15290@twin.jikos.cz> <20190605123253.GZ15290@suse.cz>
-        <CGME20190603090232epcas5p1630d0584e8a1aa9495edc819605664fc@epcms5p1>
+        Thu, 6 Jun 2019 11:06:24 -0400
+Received: by mail-pg1-f196.google.com with SMTP id h2so1533083pgg.1;
+        Thu, 06 Jun 2019 08:06:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:mime-version:content-disposition
+         :user-agent;
+        bh=Ps7YYNVhpbFuxWvfaSyiDLPbZDo03wQ8e8VV9mh4JZ0=;
+        b=lLrdVkmK1SlH0fVilflJe5AtBWAQjiMWYPS9DL+02DbBRLCW5pJ26Itws3btMdWbYw
+         fymaKr8KaITWDkjnGKaE9T5voVC18R3kYDKX/y0aOsiNxFojo2g/aMT9zXvLqYN0bXFZ
+         RJVXKOsEZEPBE4zNuV+MqLiP9jZfzHSZA8+7pZV/bbDNwpSAKYHW+fNLCHg2Bca92Qn5
+         QEtPf0TJyN41F87LV7HIfpjNEtwbEPUC/Q4a9pPCQXJt2ADqPZjBN+8uZMrQIZHYIosg
+         yAbKMmFw+33yww3ZXiUVNyDvZVbVz4oWsrS/fiW8Dui6GMXrgcSAOt6VV3xDFzbzS9IS
+         //uw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition:user-agent;
+        bh=Ps7YYNVhpbFuxWvfaSyiDLPbZDo03wQ8e8VV9mh4JZ0=;
+        b=QkhMagzBrtrxl2qai+8aP0BkJVmM44PEK0vbcv2pQDdzglilAL0oTTN0AxZk2BnApV
+         0/Xies2dD/pfts5wpLCFCS1VSuPtFivnh8O3gokLeyRD+UIRXKv57i8jm1qkIv6FzOJF
+         bHdjYaPJ4V8hSggD/vy3rjHrLZmpBaW+J8VCHyhhfCOsoOEWUFh4Y1PZ0c4/vEWhaOkX
+         jgISqAQO77vs0x7mtyE2o0qnLc7nK9QBOewUxt/PA1KZvolcDtxb6hbbZG1ZQlOZpOsU
+         RlrEflsrQBvod2ugfOjcsr1CbiDWYSM6RFWrZDVb2kJy1NTAzc+6qJF+mZx36Dbe848o
+         IZ1Q==
+X-Gm-Message-State: APjAAAUPQoihbSgcjz1Fc9SqVfNWKt5Z9JVKTMEeE15t+L4NgIs5P8PD
+        u5ovOWGJFnqIJDHvMSHJzjo=
+X-Google-Smtp-Source: APXvYqyyeUJzL2Hlqkk588lgJJeRAMqRBTyzo1zmd53TROl0MOXwsD7bVBiCPxYJcH7J0u8DjQmOqA==
+X-Received: by 2002:a63:c20c:: with SMTP id b12mr3620010pgd.3.1559833583482;
+        Thu, 06 Jun 2019 08:06:23 -0700 (PDT)
+Received: from nishad (p3261240-ipngn21201hodogaya.kanagawa.ocn.ne.jp. [153.202.122.240])
+        by smtp.gmail.com with ESMTPSA id y10sm2508493pfm.68.2019.06.06.08.06.20
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Thu, 06 Jun 2019 08:06:22 -0700 (PDT)
+Date:   Thu, 6 Jun 2019 20:36:17 +0530
+From:   Nishad Kamdar <nishadkamdar@gmail.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Joe Perches <joe@perches.com>,
+        Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= 
+        <u.kleine-koenig@pengutronix.de>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: hisilicon - Use the correct style for SPDX License
+ Identifier
+Message-ID: <20190606150612.GA4002@nishad>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Andrew / David,
+This patch corrects the SPDX License Identifier style
+in header file related to Crypto Drivers for Hisilicon
+SEC Engine in Hip06 and Hip07.
+For C header files Documentation/process/license-rules.rst
+mandates C-like comments (opposed to C source files where
+C++ style should be used)
 
-=C2=A0=0D=0A>>=C2=A0>=C2=A0>=C2=A0-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0ZSTD_parameters=C2=A0params=C2=A0=3D=C2=A0ZSTD_getParams(level,=C2=
-=A0src_len,=C2=A00);=0D=0A>>=C2=A0>=C2=A0>=C2=A0+=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0static=C2=A0ZSTD_parameters=C2=A0params;=0D=0A>>=C2=
-=A0>=C2=A0=0D=0A>>=C2=A0>=C2=A0>=C2=A0+=0D=0A>>=C2=A0>=C2=A0>=C2=A0+=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0params=C2=A0=3D=C2=A0ZSTD_getPara=
-ms(level,=C2=A0src_len,=C2=A00);=0D=0A>>=C2=A0>=C2=A0=0D=0A>>=C2=A0>=C2=A0N=
-o=C2=A0thats'=C2=A0broken,=C2=A0the=C2=A0params=C2=A0can't=C2=A0be=C2=A0sta=
-tic=C2=A0as=C2=A0it=C2=A0depends=C2=A0on=C2=A0level=C2=A0and=0D=0A>>=C2=A0>=
-=C2=A0src_len.=C2=A0What=C2=A0happens=C2=A0if=C2=A0there=C2=A0are=C2=A0seve=
-ral=C2=A0requests=C2=A0in=C2=A0parallel=C2=A0with=0D=0A>>=C2=A0>=C2=A0eg.=
-=C2=A0different=C2=A0levels?=0D=0A=0D=0AThere=20is=20no=20need=20to=20make=
-=20static=20for=20btrfs.=20We=20can=20keep=20it=20as=20a=20stack=20variable=
-.=0D=0AThis=20patch=20set=20=20focussed=20on=20reducing=20stack=20usage=20o=
-f=20zstd=20compression=20when=20triggered=0D=0Athrough=20zram.=20ZRAM=20int=
-ernally=20uses=20crypto=20and=20currently=20crpto=20uses=20fixed=20level=20=
-and=20also=0D=0Anot=20dependent=20upon=20source=20length.=0D=0A=0D=0Acrypto=
-/zstd.c:=20=20=0D=0Astatic=20ZSTD_parameters=20zstd_params(void)=0D=0A=7B=
-=0D=0A=20=20=20=20=20=20=20=20return=20ZSTD_getParams(ZSTD_DEF_LEVEL,=200,=
-=200);=0D=0A=7D=0D=0A=0D=0A=0D=0AActually=20high=20stack=20usage=20problem=
-=20with=20zstd=20compression=20patch=20gets=20exploited=20more=20incase=20o=
-f=20=0D=0Ashrink=20path=20which=20gets=20triggered=20randomly=20from=20any=
-=20call=20flow=20in=20case=20of=20low=20memory=20and=20adds=20overhead=0D=
-=0Aof=20more=20than=202000=20byte=20of=20stack=20and=20results=20in=20stack=
-=20overflow.=0D=0A=0D=0AStack=20usage=20of=20alloc_page=20in=20case=20of=20=
-low=20memory=0D=0A=0D=0A=20=20=2072=20=20=20HUF_compressWeights_wksp+0x140/=
-0x200=20=20=0D=0A=20=20=2064=20=20=20HUF_writeCTable_wksp+0xdc/0x1c8=20=20=
-=20=20=20=20=0D=0A=20=20=2088=20=20=20HUF_compress4X_repeat+0x214/0x450=20=
-=20=20=20=20=0D=0A=20=20208=20=20=20ZSTD_compressBlock_internal+0x224/0x137=
-c=0D=0A=20=20136=20=20=20ZSTD_compressContinue_internal+0x210/0x3b0=0D=0A=
-=20=20192=20=20=20ZSTD_compressCCtx+0x6c/0x144=0D=0A=20=20144=20=20=20zstd_=
-compress+0x40/0x58=0D=0A=20=20=2032=20=20=20crypto_compress+0x2c/0x34=0D=0A=
-=20=20=2032=20=20=20zcomp_compress+0x3c/0x44=0D=0A=20=20=2080=20=20=20zram_=
-bvec_rw+0x2f8/0xa7c=0D=0A=20=20=2064=20=20=20zram_rw_page+0x104/0x170=0D=0A=
-=20=20=2048=20=20=20bdev_write_page+0x80/0xb4=0D=0A=20=20112=20=20=20__swap=
-_writepage+0x160/0x29c=0D=0A=20=20=2024=20=20=20swap_writepage+0x3c/0x58=0D=
-=0A=20=20160=20=20=20shrink_page_list+0x788/0xae0=0D=0A=20=20128=20=20=20sh=
-rink_inactive_list+0x210/0x4a8=0D=0A=20=20184=20=20=20shrink_zone+0x53c/0x7=
-c0=0D=0A=20=20160=20=20=20try_to_free_pages+0x2fc/0x7cc=0D=0A=20=20=2080=20=
-=20=20__alloc_pages_nodemask+0x534/0x91c=0D=0A=0D=0AThanks=20&=20Regards,=
-=0D=0AVaneet=20Narang=C2=A0=0D=0A=C2=A0
+Changes made by using a script provided by Joe Perches here:
+https://lkml.org/lkml/2019/2/7/46
+
+Suggested-by: Joe Perches <joe@perches.com>
+Signed-off-by: Nishad Kamdar <nishadkamdar@gmail.com>
+---
+ drivers/crypto/hisilicon/sec/sec_drv.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/hisilicon/sec/sec_drv.h b/drivers/crypto/hisilicon/sec/sec_drv.h
+index 2d2f186674ba..4d9063a8b10b 100644
+--- a/drivers/crypto/hisilicon/sec/sec_drv.h
++++ b/drivers/crypto/hisilicon/sec/sec_drv.h
+@@ -1,4 +1,4 @@
+-// SPDX-License-Identifier: GPL-2.0
++/* SPDX-License-Identifier: GPL-2.0 */
+ /* Copyright (c) 2016-2017 Hisilicon Limited. */
+ 
+ #ifndef _SEC_DRV_H_
+-- 
+2.17.1
+
