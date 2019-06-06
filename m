@@ -8,60 +8,60 @@ X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 577E4C04AB5
-	for <linux-crypto@archiver.kernel.org>; Thu,  6 Jun 2019 17:21:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A2FDC04AB5
+	for <linux-crypto@archiver.kernel.org>; Thu,  6 Jun 2019 17:28:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2CF4520872
-	for <linux-crypto@archiver.kernel.org>; Thu,  6 Jun 2019 17:21:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 506F82083D
+	for <linux-crypto@archiver.kernel.org>; Thu,  6 Jun 2019 17:28:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Uv+fwX8y"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MDpTTUSM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727189AbfFFRVU (ORCPT
+        id S1727307AbfFFR2v (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 6 Jun 2019 13:21:20 -0400
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:42391 "EHLO
-        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730018AbfFFRVU (ORCPT
+        Thu, 6 Jun 2019 13:28:51 -0400
+Received: from mail-qt1-f194.google.com ([209.85.160.194]:35097 "EHLO
+        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726762AbfFFR2v (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 6 Jun 2019 13:21:20 -0400
-Received: by mail-qt1-f195.google.com with SMTP id s15so3553167qtk.9
-        for <linux-crypto@vger.kernel.org>; Thu, 06 Jun 2019 10:21:20 -0700 (PDT)
+        Thu, 6 Jun 2019 13:28:51 -0400
+Received: by mail-qt1-f194.google.com with SMTP id d23so3634651qto.2
+        for <linux-crypto@vger.kernel.org>; Thu, 06 Jun 2019 10:28:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id;
-        bh=SPyiw97pWei/KHbnhDdWTM690wY/Ap74V9d6g8sFxqA=;
-        b=Uv+fwX8yhulNH07QRWC9hu6BYogyWC1uPxV0ecV3G6h4bZi2YUpmXUDfE9w0lSyUrL
-         EXXZgThJWuo8CDM6pUVWcKmIWGzqIbL7sGz2bW9KzY6HywPPgFnPaE/oJpMauyLmafko
-         viXAojBUENyCugxc+T94GatLP3Vow8Bm48fuex0ayrtlJ+6s9jfBv2JsREFzMitBEIof
-         ylZ9lwt3s/kCHNTL2C3AXQZXPnPBCZlZaPkfLEE7TfNzg4/0nM8WQTah1LFgomDH2lnl
-         3ytZcO9/M81LATmE8RFU07X1Xxuv60IiOJIb8XOxsxkI4v7V09Ll43pf2eQIZMp4+Jz9
-         KZHg==
+        bh=Vp+M5brGDuC7e6hY9XVD72ejVZQVSg2/8aWViX7BaB0=;
+        b=MDpTTUSMMjtu4CbkZAGgdURFobb9ocEUv+tD5QyIZ/UPICVsEV5CtD4TpN7ibBnGyG
+         07vJgNL5rDZJSrFeU+7JsMKCM4NDRp1uL9pnK7TNB1pQauRUk899CzZjLMZt0q6hXDwe
+         wV7+8imerfLngPXfZ1koxvEgAZVfAzBNwV18ORQ9Ah7SR+PY4lHE944487Uzz+ymAzzz
+         dMiWa5tL8fubC4li7m4h633+7bPnjjwsjoJMktDuMLlJuxPZrYONGqwSZJqX3+wr2zCs
+         bJPd6LUHtKJ2cG8Hizi+zUxfOSUmKzYvOtKBom9myQ3/Pj8yuJrNBwXVBulx3CmyPGCA
+         L10g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=SPyiw97pWei/KHbnhDdWTM690wY/Ap74V9d6g8sFxqA=;
-        b=o4w8ZNNYZwLF9VtYf12JhWJl1GeOLpfJjLweQuvIPS9goLPwWnTnc0fnhnME/MhmTS
-         /0Hu4g+3B7wJAcFPSExTbnD9DpAa0QY26nWqxhFLmYna7fpLoE/GpXDCZICZka5u9QuW
-         Rl3wH1d0RpplDrxX2ZA4HaAARhYM6+1vHC5AOMAUAOf6pHl5BlKFNKAEEkcvCHvn1Zzy
-         xmB7woJ3E0zKFzg9HySsW9fMZH8ONsVO7PRyeFgo1oAp93ra2dEBa0lLeGMv1bNj+Dl9
-         fFGBbnvOTFJFn2SZj4X4vRWbXR3bIB8H/HiLGsXAZU6lUc9NG6u4iJwm6eDl7DaFKhEK
-         vNzw==
-X-Gm-Message-State: APjAAAWfi5GPwj3EJmV9zzb8FeC7PtdgIubaGpRj1yQFJLIZvNTEOgFa
-        D4608TtsyhXRrm6OExafuII=
-X-Google-Smtp-Source: APXvYqyPaHkjuN5jWZ9BI1UWrj4Lab1307UNsWN1uirOByKQF3dJ0pJ3/nW9VQMcPrvrmpoA30rs3w==
-X-Received: by 2002:ac8:282b:: with SMTP id 40mr9966301qtq.49.1559841679542;
-        Thu, 06 Jun 2019 10:21:19 -0700 (PDT)
+        bh=Vp+M5brGDuC7e6hY9XVD72ejVZQVSg2/8aWViX7BaB0=;
+        b=fZQLWOosLrbqoBlBGMRc3arDUOFkGTjp58J4dGxsf3RKPmBtebQvQgCSF8XgS4nZ5M
+         hpzYoolGo9u7wc3UKXTLIj/xNb90/dLBsc4PpN8sNA/lgY3hHwBZyEHk07aYzi1RJOTz
+         t60KLkBc/i2SnS1l+2/H2azjmU73LVb6HAytWhyqcNvdznX2o+zGSnxhcXWZvxYLHMAu
+         UG6R7SSk47rkjZ3PcEuMMy+T15lcUMuaFcsgoYm6iW/Wc4/8U5mHGy2O6dO56o/cbcev
+         4Q20zgS6azIpA8erl/ipsN+LscsPWK50fU3UIR4BP+aa8zcOUJAWjMPyH72cwDQpkU1Y
+         xJGg==
+X-Gm-Message-State: APjAAAVholeYrrze4RaD5s1OgntG5eyMaP+PyRK9k3p31jiVRG6P6WHG
+        ZgqIKU35zT4hEh22boKI8kg=
+X-Google-Smtp-Source: APXvYqxmg43GsmCva/IPqBSQSJUrfDwb0imG2VBmS82/5c8edl7zeziNUjfNsJnzTbm/Fcl1HD1Vzg==
+X-Received: by 2002:a0c:8732:: with SMTP id 47mr19000934qvh.105.1559842130696;
+        Thu, 06 Jun 2019 10:28:50 -0700 (PDT)
 Received: from fabio-Latitude-E5450.am.freescale.net ([177.221.114.206])
-        by smtp.gmail.com with ESMTPSA id u125sm1204304qkd.5.2019.06.06.10.21.16
+        by smtp.gmail.com with ESMTPSA id m5sm1476926qke.25.2019.06.06.10.28.47
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 06 Jun 2019 10:21:18 -0700 (PDT)
+        Thu, 06 Jun 2019 10:28:50 -0700 (PDT)
 From:   Fabio Estevam <festevam@gmail.com>
 To:     herbert@gondor.apana.org.au
 Cc:     christophe.leroy@c-s.fr, linux-crypto@vger.kernel.org,
         horia.geanta@nxp.com, Fabio Estevam <festevam@gmail.com>
-Subject: [PATCH] crypto: talitos - Use devm_platform_ioremap_resource()
-Date:   Thu,  6 Jun 2019 14:21:12 -0300
-Message-Id: <20190606172112.15701-1-festevam@gmail.com>
+Subject: [PATCH v2] crypto: talitos - Use devm_platform_ioremap_resource()
+Date:   Thu,  6 Jun 2019 14:28:45 -0300
+Message-Id: <20190606172845.16864-1-festevam@gmail.com>
 X-Mailer: git-send-email 2.17.1
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
@@ -70,13 +70,21 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 Use devm_platform_ioremap_resource() to simplify the code a bit.
 
+While at it, remove unneeded error message in case of
+devm_platform_ioremap_resource() failure, as the core mm code
+will take care of it.
+
 Signed-off-by: Fabio Estevam <festevam@gmail.com>
 ---
- drivers/crypto/talitos.c | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
+Changes since v1:
+- Adjust the error check for devm_platform_ioremap_resource()
+- Remove error message on devm_platform_ioremap_resource() failure
+
+ drivers/crypto/talitos.c | 11 +++--------
+ 1 file changed, 3 insertions(+), 8 deletions(-)
 
 diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index 32a7e747dc5f..f2269a2f8ce6 100644
+index 32a7e747dc5f..688affec36c9 100644
 --- a/drivers/crypto/talitos.c
 +++ b/drivers/crypto/talitos.c
 @@ -3336,7 +3336,6 @@ static int talitos_probe(struct platform_device *ofdev)
@@ -87,7 +95,7 @@ index 32a7e747dc5f..f2269a2f8ce6 100644
  
  	priv = devm_kzalloc(dev, sizeof(struct talitos_private), GFP_KERNEL);
  	if (!priv)
-@@ -3350,10 +3349,7 @@ static int talitos_probe(struct platform_device *ofdev)
+@@ -3350,13 +3349,9 @@ static int talitos_probe(struct platform_device *ofdev)
  
  	spin_lock_init(&priv->reg_lock);
  
@@ -95,10 +103,15 @@ index 32a7e747dc5f..f2269a2f8ce6 100644
 -	if (!res)
 -		return -ENXIO;
 -	priv->reg = devm_ioremap(dev, res->start, resource_size(res));
+-	if (!priv->reg) {
+-		dev_err(dev, "failed to of_iomap\n");
+-		err = -ENOMEM;
 +	priv->reg = devm_platform_ioremap_resource(ofdev, 0);
- 	if (!priv->reg) {
- 		dev_err(dev, "failed to of_iomap\n");
- 		err = -ENOMEM;
++	if (IS_ERR(priv->reg)) {
++		err = PTR_ERR(priv->reg);
+ 		goto err_out;
+ 	}
+ 
 -- 
 2.17.1
 
