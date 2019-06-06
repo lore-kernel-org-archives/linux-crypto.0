@@ -2,113 +2,93 @@ Return-Path: <SRS0=NolZ=UF=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_NEOMUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8B78C04AB5
-	for <linux-crypto@archiver.kernel.org>; Thu,  6 Jun 2019 06:46:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C9E8C04AB5
+	for <linux-crypto@archiver.kernel.org>; Thu,  6 Jun 2019 06:50:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B38CC20673
-	for <linux-crypto@archiver.kernel.org>; Thu,  6 Jun 2019 06:46:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3932A20673
+	for <linux-crypto@archiver.kernel.org>; Thu,  6 Jun 2019 06:50:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725769AbfFFGqM (ORCPT
+        id S1725766AbfFFGu5 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 6 Jun 2019 02:46:12 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:38340 "EHLO deadmen.hmeau.com"
+        Thu, 6 Jun 2019 02:50:57 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:38686 "EHLO deadmen.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725267AbfFFGqL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 6 Jun 2019 02:46:11 -0400
+        id S1725267AbfFFGu5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 6 Jun 2019 02:50:57 -0400
 Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
         by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1hYmA2-0006kp-Td; Thu, 06 Jun 2019 14:46:06 +0800
+        id 1hYmEh-0006rY-LI; Thu, 06 Jun 2019 14:50:55 +0800
 Received: from herbert by gondobar with local (Exim 4.89)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1hYm9z-0005LB-QE; Thu, 06 Jun 2019 14:46:03 +0800
-Date:   Thu, 6 Jun 2019 14:46:03 +0800
+        id 1hYmEd-0006gi-I4; Thu, 06 Jun 2019 14:50:51 +0800
+Date:   Thu, 6 Jun 2019 14:50:51 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc:     Iuliana Prodan <iuliana.prodan@nxp.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        dl-linux-imx <linux-imx@nxp.com>
-Subject: Re: [PATCH] crypto: gcm - fix cacheline sharing
-Message-ID: <20190606064603.lvde6dproqi3vwcq@gondor.apana.org.au>
-References: <VI1PR04MB44459EEF7BCD3458BB3D143D8C180@VI1PR04MB4445.eurprd04.prod.outlook.com>
- <20190530133427.qrwjzctac2x6nsby@gondor.apana.org.au>
- <VI1PR04MB444562A2352FE4BAD7F681258C180@VI1PR04MB4445.eurprd04.prod.outlook.com>
- <CAKv+Gu-jTWQP0Zp=QpuzX41v8Eb5Bvd0O9ajwSnFkDO-ijBf_A@mail.gmail.com>
- <CAKv+Gu9JoC+GKJ6mMAE25mr_k2gbznh-83jApT4=FZsAW=jd8w@mail.gmail.com>
- <20190530142734.qlhgzeal22zxfhk5@gondor.apana.org.au>
- <CAKv+Gu8jJQCZwiHFORUJUzRaAizWzBQ95EAgYe36sFrcvzb6vg@mail.gmail.com>
- <CAKv+Gu-KBgiyNY2Dypx6vqtmpTXNfOxxWxJf50BTiF2rCOFqnw@mail.gmail.com>
- <20190606063724.n77z7gaf32tmyxng@gondor.apana.org.au>
- <CAKv+Gu-YtKRsUYMMD_PNoFvrPpmwTD7fJNs64Q-34L8-TvucqA@mail.gmail.com>
+To:     Antoine Tenart <antoine.tenart@bootlin.com>
+Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
+        maxime.chevallier@bootlin.com, gregory.clement@bootlin.com,
+        miquel.raynal@bootlin.com, nadavh@marvell.com, igall@marvell.com
+Subject: Re: [PATCH 00/14] crypto: inside-secure - self-test fixes
+Message-ID: <20190606065051.kc7nfpwx2tt5gw2d@gondor.apana.org.au>
+References: <20190527145106.8693-1-antoine.tenart@bootlin.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAKv+Gu-YtKRsUYMMD_PNoFvrPpmwTD7fJNs64Q-34L8-TvucqA@mail.gmail.com>
+In-Reply-To: <20190527145106.8693-1-antoine.tenart@bootlin.com>
 User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jun 06, 2019 at 08:42:46AM +0200, Ard Biesheuvel wrote:
-> On Thu, 6 Jun 2019 at 08:37, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> >
-> > On Thu, May 30, 2019 at 04:31:09PM +0200, Ard Biesheuvel wrote:
-> > >
-> > > This might work:
-> > >
-> > > diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-> > > index c0ece44f303b..3d313d2a279a 100644
-> > > --- a/drivers/crypto/caam/caamalg.c
-> > > +++ b/drivers/crypto/caam/caamalg.c
-> > > @@ -1661,7 +1661,8 @@ static int aead_decrypt(struct aead_request *req)
-> > >   * allocate and map the skcipher extended descriptor for skcipher
-> > >   */
-> > >  static struct skcipher_edesc *skcipher_edesc_alloc(struct
-> > > skcipher_request *req,
-> > > -                                                  int desc_bytes)
-> > > +                                                  int desc_bytes,
-> > > +                                                  u8 const *input_iv)
-> > >  {
-> > >         struct crypto_skcipher *skcipher = crypto_skcipher_reqtfm(req);
-> > >         struct caam_ctx *ctx = crypto_skcipher_ctx(skcipher);
-> > > @@ -1745,7 +1746,7 @@ static struct skcipher_edesc
-> > > *skcipher_edesc_alloc(struct skcipher_request *req,
-> > >         /* Make sure IV is located in a DMAable area */
-> > >         if (ivsize) {
-> > >                 iv = (u8 *)edesc->hw_desc + desc_bytes + sec4_sg_bytes;
-> > > -               memcpy(iv, req->iv, ivsize);
-> > > +               memcpy(iv, input_iv, ivsize);
-> > >
-> > >                 iv_dma = dma_map_single(jrdev, iv, ivsize, DMA_TO_DEVICE);
-> > >                 if (dma_mapping_error(jrdev, iv_dma)) {
-> >
-> > Hi Ard:
-> >
-> > I presume you will be submitting this patch at some point?  When
-> > you do please base it on top of your other one which I'm about to
-> > merge.
+On Mon, May 27, 2019 at 04:50:52PM +0200, Antoine Tenart wrote:
+> Hello,
 > 
-> I'm not sure I follow. Do you want a better fix for the CBC output IV
-> going forward? Or is this about other modes?
+> The crypto runtime self-tests were improved and thanks to this we
+> spotted new issues within the Inside Secure SafeXcel cryptographic
+> engine driver:
+> - Intermediate IV were not retrieved from the hardware nor copied to the
+>   quest IV buffer for cbc(aes/des).
+> - HMAC updates wasn't supported.
+> - We spotted issues with the use of the SG lists.
+> - There was an issue with the use of result buffers.
+> 
+> The series fixes all those issues, and includes other small changes
+> found while doing this work.
+> 
+> Thanks!
+> Antoine
+> 
+> Antoine Tenart (14):
+>   crypto: inside-secure - remove empty line
+>   crypto: inside-secure - move comment
+>   crypto: inside-secure - fix coding style for a condition
+>   crypto: inside-secure - remove useless check
+>   crypto: inside-secure - improve the result error format when displayed
+>   crypto: inside-secure - change returned error when a descriptor
+>     reports an error
+>   crypto: inside-secure - enable context reuse
+>   crypto: inside-secure - unify cache reset
+>   crypto: inside-secure - fix zeroing of the request in ahash_exit_inv
+>   crypto: inside-secure - fix queued len computation
+>   crypto: inside-secure - implement IV retrieval
+>   crypto: inside-secure - add support for HMAC updates
+>   crypto: inside-secure - fix use of the SG list
+>   crypto: inside-secure - do not rely on the hardware last bit for
+>     result descriptors
+> 
+>  drivers/crypto/inside-secure/safexcel.c       |  13 +-
+>  drivers/crypto/inside-secure/safexcel.h       |  17 ++-
+>  .../crypto/inside-secure/safexcel_cipher.c    | 116 +++++++++++-------
+>  drivers/crypto/inside-secure/safexcel_hash.c  |  92 ++++++++------
+>  drivers/crypto/inside-secure/safexcel_ring.c  |   3 +
+>  5 files changed, 157 insertions(+), 84 deletions(-)
 
-You sent me a patch to fix CTR mode:
-
-https://patchwork.kernel.org/patch/10969747/
-
-But your suggested fix for CBC mode itself where we need to do the
-copy (as seen quoted above) hasn't been submitted.
-
-Cheers,
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
