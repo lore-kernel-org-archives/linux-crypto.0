@@ -2,123 +2,87 @@ Return-Path: <SRS0=NolZ=UF=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F404C04AB5
-	for <linux-crypto@archiver.kernel.org>; Thu,  6 Jun 2019 15:20:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E1DBC04AB5
+	for <linux-crypto@archiver.kernel.org>; Thu,  6 Jun 2019 15:33:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 286032083E
-	for <linux-crypto@archiver.kernel.org>; Thu,  6 Jun 2019 15:20:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F1FFB20684
+	for <linux-crypto@archiver.kernel.org>; Thu,  6 Jun 2019 15:33:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728812AbfFFPUV (ORCPT
+        id S1729165AbfFFPdX (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 6 Jun 2019 11:20:21 -0400
-Received: from gateway33.websitewelcome.com ([192.185.146.130]:23932 "EHLO
-        gateway33.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727309AbfFFPUV (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 6 Jun 2019 11:20:21 -0400
-X-Greylist: delayed 1384 seconds by postgrey-1.27 at vger.kernel.org; Thu, 06 Jun 2019 11:20:20 EDT
-Received: from cm14.websitewelcome.com (cm14.websitewelcome.com [100.42.49.7])
-        by gateway33.websitewelcome.com (Postfix) with ESMTP id 86B7520AA5B
-        for <linux-crypto@vger.kernel.org>; Thu,  6 Jun 2019 09:57:15 -0500 (CDT)
-Received: from gator4166.hostgator.com ([108.167.133.22])
-        by cmsmtp with SMTP
-        id YtpLhH8dU2qH7YtpLhTRbM; Thu, 06 Jun 2019 09:57:15 -0500
-X-Authority-Reason: nr=8
-Received: from [189.250.127.120] (port=43322 helo=embeddedor)
-        by gator4166.hostgator.com with esmtpa (Exim 4.92)
-        (envelope-from <gustavo@embeddedor.com>)
-        id 1hYtpK-000MlG-DQ; Thu, 06 Jun 2019 09:57:14 -0500
-Date:   Thu, 6 Jun 2019 09:57:13 -0500
-From:   "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-To:     Giovanni Cabiddu <giovanni.cabiddu@intel.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     qat-linux@intel.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Subject: [PATCH] crypto: qat - use struct_size() helper
-Message-ID: <20190606145713.GA16636@embeddedor>
+        Thu, 6 Jun 2019 11:33:23 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:53640 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728916AbfFFPdW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 6 Jun 2019 11:33:22 -0400
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 6C971B97A2064D149B70;
+        Thu,  6 Jun 2019 23:23:04 +0800 (CST)
+Received: from localhost (10.202.226.61) by DGGEMS412-HUB.china.huawei.com
+ (10.3.19.212) with Microsoft SMTP Server id 14.3.439.0; Thu, 6 Jun 2019
+ 23:23:00 +0800
+Date:   Thu, 6 Jun 2019 16:22:49 +0100
+From:   Jonathan Cameron <jonathan.cameron@huawei.com>
+To:     Nishad Kamdar <nishadkamdar@gmail.com>
+CC:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Joe Perches" <joe@perches.com>,
+        Uwe =?ISO-8859-1?Q?Kleine-K=F6nig?= 
+        <u.kleine-koenig@pengutronix.de>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] crypto: hisilicon - Use the correct style for SPDX
+ License Identifier
+Message-ID: <20190606162249.00002da5@huawei.com>
+In-Reply-To: <20190606150612.GA4002@nishad>
+References: <20190606150612.GA4002@nishad>
+Organization: Huawei
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; i686-w64-mingw32)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - embeddedor.com
-X-BWhitelist: no
-X-Source-IP: 189.250.127.120
-X-Source-L: No
-X-Exim-ID: 1hYtpK-000MlG-DQ
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: (embeddedor) [189.250.127.120]:43322
-X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 11
-X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
-X-Local-Domain: yes
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.202.226.61]
+X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-One of the more common cases of allocation size calculations is finding
-the size of a structure that has a zero-sized array at the end, along
-with memory for some number of elements for that array. For example:
+On Thu, 6 Jun 2019 20:36:17 +0530
+Nishad Kamdar <nishadkamdar@gmail.com> wrote:
 
-struct qat_alg_buf_list {
-	...
-        struct qat_alg_buf bufers[];
-} __packed __aligned(64);
+> This patch corrects the SPDX License Identifier style
+> in header file related to Crypto Drivers for Hisilicon
+> SEC Engine in Hip06 and Hip07.
+> For C header files Documentation/process/license-rules.rst
+> mandates C-like comments (opposed to C source files where
+> C++ style should be used)
+> 
+> Changes made by using a script provided by Joe Perches here:
+> https://lkml.org/lkml/2019/2/7/46
+> 
+> Suggested-by: Joe Perches <joe@perches.com>
+> Signed-off-by: Nishad Kamdar <nishadkamdar@gmail.com>
 
-Make use of the struct_size() helper instead of an open-coded version
-in order to avoid any potential type mistakes.
+Acked-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 
-So, replace the following form:
+> ---
+>  drivers/crypto/hisilicon/sec/sec_drv.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/crypto/hisilicon/sec/sec_drv.h b/drivers/crypto/hisilicon/sec/sec_drv.h
+> index 2d2f186674ba..4d9063a8b10b 100644
+> --- a/drivers/crypto/hisilicon/sec/sec_drv.h
+> +++ b/drivers/crypto/hisilicon/sec/sec_drv.h
+> @@ -1,4 +1,4 @@
+> -// SPDX-License-Identifier: GPL-2.0
+> +/* SPDX-License-Identifier: GPL-2.0 */
+>  /* Copyright (c) 2016-2017 Hisilicon Limited. */
+>  
+>  #ifndef _SEC_DRV_H_
 
-sizeof(struct qat_alg_buf_list) + ((1 + n) * sizeof(struct qat_alg_buf))
-
-with:
-
-struct_size(bufl, bufers, n + 1)
-
-This code was detected with the help of Coccinelle.
-
-Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
----
- drivers/crypto/qat/qat_common/qat_algs.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/crypto/qat/qat_common/qat_algs.c b/drivers/crypto/qat/qat_common/qat_algs.c
-index 2842b2cdaa90..b50eb55f8f57 100644
---- a/drivers/crypto/qat/qat_common/qat_algs.c
-+++ b/drivers/crypto/qat/qat_common/qat_algs.c
-@@ -717,8 +717,7 @@ static int qat_alg_sgl_to_bufl(struct qat_crypto_instance *inst,
- 	dma_addr_t blp;
- 	dma_addr_t bloutp = 0;
- 	struct scatterlist *sg;
--	size_t sz_out, sz = sizeof(struct qat_alg_buf_list) +
--			((1 + n) * sizeof(struct qat_alg_buf));
-+	size_t sz_out, sz = struct_size(bufl, bufers, n + 1);
- 
- 	if (unlikely(!n))
- 		return -EINVAL;
-@@ -755,8 +754,7 @@ static int qat_alg_sgl_to_bufl(struct qat_crypto_instance *inst,
- 		struct qat_alg_buf *bufers;
- 
- 		n = sg_nents(sglout);
--		sz_out = sizeof(struct qat_alg_buf_list) +
--			((1 + n) * sizeof(struct qat_alg_buf));
-+		sz_out = struct_size(buflout, bufers, n + 1);
- 		sg_nctr = 0;
- 		buflout = kzalloc_node(sz_out, GFP_ATOMIC,
- 				       dev_to_node(&GET_DEV(inst->accel_dev)));
--- 
-2.21.0
 
