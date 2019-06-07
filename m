@@ -4,66 +4,66 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCD1BC468BC
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Jun 2019 14:50:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC63CC468BC
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Jun 2019 14:50:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id ACD1A2083D
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Jun 2019 14:50:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 78704208C3
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Jun 2019 14:50:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CZvlAiz3"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xzaE+3nR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728486AbfFGOuf (ORCPT
+        id S1729342AbfFGOuh (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 7 Jun 2019 10:50:35 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:40078 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728446AbfFGOue (ORCPT
+        Fri, 7 Jun 2019 10:50:37 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:40900 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729213AbfFGOuf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 7 Jun 2019 10:50:34 -0400
-Received: by mail-wr1-f66.google.com with SMTP id p11so2458321wre.7
-        for <linux-crypto@vger.kernel.org>; Fri, 07 Jun 2019 07:50:33 -0700 (PDT)
+        Fri, 7 Jun 2019 10:50:35 -0400
+Received: by mail-wm1-f67.google.com with SMTP id v19so2205366wmj.5
+        for <linux-crypto@vger.kernel.org>; Fri, 07 Jun 2019 07:50:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=vcJMY+fqzbzAsxP+j3GnSWwHUteH8OqWbcpKZgatReo=;
-        b=CZvlAiz3/tzc0J+yK6zjz21aKF5BPmxTt6qoB9PW1Yy0vRpVdqsicmFntJ4+afYK9B
-         5+WCgfi/CcIVy1mRQ8MwEJk+K3tpzpt9G2WM9Uw3Rsc4rYc+6fQRn3xkeD77lBJX8umh
-         chRJ3knrqwH3YGfvNnx2MuT4CxAYFNTBEBSdESyNZyW2owmYgVBQrGZfM6eRJiJLrnXO
-         Hg+mMsjeYovYgWVQSvmBjW/0bKbM2FsAYCLSWFP0SP05sxTcnDrXRDmBBTor2dh1QlXG
-         dzCO/Ddu3MVzWX68hZcTxKzZ/ED1+ddSPqU4t+3hiffiGE5ay8wyAjZsZ3OEzV5FjZv8
-         Jo0g==
+        bh=Z6Wy0LB17Cj8+QFhDjq+MOW1OHqvbDIBczgJ5kYrrbI=;
+        b=xzaE+3nRMJcAfiRFheJgq7ol8JYf2GZx2t/sk5NVe5j9CnldAHgP4s/Xz+Px6ZEz7X
+         xGWKPQEEn4kDOJ+pKVrFNbvTsgIS/umEIQxDx8MbIpVlm5yU/d5ch7Z9/ojPCtMfOTR2
+         RdCmaqud8/nO4QcdMTk5rD9ZYtzler0FRiC9sJ+KKr/Y4qg1HS14MC56w5tJzCmQfAeh
+         q9Tra4gXU0dByQrHkPq7ksV6rxHvru13Tg2PmZcEzqaTWgK1bRPSXNELZuNWKVEPX4FO
+         ArHQ2wGTRjh/rv/RmVmOrrPA1Sm0CDTt+Fp6hBIjoFOEAAjnc4DA0i/HU6jNZJh0T3kv
+         hpNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=vcJMY+fqzbzAsxP+j3GnSWwHUteH8OqWbcpKZgatReo=;
-        b=nmZjBihdVRrHMYvBlR2/fK7bZqVn0TPDfCtCMRnLLBIY38NwxWBrI8fOqkPXBYeEqe
-         mW6cDU2pVqu3qLP3D9oUdmR9sRQsVNsqE7IFiyknlrCVtkNiM9zACWZohYB0D65yQx0/
-         /6e0todiBbubvx3+mmyEz2+F54dggK7PN/PL0KkmGpY6Oc+QxVyVdNNNZO9YwcfMios4
-         4tmxPVnYsdVIoBd8dHj+cwsqaVPOshQj3fPDxjdjipzr9HQzWzHKR6Utp09bJ6TKzz44
-         LqSlJphNZYuZFzJOzHYpBPkusGIWBkUUVOewh3K7U/fGEHSA+3F0XRE75xN35oehUpPQ
-         9U2g==
-X-Gm-Message-State: APjAAAWRDqgw0CCLqCJxILx9qa45Ul9dVzEtweFCs1EHNCESbaKz9n2V
-        hXsLQndv+lOBXtCF9PWx2cR4hbqDXJ7pNQ==
-X-Google-Smtp-Source: APXvYqydF0s3UC9VVMUOwUe559EMfYIIyoRPoUa0LkLSDywz1iTI7f7ge76HX9sY9OnVNY5dSFie1Q==
-X-Received: by 2002:adf:dc09:: with SMTP id t9mr34406067wri.69.1559919032627;
-        Fri, 07 Jun 2019 07:50:32 -0700 (PDT)
+        bh=Z6Wy0LB17Cj8+QFhDjq+MOW1OHqvbDIBczgJ5kYrrbI=;
+        b=ns3+M43WrOOSDAY10BUWTIn7tlRauvrYmmw3Mv0YUUZTZ5+JHS6Uaplpv5WqIdQ+O1
+         tKHP7080EPM597k+4F3keiR1UmsmjW+rRsftv6wu+wMeS1Dm5SFhUr8r6TzULLiKM3kd
+         7B1NoCQsALjh2zHxWN/zRn168UIv1/om9gQ5KJCIjg0DfOC12PERlYJjZrq7UFPUS680
+         gc+YHKpA4Gt6jsBkYK1giAf8osO6ir8xWPKOUpH1vM0KegEjvRM1bvOn4btFkY1+M4gj
+         z+vxLastlVXHDYrS6/3DSKwWg4+CFo1GJsKrI/BtmMAoRwV9m03kca9h3bJSc7+VKkGN
+         /SkQ==
+X-Gm-Message-State: APjAAAUMXOA0YhT/QjaVe9zfINdURmtGN1EvFLfzRGRIMhdUR9dKmtCt
+        CinfLuKH71IcVPFZZH/eCl7Gob4iLcCdpw==
+X-Google-Smtp-Source: APXvYqxDd2bsboZayCVfX84i2mTQBsV5ovAMJqvB6quHwmu93T6O11m5STFQcm12ih+7klauM967IQ==
+X-Received: by 2002:a1c:1bc9:: with SMTP id b192mr3942201wmb.152.1559919033813;
+        Fri, 07 Jun 2019 07:50:33 -0700 (PDT)
 Received: from localhost.localdomain (aaubervilliers-681-1-126-188.w90-88.abo.wanadoo.fr. [90.88.7.188])
-        by smtp.gmail.com with ESMTPSA id t13sm4129354wra.81.2019.06.07.07.50.31
+        by smtp.gmail.com with ESMTPSA id t13sm4129354wra.81.2019.06.07.07.50.32
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Fri, 07 Jun 2019 07:50:31 -0700 (PDT)
+        Fri, 07 Jun 2019 07:50:33 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     herbert@gondor.apana.org.au, ebiggers@kernel.org,
         johannes@sipsolutions.net, linux-wireless@vger.kernel.org,
         davem@davemloft.net, Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [RFC PATCH 1/3] net/mac80211: switch to skcipher interface for arc4
-Date:   Fri,  7 Jun 2019 16:49:42 +0200
-Message-Id: <20190607144944.13485-2-ard.biesheuvel@linaro.org>
+Subject: [RFC PATCH 2/3] lib80211/tkip: switch to skcipher interface for arc4
+Date:   Fri,  7 Jun 2019 16:49:43 +0200
+Message-Id: <20190607144944.13485-3-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190607144944.13485-1-ard.biesheuvel@linaro.org>
 References: <20190607144944.13485-1-ard.biesheuvel@linaro.org>
@@ -74,8 +74,8 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The mac80211 WEP code uses the cipher interface, and invokes it byte
-by byte. This is rather inefficient, and since the cipher interface in
+The TKIP code uses the arc4 cipher interface, and invokes it byte by
+byte. This is rather inefficient, and since the cipher interface in
 general is not really suitable for use outside of the crypto subsystem,
 move this code to use the skcipher interface instead.
 
@@ -86,300 +86,171 @@ cipher, as is required in this case)
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- net/mac80211/ieee80211_i.h |  6 +-
- net/mac80211/key.h         |  1 +
- net/mac80211/tkip.c        |  8 +-
- net/mac80211/tkip.h        |  4 +-
- net/mac80211/wep.c         | 81 +++++++++++++++-----
- net/mac80211/wep.h         |  4 +-
- net/mac80211/wpa.c         |  4 +-
- 7 files changed, 75 insertions(+), 33 deletions(-)
+ net/wireless/lib80211_crypt_tkip.c | 61 ++++++++++++++------
+ 1 file changed, 42 insertions(+), 19 deletions(-)
 
-diff --git a/net/mac80211/ieee80211_i.h b/net/mac80211/ieee80211_i.h
-index 073a8235ae1b..c0773cf685b6 100644
---- a/net/mac80211/ieee80211_i.h
-+++ b/net/mac80211/ieee80211_i.h
-@@ -1258,8 +1258,10 @@ struct ieee80211_local {
+diff --git a/net/wireless/lib80211_crypt_tkip.c b/net/wireless/lib80211_crypt_tkip.c
+index 11eaa5956f00..456c85b03b32 100644
+--- a/net/wireless/lib80211_crypt_tkip.c
++++ b/net/wireless/lib80211_crypt_tkip.c
+@@ -30,6 +30,7 @@
+ #include <net/iw_handler.h>
  
- 	struct rate_control_ref *rate_ctrl;
- 
--	struct crypto_cipher *wep_tx_tfm;
--	struct crypto_cipher *wep_rx_tfm;
-+	struct crypto_skcipher *wep_tx_tfm;
-+	struct crypto_skcipher *wep_rx_tfm;
-+	struct skcipher_request *wep_tx_req;
-+	struct skcipher_request *wep_rx_req;
- 	u32 wep_iv;
- 
- 	/* see iface.c */
-diff --git a/net/mac80211/key.h b/net/mac80211/key.h
-index f06fbd03d235..ee5e7f30a1f1 100644
---- a/net/mac80211/key.h
-+++ b/net/mac80211/key.h
-@@ -13,6 +13,7 @@
- #include <linux/types.h>
- #include <linux/list.h>
- #include <linux/crypto.h>
+ #include <crypto/hash.h>
 +#include <crypto/skcipher.h>
- #include <linux/rcupdate.h>
- #include <net/mac80211.h>
- 
-diff --git a/net/mac80211/tkip.c b/net/mac80211/tkip.c
-index b3622823bad2..23dd962633fe 100644
---- a/net/mac80211/tkip.c
-+++ b/net/mac80211/tkip.c
-@@ -222,7 +222,7 @@ EXPORT_SYMBOL(ieee80211_get_tkip_p2k);
-  * @payload_len is the length of payload (_not_ including IV/ICV length).
-  * @ta is the transmitter addresses.
-  */
--int ieee80211_tkip_encrypt_data(struct crypto_cipher *tfm,
-+int ieee80211_tkip_encrypt_data(struct skcipher_request *req,
- 				struct ieee80211_key *key,
- 				struct sk_buff *skb,
- 				u8 *payload, size_t payload_len)
-@@ -231,7 +231,7 @@ int ieee80211_tkip_encrypt_data(struct crypto_cipher *tfm,
- 
- 	ieee80211_get_tkip_p2k(&key->conf, skb, rc4key);
- 
--	return ieee80211_wep_encrypt_data(tfm, rc4key, 16,
-+	return ieee80211_wep_encrypt_data(req, rc4key, 16,
- 					  payload, payload_len);
- }
- 
-@@ -239,7 +239,7 @@ int ieee80211_tkip_encrypt_data(struct crypto_cipher *tfm,
-  * beginning of the buffer containing IEEE 802.11 header payload, i.e.,
-  * including IV, Ext. IV, real data, Michael MIC, ICV. @payload_len is the
-  * length of payload, including IV, Ext. IV, MIC, ICV.  */
--int ieee80211_tkip_decrypt_data(struct crypto_cipher *tfm,
-+int ieee80211_tkip_decrypt_data(struct skcipher_request *req,
- 				struct ieee80211_key *key,
- 				u8 *payload, size_t payload_len, u8 *ta,
- 				u8 *ra, int only_iv, int queue,
-@@ -297,7 +297,7 @@ int ieee80211_tkip_decrypt_data(struct crypto_cipher *tfm,
- 
- 	tkip_mixing_phase2(tk, &rx_ctx->ctx, iv16, rc4key);
- 
--	res = ieee80211_wep_decrypt_data(tfm, rc4key, 16, pos, payload_len - 12);
-+	res = ieee80211_wep_decrypt_data(req, rc4key, 16, pos, payload_len - 12);
-  done:
- 	if (res == TKIP_DECRYPT_OK) {
- 		/*
-diff --git a/net/mac80211/tkip.h b/net/mac80211/tkip.h
-index a1bcbfbefe7c..e66aac448786 100644
---- a/net/mac80211/tkip.h
-+++ b/net/mac80211/tkip.h
-@@ -13,7 +13,7 @@
  #include <linux/crypto.h>
- #include "key.h"
+ #include <linux/crc32.h>
  
--int ieee80211_tkip_encrypt_data(struct crypto_cipher *tfm,
-+int ieee80211_tkip_encrypt_data(struct skcipher_request *req,
- 				struct ieee80211_key *key,
- 				struct sk_buff *skb,
- 				u8 *payload, size_t payload_len);
-@@ -24,7 +24,7 @@ enum {
- 	TKIP_DECRYPT_INVALID_KEYIDX = -2,
- 	TKIP_DECRYPT_REPLAY = -3,
- };
--int ieee80211_tkip_decrypt_data(struct crypto_cipher *tfm,
-+int ieee80211_tkip_decrypt_data(struct skcipher_request *req,
- 				struct ieee80211_key *key,
- 				u8 *payload, size_t payload_len, u8 *ta,
- 				u8 *ra, int only_iv, int queue,
-diff --git a/net/mac80211/wep.c b/net/mac80211/wep.c
-index bfe9ed9f4c48..0336afb70c2b 100644
---- a/net/mac80211/wep.c
-+++ b/net/mac80211/wep.c
-@@ -27,31 +27,64 @@
+@@ -64,9 +65,11 @@ struct lib80211_tkip_data {
  
- int ieee80211_wep_init(struct ieee80211_local *local)
- {
-+	int err;
-+
- 	/* start WEP IV from a random value */
- 	get_random_bytes(&local->wep_iv, IEEE80211_WEP_IV_LEN);
+ 	int key_idx;
  
--	local->wep_tx_tfm = crypto_alloc_cipher("arc4", 0, 0);
-+	local->wep_tx_tfm = crypto_alloc_skcipher("ecb(arc4)", 0,
+-	struct crypto_cipher *rx_tfm_arc4;
++	struct crypto_skcipher *rx_tfm_arc4;
++	struct skcipher_request *rx_req_arc4;
+ 	struct crypto_shash *rx_tfm_michael;
+-	struct crypto_cipher *tx_tfm_arc4;
++	struct crypto_skcipher *tx_tfm_arc4;
++	struct skcipher_request *tx_req_arc4;
+ 	struct crypto_shash *tx_tfm_michael;
+ 
+ 	/* scratch buffers for virt_to_page() (crypto API) */
+@@ -99,7 +102,8 @@ static void *lib80211_tkip_init(int key_idx)
+ 
+ 	priv->key_idx = key_idx;
+ 
+-	priv->tx_tfm_arc4 = crypto_alloc_cipher("arc4", 0, 0);
++	priv->tx_tfm_arc4 = crypto_alloc_skcipher("ecb(arc4)", 0,
 +						  CRYPTO_ALG_ASYNC);
- 	if (IS_ERR(local->wep_tx_tfm)) {
- 		local->wep_rx_tfm = ERR_PTR(-EINVAL);
- 		return PTR_ERR(local->wep_tx_tfm);
+ 	if (IS_ERR(priv->tx_tfm_arc4)) {
+ 		priv->tx_tfm_arc4 = NULL;
+ 		goto fail;
+@@ -111,7 +115,8 @@ static void *lib80211_tkip_init(int key_idx)
+ 		goto fail;
  	}
  
--	local->wep_rx_tfm = crypto_alloc_cipher("arc4", 0, 0);
-+	local->wep_rx_tfm = crypto_alloc_skcipher("ecb(arc4)", 0,
+-	priv->rx_tfm_arc4 = crypto_alloc_cipher("arc4", 0, 0);
++	priv->rx_tfm_arc4 = crypto_alloc_skcipher("ecb(arc4)", 0,
 +						  CRYPTO_ALG_ASYNC);
- 	if (IS_ERR(local->wep_rx_tfm)) {
--		crypto_free_cipher(local->wep_tx_tfm);
--		local->wep_tx_tfm = ERR_PTR(-EINVAL);
--		return PTR_ERR(local->wep_rx_tfm);
-+		err = PTR_ERR(local->wep_rx_tfm);
-+		goto free_tx_tfm;
-+	}
-+
-+	local->wep_tx_req = skcipher_request_alloc(local->wep_tx_tfm,
-+						   GFP_KERNEL);
-+	if (!local->wep_tx_req) {
-+		err = -ENOMEM;
-+		goto free_rx_tfm;
-+	}
-+
-+	local->wep_rx_req = skcipher_request_alloc(local->wep_rx_tfm,
-+						   GFP_KERNEL);
-+	if (!local->wep_rx_req) {
-+		err = -ENOMEM;
-+		goto free_tx_req;
+ 	if (IS_ERR(priv->rx_tfm_arc4)) {
+ 		priv->rx_tfm_arc4 = NULL;
+ 		goto fail;
+@@ -123,14 +128,26 @@ static void *lib80211_tkip_init(int key_idx)
+ 		goto fail;
  	}
  
- 	return 0;
++	priv->tx_req_arc4 = skcipher_request_alloc(priv->tx_tfm_arc4,
++						   GFP_KERNEL);
++	if (!priv->tx_req_arc4)
++		goto fail;
 +
-+free_tx_req:
-+	skcipher_request_free(local->wep_tx_req);
-+	local->wep_tx_req = NULL;
-+free_rx_tfm:
-+	crypto_free_skcipher(local->wep_rx_tfm);
-+	local->wep_rx_tfm = ERR_PTR(-EINVAL);
-+free_tx_tfm:
-+	crypto_free_skcipher(local->wep_tx_tfm);
-+	local->wep_tx_tfm = ERR_PTR(-EINVAL);
++	priv->rx_req_arc4 = skcipher_request_alloc(priv->rx_tfm_arc4,
++						   GFP_KERNEL);
++	if (!priv->rx_req_arc4)
++		goto fail;
 +
-+	return err;
- }
+ 	return priv;
  
- void ieee80211_wep_free(struct ieee80211_local *local)
- {
-+	if (local->wep_tx_req)
-+		skcipher_request_free(local->wep_tx_req);
-+	if (local->wep_rx_req)
-+		skcipher_request_free(local->wep_rx_req);
- 	if (!IS_ERR(local->wep_tx_tfm))
--		crypto_free_cipher(local->wep_tx_tfm);
-+		crypto_free_skcipher(local->wep_tx_tfm);
- 	if (!IS_ERR(local->wep_rx_tfm))
--		crypto_free_cipher(local->wep_rx_tfm);
-+		crypto_free_skcipher(local->wep_rx_tfm);
- }
+       fail:
+ 	if (priv) {
++		skcipher_request_free(priv->tx_req_arc4);
++		skcipher_request_free(priv->rx_req_arc4);
+ 		crypto_free_shash(priv->tx_tfm_michael);
+-		crypto_free_cipher(priv->tx_tfm_arc4);
++		crypto_free_skcipher(priv->tx_tfm_arc4);
+ 		crypto_free_shash(priv->rx_tfm_michael);
+-		crypto_free_cipher(priv->rx_tfm_arc4);
++		crypto_free_skcipher(priv->rx_tfm_arc4);
+ 		kfree(priv);
+ 	}
  
- static inline bool ieee80211_wep_weak_iv(u32 iv, int keylen)
-@@ -131,21 +164,24 @@ static void ieee80211_wep_remove_iv(struct ieee80211_local *local,
- /* Perform WEP encryption using given key. data buffer must have tailroom
-  * for 4-byte ICV. data_len must not include this ICV. Note: this function
-  * does _not_ add IV. data = RC4(data | CRC32(data)) */
--int ieee80211_wep_encrypt_data(struct crypto_cipher *tfm, u8 *rc4key,
-+int ieee80211_wep_encrypt_data(struct skcipher_request *req, u8 *rc4key,
- 			       size_t klen, u8 *data, size_t data_len)
+@@ -141,10 +158,12 @@ static void lib80211_tkip_deinit(void *priv)
  {
+ 	struct lib80211_tkip_data *_priv = priv;
+ 	if (_priv) {
++		skcipher_request_free(_priv->tx_req_arc4);
++		skcipher_request_free(_priv->rx_req_arc4);
+ 		crypto_free_shash(_priv->tx_tfm_michael);
+-		crypto_free_cipher(_priv->tx_tfm_arc4);
++		crypto_free_skcipher(_priv->tx_tfm_arc4);
+ 		crypto_free_shash(_priv->rx_tfm_michael);
+-		crypto_free_cipher(_priv->rx_tfm_arc4);
++		crypto_free_skcipher(_priv->rx_tfm_arc4);
+ 	}
+ 	kfree(priv);
+ }
+@@ -342,10 +361,10 @@ static int lib80211_tkip_hdr(struct sk_buff *skb, int hdr_len,
+ static int lib80211_tkip_encrypt(struct sk_buff *skb, int hdr_len, void *priv)
+ {
+ 	struct lib80211_tkip_data *tkey = priv;
 +	struct scatterlist sg;
- 	__le32 icv;
+ 	int len;
+ 	u8 rc4key[16], *pos, *icv;
+ 	u32 crc;
 -	int i;
  
--	if (IS_ERR(tfm))
-+	if (!req)
- 		return -1;
+ 	if (tkey->flags & IEEE80211_CRYPTO_TKIP_COUNTERMEASURES) {
+ 		struct ieee80211_hdr *hdr = (struct ieee80211_hdr *)skb->data;
+@@ -370,10 +389,11 @@ static int lib80211_tkip_encrypt(struct sk_buff *skb, int hdr_len, void *priv)
+ 	icv[2] = crc >> 16;
+ 	icv[3] = crc >> 24;
  
- 	icv = cpu_to_le32(~crc32_le(~0, data, data_len));
- 	put_unaligned(icv, (__le32 *)(data + data_len));
- 
--	crypto_cipher_setkey(tfm, rc4key, klen);
--	for (i = 0; i < data_len + IEEE80211_WEP_ICV_LEN; i++)
--		crypto_cipher_encrypt_one(tfm, data + i, data + i);
-+	crypto_skcipher_setkey(crypto_skcipher_reqtfm(req), rc4key, klen);
-+	sg_init_one(&sg, data, data_len + IEEE80211_WEP_ICV_LEN);
-+	skcipher_request_set_crypt(req, &sg, &sg,
-+				   data_len + IEEE80211_WEP_ICV_LEN, NULL);
-+	if (crypto_skcipher_encrypt(req) < 0)
-+		return -1;
- 
- 	return 0;
- }
-@@ -184,7 +220,7 @@ int ieee80211_wep_encrypt(struct ieee80211_local *local,
- 	/* Add room for ICV */
- 	skb_put(skb, IEEE80211_WEP_ICV_LEN);
- 
--	return ieee80211_wep_encrypt_data(local->wep_tx_tfm, rc4key, keylen + 3,
-+	return ieee80211_wep_encrypt_data(local->wep_tx_req, rc4key, keylen + 3,
- 					  iv + IEEE80211_WEP_IV_LEN, len);
+-	crypto_cipher_setkey(tkey->tx_tfm_arc4, rc4key, 16);
+-	for (i = 0; i < len + 4; i++)
+-		crypto_cipher_encrypt_one(tkey->tx_tfm_arc4, pos + i, pos + i);
+-	return 0;
++	crypto_skcipher_setkey(tkey->tx_tfm_arc4, rc4key, 16);
++	sg_init_one(&sg, pos, len + 4);
++	skcipher_request_set_crypt(tkey->tx_req_arc4, &sg, &sg, len + 4, NULL);
++
++	return crypto_skcipher_encrypt(tkey->tx_req_arc4);
  }
  
-@@ -192,18 +228,21 @@ int ieee80211_wep_encrypt(struct ieee80211_local *local,
- /* Perform WEP decryption using given key. data buffer includes encrypted
-  * payload, including 4-byte ICV, but _not_ IV. data_len must not include ICV.
-  * Return 0 on success and -1 on ICV mismatch. */
--int ieee80211_wep_decrypt_data(struct crypto_cipher *tfm, u8 *rc4key,
-+int ieee80211_wep_decrypt_data(struct skcipher_request *req, u8 *rc4key,
- 			       size_t klen, u8 *data, size_t data_len)
+ /*
+@@ -392,6 +412,7 @@ static inline int tkip_replay_check(u32 iv32_n, u16 iv16_n,
+ static int lib80211_tkip_decrypt(struct sk_buff *skb, int hdr_len, void *priv)
  {
+ 	struct lib80211_tkip_data *tkey = priv;
 +	struct scatterlist sg;
- 	__le32 crc;
+ 	u8 rc4key[16];
+ 	u8 keyidx, *pos;
+ 	u32 iv32;
+@@ -400,7 +421,6 @@ static int lib80211_tkip_decrypt(struct sk_buff *skb, int hdr_len, void *priv)
+ 	u8 icv[4];
+ 	u32 crc;
+ 	int plen;
 -	int i;
  
--	if (IS_ERR(tfm))
-+	if (!req)
- 		return -1;
+ 	hdr = (struct ieee80211_hdr *)skb->data;
  
--	crypto_cipher_setkey(tfm, rc4key, klen);
--	for (i = 0; i < data_len + IEEE80211_WEP_ICV_LEN; i++)
--		crypto_cipher_decrypt_one(tfm, data + i, data + i);
-+	crypto_skcipher_setkey(crypto_skcipher_reqtfm(req), rc4key, klen);
-+	sg_init_one(&sg, data, data_len + IEEE80211_WEP_ICV_LEN);
-+	skcipher_request_set_crypt(req, &sg, &sg,
-+				   data_len + IEEE80211_WEP_ICV_LEN, NULL);
-+	if (crypto_skcipher_decrypt(req) < 0)
-+		return -1;
+@@ -453,9 +473,12 @@ static int lib80211_tkip_decrypt(struct sk_buff *skb, int hdr_len, void *priv)
  
- 	crc = cpu_to_le32(~crc32_le(~0, data, data_len));
- 	if (memcmp(&crc, data + data_len, IEEE80211_WEP_ICV_LEN) != 0)
-@@ -256,7 +295,7 @@ static int ieee80211_wep_decrypt(struct ieee80211_local *local,
- 	/* Copy rest of the WEP key (the secret part) */
- 	memcpy(rc4key + 3, key->conf.key, key->conf.keylen);
+ 	plen = skb->len - hdr_len - 12;
  
--	if (ieee80211_wep_decrypt_data(local->wep_rx_tfm, rc4key, klen,
-+	if (ieee80211_wep_decrypt_data(local->wep_rx_req, rc4key, klen,
- 				       skb->data + hdrlen +
- 				       IEEE80211_WEP_IV_LEN, len))
- 		ret = -1;
-diff --git a/net/mac80211/wep.h b/net/mac80211/wep.h
-index 9615749d1f65..6a392b1ed4b7 100644
---- a/net/mac80211/wep.h
-+++ b/net/mac80211/wep.h
-@@ -18,12 +18,12 @@
+-	crypto_cipher_setkey(tkey->rx_tfm_arc4, rc4key, 16);
+-	for (i = 0; i < plen + 4; i++)
+-		crypto_cipher_decrypt_one(tkey->rx_tfm_arc4, pos + i, pos + i);
++	crypto_skcipher_setkey(tkey->rx_tfm_arc4, rc4key, 16);
++	sg_init_one(&sg, pos, plen + 4);
++	skcipher_request_set_crypt(tkey->rx_req_arc4, &sg, &sg, plen + 4, NULL);
++
++	if (crypto_skcipher_decrypt(tkey->rx_req_arc4))
++		return -7;
  
- int ieee80211_wep_init(struct ieee80211_local *local);
- void ieee80211_wep_free(struct ieee80211_local *local);
--int ieee80211_wep_encrypt_data(struct crypto_cipher *tfm, u8 *rc4key,
-+int ieee80211_wep_encrypt_data(struct skcipher_request *req, u8 *rc4key,
- 				size_t klen, u8 *data, size_t data_len);
- int ieee80211_wep_encrypt(struct ieee80211_local *local,
- 			  struct sk_buff *skb,
- 			  const u8 *key, int keylen, int keyidx);
--int ieee80211_wep_decrypt_data(struct crypto_cipher *tfm, u8 *rc4key,
-+int ieee80211_wep_decrypt_data(struct skcipher_request *req, u8 *rc4key,
- 			       size_t klen, u8 *data, size_t data_len);
+ 	crc = ~crc32_le(~0, pos, plen);
+ 	icv[0] = crc;
+@@ -640,9 +663,9 @@ static int lib80211_tkip_set_key(void *key, int len, u8 * seq, void *priv)
+ 	struct lib80211_tkip_data *tkey = priv;
+ 	int keyidx;
+ 	struct crypto_shash *tfm = tkey->tx_tfm_michael;
+-	struct crypto_cipher *tfm2 = tkey->tx_tfm_arc4;
++	struct crypto_skcipher *tfm2 = tkey->tx_tfm_arc4;
+ 	struct crypto_shash *tfm3 = tkey->rx_tfm_michael;
+-	struct crypto_cipher *tfm4 = tkey->rx_tfm_arc4;
++	struct crypto_skcipher *tfm4 = tkey->rx_tfm_arc4;
  
- ieee80211_rx_result
-diff --git a/net/mac80211/wpa.c b/net/mac80211/wpa.c
-index 58d0b258b684..a7870ec67a26 100644
---- a/net/mac80211/wpa.c
-+++ b/net/mac80211/wpa.c
-@@ -242,7 +242,7 @@ static int tkip_encrypt_skb(struct ieee80211_tx_data *tx, struct sk_buff *skb)
- 	/* Add room for ICV */
- 	skb_put(skb, IEEE80211_TKIP_ICV_LEN);
- 
--	return ieee80211_tkip_encrypt_data(tx->local->wep_tx_tfm,
-+	return ieee80211_tkip_encrypt_data(tx->local->wep_tx_req,
- 					   key, skb, pos, len);
- }
- 
-@@ -293,7 +293,7 @@ ieee80211_crypto_tkip_decrypt(struct ieee80211_rx_data *rx)
- 	if (status->flag & RX_FLAG_DECRYPTED)
- 		hwaccel = 1;
- 
--	res = ieee80211_tkip_decrypt_data(rx->local->wep_rx_tfm,
-+	res = ieee80211_tkip_decrypt_data(rx->local->wep_rx_req,
- 					  key, skb->data + hdrlen,
- 					  skb->len - hdrlen, rx->sta->sta.addr,
- 					  hdr->addr1, hwaccel, rx->security_idx,
+ 	keyidx = tkey->key_idx;
+ 	memset(tkey, 0, sizeof(*tkey));
 -- 
 2.20.1
 
