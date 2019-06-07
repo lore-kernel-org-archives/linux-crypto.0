@@ -1,80 +1,104 @@
-Return-Path: <SRS0=NolZ=UF=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=RoO8=UG=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	T_DKIMWL_WL_HIGH autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,T_DKIMWL_WL_HIGH,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EEF7C04AB5
-	for <linux-crypto@archiver.kernel.org>; Thu,  6 Jun 2019 20:20:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99265C2BCA1
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Jun 2019 12:58:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 32EEC2083E
-	for <linux-crypto@archiver.kernel.org>; Thu,  6 Jun 2019 20:20:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1559852414;
-	bh=Enbhr0t4DrJHwsF0RYBPkQa9lvUyfpzeuvhT2rjVbA8=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
-	b=AMDPwNk1zdX2TZRjONB8vrzTyVJT2o0wntCNReHfNaT1lB0wJaC/lx4mhhFYnBYLu
-	 B2bnBSEEeyzLoCgilWnKEuaGT9PVWTnkm+GmgbZI3DSmGJThmXmdNYN4tnjLQvg9AM
-	 zC3IbCAFoSzMEyx/d37qcZDq68fvAukYBKNsa/hM=
+	by mail.kernel.org (Postfix) with ESMTP id 7344E206BB
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Jun 2019 12:58:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="dwgh7LXl"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726305AbfFFUUN (ORCPT
+        id S1727606AbfFGM6p (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 6 Jun 2019 16:20:13 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56350 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726238AbfFFUUM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 6 Jun 2019 16:20:12 -0400
-Subject: Re: [GIT] Crypto Fixes for 5.2
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1559852412;
-        bh=Enbhr0t4DrJHwsF0RYBPkQa9lvUyfpzeuvhT2rjVbA8=;
-        h=From:In-Reply-To:References:Date:To:Cc:From;
-        b=doUi+nMSSGxUu4ryIdBi1Vo+gNHhx6mKag8EslupaaO5n8gLoF0g+Tmw0/0m3V+Rv
-         n7NYeWzco3SCMEACLdTl/Sl3pgtPm+jQuSyBBVh1zWTSe7YCfo1A1crywCqF8bGLyK
-         1iEaaq9l+HNN+/ydUrXWJL4LGjV4ETmYWbAnhOTU=
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20190606060324.du5zbk3ju5djkhfe@gondor.apana.org.au>
-References: <20180428080517.haxgpvqrwgotakyo@gondor.apana.org.au>
- <20180622145403.6ltjip7che227fuo@gondor.apana.org.au>
- <20180829033353.agnzxra3jk2r2mzg@gondor.apana.org.au>
- <20181116063146.e7a3mep3ghnfltxe@gondor.apana.org.au>
- <20181207061409.xflg423nknleuddw@gondor.apana.org.au>
- <20190118104006.ye5amhxkgd4xrbmc@gondor.apana.org.au>
- <20190201054204.ehl7u7aaqmkdh5b6@gondor.apana.org.au>
- <20190215024738.fynl64d5u5htcy2l@gondor.apana.org.au>
- <20190312045818.bgpiuxogmaxyscdv@gondor.apana.org.au>
- <20190515060552.ecfwhazt2fnthepg@gondor.apana.org.au>
- <20190606060324.du5zbk3ju5djkhfe@gondor.apana.org.au>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20190606060324.du5zbk3ju5djkhfe@gondor.apana.org.au>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
-X-PR-Tracked-Commit-Id: 7829a0c1cb9c80debfb4fdb49b4d90019f2ea1ac
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: ae8766042beee814c9e16e9ae1e84cd6eaa7ffaa
-Message-Id: <155985241232.29387.3663283585345390700.pr-tracker-bot@kernel.org>
-Date:   Thu, 06 Jun 2019 20:20:12 +0000
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+        Fri, 7 Jun 2019 08:58:45 -0400
+Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:2804 "EHLO
+        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727102AbfFGM6o (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 7 Jun 2019 08:58:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1559912323; x=1591448323;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=yYhblt2+BKiN/5PsebElSxKpyf/1YoPFs0dVvX2+Xww=;
+  b=dwgh7LXlGIW2pHbCG1lI5YGA8fyFPKS7VEYqJHmWR1OaolaEMpR6oySw
+   i2EifWlnQnYqucbul/iywEBm6rbmEOxjJ2+RVEjKSTj+ND4+QvJR0KcY0
+   MINtozzpf0u4kCSXrq4qxjdxUmRSAa2xmx6aWkBF/UEY/htrbezC8aB2O
+   g=;
+X-IronPort-AV: E=Sophos;i="5.60,563,1549929600"; 
+   d="scan'208";a="804170433"
+Received: from sea3-co-svc-lb6-vlan2.sea.amazon.com (HELO email-inbound-relay-2a-c5104f52.us-west-2.amazon.com) ([10.47.22.34])
+  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP; 07 Jun 2019 12:58:37 +0000
+Received: from EX13MTAUEB001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
+        by email-inbound-relay-2a-c5104f52.us-west-2.amazon.com (Postfix) with ESMTPS id 45E57A242C;
+        Fri,  7 Jun 2019 12:58:37 +0000 (UTC)
+Received: from EX13D08UEB002.ant.amazon.com (10.43.60.107) by
+ EX13MTAUEB001.ant.amazon.com (10.43.60.129) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Fri, 7 Jun 2019 12:58:36 +0000
+Received: from EX13D02UWC004.ant.amazon.com (10.43.162.236) by
+ EX13D08UEB002.ant.amazon.com (10.43.60.107) with Microsoft SMTP Server (TLS)
+ id 15.0.1367.3; Fri, 7 Jun 2019 12:58:36 +0000
+Received: from EX13D02UWC004.ant.amazon.com ([10.43.162.236]) by
+ EX13D02UWC004.ant.amazon.com ([10.43.162.236]) with mapi id 15.00.1367.000;
+ Fri, 7 Jun 2019 12:58:35 +0000
+From:   "Saidi, Ali" <alisaidi@amazon.com>
+To:     Will Deacon <will.deacon@arm.com>
+CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Rindjunsky, Ron" <ronrindj@amazon.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        "Woodhouse, David" <dwmw@amazon.co.uk>
+Subject: Re: [PATCH 0/3] Add support for Graviton TRNG
+Thread-Topic: [PATCH 0/3] Add support for Graviton TRNG
+Thread-Index: AQHVGxR9rewpsnhufE+Qj7iDYwflKaaM+/mAgALbeQA=
+Date:   Fri, 7 Jun 2019 12:58:35 +0000
+Message-ID: <7EC45708-38A1-4826-BC82-298EFAAE30B1@amazon.com>
+References: <20190604203100.15050-1-alisaidi@amazon.com>
+ <20190605122031.GK15030@fuggles.cambridge.arm.com>
+In-Reply-To: <20190605122031.GK15030@fuggles.cambridge.arm.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.43.161.225]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <597B470E461AD641A6B2C366CC0A0DD8@amazon.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The pull request you sent on Thu, 6 Jun 2019 14:03:24 +0800:
-
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
-
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/ae8766042beee814c9e16e9ae1e84cd6eaa7ffaa
-
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.wiki.kernel.org/userdoc/prtracker
+DQoNCu+7v09uIDYvNS8xOSwgNzoyMCBBTSwgIldpbGwgRGVhY29uIiA8d2lsbC5kZWFjb25AYXJt
+LmNvbT4gd3JvdGU6DQoNCiAgICBPbiBUdWUsIEp1biAwNCwgMjAxOSBhdCAwODozMDo1N1BNICsw
+MDAwLCBBbGkgU2FpZGkgd3JvdGU6DQogICAgPiBBV1MgR3Jhdml0b24gYmFzZWQgc3lzdGVtcyBw
+cm92aWRlIGFuIEFybSBTTUMgY2FsbCBpbiB0aGUgdmVuZG9yIGRlZmluZWQNCiAgICA+IGh5cGVy
+dmlzb3IgcmVnaW9uIHRvIHJlYWQgcmFuZG9tIG51bWJlcnMgZnJvbSBhIEhXIFRSTkcgYW5kIHJl
+dHVybiB0aGVtIHRvIHRoZQ0KICAgID4gZ3Vlc3QuIA0KICAgID4gDQogICAgPiBXZSd2ZSBvYnNl
+cnZlZCBzbG93ZXIgZ3Vlc3QgYm9vdCBhbmQgZXNwZWNpYWxseSByZWJvb3QgdGltZXMgZHVlIHRv
+IGxhY2sgb2YNCiAgICA+IGVudHJvcHkgYW5kIHByb3ZpZGluZyBhY2Nlc3MgdG8gYSBUUk5HIGlz
+IG1lYW50IHRvIGFkZHJlc3MgdGhpcy4gDQogICAgDQogICAgQ3VyaW91cywgYnV0IHdoeSB0aGlz
+IG92ZXIgc29tZXRoaW5nIGxpa2UgdmlydGlvLXJuZz8NCiAgICANClRoaXMgaW50ZXJmYWNlIGFs
+bG93cyB1cyB0byBwcm92aWRlIHRoZSBmdW5jdGlvbmFsaXR5IGZyb20gYm90aCBFTDIgYW5kIEVM
+MyBhbmQgc3VwcG9ydCBtdWx0aXBsZSBkaWZmZXJlbnQgdHlwZXMgb2Ygb3VyIGluc3RhbmNlcyB3
+aGljaCB3ZSB1bmZvcnR1bmF0ZWx5IGNhbid0IGRvIHdpdGggdmlydC1pby4NCg0KQWxpDQogICAg
+DQoNCg==
