@@ -2,135 +2,173 @@ Return-Path: <SRS0=RoO8=UG=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65666C468BD
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Jun 2019 18:08:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 298D8C468BC
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Jun 2019 18:58:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4357420868
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Jun 2019 18:08:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0570A2146F
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Jun 2019 18:58:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QRPhxxFl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="o0ELG8MK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730138AbfFGSIc (ORCPT
+        id S1729895AbfFGS56 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 7 Jun 2019 14:08:32 -0400
-Received: from mail-it1-f193.google.com ([209.85.166.193]:33787 "EHLO
-        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729817AbfFGSIb (ORCPT
+        Fri, 7 Jun 2019 14:57:58 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:34952 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729629AbfFGS56 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 7 Jun 2019 14:08:31 -0400
-Received: by mail-it1-f193.google.com with SMTP id v193so5129367itc.0
-        for <linux-crypto@vger.kernel.org>; Fri, 07 Jun 2019 11:08:31 -0700 (PDT)
+        Fri, 7 Jun 2019 14:57:58 -0400
+Received: by mail-pf1-f193.google.com with SMTP id d126so1701246pfd.2;
+        Fri, 07 Jun 2019 11:57:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=46o9teIFxXJpHSlK03ACr5jm/nmZOQ89XNQuLWL2Vrg=;
-        b=QRPhxxFl/jBQO+euDBoQtl/Xax6LX6l+MU+t1ur7MtZ2YdwcSLwnK6UWEMMaOwDGWI
-         v2DJ6KmFZ8GIc/5euHuNA4I8LCdxNgyoqeUlwwilLD+Uhwm/hyw1kduJ31vDDOcwpyJp
-         QzzP8zvuP3NEGcnQKH0IJoYr5qNtfYKW2EliaoL3cT3q5yEffUVpfVA0Qw2ZbqqWYz6W
-         rU+34uxpWQEhN3MQAUnCeYJM3gilA2ukFyTHAFsDXIY8uQtcuLLSevFrvADLfJXU1CM4
-         oQZLagv+IVKXb0E1m3ackRp652W20dKe5lTBNtK50+hlVSTVrAATLsJdyxIQx10gK7PK
-         iYug==
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:openpgp:autocrypt:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=mSZTD2NfMklS5bQ8GbNy5yttK9DX9jrSHZ4msbKtDxE=;
+        b=o0ELG8MKcF5P+fDKafO98vB/KXIP2UVBtHzfxmmzFldfUIGki49IwfnSUe/tRF7lR4
+         56xgIOoN+gyE3pK0FlvxBfGvZ1OVNnC34GzXY+1VTHdNPTFpi3zKU8U1mkChn0Kr4whz
+         9xs7wPgnd6nnsJ5KoIUowEotNoHB0tMuFqImdTRGeUIdPyH0HAkbpSliNSoDfQReVBur
+         1DLIRho8iP+ZFxZ+dUbiWYptLpFhQIlWbyjzAbluW/2zjy4C2hUqZsBr1pkFhJ/nUX60
+         9l7Y5RTQ7jj5XLzXbK3mD0vJaGQjk5DsDRDlzz4BxRrlzgFgVbqUE1vmUFSoqb4yeNUa
+         eiiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=46o9teIFxXJpHSlK03ACr5jm/nmZOQ89XNQuLWL2Vrg=;
-        b=LCkD/VBODd0mK58ARUatwaofx4b1PaO/yutZozgov9+8gLriT5NMqR0DfaNtLUQUgY
-         u84ppmEH+SLtOX8+4pLuoDe+6JGd2AWCBE1c7+pZJ0c6+IgF7EWIXQL8HyyHjMMroSrr
-         fLc00jP0GPo4SnwjUV+A2M+03rzacWFAhL0BoDRtDZ3g0N0l5yeNTjZfCjPJYrcU13yt
-         N9ScJe4aB/TI3r/L8Euf04phswEkbJQfp8/3jSkN35clkRwUO7m6l1E8wG6TsG8AdZtO
-         WO+rpTCTdmKN2sNJl5vxOWo4DJDM4nIHVrmV3OlbkNOXulMVWdzP5+NVOdZw4mhQAp9R
-         /SZw==
-X-Gm-Message-State: APjAAAWQvoP8bCu4CScfbrkc65gZ2loZL0jUDatGZHexC+6DARxpuvZ8
-        dswZZlm3u9dUCht+5cGy94aAuP/gOUWeDLRfU+lg7w==
-X-Google-Smtp-Source: APXvYqyGDQ7+7lEeLzdqkbK5JHWSdDYqWifx2GOAq3qlgz2X+dhLHn7pkPpyBEg1jVQd3r3RuXy38Oq/b40LVXjutQQ=
-X-Received: by 2002:a24:4f88:: with SMTP id c130mr4847181itb.104.1559930910878;
- Fri, 07 Jun 2019 11:08:30 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=mSZTD2NfMklS5bQ8GbNy5yttK9DX9jrSHZ4msbKtDxE=;
+        b=eb/HIJIV0YtpkIoCMTkBBnwxMLA68l4ZoI7MBIyOVqZIlhJ15rEVAPbPTp3Lr1sCmP
+         28SGu2JKn3LWJijD9+Y4EFLMgfb4/nbDLlIHiG4/VASNzbwlyYOsqhsouLMLGKb1gOO0
+         xCA9RA1haAduK//Eh/6CI4K465eC0o9rCebAfLbflpl5aktCTH+QdqnzB+G1CPzowirS
+         huzkiDUfWBgsewnNagIINkLedhfNN84b++PWnXT88xMjF/w+0sAwfTuhKAtThuHyCO7W
+         G6s8Qdf7cMjdObqievqvuib2dh2Im/aM6JrDLxBKMiS+CKy1haBRGomdpktzXs/bE7pQ
+         rgmw==
+X-Gm-Message-State: APjAAAXHD0hYg1N20DokqPFJq+3heKtuHfhG6IQDqrAkEX8LEAsTkJNM
+        MJJ/By1jVmTjgFcI73szTBo=
+X-Google-Smtp-Source: APXvYqwgdiZ02Nd9UKviS+TZgVcVwyVz8vNeQNlA/eskdagZkhAul+D2MP//ULp36SEChig/2SGT3Q==
+X-Received: by 2002:a17:90a:2e87:: with SMTP id r7mr7093349pjd.112.1559933877476;
+        Fri, 07 Jun 2019 11:57:57 -0700 (PDT)
+Received: from [10.67.49.123] ([192.19.223.252])
+        by smtp.googlemail.com with ESMTPSA id k3sm2998547pfa.36.2019.06.07.11.57.55
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 07 Jun 2019 11:57:56 -0700 (PDT)
+Subject: Re: [PATCH 1/2] dt-bindings: rng: Document BCM7211 RNG compatible
+ string
+To:     Florian Fainelli <f.fainelli@gmail.com>,
+        linux-kernel@vger.kernel.org, Rob Herring <robh+dt@kernel.org>
+Cc:     bcm-kernel-feedback-list@broadcom.com, stefan.wahren@i2se.com,
+        wahrenst@gmx.net, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, mpm@selenic.com,
+        Mark Rutland <mark.rutland@arm.com>,
+        Ray Jui <rjui@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>,
+        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
+        <devicetree@vger.kernel.org>,
+        "moderated list:BROADCOM IPROC ARM ARCHITECTURE" 
+        <linux-arm-kernel@lists.infradead.org>
+References: <20190510173112.2196-1-f.fainelli@gmail.com>
+ <20190510173112.2196-2-f.fainelli@gmail.com>
+From:   Florian Fainelli <f.fainelli@gmail.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=f.fainelli@gmail.com; prefer-encrypt=mutual; keydata=
+ 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
+ M5kY0ACeNhCZJvZ5g4C2Lc9fcTHu8jxmEkI=
+Message-ID: <ce516362-658f-cde3-9be8-0e092f554782@gmail.com>
+Date:   Fri, 7 Jun 2019 11:57:49 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-References: <20190607144944.13485-1-ard.biesheuvel@linaro.org> <20190607175947.GB648@sol.localdomain>
-In-Reply-To: <20190607175947.GB648@sol.localdomain>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Fri, 7 Jun 2019 20:08:19 +0200
-Message-ID: <CAKv+Gu-uV4EELw+wYsHQ88YP05ScrYWgf02Qym+fDjrwPtGh9A@mail.gmail.com>
-Subject: Re: [RFC PATCH 0/3] move WEP implementation to skcipher interface
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        "<linux-wireless@vger.kernel.org>" <linux-wireless@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20190510173112.2196-2-f.fainelli@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 7 Jun 2019 at 19:59, Eric Biggers <ebiggers@kernel.org> wrote:
->
-> On Fri, Jun 07, 2019 at 04:49:41PM +0200, Ard Biesheuvel wrote:
-> > One of the issues that I would like to see addressed in the crypto API
-> > is they way the cipher abstraction is used. In general, a cipher should
-> > never be used directly, and so it would be much better to clean up the
-> > existing uses of ciphers outside of the crypto subsystem itself, so that
-> > we can make the cipher abstraction part of the internal API, only to
-> > be used by templates or crypto drivers that require them as a callback.
-> >
-> > As a first step, this series moves all users of the 'arc4' cipher to
-> > the ecb(arc4) skcipher, which happens to be implemented by the same
-> > driver, and is already a stream cipher, given that ARC4_BLOCK_SIZE
-> > actually evaluates to 1.
-> >
-> > Next step would be to switch the users of the 'des' and 'aes' ciphers
-> > to other interfaces that are more appropriate, either ecb(...) or a
-> > library interface, which may be more appropriate in some cases. In any
-> > case, the end result should be that ciphers are no longer used outside
-> > of crypto/ and drivers/crypto/
-> >
-> > This series is presented as an RFC, since I am mostly interested in
-> > discussing the above, but I prefer to do so in the context of actual
-> > patches rather than an abstract discussion.
-> >
-> > Ard Biesheuvel (3):
-> >   net/mac80211: switch to skcipher interface for arc4
-> >   lib80211/tkip: switch to skcipher interface for arc4
-> >   lib80211/wep: switch to skcipher interface for arc4
-> >
->
-> The way the crypto API exposes ARC4 is definitely broken.  It treats it as a
-> block cipher (with a block size of 1 byte...), when it's actually a stream
-> cipher.  Also, it violates the API by modifying the key during each encryption.
->
-> Since ARC4 is fast in software and is "legacy" crypto that people shouldn't be
-> using, and the users call it on virtual addresses, perhaps we should instead
-> remove it from the crypto API and provide a library function arc4_crypt()?  We'd
-> lose support for ARC4 in three hardware drivers, but are there real users who
-> really are using ARC4 and need those to get acceptable performance?  Note that
-> they aren't being used in the cases where the 'cipher' API is currently being
-> used, so it would only be the current 'skcipher' users that might matter.
->
+On 5/10/19 10:31 AM, Florian Fainelli wrote:
+> BCM7211 features a RNG200 block, document its compatible string.
+> 
+> Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
 
-In fact, this is what I started out doing, i.e., factor out the core
-arc4 code into crypto/arc4_lib.c, and make the existing driver a thin
-wrapper around it, so that we can invoke the library directly.
+Rob, does this look okay to you?
 
-> Someone could theoretically be using "ecb(arc4)" via AF_ALG or dm-crypt, but it
-> seems unlikely...
->
+> ---
+>  Documentation/devicetree/bindings/rng/brcm,iproc-rng200.txt | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/rng/brcm,iproc-rng200.txt b/Documentation/devicetree/bindings/rng/brcm,iproc-rng200.txt
+> index 0014da9145af..c223e54452da 100644
+> --- a/Documentation/devicetree/bindings/rng/brcm,iproc-rng200.txt
+> +++ b/Documentation/devicetree/bindings/rng/brcm,iproc-rng200.txt
+> @@ -2,6 +2,7 @@ HWRNG support for the iproc-rng200 driver
+>  
+>  Required properties:
+>  - compatible : Must be one of:
+> +	       "brcm,bcm7211-rng200"
+>  	       "brcm,bcm7278-rng200"
+>  	       "brcm,iproc-rng200"
+>  - reg : base address and size of control register block
+> 
 
-Yes, that seems highly unlikely.
 
-> As for removing the "cipher" API entirely, we'd have to consider how to convert
-> all the current users, not just ARC4, so that would be a somewhat different
-> discussion.  How do you propose to handle dm-crypt and fscrypt which use the
-> cipher API to do ESSIV?
->
-
-Without having looked in too much detail, ESSIV seems like something
-that could be moved into the crypto subsystem, and be implemented as a
-template.
+-- 
+Florian
