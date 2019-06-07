@@ -2,103 +2,113 @@ Return-Path: <SRS0=RoO8=UG=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-3.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,T_DKIMWL_WL_HIGH,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99265C2BCA1
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Jun 2019 12:58:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F42DC468BC
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Jun 2019 14:50:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7344E206BB
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Jun 2019 12:58:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 39397208C3
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Jun 2019 14:50:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="dwgh7LXl"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yR0habUD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727606AbfFGM6p (ORCPT
+        id S1728665AbfFGOud (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 7 Jun 2019 08:58:45 -0400
-Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:2804 "EHLO
-        smtp-fw-33001.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727102AbfFGM6o (ORCPT
+        Fri, 7 Jun 2019 10:50:33 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:39807 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728486AbfFGOud (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 7 Jun 2019 08:58:44 -0400
+        Fri, 7 Jun 2019 10:50:33 -0400
+Received: by mail-wr1-f66.google.com with SMTP id x4so2458404wrt.6
+        for <linux-crypto@vger.kernel.org>; Fri, 07 Jun 2019 07:50:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1559912323; x=1591448323;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=yYhblt2+BKiN/5PsebElSxKpyf/1YoPFs0dVvX2+Xww=;
-  b=dwgh7LXlGIW2pHbCG1lI5YGA8fyFPKS7VEYqJHmWR1OaolaEMpR6oySw
-   i2EifWlnQnYqucbul/iywEBm6rbmEOxjJ2+RVEjKSTj+ND4+QvJR0KcY0
-   MINtozzpf0u4kCSXrq4qxjdxUmRSAa2xmx6aWkBF/UEY/htrbezC8aB2O
-   g=;
-X-IronPort-AV: E=Sophos;i="5.60,563,1549929600"; 
-   d="scan'208";a="804170433"
-Received: from sea3-co-svc-lb6-vlan2.sea.amazon.com (HELO email-inbound-relay-2a-c5104f52.us-west-2.amazon.com) ([10.47.22.34])
-  by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP; 07 Jun 2019 12:58:37 +0000
-Received: from EX13MTAUEB001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-        by email-inbound-relay-2a-c5104f52.us-west-2.amazon.com (Postfix) with ESMTPS id 45E57A242C;
-        Fri,  7 Jun 2019 12:58:37 +0000 (UTC)
-Received: from EX13D08UEB002.ant.amazon.com (10.43.60.107) by
- EX13MTAUEB001.ant.amazon.com (10.43.60.129) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Fri, 7 Jun 2019 12:58:36 +0000
-Received: from EX13D02UWC004.ant.amazon.com (10.43.162.236) by
- EX13D08UEB002.ant.amazon.com (10.43.60.107) with Microsoft SMTP Server (TLS)
- id 15.0.1367.3; Fri, 7 Jun 2019 12:58:36 +0000
-Received: from EX13D02UWC004.ant.amazon.com ([10.43.162.236]) by
- EX13D02UWC004.ant.amazon.com ([10.43.162.236]) with mapi id 15.00.1367.000;
- Fri, 7 Jun 2019 12:58:35 +0000
-From:   "Saidi, Ali" <alisaidi@amazon.com>
-To:     Will Deacon <will.deacon@arm.com>
-CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Rindjunsky, Ron" <ronrindj@amazon.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        "Woodhouse, David" <dwmw@amazon.co.uk>
-Subject: Re: [PATCH 0/3] Add support for Graviton TRNG
-Thread-Topic: [PATCH 0/3] Add support for Graviton TRNG
-Thread-Index: AQHVGxR9rewpsnhufE+Qj7iDYwflKaaM+/mAgALbeQA=
-Date:   Fri, 7 Jun 2019 12:58:35 +0000
-Message-ID: <7EC45708-38A1-4826-BC82-298EFAAE30B1@amazon.com>
-References: <20190604203100.15050-1-alisaidi@amazon.com>
- <20190605122031.GK15030@fuggles.cambridge.arm.com>
-In-Reply-To: <20190605122031.GK15030@fuggles.cambridge.arm.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.43.161.225]
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <597B470E461AD641A6B2C366CC0A0DD8@amazon.com>
-Content-Transfer-Encoding: base64
+        d=linaro.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=SyIPK0uGfVvmF4vYYnPSL82M9o5wEbDTCrjl6r/aHXI=;
+        b=yR0habUDsptvaNtxi8t7Zb+xCxIU3fB55eZXPPy/tPwfoLPuXh14x02PlI/YMjVm/f
+         Yn8pI2IAfCnWCJRaA9QZajb9cDny131ZDPqebR3CPLTvDFx7+MzJfCGQXnAGqcqQQHt+
+         hhBp2mM7KC/fnOzsUvAGiVrjbPgdFfHIzVr71mtRH6ozzZ41klqN798QPbdNsHr0qBcR
+         gtaeZixmzDPAOLfFqJ2ck/v7nc952YY4Qj6TCpHmH+updMSr1mSq1P8oCARmh1/QMEtJ
+         vipItAXhpO+CRBzZryrIBb1AL16VqEfAc6Qy/+XZbmWtW/i6kbxSVhOzKBzOhsZZXqWV
+         pRxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=SyIPK0uGfVvmF4vYYnPSL82M9o5wEbDTCrjl6r/aHXI=;
+        b=PjU0cf+B+Q8ohX+0qZFLYD6nps8lbRCdf8ykQQqZo+D3Pl2jNlKQjWeLBiB3u8EUtR
+         aXbba/2tGZtCKjzlLKtjPVHFdrGWnaAlSc4PuWVPY9Whb27YHuuo05H6hFMLU/LDqjUB
+         zOZLaM2RcXpXlFfbFnQfuqiXgFMoIHNVu4GdHgajg5vpJxYWrvercfiNaOOFrVzm3gMe
+         u0kIYpOCpOgedNXyr0kEZCEdfQXCkw70UuNJGM5s0ZDcSwVMzz0HFltqEU4OZg52VZZJ
+         hEs92fID/czLTSkA/3EgoIYvCoLFWsNH7vgew3Dfv+1xLOYZO4p/WUQvAqCBxZrUJXoC
+         XStA==
+X-Gm-Message-State: APjAAAWytVX3MraZfydOuJx7ovN2NnwWO4YLjkobjvq8DQu8lDqNXgav
+        M7HOu/ptACffaCaY+aRyBLsRN/uTJMr0Og==
+X-Google-Smtp-Source: APXvYqxUBW3msIX4EhYmbwjgUhDr4jBHmDzriq7zWS+2FwJB4snr/s+c6QALwCt62jyT0Pj9Wuh28w==
+X-Received: by 2002:adf:b689:: with SMTP id j9mr12793509wre.76.1559919031531;
+        Fri, 07 Jun 2019 07:50:31 -0700 (PDT)
+Received: from localhost.localdomain (aaubervilliers-681-1-126-188.w90-88.abo.wanadoo.fr. [90.88.7.188])
+        by smtp.gmail.com with ESMTPSA id t13sm4129354wra.81.2019.06.07.07.50.30
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Fri, 07 Jun 2019 07:50:30 -0700 (PDT)
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To:     linux-crypto@vger.kernel.org
+Cc:     herbert@gondor.apana.org.au, ebiggers@kernel.org,
+        johannes@sipsolutions.net, linux-wireless@vger.kernel.org,
+        davem@davemloft.net, Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [RFC PATCH 0/3] move WEP implementation to skcipher interface
+Date:   Fri,  7 Jun 2019 16:49:41 +0200
+Message-Id: <20190607144944.13485-1-ard.biesheuvel@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-DQoNCu+7v09uIDYvNS8xOSwgNzoyMCBBTSwgIldpbGwgRGVhY29uIiA8d2lsbC5kZWFjb25AYXJt
-LmNvbT4gd3JvdGU6DQoNCiAgICBPbiBUdWUsIEp1biAwNCwgMjAxOSBhdCAwODozMDo1N1BNICsw
-MDAwLCBBbGkgU2FpZGkgd3JvdGU6DQogICAgPiBBV1MgR3Jhdml0b24gYmFzZWQgc3lzdGVtcyBw
-cm92aWRlIGFuIEFybSBTTUMgY2FsbCBpbiB0aGUgdmVuZG9yIGRlZmluZWQNCiAgICA+IGh5cGVy
-dmlzb3IgcmVnaW9uIHRvIHJlYWQgcmFuZG9tIG51bWJlcnMgZnJvbSBhIEhXIFRSTkcgYW5kIHJl
-dHVybiB0aGVtIHRvIHRoZQ0KICAgID4gZ3Vlc3QuIA0KICAgID4gDQogICAgPiBXZSd2ZSBvYnNl
-cnZlZCBzbG93ZXIgZ3Vlc3QgYm9vdCBhbmQgZXNwZWNpYWxseSByZWJvb3QgdGltZXMgZHVlIHRv
-IGxhY2sgb2YNCiAgICA+IGVudHJvcHkgYW5kIHByb3ZpZGluZyBhY2Nlc3MgdG8gYSBUUk5HIGlz
-IG1lYW50IHRvIGFkZHJlc3MgdGhpcy4gDQogICAgDQogICAgQ3VyaW91cywgYnV0IHdoeSB0aGlz
-IG92ZXIgc29tZXRoaW5nIGxpa2UgdmlydGlvLXJuZz8NCiAgICANClRoaXMgaW50ZXJmYWNlIGFs
-bG93cyB1cyB0byBwcm92aWRlIHRoZSBmdW5jdGlvbmFsaXR5IGZyb20gYm90aCBFTDIgYW5kIEVM
-MyBhbmQgc3VwcG9ydCBtdWx0aXBsZSBkaWZmZXJlbnQgdHlwZXMgb2Ygb3VyIGluc3RhbmNlcyB3
-aGljaCB3ZSB1bmZvcnR1bmF0ZWx5IGNhbid0IGRvIHdpdGggdmlydC1pby4NCg0KQWxpDQogICAg
-DQoNCg==
+One of the issues that I would like to see addressed in the crypto API
+is they way the cipher abstraction is used. In general, a cipher should
+never be used directly, and so it would be much better to clean up the
+existing uses of ciphers outside of the crypto subsystem itself, so that
+we can make the cipher abstraction part of the internal API, only to
+be used by templates or crypto drivers that require them as a callback.
+
+As a first step, this series moves all users of the 'arc4' cipher to
+the ecb(arc4) skcipher, which happens to be implemented by the same
+driver, and is already a stream cipher, given that ARC4_BLOCK_SIZE
+actually evaluates to 1.
+
+Next step would be to switch the users of the 'des' and 'aes' ciphers
+to other interfaces that are more appropriate, either ecb(...) or a
+library interface, which may be more appropriate in some cases. In any
+case, the end result should be that ciphers are no longer used outside
+of crypto/ and drivers/crypto/
+
+This series is presented as an RFC, since I am mostly interested in
+discussing the above, but I prefer to do so in the context of actual
+patches rather than an abstract discussion.
+
+Ard Biesheuvel (3):
+  net/mac80211: switch to skcipher interface for arc4
+  lib80211/tkip: switch to skcipher interface for arc4
+  lib80211/wep: switch to skcipher interface for arc4
+
+ net/mac80211/ieee80211_i.h         |  6 +-
+ net/mac80211/key.h                 |  1 +
+ net/mac80211/tkip.c                |  8 +-
+ net/mac80211/tkip.h                |  4 +-
+ net/mac80211/wep.c                 | 81 +++++++++++++++-----
+ net/mac80211/wep.h                 |  4 +-
+ net/mac80211/wpa.c                 |  4 +-
+ net/wireless/lib80211_crypt_tkip.c | 61 ++++++++++-----
+ net/wireless/lib80211_crypt_wep.c  | 52 +++++++++----
+ 9 files changed, 153 insertions(+), 68 deletions(-)
+
+-- 
+2.20.1
+
