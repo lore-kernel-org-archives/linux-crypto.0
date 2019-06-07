@@ -2,173 +2,121 @@ Return-Path: <SRS0=RoO8=UG=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-3.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 298D8C468BC
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Jun 2019 18:58:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B407C468BC
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Jun 2019 20:03:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0570A2146F
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Jun 2019 18:58:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E58FA212F5
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Jun 2019 20:03:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="o0ELG8MK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ayfjXIwy"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729895AbfFGS56 (ORCPT
+        id S1731166AbfFGUDB (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 7 Jun 2019 14:57:58 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:34952 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729629AbfFGS56 (ORCPT
+        Fri, 7 Jun 2019 16:03:01 -0400
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:42849 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728727AbfFGUDB (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 7 Jun 2019 14:57:58 -0400
-Received: by mail-pf1-f193.google.com with SMTP id d126so1701246pfd.2;
-        Fri, 07 Jun 2019 11:57:57 -0700 (PDT)
+        Fri, 7 Jun 2019 16:03:01 -0400
+Received: by mail-pg1-f196.google.com with SMTP id e6so1692839pgd.9;
+        Fri, 07 Jun 2019 13:03:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:openpgp:autocrypt:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
+        h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=mSZTD2NfMklS5bQ8GbNy5yttK9DX9jrSHZ4msbKtDxE=;
-        b=o0ELG8MKcF5P+fDKafO98vB/KXIP2UVBtHzfxmmzFldfUIGki49IwfnSUe/tRF7lR4
-         56xgIOoN+gyE3pK0FlvxBfGvZ1OVNnC34GzXY+1VTHdNPTFpi3zKU8U1mkChn0Kr4whz
-         9xs7wPgnd6nnsJ5KoIUowEotNoHB0tMuFqImdTRGeUIdPyH0HAkbpSliNSoDfQReVBur
-         1DLIRho8iP+ZFxZ+dUbiWYptLpFhQIlWbyjzAbluW/2zjy4C2hUqZsBr1pkFhJ/nUX60
-         9l7Y5RTQ7jj5XLzXbK3mD0vJaGQjk5DsDRDlzz4BxRrlzgFgVbqUE1vmUFSoqb4yeNUa
-         eiiw==
+        bh=2H0Ur/sD7AC58kzRcp/q9H0oOXHyisFzvBJWy6T5K1U=;
+        b=ayfjXIwybJJwfhB5BsfKrVeZjeoigG1jOpx2ZQFx+kiCrB2OVv6qz6QZkvwcygQM0+
+         DENnbgDDRAq5BIMX2a4ZINdW9YSiFub/IX3DETCWSA1QnRGChpi3Obcd4bTLUL0dhilO
+         NjOT8v1P2fcCCpG+y+r9IM4Xclb6yV0plXaxIaj3eTfc+uho8bYxM7/fJXooZyrtkAe2
+         8cJSrCkPNR9LRf3xcKGNI4e7OG8EE7bPtNwcKUGLHgAwSHgotWrCCJ61YMZI+ESZLS5B
+         6CnQGQiNGqQZfzcq8twWcjW8YDg/hyfjez9WkV85jP4mJK10OpXc0P+YNuRk73NJB4II
+         3Q7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
-         :message-id:date:user-agent:mime-version:in-reply-to
-         :content-language:content-transfer-encoding;
-        bh=mSZTD2NfMklS5bQ8GbNy5yttK9DX9jrSHZ4msbKtDxE=;
-        b=eb/HIJIV0YtpkIoCMTkBBnwxMLA68l4ZoI7MBIyOVqZIlhJ15rEVAPbPTp3Lr1sCmP
-         28SGu2JKn3LWJijD9+Y4EFLMgfb4/nbDLlIHiG4/VASNzbwlyYOsqhsouLMLGKb1gOO0
-         xCA9RA1haAduK//Eh/6CI4K465eC0o9rCebAfLbflpl5aktCTH+QdqnzB+G1CPzowirS
-         huzkiDUfWBgsewnNagIINkLedhfNN84b++PWnXT88xMjF/w+0sAwfTuhKAtThuHyCO7W
-         G6s8Qdf7cMjdObqievqvuib2dh2Im/aM6JrDLxBKMiS+CKy1haBRGomdpktzXs/bE7pQ
-         rgmw==
-X-Gm-Message-State: APjAAAXHD0hYg1N20DokqPFJq+3heKtuHfhG6IQDqrAkEX8LEAsTkJNM
-        MJJ/By1jVmTjgFcI73szTBo=
-X-Google-Smtp-Source: APXvYqwgdiZ02Nd9UKviS+TZgVcVwyVz8vNeQNlA/eskdagZkhAul+D2MP//ULp36SEChig/2SGT3Q==
-X-Received: by 2002:a17:90a:2e87:: with SMTP id r7mr7093349pjd.112.1559933877476;
-        Fri, 07 Jun 2019 11:57:57 -0700 (PDT)
-Received: from [10.67.49.123] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id k3sm2998547pfa.36.2019.06.07.11.57.55
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 07 Jun 2019 11:57:56 -0700 (PDT)
-Subject: Re: [PATCH 1/2] dt-bindings: rng: Document BCM7211 RNG compatible
- string
-To:     Florian Fainelli <f.fainelli@gmail.com>,
-        linux-kernel@vger.kernel.org, Rob Herring <robh+dt@kernel.org>
-Cc:     bcm-kernel-feedback-list@broadcom.com, stefan.wahren@i2se.com,
-        wahrenst@gmx.net, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org, mpm@selenic.com,
-        Mark Rutland <mark.rutland@arm.com>,
-        Ray Jui <rjui@broadcom.com>,
-        Scott Branden <sbranden@broadcom.com>,
-        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
-        <devicetree@vger.kernel.org>,
-        "moderated list:BROADCOM IPROC ARM ARCHITECTURE" 
-        <linux-arm-kernel@lists.infradead.org>
-References: <20190510173112.2196-1-f.fainelli@gmail.com>
- <20190510173112.2196-2-f.fainelli@gmail.com>
-From:   Florian Fainelli <f.fainelli@gmail.com>
-Openpgp: preference=signencrypt
-Autocrypt: addr=f.fainelli@gmail.com; prefer-encrypt=mutual; keydata=
- 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
- M5kY0ACeNhCZJvZ5g4C2Lc9fcTHu8jxmEkI=
-Message-ID: <ce516362-658f-cde3-9be8-0e092f554782@gmail.com>
-Date:   Fri, 7 Jun 2019 11:57:49 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=2H0Ur/sD7AC58kzRcp/q9H0oOXHyisFzvBJWy6T5K1U=;
+        b=O1fCCR6mORdT9KTVRbZRaa/vHBR71zp8UDIV2EIG6cIdNQ7Gyfkq5O7tgpnhumVHqg
+         QnesidqsVKIbevBk5A/ji9FprkLyoUQbIZqfN7YlfWIusRCnEnhnzlYpyVUULh7ENCXZ
+         Y0cFfnDr5IO7RNjfg4rsibYxsI+IDY9QGtAMKdMjtypMgXxnzvleTdwRtUO3+PLhNhT0
+         fjNMlPmEZCi9AyBdEWrp9tzoC9MZoUIEj7bFP36dL9k/uKYVpvIVRc0kYrDAVAEmw3Zi
+         LWw1b0lyn/eEAWWt3fIUR97jcD2KGaF/f6GxwhzSSfli0/z4S2ma1b/9wkll5drunoba
+         f7vg==
+X-Gm-Message-State: APjAAAXQyUAFGw79YDkbFIqV3eQvg+8spc3eai5iOuBYE3FG7ZC19dlC
+        EwXLAIPP8nGUCgeMuruqQj9pbBI8smA=
+X-Google-Smtp-Source: APXvYqxjQShwLr/YJzQWrUJA8tgq4mvBQTLC81+hA0dJk0oXkAQuSBTmoLWinWLfICwN6Muy5TEZ0Q==
+X-Received: by 2002:a17:90a:2e89:: with SMTP id r9mr7647154pjd.117.1559937780483;
+        Fri, 07 Jun 2019 13:03:00 -0700 (PDT)
+Received: from localhost.lan (c-24-22-235-96.hsd1.wa.comcast.net. [24.22.235.96])
+        by smtp.gmail.com with ESMTPSA id s5sm3289405pgj.60.2019.06.07.13.02.54
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Fri, 07 Jun 2019 13:02:59 -0700 (PDT)
+From:   Andrey Smirnov <andrew.smirnov@gmail.com>
+To:     linux-crypto@vger.kernel.org
+Cc:     Andrey Smirnov <andrew.smirnov@gmail.com>,
+        Chris Spencer <christopher.spencer@sea.co.uk>,
+        Cory Tusar <cory.tusar@zii.aero>,
+        Chris Healy <cphealy@gmail.com>,
+        Lucas Stach <l.stach@pengutronix.de>,
+        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v2 0/4] crypto: caam - Add i.MX8MQ support
+Date:   Fri,  7 Jun 2019 13:02:21 -0700
+Message-Id: <20190607200225.21419-1-andrew.smirnov@gmail.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-In-Reply-To: <20190510173112.2196-2-f.fainelli@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 5/10/19 10:31 AM, Florian Fainelli wrote:
-> BCM7211 features a RNG200 block, document its compatible string.
-> 
-> Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
+Everyone:
 
-Rob, does this look okay to you?
+Picking up where Chris left off (I chatted with him privately
+beforehead), this series adds support for i.MX8MQ to CAAM driver. Just
+like [v1], this series is i.MX8MQ only.
 
-> ---
->  Documentation/devicetree/bindings/rng/brcm,iproc-rng200.txt | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/rng/brcm,iproc-rng200.txt b/Documentation/devicetree/bindings/rng/brcm,iproc-rng200.txt
-> index 0014da9145af..c223e54452da 100644
-> --- a/Documentation/devicetree/bindings/rng/brcm,iproc-rng200.txt
-> +++ b/Documentation/devicetree/bindings/rng/brcm,iproc-rng200.txt
-> @@ -2,6 +2,7 @@ HWRNG support for the iproc-rng200 driver
->  
->  Required properties:
->  - compatible : Must be one of:
-> +	       "brcm,bcm7211-rng200"
->  	       "brcm,bcm7278-rng200"
->  	       "brcm,iproc-rng200"
->  - reg : base address and size of control register block
-> 
+Feedback is welcome!
+Thanks,
+Andrey Smirnov
 
+Changes since [v1]
+
+  - Series reworked to continuse using register based interface for
+    queueing RNG initialization job, dropping "crypto: caam - use job
+    ring for RNG instantiation instead of DECO"
+
+  - Added a patch to share DMA mask selection code
+
+  - Added missing Signed-off-by for authors of original NXP tree
+    commits that this sereis is based on
+
+[v1] https://patchwork.kernel.org/cover/10825625/
+
+Andrey Smirnov (2):
+  crypto: caam - move DMA mask selection into a function
+  crypto: caam - always select job ring via RSR on i.MX8MQ
+
+Chris Spencer (2):
+  crypto: caam - do not initialise clocks on the i.MX8
+  crypto: caam - correct DMA address size for the i.MX8
+
+ drivers/crypto/caam/ctrl.c        | 164 +++++++++++++++++-------------
+ drivers/crypto/caam/desc_constr.h |  24 ++---
+ drivers/crypto/caam/intern.h      |  24 ++++-
+ drivers/crypto/caam/jr.c          |  15 +--
+ drivers/crypto/caam/pdb.h         |  49 ++++-----
+ drivers/crypto/caam/regs.h        |  21 +++-
+ 6 files changed, 170 insertions(+), 127 deletions(-)
 
 -- 
-Florian
+2.21.0
+
