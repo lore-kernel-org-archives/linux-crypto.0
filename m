@@ -1,65 +1,73 @@
-Return-Path: <SRS0=RoO8=UG=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=S3RC=UH=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C73EC2BCA1
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Jun 2019 22:47:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C0B9C468BD
+	for <linux-crypto@archiver.kernel.org>; Sat,  8 Jun 2019 13:03:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 473EB20840
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Jun 2019 22:47:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 35AC82168B
+	for <linux-crypto@archiver.kernel.org>; Sat,  8 Jun 2019 13:03:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mkRxlQ+F"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DAuCMhAL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729977AbfFGWra (ORCPT
+        id S1726984AbfFHNDn (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 7 Jun 2019 18:47:30 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:37420 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729629AbfFGWra (ORCPT
+        Sat, 8 Jun 2019 09:03:43 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:53641 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726976AbfFHNDn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 7 Jun 2019 18:47:30 -0400
-Received: by mail-io1-f68.google.com with SMTP id e5so2651905iok.4;
-        Fri, 07 Jun 2019 15:47:29 -0700 (PDT)
+        Sat, 8 Jun 2019 09:03:43 -0400
+Received: by mail-wm1-f68.google.com with SMTP id x15so4525692wmj.3;
+        Sat, 08 Jun 2019 06:03:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=x1N+1j3185njJEKd7t0avtMttiYY52tbAqSWPNX3l+c=;
-        b=mkRxlQ+FtejDTRDsOkAKDb/+6XJzWXwfwOtVVXb8b+EWafcIbHTerLEqR0vwCS/d2C
-         Bld36mEdkvE7pk2mtI4qSXK9Ozv1pOYcHRaVEQG39UPsuRHnRZJEaC+CSYgKhBI0jgpG
-         Vr7tviy1nX7fZb8UCxwr0EljzJpcbRB1uo1BU2BTUTsbu3z7YOvtXWni34UaiahS5AL2
-         2vUKKm6CCbM24U2Z/6oKRQOqBlU+D934AnZLIuSPLTKCoKcYBSJe/qwed+37CKrN58VY
-         gG2kk/gzFlCzqZayA61c+tWkjb4Mhi8qhq7CddtaUXr7tAUc9foGp3hB66HDh/7lEGci
-         xxNw==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=9mYiopIPpps0A5+Rr62JCfqsyqeSnG5/SRF+hwgzDj0=;
+        b=DAuCMhALiMoYefyaWD/jlHJ6nNUjhzwmRPoEMEqSvhi67JYR9cIHk7tewbXF8CV0KE
+         afepfulBc7+zlcZiEbxUPAZPpV68l+5y3nPZesZqT5YA2m0Iar/EIitVUWRQw6tRdWWI
+         o3QqkRM31t7stQL/MMx/+A6lzLOV1FrtgUTI7Q281FcBFwdhN8xK/rMDb5fDrm3kQCBX
+         dEJ8UJ+2GyIoj54Qy0xemUATA/Y5zrr9iwMuBL5f+ZFJ1TXUaN33pQgMl/GhJ1Jnn3wp
+         EF9nKMN3zvMniwZW1Bq5h50l7xInp8o7hCH3XzvrSdRzgY1KKzKnq2GWLEuWx9i7iFCW
+         AKRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=x1N+1j3185njJEKd7t0avtMttiYY52tbAqSWPNX3l+c=;
-        b=qQhixt00E7iLnZxI9Q9iXPR4WUbL0O+c6mr3M/CkAmifQSweWp4bDJrMV/lKS7+2eZ
-         h+lVfPnn4EnS8qyjn78fNA8gg/0pj+KtkyZEK8IEOMUueZUkbD2gk+na8OPWUud5pQ0F
-         8OHzvVbfhCo4GawSfSNnKy4gSJ+g2QS3Q59sQwJUlNQD64hyqJ57o01NCiyKS9HqODJ6
-         1IcPrxyEt66uz8DEe19tPsJ7Nkxl8+te+0YzCkXCk3Tpx/D2owJycyffHdV3H5Q+oqBV
-         JBR229zmIAbvSeRWs7QcBWn6xzh6Pij0WX5j/e2RTZLAmdolJrd27ZlCwvkXfhh9MJaa
-         ge7A==
-X-Gm-Message-State: APjAAAVUA/uKreN/GcMMYVeXB0ybS2fOz3y2BObSWmgSZ/BgeqfV99ft
-        Cx9GvLZn87h3kTclh4PbKuk=
-X-Google-Smtp-Source: APXvYqwq5rh9tiAUwo+BYjXjYSD6lhsDgGcLR6utVidC9qv/H+tGb0bnE/Ez8yhomyJmXCQBs5EMZA==
-X-Received: by 2002:a5e:8505:: with SMTP id i5mr5762195ioj.101.1559947649086;
-        Fri, 07 Jun 2019 15:47:29 -0700 (PDT)
-Received: from [192.168.1.249] (cpe-70-114-247-242.austin.res.rr.com. [70.114.247.242])
-        by smtp.googlemail.com with ESMTPSA id b3sm1209045iot.23.2019.06.07.15.47.28
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 07 Jun 2019 15:47:28 -0700 (PDT)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=9mYiopIPpps0A5+Rr62JCfqsyqeSnG5/SRF+hwgzDj0=;
+        b=OeUa6jOPLhqs7vdxT6kLqNVJ3aNDss8TGyB5od/mjlN/Zbu/9M+1jnmE+wibkkk01V
+         8up8H98ehXUAgHfTjoBHo1p5mFBTMJrWgoutDZ+hLYwC4OT1hgtUMxroL2zcRcESZi88
+         zJi964TJx9sVjFFizJ5hBAeN00wyuSCk+L1KmNjRNudTP8/TU4Tq/Zz14djG+f2WTUyn
+         ebac9y8/LhLG+a+XNUCYLqpfKnykHuPmro9eJNt5LhtLzVjWgRzeKBjm+vZg/NR+9rfN
+         7Vy6DUj+NZr3dgohu/j4U+5G/2MIeaSKFFd62UC5zXYr8BAcYPwY0XxDqaIdsonH8Qck
+         MbaQ==
+X-Gm-Message-State: APjAAAUtf5Q5aw57XwYZ7Tmu88Zob3Y92GJe2RIH++IsIpUu9BmQ0Kcs
+        r5vljVxvjnUX5PMphc2PCp/seqP2XixpTd+0er8=
+X-Google-Smtp-Source: APXvYqwayRDzvzU3yrmx8g9aiE3Bz1mt911cA1S1ZOUVX85HnZXSfqG8PzJXY5zcZRSNifZJO3iyFxEncgZpyPK7bxU=
+X-Received: by 2002:a1c:bbc1:: with SMTP id l184mr6990075wmf.111.1559999020591;
+ Sat, 08 Jun 2019 06:03:40 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190607144944.13485-1-ard.biesheuvel@linaro.org>
+ <20190607175947.GB648@sol.localdomain> <97BB95F6-4A4C-4984-9EAB-6069E19B4A4F@holtmann.org>
+ <CAKv+Gu-ek4nK+cACx5QZTbp=ciQq_Fvtn9y3g-wFWSOabyczZg@mail.gmail.com>
+ <f40ad169-93b9-636f-9656-634ff331ee2b@gmail.com> <20190607211514.GD648@sol.localdomain>
+ <d394b421-799d-2019-fcf0-97ba0b2abb5f@gmail.com> <20190607214120.GE648@sol.localdomain>
+ <78298612-a36b-deaa-1510-94cf0001af9d@gmail.com> <20190607224040.GG648@sol.localdomain>
+ <61e1cd8a-4891-4e37-417e-1c31cd95a278@gmail.com>
+In-Reply-To: <61e1cd8a-4891-4e37-417e-1c31cd95a278@gmail.com>
+From:   Sandy Harris <sandyinchina@gmail.com>
+Date:   Sat, 8 Jun 2019 09:03:28 -0400
+Message-ID: <CACXcFm=2_1S75G7NWRCQjBS6gi+vDZFROzg6Ntjh-fAcPfYhyQ@mail.gmail.com>
 Subject: Re: [RFC PATCH 0/3] move WEP implementation to skcipher interface
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+To:     Denis Kenzior <denkenz@gmail.com>
+Cc:     Eric Biggers <ebiggers@kernel.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         Marcel Holtmann <marcel@holtmann.org>,
         "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
         <linux-crypto@vger.kernel.org>,
@@ -67,120 +75,61 @@ Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         Johannes Berg <johannes@sipsolutions.net>,
         "open list:NFC SUBSYSTEM" <linux-wireless@vger.kernel.org>,
         "David S. Miller" <davem@davemloft.net>
-References: <20190607144944.13485-1-ard.biesheuvel@linaro.org>
- <20190607175947.GB648@sol.localdomain>
- <97BB95F6-4A4C-4984-9EAB-6069E19B4A4F@holtmann.org>
- <CAKv+Gu-ek4nK+cACx5QZTbp=ciQq_Fvtn9y3g-wFWSOabyczZg@mail.gmail.com>
- <f40ad169-93b9-636f-9656-634ff331ee2b@gmail.com>
- <20190607211514.GD648@sol.localdomain>
- <d394b421-799d-2019-fcf0-97ba0b2abb5f@gmail.com>
- <20190607214120.GE648@sol.localdomain>
- <78298612-a36b-deaa-1510-94cf0001af9d@gmail.com>
- <20190607224040.GG648@sol.localdomain>
-From:   Denis Kenzior <denkenz@gmail.com>
-Message-ID: <61e1cd8a-4891-4e37-417e-1c31cd95a278@gmail.com>
-Date:   Fri, 7 Jun 2019 17:47:27 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101
- Thunderbird/52.3.0
-MIME-Version: 1.0
-In-Reply-To: <20190607224040.GG648@sol.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Eric,
+First off, it is not clear we should implement WEP at all since it is
+fatally flawed. This has been known for about a decade, there have
+been at least two better algorithms added to the standards, & the only
+reason anyone would need WEP today would be to connect to an old
+router in an obviously insecure way.
+https://www.schneier.com/blog/archives/2007/04/breaking_wep_in.html
+https://www.tomshardware.com/reviews/wireless-security-hack,2981-4.html
 
-On 06/07/2019 05:40 PM, Eric Biggers wrote:
-> On Fri, Jun 07, 2019 at 04:54:04PM -0500, Denis Kenzior wrote:
->> Hi Eric,
->>
->> On 06/07/2019 04:41 PM, Eric Biggers wrote:
->>> On Fri, Jun 07, 2019 at 04:28:59PM -0500, Denis Kenzior wrote:
->>>> Hi Eric,
->>>>
->>>> On 06/07/2019 04:15 PM, Eric Biggers wrote:
->>>>> On Fri, Jun 07, 2019 at 03:45:45PM -0500, Denis Kenzior wrote:
->>>>>> Hi Ard,
->>>>>>
->>>>>>>
->>>>>>> Ah ok, good to know. That does imply that the driver is not entirely
->>>>>>> broken, which is good news I suppose.
->>>>>>>
->>>>>>
->>>>>> Not entirely, but we did have to resort to using multiple sockets, otherwise
->>>>>> parallel encrypt/decrypt operations on the socket would result in invalid
->>>>>> behavior.  Probably due to the issue Eric already pointed out.
->>>>>>
->>>>>> No such issue with any other ciphers that we use.
->>>>>>
->>>>>> Regards,
->>>>>> -Denis
->>>>>
->>>>> Okay, that sucks, so we do have to keep "ecb(arc4)" in the crypto API then.  And
->>>>> we can't fix its name to be just "arc4".  It's odd that someone would choose to
->>>>> use AF_ALG over writing a 20 line arc4_crypt() in userspace, but whatever.
->>>>>
->>>>> Yes, "ecb(arc4)" isn't currently thread safe.  ARC4 uses a single key whereas
->>>>> modern stream ciphers use a key + IV.  To comply with the crypto API it would
->>>>> have to copy the key to a stack buffer for each encryption/decryption.  But it
->>>>> doesn't; it just updates the key instead, making it non thread safe.  If users
->>>>> are actually relying on that, we'll have to settle for adding a mutex instead.
->>>>
->>>> Well the issue isn't even about being thread safe.  We run a single thread
->>>> in iwd.  The details are a bit fuzzy now due to time elapsed, but if I
->>>> recall correctly, even behavior like:
->>>>
->>>> fd = socket();
->>>> bind(fd, ecb(arc4));
->>>> setsockopt(fd, ...key...);
->>>>
->>>> sendmsg(fd, OP_ENCRYPT, ...);
->>>> sendmsg(fd, OP_DECRYPT, ...);
->>>> sendmsg(fd, OP_ENCRYPT, ...);
->>>>
->>>> would produce different (incorrect) encrypted results compared to
->>>>
->>>> sendmsg(fd, OP_ENCRYPT, ...)
->>>> sendmsg(fd, OP_ENCRYPT, ...)
->>>>
->>>
->>> That's because currently each operation uses the next bytes from the keystream,
->>> and a new keystream is started only by setsockopt(..., ALG_SET_KEY, ...).
->>> There's no difference between ARC4 encryption and decryption; both just XOR the
->>> keystream with the data.  Are you saying you expected each encryption to be a
->>> continuation of the previous encryption, but decryptions to be independent?
->>>
->>
->>  From a userspace / api perspective, yes I would have expected the encrypt
->> and decrypt to work independently.  No biggie now, but I remember being
->> surprised when this bit me as no other cipher had this behavior.  E.g.
->> interleaving of operations seemed to only affect arc4 results.
->>
->> Are the exact semantics spelled out somewhere?
->>
-> 
-> For all other skcipher algorithms, every operation is independent and depends
-> only on the key which was set previously on the algorithm socket, plus the IV
-> provided for the operation.  There is no way to perform a single encryption or
-> decryption incrementally in multiple parts, unless the algorithm supports it
-> naturally by updating the IV (e.g. CBC mode).
+Twenty years ago the FreeS/WAN project implemented IPsec for Linux &
+deliberately did not include things like single DES which were known
+to be insecure:
+https://www.freeswan.org/freeswan_trees/freeswan-1.99/doc/compat.html#dropped
+I think a similar policy was would be a fine idea for the kernel today
+& WEP is hopelessly insecure.
 
-Right, that is what I thought.
+> > As I am attempting to explain, ecb(arc4) does not implement this API correctly
+> > because it updates the *key* after each operation, not the IV.  I doubt this is
+> > documented anywhere, but this can only be changed if people aren't relying on it
+> > already.
 
-> 
-> As I am attempting to explain, ecb(arc4) does not implement this API correctly
-> because it updates the *key* after each operation, not the IV.  I doubt this is
-> documented anywhere, but this can only be changed if people aren't relying on it
-> already.
+It is more the case that the API does not apply to arc4, or more
+generally to stream ciphers, than that "ecb(arc4) does not implement
+this API correctly".
 
-It sounds to me like it was broken and should be fixed.  So our vote / 
-preference is to have ARC4 fixed to follow the proper semantics.  We can 
-deal with the kernel behavioral change on our end easily enough; the 
-required workarounds are the worse evil.
+ECB (electronic code book) is a mode of operation for block ciphers
+https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation
+Stream ciphers do not have those modes.
 
-Regards,
--Denis
+For that matter, not all block cipher modes use an IV. The very common
+CBC mode -- the only mode used in IPsec, for example -- does, but
+others including ECB do not. I do not know of any mode that ever
+updates the IV. CBC uses the IV with the first block & on all other
+blocks uses the ciphertext from the previous block the same way; one
+might call that updating the IV I suppose, but I do not see why one
+would want to.
+
+> It sounds to me like it was broken and should be fixed.  So our vote /
+> preference is to have ARC4 fixed to follow the proper semantics.
+
+As I see it, those are clearly not "he proper semantics" for a stream
+cipher & the question of forcing it into them should not even arise.
+
+One alternative would be to drop arc4. That would make sense if WEP is
+the only usage & we elect to drop WEP. One could also argue the arc4
+itself is insecure & should go, but I'm not sure that is accurate.
+Certainly there have been some published attacks & other stream
+ciphers are now generally preferrred, but I have not followed things
+closely enough to know if RC$ should be considered fatally flawed.
+
+A better choice might be to change the interface, defining a new
+interface for stream ciphers and/or generalising the interface so it
+works for either stream ciphers or block ciphers.
