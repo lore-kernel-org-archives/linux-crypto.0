@@ -2,108 +2,134 @@ Return-Path: <SRS0=Xb3v=UI=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E9DAC28EBD
-	for <linux-crypto@archiver.kernel.org>; Sun,  9 Jun 2019 07:00:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6505C28EBD
+	for <linux-crypto@archiver.kernel.org>; Sun,  9 Jun 2019 11:55:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6BC86208E3
-	for <linux-crypto@archiver.kernel.org>; Sun,  9 Jun 2019 07:00:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8587220673
+	for <linux-crypto@archiver.kernel.org>; Sun,  9 Jun 2019 11:55:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nifty.com header.i=@nifty.com header.b="NI54pJHp"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="h/+f01WD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726480AbfFIHAu (ORCPT
+        id S1728317AbfFILzP (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 9 Jun 2019 03:00:50 -0400
-Received: from condef-10.nifty.com ([202.248.20.75]:56367 "EHLO
-        condef-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725850AbfFIHAu (ORCPT
+        Sun, 9 Jun 2019 07:55:15 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:37649 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728294AbfFILzO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 9 Jun 2019 03:00:50 -0400
-Received: from conuserg-12.nifty.com ([10.126.8.75])by condef-10.nifty.com with ESMTP id x596wGen024350
-        for <linux-crypto@vger.kernel.org>; Sun, 9 Jun 2019 15:58:16 +0900
-Received: from grover.flets-west.jp (softbank126125154139.bbtec.net [126.125.154.139]) (authenticated)
-        by conuserg-12.nifty.com with ESMTP id x596vHjR016968;
-        Sun, 9 Jun 2019 15:57:17 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com x596vHjR016968
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1560063438;
-        bh=aYer5eaUX0jo6zJ4FAQB9HvsSWCvDxkv4u3/G3QNkYM=;
-        h=From:To:Cc:Subject:Date:From;
-        b=NI54pJHpgRUMzU8yFtXRf4eQOB7y/n2ngkcysUp/Mtlulk+euiFeQdtST9nF0vTMc
-         tHfzRqcO9QPGAO1bRpV01Wt/T43CDDfprus8O52e+iOoh/wtaDPD07ETQU8X43xyd3
-         tDXm4sqTEYec5sXKUX6iWuA7z0FNAoKaC6rXUD62S0etkMQeM20v0bm7Lsy1lIqK9c
-         jQUhxtQl2l8rhzFy8fvFM5nClIjeEVLkdTrnlvmJh6kTfGraBDtDcuB7BOZ2kzCqSd
-         ha41JddYgy7xprSNCOX2ZV7LuJYL7YZp2toO1wi5vrCZlDcTNY7iCAXXP4ZfS5Q0ew
-         Xm+TQws6PDmoQ==
-X-Nifty-SrcIP: [126.125.154.139]
-From:   Masahiro Yamada <yamada.masahiro@socionext.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org
-Cc:     Masahiro Yamada <yamada.masahiro@socionext.com>,
+        Sun, 9 Jun 2019 07:55:14 -0400
+Received: by mail-wr1-f66.google.com with SMTP id v14so6370218wrr.4
+        for <linux-crypto@vger.kernel.org>; Sun, 09 Jun 2019 04:55:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=NS/OeESvjcIylX3MvpojSYicfP5yOiELOMT1mYMpd6I=;
+        b=h/+f01WDroefXzctBz18qiDh0l00iHYgnQtFRfD0l8W5BB7AGPsrYwNFgEI43f8NoH
+         VnYCwHmLC11dw3y6KXSkFTI80BrGUEZTwUkkk+Xqv4x9zYl2//1mrL2oO4rQ3l8AwnEB
+         Qc0TZkkUAapWOjGM0e3o3EU3JddurPrqHyx33hxrPsOXkRSIdINvcZ8KDO50IMQw6QbF
+         rh4nUhgSxkruwCGwjglljaHC/LGGXJsCg0ViA7x3aldoL3BrdARJq0TuIVHyrEC/CDJt
+         Duj6PKoV8PDmqD+uMpE7hFaRGLbv7IkuOlDvt+14Bt8T9NU2twvNG2HzgyAPoyVPEMw9
+         gp2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=NS/OeESvjcIylX3MvpojSYicfP5yOiELOMT1mYMpd6I=;
+        b=HD0fuHpHlWGc8/Kw4/Kn5c4aIOLpQYUhd0TCwlFeRKoy8q/v+FkQeaKolQSPNzmXk5
+         z3G/9Jn4wMOXa9k4OvO/EuQFUQ0gdA4QOywG11eQllCSIh+zvFEvR7vtz1KhUjlvNSEM
+         EHz+UvnTRzMpRNRMOPprmHBRHDa9sr73Yzgm+qXluOAEuUqWNqHsEvpqvXUMJvbBo4SH
+         YxJSuXTQp57sf4MJms+fH//znNKRpUghFTow2vvMy2U46qC8OMwiYNPkdB6W1hqpoTof
+         U63V7ka0Gryd8N1DdvLw/Gt2vwg7nElRgq0UIkeYZYoPENrB6/lioSELa3gcOaA0qDJm
+         rDTg==
+X-Gm-Message-State: APjAAAUUK119rsYubrOB1Uu4x651NYxI/+Vu1MdCvKvlqulthJfg8w1+
+        OVeyrv30y/7//whGnyXGvjjT2IUXmET4lw==
+X-Google-Smtp-Source: APXvYqzHHBeMKpI9yFtOtgGib21DiVTL3FH81JhfbgfIEaMSBnaIBHju5JZU9rWFDd0+d1n/er0DVQ==
+X-Received: by 2002:adf:8028:: with SMTP id 37mr40389410wrk.106.1560081312948;
+        Sun, 09 Jun 2019 04:55:12 -0700 (PDT)
+Received: from sudo.home ([2a01:cb1d:112:6f00:5129:23cd:5870:89d4])
+        by smtp.gmail.com with ESMTPSA id r5sm14954317wrg.10.2019.06.09.04.55.11
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sun, 09 Jun 2019 04:55:11 -0700 (PDT)
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To:     linux-crypto@vger.kernel.org
+Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        linux-kernel@vger.kernel.org, Eric Biggers <ebiggers@google.com>,
-        Corentin Labbe <clabbe@baylibre.com>
-Subject: [PATCH] crypto: user - fix potential warnings in cryptouser.h
-Date:   Sun,  9 Jun 2019 15:57:10 +0900
-Message-Id: <20190609065710.18735-1-yamada.masahiro@socionext.com>
-X-Mailer: git-send-email 2.17.1
+        Eric Biggers <ebiggers@google.com>
+Subject: [PATCH v2 0/7] crypto: rc4 cleanup
+Date:   Sun,  9 Jun 2019 13:55:02 +0200
+Message-Id: <20190609115509.26260-1-ard.biesheuvel@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Function definitions in headers are usually marked as 'static inline'.
+This is a follow-up to, and supersedes [0], which moved some WEP code from
+the cipher to the skcipher interface, in order to reduce the use of the bare
+cipher interface in non-crypto subsystem code.
 
-Since 'inline' is missing for crypto_reportstat(), if it were not
-referenced from a .c file that includes this header, it would produce
-a warning.
+Since using the skcipher interface to invoke the generic C implementation of
+an algorithm that is known at compile time is rather pointless, this series
+moves those users to a new arc4 library interface instead, which is based on
+the existing code.
 
-Also, 'struct crypto_user_alg' should be forward declared so that
-we do not rely on the specific order of header inclusion.
+Along the way, the arc4 cipher implementation is removed entirely, and only
+the ecb(arc4) code is preserved, which is used in a number of places in the
+kernel, and is known to be used by at least 'iwd' from user space via the
+algif_skcipher API.
 
-Detected by compile-testing cryptouser.h as a standalone unit:
+[0] https://lore.kernel.org/linux-crypto/20190607144944.13485-1-ard.biesheuvel@linaro.org/
 
-/include/crypto/internal/cryptouser.h:6:44: warning: ‘struct crypto_user_alg’ declared inside parameter list will not be visible outside of this definition or declaration
- struct crypto_alg *crypto_alg_match(struct crypto_user_alg *p, int exact);
-                                            ^~~~~~~~~~~~~~~
-./include/crypto/internal/cryptouser.h:11:12: warning: ‘crypto_reportstat’ defined but not used [-Wunused-function]
- static int crypto_reportstat(struct sk_buff *in_skb, struct nlmsghdr *in_nlh, struct nlattr **attrs)
-            ^~~~~~~~~~~~~~~~~
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Biggers <ebiggers@google.com>
 
-Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
----
+Ard Biesheuvel (7):
+  crypto: arc4 - refactor arc4 core code into separate library
+  net/mac80211: move WEP handling to ARC4 library interface
+  net/lib80211: move WEP handling to ARC4 library code
+  net/lib80211: move TKIP handling to ARC4 library code
+  crypto: arc4 - remove cipher implementation
+  ppp: mppe: switch to RC4 library interface
+  fs: cifs: switch to RC4 library interface
 
- include/crypto/internal/cryptouser.h | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ MAINTAINERS                        |   1 +
+ crypto/Kconfig                     |   4 +
+ crypto/arc4.c                      | 106 ++------------------
+ drivers/net/ppp/Kconfig            |   3 +-
+ drivers/net/ppp/ppp_mppe.c         |  92 ++---------------
+ fs/cifs/Kconfig                    |   2 +-
+ fs/cifs/cifsencrypt.c              |  50 +++------
+ include/crypto/arc4.h              |  13 +++
+ lib/Makefile                       |   2 +-
+ lib/crypto/Makefile                |   3 +
+ lib/crypto/libarc4.c               |  74 ++++++++++++++
+ net/mac80211/Kconfig               |   2 +-
+ net/mac80211/cfg.c                 |   3 -
+ net/mac80211/ieee80211_i.h         |   4 +-
+ net/mac80211/key.h                 |   1 +
+ net/mac80211/main.c                |  48 +--------
+ net/mac80211/mlme.c                |   2 -
+ net/mac80211/tkip.c                |   8 +-
+ net/mac80211/tkip.h                |   4 +-
+ net/mac80211/wep.c                 |  47 ++-------
+ net/mac80211/wep.h                 |   4 +-
+ net/mac80211/wpa.c                 |   4 +-
+ net/wireless/Kconfig               |   1 +
+ net/wireless/lib80211_crypt_tkip.c |  42 +++-----
+ net/wireless/lib80211_crypt_wep.c  |  43 ++------
+ 25 files changed, 176 insertions(+), 387 deletions(-)
+ create mode 100644 lib/crypto/Makefile
+ create mode 100644 lib/crypto/libarc4.c
 
-diff --git a/include/crypto/internal/cryptouser.h b/include/crypto/internal/cryptouser.h
-index 8c602b187c58..2339cb06dbf8 100644
---- a/include/crypto/internal/cryptouser.h
-+++ b/include/crypto/internal/cryptouser.h
-@@ -3,12 +3,15 @@
- 
- extern struct sock *crypto_nlsk;
- 
-+struct crypto_user_alg;
- struct crypto_alg *crypto_alg_match(struct crypto_user_alg *p, int exact);
- 
- #ifdef CONFIG_CRYPTO_STATS
- int crypto_reportstat(struct sk_buff *in_skb, struct nlmsghdr *in_nlh, struct nlattr **attrs);
- #else
--static int crypto_reportstat(struct sk_buff *in_skb, struct nlmsghdr *in_nlh, struct nlattr **attrs)
-+static inline int crypto_reportstat(struct sk_buff *in_skb,
-+				    struct nlmsghdr *in_nlh,
-+				    struct nlattr **attrs)
- {
- 	return -ENOTSUPP;
- }
 -- 
-2.17.1
+2.20.1
 
