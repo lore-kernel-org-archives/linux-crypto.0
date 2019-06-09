@@ -1,188 +1,109 @@
-Return-Path: <SRS0=S3RC=UH=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=Xb3v=UI=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 204F6C468BC
-	for <linux-crypto@archiver.kernel.org>; Sat,  8 Jun 2019 15:51:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E9DAC28EBD
+	for <linux-crypto@archiver.kernel.org>; Sun,  9 Jun 2019 07:00:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E35F320840
-	for <linux-crypto@archiver.kernel.org>; Sat,  8 Jun 2019 15:51:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6BC86208E3
+	for <linux-crypto@archiver.kernel.org>; Sun,  9 Jun 2019 07:00:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="G427dAGF"
+	dkim=pass (2048-bit key) header.d=nifty.com header.i=@nifty.com header.b="NI54pJHp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727148AbfFHPvg (ORCPT
+        id S1726480AbfFIHAu (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 8 Jun 2019 11:51:36 -0400
-Received: from mail-it1-f194.google.com ([209.85.166.194]:37556 "EHLO
-        mail-it1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727110AbfFHPvg (ORCPT
+        Sun, 9 Jun 2019 03:00:50 -0400
+Received: from condef-10.nifty.com ([202.248.20.75]:56367 "EHLO
+        condef-10.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725850AbfFIHAu (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 8 Jun 2019 11:51:36 -0400
-Received: by mail-it1-f194.google.com with SMTP id x22so7299769itl.2
-        for <linux-crypto@vger.kernel.org>; Sat, 08 Jun 2019 08:51:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=6hKpkFL1XfxDKGwehxlIu+lQy2Itff4tWF+Dz7nbA5Y=;
-        b=G427dAGFEGx349h3blBiwORFKD+GZBU2DsXkxAJST2pWyX+PHTykQuwP++jTYeI6Fb
-         fsTnuHYoTjSTcQbZoPwb/hu6yy6s3fj5QApXqz8IGeDcaNHehpeLneiHptcOAs6VUlRO
-         PjgzmMkzuy/qREToTSYvY/kkGit+pX0axQch7w4ytSgoL1vBhl7YiLdEhp1/mMKsZiZZ
-         lbH7SRrVy4i4jcmdkzHv8A7QgKbzCqV0Johmv3Uc7dnF3qtdyc2p5ymdYpsKk8srXD9M
-         fhoW+6nfvjFe41sCAcRb1gCC0Qx+J8vc+Z3J+wAg22X5yrhDyatZ6S2Afwma4jMUYfRQ
-         Q+uw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=6hKpkFL1XfxDKGwehxlIu+lQy2Itff4tWF+Dz7nbA5Y=;
-        b=EShkFzNBAOb64oqpAV1hidP/iuDHE+2NhJwr7aXC6PBCIjJKQ8S+RkLThx4yZq81md
-         92jq/GulbcYAmT8HrNJVDYdQOixxxbA5NGoNpH2BR9N6EnSfG/MVWn0ZHFozALhxO31Y
-         NAmDRCu7AxUtmqoryAyxdtqmWyjLKFEpctnU/7juRHSprXKD5WA2VX3Bv1uRV9LsDroc
-         9oVzXCqIUIHrQtqVvh9aLrmxTFq3hA5zVhDevH46bdXQSz0acF+tkSXDxgWYZ9C9kkgN
-         T+VDH4ESS5zvXV2sfTjnPWRk4C5fF3VcEehBJ+QwEm9iWhRVrJy1YasFhsgL5IuFYNmL
-         F5Zg==
-X-Gm-Message-State: APjAAAUVWGLLN3yYMbhEw62h9x/BYvZ9i+poX1bM0v7SZV/o/S1G1sMf
-        FGhWYFFUCG8zBLt0IG2zNmY+4iZDBWQc11dfUW6pYQ==
-X-Google-Smtp-Source: APXvYqxxGFFQoHg4Epl9Jl+vGmUOR1uCz7PhvXaJ9Cw1I7OChP3tJXl/lWwFzVbQJLSQfnQhtbXcrixSLzKpHZuNVys=
-X-Received: by 2002:a05:660c:44a:: with SMTP id d10mr7371332itl.153.1560009095347;
- Sat, 08 Jun 2019 08:51:35 -0700 (PDT)
+        Sun, 9 Jun 2019 03:00:50 -0400
+Received: from conuserg-12.nifty.com ([10.126.8.75])by condef-10.nifty.com with ESMTP id x596wGen024350
+        for <linux-crypto@vger.kernel.org>; Sun, 9 Jun 2019 15:58:16 +0900
+Received: from grover.flets-west.jp (softbank126125154139.bbtec.net [126.125.154.139]) (authenticated)
+        by conuserg-12.nifty.com with ESMTP id x596vHjR016968;
+        Sun, 9 Jun 2019 15:57:17 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com x596vHjR016968
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1560063438;
+        bh=aYer5eaUX0jo6zJ4FAQB9HvsSWCvDxkv4u3/G3QNkYM=;
+        h=From:To:Cc:Subject:Date:From;
+        b=NI54pJHpgRUMzU8yFtXRf4eQOB7y/n2ngkcysUp/Mtlulk+euiFeQdtST9nF0vTMc
+         tHfzRqcO9QPGAO1bRpV01Wt/T43CDDfprus8O52e+iOoh/wtaDPD07ETQU8X43xyd3
+         tDXm4sqTEYec5sXKUX6iWuA7z0FNAoKaC6rXUD62S0etkMQeM20v0bm7Lsy1lIqK9c
+         jQUhxtQl2l8rhzFy8fvFM5nClIjeEVLkdTrnlvmJh6kTfGraBDtDcuB7BOZ2kzCqSd
+         ha41JddYgy7xprSNCOX2ZV7LuJYL7YZp2toO1wi5vrCZlDcTNY7iCAXXP4ZfS5Q0ew
+         Xm+TQws6PDmoQ==
+X-Nifty-SrcIP: [126.125.154.139]
+From:   Masahiro Yamada <yamada.masahiro@socionext.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org
+Cc:     Masahiro Yamada <yamada.masahiro@socionext.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-kernel@vger.kernel.org, Eric Biggers <ebiggers@google.com>,
+        Corentin Labbe <clabbe@baylibre.com>
+Subject: [PATCH] crypto: user - fix potential warnings in cryptouser.h
+Date:   Sun,  9 Jun 2019 15:57:10 +0900
+Message-Id: <20190609065710.18735-1-yamada.masahiro@socionext.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-References: <20190607144944.13485-1-ard.biesheuvel@linaro.org>
- <20190607175947.GB648@sol.localdomain> <97BB95F6-4A4C-4984-9EAB-6069E19B4A4F@holtmann.org>
- <CAKv+Gu-ek4nK+cACx5QZTbp=ciQq_Fvtn9y3g-wFWSOabyczZg@mail.gmail.com>
- <f40ad169-93b9-636f-9656-634ff331ee2b@gmail.com> <20190607211514.GD648@sol.localdomain>
- <d394b421-799d-2019-fcf0-97ba0b2abb5f@gmail.com> <20190607214120.GE648@sol.localdomain>
- <78298612-a36b-deaa-1510-94cf0001af9d@gmail.com> <20190607224040.GG648@sol.localdomain>
- <61e1cd8a-4891-4e37-417e-1c31cd95a278@gmail.com> <CACXcFm=2_1S75G7NWRCQjBS6gi+vDZFROzg6Ntjh-fAcPfYhyQ@mail.gmail.com>
- <CAKv+Gu8Ex63n-YV7aaQEz7VBZ137vi113jv5NCPjbxP8=9Q=qQ@mail.gmail.com>
-In-Reply-To: <CAKv+Gu8Ex63n-YV7aaQEz7VBZ137vi113jv5NCPjbxP8=9Q=qQ@mail.gmail.com>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Sat, 8 Jun 2019 17:51:20 +0200
-Message-ID: <CAKv+Gu_LOAreSxj=W_=RFnTOWB1zP+wXceqOBw63WgeyKB_EUg@mail.gmail.com>
-Subject: Re: [RFC PATCH 0/3] move WEP implementation to skcipher interface
-To:     Sandy Harris <sandyinchina@gmail.com>
-Cc:     Denis Kenzior <denkenz@gmail.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        "open list:NFC SUBSYSTEM" <linux-wireless@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, 8 Jun 2019 at 16:37, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
->
-> On Sat, 8 Jun 2019 at 15:03, Sandy Harris <sandyinchina@gmail.com> wrote:
-> >
-> > First off, it is not clear we should implement WEP at all since it is
-> > fatally flawed. This has been known for about a decade, there have
-> > been at least two better algorithms added to the standards, & the only
-> > reason anyone would need WEP today would be to connect to an old
-> > router in an obviously insecure way.
-> > https://www.schneier.com/blog/archives/2007/04/breaking_wep_in.html
-> > https://www.tomshardware.com/reviews/wireless-security-hack,2981-4.html
-> >
-> > Twenty years ago the FreeS/WAN project implemented IPsec for Linux &
-> > deliberately did not include things like single DES which were known
-> > to be insecure:
-> > https://www.freeswan.org/freeswan_trees/freeswan-1.99/doc/compat.html#dropped
-> > I think a similar policy was would be a fine idea for the kernel today
-> > & WEP is hopelessly insecure.
-> >
->
-> It is actually pretty clear that we should implement WEP, simply
-> because we already do. We all know how broken it is, but that does not
-> mean we should be the ones policing its use. People may have good
-> reasons to stick with WEP in their particular use case, or maybe they
-> have bad reasons, but the bottom line is that it does not really
-> matter: if it works today, we can't just remove it.
->
-> What we can do is make the existing code less of an eyesore than it
-> already is, and in the context of what I want to achieve for the
-> crypto API, this involves moving it from the cipher API to something
-> else.
->
-> > > > As I am attempting to explain, ecb(arc4) does not implement this API correctly
-> > > > because it updates the *key* after each operation, not the IV.  I doubt this is
-> > > > documented anywhere, but this can only be changed if people aren't relying on it
-> > > > already.
-> >
-> > It is more the case that the API does not apply to arc4, or more
-> > generally to stream ciphers, than that "ecb(arc4) does not implement
-> > this API correctly".
-> >
-> > ECB (electronic code book) is a mode of operation for block ciphers
-> > https://en.wikipedia.org/wiki/Block_cipher_mode_of_operation
-> > Stream ciphers do not have those modes.
-> >
->
-> This is exactly the point Eric was making. Our skcipher abstraction
-> deals with stream ciphers fine, but the way the arc4 code is exposed
-> as ecb(arc4) and updates the key in the process makes absolutely no
-> sense.
->
-> > For that matter, not all block cipher modes use an IV. The very common
-> > CBC mode -- the only mode used in IPsec, for example -- does, but
-> > others including ECB do not. I do not know of any mode that ever
-> > updates the IV. CBC uses the IV with the first block & on all other
-> > blocks uses the ciphertext from the previous block the same way; one
-> > might call that updating the IV I suppose, but I do not see why one
-> > would want to.
-> >
->
-> If you want to split up a CBC transformation into several invocations
-> of the underlying API, then the last ciphertext block of the first
-> call serves as the IV for the next call. Arguing that we should not be
-> calling this an IV serves little purpose, since the code already
-> treats it exactly the same. In fact, our CTS template relies on this
-> feature as well, so a CBC implementation that does not return the last
-> ciphertext block in the IV buffer is broken wrt our API requirements.
->
-> > > It sounds to me like it was broken and should be fixed.  So our vote /
-> > > preference is to have ARC4 fixed to follow the proper semantics.
-> >
-> > As I see it, those are clearly not "he proper semantics" for a stream
-> > cipher & the question of forcing it into them should not even arise.
-> >
-> > One alternative would be to drop arc4. That would make sense if WEP is
-> > the only usage & we elect to drop WEP. One could also argue the arc4
-> > itself is insecure & should go, but I'm not sure that is accurate.
-> > Certainly there have been some published attacks & other stream
-> > ciphers are now generally preferrred, but I have not followed things
-> > closely enough to know if RC$ should be considered fatally flawed.
-> >
-> > A better choice might be to change the interface, defining a new
-> > interface for stream ciphers and/or generalising the interface so it
-> > works for either stream ciphers or block ciphers.
->
-> Dropping WEP is out of the question, and apparently, there are
-> userspace dependencies on the ecb(arc4) cipher as well, so
-> unfortunately, we have already painted ourselves into a corner here.
->
-> skcipher works fine for block ciphers wrapped in CTR mode, and for
-> chacha/salsa as well, so I don't think there is a problem with the API
-> for other stream ciphers we care about. Calling the rc4 skcipher
-> 'ecb(arc4)' was obviously a mistake, but it seems we're stuck with
-> that as well :-(
+Function definitions in headers are usually marked as 'static inline'.
 
-As it turns out, we have other users of ecb(arc4) in the MPPE code,
-the kerberos code and some realtek code in the staging tree. More
-interestingly, the code this series changes was recently converted
-from skcipher to cipher, while I am doing the opposite.
+Since 'inline' is missing for crypto_reportstat(), if it were not
+referenced from a .c file that includes this header, it would produce
+a warning.
 
-Given Eric's analysis that few of these users actually take advantage
-of the crypto API (i.e., they all use the sync variety and hardcode
-the algo name), we can simplify them to use library calls instead. The
-only remaining skcipher user would be the Kerberos code, which
-dynamically instantiates skciphers with a parameterized algo name.
+Also, 'struct crypto_user_alg' should be forward declared so that
+we do not rely on the specific order of header inclusion.
+
+Detected by compile-testing cryptouser.h as a standalone unit:
+
+/include/crypto/internal/cryptouser.h:6:44: warning: ‘struct crypto_user_alg’ declared inside parameter list will not be visible outside of this definition or declaration
+ struct crypto_alg *crypto_alg_match(struct crypto_user_alg *p, int exact);
+                                            ^~~~~~~~~~~~~~~
+./include/crypto/internal/cryptouser.h:11:12: warning: ‘crypto_reportstat’ defined but not used [-Wunused-function]
+ static int crypto_reportstat(struct sk_buff *in_skb, struct nlmsghdr *in_nlh, struct nlattr **attrs)
+            ^~~~~~~~~~~~~~~~~
+
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
+
+ include/crypto/internal/cryptouser.h | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/include/crypto/internal/cryptouser.h b/include/crypto/internal/cryptouser.h
+index 8c602b187c58..2339cb06dbf8 100644
+--- a/include/crypto/internal/cryptouser.h
++++ b/include/crypto/internal/cryptouser.h
+@@ -3,12 +3,15 @@
+ 
+ extern struct sock *crypto_nlsk;
+ 
++struct crypto_user_alg;
+ struct crypto_alg *crypto_alg_match(struct crypto_user_alg *p, int exact);
+ 
+ #ifdef CONFIG_CRYPTO_STATS
+ int crypto_reportstat(struct sk_buff *in_skb, struct nlmsghdr *in_nlh, struct nlattr **attrs);
+ #else
+-static int crypto_reportstat(struct sk_buff *in_skb, struct nlmsghdr *in_nlh, struct nlattr **attrs)
++static inline int crypto_reportstat(struct sk_buff *in_skb,
++				    struct nlmsghdr *in_nlh,
++				    struct nlattr **attrs)
+ {
+ 	return -ENOTSUPP;
+ }
+-- 
+2.17.1
+
