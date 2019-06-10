@@ -2,116 +2,102 @@ Return-Path: <SRS0=e/ms=UJ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,T_DKIMWL_WL_HIGH autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09835C4321A
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Jun 2019 19:00:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAEB0C4321B
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Jun 2019 21:32:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DB7DF207E0
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Jun 2019 19:00:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 83C2B21721
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Jun 2019 21:32:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TfbUPctd"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="ijZRqYOH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388927AbfFJS77 (ORCPT
+        id S2389909AbfFJVct (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 10 Jun 2019 14:59:59 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:37240 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388544AbfFJS77 (ORCPT
+        Mon, 10 Jun 2019 17:32:49 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:47033 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389784AbfFJVct (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Jun 2019 14:59:59 -0400
-Received: by mail-pf1-f195.google.com with SMTP id 19so4990460pfa.4;
-        Mon, 10 Jun 2019 11:59:59 -0700 (PDT)
+        Mon, 10 Jun 2019 17:32:49 -0400
+Received: by mail-pf1-f196.google.com with SMTP id 81so6008455pfy.13
+        for <linux-crypto@vger.kernel.org>; Mon, 10 Jun 2019 14:32:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=nQ55caWuqwbU+De7XmQQt0fy2kYmg/0ZSaiCipjUZO4=;
-        b=TfbUPctdvrXpzaf6iFgr4Y8X5ezm+GPXUs/nQV5c0gdSoF54TRbbdL6+FLLiGw+Ccg
-         LU3GOQ3l5Xodoe+ve6waq/Oj44UOSrwAd96BHCJgwH02kz42X9YOm5+LFybfefIv4Tzr
-         4jN1lt9Of+iEN9jUJnwoVOjXlHBJwx22kW1ZRUCOaWs5rgyYTvXyDMxr2BmETY1psB/w
-         fcSfLjNL0UuUHrppiYwWTfQBTsMeLsFKhZeq/PwBErApbqmvbi8f6WVRMrVMmIxILhzG
-         1Eonr+P/RYi/xSz7kgKNNhcNg0xR7d7bjJCtLBrE1JxwG2vH+ZMaq6+v3Q87xIb3NTe/
-         FbzQ==
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=u65kJhZ2c0w54Nc/i9RYT+l58N6im9e9Q29G/YH/uuc=;
+        b=ijZRqYOHAJLGYs5vVBH7AyvxnX3poiS7Ze8fMa8xMMZFUFQkNHIHUJuCZa0E+HU7KK
+         ZEEdHPDvfDlVSbqAvrXP3rviz6pH3j9htRBPT5NIqJKjGJE+FjxllNFI8RlkWV1QA19g
+         aArbTyQM1D+rcblnoPAFTe/gzDozuxJ5mSkQw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=nQ55caWuqwbU+De7XmQQt0fy2kYmg/0ZSaiCipjUZO4=;
-        b=pG2g+cvlWmIXV7QkEcz7oHGslZNHE2lKtZY8m16yhvIWI+qLjeUzpZwreAbmb3SkpC
-         tW9nkCKMOA+4Fh2yGeDZejJgHLo1BaKyXVoDoKhX+T3gavEnFazZajs+52/SoRVyMHL3
-         m76/V7trYs//jngrVLMuh3kXg9GcuxvzxW9IJyepPKQjLvk2d1bmmU7QY+ZVuC8jbbj6
-         97uqDteHj7WLpHil8cfSsPAjs4/uREnRvM9w4CalQt59AtJUvN1hzqalfmMitz+jiIIc
-         7MJ/WHVxSjZdf/S5tWpDmV49Bes+5nw/JCAk2fcsdBg7bfwN/0AfokRdrGcSU68C5JSQ
-         LnnA==
-X-Gm-Message-State: APjAAAXbL3tYGaacs9MV6X7vFuttxW7rysHZMg+4c2cYJ0gjI89JH2My
-        /9hMNOjk0f+dGw25PDZgudXptOcOq/bXqyFk74I=
-X-Google-Smtp-Source: APXvYqyW6Wq5aUqkYx7Xup/MyqMXW6iLaHVppG+h6JXWLB6YME4J8ydml7M/q37fhsG3NqB7nJT5f+kZYacXM6rJh8A=
-X-Received: by 2002:a62:7552:: with SMTP id q79mr56181991pfc.71.1560193198801;
- Mon, 10 Jun 2019 11:59:58 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190609115509.26260-1-ard.biesheuvel@linaro.org>
- <20190609115509.26260-8-ard.biesheuvel@linaro.org> <CAH2r5mvQmY8onx6y2Y1aJOuWP9AsK52EJ=cXiJ7hdYPWrLp6uA@mail.gmail.com>
- <20190610161736.GB63833@gmail.com> <CAH2r5mu+87PZEZTMKsaFKDg9Z4i4axB6g9BA8JW823dFKWmSuQ@mail.gmail.com>
- <CAKv+Gu8n2Vc5uE6Q0V+Hu8swB5Oxp9ViEQXTQqFqSHHKw7NGsQ@mail.gmail.com>
-In-Reply-To: <CAKv+Gu8n2Vc5uE6Q0V+Hu8swB5Oxp9ViEQXTQqFqSHHKw7NGsQ@mail.gmail.com>
-From:   Steve French <smfrench@gmail.com>
-Date:   Mon, 10 Jun 2019 13:59:47 -0500
-Message-ID: <CAH2r5msYba_hMcA=Cu84YFOO+hL4ok7sL-FFEJge4Mk8fZsMTA@mail.gmail.com>
-Subject: Re: [PATCH v2 7/7] fs: cifs: switch to RC4 library interface
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc:     Eric Biggers <ebiggers@kernel.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=u65kJhZ2c0w54Nc/i9RYT+l58N6im9e9Q29G/YH/uuc=;
+        b=ZkH7b+2cLCwkCnsALosYUD0Wf+S1PzwhiCMpxZpwswH8VFtoSb2Cz4YOruvN7aO5GI
+         sJdtwLABlcnZTmKjq6fMgoQHRDl7ndw1TDm/O7aXD/2w9eEphK32qyNSBQLDwGBQy0o+
+         sFkHNLIrPuzRNPRAG1mgyeHS4YSOxGTg6nUa5yVy8Qf1944DcTutszEukd1Wjd+9fXpu
+         j1CSnMQf64aGpIAiwFdET4/73SE5HbQTMd3PwLO3X1PWk6j2NenAvpqbrP4dEnvzTRb1
+         u6upGMXuVDY11B94xI4iqraRknXnlaBhSBpABV9WDhv+O12hYYtHYeHD0UUTqNq8OVgu
+         gT0Q==
+X-Gm-Message-State: APjAAAULpM2GV3UWMF258HhuEexILZYDeyfVvfrNHtLVA4anvB6y3xkS
+        Q1K3GatnjM13mOb02pBTdNG2AQ==
+X-Google-Smtp-Source: APXvYqyQzwsz4g4vXj8Aq9NRG67WJeqq4COKYtOvIJxo3DWxXcQEhMnNrnrMg8J5OGqUXm+tPqrSlw==
+X-Received: by 2002:aa7:8145:: with SMTP id d5mr77831178pfn.11.1560202368916;
+        Mon, 10 Jun 2019 14:32:48 -0700 (PDT)
+Received: from www.outflux.net (173-164-112-133-Oregon.hfc.comcastbusiness.net. [173.164.112.133])
+        by smtp.gmail.com with ESMTPSA id q1sm18907954pfb.156.2019.06.10.14.32.47
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Mon, 10 Jun 2019 14:32:48 -0700 (PDT)
+Date:   Mon, 10 Jun 2019 14:32:47 -0700
+From:   Kees Cook <keescook@chromium.org>
+To:     Thomas Garnier <thgarnie@chromium.org>
+Cc:     kernel-hardening@lists.openwall.com, kristen@linux.intel.com,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        Steve French <sfrench@samba.org>
-Content-Type: text/plain; charset="UTF-8"
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+        Andy Lutomirski <luto@kernel.org>,
+        Juergen Gross <jgross@suse.com>,
+        Alok Kataria <akataria@vmware.com>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Thomas Garnier <thgarnie@google.com>,
+        Nadav Amit <namit@vmware.com>, Jann Horn <jannh@google.com>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Masahiro Yamada <yamada.masahiro@socionext.com>,
+        Andi Kleen <ak@linux.intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Feng Tang <feng.tang@intel.com>,
+        Jan Beulich <JBeulich@suse.com>,
+        Maran Wilson <maran.wilson@oracle.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, linux-pm@vger.kernel.org
+Subject: Re: [PATCH v7 00/12] x86: PIE support to extend KASLR randomization
+Message-ID: <201906101432.B642E297F@keescook>
+References: <20190520231948.49693-1-thgarnie@chromium.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190520231948.49693-1-thgarnie@chromium.org>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jun 10, 2019 at 1:02 PM Ard Biesheuvel
-<ard.biesheuvel@linaro.org> wrote:
-> On Mon, 10 Jun 2019 at 19:54, Steve French <smfrench@gmail.com> wrote:
-> > Yes - when I tested the GCM code in cifs.ko last week (the two patches
-> > are currently
-> > in the cifs-2.6.git for-next branch and thus in linux-next and are
-> > attached), I was astounded
-> > at the improvement - encryption with GCM is now faster than signing,
-<snip>
-> I assume this was tested on high end x86 silicon? The CBCMAC path in
-> CCM is strictly sequential, so on systems with deep pipelines, you
-> lose a lot of speed there. For arm64, I implemented a CCM driver that
-> does the encryption and authentication in parallel, which mitigates
-> most of the performance hit, but even then, you will still be running
-> with a underutilized pipeline (unless you are using low end silicon
-> which only has a 2 cycle latency for AES instructions)
+On Mon, May 20, 2019 at 04:19:25PM -0700, Thomas Garnier wrote:
+> Splitting the previous serie in two. This part contains assembly code
+> changes required for PIE but without any direct dependencies with the
+> rest of the patchset.
 
-Was doing most of my testing on an i7-7820HQ 2.9GHz
-(passmark score 9231)
-
-> > Any other ideas how to improve the encryption or signing in the read
-> > or write path
-> > in cifs.ko would be appreciated.   We still are slower than Windows, probably in
-> > part due to holding mutexes longer in sending the frame across the network
-> > (including signing or encryption) which limits parallelism somewhat.
-> >
->
-> It all depends on whether crypto is still the bottleneck in this case.
-
-Trying to wade through traces to see.  Unfortunately lots of different
-configurations (especially varying network latency and network
-copy offload) to experiment with.
-
-
+Thanks for doing this! It should be easier to land the "little" fixes so
+there's less to review for the big PIE changes down the road.
 
 -- 
-Thanks,
-
-Steve
+Kees Cook
