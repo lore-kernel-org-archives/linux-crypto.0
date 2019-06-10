@@ -2,65 +2,219 @@ Return-Path: <SRS0=e/ms=UJ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_NEOMUTT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14B6CC468BC
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Jun 2019 06:35:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82B32C28D16
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Jun 2019 10:36:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E8C4B20833
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Jun 2019 06:35:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 64728206C3
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Jun 2019 10:36:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387713AbfFJGfK (ORCPT
+        id S2389328AbfFJKgj (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 10 Jun 2019 02:35:10 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:35336 "EHLO deadmen.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387464AbfFJGfK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Jun 2019 02:35:10 -0400
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1haDta-0001Fq-1k; Mon, 10 Jun 2019 14:35:06 +0800
-Received: from herbert by gondobar with local (Exim 4.89)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1haDtV-00031s-R4; Mon, 10 Jun 2019 14:35:01 +0800
-Date:   Mon, 10 Jun 2019 14:35:01 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Kalyani Akula <kalyania@xilinx.com>
-Cc:     Stephan Mueller <smueller@chronox.de>,
-        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Sarat Chand Savitala <saratcha@xilinx.com>
-Subject: Re: [RFC PATCH 4/5] crypto: Adds user space interface for
- ALG_SET_KEY_TYPE
-Message-ID: <20190610063501.u3q2k2vgytvknxs3@gondor.apana.org.au>
-References: <1547708541-23730-1-git-send-email-kalyani.akula@xilinx.com>
- <18759853.IUaQuE38eh@tauon.chronox.de>
- <SN6PR02MB5135CE53C3E3FB34CA5E6BA8AF320@SN6PR02MB5135.namprd02.prod.outlook.com>
- <2554415.t45IJDmies@tauon.chronox.de>
- <BN7PR02MB5124A7E685AC0F59AFBEFC8DAF130@BN7PR02MB5124.namprd02.prod.outlook.com>
+        Mon, 10 Jun 2019 06:36:39 -0400
+Received: from mailgw02.mediatek.com ([210.61.82.184]:58327 "EHLO
+        mailgw02.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S2388708AbfFJKgj (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 10 Jun 2019 06:36:39 -0400
+X-UUID: e94ee55e12924c7ab24c280262a0d252-20190610
+X-UUID: e94ee55e12924c7ab24c280262a0d252-20190610
+Received: from mtkmrs01.mediatek.inc [(172.21.131.159)] by mailgw02.mediatek.com
+        (envelope-from <neal.liu@mediatek.com>)
+        (mhqrelay.mediatek.com ESMTP with TLS)
+        with ESMTP id 334693022; Mon, 10 Jun 2019 18:36:35 +0800
+Received: from mtkcas07.mediatek.inc (172.21.101.84) by
+ mtkmbs07n2.mediatek.inc (172.21.101.141) with Microsoft SMTP Server (TLS) id
+ 15.0.1395.4; Mon, 10 Jun 2019 18:36:33 +0800
+Received: from mtkswgap22.mediatek.inc (172.21.77.33) by mtkcas07.mediatek.inc
+ (172.21.101.73) with Microsoft SMTP Server id 15.0.1395.4 via Frontend
+ Transport; Mon, 10 Jun 2019 18:36:33 +0800
+From:   Neal Liu <neal.liu@mediatek.com>
+To:     Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Sean Wang <sean.wang@kernel.org>
+CC:     Neal Liu <neal.liu@mediatek.com>, <linux-crypto@vger.kernel.org>,
+        <devicetree@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-mediatek@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>, <wsd_upstream@mediatek.com>,
+        Crystal Guo <Crystal.Guo@mediatek.com>
+Subject: [PATCH v3 3/3] hwrng: add mtk-sec-rng driver
+Date:   Mon, 10 Jun 2019 18:36:24 +0800
+Message-ID: <1560162984-26104-4-git-send-email-neal.liu@mediatek.com>
+X-Mailer: git-send-email 1.7.9.5
+In-Reply-To: <1560162984-26104-1-git-send-email-neal.liu@mediatek.com>
+References: <1560162984-26104-1-git-send-email-neal.liu@mediatek.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BN7PR02MB5124A7E685AC0F59AFBEFC8DAF130@BN7PR02MB5124.namprd02.prod.outlook.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
+Content-Type: text/plain
+X-MTK:  N
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jun 10, 2019 at 05:20:58AM +0000, Kalyani Akula wrote:
-> Ping!!
+For MediaTek SoCs on ARMv8 with TrustZone enabled, peripherals like
+entropy sources is not accessible from normal world (linux) and
+rather accessible from secure world (ATF/TEE) only. This driver aims
+to provide a generic interface to ATF rng service.
 
-We already have existing drivers supporting hardware keys.  Please
-check out how they're handling this.  You can grep for paes under
-drivers/crypto.
+Signed-off-by: Neal Liu <neal.liu@mediatek.com>
+---
+ drivers/char/hw_random/Kconfig       |   16 ++++++
+ drivers/char/hw_random/Makefile      |    1 +
+ drivers/char/hw_random/mtk-sec-rng.c |   97 ++++++++++++++++++++++++++++++++++
+ 3 files changed, 114 insertions(+)
+ create mode 100644 drivers/char/hw_random/mtk-sec-rng.c
 
-Cheers,
+diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+index 25a7d8f..6c82a3b 100644
+--- a/drivers/char/hw_random/Kconfig
++++ b/drivers/char/hw_random/Kconfig
+@@ -398,6 +398,22 @@ config HW_RANDOM_MTK
+ 
+ 	  If unsure, say Y.
+ 
++config HW_RANDOM_MTK_SEC
++	tristate "MediaTek Security Random Number Generator support"
++	depends on HW_RANDOM
++	depends on ARCH_MEDIATEK || COMPILE_TEST
++	default HW_RANDOM
++	help
++	  This driver provides kernel-side support for the Random Number
++	  Generator hardware found on MediaTek SoCs. The difference with
++	  mtk-rng is the Random Number Generator hardware is secure
++	  access only.
++
++	  To compile this driver as a module, choose M here. the
++	  module will be called mtk-sec-rng.
++
++	  If unsure, say Y.
++
+ config HW_RANDOM_S390
+ 	tristate "S390 True Random Number Generator support"
+ 	depends on S390
+diff --git a/drivers/char/hw_random/Makefile b/drivers/char/hw_random/Makefile
+index 7c9ef4a..0ae4993 100644
+--- a/drivers/char/hw_random/Makefile
++++ b/drivers/char/hw_random/Makefile
+@@ -36,6 +36,7 @@ obj-$(CONFIG_HW_RANDOM_PIC32) += pic32-rng.o
+ obj-$(CONFIG_HW_RANDOM_MESON) += meson-rng.o
+ obj-$(CONFIG_HW_RANDOM_CAVIUM) += cavium-rng.o cavium-rng-vf.o
+ obj-$(CONFIG_HW_RANDOM_MTK)	+= mtk-rng.o
++obj-$(CONFIG_HW_RANDOM_MTK_SEC) += mtk-sec-rng.o
+ obj-$(CONFIG_HW_RANDOM_S390) += s390-trng.o
+ obj-$(CONFIG_HW_RANDOM_KEYSTONE) += ks-sa-rng.o
+ obj-$(CONFIG_HW_RANDOM_OPTEE) += optee-rng.o
+diff --git a/drivers/char/hw_random/mtk-sec-rng.c b/drivers/char/hw_random/mtk-sec-rng.c
+new file mode 100644
+index 0000000..ecd2e29
+--- /dev/null
++++ b/drivers/char/hw_random/mtk-sec-rng.c
+@@ -0,0 +1,97 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (C) 2019 MediaTek Inc.
++ */
++
++#include <linux/arm-smccc.h>
++#include <linux/hw_random.h>
++#include <linux/module.h>
++#include <linux/of.h>
++#include <linux/platform_device.h>
++#include <linux/soc/mediatek/mtk_sip_svc.h>
++
++#define MT67XX_RNG_MAGIC	0x74726e67
++#define SMC_RET_NUM		4
++#define MTK_SEC_RND_SIZE	(sizeof(u32) * SMC_RET_NUM)
++
++struct mtk_sec_rng_priv {
++	struct hwrng rng;
++};
++
++static void mtk_sec_get_rnd(uint32_t *val)
++{
++	struct arm_smccc_res res;
++
++	arm_smccc_smc(MTK_SIP_KERNEL_GET_RND,
++		      MT67XX_RNG_MAGIC, 0, 0, 0, 0, 0, 0, &res);
++
++	val[0] = res.a0;
++	val[1] = res.a1;
++	val[2] = res.a2;
++	val[3] = res.a3;
++}
++
++static int mtk_sec_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
++{
++	u32 val[4] = {0};
++	int retval = 0;
++	int i;
++
++	while (max >= MTK_SEC_RND_SIZE) {
++		mtk_sec_get_rnd(val);
++
++		for (i = 0; i < SMC_RET_NUM; i++) {
++			*(u32 *)buf = val[i];
++			buf += sizeof(u32);
++		}
++
++		retval += MTK_SEC_RND_SIZE;
++		max -= MTK_SEC_RND_SIZE;
++	}
++
++	return retval;
++}
++
++static int mtk_sec_rng_probe(struct platform_device *pdev)
++{
++	struct mtk_sec_rng_priv *priv;
++	int ret;
++
++	priv = devm_kzalloc(&pdev->dev, sizeof(*priv), GFP_KERNEL);
++	if (!priv)
++		return -ENOMEM;
++
++	priv->rng.name = pdev->name;
++	priv->rng.read = mtk_sec_rng_read;
++	priv->rng.priv = (unsigned long)&pdev->dev;
++	priv->rng.quality = 900;
++
++	ret = devm_hwrng_register(&pdev->dev, &priv->rng);
++	if (ret) {
++		dev_err(&pdev->dev, "failed to register rng device: %d\n", ret);
++		return ret;
++	}
++
++	return 0;
++}
++
++static const struct of_device_id mtk_sec_rng_match[] = {
++	{ .compatible = "mediatek,mtk-sec-rng", },
++	{}
++};
++MODULE_DEVICE_TABLE(of, mtk_sec_rng_match);
++
++static struct platform_driver mtk_sec_rng_driver = {
++	.probe = mtk_sec_rng_probe,
++	.driver = {
++		.name = KBUILD_MODNAME,
++		.owner = THIS_MODULE,
++		.of_match_table = mtk_sec_rng_match,
++	},
++};
++
++module_platform_driver(mtk_sec_rng_driver);
++
++MODULE_DESCRIPTION("MediaTek Security Random Number Generator Driver");
++MODULE_AUTHOR("Neal Liu <neal.liu@mediatek.com>");
++MODULE_LICENSE("GPL");
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.7.9.5
+
