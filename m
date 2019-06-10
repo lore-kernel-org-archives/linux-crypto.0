@@ -2,122 +2,74 @@ Return-Path: <SRS0=e/ms=UJ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA4A4C28D16
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Jun 2019 10:58:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 580EAC28CC7
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Jun 2019 13:31:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B348C2082E
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Jun 2019 10:58:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZxLTd3tK"
+	by mail.kernel.org (Postfix) with ESMTP id 34DAB207E0
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Jun 2019 13:31:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388749AbfFJK6S (ORCPT
+        id S2390361AbfFJNbL (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 10 Jun 2019 06:58:18 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:42790 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388100AbfFJK6S (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Jun 2019 06:58:18 -0400
-Received: by mail-io1-f68.google.com with SMTP id u19so6495800ior.9
-        for <linux-crypto@vger.kernel.org>; Mon, 10 Jun 2019 03:58:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=c/b3tFGEWgoEdACLdg7bokuFxZeG6ioFu7pHbHubtFI=;
-        b=ZxLTd3tK5rGZM6S/oPVuEsCRQRG6sqjjVvC72/00peTjqUw43MsXlIruiVrqQ/lu9e
-         9vFdvWqlAZxyAWnU40mxayVAsSHBXA39zzKfoydpGIYpF0Fps6tDAkh1A9akJIkB+MAx
-         NQFEvdBSkA+5ff55xrX5PHjx58LEnIlhXtA4CY0I9Frq1eEXBlWa72loYV9l4hdO4QFb
-         jO4Q3hIZFPegygoQNy7dbaNTNCXscGAZy4pXv9AnlPuAcGG4McsSqj9RV9C2IORKWTN+
-         1dY4w9VWso8rMkQe6+BwexeSH6S2t/6yrHxo2AnkzguU6NxuqNHR4qhu7FkwCCy7ZQ7r
-         iHhA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=c/b3tFGEWgoEdACLdg7bokuFxZeG6ioFu7pHbHubtFI=;
-        b=ZMe9Q6IO9r1uj4Ly7Vxh8tGjLG+y67+6m5NSv5qYOwipUGYG0thH6Rc0YEsVU+SjRL
-         R/066XDvo+EpSKMvj4N6EyLKq5Wq2sLQ6W1PWnXtsjTNce1bX+v7a4QNiqxyTHhDvynT
-         COGMKPhUBVE7g6vKKdydd/nVzSKJ+kG7u3uMJX1wYnfY1oYKD4XLreq9Cg343mxnP66A
-         /l4+ux3b1qfW8JqSSAem0OvHj3ye6mP1TLF41ksmbEvIx1llqn7c0gkZObJdij1l3Elg
-         yaUsWsmLgkakDsrHj912I8bFZL8xNT3QGQdLkLXhf0bSQuD/3p7WBhZGhLqzEYVEHB5F
-         Sxvw==
-X-Gm-Message-State: APjAAAUfhfz+ZGDMwdNWTo9ovnGusoeS8H/MlLD2rGnF2Z7qGLGoNoz6
-        hxqgWtLfft0JNoeaNO68BDrgVFTd9nYwjDG7LSKVzQ==
-X-Google-Smtp-Source: APXvYqwcRurlC0KKJ62r5ApibARM+qdQ7meWrwXkgJri6K8WHRmL/lsqRVwhESAZpZPNromQfB+E0wEWUv/kHehTPBI=
-X-Received: by 2002:a05:6602:98:: with SMTP id h24mr9343513iob.49.1560164297208;
- Mon, 10 Jun 2019 03:58:17 -0700 (PDT)
+        Mon, 10 Jun 2019 09:31:11 -0400
+Received: from inva020.nxp.com ([92.121.34.13]:41898 "EHLO inva020.nxp.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2388833AbfFJNbK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 10 Jun 2019 09:31:10 -0400
+Received: from inva020.nxp.com (localhost [127.0.0.1])
+        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 1DF611A083B;
+        Mon, 10 Jun 2019 15:31:09 +0200 (CEST)
+Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
+        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 1150B1A02A5;
+        Mon, 10 Jun 2019 15:31:09 +0200 (CEST)
+Received: from fsr-ub1864-014.ea.freescale.net (fsr-ub1864-014.ea.freescale.net [10.171.95.219])
+        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id B2373205E4;
+        Mon, 10 Jun 2019 15:31:08 +0200 (CEST)
+From:   =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        NXP Linux Team <linux-imx@nxp.com>
+Subject: [PATCH 0/2] crypto: caam - update IV using HW support
+Date:   Mon, 10 Jun 2019 16:30:57 +0300
+Message-Id: <20190610133059.1059-1-horia.geanta@nxp.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-References: <20190609115509.26260-1-ard.biesheuvel@linaro.org>
- <20190609115509.26260-3-ard.biesheuvel@linaro.org> <107dc7707e6c9d0110aa5535bd5baf4f6db7f6a5.camel@sipsolutions.net>
-In-Reply-To: <107dc7707e6c9d0110aa5535bd5baf4f6db7f6a5.camel@sipsolutions.net>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Mon, 10 Jun 2019 12:58:04 +0200
-Message-ID: <CAKv+Gu9jknEqPN15pKW7PGDww_xcoF0o5piUi0SJphw2e_QwTA@mail.gmail.com>
-Subject: Re: [PATCH v2 2/7] net/mac80211: move WEP handling to ARC4 library interface
-To:     Johannes Berg <johannes@sipsolutions.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Biggers <ebiggers@google.com>,
-        "<linux-wireless@vger.kernel.org>" <linux-wireless@vger.kernel.org>,
-        "John W. Linville" <linville@tuxdriver.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, 9 Jun 2019 at 22:09, Johannes Berg <johannes@sipsolutions.net> wrote:
->
-> Hi Ard,
->
-> In general, I have no objections to this.
->
-> However, with this
->
-> > -     select CRYPTO_ARC4
-> > +     select CRYPTO_LIB_ARC4
->
-> and this
->
-> >       case WLAN_CIPHER_SUITE_WEP40:
-> >       case WLAN_CIPHER_SUITE_TKIP:
-> >       case WLAN_CIPHER_SUITE_WEP104:
-> > -             if (IS_ERR(local->wep_tx_tfm))
-> > -                     return -EINVAL;
-> > -             break;
->
-> there's one quirk that I worry about. Does this mean WEP is now *always*
-> available/enabled?
->
-> I had to dig in history a bit, but vaguely remembered this commit:
->
-> commit 3473187d2459a078e00e5fac8aafc30af69c57fa
-> Author: John W. Linville <linville@tuxdriver.com>
-> Date:   Wed Jul 7 15:07:49 2010 -0400
->
->     mac80211: remove wep dependency
->
->
-> Since you create the new CRYPTO_LIB_ARC4 in patch 1, I wonder if
-> something is broken? I can't really seem to figure out how WEP is
-> disallowed in FIPS mode to start with though.
->
->
-> (This also is the reason for all the code that removes WEP/TKIP from the
-> list of permitted cipher suites when ARC4 isn't available...)
->
+This patch set updates the drivers to rely on HW for providing
+the output IV in case of skcipher algorithms.
 
-Good point. And in the future, there may be other reasons besides FIPS
-compliance to turn off WEP support, so it makes sense to retain this
-logic.
+It's both an improvement, as previously mentioned here:
+https://lore.kernel.org/linux-crypto/VI1PR0401MB2591C51C446CFA129B50022298D20@VI1PR0401MB2591.eurprd04.prod.outlook.com
+and a fix for the currently broken ctr(aes) IV update.
 
-I am still curious whether FIPS compliance actually requires us to do
-this, or whether that code is simply there to work around the lack of
-RC4 in the crypto API when FIPS support happens to be enabled.
+Horia Geantă (2):
+  crypto: caam - use len instead of nents for bulding HW S/G table
+  crypto: caam - update IV using HW support
+
+ drivers/crypto/caam/caamalg.c      | 119 ++++++++++++----------
+ drivers/crypto/caam/caamalg_desc.c |  31 ++++--
+ drivers/crypto/caam/caamalg_desc.h |   4 +-
+ drivers/crypto/caam/caamalg_qi.c   | 122 ++++++++++-------------
+ drivers/crypto/caam/caamalg_qi2.c  | 152 ++++++++++++++---------------
+ drivers/crypto/caam/caamhash.c     |  15 ++-
+ drivers/crypto/caam/caampkc.c      |   4 +-
+ drivers/crypto/caam/sg_sw_qm.h     |  18 ++--
+ drivers/crypto/caam/sg_sw_qm2.h    |  18 ++--
+ drivers/crypto/caam/sg_sw_sec4.h   |  18 ++--
+ 10 files changed, 262 insertions(+), 239 deletions(-)
+
+-- 
+2.17.1
+
