@@ -1,101 +1,140 @@
 Return-Path: <SRS0=e/ms=UJ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: *
-X-Spam-Status: No, score=1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FSL_HELO_FAKE,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	T_DKIMWL_WL_HIGH,USER_AGENT_MUTT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-1.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FSL_HELO_FAKE,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,T_DKIMWL_WL_HIGH,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C8B2C31E43
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Jun 2019 16:17:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB726C31E40
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Jun 2019 16:32:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3B6EF20862
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Jun 2019 16:17:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AE9E420859
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Jun 2019 16:32:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1560183461;
-	bh=QGhJuN0HuWoeta0i22g4yniTwp+mXdkpwXH55YL+A8k=;
+	s=default; t=1560184341;
+	bh=UkqZ0Jl3vryYDHYYRNtJ4WUs4XPXH9S11Cgidt4ttX0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=q+ZOEV9fB5eruEfRnz0jfraKTCQNR+n/afv35Pr3Vqec8+At0v8KO0gwe2BR5f2KZ
-	 Zv8j7cq0VofksEm7VOH6p2FQLo7lWRRZk8boeKdI5oWpPDpZ27k2gyhgJyeMgqmSZP
-	 L++DZqpElSNGCKcSzuBD1DbdAVtpxHESzNOtuKIk=
+	b=rjPaO/lQXSTFPMOlDwQDBRYtGOnKs+VAWsvyTESlzUIUzEW1FlfnV9fDy0TxYOpni
+	 +XknbNtqY1d5RHgVZM8iYh2dCyds/odn9aC2i3lxJrU2e6fLg8oUgbmZ9Zd7V27n3c
+	 BSlSoro1ROcPjQJSDEa7TXlGFmvewC6bceYUBrbE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390167AbfFJQRk (ORCPT
+        id S1727657AbfFJQcU (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 10 Jun 2019 12:17:40 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58448 "EHLO mail.kernel.org"
+        Mon, 10 Jun 2019 12:32:20 -0400
+Received: from mail.kernel.org ([198.145.29.99]:41544 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389123AbfFJQRk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Jun 2019 12:17:40 -0400
+        id S1727305AbfFJQcU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 10 Jun 2019 12:32:20 -0400
 Received: from gmail.com (unknown [104.132.1.77])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id EA0D9206C3;
-        Mon, 10 Jun 2019 16:17:38 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 23F5720859;
+        Mon, 10 Jun 2019 16:32:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1560183459;
-        bh=QGhJuN0HuWoeta0i22g4yniTwp+mXdkpwXH55YL+A8k=;
+        s=default; t=1560184339;
+        bh=UkqZ0Jl3vryYDHYYRNtJ4WUs4XPXH9S11Cgidt4ttX0=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=2kuKZMXgAV6p4G0Dd1JARxrq/HgBj/mivIp1MeUXVUkuu67b96pKp55TLlH0k7OXT
-         oai27dLaLAonV3JIxhecGCqaJlX/CGWVFFPPg44SksMAfaFAxdk5JtUGJeAjEPl8iv
-         KOhvSHpDKvbNfsXFrVmLYDiHZNokE8lIjiUA3TZ8=
-Date:   Mon, 10 Jun 2019 09:17:37 -0700
+        b=KnkKNRtSVs1+gEvc92EQLAj++e6iiEhaXsPQWQ++Xb8R6QQFekG2/UyARHARS8UoZ
+         LCzB6+2G1DwDnvoLFTF9ePRJi9UKjdxl5fbKijQ47xkDwitZmwdhKD0UxTNIQ9HrAa
+         WWoieZS4voNUPioS0fmDTmHgajWbkp4Q32mmRTmU=
+Date:   Mon, 10 Jun 2019 09:32:17 -0700
 From:   Eric Biggers <ebiggers@kernel.org>
-To:     Steve French <smfrench@gmail.com>
-Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        linux-crypto@vger.kernel.org,
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        Steve French <sfrench@samba.org>
-Subject: Re: [PATCH v2 7/7] fs: cifs: switch to RC4 library interface
-Message-ID: <20190610161736.GB63833@gmail.com>
+        "David S. Miller" <davem@davemloft.net>
+Subject: Re: [PATCH v2 1/7] crypto: arc4 - refactor arc4 core code into
+ separate library
+Message-ID: <20190610163216.GC63833@gmail.com>
 References: <20190609115509.26260-1-ard.biesheuvel@linaro.org>
- <20190609115509.26260-8-ard.biesheuvel@linaro.org>
- <CAH2r5mvQmY8onx6y2Y1aJOuWP9AsK52EJ=cXiJ7hdYPWrLp6uA@mail.gmail.com>
+ <20190609115509.26260-2-ard.biesheuvel@linaro.org>
+ <20190610160622.GA63833@gmail.com>
+ <CAKv+Gu-az2BBVLpKqw=m_5ttXYRT95CE8toxt8-+W13A_jmuAg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAH2r5mvQmY8onx6y2Y1aJOuWP9AsK52EJ=cXiJ7hdYPWrLp6uA@mail.gmail.com>
+In-Reply-To: <CAKv+Gu-az2BBVLpKqw=m_5ttXYRT95CE8toxt8-+W13A_jmuAg@mail.gmail.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Steve,
-
-On Sun, Jun 09, 2019 at 05:03:25PM -0500, Steve French wrote:
-> Probably harmless to change this code path (build_ntlmssp_auth_blob is
-> called at session negotiation time so shouldn't have much of a
-> performance impact).
-> 
-> On the other hand if we can find optimizations in the encryption and
-> signing paths, that would be really helpful.   There was a lot of
-> focus on encryption performance at SambaXP last week.
-> 
-> Andreas from Redhat gave a talk on the improvements in Samba with TLS
-> implementation of AES-GCM.   I added the cifs client implementation of
-> AES-GCM and notice it is now faster to encrypt packets than sign them
-> (performance is about 2 to 3 times faster now with GCM).
-> 
-> On Sun, Jun 9, 2019 at 6:57 AM Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+On Mon, Jun 10, 2019 at 06:10:41PM +0200, Ard Biesheuvel wrote:
+> On Mon, 10 Jun 2019 at 18:06, Eric Biggers <ebiggers@kernel.org> wrote:
 > >
-> > The CIFS code uses the sync skcipher API to invoke the ecb(arc4) skcipher,
-> > of which only a single generic C code implementation exists. This means
-> > that going through all the trouble of using scatterlists etc buys us
-> > very little, and we're better off just invoking the arc4 library directly.
+> > Just some bike shedding:
+> >
+> > On Sun, Jun 09, 2019 at 01:55:03PM +0200, Ard Biesheuvel wrote:
+> > > diff --git a/include/crypto/arc4.h b/include/crypto/arc4.h
+> > > index 5b2c24ab0139..62ac95ec6860 100644
+> > > --- a/include/crypto/arc4.h
+> > > +++ b/include/crypto/arc4.h
+> > > @@ -6,8 +6,21 @@
+> > >  #ifndef _CRYPTO_ARC4_H
+> > >  #define _CRYPTO_ARC4_H
+> > >
+> > > +#include <linux/types.h>
+> > > +
+> > >  #define ARC4_MIN_KEY_SIZE    1
+> > >  #define ARC4_MAX_KEY_SIZE    256
+> > >  #define ARC4_BLOCK_SIZE              1
+> > >
+> > > +struct crypto_arc4_ctx {
+> > > +     u32 S[256];
+> > > +     u32 x, y;
+> > > +};
+> > > +
+> > > +int crypto_arc4_set_key(struct crypto_arc4_ctx *ctx, const u8 *in_key,
+> > > +                     unsigned int key_len);
+> > > +
+> > > +void crypto_arc4_crypt(struct crypto_arc4_ctx *ctx, u8 *out, const u8 *in,
+> > > +                    unsigned int len);
+> >
+> > How about naming these just arc4_* instead of crypto_arc4_*?  The crypto_*
+> > prefix is already used mostly for crypto API helper functions, i.e. functions
+> > that take take one of the abstract crypto API types like crypto_skcipher,
+> > shash_desc, etc.  For lib functions, the bare name seems more appropriate.  See
+> > e.g. sha256_update() vs. crypto_sha256_update().
+> >
+> 
+> That is also fine, although I am slightly concerned that we may run
+> into trouble with other algorithms in the future. But I do agree it
+> makes sense to make a clear distinction with the full blown API.
+> 
+> > > +++ b/lib/crypto/Makefile
+> > > @@ -0,0 +1,3 @@
+> > > +# SPDX-License-Identifier: GPL-2.0
+> > > +
+> > > +obj-$(CONFIG_CRYPTO_LIB_ARC4) += libarc4.o
+> > > diff --git a/lib/crypto/libarc4.c b/lib/crypto/libarc4.c
+> > > new file mode 100644
+> > > index 000000000000..b828af2cc03b
+> > > --- /dev/null
+> > > +++ b/lib/crypto/libarc4.c
+> > > @@ -0,0 +1,74 @@
+> >
+> > How about arc4.c instead of libarc4.c?  The second "lib" is redundant, given
+> > that the file is already in the lib/ directory.
+> >
+> 
+> The problem here is that we'll end up with two modules named arc4.ko,
+> one in crypto/ and one in lib/crypto/. Perhaps we should rename the
+> other one? (especially once it implements ecb(arc4) only.)
 
-This patch only changes RC4 encryption, and to be clear it actually *improves*
-the performance of the RC4 encryption, since it removes unnecessary
-abstractions.  I'd really hope that people wouldn't care either way, though,
-since RC4 is insecure and should not be used.
+Another option is to do:
 
-Also it seems that fs/cifs/ supports AES-CCM but not AES-GCM?
+obj-$(CONFIG_CRYPTO_LIB_ARC4) += libarc4.o
+libarc4-y := arc4.o
 
-/* pneg_ctxt->Ciphers[0] = SMB2_ENCRYPTION_AES128_GCM;*/ /* not supported yet */
-        pneg_ctxt->Ciphers[0] = SMB2_ENCRYPTION_AES128_CCM;
+Also, CONFIG_CRYPTO_LIB_ARC4 needs to actually be a tristate.
+It seems you accidentally made it a bool:
 
-AES-GCM is usually faster than AES-CCM, so if you want to improve performance,
-switching from CCM to GCM would do that.
+> +config CRYPTO_LIB_ARC4
+> +	bool
+> +
 
 - Eric
