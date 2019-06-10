@@ -1,210 +1,177 @@
-Return-Path: <SRS0=Xb3v=UI=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=e/ms=UJ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BA63C468BD
-	for <linux-crypto@archiver.kernel.org>; Sun,  9 Jun 2019 22:03:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8898C468C2
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Jun 2019 05:21:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1310F206E0
-	for <linux-crypto@archiver.kernel.org>; Sun,  9 Jun 2019 22:03:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B784420859
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Jun 2019 05:21:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TRin+e+z"
+	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="IkGwJFsM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729306AbfFIWDi (ORCPT
+        id S2387485AbfFJFVC (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 9 Jun 2019 18:03:38 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:35721 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726211AbfFIWDh (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 9 Jun 2019 18:03:37 -0400
-Received: by mail-pg1-f194.google.com with SMTP id s27so3947787pgl.2;
-        Sun, 09 Jun 2019 15:03:36 -0700 (PDT)
+        Mon, 10 Jun 2019 01:21:02 -0400
+Received: from mail-eopbgr810051.outbound.protection.outlook.com ([40.107.81.51]:30931
+        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S2387457AbfFJFVC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 10 Jun 2019 01:21:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=UW4lx/dXozllODMsrDEnjT74BinFnpST4DJVQDFkvYU=;
-        b=TRin+e+zQUyhMtUY67tCJfkIvgP5DRha5bS0kcYniNTBozvbNFUVBZzSGriRpOJebb
-         3szU4FaqAHwXYJSuLff17lU0YdQcRhg3xYAlz03uOXG9QPdiXUQCLItYOb+kZwHSPwej
-         yEUxI6he+E1Bb0EMaoQB0cNYI/h7ZOdwIjr1IQkQzH6C7xZIQQhYXj+SzjIB6ev5CWzZ
-         ayITvZkKpSRuOLFDLlfJ9oq0wEWwtsbZDXlfb+ASWH4w0nUQqcCi9wHeykn/jS3HXRbp
-         Afev6fMtCB9smzWZlBTMqOXn3W3GgOb2TSoOwz9ds/Ke72GctAf/GKuBOv6qess/FfZw
-         4A4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=UW4lx/dXozllODMsrDEnjT74BinFnpST4DJVQDFkvYU=;
-        b=t6bG3/fWHkokerV5So2epwT7JfGBTjt/ihigbLys0ILQ6+7ds96z6xrDgYT3zT5Jon
-         y+Xx8TijgGrwbD1cbkOJZBJWtsyLqst9CVgpDPYXtT+lpEH+Ggj0YO2GrXf3wtAc4mK+
-         +S8HwL/dQdxzCRM7bBoeHxcytTJTiJLFwhDLVqVlyAS8R3J/+QAul2RbUE3j/eMhc4mv
-         PsNpQ0SKXjah4fy/gu/c/d5ZCfHYBdziXTkZUb8SB+JXz1FMj4r0keXs4Uoa+XLUIdTp
-         Aj8fPStL0p5U59nVbm2fd8sIq0Fj/gs9NgZvPCjFURJAkgpZVsYgkDCLdXRMVBjJqBII
-         GZiQ==
-X-Gm-Message-State: APjAAAVCrDVPrD2ObuVBMa2hIjBiwudC7qxqTRVlqG0JUJSYfPM/LHSz
-        o8hz6SHJJX6gYFrqgsQnuhX1wnYnItTrD6n4irc=
-X-Google-Smtp-Source: APXvYqz/h7HnBhyTDM+Rbjvp46GWYbyANUIB5F1Eeg4q1OE5XxAODeFamF0xZCT+l0a7on1F7lKMxOz3tRWYjdDugMQ=
-X-Received: by 2002:a63:8b4c:: with SMTP id j73mr1227364pge.15.1560117816294;
- Sun, 09 Jun 2019 15:03:36 -0700 (PDT)
+ d=xilinx.onmicrosoft.com; s=selector1-xilinx-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=S9jPIrjrGwR9dzSGc3epmEvjkVYqRndp3RJZWukVrUU=;
+ b=IkGwJFsM4dBLFbWfZtFiFOSw3BgFXviTDtg4COoLQh9FeB8MfFlAeRfAuks7LAOMojE3Ncd5Glg8CvQbOhqdGMzc6xhbCEmvffzhmBi5ZDi7rGmdHC/BsQdAP3pwF141nV1X+OLVgCtkSr+IwxWfYyYBboJaSBAlRwO0ZBMjE6Y=
+Received: from BN7PR02MB5124.namprd02.prod.outlook.com (20.176.26.153) by
+ BN7PR02MB4146.namprd02.prod.outlook.com (52.132.223.156) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1965.15; Mon, 10 Jun 2019 05:20:58 +0000
+Received: from BN7PR02MB5124.namprd02.prod.outlook.com
+ ([fe80::a56f:7a30:7488:ff99]) by BN7PR02MB5124.namprd02.prod.outlook.com
+ ([fe80::a56f:7a30:7488:ff99%4]) with mapi id 15.20.1965.017; Mon, 10 Jun 2019
+ 05:20:58 +0000
+From:   Kalyani Akula <kalyania@xilinx.com>
+To:     Stephan Mueller <smueller@chronox.de>,
+        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>
+CC:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Sarat Chand Savitala <saratcha@xilinx.com>
+Subject: RE: [RFC PATCH 4/5] crypto: Adds user space interface for
+ ALG_SET_KEY_TYPE
+Thread-Topic: [RFC PATCH 4/5] crypto: Adds user space interface for
+ ALG_SET_KEY_TYPE
+Thread-Index: AQHUrjLRC0KQY4vUUEiutylzuXEA7qWzVM+AgJUjQyCAA8MlgIAVaNiQgBkBuACAGpYxMA==
+Date:   Mon, 10 Jun 2019 05:20:58 +0000
+Message-ID: <BN7PR02MB5124A7E685AC0F59AFBEFC8DAF130@BN7PR02MB5124.namprd02.prod.outlook.com>
+References: <1547708541-23730-1-git-send-email-kalyani.akula@xilinx.com>
+ <18759853.IUaQuE38eh@tauon.chronox.de>
+ <SN6PR02MB5135CE53C3E3FB34CA5E6BA8AF320@SN6PR02MB5135.namprd02.prod.outlook.com>
+ <2554415.t45IJDmies@tauon.chronox.de>
+In-Reply-To: <2554415.t45IJDmies@tauon.chronox.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=kalyania@xilinx.com; 
+x-originating-ip: [149.199.50.133]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 5d97bf42-987c-4e46-cecb-08d6ed636be5
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:BN7PR02MB4146;
+x-ms-traffictypediagnostic: BN7PR02MB4146:
+x-microsoft-antispam-prvs: <BN7PR02MB414604F0DE79EA6CBC5CCFACAF130@BN7PR02MB4146.namprd02.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-forefront-prvs: 0064B3273C
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(136003)(39860400002)(376002)(366004)(346002)(396003)(13464003)(189003)(199004)(486006)(2906002)(7736002)(54906003)(110136005)(316002)(305945005)(14444005)(256004)(5660300002)(476003)(71200400001)(71190400001)(86362001)(33656002)(2501003)(74316002)(52536014)(11346002)(446003)(14454004)(76116006)(66946007)(66446008)(64756008)(66556008)(66476007)(26005)(53936002)(7696005)(66066001)(73956011)(68736007)(186003)(76176011)(102836004)(6116002)(3846002)(6506007)(9686003)(6436002)(53546011)(55016002)(229853002)(478600001)(25786009)(8676002)(81166006)(99286004)(8936002)(4326008)(107886003)(6246003)(81156014);DIR:OUT;SFP:1101;SCL:1;SRVR:BN7PR02MB4146;H:BN7PR02MB5124.namprd02.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: xilinx.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: beHgnN2MCG+T/IWkn39JiLZgGCdx8nxM7zZveUbGy53tjJryiIXOIk0PDeUaJlzL8xNt4G4luAF6Emw8k4KOfZw4DBQK0onIF3Bvor1X1bEKVM2XsIaEN1UN1bkmkxtzLHyXTmCq1ijzkU1WN/5rXi8Mc+jBb0Z0tn1kSncULUGxy29Z3Hftml2APWknfT+pxkm2ZqZlK+KxIo1CozNHLckD0TnnosfFhN1ack/1UC0Vnr/nFM/ynXRBYMr+WhpJYOGqk0KDY8E3JLF1NmAKX1eT2YrkJkAeSqLNssdiVkEQEnmpcJbE6C1xxttEfn2Ih93nD+HzSIvdCK4C9ETvNVST+G5venqFq3Ue6ctzxUgikCFxgV457Wrd9y4fLkVRulT60MGXo+yAqvvwEA10UbwjceQbnl/FEesxrvtZbSM=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <20190609115509.26260-1-ard.biesheuvel@linaro.org> <20190609115509.26260-8-ard.biesheuvel@linaro.org>
-In-Reply-To: <20190609115509.26260-8-ard.biesheuvel@linaro.org>
-From:   Steve French <smfrench@gmail.com>
-Date:   Sun, 9 Jun 2019 17:03:25 -0500
-Message-ID: <CAH2r5mvQmY8onx6y2Y1aJOuWP9AsK52EJ=cXiJ7hdYPWrLp6uA@mail.gmail.com>
-Subject: Re: [PATCH v2 7/7] fs: cifs: switch to RC4 library interface
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Biggers <ebiggers@google.com>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        Steve French <sfrench@samba.org>
-Content-Type: text/plain; charset="UTF-8"
+X-OriginatorOrg: xilinx.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5d97bf42-987c-4e46-cecb-08d6ed636be5
+X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Jun 2019 05:20:58.6922
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 657af505-d5df-48d0-8300-c31994686c5c
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: kalyania@xilinx.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN7PR02MB4146
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Probably harmless to change this code path (build_ntlmssp_auth_blob is
-called at session negotiation time so shouldn't have much of a
-performance impact).
+Ping!!
 
-On the other hand if we can find optimizations in the encryption and
-signing paths, that would be really helpful.   There was a lot of
-focus on encryption performance at SambaXP last week.
+> -----Original Message-----
+> From: Stephan Mueller <smueller@chronox.de>
+> Sent: Friday, May 24, 2019 12:50 PM
+> To: Kalyani Akula <kalyania@xilinx.com>; keyrings@vger.kernel.org
+> Cc: herbert@gondor.apana.org.au; davem@davemloft.net; linux-
+> crypto@vger.kernel.org; linux-kernel@vger.kernel.org; Sarat Chand Savital=
+a
+> <saratcha@xilinx.com>
+> Subject: Re: [RFC PATCH 4/5] crypto: Adds user space interface for
+> ALG_SET_KEY_TYPE
+>=20
+> Am Mittwoch, 8. Mai 2019, 11:31:08 CEST schrieb Kalyani Akula:
+>=20
+> Hi Kalyani,
+>=20
+> > Hi Stephan,
+> >
+> > Keyrings is in-kernel key-management and retention facility. User can
+> > use it to manage keys used for applications.
+> >
+> > Xilinx cryptographic hardware has a mechanism to store keys in its
+> > internal hardware and do not have mechanism to read it back due to secu=
+rity
+> reasons.
+> > It stores key internally in different forms like simple key, key
+> > encrypted with unique hardware DNA, key encrypted with hardware family
+> > key, key stored in eFUSEs/BBRAM etc.
+> > Based on security level expected, user can select one of the key for
+> > AES operation. Since AES hardware internally has access to these keys,
+> > user do not require to provide key to hardware, but need to tell which
+> > internal hardware key user application like to use for AES operation.
+> >
+> > Basic need is to pass information to AES hardware about which internal
+> > hardware key to be used for AES operation.
+> >
+> > I agree that from general use case perspective we are not selecting
+> > key type but selecting internal hardware keys provided by user. How
+> > about providing option to select custom hardware keys provided by
+> > hardware (AES_SEL_HW_KEY)?
+>=20
+> I am not intimately familiary with the keyring facility. Thus, let us ask=
+ the experts
+> at the keyring mailing list :-)
+>=20
+> >
+> > Thanks
+> > kalyani
+> >
+> > > -----Original Message-----
+> > > From: Stephan Mueller <smueller@chronox.de>
+> > > Sent: Thursday, April 25, 2019 12:01 AM
+> > > To: Kalyani Akula <kalyania@xilinx.com>
+> > > Cc: herbert@gondor.apana.org.au; davem@davemloft.net; linux-
+> > > crypto@vger.kernel.org; linux-kernel@vger.kernel.org
+> > > Subject: Re: [RFC PATCH 4/5] crypto: Adds user space interface for
+> > > ALG_SET_KEY_TYPE
+> > >
+> > > Am Montag, 22. April 2019, 11:17:55 CEST schrieb Kalyani Akula:
+> > >
+> > > Hi Kalyani,
+> > >
+> > > > > Besides, seem to be more a key handling issue. Wouldn't it make
+> > > > > sense to rather have such issue solved with key rings than in
+> > > > > the kernel crypto API?
+> > > >
+> > > > [kalyani] Can you please elaborate on this further ?
+> > >
+> > > The kernel has a keyring support in security/keys which has a user
+> > > space interface with keyutils. That interface is commonly used for
+> > > any sort of key manipulation.
+> > >
+> > > Ciao
+> > > Stephan
+>=20
+>=20
+>=20
+> Ciao
+> Stephan
+>=20
 
-Andreas from Redhat gave a talk on the improvements in Samba with TLS
-implementation of AES-GCM.   I added the cifs client implementation of
-AES-GCM and notice it is now faster to encrypt packets than sign them
-(performance is about 2 to 3 times faster now with GCM).
-
-On Sun, Jun 9, 2019 at 6:57 AM Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
->
-> The CIFS code uses the sync skcipher API to invoke the ecb(arc4) skcipher,
-> of which only a single generic C code implementation exists. This means
-> that going through all the trouble of using scatterlists etc buys us
-> very little, and we're better off just invoking the arc4 library directly.
->
-> Cc: linux-cifs@vger.kernel.org
-> Cc: Steve French <sfrench@samba.org>
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> ---
->  fs/cifs/Kconfig       |  2 +-
->  fs/cifs/cifsencrypt.c | 50 +++++---------------
->  2 files changed, 13 insertions(+), 39 deletions(-)
->
-> diff --git a/fs/cifs/Kconfig b/fs/cifs/Kconfig
-> index aae2b8b2adf5..523e9ea78a28 100644
-> --- a/fs/cifs/Kconfig
-> +++ b/fs/cifs/Kconfig
-> @@ -10,7 +10,7 @@ config CIFS
->         select CRYPTO_SHA512
->         select CRYPTO_CMAC
->         select CRYPTO_HMAC
-> -       select CRYPTO_ARC4
-> +       select CRYPTO_LIB_ARC4
->         select CRYPTO_AEAD2
->         select CRYPTO_CCM
->         select CRYPTO_ECB
-> diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-> index d2a05e46d6f5..d0ab5a38e5d2 100644
-> --- a/fs/cifs/cifsencrypt.c
-> +++ b/fs/cifs/cifsencrypt.c
-> @@ -33,7 +33,7 @@
->  #include <linux/ctype.h>
->  #include <linux/random.h>
->  #include <linux/highmem.h>
-> -#include <crypto/skcipher.h>
-> +#include <crypto/arc4.h>
->  #include <crypto/aead.h>
->
->  int __cifs_calc_signature(struct smb_rqst *rqst,
-> @@ -772,11 +772,9 @@ setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
->  int
->  calc_seckey(struct cifs_ses *ses)
->  {
-> -       int rc;
-> -       struct crypto_skcipher *tfm_arc4;
-> -       struct scatterlist sgin, sgout;
-> -       struct skcipher_request *req;
-> +       struct crypto_arc4_ctx *ctx_arc4;
->         unsigned char *sec_key;
-> +       int rc = 0;
->
->         sec_key = kmalloc(CIFS_SESS_KEY_SIZE, GFP_KERNEL);
->         if (sec_key == NULL)
-> @@ -784,49 +782,25 @@ calc_seckey(struct cifs_ses *ses)
->
->         get_random_bytes(sec_key, CIFS_SESS_KEY_SIZE);
->
-> -       tfm_arc4 = crypto_alloc_skcipher("ecb(arc4)", 0, CRYPTO_ALG_ASYNC);
-> -       if (IS_ERR(tfm_arc4)) {
-> -               rc = PTR_ERR(tfm_arc4);
-> -               cifs_dbg(VFS, "could not allocate crypto API arc4\n");
-> -               goto out;
-> -       }
-> -
-> -       rc = crypto_skcipher_setkey(tfm_arc4, ses->auth_key.response,
-> -                                       CIFS_SESS_KEY_SIZE);
-> -       if (rc) {
-> -               cifs_dbg(VFS, "%s: Could not set response as a key\n",
-> -                        __func__);
-> -               goto out_free_cipher;
-> -       }
-> -
-> -       req = skcipher_request_alloc(tfm_arc4, GFP_KERNEL);
-> -       if (!req) {
-> +       ctx_arc4 = kmalloc(sizeof(*ctx_arc4), GFP_KERNEL);
-> +       if (!ctx_arc4) {
->                 rc = -ENOMEM;
-> -               cifs_dbg(VFS, "could not allocate crypto API arc4 request\n");
-> -               goto out_free_cipher;
-> +               cifs_dbg(VFS, "could not allocate arc4 context\n");
-> +               goto out;
->         }
->
-> -       sg_init_one(&sgin, sec_key, CIFS_SESS_KEY_SIZE);
-> -       sg_init_one(&sgout, ses->ntlmssp->ciphertext, CIFS_CPHTXT_SIZE);
-> -
-> -       skcipher_request_set_callback(req, 0, NULL, NULL);
-> -       skcipher_request_set_crypt(req, &sgin, &sgout, CIFS_CPHTXT_SIZE, NULL);
-> -
-> -       rc = crypto_skcipher_encrypt(req);
-> -       skcipher_request_free(req);
-> -       if (rc) {
-> -               cifs_dbg(VFS, "could not encrypt session key rc: %d\n", rc);
-> -               goto out_free_cipher;
-> -       }
-> +       crypto_arc4_set_key(ctx_arc4, ses->auth_key.response,
-> +                           CIFS_SESS_KEY_SIZE);
-> +       crypto_arc4_crypt(ctx_arc4, ses->ntlmssp->ciphertext, sec_key,
-> +                         CIFS_CPHTXT_SIZE);
->
->         /* make secondary_key/nonce as session key */
->         memcpy(ses->auth_key.response, sec_key, CIFS_SESS_KEY_SIZE);
->         /* and make len as that of session key only */
->         ses->auth_key.len = CIFS_SESS_KEY_SIZE;
->
-> -out_free_cipher:
-> -       crypto_free_skcipher(tfm_arc4);
->  out:
-> +       kfree(ctx_arc4);
->         kfree(sec_key);
->         return rc;
->  }
-> --
-> 2.20.1
->
-
-
--- 
-Thanks,
-
-Steve
