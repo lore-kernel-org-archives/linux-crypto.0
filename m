@@ -2,119 +2,146 @@ Return-Path: <SRS0=vn8P=UK=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-2.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C75CDC4321B
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jun 2019 13:06:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF835C4321A
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jun 2019 13:47:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9EBC7208E3
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jun 2019 13:06:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 82BFC20896
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jun 2019 13:47:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="Mr91wHyS"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MuAM88dN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387593AbfFKNGu (ORCPT
+        id S2389251AbfFKNr5 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 11 Jun 2019 09:06:50 -0400
-Received: from mail-eopbgr60087.outbound.protection.outlook.com ([40.107.6.87]:6151
-        "EHLO EUR04-DB3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2387657AbfFKNGu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Jun 2019 09:06:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RrP61buTAKkrf9XBLNaLEX/WD9IK9ciutw6xqLObRuw=;
- b=Mr91wHySm3bYHta+SYjsb+kVqv1X2hq3n+NEdba+kjR5Ep9x7jDgmT/j/DGJmBO3aGQg/bg6m9cFV/xbE2i62XA5J5s670sbl9e1tvOa/sHbbmKUhOEH6wusPj97XCVahshj/hzrXWYC93HLcPS4pGZCj0SrpVJHso2j1ikGlI8=
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
- VI1PR0402MB3631.eurprd04.prod.outlook.com (52.134.7.22) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1965.14; Tue, 11 Jun 2019 13:06:44 +0000
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::ccaf:f4a1:704a:e745]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::ccaf:f4a1:704a:e745%4]) with mapi id 15.20.1965.017; Tue, 11 Jun 2019
- 13:06:43 +0000
-From:   Horia Geanta <horia.geanta@nxp.com>
-To:     Christophe Leroy <christophe.leroy@c-s.fr>,
+        Tue, 11 Jun 2019 09:47:57 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:53828 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388299AbfFKNr5 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 11 Jun 2019 09:47:57 -0400
+Received: by mail-wm1-f68.google.com with SMTP id x15so3041805wmj.3
+        for <linux-crypto@vger.kernel.org>; Tue, 11 Jun 2019 06:47:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=SPvq1TSklyvGf3Mu8PrbXdN3TXq8wdRsziixaPTYMwE=;
+        b=MuAM88dNq8yvZonActjV5w2mTXFiruMmu7kwM8C7MXTERQS6rHBcEeyCzHQN8RUi6g
+         i/Wo1/xkL2bK7mB6Vhlcbqt3KrGWx1FtG8oZoNH7gv1VuL4JMqiBmtCvEAgStByzfpXx
+         G465wKK2wFE8G4HYYkEq37GPfiyEV+KxvQwuO4f1HG/n+gQWTODyEY1osQ5lsr7KvxWd
+         fB3qOf5fkWtr5t0tDU2OFXOGPnJPfphTwDtjNSdxelfYIZHmNrIGZinxJWs/Btx0uoe5
+         ltP7tvtTZsqSycT8sVqxfoMjpmcI3ZGj+3ofE1qTxSMOTY00O7K1Z5LIWdNuc9324Q5J
+         2fGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=SPvq1TSklyvGf3Mu8PrbXdN3TXq8wdRsziixaPTYMwE=;
+        b=Ors3eWOPw3z8rc/IylTr2eQjWqedM4f1nbYZc4Oxkue67jn5OLJMcfP/u4juLMBxiL
+         BylFg5efdbNZWxXqVJUdj6nK79aqZ2bnkl9DX+SWTzuvMRIHNql3xZYloLub4z8BeGW/
+         aoUwlMh6dzW6R74fcPWoCDPDt9vvAehmuNJtI/lnFi9jq+1AMiOpG8tEe0fDVMZ8WhfW
+         gNww4YWsxdnZ0h5MxTWVEfcvMvNdkOsB+hR4uWA9L+6SwJ3qXqPAlsE8IzkN4QM4t/XZ
+         GVkOnuyf9M6H6V6WSu9CurnffJM8n8wzcRRjku0plBunMM7QAR0juBzoVnIbE9eLGZvC
+         zU6g==
+X-Gm-Message-State: APjAAAXWPtROnBQHsz+9A++a4IXzP9JJP6Aa/OdF9I6gNscuLfWAdtGq
+        OIy5rNAcPN1KOlK+uepd+CDpnqxPX/lsN8l4
+X-Google-Smtp-Source: APXvYqzqgPpsZ/W/MpKZxB9bRBcTKcs/rpa0vtiQwxDFhGbodjhueVHdwFx3iEPzZuKOGy6aGTrz0g==
+X-Received: by 2002:a1c:3b02:: with SMTP id i2mr16758612wma.23.1560260874369;
+        Tue, 11 Jun 2019 06:47:54 -0700 (PDT)
+Received: from sudo.home ([2a01:cb1d:112:6f00:24bb:7f31:25fe:43a7])
+        by smtp.gmail.com with ESMTPSA id o126sm3964305wmo.31.2019.06.11.06.47.52
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 11 Jun 2019 06:47:53 -0700 (PDT)
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To:     linux-crypto@vger.kernel.org
+Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
-Subject: Re: [PATCH v1 2/5] crypto: talitos - move struct talitos_edesc into
- talitos.h
-Thread-Topic: [PATCH v1 2/5] crypto: talitos - move struct talitos_edesc into
- talitos.h
-Thread-Index: AQHVHFtoqsM5u9K3R0ScM4yhQppwKQ==
-Date:   Tue, 11 Jun 2019 13:06:43 +0000
-Message-ID: <VI1PR0402MB348502A280D64F8A0636AABB98ED0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-References: <cover.1559819372.git.christophe.leroy@c-s.fr>
- <108a23c4d2f0803b1302bc00c7321d799e42edc1.1559819372.git.christophe.leroy@c-s.fr>
- <VI1PR0402MB3485848D81EF07419EB0128F98ED0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
- <a3474daf-3e51-4ce9-0634-8690c2e3045d@c-s.fr>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=horia.geanta@nxp.com; 
-x-originating-ip: [212.146.100.6]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 83e59f19-f2f3-46e1-f122-08d6ee6da6fc
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:VI1PR0402MB3631;
-x-ms-traffictypediagnostic: VI1PR0402MB3631:
-x-microsoft-antispam-prvs: <VI1PR0402MB3631C81949894F3317DFED2C98ED0@VI1PR0402MB3631.eurprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-forefront-prvs: 006546F32A
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(376002)(346002)(136003)(396003)(366004)(39860400002)(199004)(189003)(26005)(53546011)(74316002)(6506007)(81156014)(81166006)(8936002)(76176011)(305945005)(7736002)(4744005)(110136005)(54906003)(102836004)(3846002)(55016002)(25786009)(6116002)(8676002)(99286004)(256004)(5660300002)(9686003)(6246003)(68736007)(66476007)(6436002)(66066001)(64756008)(71190400001)(4326008)(66446008)(66556008)(476003)(186003)(73956011)(33656002)(76116006)(52536014)(66946007)(486006)(86362001)(446003)(316002)(44832011)(229853002)(53936002)(71200400001)(14454004)(7696005)(478600001)(2906002);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB3631;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: nxp.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: R8+sYJdQaeonek/JE1XE6DA59bOJJHS1b78QLmcmRVHq6KS2HepzNA/aLvVRM8FMHIrNFq85S0KNJDuCg6yG4g9X2hovSw5nzf9xBkgiuDHHHsH5ymbGni9ABsaoYwr6qmM0Lyvb43yuFeGuF82hTtGP06vqv1pqRGe/+zTWObCSteFY2C1Di3HGuWCwof/W5BKMnrD0SnscJsbi7LVJQhK9GXAi98qDmhGwKwuw5dwBSk+DCwETM2MG6i+TpsTHcWVEeL0rDJvGaO8zryTJieEnoc0R1qqWI3NRrgVrVBum/VjIPx+N/gtZOw2y4Q3/czuNM9e9GW51yInF2sgPHmqEQQeKLxW8MM9ar429SbOAH5LuzClNloJsOFyPe82y4NCvAFzhOLUBYJw0mL1A9no5QJuuXduY+BKF0dAWH3o=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Biggers <ebiggers@google.com>,
+        Johannes Berg <johannes@sipsolutions.net>
+Subject: [PATCH v3 0/7] crypto: rc4 cleanup
+Date:   Tue, 11 Jun 2019 15:47:43 +0200
+Message-Id: <20190611134750.2974-1-ard.biesheuvel@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 83e59f19-f2f3-46e1-f122-08d6ee6da6fc
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Jun 2019 13:06:43.8575
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: horia.geanta@nxp.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3631
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 6/11/2019 3:38 PM, Christophe Leroy wrote:=0A=
-> =0A=
-> =0A=
-> Le 11/06/2019 =E0 13:57, Horia Geanta a =E9crit=A0:=0A=
->> On 6/6/2019 2:31 PM, Christophe Leroy wrote:=0A=
->>> Next patch will require struct talitos_edesc to be defined=0A=
->>> earlier in talitos.c=0A=
->>>=0A=
->>> This patch moves it into talitos.h so that it can be used=0A=
->>> from any place in talitos.c=0A=
->>>=0A=
->>> Fixes: 37b5e8897eb5 ("crypto: talitos - chain in buffered data for ahas=
-h on SEC1")=0A=
->> This isn't really a fix, so please drop the tag.=0A=
-> =0A=
-> As the next patch requires this one and Fixes 37b5e8897eb5, by setting =
-=0A=
-> Fixes: 37b5e8897eb5 here was for me a way to tell stable that this one =
-=0A=
-> is required for the following one.=0A=
-> =0A=
-> Otherwise, how can I ensure that this one will be taken when next one is =
-=0A=
-> taken ?=0A=
-> =0A=
-If you want these patches to be automatically sent to -stable (once they=0A=
-are merged in main tree), then add a Cc: <stable@vger.kernel.org> tag.=0A=
-=0A=
-Horia=0A=
+This is a follow-up to, and supersedes [0], which moved some WEP code from
+the cipher to the skcipher interface, in order to reduce the use of the bare
+cipher interface in non-crypto subsystem code.
+
+Since using the skcipher interface to invoke the generic C implementation of
+an algorithm that is known at compile time is rather pointless, this series
+moves those users to a new arc4 library interface instead, which is based on
+the existing code.
+
+Along the way, the arc4 cipher implementation is removed entirely, and only
+the ecb(arc4) code is preserved, which is used in a number of places in the
+kernel, and is known to be used by at least 'iwd' from user space via the
+algif_skcipher API.
+
+Changes since v2:
+- drop the crypto_ prefix from the arc4 library functions and types
+- rename the source file to arc4.c but keep the lib prefix for the actual
+  module to prevent a clash with the crypto API driver
+- preserve the existing behavior wrt the fips_enabled flag, which prevents
+  any use of ARC4 (note that the fips_enabled flag evaluates to 'false' at
+  compile time for kernels that lack the feature, so with these patches, we
+  get rid of most of the runtime logic regarding FIPS for builds that don't
+  have it enabled)
+
+[0] https://lore.kernel.org/linux-crypto/20190607144944.13485-1-ard.biesheuvel@linaro.org/
+
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Biggers <ebiggers@google.com>
+Cc: Johannes Berg <johannes@sipsolutions.net>
+
+Ard Biesheuvel (7):
+  crypto: arc4 - refactor arc4 core code into separate library
+  net/mac80211: move WEP handling to ARC4 library interface
+  net/lib80211: move WEP handling to ARC4 library code
+  net/lib80211: move TKIP handling to ARC4 library code
+  crypto: arc4 - remove cipher implementation
+  ppp: mppe: switch to RC4 library interface
+  fs: cifs: switch to RC4 library interface
+
+ MAINTAINERS                        |   1 +
+ crypto/Kconfig                     |   4 +
+ crypto/arc4.c                      | 104 +-------------------
+ drivers/net/ppp/Kconfig            |   3 +-
+ drivers/net/ppp/ppp_mppe.c         |  95 +++---------------
+ fs/cifs/Kconfig                    |   2 +-
+ fs/cifs/cifsencrypt.c              |  53 +++-------
+ include/crypto/arc4.h              |  10 ++
+ lib/Makefile                       |   2 +-
+ lib/crypto/Makefile                |   4 +
+ lib/crypto/arc4.c                  |  72 ++++++++++++++
+ net/mac80211/Kconfig               |   2 +-
+ net/mac80211/cfg.c                 |   3 -
+ net/mac80211/ieee80211_i.h         |   4 +-
+ net/mac80211/key.h                 |   1 +
+ net/mac80211/main.c                |   6 +-
+ net/mac80211/mlme.c                |   2 -
+ net/mac80211/tkip.c                |   8 +-
+ net/mac80211/tkip.h                |   4 +-
+ net/mac80211/wep.c                 |  47 ++-------
+ net/mac80211/wep.h                 |   4 +-
+ net/mac80211/wpa.c                 |   4 +-
+ net/wireless/Kconfig               |   1 +
+ net/wireless/lib80211_crypt_tkip.c |  46 +++------
+ net/wireless/lib80211_crypt_wep.c  |  49 +++------
+ 25 files changed, 179 insertions(+), 352 deletions(-)
+ create mode 100644 lib/crypto/Makefile
+ create mode 100644 lib/crypto/arc4.c
+
+-- 
+2.20.1
+
