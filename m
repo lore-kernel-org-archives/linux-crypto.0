@@ -2,158 +2,127 @@ Return-Path: <SRS0=vn8P=UK=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FSL_HELO_FAKE,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,T_DKIMWL_WL_HIGH,USER_AGENT_MUTT autolearn=ham
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,T_DKIMWL_WL_HIGH,USER_AGENT_MUTT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34D12C0650E
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jun 2019 18:17:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF22CC31E46
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jun 2019 22:53:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 12D162173C
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jun 2019 18:17:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C2A132177E
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jun 2019 22:53:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1560277059;
-	bh=FxnF+wQyVdil82o5E43BjgW8tBRCdoFPNiymJQAFTMQ=;
+	s=default; t=1560293638;
+	bh=stWnUbe+jaQuFau1PLVdqeZY8iwqhXyOVPXi0CRMm60=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=KpRFUCIPa0MKAl2iJBDOSWsjKHKi/edRr+KBmEgk63n94HO3A5BSpVEA+cTM4e5K0
-	 fyF0/V8VYxXSSPysCoWzbQbUJtX//XQzO8WaSxj5k5G6Gkc+8Slv5hr+wLEz7j2Hrw
-	 TVeyfOMntQQxRi5G21nAnsrYQc/g6FIhr6a8KuV0=
+	b=J163L224J/irPse/D33LLvpJpQLGVAw7bXU8Uk1FrxAY8cvkZAxuULBC3SrymMX6C
+	 WPlPjZnpzSKyv9Y0T/BJeqMOl2UNZjA044R15ZOA1Pf7c6JLoexftpng3JtqaVmxxE
+	 deHSULnAQQLRGXsulL+fG4t6pBixs8pFVIKsGMfg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406901AbfFKSRi (ORCPT
+        id S2407412AbfFKWx5 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 11 Jun 2019 14:17:38 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54394 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2405802AbfFKSRi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Jun 2019 14:17:38 -0400
-Received: from gmail.com (unknown [104.132.1.77])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 5114E2173B;
-        Tue, 11 Jun 2019 18:17:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1560277057;
-        bh=FxnF+wQyVdil82o5E43BjgW8tBRCdoFPNiymJQAFTMQ=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=mhH3vm77R+20PcKpYYWCp6rQC44fgIWt0r3L7R8qHGrlyB5/L4MzMup2Hw8z2dEvS
-         oHl5MZ2fx4GhESiZSzB+lC+hsEOZh6fTzq8N8OgAVzJRvW71Rh4Wf3jcy71JbLohBq
-         /HQ+XRQlmpnhZbg3+2mKRL7roktN+XvsjubwgAVQ=
-Date:   Tue, 11 Jun 2019 11:17:35 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc:     linux-crypto@vger.kernel.org,
+        Tue, 11 Jun 2019 18:53:57 -0400
+Received: from mail-it1-f195.google.com ([209.85.166.195]:53852 "EHLO
+        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2404048AbfFKWx5 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 11 Jun 2019 18:53:57 -0400
+Received: by mail-it1-f195.google.com with SMTP id m187so7742084ite.3;
+        Tue, 11 Jun 2019 15:53:57 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=iQPRF6XFm/QWEVO1CPfMz0EhoIEuoqt7VcGHt4YVR3s=;
+        b=bwzgGflXOQe5eP6WP6bnPoG5hVuqBAMFGVhnt6pOL42IxfwkdGrkJ2yelJHaSdxH4y
+         2HwasSizEfRa+XO3MMNcRLehBfehIuAOJEtOiN9yNeY44ivlEJPZ1+GwSuegddB7W4DG
+         uVxChXqaTKJS2PimQ3q+lCOnBlYEOM42U/F8/MVwBXT4TKR+iJ0WjObF4Lwvo/5wjmVA
+         8LTtSQk8ZXuFhbh45kH37/uvr0rvtcfy7BLCn58JHvMtQKg8AWUEyb+ry3S/JbLnIfuZ
+         I1QoU4w+kZcm4qiH1EjfshwroZxHbsV70PZAishX0Dwuhj4F9QNxXNHYOG/dEamKmK8t
+         sWqQ==
+X-Gm-Message-State: APjAAAUPzzgSNKXjKq5GBz+1YYQqe/mIi0F0x6YYzLjpsjXNiKiw8XkG
+        etHQzX9Ag/nWai+eDyPpLQ==
+X-Google-Smtp-Source: APXvYqzoe7kqFMLzrRy1dkQxZdck05wcc6WXp2uGdqhH5bgqiTrtunhGBZNVP2Qc9VtW1KcUeh7Ffg==
+X-Received: by 2002:a24:61d7:: with SMTP id s206mr19458252itc.133.1560293636578;
+        Tue, 11 Jun 2019 15:53:56 -0700 (PDT)
+Received: from localhost (ip-174-149-252-64.englco.spcsdns.net. [174.149.252.64])
+        by smtp.gmail.com with ESMTPSA id f4sm5155254iok.56.2019.06.11.15.53.54
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Tue, 11 Jun 2019 15:53:55 -0700 (PDT)
+Date:   Tue, 11 Jun 2019 16:53:51 -0600
+From:   Rob Herring <robh@kernel.org>
+To:     Neal Liu <neal.liu@mediatek.com>
+Cc:     Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        linux-cifs@vger.kernel.org, Steve French <sfrench@samba.org>
-Subject: Re: [PATCH v3 7/7] fs: cifs: switch to RC4 library interface
-Message-ID: <20190611181735.GE66728@gmail.com>
-References: <20190611134750.2974-1-ard.biesheuvel@linaro.org>
- <20190611134750.2974-8-ard.biesheuvel@linaro.org>
+        Mark Rutland <mark.rutland@arm.com>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Sean Wang <sean.wang@kernel.org>, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org,
+        wsd_upstream@mediatek.com, Crystal Guo <Crystal.Guo@mediatek.com>
+Subject: Re: [PATCH v3 2/3] dt-bindings: rng: update bindings for MediaTek
+ ARMv8 SoCs
+Message-ID: <20190611225351.GA17332@bogus>
+References: <1560162984-26104-1-git-send-email-neal.liu@mediatek.com>
+ <1560162984-26104-3-git-send-email-neal.liu@mediatek.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190611134750.2974-8-ard.biesheuvel@linaro.org>
+In-Reply-To: <1560162984-26104-3-git-send-email-neal.liu@mediatek.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jun 11, 2019 at 03:47:50PM +0200, Ard Biesheuvel wrote:
-> The CIFS code uses the sync skcipher API to invoke the ecb(arc4) skcipher,
-> of which only a single generic C code implementation exists. This means
-> that going through all the trouble of using scatterlists etc buys us
-> very little, and we're better off just invoking the arc4 library directly.
+On Mon, Jun 10, 2019 at 06:36:23PM +0800, Neal Liu wrote:
+> Document the binding used by the MediaTek ARMv8 SoCs random
+> number generator with TrustZone enabled.
 > 
-> Cc: linux-cifs@vger.kernel.org
-> Cc: Steve French <sfrench@samba.org>
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> Signed-off-by: Neal Liu <neal.liu@mediatek.com>
 > ---
->  fs/cifs/Kconfig       |  2 +-
->  fs/cifs/cifsencrypt.c | 53 ++++++--------------
->  2 files changed, 16 insertions(+), 39 deletions(-)
+>  Documentation/devicetree/bindings/rng/mtk-rng.txt |   15 ++++++++++++---
+>  1 file changed, 12 insertions(+), 3 deletions(-)
 > 
-> diff --git a/fs/cifs/Kconfig b/fs/cifs/Kconfig
-> index aae2b8b2adf5..523e9ea78a28 100644
-> --- a/fs/cifs/Kconfig
-> +++ b/fs/cifs/Kconfig
-> @@ -10,7 +10,7 @@ config CIFS
->  	select CRYPTO_SHA512
->  	select CRYPTO_CMAC
->  	select CRYPTO_HMAC
-> -	select CRYPTO_ARC4
-> +	select CRYPTO_LIB_ARC4
->  	select CRYPTO_AEAD2
->  	select CRYPTO_CCM
->  	select CRYPTO_ECB
-
-Since the "arc4" module is no longer needed, the
-
-	MODULE_SOFTDEP("pre: arc4");
-
-in fs/cifs/cifsfs.c should be removed too.
-
-(Note that it doesn't need a soft dependency on libarc4 instead, since the cifs
-module will link directly to it.)
-
-> diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-> index d2a05e46d6f5..3b7b5e83493d 100644
-> --- a/fs/cifs/cifsencrypt.c
-> +++ b/fs/cifs/cifsencrypt.c
-> @@ -33,7 +33,8 @@
->  #include <linux/ctype.h>
->  #include <linux/random.h>
->  #include <linux/highmem.h>
-> -#include <crypto/skcipher.h>
-> +#include <linux/fips.h>
-> +#include <crypto/arc4.h>
->  #include <crypto/aead.h>
+> diff --git a/Documentation/devicetree/bindings/rng/mtk-rng.txt b/Documentation/devicetree/bindings/rng/mtk-rng.txt
+> index 2bc89f1..fb3dd59 100644
+> --- a/Documentation/devicetree/bindings/rng/mtk-rng.txt
+> +++ b/Documentation/devicetree/bindings/rng/mtk-rng.txt
+> @@ -3,9 +3,13 @@ found in MediaTek SoC family
 >  
->  int __cifs_calc_signature(struct smb_rqst *rqst,
-> @@ -772,11 +773,12 @@ setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
->  int
->  calc_seckey(struct cifs_ses *ses)
->  {
-> -	int rc;
-> -	struct crypto_skcipher *tfm_arc4;
-> -	struct scatterlist sgin, sgout;
-> -	struct skcipher_request *req;
-> +	struct arc4_ctx *ctx_arc4;
->  	unsigned char *sec_key;
-> +	int rc = 0;
+>  Required properties:
+>  - compatible	    : Should be
+> -			"mediatek,mt7622-rng", 	"mediatek,mt7623-rng" : for MT7622
+> -			"mediatek,mt7629-rng",  "mediatek,mt7623-rng" : for MT7629
+> -			"mediatek,mt7623-rng" : for MT7623
+> +			"mediatek,mt7622-rng", "mediatek,mt7623-rng" for MT7622
+> +			"mediatek,mt7629-rng", "mediatek,mt7623-rng" for MT7629
+> +			"mediatek,mt7623-rng" for MT7623
+> +			"mediatek,mtk-sec-rng" for MediaTek ARMv8 SoCs with
+> +			security RNG
+
+Is there any commonality with the prior h/w? If not, make this a 
+separate binding doc.
+
 > +
-> +	if (fips_enabled)
-> +		return -ENODEV;
->  
->  	sec_key = kmalloc(CIFS_SESS_KEY_SIZE, GFP_KERNEL);
->  	if (sec_key == NULL)
+> +Optional properties:
+>  - clocks	    : list of clock specifiers, corresponding to
+>  		      entries in clock-names property;
+>  - clock-names	    : Should contain "rng" entries;
+> @@ -19,3 +23,8 @@ rng: rng@1020f000 {
+>  	clocks = <&infracfg CLK_INFRA_TRNG>;
+>  	clock-names = "rng";
+>  };
+> +
+> +/* secure RNG */
+> +hwrng: hwrng {
+> +	compatible = "mediatek,mtk-sec-rng";
 
-sec_key should be moved back to the stack now, basically reverting this commit:
+How does one access this? Seems like this should be part of a node for 
+firmware? What about other functions?
 
-	commit 5f4b55699aaff1028468e3f53853d781cdafedd6
-	Author: Sachin Prabhu <sprabhu@redhat.com>
-	Date:   Mon Oct 17 16:40:22 2016 -0400
-
-	    CIFS: Fix BUG() in calc_seckey()
-
-It was only moved to the heap because it had to go in a scatterlist.
-
-> +	arc4_setkey(ctx_arc4, ses->auth_key.response, CIFS_SESS_KEY_SIZE);
-> +	arc4_crypt(ctx_arc4, ses->ntlmssp->ciphertext, sec_key,
-> +		   CIFS_CPHTXT_SIZE);
->  
->  	/* make secondary_key/nonce as session key */
->  	memcpy(ses->auth_key.response, sec_key, CIFS_SESS_KEY_SIZE);
->  	/* and make len as that of session key only */
->  	ses->auth_key.len = CIFS_SESS_KEY_SIZE;
->  
-> -out_free_cipher:
-> -	crypto_free_skcipher(tfm_arc4);
->  out:
-> +	kfree(ctx_arc4);
-
-Should be kzfree().
-
-- Eric
+> +};
+> -- 
+> 1.7.9.5
+> 
