@@ -7,65 +7,66 @@ X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A164FC31E45
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jun 2019 23:09:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E252C31E46
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jun 2019 23:09:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7AE8720872
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jun 2019 23:09:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D524220872
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jun 2019 23:09:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IAYd2yE7"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="H1abtSRn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2407947AbfFKXJw (ORCPT
+        id S2407945AbfFKXJz (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 11 Jun 2019 19:09:52 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:43086 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404669AbfFKXJv (ORCPT
+        Tue, 11 Jun 2019 19:09:55 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:37408 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2407944AbfFKXJy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Jun 2019 19:09:51 -0400
-Received: by mail-wr1-f67.google.com with SMTP id p13so4697008wru.10
-        for <linux-crypto@vger.kernel.org>; Tue, 11 Jun 2019 16:09:49 -0700 (PDT)
+        Tue, 11 Jun 2019 19:09:54 -0400
+Received: by mail-wr1-f65.google.com with SMTP id v14so14787857wrr.4
+        for <linux-crypto@vger.kernel.org>; Tue, 11 Jun 2019 16:09:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=m6lrx96N+/HTU2cRYNepLqRT1HXoGD2ZJBZ5Rjzicn4=;
-        b=IAYd2yE7uLIkXSx1AbP0/RxZdmrVhO3G70eJypgZyLFMr4mDN+owMR/Ub8fYn+2N7B
-         DwiLaJ1lfDs1UxPtxIaRnPz0fAiTZfJHbGN/oxr3Y102QQf408l0ArIN/oHTcLKrS72i
-         2Nl56OMEyL77bQBo3++xDTWh5LvDU6AmgQofxeKJeDZ+MYlYZ9kxaPbv01zgJFsAP8Gl
-         Yqz5taSjXzoXs0oL1HcJY2XU/1hdyQLUPtRBTnfX+4gUTBaNV5th+hvxVPkoeGv6hnn7
-         AH42QuDzt0MDP139cU38akAY1Z+mZcuvwm7xRvB7YZVW8ueAKJl7dkXkuVSP1euA1qmD
-         gJdg==
+        bh=eTEZv0K1lF9tA5eNEQyGpuRSHV9usD2RVcNmVJMhy6c=;
+        b=H1abtSRnx6N5T81k0VGsqn+9tRmk4pAbxzr3lRfQ+j4SmDl1RkrvCAE7BPiJf2lBJZ
+         10kB5jUCvqgiByC3idIosbVez/e4+1xGGu3jbhAVoM16jnfoy6s+pSuZL+7LL4UMU7DF
+         l7WVxRmklXxwDEqB70kmfZIM6nJrt/2gAS0srMegbNXaTOkpQjE3XpM4z4Sft9BYjOa4
+         DWouJqSTlzOUS8WLONrOzU6zqEevcM596K8N8yvHeE9uzRP2jYSyE6XRIZy6ngUElYiM
+         4gNqfrB0OWs2ndVVGIm4kmrxS7bMBTEW4MqWSPOhk2JcOswRG1FlM5n52JChODddugc+
+         28oQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=m6lrx96N+/HTU2cRYNepLqRT1HXoGD2ZJBZ5Rjzicn4=;
-        b=sJWPK0JsTWlBJw5qZVbh/+p2RiX03RIvjDeq7/4HS1BoN3y/HGXY4OWIJ2qIWY5+dP
-         IwQgq+Wt3lm+BLQ5Sxt/LGU9Uabv0SrJ8M9bUWxzwSNTeE70lLz9idWFIwcvBbfvma1F
-         4sAp8s7YC3yL0G0cMNNveiqjkJ25++H6Lkywf3jN9tJz6VlCxGvy6Gdi1USqccQ2i0oU
-         MnQWP9JYlZMQpgz3pY4I6QFYLPG86g0E1m8z5UgvBxUWShCc0QmbDau3zM28wXOq2Y2X
-         56xezUwjGcUj/2S7SJT30EVnABc5R9T6YH39l7a8eNvWdHEy7sJ388CkhDKkFYhp6eue
-         NahQ==
-X-Gm-Message-State: APjAAAXBeq40c45Bvl7IfIfHE6Y3IyGvp9CaqY1vJvvo+ja8mHZ5iaUf
-        yqP/ZzmFZGcrbtAuJ692fkHlJOpFDQmhdx/W
-X-Google-Smtp-Source: APXvYqxaj9JzxXHCZf2WK4ZiFqe21Q/j/iEyKh1FPLS8PvcZZRT16BgyRK8IIrHTLlJXtqhp9s9d3w==
-X-Received: by 2002:a05:6000:181:: with SMTP id p1mr28182832wrx.247.1560294588640;
-        Tue, 11 Jun 2019 16:09:48 -0700 (PDT)
+        bh=eTEZv0K1lF9tA5eNEQyGpuRSHV9usD2RVcNmVJMhy6c=;
+        b=HrfK7p1yAF7Rv1a2TirgtugSgBjcYcOWJ9XBf9JJvt+Iv8r7y6jlvSDucf8xNu7GjA
+         dxfmvlMQuj60ZD87xZDsguourKsjhVcq4Ln5DjAtLBMmJUkXQq1Y9LZoYXZdvWQIeJfR
+         fuCMbrZ/K+SqtUQSaEZFax2PzdwCHkpptg0nQQqPr5d9Np4tolQ0AOFr/zQtBLsfqMb3
+         hAZ6GP9jGGThMxK4zbi2W3FTQsRD8BtatUSEl5wpxEGJdRrnghj9i+/WGD5RKsylVZ2v
+         ZzJs+xROZws4qDENOGNrO8u8yjKWLDkKm7dF8+vmBosnO4xkbYQJPwxmqV7f2AUBvUHG
+         lMqQ==
+X-Gm-Message-State: APjAAAW0REYMDN/T4CaRwQ5ZoyEewui4wALlzQo1l/+8oC5/p2dxLS+E
+        9nusqWhfBCdVEOQRf2HBQQJ+cS8sZvMxHIGH
+X-Google-Smtp-Source: APXvYqyWkd+gPYYLCQryzFYO6QGy4fdxARQcia0hJe9jAKbAYrXm05U33E/acrw9mpr8Tx0if9y7qg==
+X-Received: by 2002:a5d:6312:: with SMTP id i18mr11440352wru.203.1560294591558;
+        Tue, 11 Jun 2019 16:09:51 -0700 (PDT)
 Received: from sudo.home ([2a01:cb1d:112:6f00:24bb:7f31:25fe:43a7])
-        by smtp.gmail.com with ESMTPSA id g11sm10827813wrq.89.2019.06.11.16.09.47
+        by smtp.gmail.com with ESMTPSA id g11sm10827813wrq.89.2019.06.11.16.09.50
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 11 Jun 2019 16:09:47 -0700 (PDT)
+        Tue, 11 Jun 2019 16:09:50 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
         Eric Biggers <ebiggers@google.com>,
-        Johannes Berg <johannes@sipsolutions.net>
-Subject: [PATCH v4 4/7] net/lib80211: move TKIP handling to ARC4 library code
-Date:   Wed, 12 Jun 2019 01:09:35 +0200
-Message-Id: <20190611230938.19265-5-ard.biesheuvel@linaro.org>
+        Johannes Berg <johannes@sipsolutions.net>,
+        linux-ppp@vger.kernel.org, Paul Mackerras <paulus@samba.org>
+Subject: [PATCH v4 6/7] ppp: mppe: switch to RC4 library interface
+Date:   Wed, 12 Jun 2019 01:09:37 +0200
+Message-Id: <20190611230938.19265-7-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190611230938.19265-1-ard.biesheuvel@linaro.org>
 References: <20190611230938.19265-1-ard.biesheuvel@linaro.org>
@@ -76,167 +77,257 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The crypto API abstraction is not very useful for invoking ciphers
-directly, especially in the case of arc4, which only has a generic
-implementation in C. So let's invoke the library code directly.
+The MPPE code uses the sync skcipher to invoke the ecb(arc4) skcipher,
+of which only a single generic C code implementation exists. This means
+that going through all the trouble of using scatterlists etc buys us
+very little, and we're better off just invoking the arc4 library directly.
 
+Note that the SHA1 shash used by this driver has several accelerated
+implementations for various architectures, so retaining that part does
+make sense.
+
+Cc: linux-ppp@vger.kernel.org
+Cc: Paul Mackerras <paulus@samba.org>
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- net/wireless/lib80211_crypt_tkip.c | 48 +++++++-------------
- 1 file changed, 17 insertions(+), 31 deletions(-)
+ drivers/net/ppp/Kconfig    |  3 +-
+ drivers/net/ppp/ppp_mppe.c | 97 +++-----------------
+ 2 files changed, 15 insertions(+), 85 deletions(-)
 
-diff --git a/net/wireless/lib80211_crypt_tkip.c b/net/wireless/lib80211_crypt_tkip.c
-index 11eaa5956f00..0fd155c4e0a6 100644
---- a/net/wireless/lib80211_crypt_tkip.c
-+++ b/net/wireless/lib80211_crypt_tkip.c
-@@ -13,6 +13,7 @@
- #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
- 
- #include <linux/err.h>
-+#include <linux/fips.h>
- #include <linux/module.h>
- #include <linux/init.h>
- #include <linux/slab.h>
-@@ -29,6 +30,7 @@
- #include <linux/ieee80211.h>
- #include <net/iw_handler.h>
+diff --git a/drivers/net/ppp/Kconfig b/drivers/net/ppp/Kconfig
+index bf395df3bb37..1a2e2f7629f3 100644
+--- a/drivers/net/ppp/Kconfig
++++ b/drivers/net/ppp/Kconfig
+@@ -87,8 +87,7 @@ config PPP_MPPE
+ 	depends on PPP
+ 	select CRYPTO
+ 	select CRYPTO_SHA1
+-	select CRYPTO_ARC4
+-	select CRYPTO_ECB
++	select CRYPTO_LIB_ARC4
+ 	---help---
+ 	  Support for the MPPE Encryption protocol, as employed by the
+ 	  Microsoft Point-to-Point Tunneling Protocol.
+diff --git a/drivers/net/ppp/ppp_mppe.c b/drivers/net/ppp/ppp_mppe.c
+index ff61dd8748de..de3b57d09d0c 100644
+--- a/drivers/net/ppp/ppp_mppe.c
++++ b/drivers/net/ppp/ppp_mppe.c
+@@ -42,9 +42,10 @@
+  *                    deprecated in 2.6
+  */
  
 +#include <crypto/arc4.h>
  #include <crypto/hash.h>
- #include <linux/crypto.h>
- #include <linux/crc32.h>
-@@ -64,9 +66,9 @@ struct lib80211_tkip_data {
+-#include <crypto/skcipher.h>
+ #include <linux/err.h>
++#include <linux/fips.h>
+ #include <linux/module.h>
+ #include <linux/kernel.h>
+ #include <linux/init.h>
+@@ -65,13 +66,6 @@ MODULE_LICENSE("Dual BSD/GPL");
+ MODULE_ALIAS("ppp-compress-" __stringify(CI_MPPE));
+ MODULE_VERSION("1.0.2");
  
- 	int key_idx;
+-static unsigned int
+-setup_sg(struct scatterlist *sg, const void *address, unsigned int length)
+-{
+-	sg_set_buf(sg, address, length);
+-	return length;
+-}
+-
+ #define SHA1_PAD_SIZE 40
  
--	struct crypto_cipher *rx_tfm_arc4;
-+	struct arc4_ctx rx_ctx_arc4;
-+	struct arc4_ctx tx_ctx_arc4;
- 	struct crypto_shash *rx_tfm_michael;
--	struct crypto_cipher *tx_tfm_arc4;
- 	struct crypto_shash *tx_tfm_michael;
- 
- 	/* scratch buffers for virt_to_page() (crypto API) */
-@@ -93,30 +95,21 @@ static void *lib80211_tkip_init(int key_idx)
+ /*
+@@ -95,7 +89,7 @@ static inline void sha_pad_init(struct sha_pad *shapad)
+  * State for an MPPE (de)compressor.
+  */
+ struct ppp_mppe_state {
+-	struct crypto_sync_skcipher *arc4;
++	struct arc4_ctx arc4;
+ 	struct shash_desc *sha1;
+ 	unsigned char *sha1_digest;
+ 	unsigned char master_key[MPPE_MAX_KEY_LEN];
+@@ -154,24 +148,11 @@ static void get_new_key_from_sha(struct ppp_mppe_state * state)
+  */
+ static void mppe_rekey(struct ppp_mppe_state * state, int initial_key)
  {
- 	struct lib80211_tkip_data *priv;
- 
-+	if (fips_enabled)
-+		return NULL;
-+
- 	priv = kzalloc(sizeof(*priv), GFP_ATOMIC);
- 	if (priv == NULL)
- 		goto fail;
- 
- 	priv->key_idx = key_idx;
- 
--	priv->tx_tfm_arc4 = crypto_alloc_cipher("arc4", 0, 0);
--	if (IS_ERR(priv->tx_tfm_arc4)) {
--		priv->tx_tfm_arc4 = NULL;
--		goto fail;
--	}
+-	struct scatterlist sg_in[1], sg_out[1];
+-	SYNC_SKCIPHER_REQUEST_ON_STACK(req, state->arc4);
 -
- 	priv->tx_tfm_michael = crypto_alloc_shash("michael_mic", 0, 0);
- 	if (IS_ERR(priv->tx_tfm_michael)) {
- 		priv->tx_tfm_michael = NULL;
- 		goto fail;
- 	}
- 
--	priv->rx_tfm_arc4 = crypto_alloc_cipher("arc4", 0, 0);
--	if (IS_ERR(priv->rx_tfm_arc4)) {
--		priv->rx_tfm_arc4 = NULL;
--		goto fail;
--	}
+-	skcipher_request_set_sync_tfm(req, state->arc4);
+-	skcipher_request_set_callback(req, 0, NULL, NULL);
 -
- 	priv->rx_tfm_michael = crypto_alloc_shash("michael_mic", 0, 0);
- 	if (IS_ERR(priv->rx_tfm_michael)) {
- 		priv->rx_tfm_michael = NULL;
-@@ -128,9 +121,7 @@ static void *lib80211_tkip_init(int key_idx)
-       fail:
- 	if (priv) {
- 		crypto_free_shash(priv->tx_tfm_michael);
--		crypto_free_cipher(priv->tx_tfm_arc4);
- 		crypto_free_shash(priv->rx_tfm_michael);
--		crypto_free_cipher(priv->rx_tfm_arc4);
- 		kfree(priv);
+ 	get_new_key_from_sha(state);
+ 	if (!initial_key) {
+-		crypto_sync_skcipher_setkey(state->arc4, state->sha1_digest,
+-					    state->keylen);
+-		sg_init_table(sg_in, 1);
+-		sg_init_table(sg_out, 1);
+-		setup_sg(sg_in, state->sha1_digest, state->keylen);
+-		setup_sg(sg_out, state->session_key, state->keylen);
+-		skcipher_request_set_crypt(req, sg_in, sg_out, state->keylen,
+-					   NULL);
+-		if (crypto_skcipher_encrypt(req))
+-    		    printk(KERN_WARNING "mppe_rekey: cipher_encrypt failed\n");
++		arc4_setkey(&state->arc4, state->sha1_digest, state->keylen);
++		arc4_crypt(&state->arc4, state->session_key, state->sha1_digest,
++			   state->keylen);
+ 	} else {
+ 		memcpy(state->session_key, state->sha1_digest, state->keylen);
  	}
- 
-@@ -142,11 +133,9 @@ static void lib80211_tkip_deinit(void *priv)
- 	struct lib80211_tkip_data *_priv = priv;
- 	if (_priv) {
- 		crypto_free_shash(_priv->tx_tfm_michael);
--		crypto_free_cipher(_priv->tx_tfm_arc4);
- 		crypto_free_shash(_priv->rx_tfm_michael);
--		crypto_free_cipher(_priv->rx_tfm_arc4);
+@@ -181,9 +162,7 @@ static void mppe_rekey(struct ppp_mppe_state * state, int initial_key)
+ 		state->session_key[1] = 0x26;
+ 		state->session_key[2] = 0x9e;
  	}
--	kfree(priv);
-+	kzfree(priv);
+-	crypto_sync_skcipher_setkey(state->arc4, state->session_key,
+-				    state->keylen);
+-	skcipher_request_zero(req);
++	arc4_setkey(&state->arc4, state->session_key, state->keylen);
  }
  
- static inline u16 RotR1(u16 val)
-@@ -345,7 +334,6 @@ static int lib80211_tkip_encrypt(struct sk_buff *skb, int hdr_len, void *priv)
- 	int len;
- 	u8 rc4key[16], *pos, *icv;
- 	u32 crc;
--	int i;
+ /*
+@@ -196,7 +175,8 @@ static void *mppe_alloc(unsigned char *options, int optlen)
+ 	unsigned int digestsize;
  
- 	if (tkey->flags & IEEE80211_CRYPTO_TKIP_COUNTERMEASURES) {
- 		struct ieee80211_hdr *hdr = (struct ieee80211_hdr *)skb->data;
-@@ -370,9 +358,9 @@ static int lib80211_tkip_encrypt(struct sk_buff *skb, int hdr_len, void *priv)
- 	icv[2] = crc >> 16;
- 	icv[3] = crc >> 24;
+ 	if (optlen != CILEN_MPPE + sizeof(state->master_key) ||
+-	    options[0] != CI_MPPE || options[1] != CILEN_MPPE)
++	    options[0] != CI_MPPE || options[1] != CILEN_MPPE ||
++	    fips_enabled)
+ 		goto out;
  
--	crypto_cipher_setkey(tkey->tx_tfm_arc4, rc4key, 16);
--	for (i = 0; i < len + 4; i++)
--		crypto_cipher_encrypt_one(tkey->tx_tfm_arc4, pos + i, pos + i);
-+	arc4_setkey(&tkey->tx_ctx_arc4, rc4key, 16);
-+	arc4_crypt(&tkey->tx_ctx_arc4, pos, pos, len + 4);
-+
- 	return 0;
+ 	state = kzalloc(sizeof(*state), GFP_KERNEL);
+@@ -204,12 +184,6 @@ static void *mppe_alloc(unsigned char *options, int optlen)
+ 		goto out;
+ 
+ 
+-	state->arc4 = crypto_alloc_sync_skcipher("ecb(arc4)", 0, 0);
+-	if (IS_ERR(state->arc4)) {
+-		state->arc4 = NULL;
+-		goto out_free;
+-	}
+-
+ 	shash = crypto_alloc_shash("sha1", 0, 0);
+ 	if (IS_ERR(shash))
+ 		goto out_free;
+@@ -250,7 +224,6 @@ static void *mppe_alloc(unsigned char *options, int optlen)
+ 		crypto_free_shash(state->sha1->tfm);
+ 		kzfree(state->sha1);
+ 	}
+-	crypto_free_sync_skcipher(state->arc4);
+ 	kfree(state);
+ out:
+ 	return NULL;
+@@ -266,8 +239,7 @@ static void mppe_free(void *arg)
+ 		kfree(state->sha1_digest);
+ 		crypto_free_shash(state->sha1->tfm);
+ 		kzfree(state->sha1);
+-		crypto_free_sync_skcipher(state->arc4);
+-		kfree(state);
++		kzfree(state);
+ 	}
  }
  
-@@ -400,7 +388,6 @@ static int lib80211_tkip_decrypt(struct sk_buff *skb, int hdr_len, void *priv)
- 	u8 icv[4];
- 	u32 crc;
- 	int plen;
--	int i;
+@@ -366,10 +338,7 @@ mppe_compress(void *arg, unsigned char *ibuf, unsigned char *obuf,
+ 	      int isize, int osize)
+ {
+ 	struct ppp_mppe_state *state = (struct ppp_mppe_state *) arg;
+-	SYNC_SKCIPHER_REQUEST_ON_STACK(req, state->arc4);
+ 	int proto;
+-	int err;
+-	struct scatterlist sg_in[1], sg_out[1];
  
- 	hdr = (struct ieee80211_hdr *)skb->data;
+ 	/*
+ 	 * Check that the protocol is in the range we handle.
+@@ -420,21 +389,7 @@ mppe_compress(void *arg, unsigned char *ibuf, unsigned char *obuf,
+ 	ibuf += 2;		/* skip to proto field */
+ 	isize -= 2;
  
-@@ -453,9 +440,8 @@ static int lib80211_tkip_decrypt(struct sk_buff *skb, int hdr_len, void *priv)
+-	/* Encrypt packet */
+-	sg_init_table(sg_in, 1);
+-	sg_init_table(sg_out, 1);
+-	setup_sg(sg_in, ibuf, isize);
+-	setup_sg(sg_out, obuf, osize);
+-
+-	skcipher_request_set_sync_tfm(req, state->arc4);
+-	skcipher_request_set_callback(req, 0, NULL, NULL);
+-	skcipher_request_set_crypt(req, sg_in, sg_out, isize, NULL);
+-	err = crypto_skcipher_encrypt(req);
+-	skcipher_request_zero(req);
+-	if (err) {
+-		printk(KERN_DEBUG "crypto_cypher_encrypt failed\n");
+-		return -1;
+-	}
++	arc4_crypt(&state->arc4, obuf, ibuf, isize);
  
- 	plen = skb->len - hdr_len - 12;
+ 	state->stats.unc_bytes += isize;
+ 	state->stats.unc_packets++;
+@@ -480,10 +435,8 @@ mppe_decompress(void *arg, unsigned char *ibuf, int isize, unsigned char *obuf,
+ 		int osize)
+ {
+ 	struct ppp_mppe_state *state = (struct ppp_mppe_state *) arg;
+-	SYNC_SKCIPHER_REQUEST_ON_STACK(req, state->arc4);
+ 	unsigned ccount;
+ 	int flushed = MPPE_BITS(ibuf) & MPPE_BIT_FLUSHED;
+-	struct scatterlist sg_in[1], sg_out[1];
  
--	crypto_cipher_setkey(tkey->rx_tfm_arc4, rc4key, 16);
--	for (i = 0; i < plen + 4; i++)
--		crypto_cipher_decrypt_one(tkey->rx_tfm_arc4, pos + i, pos + i);
-+	arc4_setkey(&tkey->rx_ctx_arc4, rc4key, 16);
-+	arc4_crypt(&tkey->rx_ctx_arc4, pos, pos, plen + 4);
+ 	if (isize <= PPP_HDRLEN + MPPE_OVHD) {
+ 		if (state->debug)
+@@ -610,19 +563,7 @@ mppe_decompress(void *arg, unsigned char *ibuf, int isize, unsigned char *obuf,
+ 	 * Decrypt the first byte in order to check if it is
+ 	 * a compressed or uncompressed protocol field.
+ 	 */
+-	sg_init_table(sg_in, 1);
+-	sg_init_table(sg_out, 1);
+-	setup_sg(sg_in, ibuf, 1);
+-	setup_sg(sg_out, obuf, 1);
+-
+-	skcipher_request_set_sync_tfm(req, state->arc4);
+-	skcipher_request_set_callback(req, 0, NULL, NULL);
+-	skcipher_request_set_crypt(req, sg_in, sg_out, 1, NULL);
+-	if (crypto_skcipher_decrypt(req)) {
+-		printk(KERN_DEBUG "crypto_cypher_decrypt failed\n");
+-		osize = DECOMP_ERROR;
+-		goto out_zap_req;
+-	}
++	arc4_crypt(&state->arc4, obuf, ibuf, 1);
  
- 	crc = ~crc32_le(~0, pos, plen);
- 	icv[0] = crc;
-@@ -640,17 +626,17 @@ static int lib80211_tkip_set_key(void *key, int len, u8 * seq, void *priv)
- 	struct lib80211_tkip_data *tkey = priv;
- 	int keyidx;
- 	struct crypto_shash *tfm = tkey->tx_tfm_michael;
--	struct crypto_cipher *tfm2 = tkey->tx_tfm_arc4;
-+	struct arc4_ctx *tfm2 = &tkey->tx_ctx_arc4;
- 	struct crypto_shash *tfm3 = tkey->rx_tfm_michael;
--	struct crypto_cipher *tfm4 = tkey->rx_tfm_arc4;
-+	struct arc4_ctx *tfm4 = &tkey->rx_ctx_arc4;
+ 	/*
+ 	 * Do PFC decompression.
+@@ -637,14 +578,7 @@ mppe_decompress(void *arg, unsigned char *ibuf, int isize, unsigned char *obuf,
+ 	}
  
- 	keyidx = tkey->key_idx;
- 	memset(tkey, 0, sizeof(*tkey));
- 	tkey->key_idx = keyidx;
- 	tkey->tx_tfm_michael = tfm;
--	tkey->tx_tfm_arc4 = tfm2;
-+	tkey->tx_ctx_arc4 = *tfm2;
- 	tkey->rx_tfm_michael = tfm3;
--	tkey->rx_tfm_arc4 = tfm4;
-+	tkey->rx_ctx_arc4 = *tfm4;
- 	if (len == TKIP_KEY_LEN) {
- 		memcpy(tkey->key, key, TKIP_KEY_LEN);
- 		tkey->key_set = 1;
+ 	/* And finally, decrypt the rest of the packet. */
+-	setup_sg(sg_in, ibuf + 1, isize - 1);
+-	setup_sg(sg_out, obuf + 1, osize - 1);
+-	skcipher_request_set_crypt(req, sg_in, sg_out, isize - 1, NULL);
+-	if (crypto_skcipher_decrypt(req)) {
+-		printk(KERN_DEBUG "crypto_cypher_decrypt failed\n");
+-		osize = DECOMP_ERROR;
+-		goto out_zap_req;
+-	}
++	arc4_crypt(&state->arc4, obuf + 1, ibuf + 1, isize - 1);
+ 
+ 	state->stats.unc_bytes += osize;
+ 	state->stats.unc_packets++;
+@@ -654,8 +588,6 @@ mppe_decompress(void *arg, unsigned char *ibuf, int isize, unsigned char *obuf,
+ 	/* good packet credit */
+ 	state->sanity_errors >>= 1;
+ 
+-out_zap_req:
+-	skcipher_request_zero(req);
+ 	return osize;
+ 
+ sanity_error:
+@@ -728,8 +660,7 @@ static struct compressor ppp_mppe = {
+ static int __init ppp_mppe_init(void)
+ {
+ 	int answer;
+-	if (!(crypto_has_skcipher("ecb(arc4)", 0, CRYPTO_ALG_ASYNC) &&
+-	      crypto_has_ahash("sha1", 0, CRYPTO_ALG_ASYNC)))
++	if (fips_enabled || !crypto_has_ahash("sha1", 0, CRYPTO_ALG_ASYNC))
+ 		return -ENODEV;
+ 
+ 	sha_pad = kmalloc(sizeof(struct sha_pad), GFP_KERNEL);
 -- 
 2.20.1
 
