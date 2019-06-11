@@ -2,452 +2,111 @@ Return-Path: <SRS0=vn8P=UK=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 356F9C4321B
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jun 2019 06:30:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C051C4321B
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jun 2019 09:56:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 173F52146E
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jun 2019 06:30:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6070E212F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jun 2019 09:56:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="d6W435il"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404211AbfFKGai (ORCPT
+        id S1729018AbfFKJ4p (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 11 Jun 2019 02:30:38 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:33874 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2404194AbfFKGai (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Jun 2019 02:30:38 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x5B6RNdU099673;
-        Tue, 11 Jun 2019 02:30:12 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2t25e3kj42-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 11 Jun 2019 02:30:12 -0400
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x5B6RMlN099625;
-        Tue, 11 Jun 2019 02:30:11 -0400
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2t25e3kj31-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 11 Jun 2019 02:30:11 -0400
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x5B5UemO015326;
-        Tue, 11 Jun 2019 05:32:16 GMT
-Received: from b03cxnp08027.gho.boulder.ibm.com (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
-        by ppma01dal.us.ibm.com with ESMTP id 2t1x6sbmn3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 11 Jun 2019 05:32:16 +0000
-Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
-        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x5B6U7r915991068
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 11 Jun 2019 06:30:08 GMT
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id BA4AEC605A;
-        Tue, 11 Jun 2019 06:30:07 +0000 (GMT)
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6FEA0C6061;
-        Tue, 11 Jun 2019 06:30:02 +0000 (GMT)
-Received: from morokweng.localdomain.com (unknown [9.85.227.34])
-        by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Tue, 11 Jun 2019 06:30:02 +0000 (GMT)
-From:   Thiago Jung Bauermann <bauerman@linux.ibm.com>
-To:     linux-integrity@vger.kernel.org
-Cc:     linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Jessica Yu <jeyu@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jonathan Corbet <corbet@lwn.net>,
-        "AKASHI, Takahiro" <takahiro.akashi@linaro.org>,
-        Thiago Jung Bauermann <bauerman@linux.ibm.com>
-Subject: [PATCH v11 11/13] ima: Define ima-modsig template
-Date:   Tue, 11 Jun 2019 03:28:15 -0300
-Message-Id: <20190611062817.18412-12-bauerman@linux.ibm.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190611062817.18412-1-bauerman@linux.ibm.com>
-References: <20190611062817.18412-1-bauerman@linux.ibm.com>
+        Tue, 11 Jun 2019 05:56:45 -0400
+Received: from mail-eopbgr80077.outbound.protection.outlook.com ([40.107.8.77]:1856
+        "EHLO EUR04-VI1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727726AbfFKJ4p (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 11 Jun 2019 05:56:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=P2+iRFvcKX/B0Fgo8rl2Va9Wr5wecC2g8skImnvvOt4=;
+ b=d6W435ilLK7PLGLjYDS65kjb9XWAWxAHO/05QG3z/K6WUnla3HS1p8YmhKuYy8XqN5MpO0Gr+vM5Y2JanNOk2Dy4OQeCdFLvKHPM+rTxjnlrHLgJ9SXaScnh2UB3g1OlVhFSOwLnO4mFFhE7olIqKc9A88WZ+jHZRm5uSIHz4Ik=
+Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
+ VI1PR0402MB3677.eurprd04.prod.outlook.com (52.134.15.19) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1965.15; Tue, 11 Jun 2019 09:56:41 +0000
+Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
+ ([fe80::ccaf:f4a1:704a:e745]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
+ ([fe80::ccaf:f4a1:704a:e745%4]) with mapi id 15.20.1965.017; Tue, 11 Jun 2019
+ 09:56:41 +0000
+From:   Horia Geanta <horia.geanta@nxp.com>
+To:     Andrey Smirnov <andrew.smirnov@gmail.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+CC:     Chris Spencer <christopher.spencer@sea.co.uk>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Cory Tusar <cory.tusar@zii.aero>,
+        Chris Healy <cphealy@gmail.com>,
+        Lucas Stach <l.stach@pengutronix.de>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Abel Vesa <abel.vesa@nxp.com>,
+        dl-linux-imx <linux-imx@nxp.com>,
+        "linux-clk@vger.kernel.org" <linux-clk@vger.kernel.org>
+Subject: Re: [PATCH v2 1/4] crypto: caam - do not initialise clocks on the
+ i.MX8
+Thread-Topic: [PATCH v2 1/4] crypto: caam - do not initialise clocks on the
+ i.MX8
+Thread-Index: AQHVHWwGsMxFSBPcUUWzlXHZD6TwyA==
+Date:   Tue, 11 Jun 2019 09:56:40 +0000
+Message-ID: <VI1PR0402MB34855AC8C617A3D7A584A1B798ED0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+References: <20190607200225.21419-1-andrew.smirnov@gmail.com>
+ <20190607200225.21419-2-andrew.smirnov@gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=horia.geanta@nxp.com; 
+x-originating-ip: [212.146.100.6]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 1e8d4328-fb86-46c4-d806-08d6ee531a5d
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:VI1PR0402MB3677;
+x-ms-traffictypediagnostic: VI1PR0402MB3677:
+x-microsoft-antispam-prvs: <VI1PR0402MB3677CB501F7CA9E8DBD6238098ED0@VI1PR0402MB3677.eurprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:6790;
+x-forefront-prvs: 006546F32A
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(376002)(366004)(39860400002)(346002)(396003)(136003)(189003)(199004)(4744005)(66066001)(3846002)(4326008)(52536014)(2906002)(74316002)(81156014)(6116002)(71200400001)(81166006)(71190400001)(8936002)(305945005)(55016002)(229853002)(7736002)(8676002)(478600001)(14454004)(2501003)(6436002)(66476007)(110136005)(66446008)(66556008)(476003)(53936002)(5660300002)(64756008)(316002)(102836004)(25786009)(54906003)(9686003)(76116006)(86362001)(66946007)(256004)(446003)(73956011)(53546011)(68736007)(76176011)(6246003)(33656002)(26005)(186003)(7696005)(6506007)(486006)(99286004)(44832011);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB3677;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: nxp.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: 4uFTjBb6zhrXMfmPlFhHOYmNtCiQlApNIOx70ctP1hwMNDQ67bZ+/atSKi20MNYngJ5dBvxqUUaQT4erMpdgwQN3I4kPZIMBXRcnQQY/El7bahjEJiTHxzyYHyHkQsJPlKn/5B8O/XDjaAejlQ1aHbIPF0v0mGPiYnsTz3L+PlK1YRW3kvXkQ9fnWubkTPlQ6i+tiRKelx+BghBpz+XD4dnbjIed2iVODQQ8bX4sWkP5bUyIYGD0cFAxQqHD00lhn79Ol3u2iSc0XPci6VS/7LevdcoZxoCFawBdJBHdOcN3vuQfqHSqTx3OiAtbQnDAta2739fWAolNnA0EECRO5PbzjkhGmqC71nruW33bw2Eou21L7eZfV79CFtfk4jg42DVw3olSD5pDLCBvSw4VZRpgR343ejwtvoVaLzGwDoE=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-11_03:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=3 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1906110044
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1e8d4328-fb86-46c4-d806-08d6ee531a5d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Jun 2019 09:56:40.9638
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: horia.geanta@nxp.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3677
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Define new "d-modsig" template field which holds the digest that is
-expected to match the one contained in the modsig, and also new "modsig"
-template field which holds the appended file signature.
-
-Add a new "ima-modsig" defined template descriptor with the new fields as
-well as the ones from the "ima-sig" descriptor.
-
-Change ima_store_measurement() to accept a struct modsig * argument so that
-it can be passed along to the templates via struct ima_event_data.
-
-Suggested-by: Mimi Zohar <zohar@linux.ibm.com>
-Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
-Reviewed-by: Mimi Zohar <zohar@linux.ibm.com>
----
- Documentation/security/IMA-templates.rst  |  7 ++-
- security/integrity/ima/ima.h              | 20 +++++++-
- security/integrity/ima/ima_api.c          |  5 +-
- security/integrity/ima/ima_main.c         |  2 +-
- security/integrity/ima/ima_modsig.c       | 19 +++++++
- security/integrity/ima/ima_policy.c       | 41 ++++++++++++++++
- security/integrity/ima/ima_template.c     |  7 ++-
- security/integrity/ima/ima_template_lib.c | 60 ++++++++++++++++++++++-
- security/integrity/ima/ima_template_lib.h |  4 ++
- 9 files changed, 157 insertions(+), 8 deletions(-)
-
-diff --git a/Documentation/security/IMA-templates.rst b/Documentation/security/IMA-templates.rst
-index 2cd0e273cc9a..8da20b444be0 100644
---- a/Documentation/security/IMA-templates.rst
-+++ b/Documentation/security/IMA-templates.rst
-@@ -68,15 +68,18 @@ descriptors by adding their identifier to the format string
-  - 'd-ng': the digest of the event, calculated with an arbitrary hash
-    algorithm (field format: [<hash algo>:]digest, where the digest
-    prefix is shown only if the hash algorithm is not SHA1 or MD5);
-+ - 'd-modsig': the digest of the event without the appended modsig;
-  - 'n-ng': the name of the event, without size limitations;
-- - 'sig': the file signature.
-+ - 'sig': the file signature;
-+ - 'modsig' the appended file signature.
- 
- 
- Below, there is the list of defined template descriptors:
- 
-  - "ima": its format is ``d|n``;
-  - "ima-ng" (default): its format is ``d-ng|n-ng``;
-- - "ima-sig": its format is ``d-ng|n-ng|sig``.
-+ - "ima-sig": its format is ``d-ng|n-ng|sig``;
-+ - "ima-modsig": its format is ``d-ng|n-ng|sig|d-modsig|modsig``.
- 
- 
- 
-diff --git a/security/integrity/ima/ima.h b/security/integrity/ima/ima.h
-index 0acc8e56ec73..a2b2c13ceda8 100644
---- a/security/integrity/ima/ima.h
-+++ b/security/integrity/ima/ima.h
-@@ -64,6 +64,7 @@ struct ima_event_data {
- 	const unsigned char *filename;
- 	struct evm_ima_xattr_data *xattr_value;
- 	int xattr_len;
-+	const struct modsig *modsig;
- 	const char *violation;
- };
- 
-@@ -207,7 +208,7 @@ int ima_collect_measurement(struct integrity_iint_cache *iint,
- void ima_store_measurement(struct integrity_iint_cache *iint, struct file *file,
- 			   const unsigned char *filename,
- 			   struct evm_ima_xattr_data *xattr_value,
--			   int xattr_len, int pcr,
-+			   int xattr_len, const struct modsig *modsig, int pcr,
- 			   struct ima_template_desc *template_desc);
- void ima_audit_measurement(struct integrity_iint_cache *iint,
- 			   const unsigned char *filename);
-@@ -308,6 +309,10 @@ bool ima_hook_supports_modsig(enum ima_hooks func);
- int ima_read_modsig(enum ima_hooks func, const void *buf, loff_t buf_len,
- 		    struct modsig **modsig);
- void ima_collect_modsig(struct modsig *modsig, const void *buf, loff_t size);
-+int ima_get_modsig_digest(const struct modsig *modsig, enum hash_algo *algo,
-+			  const u8 **digest, u32 *digest_size);
-+int ima_get_raw_modsig(const struct modsig *modsig, const void **data,
-+		       u32 *data_len);
- void ima_free_modsig(struct modsig *modsig);
- #else
- static inline bool ima_hook_supports_modsig(enum ima_hooks func)
-@@ -326,6 +331,19 @@ static inline void ima_collect_modsig(struct modsig *modsig, const void *buf,
- {
- }
- 
-+static inline int ima_get_modsig_digest(const struct modsig *modsig,
-+					enum hash_algo *algo, const u8 **digest,
-+					u32 *digest_size)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static inline int ima_get_raw_modsig(const struct modsig *modsig,
-+				     const void **data, u32 *data_len)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
- static inline void ima_free_modsig(struct modsig *modsig)
- {
- }
-diff --git a/security/integrity/ima/ima_api.c b/security/integrity/ima/ima_api.c
-index c351b8c37278..32297d1e6164 100644
---- a/security/integrity/ima/ima_api.c
-+++ b/security/integrity/ima/ima_api.c
-@@ -291,7 +291,7 @@ int ima_collect_measurement(struct integrity_iint_cache *iint,
- void ima_store_measurement(struct integrity_iint_cache *iint,
- 			   struct file *file, const unsigned char *filename,
- 			   struct evm_ima_xattr_data *xattr_value,
--			   int xattr_len, int pcr,
-+			   int xattr_len, const struct modsig *modsig, int pcr,
- 			   struct ima_template_desc *template_desc)
- {
- 	static const char op[] = "add_template_measure";
-@@ -303,7 +303,8 @@ void ima_store_measurement(struct integrity_iint_cache *iint,
- 					     .file = file,
- 					     .filename = filename,
- 					     .xattr_value = xattr_value,
--					     .xattr_len = xattr_len };
-+					     .xattr_len = xattr_len,
-+					     .modsig = modsig };
- 	int violation = 0;
- 
- 	if (iint->measured_pcrs & (0x1 << pcr))
-diff --git a/security/integrity/ima/ima_main.c b/security/integrity/ima/ima_main.c
-index 2c9d3cf85726..85afb31fafe0 100644
---- a/security/integrity/ima/ima_main.c
-+++ b/security/integrity/ima/ima_main.c
-@@ -323,7 +323,7 @@ static int process_measurement(struct file *file, const struct cred *cred,
- 
- 	if (action & IMA_MEASURE)
- 		ima_store_measurement(iint, file, pathname,
--				      xattr_value, xattr_len, pcr,
-+				      xattr_value, xattr_len, modsig, pcr,
- 				      template_desc);
- 	if (rc == 0 && (action & IMA_APPRAISE_SUBMASK)) {
- 		inode_lock(inode);
-diff --git a/security/integrity/ima/ima_modsig.c b/security/integrity/ima/ima_modsig.c
-index d438b87dba89..b01bbfeb1d98 100644
---- a/security/integrity/ima/ima_modsig.c
-+++ b/security/integrity/ima/ima_modsig.c
-@@ -140,6 +140,25 @@ int ima_modsig_verify(struct key *keyring, const struct modsig *modsig)
- 					VERIFYING_MODULE_SIGNATURE, NULL, NULL);
- }
- 
-+int ima_get_modsig_digest(const struct modsig *modsig, enum hash_algo *algo,
-+			  const u8 **digest, u32 *digest_size)
-+{
-+	*algo = modsig->hash_algo;
-+	*digest = modsig->digest;
-+	*digest_size = modsig->digest_size;
-+
-+	return 0;
-+}
-+
-+int ima_get_raw_modsig(const struct modsig *modsig, const void **data,
-+		       u32 *data_len)
-+{
-+	*data = &modsig->raw_pkcs7;
-+	*data_len = modsig->raw_pkcs7_len;
-+
-+	return 0;
-+}
-+
- void ima_free_modsig(struct modsig *modsig)
- {
- 	if (!modsig)
-diff --git a/security/integrity/ima/ima_policy.c b/security/integrity/ima/ima_policy.c
-index f64ef84516db..6463ab8921ea 100644
---- a/security/integrity/ima/ima_policy.c
-+++ b/security/integrity/ima/ima_policy.c
-@@ -10,6 +10,9 @@
-  *	- initialize default measure policy rules
-  *
-  */
-+
-+#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-+
- #include <linux/init.h>
- #include <linux/list.h>
- #include <linux/fs.h>
-@@ -766,6 +769,38 @@ static void ima_log_string(struct audit_buffer *ab, char *key, char *value)
- 	ima_log_string_op(ab, key, value, NULL);
- }
- 
-+/*
-+ * Validating the appended signature included in the measurement list requires
-+ * the file hash calculated without the appended signature (i.e., the 'd-modsig'
-+ * field). Therefore, notify the user if they have the 'modsig' field but not
-+ * the 'd-modsig' field in the template.
-+ */
-+static void check_template_modsig(const struct ima_template_desc *template)
-+{
-+#define MSG "template with 'modsig' field also needs 'd-modsig' field\n"
-+	bool has_modsig, has_dmodsig;
-+	static bool checked;
-+	int i;
-+
-+	/* We only need to notify the user once. */
-+	if (checked)
-+		return;
-+
-+	has_modsig = has_dmodsig = false;
-+	for (i = 0; i < template->num_fields; i++) {
-+		if (!strcmp(template->fields[i]->field_id, "modsig"))
-+			has_modsig = true;
-+		else if (!strcmp(template->fields[i]->field_id, "d-modsig"))
-+			has_dmodsig = true;
-+	}
-+
-+	if (has_modsig && !has_dmodsig)
-+		pr_notice(MSG);
-+
-+	checked = true;
-+#undef MSG
-+}
-+
- static int ima_parse_rule(char *rule, struct ima_rule_entry *entry)
- {
- 	struct audit_buffer *ab;
-@@ -1096,6 +1131,12 @@ static int ima_parse_rule(char *rule, struct ima_rule_entry *entry)
- 	else if (entry->action == APPRAISE)
- 		temp_ima_appraise |= ima_appraise_flag(entry->func);
- 
-+	if (!result && entry->flags & IMA_MODSIG_ALLOWED) {
-+		template_desc = entry->template ? entry->template :
-+						  ima_template_desc_current();
-+		check_template_modsig(template_desc);
-+	}
-+
- 	audit_log_format(ab, "res=%d", !result);
- 	audit_log_end(ab);
- 	return result;
-diff --git a/security/integrity/ima/ima_template.c b/security/integrity/ima/ima_template.c
-index e6e892f31cbd..e25bef419c87 100644
---- a/security/integrity/ima/ima_template.c
-+++ b/security/integrity/ima/ima_template.c
-@@ -26,6 +26,7 @@ static struct ima_template_desc builtin_templates[] = {
- 	{.name = IMA_TEMPLATE_IMA_NAME, .fmt = IMA_TEMPLATE_IMA_FMT},
- 	{.name = "ima-ng", .fmt = "d-ng|n-ng"},
- 	{.name = "ima-sig", .fmt = "d-ng|n-ng|sig"},
-+	{.name = "ima-modsig", .fmt = "d-ng|n-ng|sig|d-modsig|modsig"},
- 	{.name = "", .fmt = ""},	/* placeholder for a custom format */
- };
- 
-@@ -43,8 +44,12 @@ static const struct ima_template_field supported_fields[] = {
- 	 .field_show = ima_show_template_string},
- 	{.field_id = "sig", .field_init = ima_eventsig_init,
- 	 .field_show = ima_show_template_sig},
-+	{.field_id = "d-modsig", .field_init = ima_eventdigest_modsig_init,
-+	 .field_show = ima_show_template_digest_ng},
-+	{.field_id = "modsig", .field_init = ima_eventmodsig_init,
-+	 .field_show = ima_show_template_sig},
- };
--#define MAX_TEMPLATE_NAME_LEN 15
-+#define MAX_TEMPLATE_NAME_LEN sizeof("d|n|d-ng|n-ng|sig|d-modisg|modsig")
- 
- static struct ima_template_desc *ima_template;
- static int template_desc_init_fields(const char *template_fmt,
-diff --git a/security/integrity/ima/ima_template_lib.c b/security/integrity/ima/ima_template_lib.c
-index 513b457ae900..dacb01fb105f 100644
---- a/security/integrity/ima/ima_template_lib.c
-+++ b/security/integrity/ima/ima_template_lib.c
-@@ -223,7 +223,8 @@ int ima_parse_buf(void *bufstartp, void *bufendp, void **bufcurp,
- 	return 0;
- }
- 
--static int ima_eventdigest_init_common(u8 *digest, u32 digestsize, u8 hash_algo,
-+static int ima_eventdigest_init_common(const u8 *digest, u32 digestsize,
-+				       u8 hash_algo,
- 				       struct ima_field_data *field_data)
- {
- 	/*
-@@ -326,6 +327,41 @@ int ima_eventdigest_ng_init(struct ima_event_data *event_data,
- 					   hash_algo, field_data);
- }
- 
-+/*
-+ * This function writes the digest of the file which is expected to match the
-+ * digest contained in the file's embedded signature.
-+ */
-+int ima_eventdigest_modsig_init(struct ima_event_data *event_data,
-+				struct ima_field_data *field_data)
-+{
-+	enum hash_algo hash_algo;
-+	const u8 *cur_digest;
-+	u32 cur_digestsize;
-+
-+	if (!event_data->modsig)
-+		return 0;
-+
-+	if (event_data->violation) {
-+		/* Recording a violation. */
-+		hash_algo = HASH_ALGO_SHA1;
-+		cur_digest = NULL;
-+		cur_digestsize = 0;
-+	} else {
-+		int rc;
-+
-+		rc = ima_get_modsig_digest(event_data->modsig, &hash_algo,
-+					   &cur_digest, &cur_digestsize);
-+		if (rc)
-+			return rc;
-+		else if (hash_algo == HASH_ALGO__LAST || cur_digestsize == 0)
-+			/* There was some error collecting the digest. */
-+			return -EINVAL;
-+	}
-+
-+	return ima_eventdigest_init_common(cur_digest, cur_digestsize,
-+					   hash_algo, field_data);
-+}
-+
- static int ima_eventname_init_common(struct ima_event_data *event_data,
- 				     struct ima_field_data *field_data,
- 				     bool size_limit)
-@@ -389,3 +425,25 @@ int ima_eventsig_init(struct ima_event_data *event_data,
- 	return ima_write_template_field_data(xattr_value, event_data->xattr_len,
- 					     DATA_FMT_HEX, field_data);
- }
-+
-+int ima_eventmodsig_init(struct ima_event_data *event_data,
-+			 struct ima_field_data *field_data)
-+{
-+	const void *data;
-+	u32 data_len;
-+	int rc;
-+
-+	if (!event_data->modsig)
-+		return 0;
-+
-+	/*
-+	 * modsig is a runtime structure containing pointers. Get its raw data
-+	 * instead.
-+	 */
-+	rc = ima_get_raw_modsig(event_data->modsig, &data, &data_len);
-+	if (rc)
-+		return rc;
-+
-+	return ima_write_template_field_data(data, data_len, DATA_FMT_HEX,
-+					     field_data);
-+}
-diff --git a/security/integrity/ima/ima_template_lib.h b/security/integrity/ima/ima_template_lib.h
-index 6a3d8b831deb..1d7c690ebae5 100644
---- a/security/integrity/ima/ima_template_lib.h
-+++ b/security/integrity/ima/ima_template_lib.h
-@@ -38,8 +38,12 @@ int ima_eventname_init(struct ima_event_data *event_data,
- 		       struct ima_field_data *field_data);
- int ima_eventdigest_ng_init(struct ima_event_data *event_data,
- 			    struct ima_field_data *field_data);
-+int ima_eventdigest_modsig_init(struct ima_event_data *event_data,
-+				struct ima_field_data *field_data);
- int ima_eventname_ng_init(struct ima_event_data *event_data,
- 			  struct ima_field_data *field_data);
- int ima_eventsig_init(struct ima_event_data *event_data,
- 		      struct ima_field_data *field_data);
-+int ima_eventmodsig_init(struct ima_event_data *event_data,
-+			 struct ima_field_data *field_data);
- #endif /* __LINUX_IMA_TEMPLATE_LIB_H */
+On 6/7/2019 11:03 PM, Andrey Smirnov wrote:=0A=
+> From: Chris Spencer <christopher.spencer@sea.co.uk>=0A=
+> =0A=
+> There are no clocks that the CAAM driver needs to initialise on the=0A=
+> i.MX8.=0A=
+> =0A=
+RM lists 5 clocks for CAAM module (instance.clock): caam.aclk, caam.ipg_clk=
+,=0A=
+caam.ipg_clk_s, caam_exsc.aclk_exsc, caam_mem.clk=0A=
+				=0A=
+Wouldn't it be better to have these clocks in DT, instead of relying that t=
+heir=0A=
+root clocks (ccm_ahb_clk_root, ccm_ipg_clk_root) are critical / always on?=
+=0A=
+=0A=
+Thanks,=0A=
+Horia=0A=
+=0A=
