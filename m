@@ -4,58 +4,58 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7D9DC43218
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C527C4321A
 	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jun 2019 13:48:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9036A20896
+	by mail.kernel.org (Postfix) with ESMTP id 5922720896
 	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jun 2019 13:48:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Jpyybqlu"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xImDbJc1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2403948AbfFKNsF (ORCPT
+        id S2388299AbfFKNsF (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Tue, 11 Jun 2019 09:48:05 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:53839 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389298AbfFKNsF (ORCPT
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:52230 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390248AbfFKNsF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Tue, 11 Jun 2019 09:48:05 -0400
-Received: by mail-wm1-f65.google.com with SMTP id x15so3042347wmj.3
-        for <linux-crypto@vger.kernel.org>; Tue, 11 Jun 2019 06:48:04 -0700 (PDT)
+Received: by mail-wm1-f66.google.com with SMTP id s3so3056962wms.2
+        for <linux-crypto@vger.kernel.org>; Tue, 11 Jun 2019 06:48:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=2CZ7XNP6ncpKBw0YJudQO1JgyRd0fuR40ry6DWOpcj4=;
-        b=Jpyybqlurfd8p8HkRweWx9A0ZRZRilrim08I8+62egJ0xAS8tiahGPiVz7xuNNXCBg
-         6nCHBPnqGNKdvljtQN9d1ojCYrj5nfQwrvCnKva3USqRdCqmYd3Komp1ou8KiqViYDQp
-         Y47OauyVN8Fzy4YQxyG90+u2pC9mcRjt7BiKS0kTyG9Sk8HZQ/8dbxiGdoKRWVu7HaxD
-         tQiw4lsxthogrO0uShmlz2yz68rPA2p/vNfA55oQAH/nTEEte46iJRn3S+Zbj5aU+4Ve
-         V+AclEU688L+c2wmvK445FKZBCHYQCq3jMQKNoYDWdskNjbYLPJj+NY61LIH1l1/gZC3
-         RMIA==
+        bh=kT6Xg5Xf2axXUbcSIqWmO5mOnGwail91z2JesUght8Y=;
+        b=xImDbJc1mqM4oRFysaYy1zwvIVWJ8Dt2fwYw3tTQjzWrZk5zouvhoWhyFFBjBSTkFi
+         Vsp4cv68m1jcIJJkstPP20meC4rBC/C+rmt0kIv+7rsnkeuJ+b0VBIdCOsr2sub1GWp1
+         4vrtLdMHVmVy49XDBv9DRdeLiUfYiAbll/1rpL3+/m3UM9nrGRwzMe9W0wwyoD3U7+nf
+         Ay3DdT44sZNbUbWBoEOUsVuZfVS7E8Se7CLWtqtPWJkFt8Ui5uFeyTgxV2/lF+hi3Ybq
+         Ur+SZvlokIvokzSm5ZmT8+Q79WV+7g9oFWz1y0lFN7hzYHXG7+kCa4AVzV3FJw3X2n4c
+         7EvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=2CZ7XNP6ncpKBw0YJudQO1JgyRd0fuR40ry6DWOpcj4=;
-        b=ETJoBgDFZCyzFi/XmnOOPe4zOWag7meXRrwR/VYFPdDD5dA2AXrT0m5jSqKjlMXuRL
-         9OktVwMZKg9OLOoj8Lm3kE/vHf6dkK2llbCvMygac8mDjC/+V0Xw28YVbRWi+5qIx/h9
-         wtxn89iK/MZu7PEkSvw0JYx50g6z/ZTFQSOwgE1J4hureau0nj6eY7qJ4z+migdds2lI
-         do9EWc9LDkuIw4GR5+aWlBycdD3sXlrFz8dwmQZ6oHV0S77dcfAhMCocX+67GJSEj61F
-         MNZVV3ivmA1lAzt4KF6K2s3wzY2+M43rXRpwUugXZi5tT3UE7nTS519H3uLZBIY824Gi
-         5Bog==
-X-Gm-Message-State: APjAAAWbI6XP2p7I5qTcMRRe+M4BuqAlf5g1P9lNyrkdGKgzTLZmbANZ
-        Rvfmx08tdXZqkA52QQ9VuzTkweWkAB3aLF9H
-X-Google-Smtp-Source: APXvYqykFvdzrVY18edtq46qoHfHf3p2RGGd1PJ7mo4pHhVHCSHHI4aen/Ca4c6s/pQLyrvXyxHavw==
-X-Received: by 2002:a1c:2e09:: with SMTP id u9mr18173175wmu.137.1560260883273;
-        Tue, 11 Jun 2019 06:48:03 -0700 (PDT)
-Received: from sudo.home ([2a01:cb1d:112:6f00:24bb:7f31:25fe:43a7])
-        by smtp.gmail.com with ESMTPSA id o126sm3964305wmo.31.2019.06.11.06.48.02
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        bh=kT6Xg5Xf2axXUbcSIqWmO5mOnGwail91z2JesUght8Y=;
+        b=TBgLo140J34doxphtwX9qdY8EOtcAHBZFo0wZzv4u2um4nn1J+zcvH6Lol2juYa5Sw
+         6bUL1RZrjD8HmmyUb1S5H9gUrhCSVX1SMned9zj9FecRKhSAaXR2pphlAOD4tBDmzTtt
+         W1ezOBLA0+e0Wy/IK5hNx9yYQkAI25/7kY7WtVL5DQRVKwecMqSdabrcGldwGHOQjvTa
+         Oie1X01keY9n77TROXIWmJ2UUAdd1L4wAoU8nvwk4Wk4FJSrsRlh2UCjdwIhoSPXzYH1
+         pDgD5shYfkjCwSwEBoa8HK1PzetwphUy4x7Egx7CbyTcYfG9DrufW/fsqgcE+uw4fKeF
+         NCAA==
+X-Gm-Message-State: APjAAAXvnkE6Wnwm1hsuQGofrMQiBsDIjegJsQOIOXzo3SubeyGCEVjg
+        BFNcoNiY8KEn9KBfv0n43OuMLOqgeulgX2YN
+X-Google-Smtp-Source: APXvYqzQCl50yl1PZEW7RYowFg/pUuvm26Hg+k+Xaxwa8OcpvEo0sfsC9Hmo3cUjf6A5tzm/efCU5A==
+X-Received: by 2002:a7b:c313:: with SMTP id k19mr7092704wmj.2.1560260882190;
         Tue, 11 Jun 2019 06:48:02 -0700 (PDT)
+Received: from sudo.home ([2a01:cb1d:112:6f00:24bb:7f31:25fe:43a7])
+        by smtp.gmail.com with ESMTPSA id o126sm3964305wmo.31.2019.06.11.06.48.00
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 11 Jun 2019 06:48:01 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
@@ -63,10 +63,10 @@ Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         "David S. Miller" <davem@davemloft.net>,
         Eric Biggers <ebiggers@google.com>,
         Johannes Berg <johannes@sipsolutions.net>,
-        linux-cifs@vger.kernel.org, Steve French <sfrench@samba.org>
-Subject: [PATCH v3 7/7] fs: cifs: switch to RC4 library interface
-Date:   Tue, 11 Jun 2019 15:47:50 +0200
-Message-Id: <20190611134750.2974-8-ard.biesheuvel@linaro.org>
+        linux-ppp@vger.kernel.org, Paul Mackerras <paulus@samba.org>
+Subject: [PATCH v3 6/7] ppp: mppe: switch to RC4 library interface
+Date:   Tue, 11 Jun 2019 15:47:49 +0200
+Message-Id: <20190611134750.2974-7-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190611134750.2974-1-ard.biesheuvel@linaro.org>
 References: <20190611134750.2974-1-ard.biesheuvel@linaro.org>
@@ -77,121 +77,255 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The CIFS code uses the sync skcipher API to invoke the ecb(arc4) skcipher,
+The MPPE code uses the sync skcipher to invoke the ecb(arc4) skcipher,
 of which only a single generic C code implementation exists. This means
 that going through all the trouble of using scatterlists etc buys us
 very little, and we're better off just invoking the arc4 library directly.
 
-Cc: linux-cifs@vger.kernel.org
-Cc: Steve French <sfrench@samba.org>
+Note that the SHA1 shash used by this driver has several accelerated
+implementations for various architectures, so retaining that part does
+make sense.
+
+Cc: linux-ppp@vger.kernel.org
+Cc: Paul Mackerras <paulus@samba.org>
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- fs/cifs/Kconfig       |  2 +-
- fs/cifs/cifsencrypt.c | 53 ++++++--------------
- 2 files changed, 16 insertions(+), 39 deletions(-)
+ drivers/net/ppp/Kconfig    |  3 +-
+ drivers/net/ppp/ppp_mppe.c | 95 +++-----------------
+ 2 files changed, 14 insertions(+), 84 deletions(-)
 
-diff --git a/fs/cifs/Kconfig b/fs/cifs/Kconfig
-index aae2b8b2adf5..523e9ea78a28 100644
---- a/fs/cifs/Kconfig
-+++ b/fs/cifs/Kconfig
-@@ -10,7 +10,7 @@ config CIFS
- 	select CRYPTO_SHA512
- 	select CRYPTO_CMAC
- 	select CRYPTO_HMAC
+diff --git a/drivers/net/ppp/Kconfig b/drivers/net/ppp/Kconfig
+index bf395df3bb37..1a2e2f7629f3 100644
+--- a/drivers/net/ppp/Kconfig
++++ b/drivers/net/ppp/Kconfig
+@@ -87,8 +87,7 @@ config PPP_MPPE
+ 	depends on PPP
+ 	select CRYPTO
+ 	select CRYPTO_SHA1
 -	select CRYPTO_ARC4
+-	select CRYPTO_ECB
 +	select CRYPTO_LIB_ARC4
- 	select CRYPTO_AEAD2
- 	select CRYPTO_CCM
- 	select CRYPTO_ECB
-diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-index d2a05e46d6f5..3b7b5e83493d 100644
---- a/fs/cifs/cifsencrypt.c
-+++ b/fs/cifs/cifsencrypt.c
-@@ -33,7 +33,8 @@
- #include <linux/ctype.h>
- #include <linux/random.h>
- #include <linux/highmem.h>
--#include <crypto/skcipher.h>
-+#include <linux/fips.h>
+ 	---help---
+ 	  Support for the MPPE Encryption protocol, as employed by the
+ 	  Microsoft Point-to-Point Tunneling Protocol.
+diff --git a/drivers/net/ppp/ppp_mppe.c b/drivers/net/ppp/ppp_mppe.c
+index ff61dd8748de..a2040a156f40 100644
+--- a/drivers/net/ppp/ppp_mppe.c
++++ b/drivers/net/ppp/ppp_mppe.c
+@@ -42,9 +42,10 @@
+  *                    deprecated in 2.6
+  */
+ 
 +#include <crypto/arc4.h>
- #include <crypto/aead.h>
+ #include <crypto/hash.h>
+-#include <crypto/skcipher.h>
+ #include <linux/err.h>
++#include <linux/fips.h>
+ #include <linux/module.h>
+ #include <linux/kernel.h>
+ #include <linux/init.h>
+@@ -65,13 +66,6 @@ MODULE_LICENSE("Dual BSD/GPL");
+ MODULE_ALIAS("ppp-compress-" __stringify(CI_MPPE));
+ MODULE_VERSION("1.0.2");
  
- int __cifs_calc_signature(struct smb_rqst *rqst,
-@@ -772,11 +773,12 @@ setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
- int
- calc_seckey(struct cifs_ses *ses)
+-static unsigned int
+-setup_sg(struct scatterlist *sg, const void *address, unsigned int length)
+-{
+-	sg_set_buf(sg, address, length);
+-	return length;
+-}
+-
+ #define SHA1_PAD_SIZE 40
+ 
+ /*
+@@ -95,7 +89,7 @@ static inline void sha_pad_init(struct sha_pad *shapad)
+  * State for an MPPE (de)compressor.
+  */
+ struct ppp_mppe_state {
+-	struct crypto_sync_skcipher *arc4;
++	struct arc4_ctx arc4;
+ 	struct shash_desc *sha1;
+ 	unsigned char *sha1_digest;
+ 	unsigned char master_key[MPPE_MAX_KEY_LEN];
+@@ -154,24 +148,11 @@ static void get_new_key_from_sha(struct ppp_mppe_state * state)
+  */
+ static void mppe_rekey(struct ppp_mppe_state * state, int initial_key)
  {
--	int rc;
--	struct crypto_skcipher *tfm_arc4;
--	struct scatterlist sgin, sgout;
--	struct skcipher_request *req;
-+	struct arc4_ctx *ctx_arc4;
- 	unsigned char *sec_key;
-+	int rc = 0;
-+
-+	if (fips_enabled)
-+		return -ENODEV;
+-	struct scatterlist sg_in[1], sg_out[1];
+-	SYNC_SKCIPHER_REQUEST_ON_STACK(req, state->arc4);
+-
+-	skcipher_request_set_sync_tfm(req, state->arc4);
+-	skcipher_request_set_callback(req, 0, NULL, NULL);
+-
+ 	get_new_key_from_sha(state);
+ 	if (!initial_key) {
+-		crypto_sync_skcipher_setkey(state->arc4, state->sha1_digest,
+-					    state->keylen);
+-		sg_init_table(sg_in, 1);
+-		sg_init_table(sg_out, 1);
+-		setup_sg(sg_in, state->sha1_digest, state->keylen);
+-		setup_sg(sg_out, state->session_key, state->keylen);
+-		skcipher_request_set_crypt(req, sg_in, sg_out, state->keylen,
+-					   NULL);
+-		if (crypto_skcipher_encrypt(req))
+-    		    printk(KERN_WARNING "mppe_rekey: cipher_encrypt failed\n");
++		arc4_setkey(&state->arc4, state->sha1_digest, state->keylen);
++		arc4_crypt(&state->arc4, state->session_key, state->sha1_digest,
++			   state->keylen);
+ 	} else {
+ 		memcpy(state->session_key, state->sha1_digest, state->keylen);
+ 	}
+@@ -181,9 +162,7 @@ static void mppe_rekey(struct ppp_mppe_state * state, int initial_key)
+ 		state->session_key[1] = 0x26;
+ 		state->session_key[2] = 0x9e;
+ 	}
+-	crypto_sync_skcipher_setkey(state->arc4, state->session_key,
+-				    state->keylen);
+-	skcipher_request_zero(req);
++	arc4_setkey(&state->arc4, state->session_key, state->keylen);
+ }
  
- 	sec_key = kmalloc(CIFS_SESS_KEY_SIZE, GFP_KERNEL);
- 	if (sec_key == NULL)
-@@ -784,49 +786,24 @@ calc_seckey(struct cifs_ses *ses)
+ /*
+@@ -196,7 +175,8 @@ static void *mppe_alloc(unsigned char *options, int optlen)
+ 	unsigned int digestsize;
  
- 	get_random_bytes(sec_key, CIFS_SESS_KEY_SIZE);
+ 	if (optlen != CILEN_MPPE + sizeof(state->master_key) ||
+-	    options[0] != CI_MPPE || options[1] != CILEN_MPPE)
++	    options[0] != CI_MPPE || options[1] != CILEN_MPPE ||
++	    fips_enabled)
+ 		goto out;
  
--	tfm_arc4 = crypto_alloc_skcipher("ecb(arc4)", 0, CRYPTO_ALG_ASYNC);
--	if (IS_ERR(tfm_arc4)) {
--		rc = PTR_ERR(tfm_arc4);
--		cifs_dbg(VFS, "could not allocate crypto API arc4\n");
--		goto out;
+ 	state = kzalloc(sizeof(*state), GFP_KERNEL);
+@@ -204,12 +184,6 @@ static void *mppe_alloc(unsigned char *options, int optlen)
+ 		goto out;
+ 
+ 
+-	state->arc4 = crypto_alloc_sync_skcipher("ecb(arc4)", 0, 0);
+-	if (IS_ERR(state->arc4)) {
+-		state->arc4 = NULL;
+-		goto out_free;
 -	}
 -
--	rc = crypto_skcipher_setkey(tfm_arc4, ses->auth_key.response,
--					CIFS_SESS_KEY_SIZE);
--	if (rc) {
--		cifs_dbg(VFS, "%s: Could not set response as a key\n",
--			 __func__);
--		goto out_free_cipher;
--	}
+ 	shash = crypto_alloc_shash("sha1", 0, 0);
+ 	if (IS_ERR(shash))
+ 		goto out_free;
+@@ -250,7 +224,6 @@ static void *mppe_alloc(unsigned char *options, int optlen)
+ 		crypto_free_shash(state->sha1->tfm);
+ 		kzfree(state->sha1);
+ 	}
+-	crypto_free_sync_skcipher(state->arc4);
+ 	kfree(state);
+ out:
+ 	return NULL;
+@@ -266,7 +239,6 @@ static void mppe_free(void *arg)
+ 		kfree(state->sha1_digest);
+ 		crypto_free_shash(state->sha1->tfm);
+ 		kzfree(state->sha1);
+-		crypto_free_sync_skcipher(state->arc4);
+ 		kfree(state);
+ 	}
+ }
+@@ -366,10 +338,7 @@ mppe_compress(void *arg, unsigned char *ibuf, unsigned char *obuf,
+ 	      int isize, int osize)
+ {
+ 	struct ppp_mppe_state *state = (struct ppp_mppe_state *) arg;
+-	SYNC_SKCIPHER_REQUEST_ON_STACK(req, state->arc4);
+ 	int proto;
+-	int err;
+-	struct scatterlist sg_in[1], sg_out[1];
+ 
+ 	/*
+ 	 * Check that the protocol is in the range we handle.
+@@ -420,21 +389,7 @@ mppe_compress(void *arg, unsigned char *ibuf, unsigned char *obuf,
+ 	ibuf += 2;		/* skip to proto field */
+ 	isize -= 2;
+ 
+-	/* Encrypt packet */
+-	sg_init_table(sg_in, 1);
+-	sg_init_table(sg_out, 1);
+-	setup_sg(sg_in, ibuf, isize);
+-	setup_sg(sg_out, obuf, osize);
 -
--	req = skcipher_request_alloc(tfm_arc4, GFP_KERNEL);
--	if (!req) {
-+	ctx_arc4 = kmalloc(sizeof(*ctx_arc4), GFP_KERNEL);
-+	if (!ctx_arc4) {
- 		rc = -ENOMEM;
--		cifs_dbg(VFS, "could not allocate crypto API arc4 request\n");
--		goto out_free_cipher;
-+		cifs_dbg(VFS, "could not allocate arc4 context\n");
-+		goto out;
+-	skcipher_request_set_sync_tfm(req, state->arc4);
+-	skcipher_request_set_callback(req, 0, NULL, NULL);
+-	skcipher_request_set_crypt(req, sg_in, sg_out, isize, NULL);
+-	err = crypto_skcipher_encrypt(req);
+-	skcipher_request_zero(req);
+-	if (err) {
+-		printk(KERN_DEBUG "crypto_cypher_encrypt failed\n");
+-		return -1;
+-	}
++	arc4_crypt(&state->arc4, obuf, ibuf, isize);
+ 
+ 	state->stats.unc_bytes += isize;
+ 	state->stats.unc_packets++;
+@@ -480,10 +435,8 @@ mppe_decompress(void *arg, unsigned char *ibuf, int isize, unsigned char *obuf,
+ 		int osize)
+ {
+ 	struct ppp_mppe_state *state = (struct ppp_mppe_state *) arg;
+-	SYNC_SKCIPHER_REQUEST_ON_STACK(req, state->arc4);
+ 	unsigned ccount;
+ 	int flushed = MPPE_BITS(ibuf) & MPPE_BIT_FLUSHED;
+-	struct scatterlist sg_in[1], sg_out[1];
+ 
+ 	if (isize <= PPP_HDRLEN + MPPE_OVHD) {
+ 		if (state->debug)
+@@ -610,19 +563,7 @@ mppe_decompress(void *arg, unsigned char *ibuf, int isize, unsigned char *obuf,
+ 	 * Decrypt the first byte in order to check if it is
+ 	 * a compressed or uncompressed protocol field.
+ 	 */
+-	sg_init_table(sg_in, 1);
+-	sg_init_table(sg_out, 1);
+-	setup_sg(sg_in, ibuf, 1);
+-	setup_sg(sg_out, obuf, 1);
+-
+-	skcipher_request_set_sync_tfm(req, state->arc4);
+-	skcipher_request_set_callback(req, 0, NULL, NULL);
+-	skcipher_request_set_crypt(req, sg_in, sg_out, 1, NULL);
+-	if (crypto_skcipher_decrypt(req)) {
+-		printk(KERN_DEBUG "crypto_cypher_decrypt failed\n");
+-		osize = DECOMP_ERROR;
+-		goto out_zap_req;
+-	}
++	arc4_crypt(&state->arc4, obuf, ibuf, 1);
+ 
+ 	/*
+ 	 * Do PFC decompression.
+@@ -637,14 +578,7 @@ mppe_decompress(void *arg, unsigned char *ibuf, int isize, unsigned char *obuf,
  	}
  
--	sg_init_one(&sgin, sec_key, CIFS_SESS_KEY_SIZE);
--	sg_init_one(&sgout, ses->ntlmssp->ciphertext, CIFS_CPHTXT_SIZE);
--
--	skcipher_request_set_callback(req, 0, NULL, NULL);
--	skcipher_request_set_crypt(req, &sgin, &sgout, CIFS_CPHTXT_SIZE, NULL);
--
--	rc = crypto_skcipher_encrypt(req);
--	skcipher_request_free(req);
--	if (rc) {
--		cifs_dbg(VFS, "could not encrypt session key rc: %d\n", rc);
--		goto out_free_cipher;
+ 	/* And finally, decrypt the rest of the packet. */
+-	setup_sg(sg_in, ibuf + 1, isize - 1);
+-	setup_sg(sg_out, obuf + 1, osize - 1);
+-	skcipher_request_set_crypt(req, sg_in, sg_out, isize - 1, NULL);
+-	if (crypto_skcipher_decrypt(req)) {
+-		printk(KERN_DEBUG "crypto_cypher_decrypt failed\n");
+-		osize = DECOMP_ERROR;
+-		goto out_zap_req;
 -	}
-+	arc4_setkey(ctx_arc4, ses->auth_key.response, CIFS_SESS_KEY_SIZE);
-+	arc4_crypt(ctx_arc4, ses->ntlmssp->ciphertext, sec_key,
-+		   CIFS_CPHTXT_SIZE);
++	arc4_crypt(&state->arc4, obuf + 1, ibuf + 1, isize - 1);
  
- 	/* make secondary_key/nonce as session key */
- 	memcpy(ses->auth_key.response, sec_key, CIFS_SESS_KEY_SIZE);
- 	/* and make len as that of session key only */
- 	ses->auth_key.len = CIFS_SESS_KEY_SIZE;
+ 	state->stats.unc_bytes += osize;
+ 	state->stats.unc_packets++;
+@@ -654,8 +588,6 @@ mppe_decompress(void *arg, unsigned char *ibuf, int isize, unsigned char *obuf,
+ 	/* good packet credit */
+ 	state->sanity_errors >>= 1;
  
--out_free_cipher:
--	crypto_free_skcipher(tfm_arc4);
- out:
-+	kfree(ctx_arc4);
- 	kfree(sec_key);
- 	return rc;
- }
+-out_zap_req:
+-	skcipher_request_zero(req);
+ 	return osize;
+ 
+ sanity_error:
+@@ -728,8 +660,7 @@ static struct compressor ppp_mppe = {
+ static int __init ppp_mppe_init(void)
+ {
+ 	int answer;
+-	if (!(crypto_has_skcipher("ecb(arc4)", 0, CRYPTO_ALG_ASYNC) &&
+-	      crypto_has_ahash("sha1", 0, CRYPTO_ALG_ASYNC)))
++	if (!crypto_has_ahash("sha1", 0, CRYPTO_ALG_ASYNC))
+ 		return -ENODEV;
+ 
+ 	sha_pad = kmalloc(sizeof(struct sha_pad), GFP_KERNEL);
 -- 
 2.20.1
 
