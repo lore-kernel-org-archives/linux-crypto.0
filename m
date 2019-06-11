@@ -2,59 +2,60 @@ Return-Path: <SRS0=vn8P=UK=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF835C4321A
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jun 2019 13:47:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 281CBC4321B
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jun 2019 13:48:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 82BFC20896
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jun 2019 13:47:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EA73E212F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jun 2019 13:47:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MuAM88dN"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="m7dlklzR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389251AbfFKNr5 (ORCPT
+        id S2389566AbfFKNr7 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 11 Jun 2019 09:47:57 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:53828 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388299AbfFKNr5 (ORCPT
+        Tue, 11 Jun 2019 09:47:59 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:42841 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388390AbfFKNr6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Jun 2019 09:47:57 -0400
-Received: by mail-wm1-f68.google.com with SMTP id x15so3041805wmj.3
-        for <linux-crypto@vger.kernel.org>; Tue, 11 Jun 2019 06:47:55 -0700 (PDT)
+        Tue, 11 Jun 2019 09:47:58 -0400
+Received: by mail-wr1-f66.google.com with SMTP id x17so13093596wrl.9
+        for <linux-crypto@vger.kernel.org>; Tue, 11 Jun 2019 06:47:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=SPvq1TSklyvGf3Mu8PrbXdN3TXq8wdRsziixaPTYMwE=;
-        b=MuAM88dNq8yvZonActjV5w2mTXFiruMmu7kwM8C7MXTERQS6rHBcEeyCzHQN8RUi6g
-         i/Wo1/xkL2bK7mB6Vhlcbqt3KrGWx1FtG8oZoNH7gv1VuL4JMqiBmtCvEAgStByzfpXx
-         G465wKK2wFE8G4HYYkEq37GPfiyEV+KxvQwuO4f1HG/n+gQWTODyEY1osQ5lsr7KvxWd
-         fB3qOf5fkWtr5t0tDU2OFXOGPnJPfphTwDtjNSdxelfYIZHmNrIGZinxJWs/Btx0uoe5
-         ltP7tvtTZsqSycT8sVqxfoMjpmcI3ZGj+3ofE1qTxSMOTY00O7K1Z5LIWdNuc9324Q5J
-         2fGQ==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=stBj9R470eTrFxTy8rUh9qMz0b4KHQ3ldsc1vJio+Ns=;
+        b=m7dlklzRB9jkFwDMixQAjKWjqH73AX7Au3V9ZrY/9/z8dZtAjwGqjCSMpnPwmTGmbC
+         Rk/vB3tdnwzfDHr7tPZF3/gmKE1eDZj7VePgm4t2ODU28BxtBlNB3Hi/9SqDDT6YivxJ
+         ubojpkMRyHgvAbf7mYHswU8Hi/I1P6onXpLax7S5We+MUHi+yMbUmkiTAMc7kqnXX4ls
+         b269AdF7THrxFetBWxxfYcMklptUrbGLX9fsUhsvK/sel0Uuq07xVNofcLj3QbK5BeuB
+         KtRvGwR60ZIGaUGhxcIEEuEqPJmYWR1E0dHwAhCQmDE3OG00+rfSUsm863AyKJOs1wP3
+         J30A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=SPvq1TSklyvGf3Mu8PrbXdN3TXq8wdRsziixaPTYMwE=;
-        b=Ors3eWOPw3z8rc/IylTr2eQjWqedM4f1nbYZc4Oxkue67jn5OLJMcfP/u4juLMBxiL
-         BylFg5efdbNZWxXqVJUdj6nK79aqZ2bnkl9DX+SWTzuvMRIHNql3xZYloLub4z8BeGW/
-         aoUwlMh6dzW6R74fcPWoCDPDt9vvAehmuNJtI/lnFi9jq+1AMiOpG8tEe0fDVMZ8WhfW
-         gNww4YWsxdnZ0h5MxTWVEfcvMvNdkOsB+hR4uWA9L+6SwJ3qXqPAlsE8IzkN4QM4t/XZ
-         GVkOnuyf9M6H6V6WSu9CurnffJM8n8wzcRRjku0plBunMM7QAR0juBzoVnIbE9eLGZvC
-         zU6g==
-X-Gm-Message-State: APjAAAXWPtROnBQHsz+9A++a4IXzP9JJP6Aa/OdF9I6gNscuLfWAdtGq
-        OIy5rNAcPN1KOlK+uepd+CDpnqxPX/lsN8l4
-X-Google-Smtp-Source: APXvYqzqgPpsZ/W/MpKZxB9bRBcTKcs/rpa0vtiQwxDFhGbodjhueVHdwFx3iEPzZuKOGy6aGTrz0g==
-X-Received: by 2002:a1c:3b02:: with SMTP id i2mr16758612wma.23.1560260874369;
-        Tue, 11 Jun 2019 06:47:54 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=stBj9R470eTrFxTy8rUh9qMz0b4KHQ3ldsc1vJio+Ns=;
+        b=M29K02ClkIJ5C9SMLOOoskLabjbJP9XXKoJD0B+0UKWE4CHI2pnyva5/1N+La02Dpx
+         Jq7Y2TrNjWMvFZxdYJkaVAvz4v9WLMlor6afBWLcQPocFUL1QOJOPJ6YhUQC6FE1PQ3T
+         yvku5E+YLyx6qZ8TnVThZCb1z96ITvWGmdJbpGVXQb/0f/RP5KZscPRFvNI2lc2wykaX
+         IggdBXB+PQTpy1wmSlkAkPRn9b8EMq5v2ENwj1B7izx23SFIQMsb6umSlLSk52nP44c6
+         ot8peAuVeWN/ARClIjvDAhBI972tuGpxqOYgN/jx2y16g8lsSBnolB4Bd6bhxWAYtxgh
+         0CHw==
+X-Gm-Message-State: APjAAAX4F3DXzQuvHsvK6IYHd1NZ7yNT4UNEIA+VOwX8rb6UeXcyl3TD
+        VjHvnrpkmlQ2jY+T9YqKaglDlpNyFYqPuXfZ
+X-Google-Smtp-Source: APXvYqx8sa7gfdwzdJGI+aAH4gymnCXiPBVqf8NsESwZ105OlLi/LBIqZozXpXOb/NUh/1DR9E9jiQ==
+X-Received: by 2002:a5d:6205:: with SMTP id y5mr18654578wru.340.1560260875652;
+        Tue, 11 Jun 2019 06:47:55 -0700 (PDT)
 Received: from sudo.home ([2a01:cb1d:112:6f00:24bb:7f31:25fe:43a7])
-        by smtp.gmail.com with ESMTPSA id o126sm3964305wmo.31.2019.06.11.06.47.52
+        by smtp.gmail.com with ESMTPSA id o126sm3964305wmo.31.2019.06.11.06.47.54
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 11 Jun 2019 06:47:53 -0700 (PDT)
+        Tue, 11 Jun 2019 06:47:54 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
@@ -62,10 +63,12 @@ Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         "David S. Miller" <davem@davemloft.net>,
         Eric Biggers <ebiggers@google.com>,
         Johannes Berg <johannes@sipsolutions.net>
-Subject: [PATCH v3 0/7] crypto: rc4 cleanup
-Date:   Tue, 11 Jun 2019 15:47:43 +0200
-Message-Id: <20190611134750.2974-1-ard.biesheuvel@linaro.org>
+Subject: [PATCH v3 1/7] crypto: arc4 - refactor arc4 core code into separate library
+Date:   Tue, 11 Jun 2019 15:47:44 +0200
+Message-Id: <20190611134750.2974-2-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190611134750.2974-1-ard.biesheuvel@linaro.org>
+References: <20190611134750.2974-1-ard.biesheuvel@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
@@ -73,75 +76,259 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This is a follow-up to, and supersedes [0], which moved some WEP code from
-the cipher to the skcipher interface, in order to reduce the use of the bare
-cipher interface in non-crypto subsystem code.
+Refactor the core rc4 handling so we can move most users to a library
+interface, permitting us to drop the cipher interface entirely in a
+future patch. This is part of an effort to simplify the crypto API
+and improve its robustness against incorrect use.
 
-Since using the skcipher interface to invoke the generic C implementation of
-an algorithm that is known at compile time is rather pointless, this series
-moves those users to a new arc4 library interface instead, which is based on
-the existing code.
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+---
+ MAINTAINERS           |  1 +
+ crypto/Kconfig        |  4 ++
+ crypto/arc4.c         | 60 +---------------
+ include/crypto/arc4.h | 10 +++
+ lib/Makefile          |  2 +-
+ lib/crypto/Makefile   |  4 ++
+ lib/crypto/arc4.c     | 72 ++++++++++++++++++++
+ 7 files changed, 93 insertions(+), 60 deletions(-)
 
-Along the way, the arc4 cipher implementation is removed entirely, and only
-the ecb(arc4) code is preserved, which is used in a number of places in the
-kernel, and is known to be used by at least 'iwd' from user space via the
-algif_skcipher API.
-
-Changes since v2:
-- drop the crypto_ prefix from the arc4 library functions and types
-- rename the source file to arc4.c but keep the lib prefix for the actual
-  module to prevent a clash with the crypto API driver
-- preserve the existing behavior wrt the fips_enabled flag, which prevents
-  any use of ARC4 (note that the fips_enabled flag evaluates to 'false' at
-  compile time for kernels that lack the feature, so with these patches, we
-  get rid of most of the runtime logic regarding FIPS for builds that don't
-  have it enabled)
-
-[0] https://lore.kernel.org/linux-crypto/20190607144944.13485-1-ard.biesheuvel@linaro.org/
-
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Biggers <ebiggers@google.com>
-Cc: Johannes Berg <johannes@sipsolutions.net>
-
-Ard Biesheuvel (7):
-  crypto: arc4 - refactor arc4 core code into separate library
-  net/mac80211: move WEP handling to ARC4 library interface
-  net/lib80211: move WEP handling to ARC4 library code
-  net/lib80211: move TKIP handling to ARC4 library code
-  crypto: arc4 - remove cipher implementation
-  ppp: mppe: switch to RC4 library interface
-  fs: cifs: switch to RC4 library interface
-
- MAINTAINERS                        |   1 +
- crypto/Kconfig                     |   4 +
- crypto/arc4.c                      | 104 +-------------------
- drivers/net/ppp/Kconfig            |   3 +-
- drivers/net/ppp/ppp_mppe.c         |  95 +++---------------
- fs/cifs/Kconfig                    |   2 +-
- fs/cifs/cifsencrypt.c              |  53 +++-------
- include/crypto/arc4.h              |  10 ++
- lib/Makefile                       |   2 +-
- lib/crypto/Makefile                |   4 +
- lib/crypto/arc4.c                  |  72 ++++++++++++++
- net/mac80211/Kconfig               |   2 +-
- net/mac80211/cfg.c                 |   3 -
- net/mac80211/ieee80211_i.h         |   4 +-
- net/mac80211/key.h                 |   1 +
- net/mac80211/main.c                |   6 +-
- net/mac80211/mlme.c                |   2 -
- net/mac80211/tkip.c                |   8 +-
- net/mac80211/tkip.h                |   4 +-
- net/mac80211/wep.c                 |  47 ++-------
- net/mac80211/wep.h                 |   4 +-
- net/mac80211/wpa.c                 |   4 +-
- net/wireless/Kconfig               |   1 +
- net/wireless/lib80211_crypt_tkip.c |  46 +++------
- net/wireless/lib80211_crypt_wep.c  |  49 +++------
- 25 files changed, 179 insertions(+), 352 deletions(-)
- create mode 100644 lib/crypto/Makefile
- create mode 100644 lib/crypto/arc4.c
-
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 57f496cff999..112f21066141 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -4241,6 +4241,7 @@ F:	crypto/
+ F:	drivers/crypto/
+ F:	include/crypto/
+ F:	include/linux/crypto*
++F:	lib/crypto/
+ 
+ CRYPTOGRAPHIC RANDOM NUMBER GENERATOR
+ M:	Neil Horman <nhorman@tuxdriver.com>
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 3d056e7da65f..5114b35ef3b4 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -1230,9 +1230,13 @@ config CRYPTO_ANUBIS
+ 	  <https://www.cosic.esat.kuleuven.be/nessie/reports/>
+ 	  <http://www.larc.usp.br/~pbarreto/AnubisPage.html>
+ 
++config CRYPTO_LIB_ARC4
++	tristate
++
+ config CRYPTO_ARC4
+ 	tristate "ARC4 cipher algorithm"
+ 	select CRYPTO_BLKCIPHER
++	select CRYPTO_LIB_ARC4
+ 	help
+ 	  ARC4 cipher algorithm.
+ 
+diff --git a/crypto/arc4.c b/crypto/arc4.c
+index a2120e06bf84..6974dba1b7b9 100644
+--- a/crypto/arc4.c
++++ b/crypto/arc4.c
+@@ -13,33 +13,12 @@
+ #include <linux/init.h>
+ #include <linux/module.h>
+ 
+-struct arc4_ctx {
+-	u32 S[256];
+-	u32 x, y;
+-};
+-
+ static int arc4_set_key(struct crypto_tfm *tfm, const u8 *in_key,
+ 			unsigned int key_len)
+ {
+ 	struct arc4_ctx *ctx = crypto_tfm_ctx(tfm);
+-	int i, j = 0, k = 0;
+-
+-	ctx->x = 1;
+-	ctx->y = 0;
+ 
+-	for (i = 0; i < 256; i++)
+-		ctx->S[i] = i;
+-
+-	for (i = 0; i < 256; i++) {
+-		u32 a = ctx->S[i];
+-		j = (j + in_key[k] + a) & 0xff;
+-		ctx->S[i] = ctx->S[j];
+-		ctx->S[j] = a;
+-		if (++k >= key_len)
+-			k = 0;
+-	}
+-
+-	return 0;
++	return arc4_setkey(ctx, in_key, key_len);
+ }
+ 
+ static int arc4_set_key_skcipher(struct crypto_skcipher *tfm, const u8 *in_key,
+@@ -48,43 +27,6 @@ static int arc4_set_key_skcipher(struct crypto_skcipher *tfm, const u8 *in_key,
+ 	return arc4_set_key(&tfm->base, in_key, key_len);
+ }
+ 
+-static void arc4_crypt(struct arc4_ctx *ctx, u8 *out, const u8 *in,
+-		       unsigned int len)
+-{
+-	u32 *const S = ctx->S;
+-	u32 x, y, a, b;
+-	u32 ty, ta, tb;
+-
+-	if (len == 0)
+-		return;
+-
+-	x = ctx->x;
+-	y = ctx->y;
+-
+-	a = S[x];
+-	y = (y + a) & 0xff;
+-	b = S[y];
+-
+-	do {
+-		S[y] = a;
+-		a = (a + b) & 0xff;
+-		S[x] = b;
+-		x = (x + 1) & 0xff;
+-		ta = S[x];
+-		ty = (y + ta) & 0xff;
+-		tb = S[ty];
+-		*out++ = *in++ ^ S[a];
+-		if (--len == 0)
+-			break;
+-		y = ty;
+-		a = ta;
+-		b = tb;
+-	} while (true);
+-
+-	ctx->x = x;
+-	ctx->y = y;
+-}
+-
+ static void arc4_crypt_one(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+ {
+ 	arc4_crypt(crypto_tfm_ctx(tfm), out, in, 1);
+diff --git a/include/crypto/arc4.h b/include/crypto/arc4.h
+index 5b2c24ab0139..f3c22fe01704 100644
+--- a/include/crypto/arc4.h
++++ b/include/crypto/arc4.h
+@@ -6,8 +6,18 @@
+ #ifndef _CRYPTO_ARC4_H
+ #define _CRYPTO_ARC4_H
+ 
++#include <linux/types.h>
++
+ #define ARC4_MIN_KEY_SIZE	1
+ #define ARC4_MAX_KEY_SIZE	256
+ #define ARC4_BLOCK_SIZE		1
+ 
++struct arc4_ctx {
++	u32 S[256];
++	u32 x, y;
++};
++
++int arc4_setkey(struct arc4_ctx *ctx, const u8 *in_key, unsigned int key_len);
++void arc4_crypt(struct arc4_ctx *ctx, u8 *out, const u8 *in, unsigned int len);
++
+ #endif /* _CRYPTO_ARC4_H */
+diff --git a/lib/Makefile b/lib/Makefile
+index fb7697031a79..d3daedf93c5a 100644
+--- a/lib/Makefile
++++ b/lib/Makefile
+@@ -102,7 +102,7 @@ endif
+ obj-$(CONFIG_DEBUG_INFO_REDUCED) += debug_info.o
+ CFLAGS_debug_info.o += $(call cc-option, -femit-struct-debug-detailed=any)
+ 
+-obj-y += math/
++obj-y += math/ crypto/
+ 
+ obj-$(CONFIG_GENERIC_IOMAP) += iomap.o
+ obj-$(CONFIG_GENERIC_PCI_IOMAP) += pci_iomap.o
+diff --git a/lib/crypto/Makefile b/lib/crypto/Makefile
+new file mode 100644
+index 000000000000..88195c34932d
+--- /dev/null
++++ b/lib/crypto/Makefile
+@@ -0,0 +1,4 @@
++# SPDX-License-Identifier: GPL-2.0
++
++obj-$(CONFIG_CRYPTO_LIB_ARC4) += libarc4.o
++libarc4-y := arc4.o
+diff --git a/lib/crypto/arc4.c b/lib/crypto/arc4.c
+new file mode 100644
+index 000000000000..fa589eba3d50
+--- /dev/null
++++ b/lib/crypto/arc4.c
+@@ -0,0 +1,72 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * Cryptographic API
++ *
++ * ARC4 Cipher Algorithm
++ *
++ * Jon Oberheide <jon@oberheide.org>
++ */
++
++#include <crypto/arc4.h>
++#include <linux/module.h>
++
++int arc4_setkey(struct arc4_ctx *ctx, const u8 *in_key, unsigned int key_len)
++{
++	int i, j = 0, k = 0;
++
++	ctx->x = 1;
++	ctx->y = 0;
++
++	for (i = 0; i < 256; i++)
++		ctx->S[i] = i;
++
++	for (i = 0; i < 256; i++) {
++		u32 a = ctx->S[i];
++
++		j = (j + in_key[k] + a) & 0xff;
++		ctx->S[i] = ctx->S[j];
++		ctx->S[j] = a;
++		if (++k >= key_len)
++			k = 0;
++	}
++
++	return 0;
++}
++EXPORT_SYMBOL(arc4_setkey);
++
++void arc4_crypt(struct arc4_ctx *ctx, u8 *out, const u8 *in, unsigned int len)
++{
++	u32 *const S = ctx->S;
++	u32 x, y, a, b;
++	u32 ty, ta, tb;
++
++	if (len == 0)
++		return;
++
++	x = ctx->x;
++	y = ctx->y;
++
++	a = S[x];
++	y = (y + a) & 0xff;
++	b = S[y];
++
++	do {
++		S[y] = a;
++		a = (a + b) & 0xff;
++		S[x] = b;
++		x = (x + 1) & 0xff;
++		ta = S[x];
++		ty = (y + ta) & 0xff;
++		tb = S[ty];
++		*out++ = *in++ ^ S[a];
++		if (--len == 0)
++			break;
++		y = ty;
++		a = ta;
++		b = tb;
++	} while (true);
++
++	ctx->x = x;
++	ctx->y = y;
++}
++EXPORT_SYMBOL(arc4_crypt);
 -- 
 2.20.1
 
