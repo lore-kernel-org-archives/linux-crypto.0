@@ -4,36 +4,36 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE322C43218
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jun 2019 11:57:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E1C9C43218
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jun 2019 12:09:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BFD3420896
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jun 2019 11:57:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 55D46206E0
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jun 2019 12:09:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="T98xkkvU"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="jML3hjYS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404302AbfFKL5i (ORCPT
+        id S2404399AbfFKMJE (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 11 Jun 2019 07:57:38 -0400
-Received: from mail-eopbgr10067.outbound.protection.outlook.com ([40.107.1.67]:44869
-        "EHLO EUR02-HE1-obe.outbound.protection.outlook.com"
+        Tue, 11 Jun 2019 08:09:04 -0400
+Received: from mail-eopbgr30046.outbound.protection.outlook.com ([40.107.3.46]:59362
+        "EHLO EUR03-AM5-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2403877AbfFKL5i (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Jun 2019 07:57:38 -0400
+        id S2404372AbfFKMJE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 11 Jun 2019 08:09:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ECpbNgV8uOXKol9qXRMchw2RjsYH5zpamqfReQDkrCI=;
- b=T98xkkvUq0WUQfmxcwwNI1B6CTHwaMAcrVcgupFEmA4kLbPoRyMe+fVVSUqz+TvdnrSVjJ348k5yvs/DLHwvmFDI3ddeGeuKMTZi98KKpCRmLtvXKuZLgFUNz2KyybnzUn/yONrKQOSWotLLFpjX5oq3xlVKNBRFnLn/VVabZ18=
+ bh=1nkCMlyKo3b55Ogy6E62bnSFHT86nMrEF8Qvq9yreLo=;
+ b=jML3hjYSG80fR2ODfruswGH7QnR4QMRVMkTdBwNfcGrLmIVpheVk2og5NWNkJxCFcW73WzzADOch1o9s1Au2eAVI+rjkoSXhURm3tPVj546AMiNDGDiNPOYuYBrK0UjXLGxxw8zpxeZdgxusyfh65YjOZLCZ0P8IcMsYb/aAGfo=
 Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
- VI1PR0402MB3567.eurprd04.prod.outlook.com (52.134.4.152) with Microsoft SMTP
+ VI1PR0402MB3918.eurprd04.prod.outlook.com (52.134.17.31) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1965.15; Tue, 11 Jun 2019 11:57:34 +0000
+ 15.20.1965.12; Tue, 11 Jun 2019 12:09:01 +0000
 Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
  ([fe80::ccaf:f4a1:704a:e745]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
  ([fe80::ccaf:f4a1:704a:e745%4]) with mapi id 15.20.1965.017; Tue, 11 Jun 2019
- 11:57:34 +0000
+ 12:09:01 +0000
 From:   Horia Geanta <horia.geanta@nxp.com>
 To:     Christophe Leroy <christophe.leroy@c-s.fr>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -41,15 +41,12 @@ To:     Christophe Leroy <christophe.leroy@c-s.fr>,
 CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
-Subject: Re: [PATCH v1 2/5] crypto: talitos - move struct talitos_edesc into
- talitos.h
-Thread-Topic: [PATCH v1 2/5] crypto: talitos - move struct talitos_edesc into
- talitos.h
-Thread-Index: AQHVHFtoqsM5u9K3R0ScM4yhQppwKQ==
-Date:   Tue, 11 Jun 2019 11:57:34 +0000
-Message-ID: <VI1PR0402MB3485848D81EF07419EB0128F98ED0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+Subject: Re: [PATCH v1 0/5] Additional fixes on Talitos driver
+Thread-Topic: [PATCH v1 0/5] Additional fixes on Talitos driver
+Thread-Index: AQHVHFtn4C4BXEoEK02U37UKYcQLNA==
+Date:   Tue, 11 Jun 2019 12:09:01 +0000
+Message-ID: <VI1PR0402MB34852D74119140ADDD4F4DF198ED0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
 References: <cover.1559819372.git.christophe.leroy@c-s.fr>
- <108a23c4d2f0803b1302bc00c7321d799e42edc1.1559819372.git.christophe.leroy@c-s.fr>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -58,45 +55,48 @@ authentication-results: spf=none (sender IP is )
  smtp.mailfrom=horia.geanta@nxp.com; 
 x-originating-ip: [212.146.100.6]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: cf2f448c-c6da-41e7-b7ff-08d6ee63fdac
+x-ms-office365-filtering-correlation-id: f1d95a0c-1ccd-4f36-2a9d-08d6ee659708
 x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:VI1PR0402MB3567;
-x-ms-traffictypediagnostic: VI1PR0402MB3567:
-x-microsoft-antispam-prvs: <VI1PR0402MB35674940D4D2FAF5F6CABB4498ED0@VI1PR0402MB3567.eurprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(5600148)(711020)(4605104)(1401327)(4618075)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);SRVR:VI1PR0402MB3918;
+x-ms-traffictypediagnostic: VI1PR0402MB3918:
+x-microsoft-antispam-prvs: <VI1PR0402MB3918217BA9EBE0716729F13098ED0@VI1PR0402MB3918.eurprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:6430;
 x-forefront-prvs: 006546F32A
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(136003)(396003)(366004)(346002)(376002)(39860400002)(199004)(189003)(55016002)(6436002)(73956011)(54906003)(9686003)(110136005)(33656002)(486006)(66066001)(476003)(44832011)(186003)(316002)(66446008)(26005)(446003)(66556008)(66476007)(52536014)(2906002)(229853002)(99286004)(76116006)(66946007)(64756008)(7736002)(4326008)(81166006)(81156014)(8676002)(25786009)(14454004)(305945005)(74316002)(76176011)(478600001)(6506007)(53546011)(3846002)(6116002)(68736007)(71200400001)(6246003)(86362001)(71190400001)(4744005)(53936002)(102836004)(256004)(8936002)(7696005)(5660300002);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB3567;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(979002)(346002)(366004)(396003)(39860400002)(136003)(376002)(189003)(199004)(44832011)(316002)(99286004)(52536014)(6246003)(33656002)(478600001)(53936002)(14454004)(4326008)(74316002)(55016002)(86362001)(71190400001)(81166006)(6436002)(9686003)(2906002)(229853002)(54906003)(486006)(4744005)(81156014)(110136005)(8676002)(71200400001)(5660300002)(68736007)(7736002)(476003)(64756008)(66066001)(305945005)(8936002)(66476007)(66946007)(66446008)(3846002)(25786009)(26005)(66556008)(53546011)(6506007)(6116002)(256004)(446003)(76176011)(7696005)(186003)(76116006)(102836004)(73956011)(969003)(989001)(999001)(1009001)(1019001);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB3918;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
 received-spf: None (protection.outlook.com: nxp.com does not designate
  permitted sender hosts)
 x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: Ti6L6IEyQbgh0KQhV11mQPOTAdRDAo7UUK/OjX9yWsuVCSEnlsnGYv90H24UM3wBdYept5c6Gr/+FrsmgD38ANFvGCH292Ef88EsWMyXvGft8JOljtLYdm9R0mubcWRKHOlOwwtj0YwPDnn1frSmp+Fx50VuE6kOkLTrMwaj/+fqP1Yzw7Gp3UNDUTVbftFctS/xUJHPVlZBPv7bGxgcj5btKFFGXWYNdSJqit6H7qn2Tk85z1yzQKS8W6lFSy1FJmAaxZrz2ES4jIr/SCPOkGgvGQIwdCt0+lg8fxuaF/9B2xMgWNKway74Fu/75rbZ4MYRbnRu7lG15ahGNPXzCqXGYrG4ndPU0yBO2/nVwutpjibmkJNgWos/ogNKExKmLJnkWo4iUTyXaxtRhQWih+E7lHilw7udVzk8mCfBIdQ=
+x-microsoft-antispam-message-info: 6Xk5VxfME+muF3MNbCpOkKYI/I7IW9dFjhRzWKUyDyOHBX75yBfeoCdfIVpaprnA6ExYHx+TPw3qhU9EUGsiEAnbyz9N5OOSDXMDtF1zyDnZrRsL49WtGQhBQsDVB5dgAmeIP0MY9qpsTLkN7YK4B4DyfIfHzIik/H5dj3ODfC7vQMlATMCmWzOm7jjbc+6W45YmA+a5BrJdW4J4tSa8wkS4hEPNUVWheKqq1AypKMg0oJl6cjmFcPJTP+Rn8j6z+Mmhq87wYlGlCQX4F7IZcAiJ+v1Ug/NRMzzEL2WbgyJLUE/U5iJs3tdvGY2KK3RcUjJf3ZIWPcJLq4zRXhsMme20VRqwLsBBk7FxAxreL4ppyJ7sHvni2NUJlALc86C/fNUOnmgk+nh2nyMOcG6dSbKQw3Xoh9G6/rlCdgJEyWs=
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: cf2f448c-c6da-41e7-b7ff-08d6ee63fdac
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Jun 2019 11:57:34.3362
+X-MS-Exchange-CrossTenant-Network-Message-Id: f1d95a0c-1ccd-4f36-2a9d-08d6ee659708
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Jun 2019 12:09:01.1047
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
 X-MS-Exchange-CrossTenant-userprincipalname: horia.geanta@nxp.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3567
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3918
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 On 6/6/2019 2:31 PM, Christophe Leroy wrote:=0A=
-> Next patch will require struct talitos_edesc to be defined=0A=
-> earlier in talitos.c=0A=
+> This series is the last set of fixes for the Talitos driver.=0A=
 > =0A=
-> This patch moves it into talitos.h so that it can be used=0A=
-> from any place in talitos.c=0A=
+> We now get a fully clean boot on both SEC1 (SEC1.2 on mpc885) and=0A=
+> SEC2 (SEC2.2 on mpc8321E) with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS:=0A=
 > =0A=
-> Fixes: 37b5e8897eb5 ("crypto: talitos - chain in buffered data for ahash =
-on SEC1")=0A=
-This isn't really a fix, so please drop the tag.=0A=
+I get failures, probably due to patch 1/5:=0A=
 =0A=
-Thanks,=0A=
+alg: skcipher: cbc-aes-talitos encryption test failed (wrong result) on tes=
+t vector 0, cfg=3D"in-place"=0A=
+alg: skcipher: cbc-des-talitos encryption test failed (wrong result) on tes=
+t vector 0, cfg=3D"in-place"=0A=
+alg: skcipher: cbc-3des-talitos encryption test failed (wrong result) on te=
+st vector 0, cfg=3D"in-place"=0A=
+=0A=
 Horia=0A=
