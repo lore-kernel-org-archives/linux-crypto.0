@@ -4,50 +4,50 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACAA6C4321B
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jun 2019 06:29:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE91FC4321B
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jun 2019 06:29:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8B6F9214AF
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jun 2019 06:29:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CC39C208E3
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jun 2019 06:29:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404054AbfFKG3f (ORCPT
+        id S2404082AbfFKG3s (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 11 Jun 2019 02:29:35 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:38512 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2404037AbfFKG3f (ORCPT
+        Tue, 11 Jun 2019 02:29:48 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51858 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2404077AbfFKG3s (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Jun 2019 02:29:35 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x5B6RSxs134405
-        for <linux-crypto@vger.kernel.org>; Tue, 11 Jun 2019 02:29:34 -0400
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2t244b5xdp-1
+        Tue, 11 Jun 2019 02:29:48 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x5B6RMQl099620
+        for <linux-crypto@vger.kernel.org>; Tue, 11 Jun 2019 02:29:46 -0400
+Received: from e36.co.us.ibm.com (e36.co.us.ibm.com [32.97.110.154])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2t25e3kh69-1
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <linux-crypto@vger.kernel.org>; Tue, 11 Jun 2019 02:29:34 -0400
+        for <linux-crypto@vger.kernel.org>; Tue, 11 Jun 2019 02:29:45 -0400
 Received: from localhost
-        by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        by e36.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
         for <linux-crypto@vger.kernel.org> from <bauerman@linux.ibm.com>;
-        Tue, 11 Jun 2019 07:29:33 +0100
-Received: from b03cxnp08027.gho.boulder.ibm.com (9.17.130.19)
-        by e34.co.us.ibm.com (192.168.1.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        Tue, 11 Jun 2019 07:29:45 +0100
+Received: from b03cxnp08028.gho.boulder.ibm.com (9.17.130.20)
+        by e36.co.us.ibm.com (192.168.1.136) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
         (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 11 Jun 2019 07:29:26 +0100
+        Tue, 11 Jun 2019 07:29:40 +0100
 Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
-        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x5B6TP8a23134580
+        by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x5B6TcX026018208
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 11 Jun 2019 06:29:25 GMT
+        Tue, 11 Jun 2019 06:29:38 GMT
 Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4FD2DC605D;
-        Tue, 11 Jun 2019 06:29:25 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 89815C605F;
+        Tue, 11 Jun 2019 06:29:38 +0000 (GMT)
 Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id AC7C0C605A;
-        Tue, 11 Jun 2019 06:29:20 +0000 (GMT)
+        by IMSVA (Postfix) with ESMTP id 42EF0C6059;
+        Tue, 11 Jun 2019 06:29:34 +0000 (GMT)
 Received: from morokweng.localdomain.com (unknown [9.85.227.34])
         by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Tue, 11 Jun 2019 06:29:20 +0000 (GMT)
+        Tue, 11 Jun 2019 06:29:34 +0000 (GMT)
 From:   Thiago Jung Bauermann <bauerman@linux.ibm.com>
 To:     linux-integrity@vger.kernel.org
 Cc:     linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
@@ -65,22 +65,22 @@ Cc:     linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
         Jonathan Corbet <corbet@lwn.net>,
         "AKASHI, Takahiro" <takahiro.akashi@linaro.org>,
         Thiago Jung Bauermann <bauerman@linux.ibm.com>
-Subject: [PATCH v11 04/13] integrity: Introduce struct evm_xattr
-Date:   Tue, 11 Jun 2019 03:28:08 -0300
+Subject: [PATCH v11 06/13] ima: Use designated initializers for struct ima_event_data
+Date:   Tue, 11 Jun 2019 03:28:10 -0300
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190611062817.18412-1-bauerman@linux.ibm.com>
 References: <20190611062817.18412-1-bauerman@linux.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-x-cbid: 19061106-0016-0000-0000-000009C11C5A
+x-cbid: 19061106-0020-0000-0000-00000EF7C4C9
 X-IBM-SpamModules-Scores: 
 X-IBM-SpamModules-Versions: BY=3.00011245; HX=3.00000242; KW=3.00000007;
  PH=3.00000004; SC=3.00000286; SDB=6.01216304; UDB=6.00639510; IPR=6.00997403;
- MB=3.00027259; MTD=3.00000008; XFM=3.00000015; UTC=2019-06-11 06:29:31
+ MB=3.00027259; MTD=3.00000008; XFM=3.00000015; UTC=2019-06-11 06:29:44
 X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19061106-0017-0000-0000-0000439AFD08
-Message-Id: <20190611062817.18412-5-bauerman@linux.ibm.com>
+x-cbparentid: 19061106-0021-0000-0000-0000663372B8
+Message-Id: <20190611062817.18412-7-bauerman@linux.ibm.com>
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-11_03:,,
  signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
@@ -93,118 +93,64 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Even though struct evm_ima_xattr_data includes a fixed-size array to hold a
-SHA1 digest, most of the code ignores the array and uses the struct to mean
-"type indicator followed by data of unspecified size" and tracks the real
-size of what the struct represents in a separate length variable.
+Designated initializers allow specifying only the members of the struct
+that need initialization. Non-mentioned members are initialized to zero.
 
-The only exception to that is the EVM code, which correctly uses the
-definition of struct evm_ima_xattr_data.
-
-So make this explicit in the code by removing the length specification from
-the array in struct evm_ima_xattr_data. Also, change the name of the
-element from digest to data since in most places the array doesn't hold a
-digest.
-
-A separate struct evm_xattr is introduced, with the original definition of
-evm_ima_xattr_data to be used in the places that actually expect that
-definition, specifically the EVM HMAC code.
+This makes the code a bit clearer (particularly in ima_add_boot_aggregate)
+and also allows adding a new member to the struct without having to update
+all struct initializations.
 
 Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
 Reviewed-by: Mimi Zohar <zohar@linux.ibm.com>
 ---
- security/integrity/evm/evm_main.c     | 8 ++++----
- security/integrity/ima/ima_appraise.c | 7 ++++---
- security/integrity/integrity.h        | 6 ++++++
- 3 files changed, 14 insertions(+), 7 deletions(-)
+ security/integrity/ima/ima_api.c  | 13 +++++++++----
+ security/integrity/ima/ima_init.c |  4 ++--
+ 2 files changed, 11 insertions(+), 6 deletions(-)
 
-diff --git a/security/integrity/evm/evm_main.c b/security/integrity/evm/evm_main.c
-index b6d9f14bc234..588f22f1b5bd 100644
---- a/security/integrity/evm/evm_main.c
-+++ b/security/integrity/evm/evm_main.c
-@@ -169,7 +169,7 @@ static enum integrity_status evm_verify_hmac(struct dentry *dentry,
- 	/* check value type */
- 	switch (xattr_data->type) {
- 	case EVM_XATTR_HMAC:
--		if (xattr_len != sizeof(struct evm_ima_xattr_data)) {
-+		if (xattr_len != sizeof(struct evm_xattr)) {
- 			evm_status = INTEGRITY_FAIL;
- 			goto out;
- 		}
-@@ -179,7 +179,7 @@ static enum integrity_status evm_verify_hmac(struct dentry *dentry,
- 				   xattr_value_len, &digest);
- 		if (rc)
- 			break;
--		rc = crypto_memneq(xattr_data->digest, digest.digest,
-+		rc = crypto_memneq(xattr_data->data, digest.digest,
- 				   SHA1_DIGEST_SIZE);
- 		if (rc)
- 			rc = -EINVAL;
-@@ -523,7 +523,7 @@ int evm_inode_init_security(struct inode *inode,
- 				 const struct xattr *lsm_xattr,
- 				 struct xattr *evm_xattr)
+diff --git a/security/integrity/ima/ima_api.c b/security/integrity/ima/ima_api.c
+index 78eb11c7ac07..c0cf4bcfc82f 100644
+--- a/security/integrity/ima/ima_api.c
++++ b/security/integrity/ima/ima_api.c
+@@ -139,8 +139,10 @@ void ima_add_violation(struct file *file, const unsigned char *filename,
  {
--	struct evm_ima_xattr_data *xattr_data;
-+	struct evm_xattr *xattr_data;
- 	int rc;
+ 	struct ima_template_entry *entry;
+ 	struct inode *inode = file_inode(file);
+-	struct ima_event_data event_data = {iint, file, filename, NULL, 0,
+-					    cause};
++	struct ima_event_data event_data = { .iint = iint,
++					     .file = file,
++					     .filename = filename,
++					     .violation = cause };
+ 	int violation = 1;
+ 	int result;
  
- 	if (!evm_key_loaded() || !evm_protected_xattr(lsm_xattr->name))
-@@ -533,7 +533,7 @@ int evm_inode_init_security(struct inode *inode,
- 	if (!xattr_data)
- 		return -ENOMEM;
+@@ -294,8 +296,11 @@ void ima_store_measurement(struct integrity_iint_cache *iint,
+ 	int result = -ENOMEM;
+ 	struct inode *inode = file_inode(file);
+ 	struct ima_template_entry *entry;
+-	struct ima_event_data event_data = {iint, file, filename, xattr_value,
+-					    xattr_len, NULL};
++	struct ima_event_data event_data = { .iint = iint,
++					     .file = file,
++					     .filename = filename,
++					     .xattr_value = xattr_value,
++					     .xattr_len = xattr_len };
+ 	int violation = 0;
  
--	xattr_data->type = EVM_XATTR_HMAC;
-+	xattr_data->data.type = EVM_XATTR_HMAC;
- 	rc = evm_init_hmac(inode, lsm_xattr, xattr_data->digest);
- 	if (rc < 0)
- 		goto out;
-diff --git a/security/integrity/ima/ima_appraise.c b/security/integrity/ima/ima_appraise.c
-index 2f6536ab69e8..18bbe753421a 100644
---- a/security/integrity/ima/ima_appraise.c
-+++ b/security/integrity/ima/ima_appraise.c
-@@ -168,7 +168,8 @@ enum hash_algo ima_get_hash_algo(struct evm_ima_xattr_data *xattr_value,
- 		return sig->hash_algo;
- 		break;
- 	case IMA_XATTR_DIGEST_NG:
--		ret = xattr_value->digest[0];
-+		/* first byte contains algorithm id */
-+		ret = xattr_value->data[0];
- 		if (ret < HASH_ALGO__LAST)
- 			return ret;
- 		break;
-@@ -176,7 +177,7 @@ enum hash_algo ima_get_hash_algo(struct evm_ima_xattr_data *xattr_value,
- 		/* this is for backward compatibility */
- 		if (xattr_len == 21) {
- 			unsigned int zero = 0;
--			if (!memcmp(&xattr_value->digest[16], &zero, 4))
-+			if (!memcmp(&xattr_value->data[16], &zero, 4))
- 				return HASH_ALGO_MD5;
- 			else
- 				return HASH_ALGO_SHA1;
-@@ -275,7 +276,7 @@ int ima_appraise_measurement(enum ima_hooks func,
- 			/* xattr length may be longer. md5 hash in previous
- 			   version occupied 20 bytes in xattr, instead of 16
- 			 */
--			rc = memcmp(&xattr_value->digest[hash_start],
-+			rc = memcmp(&xattr_value->data[hash_start],
- 				    iint->ima_hash->digest,
- 				    iint->ima_hash->length);
- 		else
-diff --git a/security/integrity/integrity.h b/security/integrity/integrity.h
-index 7de59f44cba3..88a29f72a74f 100644
---- a/security/integrity/integrity.h
-+++ b/security/integrity/integrity.h
-@@ -79,6 +79,12 @@ enum evm_ima_xattr_type {
- 
- struct evm_ima_xattr_data {
- 	u8 type;
-+	u8 data[];
-+} __packed;
-+
-+/* Only used in the EVM HMAC code. */
-+struct evm_xattr {
-+	struct evm_ima_xattr_data data;
- 	u8 digest[SHA1_DIGEST_SIZE];
- } __packed;
- 
+ 	if (iint->measured_pcrs & (0x1 << pcr))
+diff --git a/security/integrity/ima/ima_init.c b/security/integrity/ima/ima_init.c
+index 993d0f1915ff..368ef658a1cd 100644
+--- a/security/integrity/ima/ima_init.c
++++ b/security/integrity/ima/ima_init.c
+@@ -49,8 +49,8 @@ static int __init ima_add_boot_aggregate(void)
+ 	const char *audit_cause = "ENOMEM";
+ 	struct ima_template_entry *entry;
+ 	struct integrity_iint_cache tmp_iint, *iint = &tmp_iint;
+-	struct ima_event_data event_data = {iint, NULL, boot_aggregate_name,
+-					    NULL, 0, NULL};
++	struct ima_event_data event_data = { .iint = iint,
++					     .filename = boot_aggregate_name };
+ 	int result = -ENOMEM;
+ 	int violation = 0;
+ 	struct {
 
