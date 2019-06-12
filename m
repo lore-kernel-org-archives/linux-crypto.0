@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49475C31E46
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Jun 2019 12:48:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E1E4C46477
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 Jun 2019 12:48:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2115B215EA
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Jun 2019 12:48:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3590C20684
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 Jun 2019 12:48:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="djsoiZR4"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="M+2h4fD4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2409158AbfFLMsx (ORCPT
+        id S2409160AbfFLMsz (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 12 Jun 2019 08:48:53 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:54690 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2404447AbfFLMsx (ORCPT
+        Wed, 12 Jun 2019 08:48:55 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:40633 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2409157AbfFLMsz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Jun 2019 08:48:53 -0400
-Received: by mail-wm1-f66.google.com with SMTP id g135so6451627wme.4
-        for <linux-crypto@vger.kernel.org>; Wed, 12 Jun 2019 05:48:51 -0700 (PDT)
+        Wed, 12 Jun 2019 08:48:55 -0400
+Received: by mail-wm1-f67.google.com with SMTP id v19so6389255wmj.5
+        for <linux-crypto@vger.kernel.org>; Wed, 12 Jun 2019 05:48:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=OVlu3R/XDhYHCSEro6NMIXQLAFRHmhGDxGC17BFWD8A=;
-        b=djsoiZR4kDhV/HUvSBg3zkLEMwXN5MIzGZPokRW1HBnBFD5AJMKJYA22kfP19inVP2
-         mFa9evSKDMxbsAdrJ/EKxtvsEwxRuWjYse+gm2EY8P4CEpvC/vicvUbbdM6Bouq2eb8D
-         G1d1hPrXJJivLL71rAJw9vfwlC4WUF1TBIP49bDL4Qb5nz0I8NstNWwIW+/g3bEu0cIs
-         EwHnOP9KmB4stjvfoaN0XqJySjWZ9h2veKZxWgkTzc915hGCDQ1z2yNnjxrjKuYuwaII
-         G8CqRExpLsAj4+zNOazJi1UnDSOm+Ns3rxdIw9Rf/mQb3Nj/40CGkz3r0WgOAoVuxJSA
-         jcJg==
+        bh=kYNNbe+mFt8Q+RY9DxwwFbhQEO3KEw5kT4vc21gIvDg=;
+        b=M+2h4fD46HUC4cJ4KOuokanGoNSZ7xsT1Q+jGhMcs61l2SOksGa3I5dHZJ786fc1qX
+         hwWLnCna9N+1lAxU3P9SSJn8TKRYJxcyR9J6luCq5uqa+ygm7ntsNvI+jDsfVTh4wuO7
+         zLE28BI+hzPxUPqD4vUvwEXFBseb3e31yDKoID1mSHjLQa3Tl8iQZQHALHnCA0AjKWgX
+         SAgnb6jlklnhZemcReGewK60rQ1ilAj72SyvQVQ35FgVVKPpAV+BYMtkHEOLnVCkUw0w
+         C3t3tpAJqsEyHzbbjEelLLw/QJ8s+1v8JuGhRkVHs7D2rYPWmbLqi5m8rcPZLpUPDtUo
+         3jTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=OVlu3R/XDhYHCSEro6NMIXQLAFRHmhGDxGC17BFWD8A=;
-        b=GzaEzMAH+CCTsIbLo/37RswGyKX0tCxo8U4Xp+xO/6qwWaPSHFWwLIQ7B6tcu/ezDH
-         tIJJXJvm38c8EdEydonVRV8IcDCbT+02+VfnMtdSFt1xiVmJxDSIq4Lwl4CBqHyX9/nD
-         qtGVnQTBXOZq8YfX9zverWuhl8/nNy6vF9uggj8H44MN/MUBXemv5D9uPKxYjW5rz3iH
-         PXqR9RPO4d9x5QdU9QqEjivJF9L3OCxJeHJFaXb+hy/U6Ne7UbluW7KzAUfOHOS0U2mg
-         hBMHqFcfOaF8CDL1KGmCQ20WoeFBWB6V5NBSycODJAsDFdI33k4UiTNjdMAlWjFNJqSm
-         Y5xQ==
-X-Gm-Message-State: APjAAAXaIoDb50PqyUXDSRsxBGBnpi3Yyn38qTeeI3CKs1Rc1aBkfOCG
-        pMOq/5jJofGu5oDeZfIpnjfB0J1cn8n3DA==
-X-Google-Smtp-Source: APXvYqxhiPdkKRrJKmM3/bB8iZ6hGjA1a0dGgmjfsJcw19xlaihqJ6kKmUyStIxasJqeDQ/bqkjHvA==
-X-Received: by 2002:a7b:c7d8:: with SMTP id z24mr22343958wmk.10.1560343730272;
-        Wed, 12 Jun 2019 05:48:50 -0700 (PDT)
+        bh=kYNNbe+mFt8Q+RY9DxwwFbhQEO3KEw5kT4vc21gIvDg=;
+        b=cdxOuqOeL9ETOjOaO0ZvATtonhw8PB0vud7+W5Z20sXcXbL1tGDoWejy3/rPAUwMo8
+         Q2jui4WHjGZjUlti5RFc8YkZ9+iU51VbsiYcWurE4AHgkxxy50UdFpU6pMgE1k7yCsOD
+         rS6NoprcIjAN6h92P+zTY96C91y7DujfT7UDWTyaXPRPYTj7YGp27FilyM5GqfJrlA2p
+         Yk/26SK1C5xrbKNr4xwP9ETpyXrZ9kT4Plm5HfIkNTG7PDIBo1aFPq5JsI+fxZshBXci
+         y/4A0kzZwGpv82Y2zwkUmjJhDU6Q1aZ2fH0FZr4ygL2FOhDmp5WUNb/hMV5S6hO6Erx+
+         J3wA==
+X-Gm-Message-State: APjAAAV9FD5I1Wafj+GfuvowXtJcuNJ2rt1Z4t1NUufXG0s3elcAY5B1
+        civF4xp9MkQP+1cYSQlPJVuHfY8rEoRzrA==
+X-Google-Smtp-Source: APXvYqyF+C7SiBexU0MkQMJuAdUdezZFptyfoBb6DdReSF88CbWJsNt8wcl33GCpfJk6fqWFCLmSMQ==
+X-Received: by 2002:a05:600c:2243:: with SMTP id a3mr21220424wmm.83.1560343732621;
+        Wed, 12 Jun 2019 05:48:52 -0700 (PDT)
 Received: from sudo.home ([2a01:cb1d:112:6f00:353a:f33a:a393:3ada])
-        by smtp.gmail.com with ESMTPSA id s8sm28505480wra.55.2019.06.12.05.48.49
+        by smtp.gmail.com with ESMTPSA id s8sm28505480wra.55.2019.06.12.05.48.51
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 12 Jun 2019 05:48:49 -0700 (PDT)
+        Wed, 12 Jun 2019 05:48:52 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     herbert@gondor.apana.org.au, ebiggers@kernel.org,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [RFC PATCH 03/20] crypto: aes/fixed-time - align key schedule with other implementations
-Date:   Wed, 12 Jun 2019 14:48:21 +0200
-Message-Id: <20190612124838.2492-4-ard.biesheuvel@linaro.org>
+Subject: [RFC PATCH 05/20] crypto: x86/aes-ni - switch to generic for fallback and key routines
+Date:   Wed, 12 Jun 2019 14:48:23 +0200
+Message-Id: <20190612124838.2492-6-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190612124838.2492-1-ard.biesheuvel@linaro.org>
 References: <20190612124838.2492-1-ard.biesheuvel@linaro.org>
@@ -73,104 +73,102 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The fixed time AES code mangles the key schedule so that xoring the
-first round key with values at fixed offsets across the Sbox produces
-the correct value. This primes the D-cache with the entire Sbox before
-any data dependent lookups are done, making it more difficult to infer
-key bits from timing variances when the plaintext is known.
+The AES-NI code contains fallbacks for invocations that occur from a
+context where the SIMD unit is unavailable, which really only occurs
+when running in softirq context that was entered from a hard IRQ that
+was taken while running kernel code that was already using the FPU.
 
-The downside of this approach is that it renders the key schedule
-incompatible with other implementations of AES in the kernel, which
-makes it cumbersome to use this implementation as a fallback for SIMD
-based AES in contexts where this is not allowed.
-
-So let's tweak the fixed Sbox indexes so that they add up to zero under
-the xor operation. While at it, increase the granularity to 16 bytes so
-we cover the entire Sbox even on systems with 16 byte cachelines.
+That means performance is not really a consideration, and we can just
+use the new library code for this use case, which has a smaller
+footprint and is believed to be time invariant. This will allow us to
+drop the non-SIMD asm routines in a subsequent patch.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- crypto/aes_ti.c | 52 ++++++++------------
- 1 file changed, 21 insertions(+), 31 deletions(-)
+ arch/x86/crypto/aesni-intel_glue.c | 15 +++++++--------
+ arch/x86/include/asm/crypto/aes.h  | 12 ------------
+ crypto/Kconfig                     |  3 +--
+ 3 files changed, 8 insertions(+), 22 deletions(-)
 
-diff --git a/crypto/aes_ti.c b/crypto/aes_ti.c
-index 1ff9785b30f5..fd70dc322634 100644
---- a/crypto/aes_ti.c
-+++ b/crypto/aes_ti.c
-@@ -237,30 +237,8 @@ static int aesti_set_key(struct crypto_tfm *tfm, const u8 *in_key,
- 			 unsigned int key_len)
+diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
+index e9b866e87d48..9952bd312ddc 100644
+--- a/arch/x86/crypto/aesni-intel_glue.c
++++ b/arch/x86/crypto/aesni-intel_glue.c
+@@ -26,7 +26,6 @@
+ #include <crypto/gcm.h>
+ #include <crypto/xts.h>
+ #include <asm/cpu_device_id.h>
+-#include <asm/crypto/aes.h>
+ #include <asm/simd.h>
+ #include <crypto/scatterwalk.h>
+ #include <crypto/internal/aead.h>
+@@ -329,7 +328,7 @@ static int aes_set_key_common(struct crypto_tfm *tfm, void *raw_ctx,
+ 	}
+ 
+ 	if (!crypto_simd_usable())
+-		err = crypto_aes_expand_key(ctx, in_key, key_len);
++		err = aes_expandkey(ctx, in_key, key_len);
+ 	else {
+ 		kernel_fpu_begin();
+ 		err = aesni_set_key(ctx, in_key, key_len);
+@@ -349,9 +348,9 @@ static void aes_encrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
  {
- 	struct crypto_aes_ctx *ctx = crypto_tfm_ctx(tfm);
--	int err;
+ 	struct crypto_aes_ctx *ctx = aes_ctx(crypto_tfm_ctx(tfm));
  
--	err = aesti_expand_key(ctx, in_key, key_len);
--	if (err)
--		return err;
+-	if (!crypto_simd_usable())
+-		crypto_aes_encrypt_x86(ctx, dst, src);
+-	else {
++	if (!crypto_simd_usable()) {
++		aes_encrypt(ctx, dst, src);
++	} else {
+ 		kernel_fpu_begin();
+ 		aesni_enc(ctx, dst, src);
+ 		kernel_fpu_end();
+@@ -362,9 +361,9 @@ static void aes_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
+ {
+ 	struct crypto_aes_ctx *ctx = aes_ctx(crypto_tfm_ctx(tfm));
+ 
+-	if (!crypto_simd_usable())
+-		crypto_aes_decrypt_x86(ctx, dst, src);
+-	else {
++	if (!crypto_simd_usable()) {
++		aes_decrypt(ctx, dst, src);
++	} else {
+ 		kernel_fpu_begin();
+ 		aesni_dec(ctx, dst, src);
+ 		kernel_fpu_end();
+diff --git a/arch/x86/include/asm/crypto/aes.h b/arch/x86/include/asm/crypto/aes.h
+deleted file mode 100644
+index c508521dd190..000000000000
+--- a/arch/x86/include/asm/crypto/aes.h
++++ /dev/null
+@@ -1,12 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-#ifndef ASM_X86_AES_H
+-#define ASM_X86_AES_H
 -
--	/*
--	 * In order to force the compiler to emit data independent Sbox lookups
--	 * at the start of each block, xor the first round key with values at
--	 * fixed indexes in the Sbox. This will need to be repeated each time
--	 * the key is used, which will pull the entire Sbox into the D-cache
--	 * before any data dependent Sbox lookups are performed.
--	 */
--	ctx->key_enc[0] ^= __aesti_sbox[ 0] ^ __aesti_sbox[128];
--	ctx->key_enc[1] ^= __aesti_sbox[32] ^ __aesti_sbox[160];
--	ctx->key_enc[2] ^= __aesti_sbox[64] ^ __aesti_sbox[192];
--	ctx->key_enc[3] ^= __aesti_sbox[96] ^ __aesti_sbox[224];
+-#include <linux/crypto.h>
+-#include <crypto/aes.h>
 -
--	ctx->key_dec[0] ^= __aesti_inv_sbox[ 0] ^ __aesti_inv_sbox[128];
--	ctx->key_dec[1] ^= __aesti_inv_sbox[32] ^ __aesti_inv_sbox[160];
--	ctx->key_dec[2] ^= __aesti_inv_sbox[64] ^ __aesti_inv_sbox[192];
--	ctx->key_dec[3] ^= __aesti_inv_sbox[96] ^ __aesti_inv_sbox[224];
--
--	return 0;
-+	return aesti_expand_key(ctx, in_key, key_len);
- }
- 
- static void aesti_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
-@@ -283,10 +261,16 @@ static void aesti_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
- 	 */
- 	local_irq_save(flags);
- 
--	st0[0] ^= __aesti_sbox[ 0] ^ __aesti_sbox[128];
--	st0[1] ^= __aesti_sbox[32] ^ __aesti_sbox[160];
--	st0[2] ^= __aesti_sbox[64] ^ __aesti_sbox[192];
--	st0[3] ^= __aesti_sbox[96] ^ __aesti_sbox[224];
-+	/*
-+	 * Force the compiler to emit data independent Sbox references,
-+	 * by xoring the input with Sbox values that are known to add up
-+	 * to zero. This pulls the entire Sbox into the D-cache before any
-+	 * data dependent lookups are done.
-+	 */
-+	st0[0] ^= __aesti_sbox[ 0] ^ __aesti_sbox[ 64] ^ __aesti_sbox[134] ^ __aesti_sbox[195];
-+	st0[1] ^= __aesti_sbox[16] ^ __aesti_sbox[ 82] ^ __aesti_sbox[158] ^ __aesti_sbox[221];
-+	st0[2] ^= __aesti_sbox[32] ^ __aesti_sbox[ 96] ^ __aesti_sbox[160] ^ __aesti_sbox[234];
-+	st0[3] ^= __aesti_sbox[48] ^ __aesti_sbox[112] ^ __aesti_sbox[186] ^ __aesti_sbox[241];
- 
- 	for (round = 0;; round += 2, rkp += 8) {
- 		st1[0] = mix_columns(subshift(st0, 0)) ^ rkp[0];
-@@ -331,10 +315,16 @@ static void aesti_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
- 	 */
- 	local_irq_save(flags);
- 
--	st0[0] ^= __aesti_inv_sbox[ 0] ^ __aesti_inv_sbox[128];
--	st0[1] ^= __aesti_inv_sbox[32] ^ __aesti_inv_sbox[160];
--	st0[2] ^= __aesti_inv_sbox[64] ^ __aesti_inv_sbox[192];
--	st0[3] ^= __aesti_inv_sbox[96] ^ __aesti_inv_sbox[224];
-+	/*
-+	 * Force the compiler to emit data independent Sbox references,
-+	 * by xoring the input with Sbox values that are known to add up
-+	 * to zero. This pulls the entire Sbox into the D-cache before any
-+	 * data dependent lookups are done.
-+	 */
-+	st0[0] ^= __aesti_inv_sbox[ 0] ^ __aesti_inv_sbox[ 64] ^ __aesti_inv_sbox[129] ^ __aesti_inv_sbox[200];
-+	st0[1] ^= __aesti_inv_sbox[16] ^ __aesti_inv_sbox[ 83] ^ __aesti_inv_sbox[150] ^ __aesti_inv_sbox[212];
-+	st0[2] ^= __aesti_inv_sbox[32] ^ __aesti_inv_sbox[ 96] ^ __aesti_inv_sbox[160] ^ __aesti_inv_sbox[236];
-+	st0[3] ^= __aesti_inv_sbox[48] ^ __aesti_inv_sbox[112] ^ __aesti_inv_sbox[187] ^ __aesti_inv_sbox[247];
- 
- 	for (round = 0;; round += 2, rkp += 8) {
- 		st1[0] = inv_mix_columns(inv_subshift(st0, 0)) ^ rkp[0];
+-void crypto_aes_encrypt_x86(struct crypto_aes_ctx *ctx, u8 *dst,
+-			    const u8 *src);
+-void crypto_aes_decrypt_x86(struct crypto_aes_ctx *ctx, u8 *dst,
+-			    const u8 *src);
+-#endif
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index dc6f93ef3ead..0d80985016bf 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -1149,8 +1149,7 @@ config CRYPTO_AES_NI_INTEL
+ 	tristate "AES cipher algorithms (AES-NI)"
+ 	depends on X86
+ 	select CRYPTO_AEAD
+-	select CRYPTO_AES_X86_64 if 64BIT
+-	select CRYPTO_AES_586 if !64BIT
++	select CRYPTO_LIB_AES
+ 	select CRYPTO_ALGAPI
+ 	select CRYPTO_BLKCIPHER
+ 	select CRYPTO_GLUE_HELPER_X86 if 64BIT
 -- 
 2.20.1
 
