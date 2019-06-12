@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 203A1C31E47
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Jun 2019 12:49:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC9B2C31E46
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 Jun 2019 12:49:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E4F1820684
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Jun 2019 12:49:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 825D420684
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 Jun 2019 12:49:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sjaYhXv0"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tz4lZUGm"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2439229AbfFLMtH (ORCPT
+        id S2439234AbfFLMtJ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 12 Jun 2019 08:49:07 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:50650 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2439227AbfFLMtH (ORCPT
+        Wed, 12 Jun 2019 08:49:09 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:45980 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2439227AbfFLMtJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Jun 2019 08:49:07 -0400
-Received: by mail-wm1-f67.google.com with SMTP id c66so6457046wmf.0
-        for <linux-crypto@vger.kernel.org>; Wed, 12 Jun 2019 05:49:04 -0700 (PDT)
+        Wed, 12 Jun 2019 08:49:09 -0400
+Received: by mail-wr1-f67.google.com with SMTP id f9so16738345wre.12
+        for <linux-crypto@vger.kernel.org>; Wed, 12 Jun 2019 05:49:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=Dlfj4kqVFhv44IOajcgw+06riYNUJAIzXTewbPPqMIc=;
-        b=sjaYhXv0a6NKJmqvhDYeIVWz5nMWkTbteorU7HT48yNBwJPfxW6fVLxN11xDMz3hj6
-         kLn3cgCqGOrjCyzFqoPbetCQzxGaJCSJZHGNA2n7VkVrqi1eZEO81z7ngGWo/6HBNsMN
-         korc6e/FR8NvFePkaQR25iLtBpdKfVI9W/dTvOCixkjEvbEDyC5vwcORJkKbX72xabRe
-         9pR0PNTzGeitqAx5dwNc2DmAnVZ76oGyeffiMe3++WVInp98V2iwh+MM6ooRRildX1lT
-         Xssuejgi+hX/VJClXuYge961z8WjTdL0S0XduYeKhjE8DB9RnhKaU5ci8RL3I+68FzJi
-         T0dw==
+        bh=1xxctaVyY+STLE0T/Ia3mG1xDByiyGRaSaAm3A+Hnfc=;
+        b=tz4lZUGm9GNsN5QswSxBu7YXktply7N1ckplmsyGaNzKPqdMjhYQIq5MA5Za8gHjVv
+         hbmHeCSyK9Dv1HCnMTpSoZuYGyLJcOccSyP8R9Wlt5gRPw7cEK4ArZ5pLJnKCI+QeEtT
+         jn0ql/+fmwDUAt+1c2EgEFXX1XuxCczqDAGslmpsFUU2LCQZGEhBEjt6KKYQzuNZM+VI
+         PZQNvwUOv0/D3yTH8JTNF3Oyl65MrIBMnLBLuMDcOYPabmhfCtaAvgK/9SzQCWq2D15L
+         8yi/Hml1UiDmGFEws/lyBKVDlHJFjsQyUEc8MhCwy90KY9ki2vxhabPaIPfReMKal4nV
+         C12Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=Dlfj4kqVFhv44IOajcgw+06riYNUJAIzXTewbPPqMIc=;
-        b=fliAOod3ytsoI/v5bGrMtDGN1eAvxuZX8UTM71hMVN6IwWMnQawcIZSIYo+XNTtAHB
-         QaXdJatHWPLu55SHZFiMVzhlc8xUjQuRtDNs5ZbyW1dX+B3Z3kvea0wYD71FNa/k/Vpj
-         wlLlSNA9LG2RIGjegb5U9o46r4gPfhOlfmSB7GNupvZV7jYolLu8xBBvlGwcwRcZD+mH
-         RsSgmUNEW/d0oJL6lhd144mUpdoLO5qhfbdLIwuSGmn/IpXzBvf2E8d8XNa/8o/eKU2O
-         1UmiuzKNO0ZIDLarZH1CDODZ5mWhrgkB9izpdK1TGw5hVmE6H14jAkbVBLDm34qAK++w
-         FYsQ==
-X-Gm-Message-State: APjAAAX9KeLYXmrtE8kotfB9BN1mjDc9oEzLWdCOnHoZXsmkJpqSBVdf
-        QeUpmclYucVixzmowaImG1QW52CzMC9/ng==
-X-Google-Smtp-Source: APXvYqx7/FluxdO2idlOIGkMOxJvqqjzjsK16XY9ke4D7G+jzM7Y9IBePwADry15/mqEbcrHOXNWog==
-X-Received: by 2002:a1c:2907:: with SMTP id p7mr21675532wmp.100.1560343743431;
-        Wed, 12 Jun 2019 05:49:03 -0700 (PDT)
+        bh=1xxctaVyY+STLE0T/Ia3mG1xDByiyGRaSaAm3A+Hnfc=;
+        b=iImMA1ahyb/c6nZ6b3P8COk8rbhMib4CSondHip2M+1iPVctbH6g0k+ryPVkiF4aXL
+         EaviRYaAQuo31kXGrlsiJC7c+tHAoOL4rsGr7IJ9Wtj9Z17XIZXP8vKJoOEsezUlKpt+
+         yuTCNVxlsZYi3kt9xU/LWdEt0RFwX88DmOGFcPxJJhUOLBHk+bk++vYJbKiI1RbXLR9e
+         ptAPVV8RUIVkAdBYLcZg6e8tlcBzAIN/RpI/3Cfxt0S0GtvNZhciv1plz5GV66RmOiBK
+         8TqhMBt9ELQT7POnZWw1ZqCrIjin8H7WzffO8vMDweX/QOTCIcdngPfWwb+uKjDp5iIL
+         /ToQ==
+X-Gm-Message-State: APjAAAWkbL/U51IF/3X3Z4jMJa8FP3H1MnuYG9mSWbrNC/rADA5o0Y44
+        vr8flDz937CO89fU2zblX8/vp2ejuUrB+A==
+X-Google-Smtp-Source: APXvYqwRohvV78ZaYYR4vsm/h+DRxRjPQWQ7HUQFKascJ307uk4yoyMwiX8PUkwBDQO+q+L56ETbIA==
+X-Received: by 2002:adf:9d81:: with SMTP id p1mr5078018wre.294.1560343746557;
+        Wed, 12 Jun 2019 05:49:06 -0700 (PDT)
 Received: from sudo.home ([2a01:cb1d:112:6f00:353a:f33a:a393:3ada])
-        by smtp.gmail.com with ESMTPSA id s8sm28505480wra.55.2019.06.12.05.49.02
+        by smtp.gmail.com with ESMTPSA id s8sm28505480wra.55.2019.06.12.05.49.05
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 12 Jun 2019 05:49:02 -0700 (PDT)
+        Wed, 12 Jun 2019 05:49:05 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     herbert@gondor.apana.org.au, ebiggers@kernel.org,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [RFC PATCH 15/20] crypto: generic/aes - drop key expansion routine in favor of library version
-Date:   Wed, 12 Jun 2019 14:48:33 +0200
-Message-Id: <20190612124838.2492-16-ard.biesheuvel@linaro.org>
+Subject: [RFC PATCH 18/20] crypto: arm/aes-ce - provide a synchronous version of ctr(aes)
+Date:   Wed, 12 Jun 2019 14:48:36 +0200
+Message-Id: <20190612124838.2492-19-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190612124838.2492-1-ard.biesheuvel@linaro.org>
 References: <20190612124838.2492-1-ard.biesheuvel@linaro.org>
@@ -73,221 +73,86 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Drop aes-generic's version of crypto_aes_expand_key(), and switch to
-key expansion routine provided by the AES library. AES key expansion
-is not performance critical, and it is better to have a single version
-shared by all AES implementations.
+AES in CTR mode is used by modes such as GCM and CCM, which are often
+used in contexts where only synchronous ciphers are permitted. So
+provide a synchronous version of ctr(aes) based on the existing code.
+This requires a non-SIMD fallback to deal with invocations occurring
+from a context where SIMD instructions may not be used. We have a
+helper for this now in the AES library, so wire that up.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- crypto/Kconfig       |   1 +
- crypto/aes_generic.c | 153 +-------------------
- include/crypto/aes.h |   2 -
- 3 files changed, 3 insertions(+), 153 deletions(-)
+ arch/arm/crypto/aes-ce-glue.c | 36 ++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 2ed65185dde8..3b08230fe3ba 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -1065,6 +1065,7 @@ config CRYPTO_LIB_AES
- config CRYPTO_AES
- 	tristate "AES cipher algorithms"
- 	select CRYPTO_ALGAPI
-+	select CRYPTO_LIB_AES
- 	help
- 	  AES cipher algorithms (FIPS-197). AES uses the Rijndael
- 	  algorithm.
-diff --git a/crypto/aes_generic.c b/crypto/aes_generic.c
-index 3aa4a715c216..426deb437f19 100644
---- a/crypto/aes_generic.c
-+++ b/crypto/aes_generic.c
-@@ -1125,155 +1125,6 @@ EXPORT_SYMBOL_GPL(crypto_fl_tab);
- EXPORT_SYMBOL_GPL(crypto_it_tab);
- EXPORT_SYMBOL_GPL(crypto_il_tab);
+diff --git a/arch/arm/crypto/aes-ce-glue.c b/arch/arm/crypto/aes-ce-glue.c
+index 04ba66903674..cdcc4b09e7db 100644
+--- a/arch/arm/crypto/aes-ce-glue.c
++++ b/arch/arm/crypto/aes-ce-glue.c
+@@ -10,6 +10,7 @@
  
--/* initialise the key schedule from the user supplied key */
--
--#define star_x(x) (((x) & 0x7f7f7f7f) << 1) ^ ((((x) & 0x80808080) >> 7) * 0x1b)
--
--#define imix_col(y, x)	do {		\
--	u	= star_x(x);		\
--	v	= star_x(u);		\
--	w	= star_x(v);		\
--	t	= w ^ (x);		\
--	(y)	= u ^ v ^ w;		\
--	(y)	^= ror32(u ^ t, 8) ^	\
--		ror32(v ^ t, 16) ^	\
--		ror32(t, 24);		\
--} while (0)
--
--#define ls_box(x)		\
--	crypto_fl_tab[0][byte(x, 0)] ^	\
--	crypto_fl_tab[1][byte(x, 1)] ^	\
--	crypto_fl_tab[2][byte(x, 2)] ^	\
--	crypto_fl_tab[3][byte(x, 3)]
--
--#define loop4(i)	do {		\
--	t = ror32(t, 8);		\
--	t = ls_box(t) ^ rco_tab[i];	\
--	t ^= ctx->key_enc[4 * i];		\
--	ctx->key_enc[4 * i + 4] = t;		\
--	t ^= ctx->key_enc[4 * i + 1];		\
--	ctx->key_enc[4 * i + 5] = t;		\
--	t ^= ctx->key_enc[4 * i + 2];		\
--	ctx->key_enc[4 * i + 6] = t;		\
--	t ^= ctx->key_enc[4 * i + 3];		\
--	ctx->key_enc[4 * i + 7] = t;		\
--} while (0)
--
--#define loop6(i)	do {		\
--	t = ror32(t, 8);		\
--	t = ls_box(t) ^ rco_tab[i];	\
--	t ^= ctx->key_enc[6 * i];		\
--	ctx->key_enc[6 * i + 6] = t;		\
--	t ^= ctx->key_enc[6 * i + 1];		\
--	ctx->key_enc[6 * i + 7] = t;		\
--	t ^= ctx->key_enc[6 * i + 2];		\
--	ctx->key_enc[6 * i + 8] = t;		\
--	t ^= ctx->key_enc[6 * i + 3];		\
--	ctx->key_enc[6 * i + 9] = t;		\
--	t ^= ctx->key_enc[6 * i + 4];		\
--	ctx->key_enc[6 * i + 10] = t;		\
--	t ^= ctx->key_enc[6 * i + 5];		\
--	ctx->key_enc[6 * i + 11] = t;		\
--} while (0)
--
--#define loop8tophalf(i)	do {			\
--	t = ror32(t, 8);			\
--	t = ls_box(t) ^ rco_tab[i];		\
--	t ^= ctx->key_enc[8 * i];			\
--	ctx->key_enc[8 * i + 8] = t;			\
--	t ^= ctx->key_enc[8 * i + 1];			\
--	ctx->key_enc[8 * i + 9] = t;			\
--	t ^= ctx->key_enc[8 * i + 2];			\
--	ctx->key_enc[8 * i + 10] = t;			\
--	t ^= ctx->key_enc[8 * i + 3];			\
--	ctx->key_enc[8 * i + 11] = t;			\
--} while (0)
--
--#define loop8(i)	do {				\
--	loop8tophalf(i);				\
--	t  = ctx->key_enc[8 * i + 4] ^ ls_box(t);	\
--	ctx->key_enc[8 * i + 12] = t;			\
--	t ^= ctx->key_enc[8 * i + 5];			\
--	ctx->key_enc[8 * i + 13] = t;			\
--	t ^= ctx->key_enc[8 * i + 6];			\
--	ctx->key_enc[8 * i + 14] = t;			\
--	t ^= ctx->key_enc[8 * i + 7];			\
--	ctx->key_enc[8 * i + 15] = t;			\
--} while (0)
--
--/**
-- * crypto_aes_expand_key - Expands the AES key as described in FIPS-197
-- * @ctx:	The location where the computed key will be stored.
-- * @in_key:	The supplied key.
-- * @key_len:	The length of the supplied key.
-- *
-- * Returns 0 on success. The function fails only if an invalid key size (or
-- * pointer) is supplied.
-- * The expanded key size is 240 bytes (max of 14 rounds with a unique 16 bytes
-- * key schedule plus a 16 bytes key which is used before the first round).
-- * The decryption key is prepared for the "Equivalent Inverse Cipher" as
-- * described in FIPS-197. The first slot (16 bytes) of each key (enc or dec) is
-- * for the initial combination, the second slot for the first round and so on.
-- */
--int crypto_aes_expand_key(struct crypto_aes_ctx *ctx, const u8 *in_key,
--		unsigned int key_len)
--{
--	u32 i, t, u, v, w, j;
--
--	if (key_len != AES_KEYSIZE_128 && key_len != AES_KEYSIZE_192 &&
--			key_len != AES_KEYSIZE_256)
--		return -EINVAL;
--
--	ctx->key_length = key_len;
--
--	ctx->key_enc[0] = get_unaligned_le32(in_key);
--	ctx->key_enc[1] = get_unaligned_le32(in_key + 4);
--	ctx->key_enc[2] = get_unaligned_le32(in_key + 8);
--	ctx->key_enc[3] = get_unaligned_le32(in_key + 12);
--
--	ctx->key_dec[key_len + 24] = ctx->key_enc[0];
--	ctx->key_dec[key_len + 25] = ctx->key_enc[1];
--	ctx->key_dec[key_len + 26] = ctx->key_enc[2];
--	ctx->key_dec[key_len + 27] = ctx->key_enc[3];
--
--	switch (key_len) {
--	case AES_KEYSIZE_128:
--		t = ctx->key_enc[3];
--		for (i = 0; i < 10; ++i)
--			loop4(i);
--		break;
--
--	case AES_KEYSIZE_192:
--		ctx->key_enc[4] = get_unaligned_le32(in_key + 16);
--		t = ctx->key_enc[5] = get_unaligned_le32(in_key + 20);
--		for (i = 0; i < 8; ++i)
--			loop6(i);
--		break;
--
--	case AES_KEYSIZE_256:
--		ctx->key_enc[4] = get_unaligned_le32(in_key + 16);
--		ctx->key_enc[5] = get_unaligned_le32(in_key + 20);
--		ctx->key_enc[6] = get_unaligned_le32(in_key + 24);
--		t = ctx->key_enc[7] = get_unaligned_le32(in_key + 28);
--		for (i = 0; i < 6; ++i)
--			loop8(i);
--		loop8tophalf(i);
--		break;
--	}
--
--	ctx->key_dec[0] = ctx->key_enc[key_len + 24];
--	ctx->key_dec[1] = ctx->key_enc[key_len + 25];
--	ctx->key_dec[2] = ctx->key_enc[key_len + 26];
--	ctx->key_dec[3] = ctx->key_enc[key_len + 27];
--
--	for (i = 4; i < key_len + 24; ++i) {
--		j = key_len + 24 - (i & ~3) + (i & 3);
--		imix_col(ctx->key_dec[j], ctx->key_enc[i]);
--	}
--	return 0;
--}
--EXPORT_SYMBOL_GPL(crypto_aes_expand_key);
--
- /**
-  * crypto_aes_set_key - Set the AES key.
-  * @tfm:	The %crypto_tfm that is used in the context.
-@@ -1281,7 +1132,7 @@ EXPORT_SYMBOL_GPL(crypto_aes_expand_key);
-  * @key_len:	The size of the key.
-  *
-  * Returns 0 on success, on failure the %CRYPTO_TFM_RES_BAD_KEY_LEN flag in tfm
-- * is set. The function uses crypto_aes_expand_key() to expand the key.
-+ * is set. The function uses aes_expand_key() to expand the key.
-  * &crypto_aes_ctx _must_ be the private data embedded in @tfm which is
-  * retrieved with crypto_tfm_ctx().
-  */
-@@ -1292,7 +1143,7 @@ int crypto_aes_set_key(struct crypto_tfm *tfm, const u8 *in_key,
- 	u32 *flags = &tfm->crt_flags;
- 	int ret;
+ #include <asm/hwcap.h>
+ #include <asm/neon.h>
++#include <asm/simd.h>
+ #include <crypto/aes.h>
+ #include <crypto/internal/simd.h>
+ #include <crypto/internal/skcipher.h>
+@@ -292,6 +293,23 @@ static int ctr_encrypt(struct skcipher_request *req)
+ 	return err;
+ }
  
--	ret = crypto_aes_expand_key(ctx, in_key, key_len);
-+	ret = aes_expandkey(ctx, in_key, key_len);
- 	if (!ret)
- 		return 0;
++static int ctr_encrypt_sync(struct skcipher_request *req)
++{
++	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
++	struct crypto_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
++
++	if (!crypto_simd_usable()) {
++		struct skcipher_walk walk;
++		int err;
++
++		err = skcipher_walk_virt(&walk, req, true);
++		if (err)
++			return err;
++		return skcipher_encrypt_aes_ctr(&walk, ctx);
++	}
++	return ctr_encrypt(req);
++}
++
+ static int xts_encrypt(struct skcipher_request *req)
+ {
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+@@ -381,6 +399,21 @@ static struct skcipher_alg aes_algs[] = { {
+ 	.setkey			= ce_aes_setkey,
+ 	.encrypt		= ctr_encrypt,
+ 	.decrypt		= ctr_encrypt,
++}, {
++	.base.cra_name		= "ctr(aes)",
++	.base.cra_driver_name	= "ctr-aes-ce-sync",
++	.base.cra_priority	= 300 - 1,
++	.base.cra_blocksize	= 1,
++	.base.cra_ctxsize	= sizeof(struct crypto_aes_ctx),
++	.base.cra_module	= THIS_MODULE,
++
++	.min_keysize		= AES_MIN_KEY_SIZE,
++	.max_keysize		= AES_MAX_KEY_SIZE,
++	.ivsize			= AES_BLOCK_SIZE,
++	.chunksize		= AES_BLOCK_SIZE,
++	.setkey			= ce_aes_setkey,
++	.encrypt		= ctr_encrypt_sync,
++	.decrypt		= ctr_encrypt_sync,
+ }, {
+ 	.base.cra_name		= "__xts(aes)",
+ 	.base.cra_driver_name	= "__xts-aes-ce",
+@@ -424,6 +457,9 @@ static int __init aes_init(void)
+ 		return err;
  
-diff --git a/include/crypto/aes.h b/include/crypto/aes.h
-index 72ead82d3f98..31ba40d803df 100644
---- a/include/crypto/aes.h
-+++ b/include/crypto/aes.h
-@@ -35,8 +35,6 @@ extern const u32 crypto_il_tab[4][256] ____cacheline_aligned;
- 
- int crypto_aes_set_key(struct crypto_tfm *tfm, const u8 *in_key,
- 		unsigned int key_len);
--int crypto_aes_expand_key(struct crypto_aes_ctx *ctx, const u8 *in_key,
--		unsigned int key_len);
- 
- /**
-  * aes_expandkey - Expands the AES key as described in FIPS-197
+ 	for (i = 0; i < ARRAY_SIZE(aes_algs); i++) {
++		if (!(aes_algs[i].base.cra_flags & CRYPTO_ALG_INTERNAL))
++			continue;
++
+ 		algname = aes_algs[i].base.cra_name + 2;
+ 		drvname = aes_algs[i].base.cra_driver_name + 2;
+ 		basename = aes_algs[i].base.cra_driver_name;
 -- 
 2.20.1
 
