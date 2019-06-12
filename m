@@ -2,215 +2,126 @@ Return-Path: <SRS0=xlya=UL=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBB49C31E46
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Jun 2019 16:20:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB4CDC31E46
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 Jun 2019 16:28:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B53542082C
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Jun 2019 16:20:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AC7D221019
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 Jun 2019 16:28:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="s5cC4TI0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NJy20Mnq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405946AbfFLQUR (ORCPT
+        id S2502132AbfFLQ26 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 12 Jun 2019 12:20:17 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:39661 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730855AbfFLQUQ (ORCPT
+        Wed, 12 Jun 2019 12:28:58 -0400
+Received: from mail-it1-f195.google.com ([209.85.166.195]:35739 "EHLO
+        mail-it1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2502128AbfFLQ26 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Jun 2019 12:20:16 -0400
-Received: by mail-wr1-f65.google.com with SMTP id x4so14935498wrt.6
-        for <linux-crypto@vger.kernel.org>; Wed, 12 Jun 2019 09:20:14 -0700 (PDT)
+        Wed, 12 Jun 2019 12:28:58 -0400
+Received: by mail-it1-f195.google.com with SMTP id n189so11579265itd.0;
+        Wed, 12 Jun 2019 09:28:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=pcVl9rz8wdPQIbvWbTWkIx9A5zksK1bSEdXxVyTfU04=;
-        b=s5cC4TI0lnWPK+GDgtrqTDlet2i0OPiORYXE+/Ic638xklkCAjsb0spBQVUHFdfzWj
-         unvV4+WlGu6/AcBM6M1We7Yok27ESfVZnoYBYkfSrreFoVn8wWC+I4ZDQP2tXRMBO0U+
-         qy/drraE5GCMBp9DiNE9ST9DBfh5h2QVwRcLu2UIMzFcI70qqiywL7jR/jNd0aDF2DNQ
-         su/xTA9KGcirsoaFVrbDj3XhmQnIrSImK8LIBLH26S7E2XQwa0RldV9q1FhIWEuOrHBT
-         +07mqQnQ+m0NpPloOXJeNxhBzXJAHrTlTJRbkH8VHUthdxMJUXi2AXgxyFBTzkfKfqpR
-         z47Q==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=yATkbjTw8m3Q2dRPh5UAzdwM9szsemwHSJzk0zw5vRI=;
+        b=NJy20Mnqfu+Z39JVh+cD+rlnma0I6e0xYfIA6aMB86ck/8gq0ulfhoZuq50qFwrPjp
+         YpKU/FucIoUuzRYZBuWq/qrB7YbnqLf/E0CAeqUQoMjcBnZ5YL4pKqGx2Y5Nda09727g
+         okaSOVQ2IXunryTsYPSHYNJOHygLR3NZjF65121kpqkwqvSkFA0X4UsF75X7GjCdX3Cx
+         0yKoADdNzJm9pJjf0w4lyF3joG64/G+46n+aOxRS2U/sCcl/AztvAc13IVzrqRYASdM6
+         fwWD98c1SnsDyEGk+qZx3LXBk36NRosoeBukK8ohbPb3XYncV+zpmtf6vGlTzgesDLbR
+         ZIZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=pcVl9rz8wdPQIbvWbTWkIx9A5zksK1bSEdXxVyTfU04=;
-        b=nO3tU6ZmeS07rRpxlTdbiDzYX6eI2EIHJEAMNd4q/wntqiMkwcEGywopgC5loRb2gK
-         FedU/uOCMFwzdR0NpXKQ8TC5vVzzz3hzKy+kcJ0N5jWDIPHZ8VSdHLwm57FWAr7dIwXg
-         d2M/853Ft4ESSWS2HKBOeZhvAxOHvVaJ9x5/owk8UnHqGmXBW+N+KD5wbFFkSt5umtFk
-         jvaBJMFo85guj66Xgbsx2NGBw2A5dRXEiBqBl9mx843wESiGX8eO8UvDSAN0Jj6sOx98
-         C93LGKjxuZpVLYLq/sm4FR7DUedgqdGVSjOxUTbZHIksjfN1NnlMZY/xrkK0W0k+Pd8n
-         O1nA==
-X-Gm-Message-State: APjAAAU4B6hmM4uDZ6+qazh+/c1lfqRZMjWT2l9u+lesHl0rQ0P6sSBW
-        enmyHAGYnPHeSdv7uZ0TNsJqivzIC+mLsg==
-X-Google-Smtp-Source: APXvYqwXPB1T9vJUrdJh9D51oSoiSJLgkpmi95fZgaP6KWetUp946YSZKxBQ4CjakZ2I5oIfgt+VUA==
-X-Received: by 2002:a5d:43c9:: with SMTP id v9mr54497358wrr.70.1560356413425;
-        Wed, 12 Jun 2019 09:20:13 -0700 (PDT)
-Received: from sudo.home ([2a01:cb1d:112:6f00:353a:f33a:a393:3ada])
-        by smtp.gmail.com with ESMTPSA id c16sm70172wrr.53.2019.06.12.09.20.12
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 12 Jun 2019 09:20:12 -0700 (PDT)
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To:     linux-crypto@vger.kernel.org
-Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Biggers <ebiggers@google.com>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        linux-cifs@vger.kernel.org, Steve French <sfrench@samba.org>
-Subject: [PATCH v5 7/7] fs: cifs: switch to RC4 library interface
-Date:   Wed, 12 Jun 2019 18:19:59 +0200
-Message-Id: <20190612161959.30478-8-ard.biesheuvel@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190612161959.30478-1-ard.biesheuvel@linaro.org>
-References: <20190612161959.30478-1-ard.biesheuvel@linaro.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=yATkbjTw8m3Q2dRPh5UAzdwM9szsemwHSJzk0zw5vRI=;
+        b=iIchdfm+/gMYv8AkV0JOyeWJFxlJ6OCnk0i8oNFa5noSpEAalw1XnjTxDDWFGHtTJp
+         YEsA0QjNxnTYp76ApTqQVvOP9/Ms42Vp6AEuhXecYAFs/XEP/oSo2PvgCU4dq2OHtLiJ
+         WP3gwDMYuKe6WJEJ7qmA85Nww3xHZBZI1/ZorQz0o1qJSp5ZyO4Ew9eo2uLP2tULb6X3
+         QJqza7L6K8SsjfWQJj/0TS2Fk6Hjk4ef2erc9Uv9dp5c6ikNcudELtHwl+/X2I90jECd
+         jlRaYZdsxmgnTWsz7nFm/JWMyhPkftlbvvpKs2cRZ+gyVaXTn3Vel069oP6xbNk06Qcm
+         6pYQ==
+X-Gm-Message-State: APjAAAUB3qB9YaNLAbDcrTp08DGN5fsGnDTRWgeCbhLQjmEPPB06GGa3
+        NJcqJ04w/7AW98vSjOd9xc4OG18t8By9W1Dw5UE=
+X-Google-Smtp-Source: APXvYqyFy2pdIz1NIdWEELkm+gtHMFJN4Sd8HaM3yVeRCc656dsv6Qlh7LAzwGcFw1K4ggW00KmzMxZsCUTJRrfmunM=
+X-Received: by 2002:a02:3b62:: with SMTP id i34mr50167719jaf.91.1560356937141;
+ Wed, 12 Jun 2019 09:28:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20190607200225.21419-1-andrew.smirnov@gmail.com>
+ <20190607200225.21419-2-andrew.smirnov@gmail.com> <VI1PR04MB50558864B434388A52A00915EEEC0@VI1PR04MB5055.eurprd04.prod.outlook.com>
+In-Reply-To: <VI1PR04MB50558864B434388A52A00915EEEC0@VI1PR04MB5055.eurprd04.prod.outlook.com>
+From:   Andrey Smirnov <andrew.smirnov@gmail.com>
+Date:   Wed, 12 Jun 2019 09:28:45 -0700
+Message-ID: <CAHQ1cqHw4whpq9Q0hNOrh4Q-72dxQVoNqJ-VEk9g7ZMimNTCkg@mail.gmail.com>
+Subject: Re: [PATCH v2 1/4] crypto: caam - do not initialise clocks on the i.MX8
+To:     Leonard Crestez <leonard.crestez@nxp.com>
+Cc:     Chris Spencer <christopher.spencer@sea.co.uk>,
+        Horia Geanta <horia.geanta@nxp.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Cory Tusar <cory.tusar@zii.aero>,
+        Chris Healy <cphealy@gmail.com>,
+        Lucas Stach <l.stach@pengutronix.de>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Iuliana Prodan <iuliana.prodan@nxp.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The CIFS code uses the sync skcipher API to invoke the ecb(arc4) skcipher,
-of which only a single generic C code implementation exists. This means
-that going through all the trouble of using scatterlists etc buys us
-very little, and we're better off just invoking the arc4 library directly.
+On Wed, Jun 12, 2019 at 6:53 AM Leonard Crestez <leonard.crestez@nxp.com> wrote:
+>
+> On 07.06.2019 23:03, Andrey Smirnov wrote:
+>
+> > There are no clocks that the CAAM driver needs to initialise on the
+> > i.MX8.
+>
+> The clk handling inside CAAM is very convoluted and this patch doesn't
+> help. All the driver actually does is "enable all required clocks", this
+> shouldn't be complicated.
+>
 
-This also reverts commit 5f4b55699aaf ("CIFS: Fix BUG() in calc_seckey()"),
-since it is no longer necessary to allocate sec_key on the heap.
+As I mentioned before, this patch is now dropped. It is replaced with
+a one-liner to avoid requesting "emi_slow" clock on i.mx8mq.
 
-Cc: linux-cifs@vger.kernel.org
-Cc: Steve French <sfrench@samba.org>
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
----
- fs/cifs/Kconfig       |  2 +-
- fs/cifs/cifsencrypt.c | 62 +++++---------------
- fs/cifs/cifsfs.c      |  1 -
- 3 files changed, 17 insertions(+), 48 deletions(-)
+> I propose adding a const caam_soc_data struct which has a bool flag
+> marking if each clock is required or not, the replace all the
+> of_machine_is_compatible() logic with statements of the form:
+>
+> if (ctrlpriv->soc_data->need_ipg_clk)
+>      ctrlpriv->caam_ipg = devm_clk_get("ipg");
+>
+> You could even make all clks optional and claim that if a clk is not
+> listed in DT then it's assumed to be always on. However that means that
+> on some SOCs if DT is incorrect you can get a hang (due to missing clk)
+> instead of a probe error.
+>
 
-diff --git a/fs/cifs/Kconfig b/fs/cifs/Kconfig
-index aae2b8b2adf5..523e9ea78a28 100644
---- a/fs/cifs/Kconfig
-+++ b/fs/cifs/Kconfig
-@@ -10,7 +10,7 @@ config CIFS
- 	select CRYPTO_SHA512
- 	select CRYPTO_CMAC
- 	select CRYPTO_HMAC
--	select CRYPTO_ARC4
-+	select CRYPTO_LIB_ARC4
- 	select CRYPTO_AEAD2
- 	select CRYPTO_CCM
- 	select CRYPTO_ECB
-diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-index d2a05e46d6f5..97b7497c13ef 100644
---- a/fs/cifs/cifsencrypt.c
-+++ b/fs/cifs/cifsencrypt.c
-@@ -33,7 +33,8 @@
- #include <linux/ctype.h>
- #include <linux/random.h>
- #include <linux/highmem.h>
--#include <crypto/skcipher.h>
-+#include <linux/fips.h>
-+#include <crypto/arc4.h>
- #include <crypto/aead.h>
- 
- int __cifs_calc_signature(struct smb_rqst *rqst,
-@@ -772,63 +773,32 @@ setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
- int
- calc_seckey(struct cifs_ses *ses)
- {
--	int rc;
--	struct crypto_skcipher *tfm_arc4;
--	struct scatterlist sgin, sgout;
--	struct skcipher_request *req;
--	unsigned char *sec_key;
-+	unsigned char sec_key[CIFS_SESS_KEY_SIZE]; /* a nonce */
-+	struct arc4_ctx *ctx_arc4;
- 
--	sec_key = kmalloc(CIFS_SESS_KEY_SIZE, GFP_KERNEL);
--	if (sec_key == NULL)
--		return -ENOMEM;
-+	if (fips_enabled)
-+		return -ENODEV;
- 
- 	get_random_bytes(sec_key, CIFS_SESS_KEY_SIZE);
- 
--	tfm_arc4 = crypto_alloc_skcipher("ecb(arc4)", 0, CRYPTO_ALG_ASYNC);
--	if (IS_ERR(tfm_arc4)) {
--		rc = PTR_ERR(tfm_arc4);
--		cifs_dbg(VFS, "could not allocate crypto API arc4\n");
--		goto out;
--	}
--
--	rc = crypto_skcipher_setkey(tfm_arc4, ses->auth_key.response,
--					CIFS_SESS_KEY_SIZE);
--	if (rc) {
--		cifs_dbg(VFS, "%s: Could not set response as a key\n",
--			 __func__);
--		goto out_free_cipher;
--	}
--
--	req = skcipher_request_alloc(tfm_arc4, GFP_KERNEL);
--	if (!req) {
--		rc = -ENOMEM;
--		cifs_dbg(VFS, "could not allocate crypto API arc4 request\n");
--		goto out_free_cipher;
-+	ctx_arc4 = kmalloc(sizeof(*ctx_arc4), GFP_KERNEL);
-+	if (!ctx_arc4) {
-+		cifs_dbg(VFS, "could not allocate arc4 context\n");
-+		return -ENOMEM;
- 	}
- 
--	sg_init_one(&sgin, sec_key, CIFS_SESS_KEY_SIZE);
--	sg_init_one(&sgout, ses->ntlmssp->ciphertext, CIFS_CPHTXT_SIZE);
--
--	skcipher_request_set_callback(req, 0, NULL, NULL);
--	skcipher_request_set_crypt(req, &sgin, &sgout, CIFS_CPHTXT_SIZE, NULL);
--
--	rc = crypto_skcipher_encrypt(req);
--	skcipher_request_free(req);
--	if (rc) {
--		cifs_dbg(VFS, "could not encrypt session key rc: %d\n", rc);
--		goto out_free_cipher;
--	}
-+	arc4_setkey(ctx_arc4, ses->auth_key.response, CIFS_SESS_KEY_SIZE);
-+	arc4_crypt(ctx_arc4, ses->ntlmssp->ciphertext, sec_key,
-+		   CIFS_CPHTXT_SIZE);
- 
- 	/* make secondary_key/nonce as session key */
- 	memcpy(ses->auth_key.response, sec_key, CIFS_SESS_KEY_SIZE);
- 	/* and make len as that of session key only */
- 	ses->auth_key.len = CIFS_SESS_KEY_SIZE;
- 
--out_free_cipher:
--	crypto_free_skcipher(tfm_arc4);
--out:
--	kfree(sec_key);
--	return rc;
-+	memzero_explicit(sec_key, CIFS_SESS_KEY_SIZE);
-+	kzfree(ctx_arc4);
-+	return 0;
- }
- 
- void
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index f5fcd6360056..e55afaf9e5a3 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -1590,7 +1590,6 @@ MODULE_DESCRIPTION
- 	("VFS to access SMB3 servers e.g. Samba, Macs, Azure and Windows (and "
- 	"also older servers complying with the SNIA CIFS Specification)");
- MODULE_VERSION(CIFS_VERSION);
--MODULE_SOFTDEP("pre: arc4");
- MODULE_SOFTDEP("pre: des");
- MODULE_SOFTDEP("pre: ecb");
- MODULE_SOFTDEP("pre: hmac");
--- 
-2.20.1
+I agree with this approach in principle, but I'd rather focus this
+series on adding i.MX8MQ support with least amount changes needed. I
+have a separate series doing a bunch of devres related cleanup on this
+driver, which I plan to submit once i.MX8MQ is supported and we can
+(and I'd rather) address the problem there.
 
+> > +     clk_disable_unprepare(ctrlpriv->caam_ipg);
+> > +     if (ctrlpriv->caam_mem)
+> > +             clk_disable_unprepare(ctrlpriv->caam_mem);
+> > +     clk_disable_unprepare(ctrlpriv->caam_aclk);
+> > +     if (ctrlpriv->caam_emi_slow)
+> > +             clk_disable_unprepare(ctrlpriv->caam_emi_slow);
+>
+> Clock APIs have no effect if clk argument is NULL, please just drop
+> these if statements.
+
+As a part of my refactoring changes I replaced all of that code with
+devres, so it should already be addressed there.
+
+Thanks,
+Andrey Smirnov
