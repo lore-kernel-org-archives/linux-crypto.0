@@ -1,216 +1,104 @@
-Return-Path: <SRS0=vn8P=UK=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=xlya=UL=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C6E2C31E44
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jun 2019 23:09:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4EDDC31E44
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 Jun 2019 02:01:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E663320872
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Jun 2019 23:09:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9FBC520883
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 Jun 2019 02:01:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LultKpVs"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="p5WwRCYK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2407951AbfFKXJ4 (ORCPT
+        id S2406425AbfFLCB3 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 11 Jun 2019 19:09:56 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:35610 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2407949AbfFKXJ4 (ORCPT
+        Tue, 11 Jun 2019 22:01:29 -0400
+Received: from mail-it1-f193.google.com ([209.85.166.193]:52673 "EHLO
+        mail-it1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2405070AbfFLCB3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Jun 2019 19:09:56 -0400
-Received: by mail-wm1-f67.google.com with SMTP id c6so4600161wml.0
-        for <linux-crypto@vger.kernel.org>; Tue, 11 Jun 2019 16:09:53 -0700 (PDT)
+        Tue, 11 Jun 2019 22:01:29 -0400
+Received: by mail-it1-f193.google.com with SMTP id l21so8287979ita.2;
+        Tue, 11 Jun 2019 19:01:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=pcVl9rz8wdPQIbvWbTWkIx9A5zksK1bSEdXxVyTfU04=;
-        b=LultKpVs+ZyWYS4B7p0E4oNY5tofY/00+gUA9E6/KHX7ZyefpHt4v43CaQD262NQIt
-         4+xgUlvWZ1HMIEocfxvODtLt6OO1UgM8fX5sWFiEDIt3vJNkN/rr0Dc4Px6q7/xAFP8s
-         WiRc9K6DFFTCfm+V+GRp116GaLDmNSU+Wbn0KSVJcD5DyCdpWxoC25NC4Xqi9QdM2RXV
-         8NM20AjEluabPhyNSDFei0KC5AslhURWH5kv86/IpoX+S/GruCHog8QzDUH3Bzh40B3n
-         3KX5I+I+VkoOWLfVfvoMmvs8yg+lDZ123hbOcvzf+UOvwk6KyoHNp4a+/ntWMp9J1R8l
-         n0zw==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=iHeTl9h5MAISC73trVD9Z9vYX3/i6GRbRI15G+TC7d4=;
+        b=p5WwRCYKXyFPfLjGMHtHkZUxI7g1Wr8ep6fol34IecTcd7Fen5hswE5Nfh3DSlIdet
+         hFaBAumqeGhSdfBtn7B0cy6w/YYTwzOQ/4SsRIAUYm2DSBua7fyiwx7PWPmK5zS6bD88
+         y+FGWaVEAB0y0rS8lmoPQUByuovlWqVYHFtH6fRVqxxBmdwnrtaEYsaaNyBq4fnvBZhV
+         ZrlMhfQXeZTEw9MtP6mp+b+exiU/xlbPG3/RayJA50MSpY1sd7Z+571sZ7yW9J5hOezz
+         7RSAq6CfmSwDjZEyXkEK0RJQqbV8/gCQKuUUmUtg9gcCLBaUIi4FZlMhBe1+KZIxfsVa
+         23gw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=pcVl9rz8wdPQIbvWbTWkIx9A5zksK1bSEdXxVyTfU04=;
-        b=DhF7Evm4qnv/4KRMjokxlj5VNHFpdZHM7z2RcVkfLfTuJFIw03mvd9zusL7Y6lYArd
-         xSXPSIjkc02GAIcblX77NuvpzR+Mt4FVm9/6KBL+HeZKGYOCbrIdRz4nBcbKvoeYmlWW
-         bbV9nN2uGdQWxx65eZs8j2QZciequ1NJSwQlSPgxe2J44LIkozckpT0IbIEL+5mSYfc6
-         U0+/xeDtV+x/tnn9jd9a+rDw64LCBXchftlxSiwcJBtqoDgkZz37XFIlVhp56J3O5K6F
-         RiVHxtUUEL7Xfm6sD91SkDg9er67unrpUCjI6WqRNfDE6lfr5RR3WEdz54lpDLkU+8OB
-         yf+A==
-X-Gm-Message-State: APjAAAVGGQbiYCXbNNtbYDOXk9azQ8CFM0qqIC1sDbSJa1NLfCH+N+0W
-        CiZ6PzhnlokKIQTmQwKsQF8E6eOgMnhIf/9/
-X-Google-Smtp-Source: APXvYqxMYHAeVYdfTTXvxynycbxYcJMfEGnmDqOm92MaSQs3Me3gFx2MvUhL4WRxySzxerOlZfkE6A==
-X-Received: by 2002:a7b:c774:: with SMTP id x20mr372887wmk.30.1560294592714;
-        Tue, 11 Jun 2019 16:09:52 -0700 (PDT)
-Received: from sudo.home ([2a01:cb1d:112:6f00:24bb:7f31:25fe:43a7])
-        by smtp.gmail.com with ESMTPSA id g11sm10827813wrq.89.2019.06.11.16.09.51
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 11 Jun 2019 16:09:52 -0700 (PDT)
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To:     linux-crypto@vger.kernel.org
-Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Biggers <ebiggers@google.com>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        linux-cifs@vger.kernel.org, Steve French <sfrench@samba.org>
-Subject: [PATCH v4 7/7] fs: cifs: switch to RC4 library interface
-Date:   Wed, 12 Jun 2019 01:09:38 +0200
-Message-Id: <20190611230938.19265-8-ard.biesheuvel@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190611230938.19265-1-ard.biesheuvel@linaro.org>
-References: <20190611230938.19265-1-ard.biesheuvel@linaro.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=iHeTl9h5MAISC73trVD9Z9vYX3/i6GRbRI15G+TC7d4=;
+        b=KmTsusZP+1XYL+vFLleVvrNREc5RHTbFldAP4qFXCil+5CNHm83Nn0jY0QHxEuaDsZ
+         aiOJk9eU/Mtj7lt8kdU+X4lXX69Tcu/0yPfQe5Mlc+eyqlhh1Q+BZ7xhZ4OljlBgbsHY
+         8AfcOgGHnX/jSVIuaZZxchfI7ViouEWEO2m8x9Nqxt9bE6KcmLPKdd2vRj+3v4efnA2w
+         sEH4GBFV37MZP0TIZ2owEeXzyqanfraBmhZoULmgSa9eYIUnlhm6NbUxIWjE1+gZniN1
+         3JKwrYl57pl6rq5iXi6QYoC3u4Hwjt1HpRs++xQtmmnm6s+b5cJ0iRG6x2+XLlwX8vNA
+         AcUg==
+X-Gm-Message-State: APjAAAVLUkV53stQa5qntCQtbq13oMuy+FOTXttXmep3FVi0+fxCHNmT
+        tptAeVP7OGJWBsWXeF94Wxd/8aGcuEeVFTvDzEk=
+X-Google-Smtp-Source: APXvYqydEFgmHWzcLByfz0Xbu9y58yiU4/4j49WJ5O9z2avVjWScConp9krearwOkeSkCy0gZjMRSftCqtqf5M+FICo=
+X-Received: by 2002:a02:5b05:: with SMTP id g5mr49218359jab.114.1560304888209;
+ Tue, 11 Jun 2019 19:01:28 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20190607200225.21419-1-andrew.smirnov@gmail.com>
+ <20190607200225.21419-2-andrew.smirnov@gmail.com> <VI1PR0402MB34855AC8C617A3D7A584A1B798ED0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+In-Reply-To: <VI1PR0402MB34855AC8C617A3D7A584A1B798ED0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+From:   Andrey Smirnov <andrew.smirnov@gmail.com>
+Date:   Tue, 11 Jun 2019 19:01:16 -0700
+Message-ID: <CAHQ1cqGcDm6MGnmn3=SKBYNkToP_T+-SEHSvOBtq8FGcRoTb6Q@mail.gmail.com>
+Subject: Re: [PATCH v2 1/4] crypto: caam - do not initialise clocks on the i.MX8
+To:     Horia Geanta <horia.geanta@nxp.com>
+Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Chris Spencer <christopher.spencer@sea.co.uk>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Cory Tusar <cory.tusar@zii.aero>,
+        Chris Healy <cphealy@gmail.com>,
+        Lucas Stach <l.stach@pengutronix.de>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Abel Vesa <abel.vesa@nxp.com>,
+        dl-linux-imx <linux-imx@nxp.com>,
+        "linux-clk@vger.kernel.org" <linux-clk@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The CIFS code uses the sync skcipher API to invoke the ecb(arc4) skcipher,
-of which only a single generic C code implementation exists. This means
-that going through all the trouble of using scatterlists etc buys us
-very little, and we're better off just invoking the arc4 library directly.
+On Tue, Jun 11, 2019 at 2:56 AM Horia Geanta <horia.geanta@nxp.com> wrote:
+>
+> On 6/7/2019 11:03 PM, Andrey Smirnov wrote:
+> > From: Chris Spencer <christopher.spencer@sea.co.uk>
+> >
+> > There are no clocks that the CAAM driver needs to initialise on the
+> > i.MX8.
+> >
+> RM lists 5 clocks for CAAM module (instance.clock): caam.aclk, caam.ipg_clk,
+> caam.ipg_clk_s, caam_exsc.aclk_exsc, caam_mem.clk
+>
+> Wouldn't it be better to have these clocks in DT, instead of relying that their
+> root clocks (ccm_ahb_clk_root, ccm_ipg_clk_root) are critical / always on?
+>
 
-This also reverts commit 5f4b55699aaf ("CIFS: Fix BUG() in calc_seckey()"),
-since it is no longer necessary to allocate sec_key on the heap.
+Is it even possible to use the SoC in a meaningful way if
+ccm_ahb_clk_root or ccm_ipg_clk_root are disabled? It doesn't seem
+that dependency on either is expressed in a consistent manner for
+other IP blocks in imx8mq.dtsi. OTOH, it should be trivial to add
+<&clk IMX8MQ_CLK_IPG_ROOT> and <&clk IMX8MQ_CLK_AHB> as "ipg" and
+"aclk" to CAAM node and it would allow me to drop an extra patch from
+the series, so I may as well do it.
 
-Cc: linux-cifs@vger.kernel.org
-Cc: Steve French <sfrench@samba.org>
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
----
- fs/cifs/Kconfig       |  2 +-
- fs/cifs/cifsencrypt.c | 62 +++++---------------
- fs/cifs/cifsfs.c      |  1 -
- 3 files changed, 17 insertions(+), 48 deletions(-)
-
-diff --git a/fs/cifs/Kconfig b/fs/cifs/Kconfig
-index aae2b8b2adf5..523e9ea78a28 100644
---- a/fs/cifs/Kconfig
-+++ b/fs/cifs/Kconfig
-@@ -10,7 +10,7 @@ config CIFS
- 	select CRYPTO_SHA512
- 	select CRYPTO_CMAC
- 	select CRYPTO_HMAC
--	select CRYPTO_ARC4
-+	select CRYPTO_LIB_ARC4
- 	select CRYPTO_AEAD2
- 	select CRYPTO_CCM
- 	select CRYPTO_ECB
-diff --git a/fs/cifs/cifsencrypt.c b/fs/cifs/cifsencrypt.c
-index d2a05e46d6f5..97b7497c13ef 100644
---- a/fs/cifs/cifsencrypt.c
-+++ b/fs/cifs/cifsencrypt.c
-@@ -33,7 +33,8 @@
- #include <linux/ctype.h>
- #include <linux/random.h>
- #include <linux/highmem.h>
--#include <crypto/skcipher.h>
-+#include <linux/fips.h>
-+#include <crypto/arc4.h>
- #include <crypto/aead.h>
- 
- int __cifs_calc_signature(struct smb_rqst *rqst,
-@@ -772,63 +773,32 @@ setup_ntlmv2_rsp(struct cifs_ses *ses, const struct nls_table *nls_cp)
- int
- calc_seckey(struct cifs_ses *ses)
- {
--	int rc;
--	struct crypto_skcipher *tfm_arc4;
--	struct scatterlist sgin, sgout;
--	struct skcipher_request *req;
--	unsigned char *sec_key;
-+	unsigned char sec_key[CIFS_SESS_KEY_SIZE]; /* a nonce */
-+	struct arc4_ctx *ctx_arc4;
- 
--	sec_key = kmalloc(CIFS_SESS_KEY_SIZE, GFP_KERNEL);
--	if (sec_key == NULL)
--		return -ENOMEM;
-+	if (fips_enabled)
-+		return -ENODEV;
- 
- 	get_random_bytes(sec_key, CIFS_SESS_KEY_SIZE);
- 
--	tfm_arc4 = crypto_alloc_skcipher("ecb(arc4)", 0, CRYPTO_ALG_ASYNC);
--	if (IS_ERR(tfm_arc4)) {
--		rc = PTR_ERR(tfm_arc4);
--		cifs_dbg(VFS, "could not allocate crypto API arc4\n");
--		goto out;
--	}
--
--	rc = crypto_skcipher_setkey(tfm_arc4, ses->auth_key.response,
--					CIFS_SESS_KEY_SIZE);
--	if (rc) {
--		cifs_dbg(VFS, "%s: Could not set response as a key\n",
--			 __func__);
--		goto out_free_cipher;
--	}
--
--	req = skcipher_request_alloc(tfm_arc4, GFP_KERNEL);
--	if (!req) {
--		rc = -ENOMEM;
--		cifs_dbg(VFS, "could not allocate crypto API arc4 request\n");
--		goto out_free_cipher;
-+	ctx_arc4 = kmalloc(sizeof(*ctx_arc4), GFP_KERNEL);
-+	if (!ctx_arc4) {
-+		cifs_dbg(VFS, "could not allocate arc4 context\n");
-+		return -ENOMEM;
- 	}
- 
--	sg_init_one(&sgin, sec_key, CIFS_SESS_KEY_SIZE);
--	sg_init_one(&sgout, ses->ntlmssp->ciphertext, CIFS_CPHTXT_SIZE);
--
--	skcipher_request_set_callback(req, 0, NULL, NULL);
--	skcipher_request_set_crypt(req, &sgin, &sgout, CIFS_CPHTXT_SIZE, NULL);
--
--	rc = crypto_skcipher_encrypt(req);
--	skcipher_request_free(req);
--	if (rc) {
--		cifs_dbg(VFS, "could not encrypt session key rc: %d\n", rc);
--		goto out_free_cipher;
--	}
-+	arc4_setkey(ctx_arc4, ses->auth_key.response, CIFS_SESS_KEY_SIZE);
-+	arc4_crypt(ctx_arc4, ses->ntlmssp->ciphertext, sec_key,
-+		   CIFS_CPHTXT_SIZE);
- 
- 	/* make secondary_key/nonce as session key */
- 	memcpy(ses->auth_key.response, sec_key, CIFS_SESS_KEY_SIZE);
- 	/* and make len as that of session key only */
- 	ses->auth_key.len = CIFS_SESS_KEY_SIZE;
- 
--out_free_cipher:
--	crypto_free_skcipher(tfm_arc4);
--out:
--	kfree(sec_key);
--	return rc;
-+	memzero_explicit(sec_key, CIFS_SESS_KEY_SIZE);
-+	kzfree(ctx_arc4);
-+	return 0;
- }
- 
- void
-diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
-index f5fcd6360056..e55afaf9e5a3 100644
---- a/fs/cifs/cifsfs.c
-+++ b/fs/cifs/cifsfs.c
-@@ -1590,7 +1590,6 @@ MODULE_DESCRIPTION
- 	("VFS to access SMB3 servers e.g. Samba, Macs, Azure and Windows (and "
- 	"also older servers complying with the SNIA CIFS Specification)");
- MODULE_VERSION(CIFS_VERSION);
--MODULE_SOFTDEP("pre: arc4");
- MODULE_SOFTDEP("pre: des");
- MODULE_SOFTDEP("pre: ecb");
- MODULE_SOFTDEP("pre: hmac");
--- 
-2.20.1
-
+Thanks,
+Andrey Smirnov
