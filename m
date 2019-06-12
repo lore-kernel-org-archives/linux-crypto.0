@@ -2,85 +2,88 @@ Return-Path: <SRS0=xlya=UL=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_NEOMUTT autolearn=ham
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B9B8C31E46
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Jun 2019 09:40:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAFE7C31E48
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 Jun 2019 10:22:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 61CC2207E0
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Jun 2019 09:40:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 85F44207E0
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 Jun 2019 10:22:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727677AbfFLJkx (ORCPT
+        id S1727487AbfFLKWw (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 12 Jun 2019 05:40:53 -0400
-Received: from metis.ext.pengutronix.de ([85.220.165.71]:51759 "EHLO
-        metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725497AbfFLJkx (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Jun 2019 05:40:53 -0400
-Received: from ptx.hi.pengutronix.de ([2001:67c:670:100:1d::c0])
-        by metis.ext.pengutronix.de with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <sha@pengutronix.de>)
-        id 1hazkQ-0005lO-Uu; Wed, 12 Jun 2019 11:40:50 +0200
-Received: from sha by ptx.hi.pengutronix.de with local (Exim 4.89)
-        (envelope-from <sha@pengutronix.de>)
-        id 1hazkQ-0007HA-55; Wed, 12 Jun 2019 11:40:50 +0200
-Date:   Wed, 12 Jun 2019 11:40:50 +0200
-From:   Sascha Hauer <s.hauer@pengutronix.de>
-To:     Horia Geanta <horia.geanta@nxp.com>
-Cc:     Fabio Estevam <festevam@gmail.com>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        Sascha Hauer <kernel@pengutronix.de>
-Subject: Re: ctr(aes) broken in CAAM driver
-Message-ID: <20190612094050.6esonhumzv2ywhdh@pengutronix.de>
-References: <20190515130746.cvhkxxffrmmynfq3@pengutronix.de>
- <CAOMZO5CJvcipPNY6TXnwwET2fc=zaP3Dj3HPT-zfZpzfqHkeHQ@mail.gmail.com>
- <20190515132225.oczgouglycuhqo4l@pengutronix.de>
- <VI1PR0402MB3485ED478A2A3E0087E81F7C98090@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+        Wed, 12 Jun 2019 06:22:52 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:50202 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726823AbfFLKWw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 12 Jun 2019 06:22:52 -0400
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 2185F308FC4A;
+        Wed, 12 Jun 2019 10:22:52 +0000 (UTC)
+Received: from t460s.redhat.com (ovpn-116-159.ams2.redhat.com [10.36.116.159])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6F60060CCC;
+        Wed, 12 Jun 2019 10:22:49 +0000 (UTC)
+From:   David Hildenbrand <david@redhat.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     linux-s390@vger.kernel.org, linux-crypto@vger.kernel.org,
+        David Hildenbrand <david@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>,
+        Cornelia Huck <cohuck@redhat.com>
+Subject: [PATCH v2 0/4] s390/crypto: Use -ENODEV instead of -EOPNOTSUPP
+Date:   Wed, 12 Jun 2019 12:22:44 +0200
+Message-Id: <20190612102248.18903-1-david@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <VI1PR0402MB3485ED478A2A3E0087E81F7C98090@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL:  http://www.pengutronix.de/
-X-IRC:  #ptxdist @freenode
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-Uptime: 11:38:15 up 25 days, 15:56, 85 users,  load average: 0.02, 0.08,
- 0.08
-User-Agent: NeoMutt/20170113 (1.7.2)
-X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::c0
-X-SA-Exim-Mail-From: sha@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.43]); Wed, 12 Jun 2019 10:22:52 +0000 (UTC)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Horia,
+s390x crypto is one of the rare modules that returns -EOPNOTSUPP instead of
+-ENODEV in case HW support is not available.
 
-On Wed, May 15, 2019 at 01:35:16PM +0000, Horia Geanta wrote:
-> For talitos, the problem is the lack of IV update.
-> 
-> For caam, the problem is incorrect IV update (output IV is equal to last
-> ciphertext block, which is correect for cbc, but not for ctr mode).
-> 
-> I am working at a fix, but it takes longer since I would like to program the
-> accelerator to the save the IV (and not do counter increment in SW, which
-> created problems for many other implementations).
+Convert to -ENODEV, so e.g., systemd's systemd-modules-load.service
+ignores this error properly.
 
-Any news here? With the fix Ard provided gcm(aes) now works again, but
-only as long as the crypto self tests are disabled.
+v1 -> v2:
+- Include
+-- "s390/crypto: ghash: Use -ENODEV instead of -EOPNOTSUPP"
+-- "s390/crypto: prng: Use -ENODEV instead of -EOPNOTSUPP"
+-- "s390/crypto: sha: Use -ENODEV instead of -EOPNOTSUPP"
 
-Sascha
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Heiko Carstens <heiko.carstens@de.ibm.com>
+Cc: Vasily Gorbik <gor@linux.ibm.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Harald Freudenberger <freude@linux.ibm.com>
+Cc: Cornelia Huck <cohuck@redhat.com>
+
+David Hildenbrand (4):
+  s390/pkey: Use -ENODEV instead of -EOPNOTSUPP
+  s390/crypto: ghash: Use -ENODEV instead of -EOPNOTSUPP
+  s390/crypto: prng: Use -ENODEV instead of -EOPNOTSUPP
+  s390/crypto: sha: Use -ENODEV instead of -EOPNOTSUPP
+
+ arch/s390/crypto/ghash_s390.c  | 2 +-
+ arch/s390/crypto/prng.c        | 4 ++--
+ arch/s390/crypto/sha1_s390.c   | 2 +-
+ arch/s390/crypto/sha256_s390.c | 2 +-
+ arch/s390/crypto/sha512_s390.c | 2 +-
+ drivers/s390/crypto/pkey_api.c | 6 +++---
+ 6 files changed, 9 insertions(+), 9 deletions(-)
 
 -- 
-Pengutronix e.K.                           |                             |
-Industrial Linux Solutions                 | http://www.pengutronix.de/  |
-Peiner Str. 6-8, 31137 Hildesheim, Germany | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+2.21.0
+
