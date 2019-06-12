@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD253C31E46
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Jun 2019 12:49:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9C7FC31E48
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 Jun 2019 12:49:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 932CB20684
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Jun 2019 12:49:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9446E20684
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 Jun 2019 12:49:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QQVIHwG+"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fqMYY52G"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2439221AbfFLMtE (ORCPT
+        id S2439230AbfFLMtF (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 12 Jun 2019 08:49:04 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:33321 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2439227AbfFLMtD (ORCPT
+        Wed, 12 Jun 2019 08:49:05 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:36706 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2439229AbfFLMtE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Jun 2019 08:49:03 -0400
-Received: by mail-wr1-f67.google.com with SMTP id n9so16819986wru.0
-        for <linux-crypto@vger.kernel.org>; Wed, 12 Jun 2019 05:49:02 -0700 (PDT)
+        Wed, 12 Jun 2019 08:49:04 -0400
+Received: by mail-wm1-f68.google.com with SMTP id u8so6408977wmm.1
+        for <linux-crypto@vger.kernel.org>; Wed, 12 Jun 2019 05:49:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=0+abpCskFH64uUUzWz6MrJWQeWRPxd08F5mJmqOJSaY=;
-        b=QQVIHwG+58pKXs93jYTMJMczRFAiZL6Osuf0fx9Pjt7dZUy4dQChhWMUhYfFvg7pxs
-         9BGqIDU/W51lXSWRCmpOTUpeKjNKQTTqZwtZmBloToenu9UQCO8ntGIQ9KZ7q3Hu0BkT
-         t6C3vaBcpqxkn6eYbJWda9Qj18jzYaVseMnPS0tB9NF1/BpN7NPRcsTk4Q4aAQEW4FaL
-         5npBgrH+mtyv5bDOOLYLRvy1pyE1FKdf340PRXY42yOqQFlTp/AfIpGmhZzURAVbtPXt
-         rmHdOi2UWHK6jOcFKjhOdmXjErwtWLZGQkM5S0FqBxPsD7T1yIcnGpxZOu3/7iTOI8Qk
-         W8JQ==
+        bh=mCCXO8E7dxoAfZNPGu9MWapyiMaDRiD0qXpOpKK9sPY=;
+        b=fqMYY52GJRSJB7nqoddTnyp+yHfTI4dqn1gGxnvbszw1xwXLpymiUOIvsEFUqtxu83
+         fQread8hii0ShQ9ZUt0SZGprEoruVA1ff2dNsbTw4RwhxHZd6421rgtPir31C+yCEkMA
+         udlT8SXMf/1FVfEtypI30iKKpOj8TCOG7nsu3/mj4jRfYl8Gi00jCNYqTaACz20+9aRU
+         YcV+79O433Gzyiz/XeFGnmEmCBtjzXd15OOEpRBtDc2nxOQ17Q9iz/Yc9rDEeZii3WPw
+         SrfK0zS5RXjo7u3jCzWgrsG8IhdT1UJrnKaKjU9lXpwBZhvzBEWntV04Mhbm+keYn6CH
+         PbHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=0+abpCskFH64uUUzWz6MrJWQeWRPxd08F5mJmqOJSaY=;
-        b=PloMp0R5RsmwBSnlAeypGMTCOFO29t4EDaWlZJ4URusc+WxpyXrNYyCgDVhniFUNHi
-         AAWuOsvv4YHHMUjx1QNu9nPkaBEt8mhgXnzorWQM+YCaN7tHvP+v8ZfB6d763/WcDzOQ
-         bYbcJpUUoL8n3HUc2CJJYWedVWPsOZGHL1DKrvHa9w+T7cUJ44upg3U/qToubBPM+7Vu
-         kPv9zJDVPw51h+RY5ucF+0hu/ix5FKkzuGs3HH+QJYcQzsxeBGyaPRpeixnp3EMYsN/v
-         V6inSFo4nMscLacLncOz0JtJCdj6K37xzWFLqkeXlxbuBr4CzN3oKMOaayRXqEnbdDWo
-         PubQ==
-X-Gm-Message-State: APjAAAUtqGt+G3Gj0pOIj2Ti6+/Ji8XMuHdUR+gcH5tgNZdusO0uL/46
-        /1M/Vj+eY2Z/a+VgMm9/xHTvZaUtQ5INOQ==
-X-Google-Smtp-Source: APXvYqwDvJjTphhGVfRVAXKf2dTT6/qcC6XV+OpUvl+k25P9W6KERVmuTVVakLLVagc8CNQDvo247w==
-X-Received: by 2002:a5d:43c9:: with SMTP id v9mr53672758wrr.70.1560343741335;
-        Wed, 12 Jun 2019 05:49:01 -0700 (PDT)
+        bh=mCCXO8E7dxoAfZNPGu9MWapyiMaDRiD0qXpOpKK9sPY=;
+        b=becOtEKy9cH4+/vK1lHSzhRlkD4FA8E87WqqYZiJKveUGtHhBBDhFmiZgqJ5quc+7w
+         YYVMKmX4OJMS+YhVJgigJkfhI8XWgaL4R9mCFpMJZ+2yOE/UKU9XJWNAH0lZzoPrFvkG
+         4N9u5dfNugBCre6pTpnmWXbeVXaq73wHHbdXNl8f0nn0QAgAGIcdfymj2LJ5OW0t8mjp
+         jLG2LlEDa9YWiNiTZ8tfA2uwAInJHsSQYOqtVjh4kwyqu/rLCgzuzehv0dfXtNlTqewt
+         CYoCQ/E2NQWNh/y0Dz3yskyrIzF8vqrd2D3tC3bT3B3Kq6pcakPI6fo1TX/8bGobECpc
+         HIww==
+X-Gm-Message-State: APjAAAX/rSS6jOFrxYEy6EuEdniiiJ3S08ay6/bYr20np/GE9KE1S2+p
+        Lho/7KcgbpzMaW+Pxb1JhGo5dHBwNZCB1w==
+X-Google-Smtp-Source: APXvYqwdxVdPmO4Y4CaMxhkX0EkIeu+J3Lqpzi3pJpPoHcmWYZO/DJrER87cgEzDVOz687H5gdo01A==
+X-Received: by 2002:a1c:2c41:: with SMTP id s62mr22013608wms.8.1560343742297;
+        Wed, 12 Jun 2019 05:49:02 -0700 (PDT)
 Received: from sudo.home ([2a01:cb1d:112:6f00:353a:f33a:a393:3ada])
-        by smtp.gmail.com with ESMTPSA id s8sm28505480wra.55.2019.06.12.05.49.00
+        by smtp.gmail.com with ESMTPSA id s8sm28505480wra.55.2019.06.12.05.49.01
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 12 Jun 2019 05:49:00 -0700 (PDT)
+        Wed, 12 Jun 2019 05:49:01 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     herbert@gondor.apana.org.au, ebiggers@kernel.org,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [RFC PATCH 13/20] crypto: arm64/aes-neonbs - switch to library version of key expansion routine
-Date:   Wed, 12 Jun 2019 14:48:31 +0200
-Message-Id: <20190612124838.2492-14-ard.biesheuvel@linaro.org>
+Subject: [RFC PATCH 14/20] crypto: arm64/aes-ce - switch to library version of key expansion routine
+Date:   Wed, 12 Jun 2019 14:48:32 +0200
+Message-Id: <20190612124838.2492-15-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190612124838.2492-1-ard.biesheuvel@linaro.org>
 References: <20190612124838.2492-1-ard.biesheuvel@linaro.org>
@@ -79,62 +79,60 @@ generic AES cipher, allowing it to be omitted entirely in the future.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm64/crypto/Kconfig           | 1 +
- arch/arm64/crypto/aes-neonbs-glue.c | 8 ++++----
- 2 files changed, 5 insertions(+), 4 deletions(-)
+ arch/arm64/crypto/Kconfig    |  2 +-
+ arch/arm64/crypto/aes-glue.c | 12 ++++++++----
+ 2 files changed, 9 insertions(+), 5 deletions(-)
 
 diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
-index c6032bfb44fb..17bf5dc10aad 100644
+index 17bf5dc10aad..66dea518221c 100644
 --- a/arch/arm64/crypto/Kconfig
 +++ b/arch/arm64/crypto/Kconfig
-@@ -116,6 +116,7 @@ config CRYPTO_AES_ARM64_BS
+@@ -96,7 +96,7 @@ config CRYPTO_AES_ARM64_NEON_BLK
+ 	depends on KERNEL_MODE_NEON
  	select CRYPTO_BLKCIPHER
- 	select CRYPTO_AES_ARM64_NEON_BLK
  	select CRYPTO_AES_ARM64
+-	select CRYPTO_AES
 +	select CRYPTO_LIB_AES
  	select CRYPTO_SIMD
  
- endif
-diff --git a/arch/arm64/crypto/aes-neonbs-glue.c b/arch/arm64/crypto/aes-neonbs-glue.c
-index 02b65d9eb947..cb8d90f795a0 100644
---- a/arch/arm64/crypto/aes-neonbs-glue.c
-+++ b/arch/arm64/crypto/aes-neonbs-glue.c
-@@ -77,7 +77,7 @@ static int aesbs_setkey(struct crypto_skcipher *tfm, const u8 *in_key,
- 	struct crypto_aes_ctx rk;
- 	int err;
+ config CRYPTO_CHACHA20_NEON
+diff --git a/arch/arm64/crypto/aes-glue.c b/arch/arm64/crypto/aes-glue.c
+index f0ceb545bd1e..8fa17a764802 100644
+--- a/arch/arm64/crypto/aes-glue.c
++++ b/arch/arm64/crypto/aes-glue.c
+@@ -26,7 +26,6 @@
+ #ifdef USE_V8_CRYPTO_EXTENSIONS
+ #define MODE			"ce"
+ #define PRIO			300
+-#define aes_setkey		ce_aes_setkey
+ #define aes_expandkey		ce_aes_expandkey
+ #define aes_ecb_encrypt		ce_aes_ecb_encrypt
+ #define aes_ecb_decrypt		ce_aes_ecb_decrypt
+@@ -42,8 +41,6 @@ MODULE_DESCRIPTION("AES-ECB/CBC/CTR/XTS using ARMv8 Crypto Extensions");
+ #else
+ #define MODE			"neon"
+ #define PRIO			200
+-#define aes_setkey		crypto_aes_set_key
+-#define aes_expandkey		crypto_aes_expand_key
+ #define aes_ecb_encrypt		neon_aes_ecb_encrypt
+ #define aes_ecb_decrypt		neon_aes_ecb_decrypt
+ #define aes_cbc_encrypt		neon_aes_cbc_encrypt
+@@ -121,7 +118,14 @@ struct mac_desc_ctx {
+ static int skcipher_aes_setkey(struct crypto_skcipher *tfm, const u8 *in_key,
+ 			       unsigned int key_len)
+ {
+-	return aes_setkey(crypto_skcipher_tfm(tfm), in_key, key_len);
++	struct crypto_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
++	int ret;
++
++	ret = aes_expandkey(ctx, in_key, key_len);
++	if (ret)
++		crypto_skcipher_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
++
++	return ret;
+ }
  
--	err = crypto_aes_expand_key(&rk, in_key, key_len);
-+	err = aes_expandkey(&rk, in_key, key_len);
- 	if (err)
- 		return err;
- 
-@@ -136,7 +136,7 @@ static int aesbs_cbc_setkey(struct crypto_skcipher *tfm, const u8 *in_key,
- 	struct crypto_aes_ctx rk;
- 	int err;
- 
--	err = crypto_aes_expand_key(&rk, in_key, key_len);
-+	err = aes_expandkey(&rk, in_key, key_len);
- 	if (err)
- 		return err;
- 
-@@ -208,7 +208,7 @@ static int aesbs_ctr_setkey_sync(struct crypto_skcipher *tfm, const u8 *in_key,
- 	struct aesbs_ctr_ctx *ctx = crypto_skcipher_ctx(tfm);
- 	int err;
- 
--	err = crypto_aes_expand_key(&ctx->fallback, in_key, key_len);
-+	err = aes_expandkey(&ctx->fallback, in_key, key_len);
- 	if (err)
- 		return err;
- 
-@@ -274,7 +274,7 @@ static int aesbs_xts_setkey(struct crypto_skcipher *tfm, const u8 *in_key,
- 		return err;
- 
- 	key_len /= 2;
--	err = crypto_aes_expand_key(&rk, in_key + key_len, key_len);
-+	err = aes_expandkey(&rk, in_key + key_len, key_len);
- 	if (err)
- 		return err;
- 
+ static int xts_set_key(struct crypto_skcipher *tfm, const u8 *in_key,
 -- 
 2.20.1
 
