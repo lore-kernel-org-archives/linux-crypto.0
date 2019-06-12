@@ -1,101 +1,155 @@
 Return-Path: <SRS0=xlya=UL=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Level: *
+X-Spam-Status: No, score=1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_MUTT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEF6FC31E46
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Jun 2019 17:09:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4B64C31E46
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 Jun 2019 19:16:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C4AA921019
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Jun 2019 17:09:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oFsPySWd"
+	by mail.kernel.org (Postfix) with ESMTP id 7EB7B215EA
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 Jun 2019 19:16:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1560367016;
+	bh=aenpxhMy7/1vHBZSX3BbEdK/1JKlXHiSJLShsF1HDp8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=ZGfnt6A6Oef/DUhhKi/HpQZFbOfyZ/bLz7lA9bD2duyXqpOcXI8/0eViZ5q6svfl1
+	 P5b177c0Rn/34hNTXEVlSNAQtv1jkNdGZvImKyW5yQPkLPrUHrZb3wfvGpII7dj022
+	 tIcZuC3ShZyHkDOhONqPG/TOR0aNPBx98f8QsdCM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729565AbfFLRJH (ORCPT
+        id S1727813AbfFLTQz (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 12 Jun 2019 13:09:07 -0400
-Received: from mail-io1-f66.google.com ([209.85.166.66]:38261 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726004AbfFLRJH (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Jun 2019 13:09:07 -0400
-Received: by mail-io1-f66.google.com with SMTP id k13so13572816iop.5
-        for <linux-crypto@vger.kernel.org>; Wed, 12 Jun 2019 10:09:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=gi0ghm+XPYB6pEJtUt03LOWoqX3M4u5q9bEfWUfgFUY=;
-        b=oFsPySWdMJdlADJ2STTjzjkGPGPnnSOJOuPrx2TaDoTokdIoozCYhjKxsngaycvOKP
-         BqJBwV7QQo6JGZJ+LbotB83He9dLBGkG1ggXw4wbDJdc/HkfZwkXWvUtJENYE8FBRSa+
-         gILZzdiWOjYHVpndKHv5IVWfp/9RGgvDcX/raKl56uOq7VniN4KzFjVV8HqhHpR65Hn9
-         U7DRcbIiAvPPRYKbc3IwPke8v2+T5VsrFcMMaALpH7FtgIQt/OT2RRtwKCjTaKEOrbZq
-         bhSAIhgJdNrgqCsrtK1f1JqQ6E8Pk5faO/s7y2Kl/NWfcTDGy/KY5B41gU1ZYYRVbzs5
-         Nz7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=gi0ghm+XPYB6pEJtUt03LOWoqX3M4u5q9bEfWUfgFUY=;
-        b=jFiM78BhAm7XehGpF8fJUfp7J98jd1Izt89XOT5WQCShFcRUMnJtZ9upAttifJTHrJ
-         y0gAyzTAN+N+GDpKvMAI5AjpDExKcWqDYD6CDIw2E7ZePOAKzaLTZWddaIObHsSUu1Pv
-         zHfEFT/bbgb1OyeAM9gN9UdJXWYwjm4wElLoIy76bdVaL16fE/x89QzAvH2pEDcn36sP
-         NOpJGmh86NGSVRnbX8TRGOZ9qFWu5L2fFhLeTLY0ki3wUpv/NUM4LeBkhVA7V1kwkMmN
-         8vzbbGYUmkwrIV9UTcj3ZHmzUayjASYtJ/I7f7Kv26AoXB7uzUSBtLp3jKXVK5YMDjgN
-         7LyQ==
-X-Gm-Message-State: APjAAAX6+Gy0wQ4PI6ur6N0pj45sPcsl5Na5al+WQ9EUbpeAuF7XCZv1
-        IV3vwgy4ts63fJZJiy+jdvg2z4dzQv5Cwrnen+dIFNNnR2k=
-X-Google-Smtp-Source: APXvYqw3Ybh+JwyXjFTr6QIi+YpELp7b6MYbc1kLqZAwD6yCPgN/KyfZbh2E/I/BGglm/l7RzgYP4NyHPVhagDQq0oA=
-X-Received: by 2002:a5d:8794:: with SMTP id f20mr3933999ion.128.1560359346540;
- Wed, 12 Jun 2019 10:09:06 -0700 (PDT)
+        Wed, 12 Jun 2019 15:16:55 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42342 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727496AbfFLTQz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 12 Jun 2019 15:16:55 -0400
+Received: from gmail.com (unknown [104.132.1.77])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 6C86520B7C;
+        Wed, 12 Jun 2019 19:16:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1560367014;
+        bh=aenpxhMy7/1vHBZSX3BbEdK/1JKlXHiSJLShsF1HDp8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=BIOw7u3B0zwQH9t4BtsrA5Bt9DjzvSlLz8y8GWE4R0560EG5Q60uYLG6uQ3XE9+xX
+         i/rEF/WWi1Wc/J5kkfJWUofzZHjX57rR35upPbmaHItCPPYDoHpok9/rrOl2Y9eNod
+         ztX2S1bQgbgvqbAbrAx4a0784P9XS6Bs+P5c/fKw=
+Date:   Wed, 12 Jun 2019 12:16:53 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Johannes Berg <johannes@sipsolutions.net>
+Subject: Re: [PATCH v5 0/7] crypto: rc4 cleanup
+Message-ID: <20190612191652.GE18795@gmail.com>
+References: <20190612161959.30478-1-ard.biesheuvel@linaro.org>
 MIME-Version: 1.0
-References: <20190612124838.2492-1-ard.biesheuvel@linaro.org>
- <20190612135823.5w2dkibl4r7qcxx4@gondor.apana.org.au> <CAKv+Gu83M9_3DbAz9u_nmLs=4VL-BJh_L-FsEcFRAf4c2P=Gpw@mail.gmail.com>
-In-Reply-To: <CAKv+Gu83M9_3DbAz9u_nmLs=4VL-BJh_L-FsEcFRAf4c2P=Gpw@mail.gmail.com>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Wed, 12 Jun 2019 19:08:52 +0200
-Message-ID: <CAKv+Gu9UXUGPpdp=Ajff=rFNbbTzXrgb-q0E5j=wJ3H1pVGjkQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 00/20] AES cleanup
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>, Eric Biggers <ebiggers@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190612161959.30478-1-ard.biesheuvel@linaro.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 12 Jun 2019 at 16:00, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
->
-> On Wed, 12 Jun 2019 at 15:58, Herbert Xu <herbert@gondor.apana.org.au> wrote:
-> >
-> > On Wed, Jun 12, 2019 at 02:48:18PM +0200, Ard Biesheuvel wrote:
-> > >
-> > > All the patches leading up to that are cleanups for the AES code, to reduce
-> > > the dependency on the generic table based AES code, or in some cases, hardcoded
-> > > dependencies on the scalar arm64 asm code which suffers from the same problem.
-> > > It also removes redundant key expansion routines, and gets rid of the x86
-> > > scalar asm code, which is a maintenance burden and is not actually faster than
-> > > the generic code built with a modern compiler.
-> >
-> > Nice, I like this a lot.
-> >
-> > I presume you'll be converting the AES cipher users throughout
-> > the kernel (such as net/ipv4/tcp_fastopen) at some point, right?
-> >
->
-> Yes. I am currently surveying which users need to switch to a proper
-> mode, and which ones can just use the unoptimized library version
-> (such as tcp_fastopen).
+On Wed, Jun 12, 2019 at 06:19:52PM +0200, Ard Biesheuvel wrote:
+> This is a follow-up to, and supersedes [0], which moved some WEP code from
+> the cipher to the skcipher interface, in order to reduce the use of the bare
+> cipher interface in non-crypto subsystem code.
+> 
+> Since using the skcipher interface to invoke the generic C implementation of
+> an algorithm that is known at compile time is rather pointless, this series
+> moves those users to a new arc4 library interface instead, which is based on
+> the existing code.
+> 
+> Along the way, the arc4 cipher implementation is removed entirely, and only
+> the ecb(arc4) code is preserved, which is used in a number of places in the
+> kernel, and is known to be used by at least 'iwd' from user space via the
+> algif_skcipher API.
+> 
+> Changes since v4:
+> - add a missing MODULE_LICENSE() for the new libarc4 module
+> - add a missing 'select CRYPTO_LIB_ARC4' to the lib80211-tkip patch
+> - some cosmetic changes for the skcipher driver after removing the cipher code
+> - a testmgr fix to ensure that the test framework understands that this skcipher
+>   driver is the reference for testing ecb(arc4)
+> 
+> Changes since v3:
+> - fix some remaining occurrences where a tfm non-NULL test should be replaced
+>   with a fips_enabled test
+> - use kzfree() or memzero_explicit() to clear the arc4 ctx where appropriate
+> - clean up the function naming of the crypto arc4 driver when removing the
+>   cipher part
+> - remove .h declaration of a function that is being removed
+> - revert a prior CIFS change that moved a variable from the stack to the heap,
+>   which is no longer necessary
+> - remove arc4 softdep from the cifs code
+> 
+> Changes since v2:
+> - drop the crypto_ prefix from the arc4 library functions and types
+> - rename the source file to arc4.c but keep the lib prefix for the actual
+>   module to prevent a clash with the crypto API driver
+> - preserve the existing behavior wrt the fips_enabled flag, which prevents
+>   any use of ARC4 (note that the fips_enabled flag evaluates to 'false' at
+>   compile time for kernels that lack the feature, so with these patches, we
+>   get rid of most of the runtime logic regarding FIPS for builds that don't
+>   have it enabled)
+> 
+> [0] https://lore.kernel.org/linux-crypto/20190607144944.13485-1-ard.biesheuvel@linaro.org/
+> 
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Biggers <ebiggers@google.com>
+> Cc: Johannes Berg <johannes@sipsolutions.net>
+> 
+> Ard Biesheuvel (7):
+>   crypto: arc4 - refactor arc4 core code into separate library
+>   net/mac80211: move WEP handling to ARC4 library interface
+>   net/lib80211: move WEP handling to ARC4 library code
+>   net/lib80211: move TKIP handling to ARC4 library code
+>   crypto: arc4 - remove cipher implementation
+>   ppp: mppe: switch to RC4 library interface
+>   fs: cifs: switch to RC4 library interface
+> 
+>  MAINTAINERS                        |   1 +
+>  crypto/Kconfig                     |   4 +
+>  crypto/arc4.c                      | 124 +++-----------------
+>  crypto/testmgr.c                   |   1 +
+>  drivers/net/ppp/Kconfig            |   3 +-
+>  drivers/net/ppp/ppp_mppe.c         |  97 +++------------
+>  fs/cifs/Kconfig                    |   2 +-
+>  fs/cifs/cifsencrypt.c              |  62 +++-------
+>  fs/cifs/cifsfs.c                   |   1 -
+>  include/crypto/arc4.h              |  10 ++
+>  lib/Makefile                       |   2 +-
+>  lib/crypto/Makefile                |   4 +
+>  lib/crypto/arc4.c                  |  74 ++++++++++++
+>  net/mac80211/Kconfig               |   2 +-
+>  net/mac80211/cfg.c                 |   4 +-
+>  net/mac80211/ieee80211_i.h         |   4 +-
+>  net/mac80211/key.h                 |   1 +
+>  net/mac80211/main.c                |   6 +-
+>  net/mac80211/mlme.c                |   3 +-
+>  net/mac80211/tkip.c                |   8 +-
+>  net/mac80211/tkip.h                |   4 +-
+>  net/mac80211/wep.c                 |  49 ++------
+>  net/mac80211/wep.h                 |   5 +-
+>  net/mac80211/wpa.c                 |   4 +-
+>  net/wireless/Kconfig               |   2 +
+>  net/wireless/lib80211_crypt_tkip.c |  48 +++-----
+>  net/wireless/lib80211_crypt_wep.c  |  51 ++------
+>  27 files changed, 205 insertions(+), 371 deletions(-)
+>  create mode 100644 lib/crypto/Makefile
+>  create mode 100644 lib/crypto/arc4.c
 
-Would anyone mind if I switch the TCP fastopen code to SipHash instead
-of AES? I can see in the archives that Dave wasn't a fan at the time,
-but for a MAC over ~16 bytes of input, it is actually a much more
-better choice than what we have now. And calling into the AES cipher
-twice, as we do for IPv6 connections, is even worse, since you take
-the hit of invoking a SIMD cipher twice in cases where the cipher is
-provided by a SIMD based implementation.
+For the series:
+
+	Reviewed-by: Eric Biggers <ebiggers@kernel.org>
+
+- Eric
