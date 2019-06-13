@@ -6,26 +6,26 @@ X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FAE7C31E45
-	for <linux-crypto@archiver.kernel.org>; Thu, 13 Jun 2019 16:40:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D0D0C31E45
+	for <linux-crypto@archiver.kernel.org>; Thu, 13 Jun 2019 16:40:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2C4AE20644
-	for <linux-crypto@archiver.kernel.org>; Thu, 13 Jun 2019 16:40:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 266BA20644
+	for <linux-crypto@archiver.kernel.org>; Thu, 13 Jun 2019 16:40:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730687AbfFMQkv (ORCPT
+        id S1727831AbfFMQk4 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 13 Jun 2019 12:40:51 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:50080 "EHLO deadmen.hmeau.com"
+        Thu, 13 Jun 2019 12:40:56 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:50034 "EHLO deadmen.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730576AbfFMG5U (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 13 Jun 2019 02:57:20 -0400
+        id S1730567AbfFMG4g (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 13 Jun 2019 02:56:36 -0400
 Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
         by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1hbJfc-0006Ec-SK; Thu, 13 Jun 2019 14:57:12 +0800
+        id 1hbJev-0006EA-I7; Thu, 13 Jun 2019 14:56:29 +0800
 Received: from herbert by gondobar with local (Exim 4.89)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1hbJfc-000574-O0; Thu, 13 Jun 2019 14:57:12 +0800
-Date:   Thu, 13 Jun 2019 14:57:12 +0800
+        id 1hbJet-000556-MV; Thu, 13 Jun 2019 14:56:27 +0800
+Date:   Thu, 13 Jun 2019 14:56:27 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
 To:     Nishad Kamdar <nishadkamdar@gmail.com>
 Cc:     "David S. Miller" <davem@davemloft.net>,
@@ -34,24 +34,24 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
         <u.kleine-koenig@pengutronix.de>, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: hisilicon - Use the correct style for SPDX
+Subject: Re: [PATCH] crypto: cavium/nitrox - Use the correct style for SPDX
  License Identifier
-Message-ID: <20190613065712.x4d7efi4mwcgam3l@gondor.apana.org.au>
-References: <20190606150612.GA4002@nishad>
+Message-ID: <20190613065627.o2p4qvadvlzzlzbb@gondor.apana.org.au>
+References: <20190605132149.GA5589@nishad>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190606150612.GA4002@nishad>
+In-Reply-To: <20190605132149.GA5589@nishad>
 User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jun 06, 2019 at 08:36:17PM +0530, Nishad Kamdar wrote:
+On Wed, Jun 05, 2019 at 06:51:53PM +0530, Nishad Kamdar wrote:
 > This patch corrects the SPDX License Identifier style
-> in header file related to Crypto Drivers for Hisilicon
-> SEC Engine in Hip06 and Hip07.
+> in header files related to Crypto Drivers for Cavium Nitrox
+> family CNN55XX devices.
 > For C header files Documentation/process/license-rules.rst
 > mandates C-like comments (opposed to C source files where
 > C++ style should be used)
@@ -62,8 +62,9 @@ On Thu, Jun 06, 2019 at 08:36:17PM +0530, Nishad Kamdar wrote:
 > Suggested-by: Joe Perches <joe@perches.com>
 > Signed-off-by: Nishad Kamdar <nishadkamdar@gmail.com>
 > ---
->  drivers/crypto/hisilicon/sec/sec_drv.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  drivers/crypto/cavium/nitrox/nitrox_debugfs.h | 2 +-
+>  drivers/crypto/cavium/nitrox/nitrox_mbx.h     | 2 +-
+>  2 files changed, 2 insertions(+), 2 deletions(-)
 
 Patch applied.  Thanks.
 -- 
