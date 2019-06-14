@@ -2,337 +2,235 @@ Return-Path: <SRS0=me0G=UN=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFBFCC31E4D
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jun 2019 14:01:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D3D1C31E4B
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jun 2019 14:29:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A4A80217D7
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jun 2019 14:01:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LWYutGUi"
+	by mail.kernel.org (Postfix) with ESMTP id EAE7121537
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jun 2019 14:29:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1560522549;
+	bh=cY7qQ7vl0+egy4AL6ZDqmTDm4h2jklkJUrmVOLowupA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=lrI3PxCtOieBEHDtllg++VIegD5CKBZtReLlsysNIg50rWRTV6edk1R6MN6VY8Fc9
+	 71pn7fpTdg7tFDv1I/NkQVaPlEPrHu3IqXlwnaRYqfQ6nGqUS+Vc8xOZLmqseHoWxO
+	 hdYnbdpON4Nb7zPL1De8y6rdTG8owDBOBaa2tPIk=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727922AbfFNOBc (ORCPT
+        id S1728121AbfFNO3I (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Jun 2019 10:01:32 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:44746 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728422AbfFNOB3 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Jun 2019 10:01:29 -0400
-Received: by mail-wr1-f66.google.com with SMTP id r16so2639886wrl.11
-        for <linux-crypto@vger.kernel.org>; Fri, 14 Jun 2019 07:01:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=mZb2m8Jicq7pxe41avsHdrIYJhBhGMXKjr3QxPKttHY=;
-        b=LWYutGUikimZ/+mhqPniKlZ95/fjcPTV0I+0Pkoc3foeamEpfVQEwXGEKakyGnp3NY
-         pSG5iRIYy5QSwx+Pym6i6pdZ964MeMFxNuFdEXVL88HaFYcoKSrCqoA+98O+zqF0vFAc
-         NTpNqiv0WI1CzgWz5ae2erljqvQv5F82A0A3h0iknfvACyAVBQrlBpCWkypVU5FKUrkT
-         +V2UiwXVOgOmVAI6GvGkpYJQ7ndJV8URy/5JDkEYyvPc3Oc9ehyhILchQgnmd+JZAt35
-         vZM3VoZeL/3HPdE+gv2hiPQ2uzG8N2/SijfY6r1BuRdgj6J/QyyxohmTIOob4VWRY1IS
-         zneQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=mZb2m8Jicq7pxe41avsHdrIYJhBhGMXKjr3QxPKttHY=;
-        b=o7ChYwOVAWHiDfGy0gdpO9AYXyhApBEor2kjyTqrh98tXfiqIj6X95gXJX5Zm/QP1u
-         tqvY+Q6CPy5pljkcOUaoV42FSeUH65dOaOlBfJhLHBqG6NHpmTvT4f6cShA3veLvo/DW
-         AcNri1teQ8YV5iXjMYbjGBV6mnB/B5J+OXPXFxPrs21v/QSsqdPWsHGkdAPG1I7+mIbw
-         TkXg8LC6AUPl58cf8uWPvI53AdJ1zuTBs2snrwaglfmfQ/OAfVeNN7xoxM7tH4xpPP3y
-         9gGc6gWaqfzw0N0m+w/RQVFSdBMY0Hagbt5bTUTP7EVLnxplIqscgKArXYzz/mDTHDFn
-         PBWA==
-X-Gm-Message-State: APjAAAWNaQHzDDxNoZsEvgr6wXSMAYltDEe+4S86vm/6kdhrIu5/oWOi
-        vfzjQwbf3rIFzC7tkUskqR1o/w==
-X-Google-Smtp-Source: APXvYqzyniPDPZy+uHzgbfNxjbCxF34v13DgdUtfeuprK6jP/vGvPUogE5Jxkd6OPfVkQGMljb9T4Q==
-X-Received: by 2002:adf:e2c3:: with SMTP id d3mr36601593wrj.314.1560520886323;
-        Fri, 14 Jun 2019 07:01:26 -0700 (PDT)
-Received: from sudo.home ([2a01:cb1d:112:6f00:e99d:7886:2d7f:9b24])
-        by smtp.gmail.com with ESMTPSA id d1sm2400665wru.41.2019.06.14.07.01.24
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 14 Jun 2019 07:01:25 -0700 (PDT)
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To:     netdev@vger.kernel.org
-Cc:     linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-        ebiggers@kernel.org, edumazet@google.com, davem@davemloft.net,
-        kuznet@ms2.inr.ac.ru, yoshfuji@linux-ipv6.org, jbaron@akamai.com,
-        cpaasch@apple.com, David.Laight@aculab.com,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v2] net: ipv4: move tcp_fastopen server side code to SipHash library
-Date:   Fri, 14 Jun 2019 16:01:22 +0200
-Message-Id: <20190614140122.20934-1-ard.biesheuvel@linaro.org>
-X-Mailer: git-send-email 2.20.1
+        Fri, 14 Jun 2019 10:29:08 -0400
+Received: from mail.kernel.org ([198.145.29.99]:33112 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728246AbfFNO3I (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 14 Jun 2019 10:29:08 -0400
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9103420866;
+        Fri, 14 Jun 2019 14:29:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1560522547;
+        bh=cY7qQ7vl0+egy4AL6ZDqmTDm4h2jklkJUrmVOLowupA=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=eiq/xb+UdPxWqpEOmZmONEuKxa+SiiyvP9eYhCH3UgRBUIvfH0GN9HEM0EyX5u+nV
+         RUbpqwvtSYeCYQXjqaywHQzWTqhJFoHyZwqfs05GdA56xHZCJTfDvE9I0jozAGTEDQ
+         FNqGKrn/YTKGOEjp3fGLFj/D0RUOKHFpybtaugVk=
+Date:   Fri, 14 Jun 2019 16:29:04 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Breno =?iso-8859-1?Q?Leit=E3o?= <leitao@debian.org>,
+        Nayna Jain <nayna@linux.ibm.com>,
+        Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
+Subject: [PATCH v2] crypto: nx: no need to check return value of
+ debugfs_create functions
+Message-ID: <20190614142904.GA11066@kroah.com>
+References: <20190614135031.GA5809@kroah.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190614135031.GA5809@kroah.com>
+User-Agent: Mutt/1.12.0 (2019-05-25)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Using a bare block cipher in non-crypto code is almost always a bad idea,
-not only for security reasons (and we've seen some examples of this in
-the kernel in the past), but also for performance reasons.
+When calling debugfs functions, there is no need to ever check the
+return value.  The function can work or not, but the code logic should
+never do something different based on this.
 
-In the TCP fastopen case, we call into the bare AES block cipher one or
-two times (depending on whether the connection is IPv4 or IPv6). On most
-systems, this results in a call chain such as
+Also, there is no need to store the individual debugfs file names,
+especially as the whole directiry is deleted at once, so remove the
+unneeded structure entirely.
 
-  crypto_cipher_encrypt_one(ctx, dst, src)
-    crypto_cipher_crt(tfm)->cit_encrypt_one(crypto_cipher_tfm(tfm), ...);
-      aesni_encrypt
-        kernel_fpu_begin();
-        aesni_enc(ctx, dst, src); // asm routine
-        kernel_fpu_end();
-
-It is highly unlikely that the use of special AES instructions has a
-benefit in this case, especially since we are doing the above twice
-for IPv6 connections, instead of using a transform which can process
-the entire input in one go.
-
-We could switch to the cbcmac(aes) shash, which would at least get
-rid of the duplicated overhead in *some* cases (i.e., today, only
-arm64 has an accelerated implementation of cbcmac(aes), while x86 will
-end up using the generic cbcmac template wrapping the AES-NI cipher,
-which basically ends up doing exactly the above). However, in the given
-context, it makes more sense to use a light-weight MAC algorithm that
-is more suitable for the purpose at hand, such as SipHash.
-
-Since the output size of SipHash already matches our chosen value for
-TCP_FASTOPEN_COOKIE_SIZE, and given that it accepts arbitrary input
-sizes, this greatly simplifies the code as well.
-
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: "Breno Leitão" <leitao@debian.org>
+Cc: Nayna Jain <nayna@linux.ibm.com>
+Cc: Paulo Flabiano Smorigo <pfsmorigo@gmail.com>
+Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Cc: Paul Mackerras <paulus@samba.org>
+Cc: Michael Ellerman <mpe@ellerman.id.au>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org
+Cc: linuxppc-dev@lists.ozlabs.org
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
-v2: rebase onto net-next
-    reverse order of operands in BUILD_BUG_ON() comparison expression
+v2: fixed build error found by kbuild
 
- include/linux/tcp.h     |  7 +-
- include/net/tcp.h       | 10 +-
- net/ipv4/tcp_fastopen.c | 97 +++++++-------------
- 3 files changed, 36 insertions(+), 78 deletions(-)
+ drivers/crypto/nx/nx.c         |  4 +-
+ drivers/crypto/nx/nx.h         | 12 +-----
+ drivers/crypto/nx/nx_debugfs.c | 71 +++++++++++-----------------------
+ 3 files changed, 26 insertions(+), 61 deletions(-)
 
-diff --git a/include/linux/tcp.h b/include/linux/tcp.h
-index c23019a3b264..9ea0e71f5c6a 100644
---- a/include/linux/tcp.h
-+++ b/include/linux/tcp.h
-@@ -58,12 +58,7 @@ static inline unsigned int tcp_optlen(const struct sk_buff *skb)
+diff --git a/drivers/crypto/nx/nx.c b/drivers/crypto/nx/nx.c
+index 3a5e31be4764..20b5e276f184 100644
+--- a/drivers/crypto/nx/nx.c
++++ b/drivers/crypto/nx/nx.c
+@@ -581,9 +581,7 @@ static int nx_register_algs(void)
  
- /* TCP Fast Open Cookie as stored in memory */
- struct tcp_fastopen_cookie {
--	union {
--		u8	val[TCP_FASTOPEN_COOKIE_MAX];
--#if IS_ENABLED(CONFIG_IPV6)
--		struct in6_addr addr;
--#endif
--	};
-+	u64	val[TCP_FASTOPEN_COOKIE_MAX / sizeof(u64)];
- 	s8	len;
- 	bool	exp;	/* In RFC6994 experimental option format */
- };
-diff --git a/include/net/tcp.h b/include/net/tcp.h
-index 49a178b8d5b2..16c6745e30c1 100644
---- a/include/net/tcp.h
-+++ b/include/net/tcp.h
-@@ -1628,9 +1628,9 @@ bool tcp_fastopen_defer_connect(struct sock *sk, int *err);
+ 	memset(&nx_driver.stats, 0, sizeof(struct nx_stats));
  
- /* Fastopen key context */
- struct tcp_fastopen_context {
--	struct crypto_cipher	*tfm[TCP_FASTOPEN_KEY_MAX];
--	__u8			key[TCP_FASTOPEN_KEY_BUF_LENGTH];
--	struct rcu_head		rcu;
-+	__u8		key[TCP_FASTOPEN_KEY_MAX][TCP_FASTOPEN_KEY_LENGTH];
-+	int		num;
-+	struct rcu_head	rcu;
+-	rc = NX_DEBUGFS_INIT(&nx_driver);
+-	if (rc)
+-		goto out;
++	NX_DEBUGFS_INIT(&nx_driver);
+ 
+ 	nx_driver.of.status = NX_OKAY;
+ 
+diff --git a/drivers/crypto/nx/nx.h b/drivers/crypto/nx/nx.h
+index c3e54af18645..c6b5a3be02be 100644
+--- a/drivers/crypto/nx/nx.h
++++ b/drivers/crypto/nx/nx.h
+@@ -76,20 +76,12 @@ struct nx_stats {
+ 	atomic_t last_error_pid;
  };
  
- extern unsigned int sysctl_tcp_fastopen_blackhole_timeout;
-@@ -1665,9 +1665,7 @@ bool tcp_fastopen_cookie_match(const struct tcp_fastopen_cookie *foc,
- static inline
- int tcp_fastopen_context_len(const struct tcp_fastopen_context *ctx)
- {
--	if (ctx->tfm[1])
--		return 2;
--	return 1;
-+	return ctx->num;
- }
- 
- /* Latencies incurred by various limits for a sender. They are
-diff --git a/net/ipv4/tcp_fastopen.c b/net/ipv4/tcp_fastopen.c
-index 7d19fa4c8121..46b67128e1ca 100644
---- a/net/ipv4/tcp_fastopen.c
-+++ b/net/ipv4/tcp_fastopen.c
-@@ -7,6 +7,7 @@
- #include <linux/tcp.h>
- #include <linux/rcupdate.h>
- #include <linux/rculist.h>
-+#include <linux/siphash.h>
- #include <net/inetpeer.h>
- #include <net/tcp.h>
- 
-@@ -37,14 +38,8 @@ static void tcp_fastopen_ctx_free(struct rcu_head *head)
- {
- 	struct tcp_fastopen_context *ctx =
- 	    container_of(head, struct tcp_fastopen_context, rcu);
--	int i;
- 
--	/* We own ctx, thus no need to hold the Fastopen-lock */
--	for (i = 0; i < TCP_FASTOPEN_KEY_MAX; i++) {
--		if (ctx->tfm[i])
--			crypto_free_cipher(ctx->tfm[i]);
--	}
--	kfree(ctx);
-+	kzfree(ctx);
- }
- 
- void tcp_fastopen_destroy_cipher(struct sock *sk)
-@@ -72,41 +67,6 @@ void tcp_fastopen_ctx_destroy(struct net *net)
- 		call_rcu(&ctxt->rcu, tcp_fastopen_ctx_free);
- }
- 
--static struct tcp_fastopen_context *tcp_fastopen_alloc_ctx(void *primary_key,
--							   void *backup_key,
--							   unsigned int len)
--{
--	struct tcp_fastopen_context *new_ctx;
--	void *key = primary_key;
--	int err, i;
+-struct nx_debugfs {
+-	struct dentry *dfs_root;
+-	struct dentry *dfs_aes_ops, *dfs_aes_bytes;
+-	struct dentry *dfs_sha256_ops, *dfs_sha256_bytes;
+-	struct dentry *dfs_sha512_ops, *dfs_sha512_bytes;
+-	struct dentry *dfs_errors, *dfs_last_error, *dfs_last_error_pid;
+-};
 -
--	new_ctx = kmalloc(sizeof(*new_ctx), GFP_KERNEL);
--	if (!new_ctx)
--		return ERR_PTR(-ENOMEM);
--	for (i = 0; i < TCP_FASTOPEN_KEY_MAX; i++)
--		new_ctx->tfm[i] = NULL;
--	for (i = 0; i < (backup_key ? 2 : 1); i++) {
--		new_ctx->tfm[i] = crypto_alloc_cipher("aes", 0, 0);
--		if (IS_ERR(new_ctx->tfm[i])) {
--			err = PTR_ERR(new_ctx->tfm[i]);
--			new_ctx->tfm[i] = NULL;
--			pr_err("TCP: TFO aes cipher alloc error: %d\n", err);
--			goto out;
--		}
--		err = crypto_cipher_setkey(new_ctx->tfm[i], key, len);
--		if (err) {
--			pr_err("TCP: TFO cipher key error: %d\n", err);
--			goto out;
--		}
--		memcpy(&new_ctx->key[i * TCP_FASTOPEN_KEY_LENGTH], key, len);
--		key = backup_key;
--	}
--	return new_ctx;
--out:
--	tcp_fastopen_ctx_free(&new_ctx->rcu);
--	return ERR_PTR(err);
--}
--
- int tcp_fastopen_reset_cipher(struct net *net, struct sock *sk,
- 			      void *primary_key, void *backup_key,
- 			      unsigned int len)
-@@ -115,11 +75,20 @@ int tcp_fastopen_reset_cipher(struct net *net, struct sock *sk,
- 	struct fastopen_queue *q;
- 	int err = 0;
+ struct nx_crypto_driver {
+ 	struct nx_stats    stats;
+ 	struct nx_of       of;
+ 	struct vio_dev    *viodev;
+ 	struct vio_driver  viodriver;
+-	struct nx_debugfs  dfs;
++	struct dentry     *dfs_root;
+ };
  
--	ctx = tcp_fastopen_alloc_ctx(primary_key, backup_key, len);
--	if (IS_ERR(ctx)) {
--		err = PTR_ERR(ctx);
-+	ctx = kmalloc(sizeof(*ctx), GFP_KERNEL);
-+	if (!ctx) {
-+		err = -ENOMEM;
- 		goto out;
- 	}
-+
-+	memcpy(ctx->key[0], primary_key, len);
-+	if (backup_key) {
-+		memcpy(ctx->key[1], backup_key, len);
-+		ctx->num = 2;
-+	} else {
-+		ctx->num = 1;
-+	}
-+
- 	spin_lock(&net->ipv4.tcp_fastopen_ctx_lock);
- 	if (sk) {
- 		q = &inet_csk(sk)->icsk_accept_queue.fastopenq;
-@@ -141,31 +110,30 @@ int tcp_fastopen_reset_cipher(struct net *net, struct sock *sk,
+ #define NX_GCM4106_NONCE_LEN		(4)
+@@ -177,7 +169,7 @@ struct nx_sg *nx_walk_and_build(struct nx_sg *, unsigned int,
+ #define NX_DEBUGFS_INIT(drv)	nx_debugfs_init(drv)
+ #define NX_DEBUGFS_FINI(drv)	nx_debugfs_fini(drv)
  
- static bool __tcp_fastopen_cookie_gen_cipher(struct request_sock *req,
- 					     struct sk_buff *syn,
--					     struct crypto_cipher *tfm,
-+					     const u8 *key,
- 					     struct tcp_fastopen_cookie *foc)
- {
-+	BUILD_BUG_ON(TCP_FASTOPEN_KEY_LENGTH != sizeof(siphash_key_t));
-+	BUILD_BUG_ON(TCP_FASTOPEN_COOKIE_SIZE != sizeof(u64));
-+
- 	if (req->rsk_ops->family == AF_INET) {
- 		const struct iphdr *iph = ip_hdr(syn);
--		__be32 path[4] = { iph->saddr, iph->daddr, 0, 0 };
- 
--		crypto_cipher_encrypt_one(tfm, foc->val, (void *)path);
-+		foc->val[0] = siphash(&iph->saddr,
-+				      sizeof(iph->saddr) +
-+				      sizeof(iph->daddr),
-+				      (const siphash_key_t *)key);
- 		foc->len = TCP_FASTOPEN_COOKIE_SIZE;
- 		return true;
- 	}
--
- #if IS_ENABLED(CONFIG_IPV6)
- 	if (req->rsk_ops->family == AF_INET6) {
- 		const struct ipv6hdr *ip6h = ipv6_hdr(syn);
--		struct tcp_fastopen_cookie tmp;
--		struct in6_addr *buf;
--		int i;
--
--		crypto_cipher_encrypt_one(tfm, tmp.val,
--					  (void *)&ip6h->saddr);
--		buf = &tmp.addr;
--		for (i = 0; i < 4; i++)
--			buf->s6_addr32[i] ^= ip6h->daddr.s6_addr32[i];
--		crypto_cipher_encrypt_one(tfm, foc->val, (void *)buf);
-+
-+		foc->val[0] = siphash(&ip6h->saddr,
-+				      sizeof(ip6h->saddr) +
-+				      sizeof(ip6h->daddr),
-+				      (const siphash_key_t *)key);
- 		foc->len = TCP_FASTOPEN_COOKIE_SIZE;
- 		return true;
- 	}
-@@ -173,11 +141,8 @@ static bool __tcp_fastopen_cookie_gen_cipher(struct request_sock *req,
- 	return false;
- }
- 
--/* Generate the fastopen cookie by doing aes128 encryption on both
-- * the source and destination addresses. Pad 0s for IPv4 or IPv4-mapped-IPv6
-- * addresses. For the longer IPv6 addresses use CBC-MAC.
-- *
-- * XXX (TFO) - refactor when TCP_FASTOPEN_COOKIE_SIZE != AES_BLOCK_SIZE.
-+/* Generate the fastopen cookie by applying SipHash to both the source and
-+ * destination addresses.
+-int nx_debugfs_init(struct nx_crypto_driver *);
++void nx_debugfs_init(struct nx_crypto_driver *);
+ void nx_debugfs_fini(struct nx_crypto_driver *);
+ #else
+ #define NX_DEBUGFS_INIT(drv)	(0)
+diff --git a/drivers/crypto/nx/nx_debugfs.c b/drivers/crypto/nx/nx_debugfs.c
+index 7ab2e8dcd9b4..add1d8d0d23c 100644
+--- a/drivers/crypto/nx/nx_debugfs.c
++++ b/drivers/crypto/nx/nx_debugfs.c
+@@ -42,62 +42,37 @@
+  * Documentation/ABI/testing/debugfs-pfo-nx-crypto
   */
- static void tcp_fastopen_cookie_gen(struct sock *sk,
- 				    struct request_sock *req,
-@@ -189,7 +154,7 @@ static void tcp_fastopen_cookie_gen(struct sock *sk,
- 	rcu_read_lock();
- 	ctx = tcp_fastopen_get_ctx(sk);
- 	if (ctx)
--		__tcp_fastopen_cookie_gen_cipher(req, syn, ctx->tfm[0], foc);
-+		__tcp_fastopen_cookie_gen_cipher(req, syn, ctx->key[0], foc);
- 	rcu_read_unlock();
+ 
+-int nx_debugfs_init(struct nx_crypto_driver *drv)
++void nx_debugfs_init(struct nx_crypto_driver *drv)
+ {
+-	struct nx_debugfs *dfs = &drv->dfs;
++	struct dentry *root;
+ 
+-	dfs->dfs_root = debugfs_create_dir(NX_NAME, NULL);
++	root = debugfs_create_dir(NX_NAME, NULL);
++	drv->dfs_root = root;
+ 
+-	dfs->dfs_aes_ops =
+-		debugfs_create_u32("aes_ops",
+-				   S_IRUSR | S_IRGRP | S_IROTH,
+-				   dfs->dfs_root, (u32 *)&drv->stats.aes_ops);
+-	dfs->dfs_sha256_ops =
+-		debugfs_create_u32("sha256_ops",
+-				   S_IRUSR | S_IRGRP | S_IROTH,
+-				   dfs->dfs_root,
+-				   (u32 *)&drv->stats.sha256_ops);
+-	dfs->dfs_sha512_ops =
+-		debugfs_create_u32("sha512_ops",
+-				   S_IRUSR | S_IRGRP | S_IROTH,
+-				   dfs->dfs_root,
+-				   (u32 *)&drv->stats.sha512_ops);
+-	dfs->dfs_aes_bytes =
+-		debugfs_create_u64("aes_bytes",
+-				   S_IRUSR | S_IRGRP | S_IROTH,
+-				   dfs->dfs_root,
+-				   (u64 *)&drv->stats.aes_bytes);
+-	dfs->dfs_sha256_bytes =
+-		debugfs_create_u64("sha256_bytes",
+-				   S_IRUSR | S_IRGRP | S_IROTH,
+-				   dfs->dfs_root,
+-				   (u64 *)&drv->stats.sha256_bytes);
+-	dfs->dfs_sha512_bytes =
+-		debugfs_create_u64("sha512_bytes",
+-				   S_IRUSR | S_IRGRP | S_IROTH,
+-				   dfs->dfs_root,
+-				   (u64 *)&drv->stats.sha512_bytes);
+-	dfs->dfs_errors =
+-		debugfs_create_u32("errors",
+-				   S_IRUSR | S_IRGRP | S_IROTH,
+-				   dfs->dfs_root, (u32 *)&drv->stats.errors);
+-	dfs->dfs_last_error =
+-		debugfs_create_u32("last_error",
+-				   S_IRUSR | S_IRGRP | S_IROTH,
+-				   dfs->dfs_root,
+-				   (u32 *)&drv->stats.last_error);
+-	dfs->dfs_last_error_pid =
+-		debugfs_create_u32("last_error_pid",
+-				   S_IRUSR | S_IRGRP | S_IROTH,
+-				   dfs->dfs_root,
+-				   (u32 *)&drv->stats.last_error_pid);
+-	return 0;
++	debugfs_create_u32("aes_ops", S_IRUSR | S_IRGRP | S_IROTH,
++			   root, (u32 *)&drv->stats.aes_ops);
++	debugfs_create_u32("sha256_ops", S_IRUSR | S_IRGRP | S_IROTH,
++			   root, (u32 *)&drv->stats.sha256_ops);
++	debugfs_create_u32("sha512_ops", S_IRUSR | S_IRGRP | S_IROTH,
++			   root, (u32 *)&drv->stats.sha512_ops);
++	debugfs_create_u64("aes_bytes", S_IRUSR | S_IRGRP | S_IROTH,
++			   root, (u64 *)&drv->stats.aes_bytes);
++	debugfs_create_u64("sha256_bytes", S_IRUSR | S_IRGRP | S_IROTH,
++			   root, (u64 *)&drv->stats.sha256_bytes);
++	debugfs_create_u64("sha512_bytes", S_IRUSR | S_IRGRP | S_IROTH,
++			   root, (u64 *)&drv->stats.sha512_bytes);
++	debugfs_create_u32("errors", S_IRUSR | S_IRGRP | S_IROTH,
++			   root, (u32 *)&drv->stats.errors);
++	debugfs_create_u32("last_error", S_IRUSR | S_IRGRP | S_IROTH,
++			   root, (u32 *)&drv->stats.last_error);
++	debugfs_create_u32("last_error_pid", S_IRUSR | S_IRGRP | S_IROTH,
++			   root, (u32 *)&drv->stats.last_error_pid);
  }
  
-@@ -253,7 +218,7 @@ static int tcp_fastopen_cookie_gen_check(struct sock *sk,
- 	if (!ctx)
- 		goto out;
- 	for (i = 0; i < tcp_fastopen_context_len(ctx); i++) {
--		__tcp_fastopen_cookie_gen_cipher(req, syn, ctx->tfm[i], foc);
-+		__tcp_fastopen_cookie_gen_cipher(req, syn, ctx->key[i], foc);
- 		if (tcp_fastopen_cookie_match(foc, orig)) {
- 			ret = i + 1;
- 			goto out;
+ void
+ nx_debugfs_fini(struct nx_crypto_driver *drv)
+ {
+-	debugfs_remove_recursive(drv->dfs.dfs_root);
++	debugfs_remove_recursive(drv->dfs_root);
+ }
+ 
+ #endif
 -- 
-2.20.1
+2.22.0
 
