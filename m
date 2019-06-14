@@ -2,129 +2,122 @@ Return-Path: <SRS0=me0G=UN=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FB6BC31E44
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jun 2019 11:32:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AE1EC468B0
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jun 2019 12:14:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2789320645
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jun 2019 11:32:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 02726208CA
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jun 2019 12:14:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="YxYlAoR0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GsreJhur"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727469AbfFNLcf (ORCPT
+        id S1727841AbfFNMOi (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Jun 2019 07:32:35 -0400
-Received: from mail-eopbgr30087.outbound.protection.outlook.com ([40.107.3.87]:30438
-        "EHLO EUR03-AM5-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727307AbfFNLce (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Jun 2019 07:32:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=f8fb3bJeZuVjmnFNb8No/0pPhO7hT4QzZSieGtZBDrA=;
- b=YxYlAoR06DejnMeEFeYyWbfX1LNN1fBLl0ANo4uN3F+vTapuBfThtrdNd0hlVfFYctzn8j7r5KlyHrcVgx/z6KB6GTkeyJBWna6D/J+UKJcvPjsI3ye1safZNFEHifAtE2u3XcoB34gdYIY3N80iYXAUw4pfxTSW6xNKmotmUpc=
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
- VI1PR0402MB3853.eurprd04.prod.outlook.com (52.134.16.149) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.1987.11; Fri, 14 Jun 2019 11:32:32 +0000
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::ccaf:f4a1:704a:e745]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::ccaf:f4a1:704a:e745%4]) with mapi id 15.20.1987.012; Fri, 14 Jun 2019
- 11:32:31 +0000
-From:   Horia Geanta <horia.geanta@nxp.com>
-To:     Christophe Leroy <christophe.leroy@c-s.fr>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
-Subject: Re: [PATCH v3 2/4] crypto: talitos - fix hash on SEC1.
-Thread-Topic: [PATCH v3 2/4] crypto: talitos - fix hash on SEC1.
-Thread-Index: AQHVIeZZjrISGczaNEaQ63Pip1dkoQ==
-Date:   Fri, 14 Jun 2019 11:32:31 +0000
-Message-ID: <VI1PR0402MB34855C37F53DC1012DAF670798EE0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-References: <cover.1560429844.git.christophe.leroy@c-s.fr>
- <732ca0ff440bf4cd589d844cfda71d96efd500f5.1560429844.git.christophe.leroy@c-s.fr>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=horia.geanta@nxp.com; 
-x-originating-ip: [212.146.100.6]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 58372b73-6d99-40b6-7d67-08d6f0bbfd59
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:VI1PR0402MB3853;
-x-ms-traffictypediagnostic: VI1PR0402MB3853:
-x-microsoft-antispam-prvs: <VI1PR0402MB3853FE478ADAD9714EB90B3C98EE0@VI1PR0402MB3853.eurprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:6790;
-x-forefront-prvs: 0068C7E410
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(979002)(376002)(396003)(366004)(136003)(346002)(39860400002)(199004)(189003)(305945005)(99286004)(14454004)(316002)(66446008)(7736002)(7696005)(110136005)(71200400001)(66556008)(2906002)(76176011)(66476007)(446003)(66066001)(66946007)(71190400001)(73956011)(55016002)(102836004)(3846002)(74316002)(6116002)(76116006)(54906003)(86362001)(6436002)(229853002)(478600001)(64756008)(14444005)(81156014)(81166006)(6246003)(8936002)(33656002)(4326008)(52536014)(9686003)(486006)(25786009)(8676002)(53936002)(186003)(5660300002)(53546011)(6506007)(44832011)(26005)(256004)(68736007)(476003)(969003)(989001)(999001)(1009001)(1019001);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB3853;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: nxp.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: xCpkA+4QuZX9q0Eoy+DJOpnFpJBGwzdMHn2buG6bL/pNKwrvwEQRpJcAwSIQNuM1nTcZHPQlC3FyL6o5/ABQIJDPHXUgKJUWbNQ7iAYv44/HH1Ty5jhaxUVH+TkbfzAhOgN7h5CwSQWlgZHQJoKiN53PlAlyQ6lb3XaZe8EZBOpHuTAnrLDAVKOyPyf70Go7Z5wgndlU0JjBKVO44ApYB8ZeJ8+j3CTtg8NYMgAZvfP9mTk2G5YLke50RanwDB6xJSky+1gBZm5MpbJdHTgbQ3tTcV+3wmXvc8bkYYgjCqDqPp8qWJdYKnWisXIJi+3D/N1YdS0QIfnYNthFcqD8+EarLlOP9SIkCon7TatkPb1SrYRNbc93SVgMsSq2hR+fZxETezIfKWlqRLouKX59pykE0fJD7A1Df0leHPTJkUA=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Fri, 14 Jun 2019 08:14:38 -0400
+Received: from mail-yb1-f195.google.com ([209.85.219.195]:46381 "EHLO
+        mail-yb1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727749AbfFNMOi (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 14 Jun 2019 08:14:38 -0400
+Received: by mail-yb1-f195.google.com with SMTP id p8so971722ybo.13
+        for <linux-crypto@vger.kernel.org>; Fri, 14 Jun 2019 05:14:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=fxAyGD5vJ/kR9ginAE3Gfq7t4d2qI4aWOePQcKJ48hY=;
+        b=GsreJhurrOR0opg8FhYeHPEU0dU+jqlkQFjq6LaQEUssfUF+4qzJywmHePvgFA6XbY
+         rNfXDi3GrpJHzn9g13UzG8VZiHOunSq5RASabtPNhx7qduZweU+/U8Slp1Q5QBJIklJ/
+         W8BRjk6byvGFN0pp89JDcEdDC/E8CSG2SHo4gBMFP1D7GFvMtrs9tm/RytXVteUrxRX2
+         pIE/i6DCaM3denM4Efj3kbbKJICRrmR3QLJJRvLrpdfFXZXwTEeJw3LGMsd05O/uktw9
+         dv1MWRFzPQcna2OvUGtEhGzIeQUfPUHJnLGuTqshAeTRjmvmWU2pdFUqafamXpJlxeF0
+         clsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=fxAyGD5vJ/kR9ginAE3Gfq7t4d2qI4aWOePQcKJ48hY=;
+        b=kb1KHb/APGz4l8L05eTUNwQ8Hq2ejH9j+QAtgwGmOJ2GOiHnUnt4Cub95zKYiW1i+0
+         z3C37VyxCj1rlxZwcuWAbd3ZiM/XyATm7IC0yuH8espiMkCr5HPsvMjcHk6OVSMhf7JK
+         cQUZbvGwyEetyikPVdZ8vYHWK9uycHCqVhFxJ0rbdYLGN4+6WYzrgaa34rC6V+f8LyHd
+         m5AHzJ+BWqVKAdPuHuDjx0xphXIXYPYDyObAlgvfehTJeL17OBPeCzFTg6+nMy2TMeFv
+         mTp0P71TuADxOiofUM02JoILgSs0lClDahVJoUah1wpmwipfoV2LI0GPFlgsoSnpP7LJ
+         IYvg==
+X-Gm-Message-State: APjAAAUTyxR7fxZ1T+ALjHKQqBSbi9cSOf98WQ2FoOqJUCceaWdxHd8B
+        uwt2fsSas/MZ64IK8z/bpRePvSu/tJUMIBtnVFIldg==
+X-Google-Smtp-Source: APXvYqwvARY/fYj5Wa7rpR0X0gcbqSHGBnBz7sAevY/M/KUSUEs4MvxCKPaDgDrSHn/HC5ZxJREXKd+gbkeRU62rRpM=
+X-Received: by 2002:a25:7642:: with SMTP id r63mr49787764ybc.253.1560514477257;
+ Fri, 14 Jun 2019 05:14:37 -0700 (PDT)
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 58372b73-6d99-40b6-7d67-08d6f0bbfd59
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Jun 2019 11:32:31.7675
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: horia.geanta@nxp.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3853
+References: <20190614111407.26725-1-ard.biesheuvel@linaro.org>
+In-Reply-To: <20190614111407.26725-1-ard.biesheuvel@linaro.org>
+From:   Eric Dumazet <edumazet@google.com>
+Date:   Fri, 14 Jun 2019 05:14:26 -0700
+Message-ID: <CANn89iKNKKCF_yFAwjCvMqscOkRUFeDRXyFT0+s_hRbjG4wi8A@mail.gmail.com>
+Subject: Re: [RFC PATCH] net: ipv4: move tcp_fastopen server side code to
+ SipHash library
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     netdev <netdev@vger.kernel.org>, linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>, ebigger@kernel.org,
+        David Miller <davem@davemloft.net>,
+        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 6/13/2019 3:48 PM, Christophe Leroy wrote:=0A=
-> @@ -336,15 +336,18 @@ static void flush_channel(struct device *dev, int c=
-h, int error, int reset_ch)=0A=
->  	tail =3D priv->chan[ch].tail;=0A=
->  	while (priv->chan[ch].fifo[tail].desc) {=0A=
->  		__be32 hdr;=0A=
-> +		struct talitos_edesc *edesc;=0A=
->  =0A=
->  		request =3D &priv->chan[ch].fifo[tail];=0A=
-> +		edesc =3D container_of(request->desc, struct talitos_edesc, desc);=0A=
-Not needed for all cases, should be moved to the block that uses it.=0A=
-=0A=
->  =0A=
->  		/* descriptors with their done bits set don't get the error */=0A=
->  		rmb();=0A=
->  		if (!is_sec1)=0A=
->  			hdr =3D request->desc->hdr;=0A=
->  		else if (request->desc->next_desc)=0A=
-> -			hdr =3D (request->desc + 1)->hdr1;=0A=
-> +			hdr =3D ((struct talitos_desc *)=0A=
-> +			       (edesc->buf + edesc->dma_len))->hdr1;=0A=
->  		else=0A=
->  			hdr =3D request->desc->hdr1;=0A=
->  =0A=
-[snip]=0A=
-> @@ -2058,7 +2065,18 @@ static int ahash_process_req(struct ahash_request =
-*areq, unsigned int nbytes)=0A=
->  		sg_copy_to_buffer(areq->src, nents,=0A=
->  				  ctx_buf + req_ctx->nbuf, offset);=0A=
->  		req_ctx->nbuf +=3D offset;=0A=
-> -		req_ctx->psrc =3D areq->src;=0A=
-> +		for (sg =3D areq->src; sg && offset >=3D sg->length;=0A=
-> +		     offset -=3D sg->length, sg =3D sg_next(sg))=0A=
-> +			;=0A=
-> +		if (offset) {=0A=
-> +			sg_init_table(req_ctx->bufsl, 2);=0A=
-> +			sg_set_buf(req_ctx->bufsl, sg_virt(sg) + offset,=0A=
-> +				   sg->length - offset);=0A=
-> +			sg_chain(req_ctx->bufsl, 2, sg_next(sg));=0A=
-> +			req_ctx->psrc =3D req_ctx->bufsl;=0A=
-Isn't this what scatterwalk_ffwd() does?=0A=
-=0A=
-Horia=0A=
+On Fri, Jun 14, 2019 at 4:14 AM Ard Biesheuvel
+<ard.biesheuvel@linaro.org> wrote:
+>
+> Using a bare block cipher in non-crypto code is almost always a bad idea,
+> not only for security reasons (and we've seen some examples of this in
+> the kernel in the past), but also for performance reasons.
+>
+> In the TCP fastopen case, we call into the bare AES block cipher one or
+> two times (depending on whether the connection is IPv4 or IPv6). On most
+> systems, this results in a call chain such as
+>
+>   crypto_cipher_encrypt_one(ctx, dst, src)
+>     crypto_cipher_crt(tfm)->cit_encrypt_one(crypto_cipher_tfm(tfm), ...);
+>       aesni_encrypt
+>         kernel_fpu_begin();
+>         aesni_enc(ctx, dst, src); // asm routine
+>         kernel_fpu_end();
+>
+> It is highly unlikely that the use of special AES instructions has a
+> benefit in this case, especially since we are doing the above twice
+> for IPv6 connections, instead of using a transform which can process
+> the entire input in one go.
+>
+> We could switch to the cbcmac(aes) shash, which would at least get
+> rid of the duplicated overhead in *some* cases (i.e., today, only
+> arm64 has an accelerated implementation of cbcmac(aes), while x86 will
+> end up using the generic cbcmac template wrapping the AES-NI cipher,
+> which basically ends up doing exactly the above). However, in the given
+> context, it makes more sense to use a light-weight MAC algorithm that
+> is more suitable for the purpose at hand, such as SipHash.
+>
+> Since the output size of SipHash already matches our chosen value for
+> TCP_FASTOPEN_COOKIE_SIZE, and given that it accepts arbitrary input
+> sizes, this greatly simplifies the code as well.
+>
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> ---
+> NOTE: This approach assumes that there are no external dependencies,
+>       i.e., that there are no tools that implement the same algorithm
+>       to calculate TCP fastopen cookies outside of the kernel.
+>
+
+SGTM, but please base your patch on top of David Miller net-next tree,
+since fastopen has changed a bit for 5.3
+with Jason Baron and Christoph Paasch work.
+
+(Also please CC them at next submission)
+
+Thanks !
