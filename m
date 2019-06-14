@@ -2,122 +2,107 @@ Return-Path: <SRS0=me0G=UN=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AE1EC468B0
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jun 2019 12:14:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7375DC31E4D
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jun 2019 12:37:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 02726208CA
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jun 2019 12:14:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GsreJhur"
+	by mail.kernel.org (Postfix) with ESMTP id 54F862133D
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jun 2019 12:37:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727841AbfFNMOi (ORCPT
+        id S1727823AbfFNMh4 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Jun 2019 08:14:38 -0400
-Received: from mail-yb1-f195.google.com ([209.85.219.195]:46381 "EHLO
-        mail-yb1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727749AbfFNMOi (ORCPT
+        Fri, 14 Jun 2019 08:37:56 -0400
+Received: from eu-smtp-delivery-151.mimecast.com ([146.101.78.151]:39562 "EHLO
+        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727682AbfFNMh4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Jun 2019 08:14:38 -0400
-Received: by mail-yb1-f195.google.com with SMTP id p8so971722ybo.13
-        for <linux-crypto@vger.kernel.org>; Fri, 14 Jun 2019 05:14:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=fxAyGD5vJ/kR9ginAE3Gfq7t4d2qI4aWOePQcKJ48hY=;
-        b=GsreJhurrOR0opg8FhYeHPEU0dU+jqlkQFjq6LaQEUssfUF+4qzJywmHePvgFA6XbY
-         rNfXDi3GrpJHzn9g13UzG8VZiHOunSq5RASabtPNhx7qduZweU+/U8Slp1Q5QBJIklJ/
-         W8BRjk6byvGFN0pp89JDcEdDC/E8CSG2SHo4gBMFP1D7GFvMtrs9tm/RytXVteUrxRX2
-         pIE/i6DCaM3denM4Efj3kbbKJICRrmR3QLJJRvLrpdfFXZXwTEeJw3LGMsd05O/uktw9
-         dv1MWRFzPQcna2OvUGtEhGzIeQUfPUHJnLGuTqshAeTRjmvmWU2pdFUqafamXpJlxeF0
-         clsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=fxAyGD5vJ/kR9ginAE3Gfq7t4d2qI4aWOePQcKJ48hY=;
-        b=kb1KHb/APGz4l8L05eTUNwQ8Hq2ejH9j+QAtgwGmOJ2GOiHnUnt4Cub95zKYiW1i+0
-         z3C37VyxCj1rlxZwcuWAbd3ZiM/XyATm7IC0yuH8espiMkCr5HPsvMjcHk6OVSMhf7JK
-         cQUZbvGwyEetyikPVdZ8vYHWK9uycHCqVhFxJ0rbdYLGN4+6WYzrgaa34rC6V+f8LyHd
-         m5AHzJ+BWqVKAdPuHuDjx0xphXIXYPYDyObAlgvfehTJeL17OBPeCzFTg6+nMy2TMeFv
-         mTp0P71TuADxOiofUM02JoILgSs0lClDahVJoUah1wpmwipfoV2LI0GPFlgsoSnpP7LJ
-         IYvg==
-X-Gm-Message-State: APjAAAUTyxR7fxZ1T+ALjHKQqBSbi9cSOf98WQ2FoOqJUCceaWdxHd8B
-        uwt2fsSas/MZ64IK8z/bpRePvSu/tJUMIBtnVFIldg==
-X-Google-Smtp-Source: APXvYqwvARY/fYj5Wa7rpR0X0gcbqSHGBnBz7sAevY/M/KUSUEs4MvxCKPaDgDrSHn/HC5ZxJREXKd+gbkeRU62rRpM=
-X-Received: by 2002:a25:7642:: with SMTP id r63mr49787764ybc.253.1560514477257;
- Fri, 14 Jun 2019 05:14:37 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190614111407.26725-1-ard.biesheuvel@linaro.org>
-In-Reply-To: <20190614111407.26725-1-ard.biesheuvel@linaro.org>
-From:   Eric Dumazet <edumazet@google.com>
-Date:   Fri, 14 Jun 2019 05:14:26 -0700
-Message-ID: <CANn89iKNKKCF_yFAwjCvMqscOkRUFeDRXyFT0+s_hRbjG4wi8A@mail.gmail.com>
-Subject: Re: [RFC PATCH] net: ipv4: move tcp_fastopen server side code to
+        Fri, 14 Jun 2019 08:37:56 -0400
+Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
+ TLS) by relay.mimecast.com with ESMTP id
+ uk-mta-213-0gn1Q4tvNMyM3Cl0DIQUng-1; Fri, 14 Jun 2019 13:37:53 +0100
+Received: from AcuMS.Aculab.com (fd9f:af1c:a25b::d117) by AcuMS.aculab.com
+ (fd9f:af1c:a25b::d117) with Microsoft SMTP Server (TLS) id 15.0.1347.2; Fri,
+ 14 Jun 2019 13:37:53 +0100
+Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
+ AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
+ Fri, 14 Jun 2019 13:37:53 +0100
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'Ard Biesheuvel' <ard.biesheuvel@linaro.org>,
+        "<netdev@vger.kernel.org>" <netdev@vger.kernel.org>,
+        Eric Biggers <ebiggers@google.com>
+CC:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Eric Dumazet <edumazet@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        "kuznet@ms2.inr.ac.ru" <kuznet@ms2.inr.ac.ru>,
+        "yoshfuji@linux-ipv6.org" <yoshfuji@linux-ipv6.org>
+Subject: RE: [RFC PATCH] net: ipv4: move tcp_fastopen server side code to
  SipHash library
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc:     netdev <netdev@vger.kernel.org>, linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>, ebigger@kernel.org,
-        David Miller <davem@davemloft.net>,
-        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>
-Content-Type: text/plain; charset="UTF-8"
+Thread-Topic: [RFC PATCH] net: ipv4: move tcp_fastopen server side code to
+ SipHash library
+Thread-Index: AQHVIqJ4o+VgbHBQRkWOOrrkh1L6uaabFnAA
+Date:   Fri, 14 Jun 2019 12:37:53 +0000
+Message-ID: <6c21f1d9b4f54f1a82a98c9a4971e493@AcuMS.aculab.com>
+References: <20190614111407.26725-1-ard.biesheuvel@linaro.org>
+ <CAKv+Gu8SoEbsLyP5GWV+qX_F=z-yT67xdQJEeo2Vuaf2tt2+Qw@mail.gmail.com>
+In-Reply-To: <CAKv+Gu8SoEbsLyP5GWV+qX_F=z-yT67xdQJEeo2Vuaf2tt2+Qw@mail.gmail.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
+MIME-Version: 1.0
+X-MC-Unique: 0gn1Q4tvNMyM3Cl0DIQUng-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jun 14, 2019 at 4:14 AM Ard Biesheuvel
-<ard.biesheuvel@linaro.org> wrote:
->
-> Using a bare block cipher in non-crypto code is almost always a bad idea,
-> not only for security reasons (and we've seen some examples of this in
-> the kernel in the past), but also for performance reasons.
->
-> In the TCP fastopen case, we call into the bare AES block cipher one or
-> two times (depending on whether the connection is IPv4 or IPv6). On most
-> systems, this results in a call chain such as
->
->   crypto_cipher_encrypt_one(ctx, dst, src)
->     crypto_cipher_crt(tfm)->cit_encrypt_one(crypto_cipher_tfm(tfm), ...);
->       aesni_encrypt
->         kernel_fpu_begin();
->         aesni_enc(ctx, dst, src); // asm routine
->         kernel_fpu_end();
->
-> It is highly unlikely that the use of special AES instructions has a
-> benefit in this case, especially since we are doing the above twice
-> for IPv6 connections, instead of using a transform which can process
-> the entire input in one go.
->
-> We could switch to the cbcmac(aes) shash, which would at least get
-> rid of the duplicated overhead in *some* cases (i.e., today, only
-> arm64 has an accelerated implementation of cbcmac(aes), while x86 will
-> end up using the generic cbcmac template wrapping the AES-NI cipher,
-> which basically ends up doing exactly the above). However, in the given
-> context, it makes more sense to use a light-weight MAC algorithm that
-> is more suitable for the purpose at hand, such as SipHash.
->
-> Since the output size of SipHash already matches our chosen value for
-> TCP_FASTOPEN_COOKIE_SIZE, and given that it accepts arbitrary input
-> sizes, this greatly simplifies the code as well.
->
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> ---
-> NOTE: This approach assumes that there are no external dependencies,
->       i.e., that there are no tools that implement the same algorithm
->       to calculate TCP fastopen cookies outside of the kernel.
->
+RnJvbTogQXJkIEJpZXNoZXV2ZWwNCj4gU2VudDogMTQgSnVuZSAyMDE5IDEyOjE1DQo+IChmaXgg
+RXJpYydzIGVtYWlsIGFkZHJlc3MpDQo+IA0KPiBPbiBGcmksIDE0IEp1biAyMDE5IGF0IDEzOjE0
+LCBBcmQgQmllc2hldXZlbCA8YXJkLmJpZXNoZXV2ZWxAbGluYXJvLm9yZz4gd3JvdGU6DQo+ID4N
+Cj4gPiBVc2luZyBhIGJhcmUgYmxvY2sgY2lwaGVyIGluIG5vbi1jcnlwdG8gY29kZSBpcyBhbG1v
+c3QgYWx3YXlzIGEgYmFkIGlkZWEsDQo+ID4gbm90IG9ubHkgZm9yIHNlY3VyaXR5IHJlYXNvbnMg
+KGFuZCB3ZSd2ZSBzZWVuIHNvbWUgZXhhbXBsZXMgb2YgdGhpcyBpbg0KPiA+IHRoZSBrZXJuZWwg
+aW4gdGhlIHBhc3QpLCBidXQgYWxzbyBmb3IgcGVyZm9ybWFuY2UgcmVhc29ucy4NCj4gPg0KPiA+
+IEluIHRoZSBUQ1AgZmFzdG9wZW4gY2FzZSwgd2UgY2FsbCBpbnRvIHRoZSBiYXJlIEFFUyBibG9j
+ayBjaXBoZXIgb25lIG9yDQo+ID4gdHdvIHRpbWVzIChkZXBlbmRpbmcgb24gd2hldGhlciB0aGUg
+Y29ubmVjdGlvbiBpcyBJUHY0IG9yIElQdjYpLiBPbiBtb3N0DQo+ID4gc3lzdGVtcywgdGhpcyBy
+ZXN1bHRzIGluIGEgY2FsbCBjaGFpbiBzdWNoIGFzDQo+ID4NCj4gPiAgIGNyeXB0b19jaXBoZXJf
+ZW5jcnlwdF9vbmUoY3R4LCBkc3QsIHNyYykNCj4gPiAgICAgY3J5cHRvX2NpcGhlcl9jcnQodGZt
+KS0+Y2l0X2VuY3J5cHRfb25lKGNyeXB0b19jaXBoZXJfdGZtKHRmbSksIC4uLik7DQo+ID4gICAg
+ICAgYWVzbmlfZW5jcnlwdA0KPiA+ICAgICAgICAga2VybmVsX2ZwdV9iZWdpbigpOw0KPiA+ICAg
+ICAgICAgYWVzbmlfZW5jKGN0eCwgZHN0LCBzcmMpOyAvLyBhc20gcm91dGluZQ0KPiA+ICAgICAg
+ICAga2VybmVsX2ZwdV9lbmQoKTsNCj4gPg0KPiA+IEl0IGlzIGhpZ2hseSB1bmxpa2VseSB0aGF0
+IHRoZSB1c2Ugb2Ygc3BlY2lhbCBBRVMgaW5zdHJ1Y3Rpb25zIGhhcyBhDQo+ID4gYmVuZWZpdCBp
+biB0aGlzIGNhc2UsIGVzcGVjaWFsbHkgc2luY2Ugd2UgYXJlIGRvaW5nIHRoZSBhYm92ZSB0d2lj
+ZQ0KPiA+IGZvciBJUHY2IGNvbm5lY3Rpb25zLCBpbnN0ZWFkIG9mIHVzaW5nIGEgdHJhbnNmb3Jt
+IHdoaWNoIGNhbiBwcm9jZXNzDQo+ID4gdGhlIGVudGlyZSBpbnB1dCBpbiBvbmUgZ28uDQo+ID4N
+Cj4gPiBXZSBjb3VsZCBzd2l0Y2ggdG8gdGhlIGNiY21hYyhhZXMpIHNoYXNoLCB3aGljaCB3b3Vs
+ZCBhdCBsZWFzdCBnZXQNCj4gPiByaWQgb2YgdGhlIGR1cGxpY2F0ZWQgb3ZlcmhlYWQgaW4gKnNv
+bWUqIGNhc2VzIChpLmUuLCB0b2RheSwgb25seQ0KPiA+IGFybTY0IGhhcyBhbiBhY2NlbGVyYXRl
+ZCBpbXBsZW1lbnRhdGlvbiBvZiBjYmNtYWMoYWVzKSwgd2hpbGUgeDg2IHdpbGwNCj4gPiBlbmQg
+dXAgdXNpbmcgdGhlIGdlbmVyaWMgY2JjbWFjIHRlbXBsYXRlIHdyYXBwaW5nIHRoZSBBRVMtTkkg
+Y2lwaGVyLA0KPiA+IHdoaWNoIGJhc2ljYWxseSBlbmRzIHVwIGRvaW5nIGV4YWN0bHkgdGhlIGFi
+b3ZlKS4gSG93ZXZlciwgaW4gdGhlIGdpdmVuDQo+ID4gY29udGV4dCwgaXQgbWFrZXMgbW9yZSBz
+ZW5zZSB0byB1c2UgYSBsaWdodC13ZWlnaHQgTUFDIGFsZ29yaXRobSB0aGF0DQo+ID4gaXMgbW9y
+ZSBzdWl0YWJsZSBmb3IgdGhlIHB1cnBvc2UgYXQgaGFuZCwgc3VjaCBhcyBTaXBIYXNoLg0KPiA+
+DQo+ID4gU2luY2UgdGhlIG91dHB1dCBzaXplIG9mIFNpcEhhc2ggYWxyZWFkeSBtYXRjaGVzIG91
+ciBjaG9zZW4gdmFsdWUgZm9yDQo+ID4gVENQX0ZBU1RPUEVOX0NPT0tJRV9TSVpFLCBhbmQgZ2l2
+ZW4gdGhhdCBpdCBhY2NlcHRzIGFyYml0cmFyeSBpbnB1dA0KPiA+IHNpemVzLCB0aGlzIGdyZWF0
+bHkgc2ltcGxpZmllcyB0aGUgY29kZSBhcyB3ZWxsLg0KLi4uDQo+ID4gKyAgICAgICBCVUlMRF9C
+VUdfT04oc2l6ZW9mKHNpcGhhc2hfa2V5X3QpICE9IFRDUF9GQVNUT1BFTl9LRVlfTEVOR1RIKTsN
+Cj4gPiArICAgICAgIEJVSUxEX0JVR19PTihzaXplb2YodTY0KSAhPSBUQ1BfRkFTVE9QRU5fQ09P
+S0lFX1NJWkUpOw0KDQpUaG9zZSBjb21wYXJpc29ucyBhcmUgYmFja3dhcmRzLg0KDQoJRGF2aWQN
+Cg0KLQ0KUmVnaXN0ZXJlZCBBZGRyZXNzIExha2VzaWRlLCBCcmFtbGV5IFJvYWQsIE1vdW50IEZh
+cm0sIE1pbHRvbiBLZXluZXMsIE1LMSAxUFQsIFVLDQpSZWdpc3RyYXRpb24gTm86IDEzOTczODYg
+KFdhbGVzKQ0K
 
-SGTM, but please base your patch on top of David Miller net-next tree,
-since fastopen has changed a bit for 5.3
-with Jason Baron and Christoph Paasch work.
-
-(Also please CC them at next submission)
-
-Thanks !
