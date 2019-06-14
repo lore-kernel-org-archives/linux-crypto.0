@@ -4,66 +4,66 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D44DCC31E44
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jun 2019 09:36:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBE83C31E4B
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jun 2019 09:42:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A05432133D
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jun 2019 09:36:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9A3492084E
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jun 2019 09:42:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Y/CNx4L9"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zBXs+2W3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726784AbfFNJgI (ORCPT
+        id S1726083AbfFNJm5 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Jun 2019 05:36:08 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:45596 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726083AbfFNJgI (ORCPT
+        Fri, 14 Jun 2019 05:42:57 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:35871 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726900AbfFNJm5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Jun 2019 05:36:08 -0400
-Received: by mail-wr1-f68.google.com with SMTP id f9so1739942wre.12
-        for <linux-crypto@vger.kernel.org>; Fri, 14 Jun 2019 02:36:06 -0700 (PDT)
+        Fri, 14 Jun 2019 05:42:57 -0400
+Received: by mail-wr1-f65.google.com with SMTP id n4so1820997wrs.3
+        for <linux-crypto@vger.kernel.org>; Fri, 14 Jun 2019 02:42:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
         bh=1tGskau943T386kyJZ4GTkvXE83xs6wkbIyb/EV2Rpk=;
-        b=Y/CNx4L9VyVGfMTAWiKtKaJ81EJxZFYOlWZJ3RtsxYoKVeNFQt7lIQYQfdvxkDSVvO
-         ChOqSLc6wManoqjid9a86zGIIdKkGPIPcyg/oIf81fM5DokeCm3cP9R4eQC3bv1+W0NS
-         jTl0l23W5MXOqujBSEb9zOJX4fd/IxY+GWi/dY5y7SU9RPtLQFYDx5S7DRmnR+s3PWzl
-         PVa4B+45zS0Y9ifdm2yhDL1wr5m96QeDQuNdExqdwYDomNfZzpiNHVKSr0aW2S440jbS
-         Od6B1vXUzoJPvYPCgng1MpisQ7wJ0Ki3Cliu4GZ1DTqQqe//9yASEIeL6xmP6x8RbOVd
-         Ot3A==
+        b=zBXs+2W3UpOSNa9yIXR5X5C5PcdW90YRk8Xk9269IPzzdpM8TE+9iwWo5jDl1c7kci
+         AZaep9/v4N4zUEnNrGWNN37lVGPWtPR7EOK1ZfxjgUh+zPidqS8LivsyBx3wVdxFEemt
+         VjvWkfqx9Myp9n1FlZXxOxIfqMAgf6hvM8dVACwchgf+CkuBRLIiI07KVj922iYSNCo6
+         QB0vpfWtjDnEETJk2AcQ2S8hXnhjVTVrnZL5N84OJFZLr69PQB6aGLDmmLjtKRPw+ErB
+         y/P6YHCIqlWHJUhlI4GNs5/3jbDocHbZAoh+MrXEL6MO+jlapfEpk3Vnl3RaqnxwNpvL
+         OezQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
         bh=1tGskau943T386kyJZ4GTkvXE83xs6wkbIyb/EV2Rpk=;
-        b=sNSD2YFzlFiU+FzU9GLXWt7ZTGJf8Vp0sQwnXKFUqirIz2NVa24AmcC/iGmjdvbp/Y
-         TaJIVcZrdvHRkUn+TohUJsy8cyQCY+/5gx/VOLC+uQt9dFPU3dGcZBAUvZ3FGw6KfCnz
-         hZfaGw7Ic1dgDGGnvVEreZp3pkmlh7VEJK4+uDfmfzT3FUhCcAHX3LLxJJVQ/ftGBLd2
-         0528VEnEtaR076Gn5M4Ei+/mhBorMjYTsR322oyD+k8N2hFDdoYWLqXaxWXr4ktokusS
-         E5NpHNv6KNP1fyo3Yu8b7uW5z6eyeNECdaJtm7wtjFnCiX1RUsuU4MJuhpxdIvBqBVHW
-         L4Ow==
-X-Gm-Message-State: APjAAAXUsC0R9Hu8Vo4ouo4EHtCP2tN099skuRmGAWXx0JNN8qMgG1Ug
-        RVZ1axmblSvGweBpJYCX9O2Onw==
-X-Google-Smtp-Source: APXvYqwyDSumK+XyFiqwW8Qv/hrRrcOr3E3Q/uHc65nZw1hG/n0VN2Xi20DbXVRgm6yP++3J911mbA==
-X-Received: by 2002:adf:afde:: with SMTP id y30mr2274806wrd.197.1560504966014;
-        Fri, 14 Jun 2019 02:36:06 -0700 (PDT)
+        b=IzsPAX+iNQDtxceGbR8i486JC2OmOmTr/yT+jWKTufESQ16QGSoTvTEkEwPl/ugf0h
+         O4ROiaROdPtFjVWf/cidhgvNtG8IH/bXtUbs55aHiBw479SQgvHpYsUMkTV6yfLp7t2H
+         f0qimKtj+noKZNRyNqUMEniNUQNYnZwxSgJpV7qSJJn27D6X+6jQqO9zoi0s4m/DwjhZ
+         qhpV7mfItT6XbU2fCTMfVhIDIRrZtEj218JX3kYukyWWIHxgZa6Uf9CfHFLYlvMJJmQX
+         eFTA0RpdJ1iXhquRRKOT+BsRi2Onf3GZcemmK2kHfp7Unun4tjVnU/qfXJtndzkXlfxE
+         VaVA==
+X-Gm-Message-State: APjAAAUk1bjMfc86Mhdrg7gnSMHXIq2U3RmxpZAEIQDzU3nI4EtjipgT
+        XYBdOAiUFqjmtJFXpmh0opqtVA==
+X-Google-Smtp-Source: APXvYqx0Db3o3ZFAEBSbPaDuezp3pPOGT2TknFdYmxY96lSJbhl/a9mWkPJqEcokRvgXBp2rPlJIuQ==
+X-Received: by 2002:adf:ef8d:: with SMTP id d13mr47605958wro.60.1560505373986;
+        Fri, 14 Jun 2019 02:42:53 -0700 (PDT)
 Received: from sudo.home ([2a01:cb1d:112:6f00:8d0e:a5b1:c005:e3b5])
-        by smtp.gmail.com with ESMTPSA id 11sm2965086wmd.23.2019.06.14.02.36.05
+        by smtp.gmail.com with ESMTPSA id d10sm3502267wrp.74.2019.06.14.02.42.53
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 14 Jun 2019 02:36:05 -0700 (PDT)
+        Fri, 14 Jun 2019 02:42:53 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To:     linux-wireless@vger.kernel.org
-Cc:     kvalo@codeaurora.org, linux-crypto@vger.kernel.org,
+To:     linux-usb@vger.kernel.org
+Cc:     gregkh@linuxfoundation.org, linux-crypto@vger.kernel.org,
         ebiggers@kernel.org, herbert@gondor.apana.org.au,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Subject: [PATCH] wireless: airo: switch to skcipher interface
-Date:   Fri, 14 Jun 2019 11:36:03 +0200
-Message-Id: <20190614093603.22771-1-ard.biesheuvel@linaro.org>
+Date:   Fri, 14 Jun 2019 11:42:50 +0200
+Message-Id: <20190614094250.22997-1-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
