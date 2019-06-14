@@ -2,235 +2,122 @@ Return-Path: <SRS0=me0G=UN=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
+X-Spam-Status: No, score=-11.3 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D3D1C31E4B
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jun 2019 14:29:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 470A0C31E4B
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jun 2019 15:34:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EAE7121537
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jun 2019 14:29:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1560522549;
-	bh=cY7qQ7vl0+egy4AL6ZDqmTDm4h2jklkJUrmVOLowupA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=lrI3PxCtOieBEHDtllg++VIegD5CKBZtReLlsysNIg50rWRTV6edk1R6MN6VY8Fc9
-	 71pn7fpTdg7tFDv1I/NkQVaPlEPrHu3IqXlwnaRYqfQ6nGqUS+Vc8xOZLmqseHoWxO
-	 hdYnbdpON4Nb7zPL1De8y6rdTG8owDBOBaa2tPIk=
+	by mail.kernel.org (Postfix) with ESMTP id 1FD9B2177E
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jun 2019 15:34:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nxrt4giW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728121AbfFNO3I (ORCPT
+        id S1726784AbfFNPea (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Jun 2019 10:29:08 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33112 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728246AbfFNO3I (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Jun 2019 10:29:08 -0400
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 9103420866;
-        Fri, 14 Jun 2019 14:29:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1560522547;
-        bh=cY7qQ7vl0+egy4AL6ZDqmTDm4h2jklkJUrmVOLowupA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=eiq/xb+UdPxWqpEOmZmONEuKxa+SiiyvP9eYhCH3UgRBUIvfH0GN9HEM0EyX5u+nV
-         RUbpqwvtSYeCYQXjqaywHQzWTqhJFoHyZwqfs05GdA56xHZCJTfDvE9I0jozAGTEDQ
-         FNqGKrn/YTKGOEjp3fGLFj/D0RUOKHFpybtaugVk=
-Date:   Fri, 14 Jun 2019 16:29:04 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Breno =?iso-8859-1?Q?Leit=E3o?= <leitao@debian.org>,
-        Nayna Jain <nayna@linux.ibm.com>,
-        Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH v2] crypto: nx: no need to check return value of
- debugfs_create functions
-Message-ID: <20190614142904.GA11066@kroah.com>
-References: <20190614135031.GA5809@kroah.com>
+        Fri, 14 Jun 2019 11:34:30 -0400
+Received: from mail-yb1-f195.google.com ([209.85.219.195]:37605 "EHLO
+        mail-yb1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726754AbfFNPe3 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 14 Jun 2019 11:34:29 -0400
+Received: by mail-yb1-f195.google.com with SMTP id v144so1246471ybb.4
+        for <linux-crypto@vger.kernel.org>; Fri, 14 Jun 2019 08:34:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ZvSLdb4tGoj1KerVcujZWEcT0dZuhjXYXXie7nT7mXw=;
+        b=nxrt4giWUlhE9biCVR+Nf7l0dQrFKvxLWDlX56RbVNxUEL0bUAFHio4l+uzl0nCxh7
+         xXzwrZb2/VMVmB+aSmN56g905HvDn3pCUAGYNxE7lgaqutKZ1nzEtyOuvhGIdaUqZWnO
+         iwxssJBIDgARes03cNAnQxvq0Dawjb1fSsJgBu8clFk87sKOVkvglbqQV3ArKpwt6YEY
+         U0yhmXm8J5eHwfiEs6Vzf64EyDO/hlefYNr8XiDq9Xwgo4Bt8mHGoKc5wR3Umn5k4VRm
+         PysrCqMQJpRReJvso+/R9WYMkI5EyDmBVUwyI4P9kGBArUktyJcbMOmfUlNvfdkoZDtt
+         cflQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ZvSLdb4tGoj1KerVcujZWEcT0dZuhjXYXXie7nT7mXw=;
+        b=udOzB9gnnwoEz6VvVGUtYoiOKY/u9fvct6ZWHGSwDqXmfc+PafZg1h3qPmLF1uM7Ut
+         6KxPfZDd8cHKf2Ipr3BvOSbroCtjXDnxdQnOtp/i84KuoW8ZfC0N5H1QFgTlHUqXRw2K
+         YUBPqY+zKWAyqHRhI2NUaVFedPBjhKiFGxH4hN5XnNmfroxuTewGJCkdy0oRMenXhVol
+         /eVJsHFisqECCC14dMmLsmjVu7V4h8xF/aE/7/WG8qI2qqPvmB8TzkMmrXZZ0HFGtugQ
+         IKXihsEuR1enaqbcwptWhvDFYs15J0UQlMo7j1EwX5C5JPjI+dxvipY5kg3zaenx50gF
+         11YQ==
+X-Gm-Message-State: APjAAAVaeJDOGpbVvu5tFjfZaosYPcwh7sg6CeG98PiAfyOq2ujBADDC
+        Ywf63tEC9Q4qUj2p2Kh4l+OmTgK4/9r7ZPuQOPjsRkWhWcw=
+X-Google-Smtp-Source: APXvYqxJrrGfUL+aUSndZe9HBl/gZBDc+JU5kN+yx29GOggyBQLueAHuwXlwxFosnw1LNNcCP2ngQVFfaoX1rv+mQ8E=
+X-Received: by 2002:a25:55d7:: with SMTP id j206mr50996255ybb.234.1560526468360;
+ Fri, 14 Jun 2019 08:34:28 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190614135031.GA5809@kroah.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
+References: <20190614140122.20934-1-ard.biesheuvel@linaro.org>
+In-Reply-To: <20190614140122.20934-1-ard.biesheuvel@linaro.org>
+From:   Eric Dumazet <edumazet@google.com>
+Date:   Fri, 14 Jun 2019 08:34:16 -0700
+Message-ID: <CANn89iKP2fQ6Tc0jBW_WdLq3kYQx7NsdVDB5S3y453T+6yp86g@mail.gmail.com>
+Subject: Re: [PATCH v2] net: ipv4: move tcp_fastopen server side code to
+ SipHash library
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     netdev <netdev@vger.kernel.org>, linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>, ebiggers@kernel.org,
+        David Miller <davem@davemloft.net>,
+        Jason Baron <jbaron@akamai.com>,
+        Christoph Paasch <cpaasch@apple.com>,
+        David Laight <David.Laight@aculab.com>,
+        Yuchung Cheng <ycheng@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-When calling debugfs functions, there is no need to ever check the
-return value.  The function can work or not, but the code logic should
-never do something different based on this.
+On Fri, Jun 14, 2019 at 7:01 AM Ard Biesheuvel
+<ard.biesheuvel@linaro.org> wrote:
+>
+> Using a bare block cipher in non-crypto code is almost always a bad idea,
+> not only for security reasons (and we've seen some examples of this in
+> the kernel in the past), but also for performance reasons.
+>
+> In the TCP fastopen case, we call into the bare AES block cipher one or
+> two times (depending on whether the connection is IPv4 or IPv6). On most
+> systems, this results in a call chain such as
+>
+>   crypto_cipher_encrypt_one(ctx, dst, src)
+>     crypto_cipher_crt(tfm)->cit_encrypt_one(crypto_cipher_tfm(tfm), ...);
+>       aesni_encrypt
+>         kernel_fpu_begin();
+>         aesni_enc(ctx, dst, src); // asm routine
+>         kernel_fpu_end();
+>
+> It is highly unlikely that the use of special AES instructions has a
+> benefit in this case, especially since we are doing the above twice
+> for IPv6 connections, instead of using a transform which can process
+> the entire input in one go.
+>
+> We could switch to the cbcmac(aes) shash, which would at least get
+> rid of the duplicated overhead in *some* cases (i.e., today, only
+> arm64 has an accelerated implementation of cbcmac(aes), while x86 will
+> end up using the generic cbcmac template wrapping the AES-NI cipher,
+> which basically ends up doing exactly the above). However, in the given
+> context, it makes more sense to use a light-weight MAC algorithm that
+> is more suitable for the purpose at hand, such as SipHash.
+>
+> Since the output size of SipHash already matches our chosen value for
+> TCP_FASTOPEN_COOKIE_SIZE, and given that it accepts arbitrary input
+> sizes, this greatly simplifies the code as well.
+>
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-Also, there is no need to store the individual debugfs file names,
-especially as the whole directiry is deleted at once, so remove the
-unneeded structure entirely.
+While the patch looks fine (I yet have to run our tests with it), it
+might cause some deployment issues
+for server farms.
 
-Cc: "Breno Leitão" <leitao@debian.org>
-Cc: Nayna Jain <nayna@linux.ibm.com>
-Cc: Paulo Flabiano Smorigo <pfsmorigo@gmail.com>
-Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Cc: Paul Mackerras <paulus@samba.org>
-Cc: Michael Ellerman <mpe@ellerman.id.au>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org
-Cc: linuxppc-dev@lists.ozlabs.org
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
-v2: fixed build error found by kbuild
+They usually share a common fastopen key, so that clients can reuse
+the same token for different sessions.
 
- drivers/crypto/nx/nx.c         |  4 +-
- drivers/crypto/nx/nx.h         | 12 +-----
- drivers/crypto/nx/nx_debugfs.c | 71 +++++++++++-----------------------
- 3 files changed, 26 insertions(+), 61 deletions(-)
+Changing some servers in the pool will lead to inconsistencies.
 
-diff --git a/drivers/crypto/nx/nx.c b/drivers/crypto/nx/nx.c
-index 3a5e31be4764..20b5e276f184 100644
---- a/drivers/crypto/nx/nx.c
-+++ b/drivers/crypto/nx/nx.c
-@@ -581,9 +581,7 @@ static int nx_register_algs(void)
- 
- 	memset(&nx_driver.stats, 0, sizeof(struct nx_stats));
- 
--	rc = NX_DEBUGFS_INIT(&nx_driver);
--	if (rc)
--		goto out;
-+	NX_DEBUGFS_INIT(&nx_driver);
- 
- 	nx_driver.of.status = NX_OKAY;
- 
-diff --git a/drivers/crypto/nx/nx.h b/drivers/crypto/nx/nx.h
-index c3e54af18645..c6b5a3be02be 100644
---- a/drivers/crypto/nx/nx.h
-+++ b/drivers/crypto/nx/nx.h
-@@ -76,20 +76,12 @@ struct nx_stats {
- 	atomic_t last_error_pid;
- };
- 
--struct nx_debugfs {
--	struct dentry *dfs_root;
--	struct dentry *dfs_aes_ops, *dfs_aes_bytes;
--	struct dentry *dfs_sha256_ops, *dfs_sha256_bytes;
--	struct dentry *dfs_sha512_ops, *dfs_sha512_bytes;
--	struct dentry *dfs_errors, *dfs_last_error, *dfs_last_error_pid;
--};
--
- struct nx_crypto_driver {
- 	struct nx_stats    stats;
- 	struct nx_of       of;
- 	struct vio_dev    *viodev;
- 	struct vio_driver  viodriver;
--	struct nx_debugfs  dfs;
-+	struct dentry     *dfs_root;
- };
- 
- #define NX_GCM4106_NONCE_LEN		(4)
-@@ -177,7 +169,7 @@ struct nx_sg *nx_walk_and_build(struct nx_sg *, unsigned int,
- #define NX_DEBUGFS_INIT(drv)	nx_debugfs_init(drv)
- #define NX_DEBUGFS_FINI(drv)	nx_debugfs_fini(drv)
- 
--int nx_debugfs_init(struct nx_crypto_driver *);
-+void nx_debugfs_init(struct nx_crypto_driver *);
- void nx_debugfs_fini(struct nx_crypto_driver *);
- #else
- #define NX_DEBUGFS_INIT(drv)	(0)
-diff --git a/drivers/crypto/nx/nx_debugfs.c b/drivers/crypto/nx/nx_debugfs.c
-index 7ab2e8dcd9b4..add1d8d0d23c 100644
---- a/drivers/crypto/nx/nx_debugfs.c
-+++ b/drivers/crypto/nx/nx_debugfs.c
-@@ -42,62 +42,37 @@
-  * Documentation/ABI/testing/debugfs-pfo-nx-crypto
-  */
- 
--int nx_debugfs_init(struct nx_crypto_driver *drv)
-+void nx_debugfs_init(struct nx_crypto_driver *drv)
- {
--	struct nx_debugfs *dfs = &drv->dfs;
-+	struct dentry *root;
- 
--	dfs->dfs_root = debugfs_create_dir(NX_NAME, NULL);
-+	root = debugfs_create_dir(NX_NAME, NULL);
-+	drv->dfs_root = root;
- 
--	dfs->dfs_aes_ops =
--		debugfs_create_u32("aes_ops",
--				   S_IRUSR | S_IRGRP | S_IROTH,
--				   dfs->dfs_root, (u32 *)&drv->stats.aes_ops);
--	dfs->dfs_sha256_ops =
--		debugfs_create_u32("sha256_ops",
--				   S_IRUSR | S_IRGRP | S_IROTH,
--				   dfs->dfs_root,
--				   (u32 *)&drv->stats.sha256_ops);
--	dfs->dfs_sha512_ops =
--		debugfs_create_u32("sha512_ops",
--				   S_IRUSR | S_IRGRP | S_IROTH,
--				   dfs->dfs_root,
--				   (u32 *)&drv->stats.sha512_ops);
--	dfs->dfs_aes_bytes =
--		debugfs_create_u64("aes_bytes",
--				   S_IRUSR | S_IRGRP | S_IROTH,
--				   dfs->dfs_root,
--				   (u64 *)&drv->stats.aes_bytes);
--	dfs->dfs_sha256_bytes =
--		debugfs_create_u64("sha256_bytes",
--				   S_IRUSR | S_IRGRP | S_IROTH,
--				   dfs->dfs_root,
--				   (u64 *)&drv->stats.sha256_bytes);
--	dfs->dfs_sha512_bytes =
--		debugfs_create_u64("sha512_bytes",
--				   S_IRUSR | S_IRGRP | S_IROTH,
--				   dfs->dfs_root,
--				   (u64 *)&drv->stats.sha512_bytes);
--	dfs->dfs_errors =
--		debugfs_create_u32("errors",
--				   S_IRUSR | S_IRGRP | S_IROTH,
--				   dfs->dfs_root, (u32 *)&drv->stats.errors);
--	dfs->dfs_last_error =
--		debugfs_create_u32("last_error",
--				   S_IRUSR | S_IRGRP | S_IROTH,
--				   dfs->dfs_root,
--				   (u32 *)&drv->stats.last_error);
--	dfs->dfs_last_error_pid =
--		debugfs_create_u32("last_error_pid",
--				   S_IRUSR | S_IRGRP | S_IROTH,
--				   dfs->dfs_root,
--				   (u32 *)&drv->stats.last_error_pid);
--	return 0;
-+	debugfs_create_u32("aes_ops", S_IRUSR | S_IRGRP | S_IROTH,
-+			   root, (u32 *)&drv->stats.aes_ops);
-+	debugfs_create_u32("sha256_ops", S_IRUSR | S_IRGRP | S_IROTH,
-+			   root, (u32 *)&drv->stats.sha256_ops);
-+	debugfs_create_u32("sha512_ops", S_IRUSR | S_IRGRP | S_IROTH,
-+			   root, (u32 *)&drv->stats.sha512_ops);
-+	debugfs_create_u64("aes_bytes", S_IRUSR | S_IRGRP | S_IROTH,
-+			   root, (u64 *)&drv->stats.aes_bytes);
-+	debugfs_create_u64("sha256_bytes", S_IRUSR | S_IRGRP | S_IROTH,
-+			   root, (u64 *)&drv->stats.sha256_bytes);
-+	debugfs_create_u64("sha512_bytes", S_IRUSR | S_IRGRP | S_IROTH,
-+			   root, (u64 *)&drv->stats.sha512_bytes);
-+	debugfs_create_u32("errors", S_IRUSR | S_IRGRP | S_IROTH,
-+			   root, (u32 *)&drv->stats.errors);
-+	debugfs_create_u32("last_error", S_IRUSR | S_IRGRP | S_IROTH,
-+			   root, (u32 *)&drv->stats.last_error);
-+	debugfs_create_u32("last_error_pid", S_IRUSR | S_IRGRP | S_IROTH,
-+			   root, (u32 *)&drv->stats.last_error_pid);
- }
- 
- void
- nx_debugfs_fini(struct nx_crypto_driver *drv)
- {
--	debugfs_remove_recursive(drv->dfs.dfs_root);
-+	debugfs_remove_recursive(drv->dfs_root);
- }
- 
- #endif
--- 
-2.22.0
-
+Probably not a too big deal, but worth mentioning.
