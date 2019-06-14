@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 098CFC31E44
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84893C31E4B
 	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jun 2019 08:34:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CCA3020851
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jun 2019 08:34:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 530FB20851
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Jun 2019 08:34:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KajoO1eg"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RMnBvrrG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726435AbfFNIeT (ORCPT
+        id S1726429AbfFNIeT (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Fri, 14 Jun 2019 04:34:19 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:37865 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726429AbfFNIeS (ORCPT
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:34154 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726530AbfFNIeT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Jun 2019 04:34:18 -0400
-Received: by mail-wr1-f65.google.com with SMTP id v14so1577473wrr.4
-        for <linux-crypto@vger.kernel.org>; Fri, 14 Jun 2019 01:34:16 -0700 (PDT)
+        Fri, 14 Jun 2019 04:34:19 -0400
+Received: by mail-wr1-f68.google.com with SMTP id k11so1591624wrl.1
+        for <linux-crypto@vger.kernel.org>; Fri, 14 Jun 2019 01:34:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=jVi9QO7CHKBZdi2+fLpwMFoN+KF7AYiGK0YKfY/qKiM=;
-        b=KajoO1egiIOR9nWNNH2fm5ullJAmhXmPemSugKLGhmub7m/OwqcoMcL00HrUCcNZQG
-         GM76T7SP/PWooKtj0lMylEDTFWqv/WN1NeXmM1WDE1AFfWhHQlcKWdQ/xCtN7IRutTfi
-         SNOmNMyQOk9qiCEv7Q04HwpnEaBs6wVXyWtLMVr2YGTjiKyH8ig/woEtfh1ksCm9UTUI
-         7A0FUosbcrXBcUU3Rs6gzOObrgGlv4z99bF5HdfTfF615zgI5/scnZ1nxpV/n7E7+dux
-         e7QZvigJp3QXnvb3ydPJAbkpnpR5vV0E/MNNBuODlQ5qHPpvpadhOYLpshHn9PyX4n9Z
-         +v8w==
+        bh=dQGze1de3iuv2PgR54rqY+1G9v4+tWZHityhL+j8Two=;
+        b=RMnBvrrGKo2YiaFFi80CITYkCrIZGN2v6ztzF87/44+XA+mL7doQXJq9Fu11FRAMVM
+         ZA45RbDgsGNGTFrSDk98a50fNrx1yHF2/EWqBz9/P+gSLgSv54smG3QZpYcbfQkMBIqo
+         JPxN8S0rSQagFHF762GaIhcxdATr8K+lQ+gMuq1nyRswAwD/bHaGzOAvJ3z98L9svLA8
+         EdNb8m5haWCGn7yWu/445PBY7KcovQzEiobkd1mmuKmOj+E/IO8SF9mYE/mcSBJAV3DT
+         6F1FG+GXS+UDQTKBFm43F1o+NWPzQFF34AS7YqShteWjBAFejXR9CvTWZqbWtC5ChAZD
+         UXaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=jVi9QO7CHKBZdi2+fLpwMFoN+KF7AYiGK0YKfY/qKiM=;
-        b=h57yd2iuCYqJ+J/J5owU9D1i0zgsWRMl12yw8eXMNCoooPHFcKS3xA4cf/mHio/CQC
-         CNusKf2rOyPPo3i54+KHReHzGBonQegCC8DGO5pg+BU+rwB83ysXUOWE7hnh8DtGNRwV
-         sUoVNKbG5Hpc8pZKZQVAou1+yjpTJaGXXOUn29+3Lk4M5l2aqmZ4TY7r0gqRdPJHBIhW
-         WQcYQ3aqYvCPdCq2eVXrPhk6N3ZpVsJom1MBfR4cNhiPDhz/Pw3sIrE0Lzhc1TlA71WQ
-         9gSdUTBYu7dAHil6V7WYV1kO0fs2iekEDO9q2CFwEjqfmS39tYBv61AcJy0WI0mDJse4
-         WHpw==
-X-Gm-Message-State: APjAAAUNaq0G42QyBIFKtQjItrOQ/dLotGpC5JPKfydMlbjoYFCdHElu
-        o8CQCZnJztYHNeyQ4bZVhIVPfj34abX1oQ==
-X-Google-Smtp-Source: APXvYqx9YTHS84gIPgmRDm73UK26a4NsmO0BPvni9R5bFdBUI1GN/Eqp45TdzoWwLNTOb2ytUW9GGA==
-X-Received: by 2002:adf:8367:: with SMTP id 94mr13146436wrd.179.1560501255767;
-        Fri, 14 Jun 2019 01:34:15 -0700 (PDT)
+        bh=dQGze1de3iuv2PgR54rqY+1G9v4+tWZHityhL+j8Two=;
+        b=BfrQirFOS/CYnRcHB6lmutD9fMNikOhHCcADxwbFOX26Hlj4EGvvEwdzEJ6yrR8vOs
+         3ytR648H2Il/KtGfOh9ylNf6Vxw5b+QPt9lAbhq5by1MC7hOMZa2iOq4CgczKS0xDynw
+         4DN4CtzPFhU91PPSW23p1yyOT7qwpQwTiaps6RWWYmm7GDn6aGsEnMvBS8YnoRXXpGhy
+         PTAStapYa58gch/yLykANhoPDGiVrcx+3x/UJRplhnznPDUQ6ogQK2jbY3yXZnOjYx15
+         HhK4iEp4vhamyt4a8JDK75/wenMAIOKIbfCdlc9U7YKI136e9SenkqCkZ2A3gF9mKIdT
+         WN/Q==
+X-Gm-Message-State: APjAAAW/t+Kmt+CedR9+271hyt+djRwq+sxTkqcTuSlLOTJXD6mY9h8v
+        NY40gJFiUGHu3PRMmx3TgRQvcB1b46H3dQ==
+X-Google-Smtp-Source: APXvYqz4+WLmDL683bb+Hi0IhjLYQTrFwTMl2MxTXKJE4R+vpJkUW2HCIi7mk9Dm0i5uwgqXB2+Log==
+X-Received: by 2002:adf:f84a:: with SMTP id d10mr4185071wrq.319.1560501256818;
+        Fri, 14 Jun 2019 01:34:16 -0700 (PDT)
 Received: from sudo.home ([2a01:cb1d:112:6f00:8d0e:a5b1:c005:e3b5])
-        by smtp.gmail.com with ESMTPSA id f3sm1710802wre.93.2019.06.14.01.34.14
+        by smtp.gmail.com with ESMTPSA id f3sm1710802wre.93.2019.06.14.01.34.15
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 14 Jun 2019 01:34:15 -0700 (PDT)
+        Fri, 14 Jun 2019 01:34:16 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Eric Biggers <ebiggers@google.com>
-Subject: [RFC PATCH 2/3] dm crypt: switch to essiv shash
-Date:   Fri, 14 Jun 2019 10:34:03 +0200
-Message-Id: <20190614083404.20514-3-ard.biesheuvel@linaro.org>
+Subject: [RFC PATCH 3/3] fscrypt: switch to ESSIV shash
+Date:   Fri, 14 Jun 2019 10:34:04 +0200
+Message-Id: <20190614083404.20514-4-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190614083404.20514-1-ard.biesheuvel@linaro.org>
 References: <20190614083404.20514-1-ard.biesheuvel@linaro.org>
@@ -74,241 +74,182 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Replace the open coded ESSIV handling with invocations into the new
-ESSIV shash, created specifically for this purpose. Using this more
-abstract interface allows the crypto subsystem to refactor the way
-ciphers are used, and to provide better testing coverage.
+Instead of open coding the shash and cipher operations that make up
+the ESSIV transform, switch to the new ESSIV shash template that
+encapsulates all of this. Using this more abstract interface provides
+more flexibility for the crypto subsystem to do refactoring, and
+permits better testing.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- drivers/md/Kconfig    |   1 +
- drivers/md/dm-crypt.c | 137 ++++----------------
- 2 files changed, 24 insertions(+), 114 deletions(-)
+ fs/crypto/Kconfig           |  1 +
+ fs/crypto/crypto.c          | 11 ++--
+ fs/crypto/fscrypt_private.h |  4 +-
+ fs/crypto/keyinfo.c         | 64 +++-----------------
+ 4 files changed, 18 insertions(+), 62 deletions(-)
 
-diff --git a/drivers/md/Kconfig b/drivers/md/Kconfig
-index 45254b3ef715..30ca87cf25db 100644
---- a/drivers/md/Kconfig
-+++ b/drivers/md/Kconfig
-@@ -271,6 +271,7 @@ config DM_CRYPT
- 	depends on BLK_DEV_DM
- 	select CRYPTO
+diff --git a/fs/crypto/Kconfig b/fs/crypto/Kconfig
+index 24ed99e2eca0..b0292da8613c 100644
+--- a/fs/crypto/Kconfig
++++ b/fs/crypto/Kconfig
+@@ -5,6 +5,7 @@ config FS_ENCRYPTION
+ 	select CRYPTO_AES
  	select CRYPTO_CBC
+ 	select CRYPTO_ECB
 +	select CRYPTO_ESSIV
- 	---help---
- 	  This device-mapper target allows you to create a device that
- 	  transparently encrypts the data on it. You'll need to activate
-diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
-index 1b16d34bb785..b66ef3de835a 100644
---- a/drivers/md/dm-crypt.c
-+++ b/drivers/md/dm-crypt.c
-@@ -98,11 +98,6 @@ struct crypt_iv_operations {
- 		    struct dm_crypt_request *dmreq);
- };
+ 	select CRYPTO_XTS
+ 	select CRYPTO_CTS
+ 	select CRYPTO_SHA256
+diff --git a/fs/crypto/crypto.c b/fs/crypto/crypto.c
+index 335a362ee446..93d33b55c2fa 100644
+--- a/fs/crypto/crypto.c
++++ b/fs/crypto/crypto.c
+@@ -137,8 +137,13 @@ void fscrypt_generate_iv(union fscrypt_iv *iv, u64 lblk_num,
+ 	if (ci->ci_flags & FS_POLICY_FLAG_DIRECT_KEY)
+ 		memcpy(iv->nonce, ci->ci_nonce, FS_KEY_DERIVATION_NONCE_SIZE);
  
--struct iv_essiv_private {
--	struct crypto_shash *hash_tfm;
--	u8 *salt;
--};
--
- struct iv_benbi_private {
- 	int shift;
- };
-@@ -155,7 +150,6 @@ struct crypt_config {
- 
- 	const struct crypt_iv_operations *iv_gen_ops;
- 	union {
--		struct iv_essiv_private essiv;
- 		struct iv_benbi_private benbi;
- 		struct iv_lmk_private lmk;
- 		struct iv_tcw_private tcw;
-@@ -165,7 +159,7 @@ struct crypt_config {
- 	unsigned short int sector_size;
- 	unsigned char sector_shift;
- 
--	/* ESSIV: struct crypto_cipher *essiv_tfm */
-+	/* ESSIV: struct crypto_shash *essiv_tfm */
- 	void *iv_private;
- 	union {
- 		struct crypto_skcipher **tfms;
-@@ -326,94 +320,27 @@ static int crypt_iv_plain64be_gen(struct crypt_config *cc, u8 *iv,
- /* Initialise ESSIV - compute salt but no local memory allocations */
- static int crypt_iv_essiv_init(struct crypt_config *cc)
- {
--	struct iv_essiv_private *essiv = &cc->iv_gen_private.essiv;
--	SHASH_DESC_ON_STACK(desc, essiv->hash_tfm);
--	struct crypto_cipher *essiv_tfm;
--	int err;
--
--	desc->tfm = essiv->hash_tfm;
--
--	err = crypto_shash_digest(desc, cc->key, cc->key_size, essiv->salt);
--	shash_desc_zero(desc);
--	if (err)
--		return err;
--
--	essiv_tfm = cc->iv_private;
-+	struct crypto_shash *essiv_tfm = cc->iv_private;
- 
--	err = crypto_cipher_setkey(essiv_tfm, essiv->salt,
--			    crypto_shash_digestsize(essiv->hash_tfm));
--	if (err)
--		return err;
--
--	return 0;
-+	return crypto_shash_setkey(essiv_tfm, cc->key, cc->key_size);
+-	if (ci->ci_essiv_tfm != NULL)
+-		crypto_cipher_encrypt_one(ci->ci_essiv_tfm, iv->raw, iv->raw);
++	if (ci->ci_essiv_tfm != NULL) {
++		SHASH_DESC_ON_STACK(desc, ci->ci_essiv_tfm);
++
++		desc->tfm = ci->ci_essiv_tfm;
++		crypto_shash_digest(desc, (u8 *)&iv->lblk_num,
++				    sizeof(iv->lblk_num), iv->raw);
++	}
  }
  
- /* Wipe salt and reset key derived from volume key */
- static int crypt_iv_essiv_wipe(struct crypt_config *cc)
- {
--	struct iv_essiv_private *essiv = &cc->iv_gen_private.essiv;
--	unsigned salt_size = crypto_shash_digestsize(essiv->hash_tfm);
--	struct crypto_cipher *essiv_tfm;
--	int r, err = 0;
+ int fscrypt_do_page_crypto(const struct inode *inode, fscrypt_direction_t rw,
+@@ -492,8 +497,6 @@ static void __exit fscrypt_exit(void)
+ 		destroy_workqueue(fscrypt_read_workqueue);
+ 	kmem_cache_destroy(fscrypt_ctx_cachep);
+ 	kmem_cache_destroy(fscrypt_info_cachep);
 -
--	memset(essiv->salt, 0, salt_size);
-+	struct crypto_shash *essiv_tfm;
+-	fscrypt_essiv_cleanup();
+ }
+ module_exit(fscrypt_exit);
  
- 	essiv_tfm = cc->iv_private;
--	r = crypto_cipher_setkey(essiv_tfm, essiv->salt, salt_size);
--	if (r)
--		err = r;
+diff --git a/fs/crypto/fscrypt_private.h b/fs/crypto/fscrypt_private.h
+index 7da276159593..67ea4ca11474 100644
+--- a/fs/crypto/fscrypt_private.h
++++ b/fs/crypto/fscrypt_private.h
+@@ -62,10 +62,10 @@ struct fscrypt_info {
+ 	struct crypto_skcipher *ci_ctfm;
+ 
+ 	/*
+-	 * Cipher for ESSIV IV generation.  Only set for CBC contents
++	 * Shash for ESSIV IV generation.  Only set for CBC contents
+ 	 * encryption, otherwise is NULL.
+ 	 */
+-	struct crypto_cipher *ci_essiv_tfm;
++	struct crypto_shash *ci_essiv_tfm;
+ 
+ 	/*
+ 	 * Encryption mode used for this inode.  It corresponds to either
+diff --git a/fs/crypto/keyinfo.c b/fs/crypto/keyinfo.c
+index dcd91a3fbe49..c3d38f72506c 100644
+--- a/fs/crypto/keyinfo.c
++++ b/fs/crypto/keyinfo.c
+@@ -15,12 +15,10 @@
+ #include <linux/ratelimit.h>
+ #include <crypto/aes.h>
+ #include <crypto/algapi.h>
++#include <crypto/hash.h>
+ #include <crypto/sha.h>
+-#include <crypto/skcipher.h>
+ #include "fscrypt_private.h"
+ 
+-static struct crypto_shash *essiv_hash_tfm;
 -
--	return err;
+ /* Table of keys referenced by FS_POLICY_FLAG_DIRECT_KEY policies */
+ static DEFINE_HASHTABLE(fscrypt_master_keys, 6); /* 6 bits = 64 buckets */
+ static DEFINE_SPINLOCK(fscrypt_master_keys_lock);
+@@ -377,70 +375,24 @@ fscrypt_get_master_key(const struct fscrypt_info *ci, struct fscrypt_mode *mode,
+ 	return ERR_PTR(err);
+ }
+ 
+-static int derive_essiv_salt(const u8 *key, int keysize, u8 *salt)
+-{
+-	struct crypto_shash *tfm = READ_ONCE(essiv_hash_tfm);
+-
+-	/* init hash transform on demand */
+-	if (unlikely(!tfm)) {
+-		struct crypto_shash *prev_tfm;
+-
+-		tfm = crypto_alloc_shash("sha256", 0, 0);
+-		if (IS_ERR(tfm)) {
+-			fscrypt_warn(NULL,
+-				     "error allocating SHA-256 transform: %ld",
+-				     PTR_ERR(tfm));
+-			return PTR_ERR(tfm);
+-		}
+-		prev_tfm = cmpxchg(&essiv_hash_tfm, NULL, tfm);
+-		if (prev_tfm) {
+-			crypto_free_shash(tfm);
+-			tfm = prev_tfm;
+-		}
+-	}
+-
+-	{
+-		SHASH_DESC_ON_STACK(desc, tfm);
+-		desc->tfm = tfm;
+-
+-		return crypto_shash_digest(desc, key, keysize, salt);
+-	}
 -}
 -
--/* Allocate the cipher for ESSIV */
--static struct crypto_cipher *alloc_essiv_cipher(struct crypt_config *cc,
--						struct dm_target *ti,
--						const u8 *salt,
--						unsigned int saltsize)
--{
--	struct crypto_cipher *essiv_tfm;
--	int err;
--
--	/* Setup the essiv_tfm with the given salt */
--	essiv_tfm = crypto_alloc_cipher(cc->cipher, 0, 0);
--	if (IS_ERR(essiv_tfm)) {
--		ti->error = "Error allocating crypto tfm for ESSIV";
--		return essiv_tfm;
--	}
--
--	if (crypto_cipher_blocksize(essiv_tfm) != cc->iv_size) {
--		ti->error = "Block size of ESSIV cipher does "
--			    "not match IV size of block cipher";
--		crypto_free_cipher(essiv_tfm);
--		return ERR_PTR(-EINVAL);
--	}
--
--	err = crypto_cipher_setkey(essiv_tfm, salt, saltsize);
--	if (err) {
--		ti->error = "Failed to set key for ESSIV cipher";
--		crypto_free_cipher(essiv_tfm);
--		return ERR_PTR(err);
--	}
--
--	return essiv_tfm;
-+	return crypto_shash_setkey(essiv_tfm, NULL, 0);
- }
- 
- static void crypt_iv_essiv_dtr(struct crypt_config *cc)
+ static int init_essiv_generator(struct fscrypt_info *ci, const u8 *raw_key,
+ 				int keysize)
  {
+ 	int err;
 -	struct crypto_cipher *essiv_tfm;
--	struct iv_essiv_private *essiv = &cc->iv_gen_private.essiv;
+-	u8 salt[SHA256_DIGEST_SIZE];
 -
--	crypto_free_shash(essiv->hash_tfm);
--	essiv->hash_tfm = NULL;
+-	essiv_tfm = crypto_alloc_cipher("aes", 0, 0);
+-	if (IS_ERR(essiv_tfm))
+-		return PTR_ERR(essiv_tfm);
 -
--	kzfree(essiv->salt);
--	essiv->salt = NULL;
+-	ci->ci_essiv_tfm = essiv_tfm;
+-
+-	err = derive_essiv_salt(raw_key, keysize, salt);
+-	if (err)
+-		goto out;
 +	struct crypto_shash *essiv_tfm;
  
- 	essiv_tfm = cc->iv_private;
--
- 	if (essiv_tfm)
--		crypto_free_cipher(essiv_tfm);
-+		crypto_free_shash(essiv_tfm);
- 
- 	cc->iv_private = NULL;
- }
-@@ -421,9 +348,8 @@ static void crypt_iv_essiv_dtr(struct crypt_config *cc)
- static int crypt_iv_essiv_ctr(struct crypt_config *cc, struct dm_target *ti,
- 			      const char *opts)
- {
--	struct crypto_cipher *essiv_tfm = NULL;
--	struct crypto_shash *hash_tfm = NULL;
--	u8 *salt = NULL;
-+	struct crypto_shash *essiv_tfm = NULL;
-+	u8 name[CRYPTO_MAX_ALG_NAME];
- 	int err;
- 
- 	if (!opts) {
-@@ -431,51 +357,34 @@ static int crypt_iv_essiv_ctr(struct crypt_config *cc, struct dm_target *ti,
- 		return -EINVAL;
- 	}
- 
--	/* Allocate hash algorithm */
--	hash_tfm = crypto_alloc_shash(opts, 0, 0);
--	if (IS_ERR(hash_tfm)) {
--		ti->error = "Error initializing ESSIV hash";
--		err = PTR_ERR(hash_tfm);
--		goto bad;
--	}
--
--	salt = kzalloc(crypto_shash_digestsize(hash_tfm), GFP_KERNEL);
--	if (!salt) {
--		ti->error = "Error kmallocing salt storage in ESSIV";
--		err = -ENOMEM;
--		goto bad;
--	}
--
--	cc->iv_gen_private.essiv.salt = salt;
--	cc->iv_gen_private.essiv.hash_tfm = hash_tfm;
-+	snprintf(name, CRYPTO_MAX_ALG_NAME, "essiv(%s,%s)", cc->cipher, opts);
- 
--	essiv_tfm = alloc_essiv_cipher(cc, ti, salt,
--				       crypto_shash_digestsize(hash_tfm));
--	if (IS_ERR(essiv_tfm)) {
--		crypt_iv_essiv_dtr(cc);
-+	essiv_tfm = crypto_alloc_shash(name, 0, 0);
+ 	/*
+ 	 * Using SHA256 to derive the salt/key will result in AES-256 being
+ 	 * used for IV generation. File contents encryption will still use the
+ 	 * configured keysize (AES-128) nevertheless.
+ 	 */
+-	err = crypto_cipher_setkey(essiv_tfm, salt, sizeof(salt));
+-	if (err)
+-		goto out;
++	essiv_tfm = crypto_alloc_shash("essiv(aes,sha256)", 0, 0);
 +	if (IS_ERR(essiv_tfm))
- 		return PTR_ERR(essiv_tfm);
-+
-+	err = crypto_shash_setkey(essiv_tfm, cc->key, cc->key_size);
-+	if (err) {
-+		ti->error = "Failed to set key for ESSIV cipher";
-+		crypto_free_shash(essiv_tfm);
-+		return err;
- 	}
-+
- 	cc->iv_private = essiv_tfm;
++		return PTR_ERR(essiv_tfm);
  
- 	return 0;
--
--bad:
--	if (hash_tfm && !IS_ERR(hash_tfm))
--		crypto_free_shash(hash_tfm);
--	kfree(salt);
+-out:
+-	memzero_explicit(salt, sizeof(salt));
 -	return err;
+-}
++	ci->ci_essiv_tfm = essiv_tfm;
+ 
+-void __exit fscrypt_essiv_cleanup(void)
+-{
+-	crypto_free_shash(essiv_hash_tfm);
++	return crypto_shash_setkey(essiv_tfm, raw_key, keysize);
  }
  
- static int crypt_iv_essiv_gen(struct crypt_config *cc, u8 *iv,
- 			      struct dm_crypt_request *dmreq)
- {
--	struct crypto_cipher *essiv_tfm = cc->iv_private;
-+	struct crypto_shash *essiv_tfm = cc->iv_private;
-+	SHASH_DESC_ON_STACK(desc, essiv_tfm);
- 
- 	memset(iv, 0, cc->iv_size);
- 	*(__le64 *)iv = cpu_to_le64(dmreq->iv_sector);
--	crypto_cipher_encrypt_one(essiv_tfm, iv, iv);
--
--	return 0;
-+	desc->tfm = essiv_tfm;
-+	return crypto_shash_digest(desc, iv, sizeof(__le64), iv);
+ /*
+@@ -495,7 +447,7 @@ static void put_crypt_info(struct fscrypt_info *ci)
+ 		put_master_key(ci->ci_master_key);
+ 	} else {
+ 		crypto_free_skcipher(ci->ci_ctfm);
+-		crypto_free_cipher(ci->ci_essiv_tfm);
++		crypto_free_shash(ci->ci_essiv_tfm);
+ 	}
+ 	kmem_cache_free(fscrypt_info_cachep, ci);
  }
- 
- static int crypt_iv_benbi_ctr(struct crypt_config *cc, struct dm_target *ti,
 -- 
 2.20.1
 
