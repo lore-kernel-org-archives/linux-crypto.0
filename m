@@ -2,384 +2,128 @@ Return-Path: <SRS0=efdq=UO=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECB7DC31E51
-	for <linux-crypto@archiver.kernel.org>; Sat, 15 Jun 2019 09:17:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8821EC31E50
+	for <linux-crypto@archiver.kernel.org>; Sat, 15 Jun 2019 18:19:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B19CE2184D
-	for <linux-crypto@archiver.kernel.org>; Sat, 15 Jun 2019 09:17:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5F00E21841
+	for <linux-crypto@archiver.kernel.org>; Sat, 15 Jun 2019 18:19:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZDxQQ5by"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hgqO/z1b"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726521AbfFOJRw (ORCPT
+        id S1725796AbfFOST0 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 15 Jun 2019 05:17:52 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:32779 "EHLO
+        Sat, 15 Jun 2019 14:19:26 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:56023 "EHLO
         mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725927AbfFOJRw (ORCPT
+        with ESMTP id S1725270AbfFOST0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 15 Jun 2019 05:17:52 -0400
-Received: by mail-wm1-f65.google.com with SMTP id h19so988716wme.0
-        for <linux-crypto@vger.kernel.org>; Sat, 15 Jun 2019 02:17:49 -0700 (PDT)
+        Sat, 15 Jun 2019 14:19:26 -0400
+Received: by mail-wm1-f65.google.com with SMTP id a15so5404191wmj.5
+        for <linux-crypto@vger.kernel.org>; Sat, 15 Jun 2019 11:19:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=mlP9JOGrsIXsBND6JJAdW9FUM39Abwy6F4TEMlSfeQc=;
-        b=ZDxQQ5by5XvGMOAI7Ppp8uEiMjqn3fSpN6JX6TLIVf+lCtvn8cJHzp4MYvpB8Ykgse
-         nJuXn7gJLrDXftEP2P55f/FbrCpH7VTDH0eUgXYYO43pgOzJBVjN2UnbXStRt+GtO+RZ
-         HEhgeJ5beJaKWR/fjtMaZ/HVAJkWYRHoMC/u6VnESx93ZMRN6RQO6gVv0Z25xBsInl6l
-         UjTuaL2unxuKSM/05nf2cd40LmaxqOX85hftvK/HeLrC90c/J2B+/Wq17/KXvb9UP9hS
-         JBExec0rqhTPJEynw3NeXPmGeVQmnKie081jsQbqjJqa7Cd4pGyDy6s5AFXg//SNPQTe
-         MM/w==
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=NeSR6GnrdqlIjdqD3lSHhsRl+Jd7829fRlrkgMWMgPs=;
+        b=hgqO/z1b4Hx6SULrkZJIDlpNnoYvvGGS7AWkh9SO2NGoLojVNruj2KGEH8h9PLfFjX
+         VDFT5DrK8tM/FRLNhUHfZupm8TD7FfuL15GEACUbIdSJV3/jern+dSAxmnunMUql0Yx1
+         g/1PlHr63lr12IM2YnYZAMRjKusNAWBXX47U1Rysw0MXOAUKvJX65LYi0V2cMyY89Qu1
+         Z9QVya8+CDWwF+GhCtwztFUjQawWna/4EuNzTwSnGI1QLCbh26m5RtXimNGfjgCfS6lt
+         xvWQwtLu5dw7ILrP0Wt4uiYHuXRQDjdT1EExm5bnTdp5VjwyGPEzpEddkgkvMBV/bBXG
+         iaJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=mlP9JOGrsIXsBND6JJAdW9FUM39Abwy6F4TEMlSfeQc=;
-        b=VDaZ2ADiPIqYe0UapoCsaiNuiOP7RH7AybFkAa4YTmQPCwovGGYhx73TeMBIpRSUyE
-         N3BjNhq2dnN82j56gjQ51uQxBmWWHKhIfZC9AP43nasdiofhwoAoKKLYJTbQxJfRc11/
-         g6DH2twm+XUSLdxVzBtkqOTngmxUa1Fdj4tmTWuqRKPP6iDQD3ZPOinH5K8J3uhBiztw
-         1t3NKg9zJk8wpjLFYY0jRhZAfijKv+RRRnxDlJoYaRCczmQpRYDumEhQqknUV2vfCf0p
-         KPGxTa1bXkb0SYvKmNoexfzvQ6+IbCDpq6H9OspUzwYSuKI2p0C0OdlPdPnpXeGlhajV
-         1awQ==
-X-Gm-Message-State: APjAAAXz0QVMbsXgw4o1+oAnmeuqPVp/glWrNgFF717XpYQM1XH28/KH
-        uibeDGXKiV46JHox7pcj+GfgWg==
-X-Google-Smtp-Source: APXvYqzO+/jEOorbjQmzxOfSG92fT5qe8RCXPAZ3tr8rhaPOv+74yXp6MyxhbcUEEfWy5Br7b3WZAA==
-X-Received: by 2002:a1c:df46:: with SMTP id w67mr10529841wmg.69.1560590268383;
-        Sat, 15 Jun 2019 02:17:48 -0700 (PDT)
-Received: from sudo.home ([2a01:cb1d:112:6f00:813a:19ca:1349:2b8])
-        by smtp.gmail.com with ESMTPSA id b8sm5129866wrr.88.2019.06.15.02.17.47
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 15 Jun 2019 02:17:47 -0700 (PDT)
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To:     linux-usb@vger.kernel.org
-Cc:     gregkh@linuxfoundation.org, linux-crypto@vger.kernel.org,
-        ebiggers@kernel.org, herbert@gondor.apana.org.au,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v3] wusb: switch to cbcmac transform
-Date:   Sat, 15 Jun 2019 11:17:45 +0200
-Message-Id: <20190615091745.3100-1-ard.biesheuvel@linaro.org>
-X-Mailer: git-send-email 2.20.1
+        bh=NeSR6GnrdqlIjdqD3lSHhsRl+Jd7829fRlrkgMWMgPs=;
+        b=JVeLIrn9EYMCjjkYpyaWukZxF0XLPa9o4sfrcRti7AET2Yv5fjqQx5nrFe+EbMk89t
+         1hkXqBJgLaYOZjpU8wH32kExxD0pSJ3cVhiuduP9Y6jWs9JUPG+TCTWbR+vq4+6EKIQ6
+         RkVWs6onzEN6HARzyhehPsAhuWm8AfoyUpu1/Wc0MhJnWt22eDhZUEAJ3V7leROSE3j4
+         pQDIjKcl2vcyWdutAcCOXFgEznJ0sIHwXDcqbx2dFZ6I1pnFhOtaK038oMC0/xat3jvk
+         hROpU70bksxGudRRiRmcb+753b/OrshdC+NaGz678Fts4f6tE9lJSyQ59ri4pd5pk9po
+         N60w==
+X-Gm-Message-State: APjAAAVRLF9V4Th36KqU+7hXImoeDMp7QsE1ZmOE17yYxuSFEH7Fl7ym
+        6YtUgPYYQPfeQZ4Rq0xdvHY=
+X-Google-Smtp-Source: APXvYqw/K+cFbhCT0NWMIXD+LYK92nb5mpf/Ry2WAxMHuJb3dpuPdrfgG+0oXd/KUVmRuPPLBOK6/w==
+X-Received: by 2002:a1c:a783:: with SMTP id q125mr12930224wme.94.1560622764575;
+        Sat, 15 Jun 2019 11:19:24 -0700 (PDT)
+Received: from [192.168.1.158] ([178.17.7.30])
+        by smtp.gmail.com with ESMTPSA id s7sm3021728wmc.2.2019.06.15.11.19.23
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Sat, 15 Jun 2019 11:19:24 -0700 (PDT)
+Subject: Re: [RFC PATCH 0/3] crypto: switch to shash for ESSIV generation
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        linux-crypto@vger.kernel.org
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Eric Biggers <ebiggers@google.com>,
+        device-mapper development <dm-devel@redhat.com>,
+        Mike Snitzer <msnitzer@redhat.com>
+References: <20190614083404.20514-1-ard.biesheuvel@linaro.org>
+From:   Milan Broz <gmazyland@gmail.com>
+Openpgp: preference=signencrypt
+Message-ID: <9cd635ec-970b-bd1b-59f4-1a07395e69a0@gmail.com>
+Date:   Sat, 15 Jun 2019 20:19:22 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190614083404.20514-1-ard.biesheuvel@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The wusb code takes a very peculiar approach at implementing CBC-MAC,
-by using plain CBC into a scratch buffer, and taking the output IV
-as the MAC.
+On 14/06/2019 10:34, Ard Biesheuvel wrote:
+> This series is presented as an RFC for a couple of reasons:
+> - it is only build tested
+> - it is unclear whether this is the right way to move away from the use of
+>   bare ciphers in non-crypto code
+> - we haven't really discussed whether moving away from the use of bare ciphers
+>   in non-crypto code is a goal we agree on
+> 
+> This series creates an ESSIV shash template that takes a (cipher,hash) tuple,
+> where the digest size of the hash must be a valid key length for the cipher.
+> The setkey() operation takes the hash of the input key, and sets into the
+> cipher as the encryption key. Digest operations accept input up to the
+> block size of the cipher, and perform a single block encryption operation to
+> produce the ESSIV output.
+> 
+> This matches what both users of ESSIV in the kernel do, and so it is proposed
+> as a replacement for those, in patches #2 and #3.
+> 
+> As for the discussion: the code is untested, so it is presented for discussion
+> only. I'd like to understand whether we agree that phasing out the bare cipher
+> interface from non-crypto code is a good idea, and whether this approach is
+> suitable for fscrypt and dm-crypt.
 
-We can clean up this code substantially by switching to the cbcmac
-shash, as exposed by the CCM template. To ensure that the module is
-loaded on demand, add the cbcmac template name as a module alias.
+If you want some discussion, it would be very helpful if you cc device-mapper list
+to reach dm-crypt developers. Please add at least dm-devel list.
 
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
----
-v3: - add missing #include to fix build error spotted by kbuild test robot
-v2: - use finup()/digest() where possible, and process b0+b1 using a single
-      call to update()
-    - make 'stv_hsmic_hs' static const and remove comment regarding GCC 4.1
+Just a few comments:
 
-NOTE: I don't have any hardware to test this, but the built-in selftest
-      still passes.
- 
- crypto/ccm.c                  |   1 +
- drivers/usb/wusbcore/crypto.c | 169 +++++---------------
- 2 files changed, 45 insertions(+), 125 deletions(-)
+ - ESSIV is useful only for CBC mode. I wish we move to some better mode
+in the future instead of cementing CBC use... But if it helps people
+to actually use unpredictable IV for CBC, it is the right approach.
+(yes, I know XTS has own problems as well... but IMO that should be the default
+for sector/fs-block encryption these days :)
 
-diff --git a/crypto/ccm.c b/crypto/ccm.c
-index 8c24605c791e..380eb619f657 100644
---- a/crypto/ccm.c
-+++ b/crypto/ccm.c
-@@ -1009,3 +1009,4 @@ MODULE_DESCRIPTION("Counter with CBC MAC");
- MODULE_ALIAS_CRYPTO("ccm_base");
- MODULE_ALIAS_CRYPTO("rfc4309");
- MODULE_ALIAS_CRYPTO("ccm");
-+MODULE_ALIAS_CRYPTO("cbcmac");
-diff --git a/drivers/usb/wusbcore/crypto.c b/drivers/usb/wusbcore/crypto.c
-index edb7263bff40..9ee66483ee54 100644
---- a/drivers/usb/wusbcore/crypto.c
-+++ b/drivers/usb/wusbcore/crypto.c
-@@ -31,6 +31,9 @@
-  *             funneled through AES are...16 bytes in size!
-  */
- 
-+#include <crypto/aes.h>
-+#include <crypto/algapi.h>
-+#include <crypto/hash.h>
- #include <crypto/skcipher.h>
- #include <linux/crypto.h>
- #include <linux/module.h>
-@@ -109,16 +112,6 @@ struct aes_ccm_a {
- 	__be16 counter;	/* Value of x */
- } __attribute__((packed));
- 
--static void bytewise_xor(void *_bo, const void *_bi1, const void *_bi2,
--			 size_t size)
--{
--	u8 *bo = _bo;
--	const u8 *bi1 = _bi1, *bi2 = _bi2;
--	size_t itr;
--	for (itr = 0; itr < size; itr++)
--		bo[itr] = bi1[itr] ^ bi2[itr];
--}
--
- /* Scratch space for MAC calculations. */
- struct wusb_mac_scratch {
- 	struct aes_ccm_b0 b0;
-@@ -150,8 +143,7 @@ struct wusb_mac_scratch {
-  * @a: ASCII string, 14 bytes long (I guess zero padded if needed;
-  *     we use exactly 14 bytes).
-  *
-- * @b: data stream to be processed; cannot be a global or const local
-- *     (will confuse the scatterlists)
-+ * @b: data stream to be processed
-  *
-  * @blen: size of b...
-  *
-@@ -160,16 +152,10 @@ struct wusb_mac_scratch {
-  * @key. We bytewise xor B0 with B1 (1) and AES-crypt that. Then we
-  * take the payload and divide it in blocks (16 bytes), xor them with
-  * the previous crypto result (16 bytes) and crypt it, repeat the next
-- * block with the output of the previous one, rinse wash (I guess this
-- * is what AES CBC mode means...but I truly have no idea). So we use
-- * the CBC(AES) blkcipher, that does precisely that. The IV (Initial
-+ * block with the output of the previous one, rinse wash. So we use
-+ * the CBC-MAC(AES) shash, that does precisely that. The IV (Initial
-  * Vector) is 16 bytes and is set to zero, so
-  *
-- * See rfc3610. Linux crypto has a CBC implementation, but the
-- * documentation is scarce, to say the least, and the example code is
-- * so intricated that is difficult to understand how things work. Most
-- * of this is guess work -- bite me.
-- *
-  * (1) Created as 6.5 says, again, using as l(a) 'Blen + 14', and
-  *     using the 14 bytes of @a to fill up
-  *     b1.{mac_header,e0,security_reserved,padding}.
-@@ -189,44 +175,24 @@ struct wusb_mac_scratch {
-  * NOTE: blen is not aligned to a block size, we'll pad zeros, that's
-  *       what sg[4] is for. Maybe there is a smarter way to do this.
-  */
--static int wusb_ccm_mac(struct crypto_sync_skcipher *tfm_cbc,
--			struct crypto_cipher *tfm_aes,
-+static int wusb_ccm_mac(struct crypto_shash *tfm_cbcmac,
- 			struct wusb_mac_scratch *scratch,
- 			void *mic,
- 			const struct aes_ccm_nonce *n,
- 			const struct aes_ccm_label *a, const void *b,
- 			size_t blen)
- {
--	int result = 0;
--	SYNC_SKCIPHER_REQUEST_ON_STACK(req, tfm_cbc);
--	struct scatterlist sg[4], sg_dst;
--	void *dst_buf;
--	size_t dst_size;
--	u8 *iv;
--	size_t zero_padding;
-+	SHASH_DESC_ON_STACK(desc, tfm_cbcmac);
-+	u8 iv[AES_BLOCK_SIZE];
- 
- 	/*
- 	 * These checks should be compile time optimized out
- 	 * ensure @a fills b1's mac_header and following fields
- 	 */
--	WARN_ON(sizeof(*a) != sizeof(scratch->b1) - sizeof(scratch->b1.la));
--	WARN_ON(sizeof(scratch->b0) != sizeof(struct aes_ccm_block));
--	WARN_ON(sizeof(scratch->b1) != sizeof(struct aes_ccm_block));
--	WARN_ON(sizeof(scratch->ax) != sizeof(struct aes_ccm_block));
--
--	result = -ENOMEM;
--	zero_padding = blen % sizeof(struct aes_ccm_block);
--	if (zero_padding)
--		zero_padding = sizeof(struct aes_ccm_block) - zero_padding;
--	dst_size = blen + sizeof(scratch->b0) + sizeof(scratch->b1) +
--		zero_padding;
--	dst_buf = kzalloc(dst_size, GFP_KERNEL);
--	if (!dst_buf)
--		goto error_dst_buf;
--
--	iv = kzalloc(crypto_sync_skcipher_ivsize(tfm_cbc), GFP_KERNEL);
--	if (!iv)
--		goto error_iv;
-+	BUILD_BUG_ON(sizeof(*a) != sizeof(scratch->b1) - sizeof(scratch->b1.la));
-+	BUILD_BUG_ON(sizeof(scratch->b0) != sizeof(struct aes_ccm_block));
-+	BUILD_BUG_ON(sizeof(scratch->b1) != sizeof(struct aes_ccm_block));
-+	BUILD_BUG_ON(sizeof(scratch->ax) != sizeof(struct aes_ccm_block));
- 
- 	/* Setup B0 */
- 	scratch->b0.flags = 0x59;	/* Format B0 */
-@@ -243,46 +209,28 @@ static int wusb_ccm_mac(struct crypto_sync_skcipher *tfm_cbc,
- 	scratch->b1.la = cpu_to_be16(blen + 14);
- 	memcpy(&scratch->b1.mac_header, a, sizeof(*a));
- 
--	sg_init_table(sg, ARRAY_SIZE(sg));
--	sg_set_buf(&sg[0], &scratch->b0, sizeof(scratch->b0));
--	sg_set_buf(&sg[1], &scratch->b1, sizeof(scratch->b1));
--	sg_set_buf(&sg[2], b, blen);
--	/* 0 if well behaved :) */
--	sg_set_page(&sg[3], ZERO_PAGE(0), zero_padding, 0);
--	sg_init_one(&sg_dst, dst_buf, dst_size);
--
--	skcipher_request_set_sync_tfm(req, tfm_cbc);
--	skcipher_request_set_callback(req, 0, NULL, NULL);
--	skcipher_request_set_crypt(req, sg, &sg_dst, dst_size, iv);
--	result = crypto_skcipher_encrypt(req);
--	skcipher_request_zero(req);
--	if (result < 0) {
--		printk(KERN_ERR "E: can't compute CBC-MAC tag (MIC): %d\n",
--		       result);
--		goto error_cbc_crypt;
--	}
-+	desc->tfm = tfm_cbcmac;
-+	crypto_shash_init(desc);
-+	crypto_shash_update(desc, (u8 *)&scratch->b0, sizeof(scratch->b0) +
-+						      sizeof(scratch->b1));
-+	crypto_shash_finup(desc, b, blen, iv);
- 
- 	/* Now we crypt the MIC Tag (*iv) with Ax -- values per WUSB1.0[6.5]
- 	 * The procedure is to AES crypt the A0 block and XOR the MIC
- 	 * Tag against it; we only do the first 8 bytes and place it
- 	 * directly in the destination buffer.
--	 *
--	 * POS Crypto API: size is assumed to be AES's block size.
--	 * Thanks for documenting it -- tip taken from airo.c
- 	 */
- 	scratch->ax.flags = 0x01;		/* as per WUSB 1.0 spec */
- 	scratch->ax.ccm_nonce = *n;
- 	scratch->ax.counter = 0;
--	crypto_cipher_encrypt_one(tfm_aes, (void *)&scratch->ax,
--				  (void *)&scratch->ax);
--	bytewise_xor(mic, &scratch->ax, iv, 8);
--	result = 8;
--error_cbc_crypt:
--	kfree(iv);
--error_iv:
--	kfree(dst_buf);
--error_dst_buf:
--	return result;
-+
-+	/* reuse the CBC-MAC transform to perform the single block encryption */
-+	crypto_shash_digest(desc, (u8 *)&scratch->ax, sizeof(scratch->ax),
-+			    (u8 *)&scratch->ax);
-+
-+	crypto_xor_cpy(mic, (u8 *)&scratch->ax, iv, 8);
-+
-+	return 8;
- }
- 
- /*
-@@ -298,45 +246,28 @@ ssize_t wusb_prf(void *out, size_t out_size,
- {
- 	ssize_t result, bytes = 0, bitr;
- 	struct aes_ccm_nonce n = *_n;
--	struct crypto_sync_skcipher *tfm_cbc;
--	struct crypto_cipher *tfm_aes;
--	struct wusb_mac_scratch *scratch;
-+	struct crypto_shash *tfm_cbcmac;
-+	struct wusb_mac_scratch scratch;
- 	u64 sfn = 0;
- 	__le64 sfn_le;
- 
--	tfm_cbc = crypto_alloc_sync_skcipher("cbc(aes)", 0, 0);
--	if (IS_ERR(tfm_cbc)) {
--		result = PTR_ERR(tfm_cbc);
--		printk(KERN_ERR "E: can't load CBC(AES): %d\n", (int)result);
--		goto error_alloc_cbc;
--	}
--	result = crypto_sync_skcipher_setkey(tfm_cbc, key, 16);
--	if (result < 0) {
--		printk(KERN_ERR "E: can't set CBC key: %d\n", (int)result);
--		goto error_setkey_cbc;
-+	tfm_cbcmac = crypto_alloc_shash("cbcmac(aes)", 0, 0);
-+	if (IS_ERR(tfm_cbcmac)) {
-+		result = PTR_ERR(tfm_cbcmac);
-+		printk(KERN_ERR "E: can't load CBCMAC-AES: %d\n", (int)result);
-+		goto error_alloc_cbcmac;
- 	}
- 
--	tfm_aes = crypto_alloc_cipher("aes", 0, 0);
--	if (IS_ERR(tfm_aes)) {
--		result = PTR_ERR(tfm_aes);
--		printk(KERN_ERR "E: can't load AES: %d\n", (int)result);
--		goto error_alloc_aes;
--	}
--	result = crypto_cipher_setkey(tfm_aes, key, 16);
-+	result = crypto_shash_setkey(tfm_cbcmac, key, AES_BLOCK_SIZE);
- 	if (result < 0) {
--		printk(KERN_ERR "E: can't set AES key: %d\n", (int)result);
--		goto error_setkey_aes;
--	}
--	scratch = kmalloc(sizeof(*scratch), GFP_KERNEL);
--	if (!scratch) {
--		result = -ENOMEM;
--		goto error_alloc_scratch;
-+		printk(KERN_ERR "E: can't set CBCMAC-AES key: %d\n", (int)result);
-+		goto error_setkey_cbcmac;
- 	}
- 
- 	for (bitr = 0; bitr < (len + 63) / 64; bitr++) {
- 		sfn_le = cpu_to_le64(sfn++);
- 		memcpy(&n.sfn, &sfn_le, sizeof(n.sfn));	/* n.sfn++... */
--		result = wusb_ccm_mac(tfm_cbc, tfm_aes, scratch, out + bytes,
-+		result = wusb_ccm_mac(tfm_cbcmac, &scratch, out + bytes,
- 				      &n, a, b, blen);
- 		if (result < 0)
- 			goto error_ccm_mac;
-@@ -344,15 +275,10 @@ ssize_t wusb_prf(void *out, size_t out_size,
- 	}
- 	result = bytes;
- 
--	kfree(scratch);
--error_alloc_scratch:
- error_ccm_mac:
--error_setkey_aes:
--	crypto_free_cipher(tfm_aes);
--error_alloc_aes:
--error_setkey_cbc:
--	crypto_free_sync_skcipher(tfm_cbc);
--error_alloc_cbc:
-+error_setkey_cbcmac:
-+	crypto_free_shash(tfm_cbcmac);
-+error_alloc_cbcmac:
- 	return result;
- }
- 
-@@ -377,12 +303,8 @@ static int wusb_oob_mic_verify(void)
- {
- 	int result;
- 	u8 mic[8];
--	/* WUSB1.0[A.2] test vectors
--	 *
--	 * Need to keep it in the local stack as GCC 4.1.3something
--	 * messes up and generates noise.
--	 */
--	struct usb_handshake stv_hsmic_hs = {
-+	/* WUSB1.0[A.2] test vectors */
-+	static const struct usb_handshake stv_hsmic_hs = {
- 		.bMessageNumber = 2,
- 		.bStatus 	= 00,
- 		.tTKID 		= { 0x76, 0x98, 0x01 },
-@@ -457,11 +379,8 @@ static int wusb_key_derive_verify(void)
- {
- 	int result = 0;
- 	struct wusb_keydvt_out keydvt_out;
--	/* These come from WUSB1.0[A.1] + 2006/12 errata
--	 * NOTE: can't make this const or global -- somehow it seems
--	 *       the scatterlists for crypto get confused and we get
--	 *       bad data. There is no doc on this... */
--	struct wusb_keydvt_in stv_keydvt_in_a1 = {
-+	/* These come from WUSB1.0[A.1] + 2006/12 errata */
-+	static const struct wusb_keydvt_in stv_keydvt_in_a1 = {
- 		.hnonce = {
- 			0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
- 			0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f
--- 
-2.20.1
+- I do not think there is a problem if ESSIV moves to crypto API,
+but there it is presented as a hash... It is really just an IV generator.
 
+> - wiring up some essiv(x,y) combinations into the testing framework. I wonder
+>   if anything other than essiv(aes,sha256) makes sense.
+
+In cryptsetup testsuite, we test serpent and twofish ciphers at least, but in
+reality, essiv(aes,sha256) is the most used combination.
+If it makes sense, I can run some tests with dm-crypt and this patchset.
+
+Thanks,
+Milan
