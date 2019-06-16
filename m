@@ -2,135 +2,102 @@ Return-Path: <SRS0=USLa=UP=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_MUTT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8D75C31E50
-	for <linux-crypto@archiver.kernel.org>; Sun, 16 Jun 2019 19:13:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CD02C31E54
+	for <linux-crypto@archiver.kernel.org>; Sun, 16 Jun 2019 19:43:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8F8D120862
-	for <linux-crypto@archiver.kernel.org>; Sun, 16 Jun 2019 19:13:14 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AVFyW+HO"
+	by mail.kernel.org (Postfix) with ESMTP id E5D3F20870
+	for <linux-crypto@archiver.kernel.org>; Sun, 16 Jun 2019 19:43:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1560714206;
+	bh=1AgnnT0S6q2v3YXitGi8Q9A33dcfbgKdTOY6HZU7i8Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=zrHKRYGeM8TV9UVwwCtH2R3zJE5ctzuZD85qIzxj+2bCqIjQ2IX0I+oxu+umO1tY0
+	 6tgyumZMpJlxN+bb7qCedP00j8dBKOnJTFYpIIGOBSjBzfF1X8Dpejy2ecyvFsIffp
+	 qC9yBCtV0kL6u4puSl7a/sOOSoaErth1p6xg6A0k=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726683AbfFPTNN (ORCPT
+        id S1726890AbfFPTnZ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 16 Jun 2019 15:13:13 -0400
-Received: from mail-io1-f67.google.com ([209.85.166.67]:36512 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726085AbfFPTNN (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 16 Jun 2019 15:13:13 -0400
-Received: by mail-io1-f67.google.com with SMTP id h6so16699415ioh.3
-        for <linux-crypto@vger.kernel.org>; Sun, 16 Jun 2019 12:13:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=saUshM2iv2FhtdSgUUkXIgTrskoGJu0Ya5EbuRmU4C8=;
-        b=AVFyW+HOIC/dDzrlp6oyi565VgYUCIlE1FrmGeeEWn/+HOG49dqLCMEGLSNsBA7tRr
-         jaRXDJaL+cFwGxkDv3+sb4bPFcnLic922GupQ5/bglCOFB0kH7x7ZibqhqjV2gKUkiJf
-         HjxVM95nwDns58YfY7DlKQMfwihX2fmB8J8iug8VHeK/XOP0i3pn46BhipxHQ9rSSTDU
-         5R+D5sN1CnYMiIHkoqkM47R9qJc63gKC9rUvP+Ql5JnYVr0dcsHCoteTcvdBRk8uaRa4
-         rhYJYEFLjb3vTrChcI5CzYUM/jpP4NGgef2G+RZoHZOsVGoDNCekvUWRENwsEz1vOnI+
-         gxTQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=saUshM2iv2FhtdSgUUkXIgTrskoGJu0Ya5EbuRmU4C8=;
-        b=uUy4brzvQ8kAofT0mEVyzveeeowVfdReGdxZpTu9Pn+lLfnKZQ+HmDjgK0Fft0Cg3+
-         kpc/3Hgv4hBFequsX3Mqw5RuWCmZjnDKkqku4A3CzEzQ07WJai5tfse552zC8jsb9u3S
-         f7o1EgRkLjdlO4pojYPnwvLo45mtTctcXllWaJzTJYtUAubUQrUhONuIb5f4IeVGwaqe
-         UZApKQDbVYp8browfs8/b5T865w5jO5syhBbNQu9hPZMWxJoUyLLSW8GQS5OT4P0tl5/
-         4d2EnQ+lCr0RM/EfvGovigzU3r6VHUJs+GSfEIQQLkPVz/sPkHY+xtyguiAByJNWDZUX
-         q44A==
-X-Gm-Message-State: APjAAAVxZdvTxhKqRd+zWVrn+Kricaxsp12kQp2xFbDORy+4hthy7NyE
-        lgZAaXW3+PWBC2RgnGyLTxZgaecSQrurdaRFMq/g2w==
-X-Google-Smtp-Source: APXvYqzdRuBylfGxZV2fAUINljLY0ZoCJUaBkiU4gjdAJj4xQb7wKXFKBT192juh48giR7xMv6l0L1lcojs8nIkwvHM=
-X-Received: by 2002:a5e:820a:: with SMTP id l10mr12989202iom.283.1560712392550;
- Sun, 16 Jun 2019 12:13:12 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190614083404.20514-1-ard.biesheuvel@linaro.org> <9cd635ec-970b-bd1b-59f4-1a07395e69a0@gmail.com>
-In-Reply-To: <9cd635ec-970b-bd1b-59f4-1a07395e69a0@gmail.com>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Sun, 16 Jun 2019 21:13:01 +0200
-Message-ID: <CAKv+Gu88tYOmO=8mi7yP2oj=x_SOB_o7D9jo6v_3xfbUxY2R1A@mail.gmail.com>
-Subject: Re: [RFC PATCH 0/3] crypto: switch to shash for ESSIV generation
-To:     Milan Broz <gmazyland@gmail.com>
-Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        Sun, 16 Jun 2019 15:43:25 -0400
+Received: from mail.kernel.org ([198.145.29.99]:41894 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726411AbfFPTnY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 16 Jun 2019 15:43:24 -0400
+Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id E1C7E2070B;
+        Sun, 16 Jun 2019 19:43:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1560714204;
+        bh=1AgnnT0S6q2v3YXitGi8Q9A33dcfbgKdTOY6HZU7i8Y=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=qThrRM9iE3m6BsJgprPRppxZOhCLl0+LTd+186RfRwXg1YgiXZbDZCM9yBtSPTL9O
+         7SMe/RPsOO0GzJM1eQ9JuK7f29a0H4TsNyzwSeSacVy+3Hyk3YDhyGQISvARRpu4EJ
+         JtdCBx23eIXnKBu7PNH6dSa1wTbPV93zkTq0Xq+Y=
+Date:   Sun, 16 Jun 2019 12:43:22 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     "<linux-wireless@vger.kernel.org>" <linux-wireless@vger.kernel.org>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
         <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Eric Biggers <ebiggers@google.com>,
-        device-mapper development <dm-devel@redhat.com>,
-        Mike Snitzer <msnitzer@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+        Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH] wireless: airo: switch to skcipher interface
+Message-ID: <20190616194322.GC923@sol.localdomain>
+References: <20190614093603.22771-1-ard.biesheuvel@linaro.org>
+ <20190616071206.GB698@sol.localdomain>
+ <CAKv+Gu97xkz5qxycyjqmukFhWAD6p=eYbTqoPWt-ZNbBFDbNAw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKv+Gu97xkz5qxycyjqmukFhWAD6p=eYbTqoPWt-ZNbBFDbNAw@mail.gmail.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, 15 Jun 2019 at 20:19, Milan Broz <gmazyland@gmail.com> wrote:
->
-> On 14/06/2019 10:34, Ard Biesheuvel wrote:
-> > This series is presented as an RFC for a couple of reasons:
-> > - it is only build tested
-> > - it is unclear whether this is the right way to move away from the use of
-> >   bare ciphers in non-crypto code
-> > - we haven't really discussed whether moving away from the use of bare ciphers
-> >   in non-crypto code is a goal we agree on
+On Sun, Jun 16, 2019 at 09:03:58PM +0200, Ard Biesheuvel wrote:
 > >
-> > This series creates an ESSIV shash template that takes a (cipher,hash) tuple,
-> > where the digest size of the hash must be a valid key length for the cipher.
-> > The setkey() operation takes the hash of the input key, and sets into the
-> > cipher as the encryption key. Digest operations accept input up to the
-> > block size of the cipher, and perform a single block encryption operation to
-> > produce the ESSIV output.
+> > Otherwise this patch looks correct to me.
 > >
-> > This matches what both users of ESSIV in the kernel do, and so it is proposed
-> > as a replacement for those, in patches #2 and #3.
+> > The actual crypto in this driver, on the other hand, looks very outdated and
+> > broken.  Apparently it's implementing some Cisco proprietary extension to WEP
+> > that uses a universal hashing based MAC, where the hash key is generated from
+> > AES-CTR.  But the MAC is only 32 bits, and the universal hash (MMH) is
+> > implemented incorrectly: there's an off-by-one error in emmh32_final() in the
+> > code that is supposed to be an optimized version of 'sum % ((1ULL << 32) + 15)'.
 > >
-> > As for the discussion: the code is untested, so it is presented for discussion
-> > only. I'd like to understand whether we agree that phasing out the bare cipher
-> > interface from non-crypto code is a good idea, and whether this approach is
-> > suitable for fscrypt and dm-crypt.
->
-> If you want some discussion, it would be very helpful if you cc device-mapper list
-> to reach dm-crypt developers. Please add at least dm-devel list.
->
-> Just a few comments:
->
->  - ESSIV is useful only for CBC mode. I wish we move to some better mode
-> in the future instead of cementing CBC use... But if it helps people
-> to actually use unpredictable IV for CBC, it is the right approach.
-> (yes, I know XTS has own problems as well... but IMO that should be the default
-> for sector/fs-block encryption these days :)
->
+> 
+> I stared at that code for a bit, and I don't see the problem.
+> 
 
-I agree that XTS should be preferred. But for some reason, the
-kernel's XTS implementation does not support ciphertext stealing (as
-opposed to, e.g., OpenSSL), and so CBC ended up being used for
-encrypting the filenames in fscrypt.
+I'm fairly certain that the line:
 
-I am trying to serve both customers with the same solution here,
-regardless of whether it is the recommended approach or not.
+	if (utmp > 0x10000000fLL)
 
-> - I do not think there is a problem if ESSIV moves to crypto API,
-> but there it is presented as a hash... It is really just an IV generator.
->
+is supposed to be:
 
-True. But we don't have the proper abstractions to make this
-distinction, and so a shash is currently the best match.
+	if (utmp >= 0x10000000fLL)
 
-> > - wiring up some essiv(x,y) combinations into the testing framework. I wonder
-> >   if anything other than essiv(aes,sha256) makes sense.
->
-> In cryptsetup testsuite, we test serpent and twofish ciphers at least, but in
-> reality, essiv(aes,sha256) is the most used combination.
-> If it makes sense, I can run some tests with dm-crypt and this patchset.
->
+Since it's doing mod 0x10000000f.  It's supposed to be an optimized
+implementation of 'val = (u32)(context->accum % 0x10000000f)' where 0x10000000f
+is the prime number 2^32 + 15.  It's meant to be the MMH algorithm: Section 3.2
+of https://link.springer.com/content/pdf/10.1007/BFb0052345.pdf.  But there are
+values of 'accum' where it gives the wrong result, e.g. 14137323879880455377.
 
-OK, that is helpful, thanks. Mind if I ping you once we reach a state
-where we need to test for correctness? At the moment, this is still
-mostly a discussion piece.
+Possibly this is a bug in the Cisco MIC protocol itself so can't be fixed.
+
+> > Do we know whether anyone is actually using this, or is this just another old
+> > driver that's sitting around unused?
+> >
+> 
+> Excellent question. I take it this is pre-802.11b hardware, and so
+> even the OpenWRT people are unlikely to still be using this.
+
+- Eric
