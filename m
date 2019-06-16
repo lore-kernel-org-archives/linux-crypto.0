@@ -2,137 +2,167 @@ Return-Path: <SRS0=USLa=UP=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_MUTT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B797AC31E50
-	for <linux-crypto@archiver.kernel.org>; Sun, 16 Jun 2019 18:25:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F41C3C46477
+	for <linux-crypto@archiver.kernel.org>; Sun, 16 Jun 2019 19:01:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 89B1B20866
-	for <linux-crypto@archiver.kernel.org>; Sun, 16 Jun 2019 18:25:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="J53VliZa"
+	by mail.kernel.org (Postfix) with ESMTP id D5D482087F
+	for <linux-crypto@archiver.kernel.org>; Sun, 16 Jun 2019 19:01:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1560711700;
+	bh=uKpMk1eVVCVzEgPW07wIJmXouA1MVHp1ZTRzCcQswpE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=amcKxYstvPODV34R7vLWb0vq5eCi1eYTTBdu87KckOha7mgMXKCIHX28oFRWTlP58
+	 K7cwiOUW3FFiNvq0SVS1uSLx+4mHrEboj3qOZGOopSj4FA34jvpg5MsjfjwHZm19Cm
+	 7AWoBAw+QTvdEiAVYfNeNkAkRLn5zaG953QAP9xU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727138AbfFPSZb (ORCPT
+        id S1726016AbfFPTBj (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 16 Jun 2019 14:25:31 -0400
-Received: from mail-io1-f66.google.com ([209.85.166.66]:38109 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726038AbfFPSZb (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 16 Jun 2019 14:25:31 -0400
-Received: by mail-io1-f66.google.com with SMTP id d12so8523960iod.5
-        for <linux-crypto@vger.kernel.org>; Sun, 16 Jun 2019 11:25:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=e3Arpmy1FqFbai2jFV7A32rIgKalw4zz1T4egHdTM1Q=;
-        b=J53VliZa7ga0/F1EcWr9clfaa8BGIvQt9D3/186ZMVYvachuFn8fsd0VZbtDA8wQm8
-         B/JeYzAHs6eAcs33hz65pcr0iQRP0Uwb24SAqbNBrRiPJP1xqGtqN2QSc9ULAi0B1/kt
-         c3LdZUo5buKngXLCPheb+CpKIJ+JWli/QQYC565PZzvYFugH1dSt/ukj+MCjwIAZBRkB
-         29lnyB+qm5AiaK2Fhp0oDk55Q7XX0V6B9pBBWHlFFNHX9voi0rMx+xKYKlzxc33RMVYh
-         gT4oIihT+1+8112DFzwy9Mds201jIImWQuMX2qNyupdxbGviyA+/H4JrlxprxZHOdgtS
-         q6wA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=e3Arpmy1FqFbai2jFV7A32rIgKalw4zz1T4egHdTM1Q=;
-        b=gb88BVt90kDARuqgPJ+Y1PczPH+SnJksGARn4TJzplHDLlADqqrL/66MUch37SXRBl
-         2rMfF4TXk4IdCSUMVYe4Mu9I/AQFDN8e+nIifkgHoXJ7wvmoP5jsNm6PQ90JiVowlcIa
-         axK/XcM3wNGOdBJ42UTwyKeBotO2kqeXLNv86ioKk2y/IJb87uSHKzN6L5UhRhvVbLN4
-         A/5Y0qzXZoU/8Hyd/tgepXbfJoff9IsafTiw1BLgs5LwAUKLeXtcbGsDPFBVVlCVK3kI
-         RJuBz83tNgxZxjWu3XkWyrk+RuFiVom/iZ41Y314WQQzPDxm8b9da6ViV5UNTqeqlwCY
-         uX4Q==
-X-Gm-Message-State: APjAAAVls1pW6lgiTcN+C10p9QWBIrCfB/Tc0RP47psRVhQk5IiS98qa
-        Q16Umydi/Cgl0SWHAcKE7coC2qs7Z7dhgc4F9rX4sR/tgmw=
-X-Google-Smtp-Source: APXvYqzQ60Up5Foe2d3aljP1+cwPYln9V2X4zMlIB/LjUPLv4g7RKXCdRoKISpEotPV+vCs2qT3WzRaDY2w1eVy3h9I=
-X-Received: by 2002:a02:1a86:: with SMTP id 128mr80765506jai.95.1560709530418;
- Sun, 16 Jun 2019 11:25:30 -0700 (PDT)
+        Sun, 16 Jun 2019 15:01:39 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57818 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725920AbfFPTBj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 16 Jun 2019 15:01:39 -0400
+Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 265F920665;
+        Sun, 16 Jun 2019 19:01:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1560711698;
+        bh=uKpMk1eVVCVzEgPW07wIJmXouA1MVHp1ZTRzCcQswpE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=BwsDH9PCiN+eEb72SoZHwoJgyqQZ2G9ajKJ3nUVwQ0sMrULEBzJrntNV6egZs8X/a
+         Wu19UkYl76BExO+ewj0M/BUzyfaG4Phgbt6Pta0OfhFmTlIwRi2fVTF4+rAz5k4kDH
+         teUuSXd0dSsK4vy5JEOik/bGBiVp4ZqF5tTi9Rcg=
+Date:   Sun, 16 Jun 2019 12:01:36 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     linux-wireless@vger.kernel.org, johannes@sipsolutions.net,
+        linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
+Subject: Re: [PATCH] lib80211: use crypto API ccm(aes) transform for CCMP
+ processing
+Message-ID: <20190616190136.GA923@sol.localdomain>
+References: <20190614092922.22517-1-ard.biesheuvel@linaro.org>
 MIME-Version: 1.0
-References: <20190615091745.3100-1-ard.biesheuvel@linaro.org>
- <20190616012056.GA698@sol.localdomain> <CAKv+Gu_j_y3oSPy8JbTdNYVjzsSw72gM+UcC6+u_WBtw6opX2Q@mail.gmail.com>
- <20190616071951.GC698@sol.localdomain>
-In-Reply-To: <20190616071951.GC698@sol.localdomain>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Sun, 16 Jun 2019 20:25:18 +0200
-Message-ID: <CAKv+Gu8ngYYHVTb3hzLo28_f2861SRX2yc5fFkp1k0PR=Zi4tQ@mail.gmail.com>
-Subject: Re: [PATCH v3] wusb: switch to cbcmac transform
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-usb <linux-usb@vger.kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190614092922.22517-1-ard.biesheuvel@linaro.org>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, 16 Jun 2019 at 09:19, Eric Biggers <ebiggers@kernel.org> wrote:
->
-> On Sun, Jun 16, 2019 at 08:52:32AM +0200, Ard Biesheuvel wrote:
-> > On Sun, 16 Jun 2019 at 03:20, Eric Biggers <ebiggers@kernel.org> wrote:
-> > >
-> > > On Sat, Jun 15, 2019 at 11:17:45AM +0200, Ard Biesheuvel wrote:
-> > > > The wusb code takes a very peculiar approach at implementing CBC-MAC,
-> > > > by using plain CBC into a scratch buffer, and taking the output IV
-> > > > as the MAC.
-> > > >
-> > > > We can clean up this code substantially by switching to the cbcmac
-> > > > shash, as exposed by the CCM template. To ensure that the module is
-> > > > loaded on demand, add the cbcmac template name as a module alias.
-> > > >
-> > > > Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> > > > ---
-> > > > v3: - add missing #include to fix build error spotted by kbuild test robot
-> > > > v2: - use finup()/digest() where possible, and process b0+b1 using a single
-> > > >       call to update()
-> > > >     - make 'stv_hsmic_hs' static const and remove comment regarding GCC 4.1
-> > > >
-> > > > NOTE: I don't have any hardware to test this, but the built-in selftest
-> > > >       still passes.
-> > > >
-> > > >  crypto/ccm.c                  |   1 +
-> > > >  drivers/usb/wusbcore/crypto.c | 169 +++++---------------
-> > > >  2 files changed, 45 insertions(+), 125 deletions(-)
-> > > >
-> > >
-> > > drivers/usb/wusbcore/Kconfig also needs to be updated:
-> > >
-> > > diff --git a/drivers/usb/wusbcore/Kconfig b/drivers/usb/wusbcore/Kconfig
-> > > index 12e89189ca7d..2ec17d6af1f8 100644
-> > > --- a/drivers/usb/wusbcore/Kconfig
-> > > +++ b/drivers/usb/wusbcore/Kconfig
-> > > @@ -6,9 +6,7 @@ config USB_WUSB
-> > >         tristate "Enable Wireless USB extensions"
-> > >         depends on UWB
-> > >          select CRYPTO
-> > > -        select CRYPTO_BLKCIPHER
-> > > -        select CRYPTO_CBC
-> > > -        select CRYPTO_MANAGER
-> >
-> > We'll need this one, as it isn't implied by any of the other ones, and
-> > cbcmac(aes) will be composed of the ccm template and the aes cipher on
-> > all architectures except arm64.
-> >
-> > > +        select CRYPTO_CCM
->
-> Are you talking about CRYPTO_MANAGER?  One of my recent patches added
-> 'select CRYPTO_MANAGER' to the templates that didn't already select it,
-> including CCM.  See in cryptodev.git:
->
->         commit c8a3315a5f691cc4be16421aeb0608495c9a33ba
->         Author: Eric Biggers <ebiggers@google.com>
->         Date:   Mon May 20 09:49:46 2019 -0700
->
->             crypto: make all templates select CRYPTO_MANAGER
->
-> So it shouldn't need to be selected here.
->
+Hi Ard,
 
-Ah yes, thanks for pointing that out.
+On Fri, Jun 14, 2019 at 11:29:22AM +0200, Ard Biesheuvel wrote:
+> -static void ccmp_init_blocks(struct crypto_cipher *tfm,
+> -			     struct ieee80211_hdr *hdr,
+> -			     u8 * pn, size_t dlen, u8 * b0, u8 * auth, u8 * s0)
+> +static void ccmp_init_blocks(struct ieee80211_hdr *hdr,
+> +			     u8 * pn, size_t dlen, u8 * b0, u8 * aad)
+>  {
+>  	u8 *pos, qc = 0;
+>  	size_t aad_len;
+>  	int a4_included, qc_included;
+> -	u8 aad[2 * AES_BLOCK_LEN];
+>  
+>  	a4_included = ieee80211_has_a4(hdr->frame_control);
+>  	qc_included = ieee80211_is_data_qos(hdr->frame_control);
+> @@ -131,17 +123,19 @@ static void ccmp_init_blocks(struct crypto_cipher *tfm,
+>  		aad_len += 2;
+>  	}
+>  
+> -	/* CCM Initial Block:
+> -	 * Flag (Include authentication header, M=3 (8-octet MIC),
+> -	 *       L=1 (2-octet Dlen))
+> -	 * Nonce: 0x00 | A2 | PN
+> -	 * Dlen */
+> -	b0[0] = 0x59;
+> +	/* In CCM, the initial vectors (IV) used for CTR mode encryption and CBC
+> +	 * mode authentication are not allowed to collide, yet both are derived
+> +	 * from this vector b0. We only set L := 1 here to indicate that the
+> +	 * data size can be represented in (L+1) bytes. The CCM layer will take
+> +	 * care of storing the data length in the top (L+1) bytes and setting
+> +	 * and clearing the other bits as is required to derive the two IVs.
+> +	 */
+> +	b0[0] = 0x1;
+> +
+> +	/* Nonce: QC | A2 | PN */
+>  	b0[1] = qc;
+>  	memcpy(b0 + 2, hdr->addr2, ETH_ALEN);
+>  	memcpy(b0 + 8, pn, CCMP_PN_LEN);
+> -	b0[14] = (dlen >> 8) & 0xff;
+> -	b0[15] = dlen & 0xff;
+>  
+>  	/* AAD:
+>  	 * FC with bits 4..6 and 11..13 masked to zero; 14 is always one
+> @@ -166,16 +160,6 @@ static void ccmp_init_blocks(struct crypto_cipher *tfm,
+>  		aad[a4_included ? 30 : 24] = qc;
+>  		/* rest of QC masked */
+>  	}
+> -
+> -	/* Start with the first block and AAD */
+> -	lib80211_ccmp_aes_encrypt(tfm, b0, auth);
+> -	xor_block(auth, aad, AES_BLOCK_LEN);
+> -	lib80211_ccmp_aes_encrypt(tfm, auth, auth);
+> -	xor_block(auth, &aad[AES_BLOCK_LEN], AES_BLOCK_LEN);
+> -	lib80211_ccmp_aes_encrypt(tfm, auth, auth);
+> -	b0[0] &= 0x07;
+> -	b0[14] = b0[15] = 0;
+> -	lib80211_ccmp_aes_encrypt(tfm, b0, s0);
+>  }
+
+How about shifting the contents of aad over by 2 bytes and returning the AAD
+length from this function instead?  It's confusing to still manually format the
+AAD length for CCM mode, when actually it's ignored now.
+
+Also I suggest fixing up the naming:
+
+	ccmp_init_blocks() => ccmp_init_iv_and_aad()
+	b0 => iv
+
+>  
+>  static int lib80211_ccmp_hdr(struct sk_buff *skb, int hdr_len,
+> @@ -218,13 +202,13 @@ static int lib80211_ccmp_hdr(struct sk_buff *skb, int hdr_len,
+>  static int lib80211_ccmp_encrypt(struct sk_buff *skb, int hdr_len, void *priv)
+>  {
+>  	struct lib80211_ccmp_data *key = priv;
+> -	int data_len, i, blocks, last, len;
+> -	u8 *pos, *mic;
+>  	struct ieee80211_hdr *hdr;
+> -	u8 *b0 = key->tx_b0;
+> -	u8 *b = key->tx_b;
+> -	u8 *e = key->tx_e;
+> -	u8 *s0 = key->tx_s0;
+> +	struct aead_request *req;
+> +	struct scatterlist sg[2];
+> +	u8 *aad = key->tx_aad;
+> +	u8 b0[AES_BLOCK_LEN];
+> +	int len, data_len;
+> +	int ret;
+>  
+>  	if (skb_tailroom(skb) < CCMP_MIC_LEN || skb->len < hdr_len)
+>  		return -1;
+> @@ -234,31 +218,29 @@ static int lib80211_ccmp_encrypt(struct sk_buff *skb, int hdr_len, void *priv)
+>  	if (len < 0)
+>  		return -1;
+>  
+> -	pos = skb->data + hdr_len + CCMP_HDR_LEN;
+> +	req = kzalloc(sizeof(*req) + crypto_aead_reqsize(key->tfm), GFP_ATOMIC);
+> +	if (!req)
+> +		return -ENOMEM;
+> +
+
+Why not kzalloc() and kzfree() instead of aead_request_alloc() and
+aead_request_free()?  Same in lib80211_ccmp_decrypt().
+
+Otherwise this patch looks good, though I'd like for someone to test it.
+
+Thanks for doing this!
+
+- Eric
