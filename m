@@ -2,67 +2,133 @@ Return-Path: <SRS0=USLa=UP=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52ABCC31E54
-	for <linux-crypto@archiver.kernel.org>; Sun, 16 Jun 2019 20:09:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D88F8C31E50
+	for <linux-crypto@archiver.kernel.org>; Sun, 16 Jun 2019 20:44:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 368D920862
-	for <linux-crypto@archiver.kernel.org>; Sun, 16 Jun 2019 20:09:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AD02920866
+	for <linux-crypto@archiver.kernel.org>; Sun, 16 Jun 2019 20:44:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1560717862;
+	bh=ERPegYNkzD1FcPth0R9F9JaoxJphp4IIppVtDXCAaNw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=egvG6ja3bbu9paN3rIYvg4YcWmGlAG6ROmFSTQ2T4wftdlJojNFHXVT2VzrlmZnHN
+	 GQRRmS+bE4spFNt3VkL9B/g2DZi2pZGFf26wHfwb6AcpCH2mfgeKkMxtnvqPovCJQC
+	 /i3HY3KWm3jhYGXHvr5tBXzP5F7kYDXoWQaj9dPM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727435AbfFPUJD (ORCPT
+        id S1726069AbfFPUoV (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 16 Jun 2019 16:09:03 -0400
-Received: from s3.sipsolutions.net ([144.76.43.62]:49298 "EHLO
-        sipsolutions.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727211AbfFPUJD (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 16 Jun 2019 16:09:03 -0400
-Received: by sipsolutions.net with esmtpsa (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <johannes@sipsolutions.net>)
-        id 1hcbST-00032L-Uf; Sun, 16 Jun 2019 22:08:58 +0200
-Message-ID: <25dc2ee30a6a3eb855611c9fd5f6b2861dd0a518.camel@sipsolutions.net>
-Subject: Re: [PATCH] wireless: airo: switch to skcipher interface
-From:   Johannes Berg <johannes@sipsolutions.net>
-To:     Eric Biggers <ebiggers@kernel.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc:     linux-wireless@vger.kernel.org, kvalo@codeaurora.org,
-        linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-        Ondrej Zary <linux@rainbow-software.org>
-Date:   Sun, 16 Jun 2019 22:08:55 +0200
-In-Reply-To: <20190616071206.GB698@sol.localdomain> (sfid-20190616_091214_044457_F67F583B)
-References: <20190614093603.22771-1-ard.biesheuvel@linaro.org>
-         <20190616071206.GB698@sol.localdomain>
-         (sfid-20190616_091214_044457_F67F583B)
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-2.fc28) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        Sun, 16 Jun 2019 16:44:21 -0400
+Received: from mail.kernel.org ([198.145.29.99]:36722 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725920AbfFPUoV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 16 Jun 2019 16:44:21 -0400
+Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 6B5DA20657;
+        Sun, 16 Jun 2019 20:44:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1560717860;
+        bh=ERPegYNkzD1FcPth0R9F9JaoxJphp4IIppVtDXCAaNw=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=ZD6nfl7QbXsr+bn8m9kTTtdpdUoXBi0n15kPmSdKZAlCEOIRivM4FfR69m3zh2m18
+         LPiET6joxh6wkELK/OQae09JQnGUC/78BNQoB2y1xsBTeG6YEMesv3ZOUxPiKWpNli
+         0KVytrVhuGIvPn94jla5XNNePdj7jk3cHVog67/8=
+Date:   Sun, 16 Jun 2019 13:44:19 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>, dm-devel@redhat.com,
+        linux-fscrypt@vger.kernel.org
+Subject: Re: [RFC PATCH 0/3] crypto: switch to shash for ESSIV generation
+Message-ID: <20190616204419.GE923@sol.localdomain>
+References: <20190614083404.20514-1-ard.biesheuvel@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190614083404.20514-1-ard.biesheuvel@linaro.org>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, 2019-06-16 at 00:12 -0700, Eric Biggers wrote:
+[+Cc dm-devel and linux-fscrypt]
+
+On Fri, Jun 14, 2019 at 10:34:01AM +0200, Ard Biesheuvel wrote:
+> This series is presented as an RFC for a couple of reasons:
+> - it is only build tested
+> - it is unclear whether this is the right way to move away from the use of
+>   bare ciphers in non-crypto code
+> - we haven't really discussed whether moving away from the use of bare ciphers
+>   in non-crypto code is a goal we agree on
 > 
-> The actual crypto in this driver, on the other hand, looks very outdated and
-> broken.  Apparently it's implementing some Cisco proprietary extension to WEP
-> that uses a universal hashing based MAC, where the hash key is generated from
-> AES-CTR.  But the MAC is only 32 bits, and the universal hash (MMH) is
-> implemented incorrectly: there's an off-by-one error in emmh32_final() in the
-> code that is supposed to be an optimized version of 'sum % ((1ULL << 32) + 15)'.
+> This series creates an ESSIV shash template that takes a (cipher,hash) tuple,
+> where the digest size of the hash must be a valid key length for the cipher.
+> The setkey() operation takes the hash of the input key, and sets into the
+> cipher as the encryption key. Digest operations accept input up to the
+> block size of the cipher, and perform a single block encryption operation to
+> produce the ESSIV output.
 > 
-> Do we know whether anyone is actually using this, or is this just another old
-> driver that's sitting around unused?
+> This matches what both users of ESSIV in the kernel do, and so it is proposed
+> as a replacement for those, in patches #2 and #3.
+> 
+> As for the discussion: the code is untested, so it is presented for discussion
+> only. I'd like to understand whether we agree that phasing out the bare cipher
+> interface from non-crypto code is a good idea, and whether this approach is
+> suitable for fscrypt and dm-crypt.
+> 
+> Remaining work:
+> - wiring up some essiv(x,y) combinations into the testing framework. I wonder
+>   if anything other than essiv(aes,sha256) makes sense.
+> - testing - suggestions welcome on existing testing frameworks for dm-crypt
+>   and/or fscrypt
+> 
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: Eric Biggers <ebiggers@google.com>
+> 
+> Ard Biesheuvel (3):
+>   crypto: essiv - create a new shash template for IV generation
+>   dm crypt: switch to essiv shash
+>   fscrypt: switch to ESSIV shash
+> 
+>  crypto/Kconfig              |   3 +
+>  crypto/Makefile             |   1 +
+>  crypto/essiv.c              | 275 ++++++++++++++++++++
+>  drivers/md/Kconfig          |   1 +
+>  drivers/md/dm-crypt.c       | 137 ++--------
+>  fs/crypto/Kconfig           |   1 +
+>  fs/crypto/crypto.c          |  11 +-
+>  fs/crypto/fscrypt_private.h |   4 +-
+>  fs/crypto/keyinfo.c         |  64 +----
+>  9 files changed, 321 insertions(+), 176 deletions(-)
+>  create mode 100644 crypto/essiv.c
 
-I'd guess the latter, though as recent as 2015 Ondrej (CC'ed now)
-actually changed something in the driver that wasn't just cleanups ...
+I agree that moving away from bare block ciphers is generally a good idea.  For
+fscrypt I'm fine with moving ESSIV into the crypto API, though I'm not sure a
+shash template is the best approach.  Did you also consider making it a skcipher
+template so that users can do e.g. "essiv(cbc(aes),sha256,aes)"?  That would
+simplify things much more on the fscrypt side, since then all the ESSIV-related
+code would go away entirely except for changing the string "cbc(aes)" to
+"essiv(cbc(aes),sha256,aes)".
 
-Remove at least this weird Cisco WEP-with-AES-key-generation mode? That
-must pre-date even TKIP?
+Either way, for testing the fscrypt change, I recently added tests to xfstests
+that verify the on-disk ciphertext in userspace, including for non-default modes
+such as the AES-128-CBC-ESSIV in question.  So I'm not too worried about the
+fscrypt encryption getting accidentally broken anymore.  If you want to run the
+AES-128-CBC-ESSIV test yourself, you should be able to do it by following the
+directions at
+https://github.com/tytso/xfstests-bld/blob/master/Documentation/kvm-quickstart.md
+and running 'kvm-xfstests -c ext4 generic/549'.
 
-johannes
+As for adding essiv to testmgr, sha256 and aes would be enough for fscrypt.
+There aren't any plans to add more ESSIV settings to fscrypt, and
+AES-128-CBC-ESSIV was only added in the first place because some people wanted
+to use fscrypt on platforms with CBC hardware acceleration but not XTS.
 
+- Eric
