@@ -2,103 +2,132 @@ Return-Path: <SRS0=Ym9l=UQ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E79B2C31E5D
-	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 15:28:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33CA8C31E5B
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 16:03:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CA26B2182B
-	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 15:28:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 03CD7208C4
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 16:03:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GEbgzSr+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725863AbfFQP2T convert rfc822-to-8bit (ORCPT
+        id S1726248AbfFQQD5 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 17 Jun 2019 11:28:19 -0400
-Received: from eu-smtp-delivery-151.mimecast.com ([207.82.80.151]:44885 "EHLO
-        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726331AbfFQP2T (ORCPT
+        Mon, 17 Jun 2019 12:03:57 -0400
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:42183 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725995AbfFQQD5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 17 Jun 2019 11:28:19 -0400
-Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
- TLS) by relay.mimecast.com with ESMTP id
- uk-mta-214-il9BSCFIPjqk3b60HcUCPg-1; Mon, 17 Jun 2019 16:28:16 +0100
-Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
- AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
- Server (TLS) id 15.0.1347.2; Mon, 17 Jun 2019 16:28:15 +0100
-Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
- AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
- Mon, 17 Jun 2019 16:28:15 +0100
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'Herbert Xu' <herbert@gondor.apana.org.au>,
-        Arnd Bergmann <arnd@arndb.de>
-CC:     Kees Cook <keescook@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Biggers <ebiggers@google.com>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Vitaly Chikunov <vt@altlinux.org>,
-        "Gilad Ben-Yossef" <gilad@benyossef.com>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH] crypto: testmgr - reduce stack usage in fuzzers
-Thread-Topic: [PATCH] crypto: testmgr - reduce stack usage in fuzzers
-Thread-Index: AQHVJRzgXZ6zGpiwtkazfAn7xAaGHKaf9HVg
-Date:   Mon, 17 Jun 2019 15:28:15 +0000
-Message-ID: <139bf69c4d35449d9b3c9265458bab42@AcuMS.aculab.com>
-References: <20190617132343.2678836-1-arnd@arndb.de>
- <20190617140435.qjzcouaqzepaicf4@gondor.apana.org.au>
- <CAK8P3a07Vcqs+6Rs2Ckq_itWfGKUv+_pdgdis9eSujCGHQgFkQ@mail.gmail.com>
- <20190617142419.yw4w5w344tf6ozrb@gondor.apana.org.au>
- <CAK8P3a0G2K4u-Sh495O7_nfc6zydtZBTOJcq19g3YYQA2ZMKFA@mail.gmail.com>
- <20190617145624.p6alck5m6bqaswgp@gondor.apana.org.au>
-In-Reply-To: <20190617145624.p6alck5m6bqaswgp@gondor.apana.org.au>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+        Mon, 17 Jun 2019 12:03:57 -0400
+Received: by mail-pg1-f196.google.com with SMTP id l19so6055515pgh.9;
+        Mon, 17 Jun 2019 09:03:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=gldVmdE+kbOBaEyP28aTa8TNMptT/hmHnswBXsj9exw=;
+        b=GEbgzSr+SeiaUrlixmOsCdJZuCqzY/kMzs1C8A3pms8s+zRn2f/3dk9CM1gG0OqCjk
+         WVFy1aT4H9J1bUa7KXcCdt4tgqz/cAzX5xiNV7hcqGMAbwUkNH1Bk6FoYZP9UaKZfMXn
+         q3cdhwtaEcm+iwEQvbFuSKsVE9mSNV5CL7xvdQIDe035ksz3cF+I6PlmoiBxsw/C3Z4N
+         PWVWgpfErh1rT1SjJApr+fCvcJdPki9qLNdmQzabGw++qkKTappAuxx1e6PFFg+dv+DW
+         Fvfjd8uyE+t1mAjnOnGYOzvhGiQOJPCqSa86Np2BXsUKS5kOwjwdflNWzLPd0TZMcLoq
+         TzCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=gldVmdE+kbOBaEyP28aTa8TNMptT/hmHnswBXsj9exw=;
+        b=ceBF+ld8pAG74ZkVvZmoz/bNo0kXl5Kh8pO7Seb2bKhd8faxEJXjat+eNUqay2Yevq
+         hGzMUxxIn9jPcJCmOTAnsmzJL70uRM2tk/ZFpaY1NPu7jog5hu3yEHGUOGXE/EnQW5/i
+         J60IFGQKnm37ugfQiM068q0BjXbGSwuvgMiQzM8drELii6iHdCU85BiUgbVHwdNvWSIQ
+         FtmopBkAiftsjg+wmypZn6GGut9gggLNXReOZoEMjzgynB4vVVnlfzVP3ziV2P8TGf9w
+         +OCC4lIMdK214zVNuJkDVsnJfLJcr5sUPSGFnnwQjH/QSoekVtNziTSBqOEBQ6bHu/uh
+         r+1w==
+X-Gm-Message-State: APjAAAWHBKbmFr0fLpKmG+GI6rCa8NoGrqaL1sZ6marYy053PdhHKpqW
+        /BIqFNn6NQoGF7gAheLxwRPAqiRvxPI=
+X-Google-Smtp-Source: APXvYqx2OD3dEeOF9vExTqtv/owO7ZgKW4mS3DXvB5ORhd6PozpJOw4bpJ+/Ak8fk/BKiPLesRgSaQ==
+X-Received: by 2002:a63:a514:: with SMTP id n20mr20313003pgf.438.1560787436432;
+        Mon, 17 Jun 2019 09:03:56 -0700 (PDT)
+Received: from localhost.lan (c-24-22-235-96.hsd1.wa.comcast.net. [24.22.235.96])
+        by smtp.gmail.com with ESMTPSA id d187sm12834073pfa.38.2019.06.17.09.03.54
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Mon, 17 Jun 2019 09:03:55 -0700 (PDT)
+From:   Andrey Smirnov <andrew.smirnov@gmail.com>
+To:     linux-crypto@vger.kernel.org
+Cc:     Andrey Smirnov <andrew.smirnov@gmail.com>,
+        Chris Spencer <christopher.spencer@sea.co.uk>,
+        Cory Tusar <cory.tusar@zii.aero>,
+        Chris Healy <cphealy@gmail.com>,
+        Lucas Stach <l.stach@pengutronix.de>,
+        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Leonard Crestez <leonard.crestez@nxp.com>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v3 0/5] crypto: caam - Add i.MX8MQ support
+Date:   Mon, 17 Jun 2019 09:03:34 -0700
+Message-Id: <20190617160339.29179-1-andrew.smirnov@gmail.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-X-MC-Unique: il9BSCFIPjqk3b60HcUCPg-1
-X-Mimecast-Spam-Score: 0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Herbert Xu
-> Sent: 17 June 2019 15:56
-> On Mon, Jun 17, 2019 at 04:54:16PM +0200, Arnd Bergmann wrote:
-> >
-> > Just converting the three testvec_config variables is what I originally
-> > had in my patch. It got some configurations below the warning level,
-> > but some others still had the problem. I considered sending two
-> > separate patches, but as the symptom was the same, I just folded
-> > it all into one patch that does the same thing in four functions.
-> 
-> Just curious, how bad is it with only moving testvec_config off
-> the stack?
+Everyone:
 
-This all reminds me of some code I wrote a long time ago (1984?)
-that worked out the maximum stack use for a system by processing
-all the .o files to find out which functions called which at what
-stack depth and adding everything up.
-That system had no indirect calls and no recursion, but the worst
-stack use was always in diagnostic prints in obscure error paths.
+Picking up where Chris left off (I chatted with him privately
+beforehead), this series adds support for i.MX8MQ to CAAM driver. Just
+like [v1], this series is i.MX8MQ only.
 
-My guess is that the same is true for the Linux kernel.
-While getting rid of large on-stack buffers fixes the obvious cases
-full analysis is needed to guarantee the stack won't overflow.
-Doing that requires some method for determining the stack use
-of indirect calls - which really requires knowing which type of
-function is actually being called from each place.
+Feedback is welcome!
+Thanks,
+Andrey Smirnov
 
-	David
+Changes since [v2]:
 
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-Registration No: 1397386 (Wales)
+  - Dropped "crypto: caam - do not initialise clocks on the i.MX8" and
+    replaced it with "crypto: caam - simplfy clock initialization" and 
+    "crypto: caam - add clock entry for i.MX8MQ"
+
+
+Changes since [v1]
+
+  - Series reworked to continue using register based interface for
+    queueing RNG initialization job, dropping "crypto: caam - use job
+    ring for RNG instantiation instead of DECO"
+
+  - Added a patch to share DMA mask selection code
+
+  - Added missing Signed-off-by for authors of original NXP tree
+    commits that this sereis is based on
+
+[v2] lore.kernel.org/r/20190607200225.21419-1-andrew.smirnov@gmail.com
+[v1] https://patchwork.kernel.org/cover/10825625/
+
+
+Andrey Smirnov (4):
+  crypto: caam - move DMA mask selection into a function
+  crypto: caam - always select job ring via RSR on i.MX8MQ
+  crypto: caam - simplfy clock initialization
+  crypto: caam - add clock entry for i.MX8MQ
+
+Chris Spencer (1):
+  crypto: caam - correct DMA address size for the i.MX8
+
+ drivers/crypto/caam/ctrl.c        | 233 +++++++++++++++---------------
+ drivers/crypto/caam/desc_constr.h |  24 +--
+ drivers/crypto/caam/intern.h      |  29 +++-
+ drivers/crypto/caam/jr.c          |  15 +-
+ drivers/crypto/caam/pdb.h         |  49 ++++---
+ drivers/crypto/caam/regs.h        |  21 ++-
+ 6 files changed, 193 insertions(+), 178 deletions(-)
+
+-- 
+2.21.0
 
