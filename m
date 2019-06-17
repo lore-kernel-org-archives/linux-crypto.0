@@ -8,55 +8,55 @@ X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B825BC31E5B
-	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 16:04:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8F8CC31E5B
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 16:04:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 91C17208E4
-	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 16:04:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A2F1A208E4
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 16:04:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R3cBNid6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XTVTWk8W"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728036AbfFQQEE (ORCPT
+        id S1727936AbfFQQEQ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 17 Jun 2019 12:04:04 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:34303 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727996AbfFQQEE (ORCPT
+        Mon, 17 Jun 2019 12:04:16 -0400
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:39096 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727850AbfFQQEB (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 17 Jun 2019 12:04:04 -0400
-Received: by mail-pf1-f195.google.com with SMTP id c85so5944036pfc.1;
-        Mon, 17 Jun 2019 09:04:03 -0700 (PDT)
+        Mon, 17 Jun 2019 12:04:01 -0400
+Received: by mail-pg1-f196.google.com with SMTP id 196so6074291pgc.6;
+        Mon, 17 Jun 2019 09:04:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=NffYjCT+19kqu15C0XR6euahrUMgoS4xoGIubo2p80U=;
-        b=R3cBNid62KF9am1jU12o6Vn2rYWB32GFZt9Ocsfq6Zl0q4mIRtbdYY/CYx2PtfBQwU
-         Is+SPejpfpMVzkxVeMAwPldav5ZOicXXWNriEAaKO/GBIIiJvdmTMKWwWOuk8IYTfmCy
-         kk2j6S2hbeU8o4Pm6d+iORUrkJsKnsLo70IjKCKcyZbppSQabbXYrXVCme+7XIElmOo3
-         gYQ0O2PmLVy93JdBTDRMrtDp6ETe0QcF9YYl7TV9LeYc+f812hUJGkQYX//zFKUliOQc
-         YdFzZiKCGD+Pui/oFiCaIz61EGepuhmKXDJuzThekR+krWtKOAw8BVPHsoPrG381WNW7
-         YR/g==
+        bh=oScAg815dpC9PbTBv93gNwvPVQ64shuleqb2f2OZnrA=;
+        b=XTVTWk8WXNY8pPbge6G7nLODt/8u6oQt4aSgbpKV342ePgrapp90hreARn0T1BIt4+
+         ATrC5Kowys4Zdn8OJM2TBxl7w2u9Llb8aCD9UmwIhgL9iA487zLZ0LpZquB24YEYjQs+
+         JTOwFP+RcO4x/sctubZSR08s1F2sOvmfrUzHNyu5lJdzDongqMLr1h+JQRn58sO+yyNY
+         o41ERPzMDLOHHFMXQF6jJSzhdtDcCfOkGuMNcGaSw+kYm64IHs4B5hggpHm+hkem13ar
+         CyVF4n70sPpIZQikBje73n1S4vgEqEmKdcwe0FrCc+fq8g2JTxMexTiTXaJxH1dD//1B
+         Yx2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=NffYjCT+19kqu15C0XR6euahrUMgoS4xoGIubo2p80U=;
-        b=EO1hSGv3RJtnvJvl1Q+8Osq2HXdlAtNxpw8YP37qaP0z/p1HyphhZJBclSzRomdl9P
-         8g1dTlm9kpp7u/3pAzRMLoFdSEEY4duuDIjUGTM1JoVGK8zgCsbCN4JLLU0eXyly/fMw
-         F2qhwFh3Zf7dmyE1/iqRgBBMzWMESe3VJyc0rbSkWRIPFc4VZfdznPHTvF0/KuvgG2hq
-         DHqCJ4SioCNjH2hNiiSlTvOniS8cSo2V7TkdPNGcSTphZehuxANcXHwGn/hIsQJ9QdXC
-         Ur1TzZ0Be+epbr/0yb4kLp0ErnCCgKDE638UazPt6MWmEPtLl1702g0+XwndUv9wBtth
-         VRmQ==
-X-Gm-Message-State: APjAAAVtZ9/VeaERkEkaSxaDzM7YtA4n3AH9yAFtlj+SiiWdwHqoCRtU
-        HKExV7vvlxeycGEW/J/jjbj2dOpBD3k=
-X-Google-Smtp-Source: APXvYqwGL2+Nxya4XyPZRBn7XDI9RyxIsPE29y5kHHokxNLIRcofTWz35lXpf0khrx3oEdO4HI6kcQ==
-X-Received: by 2002:aa7:8394:: with SMTP id u20mr102119781pfm.252.1560787442976;
-        Mon, 17 Jun 2019 09:04:02 -0700 (PDT)
+        bh=oScAg815dpC9PbTBv93gNwvPVQ64shuleqb2f2OZnrA=;
+        b=j8TVqzIAyaKIM/jMdNQkviH5L+1hWQysz5XQAprY6oFPS2EJe4WQ3neenhjgzbsNa/
+         DOyNxgXx/gTF9wX9VoBV3V5OF0SKUEF7ZbcI8Zr51x6Gf/A29WYA6t25gOkD/kGPPu2Z
+         fx9qr/GvFFTbai3g2MdPPzrYe9+AC+E4aVej7ZII0oeLVNQ5bxnv4ZsdatyWR7L+DCdz
+         txwC1ECpeNfIx4OuJ/U//WMlzitukTc4bQPgsp3EhrO/ivw+ROjcXkD2ENXMIWpbkjkN
+         aLISM6RCkn6JhJXRsul5f9HCCw7V44ET5sPfbHCXIsCXlysSoxuB4YE4n8ZGQcTTcYxS
+         Uuow==
+X-Gm-Message-State: APjAAAXvybZw21sxrvkhUV6J7s80yAPffB1GXQEmY3uuIauZSk24yPfz
+        UHlvNJsDxuDWqJa+ZIxqyTcYnesS4qs=
+X-Google-Smtp-Source: APXvYqwvMTwCuiva/0ovNeyEtQGktnr9d19qG0OGj8M3dcSsOwzcGLGR77hmH15gdmTUVJLA7JSZng==
+X-Received: by 2002:a62:f20b:: with SMTP id m11mr62297938pfh.125.1560787440440;
+        Mon, 17 Jun 2019 09:04:00 -0700 (PDT)
 Received: from localhost.lan (c-24-22-235-96.hsd1.wa.comcast.net. [24.22.235.96])
-        by smtp.gmail.com with ESMTPSA id d187sm12834073pfa.38.2019.06.17.09.04.01
+        by smtp.gmail.com with ESMTPSA id d187sm12834073pfa.38.2019.06.17.09.03.59
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Mon, 17 Jun 2019 09:04:02 -0700 (PDT)
+        Mon, 17 Jun 2019 09:03:59 -0700 (PDT)
 From:   Andrey Smirnov <andrew.smirnov@gmail.com>
 To:     linux-crypto@vger.kernel.org
 Cc:     Andrey Smirnov <andrew.smirnov@gmail.com>,
@@ -68,9 +68,9 @@ Cc:     Andrey Smirnov <andrew.smirnov@gmail.com>,
         Aymen Sghaier <aymen.sghaier@nxp.com>,
         Leonard Crestez <leonard.crestez@nxp.com>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v3 5/5] crypto: caam - add clock entry for i.MX8MQ
-Date:   Mon, 17 Jun 2019 09:03:39 -0700
-Message-Id: <20190617160339.29179-6-andrew.smirnov@gmail.com>
+Subject: [PATCH v3 3/5] crypto: caam - always select job ring via RSR on i.MX8MQ
+Date:   Mon, 17 Jun 2019 09:03:37 -0700
+Message-Id: <20190617160339.29179-4-andrew.smirnov@gmail.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190617160339.29179-1-andrew.smirnov@gmail.com>
 References: <20190617160339.29179-1-andrew.smirnov@gmail.com>
@@ -82,7 +82,13 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add clock entry needed to support i.MX8MQ.
+Per feedback from NXP tech support the way to use register based
+service interface on i.MX8MQ is to follow the same set of steps
+outlined for the case when virtualization is enabled, regardless if it
+is. Current version of SRM for i.MX8MQ speaks of DECO DID_MS and DECO
+DID_LS registers, but apparently those are not implemented, so the
+case when SCFGR[VIRT_EN]=0 should be handles the same as the case when
+SCFGR[VIRT_EN]=1
 
 Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
 Cc: Chris Spencer <christopher.spencer@sea.co.uk>
@@ -95,21 +101,27 @@ Cc: Leonard Crestez <leonard.crestez@nxp.com>
 Cc: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
 ---
- drivers/crypto/caam/ctrl.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/crypto/caam/ctrl.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-index b9655957d369..888eacc7c17d 100644
+index e674d8770cdb..e6e2457a573e 100644
 --- a/drivers/crypto/caam/ctrl.c
 +++ b/drivers/crypto/caam/ctrl.c
-@@ -528,6 +528,7 @@ static const struct soc_device_attribute imx_soc[] = {
- 	{ .soc_id = "i.MX6UL", .data = &caam_imx6ul_clk_data },
- 	{ .soc_id = "i.MX6*",  .data = &caam_imx6_clk_data },
- 	{ .soc_id = "i.MX7*",  .data = &caam_imx7_clk_data },
-+	{ .soc_id = "i.MX8MQ", .data = &caam_imx7_clk_data },
- 	{ .family = "Freescale i.MX" },
- };
+@@ -107,7 +107,12 @@ static inline int run_descriptor_deco0(struct device *ctrldev, u32 *desc,
+ 	int i;
  
+ 
+-	if (ctrlpriv->virt_en == 1) {
++	if (ctrlpriv->virt_en == 1 ||
++	    /*
++	     * Apparently on i.MX8MQ it doesn't matter if virt_en == 1
++	     * and the following steps should be performed regardless
++	     */
++	    of_machine_is_compatible("fsl,imx8mq")) {
+ 		clrsetbits_32(&ctrl->deco_rsr, 0, DECORSR_JR0);
+ 
+ 		while (!(rd_reg32(&ctrl->deco_rsr) & DECORSR_VALID) &&
 -- 
 2.21.0
 
