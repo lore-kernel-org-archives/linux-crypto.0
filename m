@@ -2,124 +2,236 @@ Return-Path: <SRS0=Ym9l=UQ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84F2AC31E54
-	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 08:32:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16FE5C31E54
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 08:43:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5D7EB21EF2
-	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 08:32:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D92692080A
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 08:43:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SUP0HB8C"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rqrStsbc"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726405AbfFQIc1 (ORCPT
+        id S1725884AbfFQInp (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 17 Jun 2019 04:32:27 -0400
-Received: from mail-io1-f65.google.com ([209.85.166.65]:45524 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726355AbfFQIc1 (ORCPT
+        Mon, 17 Jun 2019 04:43:45 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:38137 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725837AbfFQInp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 17 Jun 2019 04:32:27 -0400
-Received: by mail-io1-f65.google.com with SMTP id e3so19236231ioc.12
-        for <linux-crypto@vger.kernel.org>; Mon, 17 Jun 2019 01:32:26 -0700 (PDT)
+        Mon, 17 Jun 2019 04:43:45 -0400
+Received: by mail-wr1-f68.google.com with SMTP id d18so8976051wrs.5
+        for <linux-crypto@vger.kernel.org>; Mon, 17 Jun 2019 01:43:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=e/UVFvSTOnQx2MdEwCsdbLMftAMFG5W38DFDRZnlaqE=;
-        b=SUP0HB8CO812sk5oBxHZBrx0VmZ/7Tn8LPjsNe48JSOup+I9iNPzIepwpMxWQwOr8O
-         KCDs4lKIm1EfJGd/e7NiKdRBd40qx2t0L8zAXk8Axh8jMohrGjO/7WmH0DyZbrv3yPcg
-         ukGi6X2f6pJES1kiGjYUkc5VUfC8KxWn1Uh+eO9mWdXHT8KMx7OZKGZsl0ee0gWlMoxH
-         xWLXjbPrRS55FFj7io0SM+hkIMfcctPC6L8oozNOzt/Hl/kZ7S9ZHAN4UXChXsyRexoL
-         +2UA84C2ri0PpIj3SPhQkDxO9i0TOl4Q6HbwDq6pbMhMZNVJkuf3rntsQsYYRiDZklN2
-         2hCA==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=tm9I8joZj3DtpZNyzaSmkPCuBjAPR7mVgbFSLszXQG8=;
+        b=rqrStsbcjK2wqBpOn/nGjuvXvPeAKlZN0/DIkQbGa5UxSQWMhbXz81feez9XCSXiIQ
+         tMpsLU5T6108426E4Cz+7fpoRMOZuU0wM9MKNrZ+15+gFUxUoPUG0YLxT+94MczDknUN
+         mX/aY4mp8Iz8N7+zCg8JsGQKh7wdEUksx5y9dDP73Etlink+kcljZGgKutYSmFFnGsyb
+         ADfbl6C10DLmcrEwagBiKYZkHXtSWF509TERbDpN/LFUtt74TkESx9ihaiCFX4sizY8R
+         2LbUqVT0IvtWkYkB8KqDVw5cGR7LqCbcK7WSYZ50eWlRYcR0uBHVHDlL5MuLYIcQYLHA
+         jQSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=e/UVFvSTOnQx2MdEwCsdbLMftAMFG5W38DFDRZnlaqE=;
-        b=Mdgt9SRJX0yuEJTyIdf259rC6hCfUSmTiMqHRDLN7t+KHpEz/QI7pMTkzh7tqOCvAi
-         usIJGVhGkajxUeUA5FCmeFNtjAHy5tMCrL0xLfK3RUyOljmJ2G4rA+gx1uO6figGE5Sc
-         jslfrk27qOwAXgGAPmTOr+6LP21+iGPTZEO+GvQjGsJfL3W2QQ/GiVpJCm7QSaxdgYBn
-         WCioM7VCjSfCfUzcLowI6XmX4sIZptpz8KXVuoQCq7UdTgoj1a2ol2oZNzsfdS1uvA+N
-         TLwVD3tndp8uuulimsIzuP4c3iVTOCaPk993AnOpfcLnmHg+V5tpukN2iUeh0zfdZ964
-         xzOQ==
-X-Gm-Message-State: APjAAAWJgnb/LEgcRf1o/HTOiRyiKZGuJM7B2XpA3T0Ywg70/Jw56gTG
-        5z6093OUSMDy9KMtEIwjwD0T3/+Iz+yWTefFxKPtWw==
-X-Google-Smtp-Source: APXvYqyCvSdGF/kKkdQvExm0EaKRVOaiq6eSYb+tcdvLqnTy4SD4UKTQokJrBkDaNyi2JnJNn/7Nxkqwv5SAu6szY4k=
-X-Received: by 2002:a5e:820a:: with SMTP id l10mr15338296iom.283.1560760346379;
- Mon, 17 Jun 2019 01:32:26 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190614093603.22771-1-ard.biesheuvel@linaro.org>
- <20190616071206.GB698@sol.localdomain> <CAKv+Gu97xkz5qxycyjqmukFhWAD6p=eYbTqoPWt-ZNbBFDbNAw@mail.gmail.com>
- <20190616194322.GC923@sol.localdomain>
-In-Reply-To: <20190616194322.GC923@sol.localdomain>
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=tm9I8joZj3DtpZNyzaSmkPCuBjAPR7mVgbFSLszXQG8=;
+        b=RD/m4jm/bLOROsN14YnbRninZgN5J5al1VHggW57MlKne1V9vXWv/zjWkm9e2Q5Hm/
+         iPm/5LY8vM2bDaHNELQp+JcTwbnVxa6B6a+Pctm0/WNTX6aOt2GLpeDqLlbw69E42qoZ
+         WXrBdxnE0OE86XsdOf4yV7CZumNn18u86RXtWwbN/xR8kLqYuKLln/oH0pyXo1ebWpvW
+         sqsv0/lkaeHhFHv36vJoiDDXyefgIRGSVuzETVZ4j9RonXh0rUUlinIZaQ1gtThKYNEx
+         z2csTer8WcOQZIIAbEMQnx1JyhtsU3N3P/pgNNS3Vsuy1VzLi1P2ckpV/P8uKsRsnbHW
+         WaLQ==
+X-Gm-Message-State: APjAAAVPIpz86iTY0urgmsHpsJ3IFj/x+ARzrPayYc6sfKRGNGpJxjHu
+        YJT/My5wzeLcAjFzursRHtTHmg==
+X-Google-Smtp-Source: APXvYqyngCRmqcgSvbfQi4rIY/h59IXGVgjQcg94VcOd36K6HH40rdQmn9W5kzjTU8vLH1Sbb+J0AA==
+X-Received: by 2002:a5d:5745:: with SMTP id q5mr20142892wrw.75.1560761022223;
+        Mon, 17 Jun 2019 01:43:42 -0700 (PDT)
+Received: from localhost.localdomain (91-167-84-221.subs.proxad.net. [91.167.84.221])
+        by smtp.gmail.com with ESMTPSA id u13sm7922348wrq.62.2019.06.17.01.43.41
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Mon, 17 Jun 2019 01:43:41 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Mon, 17 Jun 2019 10:32:14 +0200
-Message-ID: <CAKv+Gu8qgDgONkt0_2vpu3FacPbbFFMc=4tPrtnxqXt9gNexOw@mail.gmail.com>
-Subject: Re: [PATCH] wireless: airo: switch to skcipher interface
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     "<linux-wireless@vger.kernel.org>" <linux-wireless@vger.kernel.org>,
-        Kalle Valo <kvalo@codeaurora.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>, linux@rainbow-software.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-wireless@vger.kernel.org
+Cc:     linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+        ebiggers@kernel.org, kvalo@codeaurora.org,
+        johannes@sipsolutions.net, linux@rainbow-software.org,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [PATCH v2] wireless: airo: switch to skcipher interface
+Date:   Mon, 17 Jun 2019 10:43:38 +0200
+Message-Id: <20190617084338.24918-1-ard.biesheuvel@linaro.org>
+X-Mailer: git-send-email 2.20.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, 16 Jun 2019 at 21:43, Eric Biggers <ebiggers@kernel.org> wrote:
->
-> On Sun, Jun 16, 2019 at 09:03:58PM +0200, Ard Biesheuvel wrote:
-> > >
-> > > Otherwise this patch looks correct to me.
-> > >
-> > > The actual crypto in this driver, on the other hand, looks very outdated and
-> > > broken.  Apparently it's implementing some Cisco proprietary extension to WEP
-> > > that uses a universal hashing based MAC, where the hash key is generated from
-> > > AES-CTR.  But the MAC is only 32 bits, and the universal hash (MMH) is
-> > > implemented incorrectly: there's an off-by-one error in emmh32_final() in the
-> > > code that is supposed to be an optimized version of 'sum % ((1ULL << 32) + 15)'.
-> > >
-> >
-> > I stared at that code for a bit, and I don't see the problem.
-> >
->
-> I'm fairly certain that the line:
->
->         if (utmp > 0x10000000fLL)
->
-> is supposed to be:
->
->         if (utmp >= 0x10000000fLL)
->
+The AIRO driver applies a ctr(aes) on a buffer of considerable size
+(2400 bytes), and instead of invoking the crypto API to handle this
+in its entirety, it open codes the counter manipulation and invokes
+the AES block cipher directly.
 
-Ah yes, I see what you mean. 0x10000000f % 0x10000000f == 0 not 15
-(after truncation). So yes, that is definitely a bug.
+Let's fix this, by switching to the sync skcipher API instead.
 
-> Since it's doing mod 0x10000000f.  It's supposed to be an optimized
-> implementation of 'val = (u32)(context->accum % 0x10000000f)' where 0x10000000f
-> is the prime number 2^32 + 15.  It's meant to be the MMH algorithm: Section 3.2
-> of https://link.springer.com/content/pdf/10.1007/BFb0052345.pdf.  But there are
-> values of 'accum' where it gives the wrong result, e.g. 14137323879880455377.
->
-> Possibly this is a bug in the Cisco MIC protocol itself so can't be fixed.
->
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+---
+v2: - fix Kconfig dependencies
+    - zero the output buffer and use it as input instead of the zero page
 
-Highly unlikely. But also highly irrelevant :-)
+ drivers/net/wireless/cisco/Kconfig |  2 +
+ drivers/net/wireless/cisco/airo.c  | 57 ++++++++++----------
+ 2 files changed, 29 insertions(+), 30 deletions(-)
 
-> > > Do we know whether anyone is actually using this, or is this just another old
-> > > driver that's sitting around unused?
-> > >
-> >
-> > Excellent question. I take it this is pre-802.11b hardware, and so
-> > even the OpenWRT people are unlikely to still be using this.
->
+diff --git a/drivers/net/wireless/cisco/Kconfig b/drivers/net/wireless/cisco/Kconfig
+index 7329830ed7cc..01e173ede894 100644
+--- a/drivers/net/wireless/cisco/Kconfig
++++ b/drivers/net/wireless/cisco/Kconfig
+@@ -17,6 +17,7 @@ config AIRO
+ 	depends on CFG80211 && ISA_DMA_API && (PCI || BROKEN)
+ 	select WIRELESS_EXT
+ 	select CRYPTO
++	select CRYPTO_BLKCIPHER
+ 	select WEXT_SPY
+ 	select WEXT_PRIV
+ 	---help---
+@@ -40,6 +41,7 @@ config AIRO_CS
+ 	select WEXT_PRIV
+ 	select CRYPTO
+ 	select CRYPTO_AES
++	select CRYPTO_CTR
+ 	---help---
+ 	  This is the standard Linux driver to support Cisco/Aironet PCMCIA
+ 	  802.11 wireless cards.  This driver is the same as the Aironet
+diff --git a/drivers/net/wireless/cisco/airo.c b/drivers/net/wireless/cisco/airo.c
+index 3f5a14112c6b..9342ffbe1e81 100644
+--- a/drivers/net/wireless/cisco/airo.c
++++ b/drivers/net/wireless/cisco/airo.c
+@@ -49,6 +49,9 @@
+ #include <linux/kthread.h>
+ #include <linux/freezer.h>
+ 
++#include <crypto/aes.h>
++#include <crypto/skcipher.h>
++
+ #include <net/cfg80211.h>
+ #include <net/iw_handler.h>
+ 
+@@ -951,7 +954,7 @@ typedef struct {
+ } mic_statistics;
+ 
+ typedef struct {
+-	u32 coeff[((EMMH32_MSGLEN_MAX)+3)>>2];
++	__be32 coeff[((EMMH32_MSGLEN_MAX)+3)>>2];
+ 	u64 accum;	// accumulated mic, reduced to u32 in final()
+ 	int position;	// current position (byte offset) in message
+ 	union {
+@@ -1216,7 +1219,7 @@ struct airo_info {
+ 	struct iw_spy_data	spy_data;
+ 	struct iw_public_data	wireless_data;
+ 	/* MIC stuff */
+-	struct crypto_cipher	*tfm;
++	struct crypto_sync_skcipher	*tfm;
+ 	mic_module		mod[2];
+ 	mic_statistics		micstats;
+ 	HostRxDesc rxfids[MPI_MAX_FIDS]; // rx/tx/config MPI350 descriptors
+@@ -1291,14 +1294,14 @@ static int flashrestart(struct airo_info *ai,struct net_device *dev);
+ static int RxSeqValid (struct airo_info *ai,miccntx *context,int mcast,u32 micSeq);
+ static void MoveWindow(miccntx *context, u32 micSeq);
+ static void emmh32_setseed(emmh32_context *context, u8 *pkey, int keylen,
+-			   struct crypto_cipher *tfm);
++			   struct crypto_sync_skcipher *tfm);
+ static void emmh32_init(emmh32_context *context);
+ static void emmh32_update(emmh32_context *context, u8 *pOctets, int len);
+ static void emmh32_final(emmh32_context *context, u8 digest[4]);
+ static int flashpchar(struct airo_info *ai,int byte,int dwelltime);
+ 
+ static void age_mic_context(miccntx *cur, miccntx *old, u8 *key, int key_len,
+-			    struct crypto_cipher *tfm)
++			    struct crypto_sync_skcipher *tfm)
+ {
+ 	/* If the current MIC context is valid and its key is the same as
+ 	 * the MIC register, there's nothing to do.
+@@ -1359,7 +1362,7 @@ static int micsetup(struct airo_info *ai) {
+ 	int i;
+ 
+ 	if (ai->tfm == NULL)
+-		ai->tfm = crypto_alloc_cipher("aes", 0, 0);
++		ai->tfm = crypto_alloc_sync_skcipher("ctr(aes)", 0, 0);
+ 
+         if (IS_ERR(ai->tfm)) {
+                 airo_print_err(ai->dev->name, "failed to load transform for AES");
+@@ -1624,37 +1627,31 @@ static void MoveWindow(miccntx *context, u32 micSeq)
+ 
+ /* mic accumulate */
+ #define MIC_ACCUM(val)	\
+-	context->accum += (u64)(val) * context->coeff[coeff_position++];
+-
+-static unsigned char aes_counter[16];
++	context->accum += (u64)(val) * be32_to_cpu(context->coeff[coeff_position++]);
+ 
+ /* expand the key to fill the MMH coefficient array */
+ static void emmh32_setseed(emmh32_context *context, u8 *pkey, int keylen,
+-			   struct crypto_cipher *tfm)
++			   struct crypto_sync_skcipher *tfm)
+ {
+   /* take the keying material, expand if necessary, truncate at 16-bytes */
+   /* run through AES counter mode to generate context->coeff[] */
+   
+-	int i,j;
+-	u32 counter;
+-	u8 *cipher, plain[16];
+-
+-	crypto_cipher_setkey(tfm, pkey, 16);
+-	counter = 0;
+-	for (i = 0; i < ARRAY_SIZE(context->coeff); ) {
+-		aes_counter[15] = (u8)(counter >> 0);
+-		aes_counter[14] = (u8)(counter >> 8);
+-		aes_counter[13] = (u8)(counter >> 16);
+-		aes_counter[12] = (u8)(counter >> 24);
+-		counter++;
+-		memcpy (plain, aes_counter, 16);
+-		crypto_cipher_encrypt_one(tfm, plain, plain);
+-		cipher = plain;
+-		for (j = 0; (j < 16) && (i < ARRAY_SIZE(context->coeff)); ) {
+-			context->coeff[i++] = ntohl(*(__be32 *)&cipher[j]);
+-			j += 4;
+-		}
+-	}
++	SYNC_SKCIPHER_REQUEST_ON_STACK(req, tfm);
++	struct scatterlist sg;
++	u8 iv[AES_BLOCK_SIZE] = {};
++	int ret;
++
++	crypto_sync_skcipher_setkey(tfm, pkey, 16);
++
++	memset(context->coeff, 0, sizeof(context->coeff));
++	sg_init_one(&sg, context->coeff, sizeof(context->coeff));
++
++	skcipher_request_set_sync_tfm(req, tfm);
++	skcipher_request_set_callback(req, 0, NULL, NULL);
++	skcipher_request_set_crypt(req, &sg, &sg, sizeof(context->coeff), iv);
++
++	ret = crypto_skcipher_encrypt(req);
++	WARN_ON_ONCE(ret);
+ }
+ 
+ /* prepare for calculation of a new mic */
+@@ -2415,7 +2412,7 @@ void stop_airo_card( struct net_device *dev, int freeres )
+ 				ai->shared, ai->shared_dma);
+ 		}
+         }
+-	crypto_free_cipher(ai->tfm);
++	crypto_free_sync_skcipher(ai->tfm);
+ 	del_airo_dev(ai);
+ 	free_netdev( dev );
+ }
+-- 
+2.20.1
 
-I'd be fine with dropping this driver. I am just trying to get rid of
-(ab)use of the crypto cipher interface, so either we change it or we
-drop it.
