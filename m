@@ -2,140 +2,122 @@ Return-Path: <SRS0=Ym9l=UQ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_MUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C15CC31E5D
-	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 18:23:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BCF7C31E5B
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 19:24:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 619EF208C4
-	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 18:23:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1560795782;
-	bh=qV75+HHF0tyoMwQTIa7ewndX/1kvxlqxzUpwV/VWlfA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=K7wjF0mEWf5/nWcEeleH4CqIU3fuU/AtOBfkiZMQKf/lE717bQneBn36F0MHPVLtp
-	 9jRV9Cqy9xXBdQR6SlFSEI+M7dvcenHCwojB/W8wemv8/XOdcDehxmqFk9I/fMs4vL
-	 2USuVR3GDJODcUg7axDaDw2V5Ukex3Qy6VO/qFNk=
+	by mail.kernel.org (Postfix) with ESMTP id 50F652085A
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 19:24:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="WxJa7wXQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726001AbfFQSXB (ORCPT
+        id S1726822AbfFQTYa (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 17 Jun 2019 14:23:01 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50016 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725764AbfFQSXB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 17 Jun 2019 14:23:01 -0400
-Received: from gmail.com (unknown [104.132.1.77])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 786432084D;
-        Mon, 17 Jun 2019 18:22:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1560795779;
-        bh=qV75+HHF0tyoMwQTIa7ewndX/1kvxlqxzUpwV/VWlfA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=vuYrcUY26U0i1F1ZABfYZNwvLuMC2DD+FIF1Gvt0y0qc8n0wL+8pksifRQzx6eT0T
-         5FoUOX7ClJaYyc1kt9TdmFU/0PUsWjrvpydlG5bEEuxEhcY9tp8yguQpXxpd7gDfbK
-         CzOU72IYcXnAf1T+zj7et3KvNB+etwSTWxRgvQbM=
-Date:   Mon, 17 Jun 2019 11:22:57 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Nick Desaulniers <ndesaulniers@google.com>
-Cc:     Sedat Dilek <sedat.dilek@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        linux-crypto@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Clang-Built-Linux ML <clang-built-linux@googlegroups.com>,
-        Fangrui Song <maskray@google.com>,
-        Peter Smith <peter.smith@linaro.org>
-Subject: Re: crypto: x86/crct10dif-pcl - cleanup and optimizations
-Message-ID: <20190617182256.GB92263@gmail.com>
-References: <CA+icZUX3EOhrUp0Afbo_fK9rb5AbXjbaBFwhj1qmBaHom1b3MA@mail.gmail.com>
- <CAKwvOdn8Za1Dy4QgdDZu1My5oYLJJzyRqYsq+XkpRpnViC6aKQ@mail.gmail.com>
+        Mon, 17 Jun 2019 15:24:30 -0400
+Received: from mail-eopbgr130072.outbound.protection.outlook.com ([40.107.13.72]:27430
+        "EHLO EUR01-HE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725938AbfFQTYa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 17 Jun 2019 15:24:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=XJY3HURf4B+Uyav3u4C4mG294/93fmChqXHtGwXZY20=;
+ b=WxJa7wXQ97WsplDi3QUelB3xlibQ4TtRLl+0p0LFnBhpQ3aYm19T6/1pVfwJ2xXgu53s8wp0SblVU1keD+/bBEZRuskV8p5SeRizgbRKbMqVzN3z/xbFlcrYyA1Tlu7/pBUq8LVx5QQdde3SFCN0+B0YwDUQrK/aLS9wiDCDHlI=
+Received: from VI1PR04MB5055.eurprd04.prod.outlook.com (20.177.50.140) by
+ VI1PR04MB5470.eurprd04.prod.outlook.com (20.178.121.208) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.1987.13; Mon, 17 Jun 2019 19:24:25 +0000
+Received: from VI1PR04MB5055.eurprd04.prod.outlook.com
+ ([fe80::9577:379c:2078:19a1]) by VI1PR04MB5055.eurprd04.prod.outlook.com
+ ([fe80::9577:379c:2078:19a1%7]) with mapi id 15.20.1987.014; Mon, 17 Jun 2019
+ 19:24:25 +0000
+From:   Leonard Crestez <leonard.crestez@nxp.com>
+To:     Andrey Smirnov <andrew.smirnov@gmail.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Horia Geanta <horia.geanta@nxp.com>
+CC:     Chris Spencer <christopher.spencer@sea.co.uk>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Franck Lenormand <franck.lenormand@nxp.com>,
+        Cory Tusar <cory.tusar@zii.aero>,
+        Chris Healy <cphealy@gmail.com>,
+        Lucas Stach <l.stach@pengutronix.de>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Iuliana Prodan <iuliana.prodan@nxp.com>
+Subject: Re: [PATCH v3 2/5] crypto: caam - correct DMA address size for the
+ i.MX8
+Thread-Topic: [PATCH v3 2/5] crypto: caam - correct DMA address size for the
+ i.MX8
+Thread-Index: AQHVJSZIVXANdmo1E06O+7eMXYofbw==
+Date:   Mon, 17 Jun 2019 19:24:25 +0000
+Message-ID: <VI1PR04MB5055A9A725CED589FCF9254DEEEB0@VI1PR04MB5055.eurprd04.prod.outlook.com>
+References: <20190617160339.29179-1-andrew.smirnov@gmail.com>
+ <20190617160339.29179-3-andrew.smirnov@gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=leonard.crestez@nxp.com; 
+x-originating-ip: [192.88.166.1]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 5460fb4b-aa15-493e-9f26-08d6f35968f6
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:VI1PR04MB5470;
+x-ms-traffictypediagnostic: VI1PR04MB5470:
+x-microsoft-antispam-prvs: <VI1PR04MB5470F0BCBBA9D2E827605614EEEB0@VI1PR04MB5470.eurprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-forefront-prvs: 0071BFA85B
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(346002)(39860400002)(396003)(366004)(136003)(376002)(199004)(189003)(71190400001)(6506007)(53936002)(26005)(81156014)(102836004)(186003)(7696005)(486006)(476003)(53546011)(14454004)(8936002)(52536014)(74316002)(81166006)(446003)(478600001)(7736002)(64756008)(256004)(3846002)(76116006)(66946007)(110136005)(66476007)(86362001)(8676002)(66446008)(68736007)(5660300002)(6436002)(4326008)(25786009)(99286004)(54906003)(6116002)(73956011)(76176011)(91956017)(66556008)(2501003)(71200400001)(66066001)(316002)(55016002)(229853002)(4744005)(44832011)(6246003)(9686003)(33656002)(2906002)(6636002)(305945005);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR04MB5470;H:VI1PR04MB5055.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: nxp.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: S2UadDtTlYG6ImNGOtp01+woYApGyG5djlxC6QWaaUbs9CZwHZ3OcoIJV6ly3jDlco8a89UbQMrtPY+qQeriHswNG1VdV7iC+GA5VRKFCbuWprZiwrsE4JyyEYaRdyWXQXlmbO0GeNfl7gEhBKohqgse7yeCDrqlqgBmpQcypDGc3/rkgnNDpmrm7wsW3vXqNpHo1UXo0ccCfMt1bdVMjdLFSSrx/QHSW9iUpArehsJzJhj6zVh/A6ihtQX5ubLoQZlVPj84ixkH4E6JqCTRhb8qY1z6ozbGzcsypg/ma/C7dnuvKajUf3Gt3r2+ynnHkJyAtLg0spzXz0jyahi5IykWEjl3pqN3zYbEBvVHw2RyhShGGHw6DZ7g7PKaypyuQs5r+In/9eJoRbgl8jqoARPE7d6//VdSuYpO/6jzGWM=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKwvOdn8Za1Dy4QgdDZu1My5oYLJJzyRqYsq+XkpRpnViC6aKQ@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5460fb4b-aa15-493e-9f26-08d6f35968f6
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Jun 2019 19:24:25.6516
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: leonard.crestez@nxp.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB5470
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jun 17, 2019 at 11:06:21AM -0700, Nick Desaulniers wrote:
-> On Mon, Jun 17, 2019 at 6:35 AM Sedat Dilek <sedat.dilek@gmail.com> wrote:
-> >
-> > Hi,
-> >
-> > while digging through a ClangBuiltLinux issue when linking with LLD
-> > linker on x86-64 I checked the settings for...
-> >
-> > .rodata.cst16 and .rodata.cst32
-> >
-> > ...in crypto tree and fell over this change in...
-> >
-> > commit "crypto: x86/crct10dif-pcl - cleanup and optimizations":
-> >
-> > -.section .rodata.cst16.SHUF_MASK, "aM", @progbits, 16
-> > +.section .rodata.cst32.byteshift_table, "aM", @progbits, 32
-> > .align 16
-> >
-> > Is that a typo?
-> > I would have expected...
-> > .rodata.cst32.XXX -> .align 32
-> > or
-> > rodata.cst16.XXX -> .align 16
-> >
-> > But I might be wrong as I am no expert for crypto and x86/asm.
-> >
-> > Thanks in advance.
-> >
-> > Regards,
-> > - Sedat -
-> >
-> > [1] https://github.com/ClangBuiltLinux/linux/issues/431
-> > [2] https://bugs.llvm.org/show_bug.cgi?id=42289
-> 
-> > [3] https://git.kernel.org/linus/0974037fc55c
-> 
-> + Peter, Fangrui (who have looked at this, and started looking into
-> this from LLD's perspective)
-> 
-> In fact, looking closer at that diff, the section in question
-> previously had 32b alignment.  Eric, was that change intentional?  It
-> seems funny to have a 32b entity size but a 16b alignment.
-> 
-> PDF page 81 / printed page 67 of this doc:
-> https://web.eecs.umich.edu/~prabal/teaching/resources/eecs373/Assembler.pdf
-> says:
-> 
-> "The linker may remove duplicates within sections with the
-> same name, same entity size and same flags. "
-> 
-> So for us, LLD is NOT merging these sections due to differing
-> alignments, which is producing warnings when loading such kernel
-> modules that link against these object files.
-> -- 
-> Thanks,
-> ~Nick Desaulniers
-
-It was an intentional change since actually no alignment is required for this.
-It's an array of 32 bytes and the code loads 16 bytes starting from some byte
-offset in the range 1...16, so it has to use movdqu anyway.
-
-There's no problem with changing it back to 32, but I don't fully understand
-what's going on here.  Where is it documented how alignment specifiers interact
-with the section merging?  Also, there are already other mergeable sections in
-the x86 crypto code with alignment smaller than their entity size, e.g.
-
-	.rodata.cst16.aegis128_const
-	.rodata.cst16.aegis128l_const
-	.rodata.cst16.aegis256_const
-	.rodata.cst16.morus640_const
-	.rodata.cst256.K256
-
-Do those need to be changed too?
-
-- Eric
+On 6/17/2019 7:04 PM, Andrey Smirnov wrote:=0A=
+> From: Chris Spencer <christopher.spencer@sea.co.uk>=0A=
+> =0A=
+> The i.MX8 is arm64, but its CAAM DMA address size is 32-bits.=0A=
+=0A=
+> +/*=0A=
+> + * On i.MX8 boards the arch is arm64 but the CAAM dma address size is=0A=
+> + * 32 bits on 8MQ and 36 bits on 8QM and 8QXP.=0A=
+> + * For 8QM and 8QXP there is a configurable field PS called pointer size=
+=0A=
+> + * in the MCFGR register to switch between 32 and 64 (default 32)=0A=
+> + * But this register is only accessible by the SECO and is left to its=
+=0A=
+> + * default value.=0A=
+> + * Here we set the CAAM dma address size to 32 bits for all i.MX8=0A=
+> + */=0A=
+> +#if defined(CONFIG_ARM64) && defined(CONFIG_ARCH_MXC)=0A=
+> +#define caam_dma_addr_t u32=0A=
+> +#else=0A=
+> +#define caam_dma_addr_t dma_addr_t=0A=
+> +#endif=0A=
+=0A=
+Wait, doesn't this break Layerscape? Support for multiple SOC families =0A=
+can be enabled at the same time and it is something that we actually =0A=
+want to support.=0A=
+=0A=
+--=0A=
+Regards,=0A=
+Leonard=0A=
