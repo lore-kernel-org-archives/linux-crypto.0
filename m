@@ -1,96 +1,104 @@
-Return-Path: <SRS0=USLa=UP=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=Ym9l=UQ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_MUTT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_NEOMUTT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 891A3C31E50
-	for <linux-crypto@archiver.kernel.org>; Sun, 16 Jun 2019 21:09:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37501C31E50
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 01:23:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4CE4D20866
-	for <linux-crypto@archiver.kernel.org>; Sun, 16 Jun 2019 21:09:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1560719347;
-	bh=GTQ0Rb1obiOnV/loBYnTUldGJZLtLtyNtKdBjRCT2WY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=Wh8ReJLLDOyZmUddrtDYCXDIqemzEcaDeL+hq+plsPrE+Nmg7KO0fA3qyxlb6Ixtc
-	 +EEMBz9UnlD1PiJNF2cdT4EA2IXDoNqi7gLwnSZDFE05T1sa3TI0LJDio0aPeT91If
-	 wacYDItZ6Z7xdurwn6KfGsJcjcFiXeukq7Iu9Er0=
+	by mail.kernel.org (Postfix) with ESMTP id 1443C2087F
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 01:23:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726054AbfFPVJG (ORCPT
+        id S1727465AbfFQBXJ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 16 Jun 2019 17:09:06 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43550 "EHLO mail.kernel.org"
+        Sun, 16 Jun 2019 21:23:09 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:34174 "EHLO deadmen.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725920AbfFPVJG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 16 Jun 2019 17:09:06 -0400
-Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 731C32084D;
-        Sun, 16 Jun 2019 21:09:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1560719345;
-        bh=GTQ0Rb1obiOnV/loBYnTUldGJZLtLtyNtKdBjRCT2WY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=xltwFOLyMNBwP569RW8nfVX87xkROwc6ffnB9dNtW6AFnDAh80Y+EQBzV8dsCi+dN
-         BWL8tW67Wvqq2wBSh0tyfQiVhUmCjZdGOm/UTpDPk+s1w5FARQOBC1b0yayfi2Rxsg
-         4PoqnST+b0yaxcSjh37V+939+TrtkzXSfV80lntg=
-Date:   Sun, 16 Jun 2019 14:09:03 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
+        id S1727238AbfFQBXI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 16 Jun 2019 21:23:08 -0400
+Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
+        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
+        id 1hcgMV-00043D-2o; Mon, 17 Jun 2019 09:23:07 +0800
+Received: from herbert by gondobar with local (Exim 4.89)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1hcgMH-0002MA-Gw; Mon, 17 Jun 2019 09:22:53 +0800
+Date:   Mon, 17 Jun 2019 09:22:53 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
 To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc:     Milan Broz <gmazyland@gmail.com>,
-        Mike Snitzer <msnitzer@redhat.com>,
-        device-mapper development <dm-devel@redhat.com>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-fscrypt@vger.kernel.org
-Subject: Re: [dm-devel] [RFC PATCH 0/3] crypto: switch to shash for ESSIV
- generation
-Message-ID: <20190616210903.GF923@sol.localdomain>
-References: <20190614083404.20514-1-ard.biesheuvel@linaro.org>
- <9cd635ec-970b-bd1b-59f4-1a07395e69a0@gmail.com>
- <CAKv+Gu88tYOmO=8mi7yP2oj=x_SOB_o7D9jo6v_3xfbUxY2R1A@mail.gmail.com>
+Cc:     netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
+        ebiggers@kernel.org, edumazet@google.com, davem@davemloft.net,
+        kuznet@ms2.inr.ac.ru, yoshfuji@linux-ipv6.org, jbaron@akamai.com,
+        cpaasch@apple.com, David.Laight@aculab.com
+Subject: Re: [PATCH v2] net: ipv4: move tcp_fastopen server side code to
+ SipHash library
+Message-ID: <20190617012253.4hgfdwvurskstz4o@gondor.apana.org.au>
+References: <20190614140122.20934-1-ard.biesheuvel@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAKv+Gu88tYOmO=8mi7yP2oj=x_SOB_o7D9jo6v_3xfbUxY2R1A@mail.gmail.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+In-Reply-To: <20190614140122.20934-1-ard.biesheuvel@linaro.org>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-[+Cc linux-fscrypt]
-
-On Sun, Jun 16, 2019 at 09:13:01PM +0200, Ard Biesheuvel wrote:
-> >
-> >  - ESSIV is useful only for CBC mode. I wish we move to some better mode
-> > in the future instead of cementing CBC use... But if it helps people
-> > to actually use unpredictable IV for CBC, it is the right approach.
-> > (yes, I know XTS has own problems as well... but IMO that should be the default
-> > for sector/fs-block encryption these days :)
-> >
+On Fri, Jun 14, 2019 at 04:01:22PM +0200, Ard Biesheuvel wrote:
+> Using a bare block cipher in non-crypto code is almost always a bad idea,
+> not only for security reasons (and we've seen some examples of this in
+> the kernel in the past), but also for performance reasons.
 > 
-> I agree that XTS should be preferred. But for some reason, the
-> kernel's XTS implementation does not support ciphertext stealing (as
-> opposed to, e.g., OpenSSL), and so CBC ended up being used for
-> encrypting the filenames in fscrypt.
+> In the TCP fastopen case, we call into the bare AES block cipher one or
+> two times (depending on whether the connection is IPv4 or IPv6). On most
+> systems, this results in a call chain such as
 > 
+>   crypto_cipher_encrypt_one(ctx, dst, src)
+>     crypto_cipher_crt(tfm)->cit_encrypt_one(crypto_cipher_tfm(tfm), ...);
+>       aesni_encrypt
+>         kernel_fpu_begin();
+>         aesni_enc(ctx, dst, src); // asm routine
+>         kernel_fpu_end();
+> 
+> It is highly unlikely that the use of special AES instructions has a
+> benefit in this case, especially since we are doing the above twice
+> for IPv6 connections, instead of using a transform which can process
+> the entire input in one go.
+> 
+> We could switch to the cbcmac(aes) shash, which would at least get
+> rid of the duplicated overhead in *some* cases (i.e., today, only
+> arm64 has an accelerated implementation of cbcmac(aes), while x86 will
+> end up using the generic cbcmac template wrapping the AES-NI cipher,
+> which basically ends up doing exactly the above). However, in the given
+> context, it makes more sense to use a light-weight MAC algorithm that
+> is more suitable for the purpose at hand, such as SipHash.
+> 
+> Since the output size of SipHash already matches our chosen value for
+> TCP_FASTOPEN_COOKIE_SIZE, and given that it accepts arbitrary input
+> sizes, this greatly simplifies the code as well.
+> 
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> ---
+> v2: rebase onto net-next
+>     reverse order of operands in BUILD_BUG_ON() comparison expression
+> 
+>  include/linux/tcp.h     |  7 +-
+>  include/net/tcp.h       | 10 +-
+>  net/ipv4/tcp_fastopen.c | 97 +++++++-------------
+>  3 files changed, 36 insertions(+), 78 deletions(-)
 
-Actually, for fscrypt CTS-CBC was also chosen because all filenames in each
-directory use the same IV, in order to efficiently support all the possible
-filesystem operations and to support filenames up to NAME_MAX.  So there was a
-desire for there to be some propagation across ciphertext blocks rather than use
-XTS which would effectively be ECB in this case.
+You should also revert commit 798b2cbf9227 in your patch:
 
-Neither solution is great though, since CBC-CTS still has the common prefix
-problem.  Long-term we're planning to switch to an AES-based wide block mode
-such as AES-HEH or AES-HCTR for filenames encryption.  This is already solved
-for Adiantum users since Adiantum is a wide-block mode, but there should be a
-pure AES solution too to go along with AES contents encryption.
+commit 798b2cbf9227b1bd7d37ae9af4d9c750e6f4de9c
+Author: David S. Miller <davem@davemloft.net>
+Date:   Tue Sep 4 14:20:14 2012 -0400
 
-- Eric
+    net: Add INET dependency on aes crypto for the sake of TCP fastopen.
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
