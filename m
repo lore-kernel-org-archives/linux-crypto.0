@@ -2,282 +2,156 @@ Return-Path: <SRS0=Ym9l=UQ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91C0EC31E5D
-	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 21:15:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32AEFC31E5B
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 21:40:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 56B1220861
-	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 21:15:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E79BC2063F
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 21:40:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=c-s.fr header.i=@c-s.fr header.b="KJFiR+nt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aQBitjq1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728101AbfFQVPS (ORCPT
+        id S1726538AbfFQVkz (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 17 Jun 2019 17:15:18 -0400
-Received: from pegase1.c-s.fr ([93.17.236.30]:24134 "EHLO pegase1.c-s.fr"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727462AbfFQVPH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 17 Jun 2019 17:15:07 -0400
-Received: from localhost (mailhub1-int [192.168.12.234])
-        by localhost (Postfix) with ESMTP id 45SPB14fs7z9v2jK;
-        Mon, 17 Jun 2019 23:15:05 +0200 (CEST)
-Authentication-Results: localhost; dkim=pass
-        reason="1024-bit key; insecure key"
-        header.d=c-s.fr header.i=@c-s.fr header.b=KJFiR+nt; dkim-adsp=pass;
-        dkim-atps=neutral
-X-Virus-Scanned: Debian amavisd-new at c-s.fr
-Received: from pegase1.c-s.fr ([192.168.12.234])
-        by localhost (pegase1.c-s.fr [192.168.12.234]) (amavisd-new, port 10024)
-        with ESMTP id s1DIDXWioN8R; Mon, 17 Jun 2019 23:15:05 +0200 (CEST)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-        by pegase1.c-s.fr (Postfix) with ESMTP id 45SPB13P8Hz9v2jJ;
-        Mon, 17 Jun 2019 23:15:05 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=c-s.fr; s=mail;
-        t=1560806105; bh=DMvYgdU1C1BDAhzjLFRBumNES+VZsVxjS2tmKfrAT24=;
-        h=In-Reply-To:References:From:Subject:To:Cc:Date:From;
-        b=KJFiR+ntJLQwHpU+e2mhrj3i69wwyvCE8anXY9qroL9G0pvOSLRFpM4fTSxUspRTC
-         7bAmwGlegpSCDnbtaN7fAxBNd7Np9kf1TrxtICKIkNqWDLMqMQMpH4aDRsN+ZYCW3+
-         fo51p06rVF/rKfVLcdCCA8GcyIznYUcOBgUD8YKo=
-Received: from localhost (localhost [127.0.0.1])
-        by messagerie.si.c-s.fr (Postfix) with ESMTP id A74398B84B;
-        Mon, 17 Jun 2019 23:15:05 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-        by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-        with ESMTP id zVOkHRjZjeLC; Mon, 17 Jun 2019 23:15:05 +0200 (CEST)
-Received: from po16838vm.idsi0.si.c-s.fr (unknown [192.168.4.90])
-        by messagerie.si.c-s.fr (Postfix) with ESMTP id 4CD1A8B7FF;
-        Mon, 17 Jun 2019 23:15:05 +0200 (CEST)
-Received: by localhost.localdomain (Postfix, from userid 0)
-        id 02535682B3; Mon, 17 Jun 2019 21:15:04 +0000 (UTC)
-Message-Id: <e760412b67ef8fe8bc122b710ed0dbaf870d4843.1560805614.git.christophe.leroy@c-s.fr>
-In-Reply-To: <cover.1560805614.git.christophe.leroy@c-s.fr>
-References: <cover.1560805614.git.christophe.leroy@c-s.fr>
-From:   Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: [PATCH v4 3/4] crypto: talitos - fix hash on SEC1.
+        Mon, 17 Jun 2019 17:40:55 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:44278 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726514AbfFQVkz (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 17 Jun 2019 17:40:55 -0400
+Received: by mail-wr1-f67.google.com with SMTP id r16so11591740wrl.11;
+        Mon, 17 Jun 2019 14:40:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:openpgp:autocrypt:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=1FJkrw9bkFdWPtcGSG3ahPiDCEAATM1CyJmBSVbfIgw=;
+        b=aQBitjq1nrYYpx1ulQFF5r2Vynel+DU+sAXx4i6q+TGXPkjiW9eLGYovXclwTK09fd
+         3iL6RcVq8I54duE1hVEEJ4h7mF6NmlSlgdL9jEKKmBqjWnIqGcy7pTPfwi/cREGRyhVJ
+         iua9dDLVPHE7qbJ1M8MgWcd3eij76WcoYm3Kyz1p2igIFKfG987GcBp2WHbtDBg3rTII
+         iy/vTEg4FU1OR6LwaBcz0+wUS3M0XwU7d8v0/22tr2oPSuweOq+KUX5Qclb8HTFz5JZl
+         Vm/98PtOp07kP07oO+pEA3dJbeDa6AxDvBvu1iw92hvVFIW2d52n8/o3tWTUSNHVgxoh
+         rc9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=1FJkrw9bkFdWPtcGSG3ahPiDCEAATM1CyJmBSVbfIgw=;
+        b=ReRFALUq7znp3XKySEfU6aRdtr1TRHuJg35jOC6lRFPSMASOe83IOKe5pTvunUVfo4
+         fHsqE0VxU/+GzYMFoyrhLKJh57PIBHJnFWcH+hrYipxTT3md+oKSwTGqbIsXB5Ry2+IM
+         VktsRqle+AR8KTe2pun4ZYej2qocdzPOfAkPhGuoZtA3xH6JGfRn/OiPXGkrhOn2IGlT
+         XiUFORS2gzsr3TptraoXE0oKzdNzV2L2KW3KLy4cYjRhDqyKkjBe2eZCcj5QPdXY2CEa
+         SXAeR/hv0mbmQqFcKJ3VVvXFsbf2/lrV2stzP9ljYAhzqq/nq0LuwnC0DziXEkUNd3jV
+         0mCw==
+X-Gm-Message-State: APjAAAVJM+TnakoICXCmeGQZZxlDluLdTYtzEyC0B+1z8tWzUMojhUD0
+        VHYdcU9OrwU4lpk46v7FfaM=
+X-Google-Smtp-Source: APXvYqyAnh3ifMjMbJFfJonUu6bu6z7XrsbNplRnZPPHN8z4mdLMqz2s1f72Dspx1iN4IwFQooVlhQ==
+X-Received: by 2002:a5d:4ecc:: with SMTP id s12mr27486350wrv.157.1560807652791;
+        Mon, 17 Jun 2019 14:40:52 -0700 (PDT)
+Received: from [10.67.49.123] ([192.19.223.252])
+        by smtp.googlemail.com with ESMTPSA id r131sm425212wmf.4.2019.06.17.14.40.50
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 17 Jun 2019 14:40:51 -0700 (PDT)
+Subject: Re: [PATCH 0/2] hwrng: Support for 7211 in iproc-rng200
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>, horia.geanta@nxp.com
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org
-Date:   Mon, 17 Jun 2019 21:15:04 +0000 (UTC)
+        Florian Fainelli <f.fainelli@gmail.com>
+Cc:     linux-kernel@vger.kernel.org,
+        bcm-kernel-feedback-list@broadcom.com, stefan.wahren@i2se.com,
+        wahrenst@gmx.net, linux-crypto@vger.kernel.org, mpm@selenic.com
+References: <20190510173112.2196-1-f.fainelli@gmail.com>
+ <c3a3dc05-17fb-09fe-7a22-43e748f88164@gmail.com>
+ <20190523053736.5jjevtz62lgddxtq@gondor.apana.org.au>
+From:   Florian Fainelli <f.fainelli@gmail.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=f.fainelli@gmail.com; prefer-encrypt=mutual; keydata=
+ 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
+ M5kY0ACeNhCZJvZ5g4C2Lc9fcTHu8jxmEkI=
+Message-ID: <09c3e286-320c-3681-7fd6-efa34d53b4aa@gmail.com>
+Date:   Mon, 17 Jun 2019 14:40:41 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
+MIME-Version: 1.0
+In-Reply-To: <20190523053736.5jjevtz62lgddxtq@gondor.apana.org.au>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On SEC1, hash provides wrong result when performing hashing in several
-steps with input data SG list has more than one element. This was
-detected with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS:
+On 5/22/19 10:37 PM, Herbert Xu wrote:
+> On Mon, May 20, 2019 at 03:49:12PM -0700, Florian Fainelli wrote:
+>> On 5/10/19 10:31 AM, Florian Fainelli wrote:
+>>> Hi Herbert,
+>>>
+>>> This patch series adds support for BCM7211 to the iproc-rng200 driver,
+>>> nothing special besides matching the compatibile string and updating the
+>>> binding document.
+>>
+>> Herbert, can you apply those patches?
+> 
+> Hi Florian:
+> 
+> Patch 1/2 is missing an ack from Rob.
 
-[   44.185947] alg: hash: md5-talitos test failed (wrong result) on test vector 6, cfg="random: may_sleep use_finup src_divs=[<reimport>25.88%@+8063, <flush>24.19%@+9588, 28.63%@+16333, <reimport>4.60%@+6756, 16.70%@+16281] dst_divs=[71.61%@alignmask+16361, 14.36%@+7756, 14.3%@+"
-[   44.325122] alg: hash: sha1-talitos test failed (wrong result) on test vector 3, cfg="random: inplace use_final src_divs=[<flush,nosimd>16.56%@+16378, <reimport>52.0%@+16329, 21.42%@alignmask+16380, 10.2%@alignmask+16380] iv_offset=39"
-[   44.493500] alg: hash: sha224-talitos test failed (wrong result) on test vector 4, cfg="random: use_final nosimd src_divs=[<reimport>52.27%@+7401, <reimport>17.34%@+16285, <flush>17.71%@+26, 12.68%@+10644] iv_offset=43"
-[   44.673262] alg: hash: sha256-talitos test failed (wrong result) on test vector 4, cfg="random: may_sleep use_finup src_divs=[<reimport>60.6%@+12790, 17.86%@+1329, <reimport>12.64%@alignmask+16300, 8.29%@+15, 0.40%@+13506, <reimport>0.51%@+16322, <reimport>0.24%@+16339] dst_divs"
-
-This is due to two issues:
-- We have an overlap between the buffer used for copying the input
-data (SEC1 doesn't do scatter/gather) and the chained descriptor.
-- Data copy is wrong when the previous hash left less than one
-blocksize of data to hash, implying a complement of the previous
-block with a few bytes from the new request.
-
-Fix it by:
-- Moving the second descriptor after the buffer, as moving the buffer
-after the descriptor would make it more complex for other cipher
-operations (AEAD, ABLKCIPHER)
-- Skip the bytes taken from the new request to complete the previous
-one by moving the SG list forward.
-
-Fixes: 37b5e8897eb5 ("crypto: talitos - chain in buffered data for ahash on SEC1")
-Cc: stable@vger.kernel.org
-Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
----
- drivers/crypto/talitos.c | 69 ++++++++++++++++++++++++++++--------------------
- 1 file changed, 41 insertions(+), 28 deletions(-)
-
-diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index 95dc3957f358..ab6bd45addf7 100644
---- a/drivers/crypto/talitos.c
-+++ b/drivers/crypto/talitos.c
-@@ -320,6 +320,21 @@ static int talitos_submit(struct device *dev, int ch, struct talitos_desc *desc,
- 	return -EINPROGRESS;
- }
- 
-+static __be32 get_request_hdr(struct talitos_request *request, bool is_sec1)
-+{
-+	struct talitos_edesc *edesc;
-+
-+	if (!is_sec1)
-+		return request->desc->hdr;
-+
-+	if (!request->desc->next_desc)
-+		return request->desc->hdr1;
-+
-+	edesc = container_of(request->desc, struct talitos_edesc, desc);
-+
-+	return ((struct talitos_desc *)(edesc->buf + edesc->dma_len))->hdr1;
-+}
-+
- /*
-  * process what was done, notify callback of error if not
-  */
-@@ -341,12 +356,7 @@ static void flush_channel(struct device *dev, int ch, int error, int reset_ch)
- 
- 		/* descriptors with their done bits set don't get the error */
- 		rmb();
--		if (!is_sec1)
--			hdr = request->desc->hdr;
--		else if (request->desc->next_desc)
--			hdr = (request->desc + 1)->hdr1;
--		else
--			hdr = request->desc->hdr1;
-+		hdr = get_request_hdr(request, is_sec1);
- 
- 		if ((hdr & DESC_HDR_DONE) == DESC_HDR_DONE)
- 			status = 0;
-@@ -476,8 +486,14 @@ static u32 current_desc_hdr(struct device *dev, int ch)
- 		}
- 	}
- 
--	if (priv->chan[ch].fifo[iter].desc->next_desc == cur_desc)
--		return (priv->chan[ch].fifo[iter].desc + 1)->hdr;
-+	if (priv->chan[ch].fifo[iter].desc->next_desc == cur_desc) {
-+		struct talitos_edesc *edesc;
-+
-+		edesc = container_of(priv->chan[ch].fifo[iter].desc,
-+				     struct talitos_edesc, desc);
-+		return ((struct talitos_desc *)
-+			(edesc->buf + edesc->dma_len))->hdr;
-+	}
- 
- 	return priv->chan[ch].fifo[iter].desc->hdr;
- }
-@@ -1402,15 +1418,11 @@ static struct talitos_edesc *talitos_edesc_alloc(struct device *dev,
- 	edesc->dst_nents = dst_nents;
- 	edesc->iv_dma = iv_dma;
- 	edesc->dma_len = dma_len;
--	if (dma_len) {
--		void *addr = &edesc->link_tbl[0];
--
--		if (is_sec1 && !dst)
--			addr += sizeof(struct talitos_desc);
--		edesc->dma_link_tbl = dma_map_single(dev, addr,
-+	if (dma_len)
-+		edesc->dma_link_tbl = dma_map_single(dev, &edesc->link_tbl[0],
- 						     edesc->dma_len,
- 						     DMA_BIDIRECTIONAL);
--	}
-+
- 	return edesc;
- }
- 
-@@ -1722,14 +1734,16 @@ static void common_nonsnoop_hash_unmap(struct device *dev,
- 	struct talitos_private *priv = dev_get_drvdata(dev);
- 	bool is_sec1 = has_ftr_sec1(priv);
- 	struct talitos_desc *desc = &edesc->desc;
--	struct talitos_desc *desc2 = desc + 1;
-+	struct talitos_desc *desc2 = (struct talitos_desc *)
-+				     (edesc->buf + edesc->dma_len);
- 
- 	unmap_single_talitos_ptr(dev, &edesc->desc.ptr[5], DMA_FROM_DEVICE);
- 	if (desc->next_desc &&
- 	    desc->ptr[5].ptr != desc2->ptr[5].ptr)
- 		unmap_single_talitos_ptr(dev, &desc2->ptr[5], DMA_FROM_DEVICE);
- 
--	talitos_sg_unmap(dev, edesc, req_ctx->psrc, NULL, 0, 0);
-+	if (req_ctx->psrc)
-+		talitos_sg_unmap(dev, edesc, req_ctx->psrc, NULL, 0, 0);
- 
- 	/* When using hashctx-in, must unmap it. */
- 	if (from_talitos_ptr_len(&edesc->desc.ptr[1], is_sec1))
-@@ -1796,7 +1810,6 @@ static void talitos_handle_buggy_hash(struct talitos_ctx *ctx,
- 
- static int common_nonsnoop_hash(struct talitos_edesc *edesc,
- 				struct ahash_request *areq, unsigned int length,
--				unsigned int offset,
- 				void (*callback) (struct device *dev,
- 						  struct talitos_desc *desc,
- 						  void *context, int error))
-@@ -1835,9 +1848,7 @@ static int common_nonsnoop_hash(struct talitos_edesc *edesc,
- 
- 	sg_count = edesc->src_nents ?: 1;
- 	if (is_sec1 && sg_count > 1)
--		sg_pcopy_to_buffer(req_ctx->psrc, sg_count,
--				   edesc->buf + sizeof(struct talitos_desc),
--				   length, req_ctx->nbuf);
-+		sg_copy_to_buffer(req_ctx->psrc, sg_count, edesc->buf, length);
- 	else if (length)
- 		sg_count = dma_map_sg(dev, req_ctx->psrc, sg_count,
- 				      DMA_TO_DEVICE);
-@@ -1850,7 +1861,7 @@ static int common_nonsnoop_hash(struct talitos_edesc *edesc,
- 				       DMA_TO_DEVICE);
- 	} else {
- 		sg_count = talitos_sg_map(dev, req_ctx->psrc, length, edesc,
--					  &desc->ptr[3], sg_count, offset, 0);
-+					  &desc->ptr[3], sg_count, 0, 0);
- 		if (sg_count > 1)
- 			sync_needed = true;
- 	}
-@@ -1874,7 +1885,8 @@ static int common_nonsnoop_hash(struct talitos_edesc *edesc,
- 		talitos_handle_buggy_hash(ctx, edesc, &desc->ptr[3]);
- 
- 	if (is_sec1 && req_ctx->nbuf && length) {
--		struct talitos_desc *desc2 = desc + 1;
-+		struct talitos_desc *desc2 = (struct talitos_desc *)
-+					     (edesc->buf + edesc->dma_len);
- 		dma_addr_t next_desc;
- 
- 		memset(desc2, 0, sizeof(*desc2));
-@@ -1895,7 +1907,7 @@ static int common_nonsnoop_hash(struct talitos_edesc *edesc,
- 						      DMA_TO_DEVICE);
- 		copy_talitos_ptr(&desc2->ptr[2], &desc->ptr[2], is_sec1);
- 		sg_count = talitos_sg_map(dev, req_ctx->psrc, length, edesc,
--					  &desc2->ptr[3], sg_count, offset, 0);
-+					  &desc2->ptr[3], sg_count, 0, 0);
- 		if (sg_count > 1)
- 			sync_needed = true;
- 		copy_talitos_ptr(&desc2->ptr[5], &desc->ptr[5], is_sec1);
-@@ -2006,7 +2018,6 @@ static int ahash_process_req(struct ahash_request *areq, unsigned int nbytes)
- 	struct device *dev = ctx->dev;
- 	struct talitos_private *priv = dev_get_drvdata(dev);
- 	bool is_sec1 = has_ftr_sec1(priv);
--	int offset = 0;
- 	u8 *ctx_buf = req_ctx->buf[req_ctx->buf_idx];
- 
- 	if (!req_ctx->last && (nbytes + req_ctx->nbuf <= blocksize)) {
-@@ -2046,6 +2057,8 @@ static int ahash_process_req(struct ahash_request *areq, unsigned int nbytes)
- 			sg_chain(req_ctx->bufsl, 2, areq->src);
- 		req_ctx->psrc = req_ctx->bufsl;
- 	} else if (is_sec1 && req_ctx->nbuf && req_ctx->nbuf < blocksize) {
-+		int offset;
-+
- 		if (nbytes_to_hash > blocksize)
- 			offset = blocksize - req_ctx->nbuf;
- 		else
-@@ -2058,7 +2071,8 @@ static int ahash_process_req(struct ahash_request *areq, unsigned int nbytes)
- 		sg_copy_to_buffer(areq->src, nents,
- 				  ctx_buf + req_ctx->nbuf, offset);
- 		req_ctx->nbuf += offset;
--		req_ctx->psrc = areq->src;
-+		req_ctx->psrc = scatterwalk_ffwd(req_ctx->bufsl, areq->src,
-+						 offset);
- 	} else
- 		req_ctx->psrc = areq->src;
- 
-@@ -2098,8 +2112,7 @@ static int ahash_process_req(struct ahash_request *areq, unsigned int nbytes)
- 	if (ctx->keylen && (req_ctx->first || req_ctx->last))
- 		edesc->desc.hdr |= DESC_HDR_MODE0_MDEU_HMAC;
- 
--	return common_nonsnoop_hash(edesc, areq, nbytes_to_hash, offset,
--				    ahash_done);
-+	return common_nonsnoop_hash(edesc, areq, nbytes_to_hash, ahash_done);
- }
- 
- static int ahash_update(struct ahash_request *areq)
+Rob acked it now, can you take those couple of patches? Thanks!
 -- 
-2.13.3
-
+Florian
