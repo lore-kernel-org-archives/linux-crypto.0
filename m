@@ -2,121 +2,148 @@ Return-Path: <SRS0=Ym9l=UQ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A688AC31E5B
-	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 17:05:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AA87C31E5B
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 17:20:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 792DA20652
-	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 17:05:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TxjoaKSD"
+	by mail.kernel.org (Postfix) with ESMTP id 1ED35208CB
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 17:20:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1560792018;
+	bh=6deeDpyaXOI01fNb+oVFs6vLcv98dqXp2Sct02Xm+C4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=mfQip/Kn498uUueh+F3AUdc3o21d8mA2CFYrOkMxgsX0NJfh7jU6AlOX14wLxHW8L
+	 zCwYB7bBHDzx9WLpAFyRvIXUZcOvT7i0QRq2ihL5YiizK1ioJTxVtMQtyx7vDAOwHg
+	 uHfbzCzo5MrDyKcnNQQR+g7qMe7+Eh9sVU2Zqoxg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726248AbfFQRF4 (ORCPT
+        id S1726047AbfFQRUQ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 17 Jun 2019 13:05:56 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:43639 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726005AbfFQRFz (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 17 Jun 2019 13:05:55 -0400
-Received: by mail-wr1-f66.google.com with SMTP id p13so10767758wru.10;
-        Mon, 17 Jun 2019 10:05:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=lvgi3+MQpM39FRojWazLhVvXezLQFMNFRlMRkueq/IA=;
-        b=TxjoaKSD5m7bbK0Ih6BMmri+IaS5q+Ny+TFg8Gks5rIBqgGe2z3kV9mvy0d6exbcNP
-         aJT2NQySaV8BAnqHAuXv4h4Nqx1H7TxFvtMqRNtOjc2RNZWInHZgqxvGjiKYOAhOvI6j
-         Gv9uDdha/tJomPbIALK6ispRrcheUinwcrpynnjDxnFTZudsffVMK4n5pCPOXGK1adtu
-         JDB3c29gfzY6S1K7hOj9ROoPwMTAaRKPer6hNujCe7jMnQHAPC4Vews0ca4/Plb396Iw
-         QvkSBGqPnvQ/47zRhczZlPValAMW7y73+iZDdWivWjSSyLm+8G9pWyjU7GFfc1fSMXE8
-         7wTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=lvgi3+MQpM39FRojWazLhVvXezLQFMNFRlMRkueq/IA=;
-        b=jdNUIW/qr02QSYVgIfm4X0/rlCwAWg1fJEAFpo8f3xnm+dAiQOG1ZFGLAkWYejcN1v
-         Xarj+5MmQvcikM8ttagsMNKtsVQpqlapVSHdt76Kma6lNHv9LJC7FyRzX/edGNc23q7r
-         2qJ1wrWDYWaFpLi/6+ThKxr1bFPeWwONVgNwsahCdtLxqfuP9zx1QAKwnbjZJQCJbL6W
-         sSvKbDSaxiUQYFB7DdQbLoDzZA5cG0ShxGFaGTL8RX6diJ8QkmLAAga44xcjSna/uUyU
-         LfDiMf/Aj2xBCaKTIJhKh/ZJMgYjq3drpehCctFUWBYdVwiph4QwhKgFSYSmZg1HDO1W
-         APOQ==
-X-Gm-Message-State: APjAAAXEqstzq4rcOHLylC8P06vqC5hBo59D74obSRtTgqbg0eiPS+k4
-        7E/zQv9H91d555Ft+4NXKYfPr7HG6Y9wRA==
-X-Google-Smtp-Source: APXvYqzi0lLsm2064v1e5vDyLtdJ8bwCyUjazq2dKJytAV5jDeZySSDFNCf3pFZETLZqzrpwnpLjsw==
-X-Received: by 2002:adf:f946:: with SMTP id q6mr25621385wrr.109.1560791153693;
-        Mon, 17 Jun 2019 10:05:53 -0700 (PDT)
-Received: from [192.168.2.28] (39.35.broadband4.iol.cz. [85.71.35.39])
-        by smtp.gmail.com with ESMTPSA id o14sm10435129wrp.77.2019.06.17.10.05.51
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Mon, 17 Jun 2019 10:05:52 -0700 (PDT)
-Subject: Re: [RFC PATCH 0/3] crypto: switch to shash for ESSIV generation
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Milan Broz <gmazyland@gmail.com>
-Cc:     Gilad Ben-Yossef <gilad@benyossef.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        device-mapper development <dm-devel@redhat.com>,
-        linux-fscrypt@vger.kernel.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-References: <20190614083404.20514-1-ard.biesheuvel@linaro.org>
- <20190616204419.GE923@sol.localdomain>
- <CAOtvUMf86_TGYLoAHWuRW0Jz2=cXbHHJnAsZhEvy6SpSp_xgOQ@mail.gmail.com>
- <CAKv+Gu_r_WXf2y=FVYHL-T8gFSV6e4TmGkLNJ-cw6UjK_s=A=g@mail.gmail.com>
- <8e58230a-cf0e-5a81-886b-6aa72a8e5265@gmail.com>
- <CAKv+Gu9sb0t6EC=MwVfqTw5TKtatK-c8k3ryNUhV8O0876NV7g@mail.gmail.com>
- <CAKv+Gu-LFShLW-Tt7hwBpni1vQRvv7k+L_bpP-wU86x88v+eRg@mail.gmail.com>
- <90214c3d-55ef-cc3a-3a04-f200d6f96cfd@gmail.com>
- <CAKv+Gu82BLPWrX1UzUBLf7UB+qJT6ZPtkvJ2Sa9t28OpXArhnw@mail.gmail.com>
-From:   Milan Broz <gmazyland@gmail.com>
-Openpgp: preference=signencrypt
-Message-ID: <af1b7ea1-bc98-06ff-e46c-945e6bae20d8@gmail.com>
-Date:   Mon, 17 Jun 2019 19:05:51 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.1
+        Mon, 17 Jun 2019 13:20:16 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56732 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725995AbfFQRUQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 17 Jun 2019 13:20:16 -0400
+Received: from gmail.com (unknown [104.132.1.77])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 7B0AD208C0;
+        Mon, 17 Jun 2019 17:20:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1560792015;
+        bh=6deeDpyaXOI01fNb+oVFs6vLcv98dqXp2Sct02Xm+C4=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=vHlc/STIdf7nFcb1HMpHP6yU7WDmKK3QoYe2s8H1IbeGwKB0rJ1WjbYJRT48QXB24
+         pB3Aq1RvY7/eNbBLnGArcxtzyGGya+1H/1ZlJe5XE7WsCOhzQmjpEq8cx6uLYe8on5
+         0cI0lsVeVjI3R4GDBBa7QoEmAQvYpCWOOdmt0+vY=
+Date:   Mon, 17 Jun 2019 10:20:10 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Arnd Bergmann <arnd@arndb.de>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Biggers <ebiggers@google.com>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Vitaly Chikunov <vt@altlinux.org>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: testmgr - reduce stack usage in fuzzers
+Message-ID: <20190617172008.GA92263@gmail.com>
+References: <20190617132343.2678836-1-arnd@arndb.de>
 MIME-Version: 1.0
-In-Reply-To: <CAKv+Gu82BLPWrX1UzUBLf7UB+qJT6ZPtkvJ2Sa9t28OpXArhnw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190617132343.2678836-1-arnd@arndb.de>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 17/06/2019 16:39, Ard Biesheuvel wrote:
->>
->> In other words, if you add some additional limit, we are breaking backward compatibility.
->> (Despite the configuration is "wrong" from the security point of view.)
->>
+On Mon, Jun 17, 2019 at 03:23:02PM +0200, Arnd Bergmann wrote:
+> On arm32, we get warnings about high stack usage in some of the functions:
 > 
-> Yes, but breaking backward compatibility only happens if you break
-> something that is actually being *used*. So sure,
-> xts(aes)-essiv:sha256 makes no sense but people use it anyway. But is
-> that also true for, say, gcm(aes)-essiv:sha256 ?
+> crypto/testmgr.c:2269:12: error: stack frame size of 1032 bytes in function 'alg_test_aead' [-Werror,-Wframe-larger-than=]
+> static int alg_test_aead(const struct alg_test_desc *desc, const char *driver,
+>            ^
+> crypto/testmgr.c:1693:12: error: stack frame size of 1312 bytes in function '__alg_test_hash' [-Werror,-Wframe-larger-than=]
+> static int __alg_test_hash(const struct hash_testvec *vecs,
+>            ^
+> 
+> On of the larger objects on the stack here is struct testvec_config, so
+> change that to dynamic allocation.
+> 
+> Fixes: 40153b10d91c ("crypto: testmgr - fuzz AEADs against their generic implementation")
+> Fixes: d435e10e67be ("crypto: testmgr - fuzz skciphers against their generic implementation")
+> Fixes: 9a8a6b3f0950 ("crypto: testmgr - fuzz hashes against their generic implementation")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+> I only compile-tested this, and it's not completely trivial, so please
+> review carefully.
+> ---
+>  crypto/testmgr.c | 61 +++++++++++++++++++++++++++++++++++-------------
+>  1 file changed, 45 insertions(+), 16 deletions(-)
+> 
+> diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+> index 6c28055d41ca..7928296cdcb3 100644
+> --- a/crypto/testmgr.c
+> +++ b/crypto/testmgr.c
+> @@ -1503,13 +1503,15 @@ static int test_hash_vec(const char *driver, const struct hash_testvec *vec,
+>   * Generate a hash test vector from the given implementation.
+>   * Assumes the buffers in 'vec' were already allocated.
+>   */
+> -static void generate_random_hash_testvec(struct crypto_shash *tfm,
+> +static int generate_random_hash_testvec(struct crypto_shash *tfm,
+>  					 struct hash_testvec *vec,
+>  					 unsigned int maxkeysize,
+>  					 unsigned int maxdatasize,
+>  					 char *name, size_t max_namelen)
+>  {
+> -	SHASH_DESC_ON_STACK(desc, tfm);
+> +	struct shash_desc *desc = kmalloc(sizeof(*desc) + crypto_shash_descsize(tfm), GFP_KERNEL);
+> +	if (!desc)
+> +		return -ENOMEM;
+>  
+>  	/* Data */
+>  	vec->psize = generate_random_length(maxdatasize);
+> @@ -1541,6 +1543,10 @@ static void generate_random_hash_testvec(struct crypto_shash *tfm,
+>  done:
+>  	snprintf(name, max_namelen, "\"random: psize=%u ksize=%u\"",
+>  		 vec->psize, vec->ksize);
+> +
+> +	kfree(desc);
+> +
+> +	return 0;
+>  }
 
-These should not be used.  The only way when ESSIV can combine with AEAD mode
-is when you combine length-preserving mode with additional integrity tag, for example
+Instead of allocating the shash_desc here, can you allocate it in
+test_hash_vs_generic_impl() and call it 'generic_desc'?  Then it would match
+test_skcipher_vs_generic_impl() and test_aead_vs_generic_impl() which already
+dynamically allocate their skcipher_request and aead_request, respectively.
 
-  # cryptsetup luksFormat -c aes-cbc-essiv:sha256 --integrity hmac-sha256 /dev/sdb
+>  
+>  /*
+> @@ -1565,7 +1571,7 @@ static int test_hash_vs_generic_impl(const char *driver,
+>  	unsigned int i;
+>  	struct hash_testvec vec = { 0 };
+>  	char vec_name[64];
+> -	struct testvec_config cfg;
+> +	struct testvec_config *cfg;
+>  	char cfgname[TESTVEC_CONFIG_NAMELEN];
+>  	int err;
+>  
 
-it will produce this dm-crypt cipher spec:
-  capi:authenc(hmac(sha256),cbc(aes))-essiv:sha256
+Otherwise I guess this patch is fine for now, though there's still a lot of
+stuff with nontrivial size on the stack (cfgname, vec_name, _generic_driver,
+hash_testvec, plus the stuff in test_hash_vec_cfg).  There's also still a
+testvec_config on the stack in test_{hash,skcipher,aead}_vec(); I assume you
+didn't see a warning there only because it wasn't in combination with as much
+other stuff on the stack.
 
-the authenc(hmac(sha256),cbc(aes)) is direct crypto API cipher composition, the essiv:sha256
-IV is processed inside dm-crypt as IV.
+I should probably have a go at refactoring this code to pack up most of this
+stuff in *_params structures, which would then be dynamically allocated much
+more easily.
 
-So if authenc() composition is problem, then yes, I am afraid these can be used in reality.
-
-But for things like gcm(aes)-essiv:sha256 (IOW real AEAD mode with ESSIV) - these are
-not supported by cryptsetup (we support only random IV in this case), so these should
-not be used anywhere.
-
-Milan
+- Eric
