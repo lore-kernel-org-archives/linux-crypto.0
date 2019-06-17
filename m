@@ -2,103 +2,359 @@ Return-Path: <SRS0=Ym9l=UQ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_NEOMUTT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37501C31E50
-	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 01:23:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BB17C31E54
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 08:11:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1443C2087F
-	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 01:23:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E9F1021C38
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 08:11:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VlzMiAV9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727465AbfFQBXJ (ORCPT
+        id S1725884AbfFQILN (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 16 Jun 2019 21:23:09 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:34174 "EHLO deadmen.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727238AbfFQBXI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 16 Jun 2019 21:23:08 -0400
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1hcgMV-00043D-2o; Mon, 17 Jun 2019 09:23:07 +0800
-Received: from herbert by gondobar with local (Exim 4.89)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1hcgMH-0002MA-Gw; Mon, 17 Jun 2019 09:22:53 +0800
-Date:   Mon, 17 Jun 2019 09:22:53 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc:     netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Mon, 17 Jun 2019 04:11:13 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:56213 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725837AbfFQILN (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 17 Jun 2019 04:11:13 -0400
+Received: by mail-wm1-f68.google.com with SMTP id a15so8173163wmj.5
+        for <linux-crypto@vger.kernel.org>; Mon, 17 Jun 2019 01:11:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=T2DYrJyMKowWyAQpSFGQeU51o1KpgHm1+BmumkXfwiw=;
+        b=VlzMiAV9ZL942+T6PN1t43bqCjqUfvSfcQycNhc90IQJMuepCPYZEvI5IE7XLS3v87
+         35rDSpA0Rpev5oJnzo++eKFZzXLTYED850q0GNyBcvDglrCXuHUtVpIvUe07MtmSLx8x
+         75q4gUelfxtUA9d8XsStLaYb1pqFQNk94mI3y22a5cYNbhsJB0hTgJYibKMuIf00Cxq1
+         ZfDihPqika9gXZiuDt1+TO0o552W3MjenoQP+oOaVIY04l0UUrTA01KZhgEfdbp2yTCw
+         cpFNUNi5i/hclWNYFoRL0eDvjTInV8YIhvmkR25ahDzR6s00Bh0+3+OOXFIrNqGX6c+i
+         d8NQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=T2DYrJyMKowWyAQpSFGQeU51o1KpgHm1+BmumkXfwiw=;
+        b=H8hcmklc7dzkRY4302jDAdlQn1QIbdFipEyNvsZQZAA7oGXZteCQuHk/J5jh4RNntv
+         isICmBNZm435RDLHEVXxfJpPCnHCMl2qak4Ua+4/n6R55x+vK27dgIyOASXK+DcwkqyM
+         MMUjwFY7luC0axZnFLXmGueErIAaMNTC7ziDDRkwqUECbv45btbXyzsyZ4OByN7sVlSN
+         WXB0zc14rh9jF5VEjApY9xqP59LR9hrrAymd724QUDgJhIjZgbMPAzxzgW5EjknL89UZ
+         u2URbYdT57YbHSUGElMlog6P7ak+rQUVICbVc5pQEt0RTwpA+7YN9+37/Rrhi5ww1pjD
+         qe3w==
+X-Gm-Message-State: APjAAAU7A7Nnr4jV4GNSA2pAIlrM0dxcrmqyxNYfqKw+zh/IdZitWzIq
+        CH8KMZcIEsAyLFCAg2A73YxiTA==
+X-Google-Smtp-Source: APXvYqzxF21yyweKsYKW3hgO4fHW4jzgSg/Fx14kVgSq8vaOzEW4AXxAil+hYP1itIxNuTlJ+ZyEMA==
+X-Received: by 2002:a1c:968c:: with SMTP id y134mr16400721wmd.122.1560759068656;
+        Mon, 17 Jun 2019 01:11:08 -0700 (PDT)
+Received: from localhost.localdomain (laubervilliers-657-1-83-120.w92-154.abo.wanadoo.fr. [92.154.90.120])
+        by smtp.gmail.com with ESMTPSA id j189sm21734900wmb.48.2019.06.17.01.11.06
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Mon, 17 Jun 2019 01:11:07 -0700 (PDT)
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To:     netdev@vger.kernel.org
+Cc:     linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
         ebiggers@kernel.org, edumazet@google.com, davem@davemloft.net,
         kuznet@ms2.inr.ac.ru, yoshfuji@linux-ipv6.org, jbaron@akamai.com,
-        cpaasch@apple.com, David.Laight@aculab.com
-Subject: Re: [PATCH v2] net: ipv4: move tcp_fastopen server side code to
- SipHash library
-Message-ID: <20190617012253.4hgfdwvurskstz4o@gondor.apana.org.au>
-References: <20190614140122.20934-1-ard.biesheuvel@linaro.org>
+        cpaasch@apple.com, David.Laight@aculab.com, ycheng@google.com,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [PATCH v3] net: ipv4: move tcp_fastopen server side code to SipHash library
+Date:   Mon, 17 Jun 2019 10:09:33 +0200
+Message-Id: <20190617080933.32152-1-ard.biesheuvel@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190614140122.20934-1-ard.biesheuvel@linaro.org>
-User-Agent: NeoMutt/20170113 (1.7.2)
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jun 14, 2019 at 04:01:22PM +0200, Ard Biesheuvel wrote:
-> Using a bare block cipher in non-crypto code is almost always a bad idea,
-> not only for security reasons (and we've seen some examples of this in
-> the kernel in the past), but also for performance reasons.
-> 
-> In the TCP fastopen case, we call into the bare AES block cipher one or
-> two times (depending on whether the connection is IPv4 or IPv6). On most
-> systems, this results in a call chain such as
-> 
->   crypto_cipher_encrypt_one(ctx, dst, src)
->     crypto_cipher_crt(tfm)->cit_encrypt_one(crypto_cipher_tfm(tfm), ...);
->       aesni_encrypt
->         kernel_fpu_begin();
->         aesni_enc(ctx, dst, src); // asm routine
->         kernel_fpu_end();
-> 
-> It is highly unlikely that the use of special AES instructions has a
-> benefit in this case, especially since we are doing the above twice
-> for IPv6 connections, instead of using a transform which can process
-> the entire input in one go.
-> 
-> We could switch to the cbcmac(aes) shash, which would at least get
-> rid of the duplicated overhead in *some* cases (i.e., today, only
-> arm64 has an accelerated implementation of cbcmac(aes), while x86 will
-> end up using the generic cbcmac template wrapping the AES-NI cipher,
-> which basically ends up doing exactly the above). However, in the given
-> context, it makes more sense to use a light-weight MAC algorithm that
-> is more suitable for the purpose at hand, such as SipHash.
-> 
-> Since the output size of SipHash already matches our chosen value for
-> TCP_FASTOPEN_COOKIE_SIZE, and given that it accepts arbitrary input
-> sizes, this greatly simplifies the code as well.
-> 
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> ---
-> v2: rebase onto net-next
->     reverse order of operands in BUILD_BUG_ON() comparison expression
-> 
->  include/linux/tcp.h     |  7 +-
->  include/net/tcp.h       | 10 +-
->  net/ipv4/tcp_fastopen.c | 97 +++++++-------------
->  3 files changed, 36 insertions(+), 78 deletions(-)
+Using a bare block cipher in non-crypto code is almost always a bad idea,
+not only for security reasons (and we've seen some examples of this in
+the kernel in the past), but also for performance reasons.
 
-You should also revert commit 798b2cbf9227 in your patch:
+In the TCP fastopen case, we call into the bare AES block cipher one or
+two times (depending on whether the connection is IPv4 or IPv6). On most
+systems, this results in a call chain such as
 
-commit 798b2cbf9227b1bd7d37ae9af4d9c750e6f4de9c
-Author: David S. Miller <davem@davemloft.net>
-Date:   Tue Sep 4 14:20:14 2012 -0400
+  crypto_cipher_encrypt_one(ctx, dst, src)
+    crypto_cipher_crt(tfm)->cit_encrypt_one(crypto_cipher_tfm(tfm), ...);
+      aesni_encrypt
+        kernel_fpu_begin();
+        aesni_enc(ctx, dst, src); // asm routine
+        kernel_fpu_end();
 
-    net: Add INET dependency on aes crypto for the sake of TCP fastopen.
+It is highly unlikely that the use of special AES instructions has a
+benefit in this case, especially since we are doing the above twice
+for IPv6 connections, instead of using a transform which can process
+the entire input in one go.
 
-Thanks,
+We could switch to the cbcmac(aes) shash, which would at least get
+rid of the duplicated overhead in *some* cases (i.e., today, only
+arm64 has an accelerated implementation of cbcmac(aes), while x86 will
+end up using the generic cbcmac template wrapping the AES-NI cipher,
+which basically ends up doing exactly the above). However, in the given
+context, it makes more sense to use a light-weight MAC algorithm that
+is more suitable for the purpose at hand, such as SipHash.
+
+Since the output size of SipHash already matches our chosen value for
+TCP_FASTOPEN_COOKIE_SIZE, and given that it accepts arbitrary input
+sizes, this greatly simplifies the code as well.
+
+NOTE: Server farms backing a single server IP for load balancing purposes
+      and sharing a single fastopen key will be adversely affected by
+      this change unless all systems in the pool receive their kernel
+      upgrades at the same time.
+
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+---
+v3: mention potential deployment issues for server farms in commit log
+    remove CONFIG_INET Kconfig dependency on CRYPTO_AES
+
+v2: rebase onto net-next
+    reverse order of operands in BUILD_BUG_ON() comparison expression
+
+ include/linux/tcp.h     |  7 +-
+ include/net/tcp.h       | 10 +-
+ net/Kconfig             |  2 -
+ net/ipv4/tcp_fastopen.c | 97 +++++++-------------
+ 4 files changed, 36 insertions(+), 80 deletions(-)
+
+diff --git a/include/linux/tcp.h b/include/linux/tcp.h
+index c23019a3b264..9ea0e71f5c6a 100644
+--- a/include/linux/tcp.h
++++ b/include/linux/tcp.h
+@@ -58,12 +58,7 @@ static inline unsigned int tcp_optlen(const struct sk_buff *skb)
+ 
+ /* TCP Fast Open Cookie as stored in memory */
+ struct tcp_fastopen_cookie {
+-	union {
+-		u8	val[TCP_FASTOPEN_COOKIE_MAX];
+-#if IS_ENABLED(CONFIG_IPV6)
+-		struct in6_addr addr;
+-#endif
+-	};
++	u64	val[TCP_FASTOPEN_COOKIE_MAX / sizeof(u64)];
+ 	s8	len;
+ 	bool	exp;	/* In RFC6994 experimental option format */
+ };
+diff --git a/include/net/tcp.h b/include/net/tcp.h
+index 96e0e53ff440..184930b02779 100644
+--- a/include/net/tcp.h
++++ b/include/net/tcp.h
+@@ -1628,9 +1628,9 @@ bool tcp_fastopen_defer_connect(struct sock *sk, int *err);
+ 
+ /* Fastopen key context */
+ struct tcp_fastopen_context {
+-	struct crypto_cipher	*tfm[TCP_FASTOPEN_KEY_MAX];
+-	__u8			key[TCP_FASTOPEN_KEY_BUF_LENGTH];
+-	struct rcu_head		rcu;
++	__u8		key[TCP_FASTOPEN_KEY_MAX][TCP_FASTOPEN_KEY_LENGTH];
++	int		num;
++	struct rcu_head	rcu;
+ };
+ 
+ extern unsigned int sysctl_tcp_fastopen_blackhole_timeout;
+@@ -1665,9 +1665,7 @@ bool tcp_fastopen_cookie_match(const struct tcp_fastopen_cookie *foc,
+ static inline
+ int tcp_fastopen_context_len(const struct tcp_fastopen_context *ctx)
+ {
+-	if (ctx->tfm[1])
+-		return 2;
+-	return 1;
++	return ctx->num;
+ }
+ 
+ /* Latencies incurred by various limits for a sender. They are
+diff --git a/net/Kconfig b/net/Kconfig
+index d122f53c6fa2..57f51a279ad6 100644
+--- a/net/Kconfig
++++ b/net/Kconfig
+@@ -67,8 +67,6 @@ source "net/xdp/Kconfig"
+ 
+ config INET
+ 	bool "TCP/IP networking"
+-	select CRYPTO
+-	select CRYPTO_AES
+ 	---help---
+ 	  These are the protocols used on the Internet and on most local
+ 	  Ethernets. It is highly recommended to say Y here (this will enlarge
+diff --git a/net/ipv4/tcp_fastopen.c b/net/ipv4/tcp_fastopen.c
+index 7d19fa4c8121..46b67128e1ca 100644
+--- a/net/ipv4/tcp_fastopen.c
++++ b/net/ipv4/tcp_fastopen.c
+@@ -7,6 +7,7 @@
+ #include <linux/tcp.h>
+ #include <linux/rcupdate.h>
+ #include <linux/rculist.h>
++#include <linux/siphash.h>
+ #include <net/inetpeer.h>
+ #include <net/tcp.h>
+ 
+@@ -37,14 +38,8 @@ static void tcp_fastopen_ctx_free(struct rcu_head *head)
+ {
+ 	struct tcp_fastopen_context *ctx =
+ 	    container_of(head, struct tcp_fastopen_context, rcu);
+-	int i;
+ 
+-	/* We own ctx, thus no need to hold the Fastopen-lock */
+-	for (i = 0; i < TCP_FASTOPEN_KEY_MAX; i++) {
+-		if (ctx->tfm[i])
+-			crypto_free_cipher(ctx->tfm[i]);
+-	}
+-	kfree(ctx);
++	kzfree(ctx);
+ }
+ 
+ void tcp_fastopen_destroy_cipher(struct sock *sk)
+@@ -72,41 +67,6 @@ void tcp_fastopen_ctx_destroy(struct net *net)
+ 		call_rcu(&ctxt->rcu, tcp_fastopen_ctx_free);
+ }
+ 
+-static struct tcp_fastopen_context *tcp_fastopen_alloc_ctx(void *primary_key,
+-							   void *backup_key,
+-							   unsigned int len)
+-{
+-	struct tcp_fastopen_context *new_ctx;
+-	void *key = primary_key;
+-	int err, i;
+-
+-	new_ctx = kmalloc(sizeof(*new_ctx), GFP_KERNEL);
+-	if (!new_ctx)
+-		return ERR_PTR(-ENOMEM);
+-	for (i = 0; i < TCP_FASTOPEN_KEY_MAX; i++)
+-		new_ctx->tfm[i] = NULL;
+-	for (i = 0; i < (backup_key ? 2 : 1); i++) {
+-		new_ctx->tfm[i] = crypto_alloc_cipher("aes", 0, 0);
+-		if (IS_ERR(new_ctx->tfm[i])) {
+-			err = PTR_ERR(new_ctx->tfm[i]);
+-			new_ctx->tfm[i] = NULL;
+-			pr_err("TCP: TFO aes cipher alloc error: %d\n", err);
+-			goto out;
+-		}
+-		err = crypto_cipher_setkey(new_ctx->tfm[i], key, len);
+-		if (err) {
+-			pr_err("TCP: TFO cipher key error: %d\n", err);
+-			goto out;
+-		}
+-		memcpy(&new_ctx->key[i * TCP_FASTOPEN_KEY_LENGTH], key, len);
+-		key = backup_key;
+-	}
+-	return new_ctx;
+-out:
+-	tcp_fastopen_ctx_free(&new_ctx->rcu);
+-	return ERR_PTR(err);
+-}
+-
+ int tcp_fastopen_reset_cipher(struct net *net, struct sock *sk,
+ 			      void *primary_key, void *backup_key,
+ 			      unsigned int len)
+@@ -115,11 +75,20 @@ int tcp_fastopen_reset_cipher(struct net *net, struct sock *sk,
+ 	struct fastopen_queue *q;
+ 	int err = 0;
+ 
+-	ctx = tcp_fastopen_alloc_ctx(primary_key, backup_key, len);
+-	if (IS_ERR(ctx)) {
+-		err = PTR_ERR(ctx);
++	ctx = kmalloc(sizeof(*ctx), GFP_KERNEL);
++	if (!ctx) {
++		err = -ENOMEM;
+ 		goto out;
+ 	}
++
++	memcpy(ctx->key[0], primary_key, len);
++	if (backup_key) {
++		memcpy(ctx->key[1], backup_key, len);
++		ctx->num = 2;
++	} else {
++		ctx->num = 1;
++	}
++
+ 	spin_lock(&net->ipv4.tcp_fastopen_ctx_lock);
+ 	if (sk) {
+ 		q = &inet_csk(sk)->icsk_accept_queue.fastopenq;
+@@ -141,31 +110,30 @@ int tcp_fastopen_reset_cipher(struct net *net, struct sock *sk,
+ 
+ static bool __tcp_fastopen_cookie_gen_cipher(struct request_sock *req,
+ 					     struct sk_buff *syn,
+-					     struct crypto_cipher *tfm,
++					     const u8 *key,
+ 					     struct tcp_fastopen_cookie *foc)
+ {
++	BUILD_BUG_ON(TCP_FASTOPEN_KEY_LENGTH != sizeof(siphash_key_t));
++	BUILD_BUG_ON(TCP_FASTOPEN_COOKIE_SIZE != sizeof(u64));
++
+ 	if (req->rsk_ops->family == AF_INET) {
+ 		const struct iphdr *iph = ip_hdr(syn);
+-		__be32 path[4] = { iph->saddr, iph->daddr, 0, 0 };
+ 
+-		crypto_cipher_encrypt_one(tfm, foc->val, (void *)path);
++		foc->val[0] = siphash(&iph->saddr,
++				      sizeof(iph->saddr) +
++				      sizeof(iph->daddr),
++				      (const siphash_key_t *)key);
+ 		foc->len = TCP_FASTOPEN_COOKIE_SIZE;
+ 		return true;
+ 	}
+-
+ #if IS_ENABLED(CONFIG_IPV6)
+ 	if (req->rsk_ops->family == AF_INET6) {
+ 		const struct ipv6hdr *ip6h = ipv6_hdr(syn);
+-		struct tcp_fastopen_cookie tmp;
+-		struct in6_addr *buf;
+-		int i;
+-
+-		crypto_cipher_encrypt_one(tfm, tmp.val,
+-					  (void *)&ip6h->saddr);
+-		buf = &tmp.addr;
+-		for (i = 0; i < 4; i++)
+-			buf->s6_addr32[i] ^= ip6h->daddr.s6_addr32[i];
+-		crypto_cipher_encrypt_one(tfm, foc->val, (void *)buf);
++
++		foc->val[0] = siphash(&ip6h->saddr,
++				      sizeof(ip6h->saddr) +
++				      sizeof(ip6h->daddr),
++				      (const siphash_key_t *)key);
+ 		foc->len = TCP_FASTOPEN_COOKIE_SIZE;
+ 		return true;
+ 	}
+@@ -173,11 +141,8 @@ static bool __tcp_fastopen_cookie_gen_cipher(struct request_sock *req,
+ 	return false;
+ }
+ 
+-/* Generate the fastopen cookie by doing aes128 encryption on both
+- * the source and destination addresses. Pad 0s for IPv4 or IPv4-mapped-IPv6
+- * addresses. For the longer IPv6 addresses use CBC-MAC.
+- *
+- * XXX (TFO) - refactor when TCP_FASTOPEN_COOKIE_SIZE != AES_BLOCK_SIZE.
++/* Generate the fastopen cookie by applying SipHash to both the source and
++ * destination addresses.
+  */
+ static void tcp_fastopen_cookie_gen(struct sock *sk,
+ 				    struct request_sock *req,
+@@ -189,7 +154,7 @@ static void tcp_fastopen_cookie_gen(struct sock *sk,
+ 	rcu_read_lock();
+ 	ctx = tcp_fastopen_get_ctx(sk);
+ 	if (ctx)
+-		__tcp_fastopen_cookie_gen_cipher(req, syn, ctx->tfm[0], foc);
++		__tcp_fastopen_cookie_gen_cipher(req, syn, ctx->key[0], foc);
+ 	rcu_read_unlock();
+ }
+ 
+@@ -253,7 +218,7 @@ static int tcp_fastopen_cookie_gen_check(struct sock *sk,
+ 	if (!ctx)
+ 		goto out;
+ 	for (i = 0; i < tcp_fastopen_context_len(ctx); i++) {
+-		__tcp_fastopen_cookie_gen_cipher(req, syn, ctx->tfm[i], foc);
++		__tcp_fastopen_cookie_gen_cipher(req, syn, ctx->key[i], foc);
+ 		if (tcp_fastopen_cookie_match(foc, orig)) {
+ 			ret = i + 1;
+ 			goto out;
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.20.1
+
