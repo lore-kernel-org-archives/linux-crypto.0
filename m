@@ -2,92 +2,102 @@ Return-Path: <SRS0=Ym9l=UQ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1864AC31E58
-	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 09:24:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49681C31E57
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 10:08:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DE53620820
-	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 09:24:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fLsvWmEG"
+	by mail.kernel.org (Postfix) with ESMTP id 259052084D
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 10:08:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727022AbfFQJYp (ORCPT
+        id S1727949AbfFQKIp (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 17 Jun 2019 05:24:45 -0400
-Received: from mail-io1-f67.google.com ([209.85.166.67]:38757 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728105AbfFQJYn (ORCPT
+        Mon, 17 Jun 2019 06:08:45 -0400
+Received: from metis.ext.pengutronix.de ([85.220.165.71]:32813 "EHLO
+        metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726960AbfFQKIp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 17 Jun 2019 05:24:43 -0400
-Received: by mail-io1-f67.google.com with SMTP id d12so11667182iod.5
-        for <linux-crypto@vger.kernel.org>; Mon, 17 Jun 2019 02:24:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=zIqikUxxUkznt/nPhZHSPquXqmCjr0iAh/jFh9d8P3A=;
-        b=fLsvWmEGUkcftWJR9NozAsTm7Mo72HiPUuzSfhlKYGihIuydPz99+gbl4pOBPFGByl
-         5CIEpGGJJQNDSYPn0PzRtpPQdNDaJidhuYmvMJ/qGYxqEfY75Ezgbf7dY+eDXGIi/ZT4
-         j1+zcJYVZnCg87OeiZ34VLfHtpO9w63q8EK1sfhoSH9VoZD7yjbChUCDRgZsvl0hhxVX
-         8mVAzAd/n8cw3ugcUssXJybA9+gInlaL9G+E1+j7TXyz0lAyz/+7aiTCD/vvXBZw9zl1
-         bw8N6Y2lGCJ2qPBrnrH3K52Sdi6Jl3gZsF5b80N2DmKrM8/CWHDEk6w4hYqV2GgZPAOG
-         KzGw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=zIqikUxxUkznt/nPhZHSPquXqmCjr0iAh/jFh9d8P3A=;
-        b=maS42f0f5lja9Z+eyDBDgvQ+h6Tc8EKq897p5GN74a6YgV7l3hWUy3UuRxsJBs9qHM
-         MQlodnYrVurYsuYU3ieyWphfBm67wLdZgeZY2GB4X37h96rXYD9Mt329eN0NQWmJU/fk
-         1JigrxkQVTPHE7dXr2Les+U/fKLiS3xIEV+qETvmmdxcAxLhanrojzhw3DynlPOI+CO4
-         yQ0f762tNd25zoSqwz8hUViAGnA/ef32V/XtdviXf4Sh4aI/e6wMrKdjELMYNiNHYVrv
-         UGeKXj2wjl8AbtzYKcRkTASkgZD9YgEj9YbnLUL3rXVOIFBzSpLg/l3YMINJ8PxHMIir
-         mTKw==
-X-Gm-Message-State: APjAAAXXKyZhwTCXAmWaFOo2Lco92SpuOfhluFn7l4wXKyBa0VKFiCAH
-        weYO+qtNOo7xTzoA1sY8Mzlu1OlW+Szcani9NTW0Dw==
-X-Google-Smtp-Source: APXvYqxU96w28abtHE8iCpMU+y7SrZIpL//Bw34gn+u4ZU8wsAw3pX+V1uOspSgWJpQNL5A2E/SEDtf0TJoK9q0SimM=
-X-Received: by 2002:a5d:9456:: with SMTP id x22mr868694ior.71.1560763482317;
- Mon, 17 Jun 2019 02:24:42 -0700 (PDT)
+        Mon, 17 Jun 2019 06:08:45 -0400
+Received: from ptx.hi.pengutronix.de ([2001:67c:670:100:1d::c0])
+        by metis.ext.pengutronix.de with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <sha@pengutronix.de>)
+        id 1hcoZ9-0005Kn-HA; Mon, 17 Jun 2019 12:08:43 +0200
+Received: from sha by ptx.hi.pengutronix.de with local (Exim 4.89)
+        (envelope-from <sha@pengutronix.de>)
+        id 1hcoZ8-0005Qj-Gh; Mon, 17 Jun 2019 12:08:42 +0200
+Date:   Mon, 17 Jun 2019 12:08:42 +0200
+From:   Sascha Hauer <s.hauer@pengutronix.de>
+To:     Horia Geanta <horia.geanta@nxp.com>
+Cc:     Fabio Estevam <festevam@gmail.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "kernel@pengutronix.de" <kernel@pengutronix.de>
+Subject: Re: ctr(aes) broken in CAAM driver
+Message-ID: <20190617100842.wqoqan5o7hxpmgdq@pengutronix.de>
+References: <20190515130746.cvhkxxffrmmynfq3@pengutronix.de>
+ <CAOMZO5CJvcipPNY6TXnwwET2fc=zaP3Dj3HPT-zfZpzfqHkeHQ@mail.gmail.com>
+ <20190515132225.oczgouglycuhqo4l@pengutronix.de>
+ <VI1PR0402MB3485ED478A2A3E0087E81F7C98090@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+ <20190612094050.6esonhumzv2ywhdh@pengutronix.de>
+ <VI1PR0402MB3485F22CE6052F7CC24AAC3E98EC0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+ <20190612113536.eixnu5sqphynyjfr@pengutronix.de>
 MIME-Version: 1.0
-References: <20190614083404.20514-1-ard.biesheuvel@linaro.org>
- <20190616204419.GE923@sol.localdomain> <CAOtvUMf86_TGYLoAHWuRW0Jz2=cXbHHJnAsZhEvy6SpSp_xgOQ@mail.gmail.com>
- <CAKv+Gu_r_WXf2y=FVYHL-T8gFSV6e4TmGkLNJ-cw6UjK_s=A=g@mail.gmail.com> <20190617092012.gk7wrazxh7bwfmjk@gondor.apana.org.au>
-In-Reply-To: <20190617092012.gk7wrazxh7bwfmjk@gondor.apana.org.au>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Mon, 17 Jun 2019 11:24:31 +0200
-Message-ID: <CAKv+Gu_34nOAcTBJPi7cR2W7w-1c27ofgoDaXZtuZh8qaaQJSQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 0/3] crypto: switch to shash for ESSIV generation
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Gilad Ben-Yossef <gilad@benyossef.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        device-mapper development <dm-devel@redhat.com>,
-        linux-fscrypt@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190612113536.eixnu5sqphynyjfr@pengutronix.de>
+X-Sent-From: Pengutronix Hildesheim
+X-URL:  http://www.pengutronix.de/
+X-IRC:  #ptxdist @freenode
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-Uptime: 12:07:27 up 30 days, 16:25, 85 users,  load average: 0.29, 0.27,
+ 0.25
+User-Agent: NeoMutt/20170113 (1.7.2)
+X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::c0
+X-SA-Exim-Mail-From: sha@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 17 Jun 2019 at 11:20, Herbert Xu <herbert@gondor.apana.org.au> wrote:
->
-> On Mon, Jun 17, 2019 at 11:15:01AM +0200, Ard Biesheuvel wrote:
-> >
-> > Ah yes, thanks for reminding me. There was some debate in the past
-> > about this, but I don't remember the details.
->
-> I think there were some controversy regarding whether the resulting
-> code lived in drivers/md or crypto.  I think as long as drivers/md
-> is the only user of the said code then having it in drivers/md should
-> be fine.
->
-> However, if we end up using/reusing the same code for others such as
-> fs/crypto then it might make more sense to have them in crypto.
->
+On Wed, Jun 12, 2019 at 01:35:36PM +0200, Sascha Hauer wrote:
+> On Wed, Jun 12, 2019 at 10:33:56AM +0000, Horia Geanta wrote:
+> > On 6/12/2019 12:40 PM, Sascha Hauer wrote:
+> > > Hi Horia,
+> > > 
+> > > On Wed, May 15, 2019 at 01:35:16PM +0000, Horia Geanta wrote:
+> > >> For talitos, the problem is the lack of IV update.
+> > >>
+> > >> For caam, the problem is incorrect IV update (output IV is equal to last
+> > >> ciphertext block, which is correect for cbc, but not for ctr mode).
+> > >>
+> > >> I am working at a fix, but it takes longer since I would like to program the
+> > >> accelerator to the save the IV (and not do counter increment in SW, which
+> > >> created problems for many other implementations).
+> > > 
+> > > Any news here? With the fix Ard provided gcm(aes) now works again, but
+> > > only as long as the crypto self tests are disabled.
+> > > 
+> > I've recently submitted support for IV update done in HW (caam engine),
+> > which fixes this issue:
+> > https://patchwork.kernel.org/cover/10984927/
+> 
+> Thanks, I haven't seen this. I'll give it a try.
 
-Agreed. We could more easily test it in isolation and ensure parity
-between different implementations, especially now that we have Eric's
-improved testing framework that tests against generic implementations.
+This works here, thanks
+
+I don't have the original patch mails, so I'm adding it here:
+
+Tested-by: Sascha Hauer <s.hauer@pengutronix.de>
+
+Sascha
+
+-- 
+Pengutronix e.K.                           |                             |
+Industrial Linux Solutions                 | http://www.pengutronix.de/  |
+Peiner Str. 6-8, 31137 Hildesheim, Germany | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
