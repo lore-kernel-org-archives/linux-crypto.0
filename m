@@ -3,124 +3,112 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C997C31E44
-	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 08:52:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13432C31E57
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 09:15:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EC9DC2080A
-	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 08:52:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D380020848
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 09:15:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=benyossef-com.20150623.gappssmtp.com header.i=@benyossef-com.20150623.gappssmtp.com header.b="XtlskwgA"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WYpWGUjm"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727469AbfFQIwE (ORCPT
+        id S1727806AbfFQJPO (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 17 Jun 2019 04:52:04 -0400
-Received: from mail-ua1-f66.google.com ([209.85.222.66]:38611 "EHLO
-        mail-ua1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726631AbfFQIwE (ORCPT
+        Mon, 17 Jun 2019 05:15:14 -0400
+Received: from mail-io1-f65.google.com ([209.85.166.65]:44768 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727323AbfFQJPN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 17 Jun 2019 04:52:04 -0400
-Received: by mail-ua1-f66.google.com with SMTP id j2so3199767uaq.5
-        for <linux-crypto@vger.kernel.org>; Mon, 17 Jun 2019 01:52:03 -0700 (PDT)
+        Mon, 17 Jun 2019 05:15:13 -0400
+Received: by mail-io1-f65.google.com with SMTP id s7so19510118iob.11
+        for <linux-crypto@vger.kernel.org>; Mon, 17 Jun 2019 02:15:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=benyossef-com.20150623.gappssmtp.com; s=20150623;
+        d=linaro.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=JUqP3OKeD9bPLmSeCNOPOKYOA3EuQZNFNBZVHYzC5g4=;
-        b=XtlskwgAxUNAXyFcXU16C6KAhEpQNCyyXjj/AqlIJZIPfIDfe9DP0YJEN8hUAybdZS
-         GeF4UKONeKyJ16gBgPsvAi2PpvkgnDWRV530xC5Fhd1QqHmm2yPAXv+70RA+rKE5rEBj
-         9OvPRoBYneEwIjZyfG6ds0OZ8k7zGP7BsfwJJ3yCeYjfJPQC1a+hovGdIfMsNX8aeChl
-         2EoDLFZy79Y8Ra7HxUSdwkf/HAQt3tsb9ll/BlDyQe1ajUGFXwuqRHfAyqy5PzculMNI
-         BR8xoqtihnK7YQd9hRUtQuxdNnjLEKq5dBY7QGM/mt/Ss2hnCRiW8IALIkwW2pQDXOKr
-         I9pQ==
+         :cc;
+        bh=BBlAq8Hgbk1PhfyJUI7i/pP6QgmDuBb0PZdu9I+mRE8=;
+        b=WYpWGUjmF/b5U2DhXFfHaq8D+8s5go2/jFOJkLk2uW4kq/Fv7IjgWsCIoP43Tynt7H
+         2blO6czII4FOD+tpOnQXimX+P037O7oXWstll/m5VLtgOnz5kU/beNS0K5g4+DUssMf8
+         v127qxFMTsWiy5evx4nnTswUoRAa8OusVmK004aPXfXLNTQ29ioi4+qt3LdgKW5v7Adt
+         CrF2/V2eQnw6tmt8vvq7hN31gUyYz8pwsXZajaxSBLTYz5WfRkyePZV4qr+pLxZWYGlC
+         dBDm8qNvcoQd4zGwUNIu2drZ6m41Tg2gN6jU6vUjKCRfjbvfnQhz8dfskKQb57+eBbpc
+         tY8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=JUqP3OKeD9bPLmSeCNOPOKYOA3EuQZNFNBZVHYzC5g4=;
-        b=j25fYyMrTO7olza5PS4biWW8IiTZBhyEGZn4MsNsLws3Z8W7xPtIJksl5/lMIPrnAI
-         zvQFFQi5qVk73soF866pLa9iY1SzcM5Zct8CMWChp6pdx5BSQs4f+T8ng2KoQxwa/w2K
-         5x04W104216NcZDzvFqWiHzugteKhtci6U3Sn3+eC/6nA7edcNiK1ldXX6Lxm/DHdPvu
-         Wyp4F5thVXQptQTn+YsMm/U77OURs4mRZdRtzRsZmQUREhU5JRdsKRBjXDXbYc4WqAUT
-         ix20eYwpB5KO+45r8lO19Yo7TcR/gSeCeWNoY4etvz1u0AtU6cUYX5hq+0v8uSTv18UT
-         THoA==
-X-Gm-Message-State: APjAAAV3xdb7jqwwAEgSvnPU4Ig/1YJ2UPaOS2aZGkclv6TKkxVuBHGy
-        pidieODjZFtA3EwPKNl6XWWhNOeqisz9TnFnp03e0sou
-X-Google-Smtp-Source: APXvYqxUsRrEeCO+S9+Ink2+fjaOAiIAOcXiVQUU81FYi7df7idYsDJ/kS+jTivSSuU+OpV27+CqsbxLSOqSeurMJ9U=
-X-Received: by 2002:ab0:208c:: with SMTP id r12mr41428470uak.27.1560761523133;
- Mon, 17 Jun 2019 01:52:03 -0700 (PDT)
+         :message-id:subject:to:cc;
+        bh=BBlAq8Hgbk1PhfyJUI7i/pP6QgmDuBb0PZdu9I+mRE8=;
+        b=KO/JyJhgPkKXb46/L0KuDEt+Gx6+1GCrBLNF63LZ132JVM8Bjjt/bSoyPgI20H9wPC
+         Rnm299J5dNDMd8HmQDEn6gne3F3Lie2gcPqkecBvm/IEoUo58gq7X6wtcX59soiNaQf6
+         dXJ5TRXy9pZbGEx0YQ5icqUUYQ9I2sYQqdY99HZJPrcuQfjTl+bkLYb9D6jSGw4KmtNQ
+         ZKMMbxk1E7iIAtQq/In5iwivalbhaGwhDVFOaL7GbAJcM+pJePvqRFQE2jNrg/JCOxLN
+         Xujfz15rus1FY+yupOvZ4Fi1mX+A+mYdXFncZKd+rqB2NMnWj8NnsHhrUEh4Ql8GgVXQ
+         mXyQ==
+X-Gm-Message-State: APjAAAWXm6hk1xMOV8gv3PWOPDoCa+dVqZq9vLHXu9OLt80LUsRSXp7r
+        q/6DtenL2Mieyv/Kw29id/2ik96Yo0nUWUWINL5Z1g==
+X-Google-Smtp-Source: APXvYqxHcte7o9+S4aNU6gOiMoSXJgqAwijNG58b3jo5O5B7NSygezT1xkWpPBvKULdZoH6xNXgeQQY7neDGSv8dDwY=
+X-Received: by 2002:a02:3308:: with SMTP id c8mr14821917jae.103.1560762912862;
+ Mon, 17 Jun 2019 02:15:12 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190614083404.20514-1-ard.biesheuvel@linaro.org> <20190616204419.GE923@sol.localdomain>
-In-Reply-To: <20190616204419.GE923@sol.localdomain>
-From:   Gilad Ben-Yossef <gilad@benyossef.com>
-Date:   Mon, 17 Jun 2019 11:51:52 +0300
-Message-ID: <CAOtvUMf86_TGYLoAHWuRW0Jz2=cXbHHJnAsZhEvy6SpSp_xgOQ@mail.gmail.com>
+References: <20190614083404.20514-1-ard.biesheuvel@linaro.org>
+ <20190616204419.GE923@sol.localdomain> <CAOtvUMf86_TGYLoAHWuRW0Jz2=cXbHHJnAsZhEvy6SpSp_xgOQ@mail.gmail.com>
+In-Reply-To: <CAOtvUMf86_TGYLoAHWuRW0Jz2=cXbHHJnAsZhEvy6SpSp_xgOQ@mail.gmail.com>
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date:   Mon, 17 Jun 2019 11:15:01 +0200
+Message-ID: <CAKv+Gu_r_WXf2y=FVYHL-T8gFSV6e4TmGkLNJ-cw6UjK_s=A=g@mail.gmail.com>
 Subject: Re: [RFC PATCH 0/3] crypto: switch to shash for ESSIV generation
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+To:     Gilad Ben-Yossef <gilad@benyossef.com>
+Cc:     Eric Biggers <ebiggers@kernel.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         device-mapper development <dm-devel@redhat.com>,
         linux-fscrypt@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Jun 16, 2019 at 11:44 PM Eric Biggers <ebiggers@kernel.org> wrote:
+On Mon, 17 Jun 2019 at 10:52, Gilad Ben-Yossef <gilad@benyossef.com> wrote:
 >
-> [+Cc dm-devel and linux-fscrypt]
->
-> On Fri, Jun 14, 2019 at 10:34:01AM +0200, Ard Biesheuvel wrote:
-> > This series is presented as an RFC for a couple of reasons:
-> > - it is only build tested
-> > - it is unclear whether this is the right way to move away from the use=
- of
-> >   bare ciphers in non-crypto code
-> > - we haven't really discussed whether moving away from the use of bare =
-ciphers
-> >   in non-crypto code is a goal we agree on
+> On Sun, Jun 16, 2019 at 11:44 PM Eric Biggers <ebiggers@kernel.org> wrote:
 > >
-> > This series creates an ESSIV shash template that takes a (cipher,hash) =
-tuple,
-> > where the digest size of the hash must be a valid key length for the ci=
-pher.
-> > The setkey() operation takes the hash of the input key, and sets into t=
-he
-> > cipher as the encryption key. Digest operations accept input up to the
-> > block size of the cipher, and perform a single block encryption operati=
-on to
-> > produce the ESSIV output.
-...
-> I agree that moving away from bare block ciphers is generally a good idea=
-.  For
-> fscrypt I'm fine with moving ESSIV into the crypto API, though I'm not su=
-re a
-> shash template is the best approach.  Did you also consider making it a s=
-kcipher
-> template so that users can do e.g. "essiv(cbc(aes),sha256,aes)"?  That wo=
-uld
-> simplify things much more on the fscrypt side, since then all the ESSIV-r=
-elated
-> code would go away entirely except for changing the string "cbc(aes)" to
-> "essiv(cbc(aes),sha256,aes)".
+> > [+Cc dm-devel and linux-fscrypt]
+> >
+> > On Fri, Jun 14, 2019 at 10:34:01AM +0200, Ard Biesheuvel wrote:
+> > > This series is presented as an RFC for a couple of reasons:
+> > > - it is only build tested
+> > > - it is unclear whether this is the right way to move away from the use of
+> > >   bare ciphers in non-crypto code
+> > > - we haven't really discussed whether moving away from the use of bare ciphers
+> > >   in non-crypto code is a goal we agree on
+> > >
+> > > This series creates an ESSIV shash template that takes a (cipher,hash) tuple,
+> > > where the digest size of the hash must be a valid key length for the cipher.
+> > > The setkey() operation takes the hash of the input key, and sets into the
+> > > cipher as the encryption key. Digest operations accept input up to the
+> > > block size of the cipher, and perform a single block encryption operation to
+> > > produce the ESSIV output.
+> ...
+> > I agree that moving away from bare block ciphers is generally a good idea.  For
+> > fscrypt I'm fine with moving ESSIV into the crypto API, though I'm not sure a
+> > shash template is the best approach.  Did you also consider making it a skcipher
+> > template so that users can do e.g. "essiv(cbc(aes),sha256,aes)"?  That would
+> > simplify things much more on the fscrypt side, since then all the ESSIV-related
+> > code would go away entirely except for changing the string "cbc(aes)" to
+> > "essiv(cbc(aes),sha256,aes)".
+>
+> I will also add that going the skcipher route rather than shash will
+> allow hardware tfm providers like CryptoCell that can do the ESSIV
+> part in hardware implement that as a single API call and/or hardware
+> invocation flow.
+> For those system that benefit from hardware providers this can be beneficial.
+>
 
-I will also add that going the skcipher route rather than shash will
-allow hardware tfm providers like CryptoCell that can do the ESSIV
-part in hardware implement that as a single API call and/or hardware
-invocation flow.
-For those system that benefit from hardware providers this can be beneficia=
-l.
+Ah yes, thanks for reminding me. There was some debate in the past
+about this, but I don't remember the details.
 
-Thanks,
-Gilad
-
---=20
-Gilad Ben-Yossef
-Chief Coffee Drinker
-
-values of =CE=B2 will give rise to dom!
+I think implementing essiv() as a skcipher template is indeed going to
+be the best approach, I will look into that.
