@@ -2,76 +2,87 @@ Return-Path: <SRS0=Ym9l=UQ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C50DEC31E5B
-	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 17:00:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A688AC31E5B
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 17:05:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9153920652
-	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 17:00:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 792DA20652
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 17:05:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="upDVNYel"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TxjoaKSD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726091AbfFQRAb (ORCPT
+        id S1726248AbfFQRF4 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 17 Jun 2019 13:00:31 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:40887 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725863AbfFQRAb (ORCPT
+        Mon, 17 Jun 2019 13:05:56 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:43639 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726005AbfFQRFz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 17 Jun 2019 13:00:31 -0400
-Received: by mail-pf1-f193.google.com with SMTP id p184so6008709pfp.7;
-        Mon, 17 Jun 2019 10:00:31 -0700 (PDT)
+        Mon, 17 Jun 2019 13:05:55 -0400
+Received: by mail-wr1-f66.google.com with SMTP id p13so10767758wru.10;
+        Mon, 17 Jun 2019 10:05:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
+        h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=PWC+RbxtlMDHshNLSaHRZ424esMvY5x7T2f733VpE/M=;
-        b=upDVNYelb9DUB/83bN9uWmEr9jt871fNfLI5T0ZdvUdJ8DAnQ0qnF7Ja6X7Wn2suj9
-         4hdqCuD943g4PL1FC6ClHYljI0bF8vlkLKWNDxSKBL+Gc9pvvmxf4pd1E5Q5IeqsqbVg
-         nnSivwFlG5JzpTJg1nbsQhx5LBL3ISkYVSW/p6HkRyj5KwP77B8k9CFtBJcucttxH8eb
-         dNU1nSookMwuKeNmC5kjQiB/bMx+1u1YKbphgCOXU8qlfwDzLxZpsoOWmv/gMecdMHa9
-         yC+MJyyxc6R/+OT5Rj1m+svVQ4vaJuM/9ZtwZSlCw32+gEpBya/yIcDoD1xM910hiYcn
-         pLjg==
+        bh=lvgi3+MQpM39FRojWazLhVvXezLQFMNFRlMRkueq/IA=;
+        b=TxjoaKSD5m7bbK0Ih6BMmri+IaS5q+Ny+TFg8Gks5rIBqgGe2z3kV9mvy0d6exbcNP
+         aJT2NQySaV8BAnqHAuXv4h4Nqx1H7TxFvtMqRNtOjc2RNZWInHZgqxvGjiKYOAhOvI6j
+         Gv9uDdha/tJomPbIALK6ispRrcheUinwcrpynnjDxnFTZudsffVMK4n5pCPOXGK1adtu
+         JDB3c29gfzY6S1K7hOj9ROoPwMTAaRKPer6hNujCe7jMnQHAPC4Vews0ca4/Plb396Iw
+         QvkSBGqPnvQ/47zRhczZlPValAMW7y73+iZDdWivWjSSyLm+8G9pWyjU7GFfc1fSMXE8
+         7wTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=PWC+RbxtlMDHshNLSaHRZ424esMvY5x7T2f733VpE/M=;
-        b=jfSMMeJdq4fPeEpme1ayyv7JlVvFrmyPt25lZexAN0+D5zrrqz93MkOARbI3zT2y44
-         fxoTeeH7AjzzdVf0aHJI3iUig4i/QLDPzG2F4YhRLCGsjOHreA80BdJ/YvlQ+G/DKDMY
-         agECWO8wUgXGrY9u5Ubh8P4B1sH7jAB7ut9xOFLr7BLHfClvQN5GZOsHcVQapi1QrgtM
-         iu5tpYt9N6LdS2AwTFzOgX7BbCO9Ed8UhUv9kpdjlzru0j3FVlzHoSNPNhXo8MCkuUbq
-         /CXY6g5WqrDBXbcgzZvYWowlUS4rcJtDCWMR3UBeblJkeL0iobsQZnuvKaY3NrvJjZFb
-         hLwA==
-X-Gm-Message-State: APjAAAUgSertC24rigTu/NlCvUKqW+KG59PdJfAx2j2bzgAGCKihEuiA
-        ZrsLTwA+nqo25oxJSuganXU=
-X-Google-Smtp-Source: APXvYqw6wt+Opahah8Vn7nUIT5LdVOYWnQNKWZfnggSuwHfRwOO3nFjPPvZvbDGLoocfMFVJhjaLFg==
-X-Received: by 2002:a17:90a:cb97:: with SMTP id a23mr26512512pju.67.1560790830866;
-        Mon, 17 Jun 2019 10:00:30 -0700 (PDT)
-Received: from ?IPv6:2620:15c:2c1:200:55c7:81e6:c7d8:94b? ([2620:15c:2c1:200:55c7:81e6:c7d8:94b])
-        by smtp.gmail.com with ESMTPSA id d123sm15587217pfc.144.2019.06.17.10.00.29
+        bh=lvgi3+MQpM39FRojWazLhVvXezLQFMNFRlMRkueq/IA=;
+        b=jdNUIW/qr02QSYVgIfm4X0/rlCwAWg1fJEAFpo8f3xnm+dAiQOG1ZFGLAkWYejcN1v
+         Xarj+5MmQvcikM8ttagsMNKtsVQpqlapVSHdt76Kma6lNHv9LJC7FyRzX/edGNc23q7r
+         2qJ1wrWDYWaFpLi/6+ThKxr1bFPeWwONVgNwsahCdtLxqfuP9zx1QAKwnbjZJQCJbL6W
+         sSvKbDSaxiUQYFB7DdQbLoDzZA5cG0ShxGFaGTL8RX6diJ8QkmLAAga44xcjSna/uUyU
+         LfDiMf/Aj2xBCaKTIJhKh/ZJMgYjq3drpehCctFUWBYdVwiph4QwhKgFSYSmZg1HDO1W
+         APOQ==
+X-Gm-Message-State: APjAAAXEqstzq4rcOHLylC8P06vqC5hBo59D74obSRtTgqbg0eiPS+k4
+        7E/zQv9H91d555Ft+4NXKYfPr7HG6Y9wRA==
+X-Google-Smtp-Source: APXvYqzi0lLsm2064v1e5vDyLtdJ8bwCyUjazq2dKJytAV5jDeZySSDFNCf3pFZETLZqzrpwnpLjsw==
+X-Received: by 2002:adf:f946:: with SMTP id q6mr25621385wrr.109.1560791153693;
+        Mon, 17 Jun 2019 10:05:53 -0700 (PDT)
+Received: from [192.168.2.28] (39.35.broadband4.iol.cz. [85.71.35.39])
+        by smtp.gmail.com with ESMTPSA id o14sm10435129wrp.77.2019.06.17.10.05.51
         (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Mon, 17 Jun 2019 10:00:29 -0700 (PDT)
-Subject: Re: [PATCH v3] net: ipv4: move tcp_fastopen server side code to
- SipHash library
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>, netdev@vger.kernel.org
-Cc:     linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-        ebiggers@kernel.org, edumazet@google.com, davem@davemloft.net,
-        kuznet@ms2.inr.ac.ru, yoshfuji@linux-ipv6.org, jbaron@akamai.com,
-        cpaasch@apple.com, David.Laight@aculab.com, ycheng@google.com
-References: <20190617080933.32152-1-ard.biesheuvel@linaro.org>
-From:   Eric Dumazet <eric.dumazet@gmail.com>
-Message-ID: <e1c4c9b6-3668-106a-69ef-7ef6c016a5f6@gmail.com>
-Date:   Mon, 17 Jun 2019 10:00:28 -0700
+        Mon, 17 Jun 2019 10:05:52 -0700 (PDT)
+Subject: Re: [RFC PATCH 0/3] crypto: switch to shash for ESSIV generation
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Milan Broz <gmazyland@gmail.com>
+Cc:     Gilad Ben-Yossef <gilad@benyossef.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        device-mapper development <dm-devel@redhat.com>,
+        linux-fscrypt@vger.kernel.org,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+References: <20190614083404.20514-1-ard.biesheuvel@linaro.org>
+ <20190616204419.GE923@sol.localdomain>
+ <CAOtvUMf86_TGYLoAHWuRW0Jz2=cXbHHJnAsZhEvy6SpSp_xgOQ@mail.gmail.com>
+ <CAKv+Gu_r_WXf2y=FVYHL-T8gFSV6e4TmGkLNJ-cw6UjK_s=A=g@mail.gmail.com>
+ <8e58230a-cf0e-5a81-886b-6aa72a8e5265@gmail.com>
+ <CAKv+Gu9sb0t6EC=MwVfqTw5TKtatK-c8k3ryNUhV8O0876NV7g@mail.gmail.com>
+ <CAKv+Gu-LFShLW-Tt7hwBpni1vQRvv7k+L_bpP-wU86x88v+eRg@mail.gmail.com>
+ <90214c3d-55ef-cc3a-3a04-f200d6f96cfd@gmail.com>
+ <CAKv+Gu82BLPWrX1UzUBLf7UB+qJT6ZPtkvJ2Sa9t28OpXArhnw@mail.gmail.com>
+From:   Milan Broz <gmazyland@gmail.com>
+Openpgp: preference=signencrypt
+Message-ID: <af1b7ea1-bc98-06ff-e46c-945e6bae20d8@gmail.com>
+Date:   Mon, 17 Jun 2019 19:05:51 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.0
+ Thunderbird/60.7.1
 MIME-Version: 1.0
-In-Reply-To: <20190617080933.32152-1-ard.biesheuvel@linaro.org>
+In-Reply-To: <CAKv+Gu82BLPWrX1UzUBLf7UB+qJT6ZPtkvJ2Sa9t28OpXArhnw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -80,51 +91,32 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On 17/06/2019 16:39, Ard Biesheuvel wrote:
+>>
+>> In other words, if you add some additional limit, we are breaking backward compatibility.
+>> (Despite the configuration is "wrong" from the security point of view.)
+>>
+> 
+> Yes, but breaking backward compatibility only happens if you break
+> something that is actually being *used*. So sure,
+> xts(aes)-essiv:sha256 makes no sense but people use it anyway. But is
+> that also true for, say, gcm(aes)-essiv:sha256 ?
 
+These should not be used.  The only way when ESSIV can combine with AEAD mode
+is when you combine length-preserving mode with additional integrity tag, for example
 
-On 6/17/19 1:09 AM, Ard Biesheuvel wrote:
-> Using a bare block cipher in non-crypto code is almost always a bad idea,
-> not only for security reasons (and we've seen some examples of this in
-> the kernel in the past), but also for performance reasons.
-> 
-> In the TCP fastopen case, we call into the bare AES block cipher one or
-> two times (depending on whether the connection is IPv4 or IPv6). On most
-> systems, this results in a call chain such as
-> 
->   crypto_cipher_encrypt_one(ctx, dst, src)
->     crypto_cipher_crt(tfm)->cit_encrypt_one(crypto_cipher_tfm(tfm), ...);
->       aesni_encrypt
->         kernel_fpu_begin();
->         aesni_enc(ctx, dst, src); // asm routine
->         kernel_fpu_end();
-> 
-> It is highly unlikely that the use of special AES instructions has a
-> benefit in this case, especially since we are doing the above twice
-> for IPv6 connections, instead of using a transform which can process
-> the entire input in one go.
-> 
-> We could switch to the cbcmac(aes) shash, which would at least get
-> rid of the duplicated overhead in *some* cases (i.e., today, only
-> arm64 has an accelerated implementation of cbcmac(aes), while x86 will
-> end up using the generic cbcmac template wrapping the AES-NI cipher,
-> which basically ends up doing exactly the above). However, in the given
-> context, it makes more sense to use a light-weight MAC algorithm that
-> is more suitable for the purpose at hand, such as SipHash.
-> 
-> Since the output size of SipHash already matches our chosen value for
-> TCP_FASTOPEN_COOKIE_SIZE, and given that it accepts arbitrary input
-> sizes, this greatly simplifies the code as well.
-> 
-> NOTE: Server farms backing a single server IP for load balancing purposes
->       and sharing a single fastopen key will be adversely affected by
->       this change unless all systems in the pool receive their kernel
->       upgrades at the same time.
-> 
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> ---
+  # cryptsetup luksFormat -c aes-cbc-essiv:sha256 --integrity hmac-sha256 /dev/sdb
 
-All our fastopen packetdrill tests pass (after I changed all the cookie values in them)
+it will produce this dm-crypt cipher spec:
+  capi:authenc(hmac(sha256),cbc(aes))-essiv:sha256
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
+the authenc(hmac(sha256),cbc(aes)) is direct crypto API cipher composition, the essiv:sha256
+IV is processed inside dm-crypt as IV.
 
+So if authenc() composition is problem, then yes, I am afraid these can be used in reality.
 
+But for things like gcm(aes)-essiv:sha256 (IOW real AEAD mode with ESSIV) - these are
+not supported by cryptsetup (we support only random IV in this case), so these should
+not be used anywhere.
+
+Milan
