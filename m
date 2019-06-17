@@ -2,127 +2,125 @@ Return-Path: <SRS0=Ym9l=UQ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15649C31E53
-	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 08:46:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C997C31E44
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 08:52:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EC4402080A
-	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 08:46:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EC9DC2080A
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 08:52:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=benyossef-com.20150623.gappssmtp.com header.i=@benyossef-com.20150623.gappssmtp.com header.b="XtlskwgA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727892AbfFQIqr (ORCPT
+        id S1727469AbfFQIwE (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 17 Jun 2019 04:46:47 -0400
-Received: from foss.arm.com ([217.140.110.172]:41836 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727873AbfFQIqq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 17 Jun 2019 04:46:46 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4FA8E28;
-        Mon, 17 Jun 2019 01:46:46 -0700 (PDT)
-Received: from e110176-lin.kfn.arm.com (unknown [10.50.4.178])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 41CC63F246;
-        Mon, 17 Jun 2019 01:46:45 -0700 (PDT)
-From:   Gilad Ben-Yossef <gilad@benyossef.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 4/4] crypto: ccree: add HW engine config check
-Date:   Mon, 17 Jun 2019 11:46:30 +0300
-Message-Id: <20190617084631.23551-5-gilad@benyossef.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190617084631.23551-1-gilad@benyossef.com>
-References: <20190617084631.23551-1-gilad@benyossef.com>
+        Mon, 17 Jun 2019 04:52:04 -0400
+Received: from mail-ua1-f66.google.com ([209.85.222.66]:38611 "EHLO
+        mail-ua1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726631AbfFQIwE (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 17 Jun 2019 04:52:04 -0400
+Received: by mail-ua1-f66.google.com with SMTP id j2so3199767uaq.5
+        for <linux-crypto@vger.kernel.org>; Mon, 17 Jun 2019 01:52:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=benyossef-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=JUqP3OKeD9bPLmSeCNOPOKYOA3EuQZNFNBZVHYzC5g4=;
+        b=XtlskwgAxUNAXyFcXU16C6KAhEpQNCyyXjj/AqlIJZIPfIDfe9DP0YJEN8hUAybdZS
+         GeF4UKONeKyJ16gBgPsvAi2PpvkgnDWRV530xC5Fhd1QqHmm2yPAXv+70RA+rKE5rEBj
+         9OvPRoBYneEwIjZyfG6ds0OZ8k7zGP7BsfwJJ3yCeYjfJPQC1a+hovGdIfMsNX8aeChl
+         2EoDLFZy79Y8Ra7HxUSdwkf/HAQt3tsb9ll/BlDyQe1ajUGFXwuqRHfAyqy5PzculMNI
+         BR8xoqtihnK7YQd9hRUtQuxdNnjLEKq5dBY7QGM/mt/Ss2hnCRiW8IALIkwW2pQDXOKr
+         I9pQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=JUqP3OKeD9bPLmSeCNOPOKYOA3EuQZNFNBZVHYzC5g4=;
+        b=j25fYyMrTO7olza5PS4biWW8IiTZBhyEGZn4MsNsLws3Z8W7xPtIJksl5/lMIPrnAI
+         zvQFFQi5qVk73soF866pLa9iY1SzcM5Zct8CMWChp6pdx5BSQs4f+T8ng2KoQxwa/w2K
+         5x04W104216NcZDzvFqWiHzugteKhtci6U3Sn3+eC/6nA7edcNiK1ldXX6Lxm/DHdPvu
+         Wyp4F5thVXQptQTn+YsMm/U77OURs4mRZdRtzRsZmQUREhU5JRdsKRBjXDXbYc4WqAUT
+         ix20eYwpB5KO+45r8lO19Yo7TcR/gSeCeWNoY4etvz1u0AtU6cUYX5hq+0v8uSTv18UT
+         THoA==
+X-Gm-Message-State: APjAAAV3xdb7jqwwAEgSvnPU4Ig/1YJ2UPaOS2aZGkclv6TKkxVuBHGy
+        pidieODjZFtA3EwPKNl6XWWhNOeqisz9TnFnp03e0sou
+X-Google-Smtp-Source: APXvYqxUsRrEeCO+S9+Ink2+fjaOAiIAOcXiVQUU81FYi7df7idYsDJ/kS+jTivSSuU+OpV27+CqsbxLSOqSeurMJ9U=
+X-Received: by 2002:ab0:208c:: with SMTP id r12mr41428470uak.27.1560761523133;
+ Mon, 17 Jun 2019 01:52:03 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20190614083404.20514-1-ard.biesheuvel@linaro.org> <20190616204419.GE923@sol.localdomain>
+In-Reply-To: <20190616204419.GE923@sol.localdomain>
+From:   Gilad Ben-Yossef <gilad@benyossef.com>
+Date:   Mon, 17 Jun 2019 11:51:52 +0300
+Message-ID: <CAOtvUMf86_TGYLoAHWuRW0Jz2=cXbHHJnAsZhEvy6SpSp_xgOQ@mail.gmail.com>
+Subject: Re: [RFC PATCH 0/3] crypto: switch to shash for ESSIV generation
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        device-mapper development <dm-devel@redhat.com>,
+        linux-fscrypt@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add check to verify the stated device tree HW configuration
-matches the HW.
+On Sun, Jun 16, 2019 at 11:44 PM Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> [+Cc dm-devel and linux-fscrypt]
+>
+> On Fri, Jun 14, 2019 at 10:34:01AM +0200, Ard Biesheuvel wrote:
+> > This series is presented as an RFC for a couple of reasons:
+> > - it is only build tested
+> > - it is unclear whether this is the right way to move away from the use=
+ of
+> >   bare ciphers in non-crypto code
+> > - we haven't really discussed whether moving away from the use of bare =
+ciphers
+> >   in non-crypto code is a goal we agree on
+> >
+> > This series creates an ESSIV shash template that takes a (cipher,hash) =
+tuple,
+> > where the digest size of the hash must be a valid key length for the ci=
+pher.
+> > The setkey() operation takes the hash of the input key, and sets into t=
+he
+> > cipher as the encryption key. Digest operations accept input up to the
+> > block size of the cipher, and perform a single block encryption operati=
+on to
+> > produce the ESSIV output.
+...
+> I agree that moving away from bare block ciphers is generally a good idea=
+.  For
+> fscrypt I'm fine with moving ESSIV into the crypto API, though I'm not su=
+re a
+> shash template is the best approach.  Did you also consider making it a s=
+kcipher
+> template so that users can do e.g. "essiv(cbc(aes),sha256,aes)"?  That wo=
+uld
+> simplify things much more on the fscrypt side, since then all the ESSIV-r=
+elated
+> code would go away entirely except for changing the string "cbc(aes)" to
+> "essiv(cbc(aes),sha256,aes)".
 
-Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
----
- drivers/crypto/ccree/cc_driver.c    | 18 ++++++++++++++++++
- drivers/crypto/ccree/cc_driver.h    |  3 +++
- drivers/crypto/ccree/cc_host_regs.h | 17 +++++++++++++++++
- 3 files changed, 38 insertions(+)
+I will also add that going the skcipher route rather than shash will
+allow hardware tfm providers like CryptoCell that can do the ESSIV
+part in hardware implement that as a single API call and/or hardware
+invocation flow.
+For those system that benefit from hardware providers this can be beneficia=
+l.
 
-diff --git a/drivers/crypto/ccree/cc_driver.c b/drivers/crypto/ccree/cc_driver.c
-index 667bc73d7a00..980aa04b655b 100644
---- a/drivers/crypto/ccree/cc_driver.c
-+++ b/drivers/crypto/ccree/cc_driver.c
-@@ -408,6 +408,24 @@ static int init_cc_resources(struct platform_device *plat_dev)
- 		}
- 		sig_cidr = val;
- 
-+		/* Check HW engine configuration */
-+		val = cc_ioread(new_drvdata, CC_REG(HOST_REMOVE_INPUT_PINS));
-+		switch (val) {
-+		case CC_PINS_FULL:
-+			/* This is fine */
-+			break;
-+		case CC_PINS_SLIM:
-+			if (new_drvdata->std_bodies & CC_STD_NIST) {
-+				dev_warn(dev, "703 mode forced due to HW configuration.\n");
-+				new_drvdata->std_bodies = CC_STD_OSCCA;
-+			}
-+			break;
-+		default:
-+			dev_err(dev, "Unsupported engines configration.\n");
-+			rc = -EINVAL;
-+			goto post_clk_err;
-+		}
-+
- 		/* Check security disable state */
- 		val = cc_ioread(new_drvdata, CC_REG(SECURITY_DISABLED));
- 		val &= CC_SECURITY_DISABLED_MASK;
-diff --git a/drivers/crypto/ccree/cc_driver.h b/drivers/crypto/ccree/cc_driver.h
-index 556b3322667e..6448b2b9794b 100644
---- a/drivers/crypto/ccree/cc_driver.h
-+++ b/drivers/crypto/ccree/cc_driver.h
-@@ -58,6 +58,9 @@ enum cc_std_body {
- 
- #define CC_COHERENT_CACHE_PARAMS 0xEEE
- 
-+#define CC_PINS_FULL	0x0
-+#define CC_PINS_SLIM	0x9F
-+
- /* Maximum DMA mask supported by IP */
- #define DMA_BIT_MASK_LEN 48
- 
-diff --git a/drivers/crypto/ccree/cc_host_regs.h b/drivers/crypto/ccree/cc_host_regs.h
-index ad1acb105f2d..efe3e1d8b87b 100644
---- a/drivers/crypto/ccree/cc_host_regs.h
-+++ b/drivers/crypto/ccree/cc_host_regs.h
-@@ -206,6 +206,23 @@
- #define CC_HOST_POWER_DOWN_EN_REG_OFFSET	0xA78UL
- #define CC_HOST_POWER_DOWN_EN_VALUE_BIT_SHIFT	0x0UL
- #define CC_HOST_POWER_DOWN_EN_VALUE_BIT_SIZE	0x1UL
-+#define CC_HOST_REMOVE_INPUT_PINS_REG_OFFSET	0x0A7CUL
-+#define CC_HOST_REMOVE_INPUT_PINS_REMOVE_AES_ENGINE_BIT_SHIFT	0x0UL
-+#define CC_HOST_REMOVE_INPUT_PINS_REMOVE_AES_ENGINE_BIT_SIZE	0x1UL
-+#define CC_HOST_REMOVE_INPUT_PINS_REMOVE_AES_MAC_ENGINE_BIT_SHIFT	0x1UL
-+#define CC_HOST_REMOVE_INPUT_PINS_REMOVE_AES_MAC_ENGINE_BIT_SIZE	0x1UL
-+#define CC_HOST_REMOVE_INPUT_PINS_REMOVE_GHASH_ENGINE_BIT_SHIFT	0x2UL
-+#define CC_HOST_REMOVE_INPUT_PINS_REMOVE_GHASH_ENGINE_BIT_SIZE	0x1UL
-+#define CC_HOST_REMOVE_INPUT_PINS_REMOVE_DES_ENGINE_BIT_SHIFT	0x3UL
-+#define CC_HOST_REMOVE_INPUT_PINS_REMOVE_DES_ENGINE_BIT_SIZE	0x1UL
-+#define CC_HOST_REMOVE_INPUT_PINS_REMOVE_HASH_ENGINE_BIT_SHIFT	0x4UL
-+#define CC_HOST_REMOVE_INPUT_PINS_REMOVE_HASH_ENGINE_BIT_SIZE	0x1UL
-+#define CC_HOST_REMOVE_INPUT_PINS_REMOVE_SM3_ENGINE_BIT_SHIFT	0x5UL
-+#define CC_HOST_REMOVE_INPUT_PINS_REMOVE_SM3_ENGINE_BIT_SIZE	0x1UL
-+#define CC_HOST_REMOVE_INPUT_PINS_REMOVE_SM4_ENGINE_BIT_SHIFT	0x6UL
-+#define CC_HOST_REMOVE_INPUT_PINS_REMOVE_SM4_ENGINE_BIT_SIZE	0x1UL
-+#define CC_HOST_REMOVE_INPUT_PINS_OTP_DISCONNECTED_BIT_SHIFT	0x7UL
-+#define CC_HOST_REMOVE_INPUT_PINS_OTP_DISCONNECTED_BIT_SIZE	0x1UL
- // --------------------------------------
- // BLOCK: ID_REGISTERS
- // --------------------------------------
--- 
-2.21.0
+Thanks,
+Gilad
 
+--=20
+Gilad Ben-Yossef
+Chief Coffee Drinker
+
+values of =CE=B2 will give rise to dom!
