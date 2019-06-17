@@ -2,117 +2,87 @@ Return-Path: <SRS0=Ym9l=UQ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CA9AC31E57
-	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 10:58:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00F2BC31E57
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 11:59:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0DFB320861
-	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 10:58:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JyHeUQCg"
+	by mail.kernel.org (Postfix) with ESMTP id C988A208E4
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 11:59:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726960AbfFQK6x (ORCPT
+        id S1725763AbfFQL7s (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 17 Jun 2019 06:58:53 -0400
-Received: from mail-io1-f65.google.com ([209.85.166.65]:36495 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726922AbfFQK6w (ORCPT
+        Mon, 17 Jun 2019 07:59:48 -0400
+Received: from mout.kundenserver.de ([212.227.126.131]:53163 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725681AbfFQL7s (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 17 Jun 2019 06:58:52 -0400
-Received: by mail-io1-f65.google.com with SMTP id h6so20211936ioh.3
-        for <linux-crypto@vger.kernel.org>; Mon, 17 Jun 2019 03:58:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=3uIDgkFwtV6fC3eHfwnFIXovpwkgGVEyNZtxQ+vCmvg=;
-        b=JyHeUQCgQDBcUhjSLdwEL8Non5+SLMigJ0PDAlIIuhknO4X5oUbxBkiZYVpmXLa4gA
-         Buz67cfsk+9bw8Vv1Pm5nOcAqCW6SZaPP5nCPy86Dz+AbXsP/11/qja9qmhFADgnCGZ9
-         5KaURNH578Xhj8iACk3jVQaeW4BK2PHzfCUtJExY0Y5n24EtmG3tBFbzu13xsGAHwniZ
-         34caVsTHGlNRMRDUIq27W+Y+yUnVRrWQlsvBWRJ+FtYZBLk0iBCKjaeLuIYpghgVUfT8
-         dg4GNkfLH1Q/FEc6yQl0wmx0RNymYEhvTvDwRY1GcQjoivZHwwJwS9OcGD1b23nGF8f6
-         ge+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=3uIDgkFwtV6fC3eHfwnFIXovpwkgGVEyNZtxQ+vCmvg=;
-        b=GJZieC7gwKfBZF6j2+HolPyX9WIC3WoQYsurkoIYIYXGR/pusxs6GjFjwuZfaqYi3J
-         y/Ajn/N+r6GouNpDG+dFOSGbh4nHWQfHiDlEwDH7KQMri2UEgXzmqPaYzCjmV3skXuzs
-         Z6eP6dGw8BwhH5GiSTYmIHKa+ubazZapWNl3l2G38GxtiZpYQ7B6Kg5OFnQCBP2W1rWx
-         6kt8yVhSL3jNMrmVl8NZ9SahYvzagjVJ/6jXitYOH5Lo2S3lo+A/UhzkO7U9voxFxDld
-         lP7w6iMJEv7GB3oVAOgkokAuQi95Dra1a2rTesnWQ70vNSfSmJrNBMGJ1VEFD/aLb5Ff
-         KgPg==
-X-Gm-Message-State: APjAAAXNI03OQz6H91rKSYKgW74IGjwF0HgWL+w/willm3uuBHEd2/Sj
-        p9efiTRmvHVU6rysI7UkbFnMHhKiIPoqeg6nT6TBYbsw9Yc=
-X-Google-Smtp-Source: APXvYqyxdE7l3lJcOdchpE8rrs9ZQMQ4kYYp6o01m0KkPFK5LIm/xPhYSHQJwPgx1cUDNx+W0ofU7Kz/el3U4ETPYto=
-X-Received: by 2002:a02:c90d:: with SMTP id t13mr61091069jao.62.1560769131916;
- Mon, 17 Jun 2019 03:58:51 -0700 (PDT)
+        Mon, 17 Jun 2019 07:59:48 -0400
+Received: from threadripper.lan ([149.172.19.189]) by mrelayeu.kundenserver.de
+ (mreue009 [212.227.15.129]) with ESMTPA (Nemesis) id
+ 1Mq2vS-1iObZe1orS-00n8eA; Mon, 17 Jun 2019 13:59:32 +0200
+From:   Arnd Bergmann <arnd@arndb.de>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Cc:     Arnd Bergmann <arnd@arndb.de>, Eric Biggers <ebiggers@google.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: serpent - mark __serpent_setkey_sbox noinline
+Date:   Mon, 17 Jun 2019 13:59:08 +0200
+Message-Id: <20190617115927.3813471-1-arnd@arndb.de>
+X-Mailer: git-send-email 2.20.0
 MIME-Version: 1.0
-References: <20190614083404.20514-1-ard.biesheuvel@linaro.org>
- <20190616204419.GE923@sol.localdomain> <CAOtvUMf86_TGYLoAHWuRW0Jz2=cXbHHJnAsZhEvy6SpSp_xgOQ@mail.gmail.com>
- <CAKv+Gu_r_WXf2y=FVYHL-T8gFSV6e4TmGkLNJ-cw6UjK_s=A=g@mail.gmail.com> <8e58230a-cf0e-5a81-886b-6aa72a8e5265@gmail.com>
-In-Reply-To: <8e58230a-cf0e-5a81-886b-6aa72a8e5265@gmail.com>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Mon, 17 Jun 2019 12:58:40 +0200
-Message-ID: <CAKv+Gu9sb0t6EC=MwVfqTw5TKtatK-c8k3ryNUhV8O0876NV7g@mail.gmail.com>
-Subject: Re: [RFC PATCH 0/3] crypto: switch to shash for ESSIV generation
-To:     Milan Broz <gmazyland@gmail.com>
-Cc:     Gilad Ben-Yossef <gilad@benyossef.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        device-mapper development <dm-devel@redhat.com>,
-        linux-fscrypt@vger.kernel.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:nlRKSlHgvz2m3fKSfZ7wC9E0KZXX9jzM/z2eRxUPOPM/3xpzPV+
+ Zw3rBSyaQGObcrKRgaRZBxPqG/R0UConl0Iztg7s7WYIyKPn7P3/rl6YDLBpg4Wze3oViSl
+ AbUC34gVy0QvoEIx7GO+gSyXbln6QnK7KQ1WhH6FQ5BIPcxQOnQdQojUzLZutskEY55LrCR
+ uGptJwdiqTHn0XAHHUjdg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:3c/M2mR4H6w=:n/NbLMsUQ62zu8ZHsbJLcH
+ zV+JBLdWrhAArxRLcX3E2VpK0xEiURubZba5QlXHF3JvBl0Q0Kp8G7vdEoJmSs5j0GwmkyL3o
+ 5dRwdGPNWcrmWt11IU0WAvt8cK4T2ak8c3fwmzzQwEigCekU/h55VKvNYT24rgTm4iHX7PSk/
+ aWtRQjtrOOhUlt1PRfrRsf8trlX05V5N5kmsnRGRG/nOXy7B+I5bL4tmN6dx146S+mR96kxEu
+ xAHrCf6ShdehcK/uXN/FgrCjlGEt6oYFupHkmfBS79w+oqq/BWGEh6lW0AjnGu4SJS+P58H0g
+ gYXJ2pl4sxktGQQzhBzPDv3N++NFzsGTz5P63s+/rgx6SQhJkPw4OUajRd4KLKf/59sSnYglV
+ m9CWbNbxZGmXdxhRujDksY/XLnnNGC8FTR+nZGq3n6MK83hCquDeGg1pj3CQ+lkxhalKbmI35
+ itORR+B7VGRpqd7WeQaLv1GvSO7GAubUgryDiq9WP3lPFnEas7Uw8CNpRgXQYBvE8BVRCrdOC
+ x98PvOuwhSELH2Zlhjqc8rs14vUpvH/dyjLsvnyVYz6BCjc7EM4sGz8F/c7Y8T8T7iOIMoIC5
+ bAG/PXQL20Y4xzcr9qXgV1CZad8HrupmPF5v57TptwICd6UBUtRICj9RInHHNmwFWgYEEClmZ
+ Tqgf8ubm98ekNFiEPD4hfSkBikODvaS9UB8yIeGwTFW00XXNkunUsTEXnhcTXbmXD3EQTDcgh
+ 1rZ2etgkbKeTh0RQivoyC6fiipKJ3pYp9eygbQ==
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 17 Jun 2019 at 12:39, Milan Broz <gmazyland@gmail.com> wrote:
->
-> On 17/06/2019 11:15, Ard Biesheuvel wrote:
-> >> I will also add that going the skcipher route rather than shash will
-> >> allow hardware tfm providers like CryptoCell that can do the ESSIV
-> >> part in hardware implement that as a single API call and/or hardware
-> >> invocation flow.
-> >> For those system that benefit from hardware providers this can be beneficial.
-> >>
-> >
-> > Ah yes, thanks for reminding me. There was some debate in the past
-> > about this, but I don't remember the details.
-> >
-> > I think implementing essiv() as a skcipher template is indeed going to
-> > be the best approach, I will look into that.
->
-> For ESSIV (that is de-facto standard now), I think there is no problem
-> to move it to crypto API.
->
-> The problem is with some other IV generators in dm-crypt.
->
-> Some do a lot of more work than just IV (it is hackish, it can modify data, this applies
-> for loop AES "lmk" and compatible TrueCrypt "tcw" IV implementations).
->
-> For these I would strongly say it should remain "hacked" inside dm-crypt only
-> (it is unusable for anything else than disk encryption and should not be visible outside).
->
-> Moreover, it is purely legacy code - we provide it for users can access old systems only.
->
-> If you end with rewriting all IVs as templates, I think it is not a good idea.
->
-> If it is only about ESSIV, and patch for dm-crypt is simple, it is a reasonable approach.
->
-> (The same applies for simple dmcryp IVs like "plain" "plain64", "plain64be and "benbi" that
-> are just linear IVs in various encoded variants.)
->
+The same bug that gcc hit in the past is apparently now showing
+up with clang, which decides to inline __serpent_setkey_sbox:
 
-Agreed.
+crypto/serpent_generic.c:268:5: error: stack frame size of 2112 bytes in function '__serpent_setkey' [-Werror,-Wframe-larger-than=]
 
-I am mostly only interested in ensuring that the bare 'cipher'
-interface is no longer used outside of the crypto subsystem itself.
-Since ESSIV is the only one using that, ESSIV is the only one I intend
-to change.
+Marking it 'noinline' reduces the stack usage from 2112 bytes to
+192 and 96 bytes, respectively, and seems to generate more
+useful object code.
+
+Fixes: c871c10e4ea7 ("crypto: serpent - improve __serpent_setkey with UBSAN")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ crypto/serpent_generic.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/crypto/serpent_generic.c b/crypto/serpent_generic.c
+index e57757904677..183661faf420 100644
+--- a/crypto/serpent_generic.c
++++ b/crypto/serpent_generic.c
+@@ -225,7 +225,7 @@
+ 	x4 ^= x2;					\
+ 	})
+ 
+-static void __serpent_setkey_sbox(u32 r0, u32 r1, u32 r2, u32 r3, u32 r4, u32 *k)
++static void noinline __serpent_setkey_sbox(u32 r0, u32 r1, u32 r2, u32 r3, u32 r4, u32 *k)
+ {
+ 	k += 100;
+ 	S3(r3, r4, r0, r1, r2); store_and_load_keys(r1, r2, r4, r3, 28, 24);
+-- 
+2.20.0
+
