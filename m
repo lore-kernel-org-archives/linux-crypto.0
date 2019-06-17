@@ -2,107 +2,82 @@ Return-Path: <SRS0=Ym9l=UQ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56400C31E5B
-	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 14:39:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70314C31E5B
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 14:54:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1DF1C20833
-	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 14:39:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RlgzUmgf"
+	by mail.kernel.org (Postfix) with ESMTP id 3D8292084A
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 14:54:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728392AbfFQOj6 (ORCPT
+        id S1727707AbfFQOyf (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 17 Jun 2019 10:39:58 -0400
-Received: from mail-io1-f66.google.com ([209.85.166.66]:38322 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728302AbfFQOj6 (ORCPT
+        Mon, 17 Jun 2019 10:54:35 -0400
+Received: from mail-qt1-f196.google.com ([209.85.160.196]:35666 "EHLO
+        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726631AbfFQOyf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 17 Jun 2019 10:39:58 -0400
-Received: by mail-io1-f66.google.com with SMTP id d12so13710140iod.5
-        for <linux-crypto@vger.kernel.org>; Mon, 17 Jun 2019 07:39:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Sv6MBkFuxNWS4Y7/ODJd1UzhH6pb23qCRtVaIHF/q+c=;
-        b=RlgzUmgfx9yyf3BBvyHR0xyyMh+HYVVEyb+v0qWRWjZWwRwnft22o6i6RXitzgYxpt
-         bM3fzgoVGnCZ8/KJSEsW0Gb32WP2cPFqMtVMP331n/L/EKo0nYYh/D2K1UFOsgA1ZCj3
-         dcPtlokzdrTzbMOKnwurcUwqmR62ByudM9TcOJ3gSEdPjTbgXJQCkazD6LjYutdh+i5o
-         RijbGxrM4qHBvHSocR6sbHd4ijRbwAUsQen7gjUB3Uv7A+SRQBZhejgBTXY7r194EFd0
-         LeelsBjgL34ouhUOLzNzdusfidDaYD9kyzjC5wwUw1DhNVgHCq5BGmnFMV/sDSxwYfSS
-         q7wA==
+        Mon, 17 Jun 2019 10:54:35 -0400
+Received: by mail-qt1-f196.google.com with SMTP id d23so11050957qto.2;
+        Mon, 17 Jun 2019 07:54:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=Sv6MBkFuxNWS4Y7/ODJd1UzhH6pb23qCRtVaIHF/q+c=;
-        b=Nkx+iS9IDfkAvE2fD8m0sV0eklZmDXDcntMotzmSnAqSvmqlRMYrHHREbeX2zb9a5/
-         Kx0CCudYqSc7B840BCI25U7163TEq59jIj7qspcyssovZE1Vk8iUNHcfidZfGt7QaoDY
-         ITV9ERw3SHZnbbGSYBrBL0IBdEbW8rklLzQzwV/bu36sxEvG6OyGs3tmRbsmJujECjTk
-         hjHGv+MD1+InIMmV8Xyhj/cn7NwLjzhZ/XY9d0JR7InUfNchzGdJBOYwyDsDMuMPYwcU
-         ZklJegVcdvCrBAuawjUSSIT18hdw1+y3t0QwFULo+g82jPen82yb0dQKYsVTGO430sTP
-         t4ag==
-X-Gm-Message-State: APjAAAXmGbV7l3gZmi5wtelECY3t3evRvv7iIa87FrwDU8pJDALDUVig
-        3WNNCQqIEgK37BccOYUIpVBNyh4d5vPYFL1f5mwSgQ==
-X-Google-Smtp-Source: APXvYqyYa6j6Ch8HnyOd5iu7uBxGZ09vXQaTQDB4sfKP+VxQ9J+WjmYVU2uD8/bsKEKMsda+BAlZYfs5I2M96mF0JRs=
-X-Received: by 2002:a5e:820a:: with SMTP id l10mr16879074iom.283.1560782397535;
- Mon, 17 Jun 2019 07:39:57 -0700 (PDT)
+        bh=RMA/1P8Zy+Da3dPZGY3jn8d8f/ncPVG+9hhwRd3TORE=;
+        b=G2/kpH6uBUZP5+fXzdhJzzOpP+YH9Hf65NU2qPLrc29QhGWtuc7waYZd0y+X+gnHDw
+         94PLn8ZouId6ryZ9XcwOrTQmM+RMoT+gcJeP0x3HHK9PzenIEtgLHp5lxNa3uBl0Y9yu
+         pw0es2UsEE/y6Criu/RQYabj/sy5JrpkjUCtjBtB4QKsknI44os/Fb8VzmY9KbvbIanQ
+         8PjhfZbegr+c8eTShSzm4Qs0Qk0mZKLcNWrT0f/vyFx/WLcRyKkZFbHk0HuXGn0Dt2S5
+         M/zfwCiYrlhC6M5eNghTE5D0sk3G4C0Vf1eXVRkb77dcja9g8muIGIwxMVVvgQVSekF7
+         QNzg==
+X-Gm-Message-State: APjAAAXe8Ghl7BCuT//sKIRhmve3lRCweMMpyNTMMuV8rxWRKKnBNjzc
+        aKu+EKNQiVtU2Rde2NJZweepO+kcttgAaS5Apc8=
+X-Google-Smtp-Source: APXvYqwPjKhflMS1pvQDACBjClIuiv+1sDx/EJFdmh7iZpy1Q50p3hBSY1qU/lhBwpeDglWlRHqI1emBibVmJ8psd8U=
+X-Received: by 2002:a0c:b758:: with SMTP id q24mr21924859qve.45.1560783273755;
+ Mon, 17 Jun 2019 07:54:33 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190614083404.20514-1-ard.biesheuvel@linaro.org>
- <20190616204419.GE923@sol.localdomain> <CAOtvUMf86_TGYLoAHWuRW0Jz2=cXbHHJnAsZhEvy6SpSp_xgOQ@mail.gmail.com>
- <CAKv+Gu_r_WXf2y=FVYHL-T8gFSV6e4TmGkLNJ-cw6UjK_s=A=g@mail.gmail.com>
- <8e58230a-cf0e-5a81-886b-6aa72a8e5265@gmail.com> <CAKv+Gu9sb0t6EC=MwVfqTw5TKtatK-c8k3ryNUhV8O0876NV7g@mail.gmail.com>
- <CAKv+Gu-LFShLW-Tt7hwBpni1vQRvv7k+L_bpP-wU86x88v+eRg@mail.gmail.com> <90214c3d-55ef-cc3a-3a04-f200d6f96cfd@gmail.com>
-In-Reply-To: <90214c3d-55ef-cc3a-3a04-f200d6f96cfd@gmail.com>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Mon, 17 Jun 2019 16:39:45 +0200
-Message-ID: <CAKv+Gu82BLPWrX1UzUBLf7UB+qJT6ZPtkvJ2Sa9t28OpXArhnw@mail.gmail.com>
-Subject: Re: [RFC PATCH 0/3] crypto: switch to shash for ESSIV generation
-To:     Milan Broz <gmazyland@gmail.com>
-Cc:     Gilad Ben-Yossef <gilad@benyossef.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        device-mapper development <dm-devel@redhat.com>,
-        linux-fscrypt@vger.kernel.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>
+References: <20190617132343.2678836-1-arnd@arndb.de> <20190617140435.qjzcouaqzepaicf4@gondor.apana.org.au>
+ <CAK8P3a07Vcqs+6Rs2Ckq_itWfGKUv+_pdgdis9eSujCGHQgFkQ@mail.gmail.com> <20190617142419.yw4w5w344tf6ozrb@gondor.apana.org.au>
+In-Reply-To: <20190617142419.yw4w5w344tf6ozrb@gondor.apana.org.au>
+From:   Arnd Bergmann <arnd@arndb.de>
+Date:   Mon, 17 Jun 2019 16:54:16 +0200
+Message-ID: <CAK8P3a0G2K4u-Sh495O7_nfc6zydtZBTOJcq19g3YYQA2ZMKFA@mail.gmail.com>
+Subject: Re: [PATCH] crypto: testmgr - reduce stack usage in fuzzers
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Kees Cook <keescook@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Biggers <ebiggers@google.com>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Vitaly Chikunov <vt@altlinux.org>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 17 Jun 2019 at 16:35, Milan Broz <gmazyland@gmail.com> wrote:
+On Mon, Jun 17, 2019 at 4:24 PM Herbert Xu <herbert@gondor.apana.org.au> wrote:
 >
-> On 17/06/2019 15:59, Ard Biesheuvel wrote:
+> On Mon, Jun 17, 2019 at 04:10:44PM +0200, Arnd Bergmann wrote:
 > >
-> > So my main question/showstopper at the moment is: which modes do we
-> > need to support for ESSIV? Only CBC? Any skcipher? Or both skciphers
-> > and AEADs?
+> > In most cases, this ends up in favor of clang (concerning the stack
+> > warning size limit) because most variables are small, but here we have
+> > a large stack object (two objects for the hash fuzzing) with a large redzone.
 >
-> Support, or cover by internal test? I think you nee to support everything
-> what dmcrypt currently allows, if you want to port dmcrypt to new API.
->
-> I know of many systems that use aes-xts-essiv:sha256 (it does not make sense
-> much but people just use it).
->
-> Some people use serpent and twofish, but we allow any cipher that fits...
->
+> Oh I missed the fact that there is another large stack variable
+> further up the stack.  So what happens if you just convert that
+> one and leave the shash descriptor alone?
 
-Sure,  that is all fine
+Just converting the three testvec_config variables is what I originally
+had in my patch. It got some configurations below the warning level,
+but some others still had the problem. I considered sending two
+separate patches, but as the symptom was the same, I just folded
+it all into one patch that does the same thing in four functions.
 
-> For the start, run this
-> https://gitlab.com/cryptsetup/cryptsetup/blob/master/tests/mode-test
->
-> In other words, if you add some additional limit, we are breaking backward compatibility.
-> (Despite the configuration is "wrong" from the security point of view.)
->
-
-Yes, but breaking backward compatibility only happens if you break
-something that is actually being *used*. So sure,
-xts(aes)-essiv:sha256 makes no sense but people use it anyway. But is
-that also true for, say, gcm(aes)-essiv:sha256 ?
+       Arnd
