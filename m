@@ -4,68 +4,66 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BB17C31E54
-	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 08:11:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60CF4C31E44
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 08:19:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E9F1021C38
-	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 08:11:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2628421C38
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 Jun 2019 08:19:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VlzMiAV9"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GrXn8d2G"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725884AbfFQILN (ORCPT
+        id S1726334AbfFQITH (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 17 Jun 2019 04:11:13 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:56213 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725837AbfFQILN (ORCPT
+        Mon, 17 Jun 2019 04:19:07 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:46527 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725919AbfFQITH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 17 Jun 2019 04:11:13 -0400
-Received: by mail-wm1-f68.google.com with SMTP id a15so8173163wmj.5
-        for <linux-crypto@vger.kernel.org>; Mon, 17 Jun 2019 01:11:09 -0700 (PDT)
+        Mon, 17 Jun 2019 04:19:07 -0400
+Received: by mail-wr1-f66.google.com with SMTP id n4so8837668wrw.13
+        for <linux-crypto@vger.kernel.org>; Mon, 17 Jun 2019 01:19:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=T2DYrJyMKowWyAQpSFGQeU51o1KpgHm1+BmumkXfwiw=;
-        b=VlzMiAV9ZL942+T6PN1t43bqCjqUfvSfcQycNhc90IQJMuepCPYZEvI5IE7XLS3v87
-         35rDSpA0Rpev5oJnzo++eKFZzXLTYED850q0GNyBcvDglrCXuHUtVpIvUe07MtmSLx8x
-         75q4gUelfxtUA9d8XsStLaYb1pqFQNk94mI3y22a5cYNbhsJB0hTgJYibKMuIf00Cxq1
-         ZfDihPqika9gXZiuDt1+TO0o552W3MjenoQP+oOaVIY04l0UUrTA01KZhgEfdbp2yTCw
-         cpFNUNi5i/hclWNYFoRL0eDvjTInV8YIhvmkR25ahDzR6s00Bh0+3+OOXFIrNqGX6c+i
-         d8NQ==
+        bh=+2XpZCy5+ZwveRvxYvn+qB/mhJLdja/9YIJ6hslURbg=;
+        b=GrXn8d2GmrFXTkp2JP++wTzV5jW4M6mjYO182B7bhUSRXOJ4s+wKKD8Qewq2PRP+Ny
+         jiTBxeFqOZMEowEPDEAeDZ96NRDDTjLbl/DwIZvt4GqSeP+DKhCT6aWIOWKRsUl8W7Ud
+         O31/sTyAlmP851fzRxAByYs5QiMU+53JJoNSH528yKLWHPa/2KpdXPsKNtVudpxeSmTt
+         Pg7r0jenFrv11y7auIHAR/T1BCOB+koZxPlrqPj0hmR34TtRYhPVH7+4ZZDmZxYuJIQs
+         VLErnCc7H5VLxZuoIRd0fcU9dFn1LV575h2OBcuWjT53VKi1ealYvkTS1edIdDjrJiQx
+         +D6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=T2DYrJyMKowWyAQpSFGQeU51o1KpgHm1+BmumkXfwiw=;
-        b=H8hcmklc7dzkRY4302jDAdlQn1QIbdFipEyNvsZQZAA7oGXZteCQuHk/J5jh4RNntv
-         isICmBNZm435RDLHEVXxfJpPCnHCMl2qak4Ua+4/n6R55x+vK27dgIyOASXK+DcwkqyM
-         MMUjwFY7luC0axZnFLXmGueErIAaMNTC7ziDDRkwqUECbv45btbXyzsyZ4OByN7sVlSN
-         WXB0zc14rh9jF5VEjApY9xqP59LR9hrrAymd724QUDgJhIjZgbMPAzxzgW5EjknL89UZ
-         u2URbYdT57YbHSUGElMlog6P7ak+rQUVICbVc5pQEt0RTwpA+7YN9+37/Rrhi5ww1pjD
-         qe3w==
-X-Gm-Message-State: APjAAAU7A7Nnr4jV4GNSA2pAIlrM0dxcrmqyxNYfqKw+zh/IdZitWzIq
-        CH8KMZcIEsAyLFCAg2A73YxiTA==
-X-Google-Smtp-Source: APXvYqzxF21yyweKsYKW3hgO4fHW4jzgSg/Fx14kVgSq8vaOzEW4AXxAil+hYP1itIxNuTlJ+ZyEMA==
-X-Received: by 2002:a1c:968c:: with SMTP id y134mr16400721wmd.122.1560759068656;
-        Mon, 17 Jun 2019 01:11:08 -0700 (PDT)
-Received: from localhost.localdomain (laubervilliers-657-1-83-120.w92-154.abo.wanadoo.fr. [92.154.90.120])
-        by smtp.gmail.com with ESMTPSA id j189sm21734900wmb.48.2019.06.17.01.11.06
+        bh=+2XpZCy5+ZwveRvxYvn+qB/mhJLdja/9YIJ6hslURbg=;
+        b=K2JTEChb8UqoLaIhtfmaUg+hGJDEClLfABzof/ZPJ/Wjs24Os6YfBxUzSpOxhwhPA6
+         tnYjBa2mr12qxHgu2B9ZEkAi2p5w7d9AIE7OQdTi+YMK3/23gEPiA2MFnOsKuyapvPRp
+         a3aGfRS60D80mk2Tbi0HmqSbJ3Hn1doSwOn1ZEsnN7Hol5m1bn5dMv9tYonmVdeAH0ck
+         hhyULFLYKgIis3BFVEZgrgPqvBUPxqveFn7LZBq8KeRMFpQDHcMn+yDUpzE0HkcxdeuW
+         bwzE2I9jN9zlC1w5xSeK4T9HZINo4uQTJzJAdLwozaUr6GiSvoaKXEYP3M27TYljLVtR
+         DWSQ==
+X-Gm-Message-State: APjAAAW5WoDAGMfkNLCVP1n47yLnfzqX9gs0VlknKcQiryZb0L5X8fi0
+        9d5QG2+k0uQV7sl64O3bCkyguHrIFn8=
+X-Google-Smtp-Source: APXvYqyuh7cg1tYH0KyRn4G15wcYLw5IgECsC/kAJ3XItM69cSXpxSPcyBPcw6ZyRvPiSH79FYOFiA==
+X-Received: by 2002:adf:a201:: with SMTP id p1mr43468074wra.113.1560759543834;
+        Mon, 17 Jun 2019 01:19:03 -0700 (PDT)
+Received: from localhost.localdomain (aaubervilliers-681-1-6-209.w90-88.abo.wanadoo.fr. [90.88.128.209])
+        by smtp.gmail.com with ESMTPSA id w23sm12554051wmi.45.2019.06.17.01.19.02
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Mon, 17 Jun 2019 01:11:07 -0700 (PDT)
+        Mon, 17 Jun 2019 01:19:03 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To:     netdev@vger.kernel.org
-Cc:     linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-        ebiggers@kernel.org, edumazet@google.com, davem@davemloft.net,
-        kuznet@ms2.inr.ac.ru, yoshfuji@linux-ipv6.org, jbaron@akamai.com,
-        cpaasch@apple.com, David.Laight@aculab.com, ycheng@google.com,
+To:     linux-crypto@vger.kernel.org
+Cc:     herbert@gondor.apana.org.au, ebiggers@kernel.org,
+        gregkh@linuxfoundation.org, linux-usb@vger.kernel.org,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v3] net: ipv4: move tcp_fastopen server side code to SipHash library
-Date:   Mon, 17 Jun 2019 10:09:33 +0200
-Message-Id: <20190617080933.32152-1-ard.biesheuvel@linaro.org>
+Subject: [PATCH v4] wusb: switch to cbcmac transform
+Date:   Mon, 17 Jun 2019 10:18:48 +0200
+Message-Id: <20190617081848.23614-1-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -74,287 +72,335 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Using a bare block cipher in non-crypto code is almost always a bad idea,
-not only for security reasons (and we've seen some examples of this in
-the kernel in the past), but also for performance reasons.
+The wusb code takes a very peculiar approach at implementing CBC-MAC,
+by using plain CBC into a scratch buffer, and taking the output IV
+as the MAC.
 
-In the TCP fastopen case, we call into the bare AES block cipher one or
-two times (depending on whether the connection is IPv4 or IPv6). On most
-systems, this results in a call chain such as
-
-  crypto_cipher_encrypt_one(ctx, dst, src)
-    crypto_cipher_crt(tfm)->cit_encrypt_one(crypto_cipher_tfm(tfm), ...);
-      aesni_encrypt
-        kernel_fpu_begin();
-        aesni_enc(ctx, dst, src); // asm routine
-        kernel_fpu_end();
-
-It is highly unlikely that the use of special AES instructions has a
-benefit in this case, especially since we are doing the above twice
-for IPv6 connections, instead of using a transform which can process
-the entire input in one go.
-
-We could switch to the cbcmac(aes) shash, which would at least get
-rid of the duplicated overhead in *some* cases (i.e., today, only
-arm64 has an accelerated implementation of cbcmac(aes), while x86 will
-end up using the generic cbcmac template wrapping the AES-NI cipher,
-which basically ends up doing exactly the above). However, in the given
-context, it makes more sense to use a light-weight MAC algorithm that
-is more suitable for the purpose at hand, such as SipHash.
-
-Since the output size of SipHash already matches our chosen value for
-TCP_FASTOPEN_COOKIE_SIZE, and given that it accepts arbitrary input
-sizes, this greatly simplifies the code as well.
-
-NOTE: Server farms backing a single server IP for load balancing purposes
-      and sharing a single fastopen key will be adversely affected by
-      this change unless all systems in the pool receive their kernel
-      upgrades at the same time.
+We can clean up this code substantially by switching to the cbcmac
+shash, as exposed by the CCM template. To ensure that the module is
+loaded on demand, add the cbcmac template name as a module alias.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
-v3: mention potential deployment issues for server farms in commit log
-    remove CONFIG_INET Kconfig dependency on CRYPTO_AES
+v4: - update Kconfig dependencies accordingly (and fix whitespace)
+v3: - add missing #include to fix build error spotted by kbuild test robot
+v2: - use finup()/digest() where possible, and process b0+b1 using a single
+      call to update()
+    - make 'stv_hsmic_hs' static const and remove comment regarding GCC 4.1
 
-v2: rebase onto net-next
-    reverse order of operands in BUILD_BUG_ON() comparison expression
+NOTE: I don't have any hardware to test this, but the built-in selftest
+      still passes.
 
- include/linux/tcp.h     |  7 +-
- include/net/tcp.h       | 10 +-
- net/Kconfig             |  2 -
- net/ipv4/tcp_fastopen.c | 97 +++++++-------------
- 4 files changed, 36 insertions(+), 80 deletions(-)
+ crypto/ccm.c                  |   1 +
+ drivers/usb/wusbcore/Kconfig  |   8 +-
+ drivers/usb/wusbcore/crypto.c | 169 +++++---------------
+ 3 files changed, 48 insertions(+), 130 deletions(-)
 
-diff --git a/include/linux/tcp.h b/include/linux/tcp.h
-index c23019a3b264..9ea0e71f5c6a 100644
---- a/include/linux/tcp.h
-+++ b/include/linux/tcp.h
-@@ -58,12 +58,7 @@ static inline unsigned int tcp_optlen(const struct sk_buff *skb)
+diff --git a/crypto/ccm.c b/crypto/ccm.c
+index 8c24605c791e..380eb619f657 100644
+--- a/crypto/ccm.c
++++ b/crypto/ccm.c
+@@ -1009,3 +1009,4 @@ MODULE_DESCRIPTION("Counter with CBC MAC");
+ MODULE_ALIAS_CRYPTO("ccm_base");
+ MODULE_ALIAS_CRYPTO("rfc4309");
+ MODULE_ALIAS_CRYPTO("ccm");
++MODULE_ALIAS_CRYPTO("cbcmac");
+diff --git a/drivers/usb/wusbcore/Kconfig b/drivers/usb/wusbcore/Kconfig
+index 12e89189ca7d..abc0f361021f 100644
+--- a/drivers/usb/wusbcore/Kconfig
++++ b/drivers/usb/wusbcore/Kconfig
+@@ -5,11 +5,9 @@
+ config USB_WUSB
+ 	tristate "Enable Wireless USB extensions"
+ 	depends on UWB
+-        select CRYPTO
+-        select CRYPTO_BLKCIPHER
+-        select CRYPTO_CBC
+-        select CRYPTO_MANAGER
+-        select CRYPTO_AES
++	select CRYPTO
++	select CRYPTO_AES
++	select CRYPTO_CCM
+ 	help
+ 	  Enable the host-side support for Wireless USB.
  
- /* TCP Fast Open Cookie as stored in memory */
- struct tcp_fastopen_cookie {
--	union {
--		u8	val[TCP_FASTOPEN_COOKIE_MAX];
--#if IS_ENABLED(CONFIG_IPV6)
--		struct in6_addr addr;
--#endif
--	};
-+	u64	val[TCP_FASTOPEN_COOKIE_MAX / sizeof(u64)];
- 	s8	len;
- 	bool	exp;	/* In RFC6994 experimental option format */
- };
-diff --git a/include/net/tcp.h b/include/net/tcp.h
-index 96e0e53ff440..184930b02779 100644
---- a/include/net/tcp.h
-+++ b/include/net/tcp.h
-@@ -1628,9 +1628,9 @@ bool tcp_fastopen_defer_connect(struct sock *sk, int *err);
+diff --git a/drivers/usb/wusbcore/crypto.c b/drivers/usb/wusbcore/crypto.c
+index edb7263bff40..9ee66483ee54 100644
+--- a/drivers/usb/wusbcore/crypto.c
++++ b/drivers/usb/wusbcore/crypto.c
+@@ -31,6 +31,9 @@
+  *             funneled through AES are...16 bytes in size!
+  */
  
- /* Fastopen key context */
- struct tcp_fastopen_context {
--	struct crypto_cipher	*tfm[TCP_FASTOPEN_KEY_MAX];
--	__u8			key[TCP_FASTOPEN_KEY_BUF_LENGTH];
--	struct rcu_head		rcu;
-+	__u8		key[TCP_FASTOPEN_KEY_MAX][TCP_FASTOPEN_KEY_LENGTH];
-+	int		num;
-+	struct rcu_head	rcu;
- };
++#include <crypto/aes.h>
++#include <crypto/algapi.h>
++#include <crypto/hash.h>
+ #include <crypto/skcipher.h>
+ #include <linux/crypto.h>
+ #include <linux/module.h>
+@@ -109,16 +112,6 @@ struct aes_ccm_a {
+ 	__be16 counter;	/* Value of x */
+ } __attribute__((packed));
  
- extern unsigned int sysctl_tcp_fastopen_blackhole_timeout;
-@@ -1665,9 +1665,7 @@ bool tcp_fastopen_cookie_match(const struct tcp_fastopen_cookie *foc,
- static inline
- int tcp_fastopen_context_len(const struct tcp_fastopen_context *ctx)
- {
--	if (ctx->tfm[1])
--		return 2;
--	return 1;
-+	return ctx->num;
- }
- 
- /* Latencies incurred by various limits for a sender. They are
-diff --git a/net/Kconfig b/net/Kconfig
-index d122f53c6fa2..57f51a279ad6 100644
---- a/net/Kconfig
-+++ b/net/Kconfig
-@@ -67,8 +67,6 @@ source "net/xdp/Kconfig"
- 
- config INET
- 	bool "TCP/IP networking"
--	select CRYPTO
--	select CRYPTO_AES
- 	---help---
- 	  These are the protocols used on the Internet and on most local
- 	  Ethernets. It is highly recommended to say Y here (this will enlarge
-diff --git a/net/ipv4/tcp_fastopen.c b/net/ipv4/tcp_fastopen.c
-index 7d19fa4c8121..46b67128e1ca 100644
---- a/net/ipv4/tcp_fastopen.c
-+++ b/net/ipv4/tcp_fastopen.c
-@@ -7,6 +7,7 @@
- #include <linux/tcp.h>
- #include <linux/rcupdate.h>
- #include <linux/rculist.h>
-+#include <linux/siphash.h>
- #include <net/inetpeer.h>
- #include <net/tcp.h>
- 
-@@ -37,14 +38,8 @@ static void tcp_fastopen_ctx_free(struct rcu_head *head)
- {
- 	struct tcp_fastopen_context *ctx =
- 	    container_of(head, struct tcp_fastopen_context, rcu);
--	int i;
- 
--	/* We own ctx, thus no need to hold the Fastopen-lock */
--	for (i = 0; i < TCP_FASTOPEN_KEY_MAX; i++) {
--		if (ctx->tfm[i])
--			crypto_free_cipher(ctx->tfm[i]);
--	}
--	kfree(ctx);
-+	kzfree(ctx);
- }
- 
- void tcp_fastopen_destroy_cipher(struct sock *sk)
-@@ -72,41 +67,6 @@ void tcp_fastopen_ctx_destroy(struct net *net)
- 		call_rcu(&ctxt->rcu, tcp_fastopen_ctx_free);
- }
- 
--static struct tcp_fastopen_context *tcp_fastopen_alloc_ctx(void *primary_key,
--							   void *backup_key,
--							   unsigned int len)
+-static void bytewise_xor(void *_bo, const void *_bi1, const void *_bi2,
+-			 size_t size)
 -{
--	struct tcp_fastopen_context *new_ctx;
--	void *key = primary_key;
--	int err, i;
--
--	new_ctx = kmalloc(sizeof(*new_ctx), GFP_KERNEL);
--	if (!new_ctx)
--		return ERR_PTR(-ENOMEM);
--	for (i = 0; i < TCP_FASTOPEN_KEY_MAX; i++)
--		new_ctx->tfm[i] = NULL;
--	for (i = 0; i < (backup_key ? 2 : 1); i++) {
--		new_ctx->tfm[i] = crypto_alloc_cipher("aes", 0, 0);
--		if (IS_ERR(new_ctx->tfm[i])) {
--			err = PTR_ERR(new_ctx->tfm[i]);
--			new_ctx->tfm[i] = NULL;
--			pr_err("TCP: TFO aes cipher alloc error: %d\n", err);
--			goto out;
--		}
--		err = crypto_cipher_setkey(new_ctx->tfm[i], key, len);
--		if (err) {
--			pr_err("TCP: TFO cipher key error: %d\n", err);
--			goto out;
--		}
--		memcpy(&new_ctx->key[i * TCP_FASTOPEN_KEY_LENGTH], key, len);
--		key = backup_key;
--	}
--	return new_ctx;
--out:
--	tcp_fastopen_ctx_free(&new_ctx->rcu);
--	return ERR_PTR(err);
+-	u8 *bo = _bo;
+-	const u8 *bi1 = _bi1, *bi2 = _bi2;
+-	size_t itr;
+-	for (itr = 0; itr < size; itr++)
+-		bo[itr] = bi1[itr] ^ bi2[itr];
 -}
 -
- int tcp_fastopen_reset_cipher(struct net *net, struct sock *sk,
- 			      void *primary_key, void *backup_key,
- 			      unsigned int len)
-@@ -115,11 +75,20 @@ int tcp_fastopen_reset_cipher(struct net *net, struct sock *sk,
- 	struct fastopen_queue *q;
- 	int err = 0;
- 
--	ctx = tcp_fastopen_alloc_ctx(primary_key, backup_key, len);
--	if (IS_ERR(ctx)) {
--		err = PTR_ERR(ctx);
-+	ctx = kmalloc(sizeof(*ctx), GFP_KERNEL);
-+	if (!ctx) {
-+		err = -ENOMEM;
- 		goto out;
- 	}
-+
-+	memcpy(ctx->key[0], primary_key, len);
-+	if (backup_key) {
-+		memcpy(ctx->key[1], backup_key, len);
-+		ctx->num = 2;
-+	} else {
-+		ctx->num = 1;
-+	}
-+
- 	spin_lock(&net->ipv4.tcp_fastopen_ctx_lock);
- 	if (sk) {
- 		q = &inet_csk(sk)->icsk_accept_queue.fastopenq;
-@@ -141,31 +110,30 @@ int tcp_fastopen_reset_cipher(struct net *net, struct sock *sk,
- 
- static bool __tcp_fastopen_cookie_gen_cipher(struct request_sock *req,
- 					     struct sk_buff *syn,
--					     struct crypto_cipher *tfm,
-+					     const u8 *key,
- 					     struct tcp_fastopen_cookie *foc)
- {
-+	BUILD_BUG_ON(TCP_FASTOPEN_KEY_LENGTH != sizeof(siphash_key_t));
-+	BUILD_BUG_ON(TCP_FASTOPEN_COOKIE_SIZE != sizeof(u64));
-+
- 	if (req->rsk_ops->family == AF_INET) {
- 		const struct iphdr *iph = ip_hdr(syn);
--		__be32 path[4] = { iph->saddr, iph->daddr, 0, 0 };
- 
--		crypto_cipher_encrypt_one(tfm, foc->val, (void *)path);
-+		foc->val[0] = siphash(&iph->saddr,
-+				      sizeof(iph->saddr) +
-+				      sizeof(iph->daddr),
-+				      (const siphash_key_t *)key);
- 		foc->len = TCP_FASTOPEN_COOKIE_SIZE;
- 		return true;
- 	}
--
- #if IS_ENABLED(CONFIG_IPV6)
- 	if (req->rsk_ops->family == AF_INET6) {
- 		const struct ipv6hdr *ip6h = ipv6_hdr(syn);
--		struct tcp_fastopen_cookie tmp;
--		struct in6_addr *buf;
--		int i;
--
--		crypto_cipher_encrypt_one(tfm, tmp.val,
--					  (void *)&ip6h->saddr);
--		buf = &tmp.addr;
--		for (i = 0; i < 4; i++)
--			buf->s6_addr32[i] ^= ip6h->daddr.s6_addr32[i];
--		crypto_cipher_encrypt_one(tfm, foc->val, (void *)buf);
-+
-+		foc->val[0] = siphash(&ip6h->saddr,
-+				      sizeof(ip6h->saddr) +
-+				      sizeof(ip6h->daddr),
-+				      (const siphash_key_t *)key);
- 		foc->len = TCP_FASTOPEN_COOKIE_SIZE;
- 		return true;
- 	}
-@@ -173,11 +141,8 @@ static bool __tcp_fastopen_cookie_gen_cipher(struct request_sock *req,
- 	return false;
- }
- 
--/* Generate the fastopen cookie by doing aes128 encryption on both
-- * the source and destination addresses. Pad 0s for IPv4 or IPv4-mapped-IPv6
-- * addresses. For the longer IPv6 addresses use CBC-MAC.
+ /* Scratch space for MAC calculations. */
+ struct wusb_mac_scratch {
+ 	struct aes_ccm_b0 b0;
+@@ -150,8 +143,7 @@ struct wusb_mac_scratch {
+  * @a: ASCII string, 14 bytes long (I guess zero padded if needed;
+  *     we use exactly 14 bytes).
+  *
+- * @b: data stream to be processed; cannot be a global or const local
+- *     (will confuse the scatterlists)
++ * @b: data stream to be processed
+  *
+  * @blen: size of b...
+  *
+@@ -160,16 +152,10 @@ struct wusb_mac_scratch {
+  * @key. We bytewise xor B0 with B1 (1) and AES-crypt that. Then we
+  * take the payload and divide it in blocks (16 bytes), xor them with
+  * the previous crypto result (16 bytes) and crypt it, repeat the next
+- * block with the output of the previous one, rinse wash (I guess this
+- * is what AES CBC mode means...but I truly have no idea). So we use
+- * the CBC(AES) blkcipher, that does precisely that. The IV (Initial
++ * block with the output of the previous one, rinse wash. So we use
++ * the CBC-MAC(AES) shash, that does precisely that. The IV (Initial
+  * Vector) is 16 bytes and is set to zero, so
+  *
+- * See rfc3610. Linux crypto has a CBC implementation, but the
+- * documentation is scarce, to say the least, and the example code is
+- * so intricated that is difficult to understand how things work. Most
+- * of this is guess work -- bite me.
 - *
-- * XXX (TFO) - refactor when TCP_FASTOPEN_COOKIE_SIZE != AES_BLOCK_SIZE.
-+/* Generate the fastopen cookie by applying SipHash to both the source and
-+ * destination addresses.
+  * (1) Created as 6.5 says, again, using as l(a) 'Blen + 14', and
+  *     using the 14 bytes of @a to fill up
+  *     b1.{mac_header,e0,security_reserved,padding}.
+@@ -189,44 +175,24 @@ struct wusb_mac_scratch {
+  * NOTE: blen is not aligned to a block size, we'll pad zeros, that's
+  *       what sg[4] is for. Maybe there is a smarter way to do this.
   */
- static void tcp_fastopen_cookie_gen(struct sock *sk,
- 				    struct request_sock *req,
-@@ -189,7 +154,7 @@ static void tcp_fastopen_cookie_gen(struct sock *sk,
- 	rcu_read_lock();
- 	ctx = tcp_fastopen_get_ctx(sk);
- 	if (ctx)
--		__tcp_fastopen_cookie_gen_cipher(req, syn, ctx->tfm[0], foc);
-+		__tcp_fastopen_cookie_gen_cipher(req, syn, ctx->key[0], foc);
- 	rcu_read_unlock();
+-static int wusb_ccm_mac(struct crypto_sync_skcipher *tfm_cbc,
+-			struct crypto_cipher *tfm_aes,
++static int wusb_ccm_mac(struct crypto_shash *tfm_cbcmac,
+ 			struct wusb_mac_scratch *scratch,
+ 			void *mic,
+ 			const struct aes_ccm_nonce *n,
+ 			const struct aes_ccm_label *a, const void *b,
+ 			size_t blen)
+ {
+-	int result = 0;
+-	SYNC_SKCIPHER_REQUEST_ON_STACK(req, tfm_cbc);
+-	struct scatterlist sg[4], sg_dst;
+-	void *dst_buf;
+-	size_t dst_size;
+-	u8 *iv;
+-	size_t zero_padding;
++	SHASH_DESC_ON_STACK(desc, tfm_cbcmac);
++	u8 iv[AES_BLOCK_SIZE];
+ 
+ 	/*
+ 	 * These checks should be compile time optimized out
+ 	 * ensure @a fills b1's mac_header and following fields
+ 	 */
+-	WARN_ON(sizeof(*a) != sizeof(scratch->b1) - sizeof(scratch->b1.la));
+-	WARN_ON(sizeof(scratch->b0) != sizeof(struct aes_ccm_block));
+-	WARN_ON(sizeof(scratch->b1) != sizeof(struct aes_ccm_block));
+-	WARN_ON(sizeof(scratch->ax) != sizeof(struct aes_ccm_block));
+-
+-	result = -ENOMEM;
+-	zero_padding = blen % sizeof(struct aes_ccm_block);
+-	if (zero_padding)
+-		zero_padding = sizeof(struct aes_ccm_block) - zero_padding;
+-	dst_size = blen + sizeof(scratch->b0) + sizeof(scratch->b1) +
+-		zero_padding;
+-	dst_buf = kzalloc(dst_size, GFP_KERNEL);
+-	if (!dst_buf)
+-		goto error_dst_buf;
+-
+-	iv = kzalloc(crypto_sync_skcipher_ivsize(tfm_cbc), GFP_KERNEL);
+-	if (!iv)
+-		goto error_iv;
++	BUILD_BUG_ON(sizeof(*a) != sizeof(scratch->b1) - sizeof(scratch->b1.la));
++	BUILD_BUG_ON(sizeof(scratch->b0) != sizeof(struct aes_ccm_block));
++	BUILD_BUG_ON(sizeof(scratch->b1) != sizeof(struct aes_ccm_block));
++	BUILD_BUG_ON(sizeof(scratch->ax) != sizeof(struct aes_ccm_block));
+ 
+ 	/* Setup B0 */
+ 	scratch->b0.flags = 0x59;	/* Format B0 */
+@@ -243,46 +209,28 @@ static int wusb_ccm_mac(struct crypto_sync_skcipher *tfm_cbc,
+ 	scratch->b1.la = cpu_to_be16(blen + 14);
+ 	memcpy(&scratch->b1.mac_header, a, sizeof(*a));
+ 
+-	sg_init_table(sg, ARRAY_SIZE(sg));
+-	sg_set_buf(&sg[0], &scratch->b0, sizeof(scratch->b0));
+-	sg_set_buf(&sg[1], &scratch->b1, sizeof(scratch->b1));
+-	sg_set_buf(&sg[2], b, blen);
+-	/* 0 if well behaved :) */
+-	sg_set_page(&sg[3], ZERO_PAGE(0), zero_padding, 0);
+-	sg_init_one(&sg_dst, dst_buf, dst_size);
+-
+-	skcipher_request_set_sync_tfm(req, tfm_cbc);
+-	skcipher_request_set_callback(req, 0, NULL, NULL);
+-	skcipher_request_set_crypt(req, sg, &sg_dst, dst_size, iv);
+-	result = crypto_skcipher_encrypt(req);
+-	skcipher_request_zero(req);
+-	if (result < 0) {
+-		printk(KERN_ERR "E: can't compute CBC-MAC tag (MIC): %d\n",
+-		       result);
+-		goto error_cbc_crypt;
+-	}
++	desc->tfm = tfm_cbcmac;
++	crypto_shash_init(desc);
++	crypto_shash_update(desc, (u8 *)&scratch->b0, sizeof(scratch->b0) +
++						      sizeof(scratch->b1));
++	crypto_shash_finup(desc, b, blen, iv);
+ 
+ 	/* Now we crypt the MIC Tag (*iv) with Ax -- values per WUSB1.0[6.5]
+ 	 * The procedure is to AES crypt the A0 block and XOR the MIC
+ 	 * Tag against it; we only do the first 8 bytes and place it
+ 	 * directly in the destination buffer.
+-	 *
+-	 * POS Crypto API: size is assumed to be AES's block size.
+-	 * Thanks for documenting it -- tip taken from airo.c
+ 	 */
+ 	scratch->ax.flags = 0x01;		/* as per WUSB 1.0 spec */
+ 	scratch->ax.ccm_nonce = *n;
+ 	scratch->ax.counter = 0;
+-	crypto_cipher_encrypt_one(tfm_aes, (void *)&scratch->ax,
+-				  (void *)&scratch->ax);
+-	bytewise_xor(mic, &scratch->ax, iv, 8);
+-	result = 8;
+-error_cbc_crypt:
+-	kfree(iv);
+-error_iv:
+-	kfree(dst_buf);
+-error_dst_buf:
+-	return result;
++
++	/* reuse the CBC-MAC transform to perform the single block encryption */
++	crypto_shash_digest(desc, (u8 *)&scratch->ax, sizeof(scratch->ax),
++			    (u8 *)&scratch->ax);
++
++	crypto_xor_cpy(mic, (u8 *)&scratch->ax, iv, 8);
++
++	return 8;
  }
  
-@@ -253,7 +218,7 @@ static int tcp_fastopen_cookie_gen_check(struct sock *sk,
- 	if (!ctx)
- 		goto out;
- 	for (i = 0; i < tcp_fastopen_context_len(ctx); i++) {
--		__tcp_fastopen_cookie_gen_cipher(req, syn, ctx->tfm[i], foc);
-+		__tcp_fastopen_cookie_gen_cipher(req, syn, ctx->key[i], foc);
- 		if (tcp_fastopen_cookie_match(foc, orig)) {
- 			ret = i + 1;
- 			goto out;
+ /*
+@@ -298,45 +246,28 @@ ssize_t wusb_prf(void *out, size_t out_size,
+ {
+ 	ssize_t result, bytes = 0, bitr;
+ 	struct aes_ccm_nonce n = *_n;
+-	struct crypto_sync_skcipher *tfm_cbc;
+-	struct crypto_cipher *tfm_aes;
+-	struct wusb_mac_scratch *scratch;
++	struct crypto_shash *tfm_cbcmac;
++	struct wusb_mac_scratch scratch;
+ 	u64 sfn = 0;
+ 	__le64 sfn_le;
+ 
+-	tfm_cbc = crypto_alloc_sync_skcipher("cbc(aes)", 0, 0);
+-	if (IS_ERR(tfm_cbc)) {
+-		result = PTR_ERR(tfm_cbc);
+-		printk(KERN_ERR "E: can't load CBC(AES): %d\n", (int)result);
+-		goto error_alloc_cbc;
+-	}
+-	result = crypto_sync_skcipher_setkey(tfm_cbc, key, 16);
+-	if (result < 0) {
+-		printk(KERN_ERR "E: can't set CBC key: %d\n", (int)result);
+-		goto error_setkey_cbc;
++	tfm_cbcmac = crypto_alloc_shash("cbcmac(aes)", 0, 0);
++	if (IS_ERR(tfm_cbcmac)) {
++		result = PTR_ERR(tfm_cbcmac);
++		printk(KERN_ERR "E: can't load CBCMAC-AES: %d\n", (int)result);
++		goto error_alloc_cbcmac;
+ 	}
+ 
+-	tfm_aes = crypto_alloc_cipher("aes", 0, 0);
+-	if (IS_ERR(tfm_aes)) {
+-		result = PTR_ERR(tfm_aes);
+-		printk(KERN_ERR "E: can't load AES: %d\n", (int)result);
+-		goto error_alloc_aes;
+-	}
+-	result = crypto_cipher_setkey(tfm_aes, key, 16);
++	result = crypto_shash_setkey(tfm_cbcmac, key, AES_BLOCK_SIZE);
+ 	if (result < 0) {
+-		printk(KERN_ERR "E: can't set AES key: %d\n", (int)result);
+-		goto error_setkey_aes;
+-	}
+-	scratch = kmalloc(sizeof(*scratch), GFP_KERNEL);
+-	if (!scratch) {
+-		result = -ENOMEM;
+-		goto error_alloc_scratch;
++		printk(KERN_ERR "E: can't set CBCMAC-AES key: %d\n", (int)result);
++		goto error_setkey_cbcmac;
+ 	}
+ 
+ 	for (bitr = 0; bitr < (len + 63) / 64; bitr++) {
+ 		sfn_le = cpu_to_le64(sfn++);
+ 		memcpy(&n.sfn, &sfn_le, sizeof(n.sfn));	/* n.sfn++... */
+-		result = wusb_ccm_mac(tfm_cbc, tfm_aes, scratch, out + bytes,
++		result = wusb_ccm_mac(tfm_cbcmac, &scratch, out + bytes,
+ 				      &n, a, b, blen);
+ 		if (result < 0)
+ 			goto error_ccm_mac;
+@@ -344,15 +275,10 @@ ssize_t wusb_prf(void *out, size_t out_size,
+ 	}
+ 	result = bytes;
+ 
+-	kfree(scratch);
+-error_alloc_scratch:
+ error_ccm_mac:
+-error_setkey_aes:
+-	crypto_free_cipher(tfm_aes);
+-error_alloc_aes:
+-error_setkey_cbc:
+-	crypto_free_sync_skcipher(tfm_cbc);
+-error_alloc_cbc:
++error_setkey_cbcmac:
++	crypto_free_shash(tfm_cbcmac);
++error_alloc_cbcmac:
+ 	return result;
+ }
+ 
+@@ -377,12 +303,8 @@ static int wusb_oob_mic_verify(void)
+ {
+ 	int result;
+ 	u8 mic[8];
+-	/* WUSB1.0[A.2] test vectors
+-	 *
+-	 * Need to keep it in the local stack as GCC 4.1.3something
+-	 * messes up and generates noise.
+-	 */
+-	struct usb_handshake stv_hsmic_hs = {
++	/* WUSB1.0[A.2] test vectors */
++	static const struct usb_handshake stv_hsmic_hs = {
+ 		.bMessageNumber = 2,
+ 		.bStatus 	= 00,
+ 		.tTKID 		= { 0x76, 0x98, 0x01 },
+@@ -457,11 +379,8 @@ static int wusb_key_derive_verify(void)
+ {
+ 	int result = 0;
+ 	struct wusb_keydvt_out keydvt_out;
+-	/* These come from WUSB1.0[A.1] + 2006/12 errata
+-	 * NOTE: can't make this const or global -- somehow it seems
+-	 *       the scatterlists for crypto get confused and we get
+-	 *       bad data. There is no doc on this... */
+-	struct wusb_keydvt_in stv_keydvt_in_a1 = {
++	/* These come from WUSB1.0[A.1] + 2006/12 errata */
++	static const struct wusb_keydvt_in stv_keydvt_in_a1 = {
+ 		.hnonce = {
+ 			0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
+ 			0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f
 -- 
 2.20.1
 
