@@ -2,108 +2,136 @@ Return-Path: <SRS0=jBdH=UR=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFB24C31E5B
-	for <linux-crypto@archiver.kernel.org>; Tue, 18 Jun 2019 18:40:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6F1BC31E5B
+	for <linux-crypto@archiver.kernel.org>; Tue, 18 Jun 2019 18:51:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8D3D8214AF
-	for <linux-crypto@archiver.kernel.org>; Tue, 18 Jun 2019 18:40:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sa184rYS"
+	by mail.kernel.org (Postfix) with ESMTP id 9118B206BA
+	for <linux-crypto@archiver.kernel.org>; Tue, 18 Jun 2019 18:51:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730046AbfFRSkc (ORCPT
+        id S1730142AbfFRSvB (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 18 Jun 2019 14:40:32 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:40864 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730002AbfFRSkb (ORCPT
+        Tue, 18 Jun 2019 14:51:01 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:33920 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729642AbfFRSvB (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Jun 2019 14:40:31 -0400
-Received: by mail-io1-f68.google.com with SMTP id n5so32188151ioc.7
-        for <linux-crypto@vger.kernel.org>; Tue, 18 Jun 2019 11:40:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=uz6vgs3GOxjbM3AuIshCCTudGsU2NjDzL7vFSt7v/cQ=;
-        b=sa184rYSkOu0dqqQXNHk6+itUzlQAxXj+dBN9nFQYozP6bKOI/e0TaH30OYZBzug8V
-         6NxKKJpwowcYPFc+doF6gb9RXdOfBXXxOxP+x43JFA0J/sLQkzERYuctYX+jbR3LsR1n
-         DoYJ+s19h5ihqAhBlXkUM2Vqfnfy1BkqofQLWDEiC9iiLcF/SZbfeHkroYUtPoLXE5Xb
-         5uVzl2kyQGH/gaUHhE8vf0bnWmEnyROPwPLvpTM79VUKnO4VFwV6rl6DjMsg+zymS6T1
-         BpMMmk+ZuaemIaG2YJZNz7gdKRpvlA6JTPyIz6fwQ39dmT08kLG4jVdwREqBOjx8aEy2
-         Zn6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=uz6vgs3GOxjbM3AuIshCCTudGsU2NjDzL7vFSt7v/cQ=;
-        b=RCYxjtmH/Q+Cus1RMa5UGNLF4vtBltmIGFjE7ckSUgg9XdOWd+wJA+ZSlU4hIgptE6
-         w0ryup+nFihLVOD8gfHTAJm5BsDqN2OUmzobPaCKS3VPmQq2q2Z4ne7x5APCEF95l/gY
-         /zlP5N5noiz0lf/ZgE+QRVdXFYLG7ibyo7LLw6lkvjkZ1MsBy/JXhXrFzO/YQmZZkcu8
-         3fOL7CEolqh4fkLaYG+/Cm4kRjTpd7l7ybbPs85KgGT2fKiBocglWRvYJNWIGuCFn0vO
-         +b7z83T2x4fmnIIvtJwk3uWC5ouKHQeu+eG98ZaEHX1C5FZYxC0rboAlctnf3OSxNsEl
-         gjGw==
-X-Gm-Message-State: APjAAAXcgkkWQaWoPS1G32kR15LqWz8STfHNPTJkUtkOcRZlipokyv9q
-        ewPxPQPqXITe/XROdFAshAAlidmM9urlJC7k3XPFzw==
-X-Google-Smtp-Source: APXvYqwrtYX7T9EQVi5nKj6iCPZHozRcRdsgD/IsbB8GUzkC3o294t480Avwkz8omW/Kn7dPl9QBNPGfhgfxtPfZqH0=
-X-Received: by 2002:a5d:8794:: with SMTP id f20mr19039445ion.128.1560883230081;
- Tue, 18 Jun 2019 11:40:30 -0700 (PDT)
+        Tue, 18 Jun 2019 14:51:01 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x5IImLmx080588
+        for <linux-crypto@vger.kernel.org>; Tue, 18 Jun 2019 14:51:01 -0400
+Received: from e32.co.us.ibm.com (e32.co.us.ibm.com [32.97.110.150])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2t72u67sd1-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <linux-crypto@vger.kernel.org>; Tue, 18 Jun 2019 14:50:56 -0400
+Received: from localhost
+        by e32.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-crypto@vger.kernel.org> from <haren@linux.vnet.ibm.com>;
+        Tue, 18 Jun 2019 19:50:43 +0100
+Received: from b03cxnp08025.gho.boulder.ibm.com (9.17.130.17)
+        by e32.co.us.ibm.com (192.168.1.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Tue, 18 Jun 2019 19:50:39 +0100
+Received: from b03ledav001.gho.boulder.ibm.com (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
+        by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x5IIochP29229434
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 18 Jun 2019 18:50:39 GMT
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DEE7C6E050;
+        Tue, 18 Jun 2019 18:50:38 +0000 (GMT)
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EA5E16E054;
+        Tue, 18 Jun 2019 18:50:36 +0000 (GMT)
+Received: from [9.70.82.143] (unknown [9.70.82.143])
+        by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Tue, 18 Jun 2019 18:50:36 +0000 (GMT)
+Date:   Tue, 18 Jun 2019 11:49:36 -0700
+From:   Haren Myneni <haren@linux.vnet.ibm.com>
+User-Agent: Mozilla/5.0 (X11; Linux i686; rv:15.0) Gecko/20120827 Thunderbird/15.0
 MIME-Version: 1.0
-References: <20190618093207.13436-1-ard.biesheuvel@linaro.org>
- <20190618093207.13436-3-ard.biesheuvel@linaro.org> <20190618182253.GK184520@gmail.com>
-In-Reply-To: <20190618182253.GK184520@gmail.com>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Tue, 18 Jun 2019 20:40:18 +0200
-Message-ID: <CAKv+Gu-xBCe09B1=GvXBH3V-p7=fOZcdL5pvFi5v19LT0J4KHA@mail.gmail.com>
-Subject: Re: [PATCH 2/2] net: fastopen: use endianness agnostic representation
- of the cookie
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     "<netdev@vger.kernel.org>" <netdev@vger.kernel.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Eric Dumazet <edumazet@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
-        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
-        Jason Baron <jbaron@akamai.com>,
-        Christoph Paasch <cpaasch@apple.com>,
-        David Laight <David.Laight@aculab.com>,
-        Yuchung Cheng <ycheng@google.com>
-Content-Type: text/plain; charset="UTF-8"
+To:     Michael Ellerman <mpe@ellerman.id.au>
+CC:     Herbert Xu <herbert@gondor.apana.org.au>,
+        linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
+        stable@vger.kernel.org
+Subject: Re: [EXTERNAL] Re: crypto/NX: Set receive window credits to max number
+ of CRBs in RxFIFO
+References: <1560587942.17547.18.camel@hbabu-laptop> <87ef3royva.fsf@concordia.ellerman.id.au>
+In-Reply-To: <87ef3royva.fsf@concordia.ellerman.id.au>
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19061818-0004-0000-0000-0000151DD526
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011286; HX=3.00000242; KW=3.00000007;
+ PH=3.00000004; SC=3.00000286; SDB=6.01219860; UDB=6.00641670; IPR=6.01001001;
+ MB=3.00027363; MTD=3.00000008; XFM=3.00000015; UTC=2019-06-18 18:50:42
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19061818-0005-0000-0000-00008C219623
+Message-Id: <5D093240.1060506@linux.vnet.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-18_08:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1906180148
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 18 Jun 2019 at 20:22, Eric Biggers <ebiggers@kernel.org> wrote:
->
-> On Tue, Jun 18, 2019 at 11:32:07AM +0200, Ard Biesheuvel wrote:
-> > Use an explicit little endian representation of the fastopen
-> > cookie, so that the value no longer depends on the endianness
-> > of the system. This fixes a theoretical issue only, since
-> > fastopen keys are unlikely to be shared across load balancing
-> > server farms that are mixed in endiannes, but it might pop up
-> > in validation/selftests as well, so let's just settle on little
-> > endian across the board.
-> >
-> > Note that this change only affects big endian systems.
-> >
-> > Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> > ---
-> >  include/linux/tcp.h     |  2 +-
-> >  net/ipv4/tcp_fastopen.c | 16 ++++++++--------
-> >  2 files changed, 9 insertions(+), 9 deletions(-)
-> >
->
-> What about the TCP_FASTOPEN_KEY option for setsockopt and getsockopt?  Those
-> APIs treat the key as an array of bytes (let's say it's little endian), so
-> doesn't it need to be converted to/from the CPU endianness of siphash_key_t?
->
+On 06/18/2019 05:35 AM, Michael Ellerman wrote:
+> Haren Myneni <haren@linux.vnet.ibm.com> writes:
+>>     
+>> System gets checkstop if RxFIFO overruns with more requests than the
+>> maximum possible number of CRBs in FIFO at the same time. So find max
+>> CRBs from FIFO size and set it to receive window credits.
+>>    
+>> CC: stable@vger.kernel.org # v4.14+
+>> Signed-off-by:Haren Myneni <haren@us.ibm.com>
+> 
+> It's helpful to mention the actual commit that's fixed, so that people
+> with backports can join things up, so should that be:
+> 
+>   Fixes: b0d6c9bab5e4 ("crypto/nx: Add P9 NX support for 842 compression engine")
+> 
+> ???
 
-Yeah, good point.
+Sorry, Yes, We use 1K for Rx window credits in b0d6c9bab5e41d07f (crypto/nx: Add P9 NX support for 842 compression engine). But credits should be based on FIFO size. 
 
-Can we first agree on whether we care about this or not? If so, i can spin a v2.
+I will repost the patch.  
+
+> 
+> cheers
+> 
+>> diff --git a/drivers/crypto/nx/nx-842-powernv.c b/drivers/crypto/nx/nx-842-powernv.c
+>> index 4acbc47..e78ff5c 100644
+>> --- a/drivers/crypto/nx/nx-842-powernv.c
+>> +++ b/drivers/crypto/nx/nx-842-powernv.c
+>> @@ -27,8 +27,6 @@
+>>  #define WORKMEM_ALIGN	(CRB_ALIGN)
+>>  #define CSB_WAIT_MAX	(5000) /* ms */
+>>  #define VAS_RETRIES	(10)
+>> -/* # of requests allowed per RxFIFO at a time. 0 for unlimited */
+>> -#define MAX_CREDITS_PER_RXFIFO	(1024)
+>>  
+>>  struct nx842_workmem {
+>>  	/* Below fields must be properly aligned */
+>> @@ -812,7 +810,11 @@ static int __init vas_cfg_coproc_info(struct device_node *dn, int chip_id,
+>>  	rxattr.lnotify_lpid = lpid;
+>>  	rxattr.lnotify_pid = pid;
+>>  	rxattr.lnotify_tid = tid;
+>> -	rxattr.wcreds_max = MAX_CREDITS_PER_RXFIFO;
+>> +	/*
+>> +	 * Maximum RX window credits can not be more than #CRBs in
+>> +	 * RxFIFO. Otherwise, can get checkstop if RxFIFO overruns.
+>> +	 */
+>> +	rxattr.wcreds_max = fifo_size / CRB_SIZE;
+>>  
+>>  	/*
+>>  	 * Open a VAS receice window which is used to configure RxFIFO
+> 
+
