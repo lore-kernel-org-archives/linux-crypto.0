@@ -4,93 +4,110 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F0A6C31E51
-	for <linux-crypto@archiver.kernel.org>; Tue, 18 Jun 2019 11:20:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7D59C31E51
+	for <linux-crypto@archiver.kernel.org>; Tue, 18 Jun 2019 12:15:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6031720873
-	for <linux-crypto@archiver.kernel.org>; Tue, 18 Jun 2019 11:20:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A76062085A
+	for <linux-crypto@archiver.kernel.org>; Tue, 18 Jun 2019 12:15:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729572AbfFRLUL (ORCPT
+        id S1726091AbfFRMO7 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 18 Jun 2019 07:20:11 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:54111 "EHLO
+        Tue, 18 Jun 2019 08:14:59 -0400
+Received: from mout.kundenserver.de ([212.227.17.13]:34639 "EHLO
         mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729110AbfFRLUK (ORCPT
+        with ESMTP id S1725913AbfFRMO7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Jun 2019 07:20:10 -0400
+        Tue, 18 Jun 2019 08:14:59 -0400
 Received: from threadripper.lan ([149.172.19.189]) by mrelayeu.kundenserver.de
- (mreue109 [212.227.15.145]) with ESMTPA (Nemesis) id
- 1N7zJl-1ihrb10qH5-014zfL; Tue, 18 Jun 2019 13:20:00 +0200
+ (mreue107 [212.227.15.145]) with ESMTPA (Nemesis) id
+ 1MCayD-1hmruM030N-009keq; Tue, 18 Jun 2019 14:14:33 +0200
 From:   Arnd Bergmann <arnd@arndb.de>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
+To:     David Howells <dhowells@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>
-Cc:     Arnd Bergmann <arnd@arndb.de>, Eric Biggers <ebiggers@google.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] [v2] crypto: serpent - mark __serpent_setkey_sbox noinline
-Date:   Tue, 18 Jun 2019 13:19:42 +0200
-Message-Id: <20190618111953.3183723-1-arnd@arndb.de>
+Cc:     Arnd Bergmann <arnd@arndb.de>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Denis Kenzior <denkenz@gmail.com>,
+        James Morris <james.morris@microsoft.com>,
+        keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: asymmetric_keys - select CRYPTO_HASH where needed
+Date:   Tue, 18 Jun 2019 14:13:47 +0200
+Message-Id: <20190618121400.4016776-1-arnd@arndb.de>
 X-Mailer: git-send-email 2.20.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:VIWQh7CGc1e7ltY83od0FlOkocpGFJuJKawvgRQ5EwYbCB8I42u
- 7dpn0qwdoSWNr3+V9YzfMMHU1OpbH+9VYy4ji/hfTL9c6Wq8Lh+d9yDy3ahSKquSfPrDTG8
- 2h35j5Wt7KmOHdFtds3TtDu0YGLppBaMxodi+EGl9/yHBYi/CozL9FgopJ0565GQr01thZR
- ghX1zLytq4EqAVWGu8UeQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:Exce4h1rSxc=:NgW1DRQhB2jU9fDRpSqrqZ
- NkDrx8pqzA+SOEghvSwELrk+k5e28L/lu2Dvb3w08iOS2AQcgAjDVLM5qu8CDynf3unvNWXsG
- ocV8xs4MiaMcWy1aFIY30PNEClGYcsKB0koAPKDuR5g3lMim4knCt+9nPpzfpWTRyumokvQ1z
- zL1tNTQ0tABgrEZt1Y0DiO50cFXxKdCJ3vnmt8ogaNf0mp7LLR41hQgKSj2gbt3sVKIcpnoaq
- +fTdZ25uu/v7TkjVdb2UMtyS+BtWrRsXUDA0FHU1B45G7Q6zaHQjh6ngWUe4TlwG0TjYKY0xt
- fcelSULF6cE/+BZ47RpnkFIlH5Y2taWPn0SJSid3PC8vKk6LarpRfmZnILQ0jCfG8KffXy9y7
- nb+0lxYmR6SwCctbz8RwvL1sitaARBXE6A5rTktbTQV4s3jC8Bfkn3emvU1Q0SLGqj0gbcOle
- uuFDuSbExWqqeAOCp9mjQtcgQhDFuuWw04Uuj0Rmd3r4DD5fOOplGQk0xF4DOo9+DxvsrMqLq
- jvmuM4EVvAxhgjw4LqC9IP0RoSm9/lct5arMN8z8KOL/8JivZrA+7VK2X7E6r++Cap1/d+/6p
- Zzb+A9k/d6Rqj507JIBJVl61YYqLt4+nHU4MaKHoXgqG/h4AfibQ6AClwExY9TRI32M6OQZMr
- UM74UFE/kM9wqbAy+bZ/BnzfG9Sdlrp/OWbBUokBvkvAPqwJqCQZ5yerxNgStKu/08TBZcCqG
- GXD3BsGaK9GHy5hwCDdTEktYAI3vnhP9nEPF6g==
+X-Provags-ID: V03:K1:FdNmaZTGrGzDq5iXrgxkPwJziSsaX6wvGAloE87LV9MtQDdOYXc
+ A3JSH9MjAAV9AVPVTkgEg3wZiN++IzPZwFidXTmQjnffLTlpVEQktDnr6W00YY1L1/SZg6s
+ KuL2d8GXhB1u446diVQJ5V9W+fSQsRwWh6qOR+gy51zvLcbueux+r08i7qUIXrrozbQ3zhF
+ nZJuGoVzRXgPZQ8+1gVyA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:plixockunwQ=:XD/SdUpYN61LItUSwWLGyM
+ nZ9JlxNTFHA3vpsy6AIRTuM1083mhqgExjNPm6EB1VH2qZxBuaggtLv57LQMcCgEVbmGkJIkL
+ PVjZlpipfvmN19QL+uYZI3J8Ebk+nzyhTiSRM7vYtyAhwdK8QyQ4jQDNpUouwG60lJs1yIIk0
+ /ghNfhpO8L19bzX1C1EIJtfbLDZlAhx3eWo5PQRjKiHjtAVT9s2fA6HTHcFZ7P742/t6TqHXp
+ +T03CgCw5xs+itQoAdV3sHyhM44Cl6p+4cj/frHPa737y2H9WdriW6CwXbquFRgPiBiEFMt8n
+ YvDMkskHBjG2r8KKgSOMf3z1EilxxizY8ml3vayEgAncwM49ZFasDXITbRCrla9ch7bSiQixw
+ rlgKmh0zNi6GEAHdhAOlBhzH2Rz2xUcuawxn++2+Jaxm4LoCDKeoGaDnJb+bfWZD8vDsg4XiU
+ +JFQSKG1CBb+Ys/1o721HpHaSLjALWsFhSrO0mwdpiH0EhDkh3py18tFu0u56JsEHh/lmj8rj
+ mRCJ3N8CNzVMBQ+sT5ulAoHF5mDWiYp/DfVNohsGnhNb4gW/gMBHv3eeoh204cUmdj7lANo5G
+ WFlxG3ORxHRw7atPsTzk2UFbg5Nwjqlqnm4Q81z6nRjig5IwRm0Z4rtj+Cx0vgar1ye9wknp4
+ TZUhchcK2AQDcMyHNx2yK3+NWDmbYKXrJaVmtkNr3hFUlBV27TXO7sIMF4jzSQAJ34JX0LX/i
+ uG2AflvgH5hisO4KPt5V3ePfbRR4f2iQk1JXQg==
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The same bug that gcc hit in the past is apparently now showing
-up with clang, which decides to inline __serpent_setkey_sbox:
+Build testing with some core crypto options disabled revealed
+a few modules that are missing CRYPTO_HASH:
 
-crypto/serpent_generic.c:268:5: error: stack frame size of 2112 bytes in function '__serpent_setkey' [-Werror,-Wframe-larger-than=]
+crypto/asymmetric_keys/x509_public_key.o: In function `x509_get_sig_params':
+x509_public_key.c:(.text+0x4c7): undefined reference to `crypto_alloc_shash'
+x509_public_key.c:(.text+0x5e5): undefined reference to `crypto_shash_digest'
+crypto/asymmetric_keys/pkcs7_verify.o: In function `pkcs7_digest.isra.0':
+pkcs7_verify.c:(.text+0xab): undefined reference to `crypto_alloc_shash'
+pkcs7_verify.c:(.text+0x1b2): undefined reference to `crypto_shash_digest'
+pkcs7_verify.c:(.text+0x3c1): undefined reference to `crypto_shash_update'
+pkcs7_verify.c:(.text+0x411): undefined reference to `crypto_shash_finup'
 
-Marking it 'noinline' reduces the stack usage from 2112 bytes to
-192 and 96 bytes, respectively, and seems to generate more
-useful object code.
+This normally doesn't show up in randconfig tests because there is
+a large number of other options that select CRYPTO_HASH.
 
-Fixes: c871c10e4ea7 ("crypto: serpent - improve __serpent_setkey with UBSAN")
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
-v2: style improvements suggested by Eric Biggers
----
- crypto/serpent_generic.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ crypto/asymmetric_keys/Kconfig | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/crypto/serpent_generic.c b/crypto/serpent_generic.c
-index e57757904677..56fa665a4f01 100644
---- a/crypto/serpent_generic.c
-+++ b/crypto/serpent_generic.c
-@@ -225,7 +225,13 @@
- 	x4 ^= x2;					\
- 	})
- 
--static void __serpent_setkey_sbox(u32 r0, u32 r1, u32 r2, u32 r3, u32 r4, u32 *k)
-+/*
-+ * both gcc and clang have misoptimized this function in the past,
-+ * producing horrible object code from spilling temporary variables
-+ * on the stack. Forcing this part out of line avoids that.
-+ */
-+static noinline void __serpent_setkey_sbox(u32 r0, u32 r1, u32 r2,
-+					   u32 r3, u32 r4, u32 *k)
- {
- 	k += 100;
- 	S3(r3, r4, r0, r1, r2); store_and_load_keys(r1, r2, r4, r3, 28, 24);
+diff --git a/crypto/asymmetric_keys/Kconfig b/crypto/asymmetric_keys/Kconfig
+index be70ca6c85d3..1f1f004dc757 100644
+--- a/crypto/asymmetric_keys/Kconfig
++++ b/crypto/asymmetric_keys/Kconfig
+@@ -15,6 +15,7 @@ config ASYMMETRIC_PUBLIC_KEY_SUBTYPE
+ 	select MPILIB
+ 	select CRYPTO_HASH_INFO
+ 	select CRYPTO_AKCIPHER
++	select CRYPTO_HASH
+ 	help
+ 	  This option provides support for asymmetric public key type handling.
+ 	  If signature generation and/or verification are to be used,
+@@ -65,6 +66,7 @@ config TPM_KEY_PARSER
+ config PKCS7_MESSAGE_PARSER
+ 	tristate "PKCS#7 message parser"
+ 	depends on X509_CERTIFICATE_PARSER
++	select CRYPTO_HASH
+ 	select ASN1
+ 	select OID_REGISTRY
+ 	help
+@@ -87,6 +89,7 @@ config SIGNED_PE_FILE_VERIFICATION
+ 	bool "Support for PE file signature verification"
+ 	depends on PKCS7_MESSAGE_PARSER=y
+ 	depends on SYSTEM_DATA_VERIFICATION
++	select CRYPTO_HASH
+ 	select ASN1
+ 	select OID_REGISTRY
+ 	help
 -- 
 2.20.0
 
