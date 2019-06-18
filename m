@@ -2,86 +2,171 @@ Return-Path: <SRS0=jBdH=UR=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48B4AC31E5E
-	for <linux-crypto@archiver.kernel.org>; Tue, 18 Jun 2019 06:53:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F984C31E51
+	for <linux-crypto@archiver.kernel.org>; Tue, 18 Jun 2019 06:57:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 187DF2080C
-	for <linux-crypto@archiver.kernel.org>; Tue, 18 Jun 2019 06:53:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1560840793;
-	bh=sHkSN5TVuO/486QufCPLIKrTVH7p4MDl4TUt6ztrYjU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=ADdhUPa4j83jekPTz5Sm+8V948ZsErGb9hylbJAhU5gtnm1H3NmFyr16XhEcBBTsX
-	 GdPPuxsP1Il11t+WyQOx7eOHmgQH9wwcXhRCbTNWUYKB1JKwslrBYDL++4KxhoLOUN
-	 0xfsWrgF2ipJK6P8ATccyEuiHyV1TEJeIjlfaLrk=
+	by mail.kernel.org (Postfix) with ESMTP id 71D0120665
+	for <linux-crypto@archiver.kernel.org>; Tue, 18 Jun 2019 06:57:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="b6pEESMT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726413AbfFRGxL (ORCPT
+        id S1726091AbfFRG5K (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 18 Jun 2019 02:53:11 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57264 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726307AbfFRGxK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Jun 2019 02:53:10 -0400
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 6608220823;
-        Tue, 18 Jun 2019 06:53:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1560840789;
-        bh=sHkSN5TVuO/486QufCPLIKrTVH7p4MDl4TUt6ztrYjU=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Pm2yIsYLMhS0Sb9XMFKshOkQbTVCXQrJoMDgAB0RtpqqnVzQmLImzUKkqwtUJaCzK
-         uPKQ3uoL+93JInEQPRGrF/IbosuFnHtUnaVNqBlFq2Zlvqcna45QRc++x71MwAiLRm
-         7czFzhT6nXhcCluAAjcVydybDH0g3sAKGVGqpzQQ=
-Date:   Tue, 18 Jun 2019 08:53:07 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc:     linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-        ebiggers@kernel.org, linux-usb@vger.kernel.org
-Subject: Re: [PATCH v4] wusb: switch to cbcmac transform
-Message-ID: <20190618065307.GA15206@kroah.com>
-References: <20190617081848.23614-1-ard.biesheuvel@linaro.org>
+        Tue, 18 Jun 2019 02:57:10 -0400
+Received: from mail-io1-f68.google.com ([209.85.166.68]:36841 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725955AbfFRG5J (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 18 Jun 2019 02:57:09 -0400
+Received: by mail-io1-f68.google.com with SMTP id h6so27350741ioh.3
+        for <linux-crypto@vger.kernel.org>; Mon, 17 Jun 2019 23:57:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=CXnIyZ8/qpmB9O/IQNXwE4xcVL/UEsoKm7waO42Vrhc=;
+        b=b6pEESMTIYW1rETynyENJ8kZq2eRzhHdArMeVYV4OlYd8GEe0UWHcsFoQ85ltX2lB1
+         7/mZR0HWFEuuTntZ2V9EDJprv6wiqunqmpXh0lPIjyyxiqDLtff7UTDH0dBMIoMmb82/
+         BJ80aRIYEMInyuiAkLixiRkY8yVbOWntAeQm7/rXli2yHmYXfKHEaNBxJXBi4pPS90Ap
+         1voK+mEVg9DMsxNuyKJEjz/FYHjy+LTRAYuo+dU1lM70Dpzj+D/119WhW3cjaxr4MH4t
+         LB8ys+g10lKKVIFKCsoFN+Q2OfDB1b9r0t39F2e1UNOiGONW0MVoHXIcZB/WW/URNfuY
+         CH0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=CXnIyZ8/qpmB9O/IQNXwE4xcVL/UEsoKm7waO42Vrhc=;
+        b=W4v1RUXTpUepFfUaSlLpe7SFALnDFWDg/Vfp0NOrnqBz7fcZpM62GIbhG58N6+EDb/
+         q7pSQNi/5rXUNMj+xtq5qrAUiUPLYz4zidBAAkXkmLgRYsHOYqD00+sXueP86/yI6uk0
+         73sFGLdrmgnmyDEav3X9WDgK6xuHISWMOhhEcOlxPZr7JgaVdgCi9Aa7+pTGh2DsQToT
+         lKBhchjBW4o1qDYYwUBd7xiidcZZ+wzfyJOyWExoVY2lIc8n2gtaF4H/v7u1+nkN2vJh
+         1YkJ9r13KYL6wCxaAo9QfQgFFUlqncF8HUpeiVvJmyscKgUd4LtJiAEH3/CmrKdV5NAJ
+         wITw==
+X-Gm-Message-State: APjAAAWBZYj0hfB1GcPtr41tdmYNbjUgweu3YWbfLpZ6GyWNS2Q5V6tI
+        uFHo95VuwYAJrnHsXC+5FP45f6Fjl6UlPL592Baj+A==
+X-Google-Smtp-Source: APXvYqzf64Vvjzwa7BoV29fPQU32R2jtJBqmw6Kf38W7cFU4LGqvkEX6o0py4xYF6b3Uv4Iosiofvwx7c8sS4eNBf6U=
+X-Received: by 2002:a05:6602:98:: with SMTP id h24mr15093820iob.49.1560841028753;
+ Mon, 17 Jun 2019 23:57:08 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190617081848.23614-1-ard.biesheuvel@linaro.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+References: <20190617080933.32152-1-ard.biesheuvel@linaro.org> <20190618041408.GB2266@sol.localdomain>
+In-Reply-To: <20190618041408.GB2266@sol.localdomain>
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date:   Tue, 18 Jun 2019 08:56:57 +0200
+Message-ID: <CAKv+Gu9O0YjyftEEQgZqBcTtZ37co5_H1m6s2GCqk+onza7A-g@mail.gmail.com>
+Subject: Re: [PATCH v3] net: ipv4: move tcp_fastopen server side code to
+ SipHash library
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     "<netdev@vger.kernel.org>" <netdev@vger.kernel.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Eric Dumazet <edumazet@google.com>,
+        "David S. Miller" <davem@davemloft.net>, kuznet@ms2.inr.ac.ru,
+        yoshfuji@linux-ipv6.org, Jason Baron <jbaron@akamai.com>,
+        cpaasch@apple.com, David Laight <David.Laight@aculab.com>,
+        Yuchung Cheng <ycheng@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jun 17, 2019 at 10:18:48AM +0200, Ard Biesheuvel wrote:
-> The wusb code takes a very peculiar approach at implementing CBC-MAC,
-> by using plain CBC into a scratch buffer, and taking the output IV
-> as the MAC.
-> 
-> We can clean up this code substantially by switching to the cbcmac
-> shash, as exposed by the CCM template. To ensure that the module is
-> loaded on demand, add the cbcmac template name as a module alias.
-> 
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> ---
-> v4: - update Kconfig dependencies accordingly (and fix whitespace)
-> v3: - add missing #include to fix build error spotted by kbuild test robot
-> v2: - use finup()/digest() where possible, and process b0+b1 using a single
->       call to update()
->     - make 'stv_hsmic_hs' static const and remove comment regarding GCC 4.1
-> 
-> NOTE: I don't have any hardware to test this, but the built-in selftest
->       still passes.
-> 
->  crypto/ccm.c                  |   1 +
->  drivers/usb/wusbcore/Kconfig  |   8 +-
->  drivers/usb/wusbcore/crypto.c | 169 +++++---------------
->  3 files changed, 48 insertions(+), 130 deletions(-)
+On Tue, 18 Jun 2019 at 06:14, Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> On Mon, Jun 17, 2019 at 10:09:33AM +0200, Ard Biesheuvel wrote:
+> > diff --git a/include/linux/tcp.h b/include/linux/tcp.h
+> > index c23019a3b264..9ea0e71f5c6a 100644
+> > --- a/include/linux/tcp.h
+> > +++ b/include/linux/tcp.h
+> > @@ -58,12 +58,7 @@ static inline unsigned int tcp_optlen(const struct sk_buff *skb)
+> >
+> >  /* TCP Fast Open Cookie as stored in memory */
+> >  struct tcp_fastopen_cookie {
+> > -     union {
+> > -             u8      val[TCP_FASTOPEN_COOKIE_MAX];
+> > -#if IS_ENABLED(CONFIG_IPV6)
+> > -             struct in6_addr addr;
+> > -#endif
+> > -     };
+> > +     u64     val[TCP_FASTOPEN_COOKIE_MAX / sizeof(u64)];
+> >       s8      len;
+> >       bool    exp;    /* In RFC6994 experimental option format */
+> >  };
+>
+> Is it okay that the cookies will depend on CPU endianness?
+>
 
-I've queued this up in the usb-next tree now, thanks.
+That depends on whether keys shared between hosts with different
+endiannesses are expected to produce cookies that can be shared.
 
-greg k-h
+> > diff --git a/include/net/tcp.h b/include/net/tcp.h
+> > index 96e0e53ff440..184930b02779 100644
+> > --- a/include/net/tcp.h
+> > +++ b/include/net/tcp.h
+> > @@ -1628,9 +1628,9 @@ bool tcp_fastopen_defer_connect(struct sock *sk, int *err);
+> >
+> >  /* Fastopen key context */
+> >  struct tcp_fastopen_context {
+> > -     struct crypto_cipher    *tfm[TCP_FASTOPEN_KEY_MAX];
+> > -     __u8                    key[TCP_FASTOPEN_KEY_BUF_LENGTH];
+> > -     struct rcu_head         rcu;
+> > +     __u8            key[TCP_FASTOPEN_KEY_MAX][TCP_FASTOPEN_KEY_LENGTH];
+> > +     int             num;
+> > +     struct rcu_head rcu;
+> >  };
+>
+> Why not use 'siphash_key_t' here?  Then the (potentially alignment-violating)
+> cast in __tcp_fastopen_cookie_gen_cipher() wouldn't be needed.
+>
+
+These data structures are always kmalloc'ed so the alignment is never
+violated in practice. But I do take your point. My idea at the time of
+the first RFC was that the actual MAC algo should be an implementation
+detail, and so the key is just a buffer. However, after Eric pointed
+out that setting the same key across different hosts should produce
+compatible cookies (module the upgrade scenario), it is true that the
+algorithm is an externally visible property, so it might be better to
+change this into siphash_key_t[] here.
+
+> >  int tcp_fastopen_reset_cipher(struct net *net, struct sock *sk,
+> >                             void *primary_key, void *backup_key,
+> >                             unsigned int len)
+> > @@ -115,11 +75,20 @@ int tcp_fastopen_reset_cipher(struct net *net, struct sock *sk,
+> >       struct fastopen_queue *q;
+> >       int err = 0;
+> >
+> > -     ctx = tcp_fastopen_alloc_ctx(primary_key, backup_key, len);
+> > -     if (IS_ERR(ctx)) {
+> > -             err = PTR_ERR(ctx);
+> > +     ctx = kmalloc(sizeof(*ctx), GFP_KERNEL);
+> > +     if (!ctx) {
+> > +             err = -ENOMEM;
+> >               goto out;
+> >       }
+> > +
+> > +     memcpy(ctx->key[0], primary_key, len);
+> > +     if (backup_key) {
+> > +             memcpy(ctx->key[1], backup_key, len);
+> > +             ctx->num = 2;
+> > +     } else {
+> > +             ctx->num = 1;
+> > +     }
+> > +
+> >       spin_lock(&net->ipv4.tcp_fastopen_ctx_lock);
+> >       if (sk) {
+> >               q = &inet_csk(sk)->icsk_accept_queue.fastopenq;
+>
+> Shouldn't there be a check that 'len == TCP_FASTOPEN_KEY_LENGTH'?  I see that
+> all callers pass that, but it seems unnecessarily fragile for this to accept
+> short lengths and leave uninitialized memory in that case.
+>
+
+Sure, I can add back the error handling path the previously handled
+any errors from crypto_cipher_setkey() [which would perform the input
+length checking in that case]
+
+I'll spin an incremental patch covering the above.
