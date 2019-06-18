@@ -1,92 +1,140 @@
 Return-Path: <SRS0=jBdH=UR=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-1.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_MUTT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Level: *
+X-Spam-Status: No, score=1.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_MUTT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E0ABC31E5B
-	for <linux-crypto@archiver.kernel.org>; Tue, 18 Jun 2019 18:07:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54F1CC31E5E
+	for <linux-crypto@archiver.kernel.org>; Tue, 18 Jun 2019 18:18:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 042E62063F
-	for <linux-crypto@archiver.kernel.org>; Tue, 18 Jun 2019 18:07:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 328462084A
+	for <linux-crypto@archiver.kernel.org>; Tue, 18 Jun 2019 18:18:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1560881275;
-	bh=eNYbObxTyev7HB64V8QVPEXdlAg7TDx8hT2C3MX03yI=;
+	s=default; t=1560881889;
+	bh=jZMjzsK5OMZgfCQBd2j4lRcYuYePGrpIOkAj+CkC+5U=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=CICzfLXSItOKPvjyBha/CYgsBAdrJrGbRSIA8+ROp920JAMl0mWN2NaaGMUa4DTYV
-	 KPr1K8JQ5FGHxljn9JYiGs8xtqh/SZVpeGQMvKiPVY++Al4HRj1nybil+lBzlFIWY0
-	 M7mEySeqRimgRYkMa1o7fNqZaRXCLo/Aplacy8PY=
+	b=0E8XY3CPXEwqrSY5MXtXy86mx9xoVgeC03nO6zUIu8pw/wEm7Yh2kNvN103LFh7Xj
+	 uKBqWcSF4GbQ+khCJFBVoWxkyHow6cygwTOgD1mEYvhnwOTgpn83cHWRsqa9pm28+J
+	 5gk7fx2Dni57q+dy2v2EhlU2UfYCU6yuNOC9eSvc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730172AbfFRSHv (ORCPT
+        id S1729319AbfFRSSI (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 18 Jun 2019 14:07:51 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47466 "EHLO mail.kernel.org"
+        Tue, 18 Jun 2019 14:18:08 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49770 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730169AbfFRSHu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Jun 2019 14:07:50 -0400
+        id S1727616AbfFRSSH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 18 Jun 2019 14:18:07 -0400
 Received: from gmail.com (unknown [104.132.1.77])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 40D762063F;
-        Tue, 18 Jun 2019 18:07:50 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 761D5206BA;
+        Tue, 18 Jun 2019 18:18:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1560881270;
-        bh=eNYbObxTyev7HB64V8QVPEXdlAg7TDx8hT2C3MX03yI=;
+        s=default; t=1560881886;
+        bh=jZMjzsK5OMZgfCQBd2j4lRcYuYePGrpIOkAj+CkC+5U=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=A2fP+/h9oISFVSf5Zaw5YOn8UIu2Uy3T5ohsniKPb0hDCGcqdpg89juBEpJtvaxxK
-         gVKY+FbG9x0ZyA2ZN2sQxWEETWWu1eSEsJf2a0x0Tv7f3fT+q/Biv7gKrDkpS/zeZI
-         cf2czZqmT1iZ4QyQ5+gB8PpdTtO25yGGsvCGWpNg=
-Date:   Tue, 18 Jun 2019 11:07:48 -0700
+        b=Sqq6doFxMe4JbBYwRcibxB9uJvhPlSwMDzNkNKsvvF/rVlyLmWduC1Gez+z1sG7EU
+         qnMvGs9+zoQf5Kyfj8EL+oAPq4LVmcP5tYi7KNFwpselM9aBdmTaSxU/ZNZFGg5ai7
+         tj7vup137siyfYdl5cnP/v8i6rFDGdF7cKWbYnxI=
+Date:   Tue, 18 Jun 2019 11:18:05 -0700
 From:   Eric Biggers <ebiggers@kernel.org>
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Biggers <ebiggers@google.com>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Vitaly Chikunov <vt@altlinux.org>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] crypto: testmgr - dynamically allocate
- crypto_shash
-Message-ID: <20190618180748.GI184520@gmail.com>
-References: <20190618092215.2790800-1-arnd@arndb.de>
- <20190618092215.2790800-2-arnd@arndb.de>
+To:     Eric Dumazet <edumazet@google.com>
+Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        netdev <netdev@vger.kernel.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        David Miller <davem@davemloft.net>,
+        Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
+        Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+        Jason Baron <jbaron@akamai.com>,
+        Christoph Paasch <cpaasch@apple.com>,
+        David Laight <David.Laight@aculab.com>,
+        Yuchung Cheng <ycheng@google.com>
+Subject: Re: [PATCH 1/2] net: fastopen: make key handling more robust against
+ future changes
+Message-ID: <20190618181804.GJ184520@gmail.com>
+References: <20190618093207.13436-1-ard.biesheuvel@linaro.org>
+ <20190618093207.13436-2-ard.biesheuvel@linaro.org>
+ <CANn89iJuTq36KMf1madQH08g6K0a-Uj-PDH80ao9zuEw+WNcZg@mail.gmail.com>
+ <CAKv+Gu894bEEzpKNDTaNiiNJTFoUTYQuFjBBm-ezdkrzW5fyNQ@mail.gmail.com>
+ <CANn89i+X7YQ6DueDQAusA+1S5Kmo75OwzO+eYRZe_nR8=YWjuQ@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190618092215.2790800-2-arnd@arndb.de>
+In-Reply-To: <CANn89i+X7YQ6DueDQAusA+1S5Kmo75OwzO+eYRZe_nR8=YWjuQ@mail.gmail.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jun 18, 2019 at 11:21:53AM +0200, Arnd Bergmann wrote:
-> The largest stack object in this file is now the shash descriptor.
-> Since there are many other stack variables, this can push it
-> over the 1024 byte warning limit, in particular with clang and
-> KASAN:
+On Tue, Jun 18, 2019 at 02:53:05AM -0700, Eric Dumazet wrote:
+> On Tue, Jun 18, 2019 at 2:41 AM Ard Biesheuvel
+> <ard.biesheuvel@linaro.org> wrote:
+> >
+> > On Tue, 18 Jun 2019 at 11:39, Eric Dumazet <edumazet@google.com> wrote:
+> > >
+> > > On Tue, Jun 18, 2019 at 2:32 AM Ard Biesheuvel
+> > > <ard.biesheuvel@linaro.org> wrote:
+> > > >
+> > > > Some changes to the TCP fastopen code to make it more robust
+> > > > against future changes in the choice of key/cookie size, etc.
+> > > >
+> > > > - Instead of keeping the SipHash key in an untyped u8[] buffer
+> > > >   and casting it to the right type upon use, use the correct
+> > > >   siphash_key_t type directly. This ensures that the key will
+> > > >   appear at the correct alignment if we ever change the way
+> > > >   these data structures are allocated. (Currently, they are
+> > > >   only allocated via kmalloc so they always appear at the
+> > > >   correct alignment)
+> > > >
+> > > > - Use DIV_ROUND_UP when sizing the u64[] array to hold the
+> > > >   cookie, so it is always of sufficient size, even when
+> > > >   TCP_FASTOPEN_COOKIE_MAX is no longer a multiple of 8.
+> > > >
+> > > > - Add a key length check to tcp_fastopen_reset_cipher(). No
+> > > >   callers exist currently that fail this check (they all pass
+> > > >   compile constant values that equal TCP_FASTOPEN_KEY_LENGTH),
+> > > >   but future changes might create problems, e.g., by leaving part
+> > > >   of the key uninitialized, or overflowing the key buffers.
+> > > >
+> > > > Note that none of these are functional changes wrt the current
+> > > > state of the code.
+> > > >
+> > > ...
+> > >
+> > > > -       memcpy(ctx->key[0], primary_key, len);
+> > > > +       if (unlikely(len != TCP_FASTOPEN_KEY_LENGTH)) {
+> > > > +               pr_err("TCP: TFO key length %u invalid\n", len);
+> > > > +               err = -EINVAL;
+> > > > +               goto out;
+> > > > +       }
+> > >
+> > >
+> > > Why a pr_err() is there ?
+> > >
+> > > Can unpriv users flood the syslog ?
+> >
+> > They can if they could do so before: there was a call to
+> > crypto_cipher_setkey() in the original pre-SipHash code which would
+> > also result in a pr_err() on an invalid key length. That call got
+> > removed along with the AES cipher handling, and this basically
+> > reinstates it, as suggested by EricB.
 > 
-> crypto/testmgr.c:1693:12: error: stack frame size of 1312 bytes in function '__alg_test_hash' [-Werror,-Wframe-larger-than=]
+> This tcp_fastopen_reset_cipher() function is internal to TCP stack, all callers
+> always pass the correct length.
 > 
-> Make test_hash_vs_generic_impl() do the same thing as the
-> corresponding eaed and skcipher functions by allocating the
-
-Typo: "eaed" should be "aead"
-
-> descriptor dynamically. We can still do better than this,
-> but it brings us well below the 1024 byte limit.
+> We could add checks all over the place, and end up having a TCP stack
+> full of defensive
+> checks and 10,000 additional lines of code :/
 > 
-> Suggested-by: Eric Biggers <ebiggers@kernel.org>
-> Fixes: 9a8a6b3f0950 ("crypto: testmgr - fuzz hashes against their generic implementation")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
+> I would prefer not reinstating this.
 
-Actual patch looks fine though.  Thanks!
-
-Reviewed-by: Eric Biggers <ebiggers@kernel.org>
+The length parameter makes no sense if it's not checked, though.  Either it
+should exist and be checked, or it should be removed and the length should be
+implicitly TCP_FASTOPEN_KEY_LENGTH.
 
 - Eric
