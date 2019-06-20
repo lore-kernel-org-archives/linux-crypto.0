@@ -2,91 +2,147 @@ Return-Path: <SRS0=HT46=UT=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_NEOMUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B9FAC43613
-	for <linux-crypto@archiver.kernel.org>; Thu, 20 Jun 2019 06:02:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11BC1C43613
+	for <linux-crypto@archiver.kernel.org>; Thu, 20 Jun 2019 07:08:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4C6CE20B1F
-	for <linux-crypto@archiver.kernel.org>; Thu, 20 Jun 2019 06:02:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D6BB02084A
+	for <linux-crypto@archiver.kernel.org>; Thu, 20 Jun 2019 07:08:11 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=benyossef-com.20150623.gappssmtp.com header.i=@benyossef-com.20150623.gappssmtp.com header.b="d3EG1zAo"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725953AbfFTGCm (ORCPT
+        id S1726124AbfFTHIK (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 20 Jun 2019 02:02:42 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:38376 "EHLO deadmen.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725871AbfFTGCm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 20 Jun 2019 02:02:42 -0400
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1hdq9X-0008UB-3U; Thu, 20 Jun 2019 14:02:31 +0800
-Received: from herbert by gondobar with local (Exim 4.89)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1hdq9N-0006tl-Hn; Thu, 20 Jun 2019 14:02:21 +0800
-Date:   Thu, 20 Jun 2019 14:02:21 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Christophe Leroy <christophe.leroy@c-s.fr>
-Cc:     "David S. Miller" <davem@davemloft.net>, horia.geanta@nxp.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, Imre Deak <imre.deak@intel.com>
-Subject: Re: [PATCH v4 1/4] lib/scatterlist: Fix mapping iterator when
- sg->offset is greater than PAGE_SIZE
-Message-ID: <20190620060221.q4pbsqzsza3pxs42@gondor.apana.org.au>
-References: <cover.1560805614.git.christophe.leroy@c-s.fr>
- <f28c6b0e2f9510f42ca934f19c4315084e668c21.1560805614.git.christophe.leroy@c-s.fr>
+        Thu, 20 Jun 2019 03:08:10 -0400
+Received: from mail-vk1-f193.google.com ([209.85.221.193]:39131 "EHLO
+        mail-vk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726084AbfFTHIK (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 20 Jun 2019 03:08:10 -0400
+Received: by mail-vk1-f193.google.com with SMTP id o19so362138vkb.6
+        for <linux-crypto@vger.kernel.org>; Thu, 20 Jun 2019 00:08:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=benyossef-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=Q/om+71JNDD3JBQpnjSSKL2z2kEsK8+9coO279bnyEo=;
+        b=d3EG1zAoY9QepdPNBMwRdvli5sa3q+t7TrjivVr5U2xwpz7HSj3iy4fL6s9HAqG9F1
+         mE33El0J+x8/s4A1YIwtTVOyeIxwzaV5Xk2Z70aU7qQ/euZ5WXGOwTKVjYgMd39Rtlz4
+         4eeopFCQONJPvozHkt/VfLqjU8vBwvPh3rOoetwodn6PAZuHb63R+soEIqEAAU2RptnU
+         c0OB3Gay14s6Xmeuyy8JTsXBxjaB1Mywz7tSskKq/AP5ISxAg/Ry6QkK7lLbjYde2AGa
+         p9OEZjrHhdCdrquV5DgT1pzMA2VhlCLj0uw+ecSJkWkZT+NCcNC7n9g1wLg9duhOE/2c
+         1RuA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=Q/om+71JNDD3JBQpnjSSKL2z2kEsK8+9coO279bnyEo=;
+        b=XTCGJeOyIsPU1eUlf0LSqHLk44U2pageqi0likyc0SaB1tjIqjsI36VaiOofCca42c
+         lSl6mblwKaCCrmZEYzkyO5JcqEqJthfU5oKAzzQJmm26IqiyaS1WWuOlF+fkukmm59gT
+         ylADZQclCN8gxHWp8gEz6q7pV3ZoAUQM+kkywGMZIPyZuM7zHnx8fiavZjRtpWq7V+8G
+         ywLdpSzP7sarG/6F3PjRFsmtv1U7mfZh1uW8cCzlbC/xrmA4bOQKFPZ4/wToY7fjDCUH
+         x/7vMGJHWNS6NZlr32JufUQy2Z4+6ANwDYBDAKm3PsU3jGVcbRCj1i9PvSzT3AwSD0Zx
+         IWVw==
+X-Gm-Message-State: APjAAAVa1AZIhZbm/O9kB/Auu+u6y7GXMvNPFhUIPg7+Z2GqkwUCjpwS
+        06SDflXu7NNKLDDIDnluthTrguKfCxC4cAgLbC9gvg==
+X-Google-Smtp-Source: APXvYqypwyVP5mceH1L7RcgVsjBUMco5nm+IpbFYBDiFn+6Cqv/1dXa5oRNxgzHMg6Do3AUxnc61OPOl4g0CdNxFCHo=
+X-Received: by 2002:a1f:8c7:: with SMTP id 190mr3978438vki.18.1561014489490;
+ Thu, 20 Jun 2019 00:08:09 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f28c6b0e2f9510f42ca934f19c4315084e668c21.1560805614.git.christophe.leroy@c-s.fr>
-User-Agent: NeoMutt/20170113 (1.7.2)
+References: <20190619162921.12509-1-ard.biesheuvel@linaro.org>
+In-Reply-To: <20190619162921.12509-1-ard.biesheuvel@linaro.org>
+From:   Gilad Ben-Yossef <gilad@benyossef.com>
+Date:   Thu, 20 Jun 2019 10:07:57 +0300
+Message-ID: <CAOtvUMc0J3ufp3QyPwERdkRKfKzB_avPBoXSNWiCDS03jkNUzg@mail.gmail.com>
+Subject: Re: [PATCH v3 0/6] crypto: switch to crypto API for ESSIV generation
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Eric Biggers <ebiggers@google.com>,
+        device-mapper development <dm-devel@redhat.com>,
+        linux-fscrypt@vger.kernel.org, Milan Broz <gmazyland@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jun 17, 2019 at 09:15:02PM +0000, Christophe Leroy wrote:
-> All mapping iterator logic is based on the assumption that sg->offset
-> is always lower than PAGE_SIZE.
-> 
-> But there are situations where sg->offset is such that the SG item
-> is on the second page. In that case sg_copy_to_buffer() fails
-> properly copying the data into the buffer. One of the reason is
-> that the data will be outside the kmapped area used to access that
-> data.
-> 
-> This patch fixes the issue by adjusting the mapping iterator
-> offset and pgoffset fields such that offset is always lower than
-> PAGE_SIZE.
-> 
-> Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
-> Fixes: 4225fc8555a9 ("lib/scatterlist: use page iterator in the mapping iterator")
-> Cc: stable@vger.kernel.org
-> ---
->  lib/scatterlist.c | 9 +++++++--
->  1 file changed, 7 insertions(+), 2 deletions(-)
+On Wed, Jun 19, 2019 at 7:29 PM Ard Biesheuvel
+<ard.biesheuvel@linaro.org> wrote:
+>
+> This series creates an ESSIV template that produces a skcipher or AEAD
+> transform based on a tuple of the form '<skcipher>,<cipher>,<shash>'
+> (or '<aead>,<cipher>,<shash>' for the AEAD case). It exposes the
+> encapsulated sync or async skcipher/aead by passing through all operation=
+s,
+> while using the cipher/shash pair to transform the input IV into an ESSIV
+> output IV.
+>
+> This matches what both users of ESSIV in the kernel do, and so it is prop=
+osed
+> as a replacement for those, in patches #2 and #4.
+>
+> This code has been tested using the fscrypt test suggested by Eric
+> (generic/549), as well as the mode-test script suggested by Milan for
+> the dm-crypt case. I also tested the aead case in a virtual machine,
+> but it definitely needs some wider testing from the dm-crypt experts.
+>
+> Changes since v2:
+> - fixed a couple of bugs that snuck in after I'd done the bulk of my
+>   testing
+> - some cosmetic tweaks to the ESSIV template skcipher setkey function
+>   to align it with the aead one
+> - add a test case for essiv(cbc(aes),aes,sha256)
+> - add an accelerated implementation for arm64 that combines the IV
+>   derivation and the actual en/decryption in a single asm routine
+>
+> Scroll down for tcrypt speed test result comparing the essiv template
+> with the asm implementation. Bare cbc(aes) tests included for reference
+> as well. Taken on a 2GHz Cortex-A57 (AMD Seattle)
+>
+> Code can be found here
+> https://git.kernel.org/pub/scm/linux/kernel/git/ardb/linux.git/log/?h=3De=
+ssiv-v3
 
-Good catch.
 
-> @@ -686,7 +686,12 @@ static bool sg_miter_get_next_page(struct sg_mapping_iter *miter)
->  		sg = miter->piter.sg;
->  		pgoffset = miter->piter.sg_pgoffset;
->  
-> -		miter->__offset = pgoffset ? 0 : sg->offset;
-> +		offset = pgoffset ? 0 : sg->offset;
-> +		while (offset >= PAGE_SIZE) {
-> +			miter->piter.sg_pgoffset = ++pgoffset;
-> +			offset -= PAGE_SIZE;
-> +		}
+Thank you Ard for this work. It is very useful. I am testing this now
+with the essiv implementation inside CryptoCell.
 
-How about
+One possible future optimization this opens the door for is having the
+template auto-increment the sector number.
 
-	miter->piter.sg_pgoffset += offset >> PAGE_SHIFT;
-	offset &= PAGE_SIZE - 1;
+This will allow the device manager or fscrypt code to ask for crypto
+services on buffer spanning over a single sector size
+and have the crypto code automatically increment the sector number
+when processing the buffer.
+
+This may potentially shave a few cycles because it can potentially
+turn multiple calls into the crypto API in one, giving
+the crypto code a larger buffer to work on.
+
+This is actually supported by CryptoCell hardware and to the best of
+my knowledge also by a similar HW from Qualcomm
+via out-of-tree patches found in the Android tree.
+
+If this makes sense to you perhaps it is a good idea to have the
+template format be:
+
+<skcipher>,<cipher>,<shash>, <sector size>
+
+Where for now we will only support a sector size of '0' (i.e. do not
+auto-increment) and later extend or am I over engineering? :-)
 
 Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Gilad
+
+
+--=20
+Gilad Ben-Yossef
+Chief Coffee Drinker
+
+values of =CE=B2 will give rise to dom!
