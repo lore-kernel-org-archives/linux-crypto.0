@@ -5,170 +5,132 @@ X-Spam-Level:
 X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00BE7C48BE4
-	for <linux-crypto@archiver.kernel.org>; Thu, 20 Jun 2019 12:07:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00EE7C43613
+	for <linux-crypto@archiver.kernel.org>; Thu, 20 Jun 2019 12:09:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CBCE02080D
-	for <linux-crypto@archiver.kernel.org>; Thu, 20 Jun 2019 12:07:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CA1A42080C
+	for <linux-crypto@archiver.kernel.org>; Thu, 20 Jun 2019 12:09:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SGfxMA/a"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pGQojq13"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726951AbfFTMHc (ORCPT
+        id S1731716AbfFTMJV (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 20 Jun 2019 08:07:32 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:45783 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726704AbfFTMHc (ORCPT
+        Thu, 20 Jun 2019 08:09:21 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:39162 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730596AbfFTMJV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 20 Jun 2019 08:07:32 -0400
-Received: by mail-wr1-f67.google.com with SMTP id f9so2729973wre.12;
-        Thu, 20 Jun 2019 05:07:30 -0700 (PDT)
+        Thu, 20 Jun 2019 08:09:21 -0400
+Received: by mail-wr1-f66.google.com with SMTP id x4so2772433wrt.6;
+        Thu, 20 Jun 2019 05:09:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=fWInJZV9G+ALRJgF96UsSfEQo+Nr0jEpCwgfg6RpTMM=;
-        b=SGfxMA/auQHLkjCgvzy0/rjhdXFIiOZlY0xzr+gfOk7tLshPSeHj+jIxIolAyT+jFv
-         +r5X8Fj1S8DUeDW3+IUPVrXwprGK+agASiHedUIulI23OiGdiYeM7b4/xy7KBuDLEHAo
-         /84H+i9fvFy6V20/mfV09aqD+TUxjXwSSTWQsNXUatr+YDfLPEQRzHBhngxQCJLG8uOS
-         hUMaPFT2jnr+BqLVCC6rP9xApL7IG4fLUP16mQwnF+9FxqVvICkBroWrNZJJjPx8dzVe
-         s0vTiPb2IIC29pKLCKcxEnK+7PvS9Hn8PtrJjxWUmtTmrPnzaMZKgS9d8CFibgfoHf+O
-         1zIg==
+        h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=5mvPAeiaYnKYEQR24EInixOGLfqaTMkg5VDMI1QMmMg=;
+        b=pGQojq13gpTSCFuKobX79+3Cf9Ml5Lo1gq8THOBHUlnhFxv34m3uy/JOF0LlcQFe17
+         FJLrcQwDz14qisxiRbhjz2FLNDTMgU3VtVnUs8DwAgrslevzrKlBObNOur4jAsWQeuZz
+         cR81mIsxu5qIp/LIZN9elRR/tLAwdDR9abHjj7JIKmOuae+xEba87HrTM3yLkg9hlUbP
+         eaVr3hr1M58XPyCyKIZF1h90OGdGpelI8YRwIYG4rhQ3d4m91C540TalmWoXlZFv+kn+
+         ECr4O6xxdNeSsebyhocdHAEd4um52Rvx8eaaJ26wz/a8z3OvnQ+LgXTAmIC5wnS85HeJ
+         05Tg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=fWInJZV9G+ALRJgF96UsSfEQo+Nr0jEpCwgfg6RpTMM=;
-        b=m3WAJYCSTeYuUVv1aWlvxoDRYFVW+AKvvOTbCpOqwAMQALtqoVQTw1xkkThF63opoy
-         Wplo/xt6ytRbydzfk/gKBONwivsBoQyuzyfrusyuXW+EmOlzDEK8wcIB9L9foG5WkPR8
-         P4dHFuZtpulGEbBTu2binRza6RSbJmCoB6htYS2amoc3qftQ7TNnG2wA+MBCJAe2IT30
-         mzdth7MuntZrwNMrKiKwmDfTXPCmtV4l5JmFdIgMb6rlKjymHzg2ynuM4wZQ7J5O2/9f
-         uvEwVA4z2Yn8EjqQ/bYowck+DX5uiAHeH4X4EAMBDq366X2ddvBux3QxR6+fu3L1aVXk
-         I3Mg==
-X-Gm-Message-State: APjAAAUFgeAyLqIbE30HUOq4eM7ler+K46Arzdny1shHofzkkDVXskUR
-        v6JroaBVbhoVOyoHlaHOiNg=
-X-Google-Smtp-Source: APXvYqxZpIVy6bGGEudPOi7E+EbbfkbsHbRt2Cm94Uu9vtNdWs+76OKBHhsGJF/igQA4KxOXjMAPRA==
-X-Received: by 2002:adf:ebcd:: with SMTP id v13mr16823195wrn.263.1561032449986;
-        Thu, 20 Jun 2019 05:07:29 -0700 (PDT)
-Received: from debian64.daheim (pD9E29A96.dip0.t-ipconnect.de. [217.226.154.150])
-        by smtp.gmail.com with ESMTPSA id y19sm6251145wmc.21.2019.06.20.05.07.28
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 20 Jun 2019 05:07:28 -0700 (PDT)
-Received: from localhost.daheim ([127.0.0.1] helo=debian64.localnet)
-        by debian64.daheim with esmtp (Exim 4.92)
-        (envelope-from <chunkeey@gmail.com>)
-        id 1hdvqh-0001xc-SZ; Thu, 20 Jun 2019 14:07:27 +0200
-From:   Christian Lamparter <chunkeey@gmail.com>
-To:     Hauke Mehrtens <hauke@hauke-m.de>
-Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        gregkh@linuxfoundation.org, stable <stable@vger.kernel.org>,
-        linux-crypto@vger.kernel.org, Amit Pundir <amit.pundir@linaro.org>
-Subject: Re: crypto: crypto4xx - properly set IV after de- and encrypt breaks kernel 4.4
-Date:   Thu, 20 Jun 2019 14:07:27 +0200
-Message-ID: <4226536.PGTo7a8ESG@debian64>
-In-Reply-To: <9d744c3b-d4ff-b84b-527b-fc050794499b@hauke-m.de>
-References: <9d744c3b-d4ff-b84b-527b-fc050794499b@hauke-m.de>
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=5mvPAeiaYnKYEQR24EInixOGLfqaTMkg5VDMI1QMmMg=;
+        b=uV2eE5h/ZgvmX2w/gKihd2/IfgPSl5Hzi5OpXJbmGE9tsAHnUBnmclBzg8MM+wzL5d
+         rbOGeYzFSQKG8qtAIbZaG7APRfXWzKlYObEjYCmdriJkVVFMR23Hcczc4audnYF0J4le
+         R8WOx9pAFzXwbZz88nGTJ1DQ4CwATVvtZ7eW0lrcXwRSzLYsXOpAQoG4fS9oj8EtL2/D
+         E07pE1xNgzwhy9VK/NfRRFsNTkuDmEmYr2DdW9wPOXxIIHWabC51ZwJTgjed7QrOyChk
+         Q2vZGHzhw/RvF5LgnTANHIu9DZxsqZLS2ozcZGGJTeLbXLhtVnGs2tk8sJhukSYfvCgK
+         dUWA==
+X-Gm-Message-State: APjAAAXzvT7IWWMW7htSR48ikAKnNsg0Rah7FcEkf/J7b18tJdFRdEYL
+        RSgei5GzJFqql75MpuFi9Po=
+X-Google-Smtp-Source: APXvYqyY1DjkAMtvJgSsiPIR9M/m05hvqBQ8unv5XRo45PSSzjG0yRy5CETsPxPn/L1QURVdkuA1jQ==
+X-Received: by 2002:adf:e446:: with SMTP id t6mr79712848wrm.115.1561032558831;
+        Thu, 20 Jun 2019 05:09:18 -0700 (PDT)
+Received: from [172.22.36.64] (redhat-nat.vtp.fi.muni.cz. [78.128.215.6])
+        by smtp.gmail.com with ESMTPSA id f204sm6483119wme.18.2019.06.20.05.09.18
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Thu, 20 Jun 2019 05:09:18 -0700 (PDT)
+Subject: Re: [PATCH v3 0/6] crypto: switch to crypto API for ESSIV generation
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Eric Biggers <ebiggers@google.com>,
+        device-mapper development <dm-devel@redhat.com>,
+        linux-fscrypt@vger.kernel.org,
+        Gilad Ben-Yossef <gilad@benyossef.com>
+References: <20190619162921.12509-1-ard.biesheuvel@linaro.org>
+ <459f5760-3a1c-719d-2b44-824ba6283dd7@gmail.com>
+ <CAKv+Gu9jk8KxWykTcKeh6k0HUb47wgx7iZYuwwN8AUyErFLXxA@mail.gmail.com>
+From:   Milan Broz <gmazyland@gmail.com>
+Openpgp: preference=signencrypt
+Message-ID: <075cddec-1603-4a23-17c4-c766b4bd9086@gmail.com>
+Date:   Thu, 20 Jun 2019 14:09:17 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+In-Reply-To: <CAKv+Gu9jk8KxWykTcKeh6k0HUb47wgx7iZYuwwN8AUyErFLXxA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thursday, June 20, 2019 11:36:50 AM CEST Hauke Mehrtens wrote:
-> Hi,
+On 20/06/2019 13:54, Ard Biesheuvel wrote:
+> On Thu, 20 Jun 2019 at 13:22, Milan Broz <gmazyland@gmail.com> wrote:
+>>
+>> On 19/06/2019 18:29, Ard Biesheuvel wrote:
+>>> This series creates an ESSIV template that produces a skcipher or AEAD
+>>> transform based on a tuple of the form '<skcipher>,<cipher>,<shash>'
+>>> (or '<aead>,<cipher>,<shash>' for the AEAD case). It exposes the
+>>> encapsulated sync or async skcipher/aead by passing through all operations,
+>>> while using the cipher/shash pair to transform the input IV into an ESSIV
+>>> output IV.
+>>>
+>>> This matches what both users of ESSIV in the kernel do, and so it is proposed
+>>> as a replacement for those, in patches #2 and #4.
+>>>
+>>> This code has been tested using the fscrypt test suggested by Eric
+>>> (generic/549), as well as the mode-test script suggested by Milan for
+>>> the dm-crypt case. I also tested the aead case in a virtual machine,
+>>> but it definitely needs some wider testing from the dm-crypt experts.
+>>>
+>>> Changes since v2:
+>>> - fixed a couple of bugs that snuck in after I'd done the bulk of my
+>>>   testing
+>>> - some cosmetic tweaks to the ESSIV template skcipher setkey function
+>>>   to align it with the aead one
+>>> - add a test case for essiv(cbc(aes),aes,sha256)
+>>> - add an accelerated implementation for arm64 that combines the IV
+>>>   derivation and the actual en/decryption in a single asm routine
+>>
+>> I run tests for the whole patchset, including some older scripts and seems
+>> it works for dm-crypt now.
+>>
 > 
-> The patch "crypto: crypto4xx - properly set IV after de- and encrypt"
-> causes a compile error on kernel 4.4.
-
-3.18 as well.
+> Thanks Milan, that is really helpful.
 > 
-> When I revert this commit it compiles for me again:
-> https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?id=e9a60ab1609a7d975922adad1bf9c46ac6954584
-> 
-> I do not have hardware to test if it is really working.
+> Does this include configurations that combine authenc with essiv?
 
-I have a few APM821XX. But please note drivers without
+Hm, seems that we are missing these in luks2-integrity-test. I'll add them there.
 
-commit b66c685a482117d4e9ee987d252ca673689a5302
-Author: Christian Lamparter <chunkeey@gmail.com>
-Date:   Fri Dec 22 21:18:36 2017 +0100
+I also used this older test
+https://gitlab.com/omos/dm-crypt-test-scripts/blob/master/root/test_dmintegrity.sh
 
-    crypto: crypto4xx - support Revision B parts
+(just aes-gcm-random need to be commented out, we never supported this format, it was
+written for some devel version)
 
-don't work on those and I do have my doubts that 460EX
-series (and older) would either. I also don't believe that
-the inital driver as it was submitted would have worked.
-From what I've seen in their SDK, they patched the testmgr
-at the time to either disable tests or provided their own...
-so, might as well revert these patches for 4.4 and 3.18.
+But seems ESSIV is there tested only without AEAD composition...
 
-Because...
- 
-> drivers/crypto/amcc/crypto4xx_core.c: In function
-> 'crypto4xx_ablkcipher_done':
-> drivers/crypto/amcc/crypto4xx_core.c:649:21: warning: dereferencing
-> 'void *' pointer
->   if (pd_uinfo->sa_va->sa_command_0.bf.save_iv == SA_SAVE_IV) {
+So yes, this AEAD part need more testing.
 
-This would probably need 
-9e0a0b3a1 ("crypto: crypto4xx - pointer arithmetic overhaul") which is
-a big patch.
-
->                      ^
-> drivers/crypto/amcc/crypto4xx_core.c:649:21: error: request for member
-> 'sa_command_0' in something not a structure or union
-> drivers/crypto/amcc/crypto4xx_core.c:650:38: error: implicit declaration
-> of function 'crypto_skcipher_reqtfm' [-Werror=implicit-function-declaration]
->    struct crypto_skcipher *skcipher = crypto_skcipher_reqtfm(req);
->                                       ^
-This would require adding #include <crypto/skcipher.h> to crypto4xx_core.c
-
-The patch that added it upstream was 
-ce05ffe10457 ("crypto: crypto4xx - convert to skcipher")
-
-But this is more than just a one-liner.
-
-> drivers/crypto/amcc/crypto4xx_core.c:650:61: error: 'req' undeclared
-> (first use in this function)
->    struct crypto_skcipher *skcipher = crypto_skcipher_reqtfm(req);
->                                                              ^
-> drivers/crypto/amcc/crypto4xx_core.c:650:61: note: each undeclared
-> identifier is reported only once for each function it appears in
-see "#include <crypto/skcipher.h>"
-
-> drivers/crypto/amcc/crypto4xx_core.c:652:3: error: implicit declaration
-> of function 'crypto4xx_memcpy_from_le32'
-> [-Werror=implicit-function-declaration]
->    crypto4xx_memcpy_from_le32((u32 *)req->iv,
->    ^
-
-crypto4xx_memcpy_from_le32 is from
-4865b122d4af ("crypto: crypto4xx - use the correct LE32 format for IV and key defs")
-
-I think crypto4xx_memcpy_le() could work in this place.
-But again I do have my doubts that the device works
-without said patch.
-
-> drivers/crypto/amcc/crypto4xx_core.c:653:19: warning: dereferencing
-> 'void *' pointer
->     pd_uinfo->sr_va->save_iv,
->                    ^
-> drivers/crypto/amcc/crypto4xx_core.c:653:19: error: request for member
-> 'save_iv' in something not a structure or union
-See "crypto: crypto4xx - pointer arithmetic overhaul".
-> drivers/crypto/amcc/crypto4xx_core.c:654:4: error: implicit declaration
-> of function 'crypto_skcipher_ivsize' [-Werror=implicit-function-declaration]
->     crypto_skcipher_ivsize(skcipher));
->     ^
-
-see "#include <crypto/skcipher.h>"
-
-(Yeaah, there seems to be a limit of what automatic cherry-picking of
-patches can do :( )
-
-
-
+Milan
