@@ -6,58 +6,56 @@ X-Spam-Status: No, score=-5.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_NEOMUTT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D44EFC43613
-	for <linux-crypto@archiver.kernel.org>; Thu, 20 Jun 2019 08:06:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC63CC43613
+	for <linux-crypto@archiver.kernel.org>; Thu, 20 Jun 2019 08:06:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B4DCC20449
-	for <linux-crypto@archiver.kernel.org>; Thu, 20 Jun 2019 08:06:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9BAF820449
+	for <linux-crypto@archiver.kernel.org>; Thu, 20 Jun 2019 08:06:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726122AbfFTIG1 (ORCPT
+        id S1726168AbfFTIGe (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 20 Jun 2019 04:06:27 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:43588 "EHLO deadmen.hmeau.com"
+        Thu, 20 Jun 2019 04:06:34 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:43602 "EHLO deadmen.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725877AbfFTIG1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 20 Jun 2019 04:06:27 -0400
+        id S1725877AbfFTIGe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 20 Jun 2019 04:06:34 -0400
 Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
         by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1hds5N-0002E7-Qu; Thu, 20 Jun 2019 16:06:21 +0800
+        id 1hds5S-0002ED-0a; Thu, 20 Jun 2019 16:06:26 +0800
 Received: from herbert by gondobar with local (Exim 4.89)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1hds5I-0007W7-Ja; Thu, 20 Jun 2019 16:06:16 +0800
-Date:   Thu, 20 Jun 2019 16:06:16 +0800
+        id 1hds5R-0007aV-M2; Thu, 20 Jun 2019 16:06:25 +0800
+Date:   Thu, 20 Jun 2019 16:06:25 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Daniel Axtens <dja@axtens.net>
-Cc:     mpe@ellerman.id.au, ebiggers@kernel.org,
-        linux-crypto@vger.kernel.org, marcelo.cerri@canonical.com,
-        Stephan Mueller <smueller@chronox.de>,
-        leo.barbosa@canonical.com, linuxppc-dev@lists.ozlabs.org,
-        nayna@linux.ibm.com, pfsmorigo@gmail.com, leitao@debian.org,
-        gcwilson@linux.ibm.com, omosnacek@gmail.com
-Subject: Re: [PATCH] crypto: vmx - Document CTR mode counter width quirks
-Message-ID: <20190620080616.73fb2bq4yeeso4ia@gondor.apana.org.au>
-References: <20190611015431.26772-1-dja@axtens.net>
+To:     Christophe Leroy <christophe.leroy@c-s.fr>
+Cc:     "David S. Miller" <davem@davemloft.net>, horia.geanta@nxp.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH] crypto: talitos - fix max key size for sha384 and sha512
+Message-ID: <20190620080625.5q5sok7ihh4ell2y@gondor.apana.org.au>
+References: <5f1004d33b2347dcfbc677551bafc9d469bb079e.1560318544.git.christophe.leroy@c-s.fr>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20190611015431.26772-1-dja@axtens.net>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <5f1004d33b2347dcfbc677551bafc9d469bb079e.1560318544.git.christophe.leroy@c-s.fr>
 User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jun 11, 2019 at 11:54:31AM +1000, Daniel Axtens wrote:
-> The CTR code comes from OpenSSL, where it does a 32-bit counter.
-> The kernel has a 128-bit counter. This difference has lead to
-> issues.
+On Wed, Jun 12, 2019 at 05:49:50AM +0000, Christophe Leroy wrote:
+> Below commit came with a typo in the CONFIG_ symbol, leading
+> to a permanently reduced max key size regarless of the driver
+> capabilities.
 > 
-> Document it.
-> 
-> Signed-off-by: Daniel Axtens <dja@axtens.net>
+> Reported-by: Horia Geantă <horia.geanta@nxp.com>
+> Fixes: b8fbdc2bc4e7 ("crypto: talitos - reduce max key size for SEC1")
+> Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
 > ---
->  drivers/crypto/vmx/aesp8-ppc.pl | 22 ++++++++++++++++++++--
->  1 file changed, 20 insertions(+), 2 deletions(-)
+>  drivers/crypto/talitos.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Patch applied.  Thanks.
 -- 
