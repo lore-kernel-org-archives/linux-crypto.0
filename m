@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DEDBC4646B
-	for <linux-crypto@archiver.kernel.org>; Sat, 22 Jun 2019 19:34:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6455C43613
+	for <linux-crypto@archiver.kernel.org>; Sat, 22 Jun 2019 19:34:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 246C820657
-	for <linux-crypto@archiver.kernel.org>; Sat, 22 Jun 2019 19:34:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 979D820657
+	for <linux-crypto@archiver.kernel.org>; Sat, 22 Jun 2019 19:34:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kBHPINNO"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jJ3qN3P7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726338AbfFVTey (ORCPT
+        id S1726370AbfFVTe4 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 22 Jun 2019 15:34:54 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:40961 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726286AbfFVTey (ORCPT
+        Sat, 22 Jun 2019 15:34:56 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:40963 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726359AbfFVTez (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 22 Jun 2019 15:34:54 -0400
-Received: by mail-wr1-f67.google.com with SMTP id c2so9704617wrm.8
-        for <linux-crypto@vger.kernel.org>; Sat, 22 Jun 2019 12:34:51 -0700 (PDT)
+        Sat, 22 Jun 2019 15:34:55 -0400
+Received: by mail-wr1-f66.google.com with SMTP id c2so9704653wrm.8
+        for <linux-crypto@vger.kernel.org>; Sat, 22 Jun 2019 12:34:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=8rzDm2pxsxDof2+7Zzrqa2tkF2eXq+Yv+cQAP5RFetY=;
-        b=kBHPINNOkXhgNeZrO083oUFhDSW9AT0ZnejWBybqSGkBaGJ+gfR2PxCRH3oOidz5Dl
-         4UUnIK5Udm5KrB/Bueydeice4U/6dBOsBMvNR/XllDrWId3+CFccntD1Coj4OQyt7EEg
-         2qN5FGMIyIaqUI4OuwMbOE2fRpraXZTrl2kWHemj5WHH9gletc4JTrJyPcHXh5mNje9P
-         edGZF9YeJjeLotEiJEvy2/x0yUTKIxWODBMa5G0rwTilrlro3zo3lKWv0p0XqIko4oyn
-         dkGAGyYWVzHKCCEsk48D5UuVKMAG0nwqwTb7+sPzydZdKTdxmitCHybhgHplIMAjh98o
-         65fg==
+        bh=Pgzq94PpKRgLR2IqqS+QLXIksHPk3/jPtTuBsqGb9fM=;
+        b=jJ3qN3P7GB+LlOmKMZdJl6R+axoPADCBKhPa5hcIDq7yq3IJ3g06DH8JkGaZ5ArLd3
+         DQVRyVzYlmDx9Msk1nlD/j3pe2RFyrapO00lU5nYQoAiFH+q0jnOkb32uHjD92gMoIu+
+         jP6EH1wzF+cN93pZEYoQThimIrdpgiKtxagV4DunVLv8T0TOO2yt4b/xHS+YHWFcetwd
+         DBnUu09qQ3D4IqoKEIPeWajOvYk4dbcOJ6rL+eNasQ1tgLIZ2sKYmI0tAlBlvAkmzogJ
+         9q96mI/HO4Mx+MQyghDeubACjAlCAYJWSjvfW+FGG4YHcqfU5CImVncNhCTgPTvVWtdi
+         gsyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=8rzDm2pxsxDof2+7Zzrqa2tkF2eXq+Yv+cQAP5RFetY=;
-        b=MG6+VRdAIyJCSAcS8mPbOlE3mKic4DTq1cVASAayeVHNv+5z+XRJCiA7308adVU2Ke
-         Tfs1qeoHBCjbTHEPEntItqG+TfOOvB6N5rfPSVNCpw3yrRknEQg+DzZVH+26aW76jo4y
-         MXA22hooq2ejJymFIeea05yEZBBoPBYu5oLIyEUpG1D2lWzotmOnF+mPcdr8muurG/nQ
-         P0LSsZPyO+aGR+BDDPDoTmq4A69sbfeXt3N+ZOnk763d1tYKlp+xelJOjbxl7tXKcjd9
-         zjzhpayGptJrWNfDQ/RPzOI/c+cyF1/W1ZP2WA9fMMwQ8eeO45F26tjOCBBrb8ULJCNM
-         WoAA==
-X-Gm-Message-State: APjAAAVUNgAlzJMuFuvAfWqdGljUdCT2xcRcoXlmz+ch5hsCKcXEHzEx
-        JomADrTEMXha2g0UfpE6fBpNk/4x6c8wMNbs
-X-Google-Smtp-Source: APXvYqx0g12Oz47J0gKgnxJyqgwncPyq+5wVztptRi2BQ4u5oggc444QOp0K9Gzq8yFSJCXNbY8m8Q==
-X-Received: by 2002:a5d:4949:: with SMTP id r9mr41692492wrs.289.1561232090966;
-        Sat, 22 Jun 2019 12:34:50 -0700 (PDT)
+        bh=Pgzq94PpKRgLR2IqqS+QLXIksHPk3/jPtTuBsqGb9fM=;
+        b=V2TSxoU1U423MQni2VelkntoOB845YW3tD9PVjA3EG+z9BgloZus1d0Qk4Nxhdo2i4
+         VB22I33TNOGsAna6NHWALBzbwQ1pB33e9DK1Bs8ZB9uBUwBMIdyTEy5mv9lBrHAghneK
+         wLxSC+k0xE6BL8RlHnHPPb4L9x1fgVpG0omTdW17mJ49TkmAjyfisyHfwaLKc1gkLJUb
+         HyNe3yPUdSOr6RZSrpPGukH9wLEz3c3026r7rbDqvypCC2Y4J9LH3tHlrT54YnFXFzq1
+         hd37Xl6/DoKcZMsumIu8oVPjmrO6MD/OthG53fpUwqfDTtkBJZqwLSXqxFTZ9EUzif3E
+         Jtyw==
+X-Gm-Message-State: APjAAAUb8SFKOCiA78wchj8wb+z2f8IOdIuK8R/HtNU6kbS7qPDMp38N
+        U1UnoFr8mHhKniyTpE5qHOOB4nln5y1555Ex
+X-Google-Smtp-Source: APXvYqyHZbP0R8JRWi1nYXnb/1R5OY1A0rdlL/X1BUAWdbaHWE0LUz5cBCDuxxAo9oiQbwHY8BY7jA==
+X-Received: by 2002:adf:e8cb:: with SMTP id k11mr4318379wrn.244.1561232092962;
+        Sat, 22 Jun 2019 12:34:52 -0700 (PDT)
 Received: from sudo.home ([2a01:cb1d:112:6f00:4bd:3f91:4ef8:ae7e])
-        by smtp.gmail.com with ESMTPSA id h8sm4814494wmf.12.2019.06.22.12.34.49
+        by smtp.gmail.com with ESMTPSA id h8sm4814494wmf.12.2019.06.22.12.34.52
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 22 Jun 2019 12:34:50 -0700 (PDT)
+        Sat, 22 Jun 2019 12:34:52 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     herbert@gondor.apana.org.au, ebiggers@google.com,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v2 10/26] crypto: arm64/ghash - switch to AES library
-Date:   Sat, 22 Jun 2019 21:34:11 +0200
-Message-Id: <20190622193427.20336-11-ard.biesheuvel@linaro.org>
+Subject: [PATCH v2 12/26] crypto: arm64/aes-ccm - switch to AES library
+Date:   Sat, 22 Jun 2019 21:34:13 +0200
+Message-Id: <20190622193427.20336-13-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190622193427.20336-1-ard.biesheuvel@linaro.org>
 References: <20190622193427.20336-1-ard.biesheuvel@linaro.org>
@@ -73,10 +73,10 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The GHASH code uses the generic AES key expansion routines, and calls
-directly into the scalar table based AES cipher for arm64 from the
-fallback path, and since this implementation is known to be non-time
-invariant, doing so from a time invariant SIMD cipher is a bit nasty.
+The CCM code calls directly into the scalar table based AES cipher for
+arm64 from the fallback path, and since this implementation is known to
+be non-time invariant, doing so from a time invariant SIMD cipher is a
+bit nasty.
 
 So let's switch to the AES library - this makes the code more robust,
 and drops the dependency on the generic AES cipher, allowing us to
@@ -84,122 +84,81 @@ omit it entirely in the future.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm64/crypto/Kconfig         |  3 +-
- arch/arm64/crypto/ghash-ce-glue.c | 30 +++++++-------------
- 2 files changed, 11 insertions(+), 22 deletions(-)
+ arch/arm64/crypto/Kconfig           |  2 +-
+ arch/arm64/crypto/aes-ce-ccm-glue.c | 18 ++++++------------
+ 2 files changed, 7 insertions(+), 13 deletions(-)
 
 diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
-index d9a523ecdd83..1762055e7093 100644
+index 1762055e7093..c6032bfb44fb 100644
 --- a/arch/arm64/crypto/Kconfig
 +++ b/arch/arm64/crypto/Kconfig
-@@ -58,8 +58,7 @@ config CRYPTO_GHASH_ARM64_CE
- 	depends on KERNEL_MODE_NEON
- 	select CRYPTO_HASH
- 	select CRYPTO_GF128MUL
--	select CRYPTO_AES
+@@ -80,8 +80,8 @@ config CRYPTO_AES_ARM64_CE_CCM
+ 	depends on ARM64 && KERNEL_MODE_NEON
+ 	select CRYPTO_ALGAPI
+ 	select CRYPTO_AES_ARM64_CE
 -	select CRYPTO_AES_ARM64
+ 	select CRYPTO_AEAD
 +	select CRYPTO_LIB_AES
  
- config CRYPTO_CRCT10DIF_ARM64_CE
- 	tristate "CRCT10DIF digest algorithm using PMULL instructions"
-diff --git a/arch/arm64/crypto/ghash-ce-glue.c b/arch/arm64/crypto/ghash-ce-glue.c
-index b39ed99b06fb..90496765d22f 100644
---- a/arch/arm64/crypto/ghash-ce-glue.c
-+++ b/arch/arm64/crypto/ghash-ce-glue.c
-@@ -73,8 +73,6 @@ asmlinkage void pmull_gcm_decrypt(int blocks, u64 dg[], u8 dst[],
- asmlinkage void pmull_gcm_encrypt_block(u8 dst[], u8 const src[],
- 					u32 const rk[], int rounds);
+ config CRYPTO_AES_ARM64_CE_BLK
+ 	tristate "AES in ECB/CBC/CTR/XTS modes using ARMv8 Crypto Extensions"
+diff --git a/arch/arm64/crypto/aes-ce-ccm-glue.c b/arch/arm64/crypto/aes-ce-ccm-glue.c
+index cb89c80800b5..b9b7cf4b5a8f 100644
+--- a/arch/arm64/crypto/aes-ce-ccm-glue.c
++++ b/arch/arm64/crypto/aes-ce-ccm-glue.c
+@@ -46,8 +46,6 @@ asmlinkage void ce_aes_ccm_decrypt(u8 out[], u8 const in[], u32 cbytes,
+ asmlinkage void ce_aes_ccm_final(u8 mac[], u8 const ctr[], u32 const rk[],
+ 				 u32 rounds);
  
 -asmlinkage void __aes_arm64_encrypt(u32 *rk, u8 *out, const u8 *in, int rounds);
 -
- static int ghash_init(struct shash_desc *desc)
+ static int ccm_setkey(struct crypto_aead *tfm, const u8 *in_key,
+ 		      unsigned int key_len)
  {
- 	struct ghash_desc_ctx *ctx = shash_desc_ctx(desc);
-@@ -312,14 +310,13 @@ static int gcm_setkey(struct crypto_aead *tfm, const u8 *inkey,
- 	u8 key[GHASH_BLOCK_SIZE];
- 	int ret;
+@@ -127,8 +125,7 @@ static void ccm_update_mac(struct crypto_aes_ctx *key, u8 mac[], u8 const in[],
+ 		}
  
--	ret = crypto_aes_expand_key(&ctx->aes_key, inkey, keylen);
-+	ret = aes_expandkey(&ctx->aes_key, inkey, keylen);
- 	if (ret) {
- 		tfm->base.crt_flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
- 		return -EINVAL;
+ 		while (abytes >= AES_BLOCK_SIZE) {
+-			__aes_arm64_encrypt(key->key_enc, mac, mac,
+-					    num_rounds(key));
++			aes_encrypt(key, mac, mac);
+ 			crypto_xor(mac, in, AES_BLOCK_SIZE);
+ 
+ 			in += AES_BLOCK_SIZE;
+@@ -136,8 +133,7 @@ static void ccm_update_mac(struct crypto_aes_ctx *key, u8 mac[], u8 const in[],
+ 		}
+ 
+ 		if (abytes > 0) {
+-			__aes_arm64_encrypt(key->key_enc, mac, mac,
+-					    num_rounds(key));
++			aes_encrypt(key, mac, mac);
+ 			crypto_xor(mac, in, abytes);
+ 			*macp = abytes;
+ 		}
+@@ -209,10 +205,8 @@ static int ccm_crypt_fallback(struct skcipher_walk *walk, u8 mac[], u8 iv0[],
+ 				bsize = nbytes;
+ 
+ 			crypto_inc(walk->iv, AES_BLOCK_SIZE);
+-			__aes_arm64_encrypt(ctx->key_enc, buf, walk->iv,
+-					    num_rounds(ctx));
+-			__aes_arm64_encrypt(ctx->key_enc, mac, mac,
+-					    num_rounds(ctx));
++			aes_encrypt(ctx, buf, walk->iv);
++			aes_encrypt(ctx, mac, mac);
+ 			if (enc)
+ 				crypto_xor(mac, src, bsize);
+ 			crypto_xor_cpy(dst, src, buf, bsize);
+@@ -227,8 +221,8 @@ static int ccm_crypt_fallback(struct skcipher_walk *walk, u8 mac[], u8 iv0[],
  	}
  
--	__aes_arm64_encrypt(ctx->aes_key.key_enc, key, (u8[AES_BLOCK_SIZE]){},
--			    num_rounds(&ctx->aes_key));
-+	aes_encrypt(&ctx->aes_key, key, (u8[AES_BLOCK_SIZE]){});
- 
- 	return __ghash_setkey(&ctx->ghash_key, key, sizeof(be128));
- }
-@@ -470,7 +467,7 @@ static int gcm_encrypt(struct aead_request *req)
- 			rk = ctx->aes_key.key_enc;
- 		} while (walk.nbytes >= 2 * AES_BLOCK_SIZE);
- 	} else {
--		__aes_arm64_encrypt(ctx->aes_key.key_enc, tag, iv, nrounds);
-+		aes_encrypt(&ctx->aes_key, tag, iv);
- 		put_unaligned_be32(2, iv + GCM_IV_SIZE);
- 
- 		while (walk.nbytes >= (2 * AES_BLOCK_SIZE)) {
-@@ -481,8 +478,7 @@ static int gcm_encrypt(struct aead_request *req)
- 			int remaining = blocks;
- 
- 			do {
--				__aes_arm64_encrypt(ctx->aes_key.key_enc,
--						    ks, iv, nrounds);
-+				aes_encrypt(&ctx->aes_key, ks, iv);
- 				crypto_xor_cpy(dst, src, ks, AES_BLOCK_SIZE);
- 				crypto_inc(iv, AES_BLOCK_SIZE);
- 
-@@ -498,13 +494,10 @@ static int gcm_encrypt(struct aead_request *req)
- 						 walk.nbytes % (2 * AES_BLOCK_SIZE));
- 		}
- 		if (walk.nbytes) {
--			__aes_arm64_encrypt(ctx->aes_key.key_enc, ks, iv,
--					    nrounds);
-+			aes_encrypt(&ctx->aes_key, ks, iv);
- 			if (walk.nbytes > AES_BLOCK_SIZE) {
- 				crypto_inc(iv, AES_BLOCK_SIZE);
--				__aes_arm64_encrypt(ctx->aes_key.key_enc,
--					            ks + AES_BLOCK_SIZE, iv,
--						    nrounds);
-+				aes_encrypt(&ctx->aes_key, ks + AES_BLOCK_SIZE, iv);
- 			}
- 		}
+ 	if (!err) {
+-		__aes_arm64_encrypt(ctx->key_enc, buf, iv0, num_rounds(ctx));
+-		__aes_arm64_encrypt(ctx->key_enc, mac, mac, num_rounds(ctx));
++		aes_encrypt(ctx, buf, iv0);
++		aes_encrypt(ctx, mac, mac);
+ 		crypto_xor(mac, buf, AES_BLOCK_SIZE);
  	}
-@@ -608,7 +601,7 @@ static int gcm_decrypt(struct aead_request *req)
- 			rk = ctx->aes_key.key_enc;
- 		} while (walk.nbytes >= 2 * AES_BLOCK_SIZE);
- 	} else {
--		__aes_arm64_encrypt(ctx->aes_key.key_enc, tag, iv, nrounds);
-+		aes_encrypt(&ctx->aes_key, tag, iv);
- 		put_unaligned_be32(2, iv + GCM_IV_SIZE);
- 
- 		while (walk.nbytes >= (2 * AES_BLOCK_SIZE)) {
-@@ -621,8 +614,7 @@ static int gcm_decrypt(struct aead_request *req)
- 					pmull_ghash_update_p64);
- 
- 			do {
--				__aes_arm64_encrypt(ctx->aes_key.key_enc,
--						    buf, iv, nrounds);
-+				aes_encrypt(&ctx->aes_key, buf, iv);
- 				crypto_xor_cpy(dst, src, buf, AES_BLOCK_SIZE);
- 				crypto_inc(iv, AES_BLOCK_SIZE);
- 
-@@ -640,11 +632,9 @@ static int gcm_decrypt(struct aead_request *req)
- 				memcpy(iv2, iv, AES_BLOCK_SIZE);
- 				crypto_inc(iv2, AES_BLOCK_SIZE);
- 
--				__aes_arm64_encrypt(ctx->aes_key.key_enc, iv2,
--						    iv2, nrounds);
-+				aes_encrypt(&ctx->aes_key, iv2, iv2);
- 			}
--			__aes_arm64_encrypt(ctx->aes_key.key_enc, iv, iv,
--					    nrounds);
-+			aes_encrypt(&ctx->aes_key, iv, iv);
- 		}
- 	}
- 
+ 	return err;
 -- 
 2.20.1
 
