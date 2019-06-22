@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 103F9C48BE3
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C4EBC48BE0
 	for <linux-crypto@archiver.kernel.org>; Sat, 22 Jun 2019 00:32:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DA6D82084E
-	for <linux-crypto@archiver.kernel.org>; Sat, 22 Jun 2019 00:32:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 516C62084E
+	for <linux-crypto@archiver.kernel.org>; Sat, 22 Jun 2019 00:32:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RMfB2j6C"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DqneX8HO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726049AbfFVAcJ (ORCPT
+        id S1726220AbfFVAcJ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Fri, 21 Jun 2019 20:32:09 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:36787 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726212AbfFVAcG (ORCPT
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:38482 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726237AbfFVAcJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 Jun 2019 20:32:06 -0400
-Received: by mail-wr1-f65.google.com with SMTP id n4so6915577wrs.3
-        for <linux-crypto@vger.kernel.org>; Fri, 21 Jun 2019 17:32:05 -0700 (PDT)
+        Fri, 21 Jun 2019 20:32:09 -0400
+Received: by mail-wm1-f68.google.com with SMTP id s15so8083011wmj.3
+        for <linux-crypto@vger.kernel.org>; Fri, 21 Jun 2019 17:32:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=UegmsAOjoNCHrQaB/W23ATKBTZ4x8N3x14/ck1Y1UZ8=;
-        b=RMfB2j6Cb2sx1Rm9XYLCYM6p+siIEicTA5Ft5WqkGakiwcWqNRaGPagAeNuE9E+ORH
-         xAE1jD8aAE1ykIjapFruNPPK7Wrns0s8VdPWdUbl/RA29MGyOZbvdaKPHOfY/Ovff7z8
-         dj4eLDKy+BXeNOclRGqgyOSb6yXGagY/11VGMhhsnEz7CRE86+4Phq+Iy1btjYlJWyjH
-         qHaHe51FxfPtYNoigik2vd7OZKoTXjuz5ock/IW/LmRsEb+CZJW/g3MFj/UVY2hH75g4
-         4xGKiBtKGKip/9cMqTB3BCWv3jfLSv07V9HB1DejT34dgkikka+4NgPwuFCepU2EFoAQ
-         8b7w==
+        bh=FrBLYeLtuiaLDwgJn1TkWrukHdAbPf9Wo3+1MqcyfMY=;
+        b=DqneX8HOgoQO2mD6QMWQn5DHaaqbsINCgJSEvBBaKHkLw4oRa3I1nLUayrw1Dubc6h
+         5gUzeE63x8jZItdisVKTTO8CWBLYjuP/VH5JEeLv1r0QIhPvN7K+LKaDkGJ8VH4bl4Rx
+         hQhTl26a9A7k9RKExhtIGTQM9nLeNaFpipvD2HUFslu+0JvjcltPcPZnJ8zaFHTffhE5
+         W7J+VN4rqF3kPB0aXqFZThpeYggHOdLoCM+RtbWQlJmGXBTY3IT/AWZRHGRkI4bk31QV
+         +Wm/1H1fzlrhYKzrs/ymUh5sxcOPvLcXGpgYuRXFHaK/1LzdkXBqLZuMfe9D3HsZFeiy
+         uWeg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=UegmsAOjoNCHrQaB/W23ATKBTZ4x8N3x14/ck1Y1UZ8=;
-        b=S0gujvKIdV2O262FvLvqJxibtbZe3W0lgKvGm3AqGG4UO2c3nCqnil+LyMlltLwHTe
-         ddKq0hzcP4FT0SQX1FL6qibJ/SIfeTs+/0badsza5JQlO1gCirWBY1F7P55nfVNEg2KJ
-         ARFS47fjciTi2HMmDAd2f9lKXfuYEeniAb5orrlKv8Ve8QwzLsy40zu+hGkoaDTEVFoH
-         Jc0y8ETsZ3QSovBoMOmLH8mjCl0w54MEtO/zS8d/n0Yb/Jb26SdPLXOCWsPALrh5B23t
-         1Vebkr7nB58SFxw8hUfIy/nJB/9TTZ06d9+q/6FCXPwwS5bGAD68cknCqZEEqwzeRaCk
-         TU5g==
-X-Gm-Message-State: APjAAAXG7yHHEidkjo+6IT//cUWNulolN5sdbTF0P9foeDelC5rMdBnv
-        HReHL5GyyvD3we2TXBojy3qNhlj8JSRh+Ffi
-X-Google-Smtp-Source: APXvYqxypPmY2iDv3gGEXV2xCzsoeuFzu5q15Z4vZlhzBijOtt9dFzMHkyW/iwKl7QJr5zyZIVJJDg==
-X-Received: by 2002:adf:ce82:: with SMTP id r2mr35969812wrn.223.1561163524328;
-        Fri, 21 Jun 2019 17:32:04 -0700 (PDT)
+        bh=FrBLYeLtuiaLDwgJn1TkWrukHdAbPf9Wo3+1MqcyfMY=;
+        b=RMOCwSKyz5K1ecd0OiZsX4yHnw8dszpikXb6GClYLshD/vhEk1l0KtCgqWXpDiL7Dl
+         C0EnBCI1Ih+3fLkOiSKMEgFv1GBJhYvyTG0bQ8Od2m2f6nwn9SnWp9PDHvvjvSQB+6mh
+         srInEJ8HdQDnKVvmzU0BXWf2JPwY8kHCjMHB5lfMUgAFutzj40Twg2K23Z0qjnoUn3fz
+         Hw3fkULOdjSXNsMVGRAb4dPgQ34JsW4Kntu6dkpksVpPS2ICD4wOTbwmTteZElDUqBRy
+         8T/3aI9gpBEVBrejUTbIrYuMKzeQ/pC27qeaXAgBmBmUgYRbLPDiO4ccQnEhNaZyLQZh
+         GdLA==
+X-Gm-Message-State: APjAAAVKEkH6USUUToISsmM0eY3rDtJZlnmon/e9rFp/6x9sv9bUm3JZ
+        CE+M2qdaLf3CqG35hefPMdcKHCKSz8KR54kx
+X-Google-Smtp-Source: APXvYqwYCpb2wO1+oLbUReu6OUp+xpshuUiOJ3+6oZqvxYdqGfIEEF5WuojzmNYQ/geyClR+cdJKKg==
+X-Received: by 2002:a1c:f515:: with SMTP id t21mr5946128wmh.39.1561163527346;
+        Fri, 21 Jun 2019 17:32:07 -0700 (PDT)
 Received: from sudo.home ([2a01:cb1d:112:6f00:99d4:1ff0:ed6:dfbb])
-        by smtp.gmail.com with ESMTPSA id v18sm4792019wrd.51.2019.06.21.17.32.03
+        by smtp.gmail.com with ESMTPSA id v18sm4792019wrd.51.2019.06.21.17.32.06
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 21 Jun 2019 17:32:03 -0700 (PDT)
+        Fri, 21 Jun 2019 17:32:06 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     herbert@gondor.apana.org.au, ebiggers@google.com,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [RFC PATCH 19/30] crypto: qce/des - switch to new verification routines
-Date:   Sat, 22 Jun 2019 02:31:01 +0200
-Message-Id: <20190622003112.31033-20-ard.biesheuvel@linaro.org>
+Subject: [RFC PATCH 22/30] crypto: sun4i/des - switch to new verification routines
+Date:   Sat, 22 Jun 2019 02:31:04 +0200
+Message-Id: <20190622003112.31033-23-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190622003112.31033-1-ard.biesheuvel@linaro.org>
 References: <20190622003112.31033-1-ard.biesheuvel@linaro.org>
@@ -75,66 +75,65 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- drivers/crypto/qce/ablkcipher.c | 23 ++++++--------------
- 1 file changed, 7 insertions(+), 16 deletions(-)
+ drivers/crypto/sunxi-ss/sun4i-ss-cipher.c | 22 ++++----------------
+ drivers/crypto/sunxi-ss/sun4i-ss.h        |  2 +-
+ 2 files changed, 5 insertions(+), 19 deletions(-)
 
-diff --git a/drivers/crypto/qce/ablkcipher.c b/drivers/crypto/qce/ablkcipher.c
-index 8d3493855a70..e646e90f93ed 100644
---- a/drivers/crypto/qce/ablkcipher.c
-+++ b/drivers/crypto/qce/ablkcipher.c
-@@ -15,7 +15,7 @@
- #include <linux/interrupt.h>
- #include <linux/types.h>
+diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c b/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
+index b060a0810934..05b2b2136743 100644
+--- a/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
++++ b/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
+@@ -533,25 +533,11 @@ int sun4i_ss_des_setkey(struct crypto_skcipher *tfm, const u8 *key,
+ 			unsigned int keylen)
+ {
+ 	struct sun4i_tfm_ctx *op = crypto_skcipher_ctx(tfm);
+-	struct sun4i_ss_ctx *ss = op->ss;
+-	u32 flags;
+-	u32 tmp[DES_EXPKEY_WORDS];
+ 	int ret;
+ 
+-	if (unlikely(keylen != DES_KEY_SIZE)) {
+-		dev_err(ss->dev, "Invalid keylen %u\n", keylen);
+-		crypto_skcipher_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
+-		return -EINVAL;
+-	}
+-
+-	flags = crypto_skcipher_get_flags(tfm);
+-
+-	ret = des_ekey(tmp, key);
+-	if (unlikely(!ret) && (flags & CRYPTO_TFM_REQ_FORBID_WEAK_KEYS)) {
+-		crypto_skcipher_set_flags(tfm, CRYPTO_TFM_RES_WEAK_KEY);
+-		dev_dbg(ss->dev, "Weak key %u\n", keylen);
+-		return -EINVAL;
+-	}
++	err = crypto_des_verify_key(crypto_skcipher_tfm(tfm), key, keylen);
++	if (unlikely(err))
++		return err;
+ 
+ 	op->keylen = keylen;
+ 	memcpy(op->key, key, keylen);
+@@ -569,7 +555,7 @@ int sun4i_ss_des3_setkey(struct crypto_skcipher *tfm, const u8 *key,
+ 	struct sun4i_tfm_ctx *op = crypto_skcipher_ctx(tfm);
+ 	int err;
+ 
+-	err = des3_verify_key(tfm, key);
++	err = crypto_des3_ede_verify_key(crypto_skcipher_tfm(tfm), key, keylen);
+ 	if (unlikely(err))
+ 		return err;
+ 
+diff --git a/drivers/crypto/sunxi-ss/sun4i-ss.h b/drivers/crypto/sunxi-ss/sun4i-ss.h
+index 8c4ec9e93565..3c62624d8faa 100644
+--- a/drivers/crypto/sunxi-ss/sun4i-ss.h
++++ b/drivers/crypto/sunxi-ss/sun4i-ss.h
+@@ -30,7 +30,7 @@
+ #include <crypto/internal/hash.h>
+ #include <crypto/internal/skcipher.h>
  #include <crypto/aes.h>
 -#include <crypto/des.h>
 +#include <crypto/internal/des.h>
- #include <crypto/internal/skcipher.h>
+ #include <crypto/internal/rng.h>
+ #include <crypto/rng.h>
  
- #include "cipher.h"
-@@ -177,12 +177,9 @@ static int qce_ablkcipher_setkey(struct crypto_ablkcipher *ablk, const u8 *key,
- 			goto fallback;
- 		}
- 	} else if (IS_DES(flags)) {
--		u32 tmp[DES_EXPKEY_WORDS];
--
--		ret = des_ekey(tmp, key);
--		if (!ret && (crypto_ablkcipher_get_flags(ablk) &
--			     CRYPTO_TFM_REQ_FORBID_WEAK_KEYS))
--			goto weakkey;
-+		if (crypto_des_verify_key(crypto_ablkcipher_tfm(ablk), key,
-+					  keylen))
-+			return -EINVAL;
- 	}
- 
- 	ctx->enc_keylen = keylen;
-@@ -193,24 +190,18 @@ static int qce_ablkcipher_setkey(struct crypto_ablkcipher *ablk, const u8 *key,
- 	if (!ret)
- 		ctx->enc_keylen = keylen;
- 	return ret;
--weakkey:
--	crypto_ablkcipher_set_flags(ablk, CRYPTO_TFM_RES_WEAK_KEY);
--	return -EINVAL;
- }
- 
- static int qce_des3_setkey(struct crypto_ablkcipher *ablk, const u8 *key,
- 			   unsigned int keylen)
- {
- 	struct qce_cipher_ctx *ctx = crypto_ablkcipher_ctx(ablk);
--	u32 flags;
- 	int err;
- 
--	flags = crypto_ablkcipher_get_flags(ablk);
--	err = __des3_verify_key(&flags, key);
--	if (unlikely(err)) {
--		crypto_ablkcipher_set_flags(ablk, flags);
-+	err = crypto_des3_ede_verify_key(crypto_ablkcipher_tfm(ablk), key,
-+					 keylen);
-+	if (unlikely(err))
- 		return err;
--	}
- 
- 	ctx->enc_keylen = keylen;
- 	memcpy(ctx->enc_key, key, keylen);
 -- 
 2.20.1
 
