@@ -2,95 +2,64 @@ Return-Path: <SRS0=ZGow=UW=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AB1EC43613
-	for <linux-crypto@archiver.kernel.org>; Sun, 23 Jun 2019 20:51:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCC60C43613
+	for <linux-crypto@archiver.kernel.org>; Sun, 23 Jun 2019 21:34:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1A01620679
-	for <linux-crypto@archiver.kernel.org>; Sun, 23 Jun 2019 20:51:14 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EZMfUk58"
+	by mail.kernel.org (Postfix) with ESMTP id A679520679
+	for <linux-crypto@archiver.kernel.org>; Sun, 23 Jun 2019 21:34:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726321AbfFWUvN (ORCPT
+        id S1726321AbfFWVea (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 23 Jun 2019 16:51:13 -0400
-Received: from mail-lf1-f65.google.com ([209.85.167.65]:40003 "EHLO
-        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726299AbfFWUvN (ORCPT
+        Sun, 23 Jun 2019 17:34:30 -0400
+Received: from shards.monkeyblade.net ([23.128.96.9]:45354 "EHLO
+        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726312AbfFWVea (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 23 Jun 2019 16:51:13 -0400
-Received: by mail-lf1-f65.google.com with SMTP id a9so8510550lff.7;
-        Sun, 23 Jun 2019 13:51:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=24hOpItNhK/ymwYcRBGGMKPMe+FsBE7AcNfpDjTqga0=;
-        b=EZMfUk58qrrl8CbCOK4RADINkwxOkYIAQn2ERBnYxxGiui7Z4vmFJPUHddGlkY/eB9
-         bYUWdJSa39Y9dx1rUx3EuF8DbnHgM1UraOZaDCgZQgMLAcGOpY8eDXq7Dap3kWDnK4vr
-         PqHVjk510Q8qUKvEO94TNNpTMmvuunz+OF5rO3BqTbnO3EcX5ftVrOomwTFPwSyURqlE
-         PAW1eX2bvadHwaljI1eOBtH/dLYY7Y7WB6zeADPxOjIjHHkx6+gWi3B3Gj6yqNqfheqe
-         9Min1ud5AkiMvSCpbdum01nNWgYJKi0THgwj/uvisQXoewq18//Kd4KZcR+28KU0b8s1
-         yv5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=24hOpItNhK/ymwYcRBGGMKPMe+FsBE7AcNfpDjTqga0=;
-        b=JInLuruWoG5vwY1l+eyib/0Sb9kZd1Otv6zPT9sHK6tpU7f72CzEp3uKOzwpyuoKLQ
-         ZhP4El+/e5uQAaJEui3NAJcEbMQ5aSMot9dpukEpQm9WRVb24oPBYD0Hf70IA8DU1cc1
-         qEJY5g98p8E1XjR7ar+rvkNHvKsEAbTc7sBYqxf5QDJSjBQC/76Ex8SxorUEtw0Uet7b
-         BVtlLm0nY5W9JLn4orVA0/tShs3eZKUIKUX6dj7hDgzyyQpZAbAsw+Pdh5N4+LiQ58HZ
-         bLGS6M0364KpM23/x6XAAjlrX9TFiDY3QJOb7Z6/TffNjTsrqgjn7Oe0LMuEtn7ToN0k
-         bDlQ==
-X-Gm-Message-State: APjAAAVmfItd+wkDtMIG4Ml7kCilDr1zI9kG2PgTTc1ocFIkLd0X2ABT
-        7hGN24PGS6yvFUA41TZnk7s=
-X-Google-Smtp-Source: APXvYqze2CJXxUpMJortN2SIIlx4LcgbeqKYMU+B9TqPrYByuqv6+OaLKt71lRdRPvMj/n9VPYyTqg==
-X-Received: by 2002:a19:dc0d:: with SMTP id t13mr47340076lfg.152.1561323070948;
-        Sun, 23 Jun 2019 13:51:10 -0700 (PDT)
-Received: from localhost.localdomain ([91.90.160.140])
-        by smtp.gmail.com with ESMTPSA id h22sm1423292ljj.105.2019.06.23.13.51.09
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 23 Jun 2019 13:51:10 -0700 (PDT)
-From:   Vasyl Gomonovych <gomonovych@gmail.com>
-To:     george.cherian@cavium.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     Vasyl <gomonovych@gmail.com>
-Subject: [PATCH] crypto: cavium remove casting dma_alloc
-Date:   Sun, 23 Jun 2019 22:50:19 +0200
-Message-Id: <20190623205021.22261-1-gomonovych@gmail.com>
-X-Mailer: git-send-email 2.17.1
+        Sun, 23 Jun 2019 17:34:30 -0400
+Received: from localhost (unknown [IPv6:2601:601:9f80:35cd::d71])
+        (using TLSv1 with cipher AES256-SHA (256/256 bits))
+        (Client did not present a certificate)
+        (Authenticated sender: davem-davemloft)
+        by shards.monkeyblade.net (Postfix) with ESMTPSA id CDF99142DE3A5;
+        Sun, 23 Jun 2019 14:34:26 -0700 (PDT)
+Date:   Sun, 23 Jun 2019 14:34:24 -0700 (PDT)
+Message-Id: <20190623.143424.1962536673442328783.davem@davemloft.net>
+To:     gomonovych@gmail.com
+Cc:     george.cherian@cavium.com, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: cavium remove casting dma_alloc
+From:   David Miller <davem@davemloft.net>
+In-Reply-To: <20190623204849.22089-1-gomonovych@gmail.com>
+References: <20190623204849.22089-1-gomonovych@gmail.com>
+X-Mailer: Mew version 6.8 on Emacs 26.1
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+X-Greylist: Sender succeeded SMTP AUTH, not delayed by milter-greylist-4.5.12 (shards.monkeyblade.net [149.20.54.216]); Sun, 23 Jun 2019 14:34:27 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Vasyl <gomonovych@gmail.com>
+From: Vasyl Gomonovych <gomonovych@gmail.com>
+Date: Sun, 23 Jun 2019 22:48:49 +0200
 
-Generated by:  alloc_cast.cocci
+> @@ -233,7 +233,7 @@ static int alloc_command_queues(struct cpt_vf *cptvf,
+>  
+>  			c_size = (rem_q_size > qcsize_bytes) ? qcsize_bytes :
+>  					rem_q_size;
+> -			curr->head = (u8 *)dma_alloc_coherent(&pdev->dev,
+> +			curr->head = dma_alloc_coherent(&pdev->dev,
+>  							      c_size + CPT_NEXT_CHUNK_PTR_SIZE,
+>  							      &curr->dma_addr,
+>  							      GFP_KERNEL);
 
-Signed-off-by: Vasyl <gomonovych@gmail.com>
----
- drivers/crypto/cavium/cpt/cptvf_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Please fix up the indentation of the 2nd, 3rd, and 4th line of the call
+if you do this.  Each of those lines should start precisely at the
+first column after the openning parenthesis of the first line.
 
-diff --git a/drivers/crypto/cavium/cpt/cptvf_main.c b/drivers/crypto/cavium/cpt/cptvf_main.c
-index 0f72e9abdefe..e9b5c4c70317 100644
---- a/drivers/crypto/cavium/cpt/cptvf_main.c
-+++ b/drivers/crypto/cavium/cpt/cptvf_main.c
-@@ -233,7 +233,7 @@ static int alloc_command_queues(struct cpt_vf *cptvf,
- 
- 			c_size = (rem_q_size > qcsize_bytes) ? qcsize_bytes :
- 					rem_q_size;
--			curr->head = (u8 *)dma_alloc_coherent(&pdev->dev,
-+			curr->head = dma_alloc_coherent(&pdev->dev,
- 							      c_size + CPT_NEXT_CHUNK_PTR_SIZE,
- 							      &curr->dma_addr,
- 							      GFP_KERNEL);
--- 
-2.17.1
-
+Thank you.
