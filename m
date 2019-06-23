@@ -2,93 +2,99 @@ Return-Path: <SRS0=ZGow=UW=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AFFAC43613
-	for <linux-crypto@archiver.kernel.org>; Sun, 23 Jun 2019 01:40:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4219C43613
+	for <linux-crypto@archiver.kernel.org>; Sun, 23 Jun 2019 09:30:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BC52020679
-	for <linux-crypto@archiver.kernel.org>; Sun, 23 Jun 2019 01:40:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B0B6C20820
+	for <linux-crypto@archiver.kernel.org>; Sun, 23 Jun 2019 09:30:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tzzplFjO"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XIWvSciJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725844AbfFWBkI (ORCPT
+        id S1726440AbfFWJaz (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 22 Jun 2019 21:40:08 -0400
-Received: from mail-yw1-f67.google.com ([209.85.161.67]:42854 "EHLO
-        mail-yw1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725839AbfFWBkI (ORCPT
+        Sun, 23 Jun 2019 05:30:55 -0400
+Received: from mail-io1-f66.google.com ([209.85.166.66]:45625 "EHLO
+        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726415AbfFWJaz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 22 Jun 2019 21:40:08 -0400
-Received: by mail-yw1-f67.google.com with SMTP id s5so4376348ywd.9
-        for <linux-crypto@vger.kernel.org>; Sat, 22 Jun 2019 18:40:07 -0700 (PDT)
+        Sun, 23 Jun 2019 05:30:55 -0400
+Received: by mail-io1-f66.google.com with SMTP id e3so1946328ioc.12
+        for <linux-crypto@vger.kernel.org>; Sun, 23 Jun 2019 02:30:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=6qwBlkavQsZFdfvrI0rrr9RPLzQk1oY16UOPP3aJ5gs=;
-        b=tzzplFjOgB702qG9W7ro+S4Fd3scZGKPBMQvrByQm2y4IR3EPBibc8j4ZXzJmkSPIH
-         tiT9Fr+e5wFhgS3Ww9tm9i57M9zZnf9CWH3hjR5I4OPfEkAHtbLVpMdlFyOZQz7xMrMo
-         0F/U4ysp4BQszwTlUqawdGeaiLI8YvclixyHitujo/g9wgwZI07J+3vFiU9jijQ81XIt
-         3LqbrZmQ9sYkRGwDy/42HP2kw02e//nACkAmG9sxeDHkhrEBRyGhuUwv9wM9aVIq2Zm6
-         vcxUwbW1cD00xRoXINRCGf1y8Lz9SUy0Gswm6VsEl0jJiruX5Fyo25Rgm2x1h/UNrnWw
-         W9og==
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=wvgYQJkZGqcc1lfJilFFMb7xsNi0HiPMMJpo064zefM=;
+        b=XIWvSciJXTWxUHdpOJ/Jiw7mhnXChMAz38UwfOCNYhyxtiP5995AZVApj5EI1r64qE
+         G5Wb50bCXsb63Sy0BT9k05wbOEaMxUv54DGQFr61UYycrgIvHMzur3LWuloXlUEBCCaw
+         dtFMdlCVVo3+ieBGYj2lThfkRy8GABw5srKabwQYjzqsUnZt0LRsesAbKNb+ATr9jcPw
+         iah80UTd4lExTLdH1RzhcUQ4it23dakXPQiMyqQpY4Yp0RS8wvEIV6o8w/mkaNN5d98P
+         yAk/MjnWrm0JKZw9hhyk9KJDeSjzHSgAZL2sMFJOkgPmwLTOa2yjnFos/mv5KvelBlLz
+         29rQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=6qwBlkavQsZFdfvrI0rrr9RPLzQk1oY16UOPP3aJ5gs=;
-        b=V5NVdxXZAdYvBBK1nGqP13UrnyOTZnjMUDVxwDrWkNEuYHA2YMVOcAraWmWBvPBVAt
-         Qwe/SPZOZ4V0supURxYht36f6C6huPNOOXGNDUQd98WeFtkMlBaj48iC+WTIjxYuoY0f
-         Q1jwn0H7SyJBUY1/DoDuBGrkc4VC3MXmDbGNnbyEbPvplkJdLR49xMKatK+mDDkTVwfR
-         Cma5IBTO748qUbnL0xkxry0NTFgUBRbRoxXDD+5RhUoUtz558vvXxYrNoCt9OluIX5P2
-         BvUmERKMLEnYHUihKBBlpGrNPqA+a0YUBJiKAm+BmEZAOQsQsesTCSTmkbPxm/tjY2HT
-         TkTg==
-X-Gm-Message-State: APjAAAVzEWjdM6kKPbIx/IFECAg1BGCB8avW+j6xR3qOqMzBRyPFTxAh
-        2k2NyN8E9jIgZJ2qdahHVoc=
-X-Google-Smtp-Source: APXvYqwP37dpSxznlK38aXXNY7Eopa8h6bZYSVOfJF0JeNuDlRnYRKEYWZI5uVO9AM5xQSj0vQhrpA==
-X-Received: by 2002:a81:6987:: with SMTP id e129mr69132194ywc.283.1561254007475;
-        Sat, 22 Jun 2019 18:40:07 -0700 (PDT)
-Received: from localhost.localdomain ([68.234.129.38])
-        by smtp.gmail.com with ESMTPSA id j8sm1823449ywa.62.2019.06.22.18.40.06
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Sat, 22 Jun 2019 18:40:07 -0700 (PDT)
-From:   Aditya Parekh <kerneladi@gmail.com>
-To:     herbert@gondor.apana.org.au
-Cc:     davem@davemloft.net, trivial@kernel.org,
-        linux-crypto@vger.kernel.org, Aditya Parekh <kerneladi@gmail.com>
-Subject: [PATCH] Crypto: fixed a comment coding style issue
-Date:   Sat, 22 Jun 2019 21:40:00 -0400
-Message-Id: <20190623014000.2935-1-kerneladi@gmail.com>
-X-Mailer: git-send-email 2.17.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=wvgYQJkZGqcc1lfJilFFMb7xsNi0HiPMMJpo064zefM=;
+        b=KOpnSN3LE/n4OWHXSamZSTvR4+vPRkxcuAULZO9cd7bZ1Q7c2LjJkjRQolEYWDhqMi
+         7D7cAjo/YEFk/0WVnV0xWmy0FMsLbahP98u/+XPIk9QsDeNt2kw5p7RJPX0mz5Nj0muk
+         06rq7F5eCfp2NVSV99DTdPHCgadu268kem2LLUl42hkMml4dayfaJUG4EAtj8sqvf/Rj
+         EY65CE8BkIlZ17D05o3eKXoCCfPIcNXaKFP8ZgJxuG/daHin9ftnwHNs8hPZg437tRB3
+         yc+FciytUgM6kajiVSrcmeepo16fYmFhg8dn+Uh5EcbMZntP/ussU2p7geqit5Km5sMe
+         5Klg==
+X-Gm-Message-State: APjAAAUCy5Z+Jjc2NFchGZlww/fmQ2suoofjBXJee/eYfo5gJWj9Ue9c
+        WgAoLl9advZFaS5tVc741qLINCRcW/m6xCc84R7esw==
+X-Google-Smtp-Source: APXvYqw231WPDSV0vp3+/kcuJTLLvj6P/KErcOQKt6Gw4rdKpxSKVjzoeHQpp0qSCZAo3xz5kn3MmfYU0+FjLta6sSY=
+X-Received: by 2002:a5e:d51a:: with SMTP id e26mr503654iom.71.1561282254656;
+ Sun, 23 Jun 2019 02:30:54 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190621080918.22809-1-ard.biesheuvel@arm.com>
+In-Reply-To: <20190621080918.22809-1-ard.biesheuvel@arm.com>
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date:   Sun, 23 Jun 2019 11:30:41 +0200
+Message-ID: <CAKv+Gu-ZO9Fnfx06XYJ-tp+6nrk0D8TBGa2chmxFW-kjPMmLCw@mail.gmail.com>
+Subject: Re: [PATCH v4 0/6] crypto: switch to crypto API for ESSIV generation
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Eric Biggers <ebiggers@google.com>,
+        device-mapper development <dm-devel@redhat.com>,
+        linux-fscrypt@vger.kernel.org,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Milan Broz <gmazyland@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Fixed a coding style issue.
+On Fri, 21 Jun 2019 at 10:09, Ard Biesheuvel <ard.biesheuvel@arm.com> wrote:
+>
+> From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+>
+...
+>
+> - given that hardware already exists that can perform en/decryption including
+>   ESSIV generation of a range of blocks, it would be useful to encapsulate
+>   this in the ESSIV template, and teach at least dm-crypt how to use it
+>   (given that it often processes 8 512-byte sectors at a time)
 
-Signed-off-by: Aditya Parekh <kerneladi@gmail.com>
----
- crypto/fcrypt.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+I thought about this a bit more, and it occurred to me that the
+capability of issuing several sectors at a time and letting the lower
+layers increment the IV between sectors is orthogonal to whether ESSIV
+is being used or not, and so it probably belongs in another wrapper.
 
-diff --git a/crypto/fcrypt.c b/crypto/fcrypt.c
-index 4e8704405a3b..3828266af0b8 100644
---- a/crypto/fcrypt.c
-+++ b/crypto/fcrypt.c
-@@ -306,7 +306,8 @@ static int fcrypt_setkey(struct crypto_tfm *tfm, const u8 *key, unsigned int key
- 
- #if BITS_PER_LONG == 64  /* the 64-bit version can also be used for 32-bit
- 			  * kernels - it seems to be faster but the code is
--			  * larger */
-+			  * larger
-+			  */
- 
- 	u64 k;	/* k holds all 56 non-parity bits */
- 
--- 
-2.17.1
+I.e., if we define a skcipher template like dmplain64le(), which is
+defined as taking a sector size as part of the key, and which
+increments a 64 LE counter between sectors if multiple are passed, it
+can be used not only for ESSIV but also for XTS, which I assume can be
+h/w accelerated in the same way.
 
+So with that in mind, I think we should decouple the multi-sector
+discussion and leave it for a followup series, preferably proposed by
+someone who also has access to some hardware to prototype it on.
