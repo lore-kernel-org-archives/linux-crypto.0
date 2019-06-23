@@ -5,65 +5,64 @@ X-Spam-Level:
 X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F734C43613
-	for <linux-crypto@archiver.kernel.org>; Sun, 23 Jun 2019 20:49:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AB1EC43613
+	for <linux-crypto@archiver.kernel.org>; Sun, 23 Jun 2019 20:51:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 65BA520679
-	for <linux-crypto@archiver.kernel.org>; Sun, 23 Jun 2019 20:49:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1A01620679
+	for <linux-crypto@archiver.kernel.org>; Sun, 23 Jun 2019 20:51:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PJ93p6US"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EZMfUk58"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726311AbfFWUtK (ORCPT
+        id S1726321AbfFWUvN (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 23 Jun 2019 16:49:10 -0400
-Received: from mail-lf1-f68.google.com ([209.85.167.68]:36451 "EHLO
-        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726299AbfFWUtK (ORCPT
+        Sun, 23 Jun 2019 16:51:13 -0400
+Received: from mail-lf1-f65.google.com ([209.85.167.65]:40003 "EHLO
+        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726299AbfFWUvN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 23 Jun 2019 16:49:10 -0400
-Received: by mail-lf1-f68.google.com with SMTP id q26so8523788lfc.3;
-        Sun, 23 Jun 2019 13:49:09 -0700 (PDT)
+        Sun, 23 Jun 2019 16:51:13 -0400
+Received: by mail-lf1-f65.google.com with SMTP id a9so8510550lff.7;
+        Sun, 23 Jun 2019 13:51:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id;
         bh=24hOpItNhK/ymwYcRBGGMKPMe+FsBE7AcNfpDjTqga0=;
-        b=PJ93p6USx5MCze63r9MLl5BKcVGBN4PwzPWbM3Yxe5ao2DMQwZRk6D+4/sveG+K1HM
-         EaPFm1GjHi+Mc/8gQuUSPnqLhSw1A8/beFI18mTQX9MV5/fHS6I8SLYHUW0mmxpe6ESa
-         NSUUGDO8FdTOtWFL/n10lbzizBLKw8Rn9ky7RREfdvZFFAVgvqGZEPy4PXadVnGJsn3A
-         YL/MIpAa3xWB4kRrHaP8X1ewT5V8M9OhPK6eenN4qpKawY+QIw6BRFI9Q1HEPyl6CkBR
-         ZxX99L/WWVutq5WrxnrRSn+6p6y1o+O/tVW3r7VSRYNj7ooNOrwJGJnTYV1/8L+4wHH1
-         AOlg==
+        b=EZMfUk58qrrl8CbCOK4RADINkwxOkYIAQn2ERBnYxxGiui7Z4vmFJPUHddGlkY/eB9
+         bYUWdJSa39Y9dx1rUx3EuF8DbnHgM1UraOZaDCgZQgMLAcGOpY8eDXq7Dap3kWDnK4vr
+         PqHVjk510Q8qUKvEO94TNNpTMmvuunz+OF5rO3BqTbnO3EcX5ftVrOomwTFPwSyURqlE
+         PAW1eX2bvadHwaljI1eOBtH/dLYY7Y7WB6zeADPxOjIjHHkx6+gWi3B3Gj6yqNqfheqe
+         9Min1ud5AkiMvSCpbdum01nNWgYJKi0THgwj/uvisQXoewq18//Kd4KZcR+28KU0b8s1
+         yv5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id;
         bh=24hOpItNhK/ymwYcRBGGMKPMe+FsBE7AcNfpDjTqga0=;
-        b=EoFO6oBYV9bRvkKWVqMqcH1D4QQ3i9ajxC/FJSsnDcFKLTF4ILQv7XZ/75Frrh8YW8
-         rjeRU25BvCoJ0P9FxKBcDaxRKQ+5FQRy+1bQDdIZB7IWsKRcAeL5AQi/nBSgm/JIAEPO
-         xGGC7AyhtqvlCDVlowEPJu5/j2mZiqh5kEcPZinSEKUIi7ItDYwWYM3fUyaSqbfNeieQ
-         FrSthOWI0945qULTpjAoXfREV7iUBD1fhR4fvlaCXcwYfFaaMdO0JdIxbwlQamUaOqLt
-         vzATmFldPolfo+q+epmrBBONAJH0jNocrxbycAvOG4OLSc9EjIqHS1wZA9E3oQfnF84J
-         469g==
-X-Gm-Message-State: APjAAAUHtp+7KPkOHLQ/JMK9w6x0PExVJAaBqbjW0LYcyi5XOaQW23OS
-        /eELfZ24yLeMM8/CF4BSofhWRkGq+aJxMQ==
-X-Google-Smtp-Source: APXvYqxR0RDfUpDpOAnz863A6VlcUihqBolzgVYMKfXcuGbz90Go0t/jd5B9QMKTRpZc7PYCv2R/tQ==
-X-Received: by 2002:ac2:4891:: with SMTP id x17mr23934242lfc.60.1561322948389;
-        Sun, 23 Jun 2019 13:49:08 -0700 (PDT)
+        b=JInLuruWoG5vwY1l+eyib/0Sb9kZd1Otv6zPT9sHK6tpU7f72CzEp3uKOzwpyuoKLQ
+         ZhP4El+/e5uQAaJEui3NAJcEbMQ5aSMot9dpukEpQm9WRVb24oPBYD0Hf70IA8DU1cc1
+         qEJY5g98p8E1XjR7ar+rvkNHvKsEAbTc7sBYqxf5QDJSjBQC/76Ex8SxorUEtw0Uet7b
+         BVtlLm0nY5W9JLn4orVA0/tShs3eZKUIKUX6dj7hDgzyyQpZAbAsw+Pdh5N4+LiQ58HZ
+         bLGS6M0364KpM23/x6XAAjlrX9TFiDY3QJOb7Z6/TffNjTsrqgjn7Oe0LMuEtn7ToN0k
+         bDlQ==
+X-Gm-Message-State: APjAAAVmfItd+wkDtMIG4Ml7kCilDr1zI9kG2PgTTc1ocFIkLd0X2ABT
+        7hGN24PGS6yvFUA41TZnk7s=
+X-Google-Smtp-Source: APXvYqze2CJXxUpMJortN2SIIlx4LcgbeqKYMU+B9TqPrYByuqv6+OaLKt71lRdRPvMj/n9VPYyTqg==
+X-Received: by 2002:a19:dc0d:: with SMTP id t13mr47340076lfg.152.1561323070948;
+        Sun, 23 Jun 2019 13:51:10 -0700 (PDT)
 Received: from localhost.localdomain ([91.90.160.140])
-        by smtp.gmail.com with ESMTPSA id u11sm435094ljd.90.2019.06.23.13.49.07
+        by smtp.gmail.com with ESMTPSA id h22sm1423292ljj.105.2019.06.23.13.51.09
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 23 Jun 2019 13:49:07 -0700 (PDT)
+        Sun, 23 Jun 2019 13:51:10 -0700 (PDT)
 From:   Vasyl Gomonovych <gomonovych@gmail.com>
-To:     gomonovych@gmail.com
-Cc:     George Cherian <george.cherian@cavium.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+To:     george.cherian@cavium.com, herbert@gondor.apana.org.au,
+        davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     Vasyl <gomonovych@gmail.com>
 Subject: [PATCH] crypto: cavium remove casting dma_alloc
-Date:   Sun, 23 Jun 2019 22:48:49 +0200
-Message-Id: <20190623204849.22089-1-gomonovych@gmail.com>
+Date:   Sun, 23 Jun 2019 22:50:19 +0200
+Message-Id: <20190623205021.22261-1-gomonovych@gmail.com>
 X-Mailer: git-send-email 2.17.1
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
