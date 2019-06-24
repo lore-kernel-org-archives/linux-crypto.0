@@ -2,155 +2,101 @@ Return-Path: <SRS0=EE7o=UX=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49669C43613
-	for <linux-crypto@archiver.kernel.org>; Mon, 24 Jun 2019 07:40:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE64FC43613
+	for <linux-crypto@archiver.kernel.org>; Mon, 24 Jun 2019 07:59:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1C2A82089F
-	for <linux-crypto@archiver.kernel.org>; Mon, 24 Jun 2019 07:40:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cawtwA/h"
+	by mail.kernel.org (Postfix) with ESMTP id 8C3542083D
+	for <linux-crypto@archiver.kernel.org>; Mon, 24 Jun 2019 07:59:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726834AbfFXHkm (ORCPT
+        id S1726399AbfFXH7a (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 24 Jun 2019 03:40:42 -0400
-Received: from mail-io1-f67.google.com ([209.85.166.67]:45695 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726334AbfFXHkm (ORCPT
+        Mon, 24 Jun 2019 03:59:30 -0400
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:34989 "EHLO
+        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725916AbfFXH7a (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 24 Jun 2019 03:40:42 -0400
-Received: by mail-io1-f67.google.com with SMTP id e3so287816ioc.12;
-        Mon, 24 Jun 2019 00:40:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:in-reply-to:references:from:date:message-id:subject:to
-         :cc;
-        bh=8dWeSIsidu/P7YsuUWucyysKYbzHuX6DsanqLCDVdyY=;
-        b=cawtwA/hvq1bKSlAN/Yro4UJfOs1Do+w1Tz8Q7Ydrv6hktmpz7VixOW3j3Q3E9keTl
-         PKzu4RemPIw4/Vwk8ahNyd6NleKRrU9S+Nf8icfFDTbnFXAwyPr4yRpCnc5V5v4SyR2C
-         VdBApvsmq0eCN09kBZCfaOx0kKBRFYA7qQ/wqvqSPZ/MMrzFBK5JfkXETUouXdL6RQ8c
-         w5yrm0YS84SUA0ZoE9sDyuF5+LkpyD/ChkdO0S7ega4LrB+bmLbjUxQ/9nFoAUN9o66x
-         NIKkyFrEBi9TnzeOYxqOoOx8Vf8A1mTdUPkHZO2AZ8FscnXpZBpkTpDsnbUaWyeibIL0
-         1IQA==
+        Mon, 24 Jun 2019 03:59:30 -0400
+Received: by mail-ot1-f67.google.com with SMTP id j19so12616680otq.2
+        for <linux-crypto@vger.kernel.org>; Mon, 24 Jun 2019 00:59:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:in-reply-to:references:from:date
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=8dWeSIsidu/P7YsuUWucyysKYbzHuX6DsanqLCDVdyY=;
-        b=LJVteEFjawDe/Z4/6rvL8Rd2VTJw6humcJtWV6ieRko6IvpGbifzRdrvdynK9qecsW
-         sG9yartPanzTRX5Lc1ZAkAOVvEZDe22bDc7Uuy8zq3qTMzjNM7xp4nAwce0Od7zz4jA8
-         NPpaSGgOXgeKBbhOO/MuIIA6Kt8u1VdaIeos5zs0I69TJi199bd/sKA8w+csuvq6UKbS
-         ZfnKwRWFXVNYEgnbS/P/j2YNREk8vvQx3klbJx+fcXeOfTKIhMyphNXWrcmJB0JZYwK0
-         l0M8adjY1nxC761kQ1xlk9kD0ryKW3uTjw0teMdFjtCMvQciMXxkqeYWWGuAjxMaM9Gd
-         nngQ==
-X-Gm-Message-State: APjAAAWVkOZHEfbOzrLaKjfi8khIM1LetM/gYO5nC0jbjCuU5eEE0UhH
-        hdHIyQgsRfXsxrhX5WHV2VKhtsSK5XkuzanH3Ig=
-X-Google-Smtp-Source: APXvYqxAkDNHhm8nw4Daqg7MaBDWvII5tBWjXXxj+x9xAMGNRq8t5fajlOjTlm53fZwOtP4vdRUYaCwMWuXihPzxOQE=
-X-Received: by 2002:a6b:6611:: with SMTP id a17mr32114562ioc.179.1561362041175;
- Mon, 24 Jun 2019 00:40:41 -0700 (PDT)
+        bh=Y5rTUEYsELOvvw4ngFAJeKVFrPW5LktCBQ0fE2buR+k=;
+        b=C5b2FWPBYFsJ4qiHn7xKIlgsnWP9XoKrNNTTLRo91MEVbjOFFgyf75634DD0qwhD0A
+         OWLiuSVAz/6Wn7GAQjuu+JKYDfmYCfbjao2mWN/zlo9qH3+bPBTWhcmqZ5Taer0a6CQP
+         HB+F9QMHmLOOEanVD2zS1qchALbRdJ8RWKfe+GzWTFTT/KQViL9RCHddm5YME26NTGNL
+         IE/13bJ9CTPTzakZaIyiCXJXLL0sRCQ2PbvO/6iyOGONSeKTSXCRqXjfxt0yvrA0suA/
+         CfvPkR05XyplbDbYQdamOGHkOyF1ZZ070WHAues2G/uAkbnSQe8MrT4jh9R/lLEGPyi+
+         RTVQ==
+X-Gm-Message-State: APjAAAVSh9R6fLLj+CpTAc99xqZQQEq0lhuGamlvlYgP4byEkhn42Y9A
+        d48y1k7sR2XnQgcbd40YO0cngB6cIrrd8t+H++HZ1klp
+X-Google-Smtp-Source: APXvYqxZq+86CfX0eMEndXfGqzlMquFnxv7MRNp1HZttJvo4RvO8uiNDODAZ3uGhr+Q/FFza7QtsQab+jUEGzZopOyY=
+X-Received: by 2002:a9d:7a45:: with SMTP id z5mr10818120otm.197.1561363169678;
+ Mon, 24 Jun 2019 00:59:29 -0700 (PDT)
 MIME-Version: 1.0
-Received: by 2002:a4f:9896:0:0:0:0:0 with HTTP; Mon, 24 Jun 2019 00:40:40
- -0700 (PDT)
-In-Reply-To: <af75aefc-438b-9e31-b922-c847879d9dd9@gmail.com>
-References: <20190621080918.22809-1-ard.biesheuvel@arm.com>
- <20190621080918.22809-5-ard.biesheuvel@arm.com> <af75aefc-438b-9e31-b922-c847879d9dd9@gmail.com>
-From:   Surachai Saiwong <buriram1601@gmail.com>
-Date:   Mon, 24 Jun 2019 14:40:40 +0700
-Message-ID: <CAL1AwE-77TnQubVJDDhtCb0CW9QkMD+h+oZ72CKCrSc7gtkJfw@mail.gmail.com>
-Subject: Re: [dm-devel] [PATCH v4 4/6] md: dm-crypt: switch to ESSIV crypto
- API template
-To:     Milan Broz <gmazyland@gmail.com>
-Cc:     ard.biesheuvel@linaro.org, linux-crypto@vger.kernel.org,
-        Gilad Ben-Yossef <gilad@benyossef.com>, dm-devel@redhat.com,
-        linux-fscrypt@vger.kernel.org,
+References: <20190624073818.29296-1-ard.biesheuvel@linaro.org> <20190624073818.29296-2-ard.biesheuvel@linaro.org>
+In-Reply-To: <20190624073818.29296-2-ard.biesheuvel@linaro.org>
+From:   Ondrej Mosnacek <omosnace@redhat.com>
+Date:   Mon, 24 Jun 2019 09:59:18 +0200
+Message-ID: <CAFqZXNt4PgTB1Ocmui4CCYTCbguAqmcrdA=ZMbA6anH3LBX9EQ@mail.gmail.com>
+Subject: Re: [PATCH 1/6] crypto: aegis128 - use unaliged helper in unaligned
+ decrypt path
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        Eric Biggers <ebiggers@google.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Eric Biggers <ebiggers@google.com>
+        Steve Capper <steve.capper@arm.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-2562-06-24 14:05 GMT+07:00, Milan Broz <gmazyland@gmail.com>:
-> On 21/06/2019 10:09, Ard Biesheuvel wrote:
->> From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
->>
->> Replace the explicit ESSIV handling in the dm-crypt driver with calls
->> into the crypto API, which now possesses the capability to perform
->> this processing within the crypto subsystem.
+Hi Ard,
+
+On Mon, Jun 24, 2019 at 9:38 AM Ard Biesheuvel
+<ard.biesheuvel@linaro.org> wrote:
 >
-> I tried a few crazy dm-crypt configurations and was not able to crash it
-> this time :-)
+> Use crypto_aegis128_update_u() not crypto_aegis128_update_a() in the
+> decrypt path that is taken when the source or destination pointers
+> are not aligned.
 >
-> So, it definitely need some more testing, but for now, I think it works.
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> ---
+>  crypto/aegis128.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> Few comments below for this part:
+> diff --git a/crypto/aegis128.c b/crypto/aegis128.c
+> index d78f77fc5dd1..125e11246990 100644
+> --- a/crypto/aegis128.c
+> +++ b/crypto/aegis128.c
+> @@ -208,7 +208,7 @@ static void crypto_aegis128_decrypt_chunk(struct aegis_state *state, u8 *dst,
+>                         crypto_aegis_block_xor(&tmp, &state->blocks[1]);
+>                         crypto_xor(tmp.bytes, src, AEGIS_BLOCK_SIZE);
 >
->> --- a/drivers/md/dm-crypt.c
->> +++ b/drivers/md/dm-crypt.c
+> -                       crypto_aegis128_update_a(state, &tmp);
+> +                       crypto_aegis128_update_u(state, &tmp);
+
+The "tmp" variable used here is declared directly on the stack as
+'union aegis_block' and thus should be aligned to alignof(__le64),
+which allows the use of crypto_aegis128_update_a() ->
+crypto_aegis_block_xor(). It is also passed directly to
+crypto_aegis_block_xor() a few lines above. Or am I missing something?
+
+
 >
->>  static const struct crypt_iv_operations crypt_iv_benbi_ops = {
->>  	.ctr	   = crypt_iv_benbi_ctr,
->>  	.dtr	   = crypt_iv_benbi_dtr,
->> @@ -2283,7 +2112,7 @@ static int crypt_ctr_ivmode(struct dm_target *ti,
->> const char *ivmode)
->>  	else if (strcmp(ivmode, "plain64be") == 0)
->>  		cc->iv_gen_ops = &crypt_iv_plain64be_ops;
->>  	else if (strcmp(ivmode, "essiv") == 0)
->> -		cc->iv_gen_ops = &crypt_iv_essiv_ops;
->> +		cc->iv_gen_ops = &crypt_iv_plain64_ops;
->
-> This is quite misleading - it looks like you are switching to plain64 here.
-> The reality is that it uses plain64 to feed the ESSIV wrapper.
->
-> So either it need some comment to explain it here, or just keep simple
-> essiv_iv_ops
-> and duplicate that plain64 generator (it is 2 lines of code).
->
-> For the clarity, I would prefer the second variant (duplicate ops) here.
->
->> @@ -2515,8 +2357,18 @@ static int crypt_ctr_cipher_old(struct dm_target
->> *ti, char *cipher_in, char *key
->>  	if (!cipher_api)
->>  		goto bad_mem;
->>
->> -	ret = snprintf(cipher_api, CRYPTO_MAX_ALG_NAME,
->> -		       "%s(%s)", chainmode, cipher);
->> +	if (*ivmode && !strcmp(*ivmode, "essiv")) {
->> +		if (!*ivopts) {
->> +			ti->error = "Digest algorithm missing for ESSIV mode";
->> +			return -EINVAL;
->> +		}
->> +		ret = snprintf(cipher_api, CRYPTO_MAX_ALG_NAME,
->> +			       "essiv(%s(%s),%s,%s)", chainmode, cipher,
->> +			       cipher, *ivopts);
->
-> This becomes quite long string already (limit is now 128 bytes), we should
-> probably
-> check also for too long string. It will perhaps fail later, but I would
-> better add
->
-> 	if (ret < 0 || ret >= CRYPTO_MAX_ALG_NAME) {
-> 	...
->
->> +	} else {
->> +		ret = snprintf(cipher_api, CRYPTO_MAX_ALG_NAME,
->> +			       "%s(%s)", chainmode, cipher);
->> +	}
->>  	if (ret < 0) {
->>  		kfree(cipher_api);
->>  		goto bad_mem;
->>
->
-> Thanks,
-> Milan
+>                         memcpy(dst, tmp.bytes, AEGIS_BLOCK_SIZE);
 >
 > --
-> dm-devel mailing list
-> dm-devel@redhat.com
-> https://www.redhat.com/mailman/listinfo/dm-devel
+> 2.20.1
 >
+
+--
+Ondrej Mosnacek <omosnace at redhat dot com>
+Software Engineer, Security Technologies
+Red Hat, Inc.
