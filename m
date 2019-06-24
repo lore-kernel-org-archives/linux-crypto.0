@@ -2,148 +2,127 @@ Return-Path: <SRS0=EE7o=UX=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ECC4C43613
-	for <linux-crypto@archiver.kernel.org>; Mon, 24 Jun 2019 07:05:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9110FC43613
+	for <linux-crypto@archiver.kernel.org>; Mon, 24 Jun 2019 07:20:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E7AB82089F
-	for <linux-crypto@archiver.kernel.org>; Mon, 24 Jun 2019 07:05:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3CADB2083D
+	for <linux-crypto@archiver.kernel.org>; Mon, 24 Jun 2019 07:20:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GEIfAnvW"
+	dkim=pass (1024-bit key) header.d=c-s.fr header.i=@c-s.fr header.b="s19ZDSn5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726351AbfFXHFe (ORCPT
+        id S1727176AbfFXHUQ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 24 Jun 2019 03:05:34 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:35166 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726340AbfFXHFd (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 24 Jun 2019 03:05:33 -0400
-Received: by mail-wr1-f68.google.com with SMTP id f15so2720664wrp.2;
-        Mon, 24 Jun 2019 00:05:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=/dsVZYxomLMoyXfQ9mUiAOft0OKIueHGnSJjcph32Cw=;
-        b=GEIfAnvWKV2cM8oGcFp3ij+jFe48MAsv65mEMsXEuF0n6HNp090g3BbJ/pmx094Bl1
-         hP02uJOzrd9bb5kYCp0rQDC+wu322cBBMfnFbBs/ggiXcm2xS4StK4pvVqbEhOmNNLwe
-         ZQ81Cw1GBBkA5FU8XLioNSYwnj6Q5QnOfhRoVZQ+qmfx3nDAjVBSxMLiyn2qBv5r3cPR
-         T50UFs+dAEHvc3fnRMOUnl2rRm0T8BKbTgKvWA69qATU9VpgAC5jksGE2/ZNF/fHWpuk
-         XvL+Rvwv4EdS5cZeszfMm6XDuAIVb5IJEzkuDuGzFTQ/mx1WWWiL9WEx8ybZHBOYuoU1
-         zW0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=/dsVZYxomLMoyXfQ9mUiAOft0OKIueHGnSJjcph32Cw=;
-        b=TWczTl6jKiLIreWppA3QdvufH/T04tMlh9nBQdsDngvLqZlD44ZD23P+JNv/8K9a5J
-         xK5KCZaV9nZqIV4lqIoDAokxOseDWZPX0cAopasCuKVH8G5dNAGS8W9WUpeJ79BE8IS4
-         YiwiVAW4eiKBGq3dSvyzDkSUteX4ksMNcjX5KnqtLHrKSFPlQx1QxIoXZlpwWfSQJRqr
-         CCjEBHp0vPkF/i/2yKahwgsHFGk5ZpdpCyAmtuwYw+2N4w7dT8Jvo78KX0Nwc0C1g41r
-         DYt2r8SlRsYaiVUKy+BOigStwPDS+VqbI/htdlPOSUZgCLWgJfmeih2CT4Fb1RuerUP/
-         BLEA==
-X-Gm-Message-State: APjAAAXF+6SuMuriNyB9iKIugc5nUcno1A3ftQo2p4BbjSphbzR4+ezn
-        nrD7ZjxTwsToYPTEYT+b9ok=
-X-Google-Smtp-Source: APXvYqyUI9sxarZRT7ca/pkV9SQLxHe4kaJgAVev+gcG6bN3l+xz6UD8eLF1tXxeq+KeVVwHdVs/HA==
-X-Received: by 2002:a5d:528b:: with SMTP id c11mr44329691wrv.25.1561359931675;
-        Mon, 24 Jun 2019 00:05:31 -0700 (PDT)
-Received: from [172.22.36.64] (redhat-nat.vtp.fi.muni.cz. [78.128.215.6])
-        by smtp.gmail.com with ESMTPSA id t15sm8225210wrx.84.2019.06.24.00.05.30
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Mon, 24 Jun 2019 00:05:31 -0700 (PDT)
-Subject: Re: [PATCH v4 4/6] md: dm-crypt: switch to ESSIV crypto API template
-To:     ard.biesheuvel@linaro.org, linux-crypto@vger.kernel.org
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Eric Biggers <ebiggers@google.com>, dm-devel@redhat.com,
-        linux-fscrypt@vger.kernel.org,
-        Gilad Ben-Yossef <gilad@benyossef.com>
-References: <20190621080918.22809-1-ard.biesheuvel@arm.com>
- <20190621080918.22809-5-ard.biesheuvel@arm.com>
-From:   Milan Broz <gmazyland@gmail.com>
-Openpgp: preference=signencrypt
-Message-ID: <af75aefc-438b-9e31-b922-c847879d9dd9@gmail.com>
-Date:   Mon, 24 Jun 2019 09:05:30 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
-MIME-Version: 1.0
-In-Reply-To: <20190621080918.22809-5-ard.biesheuvel@arm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        Mon, 24 Jun 2019 03:20:16 -0400
+Received: from pegase1.c-s.fr ([93.17.236.30]:29730 "EHLO pegase1.c-s.fr"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726077AbfFXHUQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 24 Jun 2019 03:20:16 -0400
+Received: from localhost (mailhub1-int [192.168.12.234])
+        by localhost (Postfix) with ESMTP id 45XLKP3N1fz9vBml;
+        Mon, 24 Jun 2019 09:20:09 +0200 (CEST)
+Authentication-Results: localhost; dkim=pass
+        reason="1024-bit key; insecure key"
+        header.d=c-s.fr header.i=@c-s.fr header.b=s19ZDSn5; dkim-adsp=pass;
+        dkim-atps=neutral
+X-Virus-Scanned: Debian amavisd-new at c-s.fr
+Received: from pegase1.c-s.fr ([192.168.12.234])
+        by localhost (pegase1.c-s.fr [192.168.12.234]) (amavisd-new, port 10024)
+        with ESMTP id xldeek0ewHOc; Mon, 24 Jun 2019 09:20:09 +0200 (CEST)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+        by pegase1.c-s.fr (Postfix) with ESMTP id 45XLKP22hNz9vBmR;
+        Mon, 24 Jun 2019 09:20:09 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=c-s.fr; s=mail;
+        t=1561360809; bh=uqSyYAuIgffBR0A50tqUgIECoBVIQIvOhmxv2zbmqbg=;
+        h=From:Subject:To:Cc:Date:From;
+        b=s19ZDSn5W/iLhp9qcgc83xHYMkjAx4y1dNQgPh4SA1NxYlgcYC11NChUC8peLAiZ3
+         o+iQGQNFpMj91CRj0q9va+uqsUhEbv/NRBqQy4EYv9TQCNf3wKa5Cg/+Fo55M7ivYT
+         j1Rwg8ZPwarLO7MbxoBm8If8N4dw6qopNdtiPsrw=
+Received: from localhost (localhost [127.0.0.1])
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id D62E68B78B;
+        Mon, 24 Jun 2019 09:20:13 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+        by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+        with ESMTP id HLL_7-DMmVsO; Mon, 24 Jun 2019 09:20:13 +0200 (CEST)
+Received: from po16838vm.idsi0.si.c-s.fr (po15451.idsi0.si.c-s.fr [172.25.230.101])
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id B6E9D8B787;
+        Mon, 24 Jun 2019 09:20:13 +0200 (CEST)
+Received: by po16838vm.idsi0.si.c-s.fr (Postfix, from userid 0)
+        id 7CFA767424; Mon, 24 Jun 2019 07:20:13 +0000 (UTC)
+Message-Id: <cover.1561360551.git.christophe.leroy@c-s.fr>
+From:   Christophe Leroy <christophe.leroy@c-s.fr>
+Subject: [PATCH v5 0/4] *** SUBJECT HERE ***
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, horia.geanta@nxp.com
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org
+Date:   Mon, 24 Jun 2019 07:20:13 +0000 (UTC)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 21/06/2019 10:09, Ard Biesheuvel wrote:
-> From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> 
-> Replace the explicit ESSIV handling in the dm-crypt driver with calls
-> into the crypto API, which now possesses the capability to perform
-> this processing within the crypto subsystem.
+This series is the last set of fixes for the Talitos driver.
 
-I tried a few crazy dm-crypt configurations and was not able to crash it this time :-)
+We now get a fully clean boot on both SEC1 (SEC1.2 on mpc885) and
+SEC2 (SEC2.2 on mpc8321E) with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS:
 
-So, it definitely need some more testing, but for now, I think it works.
+[    3.385197] bus: 'platform': really_probe: probing driver talitos with device ff020000.crypto
+[    3.450982] random: fast init done
+[   12.252548] alg: No test for authenc(hmac(md5),cbc(aes)) (authenc-hmac-md5-cbc-aes-talitos-hsna)
+[   12.262226] alg: No test for authenc(hmac(md5),cbc(des3_ede)) (authenc-hmac-md5-cbc-3des-talitos-hsna)
+[   43.310737] Bug in SEC1, padding ourself
+[   45.603318] random: crng init done
+[   54.612333] talitos ff020000.crypto: fsl,sec1.2 algorithms registered in /proc/crypto
+[   54.620232] driver: 'talitos': driver_bound: bound to device 'ff020000.crypto'
 
-Few comments below for this part:
+[    1.193721] bus: 'platform': really_probe: probing driver talitos with device b0030000.crypto
+[    1.229197] random: fast init done
+[    2.714920] alg: No test for authenc(hmac(sha224),cbc(aes)) (authenc-hmac-sha224-cbc-aes-talitos)
+[    2.724312] alg: No test for authenc(hmac(sha224),cbc(aes)) (authenc-hmac-sha224-cbc-aes-talitos-hsna)
+[    4.482045] alg: No test for authenc(hmac(md5),cbc(aes)) (authenc-hmac-md5-cbc-aes-talitos)
+[    4.490940] alg: No test for authenc(hmac(md5),cbc(aes)) (authenc-hmac-md5-cbc-aes-talitos-hsna)
+[    4.500280] alg: No test for authenc(hmac(md5),cbc(des3_ede)) (authenc-hmac-md5-cbc-3des-talitos)
+[    4.509727] alg: No test for authenc(hmac(md5),cbc(des3_ede)) (authenc-hmac-md5-cbc-3des-talitos-hsna)
+[    6.631781] random: crng init done
+[   11.521795] talitos b0030000.crypto: fsl,sec2.2 algorithms registered in /proc/crypto
+[   11.529803] driver: 'talitos': driver_bound: bound to device 'b0030000.crypto'
 
-> --- a/drivers/md/dm-crypt.c
-> +++ b/drivers/md/dm-crypt.c
+v2: dropped patch 1 which was irrelevant due to a rebase weirdness. Added Cc to stable on the 2 first patches.
 
->  static const struct crypt_iv_operations crypt_iv_benbi_ops = {
->  	.ctr	   = crypt_iv_benbi_ctr,
->  	.dtr	   = crypt_iv_benbi_dtr,
-> @@ -2283,7 +2112,7 @@ static int crypt_ctr_ivmode(struct dm_target *ti, const char *ivmode)
->  	else if (strcmp(ivmode, "plain64be") == 0)
->  		cc->iv_gen_ops = &crypt_iv_plain64be_ops;
->  	else if (strcmp(ivmode, "essiv") == 0)
-> -		cc->iv_gen_ops = &crypt_iv_essiv_ops;
-> +		cc->iv_gen_ops = &crypt_iv_plain64_ops;
+v3:
+ - removed stable reference in patch 1
+ - reworded patch 1 to include name of patch 2 for the dependency.
+ - mentionned this dependency in patch 2 as well.
+ - corrected the Fixes: sha1 in patch 4
+ 
+v4:
+ - using scatterwalk_ffwd() instead of opencodying SG list forwarding.
+ - Added a patch to fix sg_copy_to_buffer() when sg->offset() is greater than PAGE_SIZE,
+ otherwise sg_copy_to_buffer() fails when the list has been forwarded with scatterwalk_ffwd().
+ - taken the patch "crypto: talitos - eliminate unneeded 'done' functions at build time"
+ out of the series because it is independent.
+ - added a helper to find the header field associated to a request in flush_channe()
+ 
+v5:
+ - Replacing the while loop by a direct shift/mask operation, as suggested by Herbert in patch 1.
 
-This is quite misleading - it looks like you are switching to plain64 here.
-The reality is that it uses plain64 to feed the ESSIV wrapper.
+Christophe Leroy (4):
+  lib/scatterlist: Fix mapping iterator when sg->offset is greater than
+    PAGE_SIZE
+  crypto: talitos - move struct talitos_edesc into talitos.h
+  crypto: talitos - fix hash on SEC1.
+  crypto: talitos - drop icv_ool
 
-So either it need some comment to explain it here, or just keep simple essiv_iv_ops
-and duplicate that plain64 generator (it is 2 lines of code).
+ drivers/crypto/talitos.c | 102 +++++++++++++++++++----------------------------
+ drivers/crypto/talitos.h |  28 +++++++++++++
+ lib/scatterlist.c        |   9 +++--
+ 3 files changed, 74 insertions(+), 65 deletions(-)
 
-For the clarity, I would prefer the second variant (duplicate ops) here.
+-- 
+2.13.3
 
-> @@ -2515,8 +2357,18 @@ static int crypt_ctr_cipher_old(struct dm_target *ti, char *cipher_in, char *key
->  	if (!cipher_api)
->  		goto bad_mem;
->  
-> -	ret = snprintf(cipher_api, CRYPTO_MAX_ALG_NAME,
-> -		       "%s(%s)", chainmode, cipher);
-> +	if (*ivmode && !strcmp(*ivmode, "essiv")) {
-> +		if (!*ivopts) {
-> +			ti->error = "Digest algorithm missing for ESSIV mode";
-> +			return -EINVAL;
-> +		}
-> +		ret = snprintf(cipher_api, CRYPTO_MAX_ALG_NAME,
-> +			       "essiv(%s(%s),%s,%s)", chainmode, cipher,
-> +			       cipher, *ivopts);
-
-This becomes quite long string already (limit is now 128 bytes), we should probably
-check also for too long string. It will perhaps fail later, but I would better add
-
-	if (ret < 0 || ret >= CRYPTO_MAX_ALG_NAME) {
-	...
-
-> +	} else {
-> +		ret = snprintf(cipher_api, CRYPTO_MAX_ALG_NAME,
-> +			       "%s(%s)", chainmode, cipher);
-> +	}
->  	if (ret < 0) {
->  		kfree(cipher_api);
->  		goto bad_mem;
-> 
-
-Thanks,
-Milan
