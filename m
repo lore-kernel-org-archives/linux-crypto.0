@@ -7,55 +7,55 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2E2FC43613
-	for <linux-crypto@archiver.kernel.org>; Mon, 24 Jun 2019 07:38:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58CA3C48BE8
+	for <linux-crypto@archiver.kernel.org>; Mon, 24 Jun 2019 07:38:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C7C762089F
-	for <linux-crypto@archiver.kernel.org>; Mon, 24 Jun 2019 07:38:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 319452089F
+	for <linux-crypto@archiver.kernel.org>; Mon, 24 Jun 2019 07:38:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ks4afDpG"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JbFH8Ho1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727135AbfFXHie (ORCPT
+        id S1726304AbfFXHie (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Mon, 24 Jun 2019 03:38:34 -0400
-Received: from mail-wm1-f46.google.com ([209.85.128.46]:56262 "EHLO
-        mail-wm1-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726304AbfFXHie (ORCPT
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:40032 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726077AbfFXHie (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Mon, 24 Jun 2019 03:38:34 -0400
-Received: by mail-wm1-f46.google.com with SMTP id a15so11714810wmj.5
-        for <linux-crypto@vger.kernel.org>; Mon, 24 Jun 2019 00:38:32 -0700 (PDT)
+Received: by mail-wm1-f67.google.com with SMTP id v19so12177480wmj.5
+        for <linux-crypto@vger.kernel.org>; Mon, 24 Jun 2019 00:38:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=uGyMTMnEnmfpuuNXf+kr/+c5q+YqlmYZacjCBN2vQcA=;
-        b=ks4afDpGmz7AEkmqzocmxBMmnx4ccAywUGq3s5K8VRlJjzKlkaewMwT33lNFF1f3p0
-         2znOrZoDv3oJ0Ct1oGVhVYE3CGSvuDS/S1jCF9Gj246Ijw3cXplRi35OX/N7KFxz1Ids
-         N6ED6uwdR4RRSupXQJ8gcJXZi7l4KMdKfkyciMwyhiES+aIR0AubgDtqzPu0e7tal/4k
-         w6MesfjMAqohVWqugFBMLNYv1IYAg9kJ8ui9UNprwcn124bSqcObf9Wwx4jpJnySOUGo
-         3peHcr3FrPnhhwFIZbbHeegFLFzqcups0pdW0OBkyi/qdzRAr/l8FId77u+HuVsfd7yC
-         PQig==
+        bh=5OEzIzFiMPRV9S0K58N+POdMr4xGLcUFsxWOdk6NnnA=;
+        b=JbFH8Ho1Xh+3eJVIL3O+9G/GjV6avDk5EN1nC/D6Yddr2ODKBk8LYB8If1dVcCabO6
+         4EPFLzpLy/BEaB+YdzCD6Q5ooGapt/8xL2NsmEMV8SVxqqeWKlrnBUTKCNK9yM0SynIS
+         +7l4AtjnkeodLGEORYVqv7yemIWAq/J+2wU4GtyD5PKzC103nVnL/13n8kaEQypBG0ql
+         CMGcBlyELTKIvt/rYd+sjHlkJutOgO75xTcrCL9ldmFsqVHGzY9xDNSik5X/1Xg64zhO
+         OW3k439WmWi9NhfATrDDosUq7sUzmn99MhQLP1/M7WvfA9UkvPbbL0LsVVO4V4KwTVi9
+         oA1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=uGyMTMnEnmfpuuNXf+kr/+c5q+YqlmYZacjCBN2vQcA=;
-        b=qHt+UVv9sATRKrhZ4UVl0mvzQ7OB6nW4bNCKpMliYzonLKVO9JI6X21OVCLe81AtZV
-         9Ol0et9CZ4pzMPqXERoNNYALFawmonWGkV1lXKdOVbiLa/ir1sJFUl1xXrGkdn53DDLc
-         wu0grT67lCbD+yatc8l8QysXCmtkYR6TIePwSR2ObeiMC3wMYvOJZYoNOH9hNDhC/Pzm
-         fvjt+BuA49GEhB4raLs8qbYzFHu/0LZPdPx+n79IIOcwtsmH5u91cOH9j/bqO1d74uJc
-         F6LF3T9iC9dCH8grBEQMgKurC8QVa+UeWQ8YpBsevM6Txnoz9cBmmoQWaPUmv0LVi1RO
-         GNBw==
-X-Gm-Message-State: APjAAAU4DaHjcA8ScJDduShCtaKGJuPF+NCWz6u5b+Tx9cx3noWW0jQG
-        jRqmApCBWtLEnf2OGJCxK4afXJNj13BiaQ==
-X-Google-Smtp-Source: APXvYqyQemsHDH1snkHDlRmvBVHNkTuLaGqWRu7VAdW1Q7D82Zp29FgrPEIWR+QsWb5D+pgdvJ9Etw==
-X-Received: by 2002:a1c:7d02:: with SMTP id y2mr14631078wmc.15.1561361911279;
-        Mon, 24 Jun 2019 00:38:31 -0700 (PDT)
+        bh=5OEzIzFiMPRV9S0K58N+POdMr4xGLcUFsxWOdk6NnnA=;
+        b=SYfbhQrnBFufxdShsuahTnL9Qg2QYUpPoBIzkkQrcINIm/G6izJv09EPjwYQkeLEqI
+         wfC+iKnyITfP/iSKsXJxE1nPTyh4oUoTX6/dO1iOJpg3vEu1OSahAASkpq3AOsXJstWd
+         52+4rhyyxMEwtxs1GeMPlEVUM8v+8RGyCg7MyDedJuHt9SUAOCpUwCqdF2qHbtMS0bup
+         IknCJLIxaKq7DT74CJMkCxZifSEtferb71Svl1Rl/p4bBNk4sKF52HSXtLs3ULXi5MYi
+         0FtY85ZQBIsmhMtfldQjzCHTDpHHQjjDgWzlku9QLFE+LgU1WqxqVjL9cvRxcv8Akj1e
+         RpyA==
+X-Gm-Message-State: APjAAAVycjZk5sM173FHtApXNGKrgcyeHG6mdGzEey9Ab8vT1a8E9d7I
+        GJGEC3ma+aeJ9p204sGQj1OBvdnapFfEww==
+X-Google-Smtp-Source: APXvYqyWlASfuGG5PFotiQ4hV9ePUb36FLzyGCScJmzQBe02DVBroVPPAdLZZh2kB6zr0Khaw6Ni1g==
+X-Received: by 2002:a1c:5a56:: with SMTP id o83mr14098674wmb.103.1561361912283;
+        Mon, 24 Jun 2019 00:38:32 -0700 (PDT)
 Received: from sudo.home ([2a01:cb1d:112:6f00:4866:7cdc:a930:8455])
-        by smtp.gmail.com with ESMTPSA id 203sm7419280wmc.30.2019.06.24.00.38.30
+        by smtp.gmail.com with ESMTPSA id 203sm7419280wmc.30.2019.06.24.00.38.31
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 24 Jun 2019 00:38:30 -0700 (PDT)
+        Mon, 24 Jun 2019 00:38:31 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     linux-arm-kernel@lists.infradead.org,
@@ -64,9 +64,9 @@ Cc:     linux-arm-kernel@lists.infradead.org,
         Ondrej Mosnacek <omosnace@redhat.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Steve Capper <steve.capper@arm.com>
-Subject: [PATCH 2/6] crypto: aegis - drop empty TFM init/exit routines
-Date:   Mon, 24 Jun 2019 09:38:14 +0200
-Message-Id: <20190624073818.29296-3-ard.biesheuvel@linaro.org>
+Subject: [PATCH 3/6] crypto: aegis - avoid prerotated AES tables
+Date:   Mon, 24 Jun 2019 09:38:15 +0200
+Message-Id: <20190624073818.29296-4-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190624073818.29296-1-ard.biesheuvel@linaro.org>
 References: <20190624073818.29296-1-ard.biesheuvel@linaro.org>
@@ -77,96 +77,58 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-TFM init/exit routines are optional, so no need to provide empty ones.
+The generic AES code provides four sets of lookup tables, where each
+set consists of four tables containing the same 32-bit values, but
+rotated by 0, 8, 16 and 24 bits, respectively. This makes sense for
+CISC architectures such as x86 which support memory operands, but
+for other architectures, the rotates are quite cheap, and using all
+four tables needlessly thrashes the D-cache, and actually hurts rather
+than helps performance.
+
+Since x86 already has its own implementation of AEGIS based on AES-NI
+instructions, let's tweak the generic implementation towards other
+architectures, and avoid the prerotated tables, and perform the
+rotations inline. On ARM Cortex-A53, this results in a ~8% speedup.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- crypto/aegis128.c  | 11 -----------
- crypto/aegis128l.c | 11 -----------
- crypto/aegis256.c  | 11 -----------
- 3 files changed, 33 deletions(-)
+ crypto/aegis.h | 14 ++++++--------
+ 1 file changed, 6 insertions(+), 8 deletions(-)
 
-diff --git a/crypto/aegis128.c b/crypto/aegis128.c
-index 125e11246990..4f8f1cdef129 100644
---- a/crypto/aegis128.c
-+++ b/crypto/aegis128.c
-@@ -403,22 +403,11 @@ static int crypto_aegis128_decrypt(struct aead_request *req)
- 	return crypto_memneq(tag.bytes, zeros, authsize) ? -EBADMSG : 0;
- }
+diff --git a/crypto/aegis.h b/crypto/aegis.h
+index 41a3090cda8e..3308066ddde0 100644
+--- a/crypto/aegis.h
++++ b/crypto/aegis.h
+@@ -10,6 +10,7 @@
+ #define _CRYPTO_AEGIS_H
  
--static int crypto_aegis128_init_tfm(struct crypto_aead *tfm)
--{
--	return 0;
--}
--
--static void crypto_aegis128_exit_tfm(struct crypto_aead *tfm)
--{
--}
--
- static struct aead_alg crypto_aegis128_alg = {
- 	.setkey = crypto_aegis128_setkey,
- 	.setauthsize = crypto_aegis128_setauthsize,
- 	.encrypt = crypto_aegis128_encrypt,
- 	.decrypt = crypto_aegis128_decrypt,
--	.init = crypto_aegis128_init_tfm,
--	.exit = crypto_aegis128_exit_tfm,
+ #include <crypto/aes.h>
++#include <linux/bitops.h>
+ #include <linux/types.h>
  
- 	.ivsize = AEGIS128_NONCE_SIZE,
- 	.maxauthsize = AEGIS128_MAX_AUTH_SIZE,
-diff --git a/crypto/aegis128l.c b/crypto/aegis128l.c
-index 9bca3d619a22..ef5bc2297a2c 100644
---- a/crypto/aegis128l.c
-+++ b/crypto/aegis128l.c
-@@ -467,22 +467,11 @@ static int crypto_aegis128l_decrypt(struct aead_request *req)
- 	return crypto_memneq(tag.bytes, zeros, authsize) ? -EBADMSG : 0;
- }
+ #define AEGIS_BLOCK_SIZE 16
+@@ -53,16 +54,13 @@ static void crypto_aegis_aesenc(union aegis_block *dst,
+ 				const union aegis_block *key)
+ {
+ 	const u8  *s  = src->bytes;
+-	const u32 *t0 = crypto_ft_tab[0];
+-	const u32 *t1 = crypto_ft_tab[1];
+-	const u32 *t2 = crypto_ft_tab[2];
+-	const u32 *t3 = crypto_ft_tab[3];
++	const u32 *t = crypto_ft_tab[0];
+ 	u32 d0, d1, d2, d3;
  
--static int crypto_aegis128l_init_tfm(struct crypto_aead *tfm)
--{
--	return 0;
--}
--
--static void crypto_aegis128l_exit_tfm(struct crypto_aead *tfm)
--{
--}
--
- static struct aead_alg crypto_aegis128l_alg = {
- 	.setkey = crypto_aegis128l_setkey,
- 	.setauthsize = crypto_aegis128l_setauthsize,
- 	.encrypt = crypto_aegis128l_encrypt,
- 	.decrypt = crypto_aegis128l_decrypt,
--	.init = crypto_aegis128l_init_tfm,
--	.exit = crypto_aegis128l_exit_tfm,
+-	d0 = t0[s[ 0]] ^ t1[s[ 5]] ^ t2[s[10]] ^ t3[s[15]];
+-	d1 = t0[s[ 4]] ^ t1[s[ 9]] ^ t2[s[14]] ^ t3[s[ 3]];
+-	d2 = t0[s[ 8]] ^ t1[s[13]] ^ t2[s[ 2]] ^ t3[s[ 7]];
+-	d3 = t0[s[12]] ^ t1[s[ 1]] ^ t2[s[ 6]] ^ t3[s[11]];
++	d0 = t[s[ 0]] ^ rol32(t[s[ 5]], 8) ^ rol32(t[s[10]], 16) ^ rol32(t[s[15]], 24);
++	d1 = t[s[ 4]] ^ rol32(t[s[ 9]], 8) ^ rol32(t[s[14]], 16) ^ rol32(t[s[ 3]], 24);
++	d2 = t[s[ 8]] ^ rol32(t[s[13]], 8) ^ rol32(t[s[ 2]], 16) ^ rol32(t[s[ 7]], 24);
++	d3 = t[s[12]] ^ rol32(t[s[ 1]], 8) ^ rol32(t[s[ 6]], 16) ^ rol32(t[s[11]], 24);
  
- 	.ivsize = AEGIS128L_NONCE_SIZE,
- 	.maxauthsize = AEGIS128L_MAX_AUTH_SIZE,
-diff --git a/crypto/aegis256.c b/crypto/aegis256.c
-index b47fd39595ad..b824ef4d1248 100644
---- a/crypto/aegis256.c
-+++ b/crypto/aegis256.c
-@@ -418,22 +418,11 @@ static int crypto_aegis256_decrypt(struct aead_request *req)
- 	return crypto_memneq(tag.bytes, zeros, authsize) ? -EBADMSG : 0;
- }
- 
--static int crypto_aegis256_init_tfm(struct crypto_aead *tfm)
--{
--	return 0;
--}
--
--static void crypto_aegis256_exit_tfm(struct crypto_aead *tfm)
--{
--}
--
- static struct aead_alg crypto_aegis256_alg = {
- 	.setkey = crypto_aegis256_setkey,
- 	.setauthsize = crypto_aegis256_setauthsize,
- 	.encrypt = crypto_aegis256_encrypt,
- 	.decrypt = crypto_aegis256_decrypt,
--	.init = crypto_aegis256_init_tfm,
--	.exit = crypto_aegis256_exit_tfm,
- 
- 	.ivsize = AEGIS256_NONCE_SIZE,
- 	.maxauthsize = AEGIS256_MAX_AUTH_SIZE,
+ 	dst->words32[0] = cpu_to_le32(d0) ^ key->words32[0];
+ 	dst->words32[1] = cpu_to_le32(d1) ^ key->words32[1];
 -- 
 2.20.1
 
