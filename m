@@ -6,121 +6,128 @@ X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0AB7C43613
-	for <linux-crypto@archiver.kernel.org>; Mon, 24 Jun 2019 08:13:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27C49C48BE9
+	for <linux-crypto@archiver.kernel.org>; Mon, 24 Jun 2019 10:10:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A7C0F2083D
-	for <linux-crypto@archiver.kernel.org>; Mon, 24 Jun 2019 08:13:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 09DDE2063F
+	for <linux-crypto@archiver.kernel.org>; Mon, 24 Jun 2019 10:10:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726343AbfFXINN (ORCPT
+        id S1729027AbfFXKKG (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 24 Jun 2019 04:13:13 -0400
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:38840 "EHLO
-        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725881AbfFXINN (ORCPT
+        Mon, 24 Jun 2019 06:10:06 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:8776 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1730384AbfFXKKG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 24 Jun 2019 04:13:13 -0400
-Received: by mail-ot1-f67.google.com with SMTP id d17so12645589oth.5
-        for <linux-crypto@vger.kernel.org>; Mon, 24 Jun 2019 01:13:13 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=tgtglqVI+yhp3Ca/jYEFLBUnBPDfmJrS3TB1QtUe6wk=;
-        b=dmUCfCRYpb5XNA/gmk4buXOxV/JuFqRDAcpX+K5WIdsJ7tc171/LitLWNtXYrxdaae
-         DHMyj9xu8Za2FD755Vhp2sdHfKG3UdgqnRpJoMKtwheV9vswVhSzF2wGl7cRVoTmJrkI
-         /vqC8ALj8ai6l0sRJS8BHyzea7mvQYXz2kq3F3cvuRz0Naz212rlFSL6zw5BsbIqZRCR
-         VNmcX6m3UcNGMEj6ez9tiymvIdgDSSUfyppa7zmQwEaim+pDsOKBrCLqxvvLh+AgXMpw
-         J1kaDRgtb2vuy9d1s32ujl6KcihM25XQhWsGMo9nxOieEfJD3r1E5tfoQpaE5QbVWM7j
-         BFYQ==
-X-Gm-Message-State: APjAAAVvWPueX2I/h26qC/ZM5sbe4EeZjdHPCGirpa07cPHfSzjxTNMY
-        mvk3eu+2tcS8VOBHTFNPK0v3LauQrH2HlRt9oTXuSA==
-X-Google-Smtp-Source: APXvYqyjjtHL7kuAGvGg1Taus+PBf+IeqW8IdvXqNYnVch4/4XwsLD4daZcwXJaUEgGgnfnMoQvjq7+bXd0qLS7+4Z4=
-X-Received: by 2002:a9d:73cd:: with SMTP id m13mr7847700otk.43.1561363993191;
- Mon, 24 Jun 2019 01:13:13 -0700 (PDT)
+        Mon, 24 Jun 2019 06:10:06 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x5OA79ir026073
+        for <linux-crypto@vger.kernel.org>; Mon, 24 Jun 2019 06:10:05 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2tasms02bn-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <linux-crypto@vger.kernel.org>; Mon, 24 Jun 2019 06:10:04 -0400
+Received: from localhost
+        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-crypto@vger.kernel.org> from <freude@linux.ibm.com>;
+        Mon, 24 Jun 2019 11:10:03 +0100
+Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
+        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Mon, 24 Jun 2019 11:10:01 +0100
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x5OAA0L742074156
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 24 Jun 2019 10:10:00 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 19CCB42054;
+        Mon, 24 Jun 2019 10:10:00 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E05EC42047;
+        Mon, 24 Jun 2019 10:09:59 +0000 (GMT)
+Received: from [10.0.2.15] (unknown [9.152.224.114])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 24 Jun 2019 10:09:59 +0000 (GMT)
+Subject: Re: [RFC PATCH 02/30] crypto: s390/des - switch to new verification
+ routines
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        linux-crypto@vger.kernel.org
+Cc:     herbert@gondor.apana.org.au, ebiggers@google.com
+References: <20190622003112.31033-1-ard.biesheuvel@linaro.org>
+ <20190622003112.31033-3-ard.biesheuvel@linaro.org>
+From:   Harald Freudenberger <freude@linux.ibm.com>
+Date:   Mon, 24 Jun 2019 12:10:03 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
 MIME-Version: 1.0
-References: <20190624073818.29296-1-ard.biesheuvel@linaro.org> <20190624073818.29296-4-ard.biesheuvel@linaro.org>
-In-Reply-To: <20190624073818.29296-4-ard.biesheuvel@linaro.org>
-From:   Ondrej Mosnacek <omosnace@redhat.com>
-Date:   Mon, 24 Jun 2019 10:13:02 +0200
-Message-ID: <CAFqZXNvC=0pDgo9fAujiun2u79SPettvcTKQVhd=Yzq-NT_q-Q@mail.gmail.com>
-Subject: Re: [PATCH 3/6] crypto: aegis - avoid prerotated AES tables
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        Eric Biggers <ebiggers@google.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Steve Capper <steve.capper@arm.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20190622003112.31033-3-ard.biesheuvel@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+x-cbid: 19062410-0016-0000-0000-0000028BD53A
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19062410-0017-0000-0000-000032E94087
+Message-Id: <a25731e1-236b-05bd-f211-788f1734d364@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-24_08:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1906240085
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jun 24, 2019 at 9:38 AM Ard Biesheuvel
-<ard.biesheuvel@linaro.org> wrote:
-> The generic AES code provides four sets of lookup tables, where each
-> set consists of four tables containing the same 32-bit values, but
-> rotated by 0, 8, 16 and 24 bits, respectively. This makes sense for
-> CISC architectures such as x86 which support memory operands, but
-> for other architectures, the rotates are quite cheap, and using all
-> four tables needlessly thrashes the D-cache, and actually hurts rather
-> than helps performance.
->
-> Since x86 already has its own implementation of AEGIS based on AES-NI
-> instructions, let's tweak the generic implementation towards other
-> architectures, and avoid the prerotated tables, and perform the
-> rotations inline. On ARM Cortex-A53, this results in a ~8% speedup.
->
+On 22.06.19 02:30, Ard Biesheuvel wrote:
 > Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-
-I'm not an expert on low-level performance, but the rationale sounds reasonable.
-
-Acked-by: Ondrej Mosnacek <omosnace@redhat.com>
-
 > ---
->  crypto/aegis.h | 14 ++++++--------
->  1 file changed, 6 insertions(+), 8 deletions(-)
+>  arch/s390/crypto/des_s390.c | 15 ++++++---------
+>  1 file changed, 6 insertions(+), 9 deletions(-)
 >
-> diff --git a/crypto/aegis.h b/crypto/aegis.h
-> index 41a3090cda8e..3308066ddde0 100644
-> --- a/crypto/aegis.h
-> +++ b/crypto/aegis.h
-> @@ -10,6 +10,7 @@
->  #define _CRYPTO_AEGIS_H
+> diff --git a/arch/s390/crypto/des_s390.c b/arch/s390/crypto/des_s390.c
+> index 1f9ab24dc048..4e4061885b0d 100644
+> --- a/arch/s390/crypto/des_s390.c
+> +++ b/arch/s390/crypto/des_s390.c
+> @@ -15,7 +15,7 @@
+>  #include <linux/crypto.h>
+>  #include <linux/fips.h>
+>  #include <crypto/algapi.h>
+> -#include <crypto/des.h>
+> +#include <crypto/internal/des.h>
+>  #include <asm/cpacf.h>
 >
->  #include <crypto/aes.h>
-> +#include <linux/bitops.h>
->  #include <linux/types.h>
->
->  #define AEGIS_BLOCK_SIZE 16
-> @@ -53,16 +54,13 @@ static void crypto_aegis_aesenc(union aegis_block *dst,
->                                 const union aegis_block *key)
+>  #define DES3_KEY_SIZE	(3 * DES_KEY_SIZE)
+> @@ -34,14 +34,11 @@ static int des_setkey(struct crypto_tfm *tfm, const u8 *key,
+>  		      unsigned int key_len)
 >  {
->         const u8  *s  = src->bytes;
-> -       const u32 *t0 = crypto_ft_tab[0];
-> -       const u32 *t1 = crypto_ft_tab[1];
-> -       const u32 *t2 = crypto_ft_tab[2];
-> -       const u32 *t3 = crypto_ft_tab[3];
-> +       const u32 *t = crypto_ft_tab[0];
->         u32 d0, d1, d2, d3;
+>  	struct s390_des_ctx *ctx = crypto_tfm_ctx(tfm);
+> -	u32 tmp[DES_EXPKEY_WORDS];
+> +	int err;
 >
-> -       d0 = t0[s[ 0]] ^ t1[s[ 5]] ^ t2[s[10]] ^ t3[s[15]];
-> -       d1 = t0[s[ 4]] ^ t1[s[ 9]] ^ t2[s[14]] ^ t3[s[ 3]];
-> -       d2 = t0[s[ 8]] ^ t1[s[13]] ^ t2[s[ 2]] ^ t3[s[ 7]];
-> -       d3 = t0[s[12]] ^ t1[s[ 1]] ^ t2[s[ 6]] ^ t3[s[11]];
-> +       d0 = t[s[ 0]] ^ rol32(t[s[ 5]], 8) ^ rol32(t[s[10]], 16) ^ rol32(t[s[15]], 24);
-> +       d1 = t[s[ 4]] ^ rol32(t[s[ 9]], 8) ^ rol32(t[s[14]], 16) ^ rol32(t[s[ 3]], 24);
-> +       d2 = t[s[ 8]] ^ rol32(t[s[13]], 8) ^ rol32(t[s[ 2]], 16) ^ rol32(t[s[ 7]], 24);
-> +       d3 = t[s[12]] ^ rol32(t[s[ 1]], 8) ^ rol32(t[s[ 6]], 16) ^ rol32(t[s[11]], 24);
+> -	/* check for weak keys */
+> -	if (!des_ekey(tmp, key) &&
+> -	    (tfm->crt_flags & CRYPTO_TFM_REQ_FORBID_WEAK_KEYS)) {
+> -		tfm->crt_flags |= CRYPTO_TFM_RES_WEAK_KEY;
+> -		return -EINVAL;
+> -	}
+> +	err = des_verify_key(tfm, key, key_len);
+> +	if (unlikely(err))
+> +		return err;
 >
->         dst->words32[0] = cpu_to_le32(d0) ^ key->words32[0];
->         dst->words32[1] = cpu_to_le32(d1) ^ key->words32[1];
-> --
-> 2.20.1
+>  	memcpy(ctx->key, key, key_len);
+>  	return 0;
+> @@ -226,7 +223,7 @@ static int des3_setkey(struct crypto_tfm *tfm, const u8 *key,
+>  	struct s390_des_ctx *ctx = crypto_tfm_ctx(tfm);
+>  	int err;
 >
+> -	err = __des3_verify_key(&tfm->crt_flags, key);
+> +	err = crypto_des3_ede_verify_key(tfm, key, key_len);
+>  	if (unlikely(err))
+>  		return err;
+>
+Fine with me, Thanks,
+Acked-by: Harald Freudenberger <freude@linux.ibm.com>
 
-
--- 
-Ondrej Mosnacek <omosnace at redhat dot com>
-Software Engineer, Security Technologies
-Red Hat, Inc.
