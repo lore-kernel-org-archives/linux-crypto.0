@@ -2,127 +2,169 @@ Return-Path: <SRS0=EE7o=UX=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9110FC43613
-	for <linux-crypto@archiver.kernel.org>; Mon, 24 Jun 2019 07:20:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 814B4C43613
+	for <linux-crypto@archiver.kernel.org>; Mon, 24 Jun 2019 07:20:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3CADB2083D
-	for <linux-crypto@archiver.kernel.org>; Mon, 24 Jun 2019 07:20:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5A47E2083D
+	for <linux-crypto@archiver.kernel.org>; Mon, 24 Jun 2019 07:20:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=c-s.fr header.i=@c-s.fr header.b="s19ZDSn5"
+	dkim=pass (1024-bit key) header.d=c-s.fr header.i=@c-s.fr header.b="ZmVkpdDa"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727176AbfFXHUQ (ORCPT
+        id S1727702AbfFXHUS (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 24 Jun 2019 03:20:16 -0400
-Received: from pegase1.c-s.fr ([93.17.236.30]:29730 "EHLO pegase1.c-s.fr"
+        Mon, 24 Jun 2019 03:20:18 -0400
+Received: from pegase1.c-s.fr ([93.17.236.30]:9803 "EHLO pegase1.c-s.fr"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726077AbfFXHUQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 24 Jun 2019 03:20:16 -0400
+        id S1726077AbfFXHUR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 24 Jun 2019 03:20:17 -0400
 Received: from localhost (mailhub1-int [192.168.12.234])
-        by localhost (Postfix) with ESMTP id 45XLKP3N1fz9vBml;
-        Mon, 24 Jun 2019 09:20:09 +0200 (CEST)
+        by localhost (Postfix) with ESMTP id 45XLKR25lPz9vBmn;
+        Mon, 24 Jun 2019 09:20:11 +0200 (CEST)
 Authentication-Results: localhost; dkim=pass
         reason="1024-bit key; insecure key"
-        header.d=c-s.fr header.i=@c-s.fr header.b=s19ZDSn5; dkim-adsp=pass;
+        header.d=c-s.fr header.i=@c-s.fr header.b=ZmVkpdDa; dkim-adsp=pass;
         dkim-atps=neutral
 X-Virus-Scanned: Debian amavisd-new at c-s.fr
 Received: from pegase1.c-s.fr ([192.168.12.234])
         by localhost (pegase1.c-s.fr [192.168.12.234]) (amavisd-new, port 10024)
-        with ESMTP id xldeek0ewHOc; Mon, 24 Jun 2019 09:20:09 +0200 (CEST)
+        with ESMTP id GNPmUBSJKdRB; Mon, 24 Jun 2019 09:20:11 +0200 (CEST)
 Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-        by pegase1.c-s.fr (Postfix) with ESMTP id 45XLKP22hNz9vBmR;
-        Mon, 24 Jun 2019 09:20:09 +0200 (CEST)
+        by pegase1.c-s.fr (Postfix) with ESMTP id 45XLKR13Kcz9vBmR;
+        Mon, 24 Jun 2019 09:20:11 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=c-s.fr; s=mail;
-        t=1561360809; bh=uqSyYAuIgffBR0A50tqUgIECoBVIQIvOhmxv2zbmqbg=;
-        h=From:Subject:To:Cc:Date:From;
-        b=s19ZDSn5W/iLhp9qcgc83xHYMkjAx4y1dNQgPh4SA1NxYlgcYC11NChUC8peLAiZ3
-         o+iQGQNFpMj91CRj0q9va+uqsUhEbv/NRBqQy4EYv9TQCNf3wKa5Cg/+Fo55M7ivYT
-         j1Rwg8ZPwarLO7MbxoBm8If8N4dw6qopNdtiPsrw=
+        t=1561360811; bh=ICrZPIPXP+mZQXc1EQQD5yVv+C0fZhFeOVrVqgUA7t4=;
+        h=In-Reply-To:References:From:Subject:To:Cc:Date:From;
+        b=ZmVkpdDaGcTqOTN00CzWQEBU7my3Lt6E9yN4LEWPHbdT7fXxftlUNgjlekf/KEcb1
+         LrmHuOc3TlYQQwx7PkxThbOT4ackABLumaWkSEMY1MgB/Rt5yUM6Y+BUXjHQztwVy8
+         6PeVXh70qzIGA/MF5SvxmQZbCLn0bDhfAOT/5bA0=
 Received: from localhost (localhost [127.0.0.1])
-        by messagerie.si.c-s.fr (Postfix) with ESMTP id D62E68B78B;
-        Mon, 24 Jun 2019 09:20:13 +0200 (CEST)
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id B4D338B787;
+        Mon, 24 Jun 2019 09:20:15 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at c-s.fr
 Received: from messagerie.si.c-s.fr ([127.0.0.1])
         by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-        with ESMTP id HLL_7-DMmVsO; Mon, 24 Jun 2019 09:20:13 +0200 (CEST)
+        with ESMTP id Kl_crwMwCszJ; Mon, 24 Jun 2019 09:20:15 +0200 (CEST)
 Received: from po16838vm.idsi0.si.c-s.fr (po15451.idsi0.si.c-s.fr [172.25.230.101])
-        by messagerie.si.c-s.fr (Postfix) with ESMTP id B6E9D8B787;
-        Mon, 24 Jun 2019 09:20:13 +0200 (CEST)
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id 8B8D58B74C;
+        Mon, 24 Jun 2019 09:20:15 +0200 (CEST)
 Received: by po16838vm.idsi0.si.c-s.fr (Postfix, from userid 0)
-        id 7CFA767424; Mon, 24 Jun 2019 07:20:13 +0000 (UTC)
-Message-Id: <cover.1561360551.git.christophe.leroy@c-s.fr>
+        id 8D2CB67424; Mon, 24 Jun 2019 07:20:15 +0000 (UTC)
+Message-Id: <5147e059577ba829235c8bd868609f214472fc28.1561360551.git.christophe.leroy@c-s.fr>
+In-Reply-To: <cover.1561360551.git.christophe.leroy@c-s.fr>
+References: <cover.1561360551.git.christophe.leroy@c-s.fr>
 From:   Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: [PATCH v5 0/4] *** SUBJECT HERE ***
+Subject: [PATCH v5 2/4] crypto: talitos - move struct talitos_edesc into
+ talitos.h
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>, horia.geanta@nxp.com
 Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         linuxppc-dev@lists.ozlabs.org
-Date:   Mon, 24 Jun 2019 07:20:13 +0000 (UTC)
+Date:   Mon, 24 Jun 2019 07:20:15 +0000 (UTC)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This series is the last set of fixes for the Talitos driver.
+Moves struct talitos_edesc into talitos.h so that it can be used
+from any place in talitos.c
 
-We now get a fully clean boot on both SEC1 (SEC1.2 on mpc885) and
-SEC2 (SEC2.2 on mpc8321E) with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS:
+It will be required for next patch ("crypto: talitos - fix hash
+on SEC1")
 
-[    3.385197] bus: 'platform': really_probe: probing driver talitos with device ff020000.crypto
-[    3.450982] random: fast init done
-[   12.252548] alg: No test for authenc(hmac(md5),cbc(aes)) (authenc-hmac-md5-cbc-aes-talitos-hsna)
-[   12.262226] alg: No test for authenc(hmac(md5),cbc(des3_ede)) (authenc-hmac-md5-cbc-3des-talitos-hsna)
-[   43.310737] Bug in SEC1, padding ourself
-[   45.603318] random: crng init done
-[   54.612333] talitos ff020000.crypto: fsl,sec1.2 algorithms registered in /proc/crypto
-[   54.620232] driver: 'talitos': driver_bound: bound to device 'ff020000.crypto'
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+Cc: stable@vger.kernel.org
+---
+ drivers/crypto/talitos.c | 30 ------------------------------
+ drivers/crypto/talitos.h | 30 ++++++++++++++++++++++++++++++
+ 2 files changed, 30 insertions(+), 30 deletions(-)
 
-[    1.193721] bus: 'platform': really_probe: probing driver talitos with device b0030000.crypto
-[    1.229197] random: fast init done
-[    2.714920] alg: No test for authenc(hmac(sha224),cbc(aes)) (authenc-hmac-sha224-cbc-aes-talitos)
-[    2.724312] alg: No test for authenc(hmac(sha224),cbc(aes)) (authenc-hmac-sha224-cbc-aes-talitos-hsna)
-[    4.482045] alg: No test for authenc(hmac(md5),cbc(aes)) (authenc-hmac-md5-cbc-aes-talitos)
-[    4.490940] alg: No test for authenc(hmac(md5),cbc(aes)) (authenc-hmac-md5-cbc-aes-talitos-hsna)
-[    4.500280] alg: No test for authenc(hmac(md5),cbc(des3_ede)) (authenc-hmac-md5-cbc-3des-talitos)
-[    4.509727] alg: No test for authenc(hmac(md5),cbc(des3_ede)) (authenc-hmac-md5-cbc-3des-talitos-hsna)
-[    6.631781] random: crng init done
-[   11.521795] talitos b0030000.crypto: fsl,sec2.2 algorithms registered in /proc/crypto
-[   11.529803] driver: 'talitos': driver_bound: bound to device 'b0030000.crypto'
-
-v2: dropped patch 1 which was irrelevant due to a rebase weirdness. Added Cc to stable on the 2 first patches.
-
-v3:
- - removed stable reference in patch 1
- - reworded patch 1 to include name of patch 2 for the dependency.
- - mentionned this dependency in patch 2 as well.
- - corrected the Fixes: sha1 in patch 4
+diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+index a7704b53529d..95dc3957f358 100644
+--- a/drivers/crypto/talitos.c
++++ b/drivers/crypto/talitos.c
+@@ -951,36 +951,6 @@ static int aead_des3_setkey(struct crypto_aead *authenc,
+ 	goto out;
+ }
  
-v4:
- - using scatterwalk_ffwd() instead of opencodying SG list forwarding.
- - Added a patch to fix sg_copy_to_buffer() when sg->offset() is greater than PAGE_SIZE,
- otherwise sg_copy_to_buffer() fails when the list has been forwarded with scatterwalk_ffwd().
- - taken the patch "crypto: talitos - eliminate unneeded 'done' functions at build time"
- out of the series because it is independent.
- - added a helper to find the header field associated to a request in flush_channe()
+-/*
+- * talitos_edesc - s/w-extended descriptor
+- * @src_nents: number of segments in input scatterlist
+- * @dst_nents: number of segments in output scatterlist
+- * @icv_ool: whether ICV is out-of-line
+- * @iv_dma: dma address of iv for checking continuity and link table
+- * @dma_len: length of dma mapped link_tbl space
+- * @dma_link_tbl: bus physical address of link_tbl/buf
+- * @desc: h/w descriptor
+- * @link_tbl: input and output h/w link tables (if {src,dst}_nents > 1) (SEC2)
+- * @buf: input and output buffeur (if {src,dst}_nents > 1) (SEC1)
+- *
+- * if decrypting (with authcheck), or either one of src_nents or dst_nents
+- * is greater than 1, an integrity check value is concatenated to the end
+- * of link_tbl data
+- */
+-struct talitos_edesc {
+-	int src_nents;
+-	int dst_nents;
+-	bool icv_ool;
+-	dma_addr_t iv_dma;
+-	int dma_len;
+-	dma_addr_t dma_link_tbl;
+-	struct talitos_desc desc;
+-	union {
+-		struct talitos_ptr link_tbl[0];
+-		u8 buf[0];
+-	};
+-};
+-
+ static void talitos_sg_unmap(struct device *dev,
+ 			     struct talitos_edesc *edesc,
+ 			     struct scatterlist *src,
+diff --git a/drivers/crypto/talitos.h b/drivers/crypto/talitos.h
+index 32ad4fc679ed..95f78c6d9206 100644
+--- a/drivers/crypto/talitos.h
++++ b/drivers/crypto/talitos.h
+@@ -42,6 +42,36 @@ struct talitos_desc {
  
-v5:
- - Replacing the while loop by a direct shift/mask operation, as suggested by Herbert in patch 1.
-
-Christophe Leroy (4):
-  lib/scatterlist: Fix mapping iterator when sg->offset is greater than
-    PAGE_SIZE
-  crypto: talitos - move struct talitos_edesc into talitos.h
-  crypto: talitos - fix hash on SEC1.
-  crypto: talitos - drop icv_ool
-
- drivers/crypto/talitos.c | 102 +++++++++++++++++++----------------------------
- drivers/crypto/talitos.h |  28 +++++++++++++
- lib/scatterlist.c        |   9 +++--
- 3 files changed, 74 insertions(+), 65 deletions(-)
-
+ #define TALITOS_DESC_SIZE	(sizeof(struct talitos_desc) - sizeof(__be32))
+ 
++/*
++ * talitos_edesc - s/w-extended descriptor
++ * @src_nents: number of segments in input scatterlist
++ * @dst_nents: number of segments in output scatterlist
++ * @icv_ool: whether ICV is out-of-line
++ * @iv_dma: dma address of iv for checking continuity and link table
++ * @dma_len: length of dma mapped link_tbl space
++ * @dma_link_tbl: bus physical address of link_tbl/buf
++ * @desc: h/w descriptor
++ * @link_tbl: input and output h/w link tables (if {src,dst}_nents > 1) (SEC2)
++ * @buf: input and output buffeur (if {src,dst}_nents > 1) (SEC1)
++ *
++ * if decrypting (with authcheck), or either one of src_nents or dst_nents
++ * is greater than 1, an integrity check value is concatenated to the end
++ * of link_tbl data
++ */
++struct talitos_edesc {
++	int src_nents;
++	int dst_nents;
++	bool icv_ool;
++	dma_addr_t iv_dma;
++	int dma_len;
++	dma_addr_t dma_link_tbl;
++	struct talitos_desc desc;
++	union {
++		struct talitos_ptr link_tbl[0];
++		u8 buf[0];
++	};
++};
++
+ /**
+  * talitos_request - descriptor submission request
+  * @desc: descriptor pointer (kernel virtual)
 -- 
 2.13.3
 
