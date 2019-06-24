@@ -2,153 +2,128 @@ Return-Path: <SRS0=EE7o=UX=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79626C43613
-	for <linux-crypto@archiver.kernel.org>; Mon, 24 Jun 2019 07:27:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7D0FC43613
+	for <linux-crypto@archiver.kernel.org>; Mon, 24 Jun 2019 07:38:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4EF752133F
-	for <linux-crypto@archiver.kernel.org>; Mon, 24 Jun 2019 07:27:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 742872089F
+	for <linux-crypto@archiver.kernel.org>; Mon, 24 Jun 2019 07:38:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EFUddc5Z"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727221AbfFXH1J (ORCPT
+        id S1726223AbfFXHia (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 24 Jun 2019 03:27:09 -0400
-Received: from mail-io1-f70.google.com ([209.85.166.70]:50958 "EHLO
-        mail-io1-f70.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726793AbfFXH1J (ORCPT
+        Mon, 24 Jun 2019 03:38:30 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:36584 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726077AbfFXHia (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 24 Jun 2019 03:27:09 -0400
-Received: by mail-io1-f70.google.com with SMTP id m26so20851289ioh.17
-        for <linux-crypto@vger.kernel.org>; Mon, 24 Jun 2019 00:27:08 -0700 (PDT)
+        Mon, 24 Jun 2019 03:38:30 -0400
+Received: by mail-wr1-f66.google.com with SMTP id n4so11516756wrs.3
+        for <linux-crypto@vger.kernel.org>; Mon, 24 Jun 2019 00:38:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=mXpydhn3h8+bwzi+XRJ+smOVOxIlaYlB/CCvwP4+MC0=;
+        b=EFUddc5ZhmYskuZkgdXO8fVeBRbsHkwxsuCWTy9nTMFiqHeoeKYmQ8UKTeARs/Ufi0
+         AGSAGAyxxey9pENHwuPySrCsOagS0TuUhMdPRGkpbum/kNByuTEOIPnGvLn7MylZ8XQY
+         zIMjaMmbzwtPwHqZF5VbI6y+sOSVj6g92/Ihem13G6RH/z/RcABIPO+vK1nLUIoWbIXG
+         w5WcIGGvh0yfhxM/QY/kHR0ZHNg5R6QLYs0kcR1cLqFb2uc9kKTFc1Q9bvbX8jmNLiID
+         YwQg++0PAd0hxvoklpata8ZfVeTv98YqXEOE5brwnTEzTKtVo/7RFSxFKfrOf46mdvep
+         xQtQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=Iupi8DOKHDcSSlu87q2pfPMCXoPDN4x3nXpdzN2NyMQ=;
-        b=Kx5VlXXhtaqlOP/HLQVxdNyUAKoX08n/CsTbHeptDt8lqVdR6PLNcwIWQjADhf7OyF
-         mGbyecop4rO1lbbZJSq211KvUkuvOW/Sc7avymfKD1X5rmD6jtks1GsTcy7R0czjqUNJ
-         x4jT481FoW/ppn2LtJFRMe5466ykEzAIq8ZrSQZ/nbgdwYFfS07FriHZBaRXHeAxrc+q
-         BVwbFRATJOZ3VEybjM9TChqGUFYrYYA2OTv8/fQAcNEjaMmWnaDHZk0DIKbsaRdsZ3eP
-         wnR+vfwD4GM1CEKrhcJzvSvQGPjapWO9GzWAzB5bKC92UkWTAS85GhbvrsrFsWfzvhzr
-         IKVQ==
-X-Gm-Message-State: APjAAAXd/XqvphC/ReR9tZeGloQrGi2BS3/nLeGhSiHUULDpb9/gP0aF
-        ErQDSKHn7ePa1RyTz3uiaXnEi7ahHkC1FHj7oX8fDparo4bm
-X-Google-Smtp-Source: APXvYqxeGV620buUz0aPb2+Oqval4tymsKZZilxKrwLaNYS/Nod4djMLtWlaFmOVev18aExDa9BRLfJkWKbYX/1+mnSH+50izSU3
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=mXpydhn3h8+bwzi+XRJ+smOVOxIlaYlB/CCvwP4+MC0=;
+        b=dKVCUC9JwO1afMyZnN/k1BPLd3PxoHihoy9SBDERJgn1JOX9DNdljTe+duSn5qSkeF
+         iuONpJarzZY9NzFLiLbnxOOzW5wyWXXBJvGs/rNtXhJWnD9FQglZAUspaNuE7I3ew/oG
+         Svm0F2jYLcZJgofGaRKNB5uYnsny3vzNJr/5Q4FhuDWKojEuZItDI3cEmsX9xWy/qlTp
+         aLVRB3NriScLnpM9YSbJl+ldflQXVc2u/5RJGfxIywM+W9DtOuzLhkONm+A43UDgRQ0b
+         yF5I81q/KK2a4rNXyoeeUcPv0RBRDoVxAAgQvwwARo4UDnV4X2d5mEd8p8eiIHFlF9XL
+         waJg==
+X-Gm-Message-State: APjAAAXZx2/IbBRE2rCkSR9vjwBJC3UaFnLIwX8SQ3Wh5nmRaAmMGrIb
+        iQAGbcf6v9rvWThPEc7mdma+QzHiQ4Sa1w==
+X-Google-Smtp-Source: APXvYqyHU+wrAL3tzmfsUcOkdJGCukuctwZR1VG5OIO/Y8RTnTMwtaL77LTKb4zuZzvqFyI6M5WWjQ==
+X-Received: by 2002:adf:fbd0:: with SMTP id d16mr23209832wrs.341.1561361908966;
+        Mon, 24 Jun 2019 00:38:28 -0700 (PDT)
+Received: from sudo.home ([2a01:cb1d:112:6f00:4866:7cdc:a930:8455])
+        by smtp.gmail.com with ESMTPSA id 203sm7419280wmc.30.2019.06.24.00.38.27
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 24 Jun 2019 00:38:28 -0700 (PDT)
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To:     linux-crypto@vger.kernel.org
+Cc:     linux-arm-kernel@lists.infradead.org,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Eric Biggers <ebiggers@google.com>,
+        Ondrej Mosnacek <omosnace@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Steve Capper <steve.capper@arm.com>
+Subject: [PATCH 0/6] crypto: aegis128 - add NEON intrinsics version for ARM/arm64
+Date:   Mon, 24 Jun 2019 09:38:12 +0200
+Message-Id: <20190624073818.29296-1-ard.biesheuvel@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:218b:: with SMTP id b11mr39471009iob.264.1561361228329;
- Mon, 24 Jun 2019 00:27:08 -0700 (PDT)
-Date:   Mon, 24 Jun 2019 00:27:08 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000617b4a058c0cbd60@google.com>
-Subject: memory leak in mpihelp_mul_karatsuba_case
-From:   syzbot <syzbot+f7baccc38dcc1e094e77@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello,
+Now that aegis128 has been announced as one of the winners of the CAESAR
+competition, it's time to provide some better support for it on arm64 (and
+32-bit ARM *)
 
-syzbot found the following crash on:
+This time, instead of cloning the generic driver twice and rewriting half
+of it in arm64 and ARM assembly, add hooks for an accelerated SIMD path to
+the generic driver, and populate it with a C version using NEON intrinsics
+that can be built for both ARM and arm64. This results in a speedup of ~11x,
+resulting in a performance of 2.2 cycles per byte on Cortex-A53.
 
-HEAD commit:    abf02e29 Merge tag 'pm-5.2-rc6' of git://git.kernel.org/pu..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=17a8bfeaa00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=56f1da14935c3cce
-dashboard link: https://syzkaller.appspot.com/bug?extid=f7baccc38dcc1e094e77
-compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=171aa7e6a00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=153306cea00000
+Patches #1 .. #3 are some fixes/improvements for the generic code. Patch #4
+adds the plumbing for using a SIMD accelerated implementation. Patch #5
+adds the ARM and arm64 code, and patch #6 adds a speed test.
 
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+f7baccc38dcc1e094e77@syzkaller.appspotmail.com
+Note that aegis128l and aegis256 were not selected, and nor where any of the
+morus contestants, and so we should probably consider dropping those drivers
+again.
 
-ffffffffda RBX: 0000000000000000 RCX: 0000000000441ac9
-BUG: memory leak
-unreferenced object 0xffff88811f4da200 (size 512):
-   comm "syz-executor301", pid 7045, jiffies 4294955450 (age 7.850s)
-   hex dump (first 32 bytes):
-     ad dc f4 43 66 b0 1a 88 8f 0c 17 d5 86 34 3a 85  ...Cf........4:.
-     e3 63 c8 bf 2e 3b f5 0d 1c ab 63 30 15 fe a1 e9  .c...;....c0....
-   backtrace:
-     [<00000000d5589961>] kmemleak_alloc_recursive  
-include/linux/kmemleak.h:43 [inline]
-     [<00000000d5589961>] slab_post_alloc_hook mm/slab.h:439 [inline]
-     [<00000000d5589961>] slab_alloc mm/slab.c:3326 [inline]
-     [<00000000d5589961>] __do_kmalloc mm/slab.c:3658 [inline]
-     [<00000000d5589961>] __kmalloc+0x161/0x2c0 mm/slab.c:3669
-     [<00000000022eaa00>] kmalloc include/linux/slab.h:552 [inline]
-     [<00000000022eaa00>] mpi_alloc_limb_space+0x29/0x50 lib/mpi/mpiutil.c:64
-     [<00000000d637c699>] mpihelp_mul_karatsuba_case+0x67/0x460  
-lib/mpi/mpih-mul.c:331
-     [<00000000401dc6f9>] mpi_powm+0x7b0/0xdd0 lib/mpi/mpi-pow.c:225
-     [<00000000be8dcb84>] _compute_val crypto/dh.c:39 [inline]
-     [<00000000be8dcb84>] dh_compute_value+0x160/0x220 crypto/dh.c:178
-     [<00000000471846ad>] crypto_kpp_generate_public_key  
-include/crypto/kpp.h:315 [inline]
-     [<00000000471846ad>] __keyctl_dh_compute+0x447/0x970  
-security/keys/dh.c:367
-     [<000000002f6d650d>] keyctl_dh_compute+0x67/0xa6 security/keys/dh.c:422
-     [<00000000b798bc7f>] __do_sys_keyctl security/keys/keyctl.c:1737  
-[inline]
-     [<00000000b798bc7f>] __se_sys_keyctl security/keys/keyctl.c:1633  
-[inline]
-     [<00000000b798bc7f>] __x64_sys_keyctl+0xa5/0x330  
-security/keys/keyctl.c:1633
-     [<000000007a6f9515>] do_syscall_64+0x76/0x1a0  
-arch/x86/entry/common.c:301
-     [<00000000057f2768>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
+* 32-bit ARM today rarely provides the special AES instruction that the
+  implementation in this series relies on, but this may change in the future,
+  and the NEON intrinsics code can be compiled for both ISAs.
 
-BUG: memory leak
-unreferenced object 0xffff88811f4dac00 (size 512):
-   comm "syz-executor301", pid 7045, jiffies 4294955450 (age 7.850s)
-   hex dump (first 32 bytes):
-     62 72 c4 ae ac af a3 ba e5 24 da a5 30 5e cb c4  br.......$..0^..
-     a6 46 44 39 76 2e 42 f6 85 6a 5b ad ae 97 4e 83  .FD9v.B..j[...N.
-   backtrace:
-     [<00000000d5589961>] kmemleak_alloc_recursive  
-include/linux/kmemleak.h:43 [inline]
-     [<00000000d5589961>] slab_post_alloc_hook mm/slab.h:439 [inline]
-     [<00000000d5589961>] slab_alloc mm/slab.c:3326 [inline]
-     [<00000000d5589961>] __do_kmalloc mm/slab.c:3658 [inline]
-     [<00000000d5589961>] __kmalloc+0x161/0x2c0 mm/slab.c:3669
-     [<00000000022eaa00>] kmalloc include/linux/slab.h:552 [inline]
-     [<00000000022eaa00>] mpi_alloc_limb_space+0x29/0x50 lib/mpi/mpiutil.c:64
-     [<0000000025804541>] mpihelp_mul_karatsuba_case+0x394/0x460  
-lib/mpi/mpih-mul.c:346
-     [<00000000401dc6f9>] mpi_powm+0x7b0/0xdd0 lib/mpi/mpi-pow.c:225
-     [<00000000be8dcb84>] _compute_val crypto/dh.c:39 [inline]
-     [<00000000be8dcb84>] dh_compute_value+0x160/0x220 crypto/dh.c:178
-     [<00000000471846ad>] crypto_kpp_generate_public_key  
-include/crypto/kpp.h:315 [inline]
-     [<00000000471846ad>] __keyctl_dh_compute+0x447/0x970  
-security/keys/dh.c:367
-     [<000000002f6d650d>] keyctl_dh_compute+0x67/0xa6 security/keys/dh.c:422
-     [<00000000b798bc7f>] __do_sys_keyctl security/keys/keyctl.c:1737  
-[inline]
-     [<00000000b798bc7f>] __se_sys_keyctl security/keys/keyctl.c:1633  
-[inline]
-     [<00000000b798bc7f>] __x64_sys_keyctl+0xa5/0x330  
-security/keys/keyctl.c:1633
-     [<000000007a6f9515>] do_syscall_64+0x76/0x1a0  
-arch/x86/entry/common.c:301
-     [<00000000057f2768>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
+Cc: Eric Biggers <ebiggers@google.com>
+Cc: Ondrej Mosnacek <omosnace@redhat.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Steve Capper <steve.capper@arm.com>
 
+Ard Biesheuvel (6):
+  crypto: aegis128 - use unaliged helper in unaligned decrypt path
+  crypto: aegis - drop empty TFM init/exit routines
+  crypto: aegis - avoid prerotated AES tables
+  crypto: aegis128 - add support for SIMD acceleration
+  crypto: aegis128 - provide a SIMD implementation based on NEON
+    intrinsics
+  crypto: tcrypt - add a speed test for AEGIS128
 
+ crypto/Kconfig               |   5 +
+ crypto/Makefile              |  12 ++
+ crypto/aegis.h               |  28 ++--
+ crypto/aegis128-neon-inner.c | 142 ++++++++++++++++++++
+ crypto/aegis128-neon.c       |  43 ++++++
+ crypto/aegis128.c            |  55 +++++---
+ crypto/aegis128l.c           |  11 --
+ crypto/aegis256.c            |  11 --
+ crypto/tcrypt.c              |   7 +
+ 9 files changed, 261 insertions(+), 53 deletions(-)
+ create mode 100644 crypto/aegis128-neon-inner.c
+ create mode 100644 crypto/aegis128-neon.c
 
----
-This bug is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+-- 
+2.20.1
 
-syzbot will keep track of this bug report. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-syzbot can test patches for this bug, for details see:
-https://goo.gl/tpsmEJ#testing-patches
