@@ -2,121 +2,129 @@ Return-Path: <SRS0=EE7o=UX=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A54E6C48BE8
-	for <linux-crypto@archiver.kernel.org>; Mon, 24 Jun 2019 07:21:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C461C43613
+	for <linux-crypto@archiver.kernel.org>; Mon, 24 Jun 2019 07:21:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7F2542083D
-	for <linux-crypto@archiver.kernel.org>; Mon, 24 Jun 2019 07:21:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 30D642083D
+	for <linux-crypto@archiver.kernel.org>; Mon, 24 Jun 2019 07:21:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=c-s.fr header.i=@c-s.fr header.b="DJ7VtSfE"
+	dkim=pass (1024-bit key) header.d=c-s.fr header.i=@c-s.fr header.b="fr1nAfXR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727636AbfFXHUR (ORCPT
+        id S1726343AbfFXHV5 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 24 Jun 2019 03:20:17 -0400
-Received: from pegase1.c-s.fr ([93.17.236.30]:64013 "EHLO pegase1.c-s.fr"
+        Mon, 24 Jun 2019 03:21:57 -0400
+Received: from pegase1.c-s.fr ([93.17.236.30]:9623 "EHLO pegase1.c-s.fr"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726909AbfFXHUQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 24 Jun 2019 03:20:16 -0400
+        id S1726077AbfFXHV5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 24 Jun 2019 03:21:57 -0400
 Received: from localhost (mailhub1-int [192.168.12.234])
-        by localhost (Postfix) with ESMTP id 45XLKQ1dzlz9vBmm;
-        Mon, 24 Jun 2019 09:20:10 +0200 (CEST)
+        by localhost (Postfix) with ESMTP id 45XLML6hfCz9vBmm;
+        Mon, 24 Jun 2019 09:21:50 +0200 (CEST)
 Authentication-Results: localhost; dkim=pass
         reason="1024-bit key; insecure key"
-        header.d=c-s.fr header.i=@c-s.fr header.b=DJ7VtSfE; dkim-adsp=pass;
+        header.d=c-s.fr header.i=@c-s.fr header.b=fr1nAfXR; dkim-adsp=pass;
         dkim-atps=neutral
 X-Virus-Scanned: Debian amavisd-new at c-s.fr
 Received: from pegase1.c-s.fr ([192.168.12.234])
         by localhost (pegase1.c-s.fr [192.168.12.234]) (amavisd-new, port 10024)
-        with ESMTP id EVGMQM8g4W45; Mon, 24 Jun 2019 09:20:10 +0200 (CEST)
+        with ESMTP id bVhUwPat72lk; Mon, 24 Jun 2019 09:21:50 +0200 (CEST)
 Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-        by pegase1.c-s.fr (Postfix) with ESMTP id 45XLKQ0cdBz9vBmR;
-        Mon, 24 Jun 2019 09:20:10 +0200 (CEST)
+        by pegase1.c-s.fr (Postfix) with ESMTP id 45XLML5gX7z9vBml;
+        Mon, 24 Jun 2019 09:21:50 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=c-s.fr; s=mail;
-        t=1561360810; bh=qtRDjQOmzU0jcEi1abEzapHHsVFqfQHgt0aZqDG8tp8=;
-        h=In-Reply-To:References:From:Subject:To:Cc:Date:From;
-        b=DJ7VtSfEndHazbdObGLIennmW//Bzzp8tAt34vhHuMOl+sPiynwkGgZzcCD1LEWuz
-         JwVSzq6TFKybaFKNrYmhojmmxGaucIpAFYL7xQ4IlWcxdVjYv2V7Z9zS6WMU4J7WBX
-         uhb5ECl6I1ciWOzRGZTHr1a+dtViu5BNrRar8cWE=
+        t=1561360910; bh=uqSyYAuIgffBR0A50tqUgIECoBVIQIvOhmxv2zbmqbg=;
+        h=From:Subject:To:Cc:Date:From;
+        b=fr1nAfXR5k6RCYhXpFmkXlofj/WpB8XH4YC/0LFO0OhP69azmMA6IGpHAfjGd+4m+
+         tYsax/ac4Gu2NlzvTyIQTSEA8uy/GECXazhRwLKdFxxy0NBEeyyIUCDlHT67I+nh6O
+         sZR6Ppy3Ror5TQufdkvkxgYv6F5SYIouDAGgjCFI=
 Received: from localhost (localhost [127.0.0.1])
-        by messagerie.si.c-s.fr (Postfix) with ESMTP id A4AE68B787;
-        Mon, 24 Jun 2019 09:20:14 +0200 (CEST)
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id 5EC0A8B787;
+        Mon, 24 Jun 2019 09:21:55 +0200 (CEST)
 X-Virus-Scanned: amavisd-new at c-s.fr
 Received: from messagerie.si.c-s.fr ([127.0.0.1])
         by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-        with ESMTP id fI-BdEW2J8X1; Mon, 24 Jun 2019 09:20:14 +0200 (CEST)
+        with ESMTP id a_sM-AAY_GJE; Mon, 24 Jun 2019 09:21:55 +0200 (CEST)
 Received: from po16838vm.idsi0.si.c-s.fr (po15451.idsi0.si.c-s.fr [172.25.230.101])
-        by messagerie.si.c-s.fr (Postfix) with ESMTP id 832AD8B74C;
-        Mon, 24 Jun 2019 09:20:14 +0200 (CEST)
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id 3F2078B74C;
+        Mon, 24 Jun 2019 09:21:55 +0200 (CEST)
 Received: by po16838vm.idsi0.si.c-s.fr (Postfix, from userid 0)
-        id 86A6A67424; Mon, 24 Jun 2019 07:20:14 +0000 (UTC)
-Message-Id: <5271b86a5b6bea0bec068c01e1124fb0a3cfa750.1561360551.git.christophe.leroy@c-s.fr>
-In-Reply-To: <cover.1561360551.git.christophe.leroy@c-s.fr>
-References: <cover.1561360551.git.christophe.leroy@c-s.fr>
+        id 44DB467424; Mon, 24 Jun 2019 07:21:55 +0000 (UTC)
+Message-Id: <cover.1561360551.git.christophe.leroy@c-s.fr>
 From:   Christophe Leroy <christophe.leroy@c-s.fr>
-Subject: [PATCH v5 1/4] lib/scatterlist: Fix mapping iterator when sg->offset
- is greater than PAGE_SIZE
+Subject: [PATCH v5 0/4] Additional fixes on Talitos driver
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>, horia.geanta@nxp.com
 Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         linuxppc-dev@lists.ozlabs.org
-Date:   Mon, 24 Jun 2019 07:20:14 +0000 (UTC)
+Date:   Mon, 24 Jun 2019 07:21:55 +0000 (UTC)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Message-ID: <20190624072155.M-xBZJW6-VTZNVwuvqf3EC3T2P1T5keiWytX5zRGBzY@z>
 
-All mapping iterator logic is based on the assumption that sg->offset
-is always lower than PAGE_SIZE.
+This series is the last set of fixes for the Talitos driver.
 
-But there are situations where sg->offset is such that the SG item
-is on the second page. In that case sg_copy_to_buffer() fails
-properly copying the data into the buffer. One of the reason is
-that the data will be outside the kmapped area used to access that
-data.
+We now get a fully clean boot on both SEC1 (SEC1.2 on mpc885) and
+SEC2 (SEC2.2 on mpc8321E) with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS:
 
-This patch fixes the issue by adjusting the mapping iterator
-offset and pgoffset fields such that offset is always lower than
-PAGE_SIZE.
+[    3.385197] bus: 'platform': really_probe: probing driver talitos with device ff020000.crypto
+[    3.450982] random: fast init done
+[   12.252548] alg: No test for authenc(hmac(md5),cbc(aes)) (authenc-hmac-md5-cbc-aes-talitos-hsna)
+[   12.262226] alg: No test for authenc(hmac(md5),cbc(des3_ede)) (authenc-hmac-md5-cbc-3des-talitos-hsna)
+[   43.310737] Bug in SEC1, padding ourself
+[   45.603318] random: crng init done
+[   54.612333] talitos ff020000.crypto: fsl,sec1.2 algorithms registered in /proc/crypto
+[   54.620232] driver: 'talitos': driver_bound: bound to device 'ff020000.crypto'
 
-Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
-Fixes: 4225fc8555a9 ("lib/scatterlist: use page iterator in the mapping iterator")
-Cc: stable@vger.kernel.org
----
- lib/scatterlist.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+[    1.193721] bus: 'platform': really_probe: probing driver talitos with device b0030000.crypto
+[    1.229197] random: fast init done
+[    2.714920] alg: No test for authenc(hmac(sha224),cbc(aes)) (authenc-hmac-sha224-cbc-aes-talitos)
+[    2.724312] alg: No test for authenc(hmac(sha224),cbc(aes)) (authenc-hmac-sha224-cbc-aes-talitos-hsna)
+[    4.482045] alg: No test for authenc(hmac(md5),cbc(aes)) (authenc-hmac-md5-cbc-aes-talitos)
+[    4.490940] alg: No test for authenc(hmac(md5),cbc(aes)) (authenc-hmac-md5-cbc-aes-talitos-hsna)
+[    4.500280] alg: No test for authenc(hmac(md5),cbc(des3_ede)) (authenc-hmac-md5-cbc-3des-talitos)
+[    4.509727] alg: No test for authenc(hmac(md5),cbc(des3_ede)) (authenc-hmac-md5-cbc-3des-talitos-hsna)
+[    6.631781] random: crng init done
+[   11.521795] talitos b0030000.crypto: fsl,sec2.2 algorithms registered in /proc/crypto
+[   11.529803] driver: 'talitos': driver_bound: bound to device 'b0030000.crypto'
 
-diff --git a/lib/scatterlist.c b/lib/scatterlist.c
-index 739dc9fe2c55..f0757a67affe 100644
---- a/lib/scatterlist.c
-+++ b/lib/scatterlist.c
-@@ -678,17 +678,18 @@ static bool sg_miter_get_next_page(struct sg_mapping_iter *miter)
- {
- 	if (!miter->__remaining) {
- 		struct scatterlist *sg;
--		unsigned long pgoffset;
+v2: dropped patch 1 which was irrelevant due to a rebase weirdness. Added Cc to stable on the 2 first patches.
+
+v3:
+ - removed stable reference in patch 1
+ - reworded patch 1 to include name of patch 2 for the dependency.
+ - mentionned this dependency in patch 2 as well.
+ - corrected the Fixes: sha1 in patch 4
  
- 		if (!__sg_page_iter_next(&miter->piter))
- 			return false;
+v4:
+ - using scatterwalk_ffwd() instead of opencodying SG list forwarding.
+ - Added a patch to fix sg_copy_to_buffer() when sg->offset() is greater than PAGE_SIZE,
+ otherwise sg_copy_to_buffer() fails when the list has been forwarded with scatterwalk_ffwd().
+ - taken the patch "crypto: talitos - eliminate unneeded 'done' functions at build time"
+ out of the series because it is independent.
+ - added a helper to find the header field associated to a request in flush_channe()
  
- 		sg = miter->piter.sg;
--		pgoffset = miter->piter.sg_pgoffset;
- 
--		miter->__offset = pgoffset ? 0 : sg->offset;
-+		miter->__offset = miter->piter.sg_pgoffset ? 0 : sg->offset;
-+		miter->piter.sg_pgoffset += miter->__offset >> PAGE_SHIFT;
-+		miter->__offset &= PAGE_SIZE - 1;
- 		miter->__remaining = sg->offset + sg->length -
--				(pgoffset << PAGE_SHIFT) - miter->__offset;
-+				     (miter->piter.sg_pgoffset << PAGE_SHIFT) -
-+				     miter->__offset;
- 		miter->__remaining = min_t(unsigned long, miter->__remaining,
- 					   PAGE_SIZE - miter->__offset);
- 	}
+v5:
+ - Replacing the while loop by a direct shift/mask operation, as suggested by Herbert in patch 1.
+
+Christophe Leroy (4):
+  lib/scatterlist: Fix mapping iterator when sg->offset is greater than
+    PAGE_SIZE
+  crypto: talitos - move struct talitos_edesc into talitos.h
+  crypto: talitos - fix hash on SEC1.
+  crypto: talitos - drop icv_ool
+
+ drivers/crypto/talitos.c | 102 +++++++++++++++++++----------------------------
+ drivers/crypto/talitos.h |  28 +++++++++++++
+ lib/scatterlist.c        |   9 +++--
+ 3 files changed, 74 insertions(+), 65 deletions(-)
+
 -- 
 2.13.3
 
