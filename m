@@ -2,72 +2,89 @@ Return-Path: <SRS0=EEB8=UY=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_NEOMUTT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D213C4646C
-	for <linux-crypto@archiver.kernel.org>; Tue, 25 Jun 2019 01:21:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34351C48BD6
+	for <linux-crypto@archiver.kernel.org>; Tue, 25 Jun 2019 05:12:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 21FAE20663
-	for <linux-crypto@archiver.kernel.org>; Tue, 25 Jun 2019 01:21:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0D63120656
+	for <linux-crypto@archiver.kernel.org>; Tue, 25 Jun 2019 05:12:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="lIsoDU9b";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=codeaurora.org header.i=@codeaurora.org header.b="ePqKsHMh"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729424AbfFYBVV (ORCPT
+        id S1727039AbfFYFMo (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 24 Jun 2019 21:21:21 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:35818 "EHLO deadmen.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729384AbfFYBVV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 24 Jun 2019 21:21:21 -0400
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1hfa8x-0004UA-5l; Tue, 25 Jun 2019 09:21:07 +0800
-Received: from herbert by gondobar with local (Exim 4.89)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1hfa8p-0005ra-Sk; Tue, 25 Jun 2019 09:20:59 +0800
-Date:   Tue, 25 Jun 2019 09:20:59 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Imre Deak <imre.deak@intel.com>
-Cc:     Christophe Leroy <christophe.leroy@c-s.fr>,
-        "David S. Miller" <davem@davemloft.net>, horia.geanta@nxp.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH v4 1/4] lib/scatterlist: Fix mapping iterator when
- sg->offset is greater than PAGE_SIZE
-Message-ID: <20190625012059.albyfaca73uoaoxr@gondor.apana.org.au>
-References: <cover.1560805614.git.christophe.leroy@c-s.fr>
- <f28c6b0e2f9510f42ca934f19c4315084e668c21.1560805614.git.christophe.leroy@c-s.fr>
- <20190620060221.q4pbsqzsza3pxs42@gondor.apana.org.au>
- <20190624173533.GA809@ideak-desk.fi.intel.com>
+        Tue, 25 Jun 2019 01:12:44 -0400
+Received: from smtp.codeaurora.org ([198.145.29.96]:46838 "EHLO
+        smtp.codeaurora.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726930AbfFYFMo (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 25 Jun 2019 01:12:44 -0400
+Received: by smtp.codeaurora.org (Postfix, from userid 1000)
+        id B57B360867; Tue, 25 Jun 2019 05:12:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1561439563;
+        bh=r/tGvEZOJPHra4fP7IYj1O8+ibu5+G1t5YDkSHhrbiE=;
+        h=Subject:From:In-Reply-To:References:To:Cc:Date:From;
+        b=lIsoDU9bfJLKdey/L+2Id3mTz5iJU932xdTpQQCg9kV+dGGPiD8vbd8AVlxdxdhsm
+         i2KUGhWbS021E4AxB7clH+zjKCXHn4PjwV18uypLQJ5hqv3CSBgd97xweJhKBdv5L2
+         sLNkxZKWzSshNDmaLBuicE+0rRAqHwZBBBl0x3lw=
+Received: from potku.adurom.net (88-114-240-156.elisa-laajakaista.fi [88.114.240.156])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        (Authenticated sender: kvalo@smtp.codeaurora.org)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 42CD76029B;
+        Tue, 25 Jun 2019 05:12:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=codeaurora.org;
+        s=default; t=1561439563;
+        bh=r/tGvEZOJPHra4fP7IYj1O8+ibu5+G1t5YDkSHhrbiE=;
+        h=Subject:From:In-Reply-To:References:To:Cc:From;
+        b=ePqKsHMhoXUIkggq8OWM4f0NlPvPJrzTEw/To4Jo0eWgw8ObeiE0+5uA9ViaHAs9p
+         XtNcc44BBaLKOkR7lpzg34AhS5P8J8r7cRdczeoET8pFs6k+N2uvuBTIhgunmCTR3o
+         veMXAP1HGwz27L2GuRIwbVWHpT6MOVVj2twyt9Ro=
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 42CD76029B
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: pdx-caf-mail.web.codeaurora.org; spf=none smtp.mailfrom=kvalo@codeaurora.org
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190624173533.GA809@ideak-desk.fi.intel.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
+Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH v2] airo: switch to skcipher interface
+From:   Kalle Valo <kvalo@codeaurora.org>
+In-Reply-To: <20190617084338.24918-1-ard.biesheuvel@linaro.org>
+References: <20190617084338.24918-1-ard.biesheuvel@linaro.org>
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     linux-wireless@vger.kernel.org, linux-crypto@vger.kernel.org,
+        herbert@gondor.apana.org.au, ebiggers@kernel.org,
+        johannes@sipsolutions.net, linux@rainbow-software.org,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>
+User-Agent: pwcli/0.0.0-git (https://github.com/kvalo/pwcli/) Python/2.7.12
+Message-Id: <20190625051243.B57B360867@smtp.codeaurora.org>
+Date:   Tue, 25 Jun 2019 05:12:43 +0000 (UTC)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jun 24, 2019 at 08:35:33PM +0300, Imre Deak wrote:
-> Hi,
-> 
-> On Thu, Jun 20, 2019 at 02:02:21PM +0800, Herbert Xu wrote:
-> > On Mon, Jun 17, 2019 at 09:15:02PM +0000, Christophe Leroy wrote:
-> > > All mapping iterator logic is based on the assumption that sg->offset
-> > > is always lower than PAGE_SIZE.
-> > > 
-> > > But there are situations where sg->offset is such that the SG item
-> > > is on the second page.
-> 
-> could you explain how sg->offset becomes >= PAGE_SIZE?
+Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
 
-The network stack can produce SG list elements that are longer
-than PAGE_SIZE.  If you the iterate over it one page at a time
-then the offset can exceed PAGE_SIZE.
+> The AIRO driver applies a ctr(aes) on a buffer of considerable size
+> (2400 bytes), and instead of invoking the crypto API to handle this
+> in its entirety, it open codes the counter manipulation and invokes
+> the AES block cipher directly.
+> 
+> Let's fix this, by switching to the sync skcipher API instead.
+> 
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-Cheers,
+Patch applied to wireless-drivers-next.git, thanks.
+
+e5db0ad7563c airo: switch to skcipher interface
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+https://patchwork.kernel.org/patch/10998553/
+
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
+
