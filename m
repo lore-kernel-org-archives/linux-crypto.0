@@ -2,191 +2,113 @@ Return-Path: <SRS0=EEB8=UY=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C615C48BD4
-	for <linux-crypto@archiver.kernel.org>; Tue, 25 Jun 2019 07:16:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1BF4C48BD4
+	for <linux-crypto@archiver.kernel.org>; Tue, 25 Jun 2019 13:05:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 42CF920665
-	for <linux-crypto@archiver.kernel.org>; Tue, 25 Jun 2019 07:16:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 731A7214DA
+	for <linux-crypto@archiver.kernel.org>; Tue, 25 Jun 2019 13:05:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="LGr9Jw+Y"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726779AbfFYHQk (ORCPT
+        id S1730133AbfFYNFJ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 25 Jun 2019 03:16:40 -0400
-Received: from mx2.suse.de ([195.135.220.15]:55120 "EHLO mx1.suse.de"
+        Tue, 25 Jun 2019 09:05:09 -0400
+Received: from mail-eopbgr680046.outbound.protection.outlook.com ([40.107.68.46]:1924
+        "EHLO NAM04-BN3-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726661AbfFYHQj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 25 Jun 2019 03:16:39 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id C3A3CAD43;
-        Tue, 25 Jun 2019 07:16:36 +0000 (UTC)
-From:   Michal Suchanek <msuchanek@suse.de>
-To:     linux-crypto@vger.kernel.org
-Cc:     Michal Suchanek <msuchanek@suse.de>, chetjain@in.ibm.com,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: algapi - guard against uninitialized spawn list in crypto_remove_spawns
-Date:   Tue, 25 Jun 2019 09:16:24 +0200
-Message-Id: <20190625071624.27039-1-msuchanek@suse.de>
-X-Mailer: git-send-email 2.21.0
+        id S1729440AbfFYNFJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 25 Jun 2019 09:05:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector1-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=wReQ+sPyOfw/5/jld0bgD9yhadk4anxbkoD1Hgt1YA4=;
+ b=LGr9Jw+YdOoWQGdWRM1H4f5D40vjP/qWhp1QvjVrICWeNcGbu4/CRWGU2WfrClZndfn5xyQYbKgEv4Qi8cXeduM4zKw15MMec81HP1A1suuoCGpS/k7sWm2yoU+4vwBYDRtuFJquLU4hGTaOOHnApk/bG225foNLX0R/ElckU+0=
+Received: from DM5PR12MB1449.namprd12.prod.outlook.com (10.172.40.14) by
+ DM5PR12MB1436.namprd12.prod.outlook.com (10.168.239.7) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2008.16; Tue, 25 Jun 2019 13:05:04 +0000
+Received: from DM5PR12MB1449.namprd12.prod.outlook.com
+ ([fe80::180c:ff0c:37e6:a482]) by DM5PR12MB1449.namprd12.prod.outlook.com
+ ([fe80::180c:ff0c:37e6:a482%10]) with mapi id 15.20.2008.017; Tue, 25 Jun
+ 2019 13:05:04 +0000
+From:   Gary R Hook <ghook@amd.com>
+To:     Eric Biggers <ebiggers@kernel.org>,
+        "Hook, Gary" <Gary.Hook@amd.com>
+CC:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "davem@davemloft.net" <davem@davemloft.net>
+Subject: Re: [PATCH 2/3] crypto: doc - Describe the crypto engine
+Thread-Topic: [PATCH 2/3] crypto: doc - Describe the crypto engine
+Thread-Index: AQHVKsAd+xpmsaFX3kCZNKb6odNQP6arW70AgAD79IA=
+Date:   Tue, 25 Jun 2019 13:05:04 +0000
+Message-ID: <9e89535a-f3c8-43fe-be77-d2e972dd2503@amd.com>
+References: <156140322426.29777.8610751479936722967.stgit@taos>
+ <156140326736.29777.7751606850237303573.stgit@taos>
+ <20190624220313.GB237341@gmail.com>
+In-Reply-To: <20190624220313.GB237341@gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: SN6PR15CA0013.namprd15.prod.outlook.com
+ (2603:10b6:805:16::26) To DM5PR12MB1449.namprd12.prod.outlook.com
+ (2603:10b6:4:10::14)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Gary.Hook@amd.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [165.204.78.1]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: b7c606bc-77e0-47bd-51e6-08d6f96dbd08
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:DM5PR12MB1436;
+x-ms-traffictypediagnostic: DM5PR12MB1436:
+x-microsoft-antispam-prvs: <DM5PR12MB1436FBD3D774E1D34E193F27FDE30@DM5PR12MB1436.namprd12.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:7219;
+x-forefront-prvs: 0079056367
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(376002)(346002)(39860400002)(136003)(396003)(366004)(189003)(199004)(4744005)(6116002)(8936002)(7736002)(53936002)(3846002)(6486002)(305945005)(486006)(446003)(2616005)(476003)(72206003)(186003)(66476007)(64756008)(110136005)(66446008)(6512007)(11346002)(229853002)(54906003)(66556008)(5660300002)(73956011)(256004)(26005)(66946007)(6636002)(6436002)(52116002)(31686004)(478600001)(99286004)(66066001)(36756003)(4326008)(53546011)(102836004)(6506007)(386003)(71190400001)(14454004)(8676002)(81156014)(76176011)(81166006)(316002)(68736007)(25786009)(31696002)(2906002)(6246003)(71200400001);DIR:OUT;SFP:1101;SCL:1;SRVR:DM5PR12MB1436;H:DM5PR12MB1449.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: 7U2/Pis5C1S5ZejbajkCwNgP3Ov+WF3BadWi3eKv8c0DNzVYdhhJtkFnvPersJd5CxJWVH0liHYYspE0VhoQOdVSA2KL82Ukth3e9F297TA2ZMlHV+3DuljWiOblMDipXitjtIk9qNly7MGohYegw8/4rwS8eZS18KcEX1BTAbJW9mPHjtVjUxRoi/CZx2xG3UgWL4vikUUjRbIaHoBI86NFTwPvAy9WtZw1DEARI3dBT3/cny+yhO2HfGXmxPRTVsU/Ef4WIXcwbTRnkxwx3jeCnYutCeYaXaVtd8iN0NbnIeQCYuc6B3e8VSJybZF0REc3XsP34gNvRHyw0pi8ERjAWtvUEKeZogbl+Fg/BaZI8i5DvohuPfgvHLdE0ODOjaDSJbcx7qEL4dNVGTeo9v1I7zRQ2uM7s7N7HdQUQd0=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <73EFC7EE0FD28E4B8A4BDB6770E1637E@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b7c606bc-77e0-47bd-51e6-08d6f96dbd08
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Jun 2019 13:05:04.1837
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: ghook@amd.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1436
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Reportedly on Linux 4.12 the LTP testsuite crashes at pcrypt_aead01 infrequently.
-
-To get it reproduce more frequently I tried
-
-n=0 ; while true ; do /opt/ltp/testcases/bin/pcrypt_aead01 >& /dev/null ; n=$(expr $n + 1) ; echo -ne $n\\r ; done
-
-but this is quite stable. However, holding ^C in the terminal where the loop is running tends to trigger the crash.
-
-The backtrace is:
-
-[  100.615804] Unable to handle kernel paging request for data at address 0x00000000
-[  100.615876] Faulting instruction address: 0xc000000000520e7c
-[  100.615943] Oops: Kernel access of bad area, sig: 11 [#1]
-[  100.616001] SMP NR_CPUS=2048 
-[  100.616002] NUMA 
-[  100.616030] pSeries
-[  100.616054] Modules linked in: authenc pcrypt crypto_user kvm_pr kvm ebtable_filter ebtables ip6table_filter ip6_tables iptable_filter devlink ip_tables x_tables af_packet rtc_generic vmx_crypto ibmveth(X) gf128mul btrfs xor raid6_pq sd_mod ibmvscsi(X) scsi_transport_srp crc32c_vpmsum sg dm_multipath dm_mod scsi_dh_rdac scsi_dh_emc scsi_dh_alua scsi_mod autofs4
-[  100.616478] Supported: Yes, External
-[  100.616509] CPU: 5 PID: 6270 Comm: pcrypt_aead01 Tainted: G                   4.12.14-150.22-default #1 SLE15
-[  100.616632] task: c000000595084d80 task.stack: c0000005be6dc000
-[  100.616708] NIP: c000000000520e7c LR: c000000000521e3c CTR: c000000000521de0
-[  100.616801] REGS: c0000005be6df620 TRAP: 0300   Tainted: G                    (4.12.14-150.22-default)
-[  100.616906] MSR: 8000000000009033 <SF,EE,ME,IR,DR,RI,LE>
-[  100.616912]   CR: 24002844  XER: 20040000
-[  100.617003] CFAR: c000000000008860 DAR: 0000000000000000 DSISR: 40000000 SOFTE: 1 
-               GPR00: c0000005a331f810 c0000005be6df8a0 c00000000119aa00 c0000005a331f800 
-               GPR04: c0000005be6df930 c0000005be6df8c0 c0000005be6df8d0 0000000000000000 
-               GPR08: 7269632929290000 c0000005a331f800 0000000000000000 0000000000000000 
-               GPR12: c000000000521de0 c000000007a33700 00000001271a0ee0 00007fffcb9e7bb8 
-               GPR16: 00000001271c2d80 00000001271c2d88 00007fffcb9e7a50 00007fffcb9e7a44 
-               GPR20: 00007fffcb9e7a98 00007fffcb9e7a60 0000000000000010 0000000000000010 
-               GPR24: 0000000000000000 0000000000000000 fffffffffffff000 c0000005be6dfaf0 
-               GPR28: c0000005b9929d00 0000000000000c93 c0000005be6df930 c0000005be6df8e0 
-[  100.617774] NIP [c000000000520e7c] crypto_remove_spawns+0x6c/0x2e0
-[  100.617816] LR [c000000000521e3c] crypto_unregister_instance+0x5c/0xa0
-[  100.617881] Call Trace:
-[  100.617903] [c0000005be6df8a0] [c0000005b9929d00] 0xc0000005b9929d00 (unreliable)
-[  100.617971] [c0000005be6df910] [0000000000000000]           (null)
-[  100.618021] [c0000005be6df960] [d0000000098d0894] crypto_del_alg+0xdc/0x110 [crypto_user]
-[  100.618119] [c0000005be6df990] [d0000000098d0b58] crypto_user_rcv_msg+0xe0/0x260 [crypto_user]
-[  100.618222] [c0000005be6dfa30] [c00000000086d678] netlink_rcv_skb+0x78/0x170
-[  100.618309] [c0000005be6dfaa0] [d0000000098d0064] crypto_netlink_rcv+0x4c/0x80 [crypto_user]
-[  100.618407] [c0000005be6dfad0] [c00000000086cb98] netlink_unicast+0x208/0x2f0
-[  100.618488] [c0000005be6dfb40] [c00000000086d170] netlink_sendmsg+0x380/0x440
-[  100.618582] [c0000005be6dfbd0] [c0000000007e9ba4] sock_sendmsg+0x64/0x90
-[  100.618650] [c0000005be6dfc00] [c0000000007eb94c] ___sys_sendmsg+0x2cc/0x330
-[  100.618710] [c0000005be6dfd90] [c0000000007ed02c] __sys_sendmsg+0x5c/0xc0
-[  100.618766] [c0000005be6dfe30] [c00000000000b188] system_call+0x3c/0x130
-[  100.618822] Instruction dump:
-[  100.618839] e9430010 83a90020 38a10020 fbe10040 fbe10048 f8c10030 f8c10038 f8a10020 
-[  100.618902] f8a10028 38030010 7fa05040 7d475378 <e90a0000> 419e0064 60000000 60000000 
-[  100.618980] ---[ end trace 60475621348ca387 ]---
-
-The code looks like this:
-
-   0xc000000000520e10 <+0>:     c8 00 4c 3c     addis   r2,r12,200
-   0xc000000000520e14 <+4>:     f0 9b 42 38     addi    r2,r2,-25616
-   0xc000000000520e18 <+8>:     a6 02 08 7c     mflr    r0
-   0xc000000000520e1c <+12>:    00 00 00 60     nop
-   0xc000000000520e20 <+16>:    79 2b ab 7c     mr.     r11,r5
-   0xc000000000520e24 <+20>:    f0 ff c1 fb     std     r30,-16(r1)
-   0xc000000000520e28 <+24>:    e8 ff a1 fb     std     r29,-24(r1)
-   0xc000000000520e2c <+28>:    f8 ff e1 fb     std     r31,-8(r1)
-   0xc000000000520e30 <+32>:    91 ff 21 f8     stdu    r1,-112(r1)
-   0xc000000000520e34 <+36>:    78 1b 69 7c     mr      r9,r3
-   0xc000000000520e38 <+40>:    78 23 9e 7c     mr      r30,r4
-   0xc000000000520e3c <+44>:    08 00 82 41     beq     0xc000000000520e44 <crypto_remove_spawns+52>
-   0xc000000000520e40 <+48>:    78 5b 69 7d     mr      r9,r11
-   0xc000000000520e44 <+52>:    40 00 e1 3b     addi    r31,r1,64
-   0xc000000000520e48 <+56>:    30 00 c1 38     addi    r6,r1,48
- # 0xc000000000520e4c <+60>:    10 00 43 e9     ld      r10,16(r3)
-   0xc000000000520e50 <+64>:    20 00 a9 83     lwz     r29,32(r9)
-   0xc000000000520e54 <+68>:    20 00 a1 38     addi    r5,r1,32
-   0xc000000000520e58 <+72>:    40 00 e1 fb     std     r31,64(r1)
-   0xc000000000520e5c <+76>:    48 00 e1 fb     std     r31,72(r1)
-   0xc000000000520e60 <+80>:    30 00 c1 f8     std     r6,48(r1)
-   0xc000000000520e64 <+84>:    38 00 c1 f8     std     r6,56(r1)
-   0xc000000000520e68 <+88>:    20 00 a1 f8     std     r5,32(r1)
-   0xc000000000520e6c <+92>:    28 00 a1 f8     std     r5,40(r1)
-   0xc000000000520e70 <+96>:    10 00 03 38     addi    r0,r3,16
- & 0xc000000000520e74 <+100>:   40 50 a0 7f     cmpld   cr7,r0,r10
-   0xc000000000520e78 <+104>:   78 53 47 7d     mr      r7,r10
- * 0xc000000000520e7c <+108>:   00 00 0a e9     ld      r8,0(r10)
-   0xc000000000520e80 <+112>:   64 00 9e 41     beq     cr7,0xc000000000520ee4 <crypto_remove_spawns+212>
-
- #) This looks like alg->cra_users.next is loaded to r10
- &) This looks like r10 is compared with &alg->cra_users calculated on the line
-    above to terminate the loop
- *) This looks like *alg->cra_users.next loaded into r8 which causes the null
-    pointer dereference
-
-So the fixup needs to be applied to the first dereference of
-alg->cra_users.next as well to prevent crash.
-
-Fixes: 9a00674213a3 ("crypto: algapi - fix NULL dereference in crypto_remove_spawns()")
-
-Reported-by: chetjain@in.ibm.com
-Signed-off-by: Michal Suchanek <msuchanek@suse.de>
----
-I cannot really test if this fix is effective because the crash is some
-heisenbug that heavily depends on timing. When the bug is not triggered it does
-not really mean anything. It is also qestionable if we should be getting these
-algs with uninitialized spawns.
-
- crypto/algapi.c | 22 +++++++++++++---------
- 1 file changed, 13 insertions(+), 9 deletions(-)
-
-diff --git a/crypto/algapi.c b/crypto/algapi.c
-index 313a7682cef1..82125b82ffba 100644
---- a/crypto/algapi.c
-+++ b/crypto/algapi.c
-@@ -151,6 +151,18 @@ void crypto_remove_spawns(struct crypto_alg *alg, struct list_head *list,
- 	LIST_HEAD(top);
- 
- 	spawns = &alg->cra_users;
-+
-+	/*
-+	 * We may encounter an unregistered instance here, since an instance's
-+	 * spawns are set up prior to the instance being registered.
-+	 * An unregistered instance will have NULL ->cra_users.next, since
-+	 * ->cra_users isn't properly initialized until registration.  But an
-+	 * unregistered instance cannot have any users, so treat it the same as
-+	 * ->cra_users being empty.
-+	 */
-+	if (spawns->next == NULL)
-+		return;
-+
- 	list_for_each_entry_safe(spawn, n, spawns, list) {
- 		if ((spawn->alg->cra_flags ^ new_type) & spawn->mask)
- 			continue;
-@@ -177,15 +189,7 @@ void crypto_remove_spawns(struct crypto_alg *alg, struct list_head *list,
- 			spawn->alg = NULL;
- 			spawns = &inst->alg.cra_users;
- 
--			/*
--			 * We may encounter an unregistered instance here, since
--			 * an instance's spawns are set up prior to the instance
--			 * being registered.  An unregistered instance will have
--			 * NULL ->cra_users.next, since ->cra_users isn't
--			 * properly initialized until registration.  But an
--			 * unregistered instance cannot have any users, so treat
--			 * it the same as ->cra_users being empty.
--			 */
-+			/* Guard against unregistered instance */
- 			if (spawns->next == NULL)
- 				break;
- 		}
--- 
-2.21.0
-
+T24gNi8yNC8xOSA1OjAzIFBNLCBFcmljIEJpZ2dlcnMgd3JvdGU6DQo+IE9uIE1vbiwgSnVuIDI0
+LCAyMDE5IGF0IDA3OjA3OjQ5UE0gKzAwMDAsIEhvb2ssIEdhcnkgd3JvdGU6DQo+PiBBZGQgYSBy
+ZWZlcmVuY2UgdG8gdGhlIGNyeXB0byBlbmdpbmUgZG9jdW1lbnRhdGlvbiB0bw0KPj4gdGhlIGlu
+ZGV4Lg0KPj4NCj4+IFNpZ25lZC1vZmYtYnk6IEdhcnkgUiBIb29rIDxnYXJ5Lmhvb2tAYW1kLmNv
+bT4NCj4+IC0tLQ0KPj4gICBEb2N1bWVudGF0aW9uL2NyeXB0by9pbmRleC5yc3QgfCAgICAxICsN
+Cj4+ICAgMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspDQo+Pg0KPj4gZGlmZiAtLWdpdCBh
+L0RvY3VtZW50YXRpb24vY3J5cHRvL2luZGV4LnJzdCBiL0RvY3VtZW50YXRpb24vY3J5cHRvL2lu
+ZGV4LnJzdA0KPj4gaW5kZXggYzRmZjVkNzkxMjMzLi4zN2NkN2ZiMGVhODIgMTAwNjQ0DQo+PiAt
+LS0gYS9Eb2N1bWVudGF0aW9uL2NyeXB0by9pbmRleC5yc3QNCj4+ICsrKyBiL0RvY3VtZW50YXRp
+b24vY3J5cHRvL2luZGV4LnJzdA0KPj4gQEAgLTE5LDYgKzE5LDcgQEAgZm9yIGNyeXB0b2dyYXBo
+aWMgdXNlIGNhc2VzLCBhcyB3ZWxsIGFzIHByb2dyYW1taW5nIGV4YW1wbGVzLg0KPj4gICAgICBp
+bnRybw0KPj4gICAgICBhcmNoaXRlY3R1cmUNCj4+ICAgICAgZGV2ZWwtYWxnb3MNCj4+ICsgICBj
+cnlwdG9fZW5naW5lDQo+PiAgICAgIHVzZXJzcGFjZS1pZg0KPj4gICAgICBjcnlwdG9fZW5naW5l
+DQo+PiAgICAgIGFwaQ0KPj4NCj4gDQo+IEl0J3MgYWxyZWFkeSBpbiB0aGUgbGlzdC4NCg0KR2Fo
+ISBBbmQgYXQgdGhlIG1vbWVudCBJIGNhbid0IHJlbWVtYmVyIHdoeSB0aGF0IGV2ZW4gZ290IHB1
+dCB0aGVyZS4NCg0KQXBvbG9naWVzLg0KDQpncmgNCg==
