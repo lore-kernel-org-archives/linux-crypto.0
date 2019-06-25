@@ -2,156 +2,113 @@ Return-Path: <SRS0=EEB8=UY=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09FEEC48BD5
-	for <linux-crypto@archiver.kernel.org>; Tue, 25 Jun 2019 18:37:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E910C48BD6
+	for <linux-crypto@archiver.kernel.org>; Tue, 25 Jun 2019 23:43:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D46262085A
-	for <linux-crypto@archiver.kernel.org>; Tue, 25 Jun 2019 18:37:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D25302086D
+	for <linux-crypto@archiver.kernel.org>; Tue, 25 Jun 2019 23:43:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="skHlmuAc"
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="ETDkH+Sg"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730795AbfFYShi (ORCPT
+        id S1726068AbfFYXnp (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 25 Jun 2019 14:37:38 -0400
-Received: from mail-io1-f66.google.com ([209.85.166.66]:41379 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729912AbfFYShi (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 25 Jun 2019 14:37:38 -0400
-Received: by mail-io1-f66.google.com with SMTP id w25so1124279ioc.8
-        for <linux-crypto@vger.kernel.org>; Tue, 25 Jun 2019 11:37:37 -0700 (PDT)
+        Tue, 25 Jun 2019 19:43:45 -0400
+Received: from mail-eopbgr740050.outbound.protection.outlook.com ([40.107.74.50]:41394
+        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725782AbfFYXnp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 25 Jun 2019 19:43:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=uzbXVhLuWBgDc1jic57o1bW8+6/W59REcwpOxrFqvA0=;
-        b=skHlmuAcD1adX1m675KbDbT6NX6DuaZxN8knJ2/gVu7l2+3ETGYFnInAp70Tw0VZnv
-         f1151GBimbrvjyerxHobRneh5rgnrj7QXYRgfs6Kl4enH/Q6L59HVHIA0pLpdCtWPGHu
-         wL418ia+e7JCmncnWXYzaMn9o8imzYcBhpZZJb8RjYyRvSRJ5gddF92sJKK+bO0HqMIw
-         IEUyN7+c/JkMONV1Gf9q2s6OfecxOucQ6Uzz8sXkBNATN3b/PNDisCV8Rf23zoIE8a+r
-         4DUNGhEI7LFzRs+ob74gLajTdRFGo6OUdyXHheoDYlkqO0RRRdic2qjf0gC7yeCbQ4fQ
-         EOTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=uzbXVhLuWBgDc1jic57o1bW8+6/W59REcwpOxrFqvA0=;
-        b=bHpEl1i4b+nMjX8PSuihqo3Wy9ze0aqNznw2yq9gS8hp0X9rRgMhVdMlOj+9zvd0qF
-         Ggn/3fP1T538SmDsBwk+PK6mclSKVdY/Zb0BzQ8khyz4nC9WxD1VaKmqBAXwNkxNMyzv
-         hxbg08Uzhts5gmy2Kgj4QbptdBGlAN4S1tCb060nxUPdO/69RlU0WDPyytP9A5lLKer2
-         lj2y+I6+NmJASDjA3snqIcAQRK0x3y36t3A7cXpF67jZELR7IVTNM5aAw6Zx5hoYweAV
-         yeGXIKiI0fMLxuDX000KarrkmxbIJ+TeNcLU9/Lx03b/jDkwDqXVy1gY50NeGvk2qLsQ
-         B9Qg==
-X-Gm-Message-State: APjAAAXySej6e+MNXjitCg+UEj77/f9mOjeZsz4aC10U/pKe3VfBrNnC
-        Jgq+JWlKA29saY/2/BJUZwEpHWdR8cRmbG1eBqo6pA==
-X-Google-Smtp-Source: APXvYqy2Hv+4ElfvM9wdIfLV64nTzJCK+1TKIzjBbjU3Kaz0lGiiDzcRMhCbr7lttLi+ZRuN1Gm1yMztEWHXrJMZLL8=
-X-Received: by 2002:a05:6602:98:: with SMTP id h24mr20969iob.49.1561487856930;
- Tue, 25 Jun 2019 11:37:36 -0700 (PDT)
+ d=amdcloud.onmicrosoft.com; s=selector1-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=13Sl8mF6O63R0DMug/w9E0Qgshwu1JbpMmKNbx/I+Nc=;
+ b=ETDkH+SgSfkAEYx0U5QSi6oLiUTSbm3huSgRdRA+a/13MTsRnV5xvuFxYnfLwQQagJUvHprrHvmjSr+VVdaQuNcWn1fKf9kS81FbOd5PuE6iz0MqVrmR0WLy2n7k+9JcT3p/LbVmkbYPYXAo3MKtJ8HI0LPo1mfZwA88T902v5E=
+Received: from DM5PR12MB1449.namprd12.prod.outlook.com (10.172.40.14) by
+ DM5PR12MB1818.namprd12.prod.outlook.com (10.175.92.13) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2008.13; Tue, 25 Jun 2019 23:43:37 +0000
+Received: from DM5PR12MB1449.namprd12.prod.outlook.com
+ ([fe80::180c:ff0c:37e6:a482]) by DM5PR12MB1449.namprd12.prod.outlook.com
+ ([fe80::180c:ff0c:37e6:a482%10]) with mapi id 15.20.2008.017; Tue, 25 Jun
+ 2019 23:43:37 +0000
+From:   "Hook, Gary" <Gary.Hook@amd.com>
+To:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "davem@davemloft.net" <davem@davemloft.net>
+Subject: [PATCH v2 0/2] Clean up crypto documentation
+Thread-Topic: [PATCH v2 0/2] Clean up crypto documentation
+Thread-Index: AQHVK6/O2ulgN25geEeArre8s+tJHg==
+Date:   Tue, 25 Jun 2019 23:43:36 +0000
+Message-ID: <156150616764.22527.16524544899486041609.stgit@taos>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: SN6PR02CA0012.namprd02.prod.outlook.com
+ (2603:10b6:805:a2::25) To DM5PR12MB1449.namprd12.prod.outlook.com
+ (2603:10b6:4:10::14)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Gary.Hook@amd.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [165.204.78.1]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 407acde8-a9e7-4143-2e10-08d6f9c6f14f
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:DM5PR12MB1818;
+x-ms-traffictypediagnostic: DM5PR12MB1818:
+x-microsoft-antispam-prvs: <DM5PR12MB18187B19F7A945C7D709474DFDE30@DM5PR12MB1818.namprd12.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:5797;
+x-forefront-prvs: 0079056367
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(7916004)(376002)(136003)(39860400002)(366004)(396003)(346002)(199004)(189003)(4744005)(25786009)(99286004)(33716001)(81166006)(2201001)(81156014)(5660300002)(8936002)(53936002)(7736002)(66066001)(9686003)(6116002)(6512007)(3846002)(6486002)(305945005)(8676002)(6436002)(2501003)(66946007)(256004)(73956011)(478600001)(14454004)(68736007)(2906002)(316002)(64756008)(102836004)(386003)(6506007)(72206003)(66476007)(186003)(71200400001)(52116002)(103116003)(476003)(71190400001)(110136005)(486006)(66556008)(66446008)(26005)(86362001);DIR:OUT;SFP:1101;SCL:1;SRVR:DM5PR12MB1818;H:DM5PR12MB1449.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: AXrBk6GoNW0GSLGxKmgmxZUS1NedZBzJvDPnC5+0kBF3qyzko1H9tPF9YLCy9tUMpWOdUw7s6EDjG4aOkXX/7STs5IA1a2AHsLj30QgXA/o3pZWkZhnnxBVObCYs7a82knn6fT8qFZhGE73zW9/mcdGpYl03odNOadCArPYUa3gxOJNbNs4pbCYvq2DrIkjHc1ould5K1cLvc/ktYNOF+y00m7DyEnIMy8u6jNIZ0sITFerqM09doWzumM9Rva3erHeRjeEDEAW4UqEgwr9ef9/Aet/ans9pLLr0qQmeKC4nGT4I+NVbEZejLXpzpDaFwTK2c+r3dh35sC3Fwbs1bf68+HsqM9NjIkHiN8YXIrKND4VXZtQLY4ujaltOT+2U6ZDbJocE0k23ZcIBgCpfJm/uTKkW4oTmE+z8ZBjiH2I=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <7C9E199BDD620C49AF80CBEA8317743B@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <20190625145254.28510-1-ard.biesheuvel@linaro.org> <20190625171234.GB81914@gmail.com>
-In-Reply-To: <20190625171234.GB81914@gmail.com>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Tue, 25 Jun 2019 20:37:23 +0200
-Message-ID: <CAKv+Gu8P4AUNbf636d=h=RDFV+CPEZCoPi9EZ+OtKEd5cBky5g@mail.gmail.com>
-Subject: Re: [PATCH] crypto: morus - remove generic and x86 implementations
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Ondrej Mosnacek <omosnace@redhat.com>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Milan Broz <gmazyland@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 407acde8-a9e7-4143-2e10-08d6f9c6f14f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Jun 2019 23:43:36.9585
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: ghook@amd.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1818
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 25 Jun 2019 at 19:12, Eric Biggers <ebiggers@kernel.org> wrote:
->
-> [+Cc Milan]
->
-> On Tue, Jun 25, 2019 at 04:52:54PM +0200, Ard Biesheuvel wrote:
-> > MORUS was not selected as a winner in the CAESAR competition, which
-> > is not surprising since it is considered to be cryptographically
-> > broken. (Note that this is not an implementation defect, but a flaw
-> > in the underlying algorithm). Since it is unlikely to be in use
-> > currently, let's remove it before we're stuck with it.
-> >
-> > Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> > ---
-> >  arch/m68k/configs/amiga_defconfig     |    2 -
-> >  arch/m68k/configs/apollo_defconfig    |    2 -
-> >  arch/m68k/configs/atari_defconfig     |    2 -
-> >  arch/m68k/configs/bvme6000_defconfig  |    2 -
-> >  arch/m68k/configs/hp300_defconfig     |    2 -
-> >  arch/m68k/configs/mac_defconfig       |    2 -
-> >  arch/m68k/configs/multi_defconfig     |    2 -
-> >  arch/m68k/configs/mvme147_defconfig   |    2 -
-> >  arch/m68k/configs/mvme16x_defconfig   |    2 -
-> >  arch/m68k/configs/q40_defconfig       |    2 -
-> >  arch/m68k/configs/sun3_defconfig      |    2 -
-> >  arch/m68k/configs/sun3x_defconfig     |    2 -
-> >  arch/x86/crypto/Makefile              |   13 -
-> >  arch/x86/crypto/morus1280-avx2-asm.S  |  622 ---------
-> >  arch/x86/crypto/morus1280-avx2-glue.c |   66 -
-> >  arch/x86/crypto/morus1280-sse2-asm.S  |  896 -------------
-> >  arch/x86/crypto/morus1280-sse2-glue.c |   65 -
-> >  arch/x86/crypto/morus1280_glue.c      |  209 ---
-> >  arch/x86/crypto/morus640-sse2-asm.S   |  615 ---------
-> >  arch/x86/crypto/morus640-sse2-glue.c  |   65 -
-> >  arch/x86/crypto/morus640_glue.c       |  204 ---
-> >  crypto/Kconfig                        |   56 -
-> >  crypto/Makefile                       |    2 -
-> >  crypto/morus1280.c                    |  542 --------
-> >  crypto/morus640.c                     |  533 --------
-> >  crypto/testmgr.c                      |   12 -
-> >  crypto/testmgr.h                      | 1707 -------------------------
-> >  include/crypto/morus1280_glue.h       |   97 --
-> >  include/crypto/morus640_glue.h        |   97 --
-> >  include/crypto/morus_common.h         |   18 -
-> >  30 files changed, 5843 deletions(-)
-> >  delete mode 100644 arch/x86/crypto/morus1280-avx2-asm.S
-> >  delete mode 100644 arch/x86/crypto/morus1280-avx2-glue.c
-> >  delete mode 100644 arch/x86/crypto/morus1280-sse2-asm.S
-> >  delete mode 100644 arch/x86/crypto/morus1280-sse2-glue.c
-> >  delete mode 100644 arch/x86/crypto/morus1280_glue.c
-> >  delete mode 100644 arch/x86/crypto/morus640-sse2-asm.S
-> >  delete mode 100644 arch/x86/crypto/morus640-sse2-glue.c
-> >  delete mode 100644 arch/x86/crypto/morus640_glue.c
-> >  delete mode 100644 crypto/morus1280.c
-> >  delete mode 100644 crypto/morus640.c
-> >  delete mode 100644 include/crypto/morus1280_glue.h
-> >  delete mode 100644 include/crypto/morus640_glue.h
-> >  delete mode 100644 include/crypto/morus_common.h
->
-> Maybe include a link to the cryptanalysis paper
-> https://eprint.iacr.org/2019/172.pdf in the commit message, so people seeing
-> this commit can better understand the reasoning?
->
+Tidy up the crypto documentation by filling in some variable
+descriptions, make some grammatical corrections, and enhance
+formatting.
 
-Sure.
+Changes since v1:
+ - Remove patch with superfluous change to index (patch 2)
+ - Remove unnecessary markup on function names in patch 3
+ - Un-add extraneous white space (patch 3)
 
-> Otherwise this patch itself looks fine to me, though I'm a little concerned
-> we'll break someone actually using MORUS.  An alternate approach would be to
-> leave just the C implementation, and make it print a deprecation warning for a
-> year or two before actually removing it.  But I'm not sure that's needed, and it
-> might be counterproductive as it would allow more people to start using it.
->
+---
 
-Indeed. 'Breaking userspace' is permitted if nobody actually notices,
-and given how broken MORUS is, anyone who truly cares about security
-wouldn't have chosen it to begin with. And if it does turn out to be a
-real issue, we can always put the C version back where it was.
+Gary R Hook (2):
+      crypto: doc - Add parameter documentation
+      crypto: doc - Fix formatting of new crypto engine content
 
-> From a Google search I don't see any documentation floating around specifically
-> telling people to use MORUS with cryptsetup, other than an email on the dm-crypt
-> mailing list (https://www.spinics.net/lists/dm-crypt/msg07763.html) which
-> mentioned it alongside other options.  So hopefully there are at most a couple
-> odd adventurous users, who won't mind migrating their data to a new LUKS volume.
->
+
+ Documentation/crypto/api-skcipher.rst  |    2 -
+ Documentation/crypto/crypto_engine.rst |  111 +++++++++++++++++++++-------=
+----
+ include/linux/crypto.h                 |   11 +++
+ 3 files changed, 85 insertions(+), 39 deletions(-)
+
+--
