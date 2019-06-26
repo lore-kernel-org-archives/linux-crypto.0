@@ -2,106 +2,179 @@ Return-Path: <SRS0=1/ZA=UZ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UPPERCASE_50_75,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED323C4646B
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Jun 2019 07:39:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51B15C48BD3
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Jun 2019 13:13:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BB4382086D
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Jun 2019 07:39:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 094FE214DA
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Jun 2019 13:13:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L5Vo4Xvg"
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="CKMQ4dke"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725930AbfFZHjd (ORCPT
+        id S1726628AbfFZNNy (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 26 Jun 2019 03:39:33 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:36977 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725797AbfFZHjd (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Jun 2019 03:39:33 -0400
-Received: by mail-wr1-f68.google.com with SMTP id v14so1469114wrr.4
-        for <linux-crypto@vger.kernel.org>; Wed, 26 Jun 2019 00:39:31 -0700 (PDT)
+        Wed, 26 Jun 2019 09:13:54 -0400
+Received: from mail-eopbgr750079.outbound.protection.outlook.com ([40.107.75.79]:58093
+        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726157AbfFZNNx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 26 Jun 2019 09:13:53 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=testarcselector01; d=microsoft.com; cv=none;
+ b=QFMpbIGzScCcLOhqWFcwp3aoE51yPBfxvrtjcrJHsBFP5dSdEan+szuPBAnb0y1pV5rEVsebPeWwBNAbVCWEFGqG4cHRAka4mRfaRE3GDBkg80HQvfgCBkhj3fvvMqctzd2lZt7ChsWNRQSMgr3Aqo6KB5vwNUt2aeWbehqcvzQ=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=testarcselector01;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+YIuwWQZ+S2eG1KEunnIqEEr9FqoLtPyxHmKBmTcNHk=;
+ b=kGy7MC6dNrNU2K2iwfsqnWV3E/xNgKOPLWJa/trcc0WWlkCZCde6m6Py1rr47zWkyXvTaJg2yCXnQSWQroV15Xx2U97vZy+P8chD+kcEvkyt3u9QMC3JyM8qs5qjO+5y42sGfDWm/s7CoevOLxnAMLa6boPubfRqdl8xogqXIO4=
+ARC-Authentication-Results: i=1; test.office365.com
+ 1;spf=none;dmarc=none;dkim=none;arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=PtXpvYN9mCa8w0iR1BV1It8OBzidBqxfzs4wNKcWYOM=;
-        b=L5Vo4Xvg+xc0hoBBMBCJ0nYhYx0CFVY6gMUyGbjUpWO5hzvnuBN7fwrLpdmW4u8oYM
-         6d7Z4y4N1b6Rpzs4PaJgSamu24kxwr3srIhWcVQQEq2LNnPu9xJxMN/XY0HgiEGpurJf
-         PxCLphYnGfyvfrW7To0nrrdD+oTRLDbMAAKQ0gxEeY5wvnuT3rBtmwkzd5pjlVozY+Dw
-         iot7axiuaLqgKR3lZM5dxEEvUCbqL1JZKDaFQskEhVOyQp/xeda5ddvntbHGU/PoAUJ6
-         /caIsyAbA7nwKckB3a7HHpkiKFqAkNW70j+FKnEG2RqZnyv9cbMVQVBx/WABnqyc3MHv
-         H7Cg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=PtXpvYN9mCa8w0iR1BV1It8OBzidBqxfzs4wNKcWYOM=;
-        b=EcVRQiWeblYurT7z9lEzQHmHY80WzvXqF8sz4kLpP3EghcwkGnaywMsYgIUINpfc3i
-         lp2zrvuQQ+jWZVMIh8NKA5mZtMzhhnAconW0eMYI8nw9y99WPsVooOBnYauL/yolUVQ+
-         4zBIecX6iNrltlDsONa5UC7HDZvJbagN/r3RynRlfANOGseYMSv66mXekeYKNX84aVEN
-         C/GP6O559zMGfn2aUidbV0VugdJk7NdrPkPKEz5sXi9ZNAuf1fMBIoKsAtkSCgrEAogM
-         mbEuYbjZnDnrWcfd7yF38pZmbiKmv7CLPAiCYhxTIOyliT2ze4+AqEz1TfIQoNxQ8RIP
-         p4AQ==
-X-Gm-Message-State: APjAAAVDCx24AJx2Ww1ZMVEEEkWrOSlBloWgniZ0v4C35nJciz/irCVU
-        hcwNwJ1hL58d4Oo/oBI1A8U=
-X-Google-Smtp-Source: APXvYqyeU2K/3I/+7yDdgNVTVngHpYhZC8BPQj9kv/pLZYqUwi7ShYq2o8ZeWZNYArP+fZA8qXLVjA==
-X-Received: by 2002:adf:f28a:: with SMTP id k10mr2411895wro.343.1561534771303;
-        Wed, 26 Jun 2019 00:39:31 -0700 (PDT)
-Received: from [10.43.17.24] (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id z6sm15941593wrw.2.2019.06.26.00.39.30
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Wed, 26 Jun 2019 00:39:30 -0700 (PDT)
-Subject: Re: [PATCH] crypto: morus - remove generic and x86 implementations
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Milan Broz <gmazyland@gmail.com>
-Cc:     Eric Biggers <ebiggers@kernel.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Ondrej Mosnacek <omosnace@redhat.com>,
-        Geert Uytterhoeven <geert@linux-m68k.org>
-References: <20190625145254.28510-1-ard.biesheuvel@linaro.org>
- <20190625171234.GB81914@gmail.com>
- <CAKv+Gu8P4AUNbf636d=h=RDFV+CPEZCoPi9EZ+OtKEd5cBky5g@mail.gmail.com>
- <ca908099-3305-9764-dbf2-adc7a256ad59@gmail.com>
- <CAKv+Gu9jAqGAYg8f_rBVbve=L3AQb_xKnpmnsqrZ3m7VLnaz1g@mail.gmail.com>
-From:   Milan Broz <gmazyland@gmail.com>
-Openpgp: preference=signencrypt
-Message-ID: <e9d045c6-f6e2-a0d2-b1f2-bebee5d027f4@gmail.com>
-Date:   Wed, 26 Jun 2019 09:39:29 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
-MIME-Version: 1.0
-In-Reply-To: <CAKv+Gu9jAqGAYg8f_rBVbve=L3AQb_xKnpmnsqrZ3m7VLnaz1g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
+ d=amdcloud.onmicrosoft.com; s=selector1-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+YIuwWQZ+S2eG1KEunnIqEEr9FqoLtPyxHmKBmTcNHk=;
+ b=CKMQ4dkeJrEaFt8zfd90M2irNacUOFr/Aaoo4K1nug2A92LnWyyZMPmAC2sU1emzUjdOsHC17y3vYx5BkUYPoZ/V9vea66VlFXl0H9bIXgWe221spIX3Q1olOwTkdJzSRswZxXb4JJg9ivbkIaE+Vfxys+rSwMMjwCFhhtUMLz0=
+Received: from DM6PR12MB3163.namprd12.prod.outlook.com (20.179.104.150) by
+ DM6PR12MB3561.namprd12.prod.outlook.com (20.178.199.24) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2008.16; Wed, 26 Jun 2019 13:13:47 +0000
+Received: from DM6PR12MB3163.namprd12.prod.outlook.com
+ ([fe80::1ddd:450:1798:1782]) by DM6PR12MB3163.namprd12.prod.outlook.com
+ ([fe80::1ddd:450:1798:1782%6]) with mapi id 15.20.2008.018; Wed, 26 Jun 2019
+ 13:13:47 +0000
+From:   "Lendacky, Thomas" <Thomas.Lendacky@amd.com>
+To:     "Hook, Gary" <Gary.Hook@amd.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+CC:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>
+Subject: Re: [PATCH] crypto: ccp - Validate the the error value used to index
+ error messages
+Thread-Topic: [PATCH] crypto: ccp - Validate the the error value used to index
+ error messages
+Thread-Index: AQHVK6/uRkTOBtmb8EK2WNLQif3aHaat6pMA
+Date:   Wed, 26 Jun 2019 13:13:46 +0000
+Message-ID: <f674f681-8913-d25e-c2c5-8d55ea2adfe5@amd.com>
+References: <156150626887.22604.14664865428727189837.stgit@taos>
+In-Reply-To: <156150626887.22604.14664865428727189837.stgit@taos>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: SN4PR0801CA0013.namprd08.prod.outlook.com
+ (2603:10b6:803:29::23) To DM6PR12MB3163.namprd12.prod.outlook.com
+ (2603:10b6:5:182::22)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Thomas.Lendacky@amd.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [165.204.84.11]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 1924b58f-5534-414c-a7f0-08d6fa381ecf
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:DM6PR12MB3561;
+x-ms-traffictypediagnostic: DM6PR12MB3561:
+x-microsoft-antispam-prvs: <DM6PR12MB3561316FD0A9C8A492D94C39ECE20@DM6PR12MB3561.namprd12.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:1169;
+x-forefront-prvs: 00808B16F3
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(366004)(346002)(396003)(376002)(39860400002)(136003)(189003)(199004)(66946007)(54906003)(5660300002)(110136005)(6436002)(256004)(14444005)(6486002)(71200400001)(71190400001)(478600001)(73956011)(36756003)(99286004)(6246003)(66066001)(316002)(72206003)(86362001)(66476007)(31696002)(25786009)(66556008)(64756008)(66446008)(229853002)(14454004)(6512007)(6116002)(76176011)(3846002)(102836004)(186003)(305945005)(53936002)(4326008)(7736002)(53546011)(6506007)(386003)(446003)(15650500001)(52116002)(486006)(2501003)(11346002)(31686004)(8936002)(68736007)(26005)(2906002)(2616005)(476003)(81166006)(81156014)(8676002);DIR:OUT;SFP:1101;SCL:1;SRVR:DM6PR12MB3561;H:DM6PR12MB3163.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: j2XZvEd7KsOP9kiDzXlL3Bk4QHbANsuLvxbhJfG7choUxD8baL0H0GkWID6sZIDHALZZ+Ma4fdZGExk0RjtENCIWbr7PD3hjcZH414+934uUV0fFCa6V9H/Rz3+vQDt4/FYAH0qef5gbktC78lz9OocgYbCq8BUIoFlxZBmXnzsUbULhSmeyxffaIC6XvW+Su+MpChXQ556gDNhZt1cg3+PFBKwxSB4aQCUklVuexxNyuy2z6Xjw4O6jKESTJKeS3FZDIhIAOQ0ydb2hhRrrewGGLkZAHD+iMhmSD3IwXakkd4byP2EumsFK/3ejwo0FB7q+82BojxKi//SA44DInXX7Hq1qluu9sSRYR1pVnN8kYIjd7t5zTMXN1PUChQnNw3LFOp/WAZiRLdfWCfAE8WemfZ3bF9LIpROydDLn9NI=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <498C1D245FC7BA47AEE0058A6FBE95C5@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1924b58f-5534-414c-a7f0-08d6fa381ecf
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Jun 2019 13:13:46.8957
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: tlendack@amd.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3561
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 26/06/2019 09:15, Ard Biesheuvel wrote:
-
-> Thanks for the insight. So I guess we have consensus that MORUS should
-> be removed. How about aegis128l and aegis256, which have been
-> disregarded in favor of aegis128 by CAESAR (note that I sent an
-> accelerated ARM/arm64 version of aegis128 based on the ARMv8 crypto
-> instructions, in case you missed it)
-
-Well, there are similar cases, see that Serpent supports many keysizes, even 0-length key (!),
-despite the AES finalists were proposed only for 128/192/256 bit keys.
-(It happened to us several times during tests that apparent mistype in Serpent key length
-was accepted by the kernel...)
-
-(Maybe the cleanup should continue? :-)
-
-Dunno, for me, I think the generic implementation could stay there.
-
-Milan
+T24gNi8yNS8xOSA2OjQ0IFBNLCBIb29rLCBHYXJ5IHdyb3RlOg0KPiBUaGUgZXJyb3IgY29kZSBy
+ZWFkIGZyb20gdGhlIHF1ZXVlIHN0YXR1cyByZWdpc3RlciBpcyBvbmx5IDYgYml0cyB3aWRlLA0K
+PiBidXQgd2UgbmVlZCB0byB2ZXJpZnkgaXRzIHZhbHVlIGlzIHdpdGhpbiByYW5nZSBiZWZvcmUg
+aW5kZXhpbmcgdGhlIGVycm9yDQo+IG1lc3NhZ2VzLiAgQWxzbywgZmlsbCBvdXQgdGhlIGFycmF5
+IHdpdGggYWxsIHBvc3NpYmxlIGVudHJpZXMgc28gdGhhdCBhbnkNCj4gdW5leHBlY3RlZCBlcnJv
+ciBjb2RlcyBhcmUgcmVwb3J0ZWQgYXMgInVua25vd24iLg0KPiANCj4gRml4ZXM6IDgxNDIyYmFk
+YjM5MDcgKCJjcnlwdG86IGNjcCAtIE1ha2Ugc3lzbG9nIGVycm9ycyBodW1hbi1yZWFkYWJsZSIp
+DQo+IA0KPiBSZXBvcnRlZC1ieTogQ2ZpciBDb2hlbiA8Y2ZpckBnb29nbGUuY29tPg0KPiBTaWdu
+ZWQtb2ZmLWJ5OiBHYXJ5IFIgSG9vayA8Z2FyeS5ob29rQGFtZC5jb20+DQo+IC0tLQ0KPiAgIGRy
+aXZlcnMvY3J5cHRvL2NjcC9jY3AtZGV2LmMgfCAgIDk0ICsrKysrKysrKysrKysrKysrKysrKyst
+LS0tLS0tLS0tLS0tLS0tLS0tLQ0KPiAgIDEgZmlsZSBjaGFuZ2VkLCA1MCBpbnNlcnRpb25zKCsp
+LCA0NCBkZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9kcml2ZXJzL2NyeXB0by9jY3Av
+Y2NwLWRldi5jIGIvZHJpdmVycy9jcnlwdG8vY2NwL2NjcC1kZXYuYw0KPiBpbmRleCAxYjUwMzVk
+NTYyODguLmM2ODUzZTE3Y2ViYiAxMDA2NDQNCj4gLS0tIGEvZHJpdmVycy9jcnlwdG8vY2NwL2Nj
+cC1kZXYuYw0KPiArKysgYi9kcml2ZXJzL2NyeXB0by9jY3AvY2NwLWRldi5jDQo+IEBAIC0zNSw1
+NiArMzUsNjIgQEAgc3RydWN0IGNjcF90YXNrbGV0X2RhdGEgew0KPiAgIH07DQo+ICAgDQo+ICAg
+LyogSHVtYW4tcmVhZGFibGUgZXJyb3Igc3RyaW5ncyAqLw0KPiArI2RlZmluZSBDQ1BfTUFYX0VS
+Uk9SX0NPREUJNjQNCj4gICBzdGF0aWMgY2hhciAqY2NwX2Vycm9yX2NvZGVzW10gPSB7DQo+ICAg
+CSIiLA0KPiAtCSJFUlIgMDE6IElMTEVHQUxfRU5HSU5FIiwNCj4gLQkiRVJSIDAyOiBJTExFR0FM
+X0tFWV9JRCIsDQo+IC0JIkVSUiAwMzogSUxMRUdBTF9GVU5DVElPTl9UWVBFIiwNCj4gLQkiRVJS
+IDA0OiBJTExFR0FMX0ZVTkNUSU9OX01PREUiLA0KPiAtCSJFUlIgMDU6IElMTEVHQUxfRlVOQ1RJ
+T05fRU5DUllQVCIsDQo+IC0JIkVSUiAwNjogSUxMRUdBTF9GVU5DVElPTl9TSVpFIiwNCj4gLQki
+RVJSIDA3OiBabGliX01JU1NJTkdfSU5JVF9FT00iLA0KPiAtCSJFUlIgMDg6IElMTEVHQUxfRlVO
+Q1RJT05fUlNWRCIsDQo+IC0JIkVSUiAwOTogSUxMRUdBTF9CVUZGRVJfTEVOR1RIIiwNCj4gLQki
+RVJSIDEwOiBWTFNCX0ZBVUxUIiwNCj4gLQkiRVJSIDExOiBJTExFR0FMX01FTV9BRERSIiwNCj4g
+LQkiRVJSIDEyOiBJTExFR0FMX01FTV9TRUwiLA0KPiAtCSJFUlIgMTM6IElMTEVHQUxfQ09OVEVY
+VF9JRCIsDQo+IC0JIkVSUiAxNDogSUxMRUdBTF9LRVlfQUREUiIsDQo+IC0JIkVSUiAxNTogMHhG
+IFJlc2VydmVkIiwNCj4gLQkiRVJSIDE2OiBabGliX0lMTEVHQUxfTVVMVElfUVVFVUUiLA0KPiAt
+CSJFUlIgMTc6IFpsaWJfSUxMRUdBTF9KT0JJRF9DSEFOR0UiLA0KPiAtCSJFUlIgMTg6IENNRF9U
+SU1FT1VUIiwNCj4gLQkiRVJSIDE5OiBJRE1BMF9BWElfU0xWRVJSIiwNCj4gLQkiRVJSIDIwOiBJ
+RE1BMF9BWElfREVDRVJSIiwNCj4gLQkiRVJSIDIxOiAweDE1IFJlc2VydmVkIiwNCj4gLQkiRVJS
+IDIyOiBJRE1BMV9BWElfU0xBVkVfRkFVTFQiLA0KPiAtCSJFUlIgMjM6IElETUExX0FJWElfREVD
+RVJSIiwNCj4gLQkiRVJSIDI0OiAweDE4IFJlc2VydmVkIiwNCj4gLQkiRVJSIDI1OiBaTElCVkhC
+X0FYSV9TTFZFUlIiLA0KPiAtCSJFUlIgMjY6IFpMSUJWSEJfQVhJX0RFQ0VSUiIsDQo+IC0JIkVS
+UiAyNzogMHgxQiBSZXNlcnZlZCIsDQo+IC0JIkVSUiAyNzogWkxJQl9VTkVYUEVDVEVEX0VPTSIs
+DQo+IC0JIkVSUiAyNzogWkxJQl9FWFRSQV9EQVRBIiwNCj4gLQkiRVJSIDMwOiBaTElCX0JUWVBF
+IiwNCj4gLQkiRVJSIDMxOiBaTElCX1VOREVGSU5FRF9TWU1CT0wiLA0KPiAtCSJFUlIgMzI6IFpM
+SUJfVU5ERUZJTkVEX0RJU1RBTkNFX1MiLA0KPiAtCSJFUlIgMzM6IFpMSUJfQ09ERV9MRU5HVEhf
+U1lNQk9MIiwNCj4gLQkiRVJSIDM0OiBaTElCIF9WSEJfSUxMRUdBTF9GRVRDSCIsDQo+IC0JIkVS
+UiAzNTogWkxJQl9VTkNPTVBSRVNTRURfTEVOIiwNCj4gLQkiRVJSIDM2OiBaTElCX0xJTUlUX1JF
+QUNIRUQiLA0KPiAtCSJFUlIgMzc6IFpMSUJfQ0hFQ0tTVU1fTUlTTUFUQ0gwIiwNCj4gLQkiRVJS
+IDM4OiBPRE1BMF9BWElfU0xWRVJSIiwNCj4gLQkiRVJSIDM5OiBPRE1BMF9BWElfREVDRVJSIiwN
+Cj4gLQkiRVJSIDQwOiAweDI4IFJlc2VydmVkIiwNCj4gLQkiRVJSIDQxOiBPRE1BMV9BWElfU0xW
+RVJSIiwNCj4gLQkiRVJSIDQyOiBPRE1BMV9BWElfREVDRVJSIiwNCj4gLQkiRVJSIDQzOiBMU0Jf
+UEFSSVRZX0VSUiIsDQo+ICsJIklMTEVHQUxfRU5HSU5FIiwNCj4gKwkiSUxMRUdBTF9LRVlfSUQi
+LA0KPiArCSJJTExFR0FMX0ZVTkNUSU9OX1RZUEUiLA0KPiArCSJJTExFR0FMX0ZVTkNUSU9OX01P
+REUiLA0KPiArCSJJTExFR0FMX0ZVTkNUSU9OX0VOQ1JZUFQiLA0KPiArCSJJTExFR0FMX0ZVTkNU
+SU9OX1NJWkUiLA0KPiArCSJabGliX01JU1NJTkdfSU5JVF9FT00iLA0KPiArCSJJTExFR0FMX0ZV
+TkNUSU9OX1JTVkQiLA0KPiArCSJJTExFR0FMX0JVRkZFUl9MRU5HVEgiLA0KPiArCSJWTFNCX0ZB
+VUxUIiwNCj4gKwkiSUxMRUdBTF9NRU1fQUREUiIsDQo+ICsJIklMTEVHQUxfTUVNX1NFTCIsDQo+
+ICsJIklMTEVHQUxfQ09OVEVYVF9JRCIsDQo+ICsJIklMTEVHQUxfS0VZX0FERFIiLA0KPiArCSIw
+eEYgUmVzZXJ2ZWQiLA0KPiArCSJabGliX0lMTEVHQUxfTVVMVElfUVVFVUUiLA0KPiArCSJabGli
+X0lMTEVHQUxfSk9CSURfQ0hBTkdFIiwNCj4gKwkiQ01EX1RJTUVPVVQiLA0KPiArCSJJRE1BMF9B
+WElfU0xWRVJSIiwNCj4gKwkiSURNQTBfQVhJX0RFQ0VSUiIsDQo+ICsJIjB4MTUgUmVzZXJ2ZWQi
+LA0KPiArCSJJRE1BMV9BWElfU0xBVkVfRkFVTFQiLA0KPiArCSJJRE1BMV9BSVhJX0RFQ0VSUiIs
+DQo+ICsJIjB4MTggUmVzZXJ2ZWQiLA0KPiArCSJaTElCVkhCX0FYSV9TTFZFUlIiLA0KPiArCSJa
+TElCVkhCX0FYSV9ERUNFUlIiLA0KPiArCSIweDFCIFJlc2VydmVkIiwNCj4gKwkiWkxJQl9VTkVY
+UEVDVEVEX0VPTSIsDQo+ICsJIlpMSUJfRVhUUkFfREFUQSIsDQo+ICsJIlpMSUJfQlRZUEUiLA0K
+PiArCSJaTElCX1VOREVGSU5FRF9TWU1CT0wiLA0KPiArCSJaTElCX1VOREVGSU5FRF9ESVNUQU5D
+RV9TIiwNCj4gKwkiWkxJQl9DT0RFX0xFTkdUSF9TWU1CT0wiLA0KPiArCSJaTElCIF9WSEJfSUxM
+RUdBTF9GRVRDSCIsDQo+ICsJIlpMSUJfVU5DT01QUkVTU0VEX0xFTiIsDQo+ICsJIlpMSUJfTElN
+SVRfUkVBQ0hFRCIsDQo+ICsJIlpMSUJfQ0hFQ0tTVU1fTUlTTUFUQ0gwIiwNCj4gKwkiT0RNQTBf
+QVhJX1NMVkVSUiIsDQo+ICsJIk9ETUEwX0FYSV9ERUNFUlIiLA0KPiArCSIweDI4IFJlc2VydmVk
+IiwNCj4gKwkiT0RNQTFfQVhJX1NMVkVSUiIsDQo+ICsJIk9ETUExX0FYSV9ERUNFUlIiLA0KPiAg
+IH07DQo+ICAgDQo+ICAgdm9pZCBjY3BfbG9nX2Vycm9yKHN0cnVjdCBjY3BfZGV2aWNlICpkLCBp
+bnQgZSkNCj4gICB7DQo+IC0JZGV2X2VycihkLT5kZXYsICJDQ1AgZXJyb3I6ICVzICgweCV4KVxu
+IiwgY2NwX2Vycm9yX2NvZGVzW2VdLCBlKTsNCj4gKwlpZiAoV0FSTl9PTigoZSA8IDApIHx8IChl
+ID49IENDUF9NQVhfRVJST1JfQ09ERSkpKQ0KPiArCQlyZXR1cm47DQoNClRoZSBjbWRfZXJyb3Ig
+dmFyaWFibGUgdGhhdCBpcyB1c2VkIHRvIGNhbGwgdGhpcyBmdW5jdGlvbiBpcyBhIHUzMiwgc28g
+eW91DQpjb3VsZCBqdXN0IGNoYW5nZSAiZSIgZnJvbSBpbnQgdG8gdW5zaWduZWQgaW50IGFuZCBy
+ZW1vdmUgdGhpcyBjaGVjay4gVGhlDQpiZWxvdyBjaGVjayB3b3VsZCBiZSBhbGwgdGhhdCBpcyBu
+ZWVkZWQuDQoNClRoYW5rcywNClRvbQ0KDQo+ICsNCj4gKwlpZiAoZSA8IEFSUkFZX1NJWkUoY2Nw
+X2Vycm9yX2NvZGVzKSkNCj4gKwkJZGV2X2VycihkLT5kZXYsICJDQ1AgZXJyb3IgJWQ6ICVzXG4i
+LCBlLCBjY3BfZXJyb3JfY29kZXNbZV0pOw0KPiArCWVsc2UNCj4gKwkJZGV2X2VycihkLT5kZXYs
+ICJDQ1AgZXJyb3IgJWQ6IFVua25vd24gRXJyb3JcbiIsIGUpOw0KPiAgIH0NCj4gICANCj4gICAv
+KiBMaXN0IG9mIENDUHMsIENDUCBjb3VudCwgcmVhZC13cml0ZSBhY2Nlc3MgbG9jaywgYW5kIGFj
+Y2VzcyBmdW5jdGlvbnMNCj4gDQo=
