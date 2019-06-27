@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84A78C48BD7
-	for <linux-crypto@archiver.kernel.org>; Thu, 27 Jun 2019 10:28:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13393C48BD9
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 Jun 2019 10:28:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5452920828
+	by mail.kernel.org (Postfix) with ESMTP id D33E320828
 	for <linux-crypto@archiver.kernel.org>; Thu, 27 Jun 2019 10:28:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fDpDUeTh"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YlrnsHIG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726686AbfF0K2V (ORCPT
+        id S1726465AbfF0K2W (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 27 Jun 2019 06:28:21 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:41693 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726462AbfF0K2S (ORCPT
+        Thu, 27 Jun 2019 06:28:22 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:33862 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726623AbfF0K2V (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 27 Jun 2019 06:28:18 -0400
-Received: by mail-wr1-f65.google.com with SMTP id c2so1903412wrm.8
-        for <linux-crypto@vger.kernel.org>; Thu, 27 Jun 2019 03:28:16 -0700 (PDT)
+        Thu, 27 Jun 2019 06:28:21 -0400
+Received: by mail-wr1-f68.google.com with SMTP id k11so1941343wrl.1
+        for <linux-crypto@vger.kernel.org>; Thu, 27 Jun 2019 03:28:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=Q96/29TdV0TBH+QbXhY2WMZ256VAP+kFBl0pIhaOEg0=;
-        b=fDpDUeThFvNCzFhp9NQqgylZHBb5OgbMoozEiZqrhAhU+yXb7B3lZOU7dXAv1SirsS
-         X8Ln6R4nWEHMcGoIZMZs4Hij5BQK9BZdzEXPdAkJMzdnzHit/bK4O+dm74jFXxL500Lv
-         VjEaUqwiSu+nLJFr4nyHgu6/8VaeYOtQqAigrJAB+WhwmjI84LilxAv0y8O0yIDRrdc4
-         PZRbMACRDPOLHXT7hvzpXPBmjUaKAx1W/1D2n7kkwI4PPgUbBBnzvXDtm/NS++1gf8PS
-         5a3WVBEkUHL/ACzZNQgbcYsyIGi86Qz3grASlgz+gd0Nl4ei5u05aa3zkJz2wqcnztrK
-         5BxQ==
+        bh=SI+i3SEIksVLr/oeokNkhVP46cu/BheSlfNWTBwHojU=;
+        b=YlrnsHIGinzZy0k+MYE7NtYe+nhsMUqfbjKt5N2RkCbkWb4iDdr98mmEpHvrTZpd/9
+         Tt9KNknJ1853cgPae5Aipruh7cClUth2tF1isvYt50KVV2xisZhz7M2/wMDYetWMagxS
+         4IBP46vwDnG6pZNKinGQ5FFjAJkYORLu0rHbAC+854Obb4F9pNOhXxdeRExMHu6DApUQ
+         CnxxJJJcEANcdPoD4jI41zEh+sk3F0OYmKHWamKeR8I3EF/juq2mqDZ6rxpIlwylM/Cc
+         KCo7NIK01uQdbT8jQrfzipd6GKHOLnD+W58/fSrWr/3WTj7ZsUI/nDOGuaDlzF3Wrbyi
+         POZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=Q96/29TdV0TBH+QbXhY2WMZ256VAP+kFBl0pIhaOEg0=;
-        b=XL52EHYASNQ03gHO78TI8UYMb02zPMrGEgjbQRX+nJe791op4y8ZHXblUxXiaUrYmd
-         odqeGHxgI6zUL9zDvUfbgZD/VxlHTN9a5piWCrVgcZ0BKCVSRPEesIB9kz0NugiPpp6J
-         7XgCKH7qgIrCzIeVfWLCHXXAxgKKCwh4idkn+azj3sslQ8eQeV84fCUnHKsPk8aWNj9c
-         QmVz2E/yxVQ92hrA4P5kCTa7UxGb0B+1WOn+BldKlFqjuyEvJxeFtcbOFTVd8S6PdluX
-         OkdMA1RwfOGcZ7MtyRMPQZWaNBIJV9TdyXx9wtc+JQSplksrg6dVM63tkmVffjF+bujT
-         fXvQ==
-X-Gm-Message-State: APjAAAU1SOaFROjzC789J5IbzktYsJRWlXOgNsdWf1kPKmpLlgZljsJO
-        ZhORCuAB83S4zkZ//T5nkEi8y3OWtog=
-X-Google-Smtp-Source: APXvYqywSImpKQ/vfKD3wowAE4fGBLdaXf5bH+/d+xCzOLT4+Untk8eaYkCvpw7wNQiO4KzIgEkzyA==
-X-Received: by 2002:adf:82e2:: with SMTP id 89mr2753495wrc.33.1561631295611;
-        Thu, 27 Jun 2019 03:28:15 -0700 (PDT)
+        bh=SI+i3SEIksVLr/oeokNkhVP46cu/BheSlfNWTBwHojU=;
+        b=p/PRfEwdhideLM/KwuNBtlKmNRdyfzZNDUp4YunpIT61CAT888S5Y/625+y/B6zzOA
+         l8hbIJrBHb0XFhBB9v7vsBvxT9AlfAKCqqfVfWcyaTvzuBRIh9zexFPFwBTcTTc4wcD4
+         AnX2uCOYjCkfpZe7/JhfWzM7W9t24QN6sgmPRpPg6ByeMTbHjj3aHFO6s25pAynyMZXo
+         KEmjzT/H4Vkii/2aW6AMmXZ94pzY6YTdfSpMUaxpBaCEh+DnV5hI0TItqFTiS0XCrbjw
+         tcoWoIHIh8WW03nrpuL+wcXNgrJ1G/PVyz00f1SDGpRk8kfUiMGpCaWrG02Ro0VMUv3Y
+         0iDg==
+X-Gm-Message-State: APjAAAWHqOJfogOMZssNux5k6dWLv3NJp1RPep3buLn81/kWg2XLK4k/
+        LIuMVacGnYLg/laSrlAg6wPYBmfVq7Y=
+X-Google-Smtp-Source: APXvYqycjE9g/OOxyl2U9gJkDahd6GfCYDIDbdW8d8bVkuPrb85x1qAqI0fz/EulEamSa3TeorHoJg==
+X-Received: by 2002:a5d:5745:: with SMTP id q5mr2800024wrw.75.1561631298633;
+        Thu, 27 Jun 2019 03:28:18 -0700 (PDT)
 Received: from localhost.localdomain (aaubervilliers-681-1-8-173.w90-88.abo.wanadoo.fr. [90.88.13.173])
-        by smtp.gmail.com with ESMTPSA id g2sm5584533wmh.0.2019.06.27.03.28.14
+        by smtp.gmail.com with ESMTPSA id g2sm5584533wmh.0.2019.06.27.03.28.17
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 27 Jun 2019 03:28:14 -0700 (PDT)
+        Thu, 27 Jun 2019 03:28:18 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     herbert@gondor.apana.org.au, ebiggers@kernel.org,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v3 23/32] bluetooth: switch to AES library
-Date:   Thu, 27 Jun 2019 12:26:38 +0200
-Message-Id: <20190627102647.2992-24-ard.biesheuvel@linaro.org>
+Subject: [PATCH v3 26/32] crypto: chelsio/aes - replace AES cipher calls with library calls
+Date:   Thu, 27 Jun 2019 12:26:41 +0200
+Message-Id: <20190627102647.2992-27-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190627102647.2992-1-ard.biesheuvel@linaro.org>
 References: <20190627102647.2992-1-ard.biesheuvel@linaro.org>
@@ -73,442 +73,251 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The bluetooth code uses a bare AES cipher for the encryption operations.
-Given that it carries out a set_key() operation right before every
-encryption operation, this is clearly not a hot path, and so the use of
-the cipher interface (which provides the best implementation available
-on the system) is not really required.
-
-In fact, when using a cipher like AES-NI or AES-CE, both the set_key()
-and the encrypt() operations involve en/disabling preemption as well as
-stacking and unstacking the SIMD context, and this is most certainly
-not worth it for encrypting 16 bytes of data.
-
-So let's switch to the new lightweight library interface instead.
+Replace a couple of occurrences where the "aes-generic" cipher is
+instantiated explicitly and only used for encryption of a single block.
+Use AES library calls instead.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- net/bluetooth/Kconfig |   3 +-
- net/bluetooth/smp.c   | 103 ++++++--------------
- 2 files changed, 33 insertions(+), 73 deletions(-)
+ drivers/crypto/chelsio/Kconfig          |  1 +
+ drivers/crypto/chelsio/chcr_algo.c      | 46 ++++++--------------
+ drivers/crypto/chelsio/chcr_crypto.h    |  1 -
+ drivers/crypto/chelsio/chcr_ipsec.c     | 19 +++-----
+ drivers/crypto/chelsio/chtls/chtls_hw.c | 20 +++------
+ 5 files changed, 26 insertions(+), 61 deletions(-)
 
-diff --git a/net/bluetooth/Kconfig b/net/bluetooth/Kconfig
-index db82a40875e8..a9d83ec4ee33 100644
---- a/net/bluetooth/Kconfig
-+++ b/net/bluetooth/Kconfig
-@@ -9,7 +9,8 @@ menuconfig BT
- 	select CRC16
- 	select CRYPTO
- 	select CRYPTO_BLKCIPHER
--	select CRYPTO_AES
+diff --git a/drivers/crypto/chelsio/Kconfig b/drivers/crypto/chelsio/Kconfig
+index 930d82d991f2..36402ba63b50 100644
+--- a/drivers/crypto/chelsio/Kconfig
++++ b/drivers/crypto/chelsio/Kconfig
+@@ -1,6 +1,7 @@
+ config CRYPTO_DEV_CHELSIO
+ 	tristate "Chelsio Crypto Co-processor Driver"
+ 	depends on CHELSIO_T4
 +	select CRYPTO_LIB_AES
-+	imply CRYPTO_AES
- 	select CRYPTO_CMAC
- 	select CRYPTO_ECB
+ 	select CRYPTO_SHA1
  	select CRYPTO_SHA256
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index e68c715f8d37..b5045b57ead3 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -23,6 +23,7 @@
- #include <linux/debugfs.h>
- #include <linux/scatterlist.h>
- #include <linux/crypto.h>
-+#include <crypto/aes.h>
- #include <crypto/algapi.h>
- #include <crypto/b128ops.h>
- #include <crypto/hash.h>
-@@ -88,7 +89,6 @@ struct smp_dev {
- 	u8			local_rand[16];
- 	bool			debug_key;
+ 	select CRYPTO_SHA512
+diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
+index 177f572b9589..38ee38b37ae6 100644
+--- a/drivers/crypto/chelsio/chcr_algo.c
++++ b/drivers/crypto/chelsio/chcr_algo.c
+@@ -1023,22 +1023,21 @@ static int chcr_update_tweak(struct ablkcipher_request *req, u8 *iv,
+ 	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(req);
+ 	struct ablk_ctx *ablkctx = ABLK_CTX(c_ctx(tfm));
+ 	struct chcr_blkcipher_req_ctx *reqctx = ablkcipher_request_ctx(req);
+-	struct crypto_cipher *cipher;
++	struct crypto_aes_ctx aes;
+ 	int ret, i;
+ 	u8 *key;
+ 	unsigned int keylen;
+ 	int round = reqctx->last_req_len / AES_BLOCK_SIZE;
+ 	int round8 = round / 8;
  
--	struct crypto_cipher	*tfm_aes;
- 	struct crypto_shash	*tfm_cmac;
- 	struct crypto_kpp	*tfm_ecdh;
- };
-@@ -127,7 +127,6 @@ struct smp_chan {
- 	u8			dhkey[32];
- 	u8			mackey[16];
+-	cipher = ablkctx->aes_generic;
+ 	memcpy(iv, reqctx->iv, AES_BLOCK_SIZE);
  
--	struct crypto_cipher	*tfm_aes;
- 	struct crypto_shash	*tfm_cmac;
- 	struct crypto_kpp	*tfm_ecdh;
- };
-@@ -377,22 +376,18 @@ static int smp_h7(struct crypto_shash *tfm_cmac, const u8 w[16],
-  * s1 and ah.
-  */
+ 	keylen = ablkctx->enckey_len / 2;
+ 	key = ablkctx->key + keylen;
+-	ret = crypto_cipher_setkey(cipher, key, keylen);
++	ret = aes_expandkey(&aes, key, keylen);
+ 	if (ret)
+-		goto out;
+-	crypto_cipher_encrypt_one(cipher, iv, iv);
++		return ret;
++	aes_encrypt(&aes, iv, iv);
+ 	for (i = 0; i < round8; i++)
+ 		gf128mul_x8_ble((le128 *)iv, (le128 *)iv);
  
--static int smp_e(struct crypto_cipher *tfm, const u8 *k, u8 *r)
-+static int smp_e(const u8 *k, u8 *r)
+@@ -1046,9 +1045,10 @@ static int chcr_update_tweak(struct ablkcipher_request *req, u8 *iv,
+ 		gf128mul_x_ble((le128 *)iv, (le128 *)iv);
+ 
+ 	if (!isfinal)
+-		crypto_cipher_decrypt_one(cipher, iv, iv);
+-out:
+-	return ret;
++		aes_decrypt(&aes, iv, iv);
++
++	memzero_explicit(&aes, sizeof(aes));
++	return 0;
+ }
+ 
+ static int chcr_update_cipher_iv(struct ablkcipher_request *req,
+@@ -1411,16 +1411,6 @@ static int chcr_cra_init(struct crypto_tfm *tfm)
+ 		return PTR_ERR(ablkctx->sw_cipher);
+ 	}
+ 
+-	if (get_cryptoalg_subtype(tfm) == CRYPTO_ALG_SUB_TYPE_XTS) {
+-		/* To update tweak*/
+-		ablkctx->aes_generic = crypto_alloc_cipher("aes-generic", 0, 0);
+-		if (IS_ERR(ablkctx->aes_generic)) {
+-			pr_err("failed to allocate aes cipher for tweak\n");
+-			return PTR_ERR(ablkctx->aes_generic);
+-		}
+-	} else
+-		ablkctx->aes_generic = NULL;
+-
+ 	tfm->crt_ablkcipher.reqsize =  sizeof(struct chcr_blkcipher_req_ctx);
+ 	return chcr_device_init(crypto_tfm_ctx(tfm));
+ }
+@@ -1451,8 +1441,6 @@ static void chcr_cra_exit(struct crypto_tfm *tfm)
+ 	struct ablk_ctx *ablkctx = ABLK_CTX(ctx);
+ 
+ 	crypto_free_sync_skcipher(ablkctx->sw_cipher);
+-	if (ablkctx->aes_generic)
+-		crypto_free_cipher(ablkctx->aes_generic);
+ }
+ 
+ static int get_alg_config(struct algo_param *params,
+@@ -3364,9 +3352,9 @@ static int chcr_gcm_setkey(struct crypto_aead *aead, const u8 *key,
  {
-+	struct crypto_aes_ctx ctx;
- 	uint8_t tmp[16], data[16];
- 	int err;
+ 	struct chcr_aead_ctx *aeadctx = AEAD_CTX(a_ctx(aead));
+ 	struct chcr_gcm_ctx *gctx = GCM_CTX(aeadctx);
+-	struct crypto_cipher *cipher;
+ 	unsigned int ck_size;
+ 	int ret = 0, key_ctx_size = 0;
++	struct crypto_aes_ctx aes;
  
- 	SMP_DBG("k %16phN r %16phN", k, r);
- 
--	if (!tfm) {
--		BT_ERR("tfm %p", tfm);
--		return -EINVAL;
+ 	aeadctx->enckey_len = 0;
+ 	crypto_aead_clear_flags(aeadctx->sw_cipher, CRYPTO_TFM_REQ_MASK);
+@@ -3409,23 +3397,15 @@ static int chcr_gcm_setkey(struct crypto_aead *aead, const u8 *key,
+ 	/* Calculate the H = CIPH(K, 0 repeated 16 times).
+ 	 * It will go in key context
+ 	 */
+-	cipher = crypto_alloc_cipher("aes-generic", 0, 0);
+-	if (IS_ERR(cipher)) {
+-		aeadctx->enckey_len = 0;
+-		ret = -ENOMEM;
+-		goto out;
 -	}
 -
- 	/* The most significant octet of key corresponds to k[0] */
- 	swap_buf(k, tmp, 16);
+-	ret = crypto_cipher_setkey(cipher, key, keylen);
++	ret = aes_expandkey(&aes, key, keylen);
+ 	if (ret) {
+ 		aeadctx->enckey_len = 0;
+-		goto out1;
++		goto out;
+ 	}
+ 	memset(gctx->ghash_h, 0, AEAD_H_SIZE);
+-	crypto_cipher_encrypt_one(cipher, gctx->ghash_h, gctx->ghash_h);
++	aes_encrypt(&aes, gctx->ghash_h, gctx->ghash_h);
++	memzero_explicit(&aes, sizeof(aes));
  
--	err = crypto_cipher_setkey(tfm, tmp, 16);
-+	err = aes_expandkey(&ctx, tmp, 16);
- 	if (err) {
- 		BT_ERR("cipher setkey failed: %d", err);
- 		return err;
-@@ -401,17 +396,18 @@ static int smp_e(struct crypto_cipher *tfm, const u8 *k, u8 *r)
- 	/* Most significant octet of plaintextData corresponds to data[0] */
- 	swap_buf(r, data, 16);
- 
--	crypto_cipher_encrypt_one(tfm, data, data);
-+	aes_encrypt(&ctx, data, data);
- 
- 	/* Most significant octet of encryptedData corresponds to data[0] */
- 	swap_buf(data, r, 16);
- 
- 	SMP_DBG("r %16phN", r);
- 
-+	memzero_explicit(&ctx, sizeof (ctx));
- 	return err;
+-out1:
+-	crypto_free_cipher(cipher);
+ out:
+ 	return ret;
  }
+diff --git a/drivers/crypto/chelsio/chcr_crypto.h b/drivers/crypto/chelsio/chcr_crypto.h
+index 655606f2e4d0..993c97e70565 100644
+--- a/drivers/crypto/chelsio/chcr_crypto.h
++++ b/drivers/crypto/chelsio/chcr_crypto.h
+@@ -172,7 +172,6 @@ static inline struct chcr_context *h_ctx(struct crypto_ahash *tfm)
  
--static int smp_c1(struct crypto_cipher *tfm_aes, const u8 k[16],
-+static int smp_c1(const u8 k[16],
- 		  const u8 r[16], const u8 preq[7], const u8 pres[7], u8 _iat,
- 		  const bdaddr_t *ia, u8 _rat, const bdaddr_t *ra, u8 res[16])
+ struct ablk_ctx {
+ 	struct crypto_sync_skcipher *sw_cipher;
+-	struct crypto_cipher *aes_generic;
+ 	__be32 key_ctx_hdr;
+ 	unsigned int enckey_len;
+ 	unsigned char ciph_mode;
+diff --git a/drivers/crypto/chelsio/chcr_ipsec.c b/drivers/crypto/chelsio/chcr_ipsec.c
+index f429aae72542..24355680f30a 100644
+--- a/drivers/crypto/chelsio/chcr_ipsec.c
++++ b/drivers/crypto/chelsio/chcr_ipsec.c
+@@ -132,11 +132,11 @@ static inline int chcr_ipsec_setauthsize(struct xfrm_state *x,
+ static inline int chcr_ipsec_setkey(struct xfrm_state *x,
+ 				    struct ipsec_sa_entry *sa_entry)
  {
-@@ -436,7 +432,7 @@ static int smp_c1(struct crypto_cipher *tfm_aes, const u8 k[16],
- 	u128_xor((u128 *) res, (u128 *) r, (u128 *) p1);
+-	struct crypto_cipher *cipher;
+ 	int keylen = (x->aead->alg_key_len + 7) / 8;
+ 	unsigned char *key = x->aead->alg_key;
+ 	int ck_size, key_ctx_size = 0;
+ 	unsigned char ghash_h[AEAD_H_SIZE];
++	struct crypto_aes_ctx aes;
+ 	int ret = 0;
  
- 	/* res = e(k, res) */
--	err = smp_e(tfm_aes, k, res);
-+	err = smp_e(k, res);
- 	if (err) {
- 		BT_ERR("Encrypt data error");
- 		return err;
-@@ -453,14 +449,14 @@ static int smp_c1(struct crypto_cipher *tfm_aes, const u8 k[16],
- 	u128_xor((u128 *) res, (u128 *) res, (u128 *) p2);
- 
- 	/* res = e(k, res) */
--	err = smp_e(tfm_aes, k, res);
-+	err = smp_e(k, res);
- 	if (err)
- 		BT_ERR("Encrypt data error");
- 
- 	return err;
+ 	if (keylen > 3) {
+@@ -170,26 +170,19 @@ static inline int chcr_ipsec_setkey(struct xfrm_state *x,
+ 	/* Calculate the H = CIPH(K, 0 repeated 16 times).
+ 	 * It will go in key context
+ 	 */
+-	cipher = crypto_alloc_cipher("aes-generic", 0, 0);
+-	if (IS_ERR(cipher)) {
+-		sa_entry->enckey_len = 0;
+-		ret = -ENOMEM;
+-		goto out;
+-	}
+-
+-	ret = crypto_cipher_setkey(cipher, key, keylen);
++	ret = aes_expandkey(&aes, key, keylen);
+ 	if (ret) {
+ 		sa_entry->enckey_len = 0;
+-		goto out1;
++		goto out;
+ 	}
+ 	memset(ghash_h, 0, AEAD_H_SIZE);
+-	crypto_cipher_encrypt_one(cipher, ghash_h, ghash_h);
++	aes_encrypt(&aes, ghash_h, ghash_h);
++	memzero_explicit(&aes, sizeof(aes));
++
+ 	memcpy(sa_entry->key + (DIV_ROUND_UP(sa_entry->enckey_len, 16) *
+ 	       16), ghash_h, AEAD_H_SIZE);
+ 	sa_entry->kctx_len = ((DIV_ROUND_UP(sa_entry->enckey_len, 16)) << 4) +
+ 			      AEAD_H_SIZE;
+-out1:
+-	crypto_free_cipher(cipher);
+ out:
+ 	return ret;
  }
- 
--static int smp_s1(struct crypto_cipher *tfm_aes, const u8 k[16],
-+static int smp_s1(const u8 k[16],
- 		  const u8 r1[16], const u8 r2[16], u8 _r[16])
- {
- 	int err;
-@@ -469,15 +465,14 @@ static int smp_s1(struct crypto_cipher *tfm_aes, const u8 k[16],
- 	memcpy(_r, r2, 8);
- 	memcpy(_r + 8, r1, 8);
- 
--	err = smp_e(tfm_aes, k, _r);
-+	err = smp_e(k, _r);
- 	if (err)
- 		BT_ERR("Encrypt data error");
- 
- 	return err;
- }
- 
--static int smp_ah(struct crypto_cipher *tfm, const u8 irk[16],
--		  const u8 r[3], u8 res[3])
-+static int smp_ah(const u8 irk[16], const u8 r[3], u8 res[3])
- {
- 	u8 _res[16];
- 	int err;
-@@ -486,7 +481,7 @@ static int smp_ah(struct crypto_cipher *tfm, const u8 irk[16],
- 	memcpy(_res, r, 3);
- 	memset(_res + 3, 0, 13);
- 
--	err = smp_e(tfm, irk, _res);
-+	err = smp_e(irk, _res);
- 	if (err) {
- 		BT_ERR("Encrypt error");
- 		return err;
-@@ -518,7 +513,7 @@ bool smp_irk_matches(struct hci_dev *hdev, const u8 irk[16],
- 
- 	BT_DBG("RPA %pMR IRK %*phN", bdaddr, 16, irk);
- 
--	err = smp_ah(smp->tfm_aes, irk, &bdaddr->b[3], hash);
-+	err = smp_ah(irk, &bdaddr->b[3], hash);
- 	if (err)
- 		return false;
- 
-@@ -541,7 +536,7 @@ int smp_generate_rpa(struct hci_dev *hdev, const u8 irk[16], bdaddr_t *rpa)
- 	rpa->b[5] &= 0x3f;	/* Clear two most significant bits */
- 	rpa->b[5] |= 0x40;	/* Set second most significant bit */
- 
--	err = smp_ah(smp->tfm_aes, irk, &rpa->b[3], rpa->b);
-+	err = smp_ah(irk, &rpa->b[3], rpa->b);
- 	if (err < 0)
- 		return err;
- 
-@@ -768,7 +763,6 @@ static void smp_chan_destroy(struct l2cap_conn *conn)
- 	kzfree(smp->slave_csrk);
- 	kzfree(smp->link_key);
- 
--	crypto_free_cipher(smp->tfm_aes);
- 	crypto_free_shash(smp->tfm_cmac);
- 	crypto_free_kpp(smp->tfm_ecdh);
- 
-@@ -957,7 +951,7 @@ static u8 smp_confirm(struct smp_chan *smp)
- 
- 	BT_DBG("conn %p", conn);
- 
--	ret = smp_c1(smp->tfm_aes, smp->tk, smp->prnd, smp->preq, smp->prsp,
-+	ret = smp_c1(smp->tk, smp->prnd, smp->preq, smp->prsp,
- 		     conn->hcon->init_addr_type, &conn->hcon->init_addr,
- 		     conn->hcon->resp_addr_type, &conn->hcon->resp_addr,
- 		     cp.confirm_val);
-@@ -983,12 +977,9 @@ static u8 smp_random(struct smp_chan *smp)
- 	u8 confirm[16];
+diff --git a/drivers/crypto/chelsio/chtls/chtls_hw.c b/drivers/crypto/chelsio/chtls/chtls_hw.c
+index 490960755864..a6f0278f3597 100644
+--- a/drivers/crypto/chelsio/chtls/chtls_hw.c
++++ b/drivers/crypto/chelsio/chtls/chtls_hw.c
+@@ -216,8 +216,8 @@ static int chtls_key_info(struct chtls_sock *csk,
+ 	unsigned char key[AES_KEYSIZE_128];
+ 	struct tls12_crypto_info_aes_gcm_128 *gcm_ctx;
+ 	unsigned char ghash_h[AEAD_H_SIZE];
+-	struct crypto_cipher *cipher;
+ 	int ck_size, key_ctx_size;
++	struct crypto_aes_ctx aes;
  	int ret;
  
--	if (IS_ERR_OR_NULL(smp->tfm_aes))
--		return SMP_UNSPECIFIED;
+ 	gcm_ctx = (struct tls12_crypto_info_aes_gcm_128 *)
+@@ -237,18 +237,13 @@ static int chtls_key_info(struct chtls_sock *csk,
+ 	/* Calculate the H = CIPH(K, 0 repeated 16 times).
+ 	 * It will go in key context
+ 	 */
+-	cipher = crypto_alloc_cipher("aes", 0, 0);
+-	if (IS_ERR(cipher)) {
+-		ret = -ENOMEM;
+-		goto out;
+-	}
 -
- 	BT_DBG("conn %p %s", conn, conn->hcon->out ? "master" : "slave");
- 
--	ret = smp_c1(smp->tfm_aes, smp->tk, smp->rrnd, smp->preq, smp->prsp,
-+	ret = smp_c1(smp->tk, smp->rrnd, smp->preq, smp->prsp,
- 		     hcon->init_addr_type, &hcon->init_addr,
- 		     hcon->resp_addr_type, &hcon->resp_addr, confirm);
+-	ret = crypto_cipher_setkey(cipher, key, keylen);
++	ret = aes_expandkey(&aes, key, keylen);
  	if (ret)
-@@ -1005,7 +996,7 @@ static u8 smp_random(struct smp_chan *smp)
- 		__le64 rand = 0;
- 		__le16 ediv = 0;
+-		goto out1;
++		return ret;
  
--		smp_s1(smp->tfm_aes, smp->tk, smp->rrnd, smp->prnd, stk);
-+		smp_s1(smp->tk, smp->rrnd, smp->prnd, stk);
+ 	memset(ghash_h, 0, AEAD_H_SIZE);
+-	crypto_cipher_encrypt_one(cipher, ghash_h, ghash_h);
++	aes_encrypt(&aes, ghash_h, ghash_h);
++	memzero_explicit(&aes, sizeof(aes));
+ 	csk->tlshws.keylen = key_ctx_size;
  
- 		if (test_and_set_bit(HCI_CONN_ENCRYPT_PEND, &hcon->flags))
- 			return SMP_UNSPECIFIED;
-@@ -1021,7 +1012,7 @@ static u8 smp_random(struct smp_chan *smp)
- 		smp_send_cmd(conn, SMP_CMD_PAIRING_RANDOM, sizeof(smp->prnd),
- 			     smp->prnd);
+ 	/* Copy the Key context */
+@@ -272,10 +267,7 @@ static int chtls_key_info(struct chtls_sock *csk,
+ 	/* erase key info from driver */
+ 	memset(gcm_ctx->key, 0, keylen);
  
--		smp_s1(smp->tfm_aes, smp->tk, smp->prnd, smp->rrnd, stk);
-+		smp_s1(smp->tk, smp->prnd, smp->rrnd, stk);
- 
- 		if (hcon->pending_sec_level == BT_SECURITY_HIGH)
- 			auth = 1;
-@@ -1389,16 +1380,10 @@ static struct smp_chan *smp_chan_create(struct l2cap_conn *conn)
- 	if (!smp)
- 		return NULL;
- 
--	smp->tfm_aes = crypto_alloc_cipher("aes", 0, 0);
--	if (IS_ERR(smp->tfm_aes)) {
--		BT_ERR("Unable to create AES crypto context");
--		goto zfree_smp;
--	}
--
- 	smp->tfm_cmac = crypto_alloc_shash("cmac(aes)", 0, 0);
- 	if (IS_ERR(smp->tfm_cmac)) {
- 		BT_ERR("Unable to create CMAC crypto context");
--		goto free_cipher;
-+		goto zfree_smp;
- 	}
- 
- 	smp->tfm_ecdh = crypto_alloc_kpp("ecdh", CRYPTO_ALG_INTERNAL, 0);
-@@ -1420,8 +1405,6 @@ static struct smp_chan *smp_chan_create(struct l2cap_conn *conn)
- 
- free_shash:
- 	crypto_free_shash(smp->tfm_cmac);
--free_cipher:
--	crypto_free_cipher(smp->tfm_aes);
- zfree_smp:
- 	kzfree(smp);
- 	return NULL;
-@@ -3219,7 +3202,6 @@ static struct l2cap_chan *smp_add_cid(struct hci_dev *hdev, u16 cid)
- {
- 	struct l2cap_chan *chan;
- 	struct smp_dev *smp;
--	struct crypto_cipher *tfm_aes;
- 	struct crypto_shash *tfm_cmac;
- 	struct crypto_kpp *tfm_ecdh;
- 
-@@ -3232,17 +3214,9 @@ static struct l2cap_chan *smp_add_cid(struct hci_dev *hdev, u16 cid)
- 	if (!smp)
- 		return ERR_PTR(-ENOMEM);
- 
--	tfm_aes = crypto_alloc_cipher("aes", 0, 0);
--	if (IS_ERR(tfm_aes)) {
--		BT_ERR("Unable to create AES crypto context");
--		kzfree(smp);
--		return ERR_CAST(tfm_aes);
--	}
--
- 	tfm_cmac = crypto_alloc_shash("cmac(aes)", 0, 0);
- 	if (IS_ERR(tfm_cmac)) {
- 		BT_ERR("Unable to create CMAC crypto context");
--		crypto_free_cipher(tfm_aes);
- 		kzfree(smp);
- 		return ERR_CAST(tfm_cmac);
- 	}
-@@ -3251,13 +3225,11 @@ static struct l2cap_chan *smp_add_cid(struct hci_dev *hdev, u16 cid)
- 	if (IS_ERR(tfm_ecdh)) {
- 		BT_ERR("Unable to create ECDH crypto context");
- 		crypto_free_shash(tfm_cmac);
--		crypto_free_cipher(tfm_aes);
- 		kzfree(smp);
- 		return ERR_CAST(tfm_ecdh);
- 	}
- 
- 	smp->local_oob = false;
--	smp->tfm_aes = tfm_aes;
- 	smp->tfm_cmac = tfm_cmac;
- 	smp->tfm_ecdh = tfm_ecdh;
- 
-@@ -3265,7 +3237,6 @@ static struct l2cap_chan *smp_add_cid(struct hci_dev *hdev, u16 cid)
- 	chan = l2cap_chan_create();
- 	if (!chan) {
- 		if (smp) {
--			crypto_free_cipher(smp->tfm_aes);
- 			crypto_free_shash(smp->tfm_cmac);
- 			crypto_free_kpp(smp->tfm_ecdh);
- 			kzfree(smp);
-@@ -3313,7 +3284,6 @@ static void smp_del_chan(struct l2cap_chan *chan)
- 	smp = chan->data;
- 	if (smp) {
- 		chan->data = NULL;
--		crypto_free_cipher(smp->tfm_aes);
- 		crypto_free_shash(smp->tfm_cmac);
- 		crypto_free_kpp(smp->tfm_ecdh);
- 		kzfree(smp);
-@@ -3569,7 +3539,7 @@ static int __init test_debug_key(struct crypto_kpp *tfm_ecdh)
- 	return 0;
+-out1:
+-	crypto_free_cipher(cipher);
+-out:
+-	return ret;
++	return 0;
  }
  
--static int __init test_ah(struct crypto_cipher *tfm_aes)
-+static int __init test_ah(void)
- {
- 	const u8 irk[16] = {
- 			0x9b, 0x7d, 0x39, 0x0a, 0xa6, 0x10, 0x10, 0x34,
-@@ -3579,7 +3549,7 @@ static int __init test_ah(struct crypto_cipher *tfm_aes)
- 	u8 res[3];
- 	int err;
- 
--	err = smp_ah(tfm_aes, irk, r, res);
-+	err = smp_ah(irk, r, res);
- 	if (err)
- 		return err;
- 
-@@ -3589,7 +3559,7 @@ static int __init test_ah(struct crypto_cipher *tfm_aes)
- 	return 0;
- }
- 
--static int __init test_c1(struct crypto_cipher *tfm_aes)
-+static int __init test_c1(void)
- {
- 	const u8 k[16] = {
- 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-@@ -3609,7 +3579,7 @@ static int __init test_c1(struct crypto_cipher *tfm_aes)
- 	u8 res[16];
- 	int err;
- 
--	err = smp_c1(tfm_aes, k, r, preq, pres, _iat, &ia, _rat, &ra, res);
-+	err = smp_c1(k, r, preq, pres, _iat, &ia, _rat, &ra, res);
- 	if (err)
- 		return err;
- 
-@@ -3619,7 +3589,7 @@ static int __init test_c1(struct crypto_cipher *tfm_aes)
- 	return 0;
- }
- 
--static int __init test_s1(struct crypto_cipher *tfm_aes)
-+static int __init test_s1(void)
- {
- 	const u8 k[16] = {
- 			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-@@ -3634,7 +3604,7 @@ static int __init test_s1(struct crypto_cipher *tfm_aes)
- 	u8 res[16];
- 	int err;
- 
--	err = smp_s1(tfm_aes, k, r1, r2, res);
-+	err = smp_s1(k, r1, r2, res);
- 	if (err)
- 		return err;
- 
-@@ -3815,8 +3785,7 @@ static const struct file_operations test_smp_fops = {
- 	.llseek		= default_llseek,
- };
- 
--static int __init run_selftests(struct crypto_cipher *tfm_aes,
--				struct crypto_shash *tfm_cmac,
-+static int __init run_selftests(struct crypto_shash *tfm_cmac,
- 				struct crypto_kpp *tfm_ecdh)
- {
- 	ktime_t calltime, delta, rettime;
-@@ -3831,19 +3800,19 @@ static int __init run_selftests(struct crypto_cipher *tfm_aes,
- 		goto done;
- 	}
- 
--	err = test_ah(tfm_aes);
-+	err = test_ah();
- 	if (err) {
- 		BT_ERR("smp_ah test failed");
- 		goto done;
- 	}
- 
--	err = test_c1(tfm_aes);
-+	err = test_c1();
- 	if (err) {
- 		BT_ERR("smp_c1 test failed");
- 		goto done;
- 	}
- 
--	err = test_s1(tfm_aes);
-+	err = test_s1();
- 	if (err) {
- 		BT_ERR("smp_s1 test failed");
- 		goto done;
-@@ -3900,21 +3869,13 @@ static int __init run_selftests(struct crypto_cipher *tfm_aes,
- 
- int __init bt_selftest_smp(void)
- {
--	struct crypto_cipher *tfm_aes;
- 	struct crypto_shash *tfm_cmac;
- 	struct crypto_kpp *tfm_ecdh;
- 	int err;
- 
--	tfm_aes = crypto_alloc_cipher("aes", 0, 0);
--	if (IS_ERR(tfm_aes)) {
--		BT_ERR("Unable to create AES crypto context");
--		return PTR_ERR(tfm_aes);
--	}
--
- 	tfm_cmac = crypto_alloc_shash("cmac(aes)", 0, 0);
- 	if (IS_ERR(tfm_cmac)) {
- 		BT_ERR("Unable to create CMAC crypto context");
--		crypto_free_cipher(tfm_aes);
- 		return PTR_ERR(tfm_cmac);
- 	}
- 
-@@ -3922,14 +3883,12 @@ int __init bt_selftest_smp(void)
- 	if (IS_ERR(tfm_ecdh)) {
- 		BT_ERR("Unable to create ECDH crypto context");
- 		crypto_free_shash(tfm_cmac);
--		crypto_free_cipher(tfm_aes);
- 		return PTR_ERR(tfm_ecdh);
- 	}
- 
--	err = run_selftests(tfm_aes, tfm_cmac, tfm_ecdh);
-+	err = run_selftests(tfm_cmac, tfm_ecdh);
- 
- 	crypto_free_shash(tfm_cmac);
--	crypto_free_cipher(tfm_aes);
- 	crypto_free_kpp(tfm_ecdh);
- 
- 	return err;
+ static void chtls_set_scmd(struct chtls_sock *csk)
 -- 
 2.20.1
 
