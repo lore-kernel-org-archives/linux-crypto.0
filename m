@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 599F6C48BD6
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA56CC48BD7
 	for <linux-crypto@archiver.kernel.org>; Thu, 27 Jun 2019 12:03:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 30691208CB
+	by mail.kernel.org (Postfix) with ESMTP id 927FA20656
 	for <linux-crypto@archiver.kernel.org>; Thu, 27 Jun 2019 12:03:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iNyT9wsz"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LAQBgYmw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726682AbfF0MDl (ORCPT
+        id S1726807AbfF0MDn (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 27 Jun 2019 08:03:41 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:38981 "EHLO
+        Thu, 27 Jun 2019 08:03:43 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:38011 "EHLO
         mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726734AbfF0MDi (ORCPT
+        with ESMTP id S1726748AbfF0MDm (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 27 Jun 2019 08:03:38 -0400
-Received: by mail-wm1-f65.google.com with SMTP id z23so5412611wma.4
-        for <linux-crypto@vger.kernel.org>; Thu, 27 Jun 2019 05:03:37 -0700 (PDT)
+        Thu, 27 Jun 2019 08:03:42 -0400
+Received: by mail-wm1-f65.google.com with SMTP id s15so5396678wmj.3
+        for <linux-crypto@vger.kernel.org>; Thu, 27 Jun 2019 05:03:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=Bm6gxVeRS4kLY3SOsRGZrbNXMPbJj65KkESLS1B6pM0=;
-        b=iNyT9wszUH7E0/vIO9JSmmoeE2OJImcnnsfMErA+jjBFD1g8zMboiSwWXBxCHVHVGI
-         LUWK9e7VDUZeBpdWRYJoMqTvf4OdW3qyWck/CB4UI9DK+Mk8Ua8sRMf3y4yROQ+/MnCs
-         81onjmbASe68efkzssbGLk48kAy1iy8BSw88Y91rQRYfGvbxLQaWyxNpTkJx3aiIc/L7
-         vUVpYpCh7idrXypRxYLlWxnrl0DoziCZUi+D5eiZ3cPpTO5MByVjUUDFkmQkaWsVolT4
-         39D7wSKQzd4pSvN91m9AY8xiXXjp9ZJI290R5uXryY0PWzIngO3trDVqi9lyJsMrPRJP
-         nfYA==
+        bh=1NLX7Ssyb/ZRxNU0BkyKxeA/jE2yVM/zXDvF/QseuEc=;
+        b=LAQBgYmwtP4sWR8noB3cdXUnjN20iabZXLL0X6sYXdfj5VetQoLy2EiVY3kAr0YcpT
+         wIbaMxQBhESZ8wXt75FZ+FOfSFNqLyHze/yHqT38qSHM9YV2Ctjre40+7XOMcMCjwkrf
+         ZokHTBB5saMNSpfmoZXu2ndC1Rr0cwVxrtUl+O0JMZ8Uc86GOK5cGGjOFgLPoF3FKbnf
+         rn707bfGaf9tpDN7HwamTuPOisWjdd6o7KCdj0hZZesJbfniSElbQDaQjSOeEEKoLgaG
+         mVoV/oLN+tUexz7eeg6AorIipjkDjNj/zGpbPKwBAfPEUpdHls4lkAAMblZxMQJf36dm
+         upcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=Bm6gxVeRS4kLY3SOsRGZrbNXMPbJj65KkESLS1B6pM0=;
-        b=RpR/qriYjsJ+pSohhOVzDtUvibKP86Aqfb0nc+83vLDknGXDxFzOJj7R/eH7+oU4+h
-         30lv/TgZJquIk2Fg56lvoHRGRBBECEWjwsM/zMJ6T606rldTKVJ9aYJxy1oIZuYcWPaM
-         QzxhTc1m39/611hGagFs5VDju6vUKZMJxri3uKW7qWt8bFfdRpDktFgDx8O/zJ6QsIGa
-         y3YTw51ehH+BSOLWjl4tonPHxiPyhJfFvWepslBBQooHwKDDLOjMDN45SOIiPcJe11BA
-         dWdAO68QyyOoi1aGoLkkrrs5qaehfk/HAvVmic2NEnQTimAVo7U+WJyX95JnCbT8UyzM
-         Y6eQ==
-X-Gm-Message-State: APjAAAVTVMGVAsUPMNASMzEbnC1vK8cu74i8NQCxVVACsVPSQi9MIhGI
-        28UjaO1yhPPlVNDw0NZt1PjdV7vlvqzYUg==
-X-Google-Smtp-Source: APXvYqzatmb3trNAqp0PmupjBp/LpPS44royoHiAq/QwiNCdITeEXYZ2NixVCWfB8W+ZFLCcGsT6EQ==
-X-Received: by 2002:a7b:c347:: with SMTP id l7mr2909276wmj.163.1561637017011;
-        Thu, 27 Jun 2019 05:03:37 -0700 (PDT)
+        bh=1NLX7Ssyb/ZRxNU0BkyKxeA/jE2yVM/zXDvF/QseuEc=;
+        b=NLcVsswUDLNOYgUbX1zxo17bTeTvTmO6uuXWs3Zp7LYrJN6OXuoYRCo+qU+PeKMKTd
+         ZJY3EWViu0aGkKslyFnB71paISjJmkRefv1L+93REwN6ZtRFjETkaKD8bcTMkPpT2DhX
+         1oJ4NVpGXsYW2iMm+x3OipANsVk7sKY8RpwQDHdLb2udlGOx9tuox9nF4JZhamlJQmWj
+         ftaZ1AwmIF7a2D0ks0F7qduYzLDV0I8XUZpfDJSN6ujtmCv3EScfpWvxZJjrpC/EagND
+         QPRx5F83ExzkLxuuBVVVJwTjQ/4Ib8pcf8d8+Vnsjsxxkt/zr9ykK2VLSgplpsgz8HBB
+         RRAA==
+X-Gm-Message-State: APjAAAXXrrXF8EqTYM6ceWMUEU1qs36nzsER0O+WAFgZTeghASGYTtgq
+        rK2we2j6kMoXsAaGHu1Wjkh/xBeBW0k6Dw==
+X-Google-Smtp-Source: APXvYqynk9nTkM0lO6v3Y59Hqf2Pn/VFi9zwL6/ejoKgAYBMAX9GUYCFeHQbVgOQOMQSqgBeIguCiQ==
+X-Received: by 2002:a1c:b146:: with SMTP id a67mr2951463wmf.124.1561637020766;
+        Thu, 27 Jun 2019 05:03:40 -0700 (PDT)
 Received: from localhost.localdomain (laubervilliers-657-1-83-120.w92-154.abo.wanadoo.fr. [92.154.90.120])
-        by smtp.gmail.com with ESMTPSA id z126sm7732431wmb.32.2019.06.27.05.03.36
+        by smtp.gmail.com with ESMTPSA id z126sm7732431wmb.32.2019.06.27.05.03.39
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 27 Jun 2019 05:03:36 -0700 (PDT)
+        Thu, 27 Jun 2019 05:03:39 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     herbert@gondor.apana.org.au, ebiggers@kernel.org,
         horia.geanta@nxp.com, Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v2 10/30] crypto: ccree/des - switch to new verification routines
-Date:   Thu, 27 Jun 2019 14:02:54 +0200
-Message-Id: <20190627120314.7197-11-ard.biesheuvel@linaro.org>
+Subject: [PATCH v2 13/30] crypto: safexcel/des - switch to new verification routines
+Date:   Thu, 27 Jun 2019 14:02:57 +0200
+Message-Id: <20190627120314.7197-14-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190627120314.7197-1-ard.biesheuvel@linaro.org>
 References: <20190627120314.7197-1-ard.biesheuvel@linaro.org>
@@ -75,79 +75,45 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- drivers/crypto/ccree/cc_aead.c   | 10 +++-------
- drivers/crypto/ccree/cc_cipher.c | 15 ++++-----------
- 2 files changed, 7 insertions(+), 18 deletions(-)
+ drivers/crypto/inside-secure/safexcel_cipher.c | 16 ++++------------
+ 1 file changed, 4 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/crypto/ccree/cc_aead.c b/drivers/crypto/ccree/cc_aead.c
-index 7aa4cbe19a86..44c621030adc 100644
---- a/drivers/crypto/ccree/cc_aead.c
-+++ b/drivers/crypto/ccree/cc_aead.c
-@@ -6,7 +6,7 @@
- #include <crypto/algapi.h>
- #include <crypto/internal/aead.h>
- #include <crypto/authenc.h>
--#include <crypto/des.h>
-+#include <crypto/internal/des.h>
- #include <linux/rtnetlink.h>
- #include "cc_driver.h"
- #include "cc_buffer_mgr.h"
-@@ -663,7 +663,6 @@ static int cc_des3_aead_setkey(struct crypto_aead *aead, const u8 *key,
- 			       unsigned int keylen)
+diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-secure/safexcel_cipher.c
+index 8cdbdbe35681..e6f00b56f063 100644
+--- a/drivers/crypto/inside-secure/safexcel_cipher.c
++++ b/drivers/crypto/inside-secure/safexcel_cipher.c
+@@ -963,19 +963,11 @@ static int safexcel_des_setkey(struct crypto_skcipher *ctfm, const u8 *key,
  {
- 	struct crypto_authenc_keys keys;
--	u32 flags;
+ 	struct crypto_tfm *tfm = crypto_skcipher_tfm(ctfm);
+ 	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
+-	u32 tmp[DES_EXPKEY_WORDS];
+ 	int ret;
+ 
+-	if (len != DES_KEY_SIZE) {
+-		crypto_skcipher_set_flags(ctfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
+-		return -EINVAL;
+-	}
+-
+-	ret = des_ekey(tmp, key);
+-	if (!ret && (tfm->crt_flags & CRYPTO_TFM_REQ_FORBID_WEAK_KEYS)) {
+-		tfm->crt_flags |= CRYPTO_TFM_RES_WEAK_KEY;
+-		return -EINVAL;
+-	}
++	ret = crypto_des_verify_key(tfm, key);
++	if (unlikely(ret))
++		return ret;
+ 
+ 	/* if context exits and key changed, need to invalidate it */
+ 	if (ctx->base.ctxr_dma)
+@@ -1074,7 +1066,7 @@ static int safexcel_des3_ede_setkey(struct crypto_skcipher *ctfm,
+ 	struct safexcel_cipher_ctx *ctx = crypto_skcipher_ctx(ctfm);
  	int err;
  
- 	err = crypto_authenc_extractkeys(&keys, key, keylen);
-@@ -674,12 +673,9 @@ static int cc_des3_aead_setkey(struct crypto_aead *aead, const u8 *key,
- 	if (keys.enckeylen != DES3_EDE_KEY_SIZE)
- 		goto badkey;
+-	err = des3_verify_key(ctfm, key);
++	err = crypto_des3_ede_verify_key(crypto_skcipher_tfm(ctfm), key);
+ 	if (unlikely(err))
+ 		return err;
  
--	flags = crypto_aead_get_flags(aead);
--	err = __des3_verify_key(&flags, keys.enckey);
--	if (unlikely(err)) {
--		crypto_aead_set_flags(aead, flags);
-+	err = crypto_des3_ede_verify_key(crypto_aead_tfm(aead), keys.enckey);
-+	if (unlikely(err))
- 		goto out;
--	}
- 
- 	err = cc_aead_setkey(aead, key, keylen);
- 
-diff --git a/drivers/crypto/ccree/cc_cipher.c b/drivers/crypto/ccree/cc_cipher.c
-index 5b58226ea24d..dc30f5aeca10 100644
---- a/drivers/crypto/ccree/cc_cipher.c
-+++ b/drivers/crypto/ccree/cc_cipher.c
-@@ -5,7 +5,7 @@
- #include <linux/module.h>
- #include <crypto/algapi.h>
- #include <crypto/internal/skcipher.h>
--#include <crypto/des.h>
-+#include <crypto/internal/des.h>
- #include <crypto/xts.h>
- #include <crypto/sm4.h>
- #include <crypto/scatterwalk.h>
-@@ -411,16 +411,9 @@ static int cc_cipher_setkey(struct crypto_skcipher *sktfm, const u8 *key,
- 	 * HW does the expansion on its own.
- 	 */
- 	if (ctx_p->flow_mode == S_DIN_to_DES) {
--		u32 tmp[DES3_EDE_EXPKEY_WORDS];
--		if (keylen == DES3_EDE_KEY_SIZE &&
--		    __des3_ede_setkey(tmp, &tfm->crt_flags, key,
--				      DES3_EDE_KEY_SIZE)) {
--			dev_dbg(dev, "weak 3DES key");
--			return -EINVAL;
--		} else if (!des_ekey(tmp, key) &&
--			   (crypto_tfm_get_flags(tfm) &
--			    CRYPTO_TFM_REQ_FORBID_WEAK_KEYS)) {
--			tfm->crt_flags |= CRYPTO_TFM_RES_WEAK_KEY;
-+		if ((keylen == DES3_EDE_KEY_SIZE &&
-+		     crypto_des3_ede_verify_key(tfm, key)) ||
-+		    crypto_des_verify_key(tfm, key)) {
- 			dev_dbg(dev, "weak DES key");
- 			return -EINVAL;
- 		}
 -- 
 2.20.1
 
