@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1EB8C48BD6
-	for <linux-crypto@archiver.kernel.org>; Thu, 27 Jun 2019 10:27:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D48FBC48BD7
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 Jun 2019 10:27:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B1D332086D
-	for <linux-crypto@archiver.kernel.org>; Thu, 27 Jun 2019 10:27:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A36F52086D
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 Jun 2019 10:27:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="czGwJyXJ"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UJ27Ao12"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726663AbfF0K1y (ORCPT
+        id S1726660AbfF0K14 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 27 Jun 2019 06:27:54 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:38267 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726659AbfF0K1y (ORCPT
+        Thu, 27 Jun 2019 06:27:56 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:34849 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726657AbfF0K14 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 27 Jun 2019 06:27:54 -0400
-Received: by mail-wr1-f67.google.com with SMTP id d18so1921486wrs.5
-        for <linux-crypto@vger.kernel.org>; Thu, 27 Jun 2019 03:27:53 -0700 (PDT)
+        Thu, 27 Jun 2019 06:27:56 -0400
+Received: by mail-wr1-f68.google.com with SMTP id f15so1937981wrp.2
+        for <linux-crypto@vger.kernel.org>; Thu, 27 Jun 2019 03:27:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=9jtH53Jk7KStQcdKvZdfqjCIjywTrKC4erKe/oL3K6E=;
-        b=czGwJyXJ+zNVPQyK6xTMltzIoJ0kfvneThDNU1tLZ+bXDWbKeo0ksXTFAIedwNjgF+
-         h9h6Lhd9GwGzieKWif/HPYN9bTlF9ZeZ9dNMThONufUH1XKy5LMkE53FhDtMmY6/BRky
-         EHGrmRKxnH+LbssJ0phJeeqANidGiQQXjUF4wL05n6nlpTxlbAVGTLT2dYuup5c1LZ8X
-         K+fXRGJaE/STIMSQzI5E5ZbWngjzkhuDtBRzMliyJiKl0Kh/D9BZ4v9jAZw9ig050LLQ
-         6kkG2IDS3yCyeCoh6iqxeD6F2YE+rHcZxb6v3Eb/aTu8Q7dqL62h0rp1D1TcRvhQh1Xu
-         ffUw==
+        bh=OVlu3R/XDhYHCSEro6NMIXQLAFRHmhGDxGC17BFWD8A=;
+        b=UJ27Ao12RucOZXSw7oZqhFXuwtj3+u7hH2ANLe2rfHQwRMH/1ldc0qpLpuS4eP9iya
+         zBtTzoESXoo1f52xoW7FCSaJv2m77g6Hk7g3nuR13HKWQmI2D++4OxHewIuI4zGP5vjv
+         akUUab84w915ev/cn/DxbVI/Pu1z93Qlu6xDF2+HREYKDghT5TkGKTNd1sKjoiF+Jqld
+         wt/qpE3LXtQ+FTFiyn3kK8qGb7TSwRowCwRd9hBgMAwz/kXeOZU8yJjVyyOOsXESu0dr
+         MRopa9SEmtJ9evKMw3yQ5LLNH2l2imot8rhSFikNlm0qS+DzwIbnEUx2OsiwHUqC1Ndh
+         JVnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=9jtH53Jk7KStQcdKvZdfqjCIjywTrKC4erKe/oL3K6E=;
-        b=GKoQiOP+KaO0u3WYnY5NYg0sGT9WQGs6zH61E5owwJ662kUrO6mqkJypmohiacWBcV
-         VenzRm8YYOHue0bxpy8GJm8Zv6Gf0/hCIRRRm8nvk44sENUoVNwMHZpeyWRdMXz8bF3O
-         WV7ZTfac1M+usJMlaE7nRRUzx+Cg8ptnLDN86OZeSK76BhH/X+AiPa8eSRU2bI0illEN
-         MCOMFza8nOWh88pq82vhgwegMPO/idYEUdHrYyUyquFS1Zkdyq97Z0h5p1CkZwWz6S0W
-         pztAEDkX199pgI9hBZrKHpqnZxwKDLao9HssnXkAlADOQBUXVHmRgNAMngVLLEFkkvOn
-         EdzA==
-X-Gm-Message-State: APjAAAWYyXHUBlCMWeri75UfeLSmuk/NAjrMY2NB6rKg+DPDkK88LLQk
-        xYmXnBpo2d5J+3sm6Bki0ADt/vA5O+M=
-X-Google-Smtp-Source: APXvYqxdSFEwN/r9luXSvT0Nkm+Hb73fywBmkK8cEysOGEINaYVyyku3LHPgPp400j/G93zX1t7ZnA==
-X-Received: by 2002:a05:6000:11c2:: with SMTP id i2mr2723505wrx.199.1561631272143;
-        Thu, 27 Jun 2019 03:27:52 -0700 (PDT)
+        bh=OVlu3R/XDhYHCSEro6NMIXQLAFRHmhGDxGC17BFWD8A=;
+        b=JjfDvGdXo74HEdPI59FCWE09FGz5hfy6OheMU8bEPnR5KRZjxS5X3so7BwYdAhEJk7
+         ln4L7mFeyEEzopzoBZ1fVGqx36Q7Z9bQpdngxAIOoc5J7J+77AodQQzH/JDXQ41pAvEo
+         p2Wy49fbuwvkj5BNC6dmNoBI5nV3HhfhY7D4rxXa8dpRVm5pGod/LefHfI6NfJwU/yg2
+         2tAmSUUT5xWMgrpaEcopQPghJiX0VTVGWYmXW9aU46p/1COBD3CQhE+E6KYl2K905rAj
+         JeG4cL8oGEScuXpk2QavR/1M4vrR69+EGWaV/S1r8vLPfZcl8LlpfNChXreGDzho+84Y
+         3xlQ==
+X-Gm-Message-State: APjAAAUG9K2q6531sv8TEp70RWySB/a2QMJaT5rhol+tlNINPwdrcQB0
+        spwf9fNYa2c2pUGdU9uTspKulSGB/ao=
+X-Google-Smtp-Source: APXvYqyEHGKEeyuCU2487HGPtbS5OZkTPSdqXRvNtkAZl9AenZ2lytd3x8xhJCMxSUp6bzpcMGmASA==
+X-Received: by 2002:adf:c654:: with SMTP id u20mr2782163wrg.271.1561631273149;
+        Thu, 27 Jun 2019 03:27:53 -0700 (PDT)
 Received: from localhost.localdomain (aaubervilliers-681-1-8-173.w90-88.abo.wanadoo.fr. [90.88.13.173])
-        by smtp.gmail.com with ESMTPSA id g2sm5584533wmh.0.2019.06.27.03.27.50
+        by smtp.gmail.com with ESMTPSA id g2sm5584533wmh.0.2019.06.27.03.27.52
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 27 Jun 2019 03:27:51 -0700 (PDT)
+        Thu, 27 Jun 2019 03:27:52 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     herbert@gondor.apana.org.au, ebiggers@kernel.org,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v3 02/32] crypto: aes - rename local routines to prevent future clashes
-Date:   Thu, 27 Jun 2019 12:26:17 +0200
-Message-Id: <20190627102647.2992-3-ard.biesheuvel@linaro.org>
+Subject: [PATCH v3 03/32] crypto: aes/fixed-time - align key schedule with other implementations
+Date:   Thu, 27 Jun 2019 12:26:18 +0200
+Message-Id: <20190627102647.2992-4-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190627102647.2992-1-ard.biesheuvel@linaro.org>
 References: <20190627102647.2992-1-ard.biesheuvel@linaro.org>
@@ -73,184 +73,104 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Rename some local AES encrypt/decrypt routines so they don't clash with
-the names we are about to introduce for the routines exposed by the
-generic AES library.
+The fixed time AES code mangles the key schedule so that xoring the
+first round key with values at fixed offsets across the Sbox produces
+the correct value. This primes the D-cache with the entire Sbox before
+any data dependent lookups are done, making it more difficult to infer
+key bits from timing variances when the plaintext is known.
+
+The downside of this approach is that it renders the key schedule
+incompatible with other implementations of AES in the kernel, which
+makes it cumbersome to use this implementation as a fallback for SIMD
+based AES in contexts where this is not allowed.
+
+So let's tweak the fixed Sbox indexes so that they add up to zero under
+the xor operation. While at it, increase the granularity to 16 bytes so
+we cover the entire Sbox even on systems with 16 byte cachelines.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm/crypto/aes-cipher-glue.c   | 8 ++++----
- arch/arm64/crypto/aes-cipher-glue.c | 8 ++++----
- arch/x86/crypto/aesni-intel_glue.c  | 8 ++++----
- crypto/aes_generic.c                | 8 ++++----
- drivers/crypto/padlock-aes.c        | 8 ++++----
- 5 files changed, 20 insertions(+), 20 deletions(-)
+ crypto/aes_ti.c | 52 ++++++++------------
+ 1 file changed, 21 insertions(+), 31 deletions(-)
 
-diff --git a/arch/arm/crypto/aes-cipher-glue.c b/arch/arm/crypto/aes-cipher-glue.c
-index c222f6e072ad..f6c07867b8ff 100644
---- a/arch/arm/crypto/aes-cipher-glue.c
-+++ b/arch/arm/crypto/aes-cipher-glue.c
-@@ -19,7 +19,7 @@ EXPORT_SYMBOL(__aes_arm_encrypt);
- asmlinkage void __aes_arm_decrypt(u32 *rk, int rounds, const u8 *in, u8 *out);
- EXPORT_SYMBOL(__aes_arm_decrypt);
- 
--static void aes_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
-+static void aes_arm_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+diff --git a/crypto/aes_ti.c b/crypto/aes_ti.c
+index 1ff9785b30f5..fd70dc322634 100644
+--- a/crypto/aes_ti.c
++++ b/crypto/aes_ti.c
+@@ -237,30 +237,8 @@ static int aesti_set_key(struct crypto_tfm *tfm, const u8 *in_key,
+ 			 unsigned int key_len)
  {
  	struct crypto_aes_ctx *ctx = crypto_tfm_ctx(tfm);
- 	int rounds = 6 + ctx->key_length / 4;
-@@ -27,7 +27,7 @@ static void aes_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
- 	__aes_arm_encrypt(ctx->key_enc, rounds, in, out);
+-	int err;
+ 
+-	err = aesti_expand_key(ctx, in_key, key_len);
+-	if (err)
+-		return err;
+-
+-	/*
+-	 * In order to force the compiler to emit data independent Sbox lookups
+-	 * at the start of each block, xor the first round key with values at
+-	 * fixed indexes in the Sbox. This will need to be repeated each time
+-	 * the key is used, which will pull the entire Sbox into the D-cache
+-	 * before any data dependent Sbox lookups are performed.
+-	 */
+-	ctx->key_enc[0] ^= __aesti_sbox[ 0] ^ __aesti_sbox[128];
+-	ctx->key_enc[1] ^= __aesti_sbox[32] ^ __aesti_sbox[160];
+-	ctx->key_enc[2] ^= __aesti_sbox[64] ^ __aesti_sbox[192];
+-	ctx->key_enc[3] ^= __aesti_sbox[96] ^ __aesti_sbox[224];
+-
+-	ctx->key_dec[0] ^= __aesti_inv_sbox[ 0] ^ __aesti_inv_sbox[128];
+-	ctx->key_dec[1] ^= __aesti_inv_sbox[32] ^ __aesti_inv_sbox[160];
+-	ctx->key_dec[2] ^= __aesti_inv_sbox[64] ^ __aesti_inv_sbox[192];
+-	ctx->key_dec[3] ^= __aesti_inv_sbox[96] ^ __aesti_inv_sbox[224];
+-
+-	return 0;
++	return aesti_expand_key(ctx, in_key, key_len);
  }
  
--static void aes_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
-+static void aes_arm_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
- {
- 	struct crypto_aes_ctx *ctx = crypto_tfm_ctx(tfm);
- 	int rounds = 6 + ctx->key_length / 4;
-@@ -47,8 +47,8 @@ static struct crypto_alg aes_alg = {
- 	.cra_cipher.cia_min_keysize	= AES_MIN_KEY_SIZE,
- 	.cra_cipher.cia_max_keysize	= AES_MAX_KEY_SIZE,
- 	.cra_cipher.cia_setkey		= crypto_aes_set_key,
--	.cra_cipher.cia_encrypt		= aes_encrypt,
--	.cra_cipher.cia_decrypt		= aes_decrypt,
-+	.cra_cipher.cia_encrypt		= aes_arm_encrypt,
-+	.cra_cipher.cia_decrypt		= aes_arm_decrypt,
+ static void aesti_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+@@ -283,10 +261,16 @@ static void aesti_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+ 	 */
+ 	local_irq_save(flags);
  
- #ifndef CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS
- 	.cra_alignmask			= 3,
-diff --git a/arch/arm64/crypto/aes-cipher-glue.c b/arch/arm64/crypto/aes-cipher-glue.c
-index 7288e7cbebff..0e90b06ebcec 100644
---- a/arch/arm64/crypto/aes-cipher-glue.c
-+++ b/arch/arm64/crypto/aes-cipher-glue.c
-@@ -18,7 +18,7 @@ EXPORT_SYMBOL(__aes_arm64_encrypt);
- asmlinkage void __aes_arm64_decrypt(u32 *rk, u8 *out, const u8 *in, int rounds);
- EXPORT_SYMBOL(__aes_arm64_decrypt);
+-	st0[0] ^= __aesti_sbox[ 0] ^ __aesti_sbox[128];
+-	st0[1] ^= __aesti_sbox[32] ^ __aesti_sbox[160];
+-	st0[2] ^= __aesti_sbox[64] ^ __aesti_sbox[192];
+-	st0[3] ^= __aesti_sbox[96] ^ __aesti_sbox[224];
++	/*
++	 * Force the compiler to emit data independent Sbox references,
++	 * by xoring the input with Sbox values that are known to add up
++	 * to zero. This pulls the entire Sbox into the D-cache before any
++	 * data dependent lookups are done.
++	 */
++	st0[0] ^= __aesti_sbox[ 0] ^ __aesti_sbox[ 64] ^ __aesti_sbox[134] ^ __aesti_sbox[195];
++	st0[1] ^= __aesti_sbox[16] ^ __aesti_sbox[ 82] ^ __aesti_sbox[158] ^ __aesti_sbox[221];
++	st0[2] ^= __aesti_sbox[32] ^ __aesti_sbox[ 96] ^ __aesti_sbox[160] ^ __aesti_sbox[234];
++	st0[3] ^= __aesti_sbox[48] ^ __aesti_sbox[112] ^ __aesti_sbox[186] ^ __aesti_sbox[241];
  
--static void aes_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
-+static void aes_arm64_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
- {
- 	struct crypto_aes_ctx *ctx = crypto_tfm_ctx(tfm);
- 	int rounds = 6 + ctx->key_length / 4;
-@@ -26,7 +26,7 @@ static void aes_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
- 	__aes_arm64_encrypt(ctx->key_enc, out, in, rounds);
- }
+ 	for (round = 0;; round += 2, rkp += 8) {
+ 		st1[0] = mix_columns(subshift(st0, 0)) ^ rkp[0];
+@@ -331,10 +315,16 @@ static void aesti_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+ 	 */
+ 	local_irq_save(flags);
  
--static void aes_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
-+static void aes_arm64_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
- {
- 	struct crypto_aes_ctx *ctx = crypto_tfm_ctx(tfm);
- 	int rounds = 6 + ctx->key_length / 4;
-@@ -46,8 +46,8 @@ static struct crypto_alg aes_alg = {
- 	.cra_cipher.cia_min_keysize	= AES_MIN_KEY_SIZE,
- 	.cra_cipher.cia_max_keysize	= AES_MAX_KEY_SIZE,
- 	.cra_cipher.cia_setkey		= crypto_aes_set_key,
--	.cra_cipher.cia_encrypt		= aes_encrypt,
--	.cra_cipher.cia_decrypt		= aes_decrypt
-+	.cra_cipher.cia_encrypt		= aes_arm64_encrypt,
-+	.cra_cipher.cia_decrypt		= aes_arm64_decrypt
- };
+-	st0[0] ^= __aesti_inv_sbox[ 0] ^ __aesti_inv_sbox[128];
+-	st0[1] ^= __aesti_inv_sbox[32] ^ __aesti_inv_sbox[160];
+-	st0[2] ^= __aesti_inv_sbox[64] ^ __aesti_inv_sbox[192];
+-	st0[3] ^= __aesti_inv_sbox[96] ^ __aesti_inv_sbox[224];
++	/*
++	 * Force the compiler to emit data independent Sbox references,
++	 * by xoring the input with Sbox values that are known to add up
++	 * to zero. This pulls the entire Sbox into the D-cache before any
++	 * data dependent lookups are done.
++	 */
++	st0[0] ^= __aesti_inv_sbox[ 0] ^ __aesti_inv_sbox[ 64] ^ __aesti_inv_sbox[129] ^ __aesti_inv_sbox[200];
++	st0[1] ^= __aesti_inv_sbox[16] ^ __aesti_inv_sbox[ 83] ^ __aesti_inv_sbox[150] ^ __aesti_inv_sbox[212];
++	st0[2] ^= __aesti_inv_sbox[32] ^ __aesti_inv_sbox[ 96] ^ __aesti_inv_sbox[160] ^ __aesti_inv_sbox[236];
++	st0[3] ^= __aesti_inv_sbox[48] ^ __aesti_inv_sbox[112] ^ __aesti_inv_sbox[187] ^ __aesti_inv_sbox[247];
  
- static int __init aes_init(void)
-diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-index c95bd397dc07..836d50bd096f 100644
---- a/arch/x86/crypto/aesni-intel_glue.c
-+++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -349,7 +349,7 @@ static int aes_set_key(struct crypto_tfm *tfm, const u8 *in_key,
- 	return aes_set_key_common(tfm, crypto_tfm_ctx(tfm), in_key, key_len);
- }
- 
--static void aes_encrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
-+static void aesni_encrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
- {
- 	struct crypto_aes_ctx *ctx = aes_ctx(crypto_tfm_ctx(tfm));
- 
-@@ -362,7 +362,7 @@ static void aes_encrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
- 	}
- }
- 
--static void aes_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
-+static void aesni_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
- {
- 	struct crypto_aes_ctx *ctx = aes_ctx(crypto_tfm_ctx(tfm));
- 
-@@ -923,8 +923,8 @@ static struct crypto_alg aesni_cipher_alg = {
- 			.cia_min_keysize	= AES_MIN_KEY_SIZE,
- 			.cia_max_keysize	= AES_MAX_KEY_SIZE,
- 			.cia_setkey		= aes_set_key,
--			.cia_encrypt		= aes_encrypt,
--			.cia_decrypt		= aes_decrypt
-+			.cia_encrypt		= aesni_encrypt,
-+			.cia_decrypt		= aesni_decrypt
- 		}
- 	}
- };
-diff --git a/crypto/aes_generic.c b/crypto/aes_generic.c
-index f217568917e4..3aa4a715c216 100644
---- a/crypto/aes_generic.c
-+++ b/crypto/aes_generic.c
-@@ -1332,7 +1332,7 @@ EXPORT_SYMBOL_GPL(crypto_aes_set_key);
- 	f_rl(bo, bi, 3, k);	\
- } while (0)
- 
--static void aes_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
-+static void crypto_aes_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
- {
- 	const struct crypto_aes_ctx *ctx = crypto_tfm_ctx(tfm);
- 	u32 b0[4], b1[4];
-@@ -1402,7 +1402,7 @@ static void aes_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
- 	i_rl(bo, bi, 3, k);	\
- } while (0)
- 
--static void aes_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
-+static void crypto_aes_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
- {
- 	const struct crypto_aes_ctx *ctx = crypto_tfm_ctx(tfm);
- 	u32 b0[4], b1[4];
-@@ -1454,8 +1454,8 @@ static struct crypto_alg aes_alg = {
- 			.cia_min_keysize	=	AES_MIN_KEY_SIZE,
- 			.cia_max_keysize	=	AES_MAX_KEY_SIZE,
- 			.cia_setkey		=	crypto_aes_set_key,
--			.cia_encrypt		=	aes_encrypt,
--			.cia_decrypt		=	aes_decrypt
-+			.cia_encrypt		=	crypto_aes_encrypt,
-+			.cia_decrypt		=	crypto_aes_decrypt
- 		}
- 	}
- };
-diff --git a/drivers/crypto/padlock-aes.c b/drivers/crypto/padlock-aes.c
-index 09d823d36d3a..854539512c35 100644
---- a/drivers/crypto/padlock-aes.c
-+++ b/drivers/crypto/padlock-aes.c
-@@ -299,7 +299,7 @@ static inline u8 *padlock_xcrypt_cbc(const u8 *input, u8 *output, void *key,
- 	return iv;
- }
- 
--static void aes_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
-+static void padlock_aes_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
- {
- 	struct aes_ctx *ctx = aes_ctx(tfm);
- 
-@@ -308,7 +308,7 @@ static void aes_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
- 	padlock_store_cword(&ctx->cword.encrypt);
- }
- 
--static void aes_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
-+static void padlock_aes_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
- {
- 	struct aes_ctx *ctx = aes_ctx(tfm);
- 
-@@ -331,8 +331,8 @@ static struct crypto_alg aes_alg = {
- 			.cia_min_keysize	=	AES_MIN_KEY_SIZE,
- 			.cia_max_keysize	=	AES_MAX_KEY_SIZE,
- 			.cia_setkey	   	= 	aes_set_key,
--			.cia_encrypt	 	=	aes_encrypt,
--			.cia_decrypt	  	=	aes_decrypt,
-+			.cia_encrypt	 	=	padlock_aes_encrypt,
-+			.cia_decrypt	  	=	padlock_aes_decrypt,
- 		}
- 	}
- };
+ 	for (round = 0;; round += 2, rkp += 8) {
+ 		st1[0] = inv_mix_columns(inv_subshift(st0, 0)) ^ rkp[0];
 -- 
 2.20.1
 
