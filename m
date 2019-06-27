@@ -6,122 +6,115 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3DBDC48BD6
-	for <linux-crypto@archiver.kernel.org>; Thu, 27 Jun 2019 13:45:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89331C48BD7
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 Jun 2019 14:44:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 86E0720828
-	for <linux-crypto@archiver.kernel.org>; Thu, 27 Jun 2019 13:45:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 56E1B20828
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 Jun 2019 14:44:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tapn1N/q"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="ngV5Z3OK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726425AbfF0NpQ (ORCPT
+        id S1726472AbfF0Oo6 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 27 Jun 2019 09:45:16 -0400
-Received: from mail-io1-f65.google.com ([209.85.166.65]:33223 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726370AbfF0NpQ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 27 Jun 2019 09:45:16 -0400
-Received: by mail-io1-f65.google.com with SMTP id u13so4890397iop.0
-        for <linux-crypto@vger.kernel.org>; Thu, 27 Jun 2019 06:45:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=zTU1BCR3y5H6UcQD/LO5/CTv37Ry7d396AOZchn/5bo=;
-        b=tapn1N/q6m64rkSjQP+dtm/AYxx5pPBGRcXyB2vdwpVQrrVEBp3BwXlO3If+5rZbnz
-         vXTxh/z75ixZ54bxWMVgngbGPEEgevcvZCC8t8gf3NkFq5WfuNZLolRTYuv8nVSTzu5c
-         dnUJk8sdptRpJCy56maYkxzBsaC6pQmM/85cRoKFH6i+hA3FF2H05TVuxgf93vNDfwJn
-         rQYt/tmGe7LipuXGo8oHN8KFXUOrfHU1Xu7sSgF/NL1WS3wuZsfFhy14PmEJGN3aiLFo
-         eszmbwb0KVk6r8aoKzEG/R4d6aSZKn9m9Wq0X702Mzz+T2g8XUrLOjwPpzZ1u0b90CO2
-         AXjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=zTU1BCR3y5H6UcQD/LO5/CTv37Ry7d396AOZchn/5bo=;
-        b=FzWv04hQ87263/2bbjwALEw6a5rnCBeWHlssaR54XPg3/G5qD/aRd8AvvPj03U7oBV
-         Bex+nZj0CoE/9pbI0CPXzcdy9tnv5ZUQxCeBf+9sCSmPOsJIOmGXUDAlkY5MEfE2DCux
-         lfFrOgkalpS513NxXwb5tWPbRPYV9YvdFauPtTG2w0r5M90LmNAKOUhnc7V7tuR9v3B+
-         pET+Wt2krYyNyBgIFrLvtfrjlu4ynIs/zgpcxtoSaHQV/e+0pQ/40CE/iSoBggf7Qbb4
-         YyO8JUWiUuDuC/gpejcYZymxlbLq9Nekmjm0F+Zio0+lVpcL0BGMECV1szGiKnv+6GRW
-         puqA==
-X-Gm-Message-State: APjAAAXj54s30NYCdIPsePOGiDLv2Z4y8spTKS5FKnF4nPGln3OzsJgw
-        o8tUEQQNUdqfGhSOS8s/F1cFdV2htVC693jo2rpjRw==
-X-Google-Smtp-Source: APXvYqzLvGzsHmOQce9qole2UEBHLCjTNbQ02zxyjzIrBbbp2DujUb471abkGzmMUX5jp6hLAN8AMibTB6pk0tRvMaA=
-X-Received: by 2002:a5d:9d83:: with SMTP id 3mr4439133ion.65.1561643115267;
- Thu, 27 Jun 2019 06:45:15 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190627120314.7197-1-ard.biesheuvel@linaro.org>
- <20190627120314.7197-7-ard.biesheuvel@linaro.org> <VI1PR0402MB348532DF646DA7522F7B689698FD0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-In-Reply-To: <VI1PR0402MB348532DF646DA7522F7B689698FD0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Thu, 27 Jun 2019 15:45:02 +0200
-Message-ID: <CAKv+Gu8D5JUUHtaOv2=gDt2s7r0ekQEVbyNBJXG5PCOG4thsCg@mail.gmail.com>
-Subject: Re: [PATCH v2 06/30] crypto: caam/des - switch to new verification routines
-To:     Horia Geanta <horia.geanta@nxp.com>
-Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        Thu, 27 Jun 2019 10:44:58 -0400
+Received: from mail-eopbgr140040.outbound.protection.outlook.com ([40.107.14.40]:19076
+        "EHLO EUR01-VE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726425AbfF0Oo6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 27 Jun 2019 10:44:58 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=testarcselector01; d=microsoft.com; cv=none;
+ b=aLkBMZ80MPgCxTBerSf7D9k9J/1C5ybTn+/wFibKLhvy7dnknl3J90D/M0HkrHCihEJihICXFii4fcoCVPC4PoYr9uLvMx/mEW0HWxe7GdVWWmzyAjXt/PNhJCIZlTiXb8C6DhMN0/uEJjcpe/EPmWsjF/jmIY/NzzMxVoCzRX4=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=testarcselector01;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=a90xYsQ8ZXmPPh2yP63G7aLes1lWx/zmwpNsaQ8QEkY=;
+ b=S8x/IxJLMzyaKDGkCWGl2RjHzVv0V+t4cyGjPOjhE35vfHu7MtyuHiIkqPi+zYjJO5C3yXc+5PKlrK4qaDIZpZac/jhplRjAH/3QcIWt9cRrIVK6BC9j6GMd2A2aZgG3dVSShxVf/0CWJB1sFBn/kV+PMngjZsOarKrXYQLrELY=
+ARC-Authentication-Results: i=1; test.office365.com
+ 1;spf=none;dmarc=none;dkim=none;arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=a90xYsQ8ZXmPPh2yP63G7aLes1lWx/zmwpNsaQ8QEkY=;
+ b=ngV5Z3OKNPQ7DbSYuVUewz2ypNye0JJfIhu3eRPyMPROc1xWR6ax0T+mYufWWZmuL2VeIt7XeID2vJsGL0M/ywj9moLV0U2nhVZePyhhLdtfuzsj+AZyAdzO0MhXv1ZW1GiumsPSqAPsPB8t3WFB5dELLLipRLLG7FHIFRUsIDQ=
+Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
+ VI1PR0402MB3520.eurprd04.prod.outlook.com (52.134.4.25) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2008.16; Thu, 27 Jun 2019 14:44:52 +0000
+Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
+ ([fe80::14c8:b254:33f0:fdba]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
+ ([fe80::14c8:b254:33f0:fdba%6]) with mapi id 15.20.2008.014; Thu, 27 Jun 2019
+ 14:44:52 +0000
+From:   Horia Geanta <horia.geanta@nxp.com>
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+CC:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
         "ebiggers@kernel.org" <ebiggers@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH v2 00/30] crypto: DES/3DES cleanup
+Thread-Topic: [PATCH v2 00/30] crypto: DES/3DES cleanup
+Thread-Index: AQHVLOBU9WVYloJzzEKdnAEeqc/5QA==
+Date:   Thu, 27 Jun 2019 14:44:52 +0000
+Message-ID: <VI1PR0402MB348548C6873044033C94F63998FD0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+References: <20190627120314.7197-1-ard.biesheuvel@linaro.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=horia.geanta@nxp.com; 
+x-originating-ip: [212.146.100.6]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 43b7f4ea-cb63-468d-9939-08d6fb0e0375
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:VI1PR0402MB3520;
+x-ms-traffictypediagnostic: VI1PR0402MB3520:
+x-microsoft-antispam-prvs: <VI1PR0402MB3520DB87FE3F0B978F6F76CF98FD0@VI1PR0402MB3520.eurprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:7691;
+x-forefront-prvs: 008184426E
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(366004)(376002)(396003)(136003)(39860400002)(346002)(189003)(199004)(53546011)(110136005)(4744005)(66556008)(66476007)(6506007)(99286004)(6436002)(52536014)(102836004)(229853002)(2501003)(53936002)(6246003)(26005)(73956011)(4326008)(44832011)(86362001)(8936002)(5660300002)(14454004)(66946007)(76116006)(68736007)(64756008)(54906003)(66446008)(9686003)(76176011)(55016002)(66066001)(14444005)(8676002)(25786009)(256004)(33656002)(7736002)(476003)(446003)(81166006)(2906002)(81156014)(6116002)(71200400001)(3846002)(486006)(71190400001)(74316002)(7696005)(478600001)(186003)(316002)(305945005);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB3520;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: nxp.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: SCFg+aBDJF0XxaYVnGHO93XuK+C0zp04sJcK2j9Yd5mO2iB/On4dl9HLd6XB2eTsrC/24fjuLTKH8XGJnTHttKsqBxVU0u8pDMu9SLrngw6G6SGMF2KS67oz0oFwhyxZrLAAh9ImJd5r/SG9HfNA1PYNU2p5r9+P9WuptoCgH6zuwIlyqImFdb67aSAY42UVt2b+tudvVkSSJYt7BbfRaI/GPDzoUKiHNYBglpRSKL/Lo5hzPRHK6yV3ujKJi/i4ZIQ8wPnA550m5BMB3s69+y5eAkrfFyyNZrgarY2gTzZ8IeF23es6OXktTw9YNHIjMUrcXsDbjxWXUIfIreZkCzLWTEbrmNe4Nyngr0Vh/unGvkhFuaqw9ICjUfzEmHB78GWqdDM2SsD6fONByJIIA0vNxCFptREHKLz1PyK9ZhU=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 43b7f4ea-cb63-468d-9939-08d6fb0e0375
+X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Jun 2019 14:44:52.4726
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: horia.geanta@nxp.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3520
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 27 Jun 2019 at 15:26, Horia Geanta <horia.geanta@nxp.com> wrote:
->
-> On 6/27/2019 3:03 PM, Ard Biesheuvel wrote:
-> > @@ -785,20 +781,23 @@ static int skcipher_setkey(struct crypto_skcipher *skcipher, const u8 *key,
-> >  static int des_skcipher_setkey(struct crypto_skcipher *skcipher,
-> >                              const u8 *key, unsigned int keylen)
-> >  {
-> > -     u32 tmp[DES3_EDE_EXPKEY_WORDS];
-> > -     struct crypto_tfm *tfm = crypto_skcipher_tfm(skcipher);
-> > +     int err;
-> >
-> > -     if (keylen == DES3_EDE_KEY_SIZE &&
-> > -         __des3_ede_setkey(tmp, &tfm->crt_flags, key, DES3_EDE_KEY_SIZE)) {
-> > -             return -EINVAL;
-> > -     }
-> > +     err = crypto_des_verify_key(crypto_skcipher_tfm(skcipher), key);
-> > +     if (unlikely(err))
-> > +             return err;
-> >
-> > -     if (!des_ekey(tmp, key) && (crypto_skcipher_get_flags(skcipher) &
-> > -         CRYPTO_TFM_REQ_FORBID_WEAK_KEYS)) {
-> > -             crypto_skcipher_set_flags(skcipher,
-> > -                                       CRYPTO_TFM_RES_WEAK_KEY);
-> > -             return -EINVAL;
-> > -     }
-> > +     return skcipher_setkey(skcipher, key, keylen);
->
-> This would be a bit more compact:
->
->         return unlikely(crypto_des_verify_key(crypto_skcipher_tfm(skcipher), key)) ?:
->                skcipher_setkey(skcipher, key, keylen);
->
-> and could be used in most places.
->
-> Actually here:
->
-> > @@ -697,8 +693,13 @@ static int skcipher_setkey(struct crypto_skcipher *skcipher, const u8 *key,
-> >  static int des3_skcipher_setkey(struct crypto_skcipher *skcipher,
-> >                               const u8 *key, unsigned int keylen)
-> >  {
-> > -     return unlikely(des3_verify_key(skcipher, key)) ?:
-> > -            skcipher_setkey(skcipher, key, keylen);
-> > +     int err;
-> > +
-> > +     err = crypto_des3_ede_verify_key(crypto_skcipher_tfm(skcipher), key);
-> > +     if (unlikely(err))
-> > +             return err;
-> > +
-> > +     return skcipher_setkey(skcipher, key, keylen);
-> >  }
->
-> this pattern is already used, only the verification function
-> has to be replaced.
->
-
-OK, got it.
+On 6/27/2019 3:03 PM, Ard Biesheuvel wrote:=0A=
+> n my effort to remove crypto_alloc_cipher() invocations from non-crypto=
+=0A=
+> code, i ran into a DES call in the CIFS driver. This is addressed in=0A=
+> patch #30.=0A=
+> =0A=
+> The other patches are cleanups for the quirky DES interface, and lots=0A=
+> of duplication of the weak key checks etc.=0A=
+> =0A=
+> Changes since v1/RFC:=0A=
+> - fix build errors in various drivers that i failed to catch in my=0A=
+>   initial testing=0A=
+> - put all caam changes into the correct patch=0A=
+> - fix weak key handling error flagged by the self tests, as reported=0A=
+>   by Eric.=0A=
+I am seeing a similar (?) issue:=0A=
+alg: skcipher: ecb-des-caam setkey failed on test vector 4; expected_error=
+=3D-22, actual_error=3D-126, flags=3D0x100101=0A=
+=0A=
+crypto_des_verify_key() in include/crypto/internal/des.h returns -ENOKEY,=
+=0A=
+while testmgr expects -EINVAL (setkey_error =3D -EINVAL in the test vector)=
+.=0A=
+=0A=
+I assume crypto_des_verify_key() should return -EINVAL, not -ENOKEY.=0A=
+=0A=
+Horia=0A=
