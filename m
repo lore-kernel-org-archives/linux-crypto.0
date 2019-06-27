@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 804ADC48BD6
-	for <linux-crypto@archiver.kernel.org>; Thu, 27 Jun 2019 10:28:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1FF5C48BD7
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 Jun 2019 10:28:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4F2DC20828
-	for <linux-crypto@archiver.kernel.org>; Thu, 27 Jun 2019 10:28:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BBCD820828
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 Jun 2019 10:28:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QrJ5irI4"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ffLR9+B7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726623AbfF0K2Z (ORCPT
+        id S1726487AbfF0K21 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 27 Jun 2019 06:28:25 -0400
-Received: from mail-wr1-f44.google.com ([209.85.221.44]:45358 "EHLO
-        mail-wr1-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726508AbfF0K2Z (ORCPT
+        Thu, 27 Jun 2019 06:28:27 -0400
+Received: from mail-wr1-f42.google.com ([209.85.221.42]:36610 "EHLO
+        mail-wr1-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726678AbfF0K20 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 27 Jun 2019 06:28:25 -0400
-Received: by mail-wr1-f44.google.com with SMTP id f9so1886663wre.12
-        for <linux-crypto@vger.kernel.org>; Thu, 27 Jun 2019 03:28:23 -0700 (PDT)
+        Thu, 27 Jun 2019 06:28:26 -0400
+Received: by mail-wr1-f42.google.com with SMTP id n4so1935754wrs.3
+        for <linux-crypto@vger.kernel.org>; Thu, 27 Jun 2019 03:28:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=e0cmL8XP70YBaJ5yxi1SfUhq2Tu3KlK+P3hfuATsmNM=;
-        b=QrJ5irI4oz0I/xDIZtqLkW1aKRg1lfIsJMZybbfy/vvFq8fctxMpdXr5Jf4/44JtYw
-         ldbQd8JYPLEaSWG8zJcBC6Btbf0b0s+etoO5lnroxL+lKWmkz3Cp/jMg+RlQVEUPVja+
-         C4cEteFjXSl+3WTfYbkWPgt2apAfJSZX7e4h7wLKdZ1NMzomLoMNXWAxiG+S2u8b9kRG
-         gBYKhRjq65nz3wJS2rxt5wGpk6J9WnC9YdmgiwVE7MZ0ksPVAzVeAIjrUlgT4t/oasTA
-         20coZ8sgB4ZAidKYwEQEgKYiDhMmb9eUv/VeqVA37/To7T+ho5nr+jcPDsXKzkwLD2Mf
-         EREA==
+        bh=LgOxz3M+88gVu7JIGRNWNEXUFNxqJnrZXlO07MCiXP4=;
+        b=ffLR9+B7GcB8IqxtWJlDizIKlinnoboJrNnyqRd1IMlSqNUg5dBUrDR2j51obEqx+P
+         idgeEGkeN8ZtAIhat3fhEB03qmD2i/0ziqm14X1FFTB7EerGh5VDPMnT9iIvkrxtYqEd
+         oXS3LcUthszwe1PC1s4VALHoWHHM6fXYdL8Zc4w7aFzNcUD/5vdVKEB64BFOhkl7RNcp
+         DbmV7k8RPLWvDJQfzdlQLVIQuFY5ls2x+02nPo4oXPCe7X+nzyyQ04vhYOjuV9v0FdD/
+         4NImUWNnhLUpLG2q2fyO9FkenF6OaZolSSIxPnH3L4bGpRYmhCEWo1TbgL4oAw/+gHx8
+         EzAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=e0cmL8XP70YBaJ5yxi1SfUhq2Tu3KlK+P3hfuATsmNM=;
-        b=dydc8DaBcGPis21dyfTrOJZl69IOG2bSrRURkHNFse5ObiLHV62NGsUJLRl+CarFAa
-         SbZcviXK9JIgmJN3Udy9GpQf3+v11dX6h0mDAqKv6oUDQkvl0pTLmy+SkgjluaJ4JLpI
-         LgTTBLVGfDq8tUrl23hI88Ifl2YU2K198AcN+aOdPVU8m8DAwlCN0U6MmQ6HPKSFsaNM
-         9QFEfYGd6A9JH0xZB/E74M62Glf8g42HKvguhldJNp8E8o7dw4Az62D74Mfs6Z0DcbFX
-         Umt3wdshmxUZ8M1MMNuvQaEbdwFbPVyAmRLzu3DSvNqlBbxoJV/i4saZgHy6HAGO+2GV
-         ZmPg==
-X-Gm-Message-State: APjAAAXqDfmieP5c4Ouuy/4AOGR3g6dg+B+jaLN/d0PfEgkUi5GOeE7e
-        2AasHfLOOmY0NkvP8bhctOnpGC9JXws=
-X-Google-Smtp-Source: APXvYqyDI/s1JBGhhbDa3XUpdUiMHPejFPP1T7xB4E5f1LgWqgCOeWBQkPR6sPWk8jauLy/IV4HqDQ==
-X-Received: by 2002:a5d:6583:: with SMTP id q3mr2869601wru.184.1561631302730;
-        Thu, 27 Jun 2019 03:28:22 -0700 (PDT)
+        bh=LgOxz3M+88gVu7JIGRNWNEXUFNxqJnrZXlO07MCiXP4=;
+        b=Y+s30LpkPQcOMN11lcHVIfOrzd70BSyHM0N46uRpmaOcqN77EXudoqkVGtHo6xFwmW
+         A5gx/8dBC3v8mUqdC8GdXGEvgVtvVmNnbpAB1P+pn7PZvQZZYwbKDqPBf8wc/3J35yHG
+         u5kyXsEtZr7dgRDoOSmI578ZmOh3Qcw5NTTfoCI/WcsgHnd9HHNLM4ggGjucXdlxF508
+         y74ijOIuSP1soHqmwmoZh0d2z1KRR2tvNo9V2ZzhVLJwMA88TiKqVdlH38muattLiM8d
+         zI/fSwGrYCYNrz8FzujxZ/tJDNf/LLSB3hYo5fMrzZPtzk25Xu/UXsjfCnu3/KEiS2Ek
+         6PaQ==
+X-Gm-Message-State: APjAAAX6xDWooGgho2jyb9vMe+A3eL9b5CE5MTO2dn+Ft9WUWHUU7Uqn
+        hauIFxitpNR8EVSbu1lg7C+wwlAW0Kg=
+X-Google-Smtp-Source: APXvYqy6BKK2hfKOvX5CpP3t3wZvWwqW6FTqAXfHvPDWOwrvKG17Cw+YgNRLle2yolDHihhTK02SLg==
+X-Received: by 2002:adf:e806:: with SMTP id o6mr485789wrm.269.1561631303799;
+        Thu, 27 Jun 2019 03:28:23 -0700 (PDT)
 Received: from localhost.localdomain (aaubervilliers-681-1-8-173.w90-88.abo.wanadoo.fr. [90.88.13.173])
-        by smtp.gmail.com with ESMTPSA id g2sm5584533wmh.0.2019.06.27.03.28.21
+        by smtp.gmail.com with ESMTPSA id g2sm5584533wmh.0.2019.06.27.03.28.22
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 27 Jun 2019 03:28:22 -0700 (PDT)
+        Thu, 27 Jun 2019 03:28:23 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     herbert@gondor.apana.org.au, ebiggers@kernel.org,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v3 30/32] crypto: arm/aes-cipher - switch to shared AES inverse Sbox
-Date:   Thu, 27 Jun 2019 12:26:45 +0200
-Message-Id: <20190627102647.2992-31-ard.biesheuvel@linaro.org>
+Subject: [PATCH v3 31/32] crypto: arm64/aes-cipher - switch to shared AES inverse Sbox
+Date:   Thu, 27 Jun 2019 12:26:46 +0200
+Message-Id: <20190627102647.2992-32-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190627102647.2992-1-ard.biesheuvel@linaro.org>
 References: <20190627102647.2992-1-ard.biesheuvel@linaro.org>
@@ -75,25 +75,25 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm/crypto/aes-cipher-core.S | 40 +-------------------
+ arch/arm64/crypto/aes-cipher-core.S | 40 +-------------------
  1 file changed, 1 insertion(+), 39 deletions(-)
 
-diff --git a/arch/arm/crypto/aes-cipher-core.S b/arch/arm/crypto/aes-cipher-core.S
-index f2d67c095e59..180d8555a09c 100644
---- a/arch/arm/crypto/aes-cipher-core.S
-+++ b/arch/arm/crypto/aes-cipher-core.S
-@@ -222,43 +222,5 @@ ENDPROC(__aes_arm_encrypt)
+diff --git a/arch/arm64/crypto/aes-cipher-core.S b/arch/arm64/crypto/aes-cipher-core.S
+index 3a44eada2347..27dac259b359 100644
+--- a/arch/arm64/crypto/aes-cipher-core.S
++++ b/arch/arm64/crypto/aes-cipher-core.S
+@@ -131,43 +131,5 @@ ENDPROC(__aes_arm64_encrypt)
  
  	.align		5
- ENTRY(__aes_arm_decrypt)
--	do_crypt	iround, crypto_it_tab, __aes_arm_inverse_sbox, 0
+ ENTRY(__aes_arm64_decrypt)
+-	do_crypt	iround, crypto_it_tab, __aes_arm64_inverse_sbox, 0
 +	do_crypt	iround, crypto_it_tab, crypto_aes_inv_sbox, 0
- ENDPROC(__aes_arm_decrypt)
+ ENDPROC(__aes_arm64_decrypt)
 -
 -	.section	".rodata", "a"
 -	.align		L1_CACHE_SHIFT
--	.type		__aes_arm_inverse_sbox, %object
--__aes_arm_inverse_sbox:
+-	.type		__aes_arm64_inverse_sbox, %object
+-__aes_arm64_inverse_sbox:
 -	.byte		0x52, 0x09, 0x6a, 0xd5, 0x30, 0x36, 0xa5, 0x38
 -	.byte		0xbf, 0x40, 0xa3, 0x9e, 0x81, 0xf3, 0xd7, 0xfb
 -	.byte		0x7c, 0xe3, 0x39, 0x82, 0x9b, 0x2f, 0xff, 0x87
@@ -126,7 +126,7 @@ index f2d67c095e59..180d8555a09c 100644
 -	.byte		0xc8, 0xeb, 0xbb, 0x3c, 0x83, 0x53, 0x99, 0x61
 -	.byte		0x17, 0x2b, 0x04, 0x7e, 0xba, 0x77, 0xd6, 0x26
 -	.byte		0xe1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0c, 0x7d
--	.size		__aes_arm_inverse_sbox, . - __aes_arm_inverse_sbox
+-	.size		__aes_arm64_inverse_sbox, . - __aes_arm64_inverse_sbox
 -- 
 2.20.1
 
