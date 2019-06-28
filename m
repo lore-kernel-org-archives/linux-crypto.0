@@ -2,69 +2,65 @@ Return-Path: <SRS0=Fqdl=U3=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 099F1C4321A
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 Jun 2019 04:53:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BB08C4321A
+	for <linux-crypto@archiver.kernel.org>; Fri, 28 Jun 2019 05:08:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D6E192086D
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 Jun 2019 04:53:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 001EA206E0
+	for <linux-crypto@archiver.kernel.org>; Fri, 28 Jun 2019 05:08:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1561697602;
-	bh=xyfM4ZWcVSKm8cjlTQWt6Dt2SEgAkACNyGwMNKTacAo=;
+	s=default; t=1561698502;
+	bh=xFjUUYnHTlg0g5AYzulJrQaNU77kJnwSuVIIBo91h8E=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=KF/LvLNEmGotYgfJANlFbW8J/x1E/ZboO6lM6WicAEkz7IcSFZdsdE3ju7cWLrS0f
-	 I9upbi8woabjgQcAoXAVSxql/qKj3mQmiYn71dG/M35maZEuBfQ2HBADO/s9rILhY6
-	 LN0j1/s3P18BFT8+5g7pdcG6PLT/6trEVXCDtVak=
+	b=LKATX9j9CNJEGbwtZg6ZCWJ54g7riTCE5zKh7LXEdrB1Y7/2cJYOEJvi+qFX83HIg
+	 MG73mc4d9K6NyS8ppGzZ8I4EM/6mhXyTy1dHd9wUEallQJ66JkeTeA/wtcUrOWePXd
+	 KO74M/YlvJgx82j/KEHhT1W2uUEsbr2XoKw+R5vw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726420AbfF1ExW (ORCPT
+        id S1726734AbfF1FIA (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 28 Jun 2019 00:53:22 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59606 "EHLO mail.kernel.org"
+        Fri, 28 Jun 2019 01:08:00 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42158 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726240AbfF1ExW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 28 Jun 2019 00:53:22 -0400
+        id S1726240AbfF1FIA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 28 Jun 2019 01:08:00 -0400
 Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id AC29A20656;
-        Fri, 28 Jun 2019 04:53:19 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 26E392086D;
+        Fri, 28 Jun 2019 05:07:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1561697600;
-        bh=xyfM4ZWcVSKm8cjlTQWt6Dt2SEgAkACNyGwMNKTacAo=;
+        s=default; t=1561698478;
+        bh=xFjUUYnHTlg0g5AYzulJrQaNU77kJnwSuVIIBo91h8E=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Z3bBPa40+DwkDvULVLnnYbo1JZ4XWv6vjxv/VDsDg4XaHDOxyLs/a29o2G5izpXRS
-         tV9rI2CL2aUtlgnfH29W2eShhpazNje3MwhMuKTERKz5mbpC59ewRFYE2CXkMeCQdj
-         aQLfoPNd/8LGSWv1cB0P8081htHFDUfJPm7MmVg4=
-Date:   Thu, 27 Jun 2019 21:53:18 -0700
+        b=Yo/rqnMJ4hlPwrOvSoY8j4fj8kRDmq/UzXkHIEsIiE55ez/1kSq9Sxw6kzUVUG87e
+         Si78lWfLXiya9n/vIWVBJ7gX/mBLezd1CrKLb+sbBvcGjxcKDtZ/qLbfSBKiFHnXUW
+         E85tlj7Bs+eB1YcVVsxR6PrA9SHIKThyel2Weehs=
+Date:   Thu, 27 Jun 2019 22:07:56 -0700
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     Keerthy <j-keerthy@ti.com>
 Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
         robh+dt@kernel.org, linux-kernel@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
         t-kristo@ti.com, linux-crypto@vger.kernel.org, nm@ti.com
-Subject: Re: [RESEND PATCH 00/10] crypto: k3: Add sa2ul driver
-Message-ID: <20190628045318.GC673@sol.localdomain>
+Subject: Re: [RESEND PATCH 02/10] crypto: sa2ul: Add crypto driver
+Message-ID: <20190628050756.GD673@sol.localdomain>
 References: <20190628042745.28455-1-j-keerthy@ti.com>
+ <20190628042745.28455-3-j-keerthy@ti.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190628042745.28455-1-j-keerthy@ti.com>
+In-Reply-To: <20190628042745.28455-3-j-keerthy@ti.com>
 User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Keerthy,
-
-On Fri, Jun 28, 2019 at 09:57:35AM +0530, Keerthy wrote:
-> The series adds Crypto hardware accelerator support for SA2UL.
-> SA2UL stands for security accelerator ultra lite.
-> 
+On Fri, Jun 28, 2019 at 09:57:37AM +0530, Keerthy wrote:
 > The Security Accelerator (SA2_UL) subsystem provides hardware
 > cryptographic acceleration for the following use cases:
 > • Encryption and authentication for secure boot
@@ -73,58 +69,91 @@ On Fri, Jun 28, 2019 at 09:57:35AM +0530, Keerthy wrote:
 >   content/asset protection
 > The device includes one instantiation of SA2_UL named SA2_UL0
 > 
-> SA2UL needs on tx channel and a pair of rx dma channels.
+> SA2_UL supports the following cryptographic industry standards to enable data authentication, data
+> integrity and data confidentiality.
 > 
-> This series has dependency on UDMA series. Hence is based on top of:
+> Crypto function library for software acceleration
+> o AES operation
+> o 3DES operation
+> o SHA1 operation
+> o MD5 operation
+> o SHA2 – 224, 256, 384, 512 operation
 > 
-> https://patchwork.kernel.org/project/linux-dmaengine/list/?series=114105
-> 
-> The above series adds couple of dmaengine APIs that are used
-> by the sa2ul driver. Hence there is a hard dependency on the
-> above series.
-> 
-> Resending with linux-crypto list in Cc.
-> 
-> Keerthy (10):
->   dt-bindings: crypto: k3: Add sa2ul bindings documentation
->   crypto: sa2ul: Add crypto driver
->   crypto: sa2ul: Add AES ECB Mode support
->   crypto: sa2ul: Add aead support for hmac(sha1)cbc(aes) algorithm
->   crypto: sha256_generic: Export the Transform function
->   crypto: sa2ul: Add hmac(sha256)cbc(aes) AEAD Algo support
->   crypto: sa2ul: Add hmac(sha1) HMAC algorithm support
->   crypto: sa2ul: Add hmac(sha256) HMAC algorithm support
->   sa2ul: Add 3DES ECB & CBC Mode support
->   arm64: dts: k3-am6: Add crypto accelarator node
-> 
->  .../devicetree/bindings/crypto/sa2ul.txt      |   47 +
->  arch/arm64/boot/dts/ti/k3-am65-main.dtsi      |   33 +
->  crypto/sha256_generic.c                       |    3 +-
->  drivers/crypto/Kconfig                        |   17 +
->  drivers/crypto/Makefile                       |    1 +
->  drivers/crypto/sa2ul.c                        | 2232 +++++++++++++++++
->  drivers/crypto/sa2ul.h                        |  384 +++
->  include/crypto/sha.h                          |    1 +
->  8 files changed, 2717 insertions(+), 1 deletion(-)
->  create mode 100644 Documentation/devicetree/bindings/crypto/sa2ul.txt
->  create mode 100644 drivers/crypto/sa2ul.c
->  create mode 100644 drivers/crypto/sa2ul.h
+> Authentication supported via following hardware cores
+> o SHA1
+> o MD5
+> o SHA2 -224
+> o SHA2-256
+> o SHA2-384
+> o SHA2-512
 
-Did you run the crypto self-tests on this driver?  i.e. boot a kernel with
+What about HMAC?  
 
-	# CONFIG_CRYPTO_MANAGER_DISABLE_TESTS is not set
-	CONFIG_DEBUG_KERNEL=y
-	CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y
+Your actual driver only exposes HMAC-SHA*, not SHA* anything.
 
-What are the results?
+What does the hardware actually support?
 
-Also, this patchset does not compile for me.
+> diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+> index 603413f28fa3..b9a3fa026c74 100644
+> --- a/drivers/crypto/Kconfig
+> +++ b/drivers/crypto/Kconfig
+> @@ -785,4 +785,21 @@ config CRYPTO_DEV_CCREE
+>  
+>  source "drivers/crypto/hisilicon/Kconfig"
+>  
+> +config CRYPTO_DEV_SA2UL
+> +	tristate "Support for TI security accelerator"
+> +	depends on ARCH_K3 || COMPILE_TEST
+> +	select ARM64_CRYPTO
+> +	select CRYPTO_AES
+> +	select CRYPTO_AES_ARM64
+> +	select CRYPTO_SHA1
+> +	select CRYPTO_MD5
+> +	select CRYPTO_ALGAPI
+> +	select CRYPTO_AUTHENC
+> +	select HW_RANDOM
+> +	default m if ARCH_K3
+> +	help
+> +	  Keystone devices include a security accelerator engine that may be
+> +	  used for crypto offload.  Select this if you want to use hardware
+> +	  acceleration for cryptographic algorithms on these devices.
 
-Error: arch/arm64/boot/dts/ti/k3-am65-main.dtsi:103.33-34 syntax error
-FATAL ERROR: Unable to parse input tree
-  DTC     arch/arm64/boot/dts/nvidia/tegra210-p2571.dtb
-make[2]: *** [scripts/Makefile.lib:294: arch/arm64/boot/dts/ti/k3-am654-base-board.dtb] Error 1
-make[1]: *** [scripts/Makefile.build:489: arch/arm64/boot/dts/ti] Error 2
-make[1]: *** Waiting for unfinished jobs....
+This shouldn't be enabled by default.  Note that arm64 defconfig sets ARCH_K3 as
+well as lots of other ARCH_* options, so clearly just because ARCH_K3 is set
+doesn't mean the kernel is being built specifically for your platform.
+
+> +/*
+> + * Mode Control Instructions for various Key lengths 128, 192, 256
+> + * For CBC (Cipher Block Chaining) mode for encryption
+> + */
+> +static u8 mci_cbc_enc_array[3][MODE_CONTROL_BYTES] = {
+> +	{	0x21, 0x00, 0x00, 0x18, 0x88, 0x0a, 0xaa, 0x4b, 0x7e, 0x00,
+> +		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> +		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00	},
+> +	{	0x21, 0x00, 0x00, 0x18, 0x88, 0x4a, 0xaa, 0x4b, 0x7e, 0x00,
+> +		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> +		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00	},
+> +	{	0x21, 0x00, 0x00, 0x18, 0x88, 0x8a, 0xaa, 0x4b, 0x7e, 0x00,
+> +		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+> +		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00	},
+> +};
+
+Use 'const' for static constants.
+
+> +static int sa_aes_cbc_setkey(struct crypto_ablkcipher *tfm, const u8 *key,
+> +			     unsigned int keylen)
+> +{
+> +	struct algo_data *ad = kzalloc(sizeof(*ad), GFP_KERNEL);
+
+Need to check from error for all memory allocations.
+
+> +static struct sa_alg_tmpl sa_algs[] = {
+> +	{.type = CRYPTO_ALG_TYPE_ABLKCIPHER,
+
+ablkcipher API is deprecated.  Use skcipher instead.
+
+(To be clear, these are just a few things I happened to notice from very quickly
+skimming through this patch.  I don't have time to do a proper review of random
+drivers.)
 
 - Eric
