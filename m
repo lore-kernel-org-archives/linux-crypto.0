@@ -2,193 +2,102 @@ Return-Path: <SRS0=Fqdl=U3=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-14.3 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 488E2C4321A
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 Jun 2019 02:21:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22FF6C5B577
+	for <linux-crypto@archiver.kernel.org>; Fri, 28 Jun 2019 02:46:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 29C9120656
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 Jun 2019 02:21:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EE3EC2177B
+	for <linux-crypto@archiver.kernel.org>; Fri, 28 Jun 2019 02:46:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NcH3rAze"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726760AbfF1CU2 (ORCPT
+        id S1726997AbfF1Cqm (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 27 Jun 2019 22:20:28 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:47656 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726476AbfF1CU2 (ORCPT
+        Thu, 27 Jun 2019 22:46:42 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:33559 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726476AbfF1Cqm (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 27 Jun 2019 22:20:28 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x5S2GWQx098045;
-        Thu, 27 Jun 2019 22:20:06 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2td9m2rwk0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 27 Jun 2019 22:20:05 -0400
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.27/8.16.0.27) with SMTP id x5S2GaTD098244;
-        Thu, 27 Jun 2019 22:20:05 -0400
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2td9m2rwje-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 27 Jun 2019 22:20:05 -0400
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
-        by ppma04dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x5S2JUro006238;
-        Fri, 28 Jun 2019 02:20:04 GMT
-Received: from b01cxnp23033.gho.pok.ibm.com (b01cxnp23033.gho.pok.ibm.com [9.57.198.28])
-        by ppma04dal.us.ibm.com with ESMTP id 2t9by7ap7m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 28 Jun 2019 02:20:04 +0000
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com [9.57.199.109])
-        by b01cxnp23033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x5S2K3jd51708168
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 28 Jun 2019 02:20:03 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5323E112064;
-        Fri, 28 Jun 2019 02:20:03 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0D989112061;
-        Fri, 28 Jun 2019 02:20:00 +0000 (GMT)
-Received: from morokweng.localdomain.com (unknown [9.85.218.134])
-        by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
-        Fri, 28 Jun 2019 02:19:59 +0000 (GMT)
-From:   Thiago Jung Bauermann <bauerman@linux.ibm.com>
-To:     linux-integrity@vger.kernel.org
-Cc:     linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Jessica Yu <jeyu@kernel.org>,
+        Thu, 27 Jun 2019 22:46:42 -0400
+Received: by mail-pf1-f195.google.com with SMTP id x15so2198649pfq.0;
+        Thu, 27 Jun 2019 19:46:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=IJEis1mjrPVU9kIf9sDkyYAOGPx0wVN8V19bPjXCBjg=;
+        b=NcH3rAzeIkMkTLlgwlwcoVfSgXsQ2kMVzVFVlQ7S+ErntDBrCWyCjE8xTKyuiP8MiL
+         KMuJo115lfnXkRLU3+oc1ZOWmekFS7agmvTyJgJgZkPi045WdP+idYHO6IDC5NemA2VX
+         HmaChCbHA3Xkv+OsNnJoO8JyUd7ednoAuI5MlQ6N5VvDCGs5qGzzjZI73pXX0wutsQ8w
+         sp2sC4+Bv7BUaNPjvWix+fiH839+ZxQUSOFIC+9kdI25dAYE4sr/lmKSqWnJUtc0v625
+         a3MC1Fgut4mOZSr8xLabGRU0bBoRfuR5w9UE8keHGuOAjauHRwGHuc+N2qMLjLeJBpyi
+         gbtQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=IJEis1mjrPVU9kIf9sDkyYAOGPx0wVN8V19bPjXCBjg=;
+        b=oyvoaGBSCAqcd2LALWuouvH5icll+WWRsBFPNQI8FymHwHI/3hmUY1jfI8jmYE9tcB
+         XgRTD9F7gdOOlD7RUBQ+i44X0lTOy9xZCNaaLvzgITQ+D1sSvWYEU1atgoPYWe5K69BA
+         UL5yoq01srrjGXKbt2Ob8O39PA0p5u7vP6eIsvNO1YeK1v68RcqvbMHTbIYX7efAHnfp
+         regU+BkfzFWXtXVf7Tt77EGm5LagW/sxhFB9YoBfDrN2fi6Ff4gWr3kTB3VGM+TNNSyQ
+         0Lxvg5CusC//+Q7W4GwequgLig7TdBFvy+Dv74io7/sYse7QAfIx1uvy2KlcggNiCql6
+         ACcA==
+X-Gm-Message-State: APjAAAXbGoS9Ulpm3jZ7jWHyyzuTZGKIqrCKf+c6QyOIX7aetSRuVlxG
+        8Nx4dXsuRwaIqYMWVf0ZLxw=
+X-Google-Smtp-Source: APXvYqxhZOwgYL9R7I+ENbhX0qJqbnPCtiV9s+uRKQct0lXz15Mk0GYOrWW/LLlMA5aoKRsR3Xs24Q==
+X-Received: by 2002:a63:fb17:: with SMTP id o23mr6898658pgh.362.1561690001123;
+        Thu, 27 Jun 2019 19:46:41 -0700 (PDT)
+Received: from hfq-skylake.ipads-lab.se.sjtu.edu.cn ([202.120.40.82])
+        by smtp.googlemail.com with ESMTPSA id d6sm386796pgf.55.2019.06.27.19.46.36
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 27 Jun 2019 19:46:40 -0700 (PDT)
+From:   Fuqian Huang <huangfq.daxian@gmail.com>
+Cc:     Fuqian Huang <huangfq.daxian@gmail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Jonathan Corbet <corbet@lwn.net>,
-        "AKASHI, Takahiro" <takahiro.akashi@linaro.org>,
-        Thiago Jung Bauermann <bauerman@linux.ibm.com>
-Subject: [PATCH v12 03/11] PKCS#7: Introduce pkcs7_get_digest()
-Date:   Thu, 27 Jun 2019 23:19:26 -0300
-Message-Id: <20190628021934.4260-4-bauerman@linux.ibm.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190628021934.4260-1-bauerman@linux.ibm.com>
-References: <20190628021934.4260-1-bauerman@linux.ibm.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-06-27_15:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1906280019
+        Christian Lamparter <chunkeey@gmail.com>,
+        Kate Stewart <kstewart@linuxfoundation.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Eric Biggers <ebiggers@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v2 05/27] crypto: remove memset after dma_alloc_coherent
+Date:   Fri, 28 Jun 2019 10:46:31 +0800
+Message-Id: <20190628024632.15035-1-huangfq.daxian@gmail.com>
+X-Mailer: git-send-email 2.11.0
+To:     unlisted-recipients:; (no To-header on input)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-IMA will need to access the digest of the PKCS7 message (as calculated by
-the kernel) before the signature is verified, so introduce
-pkcs7_get_digest() for that purpose.
+In commit af7ddd8a627c
+("Merge tag 'dma-mapping-4.21' of git://git.infradead.org/users/hch/dma-mapping"),
+dma_alloc_coherent has already zeroed the memory.
+So memset is not needed.
 
-Also, modify pkcs7_digest() to detect when the digest was already
-calculated so that it doesn't have to do redundant work. Verifying that
-sinfo->sig->digest isn't NULL is sufficient because both places which
-allocate sinfo->sig (pkcs7_parse_message() and pkcs7_note_signed_info())
-use kzalloc() so sig->digest is always initialized to zero.
-
-Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
-Reviewed-by: Mimi Zohar <zohar@linux.ibm.com>
-Cc: David Howells <dhowells@redhat.com>
-Cc: David Woodhouse <dwmw2@infradead.org>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
+Signed-off-by: Fuqian Huang <huangfq.daxian@gmail.com>
 ---
- crypto/asymmetric_keys/pkcs7_verify.c | 33 +++++++++++++++++++++++++++
- include/crypto/pkcs7.h                |  4 ++++
- 2 files changed, 37 insertions(+)
+ drivers/crypto/amcc/crypto4xx_core.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/crypto/asymmetric_keys/pkcs7_verify.c b/crypto/asymmetric_keys/pkcs7_verify.c
-index f7b0980bf02d..3243981152b5 100644
---- a/crypto/asymmetric_keys/pkcs7_verify.c
-+++ b/crypto/asymmetric_keys/pkcs7_verify.c
-@@ -16,6 +16,7 @@
- #include <linux/err.h>
- #include <linux/asn1.h>
- #include <crypto/hash.h>
-+#include <crypto/hash_info.h>
- #include <crypto/public_key.h>
- #include "pkcs7_parser.h"
- 
-@@ -33,6 +34,10 @@ static int pkcs7_digest(struct pkcs7_message *pkcs7,
- 
- 	kenter(",%u,%s", sinfo->index, sinfo->sig->hash_algo);
- 
-+	/* The digest was calculated already. */
-+	if (sig->digest)
-+		return 0;
-+
- 	if (!sinfo->sig->hash_algo)
- 		return -ENOPKG;
- 
-@@ -121,6 +126,34 @@ static int pkcs7_digest(struct pkcs7_message *pkcs7,
- 	return ret;
- }
- 
-+int pkcs7_get_digest(struct pkcs7_message *pkcs7, const u8 **buf, u32 *len,
-+		     enum hash_algo *hash_algo)
-+{
-+	struct pkcs7_signed_info *sinfo = pkcs7->signed_infos;
-+	int i, ret;
-+
-+	/*
-+	 * This function doesn't support messages with more than one signature.
-+	 */
-+	if (sinfo == NULL || sinfo->next != NULL)
-+		return -EBADMSG;
-+
-+	ret = pkcs7_digest(pkcs7, sinfo);
-+	if (ret)
-+		return ret;
-+
-+	*buf = sinfo->sig->digest;
-+	*len = sinfo->sig->digest_size;
-+
-+	for (i = 0; i < HASH_ALGO__LAST; i++)
-+		if (!strcmp(hash_algo_name[i], sinfo->sig->hash_algo)) {
-+			*hash_algo = i;
-+			break;
-+		}
-+
-+	return 0;
-+}
-+
- /*
-  * Find the key (X.509 certificate) to use to verify a PKCS#7 message.  PKCS#7
-  * uses the issuer's name and the issuing certificate serial number for
-diff --git a/include/crypto/pkcs7.h b/include/crypto/pkcs7.h
-index 583f199400a3..3bfe6829eaae 100644
---- a/include/crypto/pkcs7.h
-+++ b/include/crypto/pkcs7.h
-@@ -13,6 +13,7 @@
- #define _CRYPTO_PKCS7_H
- 
- #include <linux/verification.h>
-+#include <linux/hash_info.h>
- #include <crypto/public_key.h>
- 
- struct key;
-@@ -44,4 +45,7 @@ extern int pkcs7_verify(struct pkcs7_message *pkcs7,
- extern int pkcs7_supply_detached_data(struct pkcs7_message *pkcs7,
- 				      const void *data, size_t datalen);
- 
-+extern int pkcs7_get_digest(struct pkcs7_message *pkcs7, const u8 **buf,
-+			    u32 *len, enum hash_algo *hash_algo);
-+
- #endif /* _CRYPTO_PKCS7_H */
+diff --git a/drivers/crypto/amcc/crypto4xx_core.c b/drivers/crypto/amcc/crypto4xx_core.c
+index 16d911aaa508..5e7f2e233406 100644
+--- a/drivers/crypto/amcc/crypto4xx_core.c
++++ b/drivers/crypto/amcc/crypto4xx_core.c
+@@ -182,7 +182,6 @@ static u32 crypto4xx_build_pdr(struct crypto4xx_device *dev)
+ 				  dev->pdr_pa);
+ 		return -ENOMEM;
+ 	}
+-	memset(dev->pdr, 0, sizeof(struct ce_pd) * PPC4XX_NUM_PD);
+ 	dev->shadow_sa_pool = dma_alloc_coherent(dev->core_dev->device,
+ 				   sizeof(union shadow_sa_buf) * PPC4XX_NUM_PD,
+ 				   &dev->shadow_sa_pool_pa,
+-- 
+2.11.0
+
