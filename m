@@ -3,96 +3,97 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95866C4321A
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 Jun 2019 17:49:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10470C4321A
+	for <linux-crypto@archiver.kernel.org>; Fri, 28 Jun 2019 18:00:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 676EA208CB
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 Jun 2019 17:49:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D79A5208C4
+	for <linux-crypto@archiver.kernel.org>; Fri, 28 Jun 2019 18:00:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1561744168;
-	bh=ylC+7sFJxaB6Cj5A/cOO9045bcE5QhDv/k/YY8QEgk8=;
+	s=default; t=1561744842;
+	bh=zMbrJScFqvYyJzkDW2lrEXk0xjEy7/G9qum3AIR8LGI=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=VCLoy5BmYebrWh27C0nNlE65h3tVQiqRncqM6PrF4+MoHiQiuPhVYWyGk3WmoPIqP
-	 tPBtDhYqh4UHIf9o5Y02Yc52+gqJk5iB7ZOJQa2b9pTUcEdtXBfQ0yQD9+89PpXJVC
-	 XozXler895YbAiHF4yHs7iG+pYsIW3G+DAzTXIFs=
+	b=LFaGZGneQ1zSqcCcJqz5D0xbpu63dAoaaPv1gmsmyXhcnOIV36ZYOZFAVSx9hrAtZ
+	 /uiznGq7uNQ8C/16oFz9Al+ImdTfKfDW86xpV70VNoM5WilrCrJYc/Jd5gO4dwqyDh
+	 KM1ymDUGLE61vq5NN9xoHAfKmYFVNqVk+xjchk6E=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726809AbfF1Rt2 (ORCPT
+        id S1726674AbfF1SAl (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 28 Jun 2019 13:49:28 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54852 "EHLO mail.kernel.org"
+        Fri, 28 Jun 2019 14:00:41 -0400
+Received: from mail.kernel.org ([198.145.29.99]:33060 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726443AbfF1Rt1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 28 Jun 2019 13:49:27 -0400
+        id S1726443AbfF1SAl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 28 Jun 2019 14:00:41 -0400
 Received: from gmail.com (unknown [104.132.1.77])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id AA7FF208C4;
-        Fri, 28 Jun 2019 17:49:26 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 02E782083B;
+        Fri, 28 Jun 2019 18:00:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1561744166;
-        bh=ylC+7sFJxaB6Cj5A/cOO9045bcE5QhDv/k/YY8QEgk8=;
+        s=default; t=1561744840;
+        bh=zMbrJScFqvYyJzkDW2lrEXk0xjEy7/G9qum3AIR8LGI=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=qBsq+AbRiZZPZ3Hh9bpgGCN7bX93oEbWP0TpF+qy7L1qIR5G1Q6wXve2qHxs0Dmth
-         TF19zv1ism3kr9sqfdDBCdZFzn95NPuXlV2ztni7DsFjg3F8DgieKzKWHcAaKzoyBA
-         brWGXeTaOuwABx77YO09pZJZ3pjF/BNRejv9onNA=
-Date:   Fri, 28 Jun 2019 10:49:25 -0700
+        b=eDSD6s0atcsZcpHu8qZ3VBRxOXB7XzOdnmdmzWDzH+lDu5zEFnrf4OY0nfJaCBf9C
+         dS5HwVXaj8n6rqdZ+plvdqk0EU+Psyc47f67lW1Dr8DJmC5FPtsxcyiG25O/5TeCNb
+         JdGTA0dGgVDTXuR3DuC3S866aFfMM37i5KFH3st0=
+Date:   Fri, 28 Jun 2019 11:00:38 -0700
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Cc:     linux-crypto@vger.kernel.org,
-        Ondrej Mosnacek <omosnace@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Steve Capper <steve.capper@arm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>, dm-devel@redhat.com,
+        linux-fscrypt@vger.kernel.org,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
         Milan Broz <gmazyland@gmail.com>
-Subject: Re: [PATCH v2 2/7] crypto: aegis128l/aegis256 - remove x86 and
- generic implementations
-Message-ID: <20190628174924.GB103946@gmail.com>
-References: <20190628170746.28768-1-ard.biesheuvel@linaro.org>
- <20190628170746.28768-3-ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH v6 2/7] fs: crypto: invoke crypto API for ESSIV handling
+Message-ID: <20190628180037.GC103946@gmail.com>
+References: <20190628152112.914-1-ard.biesheuvel@linaro.org>
+ <20190628152112.914-3-ard.biesheuvel@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190628170746.28768-3-ard.biesheuvel@linaro.org>
+In-Reply-To: <20190628152112.914-3-ard.biesheuvel@linaro.org>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jun 28, 2019 at 07:07:41PM +0200, Ard Biesheuvel wrote:
-> Three variants of AEGIS were proposed for the CAESAR competition, and
-> only one was selected for the final portfolio: AEGIS128.
-> 
-> The other variants, AEGIS128L and AEGIS256, are not likely to ever turn
-> up in networking protocols or other places where interoperability
-> between Linux and other systems is a concern, nor are they likely to
-> be subjected to further cryptanalysis. However, uninformed users may
-> think that AEGIS128L (which is faster) is equally fit for use.
-> 
-> So let's remove them now, before anyone starts using them and we are
-> forced to support them forever.
-> 
-> Note that there are no known flaws in the algorithms or in any of these
-> implementations, but they have simply outlived their usefulness.
-> 
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> ---
->  arch/x86/crypto/Makefile               |   4 -
->  arch/x86/crypto/aegis128l-aesni-asm.S  | 826 ----------------
->  arch/x86/crypto/aegis128l-aesni-glue.c | 297 ------
->  arch/x86/crypto/aegis256-aesni-asm.S   | 703 --------------
->  arch/x86/crypto/aegis256-aesni-glue.c  | 297 ------
->  crypto/Makefile                        |   2 -
->  crypto/aegis128l.c                     | 522 -----------
->  crypto/aegis256.c                      | 473 ----------
->  crypto/testmgr.c                       |  12 -
->  crypto/testmgr.h                       | 984 --------------------
->  10 files changed, 4120 deletions(-)
-> 
+On Fri, Jun 28, 2019 at 05:21:07PM +0200, Ard Biesheuvel wrote:
+> diff --git a/fs/crypto/keyinfo.c b/fs/crypto/keyinfo.c
+> index dcd91a3fbe49..f39667d4316a 100644
+> --- a/fs/crypto/keyinfo.c
+> +++ b/fs/crypto/keyinfo.c
+> @@ -13,14 +13,10 @@
+>  #include <linux/hashtable.h>
+>  #include <linux/scatterlist.h>
+>  #include <linux/ratelimit.h>
+> -#include <crypto/aes.h>
+>  #include <crypto/algapi.h>
+> -#include <crypto/sha.h>
+>  #include <crypto/skcipher.h>
+>  #include "fscrypt_private.h"
+>  
+> -static struct crypto_shash *essiv_hash_tfm;
+> -
+>  /* Table of keys referenced by FS_POLICY_FLAG_DIRECT_KEY policies */
+>  static DEFINE_HASHTABLE(fscrypt_master_keys, 6); /* 6 bits = 64 buckets */
+>  static DEFINE_SPINLOCK(fscrypt_master_keys_lock);
+> @@ -144,10 +140,9 @@ static struct fscrypt_mode available_modes[] = {
+>  	},
+>  	[FS_ENCRYPTION_MODE_AES_128_CBC] = {
+>  		.friendly_name = "AES-128-CBC",
+> -		.cipher_str = "cbc(aes)",
+> +		.cipher_str = "essiv(cbc(aes),aes,sha256)",
+>  		.keysize = 16,
+> -		.ivsize = 16,
+> -		.needs_essiv = true,
+> +		.ivsize = 8,
+>  	},
 
-Need to remove the options from crypto/Kconfig too.
+Now that the essiv template takes the same size IV, the .ivsize here needs to be
+left as 16.
 
 - Eric
