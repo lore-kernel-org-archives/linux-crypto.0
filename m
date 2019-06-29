@@ -2,99 +2,112 @@ Return-Path: <SRS0=RZ7K=U4=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EF4BC4321A
-	for <linux-crypto@archiver.kernel.org>; Sat, 29 Jun 2019 04:23:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0209C4321A
+	for <linux-crypto@archiver.kernel.org>; Sat, 29 Jun 2019 08:47:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 07532214DA
-	for <linux-crypto@archiver.kernel.org>; Sat, 29 Jun 2019 04:23:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1561782211;
-	bh=kchn9D/FW0dGX0nsdGW46YTiR7OJr5RoQU52OTiuq7M=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=2n1tHgioGsJacXwJxTKAieciwSuuVDPs4xG/dZ4u2+72dDpTkfM814qls9/MSYQjy
-	 jvQcmbNJ0Wu4Kf1nQf/kTJ0IGZyALWePL7GIZWJX7VV1AZrXOy/Tk6GdHxMlM+X+i3
-	 vFxQgZbaz4k4NZacjxICyC/7jO0MfSBXRqQ492dU=
+	by mail.kernel.org (Postfix) with ESMTP id 94780214AF
+	for <linux-crypto@archiver.kernel.org>; Sat, 29 Jun 2019 08:47:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HJN5RLEu"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726022AbfF2EXa (ORCPT
+        id S1726812AbfF2Irn (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 29 Jun 2019 00:23:30 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33912 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725890AbfF2EXa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 29 Jun 2019 00:23:30 -0400
-Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id F25192075B;
-        Sat, 29 Jun 2019 04:23:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1561782209;
-        bh=kchn9D/FW0dGX0nsdGW46YTiR7OJr5RoQU52OTiuq7M=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=CX52vsnQ4OaG7F+noCD7HDM1S/hy4zm5rwp5cRCLn9DLlWBv2ARDS8AOl/YyRtT2h
-         HVIMyZD5wck8MNPQHsjeh4pLdxik0OC6AZqFir7DDQ6dlyUt0qI+TOyr1Hj3Vd/KHQ
-         I0ACgCXD4F6Ic+ZnkT8CTTCMp02OV4UDC6kENkY4=
-Date:   Fri, 28 Jun 2019 21:23:27 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>, dm-devel@redhat.com,
-        linux-fscrypt@vger.kernel.org,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Milan Broz <gmazyland@gmail.com>
-Subject: Re: [PATCH v6 1/7] crypto: essiv - create wrapper template for ESSIV
- generation
-Message-ID: <20190629042327.GB886@sol.localdomain>
-References: <20190628152112.914-1-ard.biesheuvel@linaro.org>
- <20190628152112.914-2-ard.biesheuvel@linaro.org>
+        Sat, 29 Jun 2019 04:47:43 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:42399 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726789AbfF2Irm (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 29 Jun 2019 04:47:42 -0400
+Received: by mail-wr1-f66.google.com with SMTP id x17so8557172wrl.9
+        for <linux-crypto@vger.kernel.org>; Sat, 29 Jun 2019 01:47:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=4FNg41YQwajU7cT7Ywyxjw7b0xpWcB4D/z1SX509r4A=;
+        b=HJN5RLEu2XiDF8MDnjqVDk9fCREPXuX3MBlawnhLROYC75leT02oRC89oQ/IlAHh+K
+         1lRy/GGp7WXVS3MWV1h36Nq/1gdiv+zX1OQlcl5TL2i+8FEbMX/fs4IUh8PIKC62Mbt2
+         sb/KWG+S51buXOqaryXkiOH271D84zQgC7zRmWNIipBOkYLnxDFX9TvVqoDwDbcszuWT
+         N0qElAEnuknMR0BrYKMHRcRos8DjUHCAVBLCRc0CYMkh1hlwsy8SBtR6MDl6AjVRz5QI
+         zn1/pU04O2CmnHsEtojKRUKjTl7v/TZ/bLOcN6jucFJPLUUUaKXH0sbTsrSuSWLJq060
+         WmNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=4FNg41YQwajU7cT7Ywyxjw7b0xpWcB4D/z1SX509r4A=;
+        b=l7AjFcAVpQhftprKw4eo8DbEu+2F4yAvL8wzJLM4zdpqQRDvjKJNn9Ra58d38Tabr4
+         2Mv90ohwkIlD61+cPfFNNMBtepKC5l2+yXgwM9ka+foAXreF/+6X8nzFZJWPv+Bvg9cF
+         7Sb4Z6zMPSOhqNqVgQcLmP1I1Jt7CK3K8F7IkwmhXoeM+gEwPa/NG+FjbFbhWaTRGxED
+         NPcUlC0vRmVmsgIrLfKU63iOFMSDa8M7VCn8fo0gGxtDkdimjtYPYid4XBRADqJhTH2Q
+         2JBF4spg2nUEym2T10WE5Fskapn+yMF5b7bRMvySV/BhDxPmuDBaBX7TKyBgkKMuBwcm
+         042w==
+X-Gm-Message-State: APjAAAUrUdnE7AhHy9AZ+4m/X1hxo79XnqZ6xT689nF1opoZXyRPu15K
+        hrFpc6USbINs9IzQUyioCzgubt/wnPjo9ced+7/D4w==
+X-Google-Smtp-Source: APXvYqw5U0wTn0SlcbSn1fqgZ0tg0YzjaDyqGlK3aQ/glY9nDqFJnEowP+FMdHnWN3T6LOoxAiFnjcLYzMGZui1KoQA=
+X-Received: by 2002:a5d:5589:: with SMTP id i9mr1715090wrv.198.1561798060614;
+ Sat, 29 Jun 2019 01:47:40 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190628152112.914-2-ard.biesheuvel@linaro.org>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+References: <20190628170746.28768-1-ard.biesheuvel@linaro.org>
+ <20190628170746.28768-3-ard.biesheuvel@linaro.org> <20190628174924.GB103946@gmail.com>
+In-Reply-To: <20190628174924.GB103946@gmail.com>
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date:   Sat, 29 Jun 2019 10:47:29 +0200
+Message-ID: <CAKv+Gu-Pf4n3M3nORxjtFk_U+c5gLP56zXaijvJ1dgpEkCHhEA@mail.gmail.com>
+Subject: Re: [PATCH v2 2/7] crypto: aegis128l/aegis256 - remove x86 and
+ generic implementations
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        Ondrej Mosnacek <omosnace@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Steve Capper <steve.capper@arm.com>,
+        Milan Broz <gmazyland@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jun 28, 2019 at 05:21:06PM +0200, Ard Biesheuvel wrote:
-> Implement a template that wraps a (skcipher,cipher,shash) or
-> (aead,cipher,shash) tuple so that we can consolidate the ESSIV handling
-> in fscrypt and dm-crypt and move it into the crypto API. This will result
-> in better test coverage, and will allow future changes to make the bare
-> cipher interface internal to the crypto subsystem, in order to increase
-> robustness of the API against misuse.
-> 
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> ---
->  crypto/Kconfig  |   4 +
->  crypto/Makefile |   1 +
->  crypto/essiv.c  | 640 ++++++++++++++++++++
->  3 files changed, 645 insertions(+)
-> 
-> diff --git a/crypto/Kconfig b/crypto/Kconfig
-> index 3d056e7da65f..1aa47087c1a2 100644
-> --- a/crypto/Kconfig
-> +++ b/crypto/Kconfig
-> @@ -1917,6 +1917,10 @@ config CRYPTO_STATS
->  config CRYPTO_HASH_INFO
->  	bool
->  
-> +config CRYPTO_ESSIV
-> +	tristate
-> +	select CRYPTO_AUTHENC
-> +
+On Fri, 28 Jun 2019 at 19:49, Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> On Fri, Jun 28, 2019 at 07:07:41PM +0200, Ard Biesheuvel wrote:
+> > Three variants of AEGIS were proposed for the CAESAR competition, and
+> > only one was selected for the final portfolio: AEGIS128.
+> >
+> > The other variants, AEGIS128L and AEGIS256, are not likely to ever turn
+> > up in networking protocols or other places where interoperability
+> > between Linux and other systems is a concern, nor are they likely to
+> > be subjected to further cryptanalysis. However, uninformed users may
+> > think that AEGIS128L (which is faster) is equally fit for use.
+> >
+> > So let's remove them now, before anyone starts using them and we are
+> > forced to support them forever.
+> >
+> > Note that there are no known flaws in the algorithms or in any of these
+> > implementations, but they have simply outlived their usefulness.
+> >
+> > Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> > ---
+> >  arch/x86/crypto/Makefile               |   4 -
+> >  arch/x86/crypto/aegis128l-aesni-asm.S  | 826 ----------------
+> >  arch/x86/crypto/aegis128l-aesni-glue.c | 297 ------
+> >  arch/x86/crypto/aegis256-aesni-asm.S   | 703 --------------
+> >  arch/x86/crypto/aegis256-aesni-glue.c  | 297 ------
+> >  crypto/Makefile                        |   2 -
+> >  crypto/aegis128l.c                     | 522 -----------
+> >  crypto/aegis256.c                      | 473 ----------
+> >  crypto/testmgr.c                       |  12 -
+> >  crypto/testmgr.h                       | 984 --------------------
+> >  10 files changed, 4120 deletions(-)
+> >
+>
+> Need to remove the options from crypto/Kconfig too.
+>
 
-One more request: can you make this symbol explicitly selectable, with prompt
-string and help text?
-
-As discussed earlier, to reduce bloat I don't really want FS_ENCRYPTION to
-select this.  So the user will need a way to select CRYPTO_ESSIV if they need
-it.
-
-- Eric
+Indeed.
