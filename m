@@ -7,54 +7,54 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5C87C06508
-	for <linux-crypto@archiver.kernel.org>; Sun, 30 Jun 2019 16:50:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5B62C5B57E
+	for <linux-crypto@archiver.kernel.org>; Sun, 30 Jun 2019 16:50:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8D12920828
-	for <linux-crypto@archiver.kernel.org>; Sun, 30 Jun 2019 16:50:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 228CC20665
+	for <linux-crypto@archiver.kernel.org>; Sun, 30 Jun 2019 16:50:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Pn4fEepr"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hSeUnbOD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726605AbfF3Quw (ORCPT
+        id S1726617AbfF3Qu4 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 30 Jun 2019 12:50:52 -0400
-Received: from mail-lj1-f193.google.com ([209.85.208.193]:43123 "EHLO
-        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726617AbfF3Quv (ORCPT
+        Sun, 30 Jun 2019 12:50:56 -0400
+Received: from mail-lf1-f66.google.com ([209.85.167.66]:43600 "EHLO
+        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726520AbfF3Qu4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 30 Jun 2019 12:50:51 -0400
-Received: by mail-lj1-f193.google.com with SMTP id 16so10556886ljv.10
-        for <linux-crypto@vger.kernel.org>; Sun, 30 Jun 2019 09:50:44 -0700 (PDT)
+        Sun, 30 Jun 2019 12:50:56 -0400
+Received: by mail-lf1-f66.google.com with SMTP id j29so7094339lfk.10
+        for <linux-crypto@vger.kernel.org>; Sun, 30 Jun 2019 09:50:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=84KEswv7kRQhCaOGDGimXangJVFHO03E2+Er2yLbvmU=;
-        b=Pn4fEepriTylFxJKQT6aBM4j/dJWyuekHNJq4IBS61lVqQGE4+oxMyhXH0GMU0+rkl
-         0h/jHyx8Ogh2GOfIndqbsyVbKqHgW42EsOZUDw3VeWvvK0thLxkzxyOrf8OdIFC/v1o9
-         bvdcwbbkHs559P3ZnRwrqXpsRB0UPufaHpHQhj30amCoTnERcHTQieP4lfZAHRNxEBsg
-         xWfzBnfA1rR+z/FRkIQN46WD5xStJ8ggjO4kunFiCDCi1HBNatLPj4XDo76DnDBA+Jsc
-         9YL0r6boMjJ+hNzIlNARvWV3ZuaRJNDwHmbvSp3JpCnZgCyU6dWEKcPzKcen3F8vqbO0
-         IO9A==
+        bh=t/YXmztND533/IBNoXKWH/AAQ+DwgJK6i/o4PGL4EQA=;
+        b=hSeUnbODAbQBDbbeIgQLL0Sdza1MTbZYQe3H4tFCdq2eEQz9uon55jTxtuxmSXgGWs
+         yLVA3hlEgFrJuG0SGDdOhM9p1DgSkfgdpT7n2ZFVM831Bh7tN9OWpUiYlOLhGgdvmfIU
+         jTkXoneTJTOgERnuL3sycfVKNfMj+EqNbWE1PmJEhdd2S1/jDXghK8S/hqvFyIO9TbdD
+         fvZZeKixA61YYUCXfxN/02hRe5dA+gttVuxpkNZryObAz9rNQP9yYQNetwBp7NKQT+Xh
+         gNjobCfXDS6tY7QADyW6CGijSYvshcahw7UxLgsHYU+bXVELxsJsVWdTRhNroNYM1Qiq
+         0zYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=84KEswv7kRQhCaOGDGimXangJVFHO03E2+Er2yLbvmU=;
-        b=Rx9AzaQGqmUzGqnON8deyhCeDcu3YeiqkgqLDPXARadCl+a8bdoGwCzalffwKkLAP+
-         fhrlgFyPqpbrCf9Qd5ikag6n/GWPHRH9xtjzYtig1D0heRaijZbovxPm601uFSxHsd3w
-         mDEGSKwdwLiJRTDhGJ7eKsOffs4Ydo+woyr1wzzWK2GHiv4RV1Bch3c26CVyLH2vwLc1
-         Pqji6UpK/ZCkhbSf0fpZeeRgIECSCCiGSl3aocX3h4SX/RJiSkolt5Hjevr2OhrUDSjU
-         3hD5+hpTwQYT9NHyhheDInacC+PJTy4ww8MkcnfDSbJtj1SaC4KZTPSd0zyj2TBudjmL
-         X+/g==
-X-Gm-Message-State: APjAAAXxQ0BfDQwZDgxmdZKNaDEU+NZ28gtFhDiom3NsCW+QPyEstvfR
-        fv7PtNlPt5Tf45dBPByTiQzseGXQ+OzDFA==
-X-Google-Smtp-Source: APXvYqyeRFPbhz+AZZkVzX0Y4IKjbjw8E04GdS/KIa26eErfFDEVdkN8bL9VmYrzOQLE1XtKSNzXBQ==
-X-Received: by 2002:a2e:98d7:: with SMTP id s23mr599030ljj.179.1561913441992;
-        Sun, 30 Jun 2019 09:50:41 -0700 (PDT)
+        bh=t/YXmztND533/IBNoXKWH/AAQ+DwgJK6i/o4PGL4EQA=;
+        b=VtKK4il1T0mLtQ2Mzw7cF0aosJCIlqYyk6OrLEoQrPxEZ/Vc1MlsPFoasGsWyWxdpT
+         u1j5WhZHy4m2yYetXRFkEb+dGLuZwCBP9+jb60jk+z7F521jGJRn438XlDWszHrdk3Cw
+         Vr5Ur5cPGWS5lYGKcHZ0POabpTkVQIJV8rEaHJS/D2PxebfWgQqWyd/1GnmjHoGDgMio
+         j1tUhrWqxzZKGAhwm6/aLNRSLKoqRR83w5gUQDsBNgGizru+Mi5xKDaAaLxPwpbiKGIq
+         Lb8iZjDZ3Nv1O5TiJ2A7RKnj48BnG6IihnczhJ4xa2TjnfgOzRDoOpnfWoZaHHjFTFzA
+         4pVQ==
+X-Gm-Message-State: APjAAAUj5odpidJbYeuZEaxj2gaWTzcLShBn+rUciOFDiz/AXsopwoRt
+        VnAQt1CpFOy/+nuH8OY9LC3Wj5ODkXSnfQ==
+X-Google-Smtp-Source: APXvYqxb+dbGUB1/lyOgnlAG9NwvJeTU8aonVqfBZUdlq7skb2vbgcNVCWOabWDZURNNy8+WIqRq/w==
+X-Received: by 2002:ac2:5324:: with SMTP id f4mr9824880lfh.156.1561913440287;
+        Sun, 30 Jun 2019 09:50:40 -0700 (PDT)
 Received: from e111045-lin.arm.com (89-212-78-239.static.t-2.net. [89.212.78.239])
-        by smtp.gmail.com with ESMTPSA id t15sm2097367lff.94.2019.06.30.09.50.40
+        by smtp.gmail.com with ESMTPSA id t15sm2097367lff.94.2019.06.30.09.50.38
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Sun, 30 Jun 2019 09:50:41 -0700 (PDT)
+        Sun, 30 Jun 2019 09:50:39 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     Ard Biesheuvel <ard.biesheuvel@arm.com>,
@@ -64,9 +64,9 @@ Cc:     Ard Biesheuvel <ard.biesheuvel@arm.com>,
         Steve Capper <steve.capper@arm.com>,
         Milan Broz <gmazyland@gmail.com>,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v3 2/7] crypto: aegis128l/aegis256 - remove x86 and generic implementations
-Date:   Sun, 30 Jun 2019 18:50:26 +0200
-Message-Id: <20190630165031.26365-3-ard.biesheuvel@linaro.org>
+Subject: [PATCH v3 1/7] crypto: morus - remove generic and x86 implementations
+Date:   Sun, 30 Jun 2019 18:50:25 +0200
+Message-Id: <20190630165031.26365-2-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190630165031.26365-1-ard.biesheuvel@linaro.org>
 References: <20190630165031.26365-1-ard.biesheuvel@linaro.org>
@@ -75,66 +75,89 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Three variants of AEGIS were proposed for the CAESAR competition, and
-only one was selected for the final portfolio: AEGIS128.
+MORUS was not selected as a winner in the CAESAR competition, which
+is not surprising since it is considered to be cryptographically
+broken [0]. (Note that this is not an implementation defect, but a
+flaw in the underlying algorithm). Since it is unlikely to be in use
+currently, let's remove it before we're stuck with it.
 
-The other variants, AEGIS128L and AEGIS256, are not likely to ever turn
-up in networking protocols or other places where interoperability
-between Linux and other systems is a concern, nor are they likely to
-be subjected to further cryptanalysis. However, uninformed users may
-think that AEGIS128L (which is faster) is equally fit for use.
-
-So let's remove them now, before anyone starts using them and we are
-forced to support them forever.
-
-Note that there are no known flaws in the algorithms or in any of these
-implementations, but they have simply outlived their usefulness.
+[0] https://eprint.iacr.org/2019/172.pdf
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/x86/crypto/Makefile               |   4 -
- arch/x86/crypto/aegis128l-aesni-asm.S  | 826 ----------------
- arch/x86/crypto/aegis128l-aesni-glue.c | 297 ------
- arch/x86/crypto/aegis256-aesni-asm.S   | 703 --------------
- arch/x86/crypto/aegis256-aesni-glue.c  | 297 ------
- crypto/Kconfig                         |  30 -
- crypto/Makefile                        |   2 -
- crypto/aegis128l.c                     | 522 -----------
- crypto/aegis256.c                      | 473 ----------
- crypto/testmgr.c                       |  12 -
- crypto/testmgr.h                       | 984 --------------------
- 11 files changed, 4150 deletions(-)
+ arch/x86/crypto/Makefile              |   13 -
+ arch/x86/crypto/morus1280-avx2-asm.S  |  622 -------
+ arch/x86/crypto/morus1280-avx2-glue.c |   66 -
+ arch/x86/crypto/morus1280-sse2-asm.S  |  896 ----------
+ arch/x86/crypto/morus1280-sse2-glue.c |   65 -
+ arch/x86/crypto/morus1280_glue.c      |  209 ---
+ arch/x86/crypto/morus640-sse2-asm.S   |  615 -------
+ arch/x86/crypto/morus640-sse2-glue.c  |   65 -
+ arch/x86/crypto/morus640_glue.c       |  204 ---
+ crypto/Kconfig                        |   56 -
+ crypto/Makefile                       |    2 -
+ crypto/morus1280.c                    |  542 -------
+ crypto/morus640.c                     |  533 ------
+ crypto/testmgr.c                      |   12 -
+ crypto/testmgr.h                      | 1707 --------------------
+ include/crypto/morus1280_glue.h       |   97 --
+ include/crypto/morus640_glue.h        |   97 --
+ include/crypto/morus_common.h         |   18 -
+ 18 files changed, 5819 deletions(-)
 
 diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
-index e11a62956b42..34977c81a119 100644
+index 45734e1cf967..e11a62956b42 100644
 --- a/arch/x86/crypto/Makefile
 +++ b/arch/x86/crypto/Makefile
-@@ -38,8 +38,6 @@ obj-$(CONFIG_CRYPTO_CRCT10DIF_PCLMUL) += crct10dif-pclmul.o
- obj-$(CONFIG_CRYPTO_POLY1305_X86_64) += poly1305-x86_64.o
+@@ -41,12 +41,6 @@ obj-$(CONFIG_CRYPTO_AEGIS128_AESNI_SSE2) += aegis128-aesni.o
+ obj-$(CONFIG_CRYPTO_AEGIS128L_AESNI_SSE2) += aegis128l-aesni.o
+ obj-$(CONFIG_CRYPTO_AEGIS256_AESNI_SSE2) += aegis256-aesni.o
  
- obj-$(CONFIG_CRYPTO_AEGIS128_AESNI_SSE2) += aegis128-aesni.o
--obj-$(CONFIG_CRYPTO_AEGIS128L_AESNI_SSE2) += aegis128l-aesni.o
--obj-$(CONFIG_CRYPTO_AEGIS256_AESNI_SSE2) += aegis256-aesni.o
- 
+-obj-$(CONFIG_CRYPTO_MORUS640_GLUE) += morus640_glue.o
+-obj-$(CONFIG_CRYPTO_MORUS1280_GLUE) += morus1280_glue.o
+-
+-obj-$(CONFIG_CRYPTO_MORUS640_SSE2) += morus640-sse2.o
+-obj-$(CONFIG_CRYPTO_MORUS1280_SSE2) += morus1280-sse2.o
+-
  obj-$(CONFIG_CRYPTO_NHPOLY1305_SSE2) += nhpoly1305-sse2.o
  obj-$(CONFIG_CRYPTO_NHPOLY1305_AVX2) += nhpoly1305-avx2.o
-@@ -74,8 +72,6 @@ chacha-x86_64-y := chacha-ssse3-x86_64.o chacha_glue.o
- serpent-sse2-x86_64-y := serpent-sse2-x86_64-asm_64.o serpent_sse2_glue.o
  
- aegis128-aesni-y := aegis128-aesni-asm.o aegis128-aesni-glue.o
--aegis128l-aesni-y := aegis128l-aesni-asm.o aegis128l-aesni-glue.o
--aegis256-aesni-y := aegis256-aesni-asm.o aegis256-aesni-glue.o
+@@ -64,8 +58,6 @@ endif
+ ifeq ($(avx2_supported),yes)
+ 	obj-$(CONFIG_CRYPTO_CAMELLIA_AESNI_AVX2_X86_64) += camellia-aesni-avx2.o
+ 	obj-$(CONFIG_CRYPTO_SERPENT_AVX2_X86_64) += serpent-avx2.o
+-
+-	obj-$(CONFIG_CRYPTO_MORUS1280_AVX2) += morus1280-avx2.o
+ endif
  
+ aes-i586-y := aes-i586-asm_32.o aes_glue.o
+@@ -85,9 +77,6 @@ aegis128-aesni-y := aegis128-aesni-asm.o aegis128-aesni-glue.o
+ aegis128l-aesni-y := aegis128l-aesni-asm.o aegis128l-aesni-glue.o
+ aegis256-aesni-y := aegis256-aesni-asm.o aegis256-aesni-glue.o
+ 
+-morus640-sse2-y := morus640-sse2-asm.o morus640-sse2-glue.o
+-morus1280-sse2-y := morus1280-sse2-asm.o morus1280-sse2-glue.o
+-
  nhpoly1305-sse2-y := nh-sse2-x86_64.o nhpoly1305-sse2-glue.o
  
-diff --git a/arch/x86/crypto/aegis128l-aesni-asm.S b/arch/x86/crypto/aegis128l-aesni-asm.S
+ ifeq ($(avx_supported),yes)
+@@ -106,8 +95,6 @@ ifeq ($(avx2_supported),yes)
+ 	chacha-x86_64-y += chacha-avx2-x86_64.o
+ 	serpent-avx2-y := serpent-avx2-asm_64.o serpent_avx2_glue.o
+ 
+-	morus1280-avx2-y := morus1280-avx2-asm.o morus1280-avx2-glue.o
+-
+ 	nhpoly1305-avx2-y := nh-avx2-x86_64.o nhpoly1305-avx2-glue.o
+ endif
+ 
+diff --git a/arch/x86/crypto/morus1280-avx2-asm.S b/arch/x86/crypto/morus1280-avx2-asm.S
 deleted file mode 100644
-index 491dd61c845c..000000000000
---- a/arch/x86/crypto/aegis128l-aesni-asm.S
+index de182c460f82..000000000000
+--- a/arch/x86/crypto/morus1280-avx2-asm.S
 +++ /dev/null
-@@ -1,826 +0,0 @@
+@@ -1,622 +0,0 @@
 -/*
-- * AES-NI + SSE2 implementation of AEGIS-128L
+- * AVX2 implementation of MORUS-1280
 - *
 - * Copyright (c) 2017-2018 Ondrej Mosnacek <omosnacek@gmail.com>
 - * Copyright (C) 2017-2018 Red Hat, Inc. All rights reserved.
@@ -147,117 +170,162 @@ index 491dd61c845c..000000000000
 -#include <linux/linkage.h>
 -#include <asm/frame.h>
 -
--#define STATE0	%xmm0
--#define STATE1	%xmm1
--#define STATE2	%xmm2
--#define STATE3	%xmm3
--#define STATE4	%xmm4
--#define STATE5	%xmm5
--#define STATE6	%xmm6
--#define STATE7	%xmm7
--#define MSG0	%xmm8
--#define MSG1	%xmm9
--#define T0	%xmm10
--#define T1	%xmm11
--#define T2	%xmm12
--#define T3	%xmm13
+-#define SHUFFLE_MASK(i0, i1, i2, i3) \
+-	(i0 | (i1 << 2) | (i2 << 4) | (i3 << 6))
 -
--#define STATEP	%rdi
--#define LEN	%rsi
--#define SRC	%rdx
--#define DST	%rcx
+-#define MASK1 SHUFFLE_MASK(3, 0, 1, 2)
+-#define MASK2 SHUFFLE_MASK(2, 3, 0, 1)
+-#define MASK3 SHUFFLE_MASK(1, 2, 3, 0)
 -
--.section .rodata.cst16.aegis128l_const, "aM", @progbits, 32
--.align 16
--.Laegis128l_const_0:
+-#define STATE0		%ymm0
+-#define STATE0_LOW	%xmm0
+-#define STATE1		%ymm1
+-#define STATE2		%ymm2
+-#define STATE3		%ymm3
+-#define STATE4		%ymm4
+-#define KEY		%ymm5
+-#define MSG		%ymm5
+-#define MSG_LOW		%xmm5
+-#define T0		%ymm6
+-#define T0_LOW		%xmm6
+-#define T1		%ymm7
+-
+-.section .rodata.cst32.morus1280_const, "aM", @progbits, 32
+-.align 32
+-.Lmorus1280_const:
 -	.byte 0x00, 0x01, 0x01, 0x02, 0x03, 0x05, 0x08, 0x0d
 -	.byte 0x15, 0x22, 0x37, 0x59, 0x90, 0xe9, 0x79, 0x62
--.Laegis128l_const_1:
 -	.byte 0xdb, 0x3d, 0x18, 0x55, 0x6d, 0xc2, 0x2f, 0xf1
 -	.byte 0x20, 0x11, 0x31, 0x42, 0x73, 0xb5, 0x28, 0xdd
 -
--.section .rodata.cst16.aegis128l_counter, "aM", @progbits, 16
--.align 16
--.Laegis128l_counter0:
+-.section .rodata.cst32.morus1280_counter, "aM", @progbits, 32
+-.align 32
+-.Lmorus1280_counter:
 -	.byte 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07
 -	.byte 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
--.Laegis128l_counter1:
 -	.byte 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17
 -	.byte 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f
 -
 -.text
 -
+-.macro morus1280_round s0, s1, s2, s3, s4, b, w
+-	vpand \s1, \s2, T0
+-	vpxor T0, \s0, \s0
+-	vpxor \s3, \s0, \s0
+-	vpsllq $\b, \s0, T0
+-	vpsrlq $(64 - \b), \s0, \s0
+-	vpxor T0, \s0, \s0
+-	vpermq $\w, \s3, \s3
+-.endm
+-
+-/*
+- * __morus1280_update: internal ABI
+- * input:
+- *   STATE[0-4] - input state
+- *   MSG        - message block
+- * output:
+- *   STATE[0-4] - output state
+- * changed:
+- *   T0
+- */
+-__morus1280_update:
+-	morus1280_round STATE0, STATE1, STATE2, STATE3, STATE4, 13, MASK1
+-	vpxor MSG, STATE1, STATE1
+-	morus1280_round STATE1, STATE2, STATE3, STATE4, STATE0, 46, MASK2
+-	vpxor MSG, STATE2, STATE2
+-	morus1280_round STATE2, STATE3, STATE4, STATE0, STATE1, 38, MASK3
+-	vpxor MSG, STATE3, STATE3
+-	morus1280_round STATE3, STATE4, STATE0, STATE1, STATE2,  7, MASK2
+-	vpxor MSG, STATE4, STATE4
+-	morus1280_round STATE4, STATE0, STATE1, STATE2, STATE3,  4, MASK1
+-	ret
+-ENDPROC(__morus1280_update)
+-
+-/*
+- * __morus1280_update_zero: internal ABI
+- * input:
+- *   STATE[0-4] - input state
+- * output:
+- *   STATE[0-4] - output state
+- * changed:
+- *   T0
+- */
+-__morus1280_update_zero:
+-	morus1280_round STATE0, STATE1, STATE2, STATE3, STATE4, 13, MASK1
+-	morus1280_round STATE1, STATE2, STATE3, STATE4, STATE0, 46, MASK2
+-	morus1280_round STATE2, STATE3, STATE4, STATE0, STATE1, 38, MASK3
+-	morus1280_round STATE3, STATE4, STATE0, STATE1, STATE2,  7, MASK2
+-	morus1280_round STATE4, STATE0, STATE1, STATE2, STATE3,  4, MASK1
+-	ret
+-ENDPROC(__morus1280_update_zero)
+-
 -/*
 - * __load_partial: internal ABI
 - * input:
-- *   LEN - bytes
-- *   SRC - src
+- *   %rsi - src
+- *   %rcx - bytes
 - * output:
-- *   MSG0 - first message block
-- *   MSG1 - second message block
+- *   MSG  - message block
 - * changed:
-- *   T0
 - *   %r8
 - *   %r9
 - */
 -__load_partial:
 -	xor %r9d, %r9d
--	pxor MSG0, MSG0
--	pxor MSG1, MSG1
+-	vpxor MSG, MSG, MSG
 -
--	mov LEN, %r8
+-	mov %rcx, %r8
 -	and $0x1, %r8
 -	jz .Lld_partial_1
 -
--	mov LEN, %r8
+-	mov %rcx, %r8
 -	and $0x1E, %r8
--	add SRC, %r8
+-	add %rsi, %r8
 -	mov (%r8), %r9b
 -
 -.Lld_partial_1:
--	mov LEN, %r8
+-	mov %rcx, %r8
 -	and $0x2, %r8
 -	jz .Lld_partial_2
 -
--	mov LEN, %r8
+-	mov %rcx, %r8
 -	and $0x1C, %r8
--	add SRC, %r8
--	shl $0x10, %r9
+-	add %rsi, %r8
+-	shl $16, %r9
 -	mov (%r8), %r9w
 -
 -.Lld_partial_2:
--	mov LEN, %r8
+-	mov %rcx, %r8
 -	and $0x4, %r8
 -	jz .Lld_partial_4
 -
--	mov LEN, %r8
+-	mov %rcx, %r8
 -	and $0x18, %r8
--	add SRC, %r8
+-	add %rsi, %r8
 -	shl $32, %r9
 -	mov (%r8), %r8d
 -	xor %r8, %r9
 -
 -.Lld_partial_4:
--	movq %r9, MSG0
+-	movq %r9, MSG_LOW
 -
--	mov LEN, %r8
+-	mov %rcx, %r8
 -	and $0x8, %r8
 -	jz .Lld_partial_8
 -
--	mov LEN, %r8
+-	mov %rcx, %r8
 -	and $0x10, %r8
--	add SRC, %r8
--	pslldq $8, MSG0
--	movq (%r8), T0
--	pxor T0, MSG0
+-	add %rsi, %r8
+-	pshufd $MASK2, MSG_LOW, MSG_LOW
+-	pinsrq $0, (%r8), MSG_LOW
 -
 -.Lld_partial_8:
--	mov LEN, %r8
+-	mov %rcx, %r8
 -	and $0x10, %r8
 -	jz .Lld_partial_16
 -
--	movdqa MSG0, MSG1
--	movdqu (SRC), MSG0
+-	vpermq $MASK2, MSG, MSG
+-	movdqu (%rsi), MSG_LOW
 -
 -.Lld_partial_16:
 -	ret
@@ -266,38 +334,36 @@ index 491dd61c845c..000000000000
 -/*
 - * __store_partial: internal ABI
 - * input:
-- *   LEN - bytes
-- *   DST - dst
+- *   %rdx - dst
+- *   %rcx - bytes
 - * output:
-- *   T0   - first message block
-- *   T1   - second message block
+- *   T0   - message block
 - * changed:
 - *   %r8
 - *   %r9
 - *   %r10
 - */
 -__store_partial:
--	mov LEN, %r8
--	mov DST, %r9
+-	mov %rcx, %r8
+-	mov %rdx, %r9
 -
 -	cmp $16, %r8
 -	jl .Lst_partial_16
 -
--	movdqu T0, (%r9)
--	movdqa T1, T0
+-	movdqu T0_LOW, (%r9)
+-	vpermq $MASK2, T0, T0
 -
 -	sub $16, %r8
 -	add $16, %r9
 -
 -.Lst_partial_16:
--	movq T0, %r10
+-	movq T0_LOW, %r10
 -
 -	cmp $8, %r8
 -	jl .Lst_partial_8
 -
 -	mov %r10, (%r9)
--	psrldq $8, T0
--	movq T0, %r10
+-	pextrq $1, T0_LOW, %r10
 -
 -	sub $8, %r8
 -	add $8, %r9
@@ -317,7 +383,7 @@ index 491dd61c845c..000000000000
 -	jl .Lst_partial_2
 -
 -	mov %r10w, (%r9)
--	shr $0x10, %r10
+-	shr $16, %r10
 -
 -	sub $2, %r8
 -	add $2, %r9
@@ -332,644 +398,397 @@ index 491dd61c845c..000000000000
 -	ret
 -ENDPROC(__store_partial)
 -
--.macro update
--	movdqa STATE7, T0
--	aesenc STATE0, STATE7
--	aesenc STATE1, STATE0
--	aesenc STATE2, STATE1
--	aesenc STATE3, STATE2
--	aesenc STATE4, STATE3
--	aesenc STATE5, STATE4
--	aesenc STATE6, STATE5
--	aesenc T0,     STATE6
--.endm
--
--.macro update0
--	update
--	pxor MSG0, STATE7
--	pxor MSG1, STATE3
--.endm
--
--.macro update1
--	update
--	pxor MSG0, STATE6
--	pxor MSG1, STATE2
--.endm
--
--.macro update2
--	update
--	pxor MSG0, STATE5
--	pxor MSG1, STATE1
--.endm
--
--.macro update3
--	update
--	pxor MSG0, STATE4
--	pxor MSG1, STATE0
--.endm
--
--.macro update4
--	update
--	pxor MSG0, STATE3
--	pxor MSG1, STATE7
--.endm
--
--.macro update5
--	update
--	pxor MSG0, STATE2
--	pxor MSG1, STATE6
--.endm
--
--.macro update6
--	update
--	pxor MSG0, STATE1
--	pxor MSG1, STATE5
--.endm
--
--.macro update7
--	update
--	pxor MSG0, STATE0
--	pxor MSG1, STATE4
--.endm
--
--.macro state_load
--	movdqu 0x00(STATEP), STATE0
--	movdqu 0x10(STATEP), STATE1
--	movdqu 0x20(STATEP), STATE2
--	movdqu 0x30(STATEP), STATE3
--	movdqu 0x40(STATEP), STATE4
--	movdqu 0x50(STATEP), STATE5
--	movdqu 0x60(STATEP), STATE6
--	movdqu 0x70(STATEP), STATE7
--.endm
--
--.macro state_store s0 s1 s2 s3 s4 s5 s6 s7
--	movdqu \s7, 0x00(STATEP)
--	movdqu \s0, 0x10(STATEP)
--	movdqu \s1, 0x20(STATEP)
--	movdqu \s2, 0x30(STATEP)
--	movdqu \s3, 0x40(STATEP)
--	movdqu \s4, 0x50(STATEP)
--	movdqu \s5, 0x60(STATEP)
--	movdqu \s6, 0x70(STATEP)
--.endm
--
--.macro state_store0
--	state_store STATE0 STATE1 STATE2 STATE3 STATE4 STATE5 STATE6 STATE7
--.endm
--
--.macro state_store1
--	state_store STATE7 STATE0 STATE1 STATE2 STATE3 STATE4 STATE5 STATE6
--.endm
--
--.macro state_store2
--	state_store STATE6 STATE7 STATE0 STATE1 STATE2 STATE3 STATE4 STATE5
--.endm
--
--.macro state_store3
--	state_store STATE5 STATE6 STATE7 STATE0 STATE1 STATE2 STATE3 STATE4
--.endm
--
--.macro state_store4
--	state_store STATE4 STATE5 STATE6 STATE7 STATE0 STATE1 STATE2 STATE3
--.endm
--
--.macro state_store5
--	state_store STATE3 STATE4 STATE5 STATE6 STATE7 STATE0 STATE1 STATE2
--.endm
--
--.macro state_store6
--	state_store STATE2 STATE3 STATE4 STATE5 STATE6 STATE7 STATE0 STATE1
--.endm
--
--.macro state_store7
--	state_store STATE1 STATE2 STATE3 STATE4 STATE5 STATE6 STATE7 STATE0
--.endm
--
 -/*
-- * void crypto_aegis128l_aesni_init(void *state, const void *key, const void *iv);
+- * void crypto_morus1280_avx2_init(void *state, const void *key,
+- *                                 const void *iv);
 - */
--ENTRY(crypto_aegis128l_aesni_init)
+-ENTRY(crypto_morus1280_avx2_init)
 -	FRAME_BEGIN
--
--	/* load key: */
--	movdqa (%rsi), MSG1
--	movdqa MSG1, STATE0
--	movdqa MSG1, STATE4
--	movdqa MSG1, STATE5
--	movdqa MSG1, STATE6
--	movdqa MSG1, STATE7
 -
 -	/* load IV: */
--	movdqu (%rdx), MSG0
--	pxor MSG0, STATE0
--	pxor MSG0, STATE4
+-	vpxor STATE0, STATE0, STATE0
+-	movdqu (%rdx), STATE0_LOW
+-	/* load key: */
+-	vmovdqu (%rsi), KEY
+-	vmovdqa KEY, STATE1
+-	/* load all ones: */
+-	vpcmpeqd STATE2, STATE2, STATE2
+-	/* load all zeros: */
+-	vpxor STATE3, STATE3, STATE3
+-	/* load the constant: */
+-	vmovdqa .Lmorus1280_const, STATE4
 -
--	/* load the constants: */
--	movdqa .Laegis128l_const_0, STATE2
--	movdqa .Laegis128l_const_1, STATE1
--	movdqa STATE1, STATE3
--	pxor STATE2, STATE5
--	pxor STATE1, STATE6
--	pxor STATE2, STATE7
+-	/* update 16 times with zero: */
+-	call __morus1280_update_zero
+-	call __morus1280_update_zero
+-	call __morus1280_update_zero
+-	call __morus1280_update_zero
+-	call __morus1280_update_zero
+-	call __morus1280_update_zero
+-	call __morus1280_update_zero
+-	call __morus1280_update_zero
+-	call __morus1280_update_zero
+-	call __morus1280_update_zero
+-	call __morus1280_update_zero
+-	call __morus1280_update_zero
+-	call __morus1280_update_zero
+-	call __morus1280_update_zero
+-	call __morus1280_update_zero
+-	call __morus1280_update_zero
 -
--	/* update 10 times with IV and KEY: */
--	update0
--	update1
--	update2
--	update3
--	update4
--	update5
--	update6
--	update7
--	update0
--	update1
+-	/* xor-in the key again after updates: */
+-	vpxor KEY, STATE1, STATE1
 -
--	state_store1
+-	/* store the state: */
+-	vmovdqu STATE0, (0 * 32)(%rdi)
+-	vmovdqu STATE1, (1 * 32)(%rdi)
+-	vmovdqu STATE2, (2 * 32)(%rdi)
+-	vmovdqu STATE3, (3 * 32)(%rdi)
+-	vmovdqu STATE4, (4 * 32)(%rdi)
 -
 -	FRAME_END
 -	ret
--ENDPROC(crypto_aegis128l_aesni_init)
--
--.macro ad_block a i
--	movdq\a (\i * 0x20 + 0x00)(SRC), MSG0
--	movdq\a (\i * 0x20 + 0x10)(SRC), MSG1
--	update\i
--	sub $0x20, LEN
--	cmp $0x20, LEN
--	jl .Lad_out_\i
--.endm
+-ENDPROC(crypto_morus1280_avx2_init)
 -
 -/*
-- * void crypto_aegis128l_aesni_ad(void *state, unsigned int length,
-- *                                const void *data);
+- * void crypto_morus1280_avx2_ad(void *state, const void *data,
+- *                               unsigned int length);
 - */
--ENTRY(crypto_aegis128l_aesni_ad)
+-ENTRY(crypto_morus1280_avx2_ad)
 -	FRAME_BEGIN
 -
--	cmp $0x20, LEN
+-	cmp $32, %rdx
 -	jb .Lad_out
 -
--	state_load
+-	/* load the state: */
+-	vmovdqu (0 * 32)(%rdi), STATE0
+-	vmovdqu (1 * 32)(%rdi), STATE1
+-	vmovdqu (2 * 32)(%rdi), STATE2
+-	vmovdqu (3 * 32)(%rdi), STATE3
+-	vmovdqu (4 * 32)(%rdi), STATE4
 -
--	mov  SRC, %r8
--	and $0xf, %r8
+-	mov %rsi,  %r8
+-	and $0x1F, %r8
 -	jnz .Lad_u_loop
 -
--.align 8
+-.align 4
 -.Lad_a_loop:
--	ad_block a 0
--	ad_block a 1
--	ad_block a 2
--	ad_block a 3
--	ad_block a 4
--	ad_block a 5
--	ad_block a 6
--	ad_block a 7
+-	vmovdqa (%rsi), MSG
+-	call __morus1280_update
+-	sub $32, %rdx
+-	add $32, %rsi
+-	cmp $32, %rdx
+-	jge .Lad_a_loop
 -
--	add $0x100, SRC
--	jmp .Lad_a_loop
--
--.align 8
+-	jmp .Lad_cont
+-.align 4
 -.Lad_u_loop:
--	ad_block u 0
--	ad_block u 1
--	ad_block u 2
--	ad_block u 3
--	ad_block u 4
--	ad_block u 5
--	ad_block u 6
--	ad_block u 7
+-	vmovdqu (%rsi), MSG
+-	call __morus1280_update
+-	sub $32, %rdx
+-	add $32, %rsi
+-	cmp $32, %rdx
+-	jge .Lad_u_loop
 -
--	add $0x100, SRC
--	jmp .Lad_u_loop
--
--.Lad_out_0:
--	state_store0
--	FRAME_END
--	ret
--
--.Lad_out_1:
--	state_store1
--	FRAME_END
--	ret
--
--.Lad_out_2:
--	state_store2
--	FRAME_END
--	ret
--
--.Lad_out_3:
--	state_store3
--	FRAME_END
--	ret
--
--.Lad_out_4:
--	state_store4
--	FRAME_END
--	ret
--
--.Lad_out_5:
--	state_store5
--	FRAME_END
--	ret
--
--.Lad_out_6:
--	state_store6
--	FRAME_END
--	ret
--
--.Lad_out_7:
--	state_store7
--	FRAME_END
--	ret
+-.Lad_cont:
+-	/* store the state: */
+-	vmovdqu STATE0, (0 * 32)(%rdi)
+-	vmovdqu STATE1, (1 * 32)(%rdi)
+-	vmovdqu STATE2, (2 * 32)(%rdi)
+-	vmovdqu STATE3, (3 * 32)(%rdi)
+-	vmovdqu STATE4, (4 * 32)(%rdi)
 -
 -.Lad_out:
 -	FRAME_END
 -	ret
--ENDPROC(crypto_aegis128l_aesni_ad)
--
--.macro crypt m0 m1 s0 s1 s2 s3 s4 s5 s6 s7
--	pxor \s1, \m0
--	pxor \s6, \m0
--	movdqa \s2, T3
--	pand \s3, T3
--	pxor T3, \m0
--
--	pxor \s2, \m1
--	pxor \s5, \m1
--	movdqa \s6, T3
--	pand \s7, T3
--	pxor T3, \m1
--.endm
--
--.macro crypt0 m0 m1
--	crypt \m0 \m1 STATE0 STATE1 STATE2 STATE3 STATE4 STATE5 STATE6 STATE7
--.endm
--
--.macro crypt1 m0 m1
--	crypt \m0 \m1 STATE7 STATE0 STATE1 STATE2 STATE3 STATE4 STATE5 STATE6
--.endm
--
--.macro crypt2 m0 m1
--	crypt \m0 \m1 STATE6 STATE7 STATE0 STATE1 STATE2 STATE3 STATE4 STATE5
--.endm
--
--.macro crypt3 m0 m1
--	crypt \m0 \m1 STATE5 STATE6 STATE7 STATE0 STATE1 STATE2 STATE3 STATE4
--.endm
--
--.macro crypt4 m0 m1
--	crypt \m0 \m1 STATE4 STATE5 STATE6 STATE7 STATE0 STATE1 STATE2 STATE3
--.endm
--
--.macro crypt5 m0 m1
--	crypt \m0 \m1 STATE3 STATE4 STATE5 STATE6 STATE7 STATE0 STATE1 STATE2
--.endm
--
--.macro crypt6 m0 m1
--	crypt \m0 \m1 STATE2 STATE3 STATE4 STATE5 STATE6 STATE7 STATE0 STATE1
--.endm
--
--.macro crypt7 m0 m1
--	crypt \m0 \m1 STATE1 STATE2 STATE3 STATE4 STATE5 STATE6 STATE7 STATE0
--.endm
--
--.macro encrypt_block a i
--	movdq\a (\i * 0x20 + 0x00)(SRC), MSG0
--	movdq\a (\i * 0x20 + 0x10)(SRC), MSG1
--	movdqa MSG0, T0
--	movdqa MSG1, T1
--	crypt\i T0, T1
--	movdq\a T0, (\i * 0x20 + 0x00)(DST)
--	movdq\a T1, (\i * 0x20 + 0x10)(DST)
--
--	update\i
--
--	sub $0x20, LEN
--	cmp $0x20, LEN
--	jl .Lenc_out_\i
--.endm
--
--.macro decrypt_block a i
--	movdq\a (\i * 0x20 + 0x00)(SRC), MSG0
--	movdq\a (\i * 0x20 + 0x10)(SRC), MSG1
--	crypt\i MSG0, MSG1
--	movdq\a MSG0, (\i * 0x20 + 0x00)(DST)
--	movdq\a MSG1, (\i * 0x20 + 0x10)(DST)
--
--	update\i
--
--	sub $0x20, LEN
--	cmp $0x20, LEN
--	jl .Ldec_out_\i
--.endm
+-ENDPROC(crypto_morus1280_avx2_ad)
 -
 -/*
-- * void crypto_aegis128l_aesni_enc(void *state, unsigned int length,
-- *                                 const void *src, void *dst);
+- * void crypto_morus1280_avx2_enc(void *state, const void *src, void *dst,
+- *                                unsigned int length);
 - */
--ENTRY(crypto_aegis128l_aesni_enc)
+-ENTRY(crypto_morus1280_avx2_enc)
 -	FRAME_BEGIN
 -
--	cmp $0x20, LEN
+-	cmp $32, %rcx
 -	jb .Lenc_out
 -
--	state_load
+-	/* load the state: */
+-	vmovdqu (0 * 32)(%rdi), STATE0
+-	vmovdqu (1 * 32)(%rdi), STATE1
+-	vmovdqu (2 * 32)(%rdi), STATE2
+-	vmovdqu (3 * 32)(%rdi), STATE3
+-	vmovdqu (4 * 32)(%rdi), STATE4
 -
--	mov  SRC, %r8
--	or   DST, %r8
--	and $0xf, %r8
+-	mov %rsi,  %r8
+-	or  %rdx,  %r8
+-	and $0x1F, %r8
 -	jnz .Lenc_u_loop
 -
--.align 8
+-.align 4
 -.Lenc_a_loop:
--	encrypt_block a 0
--	encrypt_block a 1
--	encrypt_block a 2
--	encrypt_block a 3
--	encrypt_block a 4
--	encrypt_block a 5
--	encrypt_block a 6
--	encrypt_block a 7
+-	vmovdqa (%rsi), MSG
+-	vmovdqa MSG, T0
+-	vpxor STATE0, T0, T0
+-	vpermq $MASK3, STATE1, T1
+-	vpxor T1, T0, T0
+-	vpand STATE2, STATE3, T1
+-	vpxor T1, T0, T0
+-	vmovdqa T0, (%rdx)
 -
--	add $0x100, SRC
--	add $0x100, DST
--	jmp .Lenc_a_loop
+-	call __morus1280_update
+-	sub $32, %rcx
+-	add $32, %rsi
+-	add $32, %rdx
+-	cmp $32, %rcx
+-	jge .Lenc_a_loop
 -
--.align 8
+-	jmp .Lenc_cont
+-.align 4
 -.Lenc_u_loop:
--	encrypt_block u 0
--	encrypt_block u 1
--	encrypt_block u 2
--	encrypt_block u 3
--	encrypt_block u 4
--	encrypt_block u 5
--	encrypt_block u 6
--	encrypt_block u 7
+-	vmovdqu (%rsi), MSG
+-	vmovdqa MSG, T0
+-	vpxor STATE0, T0, T0
+-	vpermq $MASK3, STATE1, T1
+-	vpxor T1, T0, T0
+-	vpand STATE2, STATE3, T1
+-	vpxor T1, T0, T0
+-	vmovdqu T0, (%rdx)
 -
--	add $0x100, SRC
--	add $0x100, DST
--	jmp .Lenc_u_loop
+-	call __morus1280_update
+-	sub $32, %rcx
+-	add $32, %rsi
+-	add $32, %rdx
+-	cmp $32, %rcx
+-	jge .Lenc_u_loop
 -
--.Lenc_out_0:
--	state_store0
--	FRAME_END
--	ret
--
--.Lenc_out_1:
--	state_store1
--	FRAME_END
--	ret
--
--.Lenc_out_2:
--	state_store2
--	FRAME_END
--	ret
--
--.Lenc_out_3:
--	state_store3
--	FRAME_END
--	ret
--
--.Lenc_out_4:
--	state_store4
--	FRAME_END
--	ret
--
--.Lenc_out_5:
--	state_store5
--	FRAME_END
--	ret
--
--.Lenc_out_6:
--	state_store6
--	FRAME_END
--	ret
--
--.Lenc_out_7:
--	state_store7
--	FRAME_END
--	ret
+-.Lenc_cont:
+-	/* store the state: */
+-	vmovdqu STATE0, (0 * 32)(%rdi)
+-	vmovdqu STATE1, (1 * 32)(%rdi)
+-	vmovdqu STATE2, (2 * 32)(%rdi)
+-	vmovdqu STATE3, (3 * 32)(%rdi)
+-	vmovdqu STATE4, (4 * 32)(%rdi)
 -
 -.Lenc_out:
 -	FRAME_END
 -	ret
--ENDPROC(crypto_aegis128l_aesni_enc)
+-ENDPROC(crypto_morus1280_avx2_enc)
 -
 -/*
-- * void crypto_aegis128l_aesni_enc_tail(void *state, unsigned int length,
-- *                                      const void *src, void *dst);
+- * void crypto_morus1280_avx2_enc_tail(void *state, const void *src, void *dst,
+- *                                     unsigned int length);
 - */
--ENTRY(crypto_aegis128l_aesni_enc_tail)
+-ENTRY(crypto_morus1280_avx2_enc_tail)
 -	FRAME_BEGIN
 -
--	state_load
+-	/* load the state: */
+-	vmovdqu (0 * 32)(%rdi), STATE0
+-	vmovdqu (1 * 32)(%rdi), STATE1
+-	vmovdqu (2 * 32)(%rdi), STATE2
+-	vmovdqu (3 * 32)(%rdi), STATE3
+-	vmovdqu (4 * 32)(%rdi), STATE4
 -
 -	/* encrypt message: */
 -	call __load_partial
 -
--	movdqa MSG0, T0
--	movdqa MSG1, T1
--	crypt0 T0, T1
+-	vmovdqa MSG, T0
+-	vpxor STATE0, T0, T0
+-	vpermq $MASK3, STATE1, T1
+-	vpxor T1, T0, T0
+-	vpand STATE2, STATE3, T1
+-	vpxor T1, T0, T0
 -
 -	call __store_partial
 -
--	update0
+-	call __morus1280_update
 -
--	state_store0
+-	/* store the state: */
+-	vmovdqu STATE0, (0 * 32)(%rdi)
+-	vmovdqu STATE1, (1 * 32)(%rdi)
+-	vmovdqu STATE2, (2 * 32)(%rdi)
+-	vmovdqu STATE3, (3 * 32)(%rdi)
+-	vmovdqu STATE4, (4 * 32)(%rdi)
 -
 -	FRAME_END
 -	ret
--ENDPROC(crypto_aegis128l_aesni_enc_tail)
+-ENDPROC(crypto_morus1280_avx2_enc_tail)
 -
 -/*
-- * void crypto_aegis128l_aesni_dec(void *state, unsigned int length,
-- *                                 const void *src, void *dst);
+- * void crypto_morus1280_avx2_dec(void *state, const void *src, void *dst,
+- *                                unsigned int length);
 - */
--ENTRY(crypto_aegis128l_aesni_dec)
+-ENTRY(crypto_morus1280_avx2_dec)
 -	FRAME_BEGIN
 -
--	cmp $0x20, LEN
+-	cmp $32, %rcx
 -	jb .Ldec_out
 -
--	state_load
+-	/* load the state: */
+-	vmovdqu (0 * 32)(%rdi), STATE0
+-	vmovdqu (1 * 32)(%rdi), STATE1
+-	vmovdqu (2 * 32)(%rdi), STATE2
+-	vmovdqu (3 * 32)(%rdi), STATE3
+-	vmovdqu (4 * 32)(%rdi), STATE4
 -
--	mov  SRC, %r8
--	or   DST, %r8
--	and $0xF, %r8
+-	mov %rsi,  %r8
+-	or  %rdx,  %r8
+-	and $0x1F, %r8
 -	jnz .Ldec_u_loop
 -
--.align 8
+-.align 4
 -.Ldec_a_loop:
--	decrypt_block a 0
--	decrypt_block a 1
--	decrypt_block a 2
--	decrypt_block a 3
--	decrypt_block a 4
--	decrypt_block a 5
--	decrypt_block a 6
--	decrypt_block a 7
+-	vmovdqa (%rsi), MSG
+-	vpxor STATE0, MSG, MSG
+-	vpermq $MASK3, STATE1, T0
+-	vpxor T0, MSG, MSG
+-	vpand STATE2, STATE3, T0
+-	vpxor T0, MSG, MSG
+-	vmovdqa MSG, (%rdx)
 -
--	add $0x100, SRC
--	add $0x100, DST
--	jmp .Ldec_a_loop
+-	call __morus1280_update
+-	sub $32, %rcx
+-	add $32, %rsi
+-	add $32, %rdx
+-	cmp $32, %rcx
+-	jge .Ldec_a_loop
 -
--.align 8
+-	jmp .Ldec_cont
+-.align 4
 -.Ldec_u_loop:
--	decrypt_block u 0
--	decrypt_block u 1
--	decrypt_block u 2
--	decrypt_block u 3
--	decrypt_block u 4
--	decrypt_block u 5
--	decrypt_block u 6
--	decrypt_block u 7
+-	vmovdqu (%rsi), MSG
+-	vpxor STATE0, MSG, MSG
+-	vpermq $MASK3, STATE1, T0
+-	vpxor T0, MSG, MSG
+-	vpand STATE2, STATE3, T0
+-	vpxor T0, MSG, MSG
+-	vmovdqu MSG, (%rdx)
 -
--	add $0x100, SRC
--	add $0x100, DST
--	jmp .Ldec_u_loop
+-	call __morus1280_update
+-	sub $32, %rcx
+-	add $32, %rsi
+-	add $32, %rdx
+-	cmp $32, %rcx
+-	jge .Ldec_u_loop
 -
--.Ldec_out_0:
--	state_store0
--	FRAME_END
--	ret
--
--.Ldec_out_1:
--	state_store1
--	FRAME_END
--	ret
--
--.Ldec_out_2:
--	state_store2
--	FRAME_END
--	ret
--
--.Ldec_out_3:
--	state_store3
--	FRAME_END
--	ret
--
--.Ldec_out_4:
--	state_store4
--	FRAME_END
--	ret
--
--.Ldec_out_5:
--	state_store5
--	FRAME_END
--	ret
--
--.Ldec_out_6:
--	state_store6
--	FRAME_END
--	ret
--
--.Ldec_out_7:
--	state_store7
--	FRAME_END
--	ret
+-.Ldec_cont:
+-	/* store the state: */
+-	vmovdqu STATE0, (0 * 32)(%rdi)
+-	vmovdqu STATE1, (1 * 32)(%rdi)
+-	vmovdqu STATE2, (2 * 32)(%rdi)
+-	vmovdqu STATE3, (3 * 32)(%rdi)
+-	vmovdqu STATE4, (4 * 32)(%rdi)
 -
 -.Ldec_out:
 -	FRAME_END
 -	ret
--ENDPROC(crypto_aegis128l_aesni_dec)
+-ENDPROC(crypto_morus1280_avx2_dec)
 -
 -/*
-- * void crypto_aegis128l_aesni_dec_tail(void *state, unsigned int length,
-- *                                      const void *src, void *dst);
+- * void crypto_morus1280_avx2_dec_tail(void *state, const void *src, void *dst,
+- *                                     unsigned int length);
 - */
--ENTRY(crypto_aegis128l_aesni_dec_tail)
+-ENTRY(crypto_morus1280_avx2_dec_tail)
 -	FRAME_BEGIN
 -
--	state_load
+-	/* load the state: */
+-	vmovdqu (0 * 32)(%rdi), STATE0
+-	vmovdqu (1 * 32)(%rdi), STATE1
+-	vmovdqu (2 * 32)(%rdi), STATE2
+-	vmovdqu (3 * 32)(%rdi), STATE3
+-	vmovdqu (4 * 32)(%rdi), STATE4
 -
 -	/* decrypt message: */
 -	call __load_partial
 -
--	crypt0 MSG0, MSG1
+-	vpxor STATE0, MSG, MSG
+-	vpermq $MASK3, STATE1, T0
+-	vpxor T0, MSG, MSG
+-	vpand STATE2, STATE3, T0
+-	vpxor T0, MSG, MSG
+-	vmovdqa MSG, T0
 -
--	movdqa MSG0, T0
--	movdqa MSG1, T1
 -	call __store_partial
 -
 -	/* mask with byte count: */
--	movq LEN, T0
--	punpcklbw T0, T0
--	punpcklbw T0, T0
--	punpcklbw T0, T0
--	punpcklbw T0, T0
--	movdqa T0, T1
--	movdqa .Laegis128l_counter0, T2
--	movdqa .Laegis128l_counter1, T3
--	pcmpgtb T2, T0
--	pcmpgtb T3, T1
--	pand T0, MSG0
--	pand T1, MSG1
+-	movq %rcx, T0_LOW
+-	vpbroadcastb T0_LOW, T0
+-	vmovdqa .Lmorus1280_counter, T1
+-	vpcmpgtb T1, T0, T0
+-	vpand T0, MSG, MSG
 -
--	update0
+-	call __morus1280_update
 -
--	state_store0
+-	/* store the state: */
+-	vmovdqu STATE0, (0 * 32)(%rdi)
+-	vmovdqu STATE1, (1 * 32)(%rdi)
+-	vmovdqu STATE2, (2 * 32)(%rdi)
+-	vmovdqu STATE3, (3 * 32)(%rdi)
+-	vmovdqu STATE4, (4 * 32)(%rdi)
 -
 -	FRAME_END
 -	ret
--ENDPROC(crypto_aegis128l_aesni_dec_tail)
+-ENDPROC(crypto_morus1280_avx2_dec_tail)
 -
 -/*
-- * void crypto_aegis128l_aesni_final(void *state, void *tag_xor,
-- *                                   u64 assoclen, u64 cryptlen);
+- * void crypto_morus1280_avx2_final(void *state, void *tag_xor,
+- *                                  u64 assoclen, u64 cryptlen);
 - */
--ENTRY(crypto_aegis128l_aesni_final)
+-ENTRY(crypto_morus1280_avx2_final)
 -	FRAME_BEGIN
 -
--	state_load
+-	/* load the state: */
+-	vmovdqu (0 * 32)(%rdi), STATE0
+-	vmovdqu (1 * 32)(%rdi), STATE1
+-	vmovdqu (2 * 32)(%rdi), STATE2
+-	vmovdqu (3 * 32)(%rdi), STATE3
+-	vmovdqu (4 * 32)(%rdi), STATE4
+-
+-	/* xor state[0] into state[4]: */
+-	vpxor STATE0, STATE4, STATE4
 -
 -	/* prepare length block: */
--	movq %rdx, MSG0
--	movq %rcx, T0
--	pslldq $8, T0
--	pxor T0, MSG0
--	psllq $3, MSG0 /* multiply by 8 (to get bit count) */
--
--	pxor STATE2, MSG0
--	movdqa MSG0, MSG1
+-	vpxor MSG, MSG, MSG
+-	vpinsrq $0, %rdx, MSG_LOW, MSG_LOW
+-	vpinsrq $1, %rcx, MSG_LOW, MSG_LOW
+-	vpsllq $3, MSG, MSG /* multiply by 8 (to get bit count) */
 -
 -	/* update state: */
--	update0
--	update1
--	update2
--	update3
--	update4
--	update5
--	update6
+-	call __morus1280_update
+-	call __morus1280_update
+-	call __morus1280_update
+-	call __morus1280_update
+-	call __morus1280_update
+-	call __morus1280_update
+-	call __morus1280_update
+-	call __morus1280_update
+-	call __morus1280_update
+-	call __morus1280_update
 -
 -	/* xor tag: */
--	movdqu (%rsi), T0
+-	vmovdqu (%rsi), MSG
 -
--	pxor STATE1, T0
--	pxor STATE2, T0
--	pxor STATE3, T0
--	pxor STATE4, T0
--	pxor STATE5, T0
--	pxor STATE6, T0
--	pxor STATE7, T0
--
--	movdqu T0, (%rsi)
+-	vpxor STATE0, MSG, MSG
+-	vpermq $MASK3, STATE1, T0
+-	vpxor T0, MSG, MSG
+-	vpand STATE2, STATE3, T0
+-	vpxor T0, MSG, MSG
+-	vmovdqu MSG, (%rsi)
 -
 -	FRAME_END
 -	ret
--ENDPROC(crypto_aegis128l_aesni_final)
-diff --git a/arch/x86/crypto/aegis128l-aesni-glue.c b/arch/x86/crypto/aegis128l-aesni-glue.c
+-ENDPROC(crypto_morus1280_avx2_final)
+diff --git a/arch/x86/crypto/morus1280-avx2-glue.c b/arch/x86/crypto/morus1280-avx2-glue.c
 deleted file mode 100644
-index 80d917f7e467..000000000000
---- a/arch/x86/crypto/aegis128l-aesni-glue.c
+index 679627a2a824..000000000000
+--- a/arch/x86/crypto/morus1280-avx2-glue.c
 +++ /dev/null
-@@ -1,297 +0,0 @@
+@@ -1,66 +0,0 @@
 -/*
-- * The AEGIS-128L Authenticated-Encryption Algorithm
-- *   Glue for AES-NI + SSE2 implementation
+- * The MORUS-1280 Authenticated-Encryption Algorithm
+- *   Glue for AVX2 implementation
 - *
-- * Copyright (c) 2017-2018 Ondrej Mosnacek <omosnacek@gmail.com>
+- * Copyright (c) 2016-2018 Ondrej Mosnacek <omosnacek@gmail.com>
 - * Copyright (C) 2017-2018 Red Hat, Inc. All rights reserved.
 - *
 - * This program is free software; you can redistribute it and/or modify it
@@ -980,296 +799,65 @@ index 80d917f7e467..000000000000
 -
 -#include <crypto/internal/aead.h>
 -#include <crypto/internal/simd.h>
--#include <crypto/internal/skcipher.h>
--#include <crypto/scatterwalk.h>
+-#include <crypto/morus1280_glue.h>
 -#include <linux/module.h>
 -#include <asm/fpu/api.h>
 -#include <asm/cpu_device_id.h>
 -
--#define AEGIS128L_BLOCK_ALIGN 16
--#define AEGIS128L_BLOCK_SIZE 32
--#define AEGIS128L_NONCE_SIZE 16
--#define AEGIS128L_STATE_BLOCKS 8
--#define AEGIS128L_KEY_SIZE 16
--#define AEGIS128L_MIN_AUTH_SIZE 8
--#define AEGIS128L_MAX_AUTH_SIZE 16
+-asmlinkage void crypto_morus1280_avx2_init(void *state, const void *key,
+-					   const void *iv);
+-asmlinkage void crypto_morus1280_avx2_ad(void *state, const void *data,
+-					 unsigned int length);
 -
--asmlinkage void crypto_aegis128l_aesni_init(void *state, void *key, void *iv);
+-asmlinkage void crypto_morus1280_avx2_enc(void *state, const void *src,
+-					  void *dst, unsigned int length);
+-asmlinkage void crypto_morus1280_avx2_dec(void *state, const void *src,
+-					  void *dst, unsigned int length);
 -
--asmlinkage void crypto_aegis128l_aesni_ad(
--		void *state, unsigned int length, const void *data);
+-asmlinkage void crypto_morus1280_avx2_enc_tail(void *state, const void *src,
+-					       void *dst, unsigned int length);
+-asmlinkage void crypto_morus1280_avx2_dec_tail(void *state, const void *src,
+-					       void *dst, unsigned int length);
 -
--asmlinkage void crypto_aegis128l_aesni_enc(
--		void *state, unsigned int length, const void *src, void *dst);
+-asmlinkage void crypto_morus1280_avx2_final(void *state, void *tag_xor,
+-					    u64 assoclen, u64 cryptlen);
 -
--asmlinkage void crypto_aegis128l_aesni_dec(
--		void *state, unsigned int length, const void *src, void *dst);
--
--asmlinkage void crypto_aegis128l_aesni_enc_tail(
--		void *state, unsigned int length, const void *src, void *dst);
--
--asmlinkage void crypto_aegis128l_aesni_dec_tail(
--		void *state, unsigned int length, const void *src, void *dst);
--
--asmlinkage void crypto_aegis128l_aesni_final(
--		void *state, void *tag_xor, unsigned int cryptlen,
--		unsigned int assoclen);
--
--struct aegis_block {
--	u8 bytes[AEGIS128L_BLOCK_SIZE] __aligned(AEGIS128L_BLOCK_ALIGN);
--};
--
--struct aegis_state {
--	struct aegis_block blocks[AEGIS128L_STATE_BLOCKS];
--};
--
--struct aegis_ctx {
--	struct aegis_block key;
--};
--
--struct aegis_crypt_ops {
--	int (*skcipher_walk_init)(struct skcipher_walk *walk,
--				  struct aead_request *req, bool atomic);
--
--	void (*crypt_blocks)(void *state, unsigned int length, const void *src,
--			     void *dst);
--	void (*crypt_tail)(void *state, unsigned int length, const void *src,
--			   void *dst);
--};
--
--static void crypto_aegis128l_aesni_process_ad(
--		struct aegis_state *state, struct scatterlist *sg_src,
--		unsigned int assoclen)
--{
--	struct scatter_walk walk;
--	struct aegis_block buf;
--	unsigned int pos = 0;
--
--	scatterwalk_start(&walk, sg_src);
--	while (assoclen != 0) {
--		unsigned int size = scatterwalk_clamp(&walk, assoclen);
--		unsigned int left = size;
--		void *mapped = scatterwalk_map(&walk);
--		const u8 *src = (const u8 *)mapped;
--
--		if (pos + size >= AEGIS128L_BLOCK_SIZE) {
--			if (pos > 0) {
--				unsigned int fill = AEGIS128L_BLOCK_SIZE - pos;
--				memcpy(buf.bytes + pos, src, fill);
--				crypto_aegis128l_aesni_ad(state,
--							  AEGIS128L_BLOCK_SIZE,
--							  buf.bytes);
--				pos = 0;
--				left -= fill;
--				src += fill;
--			}
--
--			crypto_aegis128l_aesni_ad(state, left, src);
--
--			src += left & ~(AEGIS128L_BLOCK_SIZE - 1);
--			left &= AEGIS128L_BLOCK_SIZE - 1;
--		}
--
--		memcpy(buf.bytes + pos, src, left);
--		pos += left;
--		assoclen -= size;
--
--		scatterwalk_unmap(mapped);
--		scatterwalk_advance(&walk, size);
--		scatterwalk_done(&walk, 0, assoclen);
--	}
--
--	if (pos > 0) {
--		memset(buf.bytes + pos, 0, AEGIS128L_BLOCK_SIZE - pos);
--		crypto_aegis128l_aesni_ad(state, AEGIS128L_BLOCK_SIZE, buf.bytes);
--	}
--}
--
--static void crypto_aegis128l_aesni_process_crypt(
--		struct aegis_state *state, struct skcipher_walk *walk,
--		const struct aegis_crypt_ops *ops)
--{
--	while (walk->nbytes >= AEGIS128L_BLOCK_SIZE) {
--		ops->crypt_blocks(state, round_down(walk->nbytes,
--						    AEGIS128L_BLOCK_SIZE),
--				  walk->src.virt.addr, walk->dst.virt.addr);
--		skcipher_walk_done(walk, walk->nbytes % AEGIS128L_BLOCK_SIZE);
--	}
--
--	if (walk->nbytes) {
--		ops->crypt_tail(state, walk->nbytes, walk->src.virt.addr,
--				walk->dst.virt.addr);
--		skcipher_walk_done(walk, 0);
--	}
--}
--
--static struct aegis_ctx *crypto_aegis128l_aesni_ctx(struct crypto_aead *aead)
--{
--	u8 *ctx = crypto_aead_ctx(aead);
--	ctx = PTR_ALIGN(ctx, __alignof__(struct aegis_ctx));
--	return (void *)ctx;
--}
--
--static int crypto_aegis128l_aesni_setkey(struct crypto_aead *aead,
--					 const u8 *key, unsigned int keylen)
--{
--	struct aegis_ctx *ctx = crypto_aegis128l_aesni_ctx(aead);
--
--	if (keylen != AEGIS128L_KEY_SIZE) {
--		crypto_aead_set_flags(aead, CRYPTO_TFM_RES_BAD_KEY_LEN);
--		return -EINVAL;
--	}
--
--	memcpy(ctx->key.bytes, key, AEGIS128L_KEY_SIZE);
--
--	return 0;
--}
--
--static int crypto_aegis128l_aesni_setauthsize(struct crypto_aead *tfm,
--					      unsigned int authsize)
--{
--	if (authsize > AEGIS128L_MAX_AUTH_SIZE)
--		return -EINVAL;
--	if (authsize < AEGIS128L_MIN_AUTH_SIZE)
--		return -EINVAL;
--	return 0;
--}
--
--static void crypto_aegis128l_aesni_crypt(struct aead_request *req,
--					 struct aegis_block *tag_xor,
--					 unsigned int cryptlen,
--					 const struct aegis_crypt_ops *ops)
--{
--	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
--	struct aegis_ctx *ctx = crypto_aegis128l_aesni_ctx(tfm);
--	struct skcipher_walk walk;
--	struct aegis_state state;
--
--	ops->skcipher_walk_init(&walk, req, true);
--
--	kernel_fpu_begin();
--
--	crypto_aegis128l_aesni_init(&state, ctx->key.bytes, req->iv);
--	crypto_aegis128l_aesni_process_ad(&state, req->src, req->assoclen);
--	crypto_aegis128l_aesni_process_crypt(&state, &walk, ops);
--	crypto_aegis128l_aesni_final(&state, tag_xor, req->assoclen, cryptlen);
--
--	kernel_fpu_end();
--}
--
--static int crypto_aegis128l_aesni_encrypt(struct aead_request *req)
--{
--	static const struct aegis_crypt_ops OPS = {
--		.skcipher_walk_init = skcipher_walk_aead_encrypt,
--		.crypt_blocks = crypto_aegis128l_aesni_enc,
--		.crypt_tail = crypto_aegis128l_aesni_enc_tail,
--	};
--
--	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
--	struct aegis_block tag = {};
--	unsigned int authsize = crypto_aead_authsize(tfm);
--	unsigned int cryptlen = req->cryptlen;
--
--	crypto_aegis128l_aesni_crypt(req, &tag, cryptlen, &OPS);
--
--	scatterwalk_map_and_copy(tag.bytes, req->dst,
--				 req->assoclen + cryptlen, authsize, 1);
--	return 0;
--}
--
--static int crypto_aegis128l_aesni_decrypt(struct aead_request *req)
--{
--	static const struct aegis_block zeros = {};
--
--	static const struct aegis_crypt_ops OPS = {
--		.skcipher_walk_init = skcipher_walk_aead_decrypt,
--		.crypt_blocks = crypto_aegis128l_aesni_dec,
--		.crypt_tail = crypto_aegis128l_aesni_dec_tail,
--	};
--
--	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
--	struct aegis_block tag;
--	unsigned int authsize = crypto_aead_authsize(tfm);
--	unsigned int cryptlen = req->cryptlen - authsize;
--
--	scatterwalk_map_and_copy(tag.bytes, req->src,
--				 req->assoclen + cryptlen, authsize, 0);
--
--	crypto_aegis128l_aesni_crypt(req, &tag, cryptlen, &OPS);
--
--	return crypto_memneq(tag.bytes, zeros.bytes, authsize) ? -EBADMSG : 0;
--}
--
--static int crypto_aegis128l_aesni_init_tfm(struct crypto_aead *aead)
--{
--	return 0;
--}
--
--static void crypto_aegis128l_aesni_exit_tfm(struct crypto_aead *aead)
--{
--}
--
--static struct aead_alg crypto_aegis128l_aesni_alg = {
--	.setkey = crypto_aegis128l_aesni_setkey,
--	.setauthsize = crypto_aegis128l_aesni_setauthsize,
--	.encrypt = crypto_aegis128l_aesni_encrypt,
--	.decrypt = crypto_aegis128l_aesni_decrypt,
--	.init = crypto_aegis128l_aesni_init_tfm,
--	.exit = crypto_aegis128l_aesni_exit_tfm,
--
--	.ivsize = AEGIS128L_NONCE_SIZE,
--	.maxauthsize = AEGIS128L_MAX_AUTH_SIZE,
--	.chunksize = AEGIS128L_BLOCK_SIZE,
--
--	.base = {
--		.cra_flags = CRYPTO_ALG_INTERNAL,
--		.cra_blocksize = 1,
--		.cra_ctxsize = sizeof(struct aegis_ctx) +
--			       __alignof__(struct aegis_ctx),
--		.cra_alignmask = 0,
--		.cra_priority = 400,
--
--		.cra_name = "__aegis128l",
--		.cra_driver_name = "__aegis128l-aesni",
--
--		.cra_module = THIS_MODULE,
--	}
--};
+-MORUS1280_DECLARE_ALG(avx2, "morus1280-avx2", 400);
 -
 -static struct simd_aead_alg *simd_alg;
 -
--static int __init crypto_aegis128l_aesni_module_init(void)
+-static int __init crypto_morus1280_avx2_module_init(void)
 -{
--	if (!boot_cpu_has(X86_FEATURE_XMM2) ||
--	    !boot_cpu_has(X86_FEATURE_AES) ||
--	    !cpu_has_xfeatures(XFEATURE_MASK_SSE, NULL))
+-	if (!boot_cpu_has(X86_FEATURE_AVX2) ||
+-	    !boot_cpu_has(X86_FEATURE_OSXSAVE) ||
+-	    !cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM, NULL))
 -		return -ENODEV;
 -
--	return simd_register_aeads_compat(&crypto_aegis128l_aesni_alg, 1,
+-	return simd_register_aeads_compat(&crypto_morus1280_avx2_alg, 1,
 -					  &simd_alg);
 -}
 -
--static void __exit crypto_aegis128l_aesni_module_exit(void)
+-static void __exit crypto_morus1280_avx2_module_exit(void)
 -{
--	simd_unregister_aeads(&crypto_aegis128l_aesni_alg, 1, &simd_alg);
+-	simd_unregister_aeads(&crypto_morus1280_avx2_alg, 1, &simd_alg);
 -}
 -
--module_init(crypto_aegis128l_aesni_module_init);
--module_exit(crypto_aegis128l_aesni_module_exit);
+-module_init(crypto_morus1280_avx2_module_init);
+-module_exit(crypto_morus1280_avx2_module_exit);
 -
 -MODULE_LICENSE("GPL");
 -MODULE_AUTHOR("Ondrej Mosnacek <omosnacek@gmail.com>");
--MODULE_DESCRIPTION("AEGIS-128L AEAD algorithm -- AESNI+SSE2 implementation");
--MODULE_ALIAS_CRYPTO("aegis128l");
--MODULE_ALIAS_CRYPTO("aegis128l-aesni");
-diff --git a/arch/x86/crypto/aegis256-aesni-asm.S b/arch/x86/crypto/aegis256-aesni-asm.S
+-MODULE_DESCRIPTION("MORUS-1280 AEAD algorithm -- AVX2 implementation");
+-MODULE_ALIAS_CRYPTO("morus1280");
+-MODULE_ALIAS_CRYPTO("morus1280-avx2");
+diff --git a/arch/x86/crypto/morus1280-sse2-asm.S b/arch/x86/crypto/morus1280-sse2-asm.S
 deleted file mode 100644
-index 8870c7c5d9a4..000000000000
---- a/arch/x86/crypto/aegis256-aesni-asm.S
+index da5d2905db60..000000000000
+--- a/arch/x86/crypto/morus1280-sse2-asm.S
 +++ /dev/null
-@@ -1,703 +0,0 @@
+@@ -1,896 +0,0 @@
 -/*
-- * AES-NI + SSE2 implementation of AEGIS-128L
+- * SSE2 implementation of MORUS-1280
 - *
 - * Copyright (c) 2017-2018 Ondrej Mosnacek <omosnacek@gmail.com>
 - * Copyright (C) 2017-2018 Red Hat, Inc. All rights reserved.
@@ -1282,45 +870,1287 @@ index 8870c7c5d9a4..000000000000
 -#include <linux/linkage.h>
 -#include <asm/frame.h>
 -
+-#define SHUFFLE_MASK(i0, i1, i2, i3) \
+-	(i0 | (i1 << 2) | (i2 << 4) | (i3 << 6))
+-
+-#define MASK2 SHUFFLE_MASK(2, 3, 0, 1)
+-
+-#define STATE0_LO	%xmm0
+-#define STATE0_HI	%xmm1
+-#define STATE1_LO	%xmm2
+-#define STATE1_HI	%xmm3
+-#define STATE2_LO	%xmm4
+-#define STATE2_HI	%xmm5
+-#define STATE3_LO	%xmm6
+-#define STATE3_HI	%xmm7
+-#define STATE4_LO	%xmm8
+-#define STATE4_HI	%xmm9
+-#define KEY_LO		%xmm10
+-#define KEY_HI		%xmm11
+-#define MSG_LO		%xmm10
+-#define MSG_HI		%xmm11
+-#define T0_LO		%xmm12
+-#define T0_HI		%xmm13
+-#define T1_LO		%xmm14
+-#define T1_HI		%xmm15
+-
+-.section .rodata.cst16.morus640_const, "aM", @progbits, 16
+-.align 16
+-.Lmorus640_const_0:
+-	.byte 0x00, 0x01, 0x01, 0x02, 0x03, 0x05, 0x08, 0x0d
+-	.byte 0x15, 0x22, 0x37, 0x59, 0x90, 0xe9, 0x79, 0x62
+-.Lmorus640_const_1:
+-	.byte 0xdb, 0x3d, 0x18, 0x55, 0x6d, 0xc2, 0x2f, 0xf1
+-	.byte 0x20, 0x11, 0x31, 0x42, 0x73, 0xb5, 0x28, 0xdd
+-
+-.section .rodata.cst16.morus640_counter, "aM", @progbits, 16
+-.align 16
+-.Lmorus640_counter_0:
+-	.byte 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07
+-	.byte 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
+-.Lmorus640_counter_1:
+-	.byte 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17
+-	.byte 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f
+-
+-.text
+-
+-.macro rol1 hi, lo
+-	/*
+-	 * HI_1 | HI_0 || LO_1 | LO_0
+-	 *  ==>
+-	 * HI_0 | HI_1 || LO_1 | LO_0
+-	 *  ==>
+-	 * HI_0 | LO_1 || LO_0 | HI_1
+-	 */
+-	pshufd $MASK2, \hi, \hi
+-	movdqa \hi, T0_LO
+-	punpcklqdq \lo, T0_LO
+-	punpckhqdq \hi, \lo
+-	movdqa \lo, \hi
+-	movdqa T0_LO, \lo
+-.endm
+-
+-.macro rol2 hi, lo
+-	movdqa \lo, T0_LO
+-	movdqa \hi, \lo
+-	movdqa T0_LO, \hi
+-.endm
+-
+-.macro rol3 hi, lo
+-	/*
+-	 * HI_1 | HI_0 || LO_1 | LO_0
+-	 *  ==>
+-	 * HI_0 | HI_1 || LO_1 | LO_0
+-	 *  ==>
+-	 * LO_0 | HI_1 || HI_0 | LO_1
+-	 */
+-	pshufd $MASK2, \hi, \hi
+-	movdqa \lo, T0_LO
+-	punpckhqdq \hi, T0_LO
+-	punpcklqdq \lo, \hi
+-	movdqa T0_LO, \lo
+-.endm
+-
+-.macro morus1280_round s0_l, s0_h, s1_l, s1_h, s2_l, s2_h, s3_l, s3_h, s4_l, s4_h, b, w
+-	movdqa \s1_l, T0_LO
+-	pand \s2_l, T0_LO
+-	pxor T0_LO, \s0_l
+-
+-	movdqa \s1_h, T0_LO
+-	pand \s2_h, T0_LO
+-	pxor T0_LO, \s0_h
+-
+-	pxor \s3_l, \s0_l
+-	pxor \s3_h, \s0_h
+-
+-	movdqa \s0_l, T0_LO
+-	psllq $\b, T0_LO
+-	psrlq $(64 - \b), \s0_l
+-	pxor T0_LO, \s0_l
+-
+-	movdqa \s0_h, T0_LO
+-	psllq $\b, T0_LO
+-	psrlq $(64 - \b), \s0_h
+-	pxor T0_LO, \s0_h
+-
+-	\w \s3_h, \s3_l
+-.endm
+-
+-/*
+- * __morus1280_update: internal ABI
+- * input:
+- *   STATE[0-4] - input state
+- *   MSG        - message block
+- * output:
+- *   STATE[0-4] - output state
+- * changed:
+- *   T0
+- */
+-__morus1280_update:
+-	morus1280_round \
+-		STATE0_LO, STATE0_HI, \
+-		STATE1_LO, STATE1_HI, \
+-		STATE2_LO, STATE2_HI, \
+-		STATE3_LO, STATE3_HI, \
+-		STATE4_LO, STATE4_HI, \
+-		13, rol1
+-	pxor MSG_LO, STATE1_LO
+-	pxor MSG_HI, STATE1_HI
+-	morus1280_round \
+-		STATE1_LO, STATE1_HI, \
+-		STATE2_LO, STATE2_HI, \
+-		STATE3_LO, STATE3_HI, \
+-		STATE4_LO, STATE4_HI, \
+-		STATE0_LO, STATE0_HI, \
+-		46, rol2
+-	pxor MSG_LO, STATE2_LO
+-	pxor MSG_HI, STATE2_HI
+-	morus1280_round \
+-		STATE2_LO, STATE2_HI, \
+-		STATE3_LO, STATE3_HI, \
+-		STATE4_LO, STATE4_HI, \
+-		STATE0_LO, STATE0_HI, \
+-		STATE1_LO, STATE1_HI, \
+-		38, rol3
+-	pxor MSG_LO, STATE3_LO
+-	pxor MSG_HI, STATE3_HI
+-	morus1280_round \
+-		STATE3_LO, STATE3_HI, \
+-		STATE4_LO, STATE4_HI, \
+-		STATE0_LO, STATE0_HI, \
+-		STATE1_LO, STATE1_HI, \
+-		STATE2_LO, STATE2_HI, \
+-		7, rol2
+-	pxor MSG_LO, STATE4_LO
+-	pxor MSG_HI, STATE4_HI
+-	morus1280_round \
+-		STATE4_LO, STATE4_HI, \
+-		STATE0_LO, STATE0_HI, \
+-		STATE1_LO, STATE1_HI, \
+-		STATE2_LO, STATE2_HI, \
+-		STATE3_LO, STATE3_HI, \
+-		4, rol1
+-	ret
+-ENDPROC(__morus1280_update)
+-
+-/*
+- * __morus1280_update_zero: internal ABI
+- * input:
+- *   STATE[0-4] - input state
+- * output:
+- *   STATE[0-4] - output state
+- * changed:
+- *   T0
+- */
+-__morus1280_update_zero:
+-	morus1280_round \
+-		STATE0_LO, STATE0_HI, \
+-		STATE1_LO, STATE1_HI, \
+-		STATE2_LO, STATE2_HI, \
+-		STATE3_LO, STATE3_HI, \
+-		STATE4_LO, STATE4_HI, \
+-		13, rol1
+-	morus1280_round \
+-		STATE1_LO, STATE1_HI, \
+-		STATE2_LO, STATE2_HI, \
+-		STATE3_LO, STATE3_HI, \
+-		STATE4_LO, STATE4_HI, \
+-		STATE0_LO, STATE0_HI, \
+-		46, rol2
+-	morus1280_round \
+-		STATE2_LO, STATE2_HI, \
+-		STATE3_LO, STATE3_HI, \
+-		STATE4_LO, STATE4_HI, \
+-		STATE0_LO, STATE0_HI, \
+-		STATE1_LO, STATE1_HI, \
+-		38, rol3
+-	morus1280_round \
+-		STATE3_LO, STATE3_HI, \
+-		STATE4_LO, STATE4_HI, \
+-		STATE0_LO, STATE0_HI, \
+-		STATE1_LO, STATE1_HI, \
+-		STATE2_LO, STATE2_HI, \
+-		7, rol2
+-	morus1280_round \
+-		STATE4_LO, STATE4_HI, \
+-		STATE0_LO, STATE0_HI, \
+-		STATE1_LO, STATE1_HI, \
+-		STATE2_LO, STATE2_HI, \
+-		STATE3_LO, STATE3_HI, \
+-		4, rol1
+-	ret
+-ENDPROC(__morus1280_update_zero)
+-
+-/*
+- * __load_partial: internal ABI
+- * input:
+- *   %rsi - src
+- *   %rcx - bytes
+- * output:
+- *   MSG  - message block
+- * changed:
+- *   %r8
+- *   %r9
+- */
+-__load_partial:
+-	xor %r9d, %r9d
+-	pxor MSG_LO, MSG_LO
+-	pxor MSG_HI, MSG_HI
+-
+-	mov %rcx, %r8
+-	and $0x1, %r8
+-	jz .Lld_partial_1
+-
+-	mov %rcx, %r8
+-	and $0x1E, %r8
+-	add %rsi, %r8
+-	mov (%r8), %r9b
+-
+-.Lld_partial_1:
+-	mov %rcx, %r8
+-	and $0x2, %r8
+-	jz .Lld_partial_2
+-
+-	mov %rcx, %r8
+-	and $0x1C, %r8
+-	add %rsi, %r8
+-	shl $16, %r9
+-	mov (%r8), %r9w
+-
+-.Lld_partial_2:
+-	mov %rcx, %r8
+-	and $0x4, %r8
+-	jz .Lld_partial_4
+-
+-	mov %rcx, %r8
+-	and $0x18, %r8
+-	add %rsi, %r8
+-	shl $32, %r9
+-	mov (%r8), %r8d
+-	xor %r8, %r9
+-
+-.Lld_partial_4:
+-	movq %r9, MSG_LO
+-
+-	mov %rcx, %r8
+-	and $0x8, %r8
+-	jz .Lld_partial_8
+-
+-	mov %rcx, %r8
+-	and $0x10, %r8
+-	add %rsi, %r8
+-	pslldq $8, MSG_LO
+-	movq (%r8), T0_LO
+-	pxor T0_LO, MSG_LO
+-
+-.Lld_partial_8:
+-	mov %rcx, %r8
+-	and $0x10, %r8
+-	jz .Lld_partial_16
+-
+-	movdqa MSG_LO, MSG_HI
+-	movdqu (%rsi), MSG_LO
+-
+-.Lld_partial_16:
+-	ret
+-ENDPROC(__load_partial)
+-
+-/*
+- * __store_partial: internal ABI
+- * input:
+- *   %rdx - dst
+- *   %rcx - bytes
+- * output:
+- *   T0   - message block
+- * changed:
+- *   %r8
+- *   %r9
+- *   %r10
+- */
+-__store_partial:
+-	mov %rcx, %r8
+-	mov %rdx, %r9
+-
+-	cmp $16, %r8
+-	jl .Lst_partial_16
+-
+-	movdqu T0_LO, (%r9)
+-	movdqa T0_HI, T0_LO
+-
+-	sub $16, %r8
+-	add $16, %r9
+-
+-.Lst_partial_16:
+-	movq T0_LO, %r10
+-
+-	cmp $8, %r8
+-	jl .Lst_partial_8
+-
+-	mov %r10, (%r9)
+-	psrldq $8, T0_LO
+-	movq T0_LO, %r10
+-
+-	sub $8, %r8
+-	add $8, %r9
+-
+-.Lst_partial_8:
+-	cmp $4, %r8
+-	jl .Lst_partial_4
+-
+-	mov %r10d, (%r9)
+-	shr $32, %r10
+-
+-	sub $4, %r8
+-	add $4, %r9
+-
+-.Lst_partial_4:
+-	cmp $2, %r8
+-	jl .Lst_partial_2
+-
+-	mov %r10w, (%r9)
+-	shr $16, %r10
+-
+-	sub $2, %r8
+-	add $2, %r9
+-
+-.Lst_partial_2:
+-	cmp $1, %r8
+-	jl .Lst_partial_1
+-
+-	mov %r10b, (%r9)
+-
+-.Lst_partial_1:
+-	ret
+-ENDPROC(__store_partial)
+-
+-/*
+- * void crypto_morus1280_sse2_init(void *state, const void *key,
+- *                                 const void *iv);
+- */
+-ENTRY(crypto_morus1280_sse2_init)
+-	FRAME_BEGIN
+-
+-	/* load IV: */
+-	pxor STATE0_HI, STATE0_HI
+-	movdqu (%rdx), STATE0_LO
+-	/* load key: */
+-	movdqu  0(%rsi), KEY_LO
+-	movdqu 16(%rsi), KEY_HI
+-	movdqa KEY_LO, STATE1_LO
+-	movdqa KEY_HI, STATE1_HI
+-	/* load all ones: */
+-	pcmpeqd STATE2_LO, STATE2_LO
+-	pcmpeqd STATE2_HI, STATE2_HI
+-	/* load all zeros: */
+-	pxor STATE3_LO, STATE3_LO
+-	pxor STATE3_HI, STATE3_HI
+-	/* load the constant: */
+-	movdqa .Lmorus640_const_0, STATE4_LO
+-	movdqa .Lmorus640_const_1, STATE4_HI
+-
+-	/* update 16 times with zero: */
+-	call __morus1280_update_zero
+-	call __morus1280_update_zero
+-	call __morus1280_update_zero
+-	call __morus1280_update_zero
+-	call __morus1280_update_zero
+-	call __morus1280_update_zero
+-	call __morus1280_update_zero
+-	call __morus1280_update_zero
+-	call __morus1280_update_zero
+-	call __morus1280_update_zero
+-	call __morus1280_update_zero
+-	call __morus1280_update_zero
+-	call __morus1280_update_zero
+-	call __morus1280_update_zero
+-	call __morus1280_update_zero
+-	call __morus1280_update_zero
+-
+-	/* xor-in the key again after updates: */
+-	pxor KEY_LO, STATE1_LO
+-	pxor KEY_HI, STATE1_HI
+-
+-	/* store the state: */
+-	movdqu STATE0_LO, (0 * 16)(%rdi)
+-	movdqu STATE0_HI, (1 * 16)(%rdi)
+-	movdqu STATE1_LO, (2 * 16)(%rdi)
+-	movdqu STATE1_HI, (3 * 16)(%rdi)
+-	movdqu STATE2_LO, (4 * 16)(%rdi)
+-	movdqu STATE2_HI, (5 * 16)(%rdi)
+-	movdqu STATE3_LO, (6 * 16)(%rdi)
+-	movdqu STATE3_HI, (7 * 16)(%rdi)
+-	movdqu STATE4_LO, (8 * 16)(%rdi)
+-	movdqu STATE4_HI, (9 * 16)(%rdi)
+-
+-	FRAME_END
+-	ret
+-ENDPROC(crypto_morus1280_sse2_init)
+-
+-/*
+- * void crypto_morus1280_sse2_ad(void *state, const void *data,
+- *                               unsigned int length);
+- */
+-ENTRY(crypto_morus1280_sse2_ad)
+-	FRAME_BEGIN
+-
+-	cmp $32, %rdx
+-	jb .Lad_out
+-
+-	/* load the state: */
+-	movdqu (0 * 16)(%rdi), STATE0_LO
+-	movdqu (1 * 16)(%rdi), STATE0_HI
+-	movdqu (2 * 16)(%rdi), STATE1_LO
+-	movdqu (3 * 16)(%rdi), STATE1_HI
+-	movdqu (4 * 16)(%rdi), STATE2_LO
+-	movdqu (5 * 16)(%rdi), STATE2_HI
+-	movdqu (6 * 16)(%rdi), STATE3_LO
+-	movdqu (7 * 16)(%rdi), STATE3_HI
+-	movdqu (8 * 16)(%rdi), STATE4_LO
+-	movdqu (9 * 16)(%rdi), STATE4_HI
+-
+-	mov %rsi, %r8
+-	and $0xF, %r8
+-	jnz .Lad_u_loop
+-
+-.align 4
+-.Lad_a_loop:
+-	movdqa  0(%rsi), MSG_LO
+-	movdqa 16(%rsi), MSG_HI
+-	call __morus1280_update
+-	sub $32, %rdx
+-	add $32, %rsi
+-	cmp $32, %rdx
+-	jge .Lad_a_loop
+-
+-	jmp .Lad_cont
+-.align 4
+-.Lad_u_loop:
+-	movdqu  0(%rsi), MSG_LO
+-	movdqu 16(%rsi), MSG_HI
+-	call __morus1280_update
+-	sub $32, %rdx
+-	add $32, %rsi
+-	cmp $32, %rdx
+-	jge .Lad_u_loop
+-
+-.Lad_cont:
+-	/* store the state: */
+-	movdqu STATE0_LO, (0 * 16)(%rdi)
+-	movdqu STATE0_HI, (1 * 16)(%rdi)
+-	movdqu STATE1_LO, (2 * 16)(%rdi)
+-	movdqu STATE1_HI, (3 * 16)(%rdi)
+-	movdqu STATE2_LO, (4 * 16)(%rdi)
+-	movdqu STATE2_HI, (5 * 16)(%rdi)
+-	movdqu STATE3_LO, (6 * 16)(%rdi)
+-	movdqu STATE3_HI, (7 * 16)(%rdi)
+-	movdqu STATE4_LO, (8 * 16)(%rdi)
+-	movdqu STATE4_HI, (9 * 16)(%rdi)
+-
+-.Lad_out:
+-	FRAME_END
+-	ret
+-ENDPROC(crypto_morus1280_sse2_ad)
+-
+-/*
+- * void crypto_morus1280_sse2_enc(void *state, const void *src, void *dst,
+- *                                unsigned int length);
+- */
+-ENTRY(crypto_morus1280_sse2_enc)
+-	FRAME_BEGIN
+-
+-	cmp $32, %rcx
+-	jb .Lenc_out
+-
+-	/* load the state: */
+-	movdqu (0 * 16)(%rdi), STATE0_LO
+-	movdqu (1 * 16)(%rdi), STATE0_HI
+-	movdqu (2 * 16)(%rdi), STATE1_LO
+-	movdqu (3 * 16)(%rdi), STATE1_HI
+-	movdqu (4 * 16)(%rdi), STATE2_LO
+-	movdqu (5 * 16)(%rdi), STATE2_HI
+-	movdqu (6 * 16)(%rdi), STATE3_LO
+-	movdqu (7 * 16)(%rdi), STATE3_HI
+-	movdqu (8 * 16)(%rdi), STATE4_LO
+-	movdqu (9 * 16)(%rdi), STATE4_HI
+-
+-	mov %rsi, %r8
+-	or  %rdx, %r8
+-	and $0xF, %r8
+-	jnz .Lenc_u_loop
+-
+-.align 4
+-.Lenc_a_loop:
+-	movdqa  0(%rsi), MSG_LO
+-	movdqa 16(%rsi), MSG_HI
+-	movdqa STATE1_LO, T1_LO
+-	movdqa STATE1_HI, T1_HI
+-	rol3 T1_HI, T1_LO
+-	movdqa MSG_LO, T0_LO
+-	movdqa MSG_HI, T0_HI
+-	pxor T1_LO, T0_LO
+-	pxor T1_HI, T0_HI
+-	pxor STATE0_LO, T0_LO
+-	pxor STATE0_HI, T0_HI
+-	movdqa STATE2_LO, T1_LO
+-	movdqa STATE2_HI, T1_HI
+-	pand STATE3_LO, T1_LO
+-	pand STATE3_HI, T1_HI
+-	pxor T1_LO, T0_LO
+-	pxor T1_HI, T0_HI
+-	movdqa T0_LO,  0(%rdx)
+-	movdqa T0_HI, 16(%rdx)
+-
+-	call __morus1280_update
+-	sub $32, %rcx
+-	add $32, %rsi
+-	add $32, %rdx
+-	cmp $32, %rcx
+-	jge .Lenc_a_loop
+-
+-	jmp .Lenc_cont
+-.align 4
+-.Lenc_u_loop:
+-	movdqu  0(%rsi), MSG_LO
+-	movdqu 16(%rsi), MSG_HI
+-	movdqa STATE1_LO, T1_LO
+-	movdqa STATE1_HI, T1_HI
+-	rol3 T1_HI, T1_LO
+-	movdqa MSG_LO, T0_LO
+-	movdqa MSG_HI, T0_HI
+-	pxor T1_LO, T0_LO
+-	pxor T1_HI, T0_HI
+-	pxor STATE0_LO, T0_LO
+-	pxor STATE0_HI, T0_HI
+-	movdqa STATE2_LO, T1_LO
+-	movdqa STATE2_HI, T1_HI
+-	pand STATE3_LO, T1_LO
+-	pand STATE3_HI, T1_HI
+-	pxor T1_LO, T0_LO
+-	pxor T1_HI, T0_HI
+-	movdqu T0_LO,  0(%rdx)
+-	movdqu T0_HI, 16(%rdx)
+-
+-	call __morus1280_update
+-	sub $32, %rcx
+-	add $32, %rsi
+-	add $32, %rdx
+-	cmp $32, %rcx
+-	jge .Lenc_u_loop
+-
+-.Lenc_cont:
+-	/* store the state: */
+-	movdqu STATE0_LO, (0 * 16)(%rdi)
+-	movdqu STATE0_HI, (1 * 16)(%rdi)
+-	movdqu STATE1_LO, (2 * 16)(%rdi)
+-	movdqu STATE1_HI, (3 * 16)(%rdi)
+-	movdqu STATE2_LO, (4 * 16)(%rdi)
+-	movdqu STATE2_HI, (5 * 16)(%rdi)
+-	movdqu STATE3_LO, (6 * 16)(%rdi)
+-	movdqu STATE3_HI, (7 * 16)(%rdi)
+-	movdqu STATE4_LO, (8 * 16)(%rdi)
+-	movdqu STATE4_HI, (9 * 16)(%rdi)
+-
+-.Lenc_out:
+-	FRAME_END
+-	ret
+-ENDPROC(crypto_morus1280_sse2_enc)
+-
+-/*
+- * void crypto_morus1280_sse2_enc_tail(void *state, const void *src, void *dst,
+- *                                     unsigned int length);
+- */
+-ENTRY(crypto_morus1280_sse2_enc_tail)
+-	FRAME_BEGIN
+-
+-	/* load the state: */
+-	movdqu (0 * 16)(%rdi), STATE0_LO
+-	movdqu (1 * 16)(%rdi), STATE0_HI
+-	movdqu (2 * 16)(%rdi), STATE1_LO
+-	movdqu (3 * 16)(%rdi), STATE1_HI
+-	movdqu (4 * 16)(%rdi), STATE2_LO
+-	movdqu (5 * 16)(%rdi), STATE2_HI
+-	movdqu (6 * 16)(%rdi), STATE3_LO
+-	movdqu (7 * 16)(%rdi), STATE3_HI
+-	movdqu (8 * 16)(%rdi), STATE4_LO
+-	movdqu (9 * 16)(%rdi), STATE4_HI
+-
+-	/* encrypt message: */
+-	call __load_partial
+-
+-	movdqa STATE1_LO, T1_LO
+-	movdqa STATE1_HI, T1_HI
+-	rol3 T1_HI, T1_LO
+-	movdqa MSG_LO, T0_LO
+-	movdqa MSG_HI, T0_HI
+-	pxor T1_LO, T0_LO
+-	pxor T1_HI, T0_HI
+-	pxor STATE0_LO, T0_LO
+-	pxor STATE0_HI, T0_HI
+-	movdqa STATE2_LO, T1_LO
+-	movdqa STATE2_HI, T1_HI
+-	pand STATE3_LO, T1_LO
+-	pand STATE3_HI, T1_HI
+-	pxor T1_LO, T0_LO
+-	pxor T1_HI, T0_HI
+-
+-	call __store_partial
+-
+-	call __morus1280_update
+-
+-	/* store the state: */
+-	movdqu STATE0_LO, (0 * 16)(%rdi)
+-	movdqu STATE0_HI, (1 * 16)(%rdi)
+-	movdqu STATE1_LO, (2 * 16)(%rdi)
+-	movdqu STATE1_HI, (3 * 16)(%rdi)
+-	movdqu STATE2_LO, (4 * 16)(%rdi)
+-	movdqu STATE2_HI, (5 * 16)(%rdi)
+-	movdqu STATE3_LO, (6 * 16)(%rdi)
+-	movdqu STATE3_HI, (7 * 16)(%rdi)
+-	movdqu STATE4_LO, (8 * 16)(%rdi)
+-	movdqu STATE4_HI, (9 * 16)(%rdi)
+-
+-	FRAME_END
+-	ret
+-ENDPROC(crypto_morus1280_sse2_enc_tail)
+-
+-/*
+- * void crypto_morus1280_sse2_dec(void *state, const void *src, void *dst,
+- *                                unsigned int length);
+- */
+-ENTRY(crypto_morus1280_sse2_dec)
+-	FRAME_BEGIN
+-
+-	cmp $32, %rcx
+-	jb .Ldec_out
+-
+-	/* load the state: */
+-	movdqu (0 * 16)(%rdi), STATE0_LO
+-	movdqu (1 * 16)(%rdi), STATE0_HI
+-	movdqu (2 * 16)(%rdi), STATE1_LO
+-	movdqu (3 * 16)(%rdi), STATE1_HI
+-	movdqu (4 * 16)(%rdi), STATE2_LO
+-	movdqu (5 * 16)(%rdi), STATE2_HI
+-	movdqu (6 * 16)(%rdi), STATE3_LO
+-	movdqu (7 * 16)(%rdi), STATE3_HI
+-	movdqu (8 * 16)(%rdi), STATE4_LO
+-	movdqu (9 * 16)(%rdi), STATE4_HI
+-
+-	mov %rsi, %r8
+-	or  %rdx, %r8
+-	and $0xF, %r8
+-	jnz .Ldec_u_loop
+-
+-.align 4
+-.Ldec_a_loop:
+-	movdqa  0(%rsi), MSG_LO
+-	movdqa 16(%rsi), MSG_HI
+-	pxor STATE0_LO, MSG_LO
+-	pxor STATE0_HI, MSG_HI
+-	movdqa STATE1_LO, T1_LO
+-	movdqa STATE1_HI, T1_HI
+-	rol3 T1_HI, T1_LO
+-	pxor T1_LO, MSG_LO
+-	pxor T1_HI, MSG_HI
+-	movdqa STATE2_LO, T1_LO
+-	movdqa STATE2_HI, T1_HI
+-	pand STATE3_LO, T1_LO
+-	pand STATE3_HI, T1_HI
+-	pxor T1_LO, MSG_LO
+-	pxor T1_HI, MSG_HI
+-	movdqa MSG_LO,  0(%rdx)
+-	movdqa MSG_HI, 16(%rdx)
+-
+-	call __morus1280_update
+-	sub $32, %rcx
+-	add $32, %rsi
+-	add $32, %rdx
+-	cmp $32, %rcx
+-	jge .Ldec_a_loop
+-
+-	jmp .Ldec_cont
+-.align 4
+-.Ldec_u_loop:
+-	movdqu  0(%rsi), MSG_LO
+-	movdqu 16(%rsi), MSG_HI
+-	pxor STATE0_LO, MSG_LO
+-	pxor STATE0_HI, MSG_HI
+-	movdqa STATE1_LO, T1_LO
+-	movdqa STATE1_HI, T1_HI
+-	rol3 T1_HI, T1_LO
+-	pxor T1_LO, MSG_LO
+-	pxor T1_HI, MSG_HI
+-	movdqa STATE2_LO, T1_LO
+-	movdqa STATE2_HI, T1_HI
+-	pand STATE3_LO, T1_LO
+-	pand STATE3_HI, T1_HI
+-	pxor T1_LO, MSG_LO
+-	pxor T1_HI, MSG_HI
+-	movdqu MSG_LO,  0(%rdx)
+-	movdqu MSG_HI, 16(%rdx)
+-
+-	call __morus1280_update
+-	sub $32, %rcx
+-	add $32, %rsi
+-	add $32, %rdx
+-	cmp $32, %rcx
+-	jge .Ldec_u_loop
+-
+-.Ldec_cont:
+-	/* store the state: */
+-	movdqu STATE0_LO, (0 * 16)(%rdi)
+-	movdqu STATE0_HI, (1 * 16)(%rdi)
+-	movdqu STATE1_LO, (2 * 16)(%rdi)
+-	movdqu STATE1_HI, (3 * 16)(%rdi)
+-	movdqu STATE2_LO, (4 * 16)(%rdi)
+-	movdqu STATE2_HI, (5 * 16)(%rdi)
+-	movdqu STATE3_LO, (6 * 16)(%rdi)
+-	movdqu STATE3_HI, (7 * 16)(%rdi)
+-	movdqu STATE4_LO, (8 * 16)(%rdi)
+-	movdqu STATE4_HI, (9 * 16)(%rdi)
+-
+-.Ldec_out:
+-	FRAME_END
+-	ret
+-ENDPROC(crypto_morus1280_sse2_dec)
+-
+-/*
+- * void crypto_morus1280_sse2_dec_tail(void *state, const void *src, void *dst,
+- *                                     unsigned int length);
+- */
+-ENTRY(crypto_morus1280_sse2_dec_tail)
+-	FRAME_BEGIN
+-
+-	/* load the state: */
+-	movdqu (0 * 16)(%rdi), STATE0_LO
+-	movdqu (1 * 16)(%rdi), STATE0_HI
+-	movdqu (2 * 16)(%rdi), STATE1_LO
+-	movdqu (3 * 16)(%rdi), STATE1_HI
+-	movdqu (4 * 16)(%rdi), STATE2_LO
+-	movdqu (5 * 16)(%rdi), STATE2_HI
+-	movdqu (6 * 16)(%rdi), STATE3_LO
+-	movdqu (7 * 16)(%rdi), STATE3_HI
+-	movdqu (8 * 16)(%rdi), STATE4_LO
+-	movdqu (9 * 16)(%rdi), STATE4_HI
+-
+-	/* decrypt message: */
+-	call __load_partial
+-
+-	pxor STATE0_LO, MSG_LO
+-	pxor STATE0_HI, MSG_HI
+-	movdqa STATE1_LO, T1_LO
+-	movdqa STATE1_HI, T1_HI
+-	rol3 T1_HI, T1_LO
+-	pxor T1_LO, MSG_LO
+-	pxor T1_HI, MSG_HI
+-	movdqa STATE2_LO, T1_LO
+-	movdqa STATE2_HI, T1_HI
+-	pand STATE3_LO, T1_LO
+-	pand STATE3_HI, T1_HI
+-	pxor T1_LO, MSG_LO
+-	pxor T1_HI, MSG_HI
+-	movdqa MSG_LO, T0_LO
+-	movdqa MSG_HI, T0_HI
+-
+-	call __store_partial
+-
+-	/* mask with byte count: */
+-	movq %rcx, T0_LO
+-	punpcklbw T0_LO, T0_LO
+-	punpcklbw T0_LO, T0_LO
+-	punpcklbw T0_LO, T0_LO
+-	punpcklbw T0_LO, T0_LO
+-	movdqa T0_LO, T0_HI
+-	movdqa .Lmorus640_counter_0, T1_LO
+-	movdqa .Lmorus640_counter_1, T1_HI
+-	pcmpgtb T1_LO, T0_LO
+-	pcmpgtb T1_HI, T0_HI
+-	pand T0_LO, MSG_LO
+-	pand T0_HI, MSG_HI
+-
+-	call __morus1280_update
+-
+-	/* store the state: */
+-	movdqu STATE0_LO, (0 * 16)(%rdi)
+-	movdqu STATE0_HI, (1 * 16)(%rdi)
+-	movdqu STATE1_LO, (2 * 16)(%rdi)
+-	movdqu STATE1_HI, (3 * 16)(%rdi)
+-	movdqu STATE2_LO, (4 * 16)(%rdi)
+-	movdqu STATE2_HI, (5 * 16)(%rdi)
+-	movdqu STATE3_LO, (6 * 16)(%rdi)
+-	movdqu STATE3_HI, (7 * 16)(%rdi)
+-	movdqu STATE4_LO, (8 * 16)(%rdi)
+-	movdqu STATE4_HI, (9 * 16)(%rdi)
+-
+-	FRAME_END
+-	ret
+-ENDPROC(crypto_morus1280_sse2_dec_tail)
+-
+-/*
+- * void crypto_morus1280_sse2_final(void *state, void *tag_xor,
+- *                                  u64 assoclen, u64 cryptlen);
+- */
+-ENTRY(crypto_morus1280_sse2_final)
+-	FRAME_BEGIN
+-
+-	/* load the state: */
+-	movdqu (0 * 16)(%rdi), STATE0_LO
+-	movdqu (1 * 16)(%rdi), STATE0_HI
+-	movdqu (2 * 16)(%rdi), STATE1_LO
+-	movdqu (3 * 16)(%rdi), STATE1_HI
+-	movdqu (4 * 16)(%rdi), STATE2_LO
+-	movdqu (5 * 16)(%rdi), STATE2_HI
+-	movdqu (6 * 16)(%rdi), STATE3_LO
+-	movdqu (7 * 16)(%rdi), STATE3_HI
+-	movdqu (8 * 16)(%rdi), STATE4_LO
+-	movdqu (9 * 16)(%rdi), STATE4_HI
+-
+-	/* xor state[0] into state[4]: */
+-	pxor STATE0_LO, STATE4_LO
+-	pxor STATE0_HI, STATE4_HI
+-
+-	/* prepare length block: */
+-	movq %rdx, MSG_LO
+-	movq %rcx, T0_LO
+-	pslldq $8, T0_LO
+-	pxor T0_LO, MSG_LO
+-	psllq $3, MSG_LO /* multiply by 8 (to get bit count) */
+-	pxor MSG_HI, MSG_HI
+-
+-	/* update state: */
+-	call __morus1280_update
+-	call __morus1280_update
+-	call __morus1280_update
+-	call __morus1280_update
+-	call __morus1280_update
+-	call __morus1280_update
+-	call __morus1280_update
+-	call __morus1280_update
+-	call __morus1280_update
+-	call __morus1280_update
+-
+-	/* xor tag: */
+-	movdqu  0(%rsi), MSG_LO
+-	movdqu 16(%rsi), MSG_HI
+-
+-	pxor STATE0_LO, MSG_LO
+-	pxor STATE0_HI, MSG_HI
+-	movdqa STATE1_LO, T0_LO
+-	movdqa STATE1_HI, T0_HI
+-	rol3 T0_HI, T0_LO
+-	pxor T0_LO, MSG_LO
+-	pxor T0_HI, MSG_HI
+-	movdqa STATE2_LO, T0_LO
+-	movdqa STATE2_HI, T0_HI
+-	pand STATE3_LO, T0_LO
+-	pand STATE3_HI, T0_HI
+-	pxor T0_LO, MSG_LO
+-	pxor T0_HI, MSG_HI
+-
+-	movdqu MSG_LO,  0(%rsi)
+-	movdqu MSG_HI, 16(%rsi)
+-
+-	FRAME_END
+-	ret
+-ENDPROC(crypto_morus1280_sse2_final)
+diff --git a/arch/x86/crypto/morus1280-sse2-glue.c b/arch/x86/crypto/morus1280-sse2-glue.c
+deleted file mode 100644
+index c35c0638d0bb..000000000000
+--- a/arch/x86/crypto/morus1280-sse2-glue.c
++++ /dev/null
+@@ -1,65 +0,0 @@
+-/*
+- * The MORUS-1280 Authenticated-Encryption Algorithm
+- *   Glue for SSE2 implementation
+- *
+- * Copyright (c) 2016-2018 Ondrej Mosnacek <omosnacek@gmail.com>
+- * Copyright (C) 2017-2018 Red Hat, Inc. All rights reserved.
+- *
+- * This program is free software; you can redistribute it and/or modify it
+- * under the terms of the GNU General Public License as published by the Free
+- * Software Foundation; either version 2 of the License, or (at your option)
+- * any later version.
+- */
+-
+-#include <crypto/internal/aead.h>
+-#include <crypto/internal/simd.h>
+-#include <crypto/morus1280_glue.h>
+-#include <linux/module.h>
+-#include <asm/fpu/api.h>
+-#include <asm/cpu_device_id.h>
+-
+-asmlinkage void crypto_morus1280_sse2_init(void *state, const void *key,
+-					   const void *iv);
+-asmlinkage void crypto_morus1280_sse2_ad(void *state, const void *data,
+-					 unsigned int length);
+-
+-asmlinkage void crypto_morus1280_sse2_enc(void *state, const void *src,
+-					  void *dst, unsigned int length);
+-asmlinkage void crypto_morus1280_sse2_dec(void *state, const void *src,
+-					  void *dst, unsigned int length);
+-
+-asmlinkage void crypto_morus1280_sse2_enc_tail(void *state, const void *src,
+-					       void *dst, unsigned int length);
+-asmlinkage void crypto_morus1280_sse2_dec_tail(void *state, const void *src,
+-					       void *dst, unsigned int length);
+-
+-asmlinkage void crypto_morus1280_sse2_final(void *state, void *tag_xor,
+-					    u64 assoclen, u64 cryptlen);
+-
+-MORUS1280_DECLARE_ALG(sse2, "morus1280-sse2", 350);
+-
+-static struct simd_aead_alg *simd_alg;
+-
+-static int __init crypto_morus1280_sse2_module_init(void)
+-{
+-	if (!boot_cpu_has(X86_FEATURE_XMM2) ||
+-	    !cpu_has_xfeatures(XFEATURE_MASK_SSE, NULL))
+-		return -ENODEV;
+-
+-	return simd_register_aeads_compat(&crypto_morus1280_sse2_alg, 1,
+-					  &simd_alg);
+-}
+-
+-static void __exit crypto_morus1280_sse2_module_exit(void)
+-{
+-	simd_unregister_aeads(&crypto_morus1280_sse2_alg, 1, &simd_alg);
+-}
+-
+-module_init(crypto_morus1280_sse2_module_init);
+-module_exit(crypto_morus1280_sse2_module_exit);
+-
+-MODULE_LICENSE("GPL");
+-MODULE_AUTHOR("Ondrej Mosnacek <omosnacek@gmail.com>");
+-MODULE_DESCRIPTION("MORUS-1280 AEAD algorithm -- SSE2 implementation");
+-MODULE_ALIAS_CRYPTO("morus1280");
+-MODULE_ALIAS_CRYPTO("morus1280-sse2");
+diff --git a/arch/x86/crypto/morus1280_glue.c b/arch/x86/crypto/morus1280_glue.c
+deleted file mode 100644
+index 30fc1bd98ec3..000000000000
+--- a/arch/x86/crypto/morus1280_glue.c
++++ /dev/null
+@@ -1,209 +0,0 @@
+-/*
+- * The MORUS-1280 Authenticated-Encryption Algorithm
+- *   Common x86 SIMD glue skeleton
+- *
+- * Copyright (c) 2016-2018 Ondrej Mosnacek <omosnacek@gmail.com>
+- * Copyright (C) 2017-2018 Red Hat, Inc. All rights reserved.
+- *
+- * This program is free software; you can redistribute it and/or modify it
+- * under the terms of the GNU General Public License as published by the Free
+- * Software Foundation; either version 2 of the License, or (at your option)
+- * any later version.
+- */
+-
+-#include <crypto/internal/aead.h>
+-#include <crypto/internal/skcipher.h>
+-#include <crypto/morus1280_glue.h>
+-#include <crypto/scatterwalk.h>
+-#include <linux/err.h>
+-#include <linux/init.h>
+-#include <linux/kernel.h>
+-#include <linux/module.h>
+-#include <linux/scatterlist.h>
+-#include <asm/fpu/api.h>
+-
+-struct morus1280_state {
+-	struct morus1280_block s[MORUS_STATE_BLOCKS];
+-};
+-
+-struct morus1280_ops {
+-	int (*skcipher_walk_init)(struct skcipher_walk *walk,
+-				  struct aead_request *req, bool atomic);
+-
+-	void (*crypt_blocks)(void *state, const void *src, void *dst,
+-			     unsigned int length);
+-	void (*crypt_tail)(void *state, const void *src, void *dst,
+-			   unsigned int length);
+-};
+-
+-static void crypto_morus1280_glue_process_ad(
+-		struct morus1280_state *state,
+-		const struct morus1280_glue_ops *ops,
+-		struct scatterlist *sg_src, unsigned int assoclen)
+-{
+-	struct scatter_walk walk;
+-	struct morus1280_block buf;
+-	unsigned int pos = 0;
+-
+-	scatterwalk_start(&walk, sg_src);
+-	while (assoclen != 0) {
+-		unsigned int size = scatterwalk_clamp(&walk, assoclen);
+-		unsigned int left = size;
+-		void *mapped = scatterwalk_map(&walk);
+-		const u8 *src = (const u8 *)mapped;
+-
+-		if (pos + size >= MORUS1280_BLOCK_SIZE) {
+-			if (pos > 0) {
+-				unsigned int fill = MORUS1280_BLOCK_SIZE - pos;
+-				memcpy(buf.bytes + pos, src, fill);
+-				ops->ad(state, buf.bytes, MORUS1280_BLOCK_SIZE);
+-				pos = 0;
+-				left -= fill;
+-				src += fill;
+-			}
+-
+-			ops->ad(state, src, left);
+-			src += left & ~(MORUS1280_BLOCK_SIZE - 1);
+-			left &= MORUS1280_BLOCK_SIZE - 1;
+-		}
+-
+-		memcpy(buf.bytes + pos, src, left);
+-
+-		pos += left;
+-		assoclen -= size;
+-		scatterwalk_unmap(mapped);
+-		scatterwalk_advance(&walk, size);
+-		scatterwalk_done(&walk, 0, assoclen);
+-	}
+-
+-	if (pos > 0) {
+-		memset(buf.bytes + pos, 0, MORUS1280_BLOCK_SIZE - pos);
+-		ops->ad(state, buf.bytes, MORUS1280_BLOCK_SIZE);
+-	}
+-}
+-
+-static void crypto_morus1280_glue_process_crypt(struct morus1280_state *state,
+-						struct morus1280_ops ops,
+-						struct skcipher_walk *walk)
+-{
+-	while (walk->nbytes >= MORUS1280_BLOCK_SIZE) {
+-		ops.crypt_blocks(state, walk->src.virt.addr,
+-				 walk->dst.virt.addr,
+-				 round_down(walk->nbytes,
+-					    MORUS1280_BLOCK_SIZE));
+-		skcipher_walk_done(walk, walk->nbytes % MORUS1280_BLOCK_SIZE);
+-	}
+-
+-	if (walk->nbytes) {
+-		ops.crypt_tail(state, walk->src.virt.addr, walk->dst.virt.addr,
+-			       walk->nbytes);
+-		skcipher_walk_done(walk, 0);
+-	}
+-}
+-
+-int crypto_morus1280_glue_setkey(struct crypto_aead *aead, const u8 *key,
+-				 unsigned int keylen)
+-{
+-	struct morus1280_ctx *ctx = crypto_aead_ctx(aead);
+-
+-	if (keylen == MORUS1280_BLOCK_SIZE) {
+-		memcpy(ctx->key.bytes, key, MORUS1280_BLOCK_SIZE);
+-	} else if (keylen == MORUS1280_BLOCK_SIZE / 2) {
+-		memcpy(ctx->key.bytes, key, keylen);
+-		memcpy(ctx->key.bytes + keylen, key, keylen);
+-	} else {
+-		crypto_aead_set_flags(aead, CRYPTO_TFM_RES_BAD_KEY_LEN);
+-		return -EINVAL;
+-	}
+-
+-	return 0;
+-}
+-EXPORT_SYMBOL_GPL(crypto_morus1280_glue_setkey);
+-
+-int crypto_morus1280_glue_setauthsize(struct crypto_aead *tfm,
+-				      unsigned int authsize)
+-{
+-	return (authsize <= MORUS_MAX_AUTH_SIZE) ? 0 : -EINVAL;
+-}
+-EXPORT_SYMBOL_GPL(crypto_morus1280_glue_setauthsize);
+-
+-static void crypto_morus1280_glue_crypt(struct aead_request *req,
+-					struct morus1280_ops ops,
+-					unsigned int cryptlen,
+-					struct morus1280_block *tag_xor)
+-{
+-	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
+-	struct morus1280_ctx *ctx = crypto_aead_ctx(tfm);
+-	struct morus1280_state state;
+-	struct skcipher_walk walk;
+-
+-	ops.skcipher_walk_init(&walk, req, true);
+-
+-	kernel_fpu_begin();
+-
+-	ctx->ops->init(&state, &ctx->key, req->iv);
+-	crypto_morus1280_glue_process_ad(&state, ctx->ops, req->src, req->assoclen);
+-	crypto_morus1280_glue_process_crypt(&state, ops, &walk);
+-	ctx->ops->final(&state, tag_xor, req->assoclen, cryptlen);
+-
+-	kernel_fpu_end();
+-}
+-
+-int crypto_morus1280_glue_encrypt(struct aead_request *req)
+-{
+-	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
+-	struct morus1280_ctx *ctx = crypto_aead_ctx(tfm);
+-	struct morus1280_ops OPS = {
+-		.skcipher_walk_init = skcipher_walk_aead_encrypt,
+-		.crypt_blocks = ctx->ops->enc,
+-		.crypt_tail = ctx->ops->enc_tail,
+-	};
+-
+-	struct morus1280_block tag = {};
+-	unsigned int authsize = crypto_aead_authsize(tfm);
+-	unsigned int cryptlen = req->cryptlen;
+-
+-	crypto_morus1280_glue_crypt(req, OPS, cryptlen, &tag);
+-
+-	scatterwalk_map_and_copy(tag.bytes, req->dst,
+-				 req->assoclen + cryptlen, authsize, 1);
+-	return 0;
+-}
+-EXPORT_SYMBOL_GPL(crypto_morus1280_glue_encrypt);
+-
+-int crypto_morus1280_glue_decrypt(struct aead_request *req)
+-{
+-	static const u8 zeros[MORUS1280_BLOCK_SIZE] = {};
+-
+-	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
+-	struct morus1280_ctx *ctx = crypto_aead_ctx(tfm);
+-	struct morus1280_ops OPS = {
+-		.skcipher_walk_init = skcipher_walk_aead_decrypt,
+-		.crypt_blocks = ctx->ops->dec,
+-		.crypt_tail = ctx->ops->dec_tail,
+-	};
+-
+-	struct morus1280_block tag;
+-	unsigned int authsize = crypto_aead_authsize(tfm);
+-	unsigned int cryptlen = req->cryptlen - authsize;
+-
+-	scatterwalk_map_and_copy(tag.bytes, req->src,
+-				 req->assoclen + cryptlen, authsize, 0);
+-
+-	crypto_morus1280_glue_crypt(req, OPS, cryptlen, &tag);
+-
+-	return crypto_memneq(tag.bytes, zeros, authsize) ? -EBADMSG : 0;
+-}
+-EXPORT_SYMBOL_GPL(crypto_morus1280_glue_decrypt);
+-
+-void crypto_morus1280_glue_init_ops(struct crypto_aead *aead,
+-				    const struct morus1280_glue_ops *ops)
+-{
+-	struct morus1280_ctx *ctx = crypto_aead_ctx(aead);
+-	ctx->ops = ops;
+-}
+-EXPORT_SYMBOL_GPL(crypto_morus1280_glue_init_ops);
+-
+-MODULE_LICENSE("GPL");
+-MODULE_AUTHOR("Ondrej Mosnacek <omosnacek@gmail.com>");
+-MODULE_DESCRIPTION("MORUS-1280 AEAD mode -- glue for x86 optimizations");
+diff --git a/arch/x86/crypto/morus640-sse2-asm.S b/arch/x86/crypto/morus640-sse2-asm.S
+deleted file mode 100644
+index 414db480250e..000000000000
+--- a/arch/x86/crypto/morus640-sse2-asm.S
++++ /dev/null
+@@ -1,615 +0,0 @@
+-/*
+- * SSE2 implementation of MORUS-640
+- *
+- * Copyright (c) 2017-2018 Ondrej Mosnacek <omosnacek@gmail.com>
+- * Copyright (C) 2017-2018 Red Hat, Inc. All rights reserved.
+- *
+- * This program is free software; you can redistribute it and/or modify it
+- * under the terms of the GNU General Public License version 2 as published
+- * by the Free Software Foundation.
+- */
+-
+-#include <linux/linkage.h>
+-#include <asm/frame.h>
+-
+-#define SHUFFLE_MASK(i0, i1, i2, i3) \
+-	(i0 | (i1 << 2) | (i2 << 4) | (i3 << 6))
+-
+-#define MASK1 SHUFFLE_MASK(3, 0, 1, 2)
+-#define MASK2 SHUFFLE_MASK(2, 3, 0, 1)
+-#define MASK3 SHUFFLE_MASK(1, 2, 3, 0)
+-
 -#define STATE0	%xmm0
 -#define STATE1	%xmm1
 -#define STATE2	%xmm2
 -#define STATE3	%xmm3
 -#define STATE4	%xmm4
--#define STATE5	%xmm5
--#define MSG	%xmm6
--#define T0	%xmm7
--#define T1	%xmm8
--#define T2	%xmm9
--#define T3	%xmm10
+-#define KEY	%xmm5
+-#define MSG	%xmm5
+-#define T0	%xmm6
+-#define T1	%xmm7
 -
--#define STATEP	%rdi
--#define LEN	%rsi
--#define SRC	%rdx
--#define DST	%rcx
--
--.section .rodata.cst16.aegis256_const, "aM", @progbits, 32
+-.section .rodata.cst16.morus640_const, "aM", @progbits, 32
 -.align 16
--.Laegis256_const_0:
+-.Lmorus640_const_0:
 -	.byte 0x00, 0x01, 0x01, 0x02, 0x03, 0x05, 0x08, 0x0d
 -	.byte 0x15, 0x22, 0x37, 0x59, 0x90, 0xe9, 0x79, 0x62
--.Laegis256_const_1:
+-.Lmorus640_const_1:
 -	.byte 0xdb, 0x3d, 0x18, 0x55, 0x6d, 0xc2, 0x2f, 0xf1
 -	.byte 0x20, 0x11, 0x31, 0x42, 0x73, 0xb5, 0x28, 0xdd
 -
--.section .rodata.cst16.aegis256_counter, "aM", @progbits, 16
+-.section .rodata.cst16.morus640_counter, "aM", @progbits, 16
 -.align 16
--.Laegis256_counter:
+-.Lmorus640_counter:
 -	.byte 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07
 -	.byte 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f
 -
 -.text
 -
+-.macro morus640_round s0, s1, s2, s3, s4, b, w
+-	movdqa \s1, T0
+-	pand \s2, T0
+-	pxor T0, \s0
+-	pxor \s3, \s0
+-	movdqa \s0, T0
+-	pslld $\b, T0
+-	psrld $(32 - \b), \s0
+-	pxor T0, \s0
+-	pshufd $\w, \s3, \s3
+-.endm
+-
+-/*
+- * __morus640_update: internal ABI
+- * input:
+- *   STATE[0-4] - input state
+- *   MSG        - message block
+- * output:
+- *   STATE[0-4] - output state
+- * changed:
+- *   T0
+- */
+-__morus640_update:
+-	morus640_round STATE0, STATE1, STATE2, STATE3, STATE4,  5, MASK1
+-	pxor MSG, STATE1
+-	morus640_round STATE1, STATE2, STATE3, STATE4, STATE0, 31, MASK2
+-	pxor MSG, STATE2
+-	morus640_round STATE2, STATE3, STATE4, STATE0, STATE1,  7, MASK3
+-	pxor MSG, STATE3
+-	morus640_round STATE3, STATE4, STATE0, STATE1, STATE2, 22, MASK2
+-	pxor MSG, STATE4
+-	morus640_round STATE4, STATE0, STATE1, STATE2, STATE3, 13, MASK1
+-	ret
+-ENDPROC(__morus640_update)
+-
+-
+-/*
+- * __morus640_update_zero: internal ABI
+- * input:
+- *   STATE[0-4] - input state
+- * output:
+- *   STATE[0-4] - output state
+- * changed:
+- *   T0
+- */
+-__morus640_update_zero:
+-	morus640_round STATE0, STATE1, STATE2, STATE3, STATE4,  5, MASK1
+-	morus640_round STATE1, STATE2, STATE3, STATE4, STATE0, 31, MASK2
+-	morus640_round STATE2, STATE3, STATE4, STATE0, STATE1,  7, MASK3
+-	morus640_round STATE3, STATE4, STATE0, STATE1, STATE2, 22, MASK2
+-	morus640_round STATE4, STATE0, STATE1, STATE2, STATE3, 13, MASK1
+-	ret
+-ENDPROC(__morus640_update_zero)
+-
 -/*
 - * __load_partial: internal ABI
 - * input:
-- *   LEN - bytes
-- *   SRC - src
+- *   %rsi - src
+- *   %rcx - bytes
 - * output:
 - *   MSG  - message block
 - * changed:
@@ -1332,34 +2162,34 @@ index 8870c7c5d9a4..000000000000
 -	xor %r9d, %r9d
 -	pxor MSG, MSG
 -
--	mov LEN, %r8
+-	mov %rcx, %r8
 -	and $0x1, %r8
 -	jz .Lld_partial_1
 -
--	mov LEN, %r8
+-	mov %rcx, %r8
 -	and $0x1E, %r8
--	add SRC, %r8
+-	add %rsi, %r8
 -	mov (%r8), %r9b
 -
 -.Lld_partial_1:
--	mov LEN, %r8
+-	mov %rcx, %r8
 -	and $0x2, %r8
 -	jz .Lld_partial_2
 -
--	mov LEN, %r8
+-	mov %rcx, %r8
 -	and $0x1C, %r8
--	add SRC, %r8
--	shl $0x10, %r9
+-	add %rsi, %r8
+-	shl $16, %r9
 -	mov (%r8), %r9w
 -
 -.Lld_partial_2:
--	mov LEN, %r8
+-	mov %rcx, %r8
 -	and $0x4, %r8
 -	jz .Lld_partial_4
 -
--	mov LEN, %r8
+-	mov %rcx, %r8
 -	and $0x18, %r8
--	add SRC, %r8
+-	add %rsi, %r8
 -	shl $32, %r9
 -	mov (%r8), %r8d
 -	xor %r8, %r9
@@ -1367,13 +2197,13 @@ index 8870c7c5d9a4..000000000000
 -.Lld_partial_4:
 -	movq %r9, MSG
 -
--	mov LEN, %r8
+-	mov %rcx, %r8
 -	and $0x8, %r8
 -	jz .Lld_partial_8
 -
--	mov LEN, %r8
+-	mov %rcx, %r8
 -	and $0x10, %r8
--	add SRC, %r8
+-	add %rsi, %r8
 -	pslldq $8, MSG
 -	movq (%r8), T0
 -	pxor T0, MSG
@@ -1385,8 +2215,8 @@ index 8870c7c5d9a4..000000000000
 -/*
 - * __store_partial: internal ABI
 - * input:
-- *   LEN - bytes
-- *   DST - dst
+- *   %rdx - dst
+- *   %rcx - bytes
 - * output:
 - *   T0   - message block
 - * changed:
@@ -1395,8 +2225,8 @@ index 8870c7c5d9a4..000000000000
 - *   %r10
 - */
 -__store_partial:
--	mov LEN, %r8
--	mov DST, %r9
+-	mov %rcx, %r8
+-	mov %rdx, %r9
 -
 -	movq T0, %r10
 -
@@ -1425,7 +2255,7 @@ index 8870c7c5d9a4..000000000000
 -	jl .Lst_partial_2
 -
 -	mov %r10w, (%r9)
--	shr $0x10, %r10
+-	shr $16, %r10
 -
 -	sub $2, %r8
 -	add $2, %r9
@@ -1440,503 +2270,360 @@ index 8870c7c5d9a4..000000000000
 -	ret
 -ENDPROC(__store_partial)
 -
--.macro update
--	movdqa STATE5, T0
--	aesenc STATE0, STATE5
--	aesenc STATE1, STATE0
--	aesenc STATE2, STATE1
--	aesenc STATE3, STATE2
--	aesenc STATE4, STATE3
--	aesenc T0,     STATE4
--.endm
--
--.macro update0 m
--	update
--	pxor \m, STATE5
--.endm
--
--.macro update1 m
--	update
--	pxor \m, STATE4
--.endm
--
--.macro update2 m
--	update
--	pxor \m, STATE3
--.endm
--
--.macro update3 m
--	update
--	pxor \m, STATE2
--.endm
--
--.macro update4 m
--	update
--	pxor \m, STATE1
--.endm
--
--.macro update5 m
--	update
--	pxor \m, STATE0
--.endm
--
--.macro state_load
--	movdqu 0x00(STATEP), STATE0
--	movdqu 0x10(STATEP), STATE1
--	movdqu 0x20(STATEP), STATE2
--	movdqu 0x30(STATEP), STATE3
--	movdqu 0x40(STATEP), STATE4
--	movdqu 0x50(STATEP), STATE5
--.endm
--
--.macro state_store s0 s1 s2 s3 s4 s5
--	movdqu \s5, 0x00(STATEP)
--	movdqu \s0, 0x10(STATEP)
--	movdqu \s1, 0x20(STATEP)
--	movdqu \s2, 0x30(STATEP)
--	movdqu \s3, 0x40(STATEP)
--	movdqu \s4, 0x50(STATEP)
--.endm
--
--.macro state_store0
--	state_store STATE0 STATE1 STATE2 STATE3 STATE4 STATE5
--.endm
--
--.macro state_store1
--	state_store STATE5 STATE0 STATE1 STATE2 STATE3 STATE4
--.endm
--
--.macro state_store2
--	state_store STATE4 STATE5 STATE0 STATE1 STATE2 STATE3
--.endm
--
--.macro state_store3
--	state_store STATE3 STATE4 STATE5 STATE0 STATE1 STATE2
--.endm
--
--.macro state_store4
--	state_store STATE2 STATE3 STATE4 STATE5 STATE0 STATE1
--.endm
--
--.macro state_store5
--	state_store STATE1 STATE2 STATE3 STATE4 STATE5 STATE0
--.endm
--
 -/*
-- * void crypto_aegis256_aesni_init(void *state, const void *key, const void *iv);
+- * void crypto_morus640_sse2_init(void *state, const void *key, const void *iv);
 - */
--ENTRY(crypto_aegis256_aesni_init)
+-ENTRY(crypto_morus640_sse2_init)
 -	FRAME_BEGIN
--
--	/* load key: */
--	movdqa 0x00(%rsi), MSG
--	movdqa 0x10(%rsi), T1
--	movdqa MSG, STATE4
--	movdqa T1, STATE5
 -
 -	/* load IV: */
--	movdqu 0x00(%rdx), T2
--	movdqu 0x10(%rdx), T3
--	pxor MSG, T2
--	pxor T1, T3
--	movdqa T2, STATE0
--	movdqa T3, STATE1
--
+-	movdqu (%rdx), STATE0
+-	/* load key: */
+-	movdqu (%rsi), KEY
+-	movdqa KEY, STATE1
+-	/* load all ones: */
+-	pcmpeqd STATE2, STATE2
 -	/* load the constants: */
--	movdqa .Laegis256_const_0, STATE3
--	movdqa .Laegis256_const_1, STATE2
--	pxor STATE3, STATE4
--	pxor STATE2, STATE5
+-	movdqa .Lmorus640_const_0, STATE3
+-	movdqa .Lmorus640_const_1, STATE4
 -
--	/* update 10 times with IV and KEY: */
--	update0 MSG
--	update1 T1
--	update2 T2
--	update3 T3
--	update4 MSG
--	update5 T1
--	update0 T2
--	update1 T3
--	update2 MSG
--	update3 T1
--	update4 T2
--	update5 T3
--	update0 MSG
--	update1 T1
--	update2 T2
--	update3 T3
+-	/* update 16 times with zero: */
+-	call __morus640_update_zero
+-	call __morus640_update_zero
+-	call __morus640_update_zero
+-	call __morus640_update_zero
+-	call __morus640_update_zero
+-	call __morus640_update_zero
+-	call __morus640_update_zero
+-	call __morus640_update_zero
+-	call __morus640_update_zero
+-	call __morus640_update_zero
+-	call __morus640_update_zero
+-	call __morus640_update_zero
+-	call __morus640_update_zero
+-	call __morus640_update_zero
+-	call __morus640_update_zero
+-	call __morus640_update_zero
 -
--	state_store3
+-	/* xor-in the key again after updates: */
+-	pxor KEY, STATE1
+-
+-	/* store the state: */
+-	movdqu STATE0, (0 * 16)(%rdi)
+-	movdqu STATE1, (1 * 16)(%rdi)
+-	movdqu STATE2, (2 * 16)(%rdi)
+-	movdqu STATE3, (3 * 16)(%rdi)
+-	movdqu STATE4, (4 * 16)(%rdi)
 -
 -	FRAME_END
 -	ret
--ENDPROC(crypto_aegis256_aesni_init)
--
--.macro ad_block a i
--	movdq\a (\i * 0x10)(SRC), MSG
--	update\i MSG
--	sub $0x10, LEN
--	cmp $0x10, LEN
--	jl .Lad_out_\i
--.endm
+-ENDPROC(crypto_morus640_sse2_init)
 -
 -/*
-- * void crypto_aegis256_aesni_ad(void *state, unsigned int length,
-- *                               const void *data);
+- * void crypto_morus640_sse2_ad(void *state, const void *data,
+- *                              unsigned int length);
 - */
--ENTRY(crypto_aegis256_aesni_ad)
+-ENTRY(crypto_morus640_sse2_ad)
 -	FRAME_BEGIN
 -
--	cmp $0x10, LEN
+-	cmp $16, %rdx
 -	jb .Lad_out
 -
--	state_load
+-	/* load the state: */
+-	movdqu (0 * 16)(%rdi), STATE0
+-	movdqu (1 * 16)(%rdi), STATE1
+-	movdqu (2 * 16)(%rdi), STATE2
+-	movdqu (3 * 16)(%rdi), STATE3
+-	movdqu (4 * 16)(%rdi), STATE4
 -
--	mov  SRC, %r8
--	and $0xf, %r8
+-	mov %rsi, %r8
+-	and $0xF, %r8
 -	jnz .Lad_u_loop
 -
--.align 8
+-.align 4
 -.Lad_a_loop:
--	ad_block a 0
--	ad_block a 1
--	ad_block a 2
--	ad_block a 3
--	ad_block a 4
--	ad_block a 5
+-	movdqa (%rsi), MSG
+-	call __morus640_update
+-	sub $16, %rdx
+-	add $16, %rsi
+-	cmp $16, %rdx
+-	jge .Lad_a_loop
 -
--	add $0x60, SRC
--	jmp .Lad_a_loop
--
--.align 8
+-	jmp .Lad_cont
+-.align 4
 -.Lad_u_loop:
--	ad_block u 0
--	ad_block u 1
--	ad_block u 2
--	ad_block u 3
--	ad_block u 4
--	ad_block u 5
+-	movdqu (%rsi), MSG
+-	call __morus640_update
+-	sub $16, %rdx
+-	add $16, %rsi
+-	cmp $16, %rdx
+-	jge .Lad_u_loop
 -
--	add $0x60, SRC
--	jmp .Lad_u_loop
--
--.Lad_out_0:
--	state_store0
--	FRAME_END
--	ret
--
--.Lad_out_1:
--	state_store1
--	FRAME_END
--	ret
--
--.Lad_out_2:
--	state_store2
--	FRAME_END
--	ret
--
--.Lad_out_3:
--	state_store3
--	FRAME_END
--	ret
--
--.Lad_out_4:
--	state_store4
--	FRAME_END
--	ret
--
--.Lad_out_5:
--	state_store5
--	FRAME_END
--	ret
+-.Lad_cont:
+-	/* store the state: */
+-	movdqu STATE0, (0 * 16)(%rdi)
+-	movdqu STATE1, (1 * 16)(%rdi)
+-	movdqu STATE2, (2 * 16)(%rdi)
+-	movdqu STATE3, (3 * 16)(%rdi)
+-	movdqu STATE4, (4 * 16)(%rdi)
 -
 -.Lad_out:
 -	FRAME_END
 -	ret
--ENDPROC(crypto_aegis256_aesni_ad)
--
--.macro crypt m s0 s1 s2 s3 s4 s5
--	pxor \s1, \m
--	pxor \s4, \m
--	pxor \s5, \m
--	movdqa \s2, T3
--	pand \s3, T3
--	pxor T3, \m
--.endm
--
--.macro crypt0 m
--	crypt \m STATE0 STATE1 STATE2 STATE3 STATE4 STATE5
--.endm
--
--.macro crypt1 m
--	crypt \m STATE5 STATE0 STATE1 STATE2 STATE3 STATE4
--.endm
--
--.macro crypt2 m
--	crypt \m STATE4 STATE5 STATE0 STATE1 STATE2 STATE3
--.endm
--
--.macro crypt3 m
--	crypt \m STATE3 STATE4 STATE5 STATE0 STATE1 STATE2
--.endm
--
--.macro crypt4 m
--	crypt \m STATE2 STATE3 STATE4 STATE5 STATE0 STATE1
--.endm
--
--.macro crypt5 m
--	crypt \m STATE1 STATE2 STATE3 STATE4 STATE5 STATE0
--.endm
--
--.macro encrypt_block a i
--	movdq\a (\i * 0x10)(SRC), MSG
--	movdqa MSG, T0
--	crypt\i T0
--	movdq\a T0, (\i * 0x10)(DST)
--
--	update\i MSG
--
--	sub $0x10, LEN
--	cmp $0x10, LEN
--	jl .Lenc_out_\i
--.endm
--
--.macro decrypt_block a i
--	movdq\a (\i * 0x10)(SRC), MSG
--	crypt\i MSG
--	movdq\a MSG, (\i * 0x10)(DST)
--
--	update\i MSG
--
--	sub $0x10, LEN
--	cmp $0x10, LEN
--	jl .Ldec_out_\i
--.endm
+-ENDPROC(crypto_morus640_sse2_ad)
 -
 -/*
-- * void crypto_aegis256_aesni_enc(void *state, unsigned int length,
-- *                                const void *src, void *dst);
+- * void crypto_morus640_sse2_enc(void *state, const void *src, void *dst,
+- *                               unsigned int length);
 - */
--ENTRY(crypto_aegis256_aesni_enc)
+-ENTRY(crypto_morus640_sse2_enc)
 -	FRAME_BEGIN
 -
--	cmp $0x10, LEN
+-	cmp $16, %rcx
 -	jb .Lenc_out
 -
--	state_load
+-	/* load the state: */
+-	movdqu (0 * 16)(%rdi), STATE0
+-	movdqu (1 * 16)(%rdi), STATE1
+-	movdqu (2 * 16)(%rdi), STATE2
+-	movdqu (3 * 16)(%rdi), STATE3
+-	movdqu (4 * 16)(%rdi), STATE4
 -
--	mov  SRC, %r8
--	or   DST, %r8
--	and $0xf, %r8
+-	mov %rsi, %r8
+-	or  %rdx, %r8
+-	and $0xF, %r8
 -	jnz .Lenc_u_loop
 -
--.align 8
+-.align 4
 -.Lenc_a_loop:
--	encrypt_block a 0
--	encrypt_block a 1
--	encrypt_block a 2
--	encrypt_block a 3
--	encrypt_block a 4
--	encrypt_block a 5
+-	movdqa (%rsi), MSG
+-	movdqa MSG, T0
+-	pxor STATE0, T0
+-	pshufd $MASK3, STATE1, T1
+-	pxor T1, T0
+-	movdqa STATE2, T1
+-	pand STATE3, T1
+-	pxor T1, T0
+-	movdqa T0, (%rdx)
 -
--	add $0x60, SRC
--	add $0x60, DST
--	jmp .Lenc_a_loop
+-	call __morus640_update
+-	sub $16, %rcx
+-	add $16, %rsi
+-	add $16, %rdx
+-	cmp $16, %rcx
+-	jge .Lenc_a_loop
 -
--.align 8
+-	jmp .Lenc_cont
+-.align 4
 -.Lenc_u_loop:
--	encrypt_block u 0
--	encrypt_block u 1
--	encrypt_block u 2
--	encrypt_block u 3
--	encrypt_block u 4
--	encrypt_block u 5
+-	movdqu (%rsi), MSG
+-	movdqa MSG, T0
+-	pxor STATE0, T0
+-	pshufd $MASK3, STATE1, T1
+-	pxor T1, T0
+-	movdqa STATE2, T1
+-	pand STATE3, T1
+-	pxor T1, T0
+-	movdqu T0, (%rdx)
 -
--	add $0x60, SRC
--	add $0x60, DST
--	jmp .Lenc_u_loop
+-	call __morus640_update
+-	sub $16, %rcx
+-	add $16, %rsi
+-	add $16, %rdx
+-	cmp $16, %rcx
+-	jge .Lenc_u_loop
 -
--.Lenc_out_0:
--	state_store0
--	FRAME_END
--	ret
--
--.Lenc_out_1:
--	state_store1
--	FRAME_END
--	ret
--
--.Lenc_out_2:
--	state_store2
--	FRAME_END
--	ret
--
--.Lenc_out_3:
--	state_store3
--	FRAME_END
--	ret
--
--.Lenc_out_4:
--	state_store4
--	FRAME_END
--	ret
--
--.Lenc_out_5:
--	state_store5
--	FRAME_END
--	ret
+-.Lenc_cont:
+-	/* store the state: */
+-	movdqu STATE0, (0 * 16)(%rdi)
+-	movdqu STATE1, (1 * 16)(%rdi)
+-	movdqu STATE2, (2 * 16)(%rdi)
+-	movdqu STATE3, (3 * 16)(%rdi)
+-	movdqu STATE4, (4 * 16)(%rdi)
 -
 -.Lenc_out:
 -	FRAME_END
 -	ret
--ENDPROC(crypto_aegis256_aesni_enc)
+-ENDPROC(crypto_morus640_sse2_enc)
 -
 -/*
-- * void crypto_aegis256_aesni_enc_tail(void *state, unsigned int length,
-- *                                     const void *src, void *dst);
+- * void crypto_morus640_sse2_enc_tail(void *state, const void *src, void *dst,
+- *                                    unsigned int length);
 - */
--ENTRY(crypto_aegis256_aesni_enc_tail)
+-ENTRY(crypto_morus640_sse2_enc_tail)
 -	FRAME_BEGIN
 -
--	state_load
+-	/* load the state: */
+-	movdqu (0 * 16)(%rdi), STATE0
+-	movdqu (1 * 16)(%rdi), STATE1
+-	movdqu (2 * 16)(%rdi), STATE2
+-	movdqu (3 * 16)(%rdi), STATE3
+-	movdqu (4 * 16)(%rdi), STATE4
 -
 -	/* encrypt message: */
 -	call __load_partial
 -
 -	movdqa MSG, T0
--	crypt0 T0
+-	pxor STATE0, T0
+-	pshufd $MASK3, STATE1, T1
+-	pxor T1, T0
+-	movdqa STATE2, T1
+-	pand STATE3, T1
+-	pxor T1, T0
 -
 -	call __store_partial
 -
--	update0 MSG
+-	call __morus640_update
 -
--	state_store0
+-	/* store the state: */
+-	movdqu STATE0, (0 * 16)(%rdi)
+-	movdqu STATE1, (1 * 16)(%rdi)
+-	movdqu STATE2, (2 * 16)(%rdi)
+-	movdqu STATE3, (3 * 16)(%rdi)
+-	movdqu STATE4, (4 * 16)(%rdi)
 -
 -	FRAME_END
 -	ret
--ENDPROC(crypto_aegis256_aesni_enc_tail)
+-ENDPROC(crypto_morus640_sse2_enc_tail)
 -
 -/*
-- * void crypto_aegis256_aesni_dec(void *state, unsigned int length,
-- *                                const void *src, void *dst);
+- * void crypto_morus640_sse2_dec(void *state, const void *src, void *dst,
+- *                               unsigned int length);
 - */
--ENTRY(crypto_aegis256_aesni_dec)
+-ENTRY(crypto_morus640_sse2_dec)
 -	FRAME_BEGIN
 -
--	cmp $0x10, LEN
+-	cmp $16, %rcx
 -	jb .Ldec_out
 -
--	state_load
+-	/* load the state: */
+-	movdqu (0 * 16)(%rdi), STATE0
+-	movdqu (1 * 16)(%rdi), STATE1
+-	movdqu (2 * 16)(%rdi), STATE2
+-	movdqu (3 * 16)(%rdi), STATE3
+-	movdqu (4 * 16)(%rdi), STATE4
 -
--	mov  SRC, %r8
--	or   DST, %r8
+-	mov %rsi, %r8
+-	or  %rdx, %r8
 -	and $0xF, %r8
 -	jnz .Ldec_u_loop
 -
--.align 8
+-.align 4
 -.Ldec_a_loop:
--	decrypt_block a 0
--	decrypt_block a 1
--	decrypt_block a 2
--	decrypt_block a 3
--	decrypt_block a 4
--	decrypt_block a 5
+-	movdqa (%rsi), MSG
+-	pxor STATE0, MSG
+-	pshufd $MASK3, STATE1, T0
+-	pxor T0, MSG
+-	movdqa STATE2, T0
+-	pand STATE3, T0
+-	pxor T0, MSG
+-	movdqa MSG, (%rdx)
 -
--	add $0x60, SRC
--	add $0x60, DST
--	jmp .Ldec_a_loop
+-	call __morus640_update
+-	sub $16, %rcx
+-	add $16, %rsi
+-	add $16, %rdx
+-	cmp $16, %rcx
+-	jge .Ldec_a_loop
 -
--.align 8
+-	jmp .Ldec_cont
+-.align 4
 -.Ldec_u_loop:
--	decrypt_block u 0
--	decrypt_block u 1
--	decrypt_block u 2
--	decrypt_block u 3
--	decrypt_block u 4
--	decrypt_block u 5
+-	movdqu (%rsi), MSG
+-	pxor STATE0, MSG
+-	pshufd $MASK3, STATE1, T0
+-	pxor T0, MSG
+-	movdqa STATE2, T0
+-	pand STATE3, T0
+-	pxor T0, MSG
+-	movdqu MSG, (%rdx)
 -
--	add $0x60, SRC
--	add $0x60, DST
--	jmp .Ldec_u_loop
+-	call __morus640_update
+-	sub $16, %rcx
+-	add $16, %rsi
+-	add $16, %rdx
+-	cmp $16, %rcx
+-	jge .Ldec_u_loop
 -
--.Ldec_out_0:
--	state_store0
--	FRAME_END
--	ret
--
--.Ldec_out_1:
--	state_store1
--	FRAME_END
--	ret
--
--.Ldec_out_2:
--	state_store2
--	FRAME_END
--	ret
--
--.Ldec_out_3:
--	state_store3
--	FRAME_END
--	ret
--
--.Ldec_out_4:
--	state_store4
--	FRAME_END
--	ret
--
--.Ldec_out_5:
--	state_store5
--	FRAME_END
--	ret
+-.Ldec_cont:
+-	/* store the state: */
+-	movdqu STATE0, (0 * 16)(%rdi)
+-	movdqu STATE1, (1 * 16)(%rdi)
+-	movdqu STATE2, (2 * 16)(%rdi)
+-	movdqu STATE3, (3 * 16)(%rdi)
+-	movdqu STATE4, (4 * 16)(%rdi)
 -
 -.Ldec_out:
 -	FRAME_END
 -	ret
--ENDPROC(crypto_aegis256_aesni_dec)
+-ENDPROC(crypto_morus640_sse2_dec)
 -
 -/*
-- * void crypto_aegis256_aesni_dec_tail(void *state, unsigned int length,
-- *                                     const void *src, void *dst);
+- * void crypto_morus640_sse2_dec_tail(void *state, const void *src, void *dst,
+- *                                    unsigned int length);
 - */
--ENTRY(crypto_aegis256_aesni_dec_tail)
+-ENTRY(crypto_morus640_sse2_dec_tail)
 -	FRAME_BEGIN
 -
--	state_load
+-	/* load the state: */
+-	movdqu (0 * 16)(%rdi), STATE0
+-	movdqu (1 * 16)(%rdi), STATE1
+-	movdqu (2 * 16)(%rdi), STATE2
+-	movdqu (3 * 16)(%rdi), STATE3
+-	movdqu (4 * 16)(%rdi), STATE4
 -
 -	/* decrypt message: */
 -	call __load_partial
 -
--	crypt0 MSG
--
+-	pxor STATE0, MSG
+-	pshufd $MASK3, STATE1, T0
+-	pxor T0, MSG
+-	movdqa STATE2, T0
+-	pand STATE3, T0
+-	pxor T0, MSG
 -	movdqa MSG, T0
+-
 -	call __store_partial
 -
 -	/* mask with byte count: */
--	movq LEN, T0
+-	movq %rcx, T0
 -	punpcklbw T0, T0
 -	punpcklbw T0, T0
 -	punpcklbw T0, T0
 -	punpcklbw T0, T0
--	movdqa .Laegis256_counter, T1
+-	movdqa .Lmorus640_counter, T1
 -	pcmpgtb T1, T0
 -	pand T0, MSG
 -
--	update0 MSG
+-	call __morus640_update
 -
--	state_store0
+-	/* store the state: */
+-	movdqu STATE0, (0 * 16)(%rdi)
+-	movdqu STATE1, (1 * 16)(%rdi)
+-	movdqu STATE2, (2 * 16)(%rdi)
+-	movdqu STATE3, (3 * 16)(%rdi)
+-	movdqu STATE4, (4 * 16)(%rdi)
 -
 -	FRAME_END
 -	ret
--ENDPROC(crypto_aegis256_aesni_dec_tail)
+-ENDPROC(crypto_morus640_sse2_dec_tail)
 -
 -/*
-- * void crypto_aegis256_aesni_final(void *state, void *tag_xor,
-- *                                  u64 assoclen, u64 cryptlen);
+- * void crypto_morus640_sse2_final(void *state, void *tag_xor,
+- *	                           u64 assoclen, u64 cryptlen);
 - */
--ENTRY(crypto_aegis256_aesni_final)
+-ENTRY(crypto_morus640_sse2_final)
 -	FRAME_BEGIN
 -
--	state_load
+-	/* load the state: */
+-	movdqu (0 * 16)(%rdi), STATE0
+-	movdqu (1 * 16)(%rdi), STATE1
+-	movdqu (2 * 16)(%rdi), STATE2
+-	movdqu (3 * 16)(%rdi), STATE3
+-	movdqu (4 * 16)(%rdi), STATE4
+-
+-	/* xor state[0] into state[4]: */
+-	pxor STATE0, STATE4
 -
 -	/* prepare length block: */
 -	movq %rdx, MSG
@@ -1945,43 +2632,44 @@ index 8870c7c5d9a4..000000000000
 -	pxor T0, MSG
 -	psllq $3, MSG /* multiply by 8 (to get bit count) */
 -
--	pxor STATE3, MSG
--
 -	/* update state: */
--	update0 MSG
--	update1 MSG
--	update2 MSG
--	update3 MSG
--	update4 MSG
--	update5 MSG
--	update0 MSG
+-	call __morus640_update
+-	call __morus640_update
+-	call __morus640_update
+-	call __morus640_update
+-	call __morus640_update
+-	call __morus640_update
+-	call __morus640_update
+-	call __morus640_update
+-	call __morus640_update
+-	call __morus640_update
 -
 -	/* xor tag: */
 -	movdqu (%rsi), MSG
 -
 -	pxor STATE0, MSG
--	pxor STATE1, MSG
--	pxor STATE2, MSG
--	pxor STATE3, MSG
--	pxor STATE4, MSG
--	pxor STATE5, MSG
+-	pshufd $MASK3, STATE1, T0
+-	pxor T0, MSG
+-	movdqa STATE2, T0
+-	pand STATE3, T0
+-	pxor T0, MSG
 -
 -	movdqu MSG, (%rsi)
 -
 -	FRAME_END
 -	ret
--ENDPROC(crypto_aegis256_aesni_final)
-diff --git a/arch/x86/crypto/aegis256-aesni-glue.c b/arch/x86/crypto/aegis256-aesni-glue.c
+-ENDPROC(crypto_morus640_sse2_final)
+diff --git a/arch/x86/crypto/morus640-sse2-glue.c b/arch/x86/crypto/morus640-sse2-glue.c
 deleted file mode 100644
-index 716eecb66bd5..000000000000
---- a/arch/x86/crypto/aegis256-aesni-glue.c
+index 32da56b3bdad..000000000000
+--- a/arch/x86/crypto/morus640-sse2-glue.c
 +++ /dev/null
-@@ -1,297 +0,0 @@
+@@ -1,65 +0,0 @@
 -/*
-- * The AEGIS-256 Authenticated-Encryption Algorithm
-- *   Glue for AES-NI + SSE2 implementation
+- * The MORUS-640 Authenticated-Encryption Algorithm
+- *   Glue for SSE2 implementation
 - *
-- * Copyright (c) 2017-2018 Ondrej Mosnacek <omosnacek@gmail.com>
+- * Copyright (c) 2016-2018 Ondrej Mosnacek <omosnacek@gmail.com>
 - * Copyright (C) 2017-2018 Red Hat, Inc. All rights reserved.
 - *
 - * This program is free software; you can redistribute it and/or modify it
@@ -1992,69 +2680,107 @@ index 716eecb66bd5..000000000000
 -
 -#include <crypto/internal/aead.h>
 -#include <crypto/internal/simd.h>
--#include <crypto/internal/skcipher.h>
--#include <crypto/scatterwalk.h>
+-#include <crypto/morus640_glue.h>
 -#include <linux/module.h>
 -#include <asm/fpu/api.h>
 -#include <asm/cpu_device_id.h>
 -
--#define AEGIS256_BLOCK_ALIGN 16
--#define AEGIS256_BLOCK_SIZE 16
--#define AEGIS256_NONCE_SIZE 32
--#define AEGIS256_STATE_BLOCKS 6
--#define AEGIS256_KEY_SIZE 32
--#define AEGIS256_MIN_AUTH_SIZE 8
--#define AEGIS256_MAX_AUTH_SIZE 16
+-asmlinkage void crypto_morus640_sse2_init(void *state, const void *key,
+-					  const void *iv);
+-asmlinkage void crypto_morus640_sse2_ad(void *state, const void *data,
+-					unsigned int length);
 -
--asmlinkage void crypto_aegis256_aesni_init(void *state, void *key, void *iv);
+-asmlinkage void crypto_morus640_sse2_enc(void *state, const void *src,
+-					 void *dst, unsigned int length);
+-asmlinkage void crypto_morus640_sse2_dec(void *state, const void *src,
+-					 void *dst, unsigned int length);
 -
--asmlinkage void crypto_aegis256_aesni_ad(
--		void *state, unsigned int length, const void *data);
+-asmlinkage void crypto_morus640_sse2_enc_tail(void *state, const void *src,
+-					      void *dst, unsigned int length);
+-asmlinkage void crypto_morus640_sse2_dec_tail(void *state, const void *src,
+-					      void *dst, unsigned int length);
 -
--asmlinkage void crypto_aegis256_aesni_enc(
--		void *state, unsigned int length, const void *src, void *dst);
+-asmlinkage void crypto_morus640_sse2_final(void *state, void *tag_xor,
+-					   u64 assoclen, u64 cryptlen);
 -
--asmlinkage void crypto_aegis256_aesni_dec(
--		void *state, unsigned int length, const void *src, void *dst);
+-MORUS640_DECLARE_ALG(sse2, "morus640-sse2", 400);
 -
--asmlinkage void crypto_aegis256_aesni_enc_tail(
--		void *state, unsigned int length, const void *src, void *dst);
+-static struct simd_aead_alg *simd_alg;
 -
--asmlinkage void crypto_aegis256_aesni_dec_tail(
--		void *state, unsigned int length, const void *src, void *dst);
+-static int __init crypto_morus640_sse2_module_init(void)
+-{
+-	if (!boot_cpu_has(X86_FEATURE_XMM2) ||
+-	    !cpu_has_xfeatures(XFEATURE_MASK_SSE, NULL))
+-		return -ENODEV;
 -
--asmlinkage void crypto_aegis256_aesni_final(
--		void *state, void *tag_xor, unsigned int cryptlen,
--		unsigned int assoclen);
+-	return simd_register_aeads_compat(&crypto_morus640_sse2_alg, 1,
+-					  &simd_alg);
+-}
 -
--struct aegis_block {
--	u8 bytes[AEGIS256_BLOCK_SIZE] __aligned(AEGIS256_BLOCK_ALIGN);
+-static void __exit crypto_morus640_sse2_module_exit(void)
+-{
+-	simd_unregister_aeads(&crypto_morus640_sse2_alg, 1, &simd_alg);
+-}
+-
+-module_init(crypto_morus640_sse2_module_init);
+-module_exit(crypto_morus640_sse2_module_exit);
+-
+-MODULE_LICENSE("GPL");
+-MODULE_AUTHOR("Ondrej Mosnacek <omosnacek@gmail.com>");
+-MODULE_DESCRIPTION("MORUS-640 AEAD algorithm -- SSE2 implementation");
+-MODULE_ALIAS_CRYPTO("morus640");
+-MODULE_ALIAS_CRYPTO("morus640-sse2");
+diff --git a/arch/x86/crypto/morus640_glue.c b/arch/x86/crypto/morus640_glue.c
+deleted file mode 100644
+index 1dea33d84426..000000000000
+--- a/arch/x86/crypto/morus640_glue.c
++++ /dev/null
+@@ -1,204 +0,0 @@
+-/*
+- * The MORUS-640 Authenticated-Encryption Algorithm
+- *   Common x86 SIMD glue skeleton
+- *
+- * Copyright (c) 2016-2018 Ondrej Mosnacek <omosnacek@gmail.com>
+- * Copyright (C) 2017-2018 Red Hat, Inc. All rights reserved.
+- *
+- * This program is free software; you can redistribute it and/or modify it
+- * under the terms of the GNU General Public License as published by the Free
+- * Software Foundation; either version 2 of the License, or (at your option)
+- * any later version.
+- */
+-
+-#include <crypto/internal/aead.h>
+-#include <crypto/internal/skcipher.h>
+-#include <crypto/morus640_glue.h>
+-#include <crypto/scatterwalk.h>
+-#include <linux/err.h>
+-#include <linux/init.h>
+-#include <linux/kernel.h>
+-#include <linux/module.h>
+-#include <linux/scatterlist.h>
+-#include <asm/fpu/api.h>
+-
+-struct morus640_state {
+-	struct morus640_block s[MORUS_STATE_BLOCKS];
 -};
 -
--struct aegis_state {
--	struct aegis_block blocks[AEGIS256_STATE_BLOCKS];
--};
--
--struct aegis_ctx {
--	struct aegis_block key[AEGIS256_KEY_SIZE / AEGIS256_BLOCK_SIZE];
--};
--
--struct aegis_crypt_ops {
+-struct morus640_ops {
 -	int (*skcipher_walk_init)(struct skcipher_walk *walk,
 -				  struct aead_request *req, bool atomic);
 -
--	void (*crypt_blocks)(void *state, unsigned int length, const void *src,
--			     void *dst);
--	void (*crypt_tail)(void *state, unsigned int length, const void *src,
--			   void *dst);
+-	void (*crypt_blocks)(void *state, const void *src, void *dst,
+-			     unsigned int length);
+-	void (*crypt_tail)(void *state, const void *src, void *dst,
+-			   unsigned int length);
 -};
 -
--static void crypto_aegis256_aesni_process_ad(
--		struct aegis_state *state, struct scatterlist *sg_src,
--		unsigned int assoclen)
+-static void crypto_morus640_glue_process_ad(
+-		struct morus640_state *state,
+-		const struct morus640_glue_ops *ops,
+-		struct scatterlist *sg_src, unsigned int assoclen)
 -{
 -	struct scatter_walk walk;
--	struct aegis_block buf;
+-	struct morus640_block buf;
 -	unsigned int pos = 0;
 -
 -	scatterwalk_start(&walk, sg_src);
@@ -2064,294 +2790,255 @@ index 716eecb66bd5..000000000000
 -		void *mapped = scatterwalk_map(&walk);
 -		const u8 *src = (const u8 *)mapped;
 -
--		if (pos + size >= AEGIS256_BLOCK_SIZE) {
+-		if (pos + size >= MORUS640_BLOCK_SIZE) {
 -			if (pos > 0) {
--				unsigned int fill = AEGIS256_BLOCK_SIZE - pos;
+-				unsigned int fill = MORUS640_BLOCK_SIZE - pos;
 -				memcpy(buf.bytes + pos, src, fill);
--				crypto_aegis256_aesni_ad(state,
--							 AEGIS256_BLOCK_SIZE,
--							 buf.bytes);
+-				ops->ad(state, buf.bytes, MORUS640_BLOCK_SIZE);
 -				pos = 0;
 -				left -= fill;
 -				src += fill;
 -			}
 -
--			crypto_aegis256_aesni_ad(state, left, src);
--
--			src += left & ~(AEGIS256_BLOCK_SIZE - 1);
--			left &= AEGIS256_BLOCK_SIZE - 1;
+-			ops->ad(state, src, left);
+-			src += left & ~(MORUS640_BLOCK_SIZE - 1);
+-			left &= MORUS640_BLOCK_SIZE - 1;
 -		}
 -
 -		memcpy(buf.bytes + pos, src, left);
+-
 -		pos += left;
 -		assoclen -= size;
--
 -		scatterwalk_unmap(mapped);
 -		scatterwalk_advance(&walk, size);
 -		scatterwalk_done(&walk, 0, assoclen);
 -	}
 -
 -	if (pos > 0) {
--		memset(buf.bytes + pos, 0, AEGIS256_BLOCK_SIZE - pos);
--		crypto_aegis256_aesni_ad(state, AEGIS256_BLOCK_SIZE, buf.bytes);
+-		memset(buf.bytes + pos, 0, MORUS640_BLOCK_SIZE - pos);
+-		ops->ad(state, buf.bytes, MORUS640_BLOCK_SIZE);
 -	}
 -}
 -
--static void crypto_aegis256_aesni_process_crypt(
--		struct aegis_state *state, struct skcipher_walk *walk,
--		const struct aegis_crypt_ops *ops)
+-static void crypto_morus640_glue_process_crypt(struct morus640_state *state,
+-					       struct morus640_ops ops,
+-					       struct skcipher_walk *walk)
 -{
--	while (walk->nbytes >= AEGIS256_BLOCK_SIZE) {
--		ops->crypt_blocks(state,
--				  round_down(walk->nbytes, AEGIS256_BLOCK_SIZE),
--				  walk->src.virt.addr, walk->dst.virt.addr);
--		skcipher_walk_done(walk, walk->nbytes % AEGIS256_BLOCK_SIZE);
+-	while (walk->nbytes >= MORUS640_BLOCK_SIZE) {
+-		ops.crypt_blocks(state, walk->src.virt.addr,
+-				 walk->dst.virt.addr,
+-				 round_down(walk->nbytes, MORUS640_BLOCK_SIZE));
+-		skcipher_walk_done(walk, walk->nbytes % MORUS640_BLOCK_SIZE);
 -	}
 -
 -	if (walk->nbytes) {
--		ops->crypt_tail(state, walk->nbytes, walk->src.virt.addr,
--				walk->dst.virt.addr);
+-		ops.crypt_tail(state, walk->src.virt.addr, walk->dst.virt.addr,
+-			       walk->nbytes);
 -		skcipher_walk_done(walk, 0);
 -	}
 -}
 -
--static struct aegis_ctx *crypto_aegis256_aesni_ctx(struct crypto_aead *aead)
+-int crypto_morus640_glue_setkey(struct crypto_aead *aead, const u8 *key,
+-				unsigned int keylen)
 -{
--	u8 *ctx = crypto_aead_ctx(aead);
--	ctx = PTR_ALIGN(ctx, __alignof__(struct aegis_ctx));
--	return (void *)ctx;
--}
+-	struct morus640_ctx *ctx = crypto_aead_ctx(aead);
 -
--static int crypto_aegis256_aesni_setkey(struct crypto_aead *aead, const u8 *key,
--					unsigned int keylen)
--{
--	struct aegis_ctx *ctx = crypto_aegis256_aesni_ctx(aead);
--
--	if (keylen != AEGIS256_KEY_SIZE) {
+-	if (keylen != MORUS640_BLOCK_SIZE) {
 -		crypto_aead_set_flags(aead, CRYPTO_TFM_RES_BAD_KEY_LEN);
 -		return -EINVAL;
 -	}
 -
--	memcpy(ctx->key, key, AEGIS256_KEY_SIZE);
--
+-	memcpy(ctx->key.bytes, key, MORUS640_BLOCK_SIZE);
 -	return 0;
 -}
+-EXPORT_SYMBOL_GPL(crypto_morus640_glue_setkey);
 -
--static int crypto_aegis256_aesni_setauthsize(struct crypto_aead *tfm,
--						unsigned int authsize)
+-int crypto_morus640_glue_setauthsize(struct crypto_aead *tfm,
+-				     unsigned int authsize)
 -{
--	if (authsize > AEGIS256_MAX_AUTH_SIZE)
--		return -EINVAL;
--	if (authsize < AEGIS256_MIN_AUTH_SIZE)
--		return -EINVAL;
--	return 0;
+-	return (authsize <= MORUS_MAX_AUTH_SIZE) ? 0 : -EINVAL;
 -}
+-EXPORT_SYMBOL_GPL(crypto_morus640_glue_setauthsize);
 -
--static void crypto_aegis256_aesni_crypt(struct aead_request *req,
--					struct aegis_block *tag_xor,
--					unsigned int cryptlen,
--					const struct aegis_crypt_ops *ops)
+-static void crypto_morus640_glue_crypt(struct aead_request *req,
+-				       struct morus640_ops ops,
+-				       unsigned int cryptlen,
+-				       struct morus640_block *tag_xor)
 -{
 -	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
--	struct aegis_ctx *ctx = crypto_aegis256_aesni_ctx(tfm);
+-	struct morus640_ctx *ctx = crypto_aead_ctx(tfm);
+-	struct morus640_state state;
 -	struct skcipher_walk walk;
--	struct aegis_state state;
 -
--	ops->skcipher_walk_init(&walk, req, true);
+-	ops.skcipher_walk_init(&walk, req, true);
 -
 -	kernel_fpu_begin();
 -
--	crypto_aegis256_aesni_init(&state, ctx->key, req->iv);
--	crypto_aegis256_aesni_process_ad(&state, req->src, req->assoclen);
--	crypto_aegis256_aesni_process_crypt(&state, &walk, ops);
--	crypto_aegis256_aesni_final(&state, tag_xor, req->assoclen, cryptlen);
+-	ctx->ops->init(&state, &ctx->key, req->iv);
+-	crypto_morus640_glue_process_ad(&state, ctx->ops, req->src, req->assoclen);
+-	crypto_morus640_glue_process_crypt(&state, ops, &walk);
+-	ctx->ops->final(&state, tag_xor, req->assoclen, cryptlen);
 -
 -	kernel_fpu_end();
 -}
 -
--static int crypto_aegis256_aesni_encrypt(struct aead_request *req)
+-int crypto_morus640_glue_encrypt(struct aead_request *req)
 -{
--	static const struct aegis_crypt_ops OPS = {
+-	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
+-	struct morus640_ctx *ctx = crypto_aead_ctx(tfm);
+-	struct morus640_ops OPS = {
 -		.skcipher_walk_init = skcipher_walk_aead_encrypt,
--		.crypt_blocks = crypto_aegis256_aesni_enc,
--		.crypt_tail = crypto_aegis256_aesni_enc_tail,
+-		.crypt_blocks = ctx->ops->enc,
+-		.crypt_tail = ctx->ops->enc_tail,
 -	};
 -
--	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
--	struct aegis_block tag = {};
+-	struct morus640_block tag = {};
 -	unsigned int authsize = crypto_aead_authsize(tfm);
 -	unsigned int cryptlen = req->cryptlen;
 -
--	crypto_aegis256_aesni_crypt(req, &tag, cryptlen, &OPS);
+-	crypto_morus640_glue_crypt(req, OPS, cryptlen, &tag);
 -
 -	scatterwalk_map_and_copy(tag.bytes, req->dst,
 -				 req->assoclen + cryptlen, authsize, 1);
 -	return 0;
 -}
+-EXPORT_SYMBOL_GPL(crypto_morus640_glue_encrypt);
 -
--static int crypto_aegis256_aesni_decrypt(struct aead_request *req)
+-int crypto_morus640_glue_decrypt(struct aead_request *req)
 -{
--	static const struct aegis_block zeros = {};
--
--	static const struct aegis_crypt_ops OPS = {
--		.skcipher_walk_init = skcipher_walk_aead_decrypt,
--		.crypt_blocks = crypto_aegis256_aesni_dec,
--		.crypt_tail = crypto_aegis256_aesni_dec_tail,
--	};
+-	static const u8 zeros[MORUS640_BLOCK_SIZE] = {};
 -
 -	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
--	struct aegis_block tag;
+-	struct morus640_ctx *ctx = crypto_aead_ctx(tfm);
+-	struct morus640_ops OPS = {
+-		.skcipher_walk_init = skcipher_walk_aead_decrypt,
+-		.crypt_blocks = ctx->ops->dec,
+-		.crypt_tail = ctx->ops->dec_tail,
+-	};
+-
+-	struct morus640_block tag;
 -	unsigned int authsize = crypto_aead_authsize(tfm);
 -	unsigned int cryptlen = req->cryptlen - authsize;
 -
 -	scatterwalk_map_and_copy(tag.bytes, req->src,
 -				 req->assoclen + cryptlen, authsize, 0);
 -
--	crypto_aegis256_aesni_crypt(req, &tag, cryptlen, &OPS);
+-	crypto_morus640_glue_crypt(req, OPS, cryptlen, &tag);
 -
--	return crypto_memneq(tag.bytes, zeros.bytes, authsize) ? -EBADMSG : 0;
+-	return crypto_memneq(tag.bytes, zeros, authsize) ? -EBADMSG : 0;
 -}
+-EXPORT_SYMBOL_GPL(crypto_morus640_glue_decrypt);
 -
--static int crypto_aegis256_aesni_init_tfm(struct crypto_aead *aead)
+-void crypto_morus640_glue_init_ops(struct crypto_aead *aead,
+-				   const struct morus640_glue_ops *ops)
 -{
--	return 0;
+-	struct morus640_ctx *ctx = crypto_aead_ctx(aead);
+-	ctx->ops = ops;
 -}
--
--static void crypto_aegis256_aesni_exit_tfm(struct crypto_aead *aead)
--{
--}
--
--static struct aead_alg crypto_aegis256_aesni_alg = {
--	.setkey = crypto_aegis256_aesni_setkey,
--	.setauthsize = crypto_aegis256_aesni_setauthsize,
--	.encrypt = crypto_aegis256_aesni_encrypt,
--	.decrypt = crypto_aegis256_aesni_decrypt,
--	.init = crypto_aegis256_aesni_init_tfm,
--	.exit = crypto_aegis256_aesni_exit_tfm,
--
--	.ivsize = AEGIS256_NONCE_SIZE,
--	.maxauthsize = AEGIS256_MAX_AUTH_SIZE,
--	.chunksize = AEGIS256_BLOCK_SIZE,
--
--	.base = {
--		.cra_flags = CRYPTO_ALG_INTERNAL,
--		.cra_blocksize = 1,
--		.cra_ctxsize = sizeof(struct aegis_ctx) +
--			       __alignof__(struct aegis_ctx),
--		.cra_alignmask = 0,
--		.cra_priority = 400,
--
--		.cra_name = "__aegis256",
--		.cra_driver_name = "__aegis256-aesni",
--
--		.cra_module = THIS_MODULE,
--	}
--};
--
--static struct simd_aead_alg *simd_alg;
--
--static int __init crypto_aegis256_aesni_module_init(void)
--{
--	if (!boot_cpu_has(X86_FEATURE_XMM2) ||
--	    !boot_cpu_has(X86_FEATURE_AES) ||
--	    !cpu_has_xfeatures(XFEATURE_MASK_SSE, NULL))
--		return -ENODEV;
--
--	return simd_register_aeads_compat(&crypto_aegis256_aesni_alg, 1,
--					  &simd_alg);
--}
--
--static void __exit crypto_aegis256_aesni_module_exit(void)
--{
--	simd_unregister_aeads(&crypto_aegis256_aesni_alg, 1, &simd_alg);
--}
--
--module_init(crypto_aegis256_aesni_module_init);
--module_exit(crypto_aegis256_aesni_module_exit);
+-EXPORT_SYMBOL_GPL(crypto_morus640_glue_init_ops);
 -
 -MODULE_LICENSE("GPL");
 -MODULE_AUTHOR("Ondrej Mosnacek <omosnacek@gmail.com>");
--MODULE_DESCRIPTION("AEGIS-256 AEAD algorithm -- AESNI+SSE2 implementation");
--MODULE_ALIAS_CRYPTO("aegis256");
--MODULE_ALIAS_CRYPTO("aegis256-aesni");
+-MODULE_DESCRIPTION("MORUS-640 AEAD mode -- glue for x86 optimizations");
 diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 4b948dac21db..7b4f537cdc9f 100644
+index e801450bcb1c..4b948dac21db 100644
 --- a/crypto/Kconfig
 +++ b/crypto/Kconfig
-@@ -306,20 +306,6 @@ config CRYPTO_AEGIS128
+@@ -344,62 +344,6 @@ config CRYPTO_AEGIS256_AESNI_SSE2
  	help
- 	 Support for the AEGIS-128 dedicated AEAD algorithm.
+ 	 AESNI+SSE2 implementation of the AEGIS-256 dedicated AEAD algorithm.
  
--config CRYPTO_AEGIS128L
--	tristate "AEGIS-128L AEAD algorithm"
+-config CRYPTO_MORUS640
+-	tristate "MORUS-640 AEAD algorithm"
 -	select CRYPTO_AEAD
--	select CRYPTO_AES  # for AES S-box tables
 -	help
--	 Support for the AEGIS-128L dedicated AEAD algorithm.
+-	  Support for the MORUS-640 dedicated AEAD algorithm.
 -
--config CRYPTO_AEGIS256
--	tristate "AEGIS-256 AEAD algorithm"
--	select CRYPTO_AEAD
--	select CRYPTO_AES  # for AES S-box tables
--	help
--	 Support for the AEGIS-256 dedicated AEAD algorithm.
--
- config CRYPTO_AEGIS128_AESNI_SSE2
- 	tristate "AEGIS-128 AEAD algorithm (x86_64 AESNI+SSE2 implementation)"
- 	depends on X86 && 64BIT
-@@ -328,22 +314,6 @@ config CRYPTO_AEGIS128_AESNI_SSE2
- 	help
- 	 AESNI+SSE2 implementation of the AEGIS-128 dedicated AEAD algorithm.
- 
--config CRYPTO_AEGIS128L_AESNI_SSE2
--	tristate "AEGIS-128L AEAD algorithm (x86_64 AESNI+SSE2 implementation)"
--	depends on X86 && 64BIT
+-config CRYPTO_MORUS640_GLUE
+-	tristate
+-	depends on X86
 -	select CRYPTO_AEAD
 -	select CRYPTO_SIMD
 -	help
--	 AESNI+SSE2 implementation of the AEGIS-128L dedicated AEAD algorithm.
+-	  Common glue for SIMD optimizations of the MORUS-640 dedicated AEAD
+-	  algorithm.
 -
--config CRYPTO_AEGIS256_AESNI_SSE2
--	tristate "AEGIS-256 AEAD algorithm (x86_64 AESNI+SSE2 implementation)"
+-config CRYPTO_MORUS640_SSE2
+-	tristate "MORUS-640 AEAD algorithm (x86_64 SSE2 implementation)"
 -	depends on X86 && 64BIT
+-	select CRYPTO_AEAD
+-	select CRYPTO_MORUS640_GLUE
+-	help
+-	  SSE2 implementation of the MORUS-640 dedicated AEAD algorithm.
+-
+-config CRYPTO_MORUS1280
+-	tristate "MORUS-1280 AEAD algorithm"
+-	select CRYPTO_AEAD
+-	help
+-	  Support for the MORUS-1280 dedicated AEAD algorithm.
+-
+-config CRYPTO_MORUS1280_GLUE
+-	tristate
+-	depends on X86
 -	select CRYPTO_AEAD
 -	select CRYPTO_SIMD
 -	help
--	 AESNI+SSE2 implementation of the AEGIS-256 dedicated AEAD algorithm.
+-	  Common glue for SIMD optimizations of the MORUS-1280 dedicated AEAD
+-	  algorithm.
+-
+-config CRYPTO_MORUS1280_SSE2
+-	tristate "MORUS-1280 AEAD algorithm (x86_64 SSE2 implementation)"
+-	depends on X86 && 64BIT
+-	select CRYPTO_AEAD
+-	select CRYPTO_MORUS1280_GLUE
+-	help
+-	  SSE2 optimizedimplementation of the MORUS-1280 dedicated AEAD
+-	  algorithm.
+-
+-config CRYPTO_MORUS1280_AVX2
+-	tristate "MORUS-1280 AEAD algorithm (x86_64 AVX2 implementation)"
+-	depends on X86 && 64BIT
+-	select CRYPTO_AEAD
+-	select CRYPTO_MORUS1280_GLUE
+-	help
+-	  AVX2 optimized implementation of the MORUS-1280 dedicated AEAD
+-	  algorithm.
 -
  config CRYPTO_SEQIV
  	tristate "Sequence Number IV Generator"
  	select CRYPTO_AEAD
 diff --git a/crypto/Makefile b/crypto/Makefile
-index 4bc1951d3787..93375e124ff7 100644
+index 9479e1a45d8c..4bc1951d3787 100644
 --- a/crypto/Makefile
 +++ b/crypto/Makefile
-@@ -90,8 +90,6 @@ obj-$(CONFIG_CRYPTO_GCM) += gcm.o
- obj-$(CONFIG_CRYPTO_CCM) += ccm.o
- obj-$(CONFIG_CRYPTO_CHACHA20POLY1305) += chacha20poly1305.o
+@@ -92,8 +92,6 @@ obj-$(CONFIG_CRYPTO_CHACHA20POLY1305) += chacha20poly1305.o
  obj-$(CONFIG_CRYPTO_AEGIS128) += aegis128.o
--obj-$(CONFIG_CRYPTO_AEGIS128L) += aegis128l.o
--obj-$(CONFIG_CRYPTO_AEGIS256) += aegis256.o
+ obj-$(CONFIG_CRYPTO_AEGIS128L) += aegis128l.o
+ obj-$(CONFIG_CRYPTO_AEGIS256) += aegis256.o
+-obj-$(CONFIG_CRYPTO_MORUS640) += morus640.o
+-obj-$(CONFIG_CRYPTO_MORUS1280) += morus1280.o
  obj-$(CONFIG_CRYPTO_PCRYPT) += pcrypt.o
  obj-$(CONFIG_CRYPTO_CRYPTD) += cryptd.o
  obj-$(CONFIG_CRYPTO_DES) += des_generic.o
-diff --git a/crypto/aegis128l.c b/crypto/aegis128l.c
+diff --git a/crypto/morus1280.c b/crypto/morus1280.c
 deleted file mode 100644
-index 9bca3d619a22..000000000000
---- a/crypto/aegis128l.c
+index f8734c6576af..000000000000
+--- a/crypto/morus1280.c
 +++ /dev/null
-@@ -1,522 +0,0 @@
+@@ -1,542 +0,0 @@
 -// SPDX-License-Identifier: GPL-2.0-or-later
 -/*
-- * The AEGIS-128L Authenticated-Encryption Algorithm
+- * The MORUS-1280 Authenticated-Encryption Algorithm
 - *
-- * Copyright (c) 2017-2018 Ondrej Mosnacek <omosnacek@gmail.com>
+- * Copyright (c) 2016-2018 Ondrej Mosnacek <omosnacek@gmail.com>
 - * Copyright (C) 2017-2018 Red Hat, Inc. All rights reserved.
 - */
 -
+-#include <asm/unaligned.h>
 -#include <crypto/algapi.h>
 -#include <crypto/internal/aead.h>
 -#include <crypto/internal/skcipher.h>
+-#include <crypto/morus_common.h>
 -#include <crypto/scatterwalk.h>
 -#include <linux/err.h>
 -#include <linux/init.h>
@@ -2359,295 +3046,301 @@ index 9bca3d619a22..000000000000
 -#include <linux/module.h>
 -#include <linux/scatterlist.h>
 -
--#include "aegis.h"
+-#define MORUS1280_WORD_SIZE 8
+-#define MORUS1280_BLOCK_SIZE (MORUS_BLOCK_WORDS * MORUS1280_WORD_SIZE)
+-#define MORUS1280_BLOCK_ALIGN (__alignof__(__le64))
+-#define MORUS1280_ALIGNED(p) IS_ALIGNED((uintptr_t)p, MORUS1280_BLOCK_ALIGN)
 -
--#define AEGIS128L_CHUNK_BLOCKS 2
--#define AEGIS128L_CHUNK_SIZE (AEGIS128L_CHUNK_BLOCKS * AEGIS_BLOCK_SIZE)
--#define AEGIS128L_NONCE_SIZE 16
--#define AEGIS128L_STATE_BLOCKS 8
--#define AEGIS128L_KEY_SIZE 16
--#define AEGIS128L_MIN_AUTH_SIZE 8
--#define AEGIS128L_MAX_AUTH_SIZE 16
--
--union aegis_chunk {
--	union aegis_block blocks[AEGIS128L_CHUNK_BLOCKS];
--	u8 bytes[AEGIS128L_CHUNK_SIZE];
+-struct morus1280_block {
+-	u64 words[MORUS_BLOCK_WORDS];
 -};
 -
--struct aegis_state {
--	union aegis_block blocks[AEGIS128L_STATE_BLOCKS];
+-union morus1280_block_in {
+-	__le64 words[MORUS_BLOCK_WORDS];
+-	u8 bytes[MORUS1280_BLOCK_SIZE];
 -};
 -
--struct aegis_ctx {
--	union aegis_block key;
+-struct morus1280_state {
+-	struct morus1280_block s[MORUS_STATE_BLOCKS];
 -};
 -
--struct aegis128l_ops {
+-struct morus1280_ctx {
+-	struct morus1280_block key;
+-};
+-
+-struct morus1280_ops {
 -	int (*skcipher_walk_init)(struct skcipher_walk *walk,
 -				  struct aead_request *req, bool atomic);
 -
--	void (*crypt_chunk)(struct aegis_state *state, u8 *dst,
--			    const u8 *src, unsigned int size);
+-	void (*crypt_chunk)(struct morus1280_state *state,
+-			    u8 *dst, const u8 *src, unsigned int size);
 -};
 -
--static void crypto_aegis128l_update(struct aegis_state *state)
+-static const struct morus1280_block crypto_morus1280_const[1] = {
+-	{ .words = {
+-		U64_C(0x0d08050302010100),
+-		U64_C(0x6279e99059372215),
+-		U64_C(0xf12fc26d55183ddb),
+-		U64_C(0xdd28b57342311120),
+-	} },
+-};
+-
+-static void crypto_morus1280_round(struct morus1280_block *b0,
+-				   struct morus1280_block *b1,
+-				   struct morus1280_block *b2,
+-				   struct morus1280_block *b3,
+-				   struct morus1280_block *b4,
+-				   const struct morus1280_block *m,
+-				   unsigned int b, unsigned int w)
 -{
--	union aegis_block tmp;
+-	unsigned int i;
+-	struct morus1280_block tmp;
+-
+-	for (i = 0; i < MORUS_BLOCK_WORDS; i++) {
+-		b0->words[i] ^= b1->words[i] & b2->words[i];
+-		b0->words[i] ^= b3->words[i];
+-		b0->words[i] ^= m->words[i];
+-		b0->words[i] = rol64(b0->words[i], b);
+-	}
+-
+-	tmp = *b3;
+-	for (i = 0; i < MORUS_BLOCK_WORDS; i++)
+-		b3->words[(i + w) % MORUS_BLOCK_WORDS] = tmp.words[i];
+-}
+-
+-static void crypto_morus1280_update(struct morus1280_state *state,
+-				    const struct morus1280_block *m)
+-{
+-	static const struct morus1280_block z = {};
+-
+-	struct morus1280_block *s = state->s;
+-
+-	crypto_morus1280_round(&s[0], &s[1], &s[2], &s[3], &s[4], &z, 13, 1);
+-	crypto_morus1280_round(&s[1], &s[2], &s[3], &s[4], &s[0], m,  46, 2);
+-	crypto_morus1280_round(&s[2], &s[3], &s[4], &s[0], &s[1], m,  38, 3);
+-	crypto_morus1280_round(&s[3], &s[4], &s[0], &s[1], &s[2], m,   7, 2);
+-	crypto_morus1280_round(&s[4], &s[0], &s[1], &s[2], &s[3], m,   4, 1);
+-}
+-
+-static void crypto_morus1280_load_a(struct morus1280_block *dst, const u8 *src)
+-{
+-	unsigned int i;
+-	for (i = 0; i < MORUS_BLOCK_WORDS; i++) {
+-		dst->words[i] = le64_to_cpu(*(const __le64 *)src);
+-		src += MORUS1280_WORD_SIZE;
+-	}
+-}
+-
+-static void crypto_morus1280_load_u(struct morus1280_block *dst, const u8 *src)
+-{
+-	unsigned int i;
+-	for (i = 0; i < MORUS_BLOCK_WORDS; i++) {
+-		dst->words[i] = get_unaligned_le64(src);
+-		src += MORUS1280_WORD_SIZE;
+-	}
+-}
+-
+-static void crypto_morus1280_load(struct morus1280_block *dst, const u8 *src)
+-{
+-	if (MORUS1280_ALIGNED(src))
+-		crypto_morus1280_load_a(dst, src);
+-	else
+-		crypto_morus1280_load_u(dst, src);
+-}
+-
+-static void crypto_morus1280_store_a(u8 *dst, const struct morus1280_block *src)
+-{
+-	unsigned int i;
+-	for (i = 0; i < MORUS_BLOCK_WORDS; i++) {
+-		*(__le64 *)dst = cpu_to_le64(src->words[i]);
+-		dst += MORUS1280_WORD_SIZE;
+-	}
+-}
+-
+-static void crypto_morus1280_store_u(u8 *dst, const struct morus1280_block *src)
+-{
+-	unsigned int i;
+-	for (i = 0; i < MORUS_BLOCK_WORDS; i++) {
+-		put_unaligned_le64(src->words[i], dst);
+-		dst += MORUS1280_WORD_SIZE;
+-	}
+-}
+-
+-static void crypto_morus1280_store(u8 *dst, const struct morus1280_block *src)
+-{
+-	if (MORUS1280_ALIGNED(dst))
+-		crypto_morus1280_store_a(dst, src);
+-	else
+-		crypto_morus1280_store_u(dst, src);
+-}
+-
+-static void crypto_morus1280_ad(struct morus1280_state *state, const u8 *src,
+-				unsigned int size)
+-{
+-	struct morus1280_block m;
+-
+-	if (MORUS1280_ALIGNED(src)) {
+-		while (size >= MORUS1280_BLOCK_SIZE) {
+-			crypto_morus1280_load_a(&m, src);
+-			crypto_morus1280_update(state, &m);
+-
+-			size -= MORUS1280_BLOCK_SIZE;
+-			src += MORUS1280_BLOCK_SIZE;
+-		}
+-	} else {
+-		while (size >= MORUS1280_BLOCK_SIZE) {
+-			crypto_morus1280_load_u(&m, src);
+-			crypto_morus1280_update(state, &m);
+-
+-			size -= MORUS1280_BLOCK_SIZE;
+-			src += MORUS1280_BLOCK_SIZE;
+-		}
+-	}
+-}
+-
+-static void crypto_morus1280_core(const struct morus1280_state *state,
+-				  struct morus1280_block *blk)
+-{
 -	unsigned int i;
 -
--	tmp = state->blocks[AEGIS128L_STATE_BLOCKS - 1];
--	for (i = AEGIS128L_STATE_BLOCKS - 1; i > 0; i--)
--		crypto_aegis_aesenc(&state->blocks[i], &state->blocks[i - 1],
--				    &state->blocks[i]);
--	crypto_aegis_aesenc(&state->blocks[0], &tmp, &state->blocks[0]);
+-	for (i = 0; i < MORUS_BLOCK_WORDS; i++)
+-		blk->words[(i + 3) % MORUS_BLOCK_WORDS] ^= state->s[1].words[i];
+-
+-        for (i = 0; i < MORUS_BLOCK_WORDS; i++) {
+-		blk->words[i] ^= state->s[0].words[i];
+-		blk->words[i] ^= state->s[2].words[i] & state->s[3].words[i];
+-	}
 -}
 -
--static void crypto_aegis128l_update_a(struct aegis_state *state,
--				      const union aegis_chunk *msg)
+-static void crypto_morus1280_encrypt_chunk(struct morus1280_state *state,
+-					   u8 *dst, const u8 *src,
+-					   unsigned int size)
 -{
--	crypto_aegis128l_update(state);
--	crypto_aegis_block_xor(&state->blocks[0], &msg->blocks[0]);
--	crypto_aegis_block_xor(&state->blocks[4], &msg->blocks[1]);
+-	struct morus1280_block c, m;
+-
+-	if (MORUS1280_ALIGNED(src) && MORUS1280_ALIGNED(dst)) {
+-		while (size >= MORUS1280_BLOCK_SIZE) {
+-			crypto_morus1280_load_a(&m, src);
+-			c = m;
+-			crypto_morus1280_core(state, &c);
+-			crypto_morus1280_store_a(dst, &c);
+-			crypto_morus1280_update(state, &m);
+-
+-			src += MORUS1280_BLOCK_SIZE;
+-			dst += MORUS1280_BLOCK_SIZE;
+-			size -= MORUS1280_BLOCK_SIZE;
+-		}
+-	} else {
+-		while (size >= MORUS1280_BLOCK_SIZE) {
+-			crypto_morus1280_load_u(&m, src);
+-			c = m;
+-			crypto_morus1280_core(state, &c);
+-			crypto_morus1280_store_u(dst, &c);
+-			crypto_morus1280_update(state, &m);
+-
+-			src += MORUS1280_BLOCK_SIZE;
+-			dst += MORUS1280_BLOCK_SIZE;
+-			size -= MORUS1280_BLOCK_SIZE;
+-		}
+-	}
+-
+-	if (size > 0) {
+-		union morus1280_block_in tail;
+-
+-		memcpy(tail.bytes, src, size);
+-		memset(tail.bytes + size, 0, MORUS1280_BLOCK_SIZE - size);
+-
+-		crypto_morus1280_load_a(&m, tail.bytes);
+-		c = m;
+-		crypto_morus1280_core(state, &c);
+-		crypto_morus1280_store_a(tail.bytes, &c);
+-		crypto_morus1280_update(state, &m);
+-
+-		memcpy(dst, tail.bytes, size);
+-	}
 -}
 -
--static void crypto_aegis128l_update_u(struct aegis_state *state,
--				      const void *msg)
+-static void crypto_morus1280_decrypt_chunk(struct morus1280_state *state,
+-					   u8 *dst, const u8 *src,
+-					   unsigned int size)
 -{
--	crypto_aegis128l_update(state);
--	crypto_xor(state->blocks[0].bytes, msg + 0 * AEGIS_BLOCK_SIZE,
--			AEGIS_BLOCK_SIZE);
--	crypto_xor(state->blocks[4].bytes, msg + 1 * AEGIS_BLOCK_SIZE,
--			AEGIS_BLOCK_SIZE);
+-	struct morus1280_block m;
+-
+-	if (MORUS1280_ALIGNED(src) && MORUS1280_ALIGNED(dst)) {
+-		while (size >= MORUS1280_BLOCK_SIZE) {
+-			crypto_morus1280_load_a(&m, src);
+-			crypto_morus1280_core(state, &m);
+-			crypto_morus1280_store_a(dst, &m);
+-			crypto_morus1280_update(state, &m);
+-
+-			src += MORUS1280_BLOCK_SIZE;
+-			dst += MORUS1280_BLOCK_SIZE;
+-			size -= MORUS1280_BLOCK_SIZE;
+-		}
+-	} else {
+-		while (size >= MORUS1280_BLOCK_SIZE) {
+-			crypto_morus1280_load_u(&m, src);
+-			crypto_morus1280_core(state, &m);
+-			crypto_morus1280_store_u(dst, &m);
+-			crypto_morus1280_update(state, &m);
+-
+-			src += MORUS1280_BLOCK_SIZE;
+-			dst += MORUS1280_BLOCK_SIZE;
+-			size -= MORUS1280_BLOCK_SIZE;
+-		}
+-	}
+-
+-	if (size > 0) {
+-		union morus1280_block_in tail;
+-
+-		memcpy(tail.bytes, src, size);
+-		memset(tail.bytes + size, 0, MORUS1280_BLOCK_SIZE - size);
+-
+-		crypto_morus1280_load_a(&m, tail.bytes);
+-		crypto_morus1280_core(state, &m);
+-		crypto_morus1280_store_a(tail.bytes, &m);
+-		memset(tail.bytes + size, 0, MORUS1280_BLOCK_SIZE - size);
+-		crypto_morus1280_load_a(&m, tail.bytes);
+-		crypto_morus1280_update(state, &m);
+-
+-		memcpy(dst, tail.bytes, size);
+-	}
 -}
 -
--static void crypto_aegis128l_init(struct aegis_state *state,
--				  const union aegis_block *key,
+-static void crypto_morus1280_init(struct morus1280_state *state,
+-				  const struct morus1280_block *key,
 -				  const u8 *iv)
 -{
--	union aegis_block key_iv;
--	union aegis_chunk chunk;
+-	static const struct morus1280_block z = {};
+-
+-	union morus1280_block_in tmp;
 -	unsigned int i;
 -
--	memcpy(chunk.blocks[0].bytes, iv, AEGIS_BLOCK_SIZE);
--	chunk.blocks[1] = *key;
+-	memcpy(tmp.bytes, iv, MORUS_NONCE_SIZE);
+-	memset(tmp.bytes + MORUS_NONCE_SIZE, 0,
+-	       MORUS1280_BLOCK_SIZE - MORUS_NONCE_SIZE);
 -
--	key_iv = *key;
--	crypto_aegis_block_xor(&key_iv, &chunk.blocks[0]);
+-	crypto_morus1280_load(&state->s[0], tmp.bytes);
+-	state->s[1] = *key;
+-	for (i = 0; i < MORUS_BLOCK_WORDS; i++)
+-		state->s[2].words[i] = U64_C(0xFFFFFFFFFFFFFFFF);
+-	state->s[3] = z;
+-	state->s[4] = crypto_morus1280_const[0];
 -
--	state->blocks[0] = key_iv;
--	state->blocks[1] = crypto_aegis_const[1];
--	state->blocks[2] = crypto_aegis_const[0];
--	state->blocks[3] = crypto_aegis_const[1];
--	state->blocks[4] = key_iv;
--	state->blocks[5] = *key;
--	state->blocks[6] = *key;
--	state->blocks[7] = *key;
+-	for (i = 0; i < 16; i++)
+-		crypto_morus1280_update(state, &z);
 -
--	crypto_aegis_block_xor(&state->blocks[5], &crypto_aegis_const[0]);
--	crypto_aegis_block_xor(&state->blocks[6], &crypto_aegis_const[1]);
--	crypto_aegis_block_xor(&state->blocks[7], &crypto_aegis_const[0]);
--
--	for (i = 0; i < 10; i++) {
--		crypto_aegis128l_update_a(state, &chunk);
--	}
+-	for (i = 0; i < MORUS_BLOCK_WORDS; i++)
+-		state->s[1].words[i] ^= key->words[i];
 -}
 -
--static void crypto_aegis128l_ad(struct aegis_state *state,
--				const u8 *src, unsigned int size)
--{
--	if (AEGIS_ALIGNED(src)) {
--		const union aegis_chunk *src_chunk =
--				(const union aegis_chunk *)src;
--
--		while (size >= AEGIS128L_CHUNK_SIZE) {
--			crypto_aegis128l_update_a(state, src_chunk);
--
--			size -= AEGIS128L_CHUNK_SIZE;
--			src_chunk += 1;
--		}
--	} else {
--		while (size >= AEGIS128L_CHUNK_SIZE) {
--			crypto_aegis128l_update_u(state, src);
--
--			size -= AEGIS128L_CHUNK_SIZE;
--			src += AEGIS128L_CHUNK_SIZE;
--		}
--	}
--}
--
--static void crypto_aegis128l_encrypt_chunk(struct aegis_state *state, u8 *dst,
--					   const u8 *src, unsigned int size)
--{
--	union aegis_chunk tmp;
--	union aegis_block *tmp0 = &tmp.blocks[0];
--	union aegis_block *tmp1 = &tmp.blocks[1];
--
--	if (AEGIS_ALIGNED(src) && AEGIS_ALIGNED(dst)) {
--		while (size >= AEGIS128L_CHUNK_SIZE) {
--			union aegis_chunk *dst_blk =
--					(union aegis_chunk *)dst;
--			const union aegis_chunk *src_blk =
--					(const union aegis_chunk *)src;
--
--			*tmp0 = state->blocks[2];
--			crypto_aegis_block_and(tmp0, &state->blocks[3]);
--			crypto_aegis_block_xor(tmp0, &state->blocks[6]);
--			crypto_aegis_block_xor(tmp0, &state->blocks[1]);
--			crypto_aegis_block_xor(tmp0, &src_blk->blocks[0]);
--
--			*tmp1 = state->blocks[6];
--			crypto_aegis_block_and(tmp1, &state->blocks[7]);
--			crypto_aegis_block_xor(tmp1, &state->blocks[5]);
--			crypto_aegis_block_xor(tmp1, &state->blocks[2]);
--			crypto_aegis_block_xor(tmp1, &src_blk->blocks[1]);
--
--			crypto_aegis128l_update_a(state, src_blk);
--
--			*dst_blk = tmp;
--
--			size -= AEGIS128L_CHUNK_SIZE;
--			src += AEGIS128L_CHUNK_SIZE;
--			dst += AEGIS128L_CHUNK_SIZE;
--		}
--	} else {
--		while (size >= AEGIS128L_CHUNK_SIZE) {
--			*tmp0 = state->blocks[2];
--			crypto_aegis_block_and(tmp0, &state->blocks[3]);
--			crypto_aegis_block_xor(tmp0, &state->blocks[6]);
--			crypto_aegis_block_xor(tmp0, &state->blocks[1]);
--			crypto_xor(tmp0->bytes, src + 0 * AEGIS_BLOCK_SIZE,
--				   AEGIS_BLOCK_SIZE);
--
--			*tmp1 = state->blocks[6];
--			crypto_aegis_block_and(tmp1, &state->blocks[7]);
--			crypto_aegis_block_xor(tmp1, &state->blocks[5]);
--			crypto_aegis_block_xor(tmp1, &state->blocks[2]);
--			crypto_xor(tmp1->bytes, src + 1 * AEGIS_BLOCK_SIZE,
--				   AEGIS_BLOCK_SIZE);
--
--			crypto_aegis128l_update_u(state, src);
--
--			memcpy(dst, tmp.bytes, AEGIS128L_CHUNK_SIZE);
--
--			size -= AEGIS128L_CHUNK_SIZE;
--			src += AEGIS128L_CHUNK_SIZE;
--			dst += AEGIS128L_CHUNK_SIZE;
--		}
--	}
--
--	if (size > 0) {
--		union aegis_chunk msg = {};
--		memcpy(msg.bytes, src, size);
--
--		*tmp0 = state->blocks[2];
--		crypto_aegis_block_and(tmp0, &state->blocks[3]);
--		crypto_aegis_block_xor(tmp0, &state->blocks[6]);
--		crypto_aegis_block_xor(tmp0, &state->blocks[1]);
--
--		*tmp1 = state->blocks[6];
--		crypto_aegis_block_and(tmp1, &state->blocks[7]);
--		crypto_aegis_block_xor(tmp1, &state->blocks[5]);
--		crypto_aegis_block_xor(tmp1, &state->blocks[2]);
--
--		crypto_aegis128l_update_a(state, &msg);
--
--		crypto_aegis_block_xor(&msg.blocks[0], tmp0);
--		crypto_aegis_block_xor(&msg.blocks[1], tmp1);
--
--		memcpy(dst, msg.bytes, size);
--	}
--}
--
--static void crypto_aegis128l_decrypt_chunk(struct aegis_state *state, u8 *dst,
--					   const u8 *src, unsigned int size)
--{
--	union aegis_chunk tmp;
--	union aegis_block *tmp0 = &tmp.blocks[0];
--	union aegis_block *tmp1 = &tmp.blocks[1];
--
--	if (AEGIS_ALIGNED(src) && AEGIS_ALIGNED(dst)) {
--		while (size >= AEGIS128L_CHUNK_SIZE) {
--			union aegis_chunk *dst_blk =
--					(union aegis_chunk *)dst;
--			const union aegis_chunk *src_blk =
--					(const union aegis_chunk *)src;
--
--			*tmp0 = state->blocks[2];
--			crypto_aegis_block_and(tmp0, &state->blocks[3]);
--			crypto_aegis_block_xor(tmp0, &state->blocks[6]);
--			crypto_aegis_block_xor(tmp0, &state->blocks[1]);
--			crypto_aegis_block_xor(tmp0, &src_blk->blocks[0]);
--
--			*tmp1 = state->blocks[6];
--			crypto_aegis_block_and(tmp1, &state->blocks[7]);
--			crypto_aegis_block_xor(tmp1, &state->blocks[5]);
--			crypto_aegis_block_xor(tmp1, &state->blocks[2]);
--			crypto_aegis_block_xor(tmp1, &src_blk->blocks[1]);
--
--			crypto_aegis128l_update_a(state, &tmp);
--
--			*dst_blk = tmp;
--
--			size -= AEGIS128L_CHUNK_SIZE;
--			src += AEGIS128L_CHUNK_SIZE;
--			dst += AEGIS128L_CHUNK_SIZE;
--		}
--	} else {
--		while (size >= AEGIS128L_CHUNK_SIZE) {
--			*tmp0 = state->blocks[2];
--			crypto_aegis_block_and(tmp0, &state->blocks[3]);
--			crypto_aegis_block_xor(tmp0, &state->blocks[6]);
--			crypto_aegis_block_xor(tmp0, &state->blocks[1]);
--			crypto_xor(tmp0->bytes, src + 0 * AEGIS_BLOCK_SIZE,
--				   AEGIS_BLOCK_SIZE);
--
--			*tmp1 = state->blocks[6];
--			crypto_aegis_block_and(tmp1, &state->blocks[7]);
--			crypto_aegis_block_xor(tmp1, &state->blocks[5]);
--			crypto_aegis_block_xor(tmp1, &state->blocks[2]);
--			crypto_xor(tmp1->bytes, src + 1 * AEGIS_BLOCK_SIZE,
--				   AEGIS_BLOCK_SIZE);
--
--			crypto_aegis128l_update_a(state, &tmp);
--
--			memcpy(dst, tmp.bytes, AEGIS128L_CHUNK_SIZE);
--
--			size -= AEGIS128L_CHUNK_SIZE;
--			src += AEGIS128L_CHUNK_SIZE;
--			dst += AEGIS128L_CHUNK_SIZE;
--		}
--	}
--
--	if (size > 0) {
--		union aegis_chunk msg = {};
--		memcpy(msg.bytes, src, size);
--
--		*tmp0 = state->blocks[2];
--		crypto_aegis_block_and(tmp0, &state->blocks[3]);
--		crypto_aegis_block_xor(tmp0, &state->blocks[6]);
--		crypto_aegis_block_xor(tmp0, &state->blocks[1]);
--		crypto_aegis_block_xor(&msg.blocks[0], tmp0);
--
--		*tmp1 = state->blocks[6];
--		crypto_aegis_block_and(tmp1, &state->blocks[7]);
--		crypto_aegis_block_xor(tmp1, &state->blocks[5]);
--		crypto_aegis_block_xor(tmp1, &state->blocks[2]);
--		crypto_aegis_block_xor(&msg.blocks[1], tmp1);
--
--		memset(msg.bytes + size, 0, AEGIS128L_CHUNK_SIZE - size);
--
--		crypto_aegis128l_update_a(state, &msg);
--
--		memcpy(dst, msg.bytes, size);
--	}
--}
--
--static void crypto_aegis128l_process_ad(struct aegis_state *state,
+-static void crypto_morus1280_process_ad(struct morus1280_state *state,
 -					struct scatterlist *sg_src,
 -					unsigned int assoclen)
 -{
 -	struct scatter_walk walk;
--	union aegis_chunk buf;
+-	struct morus1280_block m;
+-	union morus1280_block_in buf;
 -	unsigned int pos = 0;
 -
 -	scatterwalk_start(&walk, sg_src);
@@ -2657,19 +3350,22 @@ index 9bca3d619a22..000000000000
 -		void *mapped = scatterwalk_map(&walk);
 -		const u8 *src = (const u8 *)mapped;
 -
--		if (pos + size >= AEGIS128L_CHUNK_SIZE) {
+-		if (pos + size >= MORUS1280_BLOCK_SIZE) {
 -			if (pos > 0) {
--				unsigned int fill = AEGIS128L_CHUNK_SIZE - pos;
+-				unsigned int fill = MORUS1280_BLOCK_SIZE - pos;
 -				memcpy(buf.bytes + pos, src, fill);
--				crypto_aegis128l_update_a(state, &buf);
+-
+-				crypto_morus1280_load_a(&m, buf.bytes);
+-				crypto_morus1280_update(state, &m);
+-
 -				pos = 0;
 -				left -= fill;
 -				src += fill;
 -			}
 -
--			crypto_aegis128l_ad(state, src, left);
--			src += left & ~(AEGIS128L_CHUNK_SIZE - 1);
--			left &= AEGIS128L_CHUNK_SIZE - 1;
+-			crypto_morus1280_ad(state, src, left);
+-			src += left & ~(MORUS1280_BLOCK_SIZE - 1);
+-			left &= MORUS1280_BLOCK_SIZE - 1;
 -		}
 -
 -		memcpy(buf.bytes + pos, src, left);
@@ -2682,14 +3378,16 @@ index 9bca3d619a22..000000000000
 -	}
 -
 -	if (pos > 0) {
--		memset(buf.bytes + pos, 0, AEGIS128L_CHUNK_SIZE - pos);
--		crypto_aegis128l_update_a(state, &buf);
+-		memset(buf.bytes + pos, 0, MORUS1280_BLOCK_SIZE - pos);
+-
+-		crypto_morus1280_load_a(&m, buf.bytes);
+-		crypto_morus1280_update(state, &m);
 -	}
 -}
 -
--static void crypto_aegis128l_process_crypt(struct aegis_state *state,
+-static void crypto_morus1280_process_crypt(struct morus1280_state *state,
 -					   struct aead_request *req,
--					   const struct aegis128l_ops *ops)
+-					   const struct morus1280_ops *ops)
 -{
 -	struct skcipher_walk walk;
 -
@@ -2708,178 +3406,187 @@ index 9bca3d619a22..000000000000
 -	}
 -}
 -
--static void crypto_aegis128l_final(struct aegis_state *state,
--				   union aegis_block *tag_xor,
+-static void crypto_morus1280_final(struct morus1280_state *state,
+-				   struct morus1280_block *tag_xor,
 -				   u64 assoclen, u64 cryptlen)
 -{
--	u64 assocbits = assoclen * 8;
--	u64 cryptbits = cryptlen * 8;
--
--	union aegis_chunk tmp;
+-	struct morus1280_block tmp;
 -	unsigned int i;
 -
--	tmp.blocks[0].words64[0] = cpu_to_le64(assocbits);
--	tmp.blocks[0].words64[1] = cpu_to_le64(cryptbits);
+-	tmp.words[0] = assoclen * 8;
+-	tmp.words[1] = cryptlen * 8;
+-	tmp.words[2] = 0;
+-	tmp.words[3] = 0;
 -
--	crypto_aegis_block_xor(&tmp.blocks[0], &state->blocks[2]);
+-	for (i = 0; i < MORUS_BLOCK_WORDS; i++)
+-		state->s[4].words[i] ^= state->s[0].words[i];
 -
--	tmp.blocks[1] = tmp.blocks[0];
--	for (i = 0; i < 7; i++)
--		crypto_aegis128l_update_a(state, &tmp);
+-	for (i = 0; i < 10; i++)
+-		crypto_morus1280_update(state, &tmp);
 -
--	for (i = 0; i < 7; i++)
--		crypto_aegis_block_xor(tag_xor, &state->blocks[i]);
+-	crypto_morus1280_core(state, tag_xor);
 -}
 -
--static int crypto_aegis128l_setkey(struct crypto_aead *aead, const u8 *key,
+-static int crypto_morus1280_setkey(struct crypto_aead *aead, const u8 *key,
 -				   unsigned int keylen)
 -{
--	struct aegis_ctx *ctx = crypto_aead_ctx(aead);
+-	struct morus1280_ctx *ctx = crypto_aead_ctx(aead);
+-	union morus1280_block_in tmp;
 -
--	if (keylen != AEGIS128L_KEY_SIZE) {
+-	if (keylen == MORUS1280_BLOCK_SIZE)
+-		crypto_morus1280_load(&ctx->key, key);
+-	else if (keylen == MORUS1280_BLOCK_SIZE / 2) {
+-		memcpy(tmp.bytes, key, keylen);
+-		memcpy(tmp.bytes + keylen, key, keylen);
+-
+-		crypto_morus1280_load(&ctx->key, tmp.bytes);
+-	} else {
 -		crypto_aead_set_flags(aead, CRYPTO_TFM_RES_BAD_KEY_LEN);
 -		return -EINVAL;
 -	}
 -
--	memcpy(ctx->key.bytes, key, AEGIS128L_KEY_SIZE);
 -	return 0;
 -}
 -
--static int crypto_aegis128l_setauthsize(struct crypto_aead *tfm,
+-static int crypto_morus1280_setauthsize(struct crypto_aead *tfm,
 -					unsigned int authsize)
 -{
--	if (authsize > AEGIS128L_MAX_AUTH_SIZE)
--		return -EINVAL;
--	if (authsize < AEGIS128L_MIN_AUTH_SIZE)
--		return -EINVAL;
--	return 0;
+-	return (authsize <= MORUS_MAX_AUTH_SIZE) ? 0 : -EINVAL;
 -}
 -
--static void crypto_aegis128l_crypt(struct aead_request *req,
--				   union aegis_block *tag_xor,
+-static void crypto_morus1280_crypt(struct aead_request *req,
+-				   struct morus1280_block *tag_xor,
 -				   unsigned int cryptlen,
--				   const struct aegis128l_ops *ops)
+-				   const struct morus1280_ops *ops)
 -{
 -	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
--	struct aegis_ctx *ctx = crypto_aead_ctx(tfm);
--	struct aegis_state state;
+-	struct morus1280_ctx *ctx = crypto_aead_ctx(tfm);
+-	struct morus1280_state state;
 -
--	crypto_aegis128l_init(&state, &ctx->key, req->iv);
--	crypto_aegis128l_process_ad(&state, req->src, req->assoclen);
--	crypto_aegis128l_process_crypt(&state, req, ops);
--	crypto_aegis128l_final(&state, tag_xor, req->assoclen, cryptlen);
+-	crypto_morus1280_init(&state, &ctx->key, req->iv);
+-	crypto_morus1280_process_ad(&state, req->src, req->assoclen);
+-	crypto_morus1280_process_crypt(&state, req, ops);
+-	crypto_morus1280_final(&state, tag_xor, req->assoclen, cryptlen);
 -}
 -
--static int crypto_aegis128l_encrypt(struct aead_request *req)
+-static int crypto_morus1280_encrypt(struct aead_request *req)
 -{
--	static const struct aegis128l_ops ops = {
+-	static const struct morus1280_ops ops = {
 -		.skcipher_walk_init = skcipher_walk_aead_encrypt,
--		.crypt_chunk = crypto_aegis128l_encrypt_chunk,
+-		.crypt_chunk = crypto_morus1280_encrypt_chunk,
 -	};
 -
 -	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
--	union aegis_block tag = {};
+-	struct morus1280_block tag = {};
+-	union morus1280_block_in tag_out;
 -	unsigned int authsize = crypto_aead_authsize(tfm);
 -	unsigned int cryptlen = req->cryptlen;
 -
--	crypto_aegis128l_crypt(req, &tag, cryptlen, &ops);
+-	crypto_morus1280_crypt(req, &tag, cryptlen, &ops);
+-	crypto_morus1280_store(tag_out.bytes, &tag);
 -
--	scatterwalk_map_and_copy(tag.bytes, req->dst, req->assoclen + cryptlen,
--				 authsize, 1);
+-	scatterwalk_map_and_copy(tag_out.bytes, req->dst,
+-				 req->assoclen + cryptlen, authsize, 1);
 -	return 0;
 -}
 -
--static int crypto_aegis128l_decrypt(struct aead_request *req)
+-static int crypto_morus1280_decrypt(struct aead_request *req)
 -{
--	static const struct aegis128l_ops ops = {
+-	static const struct morus1280_ops ops = {
 -		.skcipher_walk_init = skcipher_walk_aead_decrypt,
--		.crypt_chunk = crypto_aegis128l_decrypt_chunk,
+-		.crypt_chunk = crypto_morus1280_decrypt_chunk,
 -	};
--	static const u8 zeros[AEGIS128L_MAX_AUTH_SIZE] = {};
+-	static const u8 zeros[MORUS1280_BLOCK_SIZE] = {};
 -
 -	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
--	union aegis_block tag;
+-	union morus1280_block_in tag_in;
+-	struct morus1280_block tag;
 -	unsigned int authsize = crypto_aead_authsize(tfm);
 -	unsigned int cryptlen = req->cryptlen - authsize;
 -
--	scatterwalk_map_and_copy(tag.bytes, req->src, req->assoclen + cryptlen,
--				 authsize, 0);
+-	scatterwalk_map_and_copy(tag_in.bytes, req->src,
+-				 req->assoclen + cryptlen, authsize, 0);
 -
--	crypto_aegis128l_crypt(req, &tag, cryptlen, &ops);
+-	crypto_morus1280_load(&tag, tag_in.bytes);
+-	crypto_morus1280_crypt(req, &tag, cryptlen, &ops);
+-	crypto_morus1280_store(tag_in.bytes, &tag);
 -
--	return crypto_memneq(tag.bytes, zeros, authsize) ? -EBADMSG : 0;
+-	return crypto_memneq(tag_in.bytes, zeros, authsize) ? -EBADMSG : 0;
 -}
 -
--static int crypto_aegis128l_init_tfm(struct crypto_aead *tfm)
+-static int crypto_morus1280_init_tfm(struct crypto_aead *tfm)
 -{
 -	return 0;
 -}
 -
--static void crypto_aegis128l_exit_tfm(struct crypto_aead *tfm)
+-static void crypto_morus1280_exit_tfm(struct crypto_aead *tfm)
 -{
 -}
 -
--static struct aead_alg crypto_aegis128l_alg = {
--	.setkey = crypto_aegis128l_setkey,
--	.setauthsize = crypto_aegis128l_setauthsize,
--	.encrypt = crypto_aegis128l_encrypt,
--	.decrypt = crypto_aegis128l_decrypt,
--	.init = crypto_aegis128l_init_tfm,
--	.exit = crypto_aegis128l_exit_tfm,
+-static struct aead_alg crypto_morus1280_alg = {
+-	.setkey = crypto_morus1280_setkey,
+-	.setauthsize = crypto_morus1280_setauthsize,
+-	.encrypt = crypto_morus1280_encrypt,
+-	.decrypt = crypto_morus1280_decrypt,
+-	.init = crypto_morus1280_init_tfm,
+-	.exit = crypto_morus1280_exit_tfm,
 -
--	.ivsize = AEGIS128L_NONCE_SIZE,
--	.maxauthsize = AEGIS128L_MAX_AUTH_SIZE,
--	.chunksize = AEGIS128L_CHUNK_SIZE,
+-	.ivsize = MORUS_NONCE_SIZE,
+-	.maxauthsize = MORUS_MAX_AUTH_SIZE,
+-	.chunksize = MORUS1280_BLOCK_SIZE,
 -
 -	.base = {
 -		.cra_blocksize = 1,
--		.cra_ctxsize = sizeof(struct aegis_ctx),
+-		.cra_ctxsize = sizeof(struct morus1280_ctx),
 -		.cra_alignmask = 0,
 -
 -		.cra_priority = 100,
 -
--		.cra_name = "aegis128l",
--		.cra_driver_name = "aegis128l-generic",
+-		.cra_name = "morus1280",
+-		.cra_driver_name = "morus1280-generic",
 -
 -		.cra_module = THIS_MODULE,
 -	}
 -};
 -
--static int __init crypto_aegis128l_module_init(void)
+-
+-static int __init crypto_morus1280_module_init(void)
 -{
--	return crypto_register_aead(&crypto_aegis128l_alg);
+-	return crypto_register_aead(&crypto_morus1280_alg);
 -}
 -
--static void __exit crypto_aegis128l_module_exit(void)
+-static void __exit crypto_morus1280_module_exit(void)
 -{
--	crypto_unregister_aead(&crypto_aegis128l_alg);
+-	crypto_unregister_aead(&crypto_morus1280_alg);
 -}
 -
--subsys_initcall(crypto_aegis128l_module_init);
--module_exit(crypto_aegis128l_module_exit);
+-subsys_initcall(crypto_morus1280_module_init);
+-module_exit(crypto_morus1280_module_exit);
 -
 -MODULE_LICENSE("GPL");
 -MODULE_AUTHOR("Ondrej Mosnacek <omosnacek@gmail.com>");
--MODULE_DESCRIPTION("AEGIS-128L AEAD algorithm");
--MODULE_ALIAS_CRYPTO("aegis128l");
--MODULE_ALIAS_CRYPTO("aegis128l-generic");
-diff --git a/crypto/aegis256.c b/crypto/aegis256.c
+-MODULE_DESCRIPTION("MORUS-1280 AEAD algorithm");
+-MODULE_ALIAS_CRYPTO("morus1280");
+-MODULE_ALIAS_CRYPTO("morus1280-generic");
+diff --git a/crypto/morus640.c b/crypto/morus640.c
 deleted file mode 100644
-index b47fd39595ad..000000000000
---- a/crypto/aegis256.c
+index ae5aa9482cb4..000000000000
+--- a/crypto/morus640.c
 +++ /dev/null
-@@ -1,473 +0,0 @@
+@@ -1,533 +0,0 @@
 -// SPDX-License-Identifier: GPL-2.0-or-later
 -/*
-- * The AEGIS-256 Authenticated-Encryption Algorithm
+- * The MORUS-640 Authenticated-Encryption Algorithm
 - *
-- * Copyright (c) 2017-2018 Ondrej Mosnacek <omosnacek@gmail.com>
+- * Copyright (c) 2016-2018 Ondrej Mosnacek <omosnacek@gmail.com>
 - * Copyright (C) 2017-2018 Red Hat, Inc. All rights reserved.
 - */
 -
+-#include <asm/unaligned.h>
 -#include <crypto/algapi.h>
 -#include <crypto/internal/aead.h>
 -#include <crypto/internal/skcipher.h>
+-#include <crypto/morus_common.h>
 -#include <crypto/scatterwalk.h>
 -#include <linux/err.h>
 -#include <linux/init.h>
@@ -2887,245 +3594,300 @@ index b47fd39595ad..000000000000
 -#include <linux/module.h>
 -#include <linux/scatterlist.h>
 -
--#include "aegis.h"
+-#define MORUS640_WORD_SIZE 4
+-#define MORUS640_BLOCK_SIZE (MORUS_BLOCK_WORDS * MORUS640_WORD_SIZE)
+-#define MORUS640_BLOCK_ALIGN (__alignof__(__le32))
+-#define MORUS640_ALIGNED(p) IS_ALIGNED((uintptr_t)p, MORUS640_BLOCK_ALIGN)
 -
--#define AEGIS256_NONCE_SIZE 32
--#define AEGIS256_STATE_BLOCKS 6
--#define AEGIS256_KEY_SIZE 32
--#define AEGIS256_MIN_AUTH_SIZE 8
--#define AEGIS256_MAX_AUTH_SIZE 16
--
--struct aegis_state {
--	union aegis_block blocks[AEGIS256_STATE_BLOCKS];
+-struct morus640_block {
+-	u32 words[MORUS_BLOCK_WORDS];
 -};
 -
--struct aegis_ctx {
--	union aegis_block key[AEGIS256_KEY_SIZE / AEGIS_BLOCK_SIZE];
+-union morus640_block_in {
+-	__le32 words[MORUS_BLOCK_WORDS];
+-	u8 bytes[MORUS640_BLOCK_SIZE];
 -};
 -
--struct aegis256_ops {
+-struct morus640_state {
+-	struct morus640_block s[MORUS_STATE_BLOCKS];
+-};
+-
+-struct morus640_ctx {
+-	struct morus640_block key;
+-};
+-
+-struct morus640_ops {
 -	int (*skcipher_walk_init)(struct skcipher_walk *walk,
 -				  struct aead_request *req, bool atomic);
 -
--	void (*crypt_chunk)(struct aegis_state *state, u8 *dst,
--			    const u8 *src, unsigned int size);
+-	void (*crypt_chunk)(struct morus640_state *state,
+-			    u8 *dst, const u8 *src, unsigned int size);
 -};
 -
--static void crypto_aegis256_update(struct aegis_state *state)
+-static const struct morus640_block crypto_morus640_const[2] = {
+-	{ .words = {
+-		U32_C(0x02010100),
+-		U32_C(0x0d080503),
+-		U32_C(0x59372215),
+-		U32_C(0x6279e990),
+-	} },
+-	{ .words = {
+-		U32_C(0x55183ddb),
+-		U32_C(0xf12fc26d),
+-		U32_C(0x42311120),
+-		U32_C(0xdd28b573),
+-	} },
+-};
+-
+-static void crypto_morus640_round(struct morus640_block *b0,
+-				  struct morus640_block *b1,
+-				  struct morus640_block *b2,
+-				  struct morus640_block *b3,
+-				  struct morus640_block *b4,
+-				  const struct morus640_block *m,
+-				  unsigned int b, unsigned int w)
 -{
--	union aegis_block tmp;
+-	unsigned int i;
+-	struct morus640_block tmp;
+-
+-	for (i = 0; i < MORUS_BLOCK_WORDS; i++) {
+-		b0->words[i] ^= b1->words[i] & b2->words[i];
+-		b0->words[i] ^= b3->words[i];
+-		b0->words[i] ^= m->words[i];
+-		b0->words[i] = rol32(b0->words[i], b);
+-	}
+-
+-	tmp = *b3;
+-	for (i = 0; i < MORUS_BLOCK_WORDS; i++)
+-		b3->words[(i + w) % MORUS_BLOCK_WORDS] = tmp.words[i];
+-}
+-
+-static void crypto_morus640_update(struct morus640_state *state,
+-				   const struct morus640_block *m)
+-{
+-	static const struct morus640_block z = {};
+-
+-	struct morus640_block *s = state->s;
+-
+-	crypto_morus640_round(&s[0], &s[1], &s[2], &s[3], &s[4], &z,  5, 1);
+-	crypto_morus640_round(&s[1], &s[2], &s[3], &s[4], &s[0], m,  31, 2);
+-	crypto_morus640_round(&s[2], &s[3], &s[4], &s[0], &s[1], m,   7, 3);
+-	crypto_morus640_round(&s[3], &s[4], &s[0], &s[1], &s[2], m,  22, 2);
+-	crypto_morus640_round(&s[4], &s[0], &s[1], &s[2], &s[3], m,  13, 1);
+-}
+-
+-static void crypto_morus640_load_a(struct morus640_block *dst, const u8 *src)
+-{
+-	unsigned int i;
+-	for (i = 0; i < MORUS_BLOCK_WORDS; i++) {
+-		dst->words[i] = le32_to_cpu(*(const __le32 *)src);
+-		src += MORUS640_WORD_SIZE;
+-	}
+-}
+-
+-static void crypto_morus640_load_u(struct morus640_block *dst, const u8 *src)
+-{
+-	unsigned int i;
+-	for (i = 0; i < MORUS_BLOCK_WORDS; i++) {
+-		dst->words[i] = get_unaligned_le32(src);
+-		src += MORUS640_WORD_SIZE;
+-	}
+-}
+-
+-static void crypto_morus640_load(struct morus640_block *dst, const u8 *src)
+-{
+-	if (MORUS640_ALIGNED(src))
+-		crypto_morus640_load_a(dst, src);
+-	else
+-		crypto_morus640_load_u(dst, src);
+-}
+-
+-static void crypto_morus640_store_a(u8 *dst, const struct morus640_block *src)
+-{
+-	unsigned int i;
+-	for (i = 0; i < MORUS_BLOCK_WORDS; i++) {
+-		*(__le32 *)dst = cpu_to_le32(src->words[i]);
+-		dst += MORUS640_WORD_SIZE;
+-	}
+-}
+-
+-static void crypto_morus640_store_u(u8 *dst, const struct morus640_block *src)
+-{
+-	unsigned int i;
+-	for (i = 0; i < MORUS_BLOCK_WORDS; i++) {
+-		put_unaligned_le32(src->words[i], dst);
+-		dst += MORUS640_WORD_SIZE;
+-	}
+-}
+-
+-static void crypto_morus640_store(u8 *dst, const struct morus640_block *src)
+-{
+-	if (MORUS640_ALIGNED(dst))
+-		crypto_morus640_store_a(dst, src);
+-	else
+-		crypto_morus640_store_u(dst, src);
+-}
+-
+-static void crypto_morus640_ad(struct morus640_state *state, const u8 *src,
+-			       unsigned int size)
+-{
+-	struct morus640_block m;
+-
+-	if (MORUS640_ALIGNED(src)) {
+-		while (size >= MORUS640_BLOCK_SIZE) {
+-			crypto_morus640_load_a(&m, src);
+-			crypto_morus640_update(state, &m);
+-
+-			size -= MORUS640_BLOCK_SIZE;
+-			src += MORUS640_BLOCK_SIZE;
+-		}
+-	} else {
+-		while (size >= MORUS640_BLOCK_SIZE) {
+-			crypto_morus640_load_u(&m, src);
+-			crypto_morus640_update(state, &m);
+-
+-			size -= MORUS640_BLOCK_SIZE;
+-			src += MORUS640_BLOCK_SIZE;
+-		}
+-	}
+-}
+-
+-static void crypto_morus640_core(const struct morus640_state *state,
+-				 struct morus640_block *blk)
+-{
 -	unsigned int i;
 -
--	tmp = state->blocks[AEGIS256_STATE_BLOCKS - 1];
--	for (i = AEGIS256_STATE_BLOCKS - 1; i > 0; i--)
--		crypto_aegis_aesenc(&state->blocks[i], &state->blocks[i - 1],
--				    &state->blocks[i]);
--	crypto_aegis_aesenc(&state->blocks[0], &tmp, &state->blocks[0]);
+-	for (i = 0; i < MORUS_BLOCK_WORDS; i++)
+-		blk->words[(i + 3) % MORUS_BLOCK_WORDS] ^= state->s[1].words[i];
+-
+-	for (i = 0; i < MORUS_BLOCK_WORDS; i++) {
+-		blk->words[i] ^= state->s[0].words[i];
+-		blk->words[i] ^= state->s[2].words[i] & state->s[3].words[i];
+-	}
 -}
 -
--static void crypto_aegis256_update_a(struct aegis_state *state,
--				     const union aegis_block *msg)
+-static void crypto_morus640_encrypt_chunk(struct morus640_state *state, u8 *dst,
+-					  const u8 *src, unsigned int size)
 -{
--	crypto_aegis256_update(state);
--	crypto_aegis_block_xor(&state->blocks[0], msg);
+-	struct morus640_block c, m;
+-
+-	if (MORUS640_ALIGNED(src) && MORUS640_ALIGNED(dst)) {
+-		while (size >= MORUS640_BLOCK_SIZE) {
+-			crypto_morus640_load_a(&m, src);
+-			c = m;
+-			crypto_morus640_core(state, &c);
+-			crypto_morus640_store_a(dst, &c);
+-			crypto_morus640_update(state, &m);
+-
+-			src += MORUS640_BLOCK_SIZE;
+-			dst += MORUS640_BLOCK_SIZE;
+-			size -= MORUS640_BLOCK_SIZE;
+-		}
+-	} else {
+-		while (size >= MORUS640_BLOCK_SIZE) {
+-			crypto_morus640_load_u(&m, src);
+-			c = m;
+-			crypto_morus640_core(state, &c);
+-			crypto_morus640_store_u(dst, &c);
+-			crypto_morus640_update(state, &m);
+-
+-			src += MORUS640_BLOCK_SIZE;
+-			dst += MORUS640_BLOCK_SIZE;
+-			size -= MORUS640_BLOCK_SIZE;
+-		}
+-	}
+-
+-	if (size > 0) {
+-		union morus640_block_in tail;
+-
+-		memcpy(tail.bytes, src, size);
+-		memset(tail.bytes + size, 0, MORUS640_BLOCK_SIZE - size);
+-
+-		crypto_morus640_load_a(&m, tail.bytes);
+-		c = m;
+-		crypto_morus640_core(state, &c);
+-		crypto_morus640_store_a(tail.bytes, &c);
+-		crypto_morus640_update(state, &m);
+-
+-		memcpy(dst, tail.bytes, size);
+-	}
 -}
 -
--static void crypto_aegis256_update_u(struct aegis_state *state, const void *msg)
+-static void crypto_morus640_decrypt_chunk(struct morus640_state *state, u8 *dst,
+-					  const u8 *src, unsigned int size)
 -{
--	crypto_aegis256_update(state);
--	crypto_xor(state->blocks[0].bytes, msg, AEGIS_BLOCK_SIZE);
+-	struct morus640_block m;
+-
+-	if (MORUS640_ALIGNED(src) && MORUS640_ALIGNED(dst)) {
+-		while (size >= MORUS640_BLOCK_SIZE) {
+-			crypto_morus640_load_a(&m, src);
+-			crypto_morus640_core(state, &m);
+-			crypto_morus640_store_a(dst, &m);
+-			crypto_morus640_update(state, &m);
+-
+-			src += MORUS640_BLOCK_SIZE;
+-			dst += MORUS640_BLOCK_SIZE;
+-			size -= MORUS640_BLOCK_SIZE;
+-		}
+-	} else {
+-		while (size >= MORUS640_BLOCK_SIZE) {
+-			crypto_morus640_load_u(&m, src);
+-			crypto_morus640_core(state, &m);
+-			crypto_morus640_store_u(dst, &m);
+-			crypto_morus640_update(state, &m);
+-
+-			src += MORUS640_BLOCK_SIZE;
+-			dst += MORUS640_BLOCK_SIZE;
+-			size -= MORUS640_BLOCK_SIZE;
+-		}
+-	}
+-
+-	if (size > 0) {
+-		union morus640_block_in tail;
+-
+-		memcpy(tail.bytes, src, size);
+-		memset(tail.bytes + size, 0, MORUS640_BLOCK_SIZE - size);
+-
+-		crypto_morus640_load_a(&m, tail.bytes);
+-		crypto_morus640_core(state, &m);
+-		crypto_morus640_store_a(tail.bytes, &m);
+-		memset(tail.bytes + size, 0, MORUS640_BLOCK_SIZE - size);
+-		crypto_morus640_load_a(&m, tail.bytes);
+-		crypto_morus640_update(state, &m);
+-
+-		memcpy(dst, tail.bytes, size);
+-	}
 -}
 -
--static void crypto_aegis256_init(struct aegis_state *state,
--				 const union aegis_block *key,
+-static void crypto_morus640_init(struct morus640_state *state,
+-				 const struct morus640_block *key,
 -				 const u8 *iv)
 -{
--	union aegis_block key_iv[2];
+-	static const struct morus640_block z = {};
+-
 -	unsigned int i;
 -
--	key_iv[0] = key[0];
--	key_iv[1] = key[1];
--	crypto_xor(key_iv[0].bytes, iv + 0 * AEGIS_BLOCK_SIZE,
--			AEGIS_BLOCK_SIZE);
--	crypto_xor(key_iv[1].bytes, iv + 1 * AEGIS_BLOCK_SIZE,
--			AEGIS_BLOCK_SIZE);
+-	crypto_morus640_load(&state->s[0], iv);
+-	state->s[1] = *key;
+-	for (i = 0; i < MORUS_BLOCK_WORDS; i++)
+-		state->s[2].words[i] = U32_C(0xFFFFFFFF);
+-	state->s[3] = crypto_morus640_const[0];
+-	state->s[4] = crypto_morus640_const[1];
 -
--	state->blocks[0] = key_iv[0];
--	state->blocks[1] = key_iv[1];
--	state->blocks[2] = crypto_aegis_const[1];
--	state->blocks[3] = crypto_aegis_const[0];
--	state->blocks[4] = key[0];
--	state->blocks[5] = key[1];
+-	for (i = 0; i < 16; i++)
+-		crypto_morus640_update(state, &z);
 -
--	crypto_aegis_block_xor(&state->blocks[4], &crypto_aegis_const[0]);
--	crypto_aegis_block_xor(&state->blocks[5], &crypto_aegis_const[1]);
--
--	for (i = 0; i < 4; i++) {
--		crypto_aegis256_update_a(state, &key[0]);
--		crypto_aegis256_update_a(state, &key[1]);
--		crypto_aegis256_update_a(state, &key_iv[0]);
--		crypto_aegis256_update_a(state, &key_iv[1]);
--	}
+-	for (i = 0; i < MORUS_BLOCK_WORDS; i++)
+-		state->s[1].words[i] ^= key->words[i];
 -}
 -
--static void crypto_aegis256_ad(struct aegis_state *state,
--			       const u8 *src, unsigned int size)
--{
--	if (AEGIS_ALIGNED(src)) {
--		const union aegis_block *src_blk =
--				(const union aegis_block *)src;
--
--		while (size >= AEGIS_BLOCK_SIZE) {
--			crypto_aegis256_update_a(state, src_blk);
--
--			size -= AEGIS_BLOCK_SIZE;
--			src_blk++;
--		}
--	} else {
--		while (size >= AEGIS_BLOCK_SIZE) {
--			crypto_aegis256_update_u(state, src);
--
--			size -= AEGIS_BLOCK_SIZE;
--			src += AEGIS_BLOCK_SIZE;
--		}
--	}
--}
--
--static void crypto_aegis256_encrypt_chunk(struct aegis_state *state, u8 *dst,
--					  const u8 *src, unsigned int size)
--{
--	union aegis_block tmp;
--
--	if (AEGIS_ALIGNED(src) && AEGIS_ALIGNED(dst)) {
--		while (size >= AEGIS_BLOCK_SIZE) {
--			union aegis_block *dst_blk =
--					(union aegis_block *)dst;
--			const union aegis_block *src_blk =
--					(const union aegis_block *)src;
--
--			tmp = state->blocks[2];
--			crypto_aegis_block_and(&tmp, &state->blocks[3]);
--			crypto_aegis_block_xor(&tmp, &state->blocks[5]);
--			crypto_aegis_block_xor(&tmp, &state->blocks[4]);
--			crypto_aegis_block_xor(&tmp, &state->blocks[1]);
--			crypto_aegis_block_xor(&tmp, src_blk);
--
--			crypto_aegis256_update_a(state, src_blk);
--
--			*dst_blk = tmp;
--
--			size -= AEGIS_BLOCK_SIZE;
--			src += AEGIS_BLOCK_SIZE;
--			dst += AEGIS_BLOCK_SIZE;
--		}
--	} else {
--		while (size >= AEGIS_BLOCK_SIZE) {
--			tmp = state->blocks[2];
--			crypto_aegis_block_and(&tmp, &state->blocks[3]);
--			crypto_aegis_block_xor(&tmp, &state->blocks[5]);
--			crypto_aegis_block_xor(&tmp, &state->blocks[4]);
--			crypto_aegis_block_xor(&tmp, &state->blocks[1]);
--			crypto_xor(tmp.bytes, src, AEGIS_BLOCK_SIZE);
--
--			crypto_aegis256_update_u(state, src);
--
--			memcpy(dst, tmp.bytes, AEGIS_BLOCK_SIZE);
--
--			size -= AEGIS_BLOCK_SIZE;
--			src += AEGIS_BLOCK_SIZE;
--			dst += AEGIS_BLOCK_SIZE;
--		}
--	}
--
--	if (size > 0) {
--		union aegis_block msg = {};
--		memcpy(msg.bytes, src, size);
--
--		tmp = state->blocks[2];
--		crypto_aegis_block_and(&tmp, &state->blocks[3]);
--		crypto_aegis_block_xor(&tmp, &state->blocks[5]);
--		crypto_aegis_block_xor(&tmp, &state->blocks[4]);
--		crypto_aegis_block_xor(&tmp, &state->blocks[1]);
--
--		crypto_aegis256_update_a(state, &msg);
--
--		crypto_aegis_block_xor(&msg, &tmp);
--
--		memcpy(dst, msg.bytes, size);
--	}
--}
--
--static void crypto_aegis256_decrypt_chunk(struct aegis_state *state, u8 *dst,
--					  const u8 *src, unsigned int size)
--{
--	union aegis_block tmp;
--
--	if (AEGIS_ALIGNED(src) && AEGIS_ALIGNED(dst)) {
--		while (size >= AEGIS_BLOCK_SIZE) {
--			union aegis_block *dst_blk =
--					(union aegis_block *)dst;
--			const union aegis_block *src_blk =
--					(const union aegis_block *)src;
--
--			tmp = state->blocks[2];
--			crypto_aegis_block_and(&tmp, &state->blocks[3]);
--			crypto_aegis_block_xor(&tmp, &state->blocks[5]);
--			crypto_aegis_block_xor(&tmp, &state->blocks[4]);
--			crypto_aegis_block_xor(&tmp, &state->blocks[1]);
--			crypto_aegis_block_xor(&tmp, src_blk);
--
--			crypto_aegis256_update_a(state, &tmp);
--
--			*dst_blk = tmp;
--
--			size -= AEGIS_BLOCK_SIZE;
--			src += AEGIS_BLOCK_SIZE;
--			dst += AEGIS_BLOCK_SIZE;
--		}
--	} else {
--		while (size >= AEGIS_BLOCK_SIZE) {
--			tmp = state->blocks[2];
--			crypto_aegis_block_and(&tmp, &state->blocks[3]);
--			crypto_aegis_block_xor(&tmp, &state->blocks[5]);
--			crypto_aegis_block_xor(&tmp, &state->blocks[4]);
--			crypto_aegis_block_xor(&tmp, &state->blocks[1]);
--			crypto_xor(tmp.bytes, src, AEGIS_BLOCK_SIZE);
--
--			crypto_aegis256_update_a(state, &tmp);
--
--			memcpy(dst, tmp.bytes, AEGIS_BLOCK_SIZE);
--
--			size -= AEGIS_BLOCK_SIZE;
--			src += AEGIS_BLOCK_SIZE;
--			dst += AEGIS_BLOCK_SIZE;
--		}
--	}
--
--	if (size > 0) {
--		union aegis_block msg = {};
--		memcpy(msg.bytes, src, size);
--
--		tmp = state->blocks[2];
--		crypto_aegis_block_and(&tmp, &state->blocks[3]);
--		crypto_aegis_block_xor(&tmp, &state->blocks[5]);
--		crypto_aegis_block_xor(&tmp, &state->blocks[4]);
--		crypto_aegis_block_xor(&tmp, &state->blocks[1]);
--		crypto_aegis_block_xor(&msg, &tmp);
--
--		memset(msg.bytes + size, 0, AEGIS_BLOCK_SIZE - size);
--
--		crypto_aegis256_update_a(state, &msg);
--
--		memcpy(dst, msg.bytes, size);
--	}
--}
--
--static void crypto_aegis256_process_ad(struct aegis_state *state,
+-static void crypto_morus640_process_ad(struct morus640_state *state,
 -				       struct scatterlist *sg_src,
 -				       unsigned int assoclen)
 -{
 -	struct scatter_walk walk;
--	union aegis_block buf;
+-	struct morus640_block m;
+-	union morus640_block_in buf;
 -	unsigned int pos = 0;
 -
 -	scatterwalk_start(&walk, sg_src);
@@ -3135,19 +3897,22 @@ index b47fd39595ad..000000000000
 -		void *mapped = scatterwalk_map(&walk);
 -		const u8 *src = (const u8 *)mapped;
 -
--		if (pos + size >= AEGIS_BLOCK_SIZE) {
+-		if (pos + size >= MORUS640_BLOCK_SIZE) {
 -			if (pos > 0) {
--				unsigned int fill = AEGIS_BLOCK_SIZE - pos;
+-				unsigned int fill = MORUS640_BLOCK_SIZE - pos;
 -				memcpy(buf.bytes + pos, src, fill);
--				crypto_aegis256_update_a(state, &buf);
+-
+-				crypto_morus640_load_a(&m, buf.bytes);
+-				crypto_morus640_update(state, &m);
+-
 -				pos = 0;
 -				left -= fill;
 -				src += fill;
 -			}
 -
--			crypto_aegis256_ad(state, src, left);
--			src += left & ~(AEGIS_BLOCK_SIZE - 1);
--			left &= AEGIS_BLOCK_SIZE - 1;
+-			crypto_morus640_ad(state, src, left);
+-			src += left & ~(MORUS640_BLOCK_SIZE - 1);
+-			left &= MORUS640_BLOCK_SIZE - 1;
 -		}
 -
 -		memcpy(buf.bytes + pos, src, left);
@@ -3160,14 +3925,16 @@ index b47fd39595ad..000000000000
 -	}
 -
 -	if (pos > 0) {
--		memset(buf.bytes + pos, 0, AEGIS_BLOCK_SIZE - pos);
--		crypto_aegis256_update_a(state, &buf);
+-		memset(buf.bytes + pos, 0, MORUS640_BLOCK_SIZE - pos);
+-
+-		crypto_morus640_load_a(&m, buf.bytes);
+-		crypto_morus640_update(state, &m);
 -	}
 -}
 -
--static void crypto_aegis256_process_crypt(struct aegis_state *state,
+-static void crypto_morus640_process_crypt(struct morus640_state *state,
 -					  struct aead_request *req,
--					  const struct aegis256_ops *ops)
+-					  const struct morus640_ops *ops)
 -{
 -	struct skcipher_walk walk;
 -
@@ -3186,1089 +3953,1141 @@ index b47fd39595ad..000000000000
 -	}
 -}
 -
--static void crypto_aegis256_final(struct aegis_state *state,
--				  union aegis_block *tag_xor,
+-static void crypto_morus640_final(struct morus640_state *state,
+-				  struct morus640_block *tag_xor,
 -				  u64 assoclen, u64 cryptlen)
 -{
--	u64 assocbits = assoclen * 8;
--	u64 cryptbits = cryptlen * 8;
--
--	union aegis_block tmp;
+-	struct morus640_block tmp;
 -	unsigned int i;
 -
--	tmp.words64[0] = cpu_to_le64(assocbits);
--	tmp.words64[1] = cpu_to_le64(cryptbits);
+-	tmp.words[0] = lower_32_bits(assoclen * 8);
+-	tmp.words[1] = upper_32_bits(assoclen * 8);
+-	tmp.words[2] = lower_32_bits(cryptlen * 8);
+-	tmp.words[3] = upper_32_bits(cryptlen * 8);
 -
--	crypto_aegis_block_xor(&tmp, &state->blocks[3]);
+-	for (i = 0; i < MORUS_BLOCK_WORDS; i++)
+-		state->s[4].words[i] ^= state->s[0].words[i];
 -
--	for (i = 0; i < 7; i++)
--		crypto_aegis256_update_a(state, &tmp);
+-	for (i = 0; i < 10; i++)
+-		crypto_morus640_update(state, &tmp);
 -
--	for (i = 0; i < AEGIS256_STATE_BLOCKS; i++)
--		crypto_aegis_block_xor(tag_xor, &state->blocks[i]);
+-	crypto_morus640_core(state, tag_xor);
 -}
 -
--static int crypto_aegis256_setkey(struct crypto_aead *aead, const u8 *key,
+-static int crypto_morus640_setkey(struct crypto_aead *aead, const u8 *key,
 -				  unsigned int keylen)
 -{
--	struct aegis_ctx *ctx = crypto_aead_ctx(aead);
+-	struct morus640_ctx *ctx = crypto_aead_ctx(aead);
 -
--	if (keylen != AEGIS256_KEY_SIZE) {
+-	if (keylen != MORUS640_BLOCK_SIZE) {
 -		crypto_aead_set_flags(aead, CRYPTO_TFM_RES_BAD_KEY_LEN);
 -		return -EINVAL;
 -	}
 -
--	memcpy(ctx->key[0].bytes, key, AEGIS_BLOCK_SIZE);
--	memcpy(ctx->key[1].bytes, key + AEGIS_BLOCK_SIZE,
--			AEGIS_BLOCK_SIZE);
+-	crypto_morus640_load(&ctx->key, key);
 -	return 0;
 -}
 -
--static int crypto_aegis256_setauthsize(struct crypto_aead *tfm,
+-static int crypto_morus640_setauthsize(struct crypto_aead *tfm,
 -				       unsigned int authsize)
 -{
--	if (authsize > AEGIS256_MAX_AUTH_SIZE)
--		return -EINVAL;
--	if (authsize < AEGIS256_MIN_AUTH_SIZE)
--		return -EINVAL;
--	return 0;
+-	return (authsize <= MORUS_MAX_AUTH_SIZE) ? 0 : -EINVAL;
 -}
 -
--static void crypto_aegis256_crypt(struct aead_request *req,
--				  union aegis_block *tag_xor,
+-static void crypto_morus640_crypt(struct aead_request *req,
+-				  struct morus640_block *tag_xor,
 -				  unsigned int cryptlen,
--				  const struct aegis256_ops *ops)
+-				  const struct morus640_ops *ops)
 -{
 -	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
--	struct aegis_ctx *ctx = crypto_aead_ctx(tfm);
--	struct aegis_state state;
+-	struct morus640_ctx *ctx = crypto_aead_ctx(tfm);
+-	struct morus640_state state;
 -
--	crypto_aegis256_init(&state, ctx->key, req->iv);
--	crypto_aegis256_process_ad(&state, req->src, req->assoclen);
--	crypto_aegis256_process_crypt(&state, req, ops);
--	crypto_aegis256_final(&state, tag_xor, req->assoclen, cryptlen);
+-	crypto_morus640_init(&state, &ctx->key, req->iv);
+-	crypto_morus640_process_ad(&state, req->src, req->assoclen);
+-	crypto_morus640_process_crypt(&state, req, ops);
+-	crypto_morus640_final(&state, tag_xor, req->assoclen, cryptlen);
 -}
 -
--static int crypto_aegis256_encrypt(struct aead_request *req)
+-static int crypto_morus640_encrypt(struct aead_request *req)
 -{
--	static const struct aegis256_ops ops = {
+-	static const struct morus640_ops ops = {
 -		.skcipher_walk_init = skcipher_walk_aead_encrypt,
--		.crypt_chunk = crypto_aegis256_encrypt_chunk,
+-		.crypt_chunk = crypto_morus640_encrypt_chunk,
 -	};
 -
 -	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
--	union aegis_block tag = {};
+-	struct morus640_block tag = {};
+-	union morus640_block_in tag_out;
 -	unsigned int authsize = crypto_aead_authsize(tfm);
 -	unsigned int cryptlen = req->cryptlen;
 -
--	crypto_aegis256_crypt(req, &tag, cryptlen, &ops);
+-	crypto_morus640_crypt(req, &tag, cryptlen, &ops);
+-	crypto_morus640_store(tag_out.bytes, &tag);
 -
--	scatterwalk_map_and_copy(tag.bytes, req->dst, req->assoclen + cryptlen,
--				 authsize, 1);
+-	scatterwalk_map_and_copy(tag_out.bytes, req->dst,
+-				 req->assoclen + cryptlen, authsize, 1);
 -	return 0;
 -}
 -
--static int crypto_aegis256_decrypt(struct aead_request *req)
+-static int crypto_morus640_decrypt(struct aead_request *req)
 -{
--	static const struct aegis256_ops ops = {
+-	static const struct morus640_ops ops = {
 -		.skcipher_walk_init = skcipher_walk_aead_decrypt,
--		.crypt_chunk = crypto_aegis256_decrypt_chunk,
+-		.crypt_chunk = crypto_morus640_decrypt_chunk,
 -	};
--	static const u8 zeros[AEGIS256_MAX_AUTH_SIZE] = {};
+-	static const u8 zeros[MORUS640_BLOCK_SIZE] = {};
 -
 -	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
--	union aegis_block tag;
+-	union morus640_block_in tag_in;
+-	struct morus640_block tag;
 -	unsigned int authsize = crypto_aead_authsize(tfm);
 -	unsigned int cryptlen = req->cryptlen - authsize;
 -
--	scatterwalk_map_and_copy(tag.bytes, req->src, req->assoclen + cryptlen,
--				 authsize, 0);
+-	scatterwalk_map_and_copy(tag_in.bytes, req->src,
+-				 req->assoclen + cryptlen, authsize, 0);
 -
--	crypto_aegis256_crypt(req, &tag, cryptlen, &ops);
+-	crypto_morus640_load(&tag, tag_in.bytes);
+-	crypto_morus640_crypt(req, &tag, cryptlen, &ops);
+-	crypto_morus640_store(tag_in.bytes, &tag);
 -
--	return crypto_memneq(tag.bytes, zeros, authsize) ? -EBADMSG : 0;
+-	return crypto_memneq(tag_in.bytes, zeros, authsize) ? -EBADMSG : 0;
 -}
 -
--static int crypto_aegis256_init_tfm(struct crypto_aead *tfm)
+-static int crypto_morus640_init_tfm(struct crypto_aead *tfm)
 -{
 -	return 0;
 -}
 -
--static void crypto_aegis256_exit_tfm(struct crypto_aead *tfm)
+-static void crypto_morus640_exit_tfm(struct crypto_aead *tfm)
 -{
 -}
 -
--static struct aead_alg crypto_aegis256_alg = {
--	.setkey = crypto_aegis256_setkey,
--	.setauthsize = crypto_aegis256_setauthsize,
--	.encrypt = crypto_aegis256_encrypt,
--	.decrypt = crypto_aegis256_decrypt,
--	.init = crypto_aegis256_init_tfm,
--	.exit = crypto_aegis256_exit_tfm,
+-static struct aead_alg crypto_morus640_alg = {
+-	.setkey = crypto_morus640_setkey,
+-	.setauthsize = crypto_morus640_setauthsize,
+-	.encrypt = crypto_morus640_encrypt,
+-	.decrypt = crypto_morus640_decrypt,
+-	.init = crypto_morus640_init_tfm,
+-	.exit = crypto_morus640_exit_tfm,
 -
--	.ivsize = AEGIS256_NONCE_SIZE,
--	.maxauthsize = AEGIS256_MAX_AUTH_SIZE,
--	.chunksize = AEGIS_BLOCK_SIZE,
+-	.ivsize = MORUS_NONCE_SIZE,
+-	.maxauthsize = MORUS_MAX_AUTH_SIZE,
+-	.chunksize = MORUS640_BLOCK_SIZE,
 -
 -	.base = {
 -		.cra_blocksize = 1,
--		.cra_ctxsize = sizeof(struct aegis_ctx),
+-		.cra_ctxsize = sizeof(struct morus640_ctx),
 -		.cra_alignmask = 0,
 -
 -		.cra_priority = 100,
 -
--		.cra_name = "aegis256",
--		.cra_driver_name = "aegis256-generic",
+-		.cra_name = "morus640",
+-		.cra_driver_name = "morus640-generic",
 -
 -		.cra_module = THIS_MODULE,
 -	}
 -};
 -
--static int __init crypto_aegis256_module_init(void)
+-static int __init crypto_morus640_module_init(void)
 -{
--	return crypto_register_aead(&crypto_aegis256_alg);
+-	return crypto_register_aead(&crypto_morus640_alg);
 -}
 -
--static void __exit crypto_aegis256_module_exit(void)
+-static void __exit crypto_morus640_module_exit(void)
 -{
--	crypto_unregister_aead(&crypto_aegis256_alg);
+-	crypto_unregister_aead(&crypto_morus640_alg);
 -}
 -
--subsys_initcall(crypto_aegis256_module_init);
--module_exit(crypto_aegis256_module_exit);
+-subsys_initcall(crypto_morus640_module_init);
+-module_exit(crypto_morus640_module_exit);
 -
 -MODULE_LICENSE("GPL");
 -MODULE_AUTHOR("Ondrej Mosnacek <omosnacek@gmail.com>");
--MODULE_DESCRIPTION("AEGIS-256 AEAD algorithm");
--MODULE_ALIAS_CRYPTO("aegis256");
--MODULE_ALIAS_CRYPTO("aegis256-generic");
+-MODULE_DESCRIPTION("MORUS-640 AEAD algorithm");
+-MODULE_ALIAS_CRYPTO("morus640");
+-MODULE_ALIAS_CRYPTO("morus640-generic");
 diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index b2061588ce0f..8f470768ae0a 100644
+index d760f5cd35b2..b2061588ce0f 100644
 --- a/crypto/testmgr.c
 +++ b/crypto/testmgr.c
-@@ -3891,18 +3891,6 @@ static const struct alg_test_desc alg_test_descs[] = {
+@@ -4763,18 +4763,6 @@ static const struct alg_test_desc alg_test_descs[] = {
  		.suite = {
- 			.aead = __VECS(aegis128_tv_template)
+ 			.hash = __VECS(michael_mic_tv_template)
  		}
 -	}, {
--		.alg = "aegis128l",
+-		.alg = "morus1280",
 -		.test = alg_test_aead,
 -		.suite = {
--			.aead = __VECS(aegis128l_tv_template)
+-			.aead = __VECS(morus1280_tv_template)
 -		}
 -	}, {
--		.alg = "aegis256",
+-		.alg = "morus640",
 -		.test = alg_test_aead,
 -		.suite = {
--			.aead = __VECS(aegis256_tv_template)
+-			.aead = __VECS(morus640_tv_template)
 -		}
  	}, {
- 		.alg = "ansi_cprng",
- 		.test = alg_test_cprng,
+ 		.alg = "nhpoly1305",
+ 		.test = alg_test_hash,
 diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index e13351145e23..671443f33fe2 100644
+index 6b459a6a796b..e13351145e23 100644
 --- a/crypto/testmgr.h
 +++ b/crypto/testmgr.h
-@@ -19493,990 +19493,6 @@ static const struct aead_testvec aegis128_tv_template[] = {
+@@ -20477,1713 +20477,6 @@ static const struct aead_testvec aegis256_tv_template[] = {
  	},
  };
  
 -/*
-- * AEGIS-128L test vectors - generated via reference implementation from
+- * MORUS-640 test vectors - generated via reference implementation from
 - * SUPERCOP (https://bench.cr.yp.to/supercop.html):
 - *
 - *   https://bench.cr.yp.to/supercop/supercop-20170228.tar.xz
-- *   (see crypto_aead/aegis128l/)
+- *   (see crypto_aead/morus640128v2/)
 - */
--static const struct aead_testvec aegis128l_tv_template[] = {
+-static const struct aead_testvec morus640_tv_template[] = {
 -	{
--		.key	= "\x0f\xc9\x8e\x67\x44\x9e\xaa\x86"
--			  "\x20\x36\x2c\x24\xfe\xc9\x30\x81",
+-		.key	= "\x00\x00\x00\x00\x00\x00\x00\x00"
+-			  "\x00\x00\x00\x00\x00\x00\x00\x00",
 -		.klen	= 16,
--		.iv	= "\x1e\x92\x1c\xcf\x88\x3d\x54\x0d"
--			  "\x40\x6d\x59\x48\xfc\x92\x61\x03",
+-		.iv	= "\x0f\xc9\x8e\x67\x44\x9e\xaa\x86"
+-			  "\x20\x36\x2c\x24\xfe\xc9\x30\x81",
 -		.assoc	= "",
 -		.alen	= 0,
 -		.ptext	= "",
 -		.plen	= 0,
--		.ctext	= "\x30\x4f\xf3\xe9\xb1\xfa\x81\xa6"
--			  "\x20\x72\x78\xdd\x93\xc8\x57\xef",
+-		.ctext	= "\x89\x62\x7d\xf3\x07\x9d\x52\x05"
+-			  "\x53\xc3\x04\x60\x93\xb4\x37\x9a",
 -		.clen	= 16,
 -	}, {
--		.key	= "\x4b\xed\xc8\x07\x54\x1a\x52\xa2"
--			  "\xa1\x10\xde\xb5\xf8\xed\xf3\x87",
+-		.key	= "\x3c\x24\x39\x9f\x10\x7b\xa8\x1b"
+-			  "\x80\xda\xb2\x91\xf9\x24\xc2\x06",
 -		.klen	= 16,
--		.iv	= "\x5a\xb7\x56\x6e\x98\xb9\xfd\x29"
--			  "\xc1\x47\x0b\xda\xf6\xb6\x23\x09",
+-		.iv	= "\x4b\xed\xc8\x07\x54\x1a\x52\xa2"
+-			  "\xa1\x10\xde\xb5\xf8\xed\xf3\x87",
 -		.assoc	= "",
 -		.alen	= 0,
--		.ptext	= "\x79",
+-		.ptext	= "\x69",
 -		.plen	= 1,
--		.ctext	= "\xa9\x24\xa0\xb6\x2d\xdd\x29\xdb"
--			  "\x40\xb3\x71\xc5\x22\x58\x31\x77"
--			  "\x6d",
+-		.ctext	= "\xa8\x8d\xe4\x90\xb5\x50\x8f\x78"
+-			  "\xb6\x10\x9a\x59\x5f\x61\x37\x70"
+-			  "\x09",
 -		.clen	= 17,
 -	}, {
--		.key	= "\x88\x12\x01\xa6\x64\x96\xfb\xbe"
--			  "\x22\xea\x90\x47\xf2\x11\xb5\x8e",
+-		.key	= "\x79\x49\x73\x3e\x20\xf7\x51\x37"
+-			  "\x01\xb4\x64\x22\xf3\x48\x85\x0c",
 -		.klen	= 16,
--		.iv	= "\x97\xdb\x90\x0e\xa8\x35\xa5\x45"
--			  "\x42\x21\xbd\x6b\xf0\xda\xe6\x0f",
+-		.iv	= "\x88\x12\x01\xa6\x64\x96\xfb\xbe"
+-			  "\x22\xea\x90\x47\xf2\x11\xb5\x8e",
 -		.assoc	= "",
 -		.alen	= 0,
--		.ptext	= "\xb5\x6e\xad\xdd\x30\x72\xfa\x53"
--			  "\x82\x8e\x16\xb4\xed\x6d\x47",
+-		.ptext	= "\xa6\xa4\x1e\x76\xec\xd4\x50\xcc"
+-			  "\x62\x58\xe9\x8f\xef\xa4\x17",
 -		.plen	= 15,
--		.ctext	= "\xbb\x0a\x53\xc4\xaa\x7e\xa4\x03"
--			  "\x2b\xee\x62\x99\x7b\x98\x13\x1f"
--			  "\xe0\x76\x4c\x2e\x53\x99\x4f\xbe"
--			  "\xe1\xa8\x04\x7f\xe1\x71\xbe",
+-		.ctext	= "\x76\xdd\xb9\x05\x3d\xce\x61\x38"
+-			  "\xf3\xef\xf7\xe5\xd7\xfd\x70\xa5"
+-			  "\xcf\x9d\x64\xb8\x0a\x9f\xfd\x8b"
+-			  "\xd4\x6e\xfe\xd9\xc8\x63\x4b",
 -		.clen	= 31,
 -	}, {
--		.key	= "\xc4\x37\x3b\x45\x74\x11\xa4\xda"
--			  "\xa2\xc5\x42\xd8\xec\x36\x78\x94",
+-		.key	= "\xb5\x6e\xad\xdd\x30\x72\xfa\x53"
+-			  "\x82\x8e\x16\xb4\xed\x6d\x47\x12",
 -		.klen	= 16,
--		.iv	= "\xd3\x00\xc9\xad\xb8\xb0\x4e\x61"
--			  "\xc3\xfb\x6f\xfd\xea\xff\xa9\x15",
+-		.iv	= "\xc4\x37\x3b\x45\x74\x11\xa4\xda"
+-			  "\xa2\xc5\x42\xd8\xec\x36\x78\x94",
 -		.assoc	= "",
 -		.alen	= 0,
--		.ptext	= "\xf2\x92\xe6\x7d\x40\xee\xa3\x6f"
--			  "\x03\x68\xc8\x45\xe7\x91\x0a\x18",
+-		.ptext	= "\xe2\xc9\x58\x15\xfc\x4f\xf8\xe8"
+-			  "\xe3\x32\x9b\x21\xe9\xc8\xd9\x97",
 -		.plen	= 16,
--		.ctext	= "\x66\xdf\x6e\x71\xc0\x6e\xa4\x4c"
--			  "\x9d\xb7\x8c\x9a\xdb\x1f\xd2\x2e"
--			  "\x23\xb6\xa4\xfb\xd3\x86\xdd\xbb"
--			  "\xde\x54\x9b\xf5\x92\x8b\x93\xc5",
+-		.ctext	= "\xdc\x72\xe8\x14\xfb\x63\xad\x72"
+-			  "\x1f\x57\x9a\x1f\x88\x81\xdb\xd6"
+-			  "\xc1\x91\x9d\xb9\x25\xc4\x99\x4c"
+-			  "\x97\xcd\x8a\x0c\x9d\x68\x00\x1c",
 -		.clen	= 32,
 -	}, {
--		.key	= "\x01\x5c\x75\xe5\x84\x8d\x4d\xf6"
--			  "\x23\x9f\xf4\x6a\xe6\x5a\x3b\x9a",
+-		.key	= "\xf2\x92\xe6\x7d\x40\xee\xa3\x6f"
+-			  "\x03\x68\xc8\x45\xe7\x91\x0a\x18",
 -		.klen	= 16,
--		.iv	= "\x10\x25\x03\x4c\xc8\x2c\xf7\x7d"
--			  "\x44\xd5\x21\x8e\xe4\x23\x6b\x1c",
+-		.iv	= "\x01\x5c\x75\xe5\x84\x8d\x4d\xf6"
+-			  "\x23\x9f\xf4\x6a\xe6\x5a\x3b\x9a",
 -		.assoc	= "",
 -		.alen	= 0,
--		.ptext	= "\x2e\xb7\x20\x1c\x50\x6a\x4b\x8b"
--			  "\x84\x42\x7a\xd7\xe1\xb5\xcd\x1f"
--			  "\xd3",
+-		.ptext	= "\x1f\xee\x92\xb4\x0c\xcb\xa1\x04"
+-			  "\x64\x0c\x4d\xb2\xe3\xec\x9c\x9d"
+-			  "\x09",
 -		.plen	= 17,
--		.ctext	= "\x4f\xc3\x69\xb6\xd3\xa4\x64\x8b"
--			  "\x71\xc3\x8a\x91\x22\x4f\x1b\xd2"
--			  "\x33\x6d\x86\xbc\xf8\x2f\x06\xf9"
--			  "\x82\x64\xc7\x72\x00\x30\xfc\xf0"
--			  "\xf8",
+-		.ctext	= "\x6b\x4f\x3b\x90\x9a\xa2\xb3\x82"
+-			  "\x0a\xb8\x55\xee\xeb\x73\x4d\x7f"
+-			  "\x54\x11\x3a\x8a\x31\xa3\xb5\xf2"
+-			  "\xcd\x49\xdb\xf3\xee\x26\xbd\xa2"
+-			  "\x0d",
 -		.clen	= 33,
 -	}, {
--		.key	= "\x3d\x80\xae\x84\x94\x09\xf6\x12"
--			  "\xa4\x79\xa6\xfb\xe0\x7f\xfd\xa0",
+-		.key	= "\x2e\xb7\x20\x1c\x50\x6a\x4b\x8b"
+-			  "\x84\x42\x7a\xd7\xe1\xb5\xcd\x1f",
 -		.klen	= 16,
--		.iv	= "\x4c\x49\x3d\xec\xd8\xa8\xa0\x98"
--			  "\xc5\xb0\xd3\x1f\xde\x48\x2e\x22",
+-		.iv	= "\x3d\x80\xae\x84\x94\x09\xf6\x12"
+-			  "\xa4\x79\xa6\xfb\xe0\x7f\xfd\xa0",
 -		.assoc	= "",
 -		.alen	= 0,
--		.ptext	= "\x6b\xdc\x5a\xbb\x60\xe5\xf4\xa6"
--			  "\x05\x1d\x2c\x68\xdb\xda\x8f\x25"
--			  "\xfe\x8d\x45\x19\x1e\xc0\x0b\x99"
--			  "\x88\x11\x39\x12\x1c\x3a\xbb",
+-		.ptext	= "\x5c\x13\xcb\x54\x1c\x47\x4a\x1f"
+-			  "\xe5\xe6\xff\x44\xdd\x11\x5f\xa3"
+-			  "\x33\xdd\xc2\xf8\xdd\x18\x2b\x93"
+-			  "\x57\x05\x01\x1c\x66\x22\xd3",
 -		.plen	= 31,
--		.ctext	= "\xe3\x93\x15\xae\x5f\x9d\x3c\xb5"
--			  "\xd6\x9d\xee\xee\xcf\xaa\xaf\xe1"
--			  "\x45\x10\x96\xe0\xbf\x55\x0f\x4c"
--			  "\x1a\xfd\xf4\xda\x4e\x10\xde\xc9"
--			  "\x0e\x6f\xc7\x3c\x49\x94\x41\xfc"
--			  "\x59\x28\x88\x3c\x79\x10\x6b",
+-		.ctext	= "\x59\xd1\x0f\x6b\xee\x27\x84\x92"
+-			  "\xb7\xa9\xb5\xdd\x02\xa4\x12\xa5"
+-			  "\x50\x32\xb4\x9a\x2e\x35\x83\x55"
+-			  "\x36\x12\x12\xed\xa3\x31\xc5\x30"
+-			  "\xa7\xe2\x4a\x6d\x05\x59\x43\x91"
+-			  "\x75\xfa\x6c\x17\xc6\x73\xca",
 -		.clen	= 47,
 -	}, {
--		.key	= "\x7a\xa5\xe8\x23\xa4\x84\x9e\x2d"
--			  "\x25\x53\x58\x8c\xda\xa3\xc0\xa6",
+-		.key	= "\x6b\xdc\x5a\xbb\x60\xe5\xf4\xa6"
+-			  "\x05\x1d\x2c\x68\xdb\xda\x8f\x25",
 -		.klen	= 16,
--		.iv	= "\x89\x6e\x77\x8b\xe8\x23\x49\xb4"
--			  "\x45\x8a\x85\xb1\xd8\x6c\xf1\x28",
+-		.iv	= "\x7a\xa5\xe8\x23\xa4\x84\x9e\x2d"
+-			  "\x25\x53\x58\x8c\xda\xa3\xc0\xa6",
 -		.assoc	= "",
 -		.alen	= 0,
--		.ptext	= "\xa7\x00\x93\x5b\x70\x61\x9d\xc2"
--			  "\x86\xf7\xde\xfa\xd5\xfe\x52\x2b"
--			  "\x28\x50\x51\x9d\x24\x60\x8d\xb3"
--			  "\x49\x3e\x17\xea\xf6\x99\x5a\xdd",
+-		.ptext	= "\x98\x37\x05\xf3\x2c\xc2\xf3\x3b"
+-			  "\x66\xc0\xb1\xd5\xd7\x35\x21\xaa"
+-			  "\x5d\x9f\xce\x7c\xe2\xb8\xad\xad"
+-			  "\x19\x33\xe0\xf4\x40\x81\x72\x28",
 -		.plen	= 32,
--		.ctext	= "\x1c\x8e\x22\x34\xfd\xab\xe6\x0d"
--			  "\x1c\x9f\x06\x54\x8b\x0b\xb4\x40"
--			  "\xde\x11\x59\x3e\xfd\x74\xf6\x42"
--			  "\x97\x17\xf7\x24\xb6\x7e\xc4\xc6"
--			  "\x06\xa3\x94\xda\x3d\x7f\x55\x0a"
--			  "\x92\x07\x2f\xa6\xf3\x6b\x2c\xfc",
+-		.ctext	= "\xdb\x49\x68\x0f\x91\x5b\x21\xb1"
+-			  "\xcf\x50\xb2\x4c\x32\xe1\xa6\x69"
+-			  "\xc0\xfb\x44\x1f\xa0\x9a\xeb\x39"
+-			  "\x1b\xde\x68\x38\xcc\x27\x52\xc5"
+-			  "\xf6\x3e\x74\xea\x66\x5b\x5f\x0c"
+-			  "\x65\x9e\x58\xe6\x52\xa2\xfe\x59",
 -		.clen	= 48,
 -	}, {
--		.key	= "\xb6\xca\x22\xc3\xb4\x00\x47\x49"
--			  "\xa6\x2d\x0a\x1e\xd4\xc7\x83\xad",
+-		.key	= "\xa7\x00\x93\x5b\x70\x61\x9d\xc2"
+-			  "\x86\xf7\xde\xfa\xd5\xfe\x52\x2b",
 -		.klen	= 16,
--		.iv	= "\xc5\x93\xb0\x2a\xf8\x9f\xf1\xd0"
--			  "\xc6\x64\x37\x42\xd2\x90\xb3\x2e",
--		.assoc	= "\xd5",
+-		.iv	= "\xb6\xca\x22\xc3\xb4\x00\x47\x49"
+-			  "\xa6\x2d\x0a\x1e\xd4\xc7\x83\xad",
+-		.assoc	= "\xc5",
 -		.alen	= 1,
 -		.ptext	= "",
 -		.plen	= 0,
--		.ctext	= "\xa0\x2a\xb4\x9a\x91\x00\x15\xb8"
--			  "\x0f\x9a\x15\x60\x0e\x9b\x13\x8f",
+-		.ctext	= "\x56\xe7\x24\x52\xdd\x95\x60\x5b"
+-			  "\x09\x48\x39\x69\x9c\xb3\x62\x46",
 -		.clen	= 16,
 -	}, {
--		.key	= "\xf3\xee\x5c\x62\xc4\x7c\xf0\x65"
--			  "\x27\x08\xbd\xaf\xce\xec\x45\xb3",
+-		.key	= "\xe4\x25\xcd\xfa\x80\xdd\x46\xde"
+-			  "\x07\xd1\x90\x8b\xcf\x23\x15\x31",
 -		.klen	= 16,
--		.iv	= "\x02\xb8\xea\xca\x09\x1b\x9a\xec"
--			  "\x47\x3e\xe9\xd4\xcc\xb5\x76\x34",
--		.assoc	= "\x11\x81\x78\x32\x4d\xb9\x44\x73"
--			  "\x68\x75\x16\xf8\xcb\x7e\xa7",
+-		.iv	= "\xf3\xee\x5c\x62\xc4\x7c\xf0\x65"
+-			  "\x27\x08\xbd\xaf\xce\xec\x45\xb3",
+-		.assoc	= "\x02\xb8\xea\xca\x09\x1b\x9a\xec"
+-			  "\x47\x3e\xe9\xd4\xcc\xb5\x76",
 -		.alen	= 15,
 -		.ptext	= "",
 -		.plen	= 0,
--		.ctext	= "\x4c\x26\xad\x9c\x14\xfd\x9c\x8c"
--			  "\x84\xfb\x26\xfb\xd5\xca\x62\x39",
+-		.ctext	= "\xdd\xfa\x6c\x1f\x5d\x86\x87\x01"
+-			  "\x13\xe5\x73\x46\x46\xf2\x5c\xe1",
 -		.clen	= 16,
 -	}, {
--		.key	= "\x2f\x13\x95\x01\xd5\xf7\x99\x81"
--			  "\xa8\xe2\x6f\x41\xc8\x10\x08\xb9",
+-		.key	= "\x20\x4a\x07\x99\x91\x58\xee\xfa"
+-			  "\x88\xab\x42\x1c\xc9\x47\xd7\x38",
 -		.klen	= 16,
--		.iv	= "\x3f\xdc\x24\x69\x19\x96\x43\x08"
+-		.iv	= "\x2f\x13\x95\x01\xd5\xf7\x99\x81"
+-			  "\xa8\xe2\x6f\x41\xc8\x10\x08\xb9",
+-		.assoc	= "\x3f\xdc\x24\x69\x19\x96\x43\x08"
 -			  "\xc8\x18\x9b\x65\xc6\xd9\x39\x3b",
--		.assoc	= "\x4e\xa5\xb2\xd1\x5d\x35\xed\x8f"
--			  "\xe8\x4f\xc8\x89\xc5\xa2\x69\xbc",
 -		.alen	= 16,
 -		.ptext	= "",
 -		.plen	= 0,
--		.ctext	= "\x45\x85\x0e\x0f\xf4\xae\x96\xa1"
--			  "\x99\x4d\x6d\xb4\x67\x32\xb0\x3a",
+-		.ctext	= "\xa6\x1b\xb9\xd7\x5e\x3c\xcf\xac"
+-			  "\xa9\x21\x45\x0b\x16\x52\xf7\xe1",
 -		.clen	= 16,
 -	}, {
--		.key	= "\x6c\x38\xcf\xa1\xe5\x73\x41\x9d"
--			  "\x29\xbc\x21\xd2\xc2\x35\xcb\xbf",
+-		.key	= "\x5d\x6f\x41\x39\xa1\xd4\x97\x16"
+-			  "\x09\x85\xf4\xae\xc3\x6b\x9a\x3e",
 -		.klen	= 16,
--		.iv	= "\x7b\x01\x5d\x08\x29\x12\xec\x24"
--			  "\x49\xf3\x4d\xf7\xc0\xfe\xfb\x41",
--		.assoc	= "\x8a\xca\xec\x70\x6d\xb1\x96\xab"
--			  "\x69\x29\x7a\x1b\xbf\xc7\x2c\xc2"
--			  "\x07",
+-		.iv	= "\x6c\x38\xcf\xa1\xe5\x73\x41\x9d"
+-			  "\x29\xbc\x21\xd2\xc2\x35\xcb\xbf",
+-		.assoc	= "\x7b\x01\x5d\x08\x29\x12\xec\x24"
+-			  "\x49\xf3\x4d\xf7\xc0\xfe\xfb\x41"
+-			  "\x3c",
 -		.alen	= 17,
 -		.ptext	= "",
 -		.plen	= 0,
--		.ctext	= "\x33\xb1\x42\x97\x8e\x16\x7b\x63"
--			  "\x06\xba\x5b\xcb\xae\x6d\x8b\x56",
+-		.ctext	= "\x15\xff\xde\x3b\x34\xfc\xf6\xf9"
+-			  "\xbb\xa8\x62\xad\x0a\xf5\x48\x60",
 -		.clen	= 16,
 -	}, {
--		.key	= "\xa8\x5c\x09\x40\xf5\xef\xea\xb8"
--			  "\xaa\x96\xd3\x64\xbc\x59\x8d\xc6",
+-		.key	= "\x99\x93\x7a\xd8\xb1\x50\x40\x31"
+-			  "\x8a\x60\xa6\x3f\xbd\x90\x5d\x44",
 -		.klen	= 16,
--		.iv	= "\xb8\x26\x97\xa8\x39\x8e\x94\x3f"
--			  "\xca\xcd\xff\x88\xba\x22\xbe\x47",
--		.assoc	= "\xc7\xef\x26\x10\x7d\x2c\x3f\xc6"
--			  "\xea\x03\x2c\xac\xb9\xeb\xef\xc9"
--			  "\x31\x6b\x08\x12\xfc\xd8\x37\x2d"
--			  "\xe0\x17\x3a\x2e\x83\x5c\x8f",
+-		.iv	= "\xa8\x5c\x09\x40\xf5\xef\xea\xb8"
+-			  "\xaa\x96\xd3\x64\xbc\x59\x8d\xc6",
+-		.assoc	= "\xb8\x26\x97\xa8\x39\x8e\x94\x3f"
+-			  "\xca\xcd\xff\x88\xba\x22\xbe\x47"
+-			  "\x67\xba\x85\xf1\xbb\x30\x56\x26"
+-			  "\xaf\x0b\x02\x38\xcc\x44\xa7",
 -		.alen	= 31,
 -		.ptext	= "",
 -		.plen	= 0,
--		.ctext	= "\xda\x44\x08\x8c\x2a\xa5\x07\x35"
--			  "\x0b\x54\x4e\x6d\xe3\xfd\xc4\x5f",
+-		.ctext	= "\xd2\x9d\xf8\x3b\xd7\x84\xe9\x2d"
+-			  "\x4b\xef\x75\x16\x0a\x99\xae\x6b",
 -		.clen	= 16,
 -	}, {
--		.key	= "\xe5\x81\x42\xdf\x05\x6a\x93\xd4"
--			  "\x2b\x70\x85\xf5\xb6\x7d\x50\xcc",
+-		.key	= "\xd6\xb8\xb4\x77\xc1\xcb\xe9\x4d"
+-			  "\x0a\x3a\x58\xd1\xb7\xb4\x1f\x4a",
 -		.klen	= 16,
--		.iv	= "\xf4\x4a\xd1\x47\x49\x09\x3d\x5b"
--			  "\x4b\xa7\xb1\x19\xb4\x46\x81\x4d",
--		.assoc	= "\x03\x14\x5f\xaf\x8d\xa8\xe7\xe2"
--			  "\x6b\xde\xde\x3e\xb3\x10\xb1\xcf"
--			  "\x5c\x2d\x14\x96\x01\x78\xb9\x47"
--			  "\xa1\x44\x19\x06\x5d\xbb\x2e\x2f",
+-		.iv	= "\xe5\x81\x42\xdf\x05\x6a\x93\xd4"
+-			  "\x2b\x70\x85\xf5\xb6\x7d\x50\xcc",
+-		.assoc	= "\xf4\x4a\xd1\x47\x49\x09\x3d\x5b"
+-			  "\x4b\xa7\xb1\x19\xb4\x46\x81\x4d"
+-			  "\x91\x7c\x91\x75\xc0\xd0\xd8\x40"
+-			  "\x71\x39\xe1\x10\xa6\xa3\x46\x7a",
 -		.alen	= 32,
 -		.ptext	= "",
 -		.plen	= 0,
--		.ctext	= "\x1b\xb1\xf1\xa8\x9e\xc2\xb2\x88"
--			  "\x40\x7f\x7b\x19\x7a\x52\x8c\xf0",
+-		.ctext	= "\xe4\x8d\xa7\xa7\x45\xc1\x31\x4f"
+-			  "\xce\xfb\xaf\xd6\xc2\xe6\xee\xc0",
 -		.clen	= 16,
 -	}, {
--		.key	= "\x22\xa6\x7c\x7f\x15\xe6\x3c\xf0"
--			  "\xac\x4b\x37\x86\xb0\xa2\x13\xd2",
+-		.key	= "\x12\xdd\xee\x17\xd1\x47\x92\x69"
+-			  "\x8b\x14\x0a\x62\xb1\xd9\xe2\x50",
 -		.klen	= 16,
--		.iv	= "\x31\x6f\x0b\xe6\x59\x85\xe6\x77"
--			  "\xcc\x81\x63\xab\xae\x6b\x43\x54",
--		.assoc	= "\x40",
+-		.iv	= "\x22\xa6\x7c\x7f\x15\xe6\x3c\xf0"
+-			  "\xac\x4b\x37\x86\xb0\xa2\x13\xd2",
+-		.assoc	= "\x31",
 -		.alen	= 1,
--		.ptext	= "\x4f",
+-		.ptext	= "\x40",
 -		.plen	= 1,
--		.ctext	= "\x6e\xc8\xfb\x15\x9d\x98\x49\xc9"
--			  "\xa0\x98\x09\x85\xbe\x56\x8e\x79"
--			  "\xf4",
+-		.ctext	= "\xe2\x67\x38\x4f\xb9\xad\x7d\x38"
+-			  "\x01\xfe\x84\x14\x85\xf8\xd1\xe3"
+-			  "\x22",
 -		.clen	= 17,
 -	}, {
--		.key	= "\x5e\xcb\xb6\x1e\x25\x62\xe4\x0c"
--			  "\x2d\x25\xe9\x18\xaa\xc6\xd5\xd8",
+-		.key	= "\x4f\x01\x27\xb6\xe1\xc3\x3a\x85"
+-			  "\x0c\xee\xbc\xf4\xab\xfd\xa5\x57",
 -		.klen	= 16,
--		.iv	= "\x6d\x94\x44\x86\x69\x00\x8f\x93"
--			  "\x4d\x5b\x15\x3c\xa8\x8f\x06\x5a",
--		.assoc	= "\x7c\x5d\xd3\xee\xad\x9f\x39\x1a"
--			  "\x6d\x92\x42\x61\xa7\x58\x37",
+-		.iv	= "\x5e\xcb\xb6\x1e\x25\x62\xe4\x0c"
+-			  "\x2d\x25\xe9\x18\xaa\xc6\xd5\xd8",
+-		.assoc	= "\x6d\x94\x44\x86\x69\x00\x8f\x93"
+-			  "\x4d\x5b\x15\x3c\xa8\x8f\x06",
 -		.alen	= 15,
--		.ptext	= "\x8b\x26\x61\x55\xf1\x3e\xe3\xa1"
--			  "\x8d\xc8\x6e\x85\xa5\x21\x67",
+-		.ptext	= "\x7c\x5d\xd3\xee\xad\x9f\x39\x1a"
+-			  "\x6d\x92\x42\x61\xa7\x58\x37",
 -		.plen	= 15,
--		.ctext	= "\x99\x2e\x84\x50\x64\x5c\xab\x29"
--			  "\x20\xba\xb9\x2f\x62\x3a\xce\x2a"
--			  "\x75\x25\x3b\xe3\x40\xe0\x1d\xfc"
--			  "\x20\x63\x0b\x49\x7e\x97\x08",
+-		.ctext	= "\x77\x32\x61\xeb\xb4\x33\x29\x92"
+-			  "\x29\x95\xc5\x8e\x85\x76\xab\xfc"
+-			  "\x07\x95\xa7\x44\x74\xf7\x22\xff"
+-			  "\xd8\xd8\x36\x3d\x8a\x7f\x9e",
 -		.clen	= 31,
 -	}, {
--		.key	= "\x9b\xef\xf0\xbd\x35\xdd\x8d\x28"
--			  "\xad\xff\x9b\xa9\xa4\xeb\x98\xdf",
+-		.key	= "\x8b\x26\x61\x55\xf1\x3e\xe3\xa1"
+-			  "\x8d\xc8\x6e\x85\xa5\x21\x67\x5d",
 -		.klen	= 16,
--		.iv	= "\xaa\xb8\x7e\x25\x79\x7c\x37\xaf"
+-		.iv	= "\x9b\xef\xf0\xbd\x35\xdd\x8d\x28"
+-			  "\xad\xff\x9b\xa9\xa4\xeb\x98\xdf",
+-		.assoc	= "\xaa\xb8\x7e\x25\x79\x7c\x37\xaf"
 -			  "\xce\x36\xc7\xce\xa2\xb4\xc9\x60",
--		.assoc	= "\xb9\x82\x0c\x8d\xbd\x1b\xe2\x36"
--			  "\xee\x6c\xf4\xf2\xa1\x7d\xf9\xe2",
 -		.alen	= 16,
--		.ptext	= "\xc8\x4b\x9b\xf5\x01\xba\x8c\xbd"
--			  "\x0e\xa3\x21\x16\x9f\x46\x2a\x63",
+-		.ptext	= "\xb9\x82\x0c\x8d\xbd\x1b\xe2\x36"
+-			  "\xee\x6c\xf4\xf2\xa1\x7d\xf9\xe2",
 -		.plen	= 16,
--		.ctext	= "\xd9\x8e\xfd\x50\x8f\x02\x9f\xee"
--			  "\x78\x08\x12\xec\x09\xaf\x53\x14"
--			  "\x90\x3e\x3d\x76\xad\x71\x21\x08"
--			  "\x77\xe5\x4b\x15\xc2\xe6\xbc\xdb",
+-		.ctext	= "\xd8\xfd\x44\x45\xf6\x42\x12\x38"
+-			  "\xf2\x0b\xea\x4f\x9e\x11\x61\x07"
+-			  "\x48\x67\x98\x18\x9b\xd0\x0c\x59"
+-			  "\x67\xa4\x11\xb3\x2b\xd6\xc1\x70",
 -		.clen	= 32,
 -	}, {
--		.key	= "\xd7\x14\x29\x5d\x45\x59\x36\x44"
--			  "\x2e\xd9\x4d\x3b\x9e\x0f\x5b\xe5",
+-		.key	= "\xc8\x4b\x9b\xf5\x01\xba\x8c\xbd"
+-			  "\x0e\xa3\x21\x16\x9f\x46\x2a\x63",
 -		.klen	= 16,
--		.iv	= "\xe6\xdd\xb8\xc4\x89\xf8\xe0\xca"
--			  "\x4f\x10\x7a\x5f\x9c\xd8\x8b\x66",
--		.assoc	= "\xf5\xa6\x46\x2c\xce\x97\x8a\x51"
+-		.iv	= "\xd7\x14\x29\x5d\x45\x59\x36\x44"
+-			  "\x2e\xd9\x4d\x3b\x9e\x0f\x5b\xe5",
+-		.assoc	= "\xe6\xdd\xb8\xc4\x89\xf8\xe0\xca"
+-			  "\x4f\x10\x7a\x5f\x9c\xd8\x8b\x66"
+-			  "\x3b",
+-		.alen	= 17,
+-		.ptext	= "\xf5\xa6\x46\x2c\xce\x97\x8a\x51"
 -			  "\x6f\x46\xa6\x83\x9b\xa1\xbc\xe8"
 -			  "\x05",
--		.alen	= 17,
--		.ptext	= "\x05\x70\xd5\x94\x12\x36\x35\xd8"
--			  "\x8f\x7d\xd3\xa8\x99\x6a\xed\x69"
--			  "\xd0",
 -		.plen	= 17,
--		.ctext	= "\xf3\xe7\x95\x86\xcf\x34\x95\x96"
--			  "\x17\xfe\x1b\xae\x1b\x31\xf2\x1a"
--			  "\xbd\xbc\xc9\x4e\x11\x29\x09\x5c"
--			  "\x05\xd3\xb4\x2e\x4a\x74\x59\x49"
--			  "\x7d",
+-		.ctext	= "\xb1\xab\x53\x4e\xc7\x40\x16\xb6"
+-			  "\x71\x3a\x00\x9f\x41\x88\xb0\xb2"
+-			  "\x71\x83\x85\x5f\xc8\x79\x0a\x99"
+-			  "\x99\xdc\x89\x1c\x88\xd2\x3e\xf9"
+-			  "\x83",
 -		.clen	= 33,
 -	}, {
--		.key	= "\x14\x39\x63\xfc\x56\xd5\xdf\x5f"
--			  "\xaf\xb3\xff\xcc\x98\x33\x1d\xeb",
+-		.key	= "\x05\x70\xd5\x94\x12\x36\x35\xd8"
+-			  "\x8f\x7d\xd3\xa8\x99\x6a\xed\x69",
 -		.klen	= 16,
--		.iv	= "\x23\x02\xf1\x64\x9a\x73\x89\xe6"
--			  "\xd0\xea\x2c\xf1\x96\xfc\x4e\x6d",
--		.assoc	= "\x32\xcb\x80\xcc\xde\x12\x33\x6d"
+-		.iv	= "\x14\x39\x63\xfc\x56\xd5\xdf\x5f"
+-			  "\xaf\xb3\xff\xcc\x98\x33\x1d\xeb",
+-		.assoc	= "\x23\x02\xf1\x64\x9a\x73\x89\xe6"
+-			  "\xd0\xea\x2c\xf1\x96\xfc\x4e\x6d"
+-			  "\x65\x48\xcb\x0a\xda\xf0\x62\xc0"
+-			  "\x38\x1d\x3b\x4a\xe9\x7e\x62",
+-		.alen	= 31,
+-		.ptext	= "\x32\xcb\x80\xcc\xde\x12\x33\x6d"
 -			  "\xf0\x20\x58\x15\x95\xc6\x7f\xee"
 -			  "\x2f\xf9\x4e\x2c\x1b\x98\x43\xc7"
 -			  "\x68\x28\x73\x40\x9f\x96\x4a",
--		.alen	= 31,
--		.ptext	= "\x41\x94\x0e\x33\x22\xb1\xdd\xf4"
--			  "\x10\x57\x85\x39\x93\x8f\xaf\x70"
--			  "\xfa\xa9\xd0\x4d\x5c\x40\x23\xcd"
--			  "\x98\x34\xab\x37\x56\xae\x32",
 -		.plen	= 31,
--		.ctext	= "\x06\x96\xb2\xbf\x63\xf4\x1e\x24"
--			  "\x0d\x19\x15\x61\x65\x3b\x06\x26"
--			  "\x71\xe8\x7e\x16\xdb\x96\x01\x01"
--			  "\x52\xcd\x49\x5b\x07\x33\x4e\xe7"
--			  "\xaa\x91\xf5\xd5\xc6\xfe\x41\xb5"
--			  "\xed\x90\xce\xb9\xcd\xcc\xa1",
+-		.ctext	= "\x29\xc4\xf0\x03\xc1\x86\xdf\x06"
+-			  "\x5c\x7b\xef\x64\x87\x00\xd1\x37"
+-			  "\xa7\x08\xbc\x7f\x8f\x41\x54\xd0"
+-			  "\x3e\xf1\xc3\xa2\x96\x84\xdd\x2a"
+-			  "\x2d\x21\x30\xf9\x02\xdb\x06\x0c"
+-			  "\xf1\x5a\x66\x69\xe0\xca\x83",
 -		.clen	= 47,
 -	}, {
--		.key	= "\x50\x5d\x9d\x9b\x66\x50\x88\x7b"
--			  "\x30\x8e\xb1\x5e\x92\x58\xe0\xf1",
+-		.key	= "\x41\x94\x0e\x33\x22\xb1\xdd\xf4"
+-			  "\x10\x57\x85\x39\x93\x8f\xaf\x70",
 -		.klen	= 16,
--		.iv	= "\x5f\x27\x2b\x03\xaa\xef\x32\x02"
--			  "\x50\xc4\xde\x82\x90\x21\x11\x73",
--		.assoc	= "\x6e\xf0\xba\x6b\xee\x8e\xdc\x89"
+-		.iv	= "\x50\x5d\x9d\x9b\x66\x50\x88\x7b"
+-			  "\x30\x8e\xb1\x5e\x92\x58\xe0\xf1",
+-		.assoc	= "\x5f\x27\x2b\x03\xaa\xef\x32\x02"
+-			  "\x50\xc4\xde\x82\x90\x21\x11\x73"
+-			  "\x8f\x0a\xd6\x8f\xdf\x90\xe4\xda"
+-			  "\xf9\x4a\x1a\x23\xc3\xdd\x02\x81",
+-		.alen	= 32,
+-		.ptext	= "\x6e\xf0\xba\x6b\xee\x8e\xdc\x89"
 -			  "\x71\xfb\x0a\xa6\x8f\xea\x41\xf4"
 -			  "\x5a\xbb\x59\xb0\x20\x38\xc5\xe0"
 -			  "\x29\x56\x52\x19\x79\xf5\xe9\x37",
--		.alen	= 32,
--		.ptext	= "\x7e\xb9\x48\xd3\x32\x2d\x86\x10"
--			  "\x91\x31\x37\xcb\x8d\xb3\x72\x76"
--			  "\x24\x6b\xdc\xd1\x61\xe0\xa5\xe7"
--			  "\x5a\x61\x8a\x0f\x30\x0d\xd1\xec",
 -		.plen	= 32,
--		.ctext	= "\xf9\xd7\xee\x17\xfd\x24\xcd\xf1"
--			  "\xbc\x0f\x35\x97\x97\x0c\x4b\x18"
--			  "\xce\x58\xc8\x3b\xd4\x85\x93\x79"
--			  "\xcc\x9c\xea\xc1\x73\x13\x0b\x4c"
--			  "\xcc\x6f\x28\xf8\xa4\x4e\xb8\x56"
--			  "\x64\x4e\x47\xce\xb2\xb4\x92\xb4",
+-		.ctext	= "\xe2\x2e\x44\xdf\xd3\x60\x6d\xb2"
+-			  "\x70\x57\x37\xc5\xc2\x4f\x8d\x14"
+-			  "\xc6\xbf\x8b\xec\xf5\x62\x67\xf2"
+-			  "\x2f\xa1\xe6\xd6\xa7\xb1\x8c\x54"
+-			  "\xe5\x6b\x49\xf9\x6e\x90\xc3\xaa"
+-			  "\x7a\x00\x2e\x4d\x7f\x31\x2e\x81",
 -		.clen	= 48,
 -	}, {
--		.key	= "\x8d\x82\xd6\x3b\x76\xcc\x30\x97"
--			  "\xb1\x68\x63\xef\x8c\x7c\xa3\xf7",
+-		.key	= "\x7e\xb9\x48\xd3\x32\x2d\x86\x10"
+-			  "\x91\x31\x37\xcb\x8d\xb3\x72\x76",
 -		.klen	= 16,
--		.iv	= "\x9c\x4b\x65\xa2\xba\x6b\xdb\x1e"
--			  "\xd1\x9e\x90\x13\x8a\x45\xd3\x79",
--		.assoc	= "\xab\x14\xf3\x0a\xfe\x0a\x85\xa5"
+-		.iv	= "\x8d\x82\xd6\x3b\x76\xcc\x30\x97"
+-			  "\xb1\x68\x63\xef\x8c\x7c\xa3\xf7",
+-		.assoc	= "\x9c\x4b\x65\xa2\xba\x6b\xdb\x1e"
+-			  "\xd1\x9e\x90\x13\x8a\x45\xd3\x79"
+-			  "\xba\xcd\xe2\x13\xe4\x30\x66\xf4"
+-			  "\xba\x78\xf9\xfb\x9d\x3c\xa1\x58"
+-			  "\x1a",
+-		.alen	= 33,
+-		.ptext	= "\xab\x14\xf3\x0a\xfe\x0a\x85\xa5"
 -			  "\xf2\xd5\xbc\x38\x89\x0e\x04\xfb"
 -			  "\x84\x7d\x65\x34\x25\xd8\x47\xfa"
 -			  "\xeb\x83\x31\xf1\x54\x54\x89\x0d"
--			  "\x9d",
--		.alen	= 33,
--		.ptext	= "\xba\xde\x82\x72\x42\xa9\x2f\x2c"
--			  "\x12\x0b\xe9\x5c\x87\xd7\x35\x7c"
--			  "\x4f\x2e\xe8\x55\x66\x80\x27\x00"
--			  "\x1b\x8f\x68\xe7\x0a\x6c\x71\xc3"
--			  "\x21\x78\x55\x9d\x9c\x65\x7b\xcd"
--			  "\x0a\x34\x97\xff\x47\x37\xb0\x2a"
--			  "\x80\x0d\x19\x98\x33\xa9\x7a\xe3"
--			  "\x2e\x4c\xc6\xf3\x8c\x88\x42\x01"
--			  "\xbd",
+-			  "\x9d\x4d\x54\x51\x84\x61\xf6\x8e"
+-			  "\x03\x31\xf2\x25\x16\xcc\xaa\xc6"
+-			  "\x75\x73\x20\x30\x59\x54\xb2\xf0"
+-			  "\x3a\x4b\xe0\x23\x8e\xa6\x08\x35"
+-			  "\x8a",
 -		.plen	= 65,
--		.ctext	= "\x58\xfa\x3a\x3d\xd9\x88\x63\xe8"
--			  "\xc5\x78\x50\x8b\x4a\xc9\xdf\x7f"
--			  "\x4b\xfa\xc8\x2e\x67\x43\xf3\x63"
--			  "\x42\x8e\x99\x5a\x9c\x0b\x84\x77"
--			  "\xbc\x46\x76\x48\x82\xc7\x57\x96"
--			  "\xe1\x65\xd1\xed\x1d\xdd\x80\x24"
--			  "\xa6\x4d\xa9\xf1\x53\x8b\x5e\x0e"
--			  "\x26\xb9\xcc\x37\xe5\x43\xe1\x5a"
--			  "\x8a\xd6\x8c\x5a\xe4\x95\xd1\x8d"
--			  "\xf7\x33\x64\xc1\xd3\xf2\xfc\x35"
--			  "\x01",
+-		.ctext	= "\xc7\xca\x26\x61\x57\xee\xa2\xb9"
+-			  "\xb1\x37\xde\x95\x06\x90\x11\x08"
+-			  "\x4d\x30\x9f\x24\xc0\x56\xb7\xe1"
+-			  "\x0b\x9f\xd2\x57\xe9\xd2\xb1\x76"
+-			  "\x56\x9a\xb4\x58\xc5\x08\xfc\xb5"
+-			  "\xf2\x31\x9b\xc9\xcd\xb3\x64\xdb"
+-			  "\x6f\x50\xbf\xf4\x73\x9d\xfb\x6b"
+-			  "\xef\x35\x25\x48\xed\xcf\x29\xa8"
+-			  "\xac\xc3\xb9\xcb\x61\x8f\x73\x92"
+-			  "\x2c\x7a\x6f\xda\xf9\x09\x6f\xe1"
+-			  "\xc4",
 -		.clen	= 81,
 -	}, {
--		.key	= "\xc9\xa7\x10\xda\x86\x48\xd9\xb3"
--			  "\x32\x42\x15\x80\x85\xa1\x65\xfe",
+-		.key	= "\xba\xde\x82\x72\x42\xa9\x2f\x2c"
+-			  "\x12\x0b\xe9\x5c\x87\xd7\x35\x7c",
 -		.klen	= 16,
--		.iv	= "\xd8\x70\x9f\x42\xca\xe6\x83\x3a"
--			  "\x52\x79\x42\xa5\x84\x6a\x96\x7f",
--		.assoc	= "\xe8\x39\x2d\xaa\x0e\x85\x2d\xc1"
+-		.iv	= "\xc9\xa7\x10\xda\x86\x48\xd9\xb3"
+-			  "\x32\x42\x15\x80\x85\xa1\x65\xfe",
+-		.assoc	= "\xd8\x70\x9f\x42\xca\xe6\x83\x3a"
+-			  "\x52\x79\x42\xa5\x84\x6a\x96\x7f"
+-			  "\xe4\x8f\xed\x97\xe9\xd0\xe8\x0d"
+-			  "\x7c\xa6\xd8\xd4\x77\x9b\x40\x2e"
+-			  "\x28\xce\x57\x34\xcd\x6e\x84\x4c"
+-			  "\x17\x3c\xe1\xb2\xa8\x0b\xbb\xf1"
+-			  "\x96\x41\x0d\x69\xe8\x54\x0a\xc8"
+-			  "\x15\x4e\x91\x92\x89\x4b\xb7\x9b"
+-			  "\x21",
+-		.alen	= 65,
+-		.ptext	= "\xe8\x39\x2d\xaa\x0e\x85\x2d\xc1"
 -			  "\x72\xaf\x6e\xc9\x82\x33\xc7\x01"
 -			  "\xaf\x40\x70\xb8\x2a\x78\xc9\x14"
 -			  "\xac\xb1\x10\xca\x2e\xb3\x28\xe4"
--			  "\xac\xfa\x58\x7f\xe5\x73\x09\x8c"
--			  "\x1d\x40\x87\x8c\xd9\x75\xc0\x55"
--			  "\xa2\xda\x07\xd1\xc2\xa9\xd1\xbb"
--			  "\x09\x4f\x77\x62\x88\x2d\xf2\x68"
--			  "\x54",
--		.alen	= 65,
--		.ptext	= "\xf7\x02\xbb\x11\x52\x24\xd8\x48"
--			  "\x93\xe6\x9b\xee\x81\xfc\xf7\x82"
--			  "\x79\xf0\xf3\xd9\x6c\x20\xa9\x1a"
--			  "\xdc\xbc\x47\xc0\xe4\xcb\x10\x99"
--			  "\x2f",
+-			  "\xac",
 -		.plen	= 33,
--		.ctext	= "\x4c\xa9\xac\x71\xed\x10\xa6\x24"
--			  "\xb7\xa7\xdf\x8b\xf5\xc2\x41\xcb"
--			  "\x05\xc9\xd6\x97\xb6\x10\x7f\x17"
--			  "\xc2\xc0\x93\xcf\xe0\x94\xfd\x99"
--			  "\xf2\x62\x25\x28\x01\x23\x6f\x8b"
--			  "\x04\x52\xbc\xb0\x3e\x66\x52\x90"
--			  "\x9f",
+-		.ctext	= "\x57\xcd\x3d\x46\xc5\xf9\x68\x3b"
+-			  "\x2c\x0f\xb4\x7e\x7b\x64\x3e\x40"
+-			  "\xf3\x78\x63\x34\x89\x79\x39\x6b"
+-			  "\x61\x64\x4a\x9a\xfa\x70\xa4\xd3"
+-			  "\x54\x0b\xea\x05\xa6\x95\x64\xed"
+-			  "\x3d\x69\xa2\x0c\x27\x56\x2f\x34"
+-			  "\x66",
 -		.clen	= 49,
 -	}, {
--		.key	= "\x06\xcc\x4a\x79\x96\xc3\x82\xcf"
--			  "\xb3\x1c\xc7\x12\x7f\xc5\x28\x04",
+-		.key	= "\xf7\x02\xbb\x11\x52\x24\xd8\x48"
+-			  "\x93\xe6\x9b\xee\x81\xfc\xf7\x82",
 -		.klen	= 16,
--		.iv	= "\x15\x95\xd8\xe1\xda\x62\x2c\x56"
+-		.iv	= "\x06\xcc\x4a\x79\x96\xc3\x82\xcf"
+-			  "\xb3\x1c\xc7\x12\x7f\xc5\x28\x04",
+-		.assoc	= "\x15\x95\xd8\xe1\xda\x62\x2c\x56"
 -			  "\xd3\x53\xf4\x36\x7e\x8e\x59\x85",
--		.assoc	= "\x24\x5e\x67\x49\x1e\x01\xd6\xdd"
--			  "\xf3\x89\x20\x5b\x7c\x57\x89\x07",
 -		.alen	= 16,
--		.ptext	= "\x33\x27\xf5\xb1\x62\xa0\x80\x63"
--			  "\x14\xc0\x4d\x7f\x7b\x20\xba\x89",
+-		.ptext	= "\x24\x5e\x67\x49\x1e\x01\xd6\xdd"
+-			  "\xf3\x89\x20\x5b\x7c\x57\x89\x07",
 -		.plen	= 16,
--		.ctext	= "\x6d\xed\x04\x7a\x2f\x0c\x30\xa5"
--			  "\x96\xe6\x97\xe4\x10\xeb\x40\x95"
--			  "\xc5\x9a\xdf\x31\xd5\xa5\xa6\xec"
--			  "\x05\xa8\x31\x50\x11\x19\x44",
+-		.ctext	= "\xfc\x85\x06\x28\x8f\xe8\x23\x1f"
+-			  "\x33\x98\x87\xde\x08\xb6\xb6\xae"
+-			  "\x3e\xa4\xf8\x19\xf1\x92\x60\x39"
+-			  "\xb9\x6b\x3f\xdf\xc8\xcb\x30",
 -		.clen	= 31,
 -	}, {
--		.key	= "\x42\xf0\x84\x19\xa6\x3f\x2b\xea"
--			  "\x34\xf6\x79\xa3\x79\xe9\xeb\x0a",
+-		.key	= "\x33\x27\xf5\xb1\x62\xa0\x80\x63"
+-			  "\x14\xc0\x4d\x7f\x7b\x20\xba\x89",
 -		.klen	= 16,
--		.iv	= "\x51\xb9\x12\x80\xea\xde\xd5\x71"
+-		.iv	= "\x42\xf0\x84\x19\xa6\x3f\x2b\xea"
+-			  "\x34\xf6\x79\xa3\x79\xe9\xeb\x0a",
+-		.assoc	= "\x51\xb9\x12\x80\xea\xde\xd5\x71"
 -			  "\x54\x2d\xa6\xc8\x78\xb2\x1b\x8c",
--		.assoc	= "\x61\x83\xa0\xe8\x2e\x7d\x7f\xf8"
--			  "\x74\x63\xd2\xec\x76\x7c\x4c\x0d",
 -		.alen	= 16,
--		.ptext	= "\x70\x4c\x2f\x50\x72\x1c\x29\x7f"
--			  "\x95\x9a\xff\x10\x75\x45\x7d\x8f",
+-		.ptext	= "\x61\x83\xa0\xe8\x2e\x7d\x7f\xf8"
+-			  "\x74\x63\xd2\xec\x76\x7c\x4c\x0d",
 -		.plen	= 16,
--		.ctext	= "\x30\x95\x7d\xea\xdc\x62\xc0\x88"
--			  "\xa1\xe3\x8d\x8c\xac\x04\x10\xa7"
--			  "\xfa\xfa\x07\xbd\xa0\xf0\x36\xeb"
--			  "\x21\x93\x2e\x31\x84\x83",
+-		.ctext	= "\x74\x7d\x70\x07\xe9\xba\x01\xee"
+-			  "\x6c\xc6\x6f\x50\x25\x33\xbe\x50"
+-			  "\x17\xb8\x17\x62\xed\x80\xa2\xf5"
+-			  "\x03\xde\x85\x71\x5d\x34",
 -		.clen	= 30,
 -	}, {
--		.key	= "\x7f\x15\xbd\xb8\xb6\xba\xd3\x06"
--			  "\xb5\xd1\x2b\x35\x73\x0e\xad\x10",
+-		.key	= "\x70\x4c\x2f\x50\x72\x1c\x29\x7f"
+-			  "\x95\x9a\xff\x10\x75\x45\x7d\x8f",
 -		.klen	= 16,
--		.iv	= "\x8e\xde\x4c\x20\xfa\x59\x7e\x8d"
+-		.iv	= "\x7f\x15\xbd\xb8\xb6\xba\xd3\x06"
+-			  "\xb5\xd1\x2b\x35\x73\x0e\xad\x10",
+-		.assoc	= "\x8e\xde\x4c\x20\xfa\x59\x7e\x8d"
 -			  "\xd5\x07\x58\x59\x72\xd7\xde\x92",
--		.assoc	= "\x9d\xa7\xda\x88\x3e\xf8\x28\x14"
--			  "\xf5\x3e\x85\x7d\x70\xa0\x0f\x13",
 -		.alen	= 16,
--		.ptext	= "\xac\x70\x69\xef\x82\x97\xd2\x9b"
--			  "\x15\x74\xb1\xa2\x6f\x69\x3f\x95",
+-		.ptext	= "\x9d\xa7\xda\x88\x3e\xf8\x28\x14"
+-			  "\xf5\x3e\x85\x7d\x70\xa0\x0f\x13",
 -		.plen	= 16,
--		.ctext	= "\x93\xcd\xee\xd4\xcb\x9d\x8d\x16"
--			  "\x63\x0d\x43\xd5\x49\xca\xa8\x85"
--			  "\x49\xc0\xae\x13\xbc\x26\x1d\x4b",
+-		.ctext	= "\xf4\xb3\x85\xf9\xac\xde\xb1\x38"
+-			  "\x29\xfd\x6c\x7c\x49\xe5\x1d\xaf"
+-			  "\xba\xea\xd4\xfa\x3f\x11\x33\x98",
 -		.clen	= 24,
+-	}, {
+-		.key	= "\xac\x70\x69\xef\x82\x97\xd2\x9b"
+-			  "\x15\x74\xb1\xa2\x6f\x69\x3f\x95",
+-		.klen	= 16,
+-		.iv	= "\xbb\x3a\xf7\x57\xc6\x36\x7c\x22"
+-			  "\x36\xab\xde\xc6\x6d\x32\x70\x17",
+-		.assoc	= "\xcb\x03\x85\xbf\x0a\xd5\x26\xa9"
+-			  "\x56\xe1\x0a\xeb\x6c\xfb\xa1\x98",
+-		.alen	= 16,
+-		.ptext	= "\xda\xcc\x14\x27\x4e\x74\xd1\x30"
+-			  "\x76\x18\x37\x0f\x6a\xc4\xd1\x1a",
+-		.plen	= 16,
+-		.ctext	= "\xe6\x5c\x49\x4f\x78\xf3\x62\x86"
+-			  "\xe1\xb7\xa5\xc3\x32\x88\x3c\x8c"
+-			  "\x6e",
+-		.clen	= 17,
 -	},
 -};
 -
 -/*
-- * AEGIS-256 test vectors - generated via reference implementation from
+- * MORUS-1280 test vectors - generated via reference implementation from
 - * SUPERCOP (https://bench.cr.yp.to/supercop.html):
 - *
 - *   https://bench.cr.yp.to/supercop/supercop-20170228.tar.xz
-- *   (see crypto_aead/aegis256/)
+- *   (see crypto_aead/morus1280128v2/ and crypto_aead/morus1280256v2/ )
 - */
--static const struct aead_testvec aegis256_tv_template[] = {
+-static const struct aead_testvec morus1280_tv_template[] = {
 -	{
--		.key	= "\x0f\xc9\x8e\x67\x44\x9e\xaa\x86"
--			  "\x20\x36\x2c\x24\xfe\xc9\x30\x81"
--			  "\xca\xb0\x82\x21\x41\xa8\xe0\x06"
--			  "\x30\x0b\x37\xf6\xb6\x17\xe7\xb5",
--		.klen	= 32,
--		.iv	= "\x1e\x92\x1c\xcf\x88\x3d\x54\x0d"
--			  "\x40\x6d\x59\x48\xfc\x92\x61\x03"
--			  "\x95\x61\x05\x42\x82\x50\xc0\x0c"
--			  "\x60\x16\x6f\xec\x6d\x2f\xcf\x6b",
+-		.key	= "\x00\x00\x00\x00\x00\x00\x00\x00"
+-			  "\x00\x00\x00\x00\x00\x00\x00\x00",
+-		.klen	= 16,
+-		.iv	= "\x0f\xc9\x8e\x67\x44\x9e\xaa\x86"
+-			  "\x20\x36\x2c\x24\xfe\xc9\x30\x81",
 -		.assoc	= "",
 -		.alen	= 0,
 -		.ptext	= "",
 -		.plen	= 0,
--		.ctext	= "\xd5\x65\x3a\xa9\x03\x51\xd7\xaa"
--			  "\xfa\x4b\xd8\xa2\x41\x9b\xc1\xb2",
+-		.ctext	= "\x91\x85\x0f\xf5\x52\x9e\xce\xce"
+-			  "\x65\x99\xc7\xbf\xd3\x76\xe8\x98",
 -		.clen	= 16,
 -	}, {
--		.key	= "\x4b\xed\xc8\x07\x54\x1a\x52\xa2"
--			  "\xa1\x10\xde\xb5\xf8\xed\xf3\x87"
--			  "\xf4\x72\x8e\xa5\x46\x48\x62\x20"
--			  "\xf1\x38\x16\xce\x90\x76\x87\x8c",
--		.klen	= 32,
--		.iv	= "\x5a\xb7\x56\x6e\x98\xb9\xfd\x29"
--			  "\xc1\x47\x0b\xda\xf6\xb6\x23\x09"
--			  "\xbf\x23\x11\xc6\x87\xf0\x42\x26"
--			  "\x22\x44\x4e\xc4\x47\x8e\x6e\x41",
+-		.key	= "\x3c\x24\x39\x9f\x10\x7b\xa8\x1b"
+-			  "\x80\xda\xb2\x91\xf9\x24\xc2\x06",
+-		.klen	= 16,
+-		.iv	= "\x4b\xed\xc8\x07\x54\x1a\x52\xa2"
+-			  "\xa1\x10\xde\xb5\xf8\xed\xf3\x87",
 -		.assoc	= "",
 -		.alen	= 0,
--		.ptext	= "\x79",
+-		.ptext	= "\x69",
 -		.plen	= 1,
--		.ctext	= "\x84\xa2\x8f\xad\xdb\x8d\x2c\x16"
--			  "\x9e\x89\xd9\x06\xa6\xa8\x14\x29"
--			  "\x8b",
+-		.ctext	= "\x88\xc3\x4c\xf0\x2f\x43\x76\x13"
+-			  "\x96\xda\x76\x34\x33\x4e\xd5\x39"
+-			  "\x73",
 -		.clen	= 17,
 -	}, {
--		.key	= "\x88\x12\x01\xa6\x64\x96\xfb\xbe"
--			  "\x22\xea\x90\x47\xf2\x11\xb5\x8e"
--			  "\x1f\x35\x9a\x29\x4b\xe8\xe4\x39"
--			  "\xb3\x66\xf5\xa6\x6a\xd5\x26\x62",
--		.klen	= 32,
--		.iv	= "\x97\xdb\x90\x0e\xa8\x35\xa5\x45"
--			  "\x42\x21\xbd\x6b\xf0\xda\xe6\x0f"
--			  "\xe9\xe5\x1d\x4a\x8c\x90\xc4\x40"
--			  "\xe3\x71\x2d\x9c\x21\xed\x0e\x18",
+-		.key	= "\x79\x49\x73\x3e\x20\xf7\x51\x37"
+-			  "\x01\xb4\x64\x22\xf3\x48\x85\x0c",
+-		.klen	= 16,
+-		.iv	= "\x88\x12\x01\xa6\x64\x96\xfb\xbe"
+-			  "\x22\xea\x90\x47\xf2\x11\xb5\x8e",
 -		.assoc	= "",
 -		.alen	= 0,
--		.ptext	= "\xb5\x6e\xad\xdd\x30\x72\xfa\x53"
--			  "\x82\x8e\x16\xb4\xed\x6d\x47",
--		.plen	= 15,
--		.ctext	= "\x09\x94\x1f\xa6\x13\xc3\x74\x75"
--			  "\x17\xad\x8a\x0e\xd8\x66\x9a\x28"
--			  "\xd7\x30\x66\x09\x2a\xdc\xfa\x2a"
--			  "\x9f\x3b\xd7\xdd\x66\xd1\x2b",
--		.clen	= 31,
--	}, {
--		.key	= "\xc4\x37\x3b\x45\x74\x11\xa4\xda"
--			  "\xa2\xc5\x42\xd8\xec\x36\x78\x94"
--			  "\x49\xf7\xa5\xad\x50\x88\x66\x53"
--			  "\x74\x94\xd4\x7f\x44\x34\xc5\x39",
--		.klen	= 32,
--		.iv	= "\xd3\x00\xc9\xad\xb8\xb0\x4e\x61"
--			  "\xc3\xfb\x6f\xfd\xea\xff\xa9\x15"
--			  "\x14\xa8\x28\xce\x92\x30\x46\x59"
--			  "\xa4\x9f\x0b\x75\xfb\x4c\xad\xee",
--		.assoc	= "",
--		.alen	= 0,
--		.ptext	= "\xf2\x92\xe6\x7d\x40\xee\xa3\x6f"
--			  "\x03\x68\xc8\x45\xe7\x91\x0a\x18",
--		.plen	= 16,
--		.ctext	= "\x8a\x46\xa2\x22\x8c\x03\xab\x6f"
--			  "\x54\x63\x4e\x7f\xc9\x8e\xfa\x70"
--			  "\x7b\xe5\x8d\x78\xbc\xe9\xb6\xa1"
--			  "\x29\x17\xc8\x3b\x52\xa4\x98\x72",
--		.clen	= 32,
--	}, {
--		.key	= "\x01\x5c\x75\xe5\x84\x8d\x4d\xf6"
--			  "\x23\x9f\xf4\x6a\xe6\x5a\x3b\x9a"
--			  "\x74\xb9\xb1\x32\x55\x28\xe8\x6d"
--			  "\x35\xc1\xb3\x57\x1f\x93\x64\x0f",
--		.klen	= 32,
--		.iv	= "\x10\x25\x03\x4c\xc8\x2c\xf7\x7d"
--			  "\x44\xd5\x21\x8e\xe4\x23\x6b\x1c"
--			  "\x3e\x6a\x34\x53\x97\xd0\xc8\x73"
--			  "\x66\xcd\xea\x4d\xd5\xab\x4c\xc5",
--		.assoc	= "",
--		.alen	= 0,
--		.ptext	= "\x2e\xb7\x20\x1c\x50\x6a\x4b\x8b"
--			  "\x84\x42\x7a\xd7\xe1\xb5\xcd\x1f"
--			  "\xd3",
--		.plen	= 17,
--		.ctext	= "\x71\x6b\x37\x0b\x02\x61\x28\x12"
--			  "\x83\xab\x66\x90\x84\xc7\xd1\xc5"
--			  "\xb2\x7a\xb4\x7b\xb4\xfe\x02\xb2"
--			  "\xc0\x00\x39\x13\xb5\x51\x68\x44"
--			  "\xad",
--		.clen	= 33,
--	}, {
--		.key	= "\x3d\x80\xae\x84\x94\x09\xf6\x12"
--			  "\xa4\x79\xa6\xfb\xe0\x7f\xfd\xa0"
--			  "\x9e\x7c\xbc\xb6\x5b\xc8\x6a\x86"
--			  "\xf7\xef\x91\x30\xf9\xf2\x04\xe6",
--		.klen	= 32,
--		.iv	= "\x4c\x49\x3d\xec\xd8\xa8\xa0\x98"
--			  "\xc5\xb0\xd3\x1f\xde\x48\x2e\x22"
--			  "\x69\x2c\x3f\xd7\x9c\x70\x4a\x8d"
--			  "\x27\xfa\xc9\x26\xaf\x0a\xeb\x9c",
--		.assoc	= "",
--		.alen	= 0,
--		.ptext	= "\x6b\xdc\x5a\xbb\x60\xe5\xf4\xa6"
--			  "\x05\x1d\x2c\x68\xdb\xda\x8f\x25"
--			  "\xfe\x8d\x45\x19\x1e\xc0\x0b\x99"
--			  "\x88\x11\x39\x12\x1c\x3a\xbb",
+-		.ptext	= "\xa6\xa4\x1e\x76\xec\xd4\x50\xcc"
+-			  "\x62\x58\xe9\x8f\xef\xa4\x17\x91"
+-			  "\xb4\x96\x9f\x6b\xce\x38\xa5\x46"
+-			  "\x13\x7d\x64\x93\xd7\x05\xf5",
 -		.plen	= 31,
--		.ctext	= "\xaf\xa4\x34\x0d\x59\xe6\x1c\x2f"
--			  "\x06\x3b\x52\x18\x49\x75\x1b\xf0"
--			  "\x53\x09\x72\x7b\x45\x79\xe0\xbe"
--			  "\x89\x85\x23\x15\xb8\x79\x07\x4c"
--			  "\x53\x7a\x15\x37\x0a\xee\xb7\xfb"
--			  "\xc4\x1f\x12\x27\xcf\x77\x90",
+-		.ctext	= "\x3e\x5c\x3b\x58\x3b\x7d\x2a\x22"
+-			  "\x75\x0b\x24\xa6\x0e\xc3\xde\x52"
+-			  "\x97\x0b\x64\xd4\xce\x90\x52\xf7"
+-			  "\xef\xdb\x6a\x38\xd2\xa8\xa1\x0d"
+-			  "\xe0\x61\x33\x24\xc6\x4d\x51\xbc"
+-			  "\xa4\x21\x74\xcf\x19\x16\x59",
 -		.clen	= 47,
 -	}, {
--		.key	= "\x7a\xa5\xe8\x23\xa4\x84\x9e\x2d"
--			  "\x25\x53\x58\x8c\xda\xa3\xc0\xa6"
--			  "\xc8\x3e\xc8\x3a\x60\x68\xec\xa0"
--			  "\xb8\x1c\x70\x08\xd3\x51\xa3\xbd",
--		.klen	= 32,
--		.iv	= "\x89\x6e\x77\x8b\xe8\x23\x49\xb4"
--			  "\x45\x8a\x85\xb1\xd8\x6c\xf1\x28"
--			  "\x93\xef\x4b\x5b\xa1\x10\xcc\xa6"
--			  "\xe8\x28\xa8\xfe\x89\x69\x8b\x72",
+-		.key	= "\xb5\x6e\xad\xdd\x30\x72\xfa\x53"
+-			  "\x82\x8e\x16\xb4\xed\x6d\x47\x12",
+-		.klen	= 16,
+-		.iv	= "\xc4\x37\x3b\x45\x74\x11\xa4\xda"
+-			  "\xa2\xc5\x42\xd8\xec\x36\x78\x94",
 -		.assoc	= "",
 -		.alen	= 0,
--		.ptext	= "\xa7\x00\x93\x5b\x70\x61\x9d\xc2"
--			  "\x86\xf7\xde\xfa\xd5\xfe\x52\x2b"
--			  "\x28\x50\x51\x9d\x24\x60\x8d\xb3"
--			  "\x49\x3e\x17\xea\xf6\x99\x5a\xdd",
+-		.ptext	= "\xe2\xc9\x58\x15\xfc\x4f\xf8\xe8"
+-			  "\xe3\x32\x9b\x21\xe9\xc8\xd9\x97"
+-			  "\xde\x58\xab\xf0\xd3\xd8\x27\x60"
+-			  "\xd5\xaa\x43\x6b\xb1\x64\x95\xa4",
 -		.plen	= 32,
--		.ctext	= "\xe2\xc9\x0b\x33\x31\x02\xb3\xb4"
--			  "\x33\xfe\xeb\xa8\xb7\x9b\xb2\xd7"
--			  "\xeb\x0f\x05\x2b\xba\xb3\xca\xef"
--			  "\xf6\xd1\xb6\xc0\xb9\x9b\x85\xc5"
--			  "\xbf\x7a\x3e\xcc\x31\x76\x09\x80"
--			  "\x32\x5d\xbb\xe8\x38\x0e\x77\xd3",
+-		.ctext	= "\x30\x82\x9c\x2b\x67\xcb\xf9\x1f"
+-			  "\xde\x9f\x77\xb2\xda\x92\x61\x5c"
+-			  "\x09\x0b\x2d\x9a\x26\xaa\x1c\x06"
+-			  "\xab\x74\xb7\x2b\x95\x5f\x9f\xa1"
+-			  "\x9a\xff\x50\xa0\xa2\xff\xc5\xad"
+-			  "\x21\x8e\x84\x5c\x12\x61\xb2\xae",
 -		.clen	= 48,
 -	}, {
--		.key	= "\xb6\xca\x22\xc3\xb4\x00\x47\x49"
--			  "\xa6\x2d\x0a\x1e\xd4\xc7\x83\xad"
--			  "\xf3\x00\xd4\xbf\x65\x08\x6e\xb9"
--			  "\x7a\x4a\x4f\xe0\xad\xb0\x42\x93",
--		.klen	= 32,
--		.iv	= "\xc5\x93\xb0\x2a\xf8\x9f\xf1\xd0"
--			  "\xc6\x64\x37\x42\xd2\x90\xb3\x2e"
--			  "\xbd\xb1\x57\xe0\xa6\xb0\x4e\xc0"
--			  "\xaa\x55\x87\xd6\x63\xc8\x2a\x49",
--		.assoc	= "\xd5",
+-		.key	= "\xf2\x92\xe6\x7d\x40\xee\xa3\x6f"
+-			  "\x03\x68\xc8\x45\xe7\x91\x0a\x18",
+-		.klen	= 16,
+-		.iv	= "\x01\x5c\x75\xe5\x84\x8d\x4d\xf6"
+-			  "\x23\x9f\xf4\x6a\xe6\x5a\x3b\x9a",
+-		.assoc	= "",
+-		.alen	= 0,
+-		.ptext	= "\x1f\xee\x92\xb4\x0c\xcb\xa1\x04"
+-			  "\x64\x0c\x4d\xb2\xe3\xec\x9c\x9d"
+-			  "\x09\x1a\xb7\x74\xd8\x78\xa9\x79"
+-			  "\x96\xd8\x22\x43\x8c\xc3\x34\x7b"
+-			  "\xc4",
+-		.plen	= 33,
+-		.ctext	= "\x67\x5d\x8e\x45\xc8\x39\xf5\x17"
+-			  "\xc1\x1d\x2a\xdd\x88\x67\xda\x1f"
+-			  "\x6d\xe8\x37\x28\x5a\xc1\x5e\x9f"
+-			  "\xa6\xec\xc6\x92\x05\x4b\xc0\xa3"
+-			  "\x63\xef\x88\xa4\x9b\x0a\x5c\xed"
+-			  "\x2b\x6a\xac\x63\x52\xaa\x10\x94"
+-			  "\xd0",
+-		.clen	= 49,
+-	}, {
+-		.key	= "\x2e\xb7\x20\x1c\x50\x6a\x4b\x8b"
+-			  "\x84\x42\x7a\xd7\xe1\xb5\xcd\x1f",
+-		.klen	= 16,
+-		.iv	= "\x3d\x80\xae\x84\x94\x09\xf6\x12"
+-			  "\xa4\x79\xa6\xfb\xe0\x7f\xfd\xa0",
+-		.assoc	= "",
+-		.alen	= 0,
+-		.ptext	= "\x5c\x13\xcb\x54\x1c\x47\x4a\x1f"
+-			  "\xe5\xe6\xff\x44\xdd\x11\x5f\xa3"
+-			  "\x33\xdd\xc2\xf8\xdd\x18\x2b\x93"
+-			  "\x57\x05\x01\x1c\x66\x22\xd3\x51"
+-			  "\xd3\xdf\x18\xc9\x30\x66\xed\xb1"
+-			  "\x96\x58\xd5\x8c\x64\x8c\x7c\xf5"
+-			  "\x01\xd0\x74\x5f\x9b\xaa\xf6\xd1"
+-			  "\xe6\x16\xa2\xac\xde\x47\x40",
+-		.plen	= 63,
+-		.ctext	= "\x7d\x61\x1a\x35\x20\xcc\x07\x88"
+-			  "\x03\x98\x87\xcf\xc0\x6e\x4d\x19"
+-			  "\xe3\xd4\x0b\xfb\x29\x8f\x49\x1a"
+-			  "\x3a\x06\x77\xce\x71\x2c\xcd\xdd"
+-			  "\xed\xf6\xc9\xbe\xa6\x3b\xb8\xfc"
+-			  "\x6c\xbe\x77\xed\x74\x0e\x20\x85"
+-			  "\xd0\x65\xde\x24\x6f\xe3\x25\xc5"
+-			  "\xdf\x5b\x0f\xbd\x8a\x88\x78\xc9"
+-			  "\xe5\x81\x37\xde\x84\x7a\xf6\x84"
+-			  "\x99\x7a\x72\x9c\x54\x31\xa1",
+-		.clen	= 79,
+-	}, {
+-		.key	= "\x6b\xdc\x5a\xbb\x60\xe5\xf4\xa6"
+-			  "\x05\x1d\x2c\x68\xdb\xda\x8f\x25",
+-		.klen	= 16,
+-		.iv	= "\x7a\xa5\xe8\x23\xa4\x84\x9e\x2d"
+-			  "\x25\x53\x58\x8c\xda\xa3\xc0\xa6",
+-		.assoc	= "",
+-		.alen	= 0,
+-		.ptext	= "\x98\x37\x05\xf3\x2c\xc2\xf3\x3b"
+-			  "\x66\xc0\xb1\xd5\xd7\x35\x21\xaa"
+-			  "\x5d\x9f\xce\x7c\xe2\xb8\xad\xad"
+-			  "\x19\x33\xe0\xf4\x40\x81\x72\x28"
+-			  "\xe1\x8b\x1c\xf8\x91\x78\xff\xaf"
+-			  "\xb0\x68\x69\xf2\x27\x35\x91\x84"
+-			  "\x2e\x37\x5b\x00\x04\xff\x16\x9c"
+-			  "\xb5\x19\x39\xeb\xd9\xcd\x29\x9a",
+-		.plen	= 64,
+-		.ctext	= "\x05\xc5\xb1\xf9\x1b\xb9\xab\x2c"
+-			  "\xa5\x07\x12\xa7\x12\x39\x60\x66"
+-			  "\x30\x81\x4a\x03\x78\x28\x45\x52"
+-			  "\xd2\x2b\x24\xfd\x8b\xa5\xb7\x66"
+-			  "\x6f\x45\xd7\x3b\x67\x6f\x51\xb9"
+-			  "\xc0\x3d\x6c\xca\x1e\xae\xff\xb6"
+-			  "\x79\xa9\xe4\x82\x5d\x4c\x2d\xdf"
+-			  "\xeb\x71\x40\xc9\x2c\x40\x45\x6d"
+-			  "\x73\x77\x01\xf3\x4f\xf3\x9d\x2a"
+-			  "\x5d\x57\xa8\xa1\x18\xa2\xad\xcb",
+-		.clen	= 80,
+-	}, {
+-		.key	= "\xa7\x00\x93\x5b\x70\x61\x9d\xc2"
+-			  "\x86\xf7\xde\xfa\xd5\xfe\x52\x2b",
+-		.klen	= 16,
+-		.iv	= "\xb6\xca\x22\xc3\xb4\x00\x47\x49"
+-			  "\xa6\x2d\x0a\x1e\xd4\xc7\x83\xad",
+-		.assoc	= "\xc5",
 -		.alen	= 1,
 -		.ptext	= "",
 -		.plen	= 0,
--		.ctext	= "\x96\x43\x30\xca\x6c\x4f\xd7\x12"
--			  "\xba\xd9\xb3\x18\x86\xdf\xc3\x52",
+-		.ctext	= "\x4d\xbf\x11\xac\x7f\x97\x0b\x2e"
+-			  "\x89\x3b\x9d\x0f\x83\x1c\x08\xc3",
 -		.clen	= 16,
 -	}, {
--		.key	= "\xf3\xee\x5c\x62\xc4\x7c\xf0\x65"
--			  "\x27\x08\xbd\xaf\xce\xec\x45\xb3"
--			  "\x1d\xc3\xdf\x43\x6a\xa8\xf0\xd3"
--			  "\x3b\x77\x2e\xb9\x87\x0f\xe1\x6a",
--		.klen	= 32,
--		.iv	= "\x02\xb8\xea\xca\x09\x1b\x9a\xec"
+-		.key	= "\xe4\x25\xcd\xfa\x80\xdd\x46\xde"
+-			  "\x07\xd1\x90\x8b\xcf\x23\x15\x31",
+-		.klen	= 16,
+-		.iv	= "\xf3\xee\x5c\x62\xc4\x7c\xf0\x65"
+-			  "\x27\x08\xbd\xaf\xce\xec\x45\xb3",
+-		.assoc	= "\x02\xb8\xea\xca\x09\x1b\x9a\xec"
 -			  "\x47\x3e\xe9\xd4\xcc\xb5\x76\x34"
 -			  "\xe8\x73\x62\x64\xab\x50\xd0\xda"
--			  "\x6b\x83\x66\xaf\x3e\x27\xc9\x1f",
--		.assoc	= "\x11\x81\x78\x32\x4d\xb9\x44\x73"
--			  "\x68\x75\x16\xf8\xcb\x7e\xa7",
--		.alen	= 15,
+-			  "\x6b\x83\x66\xaf\x3e\x27\xc9",
+-		.alen	= 31,
 -		.ptext	= "",
 -		.plen	= 0,
--		.ctext	= "\x2f\xab\x45\xe2\xa7\x46\xc5\x83"
--			  "\x11\x9f\xb0\x74\xee\xc7\x03\xdd",
+-		.ctext	= "\x5b\xc0\x8d\x54\xe4\xec\xbe\x38"
+-			  "\x03\x12\xf9\xcc\x9e\x46\x42\x92",
 -		.clen	= 16,
 -	}, {
--		.key	= "\x2f\x13\x95\x01\xd5\xf7\x99\x81"
--			  "\xa8\xe2\x6f\x41\xc8\x10\x08\xb9"
--			  "\x47\x85\xeb\xc7\x6f\x48\x72\xed"
--			  "\xfc\xa5\x0d\x91\x61\x6e\x81\x40",
--		.klen	= 32,
--		.iv	= "\x3f\xdc\x24\x69\x19\x96\x43\x08"
+-		.key	= "\x20\x4a\x07\x99\x91\x58\xee\xfa"
+-			  "\x88\xab\x42\x1c\xc9\x47\xd7\x38",
+-		.klen	= 16,
+-		.iv	= "\x2f\x13\x95\x01\xd5\xf7\x99\x81"
+-			  "\xa8\xe2\x6f\x41\xc8\x10\x08\xb9",
+-		.assoc	= "\x3f\xdc\x24\x69\x19\x96\x43\x08"
 -			  "\xc8\x18\x9b\x65\xc6\xd9\x39\x3b"
 -			  "\x12\x35\x6e\xe8\xb0\xf0\x52\xf3"
 -			  "\x2d\xb0\x45\x87\x18\x86\x68\xf6",
--		.assoc	= "\x4e\xa5\xb2\xd1\x5d\x35\xed\x8f"
--			  "\xe8\x4f\xc8\x89\xc5\xa2\x69\xbc",
--		.alen	= 16,
--		.ptext	= "",
--		.plen	= 0,
--		.ctext	= "\x16\x44\x73\x33\x5d\xf2\xb9\x04"
--			  "\x6b\x79\x98\xef\xdb\xd5\xc5\xf1",
--		.clen	= 16,
--	}, {
--		.key	= "\x6c\x38\xcf\xa1\xe5\x73\x41\x9d"
--			  "\x29\xbc\x21\xd2\xc2\x35\xcb\xbf"
--			  "\x72\x47\xf6\x4b\x74\xe8\xf4\x06"
--			  "\xbe\xd3\xec\x6a\x3b\xcd\x20\x17",
--		.klen	= 32,
--		.iv	= "\x7b\x01\x5d\x08\x29\x12\xec\x24"
--			  "\x49\xf3\x4d\xf7\xc0\xfe\xfb\x41"
--			  "\x3c\xf8\x79\x6c\xb6\x90\xd4\x0d"
--			  "\xee\xde\x23\x60\xf2\xe5\x08\xcc",
--		.assoc	= "\x8a\xca\xec\x70\x6d\xb1\x96\xab"
--			  "\x69\x29\x7a\x1b\xbf\xc7\x2c\xc2"
--			  "\x07",
--		.alen	= 17,
--		.ptext	= "",
--		.plen	= 0,
--		.ctext	= "\xa4\x9b\xb8\x47\xc0\xed\x7a\x45"
--			  "\x98\x54\x8c\xed\x3d\x17\xf0\xdd",
--		.clen	= 16,
--	}, {
--		.key	= "\xa8\x5c\x09\x40\xf5\xef\xea\xb8"
--			  "\xaa\x96\xd3\x64\xbc\x59\x8d\xc6"
--			  "\x9c\x0a\x02\xd0\x79\x88\x76\x20"
--			  "\x7f\x00\xca\x42\x15\x2c\xbf\xed",
--		.klen	= 32,
--		.iv	= "\xb8\x26\x97\xa8\x39\x8e\x94\x3f"
--			  "\xca\xcd\xff\x88\xba\x22\xbe\x47"
--			  "\x67\xba\x85\xf1\xbb\x30\x56\x26"
--			  "\xaf\x0b\x02\x38\xcc\x44\xa7\xa3",
--		.assoc	= "\xc7\xef\x26\x10\x7d\x2c\x3f\xc6"
--			  "\xea\x03\x2c\xac\xb9\xeb\xef\xc9"
--			  "\x31\x6b\x08\x12\xfc\xd8\x37\x2d"
--			  "\xe0\x17\x3a\x2e\x83\x5c\x8f",
--		.alen	= 31,
--		.ptext	= "",
--		.plen	= 0,
--		.ctext	= "\x20\x24\xe2\x33\x5c\x60\xc9\xf0"
--			  "\xa4\x96\x2f\x0d\x53\xc2\xf8\xfc",
--		.clen	= 16,
--	}, {
--		.key	= "\xe5\x81\x42\xdf\x05\x6a\x93\xd4"
--			  "\x2b\x70\x85\xf5\xb6\x7d\x50\xcc"
--			  "\xc6\xcc\x0e\x54\x7f\x28\xf8\x3a"
--			  "\x40\x2e\xa9\x1a\xf0\x8b\x5e\xc4",
--		.klen	= 32,
--		.iv	= "\xf4\x4a\xd1\x47\x49\x09\x3d\x5b"
--			  "\x4b\xa7\xb1\x19\xb4\x46\x81\x4d"
--			  "\x91\x7c\x91\x75\xc0\xd0\xd8\x40"
--			  "\x71\x39\xe1\x10\xa6\xa3\x46\x7a",
--		.assoc	= "\x03\x14\x5f\xaf\x8d\xa8\xe7\xe2"
--			  "\x6b\xde\xde\x3e\xb3\x10\xb1\xcf"
--			  "\x5c\x2d\x14\x96\x01\x78\xb9\x47"
--			  "\xa1\x44\x19\x06\x5d\xbb\x2e\x2f",
 -		.alen	= 32,
 -		.ptext	= "",
 -		.plen	= 0,
--		.ctext	= "\x6f\x4a\xb9\xe0\xff\x51\xa3\xf1"
--			  "\xd2\x64\x3e\x66\x6a\xb2\x03\xc0",
+-		.ctext	= "\x48\xc5\xc3\x4c\x40\x2e\x2f\xc2"
+-			  "\x6d\x65\xe0\x67\x9c\x1d\xa0\xf0",
 -		.clen	= 16,
 -	}, {
--		.key	= "\x22\xa6\x7c\x7f\x15\xe6\x3c\xf0"
--			  "\xac\x4b\x37\x86\xb0\xa2\x13\xd2"
--			  "\xf1\x8e\x19\xd8\x84\xc8\x7a\x53"
--			  "\x02\x5b\x88\xf3\xca\xea\xfe\x9b",
--		.klen	= 32,
--		.iv	= "\x31\x6f\x0b\xe6\x59\x85\xe6\x77"
--			  "\xcc\x81\x63\xab\xae\x6b\x43\x54"
--			  "\xbb\x3f\x9c\xf9\xc5\x70\x5a\x5a"
--			  "\x32\x67\xc0\xe9\x80\x02\xe5\x50",
--		.assoc	= "\x40",
+-		.key	= "\x5d\x6f\x41\x39\xa1\xd4\x97\x16"
+-			  "\x09\x85\xf4\xae\xc3\x6b\x9a\x3e",
+-		.klen	= 16,
+-		.iv	= "\x6c\x38\xcf\xa1\xe5\x73\x41\x9d"
+-			  "\x29\xbc\x21\xd2\xc2\x35\xcb\xbf",
+-		.assoc	= "\x7b\x01\x5d\x08\x29\x12\xec\x24"
+-			  "\x49\xf3\x4d\xf7\xc0\xfe\xfb\x41"
+-			  "\x3c\xf8\x79\x6c\xb6\x90\xd4\x0d"
+-			  "\xee\xde\x23\x60\xf2\xe5\x08\xcc"
+-			  "\x97",
+-		.alen	= 33,
+-		.ptext	= "",
+-		.plen	= 0,
+-		.ctext	= "\x28\x64\x78\x51\x55\xd8\x56\x4a"
+-			  "\x58\x3e\xf7\xbe\xee\x21\xfe\x94",
+-		.clen	= 16,
+-	}, {
+-		.key	= "\x99\x93\x7a\xd8\xb1\x50\x40\x31"
+-			  "\x8a\x60\xa6\x3f\xbd\x90\x5d\x44",
+-		.klen	= 16,
+-		.iv	= "\xa8\x5c\x09\x40\xf5\xef\xea\xb8"
+-			  "\xaa\x96\xd3\x64\xbc\x59\x8d\xc6",
+-		.assoc	= "\xb8\x26\x97\xa8\x39\x8e\x94\x3f"
+-			  "\xca\xcd\xff\x88\xba\x22\xbe\x47"
+-			  "\x67\xba\x85\xf1\xbb\x30\x56\x26"
+-			  "\xaf\x0b\x02\x38\xcc\x44\xa7\xa3"
+-			  "\xa6\xbf\x31\x93\x60\xcd\xda\x63"
+-			  "\x2c\xb1\xaa\x19\xc8\x19\xf8\xeb"
+-			  "\x03\xa1\xe8\xbe\x37\x54\xec\xa2"
+-			  "\xcd\x2c\x45\x58\xbd\x8e\x80",
+-		.alen	= 63,
+-		.ptext	= "",
+-		.plen	= 0,
+-		.ctext	= "\xb3\xa6\x00\x4e\x09\x20\xac\x21"
+-			  "\x77\x72\x69\x76\x2d\x36\xe5\xc8",
+-		.clen	= 16,
+-	}, {
+-		.key	= "\xd6\xb8\xb4\x77\xc1\xcb\xe9\x4d"
+-			  "\x0a\x3a\x58\xd1\xb7\xb4\x1f\x4a",
+-		.klen	= 16,
+-		.iv	= "\xe5\x81\x42\xdf\x05\x6a\x93\xd4"
+-			  "\x2b\x70\x85\xf5\xb6\x7d\x50\xcc",
+-		.assoc	= "\xf4\x4a\xd1\x47\x49\x09\x3d\x5b"
+-			  "\x4b\xa7\xb1\x19\xb4\x46\x81\x4d"
+-			  "\x91\x7c\x91\x75\xc0\xd0\xd8\x40"
+-			  "\x71\x39\xe1\x10\xa6\xa3\x46\x7a"
+-			  "\xb4\x6b\x35\xc2\xc1\xdf\xed\x60"
+-			  "\x46\xc1\x3e\x7f\x8c\xc2\x0e\x7a"
+-			  "\x30\x08\xd0\x5f\xa0\xaa\x0c\x6d"
+-			  "\x9c\x2f\xdb\x97\xb8\x15\x69\x01",
+-		.alen	= 64,
+-		.ptext	= "",
+-		.plen	= 0,
+-		.ctext	= "\x65\x33\x7b\xa1\x63\xf4\x20\xdd"
+-			  "\xe4\xb9\x4a\xaa\x9a\x21\xaa\x14",
+-		.clen	= 16,
+-	}, {
+-		.key	= "\x12\xdd\xee\x17\xd1\x47\x92\x69"
+-			  "\x8b\x14\x0a\x62\xb1\xd9\xe2\x50",
+-		.klen	= 16,
+-		.iv	= "\x22\xa6\x7c\x7f\x15\xe6\x3c\xf0"
+-			  "\xac\x4b\x37\x86\xb0\xa2\x13\xd2",
+-		.assoc	= "\x31",
 -		.alen	= 1,
--		.ptext	= "\x4f",
+-		.ptext	= "\x40",
 -		.plen	= 1,
--		.ctext	= "\x2c\xfb\xad\x7e\xbe\xa0\x9a\x5b"
--			  "\x7a\x3f\x81\xf7\xfc\x1b\x79\x83"
--			  "\xc7",
+-		.ctext	= "\x1d\x47\x17\x34\x86\xf5\x54\x1a"
+-			  "\x6d\x28\xb8\x5d\x6c\xcf\xa0\xb9"
+-			  "\xbf",
 -		.clen	= 17,
 -	}, {
--		.key	= "\x5e\xcb\xb6\x1e\x25\x62\xe4\x0c"
--			  "\x2d\x25\xe9\x18\xaa\xc6\xd5\xd8"
--			  "\x1b\x50\x25\x5d\x89\x68\xfc\x6d"
--			  "\xc3\x89\x67\xcb\xa4\x49\x9d\x71",
--		.klen	= 32,
--		.iv	= "\x6d\x94\x44\x86\x69\x00\x8f\x93"
+-		.key	= "\x4f\x01\x27\xb6\xe1\xc3\x3a\x85"
+-			  "\x0c\xee\xbc\xf4\xab\xfd\xa5\x57",
+-		.klen	= 16,
+-		.iv	= "\x5e\xcb\xb6\x1e\x25\x62\xe4\x0c"
+-			  "\x2d\x25\xe9\x18\xaa\xc6\xd5\xd8",
+-		.assoc	= "\x6d\x94\x44\x86\x69\x00\x8f\x93"
 -			  "\x4d\x5b\x15\x3c\xa8\x8f\x06\x5a"
 -			  "\xe6\x01\xa8\x7e\xca\x10\xdc\x73"
--			  "\xf4\x94\x9f\xc1\x5a\x61\x85\x27",
--		.assoc	= "\x7c\x5d\xd3\xee\xad\x9f\x39\x1a"
--			  "\x6d\x92\x42\x61\xa7\x58\x37",
--		.alen	= 15,
--		.ptext	= "\x8b\x26\x61\x55\xf1\x3e\xe3\xa1"
--			  "\x8d\xc8\x6e\x85\xa5\x21\x67",
--		.plen	= 15,
--		.ctext	= "\x1f\x7f\xca\x3c\x2b\xe7\x27\xba"
--			  "\x7e\x98\x83\x02\x34\x23\xf7\x94"
--			  "\xde\x35\xe6\x1d\x14\x18\xe5\x38"
--			  "\x14\x80\x6a\xa7\x1b\xae\x1d",
--		.clen	= 31,
+-			  "\xf4\x94\x9f\xc1\x5a\x61\x85",
+-		.alen	= 31,
+-		.ptext	= "\x7c\x5d\xd3\xee\xad\x9f\x39\x1a"
+-			  "\x6d\x92\x42\x61\xa7\x58\x37\xdb"
+-			  "\xb0\xb2\x2b\x9f\x0b\xb8\xbd\x7a"
+-			  "\x24\xa0\xd6\xb7\x11\x79\x6c",
+-		.plen	= 31,
+-		.ctext	= "\x78\x90\x52\xae\x0f\xf7\x2e\xef"
+-			  "\x63\x09\x08\x58\xb5\x56\xbd\x72"
+-			  "\x6e\x42\xcf\x27\x04\x7c\xdb\x92"
+-			  "\x18\xe9\xa4\x33\x90\xba\x62\xb5"
+-			  "\x70\xd3\x88\x9b\x4f\x05\xa7\x51"
+-			  "\x85\x87\x17\x09\x42\xed\x4e",
+-		.clen	= 47,
 -	}, {
--		.key	= "\x9b\xef\xf0\xbd\x35\xdd\x8d\x28"
--			  "\xad\xff\x9b\xa9\xa4\xeb\x98\xdf"
--			  "\x46\x13\x31\xe1\x8e\x08\x7e\x87"
--			  "\x85\xb6\x46\xa3\x7e\xa8\x3c\x48",
--		.klen	= 32,
--		.iv	= "\xaa\xb8\x7e\x25\x79\x7c\x37\xaf"
+-		.key	= "\x8b\x26\x61\x55\xf1\x3e\xe3\xa1"
+-			  "\x8d\xc8\x6e\x85\xa5\x21\x67\x5d",
+-		.klen	= 16,
+-		.iv	= "\x9b\xef\xf0\xbd\x35\xdd\x8d\x28"
+-			  "\xad\xff\x9b\xa9\xa4\xeb\x98\xdf",
+-		.assoc	= "\xaa\xb8\x7e\x25\x79\x7c\x37\xaf"
 -			  "\xce\x36\xc7\xce\xa2\xb4\xc9\x60"
 -			  "\x10\xc3\xb3\x02\xcf\xb0\x5e\x8d"
 -			  "\xb5\xc2\x7e\x9a\x35\xc0\x24\xfd",
--		.assoc	= "\xb9\x82\x0c\x8d\xbd\x1b\xe2\x36"
--			  "\xee\x6c\xf4\xf2\xa1\x7d\xf9\xe2",
--		.alen	= 16,
--		.ptext	= "\xc8\x4b\x9b\xf5\x01\xba\x8c\xbd"
--			  "\x0e\xa3\x21\x16\x9f\x46\x2a\x63",
--		.plen	= 16,
--		.ctext	= "\x05\x86\x9e\xd7\x2b\xa3\x97\x01"
--			  "\xbe\x28\x98\x10\x6f\xe9\x61\x32"
--			  "\x96\xbb\xb1\x2e\x8f\x0c\x44\xb9"
--			  "\x46\x2d\x55\xe3\x42\x67\xf2\xaf",
--		.clen	= 32,
--	}, {
--		.key	= "\xd7\x14\x29\x5d\x45\x59\x36\x44"
--			  "\x2e\xd9\x4d\x3b\x9e\x0f\x5b\xe5"
--			  "\x70\xd5\x3c\x65\x93\xa8\x00\xa0"
--			  "\x46\xe4\x25\x7c\x58\x08\xdb\x1e",
--		.klen	= 32,
--		.iv	= "\xe6\xdd\xb8\xc4\x89\xf8\xe0\xca"
--			  "\x4f\x10\x7a\x5f\x9c\xd8\x8b\x66"
--			  "\x3b\x86\xbf\x86\xd4\x50\xe0\xa7"
--			  "\x76\xef\x5c\x72\x0f\x1f\xc3\xd4",
--		.assoc	= "\xf5\xa6\x46\x2c\xce\x97\x8a\x51"
--			  "\x6f\x46\xa6\x83\x9b\xa1\xbc\xe8"
--			  "\x05",
--		.alen	= 17,
--		.ptext	= "\x05\x70\xd5\x94\x12\x36\x35\xd8"
--			  "\x8f\x7d\xd3\xa8\x99\x6a\xed\x69"
--			  "\xd0",
--		.plen	= 17,
--		.ctext	= "\x9c\xe0\x06\x7b\x86\xcf\x2e\xd8"
--			  "\x45\x65\x1b\x72\x9b\xaa\xa3\x1e"
--			  "\x87\x9d\x26\xdf\xff\x81\x11\xd2"
--			  "\x47\x41\xb9\x24\xc1\x8a\xa3\x8b"
--			  "\x55",
--		.clen	= 33,
--	}, {
--		.key	= "\x14\x39\x63\xfc\x56\xd5\xdf\x5f"
--			  "\xaf\xb3\xff\xcc\x98\x33\x1d\xeb"
--			  "\x9a\x97\x48\xe9\x98\x48\x82\xba"
--			  "\x07\x11\x04\x54\x32\x67\x7b\xf5",
--		.klen	= 32,
--		.iv	= "\x23\x02\xf1\x64\x9a\x73\x89\xe6"
--			  "\xd0\xea\x2c\xf1\x96\xfc\x4e\x6d"
--			  "\x65\x48\xcb\x0a\xda\xf0\x62\xc0"
--			  "\x38\x1d\x3b\x4a\xe9\x7e\x62\xaa",
--		.assoc	= "\x32\xcb\x80\xcc\xde\x12\x33\x6d"
--			  "\xf0\x20\x58\x15\x95\xc6\x7f\xee"
--			  "\x2f\xf9\x4e\x2c\x1b\x98\x43\xc7"
--			  "\x68\x28\x73\x40\x9f\x96\x4a",
--		.alen	= 31,
--		.ptext	= "\x41\x94\x0e\x33\x22\xb1\xdd\xf4"
--			  "\x10\x57\x85\x39\x93\x8f\xaf\x70"
--			  "\xfa\xa9\xd0\x4d\x5c\x40\x23\xcd"
--			  "\x98\x34\xab\x37\x56\xae\x32",
--		.plen	= 31,
--		.ctext	= "\xa0\xc8\xde\x83\x0d\xc3\x4e\xd5"
--			  "\x69\x7f\x7a\xdd\x8c\x46\xda\xba"
--			  "\x0a\x5c\x0e\x7f\xac\xee\x02\xd2"
--			  "\xe5\x4b\x0a\xba\xb8\xa4\x7b\x66"
--			  "\xde\xae\xdb\xc2\xc0\x0b\xf7\x2b"
--			  "\xdf\xb8\xea\xd8\xa9\x38\xed",
--		.clen	= 47,
--	}, {
--		.key	= "\x50\x5d\x9d\x9b\x66\x50\x88\x7b"
--			  "\x30\x8e\xb1\x5e\x92\x58\xe0\xf1"
--			  "\xc5\x5a\x53\x6e\x9d\xe8\x04\xd4"
--			  "\xc9\x3f\xe2\x2d\x0c\xc6\x1a\xcb",
--		.klen	= 32,
--		.iv	= "\x5f\x27\x2b\x03\xaa\xef\x32\x02"
--			  "\x50\xc4\xde\x82\x90\x21\x11\x73"
--			  "\x8f\x0a\xd6\x8f\xdf\x90\xe4\xda"
--			  "\xf9\x4a\x1a\x23\xc3\xdd\x02\x81",
--		.assoc	= "\x6e\xf0\xba\x6b\xee\x8e\xdc\x89"
--			  "\x71\xfb\x0a\xa6\x8f\xea\x41\xf4"
--			  "\x5a\xbb\x59\xb0\x20\x38\xc5\xe0"
--			  "\x29\x56\x52\x19\x79\xf5\xe9\x37",
 -		.alen	= 32,
--		.ptext	= "\x7e\xb9\x48\xd3\x32\x2d\x86\x10"
--			  "\x91\x31\x37\xcb\x8d\xb3\x72\x76"
--			  "\x24\x6b\xdc\xd1\x61\xe0\xa5\xe7"
--			  "\x5a\x61\x8a\x0f\x30\x0d\xd1\xec",
+-		.ptext	= "\xb9\x82\x0c\x8d\xbd\x1b\xe2\x36"
+-			  "\xee\x6c\xf4\xf2\xa1\x7d\xf9\xe2"
+-			  "\xdb\x74\x36\x23\x11\x58\x3f\x93"
+-			  "\xe5\xcd\xb5\x90\xeb\xd8\x0c\xb3",
 -		.plen	= 32,
--		.ctext	= "\xd3\x68\x14\x70\x3c\x01\x43\x86"
--			  "\x02\xab\xbe\x75\xaa\xe7\xf5\x53"
--			  "\x5c\x05\xbd\x9b\x19\xbb\x2a\x61"
--			  "\x8f\x69\x05\x75\x8e\xca\x60\x0c"
--			  "\x5b\xa2\x48\x61\x32\x74\x11\x2b"
--			  "\xf6\xcf\x06\x78\x6f\x78\x1a\x4a",
+-		.ctext	= "\x1d\x2c\x57\xe0\x50\x38\x3d\x41"
+-			  "\x2e\x71\xc8\x3b\x92\x43\x58\xaf"
+-			  "\x5a\xfb\xad\x8f\xd9\xd5\x8a\x5e"
+-			  "\xdb\xf3\xcd\x3a\x2b\xe1\x2c\x1a"
+-			  "\xb0\xed\xe3\x0c\x6e\xf9\xf2\xd6"
+-			  "\x90\xe6\xb1\x0e\xa5\x8a\xac\xb7",
 -		.clen	= 48,
 -	}, {
--		.key	= "\x8d\x82\xd6\x3b\x76\xcc\x30\x97"
--			  "\xb1\x68\x63\xef\x8c\x7c\xa3\xf7"
--			  "\xef\x1c\x5f\xf2\xa3\x88\x86\xed"
--			  "\x8a\x6d\xc1\x05\xe7\x25\xb9\xa2",
--		.klen	= 32,
--		.iv	= "\x9c\x4b\x65\xa2\xba\x6b\xdb\x1e"
+-		.key	= "\xc8\x4b\x9b\xf5\x01\xba\x8c\xbd"
+-			  "\x0e\xa3\x21\x16\x9f\x46\x2a\x63",
+-		.klen	= 16,
+-		.iv	= "\xd7\x14\x29\x5d\x45\x59\x36\x44"
+-			  "\x2e\xd9\x4d\x3b\x9e\x0f\x5b\xe5",
+-		.assoc	= "\xe6\xdd\xb8\xc4\x89\xf8\xe0\xca"
+-			  "\x4f\x10\x7a\x5f\x9c\xd8\x8b\x66"
+-			  "\x3b\x86\xbf\x86\xd4\x50\xe0\xa7"
+-			  "\x76\xef\x5c\x72\x0f\x1f\xc3\xd4"
+-			  "\xee",
+-		.alen	= 33,
+-		.ptext	= "\xf5\xa6\x46\x2c\xce\x97\x8a\x51"
+-			  "\x6f\x46\xa6\x83\x9b\xa1\xbc\xe8"
+-			  "\x05\x36\x42\xa7\x16\xf8\xc1\xad"
+-			  "\xa7\xfb\x94\x68\xc5\x37\xab\x8a"
+-			  "\x72",
+-		.plen	= 33,
+-		.ctext	= "\x59\x10\x84\x1c\x83\x4c\x8b\xfc"
+-			  "\xfd\x2e\x4b\x46\x84\xff\x78\x4e"
+-			  "\x50\xda\x5c\xb9\x61\x1d\xf5\xb9"
+-			  "\xfe\xbb\x7f\xae\x8c\xc1\x24\xbd"
+-			  "\x8c\x6f\x1f\x9b\xce\xc6\xc1\x37"
+-			  "\x08\x06\x5a\xe5\x96\x10\x95\xc2"
+-			  "\x5e",
+-		.clen	= 49,
+-	}, {
+-		.key	= "\x05\x70\xd5\x94\x12\x36\x35\xd8"
+-			  "\x8f\x7d\xd3\xa8\x99\x6a\xed\x69",
+-		.klen	= 16,
+-		.iv	= "\x14\x39\x63\xfc\x56\xd5\xdf\x5f"
+-			  "\xaf\xb3\xff\xcc\x98\x33\x1d\xeb",
+-		.assoc	= "\x23\x02\xf1\x64\x9a\x73\x89\xe6"
+-			  "\xd0\xea\x2c\xf1\x96\xfc\x4e\x6d"
+-			  "\x65\x48\xcb\x0a\xda\xf0\x62\xc0"
+-			  "\x38\x1d\x3b\x4a\xe9\x7e\x62\xaa"
+-			  "\xfd\xc9\x4a\xa9\xa9\x39\x4b\x54"
+-			  "\xc8\x0e\x24\x7f\x5e\x10\x7a\x45"
+-			  "\x10\x0b\x56\x85\xad\x54\xaa\x66"
+-			  "\xa8\x43\xcd\xd4\x9b\xb7\xfa",
+-		.alen	= 63,
+-		.ptext	= "\x32\xcb\x80\xcc\xde\x12\x33\x6d"
+-			  "\xf0\x20\x58\x15\x95\xc6\x7f\xee"
+-			  "\x2f\xf9\x4e\x2c\x1b\x98\x43\xc7"
+-			  "\x68\x28\x73\x40\x9f\x96\x4a\x60"
+-			  "\x80\xf4\x4b\xf4\xc1\x3d\xd0\x93"
+-			  "\xcf\x12\xc9\x59\x8f\x7a\x7f\xa8"
+-			  "\x1b\xa5\x50\xed\x87\xa9\x72\x59"
+-			  "\x9c\x44\xb2\xa4\x99\x98\x34",
+-		.plen	= 63,
+-		.ctext	= "\x9a\x12\xbc\xdf\x72\xa8\x56\x22"
+-			  "\x49\x2d\x07\x92\xfc\x3d\x6d\x5f"
+-			  "\xef\x36\x19\xae\x91\xfa\xd6\x63"
+-			  "\x46\xea\x8a\x39\x14\x21\xa6\x37"
+-			  "\x18\xfc\x97\x3e\x16\xa5\x4d\x39"
+-			  "\x45\x2e\x69\xcc\x9c\x5f\xdf\x6d"
+-			  "\x5e\xa2\xbf\xac\x83\x32\x72\x52"
+-			  "\x58\x58\x23\x40\xfd\xa5\xc2\xe6"
+-			  "\xe9\x5a\x50\x98\x00\x58\xc9\x86"
+-			  "\x4f\x20\x37\xdb\x7b\x22\xa3",
+-		.clen	= 79,
+-	}, {
+-		.key	= "\x41\x94\x0e\x33\x22\xb1\xdd\xf4"
+-			  "\x10\x57\x85\x39\x93\x8f\xaf\x70",
+-		.klen	= 16,
+-		.iv	= "\x50\x5d\x9d\x9b\x66\x50\x88\x7b"
+-			  "\x30\x8e\xb1\x5e\x92\x58\xe0\xf1",
+-		.assoc	= "\x5f\x27\x2b\x03\xaa\xef\x32\x02"
+-			  "\x50\xc4\xde\x82\x90\x21\x11\x73"
+-			  "\x8f\x0a\xd6\x8f\xdf\x90\xe4\xda"
+-			  "\xf9\x4a\x1a\x23\xc3\xdd\x02\x81"
+-			  "\x0b\x76\x4f\xd7\x0a\x4b\x5e\x51"
+-			  "\xe3\x1d\xb9\xe5\x21\xb9\x8f\xd4"
+-			  "\x3d\x72\x3e\x26\x16\xa9\xca\x32"
+-			  "\x77\x47\x63\x14\x95\x3d\xe4\x34",
+-		.alen	= 64,
+-		.ptext	= "\x6e\xf0\xba\x6b\xee\x8e\xdc\x89"
+-			  "\x71\xfb\x0a\xa6\x8f\xea\x41\xf4"
+-			  "\x5a\xbb\x59\xb0\x20\x38\xc5\xe0"
+-			  "\x29\x56\x52\x19\x79\xf5\xe9\x37"
+-			  "\x8f\xa1\x50\x23\x22\x4f\xe3\x91"
+-			  "\xe9\x21\x5e\xbf\x52\x23\x95\x37"
+-			  "\x48\x0c\x38\x8f\xf0\xff\x92\x24"
+-			  "\x6b\x47\x49\xe3\x94\x1f\x1e\x01",
+-		.plen	= 64,
+-		.ctext	= "\xe6\xeb\x92\x5a\x5b\xf0\x2d\xbb"
+-			  "\x23\xec\x35\xe3\xae\xc9\xfb\x0b"
+-			  "\x90\x14\x46\xeb\xa8\x8d\xb0\x9b"
+-			  "\x39\xda\x8b\x48\xec\xb2\x00\x4e"
+-			  "\x80\x6f\x46\x4f\x9b\x1e\xbb\x35"
+-			  "\xea\x5a\xbc\xa2\x36\xa5\x89\x45"
+-			  "\xc2\xd6\xd7\x15\x0b\xf6\x6c\x56"
+-			  "\xec\x99\x7d\x61\xb3\x15\x93\xed"
+-			  "\x83\x1e\xd9\x48\x84\x0b\x37\xfe"
+-			  "\x95\x74\x44\xd5\x54\xa6\x27\x06",
+-		.clen	= 80,
+-	}, {
+-		.key	= "\x7e\xb9\x48\xd3\x32\x2d\x86\x10"
+-			  "\x91\x31\x37\xcb\x8d\xb3\x72\x76",
+-		.klen	= 16,
+-		.iv	= "\x8d\x82\xd6\x3b\x76\xcc\x30\x97"
+-			  "\xb1\x68\x63\xef\x8c\x7c\xa3\xf7",
+-		.assoc	= "\x9c\x4b\x65\xa2\xba\x6b\xdb\x1e"
 -			  "\xd1\x9e\x90\x13\x8a\x45\xd3\x79"
 -			  "\xba\xcd\xe2\x13\xe4\x30\x66\xf4"
--			  "\xba\x78\xf9\xfb\x9d\x3c\xa1\x58",
--		.assoc	= "\xab\x14\xf3\x0a\xfe\x0a\x85\xa5"
+-			  "\xba\x78\xf9\xfb\x9d\x3c\xa1\x58"
+-			  "\x1a\x22\x53\x05\x6b\x5c\x71\x4f"
+-			  "\xfd\x2d\x4d\x4c\xe5\x62\xa5\x63"
+-			  "\x6a\xda\x26\xc8\x7f\xff\xea\xfd"
+-			  "\x46\x4a\xfa\x53\x8f\xc4\xcd\x68"
+-			  "\x58",
+-		.alen	= 65,
+-		.ptext	= "\xab\x14\xf3\x0a\xfe\x0a\x85\xa5"
 -			  "\xf2\xd5\xbc\x38\x89\x0e\x04\xfb"
 -			  "\x84\x7d\x65\x34\x25\xd8\x47\xfa"
 -			  "\xeb\x83\x31\xf1\x54\x54\x89\x0d"
--			  "\x9d",
--		.alen	= 33,
--		.ptext	= "\xba\xde\x82\x72\x42\xa9\x2f\x2c"
--			  "\x12\x0b\xe9\x5c\x87\xd7\x35\x7c"
--			  "\x4f\x2e\xe8\x55\x66\x80\x27\x00"
--			  "\x1b\x8f\x68\xe7\x0a\x6c\x71\xc3"
--			  "\x21\x78\x55\x9d\x9c\x65\x7b\xcd"
--			  "\x0a\x34\x97\xff\x47\x37\xb0\x2a"
--			  "\x80\x0d\x19\x98\x33\xa9\x7a\xe3"
--			  "\x2e\x4c\xc6\xf3\x8c\x88\x42\x01"
--			  "\xbd",
--		.plen	= 65,
--		.ctext	= "\x07\x0a\x35\xb0\x82\x03\x5a\xd2"
--			  "\x15\x3a\x6c\x72\x83\x9b\xb1\x75"
--			  "\xea\xf2\xfc\xff\xc6\xf1\x13\xa4"
--			  "\x1a\x93\x33\x79\x97\x82\x81\xc0"
--			  "\x96\xc2\x00\xab\x39\xae\xa1\x62"
--			  "\x53\xa3\x86\xc9\x07\x8c\xaf\x22"
--			  "\x47\x31\x29\xca\x4a\x95\xf5\xd5"
--			  "\x20\x63\x5a\x54\x80\x2c\x4a\x63"
--			  "\xfb\x18\x73\x31\x4f\x08\x21\x5d"
--			  "\x20\xe9\xc3\x7e\xea\x25\x77\x3a"
--			  "\x65",
--		.clen	= 81,
+-			  "\x9d\x4d\x54\x51\x84\x61\xf6\x8e"
+-			  "\x03\x31\xf2\x25\x16\xcc\xaa\xc6"
+-			  "\x75\x73\x20\x30\x59\x54\xb2\xf0"
+-			  "\x3a\x4b\xe0\x23\x8e\xa6\x08\x35"
+-			  "\x8a\xdf\x27\xa0\xe4\x60\x99\xae"
+-			  "\x8e\x43\xd9\x39\x7b\x10\x40\x67"
+-			  "\x5c\x7e\xc9\x70\x63\x34\xca\x59"
+-			  "\xfe\x86\xbc\xb7\x9c\x39\xf3\x6d"
+-			  "\x6a\x41\x64\x6f\x16\x7f\x65\x7e"
+-			  "\x89\x84\x68\xeb\xb0\x51\xbe\x55"
+-			  "\x33\x16\x59\x6c\x3b\xef\x88\xad"
+-			  "\x2f\xab\xbc\x25\x76\x87\x41\x2f"
+-			  "\x36",
+-		.plen	= 129,
+-		.ctext	= "\x89\x24\x27\x86\xdc\xd7\x6b\xd9"
+-			  "\xd1\xcd\xdc\x16\xdd\x2c\xc1\xfb"
+-			  "\x52\xb5\xb3\xab\x50\x99\x3f\xa0"
+-			  "\x38\xa4\x74\xa5\x04\x15\x63\x05"
+-			  "\x8f\x54\x81\x06\x5a\x6b\xa4\x63"
+-			  "\x6d\xa7\x21\xcb\xff\x42\x30\x8e"
+-			  "\x3b\xd1\xca\x3f\x4b\x1a\xb8\xc3"
+-			  "\x42\x01\xe6\xbc\x75\x15\x87\xee"
+-			  "\xc9\x8e\x65\x01\xd9\xd8\xb5\x9f"
+-			  "\x48\x86\xa6\x5f\x2c\xc7\xb5\xb0"
+-			  "\xed\x5d\x14\x7c\x3f\x40\xb1\x0b"
+-			  "\x72\xef\x94\x8d\x7a\x85\x56\xe5"
+-			  "\x56\x08\x15\x56\xba\xaf\xbd\xf0"
+-			  "\x20\xef\xa0\xf6\xa9\xad\xa2\xc9"
+-			  "\x1c\x3b\x28\x51\x7e\x77\xb2\x18"
+-			  "\x4f\x61\x64\x37\x22\x36\x6d\x78"
+-			  "\xed\xed\x35\xe8\x83\xa5\xec\x25"
+-			  "\x6b\xff\x5f\x1a\x09\x96\x3d\xdc"
+-			  "\x20",
+-		.clen	= 145,
 -	}, {
--		.key	= "\xc9\xa7\x10\xda\x86\x48\xd9\xb3"
--			  "\x32\x42\x15\x80\x85\xa1\x65\xfe"
--			  "\x19\xde\x6b\x76\xa8\x28\x08\x07"
--			  "\x4b\x9a\xa0\xdd\xc1\x84\x58\x79",
--		.klen	= 32,
--		.iv	= "\xd8\x70\x9f\x42\xca\xe6\x83\x3a"
+-		.key	= "\xba\xde\x82\x72\x42\xa9\x2f\x2c"
+-			  "\x12\x0b\xe9\x5c\x87\xd7\x35\x7c",
+-		.klen	= 16,
+-		.iv	= "\xc9\xa7\x10\xda\x86\x48\xd9\xb3"
+-			  "\x32\x42\x15\x80\x85\xa1\x65\xfe",
+-		.assoc	= "\xd8\x70\x9f\x42\xca\xe6\x83\x3a"
 -			  "\x52\x79\x42\xa5\x84\x6a\x96\x7f"
 -			  "\xe4\x8f\xed\x97\xe9\xd0\xe8\x0d"
--			  "\x7c\xa6\xd8\xd4\x77\x9b\x40\x2e",
--		.assoc	= "\xe8\x39\x2d\xaa\x0e\x85\x2d\xc1"
+-			  "\x7c\xa6\xd8\xd4\x77\x9b\x40\x2e"
+-			  "\x28\xce\x57\x34\xcd\x6e\x84\x4c"
+-			  "\x17\x3c\xe1\xb2\xa8\x0b\xbb\xf1"
+-			  "\x96\x41\x0d\x69\xe8\x54\x0a\xc8"
+-			  "\x15\x4e\x91\x92\x89\x4b\xb7\x9b"
+-			  "\x21\xf7\x42\x89\xac\x12\x2a\x54"
+-			  "\x69\xee\x18\xc7\x8d\xed\xe8\xfd"
+-			  "\xbb\x04\x28\xe6\x8a\x3c\x98\xc1"
+-			  "\x04\x2d\xa9\xa1\x24\x83\xff\xe9"
+-			  "\x55\x7a\xf0\xd1\xf6\x63\x05\xe1"
+-			  "\xd9\x1e\x75\x72\xc1\x9f\xae\x32"
+-			  "\xe1\x6b\xcd\x9e\x61\x19\x23\x86"
+-			  "\xd9\xd2\xaf\x8e\xd5\xd3\xa8\xa9"
+-			  "\x51",
+-		.alen	= 129,
+-		.ptext	= "\xe8\x39\x2d\xaa\x0e\x85\x2d\xc1"
 -			  "\x72\xaf\x6e\xc9\x82\x33\xc7\x01"
 -			  "\xaf\x40\x70\xb8\x2a\x78\xc9\x14"
 -			  "\xac\xb1\x10\xca\x2e\xb3\x28\xe4"
@@ -4277,89 +5096,988 @@ index e13351145e23..671443f33fe2 100644
 -			  "\xa2\xda\x07\xd1\xc2\xa9\xd1\xbb"
 -			  "\x09\x4f\x77\x62\x88\x2d\xf2\x68"
 -			  "\x54",
--		.alen	= 65,
--		.ptext	= "\xf7\x02\xbb\x11\x52\x24\xd8\x48"
--			  "\x93\xe6\x9b\xee\x81\xfc\xf7\x82"
--			  "\x79\xf0\xf3\xd9\x6c\x20\xa9\x1a"
--			  "\xdc\xbc\x47\xc0\xe4\xcb\x10\x99"
--			  "\x2f",
--		.plen	= 33,
--		.ctext	= "\x33\xc1\xda\xfa\x15\x21\x07\x8e"
--			  "\x93\x68\xea\x64\x7b\x3d\x4b\x6b"
--			  "\x71\x5e\x5e\x6b\x92\xaa\x65\xc2"
--			  "\x7a\x2a\xc1\xa9\x0a\xa1\x24\x81"
--			  "\x26\x3a\x5a\x09\xe8\xce\x73\x72"
--			  "\xde\x7b\x58\x9e\x85\xb9\xa4\x28"
--			  "\xda",
--		.clen	= 49,
+-		.plen	= 65,
+-		.ctext	= "\x36\x78\xb9\x22\xde\x62\x35\x55"
+-			  "\x1a\x7a\xf5\x45\xbc\xd7\x15\x82"
+-			  "\x01\xe9\x5a\x07\xea\x46\xaf\x91"
+-			  "\xcb\x73\xa5\xee\xe1\xb4\xbf\xc2"
+-			  "\xdb\xd2\x9d\x59\xde\xfc\x83\x00"
+-			  "\xf5\x46\xac\x97\xd5\x57\xa9\xb9"
+-			  "\x1f\x8c\xe8\xca\x68\x8b\x91\x0c"
+-			  "\x01\xbe\x0a\xaf\x7c\xf6\x67\xa4"
+-			  "\xbf\xbc\x88\x3f\x5d\xd1\xf9\x19"
+-			  "\x0f\x9d\xb2\xaf\xb9\x6e\x17\xdf"
+-			  "\xa2",
+-		.clen	= 81,
 -	}, {
--		.key	= "\x06\xcc\x4a\x79\x96\xc3\x82\xcf"
--			  "\xb3\x1c\xc7\x12\x7f\xc5\x28\x04"
--			  "\x44\xa1\x76\xfb\xad\xc8\x8a\x21"
--			  "\x0d\xc8\x7f\xb6\x9b\xe3\xf8\x4f",
--		.klen	= 32,
--		.iv	= "\x15\x95\xd8\xe1\xda\x62\x2c\x56"
+-		.key	= "\xf7\x02\xbb\x11\x52\x24\xd8\x48"
+-			  "\x93\xe6\x9b\xee\x81\xfc\xf7\x82",
+-		.klen	= 16,
+-		.iv	= "\x06\xcc\x4a\x79\x96\xc3\x82\xcf"
+-			  "\xb3\x1c\xc7\x12\x7f\xc5\x28\x04",
+-		.assoc	= "\x15\x95\xd8\xe1\xda\x62\x2c\x56"
 -			  "\xd3\x53\xf4\x36\x7e\x8e\x59\x85"
 -			  "\x0e\x51\xf9\x1c\xee\x70\x6a\x27"
 -			  "\x3d\xd3\xb7\xac\x51\xfa\xdf\x05",
--		.assoc	= "\x24\x5e\x67\x49\x1e\x01\xd6\xdd"
--			  "\xf3\x89\x20\x5b\x7c\x57\x89\x07",
--		.alen	= 16,
--		.ptext	= "\x33\x27\xf5\xb1\x62\xa0\x80\x63"
--			  "\x14\xc0\x4d\x7f\x7b\x20\xba\x89",
--		.plen	= 16,
--		.ctext	= "\x3e\xf8\x86\x3d\x39\xf8\x96\x02"
--			  "\x0f\xdf\xc9\x6e\x37\x1e\x57\x99"
--			  "\x07\x2a\x1a\xac\xd1\xda\xfd\x3b"
--			  "\xc7\xff\xbd\xbc\x85\x09\x0b",
--		.clen	= 31,
+-		.alen	= 32,
+-		.ptext	= "\x24\x5e\x67\x49\x1e\x01\xd6\xdd"
+-			  "\xf3\x89\x20\x5b\x7c\x57\x89\x07"
+-			  "\xd9\x02\x7c\x3d\x2f\x18\x4b\x2d"
+-			  "\x6e\xde\xee\xa2\x08\x12\xc7\xba",
+-		.plen	= 32,
+-		.ctext	= "\x08\x1b\x95\x0e\x41\x95\x02\x4b"
+-			  "\x9c\xbb\xa8\xd0\x7c\xd3\x44\x6e"
+-			  "\x89\x14\x33\x70\x0a\xbc\xea\x39"
+-			  "\x88\xaa\x2b\xd5\x73\x11\x55\xf5"
+-			  "\x33\x33\x9c\xd7\x42\x34\x49\x8e"
+-			  "\x2f\x03\x30\x05\x47\xaf\x34",
+-		.clen	= 47,
 -	}, {
--		.key	= "\x42\xf0\x84\x19\xa6\x3f\x2b\xea"
--			  "\x34\xf6\x79\xa3\x79\xe9\xeb\x0a"
--			  "\x6e\x63\x82\x7f\xb2\x68\x0c\x3a"
--			  "\xce\xf5\x5e\x8e\x75\x42\x97\x26",
--		.klen	= 32,
--		.iv	= "\x51\xb9\x12\x80\xea\xde\xd5\x71"
+-		.key	= "\x33\x27\xf5\xb1\x62\xa0\x80\x63"
+-			  "\x14\xc0\x4d\x7f\x7b\x20\xba\x89",
+-		.klen	= 16,
+-		.iv	= "\x42\xf0\x84\x19\xa6\x3f\x2b\xea"
+-			  "\x34\xf6\x79\xa3\x79\xe9\xeb\x0a",
+-		.assoc	= "\x51\xb9\x12\x80\xea\xde\xd5\x71"
 -			  "\x54\x2d\xa6\xc8\x78\xb2\x1b\x8c"
 -			  "\x39\x14\x05\xa0\xf3\x10\xec\x41"
 -			  "\xff\x01\x95\x84\x2b\x59\x7f\xdb",
--		.assoc	= "\x61\x83\xa0\xe8\x2e\x7d\x7f\xf8"
--			  "\x74\x63\xd2\xec\x76\x7c\x4c\x0d",
--		.alen	= 16,
--		.ptext	= "\x70\x4c\x2f\x50\x72\x1c\x29\x7f"
--			  "\x95\x9a\xff\x10\x75\x45\x7d\x8f",
--		.plen	= 16,
--		.ctext	= "\x2f\xc4\xd8\x0d\xa6\x07\xef\x2e"
--			  "\x6c\xd9\x84\x63\x70\x97\x61\x37"
--			  "\x08\x2f\x16\x90\x9e\x62\x30\x0d"
--			  "\x62\xd5\xc8\xf0\x46\x1a",
--		.clen	= 30,
+-		.alen	= 32,
+-		.ptext	= "\x61\x83\xa0\xe8\x2e\x7d\x7f\xf8"
+-			  "\x74\x63\xd2\xec\x76\x7c\x4c\x0d"
+-			  "\x03\xc4\x88\xc1\x35\xb8\xcd\x47"
+-			  "\x2f\x0c\xcd\x7a\xe2\x71\x66\x91",
+-		.plen	= 32,
+-		.ctext	= "\x97\xca\xf4\xe0\x8d\x89\xbf\x68"
+-			  "\x0c\x60\xb9\x27\xdf\xaa\x41\xc6"
+-			  "\x25\xd8\xf7\x1f\x10\x15\x48\x61"
+-			  "\x4c\x95\x00\xdf\x51\x9b\x7f\xe6"
+-			  "\x24\x40\x9e\xbe\x3b\xeb\x1b\x98"
+-			  "\xb9\x9c\xe5\xef\xf2\x05",
+-		.clen	= 46,
 -	}, {
--		.key	= "\x7f\x15\xbd\xb8\xb6\xba\xd3\x06"
--			  "\xb5\xd1\x2b\x35\x73\x0e\xad\x10"
--			  "\x98\x25\x8d\x03\xb7\x08\x8e\x54"
--			  "\x90\x23\x3d\x67\x4f\xa1\x36\xfc",
--		.klen	= 32,
--		.iv	= "\x8e\xde\x4c\x20\xfa\x59\x7e\x8d"
+-		.key	= "\x70\x4c\x2f\x50\x72\x1c\x29\x7f"
+-			  "\x95\x9a\xff\x10\x75\x45\x7d\x8f",
+-		.klen	= 16,
+-		.iv	= "\x7f\x15\xbd\xb8\xb6\xba\xd3\x06"
+-			  "\xb5\xd1\x2b\x35\x73\x0e\xad\x10",
+-		.assoc	= "\x8e\xde\x4c\x20\xfa\x59\x7e\x8d"
 -			  "\xd5\x07\x58\x59\x72\xd7\xde\x92"
 -			  "\x63\xd6\x10\x24\xf8\xb0\x6e\x5a"
 -			  "\xc0\x2e\x74\x5d\x06\xb8\x1e\xb2",
--		.assoc	= "\x9d\xa7\xda\x88\x3e\xf8\x28\x14"
--			  "\xf5\x3e\x85\x7d\x70\xa0\x0f\x13",
--		.alen	= 16,
--		.ptext	= "\xac\x70\x69\xef\x82\x97\xd2\x9b"
+-		.alen	= 32,
+-		.ptext	= "\x9d\xa7\xda\x88\x3e\xf8\x28\x14"
+-			  "\xf5\x3e\x85\x7d\x70\xa0\x0f\x13"
+-			  "\x2e\x86\x93\x45\x3a\x58\x4f\x61"
+-			  "\xf0\x3a\xac\x53\xbc\xd0\x06\x68",
+-		.plen	= 32,
+-		.ctext	= "\x63\x4c\x2a\x8e\xb4\x6b\x63\x0d"
+-			  "\xb5\xec\x9b\x4e\x12\x23\xa3\xcf"
+-			  "\x1a\x5a\x70\x15\x5a\x10\x40\x51"
+-			  "\xca\x47\x4c\x9d\xc9\x97\xf4\x77"
+-			  "\xdb\xc8\x10\x2d\xdc\x65\x20\x3f",
+-		.clen	= 40,
+-	}, {
+-		.key	= "\xac\x70\x69\xef\x82\x97\xd2\x9b"
 -			  "\x15\x74\xb1\xa2\x6f\x69\x3f\x95",
--		.plen	= 16,
--		.ctext	= "\xce\xf3\x17\x87\x49\xc2\x00\x46"
--			  "\xc6\x12\x5c\x8f\x81\x38\xaa\x55"
--			  "\xf8\x67\x75\xf1\x75\xe3\x2a\x24",
--		.clen	= 24,
+-		.klen	= 16,
+-		.iv	= "\xbb\x3a\xf7\x57\xc6\x36\x7c\x22"
+-			  "\x36\xab\xde\xc6\x6d\x32\x70\x17",
+-		.assoc	= "\xcb\x03\x85\xbf\x0a\xd5\x26\xa9"
+-			  "\x56\xe1\x0a\xeb\x6c\xfb\xa1\x98"
+-			  "\x8d\x98\x1c\xa8\xfe\x50\xf0\x74"
+-			  "\x81\x5c\x53\x35\xe0\x17\xbd\x88",
+-		.alen	= 32,
+-		.ptext	= "\xda\xcc\x14\x27\x4e\x74\xd1\x30"
+-			  "\x76\x18\x37\x0f\x6a\xc4\xd1\x1a"
+-			  "\x58\x49\x9f\xc9\x3f\xf8\xd1\x7a"
+-			  "\xb2\x67\x8b\x2b\x96\x2f\xa5\x3e",
+-		.plen	= 32,
+-		.ctext	= "\xf1\x62\x44\xc7\x5f\x19\xca\x43"
+-			  "\x47\x2c\xaf\x68\x82\xbd\x51\xef"
+-			  "\x3d\x65\xd8\x45\x2d\x06\x07\x78"
+-			  "\x08\x2e\xb3\x23\xcd\x81\x12\x55"
+-			  "\x1a",
+-		.clen	= 33,
+-	}, {
+-		.key	= "\xe9\x95\xa2\x8f\x93\x13\x7b\xb7"
+-			  "\x96\x4e\x63\x33\x69\x8d\x02\x9b"
+-			  "\x23\xf9\x22\xeb\x80\xa0\xb1\x81"
+-			  "\xe2\x73\xc3\x21\x4d\x47\x8d\xf4",
+-		.klen	= 32,
+-		.iv	= "\xf8\x5e\x31\xf7\xd7\xb2\x25\x3e"
+-			  "\xb7\x85\x90\x58\x67\x57\x33\x1d",
+-		.assoc	= "",
+-		.alen	= 0,
+-		.ptext	= "",
+-		.plen	= 0,
+-		.ctext	= "\xdf\x2f\x83\xc0\x45\x4a\x2c\xcf"
+-			  "\xb9\xd2\x41\xf6\x80\xa1\x52\x70",
+-		.clen	= 16,
+-	}, {
+-		.key	= "\x25\xba\xdc\x2e\xa3\x8f\x24\xd3"
+-			  "\x17\x29\x15\xc5\x63\xb2\xc5\xa1"
+-			  "\x4d\xbc\x2d\x6f\x85\x40\x33\x9a"
+-			  "\xa3\xa0\xa1\xfa\x27\xa6\x2c\xca",
+-		.klen	= 32,
+-		.iv	= "\x34\x83\x6a\x96\xe7\x2d\xce\x5a"
+-			  "\x38\x5f\x42\xe9\x61\x7b\xf5\x23",
+-		.assoc	= "",
+-		.alen	= 0,
+-		.ptext	= "\x53",
+-		.plen	= 1,
+-		.ctext	= "\x01\xd8\x55\x3c\xc0\x5a\x4b\xc7"
+-			  "\x01\xf4\x08\xe3\x0d\xf7\xf0\x78"
+-			  "\x53",
+-		.clen	= 17,
+-	}, {
+-		.key	= "\x62\xdf\x16\xcd\xb3\x0a\xcc\xef"
+-			  "\x98\x03\xc7\x56\x5d\xd6\x87\xa8"
+-			  "\x77\x7e\x39\xf3\x8a\xe0\xb5\xb4"
+-			  "\x65\xce\x80\xd2\x01\x05\xcb\xa1",
+-		.klen	= 32,
+-		.iv	= "\x71\xa8\xa4\x35\xf7\xa9\x76\x75"
+-			  "\xb8\x39\xf4\x7a\x5b\x9f\xb8\x29",
+-		.assoc	= "",
+-		.alen	= 0,
+-		.ptext	= "\x8f\x3a\xc1\x05\x7f\xe7\xcb\x83"
+-			  "\xf9\xa6\x4d\xc3\x58\x31\x19\x2c"
+-			  "\xd7\x90\xc2\x56\x4e\xd8\x57\xc7"
+-			  "\xf6\xf0\x27\xb4\x25\x4c\x83",
+-		.plen	= 31,
+-		.ctext	= "\xc2\x4b\x41\x0f\x2d\xb9\x62\x07"
+-			  "\xff\x8e\x74\xf8\xa1\xa6\xd5\x37"
+-			  "\xa5\x64\x31\x5c\xca\x73\x9b\x43"
+-			  "\xe6\x70\x63\x46\x95\xcb\xf7\xb5"
+-			  "\x20\x8c\x75\x7a\x2a\x17\x2f\xa9"
+-			  "\xb8\x4d\x11\x42\xd1\xf8\xf1",
+-		.clen	= 47,
+-	}, {
+-		.key	= "\x9e\x03\x4f\x6d\xc3\x86\x75\x0a"
+-			  "\x19\xdd\x79\xe8\x57\xfb\x4a\xae"
+-			  "\xa2\x40\x45\x77\x90\x80\x37\xce"
+-			  "\x26\xfb\x5f\xaa\xdb\x64\x6b\x77",
+-		.klen	= 32,
+-		.iv	= "\xae\xcc\xde\xd5\x07\x25\x1f\x91"
+-			  "\x39\x14\xa6\x0c\x55\xc4\x7b\x30",
+-		.assoc	= "",
+-		.alen	= 0,
+-		.ptext	= "\xcc\x5f\xfb\xa4\x8f\x63\x74\x9f"
+-			  "\x7a\x81\xff\x55\x52\x56\xdc\x33"
+-			  "\x01\x52\xcd\xdb\x53\x78\xd9\xe1"
+-			  "\xb7\x1d\x06\x8d\xff\xab\x22\x98",
+-		.plen	= 32,
+-		.ctext	= "\xbb\x01\x7c\xd1\x2c\x33\x7b\x37"
+-			  "\x0a\xee\xc4\x30\x19\xd7\x3a\x6f"
+-			  "\xf8\x2b\x67\xf5\x3b\x84\x87\x2a"
+-			  "\xfb\x07\x7a\x82\xb5\xe4\x85\x26"
+-			  "\x1e\xa8\xe5\x04\x54\xce\xe5\x5f"
+-			  "\xb5\x3f\xc1\xd5\x7f\xbd\xd2\xa6",
+-		.clen	= 48,
+-	}, {
+-		.key	= "\xdb\x28\x89\x0c\xd3\x01\x1e\x26"
+-			  "\x9a\xb7\x2b\x79\x51\x1f\x0d\xb4"
+-			  "\xcc\x03\x50\xfc\x95\x20\xb9\xe7"
+-			  "\xe8\x29\x3e\x83\xb5\xc3\x0a\x4e",
+-		.klen	= 32,
+-		.iv	= "\xea\xf1\x18\x74\x17\xa0\xc8\xad"
+-			  "\xba\xee\x58\x9d\x4f\xe8\x3d\x36",
+-		.assoc	= "",
+-		.alen	= 0,
+-		.ptext	= "\x08\x84\x34\x44\x9f\xde\x1c\xbb"
+-			  "\xfb\x5b\xb1\xe6\x4c\x7a\x9f\x39"
+-			  "\x2c\x14\xd9\x5f\x59\x18\x5b\xfb"
+-			  "\x79\x4b\xe5\x65\xd9\x0a\xc1\x6f"
+-			  "\x2e",
+-		.plen	= 33,
+-		.ctext	= "\xc2\xf4\x40\x55\xf9\x59\xff\x73"
+-			  "\x08\xf5\x98\x92\x0c\x7b\x35\x9a"
+-			  "\xa8\xf4\x42\x7e\x6f\x93\xca\x22"
+-			  "\x23\x06\x1e\xf8\x89\x22\xf4\x46"
+-			  "\x7c\x7c\x67\x75\xab\xe5\x75\xaa"
+-			  "\x15\xd7\x83\x19\xfd\x31\x59\x5b"
+-			  "\x32",
+-		.clen	= 49,
+-	}, {
+-		.key	= "\x17\x4d\xc3\xab\xe3\x7d\xc7\x42"
+-			  "\x1b\x91\xdd\x0a\x4b\x43\xcf\xba"
+-			  "\xf6\xc5\x5c\x80\x9a\xc0\x3b\x01"
+-			  "\xa9\x56\x1d\x5b\x8f\x22\xa9\x25",
+-		.klen	= 32,
+-		.iv	= "\x27\x16\x51\x13\x27\x1c\x71\xc9"
+-			  "\x3b\xc8\x0a\x2f\x49\x0c\x00\x3c",
+-		.assoc	= "",
+-		.alen	= 0,
+-		.ptext	= "\x45\xa8\x6e\xe3\xaf\x5a\xc5\xd7"
+-			  "\x7c\x35\x63\x77\x46\x9f\x61\x3f"
+-			  "\x56\xd7\xe4\xe3\x5e\xb8\xdc\x14"
+-			  "\x3a\x79\xc4\x3e\xb3\x69\x61\x46"
+-			  "\x3c\xb6\x83\x4e\xb4\x26\xc7\x73"
+-			  "\x22\xda\x52\x8b\x7d\x11\x98\xea"
+-			  "\x62\xe1\x14\x1e\xdc\xfe\x0f\xad"
+-			  "\x20\x76\x5a\xdc\x4e\x71\x13",
+-		.plen	= 63,
+-		.ctext	= "\xc9\x82\x3b\x4b\x87\x84\xa5\xdb"
+-			  "\xa0\x8c\xd3\x3e\x7f\x8d\xe8\x28"
+-			  "\x2a\xdc\xfa\x01\x84\x87\x9a\x70"
+-			  "\x81\x75\x37\x0a\xd2\x75\xa9\xb6"
+-			  "\x21\x72\xee\x7e\x65\x95\xe5\xcc"
+-			  "\x01\xb7\x39\xa6\x51\x15\xca\xff"
+-			  "\x61\xdc\x97\x38\xcc\xf4\xca\xc7"
+-			  "\x83\x9b\x05\x11\x72\x60\xf0\xb4"
+-			  "\x7e\x06\xab\x0a\xc0\xbb\x59\x23"
+-			  "\xaa\x2d\xfc\x4e\x35\x05\x59",
+-		.clen	= 79,
+-	}, {
+-		.key	= "\x54\x71\xfd\x4b\xf3\xf9\x6f\x5e"
+-			  "\x9c\x6c\x8f\x9c\x45\x68\x92\xc1"
+-			  "\x21\x87\x67\x04\x9f\x60\xbd\x1b"
+-			  "\x6a\x84\xfc\x34\x6a\x81\x48\xfb",
+-		.klen	= 32,
+-		.iv	= "\x63\x3b\x8b\xb3\x37\x98\x1a\xe5"
+-			  "\xbc\xa2\xbc\xc0\x43\x31\xc2\x42",
+-		.assoc	= "",
+-		.alen	= 0,
+-		.ptext	= "\x81\xcd\xa8\x82\xbf\xd6\x6e\xf3"
+-			  "\xfd\x0f\x15\x09\x40\xc3\x24\x45"
+-			  "\x81\x99\xf0\x67\x63\x58\x5e\x2e"
+-			  "\xfb\xa6\xa3\x16\x8d\xc8\x00\x1c"
+-			  "\x4b\x62\x87\x7c\x15\x38\xda\x70"
+-			  "\x3d\xea\xe7\xf2\x40\xba\xae\x79"
+-			  "\x8f\x48\xfc\xbf\x45\x53\x2e\x78"
+-			  "\xef\x79\xf0\x1b\x49\xf7\xfd\x9c",
+-		.plen	= 64,
+-		.ctext	= "\x11\x7c\x7d\xef\xce\x29\x95\xec"
+-			  "\x7e\x9f\x42\xa6\x26\x07\xa1\x75"
+-			  "\x2f\x4e\x09\x9a\xf6\x6b\xc2\xfa"
+-			  "\x0d\xd0\x17\xdc\x25\x1e\x9b\xdc"
+-			  "\x5f\x8c\x1c\x60\x15\x4f\x9b\x20"
+-			  "\x7b\xff\xcd\x82\x60\x84\xf4\xa5"
+-			  "\x20\x9a\x05\x19\x5b\x02\x0a\x72"
+-			  "\x43\x11\x26\x58\xcf\xc5\x41\xcf"
+-			  "\x13\xcc\xde\x32\x92\xfa\x86\xf2"
+-			  "\xaf\x16\xe8\x8f\xca\xb6\xfd\x54",
+-		.clen	= 80,
+-	}, {
+-		.key	= "\x90\x96\x36\xea\x03\x74\x18\x7a"
+-			  "\x1d\x46\x42\x2d\x3f\x8c\x54\xc7"
+-			  "\x4b\x4a\x73\x89\xa4\x00\x3f\x34"
+-			  "\x2c\xb1\xdb\x0c\x44\xe0\xe8\xd2",
+-		.klen	= 32,
+-		.iv	= "\xa0\x5f\xc5\x52\x47\x13\xc2\x01"
+-			  "\x3d\x7c\x6e\x52\x3d\x55\x85\x48",
+-		.assoc	= "\xaf",
+-		.alen	= 1,
+-		.ptext	= "",
+-		.plen	= 0,
+-		.ctext	= "\x9b\xc5\x3b\x20\x0a\x88\x56\xbe"
+-			  "\x69\xdf\xc4\xc4\x02\x46\x3a\xf0",
+-		.clen	= 16,
+-	}, {
+-		.key	= "\xcd\xbb\x70\x89\x13\xf0\xc1\x95"
+-			  "\x9e\x20\xf4\xbf\x39\xb1\x17\xcd"
+-			  "\x76\x0c\x7f\x0d\xa9\xa0\xc1\x4e"
+-			  "\xed\xdf\xb9\xe4\x1e\x3f\x87\xa8",
+-		.klen	= 32,
+-		.iv	= "\xdc\x84\xfe\xf1\x58\x8f\x6b\x1c"
+-			  "\xbe\x57\x20\xe3\x37\x7a\x48\x4f",
+-		.assoc	= "\xeb\x4d\x8d\x59\x9c\x2e\x15\xa3"
+-			  "\xde\x8d\x4d\x07\x36\x43\x78\xd0"
+-			  "\x0b\x6d\x84\x4f\x2c\xf0\x82\x5b"
+-			  "\x4e\xf6\x29\xd1\x8b\x6f\x56",
+-		.alen	= 31,
+-		.ptext	= "",
+-		.plen	= 0,
+-		.ctext	= "\xe0\x6d\xa1\x07\x98\x2f\x40\x2d"
+-			  "\x2e\x9a\xd6\x61\x43\xc0\x74\x69",
+-		.clen	= 16,
+-	}, {
+-		.key	= "\x0a\xe0\xaa\x29\x24\x6c\x6a\xb1"
+-			  "\x1f\xfa\xa6\x50\x33\xd5\xda\xd3"
+-			  "\xa0\xce\x8a\x91\xae\x40\x43\x68"
+-			  "\xae\x0d\x98\xbd\xf8\x9e\x26\x7f",
+-		.klen	= 32,
+-		.iv	= "\x19\xa9\x38\x91\x68\x0b\x14\x38"
+-			  "\x3f\x31\xd2\x74\x31\x9e\x0a\x55",
+-		.assoc	= "\x28\x72\xc7\xf8\xac\xaa\xbe\xbf"
+-			  "\x5f\x67\xff\x99\x30\x67\x3b\xd6"
+-			  "\x35\x2f\x90\xd3\x31\x90\x04\x74"
+-			  "\x0f\x23\x08\xa9\x65\xce\xf6\xea",
+-		.alen	= 32,
+-		.ptext	= "",
+-		.plen	= 0,
+-		.ctext	= "\xb9\x57\x13\x3e\x82\x31\x61\x65"
+-			  "\x0d\x7f\x6c\x96\x93\x5c\x50\xe2",
+-		.clen	= 16,
+-	}, {
+-		.key	= "\x46\x04\xe3\xc8\x34\xe7\x12\xcd"
+-			  "\xa0\xd4\x58\xe2\x2d\xf9\x9c\xda"
+-			  "\xca\x91\x96\x15\xb4\xe0\xc5\x81"
+-			  "\x70\x3a\x77\x95\xd2\xfd\xc5\x55",
+-		.klen	= 32,
+-		.iv	= "\x55\xcd\x72\x30\x78\x86\xbd\x54"
+-			  "\xc0\x0b\x84\x06\x2b\xc2\xcd\x5b",
+-		.assoc	= "\x64\x97\x00\x98\xbc\x25\x67\xdb"
+-			  "\xe0\x41\xb1\x2a\x2a\x8c\xfe\xdd"
+-			  "\x5f\xf2\x9c\x58\x36\x30\x86\x8e"
+-			  "\xd1\x51\xe6\x81\x3f\x2d\x95\xc1"
+-			  "\x01",
+-		.alen	= 33,
+-		.ptext	= "",
+-		.plen	= 0,
+-		.ctext	= "\x81\x96\x34\xde\xbb\x36\xdd\x3e"
+-			  "\x4e\x5e\xcb\x44\x21\xb8\x3f\xf1",
+-		.clen	= 16,
+-	}, {
+-		.key	= "\x83\x29\x1d\x67\x44\x63\xbb\xe9"
+-			  "\x20\xaf\x0a\x73\x27\x1e\x5f\xe0"
+-			  "\xf5\x53\xa1\x9a\xb9\x80\x47\x9b"
+-			  "\x31\x68\x56\x6e\xac\x5c\x65\x2c",
+-		.klen	= 32,
+-		.iv	= "\x92\xf2\xac\xcf\x88\x02\x65\x70"
+-			  "\x41\xe5\x36\x97\x25\xe7\x90\x61",
+-		.assoc	= "\xa1\xbb\x3a\x37\xcc\xa1\x10\xf7"
+-			  "\x61\x1c\x63\xbc\x24\xb0\xc0\xe3"
+-			  "\x8a\xb4\xa7\xdc\x3b\xd0\x08\xa8"
+-			  "\x92\x7f\xc5\x5a\x19\x8c\x34\x97"
+-			  "\x0f\x95\x9b\x18\xe4\x8d\xb4\x24"
+-			  "\xb9\x33\x28\x18\xe1\x9d\x14\xe0"
+-			  "\x64\xb2\x89\x7d\x78\xa8\x05\x7e"
+-			  "\x07\x8c\xfc\x88\x2d\xb8\x53",
+-		.alen	= 63,
+-		.ptext	= "",
+-		.plen	= 0,
+-		.ctext	= "\x2e\x99\xb6\x79\x57\x56\x80\x36"
+-			  "\x8e\xc4\x1c\x12\x7d\x71\x36\x0c",
+-		.clen	= 16,
+-	}, {
+-		.key	= "\xbf\x4e\x57\x07\x54\xdf\x64\x05"
+-			  "\xa1\x89\xbc\x04\x21\x42\x22\xe6"
+-			  "\x1f\x15\xad\x1e\xbe\x20\xc9\xb4"
+-			  "\xf3\x95\x35\x46\x86\xbb\x04\x03",
+-		.klen	= 32,
+-		.iv	= "\xce\x17\xe5\x6f\x98\x7e\x0e\x8c"
+-			  "\xc2\xbf\xe8\x29\x1f\x0b\x52\x68",
+-		.assoc	= "\xdd\xe0\x74\xd6\xdc\x1d\xb8\x13"
+-			  "\xe2\xf6\x15\x4d\x1e\xd4\x83\xe9"
+-			  "\xb4\x76\xb3\x60\x40\x70\x8a\xc1"
+-			  "\x53\xac\xa4\x32\xf3\xeb\xd3\x6e"
+-			  "\x1e\x42\xa0\x46\x45\x9f\xc7\x22"
+-			  "\xd3\x43\xbc\x7e\xa5\x47\x2a\x6f"
+-			  "\x91\x19\x70\x1e\xe1\xfe\x25\x49"
+-			  "\xd6\x8f\x93\xc7\x28\x3f\x3d\x03",
+-		.alen	= 64,
+-		.ptext	= "",
+-		.plen	= 0,
+-		.ctext	= "\x7b\x25\x3d\x47\xd4\xa7\x08\xce"
+-			  "\x3b\x89\x40\x36\xba\x6d\x0e\xa2",
+-		.clen	= 16,
+-	}, {
+-		.key	= "\xfc\x72\x90\xa6\x64\x5a\x0d\x21"
+-			  "\x22\x63\x6e\x96\x1b\x67\xe4\xec"
+-			  "\x49\xd7\xb9\xa2\xc3\xc0\x4b\xce"
+-			  "\xb4\xc3\x14\x1e\x61\x1a\xa3\xd9",
+-		.klen	= 32,
+-		.iv	= "\x0b\x3c\x1f\x0e\xa8\xf9\xb7\xa7"
+-			  "\x42\x9a\x9a\xba\x19\x30\x15\x6e",
+-		.assoc	= "\x1a",
+-		.alen	= 1,
+-		.ptext	= "\x29",
+-		.plen	= 1,
+-		.ctext	= "\xe6\x09\x6f\x95\x9a\x18\xc8\xf6"
+-			  "\x17\x75\x81\x16\xdf\x26\xff\x67"
+-			  "\x92",
+-		.clen	= 17,
+-	}, {
+-		.key	= "\x38\x97\xca\x45\x74\xd6\xb6\x3c"
+-			  "\xa3\x3d\x20\x27\x15\x8b\xa7\xf2"
+-			  "\x74\x9a\xc4\x27\xc8\x60\xcd\xe8"
+-			  "\x75\xf0\xf2\xf7\x3b\x79\x42\xb0",
+-		.klen	= 32,
+-		.iv	= "\x47\x60\x59\xad\xb8\x75\x60\xc3"
+-			  "\xc3\x74\x4c\x4c\x13\x54\xd8\x74",
+-		.assoc	= "\x56\x29\xe7\x15\xfc\x14\x0a\x4a"
+-			  "\xe4\xaa\x79\x70\x12\x1d\x08\xf6"
+-			  "\x09\xfb\xca\x69\x4b\xb0\x8e\xf5"
+-			  "\xd6\x07\x62\xe3\xa8\xa9\x12",
+-		.alen	= 31,
+-		.ptext	= "\x66\xf3\x75\x7d\x40\xb3\xb4\xd1"
+-			  "\x04\xe1\xa6\x94\x10\xe6\x39\x77"
+-			  "\xd3\xac\x4d\x8a\x8c\x58\x6e\xfb"
+-			  "\x06\x13\x9a\xd9\x5e\xc0\xfa",
+-		.plen	= 31,
+-		.ctext	= "\x82\xc0\x56\xf0\xd7\xc4\xc9\xfd"
+-			  "\x3c\xd1\x2a\xd4\x15\x86\x9d\xda"
+-			  "\xea\x6c\x6f\xa1\x33\xb0\x7a\x01"
+-			  "\x57\xe7\xf3\x7b\x73\xe7\x54\x10"
+-			  "\xc6\x91\xe2\xc6\xa0\x69\xe7\xe6"
+-			  "\x76\xc3\xf5\x3a\x76\xfd\x4a",
+-		.clen	= 47,
+-	}, {
+-		.key	= "\x75\xbc\x04\xe5\x84\x52\x5e\x58"
+-			  "\x24\x17\xd2\xb9\x0e\xaf\x6a\xf9"
+-			  "\x9e\x5c\xd0\xab\xcd\x00\x4f\x01"
+-			  "\x37\x1e\xd1\xcf\x15\xd8\xe2\x86",
+-		.klen	= 32,
+-		.iv	= "\x84\x85\x92\x4d\xc8\xf1\x08\xdf"
+-			  "\x44\x4e\xff\xdd\x0d\x78\x9a\x7a",
+-		.assoc	= "\x93\x4e\x21\xb4\x0c\x90\xb3\x66"
+-			  "\x65\x84\x2b\x01\x0b\x42\xcb\xfc"
+-			  "\x33\xbd\xd6\xed\x50\x50\x10\x0e"
+-			  "\x97\x35\x41\xbb\x82\x08\xb1\xf2",
+-		.alen	= 32,
+-		.ptext	= "\xa2\x17\xaf\x1c\x50\x2e\x5d\xed"
+-			  "\x85\xbb\x58\x26\x0a\x0b\xfc\x7d"
+-			  "\xfe\x6e\x59\x0e\x91\xf8\xf0\x15"
+-			  "\xc8\x40\x78\xb1\x38\x1f\x99\xa7",
+-		.plen	= 32,
+-		.ctext	= "\x01\x47\x8e\x6c\xf6\x64\x89\x3a"
+-			  "\x71\xce\xe4\xaa\x45\x70\xe6\x84"
+-			  "\x62\x48\x08\x64\x86\x6a\xdf\xec"
+-			  "\xb4\xa0\xfb\x34\x03\x0c\x19\xf4"
+-			  "\x2b\x7b\x36\x73\xec\x54\xa9\x1e"
+-			  "\x30\x85\xdb\xe4\xac\xe9\x2c\xca",
+-		.clen	= 48,
+-	}, {
+-		.key	= "\xb1\xe1\x3e\x84\x94\xcd\x07\x74"
+-			  "\xa5\xf2\x84\x4a\x08\xd4\x2c\xff"
+-			  "\xc8\x1e\xdb\x2f\xd2\xa0\xd1\x1b"
+-			  "\xf8\x4c\xb0\xa8\xef\x37\x81\x5d",
+-		.klen	= 32,
+-		.iv	= "\xc0\xaa\xcc\xec\xd8\x6c\xb1\xfb"
+-			  "\xc5\x28\xb1\x6e\x07\x9d\x5d\x81",
+-		.assoc	= "\xd0\x73\x5a\x54\x1d\x0b\x5b\x82"
+-			  "\xe5\x5f\xdd\x93\x05\x66\x8e\x02"
+-			  "\x5e\x80\xe1\x71\x55\xf0\x92\x28"
+-			  "\x59\x62\x20\x94\x5c\x67\x50\xc8"
+-			  "\x58",
+-		.alen	= 33,
+-		.ptext	= "\xdf\x3c\xe9\xbc\x61\xaa\x06\x09"
+-			  "\x06\x95\x0a\xb7\x04\x2f\xbe\x84"
+-			  "\x28\x30\x64\x92\x96\x98\x72\x2e"
+-			  "\x89\x6e\x57\x8a\x13\x7e\x38\x7e"
+-			  "\xdb",
+-		.plen	= 33,
+-		.ctext	= "\x85\xe0\xf8\x0f\x8e\x49\xe3\x60"
+-			  "\xcb\x4a\x54\x94\xcf\xf5\x7e\x34"
+-			  "\xe9\xf8\x80\x65\x53\xd0\x72\x70"
+-			  "\x4f\x7d\x9d\xd1\x15\x6f\xb9\x2c"
+-			  "\xfa\xe8\xdd\xac\x2e\xe1\x3f\x67"
+-			  "\x63\x0f\x1a\x59\xb7\x89\xdb\xf4"
+-			  "\xc3",
+-		.clen	= 49,
+-	}, {
+-		.key	= "\xee\x05\x77\x23\xa5\x49\xb0\x90"
+-			  "\x26\xcc\x36\xdc\x02\xf8\xef\x05"
+-			  "\xf3\xe1\xe7\xb3\xd8\x40\x53\x35"
+-			  "\xb9\x79\x8f\x80\xc9\x96\x20\x33",
+-		.klen	= 32,
+-		.iv	= "\xfd\xce\x06\x8b\xe9\xe8\x5a\x17"
+-			  "\x46\x02\x63\x00\x01\xc1\x20\x87",
+-		.assoc	= "\x0c\x98\x94\xf3\x2d\x87\x04\x9e"
+-			  "\x66\x39\x8f\x24\xff\x8a\x50\x08"
+-			  "\x88\x42\xed\xf6\x5a\x90\x14\x42"
+-			  "\x1a\x90\xfe\x6c\x36\xc6\xf0\x9f"
+-			  "\x66\xa0\xb5\x2d\x2c\xf8\x25\x15"
+-			  "\x55\x90\xa2\x7e\x77\x94\x96\x3a"
+-			  "\x71\x1c\xf7\x44\xee\xa8\xc3\x42"
+-			  "\xe2\xa3\x84\x04\x0b\xe1\xce",
+-		.alen	= 63,
+-		.ptext	= "\x1b\x61\x23\x5b\x71\x26\xae\x25"
+-			  "\x87\x6f\xbc\x49\xfe\x53\x81\x8a"
+-			  "\x53\xf2\x70\x17\x9b\x38\xf4\x48"
+-			  "\x4b\x9b\x36\x62\xed\xdd\xd8\x54"
+-			  "\xea\xcb\xb6\x79\x45\xfc\xaa\x54"
+-			  "\x5c\x94\x47\x58\xa7\xff\x9c\x9e"
+-			  "\x7c\xb6\xf1\xac\xc8\xfd\x8b\x35"
+-			  "\xd5\xa4\x6a\xd4\x09\xc2\x08",
+-		.plen	= 63,
+-		.ctext	= "\x00\xe5\x5b\x87\x5c\x20\x22\x8a"
+-			  "\xda\x1f\xd3\xff\xbb\xb2\xb0\xf8"
+-			  "\xef\xe9\xeb\x9e\x7c\x80\xf4\x2b"
+-			  "\x59\xc0\x79\xbc\x17\xa0\x15\x01"
+-			  "\xf5\x72\xfb\x5a\xe7\xaf\x07\xe3"
+-			  "\x1b\x49\x21\x34\x23\x63\x55\x5e"
+-			  "\xee\x4f\x34\x17\xfa\xfe\xa5\x0c"
+-			  "\xed\x0b\x23\xea\x9b\xda\x57\x2f"
+-			  "\xf6\xa9\xae\x0d\x4e\x40\x96\x45"
+-			  "\x7f\xfa\xf0\xbf\xc4\x98\x78",
+-		.clen	= 79,
+-	}, {
+-		.key	= "\x2a\x2a\xb1\xc3\xb5\xc5\x59\xac"
+-			  "\xa7\xa6\xe8\x6d\xfc\x1d\xb2\x0b"
+-			  "\x1d\xa3\xf3\x38\xdd\xe0\xd5\x4e"
+-			  "\x7b\xa7\x6e\x58\xa3\xf5\xbf\x0a",
+-		.klen	= 32,
+-		.iv	= "\x39\xf3\x3f\x2b\xf9\x64\x03\x33"
+-			  "\xc7\xdd\x15\x91\xfb\xe6\xe2\x8d",
+-		.assoc	= "\x49\xbc\xce\x92\x3d\x02\xad\xba"
+-			  "\xe7\x13\x41\xb6\xf9\xaf\x13\x0f"
+-			  "\xb2\x04\xf8\x7a\x5f\x30\x96\x5b"
+-			  "\xdc\xbd\xdd\x44\x10\x25\x8f\x75"
+-			  "\x75\x4d\xb9\x5b\x8e\x0a\x38\x13"
+-			  "\x6f\x9f\x36\xe4\x3a\x3e\xac\xc9"
+-			  "\x9d\x83\xde\xe5\x57\xfd\xe3\x0e"
+-			  "\xb1\xa7\x1b\x44\x05\x67\xb7\x37",
+-		.alen	= 64,
+-		.ptext	= "\x58\x85\x5c\xfa\x81\xa1\x57\x40"
+-			  "\x08\x4a\x6e\xda\xf8\x78\x44\x90"
+-			  "\x7d\xb5\x7b\x9b\xa1\xd8\x76\x62"
+-			  "\x0c\xc9\x15\x3b\xc7\x3c\x77\x2b"
+-			  "\xf8\x78\xba\xa7\xa6\x0e\xbd\x52"
+-			  "\x76\xa3\xdc\xbe\x6b\xa8\xb1\x2d"
+-			  "\xa9\x1d\xd8\x4e\x31\x53\xab\x00"
+-			  "\xa5\xa7\x01\x13\x04\x49\xf2\x04",
+-		.plen	= 64,
+-		.ctext	= "\x28\xdd\xb9\x4a\x12\xc7\x0a\xe1"
+-			  "\x58\x06\x1a\x9b\x8c\x67\xdf\xeb"
+-			  "\x35\x35\x60\x9d\x06\x40\x65\xc1"
+-			  "\x93\xe8\xb3\x82\x50\x29\xdd\xb5"
+-			  "\x2b\xcb\xde\x18\x78\x6b\x42\xbe"
+-			  "\x6d\x24\xd0\xb2\x7d\xd7\x08\x8f"
+-			  "\x4a\x18\x98\xad\x8c\xf2\x97\xb4"
+-			  "\xf4\x77\xe4\xbf\x41\x3b\xc4\x06"
+-			  "\xce\x9e\x34\x81\xf0\x89\x11\x13"
+-			  "\x02\x65\xa1\x7c\xdf\x07\x33\x06",
+-		.clen	= 80,
+-	}, {
+-		.key	= "\x67\x4f\xeb\x62\xc5\x40\x01\xc7"
+-			  "\x28\x80\x9a\xfe\xf6\x41\x74\x12"
+-			  "\x48\x65\xfe\xbc\xe2\x80\x57\x68"
+-			  "\x3c\xd4\x4d\x31\x7d\x54\x5f\xe1",
+-		.klen	= 32,
+-		.iv	= "\x76\x18\x79\xca\x09\xdf\xac\x4e"
+-			  "\x48\xb7\xc7\x23\xf5\x0a\xa5\x93",
+-		.assoc	= "\x85\xe1\x08\x32\x4d\x7e\x56\xd5"
+-			  "\x68\xed\xf3\x47\xf3\xd3\xd6\x15"
+-			  "\xdd\xc7\x04\xfe\x64\xd0\x18\x75"
+-			  "\x9d\xeb\xbc\x1d\xea\x84\x2e\x4c"
+-			  "\x83\xf9\xbe\x8a\xef\x1c\x4b\x10"
+-			  "\x89\xaf\xcb\x4b\xfe\xe7\xc1\x58"
+-			  "\xca\xea\xc6\x87\xc0\x53\x03\xd9"
+-			  "\x80\xaa\xb2\x83\xff\xee\xa1\x6a"
+-			  "\x04",
+-		.alen	= 65,
+-		.ptext	= "\x94\xaa\x96\x9a\x91\x1d\x00\x5c"
+-			  "\x88\x24\x20\x6b\xf2\x9c\x06\x96"
+-			  "\xa7\x77\x87\x1f\xa6\x78\xf8\x7b"
+-			  "\xcd\xf6\xf4\x13\xa1\x9b\x16\x02"
+-			  "\x07\x24\xbf\xd5\x08\x20\xd0\x4f"
+-			  "\x90\xb3\x70\x24\x2f\x51\xc7\xbb"
+-			  "\xd6\x84\xc0\xef\x9a\xa8\xca\xcc"
+-			  "\x74\xab\x97\x53\xfe\xd0\xdb\x37"
+-			  "\x37\x6a\x0e\x9f\x3f\xa3\x2a\xe3"
+-			  "\x1b\x34\x6d\x51\x72\x2b\x17\xe7"
+-			  "\x4d\xaa\x2c\x18\xda\xa3\x33\x89"
+-			  "\x2a\x9f\xf4\xd2\xed\x76\x3d\x3f"
+-			  "\x3c\x15\x9d\x8e\x4f\x3c\x27\xb0"
+-			  "\x42\x3f\x2f\x8a\xd4\xc2\x10\xb2"
+-			  "\x27\x7f\xe3\x34\x80\x02\x49\x4b"
+-			  "\x07\x68\x22\x2a\x88\x25\x53\xb2"
+-			  "\x2f",
+-		.plen	= 129,
+-		.ctext	= "\x85\x39\x69\x35\xfb\xf9\xb0\xa6"
+-			  "\x85\x43\x88\xd0\xd7\x78\x60\x19"
+-			  "\x3e\x1f\xb1\xa4\xd6\xc5\x96\xec"
+-			  "\xf7\x84\x85\xc7\x27\x0f\x74\x57"
+-			  "\x28\x9e\xdd\x90\x3c\x43\x12\xc5"
+-			  "\x51\x3d\x39\x8f\xa5\xf4\xe0\x0b"
+-			  "\x57\x04\xf1\x6d\xfe\x9b\x84\x27"
+-			  "\xe8\xeb\x4d\xda\x02\x0a\xc5\x49"
+-			  "\x1a\x55\x5e\x50\x56\x4d\x94\xda"
+-			  "\x20\xf8\x12\x54\x50\xb3\x11\xda"
+-			  "\xed\x44\x27\x67\xd5\xd1\x8b\x4b"
+-			  "\x38\x67\x56\x65\x59\xda\xe6\x97"
+-			  "\x81\xae\x2f\x92\x3b\xae\x22\x1c"
+-			  "\x91\x59\x38\x18\x00\xe8\xba\x92"
+-			  "\x04\x19\x56\xdf\xb0\x82\xeb\x6f"
+-			  "\x2e\xdb\x54\x3c\x4b\xbb\x60\x90"
+-			  "\x4c\x50\x10\x62\xba\x7a\xb1\x68"
+-			  "\x37\xd7\x87\x4e\xe4\x66\x09\x1f"
+-			  "\xa5",
+-		.clen	= 145,
+-	}, {
+-		.key	= "\xa3\x73\x24\x01\xd5\xbc\xaa\xe3"
+-			  "\xa9\x5a\x4c\x90\xf0\x65\x37\x18"
+-			  "\x72\x28\x0a\x40\xe7\x20\xd9\x82"
+-			  "\xfe\x02\x2b\x09\x57\xb3\xfe\xb7",
+-		.klen	= 32,
+-		.iv	= "\xb3\x3d\xb3\x69\x19\x5b\x54\x6a"
+-			  "\xc9\x91\x79\xb4\xef\x2e\x68\x99",
+-		.assoc	= "\xc2\x06\x41\xd1\x5d\xfa\xff\xf1"
+-			  "\xe9\xc7\xa5\xd9\xed\xf8\x98\x1b"
+-			  "\x07\x89\x10\x82\x6a\x70\x9a\x8f"
+-			  "\x5e\x19\x9b\xf5\xc5\xe3\xcd\x22"
+-			  "\x92\xa5\xc2\xb8\x51\x2e\x5e\x0e"
+-			  "\xa4\xbe\x5f\xb1\xc1\x90\xd7\xe7"
+-			  "\xf7\x52\xae\x28\x29\xa8\x22\xa4"
+-			  "\x4f\xae\x48\xc2\xfa\x75\x8b\x9e"
+-			  "\xce\x83\x2a\x88\x07\x55\xbb\x89"
+-			  "\xf6\xdf\xac\xdf\x83\x08\xbf\x7d"
+-			  "\xac\x30\x8b\x8e\x02\xac\x00\xf1"
+-			  "\x30\x46\xe1\xbc\x75\xbf\x49\xbb"
+-			  "\x26\x4e\x29\xf0\x2f\x21\xc6\x13"
+-			  "\x92\xd9\x3d\x11\xe4\x10\x00\x8e"
+-			  "\xd4\xd4\x58\x65\xa6\x2b\xe3\x25"
+-			  "\xb1\x8f\x15\x93\xe7\x71\xb9\x2c"
+-			  "\x4b",
+-		.alen	= 129,
+-		.ptext	= "\xd1\xcf\xd0\x39\xa1\x99\xa9\x78"
+-			  "\x09\xfe\xd2\xfd\xec\xc1\xc9\x9d"
+-			  "\xd2\x39\x93\xa3\xab\x18\x7a\x95"
+-			  "\x8f\x24\xd3\xeb\x7b\xfa\xb5\xd8"
+-			  "\x15\xd1\xc3\x04\x69\x32\xe3\x4d"
+-			  "\xaa\xc2\x04\x8b\xf2\xfa\xdc\x4a"
+-			  "\x02\xeb\xa8\x90\x03\xfd\xea\x97"
+-			  "\x43\xaf\x2e\x92\xf8\x57\xc5\x6a"
+-			  "\x00",
+-		.plen	= 65,
+-		.ctext	= "\x7d\xde\x53\x22\xe4\x23\x3b\x30"
+-			  "\x78\xde\x35\x90\x7a\xd9\x0b\x93"
+-			  "\xf6\x0e\x0b\xed\x40\xee\x10\x9c"
+-			  "\x96\x3a\xd3\x34\xb2\xd0\x67\xcf"
+-			  "\x63\x7f\x2d\x0c\xcf\x96\xec\x64"
+-			  "\x1a\x87\xcc\x7d\x2c\x5e\x81\x4b"
+-			  "\xd2\x8f\x4c\x7c\x00\xb1\xb4\xe0"
+-			  "\x87\x4d\xb1\xbc\xd8\x78\x2c\x17"
+-			  "\xf2\x3b\xd8\x28\x40\xe2\x76\xf6"
+-			  "\x20\x13\x83\x46\xaf\xff\xe3\x0f"
+-			  "\x72",
+-		.clen	= 81,
+-	}, {
+-		.key	= "\xe0\x98\x5e\xa1\xe5\x38\x53\xff"
+-			  "\x2a\x35\xfe\x21\xea\x8a\xfa\x1e"
+-			  "\x9c\xea\x15\xc5\xec\xc0\x5b\x9b"
+-			  "\xbf\x2f\x0a\xe1\x32\x12\x9d\x8e",
+-		.klen	= 32,
+-		.iv	= "\xef\x61\xed\x08\x29\xd7\xfd\x86"
+-			  "\x4a\x6b\x2b\x46\xe9\x53\x2a\xa0",
+-		.assoc	= "\xfe\x2a\x7b\x70\x6d\x75\xa7\x0d"
+-			  "\x6a\xa2\x57\x6a\xe7\x1c\x5b\x21"
+-			  "\x31\x4b\x1b\x07\x6f\x10\x1c\xa8"
+-			  "\x20\x46\x7a\xce\x9f\x42\x6d\xf9",
+-		.alen	= 32,
+-		.ptext	= "\x0d\xf4\x09\xd8\xb1\x14\x51\x94"
+-			  "\x8a\xd8\x84\x8e\xe6\xe5\x8c\xa3"
+-			  "\xfc\xfc\x9e\x28\xb0\xb8\xfc\xaf"
+-			  "\x50\x52\xb1\xc4\x55\x59\x55\xaf",
+-		.plen	= 32,
+-		.ctext	= "\x5a\xcd\x8c\x57\xf2\x6a\xb6\xbe"
+-			  "\x53\xc7\xaa\x9a\x60\x74\x9c\xc4"
+-			  "\xa2\xc2\xd0\x6d\xe1\x03\x63\xdc"
+-			  "\xbb\x51\x7e\x9c\x89\x73\xde\x4e"
+-			  "\x24\xf8\x52\x7c\x15\x41\x0e\xba"
+-			  "\x69\x0e\x36\x5f\x2f\x22\x8c",
+-		.clen	= 47,
+-	}, {
+-		.key	= "\x1c\xbd\x98\x40\xf5\xb3\xfc\x1b"
+-			  "\xaa\x0f\xb0\xb3\xe4\xae\xbc\x24"
+-			  "\xc7\xac\x21\x49\xf1\x60\xdd\xb5"
+-			  "\x80\x5d\xe9\xba\x0c\x71\x3c\x64",
+-		.klen	= 32,
+-		.iv	= "\x2c\x86\x26\xa8\x39\x52\xa6\xa2"
+-			  "\xcb\x45\xdd\xd7\xe3\x77\xed\xa6",
+-		.assoc	= "\x3b\x4f\xb5\x10\x7d\xf1\x50\x29"
+-			  "\xeb\x7c\x0a\xfb\xe1\x40\x1e\x27"
+-			  "\x5c\x0d\x27\x8b\x74\xb0\x9e\xc2"
+-			  "\xe1\x74\x59\xa6\x79\xa1\x0c\xd0",
+-		.alen	= 32,
+-		.ptext	= "\x4a\x18\x43\x77\xc1\x90\xfa\xb0"
+-			  "\x0b\xb2\x36\x20\xe0\x09\x4e\xa9"
+-			  "\x26\xbe\xaa\xac\xb5\x58\x7e\xc8"
+-			  "\x11\x7f\x90\x9c\x2f\xb8\xf4\x85",
+-		.plen	= 32,
+-		.ctext	= "\x47\xd6\xce\x78\xd6\xbf\x4a\x51"
+-			  "\xb8\xda\x92\x3c\xfd\xda\xac\x8e"
+-			  "\x8d\x88\xd7\x4d\x90\xe5\xeb\xa1"
+-			  "\xab\xd6\x7c\x76\xad\xea\x7d\x76"
+-			  "\x53\xee\xb0\xcd\xd0\x02\xbb\x70"
+-			  "\x5b\x6f\x7b\xe2\x8c\xe8",
+-		.clen	= 46,
+-	}, {
+-		.key	= "\x59\xe1\xd2\xdf\x05\x2f\xa4\x37"
+-			  "\x2b\xe9\x63\x44\xde\xd3\x7f\x2b"
+-			  "\xf1\x6f\x2d\xcd\xf6\x00\x5f\xcf"
+-			  "\x42\x8a\xc8\x92\xe6\xd0\xdc\x3b",
+-		.klen	= 32,
+-		.iv	= "\x68\xab\x60\x47\x49\xce\x4f\xbe"
+-			  "\x4c\x20\x8f\x68\xdd\x9c\xb0\xac",
+-		.assoc	= "\x77\x74\xee\xaf\x8d\x6d\xf9\x45"
+-			  "\x6c\x56\xbc\x8d\xdb\x65\xe0\x2e"
+-			  "\x86\xd0\x32\x0f\x79\x50\x20\xdb"
+-			  "\xa2\xa1\x37\x7e\x53\x00\xab\xa6",
+-		.alen	= 32,
+-		.ptext	= "\x86\x3d\x7d\x17\xd1\x0c\xa3\xcc"
+-			  "\x8c\x8d\xe8\xb1\xda\x2e\x11\xaf"
+-			  "\x51\x80\xb5\x30\xba\xf8\x00\xe2"
+-			  "\xd3\xad\x6f\x75\x09\x18\x93\x5c",
+-		.plen	= 32,
+-		.ctext	= "\x9f\xa9\x2b\xa4\x8f\x00\x05\x2b"
+-			  "\xe7\x68\x81\x51\xbb\xfb\xdf\x60"
+-			  "\xbb\xac\xe8\xc1\xdc\x68\xae\x68"
+-			  "\x3a\xcd\x7a\x06\x49\xfe\x80\x11"
+-			  "\xe6\x61\x99\xe2\xdd\xbe\x2c\xbf",
+-		.clen	= 40,
+-	}, {
+-		.key	= "\x96\x06\x0b\x7f\x15\xab\x4d\x53"
+-			  "\xac\xc3\x15\xd6\xd8\xf7\x42\x31"
+-			  "\x1b\x31\x38\x51\xfc\xa0\xe1\xe8"
+-			  "\x03\xb8\xa7\x6b\xc0\x2f\x7b\x11",
+-		.klen	= 32,
+-		.iv	= "\xa5\xcf\x9a\xe6\x59\x4a\xf7\xd9"
+-			  "\xcd\xfa\x41\xfa\xd7\xc0\x72\xb2",
+-		.assoc	= "\xb4\x99\x28\x4e\x9d\xe8\xa2\x60"
+-			  "\xed\x30\x6e\x1e\xd5\x89\xa3\x34"
+-			  "\xb1\x92\x3e\x93\x7e\xf0\xa2\xf5"
+-			  "\x64\xcf\x16\x57\x2d\x5f\x4a\x7d",
+-		.alen	= 32,
+-		.ptext	= "\xc3\x62\xb7\xb6\xe2\x87\x4c\xe7"
+-			  "\x0d\x67\x9a\x43\xd4\x52\xd4\xb5"
+-			  "\x7b\x43\xc1\xb5\xbf\x98\x82\xfc"
+-			  "\x94\xda\x4e\x4d\xe4\x77\x32\x32",
+-		.plen	= 32,
+-		.ctext	= "\xe2\x34\xfa\x25\xfd\xfb\x89\x5e"
+-			  "\x5b\x4e\x0b\x15\x6e\x39\xfb\x0c"
+-			  "\x73\xc7\xd9\x6b\xbe\xce\x9b\x70"
+-			  "\xc7\x4f\x96\x16\x03\xfc\xea\xfb"
+-			  "\x56",
+-		.clen	= 33,
 -	},
 -};
 -
  /*
   * All key wrapping test vectors taken from
   * http://csrc.nist.gov/groups/STM/cavp/documents/mac/kwtestvectors.zip
+diff --git a/include/crypto/morus1280_glue.h b/include/crypto/morus1280_glue.h
+deleted file mode 100644
+index 5cefddb1991f..000000000000
+--- a/include/crypto/morus1280_glue.h
++++ /dev/null
+@@ -1,97 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0-or-later */
+-/*
+- * The MORUS-1280 Authenticated-Encryption Algorithm
+- *   Common glue skeleton -- header file
+- *
+- * Copyright (c) 2016-2018 Ondrej Mosnacek <omosnacek@gmail.com>
+- * Copyright (C) 2017-2018 Red Hat, Inc. All rights reserved.
+- */
+-
+-#ifndef _CRYPTO_MORUS1280_GLUE_H
+-#define _CRYPTO_MORUS1280_GLUE_H
+-
+-#include <linux/module.h>
+-#include <linux/types.h>
+-#include <crypto/algapi.h>
+-#include <crypto/aead.h>
+-#include <crypto/morus_common.h>
+-
+-#define MORUS1280_WORD_SIZE 8
+-#define MORUS1280_BLOCK_SIZE (MORUS_BLOCK_WORDS * MORUS1280_WORD_SIZE)
+-
+-struct morus1280_block {
+-	u8 bytes[MORUS1280_BLOCK_SIZE];
+-};
+-
+-struct morus1280_glue_ops {
+-	void (*init)(void *state, const void *key, const void *iv);
+-	void (*ad)(void *state, const void *data, unsigned int length);
+-	void (*enc)(void *state, const void *src, void *dst, unsigned int length);
+-	void (*dec)(void *state, const void *src, void *dst, unsigned int length);
+-	void (*enc_tail)(void *state, const void *src, void *dst, unsigned int length);
+-	void (*dec_tail)(void *state, const void *src, void *dst, unsigned int length);
+-	void (*final)(void *state, void *tag_xor, u64 assoclen, u64 cryptlen);
+-};
+-
+-struct morus1280_ctx {
+-	const struct morus1280_glue_ops *ops;
+-	struct morus1280_block key;
+-};
+-
+-void crypto_morus1280_glue_init_ops(struct crypto_aead *aead,
+-				    const struct morus1280_glue_ops *ops);
+-int crypto_morus1280_glue_setkey(struct crypto_aead *aead, const u8 *key,
+-				 unsigned int keylen);
+-int crypto_morus1280_glue_setauthsize(struct crypto_aead *tfm,
+-				      unsigned int authsize);
+-int crypto_morus1280_glue_encrypt(struct aead_request *req);
+-int crypto_morus1280_glue_decrypt(struct aead_request *req);
+-
+-#define MORUS1280_DECLARE_ALG(id, driver_name, priority) \
+-	static const struct morus1280_glue_ops crypto_morus1280_##id##_ops = {\
+-		.init = crypto_morus1280_##id##_init, \
+-		.ad = crypto_morus1280_##id##_ad, \
+-		.enc = crypto_morus1280_##id##_enc, \
+-		.enc_tail = crypto_morus1280_##id##_enc_tail, \
+-		.dec = crypto_morus1280_##id##_dec, \
+-		.dec_tail = crypto_morus1280_##id##_dec_tail, \
+-		.final = crypto_morus1280_##id##_final, \
+-	}; \
+-	\
+-	static int crypto_morus1280_##id##_init_tfm(struct crypto_aead *tfm) \
+-	{ \
+-		crypto_morus1280_glue_init_ops(tfm, &crypto_morus1280_##id##_ops); \
+-		return 0; \
+-	} \
+-	\
+-	static void crypto_morus1280_##id##_exit_tfm(struct crypto_aead *tfm) \
+-	{ \
+-	} \
+-	\
+-	static struct aead_alg crypto_morus1280_##id##_alg = { \
+-		.setkey = crypto_morus1280_glue_setkey, \
+-		.setauthsize = crypto_morus1280_glue_setauthsize, \
+-		.encrypt = crypto_morus1280_glue_encrypt, \
+-		.decrypt = crypto_morus1280_glue_decrypt, \
+-		.init = crypto_morus1280_##id##_init_tfm, \
+-		.exit = crypto_morus1280_##id##_exit_tfm, \
+-		\
+-		.ivsize = MORUS_NONCE_SIZE, \
+-		.maxauthsize = MORUS_MAX_AUTH_SIZE, \
+-		.chunksize = MORUS1280_BLOCK_SIZE, \
+-		\
+-		.base = { \
+-			.cra_flags = CRYPTO_ALG_INTERNAL, \
+-			.cra_blocksize = 1, \
+-			.cra_ctxsize = sizeof(struct morus1280_ctx), \
+-			.cra_alignmask = 0, \
+-			.cra_priority = priority, \
+-			\
+-			.cra_name = "__morus1280", \
+-			.cra_driver_name = "__"driver_name, \
+-			\
+-			.cra_module = THIS_MODULE, \
+-		} \
+-	}
+-
+-#endif /* _CRYPTO_MORUS1280_GLUE_H */
+diff --git a/include/crypto/morus640_glue.h b/include/crypto/morus640_glue.h
+deleted file mode 100644
+index 0ee6266cb26c..000000000000
+--- a/include/crypto/morus640_glue.h
++++ /dev/null
+@@ -1,97 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0-or-later */
+-/*
+- * The MORUS-640 Authenticated-Encryption Algorithm
+- *   Common glue skeleton -- header file
+- *
+- * Copyright (c) 2016-2018 Ondrej Mosnacek <omosnacek@gmail.com>
+- * Copyright (C) 2017-2018 Red Hat, Inc. All rights reserved.
+- */
+-
+-#ifndef _CRYPTO_MORUS640_GLUE_H
+-#define _CRYPTO_MORUS640_GLUE_H
+-
+-#include <linux/module.h>
+-#include <linux/types.h>
+-#include <crypto/algapi.h>
+-#include <crypto/aead.h>
+-#include <crypto/morus_common.h>
+-
+-#define MORUS640_WORD_SIZE 4
+-#define MORUS640_BLOCK_SIZE (MORUS_BLOCK_WORDS * MORUS640_WORD_SIZE)
+-
+-struct morus640_block {
+-	u8 bytes[MORUS640_BLOCK_SIZE];
+-};
+-
+-struct morus640_glue_ops {
+-	void (*init)(void *state, const void *key, const void *iv);
+-	void (*ad)(void *state, const void *data, unsigned int length);
+-	void (*enc)(void *state, const void *src, void *dst, unsigned int length);
+-	void (*dec)(void *state, const void *src, void *dst, unsigned int length);
+-	void (*enc_tail)(void *state, const void *src, void *dst, unsigned int length);
+-	void (*dec_tail)(void *state, const void *src, void *dst, unsigned int length);
+-	void (*final)(void *state, void *tag_xor, u64 assoclen, u64 cryptlen);
+-};
+-
+-struct morus640_ctx {
+-	const struct morus640_glue_ops *ops;
+-	struct morus640_block key;
+-};
+-
+-void crypto_morus640_glue_init_ops(struct crypto_aead *aead,
+-				   const struct morus640_glue_ops *ops);
+-int crypto_morus640_glue_setkey(struct crypto_aead *aead, const u8 *key,
+-				unsigned int keylen);
+-int crypto_morus640_glue_setauthsize(struct crypto_aead *tfm,
+-				     unsigned int authsize);
+-int crypto_morus640_glue_encrypt(struct aead_request *req);
+-int crypto_morus640_glue_decrypt(struct aead_request *req);
+-
+-#define MORUS640_DECLARE_ALG(id, driver_name, priority) \
+-	static const struct morus640_glue_ops crypto_morus640_##id##_ops = {\
+-		.init = crypto_morus640_##id##_init, \
+-		.ad = crypto_morus640_##id##_ad, \
+-		.enc = crypto_morus640_##id##_enc, \
+-		.enc_tail = crypto_morus640_##id##_enc_tail, \
+-		.dec = crypto_morus640_##id##_dec, \
+-		.dec_tail = crypto_morus640_##id##_dec_tail, \
+-		.final = crypto_morus640_##id##_final, \
+-	}; \
+-	\
+-	static int crypto_morus640_##id##_init_tfm(struct crypto_aead *tfm) \
+-	{ \
+-		crypto_morus640_glue_init_ops(tfm, &crypto_morus640_##id##_ops); \
+-		return 0; \
+-	} \
+-	\
+-	static void crypto_morus640_##id##_exit_tfm(struct crypto_aead *tfm) \
+-	{ \
+-	} \
+-	\
+-	static struct aead_alg crypto_morus640_##id##_alg = {\
+-		.setkey = crypto_morus640_glue_setkey, \
+-		.setauthsize = crypto_morus640_glue_setauthsize, \
+-		.encrypt = crypto_morus640_glue_encrypt, \
+-		.decrypt = crypto_morus640_glue_decrypt, \
+-		.init = crypto_morus640_##id##_init_tfm, \
+-		.exit = crypto_morus640_##id##_exit_tfm, \
+-		\
+-		.ivsize = MORUS_NONCE_SIZE, \
+-		.maxauthsize = MORUS_MAX_AUTH_SIZE, \
+-		.chunksize = MORUS640_BLOCK_SIZE, \
+-		\
+-		.base = { \
+-			.cra_flags = CRYPTO_ALG_INTERNAL, \
+-			.cra_blocksize = 1, \
+-			.cra_ctxsize = sizeof(struct morus640_ctx), \
+-			.cra_alignmask = 0, \
+-			.cra_priority = priority, \
+-			\
+-			.cra_name = "__morus640", \
+-			.cra_driver_name = "__"driver_name, \
+-			\
+-			.cra_module = THIS_MODULE, \
+-		} \
+-	}
+-
+-#endif /* _CRYPTO_MORUS640_GLUE_H */
+diff --git a/include/crypto/morus_common.h b/include/crypto/morus_common.h
+deleted file mode 100644
+index 969510a9a56c..000000000000
+--- a/include/crypto/morus_common.h
++++ /dev/null
+@@ -1,18 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0-or-later */
+-/*
+- * The MORUS Authenticated-Encryption Algorithm
+- *   Common definitions
+- *
+- * Copyright (c) 2016-2018 Ondrej Mosnacek <omosnacek@gmail.com>
+- * Copyright (C) 2017-2018 Red Hat, Inc. All rights reserved.
+- */
+-
+-#ifndef _CRYPTO_MORUS_COMMON_H
+-#define _CRYPTO_MORUS_COMMON_H
+-
+-#define MORUS_BLOCK_WORDS 4
+-#define MORUS_STATE_BLOCKS 5
+-#define MORUS_NONCE_SIZE 16
+-#define MORUS_MAX_AUTH_SIZE 16
+-
+-#endif /* _CRYPTO_MORUS_COMMON_H */
 -- 
 2.17.1
 
