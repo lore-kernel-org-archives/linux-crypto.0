@@ -2,155 +2,188 @@ Return-Path: <SRS0=UDVD=U6=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5900AC0650E
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Jul 2019 08:59:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58196C0650E
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Jul 2019 11:48:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1FB5420B7C
-	for <linux-crypto@archiver.kernel.org>; Mon,  1 Jul 2019 08:59:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dgvfmzPi"
+	by mail.kernel.org (Postfix) with ESMTP id 2C83120881
+	for <linux-crypto@archiver.kernel.org>; Mon,  1 Jul 2019 11:48:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728236AbfGAI7z (ORCPT
+        id S1728053AbfGALs5 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 1 Jul 2019 04:59:55 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:50771 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728220AbfGAI7z (ORCPT
+        Mon, 1 Jul 2019 07:48:57 -0400
+Received: from mail-ot1-f66.google.com ([209.85.210.66]:38022 "EHLO
+        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727888AbfGALs4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 1 Jul 2019 04:59:55 -0400
-Received: by mail-wm1-f65.google.com with SMTP id n9so3087200wmi.0;
-        Mon, 01 Jul 2019 01:59:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=w61ODbvkI0Zrw3EYxOf1VfxblVTs7Fwinzs4mF4Uw28=;
-        b=dgvfmzPiBGjYavETfH1aqOg3TgAJMNmg3yENDIayIfGIrNEAbCCpjzOEXYJQjulb4/
-         Fl0Dx5Q5MPg3IMUNN79TmVblHeswOa0YrCw8Zn6Nf1r2mMzOGCsa1m0nXVjnxcjY8Tfo
-         zJFTPeju8KBM3BtrWtwmlc5+bS36CehftgWDjYHmNy5yNdDDqfqhWgaanbvsjN83wtj2
-         SwKhJ6XEQf+b+fRZeVTMGujH3grDIgBlvu2UBlUnHNccdMRwemuSGQti04Be1zNW6JVS
-         6HQaq7mxIoCcxhgjnyDFmECj34cWIyUhgTHzmnN7z/+LVjtWuTwV47A0DEcQc7FYiTVe
-         Or1A==
+        Mon, 1 Jul 2019 07:48:56 -0400
+Received: by mail-ot1-f66.google.com with SMTP id d17so13186297oth.5
+        for <linux-crypto@vger.kernel.org>; Mon, 01 Jul 2019 04:48:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=w61ODbvkI0Zrw3EYxOf1VfxblVTs7Fwinzs4mF4Uw28=;
-        b=LpgXqto/MuAAbGaMKprMSN5ELzLnNaSwPX4cyUinyNrjBPaJ+Qln7eIby02gWQ/a+X
-         ggYbfaB2NgJXBJ60DQ1jpStpf07Fuphx23KXGBxSHUck5lMSGg5Ux4j+2zD/ctfFGQCR
-         z7WN3fmi5Pe4A0ml9v/6LA+JaaFq7WlIbG1dKefCEfSWoygSraCALwnIGbuM0f5jmC0B
-         9vUE7c/vrodZ+gT2FaPHYsiU+73Gf8JFXz2zkT0GZJ8wazKBS9Iq+trtgm+4TG0eierB
-         s86KOy0ulMijI4ouI115pw1fN2kBw2g9vQzTZj/OlWRu7l1DPt63DkA3FI5LmS6xx7m/
-         akCA==
-X-Gm-Message-State: APjAAAVTmGwP+yd6y/EmT8+mQmpRZJZTeY3Kik1JHmG86pbl8Oevo4BM
-        3mt72NiajNGr0fqHa3+hmAc=
-X-Google-Smtp-Source: APXvYqxrdqHGK9w8pJlZpIcrlORI9AX1/geKS8zqY+DV00b239EBSoZEjEHk6Kkaoy3lOnz8HytdJA==
-X-Received: by 2002:a05:600c:2182:: with SMTP id e2mr16175249wme.104.1561971593030;
-        Mon, 01 Jul 2019 01:59:53 -0700 (PDT)
-Received: from [172.22.36.64] (redhat-nat.vtp.fi.muni.cz. [78.128.215.6])
-        by smtp.gmail.com with ESMTPSA id r16sm18499171wrr.42.2019.07.01.01.59.52
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Mon, 01 Jul 2019 01:59:52 -0700 (PDT)
-Subject: Re: [PATCH v6 4/7] md: dm-crypt: switch to ESSIV crypto API template
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        linux-crypto@vger.kernel.org
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Eric Biggers <ebiggers@google.com>, dm-devel@redhat.com,
-        linux-fscrypt@vger.kernel.org,
-        Gilad Ben-Yossef <gilad@benyossef.com>
-References: <20190628152112.914-1-ard.biesheuvel@linaro.org>
- <20190628152112.914-5-ard.biesheuvel@linaro.org>
-From:   Milan Broz <gmazyland@gmail.com>
-Openpgp: preference=signencrypt
-Message-ID: <f068888f-1a13-babf-0144-07939a79d9d9@gmail.com>
-Date:   Mon, 1 Jul 2019 10:59:51 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=L7nv+0k5jPCe+/Br+DX4QwoajWjH5c2OanrJcWRtVVA=;
+        b=KgKoZLeN6ECKyawC7ZAmT9n2hv+4Tg7wru/5LiqMghU1QvNLSitK/gCnz4E2rhwfbc
+         IMr9OEf8WQiBeoeagCiF11i9ukNdKvurqtSGMUKpUhOgojOumFn2plpk4biyb0iAS7Ay
+         vCMaVfYyAipK9COdNVa9IHbvvAu2PbxP1UF9vAjbCNQPqD3wEQbWvEym7+DHFu3Nk0IO
+         uK2JK+mu3qO7+4kxjjyp5s1uIq2Z5u6IoK2BzNFPzw7nYer6CabrI8+EaMVYPUAIgA2e
+         urLTo8WpeqWrlvZLao1204SLIw5tZj15/SgsOAIZp0KVWSnmCUT/MiUTR36L+P4k/l77
+         075g==
+X-Gm-Message-State: APjAAAVnlb1gT80H/fq+rmh1wjZSByuWEWc4lXODd4mijIBSGn+mYdk8
+        4ra/c+uFf65AhdHBC7Cm4DgZdwFVRKbxXJIb8hrtXg==
+X-Google-Smtp-Source: APXvYqxzhKVMRuV0w+3NI63Z1U1/1Z9WsOVTxrHdBzYkZF1xET+VxRH4Zg+wZLH+YMB6ZybaG/xTU8++W62XmXYd4Qg=
+X-Received: by 2002:a9d:4c17:: with SMTP id l23mr18600435otf.367.1561981735781;
+ Mon, 01 Jul 2019 04:48:55 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190628152112.914-5-ard.biesheuvel@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20190630165031.26365-1-ard.biesheuvel@linaro.org>
+In-Reply-To: <20190630165031.26365-1-ard.biesheuvel@linaro.org>
+From:   Ondrej Mosnacek <omosnace@redhat.com>
+Date:   Mon, 1 Jul 2019 13:48:44 +0200
+Message-ID: <CAFqZXNtJga4efgo_2zRnWhaDwV=F-PBFbZE1epWoUTVVMCvPsw@mail.gmail.com>
+Subject: Re: [PATCH v3 0/7] crypto: CAESAR final portfolio follow-up
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     linux-crypto@vger.kernel.org,
+        Ard Biesheuvel <ard.biesheuvel@arm.com>,
+        Eric Biggers <ebiggers@google.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Steve Capper <steve.capper@arm.com>,
+        Milan Broz <gmazyland@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 28/06/2019 17:21, Ard Biesheuvel wrote:
-> Replace the explicit ESSIV handling in the dm-crypt driver with calls
-> into the crypto API, which now possesses the capability to perform
-> this processing within the crypto subsystem.
-> 
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+On Sun, Jun 30, 2019 at 6:50 PM Ard Biesheuvel
+<ard.biesheuvel@linaro.org> wrote:
+> From: Ard Biesheuvel <ard.biesheuvel@arm.com>
+>
+> This v2/v3 is a follow-up to both 'crypto: aegis128 - add NEON intrinsics
+> version for ARM/arm64' [0] and 'crypto: morus - remove generic and x86
+> implementations' [1]. Since there is some overlap, it makes sense to merge
+> them and avoid merge conflicts.
+>
+> Now that aegis128 has been announced as one of the winners of the CAESAR
+> competition, it's time to provide some better support for it on arm64 (and
+> 32-bit ARM *)
+>
+> This time, instead of cloning the generic driver twice and rewriting half
+> of it in arm64 and ARM assembly, add hooks for an accelerated SIMD path to
+> the generic driver, and populate it with a C version using NEON intrinsics
+> that can be built for both ARM and arm64. This results in a speedup of ~11x,
+> resulting in a performance of 2.2 cycles per byte on Cortex-A53.
+>
+> Patches #3 and #4 are fixes/improvements for the generic code. Patch #5
+> adds the plumbing for using a SIMD accelerated implementation. Patch #6
+> adds the ARM and arm64 code, and patch #7 adds a speed test.
+>
+> Since aegis128l and aegis256 were not selected, and nor where any of the
+> morus contestants (which are in fact found to be cryptographically broken),
+> patches #1 and #2 remove these entirely.
+>
+> Changes since v2:
+> - drop AEGIS128L/256 Kconfig symbols from crypto/Kconfig
+> - ensure that aese/aesmc are issued in pairs
+>
+> Changes since v1s:
+> - add reference to research paper (#1)
+> - drop hunks against m68k defconfigs - these get regenerated automatically
+>   anyway, and so it is better to avoid the potential merge conflicts.
+> - drop patch to use unaligned accessors where it isn't needed
+> - drop hunks against aegis variants that are being removed (#3)
+> - add acks from Ondrej
+>
+> * 32-bit ARM today rarely provides the special AES instruction that the
+>   implementation in this series relies on, but this may change in the future,
+>   and the NEON intrinsics code can be compiled for both ISAs.
+>
+> Cc: Eric Biggers <ebiggers@google.com>
+> Cc: Ondrej Mosnacek <omosnace@redhat.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: Steve Capper <steve.capper@arm.com>
+> Cc: Milan Broz <gmazyland@gmail.com>
+>
+> [0] https://lore.kernel.org/linux-crypto/20190624073818.29296-1-ard.biesheuvel@linaro.org/
+> [1] https://lore.kernel.org/linux-crypto/20190625145254.28510-1-ard.biesheuvel@linaro.org/
+>
+> Ard Biesheuvel (7):
+>   crypto: morus - remove generic and x86 implementations
+>   crypto: aegis128l/aegis256 - remove x86 and generic implementations
+>   crypto: aegis128 - drop empty TFM init/exit routines
+>   crypto: aegis - avoid prerotated AES tables
+>   crypto: aegis128 - add support for SIMD acceleration
+>   crypto: aegis128 - provide a SIMD implementation based on NEON
+>     intrinsics
+>   crypto: tcrypt - add a speed test for AEGIS128
 
->  drivers/md/dm-crypt.c | 200 ++++----------------
+LGTM; for the series:
 
-...
+Reviewed-by: Ondrej Mosnacek <omosnace@redhat.com>
 
-> -/* Wipe salt and reset key derived from volume key */
-> -static int crypt_iv_essiv_wipe(struct crypt_config *cc)
+>
+>  arch/x86/crypto/Makefile               |   17 -
+>  arch/x86/crypto/aegis128l-aesni-asm.S  |  826 ------
+>  arch/x86/crypto/aegis128l-aesni-glue.c |  297 ---
+>  arch/x86/crypto/aegis256-aesni-asm.S   |  703 -----
+>  arch/x86/crypto/aegis256-aesni-glue.c  |  297 ---
+>  arch/x86/crypto/morus1280-avx2-asm.S   |  622 -----
+>  arch/x86/crypto/morus1280-avx2-glue.c  |   66 -
+>  arch/x86/crypto/morus1280-sse2-asm.S   |  896 -------
+>  arch/x86/crypto/morus1280-sse2-glue.c  |   65 -
+>  arch/x86/crypto/morus1280_glue.c       |  209 --
+>  arch/x86/crypto/morus640-sse2-asm.S    |  615 -----
+>  arch/x86/crypto/morus640-sse2-glue.c   |   65 -
+>  arch/x86/crypto/morus640_glue.c        |  204 --
+>  crypto/Kconfig                         |   89 +-
+>  crypto/Makefile                        |   16 +-
+>  crypto/aegis.h                         |   28 +-
+>  crypto/{aegis128.c => aegis128-core.c} |   53 +-
+>  crypto/aegis128-neon-inner.c           |  149 ++
+>  crypto/aegis128-neon.c                 |   43 +
+>  crypto/aegis128l.c                     |  522 ----
+>  crypto/aegis256.c                      |  473 ----
+>  crypto/morus1280.c                     |  542 ----
+>  crypto/morus640.c                      |  533 ----
+>  crypto/tcrypt.c                        |    7 +
+>  crypto/testmgr.c                       |   24 -
+>  crypto/testmgr.h                       | 2691 --------------------
+>  include/crypto/morus1280_glue.h        |   97 -
+>  include/crypto/morus640_glue.h         |   97 -
+>  include/crypto/morus_common.h          |   18 -
+>  29 files changed, 266 insertions(+), 9998 deletions(-)
+>  delete mode 100644 arch/x86/crypto/aegis128l-aesni-asm.S
+>  delete mode 100644 arch/x86/crypto/aegis128l-aesni-glue.c
+>  delete mode 100644 arch/x86/crypto/aegis256-aesni-asm.S
+>  delete mode 100644 arch/x86/crypto/aegis256-aesni-glue.c
+>  delete mode 100644 arch/x86/crypto/morus1280-avx2-asm.S
+>  delete mode 100644 arch/x86/crypto/morus1280-avx2-glue.c
+>  delete mode 100644 arch/x86/crypto/morus1280-sse2-asm.S
+>  delete mode 100644 arch/x86/crypto/morus1280-sse2-glue.c
+>  delete mode 100644 arch/x86/crypto/morus1280_glue.c
+>  delete mode 100644 arch/x86/crypto/morus640-sse2-asm.S
+>  delete mode 100644 arch/x86/crypto/morus640-sse2-glue.c
+>  delete mode 100644 arch/x86/crypto/morus640_glue.c
+>  rename crypto/{aegis128.c => aegis128-core.c} (89%)
+>  create mode 100644 crypto/aegis128-neon-inner.c
+>  create mode 100644 crypto/aegis128-neon.c
+>  delete mode 100644 crypto/aegis128l.c
+>  delete mode 100644 crypto/aegis256.c
+>  delete mode 100644 crypto/morus1280.c
+>  delete mode 100644 crypto/morus640.c
+>  delete mode 100644 include/crypto/morus1280_glue.h
+>  delete mode 100644 include/crypto/morus640_glue.h
+>  delete mode 100644 include/crypto/morus_common.h
+>
+> --
+> 2.17.1
+>
 
-Do I understand it correctly, that this is now called inside the whole cipher
-set key in wipe command (in crypt_wipe_key())?
 
-(Wipe message is meant to suspend the device and wipe all key material
-from memory without actually destroying the device.)
-
-> -{
-> -	struct iv_essiv_private *essiv = &cc->iv_gen_private.essiv;
-> -	unsigned salt_size = crypto_shash_digestsize(essiv->hash_tfm);
-> -	struct crypto_cipher *essiv_tfm;
-> -	int r, err = 0;
-> -
-> -	memset(essiv->salt, 0, salt_size);
-> -
-> -	essiv_tfm = cc->iv_private;
-> -	r = crypto_cipher_setkey(essiv_tfm, essiv->salt, salt_size);
-> -	if (r)
-> -		err = r;
-> -
-> -	return err;
-> -}
-
-...
-
-> @@ -2435,9 +2281,19 @@ static int crypt_ctr_cipher_new(struct dm_target *ti, char *cipher_in, char *key
->  	}
->  
->  	ret = crypt_ctr_blkdev_cipher(cc, cipher_api);
-> -	if (ret < 0) {
-> -		ti->error = "Cannot allocate cipher string";
-> -		return -ENOMEM;
-> +	if (ret < 0)
-> +		goto bad_mem;
-> +
-> +	if (*ivmode && !strcmp(*ivmode, "essiv")) {
-> +		if (!*ivopts) {
-> +			ti->error = "Digest algorithm missing for ESSIV mode";
-> +			return -EINVAL;
-> +		}
-> +		ret = snprintf(buf, CRYPTO_MAX_ALG_NAME, "essiv(%s,%s,%s)",
-> +			       cipher_api, cc->cipher, *ivopts);
-> +		if (ret < 0 || ret >= CRYPTO_MAX_ALG_NAME)
-> +			goto bad_mem;
-
-Hm, nitpicking, but goto from only one place while we have another -ENOMEM above...
-
-Just place this here without goto?
-
-> +	ti->error = "Cannot allocate cipher string";
-> +	return -ENOMEM;
-
-Otherwise
-
-Reviewed-by: Milan Broz <gmazyland@gmail.com>
-
-Thanks,
-Milan
+-- 
+Ondrej Mosnacek <omosnace at redhat dot com>
+Software Engineer, Security Technologies
+Red Hat, Inc.
