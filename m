@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E1E0C06513
-	for <linux-crypto@archiver.kernel.org>; Tue,  2 Jul 2019 19:42:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16AF7C06510
+	for <linux-crypto@archiver.kernel.org>; Tue,  2 Jul 2019 19:42:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E0A1B21850
-	for <linux-crypto@archiver.kernel.org>; Tue,  2 Jul 2019 19:42:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E8F0621850
+	for <linux-crypto@archiver.kernel.org>; Tue,  2 Jul 2019 19:42:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="u38mRObk"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cFSPCIG/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727074AbfGBTme (ORCPT
+        id S1727080AbfGBTmg (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 2 Jul 2019 15:42:34 -0400
-Received: from mail-lf1-f67.google.com ([209.85.167.67]:34597 "EHLO
-        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727069AbfGBTme (ORCPT
+        Tue, 2 Jul 2019 15:42:36 -0400
+Received: from mail-lj1-f196.google.com ([209.85.208.196]:43128 "EHLO
+        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727077AbfGBTmg (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 2 Jul 2019 15:42:34 -0400
-Received: by mail-lf1-f67.google.com with SMTP id b29so2309621lfq.1
-        for <linux-crypto@vger.kernel.org>; Tue, 02 Jul 2019 12:42:32 -0700 (PDT)
+        Tue, 2 Jul 2019 15:42:36 -0400
+Received: by mail-lj1-f196.google.com with SMTP id 16so18134504ljv.10
+        for <linux-crypto@vger.kernel.org>; Tue, 02 Jul 2019 12:42:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=cNds9JAEq1hTUuemrXbQh9sj10to3vETzPkNzlmk2jM=;
-        b=u38mRObkPGCNBpkUfqFku8ZoUy0UumUJnobS0qIyeuCnatakwjiXwIbv5q+4gcD1/f
-         hYpaqvE42a5zxZ/usTOvnSI8b3jOwElOCHwPQYQW3ROwY/T2690uL/bfxsmeTasOeTP3
-         9usz4Xg7U/zL5Xtoa92i8QccFmxZu5LiBt6Ipvj3Y2kEaHVTy6XUT+GE07S2tHMP/m+W
-         YafR6IEU/XjJV87YhXqBOdImyaydmRwGupfGaakTMPiY7kH/v5V/mJoPhiR1Jz3TrGom
-         WMZlYooS06YsixisHAUprj9ISqe2Sl8EmSfT7rydvgUt5MBpqvgTW13w//FgPcJYvY5R
-         tmLg==
+        bh=RA/9IzM/wteRuTKu0pLDxMNR1Wzx064tA8Ih0Blx/i0=;
+        b=cFSPCIG/bffIkSOQesv7FkfPabeFVhhkSZpvMaJ1VeLDzo7FC5pD7m6sQB3EJMQBSO
+         r2GYUbQ0o51V6I4iDxEk3PTvelCfsdtr6JBBVTHt1KVlGIuGgbbPQHoNEfZX+oGzUqLQ
+         4ubA3HfxM6y+lDhP8dcgOYQUnGBhZcV83YuXXNKq0GlXSJCWvShzeGL1A2e3/xfgB9Tz
+         PK9i1cDfy3MuSDa9fs9IQogmvpLGe/VMI/XwcZbu8eD4cVgocfUIWuH1p1kq4PcwlxvC
+         ztqvhoN9z/yYEgAoRs7DBZdkKnjLvjkDmRIoSm6wPd8/g1gf4IFesjFS4pbcJDQllhrO
+         T9Ww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=cNds9JAEq1hTUuemrXbQh9sj10to3vETzPkNzlmk2jM=;
-        b=TxQpWk94ywE5dwYcUijjmJ7td3fO8M8iHFNOpZejxv5quDMZlk93ADJS21iNaNk9F0
-         gbi2+NXVA8je/YlbJGmrW32tbaKvDWpvWREoRHaBZc9VxkNgCWeMKxDAwH8ACIZekLyX
-         wuSgjXQUSSmc2hLg20qfu4CBAf+C7O6HjXqfa26LZSLlCZubgUQBW6y2NiQyqJoT20QN
-         NDgHoznDaJUH69hwtDuxrYon2mRxCtMLtILdhZBvCaXNaFBPGTaUfDqib8GLqlRSVIB1
-         XEdjCUg6aaqUxdPinyTBBdfMPtQrmwmvNXdUV0NSpdh03Bo8CsOl4b2YgRXPJRSH7zAU
-         bARA==
-X-Gm-Message-State: APjAAAWmanSc4WxJi6hCn5+oL3h4wCghKfeVWq7qh1IecxpMZWCGwOdU
-        8Q28y8O0zXHCXqpoBgVAfAnWs25A4NWA8OnF
-X-Google-Smtp-Source: APXvYqzoQDKNn9zBHjWWLG+oR2fk4DwVcuX6BG6wvz8DceyjSULfNtgT48RLa68sJoZqXCcfOtJnxg==
-X-Received: by 2002:ac2:52b7:: with SMTP id r23mr1871076lfm.120.1562096551941;
-        Tue, 02 Jul 2019 12:42:31 -0700 (PDT)
+        bh=RA/9IzM/wteRuTKu0pLDxMNR1Wzx064tA8Ih0Blx/i0=;
+        b=X9939y6R63Z4MwTIob/wtmKD9gORjKAskZD8xQFrzzv4LXoz3gagc+N0m2/meH6lvl
+         KIXXcefIYaEyQ8DLQWwLZvIv9hEyRPybMPM/eu9+NUCmlvXVEpWYisoKkFusWL7RJWpH
+         HmN82UlFJhC5Qkv7BEI6zlQVjWQbapv7ls4TUMsxuIYtkz7JcNGurrYjdQJkc6SHA/yE
+         r3FzkT5gQsUg3Fj/MQlHUteTAFaoGSO8OZ2LXB2qmmLk/V05EtSkLa1G1+vJtVUU4M7w
+         0WQjmavNxQjMSwlauVTToEDByAusEHT8AT3p9cxpJuNRxhhD8rsV2UXesqOFgxDe7FaP
+         3S1A==
+X-Gm-Message-State: APjAAAWizuGs8LTjVC816Vl9AfV23F8B6oR39R60TptaC98Snbps5j29
+        h3A0jiQ73T3tLLZ7KN+gOSVxCYPujGI6qJeX
+X-Google-Smtp-Source: APXvYqxAavoMSRtKSF5TetHoVj18kzccCHeX/StX5kHh1C2q79XskppXcmcL8eiYLynkOuxtZXYGaQ==
+X-Received: by 2002:a2e:3e01:: with SMTP id l1mr18413773lja.208.1562096554329;
+        Tue, 02 Jul 2019 12:42:34 -0700 (PDT)
 Received: from e111045-lin.arm.com (89-212-78-239.static.t-2.net. [89.212.78.239])
-        by smtp.gmail.com with ESMTPSA id 24sm4475163ljs.63.2019.07.02.12.42.30
+        by smtp.gmail.com with ESMTPSA id 24sm4475163ljs.63.2019.07.02.12.42.33
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Tue, 02 Jul 2019 12:42:31 -0700 (PDT)
+        Tue, 02 Jul 2019 12:42:33 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     herbert@gondor.apana.org.au, ebiggers@google.com,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v4 16/32] crypto: ctr - add helper for performing a CTR encryption walk
-Date:   Tue,  2 Jul 2019 21:41:34 +0200
-Message-Id: <20190702194150.10405-17-ard.biesheuvel@linaro.org>
+Subject: [PATCH v4 18/32] crypto: arm64/aes-ce-cipher - use AES library as fallback
+Date:   Tue,  2 Jul 2019 21:41:36 +0200
+Message-Id: <20190702194150.10405-19-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190702194150.10405-1-ard.biesheuvel@linaro.org>
 References: <20190702194150.10405-1-ard.biesheuvel@linaro.org>
@@ -70,78 +70,78 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add a static inline helper modeled after crypto_cbc_encrypt_walk()
-that can be reused for SIMD algorithms that need to implement a
-non-SIMD fallback for performing CTR encryption.
+Instead of calling into the table based scalar AES code in situations
+where the SIMD unit may not be used, use the generic AES code, which
+is more appropriate since it is less likely to be susceptible to
+timing attacks.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- include/crypto/ctr.h | 50 ++++++++++++++++++++
- 1 file changed, 50 insertions(+)
+ arch/arm64/crypto/Kconfig           | 2 +-
+ arch/arm64/crypto/aes-ce-glue.c     | 7 ++-----
+ arch/arm64/crypto/aes-cipher-glue.c | 3 ---
+ 3 files changed, 3 insertions(+), 9 deletions(-)
 
-diff --git a/include/crypto/ctr.h b/include/crypto/ctr.h
-index 4180fc080e3b..d64017fae41c 100644
---- a/include/crypto/ctr.h
-+++ b/include/crypto/ctr.h
-@@ -13,8 +13,58 @@
- #ifndef _CRYPTO_CTR_H
- #define _CRYPTO_CTR_H
+diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
+index 66dea518221c..4922c4451e7c 100644
+--- a/arch/arm64/crypto/Kconfig
++++ b/arch/arm64/crypto/Kconfig
+@@ -73,7 +73,7 @@ config CRYPTO_AES_ARM64_CE
+ 	tristate "AES core cipher using ARMv8 Crypto Extensions"
+ 	depends on ARM64 && KERNEL_MODE_NEON
+ 	select CRYPTO_ALGAPI
+-	select CRYPTO_AES_ARM64
++	select CRYPTO_LIB_AES
  
-+#include <crypto/algapi.h>
-+#include <crypto/internal/skcipher.h>
-+#include <linux/string.h>
-+#include <linux/types.h>
-+
- #define CTR_RFC3686_NONCE_SIZE 4
- #define CTR_RFC3686_IV_SIZE 8
- #define CTR_RFC3686_BLOCK_SIZE 16
+ config CRYPTO_AES_ARM64_CE_CCM
+ 	tristate "AES in CCM mode using ARMv8 Crypto Extensions"
+diff --git a/arch/arm64/crypto/aes-ce-glue.c b/arch/arm64/crypto/aes-ce-glue.c
+index 3213843fcb46..6890e003b8f1 100644
+--- a/arch/arm64/crypto/aes-ce-glue.c
++++ b/arch/arm64/crypto/aes-ce-glue.c
+@@ -23,9 +23,6 @@ MODULE_DESCRIPTION("Synchronous AES cipher using ARMv8 Crypto Extensions");
+ MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
+ MODULE_LICENSE("GPL v2");
  
-+static inline int crypto_ctr_encrypt_walk(struct skcipher_request *req,
-+					  void (*fn)(struct crypto_skcipher *,
-+						     const u8 *, u8 *))
-+{
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	int blocksize = crypto_skcipher_chunksize(tfm);
-+	u8 buf[MAX_CIPHER_BLOCKSIZE];
-+	struct skcipher_walk walk;
-+	int err;
-+
-+	/* avoid integer division due to variable blocksize parameter */
-+	if (WARN_ON_ONCE(!is_power_of_2(blocksize)))
-+		return -EINVAL;
-+
-+	err = skcipher_walk_virt(&walk, req, false);
-+
-+	while (walk.nbytes > 0) {
-+		u8 *dst = walk.dst.virt.addr;
-+		u8 *src = walk.src.virt.addr;
-+		int nbytes = walk.nbytes;
-+		int tail = 0;
-+
-+		if (nbytes < walk.total) {
-+			tail = walk.nbytes & (blocksize - 1);
-+			nbytes -= tail;
-+		}
-+
-+		do {
-+			int bsize = min(nbytes, blocksize);
-+
-+			fn(tfm, walk.iv, buf);
-+
-+			crypto_xor_cpy(dst, src, buf, bsize);
-+			crypto_inc(walk.iv, blocksize);
-+
-+			dst += bsize;
-+			src += bsize;
-+			nbytes -= bsize;
-+		} while (nbytes > 0);
-+
-+		err = skcipher_walk_done(&walk, tail);
-+	}
-+	return err;
-+}
-+
- #endif  /* _CRYPTO_CTR_H */
+-asmlinkage void __aes_arm64_encrypt(u32 *rk, u8 *out, const u8 *in, int rounds);
+-asmlinkage void __aes_arm64_decrypt(u32 *rk, u8 *out, const u8 *in, int rounds);
+-
+ struct aes_block {
+ 	u8 b[AES_BLOCK_SIZE];
+ };
+@@ -54,7 +51,7 @@ static void aes_cipher_encrypt(struct crypto_tfm *tfm, u8 dst[], u8 const src[])
+ 	struct crypto_aes_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
+ 	if (!crypto_simd_usable()) {
+-		__aes_arm64_encrypt(ctx->key_enc, dst, src, num_rounds(ctx));
++		aes_encrypt(ctx, dst, src);
+ 		return;
+ 	}
+ 
+@@ -68,7 +65,7 @@ static void aes_cipher_decrypt(struct crypto_tfm *tfm, u8 dst[], u8 const src[])
+ 	struct crypto_aes_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
+ 	if (!crypto_simd_usable()) {
+-		__aes_arm64_decrypt(ctx->key_dec, dst, src, num_rounds(ctx));
++		aes_decrypt(ctx, dst, src);
+ 		return;
+ 	}
+ 
+diff --git a/arch/arm64/crypto/aes-cipher-glue.c b/arch/arm64/crypto/aes-cipher-glue.c
+index 0e90b06ebcec..bf32cc6489e1 100644
+--- a/arch/arm64/crypto/aes-cipher-glue.c
++++ b/arch/arm64/crypto/aes-cipher-glue.c
+@@ -13,10 +13,7 @@
+ #include <linux/module.h>
+ 
+ asmlinkage void __aes_arm64_encrypt(u32 *rk, u8 *out, const u8 *in, int rounds);
+-EXPORT_SYMBOL(__aes_arm64_encrypt);
+-
+ asmlinkage void __aes_arm64_decrypt(u32 *rk, u8 *out, const u8 *in, int rounds);
+-EXPORT_SYMBOL(__aes_arm64_decrypt);
+ 
+ static void aes_arm64_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+ {
 -- 
 2.17.1
 
