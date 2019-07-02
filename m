@@ -2,191 +2,181 @@ Return-Path: <SRS0=EZcf=VA=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.5 required=3.0 tests=DATE_IN_PAST_03_06,
-	DKIMWL_WL_MED,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B222BC5B57D
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 01:20:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60D5FC46478
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 01:33:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8B2CB2064A
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 01:20:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HFTGEtAH"
+	by mail.kernel.org (Postfix) with ESMTP id 39F992063F
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 01:33:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1562117586;
+	bh=hOYB46lYLP30wkEWfOV6OIbMxQdFCth2OM8MWmv+OgA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=Bcc0ujXQwFmYy3Auq6u7jk4eapdkb6P1U1Bxo2N0NiRJny/NPWoGzrAZbgK/Bb7zw
+	 Z+BZZVccrf7sbNArwFu5dZtlhkxNNfiHAW2yK1n95B/reDv2o/5J/Wxhs6AEG7nWeb
+	 ckhqGY1PJe1aiqcUFFbnS17LLh9dtoap3EieZdXc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727219AbfGCBUm (ORCPT
+        id S1727407AbfGCBdF (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 2 Jul 2019 21:20:42 -0400
-Received: from mail-pg1-f202.google.com ([209.85.215.202]:45406 "EHLO
-        mail-pg1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726329AbfGCBUk (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 2 Jul 2019 21:20:40 -0400
-Received: by mail-pg1-f202.google.com with SMTP id n7so513866pgr.12
-        for <linux-crypto@vger.kernel.org>; Tue, 02 Jul 2019 18:20:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=5pef2FmAnlM+QWRsh4dTLRGQILNCjv4NmeuYpQBmgEA=;
-        b=HFTGEtAH+TiPSW0rjw3Mi+iJdcR98StRYDiH88gvvbwa6f/D0j8dTS7RXBv9w26MId
-         SfRPUxiljRg2yh/fQ558NrAbM/8elfRqhcdJN7x+tYTwZLmQF5OP8LhDnGk7JqPqjWLv
-         tqLWCH1zVSyWQScYIQqJvuxzO8AIdqWbBGpEyzdKtT6f9cPh27ACMxAYZDSz5AapvhWu
-         rT73tfO1uup3LaVGb7e/lEjey5r3LN2IyH48iSwKeg5xGL3gNg9GazedobtHrspjH//R
-         4XAHipiFE8qrM8hVBXabL16ovb1CDR1dB9xbE+1QJMlpZrm++PKrVQMqTtvTBrSWkrWZ
-         sjXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=5pef2FmAnlM+QWRsh4dTLRGQILNCjv4NmeuYpQBmgEA=;
-        b=SIHEKodz/ptKajeVJd6llmvlVq7vRDxe61mpebVxUb7Z8N0W+yHuDGYEWvSdc7ghbE
-         oVQAvhqgA2b//ReJc7zebFMhorMKiNFTIIrgDphuI0NnBe1YBYnHJdKL7M8NAFZFgavQ
-         alDizK4GpkSfM2oIXQyGKo56E6iRIUk0KIvOYpKEO8c9Rff61kacKJtFVyKUAD037y5G
-         fXg+MGBZUsMBT24V235NgjFoVvLjah5kfXD72YosOe/GGQmDiatE5XrV92RWXXtgbl1O
-         YjonHpGcmps8mwRDS/VKEVxRAirbWDuYpRLX5upfql/Pi2yry4qLkwIDtvlykp2HiEG2
-         YXXw==
-X-Gm-Message-State: APjAAAVHWUZfjiFlTolTu8GnjZvjwo+rqvQX8zlNRoP2KTrcKH1o8lQm
-        4SKHSYPV6VRwgiqYT+F7fe3GR0UfqwbZ1hI=
-X-Google-Smtp-Source: APXvYqyGy2X1QyFInWll9cR9+qCKZirNRmZ7tB0RIVjS53rewNqC45t5w4HsIlrc5nNmfd1XHbj1RJqDHbSXSc0=
-X-Received: by 2002:a63:e250:: with SMTP id y16mr32019623pgj.392.1562105829343;
- Tue, 02 Jul 2019 15:17:09 -0700 (PDT)
-Date:   Tue,  2 Jul 2019 15:16:02 -0700
-Message-Id: <20190702221602.120879-1-hannahpan@google.com>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.22.0.410.gd8fdbe21b5-goog
-Subject: [PATCH] crypto: testmgr - add tests for lzo-rle
-From:   Hannah Pan <hannahpan@google.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org
-Cc:     Dave Rodgman <dave.rodgman@arm.com>,
-        Hannah Pan <hannahpan@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Tue, 2 Jul 2019 21:33:05 -0400
+Received: from mail.kernel.org ([198.145.29.99]:39006 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727108AbfGCBdE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 2 Jul 2019 21:33:04 -0400
+Received: from gmail.com (unknown [104.132.1.77])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9F4F8218BE;
+        Tue,  2 Jul 2019 21:55:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1562104519;
+        bh=hOYB46lYLP30wkEWfOV6OIbMxQdFCth2OM8MWmv+OgA=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=LRvfL6OpM8Gh8nwRW5vFj6q6upNRHcWevxIMA3GvQ/nfj+fVXB/TyDBBn3wFIFl8b
+         zaDvhResmMi3czwuhRgtBLh2vXMm+7PDsGIW1oE2vA9lMqT3uirydvhpF6c+ThlaRm
+         /h/cme9IwahHJcTITFQYbDWCPiA9qQTNxAAo/lSo=
+Date:   Tue, 2 Jul 2019 14:55:18 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>, dm-devel@redhat.com,
+        linux-fscrypt@vger.kernel.org,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Milan Broz <gmazyland@gmail.com>
+Subject: Re: [PATCH v7 2/7] fs: crypto: invoke crypto API for ESSIV handling
+Message-ID: <20190702215517.GA69157@gmail.com>
+References: <20190702164815.6341-1-ard.biesheuvel@linaro.org>
+ <20190702164815.6341-3-ard.biesheuvel@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190702164815.6341-3-ard.biesheuvel@linaro.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add self-tests for the lzo-rle algorithm.
+Hi Ard,
 
-Signed-off-by: Hannah Pan <hannahpan@google.com>
----
- crypto/testmgr.c | 10 ++++++
- crypto/testmgr.h | 80 ++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 90 insertions(+)
+On Tue, Jul 02, 2019 at 06:48:10PM +0200, Ard Biesheuvel wrote:
+> Instead of open coding the calculations for ESSIV handling, use a
+> ESSIV skcipher which does all of this under the hood.
+> 
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> ---
+>  fs/crypto/Kconfig           |  1 +
+>  fs/crypto/crypto.c          |  5 --
+>  fs/crypto/fscrypt_private.h |  9 --
+>  fs/crypto/keyinfo.c         | 95 +-------------------
+>  4 files changed, 5 insertions(+), 105 deletions(-)
+> 
+> diff --git a/fs/crypto/Kconfig b/fs/crypto/Kconfig
+> index 24ed99e2eca0..b0292da8613c 100644
+> --- a/fs/crypto/Kconfig
+> +++ b/fs/crypto/Kconfig
+> @@ -5,6 +5,7 @@ config FS_ENCRYPTION
+>  	select CRYPTO_AES
+>  	select CRYPTO_CBC
+>  	select CRYPTO_ECB
+> +	select CRYPTO_ESSIV
+>  	select CRYPTO_XTS
+>  	select CRYPTO_CTS
+>  	select CRYPTO_SHA256
+> diff --git a/fs/crypto/crypto.c b/fs/crypto/crypto.c
+> index 335a362ee446..c53ce262a06c 100644
+> --- a/fs/crypto/crypto.c
+> +++ b/fs/crypto/crypto.c
+> @@ -136,9 +136,6 @@ void fscrypt_generate_iv(union fscrypt_iv *iv, u64 lblk_num,
+>  
+>  	if (ci->ci_flags & FS_POLICY_FLAG_DIRECT_KEY)
+>  		memcpy(iv->nonce, ci->ci_nonce, FS_KEY_DERIVATION_NONCE_SIZE);
+> -
+> -	if (ci->ci_essiv_tfm != NULL)
+> -		crypto_cipher_encrypt_one(ci->ci_essiv_tfm, iv->raw, iv->raw);
+>  }
+>  
+>  int fscrypt_do_page_crypto(const struct inode *inode, fscrypt_direction_t rw,
+> @@ -492,8 +489,6 @@ static void __exit fscrypt_exit(void)
+>  		destroy_workqueue(fscrypt_read_workqueue);
+>  	kmem_cache_destroy(fscrypt_ctx_cachep);
+>  	kmem_cache_destroy(fscrypt_info_cachep);
+> -
+> -	fscrypt_essiv_cleanup();
+>  }
+>  module_exit(fscrypt_exit);
+>  
+> diff --git a/fs/crypto/fscrypt_private.h b/fs/crypto/fscrypt_private.h
+> index 7da276159593..59d0cba9cfb9 100644
+> --- a/fs/crypto/fscrypt_private.h
+> +++ b/fs/crypto/fscrypt_private.h
+> @@ -61,12 +61,6 @@ struct fscrypt_info {
+>  	/* The actual crypto transform used for encryption and decryption */
+>  	struct crypto_skcipher *ci_ctfm;
+>  
+> -	/*
+> -	 * Cipher for ESSIV IV generation.  Only set for CBC contents
+> -	 * encryption, otherwise is NULL.
+> -	 */
+> -	struct crypto_cipher *ci_essiv_tfm;
+> -
+>  	/*
+>  	 * Encryption mode used for this inode.  It corresponds to either
+>  	 * ci_data_mode or ci_filename_mode, depending on the inode type.
+> @@ -166,9 +160,6 @@ struct fscrypt_mode {
+>  	int keysize;
+>  	int ivsize;
+>  	bool logged_impl_name;
+> -	bool needs_essiv;
+>  };
+>  
+> -extern void __exit fscrypt_essiv_cleanup(void);
+> -
+>  #endif /* _FSCRYPT_PRIVATE_H */
+> diff --git a/fs/crypto/keyinfo.c b/fs/crypto/keyinfo.c
+> index dcd91a3fbe49..f39667d4316a 100644
+> --- a/fs/crypto/keyinfo.c
+> +++ b/fs/crypto/keyinfo.c
+> @@ -13,14 +13,10 @@
+>  #include <linux/hashtable.h>
+>  #include <linux/scatterlist.h>
+>  #include <linux/ratelimit.h>
+> -#include <crypto/aes.h>
+>  #include <crypto/algapi.h>
+> -#include <crypto/sha.h>
+>  #include <crypto/skcipher.h>
+>  #include "fscrypt_private.h"
+>  
+> -static struct crypto_shash *essiv_hash_tfm;
+> -
+>  /* Table of keys referenced by FS_POLICY_FLAG_DIRECT_KEY policies */
+>  static DEFINE_HASHTABLE(fscrypt_master_keys, 6); /* 6 bits = 64 buckets */
+>  static DEFINE_SPINLOCK(fscrypt_master_keys_lock);
+> @@ -144,10 +140,9 @@ static struct fscrypt_mode available_modes[] = {
+>  	},
+>  	[FS_ENCRYPTION_MODE_AES_128_CBC] = {
+>  		.friendly_name = "AES-128-CBC",
+> -		.cipher_str = "cbc(aes)",
+> +		.cipher_str = "essiv(cbc(aes),aes,sha256)",
+>  		.keysize = 16,
+> -		.ivsize = 16,
+> -		.needs_essiv = true,
+> +		.ivsize = 8,
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 658a7eeebab2..c8a2fd96384d 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -4437,6 +4437,16 @@ static const struct alg_test_desc alg_test_descs[] = {
- 				.decomp = __VECS(lzo_decomp_tv_template)
- 			}
- 		}
-+	}, {
-+		.alg = "lzo-rle",
-+		.test = alg_test_comp,
-+		.fips_allowed = 1,
-+		.suite = {
-+			.comp = {
-+				.comp = __VECS(lzorle_comp_tv_template),
-+				.decomp = __VECS(lzorle_decomp_tv_template)
-+			}
-+		}
- 	}, {
- 		.alg = "md4",
- 		.test = alg_test_hash,
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 1fdae5993bc3..e7f71df2386e 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -32454,6 +32454,86 @@ static const struct comp_testvec lzo_decomp_tv_template[] = {
- 	},
- };
- 
-+static const struct comp_testvec lzorle_comp_tv_template[] = {
-+	{
-+		.inlen	= 70,
-+		.outlen	= 59,
-+		.input	= "Join us now and share the software "
-+			"Join us now and share the software ",
-+		.output	= "\x11\x01\x00\x0d\x4a\x6f\x69\x6e"
-+			  "\x20\x75\x73\x20\x6e\x6f\x77\x20"
-+			  "\x61\x6e\x64\x20\x73\x68\x61\x72"
-+			  "\x65\x20\x74\x68\x65\x20\x73\x6f"
-+			  "\x66\x74\x77\x70\x01\x32\x88\x00"
-+			  "\x0c\x65\x20\x74\x68\x65\x20\x73"
-+			  "\x6f\x66\x74\x77\x61\x72\x65\x20"
-+			  "\x11\x00\x00",
-+	}, {
-+		.inlen	= 159,
-+		.outlen	= 133,
-+		.input	= "This document describes a compression method based on the LZO "
-+			"compression algorithm.  This document defines the application of "
-+			"the LZO algorithm used in UBIFS.",
-+		.output	= "\x11\x01\x00\x2c\x54\x68\x69\x73"
-+			  "\x20\x64\x6f\x63\x75\x6d\x65\x6e"
-+			  "\x74\x20\x64\x65\x73\x63\x72\x69"
-+			  "\x62\x65\x73\x20\x61\x20\x63\x6f"
-+			  "\x6d\x70\x72\x65\x73\x73\x69\x6f"
-+			  "\x6e\x20\x6d\x65\x74\x68\x6f\x64"
-+			  "\x20\x62\x61\x73\x65\x64\x20\x6f"
-+			  "\x6e\x20\x74\x68\x65\x20\x4c\x5a"
-+			  "\x4f\x20\x2a\x8c\x00\x09\x61\x6c"
-+			  "\x67\x6f\x72\x69\x74\x68\x6d\x2e"
-+			  "\x20\x20\x2e\x54\x01\x03\x66\x69"
-+			  "\x6e\x65\x73\x20\x74\x06\x05\x61"
-+			  "\x70\x70\x6c\x69\x63\x61\x74\x76"
-+			  "\x0a\x6f\x66\x88\x02\x60\x09\x27"
-+			  "\xf0\x00\x0c\x20\x75\x73\x65\x64"
-+			  "\x20\x69\x6e\x20\x55\x42\x49\x46"
-+			  "\x53\x2e\x11\x00\x00",
-+	},
-+};
-+
-+static const struct comp_testvec lzorle_decomp_tv_template[] = {
-+	{
-+		.inlen	= 133,
-+		.outlen	= 159,
-+		.input	= "\x00\x2b\x54\x68\x69\x73\x20\x64"
-+			  "\x6f\x63\x75\x6d\x65\x6e\x74\x20"
-+			  "\x64\x65\x73\x63\x72\x69\x62\x65"
-+			  "\x73\x20\x61\x20\x63\x6f\x6d\x70"
-+			  "\x72\x65\x73\x73\x69\x6f\x6e\x20"
-+			  "\x6d\x65\x74\x68\x6f\x64\x20\x62"
-+			  "\x61\x73\x65\x64\x20\x6f\x6e\x20"
-+			  "\x74\x68\x65\x20\x4c\x5a\x4f\x2b"
-+			  "\x8c\x00\x0d\x61\x6c\x67\x6f\x72"
-+			  "\x69\x74\x68\x6d\x2e\x20\x20\x54"
-+			  "\x68\x69\x73\x2a\x54\x01\x02\x66"
-+			  "\x69\x6e\x65\x73\x94\x06\x05\x61"
-+			  "\x70\x70\x6c\x69\x63\x61\x74\x76"
-+			  "\x0a\x6f\x66\x88\x02\x60\x09\x27"
-+			  "\xf0\x00\x0c\x20\x75\x73\x65\x64"
-+			  "\x20\x69\x6e\x20\x55\x42\x49\x46"
-+			  "\x53\x2e\x11\x00\x00",
-+		.output	= "This document describes a compression method based on the LZO "
-+			"compression algorithm.  This document defines the application of "
-+			"the LZO algorithm used in UBIFS.",
-+	}, {
-+		.inlen	= 59,
-+		.outlen	= 70,
-+		.input	= "\x11\x01\x00\x0d\x4a\x6f\x69\x6e"
-+			  "\x20\x75\x73\x20\x6e\x6f\x77\x20"
-+			  "\x61\x6e\x64\x20\x73\x68\x61\x72"
-+			  "\x65\x20\x74\x68\x65\x20\x73\x6f"
-+			  "\x66\x74\x77\x70\x01\x32\x88\x00"
-+			  "\x0c\x65\x20\x74\x68\x65\x20\x73"
-+			  "\x6f\x66\x74\x77\x61\x72\x65\x20"
-+			  "\x11\x00\x00",
-+		.output	= "Join us now and share the software "
-+			"Join us now and share the software ",
-+	},
-+};
-+
- /*
-  * Michael MIC test vectors from IEEE 802.11i
-  */
--- 
-2.22.0.410.gd8fdbe21b5-goog
+As I said before, this needs to be kept as .ivsize = 16.
 
+This bug actually causes the generic/549 test to fail.
+
+Otherwise this patch looks good.  FYI: to avoid conflicts with planned fscrypt
+work I'd prefer to take this patch through the fscrypt.git tree after the ESSIV
+template is merged, rather than have Herbert take it through cryptodev.  (Unless
+he's going to apply this whole series for v5.3, in which case I'm fine with him
+taking the fscrypt patch too, though it seems too late for that.)
+
+Thanks!
+
+- Eric
