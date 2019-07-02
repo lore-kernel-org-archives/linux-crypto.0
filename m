@@ -1,208 +1,195 @@
 Return-Path: <SRS0=EZcf=VA=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Level: *
+X-Spam-Status: No, score=1.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59F31C5B57D
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 00:37:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93389C5B57D
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 00:38:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 209A920673
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 00:37:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XgqNz3DD"
+	by mail.kernel.org (Postfix) with ESMTP id 5BA47218A5
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 00:38:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1562114286;
+	bh=Ed+V3TIIDTnClTbpLgAqUanLKLZrzlND7+0lmgD7UgU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=hwbjbq3jvpCm9YQ/IXZHkB1JvaqVJ3ZCmif8H6GhI2RDN62DyaUn4KYRUE2pc3jSj
+	 ISxD9vmwY2uf1UxIMC/7x4sVbuVhEL7kAX7/W6mxiecghCuz/GB8tkt60Yuet4/qIb
+	 aSpSpnV9+Yiu4wi7GC4B4CstkE/fTvsQwgAUxY8U=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727082AbfGCAhJ (ORCPT
+        id S1727036AbfGCAiF (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 2 Jul 2019 20:37:09 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:40400 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727025AbfGCAhJ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 2 Jul 2019 20:37:09 -0400
-Received: by mail-wm1-f67.google.com with SMTP id v19so390181wmj.5
-        for <linux-crypto@vger.kernel.org>; Tue, 02 Jul 2019 17:37:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=BuJjnmsa16yGtmKm23b5SK8rLGuToUCsb0RcIjLnyYU=;
-        b=XgqNz3DD88MTi6lB/EV9D4bVepBN++dm78f7u60dKhmfewGE95rngfKmODgiZKw2Ch
-         hmvF5K1gEcOgC1tqKmy5RJF2MmmjiKOp5G1ODPdH+H6FDhah+kr7E31r8DLUJ03dypaA
-         5R6/61yNVE5Ola60Xt4w9E9HwKzuerv8hHj6J3By3y76wxQ+5tHQQkloE6PdE3Ljdwq1
-         cUS2GMytbM2CUOyt3CJPYg028cTZNQGNUV3U8HpKoVyGaJdF/g01fsnlKaee1UxbcM6L
-         qeKAa13EpeLZWNLI/KxJnkhAL2SUf2Ruffnzz96GfCt/PXlYrRkGGp0YPh1jCvGtVId4
-         hkQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=BuJjnmsa16yGtmKm23b5SK8rLGuToUCsb0RcIjLnyYU=;
-        b=MMR84Laf7jinq1PBoorM9uZ8/1n7mwpykRLjP/nrV9p7D52wvTx6ek4E9wNxrkMGhQ
-         3E/ADLX2Mh+XsPmISYndLLXHG6yE4Urq8W1o6VVT7HjJTPNebRimjhJvjdNJJAlNxzKU
-         4gkwA6p8bt5cJJSTQ3kRjYqt6JS/oHl3JwIr+r6PPKknhC+Ah+WtJ3AbEnKPYVRdrdFh
-         PETk46LYtZPqdlHIBlpv7DIYsHvvPiAL2q7SEli9UC7D+aBll+IbWcbRh9xph893/QBV
-         20f/sB39ZLMSEV8F2F4wSnfA0pf5l2hD+ie+ZD1/WzZRqViJXWz8fFYe0mALg8Mpo53L
-         DPYw==
-X-Gm-Message-State: APjAAAW0gLJF4KLhQa5LBRoRLX8jFlTrLcnBZWssIlMgs/FW0T97YkfM
-        mpaLD3gLRUfsYEf5u61ZL0Uar5iOziA83LioHaQuLsG1WbewKg==
-X-Google-Smtp-Source: APXvYqzNRL6kfVI6JRBm+/aVjGrWSvVW8XEmwzmlDfnElYLBce73LMP87RvgXUPNwrF+SvTgKH6XZnh16uSANnqnlvw=
-X-Received: by 2002:a05:600c:21d4:: with SMTP id x20mr4187565wmj.61.1562105213973;
- Tue, 02 Jul 2019 15:06:53 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190702164815.6341-1-ard.biesheuvel@linaro.org>
- <20190702164815.6341-3-ard.biesheuvel@linaro.org> <20190702215517.GA69157@gmail.com>
-In-Reply-To: <20190702215517.GA69157@gmail.com>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Wed, 3 Jul 2019 00:06:43 +0200
-Message-ID: <CAKv+Gu9qPPBpm7aocHCsid6yyL7HyX9Dk2M72A5W9OeHG58MZw@mail.gmail.com>
-Subject: Re: [PATCH v7 2/7] fs: crypto: invoke crypto API for ESSIV handling
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
+        Tue, 2 Jul 2019 20:38:05 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40596 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727099AbfGCAiF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 2 Jul 2019 20:38:05 -0400
+Received: from gmail.com (unknown [104.132.1.77])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id D91B1218DA;
+        Tue,  2 Jul 2019 22:11:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1562105482;
+        bh=Ed+V3TIIDTnClTbpLgAqUanLKLZrzlND7+0lmgD7UgU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=e75unzzTApuKpibxObNNHHIsTXMa08GNS/B+cyulbwsFQJ6iLSW3y16ZHdoB2liii
+         eYtJE7ZhJYo3YzU7UfiArfiCW0m5kd8Vr5xqDP2Undo7YVTViWbsv0DNsh5TxCismo
+         OAW1acBAxLzKrIV1CwF6uPQb8t6kpCv8sU5IOMmg=
+Date:   Tue, 2 Jul 2019 15:11:20 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Michal =?iso-8859-1?Q?Such=E1nek?= <msuchanek@suse.de>
+Cc:     linux-crypto@vger.kernel.org, chetjain@in.ibm.com,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        device-mapper development <dm-devel@redhat.com>,
-        linux-fscrypt@vger.kernel.org,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Milan Broz <gmazyland@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+        "David S. Miller" <davem@davemloft.net>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: algapi - guard against uninitialized spawn list
+ in crypto_remove_spawns
+Message-ID: <20190702221119.GB69157@gmail.com>
+References: <20190625071624.27039-1-msuchanek@suse.de>
+ <20190625164052.GA81914@gmail.com>
+ <20190701153154.1569c2dc@kitsune.suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190701153154.1569c2dc@kitsune.suse.cz>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 2 Jul 2019 at 23:55, Eric Biggers <ebiggers@kernel.org> wrote:
->
-> Hi Ard,
->
-> On Tue, Jul 02, 2019 at 06:48:10PM +0200, Ard Biesheuvel wrote:
-> > Instead of open coding the calculations for ESSIV handling, use a
-> > ESSIV skcipher which does all of this under the hood.
-> >
-> > Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> > ---
-> >  fs/crypto/Kconfig           |  1 +
-> >  fs/crypto/crypto.c          |  5 --
-> >  fs/crypto/fscrypt_private.h |  9 --
-> >  fs/crypto/keyinfo.c         | 95 +-------------------
-> >  4 files changed, 5 insertions(+), 105 deletions(-)
-> >
-> > diff --git a/fs/crypto/Kconfig b/fs/crypto/Kconfig
-> > index 24ed99e2eca0..b0292da8613c 100644
-> > --- a/fs/crypto/Kconfig
-> > +++ b/fs/crypto/Kconfig
-> > @@ -5,6 +5,7 @@ config FS_ENCRYPTION
-> >       select CRYPTO_AES
-> >       select CRYPTO_CBC
-> >       select CRYPTO_ECB
-> > +     select CRYPTO_ESSIV
-> >       select CRYPTO_XTS
-> >       select CRYPTO_CTS
-> >       select CRYPTO_SHA256
-> > diff --git a/fs/crypto/crypto.c b/fs/crypto/crypto.c
-> > index 335a362ee446..c53ce262a06c 100644
-> > --- a/fs/crypto/crypto.c
-> > +++ b/fs/crypto/crypto.c
-> > @@ -136,9 +136,6 @@ void fscrypt_generate_iv(union fscrypt_iv *iv, u64 lblk_num,
-> >
-> >       if (ci->ci_flags & FS_POLICY_FLAG_DIRECT_KEY)
-> >               memcpy(iv->nonce, ci->ci_nonce, FS_KEY_DERIVATION_NONCE_SIZE);
-> > -
-> > -     if (ci->ci_essiv_tfm != NULL)
-> > -             crypto_cipher_encrypt_one(ci->ci_essiv_tfm, iv->raw, iv->raw);
-> >  }
-> >
-> >  int fscrypt_do_page_crypto(const struct inode *inode, fscrypt_direction_t rw,
-> > @@ -492,8 +489,6 @@ static void __exit fscrypt_exit(void)
-> >               destroy_workqueue(fscrypt_read_workqueue);
-> >       kmem_cache_destroy(fscrypt_ctx_cachep);
-> >       kmem_cache_destroy(fscrypt_info_cachep);
-> > -
-> > -     fscrypt_essiv_cleanup();
-> >  }
-> >  module_exit(fscrypt_exit);
-> >
-> > diff --git a/fs/crypto/fscrypt_private.h b/fs/crypto/fscrypt_private.h
-> > index 7da276159593..59d0cba9cfb9 100644
-> > --- a/fs/crypto/fscrypt_private.h
-> > +++ b/fs/crypto/fscrypt_private.h
-> > @@ -61,12 +61,6 @@ struct fscrypt_info {
-> >       /* The actual crypto transform used for encryption and decryption */
-> >       struct crypto_skcipher *ci_ctfm;
-> >
-> > -     /*
-> > -      * Cipher for ESSIV IV generation.  Only set for CBC contents
-> > -      * encryption, otherwise is NULL.
-> > -      */
-> > -     struct crypto_cipher *ci_essiv_tfm;
-> > -
-> >       /*
-> >        * Encryption mode used for this inode.  It corresponds to either
-> >        * ci_data_mode or ci_filename_mode, depending on the inode type.
-> > @@ -166,9 +160,6 @@ struct fscrypt_mode {
-> >       int keysize;
-> >       int ivsize;
-> >       bool logged_impl_name;
-> > -     bool needs_essiv;
-> >  };
-> >
-> > -extern void __exit fscrypt_essiv_cleanup(void);
-> > -
-> >  #endif /* _FSCRYPT_PRIVATE_H */
-> > diff --git a/fs/crypto/keyinfo.c b/fs/crypto/keyinfo.c
-> > index dcd91a3fbe49..f39667d4316a 100644
-> > --- a/fs/crypto/keyinfo.c
-> > +++ b/fs/crypto/keyinfo.c
-> > @@ -13,14 +13,10 @@
-> >  #include <linux/hashtable.h>
-> >  #include <linux/scatterlist.h>
-> >  #include <linux/ratelimit.h>
-> > -#include <crypto/aes.h>
-> >  #include <crypto/algapi.h>
-> > -#include <crypto/sha.h>
-> >  #include <crypto/skcipher.h>
-> >  #include "fscrypt_private.h"
-> >
-> > -static struct crypto_shash *essiv_hash_tfm;
-> > -
-> >  /* Table of keys referenced by FS_POLICY_FLAG_DIRECT_KEY policies */
-> >  static DEFINE_HASHTABLE(fscrypt_master_keys, 6); /* 6 bits = 64 buckets */
-> >  static DEFINE_SPINLOCK(fscrypt_master_keys_lock);
-> > @@ -144,10 +140,9 @@ static struct fscrypt_mode available_modes[] = {
-> >       },
-> >       [FS_ENCRYPTION_MODE_AES_128_CBC] = {
-> >               .friendly_name = "AES-128-CBC",
-> > -             .cipher_str = "cbc(aes)",
-> > +             .cipher_str = "essiv(cbc(aes),aes,sha256)",
-> >               .keysize = 16,
-> > -             .ivsize = 16,
-> > -             .needs_essiv = true,
-> > +             .ivsize = 8,
->
-> As I said before, this needs to be kept as .ivsize = 16.
->
-> This bug actually causes the generic/549 test to fail.
->
+On Mon, Jul 01, 2019 at 03:31:54PM +0200, Michal Suchánek wrote:
+> On Tue, 25 Jun 2019 09:40:54 -0700
+> Eric Biggers <ebiggers@kernel.org> wrote:
+> 
+> > Hi Michal,
+> > 
+> > On Tue, Jun 25, 2019 at 09:16:24AM +0200, Michal Suchanek wrote:
+> > > Reportedly on Linux 4.12 the LTP testsuite crashes at pcrypt_aead01 infrequently.
+> > > 
+> > > To get it reproduce more frequently I tried
+> > > 
+> > > n=0 ; while true ; do /opt/ltp/testcases/bin/pcrypt_aead01 >& /dev/null ; n=$(expr $n + 1) ; echo -ne $n\\r ; done
+> > > 
+> > > but this is quite stable. However, holding ^C in the terminal where the loop is running tends to trigger the crash.
+> > > 
+> 
+> > > 
+> > > The code looks like this:
+> > > 
+> > >    0xc000000000520e10 <+0>:     c8 00 4c 3c     addis   r2,r12,200
+> > >    0xc000000000520e14 <+4>:     f0 9b 42 38     addi    r2,r2,-25616
+> > >    0xc000000000520e18 <+8>:     a6 02 08 7c     mflr    r0
+> > >    0xc000000000520e1c <+12>:    00 00 00 60     nop
+> > >    0xc000000000520e20 <+16>:    79 2b ab 7c     mr.     r11,r5
+> > >    0xc000000000520e24 <+20>:    f0 ff c1 fb     std     r30,-16(r1)
+> > >    0xc000000000520e28 <+24>:    e8 ff a1 fb     std     r29,-24(r1)
+> > >    0xc000000000520e2c <+28>:    f8 ff e1 fb     std     r31,-8(r1)
+> > >    0xc000000000520e30 <+32>:    91 ff 21 f8     stdu    r1,-112(r1)
+> > >    0xc000000000520e34 <+36>:    78 1b 69 7c     mr      r9,r3
+> > >    0xc000000000520e38 <+40>:    78 23 9e 7c     mr      r30,r4
+> > >    0xc000000000520e3c <+44>:    08 00 82 41     beq     0xc000000000520e44 <crypto_remove_spawns+52>
+> > >    0xc000000000520e40 <+48>:    78 5b 69 7d     mr      r9,r11
+> > >    0xc000000000520e44 <+52>:    40 00 e1 3b     addi    r31,r1,64
+> > >    0xc000000000520e48 <+56>:    30 00 c1 38     addi    r6,r1,48
+> > >  # 0xc000000000520e4c <+60>:    10 00 43 e9     ld      r10,16(r3)
+> > >    0xc000000000520e50 <+64>:    20 00 a9 83     lwz     r29,32(r9)
+> > >    0xc000000000520e54 <+68>:    20 00 a1 38     addi    r5,r1,32
+> > >    0xc000000000520e58 <+72>:    40 00 e1 fb     std     r31,64(r1)
+> > >    0xc000000000520e5c <+76>:    48 00 e1 fb     std     r31,72(r1)
+> > >    0xc000000000520e60 <+80>:    30 00 c1 f8     std     r6,48(r1)
+> > >    0xc000000000520e64 <+84>:    38 00 c1 f8     std     r6,56(r1)
+> > >    0xc000000000520e68 <+88>:    20 00 a1 f8     std     r5,32(r1)
+> > >    0xc000000000520e6c <+92>:    28 00 a1 f8     std     r5,40(r1)
+> > >    0xc000000000520e70 <+96>:    10 00 03 38     addi    r0,r3,16
+> > >  & 0xc000000000520e74 <+100>:   40 50 a0 7f     cmpld   cr7,r0,r10
+> > >    0xc000000000520e78 <+104>:   78 53 47 7d     mr      r7,r10
+> > >  * 0xc000000000520e7c <+108>:   00 00 0a e9     ld      r8,0(r10)
+> > >    0xc000000000520e80 <+112>:   64 00 9e 41     beq     cr7,0xc000000000520ee4 <crypto_remove_spawns+212>
+> > > 
+> > >  #) This looks like alg->cra_users.next is loaded to r10
+> > >  &) This looks like r10 is compared with &alg->cra_users calculated on the line
+> > >     above to terminate the loop
+> > >  *) This looks like *alg->cra_users.next loaded into r8 which causes the null
+> > >     pointer dereference
+> > > 
+> > > So the fixup needs to be applied to the first dereference of
+> > > alg->cra_users.next as well to prevent crash.
+> > > 
+> > > Fixes: 9a00674213a3 ("crypto: algapi - fix NULL dereference in crypto_remove_spawns()")
+> > > 
+> > > Reported-by: chetjain@in.ibm.com
+> 
+> > 
+> > The stack trace shows that crypto_remove_spawns() is being called from
+> > crypto_unregister_instance().  Therefore, the instance should already be
+> > registered and have initialized cra_users.  Now, I don't claim to understand the
+> > spawn lists stuff that well, so I could have missed something; but if there *is*
+> > a bug, I'd like to see a proper explanation.
+> > 
+> > Did you check whether this is actually reproducible on mainline, and not just
+> > the SUSE v4.12 based kernel?
+> 
+> This is the crash with mainline:
+> 
+> BUG: Kernel NULL pointer dereference at 0x00000000
+> Faulting instruction address: 0xc0000000005bb280
+> Oops: Kernel access of bad area, sig: 11 [#1]
+> LE PAGE_SIZE=64K MMU=Hash SMP NR_CPUS=2048 NUMA pSeries
+> Modules linked in: authenc pcrypt crypto_user kvm_pr kvm ebtable_filter ebtables ip6table_filter ip6_tables iptable_filter ip_tables x_tables af_packet ibmveth(xX) vmx_crypto rtc_generic gf128mul btrfs libcrc32c xor zstd_decompress(nN) zstd_compress(nN) raid6_pq sd_mod sg dm_multipath dm_mod ibmvscsi(xX) scsi_dh_rdac scsi_dh_emc scsi_transport_srp scsi_dh_alua crc32c_vpmsum scsi_mod autofs4
+> Supported: No, Unreleased kernel
+> CPU: 6 PID: 24816 Comm: pcrypt_aead01 Kdump: loaded Tainted: G                  5.2.0-rc6-11.g9d2be15-default #1 SLE15 (unreleased)
+> NIP:  c0000000005bb280 LR: c0000000005bc108 CTR: c0000000005bc0b0
+> REGS: c0000005b574b590 TRAP: 0300   Tainted: G                   (5.2.0-rc6-11.g9d2be15-default)
+> MSR:  8000000000009033 <SF,EE,ME,IR,DR,RI,LE>  CR: 44002840  XER: 20040000
+> CFAR: c00000000000e244 DAR: 0000000000000000 DSISR: 40000000 IRQMASK: 0
+> GPR00: c0000000005bc108 c0000005b574b820 c000000001406900 c0000005b2eabc00
+> GPR04: c0000005b574b8b0 0000000000000000 c0000005b574b850 0000000000000000
+> GPR08: 0000000000000000 c0000005b2eabc00 ffffffff00000001 c0000005b574b860
+> GPR12: c0000005b2eabc10 c000000007fa7800 0000000131b90ee0 00007fffc975b748
+> GPR16: 0000000131bb2d80 0000000131bb2d88 00007fffc975b5e0 00007fffc975b5d4
+> GPR20: 00007fffc975b628 00007fffc975b5f0 0000000000000010 0000000000000000
+> GPR24: 0000000000000000 0000000000000000 fffffffffffff000 0000000000000000
+> GPR28: c0000005b574b8b0 0000000000000cb3 c0000000013366f8 c0000005b574b840
+> CFAR: c00000000000e244 DAR: 0000000000000000 DSISR: 40000000 IRQMASK: 0
+> GPR00: c0000000005bc108 c0000005b574b820 c000000001406900 c0000005b2eabc00
+> GPR04: c0000005b574b8b0 0000000000000000 c0000005b574b850 0000000000000000
+> GPR08: 0000000000000000 c0000005b2eabc00 ffffffff00000001 c0000005b574b860
+> GPR12: c0000005b2eabc10 c000000007fa7800 0000000131b90ee0 00007fffc975b748
+> GPR16: 0000000131bb2d80 0000000131bb2d88 00007fffc975b5e0 00007fffc975b5d4
+> GPR20: 00007fffc975b628 00007fffc975b5f0 0000000000000010 0000000000000000
+> GPR24: 0000000000000000 0000000000000000 fffffffffffff000 0000000000000000
+> GPR28: c0000005b574b8b0 0000000000000cb3 c0000000013366f8 c0000005b574b840
+> NIP [c0000000005bb280] crypto_remove_spawns+0x70/0x2e0
+> LR [c0000000005bc108] crypto_unregister_instance+0x58/0xa0
+> Call Trace:
+> [c0000005b574b820] [000000000000000c] 0xc (unreliable)
+> [c0000005b574b890] [fffffffffffff000] 0xfffffffffffff000
+> [c0000005b574b8d0] [c0080000048811c4] crypto_del_alg+0xdc/0x110 [crypto_user]
+> [c0000005b574b900] [c0080000048802b8] crypto_user_rcv_msg+0xe0/0x270 [crypto_user]
+> [c0000005b574ba00] [c00000000095d8e4] netlink_rcv_skb+0x84/0x1a0
+> [c0000005b574ba70] [c008000004880074] crypto_netlink_rcv+0x4c/0x80 [crypto_user]
+> [c0000005b574baa0] [c00000000095ce1c] netlink_unicast+0x1dc/0x2a0
+> [c0000005b574bb00] [c00000000095d25c] netlink_sendmsg+0x20c/0x430
+> [c0000005b574bba0] [c0000000008a09d0] sock_sendmsg+0x60/0x90
+> [c0000005b574bbd0] [c0000000008a151c] ___sys_sendmsg+0x31c/0x370
+> [c0000005b574bd80] [c0000000008a320c] __sys_sendmsg+0x6c/0xe0
+> [c0000005b574be20] [c00000000000b688] system_call+0x5c/0x70
+> Instruction dump:
+> e9030010 83a90020 39610040 fbe10020 fbe10028 f8c10030 f8c10038 f9610040
+> f9610048 39830010 7c2c4040 7d074378 <e9480000> 41820060 60000000 60000000
+> ---[ end trace 4ff8403d5fbae222 ]---
+> 
+> Attaching config and dmesg.
+> 
 
-Ugh, yes, I intended to fix that. Apologies for the sloppiness, I have
-been trying to wrap this up in time for my holidays, but the end
-result is quite the opposite :-)
+Thanks, I was able to reproduce this, and I came up with a different fix.
 
-> Otherwise this patch looks good.  FYI: to avoid conflicts with planned fscrypt
-> work I'd prefer to take this patch through the fscrypt.git tree after the ESSIV
-> template is merged, rather than have Herbert take it through cryptodev.  (Unless
-> he's going to apply this whole series for v5.3, in which case I'm fine with him
-> taking the fscrypt patch too, though it seems too late for that.)
->
+I sent it out, but for some reason it doesn't seem to have reached any of the
+lists...  If I still don't see after a little while, I'll resend it.
 
-I agree that the fscrypt and dm-crypt changes should not be merged for v5.3
-
-I know that Herbert typically prefers not to take any new code without
-any of its users, but perhaps we can make an exception in this case,
-and merge patches #1, #5, #6 and #7 now (which is mostly risk free
-since no code uses essiv yet, and patch #5 is a straight-forward
-refactor) and take the fscrypt and dm-crypt patches through their
-respective trees for the next cycle.
+- Eric
