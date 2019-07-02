@@ -2,110 +2,191 @@ Return-Path: <SRS0=EZcf=VA=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.5 required=3.0 tests=DATE_IN_PAST_03_06,
+	DKIMWL_WL_MED,DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06F5FC06511
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 00:58:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B222BC5B57D
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 01:20:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D3A9B20828
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 00:58:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1562115495;
-	bh=ZncPmqJjQ5p8Nzi6KA3tSryklHFPA1+D6VokdeGHa28=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=1G/m4Qy7i5w5mggri45F7E8KDRf1AVb/2fUH1LBaaEZ8w0plYuwnyqGzxt4yZw2iy
-	 JTb2UnCWUn+ZWYPT1eJRWSbLDQZ8Waa/lebTcJnqVL5PkzAAazOP/uEUnQ0RwJI89i
-	 amq5UBR6nmT8OpNEj8rbejnd2kP0bXu4PtTNenFc=
+	by mail.kernel.org (Postfix) with ESMTP id 8B2CB2064A
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 01:20:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HFTGEtAH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727124AbfGCA6G (ORCPT
+        id S1727219AbfGCBUm (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 2 Jul 2019 20:58:06 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49336 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727089AbfGCA6F (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 2 Jul 2019 20:58:05 -0400
-Received: from ebiggers-linuxstation.mtv.corp.google.com (unknown [104.132.1.77])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id BC2DD20449;
-        Tue,  2 Jul 2019 21:18:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1562102286;
-        bh=ZncPmqJjQ5p8Nzi6KA3tSryklHFPA1+D6VokdeGHa28=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=SB5zOgdMv5+0+Y00OB/l2Jsui1egnX0iDRToH0chu73SQDnspeXPnukhhoEmUrnLn
-         1J+BRo9A3r/sqHCxARyy5JjA32jtlBzB0ijOU2DU7SGrhcMqqdeMDKnGYa4XxgYNle
-         NM7aJFyBE6dbHGDyiqMab5d1sEPNEWHorvFmP4uM=
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     chetjain@in.ibm.com, "David S . Miller" <davem@davemloft.net>,
-        linux-kernel@vger.kernel.org, Michal Suchanek <msuchanek@suse.de>,
-        stable@vger.kernel.org,
-        Steffen Klassert <steffen.klassert@secunet.com>
-Subject: [PATCH] crypto: user - prevent operating on larval algorithms
-Date:   Tue,  2 Jul 2019 14:17:00 -0700
-Message-Id: <20190702211700.16526-1-ebiggers@kernel.org>
+        Tue, 2 Jul 2019 21:20:42 -0400
+Received: from mail-pg1-f202.google.com ([209.85.215.202]:45406 "EHLO
+        mail-pg1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726329AbfGCBUk (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 2 Jul 2019 21:20:40 -0400
+Received: by mail-pg1-f202.google.com with SMTP id n7so513866pgr.12
+        for <linux-crypto@vger.kernel.org>; Tue, 02 Jul 2019 18:20:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=5pef2FmAnlM+QWRsh4dTLRGQILNCjv4NmeuYpQBmgEA=;
+        b=HFTGEtAH+TiPSW0rjw3Mi+iJdcR98StRYDiH88gvvbwa6f/D0j8dTS7RXBv9w26MId
+         SfRPUxiljRg2yh/fQ558NrAbM/8elfRqhcdJN7x+tYTwZLmQF5OP8LhDnGk7JqPqjWLv
+         tqLWCH1zVSyWQScYIQqJvuxzO8AIdqWbBGpEyzdKtT6f9cPh27ACMxAYZDSz5AapvhWu
+         rT73tfO1uup3LaVGb7e/lEjey5r3LN2IyH48iSwKeg5xGL3gNg9GazedobtHrspjH//R
+         4XAHipiFE8qrM8hVBXabL16ovb1CDR1dB9xbE+1QJMlpZrm++PKrVQMqTtvTBrSWkrWZ
+         sjXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=5pef2FmAnlM+QWRsh4dTLRGQILNCjv4NmeuYpQBmgEA=;
+        b=SIHEKodz/ptKajeVJd6llmvlVq7vRDxe61mpebVxUb7Z8N0W+yHuDGYEWvSdc7ghbE
+         oVQAvhqgA2b//ReJc7zebFMhorMKiNFTIIrgDphuI0NnBe1YBYnHJdKL7M8NAFZFgavQ
+         alDizK4GpkSfM2oIXQyGKo56E6iRIUk0KIvOYpKEO8c9Rff61kacKJtFVyKUAD037y5G
+         fXg+MGBZUsMBT24V235NgjFoVvLjah5kfXD72YosOe/GGQmDiatE5XrV92RWXXtgbl1O
+         YjonHpGcmps8mwRDS/VKEVxRAirbWDuYpRLX5upfql/Pi2yry4qLkwIDtvlykp2HiEG2
+         YXXw==
+X-Gm-Message-State: APjAAAVHWUZfjiFlTolTu8GnjZvjwo+rqvQX8zlNRoP2KTrcKH1o8lQm
+        4SKHSYPV6VRwgiqYT+F7fe3GR0UfqwbZ1hI=
+X-Google-Smtp-Source: APXvYqyGy2X1QyFInWll9cR9+qCKZirNRmZ7tB0RIVjS53rewNqC45t5w4HsIlrc5nNmfd1XHbj1RJqDHbSXSc0=
+X-Received: by 2002:a63:e250:: with SMTP id y16mr32019623pgj.392.1562105829343;
+ Tue, 02 Jul 2019 15:17:09 -0700 (PDT)
+Date:   Tue,  2 Jul 2019 15:16:02 -0700
+Message-Id: <20190702221602.120879-1-hannahpan@google.com>
+Mime-Version: 1.0
 X-Mailer: git-send-email 2.22.0.410.gd8fdbe21b5-goog
-In-Reply-To: <20190701153154.1569c2dc@kitsune.suse.cz>
-References: <20190701153154.1569c2dc@kitsune.suse.cz>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Subject: [PATCH] crypto: testmgr - add tests for lzo-rle
+From:   Hannah Pan <hannahpan@google.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org
+Cc:     Dave Rodgman <dave.rodgman@arm.com>,
+        Hannah Pan <hannahpan@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+Add self-tests for the lzo-rle algorithm.
 
-Michal Suchanek reported [1] that running the pcrypt_aead01 test from
-LTP [2] in a loop and holding Ctrl-C causes a NULL dereference of
-alg->cra_users.next in crypto_remove_spawns(), via crypto_del_alg().
-The test repeatedly uses CRYPTO_MSG_NEWALG and CRYPTO_MSG_DELALG.
-
-The crash occurs when the instance that CRYPTO_MSG_DELALG is trying to
-unregister isn't a real registered algorithm, but rather is a "test
-larval", which is a special "algorithm" added to the algorithms list
-while the real algorithm is still being tested.  Larvals don't have
-initialized cra_users, so that causes the crash.  Normally pcrypt_aead01
-doesn't trigger this because CRYPTO_MSG_NEWALG waits for the algorithm
-to be tested; however, CRYPTO_MSG_NEWALG returns early when interrupted.
-
-Everything else in the "crypto user configuration" API has this same bug
-too, i.e. it inappropriately allows operating on larval algorithms
-(though it doesn't look like the other cases can cause a crash).
-
-Fix this by making crypto_alg_match() exclude larval algorithms.
-
-[1] https://lkml.kernel.org/r/20190625071624.27039-1-msuchanek@suse.de
-[2] https://github.com/linux-test-project/ltp/blob/20190517/testcases/kernel/crypto/pcrypt_aead01.c
-
-Reported-by: Michal Suchanek <msuchanek@suse.de>
-Fixes: a38f7907b926 ("crypto: Add userspace configuration API")
-Cc: <stable@vger.kernel.org> # v3.2+
-Cc: Steffen Klassert <steffen.klassert@secunet.com>
-Signed-off-by: Eric Biggers <ebiggers@google.com>
+Signed-off-by: Hannah Pan <hannahpan@google.com>
 ---
- crypto/crypto_user_base.c | 3 +++
- 1 file changed, 3 insertions(+)
+ crypto/testmgr.c | 10 ++++++
+ crypto/testmgr.h | 80 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 90 insertions(+)
 
-diff --git a/crypto/crypto_user_base.c b/crypto/crypto_user_base.c
-index e48da3b75c71d4..a89fcc530092a8 100644
---- a/crypto/crypto_user_base.c
-+++ b/crypto/crypto_user_base.c
-@@ -56,6 +56,9 @@ struct crypto_alg *crypto_alg_match(struct crypto_user_alg *p, int exact)
- 	list_for_each_entry(q, &crypto_alg_list, cra_list) {
- 		int match = 0;
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 658a7eeebab2..c8a2fd96384d 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -4437,6 +4437,16 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 				.decomp = __VECS(lzo_decomp_tv_template)
+ 			}
+ 		}
++	}, {
++		.alg = "lzo-rle",
++		.test = alg_test_comp,
++		.fips_allowed = 1,
++		.suite = {
++			.comp = {
++				.comp = __VECS(lzorle_comp_tv_template),
++				.decomp = __VECS(lzorle_decomp_tv_template)
++			}
++		}
+ 	}, {
+ 		.alg = "md4",
+ 		.test = alg_test_hash,
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index 1fdae5993bc3..e7f71df2386e 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -32454,6 +32454,86 @@ static const struct comp_testvec lzo_decomp_tv_template[] = {
+ 	},
+ };
  
-+		if (crypto_is_larval(q))
-+			continue;
++static const struct comp_testvec lzorle_comp_tv_template[] = {
++	{
++		.inlen	= 70,
++		.outlen	= 59,
++		.input	= "Join us now and share the software "
++			"Join us now and share the software ",
++		.output	= "\x11\x01\x00\x0d\x4a\x6f\x69\x6e"
++			  "\x20\x75\x73\x20\x6e\x6f\x77\x20"
++			  "\x61\x6e\x64\x20\x73\x68\x61\x72"
++			  "\x65\x20\x74\x68\x65\x20\x73\x6f"
++			  "\x66\x74\x77\x70\x01\x32\x88\x00"
++			  "\x0c\x65\x20\x74\x68\x65\x20\x73"
++			  "\x6f\x66\x74\x77\x61\x72\x65\x20"
++			  "\x11\x00\x00",
++	}, {
++		.inlen	= 159,
++		.outlen	= 133,
++		.input	= "This document describes a compression method based on the LZO "
++			"compression algorithm.  This document defines the application of "
++			"the LZO algorithm used in UBIFS.",
++		.output	= "\x11\x01\x00\x2c\x54\x68\x69\x73"
++			  "\x20\x64\x6f\x63\x75\x6d\x65\x6e"
++			  "\x74\x20\x64\x65\x73\x63\x72\x69"
++			  "\x62\x65\x73\x20\x61\x20\x63\x6f"
++			  "\x6d\x70\x72\x65\x73\x73\x69\x6f"
++			  "\x6e\x20\x6d\x65\x74\x68\x6f\x64"
++			  "\x20\x62\x61\x73\x65\x64\x20\x6f"
++			  "\x6e\x20\x74\x68\x65\x20\x4c\x5a"
++			  "\x4f\x20\x2a\x8c\x00\x09\x61\x6c"
++			  "\x67\x6f\x72\x69\x74\x68\x6d\x2e"
++			  "\x20\x20\x2e\x54\x01\x03\x66\x69"
++			  "\x6e\x65\x73\x20\x74\x06\x05\x61"
++			  "\x70\x70\x6c\x69\x63\x61\x74\x76"
++			  "\x0a\x6f\x66\x88\x02\x60\x09\x27"
++			  "\xf0\x00\x0c\x20\x75\x73\x65\x64"
++			  "\x20\x69\x6e\x20\x55\x42\x49\x46"
++			  "\x53\x2e\x11\x00\x00",
++	},
++};
 +
- 		if ((q->cra_flags ^ p->cru_type) & p->cru_mask)
- 			continue;
- 
++static const struct comp_testvec lzorle_decomp_tv_template[] = {
++	{
++		.inlen	= 133,
++		.outlen	= 159,
++		.input	= "\x00\x2b\x54\x68\x69\x73\x20\x64"
++			  "\x6f\x63\x75\x6d\x65\x6e\x74\x20"
++			  "\x64\x65\x73\x63\x72\x69\x62\x65"
++			  "\x73\x20\x61\x20\x63\x6f\x6d\x70"
++			  "\x72\x65\x73\x73\x69\x6f\x6e\x20"
++			  "\x6d\x65\x74\x68\x6f\x64\x20\x62"
++			  "\x61\x73\x65\x64\x20\x6f\x6e\x20"
++			  "\x74\x68\x65\x20\x4c\x5a\x4f\x2b"
++			  "\x8c\x00\x0d\x61\x6c\x67\x6f\x72"
++			  "\x69\x74\x68\x6d\x2e\x20\x20\x54"
++			  "\x68\x69\x73\x2a\x54\x01\x02\x66"
++			  "\x69\x6e\x65\x73\x94\x06\x05\x61"
++			  "\x70\x70\x6c\x69\x63\x61\x74\x76"
++			  "\x0a\x6f\x66\x88\x02\x60\x09\x27"
++			  "\xf0\x00\x0c\x20\x75\x73\x65\x64"
++			  "\x20\x69\x6e\x20\x55\x42\x49\x46"
++			  "\x53\x2e\x11\x00\x00",
++		.output	= "This document describes a compression method based on the LZO "
++			"compression algorithm.  This document defines the application of "
++			"the LZO algorithm used in UBIFS.",
++	}, {
++		.inlen	= 59,
++		.outlen	= 70,
++		.input	= "\x11\x01\x00\x0d\x4a\x6f\x69\x6e"
++			  "\x20\x75\x73\x20\x6e\x6f\x77\x20"
++			  "\x61\x6e\x64\x20\x73\x68\x61\x72"
++			  "\x65\x20\x74\x68\x65\x20\x73\x6f"
++			  "\x66\x74\x77\x70\x01\x32\x88\x00"
++			  "\x0c\x65\x20\x74\x68\x65\x20\x73"
++			  "\x6f\x66\x74\x77\x61\x72\x65\x20"
++			  "\x11\x00\x00",
++		.output	= "Join us now and share the software "
++			"Join us now and share the software ",
++	},
++};
++
+ /*
+  * Michael MIC test vectors from IEEE 802.11i
+  */
 -- 
 2.22.0.410.gd8fdbe21b5-goog
 
