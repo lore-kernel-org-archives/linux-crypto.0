@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8DE3C06510
-	for <linux-crypto@archiver.kernel.org>; Tue,  2 Jul 2019 19:42:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFFE8C06511
+	for <linux-crypto@archiver.kernel.org>; Tue,  2 Jul 2019 19:42:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A68BC21850
-	for <linux-crypto@archiver.kernel.org>; Tue,  2 Jul 2019 19:42:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CE3D121850
+	for <linux-crypto@archiver.kernel.org>; Tue,  2 Jul 2019 19:42:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JN9Jgah2"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gubS8BLH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727089AbfGBTml (ORCPT
+        id S1727092AbfGBTmm (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 2 Jul 2019 15:42:41 -0400
-Received: from mail-lf1-f66.google.com ([209.85.167.66]:41957 "EHLO
-        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727077AbfGBTml (ORCPT
+        Tue, 2 Jul 2019 15:42:42 -0400
+Received: from mail-lj1-f196.google.com ([209.85.208.196]:40428 "EHLO
+        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727069AbfGBTmm (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 2 Jul 2019 15:42:41 -0400
-Received: by mail-lf1-f66.google.com with SMTP id 62so2219768lfa.8
-        for <linux-crypto@vger.kernel.org>; Tue, 02 Jul 2019 12:42:39 -0700 (PDT)
+        Tue, 2 Jul 2019 15:42:42 -0400
+Received: by mail-lj1-f196.google.com with SMTP id a21so18169330ljh.7
+        for <linux-crypto@vger.kernel.org>; Tue, 02 Jul 2019 12:42:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=bK4LustB8GmckyS2nPrFKDpnC0XD07k3hKGC7VgrKjI=;
-        b=JN9Jgah2WGcVN504HWo6oO8sZaZHO954dgn+nY0MTg68xJHIiFTw5pIg31ihwH3nD8
-         Tb5T03mnm7Kn8YEhiFhsMMDyDBZR97UFbmZnULjgrlbst1/4ag0p/7H+/fAKNrEEsKm8
-         f4kIb8f8YWRYaWdQivY7rIL20c1D1mJWMp39+izc17g1wa4KhAy7TkWRANkk9NQF/8am
-         a1+VyrIoJ41DDSneKIWXBVI5fk2aWyDEaFYuNnGeBHCWHgHyhYEaTyV/pEH/NN966972
-         aVAlA72NPTCdQakDc9IIXh7YQJ3jvmMVWmf8siUWfWuUXLMr87EbcVk9vg9a4cQ633hB
-         8Zxw==
+        bh=VA1NX4OTJyuJ+sHjTv3EgQQCR56i+Qi8C4n3+5icP3I=;
+        b=gubS8BLHsB5NbC39fRYRNOlmUqVxLMuCXolIY+O+z7WZMFn4CibcpVlUlw0snTj7hC
+         S1MHCspjJWaQXoACWaw1T4lBLRAJyvLX55lbQcIwcU0Ji1DMdw32MZ5u3L4APxZICP5g
+         bWQ2CklluUVYKdYfJTOWou+0m7mp/aM38Fs29RdRaooiO2geHajp2L7lIVdKXlIbnAg5
+         sc9XlEZtoLMcsSi3QfBSYo7cUNvGn5PFmB6Tu1eb+TLp1Fl5Y2T/kyIcFpkQYC6Pxkjv
+         MMBA6H8Ebzxxj1uqw7SBZnDjXmYmsYF6eSSnJPMzA/UOl65abwHf8fjQ+Gu2Xjbx/Ac9
+         X5UA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=bK4LustB8GmckyS2nPrFKDpnC0XD07k3hKGC7VgrKjI=;
-        b=kN/+3vRIrU0f9q+hN/46ySYqPpj23Wo8ybPS5w+OrcIAKB8+7hID76IkLh7GyPfMvl
-         U1dkiTd40BQ43JFNEog+NtnnsNIo8IslQ8229ip96J0tdVNckcXqKbHmSa46ZiVsH5ge
-         8x0B8Ao9hiRZ4blIpoNPGbwEvJnwx7jIvWgeN+humVZldkMDUMTg8nfa8d1v2bm4Ryce
-         n/OYOqQe3F12/acfri7Ag9AlFZb4l7dNHNdMDYH8x8mJ/UWaQDOk+qrJ6mSbaE9gFcjN
-         wIy4c2OY33jv/exjkb/rPLSb/7n/ayYRaTw7TlXNkNcgRRwSk+F996EWwHjjy5xcZoh7
-         qN4w==
-X-Gm-Message-State: APjAAAVQq3Lip6aK7E3ztT2rH40SU6BzbZfEkx+8xfOdlop4Ryv7ujsR
-        m2qthOJoUbRdUbFfFYblTL5PVaaLkYGAEEK+
-X-Google-Smtp-Source: APXvYqw+y7neGtiKBmjeXYIYfiygRoJTckzZ00cCkks9eF1ri5QEmmWSgsHGNqPN1Axm3onldotXZA==
-X-Received: by 2002:a19:41cc:: with SMTP id o195mr14128017lfa.166.1562096558298;
-        Tue, 02 Jul 2019 12:42:38 -0700 (PDT)
+        bh=VA1NX4OTJyuJ+sHjTv3EgQQCR56i+Qi8C4n3+5icP3I=;
+        b=YjCHgmK2C1ePflwAxnfBw8aD0wDrUIpvT/wNbb/Kgbsr+SXC77n7yfIs6uYxjie//F
+         rlcux5rzH8JM1ZDo/RB7cKutbiDpOQW/EIwtkWjYIKuvnn3Q6ayHbsk54032smkk7LWr
+         5Ph+aNzVWalYZ8UGIunWFkO+CirjnO4Y5iuwaL2pjO24lYC06mM8aOxVMxHLAbUk+wcN
+         bLF/1eUo6KbHPVkfLhz+s+jvBBRiYS1TjtUm3W5GL0O0TXU+LGiFXXt6DBmlrL5iZevm
+         MEuWfwT6O6N7vsop7J9rFtH8sgmgUwOkaGrb7d4MWas5EM82bk1aLtbNqFTm1hMexhTW
+         otRA==
+X-Gm-Message-State: APjAAAXpZZcoKrm6X8sGCObcemXVpuGfLck8MpR/lpRU/0Bsjx+RUjZU
+        4mROwLKTK16vhan8LCdiLUgWsXYusvA++b1D
+X-Google-Smtp-Source: APXvYqzdgImVlrBqvJ1vOmmzyjkJ950xdrhvE7HMYshLLb1AlXMNnRVkQSqcrZ72csGuW/LPDyLh+A==
+X-Received: by 2002:a2e:5d46:: with SMTP id r67mr17553560ljb.187.1562096559561;
+        Tue, 02 Jul 2019 12:42:39 -0700 (PDT)
 Received: from e111045-lin.arm.com (89-212-78-239.static.t-2.net. [89.212.78.239])
-        by smtp.gmail.com with ESMTPSA id 24sm4475163ljs.63.2019.07.02.12.42.37
+        by smtp.gmail.com with ESMTPSA id 24sm4475163ljs.63.2019.07.02.12.42.38
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Tue, 02 Jul 2019 12:42:37 -0700 (PDT)
+        Tue, 02 Jul 2019 12:42:38 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     herbert@gondor.apana.org.au, ebiggers@google.com,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v4 21/32] crypto: arm/aes-neonbs - provide a synchronous version of ctr(aes)
-Date:   Tue,  2 Jul 2019 21:41:39 +0200
-Message-Id: <20190702194150.10405-22-ard.biesheuvel@linaro.org>
+Subject: [PATCH v4 22/32] crypto: arm/ghash - provide a synchronous version
+Date:   Tue,  2 Jul 2019 21:41:40 +0200
+Message-Id: <20190702194150.10405-23-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190702194150.10405-1-ard.biesheuvel@linaro.org>
 References: <20190702194150.10405-1-ard.biesheuvel@linaro.org>
@@ -70,124 +70,166 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-AES in CTR mode is used by modes such as GCM and CCM, which are often
-used in contexts where only synchronous ciphers are permitted. So
-provide a synchronous version of ctr(aes) based on the existing code.
-This requires a non-SIMD fallback to deal with invocations occurring
-from a context where SIMD instructions may not be used. We have a
-helper for this now in the AES library, so wire that up.
+GHASH is used by the GCM mode, which is often used in contexts where
+only synchronous ciphers are permitted. So provide a synchronous version
+of GHASH based on the existing code. This requires a non-SIMD fallback
+to deal with invocations occurring from a context where SIMD instructions
+may not be used.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm/crypto/aes-neonbs-glue.c | 65 ++++++++++++++++++++
- 1 file changed, 65 insertions(+)
+ arch/arm/crypto/ghash-ce-glue.c | 78 +++++++++++++-------
+ 1 file changed, 52 insertions(+), 26 deletions(-)
 
-diff --git a/arch/arm/crypto/aes-neonbs-glue.c b/arch/arm/crypto/aes-neonbs-glue.c
-index f43c9365b6a9..6eecdbb7e9b6 100644
---- a/arch/arm/crypto/aes-neonbs-glue.c
-+++ b/arch/arm/crypto/aes-neonbs-glue.c
-@@ -9,8 +9,10 @@
-  */
- 
+diff --git a/arch/arm/crypto/ghash-ce-glue.c b/arch/arm/crypto/ghash-ce-glue.c
+index 39d1ccec1aab..ebb237ca874b 100644
+--- a/arch/arm/crypto/ghash-ce-glue.c
++++ b/arch/arm/crypto/ghash-ce-glue.c
+@@ -12,6 +12,7 @@
  #include <asm/neon.h>
-+#include <asm/simd.h>
- #include <crypto/aes.h>
- #include <crypto/cbc.h>
-+#include <crypto/ctr.h>
+ #include <asm/simd.h>
+ #include <asm/unaligned.h>
++#include <crypto/b128ops.h>
+ #include <crypto/cryptd.h>
+ #include <crypto/internal/hash.h>
  #include <crypto/internal/simd.h>
- #include <crypto/internal/skcipher.h>
- #include <crypto/xts.h>
-@@ -57,6 +59,11 @@ struct aesbs_xts_ctx {
- 	struct crypto_cipher	*tweak_tfm;
+@@ -33,6 +34,8 @@ struct ghash_key {
+ 	u64	h2[2];
+ 	u64	h3[2];
+ 	u64	h4[2];
++
++	be128	k;
  };
  
-+struct aesbs_ctr_ctx {
-+	struct aesbs_ctx	key;		/* must be first member */
-+	struct crypto_aes_ctx	fallback;
-+};
-+
- static int aesbs_setkey(struct crypto_skcipher *tfm, const u8 *in_key,
- 			unsigned int key_len)
- {
-@@ -192,6 +199,25 @@ static void cbc_exit(struct crypto_tfm *tfm)
- 	crypto_free_cipher(ctx->enc_tfm);
+ struct ghash_desc_ctx {
+@@ -65,6 +68,36 @@ static int ghash_init(struct shash_desc *desc)
+ 	return 0;
  }
  
-+static int aesbs_ctr_setkey_sync(struct crypto_skcipher *tfm, const u8 *in_key,
-+				 unsigned int key_len)
++static void ghash_do_update(int blocks, u64 dg[], const char *src,
++			    struct ghash_key *key, const char *head)
 +{
-+	struct aesbs_ctr_ctx *ctx = crypto_skcipher_ctx(tfm);
-+	int err;
++	if (likely(crypto_simd_usable())) {
++		kernel_neon_begin();
++		pmull_ghash_update(blocks, dg, src, key, head);
++		kernel_neon_end();
++	} else {
++		be128 dst = { cpu_to_be64(dg[1]), cpu_to_be64(dg[0]) };
 +
-+	err = aes_expandkey(&ctx->fallback, in_key, key_len);
-+	if (err)
-+		return err;
++		do {
++			const u8 *in = src;
 +
-+	ctx->key.rounds = 6 + key_len / 4;
++			if (head) {
++				in = head;
++				blocks++;
++				head = NULL;
++			} else {
++				src += GHASH_BLOCK_SIZE;
++			}
 +
-+	kernel_neon_begin();
-+	aesbs_convert_key(ctx->key.rk, ctx->fallback.key_enc, ctx->key.rounds);
-+	kernel_neon_end();
++			crypto_xor((u8 *)&dst, in, GHASH_BLOCK_SIZE);
++			gf128mul_lle(&dst, &key->k);
++		} while (--blocks);
 +
-+	return 0;
++		dg[0] = be64_to_cpu(dst.b);
++		dg[1] = be64_to_cpu(dst.a);
++	}
 +}
 +
- static int ctr_encrypt(struct skcipher_request *req)
+ static int ghash_update(struct shash_desc *desc, const u8 *src,
+ 			unsigned int len)
  {
- 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-@@ -234,6 +260,29 @@ static int ctr_encrypt(struct skcipher_request *req)
- 	return err;
- }
+@@ -88,10 +121,8 @@ static int ghash_update(struct shash_desc *desc, const u8 *src,
+ 		blocks = len / GHASH_BLOCK_SIZE;
+ 		len %= GHASH_BLOCK_SIZE;
  
-+static void ctr_encrypt_one(struct crypto_skcipher *tfm, const u8 *src, u8 *dst)
-+{
-+	struct aesbs_ctr_ctx *ctx = crypto_skcipher_ctx(tfm);
-+	unsigned long flags;
-+
-+	/*
-+	 * Temporarily disable interrupts to avoid races where
-+	 * cachelines are evicted when the CPU is interrupted
-+	 * to do something else.
-+	 */
-+	local_irq_save(flags);
-+	aes_encrypt(&ctx->fallback, dst, src);
-+	local_irq_restore(flags);
-+}
-+
-+static int ctr_encrypt_sync(struct skcipher_request *req)
-+{
-+	if (!crypto_simd_usable())
-+		return crypto_ctr_encrypt_walk(req, ctr_encrypt_one);
-+
-+	return ctr_encrypt(req);
-+}
-+
- static int aesbs_xts_setkey(struct crypto_skcipher *tfm, const u8 *in_key,
- 			    unsigned int key_len)
+-		kernel_neon_begin();
+-		pmull_ghash_update(blocks, ctx->digest, src, key,
+-				   partial ? ctx->buf : NULL);
+-		kernel_neon_end();
++		ghash_do_update(blocks, ctx->digest, src, key,
++				partial ? ctx->buf : NULL);
+ 		src += blocks * GHASH_BLOCK_SIZE;
+ 		partial = 0;
+ 	}
+@@ -109,9 +140,7 @@ static int ghash_final(struct shash_desc *desc, u8 *dst)
+ 		struct ghash_key *key = crypto_shash_ctx(desc->tfm);
+ 
+ 		memset(ctx->buf + partial, 0, GHASH_BLOCK_SIZE - partial);
+-		kernel_neon_begin();
+-		pmull_ghash_update(1, ctx->digest, ctx->buf, key, NULL);
+-		kernel_neon_end();
++		ghash_do_update(1, ctx->digest, ctx->buf, key, NULL);
+ 	}
+ 	put_unaligned_be64(ctx->digest[1], dst);
+ 	put_unaligned_be64(ctx->digest[0], dst + 8);
+@@ -135,24 +164,25 @@ static int ghash_setkey(struct crypto_shash *tfm,
+ 			const u8 *inkey, unsigned int keylen)
  {
-@@ -361,6 +410,22 @@ static struct skcipher_alg aes_algs[] = { {
- 	.setkey			= aesbs_setkey,
- 	.encrypt		= ctr_encrypt,
- 	.decrypt		= ctr_encrypt,
-+}, {
-+	.base.cra_name		= "ctr(aes)",
-+	.base.cra_driver_name	= "ctr-aes-neonbs-sync",
-+	.base.cra_priority	= 250 - 1,
-+	.base.cra_blocksize	= 1,
-+	.base.cra_ctxsize	= sizeof(struct aesbs_ctr_ctx),
+ 	struct ghash_key *key = crypto_shash_ctx(tfm);
+-	be128 h, k;
++	be128 h;
+ 
+ 	if (keylen != GHASH_BLOCK_SIZE) {
+ 		crypto_shash_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
+ 		return -EINVAL;
+ 	}
+ 
+-	memcpy(&k, inkey, GHASH_BLOCK_SIZE);
+-	ghash_reflect(key->h, &k);
++	/* needed for the fallback */
++	memcpy(&key->k, inkey, GHASH_BLOCK_SIZE);
++	ghash_reflect(key->h, &key->k);
+ 
+-	h = k;
+-	gf128mul_lle(&h, &k);
++	h = key->k;
++	gf128mul_lle(&h, &key->k);
+ 	ghash_reflect(key->h2, &h);
+ 
+-	gf128mul_lle(&h, &k);
++	gf128mul_lle(&h, &key->k);
+ 	ghash_reflect(key->h3, &h);
+ 
+-	gf128mul_lle(&h, &k);
++	gf128mul_lle(&h, &key->k);
+ 	ghash_reflect(key->h4, &h);
+ 
+ 	return 0;
+@@ -165,15 +195,13 @@ static struct shash_alg ghash_alg = {
+ 	.final			= ghash_final,
+ 	.setkey			= ghash_setkey,
+ 	.descsize		= sizeof(struct ghash_desc_ctx),
+-	.base			= {
+-		.cra_name	= "__ghash",
+-		.cra_driver_name = "__driver-ghash-ce",
+-		.cra_priority	= 0,
+-		.cra_flags	= CRYPTO_ALG_INTERNAL,
+-		.cra_blocksize	= GHASH_BLOCK_SIZE,
+-		.cra_ctxsize	= sizeof(struct ghash_key),
+-		.cra_module	= THIS_MODULE,
+-	},
++
++	.base.cra_name		= "ghash",
++	.base.cra_driver_name	= "ghash-ce-sync",
++	.base.cra_priority	= 300 - 1,
++	.base.cra_blocksize	= GHASH_BLOCK_SIZE,
++	.base.cra_ctxsize	= sizeof(struct ghash_key),
 +	.base.cra_module	= THIS_MODULE,
-+
-+	.min_keysize		= AES_MIN_KEY_SIZE,
-+	.max_keysize		= AES_MAX_KEY_SIZE,
-+	.chunksize		= AES_BLOCK_SIZE,
-+	.walksize		= 8 * AES_BLOCK_SIZE,
-+	.ivsize			= AES_BLOCK_SIZE,
-+	.setkey			= aesbs_ctr_setkey_sync,
-+	.encrypt		= ctr_encrypt_sync,
-+	.decrypt		= ctr_encrypt_sync,
- }, {
- 	.base.cra_name		= "__xts(aes)",
- 	.base.cra_driver_name	= "__xts-aes-neonbs",
+ };
+ 
+ static int ghash_async_init(struct ahash_request *req)
+@@ -288,9 +316,7 @@ static int ghash_async_init_tfm(struct crypto_tfm *tfm)
+ 	struct cryptd_ahash *cryptd_tfm;
+ 	struct ghash_async_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
+-	cryptd_tfm = cryptd_alloc_ahash("__driver-ghash-ce",
+-					CRYPTO_ALG_INTERNAL,
+-					CRYPTO_ALG_INTERNAL);
++	cryptd_tfm = cryptd_alloc_ahash("ghash-ce-sync", 0, 0);
+ 	if (IS_ERR(cryptd_tfm))
+ 		return PTR_ERR(cryptd_tfm);
+ 	ctx->cryptd_tfm = cryptd_tfm;
 -- 
 2.17.1
 
