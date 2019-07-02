@@ -2,58 +2,59 @@ Return-Path: <SRS0=X5ob=U7=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87A8DC06510
-	for <linux-crypto@archiver.kernel.org>; Tue,  2 Jul 2019 16:48:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF4B3C06510
+	for <linux-crypto@archiver.kernel.org>; Tue,  2 Jul 2019 16:48:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 46D352063F
-	for <linux-crypto@archiver.kernel.org>; Tue,  2 Jul 2019 16:48:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7DC662089C
+	for <linux-crypto@archiver.kernel.org>; Tue,  2 Jul 2019 16:48:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NIJMyvki"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zgHsWq06"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726642AbfGBQsc (ORCPT
+        id S1726591AbfGBQsf (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 2 Jul 2019 12:48:32 -0400
-Received: from mail-lf1-f65.google.com ([209.85.167.65]:33356 "EHLO
-        mail-lf1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726046AbfGBQsc (ORCPT
+        Tue, 2 Jul 2019 12:48:35 -0400
+Received: from mail-lf1-f68.google.com ([209.85.167.68]:46979 "EHLO
+        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726664AbfGBQse (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 2 Jul 2019 12:48:32 -0400
-Received: by mail-lf1-f65.google.com with SMTP id y17so11921806lfe.0
-        for <linux-crypto@vger.kernel.org>; Tue, 02 Jul 2019 09:48:30 -0700 (PDT)
+        Tue, 2 Jul 2019 12:48:34 -0400
+Received: by mail-lf1-f68.google.com with SMTP id z15so11867696lfh.13
+        for <linux-crypto@vger.kernel.org>; Tue, 02 Jul 2019 09:48:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id;
-        bh=n1MiZRQXY1X5/1Lfb3V7ryug15xS4eKlSLkntpBu3p8=;
-        b=NIJMyvki0ukOG2yDafz+vzWNfARdo8Xk/QtUd/vJ7S0VvPLvYhtPx+yljhwzrIwBgp
-         ZHrdkqMPUVVi/CvG+sI1nJuPrW9eu6gdPDCtrLf/KAs9oULJ5LVZ6xmwcU3gggS1V3YX
-         RRQfRx4AnhZfszYn+TgMjNuMWUqMe1rQtWczE8wooWj9HNx+wi9t6Z2XAHVSqmm/NZys
-         toRno9eyuR3rnF1tV4J39kZksTHQKYXCBpCBLXmz+d+ZhJedVQ9rDmk3WZXZYkL3b3BF
-         6OkSPIxoH6OxV8W9DJmweixQrtpwwtogPYtbIuNprMVTPmDNQEQehjmxF5tYs4W/yAzB
-         pQRQ==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=deqb3C583WPwsTT07806RWwyMqGNcKRuVQc+SCr8bbg=;
+        b=zgHsWq06rJA92GxFdT5mTXPfAUeJYgDmPcttcmQ73pSJkbxefPkGb1Vk0lNSP9hgO0
+         fP1s6vWpJa3cARqJLH1u7YmTPOaU9s2/N5gNgUfVmF4uU1FGh8/bwOKlIrGAPLHqS/BC
+         nphtqCd9w1bQV8AguKN3pSA2hyOuxnp7CB5Edi0YxVLD6lEHjZ3tqzLLixmr9jiHz1qs
+         s84cWHZj/lcn08b5oICHheMjITocFVVAOUrDwddcA8d7dLpZ4p5Cs38RQZNk0GfcllgH
+         gK78gd57y59KpgQlY/ZAdPSIUQiuOlq2IZJgz9F+h7uCh3JXwxcvamcrrro7znJ6lLBv
+         57aw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=n1MiZRQXY1X5/1Lfb3V7ryug15xS4eKlSLkntpBu3p8=;
-        b=NlEWJfyb1vau0c8Yso24axTJjSY3GY4TN4eq0rr3FiCyJCJ7+c3ttiT+k8+aJ3lSyb
-         tqR8ZWrXMZW/+ADuDNRGCYJoufzg1dLm6zbWIaFYFYhULWfWvWsX/I4OqZdlf6kvewcI
-         L6euHZjnq2KFSdN7DfNDOFeVzuPtwfazDrthtdCkSiKYhZS3JEQv/RKd8s4duCwKVsbc
-         stTGnE1VftByM+D0mfZzNRgWSOtDxJUrYk9hG13dLswNlE7jSPLTnYZRiBsn6nm6Fhkz
-         LNcBab0xww8RAAzN+HQ2BUkkJ67/TZlKV4egsTYcZoy5ueznv+cc9GdY+X3TbSYLfRlY
-         ugSA==
-X-Gm-Message-State: APjAAAUROdmNdGnUnAdle7it3ROl0mXx2yyJrOhuCHMB9GKpmwpFNe/Z
-        0KI1aWKSOWs6ObF2RtjmrPzSrnSLEH4g4R4h
-X-Google-Smtp-Source: APXvYqxF+/r4KCOGGCedGogDPlPJlaPfEYSAVZQw5bwdbPZFxOAbCJwriqBGDvCHDVCPc2LEE6pGJg==
-X-Received: by 2002:ac2:48a5:: with SMTP id u5mr15588960lfg.62.1562086108660;
-        Tue, 02 Jul 2019 09:48:28 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=deqb3C583WPwsTT07806RWwyMqGNcKRuVQc+SCr8bbg=;
+        b=LE7pCiBdQcmlBJjO36s9AlmJIdYEFLguiA3zBj7RibkSiqaTHEHcPcYkeAejZX7ZnK
+         gZ2vvEuvWd045HuKXSiOVML63u/Rft8qfcLl2WFzKdipqU2bvxYkFg4N25ep2ikUg+/L
+         RlI9dg+bil9dsbh0B7gVmFCPNkPlatX0h9E1cRQpYCK7Z1Xltt6gESyfNeei/Hn9Mr5E
+         Ot5drG/DNmHp/MTTEwQLVqtKZzlfcMRCYI8GTQoRUwqqwe7w84K9FaSC9VeBTU/tBt51
+         j6fG1XRtI7ZldEz/uA9TQsNhUGnpChG/lbQulYYU5PP3tsa0J8rt+1fdB6ooVS6SGp4k
+         7MQQ==
+X-Gm-Message-State: APjAAAVXAOl/JFlzO+83mF70WWSoOZ0W4gBiL23jToWYQCF8SVDz4py3
+        2RJ/cTpW27+nBp0D4UOIOeW8oEsK74J9lR3o
+X-Google-Smtp-Source: APXvYqxN1IHyM3fHCpTa3C7kjDglwhm7jUFxJdHQ0bNc2hRhVGeTOFR2w0kDiMOR2rt3N1/dZa162A==
+X-Received: by 2002:a05:6512:21c:: with SMTP id a28mr15599420lfo.14.1562086111826;
+        Tue, 02 Jul 2019 09:48:31 -0700 (PDT)
 Received: from e111045-lin.arm.com (89-212-78-239.static.t-2.net. [89.212.78.239])
-        by smtp.gmail.com with ESMTPSA id r17sm3906055ljc.85.2019.07.02.09.48.27
+        by smtp.gmail.com with ESMTPSA id r17sm3906055ljc.85.2019.07.02.09.48.30
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Tue, 02 Jul 2019 09:48:27 -0700 (PDT)
+        Tue, 02 Jul 2019 09:48:31 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
@@ -62,243 +63,238 @@ Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         linux-fscrypt@vger.kernel.org,
         Gilad Ben-Yossef <gilad@benyossef.com>,
         Milan Broz <gmazyland@gmail.com>
-Subject: [PATCH v7 0/7] crypto: switch to crypto API for ESSIV generation
-Date:   Tue,  2 Jul 2019 18:48:08 +0200
-Message-Id: <20190702164815.6341-1-ard.biesheuvel@linaro.org>
+Subject: [PATCH v7 2/7] fs: crypto: invoke crypto API for ESSIV handling
+Date:   Tue,  2 Jul 2019 18:48:10 +0200
+Message-Id: <20190702164815.6341-3-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190702164815.6341-1-ard.biesheuvel@linaro.org>
+References: <20190702164815.6341-1-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This series creates an ESSIV template that produces a skcipher or AEAD
-transform based on a tuple of the form '<skcipher>,<cipher>,<shash>'
-(or '<aead>,<cipher>,<shash>' for the AEAD case). It exposes the
-encapsulated sync or async skcipher/aead by passing through all operations,
-while using the cipher/shash pair to transform the input IV into an ESSIV
-output IV.
+Instead of open coding the calculations for ESSIV handling, use a
+ESSIV skcipher which does all of this under the hood.
 
-This matches what both users of ESSIV in the kernel do, and so it is proposed
-as a replacement for those, in patches #2 and #4.
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+---
+ fs/crypto/Kconfig           |  1 +
+ fs/crypto/crypto.c          |  5 --
+ fs/crypto/fscrypt_private.h |  9 --
+ fs/crypto/keyinfo.c         | 95 +-------------------
+ 4 files changed, 5 insertions(+), 105 deletions(-)
 
-This code has been tested using the fscrypt test suggested by Eric
-(generic/549), as well as the mode-test script suggested by Milan for
-the dm-crypt case. I also tested the aead case in a virtual machine,
-but it definitely needs some wider testing from the dm-crypt experts.
-
-The consensus appears to be that it would be useful if the crypto API
-encapsulates the handling of multiple subsequent blocks that are
-encrypted using a 64-bit LE counter as IV, and makes it the duty of
-the algo to increment the counter between blocks. However, this is
-equally suitable for non-ESSIV transforms (or even more so), and so
-this is left as a future enhancement to  be applied on top.
-
-Changes since v6:
-- make CRYPTO_ESSIV user selectable so we can opt out of selecting it even
-  if FS_ENCRYPTION (which cannot be built as a module) is enabled
-- move a comment along with the code it referred to (#3), not that this change
-  and removing some redundant braces makes the diff look totally different
-- add Milan's R-b to #3 and #4
-
-Changes since v5:
-- drop redundant #includes and drop some unneeded braces (#2)
-- add test case for essiv(authenc(hmac(sha256),cbc(aes)),aes,sha256)
-- make ESSIV driver deal with assoc data that is described by more than two
-  scatterlist entries - this only happens when the extended tests are being
-  performed, so don't optimize for it
-- clarify that both fscrypt and dm-crypt only use ESSIV in special cases (#7)
-
-Changes since v4:
-- make the ESSIV template IV size equal the IV size of the encapsulated
-  cipher - defining it as 8 bytes was needlessly restrictive, and also
-  complicated the code for no reason
-- add a missing kfree() spotted by Smatch
-- add additional algo length name checks when constructing the essiv()
-  cipher name
-- reinstate the 'essiv' IV generation implementation in dm-crypt, but
-  make its generation function identical to plain64le (and drop the other
-  methods)
-- fix a bug in the arm64 CE/NEON code
-- simplify the arm64 code by reusing more of the existing CBC implementation
-  (patch #6 is new to this series and was added for this reason)
-
-Changes since v3:
-- address various review comments from Eric on patch #1
-- use Kconfig's 'imply' instead of 'select' to permit CRYPTO_ESSIV to be
-  enabled as a module or disabled entirely even if fscrypt is compiled in (#2)
-- fix an issue in the AEAD encrypt path caused by the IV being clobbered by
-  the inner skcipher before the hmac was being calculated
-
-Changes since v2:
-- fixed a couple of bugs that snuck in after I'd done the bulk of my
-  testing
-- some cosmetic tweaks to the ESSIV template skcipher setkey function
-  to align it with the aead one
-- add a test case for essiv(cbc(aes),aes,sha256)
-- add an accelerated implementation for arm64 that combines the IV
-  derivation and the actual en/decryption in a single asm routine
-
-Scroll down for tcrypt speed test result comparing the essiv template
-with the asm implementation. Bare cbc(aes) tests included for reference
-as well. Taken on a 2GHz Cortex-A57 (AMD Seattle)
-
-Code can be found here
-https://git.kernel.org/pub/scm/linux/kernel/git/ardb/linux.git/log/?h=essiv-v6
-
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Eric Biggers <ebiggers@google.com>
-Cc: dm-devel@redhat.com
-Cc: linux-fscrypt@vger.kernel.org
-Cc: Gilad Ben-Yossef <gilad@benyossef.com>
-Cc: Milan Broz <gmazyland@gmail.com>
-
-Ard Biesheuvel (7):
-  crypto: essiv - create wrapper template for ESSIV generation
-  fs: crypto: invoke crypto API for ESSIV handling
-  md: dm-crypt: infer ESSIV block cipher from cipher string directly
-  md: dm-crypt: switch to ESSIV crypto API template
-  crypto: essiv - add test vector for essiv(cbc(aes),aes,sha256)
-  crypto: arm64/aes-cts-cbc - factor out CBC en/decryption of a walk
-  crypto: arm64/aes - implement accelerated ESSIV/CBC mode
-
- arch/arm64/crypto/aes-glue.c  | 205 +++++--
- arch/arm64/crypto/aes-modes.S |  29 +-
- crypto/Kconfig                |  28 +
- crypto/Makefile               |   1 +
- crypto/essiv.c                | 640 ++++++++++++++++++++
- crypto/tcrypt.c               |   9 +
- crypto/testmgr.c              |  14 +
- crypto/testmgr.h              | 497 +++++++++++++++
- drivers/md/Kconfig            |   1 +
- drivers/md/dm-crypt.c         | 235 ++-----
- fs/crypto/Kconfig             |   1 +
- fs/crypto/crypto.c            |   5 -
- fs/crypto/fscrypt_private.h   |   9 -
- fs/crypto/keyinfo.c           |  95 +--
- 14 files changed, 1436 insertions(+), 333 deletions(-)
- create mode 100644 crypto/essiv.c
-
+diff --git a/fs/crypto/Kconfig b/fs/crypto/Kconfig
+index 24ed99e2eca0..b0292da8613c 100644
+--- a/fs/crypto/Kconfig
++++ b/fs/crypto/Kconfig
+@@ -5,6 +5,7 @@ config FS_ENCRYPTION
+ 	select CRYPTO_AES
+ 	select CRYPTO_CBC
+ 	select CRYPTO_ECB
++	select CRYPTO_ESSIV
+ 	select CRYPTO_XTS
+ 	select CRYPTO_CTS
+ 	select CRYPTO_SHA256
+diff --git a/fs/crypto/crypto.c b/fs/crypto/crypto.c
+index 335a362ee446..c53ce262a06c 100644
+--- a/fs/crypto/crypto.c
++++ b/fs/crypto/crypto.c
+@@ -136,9 +136,6 @@ void fscrypt_generate_iv(union fscrypt_iv *iv, u64 lblk_num,
+ 
+ 	if (ci->ci_flags & FS_POLICY_FLAG_DIRECT_KEY)
+ 		memcpy(iv->nonce, ci->ci_nonce, FS_KEY_DERIVATION_NONCE_SIZE);
+-
+-	if (ci->ci_essiv_tfm != NULL)
+-		crypto_cipher_encrypt_one(ci->ci_essiv_tfm, iv->raw, iv->raw);
+ }
+ 
+ int fscrypt_do_page_crypto(const struct inode *inode, fscrypt_direction_t rw,
+@@ -492,8 +489,6 @@ static void __exit fscrypt_exit(void)
+ 		destroy_workqueue(fscrypt_read_workqueue);
+ 	kmem_cache_destroy(fscrypt_ctx_cachep);
+ 	kmem_cache_destroy(fscrypt_info_cachep);
+-
+-	fscrypt_essiv_cleanup();
+ }
+ module_exit(fscrypt_exit);
+ 
+diff --git a/fs/crypto/fscrypt_private.h b/fs/crypto/fscrypt_private.h
+index 7da276159593..59d0cba9cfb9 100644
+--- a/fs/crypto/fscrypt_private.h
++++ b/fs/crypto/fscrypt_private.h
+@@ -61,12 +61,6 @@ struct fscrypt_info {
+ 	/* The actual crypto transform used for encryption and decryption */
+ 	struct crypto_skcipher *ci_ctfm;
+ 
+-	/*
+-	 * Cipher for ESSIV IV generation.  Only set for CBC contents
+-	 * encryption, otherwise is NULL.
+-	 */
+-	struct crypto_cipher *ci_essiv_tfm;
+-
+ 	/*
+ 	 * Encryption mode used for this inode.  It corresponds to either
+ 	 * ci_data_mode or ci_filename_mode, depending on the inode type.
+@@ -166,9 +160,6 @@ struct fscrypt_mode {
+ 	int keysize;
+ 	int ivsize;
+ 	bool logged_impl_name;
+-	bool needs_essiv;
+ };
+ 
+-extern void __exit fscrypt_essiv_cleanup(void);
+-
+ #endif /* _FSCRYPT_PRIVATE_H */
+diff --git a/fs/crypto/keyinfo.c b/fs/crypto/keyinfo.c
+index dcd91a3fbe49..f39667d4316a 100644
+--- a/fs/crypto/keyinfo.c
++++ b/fs/crypto/keyinfo.c
+@@ -13,14 +13,10 @@
+ #include <linux/hashtable.h>
+ #include <linux/scatterlist.h>
+ #include <linux/ratelimit.h>
+-#include <crypto/aes.h>
+ #include <crypto/algapi.h>
+-#include <crypto/sha.h>
+ #include <crypto/skcipher.h>
+ #include "fscrypt_private.h"
+ 
+-static struct crypto_shash *essiv_hash_tfm;
+-
+ /* Table of keys referenced by FS_POLICY_FLAG_DIRECT_KEY policies */
+ static DEFINE_HASHTABLE(fscrypt_master_keys, 6); /* 6 bits = 64 buckets */
+ static DEFINE_SPINLOCK(fscrypt_master_keys_lock);
+@@ -144,10 +140,9 @@ static struct fscrypt_mode available_modes[] = {
+ 	},
+ 	[FS_ENCRYPTION_MODE_AES_128_CBC] = {
+ 		.friendly_name = "AES-128-CBC",
+-		.cipher_str = "cbc(aes)",
++		.cipher_str = "essiv(cbc(aes),aes,sha256)",
+ 		.keysize = 16,
+-		.ivsize = 16,
+-		.needs_essiv = true,
++		.ivsize = 8,
+ 	},
+ 	[FS_ENCRYPTION_MODE_AES_128_CTS] = {
+ 		.friendly_name = "AES-128-CTS-CBC",
+@@ -377,72 +372,6 @@ fscrypt_get_master_key(const struct fscrypt_info *ci, struct fscrypt_mode *mode,
+ 	return ERR_PTR(err);
+ }
+ 
+-static int derive_essiv_salt(const u8 *key, int keysize, u8 *salt)
+-{
+-	struct crypto_shash *tfm = READ_ONCE(essiv_hash_tfm);
+-
+-	/* init hash transform on demand */
+-	if (unlikely(!tfm)) {
+-		struct crypto_shash *prev_tfm;
+-
+-		tfm = crypto_alloc_shash("sha256", 0, 0);
+-		if (IS_ERR(tfm)) {
+-			fscrypt_warn(NULL,
+-				     "error allocating SHA-256 transform: %ld",
+-				     PTR_ERR(tfm));
+-			return PTR_ERR(tfm);
+-		}
+-		prev_tfm = cmpxchg(&essiv_hash_tfm, NULL, tfm);
+-		if (prev_tfm) {
+-			crypto_free_shash(tfm);
+-			tfm = prev_tfm;
+-		}
+-	}
+-
+-	{
+-		SHASH_DESC_ON_STACK(desc, tfm);
+-		desc->tfm = tfm;
+-
+-		return crypto_shash_digest(desc, key, keysize, salt);
+-	}
+-}
+-
+-static int init_essiv_generator(struct fscrypt_info *ci, const u8 *raw_key,
+-				int keysize)
+-{
+-	int err;
+-	struct crypto_cipher *essiv_tfm;
+-	u8 salt[SHA256_DIGEST_SIZE];
+-
+-	essiv_tfm = crypto_alloc_cipher("aes", 0, 0);
+-	if (IS_ERR(essiv_tfm))
+-		return PTR_ERR(essiv_tfm);
+-
+-	ci->ci_essiv_tfm = essiv_tfm;
+-
+-	err = derive_essiv_salt(raw_key, keysize, salt);
+-	if (err)
+-		goto out;
+-
+-	/*
+-	 * Using SHA256 to derive the salt/key will result in AES-256 being
+-	 * used for IV generation. File contents encryption will still use the
+-	 * configured keysize (AES-128) nevertheless.
+-	 */
+-	err = crypto_cipher_setkey(essiv_tfm, salt, sizeof(salt));
+-	if (err)
+-		goto out;
+-
+-out:
+-	memzero_explicit(salt, sizeof(salt));
+-	return err;
+-}
+-
+-void __exit fscrypt_essiv_cleanup(void)
+-{
+-	crypto_free_shash(essiv_hash_tfm);
+-}
+-
+ /*
+  * Given the encryption mode and key (normally the derived key, but for
+  * FS_POLICY_FLAG_DIRECT_KEY mode it's the master key), set up the inode's
+@@ -454,7 +383,6 @@ static int setup_crypto_transform(struct fscrypt_info *ci,
+ {
+ 	struct fscrypt_master_key *mk;
+ 	struct crypto_skcipher *ctfm;
+-	int err;
+ 
+ 	if (ci->ci_flags & FS_POLICY_FLAG_DIRECT_KEY) {
+ 		mk = fscrypt_get_master_key(ci, mode, raw_key, inode);
+@@ -470,19 +398,6 @@ static int setup_crypto_transform(struct fscrypt_info *ci,
+ 	ci->ci_master_key = mk;
+ 	ci->ci_ctfm = ctfm;
+ 
+-	if (mode->needs_essiv) {
+-		/* ESSIV implies 16-byte IVs which implies !DIRECT_KEY */
+-		WARN_ON(mode->ivsize != AES_BLOCK_SIZE);
+-		WARN_ON(ci->ci_flags & FS_POLICY_FLAG_DIRECT_KEY);
+-
+-		err = init_essiv_generator(ci, raw_key, mode->keysize);
+-		if (err) {
+-			fscrypt_warn(inode->i_sb,
+-				     "error initializing ESSIV generator for inode %lu: %d",
+-				     inode->i_ino, err);
+-			return err;
+-		}
+-	}
+ 	return 0;
+ }
+ 
+@@ -491,12 +406,10 @@ static void put_crypt_info(struct fscrypt_info *ci)
+ 	if (!ci)
+ 		return;
+ 
+-	if (ci->ci_master_key) {
++	if (ci->ci_master_key)
+ 		put_master_key(ci->ci_master_key);
+-	} else {
++	else
+ 		crypto_free_skcipher(ci->ci_ctfm);
+-		crypto_free_cipher(ci->ci_essiv_tfm);
+-	}
+ 	kmem_cache_free(fscrypt_info_cachep, ci);
+ }
+ 
 -- 
 2.17.1
-
-testing speed of async essiv(cbc(aes),aes,sha256) (essiv(cbc-aes-ce,aes-ce,sha256-ce)) encryption
-tcrypt: test  0 (128 bit key,   16 byte blocks): 3140785 ops/s ( 50252560 bytes)
-tcrypt: test  1 (128 bit key,   64 byte blocks): 2672908 ops/s (171066112 bytes)
-tcrypt: test  2 (128 bit key,  256 byte blocks): 1632811 ops/s (417999616 bytes)
-tcrypt: test  3 (128 bit key, 1024 byte blocks):  665980 ops/s (681963520 bytes)
-tcrypt: test  4 (128 bit key, 1472 byte blocks):  495180 ops/s (728904960 bytes)
-tcrypt: test  5 (128 bit key, 8192 byte blocks):   99329 ops/s (813703168 bytes)
-tcrypt: test  6 (192 bit key,   16 byte blocks): 3106888 ops/s ( 49710208 bytes)
-tcrypt: test  7 (192 bit key,   64 byte blocks): 2582682 ops/s (165291648 bytes)
-tcrypt: test  8 (192 bit key,  256 byte blocks): 1511160 ops/s (386856960 bytes)
-tcrypt: test  9 (192 bit key, 1024 byte blocks):  589841 ops/s (603997184 bytes)
-tcrypt: test 10 (192 bit key, 1472 byte blocks):  435094 ops/s (640458368 bytes)
-tcrypt: test 11 (192 bit key, 8192 byte blocks):   82997 ops/s (679911424 bytes)
-tcrypt: test 12 (256 bit key,   16 byte blocks): 3058592 ops/s ( 48937472 bytes)
-tcrypt: test 13 (256 bit key,   64 byte blocks): 2496988 ops/s (159807232 bytes)
-tcrypt: test 14 (256 bit key,  256 byte blocks): 1438355 ops/s (368218880 bytes)
-tcrypt: test 15 (256 bit key, 1024 byte blocks):  528902 ops/s (541595648 bytes)
-tcrypt: test 16 (256 bit key, 1472 byte blocks):  387861 ops/s (570931392 bytes)
-tcrypt: test 17 (256 bit key, 8192 byte blocks):   75444 ops/s (618037248 bytes)
-
-testing speed of async essiv(cbc(aes),aes,sha256) (essiv(cbc-aes-ce,aes-ce,sha256-ce)) decryption
-tcrypt: test  0 (128 bit key,   16 byte blocks): 3164752 ops/s (  50636032 bytes)
-tcrypt: test  1 (128 bit key,   64 byte blocks): 2975874 ops/s ( 190455936 bytes)
-tcrypt: test  2 (128 bit key,  256 byte blocks): 2393123 ops/s ( 612639488 bytes)
-tcrypt: test  3 (128 bit key, 1024 byte blocks): 1314745 ops/s (1346298880 bytes)
-tcrypt: test  4 (128 bit key, 1472 byte blocks): 1050717 ops/s (1546655424 bytes)
-tcrypt: test  5 (128 bit key, 8192 byte blocks):  246457 ops/s (2018975744 bytes)
-tcrypt: test  6 (192 bit key,   16 byte blocks): 3117489 ops/s (  49879824 bytes)
-tcrypt: test  7 (192 bit key,   64 byte blocks): 2922089 ops/s ( 187013696 bytes)
-tcrypt: test  8 (192 bit key,  256 byte blocks): 2292023 ops/s ( 586757888 bytes)
-tcrypt: test  9 (192 bit key, 1024 byte blocks): 1207942 ops/s (1236932608 bytes)
-tcrypt: test 10 (192 bit key, 1472 byte blocks):  955598 ops/s (1406640256 bytes)
-tcrypt: test 11 (192 bit key, 8192 byte blocks):  195198 ops/s (1599062016 bytes)
-tcrypt: test 12 (256 bit key,   16 byte blocks): 3081935 ops/s (  49310960 bytes)
-tcrypt: test 13 (256 bit key,   64 byte blocks): 2883181 ops/s ( 184523584 bytes)
-tcrypt: test 14 (256 bit key,  256 byte blocks): 2205147 ops/s ( 564517632 bytes)
-tcrypt: test 15 (256 bit key, 1024 byte blocks): 1119468 ops/s (1146335232 bytes)
-tcrypt: test 16 (256 bit key, 1472 byte blocks):  877017 ops/s (1290969024 bytes)
-tcrypt: test 17 (256 bit key, 8192 byte blocks):  195255 ops/s (1599528960 bytes)
-
-
-testing speed of async essiv(cbc(aes),aes,sha256) (essiv-cbc-aes-sha256-ce) encryption
-tcrypt: test  0 (128 bit key,   16 byte blocks): 5037539 ops/s ( 80600624 bytes)
-tcrypt: test  1 (128 bit key,   64 byte blocks): 3884302 ops/s (248595328 bytes)
-tcrypt: test  2 (128 bit key,  256 byte blocks): 2014999 ops/s (515839744 bytes)
-tcrypt: test  3 (128 bit key, 1024 byte blocks):  721147 ops/s (738454528 bytes)
-tcrypt: test  4 (128 bit key, 1472 byte blocks):  525262 ops/s (773185664 bytes)
-tcrypt: test  5 (128 bit key, 8192 byte blocks):  100453 ops/s (822910976 bytes)
-tcrypt: test  6 (192 bit key,   16 byte blocks): 4972667 ops/s ( 79562672 bytes)
-tcrypt: test  7 (192 bit key,   64 byte blocks): 3721788 ops/s (238194432 bytes)
-tcrypt: test  8 (192 bit key,  256 byte blocks): 1835967 ops/s (470007552 bytes)
-tcrypt: test  9 (192 bit key, 1024 byte blocks):  633524 ops/s (648728576 bytes)
-tcrypt: test 10 (192 bit key, 1472 byte blocks):  458306 ops/s (674626432 bytes)
-tcrypt: test 11 (192 bit key, 8192 byte blocks):   83595 ops/s (684810240 bytes)
-tcrypt: test 12 (256 bit key,   16 byte blocks): 4975101 ops/s ( 79601616 bytes)
-tcrypt: test 13 (256 bit key,   64 byte blocks): 3581137 ops/s (229192768 bytes)
-tcrypt: test 14 (256 bit key,  256 byte blocks): 1741799 ops/s (445900544 bytes)
-tcrypt: test 15 (256 bit key, 1024 byte blocks):  565340 ops/s (578908160 bytes)
-tcrypt: test 16 (256 bit key, 1472 byte blocks):  407040 ops/s (599162880 bytes)
-tcrypt: test 17 (256 bit key, 8192 byte blocks):   76092 ops/s (623345664 bytes)
-
-testing speed of async essiv(cbc(aes),aes,sha256) (essiv-cbc-aes-sha256-ce) decryption
-tcrypt: test  0 (128 bit key,   16 byte blocks): 5122947 ops/s (  81967152 bytes)
-tcrypt: test  1 (128 bit key,   64 byte blocks): 4546576 ops/s ( 290980864 bytes)
-tcrypt: test  2 (128 bit key,  256 byte blocks): 3314744 ops/s ( 848574464 bytes)
-tcrypt: test  3 (128 bit key, 1024 byte blocks): 1550823 ops/s (1588042752 bytes)
-tcrypt: test  4 (128 bit key, 1472 byte blocks): 1197388 ops/s (1762555136 bytes)
-tcrypt: test  5 (128 bit key, 8192 byte blocks):  253661 ops/s (2077990912 bytes)
-tcrypt: test  6 (192 bit key,   16 byte blocks): 5040644 ops/s (  80650304 bytes)
-tcrypt: test  7 (192 bit key,   64 byte blocks): 4442490 ops/s ( 284319360 bytes)
-tcrypt: test  8 (192 bit key,  256 byte blocks): 3138199 ops/s ( 803378944 bytes)
-tcrypt: test  9 (192 bit key, 1024 byte blocks): 1406038 ops/s (1439782912 bytes)
-tcrypt: test 10 (192 bit key, 1472 byte blocks): 1075658 ops/s (1583368576 bytes)
-tcrypt: test 11 (192 bit key, 8192 byte blocks):  199652 ops/s (1635549184 bytes)
-tcrypt: test 12 (256 bit key,   16 byte blocks): 4979432 ops/s (  79670912 bytes)
-tcrypt: test 13 (256 bit key,   64 byte blocks): 4394406 ops/s ( 281241984 bytes)
-tcrypt: test 14 (256 bit key,  256 byte blocks): 2999511 ops/s ( 767874816 bytes)
-tcrypt: test 15 (256 bit key, 1024 byte blocks): 1294498 ops/s (1325565952 bytes)
-tcrypt: test 16 (256 bit key, 1472 byte blocks):  981009 ops/s (1444045248 bytes)
-tcrypt: test 17 (256 bit key, 8192 byte blocks):  200463 ops/s (1642192896 bytes)
-
-testing speed of async cbc(aes) (cbc-aes-ce) encryption
-tcrypt: test  0 (128 bit key,   16 byte blocks): 5895884 ops/s ( 94334144 bytes)
-tcrypt: test  1 (128 bit key,   64 byte blocks): 4347437 ops/s (278235968 bytes)
-tcrypt: test  2 (128 bit key,  256 byte blocks): 2135454 ops/s (546676224 bytes)
-tcrypt: test  3 (128 bit key, 1024 byte blocks):  736839 ops/s (754523136 bytes)
-tcrypt: test  4 (128 bit key, 1472 byte blocks):  533261 ops/s (784960192 bytes)
-tcrypt: test  5 (128 bit key, 8192 byte blocks):  100850 ops/s (826163200 bytes)
-tcrypt: test  6 (192 bit key,   16 byte blocks): 5745691 ops/s ( 91931056 bytes)
-tcrypt: test  7 (192 bit key,   64 byte blocks): 4113271 ops/s (263249344 bytes)
-tcrypt: test  8 (192 bit key,  256 byte blocks): 1932208 ops/s (494645248 bytes)
-tcrypt: test  9 (192 bit key, 1024 byte blocks):  644555 ops/s (660024320 bytes)
-tcrypt: test 10 (192 bit key, 1472 byte blocks):  464237 ops/s (683356864 bytes)
-tcrypt: test 11 (192 bit key, 8192 byte blocks):   84019 ops/s (688283648 bytes)
-tcrypt: test 12 (256 bit key,   16 byte blocks): 5620065 ops/s ( 89921040 bytes)
-tcrypt: test 13 (256 bit key,   64 byte blocks): 3982991 ops/s (254911424 bytes)
-tcrypt: test 14 (256 bit key,  256 byte blocks): 1830587 ops/s (468630272 bytes)
-tcrypt: test 15 (256 bit key, 1024 byte blocks):  576151 ops/s (589978624 bytes)
-tcrypt: test 16 (256 bit key, 1472 byte blocks):  412487 ops/s (607180864 bytes)
-tcrypt: test 17 (256 bit key, 8192 byte blocks):   76378 ops/s (625688576 bytes)
-
-testing speed of async cbc(aes) (cbc-aes-ce) decryption
-tcrypt: test  0 (128 bit key,   16 byte blocks): 5821314 ops/s (  93141024 bytes)
-tcrypt: test  1 (128 bit key,   64 byte blocks): 5248040 ops/s ( 335874560 bytes)
-tcrypt: test  2 (128 bit key,  256 byte blocks): 3677701 ops/s ( 941491456 bytes)
-tcrypt: test  3 (128 bit key, 1024 byte blocks): 1650808 ops/s (1690427392 bytes)
-tcrypt: test  4 (128 bit key, 1472 byte blocks): 1256545 ops/s (1849634240 bytes)
-tcrypt: test  5 (128 bit key, 8192 byte blocks):  257922 ops/s (2112897024 bytes)
-tcrypt: test  6 (192 bit key,   16 byte blocks): 5690108 ops/s (  91041728 bytes)
-tcrypt: test  7 (192 bit key,   64 byte blocks): 5086441 ops/s ( 325532224 bytes)
-tcrypt: test  8 (192 bit key,  256 byte blocks): 3447562 ops/s ( 882575872 bytes)
-tcrypt: test  9 (192 bit key, 1024 byte blocks): 1490136 ops/s (1525899264 bytes)
-tcrypt: test 10 (192 bit key, 1472 byte blocks): 1124620 ops/s (1655440640 bytes)
-tcrypt: test 11 (192 bit key, 8192 byte blocks):  201222 ops/s (1648410624 bytes)
-tcrypt: test 12 (256 bit key,   16 byte blocks): 5567247 ops/s (  89075952 bytes)
-tcrypt: test 13 (256 bit key,   64 byte blocks): 5050010 ops/s ( 323200640 bytes)
-tcrypt: test 14 (256 bit key,  256 byte blocks): 3290422 ops/s ( 842348032 bytes)
-tcrypt: test 15 (256 bit key, 1024 byte blocks): 1359439 ops/s (1392065536 bytes)
-tcrypt: test 16 (256 bit key, 1472 byte blocks): 1017751 ops/s (1498129472 bytes)
-tcrypt: test 17 (256 bit key, 8192 byte blocks):  201492 ops/s (1650622464 bytes)
 
