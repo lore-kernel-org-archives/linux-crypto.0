@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86E68C06513
-	for <linux-crypto@archiver.kernel.org>; Tue,  2 Jul 2019 19:42:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96CB5C06510
+	for <linux-crypto@archiver.kernel.org>; Tue,  2 Jul 2019 19:42:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 61D9C21850
-	for <linux-crypto@archiver.kernel.org>; Tue,  2 Jul 2019 19:42:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 71FB121850
+	for <linux-crypto@archiver.kernel.org>; Tue,  2 Jul 2019 19:42:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="awJ3a9BX"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qB2oh01+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727124AbfGBTmw (ORCPT
+        id S1727121AbfGBTmy (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 2 Jul 2019 15:42:52 -0400
-Received: from mail-lj1-f180.google.com ([209.85.208.180]:37029 "EHLO
-        mail-lj1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727069AbfGBTmw (ORCPT
+        Tue, 2 Jul 2019 15:42:54 -0400
+Received: from mail-lj1-f178.google.com ([209.85.208.178]:40536 "EHLO
+        mail-lj1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727118AbfGBTmx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 2 Jul 2019 15:42:52 -0400
-Received: by mail-lj1-f180.google.com with SMTP id 131so18177199ljf.4
-        for <linux-crypto@vger.kernel.org>; Tue, 02 Jul 2019 12:42:51 -0700 (PDT)
+        Tue, 2 Jul 2019 15:42:53 -0400
+Received: by mail-lj1-f178.google.com with SMTP id a21so18169992ljh.7
+        for <linux-crypto@vger.kernel.org>; Tue, 02 Jul 2019 12:42:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=QBCdXIHrY/tobdMXALDGrMgM1Ga6gEjW1DZkTfwKxtw=;
-        b=awJ3a9BXCD4kKi0fCWNLbKLQ4dHYurRXSOI2PLB+TG7l44SowikrmS3utbETW0erzK
-         miGvgr/+4GynNabx3y6prtFKPSrwhJsmlrQ7zbcNEqqRTIj4ZddMBq+o/PQg37n24WBN
-         DxeIrlrkZmAkypEykddgnhumwgL+j343PtvV82BhiCKyioZPFsRUIlfy5NubKPG+4i4P
-         F1TVqTvSBSBNllmzUhvTELNeeNFPEFrOdBacD0a7bavgsC5q4y/mfP7ZtADFuzb+wysC
-         LEhJnRir03oOYDPJHlzb+JJ1xaFaO8ZikVxzOFQESUgWwfugQtKrwgpXDs8mVSb4FNY/
-         1X2w==
+        bh=y8bW1Oz9Gva4RHYCivhqTUhkqRq1s3Ji3bb3o0vH+Kk=;
+        b=qB2oh01+ax1n1uskOVzYmXlI6RiNJYNT5T3orVG7VOHRda+I0Xgm7sIvWKthtxymhf
+         wuCS1H1f1izwXMeuLa1hJJqP6wpxoZ1m9UQu4b5jvc6r6NTLDrEViVl/PGCRdOfqvLfa
+         TPKxaRGYLeZSo1wcSIMCbbUve3Vya3IcQOc3OHkAYCtIykuTFIB7YRdK6HlSipqVpjdd
+         eXYnNAB+70VsXwlNll+WTdvhakFqxBaW5CUe7y+HaNkEajywN4TjVcHoWujzy/y5GRNJ
+         luymSMqAdrb3uzo5luodCVZ+UX+oQhDcrEbNZJJL6qKto07risN1QYCNVFrzxdazDShx
+         0svQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=QBCdXIHrY/tobdMXALDGrMgM1Ga6gEjW1DZkTfwKxtw=;
-        b=PrIjW5mooha+Usbjkghxp+MBurpSPwUb5Tx0Uo9j8Gp33we72gFfuBckAMGkPSMUkw
-         U3cQ+ixTpUrw8O0I5IiMQnFpApcip8duaVHrOX8YyjdfDTXaK2FQ5rO0jG7QYhiaBzid
-         i9kboEGMobHqrEhOszVKgvJY5h87Dt1iEQ41nK8qxGNQFxa1ZazesqJsMvbDD1D83bC/
-         fVh8JB2xkBLED4IKt3u+MRzVyHdZszSLg0fNt5i9+mmO7GejQw98fau/z9wEAcAC7cwX
-         E1EUmyXz55UCy9/43/HImIIZ4JLVoS+LXEATtGD+Gc/6Myyh4E3/TRJ1FnCi0K4GSJse
-         jgHA==
-X-Gm-Message-State: APjAAAX8vdYObvvw3fx/jSY+3U6Nm92ql/O2IqAcvDr99YUMb3HH3snN
-        agHTqTOsCvmLhZ4CzLHDNk5x9dzeJzJxlP6i
-X-Google-Smtp-Source: APXvYqwOVsH3lMsxqQWSfVULVjxVoXYmpNrOhBAMoElYeKh+VsYLhYtRMYBUh4zJMbczeBarCMFNpA==
-X-Received: by 2002:a2e:9951:: with SMTP id r17mr18066950ljj.125.1562096570015;
-        Tue, 02 Jul 2019 12:42:50 -0700 (PDT)
+        bh=y8bW1Oz9Gva4RHYCivhqTUhkqRq1s3Ji3bb3o0vH+Kk=;
+        b=kiSiqk9LI+En7pAyZ6Qv6PnYbVUuDaQCrgY096xmu1OsI8I4B5m5isHG7wpYFcbrQG
+         wmbdVMZIHDqOZ9HORJyWlAPbfdxOyhiy4JwpGBh+PJwmFZCB3nojGIkCqWc9dWNHI14U
+         +ziUJy990sBpe5yYXtflY3QfzlxEufgk1EEVuxjYjuRweaqxhbA0Jm1hJgCm7vmkFys2
+         6M2JfaPU/HcIqUqsnq6yUArQoE0I/baBChyrYOtdwA0NNKJ5hkYRhnXv7iKfTND2ldjY
+         BrDCcYRGbF2XDlxvyMJDqMPK0f3PKmFIvAXp9vdwqpuph8cBO9a1QBrz2m+e6uM6QQBX
+         Qf1Q==
+X-Gm-Message-State: APjAAAVUbUfpCIuSqI7EWlnKUsgb5D72dgKF8hyUy8Hx6W2fEU74rW30
+        c73BfvGlWumbZOsIIt6cldyTpSCLYwQkMK+9
+X-Google-Smtp-Source: APXvYqweRe75cRZFloMKjjbYKRHpJlQZdMy1n1gHWSCmS4j1FVm/nZ1GnbTsBMJRw6AeLjFQpBHI7A==
+X-Received: by 2002:a2e:9b84:: with SMTP id z4mr18657031lji.75.1562096571298;
+        Tue, 02 Jul 2019 12:42:51 -0700 (PDT)
 Received: from e111045-lin.arm.com (89-212-78-239.static.t-2.net. [89.212.78.239])
-        by smtp.gmail.com with ESMTPSA id 24sm4475163ljs.63.2019.07.02.12.42.48
+        by smtp.gmail.com with ESMTPSA id 24sm4475163ljs.63.2019.07.02.12.42.50
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Tue, 02 Jul 2019 12:42:49 -0700 (PDT)
+        Tue, 02 Jul 2019 12:42:50 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     herbert@gondor.apana.org.au, ebiggers@google.com,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v4 30/32] crypto: arm/aes-cipher - switch to shared AES inverse Sbox
-Date:   Tue,  2 Jul 2019 21:41:48 +0200
-Message-Id: <20190702194150.10405-31-ard.biesheuvel@linaro.org>
+Subject: [PATCH v4 31/32] crypto: arm64/aes-cipher - switch to shared AES inverse Sbox
+Date:   Tue,  2 Jul 2019 21:41:49 +0200
+Message-Id: <20190702194150.10405-32-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190702194150.10405-1-ard.biesheuvel@linaro.org>
 References: <20190702194150.10405-1-ard.biesheuvel@linaro.org>
@@ -72,25 +72,25 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm/crypto/aes-cipher-core.S | 40 +-------------------
+ arch/arm64/crypto/aes-cipher-core.S | 40 +-------------------
  1 file changed, 1 insertion(+), 39 deletions(-)
 
-diff --git a/arch/arm/crypto/aes-cipher-core.S b/arch/arm/crypto/aes-cipher-core.S
-index f2d67c095e59..180d8555a09c 100644
---- a/arch/arm/crypto/aes-cipher-core.S
-+++ b/arch/arm/crypto/aes-cipher-core.S
-@@ -222,43 +222,5 @@ ENDPROC(__aes_arm_encrypt)
+diff --git a/arch/arm64/crypto/aes-cipher-core.S b/arch/arm64/crypto/aes-cipher-core.S
+index 3a44eada2347..27dac259b359 100644
+--- a/arch/arm64/crypto/aes-cipher-core.S
++++ b/arch/arm64/crypto/aes-cipher-core.S
+@@ -131,43 +131,5 @@ ENDPROC(__aes_arm64_encrypt)
  
  	.align		5
- ENTRY(__aes_arm_decrypt)
--	do_crypt	iround, crypto_it_tab, __aes_arm_inverse_sbox, 0
+ ENTRY(__aes_arm64_decrypt)
+-	do_crypt	iround, crypto_it_tab, __aes_arm64_inverse_sbox, 0
 +	do_crypt	iround, crypto_it_tab, crypto_aes_inv_sbox, 0
- ENDPROC(__aes_arm_decrypt)
+ ENDPROC(__aes_arm64_decrypt)
 -
 -	.section	".rodata", "a"
 -	.align		L1_CACHE_SHIFT
--	.type		__aes_arm_inverse_sbox, %object
--__aes_arm_inverse_sbox:
+-	.type		__aes_arm64_inverse_sbox, %object
+-__aes_arm64_inverse_sbox:
 -	.byte		0x52, 0x09, 0x6a, 0xd5, 0x30, 0x36, 0xa5, 0x38
 -	.byte		0xbf, 0x40, 0xa3, 0x9e, 0x81, 0xf3, 0xd7, 0xfb
 -	.byte		0x7c, 0xe3, 0x39, 0x82, 0x9b, 0x2f, 0xff, 0x87
@@ -123,7 +123,7 @@ index f2d67c095e59..180d8555a09c 100644
 -	.byte		0xc8, 0xeb, 0xbb, 0x3c, 0x83, 0x53, 0x99, 0x61
 -	.byte		0x17, 0x2b, 0x04, 0x7e, 0xba, 0x77, 0xd6, 0x26
 -	.byte		0xe1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0c, 0x7d
--	.size		__aes_arm_inverse_sbox, . - __aes_arm_inverse_sbox
+-	.size		__aes_arm64_inverse_sbox, . - __aes_arm64_inverse_sbox
 -- 
 2.17.1
 
