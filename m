@@ -2,112 +2,239 @@ Return-Path: <SRS0=X5ob=U7=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 161A7C06513
-	for <linux-crypto@archiver.kernel.org>; Tue,  2 Jul 2019 17:47:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02B6DC06510
+	for <linux-crypto@archiver.kernel.org>; Tue,  2 Jul 2019 19:42:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EB9F32184C
-	for <linux-crypto@archiver.kernel.org>; Tue,  2 Jul 2019 17:46:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B9D8321850
+	for <linux-crypto@archiver.kernel.org>; Tue,  2 Jul 2019 19:42:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="ZiOw17Oa"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Fpu1cYpS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726613AbfGBRq7 (ORCPT
+        id S1726635AbfGBTmM (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 2 Jul 2019 13:46:59 -0400
-Received: from mail-eopbgr680041.outbound.protection.outlook.com ([40.107.68.41]:31008
-        "EHLO NAM04-BN3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726193AbfGBRq6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 2 Jul 2019 13:46:58 -0400
+        Tue, 2 Jul 2019 15:42:12 -0400
+Received: from mail-lf1-f66.google.com ([209.85.167.66]:39998 "EHLO
+        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726150AbfGBTmM (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 2 Jul 2019 15:42:12 -0400
+Received: by mail-lf1-f66.google.com with SMTP id a9so12296563lff.7
+        for <linux-crypto@vger.kernel.org>; Tue, 02 Jul 2019 12:42:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector1-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JKrxzGEfgC/NFJCq6+fmtSWANUJEAldqOq1UQ2lA/xQ=;
- b=ZiOw17Oa9ynZHDMUx6RiEulW7DxPd2FEVvAUePXGQ9G1l879OZHCimmq7Rygrp/20AI3tKZwuu5Z0Liy0KM8VFHfnR8CVoy+7B9bTfEAgt+LymTlfqGD8vBTm5mtkFQjMByX+z1kCw1Ou94WyrM2Lvo9a74Q7GmxUqRhy+xrUTE=
-Received: from DM5PR12MB1449.namprd12.prod.outlook.com (10.172.40.14) by
- DM5PR12MB1420.namprd12.prod.outlook.com (10.168.239.12) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2032.20; Tue, 2 Jul 2019 17:46:54 +0000
-Received: from DM5PR12MB1449.namprd12.prod.outlook.com
- ([fe80::180c:ff0c:37e6:a482]) by DM5PR12MB1449.namprd12.prod.outlook.com
- ([fe80::180c:ff0c:37e6:a482%10]) with mapi id 15.20.2032.019; Tue, 2 Jul 2019
- 17:46:54 +0000
-From:   Gary R Hook <ghook@amd.com>
-To:     Cfir Cohen <cfir@google.com>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "Hook, Gary" <Gary.Hook@amd.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        David Rientjes <rientjes@google.com>
-CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: Re: [PATCH v2] crypto: ccp/gcm - use const time tag comparison.
-Thread-Topic: [PATCH v2] crypto: ccp/gcm - use const time tag comparison.
-Thread-Index: AQHVMPw13VShZb2ZG0mtCEYORUtnoKa3mkoA
-Date:   Tue, 2 Jul 2019 17:46:53 +0000
-Message-ID: <aa19bd59-7b76-b8ad-3f25-42efbfb7fd29@amd.com>
-References: <20190702173256.50485-1-cfir@google.com>
-In-Reply-To: <20190702173256.50485-1-cfir@google.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: SN6PR04CA0020.namprd04.prod.outlook.com
- (2603:10b6:805:3e::33) To DM5PR12MB1449.namprd12.prod.outlook.com
- (2603:10b6:4:10::14)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Gary.Hook@amd.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-originating-ip: [165.204.78.1]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: e50e804a-1b8e-49de-b36e-08d6ff1544ea
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:DM5PR12MB1420;
-x-ms-traffictypediagnostic: DM5PR12MB1420:
-x-microsoft-antispam-prvs: <DM5PR12MB142050A723D046C9C3672BB4FDF80@DM5PR12MB1420.namprd12.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:1728;
-x-forefront-prvs: 008663486A
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(366004)(136003)(39860400002)(396003)(346002)(376002)(199004)(189003)(66556008)(66946007)(66476007)(73956011)(68736007)(3846002)(99286004)(66446008)(64756008)(6116002)(4744005)(7736002)(478600001)(66066001)(72206003)(36756003)(305945005)(8936002)(31686004)(81156014)(5660300002)(81166006)(4326008)(25786009)(54906003)(76176011)(2906002)(11346002)(6512007)(186003)(6436002)(446003)(14444005)(486006)(53936002)(256004)(102836004)(6506007)(386003)(53546011)(2616005)(476003)(26005)(8676002)(6486002)(71190400001)(52116002)(229853002)(14454004)(31696002)(6246003)(71200400001)(316002)(110136005);DIR:OUT;SFP:1101;SCL:1;SRVR:DM5PR12MB1420;H:DM5PR12MB1449.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: amd.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: Z+Yntg6EzFCNnvQX+L8Jtnw8J1z4q/dpq8kBLudSBCPOwjvQr6heESzRjLzvKoOcLrEoCLVyj4OVnLkYLSCBoW+J52CIQJNHdODYVN6QVtyvBkf7GvVMSrmJiwSldZW3zCFTmJTBFyuYuI+EnnU4gI6i14PFz2E5YWq29+nbKfs98o7jmtlD6lw7pUt1FJIdJ91b55p/Q1By8fz0CJno90DVt8rJLpHF8iGb6pE00oPzk6mQY9IVufdchgq41K/km0jx+RocpB53cDVFIfVhGwSBxYK+uuNF0ZIaA8nOqtH+sfqB7Ttn9dOOouIeGXJfJH7isMfbDxgYO3wQZ8IOFHDgo8uYRIDJSC2oCPTDTa0Iz/1w2vznDC0kxk8MWxqvXY8Vtf/o/Nf1OyQDXli4hkfWnBZd84xuQkmlC0ZXgHw=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <3383CC4B34FCFC47B2A45BEA5C4D5FD2@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e50e804a-1b8e-49de-b36e-08d6ff1544ea
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Jul 2019 17:46:53.8955
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ghook@amd.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1420
+        d=linaro.org; s=google;
+        h=from:to:cc:subject:date:message-id;
+        bh=dYNc7wSVddLBsr7l08vFcjO19Rdo3haO1zWdsffvS2o=;
+        b=Fpu1cYpSOXfk78xiq+rFBuHU48lBL+zohtnUeJ/XZLKB7UObdCZHwfI1Rl2CoDsITA
+         9yVG9sLxTXBmTdVYMqG55/yN42GzcUcZbTqvampqpdlMw9mZ3DmRTW5Uun/6Sn87YKjk
+         AdGkaqNa8q0KHGrAzcCSB+N1/EbHaBJwmBRg9Thm/QPdwSs2/gYNYSfLZa1tvaBs6qXA
+         Q0apA0zFPhP+Ux2Wr044JLzRMvNNt2XNTPtFbHVW+WtnG7ACPaZakygFNmeYOv7jnXF4
+         brmX5KOdDLXcNQ/eCMpIM3PSb0Liyiclj3DiLjHZQalOcBkg4ttj6QVkrFNk/R50zJLo
+         Ccww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=dYNc7wSVddLBsr7l08vFcjO19Rdo3haO1zWdsffvS2o=;
+        b=V7ccuyx1ka26FVOr0B00O4ubv35MrOg02s0yM9EmUjRk/GfipfzQl7B7Dy6FnR15og
+         CEmrSk4aivV+s+06IOUw/DApA8neSbW7So2MHwtEbJJxCZ8O5G6gwaXAsKL99TkHuQPp
+         n+GFhWAeFIRQQixgixf+i4B+T3c/K8LOe3Xs8wKzC71C8jD/QyY6i4mSKumaWCuY8IJr
+         4vhoryUa59GzBlYKTWVDHOHgjxFIuxkwYa+u1Xf9CQKicUUBSbaZ0nvhsXo4M0VTCvES
+         4gNjeHuE8xVg3TaE6Hb/YQ95FZvOX9NBnqy2Sb+qPOoj4dqgK2oLdJahg4OKcRnj/755
+         zDuA==
+X-Gm-Message-State: APjAAAUNomayxFaspomrdYHPcoh+rLeetPGvXtAPRRL61e4EwpoyFWJP
+        hFJMrpRnbEB3dHW/ybd2Vx4ghwcRiz5v8CcJ
+X-Google-Smtp-Source: APXvYqwVAMqwzA/RMffP8uP+gd+9fQ6vr4cRTMZITANjFtfII9a4F0ZnNjEH6fatbJIIZzmYQzwncQ==
+X-Received: by 2002:a19:2297:: with SMTP id i145mr1611493lfi.97.1562096529791;
+        Tue, 02 Jul 2019 12:42:09 -0700 (PDT)
+Received: from e111045-lin.arm.com (89-212-78-239.static.t-2.net. [89.212.78.239])
+        by smtp.gmail.com with ESMTPSA id 24sm4475163ljs.63.2019.07.02.12.42.08
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Tue, 02 Jul 2019 12:42:08 -0700 (PDT)
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+To:     linux-crypto@vger.kernel.org
+Cc:     herbert@gondor.apana.org.au, ebiggers@google.com,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [PATCH v4 00/32] crypto: AES cleanup
+Date:   Tue,  2 Jul 2019 21:41:18 +0200
+Message-Id: <20190702194150.10405-1-ard.biesheuvel@linaro.org>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-T24gNy8yLzE5IDEyOjMyIFBNLCBDZmlyIENvaGVuIHdyb3RlOg0KPiBBdm9pZCBsZWFraW5nIEdD
-TSB0YWcgdGhyb3VnaCB0aW1pbmcgc2lkZSBjaGFubmVsLg0KPiANCj4gRml4ZXM6IDM2Y2Y1MTVi
-OWJiZSAoImNyeXB0bzogY2NwIC0gRW5hYmxlIHN1cHBvcnQgZm9yIEFFUyBHQ00gb24gdjUgQ0NQ
-cyIpDQo+IENjOiA8c3RhYmxlQHZnZXIua2VybmVsLm9yZz4gIyB2NC4xMisNCj4gU2lnbmVkLW9m
-Zi1ieTogQ2ZpciBDb2hlbiA8Y2ZpckBnb29nbGUuY29tPg0KDQpBY2tlZC1ieTogR2FyeSBSIEhv
-b2sgPGdob29rQGFtZC5jb20+DQoNCj4gLS0tDQo+ICAgZHJpdmVycy9jcnlwdG8vY2NwL2NjcC1v
-cHMuYyB8IDMgKystDQo+ICAgMSBmaWxlIGNoYW5nZWQsIDIgaW5zZXJ0aW9ucygrKSwgMSBkZWxl
-dGlvbigtKQ0KPiANCj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvY3J5cHRvL2NjcC9jY3Atb3BzLmMg
-Yi9kcml2ZXJzL2NyeXB0by9jY3AvY2NwLW9wcy5jDQo+IGluZGV4IGRiOGRlODlkOTkwZi4uNjMz
-NjcwMjIwZjZjIDEwMDY0NA0KPiAtLS0gYS9kcml2ZXJzL2NyeXB0by9jY3AvY2NwLW9wcy5jDQo+
-ICsrKyBiL2RyaXZlcnMvY3J5cHRvL2NjcC9jY3Atb3BzLmMNCj4gQEAgLTg0MCw3ICs4NDAsOCBA
-QCBzdGF0aWMgaW50IGNjcF9ydW5fYWVzX2djbV9jbWQoc3RydWN0IGNjcF9jbWRfcXVldWUgKmNt
-ZF9xLA0KPiAgIAkJaWYgKHJldCkNCj4gICAJCQlnb3RvIGVfdGFnOw0KPiAgIA0KPiAtCQlyZXQg
-PSBtZW1jbXAodGFnLmFkZHJlc3MsIGZpbmFsX3dhLmFkZHJlc3MsIEFFU19CTE9DS19TSVpFKTsN
-Cj4gKwkJcmV0ID0gY3J5cHRvX21lbW5lcSh0YWcuYWRkcmVzcywgZmluYWxfd2EuYWRkcmVzcywN
-Cj4gKwkJCQkgICAgQUVTX0JMT0NLX1NJWkUpID8gLUVCQURNU0cgOiAwOw0KPiAgIAkJY2NwX2Rt
-X2ZyZWUoJnRhZyk7DQo+ICAgCX0NCj4gICANCj4gDQoNCg==
+This started out as an attempt to provide synchronous SIMD based GCM
+on 32-bit ARM, but along the way, I ended up changing and cleaning up
+so many things that it is more of a general AES cleanup now rather than
+anything else.
+
+Changes since v3:
+- fix build warning due to missing array dimensions of exported sboxes
+- rename the internal sparc64 AES routines so they don't clash with the
+  new library symbols
+- fix a couple of comments that got truncated
+
+Changes since v2:
+- fix a bug in the CTR helper function - use chunksize not blocksize of the
+  skcipher as the blocksize of the CTR transformation
+- add a couple of patches so all AES implementation share the forward and
+  inverse Sboxes that are in the AES library.
+- unexpert data structures and helpers that are not actually (or should be)
+  used outside the drivers that define them
+
+Code can be found here:
+https://git.kernel.org/pub/scm/linux/kernel/git/ardb/linux.git/log/?h=aes-cleanup-v4
+
+Changes since v1/RFC:
+- rename x86 AES-NI and padlock routines as well, in order to avoid clashes (#2)
+- move irq en/disabling out of the AES library into the callers (aes-ti
+  and the skcipher helper for sync ctr(aes) added in #17)
+- align 32-bit ARM CE key schedule endianness with other AES drivers, to
+  avoid problems on BE systems when using the synchronous ctr fallback (#18)
+- replace some occurrences where a "aes" or "aes-generic" cipher was allocated
+  explicitly, and use library calls instead.
+- use a generic helper in crypto/ctr.h instead of adding a CTR helper to the
+  AES library for providing the synchronous CTR fallback code.
+
+Some users of the AES cipher are being switched to other algorithms (i.e.,
+SipHash for TCP fastopen and CCM or cbcmac for wusb and lib80211). These
+have been posted separately, since they have no build time interdependencies.
+
+----- Original blurb below ------
+
+On 32-bit ARM, asynchronous GCM can be provided by the following drivers:
+
+                                              |  cycles per byte on low end Si
+  gcm_base(ctr(aes-generic),ghash-generic)    |            65.3
+  gcm_base(ctr-aes-neonbs,ghash-ce) [*]       |            27.7
+  gcm_base(ctr-aes-ce,ghash-ce) [**]          |             3.7
+
+  [*]  ghash-ce using vmull.p8 instructions
+  [**] ghash-ce using optional vmull.p64 instructions
+
+The third and fastest option is actually only available on 32-bit cores that
+implement the v8 Crypto Extensions, which are rare, but the NEON based runner
+up is obviously a huge improvement over the generic code, not only in terms of
+performance, but also because it is time invariant (generic AES and generic
+GHASH are both implemented using lookup tables, which are susceptible to
+cache timing attacks)
+
+However, when allocating the gcm(aes) skcipher in synchronous mode, we end up
+with the generic code, due to the fact that the NEON code has no handling for
+invocations that occur from a context where the NEON cannot be used, and so
+it defers the processing to a kthread, which is only permitted for asynchronous
+ciphers.
+
+So let's implement this fallback handling, by reusing some of the logic that
+has already been implemented for arm64. Note that these fallbacks are rarely
+called in practice, but the API requires the functionality to be there.
+This is implemented in patches 16-22.
+
+All the patches leading up to that are cleanups for the AES code, to reduce
+the dependency on the generic table based AES code, or in some cases, hardcoded
+dependencies on the scalar arm64 asm code which suffers from the same problem.
+It also removes redundant key expansion routines, and gets rid of the x86
+scalar asm code, which is a maintenance burden and is not actually faster than
+the generic code built with a modern compiler.
+
+Ard Biesheuvel (32):
+  crypto: arm/aes-ce - cosmetic/whitespace cleanup
+  crypto: aes - rename local routines to prevent future clashes
+  crypto: aes/fixed-time - align key schedule with other implementations
+  crypto: aes - create AES library based on the fixed time AES code
+  crypto: x86/aes-ni - switch to generic for fallback and key routines
+  crypto: x86/aes - drop scalar assembler implementations
+  crypto: padlock/aes - switch to library version of key expansion
+    routine
+  crypto: cesa/aes - switch to library version of key expansion routine
+  crypto: safexcel/aes - switch to library version of key expansion
+    routine
+  crypto: arm64/ghash - switch to AES library
+  crypto: arm/aes-neonbs - switch to library version of key expansion
+    routine
+  crypto: arm64/aes-ccm - switch to AES library
+  crypto: arm64/aes-neonbs - switch to library version of key expansion
+    routine
+  crypto: arm64/aes-ce - switch to library version of key expansion
+    routine
+  crypto: generic/aes - drop key expansion routine in favor of library
+    version
+  crypto: ctr - add helper for performing a CTR encryption walk
+  crypto: aes - move sync ctr(aes) to AES library and generic helper
+  crypto: arm64/aes-ce-cipher - use AES library as fallback
+  crypto: aes/arm - use native endiannes for key schedule
+  crypto: arm/aes-ce - provide a synchronous version of ctr(aes)
+  crypto: arm/aes-neonbs - provide a synchronous version of ctr(aes)
+  crypto: arm/ghash - provide a synchronous version
+  bluetooth: switch to AES library
+  crypto: amcc/aes - switch to AES library for GCM key derivation
+  crypto: ccp - move to AES library for CMAC key derivation
+  crypto: chelsio/aes - replace AES cipher calls with library calls
+  crypto: aes/generic - unexport last-round AES tables
+  crypto: lib/aes - export sbox and inverse sbox
+  crypto: arm64/aes-neon - switch to shared AES Sboxes
+  crypto: arm/aes-cipher - switch to shared AES inverse Sbox
+  crypto: arm64/aes-cipher - switch to shared AES inverse Sbox
+  crypto: arm/aes-scalar - unexport en/decryption routines
+
+ arch/arm/crypto/Kconfig                       |   2 +-
+ arch/arm/crypto/aes-ce-core.S                 |  20 +-
+ arch/arm/crypto/aes-ce-glue.c                 | 168 ++++----
+ arch/arm/crypto/aes-cipher-core.S             |  40 +-
+ arch/arm/crypto/aes-cipher-glue.c             |  11 +-
+ arch/arm/crypto/aes-neonbs-glue.c             |  69 +++-
+ arch/arm/crypto/ghash-ce-glue.c               |  78 ++--
+ arch/arm64/crypto/Kconfig                     |  10 +-
+ arch/arm64/crypto/aes-ce-ccm-glue.c           |  18 +-
+ arch/arm64/crypto/aes-ce-glue.c               |   7 +-
+ arch/arm64/crypto/aes-cipher-core.S           |  40 +-
+ arch/arm64/crypto/aes-cipher-glue.c           |  11 +-
+ arch/arm64/crypto/aes-ctr-fallback.h          |  53 ---
+ arch/arm64/crypto/aes-glue.c                  |  39 +-
+ arch/arm64/crypto/aes-neon.S                  |  74 +---
+ arch/arm64/crypto/aes-neonbs-glue.c           |  29 +-
+ arch/arm64/crypto/ghash-ce-glue.c             |  30 +-
+ arch/sparc/crypto/aes_glue.c                  |   8 +-
+ arch/x86/crypto/Makefile                      |   4 -
+ arch/x86/crypto/aes-i586-asm_32.S             | 362 ------------------
+ arch/x86/crypto/aes-x86_64-asm_64.S           | 185 ---------
+ arch/x86/crypto/aes_glue.c                    |  70 ----
+ arch/x86/crypto/aesni-intel_glue.c            |  23 +-
+ arch/x86/include/asm/crypto/aes.h             |  12 -
+ crypto/Kconfig                                |  52 +--
+ crypto/aes_generic.c                          | 167 +-------
+ crypto/aes_ti.c                               | 317 +--------------
+ drivers/crypto/Kconfig                        |   8 +-
+ drivers/crypto/amcc/crypto4xx_alg.c           |  24 +-
+ drivers/crypto/ccp/Kconfig                    |   1 +
+ drivers/crypto/ccp/ccp-crypto-aes-cmac.c      |  25 +-
+ drivers/crypto/ccp/ccp-crypto.h               |   3 -
+ drivers/crypto/chelsio/Kconfig                |   1 +
+ drivers/crypto/chelsio/chcr_algo.c            |  46 +--
+ drivers/crypto/chelsio/chcr_crypto.h          |   1 -
+ drivers/crypto/chelsio/chcr_ipsec.c           |  19 +-
+ drivers/crypto/chelsio/chtls/chtls_hw.c       |  20 +-
+ .../crypto/inside-secure/safexcel_cipher.c    |   2 +-
+ drivers/crypto/marvell/cipher.c               |   2 +-
+ drivers/crypto/padlock-aes.c                  |  10 +-
+ include/crypto/aes.h                          |  41 +-
+ include/crypto/ctr.h                          |  50 +++
+ lib/crypto/Makefile                           |   3 +
+ lib/crypto/aes.c                              | 356 +++++++++++++++++
+ net/bluetooth/Kconfig                         |   3 +-
+ net/bluetooth/smp.c                           | 103 ++---
+ 46 files changed, 877 insertions(+), 1740 deletions(-)
+ delete mode 100644 arch/arm64/crypto/aes-ctr-fallback.h
+ delete mode 100644 arch/x86/crypto/aes-i586-asm_32.S
+ delete mode 100644 arch/x86/crypto/aes-x86_64-asm_64.S
+ delete mode 100644 arch/x86/crypto/aes_glue.c
+ delete mode 100644 arch/x86/include/asm/crypto/aes.h
+ create mode 100644 lib/crypto/aes.c
+
+-- 
+2.17.1
+
