@@ -2,155 +2,140 @@ Return-Path: <SRS0=X5ob=U7=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8A90C06510
-	for <linux-crypto@archiver.kernel.org>; Tue,  2 Jul 2019 08:07:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 646BEC06510
+	for <linux-crypto@archiver.kernel.org>; Tue,  2 Jul 2019 09:23:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 81E6D2184E
-	for <linux-crypto@archiver.kernel.org>; Tue,  2 Jul 2019 08:07:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 366E220659
+	for <linux-crypto@archiver.kernel.org>; Tue,  2 Jul 2019 09:23:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="q9ZilC05"
+	dkim=pass (1024-bit key) header.d=c-s.fr header.i=@c-s.fr header.b="eXf1y6ts"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728323AbfGBIHq (ORCPT
+        id S1726598AbfGBJX0 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 2 Jul 2019 04:07:46 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:36369 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728318AbfGBIHp (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 2 Jul 2019 04:07:45 -0400
-Received: by mail-wr1-f65.google.com with SMTP id n4so16660944wrs.3
-        for <linux-crypto@vger.kernel.org>; Tue, 02 Jul 2019 01:07:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=fVYsMgjvlhzbh/TqKhi7d4SFK7B/Ukhib20YGwD2OlM=;
-        b=q9ZilC05a2m+mrPUNO5+3iadDkIlMvNCFVYKl5FwLDPma2TRWE2R0chNTM9iMMEJrH
-         ln26Gtv3kLxEQ7ulT1DkTflxRzOwddrLnWXMwiWJwKlsKAnIi7J33WBU5V1Quqvbc72s
-         dd52JvuRxilYVEeEFwthTvCbMFJTWKlEdApwk2O4qdpjwKuR8kZiIU2pFTfsAa23aVMb
-         8FwY1p93XrB1ewOEpLAGY23N5AibhbXyLd4QbBrI/O8VD+2yiqIzRtZrmonKEEpGn9wS
-         WRwgd95Nut+jEnE6ytQXprbCcr0g9xR14lMdywhfUMDKpnS6rB3KHbxwPdR0YL1tJpfH
-         RWlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=fVYsMgjvlhzbh/TqKhi7d4SFK7B/Ukhib20YGwD2OlM=;
-        b=M/wUCgSlENmBDAS2i7/d4Ps6z40/HzwSubVGW1L7e0oUDG3UyijJGiL6GJxDo9KXcn
-         T1ehq7+bvpqAlZiNepfo9G5sCc/zzEUTfBxh5l0hsLJESxIFtrr7KErRq5qLkbjuhyZ0
-         bePGLHjUmAtqThsMzJ/6scBn9luxals1K+Mj67voNueI0EqA7whZGntz4SrDkJ6F/wA0
-         MZxSo4gybvnqiKfA1o6DLthVOGaxn7X5RUTPQk3vAfwdBDGGftySMxXAsLOm38/SNlmd
-         zj7i5P8+5JU8D2ZCbMNm/aSJqLFbriSQ3lqAavblfufDh4X5/1ajXSJ/Cv8pfGUAs5Q3
-         9wJA==
-X-Gm-Message-State: APjAAAXWjxN3UaKkzQPyIJtG7esfgZMbUvjMIH8eLwRUQH5pkCFgiVmh
-        IkpcL3u6tqWhpijb6uhBCQ6UzdfrnCGl0D3dNjGehg==
-X-Google-Smtp-Source: APXvYqxFTr09aEUjlKJBTyUb2A6Ysfnih9bFlGYN09LsP6ZlqtItJRPDuv1wBv6XO4bEEeoL2GdtXHtohvv80mpjsQ8=
-X-Received: by 2002:a5d:6b07:: with SMTP id v7mr7958887wrw.169.1562054863371;
- Tue, 02 Jul 2019 01:07:43 -0700 (PDT)
+        Tue, 2 Jul 2019 05:23:26 -0400
+Received: from pegase1.c-s.fr ([93.17.236.30]:50270 "EHLO pegase1.c-s.fr"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725851AbfGBJX0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 2 Jul 2019 05:23:26 -0400
+Received: from localhost (mailhub1-int [192.168.12.234])
+        by localhost (Postfix) with ESMTP id 45dJgt0lkkz9tyW5;
+        Tue,  2 Jul 2019 11:23:22 +0200 (CEST)
+Authentication-Results: localhost; dkim=pass
+        reason="1024-bit key; insecure key"
+        header.d=c-s.fr header.i=@c-s.fr header.b=eXf1y6ts; dkim-adsp=pass;
+        dkim-atps=neutral
+X-Virus-Scanned: Debian amavisd-new at c-s.fr
+Received: from pegase1.c-s.fr ([192.168.12.234])
+        by localhost (pegase1.c-s.fr [192.168.12.234]) (amavisd-new, port 10024)
+        with ESMTP id C_iwf4exc7f3; Tue,  2 Jul 2019 11:23:22 +0200 (CEST)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+        by pegase1.c-s.fr (Postfix) with ESMTP id 45dJgs6n7Gz9tyW2;
+        Tue,  2 Jul 2019 11:23:21 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=c-s.fr; s=mail;
+        t=1562059401; bh=gVoERgHKIFk4OuIIk75HX0yexcvpcXiFS6/Z652gKOw=;
+        h=Subject:From:To:Cc:References:Date:In-Reply-To:From;
+        b=eXf1y6tseVQAs4TEQD11CqLfSxdQlnYWjn+j76vNRu8bfRbKoZREH4ty5W+7+2UB0
+         55ISWPeXYaBpsQwxsORmoSj/bRb2XPN1Di3NGj3RQzhLcuUDqP/HuYne6UnewbkrEI
+         8G/drzNyxlqXW9DHHFS5B++DE5bYHmBhcpSm7sTw=
+Received: from localhost (localhost [127.0.0.1])
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id D1AE88B7E5;
+        Tue,  2 Jul 2019 11:23:23 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+        by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+        with ESMTP id TU2F78_MYv5d; Tue,  2 Jul 2019 11:23:23 +0200 (CEST)
+Received: from [192.168.4.90] (unknown [192.168.4.90])
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id CAFE58B7E1;
+        Tue,  2 Jul 2019 11:23:22 +0200 (CEST)
+Subject: Re: [PATCH v5 0/4] Additional fixes on Talitos driver
+From:   Christophe Leroy <christophe.leroy@c-s.fr>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>, horia.geanta@nxp.com
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org
+References: <cover.1561360551.git.christophe.leroy@c-s.fr>
+Message-ID: <e011f5a3-2be3-90c9-4723-a2b16d6d56ac@c-s.fr>
+Date:   Tue, 2 Jul 2019 11:23:22 +0200
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-References: <20190628152112.914-1-ard.biesheuvel@linaro.org>
- <20190628152112.914-5-ard.biesheuvel@linaro.org> <f068888f-1a13-babf-0144-07939a79d9d9@gmail.com>
-In-Reply-To: <f068888f-1a13-babf-0144-07939a79d9d9@gmail.com>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Tue, 2 Jul 2019 10:07:32 +0200
-Message-ID: <CAKv+Gu-gnKk2EQ4Asq2evghhyTFYVq9SRQ8tu_p4VCA1dSJfHQ@mail.gmail.com>
-Subject: Re: [PATCH v6 4/7] md: dm-crypt: switch to ESSIV crypto API template
-To:     Milan Broz <gmazyland@gmail.com>
-Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Eric Biggers <ebiggers@google.com>,
-        device-mapper development <dm-devel@redhat.com>,
-        linux-fscrypt@vger.kernel.org,
-        Gilad Ben-Yossef <gilad@benyossef.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <cover.1561360551.git.christophe.leroy@c-s.fr>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 1 Jul 2019 at 10:59, Milan Broz <gmazyland@gmail.com> wrote:
->
-> On 28/06/2019 17:21, Ard Biesheuvel wrote:
-> > Replace the explicit ESSIV handling in the dm-crypt driver with calls
-> > into the crypto API, which now possesses the capability to perform
-> > this processing within the crypto subsystem.
-> >
-> > Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
->
-> >  drivers/md/dm-crypt.c | 200 ++++----------------
->
-> ...
->
-> > -/* Wipe salt and reset key derived from volume key */
-> > -static int crypt_iv_essiv_wipe(struct crypt_config *cc)
->
-> Do I understand it correctly, that this is now called inside the whole cipher
-> set key in wipe command (in crypt_wipe_key())?
->
-> (Wipe message is meant to suspend the device and wipe all key material
-> from memory without actually destroying the device.)
->
+Hi Herbert,
 
-Yes, setting the random key in wipe() triggers the SHA256 operation as
-normal, which is slightly wasteful but not a big deal imo.
+Le 24/06/2019 à 09:21, Christophe Leroy a écrit :
+> This series is the last set of fixes for the Talitos driver.
 
-> > -{
-> > -     struct iv_essiv_private *essiv = &cc->iv_gen_private.essiv;
-> > -     unsigned salt_size = crypto_shash_digestsize(essiv->hash_tfm);
-> > -     struct crypto_cipher *essiv_tfm;
-> > -     int r, err = 0;
-> > -
-> > -     memset(essiv->salt, 0, salt_size);
-> > -
-> > -     essiv_tfm = cc->iv_private;
-> > -     r = crypto_cipher_setkey(essiv_tfm, essiv->salt, salt_size);
-> > -     if (r)
-> > -             err = r;
-> > -
-> > -     return err;
-> > -}
->
-> ...
->
-> > @@ -2435,9 +2281,19 @@ static int crypt_ctr_cipher_new(struct dm_target *ti, char *cipher_in, char *key
-> >       }
-> >
-> >       ret = crypt_ctr_blkdev_cipher(cc, cipher_api);
-> > -     if (ret < 0) {
-> > -             ti->error = "Cannot allocate cipher string";
-> > -             return -ENOMEM;
-> > +     if (ret < 0)
-> > +             goto bad_mem;
-> > +
-> > +     if (*ivmode && !strcmp(*ivmode, "essiv")) {
-> > +             if (!*ivopts) {
-> > +                     ti->error = "Digest algorithm missing for ESSIV mode";
-> > +                     return -EINVAL;
-> > +             }
-> > +             ret = snprintf(buf, CRYPTO_MAX_ALG_NAME, "essiv(%s,%s,%s)",
-> > +                            cipher_api, cc->cipher, *ivopts);
-> > +             if (ret < 0 || ret >= CRYPTO_MAX_ALG_NAME)
-> > +                     goto bad_mem;
->
-> Hm, nitpicking, but goto from only one place while we have another -ENOMEM above...
->
-> Just place this here without goto?
->
+Do you plan to apply this series, or are you expecting anythink from 
+myself ?
 
-OK
+Thanks
+Christophe
 
-> > +     ti->error = "Cannot allocate cipher string";
-> > +     return -ENOMEM;
->
-> Otherwise
->
-> Reviewed-by: Milan Broz <gmazyland@gmail.com>
->
-> Thanks,
-> Milan
+> 
+> We now get a fully clean boot on both SEC1 (SEC1.2 on mpc885) and
+> SEC2 (SEC2.2 on mpc8321E) with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS:
+> 
+> [    3.385197] bus: 'platform': really_probe: probing driver talitos with device ff020000.crypto
+> [    3.450982] random: fast init done
+> [   12.252548] alg: No test for authenc(hmac(md5),cbc(aes)) (authenc-hmac-md5-cbc-aes-talitos-hsna)
+> [   12.262226] alg: No test for authenc(hmac(md5),cbc(des3_ede)) (authenc-hmac-md5-cbc-3des-talitos-hsna)
+> [   43.310737] Bug in SEC1, padding ourself
+> [   45.603318] random: crng init done
+> [   54.612333] talitos ff020000.crypto: fsl,sec1.2 algorithms registered in /proc/crypto
+> [   54.620232] driver: 'talitos': driver_bound: bound to device 'ff020000.crypto'
+> 
+> [    1.193721] bus: 'platform': really_probe: probing driver talitos with device b0030000.crypto
+> [    1.229197] random: fast init done
+> [    2.714920] alg: No test for authenc(hmac(sha224),cbc(aes)) (authenc-hmac-sha224-cbc-aes-talitos)
+> [    2.724312] alg: No test for authenc(hmac(sha224),cbc(aes)) (authenc-hmac-sha224-cbc-aes-talitos-hsna)
+> [    4.482045] alg: No test for authenc(hmac(md5),cbc(aes)) (authenc-hmac-md5-cbc-aes-talitos)
+> [    4.490940] alg: No test for authenc(hmac(md5),cbc(aes)) (authenc-hmac-md5-cbc-aes-talitos-hsna)
+> [    4.500280] alg: No test for authenc(hmac(md5),cbc(des3_ede)) (authenc-hmac-md5-cbc-3des-talitos)
+> [    4.509727] alg: No test for authenc(hmac(md5),cbc(des3_ede)) (authenc-hmac-md5-cbc-3des-talitos-hsna)
+> [    6.631781] random: crng init done
+> [   11.521795] talitos b0030000.crypto: fsl,sec2.2 algorithms registered in /proc/crypto
+> [   11.529803] driver: 'talitos': driver_bound: bound to device 'b0030000.crypto'
+> 
+> v2: dropped patch 1 which was irrelevant due to a rebase weirdness. Added Cc to stable on the 2 first patches.
+> 
+> v3:
+>   - removed stable reference in patch 1
+>   - reworded patch 1 to include name of patch 2 for the dependency.
+>   - mentionned this dependency in patch 2 as well.
+>   - corrected the Fixes: sha1 in patch 4
+>   
+> v4:
+>   - using scatterwalk_ffwd() instead of opencodying SG list forwarding.
+>   - Added a patch to fix sg_copy_to_buffer() when sg->offset() is greater than PAGE_SIZE,
+>   otherwise sg_copy_to_buffer() fails when the list has been forwarded with scatterwalk_ffwd().
+>   - taken the patch "crypto: talitos - eliminate unneeded 'done' functions at build time"
+>   out of the series because it is independent.
+>   - added a helper to find the header field associated to a request in flush_channe()
+>   
+> v5:
+>   - Replacing the while loop by a direct shift/mask operation, as suggested by Herbert in patch 1.
+> 
+> Christophe Leroy (4):
+>    lib/scatterlist: Fix mapping iterator when sg->offset is greater than
+>      PAGE_SIZE
+>    crypto: talitos - move struct talitos_edesc into talitos.h
+>    crypto: talitos - fix hash on SEC1.
+>    crypto: talitos - drop icv_ool
+> 
+>   drivers/crypto/talitos.c | 102 +++++++++++++++++++----------------------------
+>   drivers/crypto/talitos.h |  28 +++++++++++++
+>   lib/scatterlist.c        |   9 +++--
+>   3 files changed, 74 insertions(+), 65 deletions(-)
+> 
