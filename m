@@ -2,192 +2,191 @@ Return-Path: <SRS0=EZcf=VA=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BFBAC5B578
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 08:15:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBF8FC0650E
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 08:55:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 555A2218A3
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 08:15:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A2EFF218A3
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 08:55:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N50zpxJw"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="x9uIM2l9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727275AbfGCIOB (ORCPT
+        id S1726670AbfGCIzr (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 3 Jul 2019 04:14:01 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:38193 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727004AbfGCIOA (ORCPT
+        Wed, 3 Jul 2019 04:55:47 -0400
+Received: from mail-lj1-f196.google.com ([209.85.208.196]:45224 "EHLO
+        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726400AbfGCIzr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 3 Jul 2019 04:14:00 -0400
-Received: by mail-pf1-f196.google.com with SMTP id y15so856374pfn.5;
-        Wed, 03 Jul 2019 01:13:59 -0700 (PDT)
+        Wed, 3 Jul 2019 04:55:47 -0400
+Received: by mail-lj1-f196.google.com with SMTP id m23so1485113lje.12
+        for <linux-crypto@vger.kernel.org>; Wed, 03 Jul 2019 01:55:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=6x6jWn1arFYtCfxNQ45HZjLDVkH250RmOZOdF+kQcoI=;
-        b=N50zpxJwnQFYf34e2vjC/buPUEmo71NS8jbvOqdqR8/g1FHy8o3AYLowccVfeiRgcM
-         n8f22BJK86jY+QLfkLJgtQSW3JIeDacJXodSJm9GO61ZVfs0Rby2wGaBnPwySgERTmxf
-         oF3oqF62ynoddlZW+W2hZJMzAzctR4XtHk1rD33msYh5FqcHgqyAGu5WuXV0CV4qXPiU
-         oeZe6x5WEv+lW2J7RSTmZXO/mf4xw4xPUJH2y84ZANb4tIu627NgG5cglLVYHR2fYLyH
-         MCPFeXFGXx4olNZpqCPMTTlz5uqfWN8XwTXGbtHI84RnFM/tQ8i5N5nh4VgnUrnUqDgz
-         q4+A==
+        d=linaro.org; s=google;
+        h=from:to:cc:subject:date:message-id;
+        bh=BTr6fg1Hs9FFHmhEKIExNXDxUhJliY2YcV2IbTXbo5A=;
+        b=x9uIM2l9AHL3+msXH1V2Cu/PAe9MUHbJht883gdQG/7nISlgMj6Z2lugEItNg8zlMJ
+         xOzb5y4sGEfybDAeWahpnCM6zCoMtjpZpKR+MvU8slo3lESrTyf5R1Dq+RIf7GjPwfqK
+         czNATtut3vmANaVQ22FXWRuaaSrqB7zfLsh5pdJnNRYyZgieNwAg8L7lgi4U9ZDWAaxd
+         YTSY0WBY9oC4wCc1j5LEEHi3dCbgElCTMwc0XVjroxN3hW9AHkFusyF6hSA0cTe6jsHw
+         PXh0aKK81Zk6TEixjr585PeJBgTtdetLi/tQm/DvCFPWUs5GrnaJvu30cXIlfbdV7Pfy
+         ZnlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=6x6jWn1arFYtCfxNQ45HZjLDVkH250RmOZOdF+kQcoI=;
-        b=dLZEiehr5TmzJ9rUJ3jSZyyqPktX7fkdDtskIu5WTgJWFBtkkcxZi3QvwbCdniS1rl
-         R5cc5HbFQa0dWPfT2K+QHagu080PNQoadSSciOocnkmV19J9JwOz1IyskCxO0ppo+H5Q
-         t3ElmPhTn9mAbCFaAABk+c42nhQWabAQJ1dkEw5ymPO4PuSqU7v9gmZ0PpdEZ3FbDCoz
-         neVYpJIpO66dnWqghH7fyMgCFtsnhUEJRYDJJ0unrK7zUIBmeIsaMU7eRuSUSeuHl70w
-         v5w663gQEiWxC5VSTQ4CkbHBJqvA+DLDweWR6KpJIe/KG5kMG3TphTIcvVaWX9lwNgL0
-         GN4A==
-X-Gm-Message-State: APjAAAWoBesQB4lAVsvMcla5IaN8hCslG7qqM+FOZ4vNuro7uvPi3wbE
-        1iBPqrLt4tECNE1pLgS5DBY0dTtjlDA=
-X-Google-Smtp-Source: APXvYqwZYbvTT+7X+Zd3zsAH8twpYtWuKStEbv+6mrfkYCWkO469a/5y+/PYTbl8r3Gk2e05e4aNFw==
-X-Received: by 2002:a17:90a:e38f:: with SMTP id b15mr11382311pjz.85.1562141638765;
-        Wed, 03 Jul 2019 01:13:58 -0700 (PDT)
-Received: from localhost.lan (c-67-185-54-80.hsd1.wa.comcast.net. [67.185.54.80])
-        by smtp.gmail.com with ESMTPSA id d2sm1445306pgo.0.2019.07.03.01.13.57
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=BTr6fg1Hs9FFHmhEKIExNXDxUhJliY2YcV2IbTXbo5A=;
+        b=ayrIgBnswcEGoRKdVE23s20CtQRFLS/slTc19qrF4UFqsDSnppB0jY22CQkGTZAmed
+         GmQhboUcP4MnBoSLYcafT/ySQi3iSu9T+G9IHmoR+/FR5fvqttGHjH4n4uYZvHoMV/fG
+         Gyo38Fz2De+irODEppTzuCRKJSjam4CvhR8Tf107Rr6vDZa8A+jCm67WjvE0zJ0HqXHa
+         aAxhMH93xbO8JfSXZab1/hCr+N6UAXDpUCcq9itR2y99kaaGfM15OM1+ncyXdFHuiJ2B
+         cdBT9vmmTpDC1zpIBb+nMharzz2ks5GPKmZVEwSKEuo+zOUvHBOAhK/654e3B+HdFpwz
+         LGDg==
+X-Gm-Message-State: APjAAAUSyvs1jyczVyBe9XXqb8dZ20hcck6Qn6utBuwQPCG7sTbmgDVq
+        3SL8P8Jp8UizLYVU7p6eUHjgnTORIPUsQ/RO
+X-Google-Smtp-Source: APXvYqxGX3H3ahlNB3L4mTj4NnodleeyB4RW3wEJOWQzIkYlsu6PDY3Ftzd91IecGK9q7ph7hBJePg==
+X-Received: by 2002:a2e:88d3:: with SMTP id a19mr7591789ljk.32.1562144144770;
+        Wed, 03 Jul 2019 01:55:44 -0700 (PDT)
+Received: from e111045-lin.arm.com (89-212-78-239.static.t-2.net. [89.212.78.239])
+        by smtp.gmail.com with ESMTPSA id h4sm354529ljj.31.2019.07.03.01.55.43
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Wed, 03 Jul 2019 01:13:57 -0700 (PDT)
-From:   Andrey Smirnov <andrew.smirnov@gmail.com>
+        Wed, 03 Jul 2019 01:55:43 -0700 (PDT)
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
-Cc:     Andrey Smirnov <andrew.smirnov@gmail.com>,
-        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
-        Chris Spencer <christopher.spencer@sea.co.uk>,
-        Cory Tusar <cory.tusar@zii.aero>,
-        Chris Healy <cphealy@gmail.com>,
-        Lucas Stach <l.stach@pengutronix.de>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Leonard Crestez <leonard.crestez@nxp.com>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v4 01/16] crypto: caam - move DMA mask selection into a function
-Date:   Wed,  3 Jul 2019 01:13:12 -0700
-Message-Id: <20190703081327.17505-2-andrew.smirnov@gmail.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190703081327.17505-1-andrew.smirnov@gmail.com>
-References: <20190703081327.17505-1-andrew.smirnov@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Eric Biggers <ebiggers@google.com>,
+        Ondrej Mosnacek <omosnace@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Steve Capper <steve.capper@arm.com>,
+        Milan Broz <gmazyland@gmail.com>
+Subject: [PATCH v4 0/7] crypto: CAESAR final portfolio follow-up
+Date:   Wed,  3 Jul 2019 10:55:05 +0200
+Message-Id: <20190703085512.13915-1-ard.biesheuvel@linaro.org>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Exactly the same code to figure out DMA mask is repeated twice in the
-driver code. To avoid repetition, move that logic into a standalone
-subroutine in intern.h. While at it re-shuffle the code to make it
-more readable with early returns.
+This v2/v3/v4 is a follow-up to both 'crypto: aegis128 - add NEON intrinsics
+version for ARM/arm64' [0] and 'crypto: morus - remove generic and x86
+implementations' [1]. Since there is some overlap, it makes sense to merge
+them and avoid merge conflicts.
 
-Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
-Reviewed-by: Horia Geantă <horia.geanta@nxp.com>
-Cc: Chris Spencer <christopher.spencer@sea.co.uk>
-Cc: Cory Tusar <cory.tusar@zii.aero>
-Cc: Chris Healy <cphealy@gmail.com>
-Cc: Lucas Stach <l.stach@pengutronix.de>
-Cc: Horia Geantă <horia.geanta@nxp.com>
-Cc: Aymen Sghaier <aymen.sghaier@nxp.com>
-Cc: Leonard Crestez <leonard.crestez@nxp.com>
-Cc: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
----
- drivers/crypto/caam/ctrl.c   | 11 +----------
- drivers/crypto/caam/intern.h | 20 ++++++++++++++++++++
- drivers/crypto/caam/jr.c     | 15 +--------------
- 3 files changed, 22 insertions(+), 24 deletions(-)
+Now that aegis128 has been announced as one of the winners of the CAESAR
+competition, it's time to provide some better support for it on arm64 (and
+32-bit ARM *)
 
-diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-index 4e43ca4d3656..e674d8770cdb 100644
---- a/drivers/crypto/caam/ctrl.c
-+++ b/drivers/crypto/caam/ctrl.c
-@@ -688,16 +688,7 @@ static int caam_probe(struct platform_device *pdev)
- 			      JRSTART_JR1_START | JRSTART_JR2_START |
- 			      JRSTART_JR3_START);
- 
--	if (sizeof(dma_addr_t) == sizeof(u64)) {
--		if (caam_dpaa2)
--			ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(49));
--		else if (of_device_is_compatible(nprop, "fsl,sec-v5.0"))
--			ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(40));
--		else
--			ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(36));
--	} else {
--		ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(32));
--	}
-+	ret = dma_set_mask_and_coherent(dev, caam_get_dma_mask(dev));
- 	if (ret) {
- 		dev_err(dev, "dma_set_mask_and_coherent failed (%d)\n", ret);
- 		goto iounmap_ctrl;
-diff --git a/drivers/crypto/caam/intern.h b/drivers/crypto/caam/intern.h
-index 6af84bbc612c..ec25d260fa40 100644
---- a/drivers/crypto/caam/intern.h
-+++ b/drivers/crypto/caam/intern.h
-@@ -10,6 +10,8 @@
- #ifndef INTERN_H
- #define INTERN_H
- 
-+#include "ctrl.h"
-+
- /* Currently comes from Kconfig param as a ^2 (driver-required) */
- #define JOBR_DEPTH (1 << CONFIG_CRYPTO_DEV_FSL_CAAM_RINGSIZE)
- 
-@@ -215,4 +217,22 @@ DEFINE_SIMPLE_ATTRIBUTE(caam_fops_u32_ro, caam_debugfs_u32_get, NULL, "%llu\n");
- DEFINE_SIMPLE_ATTRIBUTE(caam_fops_u64_ro, caam_debugfs_u64_get, NULL, "%llu\n");
- #endif
- 
-+static inline u64 caam_get_dma_mask(struct device *dev)
-+{
-+	struct device_node *nprop = dev->of_node;
-+
-+	if (sizeof(dma_addr_t) != sizeof(u64))
-+		return DMA_BIT_MASK(32);
-+
-+	if (caam_dpaa2)
-+		return DMA_BIT_MASK(49);
-+
-+	if (of_device_is_compatible(nprop, "fsl,sec-v5.0-job-ring") ||
-+	    of_device_is_compatible(nprop, "fsl,sec-v5.0"))
-+		return DMA_BIT_MASK(40);
-+
-+	return DMA_BIT_MASK(36);
-+}
-+
-+
- #endif /* INTERN_H */
-diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
-index cea811fed320..4b25b2fa3d02 100644
---- a/drivers/crypto/caam/jr.c
-+++ b/drivers/crypto/caam/jr.c
-@@ -543,20 +543,7 @@ static int caam_jr_probe(struct platform_device *pdev)
- 
- 	jrpriv->rregs = (struct caam_job_ring __iomem __force *)ctrl;
- 
--	if (sizeof(dma_addr_t) == sizeof(u64)) {
--		if (caam_dpaa2)
--			error = dma_set_mask_and_coherent(jrdev,
--							  DMA_BIT_MASK(49));
--		else if (of_device_is_compatible(nprop,
--						 "fsl,sec-v5.0-job-ring"))
--			error = dma_set_mask_and_coherent(jrdev,
--							  DMA_BIT_MASK(40));
--		else
--			error = dma_set_mask_and_coherent(jrdev,
--							  DMA_BIT_MASK(36));
--	} else {
--		error = dma_set_mask_and_coherent(jrdev, DMA_BIT_MASK(32));
--	}
-+	error = dma_set_mask_and_coherent(jrdev, caam_get_dma_mask(jrdev));
- 	if (error) {
- 		dev_err(jrdev, "dma_set_mask_and_coherent failed (%d)\n",
- 			error);
+This time, instead of cloning the generic driver twice and rewriting half
+of it in arm64 and ARM assembly, add hooks for an accelerated SIMD path to
+the generic driver, and populate it with a C version using NEON intrinsics
+that can be built for both ARM and arm64. This results in a speedup of ~11x,
+resulting in a performance of 2.2 cycles per byte on Cortex-A53.
+
+Patches #3 and #4 are fixes/improvements for the generic code. Patch #5
+adds the plumbing for using a SIMD accelerated implementation. Patch #6
+adds the ARM and arm64 code, and patch #7 adds a speed test.
+
+Since aegis128l and aegis256 were not selected, and nor where any of the
+morus contestants (which are in fact found to be cryptographically broken),
+patches #1 and #2 remove these entirely.
+
+Changes since v3:
+- drop always_inline annotation from aegis_aes_round(), which triggers a
+  warning on ARM
+- add Ondrej's R-b to the series
+
+Changes since v2:
+- drop AEGIS128L/256 Kconfig symbols from crypto/Kconfig
+- ensure that aese/aesmc are issued in pairs
+
+Changes since v1s:
+- add reference to research paper (#1)
+- drop hunks against m68k defconfigs - these get regenerated automatically
+  anyway, and so it is better to avoid the potential merge conflicts.
+- drop patch to use unaligned accessors where it isn't needed
+- drop hunks against aegis variants that are being removed (#3)
+- add acks from Ondrej
+
+* 32-bit ARM today rarely provides the special AES instruction that the
+  implementation in this series relies on, but this may change in the future,
+  and the NEON intrinsics code can be compiled for both ISAs.
+
+Cc: Eric Biggers <ebiggers@google.com>
+Cc: Ondrej Mosnacek <omosnace@redhat.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Steve Capper <steve.capper@arm.com>
+Cc: Milan Broz <gmazyland@gmail.com>
+
+[0] https://lore.kernel.org/linux-crypto/20190624073818.29296-1-ard.biesheuvel@linaro.org/
+[1] https://lore.kernel.org/linux-crypto/20190625145254.28510-1-ard.biesheuvel@linaro.org/
+
+Ard Biesheuvel (7):
+  crypto: morus - remove generic and x86 implementations
+  crypto: aegis128l/aegis256 - remove x86 and generic implementations
+  crypto: aegis128 - drop empty TFM init/exit routines
+  crypto: aegis - avoid prerotated AES tables
+  crypto: aegis128 - add support for SIMD acceleration
+  crypto: aegis128 - provide a SIMD implementation based on NEON
+    intrinsics
+  crypto: tcrypt - add a speed test for AEGIS128
+
+ arch/x86/crypto/Makefile               |   17 -
+ arch/x86/crypto/aegis128l-aesni-asm.S  |  826 ------
+ arch/x86/crypto/aegis128l-aesni-glue.c |  297 ---
+ arch/x86/crypto/aegis256-aesni-asm.S   |  703 -----
+ arch/x86/crypto/aegis256-aesni-glue.c  |  297 ---
+ arch/x86/crypto/morus1280-avx2-asm.S   |  622 -----
+ arch/x86/crypto/morus1280-avx2-glue.c  |   66 -
+ arch/x86/crypto/morus1280-sse2-asm.S   |  896 -------
+ arch/x86/crypto/morus1280-sse2-glue.c  |   65 -
+ arch/x86/crypto/morus1280_glue.c       |  209 --
+ arch/x86/crypto/morus640-sse2-asm.S    |  615 -----
+ arch/x86/crypto/morus640-sse2-glue.c   |   65 -
+ arch/x86/crypto/morus640_glue.c        |  204 --
+ crypto/Kconfig                         |   89 +-
+ crypto/Makefile                        |   16 +-
+ crypto/aegis.h                         |   28 +-
+ crypto/{aegis128.c => aegis128-core.c} |   53 +-
+ crypto/aegis128-neon-inner.c           |  149 ++
+ crypto/aegis128-neon.c                 |   43 +
+ crypto/aegis128l.c                     |  522 ----
+ crypto/aegis256.c                      |  473 ----
+ crypto/morus1280.c                     |  542 ----
+ crypto/morus640.c                      |  533 ----
+ crypto/tcrypt.c                        |    7 +
+ crypto/testmgr.c                       |   24 -
+ crypto/testmgr.h                       | 2691 --------------------
+ include/crypto/morus1280_glue.h        |   97 -
+ include/crypto/morus640_glue.h         |   97 -
+ include/crypto/morus_common.h          |   18 -
+ 29 files changed, 266 insertions(+), 9998 deletions(-)
+ delete mode 100644 arch/x86/crypto/aegis128l-aesni-asm.S
+ delete mode 100644 arch/x86/crypto/aegis128l-aesni-glue.c
+ delete mode 100644 arch/x86/crypto/aegis256-aesni-asm.S
+ delete mode 100644 arch/x86/crypto/aegis256-aesni-glue.c
+ delete mode 100644 arch/x86/crypto/morus1280-avx2-asm.S
+ delete mode 100644 arch/x86/crypto/morus1280-avx2-glue.c
+ delete mode 100644 arch/x86/crypto/morus1280-sse2-asm.S
+ delete mode 100644 arch/x86/crypto/morus1280-sse2-glue.c
+ delete mode 100644 arch/x86/crypto/morus1280_glue.c
+ delete mode 100644 arch/x86/crypto/morus640-sse2-asm.S
+ delete mode 100644 arch/x86/crypto/morus640-sse2-glue.c
+ delete mode 100644 arch/x86/crypto/morus640_glue.c
+ rename crypto/{aegis128.c => aegis128-core.c} (89%)
+ create mode 100644 crypto/aegis128-neon-inner.c
+ create mode 100644 crypto/aegis128-neon.c
+ delete mode 100644 crypto/aegis128l.c
+ delete mode 100644 crypto/aegis256.c
+ delete mode 100644 crypto/morus1280.c
+ delete mode 100644 crypto/morus640.c
+ delete mode 100644 include/crypto/morus1280_glue.h
+ delete mode 100644 include/crypto/morus640_glue.h
+ delete mode 100644 include/crypto/morus_common.h
+
 -- 
-2.21.0
+2.17.1
 
