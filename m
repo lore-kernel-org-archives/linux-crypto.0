@@ -1,106 +1,100 @@
 Return-Path: <SRS0=EZcf=VA=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: *
-X-Spam-Status: No, score=1.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-2.5 required=3.0 tests=FROM_EXCESS_BASE64,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 192B5C06511
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 20:31:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45D69C5B578
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 21:10:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DC430218A3
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 20:31:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1562185894;
-	bh=8rZJjhlUf/qMBdRLPI5prMW5R8RsnoeRcyV06al/QNE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=xceSJl1odWnsWUUbYJwjSTPOIxIk8DyNeiPsGT02Q7av+RP2IbysKLi7fjfetfjPL
-	 jqZDZb0gIdYVprxuIiRgx0GVtx/ThYugZ8LdNnmcs5Pp3rGh+8qB7ngzRQ7WmXlvHa
-	 MdaeymvMfdzRgPGJ0FqmO4a9v3xHasvAotozboOQ=
+	by mail.kernel.org (Postfix) with ESMTP id 29595218A0
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 21:10:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726581AbfGCUbc (ORCPT
+        id S1726678AbfGCVKQ convert rfc822-to-8bit (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 3 Jul 2019 16:31:32 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48494 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726550AbfGCUbc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 3 Jul 2019 16:31:32 -0400
-Received: from gmail.com (unknown [104.132.1.77])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E92C1218A0;
-        Wed,  3 Jul 2019 20:31:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1562185891;
-        bh=8rZJjhlUf/qMBdRLPI5prMW5R8RsnoeRcyV06al/QNE=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=igHZO/XeFH2AYZ1UZL9Hr/0DlCMrJobgPYTmblwWmLYpJhrE0ThCPKavzhp8UODlC
-         dltKVf6ekIyFcekgpsHgb2EKKhfzm/UKUp8JEeh9zMBZsnYyG+EmijpcD1zhcqkJ9c
-         lsy2bCVVV3XzCoQn+FNDlTDjcguJ5uJAMU1QUF9c=
-Date:   Wed, 3 Jul 2019 13:31:29 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Michal =?iso-8859-1?Q?Such=E1nek?= <msuchanek@suse.de>
+        Wed, 3 Jul 2019 17:10:16 -0400
+Received: from mx2.suse.de ([195.135.220.15]:35034 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726550AbfGCVKQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 3 Jul 2019 17:10:16 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 24FABAD35;
+        Wed,  3 Jul 2019 21:10:15 +0000 (UTC)
+Date:   Wed, 3 Jul 2019 23:10:14 +0200
+From:   Michal =?UTF-8?B?U3VjaMOhbmVr?= <msuchanek@suse.de>
+To:     Eric Biggers <ebiggers@kernel.org>
 Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
         linux-crypto@vger.kernel.org, chetjain@in.ibm.com,
         "David S . Miller" <davem@davemloft.net>,
         linux-kernel@vger.kernel.org, stable@vger.kernel.org,
         Steffen Klassert <steffen.klassert@secunet.com>
 Subject: Re: [PATCH] crypto: user - prevent operating on larval algorithms
-Message-ID: <20190703203128.GC10080@gmail.com>
+Message-ID: <20190703231014.610ab8b5@kitsune.suse.cz>
+In-Reply-To: <20190703203128.GC10080@gmail.com>
 References: <20190701153154.1569c2dc@kitsune.suse.cz>
- <20190702211700.16526-1-ebiggers@kernel.org>
- <20190703143057.miqgc7blhjjxjmee@gondor.apana.org.au>
- <20190703222108.467ec204@kitsune.suse.cz>
+        <20190702211700.16526-1-ebiggers@kernel.org>
+        <20190703143057.miqgc7blhjjxjmee@gondor.apana.org.au>
+        <20190703222108.467ec204@kitsune.suse.cz>
+        <20190703203128.GC10080@gmail.com>
+Organization: SUSE Linux
+X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-suse-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190703222108.467ec204@kitsune.suse.cz>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Michal,
+On Wed, 3 Jul 2019 13:31:29 -0700
+Eric Biggers <ebiggers@kernel.org> wrote:
 
-On Wed, Jul 03, 2019 at 10:21:08PM +0200, Michal Suchánek wrote:
-> On Wed, 3 Jul 2019 22:30:57 +0800
-> Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> Hi Michal,
 > 
-> > On Tue, Jul 02, 2019 at 02:17:00PM -0700, Eric Biggers wrote:
-> > > From: Eric Biggers <ebiggers@google.com>
-> > > 
-> > > Michal Suchanek reported [1] that running the pcrypt_aead01 test from
-> > > LTP [2] in a loop and holding Ctrl-C causes a NULL dereference of
-> > > alg->cra_users.next in crypto_remove_spawns(), via crypto_del_alg().
-> > > The test repeatedly uses CRYPTO_MSG_NEWALG and CRYPTO_MSG_DELALG.
-> > > 
-> > > The crash occurs when the instance that CRYPTO_MSG_DELALG is trying to
-> > > unregister isn't a real registered algorithm, but rather is a "test
-> > > larval", which is a special "algorithm" added to the algorithms list
-> > > while the real algorithm is still being tested.  Larvals don't have
-> > > initialized cra_users, so that causes the crash.  Normally pcrypt_aead01
-> > > doesn't trigger this because CRYPTO_MSG_NEWALG waits for the algorithm
-> > > to be tested; however, CRYPTO_MSG_NEWALG returns early when interrupted.
-> > > 
+> On Wed, Jul 03, 2019 at 10:21:08PM +0200, Michal SuchÃ¡nek wrote:
+> > On Wed, 3 Jul 2019 22:30:57 +0800
+> > Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> >   
+> > > On Tue, Jul 02, 2019 at 02:17:00PM -0700, Eric Biggers wrote:  
+> > > > From: Eric Biggers <ebiggers@google.com>
+> > > > 
+> > > > Michal Suchanek reported [1] that running the pcrypt_aead01 test from
+> > > > LTP [2] in a loop and holding Ctrl-C causes a NULL dereference of
+> > > > alg->cra_users.next in crypto_remove_spawns(), via crypto_del_alg().
+> > > > The test repeatedly uses CRYPTO_MSG_NEWALG and CRYPTO_MSG_DELALG.
+> > > > 
+> > > > The crash occurs when the instance that CRYPTO_MSG_DELALG is trying to
+> > > > unregister isn't a real registered algorithm, but rather is a "test
+> > > > larval", which is a special "algorithm" added to the algorithms list
+> > > > while the real algorithm is still being tested.  Larvals don't have
+> > > > initialized cra_users, so that causes the crash.  Normally pcrypt_aead01
+> > > > doesn't trigger this because CRYPTO_MSG_NEWALG waits for the algorithm
+> > > > to be tested; however, CRYPTO_MSG_NEWALG returns early when interrupted.
+> > > >   
+> > 
+> > Do you have some way to reproduce this reliably?
+> > 
+> > I suppose you would have to send a signal to the process for the call
+> > to get interrupted, right?
+> >   
 > 
-> Do you have some way to reproduce this reliably?
+> It reproduced pretty reliably for me with what you suggested.  Just typing in
+> terminal:
 > 
-> I suppose you would have to send a signal to the process for the call
-> to get interrupted, right?
+> 	while true; do pcrypt_aead01; done
 > 
+> and then holding Ctrl-C.
+> 
+> If I have time I'll try writing an LTP test that specifically reproduces it.
+> Yes, it would involve sending a signal to a thread or process that's executing
+> CRYPTO_MSG_NEWALG (unless I find a better way).
 
-It reproduced pretty reliably for me with what you suggested.  Just typing in
-terminal:
+Maybe it is possible to just send the remove message without waiting
+for the ack on add.
 
-	while true; do pcrypt_aead01; done
+Thanks
 
-and then holding Ctrl-C.
-
-If I have time I'll try writing an LTP test that specifically reproduces it.
-Yes, it would involve sending a signal to a thread or process that's executing
-CRYPTO_MSG_NEWALG (unless I find a better way).
-
-- Eric
+Michal
