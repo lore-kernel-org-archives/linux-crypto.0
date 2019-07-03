@@ -2,119 +2,94 @@ Return-Path: <SRS0=EZcf=VA=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68C6DC0650E
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 17:14:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD898C0650E
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 18:22:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3D0EF21881
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 17:14:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9995B2080C
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 18:22:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UX5GJ5a3"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NYwMoQRq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726821AbfGCROv (ORCPT
+        id S1726430AbfGCSWH (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 3 Jul 2019 13:14:51 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:45441 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726718AbfGCROv (ORCPT
+        Wed, 3 Jul 2019 14:22:07 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:54836 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725933AbfGCSWH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 3 Jul 2019 13:14:51 -0400
-Received: by mail-io1-f68.google.com with SMTP id e3so6202661ioc.12;
-        Wed, 03 Jul 2019 10:14:50 -0700 (PDT)
+        Wed, 3 Jul 2019 14:22:07 -0400
+Received: by mail-wm1-f68.google.com with SMTP id p74so161701wme.4
+        for <linux-crypto@vger.kernel.org>; Wed, 03 Jul 2019 11:22:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
+        d=linaro.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=Nh9dEJ9u2Y4ShTiHFYbydyiw3WYwXZ47VJXMaHvlETk=;
-        b=UX5GJ5a3W8vnXqaG6bYQid9Tk2rxUC2cxFyHfISjXfw3xZRhBp7g5yal7gmi6b+6bi
-         2OLiaKbvjjNWqKVDRvxuLXZeTzOAx7XWNj4cscpT5PGP01nMamx5ZgU+H3IJCmIBzqDU
-         KgQXltDjEnYoX2BhQEahn5u43RU8j9EqAdsuofkq42ucH0lBO56IHtRvRphjKhqKzVoQ
-         9fShBsIyuPVasNQazC/c6i/B7Xou5NXhw9stdppSWRzSsuZsL3sewE8at0IeHbRAE/Pe
-         bYVRthrz3Rfw4iYDW5dX4GLX1rf3ctOZdw1gLtCF2Rxca41XJjSpReslNoHg9O0h4rBq
-         sSXw==
+        bh=KAJLoXmtlUGTIhQz/R8IxrT9lql92ArMXqcy3RaeD8g=;
+        b=NYwMoQRqTluy3SeUDuqwkuwDUyWGvCxbWa5fkmSy51KJ9k5YaPXQnEBMADn9Tw3cfa
+         4qEJLOQjOn+nK3OdVulFa8UMbmM66kLUWTPiqYfyKjeOceoaBM6DRvhi68GXqpSAulve
+         2e/EjzV0QOLTC7CP0XcZiPp0DuRGCJ1m/Yku3j0OwLwwP5rIPc21S/DpiYy4GavaG3/9
+         7qc1AGnREJxpJLIg+0qEeRUJis3rSPmLOZoEFVXpMZvXjST0IookzPQC7hsLD1FcIkK7
+         obiDc3P6wkNXofNQooqtfV9Uer1RwbfWO3VFSRN4jc5B3MntJqD0LkmMJhhRWSxp3dpq
+         KJUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=Nh9dEJ9u2Y4ShTiHFYbydyiw3WYwXZ47VJXMaHvlETk=;
-        b=Sf5AYg6N1HXJhPATSZu5PO02y25DkQaU2rukL1Wom47pG2llUUDi8UNgeftCrKR+wD
-         FOFHuAeQTCtEuF8hm0dPWOqwLDm3FvXyKpILA7AqbTcQlGlirmWB3DmTsPN5sYFMEHdV
-         7g5Pz56wV4Q/GUcwBXmrI+st8rKCXK13Bz8VGi41cBs1jhFihOXBItr5fMd5bhsqcbzU
-         6CbAjAx6TeFijKOK5yjMw1y6zywyd1N7xSnK0Jtzbl2z0XiD+tuN76tM4EKrpBfnpeJ7
-         DC1Pz+VLtO/HlPyCm2gi3Dpj23QYibogykhFwFvdLNYK1OA0vCGJzLJg8d5qeKxPEEN6
-         y1sQ==
-X-Gm-Message-State: APjAAAX72VWkPG5O3xQ1K6ES4RhLIw5UxfS4dEjXVshqhwoFvDfWaIk3
-        1cBKpiSnZekyG4jrmM+0RDiREdGcJFRfsFeh7Vo=
-X-Google-Smtp-Source: APXvYqzxSGfndHH5s8QQP6JMhmrjCfpxwk4akPLDTwdab+2QJvkTvQ8scvf2HrUvngz2nLIFp8dcUZexpefSjuHWDW8=
-X-Received: by 2002:a02:8814:: with SMTP id r20mr45482735jai.115.1562174090222;
- Wed, 03 Jul 2019 10:14:50 -0700 (PDT)
+        bh=KAJLoXmtlUGTIhQz/R8IxrT9lql92ArMXqcy3RaeD8g=;
+        b=WV7jl0QOn96QqlW7Db9A5qu1tVA4M8TqOpxp3RQoL1wN2JXqzPRnDnDNyCSCZL4fgC
+         prXpTSGkIIro4lcij/pvT0tEZAWaYrHLxSddUPQhnN5z6hwtAHvYKLCADOkWwO/6O3Rz
+         pIL+mrEUhiVJTCTv6Y5kUHimANbE/xEcO8DzyqKGSynATwcwvq0D6JYGFcWwQAJAAYLX
+         dfHuaLhD4CyLvZteyTs+JlZI5e74pDaZXIYVh2fFwnhA4SHgyac/UwU1pP3u0yhfs8vB
+         8vJ5gvXVi88GTe4oatsMyvjdVS0WfovLTZ4i2Wak1vibQZAMKQ3pBiXgg7MP2oo7kH6E
+         FXZA==
+X-Gm-Message-State: APjAAAWbZGJkoFI7Sop5eCAjbKjufZ8buFKiHT4drgUb04CqGN8DU6kn
+        tEGiKpVCN7X9UymbE9Gm+OZwSx6cMOCsfm2Wmwl78w==
+X-Google-Smtp-Source: APXvYqx5+pyNBabT/eHf40ztsZ9ljN/unxi8jbD5mXGGQuW8bkNxV1kJPRUMZ/Uly8cx60YDSkNYRm/Hp+VqAh3FRMo=
+X-Received: by 2002:a1c:b706:: with SMTP id h6mr8573915wmf.119.1562178125589;
+ Wed, 03 Jul 2019 11:22:05 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190703081327.17505-1-andrew.smirnov@gmail.com>
- <20190703081327.17505-4-andrew.smirnov@gmail.com> <VI1PR04MB505565EC5520F4820E234A84EEFB0@VI1PR04MB5055.eurprd04.prod.outlook.com>
-In-Reply-To: <VI1PR04MB505565EC5520F4820E234A84EEFB0@VI1PR04MB5055.eurprd04.prod.outlook.com>
-From:   Andrey Smirnov <andrew.smirnov@gmail.com>
-Date:   Wed, 3 Jul 2019 10:14:38 -0700
-Message-ID: <CAHQ1cqHfBU92g-P7jDfiWtEr0m-kv5Lw9yZcvUEXYg7OyhURfg@mail.gmail.com>
-Subject: Re: [PATCH v4 03/16] crypto: caam - move tasklet_init() call down
-To:     Leonard Crestez <leonard.crestez@nxp.com>
-Cc:     Horia Geanta <horia.geanta@nxp.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Chris Spencer <christopher.spencer@sea.co.uk>,
-        Cory Tusar <cory.tusar@zii.aero>,
-        Chris Healy <cphealy@gmail.com>,
-        Lucas Stach <l.stach@pengutronix.de>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20190624133042.7422-1-ard.biesheuvel@linaro.org> <20190703132532.n4zi66shnsq5ft5k@gondor.apana.org.au>
+In-Reply-To: <20190703132532.n4zi66shnsq5ft5k@gondor.apana.org.au>
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date:   Wed, 3 Jul 2019 20:21:50 +0200
+Message-ID: <CAKv+Gu9jg6omSmBFFqQRFeQ-a0K+5PuqgJcjEpjGWVeWMR8eTg@mail.gmail.com>
+Subject: Re: [RFC/RFT PATCH] crypto: aes/generic - use unaligned loads to
+ eliminate 50% of lookup tables
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>, Eric Biggers <ebiggers@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jul 3, 2019 at 6:51 AM Leonard Crestez <leonard.crestez@nxp.com> wrote:
+On Wed, 3 Jul 2019 at 15:25, Herbert Xu <herbert@gondor.apana.org.au> wrote:
 >
-> On 7/3/2019 11:14 AM, Andrey Smirnov wrote:
-> > Move tasklet_init() call further down in order to simplify error path
-> > cleanup. No functional change intended.
+> Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
 > >
-> > diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
-> > index 4b25b2fa3d02..a7ca2bbe243f 100644
-> > --- a/drivers/crypto/caam/jr.c
-> > +++ b/drivers/crypto/caam/jr.c
-> > @@ -441,15 +441,13 @@ static int caam_jr_init(struct device *dev)
-> >
-> >       jrp = dev_get_drvdata(dev);
-> >
-> > -     tasklet_init(&jrp->irqtask, caam_jr_dequeue, (unsigned long)dev);
-> > -
-> >       /* Connect job ring interrupt handler. */
-> >       error = request_irq(jrp->irq, caam_jr_interrupt, IRQF_SHARED,
-> >                           dev_name(dev), dev);
-> >       if (error) {
-> >               dev_err(dev, "can't connect JobR %d interrupt (%d)\n",
-> >                       jrp->ridx, jrp->irq);
-> > -             goto out_kill_deq;
-> > +             return error;
-> >       }
+> > +config CRYPTO_AES_REDUCED_TABLES
+> > +       bool "Use reduced AES table set"
+> > +       depends on CRYPTO_AES && HAVE_EFFICIENT_UNALIGNED_ACCESS
+> > +       default y
+> > +       help
+> > +         Use a set of AES lookup tables that is only half the size, but
+> > +         uses unaligned accesses to fetch the data. Given that the D-cache
+> > +         pressure of table based AES induces timing variances that can
+> > +         sometimes be exploited to infer key bits when the plaintext is
+> > +         known, this should typically be left enabled.
 >
-> The caam_jr_interrupt handler can schedule the tasklet so it makes sense
-> to have it be initialized ahead of request_irq. In theory it's possible
-> for an interrupt to be triggered immediately when request_irq is called.
->
-> I'm not very familiar with the CAAM ip, can you ensure no interrupts are
-> pending in HW at probe time? The "no functional change" part is not obvious.
+> I don't think this option should exist at all, and certainly
+> not as a user-visible option.
 >
 
-Said tasklet will use both jrp->outring and jrp->entinfo array
-initialized after IRQ request call in both versions of the code
-(before/after this patch). AFAICT, the only case where this patch
-would change initialization safety of the original code is if JR was
-scheduled somehow while ORSFx is 0 (no jobs done), which I don't think
-is possible.
-
-Thanks,
-Andrey Smirnov
+OK, so perhaps we should just use  HAVE_EFFICIENT_UNALIGNED_ACCESS in
+the code to make the distinction. But i'd like to gain an
+understanding of how this affects performance on various
+(micro)architectures first. I'll park this until after the summer,
+since i won't have time to spend on this myself anyway, and hopefully,
+some interested parties will have provided some data points by then.
