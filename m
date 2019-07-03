@@ -2,181 +2,108 @@ Return-Path: <SRS0=EZcf=VA=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60D5FC46478
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 01:33:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D1CCC5B578
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 06:37:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 39F992063F
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 01:33:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1562117586;
-	bh=hOYB46lYLP30wkEWfOV6OIbMxQdFCth2OM8MWmv+OgA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=Bcc0ujXQwFmYy3Auq6u7jk4eapdkb6P1U1Bxo2N0NiRJny/NPWoGzrAZbgK/Bb7zw
-	 Z+BZZVccrf7sbNArwFu5dZtlhkxNNfiHAW2yK1n95B/reDv2o/5J/Wxhs6AEG7nWeb
-	 ckhqGY1PJe1aiqcUFFbnS17LLh9dtoap3EieZdXc=
+	by mail.kernel.org (Postfix) with ESMTP id 593BA21881
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 06:37:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oQrvKYN6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727407AbfGCBdF (ORCPT
+        id S1726684AbfGCGhr (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 2 Jul 2019 21:33:05 -0400
-Received: from mail.kernel.org ([198.145.29.99]:39006 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727108AbfGCBdE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 2 Jul 2019 21:33:04 -0400
-Received: from gmail.com (unknown [104.132.1.77])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 9F4F8218BE;
-        Tue,  2 Jul 2019 21:55:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1562104519;
-        bh=hOYB46lYLP30wkEWfOV6OIbMxQdFCth2OM8MWmv+OgA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=LRvfL6OpM8Gh8nwRW5vFj6q6upNRHcWevxIMA3GvQ/nfj+fVXB/TyDBBn3wFIFl8b
-         zaDvhResmMi3czwuhRgtBLh2vXMm+7PDsGIW1oE2vA9lMqT3uirydvhpF6c+ThlaRm
-         /h/cme9IwahHJcTITFQYbDWCPiA9qQTNxAAo/lSo=
-Date:   Tue, 2 Jul 2019 14:55:18 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>, dm-devel@redhat.com,
-        linux-fscrypt@vger.kernel.org,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Milan Broz <gmazyland@gmail.com>
-Subject: Re: [PATCH v7 2/7] fs: crypto: invoke crypto API for ESSIV handling
-Message-ID: <20190702215517.GA69157@gmail.com>
-References: <20190702164815.6341-1-ard.biesheuvel@linaro.org>
- <20190702164815.6341-3-ard.biesheuvel@linaro.org>
+        Wed, 3 Jul 2019 02:37:47 -0400
+Received: from mail-io1-f68.google.com ([209.85.166.68]:40495 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726327AbfGCGhq (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 3 Jul 2019 02:37:46 -0400
+Received: by mail-io1-f68.google.com with SMTP id n5so2153457ioc.7;
+        Tue, 02 Jul 2019 23:37:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=FOIxNlDzVh5kXdl9uOiCioxQI2rCCNBXDcfxZ9oiGn4=;
+        b=oQrvKYN6+Oa/mi5oqHJm/0u1d3bIJSZvqt/2eGg8P4ktEZTx14HyMyCIxEvYI2B47V
+         4VsUmdNttA9TSM+TZLgpm0PDvKjyAgy6GUAREped91mDu/QX+CltfgdXh38jba5ZKmhd
+         P2AK0d/w1qNtPkjFY9xb5mktdhaE7uih5Av11615R4hJy0wb0yzqczDF7HYpVFJpv6/6
+         s3hCxB8VolfGSXpmccI/iIYtGaaqPGqKhLuh5cU3IXY74iOMUdruB89oozjiPO3Dy+gr
+         pZlFmom46AbUUceksx7V0grs2DsemIajtC3WLtW8zVxkoNwidJm0HYjD3bK6ejRS98NQ
+         05ig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=FOIxNlDzVh5kXdl9uOiCioxQI2rCCNBXDcfxZ9oiGn4=;
+        b=UEDxaF+aYdGrgVc3Gt1/Du0+jG0uYirsVwt55eUdCSEG6tO0p1Vv3dHiQ8PrAuVDEf
+         jRVl4RybltNLOPkjXod4eA+ZtgPV4Ih9JvvtCo9B4I1av7KxDyMNh7d6n3FyiQJSwp3Z
+         BXZMva5a1U33rOC9phhiA5fKVB825N8TxCxdnmyfUpDFfn0pDsFArBZKL3L1khQv5SaH
+         xUHteoje2g+A4F6EEACFCaY/CaWkf8EQcVMiah6GL4aeNKQhYRMpi1EP2+fpAmQ/B1O6
+         LsXpmiDerVCnaigWPAKAfeEUgewQiOlprSn/AuIng+pfKT/V/1tVxXWvR08vvhN6ZmMo
+         cNmw==
+X-Gm-Message-State: APjAAAUPHhJ/YlGRPF5U4A60Bw0qsM33lvgcZHAbsfIqA+A7dYQxmDeG
+        7cVp5ZWeJFeBtFKUEuqAQLqGtgDl9yHi6h83ROeqpeV+
+X-Google-Smtp-Source: APXvYqzUoLIbKm+T5fsnG1Of6uNoe9L4Lk43sPF5Mm1NCv7QtIHFm6oVd5rzrOle8bjQuRlwvYUdK+/9Ip+p+q6a0f8=
+X-Received: by 2002:a6b:4107:: with SMTP id n7mr4379048ioa.12.1562135865720;
+ Tue, 02 Jul 2019 23:37:45 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190702164815.6341-3-ard.biesheuvel@linaro.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <20190617160339.29179-1-andrew.smirnov@gmail.com>
+ <20190617160339.29179-2-andrew.smirnov@gmail.com> <VI1PR0402MB3485542286BC0F8814DE4EB098FD0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+In-Reply-To: <VI1PR0402MB3485542286BC0F8814DE4EB098FD0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+From:   Andrey Smirnov <andrew.smirnov@gmail.com>
+Date:   Tue, 2 Jul 2019 23:37:41 -0700
+Message-ID: <CAHQ1cqH4t7zge8ceNQ9GSA=ioMNJxerz9qJ4vtgY_Gh0Bz689A@mail.gmail.com>
+Subject: Re: [PATCH v3 1/5] crypto: caam - move DMA mask selection into a function
+To:     Horia Geanta <horia.geanta@nxp.com>
+Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Chris Spencer <christopher.spencer@sea.co.uk>,
+        Cory Tusar <cory.tusar@zii.aero>,
+        Chris Healy <cphealy@gmail.com>,
+        Lucas Stach <l.stach@pengutronix.de>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Leonard Crestez <leonard.crestez@nxp.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Ard,
+On Thu, Jun 27, 2019 at 3:50 AM Horia Geanta <horia.geanta@nxp.com> wrote:
+>
+> On 6/17/2019 7:04 PM, Andrey Smirnov wrote:
+> > Exactly the same code to figure out DMA mask is repeated twice in the
+> > driver code. To avoid repetition, move that logic into a standalone
+> > subroutine in intern.h. While at it re-shuffle the code to make it
+> > more readable with early returns.
+> >
+> > Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+> > Cc: Chris Spencer <christopher.spencer@sea.co.uk>
+> > Cc: Cory Tusar <cory.tusar@zii.aero>
+> > Cc: Chris Healy <cphealy@gmail.com>
+> > Cc: Lucas Stach <l.stach@pengutronix.de>
+> > Cc: Horia Geant=C4=83 <horia.geanta@nxp.com>
+> > Cc: Aymen Sghaier <aymen.sghaier@nxp.com>
+> > Cc: Leonard Crestez <leonard.crestez@nxp.com>
+> > Cc: linux-crypto@vger.kernel.org
+> > Cc: linux-kernel@vger.kernel.org
+> Reviewed-by: Horia Geant=C4=83 <horia.geanta@nxp.com>
+>
+> Being the 1st patch in the series and not i.MX8-specific, I'd say it shou=
+ld
+> be merged separately.
+>
 
-On Tue, Jul 02, 2019 at 06:48:10PM +0200, Ard Biesheuvel wrote:
-> Instead of open coding the calculations for ESSIV handling, use a
-> ESSIV skcipher which does all of this under the hood.
-> 
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> ---
->  fs/crypto/Kconfig           |  1 +
->  fs/crypto/crypto.c          |  5 --
->  fs/crypto/fscrypt_private.h |  9 --
->  fs/crypto/keyinfo.c         | 95 +-------------------
->  4 files changed, 5 insertions(+), 105 deletions(-)
-> 
-> diff --git a/fs/crypto/Kconfig b/fs/crypto/Kconfig
-> index 24ed99e2eca0..b0292da8613c 100644
-> --- a/fs/crypto/Kconfig
-> +++ b/fs/crypto/Kconfig
-> @@ -5,6 +5,7 @@ config FS_ENCRYPTION
->  	select CRYPTO_AES
->  	select CRYPTO_CBC
->  	select CRYPTO_ECB
-> +	select CRYPTO_ESSIV
->  	select CRYPTO_XTS
->  	select CRYPTO_CTS
->  	select CRYPTO_SHA256
-> diff --git a/fs/crypto/crypto.c b/fs/crypto/crypto.c
-> index 335a362ee446..c53ce262a06c 100644
-> --- a/fs/crypto/crypto.c
-> +++ b/fs/crypto/crypto.c
-> @@ -136,9 +136,6 @@ void fscrypt_generate_iv(union fscrypt_iv *iv, u64 lblk_num,
->  
->  	if (ci->ci_flags & FS_POLICY_FLAG_DIRECT_KEY)
->  		memcpy(iv->nonce, ci->ci_nonce, FS_KEY_DERIVATION_NONCE_SIZE);
-> -
-> -	if (ci->ci_essiv_tfm != NULL)
-> -		crypto_cipher_encrypt_one(ci->ci_essiv_tfm, iv->raw, iv->raw);
->  }
->  
->  int fscrypt_do_page_crypto(const struct inode *inode, fscrypt_direction_t rw,
-> @@ -492,8 +489,6 @@ static void __exit fscrypt_exit(void)
->  		destroy_workqueue(fscrypt_read_workqueue);
->  	kmem_cache_destroy(fscrypt_ctx_cachep);
->  	kmem_cache_destroy(fscrypt_info_cachep);
-> -
-> -	fscrypt_essiv_cleanup();
->  }
->  module_exit(fscrypt_exit);
->  
-> diff --git a/fs/crypto/fscrypt_private.h b/fs/crypto/fscrypt_private.h
-> index 7da276159593..59d0cba9cfb9 100644
-> --- a/fs/crypto/fscrypt_private.h
-> +++ b/fs/crypto/fscrypt_private.h
-> @@ -61,12 +61,6 @@ struct fscrypt_info {
->  	/* The actual crypto transform used for encryption and decryption */
->  	struct crypto_skcipher *ci_ctfm;
->  
-> -	/*
-> -	 * Cipher for ESSIV IV generation.  Only set for CBC contents
-> -	 * encryption, otherwise is NULL.
-> -	 */
-> -	struct crypto_cipher *ci_essiv_tfm;
-> -
->  	/*
->  	 * Encryption mode used for this inode.  It corresponds to either
->  	 * ci_data_mode or ci_filename_mode, depending on the inode type.
-> @@ -166,9 +160,6 @@ struct fscrypt_mode {
->  	int keysize;
->  	int ivsize;
->  	bool logged_impl_name;
-> -	bool needs_essiv;
->  };
->  
-> -extern void __exit fscrypt_essiv_cleanup(void);
-> -
->  #endif /* _FSCRYPT_PRIVATE_H */
-> diff --git a/fs/crypto/keyinfo.c b/fs/crypto/keyinfo.c
-> index dcd91a3fbe49..f39667d4316a 100644
-> --- a/fs/crypto/keyinfo.c
-> +++ b/fs/crypto/keyinfo.c
-> @@ -13,14 +13,10 @@
->  #include <linux/hashtable.h>
->  #include <linux/scatterlist.h>
->  #include <linux/ratelimit.h>
-> -#include <crypto/aes.h>
->  #include <crypto/algapi.h>
-> -#include <crypto/sha.h>
->  #include <crypto/skcipher.h>
->  #include "fscrypt_private.h"
->  
-> -static struct crypto_shash *essiv_hash_tfm;
-> -
->  /* Table of keys referenced by FS_POLICY_FLAG_DIRECT_KEY policies */
->  static DEFINE_HASHTABLE(fscrypt_master_keys, 6); /* 6 bits = 64 buckets */
->  static DEFINE_SPINLOCK(fscrypt_master_keys_lock);
-> @@ -144,10 +140,9 @@ static struct fscrypt_mode available_modes[] = {
->  	},
->  	[FS_ENCRYPTION_MODE_AES_128_CBC] = {
->  		.friendly_name = "AES-128-CBC",
-> -		.cipher_str = "cbc(aes)",
-> +		.cipher_str = "essiv(cbc(aes),aes,sha256)",
->  		.keysize = 16,
-> -		.ivsize = 16,
-> -		.needs_essiv = true,
-> +		.ivsize = 8,
+Can it be done by cherry picking it from the series or does it have to
+be submitted as a separate patch? I am hoping the former is possible
+since it'd make life easier for me.
 
-As I said before, this needs to be kept as .ivsize = 16.
-
-This bug actually causes the generic/549 test to fail.
-
-Otherwise this patch looks good.  FYI: to avoid conflicts with planned fscrypt
-work I'd prefer to take this patch through the fscrypt.git tree after the ESSIV
-template is merged, rather than have Herbert take it through cryptodev.  (Unless
-he's going to apply this whole series for v5.3, in which case I'm fine with him
-taking the fscrypt patch too, though it seems too late for that.)
-
-Thanks!
-
-- Eric
+Thanks,
+Andrey Smirnov
