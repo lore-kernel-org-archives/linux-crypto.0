@@ -8,55 +8,55 @@ X-Spam-Status: No, score=-10.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1127C0650E
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 08:14:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEA33C5B578
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 08:14:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BA589218A3
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 08:14:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A7895218AD
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 08:14:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZZnIX9Ua"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MjGvB2vd"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727363AbfGCIOJ (ORCPT
+        id S1727454AbfGCIOU (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 3 Jul 2019 04:14:09 -0400
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:38694 "EHLO
+        Wed, 3 Jul 2019 04:14:20 -0400
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:34620 "EHLO
         mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727185AbfGCIOJ (ORCPT
+        with ESMTP id S1727442AbfGCIOU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 3 Jul 2019 04:14:09 -0400
-Received: by mail-pg1-f195.google.com with SMTP id z75so814471pgz.5;
-        Wed, 03 Jul 2019 01:14:08 -0700 (PDT)
+        Wed, 3 Jul 2019 04:14:20 -0400
+Received: by mail-pg1-f195.google.com with SMTP id p10so825100pgn.1;
+        Wed, 03 Jul 2019 01:14:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=HCmJmyzmQT4Pt6JaXDG9/uRNYLrXoyYw1jAGneb5HzY=;
-        b=ZZnIX9UaZGyuDvO48xtLr/H1WO8/EBI2wEYk1XHvwBJVcjwsQGK5gkEmlb1eY8S82G
-         14ZRWDzdxXdnu5CSjJV7Y6AZxCkSEwnYWPD8yJAiskPfr+iJvnlqRqgJJ3g9YOlgpv+w
-         u11t3H2O517+696LChy64YGdWoNLI4WaTJ019UPrwqZsdpNXxP0NzOsWaaWGHKnOHiKj
-         mwr3vuDC6Uzs/yr71SBCQKIGf/3WsJuc1pWOds9iQ1j+RwlEfKDCfuQpOp0kD1rFjfZo
-         a+LIkkZpnLgXDNBQ406PqJPzuU8qSLLWcALZ8Y1WqGSxNaqgb6f+DIDiu/6UhVNfl/yS
-         OIig==
+        bh=p3NE6eF8wtZSbcEMraRfzpbuJsj8vIEFXgZ9uVdKcjs=;
+        b=MjGvB2vdicUC+rpaKAkXobo4d4VHJRRoHXJfCbyAa/hzEWdvz8mdYPZiIwCB46+imG
+         DDNtYWfLtizE6NhwQmkrSzcMBVXU4z3kRgDuOgPYJ48fVdoo+5smd8lySjs4Rwo+qWf+
+         27L0n6Br7f3GCdtpc1BQTIB0OSQ1odY/rxsJxJSqFkpG3v/RPqn/LrYulYJvC5hA08Y5
+         syancLCDgupxxzz8dlWLIa37qsiuP/0IRh0B1hGGFAnNzt9XGd3JWARku2O0V8VF7PQ5
+         UA4UOCjeclOtCo3XgjuxtatOiJL/NWkqmvGTjMDhbFtXMexUNMOqgMioriSqoD0Q6Pqa
+         JaEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=HCmJmyzmQT4Pt6JaXDG9/uRNYLrXoyYw1jAGneb5HzY=;
-        b=kqtfve1ou+5XtvV01XUsBKIJdVdltT8Tw4Vaz/42ASUu3X8NJWeWhIuF0mT2iUIsTL
-         loPJrk1LJOQ6ff/85a0ziGz/EbVpUKBKK0PgyCNxlXMnkujJPmzdbLEz7rs31IMgX2Fr
-         xO+REVwhZZ7nHHeZHKjbPRAYQ5dR7GYZQS3pkOJOfjZ+R4IypPp0XwnYPqvRdWQw6/cc
-         +oytpBfoNldK3JK/fGcsEGRPb1qjbKwbOJ2h7IZj5Qs6aVw5igM1/AVXssLWCyDU6i6u
-         Yoc5DAIoIhk+QxErbShG0OB7HYuWhqwEvM0/JKw5qCQpZGnIsuTlo3OgoWD+DZfv/bER
-         zGHg==
-X-Gm-Message-State: APjAAAUh8oymHqQybuUf4zIH7uKptSlF6Z6G0JjdD282OHL/1NjXM2gy
-        MH+A5LrKyL9L2UiWITlZyqZ6zAHO+bQ=
-X-Google-Smtp-Source: APXvYqzaR5M8wziwkPrxSec1KbxGfXyehUKrRQebI+8TmPvE84ahWfftCUUbP8FlaLVx6eF2DJFghg==
-X-Received: by 2002:a63:62c3:: with SMTP id w186mr36989443pgb.64.1562141647547;
-        Wed, 03 Jul 2019 01:14:07 -0700 (PDT)
+        bh=p3NE6eF8wtZSbcEMraRfzpbuJsj8vIEFXgZ9uVdKcjs=;
+        b=Li/KLlhSy2QYL6rkOncx2AM2x4wOr8pRw1pr5rBmosjCIIf59Vx6wt4jqm7RKm6QFb
+         iUHsYiLsOd61JHbrVqtzE74iOUfBVzlPdosR9G5UXOjPgADm4hNrTNZ3yAGd+PYk2/6n
+         NFrG67mCW9PPja/05hajf4CRAq33W3z4kpzO15KrRUhvR2qZV11A/x+O0h9n9zCVZNeP
+         fiJxX/qDzbPOKMIovkj0tpWNA4ngs/6MgR6PjICwY8hXOczxadfgE+gmkVSnwQm8PvDF
+         r6HbZ4xoHEYU/TlQ/wsQ2VJ9+I4QqHaZIw5ucESvxg7YDy6eXuXK7Iu0fduRyXknXzyt
+         GPtg==
+X-Gm-Message-State: APjAAAUtSl3w9PDRSlIpkDKCN9jhLKC1wUgb9YaSn+vMa75sdmyXmyQ5
+        sItP429o61afEN+2fYboVxdi9FFucFM=
+X-Google-Smtp-Source: APXvYqxD0vSuPSwOFaa0ONFk6vM54vgp5nr7d54JfN1Tutz7WSjZUlZ3J8J0UV1Jul9hXde0zjsmFQ==
+X-Received: by 2002:a63:545c:: with SMTP id e28mr36881906pgm.374.1562141659184;
+        Wed, 03 Jul 2019 01:14:19 -0700 (PDT)
 Received: from localhost.lan (c-67-185-54-80.hsd1.wa.comcast.net. [67.185.54.80])
-        by smtp.gmail.com with ESMTPSA id d2sm1445306pgo.0.2019.07.03.01.14.06
+        by smtp.gmail.com with ESMTPSA id d2sm1445306pgo.0.2019.07.03.01.14.18
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Wed, 03 Jul 2019 01:14:06 -0700 (PDT)
+        Wed, 03 Jul 2019 01:14:18 -0700 (PDT)
 From:   Andrey Smirnov <andrew.smirnov@gmail.com>
 To:     linux-crypto@vger.kernel.org
 Cc:     Andrey Smirnov <andrew.smirnov@gmail.com>,
@@ -68,9 +68,9 @@ Cc:     Andrey Smirnov <andrew.smirnov@gmail.com>,
         Aymen Sghaier <aymen.sghaier@nxp.com>,
         Leonard Crestez <leonard.crestez@nxp.com>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v4 08/16] crypto: caam - use ioread64*_hi_lo in rd_reg64
-Date:   Wed,  3 Jul 2019 01:13:19 -0700
-Message-Id: <20190703081327.17505-9-andrew.smirnov@gmail.com>
+Subject: [PATCH v4 16/16] crypto: caam - add clock entry for i.MX8MQ
+Date:   Wed,  3 Jul 2019 01:13:27 -0700
+Message-Id: <20190703081327.17505-17-andrew.smirnov@gmail.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190703081327.17505-1-andrew.smirnov@gmail.com>
 References: <20190703081327.17505-1-andrew.smirnov@gmail.com>
@@ -82,9 +82,7 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Following the same transformation logic as outlined in previous commit
-converting wr_reg64, convert rd_reg64 to use helpers from
-<linux/io-64-nonatomic-hi-lo.h> first. No functional change intended.
+Add clock entry needed to support i.MX8MQ.
 
 Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
 Cc: Chris Spencer <christopher.spencer@sea.co.uk>
@@ -97,38 +95,20 @@ Cc: Leonard Crestez <leonard.crestez@nxp.com>
 Cc: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
 ---
- drivers/crypto/caam/regs.h | 18 +++++++++++++-----
- 1 file changed, 13 insertions(+), 5 deletions(-)
+ drivers/crypto/caam/ctrl.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h
-index 6e8352ac0d92..afdc0d1aa338 100644
---- a/drivers/crypto/caam/regs.h
-+++ b/drivers/crypto/caam/regs.h
-@@ -172,12 +172,20 @@ static inline void wr_reg64(void __iomem *reg, u64 data)
- 
- static inline u64 rd_reg64(void __iomem *reg)
- {
--	if (!caam_imx && caam_little_end)
--		return ((u64)rd_reg32((u32 __iomem *)(reg) + 1) << 32 |
--			(u64)rd_reg32((u32 __iomem *)(reg)));
-+	if (caam_little_end) {
-+		if (caam_imx) {
-+			u32 low, high;
- 
--	return ((u64)rd_reg32((u32 __iomem *)(reg)) << 32 |
--		(u64)rd_reg32((u32 __iomem *)(reg) + 1));
-+			high = ioread32(reg);
-+			low  = ioread32(reg + sizeof(u32));
-+
-+			return low + ((u64)high << 32);
-+		} else {
-+			return ioread64(reg);
-+		}
-+	} else {
-+		return ioread64be(reg);
-+	}
- }
- #endif /* CONFIG_64BIT  */
+diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
+index a354c64ca39d..916b63f4f93b 100644
+--- a/drivers/crypto/caam/ctrl.c
++++ b/drivers/crypto/caam/ctrl.c
+@@ -527,6 +527,7 @@ static const struct soc_device_attribute caam_imx_soc_table[] = {
+ 	{ .soc_id = "i.MX6UL", .data = &caam_imx6ul_data },
+ 	{ .soc_id = "i.MX6*",  .data = &caam_imx6_data },
+ 	{ .soc_id = "i.MX7*",  .data = &caam_imx7_data },
++	{ .soc_id = "i.MX8MQ", .data = &caam_imx7_data },
+ 	{ .family = "Freescale i.MX" },
+ };
  
 -- 
 2.21.0
