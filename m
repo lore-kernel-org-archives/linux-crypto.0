@@ -8,55 +8,55 @@ X-Spam-Status: No, score=-10.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D2D7C5B578
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 08:15:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36427C5B578
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 08:15:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 46772218A3
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 08:15:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0CCEC218A3
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 08:15:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NXBXHY2r"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UByox/6o"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727562AbfGCIPJ (ORCPT
+        id S1727294AbfGCIOC (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 3 Jul 2019 04:15:09 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:33748 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727311AbfGCIOD (ORCPT
+        Wed, 3 Jul 2019 04:14:02 -0400
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:46251 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727282AbfGCIOC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 3 Jul 2019 04:14:03 -0400
-Received: by mail-pf1-f193.google.com with SMTP id x15so870044pfq.0;
-        Wed, 03 Jul 2019 01:14:03 -0700 (PDT)
+        Wed, 3 Jul 2019 04:14:02 -0400
+Received: by mail-pl1-f196.google.com with SMTP id e5so785184pls.13;
+        Wed, 03 Jul 2019 01:14:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=6BcX9hRF1ZcJg0bLQVxEUNzqf7x1OYXFm4Avex33mzw=;
-        b=NXBXHY2rOfDIIefdmLBUtihvwLxZoamAXmXEhzmcHgE1//wHqu3N1fJ0mn8cVhHOCY
-         oEG9EAi5UrMAFjLuT380GshZwbi9WWx5FVLWdP/QZyW9ZAA6CmM3qbw/f1ahx9RcQLxR
-         FYTyL4nso9PO/ba16bytiqE7aorc8O6S/c7ZG7OM023sGc1+izwyw7WiDvL9v4W1cKf4
-         ZPBVAVDOOGRRfS7TyyW5v/plLynTgr+i6pL/B09mmY+WQOv9bmJkP46+e3MZTYcWPq2C
-         xdcMXwaK6ASx+lfT91VB/cds4KVep1xnFDTRrWZSpQ/g+xIZYhkynwJ8X82KgADmODYy
-         8DMA==
+        bh=nmCsYbm1OChUS/6iyzuZc8+iRZsteMJe/aD4EAVxC/s=;
+        b=UByox/6ooMiUeUN9pNJYDu5l/7oPAkbrqiAGR6ZlR/yGvFd0NRmZtOy8mgQFOl9Xx9
+         P+RKZo5hMxaIa/X1bDjJ+L2JRQZzKiTGgm83+W16ScQKadvAn7mw2EagotmP0zEx3tPU
+         bDKkMfb/slpwP27vSkSn7gL/T7abisnqf2tBOpH/09W3cSP+5em66Fsj30cXq15fbj1E
+         rrTA1Eb3Sn2RdWuHj081Kh8Ko+H8N87p+AuP5Dl32aelgOpB0z2ZZvABLPMRNoOL2D7h
+         roMDXQfCoJDbAGAHYJRfSdaWvpiQzYT6iNKR18YqyJaKO87Wgny2tZvCjlNOYLjVVjQ6
+         8SLw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=6BcX9hRF1ZcJg0bLQVxEUNzqf7x1OYXFm4Avex33mzw=;
-        b=Q2EnOC8f1HTJluq2GyFhl+J0Ga5rVU/aBc+O1uR5IZ6XD/8wR+7ZZhRaxq4OYc/vZH
-         rpENtXBCB8Y8jLCw2BwOC0Z0kOAkP6xCulZSIjvi0Q/LCGeHNElfpHBuCMKX76fZZzyI
-         yzPBSZc5P/fQCRZt+LX7NKe0DVWO63x8uKPuxXiqCa59i28NwzhGFu6qRDqCFIgmypE7
-         PlRkZzlsnYrszhlcr3DOMD/p3cqnyFxRaYPUz6mGDwqSNQGys6CbQe2g3BCBX8nj23qr
-         r5bY/bMETOitxnFZ2mtMmbhRIyPtwW/aawWhVNRK4Y7P2ivuMjam2+x7RlXzTrshmnHj
-         IHhw==
-X-Gm-Message-State: APjAAAXtevJdkHSOe9Nq/vSOGeuNEhF8Why8c1k4e8W594K0SgkM5OZz
-        vwd1iaDWRrdrexBH2yqVEK+dDTH6g6Y=
-X-Google-Smtp-Source: APXvYqw8B01YxlWv3cdvdz1KbV9dJR9VvgR4WsLnkObSzKzJf+FzgcxEKHUe8Cq+m7lYJnf+Gu0+ww==
-X-Received: by 2002:a63:3f84:: with SMTP id m126mr34593874pga.213.1562141642532;
-        Wed, 03 Jul 2019 01:14:02 -0700 (PDT)
-Received: from localhost.lan (c-67-185-54-80.hsd1.wa.comcast.net. [67.185.54.80])
-        by smtp.gmail.com with ESMTPSA id d2sm1445306pgo.0.2019.07.03.01.14.01
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        bh=nmCsYbm1OChUS/6iyzuZc8+iRZsteMJe/aD4EAVxC/s=;
+        b=YXV9coBG60Xaj7zedKqR2UyhY0xaqNK9KvCMxvDcDvBC2Gzq0N2dDjJpWG66aB4NRt
+         keXCfv5x9MZr0Gl7hwtvnhOde/NH3DjiWsuG+AkRTdQ7jgl/9C6HvPNthWAMSeMa+5fc
+         Bvpz/UhRIf5h/ZPat066aAE02Fk7QzA4XJqPYrz1qN7N+Owxw8MRoGdfRrmQ6LrPSTCi
+         Ebrg6qli1dbsGeTZwWCAWzcHsTZD/iSNNSXJjdk54nGUncAHIuS1fpD364fKiEXwTEib
+         yc0rrfiZv7Xqezec+iQ3LmwyRJC0pbZ0Y48Zf5ztkvPZuWcyeDm3RwrtYlmIWWrl63V8
+         t10A==
+X-Gm-Message-State: APjAAAWjLv0mFiaGGn/U1EE5gmNSsW+VoIyCowXGyDm19nCHEmlOT0v/
+        atnhfmKnaThSlxcIVBIstZHOvz05//0=
+X-Google-Smtp-Source: APXvYqxPwQGd/DQpl5Vf317Gi61kfH7TZG6TGsyBMCktingto6JDt3KHixMP9vvfKMcenuLf4NVcyw==
+X-Received: by 2002:a17:902:106:: with SMTP id 6mr41661031plb.64.1562141641353;
         Wed, 03 Jul 2019 01:14:01 -0700 (PDT)
+Received: from localhost.lan (c-67-185-54-80.hsd1.wa.comcast.net. [67.185.54.80])
+        by smtp.gmail.com with ESMTPSA id d2sm1445306pgo.0.2019.07.03.01.13.59
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Wed, 03 Jul 2019 01:14:00 -0700 (PDT)
 From:   Andrey Smirnov <andrew.smirnov@gmail.com>
 To:     linux-crypto@vger.kernel.org
 Cc:     Andrey Smirnov <andrew.smirnov@gmail.com>,
@@ -68,9 +68,9 @@ Cc:     Andrey Smirnov <andrew.smirnov@gmail.com>,
         Aymen Sghaier <aymen.sghaier@nxp.com>,
         Leonard Crestez <leonard.crestez@nxp.com>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v4 04/16] crypto: caam - use deveres to allocate 'entinfo'
-Date:   Wed,  3 Jul 2019 01:13:15 -0700
-Message-Id: <20190703081327.17505-5-andrew.smirnov@gmail.com>
+Subject: [PATCH v4 03/16] crypto: caam - move tasklet_init() call down
+Date:   Wed,  3 Jul 2019 01:13:14 -0700
+Message-Id: <20190703081327.17505-4-andrew.smirnov@gmail.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190703081327.17505-1-andrew.smirnov@gmail.com>
 References: <20190703081327.17505-1-andrew.smirnov@gmail.com>
@@ -82,8 +82,8 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Use deveres to allocate 'entinfo' and drop corresponding call to
-kfree(). No functional change intended.
+Move tasklet_init() call further down in order to simplify error path
+cleanup. No functional change intended.
 
 Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
 Cc: Chris Spencer <christopher.spencer@sea.co.uk>
@@ -96,30 +96,47 @@ Cc: Leonard Crestez <leonard.crestez@nxp.com>
 Cc: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
 ---
- drivers/crypto/caam/jr.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/crypto/caam/jr.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
-index a7ca2bbe243f..fc7deb445aa8 100644
+index 4b25b2fa3d02..a7ca2bbe243f 100644
 --- a/drivers/crypto/caam/jr.c
 +++ b/drivers/crypto/caam/jr.c
-@@ -125,7 +125,6 @@ static int caam_jr_shutdown(struct device *dev)
- 			  jrp->inpring, inpbusaddr);
- 	dma_free_coherent(dev, sizeof(struct jr_outentry) * JOBR_DEPTH,
- 			  jrp->outring, outbusaddr);
--	kfree(jrp->entinfo);
+@@ -441,15 +441,13 @@ static int caam_jr_init(struct device *dev)
  
- 	return ret;
- }
-@@ -465,7 +464,8 @@ static int caam_jr_init(struct device *dev)
- 	if (!jrp->outring)
- 		goto out_free_inpring;
+ 	jrp = dev_get_drvdata(dev);
  
--	jrp->entinfo = kcalloc(JOBR_DEPTH, sizeof(*jrp->entinfo), GFP_KERNEL);
-+	jrp->entinfo = devm_kcalloc(dev, JOBR_DEPTH, sizeof(*jrp->entinfo),
-+				    GFP_KERNEL);
+-	tasklet_init(&jrp->irqtask, caam_jr_dequeue, (unsigned long)dev);
+-
+ 	/* Connect job ring interrupt handler. */
+ 	error = request_irq(jrp->irq, caam_jr_interrupt, IRQF_SHARED,
+ 			    dev_name(dev), dev);
+ 	if (error) {
+ 		dev_err(dev, "can't connect JobR %d interrupt (%d)\n",
+ 			jrp->ridx, jrp->irq);
+-		goto out_kill_deq;
++		return error;
+ 	}
+ 
+ 	error = caam_reset_hw_jr(dev);
+@@ -471,6 +469,8 @@ static int caam_jr_init(struct device *dev)
  	if (!jrp->entinfo)
  		goto out_free_outring;
+ 
++	tasklet_init(&jrp->irqtask, caam_jr_dequeue, (unsigned long)dev);
++
+ 	for (i = 0; i < JOBR_DEPTH; i++)
+ 		jrp->entinfo[i].desc_addr_dma = !0;
+ 
+@@ -504,8 +504,6 @@ static int caam_jr_init(struct device *dev)
+ 	dev_err(dev, "can't allocate job rings for %d\n", jrp->ridx);
+ out_free_irq:
+ 	free_irq(jrp->irq, dev);
+-out_kill_deq:
+-	tasklet_kill(&jrp->irqtask);
+ 	return error;
+ }
  
 -- 
 2.21.0
