@@ -2,213 +2,143 @@ Return-Path: <SRS0=EZcf=VA=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF65DC0650E
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 18:23:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7312C0650E
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 18:51:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9DB9721881
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 18:23:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bFtczPMQ"
+	by mail.kernel.org (Postfix) with ESMTP id 8813121852
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 18:51:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726550AbfGCSXu (ORCPT
+        id S1726550AbfGCSvy (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 3 Jul 2019 14:23:50 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:39380 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726430AbfGCSXt (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 3 Jul 2019 14:23:49 -0400
-Received: by mail-wr1-f66.google.com with SMTP id x4so3884156wrt.6
-        for <linux-crypto@vger.kernel.org>; Wed, 03 Jul 2019 11:23:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=LLTuQo1OZIVp9Z7lHm2QGjHGUwT5+3YNp++5BSBzGsQ=;
-        b=bFtczPMQ6VamRadGhV6Y1RKYREhy/Lr1WkMy9y2NdQE6se847q9chaYU5+CscBjFea
-         RQRPf2Z854bOz5w6kFrpt5AhevJUxZxB+jAxe9QQffpOaj2q5BjNMAi+C6WebQlpriWV
-         y3vBBh0KQfIgsAFqesDHz3bkEx9kJf3LRkbyVtF+5g5UZfGfgwkNCMSovYLhIWgub+eb
-         ZcJwkvQbAyttlrTDgB6trLyytz8icAGHwYUBlWCVCizO6WVBdM8HbHkjmeA/vRYMY3Xf
-         WPry5YCzRU64FzF73tES68Iv3OjtnIXwAF8EmUtLpfzVe73Ndt4qioups4K5L1BX4utx
-         I4Qg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=LLTuQo1OZIVp9Z7lHm2QGjHGUwT5+3YNp++5BSBzGsQ=;
-        b=bLSPTKYNmAifvSty5qSVxNbl7qGSS24X3WZu7VhTdh8zRXTyeojbsPq0Gn0VVy/a0D
-         xCR5FbrRSfXjadH6ranrJp9x7go1RMagCLIcwUrNU6iZIt/yRZq/ExtXhyEa9eO2rIbP
-         XdCBT+esEi9qcpziiGIWC79U2ucgDY4tDTHALsHUa6zcUBtX8unx9jj8wPMPta53kvVO
-         Sq+DDR+11IhWtJ2amr78b0GE1vboGHxnKFexxiHgIQLc56sI+SizoFW2WFrqd811/Nql
-         19a6nQXXTiiSlgwxpmiYdslNt5oE+uAFp++/hG99MKU6zuiUJj6ImeIf3MfZQdI8socp
-         xilg==
-X-Gm-Message-State: APjAAAXooJsXr4xb2N0iSyWpQA3wv08eBOf8CHz/557f/MM2O2XD7DZC
-        FHry6HvWBYTiGl/jUmGJLXoDzRK2VlLOjScp6/SsFg==
-X-Google-Smtp-Source: APXvYqxr9GHbnUZfArDOavd6fMb06nuXoVUMVeRM5lce/thLvueVeSZKAwX8HylHsvxsyCgX3WPcdJlwGZCRUiqflug=
-X-Received: by 2002:a5d:5589:: with SMTP id i9mr20420930wrv.198.1562178226880;
- Wed, 03 Jul 2019 11:23:46 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190702164815.6341-1-ard.biesheuvel@linaro.org>
- <20190702164815.6341-3-ard.biesheuvel@linaro.org> <20190702215517.GA69157@gmail.com>
- <CAKv+Gu9qPPBpm7aocHCsid6yyL7HyX9Dk2M72A5W9OeHG58MZw@mail.gmail.com>
-In-Reply-To: <CAKv+Gu9qPPBpm7aocHCsid6yyL7HyX9Dk2M72A5W9OeHG58MZw@mail.gmail.com>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Wed, 3 Jul 2019 20:23:31 +0200
-Message-ID: <CAKv+Gu9gcbYrU3EjCuYudoT-vrAp3Q2y7ExpcqgHBLQFPXQsWw@mail.gmail.com>
-Subject: Re: [PATCH v7 2/7] fs: crypto: invoke crypto API for ESSIV handling
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
+        Wed, 3 Jul 2019 14:51:54 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:54044 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726430AbfGCSvy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 3 Jul 2019 14:51:54 -0400
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 751483E2B7;
+        Wed,  3 Jul 2019 18:51:48 +0000 (UTC)
+Received: from redhat.com (ovpn-123-166.rdu2.redhat.com [10.10.123.166])
+        by smtp.corp.redhat.com (Postfix) with SMTP id 39A3D3795;
+        Wed,  3 Jul 2019 18:51:43 +0000 (UTC)
+Date:   Wed, 3 Jul 2019 14:51:41 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Fuqian Huang <huangfq.daxian@gmail.com>
+Cc:     Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        device-mapper development <dm-devel@redhat.com>,
-        linux-fscrypt@vger.kernel.org,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Milan Broz <gmazyland@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+        "David S . Miller" <davem@davemloft.net>,
+        Gonglei <arei.gonglei@huawei.com>,
+        Jason Wang <jasowang@redhat.com>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH v2 06/35] crypto: Use kmemdup rather than duplicating its
+ implementation
+Message-ID: <20190703145109-mutt-send-email-mst@kernel.org>
+References: <20190703162708.32137-1-huangfq.daxian@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190703162708.32137-1-huangfq.daxian@gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.30]); Wed, 03 Jul 2019 18:51:53 +0000 (UTC)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 3 Jul 2019 at 00:06, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
->
-> On Tue, 2 Jul 2019 at 23:55, Eric Biggers <ebiggers@kernel.org> wrote:
-> >
-> > Hi Ard,
-> >
-> > On Tue, Jul 02, 2019 at 06:48:10PM +0200, Ard Biesheuvel wrote:
-> > > Instead of open coding the calculations for ESSIV handling, use a
-> > > ESSIV skcipher which does all of this under the hood.
-> > >
-> > > Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> > > ---
-> > >  fs/crypto/Kconfig           |  1 +
-> > >  fs/crypto/crypto.c          |  5 --
-> > >  fs/crypto/fscrypt_private.h |  9 --
-> > >  fs/crypto/keyinfo.c         | 95 +-------------------
-> > >  4 files changed, 5 insertions(+), 105 deletions(-)
-> > >
-> > > diff --git a/fs/crypto/Kconfig b/fs/crypto/Kconfig
-> > > index 24ed99e2eca0..b0292da8613c 100644
-> > > --- a/fs/crypto/Kconfig
-> > > +++ b/fs/crypto/Kconfig
-> > > @@ -5,6 +5,7 @@ config FS_ENCRYPTION
-> > >       select CRYPTO_AES
-> > >       select CRYPTO_CBC
-> > >       select CRYPTO_ECB
-> > > +     select CRYPTO_ESSIV
-> > >       select CRYPTO_XTS
-> > >       select CRYPTO_CTS
-> > >       select CRYPTO_SHA256
-> > > diff --git a/fs/crypto/crypto.c b/fs/crypto/crypto.c
-> > > index 335a362ee446..c53ce262a06c 100644
-> > > --- a/fs/crypto/crypto.c
-> > > +++ b/fs/crypto/crypto.c
-> > > @@ -136,9 +136,6 @@ void fscrypt_generate_iv(union fscrypt_iv *iv, u64 lblk_num,
-> > >
-> > >       if (ci->ci_flags & FS_POLICY_FLAG_DIRECT_KEY)
-> > >               memcpy(iv->nonce, ci->ci_nonce, FS_KEY_DERIVATION_NONCE_SIZE);
-> > > -
-> > > -     if (ci->ci_essiv_tfm != NULL)
-> > > -             crypto_cipher_encrypt_one(ci->ci_essiv_tfm, iv->raw, iv->raw);
-> > >  }
-> > >
-> > >  int fscrypt_do_page_crypto(const struct inode *inode, fscrypt_direction_t rw,
-> > > @@ -492,8 +489,6 @@ static void __exit fscrypt_exit(void)
-> > >               destroy_workqueue(fscrypt_read_workqueue);
-> > >       kmem_cache_destroy(fscrypt_ctx_cachep);
-> > >       kmem_cache_destroy(fscrypt_info_cachep);
-> > > -
-> > > -     fscrypt_essiv_cleanup();
-> > >  }
-> > >  module_exit(fscrypt_exit);
-> > >
-> > > diff --git a/fs/crypto/fscrypt_private.h b/fs/crypto/fscrypt_private.h
-> > > index 7da276159593..59d0cba9cfb9 100644
-> > > --- a/fs/crypto/fscrypt_private.h
-> > > +++ b/fs/crypto/fscrypt_private.h
-> > > @@ -61,12 +61,6 @@ struct fscrypt_info {
-> > >       /* The actual crypto transform used for encryption and decryption */
-> > >       struct crypto_skcipher *ci_ctfm;
-> > >
-> > > -     /*
-> > > -      * Cipher for ESSIV IV generation.  Only set for CBC contents
-> > > -      * encryption, otherwise is NULL.
-> > > -      */
-> > > -     struct crypto_cipher *ci_essiv_tfm;
-> > > -
-> > >       /*
-> > >        * Encryption mode used for this inode.  It corresponds to either
-> > >        * ci_data_mode or ci_filename_mode, depending on the inode type.
-> > > @@ -166,9 +160,6 @@ struct fscrypt_mode {
-> > >       int keysize;
-> > >       int ivsize;
-> > >       bool logged_impl_name;
-> > > -     bool needs_essiv;
-> > >  };
-> > >
-> > > -extern void __exit fscrypt_essiv_cleanup(void);
-> > > -
-> > >  #endif /* _FSCRYPT_PRIVATE_H */
-> > > diff --git a/fs/crypto/keyinfo.c b/fs/crypto/keyinfo.c
-> > > index dcd91a3fbe49..f39667d4316a 100644
-> > > --- a/fs/crypto/keyinfo.c
-> > > +++ b/fs/crypto/keyinfo.c
-> > > @@ -13,14 +13,10 @@
-> > >  #include <linux/hashtable.h>
-> > >  #include <linux/scatterlist.h>
-> > >  #include <linux/ratelimit.h>
-> > > -#include <crypto/aes.h>
-> > >  #include <crypto/algapi.h>
-> > > -#include <crypto/sha.h>
-> > >  #include <crypto/skcipher.h>
-> > >  #include "fscrypt_private.h"
-> > >
-> > > -static struct crypto_shash *essiv_hash_tfm;
-> > > -
-> > >  /* Table of keys referenced by FS_POLICY_FLAG_DIRECT_KEY policies */
-> > >  static DEFINE_HASHTABLE(fscrypt_master_keys, 6); /* 6 bits = 64 buckets */
-> > >  static DEFINE_SPINLOCK(fscrypt_master_keys_lock);
-> > > @@ -144,10 +140,9 @@ static struct fscrypt_mode available_modes[] = {
-> > >       },
-> > >       [FS_ENCRYPTION_MODE_AES_128_CBC] = {
-> > >               .friendly_name = "AES-128-CBC",
-> > > -             .cipher_str = "cbc(aes)",
-> > > +             .cipher_str = "essiv(cbc(aes),aes,sha256)",
-> > >               .keysize = 16,
-> > > -             .ivsize = 16,
-> > > -             .needs_essiv = true,
-> > > +             .ivsize = 8,
-> >
-> > As I said before, this needs to be kept as .ivsize = 16.
-> >
-> > This bug actually causes the generic/549 test to fail.
-> >
->
-> Ugh, yes, I intended to fix that. Apologies for the sloppiness, I have
-> been trying to wrap this up in time for my holidays, but the end
-> result is quite the opposite :-)
->
-> > Otherwise this patch looks good.  FYI: to avoid conflicts with planned fscrypt
-> > work I'd prefer to take this patch through the fscrypt.git tree after the ESSIV
-> > template is merged, rather than have Herbert take it through cryptodev.  (Unless
-> > he's going to apply this whole series for v5.3, in which case I'm fine with him
-> > taking the fscrypt patch too, though it seems too late for that.)
-> >
->
-> I agree that the fscrypt and dm-crypt changes should not be merged for v5.3
->
-> I know that Herbert typically prefers not to take any new code without
-> any of its users, but perhaps we can make an exception in this case,
-> and merge patches #1, #5, #6 and #7 now (which is mostly risk free
-> since no code uses essiv yet, and patch #5 is a straight-forward
-> refactor) and take the fscrypt and dm-crypt patches through their
-> respective trees for the next cycle.
+On Thu, Jul 04, 2019 at 12:27:08AM +0800, Fuqian Huang wrote:
+> kmemdup is introduced to duplicate a region of memory in a neat way.
+> Rather than kmalloc/kzalloc + memcpy, which the programmer needs to
+> write the size twice (sometimes lead to mistakes), kmemdup improves
+> readability, leads to smaller code and also reduce the chances of mistakes.
+> Suggestion to use kmemdup rather than using kmalloc/kzalloc + memcpy.
+> 
+> Signed-off-by: Fuqian Huang <huangfq.daxian@gmail.com>
 
-Actually, #7 no longer applies cleanly to cryptodev, so I am going to
-respin in any case, and finally fix the ivsize change.
+virtio part:
+
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+
+
+> ---
+> Changes in v2:
+>   - Fix a typo in commit message (memset -> memcpy)
+> 
+>  drivers/crypto/caam/caampkc.c              | 11 +++--------
+>  drivers/crypto/virtio/virtio_crypto_algs.c |  4 +---
+>  2 files changed, 4 insertions(+), 11 deletions(-)
+> 
+> diff --git a/drivers/crypto/caam/caampkc.c b/drivers/crypto/caam/caampkc.c
+> index fe24485274e1..a03464b4c019 100644
+> --- a/drivers/crypto/caam/caampkc.c
+> +++ b/drivers/crypto/caam/caampkc.c
+> @@ -816,7 +816,7 @@ static int caam_rsa_set_pub_key(struct crypto_akcipher *tfm, const void *key,
+>  		return ret;
+>  
+>  	/* Copy key in DMA zone */
+> -	rsa_key->e = kzalloc(raw_key.e_sz, GFP_DMA | GFP_KERNEL);
+> +	rsa_key->e = kmemdup(raw_key.e, raw_key.e_sz, GFP_DMA | GFP_KERNEL);
+>  	if (!rsa_key->e)
+>  		goto err;
+>  
+> @@ -838,8 +838,6 @@ static int caam_rsa_set_pub_key(struct crypto_akcipher *tfm, const void *key,
+>  	rsa_key->e_sz = raw_key.e_sz;
+>  	rsa_key->n_sz = raw_key.n_sz;
+>  
+> -	memcpy(rsa_key->e, raw_key.e, raw_key.e_sz);
+> -
+>  	return 0;
+>  err:
+>  	caam_rsa_free_key(rsa_key);
+> @@ -920,11 +918,11 @@ static int caam_rsa_set_priv_key(struct crypto_akcipher *tfm, const void *key,
+>  		return ret;
+>  
+>  	/* Copy key in DMA zone */
+> -	rsa_key->d = kzalloc(raw_key.d_sz, GFP_DMA | GFP_KERNEL);
+> +	rsa_key->d = kmemdup(raw_key.d, raw_key.d_sz, GFP_DMA | GFP_KERNEL);
+>  	if (!rsa_key->d)
+>  		goto err;
+>  
+> -	rsa_key->e = kzalloc(raw_key.e_sz, GFP_DMA | GFP_KERNEL);
+> +	rsa_key->e = kmemdup(raw_key.e, raw_key.e_sz, GFP_DMA | GFP_KERNEL);
+>  	if (!rsa_key->e)
+>  		goto err;
+>  
+> @@ -947,9 +945,6 @@ static int caam_rsa_set_priv_key(struct crypto_akcipher *tfm, const void *key,
+>  	rsa_key->e_sz = raw_key.e_sz;
+>  	rsa_key->n_sz = raw_key.n_sz;
+>  
+> -	memcpy(rsa_key->d, raw_key.d, raw_key.d_sz);
+> -	memcpy(rsa_key->e, raw_key.e, raw_key.e_sz);
+> -
+>  	caam_rsa_set_priv_key_form(ctx, &raw_key);
+>  
+>  	return 0;
+> diff --git a/drivers/crypto/virtio/virtio_crypto_algs.c b/drivers/crypto/virtio/virtio_crypto_algs.c
+> index 10f266d462d6..42d19205166b 100644
+> --- a/drivers/crypto/virtio/virtio_crypto_algs.c
+> +++ b/drivers/crypto/virtio/virtio_crypto_algs.c
+> @@ -129,13 +129,11 @@ static int virtio_crypto_alg_ablkcipher_init_session(
+>  	 * Avoid to do DMA from the stack, switch to using
+>  	 * dynamically-allocated for the key
+>  	 */
+> -	uint8_t *cipher_key = kmalloc(keylen, GFP_ATOMIC);
+> +	uint8_t *cipher_key = kmemdup(key, keylen, GFP_ATOMIC);
+>  
+>  	if (!cipher_key)
+>  		return -ENOMEM;
+>  
+> -	memcpy(cipher_key, key, keylen);
+> -
+>  	spin_lock(&vcrypto->ctrl_lock);
+>  	/* Pad ctrl header */
+>  	vcrypto->ctrl.header.opcode =
+> -- 
+> 2.11.0
