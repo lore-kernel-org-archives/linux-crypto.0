@@ -2,98 +2,126 @@ Return-Path: <SRS0=EZcf=VA=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08C70C46478
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 13:50:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F8B6C0650E
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 13:51:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CBA4E218A6
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 13:50:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 40D5221850
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 13:51:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ygibtc7g"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="F7bhBp4b"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725933AbfGCNuW (ORCPT
+        id S1725944AbfGCNvV (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 3 Jul 2019 09:50:22 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:55014 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725943AbfGCNuW (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 3 Jul 2019 09:50:22 -0400
-Received: by mail-wm1-f65.google.com with SMTP id g135so2297762wme.4;
-        Wed, 03 Jul 2019 06:50:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=YFbVXlxoYz2j0yWH+kl6Asgr36XCltStIn0g6Mr9B8w=;
-        b=Ygibtc7gTh0+cqjA02xazjen9ww1ScHU0j2G5jXkqHMZmtEfu05BjQPbn5MK8Ln+61
-         EjBq/NFluFO5KnsyGCyPHTvG6jM2mN+AuNyfdXhe2J/ZM3vxBHXtf5wIO5o+BPmDwMJm
-         GV/N+F9vOP9DYBk0e+tyqVlWcYoWzf2ll2jyTRte6u6Abnw9ol/A51ankU8DBtFqvSkZ
-         tUVdPEeUbWSyioBh562LebC2aeKKQx6I7jWR984QpIVZ9QyhClxMWERqxk6LLSY8Dca+
-         9w4/V2hPdzZha1HJovwsTBkD75Wijy9EoYcSA+f6OzkkYhuTQXTT/UwvNxaft6i2YiBb
-         wlOQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=YFbVXlxoYz2j0yWH+kl6Asgr36XCltStIn0g6Mr9B8w=;
-        b=epmGl0mc3LMLPP9t+FQOZ0Mfe0tkWD26YPwc//4kVboh9ZXrfclXAV0LTNs4FS97/I
-         4+Lq/PbMU6kLIy/ifiFRJuaxXOA9BOXjgQdnzIbZAGmoqaL7lOzfC7WRMtSG2N2UDLka
-         lc2SqxlgCN1A+REwDvhUDUxyPH4IcNw9diJuuEpsK3jf1Nwh86AlgJVZLbTN+bZq9Rlw
-         NmGcD5ZYfKcm/iDrSZiJQDFaiBZ5iRDI360n/qe+3ZjSi6NNXa+6aVsdqPvG9FXbMqcc
-         ydDXcZtY8lziYLPX4fmcxWcyFz/wYLcejCxN0utwBOGxqRBx207YkSV8owgWYg1AGmvm
-         ut8w==
-X-Gm-Message-State: APjAAAXV5EEIgLbozquHIjx2K6OY+VKNZbfz6U4e2oi/Bsmk/u2mFOGc
-        tQdg9pz01hHFGGJblSPHzq4=
-X-Google-Smtp-Source: APXvYqwUh87fuoSZF/FPYj+B5TiydkOU+kjZrA/YtS4lovdEJlLn3AcrxHFEkISCsO2az/sjn1zqtQ==
-X-Received: by 2002:a7b:cd04:: with SMTP id f4mr8722390wmj.64.1562161820234;
-        Wed, 03 Jul 2019 06:50:20 -0700 (PDT)
-Received: from puskevit.guest.wlan ([195.142.153.182])
-        by smtp.gmail.com with ESMTPSA id t80sm2669920wmt.26.2019.07.03.06.50.18
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Wed, 03 Jul 2019 06:50:19 -0700 (PDT)
-From:   Fatih ALTINPINAR <fatihaltinpinar@gmail.com>
-X-Google-Original-From: Fatih ALTINPINAR
-To:     herbert@gondor.apana.org.au
-Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Fatih ALTINPINAR <fatihaltinpinar@gmail.com>
-Subject: [PATCH] Crypto: aegis128l: fix a coding stlye issue
-Date:   Wed,  3 Jul 2019 16:49:35 +0300
-Message-Id: <20190703134935.24747-1-fatihaltinpinar@gmail.com>
-X-Mailer: git-send-email 2.17.1
+        Wed, 3 Jul 2019 09:51:21 -0400
+Received: from mail-eopbgr00044.outbound.protection.outlook.com ([40.107.0.44]:61006
+        "EHLO EUR02-AM5-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725943AbfGCNvV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 3 Jul 2019 09:51:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=s2mSe+b7wNO0CxfTOhQmarb46NeTm9G0eXlk4fgdyJw=;
+ b=F7bhBp4bFQ8SYcXqjaaqdDn0waaPkaoGlsgZ5I4hEzAOkjSejUf2APksWv2cmc5v59YncOjT+Y2A3nmuDbWm1QqM8joV7L8fPLKlRYZ0t4M36dYMxGuwJVL0VyUafRnEi6UEqSm85urK4GiW88ddJDDvYUUJiLTRT7P/mlljORE=
+Received: from VI1PR04MB5055.eurprd04.prod.outlook.com (20.177.50.140) by
+ VI1PR04MB5648.eurprd04.prod.outlook.com (20.178.125.221) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2032.20; Wed, 3 Jul 2019 13:51:17 +0000
+Received: from VI1PR04MB5055.eurprd04.prod.outlook.com
+ ([fe80::d83:14c4:dedb:213b]) by VI1PR04MB5055.eurprd04.prod.outlook.com
+ ([fe80::d83:14c4:dedb:213b%5]) with mapi id 15.20.2032.019; Wed, 3 Jul 2019
+ 13:51:17 +0000
+From:   Leonard Crestez <leonard.crestez@nxp.com>
+To:     Andrey Smirnov <andrew.smirnov@gmail.com>,
+        Horia Geanta <horia.geanta@nxp.com>
+CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Chris Spencer <christopher.spencer@sea.co.uk>,
+        Cory Tusar <cory.tusar@zii.aero>,
+        Chris Healy <cphealy@gmail.com>,
+        Lucas Stach <l.stach@pengutronix.de>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v4 03/16] crypto: caam - move tasklet_init() call down
+Thread-Topic: [PATCH v4 03/16] crypto: caam - move tasklet_init() call down
+Thread-Index: AQHVMXdGY7YVraimN0KG3E6/ZzGQWw==
+Date:   Wed, 3 Jul 2019 13:51:16 +0000
+Message-ID: <VI1PR04MB505565EC5520F4820E234A84EEFB0@VI1PR04MB5055.eurprd04.prod.outlook.com>
+References: <20190703081327.17505-1-andrew.smirnov@gmail.com>
+ <20190703081327.17505-4-andrew.smirnov@gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=leonard.crestez@nxp.com; 
+x-originating-ip: [82.144.34.2]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: af6df985-4c44-418b-1098-08d6ffbd8558
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:VI1PR04MB5648;
+x-ms-traffictypediagnostic: VI1PR04MB5648:
+x-microsoft-antispam-prvs: <VI1PR04MB5648129F53E1527C61D555E1EEFB0@VI1PR04MB5648.eurprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:4941;
+x-forefront-prvs: 00872B689F
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(346002)(39860400002)(366004)(376002)(136003)(396003)(199004)(189003)(478600001)(76176011)(25786009)(7696005)(110136005)(99286004)(5660300002)(9686003)(102836004)(54906003)(229853002)(6506007)(68736007)(66556008)(91956017)(64756008)(6436002)(73956011)(52536014)(66476007)(66946007)(6636002)(53546011)(316002)(26005)(66446008)(76116006)(6246003)(486006)(446003)(74316002)(4326008)(86362001)(8676002)(7736002)(44832011)(66066001)(33656002)(2906002)(81166006)(81156014)(14454004)(14444005)(6116002)(3846002)(476003)(8936002)(71190400001)(71200400001)(186003)(53936002)(305945005)(256004)(55016002);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR04MB5648;H:VI1PR04MB5055.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: nxp.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: Ih9HYL9NM9JlmsOPztgTiLh9CwOYwEjRXbns49LkcUn+BdSsxzV3HZYGmXjm8ON9fEw9l/myTWzGqLw7IMPK53OC1uGXu9U+kZVoCoy4iRDmmrviy0DrZ7//TsckHNyXhGMtqo6hZOR74nOZngBrRPmCee55vfmG0zRgxpA0ebzyTdLtPrREkNemWs2sewecTbIzKl7JySXGGQ2Yv7mQu4qHwTOPR1nryMzvR2Xen00f4z+8DasMBt1shmx4f7ryitqrnlI2+q3P5FQIvO7MFrZ4r/nLseQII9eaTzCuOKmNUbRrvDm7/xJd3b4qMpZhE19lZ+06b8o3cIz094e/xjJXPFZEut/hxnsG+BlPZwRp8kF3ZsRHyxLJpugbKEtKWzqdRAWNiBqsX3wvNMHcn/tT4b2dSdd4U6TzmP0/5Is=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: af6df985-4c44-418b-1098-08d6ffbd8558
+X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Jul 2019 13:51:16.8687
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: leonard.crestez@nxp.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB5648
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Fatih ALTINPINAR <fatihaltinpinar@gmail.com>
-
-Fixed a coding style issue. Removed curly brackets of an one
-line for statement.
-
-Signed-of-by: Fatih ALTINPINAR <fatihaltinpinar@gmail.com>
----
- crypto/aegis128l.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/crypto/aegis128l.c b/crypto/aegis128l.c
-index 9bca3d619a22..6c70e718c9c4 100644
---- a/crypto/aegis128l.c
-+++ b/crypto/aegis128l.c
-@@ -104,9 +104,8 @@ static void crypto_aegis128l_init(struct aegis_state *state,
- 	crypto_aegis_block_xor(&state->blocks[6], &crypto_aegis_const[1]);
- 	crypto_aegis_block_xor(&state->blocks[7], &crypto_aegis_const[0]);
- 
--	for (i = 0; i < 10; i++) {
-+	for (i = 0; i < 10; i++)
- 		crypto_aegis128l_update_a(state, &chunk);
--	}
- }
- 
- static void crypto_aegis128l_ad(struct aegis_state *state,
--- 
-2.17.1
-
+On 7/3/2019 11:14 AM, Andrey Smirnov wrote:=0A=
+> Move tasklet_init() call further down in order to simplify error path=0A=
+> cleanup. No functional change intended.=0A=
+> =0A=
+> diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c=0A=
+> index 4b25b2fa3d02..a7ca2bbe243f 100644=0A=
+> --- a/drivers/crypto/caam/jr.c=0A=
+> +++ b/drivers/crypto/caam/jr.c=0A=
+> @@ -441,15 +441,13 @@ static int caam_jr_init(struct device *dev)=0A=
+>   =0A=
+>   	jrp =3D dev_get_drvdata(dev);=0A=
+>   =0A=
+> -	tasklet_init(&jrp->irqtask, caam_jr_dequeue, (unsigned long)dev);=0A=
+> -=0A=
+>   	/* Connect job ring interrupt handler. */=0A=
+>   	error =3D request_irq(jrp->irq, caam_jr_interrupt, IRQF_SHARED,=0A=
+>   			    dev_name(dev), dev);=0A=
+>   	if (error) {=0A=
+>   		dev_err(dev, "can't connect JobR %d interrupt (%d)\n",=0A=
+>   			jrp->ridx, jrp->irq);=0A=
+> -		goto out_kill_deq;=0A=
+> +		return error;=0A=
+>   	}=0A=
+=0A=
+The caam_jr_interrupt handler can schedule the tasklet so it makes sense =
+=0A=
+to have it be initialized ahead of request_irq. In theory it's possible =0A=
+for an interrupt to be triggered immediately when request_irq is called.=0A=
+=0A=
+I'm not very familiar with the CAAM ip, can you ensure no interrupts are =
+=0A=
+pending in HW at probe time? The "no functional change" part is not obvious=
+.=0A=
+=0A=
+--=0A=
+Regards,=0A=
+Leonard=0A=
