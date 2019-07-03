@@ -2,127 +2,160 @@ Return-Path: <SRS0=EZcf=VA=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B545DC06513
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 16:15:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99321C0650E
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 16:27:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8AB22218A0
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 16:15:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1562170501;
-	bh=teE3VF+r2gEAdO7AE/iYCU7y2y5tlqdZ7l8i0yKOIPc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=X2QPdMyPqhYbz2NsjO0fJoUeBsv/cwzLQGXRKIxVBAah48muiCODUHYbLuwn6SkOS
-	 8aV0tI1fcqOWgUvhL5BRaCCfh59vZ8qwdNYYDOzd5ww1H2ejMcRdsSdtHFt74Ci30+
-	 JfFNCwmUlqqh8Hbcfeqyi4R0uvwfymUL9Vytg920=
+	by mail.kernel.org (Postfix) with ESMTP id 6F723218A4
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 16:27:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OD7BugQk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727012AbfGCQPA (ORCPT
+        id S1726881AbfGCQ1S (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 3 Jul 2019 12:15:00 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60482 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727011AbfGCQO7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 3 Jul 2019 12:14:59 -0400
-Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 5C38B21882;
-        Wed,  3 Jul 2019 16:14:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1562170498;
-        bh=teE3VF+r2gEAdO7AE/iYCU7y2y5tlqdZ7l8i0yKOIPc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=gWocQ9FlqhmMmx01IHs1ayLjCFq3vVMgpFJyU3uc0McJent02zZZ1vNQAynOIrVsV
-         XJKS8z3K5AMYj87RBtDOzk+I3iuILpmIZRdBu4p41gmw/k9Scz5rnQgtq0Hktd2Dei
-         AyK8/HzlGzY8hfrxxbwImhcGvRBN2fNSYBp4HRG0=
-Date:   Wed, 3 Jul 2019 09:14:56 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Sedat Dilek <sedat.dilek@gmail.com>
-Cc:     Nick Desaulniers <ndesaulniers@google.com>,
+        Wed, 3 Jul 2019 12:27:18 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:41783 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726473AbfGCQ1S (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 3 Jul 2019 12:27:18 -0400
+Received: by mail-pf1-f196.google.com with SMTP id m30so1524007pff.8;
+        Wed, 03 Jul 2019 09:27:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=ryQ+KV6I+HBh6xV68vUzaQ/j84wovxLqLnfA8omtyrY=;
+        b=OD7BugQkK23UKrAdvIBgZXB8LBubmLCFmJqY3b/p6UcRfTTiHWgohMCNNbEcDS2eeO
+         FMrXFQu3ZXoniAXFlPJJPEohRbHY4OcQjgb4eWS9CJV8YP7gRCvVsJSh5ZpFmpWXg7s3
+         MxjUhUOqBwYGq/ocXxEwR3EOns2s/1+e3zj2aA0+RSNEsL1kvBWX4062hFoErBOP56oH
+         LZHN8Z0Y8vsOuygdEO56hD8aaN8IJL8KnKa74TTxLrJF9rbYRD9U7pRbN2zNuPsJPZ1j
+         xk6bsxhqS5gboFfZwQfVsfcLBamqwIq/AoXRqYA/AxsfcF1YgXQUTbFLPa6p9jekVaGO
+         CQvQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=ryQ+KV6I+HBh6xV68vUzaQ/j84wovxLqLnfA8omtyrY=;
+        b=s+3CLakpy8lZpFw+QJMWaYd9SWAn2zAsmix95WQsnQzYsbuWFPxD+OGhKO14449x+8
+         EMwyaYjjmAH+Wh6XaBf6W3farN6nF6DevERq4aOswN1XVZOLYJ9PP9YZQbZij66ymNBk
+         MszbZp+153w91WbGB/IBJs4iS59tVTt4emsaEb4w56qP3LyU16sk1gngUVEHahRw7tUT
+         paJw3FNc4Caa/5hpm/xeM4fc+WQT+K0+cf4Jt280r/59ztfBUaPUt/MuTxOVUOVr2ie2
+         MuxQRtLE41xu/isreql2m2iIXkSNrA54oMgW7/LBZR/lz7qOmrNsK+3Uo1Gdxy22fBrl
+         KgdQ==
+X-Gm-Message-State: APjAAAUABiDBnJZPBIxFXIvdgXrnYQqtex6y94YKcpnloAS206YuSlzZ
+        3QKGxjjk1eB+XDLcdNrqmcw=
+X-Google-Smtp-Source: APXvYqzXA1rOPPHweXD5XzmorpU7NYYzo6+KU07FLUuYqjhEoveOo9let3lwgDMUXOQvB3YNvDcZGA==
+X-Received: by 2002:a65:60cc:: with SMTP id r12mr32890562pgv.333.1562171237362;
+        Wed, 03 Jul 2019 09:27:17 -0700 (PDT)
+Received: from hfq-skylake.ipads-lab.se.sjtu.edu.cn ([202.120.40.82])
+        by smtp.googlemail.com with ESMTPSA id s193sm3183112pgc.32.2019.07.03.09.27.13
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 03 Jul 2019 09:27:16 -0700 (PDT)
+From:   Fuqian Huang <huangfq.daxian@gmail.com>
+Cc:     =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        linux-crypto@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Clang-Built-Linux ML <clang-built-linux@googlegroups.com>,
-        Fangrui Song <maskray@google.com>,
-        Peter Smith <peter.smith@linaro.org>
-Subject: Re: crypto: x86/crct10dif-pcl - cleanup and optimizations
-Message-ID: <20190703161456.GC21629@sol.localdomain>
-References: <CA+icZUX3EOhrUp0Afbo_fK9rb5AbXjbaBFwhj1qmBaHom1b3MA@mail.gmail.com>
- <CAKwvOdn8Za1Dy4QgdDZu1My5oYLJJzyRqYsq+XkpRpnViC6aKQ@mail.gmail.com>
- <20190617182256.GB92263@gmail.com>
- <CA+icZUV8693G8jgHw2t9qUay4_Ad-7BgNOkL6z+4z8xNXyL=cA@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CA+icZUV8693G8jgHw2t9qUay4_Ad-7BgNOkL6z+4z8xNXyL=cA@mail.gmail.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+        "David S . Miller" <davem@davemloft.net>,
+        Gonglei <arei.gonglei@huawei.com>,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        Fuqian Huang <huangfq.daxian@gmail.com>
+Subject: [PATCH v2 06/35] crypto: Use kmemdup rather than duplicating its implementation
+Date:   Thu,  4 Jul 2019 00:27:08 +0800
+Message-Id: <20190703162708.32137-1-huangfq.daxian@gmail.com>
+X-Mailer: git-send-email 2.11.0
+To:     unlisted-recipients:; (no To-header on input)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Sedat,
+kmemdup is introduced to duplicate a region of memory in a neat way.
+Rather than kmalloc/kzalloc + memcpy, which the programmer needs to
+write the size twice (sometimes lead to mistakes), kmemdup improves
+readability, leads to smaller code and also reduce the chances of mistakes.
+Suggestion to use kmemdup rather than using kmalloc/kzalloc + memcpy.
 
-On Wed, Jul 03, 2019 at 05:16:40PM +0200, Sedat Dilek wrote:
-> 
-> Hi Eric, Hi Nick,
-> 
-> I am building Linux v5.1.16 with a new llvm-toolchain including the fix for LLD:
-> 
-> "[ELF] Allow placing SHF_MERGE sections with different alignments into
-> the same MergeSyntheticSection"
-> 
-> [ Alignment=16 before my patch ]
-> 
-> $ cd arch/x86/crypto/
-> $ for o in $(ls *.o) ; do echo [ $o ] ; readelf -WS $o | grep
-> rodata\.cst32 ; done
-> 
-> [ crct10dif-pcl-asm_64.o ]
->   [ 9] .rodata.cst32.byteshift_table PROGBITS        0000000000000000
-> 0004e0 000020 20  AM  0   0 16
-> 
-> [ crct10dif-pclmul.o ]
->   [ 9] .rodata.cst32.byteshift_table PROGBITS        0000000000000000
-> 000b40 000020 20  AM  0   0 16
-> 
-> [ Alignment=32 after my patch ]
-> 
-> [ crct10dif-pcl-asm_64.o ]
->   [ 9] .rodata.cst32.byteshift_table PROGBITS        0000000000000000
-> 0004e0 000020 20  AM  0   0 32
-> 
-> [ crct10dif-pclmul.o ]
->   [ 9] .rodata.cst32.byteshift_table PROGBITS        0000000000000000
-> 000b40 000020 20  AM  0   0 32
-> 
-> I am still building the Linux-kernel but first checks in [3] looks good.
-> 
-> I can send out a separate patch if you like for the issue I have reported.
+Signed-off-by: Fuqian Huang <huangfq.daxian@gmail.com>
+---
+Changes in v2:
+  - Fix a typo in commit message (memset -> memcpy)
 
-Sorry, I am still confused.  Are you saying that something still needs to be
-fixed in the kernel code, and if so, why?  To reiterate, the byteshift_table
-doesn't actually *need* any particular alignment.  Would it avoid the confusion
-if I changed it to no alignment?  Or is there some section merging related
-reason it actually needs to be 32?
+ drivers/crypto/caam/caampkc.c              | 11 +++--------
+ drivers/crypto/virtio/virtio_crypto_algs.c |  4 +---
+ 2 files changed, 4 insertions(+), 11 deletions(-)
 
-> 
-> I can not say much to ...
-> 
-> >         .rodata.cst16.aegis128_const
-> >         .rodata.cst16.aegis128l_const
-> >         .rodata.cst16.aegis256_const
-> >         .rodata.cst16.morus640_const
-> >         .rodata.cst256.K256
-> 
-> ... as I am not a Linker or Linux/x86/crypto specialist.
+diff --git a/drivers/crypto/caam/caampkc.c b/drivers/crypto/caam/caampkc.c
+index fe24485274e1..a03464b4c019 100644
+--- a/drivers/crypto/caam/caampkc.c
++++ b/drivers/crypto/caam/caampkc.c
+@@ -816,7 +816,7 @@ static int caam_rsa_set_pub_key(struct crypto_akcipher *tfm, const void *key,
+ 		return ret;
+ 
+ 	/* Copy key in DMA zone */
+-	rsa_key->e = kzalloc(raw_key.e_sz, GFP_DMA | GFP_KERNEL);
++	rsa_key->e = kmemdup(raw_key.e, raw_key.e_sz, GFP_DMA | GFP_KERNEL);
+ 	if (!rsa_key->e)
+ 		goto err;
+ 
+@@ -838,8 +838,6 @@ static int caam_rsa_set_pub_key(struct crypto_akcipher *tfm, const void *key,
+ 	rsa_key->e_sz = raw_key.e_sz;
+ 	rsa_key->n_sz = raw_key.n_sz;
+ 
+-	memcpy(rsa_key->e, raw_key.e, raw_key.e_sz);
+-
+ 	return 0;
+ err:
+ 	caam_rsa_free_key(rsa_key);
+@@ -920,11 +918,11 @@ static int caam_rsa_set_priv_key(struct crypto_akcipher *tfm, const void *key,
+ 		return ret;
+ 
+ 	/* Copy key in DMA zone */
+-	rsa_key->d = kzalloc(raw_key.d_sz, GFP_DMA | GFP_KERNEL);
++	rsa_key->d = kmemdup(raw_key.d, raw_key.d_sz, GFP_DMA | GFP_KERNEL);
+ 	if (!rsa_key->d)
+ 		goto err;
+ 
+-	rsa_key->e = kzalloc(raw_key.e_sz, GFP_DMA | GFP_KERNEL);
++	rsa_key->e = kmemdup(raw_key.e, raw_key.e_sz, GFP_DMA | GFP_KERNEL);
+ 	if (!rsa_key->e)
+ 		goto err;
+ 
+@@ -947,9 +945,6 @@ static int caam_rsa_set_priv_key(struct crypto_akcipher *tfm, const void *key,
+ 	rsa_key->e_sz = raw_key.e_sz;
+ 	rsa_key->n_sz = raw_key.n_sz;
+ 
+-	memcpy(rsa_key->d, raw_key.d, raw_key.d_sz);
+-	memcpy(rsa_key->e, raw_key.e, raw_key.e_sz);
+-
+ 	caam_rsa_set_priv_key_form(ctx, &raw_key);
+ 
+ 	return 0;
+diff --git a/drivers/crypto/virtio/virtio_crypto_algs.c b/drivers/crypto/virtio/virtio_crypto_algs.c
+index 10f266d462d6..42d19205166b 100644
+--- a/drivers/crypto/virtio/virtio_crypto_algs.c
++++ b/drivers/crypto/virtio/virtio_crypto_algs.c
+@@ -129,13 +129,11 @@ static int virtio_crypto_alg_ablkcipher_init_session(
+ 	 * Avoid to do DMA from the stack, switch to using
+ 	 * dynamically-allocated for the key
+ 	 */
+-	uint8_t *cipher_key = kmalloc(keylen, GFP_ATOMIC);
++	uint8_t *cipher_key = kmemdup(key, keylen, GFP_ATOMIC);
+ 
+ 	if (!cipher_key)
+ 		return -ENOMEM;
+ 
+-	memcpy(cipher_key, key, keylen);
+-
+ 	spin_lock(&vcrypto->ctrl_lock);
+ 	/* Pad ctrl header */
+ 	vcrypto->ctrl.header.opcode =
+-- 
+2.11.0
 
-Well those all seem to be the same issue; the needed alignment isn't the same as
-the entity size.  So if the crct10dif one needs to be fixed, these need to be
-too.  Am I missing something?
-
-- Eric
