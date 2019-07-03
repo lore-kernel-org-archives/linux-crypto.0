@@ -8,55 +8,55 @@ X-Spam-Status: No, score=-10.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B700BC06511
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 08:15:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D2D7C5B578
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 08:15:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 91C2F218A6
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 08:15:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 46772218A3
+	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 08:15:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lq1x3a+Q"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NXBXHY2r"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727327AbfGCIOF (ORCPT
+        id S1727562AbfGCIPJ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 3 Jul 2019 04:14:05 -0400
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:36464 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727185AbfGCIOF (ORCPT
+        Wed, 3 Jul 2019 04:15:09 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:33748 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727311AbfGCIOD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 3 Jul 2019 04:14:05 -0400
-Received: by mail-pl1-f194.google.com with SMTP id k8so811616plt.3;
-        Wed, 03 Jul 2019 01:14:04 -0700 (PDT)
+        Wed, 3 Jul 2019 04:14:03 -0400
+Received: by mail-pf1-f193.google.com with SMTP id x15so870044pfq.0;
+        Wed, 03 Jul 2019 01:14:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=9WUDh01MjOopjE2651F/x1CBV/vDwEN3vFSVjbCfKwU=;
-        b=Lq1x3a+QBg/bPxKkRGIQH/UAK1iYekfX7MVQv7letnQBccACuyCFvLD2qVTuuFZogz
-         /FcNgnWnpj/a2NPZW0/tO0DZQDYKfZvD+02K9I/HBO1NLrv1pOv2c+WqDCcPdPQrgAmG
-         pdKSios3ua9DEdcOrAC1Oh41B1lWYLZ80h2uTqtl8oDUGFws873ha8tNjwouYxPHyE5g
-         znOgH2cqbld/afw/9vwVVCWGmzUV7zhRZmrs+/D2jc7ERbk5QlboxsrVthIG+YqkFU/K
-         kIf2CXA4YkgjyghFJ2jVJnMuCsdoe+FiPOHyojlZKBwg6KOTi11OSu0Gppkr6ooM1TTz
-         25Zw==
+        bh=6BcX9hRF1ZcJg0bLQVxEUNzqf7x1OYXFm4Avex33mzw=;
+        b=NXBXHY2rOfDIIefdmLBUtihvwLxZoamAXmXEhzmcHgE1//wHqu3N1fJ0mn8cVhHOCY
+         oEG9EAi5UrMAFjLuT380GshZwbi9WWx5FVLWdP/QZyW9ZAA6CmM3qbw/f1ahx9RcQLxR
+         FYTyL4nso9PO/ba16bytiqE7aorc8O6S/c7ZG7OM023sGc1+izwyw7WiDvL9v4W1cKf4
+         ZPBVAVDOOGRRfS7TyyW5v/plLynTgr+i6pL/B09mmY+WQOv9bmJkP46+e3MZTYcWPq2C
+         xdcMXwaK6ASx+lfT91VB/cds4KVep1xnFDTRrWZSpQ/g+xIZYhkynwJ8X82KgADmODYy
+         8DMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=9WUDh01MjOopjE2651F/x1CBV/vDwEN3vFSVjbCfKwU=;
-        b=McbInfIBLP/RnpO/InIjePYLDMNtxi2dFRCXg/6IOsY+fUeMWoENjXtUv8dWr/tsGE
-         QGOXZvgriUizi0txoTTvFBg2+GNkjLq0PLgalrIlBaODykX8nB6V7m61u4+7ePLrDyAF
-         FRoC/saGiv72eH6+BkQeTCL6ym+i5JTyvx6tF6Tn4B2Jh/My2M3v6zrqv2+fb1cwmUq2
-         HB2KiAcrZrHAtzWVF4smCBUqmHvYMM2oNGRHBD1sXD1M1cumykA5GsZhD+GByct4AB1n
-         xbRgz47OpIjQYi3PyFj6qP38GKePw8ZvMdtAGSj+3cU2qF19cRRoyRb6l9tq9jEEw+Vv
-         /vXg==
-X-Gm-Message-State: APjAAAW5RUj1uS5Hsv12Uf5iatAMIOf6GA99lF8nbR75QLDYie8VOhuw
-        UYnsmJPRt23aqKjgm0PwfSv2ExfgOak=
-X-Google-Smtp-Source: APXvYqyS/mLU68zLObUvHEK0z68mtiUbdOO0ip92Wh2px534KXtR/5l/W1NpAs0gdeylAoUcJyB7yQ==
-X-Received: by 2002:a17:902:1e6:: with SMTP id b93mr40713178plb.295.1562141643827;
-        Wed, 03 Jul 2019 01:14:03 -0700 (PDT)
+        bh=6BcX9hRF1ZcJg0bLQVxEUNzqf7x1OYXFm4Avex33mzw=;
+        b=Q2EnOC8f1HTJluq2GyFhl+J0Ga5rVU/aBc+O1uR5IZ6XD/8wR+7ZZhRaxq4OYc/vZH
+         rpENtXBCB8Y8jLCw2BwOC0Z0kOAkP6xCulZSIjvi0Q/LCGeHNElfpHBuCMKX76fZZzyI
+         yzPBSZc5P/fQCRZt+LX7NKe0DVWO63x8uKPuxXiqCa59i28NwzhGFu6qRDqCFIgmypE7
+         PlRkZzlsnYrszhlcr3DOMD/p3cqnyFxRaYPUz6mGDwqSNQGys6CbQe2g3BCBX8nj23qr
+         r5bY/bMETOitxnFZ2mtMmbhRIyPtwW/aawWhVNRK4Y7P2ivuMjam2+x7RlXzTrshmnHj
+         IHhw==
+X-Gm-Message-State: APjAAAXtevJdkHSOe9Nq/vSOGeuNEhF8Why8c1k4e8W594K0SgkM5OZz
+        vwd1iaDWRrdrexBH2yqVEK+dDTH6g6Y=
+X-Google-Smtp-Source: APXvYqw8B01YxlWv3cdvdz1KbV9dJR9VvgR4WsLnkObSzKzJf+FzgcxEKHUe8Cq+m7lYJnf+Gu0+ww==
+X-Received: by 2002:a63:3f84:: with SMTP id m126mr34593874pga.213.1562141642532;
+        Wed, 03 Jul 2019 01:14:02 -0700 (PDT)
 Received: from localhost.lan (c-67-185-54-80.hsd1.wa.comcast.net. [67.185.54.80])
-        by smtp.gmail.com with ESMTPSA id d2sm1445306pgo.0.2019.07.03.01.14.02
+        by smtp.gmail.com with ESMTPSA id d2sm1445306pgo.0.2019.07.03.01.14.01
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Wed, 03 Jul 2019 01:14:03 -0700 (PDT)
+        Wed, 03 Jul 2019 01:14:01 -0700 (PDT)
 From:   Andrey Smirnov <andrew.smirnov@gmail.com>
 To:     linux-crypto@vger.kernel.org
 Cc:     Andrey Smirnov <andrew.smirnov@gmail.com>,
@@ -68,9 +68,9 @@ Cc:     Andrey Smirnov <andrew.smirnov@gmail.com>,
         Aymen Sghaier <aymen.sghaier@nxp.com>,
         Leonard Crestez <leonard.crestez@nxp.com>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v4 05/16] crypto: caam - use devres to allocate 'outring'
-Date:   Wed,  3 Jul 2019 01:13:16 -0700
-Message-Id: <20190703081327.17505-6-andrew.smirnov@gmail.com>
+Subject: [PATCH v4 04/16] crypto: caam - use deveres to allocate 'entinfo'
+Date:   Wed,  3 Jul 2019 01:13:15 -0700
+Message-Id: <20190703081327.17505-5-andrew.smirnov@gmail.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190703081327.17505-1-andrew.smirnov@gmail.com>
 References: <20190703081327.17505-1-andrew.smirnov@gmail.com>
@@ -82,10 +82,8 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Use devres to allocate 'outring' and drop corresponding call to
-dma_free_coherent() as well as extra references to 'struct
-jr_outentry' (needed in following commits). No functional change
-inteded.
+Use deveres to allocate 'entinfo' and drop corresponding call to
+kfree(). No functional change intended.
 
 Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
 Cc: Chris Spencer <christopher.spencer@sea.co.uk>
@@ -98,64 +96,31 @@ Cc: Leonard Crestez <leonard.crestez@nxp.com>
 Cc: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
 ---
- drivers/crypto/caam/jr.c | 15 +++++----------
- 1 file changed, 5 insertions(+), 10 deletions(-)
+ drivers/crypto/caam/jr.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
-index fc7deb445aa8..1eaa91dcc146 100644
+index a7ca2bbe243f..fc7deb445aa8 100644
 --- a/drivers/crypto/caam/jr.c
 +++ b/drivers/crypto/caam/jr.c
-@@ -108,7 +108,7 @@ static int caam_reset_hw_jr(struct device *dev)
- static int caam_jr_shutdown(struct device *dev)
- {
- 	struct caam_drv_private_jr *jrp = dev_get_drvdata(dev);
--	dma_addr_t inpbusaddr, outbusaddr;
-+	dma_addr_t inpbusaddr;
- 	int ret;
- 
- 	ret = caam_reset_hw_jr(dev);
-@@ -120,11 +120,8 @@ static int caam_jr_shutdown(struct device *dev)
- 
- 	/* Free rings */
- 	inpbusaddr = rd_reg64(&jrp->rregs->inpring_base);
--	outbusaddr = rd_reg64(&jrp->rregs->outring_base);
- 	dma_free_coherent(dev, sizeof(dma_addr_t) * JOBR_DEPTH,
+@@ -125,7 +125,6 @@ static int caam_jr_shutdown(struct device *dev)
  			  jrp->inpring, inpbusaddr);
--	dma_free_coherent(dev, sizeof(struct jr_outentry) * JOBR_DEPTH,
--			  jrp->outring, outbusaddr);
+ 	dma_free_coherent(dev, sizeof(struct jr_outentry) * JOBR_DEPTH,
+ 			  jrp->outring, outbusaddr);
+-	kfree(jrp->entinfo);
  
  	return ret;
  }
-@@ -459,15 +456,16 @@ static int caam_jr_init(struct device *dev)
- 	if (!jrp->inpring)
- 		goto out_free_irq;
- 
--	jrp->outring = dma_alloc_coherent(dev, sizeof(*jrp->outring) *
--					  JOBR_DEPTH, &outbusaddr, GFP_KERNEL);
-+	jrp->outring = dmam_alloc_coherent(dev, sizeof(*jrp->outring) *
-+					   JOBR_DEPTH, &outbusaddr,
-+					   GFP_KERNEL);
+@@ -465,7 +464,8 @@ static int caam_jr_init(struct device *dev)
  	if (!jrp->outring)
  		goto out_free_inpring;
  
- 	jrp->entinfo = devm_kcalloc(dev, JOBR_DEPTH, sizeof(*jrp->entinfo),
- 				    GFP_KERNEL);
+-	jrp->entinfo = kcalloc(JOBR_DEPTH, sizeof(*jrp->entinfo), GFP_KERNEL);
++	jrp->entinfo = devm_kcalloc(dev, JOBR_DEPTH, sizeof(*jrp->entinfo),
++				    GFP_KERNEL);
  	if (!jrp->entinfo)
--		goto out_free_outring;
-+		return -ENOMEM;
+ 		goto out_free_outring;
  
- 	tasklet_init(&jrp->irqtask, caam_jr_dequeue, (unsigned long)dev);
- 
-@@ -495,9 +493,6 @@ static int caam_jr_init(struct device *dev)
- 
- 	return 0;
- 
--out_free_outring:
--	dma_free_coherent(dev, sizeof(struct jr_outentry) * JOBR_DEPTH,
--			  jrp->outring, outbusaddr);
- out_free_inpring:
- 	dma_free_coherent(dev, sizeof(dma_addr_t) * JOBR_DEPTH,
- 			  jrp->inpring, inpbusaddr);
 -- 
 2.21.0
 
