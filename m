@@ -7,54 +7,54 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ADCCC0651F
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Jul 2019 18:30:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35478C0651F
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Jul 2019 18:30:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 456A821670
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Jul 2019 18:30:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 09AA221670
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Jul 2019 18:30:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lm3/qUDB"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AWw0X0ld"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727045AbfGDSau (ORCPT
+        id S1726817AbfGDSaw (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 4 Jul 2019 14:30:50 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:34778 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727040AbfGDSau (ORCPT
+        Thu, 4 Jul 2019 14:30:52 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:46047 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727046AbfGDSav (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 4 Jul 2019 14:30:50 -0400
-Received: by mail-wr1-f67.google.com with SMTP id u18so7543926wru.1
-        for <linux-crypto@vger.kernel.org>; Thu, 04 Jul 2019 11:30:47 -0700 (PDT)
+        Thu, 4 Jul 2019 14:30:51 -0400
+Received: by mail-wr1-f66.google.com with SMTP id f9so7491033wre.12
+        for <linux-crypto@vger.kernel.org>; Thu, 04 Jul 2019 11:30:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=N12ApufgoexL9WzpaPENxsB09Hf/go+8FiAedLdpfCo=;
-        b=lm3/qUDBAkFuFnB2hVpM6WBybTS2O72DhYTcx/qbPto7tRXAyg3BQ56NSJbKceneaM
-         xA4XkSKXxC8TAB9Zw8W3WQi3G/tcwER0SjIsblDpjJJncIsoyFOzClXiz+P3wYNlAqky
-         rvMv+CGuZfY+vPqVUl+vB5khS3j8DJTqGBmPUmRcOR7SyJHE47QBKy7N/cpqteemJYRp
-         ziJFFd3pRiR/e42mHqSqxODi4sLk11w2n8qmBQa2oohKfLPIqCAwlCG1aJeJafUW4UW6
-         ATpjLHVybsLZo9mZp7mdGmf305ECIBj/fWwjo4b3igyXiayhU7qH2VeTZX3/jFy/KxFS
-         F6zw==
+        bh=q2LNtGCmE5IlgP+bQlpDKN5FkREmAvC3oHX/3jKNrRY=;
+        b=AWw0X0ldg6U0xP9z9EIXN7pc0fp+5EvjK30XzbXoxs0EeTO0y5XABAeisWIdXREF2U
+         s/Ja7Bt67iGxB1hb3QkS5sDE8FdLB83mKoVxX3839omjjETHgxjlgqQHezmEFbSCbDin
+         vBzof1dEhE0DdRdjf4IkgPswj6SG4Z+pFPMa/RnDjx7JwXuuDnvuduqZ+gCgws210EGx
+         ASjM+J6SRXvlmaxVMn/DHjB++J6cU1VSvgbwUazKIWlPaGFpjPkWOawsr8XAATsxSSpy
+         SsEwXGg1jTlmCv3YHoPXXkKHlzMw3yM2gP2BSf3kY73pijSgQDyCIDVrwOBV4+BAiCPj
+         GQlQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=N12ApufgoexL9WzpaPENxsB09Hf/go+8FiAedLdpfCo=;
-        b=hHQrwUyH2HixfUm72qU6RVxotOknw4N68O7CKZuLVFdRYmsZpGNjDFVg8ZpMgk7a2w
-         BTXnupZa5mNLPGVf7VD1NbKcSZWTlBQ6hIIJmMiQRjeGVWtrvxgEAo0LruO8ZvDQRlUC
-         rykxKkGCv5N70VJSjHyR77rXM7ElX6rMPbgMSmJdN3pZP8B+UXn3w7akxPQpQuWsw+p4
-         y/typhHm/5uYs1jsHxuIz5yovRAa95ivlyd7sSHaIEcsBq/pdvhDghsMLtpnKzAtCMbc
-         +s+gmefvdywWx4wizzSBm8jR9qh4DL0qmPeak5Zh5SY5qN0QcgAxBuLbuRhUuQnJH/Uy
-         wsGA==
-X-Gm-Message-State: APjAAAWqsxdo97ATBrmsaRgmhZdEdq7qju0xY+XZYxP3ySYw0O4lhQJB
-        K4/0vayt0WHvZEmB6B5g7e1PG3edj4shpQ==
-X-Google-Smtp-Source: APXvYqzc3yGxe5RGRlOLkuRJ8NXX83JN4eseDBgieuYoZugSK2nwSlK6S+7jcraA/FUQ+BhJLhi6KA==
-X-Received: by 2002:adf:d081:: with SMTP id y1mr34406wrh.34.1562265046761;
-        Thu, 04 Jul 2019 11:30:46 -0700 (PDT)
+        bh=q2LNtGCmE5IlgP+bQlpDKN5FkREmAvC3oHX/3jKNrRY=;
+        b=lGWvLrbC2pa9/yT3oOqCIzQs1U5byhrrnkefqn0L1AVPJ6rQ75J4Dt4wJo5NREbG3F
+         5pXJFArOITqsJ71aDXQFPUYGIRDNviRavvzTqWXEN7clvpbtZO6VMHY1tbs1egudNIp8
+         h27CjILuXN10N97PvrSbDT0ATDMvlfrMcAwHZeyg/JkmTWofAOW5lvyYV/H3Qd07rzo+
+         1qzKL3b7R2b0aikZv9zXtv7Xv0XharBoFJ5PnvOz2QcwVZdJFdBeYzKjt+FKUDBqZlXI
+         oXiolYCD4rbgZ93QIGCmewo9M1xdb+qaRwCIQacc7YkePkjRJlR1Yb1DVtJ/g3yYQE7R
+         214Q==
+X-Gm-Message-State: APjAAAUmUzs/WafIv33jNquOEMzYdI09rEHl/+RAIZe8tAWuvWDnk9KD
+        nNb7t9K+26zsspnFm2szCCVlbqIUp2+f8g==
+X-Google-Smtp-Source: APXvYqytPc5jdSNLJ9V0tw1rQghVl5C+oRle/fcBMLN0f/E6Tk3hHy9XRVLksXKPd8W7SpVTOQr26A==
+X-Received: by 2002:a5d:5752:: with SMTP id q18mr29699813wrw.337.1562265050057;
+        Thu, 04 Jul 2019 11:30:50 -0700 (PDT)
 Received: from e111045-lin.arm.com (93-143-123-179.adsl.net.t-com.hr. [93.143.123.179])
-        by smtp.gmail.com with ESMTPSA id o6sm11114695wra.27.2019.07.04.11.30.45
+        by smtp.gmail.com with ESMTPSA id o6sm11114695wra.27.2019.07.04.11.30.48
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 04 Jul 2019 11:30:46 -0700 (PDT)
+        Thu, 04 Jul 2019 11:30:49 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
@@ -63,9 +63,9 @@ Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         linux-fscrypt@vger.kernel.org,
         Gilad Ben-Yossef <gilad@benyossef.com>,
         Milan Broz <gmazyland@gmail.com>
-Subject: [PATCH v8 4/7] md: dm-crypt: switch to ESSIV crypto API template
-Date:   Thu,  4 Jul 2019 20:30:14 +0200
-Message-Id: <20190704183017.31570-5-ard.biesheuvel@linaro.org>
+Subject: [PATCH v8 6/7] crypto: arm64/aes-cts-cbc - factor out CBC en/decryption of a walk
+Date:   Thu,  4 Jul 2019 20:30:16 +0200
+Message-Id: <20190704183017.31570-7-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190704183017.31570-1-ard.biesheuvel@linaro.org>
 References: <20190704183017.31570-1-ard.biesheuvel@linaro.org>
@@ -74,301 +74,153 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Replace the explicit ESSIV handling in the dm-crypt driver with calls
-into the crypto API, which now possesses the capability to perform
-this processing within the crypto subsystem.
+The plain CBC driver and the CTS one share some code that iterates over
+a scatterwalk and invokes the CBC asm code to do the processing. The
+upcoming ESSIV/CBC mode will clone that pattern for the third time, so
+let's factor it out first.
 
-Reviewed-by: Milan Broz <gmazyland@gmail.com>
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- drivers/md/Kconfig    |   1 +
- drivers/md/dm-crypt.c | 200 ++++----------------
- 2 files changed, 36 insertions(+), 165 deletions(-)
+ arch/arm64/crypto/aes-glue.c | 82 ++++++++++----------
+ 1 file changed, 40 insertions(+), 42 deletions(-)
 
-diff --git a/drivers/md/Kconfig b/drivers/md/Kconfig
-index db269a348b20..3c57e76969fa 100644
---- a/drivers/md/Kconfig
-+++ b/drivers/md/Kconfig
-@@ -270,6 +270,7 @@ config DM_CRYPT
- 	depends on BLK_DEV_DM
- 	select CRYPTO
- 	select CRYPTO_CBC
-+	select CRYPTO_ESSIV
- 	---help---
- 	  This device-mapper target allows you to create a device that
- 	  transparently encrypts the data on it. You'll need to activate
-diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
-index 3c17d588f6db..e6b49b323543 100644
---- a/drivers/md/dm-crypt.c
-+++ b/drivers/md/dm-crypt.c
-@@ -98,11 +98,6 @@ struct crypt_iv_operations {
- 		    struct dm_crypt_request *dmreq);
- };
- 
--struct iv_essiv_private {
--	struct crypto_shash *hash_tfm;
--	u8 *salt;
--};
--
- struct iv_benbi_private {
- 	int shift;
- };
-@@ -155,7 +150,6 @@ struct crypt_config {
- 
- 	const struct crypt_iv_operations *iv_gen_ops;
- 	union {
--		struct iv_essiv_private essiv;
- 		struct iv_benbi_private benbi;
- 		struct iv_lmk_private lmk;
- 		struct iv_tcw_private tcw;
-@@ -165,8 +159,6 @@ struct crypt_config {
- 	unsigned short int sector_size;
- 	unsigned char sector_shift;
- 
--	/* ESSIV: struct crypto_cipher *essiv_tfm */
--	void *iv_private;
- 	union {
- 		struct crypto_skcipher **tfms;
- 		struct crypto_aead **tfms_aead;
-@@ -323,157 +315,15 @@ static int crypt_iv_plain64be_gen(struct crypt_config *cc, u8 *iv,
- 	return 0;
+diff --git a/arch/arm64/crypto/aes-glue.c b/arch/arm64/crypto/aes-glue.c
+index f0ceb545bd1e..11b85ce02d7a 100644
+--- a/arch/arm64/crypto/aes-glue.c
++++ b/arch/arm64/crypto/aes-glue.c
+@@ -185,46 +185,64 @@ static int ecb_decrypt(struct skcipher_request *req)
+ 	return err;
  }
  
--/* Initialise ESSIV - compute salt but no local memory allocations */
--static int crypt_iv_essiv_init(struct crypt_config *cc)
--{
--	struct iv_essiv_private *essiv = &cc->iv_gen_private.essiv;
--	SHASH_DESC_ON_STACK(desc, essiv->hash_tfm);
--	struct crypto_cipher *essiv_tfm;
--	int err;
--
--	desc->tfm = essiv->hash_tfm;
--
--	err = crypto_shash_digest(desc, cc->key, cc->key_size, essiv->salt);
--	shash_desc_zero(desc);
--	if (err)
--		return err;
--
--	essiv_tfm = cc->iv_private;
--
--	err = crypto_cipher_setkey(essiv_tfm, essiv->salt,
--			    crypto_shash_digestsize(essiv->hash_tfm));
--	if (err)
--		return err;
--
--	return 0;
--}
--
--/* Wipe salt and reset key derived from volume key */
--static int crypt_iv_essiv_wipe(struct crypt_config *cc)
--{
--	struct iv_essiv_private *essiv = &cc->iv_gen_private.essiv;
--	unsigned salt_size = crypto_shash_digestsize(essiv->hash_tfm);
--	struct crypto_cipher *essiv_tfm;
--	int r, err = 0;
--
--	memset(essiv->salt, 0, salt_size);
--
--	essiv_tfm = cc->iv_private;
--	r = crypto_cipher_setkey(essiv_tfm, essiv->salt, salt_size);
--	if (r)
--		err = r;
--
--	return err;
--}
--
--/* Allocate the cipher for ESSIV */
--static struct crypto_cipher *alloc_essiv_cipher(struct crypt_config *cc,
--						struct dm_target *ti,
--						const u8 *salt,
--						unsigned int saltsize)
--{
--	struct crypto_cipher *essiv_tfm;
--	int err;
--
--	/* Setup the essiv_tfm with the given salt */
--	essiv_tfm = crypto_alloc_cipher(cc->cipher, 0, 0);
--	if (IS_ERR(essiv_tfm)) {
--		ti->error = "Error allocating crypto tfm for ESSIV";
--		return essiv_tfm;
--	}
--
--	if (crypto_cipher_blocksize(essiv_tfm) != cc->iv_size) {
--		ti->error = "Block size of ESSIV cipher does "
--			    "not match IV size of block cipher";
--		crypto_free_cipher(essiv_tfm);
--		return ERR_PTR(-EINVAL);
--	}
--
--	err = crypto_cipher_setkey(essiv_tfm, salt, saltsize);
--	if (err) {
--		ti->error = "Failed to set key for ESSIV cipher";
--		crypto_free_cipher(essiv_tfm);
--		return ERR_PTR(err);
--	}
--
--	return essiv_tfm;
--}
--
--static void crypt_iv_essiv_dtr(struct crypt_config *cc)
--{
--	struct crypto_cipher *essiv_tfm;
--	struct iv_essiv_private *essiv = &cc->iv_gen_private.essiv;
--
--	crypto_free_shash(essiv->hash_tfm);
--	essiv->hash_tfm = NULL;
--
--	kzfree(essiv->salt);
--	essiv->salt = NULL;
--
--	essiv_tfm = cc->iv_private;
--
--	if (essiv_tfm)
--		crypto_free_cipher(essiv_tfm);
--
--	cc->iv_private = NULL;
--}
--
--static int crypt_iv_essiv_ctr(struct crypt_config *cc, struct dm_target *ti,
--			      const char *opts)
--{
--	struct crypto_cipher *essiv_tfm = NULL;
--	struct crypto_shash *hash_tfm = NULL;
--	u8 *salt = NULL;
--	int err;
--
--	if (!opts) {
--		ti->error = "Digest algorithm missing for ESSIV mode";
--		return -EINVAL;
--	}
--
--	/* Allocate hash algorithm */
--	hash_tfm = crypto_alloc_shash(opts, 0, 0);
--	if (IS_ERR(hash_tfm)) {
--		ti->error = "Error initializing ESSIV hash";
--		err = PTR_ERR(hash_tfm);
--		goto bad;
--	}
--
--	salt = kzalloc(crypto_shash_digestsize(hash_tfm), GFP_KERNEL);
--	if (!salt) {
--		ti->error = "Error kmallocing salt storage in ESSIV";
--		err = -ENOMEM;
--		goto bad;
--	}
--
--	cc->iv_gen_private.essiv.salt = salt;
--	cc->iv_gen_private.essiv.hash_tfm = hash_tfm;
--
--	essiv_tfm = alloc_essiv_cipher(cc, ti, salt,
--				       crypto_shash_digestsize(hash_tfm));
--	if (IS_ERR(essiv_tfm)) {
--		crypt_iv_essiv_dtr(cc);
--		return PTR_ERR(essiv_tfm);
--	}
--	cc->iv_private = essiv_tfm;
--
--	return 0;
--
--bad:
--	if (hash_tfm && !IS_ERR(hash_tfm))
--		crypto_free_shash(hash_tfm);
--	kfree(salt);
--	return err;
--}
--
- static int crypt_iv_essiv_gen(struct crypt_config *cc, u8 *iv,
- 			      struct dm_crypt_request *dmreq)
+-static int cbc_encrypt(struct skcipher_request *req)
++static int cbc_encrypt_walk(struct skcipher_request *req,
++			    struct skcipher_walk *walk)
  {
--	struct crypto_cipher *essiv_tfm = cc->iv_private;
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+ 	struct crypto_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
+-	int err, rounds = 6 + ctx->key_length / 4;
+-	struct skcipher_walk walk;
++	int err = 0, rounds = 6 + ctx->key_length / 4;
+ 	unsigned int blocks;
+ 
+-	err = skcipher_walk_virt(&walk, req, false);
 -
-+	/*
-+	 * ESSIV encryption of the IV is now handled by the crypto API,
-+	 * so just pass the plain sector number here.
-+	 */
- 	memset(iv, 0, cc->iv_size);
- 	*(__le64 *)iv = cpu_to_le64(dmreq->iv_sector);
--	crypto_cipher_encrypt_one(essiv_tfm, iv, iv);
- 
- 	return 0;
- }
-@@ -854,10 +704,6 @@ static const struct crypt_iv_operations crypt_iv_plain64be_ops = {
- };
- 
- static const struct crypt_iv_operations crypt_iv_essiv_ops = {
--	.ctr       = crypt_iv_essiv_ctr,
--	.dtr       = crypt_iv_essiv_dtr,
--	.init      = crypt_iv_essiv_init,
--	.wipe      = crypt_iv_essiv_wipe,
- 	.generator = crypt_iv_essiv_gen
- };
- 
-@@ -2397,7 +2243,7 @@ static int crypt_ctr_cipher_new(struct dm_target *ti, char *cipher_in, char *key
- 				char **ivmode, char **ivopts)
- {
- 	struct crypt_config *cc = ti->private;
--	char *tmp, *cipher_api;
-+	char *tmp, *cipher_api, buf[CRYPTO_MAX_ALG_NAME];
- 	int ret = -EINVAL;
- 
- 	cc->tfms_count = 1;
-@@ -2436,9 +2282,19 @@ static int crypt_ctr_cipher_new(struct dm_target *ti, char *cipher_in, char *key
+-	while ((blocks = (walk.nbytes / AES_BLOCK_SIZE))) {
++	while ((blocks = (walk->nbytes / AES_BLOCK_SIZE))) {
+ 		kernel_neon_begin();
+-		aes_cbc_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
+-				ctx->key_enc, rounds, blocks, walk.iv);
++		aes_cbc_encrypt(walk->dst.virt.addr, walk->src.virt.addr,
++				ctx->key_enc, rounds, blocks, walk->iv);
+ 		kernel_neon_end();
+-		err = skcipher_walk_done(&walk, walk.nbytes % AES_BLOCK_SIZE);
++		err = skcipher_walk_done(walk, walk->nbytes % AES_BLOCK_SIZE);
  	}
+ 	return err;
+ }
  
- 	ret = crypt_ctr_blkdev_cipher(cc, cipher_api);
--	if (ret < 0) {
--		ti->error = "Cannot allocate cipher string";
--		return -ENOMEM;
-+	if (ret < 0)
-+		goto bad_mem;
+-static int cbc_decrypt(struct skcipher_request *req)
++static int cbc_encrypt(struct skcipher_request *req)
+ {
+-	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+-	struct crypto_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
+-	int err, rounds = 6 + ctx->key_length / 4;
+ 	struct skcipher_walk walk;
+-	unsigned int blocks;
++	int err;
+ 
+ 	err = skcipher_walk_virt(&walk, req, false);
++	if (err)
++		return err;
++	return cbc_encrypt_walk(req, &walk);
++}
+ 
+-	while ((blocks = (walk.nbytes / AES_BLOCK_SIZE))) {
++static int cbc_decrypt_walk(struct skcipher_request *req,
++			    struct skcipher_walk *walk)
++{
++	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
++	struct crypto_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
++	int err = 0, rounds = 6 + ctx->key_length / 4;
++	unsigned int blocks;
 +
-+	if (*ivmode && !strcmp(*ivmode, "essiv")) {
-+		if (!*ivopts) {
-+			ti->error = "Digest algorithm missing for ESSIV mode";
-+			return -EINVAL;
-+		}
-+		ret = snprintf(buf, CRYPTO_MAX_ALG_NAME, "essiv(%s,%s,%s)",
-+			       cipher_api, cc->cipher, *ivopts);
-+		if (ret < 0 || ret >= CRYPTO_MAX_ALG_NAME)
-+			goto bad_mem;
-+		cipher_api = buf;
++	while ((blocks = (walk->nbytes / AES_BLOCK_SIZE))) {
+ 		kernel_neon_begin();
+-		aes_cbc_decrypt(walk.dst.virt.addr, walk.src.virt.addr,
+-				ctx->key_dec, rounds, blocks, walk.iv);
++		aes_cbc_decrypt(walk->dst.virt.addr, walk->src.virt.addr,
++				ctx->key_dec, rounds, blocks, walk->iv);
+ 		kernel_neon_end();
+-		err = skcipher_walk_done(&walk, walk.nbytes % AES_BLOCK_SIZE);
++		err = skcipher_walk_done(walk, walk->nbytes % AES_BLOCK_SIZE);
  	}
- 
- 	cc->key_parts = cc->tfms_count;
-@@ -2456,6 +2312,9 @@ static int crypt_ctr_cipher_new(struct dm_target *ti, char *cipher_in, char *key
- 		cc->iv_size = crypto_skcipher_ivsize(any_tfm(cc));
- 
- 	return 0;
-+bad_mem:
-+	ti->error = "Cannot allocate cipher string";
-+	return -ENOMEM;
+ 	return err;
  }
  
- static int crypt_ctr_cipher_old(struct dm_target *ti, char *cipher_in, char *key,
-@@ -2515,9 +2374,20 @@ static int crypt_ctr_cipher_old(struct dm_target *ti, char *cipher_in, char *key
- 	if (!cipher_api)
- 		goto bad_mem;
- 
--	ret = snprintf(cipher_api, CRYPTO_MAX_ALG_NAME,
--		       "%s(%s)", chainmode, cipher);
--	if (ret < 0) {
-+	if (*ivmode && !strcmp(*ivmode, "essiv")) {
-+		if (!*ivopts) {
-+			ti->error = "Digest algorithm missing for ESSIV mode";
-+			kfree(cipher_api);
-+			return -EINVAL;
-+		}
-+		ret = snprintf(cipher_api, CRYPTO_MAX_ALG_NAME,
-+			       "essiv(%s(%s),%s,%s)", chainmode, cipher,
-+			       cipher, *ivopts);
-+	} else {
-+		ret = snprintf(cipher_api, CRYPTO_MAX_ALG_NAME,
-+			       "%s(%s)", chainmode, cipher);
-+	}
-+	if (ret < 0 || ret >= CRYPTO_MAX_ALG_NAME) {
- 		kfree(cipher_api);
- 		goto bad_mem;
++static int cbc_decrypt(struct skcipher_request *req)
++{
++	struct skcipher_walk walk;
++	int err;
++
++	err = skcipher_walk_virt(&walk, req, false);
++	if (err)
++		return err;
++	return cbc_decrypt_walk(req, &walk);
++}
++
+ static int cts_cbc_init_tfm(struct crypto_skcipher *tfm)
+ {
+ 	crypto_skcipher_set_reqsize(tfm, sizeof(struct cts_cbc_req_ctx));
+@@ -250,22 +268,12 @@ static int cts_cbc_encrypt(struct skcipher_request *req)
  	}
+ 
+ 	if (cbc_blocks > 0) {
+-		unsigned int blocks;
+-
+ 		skcipher_request_set_crypt(&rctx->subreq, req->src, req->dst,
+ 					   cbc_blocks * AES_BLOCK_SIZE,
+ 					   req->iv);
+ 
+-		err = skcipher_walk_virt(&walk, &rctx->subreq, false);
+-
+-		while ((blocks = (walk.nbytes / AES_BLOCK_SIZE))) {
+-			kernel_neon_begin();
+-			aes_cbc_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
+-					ctx->key_enc, rounds, blocks, walk.iv);
+-			kernel_neon_end();
+-			err = skcipher_walk_done(&walk,
+-						 walk.nbytes % AES_BLOCK_SIZE);
+-		}
++		err = skcipher_walk_virt(&walk, &rctx->subreq, false) ?:
++		      cbc_encrypt_walk(&rctx->subreq, &walk);
+ 		if (err)
+ 			return err;
+ 
+@@ -315,22 +323,12 @@ static int cts_cbc_decrypt(struct skcipher_request *req)
+ 	}
+ 
+ 	if (cbc_blocks > 0) {
+-		unsigned int blocks;
+-
+ 		skcipher_request_set_crypt(&rctx->subreq, req->src, req->dst,
+ 					   cbc_blocks * AES_BLOCK_SIZE,
+ 					   req->iv);
+ 
+-		err = skcipher_walk_virt(&walk, &rctx->subreq, false);
+-
+-		while ((blocks = (walk.nbytes / AES_BLOCK_SIZE))) {
+-			kernel_neon_begin();
+-			aes_cbc_decrypt(walk.dst.virt.addr, walk.src.virt.addr,
+-					ctx->key_dec, rounds, blocks, walk.iv);
+-			kernel_neon_end();
+-			err = skcipher_walk_done(&walk,
+-						 walk.nbytes % AES_BLOCK_SIZE);
+-		}
++		err = skcipher_walk_virt(&walk, &rctx->subreq, false) ?:
++		      cbc_decrypt_walk(&rctx->subreq, &walk);
+ 		if (err)
+ 			return err;
+ 
 -- 
 2.17.1
 
