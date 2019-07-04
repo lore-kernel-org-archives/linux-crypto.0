@@ -2,339 +2,196 @@ Return-Path: <SRS0=Wq3S=VB=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F212C0651F
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Jul 2019 18:12:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 814BBC0651F
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Jul 2019 18:30:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E32CB21738
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Jul 2019 18:12:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 50E6621670
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Jul 2019 18:30:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QmVTcjyU"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BmBZ+MX9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727044AbfGDSMH (ORCPT
+        id S1727002AbfGDSan (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 4 Jul 2019 14:12:07 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:40276 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727164AbfGDSMG (ORCPT
+        Thu, 4 Jul 2019 14:30:43 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:53180 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726911AbfGDSan (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 4 Jul 2019 14:12:06 -0400
-Received: by mail-wr1-f67.google.com with SMTP id r1so1149244wrl.7
-        for <linux-crypto@vger.kernel.org>; Thu, 04 Jul 2019 11:12:03 -0700 (PDT)
+        Thu, 4 Jul 2019 14:30:43 -0400
+Received: by mail-wm1-f68.google.com with SMTP id s3so6564493wms.2
+        for <linux-crypto@vger.kernel.org>; Thu, 04 Jul 2019 11:30:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=HuXIZkfyY0YKTx8OmkeMIGwbQPTVHS93TtpteeaIkps=;
-        b=QmVTcjyUXw4tXpkU1bev3Vj26bzENCgNWbq4YQH0Pfde/cH/tV1GhtJ27Z5ZnTrF+4
-         FgHIzgEZ4TdtqVnO/F5fjQuWlP4zkmjUPSUFOFyGRXpniAOaEnPMkFhNxEEO4a0WlaL1
-         ozkLBvUHW+22CcAEaYt4VCEPL7kYsoiNW/OFRY1deObtoGpSZWwEEIsN2NDNgyku9fe4
-         WvSh+N6NUZgHuQf7DcD7q2RaM04N6hctbDndYfT9L9QYX7FYgfqMVvtIVg6CU4UWAy2R
-         sHRj+JoyKwSLI02xBf3lhzE+LOxgnWE8zeaByF57CMShibrXY3Ur5eSN7NKCW2DTqYSy
-         3YTQ==
+        h=from:to:cc:subject:date:message-id;
+        bh=yk+JztDjUT/qSbh+IewDnfzPsmvS7/u063GlyhA1d8U=;
+        b=BmBZ+MX9BXAQxEj2buKZqZihI4km2NUvVBKuQKUJyDY7DFynpvmFuxmqewZQ9KT2TY
+         C9kY9BEs+DlKRO5OwmOMSKC6KAdb++a7y2kCihIXImX28PopDdfaLSVF2qad4/In5f+l
+         cOKwRPxInEEPb75rxIQJrrh6U5EFPDNGqM+Qb0UFM9absAdtVngZ+isF3qWwTQMCHFPD
+         F0+q90C3oPUtqvBKwjyg5s3NOUr/ooEAtEsa5StHGZCXoD2kTrfaGrtD+n9B4zjv7cj/
+         SLq19dUKWf9emsxZClNP6AutpVFhv/lJXIKFtJtZp72NivqUuskMrg6t398VLIWWRFP3
+         uhBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=HuXIZkfyY0YKTx8OmkeMIGwbQPTVHS93TtpteeaIkps=;
-        b=p4/9RNrrZBUlYjXMlPwdlDGdAnAAcNLg2w0kRINCWAVoCtwZlPYpii+OmjQJk1vfA3
-         0EYoQg9I9NDGfDgSyQAgyXkH93fAb6GhA5CNL9jzl6LF3Wn3JvEHoTXcDANR587fu/oV
-         Z7dZz3rWqB0h/DLwKr6Luna1MKUaqrggwWWqfJc3eg8dHLv4e1UBgSTx1AI+wMt1tefP
-         v+MCemgFTwzRP6rpnRtOUct73eGC0XRwqi6J1JiOelp/tx7RvAq2dPsrJCnUzjQQZ1lT
-         8TDRvjHH8JatCCHgJmsPtcM8oW9iWsJu4PKHgbbdN9e+p8pQqgaK9X35W8x1M01EO7Ia
-         knAQ==
-X-Gm-Message-State: APjAAAUyfMM0S6GsriGFOZf3hHGFUr0nnNI4BDfZIHs16atjw/XVunIk
-        kcAM21sZF+kwapwb4TJSfAzPdNk4AnaK2JdI/VSzxw==
-X-Google-Smtp-Source: APXvYqzXv6qxcF3YEfLRpSADQXr5sJEIbc/6mQ9clj7L+KSmVga+3xCLc3v7Ei8bOK8f29pQhVeP9qDTlztcV1LEq00=
-X-Received: by 2002:a5d:6b07:: with SMTP id v7mr20466300wrw.169.1562263923058;
- Thu, 04 Jul 2019 11:12:03 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190704131033.9919-1-gmazyland@gmail.com> <20190704131033.9919-3-gmazyland@gmail.com>
- <7a8d13ee-2d3f-5357-48c6-37f56d7eff07@gmail.com> <CAKv+Gu_c+OpOwrr0dSM=j=HiDpfM4sarq6u=6AXrU8jwLaEr-w@mail.gmail.com>
- <CAKv+Gu8a6cBQYsbYs8CDyGbhHx0E=+1SU7afqoy9Cs+K8PMfqA@mail.gmail.com> <4286b8f6-03b5-a8b4-4db2-35dda954e518@gmail.com>
-In-Reply-To: <4286b8f6-03b5-a8b4-4db2-35dda954e518@gmail.com>
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=yk+JztDjUT/qSbh+IewDnfzPsmvS7/u063GlyhA1d8U=;
+        b=oGZII5DC98y3FxSPokWcXiBWMjhPPiVutXCY8kdNq7NdfMOiRB2NH0xK+ZzTz781pX
+         52L7EojWVXdoB+bfosmGwae+/XO8jx41sYeqbbi+L48S9oemK5lchj6y6l0FwvBvrH67
+         NgJBN21R0c55b4b7pb2XKnC34ZlOpp3rxPGoav2rdeucGIbCxraNIO4BfYnBPxMnfD7g
+         DqSlKcPC5PpiItbH7q4SgYfS60oXdpsCKb4fWFZCTSAtLCJHuC3/Vmp666u8XKKyZ9E9
+         60p8hZOUO9XF7WXP9vA6Za6Y+VckwSO9DSRuXtoZzRhrUc8cLxU9RYshczqsGX+1pmXo
+         q2iw==
+X-Gm-Message-State: APjAAAUJQif+VdYqE0OML6nk0yMAVKjc0CuobGO7ZThWxdN17GJU0WII
+        5GKdvPRkc04SYgxzHB2khRH2aqTV7f2+JA==
+X-Google-Smtp-Source: APXvYqyipzTA43sgCecfs/nwEE8twcuGUax7qR2FvBJdFF1ZBok/6pdHPrp60LV3tGcl7fOEHuUIrQ==
+X-Received: by 2002:a05:600c:291:: with SMTP id 17mr555909wmk.32.1562265040371;
+        Thu, 04 Jul 2019 11:30:40 -0700 (PDT)
+Received: from e111045-lin.arm.com (93-143-123-179.adsl.net.t-com.hr. [93.143.123.179])
+        by smtp.gmail.com with ESMTPSA id o6sm11114695wra.27.2019.07.04.11.30.38
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Thu, 04 Jul 2019 11:30:39 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Thu, 4 Jul 2019 20:11:46 +0200
-Message-ID: <CAKv+Gu_Nesqtz-xs0LkHYZ6HXrKkbJjq8dKL6Cnrk9ZsQ=T3jg@mail.gmail.com>
-Subject: Re: [PATCH 3/3] dm-crypt: Implement eboiv - encrypted byte-offset
- initialization vector.
-To:     Milan Broz <gmazyland@gmail.com>
-Cc:     Eric Biggers <ebiggers@google.com>,
+To:     linux-crypto@vger.kernel.org
+Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        device-mapper development <dm-devel@redhat.com>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Eric Biggers <ebiggers@google.com>, dm-devel@redhat.com,
+        linux-fscrypt@vger.kernel.org,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Milan Broz <gmazyland@gmail.com>
+Subject: [PATCH v8 0/7]  crypto: switch to crypto API for ESSIV generation
+Date:   Thu,  4 Jul 2019 20:30:10 +0200
+Message-Id: <20190704183017.31570-1-ard.biesheuvel@linaro.org>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 4 Jul 2019 at 19:45, Milan Broz <gmazyland@gmail.com> wrote:
->
-> On 04/07/2019 16:30, Ard Biesheuvel wrote:
-> > On Thu, 4 Jul 2019 at 16:28, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
-> >>
-> >> (+ Eric)
-> >>
-> >> On Thu, 4 Jul 2019 at 15:29, Milan Broz <gmazyland@gmail.com> wrote:
-> >>>
-> >>> Hi Herbert,
-> >>>
-> >>> I have a question about the crypto_cipher API in dm-crypt:
-> >>>
-> >>> We are apparently trying to deprecate cryto_cipher API (see the ESSIV patchset),
-> >>> but I am not sure what API now should be used instead.
-> >>>
-> >>
-> >> Not precisely - what I would like to do is to make the cipher part of
-> >> the internal crypto API. The reason is that there are too many
-> >> occurrences where non-trivial chaining modes have been cobbled
-> >> together from the cipher API.
->
-> Well, in the ESSIV case I understand there are two in-kernel users, so it makes
-> perfect sense to use common crypto API implementation.
->
-> For the rest, I perhaps still do not understand the reason to move this API
-> to "internal only" state.
->
-> (I am sure people will find an another way to to construct crazy things,
-> even if they are forced to use skcipher API. 8-)
->
+This series creates an ESSIV template that produces a skcipher or AEAD
+transform based on a tuple of the form '<skcipher>,<cipher>,<shash>'
+(or '<aead>,<cipher>,<shash>' for the AEAD case). It exposes the
+encapsulated sync or async skcipher/aead by passing through all operations,
+while using the cipher/shash pair to transform the input IV into an ESSIV
+output IV.
 
-True
+This matches what both users of ESSIV in the kernel do, and so it is proposed
+as a replacement for those, in patches #2 and #4.
 
-To be clear, making the cipher API internal only is something that I
-am proposing but hasn't been widely discussed yet. So if you make a
-good argument why it is a terrible idea, I'm sure it will be taken
-into account.
+Note to the maintainer: patches #2 .. #4 are against other subsystems, and
+so it might make sense to take only the crypto patches (#1, #5, and optionally
+#6 and #7) now, and allow the other subsystem maintainers to take the other
+patches at their leisure during the next cycle.
 
-The main issue is that the cipher API is suboptimal if you process
-many blocks in sequence, since SIMD implementations will not be able
-to amortize the cost of kernel_fpu_begin()/end(). This is something
-that we might be able to fix in other ways (and a SIMD get/put
-interface has already been proposed which looks suitable for this as
-well) but that would still involve an API change for something that
-isn't the correct abstraction in the first place in many cases. (There
-are multiple implementations of ccm(aes) using cipher_encrypt_one() in
-a loop, for instance, and these are not able to benefit from, e.g,
-the accelerated implementation that I created for arm64, since it open
-codes the CCM operations)
+This code has been tested using the fscrypt test suggested by Eric
+(generic/549 *), as well as the mode-test scripts suggested by Milan for
+the dm-crypt case. I also tested the aead case in a virtual machine,
+but it definitely needs some wider testing from the dm-crypt experts.
 
-> >>> See the patch below - all we need is to one block encryption for IV.
-> >>>
-> >>> This algorithm makes sense only for FDE (old compatible Bitlocker devices),
-> >>> I really do not want this to be shared in some crypto module...
-> >>>
-> >>> What API should I use here? Sync skcipher? Is the crypto_cipher API
-> >>> really a problem in this case?
-> >>>
-> >>
-> >> Are arbitrary ciphers supported? Or are you only interested in AES? In
-> >> the former case, I'd suggest the sync skcipher API to instantiate
-> >> "ecb(%s)", otherwise, use the upcoming AES library interface.
->
-> For the Bitlocker compatibility, it is only AES in CBC mode, but we usually do
-> not limit IV use in dmcrypt.
+* due to sloppiness on my part, the fscrypt change was actually broken
+  since I switched back to using full size IVs in the ESSIV template.
+  This time, I fixed this, and reran the test in question and it passed.
 
-Why on earth would you implement eboiv for compatibility purposes, and
-then allow it to be used in random other combinations? Pushing back on
-the use of arbitrary cipher cocktails is one of the reasons I'd prefer
-the cipher API to become crypto internal, since it is typically much
-better to stick with recommended combinations that are known to be
-secure/
+The consensus appears to be that it would be useful if the crypto API
+encapsulates the handling of multiple subsequent blocks that are
+encrypted using a 64-bit LE counter as IV, and makes it the duty of
+the algo to increment the counter between blocks. However, this is
+equally suitable for non-ESSIV transforms (or even more so), and so
+this is left as a future enhancement to  be applied on top.
 
-> (We still need to solve the Bitlocker Elephant diffuser, but that's another issue.)
->
-> > Actually, if CBC is the only supported mode, you could also use the
-> > skcipher itself to encrypt a single block of input (just encrypt the
-> > IV using CBC but with an IV of all zeroes)
->
-> I can then use ECB skcipher directly (IOW use skcipher ecb(aes) for IV).
-> (ECB mode must be present, because XTS is based on it anyway.)
->
-> Why I am asking is that with sync skcipher it means allocation of request
-> on stack - still more code than the patch I posted below.
->
+Changes since v7:
+- rebase onto cryptodev/master
+- drop change to ivsize in #2
+- add Milan's R-b's
 
-That is a very good point, and something that I have been meaning to
-bring up myself: ever since we switched from [a]blkciphers so
-skciphers, we lost the ability to operate synchronously on virtual
-addresses, like we still have with shashes (as opposed to ahashes)
-today. AEADs suffer from the same limitation.
+Changes since v6:
+- make CRYPTO_ESSIV user selectable so we can opt out of selecting it even
+  if FS_ENCRYPTION (which cannot be built as a module) is enabled
+- move a comment along with the code it referred to (#3), not that this change
+  and removing some redundant braces makes the diff look totally different
+- add Milan's R-b to #3 and #4
 
-The thing is, while switching to the cipher API does work around that,
-it is not a proper fix, and going forward, we should really address
-the above limitation in a sane way.
+Changes since v5:
+- drop redundant #includes and drop some unneeded braces (#2)
+- add test case for essiv(authenc(hmac(sha256),cbc(aes)),aes,sha256)
+- make ESSIV driver deal with assoc data that is described by more than two
+  scatterlist entries - this only happens when the extended tests are being
+  performed, so don't optimize for it
+- clarify that both fscrypt and dm-crypt only use ESSIV in special cases (#7)
 
-> We can do that. But if the crypto_cipher API stays exported, I do not see any
-> reason to write more complicated code.
->
-> We (dmcrypt) are pretty sophisticated user of crypto API already :)
->
+Changes since v4:
+- make the ESSIV template IV size equal the IV size of the encapsulated
+  cipher - defining it as 8 bytes was needlessly restrictive, and also
+  complicated the code for no reason
+- add a missing kfree() spotted by Smatch
+- add additional algo length name checks when constructing the essiv()
+  cipher name
+- reinstate the 'essiv' IV generation implementation in dm-crypt, but
+  make its generation function identical to plain64le (and drop the other
+  methods)
+- fix a bug in the arm64 CE/NEON code
+- simplify the arm64 code by reusing more of the existing CBC implementation
+  (patch #6 is new to this series and was added for this reason)
 
-That is absolutely true.
+Changes since v3:
+- address various review comments from Eric on patch #1
+- use Kconfig's 'imply' instead of 'select' to permit CRYPTO_ESSIV to be
+  enabled as a module or disabled entirely even if fscrypt is compiled in (#2)
+- fix an issue in the AEAD encrypt path caused by the IV being clobbered by
+  the inner skcipher before the hmac was being calculated
 
-In summary, I think implementing eboiv for arbitrary ciphers would be
-a mistake, since it is a mode that is intended for compatibility.
-However, if you do, I think going with the cipher API for now is fine,
-since you are using it in a sane way (i.e., to encrypt a single block
-of plaintext with an a priori unknown cipher). If it ever becomes an
-internal-only crypto API, we'll propose something else by that time.
+Changes since v2:
+- fixed a couple of bugs that snuck in after I'd done the bulk of my
+  testing
+- some cosmetic tweaks to the ESSIV template skcipher setkey function
+  to align it with the aead one
+- add a test case for essiv(cbc(aes),aes,sha256)
+- add an accelerated implementation for arm64 that combines the IV
+  derivation and the actual en/decryption in a single asm routine
 
+Scroll down for tcrypt speed test result comparing the essiv template
+with the asm implementation. Bare cbc(aes) tests included for reference
+as well. Taken on a 2GHz Cortex-A57 (AMD Seattle)
 
+Code can be found here
+https://git.kernel.org/pub/scm/linux/kernel/git/ardb/linux.git/log/?h=essiv-v8
 
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Eric Biggers <ebiggers@google.com>
+Cc: dm-devel@redhat.com
+Cc: linux-fscrypt@vger.kernel.org
+Cc: Gilad Ben-Yossef <gilad@benyossef.com>
+Cc: Milan Broz <gmazyland@gmail.com>
 
-> >
-> >
-> >>> On 04/07/2019 15:10, Milan Broz wrote:
-> >>>> This IV is used in some BitLocker devices with CBC encryption mode.
-> >>>>
-> >>>> NOTE: maybe we need to use another crypto API if the bare cipher
-> >>>>       API is going to be deprecated.
-> >>>>
-> >>>> Signed-off-by: Milan Broz <gmazyland@gmail.com>
-> >>>> ---
-> >>>>  drivers/md/dm-crypt.c | 82 ++++++++++++++++++++++++++++++++++++++++++-
-> >>>>  1 file changed, 81 insertions(+), 1 deletion(-)
-> >>>>
-> >>>> diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
-> >>>> index 96ead4492787..a5ffa1ac6a28 100644
-> >>>> --- a/drivers/md/dm-crypt.c
-> >>>> +++ b/drivers/md/dm-crypt.c
-> >>>> @@ -120,6 +120,10 @@ struct iv_tcw_private {
-> >>>>       u8 *whitening;
-> >>>>  };
-> >>>>
-> >>>> +struct iv_eboiv_private {
-> >>>> +     struct crypto_cipher *tfm;
-> >>>> +};
-> >>>> +
-> >>>>  /*
-> >>>>   * Crypt: maps a linear range of a block device
-> >>>>   * and encrypts / decrypts at the same time.
-> >>>> @@ -159,6 +163,7 @@ struct crypt_config {
-> >>>>               struct iv_benbi_private benbi;
-> >>>>               struct iv_lmk_private lmk;
-> >>>>               struct iv_tcw_private tcw;
-> >>>> +             struct iv_eboiv_private eboiv;
-> >>>>       } iv_gen_private;
-> >>>>       u64 iv_offset;
-> >>>>       unsigned int iv_size;
-> >>>> @@ -290,6 +295,10 @@ static struct crypto_aead *any_tfm_aead(struct crypt_config *cc)
-> >>>>   *       is calculated from initial key, sector number and mixed using CRC32.
-> >>>>   *       Note that this encryption scheme is vulnerable to watermarking attacks
-> >>>>   *       and should be used for old compatible containers access only.
-> >>>> + *
-> >>>> + * eboiv: Encrypted byte-offset IV (used in Bitlocker in CBC mode)
-> >>>> + *        The IV is encrypted little-endian byte-offset (with the same key
-> >>>> + *        and cipher as the volume).
-> >>>>   */
-> >>>>
-> >>>>  static int crypt_iv_plain_gen(struct crypt_config *cc, u8 *iv,
-> >>>> @@ -838,6 +847,67 @@ static int crypt_iv_random_gen(struct crypt_config *cc, u8 *iv,
-> >>>>       return 0;
-> >>>>  }
-> >>>>
-> >>>> +static void crypt_iv_eboiv_dtr(struct crypt_config *cc)
-> >>>> +{
-> >>>> +     struct iv_eboiv_private *eboiv = &cc->iv_gen_private.eboiv;
-> >>>> +
-> >>>> +     crypto_free_cipher(eboiv->tfm);
-> >>>> +     eboiv->tfm = NULL;
-> >>>> +}
-> >>>> +
-> >>>> +static int crypt_iv_eboiv_ctr(struct crypt_config *cc, struct dm_target *ti,
-> >>>> +                         const char *opts)
-> >>>> +{
-> >>>> +     struct iv_eboiv_private *eboiv = &cc->iv_gen_private.eboiv;
-> >>>> +     struct crypto_cipher *tfm;
-> >>>> +
-> >>>> +     tfm = crypto_alloc_cipher(cc->cipher, 0, 0);
-> >>>> +     if (IS_ERR(tfm)) {
-> >>>> +             ti->error = "Error allocating crypto tfm for EBOIV";
-> >>>> +             return PTR_ERR(tfm);
-> >>>> +     }
-> >>>> +
-> >>>> +     if (crypto_cipher_blocksize(tfm) != cc->iv_size) {
-> >>>> +             ti->error = "Block size of EBOIV cipher does "
-> >>>> +                         "not match IV size of block cipher";
-> >>>> +             crypto_free_cipher(tfm);
-> >>>> +             return -EINVAL;
-> >>>> +     }
-> >>>> +
-> >>>> +     eboiv->tfm = tfm;
-> >>>> +     return 0;
-> >>>> +}
-> >>>> +
-> >>>> +static int crypt_iv_eboiv_init(struct crypt_config *cc)
-> >>>> +{
-> >>>> +     struct iv_eboiv_private *eboiv = &cc->iv_gen_private.eboiv;
-> >>>> +     int err;
-> >>>> +
-> >>>> +     err = crypto_cipher_setkey(eboiv->tfm, cc->key, cc->key_size);
-> >>>> +     if (err)
-> >>>> +             return err;
-> >>>> +
-> >>>> +     return 0;
-> >>>> +}
-> >>>> +
-> >>>> +static int crypt_iv_eboiv_wipe(struct crypt_config *cc)
-> >>>> +{
-> >>>> +     /* Called after cc->key is set to random key in crypt_wipe() */
-> >>>> +     return crypt_iv_eboiv_init(cc);
-> >>>> +}
-> >>>> +
-> >>>> +static int crypt_iv_eboiv_gen(struct crypt_config *cc, u8 *iv,
-> >>>> +                         struct dm_crypt_request *dmreq)
-> >>>> +{
-> >>>> +     struct iv_eboiv_private *eboiv = &cc->iv_gen_private.eboiv;
-> >>>> +
-> >>>> +     memset(iv, 0, cc->iv_size);
-> >>>> +     *(__le64 *)iv = cpu_to_le64(dmreq->iv_sector * cc->sector_size);
-> >>>> +     crypto_cipher_encrypt_one(eboiv->tfm, iv, iv);
-> >>>> +
-> >>>> +     return 0;
-> >>>> +}
-> >>>> +
-> >>>>  static const struct crypt_iv_operations crypt_iv_plain_ops = {
-> >>>>       .generator = crypt_iv_plain_gen
-> >>>>  };
-> >>>> @@ -890,6 +960,14 @@ static struct crypt_iv_operations crypt_iv_random_ops = {
-> >>>>       .generator = crypt_iv_random_gen
-> >>>>  };
-> >>>>
-> >>>> +static struct crypt_iv_operations crypt_iv_eboiv_ops = {
-> >>>> +     .ctr       = crypt_iv_eboiv_ctr,
-> >>>> +     .dtr       = crypt_iv_eboiv_dtr,
-> >>>> +     .init      = crypt_iv_eboiv_init,
-> >>>> +     .wipe      = crypt_iv_eboiv_wipe,
-> >>>> +     .generator = crypt_iv_eboiv_gen
-> >>>> +};
-> >>>> +
-> >>>>  /*
-> >>>>   * Integrity extensions
-> >>>>   */
-> >>>> @@ -2293,6 +2371,8 @@ static int crypt_ctr_ivmode(struct dm_target *ti, const char *ivmode)
-> >>>>               cc->iv_gen_ops = &crypt_iv_benbi_ops;
-> >>>>       else if (strcmp(ivmode, "null") == 0)
-> >>>>               cc->iv_gen_ops = &crypt_iv_null_ops;
-> >>>> +     else if (strcmp(ivmode, "eboiv") == 0)
-> >>>> +             cc->iv_gen_ops = &crypt_iv_eboiv_ops;
-> >>>>       else if (strcmp(ivmode, "lmk") == 0) {
-> >>>>               cc->iv_gen_ops = &crypt_iv_lmk_ops;
-> >>>>               /*
-> >>>> @@ -3093,7 +3173,7 @@ static void crypt_io_hints(struct dm_target *ti, struct queue_limits *limits)
-> >>>>
-> >>>>  static struct target_type crypt_target = {
-> >>>>       .name   = "crypt",
-> >>>> -     .version = {1, 18, 1},
-> >>>> +     .version = {1, 19, 0},
-> >>>>       .module = THIS_MODULE,
-> >>>>       .ctr    = crypt_ctr,
-> >>>>       .dtr    = crypt_dtr,
-> >>>>
+Ard Biesheuvel (7):
+  crypto: essiv - create wrapper template for ESSIV generation
+  fs: crypto: invoke crypto API for ESSIV handling
+  md: dm-crypt: infer ESSIV block cipher from cipher string directly
+  md: dm-crypt: switch to ESSIV crypto API template
+  crypto: essiv - add test vector for essiv(cbc(aes),aes,sha256)
+  crypto: arm64/aes-cts-cbc - factor out CBC en/decryption of a walk
+  crypto: arm64/aes - implement accelerated ESSIV/CBC mode
+
+ arch/arm64/crypto/aes-glue.c  | 205 +++++--
+ arch/arm64/crypto/aes-modes.S |  29 +-
+ crypto/Kconfig                |  28 +
+ crypto/Makefile               |   1 +
+ crypto/essiv.c                | 640 ++++++++++++++++++++
+ crypto/tcrypt.c               |   9 +
+ crypto/testmgr.c              |  14 +
+ crypto/testmgr.h              | 497 +++++++++++++++
+ drivers/md/Kconfig            |   1 +
+ drivers/md/dm-crypt.c         | 235 ++-----
+ fs/crypto/Kconfig             |   1 +
+ fs/crypto/crypto.c            |   5 -
+ fs/crypto/fscrypt_private.h   |   9 -
+ fs/crypto/keyinfo.c           |  93 +--
+ 14 files changed, 1435 insertions(+), 332 deletions(-)
+ create mode 100644 crypto/essiv.c
+
+-- 
+2.17.1
+
