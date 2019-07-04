@@ -2,117 +2,106 @@ Return-Path: <SRS0=Wq3S=VB=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 765A2C06513
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Jul 2019 06:45:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FDF5C0650E
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Jul 2019 07:39:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 592BC216E3
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Jul 2019 06:45:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4F4632133F
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Jul 2019 07:39:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="llZ031et"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727247AbfGDGp1 (ORCPT
+        id S1727008AbfGDHjJ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 4 Jul 2019 02:45:27 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:26632 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726515AbfGDGp1 (ORCPT
+        Thu, 4 Jul 2019 03:39:09 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:43257 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726964AbfGDHjJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 4 Jul 2019 02:45:27 -0400
-Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x646gQ5p079862
-        for <linux-crypto@vger.kernel.org>; Thu, 4 Jul 2019 02:45:26 -0400
-Received: from e13.ny.us.ibm.com (e13.ny.us.ibm.com [129.33.205.203])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2thbr61dcj-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <linux-crypto@vger.kernel.org>; Thu, 04 Jul 2019 02:45:25 -0400
-Received: from localhost
-        by e13.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-crypto@vger.kernel.org> from <bauerman@linux.ibm.com>;
-        Thu, 4 Jul 2019 07:45:24 +0100
-Received: from b01cxnp22036.gho.pok.ibm.com (9.57.198.26)
-        by e13.ny.us.ibm.com (146.89.104.200) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 4 Jul 2019 07:45:19 +0100
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
-        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x646jIW138338826
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 4 Jul 2019 06:45:18 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B3404AC06B;
-        Thu,  4 Jul 2019 06:45:17 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 4321AAC05B;
-        Thu,  4 Jul 2019 06:45:11 +0000 (GMT)
-Received: from morokweng.localdomain (unknown [9.85.146.222])
-        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTPS;
-        Thu,  4 Jul 2019 06:45:10 +0000 (GMT)
-References: <20190628021934.4260-1-bauerman@linux.ibm.com> <1561991934.4067.17.camel@linux.ibm.com>
-User-agent: mu4e 1.2.0; emacs 26.2
-From:   Thiago Jung Bauermann <bauerman@linux.ibm.com>
-To:     Mimi Zohar <zohar@linux.ibm.com>
-Cc:     linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        David Howells <dhowells@redhat.com>,
-        "David Woodhouse" <dwmw2@infradead.org>,
-        Jessica Yu <jeyu@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jonathan Corbet <corbet@lwn.net>,
-        "AKASHI\, Takahiro" <takahiro.akashi@linaro.org>
-Subject: Re: [PATCH v12 00/11] Appended signatures support for IMA appraisal
-In-reply-to: <1561991934.4067.17.camel@linux.ibm.com>
-Date:   Thu, 04 Jul 2019 03:45:07 -0300
+        Thu, 4 Jul 2019 03:39:09 -0400
+Received: by mail-wr1-f67.google.com with SMTP id p13so5438347wru.10
+        for <linux-crypto@vger.kernel.org>; Thu, 04 Jul 2019 00:39:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:reply-to:from:date:message-id
+         :subject:to:cc;
+        bh=XkALWcZPhy/UlmJy/l5A12TANGuzgR+hn/seVO8wsMw=;
+        b=llZ031etpU3igTTEQRusZiGE1UvfGRKrSJtz1nYNuNruMttEQm1QwpzpEM/Ddto1E0
+         mkC7n8IgZtDTRDm1sfpQkcPUgLwVK1cyPbrj8J3Zm/J5N1qcCyyAF7uB1C0llw9Po5ik
+         8QAptBopu/daAIZDkTJrml/gaLeK5cy0aPf+mtvqNUuiH0Uvijfw+/l9LeX0d0sRD/xH
+         R/krZEWdiyfOOUi2MW1CfihU6jVBxRsEnIxDOAb+ScbG2O+rxSaRMIJOlaIttiCTSXOd
+         EACoi1Iucc8FFg1qMvOqMeV5HT/92Dpfwct93um7nFmGPGtX9UsgfRgqAPN+tPSsoJ3I
+         9LyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
+         :from:date:message-id:subject:to:cc;
+        bh=XkALWcZPhy/UlmJy/l5A12TANGuzgR+hn/seVO8wsMw=;
+        b=BzZSiV+Pu6rkupeu8m9kuTBsa+dYHQroCGnoY9jMiaztfFBsguaKLnSlI6/9ZyamFS
+         1xLA40/DT2Ikq94wQoSKPWP2TYixtMgLYWoO4j57jVUWV0ulOFmT90SeJak6x1s8hkcV
+         26j3PiRqurkA9O7PONxaY2bkiWr/LE6bYNK6qYHYM2c3QGc/jqYo8+rx1ltYs3RC5OCE
+         FJI7t1D+5jmGpGTyivVSn3Q6EYzJEqEzkbLfuibfCMytF1X2l11fpWuMFrgVbi05EZDo
+         CPbBUCEW1j8OIfbaQuuPCzmiUY7HjSUrE1ODiJo+XfXk4jupBljnl9vrdDhSNLt/ZqGv
+         ekKg==
+X-Gm-Message-State: APjAAAUVN+0iOgY4lU0U3WN5137kFv/lhikH1jSt0uOE0V0cecJTU9tw
+        fF0gL6KR/Dx7+Fxi+4yS3iJAurNQyELL1GrVqxU=
+X-Google-Smtp-Source: APXvYqx5bH/CjBFioqJj/QoeCPrv9f08VwsaY7/MGRKDjkNV/e9eAkxhVhJxq8K5RIB806j2FoKvNpb718jivgpiF4I=
+X-Received: by 2002:a5d:498f:: with SMTP id r15mr4511823wrq.353.1562225946735;
+ Thu, 04 Jul 2019 00:39:06 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-TM-AS-GCONF: 00
-x-cbid: 19070406-0064-0000-0000-000003F7088F
-X-IBM-SpamModules-Scores: 
-X-IBM-SpamModules-Versions: BY=3.00011376; HX=3.00000242; KW=3.00000007;
- PH=3.00000004; SC=3.00000286; SDB=6.01227188; UDB=6.00646128; IPR=6.01008425;
- MB=3.00027580; MTD=3.00000008; XFM=3.00000015; UTC=2019-07-04 06:45:23
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19070406-0065-0000-0000-00003E225467
-Message-Id: <87k1cyl2mk.fsf@morokweng.localdomain>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-07-04_03:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=968 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1907040087
+References: <CA+icZUX3EOhrUp0Afbo_fK9rb5AbXjbaBFwhj1qmBaHom1b3MA@mail.gmail.com>
+ <CAKwvOdn8Za1Dy4QgdDZu1My5oYLJJzyRqYsq+XkpRpnViC6aKQ@mail.gmail.com>
+ <20190617182256.GB92263@gmail.com> <CA+icZUV8693G8jgHw2t9qUay4_Ad-7BgNOkL6z+4z8xNXyL=cA@mail.gmail.com>
+ <20190703161456.GC21629@sol.localdomain> <CAKwvOdmRdef1PD9NQnOhfeNC_LWAp8a-oYcnxXo1WWGoWnyn0w@mail.gmail.com>
+In-Reply-To: <CAKwvOdmRdef1PD9NQnOhfeNC_LWAp8a-oYcnxXo1WWGoWnyn0w@mail.gmail.com>
+Reply-To: sedat.dilek@gmail.com
+From:   Sedat Dilek <sedat.dilek@gmail.com>
+Date:   Thu, 4 Jul 2019 09:38:55 +0200
+Message-ID: <CA+icZUUgcXRH14yZRguopjuGzDWUi04Q2L_drbMU-AZCX9NDkA@mail.gmail.com>
+Subject: Re: crypto: x86/crct10dif-pcl - cleanup and optimizations
+To:     Nick Desaulniers <ndesaulniers@google.com>
+Cc:     Eric Biggers <ebiggers@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        linux-crypto@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Clang-Built-Linux ML <clang-built-linux@googlegroups.com>,
+        Fangrui Song <maskray@google.com>,
+        Peter Smith <peter.smith@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-
-Mimi Zohar <zohar@linux.ibm.com> writes:
-
-> On Thu, 2019-06-27 at 23:19 -0300, Thiago Jung Bauermann wrote:
->> Hello,
->> 
->> This version is essentially identical to the last one.
->> 
->> It is only a rebase on top of today's linux-integrity/next-queued-testing,
->> prompted by conflicts with Prakhar Srivastava's patches to measure the
->> kernel command line. It also drops two patches that are already present in
->> that branch.
+On Wed, Jul 3, 2019 at 8:52 PM Nick Desaulniers <ndesaulniers@google.com> wrote:
 >
-> Thanks, Thiago.  These patches are now in next-queued-testing waiting
-> for some additional reviews/acks.
+> On Wed, Jul 3, 2019 at 9:15 AM Eric Biggers <ebiggers@kernel.org> wrote:
+> > Sorry, I am still confused.  Are you saying that something still needs to be
+> > fixed in the kernel code, and if so, why?  To reiterate, the byteshift_table
+> > doesn't actually *need* any particular alignment.  Would it avoid the confusion
+> > if I changed it to no alignment?  Or is there some section merging related
+> > reason it actually needs to be 32?
+>
+> Looks like the section merging of similarly named sections of
+> differing alignment in LLD just got reverted:
+> https://bugs.llvm.org/show_bug.cgi?id=42289#c8
+> I wasn't able to find any documentation that said alignment must match
+> entity size, but if there's not a functional reason for them to differ
+> then it seems like LLD need not even support such a particularly
+> non-common case.
+>
 
-Thank you very much, Mimi! Now I think I'm only missing acks for the
-PKCS#7 changes in patches 2 and 3, and an ack for the s390 changes in
-patch 1.
+My primary goal was to get rid of these sysfs warnings when building
+with clang-9 and linking with lld-9 (details see [0]).
+"clang-9" and "lld-9" are snapshot versions (details see [1]).
 
--- 
-Thiago Jung Bauermann
-IBM Linux Technology Center
+- Sedat -
 
+[0] https://github.com/ClangBuiltLinux/linux/issues/431
+[1] https://github.com/ClangBuiltLinux/linux/issues/431#issuecomment-508354865
