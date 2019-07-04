@@ -2,170 +2,248 @@ Return-Path: <SRS0=Wq3S=VB=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7B35C06517
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Jul 2019 10:54:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FC85C0651F
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Jul 2019 13:30:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C61BC218A6
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Jul 2019 10:54:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2DFE321850
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Jul 2019 13:30:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gN6z8PaW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727403AbfGDKym (ORCPT
+        id S1727321AbfGDN34 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 4 Jul 2019 06:54:42 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:22456 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727512AbfGDKyj (ORCPT
+        Thu, 4 Jul 2019 09:29:56 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:56281 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727094AbfGDN3z (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 4 Jul 2019 06:54:39 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x64Apv8R024523
-        for <linux-crypto@vger.kernel.org>; Thu, 4 Jul 2019 06:54:37 -0400
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2thfuq8m38-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <linux-crypto@vger.kernel.org>; Thu, 04 Jul 2019 06:54:36 -0400
-Received: from localhost
-        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-crypto@vger.kernel.org> from <prudo@linux.ibm.com>;
-        Thu, 4 Jul 2019 11:54:35 +0100
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
-        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 4 Jul 2019 11:54:30 +0100
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x64AsSpq35455354
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 4 Jul 2019 10:54:28 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B9AC8AE045;
-        Thu,  4 Jul 2019 10:54:28 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 33C7FAE053;
-        Thu,  4 Jul 2019 10:54:28 +0000 (GMT)
-Received: from laptop-ibm (unknown [9.152.212.73])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu,  4 Jul 2019 10:54:28 +0000 (GMT)
-Date:   Thu, 4 Jul 2019 12:54:27 +0200
-From:   Philipp Rudo <prudo@linux.ibm.com>
-To:     Thiago Jung Bauermann <bauerman@linux.ibm.com>
-Cc:     Jessica Yu <jeyu@kernel.org>, linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        David Howells <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jonathan Corbet <corbet@lwn.net>,
-        "AKASHI\, Takahiro" <takahiro.akashi@linaro.org>,
-        Heiko Carstens <heiko.carstens@de.ibm.com>,
-        linux-s390@vger.kernel.org
-Subject: Re: [PATCH v12 01/11] MODSIGN: Export module signature definitions
-In-Reply-To: <87lfxel2q6.fsf@morokweng.localdomain>
-References: <20190628021934.4260-1-bauerman@linux.ibm.com>
-        <20190628021934.4260-2-bauerman@linux.ibm.com>
-        <20190701144752.GC25484@linux-8ccs>
-        <87lfxel2q6.fsf@morokweng.localdomain>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+        Thu, 4 Jul 2019 09:29:55 -0400
+Received: by mail-wm1-f65.google.com with SMTP id a15so5757785wmj.5
+        for <linux-crypto@vger.kernel.org>; Thu, 04 Jul 2019 06:29:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:references:cc:from:openpgp:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=ayCRIhqWSMy1q+h3XFfGHK2FQt5FIGxphjkjd92VHhk=;
+        b=gN6z8PaWvpr8YE/cko1K6YBvILZ7rGhriXRhyHHRuXAzd883jK/ww80apHEFrz4KIg
+         P49jRyZPl6Xzc8PES+o4sjO0QVJVPKJaMD4Bcxj1MTIqQDH33XuMc2oPEJ5LeKakNEVg
+         JYVZ1zw3Yudpjc3PqJg/XwmmlESvgf6GSm+a7GHMEWSYcjcL1qA++o/7thutebYIrhhc
+         vBla3RyCP0OvRSO/tSQqs1pHfpdGLuCEW6YpDSvESdx0iGDVvj6zxwn6nltulp1QbZ+7
+         LqMd5lVz33UpXeBQcj5GZR2KtSh89lAv8CU/7A2Oxx78JcKc0H1UhTcDkPbLlAMI6SLx
+         qoLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:references:cc:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ayCRIhqWSMy1q+h3XFfGHK2FQt5FIGxphjkjd92VHhk=;
+        b=KH71w2qPSePz/G2O6fgr4xe4predNFj+/nc07bxtBQ6+tZsTV98sW/VJhIcfvcaSxQ
+         OPp3DS6ufSek7qQPN6KKglaGJaXTDnOCc41dMdDQlI2NYS1IfATjbmYSTgHCMYk0Iqfi
+         C8xcKPpsTv2VkEtBWKiqWK2XTO2o/GrpCzGYHswV2L8E6uEtML/4xI4xb9GxL8ZGyqyx
+         28t+fpfnR5xwWEpcStdtVQ8Np1bf1dv6C42DI8BXbfFnm2h6XJrebMGdC1IJ1SYHUyWO
+         qGAyM5LN9Pjy9F//nPSxnuXREuuGnItAHBUNif+WeiruaMdI62AlKEPAamQCqLFxaBpe
+         kwvA==
+X-Gm-Message-State: APjAAAUyhzBLHifxrtvSLbVTX4rjMhp7y4oMjXiEkK0VJ3QkjNDoEH1/
+        SMmlC64+rm/GXqNafEIZX7FRVXBrWr0=
+X-Google-Smtp-Source: APXvYqwW1jYLR8Ba8FxJ5l+p5J+yFVs7stOGcg8QskjeuX19yVbT5frTpAbrw5wnE0HNNleeKaGkFA==
+X-Received: by 2002:a1c:5f87:: with SMTP id t129mr13528498wmb.150.1562246992850;
+        Thu, 04 Jul 2019 06:29:52 -0700 (PDT)
+Received: from [10.43.17.24] (nat-pool-brq-t.redhat.com. [213.175.37.10])
+        by smtp.gmail.com with ESMTPSA id o1sm4738327wrw.54.2019.07.04.06.29.51
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Thu, 04 Jul 2019 06:29:51 -0700 (PDT)
+Subject: Re: [PATCH 3/3] dm-crypt: Implement eboiv - encrypted byte-offset
+ initialization vector.
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+References: <20190704131033.9919-1-gmazyland@gmail.com>
+ <20190704131033.9919-3-gmazyland@gmail.com>
+Cc:     dm-devel@redhat.com, Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        linux-crypto@vger.kernel.org
+From:   Milan Broz <gmazyland@gmail.com>
+Openpgp: preference=signencrypt
+Message-ID: <7a8d13ee-2d3f-5357-48c6-37f56d7eff07@gmail.com>
+Date:   Thu, 4 Jul 2019 15:29:50 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20190704131033.9919-3-gmazyland@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 19070410-0008-0000-0000-000002F9D612
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19070410-0009-0000-0000-000022672778
-Message-Id: <20190704125427.31146026@laptop-ibm>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-07-04_06:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1810050000 definitions=main-1907040141
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Thiago,
+Hi Herbert,
+
+I have a question about the crypto_cipher API in dm-crypt:
+
+We are apparently trying to deprecate cryto_cipher API (see the ESSIV patchset),
+but I am not sure what API now should be used instead.
+
+See the patch below - all we need is to one block encryption for IV.
+
+This algorithm makes sense only for FDE (old compatible Bitlocker devices),
+I really do not want this to be shared in some crypto module...
+
+What API should I use here? Sync skcipher? Is the crypto_cipher API
+really a problem in this case?
+
+Thanks,
+Milan
 
 
-On Thu, 04 Jul 2019 03:42:57 -0300
-Thiago Jung Bauermann <bauerman@linux.ibm.com> wrote:
-
-> Jessica Yu <jeyu@kernel.org> writes:
+On 04/07/2019 15:10, Milan Broz wrote:
+> This IV is used in some BitLocker devices with CBC encryption mode.
 > 
-> > +++ Thiago Jung Bauermann [27/06/19 23:19 -0300]:  
-> >>IMA will use the module_signature format for append signatures, so export
-> >>the relevant definitions and factor out the code which verifies that the
-> >>appended signature trailer is valid.
-> >>
-> >>Also, create a CONFIG_MODULE_SIG_FORMAT option so that IMA can select it
-> >>and be able to use mod_check_sig() without having to depend on either
-> >>CONFIG_MODULE_SIG or CONFIG_MODULES.
-> >>
-> >>Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
-> >>Reviewed-by: Mimi Zohar <zohar@linux.ibm.com>
-> >>Cc: Jessica Yu <jeyu@kernel.org>
-> >>---
-> >> include/linux/module.h           |  3 --
-> >> include/linux/module_signature.h | 44 +++++++++++++++++++++++++
-> >> init/Kconfig                     |  6 +++-
-> >> kernel/Makefile                  |  1 +
-> >> kernel/module.c                  |  1 +
-> >> kernel/module_signature.c        | 46 ++++++++++++++++++++++++++
-> >> kernel/module_signing.c          | 56 +++++---------------------------
-> >> scripts/Makefile                 |  2 +-
-> >> 8 files changed, 106 insertions(+), 53 deletions(-)
-> >>
-> >>diff --git a/include/linux/module.h b/include/linux/module.h
-> >>index 188998d3dca9..aa56f531cf1e 100644
-> >>--- a/include/linux/module.h
-> >>+++ b/include/linux/module.h
-> >>@@ -25,9 +25,6 @@
-> >> #include <linux/percpu.h>
-> >> #include <asm/module.h>
-> >>
-> >>-/* In stripped ARM and x86-64 modules, ~ is surprisingly rare. */
-> >>-#define MODULE_SIG_STRING "~Module signature appended~\n"
-> >>-  
-> >
-> > Hi Thiago, apologies for the delay.  
+> NOTE: maybe we need to use another crypto API if the bare cipher
+>       API is going to be deprecated.
 > 
-> Hello Jessica, thanks for reviewing the patch!
+> Signed-off-by: Milan Broz <gmazyland@gmail.com>
+> ---
+>  drivers/md/dm-crypt.c | 82 ++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 81 insertions(+), 1 deletion(-)
 > 
-> > It looks like arch/s390/kernel/machine_kexec_file.c also relies on
-> > MODULE_SIG_STRING being defined, so module_signature.h will need to be
-> > included there too, otherwise we'll run into a compilation error.  
+> diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
+> index 96ead4492787..a5ffa1ac6a28 100644
+> --- a/drivers/md/dm-crypt.c
+> +++ b/drivers/md/dm-crypt.c
+> @@ -120,6 +120,10 @@ struct iv_tcw_private {
+>  	u8 *whitening;
+>  };
+>  
+> +struct iv_eboiv_private {
+> +	struct crypto_cipher *tfm;
+> +};
+> +
+>  /*
+>   * Crypt: maps a linear range of a block device
+>   * and encrypts / decrypts at the same time.
+> @@ -159,6 +163,7 @@ struct crypt_config {
+>  		struct iv_benbi_private benbi;
+>  		struct iv_lmk_private lmk;
+>  		struct iv_tcw_private tcw;
+> +		struct iv_eboiv_private eboiv;
+>  	} iv_gen_private;
+>  	u64 iv_offset;
+>  	unsigned int iv_size;
+> @@ -290,6 +295,10 @@ static struct crypto_aead *any_tfm_aead(struct crypt_config *cc)
+>   *       is calculated from initial key, sector number and mixed using CRC32.
+>   *       Note that this encryption scheme is vulnerable to watermarking attacks
+>   *       and should be used for old compatible containers access only.
+> + *
+> + * eboiv: Encrypted byte-offset IV (used in Bitlocker in CBC mode)
+> + *        The IV is encrypted little-endian byte-offset (with the same key
+> + *        and cipher as the volume).
+>   */
+>  
+>  static int crypt_iv_plain_gen(struct crypt_config *cc, u8 *iv,
+> @@ -838,6 +847,67 @@ static int crypt_iv_random_gen(struct crypt_config *cc, u8 *iv,
+>  	return 0;
+>  }
+>  
+> +static void crypt_iv_eboiv_dtr(struct crypt_config *cc)
+> +{
+> +	struct iv_eboiv_private *eboiv = &cc->iv_gen_private.eboiv;
+> +
+> +	crypto_free_cipher(eboiv->tfm);
+> +	eboiv->tfm = NULL;
+> +}
+> +
+> +static int crypt_iv_eboiv_ctr(struct crypt_config *cc, struct dm_target *ti,
+> +			    const char *opts)
+> +{
+> +	struct iv_eboiv_private *eboiv = &cc->iv_gen_private.eboiv;
+> +	struct crypto_cipher *tfm;
+> +
+> +	tfm = crypto_alloc_cipher(cc->cipher, 0, 0);
+> +	if (IS_ERR(tfm)) {
+> +		ti->error = "Error allocating crypto tfm for EBOIV";
+> +		return PTR_ERR(tfm);
+> +	}
+> +
+> +	if (crypto_cipher_blocksize(tfm) != cc->iv_size) {
+> +		ti->error = "Block size of EBOIV cipher does "
+> +			    "not match IV size of block cipher";
+> +		crypto_free_cipher(tfm);
+> +		return -EINVAL;
+> +	}
+> +
+> +	eboiv->tfm = tfm;
+> +	return 0;
+> +}
+> +
+> +static int crypt_iv_eboiv_init(struct crypt_config *cc)
+> +{
+> +	struct iv_eboiv_private *eboiv = &cc->iv_gen_private.eboiv;
+> +	int err;
+> +
+> +	err = crypto_cipher_setkey(eboiv->tfm, cc->key, cc->key_size);
+> +	if (err)
+> +		return err;
+> +
+> +	return 0;
+> +}
+> +
+> +static int crypt_iv_eboiv_wipe(struct crypt_config *cc)
+> +{
+> +	/* Called after cc->key is set to random key in crypt_wipe() */
+> +	return crypt_iv_eboiv_init(cc);
+> +}
+> +
+> +static int crypt_iv_eboiv_gen(struct crypt_config *cc, u8 *iv,
+> +			    struct dm_crypt_request *dmreq)
+> +{
+> +	struct iv_eboiv_private *eboiv = &cc->iv_gen_private.eboiv;
+> +
+> +	memset(iv, 0, cc->iv_size);
+> +	*(__le64 *)iv = cpu_to_le64(dmreq->iv_sector * cc->sector_size);
+> +	crypto_cipher_encrypt_one(eboiv->tfm, iv, iv);
+> +
+> +	return 0;
+> +}
+> +
+>  static const struct crypt_iv_operations crypt_iv_plain_ops = {
+>  	.generator = crypt_iv_plain_gen
+>  };
+> @@ -890,6 +960,14 @@ static struct crypt_iv_operations crypt_iv_random_ops = {
+>  	.generator = crypt_iv_random_gen
+>  };
+>  
+> +static struct crypt_iv_operations crypt_iv_eboiv_ops = {
+> +	.ctr	   = crypt_iv_eboiv_ctr,
+> +	.dtr	   = crypt_iv_eboiv_dtr,
+> +	.init	   = crypt_iv_eboiv_init,
+> +	.wipe	   = crypt_iv_eboiv_wipe,
+> +	.generator = crypt_iv_eboiv_gen
+> +};
+> +
+>  /*
+>   * Integrity extensions
+>   */
+> @@ -2293,6 +2371,8 @@ static int crypt_ctr_ivmode(struct dm_target *ti, const char *ivmode)
+>  		cc->iv_gen_ops = &crypt_iv_benbi_ops;
+>  	else if (strcmp(ivmode, "null") == 0)
+>  		cc->iv_gen_ops = &crypt_iv_null_ops;
+> +	else if (strcmp(ivmode, "eboiv") == 0)
+> +		cc->iv_gen_ops = &crypt_iv_eboiv_ops;
+>  	else if (strcmp(ivmode, "lmk") == 0) {
+>  		cc->iv_gen_ops = &crypt_iv_lmk_ops;
+>  		/*
+> @@ -3093,7 +3173,7 @@ static void crypt_io_hints(struct dm_target *ti, struct queue_limits *limits)
+>  
+>  static struct target_type crypt_target = {
+>  	.name   = "crypt",
+> -	.version = {1, 18, 1},
+> +	.version = {1, 19, 0},
+>  	.module = THIS_MODULE,
+>  	.ctr    = crypt_ctr,
+>  	.dtr    = crypt_dtr,
 > 
-> Indeed. Thanks for spotting that. The patch below fixes it. It's
-> identical to the previous version except for the changes in 
-> arch/s390/kernel/machine_kexec_file.c and their description in the
-> commit message. I'm also copying some s390 people in this email.
-
-to me the s390 part looks good but for one minor nit.
-
-In arch/s390/Kconfig KEXEC_VERIFY_SIG currently depends on
-SYSTEM_DATA_VERIFICATION. I'd prefer when you update this to the new
-MODULE_SIG_FORMAT. It shouldn't make any difference right now, as we don't
-use mod_check_sig in our code path. But it could cause problems in the future,
-when more code might be shared.
-
-Thanks
-Philipp
-
-> > Other than that, the module-related changes look good to me:
-> >
-> > Acked-by: Jessica Yu <jeyu@kernel.org>  
-> 
-> Thank you very much!
-> 
-
