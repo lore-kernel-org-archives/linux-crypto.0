@@ -1,156 +1,503 @@
-Return-Path: <SRS0=EZcf=VA=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=Wq3S=VB=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25FBFC0650E
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 23:45:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11A8CC0650E
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Jul 2019 06:44:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E7EF22187F
-	for <linux-crypto@archiver.kernel.org>; Wed,  3 Jul 2019 23:45:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="pguTsmTU"
+	by mail.kernel.org (Postfix) with ESMTP id C4597216E3
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Jul 2019 06:44:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726902AbfGCXpl (ORCPT
+        id S1726069AbfGDGoM (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 3 Jul 2019 19:45:41 -0400
-Received: from mail-eopbgr30060.outbound.protection.outlook.com ([40.107.3.60]:51364
-        "EHLO EUR03-AM5-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726562AbfGCXpl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 3 Jul 2019 19:45:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pl1N1KKRlbVNZqTDGWye8FUGkTS/iOqd5lQr7gzxj8A=;
- b=pguTsmTUHbMp0pOuDKu9S0yjYXU1ErJECS42UgBmjc9Y1gNJlFWRQ7qoaNYxvsFn0FTVj8Ch0hk/OCyQCakxeFxDn6cc1sVMb55xRD78lMktF0pSu+OhGK0Nlxu3T5X5baQFQFIWPGhYvgCohDTAG9VmI5+caN1+b+wXhPUG600=
-Received: from DB7PR04MB5051.eurprd04.prod.outlook.com (20.176.234.223) by
- DB7PR04MB4538.eurprd04.prod.outlook.com (52.135.134.146) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2052.16; Wed, 3 Jul 2019 23:45:38 +0000
-Received: from DB7PR04MB5051.eurprd04.prod.outlook.com
- ([fe80::6c98:1416:8221:bdfc]) by DB7PR04MB5051.eurprd04.prod.outlook.com
- ([fe80::6c98:1416:8221:bdfc%4]) with mapi id 15.20.2052.010; Wed, 3 Jul 2019
- 23:45:38 +0000
-From:   Leonard Crestez <leonard.crestez@nxp.com>
-To:     Andrey Smirnov <andrew.smirnov@gmail.com>
-CC:     Horia Geanta <horia.geanta@nxp.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Chris Spencer <christopher.spencer@sea.co.uk>,
-        Cory Tusar <cory.tusar@zii.aero>,
-        Chris Healy <cphealy@gmail.com>,
-        Lucas Stach <l.stach@pengutronix.de>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v4 03/16] crypto: caam - move tasklet_init() call down
-Thread-Topic: [PATCH v4 03/16] crypto: caam - move tasklet_init() call down
-Thread-Index: AQHVMXdGY7YVraimN0KG3E6/ZzGQWw==
-Date:   Wed, 3 Jul 2019 23:45:37 +0000
-Message-ID: <DB7PR04MB50517E97A2BE28050E056B90EEFB0@DB7PR04MB5051.eurprd04.prod.outlook.com>
-References: <20190703081327.17505-1-andrew.smirnov@gmail.com>
- <20190703081327.17505-4-andrew.smirnov@gmail.com>
- <VI1PR04MB505565EC5520F4820E234A84EEFB0@VI1PR04MB5055.eurprd04.prod.outlook.com>
- <CAHQ1cqHfBU92g-P7jDfiWtEr0m-kv5Lw9yZcvUEXYg7OyhURfg@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=leonard.crestez@nxp.com; 
-x-originating-ip: [82.144.34.2]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 919eb507-f56f-48e9-d388-08d700108d0a
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:DB7PR04MB4538;
-x-ms-traffictypediagnostic: DB7PR04MB4538:
-x-microsoft-antispam-prvs: <DB7PR04MB453853660A802BEFCBD03C58EEFB0@DB7PR04MB4538.eurprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:2449;
-x-forefront-prvs: 00872B689F
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(396003)(366004)(136003)(346002)(39860400002)(376002)(199004)(189003)(33656002)(9686003)(81166006)(71190400001)(81156014)(55016002)(102836004)(26005)(229853002)(53936002)(6916009)(6116002)(8936002)(446003)(54906003)(186003)(316002)(476003)(44832011)(3846002)(68736007)(486006)(71200400001)(6436002)(6506007)(6246003)(7736002)(73956011)(66946007)(305945005)(66446008)(64756008)(66556008)(66476007)(478600001)(86362001)(52536014)(14444005)(256004)(5660300002)(99286004)(53546011)(4326008)(76176011)(66066001)(74316002)(25786009)(76116006)(7696005)(91956017)(14454004)(8676002)(2906002);DIR:OUT;SFP:1101;SCL:1;SRVR:DB7PR04MB4538;H:DB7PR04MB5051.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: nxp.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: MI0znHPPqDgzTngT+HjwgCnoO7iXIrynSPDIz7Ewj2xw5O0HN6j8GmoMSx0Fbnpnep/seZMFkXWsDoIn7t7gK3xf9sGjDmXMYyw0xsyDmyTEPvC9mGOCVP+Sq8Ly+jqqBkpF54+oRwke/bTM2ba67RJvwYYkI/03qWLKj3WkqNpA9FAjABPMfGOD/lvTTrJl4wwMM/PbGecIaorcw6ax6FbZBXrXt88BeDmmCcvUGfN4WtENfkl1EOmRNSzLABW+dp6D8Lkfmuv3VTO1OrDZ0Zt5Vbcr5CnFWwCnPbCPPTU9cfmBo+ZG9hxWMgXS4jaOeO5w0A6acZjmaJDvre+Bp/+nyxWSOOaUQUp7AAT1f2uDxfnXVZ7pToW0McQxF7BSBbH8nIz5JNnbNQk8vZcc3k4WkX3VKkdtGFMzo1+/QPA=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Thu, 4 Jul 2019 02:44:12 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:38806 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726038AbfGDGoM (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 4 Jul 2019 02:44:12 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x646i7JU041090
+        for <linux-crypto@vger.kernel.org>; Thu, 4 Jul 2019 02:44:10 -0400
+Received: from e14.ny.us.ibm.com (e14.ny.us.ibm.com [129.33.205.204])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2thc6f0h8r-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <linux-crypto@vger.kernel.org>; Thu, 04 Jul 2019 02:44:06 -0400
+Received: from localhost
+        by e14.ny.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-crypto@vger.kernel.org> from <bauerman@linux.ibm.com>;
+        Thu, 4 Jul 2019 07:43:18 +0100
+Received: from b01cxnp22033.gho.pok.ibm.com (9.57.198.23)
+        by e14.ny.us.ibm.com (146.89.104.201) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 4 Jul 2019 07:43:13 +0100
+Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
+        by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x646hCHZ46399926
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 4 Jul 2019 06:43:12 GMT
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 795ECAE05C;
+        Thu,  4 Jul 2019 06:43:12 +0000 (GMT)
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 97D51AE05F;
+        Thu,  4 Jul 2019 06:43:07 +0000 (GMT)
+Received: from morokweng.localdomain (unknown [9.85.146.222])
+        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTPS;
+        Thu,  4 Jul 2019 06:43:07 +0000 (GMT)
+References: <20190628021934.4260-1-bauerman@linux.ibm.com> <20190628021934.4260-2-bauerman@linux.ibm.com> <20190701144752.GC25484@linux-8ccs>
+User-agent: mu4e 1.2.0; emacs 26.2
+From:   Thiago Jung Bauermann <bauerman@linux.ibm.com>
+To:     Jessica Yu <jeyu@kernel.org>
+Cc:     linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jonathan Corbet <corbet@lwn.net>,
+        "AKASHI\, Takahiro" <takahiro.akashi@linaro.org>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>,
+        Philipp Rudo <prudo@linux.ibm.com>, linux-s390@vger.kernel.org
+Subject: Re: [PATCH v12 01/11] MODSIGN: Export module signature definitions
+In-reply-to: <20190701144752.GC25484@linux-8ccs>
+Date:   Thu, 04 Jul 2019 03:42:57 -0300
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 919eb507-f56f-48e9-d388-08d700108d0a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Jul 2019 23:45:37.9509
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: leonard.crestez@nxp.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB7PR04MB4538
+Content-Type: text/plain
+X-TM-AS-GCONF: 00
+x-cbid: 19070406-0052-0000-0000-000003DA4435
+X-IBM-SpamModules-Scores: 
+X-IBM-SpamModules-Versions: BY=3.00011376; HX=3.00000242; KW=3.00000007;
+ PH=3.00000004; SC=3.00000286; SDB=6.01227187; UDB=6.00646127; IPR=6.01008424;
+ MB=3.00027580; MTD=3.00000008; XFM=3.00000015; UTC=2019-07-04 06:43:18
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19070406-0053-0000-0000-000061901700
+Message-Id: <87lfxel2q6.fsf@morokweng.localdomain>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-07-04_03:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1907040087
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 7/3/2019 8:14 PM, Andrey Smirnov wrote:=0A=
-> On Wed, Jul 3, 2019 at 6:51 AM Leonard Crestez <leonard.crestez@nxp.com> =
-wrote:=0A=
->> On 7/3/2019 11:14 AM, Andrey Smirnov wrote:=0A=
->>> Move tasklet_init() call further down in order to simplify error path=
-=0A=
->>> cleanup. No functional change intended.=0A=
->>>=0A=
->>> diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c=0A=
->>> index 4b25b2fa3d02..a7ca2bbe243f 100644=0A=
->>> --- a/drivers/crypto/caam/jr.c=0A=
->>> +++ b/drivers/crypto/caam/jr.c=0A=
->>> @@ -441,15 +441,13 @@ static int caam_jr_init(struct device *dev)=0A=
->>>=0A=
->>>        jrp =3D dev_get_drvdata(dev);=0A=
->>>=0A=
->>> -     tasklet_init(&jrp->irqtask, caam_jr_dequeue, (unsigned long)dev);=
-=0A=
->>> -=0A=
->>>        /* Connect job ring interrupt handler. */=0A=
->>>        error =3D request_irq(jrp->irq, caam_jr_interrupt, IRQF_SHARED,=
-=0A=
->>>                            dev_name(dev), dev);=0A=
->>>        if (error) {=0A=
->>>                dev_err(dev, "can't connect JobR %d interrupt (%d)\n",=
-=0A=
->>>                        jrp->ridx, jrp->irq);=0A=
->>> -             goto out_kill_deq;=0A=
->>> +             return error;=0A=
->>>        }=0A=
->>=0A=
->> The caam_jr_interrupt handler can schedule the tasklet so it makes sense=
-=0A=
->> to have it be initialized ahead of request_irq. In theory it's possible=
-=0A=
->> for an interrupt to be triggered immediately when request_irq is called.=
-=0A=
->>=0A=
->> I'm not very familiar with the CAAM ip, can you ensure no interrupts are=
-=0A=
->> pending in HW at probe time? The "no functional change" part is not obvi=
-ous.=0A=
->>=0A=
-> =0A=
-> Said tasklet will use both jrp->outring and jrp->entinfo array=0A=
-> initialized after IRQ request call in both versions of the code=0A=
-> (before/after this patch). AFAICT, the only case where this patch=0A=
-> would change initialization safety of the original code is if JR was=0A=
-> scheduled somehow while ORSFx is 0 (no jobs done), which I don't think=0A=
-> is possible.=0A=
-=0A=
-I took a second look at caam_jr_init and there is apparently a whole =0A=
-bunch of other reset/init stuff done after request_irq. For example =0A=
-caam_reset_hw_jr is done after request_irq and masks interrupts?=0A=
-=0A=
-What I'd expect is that request_irq is done last after all other =0A=
-initialization is performed. But I'm not familiar with how CAAM JRs work =
-=0A=
-so feel free to ignore this.=0A=
-=0A=
---=0A=
-Regards,=0A=
-Leonard=0A=
+
+Jessica Yu <jeyu@kernel.org> writes:
+
+> +++ Thiago Jung Bauermann [27/06/19 23:19 -0300]:
+>>IMA will use the module_signature format for append signatures, so export
+>>the relevant definitions and factor out the code which verifies that the
+>>appended signature trailer is valid.
+>>
+>>Also, create a CONFIG_MODULE_SIG_FORMAT option so that IMA can select it
+>>and be able to use mod_check_sig() without having to depend on either
+>>CONFIG_MODULE_SIG or CONFIG_MODULES.
+>>
+>>Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+>>Reviewed-by: Mimi Zohar <zohar@linux.ibm.com>
+>>Cc: Jessica Yu <jeyu@kernel.org>
+>>---
+>> include/linux/module.h           |  3 --
+>> include/linux/module_signature.h | 44 +++++++++++++++++++++++++
+>> init/Kconfig                     |  6 +++-
+>> kernel/Makefile                  |  1 +
+>> kernel/module.c                  |  1 +
+>> kernel/module_signature.c        | 46 ++++++++++++++++++++++++++
+>> kernel/module_signing.c          | 56 +++++---------------------------
+>> scripts/Makefile                 |  2 +-
+>> 8 files changed, 106 insertions(+), 53 deletions(-)
+>>
+>>diff --git a/include/linux/module.h b/include/linux/module.h
+>>index 188998d3dca9..aa56f531cf1e 100644
+>>--- a/include/linux/module.h
+>>+++ b/include/linux/module.h
+>>@@ -25,9 +25,6 @@
+>> #include <linux/percpu.h>
+>> #include <asm/module.h>
+>>
+>>-/* In stripped ARM and x86-64 modules, ~ is surprisingly rare. */
+>>-#define MODULE_SIG_STRING "~Module signature appended~\n"
+>>-
+>
+> Hi Thiago, apologies for the delay.
+
+Hello Jessica, thanks for reviewing the patch!
+
+> It looks like arch/s390/kernel/machine_kexec_file.c also relies on
+> MODULE_SIG_STRING being defined, so module_signature.h will need to be
+> included there too, otherwise we'll run into a compilation error.
+
+Indeed. Thanks for spotting that. The patch below fixes it. It's
+identical to the previous version except for the changes in 
+arch/s390/kernel/machine_kexec_file.c and their description in the
+commit message. I'm also copying some s390 people in this email.
+
+> Other than that, the module-related changes look good to me:
+>
+> Acked-by: Jessica Yu <jeyu@kernel.org>
+
+Thank you very much!
+
+-- 
+Thiago Jung Bauermann
+IBM Linux Technology Center
+
+
+From 0ca180c66f4cff8b1fcd51f3457cc06dac2f0e81 Mon Sep 17 00:00:00 2001
+From: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+Date: Thu, 17 May 2018 21:46:12 -0300
+Subject: [PATCH 1/1] MODSIGN: Export module signature definitions
+
+IMA will use the module_signature format for append signatures, so export
+the relevant definitions and factor out the code which verifies that the
+appended signature trailer is valid.
+
+Also, create a CONFIG_MODULE_SIG_FORMAT option so that IMA can select it
+and be able to use mod_check_sig() without having to depend on either
+CONFIG_MODULE_SIG or CONFIG_MODULES.
+
+s390 duplicated the definition of struct module_signature so now they can
+use the new <linux/module_signature.h> header instead.
+
+Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+Reviewed-by: Mimi Zohar <zohar@linux.ibm.com>
+Acked-by: Jessica Yu <jeyu@kernel.org>
+Cc: Heiko Carstens <heiko.carstens@de.ibm.com>
+Cc: Philipp Rudo <prudo@linux.ibm.com>
+---
+ arch/s390/kernel/machine_kexec_file.c | 24 +-----------
+ include/linux/module.h                |  3 --
+ include/linux/module_signature.h      | 44 +++++++++++++++++++++
+ init/Kconfig                          |  6 ++-
+ kernel/Makefile                       |  1 +
+ kernel/module.c                       |  1 +
+ kernel/module_signature.c             | 46 ++++++++++++++++++++++
+ kernel/module_signing.c               | 56 ++++-----------------------
+ scripts/Makefile                      |  2 +-
+ 9 files changed, 107 insertions(+), 76 deletions(-)
+ create mode 100644 include/linux/module_signature.h
+ create mode 100644 kernel/module_signature.c
+
+diff --git a/arch/s390/kernel/machine_kexec_file.c b/arch/s390/kernel/machine_kexec_file.c
+index fbdd3ea73667..1ac9fbc6e01e 100644
+--- a/arch/s390/kernel/machine_kexec_file.c
++++ b/arch/s390/kernel/machine_kexec_file.c
+@@ -10,7 +10,7 @@
+ #include <linux/elf.h>
+ #include <linux/errno.h>
+ #include <linux/kexec.h>
+-#include <linux/module.h>
++#include <linux/module_signature.h>
+ #include <linux/verification.h>
+ #include <asm/boot_data.h>
+ #include <asm/ipl.h>
+@@ -23,28 +23,6 @@ const struct kexec_file_ops * const kexec_file_loaders[] = {
+ };
+ 
+ #ifdef CONFIG_KEXEC_VERIFY_SIG
+-/*
+- * Module signature information block.
+- *
+- * The constituents of the signature section are, in order:
+- *
+- *	- Signer's name
+- *	- Key identifier
+- *	- Signature data
+- *	- Information block
+- */
+-struct module_signature {
+-	u8	algo;		/* Public-key crypto algorithm [0] */
+-	u8	hash;		/* Digest algorithm [0] */
+-	u8	id_type;	/* Key identifier type [PKEY_ID_PKCS7] */
+-	u8	signer_len;	/* Length of signer's name [0] */
+-	u8	key_id_len;	/* Length of key identifier [0] */
+-	u8	__pad[3];
+-	__be32	sig_len;	/* Length of signature data */
+-};
+-
+-#define PKEY_ID_PKCS7 2
+-
+ int s390_verify_sig(const char *kernel, unsigned long kernel_len)
+ {
+ 	const unsigned long marker_len = sizeof(MODULE_SIG_STRING) - 1;
+diff --git a/include/linux/module.h b/include/linux/module.h
+index 188998d3dca9..aa56f531cf1e 100644
+--- a/include/linux/module.h
++++ b/include/linux/module.h
+@@ -25,9 +25,6 @@
+ #include <linux/percpu.h>
+ #include <asm/module.h>
+ 
+-/* In stripped ARM and x86-64 modules, ~ is surprisingly rare. */
+-#define MODULE_SIG_STRING "~Module signature appended~\n"
+-
+ /* Not Yet Implemented */
+ #define MODULE_SUPPORTED_DEVICE(name)
+ 
+diff --git a/include/linux/module_signature.h b/include/linux/module_signature.h
+new file mode 100644
+index 000000000000..523617fc5b6a
+--- /dev/null
++++ b/include/linux/module_signature.h
+@@ -0,0 +1,44 @@
++/* SPDX-License-Identifier: GPL-2.0+ */
++/*
++ * Module signature handling.
++ *
++ * Copyright (C) 2012 Red Hat, Inc. All Rights Reserved.
++ * Written by David Howells (dhowells@redhat.com)
++ */
++
++#ifndef _LINUX_MODULE_SIGNATURE_H
++#define _LINUX_MODULE_SIGNATURE_H
++
++/* In stripped ARM and x86-64 modules, ~ is surprisingly rare. */
++#define MODULE_SIG_STRING "~Module signature appended~\n"
++
++enum pkey_id_type {
++	PKEY_ID_PGP,		/* OpenPGP generated key ID */
++	PKEY_ID_X509,		/* X.509 arbitrary subjectKeyIdentifier */
++	PKEY_ID_PKCS7,		/* Signature in PKCS#7 message */
++};
++
++/*
++ * Module signature information block.
++ *
++ * The constituents of the signature section are, in order:
++ *
++ *	- Signer's name
++ *	- Key identifier
++ *	- Signature data
++ *	- Information block
++ */
++struct module_signature {
++	u8	algo;		/* Public-key crypto algorithm [0] */
++	u8	hash;		/* Digest algorithm [0] */
++	u8	id_type;	/* Key identifier type [PKEY_ID_PKCS7] */
++	u8	signer_len;	/* Length of signer's name [0] */
++	u8	key_id_len;	/* Length of key identifier [0] */
++	u8	__pad[3];
++	__be32	sig_len;	/* Length of signature data */
++};
++
++int mod_check_sig(const struct module_signature *ms, size_t file_len,
++		  const char *name);
++
++#endif /* _LINUX_MODULE_SIGNATURE_H */
+diff --git a/init/Kconfig b/init/Kconfig
+index 8b9ffe236e4f..c2286a3c74c5 100644
+--- a/init/Kconfig
++++ b/init/Kconfig
+@@ -1852,6 +1852,10 @@ config BASE_SMALL
+ 	default 0 if BASE_FULL
+ 	default 1 if !BASE_FULL
+ 
++config MODULE_SIG_FORMAT
++	def_bool n
++	select SYSTEM_DATA_VERIFICATION
++
+ menuconfig MODULES
+ 	bool "Enable loadable module support"
+ 	option modules
+@@ -1929,7 +1933,7 @@ config MODULE_SRCVERSION_ALL
+ config MODULE_SIG
+ 	bool "Module signature verification"
+ 	depends on MODULES
+-	select SYSTEM_DATA_VERIFICATION
++	select MODULE_SIG_FORMAT
+ 	help
+ 	  Check modules for valid signatures upon load: the signature
+ 	  is simply appended to the module. For more information see
+diff --git a/kernel/Makefile b/kernel/Makefile
+index 33824f0385b3..f29ae2997a43 100644
+--- a/kernel/Makefile
++++ b/kernel/Makefile
+@@ -58,6 +58,7 @@ endif
+ obj-$(CONFIG_UID16) += uid16.o
+ obj-$(CONFIG_MODULES) += module.o
+ obj-$(CONFIG_MODULE_SIG) += module_signing.o
++obj-$(CONFIG_MODULE_SIG_FORMAT) += module_signature.o
+ obj-$(CONFIG_KALLSYMS) += kallsyms.o
+ obj-$(CONFIG_BSD_PROCESS_ACCT) += acct.o
+ obj-$(CONFIG_CRASH_CORE) += crash_core.o
+diff --git a/kernel/module.c b/kernel/module.c
+index 6e6712b3aaf5..2712f4d217f5 100644
+--- a/kernel/module.c
++++ b/kernel/module.c
+@@ -19,6 +19,7 @@
+ #include <linux/export.h>
+ #include <linux/extable.h>
+ #include <linux/moduleloader.h>
++#include <linux/module_signature.h>
+ #include <linux/trace_events.h>
+ #include <linux/init.h>
+ #include <linux/kallsyms.h>
+diff --git a/kernel/module_signature.c b/kernel/module_signature.c
+new file mode 100644
+index 000000000000..4224a1086b7d
+--- /dev/null
++++ b/kernel/module_signature.c
+@@ -0,0 +1,46 @@
++// SPDX-License-Identifier: GPL-2.0+
++/*
++ * Module signature checker
++ *
++ * Copyright (C) 2012 Red Hat, Inc. All Rights Reserved.
++ * Written by David Howells (dhowells@redhat.com)
++ */
++
++#include <linux/errno.h>
++#include <linux/printk.h>
++#include <linux/module_signature.h>
++#include <asm/byteorder.h>
++
++/**
++ * mod_check_sig - check that the given signature is sane
++ *
++ * @ms:		Signature to check.
++ * @file_len:	Size of the file to which @ms is appended.
++ * @name:	What is being checked. Used for error messages.
++ */
++int mod_check_sig(const struct module_signature *ms, size_t file_len,
++		  const char *name)
++{
++	if (be32_to_cpu(ms->sig_len) >= file_len - sizeof(*ms))
++		return -EBADMSG;
++
++	if (ms->id_type != PKEY_ID_PKCS7) {
++		pr_err("%s: Module is not signed with expected PKCS#7 message\n",
++		       name);
++		return -ENOPKG;
++	}
++
++	if (ms->algo != 0 ||
++	    ms->hash != 0 ||
++	    ms->signer_len != 0 ||
++	    ms->key_id_len != 0 ||
++	    ms->__pad[0] != 0 ||
++	    ms->__pad[1] != 0 ||
++	    ms->__pad[2] != 0) {
++		pr_err("%s: PKCS#7 signature info has unexpected non-zero params\n",
++		       name);
++		return -EBADMSG;
++	}
++
++	return 0;
++}
+diff --git a/kernel/module_signing.c b/kernel/module_signing.c
+index 6b9a926fd86b..cdd04a6b8074 100644
+--- a/kernel/module_signing.c
++++ b/kernel/module_signing.c
+@@ -11,37 +11,13 @@
+ 
+ #include <linux/kernel.h>
+ #include <linux/errno.h>
++#include <linux/module.h>
++#include <linux/module_signature.h>
+ #include <linux/string.h>
+ #include <linux/verification.h>
+ #include <crypto/public_key.h>
+ #include "module-internal.h"
+ 
+-enum pkey_id_type {
+-	PKEY_ID_PGP,		/* OpenPGP generated key ID */
+-	PKEY_ID_X509,		/* X.509 arbitrary subjectKeyIdentifier */
+-	PKEY_ID_PKCS7,		/* Signature in PKCS#7 message */
+-};
+-
+-/*
+- * Module signature information block.
+- *
+- * The constituents of the signature section are, in order:
+- *
+- *	- Signer's name
+- *	- Key identifier
+- *	- Signature data
+- *	- Information block
+- */
+-struct module_signature {
+-	u8	algo;		/* Public-key crypto algorithm [0] */
+-	u8	hash;		/* Digest algorithm [0] */
+-	u8	id_type;	/* Key identifier type [PKEY_ID_PKCS7] */
+-	u8	signer_len;	/* Length of signer's name [0] */
+-	u8	key_id_len;	/* Length of key identifier [0] */
+-	u8	__pad[3];
+-	__be32	sig_len;	/* Length of signature data */
+-};
+-
+ /*
+  * Verify the signature on a module.
+  */
+@@ -49,6 +25,7 @@ int mod_verify_sig(const void *mod, struct load_info *info)
+ {
+ 	struct module_signature ms;
+ 	size_t sig_len, modlen = info->len;
++	int ret;
+ 
+ 	pr_devel("==>%s(,%zu)\n", __func__, modlen);
+ 
+@@ -56,32 +33,15 @@ int mod_verify_sig(const void *mod, struct load_info *info)
+ 		return -EBADMSG;
+ 
+ 	memcpy(&ms, mod + (modlen - sizeof(ms)), sizeof(ms));
+-	modlen -= sizeof(ms);
++
++	ret = mod_check_sig(&ms, modlen, info->name);
++	if (ret)
++		return ret;
+ 
+ 	sig_len = be32_to_cpu(ms.sig_len);
+-	if (sig_len >= modlen)
+-		return -EBADMSG;
+-	modlen -= sig_len;
++	modlen -= sig_len + sizeof(ms);
+ 	info->len = modlen;
+ 
+-	if (ms.id_type != PKEY_ID_PKCS7) {
+-		pr_err("%s: Module is not signed with expected PKCS#7 message\n",
+-		       info->name);
+-		return -ENOPKG;
+-	}
+-
+-	if (ms.algo != 0 ||
+-	    ms.hash != 0 ||
+-	    ms.signer_len != 0 ||
+-	    ms.key_id_len != 0 ||
+-	    ms.__pad[0] != 0 ||
+-	    ms.__pad[1] != 0 ||
+-	    ms.__pad[2] != 0) {
+-		pr_err("%s: PKCS#7 signature info has unexpected non-zero params\n",
+-		       info->name);
+-		return -EBADMSG;
+-	}
+-
+ 	return verify_pkcs7_signature(mod, modlen, mod + modlen, sig_len,
+ 				      VERIFY_USE_SECONDARY_KEYRING,
+ 				      VERIFYING_MODULE_SIGNATURE,
+diff --git a/scripts/Makefile b/scripts/Makefile
+index 9d442ee050bd..52098b080ab7 100644
+--- a/scripts/Makefile
++++ b/scripts/Makefile
+@@ -17,7 +17,7 @@ hostprogs-$(CONFIG_VT)           += conmakehash
+ hostprogs-$(BUILD_C_RECORDMCOUNT) += recordmcount
+ hostprogs-$(CONFIG_BUILDTIME_EXTABLE_SORT) += sortextable
+ hostprogs-$(CONFIG_ASN1)	 += asn1_compiler
+-hostprogs-$(CONFIG_MODULE_SIG)	 += sign-file
++hostprogs-$(CONFIG_MODULE_SIG_FORMAT) += sign-file
+ hostprogs-$(CONFIG_SYSTEM_TRUSTED_KEYRING) += extract-cert
+ hostprogs-$(CONFIG_SYSTEM_EXTRA_CERTIFICATE) += insert-sys-cert
+ 
+
