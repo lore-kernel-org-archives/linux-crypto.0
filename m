@@ -2,106 +2,155 @@ Return-Path: <SRS0=Wq3S=VB=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FDF5C0650E
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Jul 2019 07:39:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46F8AC0650E
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Jul 2019 08:37:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4F4632133F
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Jul 2019 07:39:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1BC842189E
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Jul 2019 08:37:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="llZ031et"
+	dkim=pass (1024-bit key) header.d=verimatrix.com header.i=@verimatrix.com header.b="OzRuzBI3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727008AbfGDHjJ (ORCPT
+        id S1726870AbfGDIhP (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 4 Jul 2019 03:39:09 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:43257 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726964AbfGDHjJ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 4 Jul 2019 03:39:09 -0400
-Received: by mail-wr1-f67.google.com with SMTP id p13so5438347wru.10
-        for <linux-crypto@vger.kernel.org>; Thu, 04 Jul 2019 00:39:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:reply-to:from:date:message-id
-         :subject:to:cc;
-        bh=XkALWcZPhy/UlmJy/l5A12TANGuzgR+hn/seVO8wsMw=;
-        b=llZ031etpU3igTTEQRusZiGE1UvfGRKrSJtz1nYNuNruMttEQm1QwpzpEM/Ddto1E0
-         mkC7n8IgZtDTRDm1sfpQkcPUgLwVK1cyPbrj8J3Zm/J5N1qcCyyAF7uB1C0llw9Po5ik
-         8QAptBopu/daAIZDkTJrml/gaLeK5cy0aPf+mtvqNUuiH0Uvijfw+/l9LeX0d0sRD/xH
-         R/krZEWdiyfOOUi2MW1CfihU6jVBxRsEnIxDOAb+ScbG2O+rxSaRMIJOlaIttiCTSXOd
-         EACoi1Iucc8FFg1qMvOqMeV5HT/92Dpfwct93um7nFmGPGtX9UsgfRgqAPN+tPSsoJ3I
-         9LyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
-         :from:date:message-id:subject:to:cc;
-        bh=XkALWcZPhy/UlmJy/l5A12TANGuzgR+hn/seVO8wsMw=;
-        b=BzZSiV+Pu6rkupeu8m9kuTBsa+dYHQroCGnoY9jMiaztfFBsguaKLnSlI6/9ZyamFS
-         1xLA40/DT2Ikq94wQoSKPWP2TYixtMgLYWoO4j57jVUWV0ulOFmT90SeJak6x1s8hkcV
-         26j3PiRqurkA9O7PONxaY2bkiWr/LE6bYNK6qYHYM2c3QGc/jqYo8+rx1ltYs3RC5OCE
-         FJI7t1D+5jmGpGTyivVSn3Q6EYzJEqEzkbLfuibfCMytF1X2l11fpWuMFrgVbi05EZDo
-         CPbBUCEW1j8OIfbaQuuPCzmiUY7HjSUrE1ODiJo+XfXk4jupBljnl9vrdDhSNLt/ZqGv
-         ekKg==
-X-Gm-Message-State: APjAAAUVN+0iOgY4lU0U3WN5137kFv/lhikH1jSt0uOE0V0cecJTU9tw
-        fF0gL6KR/Dx7+Fxi+4yS3iJAurNQyELL1GrVqxU=
-X-Google-Smtp-Source: APXvYqx5bH/CjBFioqJj/QoeCPrv9f08VwsaY7/MGRKDjkNV/e9eAkxhVhJxq8K5RIB806j2FoKvNpb718jivgpiF4I=
-X-Received: by 2002:a5d:498f:: with SMTP id r15mr4511823wrq.353.1562225946735;
- Thu, 04 Jul 2019 00:39:06 -0700 (PDT)
+        Thu, 4 Jul 2019 04:37:15 -0400
+Received: from mail-eopbgr730043.outbound.protection.outlook.com ([40.107.73.43]:39040
+        "EHLO NAM05-DM3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726805AbfGDIhO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 4 Jul 2019 04:37:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verimatrix.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Zhpan8ykED7nbKSstMFVTotIAbis9JPN4qdFf67O1tw=;
+ b=OzRuzBI3g2IxIm7Xpx8uxHvO1xTy8sKInyRrr15FlSNgI1W2C25AO/MrQszpbhdssimGxxinXn05M5EJcOR+6kRRhKX8gBCp5UmfGfZa7DfI2w0bfasc6Xbjyxrv0lLyYC85uh+eoU/l9yRaZR7UkYmflDQvNl76XFGbsOlCKwc=
+Received: from MN2PR20MB2973.namprd20.prod.outlook.com (52.132.172.146) by
+ MN2PR20MB3101.namprd20.prod.outlook.com (52.132.174.82) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2052.16; Thu, 4 Jul 2019 08:37:11 +0000
+Received: from MN2PR20MB2973.namprd20.prod.outlook.com
+ ([fe80::68d7:2bbb:af61:2e69]) by MN2PR20MB2973.namprd20.prod.outlook.com
+ ([fe80::68d7:2bbb:af61:2e69%6]) with mapi id 15.20.2032.019; Thu, 4 Jul 2019
+ 08:37:11 +0000
+From:   Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+To:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+CC:     Eric Biggers <ebiggers@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Subject: testmgr fuzzing for AEAD ciphers
+Thread-Topic: testmgr fuzzing for AEAD ciphers
+Thread-Index: AdUyQjTY1c0oiQ20QKyM6t3OYyJc2g==
+Date:   Thu, 4 Jul 2019 08:37:11 +0000
+Message-ID: <MN2PR20MB297300C9DA57540354107BEBCAFA0@MN2PR20MB2973.namprd20.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=pvanleeuwen@verimatrix.com; 
+x-originating-ip: [188.204.2.113]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 17733ceb-2086-4202-b994-08d7005acef3
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:MN2PR20MB3101;
+x-ms-traffictypediagnostic: MN2PR20MB3101:
+x-ms-exchange-purlcount: 1
+x-microsoft-antispam-prvs: <MN2PR20MB31013712B4BAB44139865C85CAFA0@MN2PR20MB3101.namprd20.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-forefront-prvs: 0088C92887
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(366004)(376002)(396003)(39850400004)(136003)(346002)(13464003)(189003)(199004)(8676002)(7736002)(68736007)(9686003)(476003)(256004)(81156014)(81166006)(55016002)(33656002)(25786009)(7696005)(53936002)(2906002)(66066001)(54906003)(3846002)(6116002)(5640700003)(478600001)(14454004)(99286004)(66556008)(66476007)(74316002)(186003)(6916009)(71190400001)(4326008)(2501003)(53546011)(66946007)(73956011)(76116006)(316002)(6506007)(2351001)(102836004)(66446008)(64756008)(26005)(71200400001)(52536014)(305945005)(86362001)(15974865002)(486006)(5660300002)(8936002)(6436002)(21314003)(18886075002);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR20MB3101;H:MN2PR20MB2973.namprd20.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: verimatrix.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: TBqCan8aF81KnogD6guHX9TIKfmHKzOzbVmJxq5ffyW6YUZm3F8hH2JCMWEPb5Xx36x00+JCQUS5iIfNeoK8tZpMAVMtdEPHSJWfoUdqCp3nldoY56T/JC36SdzLcQrThzSo2b5RD3rVuiseNerlg9QIqML54XCVQwjqo3H8SWUtVRnngTGNQf63Lgj3ZBEQHsSygMilrU7fTp/QSAyNYiPENjW8jkhb4BKTfp9pAnmCKMgsH743n7qdFM0sNLM11AGUuRMKGP9twVeDSfZj8k+apdBinSPUDnidV717pr/6bS+8/YepTt/2kp8Mbff3uBZfGjTciyVwdjpdcNUc3/i6DIf5Qk+rVSrp30Xja6IFsafcAAxLFOl01rmSotjnTDBkhCu3NOhf1aJzGLhu4wSujHmEklTqi7lc5vRf/dI=
+Content-Type: text/plain; charset="Windows-1252"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-References: <CA+icZUX3EOhrUp0Afbo_fK9rb5AbXjbaBFwhj1qmBaHom1b3MA@mail.gmail.com>
- <CAKwvOdn8Za1Dy4QgdDZu1My5oYLJJzyRqYsq+XkpRpnViC6aKQ@mail.gmail.com>
- <20190617182256.GB92263@gmail.com> <CA+icZUV8693G8jgHw2t9qUay4_Ad-7BgNOkL6z+4z8xNXyL=cA@mail.gmail.com>
- <20190703161456.GC21629@sol.localdomain> <CAKwvOdmRdef1PD9NQnOhfeNC_LWAp8a-oYcnxXo1WWGoWnyn0w@mail.gmail.com>
-In-Reply-To: <CAKwvOdmRdef1PD9NQnOhfeNC_LWAp8a-oYcnxXo1WWGoWnyn0w@mail.gmail.com>
-Reply-To: sedat.dilek@gmail.com
-From:   Sedat Dilek <sedat.dilek@gmail.com>
-Date:   Thu, 4 Jul 2019 09:38:55 +0200
-Message-ID: <CA+icZUUgcXRH14yZRguopjuGzDWUi04Q2L_drbMU-AZCX9NDkA@mail.gmail.com>
-Subject: Re: crypto: x86/crct10dif-pcl - cleanup and optimizations
-To:     Nick Desaulniers <ndesaulniers@google.com>
-Cc:     Eric Biggers <ebiggers@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        linux-crypto@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Clang-Built-Linux ML <clang-built-linux@googlegroups.com>,
-        Fangrui Song <maskray@google.com>,
-        Peter Smith <peter.smith@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+X-OriginatorOrg: verimatrix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 17733ceb-2086-4202-b994-08d7005acef3
+X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Jul 2019 08:37:11.4321
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: dcb260f9-022d-4495-8602-eae51035a0d0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: pvanleeuwen@verimatrix.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR20MB3101
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jul 3, 2019 at 8:52 PM Nick Desaulniers <ndesaulniers@google.com> wrote:
->
-> On Wed, Jul 3, 2019 at 9:15 AM Eric Biggers <ebiggers@kernel.org> wrote:
-> > Sorry, I am still confused.  Are you saying that something still needs to be
-> > fixed in the kernel code, and if so, why?  To reiterate, the byteshift_table
-> > doesn't actually *need* any particular alignment.  Would it avoid the confusion
-> > if I changed it to no alignment?  Or is there some section merging related
-> > reason it actually needs to be 32?
->
-> Looks like the section merging of similarly named sections of
-> differing alignment in LLD just got reverted:
-> https://bugs.llvm.org/show_bug.cgi?id=42289#c8
-> I wasn't able to find any documentation that said alignment must match
-> entity size, but if there's not a functional reason for them to differ
-> then it seems like LLD need not even support such a particularly
-> non-common case.
->
+Hi,
 
-My primary goal was to get rid of these sysfs warnings when building
-with clang-9 and linking with lld-9 (details see [0]).
-"clang-9" and "lld-9" are snapshot versions (details see [1]).
+I was attempting to get some fuzzing going for the RFC3686 AEAD ciphers I'm=
+ adding to the=20
+inside-secure driver, and I noticed some more things besides what I mention=
+ed below:
 
-- Sedat -
+1) If there is no test suite, but the entry does point to something other t=
+hen alg_test_null,
+then fuzzing is still not performed if there is no test suite, as all of th=
+e alg_test_xxx routines
+first check for suite->count being > 0 and exit due to count being 0 in thi=
+s case.
+I would think that if there are no reference vectors, then fuzzing against =
+the generic=20
+implementation (if enabled) is the very least you can do?
 
-[0] https://github.com/ClangBuiltLinux/linux/issues/431
-[1] https://github.com/ClangBuiltLinux/linux/issues/431#issuecomment-508354865
+2) The AEAD fuzzing routine attempts to determine the maximum key size by a=
+ctually
+scanning the test suite. So if there is no test suite, this will remain at =
+zero and the AEAD
+fuzzing routine will still exit without performing any tests because of thi=
+s.
+Isn't there a better way to determine the maximum key size for AEAD ciphers=
+?
+
+3) The AEAD fuzzing vector generation generates fully random keydata that i=
+s <=3D maxlen.
+However, for AEAD ciphers, the key blob is actually some RTA struct contain=
+ing length
+fields and types. Which means that most of the time, it will simply be gene=
+rating illegal
+key blobs and you are merely testing whether both implementations correctly=
+ flag the
+key as illegal. (for which they likely use the same crypto_authenc_extractk=
+eys
+subroutine, so that check probably/likely always passes - and therefore is =
+not very useful)
+
+Regards,
+Pascal van Leeuwen
+Silicon IP Architect, Multi-Protocol Engines @ Verimatrix
+www.insidesecure.com
+
+> -----Original Message-----
+> From: linux-crypto-owner@vger.kernel.org <linux-crypto-owner@vger.kernel.=
+org> On Behalf Of Pascal Van Leeuwen
+> Sent: Wednesday, July 3, 2019 11:51 PM
+> To: linux-crypto@vger.kernel.org
+> Subject: testmgr question
+>=20
+> Hi,
+>=20
+> I'm currently busy adding support for some AES-CTR based authenticated en=
+cryption suites to the
+> inside-secure driver, and I got the distinct impression they were silentl=
+y not getting tested at all.
+>=20
+> Looking at testmgr.c, I noticed that they point to alg_test_null, confirm=
+ing my suspicion.
+> I was wondering whether this was intentional and, if so, why that is the =
+case?
+>=20
+> I get that there are no reference vectors for these ciphersuites yet, but=
+ that shouldn't stop
+> testmgr from at least fuzzing the ciphersuite against the reference imple=
+mentation?
+>=20
+> Regards,
+> Pascal van Leeuwen
+> Silicon IP Architect, Multi-Protocol Engines @ Verimatrix
+> www.insidesecure.com
+
