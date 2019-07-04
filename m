@@ -2,175 +2,170 @@ Return-Path: <SRS0=Wq3S=VB=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 427CDC06513
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Jul 2019 09:54:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7B35C06517
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Jul 2019 10:54:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0C99C21882
-	for <linux-crypto@archiver.kernel.org>; Thu,  4 Jul 2019 09:54:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="CJtp3p6F"
+	by mail.kernel.org (Postfix) with ESMTP id C61BC218A6
+	for <linux-crypto@archiver.kernel.org>; Thu,  4 Jul 2019 10:54:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727472AbfGDJyz (ORCPT
+        id S1727403AbfGDKym (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 4 Jul 2019 05:54:55 -0400
-Received: from mail-eopbgr00045.outbound.protection.outlook.com ([40.107.0.45]:35593
-        "EHLO EUR02-AM5-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727223AbfGDJyz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 4 Jul 2019 05:54:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fzUCfW+9lYwogIItMbux/A3luG0AzXDu5IeMbJxi41g=;
- b=CJtp3p6Fa1qteOQaguYUj7AtV1ZY+AqRQbacvqLbohAcdPEKIxZqPvNXiFtMTxBMW1JcpaJ4c4MEK8luV7ZZ0cBPuJwT652MnzB/TaBUDzfaBUOeYGqnioSCY9yDVpbDqx2ykkS9QQCY7ZtkRhlF90r5ZZcsU5heeAApO1PQOhA=
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
- VI1PR0402MB3743.eurprd04.prod.outlook.com (52.134.15.149) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2032.20; Thu, 4 Jul 2019 09:54:51 +0000
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::14c8:b254:33f0:fdba]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::14c8:b254:33f0:fdba%6]) with mapi id 15.20.2032.019; Thu, 4 Jul 2019
- 09:54:51 +0000
-From:   Horia Geanta <horia.geanta@nxp.com>
-To:     Andrey Smirnov <andrew.smirnov@gmail.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-CC:     Chris Spencer <christopher.spencer@sea.co.uk>,
-        Cory Tusar <cory.tusar@zii.aero>,
-        Chris Healy <cphealy@gmail.com>,
-        Lucas Stach <l.stach@pengutronix.de>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Leonard Crestez <leonard.crestez@nxp.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v4 05/16] crypto: caam - use devres to allocate 'outring'
-Thread-Topic: [PATCH v4 05/16] crypto: caam - use devres to allocate 'outring'
-Thread-Index: AQHVMXdI6RIFtQ/HV0qJM9wqCVa4iQ==
-Date:   Thu, 4 Jul 2019 09:54:51 +0000
-Message-ID: <VI1PR0402MB3485379B9E2DF0D109E4743A98FA0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-References: <20190703081327.17505-1-andrew.smirnov@gmail.com>
- <20190703081327.17505-6-andrew.smirnov@gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=horia.geanta@nxp.com; 
-x-originating-ip: [78.96.98.22]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 6c79304a-19ae-4de7-aab4-08d70065a8a8
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:VI1PR0402MB3743;
-x-ms-traffictypediagnostic: VI1PR0402MB3743:
-x-microsoft-antispam-prvs: <VI1PR0402MB3743CE82FF45F1043F4646AE98FA0@VI1PR0402MB3743.eurprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:4303;
-x-forefront-prvs: 0088C92887
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(366004)(136003)(376002)(346002)(396003)(39860400002)(189003)(199004)(2906002)(305945005)(68736007)(53546011)(6506007)(91956017)(66446008)(73956011)(66946007)(5660300002)(478600001)(76116006)(64756008)(66476007)(66556008)(6246003)(316002)(7736002)(7696005)(186003)(8676002)(81166006)(3846002)(76176011)(81156014)(6116002)(229853002)(102836004)(25786009)(110136005)(54906003)(4326008)(26005)(86362001)(52536014)(256004)(486006)(476003)(99286004)(66066001)(14454004)(71190400001)(71200400001)(74316002)(53936002)(44832011)(2501003)(55016002)(33656002)(446003)(9686003)(6436002)(8936002);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB3743;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: nxp.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: C5i5wuCZkIQ2cUWj9wT4EPZFkqCDapN8rJJM6BkUO8uS3cYPRAV3qMe9WMzTM0qxAv4Of8KnNToGTtwIP2ygnH7aE1IgiN0b+XAppzQptnpcLEN/1Z7gwD833121dceWtO+hSNfsVfJOxtBoa3VlQb8eK4VxNbCDBeD1mggc+Nd+W8NPMWMEDEzhqgm5CevOq8qEdh9ptLNP6z7Mvya0DCUZo25WHsE0Wb/Oao8xh27eXr/O48tGLkWCSYjR5rYeHcpNVzYABbyjKyfidqN48ZA41pCpy+yp0LWCglzWukFGDTn8LNBgho1Q4WCUD/HIC5NR0QuhUWtG00isOhP+p3QfrTk18Z+uONQ+R4uJFi5oNyTdj6pzQcfK3sIwuWVuxVEDdUneFum+1oOXFcJW23bdp3lIifIm7PHxjPuATPI=
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
+        Thu, 4 Jul 2019 06:54:42 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:22456 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727512AbfGDKyj (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 4 Jul 2019 06:54:39 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x64Apv8R024523
+        for <linux-crypto@vger.kernel.org>; Thu, 4 Jul 2019 06:54:37 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2thfuq8m38-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <linux-crypto@vger.kernel.org>; Thu, 04 Jul 2019 06:54:36 -0400
+Received: from localhost
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-crypto@vger.kernel.org> from <prudo@linux.ibm.com>;
+        Thu, 4 Jul 2019 11:54:35 +0100
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Thu, 4 Jul 2019 11:54:30 +0100
+Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x64AsSpq35455354
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 4 Jul 2019 10:54:28 GMT
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B9AC8AE045;
+        Thu,  4 Jul 2019 10:54:28 +0000 (GMT)
+Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 33C7FAE053;
+        Thu,  4 Jul 2019 10:54:28 +0000 (GMT)
+Received: from laptop-ibm (unknown [9.152.212.73])
+        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Thu,  4 Jul 2019 10:54:28 +0000 (GMT)
+Date:   Thu, 4 Jul 2019 12:54:27 +0200
+From:   Philipp Rudo <prudo@linux.ibm.com>
+To:     Thiago Jung Bauermann <bauerman@linux.ibm.com>
+Cc:     Jessica Yu <jeyu@kernel.org>, linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jonathan Corbet <corbet@lwn.net>,
+        "AKASHI\, Takahiro" <takahiro.akashi@linaro.org>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>,
+        linux-s390@vger.kernel.org
+Subject: Re: [PATCH v12 01/11] MODSIGN: Export module signature definitions
+In-Reply-To: <87lfxel2q6.fsf@morokweng.localdomain>
+References: <20190628021934.4260-1-bauerman@linux.ibm.com>
+        <20190628021934.4260-2-bauerman@linux.ibm.com>
+        <20190701144752.GC25484@linux-8ccs>
+        <87lfxel2q6.fsf@morokweng.localdomain>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6c79304a-19ae-4de7-aab4-08d70065a8a8
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Jul 2019 09:54:51.6158
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: horia.geanta@nxp.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3743
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+x-cbid: 19070410-0008-0000-0000-000002F9D612
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19070410-0009-0000-0000-000022672778
+Message-Id: <20190704125427.31146026@laptop-ibm>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-07-04_06:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1810050000 definitions=main-1907040141
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 7/3/2019 11:14 AM, Andrey Smirnov wrote:=0A=
-> Use devres to allocate 'outring' and drop corresponding call to=0A=
-> dma_free_coherent() as well as extra references to 'struct=0A=
-> jr_outentry' (needed in following commits). No functional change=0A=
-> inteded.=0A=
-> =0A=
-> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>=0A=
-> Cc: Chris Spencer <christopher.spencer@sea.co.uk>=0A=
-> Cc: Cory Tusar <cory.tusar@zii.aero>=0A=
-> Cc: Chris Healy <cphealy@gmail.com>=0A=
-> Cc: Lucas Stach <l.stach@pengutronix.de>=0A=
-> Cc: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
-> Cc: Aymen Sghaier <aymen.sghaier@nxp.com>=0A=
-> Cc: Leonard Crestez <leonard.crestez@nxp.com>=0A=
-> Cc: linux-crypto@vger.kernel.org=0A=
-> Cc: linux-kernel@vger.kernel.org=0A=
-> ---=0A=
->  drivers/crypto/caam/jr.c | 15 +++++----------=0A=
->  1 file changed, 5 insertions(+), 10 deletions(-)=0A=
-> =0A=
-> diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c=0A=
-> index fc7deb445aa8..1eaa91dcc146 100644=0A=
-> --- a/drivers/crypto/caam/jr.c=0A=
-> +++ b/drivers/crypto/caam/jr.c=0A=
-> @@ -108,7 +108,7 @@ static int caam_reset_hw_jr(struct device *dev)=0A=
->  static int caam_jr_shutdown(struct device *dev)=0A=
->  {=0A=
->  	struct caam_drv_private_jr *jrp =3D dev_get_drvdata(dev);=0A=
-> -	dma_addr_t inpbusaddr, outbusaddr;=0A=
-> +	dma_addr_t inpbusaddr;=0A=
->  	int ret;=0A=
->  =0A=
->  	ret =3D caam_reset_hw_jr(dev);=0A=
-> @@ -120,11 +120,8 @@ static int caam_jr_shutdown(struct device *dev)=0A=
->  =0A=
->  	/* Free rings */=0A=
->  	inpbusaddr =3D rd_reg64(&jrp->rregs->inpring_base);=0A=
-> -	outbusaddr =3D rd_reg64(&jrp->rregs->outring_base);=0A=
->  	dma_free_coherent(dev, sizeof(dma_addr_t) * JOBR_DEPTH,=0A=
->  			  jrp->inpring, inpbusaddr);=0A=
-> -	dma_free_coherent(dev, sizeof(struct jr_outentry) * JOBR_DEPTH,=0A=
-> -			  jrp->outring, outbusaddr);=0A=
->  =0A=
->  	return ret;=0A=
->  }=0A=
-> @@ -459,15 +456,16 @@ static int caam_jr_init(struct device *dev)=0A=
->  	if (!jrp->inpring)=0A=
->  		goto out_free_irq;=0A=
->  =0A=
-> -	jrp->outring =3D dma_alloc_coherent(dev, sizeof(*jrp->outring) *=0A=
-> -					  JOBR_DEPTH, &outbusaddr, GFP_KERNEL);=0A=
-> +	jrp->outring =3D dmam_alloc_coherent(dev, sizeof(*jrp->outring) *=0A=
-> +					   JOBR_DEPTH, &outbusaddr,=0A=
-> +					   GFP_KERNEL);=0A=
->  	if (!jrp->outring)=0A=
->  		goto out_free_inpring;=0A=
->  =0A=
->  	jrp->entinfo =3D devm_kcalloc(dev, JOBR_DEPTH, sizeof(*jrp->entinfo),=
-=0A=
->  				    GFP_KERNEL);=0A=
->  	if (!jrp->entinfo)=0A=
-> -		goto out_free_outring;=0A=
-> +		return -ENOMEM;=0A=
->  =0A=
-This is going to leak resources, so should instead be:=0A=
-		goto out_free_inpring;=0A=
-=0A=
-I suggest merging patches 4, 5, 6.=0A=
-They have the same goal, are rather small and make changes in the same plac=
-es,=0A=
-and would avoid issues like this one.=0A=
-=0A=
->  	tasklet_init(&jrp->irqtask, caam_jr_dequeue, (unsigned long)dev);=0A=
->  =0A=
-> @@ -495,9 +493,6 @@ static int caam_jr_init(struct device *dev)=0A=
->  =0A=
->  	return 0;=0A=
->  =0A=
-> -out_free_outring:=0A=
-> -	dma_free_coherent(dev, sizeof(struct jr_outentry) * JOBR_DEPTH,=0A=
-> -			  jrp->outring, outbusaddr);=0A=
->  out_free_inpring:=0A=
->  	dma_free_coherent(dev, sizeof(dma_addr_t) * JOBR_DEPTH,=0A=
->  			  jrp->inpring, inpbusaddr);=0A=
-> =0A=
+Hi Thiago,
+
+
+On Thu, 04 Jul 2019 03:42:57 -0300
+Thiago Jung Bauermann <bauerman@linux.ibm.com> wrote:
+
+> Jessica Yu <jeyu@kernel.org> writes:
+> 
+> > +++ Thiago Jung Bauermann [27/06/19 23:19 -0300]:  
+> >>IMA will use the module_signature format for append signatures, so export
+> >>the relevant definitions and factor out the code which verifies that the
+> >>appended signature trailer is valid.
+> >>
+> >>Also, create a CONFIG_MODULE_SIG_FORMAT option so that IMA can select it
+> >>and be able to use mod_check_sig() without having to depend on either
+> >>CONFIG_MODULE_SIG or CONFIG_MODULES.
+> >>
+> >>Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+> >>Reviewed-by: Mimi Zohar <zohar@linux.ibm.com>
+> >>Cc: Jessica Yu <jeyu@kernel.org>
+> >>---
+> >> include/linux/module.h           |  3 --
+> >> include/linux/module_signature.h | 44 +++++++++++++++++++++++++
+> >> init/Kconfig                     |  6 +++-
+> >> kernel/Makefile                  |  1 +
+> >> kernel/module.c                  |  1 +
+> >> kernel/module_signature.c        | 46 ++++++++++++++++++++++++++
+> >> kernel/module_signing.c          | 56 +++++---------------------------
+> >> scripts/Makefile                 |  2 +-
+> >> 8 files changed, 106 insertions(+), 53 deletions(-)
+> >>
+> >>diff --git a/include/linux/module.h b/include/linux/module.h
+> >>index 188998d3dca9..aa56f531cf1e 100644
+> >>--- a/include/linux/module.h
+> >>+++ b/include/linux/module.h
+> >>@@ -25,9 +25,6 @@
+> >> #include <linux/percpu.h>
+> >> #include <asm/module.h>
+> >>
+> >>-/* In stripped ARM and x86-64 modules, ~ is surprisingly rare. */
+> >>-#define MODULE_SIG_STRING "~Module signature appended~\n"
+> >>-  
+> >
+> > Hi Thiago, apologies for the delay.  
+> 
+> Hello Jessica, thanks for reviewing the patch!
+> 
+> > It looks like arch/s390/kernel/machine_kexec_file.c also relies on
+> > MODULE_SIG_STRING being defined, so module_signature.h will need to be
+> > included there too, otherwise we'll run into a compilation error.  
+> 
+> Indeed. Thanks for spotting that. The patch below fixes it. It's
+> identical to the previous version except for the changes in 
+> arch/s390/kernel/machine_kexec_file.c and their description in the
+> commit message. I'm also copying some s390 people in this email.
+
+to me the s390 part looks good but for one minor nit.
+
+In arch/s390/Kconfig KEXEC_VERIFY_SIG currently depends on
+SYSTEM_DATA_VERIFICATION. I'd prefer when you update this to the new
+MODULE_SIG_FORMAT. It shouldn't make any difference right now, as we don't
+use mod_check_sig in our code path. But it could cause problems in the future,
+when more code might be shared.
+
+Thanks
+Philipp
+
+> > Other than that, the module-related changes look good to me:
+> >
+> > Acked-by: Jessica Yu <jeyu@kernel.org>  
+> 
+> Thank you very much!
+> 
+
