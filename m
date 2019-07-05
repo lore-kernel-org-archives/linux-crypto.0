@@ -2,76 +2,94 @@ Return-Path: <SRS0=kkEj=VC=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43CAAC5B57D
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 Jul 2019 08:51:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C8F2C5B57D
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 Jul 2019 09:19:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1F252218BC
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 Jul 2019 08:51:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2C9F12147A
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 Jul 2019 09:19:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IPuSXLRr"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726977AbfGEIvV (ORCPT
+        id S1727010AbfGEJTz (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 5 Jul 2019 04:51:21 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:40692 "EHLO deadmen.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726427AbfGEIvV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 5 Jul 2019 04:51:21 -0400
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1hjJw2-0004ul-QO; Fri, 05 Jul 2019 16:51:14 +0800
-Received: from herbert by gondobar with local (Exim 4.89)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1hjJvz-00030Q-8S; Fri, 05 Jul 2019 16:51:11 +0800
-Date:   Fri, 5 Jul 2019 16:51:11 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc:     Milan Broz <gmazyland@gmail.com>,
-        Eric Biggers <ebiggers@google.com>,
-        device-mapper development <dm-devel@redhat.com>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH 3/3] dm-crypt: Implement eboiv - encrypted byte-offset
- initialization vector.
-Message-ID: <20190705085111.ibpv3bmbxzy4mxgo@gondor.apana.org.au>
-References: <20190704131033.9919-1-gmazyland@gmail.com>
- <20190704131033.9919-3-gmazyland@gmail.com>
- <7a8d13ee-2d3f-5357-48c6-37f56d7eff07@gmail.com>
- <CAKv+Gu_c+OpOwrr0dSM=j=HiDpfM4sarq6u=6AXrU8jwLaEr-w@mail.gmail.com>
- <CAKv+Gu8a6cBQYsbYs8CDyGbhHx0E=+1SU7afqoy9Cs+K8PMfqA@mail.gmail.com>
- <4286b8f6-03b5-a8b4-4db2-35dda954e518@gmail.com>
- <CAKv+Gu_Nesqtz-xs0LkHYZ6HXrKkbJjq8dKL6Cnrk9ZsQ=T3jg@mail.gmail.com>
- <20190705030827.k6f7hnhxjsoxdj6b@gondor.apana.org.au>
- <CAKv+Gu-Nye8TF68bZ=fKzU-SBpW7nx3F8ECcZjLjKD_TTbtsmw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKv+Gu-Nye8TF68bZ=fKzU-SBpW7nx3F8ECcZjLjKD_TTbtsmw@mail.gmail.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
+        Fri, 5 Jul 2019 05:19:55 -0400
+Received: from mail-ed1-f67.google.com ([209.85.208.67]:34565 "EHLO
+        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726116AbfGEJTy (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 5 Jul 2019 05:19:54 -0400
+Received: by mail-ed1-f67.google.com with SMTP id s49so7669476edb.1
+        for <linux-crypto@vger.kernel.org>; Fri, 05 Jul 2019 02:19:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=D65aWDbv/4VC+dU+H1d7BrPwuYTp9yWxRRias8MoVDg=;
+        b=IPuSXLRrR+pa/MEv4Vo9Cyo/mPlOXLf6Gl78qU5ThL8B4jMzb+cYBRCNhPyThFwdtG
+         f8WJHpXQH9f9lTw8E8Zo5vMjlpfpU6wscizmHRr3dN0wXyai0Fz6B20AXKpuq/fjah/A
+         f7Azn7BMQ0r4DOU9lwLiGPXad6W5LgidMZ0AnF/TPWtzbJm11zXfJLnKEX5CzK5CKPb+
+         JSr4hUlAqULktB9paD2mqEJuhWyp+MksvblGnDlUSHdQlkSoOgQ9W65Ja3aRR/EqMkA2
+         7uvGDYDgPh7FbriSQn8NqYZWf6xPKfXO6gUmv9j2WCeMqSWsGEE8i+bPTSOqb3Eyxbc6
+         MJDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=D65aWDbv/4VC+dU+H1d7BrPwuYTp9yWxRRias8MoVDg=;
+        b=b+juh1ZiF1t4/Wfuni6Yo5ydDGVHdvys7kRRaPGPoR547DS+1LzDWlmUFb0WPwd/xQ
+         4/0ZRCfOnaYgeDK2+ROqqQeMbz3nObTJl4Q/XofaCpfUpe9OYOIcF6aiWSbF5hwuZT8w
+         BcK7dAa1QWEui9cd1xJwOFIzyer9OKnDrhr+Lzm3U2PMqmr4PFkk+Qm5XcWy/YJE+jWj
+         eXVhkZD4T3jOjfk0XPSII2jc7a9/m/XnhKHGxJLyhkw1+FDm2zfzViMNhq7Pom/iz3JM
+         usD1RowwkoSjqDfo7Dt2ujMm77TKbVyj9cMluWtGpCuV/maWAPK+XWBAO9uH7PUTh8R8
+         Z6cA==
+X-Gm-Message-State: APjAAAWHDQvEx0j3GwK8FkBNiqSR/yeHYkhu9qV0I4qo12Eg3tcLCXc8
+        cGgyM1fC8AdsvuWgPcPVu/iu93El
+X-Google-Smtp-Source: APXvYqyDrE2m5BpFlVypgGBSRVRAeZCuzIzgtp2rFWs6Ckn1BuIidTttMYyp8REmOvd0rYaFq8pjwg==
+X-Received: by 2002:a17:906:7382:: with SMTP id f2mr2468051ejl.88.1562318393027;
+        Fri, 05 Jul 2019 02:19:53 -0700 (PDT)
+Received: from localhost.localdomain.com ([188.204.2.113])
+        by smtp.gmail.com with ESMTPSA id c49sm2537078eda.74.2019.07.05.02.19.52
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 05 Jul 2019 02:19:52 -0700 (PDT)
+From:   Pascal van Leeuwen <pascalvanl@gmail.com>
+X-Google-Original-From: Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
+To:     linux-crypto@vger.kernel.org
+Cc:     antoine.tenart@bootlin.com, herbert@gondor.apana.org.au,
+        davem@davemloft.net,
+        Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
+Subject: [PATCH] crypto: inside-secure - remove unused struct entry
+Date:   Fri,  5 Jul 2019 10:17:25 +0200
+Message-Id: <1562314645-22949-1-git-send-email-pvanleeuwen@verimatrix.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jul 05, 2019 at 08:32:03AM +0200, Ard Biesheuvel wrote:
->
-> > AFAICS this is using the same key as the actual data.  So why
-> > don't you combine it with the actual data when encrypting/decrypting?
-> >
-> > That is, add a block at the front of the actual data containing
-> > the little-endian byte offset and then use an IV of zero.
-> >
-> 
-> That would only work for encryption.
+This patch removes 'engines' from struct safexcel_alg_template, as it is
+no longer used.
 
-True.  So this doesn't obviate the need to access the single-block
-cipher.  But the code probably should still do it that way for
-encryption for performance reasons.
+Signed-off-by: Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
+---
+ drivers/crypto/inside-secure/safexcel.h | 1 -
+ 1 file changed, 1 deletion(-)
 
-Cheers,
+diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
+index 379d0b0..30a222e 100644
+--- a/drivers/crypto/inside-secure/safexcel.h
++++ b/drivers/crypto/inside-secure/safexcel.h
+@@ -660,7 +660,6 @@ struct safexcel_ahash_export_state {
+ struct safexcel_alg_template {
+ 	struct safexcel_crypto_priv *priv;
+ 	enum safexcel_alg_type type;
+-	u32 engines;
+ 	union {
+ 		struct skcipher_alg skcipher;
+ 		struct aead_alg aead;
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+1.8.3.1
+
