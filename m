@@ -2,37 +2,40 @@ Return-Path: <SRS0=kkEj=VC=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1F63C5B57D
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 Jul 2019 04:24:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11E01C5B57D
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 Jul 2019 04:40:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6069820856
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 Jul 2019 04:24:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D7F382189E
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 Jul 2019 04:40:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1562301607;
+	bh=anXgiQzlwWAoucjffgnQSite8ZEZr2YplIVIl/UKK8E=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
+	b=ppfCjx9iUsesaPSf1luyUEKmJkCYlS462Q2TKMlJk8plm69w/tdKCmlXAHOlc66S+
+	 OPM8yxzk6yRWU2DHzO+x8sQZfBjyAsoUxYbkufApVHoCKETIkltdQjyyAu1jAulO1A
+	 KVzTgkNEf5OCeCubya7bkc9zmZHsqjPmRZmG4H90=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725763AbfGEEYz (ORCPT
+        id S1726001AbfGEEkG (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 5 Jul 2019 00:24:55 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:58474 "EHLO deadmen.hmeau.com"
+        Fri, 5 Jul 2019 00:40:06 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58636 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725497AbfGEEYz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 5 Jul 2019 00:24:55 -0400
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1hjFmF-0001aU-9l; Fri, 05 Jul 2019 12:24:51 +0800
-Received: from herbert by gondobar with local (Exim 4.89)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1hjFmD-0002kO-2y; Fri, 05 Jul 2019 12:24:49 +0800
-Date:   Fri, 5 Jul 2019 12:24:49 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [GIT] Crypto Fixes for 5.2
-Message-ID: <20190705042449.rmzg2rk4janrgeoe@gondor.apana.org.au>
+        id S1725497AbfGEEkG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 5 Jul 2019 00:40:06 -0400
+Subject: Re: [GIT] Crypto Fixes for 5.2
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1562301605;
+        bh=anXgiQzlwWAoucjffgnQSite8ZEZr2YplIVIl/UKK8E=;
+        h=From:In-Reply-To:References:Date:To:Cc:From;
+        b=zNoj/DpE4fpJ9RnSQaxyeU5kMN4ozxWxZ/KqvTzFBpllfKiFd6D9SywEt986PDOyv
+         aDuFgPWjeu/zp5h6X0CrCqgNMiP/BK9l0jxNFB3g3xWKyqlZSjIvVzGyMPRNZBIAqA
+         LRSMbhCMxnRFXARBpyxatXKEtAL0uK8HIS2nFORA=
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <20190705042449.rmzg2rk4janrgeoe@gondor.apana.org.au>
 References: <20180622145403.6ltjip7che227fuo@gondor.apana.org.au>
  <20180829033353.agnzxra3jk2r2mzg@gondor.apana.org.au>
  <20181116063146.e7a3mep3ghnfltxe@gondor.apana.org.au>
@@ -43,42 +46,35 @@ References: <20180622145403.6ltjip7che227fuo@gondor.apana.org.au>
  <20190312045818.bgpiuxogmaxyscdv@gondor.apana.org.au>
  <20190515060552.ecfwhazt2fnthepg@gondor.apana.org.au>
  <20190606060324.du5zbk3ju5djkhfe@gondor.apana.org.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190606060324.du5zbk3ju5djkhfe@gondor.apana.org.au>
-User-Agent: NeoMutt/20170113 (1.7.2)
+ <20190705042449.rmzg2rk4janrgeoe@gondor.apana.org.au>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20190705042449.rmzg2rk4janrgeoe@gondor.apana.org.au>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+X-PR-Tracked-Commit-Id: 21d4120ec6f5b5992b01b96ac484701163917b63
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: ee39d46dcaf8f25894f13236d3d984d9a4d2fd3e
+Message-Id: <156230160517.9557.7664525002945873265.pr-tracker-bot@kernel.org>
+Date:   Fri, 05 Jul 2019 04:40:05 +0000
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Linus: 
+The pull request you sent on Fri, 5 Jul 2019 12:24:49 +0800:
 
-This push fixes two memory leaks and a list corruption bug.
+> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
 
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/ee39d46dcaf8f25894f13236d3d984d9a4d2fd3e
 
-Please pull from
+Thank you!
 
-git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
-
-
-Eric Biggers (1):
-      crypto: user - prevent operating on larval algorithms
-
-Herbert Xu (1):
-      lib/mpi: Fix karactx leak in mpi_powm
-
-Vincent Whitchurch (1):
-      crypto: cryptd - Fix skcipher instance memory leak
-
- crypto/cryptd.c           | 1 +
- crypto/crypto_user_base.c | 3 +++
- lib/mpi/mpi-pow.c         | 6 ++----
- 3 files changed, 6 insertions(+), 4 deletions(-)
-
-Thanks,
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Deet-doot-dot, I am a bot.
+https://korg.wiki.kernel.org/userdoc/prtracker
