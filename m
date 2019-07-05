@@ -5,390 +5,334 @@ X-Spam-Level:
 X-Spam-Status: No, score=-10.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97B2FC4649A
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 Jul 2019 07:53:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0B31C4649A
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 Jul 2019 08:39:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6B237218BC
-	for <linux-crypto@archiver.kernel.org>; Fri,  5 Jul 2019 07:53:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A07F0218BC
+	for <linux-crypto@archiver.kernel.org>; Fri,  5 Jul 2019 08:39:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ADK8UOiZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cr7SZLNj"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725894AbfGEHxM (ORCPT
+        id S1727113AbfGEIjB (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 5 Jul 2019 03:53:12 -0400
-Received: from mail-ed1-f68.google.com ([209.85.208.68]:34017 "EHLO
+        Fri, 5 Jul 2019 04:39:01 -0400
+Received: from mail-ed1-f68.google.com ([209.85.208.68]:37191 "EHLO
         mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727654AbfGEHxM (ORCPT
+        with ESMTP id S1727060AbfGEIjB (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 5 Jul 2019 03:53:12 -0400
-Received: by mail-ed1-f68.google.com with SMTP id s49so7447936edb.1
-        for <linux-crypto@vger.kernel.org>; Fri, 05 Jul 2019 00:53:10 -0700 (PDT)
+        Fri, 5 Jul 2019 04:39:01 -0400
+Received: by mail-ed1-f68.google.com with SMTP id w13so7546081eds.4
+        for <linux-crypto@vger.kernel.org>; Fri, 05 Jul 2019 01:38:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=yb0+YrhVhIqNqblwYmQ7EReShWk4/O5bzgnhpMk0T1I=;
-        b=ADK8UOiZISbwOwolsqJZNqnvVeJLuLvuXejdOh6k3IGKDQw5zmvlszqzIlN9TlQquq
-         1S/AcuHaia2eVVSCoN49nlnag84m2uKlPIwcyM15trEcI4Xp84KU2rJrFrk8089V4qLt
-         oXy2LzgPWOzLBRSZ3R2LndDYsrlWEqTK+dxvJxedcyYVRdXB4t9tgf9M4So+d7+Il4tX
-         vzfIUI+29FMVF8wCSsBI0TSQnBFsDQtS4CzWzFAS/BxJg+NSn2YQclP1wTjauTLf82ZI
-         CXXt9l6vzeVYsD3Q3SsXwWy52gyxd9LnRAEGkWWcRommICUIUcCkaQrqVCyRF3jE4M2V
-         k93A==
+        h=from:to:cc:subject:date:message-id;
+        bh=0wG0Qp0DymOFsW+hfNfz0YB5oNq3mQs/TYBemqc1SNE=;
+        b=cr7SZLNjQkEIW7VK9CvdSCSgl9yttfJsBrx6OcHUYalczB80C1wUhL+5+T16T51Sfi
+         ozrR2qwc4Zbx+9XGfdQxUsvIHyZ8rr4MN3w3eWPvJtZFOU5NOvBqL7u9xVllb+zqYTfT
+         kTlvHiMGDmA0/VkmFnM/rsgQ3UnxFiCk1cP0whE+FRuj7y4PnjZzimglQ79oAFJp5uu+
+         9NfcXUomOqKyfY+q6+4KilUfNJbrFY1rjRVRKWHee3awWq9hgjrv0mJlqkqIXwKFxA7r
+         KElHdOXpXTjXFhhtQ3M7YH8R+op3ZTqjd6c7gNrYgfSBwSmJgZXFJRz3cStQua9eD9rU
+         1ZEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=yb0+YrhVhIqNqblwYmQ7EReShWk4/O5bzgnhpMk0T1I=;
-        b=HBxsAfUl845etmlUgpmEMcNdCwe8WFkRxp09glTeEaBsr3xmDt7ayoQzVwErUyVPeG
-         o1EW7UN9qC4hCEnsQjPGGBek90PqQdzTEk66TQ194qxdGGwEAReAIqo/2Ncf9a38OO3G
-         XWbqagjA/kHNrBTXI4Uzt7C4eNVouICbCZxCrGpAY08LNv2bNILUEv6AfPfjFnkgLZnm
-         3KO367Ig9n5PMrco1koVYdl3ZYPHPcVSuD6lXpr6VTYy7URXeiAGSmOGyieYIv2I7+KR
-         dmKAi5dsL26wBwSzIDVkkOGwN4dpRkS9GyVi/thNFhY4CuqS7UbmP0ulcsWECih8GWeK
-         U5gg==
-X-Gm-Message-State: APjAAAVOUE9aHNHI9hWCLKA1935tFvnRnyAgfLyJcOC0/vQZMdzHWjUZ
-        IoegNqdSESvuTzqnS6TUx1j58Z3O
-X-Google-Smtp-Source: APXvYqzeYxxXHYEIo/pcKSWBekSZD9vDGQX17RLNqlzJ8t+B6cU3OhJuG6ZGCBM2XpH8HV+qRPbJiQ==
-X-Received: by 2002:a17:906:1f43:: with SMTP id d3mr2090680ejk.169.1562313189103;
-        Fri, 05 Jul 2019 00:53:09 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=0wG0Qp0DymOFsW+hfNfz0YB5oNq3mQs/TYBemqc1SNE=;
+        b=FlucLHE9Di5kD0gaOQG4pG0XqblyeFmifydnLQf7B0OHUHGjeaVT1JH9ILltFAmKX9
+         DqPsr6PQ+wPWW4Y5Zfa5G71W7vUrOu4Xhh5WfUDNpW/czUI9jBJ2uRfRNRFIi+cC8eox
+         RjPrWLVWDUExPJZriXdCne3BHC0gVCUuwtXqEiaSadb40n1X/uQhSc+awIZWCKNWKa9B
+         LRCwZMBR/jHYugsFdfyLrPwLTlEShA1LtXGqc+8h/pypOK1mXWqiW+DsStSsUDwGfqFK
+         TqNyenAzyDZDcl+PI0tyzSjKuSOXMJT0lQdPnPxpdKkBBk0o4pOvVswmdfAcly3ka6js
+         2E6Q==
+X-Gm-Message-State: APjAAAWQSX+3mfd53yuTTJ+5bXRnIOtpI2qOnBqyB1+Oc/CSOYavk0xX
+        eyTAM/v67p+63niR4JZQk+4rYndy
+X-Google-Smtp-Source: APXvYqxkqO0QUG68MK4MqWtHOPSptm81nukfn5w1h56BYkVN0Yu4m6pjJoxAyTupLoLdR1jfYM8EkA==
+X-Received: by 2002:a17:906:505:: with SMTP id j5mr2303032eja.261.1562315938358;
+        Fri, 05 Jul 2019 01:38:58 -0700 (PDT)
 Received: from localhost.localdomain.com ([188.204.2.113])
-        by smtp.gmail.com with ESMTPSA id z2sm1551438ejp.73.2019.07.05.00.53.08
+        by smtp.gmail.com with ESMTPSA id r44sm2457525edd.20.2019.07.05.01.38.57
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 05 Jul 2019 00:53:08 -0700 (PDT)
+        Fri, 05 Jul 2019 01:38:57 -0700 (PDT)
 From:   Pascal van Leeuwen <pascalvanl@gmail.com>
 X-Google-Original-From: Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
 To:     linux-crypto@vger.kernel.org
 Cc:     antoine.tenart@bootlin.com, herbert@gondor.apana.org.au,
         davem@davemloft.net,
         Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
-Subject: [PATCH 2/3] crypto: inside-secure - added support for rfc3686(ctr(aes))
-Date:   Fri,  5 Jul 2019 08:49:23 +0200
-Message-Id: <1562309364-942-3-git-send-email-pvanleeuwen@verimatrix.com>
+Subject: [PATCH] crypto: inside-secure -reduce hash byte counters to 64 bits
+Date:   Fri,  5 Jul 2019 09:36:31 +0200
+Message-Id: <1562312191-8202-1-git-send-email-pvanleeuwen@verimatrix.com>
 X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1562309364-942-1-git-send-email-pvanleeuwen@verimatrix.com>
-References: <1562309364-942-1-git-send-email-pvanleeuwen@verimatrix.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+This patch recognises the fact that the hardware cannot ever process more
+than 2,199,023,386,111 bytes of hash or HMAC payload, so there is no point
+in maintaining 128 bit wide byte counters, 64 bits is more than sufficient
+
 Signed-off-by: Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
 ---
- drivers/crypto/inside-secure/safexcel.c        |  15 +--
- drivers/crypto/inside-secure/safexcel.h        |  32 +----
- drivers/crypto/inside-secure/safexcel_cipher.c | 155 +++++++++++++++++++++----
- 3 files changed, 138 insertions(+), 64 deletions(-)
+ drivers/crypto/inside-secure/safexcel.h      |  4 +-
+ drivers/crypto/inside-secure/safexcel_hash.c | 88 +++++++++++-----------------
+ 2 files changed, 36 insertions(+), 56 deletions(-)
 
-diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
-index c3bb177..26f086b 100644
---- a/drivers/crypto/inside-secure/safexcel.c
-+++ b/drivers/crypto/inside-secure/safexcel.c
-@@ -506,17 +506,9 @@ static int safexcel_hw_init(struct safexcel_crypto_priv *priv)
- 		      EIP197_PE_EIP96_TOKEN_CTRL_POST_REUSE_CTX;
- 		writel(val, EIP197_PE(priv) + EIP197_PE_EIP96_TOKEN_CTRL(pe));
- 
--		/* H/W capabilities selection */
--		val = EIP197_FUNCTION_RSVD;
--		val |= EIP197_PROTOCOL_ENCRYPT_ONLY | EIP197_PROTOCOL_HASH_ONLY;
--		val |= EIP197_PROTOCOL_ENCRYPT_HASH | EIP197_PROTOCOL_HASH_DECRYPT;
--		val |= EIP197_ALG_DES_ECB | EIP197_ALG_DES_CBC;
--		val |= EIP197_ALG_3DES_ECB | EIP197_ALG_3DES_CBC;
--		val |= EIP197_ALG_AES_ECB | EIP197_ALG_AES_CBC;
--		val |= EIP197_ALG_MD5 | EIP197_ALG_HMAC_MD5;
--		val |= EIP197_ALG_SHA1 | EIP197_ALG_HMAC_SHA1;
--		val |= EIP197_ALG_SHA2 | EIP197_ALG_HMAC_SHA2;
--		writel(val, EIP197_PE(priv) + EIP197_PE_EIP96_FUNCTION_EN(pe));
-+		/* H/W capabilities selection: just enable everything */
-+		writel(EIP197_FUNCTION_ALL,
-+		       EIP197_PE(priv) + EIP197_PE_EIP96_FUNCTION_EN(pe));
- 	}
- 
- 	/* Command Descriptor Rings prepare */
-@@ -987,6 +979,7 @@ static int safexcel_request_ring_irq(void *pdev, int irqid,
- 	&safexcel_alg_cbc_des3_ede,
- 	&safexcel_alg_ecb_aes,
- 	&safexcel_alg_cbc_aes,
-+	&safexcel_alg_ctr_aes,
- 	&safexcel_alg_md5,
- 	&safexcel_alg_sha1,
- 	&safexcel_alg_sha224,
 diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
-index 765f481..af71120 100644
+index 36657c3..379d0b0 100644
 --- a/drivers/crypto/inside-secure/safexcel.h
 +++ b/drivers/crypto/inside-secure/safexcel.h
-@@ -279,35 +279,7 @@
- #define EIP197_PE_EIP96_TOKEN_CTRL_POST_REUSE_CTX	BIT(20)
+@@ -643,8 +643,8 @@ struct safexcel_context {
+ #define HASH_CACHE_SIZE			SHA512_BLOCK_SIZE
  
- /* EIP197_PE_EIP96_FUNCTION_EN */
--#define EIP197_FUNCTION_RSVD			(BIT(6) | BIT(15) | BIT(20) | BIT(23))
--#define EIP197_PROTOCOL_HASH_ONLY		BIT(0)
--#define EIP197_PROTOCOL_ENCRYPT_ONLY		BIT(1)
--#define EIP197_PROTOCOL_HASH_ENCRYPT		BIT(2)
--#define EIP197_PROTOCOL_HASH_DECRYPT		BIT(3)
--#define EIP197_PROTOCOL_ENCRYPT_HASH		BIT(4)
--#define EIP197_PROTOCOL_DECRYPT_HASH		BIT(5)
--#define EIP197_ALG_ARC4				BIT(7)
--#define EIP197_ALG_AES_ECB			BIT(8)
--#define EIP197_ALG_AES_CBC			BIT(9)
--#define EIP197_ALG_AES_CTR_ICM			BIT(10)
--#define EIP197_ALG_AES_OFB			BIT(11)
--#define EIP197_ALG_AES_CFB			BIT(12)
--#define EIP197_ALG_DES_ECB			BIT(13)
--#define EIP197_ALG_DES_CBC			BIT(14)
--#define EIP197_ALG_DES_OFB			BIT(16)
--#define EIP197_ALG_DES_CFB			BIT(17)
--#define EIP197_ALG_3DES_ECB			BIT(18)
--#define EIP197_ALG_3DES_CBC			BIT(19)
--#define EIP197_ALG_3DES_OFB			BIT(21)
--#define EIP197_ALG_3DES_CFB			BIT(22)
--#define EIP197_ALG_MD5				BIT(24)
--#define EIP197_ALG_HMAC_MD5			BIT(25)
--#define EIP197_ALG_SHA1				BIT(26)
--#define EIP197_ALG_HMAC_SHA1			BIT(27)
--#define EIP197_ALG_SHA2				BIT(28)
--#define EIP197_ALG_HMAC_SHA2			BIT(29)
--#define EIP197_ALG_AES_XCBC_MAC			BIT(30)
--#define EIP197_ALG_GCM_HASH			BIT(31)
-+#define EIP197_FUNCTION_ALL			0xffffffff
+ struct safexcel_ahash_export_state {
+-	u64 len[2];
+-	u64 processed[2];
++	u64 len;
++	u64 processed;
  
- /* EIP197_PE_EIP96_CONTEXT_CTRL */
- #define EIP197_CONTEXT_SIZE(n)			(n)
-@@ -356,6 +328,7 @@ struct safexcel_context_record {
- /* control1 */
- #define CONTEXT_CONTROL_CRYPTO_MODE_ECB		(0 << 0)
- #define CONTEXT_CONTROL_CRYPTO_MODE_CBC		(1 << 0)
-+#define CONTEXT_CONTROL_CRYPTO_MODE_CTR_LOAD	(6 << 0)
- #define CONTEXT_CONTROL_IV0			BIT(5)
- #define CONTEXT_CONTROL_IV1			BIT(6)
- #define CONTEXT_CONTROL_IV2			BIT(7)
-@@ -748,6 +721,7 @@ int safexcel_hmac_setkey(const char *alg, const u8 *key, unsigned int keylen,
- extern struct safexcel_alg_template safexcel_alg_cbc_des3_ede;
- extern struct safexcel_alg_template safexcel_alg_ecb_aes;
- extern struct safexcel_alg_template safexcel_alg_cbc_aes;
-+extern struct safexcel_alg_template safexcel_alg_ctr_aes;
- extern struct safexcel_alg_template safexcel_alg_md5;
- extern struct safexcel_alg_template safexcel_alg_sha1;
- extern struct safexcel_alg_template safexcel_alg_sha224;
-diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-secure/safexcel_cipher.c
-index 5eed890..91945b1 100644
---- a/drivers/crypto/inside-secure/safexcel_cipher.c
-+++ b/drivers/crypto/inside-secure/safexcel_cipher.c
-@@ -40,6 +40,7 @@ struct safexcel_cipher_ctx {
- 	bool aead;
+ 	u32 digest;
  
- 	__le32 key[8];
-+	u32 nonce;
- 	unsigned int key_len;
+diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
+index bdbaea9..626dd82 100644
+--- a/drivers/crypto/inside-secure/safexcel_hash.c
++++ b/drivers/crypto/inside-secure/safexcel_hash.c
+@@ -41,8 +41,8 @@ struct safexcel_ahash_req {
+ 	u8 block_sz;    /* block size, only set once */
+ 	u32 state[SHA512_DIGEST_SIZE / sizeof(u32)] __aligned(sizeof(u32));
  
- 	/* All the below is AEAD specific */
-@@ -62,9 +63,9 @@ static void safexcel_skcipher_token(struct safexcel_cipher_ctx *ctx, u8 *iv,
- 				    u32 length)
+-	u64 len[2];
+-	u64 processed[2];
++	u64 len;
++	u64 processed;
+ 
+ 	u8 cache[HASH_CACHE_SIZE] __aligned(sizeof(u32));
+ 	dma_addr_t cache_dma;
+@@ -53,12 +53,7 @@ struct safexcel_ahash_req {
+ 
+ static inline u64 safexcel_queued_len(struct safexcel_ahash_req *req)
  {
- 	struct safexcel_token *token;
--	u32 offset = 0, block_sz = 0;
-+	u32 block_sz = 0;
- 
--	if (ctx->mode == CONTEXT_CONTROL_CRYPTO_MODE_CBC) {
-+	if (ctx->mode != CONTEXT_CONTROL_CRYPTO_MODE_ECB) {
- 		switch (ctx->alg) {
- 		case SAFEXCEL_DES:
- 			block_sz = DES_BLOCK_SIZE;
-@@ -80,11 +81,20 @@ static void safexcel_skcipher_token(struct safexcel_cipher_ctx *ctx, u8 *iv,
- 			break;
- 		}
- 
--		offset = block_sz / sizeof(u32);
--		memcpy(cdesc->control_data.token, iv, block_sz);
-+		if (ctx->mode == CONTEXT_CONTROL_CRYPTO_MODE_CTR_LOAD) {
-+			/* 32 bit nonce */
-+			cdesc->control_data.token[0] = ctx->nonce;
-+			/* 64 bit IV part */
-+			memcpy(&cdesc->control_data.token[1], iv, 8);
-+			/* 32 bit counter, start at 1 (big endian!) */
-+			cdesc->control_data.token[3] = cpu_to_be32(1);
-+		} else {
-+			memcpy(cdesc->control_data.token, iv, block_sz);
-+		}
- 	}
- 
--	token = (struct safexcel_token *)(cdesc->control_data.token + offset);
-+	/* skip over worst case IV of 4 dwords, no need to be exact */
-+	token = (struct safexcel_token *)(cdesc->control_data.token + 4);
- 
- 	token[0].opcode = EIP197_TOKEN_OPCODE_DIRECTION;
- 	token[0].packet_length = length;
-@@ -101,33 +111,35 @@ static void safexcel_aead_token(struct safexcel_cipher_ctx *ctx, u8 *iv,
- 				u32 cryptlen, u32 assoclen, u32 digestsize)
- {
- 	struct safexcel_token *token;
--	unsigned offset = 0;
-+	u32 block_sz = 0;
- 
--	if (ctx->mode == CONTEXT_CONTROL_CRYPTO_MODE_CBC) {
--		offset = AES_BLOCK_SIZE / sizeof(u32);
--		memcpy(cdesc->control_data.token, iv, AES_BLOCK_SIZE);
-+	if (ctx->mode != CONTEXT_CONTROL_CRYPTO_MODE_ECB) {
-+		switch (ctx->alg) {
-+		case SAFEXCEL_DES:
-+			block_sz = DES_BLOCK_SIZE;
-+			cdesc->control_data.options |= EIP197_OPTION_2_TOKEN_IV_CMD;
-+			break;
-+		case SAFEXCEL_3DES:
-+			block_sz = DES3_EDE_BLOCK_SIZE;
-+			cdesc->control_data.options |= EIP197_OPTION_2_TOKEN_IV_CMD;
-+			break;
-+		case SAFEXCEL_AES:
-+			block_sz = AES_BLOCK_SIZE;
-+			cdesc->control_data.options |= EIP197_OPTION_4_TOKEN_IV_CMD;
-+			break;
-+		}
- 
--		cdesc->control_data.options |= EIP197_OPTION_4_TOKEN_IV_CMD;
-+		memcpy(cdesc->control_data.token, iv, block_sz);
- 	}
- 
--	token = (struct safexcel_token *)(cdesc->control_data.token + offset);
+-	u64 len, processed;
 -
- 	if (direction == SAFEXCEL_DECRYPT)
- 		cryptlen -= digestsize;
- 
--	token[0].opcode = EIP197_TOKEN_OPCODE_DIRECTION;
--	token[0].packet_length = assoclen;
--	token[0].instructions = EIP197_TOKEN_INS_TYPE_HASH;
+-	len = (0xffffffff * req->len[1]) + req->len[0];
+-	processed = (0xffffffff * req->processed[1]) + req->processed[0];
 -
--	token[1].opcode = EIP197_TOKEN_OPCODE_DIRECTION;
--	token[1].packet_length = cryptlen;
--	token[1].stat = EIP197_TOKEN_STAT_LAST_HASH;
--	token[1].instructions = EIP197_TOKEN_INS_LAST |
--				EIP197_TOKEN_INS_TYPE_CRYPTO |
--				EIP197_TOKEN_INS_TYPE_HASH |
--				EIP197_TOKEN_INS_TYPE_OUTPUT;
--
- 	if (direction == SAFEXCEL_ENCRYPT) {
-+		/* align end of instruction sequence to end of token */
-+		token = (struct safexcel_token *)(cdesc->control_data.token +
-+			 EIP197_MAX_TOKENS - 3);
-+
- 		token[2].opcode = EIP197_TOKEN_OPCODE_INSERT;
- 		token[2].packet_length = digestsize;
- 		token[2].stat = EIP197_TOKEN_STAT_LAST_HASH |
-@@ -135,6 +147,10 @@ static void safexcel_aead_token(struct safexcel_cipher_ctx *ctx, u8 *iv,
- 		token[2].instructions = EIP197_TOKEN_INS_TYPE_OUTPUT |
- 					EIP197_TOKEN_INS_INSERT_HASH_DIGEST;
- 	} else {
-+		/* align end of instruction sequence to end of token */
-+		token = (struct safexcel_token *)(cdesc->control_data.token +
-+			 EIP197_MAX_TOKENS - 4);
-+
- 		token[2].opcode = EIP197_TOKEN_OPCODE_RETRIEVE;
- 		token[2].packet_length = digestsize;
- 		token[2].stat = EIP197_TOKEN_STAT_LAST_HASH |
-@@ -148,6 +164,19 @@ static void safexcel_aead_token(struct safexcel_cipher_ctx *ctx, u8 *iv,
- 				EIP197_TOKEN_STAT_LAST_PACKET;
- 		token[3].instructions = EIP197_TOKEN_INS_TYPE_OUTPUT;
- 	}
-+
-+	token[0].opcode = EIP197_TOKEN_OPCODE_DIRECTION;
-+	token[0].packet_length = assoclen;
-+	token[0].instructions = EIP197_TOKEN_INS_TYPE_HASH;
-+
-+	token[1].opcode = EIP197_TOKEN_OPCODE_DIRECTION;
-+	token[1].packet_length = cryptlen;
-+	token[1].stat = EIP197_TOKEN_STAT_LAST_HASH;
-+	token[1].instructions = EIP197_TOKEN_INS_LAST |
-+				EIP197_TOKEN_INS_TYPE_CRYPTO |
-+				EIP197_TOKEN_INS_TYPE_HASH |
-+				EIP197_TOKEN_INS_TYPE_OUTPUT;
-+
+-	return len - processed;
++	return req->len - req->processed;
  }
  
- static int safexcel_skcipher_aes_setkey(struct crypto_skcipher *ctfm,
-@@ -1044,6 +1073,84 @@ struct safexcel_alg_template safexcel_alg_cbc_aes = {
- 	},
- };
+ static void safexcel_hash_token(struct safexcel_command_desc *cdesc,
+@@ -94,7 +89,7 @@ static void safexcel_context_control(struct safexcel_ahash_ctx *ctx,
+ 	 * fields. Do this now as we need it to setup the first command
+ 	 * descriptor.
+ 	 */
+-	if ((!req->processed[0]) && (!req->processed[1])) {
++	if (!req->processed) {
+ 		/* First - and possibly only - block of basic hash only */
+ 		if (req->finish) {
+ 			cdesc->control_data.control0 |=
+@@ -119,11 +114,8 @@ static void safexcel_context_control(struct safexcel_ahash_ctx *ctx,
+ 	if (req->finish) {
+ 		/* Compute digest count for hash/HMAC finish operations */
+ 		if ((req->digest == CONTEXT_CONTROL_DIGEST_PRECOMPUTED) ||
+-		    req->hmac_zlen || req->processed[1] ||
+-		    (req->processed[0] != req->block_sz)) {
+-			count = req->processed[0] / EIP197_COUNTER_BLOCK_SIZE;
+-			count += ((0x100000000ULL / EIP197_COUNTER_BLOCK_SIZE) *
+-				  req->processed[1]);
++		    req->hmac_zlen || (req->processed != req->block_sz)) {
++			count = req->processed / EIP197_COUNTER_BLOCK_SIZE;
  
-+static int safexcel_ctr_aes_encrypt(struct skcipher_request *req)
-+{
-+	return safexcel_queue_req(&req->base, skcipher_request_ctx(req),
-+			SAFEXCEL_ENCRYPT, CONTEXT_CONTROL_CRYPTO_MODE_CTR_LOAD,
-+			SAFEXCEL_AES);
-+}
-+
-+static int safexcel_ctr_aes_decrypt(struct skcipher_request *req)
-+{
-+	return safexcel_queue_req(&req->base, skcipher_request_ctx(req),
-+			SAFEXCEL_DECRYPT, CONTEXT_CONTROL_CRYPTO_MODE_CTR_LOAD,
-+			SAFEXCEL_AES);
-+}
-+
-+static int safexcel_skcipher_aesctr_setkey(struct crypto_skcipher *ctfm,
-+					   const u8 *key, unsigned int len)
-+{
-+	struct crypto_tfm *tfm = crypto_skcipher_tfm(ctfm);
-+	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
-+	struct safexcel_crypto_priv *priv = ctx->priv;
-+	struct crypto_aes_ctx aes;
-+	int ret, i;
-+	unsigned int keylen;
-+
-+	/* last 4 bytes of key are the nonce! */
-+	ctx->nonce = *(u32 *)(key + len - 4);
-+	/* exclude the nonce here */
-+	keylen = len - 4;
-+	ret = crypto_aes_expand_key(&aes, key, keylen);
-+	if (ret) {
-+		crypto_skcipher_set_flags(ctfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
-+		return ret;
-+	}
-+
-+	if (priv->flags & EIP197_TRC_CACHE && ctx->base.ctxr_dma) {
-+		for (i = 0; i < keylen / sizeof(u32); i++) {
-+			if (ctx->key[i] != cpu_to_le32(aes.key_enc[i])) {
-+				ctx->base.needs_inv = true;
-+				break;
-+			}
-+		}
-+	}
-+
-+	for (i = 0; i < keylen / sizeof(u32); i++)
-+		ctx->key[i] = cpu_to_le32(aes.key_enc[i]);
-+
-+	ctx->key_len = keylen;
-+
-+	memzero_explicit(&aes, sizeof(aes));
-+	return 0;
-+}
-+
-+struct safexcel_alg_template safexcel_alg_ctr_aes = {
-+	.type = SAFEXCEL_ALG_TYPE_SKCIPHER,
-+	.alg.skcipher = {
-+		.setkey = safexcel_skcipher_aesctr_setkey,
-+		.encrypt = safexcel_ctr_aes_encrypt,
-+		.decrypt = safexcel_ctr_aes_decrypt,
-+		/* Add 4 to include the 4 byte nonce! */
-+		.min_keysize = AES_MIN_KEY_SIZE + 4,
-+		.max_keysize = AES_MAX_KEY_SIZE + 4,
-+		.ivsize = 8,
-+		.base = {
-+			.cra_name = "rfc3686(ctr(aes))",
-+			.cra_driver_name = "safexcel-ctr-aes",
-+			.cra_priority = 300,
-+			.cra_flags = CRYPTO_ALG_ASYNC |
-+				     CRYPTO_ALG_KERN_DRIVER_ONLY,
-+			.cra_blocksize = 1,
-+			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
-+			.cra_alignmask = 0,
-+			.cra_init = safexcel_skcipher_cra_init,
-+			.cra_exit = safexcel_skcipher_cra_exit,
-+			.cra_module = THIS_MODULE,
-+		},
-+	},
-+};
-+
- static int safexcel_cbc_des_encrypt(struct skcipher_request *req)
- {
- 	return safexcel_queue_req(&req->base, skcipher_request_ctx(req),
+ 			/* This is a hardware limitation, as the
+ 			 * counter must fit into an u32. This represents
+@@ -141,8 +133,7 @@ static void safexcel_context_control(struct safexcel_ahash_ctx *ctx,
+ 		    /* Special case: zero length HMAC */
+ 		    req->hmac_zlen ||
+ 		    /* PE HW < 4.4 cannot do HMAC continue, fake using hash */
+-		    ((req->processed[1] ||
+-		      (req->processed[0] != req->block_sz)))) {
++		    (req->processed != req->block_sz)) {
+ 			/* Basic hash continue operation, need digest + cnt */
+ 			cdesc->control_data.control0 |=
+ 				CONTEXT_CONTROL_SIZE((req->state_sz >> 2) + 1) |
+@@ -234,11 +225,9 @@ static int safexcel_handle_req_result(struct safexcel_crypto_priv *priv,
+ 
+ 			memcpy(sreq->state, ctx->opad, sreq->state_sz);
+ 
+-			sreq->len[0] = sreq->block_sz +
+-				       crypto_ahash_digestsize(ahash);
+-			sreq->len[1] = 0;
+-			sreq->processed[0] = sreq->block_sz;
+-			sreq->processed[1] = 0;
++			sreq->len = sreq->block_sz +
++				    crypto_ahash_digestsize(ahash);
++			sreq->processed = sreq->block_sz;
+ 			sreq->hmac = 0;
+ 
+ 			ctx->base.needs_inv = true;
+@@ -393,9 +382,7 @@ static int safexcel_ahash_send_req(struct crypto_async_request *async, int ring,
+ 
+ 	safexcel_rdr_req_set(priv, ring, rdesc, &areq->base);
+ 
+-	req->processed[0] += len;
+-	if (req->processed[0] < len)
+-		req->processed[1]++;
++	req->processed += len;
+ 
+ 	*commands = n_cdesc;
+ 	*results = 1;
+@@ -603,15 +590,14 @@ static int safexcel_ahash_enqueue(struct ahash_request *areq)
+ 
+ 	if (ctx->base.ctxr) {
+ 		if (priv->flags & EIP197_TRC_CACHE && !ctx->base.needs_inv &&
+-		    (req->processed[0] || req->processed[1]) &&
++		    req->processed &&
+ 		    (/* invalidate for basic hash continuation finish */
+ 		     (req->finish &&
+ 		      (req->digest == CONTEXT_CONTROL_DIGEST_PRECOMPUTED)) ||
+ 		     /* invalidate if (i)digest changed */
+ 		     memcmp(ctx->base.ctxr->data, req->state, req->state_sz) ||
+ 		     /* invalidate for HMAC continuation finish */
+-		     (req->finish && (req->processed[1] ||
+-		      (req->processed[0] != req->block_sz))) ||
++		     (req->finish && (req->processed != req->block_sz)) ||
+ 		     /* invalidate for HMAC finish with odigest changed */
+ 		     (req->finish &&
+ 		      memcmp(ctx->base.ctxr->data + (req->state_sz>>2),
+@@ -662,9 +648,7 @@ static int safexcel_ahash_update(struct ahash_request *areq)
+ 	ret = safexcel_ahash_cache(areq);
+ 
+ 	/* Update total request length */
+-	req->len[0] += areq->nbytes;
+-	if (req->len[0] < areq->nbytes)
+-		req->len[1]++;
++	req->len += areq->nbytes;
+ 
+ 	/* If not all data could fit into the cache, go process the excess.
+ 	 * Also go process immediately for an HMAC IV precompute, which
+@@ -683,7 +667,7 @@ static int safexcel_ahash_final(struct ahash_request *areq)
+ 
+ 	req->finish = true;
+ 
+-	if (unlikely(!req->len[0] && !req->len[1] && !areq->nbytes)) {
++	if (unlikely(!req->len && !areq->nbytes)) {
+ 		/*
+ 		 * If we have an overall 0 length *hash* request:
+ 		 * The HW cannot do 0 length hash, so we provide the correct
+@@ -709,8 +693,8 @@ static int safexcel_ahash_final(struct ahash_request *areq)
+ 			       SHA512_DIGEST_SIZE);
+ 
+ 		return 0;
+-	} else if (unlikely(req->hmac && !req->len[1] &&
+-			    (req->len[0] == req->block_sz) &&
++	} else if (unlikely(req->hmac &&
++			    (req->len == req->block_sz) &&
+ 			    !areq->nbytes)) {
+ 		/*
+ 		 * If we have an overall 0 length *HMAC* request:
+@@ -736,7 +720,7 @@ static int safexcel_ahash_final(struct ahash_request *areq)
+ 						      255;
+ 		}
+ 
+-		req->len[0] += req->block_sz; /* plus 1 hash block */
++		req->len += req->block_sz; /* plus 1 hash block */
+ 
+ 		/* Set special zero-length HMAC flag */
+ 		req->hmac_zlen = true;
+@@ -766,10 +750,8 @@ static int safexcel_ahash_export(struct ahash_request *areq, void *out)
+ 	struct safexcel_ahash_req *req = ahash_request_ctx(areq);
+ 	struct safexcel_ahash_export_state *export = out;
+ 
+-	export->len[0] = req->len[0];
+-	export->len[1] = req->len[1];
+-	export->processed[0] = req->processed[0];
+-	export->processed[1] = req->processed[1];
++	export->len = req->len;
++	export->processed = req->processed;
+ 
+ 	export->digest = req->digest;
+ 
+@@ -789,10 +771,8 @@ static int safexcel_ahash_import(struct ahash_request *areq, const void *in)
+ 	if (ret)
+ 		return ret;
+ 
+-	req->len[0] = export->len[0];
+-	req->len[1] = export->len[1];
+-	req->processed[0] = export->processed[0];
+-	req->processed[1] = export->processed[1];
++	req->len = export->len;
++	req->processed = export->processed;
+ 
+ 	req->digest = export->digest;
+ 
+@@ -902,8 +882,8 @@ static int safexcel_hmac_sha1_init(struct ahash_request *areq)
+ 	/* Start from ipad precompute */
+ 	memcpy(req->state, ctx->ipad, SHA1_DIGEST_SIZE);
+ 	/* Already processed the key^ipad part now! */
+-	req->len[0]	  = SHA1_BLOCK_SIZE;
+-	req->processed[0] = SHA1_BLOCK_SIZE;
++	req->len	= SHA1_BLOCK_SIZE;
++	req->processed	= SHA1_BLOCK_SIZE;
+ 
+ 	ctx->alg = CONTEXT_CONTROL_CRYPTO_ALG_SHA1;
+ 	req->digest = CONTEXT_CONTROL_DIGEST_PRECOMPUTED;
+@@ -1258,8 +1238,8 @@ static int safexcel_hmac_sha224_init(struct ahash_request *areq)
+ 	/* Start from ipad precompute */
+ 	memcpy(req->state, ctx->ipad, SHA256_DIGEST_SIZE);
+ 	/* Already processed the key^ipad part now! */
+-	req->len[0]	  = SHA256_BLOCK_SIZE;
+-	req->processed[0] = SHA256_BLOCK_SIZE;
++	req->len	= SHA256_BLOCK_SIZE;
++	req->processed	= SHA256_BLOCK_SIZE;
+ 
+ 	ctx->alg = CONTEXT_CONTROL_CRYPTO_ALG_SHA224;
+ 	req->digest = CONTEXT_CONTROL_DIGEST_PRECOMPUTED;
+@@ -1327,8 +1307,8 @@ static int safexcel_hmac_sha256_init(struct ahash_request *areq)
+ 	/* Start from ipad precompute */
+ 	memcpy(req->state, ctx->ipad, SHA256_DIGEST_SIZE);
+ 	/* Already processed the key^ipad part now! */
+-	req->len[0]	  = SHA256_BLOCK_SIZE;
+-	req->processed[0] = SHA256_BLOCK_SIZE;
++	req->len	= SHA256_BLOCK_SIZE;
++	req->processed	= SHA256_BLOCK_SIZE;
+ 
+ 	ctx->alg = CONTEXT_CONTROL_CRYPTO_ALG_SHA256;
+ 	req->digest = CONTEXT_CONTROL_DIGEST_PRECOMPUTED;
+@@ -1504,8 +1484,8 @@ static int safexcel_hmac_sha512_init(struct ahash_request *areq)
+ 	/* Start from ipad precompute */
+ 	memcpy(req->state, ctx->ipad, SHA512_DIGEST_SIZE);
+ 	/* Already processed the key^ipad part now! */
+-	req->len[0]	  = SHA512_BLOCK_SIZE;
+-	req->processed[0] = SHA512_BLOCK_SIZE;
++	req->len	= SHA512_BLOCK_SIZE;
++	req->processed	= SHA512_BLOCK_SIZE;
+ 
+ 	ctx->alg = CONTEXT_CONTROL_CRYPTO_ALG_SHA512;
+ 	req->digest = CONTEXT_CONTROL_DIGEST_PRECOMPUTED;
+@@ -1573,8 +1553,8 @@ static int safexcel_hmac_sha384_init(struct ahash_request *areq)
+ 	/* Start from ipad precompute */
+ 	memcpy(req->state, ctx->ipad, SHA512_DIGEST_SIZE);
+ 	/* Already processed the key^ipad part now! */
+-	req->len[0]	  = SHA512_BLOCK_SIZE;
+-	req->processed[0] = SHA512_BLOCK_SIZE;
++	req->len	= SHA512_BLOCK_SIZE;
++	req->processed	= SHA512_BLOCK_SIZE;
+ 
+ 	ctx->alg = CONTEXT_CONTROL_CRYPTO_ALG_SHA384;
+ 	req->digest = CONTEXT_CONTROL_DIGEST_PRECOMPUTED;
+@@ -1689,8 +1669,8 @@ static int safexcel_hmac_md5_init(struct ahash_request *areq)
+ 	/* Start from ipad precompute */
+ 	memcpy(req->state, ctx->ipad, MD5_DIGEST_SIZE);
+ 	/* Already processed the key^ipad part now! */
+-	req->len[0]	  = MD5_HMAC_BLOCK_SIZE;
+-	req->processed[0] = MD5_HMAC_BLOCK_SIZE;
++	req->len	= MD5_HMAC_BLOCK_SIZE;
++	req->processed	= MD5_HMAC_BLOCK_SIZE;
+ 
+ 	ctx->alg = CONTEXT_CONTROL_CRYPTO_ALG_MD5;
+ 	req->digest = CONTEXT_CONTROL_DIGEST_PRECOMPUTED;
 -- 
 1.8.3.1
 
