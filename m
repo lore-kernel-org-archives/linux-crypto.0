@@ -2,107 +2,189 @@ Return-Path: <SRS0=KAtS=VF=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3871C606BD
-	for <linux-crypto@archiver.kernel.org>; Mon,  8 Jul 2019 17:08:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55F42C606C7
+	for <linux-crypto@archiver.kernel.org>; Mon,  8 Jul 2019 17:50:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9608021479
-	for <linux-crypto@archiver.kernel.org>; Mon,  8 Jul 2019 17:08:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 299B4218A0
+	for <linux-crypto@archiver.kernel.org>; Mon,  8 Jul 2019 17:50:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="uj+jsllU"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Cp2JMiqR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729085AbfGHRIM (ORCPT
+        id S1730866AbfGHRtZ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 8 Jul 2019 13:08:12 -0400
-Received: from mail-eopbgr780042.outbound.protection.outlook.com ([40.107.78.42]:27040
-        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728323AbfGHRIM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 8 Jul 2019 13:08:12 -0400
+        Mon, 8 Jul 2019 13:49:25 -0400
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:43802 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729306AbfGHRtZ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 8 Jul 2019 13:49:25 -0400
+Received: by mail-pl1-f195.google.com with SMTP id cl9so8621951plb.10
+        for <linux-crypto@vger.kernel.org>; Mon, 08 Jul 2019 10:49:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector1-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yXyyrwNPph9qS1pNK/xUppy4I0eajQuYeHJbvuEJJlU=;
- b=uj+jsllUQvfDA3gjVpLNmFPMSocY6NZaZO+ikUG939co8iFu59VzTEpcxf4Mhf/qcyXGKVFc2mFIaG86fuWr/4Xl67Qlu01M6S08oMR1n8ImRhWoEPHFhQ4hxx/fVCD8q86QI8S0+AIB15d1MyAPlkVUCp4Rw1TXRut9gpFb9bg=
-Received: from DM5PR12MB1449.namprd12.prod.outlook.com (10.172.40.14) by
- DM5PR12MB1708.namprd12.prod.outlook.com (10.175.89.22) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2052.18; Mon, 8 Jul 2019 17:08:09 +0000
-Received: from DM5PR12MB1449.namprd12.prod.outlook.com
- ([fe80::a894:b1d5:a126:adce]) by DM5PR12MB1449.namprd12.prod.outlook.com
- ([fe80::a894:b1d5:a126:adce%6]) with mapi id 15.20.2052.019; Mon, 8 Jul 2019
- 17:08:09 +0000
-From:   Gary R Hook <ghook@amd.com>
-To:     Eric Biggers <ebiggers@kernel.org>,
-        "Hook, Gary" <Gary.Hook@amd.com>
-CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>
-Subject: Re: [PATCH] crypto: ccp - memset structure fields to zero before
- reuse
-Thread-Topic: [PATCH] crypto: ccp - memset structure fields to zero before
- reuse
-Thread-Index: AQHVMdSCRv0gts48Gk+YiLK37j85MKa8b1UAgASMbQA=
-Date:   Mon, 8 Jul 2019 17:08:09 +0000
-Message-ID: <2cc5e065-0fce-5278-9c38-3bdd4755f21f@amd.com>
-References: <156218168473.3184.15319927087462863547.stgit@sosrh3.amd.com>
- <20190705194028.GB4022@sol.localdomain>
-In-Reply-To: <20190705194028.GB4022@sol.localdomain>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: BL0PR03CA0011.namprd03.prod.outlook.com
- (2603:10b6:208:2d::24) To DM5PR12MB1449.namprd12.prod.outlook.com
- (2603:10b6:4:10::14)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Gary.Hook@amd.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-originating-ip: [165.204.84.11]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 73272329-07f7-4734-533b-08d703c6d9ec
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:DM5PR12MB1708;
-x-ms-traffictypediagnostic: DM5PR12MB1708:
-x-microsoft-antispam-prvs: <DM5PR12MB170829CD500A2F8745860213FDF60@DM5PR12MB1708.namprd12.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:7219;
-x-forefront-prvs: 00922518D8
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(136003)(346002)(376002)(39860400002)(366004)(396003)(189003)(199004)(386003)(31696002)(6506007)(76176011)(110136005)(102836004)(316002)(54906003)(6246003)(52116002)(99286004)(72206003)(53936002)(31686004)(66556008)(4744005)(71190400001)(5660300002)(305945005)(66476007)(14444005)(36756003)(64756008)(2906002)(26005)(73956011)(66066001)(66446008)(53546011)(71200400001)(186003)(6512007)(14454004)(3846002)(6116002)(229853002)(8676002)(25786009)(11346002)(446003)(7736002)(81166006)(8936002)(68736007)(2616005)(4326008)(81156014)(6486002)(6636002)(66946007)(486006)(256004)(6436002)(476003)(478600001);DIR:OUT;SFP:1101;SCL:1;SRVR:DM5PR12MB1708;H:DM5PR12MB1449.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: amd.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: Kc7AncsZ+1Tb4oR2WFh2KaJlQKmjWrQKERa921FZt862XufTxQt3ROIM2WfcX35S3NeZvKuj8tisOv6W8Q8yMGb9JO6hFopaKujpBbQLiftlyTaK93NRmo2hwSoBI2Vduh5eO6fuGN7H612od5UNz6BgiLgoGHgGlJp3ddLUQthLhkkO3eF7kWYUpVKn6HSdvWNdQetxVj5utvHqXk/u2ESQOmiHc5JaLZXhl53c/kcbieMuS3OPDMDnD1mT1TzsANoUzGns4um+LLOwi4LbHfpsdJPC4QQhyu7x3PzpjMwuYH9DAbZhNCDySo4m03woL/GoCeCt2lwkBVy0FjSEzbKnbSXL0VG4c7TZ/3GctnGCfT3iDfKTeyDNYZwFBBJ/MBPCTRmYsRvE0eMtOujk4L30T6ok/MZH9NDAsSvnQGo=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <0005E7DB6715444FAA7B57771CFD0994@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=u3wADtOhWERBIwfgOKqVInl3i4gu5vwcVNjYQ611JUc=;
+        b=Cp2JMiqRMbHHc8yVRj5gwNVXKSXDh307ZJxdfhj5m5wZqxjCcjOB1cq6Hoydsv5OFo
+         14RVaNEV9QQ8pm4bi7zWlnTUgO/o0R9Nb9nSi+ekxv0wRSSnm/Ntf2nDLjSDt3fpc+ag
+         If9clYeN+kLlkea7uIf7yLK5X+UGvuATfkHc4=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=u3wADtOhWERBIwfgOKqVInl3i4gu5vwcVNjYQ611JUc=;
+        b=D4ywm6H8Kdt1PrJE6EWBB5d9HnB60oyyUTZjHXWlIsVpzyzuqKBmjnzeWo/M12uEuk
+         MokSgt1hQsmyDK+615Lnex2NK5rjCXc7VT+NvNH0DukXDgK1KrbuaAScBLW1ErvXjxb3
+         /unUa2WAnlZyzAl7RRKhk6qHU5fFi1N1SLKbGiAo1p/q5kvP6m8J19Cd4XKMpnBqqwok
+         esuGvbKvtVy1o0NIxxGYdMyt2vP/4k8wp8orV8q/dToA3kqrd/oK8lR8We+F6zrMXEc1
+         VZRq3dY7lSe5vz/3vDKyqWTSg5x/sDy3O1aJvD00CPcslZs5vgr7a4fakaB7uui5/osc
+         MdvQ==
+X-Gm-Message-State: APjAAAUK+Z0pmjuBQJy2jbT5BgBz5KGzXdNa3Wi/AdNyGLUUooOfDCsk
+        CDQ0BVn5q2rkSTf5XqV87uyVbA==
+X-Google-Smtp-Source: APXvYqx5LipVNdbKqMBoKjNn4lRTatM0sZZZf8RlaGam+sYAQe4c/KcA1glvKLTNDdd17g2N+PzrMw==
+X-Received: by 2002:a17:902:6b02:: with SMTP id o2mr24590139plk.99.1562608164453;
+        Mon, 08 Jul 2019 10:49:24 -0700 (PDT)
+Received: from skynet.sea.corp.google.com ([2620:0:1008:1100:c4b5:ec23:d87b:d6d3])
+        by smtp.gmail.com with ESMTPSA id j1sm20151686pfe.101.2019.07.08.10.49.23
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Mon, 08 Jul 2019 10:49:23 -0700 (PDT)
+From:   Thomas Garnier <thgarnie@chromium.org>
+To:     kernel-hardening@lists.openwall.com
+Cc:     kristen@linux.intel.com, keescook@chromium.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+        Andy Lutomirski <luto@kernel.org>,
+        Juergen Gross <jgross@suse.com>,
+        Alok Kataria <akataria@vmware.com>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Thomas Garnier <thgarnie@chromium.org>,
+        Nadav Amit <namit@vmware.com>, Jann Horn <jannh@google.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Feng Tang <feng.tang@intel.com>,
+        Maran Wilson <maran.wilson@oracle.com>,
+        Enrico Weigelt <info@metux.net>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Alexios Zavras <alexios.zavras@intel.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org, linux-pm@vger.kernel.org
+Subject: [PATCH v8 00/11] x86: PIE support to extend KASLR randomization
+Date:   Mon,  8 Jul 2019 10:48:53 -0700
+Message-Id: <20190708174913.123308-1-thgarnie@chromium.org>
+X-Mailer: git-send-email 2.22.0.410.gd8fdbe21b5-goog
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 73272329-07f7-4734-533b-08d703c6d9ec
-X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Jul 2019 17:08:09.7021
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ghook@amd.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1708
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-T24gNy81LzE5IDI6NDAgUE0sIEVyaWMgQmlnZ2VycyB3cm90ZToNCj4gSGkgR2FyeSwNCj4gDQo+
-IE9uIFdlZCwgSnVsIDAzLCAyMDE5IGF0IDA3OjIxOjI2UE0gKzAwMDAsIEhvb2ssIEdhcnkgd3Jv
-dGU6DQo+PiBUaGUgQUVTIEdDTSBmdW5jdGlvbiByZXVzZXMgYW4gJ29wJyBkYXRhIHN0cnVjdHVy
-ZSwgd2hpY2ggbWVtYmVycw0KPj4gY29udGFpbiB2YWx1ZXMgdGhhdCBtdXN0IGJlIGNsZWFyZWQg
-Zm9yIGVhY2ggKHJlKXVzZS4NCj4+DQo+PiBGaXhlczogMzZjZjUxNWI5YmJlICgiY3J5cHRvOiBj
-Y3AgLSBFbmFibGUgc3VwcG9ydCBmb3IgQUVTIEdDTSBvbiB2NSBDQ1BzIikNCj4+DQo+PiBTaWdu
-ZWQtb2ZmLWJ5OiBHYXJ5IFIgSG9vayA8Z2FyeS5ob29rQGFtZC5jb20+DQo+PiAtLS0NCj4+ICAg
-ZHJpdmVycy9jcnlwdG8vY2NwL2NjcC1vcHMuYyB8ICAgMTIgKysrKysrKysrKystDQo+PiAgIDEg
-ZmlsZSBjaGFuZ2VkLCAxMSBpbnNlcnRpb25zKCspLCAxIGRlbGV0aW9uKC0pDQo+IA0KPiBJcyB0
-aGlzIHBhdGNoIG1lYW50IHRvIGZpeCB0aGUgZ2NtLWFlcy1jY3Agc2VsZi10ZXN0cyBmYWlsdXJl
-Pw0KDQpZZXNzaXIsIHRoYXQgaXMgdGhlIGludGVudGlvbi4gQXBvbG9naWVzIGZvciBub3QgY2xh
-cmlmeWluZyB0aGF0IHBvaW50Lg0KDQpncmgNCg0KDQo=
+Splitting the previous serie in two. This part contains assembly code
+changes required for PIE but without any direct dependencies with the
+rest of the patchset.
+
+Changes:
+ - patch v8 (assembly):
+   - Fix issues in crypto changes (thanks to Eric Biggers).
+   - Remove unnecessary jump table change.
+   - Change author and signoff to chromium email address.
+ - patch v7 (assembly):
+   - Split patchset and reorder changes.
+ - patch v6:
+   - Rebase on latest changes in jump tables and crypto.
+   - Fix wording on couple commits.
+   - Revisit checkpatch warnings.
+   - Moving to @chromium.org.
+ - patch v5:
+   - Adapt new crypto modules for PIE.
+   - Improve per-cpu commit message.
+   - Fix xen 32-bit build error with .quad.
+   - Remove extra code for ftrace.
+ - patch v4:
+   - Simplify early boot by removing global variables.
+   - Modify the mcount location script for __mcount_loc intead of the address
+     read in the ftrace implementation.
+   - Edit commit description to explain better where the kernel can be located.
+   - Streamlined the testing done on each patch proposal. Always testing
+     hibernation, suspend, ftrace and kprobe to ensure no regressions.
+ - patch v3:
+   - Update on message to describe longer term PIE goal.
+   - Minor change on ftrace if condition.
+   - Changed code using xchgq.
+ - patch v2:
+   - Adapt patch to work post KPTI and compiler changes
+   - Redo all performance testing with latest configs and compilers
+   - Simplify mov macro on PIE (MOVABS now)
+   - Reduce GOT footprint
+ - patch v1:
+   - Simplify ftrace implementation.
+   - Use gcc mstack-protector-guard-reg=%gs with PIE when possible.
+ - rfc v3:
+   - Use --emit-relocs instead of -pie to reduce dynamic relocation space on
+     mapped memory. It also simplifies the relocation process.
+   - Move the start the module section next to the kernel. Remove the need for
+     -mcmodel=large on modules. Extends module space from 1 to 2G maximum.
+   - Support for XEN PVH as 32-bit relocations can be ignored with
+     --emit-relocs.
+   - Support for GOT relocations previously done automatically with -pie.
+   - Remove need for dynamic PLT in modules.
+   - Support dymamic GOT for modules.
+ - rfc v2:
+   - Add support for global stack cookie while compiler default to fs without
+     mcmodel=kernel
+   - Change patch 7 to correctly jump out of the identity mapping on kexec load
+     preserve.
+
+These patches make some of the changes necessary to build the kernel as
+Position Independent Executable (PIE) on x86_64. Another patchset will
+add the PIE option and larger architecture changes.
+
+The patches:
+ - 1, 3-11: Change in assembly code to be PIE compliant.
+ - 2: Add a new _ASM_MOVABS macro to fetch a symbol address generically.
+
+diffstat:
+ crypto/aegis128-aesni-asm.S         |    6 +-
+ crypto/aegis128l-aesni-asm.S        |    8 +--
+ crypto/aegis256-aesni-asm.S         |    6 +-
+ crypto/aes-x86_64-asm_64.S          |   45 ++++++++++------
+ crypto/aesni-intel_asm.S            |    8 +--
+ crypto/aesni-intel_avx-x86_64.S     |    3 -
+ crypto/camellia-aesni-avx-asm_64.S  |   42 +++++++--------
+ crypto/camellia-aesni-avx2-asm_64.S |   44 ++++++++--------
+ crypto/camellia-x86_64-asm_64.S     |    8 +--
+ crypto/cast5-avx-x86_64-asm_64.S    |   50 ++++++++++--------
+ crypto/cast6-avx-x86_64-asm_64.S    |   44 +++++++++-------
+ crypto/des3_ede-asm_64.S            |   96 ++++++++++++++++++++++++------------
+ crypto/ghash-clmulni-intel_asm.S    |    4 -
+ crypto/glue_helper-asm-avx.S        |    4 -
+ crypto/glue_helper-asm-avx2.S       |    6 +-
+ crypto/morus1280-avx2-asm.S         |    4 -
+ crypto/morus1280-sse2-asm.S         |    8 +--
+ crypto/morus640-sse2-asm.S          |    6 +-
+ crypto/sha256-avx2-asm.S            |   18 ++++--
+ entry/entry_64.S                    |   16 ++++--
+ include/asm/alternative.h           |    6 +-
+ include/asm/asm.h                   |    1 
+ include/asm/paravirt_types.h        |   25 +++++++--
+ include/asm/pm-trace.h              |    2 
+ include/asm/processor.h             |    6 +-
+ kernel/acpi/wakeup_64.S             |   31 ++++++-----
+ kernel/head_64.S                    |   16 +++---
+ kernel/relocate_kernel_64.S         |    2 
+ power/hibernate_asm_64.S            |    4 -
+ 29 files changed, 306 insertions(+), 213 deletions(-)
+
+Patchset is based on next-20190708.
+
+
