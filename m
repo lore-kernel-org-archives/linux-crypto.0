@@ -2,250 +2,103 @@ Return-Path: <SRS0=mwGE=VG=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.8 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92280C48BE9
-	for <linux-crypto@archiver.kernel.org>; Tue,  9 Jul 2019 11:11:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BEC3C004EF
+	for <linux-crypto@archiver.kernel.org>; Tue,  9 Jul 2019 11:34:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6A5372082A
-	for <linux-crypto@archiver.kernel.org>; Tue,  9 Jul 2019 11:11:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3AA8F20844
+	for <linux-crypto@archiver.kernel.org>; Tue,  9 Jul 2019 11:34:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=benyossef-com.20150623.gappssmtp.com header.i=@benyossef-com.20150623.gappssmtp.com header.b="VlApBi7V"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726197AbfGILLb (ORCPT
+        id S1726060AbfGILed (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 9 Jul 2019 07:11:31 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:55986 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726211AbfGILLa (ORCPT
+        Tue, 9 Jul 2019 07:34:33 -0400
+Received: from mail-vs1-f68.google.com ([209.85.217.68]:40615 "EHLO
+        mail-vs1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726047AbfGILed (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 9 Jul 2019 07:11:30 -0400
-Received: by mail-wm1-f66.google.com with SMTP id a15so2618733wmj.5
-        for <linux-crypto@vger.kernel.org>; Tue, 09 Jul 2019 04:11:28 -0700 (PDT)
+        Tue, 9 Jul 2019 07:34:33 -0400
+Received: by mail-vs1-f68.google.com with SMTP id a186so10396823vsd.7
+        for <linux-crypto@vger.kernel.org>; Tue, 09 Jul 2019 04:34:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=benyossef-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=CGzDFS1Bv4DEi06akjll6evAdaNH8lWyUH1GXoVHxZw=;
+        b=VlApBi7VP6O0l5TLW4xKUeP1IP3gld8yI+26iO6zNpYhHfvwdWFMhV+Ua7LqXaGheH
+         XskVEtqaurt4yH7ETAnfX2RxLFGkcvxAXiNzliaEKP+vYZNjAHOxiFa83B4IxJ6XQSxr
+         kF/5w5ghuo5E0iWmaQBioi2mFKAD7V+vqzFAxkuAxkAfj1khA/+I+uU3CE0dIAbxjjOo
+         xRb6l5HMdw/MRvo9hTC/xjgj9L84BoTP6RZsCXAyH1cYLK9Ot+IchEqzH1EFi9OZ0bDB
+         WY6ohWHHZdBq++Ck1jD52zIiPcFBfZmeouzQ88Q2JW+RV1p21DWtZCxSwSOUGMTMeBDe
+         Pd2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=jGmHTjJZW0kk7n8QDUWDYgDVD45moRikNT/Us3qktnE=;
-        b=h4tudJWoBZlrf+Ml7SDSUkRqept1fQNDzhvjRZoYe0bKic3QVwHqtkBLAk42OK3jdg
-         44rjPDuQH64rMAsJlfmidqFkDs1/D37pXtcO+syc0x6XPTxyJLd4pAjt+HXgQml26X/o
-         6kmIRPJyqL66pTWpYF6hpd59RbHpzmTq00yjI3Df/ELjXuiw8k/OD3xyTy6iA7MUsXzq
-         tfFBlqpHqnNIYX0ZWYwSXPKbVRdOayaloMwr0NSPoKF0l4v4YVK+MZeZYIlJRnZq6eSK
-         fU6a9oiomkuw/v0A8Pqmz8GpojWLOCdEfvhBV8vSPQkj/Mv446IApD0WNrEB8mvXTdby
-         GlSw==
-X-Gm-Message-State: APjAAAWFJHBZCgjHnF8QnLqufv55h0TQTbZt7Ten/s0MNZ6JyjHdxHZf
-        iq2fQzx7YDdJ1KMyHEsSLXu5TvwqvU4=
-X-Google-Smtp-Source: APXvYqzB1p33l7Nc3w4T72Di5XiH+Y863LiYt2Xo+TDGQ6NeAxdtE31ay/MrqW8AgHsR/2Ckcz8+uA==
-X-Received: by 2002:a7b:cbcb:: with SMTP id n11mr21327811wmi.146.1562670687333;
-        Tue, 09 Jul 2019 04:11:27 -0700 (PDT)
-Received: from localhost.localdomain.com (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id f12sm21545425wrg.5.2019.07.09.04.11.26
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Tue, 09 Jul 2019 04:11:26 -0700 (PDT)
-From:   Ondrej Mosnacek <omosnace@redhat.com>
-To:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
-        Stephan Mueller <smueller@chronox.de>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Don Zickus <dzickus@redhat.com>
-Subject: [PATCH] crypto: user - make NETLINK_CRYPTO work inside netns
-Date:   Tue,  9 Jul 2019 13:11:24 +0200
-Message-Id: <20190709111124.31127-1-omosnace@redhat.com>
-X-Mailer: git-send-email 2.21.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=CGzDFS1Bv4DEi06akjll6evAdaNH8lWyUH1GXoVHxZw=;
+        b=FbNx/hH8ONubuRGXiaG/xolDty1HWhcGxXE7bhWUEf9IRM/3F6TU9lyzW0/ZphtBv5
+         P9BOJRXrlo9dXtw4roFLWfQqghGwGeCC5nhv4Ee9Tjmy9pUK7xQ5VqosVSjzOzqYoktC
+         yshU+L7Rl2IKobmdujs2o/t9cc4b5MeaX6e63+5OoxOI6G99kxuClBVqJaEL1wAk/tz/
+         L9nBBIqdWob31hJvk4wXkQShQmB9EiZ5wjW7bKymeWhMVvFUd+83RN7Tk4iZjb3aIRZt
+         5SMMejbLW7Le2S+DhsX5E2qp0qPHoGJiZzOUMqyyfZHlIu9Dhxq1CoSF4/7fiEOutWWi
+         5y/w==
+X-Gm-Message-State: APjAAAVT0dv5L6iG9S4TG604DPNMGJ7tQPOkNQXuaATwi0j6zJqwoOim
+        eXZQCwGI5tG8UHgyhfQyfCw67U09IlZrcTfBJ02F+Q==
+X-Google-Smtp-Source: APXvYqw/fOlBWCZg3eOdJ4Z+R/Zzyb35A8vjOMRIwr2ALQ9RHroIGw/qY8lDtLz8G7xKq+Di/EEzcol/mz8PreNSHP0=
+X-Received: by 2002:a67:8081:: with SMTP id b123mr14107151vsd.117.1562672071964;
+ Tue, 09 Jul 2019 04:34:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <TU4PR8401MB0544875B118D39899547FDEFF6F10@TU4PR8401MB0544.NAMPRD84.PROD.OUTLOOK.COM>
+In-Reply-To: <TU4PR8401MB0544875B118D39899547FDEFF6F10@TU4PR8401MB0544.NAMPRD84.PROD.OUTLOOK.COM>
+From:   Gilad Ben-Yossef <gilad@benyossef.com>
+Date:   Tue, 9 Jul 2019 14:34:21 +0300
+Message-ID: <CAOtvUMcUeVYh_eUrQWqunR8NUpos5-7zRU0jn0RdSTMtikm0XQ@mail.gmail.com>
+Subject: Re: CAVS test harness
+To:     "Bhat, Jayalakshmi Manjunath" <jayalakshmi.bhat@hp.com>
+Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Currently, NETLINK_CRYPTO works only in the init network namespace. It
-doesn't make much sense to cut it out of the other network namespaces,
-so do the minor plumbing work necessary to make it work in any network
-namespace. Code inspired by net/core/sock_diag.c.
+On Tue, Jul 9, 2019 at 9:44 AM Bhat, Jayalakshmi Manjunath
+<jayalakshmi.bhat@hp.com> wrote:
+>
+> Hi All,
+>
+> We are working on a product that requires NIAP certification and use IPSe=
+c environment for certification. IPSec functionality is achieved by third p=
+arty IPsec library and native XFRM.
+> Third  party IPsec library is used for ISAKMP and XFRM for IPsec.
+>
+> CAVS test cases are required for NIAP certification.  Thus we need to imp=
+lement CAVS test harness for Third party library and Linux crypto algorithm=
+s. I found the documentation on kernel crypto
+> API usage.
+>
+> Please can you indication what is the right method to implement the test =
+harness for Linux crypto algorithms.
+> 1.      Should I implement CAVS test harness for Linux kernel crypto algo=
+rithms as a user space application that exercise the kernel crypto API?
+> 2.      Should I implement  CAVS test harness as module in Linux kernel?
+>
+>
+> Any information on this will help me very much on implementation.
 
-Tested using kcapi-dgst from libkcapi [1]:
-Before:
-    # unshare -n kcapi-dgst -c sha256 </dev/null | wc -c
-    libkcapi - Error: Netlink error: sendmsg failed
-    libkcapi - Error: Netlink error: sendmsg failed
-    libkcapi - Error: NETLINK_CRYPTO: cannot obtain cipher information for hmac(sha512) (is required crypto_user.c patch missing? see documentation)
-    0
+Are you sure the needed tests are not already implemented in the
+kernel crypto API testmgr?
 
-After:
-    # unshare -n kcapi-dgst -c sha256 </dev/null | wc -c
-    32
+Gilad
 
-[1] https://github.com/smuellerDD/libkcapi
 
-Signed-off-by: Ondrej Mosnacek <omosnace@redhat.com>
----
- crypto/crypto_user_base.c            | 37 +++++++++++++++++++---------
- crypto/crypto_user_stat.c            |  4 ++-
- include/crypto/internal/cryptouser.h |  2 --
- include/net/net_namespace.h          |  3 +++
- 4 files changed, 31 insertions(+), 15 deletions(-)
+--=20
+Gilad Ben-Yossef
+Chief Coffee Drinker
 
-diff --git a/crypto/crypto_user_base.c b/crypto/crypto_user_base.c
-index e48da3b75c71..c92d415eaf82 100644
---- a/crypto/crypto_user_base.c
-+++ b/crypto/crypto_user_base.c
-@@ -22,9 +22,10 @@
- #include <linux/crypto.h>
- #include <linux/cryptouser.h>
- #include <linux/sched.h>
--#include <net/netlink.h>
- #include <linux/security.h>
-+#include <net/netlink.h>
- #include <net/net_namespace.h>
-+#include <net/sock.h>
- #include <crypto/internal/skcipher.h>
- #include <crypto/internal/rng.h>
- #include <crypto/akcipher.h>
-@@ -37,9 +38,6 @@
- 
- static DEFINE_MUTEX(crypto_cfg_mutex);
- 
--/* The crypto netlink socket */
--struct sock *crypto_nlsk;
--
- struct crypto_dump_info {
- 	struct sk_buff *in_skb;
- 	struct sk_buff *out_skb;
-@@ -195,6 +193,7 @@ out:
- static int crypto_report(struct sk_buff *in_skb, struct nlmsghdr *in_nlh,
- 			 struct nlattr **attrs)
- {
-+	struct net *net = sock_net(in_skb->sk);
- 	struct crypto_user_alg *p = nlmsg_data(in_nlh);
- 	struct crypto_alg *alg;
- 	struct sk_buff *skb;
-@@ -226,7 +225,7 @@ drop_alg:
- 	if (err)
- 		return err;
- 
--	return nlmsg_unicast(crypto_nlsk, skb, NETLINK_CB(in_skb).portid);
-+	return nlmsg_unicast(net->crypto_nlsk, skb, NETLINK_CB(in_skb).portid);
- }
- 
- static int crypto_dump_report(struct sk_buff *skb, struct netlink_callback *cb)
-@@ -429,6 +428,7 @@ static const struct crypto_link {
- static int crypto_user_rcv_msg(struct sk_buff *skb, struct nlmsghdr *nlh,
- 			       struct netlink_ext_ack *extack)
- {
-+	struct net *net = sock_net(skb->sk);
- 	struct nlattr *attrs[CRYPTOCFGA_MAX+1];
- 	const struct crypto_link *link;
- 	int type, err;
-@@ -459,7 +459,7 @@ static int crypto_user_rcv_msg(struct sk_buff *skb, struct nlmsghdr *nlh,
- 				.done = link->done,
- 				.min_dump_alloc = min(dump_alloc, 65535UL),
- 			};
--			err = netlink_dump_start(crypto_nlsk, skb, nlh, &c);
-+			err = netlink_dump_start(net->crypto_nlsk, skb, nlh, &c);
- 		}
- 
- 		return err;
-@@ -483,22 +483,35 @@ static void crypto_netlink_rcv(struct sk_buff *skb)
- 	mutex_unlock(&crypto_cfg_mutex);
- }
- 
--static int __init crypto_user_init(void)
-+static int __net_init crypto_netlink_init(struct net *net)
- {
- 	struct netlink_kernel_cfg cfg = {
- 		.input	= crypto_netlink_rcv,
- 	};
- 
--	crypto_nlsk = netlink_kernel_create(&init_net, NETLINK_CRYPTO, &cfg);
--	if (!crypto_nlsk)
--		return -ENOMEM;
-+	net->crypto_nlsk = netlink_kernel_create(net, NETLINK_CRYPTO, &cfg);
-+	return net->crypto_nlsk == NULL ? -ENOMEM : 0;
-+}
- 
--	return 0;
-+static void __net_exit crypto_netlink_exit(struct net *net)
-+{
-+	netlink_kernel_release(net->crypto_nlsk);
-+	net->crypto_nlsk = NULL;
-+}
-+
-+static struct pernet_operations crypto_netlink_net_ops = {
-+	.init = crypto_netlink_init,
-+	.exit = crypto_netlink_exit,
-+};
-+
-+static int __init crypto_user_init(void)
-+{
-+	return register_pernet_subsys(&crypto_netlink_net_ops);
- }
- 
- static void __exit crypto_user_exit(void)
- {
--	netlink_kernel_release(crypto_nlsk);
-+	unregister_pernet_subsys(&crypto_netlink_net_ops);
- }
- 
- module_init(crypto_user_init);
-diff --git a/crypto/crypto_user_stat.c b/crypto/crypto_user_stat.c
-index a03f326a63d3..8bad88413de1 100644
---- a/crypto/crypto_user_stat.c
-+++ b/crypto/crypto_user_stat.c
-@@ -10,6 +10,7 @@
- #include <linux/cryptouser.h>
- #include <linux/sched.h>
- #include <net/netlink.h>
-+#include <net/sock.h>
- #include <crypto/internal/skcipher.h>
- #include <crypto/internal/rng.h>
- #include <crypto/akcipher.h>
-@@ -298,6 +299,7 @@ out:
- int crypto_reportstat(struct sk_buff *in_skb, struct nlmsghdr *in_nlh,
- 		      struct nlattr **attrs)
- {
-+	struct net *net = sock_net(in_skb->sk);
- 	struct crypto_user_alg *p = nlmsg_data(in_nlh);
- 	struct crypto_alg *alg;
- 	struct sk_buff *skb;
-@@ -329,7 +331,7 @@ drop_alg:
- 	if (err)
- 		return err;
- 
--	return nlmsg_unicast(crypto_nlsk, skb, NETLINK_CB(in_skb).portid);
-+	return nlmsg_unicast(net->crypto_nlsk, skb, NETLINK_CB(in_skb).portid);
- }
- 
- MODULE_LICENSE("GPL");
-diff --git a/include/crypto/internal/cryptouser.h b/include/crypto/internal/cryptouser.h
-index 8c602b187c58..40623f4457df 100644
---- a/include/crypto/internal/cryptouser.h
-+++ b/include/crypto/internal/cryptouser.h
-@@ -1,8 +1,6 @@
- /* SPDX-License-Identifier: GPL-2.0 */
- #include <net/netlink.h>
- 
--extern struct sock *crypto_nlsk;
--
- struct crypto_alg *crypto_alg_match(struct crypto_user_alg *p, int exact);
- 
- #ifdef CONFIG_CRYPTO_STATS
-diff --git a/include/net/net_namespace.h b/include/net/net_namespace.h
-index 12689ddfc24c..610e40eaea52 100644
---- a/include/net/net_namespace.h
-+++ b/include/net/net_namespace.h
-@@ -165,6 +165,9 @@ struct net {
- #endif
- #ifdef CONFIG_XDP_SOCKETS
- 	struct netns_xdp	xdp;
-+#endif
-+#if IS_ENABLED(CONFIG_CRYPTO_USER)
-+	struct sock		*crypto_nlsk;
- #endif
- 	struct sock		*diag_nlsk;
- 	atomic_t		fnhe_genid;
--- 
-2.21.0
-
+values of =CE=B2 will give rise to dom!
