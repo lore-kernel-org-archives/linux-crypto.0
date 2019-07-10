@@ -2,146 +2,107 @@ Return-Path: <SRS0=+pKF=VH=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.9 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63094C74A35
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Jul 2019 21:28:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12831C74A36
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Jul 2019 21:45:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 292962087F
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Jul 2019 21:28:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CDB1F20838
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Jul 2019 21:45:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="daN8MuF1"
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="Vv3AVlEt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727434AbfGJV2H (ORCPT
+        id S1727220AbfGJVph (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 10 Jul 2019 17:28:07 -0400
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:33537 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726033AbfGJV2G (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 10 Jul 2019 17:28:06 -0400
-Received: by mail-pf1-f195.google.com with SMTP id g2so1695611pfq.0
-        for <linux-crypto@vger.kernel.org>; Wed, 10 Jul 2019 14:28:06 -0700 (PDT)
+        Wed, 10 Jul 2019 17:45:37 -0400
+Received: from mail-eopbgr700073.outbound.protection.outlook.com ([40.107.70.73]:16097
+        "EHLO NAM04-SN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727188AbfGJVpg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 10 Jul 2019 17:45:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:user-agent:mime-version;
-        bh=2/LQ+syV8algN2h7OJBFggoQfWNkjHh3ATrB2VsxuKc=;
-        b=daN8MuF1/lEGfilGDX6IF+SUiDKa9qpZAq8GG3koP/7y04fK++4Bl5JwtbyEu4fRWw
-         JxFekoZVPITR2x4/Ygb4Mf1Bq3ym8zT8Nag4L/ZzC2S2E+BjL/5zdX0J2Et+TVa+GtbS
-         B23SiD5fg5Vogz8Glol23Wsb0tnyEwDbE/5/QCXkstf5X9Yu8rWdcg3NImLDdqIINf0R
-         /YMHnRxm0orEoeLSZzUr2MQ4Of5iIo3RNkXb+nKrQBdJdDAj/f7qqmuIdiC3/FwjWJ5u
-         5MST2J+yggJWzGX50XBQteW2dBMf7SizdIQWNn8MnYROs3SW6eT0cHQ/OSOGgn08O3Ck
-         E9Lg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:user-agent
-         :mime-version;
-        bh=2/LQ+syV8algN2h7OJBFggoQfWNkjHh3ATrB2VsxuKc=;
-        b=og/Cwmt+EZ1qKQ7PH2FpmiZQQVk21J6mLSfB2ap5Q7j+Ix/g6l9EMY7SQza0GpKl9T
-         aaBNDFRvkizoR/W+yG8Lp7X8PoqFZudQEZgq6v1RLCIt8vxAT7E3doOVagOaMWaIA+q8
-         KYWMyxnJZdu/my590iRqQyDVOxNSfN88vdZA/5yLAesezLA2VmSUBxGD38tc+0l/rv+u
-         bg1K7BmSCZHIEPKmuuJSMS2sP2m8wO+9LxROiejb5sm8NOp7PRK64tPkRumVMakOi7id
-         mFHY6Gk9zpwYFrQZ1L+eEOKV7vP/XiOnTe3WRSkp0uSAaWgM9BQmH323R+RXM3LmGwBn
-         ZwUw==
-X-Gm-Message-State: APjAAAXB3skWBgghkDcHBTXwa0gzWGCRsGlHARE+FOuKdJ1GiX/0j5kN
-        oDTAeWWxeqaPsXwjGCIC19RS7g==
-X-Google-Smtp-Source: APXvYqy3KbwmvZ8Ja3wu6WerM1ugQjC9s4Qj0nEwijNHOzchNo+fuXoacPeYA+nP96bUoYEgkDaDxA==
-X-Received: by 2002:a17:90a:c588:: with SMTP id l8mr558340pjt.16.1562794085970;
-        Wed, 10 Jul 2019 14:28:05 -0700 (PDT)
-Received: from [2620:15c:17:3:3a5:23a7:5e32:4598] ([2620:15c:17:3:3a5:23a7:5e32:4598])
-        by smtp.gmail.com with ESMTPSA id w18sm3209783pfj.37.2019.07.10.14.28.05
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Wed, 10 Jul 2019 14:28:05 -0700 (PDT)
-Date:   Wed, 10 Jul 2019 14:28:04 -0700 (PDT)
-From:   David Rientjes <rientjes@google.com>
-X-X-Sender: rientjes@chino.kir.corp.google.com
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-cc:     Cfir Cohen <cfir@google.com>,
-        Janakarajan Natarajan <Janakarajan.Natarajan@amd.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Gary Hook <gary.hook@amd.com>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [patch] crypto: ccp - Fix SEV_VERSION_GREATER_OR_EQUAL
-Message-ID: <alpine.DEB.2.21.1907101426290.2777@chino.kir.corp.google.com>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
+ d=amdcloud.onmicrosoft.com; s=selector1-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WIOVNeEN9Q05R9AOVsXvkpzY2LJ9maJl+YXwG+XoQZ0=;
+ b=Vv3AVlEtJnv3vAXbubJTGyksxhtMArxw1TeBY/Mcu0IcH9uPdcxQjntndmBIcB3GLJ3XDCflaXuWgkPm60BMpOBR5gWh9h9x/tem/WrQgrYxhJYrZpFH4QFGmJI4mav7qiyeIcLGxtJcgnLBV62Zi+RElNwPShmgo5AAy8h1t4M=
+Received: from DM5PR12MB1449.namprd12.prod.outlook.com (10.172.40.14) by
+ DM5PR12MB1338.namprd12.prod.outlook.com (10.168.235.147) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2052.19; Wed, 10 Jul 2019 21:45:29 +0000
+Received: from DM5PR12MB1449.namprd12.prod.outlook.com
+ ([fe80::a894:b1d5:a126:adce]) by DM5PR12MB1449.namprd12.prod.outlook.com
+ ([fe80::a894:b1d5:a126:adce%6]) with mapi id 15.20.2052.020; Wed, 10 Jul 2019
+ 21:45:29 +0000
+From:   "Hook, Gary" <Gary.Hook@amd.com>
+To:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+CC:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "Hook, Gary" <Gary.Hook@amd.com>
+Subject: [PATCH 0/2] Improve system log messaging in ccp-crypto
+Thread-Topic: [PATCH 0/2] Improve system log messaging in ccp-crypto
+Thread-Index: AQHVN2jKv0PAxZNzIEOPzBlJ2ZshRw==
+Date:   Wed, 10 Jul 2019 21:45:28 +0000
+Message-ID: <20190710214504.3420-1-gary.hook@amd.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: SN6PR06CA0017.namprd06.prod.outlook.com
+ (2603:10b6:805:8e::30) To DM5PR12MB1449.namprd12.prod.outlook.com
+ (2603:10b6:4:10::14)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Gary.Hook@amd.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-mailer: git-send-email 2.17.1
+x-originating-ip: [165.204.78.2]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 4d5df153-648a-48e2-1619-08d7057fecb1
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:DM5PR12MB1338;
+x-ms-traffictypediagnostic: DM5PR12MB1338:
+x-microsoft-antispam-prvs: <DM5PR12MB13388D65A7C2B007055AC144FDF00@DM5PR12MB1338.namprd12.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:7219;
+x-forefront-prvs: 0094E3478A
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(376002)(346002)(39860400002)(396003)(366004)(136003)(189003)(199004)(186003)(478600001)(14454004)(54906003)(316002)(25786009)(14444005)(102836004)(6506007)(4326008)(386003)(71190400001)(26005)(256004)(3846002)(1076003)(5640700003)(52116002)(99286004)(6116002)(66066001)(305945005)(2906002)(2501003)(6436002)(7736002)(6486002)(8676002)(81166006)(53936002)(86362001)(50226002)(6512007)(6916009)(66446008)(66946007)(66556008)(64756008)(2351001)(36756003)(68736007)(66476007)(476003)(2616005)(4744005)(5660300002)(71200400001)(81156014)(486006)(8936002);DIR:OUT;SFP:1101;SCL:1;SRVR:DM5PR12MB1338;H:DM5PR12MB1449.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: gBB+qplHUYdIrutj1i/umrpkOUFXqCfXg4q3sMCmxxqdWtP6N1iBXTYTj8nEHXxx8nkDHxqUutx1iyo3EwdRX/+o3IjLPJeq2J1cr9zdbPibBYWFYMKFvIKyL6eSdUKWAi7OPKFv/BS0/4w8JPOL1wX5e3muMV8B8R5TksQEX3FWfsj5ruMTK2IyEKismSJ0Yunm7yEkaOfcbwzWfRx7OL/oJcnGqalx3E3DeSGfTaE4ulb9fLz0Fub8rYfsJGwgQMOnuMv3zYg4yAhYoExhv8szwLIQ6hRYeXB9cZQbrvOiLDijO4KRtZiu71GME5QCITuo1ludp3JL6lvEMwAkDn9blQ5i9T4fGw4FQJayz6Jkl7sVuHCgCafpLRntkfBARiheRlhU/kaZ/iDpKHBZwZ7dCmK41VJgLTA0ZhCKaLM=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-ID: <14DE6F67ABD6F34E98BD3A1258256BF9@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4d5df153-648a-48e2-1619-08d7057fecb1
+X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Jul 2019 21:45:28.9311
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: ghook@amd.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1338
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-SEV_VERSION_GREATER_OR_EQUAL() will fail if upgrading from 2.2 to 3.1, for
-example, because the minor version is not equal to or greater than the
-major.
+From: Gary R Hook <gary.hook@amd.com>
 
-Fix this and move to a static inline function for appropriate type
-checking.
+Add a prefix to any messages logged by the ccp-crypto module, and
+add a notice if the module fails to load in the case that no CCPs
+are defined.
 
-Fixes: edd303ff0e9e ("crypto: ccp - Add DOWNLOAD_FIRMWARE SEV command")
-Reported-by: Cfir Cohen <cfir@google.com>
-Signed-off-by: David Rientjes <rientjes@google.com>
----
- drivers/crypto/ccp/psp-dev.c | 19 ++++++++++++-------
- 1 file changed, 12 insertions(+), 7 deletions(-)
+Gary R Hook (2):
+  crypto: ccp - Include the module name in system log messages
+  crypto: ccp - Log an error message when ccp-crypto fails to load
 
-diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
---- a/drivers/crypto/ccp/psp-dev.c
-+++ b/drivers/crypto/ccp/psp-dev.c
-@@ -24,10 +24,6 @@
- #include "sp-dev.h"
- #include "psp-dev.h"
- 
--#define SEV_VERSION_GREATER_OR_EQUAL(_maj, _min)	\
--		((psp_master->api_major) >= _maj &&	\
--		 (psp_master->api_minor) >= _min)
--
- #define DEVICE_NAME		"sev"
- #define SEV_FW_FILE		"amd/sev.fw"
- #define SEV_FW_NAME_SIZE	64
-@@ -47,6 +43,15 @@ MODULE_PARM_DESC(psp_probe_timeout, " default timeout value, in seconds, during
- static bool psp_dead;
- static int psp_timeout;
- 
-+static inline bool sev_version_greater_or_equal(u8 maj, u8 min)
-+{
-+	if (psp_master->api_major > maj)
-+		return true;
-+	if (psp_master->api_major >= maj && psp_master->api_minor >= min)
-+		return true;
-+	return false;
-+}
-+
- static struct psp_device *psp_alloc_struct(struct sp_device *sp)
- {
- 	struct device *dev = sp->dev;
-@@ -588,7 +593,7 @@ static int sev_ioctl_do_get_id2(struct sev_issue_cmd *argp)
- 	int ret;
- 
- 	/* SEV GET_ID is available from SEV API v0.16 and up */
--	if (!SEV_VERSION_GREATER_OR_EQUAL(0, 16))
-+	if (!sev_version_greater_or_equal(0, 16))
- 		return -ENOTSUPP;
- 
- 	if (copy_from_user(&input, (void __user *)argp->data, sizeof(input)))
-@@ -651,7 +656,7 @@ static int sev_ioctl_do_get_id(struct sev_issue_cmd *argp)
- 	int ret;
- 
- 	/* SEV GET_ID available from SEV API v0.16 and up */
--	if (!SEV_VERSION_GREATER_OR_EQUAL(0, 16))
-+	if (!sev_version_greater_or_equal(0, 16))
- 		return -ENOTSUPP;
- 
- 	/* SEV FW expects the buffer it fills with the ID to be
-@@ -1053,7 +1058,7 @@ void psp_pci_init(void)
- 		psp_master->sev_state = SEV_STATE_UNINIT;
- 	}
- 
--	if (SEV_VERSION_GREATER_OR_EQUAL(0, 15) &&
-+	if (sev_version_greater_or_equal(0, 15) &&
- 	    sev_update_firmware(psp_master->dev) == 0)
- 		sev_get_api_version();
- 
+ drivers/crypto/ccp/ccp-crypto-main.c | 4 +++-
+ drivers/crypto/ccp/ccp-crypto.h      | 4 ++++
+ 2 files changed, 7 insertions(+), 1 deletion(-)
+
+--=20
+2.17.1
+
