@@ -2,354 +2,141 @@ Return-Path: <SRS0=+pKF=VH=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13164C73C6D
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Jul 2019 05:32:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79527C73C72
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Jul 2019 05:56:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D2A4C20665
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Jul 2019 05:32:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4346920838
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Jul 2019 05:56:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=web.de header.i=@web.de header.b="MQI8Lwdn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726997AbfGJFcX (ORCPT
+        id S1726272AbfGJF4o (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 10 Jul 2019 01:32:23 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:37606 "EHLO deadmen.hmeau.com"
+        Wed, 10 Jul 2019 01:56:44 -0400
+Received: from mout.web.de ([212.227.17.11]:51793 "EHLO mout.web.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725932AbfGJFcW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 10 Jul 2019 01:32:22 -0400
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1hl5DJ-0007q8-5H; Wed, 10 Jul 2019 13:32:21 +0800
-Received: from herbert by gondobar with local (Exim 4.89)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1hl5DG-0003Qt-JS; Wed, 10 Jul 2019 13:32:18 +0800
-Date:   Wed, 10 Jul 2019 13:32:18 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Corentin Labbe <clabbe@baylibre.com>,
-        Kees Cook <keescook@chromium.org>, David Kutik <david@kutik.eu>
-Cc:     Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>,
-        Steffen Klassert <steffen.klassert@secunet.com>
-Subject: crypto: Remove orphan tools/crypto directory
-Message-ID: <20190710053218.fblaxelrinzlzjoq@gondor.apana.org.au>
+        id S1725791AbfGJF4n (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 10 Jul 2019 01:56:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+        s=dbaedf251592; t=1562738166;
+        bh=TVMPWtxhrM6Y1UVcY/Fxy6fvCMPRppnabQwd5AhobCo=;
+        h=X-UI-Sender-Class:Subject:From:To:Cc:References:Date:In-Reply-To;
+        b=MQI8LwdnPo34u09NpYysmQm3Q+z3g6/gHcqOQGtQp8c8EiJXQHs6rszLd4i666B0S
+         Msi+eMOCPMgJXdcT94DeK39F92BUdjcc0YIWvQ/RwZtX+2TvunJGr7UPfow5dHx6xF
+         4yUINT/1F9oIMzA0KuRQZtta/U33V7y26Uvw6Wn0=
+X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
+Received: from [192.168.1.2] ([93.132.42.76]) by smtp.web.de (mrweb102
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 0MI5ze-1hmjDE1cAI-003rjx; Wed, 10
+ Jul 2019 07:56:06 +0200
+Subject: Re: Coccinelle: Checking the deletion of duplicate of_node_put()
+ calls with SmPL
+From:   Markus Elfring <Markus.Elfring@web.de>
+To:     Wen Yang <wen.yang99@zte.com.cn>,
+        Julia Lawall <julia.lawall@lip6.fr>,
+        Coccinelle <cocci@systeme.lip6.fr>
+Cc:     Allison Randal <allison@lohutok.net>,
+        Armijn Hemel <armijn@tjaldur.nl>,
+        Cheng Shengyu <cheng.shengyu@zte.com.cn>,
+        "David S. Miller" <davem@davemloft.net>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Xue Zhihong <xue.zhihong@zte.com.cn>,
+        Yi Wang <wang.yi59@zte.com.cn>, linux-crypto@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>
+References: <1562566745-7447-2-git-send-email-wen.yang99@zte.com.cn>
+ <1c215500-b599-8b2f-61ea-a6f418ab4905@web.de>
+Openpgp: preference=signencrypt
+Autocrypt: addr=Markus.Elfring@web.de; prefer-encrypt=mutual; keydata=
+ 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 FEE=
+Message-ID: <80dc77ec-16ef-4573-d80b-70452358eab8@web.de>
+Date:   Wed, 10 Jul 2019 07:55:40 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: NeoMutt/20170113 (1.7.2)
+In-Reply-To: <1c215500-b599-8b2f-61ea-a6f418ab4905@web.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+X-Provags-ID: V03:K1:2Cc53XfhSJE+KlXiuHHnzCh1W0icYpRpeHLkLHlKiwGc9fe+Tvp
+ EUo4xKZZcWPr7HUb3fTvOnnvHUng/tZmMKB/rAhd+jcMZLBeWfX5xhk1HfWOrXe1WDccdlZ
+ 5Zc64HpmO0V9p0cl5h76M2H84Z1y8HIXiq5UL1Ip5QMr8fTr72Wr5p+Qao31P5iQYqXYQ6i
+ oL2F+z+ttoJjcv0kHtrUw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:m30nMVk5pJQ=:Q8B1x3VdjBjXIzBk/mOTLr
+ CbeJvC2IF+DfOrjEHXJY6o6oY/ZXTy622br15W8WyFPbrEmc0vCHFJzDX5gEHZq1OfOnS0bBS
+ Arvsw36Afbmk3vSTodk4sbpaKXq7o2VQosBP6/qIwYYUo0GyLYyHPfigrBqcVUXqRhSncwSRC
+ EYV/O9DK7mt5LZsXP4SKDL2rXXFnUukDtkEXgkFpod6CmJEw1JRumYUuVwNCq/3MsiDF20kSe
+ B4lmdEtiCUM9wnDwMTh1YFhId3HvVDTJ/LL405rbPZinHciCZzg4VE7EEC5vxYYMwjoCzYsvJ
+ 2Mnj4/WmpBCMka2bbW4JlINKbBfo9kCHWyv44+k24OimG/Cj31htqaw+tZui+GYJ+YX313Bts
+ +4Y1o9cuecoSUSSzo/vENK/xJt7Mu1jZ4urA7JpdvEoqt9ZFqB+zdhgW07GVEo97+84NTL4Un
+ 7mSKeeH20Vml31Ty4VJqUNtTyr1MHt+HfFyywrIup5/IIO0dt/yM4wYpVxRS+UJ2NiGOTDImK
+ fbJ9cY+F6TZ9bI6ava77Y2lDMkN0osHypRFGBHfzVXMRD00y+2hQpXC9ZyS+xqTrcmMUmJDBy
+ 7Otl2q/Q24ZidjCkDytBneRXFhQ7w0UiPaZpW6Zm0O8w2216GQjC6SkPeLYU9OHp4779L6bl2
+ yj+BTXZ1lKwi/LGZ6xSPAAHLM4QbY/k/MW3TfrbLqKBnIKWyHlMwm90vhePIYPNNkwPRSrXoX
+ 5Av/tB/76PfzG4qqgHwP4tyeUfd5DQR1uDczXCuaf3tXl7G1Ker/ePv3gB/f++wWVEyN/T9Z/
+ i1O8OUboqgZ4oeG4brfaUyRNSqdf3CMk4LnTkfT19ydx6kd2e8H9N2W2KKVgiA6Eff6j64Bs3
+ ycvKikKr7CVcp6MDO4o6s9uVhYWujy0FDiHAOcapVsnngLxTJYjSO4++bLLV6wgahPAJeYOPx
+ Q3GcQhi3vJBiuAUyhhkbrvsSv4OWeLhqzkMj60FhtsvE/sSzH87wSbWey4Us2WktKKN55LORL
+ p2e6ZfrIUk003/tGuXtsn9KHr/MNUTPt0Xc3bq5PKSLcKqg9PLyoED/SL66g4NMYTRwnjseco
+ 7xy28F4LkGb7Ij/glmy99EkJrIZ/KKbvMeX
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The directory tools/crypto and the only file under it never gets
-built anywhere.  This program should instead be incorporated into
-one of the existing user-space projects, crconf or libkcapi.
+> But I wonder at the moment why it does not work (as expected) for the original
+> complete source file.
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+I discovered that a diff hunk (or usable patch?) is generated
+if the return statement is deleted (or commented out) before the jump label
+which refers to a potentially unwanted function call at the mentioned place.
+How will the support evolve for automatic adjustment of such source code
+combinations by the semantic patch language (Coccinelle software)?
 
-diff --git a/tools/crypto/getstat.c b/tools/crypto/getstat.c
-deleted file mode 100644
-index 9e8ff76420fa..000000000000
---- a/tools/crypto/getstat.c
-+++ /dev/null
-@@ -1,294 +0,0 @@
--/* Heavily copied from libkcapi 2015 - 2017, Stephan Mueller <smueller@chronox.de> */
--#include <errno.h>
--#include <linux/cryptouser.h>
--#include <linux/netlink.h>
--#include <linux/rtnetlink.h>
--#include <sys/types.h>
--#include <sys/socket.h>
--#include <stdlib.h>
--#include <stdio.h>
--#include <string.h>
--#include <time.h>
--#include <unistd.h>
--
--#define CR_RTA(x)  ((struct rtattr *)(((char *)(x)) + NLMSG_ALIGN(sizeof(struct crypto_user_alg))))
--
--static int get_stat(const char *drivername)
--{
--	struct {
--		struct nlmsghdr n;
--		struct crypto_user_alg cru;
--	} req;
--	struct sockaddr_nl nl;
--	int sd = 0, ret;
--	socklen_t addr_len;
--	struct iovec iov;
--	struct msghdr msg;
--	char buf[4096];
--	struct nlmsghdr *res_n = (struct nlmsghdr *)buf;
--	struct crypto_user_alg *cru_res = NULL;
--	int res_len = 0;
--	struct rtattr *tb[CRYPTOCFGA_MAX + 1];
--	struct rtattr *rta;
--	struct nlmsgerr *errmsg;
--
--	memset(&req, 0, sizeof(req));
--	memset(&buf, 0, sizeof(buf));
--	memset(&msg, 0, sizeof(msg));
--
--	req.n.nlmsg_len = NLMSG_LENGTH(sizeof(req.cru));
--	req.n.nlmsg_flags = NLM_F_REQUEST;
--	req.n.nlmsg_type = CRYPTO_MSG_GETSTAT;
--	req.n.nlmsg_seq = time(NULL);
--
--	strncpy(req.cru.cru_driver_name, drivername, strlen(drivername));
--
--	sd =  socket(AF_NETLINK, SOCK_RAW, NETLINK_CRYPTO);
--	if (sd < 0) {
--		fprintf(stderr, "Netlink error: cannot open netlink socket");
--		return -errno;
--	}
--	memset(&nl, 0, sizeof(nl));
--	nl.nl_family = AF_NETLINK;
--	if (bind(sd, (struct sockaddr *)&nl, sizeof(nl)) < 0) {
--		ret = -errno;
--		fprintf(stderr, "Netlink error: cannot bind netlink socket");
--		goto out;
--	}
--
--	/* sanity check that netlink socket was successfully opened */
--	addr_len = sizeof(nl);
--	if (getsockname(sd, (struct sockaddr *)&nl, &addr_len) < 0) {
--		ret = -errno;
--		printf("Netlink error: cannot getsockname");
--		goto out;
--	}
--	if (addr_len != sizeof(nl)) {
--		ret = -errno;
--		printf("Netlink error: wrong address length %d", addr_len);
--		goto out;
--	}
--	if (nl.nl_family != AF_NETLINK) {
--		ret = -errno;
--		printf("Netlink error: wrong address family %d",
--				nl.nl_family);
--		goto out;
--	}
--
--	memset(&nl, 0, sizeof(nl));
--	nl.nl_family = AF_NETLINK;
--	iov.iov_base = (void *)&req.n;
--	iov.iov_len = req.n.nlmsg_len;
--	msg.msg_name = &nl;
--	msg.msg_namelen = sizeof(nl);
--	msg.msg_iov = &iov;
--	msg.msg_iovlen = 1;
--	if (sendmsg(sd, &msg, 0) < 0) {
--		ret = -errno;
--		printf("Netlink error: sendmsg failed");
--		goto out;
--	}
--	memset(buf, 0, sizeof(buf));
--	iov.iov_base = buf;
--	while (1) {
--		iov.iov_len = sizeof(buf);
--		ret = recvmsg(sd, &msg, 0);
--		if (ret < 0) {
--			if (errno == EINTR || errno == EAGAIN)
--				continue;
--			ret = -errno;
--			printf("Netlink error: netlink receive error");
--			goto out;
--		}
--		if (ret == 0) {
--			ret = -errno;
--			printf("Netlink error: no data");
--			goto out;
--		}
--		if (ret > sizeof(buf)) {
--			ret = -errno;
--			printf("Netlink error: received too much data");
--			goto out;
--		}
--		break;
--	}
--
--	ret = -EFAULT;
--	res_len = res_n->nlmsg_len;
--	if (res_n->nlmsg_type == NLMSG_ERROR) {
--		errmsg = NLMSG_DATA(res_n);
--		fprintf(stderr, "Fail with %d\n", errmsg->error);
--		ret = errmsg->error;
--		goto out;
--	}
--
--	if (res_n->nlmsg_type == CRYPTO_MSG_GETSTAT) {
--		cru_res = NLMSG_DATA(res_n);
--		res_len -= NLMSG_SPACE(sizeof(*cru_res));
--	}
--	if (res_len < 0) {
--		printf("Netlink error: nlmsg len %d\n", res_len);
--		goto out;
--	}
--
--	if (!cru_res) {
--		ret = -EFAULT;
--		printf("Netlink error: no cru_res\n");
--		goto out;
--	}
--
--	rta = CR_RTA(cru_res);
--	memset(tb, 0, sizeof(struct rtattr *) * (CRYPTOCFGA_MAX + 1));
--	while (RTA_OK(rta, res_len)) {
--		if ((rta->rta_type <= CRYPTOCFGA_MAX) && (!tb[rta->rta_type]))
--			tb[rta->rta_type] = rta;
--		rta = RTA_NEXT(rta, res_len);
--	}
--	if (res_len) {
--		printf("Netlink error: unprocessed data %d",
--				res_len);
--		goto out;
--	}
--
--	if (tb[CRYPTOCFGA_STAT_HASH]) {
--		struct rtattr *rta = tb[CRYPTOCFGA_STAT_HASH];
--		struct crypto_stat_hash *rhash =
--			(struct crypto_stat_hash *)RTA_DATA(rta);
--		printf("%s\tHash\n\tHash: %llu bytes: %llu\n\tErrors: %llu\n",
--			drivername,
--			rhash->stat_hash_cnt, rhash->stat_hash_tlen,
--			rhash->stat_err_cnt);
--	} else if (tb[CRYPTOCFGA_STAT_COMPRESS]) {
--		struct rtattr *rta = tb[CRYPTOCFGA_STAT_COMPRESS];
--		struct crypto_stat_compress *rblk =
--			(struct crypto_stat_compress *)RTA_DATA(rta);
--		printf("%s\tCompress\n\tCompress: %llu bytes: %llu\n\tDecompress: %llu bytes: %llu\n\tErrors: %llu\n",
--			drivername,
--			rblk->stat_compress_cnt, rblk->stat_compress_tlen,
--			rblk->stat_decompress_cnt, rblk->stat_decompress_tlen,
--			rblk->stat_err_cnt);
--	} else if (tb[CRYPTOCFGA_STAT_ACOMP]) {
--		struct rtattr *rta = tb[CRYPTOCFGA_STAT_ACOMP];
--		struct crypto_stat_compress *rcomp =
--			(struct crypto_stat_compress *)RTA_DATA(rta);
--		printf("%s\tACompress\n\tCompress: %llu bytes: %llu\n\tDecompress: %llu bytes: %llu\n\tErrors: %llu\n",
--			drivername,
--			rcomp->stat_compress_cnt, rcomp->stat_compress_tlen,
--			rcomp->stat_decompress_cnt, rcomp->stat_decompress_tlen,
--			rcomp->stat_err_cnt);
--	} else if (tb[CRYPTOCFGA_STAT_AEAD]) {
--		struct rtattr *rta = tb[CRYPTOCFGA_STAT_AEAD];
--		struct crypto_stat_aead *raead =
--			(struct crypto_stat_aead *)RTA_DATA(rta);
--		printf("%s\tAEAD\n\tEncrypt: %llu bytes: %llu\n\tDecrypt: %llu bytes: %llu\n\tErrors: %llu\n",
--			drivername,
--			raead->stat_encrypt_cnt, raead->stat_encrypt_tlen,
--			raead->stat_decrypt_cnt, raead->stat_decrypt_tlen,
--			raead->stat_err_cnt);
--	} else if (tb[CRYPTOCFGA_STAT_BLKCIPHER]) {
--		struct rtattr *rta = tb[CRYPTOCFGA_STAT_BLKCIPHER];
--		struct crypto_stat_cipher *rblk =
--			(struct crypto_stat_cipher *)RTA_DATA(rta);
--		printf("%s\tCipher\n\tEncrypt: %llu bytes: %llu\n\tDecrypt: %llu bytes: %llu\n\tErrors: %llu\n",
--			drivername,
--			rblk->stat_encrypt_cnt, rblk->stat_encrypt_tlen,
--			rblk->stat_decrypt_cnt, rblk->stat_decrypt_tlen,
--			rblk->stat_err_cnt);
--	} else if (tb[CRYPTOCFGA_STAT_AKCIPHER]) {
--		struct rtattr *rta = tb[CRYPTOCFGA_STAT_AKCIPHER];
--		struct crypto_stat_akcipher *rblk =
--			(struct crypto_stat_akcipher *)RTA_DATA(rta);
--		printf("%s\tAkcipher\n\tEncrypt: %llu bytes: %llu\n\tDecrypt: %llu bytes: %llu\n\tSign: %llu\n\tVerify: %llu\n\tErrors: %llu\n",
--			drivername,
--			rblk->stat_encrypt_cnt, rblk->stat_encrypt_tlen,
--			rblk->stat_decrypt_cnt, rblk->stat_decrypt_tlen,
--			rblk->stat_sign_cnt, rblk->stat_verify_cnt,
--			rblk->stat_err_cnt);
--	} else if (tb[CRYPTOCFGA_STAT_CIPHER]) {
--		struct rtattr *rta = tb[CRYPTOCFGA_STAT_CIPHER];
--		struct crypto_stat_cipher *rblk =
--			(struct crypto_stat_cipher *)RTA_DATA(rta);
--		printf("%s\tcipher\n\tEncrypt: %llu bytes: %llu\n\tDecrypt: %llu bytes: %llu\n\tErrors: %llu\n",
--			drivername,
--			rblk->stat_encrypt_cnt, rblk->stat_encrypt_tlen,
--			rblk->stat_decrypt_cnt, rblk->stat_decrypt_tlen,
--			rblk->stat_err_cnt);
--	} else if (tb[CRYPTOCFGA_STAT_RNG]) {
--		struct rtattr *rta = tb[CRYPTOCFGA_STAT_RNG];
--		struct crypto_stat_rng *rrng =
--			(struct crypto_stat_rng *)RTA_DATA(rta);
--		printf("%s\tRNG\n\tSeed: %llu\n\tGenerate: %llu bytes: %llu\n\tErrors: %llu\n",
--			drivername,
--			rrng->stat_seed_cnt,
--			rrng->stat_generate_cnt, rrng->stat_generate_tlen,
--			rrng->stat_err_cnt);
--	} else if (tb[CRYPTOCFGA_STAT_KPP]) {
--		struct rtattr *rta = tb[CRYPTOCFGA_STAT_KPP];
--		struct crypto_stat_kpp *rkpp =
--			(struct crypto_stat_kpp *)RTA_DATA(rta);
--		printf("%s\tKPP\n\tSetsecret: %llu\n\tGenerate public key: %llu\n\tCompute_shared_secret: %llu\n\tErrors: %llu\n",
--			drivername,
--			rkpp->stat_setsecret_cnt,
--			rkpp->stat_generate_public_key_cnt,
--			rkpp->stat_compute_shared_secret_cnt,
--			rkpp->stat_err_cnt);
--	} else {
--		fprintf(stderr, "%s is of an unknown algorithm\n", drivername);
--	}
--	ret = 0;
--out:
--	close(sd);
--	return ret;
--}
--
--int main(int argc, const char *argv[])
--{
--	char buf[4096];
--	FILE *procfd;
--	int i, lastspace;
--	int ret;
--
--	procfd = fopen("/proc/crypto", "r");
--	if (!procfd) {
--		ret = errno;
--		fprintf(stderr, "Cannot open /proc/crypto %s\n", strerror(errno));
--		return ret;
--	}
--	if (argc > 1) {
--		if (!strcmp(argv[1], "-h") || !strcmp(argv[1], "--help")) {
--			printf("Usage: %s [-h|--help] display this help\n", argv[0]);
--			printf("Usage: %s display all crypto statistics\n", argv[0]);
--			printf("Usage: %s drivername1 drivername2 ... = display crypto statistics about drivername1 ...\n", argv[0]);
--			return 0;
--		}
--		for (i = 1; i < argc; i++) {
--			ret = get_stat(argv[i]);
--			if (ret) {
--				fprintf(stderr, "Failed with %s\n", strerror(-ret));
--				return ret;
--			}
--		}
--		return 0;
--	}
--
--	while (fgets(buf, sizeof(buf), procfd)) {
--		if (!strncmp(buf, "driver", 6)) {
--			lastspace = 0;
--			i = 0;
--			while (i < strlen(buf)) {
--				i++;
--				if (buf[i] == ' ')
--					lastspace = i;
--			}
--			buf[strlen(buf) - 1] = '\0';
--			ret = get_stat(buf + lastspace + 1);
--			if (ret) {
--				fprintf(stderr, "Failed with %s\n", strerror(-ret));
--				goto out;
--			}
--		}
--	}
--out:
--	fclose(procfd);
--	return ret;
--}
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Regards,
+Markus
