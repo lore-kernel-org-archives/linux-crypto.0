@@ -2,154 +2,150 @@ Return-Path: <SRS0=+pKF=VH=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 755EAC73C65
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Jul 2019 00:09:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC297C73C63
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Jul 2019 01:47:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3D4222081C
-	for <linux-crypto@archiver.kernel.org>; Wed, 10 Jul 2019 00:09:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="eEcaVrIR"
+	by mail.kernel.org (Postfix) with ESMTP id 97B3E2073D
+	for <linux-crypto@archiver.kernel.org>; Wed, 10 Jul 2019 01:47:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1562723250;
+	bh=Tsxx7CaSMOqfOopAnK5QN0Wr6X2fs3hEmJ+QnjoILec=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=k9eJrUdulFYIMiVcmSQg78eaonoDetiwUKH38SoTvx+bGtvsTqz2HbubQX/yjRzVD
+	 s4/SuCJEiqICKnxVP+2vM0+1yeQRkJaTuHKcDJ5YphkSiYZNx3Uphjq9MgNQW10Kas
+	 NYCyrTqjHoX9DEoPasKtbtjlWwiZ8W7qbLR2eijQ=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726496AbfGJAJc (ORCPT
+        id S1725832AbfGJBr3 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 9 Jul 2019 20:09:32 -0400
-Received: from mail-eopbgr820087.outbound.protection.outlook.com ([40.107.82.87]:60288
-        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726218AbfGJAJc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 9 Jul 2019 20:09:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector1-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=A5a1K4TAi1Y+d4bV3QjM993xStEEqVv5OAd3MHCKkzE=;
- b=eEcaVrIRAAu8Vmwz0bETfUiQteiPYWMbkmcMecnJ8hN74z3E7LTbpFhh7ecyFdHGc+HQIyoPzKYVfwCK9ldZbG7JUFdGagK+nZrJMgUwcNAnshG9iBc8cSqlU92/9INN2x93coj2Ho2sl06pRI483jl8nMNegrXc2yk3pLUGoD8=
-Received: from DM5PR12MB1449.namprd12.prod.outlook.com (10.172.40.14) by
- DM5PR12MB1402.namprd12.prod.outlook.com (10.168.236.140) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2032.20; Wed, 10 Jul 2019 00:09:23 +0000
-Received: from DM5PR12MB1449.namprd12.prod.outlook.com
- ([fe80::a894:b1d5:a126:adce]) by DM5PR12MB1449.namprd12.prod.outlook.com
- ([fe80::a894:b1d5:a126:adce%6]) with mapi id 15.20.2052.019; Wed, 10 Jul 2019
- 00:09:23 +0000
-From:   "Hook, Gary" <Gary.Hook@amd.com>
-To:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-CC:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
+        Tue, 9 Jul 2019 21:47:29 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47466 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725807AbfGJBr2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 9 Jul 2019 21:47:28 -0400
+Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id C0F5020651;
+        Wed, 10 Jul 2019 01:47:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1562723248;
+        bh=Tsxx7CaSMOqfOopAnK5QN0Wr6X2fs3hEmJ+QnjoILec=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=lAPITBIuo7LQGOSiRMkxU50wQdz9eP1kvXDFoPG9hzGK945L43N7jWbCme0PUGsqo
+         /m4P3QOrSvvw+sFEIbV8Vx/ge4M3I5Yp7dEenjvs4ebCsewoUxywEQOI7Dfzmg00aC
+         qzrSpaadubVbABqHYmShXAUlUt6f82m4555FZGnI=
+Date:   Tue, 9 Jul 2019 18:47:26 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Gary R Hook <ghook@amd.com>
+Cc:     "Hook, Gary" <Gary.Hook@amd.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "Hook, Gary" <Gary.Hook@amd.com>
-Subject: [PATCH v2] crypto: ccp - memset structure fields to zero before reuse
-Thread-Topic: [PATCH v2] crypto: ccp - memset structure fields to zero before
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>
+Subject: Re: [PATCH] crypto: ccp - memset structure fields to zero before
  reuse
-Thread-Index: AQHVNrO6m+NQJFdJik6RYa0T/lhkoA==
-Date:   Wed, 10 Jul 2019 00:09:22 +0000
-Message-ID: <20190710000849.3131-1-gary.hook@amd.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: SN1PR12CA0080.namprd12.prod.outlook.com
- (2603:10b6:802:21::15) To DM5PR12MB1449.namprd12.prod.outlook.com
- (2603:10b6:4:10::14)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Gary.Hook@amd.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-mailer: git-send-email 2.17.1
-x-originating-ip: [165.204.78.2]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 56647ff3-4a2c-444f-a05a-08d704cadc7b
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:DM5PR12MB1402;
-x-ms-traffictypediagnostic: DM5PR12MB1402:
-x-microsoft-antispam-prvs: <DM5PR12MB1402CEE617B4DEE231409A37FDF00@DM5PR12MB1402.namprd12.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:312;
-x-forefront-prvs: 0094E3478A
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(376002)(346002)(39860400002)(366004)(136003)(396003)(199004)(189003)(316002)(14444005)(1076003)(6512007)(6916009)(71200400001)(71190400001)(476003)(256004)(53936002)(25786009)(2501003)(6486002)(81156014)(14454004)(8676002)(478600001)(4326008)(50226002)(486006)(3846002)(6116002)(6436002)(99286004)(26005)(66066001)(305945005)(7736002)(386003)(2906002)(8936002)(52116002)(81166006)(66556008)(5660300002)(2351001)(6506007)(86362001)(102836004)(64756008)(186003)(54906003)(66476007)(36756003)(5640700003)(66446008)(68736007)(66946007)(2616005);DIR:OUT;SFP:1101;SCL:1;SRVR:DM5PR12MB1402;H:DM5PR12MB1449.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: amd.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: fpprE1iTTxrj1wfu0EvjBg6XPBRECp1HYYflmJO3DF26gTs9yepQbSnKD9LbaQpC341E/82tidlCGQO8B7XcMqx/YUeJtwxPFFAiOsBvEuaL/TrS11v7To2M49KXkuEPzX3f2SDwao1C64XK4hXojoxHL/3mmXSe5iNHHqCh/J5Ry+yrAj5iOK9Rw2cMvyHSZQ7C8KlBg35uKncnTLxzBqEmodxjW6R/+IOrfG7NmyNKfgGg94cSr1+PKYYDp1tCOIi2v45hzsVQcWY0+sv+B8eDyCjaQzrSv/ZyJSCtVhJPsQx9w1xHx5D853ifxoE0tosz0oUJa/NETI4gOHhjTzKLHqVg8uI8Y65m23bFDwNaiEoK8WRDlQZxGo6HCkSWOz2uf9+pliUUXFIHww/WYxFQMbRpdP24lDxpOQc6968=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+Message-ID: <20190710014726.GA10582@sol.localdomain>
+Mail-Followup-To: Gary R Hook <ghook@amd.com>,
+        "Hook, Gary" <Gary.Hook@amd.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>
+References: <156218168473.3184.15319927087462863547.stgit@sosrh3.amd.com>
+ <20190705194028.GB4022@sol.localdomain>
+ <2cc5e065-0fce-5278-9c38-3bdd4755f21f@amd.com>
+ <20190709201014.GH641@sol.localdomain>
+ <c770ea90-fad8-8379-76ad-889e410b6d74@amd.com>
+ <20190709225622.GN641@sol.localdomain>
+ <6cd19eb1-0322-95d1-8a2b-b0078ae40cca@amd.com>
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 56647ff3-4a2c-444f-a05a-08d704cadc7b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Jul 2019 00:09:22.8201
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ghook@amd.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1402
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6cd19eb1-0322-95d1-8a2b-b0078ae40cca@amd.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The AES GCM function reuses an 'op' data structure, which members
-contain values that must be cleared for each (re)use.
+On Tue, Jul 09, 2019 at 11:34:08PM +0000, Gary R Hook wrote:
+> On 7/9/19 5:56 PM, Eric Biggers wrote:
+> > On Tue, Jul 09, 2019 at 10:09:16PM +0000, Gary R Hook wrote:
+> >> On 7/9/19 3:10 PM, Eric Biggers wrote:
+> >>> On Mon, Jul 08, 2019 at 05:08:09PM +0000, Gary R Hook wrote:
+> >>>> On 7/5/19 2:40 PM, Eric Biggers wrote:
+> >>>>> Hi Gary,
+> >>>>>
+> >>>>> On Wed, Jul 03, 2019 at 07:21:26PM +0000, Hook, Gary wrote:
+> >>>>>> The AES GCM function reuses an 'op' data structure, which members
+> >>>>>> contain values that must be cleared for each (re)use.
+> >>>>>>
+> >>>>>> Fixes: 36cf515b9bbe ("crypto: ccp - Enable support for AES GCM on v5 CCPs")
+> >>>>>>
+> >>>>>> Signed-off-by: Gary R Hook <gary.hook@amd.com>
+> >>>>>> ---
+> >>>>>>     drivers/crypto/ccp/ccp-ops.c |   12 +++++++++++-
+> >>>>>>     1 file changed, 11 insertions(+), 1 deletion(-)
+> >>>>>
+> >>>>> Is this patch meant to fix the gcm-aes-ccp self-tests failure?
+> >>>>
+> >>>> Yessir, that is the intention. Apologies for not clarifying that point.
+> >>>>
+> >>>> grh
+> >>>
+> >>> Okay, it would be helpful if you'd explain that in the commit message.
+> >>
+> >> Gah. Of course. I'll repost.
+> >>
+> >>> Also, what branch does this patch apply to?  It doesn't apply to cryptodev.
+> >>
+> >> I have endeavored to make a "git pull" and a full build a required,
+> >> regular part of my submission process, having made (plenty of) mistakes
+> >> in the past. I did so last week before posting this, and the patch
+> >> applied then, and applies now in my local copy, before and after a git
+> >> pull today.
+> >>
+> >> We've been having trouble with our SMTP mail server, and patches have
+> >> been going out base64 encoded. I'm willing to bet that's what you're
+> >> wrestling with.
+> >>
+> >> The last patch of mine that Herbert applied appeared to be encoded
+> >> thusly, but he was able to successfully apply it.
+> >>
+> >> I've been experimenting with changing the transfer encoding value
+> >> (charset=) to iso-8859-1 and us-ascii, but the best I can do is an
+> >> encoding that contains a lot of "=##" stuff. I'm not sure that's any
+> >> better, but my recent documentation patches contained those, and Herbert
+> >> was also able to apply them.
+> >>
+> >> We'd really like to know what Herbert does to accommodate these
+> >> non-textual emails? And is that something that others could do?
+> >>
+> > 
+> > What I did was simply save your email and use 'git am -3' to try to apply it.
+> > It didn't work.
+> > 
+> > Yes, your email is base64 encoded, which apparently 'git am' handles.  But even
+> > after base64 decoding your patch has an extra blank line at the end, which
+> > corrupts it since it's part of the diff context.
+> 
+> I was unaware of this behavior. Thanks for letting me know.
+> 
+> > Can't you just use git send-email like everyone else?
+> 
+> Sure, until I find the time to fix stgit's email function.
+> 
+> It's still going to be quoted-printable text; I can't fix that problem 
+> without the mail gateway cooperating. But I presume it will be in the 
+> proper format. Look for a v2 and let me know how it comes out.
+> 
+> grh
 
-This fix resolves a crypto self-test failure:
-alg: aead: gcm-aes-ccp encryption test failed (wrong result) on test vector=
- 2, cfg=3D"two even aligned splits"
+Yes the v2 patch applies.
 
-Fixes: 36cf515b9bbe ("crypto: ccp - Enable support for AES GCM on v5 CCPs")
-
-Signed-off-by: Gary R Hook <gary.hook@amd.com>
----
-
-Changes since v1:
- - Explain in the commit message that this fix resolves a failed test
-
- drivers/crypto/ccp/ccp-ops.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/ccp/ccp-ops.c b/drivers/crypto/ccp/ccp-ops.c
-index a817f2755c58..9ecc1bb4b237 100644
---- a/drivers/crypto/ccp/ccp-ops.c
-+++ b/drivers/crypto/ccp/ccp-ops.c
-@@ -622,6 +622,7 @@ static int ccp_run_aes_gcm_cmd(struct ccp_cmd_queue *cm=
-d_q,
-=20
- 	unsigned long long *final;
- 	unsigned int dm_offset;
-+	unsigned int jobid;
- 	unsigned int ilen;
- 	bool in_place =3D true; /* Default value */
- 	int ret;
-@@ -660,9 +661,11 @@ static int ccp_run_aes_gcm_cmd(struct ccp_cmd_queue *c=
-md_q,
- 		p_tag =3D scatterwalk_ffwd(sg_tag, p_inp, ilen);
- 	}
-=20
-+	jobid =3D CCP_NEW_JOBID(cmd_q->ccp);
-+
- 	memset(&op, 0, sizeof(op));
- 	op.cmd_q =3D cmd_q;
--	op.jobid =3D CCP_NEW_JOBID(cmd_q->ccp);
-+	op.jobid =3D jobid;
- 	op.sb_key =3D cmd_q->sb_key; /* Pre-allocated */
- 	op.sb_ctx =3D cmd_q->sb_ctx; /* Pre-allocated */
- 	op.init =3D 1;
-@@ -813,6 +816,13 @@ static int ccp_run_aes_gcm_cmd(struct ccp_cmd_queue *c=
-md_q,
- 	final[0] =3D cpu_to_be64(aes->aad_len * 8);
- 	final[1] =3D cpu_to_be64(ilen * 8);
-=20
-+	memset(&op, 0, sizeof(op));
-+	op.cmd_q =3D cmd_q;
-+	op.jobid =3D jobid;
-+	op.sb_key =3D cmd_q->sb_key; /* Pre-allocated */
-+	op.sb_ctx =3D cmd_q->sb_ctx; /* Pre-allocated */
-+	op.init =3D 1;
-+	op.u.aes.type =3D aes->type;
- 	op.u.aes.mode =3D CCP_AES_MODE_GHASH;
- 	op.u.aes.action =3D CCP_AES_GHASHFINAL;
- 	op.src.type =3D CCP_MEMTYPE_SYSTEM;
---=20
-2.17.1
-
+- Eric
