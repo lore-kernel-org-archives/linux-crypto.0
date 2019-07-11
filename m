@@ -2,168 +2,110 @@ Return-Path: <SRS0=zNYl=VI=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14A3BC74A35
-	for <linux-crypto@archiver.kernel.org>; Thu, 11 Jul 2019 15:22:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55C1AC74A35
+	for <linux-crypto@archiver.kernel.org>; Thu, 11 Jul 2019 15:25:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A824420644
-	for <linux-crypto@archiver.kernel.org>; Thu, 11 Jul 2019 15:22:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 28A4620872
+	for <linux-crypto@archiver.kernel.org>; Thu, 11 Jul 2019 15:25:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=hp.com header.i=@hp.com header.b="Obfz3qJw"
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="WwinmF9W"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726722AbfGKPWE (ORCPT
+        id S1728569AbfGKPZD (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 11 Jul 2019 11:22:04 -0400
-Received: from us-smtp-delivery-162.mimecast.com ([216.205.24.162]:59330 "EHLO
-        us-smtp-delivery-162.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726012AbfGKPWE (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 11 Jul 2019 11:22:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hp.com; s=mimecast20180716;
-        t=1562858523;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=qZYQfksre6ErtpOPnbg36I7bdTyGBffji0jMc7fEtNw=;
-        b=Obfz3qJwt4foraiQIlTLrU1TIfEzvlTEwXnHDF23wfobw58iu/sZDaVuotmW1p4OrU6HUV
-        t2LA/u0rAnrU1R6z5EGhVmY+Vv6b4XckASKHoY8AF4qVqHHWPGpXSTTP+gYBPptiLR9pJi
-        MTasT+vCPhmk1y4XDuUzElRIvOEf+HA=
-Received: from NAM04-SN1-obe.outbound.protection.outlook.com
- (mail-sn1nam04lp2051.outbound.protection.outlook.com [104.47.44.51]) (Using
- TLS) by relay.mimecast.com with ESMTP id
- us-mta-351-FkR16nKtOaWLM88BpKMpJA-1; Thu, 11 Jul 2019 11:22:02 -0400
-Received: from TU4PR8401MB0544.NAMPRD84.PROD.OUTLOOK.COM (10.169.43.141) by
- TU4PR8401MB0703.NAMPRD84.PROD.OUTLOOK.COM (10.169.45.16) with Microsoft SMTP
+        Thu, 11 Jul 2019 11:25:03 -0400
+Received: from mail-eopbgr790079.outbound.protection.outlook.com ([40.107.79.79]:58252
+        "EHLO NAM03-CO1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728438AbfGKPZD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 11 Jul 2019 11:25:03 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector1-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6e+nCAYrjJDWyoMk1Hk13wIfHzFHpvi/tGHBKVpMjTw=;
+ b=WwinmF9WPfwInVmxp8Fe7otVz9MaUd0+akz03W7vBwnWsjROSzzMqv+Gb2sKy38yBvWVZGeot+Dpjgx1HgktDFEAeQCusGhhRODYq8rPwQYFhqDHbRfHgdkx9TWgZ9h+qrUJwAoGJHqzQ9jaroHQsmdSnoELafsw9rfsalaIzwc=
+Received: from DM5PR12MB1449.namprd12.prod.outlook.com (10.172.40.14) by
+ DM5PR12MB1769.namprd12.prod.outlook.com (10.175.89.150) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2073.10; Thu, 11 Jul 2019 15:22:00 +0000
-Received: from TU4PR8401MB0544.NAMPRD84.PROD.OUTLOOK.COM
- ([fe80::84f0:ed8d:a382:7d41]) by TU4PR8401MB0544.NAMPRD84.PROD.OUTLOOK.COM
- ([fe80::84f0:ed8d:a382:7d41%8]) with mapi id 15.20.2052.020; Thu, 11 Jul 2019
- 15:22:00 +0000
-From:   "Bhat, Jayalakshmi Manjunath" <jayalakshmi.bhat@hp.com>
-To:     Stephan Mueller <smueller@chronox.de>
-CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Subject: RE: CAVS test harness
-Thread-Topic: CAVS test harness
-Thread-Index: AdU2IaQXtQPkG6HVRT2zauBDH3qftABvXlyAAABAX4AABvU+0A==
-Date:   Thu, 11 Jul 2019 15:22:00 +0000
-Message-ID: <TU4PR8401MB05445179722F462CD8C05AB0F6F30@TU4PR8401MB0544.NAMPRD84.PROD.OUTLOOK.COM>
-References: <TU4PR8401MB0544875B118D39899547FDEFF6F10@TU4PR8401MB0544.NAMPRD84.PROD.OUTLOOK.COM>
- <3201120.NINpRaGeap@tauon.chronox.de> <1782078.ZURsmYODYl@tauon.chronox.de>
-In-Reply-To: <1782078.ZURsmYODYl@tauon.chronox.de>
+ 15.20.2052.19; Thu, 11 Jul 2019 15:25:01 +0000
+Received: from DM5PR12MB1449.namprd12.prod.outlook.com
+ ([fe80::a894:b1d5:a126:adce]) by DM5PR12MB1449.namprd12.prod.outlook.com
+ ([fe80::a894:b1d5:a126:adce%6]) with mapi id 15.20.2052.020; Thu, 11 Jul 2019
+ 15:25:01 +0000
+From:   Gary R Hook <ghook@amd.com>
+To:     "Hook, Gary" <Gary.Hook@amd.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>
+Subject: Re: [PATCH v2] crypto: ccp - memset structure fields to zero before
+ reuse
+Thread-Topic: [PATCH v2] crypto: ccp - memset structure fields to zero before
+ reuse
+Thread-Index: AQHVNrO6m+NQJFdJik6RYa0T/lhkoKbDGDyAgACXVICAAKDHgP//0i2AgAB0LYCAAPWBgA==
+Date:   Thu, 11 Jul 2019 15:25:00 +0000
+Message-ID: <7a4dfdce-41ca-2047-f9f2-77e0b7abedb3@amd.com>
+References: <20190710000849.3131-1-gary.hook@amd.com>
+ <20190710015725.GA746@sol.localdomain>
+ <2875285f-d438-667e-52d9-801124ffba88@amd.com>
+ <20190710203428.GC83443@gmail.com>
+ <d4b8006c-0243-b4a4-c695-a67041acc82f@amd.com>
+ <20190711004617.GA628@sol.localdomain>
+In-Reply-To: <20190711004617.GA628@sol.localdomain>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-x-originating-ip: [106.51.110.207]
+x-clientproxiedby: SN2PR01CA0032.prod.exchangelabs.com (2603:10b6:804:2::42)
+ To DM5PR12MB1449.namprd12.prod.outlook.com (2603:10b6:4:10::14)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Gary.Hook@amd.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [165.204.77.1]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 74ef4cd2-c76f-4e49-3b83-08d706138558
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:TU4PR8401MB0703;
-x-ms-traffictypediagnostic: TU4PR8401MB0703:
-x-microsoft-antispam-prvs: <TU4PR8401MB0703376F6BF1B6D35D18CC11F6F30@TU4PR8401MB0703.NAMPRD84.PROD.OUTLOOK.COM>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-ms-office365-filtering-correlation-id: 41143925-8a80-44ca-da3b-08d70613f090
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:DM5PR12MB1769;
+x-ms-traffictypediagnostic: DM5PR12MB1769:
+x-ms-exchange-purlcount: 1
+x-microsoft-antispam-prvs: <DM5PR12MB17691BB557955B7BE4E9CD3DFDF30@DM5PR12MB1769.namprd12.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8273;
 x-forefront-prvs: 0095BCF226
-x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(346002)(366004)(39860400002)(396003)(376002)(136003)(53754006)(13464003)(199004)(189003)(51874003)(6602003)(9686003)(52536014)(6246003)(5660300002)(81166006)(8676002)(305945005)(81156014)(74316002)(9456002)(486006)(476003)(446003)(316002)(102836004)(4326008)(86362001)(11346002)(7736002)(68736007)(8936002)(186003)(478600001)(256004)(6916009)(76176011)(53546011)(6506007)(55236004)(26005)(76116006)(66946007)(66476007)(64756008)(33656002)(14454004)(66556008)(6436002)(66066001)(78486014)(71200400001)(66446008)(71190400001)(55016002)(7696005)(7116003)(99286004)(25786009)(6116002)(3846002)(53936002)(3480700005)(2906002)(229853002);DIR:OUT;SFP:1102;SCL:1;SRVR:TU4PR8401MB0703;H:TU4PR8401MB0544.NAMPRD84.PROD.OUTLOOK.COM;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(396003)(39860400002)(366004)(346002)(376002)(136003)(199004)(189003)(8676002)(8936002)(966005)(81166006)(4744005)(478600001)(2201001)(99286004)(52116002)(31696002)(76176011)(229853002)(66446008)(71200400001)(68736007)(64756008)(256004)(3846002)(316002)(71190400001)(110136005)(66476007)(81156014)(66556008)(36756003)(305945005)(31686004)(14454004)(66946007)(7736002)(6436002)(6486002)(53936002)(186003)(26005)(6116002)(6246003)(6306002)(6636002)(6512007)(5660300002)(102836004)(2616005)(11346002)(2501003)(476003)(25786009)(446003)(53546011)(66066001)(486006)(2906002)(6506007)(386003);DIR:OUT;SFP:1101;SCL:1;SRVR:DM5PR12MB1769;H:DM5PR12MB1449.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
 x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: XIvRPmGW0XWk5nDwiAAOv/zG8+eueI8XThRfl9pIndPRGSCBzyYXPeA/VErV5/e8V3AnfQfZTi8MPLTwBjIQ1LtDOEC8LNx8kt65C0xOITl5xbdQqsQOlvz3R4gv0mgY81B6Yq+ePbbUR6xljoDffxESg0pgl3Wg0LYu5hf9GgsPpqeuK63mT4E4788gjsh1b234XFc4pGm7VPwKXl3UOwA22vQ+dXwxA5Ue0SpSvS3m9kfp1mji6EitIzoSK0xzVEdKPa2YFhdnzOnt6uzxxcdB56GxvjiCzcRbElY1v8Nusg5c1wBOVOgHFgwDHZ13FRaMDL+Q1yDl+3+j+4YHk2HMXlGPZa4qC13ArRkSs+RkHaUEJJZSJicJdLoadYF/RBeoqKoPb3yXdeE0S8EeLJOfqEiDjrPRjC2rjiHkJVg=
+x-microsoft-antispam-message-info: 8TNzS+dGF2/smcm7ule4rVOxap5ddKAmfg+kle6pEd/z4MlMgtKCtFe824IuYlMU/uWHNwrnrYnp4IpwyQ5yEW8RSzcjLTdpv9CSqk3MILT3YveKbaxJ1yC+u338AKjHAMkTonC9rep/JSJG5l20X/nCSiWRF5aJuzJeCHFheoOP4ZUg6ScT4X8OrlHAr7ifTCL9jjS3q9m1gIFkVI/ybNoNHu3vtiB9ichepEgmDvwJ///FqV79t/hHzRBdbViqEyIDRgIQnhOtxZUmjfpfiPAnWCfzO3Ir2dy9kB8DCOfwoer7aOo/hTpJ/mATGeUjrFQtAWZ2hjutbN2xDZnfJr8BWMerYysC8ZA6WNZ+wW/hnt1BfrC9lzam6lJ5dZ1CGxrwfJbV+WBbxNPpLKYSIBr7Tbyte4Lq2IivEzjxX7g=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <95A04282416FEF42B39559D16439721E@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-X-OriginatorOrg: hp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 74ef4cd2-c76f-4e49-3b83-08d706138558
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Jul 2019 15:22:00.6280
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 41143925-8a80-44ca-da3b-08d70613f090
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Jul 2019 15:25:00.9927
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: ca7981a2-785a-463d-b82a-3db87dfc3ce6
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: jayalakshmi.bhat@hp.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TU4PR8401MB0703
-X-MC-Unique: FkR16nKtOaWLM88BpKMpJA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-CrossTenant-userprincipalname: ghook@amd.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1769
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Stephan,
-
-Thank you very much for the reply. Yes we would need to write the test for =
-AEC (ECB,CBC,CTR) 128 and 256 bits, SHA-1, SHA-2 (256,384 and 512), HMAC, D=
-RBG and also for key derivation functions.
-We are planning to write netlink based kernel module to receive the data (t=
-est vector input) from the user space and process the data and generate the=
- result, pass it on to user space.
-
-I wanted to know if this sounds a reasonable approach?
-
-Thanks in advance,
-Jayalakshmi
-
-
-
------Original Message-----
-From: Stephan Mueller <smueller@chronox.de>=20
-Sent: Thursday, July 11, 2019 5:30 PM
-To: Bhat, Jayalakshmi Manjunath <jayalakshmi.bhat@hp.com>
-Cc: linux-crypto@vger.kernel.org
-Subject: Re: CAVS test harness
-
-Am Donnerstag, 11. Juli 2019, 13:52:29 CEST schrieb Stephan Mueller:
-
-Hi,
-
-> Am Dienstag, 9. Juli 2019, 08:43:51 CEST schrieb Bhat, Jayalakshmi
-> Manjunath:
->=20
-> Hi Jayalakshmi,
->=20
-> > Hi All,
-> >=20
-> > We are working on a product that requires NIAP certification and use=20
-> > IPSec environment for certification. IPSec functionality is achieved=20
-> > by third party IPsec library and native XFRM. Third  party IPsec=20
-> > library is used for ISAKMP and XFRM for IPsec.
-> >=20
-> > CAVS test cases are required for NIAP certification.  Thus we need=20
-> > to implement CAVS test harness for Third party library and Linux=20
-> > crypto algorithms. I found the documentation on kernel crypto API usage=
-.
-> >=20
-> > Please can you indication what is the right method to implement the=20
-> > test harness for Linux crypto algorithms.
-> > 1.=09Should I implement CAVS test
-> > harness for Linux kernel crypto algorithms as a user space=20
-> > application that exercise the kernel crypto API?
-> > 2.=09Should I implement  CAVS test harness as
-> > module in Linux kernel?
->=20
-> As I have implemented the full CAVS test framework I can tell you that=20
-> the AF_ALG interface will not allow you to perform all tests required by =
-CAVS.
->=20
-> Thus you need to implement your own kernel module with its own interface.
-
-As a side note: if you only want to test the symmetric ciphers and the hash=
-es/ HMACs, you can implement that with libkcapi easily.
-
-However, if you are interested in testing the DRBG due to its relevance for=
- the GCM IV, you certainly need a kernel module.
->=20
-> > Any information on this will help me very much on implementation.
-> >=20
-> > Regards,
-> > Jayalakshmi
->=20
-> Ciao
-> Stephan
-
-
-
-Ciao
-Stephan
-
-
+T24gNy8xMC8xOSA3OjQ2IFBNLCBFcmljIEJpZ2dlcnMgd3JvdGU6DQo+IA0KPiBUaGUgZ2VuZXJp
+YyBpbXBsZW1lbnRhdGlvbiBhbGxvd3MgYXV0aGVudGljYXRpb24gdGFncyBvZiA0LCA4LCAxMiwg
+MTMsIDE0LCAxNSwNCj4gb3IgMTYgYnl0ZXMuICBTZWUgY3J5cHRvX2djbV9zZXRhdXRoc2l6ZSgp
+IGluIGNyeXB0by9nY20uYywgYW5kIHNlZQ0KPiBodHRwczovL252bHB1YnMubmlzdC5nb3Yvbmlz
+dHB1YnMvTGVnYWN5L1NQL25pc3RzcGVjaWFscHVibGljYXRpb244MDAtMzhkLnBkZg0KPiBzZWN0
+aW9uIDUuMi4xLjIgIk91dHB1dCBEYXRhIi4gIElmIHlvdSBkaXNhZ3JlZSB0aGF0IHRoaXMgaXMg
+dGhlIGNvcnJlY3QNCj4gYmVoYXZpb3IsIHRoZW4gd2UgbmVlZCB0byBmaXggdGhlIGdlbmVyaWMg
+aW1wbGVtZW50YXRpb24gdG9vLg0KDQpJdCdzIGJlZW4gYSB3aGlsZSwgYW5kIHRoZSByZWZyZXNo
+ZXIgd2FzIG5lZWRlZCwgYW5kIGlzIGFwcHJlY2lhdGVkLg0KDQpPdXIgZGV2aWNlIG9ubHkgYWxs
+b3dzIDE2IGJ5dGUgdGFncy4gU28gSSBoYXZlIHRvIGZpZ3VyZSBvdXQgaG93IHRvIHNldCANCnVw
+IHRoZSBkcml2ZXIgdG8gZXhwb3NlL2VuZm9yY2UgdGhhdCBsaW1pdGF0aW9uLiBUaGF0J3Mgd2hl
+cmUgd2UgZ28gYXdyeS4NCg0KVGhhbmtzIG11Y2ghDQoNCg==
