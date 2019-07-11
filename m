@@ -2,67 +2,114 @@ Return-Path: <SRS0=zNYl=VI=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 931ADC74A4B
-	for <linux-crypto@archiver.kernel.org>; Thu, 11 Jul 2019 11:10:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D4F4C74A35
+	for <linux-crypto@archiver.kernel.org>; Thu, 11 Jul 2019 11:59:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 73AE521019
-	for <linux-crypto@archiver.kernel.org>; Thu, 11 Jul 2019 11:10:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 75302208E4
+	for <linux-crypto@archiver.kernel.org>; Thu, 11 Jul 2019 11:59:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="CfIfHB1r"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728055AbfGKLKT (ORCPT
+        id S1728289AbfGKL7q (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 11 Jul 2019 07:10:19 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:39668 "EHLO deadmen.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727865AbfGKLKT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 11 Jul 2019 07:10:19 -0400
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1hlWxr-0001EV-Au; Thu, 11 Jul 2019 19:10:15 +0800
-Received: from herbert by gondobar with local (Exim 4.89)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1hlWxn-0006ie-Mw; Thu, 11 Jul 2019 19:10:11 +0800
-Date:   Thu, 11 Jul 2019 19:10:11 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Kalyani Akula <kalyania@xilinx.com>
-Cc:     Stephan Mueller <smueller@chronox.de>,
-        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Sarat Chand Savitala <saratcha@xilinx.com>
-Subject: Re: [RFC PATCH 4/5] crypto: Adds user space interface for
- ALG_SET_KEY_TYPE
-Message-ID: <20190711111011.x3qzukon2zqnsgac@gondor.apana.org.au>
-References: <1547708541-23730-1-git-send-email-kalyani.akula@xilinx.com>
- <18759853.IUaQuE38eh@tauon.chronox.de>
- <SN6PR02MB5135CE53C3E3FB34CA5E6BA8AF320@SN6PR02MB5135.namprd02.prod.outlook.com>
- <2554415.t45IJDmies@tauon.chronox.de>
- <BN7PR02MB5124A7E685AC0F59AFBEFC8DAF130@BN7PR02MB5124.namprd02.prod.outlook.com>
- <20190610063501.u3q2k2vgytvknxs3@gondor.apana.org.au>
- <BN7PR02MB5124F4680E424C25D77D178DAFF30@BN7PR02MB5124.namprd02.prod.outlook.com>
+        Thu, 11 Jul 2019 07:59:46 -0400
+Received: from mo4-p01-ob.smtp.rzone.de ([85.215.255.52]:10903 "EHLO
+        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728198AbfGKL7q (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 11 Jul 2019 07:59:46 -0400
+X-Greylist: delayed 434 seconds by postgrey-1.27 at vger.kernel.org; Thu, 11 Jul 2019 07:59:45 EDT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1562846382;
+        s=strato-dkim-0002; d=chronox.de;
+        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
+        bh=OuwZ8K0f/Gg0RtZtWjajCRJNHjGMsgFwRKm7HEm15Qc=;
+        b=CfIfHB1rJMqMlyaCkkle+fM0C7apQMpe+2RbbXE0Fqzdf3buncb1gadzdbw9N2pfXK
+        tNSqHP8r9FMDrYU+C7Dn4jmcwqKQj58y0MLEOb0EVzuB4CCL++Fb+MDYU/4TWcNBea7Z
+        jJ+ptJTCZKE2y+HQLZRmON+5ndugZ5GMK9AbzriNuLU0/n5ALxU2X0GatzB+PEXy7lae
+        PzERneUEgXdEGsUscSxhNTHfzqjbVMTzC0eI83K8QqjoOnyLLs41DZHiTVC9MB82w1GX
+        OaXSHawJ+JZ2Nq4yRDg/AyX8sF6L0+Nz2UsI+MGRSJ3QeAZ2s6dOWn4gN1uGw6JmVvoF
+        oDiw==
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xm0dNS3IdRcRALiq2+M="
+X-RZG-CLASS-ID: mo00
+Received: from tauon.chronox.de
+        by smtp.strato.de (RZmta 44.24 DYNA|AUTH)
+        with ESMTPSA id 9078d1v6BBxfwtR
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (curve secp521r1 with 521 ECDH bits, eq. 15360 bits RSA))
+        (Client did not present a certificate);
+        Thu, 11 Jul 2019 13:59:41 +0200 (CEST)
+From:   Stephan Mueller <smueller@chronox.de>
+To:     "Bhat, Jayalakshmi Manjunath" <jayalakshmi.bhat@hp.com>
+Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Subject: Re: CAVS test harness
+Date:   Thu, 11 Jul 2019 13:59:41 +0200
+Message-ID: <1782078.ZURsmYODYl@tauon.chronox.de>
+In-Reply-To: <3201120.NINpRaGeap@tauon.chronox.de>
+References: <TU4PR8401MB0544875B118D39899547FDEFF6F10@TU4PR8401MB0544.NAMPRD84.PROD.OUTLOOK.COM> <3201120.NINpRaGeap@tauon.chronox.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BN7PR02MB5124F4680E424C25D77D178DAFF30@BN7PR02MB5124.namprd02.prod.outlook.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jul 11, 2019 at 09:25:38AM +0000, Kalyani Akula wrote:
->
-> How about using same interface to distinguish between the User supplied key Vs HW key selection based on key_len parameter.
+Am Donnerstag, 11. Juli 2019, 13:52:29 CEST schrieb Stephan Mueller:
 
-As long as you use the paes name instead of aes you can do whatever
-you want with the key encoding.
+Hi,
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+> Am Dienstag, 9. Juli 2019, 08:43:51 CEST schrieb Bhat, Jayalakshmi
+> Manjunath:
+> 
+> Hi Jayalakshmi,
+> 
+> > Hi All,
+> > 
+> > We are working on a product that requires NIAP certification and use IPSec
+> > environment for certification. IPSec functionality is achieved by third
+> > party IPsec library and native XFRM. Third  party IPsec library is used
+> > for
+> > ISAKMP and XFRM for IPsec.
+> > 
+> > CAVS test cases are required for NIAP certification.  Thus we need to
+> > implement CAVS test harness for Third party library and Linux crypto
+> > algorithms. I found the documentation on kernel crypto API usage.
+> > 
+> > Please can you indication what is the right method to implement the test
+> > harness for Linux crypto algorithms.
+> > 1.	Should I implement CAVS test
+> > harness for Linux kernel crypto algorithms as a user space application
+> > that
+> > exercise the kernel crypto API?
+> > 2.	Should I implement  CAVS test harness as
+> > module in Linux kernel?
+> 
+> As I have implemented the full CAVS test framework I can tell you that the
+> AF_ALG interface will not allow you to perform all tests required by CAVS.
+> 
+> Thus you need to implement your own kernel module with its own interface.
+
+As a side note: if you only want to test the symmetric ciphers and the hashes/
+HMACs, you can implement that with libkcapi easily.
+
+However, if you are interested in testing the DRBG due to its relevance for 
+the GCM IV, you certainly need a kernel module.
+> 
+> > Any information on this will help me very much on implementation.
+> > 
+> > Regards,
+> > Jayalakshmi
+> 
+> Ciao
+> Stephan
+
+
+
+Ciao
+Stephan
+
+
