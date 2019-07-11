@@ -2,83 +2,71 @@ Return-Path: <SRS0=zNYl=VI=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1A44C74A35
-	for <linux-crypto@archiver.kernel.org>; Thu, 11 Jul 2019 15:33:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 345FEC742A1
+	for <linux-crypto@archiver.kernel.org>; Thu, 11 Jul 2019 19:22:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DF61D206B8
-	for <linux-crypto@archiver.kernel.org>; Thu, 11 Jul 2019 15:33:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="VsBWIpov"
+	by mail.kernel.org (Postfix) with ESMTP id E250C20872
+	for <linux-crypto@archiver.kernel.org>; Thu, 11 Jul 2019 19:22:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728640AbfGKPdv (ORCPT
+        id S1726880AbfGKTW1 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 11 Jul 2019 11:33:51 -0400
-Received: from mo4-p00-ob.smtp.rzone.de ([85.215.255.23]:18934 "EHLO
-        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728532AbfGKPdv (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 11 Jul 2019 11:33:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1562859229;
-        s=strato-dkim-0002; d=chronox.de;
-        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
-        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-        bh=wXYSwrVKmSiKFnLIqd3QD5ata78pErb1hIhwUpGh7Jc=;
-        b=VsBWIpovvYHoWwYRiS8+bAJ/pQ6B14fx+LVNqlDZSvQ3j7GMPAnL+/NhWUEs+Hmzh0
-        dns9ZPeeCzWQgyH2l/NJm1sckAndPF1Aemr9fsva9ZqTg24rEhnAZR0eobCmr36qJFp0
-        fW3hKQMQi4JhlZu0GIXP3CyDlSkZX9Su43SeKGf8H9FI7cQEOOZVVZfGU5JEY+t/+b5B
-        7YQS/20SYk+WEUP65/d230S+6bo4z2x2k7bTX9bZrDQdaCDIHRXJ8MhlyPj2ZAnOhTFl
-        i1YGXMYK36p24eAcnz9x+oqa1MdlJ3bm5voTumy3iHV9hbBSzAygQPMCHnhCh05Af0T7
-        5fEw==
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9x2wdNs6neUFoh7cs0E0="
-X-RZG-CLASS-ID: mo00
-Received: from tauon.chronox.de
-        by smtp.strato.de (RZmta 44.24 AUTH)
-        with ESMTPSA id 9078d1v6BFXnyMY
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (curve secp521r1 with 521 ECDH bits, eq. 15360 bits RSA))
-        (Client did not present a certificate);
-        Thu, 11 Jul 2019 17:33:49 +0200 (CEST)
-From:   Stephan Mueller <smueller@chronox.de>
-To:     "Bhat, Jayalakshmi Manjunath" <jayalakshmi.bhat@hp.com>
-Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Subject: Re: CAVS test harness
-Date:   Thu, 11 Jul 2019 17:33:47 +0200
-Message-ID: <2317418.W1bvXbUTk3@tauon.chronox.de>
-In-Reply-To: <TU4PR8401MB05445179722F462CD8C05AB0F6F30@TU4PR8401MB0544.NAMPRD84.PROD.OUTLOOK.COM>
-References: <TU4PR8401MB0544875B118D39899547FDEFF6F10@TU4PR8401MB0544.NAMPRD84.PROD.OUTLOOK.COM> <1782078.ZURsmYODYl@tauon.chronox.de> <TU4PR8401MB05445179722F462CD8C05AB0F6F30@TU4PR8401MB0544.NAMPRD84.PROD.OUTLOOK.COM>
+        Thu, 11 Jul 2019 15:22:27 -0400
+Received: from mga14.intel.com ([192.55.52.115]:9170 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726446AbfGKTW0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 11 Jul 2019 15:22:26 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 11 Jul 2019 12:22:25 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.63,479,1557212400"; 
+   d="scan'208";a="156917272"
+Received: from mmoerth-mobl6.ger.corp.intel.com (HELO localhost) ([10.249.35.82])
+  by orsmga007.jf.intel.com with ESMTP; 11 Jul 2019 12:22:16 -0700
+Date:   Thu, 11 Jul 2019 22:22:15 +0300
+From:   Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+To:     Sumit Garg <sumit.garg@linaro.org>
+Cc:     keyrings@vger.kernel.org, linux-integrity@vger.kernel.org,
+        linux-crypto@vger.kernel.org,
+        linux-security-module@vger.kernel.org, dhowells@redhat.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        jejb@linux.ibm.com, zohar@linux.ibm.com, jmorris@namei.org,
+        serge@hallyn.com, casey@schaufler-ca.com,
+        ard.biesheuvel@linaro.org, daniel.thompson@linaro.org,
+        linux-kernel@vger.kernel.org, tee-dev@lists.linaro.org
+Subject: Re: [RFC/RFT] KEYS: trusted: Add generic trusted keys framework
+Message-ID: <20190711192215.5w3fzdjwsebgoesh@linux.intel.com>
+References: <1562337154-26376-1-git-send-email-sumit.garg@linaro.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1562337154-26376-1-git-send-email-sumit.garg@linaro.org>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+User-Agent: NeoMutt/20180716
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Donnerstag, 11. Juli 2019, 17:22:00 CEST schrieb Bhat, Jayalakshmi 
-Manjunath:
-
-Hi Jayalakshmi,
-
-> Hi Stephan,
+On Fri, Jul 05, 2019 at 08:02:34PM +0530, Sumit Garg wrote:
+> Current trusted keys framework is tightly coupled to use TPM device as
+> an underlying implementation which makes it difficult for implementations
+> like Trusted Execution Environment (TEE) etc. to provide trusked keys
+> support in case platform doesn't posses a TPM device.
 > 
-> Thank you very much for the reply. Yes we would need to write the test for
-> AEC (ECB,CBC,CTR) 128 and 256 bits, SHA-1, SHA-2 (256,384 and 512), HMAC,
-> DRBG and also for key derivation functions. We are planning to write
-> netlink based kernel module to receive the data (test vector input) from
-> the user space and process the data and generate the result, pass it on to
-> user space.
+> So this patch tries to add generic trusted keys framework where underlying
+> implemtations like TPM, TEE etc. could be easily plugged-in.
 > 
-> I wanted to know if this sounds a reasonable approach?
+> Suggested-by: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
 
-That sounds reasonable.
+1. Needs to be somehow dissected into digestable/reviewable pieces.
+2. As a precursory step probably would make sense to move all
+   existing trusted keys code into one subsystem first.
 
-I implemented the kernel module as you described it but with a debugfs 
-interface to use the interface straight from a shell if needed.
-
-Ciao
-Stephan
-
-
+/Jarkko
