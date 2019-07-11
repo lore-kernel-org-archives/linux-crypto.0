@@ -2,137 +2,143 @@ Return-Path: <SRS0=zNYl=VI=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F847C74A36
-	for <linux-crypto@archiver.kernel.org>; Thu, 11 Jul 2019 00:46:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7EB9C74A51
+	for <linux-crypto@archiver.kernel.org>; Thu, 11 Jul 2019 09:25:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CE3AE214AF
-	for <linux-crypto@archiver.kernel.org>; Thu, 11 Jul 2019 00:46:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1562805981;
-	bh=9PtXVEFgbz5xR5gteaqKYk77B7+n5FHztKZstybeI4s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=OKNxvAcTgZ43X5BeMiI4BTtiQfPEIjOkk/No3ktH2v+Sm4LRvLu9qouRf+mSXzPpV
-	 1MhulP4R811OZ5Fx3+D9Q7gxFKf68rhX+39R1/3rMQz3AyGCfyaJtRJ6OiXtCFzmYJ
-	 oOKkTSC2Xj0GxXcPslXXAotUNSyQEZW1jg8fUHOw=
+	by mail.kernel.org (Postfix) with ESMTP id 8782821019
+	for <linux-crypto@archiver.kernel.org>; Thu, 11 Jul 2019 09:25:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="dqbvOxsm"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727594AbfGKAqU (ORCPT
+        id S1728233AbfGKJZn (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 10 Jul 2019 20:46:20 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33886 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726627AbfGKAqU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 10 Jul 2019 20:46:20 -0400
-Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id D74C220872;
-        Thu, 11 Jul 2019 00:46:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1562805979;
-        bh=9PtXVEFgbz5xR5gteaqKYk77B7+n5FHztKZstybeI4s=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=tJpS94AGuN+4L3uTDEOV3v6YUZ4FGPEa6uDHBQmLu5JZc2RY5tlE8gjnNiNCzAe0P
-         p0AXY+18wYECcmPjjrcZ0XG91KHsO3TGoLtTkqsm1rHkynm/os2O4QCxeEDs0VNKYg
-         dg93rTLsiDYaW2yKY32gwZuEacIwt5uPYKAzNq4o=
-Date:   Wed, 10 Jul 2019 17:46:17 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Gary R Hook <ghook@amd.com>
-Cc:     "Hook, Gary" <Gary.Hook@amd.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        Thu, 11 Jul 2019 05:25:43 -0400
+Received: from mail-eopbgr780082.outbound.protection.outlook.com ([40.107.78.82]:12112
+        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728024AbfGKJZm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 11 Jul 2019 05:25:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=xilinx.onmicrosoft.com; s=selector1-xilinx-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=mDFle8KYi5L+L3wjkkPB12ErVtquOcT3MqdB/MhjGiQ=;
+ b=dqbvOxsmXKFeQn67Xx6ElX0d4LDFR2YCM/WNUYuB4TF6r9Y7JYgvnur9yM0LpBf8T/UEzIWb8vYc2pY4syvpdI96ZYFpU1v7N9fIlWlnlSE30BMfMVw1eG2dwFlo9cZA1sAzc/Bpz1Q3Q3p2HcxZsKQxOzi42P0J8hDDdRxgQmk=
+Received: from BN7PR02MB5124.namprd02.prod.outlook.com (20.176.26.153) by
+ BN7PR02MB4244.namprd02.prod.outlook.com (52.135.251.161) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2052.18; Thu, 11 Jul 2019 09:25:39 +0000
+Received: from BN7PR02MB5124.namprd02.prod.outlook.com
+ ([fe80::cba:ad22:b7fd:2cfe]) by BN7PR02MB5124.namprd02.prod.outlook.com
+ ([fe80::cba:ad22:b7fd:2cfe%5]) with mapi id 15.20.2052.022; Thu, 11 Jul 2019
+ 09:25:39 +0000
+From:   Kalyani Akula <kalyania@xilinx.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+CC:     Stephan Mueller <smueller@chronox.de>,
+        "keyrings@vger.kernel.org" <keyrings@vger.kernel.org>,
         "davem@davemloft.net" <davem@davemloft.net>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>
-Subject: Re: [PATCH v2] crypto: ccp - memset structure fields to zero before
- reuse
-Message-ID: <20190711004617.GA628@sol.localdomain>
-Mail-Followup-To: Gary R Hook <ghook@amd.com>,
-        "Hook, Gary" <Gary.Hook@amd.com>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>
-References: <20190710000849.3131-1-gary.hook@amd.com>
- <20190710015725.GA746@sol.localdomain>
- <2875285f-d438-667e-52d9-801124ffba88@amd.com>
- <20190710203428.GC83443@gmail.com>
- <d4b8006c-0243-b4a4-c695-a67041acc82f@amd.com>
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Sarat Chand Savitala <saratcha@xilinx.com>
+Subject: RE: [RFC PATCH 4/5] crypto: Adds user space interface for
+ ALG_SET_KEY_TYPE
+Thread-Topic: [RFC PATCH 4/5] crypto: Adds user space interface for
+ ALG_SET_KEY_TYPE
+Thread-Index: AQHUrjLRC0KQY4vUUEiutylzuXEA7qWzVM+AgJUjQyCAA8MlgIAVaNiQgBkBuACAGpYxMIAAFOSAgCdEexA=
+Date:   Thu, 11 Jul 2019 09:25:38 +0000
+Message-ID: <BN7PR02MB5124F4680E424C25D77D178DAFF30@BN7PR02MB5124.namprd02.prod.outlook.com>
+References: <1547708541-23730-1-git-send-email-kalyani.akula@xilinx.com>
+ <18759853.IUaQuE38eh@tauon.chronox.de>
+ <SN6PR02MB5135CE53C3E3FB34CA5E6BA8AF320@SN6PR02MB5135.namprd02.prod.outlook.com>
+ <2554415.t45IJDmies@tauon.chronox.de>
+ <BN7PR02MB5124A7E685AC0F59AFBEFC8DAF130@BN7PR02MB5124.namprd02.prod.outlook.com>
+ <20190610063501.u3q2k2vgytvknxs3@gondor.apana.org.au>
+In-Reply-To: <20190610063501.u3q2k2vgytvknxs3@gondor.apana.org.au>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=kalyania@xilinx.com; 
+x-originating-ip: [149.199.50.133]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 7c51238a-e0b7-46c0-f32d-08d705e1bcfc
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:BN7PR02MB4244;
+x-ms-traffictypediagnostic: BN7PR02MB4244:
+x-ms-exchange-purlcount: 2
+x-microsoft-antispam-prvs: <BN7PR02MB424488DD1D8E78B241AB09F2AFF30@BN7PR02MB4244.namprd02.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:7691;
+x-forefront-prvs: 0095BCF226
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(346002)(376002)(136003)(39860400002)(366004)(396003)(199004)(13464003)(189003)(54906003)(33656002)(26005)(53936002)(316002)(7696005)(486006)(99286004)(71190400001)(102836004)(71200400001)(76176011)(25786009)(68736007)(186003)(6506007)(9686003)(6306002)(4326008)(55016002)(14454004)(966005)(6246003)(107886003)(478600001)(6116002)(229853002)(256004)(6436002)(14444005)(66476007)(52536014)(66446008)(5660300002)(66066001)(66556008)(64756008)(86362001)(76116006)(7736002)(11346002)(3846002)(81156014)(6916009)(305945005)(74316002)(8936002)(66946007)(446003)(8676002)(476003)(81166006)(53546011)(2906002);DIR:OUT;SFP:1101;SCL:1;SRVR:BN7PR02MB4244;H:BN7PR02MB5124.namprd02.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: xilinx.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: X2tYWxnTyyBUkx/MY7xHc8Fmhpiag7fY9zIa7Yz7vd4tVqR4p8mNNjCzdNSpGMSf/3+oKWbjaZVIOj0s0fQ52YqNJJuWx/gh7FFGwbSW2xP3JyCtzXxJQxl/mqfDvq7KSYEyzG+mfbo7z7uygwqtzV3bAVTUOrOwLR4Hlj10Y1xop6VgN56UU6YoJTdZ4PVwGSkZoJwCUlqyApA/fqUB8HHh2dS1l67AzPof0NvsBQtk5/PFfCPjCiZFxa76ZeW9ge+mt1VFJi4eoFUwaPIx0n9NXdferw9PljKd2EbwZghpU9eSYc8rA9UwSfxPREADzXZQ2haHQ/mJMM5+5pAJgNradjjREL+/pzgEQmM7UDq7uzk0YK7h4Ku9QidU/0OnKDQNBS7UjjRmj8cJymy39xRFCdn0STBRerF31rze/dQ=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d4b8006c-0243-b4a4-c695-a67041acc82f@amd.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+X-OriginatorOrg: xilinx.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7c51238a-e0b7-46c0-f32d-08d705e1bcfc
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Jul 2019 09:25:38.9530
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 657af505-d5df-48d0-8300-c31994686c5c
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: kalyania@xilinx.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN7PR02MB4244
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jul 10, 2019 at 10:50:31PM +0000, Gary R Hook wrote:
-> On 7/10/19 3:34 PM, Eric Biggers wrote:
-> > On Wed, Jul 10, 2019 at 03:59:05PM +0000, Gary R Hook wrote:
-> >> On 7/9/19 8:57 PM, Eric Biggers wrote:
-> >>> On Wed, Jul 10, 2019 at 12:09:22AM +0000, Hook, Gary wrote:
-> >>>> The AES GCM function reuses an 'op' data structure, which members
-> >>>> contain values that must be cleared for each (re)use.
-> >>>>
-> >>>> This fix resolves a crypto self-test failure:
-> >>>> alg: aead: gcm-aes-ccp encryption test failed (wrong result) on test vector 2, cfg="two even aligned splits"
-> >>>>
-> >>>> Fixes: 36cf515b9bbe ("crypto: ccp - Enable support for AES GCM on v5 CCPs")
-> >>>>
-> >>>> Signed-off-by: Gary R Hook <gary.hook@amd.com>
-> >>>
-> >>> FYI, with this patch applied I'm still seeing another test failure:
-> >>>
-> >>> [    2.140227] alg: aead: gcm-aes-ccp setauthsize unexpectedly succeeded on test vector "random: alen=264 plen=161 authsize=6 klen=32"; expected_error=-22
-> >>>
-> >>> Are you aware of that one too, and are you planning to fix it?
-> >>>
-> >>> - Eric
-> >>>
-> >>
-> >> I just pulled the latest on the master branch of cryptodev-2.6, built,
-> >> booted, and loaded our module. And I don't see that error. It must be new?
-> > 
-> > Did you have CONFIG_CRYPTO_MANAGER_EXTRA_TESTS enabled?  This failure was with a
-> > test vector that was generated randomly by the fuzz tests, so
-> > CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y is needed to reproduce it.
-> > 
-> > You probably just need to update ccp_aes_gcm_setauthsize() to validate the
-> > authentication tag size.
-> 
-> Now I'm confused. I did need to fix that function, and AFAIK the tag for 
-> GCM is always going to be 16 bytes (our AES_BLOCK_SIZE).
-> 
-> So, after making the small change, the above test passes, but now I 
-> progress and get this error:
-> 
-> [ 1640.820781] alg: aead: gcm-aes-ccp setauthsize failed on test vector 
-> "random: alen=29 plen=29 authsize=12 klen=32"; expected_error=0, 
-> actual_error=1
-> 
-> Which is wholly unclear. Why would an authsize of 12 be okay for this 
-> transformation? The GCM tag is a fixed size.
-> 
-> Nothing in the AEAD documentation jumps out at me. As I don't profess to 
-> be a crypto expert, I'd appreciate any guidance on this subtle issue 
-> that is eluding me...
-> 
+Hi Herbert,
 
-The generic implementation allows authentication tags of 4, 8, 12, 13, 14, 15,
-or 16 bytes.  See crypto_gcm_setauthsize() in crypto/gcm.c, and see
-https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication800-38d.pdf
-section 5.2.1.2 "Output Data".  If you disagree that this is the correct
-behavior, then we need to fix the generic implementation too.
+Paes driver is using key expansion algorithm to encrypt and decrypt the pla=
+intext. HW capability of expanding the given plain key is checked based on =
+the provide key length. Here the HW key is the expended version of plain ke=
+y.
 
-Also, I just got a kernel panic in the CCP driver on boot with
-CONFIG_CRYPTO_MANAGER_EXTRA_TESTS enabled.  The kernel included this patch.  So
-apparently there's yet another bug that needs to be fixed.  This one must occur
-infrequently enough to not be hit every time with the default
-fuzz_iterations=100, but still frequently enough for me to have seen it.
+Xilinx AES hardware has a capability to take plain keys/encrypted keys ( th=
+ese keys are user programmable but for security reasons they are not readab=
+le. Only AES accelerator has read access to these keys) stored on chip ( in=
+ eFuse/BBRAM etc, ) and used for AES encryption/decryption.
+Xilinx software is giving the Customer, the flexibility to choose among the=
+ different on-chip AES keys.
+So, we chosen a way to add AES_SEL_HW_KEY option.
 
-- Eric
+In Paes driver , The ALG_SET_KEY interface is used to distinguish between H=
+W Vs SW expansion of plain key based on the key_len.=20
+
+How about using same interface to distinguish between the User supplied key=
+ Vs HW key selection based on key_len parameter.
+
+Thanks
+kalyani  =09
+
+> -----Original Message-----
+> From: Herbert Xu <herbert@gondor.apana.org.au>
+> Sent: Monday, June 10, 2019 12:05 PM
+> To: Kalyani Akula <kalyania@xilinx.com>
+> Cc: Stephan Mueller <smueller@chronox.de>; keyrings@vger.kernel.org;
+> davem@davemloft.net; linux-crypto@vger.kernel.org; linux-
+> kernel@vger.kernel.org; Sarat Chand Savitala <saratcha@xilinx.com>
+> Subject: Re: [RFC PATCH 4/5] crypto: Adds user space interface for
+> ALG_SET_KEY_TYPE
+>=20
+> On Mon, Jun 10, 2019 at 05:20:58AM +0000, Kalyani Akula wrote:
+> > Ping!!
+>=20
+> We already have existing drivers supporting hardware keys.  Please check
+> out how they're handling this.  You can grep for paes under drivers/crypt=
+o.
+>=20
+> Cheers,
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au> Home Page:
+> http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
