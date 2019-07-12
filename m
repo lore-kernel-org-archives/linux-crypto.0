@@ -2,176 +2,134 @@ Return-Path: <SRS0=HUI/=VJ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65B77C742CF
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Jul 2019 16:10:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BD5DC742D2
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Jul 2019 17:56:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2D68C208E4
-	for <linux-crypto@archiver.kernel.org>; Fri, 12 Jul 2019 16:10:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C76E02054F
+	for <linux-crypto@archiver.kernel.org>; Fri, 12 Jul 2019 17:56:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="3/Xd2s3w"
+	dkim=pass (1024-bit key) header.d=hp.com header.i=@hp.com header.b="QR9ySyR0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726449AbfGLQK0 (ORCPT
+        id S1726984AbfGLR4U (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 12 Jul 2019 12:10:26 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:56766 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726867AbfGLQK0 (ORCPT
+        Fri, 12 Jul 2019 13:56:20 -0400
+Received: from us-smtp-delivery-162.mimecast.com ([216.205.24.162]:46468 "EHLO
+        us-smtp-delivery-162.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726977AbfGLR4U (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 12 Jul 2019 12:10:26 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6CFx4CS015324;
-        Fri, 12 Jul 2019 16:09:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2018-07-02;
- bh=Wb5JusxFe8jjYmZhTUkvAEwxtlKfAgSqfJIMrgMwL4s=;
- b=3/Xd2s3w4xR6nzadGwYoukLdbcgJV8Gl4rxc+fL63xAIBmYqbbqrrvNYp6+2gVtmKAUL
- P1rt2Ya3gd6EPzEIESMMc5KtSZZq5WOHXVeVk04QmpuZBvQyRPiw6KjL7HKZUxgKtYi+
- dm8Yz1F4N8WxkN4rQZkWmhYu3mmX1uEz+Qic6Rd3tFOb1UsINlOdJmVcgtwvCFURvmOW
- envClJYB+BrHTLinM4QDfmlErQdFTq9usicw4Tx6eKEswfvLitNdVakjMiNpxSf5d1Bc
- xZ/5J8KVQG1FojSbQUtxGuuUVUou1Mc2mLUCo7KKWuG2kk43uips6Am7ipAOmGwoObAA dg== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2120.oracle.com with ESMTP id 2tjm9r6ha1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 12 Jul 2019 16:09:51 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6CG2YOw116123;
-        Fri, 12 Jul 2019 16:07:50 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3020.oracle.com with ESMTP id 2tnc8u7st5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 12 Jul 2019 16:07:50 +0000
-Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x6CG7lhZ015324;
-        Fri, 12 Jul 2019 16:07:47 GMT
-Received: from ca-dmjordan1.us.oracle.com (/10.211.9.48)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 12 Jul 2019 09:07:46 -0700
-Date:   Fri, 12 Jul 2019 12:07:37 -0400
-From:   Daniel Jordan <daniel.m.jordan@oracle.com>
-To:     Steffen Klassert <steffen.klassert@secunet.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        andrea.parri@amarulasolutions.com, boqun.feng@gmail.com,
-        paulmck@linux.ibm.com, peterz@infradead.org,
-        linux-arch@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] padata: use smp_mb in padata_reorder to avoid orphaned
- padata jobs
-Message-ID: <20190712160737.iniaaxlsnhs6azg5@ca-dmjordan1.us.oracle.com>
-References: <20190711221205.29889-1-daniel.m.jordan@oracle.com>
- <20190712100636.mqdr567p7ozanlyl@gondor.apana.org.au>
- <20190712101012.GW14601@gauss3.secunet.de>
+        Fri, 12 Jul 2019 13:56:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hp.com; s=mimecast20180716;
+        t=1562954178;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=o/luIBdbk/1+l0y37VNWm6oAGSWgNtjOHiXjBx6BYZ4=;
+        b=QR9ySyR0j1pL56uuEBjnp7bQpsdlsjfjzbUkiH+5MGjD7Q0md2fHMAuE4MP9Lc6x0ZbTYH
+        HiK7pcOONsbtIfeVyPN4fpgSVLsE7aoUvrmC2eH3siTwg/8/v/a6enTYhBHEipARkEouTP
+        ePiR429uUXhCT5ydhvlptr7y37SbfdM=
+Received: from NAM05-CO1-obe.outbound.protection.outlook.com
+ (mail-co1nam05lp2051.outbound.protection.outlook.com [104.47.48.51]) (Using
+ TLS) by relay.mimecast.com with ESMTP id
+ us-mta-206-e0U5puxLOJCLcAVvz2iung-1; Fri, 12 Jul 2019 13:55:09 -0400
+Received: from TU4PR8401MB0544.NAMPRD84.PROD.OUTLOOK.COM (10.169.43.141) by
+ TU4PR8401MB0814.NAMPRD84.PROD.OUTLOOK.COM (10.169.45.143) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2052.19; Fri, 12 Jul 2019 17:55:07 +0000
+Received: from TU4PR8401MB0544.NAMPRD84.PROD.OUTLOOK.COM
+ ([fe80::84f0:ed8d:a382:7d41]) by TU4PR8401MB0544.NAMPRD84.PROD.OUTLOOK.COM
+ ([fe80::84f0:ed8d:a382:7d41%8]) with mapi id 15.20.2052.022; Fri, 12 Jul 2019
+ 17:55:07 +0000
+From:   "Bhat, Jayalakshmi Manjunath" <jayalakshmi.bhat@hp.com>
+To:     Stephan Mueller <smueller@chronox.de>
+CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Subject: RE: CAVS test harness
+Thread-Topic: CAVS test harness
+Thread-Index: AdU2IaQXtQPkG6HVRT2zauBDH3qftABvXlyAAABAX4AABvU+0AAAhPaAADcrObA=
+Date:   Fri, 12 Jul 2019 17:55:07 +0000
+Message-ID: <TU4PR8401MB0544B9D0BCD4C091857A1EAFF6F20@TU4PR8401MB0544.NAMPRD84.PROD.OUTLOOK.COM>
+References: <TU4PR8401MB0544875B118D39899547FDEFF6F10@TU4PR8401MB0544.NAMPRD84.PROD.OUTLOOK.COM>
+ <1782078.ZURsmYODYl@tauon.chronox.de>
+ <TU4PR8401MB05445179722F462CD8C05AB0F6F30@TU4PR8401MB0544.NAMPRD84.PROD.OUTLOOK.COM>
+ <2317418.W1bvXbUTk3@tauon.chronox.de>
+In-Reply-To: <2317418.W1bvXbUTk3@tauon.chronox.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [106.51.109.129]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 5634e5d2-6769-42de-124d-08d706f21394
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:TU4PR8401MB0814;
+x-ms-traffictypediagnostic: TU4PR8401MB0814:
+x-microsoft-antispam-prvs: <TU4PR8401MB08140DE58DEC52900F6EFCB5F6F20@TU4PR8401MB0814.NAMPRD84.PROD.OUTLOOK.COM>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-forefront-prvs: 00963989E5
+x-forefront-antispam-report: SFV:NSPM;SFS:(10019020)(4636009)(396003)(346002)(136003)(39860400002)(366004)(376002)(13464003)(6602003)(199004)(189003)(66556008)(66446008)(7696005)(2906002)(186003)(26005)(66476007)(446003)(7116003)(11346002)(81156014)(8676002)(6916009)(64756008)(81166006)(52536014)(3846002)(78486014)(8936002)(14454004)(6506007)(102836004)(99286004)(76116006)(55236004)(86362001)(3480700005)(7736002)(76176011)(53546011)(66946007)(5660300002)(71200400001)(476003)(256004)(486006)(71190400001)(66066001)(6436002)(74316002)(305945005)(229853002)(55016002)(6116002)(68736007)(6246003)(53936002)(4326008)(25786009)(33656002)(316002)(9456002)(478600001)(9686003);DIR:OUT;SFP:1102;SCL:1;SRVR:TU4PR8401MB0814;H:TU4PR8401MB0544.NAMPRD84.PROD.OUTLOOK.COM;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: jAZuNGCvPb2+4l57VfXoTlUR37tnA6MKugKr2i6ibZF5qpFepcp2pnAjm1jXU82QdjRXJnrM6Qzs58ZZP6OLd3Rzw/5KgdgEsryWhlQKTbfkrOm81U3NbmM91gGElhL2njt03NUwvmhRxR7ZOuD2sTiunDk9/tWQiU/zE4RIxVMD95iwQhI8agisL9R8HP1FFEPi3nERtlQeOt1PVt9o3P6XnzOc9AHuaE8rA8o/Cs0LK8w4tJVCC1lrZgSP9xf10IOl5qFTyNr2MXB4NtWVap9vfYdsZyZwTrhyFzoUQp+pY+M/uryefiZaB/GQXtbTl3f3s/wQ2F2oEKpXG6zI6Xz9qfT2yqgEY5hCPyuGieAH7zbzuhwlkgNowR7NuL8hpTIo4wgA29bhudNhfV9fBE4N2cvhVcpVe1sVQs/3QM0=
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190712101012.GW14601@gauss3.secunet.de>
-User-Agent: NeoMutt/20180323-268-5a959c
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9316 signatures=668688
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1810050000 definitions=main-1907120169
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9316 signatures=668688
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
- definitions=main-1907120169
+X-OriginatorOrg: hp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5634e5d2-6769-42de-124d-08d706f21394
+X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Jul 2019 17:55:07.5236
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: ca7981a2-785a-463d-b82a-3db87dfc3ce6
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: jayalakshmi.bhat@hp.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TU4PR8401MB0814
+X-MC-Unique: e0U5puxLOJCLcAVvz2iung-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jul 12, 2019 at 12:10:12PM +0200, Steffen Klassert wrote:
-> On Fri, Jul 12, 2019 at 06:06:36PM +0800, Herbert Xu wrote:
-> > Daniel Jordan <daniel.m.jordan@oracle.com> wrote:
-> > >
-> > > CPU0                                 CPU1
-> > >
-> > > padata_reorder                       padata_do_serial
-> > >  LOAD reorder_objects  // 0
-> > >                                       INC reorder_objects  // 1
-> > >                                       padata_reorder
-> > >                                         TRYLOCK pd->lock   // failed
-> > >  UNLOCK pd->lock
-> >
-> > I think this can't happen because CPU1 won't call padata_reorder
-> > at all as it's the wrong CPU so it gets pushed back onto a work
-> > queue which will go back to CPU0.
+Hi Stephan,
 
-Thanks for looking at this.
+Thank you very much for the suggestions, I have another question, is it pos=
+sible to implement MMT and MCT using kernel crypto API's.  Also FCC and FCC=
+ functions.
 
-When you say the wrong CPU, I think you're referring to the reorder_via_wq
-logic in padata_do_serial.  If so, I think my explanation was unclear, because
-there were two padata jobs in flight and my tracepoints showed neither of them
-punted padata_reorder to a workqueue.  Let me expand on this, hopefully it
-helps.
+Regards,
+Jaya
 
-pcrypt used CPU 5 for its callback CPU.  The first job in question, with
-sequence number 16581, hashed to CPU 21 on my system.  This is a more complete
-version of what led to the hanging modprobe command.
+-----Original Message-----
+From: Stephan Mueller <smueller@chronox.de>=20
+Sent: Thursday, July 11, 2019 9:04 PM
+To: Bhat, Jayalakshmi Manjunath <jayalakshmi.bhat@hp.com>
+Cc: linux-crypto@vger.kernel.org
+Subject: Re: CAVS test harness
 
-modprobe (CPU2)               kworker/21:1-293 (CPU21)                              kworker/5:2-276 (CPU5)
---------------------------    ------------------------                              ----------------------
-<submit job, seq_nr=16581>
-...
-  padata_do_parallel
-    queue_work_on(21, ...)
-<sleeps>
-                              padata_parallel_worker
-                                pcrypt_aead_dec
-                                  padata_do_serial
-                                    padata_reorder
-                                    | padata_get_next  // returns job, seq_nr=16581
-                                    | // serialize seq_nr=16581
-                                    | queue_work_on(5, ...)
-                                    | padata_get_next  // returns -EINPROGRESS
-                                    // padata_reorder doesn't return yet!
-                                    | |                                             padata_serial_worker
-                                    | |                                               pcrypt_aead_serial
-                                    | |                                                 <wake up modprobe>
-                                    | |                                             <worker finishes>
-<submit job, seq_nr=16582>          | |
-...                                 | |
-  padata_do_parallel                | |
-    queue_work_on(22, ...)          | | (LOAD reorder_objects as 0 somewhere
-<sleeps>                            | |    in here, before the INC)
-                                    | |                                             kworker/22:1-291 (CPU22)
-                                    | |                                             ------------------------
-                                    | |                                             padata_parallel_worker
-                                    | |                                               pcrypt_aead_dec
-                                    | |                                                 padata_do_serial
-                                    | |                                                   // INC reorder_objects to 1
-                                    | |                                                   padata_reorder
-                                    | |                                                     // trylock fail, CPU21 _should_
-                                    | |                                                     //   serialize 16582 but doesn't
-                                    | |                                             <worker finishes>
-                                    | // deletes pd->timer
-                                    // padata_reorder returns
-                              <worker finishes>
-<keeps on sleeping lazily>
+Am Donnerstag, 11. Juli 2019, 17:22:00 CEST schrieb Bhat, Jayalakshmi
+Manjunath:
 
-My tracepoints showed CPU22 increased reorder_objects to 1 but CPU21 read it as
-0.
+Hi Jayalakshmi,
 
-I think adding the full barrier guarantees the following ordering, and the
-memory model people can correct me if I'm wrong:
+> Hi Stephan,
+>=20
+> Thank you very much for the reply. Yes we would need to write the test=20
+> for AEC (ECB,CBC,CTR) 128 and 256 bits, SHA-1, SHA-2 (256,384 and=20
+> 512), HMAC, DRBG and also for key derivation functions. We are=20
+> planning to write netlink based kernel module to receive the data=20
+> (test vector input) from the user space and process the data and=20
+> generate the result, pass it on to user space.
+>=20
+> I wanted to know if this sounds a reasonable approach?
 
-CPU21                      CPU22
-------------------------   --------------------------
-UNLOCK pd->lock
-smp_mb()
-LOAD reorder_objects
-                           INC reorder_objects
-                           spin_unlock(&pqueue->reorder.lock) // release barrier
-                           TRYLOCK pd->lock
+That sounds reasonable.
 
-So if CPU22 has incremented reorder_objects but CPU21 reads 0 for it, CPU21
-should also have unlocked pd->lock so CPU22 can get it and serialize any
-remaining jobs.
+I implemented the kernel module as you described it but with a debugfs inte=
+rface to use the interface straight from a shell if needed.
+
+Ciao
+Stephan
+
+
