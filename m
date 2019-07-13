@@ -2,75 +2,71 @@ Return-Path: <SRS0=EMKO=VK=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B819AC742A7
-	for <linux-crypto@archiver.kernel.org>; Sat, 13 Jul 2019 05:03:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2E0AC742A7
+	for <linux-crypto@archiver.kernel.org>; Sat, 13 Jul 2019 06:07:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 919C1217D4
-	for <linux-crypto@archiver.kernel.org>; Sat, 13 Jul 2019 05:03:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BB727208E4
+	for <linux-crypto@archiver.kernel.org>; Sat, 13 Jul 2019 06:07:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726340AbfGMFDk (ORCPT
+        id S1726715AbfGMGHw (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 13 Jul 2019 01:03:40 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:48170 "EHLO deadmen.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726301AbfGMFDj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 13 Jul 2019 01:03:39 -0400
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1hmAC0-0006BY-Hm; Sat, 13 Jul 2019 13:03:28 +0800
-Received: from herbert by gondobar with local (Exim 4.89)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1hmABt-0000yf-KY; Sat, 13 Jul 2019 13:03:21 +0800
-Date:   Sat, 13 Jul 2019 13:03:21 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Daniel Jordan <daniel.m.jordan@oracle.com>
-Cc:     Steffen Klassert <steffen.klassert@secunet.com>,
-        andrea.parri@amarulasolutions.com, boqun.feng@gmail.com,
-        paulmck@linux.ibm.com, peterz@infradead.org,
-        linux-arch@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] padata: use smp_mb in padata_reorder to avoid orphaned
- padata jobs
-Message-ID: <20190713050321.c5wq7a7jrb6q2pxn@gondor.apana.org.au>
-References: <20190711221205.29889-1-daniel.m.jordan@oracle.com>
- <20190712100636.mqdr567p7ozanlyl@gondor.apana.org.au>
- <20190712101012.GW14601@gauss3.secunet.de>
- <20190712160737.iniaaxlsnhs6azg5@ca-dmjordan1.us.oracle.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190712160737.iniaaxlsnhs6azg5@ca-dmjordan1.us.oracle.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
+        Sat, 13 Jul 2019 02:07:52 -0400
+Received: from shards.monkeyblade.net ([23.128.96.9]:37238 "EHLO
+        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726393AbfGMGHw (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 13 Jul 2019 02:07:52 -0400
+Received: from localhost (unknown [IPv6:2601:601:9f80:35cd::d71])
+        (using TLSv1 with cipher AES256-SHA (256/256 bits))
+        (Client did not present a certificate)
+        (Authenticated sender: davem-davemloft)
+        by shards.monkeyblade.net (Postfix) with ESMTPSA id 5E13414EF712C;
+        Fri, 12 Jul 2019 23:07:51 -0700 (PDT)
+Date:   Fri, 12 Jul 2019 23:07:48 -0700 (PDT)
+Message-Id: <20190712.230748.1491964275720335140.davem@davemloft.net>
+To:     ebiggers@kernel.org
+Cc:     netdev@vger.kernel.org, linux-ppp@vger.kernel.org,
+        paulus@samba.org, linux-crypto@vger.kernel.org, tiwai@suse.de,
+        ard.biesheuvel@linaro.org
+Subject: Re: [PATCH net] ppp: mppe: Revert "ppp: mppe: Add softdep to arc4"
+From:   David Miller <davem@davemloft.net>
+In-Reply-To: <20190712233931.17350-1-ebiggers@kernel.org>
+References: <20190712233931.17350-1-ebiggers@kernel.org>
+X-Mailer: Mew version 6.8 on Emacs 26.1
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+X-Greylist: Sender succeeded SMTP AUTH, not delayed by milter-greylist-4.5.12 (shards.monkeyblade.net [149.20.54.216]); Fri, 12 Jul 2019 23:07:51 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jul 12, 2019 at 12:07:37PM -0400, Daniel Jordan wrote:
->
-> modprobe (CPU2)               kworker/21:1-293 (CPU21)                              kworker/5:2-276 (CPU5)
-> --------------------------    ------------------------                              ----------------------
-> <submit job, seq_nr=16581>
-> ...
->   padata_do_parallel
->     queue_work_on(21, ...)
-> <sleeps>
->                               padata_parallel_worker
->                                 pcrypt_aead_dec
->                                   padata_do_serial
->                                     padata_reorder
+From: Eric Biggers <ebiggers@kernel.org>
+Date: Fri, 12 Jul 2019 16:39:31 -0700
 
-This can't happen because if the job started on CPU2 then it must
-go back to CPU2 for completion.  IOW padata_do_serial should be
-punting this to a work queue for CPU2 rather than calling
-padata_reorder on CPU21.
+> From: Eric Biggers <ebiggers@google.com>
+> 
+> Commit 0e5a610b5ca5 ("ppp: mppe: switch to RC4 library interface"),
+> which was merged through the crypto tree for v5.3, changed ppp_mppe.c to
+> use the new arc4_crypt() library function rather than access RC4 through
+> the dynamic crypto_skcipher API.
+> 
+> Meanwhile commit aad1dcc4f011 ("ppp: mppe: Add softdep to arc4") was
+> merged through the net tree and added a module soft-dependency on "arc4".
+> 
+> The latter commit no longer makes sense because the code now uses the
+> "libarc4" module rather than "arc4", and also due to the direct use of
+> arc4_crypt(), no module soft-dependency is required.
+> 
+> So revert the latter commit.
+> 
+> Cc: Takashi Iwai <tiwai@suse.de>
+> Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Applied.
