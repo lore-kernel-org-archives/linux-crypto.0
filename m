@@ -7,46 +7,47 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CDFDC7618F
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 13:51:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BDE2C7618F
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 13:52:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0620C2086C
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 13:51:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 051902083D
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 13:52:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1563198662;
-	bh=5fiYdVdy8du8mtSVqQvBcRDYu3eo8LkCIAii7fdOsto=;
+	s=default; t=1563198770;
+	bh=dbZ9UkTc8jQ7thfAA7TdTEU2rDgk8mjNAe28LtjKQ68=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=rQ+WuwANl+j16YtANKxrLOD+QwKqB8l2p5V+UsQ9J+xzdYO8liJYlGgpgiBgEPZ+n
-	 trOsBptIqDayPZTeCA1FSrJVrcC2N7jAURf9B9eAP7V17EeXvpRNaBwoBJc93FNG1z
-	 OIqH25iNuaCa3PX+N60jfYOLxl+GmhbQakWEV87U=
+	b=OVBMCNOVUJ0TehWLJg7WsmcVOp5fp9+t+bccAPC30Wk6uflJuq9VIYEWFP/Iz2wGZ
+	 NhS9cRZXTPwSY9jznYf/w2EVoEI/QfQTF2a8LvQoyj7Eh2zordiI4JKDxK6xEUfBGD
+	 BWjAc9cdcznr8EFGb2ei4fuppsX3qmfKSs5PhwVI=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731117AbfGONu7 (ORCPT
+        id S1732250AbfGONwt (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 Jul 2019 09:50:59 -0400
-Received: from mail.kernel.org ([198.145.29.99]:41548 "EHLO mail.kernel.org"
+        Mon, 15 Jul 2019 09:52:49 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47124 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732045AbfGONu7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Jul 2019 09:50:59 -0400
+        id S1732248AbfGONwm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 15 Jul 2019 09:52:42 -0400
 Received: from sasha-vm.mshome.net (unknown [73.61.17.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8B9EA212F5;
-        Mon, 15 Jul 2019 13:50:56 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 5A1BD206B8;
+        Mon, 15 Jul 2019 13:52:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1563198657;
-        bh=5fiYdVdy8du8mtSVqQvBcRDYu3eo8LkCIAii7fdOsto=;
+        s=default; t=1563198761;
+        bh=dbZ9UkTc8jQ7thfAA7TdTEU2rDgk8mjNAe28LtjKQ68=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=kS1roxOHzRYtqoA6fX/zABeXEM9aZd0/7HrBDpkgyfBrWbRmxCSVPHiHEoiJWXx7e
-         QphMPbSP44RwfwUoaVDuvZKC/+oBOZVVKp5vzmMmOdym6cT0kLHUHAEN6yyC+bsvRi
-         an7SvUF3dijEA/RyuSr6ImxvdrZC1apvlheMx83w=
+        b=qYvdasqGPDKX13yqgjBtK13rhhxyYSAac4dMWe6xc83Waw5zi3z7hG/Zs3UbG/NP5
+         yf8XRzjJuhoLjMHh/bnu/4IKjKPE85hGNtIoCNu2QL35wVI7edPc9rMYBlPYqKah4P
+         JIDRtDJgOA0NM21K6olNtW3mjLOnebQmLcTy9eWk=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Antoine Tenart <antoine.tenart@bootlin.com>,
+Cc:     Eric Biggers <ebiggers@google.com>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.2 074/249] crypto: inside-secure - do not rely on the hardware last bit for result descriptors
-Date:   Mon, 15 Jul 2019 09:43:59 -0400
-Message-Id: <20190715134655.4076-74-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.2 098/249] crypto: testmgr - add some more preemption points
+Date:   Mon, 15 Jul 2019 09:44:23 -0400
+Message-Id: <20190715134655.4076-98-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190715134655.4076-1-sashal@kernel.org>
 References: <20190715134655.4076-1-sashal@kernel.org>
@@ -59,129 +60,76 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Antoine Tenart <antoine.tenart@bootlin.com>
+From: Eric Biggers <ebiggers@google.com>
 
-[ Upstream commit 89332590427235680236b9470e851afc49b3caa1 ]
+[ Upstream commit e63e1b0dd0003dc31f73d875907432be3a2abe5d ]
 
-When performing a transformation the hardware is given result
-descriptors to save the result data. Those result descriptors are
-batched using a 'first' and a 'last' bit. There are cases were more
-descriptors than needed are given to the engine, leading to the engine
-only using some of them, and not setting the last bit on the last
-descriptor we gave. This causes issues were the driver and the hardware
-aren't in sync anymore about the number of result descriptors given (as
-the driver do not give a pool of descriptor to use for any
-transformation, but a pool of descriptors to use *per* transformation).
+Call cond_resched() after each fuzz test iteration.  This avoids stall
+warnings if fuzz_iterations is set very high for testing purposes.
 
-This patch fixes it by attaching the number of given result descriptors
-to the requests, and by using this number instead of the 'last' bit
-found on the descriptors to process them.
+While we're at it, also call cond_resched() after finishing testing each
+test vector.
 
-Signed-off-by: Antoine Tenart <antoine.tenart@bootlin.com>
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+Acked-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- .../crypto/inside-secure/safexcel_cipher.c    | 24 ++++++++++++++-----
- 1 file changed, 18 insertions(+), 6 deletions(-)
+ crypto/testmgr.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-secure/safexcel_cipher.c
-index de4be10b172f..ccacdcf07ffc 100644
---- a/drivers/crypto/inside-secure/safexcel_cipher.c
-+++ b/drivers/crypto/inside-secure/safexcel_cipher.c
-@@ -51,6 +51,8 @@ struct safexcel_cipher_ctx {
- 
- struct safexcel_cipher_req {
- 	enum safexcel_cipher_direction direction;
-+	/* Number of result descriptors associated to the request */
-+	unsigned int rdescs;
- 	bool needs_inv;
- };
- 
-@@ -333,7 +335,10 @@ static int safexcel_handle_req_result(struct safexcel_crypto_priv *priv, int rin
- 
- 	*ret = 0;
- 
--	do {
-+	if (unlikely(!sreq->rdescs))
-+		return 0;
-+
-+	while (sreq->rdescs--) {
- 		rdesc = safexcel_ring_next_rptr(priv, &priv->ring[ring].rdr);
- 		if (IS_ERR(rdesc)) {
- 			dev_err(priv->dev,
-@@ -346,7 +351,7 @@ static int safexcel_handle_req_result(struct safexcel_crypto_priv *priv, int rin
- 			*ret = safexcel_rdesc_check_errors(priv, rdesc);
- 
- 		ndesc++;
--	} while (!rdesc->last_seg);
-+	}
- 
- 	safexcel_complete(priv, ring);
- 
-@@ -501,6 +506,7 @@ static int safexcel_send_req(struct crypto_async_request *base, int ring,
- static int safexcel_handle_inv_result(struct safexcel_crypto_priv *priv,
- 				      int ring,
- 				      struct crypto_async_request *base,
-+				      struct safexcel_cipher_req *sreq,
- 				      bool *should_complete, int *ret)
- {
- 	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(base->tfm);
-@@ -509,7 +515,10 @@ static int safexcel_handle_inv_result(struct safexcel_crypto_priv *priv,
- 
- 	*ret = 0;
- 
--	do {
-+	if (unlikely(!sreq->rdescs))
-+		return 0;
-+
-+	while (sreq->rdescs--) {
- 		rdesc = safexcel_ring_next_rptr(priv, &priv->ring[ring].rdr);
- 		if (IS_ERR(rdesc)) {
- 			dev_err(priv->dev,
-@@ -522,7 +531,7 @@ static int safexcel_handle_inv_result(struct safexcel_crypto_priv *priv,
- 			*ret = safexcel_rdesc_check_errors(priv, rdesc);
- 
- 		ndesc++;
--	} while (!rdesc->last_seg);
-+	}
- 
- 	safexcel_complete(priv, ring);
- 
-@@ -564,7 +573,7 @@ static int safexcel_skcipher_handle_result(struct safexcel_crypto_priv *priv,
- 
- 	if (sreq->needs_inv) {
- 		sreq->needs_inv = false;
--		err = safexcel_handle_inv_result(priv, ring, async,
-+		err = safexcel_handle_inv_result(priv, ring, async, sreq,
- 						 should_complete, ret);
- 	} else {
- 		err = safexcel_handle_req_result(priv, ring, async, req->src,
-@@ -587,7 +596,7 @@ static int safexcel_aead_handle_result(struct safexcel_crypto_priv *priv,
- 
- 	if (sreq->needs_inv) {
- 		sreq->needs_inv = false;
--		err = safexcel_handle_inv_result(priv, ring, async,
-+		err = safexcel_handle_inv_result(priv, ring, async, sreq,
- 						 should_complete, ret);
- 	} else {
- 		err = safexcel_handle_req_result(priv, ring, async, req->src,
-@@ -633,6 +642,8 @@ static int safexcel_skcipher_send(struct crypto_async_request *async, int ring,
- 		ret = safexcel_send_req(async, ring, sreq, req->src,
- 					req->dst, req->cryptlen, 0, 0, req->iv,
- 					commands, results);
-+
-+	sreq->rdescs = *results;
- 	return ret;
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 658a7eeebab2..292d28caf00f 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -1279,6 +1279,7 @@ static int test_hash_vec(const char *driver, const struct hash_testvec *vec,
+ 						req, tsgl, hashstate);
+ 			if (err)
+ 				return err;
++			cond_resched();
+ 		}
+ 	}
+ #endif
+@@ -1493,6 +1494,7 @@ static int __alg_test_hash(const struct hash_testvec *vecs,
+ 		err = test_hash_vec(driver, &vecs[i], i, req, tsgl, hashstate);
+ 		if (err)
+ 			goto out;
++		cond_resched();
+ 	}
+ 	err = test_hash_vs_generic_impl(driver, generic_driver, maxkeysize, req,
+ 					tsgl, hashstate);
+@@ -1755,6 +1757,7 @@ static int test_aead_vec(const char *driver, int enc,
+ 						&cfg, req, tsgls);
+ 			if (err)
+ 				return err;
++			cond_resched();
+ 		}
+ 	}
+ #endif
+@@ -1994,6 +1997,7 @@ static int test_aead(const char *driver, int enc,
+ 				    tsgls);
+ 		if (err)
+ 			return err;
++		cond_resched();
+ 	}
+ 	return 0;
  }
- 
-@@ -655,6 +666,7 @@ static int safexcel_aead_send(struct crypto_async_request *async, int ring,
- 					req->cryptlen, req->assoclen,
- 					crypto_aead_authsize(tfm), req->iv,
- 					commands, results);
-+	sreq->rdescs = *results;
- 	return ret;
+@@ -2336,6 +2340,7 @@ static int test_skcipher_vec(const char *driver, int enc,
+ 						    &cfg, req, tsgls);
+ 			if (err)
+ 				return err;
++			cond_resched();
+ 		}
+ 	}
+ #endif
+@@ -2535,6 +2540,7 @@ static int test_skcipher(const char *driver, int enc,
+ 					tsgls);
+ 		if (err)
+ 			return err;
++		cond_resched();
+ 	}
+ 	return 0;
  }
- 
 -- 
 2.20.1
 
