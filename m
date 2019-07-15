@@ -2,154 +2,137 @@ Return-Path: <SRS0=7mlD=VM=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7896C7618F
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 15:13:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F879C7618F
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 16:11:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8FF8D2054F
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 15:13:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1563203607;
-	bh=S7QMUTIfrMKNE8TMyNmP9bg8l/7SEA7p9sCrWAdjPfg=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=YAmdoOBI2oV2M0sbcVgV/20Fn2PkxcVDa6+V1po+oafMDez01T9TeBK0iYYCl/rx9
-	 /WiWl38L3sbo6hfhnNNUV1qajelkzWpuuMmqI/9jSJbQW1bQdp0xTWqLYdS4kKVf5N
-	 hssJvs9+jUh2Gu2TkeI5eWCHEWkH0ZHHwkV0i+5Q=
+	by mail.kernel.org (Postfix) with ESMTP id 282742080A
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 16:11:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="R4wRB/lV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730972AbfGONuL (ORCPT
+        id S1729803AbfGOQLX (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 Jul 2019 09:50:11 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38472 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731934AbfGONuC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Jul 2019 09:50:02 -0400
-Received: from sasha-vm.mshome.net (unknown [73.61.17.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E038220651;
-        Mon, 15 Jul 2019 13:49:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1563198601;
-        bh=S7QMUTIfrMKNE8TMyNmP9bg8l/7SEA7p9sCrWAdjPfg=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=LSOUGZQbbHnlcO08kBwExeBbFZVE0RiQb8UMVFdehX7OCK1jfNiQtxt+JsZmFPl8V
-         vrEvP6aTLMN+VZcA8AGDmkI5YCDcTXth81QcvUSKIYWUkQPLH/uclU9pqaA0ecjlIl
-         gGcCwpoSmpY/0g+6oxJKFp1ez5yJ68y00NIkTQOA=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Christophe Leroy <christophe.leroy@c-s.fr>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.2 056/249] crypto: talitos - properly handle split ICV.
-Date:   Mon, 15 Jul 2019 09:43:41 -0400
-Message-Id: <20190715134655.4076-56-sashal@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190715134655.4076-1-sashal@kernel.org>
-References: <20190715134655.4076-1-sashal@kernel.org>
+        Mon, 15 Jul 2019 12:11:23 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:50876 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729533AbfGOQLX (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 15 Jul 2019 12:11:23 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6FG9K7g046431;
+        Mon, 15 Jul 2019 16:11:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2018-07-02;
+ bh=FHNs/VLuaqZ6nZAgJqcIiUHrYF7VNMT5n+FgGHZ8rBc=;
+ b=R4wRB/lVnB1ltWkn/GMHIPbIECr3MzMvRuYL91sqD33inkHwuq+Szs0wGXTlwCC6z0j5
+ 7apQxbjsKIBBBrhCePlKJcEWM6pS48zSoAnF49EBkuf40UAZotacRDXx1lEkqzkf0r/6
+ u0BSecvo6MhRdZJMcNj3r53xdgxQtSgx2MSBYw1g+k7PMClmOrkqXs4lVVDa1+93zOyB
+ G5uIKr+d2OHcUtdqjTIyJV11TQRRN7EqlCDesVWZbrPM5LGjz10FHUqyyCPOglHuK22s
+ BJQOEIw5w1zxHzmvXj5tEJPINnAHUZEV/0iiPAXUINZTEuwvRp3HKhgLi7EHqcfHFtbi aQ== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2130.oracle.com with ESMTP id 2tq6qtfjbp-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 15 Jul 2019 16:11:00 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6FG7xVU011256;
+        Mon, 15 Jul 2019 16:10:59 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by userp3020.oracle.com with ESMTP id 2tq6mmc445-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 15 Jul 2019 16:10:59 +0000
+Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x6FGApLd006898;
+        Mon, 15 Jul 2019 16:10:56 GMT
+Received: from ca-dmjordan1.us.oracle.com (/10.211.9.48)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 15 Jul 2019 09:10:51 -0700
+Date:   Mon, 15 Jul 2019 12:10:46 -0400
+From:   Daniel Jordan <daniel.m.jordan@oracle.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Daniel Jordan <daniel.m.jordan@oracle.com>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        andrea.parri@amarulasolutions.com, boqun.feng@gmail.com,
+        paulmck@linux.ibm.com, peterz@infradead.org,
+        linux-arch@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] padata: use smp_mb in padata_reorder to avoid orphaned
+ padata jobs
+Message-ID: <20190715161045.zqwgsp62uqjnvx3l@ca-dmjordan1.us.oracle.com>
+References: <20190711221205.29889-1-daniel.m.jordan@oracle.com>
+ <20190712100636.mqdr567p7ozanlyl@gondor.apana.org.au>
+ <20190712101012.GW14601@gauss3.secunet.de>
+ <20190712160737.iniaaxlsnhs6azg5@ca-dmjordan1.us.oracle.com>
+ <20190713050321.c5wq7a7jrb6q2pxn@gondor.apana.org.au>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190713050321.c5wq7a7jrb6q2pxn@gondor.apana.org.au>
+User-Agent: NeoMutt/20180323-268-5a959c
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9319 signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=876
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1907150188
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9319 signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=921 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1907150188
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Christophe Leroy <christophe.leroy@c-s.fr>
+On Sat, Jul 13, 2019 at 01:03:21PM +0800, Herbert Xu wrote:
+> On Fri, Jul 12, 2019 at 12:07:37PM -0400, Daniel Jordan wrote:
+> >
+> > modprobe (CPU2)               kworker/21:1-293 (CPU21)                              kworker/5:2-276 (CPU5)
+> > --------------------------    ------------------------                              ----------------------
+> > <submit job, seq_nr=16581>
+> > ...
+> >   padata_do_parallel
+> >     queue_work_on(21, ...)
+> > <sleeps>
+> >                               padata_parallel_worker
+> >                                 pcrypt_aead_dec
+> >                                   padata_do_serial
+> >                                     padata_reorder
+> 
+> This can't happen because if the job started on CPU2 then it must
+> go back to CPU2 for completion.  IOW padata_do_serial should be
+> punting this to a work queue for CPU2 rather than calling
+> padata_reorder on CPU21.
 
-[ Upstream commit eae55a586c3c8b50982bad3c3426e9c9dd7a0075 ]
+I've been wrong before plenty of times, and there's nothing preventing this
+from being one of those times :) , but in this case I believe what I'm showing
+is correct.
 
-The driver assumes that the ICV is as a single piece in the last
-element of the scatterlist. This assumption is wrong.
+The padata_do_serial call for a given job ensures padata_reorder runs on the
+CPU that the job hashed to in padata_do_parallel, which is not necessarily the
+same CPU as the one that padata_do_parallel itself ran on.
 
-This patch ensures that the ICV is properly handled regardless of
-the scatterlist layout.
+In this case, the padata job in question started via padata_do_parallel, where
+it hashed to CPU 21:
 
-Fixes: 9c4a79653b35 ("crypto: talitos - Freescale integrated security engine (SEC) driver")
-Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/crypto/talitos.c | 26 +++++++++++++++-----------
- 1 file changed, 15 insertions(+), 11 deletions(-)
+  padata_do_parallel                    // ran on CPU 2
+    ...
+    target_cpu = padata_cpu_hash(pd);   // target_cpu == 21
+    padata->cpu = target_cpu;
+    ...
+    queue_work_on(21, ...)
 
-diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index 2d9a0971a7fc..eec880909fdf 100644
---- a/drivers/crypto/talitos.c
-+++ b/drivers/crypto/talitos.c
-@@ -1050,7 +1050,6 @@ static void ipsec_esp_encrypt_done(struct device *dev,
- 	unsigned int authsize = crypto_aead_authsize(authenc);
- 	unsigned int ivsize = crypto_aead_ivsize(authenc);
- 	struct talitos_edesc *edesc;
--	struct scatterlist *sg;
- 	void *icvdata;
- 
- 	edesc = container_of(desc, struct talitos_edesc, desc);
-@@ -1064,9 +1063,8 @@ static void ipsec_esp_encrypt_done(struct device *dev,
- 		else
- 			icvdata = &edesc->link_tbl[edesc->src_nents +
- 						   edesc->dst_nents + 2];
--		sg = sg_last(areq->dst, edesc->dst_nents);
--		memcpy((char *)sg_virt(sg) + sg->length - authsize,
--		       icvdata, authsize);
-+		sg_pcopy_from_buffer(areq->dst, edesc->dst_nents ? : 1, icvdata,
-+				     authsize, areq->assoclen + areq->cryptlen);
- 	}
- 
- 	dma_unmap_single(dev, edesc->iv_dma, ivsize, DMA_TO_DEVICE);
-@@ -1084,7 +1082,6 @@ static void ipsec_esp_decrypt_swauth_done(struct device *dev,
- 	struct crypto_aead *authenc = crypto_aead_reqtfm(req);
- 	unsigned int authsize = crypto_aead_authsize(authenc);
- 	struct talitos_edesc *edesc;
--	struct scatterlist *sg;
- 	char *oicv, *icv;
- 	struct talitos_private *priv = dev_get_drvdata(dev);
- 	bool is_sec1 = has_ftr_sec1(priv);
-@@ -1094,9 +1091,18 @@ static void ipsec_esp_decrypt_swauth_done(struct device *dev,
- 	ipsec_esp_unmap(dev, edesc, req);
- 
- 	if (!err) {
-+		char icvdata[SHA512_DIGEST_SIZE];
-+		int nents = edesc->dst_nents ? : 1;
-+		unsigned int len = req->assoclen + req->cryptlen;
-+
- 		/* auth check */
--		sg = sg_last(req->dst, edesc->dst_nents ? : 1);
--		icv = (char *)sg_virt(sg) + sg->length - authsize;
-+		if (nents > 1) {
-+			sg_pcopy_to_buffer(req->dst, nents, icvdata, authsize,
-+					   len - authsize);
-+			icv = icvdata;
-+		} else {
-+			icv = (char *)sg_virt(req->dst) + len - authsize;
-+		}
- 
- 		if (edesc->dma_len) {
- 			if (is_sec1)
-@@ -1516,7 +1522,6 @@ static int aead_decrypt(struct aead_request *req)
- 	struct talitos_ctx *ctx = crypto_aead_ctx(authenc);
- 	struct talitos_private *priv = dev_get_drvdata(ctx->dev);
- 	struct talitos_edesc *edesc;
--	struct scatterlist *sg;
- 	void *icvdata;
- 
- 	req->cryptlen -= authsize;
-@@ -1550,9 +1555,8 @@ static int aead_decrypt(struct aead_request *req)
- 	else
- 		icvdata = &edesc->link_tbl[0];
- 
--	sg = sg_last(req->src, edesc->src_nents ? : 1);
--
--	memcpy(icvdata, (char *)sg_virt(sg) + sg->length - authsize, authsize);
-+	sg_pcopy_to_buffer(req->src, edesc->src_nents ? : 1, icvdata, authsize,
-+			   req->assoclen + req->cryptlen - authsize);
- 
- 	return ipsec_esp(edesc, req, ipsec_esp_decrypt_swauth_done);
- }
--- 
-2.20.1
+The corresponding kworker then started:
 
+  padata_parallel_worker                // bound to CPU 21
+    pcrypt_aead_dec
+      padata_do_serial
+        padata_reorder
+
+Daniel
