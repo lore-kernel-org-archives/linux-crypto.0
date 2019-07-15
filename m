@@ -4,49 +4,50 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9253CC76195
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 14:19:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A4A6C7618F
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 14:25:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6BAA321530
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 14:19:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DAA0520896
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 14:25:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1563200394;
-	bh=JeED2MLzVHRU380nfTU/LlGZeiefkXph35PBqEon+Kw=;
+	s=default; t=1563200730;
+	bh=lkCTKh7ZxrUCm8Sg5urEHMxEK4sQo1A2rQt+ok6fEYQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=qhNArkhh0yMpuXozEdHvOe5VZbKkkxRJ8KRW+CHV4LI2qHwrBtEEFLJe1xtb/unmg
-	 DRn2Ry8MXN0YrUyp/cyzc7lLollKwWIwrwDVaE4oMMF9cbzruneJy6afjpW/b4w4dH
-	 t1a3IVp0T9DRehbMy5a7F6NlaSZBRT6Yh1qaKYtk=
+	b=B4C+mQRryj5549rL4vIv+GL2h9qLWhb2Qcd/oZKRZV4DrPUAdU8oBWSMsaogtncXE
+	 OW4pJrc8gYABJEk/up4kAtEZwarM08LMQX56JaYZK7FzZR3BEM3ogbHVOuYJ2JhIUL
+	 1zwVxhn4Wv5ztQXGvSvL3Shm+3tV56GGZ1Vc+yxk=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389697AbfGOOTs (ORCPT
+        id S2391214AbfGOOZ0 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 Jul 2019 10:19:48 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42124 "EHLO mail.kernel.org"
+        Mon, 15 Jul 2019 10:25:26 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60446 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389747AbfGOOTr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Jul 2019 10:19:47 -0400
+        id S1730720AbfGOOZZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 15 Jul 2019 10:25:25 -0400
 Received: from sasha-vm.mshome.net (unknown [73.61.17.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id CBA9C206B8;
-        Mon, 15 Jul 2019 14:19:45 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 54A0B206B8;
+        Mon, 15 Jul 2019 14:25:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1563200387;
-        bh=JeED2MLzVHRU380nfTU/LlGZeiefkXph35PBqEon+Kw=;
+        s=default; t=1563200724;
+        bh=lkCTKh7ZxrUCm8Sg5urEHMxEK4sQo1A2rQt+ok6fEYQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=jtospgeaaA1ZO4PDBbcO70T53T7Cg4oME1vZ12oJ8rddraGogxUF5pCndu5c60OEQ
-         a7k4o4fcVOo7fLJHZiy9XxS/ekg26cDFWKCugFVpt4w6QfSh2z6OdmYHGZOQfmPABf
-         nWUYq10w/mjXF8aSXgAYbI1KM+crtVhn65fYCYXw=
+        b=aAbnN2M/bbucc9OJuKiR9qecXszH66VvuluK4oY04hqDLjekTIqd0rLRqe3LexFh0
+         4zHGxBpJdfpYxs12jcnA4fU99ZEnh9rIAiCDho0VwRN4Gg0njTCTOeSjBNAAWCb/ic
+         wXG9owNitw5SPMqsc0mOsww8H4BiKclupROY49No=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Christophe Leroy <christophe.leroy@c-s.fr>,
+Cc:     Arnd Bergmann <arnd@arndb.de>, Eric Biggers <ebiggers@kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 034/158] crypto: talitos - Align SEC1 accesses to 32 bits boundaries.
-Date:   Mon, 15 Jul 2019 10:16:05 -0400
-Message-Id: <20190715141809.8445-34-sashal@kernel.org>
+        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
+        clang-built-linux@googlegroups.com
+Subject: [PATCH AUTOSEL 4.19 118/158] crypto: serpent - mark __serpent_setkey_sbox noinline
+Date:   Mon, 15 Jul 2019 10:17:29 -0400
+Message-Id: <20190715141809.8445-118-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190715141809.8445-1-sashal@kernel.org>
 References: <20190715141809.8445-1-sashal@kernel.org>
@@ -59,42 +60,47 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Christophe Leroy <christophe.leroy@c-s.fr>
+From: Arnd Bergmann <arnd@arndb.de>
 
-[ Upstream commit c9cca7034b34a2d82e9a03b757de2485c294851c ]
+[ Upstream commit 473971187d6727609951858c63bf12b0307ef015 ]
 
-The MPC885 reference manual states:
+The same bug that gcc hit in the past is apparently now showing
+up with clang, which decides to inline __serpent_setkey_sbox:
 
-SEC Lite-initiated 8xx writes can occur only on 32-bit-word boundaries, but
-reads can occur on any byte boundary. Writing back a header read from a
-non-32-bit-word boundary will yield unpredictable results.
+crypto/serpent_generic.c:268:5: error: stack frame size of 2112 bytes in function '__serpent_setkey' [-Werror,-Wframe-larger-than=]
 
-In order to ensure that, cra_alignmask is set to 3 for SEC1.
+Marking it 'noinline' reduces the stack usage from 2112 bytes to
+192 and 96 bytes, respectively, and seems to generate more
+useful object code.
 
-Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
-Fixes: 9c4a79653b35 ("crypto: talitos - Freescale integrated security engine (SEC) driver")
+Fixes: c871c10e4ea7 ("crypto: serpent - improve __serpent_setkey with UBSAN")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Reviewed-by: Eric Biggers <ebiggers@kernel.org>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/talitos.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ crypto/serpent_generic.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index 027cb298888e..d2c02ad2cfd6 100644
---- a/drivers/crypto/talitos.c
-+++ b/drivers/crypto/talitos.c
-@@ -3210,7 +3210,10 @@ static struct talitos_crypto_alg *talitos_alg_alloc(struct device *dev,
- 		alg->cra_priority = t_alg->algt.priority;
- 	else
- 		alg->cra_priority = TALITOS_CRA_PRIORITY;
--	alg->cra_alignmask = 0;
-+	if (has_ftr_sec1(priv))
-+		alg->cra_alignmask = 3;
-+	else
-+		alg->cra_alignmask = 0;
- 	alg->cra_ctxsize = sizeof(struct talitos_ctx);
- 	alg->cra_flags |= CRYPTO_ALG_KERN_DRIVER_ONLY;
+diff --git a/crypto/serpent_generic.c b/crypto/serpent_generic.c
+index 7c3382facc82..600bd288881d 100644
+--- a/crypto/serpent_generic.c
++++ b/crypto/serpent_generic.c
+@@ -229,7 +229,13 @@
+ 	x4 ^= x2;					\
+ 	})
  
+-static void __serpent_setkey_sbox(u32 r0, u32 r1, u32 r2, u32 r3, u32 r4, u32 *k)
++/*
++ * both gcc and clang have misoptimized this function in the past,
++ * producing horrible object code from spilling temporary variables
++ * on the stack. Forcing this part out of line avoids that.
++ */
++static noinline void __serpent_setkey_sbox(u32 r0, u32 r1, u32 r2,
++					   u32 r3, u32 r4, u32 *k)
+ {
+ 	k += 100;
+ 	S3(r3, r4, r0, r1, r2); store_and_load_keys(r1, r2, r4, r3, 28, 24);
 -- 
 2.20.1
 
