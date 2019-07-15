@@ -4,53 +4,52 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30B47C7618F
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 13:58:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC6FAC7618F
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 14:06:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F2323212F5
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 13:57:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 93076217D9
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 14:06:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1563199080;
-	bh=e7n4SXe09RzoHoyeKaTu1LZkIdvfo40iBdxKRHi0oac=;
+	s=default; t=1563199584;
+	bh=fvWvnH2X8v2u7UuJzqFvZ743uC76lrfXz508zJ0VKoQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=ahhhZ+w5mzepRywtCtJSm7t/DiVkuYA/8T7G8NqZDplsCc+7gEhrpxOPoh1QljWbD
-	 5C3ZljbIY/umrSB428LZg36VO4jvVvQYlyFAaKOHMnJoX/lVQQRY6GOAfM7QpHYwnM
-	 Z6y14VNj/1Fp7KttkYzkwHxx4Rs5EvRKQ9rpy0AQ=
+	b=zdP5Ed+kxBJGrsufpQXvkYoCuUtkDDBFkIVrtO/cDHbHq0Zv5j/SA9nDSDi7+o0iO
+	 y1S9yinf9r8Yb3p6dhD6ywGBarjN0SRawI4h00Zs3i69/7NPJ0r1+n3QNukMZP0kvG
+	 Fhe2CfhunrdqP7U4d1OKvRU91xufIGAx0LdwmvdE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733040AbfGON57 (ORCPT
+        id S2388267AbfGOOGX (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 Jul 2019 09:57:59 -0400
-Received: from mail.kernel.org ([198.145.29.99]:36868 "EHLO mail.kernel.org"
+        Mon, 15 Jul 2019 10:06:23 -0400
+Received: from mail.kernel.org ([198.145.29.99]:53846 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732131AbfGON57 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Jul 2019 09:57:59 -0400
+        id S2388261AbfGOOGX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 15 Jul 2019 10:06:23 -0400
 Received: from sasha-vm.mshome.net (unknown [73.61.17.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id A9B5621537;
-        Mon, 15 Jul 2019 13:57:56 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 979332086C;
+        Mon, 15 Jul 2019 14:06:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1563199078;
-        bh=e7n4SXe09RzoHoyeKaTu1LZkIdvfo40iBdxKRHi0oac=;
+        s=default; t=1563199581;
+        bh=fvWvnH2X8v2u7UuJzqFvZ743uC76lrfXz508zJ0VKoQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ziA8+eIpGjvMLGhiPaD4SAL5JjNM+jsL5Hc/1/1udvlyoUSU5z4dsNUu6gTUpbfMS
-         9J3aGQrxVlcL/LJ5k1t4QnqTnyaeZb/wMK5Z+3dAjvw0K/7NoeoeESpENxr18qgM2i
-         O+aD85YArUcYBnKsaUbDu0pK8Czyv20aDmRraxp8=
+        b=eFFPlgU2vnJRsrD2Zpqg7x4Ed1RD2n2CTvanvABacT+hDwhm1xGC//fblg56BrrCv
+         BJnqs1jZOEBAlcWhOePWxfIqViB9vNTfoZJUTjpT4fhUwlcUIBd18gsJem46ywHYX4
+         nVmIRQ4HPh38nRApFvsa8SsNih7rmbUUvw3faDfI=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Arnd Bergmann <arnd@arndb.de>, Eric Biggers <ebiggers@kernel.org>,
+Cc:     Christophe Leroy <christophe.leroy@c-s.fr>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
-        clang-built-linux@googlegroups.com
-Subject: [PATCH AUTOSEL 5.2 183/249] crypto: serpent - mark __serpent_setkey_sbox noinline
-Date:   Mon, 15 Jul 2019 09:45:48 -0400
-Message-Id: <20190715134655.4076-183-sashal@kernel.org>
+        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.1 048/219] crypto: talitos - properly handle split ICV.
+Date:   Mon, 15 Jul 2019 10:00:49 -0400
+Message-Id: <20190715140341.6443-48-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190715134655.4076-1-sashal@kernel.org>
-References: <20190715134655.4076-1-sashal@kernel.org>
+In-Reply-To: <20190715140341.6443-1-sashal@kernel.org>
+References: <20190715140341.6443-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -60,47 +59,97 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Arnd Bergmann <arnd@arndb.de>
+From: Christophe Leroy <christophe.leroy@c-s.fr>
 
-[ Upstream commit 473971187d6727609951858c63bf12b0307ef015 ]
+[ Upstream commit eae55a586c3c8b50982bad3c3426e9c9dd7a0075 ]
 
-The same bug that gcc hit in the past is apparently now showing
-up with clang, which decides to inline __serpent_setkey_sbox:
+The driver assumes that the ICV is as a single piece in the last
+element of the scatterlist. This assumption is wrong.
 
-crypto/serpent_generic.c:268:5: error: stack frame size of 2112 bytes in function '__serpent_setkey' [-Werror,-Wframe-larger-than=]
+This patch ensures that the ICV is properly handled regardless of
+the scatterlist layout.
 
-Marking it 'noinline' reduces the stack usage from 2112 bytes to
-192 and 96 bytes, respectively, and seems to generate more
-useful object code.
-
-Fixes: c871c10e4ea7 ("crypto: serpent - improve __serpent_setkey with UBSAN")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-Reviewed-by: Eric Biggers <ebiggers@kernel.org>
+Fixes: 9c4a79653b35 ("crypto: talitos - Freescale integrated security engine (SEC) driver")
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- crypto/serpent_generic.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ drivers/crypto/talitos.c | 26 +++++++++++++++-----------
+ 1 file changed, 15 insertions(+), 11 deletions(-)
 
-diff --git a/crypto/serpent_generic.c b/crypto/serpent_generic.c
-index 16f612b6dbca..a9cc0b2aa0d6 100644
---- a/crypto/serpent_generic.c
-+++ b/crypto/serpent_generic.c
-@@ -225,7 +225,13 @@
- 	x4 ^= x2;					\
- 	})
+diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+index 83883438d134..3bf727c89647 100644
+--- a/drivers/crypto/talitos.c
++++ b/drivers/crypto/talitos.c
+@@ -1015,7 +1015,6 @@ static void ipsec_esp_encrypt_done(struct device *dev,
+ 	unsigned int authsize = crypto_aead_authsize(authenc);
+ 	unsigned int ivsize = crypto_aead_ivsize(authenc);
+ 	struct talitos_edesc *edesc;
+-	struct scatterlist *sg;
+ 	void *icvdata;
  
--static void __serpent_setkey_sbox(u32 r0, u32 r1, u32 r2, u32 r3, u32 r4, u32 *k)
-+/*
-+ * both gcc and clang have misoptimized this function in the past,
-+ * producing horrible object code from spilling temporary variables
-+ * on the stack. Forcing this part out of line avoids that.
-+ */
-+static noinline void __serpent_setkey_sbox(u32 r0, u32 r1, u32 r2,
-+					   u32 r3, u32 r4, u32 *k)
- {
- 	k += 100;
- 	S3(r3, r4, r0, r1, r2); store_and_load_keys(r1, r2, r4, r3, 28, 24);
+ 	edesc = container_of(desc, struct talitos_edesc, desc);
+@@ -1029,9 +1028,8 @@ static void ipsec_esp_encrypt_done(struct device *dev,
+ 		else
+ 			icvdata = &edesc->link_tbl[edesc->src_nents +
+ 						   edesc->dst_nents + 2];
+-		sg = sg_last(areq->dst, edesc->dst_nents);
+-		memcpy((char *)sg_virt(sg) + sg->length - authsize,
+-		       icvdata, authsize);
++		sg_pcopy_from_buffer(areq->dst, edesc->dst_nents ? : 1, icvdata,
++				     authsize, areq->assoclen + areq->cryptlen);
+ 	}
+ 
+ 	dma_unmap_single(dev, edesc->iv_dma, ivsize, DMA_TO_DEVICE);
+@@ -1049,7 +1047,6 @@ static void ipsec_esp_decrypt_swauth_done(struct device *dev,
+ 	struct crypto_aead *authenc = crypto_aead_reqtfm(req);
+ 	unsigned int authsize = crypto_aead_authsize(authenc);
+ 	struct talitos_edesc *edesc;
+-	struct scatterlist *sg;
+ 	char *oicv, *icv;
+ 	struct talitos_private *priv = dev_get_drvdata(dev);
+ 	bool is_sec1 = has_ftr_sec1(priv);
+@@ -1059,9 +1056,18 @@ static void ipsec_esp_decrypt_swauth_done(struct device *dev,
+ 	ipsec_esp_unmap(dev, edesc, req);
+ 
+ 	if (!err) {
++		char icvdata[SHA512_DIGEST_SIZE];
++		int nents = edesc->dst_nents ? : 1;
++		unsigned int len = req->assoclen + req->cryptlen;
++
+ 		/* auth check */
+-		sg = sg_last(req->dst, edesc->dst_nents ? : 1);
+-		icv = (char *)sg_virt(sg) + sg->length - authsize;
++		if (nents > 1) {
++			sg_pcopy_to_buffer(req->dst, nents, icvdata, authsize,
++					   len - authsize);
++			icv = icvdata;
++		} else {
++			icv = (char *)sg_virt(req->dst) + len - authsize;
++		}
+ 
+ 		if (edesc->dma_len) {
+ 			if (is_sec1)
+@@ -1481,7 +1487,6 @@ static int aead_decrypt(struct aead_request *req)
+ 	struct talitos_ctx *ctx = crypto_aead_ctx(authenc);
+ 	struct talitos_private *priv = dev_get_drvdata(ctx->dev);
+ 	struct talitos_edesc *edesc;
+-	struct scatterlist *sg;
+ 	void *icvdata;
+ 
+ 	req->cryptlen -= authsize;
+@@ -1515,9 +1520,8 @@ static int aead_decrypt(struct aead_request *req)
+ 	else
+ 		icvdata = &edesc->link_tbl[0];
+ 
+-	sg = sg_last(req->src, edesc->src_nents ? : 1);
+-
+-	memcpy(icvdata, (char *)sg_virt(sg) + sg->length - authsize, authsize);
++	sg_pcopy_to_buffer(req->src, edesc->src_nents ? : 1, icvdata, authsize,
++			   req->assoclen + req->cryptlen - authsize);
+ 
+ 	return ipsec_esp(edesc, req, ipsec_esp_decrypt_swauth_done);
+ }
 -- 
 2.20.1
 
