@@ -4,53 +4,53 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21148C76195
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 13:40:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78524C7618F
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 13:48:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E4E1E21537
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 13:40:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 449AF2081C
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 13:48:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1563198005;
-	bh=FTKJOaDBqWWGx5K6l7a3GQeiN9iEecrkXmoJNkID+74=;
+	s=default; t=1563198485;
+	bh=wrjyNQbObLvjelRCjEwGsOG2WLTckPtUZUU2q/uxbrI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=0pti1lDf8q8DxrrBzlzD2FjIOAZmZcQ4MJrocXi0b7RHy5G95Nfv3l1IFP/XQxUFS
-	 gKxn7Eo7PeeY4rkxqljqfZzTjQbY7Zs8KHZfJT+t0G77ECvjX1F12EZiWeYVbxR2Wc
-	 evR60oegdxP5KeEEy53/OEK0otTHLisWJUr651l8=
+	b=vCKGGMkqpNW7zAvNuRwDCFrpcM+2rHjS3Y3vox1jP1NVKVhqHYl2o9foIaZ4DhyC4
+	 CS+Of62fPzNDTQ0UBRsWQCQcfrMuXaOigoDWita+Ao2/tZBMBTtaf5l1y7GMlZO46M
+	 NJ88BrymGhn8mWRkTCvnImGKH+TpbcLLdj76jHcI=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731359AbfGONkD (ORCPT
+        id S1731211AbfGONsD (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 Jul 2019 09:40:03 -0400
-Received: from mail.kernel.org ([198.145.29.99]:41650 "EHLO mail.kernel.org"
+        Mon, 15 Jul 2019 09:48:03 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57828 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731354AbfGONkC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Jul 2019 09:40:02 -0400
+        id S1731347AbfGONsC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 15 Jul 2019 09:48:02 -0400
 Received: from sasha-vm.mshome.net (unknown [73.61.17.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 6532321530;
-        Mon, 15 Jul 2019 13:40:00 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4387321530;
+        Mon, 15 Jul 2019 13:47:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1563198001;
-        bh=FTKJOaDBqWWGx5K6l7a3GQeiN9iEecrkXmoJNkID+74=;
+        s=default; t=1563198482;
+        bh=wrjyNQbObLvjelRCjEwGsOG2WLTckPtUZUU2q/uxbrI=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=RGgGeG+lZSFdupfdn2tznN7C2qv+oYdY7DRpz/n1VzBEGfQ14CKHgJnrcclPNQ4LG
-         He+dnoDkznCpNKRc4g1NxcypeEBpRmS6nnFghLeVBv7hH1DjVayt9UiHUszXhxaMdt
-         4VKOsfqkrfFYZ3G7qgOMg6r45lJqcpkUQ3JwVtp8=
+        b=RcauP7+G+CTMqTIoraxkDpWlLmFpf3nsqOMCvbvZUDBVlMN/OlEH+jPx1sEOm5Zo8
+         aL0J0GW9ZAUR/i3CTa4fUS4ooVC/sNsdK08zd/unBoJJXq7d6+YhF0cHP8+slALc52
+         4qucBY/U96LdsjtO30JkUg9cm08wk72eKWEEMb08=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Christophe Leroy <christophe.leroy@c-s.fr>,
         =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 013/158] crypto: talitos - fix skcipher failure due to wrong output IV
-Date:   Mon, 15 Jul 2019 09:36:58 -0400
-Message-Id: <20190715133923.2890-13-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.2 021/249] crypto: talitos - fix skcipher failure due to wrong output IV
+Date:   Mon, 15 Jul 2019 09:43:06 -0400
+Message-Id: <20190715134655.4076-21-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190715133923.2890-1-sashal@kernel.org>
-References: <20190715133923.2890-1-sashal@kernel.org>
+In-Reply-To: <20190715134655.4076-1-sashal@kernel.org>
+References: <20190715134655.4076-1-sashal@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-stable: review
@@ -88,10 +88,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 4 insertions(+)
 
 diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index c5859d3cb825..9cc5309a3fbf 100644
+index 427c78d4d948..2d9a0971a7fc 100644
 --- a/drivers/crypto/talitos.c
 +++ b/drivers/crypto/talitos.c
-@@ -1571,11 +1571,15 @@ static void ablkcipher_done(struct device *dev,
+@@ -1624,11 +1624,15 @@ static void ablkcipher_done(struct device *dev,
  			    int err)
  {
  	struct ablkcipher_request *areq = context;
