@@ -8,55 +8,55 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44DB1C7618F
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E680BC76196
 	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 20:20:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1E2EF2173E
+	by mail.kernel.org (Postfix) with ESMTP id BA61A20C01
 	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 20:20:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y+1xk1Ef"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ww0C+505"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732685AbfGOUU2 (ORCPT
+        id S1732620AbfGOUUD (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 Jul 2019 16:20:28 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:35493 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732646AbfGOUUE (ORCPT
+        Mon, 15 Jul 2019 16:20:03 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:39188 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732433AbfGOUUC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Jul 2019 16:20:04 -0400
-Received: by mail-pf1-f193.google.com with SMTP id u14so7958141pfn.2;
-        Mon, 15 Jul 2019 13:20:04 -0700 (PDT)
+        Mon, 15 Jul 2019 16:20:02 -0400
+Received: by mail-pf1-f196.google.com with SMTP id f17so3958845pfn.6;
+        Mon, 15 Jul 2019 13:20:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=rjkoz5FfLP6toRFqWP/+xlvUq5++XvAds3/6+Iry0Wc=;
-        b=Y+1xk1Efayam/RGlrrXOiL6NKHkRki3fTyaKo2w4J7fD6uuul7dyae2MEdUMTLsWyM
-         CkLbVaYOt6877lACC6cdoB+AV5ruCL4m2qoMCxbUw2HIT1/fU4NQ3pkrniW8nk04uGps
-         u6ns4ueynlFv61UrO8sXyBKxK59PCFV7/fiex6oBk77h2OMf8jKMke2xaqo1Qs6PN3TH
-         1BFtHrfNGidBJl2UeBEHhVJfdAHmSi6QqP6nF8Lkhk2eNtv2nVGdSxrVb/3PnQup9DOy
-         MpNQ7V1Hpr8EXHGazKXKl+bsuEDfx1ihcxWBEi8EVCM8cgxb/yNfTI1e6K+x+ynwDl+U
-         ezAg==
+        bh=BNJCQUNcof8kUIy33ye35eh+3AWm1VC+G5oQzkM3XSE=;
+        b=Ww0C+505X6n3XgMvUlrWf6u0PaU62GuD+U5FMuCONhBOeQAcCP9eRV3gfwVo+b6qhk
+         OqVjFT2l/qgSbnt/o4MH+9MTg7TvymdF3Vj3PnF8d4wGcz3n8QNVNTMQ1z613PbyKkMz
+         l3r3FWXSwEDq1FwSBa6djhcAQuaPTKjT2OQEkWVkLzVxhCCPFyeismwZVfJuQLw09CY5
+         CkEHT0roLGDNfD5YCCjbjGns5RWI1D8y6zqfHBOJJhBW07cEGZrSGIK7LunHhHbgWdwA
+         YPGrpbJjNXlKKCFnHinIOKTbIXLzK9FFhrfoXykGUWGBtLYothgAvfBJjHg2NovtyWVU
+         gv9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=rjkoz5FfLP6toRFqWP/+xlvUq5++XvAds3/6+Iry0Wc=;
-        b=WIJ/B8HDOLUG/zjMWgoQQ+6uonZtA8gZGMZBQn8eicvyYGLDcUpAkVm/dI+hXebJjd
-         +bQvJcN01i1oX+B4D4aH8rbKsfDBCnslJp8K36KpWmBxK+rHMX1OI/sIn+LnsPz3MMjL
-         kqtg1zPgu38FUArWcTBtbMcKvk/uzQ+p5sS+N13KbaZSzBBMSkXRNtkOnfS8xKsBdvbh
-         yBXMACiiddoMvFZOMODlAus5p/n3P3o+MluJy4Hv4zcgr2GFnLLDQDPT8beRwVowDZCE
-         KABNS+6SkG3xYde89r59RcBttsJDi4gcLtBpBmvHcKdeCFE70PKdFzfF/FUX5eg6/tDY
-         N97g==
-X-Gm-Message-State: APjAAAWX49qoa+kU1CPxqD6+8n+AB4pzDBo6CVxC3UVQagFWAlQ59VO/
-        kExBkljQZ7hv1zlE5h6+ZaYW2zVH
-X-Google-Smtp-Source: APXvYqwHm5fcEmWVRcBVmAJ2kgGu9+h71HxhZRgZ6p6EUgyZDB9U6NCU80LG7A2vw0zzFtqHNhQYbA==
-X-Received: by 2002:a63:124a:: with SMTP id 10mr28643439pgs.254.1563222003867;
-        Mon, 15 Jul 2019 13:20:03 -0700 (PDT)
+        bh=BNJCQUNcof8kUIy33ye35eh+3AWm1VC+G5oQzkM3XSE=;
+        b=GjlNFYjwCuZQcbIplKHakkeQ/5yIjMZAVpxB5Gh2afSmyBaANSqQKR8nt2jfMZ/5Tb
+         j+pBNsTuFrlurQBNacdoOzTz8ssLqgCxNhB4ZDRjZh6I2TZjHoXh5avtnbCXIpl4fKw0
+         7TLZoSIwzukQ+oKYeWqvHQ/XothwgQLUqPghXcrfteGZ4rVJQtF4fgRu/9qPXtmhKyvC
+         N4MtZrp2JKlCZdlJCMRASt24EgtBgr3JSw71aIItvbVzRXE204STtPfYjbkUj1DetxvR
+         Re0HxBpGGnDrOZBjs1tGk1yLiZZsvUN5QzBmakTu5YyAYcJ8FpldY8p9XFGoM5o2twRz
+         NtqA==
+X-Gm-Message-State: APjAAAVTQNs8CIWWz0kvf5bts1wxvsDIng+t9r2oo8SkMXU6drTUW3+K
+        VR/0Po6PHg3jUlaNsvwXpxhtLbBx
+X-Google-Smtp-Source: APXvYqxwfZBozuoIG0wO3hu6LnBKbUBELfmsWKETncHYMl7rfVA5xkGyab1ktpvHUA+D+FbPZr1tLQ==
+X-Received: by 2002:a63:5d45:: with SMTP id o5mr29266075pgm.40.1563222001189;
+        Mon, 15 Jul 2019 13:20:01 -0700 (PDT)
 Received: from localhost.lan (c-67-185-54-80.hsd1.wa.comcast.net. [67.185.54.80])
-        by smtp.gmail.com with ESMTPSA id h1sm22730534pfg.55.2019.07.15.13.20.02
+        by smtp.gmail.com with ESMTPSA id h1sm22730534pfg.55.2019.07.15.13.19.59
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Mon, 15 Jul 2019 13:20:03 -0700 (PDT)
+        Mon, 15 Jul 2019 13:20:00 -0700 (PDT)
 From:   Andrey Smirnov <andrew.smirnov@gmail.com>
 To:     linux-crypto@vger.kernel.org
 Cc:     Andrey Smirnov <andrew.smirnov@gmail.com>,
@@ -68,9 +68,9 @@ Cc:     Andrey Smirnov <andrew.smirnov@gmail.com>,
         Aymen Sghaier <aymen.sghaier@nxp.com>,
         Leonard Crestez <leonard.crestez@nxp.com>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v5 11/14] crypto: caam - don't hardcode inpentry size
-Date:   Mon, 15 Jul 2019 13:19:39 -0700
-Message-Id: <20190715201942.17309-12-andrew.smirnov@gmail.com>
+Subject: [PATCH v5 09/14] crypto: caam - move cpu_to_caam_dma() selection to runtime
+Date:   Mon, 15 Jul 2019 13:19:37 -0700
+Message-Id: <20190715201942.17309-10-andrew.smirnov@gmail.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190715201942.17309-1-andrew.smirnov@gmail.com>
 References: <20190715201942.17309-1-andrew.smirnov@gmail.com>
@@ -82,11 +82,11 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Using dma_addr_t for elements of JobR input ring is not appropriate on
-all 64-bit SoCs, some of which, like i.MX8MQ, use only 32-bit wide
-pointers there. Convert all of the code to use explicit helper
-function that can be later extended to support i.MX8MQ. No functional
-change intended.
+Instead of selecting the implementation of
+cpu_to_caam_dma()/caam_dma_to_cpu() at build time using the
+preprocessor, convert the code to do that at run-time using IS_ENABLED
+macro. This is needed to add support for i.MX8MQ. No functional change
+intended.
 
 Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
 Cc: Chris Spencer <christopher.spencer@sea.co.uk>
@@ -99,58 +99,42 @@ Cc: Leonard Crestez <leonard.crestez@nxp.com>
 Cc: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
 ---
- drivers/crypto/caam/intern.h | 3 ++-
- drivers/crypto/caam/jr.c     | 2 +-
- drivers/crypto/caam/regs.h   | 9 +++++++++
- 3 files changed, 12 insertions(+), 2 deletions(-)
+ drivers/crypto/caam/regs.h | 22 +++++++++++++++-------
+ 1 file changed, 15 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/crypto/caam/intern.h b/drivers/crypto/caam/intern.h
-index 081805c0f88b..c00c7c84ec84 100644
---- a/drivers/crypto/caam/intern.h
-+++ b/drivers/crypto/caam/intern.h
-@@ -55,7 +55,8 @@ struct caam_drv_private_jr {
- 	spinlock_t inplock ____cacheline_aligned; /* Input ring index lock */
- 	u32 inpring_avail;	/* Number of free entries in input ring */
- 	int head;			/* entinfo (s/w ring) head index */
--	dma_addr_t *inpring;	/* Base of input ring, alloc DMA-safe */
-+	void *inpring;			/* Base of input ring, alloc
-+					 * DMA-safe */
- 	int out_ring_read_index;	/* Output index "tail" */
- 	int tail;			/* entinfo (s/w ring) tail index */
- 	void *outring;			/* Base of output ring, DMA-safe */
-diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
-index 138f71adb7e6..4f06cc7eb6a4 100644
---- a/drivers/crypto/caam/jr.c
-+++ b/drivers/crypto/caam/jr.c
-@@ -388,7 +388,7 @@ int caam_jr_enqueue(struct device *dev, u32 *desc,
- 	head_entry->cbkarg = areq;
- 	head_entry->desc_addr_dma = desc_dma;
- 
--	jrp->inpring[head] = cpu_to_caam_dma(desc_dma);
-+	jr_inpentry_set(jrp->inpring, head, cpu_to_caam_dma(desc_dma));
- 
- 	/*
- 	 * Guarantee that the descriptor's DMA address has been written to
 diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h
-index 0cc4a48dfc30..ec49f5ba9689 100644
+index fb494d14f262..511e28ba740a 100644
 --- a/drivers/crypto/caam/regs.h
 +++ b/drivers/crypto/caam/regs.h
-@@ -244,6 +244,15 @@ static inline u32 jr_outentry_jrstatus(void *outring, int hw_idx)
- 	return jrstatus;
+@@ -188,13 +188,21 @@ static inline u64 caam_dma64_to_cpu(u64 value)
+ 	return caam64_to_cpu(value);
  }
  
-+static inline void jr_inpentry_set(void *inpring, int hw_idx, dma_addr_t val)
+-#ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
+-#define cpu_to_caam_dma(value) cpu_to_caam_dma64(value)
+-#define caam_dma_to_cpu(value) caam_dma64_to_cpu(value)
+-#else
+-#define cpu_to_caam_dma(value) cpu_to_caam32(value)
+-#define caam_dma_to_cpu(value) caam32_to_cpu(value)
+-#endif /* CONFIG_ARCH_DMA_ADDR_T_64BIT */
++static inline u64 cpu_to_caam_dma(u64 value)
 +{
-+	dma_addr_t *inpentry = inpring;
-+
-+	inpentry[hw_idx] = val;
++	if (IS_ENABLED(CONFIG_ARCH_DMA_ADDR_T_64BIT))
++		return cpu_to_caam_dma64(value);
++	else
++		return cpu_to_caam32(value);
 +}
 +
-+#define SIZEOF_JR_INPENTRY	caam_ptr_sz
-+
++static inline u64 caam_dma_to_cpu(u64 value)
++{
++	if (IS_ENABLED(CONFIG_ARCH_DMA_ADDR_T_64BIT))
++		return caam_dma64_to_cpu(value);
++	else
++		return caam32_to_cpu(value);
++}
  
- /* Version registers (Era 10+)	e80-eff */
- struct version_regs {
+ /*
+  * jr_outentry
 -- 
 2.21.0
 
