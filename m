@@ -4,49 +4,50 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AA7DC76191
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 14:38:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5007C76195
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 14:42:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 409592184E
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 14:38:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ADE7B20868
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 14:42:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1563201482;
-	bh=IQWtWVWlYst0iv+lxsOcqXI1qfOtoqpIzwP7TNFbAhA=;
+	s=default; t=1563201734;
+	bh=DJbrE1O1zB+v1rzzUPlHxWpLKZaxQ9ZdCmFlxx9QI3o=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=XXtKogKwz/BuJmvBtxMe0NAbRiNkeubYoz+I9W/Akbu/YgyJH14yZi2+lxqNnrs5z
-	 WSwWe4PZNnRJGcD9xrzr02NHavfe7p2jxi0d69WNLsFaAqdJIphJteY9OZv6O0qPSg
-	 9rWgnIOS8AENTjfphq2cqxmB+47iWnM1hVlie84w=
+	b=tFMQ7qIiCLpxy5L3YCdN0qQLTm7eNnwidVc2d/J77PrcvSs5EX1oCUIJtMvZruTR/
+	 vt4Kr1CNxcx9yr+OlkZkFErEfcHOEiSQzvLBg94W60eoY9sqSqHco6dLnEISPTGZ6U
+	 oY4coewjtephjBTpQW6XTVleZlMDx8XCnsGcl/Rs=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392148AbfGOOh7 (ORCPT
+        id S2390831AbfGOOmO (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 Jul 2019 10:37:59 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60694 "EHLO mail.kernel.org"
+        Mon, 15 Jul 2019 10:42:14 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42310 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2391820AbfGOOh6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Jul 2019 10:37:58 -0400
+        id S2404476AbfGOOkl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 15 Jul 2019 10:40:41 -0400
 Received: from sasha-vm.mshome.net (unknown [73.61.17.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 57669217F9;
-        Mon, 15 Jul 2019 14:37:54 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 2CC49204FD;
+        Mon, 15 Jul 2019 14:40:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1563201477;
-        bh=IQWtWVWlYst0iv+lxsOcqXI1qfOtoqpIzwP7TNFbAhA=;
+        s=default; t=1563201641;
+        bh=DJbrE1O1zB+v1rzzUPlHxWpLKZaxQ9ZdCmFlxx9QI3o=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=GFkoZ9G0Zl1vfTVnMeKL9H8qwR55959bkNXmksmejHnlTqsm9J8dCNKWwyHHwDGde
-         /EWIaUXXGSlcbp+XYtDWozm1kBf8kndDe2r6e3apGpeerP9kMfhieodmaKshGUNnZY
-         /A0t612c4VhE0jS+bpcWooWyR7rIOc6R56K5eP1A=
+        b=CixLkruRhwliLXH+tZnEIhQ6n31IYL6ltm11ieREtN4Tta0EcTmT0eObpt1DvTQCC
+         YY6ws267QuIt6BtdY8/TwWnCzS15Q3ppSSZYfD4EexeFYfg8KsaeXCtZ/TolucozI7
+         gPqRgVM0ghF6h1tqEVyzqqk3gZhnD8zQ9AqU9cmo=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Christophe Leroy <christophe.leroy@c-s.fr>,
+Cc:     Arnd Bergmann <arnd@arndb.de>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.9 23/73] crypto: talitos - Align SEC1 accesses to 32 bits boundaries.
-Date:   Mon, 15 Jul 2019 10:35:39 -0400
-Message-Id: <20190715143629.10893-23-sashal@kernel.org>
+        Sasha Levin <sashal@kernel.org>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.9 61/73] crypto: asymmetric_keys - select CRYPTO_HASH where needed
+Date:   Mon, 15 Jul 2019 10:36:17 -0400
+Message-Id: <20190715143629.10893-61-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190715143629.10893-1-sashal@kernel.org>
 References: <20190715143629.10893-1-sashal@kernel.org>
@@ -59,42 +60,60 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Christophe Leroy <christophe.leroy@c-s.fr>
+From: Arnd Bergmann <arnd@arndb.de>
 
-[ Upstream commit c9cca7034b34a2d82e9a03b757de2485c294851c ]
+[ Upstream commit 90acc0653d2bee203174e66d519fbaaa513502de ]
 
-The MPC885 reference manual states:
+Build testing with some core crypto options disabled revealed
+a few modules that are missing CRYPTO_HASH:
 
-SEC Lite-initiated 8xx writes can occur only on 32-bit-word boundaries, but
-reads can occur on any byte boundary. Writing back a header read from a
-non-32-bit-word boundary will yield unpredictable results.
+crypto/asymmetric_keys/x509_public_key.o: In function `x509_get_sig_params':
+x509_public_key.c:(.text+0x4c7): undefined reference to `crypto_alloc_shash'
+x509_public_key.c:(.text+0x5e5): undefined reference to `crypto_shash_digest'
+crypto/asymmetric_keys/pkcs7_verify.o: In function `pkcs7_digest.isra.0':
+pkcs7_verify.c:(.text+0xab): undefined reference to `crypto_alloc_shash'
+pkcs7_verify.c:(.text+0x1b2): undefined reference to `crypto_shash_digest'
+pkcs7_verify.c:(.text+0x3c1): undefined reference to `crypto_shash_update'
+pkcs7_verify.c:(.text+0x411): undefined reference to `crypto_shash_finup'
 
-In order to ensure that, cra_alignmask is set to 3 for SEC1.
+This normally doesn't show up in randconfig tests because there is
+a large number of other options that select CRYPTO_HASH.
 
-Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
-Fixes: 9c4a79653b35 ("crypto: talitos - Freescale integrated security engine (SEC) driver")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/talitos.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ crypto/asymmetric_keys/Kconfig | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index 36d4f2a32e54..e15c10414e60 100644
---- a/drivers/crypto/talitos.c
-+++ b/drivers/crypto/talitos.c
-@@ -3119,7 +3119,10 @@ static struct talitos_crypto_alg *talitos_alg_alloc(struct device *dev,
- 		alg->cra_priority = t_alg->algt.priority;
- 	else
- 		alg->cra_priority = TALITOS_CRA_PRIORITY;
--	alg->cra_alignmask = 0;
-+	if (has_ftr_sec1(priv))
-+		alg->cra_alignmask = 3;
-+	else
-+		alg->cra_alignmask = 0;
- 	alg->cra_ctxsize = sizeof(struct talitos_ctx);
- 	alg->cra_flags |= CRYPTO_ALG_KERN_DRIVER_ONLY;
- 
+diff --git a/crypto/asymmetric_keys/Kconfig b/crypto/asymmetric_keys/Kconfig
+index 331f6baf2df8..13f3de68b479 100644
+--- a/crypto/asymmetric_keys/Kconfig
++++ b/crypto/asymmetric_keys/Kconfig
+@@ -14,6 +14,7 @@ config ASYMMETRIC_PUBLIC_KEY_SUBTYPE
+ 	select MPILIB
+ 	select CRYPTO_HASH_INFO
+ 	select CRYPTO_AKCIPHER
++	select CRYPTO_HASH
+ 	help
+ 	  This option provides support for asymmetric public key type handling.
+ 	  If signature generation and/or verification are to be used,
+@@ -33,6 +34,7 @@ config X509_CERTIFICATE_PARSER
+ config PKCS7_MESSAGE_PARSER
+ 	tristate "PKCS#7 message parser"
+ 	depends on X509_CERTIFICATE_PARSER
++	select CRYPTO_HASH
+ 	select ASN1
+ 	select OID_REGISTRY
+ 	help
+@@ -55,6 +57,7 @@ config SIGNED_PE_FILE_VERIFICATION
+ 	bool "Support for PE file signature verification"
+ 	depends on PKCS7_MESSAGE_PARSER=y
+ 	depends on SYSTEM_DATA_VERIFICATION
++	select CRYPTO_HASH
+ 	select ASN1
+ 	select OID_REGISTRY
+ 	help
 -- 
 2.20.1
 
