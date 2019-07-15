@@ -7,51 +7,50 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 422BBC76191
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 13:48:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DCD8C7618F
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 13:50:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1BF6520651
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 13:48:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2D2A520651
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 13:50:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1563198511;
-	bh=EnHbVa0n2DNtM+we6IlsunRzNnWFrNPN7aGVV7YC5Mc=;
+	s=default; t=1563198607;
+	bh=JAnLtsV+A+ImHI4VW2GLzMDKqOtvxsK3+J+mNbFY1wE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=oTZYDpdpjNfwxEz60gYnJK/4pfKU6Exsn8zD567fsXajnbl5st2GUi8HkqF7A2AQT
-	 WeohtXHMseRij9JVqkSfgPAX3jV9V06OFPaXmKG+77U2FhFs7CISntbGnAMQcnbDNI
-	 ELqoL1yO/grjqxmGrB9E6yp4h+FnBJlaKLbDtm7g=
+	b=bHzLoR+/nU4x4lYOKJbCTas5znBp0A7pAAjvgB80AWMO4BrtTkje9m1Q2z6GQTrJi
+	 cliH5nQ595CA6QcHgsZm2tlc5e9vTkibkDV5Se5k2jcYcJGaxW4D/z19dbIxRKTdh0
+	 kOrus5spkEU/LNbBsC/Xa25cQzPhSu/lAT9krukk=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731504AbfGONs3 (ORCPT
+        id S1731829AbfGONuF (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 Jul 2019 09:48:29 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58504 "EHLO mail.kernel.org"
+        Mon, 15 Jul 2019 09:50:05 -0400
+Received: from mail.kernel.org ([198.145.29.99]:38978 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731301AbfGONs1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Jul 2019 09:48:27 -0400
+        id S1731831AbfGONuF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 15 Jul 2019 09:50:05 -0400
 Received: from sasha-vm.mshome.net (unknown [73.61.17.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 3821D2067C;
-        Mon, 15 Jul 2019 13:48:24 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 364F82086C;
+        Mon, 15 Jul 2019 13:50:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1563198506;
-        bh=EnHbVa0n2DNtM+we6IlsunRzNnWFrNPN7aGVV7YC5Mc=;
+        s=default; t=1563198604;
+        bh=JAnLtsV+A+ImHI4VW2GLzMDKqOtvxsK3+J+mNbFY1wE=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=HZknsrWMcvKfhtjRGZFU/L2ImclXAoQXqtu1CWemIPtWlwRHpPNPLEdTvDqXtCNZt
-         9qWdsZk1TBk7cOJnJkPVotGKCGlciQcpvws5V0UHnie0rb6B2wauh0Fre9/pj8byWr
-         LmLj7EDaakr/UY199BKwLutILhjr14Jn7tV7OJyE=
+        b=meoQ41taQaswH3RRJL6bGSxM4Gtk9eC2pxDXY4NGFoHW4SeGSGvWqdSLN+P51Ij5+
+         aRQlfcJFm6X2/s9Q/msQQeKwq1VXB28MfpBGxpzOqHw4NB40rF8qgtxgKJ8upn+0m7
+         72X3VTwTCuxKpQF8XT3X2eyndGcvJr5ed7DdJnxg=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+Cc:     Christophe Leroy <christophe.leroy@c-s.fr>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.2 029/249] crypto: caam - avoid S/G table fetching for AEAD zero-length output
-Date:   Mon, 15 Jul 2019 09:43:14 -0400
-Message-Id: <20190715134655.4076-29-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.2 057/249] crypto: talitos - Align SEC1 accesses to 32 bits boundaries.
+Date:   Mon, 15 Jul 2019 09:43:42 -0400
+Message-Id: <20190715134655.4076-57-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190715134655.4076-1-sashal@kernel.org>
 References: <20190715134655.4076-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
@@ -60,134 +59,42 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Horia Geantă <horia.geanta@nxp.com>
+From: Christophe Leroy <christophe.leroy@c-s.fr>
 
-[ Upstream commit dcd9c76e5a183af4f793beb5141efcd260b8d09f ]
+[ Upstream commit c9cca7034b34a2d82e9a03b757de2485c294851c ]
 
-When enabling IOMMU support, the following issue becomes visible
-in the AEAD zero-length case.
+The MPC885 reference manual states:
 
-Even though the output sequence length is set to zero, the crypto engine
-tries to prefetch 4 S/G table entries (since SGF bit is set
-in SEQ OUT PTR command - which is either generated in SW in case of
-caam/jr or in HW in case of caam/qi, caam/qi2).
-The DMA read operation will trigger an IOMMU fault since the address in
-the SEQ OUT PTR is "dummy" (set to zero / not obtained via DMA API
-mapping).
+SEC Lite-initiated 8xx writes can occur only on 32-bit-word boundaries, but
+reads can occur on any byte boundary. Writing back a header read from a
+non-32-bit-word boundary will yield unpredictable results.
 
-1. In case of caam/jr, avoid the IOMMU fault by clearing the SGF bit
-in SEQ OUT PTR command.
+In order to ensure that, cra_alignmask is set to 3 for SEC1.
 
-2. In case of caam/qi - setting address, bpid, length to zero for output
-entry in the compound frame has a special meaning (cf. CAAM RM):
-"Output frame = Unspecified, Input address = Y. A unspecified frame is
-indicated by an unused SGT entry (an entry in which the Address, Length,
-and BPID fields are all zero). SEC obtains output buffers from BMan as
-prescribed by the preheader."
-
-Since no output buffers are needed, modify the preheader by setting
-(ABS = 1, ADDBUF = 0):
--"ABS = 1 means obtain the number of buffers in ADDBUF (0 or 1) from
-the pool POOL ID"
--ADDBUF: "If ABS is set, ADD BUF specifies whether to allocate
-a buffer or not"
-
-3. In case of caam/qi2, since engine:
--does not support FLE[FMT]=2'b11 ("unused" entry) mentioned in DPAA2 RM
--requires output entry to be present, even if not used
-the solution chosen is to leave output frame list entry zeroized.
-
-Fixes: 763069ba49d3 ("crypto: caam - handle zero-length AEAD output")
-Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+Fixes: 9c4a79653b35 ("crypto: talitos - Freescale integrated security engine (SEC) driver")
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/caam/caamalg.c     | 1 +
- drivers/crypto/caam/caamalg_qi.c  | 2 +-
- drivers/crypto/caam/caamalg_qi2.c | 9 +++++++++
- drivers/crypto/caam/qi.c          | 3 +++
- 4 files changed, 14 insertions(+), 1 deletion(-)
+ drivers/crypto/talitos.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index c0ece44f303b..df416e6c1468 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -1106,6 +1106,7 @@ static void init_aead_job(struct aead_request *req,
- 	if (unlikely(req->src != req->dst)) {
- 		if (!edesc->mapped_dst_nents) {
- 			dst_dma = 0;
-+			out_options = 0;
- 		} else if (edesc->mapped_dst_nents == 1) {
- 			dst_dma = sg_dma_address(req->dst);
- 			out_options = 0;
-diff --git a/drivers/crypto/caam/caamalg_qi.c b/drivers/crypto/caam/caamalg_qi.c
-index d290d6b41825..116cbc81fa8d 100644
---- a/drivers/crypto/caam/caamalg_qi.c
-+++ b/drivers/crypto/caam/caamalg_qi.c
-@@ -1109,7 +1109,7 @@ static struct aead_edesc *aead_edesc_alloc(struct aead_request *req,
- 			dma_to_qm_sg_one_ext(&fd_sgt[0], qm_sg_dma +
- 					     (1 + !!ivsize) * sizeof(*sg_table),
- 					     out_len, 0);
--	} else if (mapped_dst_nents == 1) {
-+	} else if (mapped_dst_nents <= 1) {
- 		dma_to_qm_sg_one(&fd_sgt[0], sg_dma_address(req->dst), out_len,
- 				 0);
- 	} else {
-diff --git a/drivers/crypto/caam/caamalg_qi2.c b/drivers/crypto/caam/caamalg_qi2.c
-index 2b2980a8a9b9..b949944c8e55 100644
---- a/drivers/crypto/caam/caamalg_qi2.c
-+++ b/drivers/crypto/caam/caamalg_qi2.c
-@@ -559,6 +559,14 @@ static struct aead_edesc *aead_edesc_alloc(struct aead_request *req,
- 			dpaa2_fl_set_addr(out_fle, qm_sg_dma +
- 					  (1 + !!ivsize) * sizeof(*sg_table));
- 		}
-+	} else if (!mapped_dst_nents) {
-+		/*
-+		 * crypto engine requires the output entry to be present when
-+		 * "frame list" FD is used.
-+		 * Since engine does not support FMT=2'b11 (unused entry type),
-+		 * leaving out_fle zeroized is the best option.
-+		 */
-+		goto skip_out_fle;
- 	} else if (mapped_dst_nents == 1) {
- 		dpaa2_fl_set_format(out_fle, dpaa2_fl_single);
- 		dpaa2_fl_set_addr(out_fle, sg_dma_address(req->dst));
-@@ -570,6 +578,7 @@ static struct aead_edesc *aead_edesc_alloc(struct aead_request *req,
+diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+index eec880909fdf..b6433d58df41 100644
+--- a/drivers/crypto/talitos.c
++++ b/drivers/crypto/talitos.c
+@@ -3278,7 +3278,10 @@ static struct talitos_crypto_alg *talitos_alg_alloc(struct device *dev,
+ 		alg->cra_priority = t_alg->algt.priority;
+ 	else
+ 		alg->cra_priority = TALITOS_CRA_PRIORITY;
+-	alg->cra_alignmask = 0;
++	if (has_ftr_sec1(priv))
++		alg->cra_alignmask = 3;
++	else
++		alg->cra_alignmask = 0;
+ 	alg->cra_ctxsize = sizeof(struct talitos_ctx);
+ 	alg->cra_flags |= CRYPTO_ALG_KERN_DRIVER_ONLY;
  
- 	dpaa2_fl_set_len(out_fle, out_len);
- 
-+skip_out_fle:
- 	return edesc;
- }
- 
-diff --git a/drivers/crypto/caam/qi.c b/drivers/crypto/caam/qi.c
-index 9f08f84cca59..2d9b0485141f 100644
---- a/drivers/crypto/caam/qi.c
-+++ b/drivers/crypto/caam/qi.c
-@@ -18,6 +18,7 @@
- #include "desc_constr.h"
- 
- #define PREHDR_RSLS_SHIFT	31
-+#define PREHDR_ABS		BIT(25)
- 
- /*
-  * Use a reasonable backlog of frames (per CPU) as congestion threshold,
-@@ -346,6 +347,7 @@ int caam_drv_ctx_update(struct caam_drv_ctx *drv_ctx, u32 *sh_desc)
- 	 */
- 	drv_ctx->prehdr[0] = cpu_to_caam32((1 << PREHDR_RSLS_SHIFT) |
- 					   num_words);
-+	drv_ctx->prehdr[1] = cpu_to_caam32(PREHDR_ABS);
- 	memcpy(drv_ctx->sh_desc, sh_desc, desc_bytes(sh_desc));
- 	dma_sync_single_for_device(qidev, drv_ctx->context_a,
- 				   sizeof(drv_ctx->sh_desc) +
-@@ -401,6 +403,7 @@ struct caam_drv_ctx *caam_drv_ctx_init(struct device *qidev,
- 	 */
- 	drv_ctx->prehdr[0] = cpu_to_caam32((1 << PREHDR_RSLS_SHIFT) |
- 					   num_words);
-+	drv_ctx->prehdr[1] = cpu_to_caam32(PREHDR_ABS);
- 	memcpy(drv_ctx->sh_desc, sh_desc, desc_bytes(sh_desc));
- 	size = sizeof(drv_ctx->prehdr) + sizeof(drv_ctx->sh_desc);
- 	hwdesc = dma_map_single(qidev, drv_ctx->prehdr, size,
 -- 
 2.20.1
 
