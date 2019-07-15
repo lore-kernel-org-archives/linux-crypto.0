@@ -7,52 +7,51 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BFABC7618F
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 14:29:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7923CC7618F
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 14:33:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 24F4D20896
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 14:29:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5331D21530
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 14:33:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1563200962;
-	bh=Ui9E1GA+baKaGGuaC4XJ/9TcFlJY9UJvABrDakaZdgs=;
+	s=default; t=1563201237;
+	bh=lkCTKh7ZxrUCm8Sg5urEHMxEK4sQo1A2rQt+ok6fEYQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=Tpj3iUpB0m3BWrpCy4pLqRAsSX8yUhFat6ysOCHlMFBZ9fpPM3/TCYSnOXZfynpBY
-	 QYoDyV1q9k6EHH+G97iFxs8d9K1hSFJoYtGg6PNgracjOyFpak++AEP1CvcC38kQXj
-	 mwyDx2pgkQPGgmWhfEMqozS56ko8ZwKLh5i8IBlI=
+	b=igSo33yXd/ftTYnLweP27XdvWHDqjNfnHm8MdmzvBaYMIJ8OTZ+d9KzflRZxtOF83
+	 V6gUC+5HiHAt5hCs6jnbFAsolz/1D9goK5k/vM6JDcuw9lW4YztGv9yZ9PRVfV7Mzn
+	 Cam4prmL5M4Fb1TxLiijDwlAZZ1hlrROV+OJEQbw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391544AbfGOO3U (ORCPT
+        id S2391977AbfGOOdz (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 Jul 2019 10:29:20 -0400
-Received: from mail.kernel.org ([198.145.29.99]:40472 "EHLO mail.kernel.org"
+        Mon, 15 Jul 2019 10:33:55 -0400
+Received: from mail.kernel.org ([198.145.29.99]:50322 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2391551AbfGOO3T (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Jul 2019 10:29:19 -0400
+        id S2391968AbfGOOdv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 15 Jul 2019 10:33:51 -0400
 Received: from sasha-vm.mshome.net (unknown [73.61.17.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id D62742086C;
-        Mon, 15 Jul 2019 14:29:15 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id F033721530;
+        Mon, 15 Jul 2019 14:33:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1563200958;
-        bh=Ui9E1GA+baKaGGuaC4XJ/9TcFlJY9UJvABrDakaZdgs=;
+        s=default; t=1563201231;
+        bh=lkCTKh7ZxrUCm8Sg5urEHMxEK4sQo1A2rQt+ok6fEYQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=WSfhXXzzMnss/J517P9UZVahE3OJep91sljLbgTTbNgucY+btG01tI85AIkEy+Fup
-         pwtph43oWSlXifll8YyFsZ65tHDpbCMT7u8w6iuXDYEEEpZdo2mIbhuKAfHideYayJ
-         WzDNEHBbzAyL3iWR6QxiQJQeZrB9hMoQI2WFyZ88=
+        b=U9CJUwUp0FfZp2Q229A/auHj5oijRMCtwadrAf8w35s2ofQux02eJfKE8zNsJbu3B
+         Fnkfd1/MWLPsSaZrezkOPHqdQOhGMeYsLV52PfPokB43ROupRC0N0vs+QicT0hKzEg
+         EdESrN2HnZzuUiAjrDG6hV6o6T9lPYlfWbBAHsOY=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Christophe Leroy <christophe.leroy@c-s.fr>,
-        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+Cc:     Arnd Bergmann <arnd@arndb.de>, Eric Biggers <ebiggers@kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 010/105] crypto: talitos - fix skcipher failure due to wrong output IV
-Date:   Mon, 15 Jul 2019 10:27:04 -0400
-Message-Id: <20190715142839.9896-10-sashal@kernel.org>
+        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
+        clang-built-linux@googlegroups.com
+Subject: [PATCH AUTOSEL 4.14 084/105] crypto: serpent - mark __serpent_setkey_sbox noinline
+Date:   Mon, 15 Jul 2019 10:28:18 -0400
+Message-Id: <20190715142839.9896-84-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190715142839.9896-1-sashal@kernel.org>
 References: <20190715142839.9896-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
@@ -61,52 +60,47 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Christophe Leroy <christophe.leroy@c-s.fr>
+From: Arnd Bergmann <arnd@arndb.de>
 
-[ Upstream commit 3e03e792865ae48b8cfc69a0b4d65f02f467389f ]
+[ Upstream commit 473971187d6727609951858c63bf12b0307ef015 ]
 
-Selftests report the following:
+The same bug that gcc hit in the past is apparently now showing
+up with clang, which decides to inline __serpent_setkey_sbox:
 
-[    2.984845] alg: skcipher: cbc-aes-talitos encryption test failed (wrong output IV) on test vector 0, cfg="in-place"
-[    2.995377] 00000000: 3d af ba 42 9d 9e b4 30 b4 22 da 80 2c 9f ac 41
-[    3.032673] alg: skcipher: cbc-des-talitos encryption test failed (wrong output IV) on test vector 0, cfg="in-place"
-[    3.043185] 00000000: fe dc ba 98 76 54 32 10
-[    3.063238] alg: skcipher: cbc-3des-talitos encryption test failed (wrong output IV) on test vector 0, cfg="in-place"
-[    3.073818] 00000000: 7d 33 88 93 0f 93 b2 42
+crypto/serpent_generic.c:268:5: error: stack frame size of 2112 bytes in function '__serpent_setkey' [-Werror,-Wframe-larger-than=]
 
-This above dumps show that the actual output IV is indeed the input IV.
-This is due to the IV not being copied back into the request.
+Marking it 'noinline' reduces the stack usage from 2112 bytes to
+192 and 96 bytes, respectively, and seems to generate more
+useful object code.
 
-This patch fixes that.
-
-Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
-Reviewed-by: Horia Geantă <horia.geanta@nxp.com>
+Fixes: c871c10e4ea7 ("crypto: serpent - improve __serpent_setkey with UBSAN")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Reviewed-by: Eric Biggers <ebiggers@kernel.org>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/talitos.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ crypto/serpent_generic.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index 4388f4e3840c..33fcedeb5f9f 100644
---- a/drivers/crypto/talitos.c
-+++ b/drivers/crypto/talitos.c
-@@ -1544,11 +1544,15 @@ static void ablkcipher_done(struct device *dev,
- 			    int err)
+diff --git a/crypto/serpent_generic.c b/crypto/serpent_generic.c
+index 7c3382facc82..600bd288881d 100644
+--- a/crypto/serpent_generic.c
++++ b/crypto/serpent_generic.c
+@@ -229,7 +229,13 @@
+ 	x4 ^= x2;					\
+ 	})
+ 
+-static void __serpent_setkey_sbox(u32 r0, u32 r1, u32 r2, u32 r3, u32 r4, u32 *k)
++/*
++ * both gcc and clang have misoptimized this function in the past,
++ * producing horrible object code from spilling temporary variables
++ * on the stack. Forcing this part out of line avoids that.
++ */
++static noinline void __serpent_setkey_sbox(u32 r0, u32 r1, u32 r2,
++					   u32 r3, u32 r4, u32 *k)
  {
- 	struct ablkcipher_request *areq = context;
-+	struct crypto_ablkcipher *cipher = crypto_ablkcipher_reqtfm(areq);
-+	struct talitos_ctx *ctx = crypto_ablkcipher_ctx(cipher);
-+	unsigned int ivsize = crypto_ablkcipher_ivsize(cipher);
- 	struct talitos_edesc *edesc;
- 
- 	edesc = container_of(desc, struct talitos_edesc, desc);
- 
- 	common_nonsnoop_unmap(dev, edesc, areq);
-+	memcpy(areq->info, ctx->iv, ivsize);
- 
- 	kfree(edesc);
- 
+ 	k += 100;
+ 	S3(r3, r4, r0, r1, r2); store_and_load_keys(r1, r2, r4, r3, 28, 24);
 -- 
 2.20.1
 
