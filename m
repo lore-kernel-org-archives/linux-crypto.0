@@ -7,52 +7,51 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 213DCC76195
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 14:59:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DACD8C76195
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 15:02:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E4FCD205ED
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 14:59:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B4B7C2067C
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 15:02:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1563202783;
-	bh=FTKJOaDBqWWGx5K6l7a3GQeiN9iEecrkXmoJNkID+74=;
+	s=default; t=1563202932;
+	bh=mpv5qIPsHtYPw+A/BGE2sSjzuUPliIMI57zTeeXOEkA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=nvE+G/hF+n2YwhZorthx6kZPYJ7Gg2n+HtVTM4lvA4IgadTtkqDrmpaBlpMPPU/B5
-	 knlZ1kULe4vy6RR8Av550QPYvT7DKHKIWM98ox9ANpLSa7a15JYdPPOV0hF9ptwUXi
-	 JcwpsgfhZXZzrJ0N0OybIMqo4oEyZhQEkGod0eyc=
+	b=QUGfZW/Zm8pwdHrh8gowdObnVv2WCb7zTQhY1PUutUIJlwmMhXM/jl4eIzxce8rMc
+	 Yip1YgWi3pL7PStF7pxsrc57wosT+I5w0ov1043QYaRFIR/+1X+SQBRZcVwuVd6YXb
+	 TSVwmF3Y0SVHUVO7AjzKOKDfE+L2yXd21ar8ZqF0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389774AbfGOOSy (ORCPT
+        id S2388482AbfGOONt (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 Jul 2019 10:18:54 -0400
-Received: from mail.kernel.org ([198.145.29.99]:39262 "EHLO mail.kernel.org"
+        Mon, 15 Jul 2019 10:13:49 -0400
+Received: from mail.kernel.org ([198.145.29.99]:54556 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389978AbfGOOSt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Jul 2019 10:18:49 -0400
+        id S1731356AbfGOONs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 15 Jul 2019 10:13:48 -0400
 Received: from sasha-vm.mshome.net (unknown [73.61.17.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 74EE520651;
-        Mon, 15 Jul 2019 14:18:47 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id A034F2083D;
+        Mon, 15 Jul 2019 14:13:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1563200329;
-        bh=FTKJOaDBqWWGx5K6l7a3GQeiN9iEecrkXmoJNkID+74=;
+        s=default; t=1563200027;
+        bh=mpv5qIPsHtYPw+A/BGE2sSjzuUPliIMI57zTeeXOEkA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Xvo0TsS/Kfsuix67ZnNsstQicxvmwG2fUD9bUKmS8aKU310V+TONHx+0SBzy6v/m6
-         jenlMGMbRFh19IWxqS+8xGzFdiWM0M5PdcuNfPGJRKCInnoH0YmJrkiCFBiUb7+1YR
-         RRnqT/75EKn+SLEH75KH6DKpcHA2exUOg5VOa3Ko=
+        b=VThiK6WcIg83p7Wdsms0xh80otxUO8HpIppcOLrOJqyP87RPc9dS5Pck1K/JvEAO9
+         E1JgR+4fKzj8tJuC3FAGLj/MQFW6twREJxA1ErpD57fMxmJOSmvt+ApeCjKl3L7m5/
+         xX100PbMzWVk8VMytcvKky0SEqup1jnY1gfUlh2M=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Christophe Leroy <christophe.leroy@c-s.fr>,
-        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+Cc:     Arnd Bergmann <arnd@arndb.de>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 013/158] crypto: talitos - fix skcipher failure due to wrong output IV
-Date:   Mon, 15 Jul 2019 10:15:44 -0400
-Message-Id: <20190715141809.8445-13-sashal@kernel.org>
+        Sasha Levin <sashal@kernel.org>, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.1 162/219] crypto: asymmetric_keys - select CRYPTO_HASH where needed
+Date:   Mon, 15 Jul 2019 10:02:43 -0400
+Message-Id: <20190715140341.6443-162-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190715141809.8445-1-sashal@kernel.org>
-References: <20190715141809.8445-1-sashal@kernel.org>
+In-Reply-To: <20190715140341.6443-1-sashal@kernel.org>
+References: <20190715140341.6443-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
@@ -61,52 +60,60 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Christophe Leroy <christophe.leroy@c-s.fr>
+From: Arnd Bergmann <arnd@arndb.de>
 
-[ Upstream commit 3e03e792865ae48b8cfc69a0b4d65f02f467389f ]
+[ Upstream commit 90acc0653d2bee203174e66d519fbaaa513502de ]
 
-Selftests report the following:
+Build testing with some core crypto options disabled revealed
+a few modules that are missing CRYPTO_HASH:
 
-[    2.984845] alg: skcipher: cbc-aes-talitos encryption test failed (wrong output IV) on test vector 0, cfg="in-place"
-[    2.995377] 00000000: 3d af ba 42 9d 9e b4 30 b4 22 da 80 2c 9f ac 41
-[    3.032673] alg: skcipher: cbc-des-talitos encryption test failed (wrong output IV) on test vector 0, cfg="in-place"
-[    3.043185] 00000000: fe dc ba 98 76 54 32 10
-[    3.063238] alg: skcipher: cbc-3des-talitos encryption test failed (wrong output IV) on test vector 0, cfg="in-place"
-[    3.073818] 00000000: 7d 33 88 93 0f 93 b2 42
+crypto/asymmetric_keys/x509_public_key.o: In function `x509_get_sig_params':
+x509_public_key.c:(.text+0x4c7): undefined reference to `crypto_alloc_shash'
+x509_public_key.c:(.text+0x5e5): undefined reference to `crypto_shash_digest'
+crypto/asymmetric_keys/pkcs7_verify.o: In function `pkcs7_digest.isra.0':
+pkcs7_verify.c:(.text+0xab): undefined reference to `crypto_alloc_shash'
+pkcs7_verify.c:(.text+0x1b2): undefined reference to `crypto_shash_digest'
+pkcs7_verify.c:(.text+0x3c1): undefined reference to `crypto_shash_update'
+pkcs7_verify.c:(.text+0x411): undefined reference to `crypto_shash_finup'
 
-This above dumps show that the actual output IV is indeed the input IV.
-This is due to the IV not being copied back into the request.
+This normally doesn't show up in randconfig tests because there is
+a large number of other options that select CRYPTO_HASH.
 
-This patch fixes that.
-
-Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
-Reviewed-by: Horia Geantă <horia.geanta@nxp.com>
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/talitos.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ crypto/asymmetric_keys/Kconfig | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index c5859d3cb825..9cc5309a3fbf 100644
---- a/drivers/crypto/talitos.c
-+++ b/drivers/crypto/talitos.c
-@@ -1571,11 +1571,15 @@ static void ablkcipher_done(struct device *dev,
- 			    int err)
- {
- 	struct ablkcipher_request *areq = context;
-+	struct crypto_ablkcipher *cipher = crypto_ablkcipher_reqtfm(areq);
-+	struct talitos_ctx *ctx = crypto_ablkcipher_ctx(cipher);
-+	unsigned int ivsize = crypto_ablkcipher_ivsize(cipher);
- 	struct talitos_edesc *edesc;
- 
- 	edesc = container_of(desc, struct talitos_edesc, desc);
- 
- 	common_nonsnoop_unmap(dev, edesc, areq);
-+	memcpy(areq->info, ctx->iv, ivsize);
- 
- 	kfree(edesc);
- 
+diff --git a/crypto/asymmetric_keys/Kconfig b/crypto/asymmetric_keys/Kconfig
+index be70ca6c85d3..1f1f004dc757 100644
+--- a/crypto/asymmetric_keys/Kconfig
++++ b/crypto/asymmetric_keys/Kconfig
+@@ -15,6 +15,7 @@ config ASYMMETRIC_PUBLIC_KEY_SUBTYPE
+ 	select MPILIB
+ 	select CRYPTO_HASH_INFO
+ 	select CRYPTO_AKCIPHER
++	select CRYPTO_HASH
+ 	help
+ 	  This option provides support for asymmetric public key type handling.
+ 	  If signature generation and/or verification are to be used,
+@@ -65,6 +66,7 @@ config TPM_KEY_PARSER
+ config PKCS7_MESSAGE_PARSER
+ 	tristate "PKCS#7 message parser"
+ 	depends on X509_CERTIFICATE_PARSER
++	select CRYPTO_HASH
+ 	select ASN1
+ 	select OID_REGISTRY
+ 	help
+@@ -87,6 +89,7 @@ config SIGNED_PE_FILE_VERIFICATION
+ 	bool "Support for PE file signature verification"
+ 	depends on PKCS7_MESSAGE_PARSER=y
+ 	depends on SYSTEM_DATA_VERIFICATION
++	select CRYPTO_HASH
+ 	select ASN1
+ 	select OID_REGISTRY
+ 	help
 -- 
 2.20.1
 
