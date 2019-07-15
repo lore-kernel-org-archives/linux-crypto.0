@@ -2,38 +2,52 @@ Return-Path: <SRS0=7mlD=VM=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D210FC7618A
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 06:26:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 624E4C7618F
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 07:57:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B0AA220838
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 06:26:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3B24F214C6
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 07:57:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1563177443;
+	bh=mroLkCCn2tDhUBkSu/vA39E++KpXetGzGIWhdAxd0ts=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:List-ID:From;
+	b=DjI7V/50cXdM/iYfTQjG+7FJ4skCjSqMQTP4XkzHy++L0JFlY5G9itwrojoOQqxse
+	 dQKzQ1WW3hnsZezyqHUZtwLVI8LG+EzR0B7BdR9UdVyqXdrIZ45nVtljyeZZtO7P2C
+	 qb3bjgE6Oiwxl4BlIqr9ax8MSZnPj9HysCIKrZU4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728952AbfGOG0a (ORCPT
+        id S1729289AbfGOH5W (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 Jul 2019 02:26:30 -0400
-Received: from smtp3.goneo.de ([85.220.129.37]:38280 "EHLO smtp3.goneo.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726579AbfGOG0a (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Jul 2019 02:26:30 -0400
-X-Greylist: delayed 565 seconds by postgrey-1.27 at vger.kernel.org; Mon, 15 Jul 2019 02:26:28 EDT
-Received: from localhost (localhost [127.0.0.1])
-        by smtp3.goneo.de (Postfix) with ESMTP id C2C2623F2CD;
-        Mon, 15 Jul 2019 08:17:00 +0200 (CEST)
-X-Virus-Scanned: by goneo
-Received: from smtp3.goneo.de ([127.0.0.1])
-        by localhost (smtp3.goneo.de [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id 9DTgEevx57Ss; Mon, 15 Jul 2019 08:16:59 +0200 (CEST)
-Received: from [192.168.1.127] (dyndsl-091-248-140-021.ewe-ip-backbone.de [91.248.140.21])
-        by smtp3.goneo.de (Postfix) with ESMTPSA id 7016023F001;
-        Mon, 15 Jul 2019 08:16:54 +0200 (CEST)
-Subject: Re: [PATCH 8/8] docs: remove extra conf.py files
-To:     Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
-        Linux Doc Mailing List <linux-doc@vger.kernel.org>
-Cc:     Mauro Carvalho Chehab <mchehab@infradead.org>,
+        Mon, 15 Jul 2019 03:57:22 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:34870 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726170AbfGOH5V (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 15 Jul 2019 03:57:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
+        Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Subject:Cc:To:
+        From:Date:Sender:Reply-To:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=eJlbjim1fxU57ZaVX/VVgKi/dG9GtJerPxx9UJo7Fww=; b=JcDzLwBGAR3DIQ5PzjliPmdfB
+        wt3f3sg2z3AO/OuERhsRmMQS2qwxDHfr81HUZ8bO4iiwRmK3RrOm2h4/5DNGgtFEZDvuz7A8dJNNm
+        8SC+KQ1Nwm9BOBk47L69bPbiRtcflOhdeLDtFR53AOVtvZ10BSu6RTR+jOSoexCb+TOn62JzVO7/Z
+        O55lv0FaRBBJ2LYyXSZdelp0ocAQap0NW6KHdOxn0lTVtf8TDPBJOZV7LLeVVU8RcXQa7O955vRo5
+        mleM8mlHWSbuEWzj/LK75trdO7CY3hdfI2sN1X09S7ln7kgJuHQUi7kWjs9YHKWyAOp1nM2lXWTrS
+        FqvVaEtvQ==;
+Received: from [189.27.46.152] (helo=coco.lan)
+        by bombadil.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
+        id 1hmvrD-0003qC-8d; Mon, 15 Jul 2019 07:57:11 +0000
+Date:   Mon, 15 Jul 2019 04:57:02 -0300
+From:   Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
+To:     Markus Heiser <markus.heiser@darmarit.de>
+Cc:     Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        Mauro Carvalho Chehab <mchehab@infradead.org>,
         linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
@@ -53,32 +67,56 @@ Cc:     Mauro Carvalho Chehab <mchehab@infradead.org>,
         linux-crypto@vger.kernel.org, dri-devel@lists.freedesktop.org,
         linux-input@vger.kernel.org, netdev@vger.kernel.org,
         linux-sh@vger.kernel.org, alsa-devel@alsa-project.org
+Subject: Re: [PATCH 8/8] docs: remove extra conf.py files
+Message-ID: <20190715045702.1e2b569b@coco.lan>
+In-Reply-To: <e3ff0a8a-6956-3855-07be-9c126df2da2d@darmarit.de>
 References: <cover.1563115732.git.mchehab+samsung@kernel.org>
- <12a160afc9e70156f671010bd4ccff9311acdc5e.1563115732.git.mchehab+samsung@kernel.org>
-From:   Markus Heiser <markus.heiser@darmarit.de>
-Message-ID: <e3ff0a8a-6956-3855-07be-9c126df2da2d@darmarit.de>
-Date:   Mon, 15 Jul 2019 08:16:54 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+        <12a160afc9e70156f671010bd4ccff9311acdc5e.1563115732.git.mchehab+samsung@kernel.org>
+        <e3ff0a8a-6956-3855-07be-9c126df2da2d@darmarit.de>
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <12a160afc9e70156f671010bd4ccff9311acdc5e.1563115732.git.mchehab+samsung@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: de-DE
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Mauro,
+Em Mon, 15 Jul 2019 08:16:54 +0200
+Markus Heiser <markus.heiser@darmarit.de> escreveu:
 
-sorry, I havn't tested your patch, but one question ...
+> Hi Mauro,
+> 
+> sorry, I havn't tested your patch, but one question ...
+> 
+> Am 14.07.19 um 17:10 schrieb Mauro Carvalho Chehab:
+> > Now that the latex_documents are handled automatically, we can
+> > remove those extra conf.py files.  
+> 
+> We need these conf.py also for compiling books' into HTML.  For this
+> the tags.add("subproject") is needed.  Should we realy drop this feature?
+> 
+> -- Markus --
 
-Am 14.07.19 um 17:10 schrieb Mauro Carvalho Chehab:
-> Now that the latex_documents are handled automatically, we can
-> remove those extra conf.py files.
+You're right: adding "subproject" tags is needed for html. Folding this
+to patch 7/8 makes both htmldocs and pdfdocs to work with SPHINXDIRS
+without the need of a per-subdir conf.py.
 
-We need these conf.py also for compiling books' into HTML.  For this
-the tags.add("subproject") is needed.  Should we realy drop this feature?
+Regards,
+Mauro
 
--- Markus --
+diff --git a/Documentation/sphinx/load_config.py b/Documentation/sphinx/load_config.py
+index 75f527ff4c95..e4a04f367b41 100644
+--- a/Documentation/sphinx/load_config.py
++++ b/Documentation/sphinx/load_config.py
+@@ -51,3 +51,7 @@ def loadConfig(namespace):
+             execfile_(config_file, config)
+             del config['__file__']
+             namespace.update(config)
++        else:
++            config = namespace.copy()
++            config['tags'].add("subproject")
++            namespace.update(config)
+
+Thanks,
+Mauro
