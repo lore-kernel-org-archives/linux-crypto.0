@@ -4,49 +4,49 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01DA3C76191
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 14:52:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 440D5C7618F
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 14:52:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C336E2067C
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 14:52:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1E3B72086C
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 14:52:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1563202365;
-	bh=bQVtRsGrw+3wu0yWXawwgorV2iyj8YOHTmsPh2Ix4O4=;
+	s=default; t=1563202368;
+	bh=J/oByyn60QUD/e/82Ke5a6mlvNsmDHvOy3T68N0PlYs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=YIj6sR2xQomIl6k2mP6gV8MvMnNHw0i8MkPNGuOtgy0sR8KMNqSUDlmzzLU+0Ws6W
-	 E9JQbul3HgV2BlRUfS7yvjMC+mY2le7CxF1oImfzQI6/nOvhNfPfHm98A9WKzaYxuZ
-	 ddEdkwE2Wu4XhGWeNRsYG5U+n/vTiSTqKpjLj1uY=
+	b=aSjFew5j8VVdp8BQ6bTSfLaLtMfeyl0zpBG9aiUIugaN36eG2ULqQ4Jvxi9vAv0jc
+	 JRbknmqFSKzQEGxrHoMSWBoiY9Jw6BQBKS/nL85RdVrcCm2LXIMjeaDe/VKXc2pasK
+	 2UQKAuyZZkc3nG+Y3V0VE3OFGEuiFQNA9y/AkcSY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391675AbfGOOaR (ORCPT
+        id S2390889AbfGOOaP (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 Jul 2019 10:30:17 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42796 "EHLO mail.kernel.org"
+        Mon, 15 Jul 2019 10:30:15 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42692 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2391671AbfGOOaR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Jul 2019 10:30:17 -0400
+        id S2391663AbfGOOaN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 15 Jul 2019 10:30:13 -0400
 Received: from sasha-vm.mshome.net (unknown [73.61.17.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 6A93F206B8;
-        Mon, 15 Jul 2019 14:30:13 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 30FB9205ED;
+        Mon, 15 Jul 2019 14:30:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1563201016;
-        bh=bQVtRsGrw+3wu0yWXawwgorV2iyj8YOHTmsPh2Ix4O4=;
+        s=default; t=1563201012;
+        bh=J/oByyn60QUD/e/82Ke5a6mlvNsmDHvOy3T68N0PlYs=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=befsy4XSTvpiHSbAQ7lba2meNA4/+r2aRlWIxiupAHrTwN/qeiinCnrjZS/Gqx96C
-         jG89a5Fsqc/ogV4QWRhEQZvIUCHjEdmZVyP7D/uYXInkFPj/mz8Dv2m8nsYYEQmPcv
-         jwLpN5wlnuqUBYnBsXvoDmottP7qZdR3ecP9fYh0=
+        b=0/5dlDkHfpfFTlDcnfIErMEBQ2JsqaVBR3VppGFGf38dUdNSMGiQJgytWDJy6ygbM
+         TXXTg2O7MZd/m0MKCnAzhd0Ef5oHBQFGGOryDBs7ExICd8JZ6/jQWxMDrjEd4zKSp2
+         Ot7016q0Dq69/B4wdeJk3Ri1oQY4DlWD5LbYhMGA=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Christophe Leroy <christophe.leroy@c-s.fr>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 028/105] crypto: talitos - Align SEC1 accesses to 32 bits boundaries.
-Date:   Mon, 15 Jul 2019 10:27:22 -0400
-Message-Id: <20190715142839.9896-28-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.14 027/105] crypto: talitos - properly handle split ICV.
+Date:   Mon, 15 Jul 2019 10:27:21 -0400
+Message-Id: <20190715142839.9896-27-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190715142839.9896-1-sashal@kernel.org>
 References: <20190715142839.9896-1-sashal@kernel.org>
@@ -61,40 +61,95 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Christophe Leroy <christophe.leroy@c-s.fr>
 
-[ Upstream commit c9cca7034b34a2d82e9a03b757de2485c294851c ]
+[ Upstream commit eae55a586c3c8b50982bad3c3426e9c9dd7a0075 ]
 
-The MPC885 reference manual states:
+The driver assumes that the ICV is as a single piece in the last
+element of the scatterlist. This assumption is wrong.
 
-SEC Lite-initiated 8xx writes can occur only on 32-bit-word boundaries, but
-reads can occur on any byte boundary. Writing back a header read from a
-non-32-bit-word boundary will yield unpredictable results.
+This patch ensures that the ICV is properly handled regardless of
+the scatterlist layout.
 
-In order to ensure that, cra_alignmask is set to 3 for SEC1.
-
-Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
 Fixes: 9c4a79653b35 ("crypto: talitos - Freescale integrated security engine (SEC) driver")
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/talitos.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ drivers/crypto/talitos.c | 26 +++++++++++++++-----------
+ 1 file changed, 15 insertions(+), 11 deletions(-)
 
 diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index ec9473ddfbb3..9f79ad57a5a5 100644
+index 33fcedeb5f9f..ec9473ddfbb3 100644
 --- a/drivers/crypto/talitos.c
 +++ b/drivers/crypto/talitos.c
-@@ -3119,7 +3119,10 @@ static struct talitos_crypto_alg *talitos_alg_alloc(struct device *dev,
- 		alg->cra_priority = t_alg->algt.priority;
- 	else
- 		alg->cra_priority = TALITOS_CRA_PRIORITY;
--	alg->cra_alignmask = 0;
-+	if (has_ftr_sec1(priv))
-+		alg->cra_alignmask = 3;
-+	else
-+		alg->cra_alignmask = 0;
- 	alg->cra_ctxsize = sizeof(struct talitos_ctx);
- 	alg->cra_flags |= CRYPTO_ALG_KERN_DRIVER_ONLY;
+@@ -984,7 +984,6 @@ static void ipsec_esp_encrypt_done(struct device *dev,
+ 	struct crypto_aead *authenc = crypto_aead_reqtfm(areq);
+ 	unsigned int authsize = crypto_aead_authsize(authenc);
+ 	struct talitos_edesc *edesc;
+-	struct scatterlist *sg;
+ 	void *icvdata;
  
+ 	edesc = container_of(desc, struct talitos_edesc, desc);
+@@ -998,9 +997,8 @@ static void ipsec_esp_encrypt_done(struct device *dev,
+ 		else
+ 			icvdata = &edesc->link_tbl[edesc->src_nents +
+ 						   edesc->dst_nents + 2];
+-		sg = sg_last(areq->dst, edesc->dst_nents);
+-		memcpy((char *)sg_virt(sg) + sg->length - authsize,
+-		       icvdata, authsize);
++		sg_pcopy_from_buffer(areq->dst, edesc->dst_nents ? : 1, icvdata,
++				     authsize, areq->assoclen + areq->cryptlen);
+ 	}
+ 
+ 	kfree(edesc);
+@@ -1016,7 +1014,6 @@ static void ipsec_esp_decrypt_swauth_done(struct device *dev,
+ 	struct crypto_aead *authenc = crypto_aead_reqtfm(req);
+ 	unsigned int authsize = crypto_aead_authsize(authenc);
+ 	struct talitos_edesc *edesc;
+-	struct scatterlist *sg;
+ 	char *oicv, *icv;
+ 	struct talitos_private *priv = dev_get_drvdata(dev);
+ 	bool is_sec1 = has_ftr_sec1(priv);
+@@ -1026,9 +1023,18 @@ static void ipsec_esp_decrypt_swauth_done(struct device *dev,
+ 	ipsec_esp_unmap(dev, edesc, req);
+ 
+ 	if (!err) {
++		char icvdata[SHA512_DIGEST_SIZE];
++		int nents = edesc->dst_nents ? : 1;
++		unsigned int len = req->assoclen + req->cryptlen;
++
+ 		/* auth check */
+-		sg = sg_last(req->dst, edesc->dst_nents ? : 1);
+-		icv = (char *)sg_virt(sg) + sg->length - authsize;
++		if (nents > 1) {
++			sg_pcopy_to_buffer(req->dst, nents, icvdata, authsize,
++					   len - authsize);
++			icv = icvdata;
++		} else {
++			icv = (char *)sg_virt(req->dst) + len - authsize;
++		}
+ 
+ 		if (edesc->dma_len) {
+ 			if (is_sec1)
+@@ -1458,7 +1464,6 @@ static int aead_decrypt(struct aead_request *req)
+ 	struct talitos_ctx *ctx = crypto_aead_ctx(authenc);
+ 	struct talitos_private *priv = dev_get_drvdata(ctx->dev);
+ 	struct talitos_edesc *edesc;
+-	struct scatterlist *sg;
+ 	void *icvdata;
+ 
+ 	req->cryptlen -= authsize;
+@@ -1493,9 +1498,8 @@ static int aead_decrypt(struct aead_request *req)
+ 	else
+ 		icvdata = &edesc->link_tbl[0];
+ 
+-	sg = sg_last(req->src, edesc->src_nents ? : 1);
+-
+-	memcpy(icvdata, (char *)sg_virt(sg) + sg->length - authsize, authsize);
++	sg_pcopy_to_buffer(req->src, edesc->src_nents ? : 1, icvdata, authsize,
++			   req->assoclen + req->cryptlen - authsize);
+ 
+ 	return ipsec_esp(edesc, req, ipsec_esp_decrypt_swauth_done);
+ }
 -- 
 2.20.1
 
