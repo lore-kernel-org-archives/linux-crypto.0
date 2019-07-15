@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BDE2C7618F
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 13:52:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30B47C7618F
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 13:58:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 051902083D
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 13:52:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F2323212F5
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 13:57:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1563198770;
-	bh=dbZ9UkTc8jQ7thfAA7TdTEU2rDgk8mjNAe28LtjKQ68=;
+	s=default; t=1563199080;
+	bh=e7n4SXe09RzoHoyeKaTu1LZkIdvfo40iBdxKRHi0oac=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=OVBMCNOVUJ0TehWLJg7WsmcVOp5fp9+t+bccAPC30Wk6uflJuq9VIYEWFP/Iz2wGZ
-	 NhS9cRZXTPwSY9jznYf/w2EVoEI/QfQTF2a8LvQoyj7Eh2zordiI4JKDxK6xEUfBGD
-	 BWjAc9cdcznr8EFGb2ei4fuppsX3qmfKSs5PhwVI=
+	b=ahhhZ+w5mzepRywtCtJSm7t/DiVkuYA/8T7G8NqZDplsCc+7gEhrpxOPoh1QljWbD
+	 5C3ZljbIY/umrSB428LZg36VO4jvVvQYlyFAaKOHMnJoX/lVQQRY6GOAfM7QpHYwnM
+	 Z6y14VNj/1Fp7KttkYzkwHxx4Rs5EvRKQ9rpy0AQ=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732250AbfGONwt (ORCPT
+        id S1733040AbfGON57 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 Jul 2019 09:52:49 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47124 "EHLO mail.kernel.org"
+        Mon, 15 Jul 2019 09:57:59 -0400
+Received: from mail.kernel.org ([198.145.29.99]:36868 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732248AbfGONwm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Jul 2019 09:52:42 -0400
+        id S1732131AbfGON57 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 15 Jul 2019 09:57:59 -0400
 Received: from sasha-vm.mshome.net (unknown [73.61.17.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 5A1BD206B8;
-        Mon, 15 Jul 2019 13:52:39 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id A9B5621537;
+        Mon, 15 Jul 2019 13:57:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1563198761;
-        bh=dbZ9UkTc8jQ7thfAA7TdTEU2rDgk8mjNAe28LtjKQ68=;
+        s=default; t=1563199078;
+        bh=e7n4SXe09RzoHoyeKaTu1LZkIdvfo40iBdxKRHi0oac=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=qYvdasqGPDKX13yqgjBtK13rhhxyYSAac4dMWe6xc83Waw5zi3z7hG/Zs3UbG/NP5
-         yf8XRzjJuhoLjMHh/bnu/4IKjKPE85hGNtIoCNu2QL35wVI7edPc9rMYBlPYqKah4P
-         JIDRtDJgOA0NM21K6olNtW3mjLOnebQmLcTy9eWk=
+        b=ziA8+eIpGjvMLGhiPaD4SAL5JjNM+jsL5Hc/1/1udvlyoUSU5z4dsNUu6gTUpbfMS
+         9J3aGQrxVlcL/LJ5k1t4QnqTnyaeZb/wMK5Z+3dAjvw0K/7NoeoeESpENxr18qgM2i
+         O+aD85YArUcYBnKsaUbDu0pK8Czyv20aDmRraxp8=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Eric Biggers <ebiggers@google.com>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+Cc:     Arnd Bergmann <arnd@arndb.de>, Eric Biggers <ebiggers@kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.2 098/249] crypto: testmgr - add some more preemption points
-Date:   Mon, 15 Jul 2019 09:44:23 -0400
-Message-Id: <20190715134655.4076-98-sashal@kernel.org>
+        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
+        clang-built-linux@googlegroups.com
+Subject: [PATCH AUTOSEL 5.2 183/249] crypto: serpent - mark __serpent_setkey_sbox noinline
+Date:   Mon, 15 Jul 2019 09:45:48 -0400
+Message-Id: <20190715134655.4076-183-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190715134655.4076-1-sashal@kernel.org>
 References: <20190715134655.4076-1-sashal@kernel.org>
@@ -60,76 +60,47 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+From: Arnd Bergmann <arnd@arndb.de>
 
-[ Upstream commit e63e1b0dd0003dc31f73d875907432be3a2abe5d ]
+[ Upstream commit 473971187d6727609951858c63bf12b0307ef015 ]
 
-Call cond_resched() after each fuzz test iteration.  This avoids stall
-warnings if fuzz_iterations is set very high for testing purposes.
+The same bug that gcc hit in the past is apparently now showing
+up with clang, which decides to inline __serpent_setkey_sbox:
 
-While we're at it, also call cond_resched() after finishing testing each
-test vector.
+crypto/serpent_generic.c:268:5: error: stack frame size of 2112 bytes in function '__serpent_setkey' [-Werror,-Wframe-larger-than=]
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
-Acked-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Marking it 'noinline' reduces the stack usage from 2112 bytes to
+192 and 96 bytes, respectively, and seems to generate more
+useful object code.
+
+Fixes: c871c10e4ea7 ("crypto: serpent - improve __serpent_setkey with UBSAN")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Reviewed-by: Eric Biggers <ebiggers@kernel.org>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- crypto/testmgr.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ crypto/serpent_generic.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 658a7eeebab2..292d28caf00f 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -1279,6 +1279,7 @@ static int test_hash_vec(const char *driver, const struct hash_testvec *vec,
- 						req, tsgl, hashstate);
- 			if (err)
- 				return err;
-+			cond_resched();
- 		}
- 	}
- #endif
-@@ -1493,6 +1494,7 @@ static int __alg_test_hash(const struct hash_testvec *vecs,
- 		err = test_hash_vec(driver, &vecs[i], i, req, tsgl, hashstate);
- 		if (err)
- 			goto out;
-+		cond_resched();
- 	}
- 	err = test_hash_vs_generic_impl(driver, generic_driver, maxkeysize, req,
- 					tsgl, hashstate);
-@@ -1755,6 +1757,7 @@ static int test_aead_vec(const char *driver, int enc,
- 						&cfg, req, tsgls);
- 			if (err)
- 				return err;
-+			cond_resched();
- 		}
- 	}
- #endif
-@@ -1994,6 +1997,7 @@ static int test_aead(const char *driver, int enc,
- 				    tsgls);
- 		if (err)
- 			return err;
-+		cond_resched();
- 	}
- 	return 0;
- }
-@@ -2336,6 +2340,7 @@ static int test_skcipher_vec(const char *driver, int enc,
- 						    &cfg, req, tsgls);
- 			if (err)
- 				return err;
-+			cond_resched();
- 		}
- 	}
- #endif
-@@ -2535,6 +2540,7 @@ static int test_skcipher(const char *driver, int enc,
- 					tsgls);
- 		if (err)
- 			return err;
-+		cond_resched();
- 	}
- 	return 0;
- }
+diff --git a/crypto/serpent_generic.c b/crypto/serpent_generic.c
+index 16f612b6dbca..a9cc0b2aa0d6 100644
+--- a/crypto/serpent_generic.c
++++ b/crypto/serpent_generic.c
+@@ -225,7 +225,13 @@
+ 	x4 ^= x2;					\
+ 	})
+ 
+-static void __serpent_setkey_sbox(u32 r0, u32 r1, u32 r2, u32 r3, u32 r4, u32 *k)
++/*
++ * both gcc and clang have misoptimized this function in the past,
++ * producing horrible object code from spilling temporary variables
++ * on the stack. Forcing this part out of line avoids that.
++ */
++static noinline void __serpent_setkey_sbox(u32 r0, u32 r1, u32 r2,
++					   u32 r3, u32 r4, u32 *k)
+ {
+ 	k += 100;
+ 	S3(r3, r4, r0, r1, r2); store_and_load_keys(r1, r2, r4, r3, 28, 24);
 -- 
 2.20.1
 
