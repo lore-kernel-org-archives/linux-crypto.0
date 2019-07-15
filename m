@@ -7,50 +7,52 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8329FC7618F
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 14:57:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 213DCC76195
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 14:59:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 58419205ED
-	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 14:57:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E4FCD205ED
+	for <linux-crypto@archiver.kernel.org>; Mon, 15 Jul 2019 14:59:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1563202653;
-	bh=siaOQU+9Yi/g6m79iq793PysKjLd5jvq5ck8WDVyUTw=;
+	s=default; t=1563202783;
+	bh=FTKJOaDBqWWGx5K6l7a3GQeiN9iEecrkXmoJNkID+74=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=TCWbYOCq1HjN9G3k/LZVs7dWSy+jL1kGjWGSOzWIday2lA4C+9OzclM7DgqW4D86M
-	 Admy6ijRXfpKGn/s46SZQWHRJA0+H6BANFAYIrxLaZu/jHTVbZVNsGxgB+2PBw4sUL
-	 pcUV3+Nl71zLNfegySwXImRU4WbEczI3RpGWtmTg=
+	b=nvE+G/hF+n2YwhZorthx6kZPYJ7Gg2n+HtVTM4lvA4IgadTtkqDrmpaBlpMPPU/B5
+	 knlZ1kULe4vy6RR8Av550QPYvT7DKHKIWM98ox9ANpLSa7a15JYdPPOV0hF9ptwUXi
+	 JcwpsgfhZXZzrJ0N0OybIMqo4oEyZhQEkGod0eyc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390231AbfGOOUa (ORCPT
+        id S2389774AbfGOOSy (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 15 Jul 2019 10:20:30 -0400
-Received: from mail.kernel.org ([198.145.29.99]:44384 "EHLO mail.kernel.org"
+        Mon, 15 Jul 2019 10:18:54 -0400
+Received: from mail.kernel.org ([198.145.29.99]:39262 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2390225AbfGOOU3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 15 Jul 2019 10:20:29 -0400
+        id S2389978AbfGOOSt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 15 Jul 2019 10:18:49 -0400
 Received: from sasha-vm.mshome.net (unknown [73.61.17.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 23D07206B8;
-        Mon, 15 Jul 2019 14:20:27 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 74EE520651;
+        Mon, 15 Jul 2019 14:18:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1563200428;
-        bh=siaOQU+9Yi/g6m79iq793PysKjLd5jvq5ck8WDVyUTw=;
+        s=default; t=1563200329;
+        bh=FTKJOaDBqWWGx5K6l7a3GQeiN9iEecrkXmoJNkID+74=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Y13PGwKJMExI9xLYYUr43j3iYvKgVhkxZ9GTWHUD64G6wxKEQMDx/tr9+6jXWYC0D
-         DpTE2dhFS0RzvPrTB68M/K7fpyulEOz1J4brTFKV4MAVQjudVtQoJuXgfUTzK9Dw59
-         3NL9w8Xpw3DXZ3UQbxlhCgKJAkkgtV6VKLWHU75M=
+        b=Xvo0TsS/Kfsuix67ZnNsstQicxvmwG2fUD9bUKmS8aKU310V+TONHx+0SBzy6v/m6
+         jenlMGMbRFh19IWxqS+8xGzFdiWM0M5PdcuNfPGJRKCInnoH0YmJrkiCFBiUb7+1YR
+         RRnqT/75EKn+SLEH75KH6DKpcHA2exUOg5VOa3Ko=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Antoine Tenart <antoine.tenart@bootlin.com>,
+Cc:     Christophe Leroy <christophe.leroy@c-s.fr>,
+        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 045/158] crypto: inside-secure - do not rely on the hardware last bit for result descriptors
-Date:   Mon, 15 Jul 2019 10:16:16 -0400
-Message-Id: <20190715141809.8445-45-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 013/158] crypto: talitos - fix skcipher failure due to wrong output IV
+Date:   Mon, 15 Jul 2019 10:15:44 -0400
+Message-Id: <20190715141809.8445-13-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190715141809.8445-1-sashal@kernel.org>
 References: <20190715141809.8445-1-sashal@kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
@@ -59,128 +61,51 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Antoine Tenart <antoine.tenart@bootlin.com>
+From: Christophe Leroy <christophe.leroy@c-s.fr>
 
-[ Upstream commit 89332590427235680236b9470e851afc49b3caa1 ]
+[ Upstream commit 3e03e792865ae48b8cfc69a0b4d65f02f467389f ]
 
-When performing a transformation the hardware is given result
-descriptors to save the result data. Those result descriptors are
-batched using a 'first' and a 'last' bit. There are cases were more
-descriptors than needed are given to the engine, leading to the engine
-only using some of them, and not setting the last bit on the last
-descriptor we gave. This causes issues were the driver and the hardware
-aren't in sync anymore about the number of result descriptors given (as
-the driver do not give a pool of descriptor to use for any
-transformation, but a pool of descriptors to use *per* transformation).
+Selftests report the following:
 
-This patch fixes it by attaching the number of given result descriptors
-to the requests, and by using this number instead of the 'last' bit
-found on the descriptors to process them.
+[    2.984845] alg: skcipher: cbc-aes-talitos encryption test failed (wrong output IV) on test vector 0, cfg="in-place"
+[    2.995377] 00000000: 3d af ba 42 9d 9e b4 30 b4 22 da 80 2c 9f ac 41
+[    3.032673] alg: skcipher: cbc-des-talitos encryption test failed (wrong output IV) on test vector 0, cfg="in-place"
+[    3.043185] 00000000: fe dc ba 98 76 54 32 10
+[    3.063238] alg: skcipher: cbc-3des-talitos encryption test failed (wrong output IV) on test vector 0, cfg="in-place"
+[    3.073818] 00000000: 7d 33 88 93 0f 93 b2 42
 
-Signed-off-by: Antoine Tenart <antoine.tenart@bootlin.com>
+This above dumps show that the actual output IV is indeed the input IV.
+This is due to the IV not being copied back into the request.
+
+This patch fixes that.
+
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+Reviewed-by: Horia Geantă <horia.geanta@nxp.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- .../crypto/inside-secure/safexcel_cipher.c    | 24 ++++++++++++++-----
- 1 file changed, 18 insertions(+), 6 deletions(-)
+ drivers/crypto/talitos.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-secure/safexcel_cipher.c
-index 3aef1d43e435..42a3830fbd19 100644
---- a/drivers/crypto/inside-secure/safexcel_cipher.c
-+++ b/drivers/crypto/inside-secure/safexcel_cipher.c
-@@ -51,6 +51,8 @@ struct safexcel_cipher_ctx {
- 
- struct safexcel_cipher_req {
- 	enum safexcel_cipher_direction direction;
-+	/* Number of result descriptors associated to the request */
-+	unsigned int rdescs;
- 	bool needs_inv;
- };
- 
-@@ -333,7 +335,10 @@ static int safexcel_handle_req_result(struct safexcel_crypto_priv *priv, int rin
- 
- 	*ret = 0;
- 
--	do {
-+	if (unlikely(!sreq->rdescs))
-+		return 0;
-+
-+	while (sreq->rdescs--) {
- 		rdesc = safexcel_ring_next_rptr(priv, &priv->ring[ring].rdr);
- 		if (IS_ERR(rdesc)) {
- 			dev_err(priv->dev,
-@@ -346,7 +351,7 @@ static int safexcel_handle_req_result(struct safexcel_crypto_priv *priv, int rin
- 			*ret = safexcel_rdesc_check_errors(priv, rdesc);
- 
- 		ndesc++;
--	} while (!rdesc->last_seg);
-+	}
- 
- 	safexcel_complete(priv, ring);
- 
-@@ -501,6 +506,7 @@ static int safexcel_send_req(struct crypto_async_request *base, int ring,
- static int safexcel_handle_inv_result(struct safexcel_crypto_priv *priv,
- 				      int ring,
- 				      struct crypto_async_request *base,
-+				      struct safexcel_cipher_req *sreq,
- 				      bool *should_complete, int *ret)
+diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+index c5859d3cb825..9cc5309a3fbf 100644
+--- a/drivers/crypto/talitos.c
++++ b/drivers/crypto/talitos.c
+@@ -1571,11 +1571,15 @@ static void ablkcipher_done(struct device *dev,
+ 			    int err)
  {
- 	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(base->tfm);
-@@ -509,7 +515,10 @@ static int safexcel_handle_inv_result(struct safexcel_crypto_priv *priv,
+ 	struct ablkcipher_request *areq = context;
++	struct crypto_ablkcipher *cipher = crypto_ablkcipher_reqtfm(areq);
++	struct talitos_ctx *ctx = crypto_ablkcipher_ctx(cipher);
++	unsigned int ivsize = crypto_ablkcipher_ivsize(cipher);
+ 	struct talitos_edesc *edesc;
  
- 	*ret = 0;
+ 	edesc = container_of(desc, struct talitos_edesc, desc);
  
--	do {
-+	if (unlikely(!sreq->rdescs))
-+		return 0;
-+
-+	while (sreq->rdescs--) {
- 		rdesc = safexcel_ring_next_rptr(priv, &priv->ring[ring].rdr);
- 		if (IS_ERR(rdesc)) {
- 			dev_err(priv->dev,
-@@ -522,7 +531,7 @@ static int safexcel_handle_inv_result(struct safexcel_crypto_priv *priv,
- 			*ret = safexcel_rdesc_check_errors(priv, rdesc);
+ 	common_nonsnoop_unmap(dev, edesc, areq);
++	memcpy(areq->info, ctx->iv, ivsize);
  
- 		ndesc++;
--	} while (!rdesc->last_seg);
-+	}
- 
- 	safexcel_complete(priv, ring);
- 
-@@ -564,7 +573,7 @@ static int safexcel_skcipher_handle_result(struct safexcel_crypto_priv *priv,
- 
- 	if (sreq->needs_inv) {
- 		sreq->needs_inv = false;
--		err = safexcel_handle_inv_result(priv, ring, async,
-+		err = safexcel_handle_inv_result(priv, ring, async, sreq,
- 						 should_complete, ret);
- 	} else {
- 		err = safexcel_handle_req_result(priv, ring, async, req->src,
-@@ -587,7 +596,7 @@ static int safexcel_aead_handle_result(struct safexcel_crypto_priv *priv,
- 
- 	if (sreq->needs_inv) {
- 		sreq->needs_inv = false;
--		err = safexcel_handle_inv_result(priv, ring, async,
-+		err = safexcel_handle_inv_result(priv, ring, async, sreq,
- 						 should_complete, ret);
- 	} else {
- 		err = safexcel_handle_req_result(priv, ring, async, req->src,
-@@ -633,6 +642,8 @@ static int safexcel_skcipher_send(struct crypto_async_request *async, int ring,
- 		ret = safexcel_send_req(async, ring, sreq, req->src,
- 					req->dst, req->cryptlen, 0, 0, req->iv,
- 					commands, results);
-+
-+	sreq->rdescs = *results;
- 	return ret;
- }
- 
-@@ -655,6 +666,7 @@ static int safexcel_aead_send(struct crypto_async_request *async, int ring,
- 					req->cryptlen, req->assoclen,
- 					crypto_aead_authsize(tfm), req->iv,
- 					commands, results);
-+	sreq->rdescs = *results;
- 	return ret;
- }
+ 	kfree(edesc);
  
 -- 
 2.20.1
