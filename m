@@ -2,141 +2,122 @@ Return-Path: <SRS0=wawN=VN=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4715CC76188
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Jul 2019 12:53:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F27C2C76188
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Jul 2019 12:57:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1909E206C2
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Jul 2019 12:53:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amarulasolutions.com header.i=@amarulasolutions.com header.b="DKQ581ht"
+	by mail.kernel.org (Postfix) with ESMTP id C651F2173B
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Jul 2019 12:57:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728004AbfGPMxV (ORCPT
+        id S1727849AbfGPM51 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 16 Jul 2019 08:53:21 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:38392 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727849AbfGPMxU (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 Jul 2019 08:53:20 -0400
-Received: by mail-wr1-f65.google.com with SMTP id g17so20840027wrr.5
-        for <linux-crypto@vger.kernel.org>; Tue, 16 Jul 2019 05:53:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=amarulasolutions.com; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=yazVOO3iTYBRMQULwRwZVDyE2scRH2IKVdUe1u2gmOw=;
-        b=DKQ581htLJQ56ZOJaT5FgLh1LXLSBNdlTYqeheUkeMjc0nH2OLkvxz4tdiHDCDKgze
-         eJKayH+uFhNeXMgVb23QKEuiY5sMvAeR6EP/gBhPTwP1yeBarxHlTDQC+j9Qaha/BS1L
-         Fss3rIyzd3CNurC1oxSZTu/+PKtXVSEJtuAWs=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=yazVOO3iTYBRMQULwRwZVDyE2scRH2IKVdUe1u2gmOw=;
-        b=enxfqIrOUVKKo0qfZU3kFzAf4y9OvvluysdJNwl9HzwhZQAqeVfGjRnXNZI1yG1puX
-         eEOIrEFgxA5QXEiTcm+4miZRDeJZegdGMighH8s1USN4NCVPVIYzjKTebSj4nzUdgj+m
-         X7upCAiq1f2x5dB33m/cp3jWp/2jMrLtVviNYwoRqJnXWpdLn5MGfgfhgSx+APHAFlSu
-         m7WyB0T5QzZ3hs4BtG51ZIVrugAlXFZmf7NsFKWhYMPBgnbQPfTIy5SAt77ZwvwMfF8c
-         cQveVDAAOmMHiMAUJfLFhIuCCatyH/2RdYq8acAPFWlDkJhWpgVwPgWDICA2W/3b7No0
-         I4uw==
-X-Gm-Message-State: APjAAAXpiPiXZ37mr5vTEJXBQKh3fHjkruaUCdiHaRP1JkI/hHf8mog6
-        o+IQmU/lt4pTC577x+hW4Ok8wA==
-X-Google-Smtp-Source: APXvYqzu1vTspyk2jf/HErrlXlwzxNRRcNX5JAEUAK+QB6I8ayhtDWL/42dn6RVIMQJgt1t4XxOXtA==
-X-Received: by 2002:adf:db0b:: with SMTP id s11mr35975157wri.7.1563281598676;
-        Tue, 16 Jul 2019 05:53:18 -0700 (PDT)
-Received: from andrea (host234-214-static.12-87-b.business.telecomitalia.it. [87.12.214.234])
-        by smtp.gmail.com with ESMTPSA id n5sm16809733wmi.21.2019.07.16.05.53.16
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 16 Jul 2019 05:53:17 -0700 (PDT)
-Date:   Tue, 16 Jul 2019 14:53:09 +0200
-From:   Andrea Parri <andrea.parri@amarulasolutions.com>
-To:     Daniel Jordan <daniel.m.jordan@oracle.com>
-Cc:     Steffen Klassert <steffen.klassert@secunet.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>, boqun.feng@gmail.com,
+        Tue, 16 Jul 2019 08:57:27 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:58104 "EHLO deadmen.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725926AbfGPM50 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 16 Jul 2019 08:57:26 -0400
+Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
+        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
+        id 1hnN11-0005G9-5N; Tue, 16 Jul 2019 20:57:07 +0800
+Received: from herbert by gondobar with local (Exim 4.89)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1hnN0y-0001sk-IB; Tue, 16 Jul 2019 20:57:04 +0800
+Date:   Tue, 16 Jul 2019 20:57:04 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Steffen Klassert <steffen.klassert@secunet.com>
+Cc:     Daniel Jordan <daniel.m.jordan@oracle.com>,
+        andrea.parri@amarulasolutions.com, boqun.feng@gmail.com,
         paulmck@linux.ibm.com, peterz@infradead.org,
         linux-arch@vger.kernel.org, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] padata: use smp_mb in padata_reorder to avoid orphaned
- padata jobs
-Message-ID: <20190716125309.GA10672@andrea>
+Subject: [PATCH] padata: Use RCU when fetching pd from do_serial
+Message-ID: <20190716125704.l2jolyyd3bue6hhn@gondor.apana.org.au>
 References: <20190711221205.29889-1-daniel.m.jordan@oracle.com>
  <20190712100636.mqdr567p7ozanlyl@gondor.apana.org.au>
  <20190712101012.GW14601@gauss3.secunet.de>
  <20190712160737.iniaaxlsnhs6azg5@ca-dmjordan1.us.oracle.com>
+ <20190713050321.c5wq7a7jrb6q2pxn@gondor.apana.org.au>
+ <20190715161045.zqwgsp62uqjnvx3l@ca-dmjordan1.us.oracle.com>
+ <20190716100447.pdongriwwfxsuajf@gondor.apana.org.au>
+ <20190716111410.GN17989@gauss3.secunet.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190712160737.iniaaxlsnhs6azg5@ca-dmjordan1.us.oracle.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20190716111410.GN17989@gauss3.secunet.de>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Daniel,
+On Tue, Jul 16, 2019 at 01:14:10PM +0200, Steffen Klassert wrote:
+>
+> Maybe we can fix it if we call padata_free_pd() from
+> padata_serial_worker() when it sent out the last object.
 
-My two cents (summarizing some findings we discussed privately):
+How about using RCU?
 
+We still need to fix up the refcnt if it's supposed to limit the
+overall number of outstanding requests.
 
-> I think adding the full barrier guarantees the following ordering, and the
-> memory model people can correct me if I'm wrong:
-> 
-> CPU21                      CPU22
-> ------------------------   --------------------------
-> UNLOCK pd->lock
-> smp_mb()
-> LOAD reorder_objects
->                            INC reorder_objects
->                            spin_unlock(&pqueue->reorder.lock) // release barrier
->                            TRYLOCK pd->lock
-> 
-> So if CPU22 has incremented reorder_objects but CPU21 reads 0 for it, CPU21
-> should also have unlocked pd->lock so CPU22 can get it and serialize any
-> remaining jobs.
+---8<---
+The function padata_do_serial uses parallel_data without obeying
+the RCU rules around its life-cycle.  This means that a concurrent
+padata_replace call can result in a crash.
 
-This information inspired me to write down the following litmus test:
-(AFAICT, you independently wrote a very similar test, which is indeed
-quite reassuring! ;D)
+This patch fixes it by using RCU just as we do in padata_do_parallel.
 
-C daniel-padata
+Fixes: 16295bec6398 ("padata: Generic parallelization/...")
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-{ }
-
-P0(atomic_t *reorder_objects, spinlock_t *pd_lock)
-{
-	int r0;
-
-	spin_lock(pd_lock);
-	spin_unlock(pd_lock);
-	smp_mb();
-	r0 = atomic_read(reorder_objects);
-}
-
-P1(atomic_t *reorder_objects, spinlock_t *pd_lock, spinlock_t *reorder_lock)
-{
-	int r1;
-
-	spin_lock(reorder_lock);
-	atomic_inc(reorder_objects);
-	spin_unlock(reorder_lock);
-	//smp_mb();
-	r1 = spin_trylock(pd_lock);
-}
-
-exists (0:r0=0 /\ 1:r1=0)
-
-It seems worth noticing that this test's "exists" clause is satisfiable
-according to the (current) memory consistency model.  (Informally, this
-can be explained by noticing that the RELEASE from the spin_unlock() in
-P1 does not provide any order between the atomic increment and the read
-part of the spin_trylock() operation.)  FWIW, uncommenting the smp_mb()
-in P1 would suffice to prevent this clause from being satisfiable; I am
-not sure, however, whether this approach is feasible or ideal... (sorry,
-I'm definitely not too familiar with this code... ;/)
-
-Thanks,
-  Andrea
+diff --git a/include/linux/padata.h b/include/linux/padata.h
+index 5d13d25da2c8..952f6514dd72 100644
+--- a/include/linux/padata.h
++++ b/include/linux/padata.h
+@@ -35,7 +35,7 @@
+  * struct padata_priv -  Embedded to the users data structure.
+  *
+  * @list: List entry, to attach to the padata lists.
+- * @pd: Pointer to the internal control structure.
++ * @inst: Pointer to the overall control structure.
+  * @cb_cpu: Callback cpu for serializatioon.
+  * @cpu: Cpu for parallelization.
+  * @seq_nr: Sequence number of the parallelized data object.
+@@ -45,7 +45,7 @@
+  */
+ struct padata_priv {
+ 	struct list_head	list;
+-	struct parallel_data	*pd;
++	struct padata_instance	*inst;
+ 	int			cb_cpu;
+ 	int			cpu;
+ 	int			info;
+diff --git a/kernel/padata.c b/kernel/padata.c
+index 2d2fddbb7a4c..fb5dd1210d2b 100644
+--- a/kernel/padata.c
++++ b/kernel/padata.c
+@@ -128,7 +128,7 @@ int padata_do_parallel(struct padata_instance *pinst,
+ 
+ 	err = 0;
+ 	atomic_inc(&pd->refcnt);
+-	padata->pd = pd;
++	padata->inst = pinst;
+ 	padata->cb_cpu = cb_cpu;
+ 
+ 	target_cpu = padata_cpu_hash(pd);
+@@ -367,7 +368,7 @@ void padata_do_serial(struct padata_priv *padata)
+ 	struct parallel_data *pd;
+ 	int reorder_via_wq = 0;
+ 
+-	pd = padata->pd;
++	pd = rcu_dereference_bh(padata->inst->pd);
+ 
+ 	cpu = get_cpu();
+ 
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
