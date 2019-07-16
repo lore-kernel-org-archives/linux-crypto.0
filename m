@@ -2,30 +2,30 @@ Return-Path: <SRS0=wawN=VN=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F27C2C76188
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Jul 2019 12:57:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 648BAC76192
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Jul 2019 13:09:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C651F2173B
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Jul 2019 12:57:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 45F6C20880
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Jul 2019 13:09:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727849AbfGPM51 (ORCPT
+        id S1732984AbfGPNJr (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 16 Jul 2019 08:57:27 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:58104 "EHLO deadmen.hmeau.com"
+        Tue, 16 Jul 2019 09:09:47 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:59006 "EHLO deadmen.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725926AbfGPM50 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 Jul 2019 08:57:26 -0400
+        id S1726053AbfGPNJq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 16 Jul 2019 09:09:46 -0400
 Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
         by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1hnN11-0005G9-5N; Tue, 16 Jul 2019 20:57:07 +0800
+        id 1hnND3-0005Sp-AS; Tue, 16 Jul 2019 21:09:33 +0800
 Received: from herbert by gondobar with local (Exim 4.89)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1hnN0y-0001sk-IB; Tue, 16 Jul 2019 20:57:04 +0800
-Date:   Tue, 16 Jul 2019 20:57:04 +0800
+        id 1hnNCy-0001uZ-ES; Tue, 16 Jul 2019 21:09:28 +0800
+Date:   Tue, 16 Jul 2019 21:09:28 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
 To:     Steffen Klassert <steffen.klassert@secunet.com>
 Cc:     Daniel Jordan <daniel.m.jordan@oracle.com>,
@@ -33,8 +33,8 @@ Cc:     Daniel Jordan <daniel.m.jordan@oracle.com>,
         paulmck@linux.ibm.com, peterz@infradead.org,
         linux-arch@vger.kernel.org, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH] padata: Use RCU when fetching pd from do_serial
-Message-ID: <20190716125704.l2jolyyd3bue6hhn@gondor.apana.org.au>
+Subject: Re: [PATCH] padata: Use RCU when fetching pd from do_serial
+Message-ID: <20190716130928.ga4acvxipsdzyzlp@gondor.apana.org.au>
 References: <20190711221205.29889-1-daniel.m.jordan@oracle.com>
  <20190712100636.mqdr567p7ozanlyl@gondor.apana.org.au>
  <20190712101012.GW14601@gauss3.secunet.de>
@@ -43,80 +43,35 @@ References: <20190711221205.29889-1-daniel.m.jordan@oracle.com>
  <20190715161045.zqwgsp62uqjnvx3l@ca-dmjordan1.us.oracle.com>
  <20190716100447.pdongriwwfxsuajf@gondor.apana.org.au>
  <20190716111410.GN17989@gauss3.secunet.de>
+ <20190716125704.l2jolyyd3bue6hhn@gondor.apana.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190716111410.GN17989@gauss3.secunet.de>
+In-Reply-To: <20190716125704.l2jolyyd3bue6hhn@gondor.apana.org.au>
 User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jul 16, 2019 at 01:14:10PM +0200, Steffen Klassert wrote:
+On Tue, Jul 16, 2019 at 08:57:04PM +0800, Herbert Xu wrote:
 >
-> Maybe we can fix it if we call padata_free_pd() from
-> padata_serial_worker() when it sent out the last object.
+> How about using RCU?
+> 
+> We still need to fix up the refcnt if it's supposed to limit the
+> overall number of outstanding requests.
 
-How about using RCU?
+Hmm, it doesn't work because the refcnt is attached to the old
+pd.  That shouldn't be a problem though as we could simply ignore
+the refcnt in padata_flush_queue.
 
-We still need to fix up the refcnt if it's supposed to limit the
-overall number of outstanding requests.
+However, I think this leads to another bug in that pcrypt doesn't
+support dm-crypt properly.  It never does the backlog stuff and
+therefore can't guarantee reliable processing which dm-crypt requires.
 
----8<---
-The function padata_do_serial uses parallel_data without obeying
-the RCU rules around its life-cycle.  This means that a concurrent
-padata_replace call can result in a crash.
+Is it intentional to only allow pcrypt for IPsec?
 
-This patch fixes it by using RCU just as we do in padata_do_parallel.
-
-Fixes: 16295bec6398 ("padata: Generic parallelization/...")
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/include/linux/padata.h b/include/linux/padata.h
-index 5d13d25da2c8..952f6514dd72 100644
---- a/include/linux/padata.h
-+++ b/include/linux/padata.h
-@@ -35,7 +35,7 @@
-  * struct padata_priv -  Embedded to the users data structure.
-  *
-  * @list: List entry, to attach to the padata lists.
-- * @pd: Pointer to the internal control structure.
-+ * @inst: Pointer to the overall control structure.
-  * @cb_cpu: Callback cpu for serializatioon.
-  * @cpu: Cpu for parallelization.
-  * @seq_nr: Sequence number of the parallelized data object.
-@@ -45,7 +45,7 @@
-  */
- struct padata_priv {
- 	struct list_head	list;
--	struct parallel_data	*pd;
-+	struct padata_instance	*inst;
- 	int			cb_cpu;
- 	int			cpu;
- 	int			info;
-diff --git a/kernel/padata.c b/kernel/padata.c
-index 2d2fddbb7a4c..fb5dd1210d2b 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -128,7 +128,7 @@ int padata_do_parallel(struct padata_instance *pinst,
- 
- 	err = 0;
- 	atomic_inc(&pd->refcnt);
--	padata->pd = pd;
-+	padata->inst = pinst;
- 	padata->cb_cpu = cb_cpu;
- 
- 	target_cpu = padata_cpu_hash(pd);
-@@ -367,7 +368,7 @@ void padata_do_serial(struct padata_priv *padata)
- 	struct parallel_data *pd;
- 	int reorder_via_wq = 0;
- 
--	pd = padata->pd;
-+	pd = rcu_dereference_bh(padata->inst->pd);
- 
- 	cpu = get_cpu();
- 
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
