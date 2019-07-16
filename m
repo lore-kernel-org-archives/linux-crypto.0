@@ -2,82 +2,80 @@ Return-Path: <SRS0=wawN=VN=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B66BC76188
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Jul 2019 09:48:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FC10C76188
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Jul 2019 10:05:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D829C2064B
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Jul 2019 09:48:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bi3N5ZXj"
+	by mail.kernel.org (Postfix) with ESMTP id 0F26420665
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Jul 2019 10:05:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730520AbfGPJsC (ORCPT
+        id S1728310AbfGPKFG (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 16 Jul 2019 05:48:02 -0400
-Received: from mail-ed1-f41.google.com ([209.85.208.41]:44537 "EHLO
-        mail-ed1-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726536AbfGPJsC (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 Jul 2019 05:48:02 -0400
-Received: by mail-ed1-f41.google.com with SMTP id k8so18998611edr.11;
-        Tue, 16 Jul 2019 02:48:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=0wfVyGH0X6+9UHLK++wYtzi5ucbNIhbZ7zOfGWzratw=;
-        b=bi3N5ZXj1FPte/06BKkeqSw9+RZe091YwqQGlvugSipO5mlC1wectyFCqjvk5GiDWj
-         50dU8UakVQOLMnbU1AzNzWbQ7PYs5gAUMTbXyI3IMGYXweOi//O42A+SndNrq4yRZncD
-         47cQVKxFnXBLRlaW+IaPYYohvR9LJHuqZH9mvDWzI/ekOCwludk0iAsZ5ndLP714NZRU
-         uRlN+EbLulhjsn2RCdD47tECtZd9KBmIShsQFDOIb/b2xV8Mprqv+fPAOK3msdWK85yF
-         z2Mud/zXdfNdojoq6gwVKIzkzPLDPr3xfeTGzieF5qRe7A2QZNM/2NrbNNATpbm9M+80
-         Mqxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=0wfVyGH0X6+9UHLK++wYtzi5ucbNIhbZ7zOfGWzratw=;
-        b=WdD5cbdMjry5gBBOmxGWnMSazsDlF/EYEa/5nHuTlXJ5kUnIeOQ8SqZdukVjtROa55
-         QDXXdxb+C9sJtpQ1M5VwSIeTd4AWviG+T+CzyubFDwqAlLtdfLfBKuhElIuswOaIfRUX
-         YTEZtnCyG1NOCFFlm/2uniLlxuYUshSUyuh7b+qbnF5SYXKLr6jwbVtK3h+FtOnl1ZKm
-         3H2ze9wa75yKOfi/Rcd+7h3MMzYPqZu3e78kh2xcHwGiuB4Bkcf66AAt0SNXgBXn6E07
-         SxVRWGDJgN0cq1/0Ay1w6LlFloQ1yt/BiNBNbqM4AaOa7q5xxu3ETMvONdSzRdgW41ZN
-         /XkQ==
-X-Gm-Message-State: APjAAAWX7W8366lw5WHxEEUU5HBc9ZbzMIwEem9vlumHaFboKEKZbhgb
-        ykKdd/wwOzojbtZrApk3fwxIZg+paVpE2Gc8/c+VP7CL
-X-Google-Smtp-Source: APXvYqyAwk0IAK4j0C2BPjFQrIvCPpSoKQl9ImnXQAsd/YoOtu7lNU9rL4MDjSjZcQpG9rXLsZ5MgabuQQdlt8BKeLo=
-X-Received: by 2002:a50:f410:: with SMTP id r16mr28400816edm.120.1563270480118;
- Tue, 16 Jul 2019 02:48:00 -0700 (PDT)
+        Tue, 16 Jul 2019 06:05:06 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:49860 "EHLO deadmen.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728015AbfGPKFG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 16 Jul 2019 06:05:06 -0400
+Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
+        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
+        id 1hnKKN-0002OT-MR; Tue, 16 Jul 2019 18:04:55 +0800
+Received: from herbert by gondobar with local (Exim 4.89)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1hnKKF-0003tz-SN; Tue, 16 Jul 2019 18:04:47 +0800
+Date:   Tue, 16 Jul 2019 18:04:47 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Daniel Jordan <daniel.m.jordan@oracle.com>
+Cc:     Steffen Klassert <steffen.klassert@secunet.com>,
+        andrea.parri@amarulasolutions.com, boqun.feng@gmail.com,
+        paulmck@linux.ibm.com, peterz@infradead.org,
+        linux-arch@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] padata: use smp_mb in padata_reorder to avoid orphaned
+ padata jobs
+Message-ID: <20190716100447.pdongriwwfxsuajf@gondor.apana.org.au>
+References: <20190711221205.29889-1-daniel.m.jordan@oracle.com>
+ <20190712100636.mqdr567p7ozanlyl@gondor.apana.org.au>
+ <20190712101012.GW14601@gauss3.secunet.de>
+ <20190712160737.iniaaxlsnhs6azg5@ca-dmjordan1.us.oracle.com>
+ <20190713050321.c5wq7a7jrb6q2pxn@gondor.apana.org.au>
+ <20190715161045.zqwgsp62uqjnvx3l@ca-dmjordan1.us.oracle.com>
 MIME-Version: 1.0
-Received: by 2002:a50:b3b9:0:0:0:0:0 with HTTP; Tue, 16 Jul 2019 02:47:59
- -0700 (PDT)
-From:   Jari Ruusu <jari.ruusu@gmail.com>
-Date:   Tue, 16 Jul 2019 12:47:59 +0300
-Message-ID: <CACMCwJKJd8QzduZ3WKTqsHdftEaJH07iupKiWgSw7M0Xm7=gSA@mail.gmail.com>
-Subject: Announce loop-AES-v3.7o file/swap crypto package
-To:     linux-crypto@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190715161045.zqwgsp62uqjnvx3l@ca-dmjordan1.us.oracle.com>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-loop-AES changes since previous release:
-- Set loop device queue ->nr_requests to better value than the default. This
-  may improve performance in some cases.
-- Worked around kernel interface changes on 5.1 kernels (multi page bio vecs
-  + busted bio segment limits) and 5.2 kernels.
+On Mon, Jul 15, 2019 at 12:10:46PM -0400, Daniel Jordan wrote:
+>
+> I've been wrong before plenty of times, and there's nothing preventing this
+> from being one of those times :) , but in this case I believe what I'm showing
+> is correct.
+> 
+> The padata_do_serial call for a given job ensures padata_reorder runs on the
+> CPU that the job hashed to in padata_do_parallel, which is not necessarily the
+> same CPU as the one that padata_do_parallel itself ran on.
 
+You're right.  I was taking the comment in the code at face value,
+never trust comments :)
 
-bzip2 compressed tarball is here:
+While looking at the code in question, I think it is seriously
+broken.  For instance, padata_replace does not deal with async
+crypto at all.  It would fail miserably if the underlying async
+crypto held onto references to the old pd.
 
-    http://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.7o.tar.bz2
-    md5sum e43d6a1067c59ab38ff6fe5c372177fd
+So we may have to restrict pcrypt to sync crypto only, which
+would obviously mean that it can no longer use aesni.  Or we
+will have to spend a lot of time to fix this up properly.
 
-    http://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.7o.tar.bz2.sign
-
+Cheers,
 -- 
-Jari Ruusu  4096R/8132F189 12D6 4C3A DCDA 0AA4 27BD  ACDF F073 3C80 8132 F189
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
