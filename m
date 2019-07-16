@@ -1,111 +1,102 @@
 Return-Path: <SRS0=wawN=VN=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: *
+X-Spam-Status: No, score=1.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB555C76195
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Jul 2019 18:28:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA4D0C7618F
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Jul 2019 22:16:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AC14220880
-	for <linux-crypto@archiver.kernel.org>; Tue, 16 Jul 2019 18:28:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="HaFxzYUq"
+	by mail.kernel.org (Postfix) with ESMTP id BC78B2173B
+	for <linux-crypto@archiver.kernel.org>; Tue, 16 Jul 2019 22:16:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1563315406;
+	bh=GmeO5yi4t0dbDpMdkRaLpWH3QSHfNwKYnvWl9mEMk8A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=RfRYe5cZspfj2ZTN3+nWTJ1Pccf8bRRx1ODq07LzCzmF9RXHkQqq3jkGrE7JfbMPl
+	 lrrkvfwKv07Ielpp46tK4G3c0/6Ipp9m2T1vRqHuTD1nIY/PxdnoMseZLxkrBn+TNx
+	 m8gU1vBvdCBsP5o3PELCooR5ARTqDF4ZSu94IxKo=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388358AbfGPS2y (ORCPT
+        id S1728681AbfGPWQn (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 16 Jul 2019 14:28:54 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:39483 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388345AbfGPS2y (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 16 Jul 2019 14:28:54 -0400
-Received: by mail-pf1-f194.google.com with SMTP id f17so5527273pfn.6
-        for <linux-crypto@vger.kernel.org>; Tue, 16 Jul 2019 11:28:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=message-id:mime-version:content-transfer-encoding:in-reply-to
-         :references:from:to:subject:cc:user-agent:date;
-        bh=zvGcK+VeZ8cxUQUUb/Ziua1dyjBrgzj1NF9vZ94FkTY=;
-        b=HaFxzYUquBICo8Qa2dhDAMayVb4+B8XnoZq6FveM6TFEZ4xttZwMrCmGGANC/QGVlw
-         u+Q8JPimlFkaChFUdUbnRKD6m1PJup0MyZsBkdRyVka7yI9ODuShs0+cBre686lEzvVj
-         jGQyqpkhbiFKGwnAmGCcyqaMlrf7d6Hd+QgwM=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:mime-version
-         :content-transfer-encoding:in-reply-to:references:from:to:subject:cc
-         :user-agent:date;
-        bh=zvGcK+VeZ8cxUQUUb/Ziua1dyjBrgzj1NF9vZ94FkTY=;
-        b=Ct57xP7HJIIYdbCWKZziY4LgRR9uMGrggRFfcAMO417mpMorrfLPQZzvT7vH938cFp
-         S38l5iZyGutwkVIX1is6rELVv5HSHtWX1FylM/TSSwdaaCJlp5dND74woh8ZjxBFdVTm
-         BHGiwRb8AolW1lSpDsNa/yyw8kXtaWLh2lXHStSAVH2UpNNz9d45WWzlVsY1mHAfuhmV
-         d/SrfEowFDav5Zb35ZvOeNRB+jN81LAwwY7UYxHj1/QxNpVRh0/qYnA0aKXmaJUJxCHA
-         4DKcX+Hm+oksBHvrm1PW7Cc2YXAHYt53lTZCi3MyVVxXhuwHXxGODgzR82j/cCW1Jklq
-         QgSg==
-X-Gm-Message-State: APjAAAVolp+see5tXJFAUoVuujXp1VRNMx7vGSv5PW66Pf5eAF2sT67S
-        55sUQTBQ33ru1MCC7AfvevwjSA==
-X-Google-Smtp-Source: APXvYqz4qZBoRB6OmcdQOJn/RkfEoww9MxRhFBGtRytBBWzy2H7BHROzWqtrB66vhSitRPsWPlDCmg==
-X-Received: by 2002:a63:5550:: with SMTP id f16mr17160524pgm.426.1563301733618;
-        Tue, 16 Jul 2019 11:28:53 -0700 (PDT)
-Received: from chromium.org ([2620:15c:202:1:fa53:7765:582b:82b9])
-        by smtp.gmail.com with ESMTPSA id x8sm18949101pfa.46.2019.07.16.11.28.52
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Tue, 16 Jul 2019 11:28:52 -0700 (PDT)
-Message-ID: <5d2e1764.1c69fb81.448bb.65c0@mx.google.com>
-Content-Type: text/plain; charset="utf-8"
+        Tue, 16 Jul 2019 18:16:43 -0400
+Received: from mail.kernel.org ([198.145.29.99]:52336 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728235AbfGPWQn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 16 Jul 2019 18:16:43 -0400
+Received: from gmail.com (unknown [104.132.1.77])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id AC4482173B;
+        Tue, 16 Jul 2019 22:16:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1563315402;
+        bh=GmeO5yi4t0dbDpMdkRaLpWH3QSHfNwKYnvWl9mEMk8A=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Tt0P5e36/mP7FGqLuIvBPOZbAfs+Fog54vpMAd0uTKOr7S5qsWjrf5IN1qUxcr4JG
+         l3R0ETaYpJ5CuqagosvhZhHCl/mNswKx5GKVNkH96NpHgFyxs4wE3lLj7bj2SCx+1U
+         JM+d/Wb93fuhJkzLRJYe9uBN7oXSzEOrFkf/ycrk=
+Date:   Tue, 16 Jul 2019 15:16:41 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Horia Geanta <horia.geanta@nxp.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Subject: Re: xts fuzz testing and lack of ciphertext stealing support
+Message-ID: <20190716221639.GA44406@gmail.com>
+Mail-Followup-To: Horia Geanta <horia.geanta@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+References: <VI1PR0402MB34858E4EF0ACA7CDB446FF5798CE0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20190624142654.zprcpz42hivuyrjq@gondor.apana.org.au>
-References: <20190613180931.65445-1-swboyd@chromium.org> <20190613180931.65445-2-swboyd@chromium.org> <20190613232613.GH22901@ziepe.ca> <5d03e394.1c69fb81.f028c.bffb@mx.google.com> <20190617225134.GA30762@ziepe.ca> <5d0c2cd6.1c69fb81.e66af.32bf@mx.google.com> <20190624142654.zprcpz42hivuyrjq@gondor.apana.org.au>
-From:   Stephen Boyd <swboyd@chromium.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH 1/8] tpm: block messages while suspended
-Cc:     Jason Gunthorpe <jgg@ziepe.ca>, Peter Huewe <peterhuewe@gmx.de>,
-        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
-        Andrey Pronin <apronin@chromium.org>,
-        linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-integrity@vger.kernel.org, devicetree@vger.kernel.org,
-        Duncan Laurie <dlaurie@chromium.org>,
-        Guenter Roeck <groeck@chromium.org>,
-        Matt Mackall <mpm@selenic.com>, linux-crypto@vger.kernel.org
-User-Agent: alot/0.8.1
-Date:   Tue, 16 Jul 2019 11:28:51 -0700
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <VI1PR0402MB34858E4EF0ACA7CDB446FF5798CE0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Quoting Herbert Xu (2019-06-24 07:26:54)
-> On Thu, Jun 20, 2019 at 06:03:17PM -0700, Stephen Boyd wrote:
-> >
-> > What do you think of the attached patch? I haven't tested it, but it
-> > would make sure that the kthread is frozen so that the hardware can be
-> > resumed before the kthread is thawed and tries to go touch the hardware.
->=20
-> Looks good to me.
->=20
+Hi Horia,
 
-Thanks for checking. I haven't been able to reproduce the problem yet to
-confirm this is actually fixing anything, even after tweaking the sysctl
-values for khwrng to try and force the thread to run continuously.
+On Tue, Jul 16, 2019 at 05:46:29PM +0000, Horia Geanta wrote:
+> Hi,
+> 
+> With fuzz testing enabled, I am seeing xts(aes) failures on caam drivers.
+> 
+> Below are several failures, extracted from different runs:
+> 
+> [    3.921654] alg: skcipher: xts-aes-caam encryption unexpectedly succeeded on test vector "random: len=40 klen=64"; expected_error=-22, cfg="random: inplace use_finup nosimd src_divs=[57.93%@+11, 37.18%@+164, <reimport>0.68%@+4, 0.50%@+305, 3.71%@alignmask+3975]" 
+> 
+> [    3.726698] alg: skcipher: xts-aes-caam encryption unexpectedly succeeded on test vector "random: len=369 klen=64"; expected_error=-22, cfg="random: inplace may_sleep use_digest src_divs=[100.0%@alignmask+584]" 
+> 
+> [    3.741082] alg: skcipher: xts-aes-caam encryption unexpectedly succeeded on test vector "random: len=2801 klen=64"; expected_error=-22, cfg="random: inplace may_sleep use_digest src_divs=[100.0%@+6] iv_offset=18"
+> 
+> It looks like the problem is not in CAAM driver.
+> More exactly, fuzz testing is generating random test vectors and running
+> them through both SW generic (crypto/xts.c) and CAAM implementation:
+> -SW generic implementation of xts(aes) does not support ciphertext stealing
+> and throws -EINVAL when input is not a multiple of AES block size (16B)
+> -caam has support for ciphertext stealing, and allows for any input size
+> which results in "unexpectedly succeeded" error messages.
+> 
+> Any suggestion how this should be fixed?
+> 
+> Thanks,
+> Horia
 
-From reading the bug report that caused this 'is_suspended' code to be
-added to the driver I'm fairly convinced this is the right solution. To
-give some more background, it looks like we use s2idle suspend (i.e.
-all CPUs are idle across suspend) and then we have the kthread running
-to ask the hardware for some more random numbers. The i2c transaction
-fails when asking the hwrng for data, and we see these messages printed
-on the resume path:
+I don't think drivers should allow inputs the generic implementation doesn't,
+since those inputs aren't tested by the crypto self-tests (so how do you know
+it's even correct?), and people could accidentally rely on the driver-specific
+behavior and then be unable to migrate to another platform or implementation.
 
-	i2c_designware i2c_designware.2: i2c_dw_handle_tx_abort: lost arbitration
-	tpm tpm0: i2c transfer failed (attempt 3/3): -11
-	tpm0: tpm_transmit: tpm_send: error -11
-	hwrng: no data available
+So for now I recommend just updating the caam driver to return -EINVAL on XTS
+inputs not evenly divisible by the block size.
 
-Userspace tasks are thawed after this failure so it looks like something
-in the kernel kicks khwrng to grab more data before the i2c bus can be
-resumed.
+Of course, if there are actual use cases for XTS with ciphertext stealing in the
+kernel, we could add it to all the other implementations too.  But I'm not aware
+of any currently.  Don't all XTS users in the kernel pass whole blocks?
 
+- Eric
