@@ -2,50 +2,39 @@ Return-Path: <SRS0=f4o8=VO=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C96B0C76186
-	for <linux-crypto@archiver.kernel.org>; Wed, 17 Jul 2019 08:36:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 799D8C76192
+	for <linux-crypto@archiver.kernel.org>; Wed, 17 Jul 2019 08:48:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A7C3320818
-	for <linux-crypto@archiver.kernel.org>; Wed, 17 Jul 2019 08:36:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 52DEB2173E
+	for <linux-crypto@archiver.kernel.org>; Wed, 17 Jul 2019 08:48:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726188AbfGQIgp (ORCPT
+        id S1726336AbfGQIsG (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 17 Jul 2019 04:36:45 -0400
-Received: from a.mx.secunet.com ([62.96.220.36]:34262 "EHLO a.mx.secunet.com"
+        Wed, 17 Jul 2019 04:48:06 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:55210 "EHLO deadmen.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725873AbfGQIgo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 17 Jul 2019 04:36:44 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by a.mx.secunet.com (Postfix) with ESMTP id BEF62201E3;
-        Wed, 17 Jul 2019 10:36:42 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-        by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id 5AFfrnKOEgbx; Wed, 17 Jul 2019 10:36:42 +0200 (CEST)
-Received: from mail-essen-01.secunet.de (mail-essen-01.secunet.de [10.53.40.204])
-        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by a.mx.secunet.com (Postfix) with ESMTPS id 534432008D;
-        Wed, 17 Jul 2019 10:36:42 +0200 (CEST)
-Received: from gauss2.secunet.de (10.182.7.193) by mail-essen-01.secunet.de
- (10.53.40.204) with Microsoft SMTP Server id 14.3.439.0; Wed, 17 Jul 2019
- 10:36:42 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)      id AB9F1318055E;
- Wed, 17 Jul 2019 10:36:41 +0200 (CEST)
-Date:   Wed, 17 Jul 2019 10:36:41 +0200
-From:   Steffen Klassert <steffen.klassert@secunet.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-CC:     Daniel Jordan <daniel.m.jordan@oracle.com>,
-        <andrea.parri@amarulasolutions.com>, <boqun.feng@gmail.com>,
-        <paulmck@linux.ibm.com>, <peterz@infradead.org>,
-        <linux-arch@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: Re: [v2 PATCH] padata: Use RCU when fetching pd from do_serial
-Message-ID: <20190717083641.GQ17989@gauss3.secunet.de>
+        id S1725873AbfGQIsG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 17 Jul 2019 04:48:06 -0400
+Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
+        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
+        id 1hnfbJ-00012Y-Ay; Wed, 17 Jul 2019 16:47:49 +0800
+Received: from herbert by gondobar with local (Exim 4.89)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1hnfbA-0002eu-59; Wed, 17 Jul 2019 16:47:40 +0800
+Date:   Wed, 17 Jul 2019 16:47:40 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Steffen Klassert <steffen.klassert@secunet.com>
+Cc:     Daniel Jordan <daniel.m.jordan@oracle.com>,
+        andrea.parri@amarulasolutions.com, boqun.feng@gmail.com,
+        paulmck@linux.ibm.com, peterz@infradead.org,
+        linux-arch@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] padata: Use RCU when fetching pd from do_serial
+Message-ID: <20190717084739.35evhqushmjejmmq@gondor.apana.org.au>
 References: <20190712100636.mqdr567p7ozanlyl@gondor.apana.org.au>
  <20190712101012.GW14601@gauss3.secunet.de>
  <20190712160737.iniaaxlsnhs6azg5@ca-dmjordan1.us.oracle.com>
@@ -55,62 +44,30 @@ References: <20190712100636.mqdr567p7ozanlyl@gondor.apana.org.au>
  <20190716111410.GN17989@gauss3.secunet.de>
  <20190716125704.l2jolyyd3bue6hhn@gondor.apana.org.au>
  <20190716130928.ga4acvxipsdzyzlp@gondor.apana.org.au>
- <20190716132345.ujj2v3kqra2lbi75@gondor.apana.org.au>
+ <20190717082815.GP17989@gauss3.secunet.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190716132345.ujj2v3kqra2lbi75@gondor.apana.org.au>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+In-Reply-To: <20190717082815.GP17989@gauss3.secunet.de>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jul 16, 2019 at 09:23:45PM +0800, Herbert Xu wrote:
-> On Tue, Jul 16, 2019 at 09:09:28PM +0800, Herbert Xu wrote:
-> >
-> > Hmm, it doesn't work because the refcnt is attached to the old
-> > pd.  That shouldn't be a problem though as we could simply ignore
-> > the refcnt in padata_flush_queue.
-> 
-> This should fix it:
-> 
-> ---8<---
-> The function padata_do_serial uses parallel_data without obeying
-> the RCU rules around its life-cycle.  This means that a concurrent
-> padata_replace call can result in a crash.
-> 
-> This patch fixes it by using RCU just as we do in padata_do_parallel.
+On Wed, Jul 17, 2019 at 10:28:15AM +0200, Steffen Klassert wrote:
+>
+> I had a patch to support crypto backlog some years ago,
+> but testing with dm-crypt did not show any performance
+> improvement. So I decided to just skip that patch because
+> it added code for no need.
 
-RCU alone won't help because if some object is queued for async
-crypto, we left the RCU protected aera. I think padata_do_serial
-needs to do RCU and should free 'parallel_data' if the flag
-PADATA_RESET is set and the refcount goes to zero. padata_replace
-should do the same then.
+Well pcrypt is part of the API so it needs to obey the rules.
+So even if it wouldn't make sense to use dm-crypt with pcrypt
+it still needs to do the right thing.
 
-> 
-> As the refcnt may now span two parallel_data structures, this patch
-> moves it to padata_instance instead.  FWIW the refcnt is used to
-> limit the number of outstanding requests (albeit a soft limit as
-> we don't do a proper atomic inc and test).
-> 
-> Fixes: 16295bec6398 ("padata: Generic parallelization/...")
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> 
-> diff --git a/include/linux/padata.h b/include/linux/padata.h
-
-...
-
-> index 5d13d25da2c8..ce51555cb86c 100644
-> @@ -367,7 +367,7 @@ void padata_do_serial(struct padata_priv *padata)
->  	struct parallel_data *pd;
->  	int reorder_via_wq = 0;
->  
-> -	pd = padata->pd;
-> +	pd = rcu_dereference_bh(padata->inst->pd);
-
-Why not just
-
-pd = rcu_dereference_bh(padata->pd);
-
+Thanks,`
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
