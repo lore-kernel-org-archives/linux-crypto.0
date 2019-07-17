@@ -2,178 +2,168 @@ Return-Path: <SRS0=f4o8=VO=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 330C4C7618F
-	for <linux-crypto@archiver.kernel.org>; Wed, 17 Jul 2019 18:08:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F33BCC7618F
+	for <linux-crypto@archiver.kernel.org>; Wed, 17 Jul 2019 18:33:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D727A208C0
-	for <linux-crypto@archiver.kernel.org>; Wed, 17 Jul 2019 18:08:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AC205208C0
+	for <linux-crypto@archiver.kernel.org>; Wed, 17 Jul 2019 18:33:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="q/7J3fU6"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="vzEDQebF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727361AbfGQSIl (ORCPT
+        id S2388629AbfGQSdG (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 17 Jul 2019 14:08:41 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:38378 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727289AbfGQSIl (ORCPT
+        Wed, 17 Jul 2019 14:33:06 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:59650 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727377AbfGQSdF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 17 Jul 2019 14:08:41 -0400
-Received: by mail-wm1-f68.google.com with SMTP id s15so1701374wmj.3
-        for <linux-crypto@vger.kernel.org>; Wed, 17 Jul 2019 11:08:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :content-transfer-encoding;
-        bh=zv8wcEa6GYy4YZQahLdN/TanAjq6LmsiMTWLNjQH94k=;
-        b=q/7J3fU6PDaEBbr2nkuxyzQoz8cgHtbgf1YxcPMSWfEEMq3Dd1ksOdnSWjURBlC98A
-         qjsT1x0lucqEByJrWHSW3THwpHO65XHtupbPeXRHbAuRSidwiw/Npdt64jcJHcVV1mRu
-         hGls0hJ6cD30K/z4YfGF/Rdzr0KQPyqvI8Ywye2UUv2BbmTdTH0deB7YdjZzvqV9tKRn
-         G1pyJNahzIOMs3jPotbId7bvnCRz9skPp4QRBTkZXZAizSAZFSMQVtukLbqYS6w1howW
-         hWBUg/VDShpjx1CGZYfcquUrpp4qTuuO/Q49aSblWjAajzgwm5GBBmE6h3o7a34FaG/K
-         fZsQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:content-transfer-encoding;
-        bh=zv8wcEa6GYy4YZQahLdN/TanAjq6LmsiMTWLNjQH94k=;
-        b=Cum+INhpeO4alW7PTJSkWwGasdJg5IlyRM1Y3EvmOqNoX3wDyQrpvO9swEcLs0RYJG
-         jdEBCZLkt0W6RAp+jsytUgnpRn1FspT8puVdrVeKc6gOunqznO5HtCbHKjw6bUWunM6A
-         yx9d2ydFJZhWIKMSjl1koINcPVY9sfnaRkIjRLFBbX+FTewQwMZLDnT5A1FjCexOFc5p
-         tsziq7FUbuU2U9QRuZihrjOsISIUPWR2GW+86bak38KJL+Ib7U498nVTl+G6Efz6vJsZ
-         GA96gE9yAzn9n82wkhiRA7XGPmwEI0QpgA5zbTcVi6NyN2CY9c4KB1oaDermR6T3GR9R
-         qyHg==
-X-Gm-Message-State: APjAAAUeC5PaHouJnCxm/GEnKJtlMFTRl3bPxt9NbMs4VbJXdbNsIwES
-        BvYbd5CUwWny1XTiZpu7FQYxIw149m5eOWLro/uyZA==
-X-Google-Smtp-Source: APXvYqxmjONHtcsZZASFx3N2OTq1HdgdMKU6bkt0xXd/bpop34cTFabMv0RftY+oyh6eAThyKpuQePlIdxwqOm7TMJ0=
-X-Received: by 2002:a05:600c:21d4:: with SMTP id x20mr34589939wmj.61.1563386918556;
- Wed, 17 Jul 2019 11:08:38 -0700 (PDT)
+        Wed, 17 Jul 2019 14:33:05 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6HIOMrp104085;
+        Wed, 17 Jul 2019 18:32:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2018-07-02;
+ bh=Nt1djCiW2v5DCWrFgJ4gH6llZFolu0csYx/x53Q36PY=;
+ b=vzEDQebF8/I2vM9bCDO6V7GLz4jTyBpGCSlB0Ge9uO1/K54cE2hQLoXMamB8Bf6+m3hl
+ rLNR+evgTsmVYQ4Vf9ZHMCKre92BBTW79CY5ggJ0o5BHo7rfFbRQwT798qe84/xhRtIi
+ b6Ikjym84OB+G0i9mwun/OXMRIv8P3kIcvTZTCqkdcrFSMMMKMkuOI/Di+9hEXWEDYvI
+ 1tH4CLFVByOwpRWo+6Zf76R30ldwEOBJsWxq8iK1tSmRNSrE4otxt9cpYtwR1oHQ4fTL
+ nbQzcxU8qu5YX7THZhIaFjVb834UFN1b0wthL1TQyHVoJrfOoPHntlF98RrcDEOvj9Jx 1w== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2130.oracle.com with ESMTP id 2tq6qtvqq1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 17 Jul 2019 18:32:38 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6HIWZSR035259;
+        Wed, 17 Jul 2019 18:32:38 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3030.oracle.com with ESMTP id 2tt77h9x8p-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 17 Jul 2019 18:32:36 +0000
+Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x6HIWWKM019968;
+        Wed, 17 Jul 2019 18:32:32 GMT
+Received: from ca-dmjordan1.us.oracle.com (/10.211.9.48)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 17 Jul 2019 18:32:32 +0000
+Date:   Wed, 17 Jul 2019 14:32:27 -0400
+From:   Daniel Jordan <daniel.m.jordan@oracle.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Daniel Jordan <daniel.m.jordan@oracle.com>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        Andrea Parri <andrea.parri@amarulasolutions.com>,
+        Boqun Feng <boqun.feng@gmail.com>,
+        "Paul E . McKenney" <paulmck@linux.ibm.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        linux-arch@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Mathias Krause <minipli@googlemail.com>
+Subject: Re: [PATCH] padata: Replace delayed timer with immediate workqueue
+ in padata_reorder
+Message-ID: <20190717183227.b3hqphukkndqumhw@ca-dmjordan1.us.oracle.com>
+References: <c1bbbe94-dbdc-da14-e0c3-850c965d8b5d@oracle.com>
+ <20190716163253.24377-1-daniel.m.jordan@oracle.com>
+ <20190717111147.t776zlyhdqyl5dhc@gondor.apana.org.au>
 MIME-Version: 1.0
-References: <VI1PR0402MB34858E4EF0ACA7CDB446FF5798CE0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
- <20190716221639.GA44406@gmail.com> <VI1PR0402MB34857BBB18C2BB8CBA2DEC7198C90@VI1PR0402MB3485.eurprd04.prod.outlook.com>
- <20190717172823.GA205944@gmail.com>
-In-Reply-To: <20190717172823.GA205944@gmail.com>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Wed, 17 Jul 2019 20:08:27 +0200
-Message-ID: <CAKv+Gu__offPaWvyURJr8v56ig58q-Deo16QhP26EJ32uf5m3w@mail.gmail.com>
-Subject: Re: xts fuzz testing and lack of ciphertext stealing support
-To:     Horia Geanta <horia.geanta@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190717111147.t776zlyhdqyl5dhc@gondor.apana.org.au>
+User-Agent: NeoMutt/20180323-268-5a959c
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9321 signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=895
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1907170210
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9321 signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=947 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1907170209
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 17 Jul 2019 at 19:28, Eric Biggers <ebiggers@kernel.org> wrote:
->
-> On Wed, Jul 17, 2019 at 05:09:31PM +0000, Horia Geanta wrote:
-> > On 7/17/2019 1:16 AM, Eric Biggers wrote:
-> > > Hi Horia,
-> > >
-> > > On Tue, Jul 16, 2019 at 05:46:29PM +0000, Horia Geanta wrote:
-> > >> Hi,
-> > >>
-> > >> With fuzz testing enabled, I am seeing xts(aes) failures on caam dri=
-vers.
-> > >>
-> > >> Below are several failures, extracted from different runs:
-> > >>
-> > >> [    3.921654] alg: skcipher: xts-aes-caam encryption unexpectedly s=
-ucceeded on test vector "random: len=3D40 klen=3D64"; expected_error=3D-22,=
- cfg=3D"random: inplace use_finup nosimd src_divs=3D[57.93%@+11, 37.18%@+16=
-4, <reimport>0.68%@+4, 0.50%@+305, 3.71%@alignmask+3975]"
-> > >>
-> > >> [    3.726698] alg: skcipher: xts-aes-caam encryption unexpectedly s=
-ucceeded on test vector "random: len=3D369 klen=3D64"; expected_error=3D-22=
-, cfg=3D"random: inplace may_sleep use_digest src_divs=3D[100.0%@alignmask+=
-584]"
-> > >>
-> > >> [    3.741082] alg: skcipher: xts-aes-caam encryption unexpectedly s=
-ucceeded on test vector "random: len=3D2801 klen=3D64"; expected_error=3D-2=
-2, cfg=3D"random: inplace may_sleep use_digest src_divs=3D[100.0%@+6] iv_of=
-fset=3D18"
-> > >>
-> > >> It looks like the problem is not in CAAM driver.
-> > >> More exactly, fuzz testing is generating random test vectors and run=
-ning
-> > >> them through both SW generic (crypto/xts.c) and CAAM implementation:
-> > >> -SW generic implementation of xts(aes) does not support ciphertext s=
-tealing
-> > >> and throws -EINVAL when input is not a multiple of AES block size (1=
-6B)
-> > >> -caam has support for ciphertext stealing, and allows for any input =
-size
-> > >> which results in "unexpectedly succeeded" error messages.
-> > >>
-> > >> Any suggestion how this should be fixed?
-> > >>
-> > >> Thanks,
-> > >> Horia
-> > >
-> > > I don't think drivers should allow inputs the generic implementation =
-doesn't,
-> > > since those inputs aren't tested by the crypto self-tests (so how do =
-you know
-> > How about implementation adding static test vectors and using them to v=
-alidate
-> > the standard feature set that's not supported by the generic implementa=
-tion?
-> >
-> > > it's even correct?), and people could accidentally rely on the driver=
--specific
-> > > behavior and then be unable to migrate to another platform or impleme=
-ntation.
-> > >
-> > People could also *intentionally* rely on a driver offering an implemen=
-tation
-> > that is closer to the spec / standard.
-> >
-> > > So for now I recommend just updating the caam driver to return -EINVA=
-L on XTS
-> > > inputs not evenly divisible by the block size.
-> > >
-> > I was hoping for something more constructive...
-> >
-> > > Of course, if there are actual use cases for XTS with ciphertext stea=
-ling in the
-> > > kernel, we could add it to all the other implementations too.  But I'=
-m not aware
-> > > of any currently.  Don't all XTS users in the kernel pass whole block=
-s?
-> > >
-> > That's my guess too.
-> >
-> > What about user space relying on offloading and xts working
-> > according to the spec?
-> >
->
-> Sure, AF_ALG users could expect ciphertext stealing to work.  I don't kno=
-w of
-> any actual examples of people saying they want it, but it's possible.
->
-> My point is simply that we add this, we need to find a way to support it =
-in all
-> implementations.  It's not helpful to add it to only one specific driver,=
- as
-> then it's inconsistent and is untestable with the common tests.
->
+On Wed, Jul 17, 2019 at 07:11:47PM +0800, Herbert Xu wrote:
+> On Tue, Jul 16, 2019 at 12:32:53PM -0400, Daniel Jordan wrote:
+> > Testing padata with the tcrypt module on a 5.2 kernel...
+> 
+> Thanks for the patch!
+> 
+> And here is an incremental patch to get rid of the timer that
+> appears to be an attempt at fixing a problem related to this.
 
-IIRC there are different ways to implement CTS, and the cts template
-we have in the kernel (which is used for CBC in some cases) implements
-the flavor where the last two blocks are reordered if the input size
-is an exact multiple of the block size. If your CTS implementation
-does not implement this reordering (which seems to be the case since
-it is compatible with plain XTS), it implements CTS in an incompatible
-way.
+Nice, +1 for getting rid of the timer.
 
-Since the kernel does not support CTS for XTS any way, and since no
-AF_ALG users can portably rely on this, I agree with Eric that the
-only sensible way to address this is to disable this functionality in
-the driver.
+> diff --git a/kernel/padata.c b/kernel/padata.c
+> index 15a8ad63f4ff..b5dfc21e976f 100644
+> --- a/kernel/padata.c
+> +++ b/kernel/padata.c
+> @@ -165,23 +165,12 @@ EXPORT_SYMBOL(padata_do_parallel);
+>   */
+>  static struct padata_priv *padata_get_next(struct parallel_data *pd)
+>  {
+> -	int cpu, num_cpus;
+> -	unsigned int next_nr, next_index;
+>  	struct padata_parallel_queue *next_queue;
+>  	struct padata_priv *padata;
+>  	struct padata_list *reorder;
+> +	int cpu = pd->cpu;
+>  
+> -	num_cpus = cpumask_weight(pd->cpumask.pcpu);
+> -
+> -	/*
+> -	 * Calculate the percpu reorder queue and the sequence
+> -	 * number of the next object.
+> -	 */
+> -	next_nr = pd->processed;
+> -	next_index = next_nr % num_cpus;
+> -	cpu = padata_index_to_cpu(pd, next_index);
+>  	next_queue = per_cpu_ptr(pd->pqueue, cpu);
+> -
+>  	reorder = &next_queue->reorder;
+>  
+>  	spin_lock(&reorder->lock);
+> @@ -192,7 +181,8 @@ static struct padata_priv *padata_get_next(struct parallel_data *pd)
+>  		list_del_init(&padata->list);
+>  		atomic_dec(&pd->reorder_objects);
+>  
+> -		pd->processed++;
+> +		pd->cpu = cpumask_next_wrap(cpu, pd->cpumask.pcpu, 0,
+> +					    false);
+
+We'll crash when cpumask_next_wrap returns nr_cpumask_bits and later try to get
+the corresponding per-cpu queue.
+
+This handles that as well as the case where there's only 1 CPU in the parallel
+mask:
+
+diff --git a/kernel/padata.c b/kernel/padata.c
+index b5dfc21e976f..ab352839df04 100644
+--- a/kernel/padata.c
++++ b/kernel/padata.c
+@@ -181,8 +181,10 @@ static struct padata_priv *padata_get_next(struct parallel_data *pd)
+ 		list_del_init(&padata->list);
+ 		atomic_dec(&pd->reorder_objects);
+ 
+-		pd->cpu = cpumask_next_wrap(cpu, pd->cpumask.pcpu, 0,
+-					    false);
++		if (cpumask_weight(pd->cpumask.pcpu) > 1) {
++			pd->cpu = cpumask_next_wrap(cpu, pd->cpumask.pcpu, cpu,
++						    false);
++		}
+ 
+ 		spin_unlock(&reorder->lock);
+ 		goto out;
+
+
+
+Haven't finished looking at the patch, but have to run somewhere for now, will
+pick it up later today.
