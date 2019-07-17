@@ -2,85 +2,84 @@ Return-Path: <SRS0=f4o8=VO=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CFA4C76192
-	for <linux-crypto@archiver.kernel.org>; Wed, 17 Jul 2019 08:53:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A0BCC76186
+	for <linux-crypto@archiver.kernel.org>; Wed, 17 Jul 2019 09:14:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 603A32077C
-	for <linux-crypto@archiver.kernel.org>; Wed, 17 Jul 2019 08:53:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0534A2077C
+	for <linux-crypto@archiver.kernel.org>; Wed, 17 Jul 2019 09:14:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726343AbfGQIxi (ORCPT
+        id S1725948AbfGQJOG (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 17 Jul 2019 04:53:38 -0400
-Received: from a.mx.secunet.com ([62.96.220.36]:35122 "EHLO a.mx.secunet.com"
+        Wed, 17 Jul 2019 05:14:06 -0400
+Received: from inva021.nxp.com ([92.121.34.21]:56070 "EHLO inva021.nxp.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725890AbfGQIxh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 17 Jul 2019 04:53:37 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by a.mx.secunet.com (Postfix) with ESMTP id 7F5C0201AE;
-        Wed, 17 Jul 2019 10:53:36 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-        by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id XTJfI7HmDPTO; Wed, 17 Jul 2019 10:53:35 +0200 (CEST)
-Received: from mail-essen-01.secunet.de (mail-essen-01.secunet.de [10.53.40.204])
-        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by a.mx.secunet.com (Postfix) with ESMTPS id D995320189;
-        Wed, 17 Jul 2019 10:53:35 +0200 (CEST)
-Received: from gauss2.secunet.de (10.182.7.193) by mail-essen-01.secunet.de
- (10.53.40.204) with Microsoft SMTP Server id 14.3.439.0; Wed, 17 Jul 2019
- 10:53:36 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)      id 8B819318055E;
- Wed, 17 Jul 2019 10:53:35 +0200 (CEST)
-Date:   Wed, 17 Jul 2019 10:53:35 +0200
-From:   Steffen Klassert <steffen.klassert@secunet.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-CC:     Daniel Jordan <daniel.m.jordan@oracle.com>,
-        <andrea.parri@amarulasolutions.com>, <boqun.feng@gmail.com>,
-        <paulmck@linux.ibm.com>, <peterz@infradead.org>,
-        <linux-arch@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] padata: Use RCU when fetching pd from do_serial
-Message-ID: <20190717085335.GR17989@gauss3.secunet.de>
-References: <20190712101012.GW14601@gauss3.secunet.de>
- <20190712160737.iniaaxlsnhs6azg5@ca-dmjordan1.us.oracle.com>
- <20190713050321.c5wq7a7jrb6q2pxn@gondor.apana.org.au>
- <20190715161045.zqwgsp62uqjnvx3l@ca-dmjordan1.us.oracle.com>
- <20190716100447.pdongriwwfxsuajf@gondor.apana.org.au>
- <20190716111410.GN17989@gauss3.secunet.de>
- <20190716125704.l2jolyyd3bue6hhn@gondor.apana.org.au>
- <20190716130928.ga4acvxipsdzyzlp@gondor.apana.org.au>
- <20190717082815.GP17989@gauss3.secunet.de>
- <20190717084739.35evhqushmjejmmq@gondor.apana.org.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20190717084739.35evhqushmjejmmq@gondor.apana.org.au>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+        id S1725799AbfGQJOF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 17 Jul 2019 05:14:05 -0400
+Received: from inva021.nxp.com (localhost [127.0.0.1])
+        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 3219120005C;
+        Wed, 17 Jul 2019 11:14:04 +0200 (CEST)
+Received: from invc005.ap-rdc01.nxp.com (invc005.ap-rdc01.nxp.com [165.114.16.14])
+        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id F185E20005E;
+        Wed, 17 Jul 2019 11:13:55 +0200 (CEST)
+Received: from titan.ap.freescale.net (TITAN.ap.freescale.net [10.192.208.233])
+        by invc005.ap-rdc01.nxp.com (Postfix) with ESMTP id D2E4F402C3;
+        Wed, 17 Jul 2019 17:13:45 +0800 (SGT)
+From:   Anson.Huang@nxp.com
+To:     mpm@selenic.com, herbert@gondor.apana.org.au, arnd@arndb.de,
+        gregkh@linuxfoundation.org, shawnguo@kernel.org,
+        s.hauer@pengutronix.de, kernel@pengutronix.de, festevam@gmail.com,
+        rfontana@redhat.com, allison@lohutok.net,
+        kstewart@linuxfoundation.org, tglx@linutronix.de,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+Cc:     Linux-imx@nxp.com
+Subject: [PATCH 1/2] char: hw_random: imx-rngc: use devm_platform_ioremap_resource() to simplify code
+Date:   Wed, 17 Jul 2019 17:04:37 +0800
+Message-Id: <20190717090438.31522-1-Anson.Huang@nxp.com>
+X-Mailer: git-send-email 2.9.5
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jul 17, 2019 at 04:47:40PM +0800, Herbert Xu wrote:
-> On Wed, Jul 17, 2019 at 10:28:15AM +0200, Steffen Klassert wrote:
-> >
-> > I had a patch to support crypto backlog some years ago,
-> > but testing with dm-crypt did not show any performance
-> > improvement. So I decided to just skip that patch because
-> > it added code for no need.
-> 
-> Well pcrypt is part of the API so it needs to obey the rules.
-> So even if it wouldn't make sense to use dm-crypt with pcrypt
-> it still needs to do the right thing.
+From: Anson Huang <Anson.Huang@nxp.com>
 
-Ok, makes sense. The old patch still exists:
+Use the new helper devm_platform_ioremap_resource() which wraps the
+platform_get_resource() and devm_ioremap_resource() together, to
+simplify the code.
 
-https://git.kernel.org/pub/scm/linux/kernel/git/klassert/linux-stk.git/commit/?h=net-next-pcrypt&id=5909a88ccef6f4c78fe9969160155a8f0ce8fee7
+Signed-off-by: Anson Huang <Anson.Huang@nxp.com>
+---
+ drivers/char/hw_random/imx-rngc.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-Let me see if I can respin it...
+diff --git a/drivers/char/hw_random/imx-rngc.c b/drivers/char/hw_random/imx-rngc.c
+index 69f5379..30cf00f 100644
+--- a/drivers/char/hw_random/imx-rngc.c
++++ b/drivers/char/hw_random/imx-rngc.c
+@@ -196,7 +196,6 @@ static int imx_rngc_init(struct hwrng *rng)
+ static int imx_rngc_probe(struct platform_device *pdev)
+ {
+ 	struct imx_rngc *rngc;
+-	struct resource *res;
+ 	int ret;
+ 	int irq;
+ 
+@@ -204,8 +203,7 @@ static int imx_rngc_probe(struct platform_device *pdev)
+ 	if (!rngc)
+ 		return -ENOMEM;
+ 
+-	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+-	rngc->base = devm_ioremap_resource(&pdev->dev, res);
++	rngc->base = devm_platform_ioremap_resource(pdev, 0);
+ 	if (IS_ERR(rngc->base))
+ 		return PTR_ERR(rngc->base);
+ 
+-- 
+2.7.4
+
