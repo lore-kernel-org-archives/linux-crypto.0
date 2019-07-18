@@ -6,28 +6,28 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E2CDC7618F
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jul 2019 23:59:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E94C4C7618F
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jul 2019 23:59:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1F14A208C0
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jul 2019 23:59:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CD3BD208C0
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jul 2019 23:59:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726290AbfGRX6Q (ORCPT
+        id S1726188AbfGRX7N (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 18 Jul 2019 19:58:16 -0400
-Received: from inva020.nxp.com ([92.121.34.13]:54556 "EHLO inva020.nxp.com"
+        Thu, 18 Jul 2019 19:59:13 -0400
+Received: from inva021.nxp.com ([92.121.34.21]:53130 "EHLO inva021.nxp.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726211AbfGRX6Q (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1726066AbfGRX6Q (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Thu, 18 Jul 2019 19:58:16 -0400
-Received: from inva020.nxp.com (localhost [127.0.0.1])
-        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id EE9BA1A0369;
-        Fri, 19 Jul 2019 01:58:14 +0200 (CEST)
+Received: from inva021.nxp.com (localhost [127.0.0.1])
+        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 74C522003BD;
+        Fri, 19 Jul 2019 01:58:13 +0200 (CEST)
 Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
-        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id E1CF61A0365;
-        Fri, 19 Jul 2019 01:58:14 +0200 (CEST)
+        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 678C3200003;
+        Fri, 19 Jul 2019 01:58:13 +0200 (CEST)
 Received: from lorenz.ea.freescale.net (lorenz.ea.freescale.net [10.171.71.5])
-        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 979A7205D1;
-        Fri, 19 Jul 2019 01:58:14 +0200 (CEST)
+        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 0B9C3205D1;
+        Fri, 19 Jul 2019 01:58:13 +0200 (CEST)
 From:   Iuliana Prodan <iuliana.prodan@nxp.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         Horia Geanta <horia.geanta@nxp.com>,
@@ -35,89 +35,101 @@ To:     Herbert Xu <herbert@gondor.apana.org.au>,
 Cc:     "David S. Miller" <davem@davemloft.net>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-imx <linux-imx@nxp.com>
-Subject: [PATCH v2 07/14] crypto: caam - check zero-length input
-Date:   Fri, 19 Jul 2019 02:57:49 +0300
-Message-Id: <1563494276-3993-8-git-send-email-iuliana.prodan@nxp.com>
+Subject: [PATCH v2 03/14] crypto: caam - update IV only when crypto operation succeeds
+Date:   Fri, 19 Jul 2019 02:57:45 +0300
+Message-Id: <1563494276-3993-4-git-send-email-iuliana.prodan@nxp.com>
 X-Mailer: git-send-email 2.1.0
 In-Reply-To: <1563494276-3993-1-git-send-email-iuliana.prodan@nxp.com>
 References: <1563494276-3993-1-git-send-email-iuliana.prodan@nxp.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Check zero-length input, for skcipher algorithm, to solve the extra
-tests. This is a valid operation, therefore the API will return no error.
+From: Horia Geantă <horia.geanta@nxp.com>
 
+skcipher encryption might fail and in some cases, like (invalid) input
+length smaller then block size, updating the IV would lead to a useless
+IV copy in case hardware issued an error.
+
+Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
 Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>
 ---
- drivers/crypto/caam/caamalg.c     | 6 ++++++
- drivers/crypto/caam/caamalg_qi.c  | 3 +++
- drivers/crypto/caam/caamalg_qi2.c | 5 +++++
- 3 files changed, 14 insertions(+)
+ drivers/crypto/caam/caamalg.c     | 5 ++---
+ drivers/crypto/caam/caamalg_qi.c  | 4 +++-
+ drivers/crypto/caam/caamalg_qi2.c | 8 ++++++--
+ 3 files changed, 11 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index 6b9937c..9a7bb06 100644
+index 06b4f2d..28d55a0 100644
 --- a/drivers/crypto/caam/caamalg.c
 +++ b/drivers/crypto/caam/caamalg.c
-@@ -1891,6 +1891,9 @@ static int skcipher_encrypt(struct skcipher_request *req)
- 	u32 *desc;
- 	int ret = 0;
+@@ -990,10 +990,9 @@ static void skcipher_encrypt_done(struct device *jrdev, u32 *desc, u32 err,
+ 	 * ciphertext block (CBC mode) or last counter (CTR mode).
+ 	 * This is used e.g. by the CTS mode.
+ 	 */
+-	if (ivsize) {
++	if (ivsize && !ecode) {
+ 		memcpy(req->iv, (u8 *)edesc->sec4_sg + edesc->sec4_sg_bytes,
+ 		       ivsize);
+-
+ 		print_hex_dump_debug("dstiv  @"__stringify(__LINE__)": ",
+ 				     DUMP_PREFIX_ADDRESS, 16, 4, req->iv,
+ 				     edesc->src_nents > 1 ? 100 : ivsize, 1);
+@@ -1030,7 +1029,7 @@ static void skcipher_decrypt_done(struct device *jrdev, u32 *desc, u32 err,
+ 	 * ciphertext block (CBC mode) or last counter (CTR mode).
+ 	 * This is used e.g. by the CTS mode.
+ 	 */
+-	if (ivsize) {
++	if (ivsize && !ecode) {
+ 		memcpy(req->iv, (u8 *)edesc->sec4_sg + edesc->sec4_sg_bytes,
+ 		       ivsize);
  
-+	if (!req->cryptlen)
-+		return 0;
-+
- 	/* allocate extended descriptor */
- 	edesc = skcipher_edesc_alloc(req, DESC_JOB_IO_LEN * CAAM_CMD_SZ);
- 	if (IS_ERR(edesc))
-@@ -1925,6 +1928,9 @@ static int skcipher_decrypt(struct skcipher_request *req)
- 	u32 *desc;
- 	int ret = 0;
- 
-+	if (!req->cryptlen)
-+		return 0;
-+
- 	/* allocate extended descriptor */
- 	edesc = skcipher_edesc_alloc(req, DESC_JOB_IO_LEN * CAAM_CMD_SZ);
- 	if (IS_ERR(edesc))
 diff --git a/drivers/crypto/caam/caamalg_qi.c b/drivers/crypto/caam/caamalg_qi.c
-index 69cc657..b2dd4f3 100644
+index ab263b1..66531d6 100644
 --- a/drivers/crypto/caam/caamalg_qi.c
 +++ b/drivers/crypto/caam/caamalg_qi.c
-@@ -1450,6 +1450,9 @@ static inline int skcipher_crypt(struct skcipher_request *req, bool encrypt)
- 	struct caam_ctx *ctx = crypto_skcipher_ctx(skcipher);
- 	int ret;
+@@ -1201,7 +1201,9 @@ static void skcipher_done(struct caam_drv_req *drv_req, u32 status)
+ 	 * ciphertext block (CBC mode) or last counter (CTR mode).
+ 	 * This is used e.g. by the CTS mode.
+ 	 */
+-	memcpy(req->iv, (u8 *)&edesc->sgt[0] + edesc->qm_sg_bytes, ivsize);
++	if (!ecode)
++		memcpy(req->iv, (u8 *)&edesc->sgt[0] + edesc->qm_sg_bytes,
++		       ivsize);
  
-+	if (!req->cryptlen)
-+		return 0;
-+
- 	if (unlikely(caam_congested))
- 		return -EAGAIN;
- 
+ 	qi_cache_free(edesc);
+ 	skcipher_request_complete(req, ecode);
 diff --git a/drivers/crypto/caam/caamalg_qi2.c b/drivers/crypto/caam/caamalg_qi2.c
-index da3452b..285e3c9 100644
+index 2681581..bc370af 100644
 --- a/drivers/crypto/caam/caamalg_qi2.c
 +++ b/drivers/crypto/caam/caamalg_qi2.c
-@@ -1499,6 +1499,9 @@ static int skcipher_encrypt(struct skcipher_request *req)
- 	struct caam_request *caam_req = skcipher_request_ctx(req);
- 	int ret;
+@@ -1358,7 +1358,9 @@ static void skcipher_encrypt_done(void *cbk_ctx, u32 status)
+ 	 * ciphertext block (CBC mode) or last counter (CTR mode).
+ 	 * This is used e.g. by the CTS mode.
+ 	 */
+-	memcpy(req->iv, (u8 *)&edesc->sgt[0] + edesc->qm_sg_bytes, ivsize);
++	if (!ecode)
++		memcpy(req->iv, (u8 *)&edesc->sgt[0] + edesc->qm_sg_bytes,
++		       ivsize);
  
-+	if (!req->cryptlen)
-+		return 0;
-+
- 	/* allocate extended descriptor */
- 	edesc = skcipher_edesc_alloc(req);
- 	if (IS_ERR(edesc))
-@@ -1527,6 +1530,8 @@ static int skcipher_decrypt(struct skcipher_request *req)
- 	struct caam_request *caam_req = skcipher_request_ctx(req);
- 	int ret;
+ 	qi_cache_free(edesc);
+ 	skcipher_request_complete(req, ecode);
+@@ -1394,7 +1396,9 @@ static void skcipher_decrypt_done(void *cbk_ctx, u32 status)
+ 	 * ciphertext block (CBC mode) or last counter (CTR mode).
+ 	 * This is used e.g. by the CTS mode.
+ 	 */
+-	memcpy(req->iv, (u8 *)&edesc->sgt[0] + edesc->qm_sg_bytes, ivsize);
++	if (!ecode)
++		memcpy(req->iv, (u8 *)&edesc->sgt[0] + edesc->qm_sg_bytes,
++		       ivsize);
  
-+	if (!req->cryptlen)
-+		return 0;
- 	/* allocate extended descriptor */
- 	edesc = skcipher_edesc_alloc(req);
- 	if (IS_ERR(edesc))
+ 	qi_cache_free(edesc);
+ 	skcipher_request_complete(req, ecode);
 -- 
 2.1.0
 
