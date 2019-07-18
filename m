@@ -2,102 +2,127 @@ Return-Path: <SRS0=4UBR=VP=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3ED4C76191
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jul 2019 07:28:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B2D4C76191
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jul 2019 07:40:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AA2002173B
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jul 2019 07:28:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 612CE21019
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jul 2019 07:40:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DIY9XY4h"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q8RSszfw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726386AbfGRH2R (ORCPT
+        id S1726482AbfGRHkP (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 18 Jul 2019 03:28:17 -0400
-Received: from mail-wr1-f54.google.com ([209.85.221.54]:35425 "EHLO
-        mail-wr1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726304AbfGRH2R (ORCPT
+        Thu, 18 Jul 2019 03:40:15 -0400
+Received: from mail-wr1-f48.google.com ([209.85.221.48]:44065 "EHLO
+        mail-wr1-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726397AbfGRHkP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 Jul 2019 03:28:17 -0400
-Received: by mail-wr1-f54.google.com with SMTP id y4so27482118wrm.2
-        for <linux-crypto@vger.kernel.org>; Thu, 18 Jul 2019 00:28:15 -0700 (PDT)
+        Thu, 18 Jul 2019 03:40:15 -0400
+Received: by mail-wr1-f48.google.com with SMTP id p17so27466962wrf.11
+        for <linux-crypto@vger.kernel.org>; Thu, 18 Jul 2019 00:40:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=zllCHY/cRVRmhrsSL2iE9WJ0AIohaFe+eHpEOu+sQFU=;
-        b=DIY9XY4hX0T14cuJ8OXQjvqwvkd8HuXVjCn8+rlK9CzCPUk7Z2b9cQCkW050Iw+bU3
-         vzsaPfEoTSeO6wjM8un9rUwFoJQg6XOcDGUMF6e2S7S0OHJVV5qVVl6IrSZbp+PM/qWF
-         K5ZQGoj8N1RHbS4JLMDLW3PCncnpUjzLBMTlO0VSNquypJAHwbRAnWdedaIrbkrEp/Fn
-         +shvmAqjwoOYk8T81uHzdFlQ9YHyTodFR+bomNzRarWRE99eoj2xS5rNnM+DicYvBy+F
-         u+cEWVtXyuCSFvcNE3PSdP/+ahNIQpZiWjkIjH4126nhKXJi20AxH03Rk6qz4HepOBvI
-         J84A==
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=8Ets9DwLOZVAU6fNpoFk58BESPFJh1jtTqQh2d/rdgA=;
+        b=Q8RSszfwbaBbTcKCdYB4rZi3IlzgC2nBGE4+cOKO37g6oLxfPfHR0yFvV51VyIaXV8
+         dbe0496/B+HfIAgO/Q/HIgtV1GMya9jx8s5fYFl7IFhAC9+UvLch6tOduPB1G9atAFLA
+         YZxrb6Wn/TFtbBj3TiOki4rRGf+pnRKulZcfQdoRTh5iIPztJU978326joEn8Pm9Zz5z
+         2hXdIZ/ch1qo5haTon071iQ9oZteCR+BdW5yeesLajqQF9vA9H9cbsq8anMGDjmuyRho
+         nu7mPghSn37t7sl8qeoRJ6phl01Ur84wrKmRax/DUdaapb3KzeihrVpXsU7HbM4bW5Ah
+         eJ9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=zllCHY/cRVRmhrsSL2iE9WJ0AIohaFe+eHpEOu+sQFU=;
-        b=UurnyJAscadE6eoevtk+FcEXJqEYTsK1Dp7Na0Rl3htxRrTxqO2jq7s+ItLqQhJhod
-         Jp9PkBN0xYCfZtv3REWjybPTAhVbdM0zH4y2Gs42I9nd+S1hs9Ro/UwAXCtFElu9GpYk
-         WGg9nxB3nzf2c+hcaPUXe18SeWlv4AhxZqNXnkvrmSkvzSIHIm/m3Lhp+bKIRKvHr2hV
-         MDAl6gj+0QbjXeZsRHeWiP36Cx++T9v0Je83MxuKOf35rCOTRmo/SoK1mvUwtt/vjo/R
-         DZptbL0CqI5LQcsD9ffpoI0H/ElKx9QSLvCgPsr2DaAqMlWZVUTCy46ItKboAhFne9Dj
-         DgZQ==
-X-Gm-Message-State: APjAAAUwrfawunVU8k5xQ6Nnqt1E7AzFWV46EDm4xc1SI8xjkU3Clwak
-        5Zxc720ACh+zaKwQX6kHTQZLE9hBryWbpiMH8qHLMQ==
-X-Google-Smtp-Source: APXvYqz2KeADeEBZzbaWHI9EeYR4xSsmdE03VIrqg0AqBBcAwB+aC1wb3gUSXW1Tue7fJA098aG2FYk0jpQIXxnujZ8=
-X-Received: by 2002:adf:e8c2:: with SMTP id k2mr33687652wrn.198.1563434894890;
- Thu, 18 Jul 2019 00:28:14 -0700 (PDT)
-MIME-Version: 1.0
-References: <VI1PR0402MB34858E4EF0ACA7CDB446FF5798CE0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
- <20190716221639.GA44406@gmail.com> <VI1PR0402MB34857BBB18C2BB8CBA2DEC7198C90@VI1PR0402MB3485.eurprd04.prod.outlook.com>
- <20190717172823.GA205944@gmail.com> <CAKv+Gu__offPaWvyURJr8v56ig58q-Deo16QhP26EJ32uf5m3w@mail.gmail.com>
- <20190718065223.4xaefcwjoxvujntw@gondor.apana.org.au> <CAKv+Gu9-EWNpJ9viSsjhYRdOZb=7a=Mpddmyt8SLEq9aFtawjg@mail.gmail.com>
- <20190718072154.m2umem24x4grbf6w@gondor.apana.org.au>
-In-Reply-To: <20190718072154.m2umem24x4grbf6w@gondor.apana.org.au>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Thu, 18 Jul 2019 09:28:03 +0200
-Message-ID: <CAKv+Gu_CVBKUkb19yPPHJp3HcnAgxRn834yfKHcuUD5A69786g@mail.gmail.com>
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=8Ets9DwLOZVAU6fNpoFk58BESPFJh1jtTqQh2d/rdgA=;
+        b=eclKTaXk39CNhdoSgSomJGc4mrMpDsUSd71LJ38eMxgd6NCqsa66X0j26y/HUfleuu
+         jQbPnOxJD2C6iFwedHpU71Wtkxf3bAJAbPAz8yamBKma/efJYfvnMh8tz8ds40m7uv0T
+         imDSq8XEHO0IUC+nJSgMFZ6chiCC9zN7Hw+ZIKwAc8qTYKMec6qjePEG8V4sB0CEChv0
+         i7KcHGBFNgjhIhjn81tUaAn/KBHWxKMGPvA5Z7caTaxBw9xFmYW1sTA2pM38sMUdgyf+
+         /uHD8VeUJSxNCSO4ya1Y0YcxYtS5DgwbPMnIXHKaEkI3fT4E5xesq8iz7tSNWdPe/l97
+         3q2A==
+X-Gm-Message-State: APjAAAWNnN8tzgecgah7t89IBl1N7qvGvFhTYVpQXG0LjGKDAh7Mo/3l
+        w+O5G5E6PQGC3JXAJaNtQfvu9wglJfQ=
+X-Google-Smtp-Source: APXvYqxbf6KAe77UBX6m38X+WIIUli0ULfcoB5r6fTp/YzaSZZTCqbBLoWOjawnGl/CjeYCxOX2JXg==
+X-Received: by 2002:adf:cd84:: with SMTP id q4mr40132324wrj.232.1563435613007;
+        Thu, 18 Jul 2019 00:40:13 -0700 (PDT)
+Received: from [172.22.36.64] (redhat-nat.vtp.fi.muni.cz. [78.128.215.6])
+        by smtp.gmail.com with ESMTPSA id r14sm24128962wrx.57.2019.07.18.00.40.11
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Thu, 18 Jul 2019 00:40:12 -0700 (PDT)
 Subject: Re: xts fuzz testing and lack of ciphertext stealing support
-To:     Herbert Xu <herbert@gondor.apana.org.au>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Cc:     Horia Geanta <horia.geanta@nxp.com>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         "dm-devel@redhat.com" <dm-devel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+References: <VI1PR0402MB34858E4EF0ACA7CDB446FF5798CE0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+ <20190716221639.GA44406@gmail.com>
+ <VI1PR0402MB34857BBB18C2BB8CBA2DEC7198C90@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+ <20190717172823.GA205944@gmail.com>
+ <CAKv+Gu__offPaWvyURJr8v56ig58q-Deo16QhP26EJ32uf5m3w@mail.gmail.com>
+ <20190718065223.4xaefcwjoxvujntw@gondor.apana.org.au>
+ <CAKv+Gu9-EWNpJ9viSsjhYRdOZb=7a=Mpddmyt8SLEq9aFtawjg@mail.gmail.com>
+ <20190718072154.m2umem24x4grbf6w@gondor.apana.org.au>
+From:   Milan Broz <gmazyland@gmail.com>
+Openpgp: preference=signencrypt
+Message-ID: <36e78459-1594-6d19-0ab4-95b03a6de036@gmail.com>
+Date:   Thu, 18 Jul 2019 09:40:11 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <20190718072154.m2umem24x4grbf6w@gondor.apana.org.au>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 18 Jul 2019 at 09:22, Herbert Xu <herbert@gondor.apana.org.au> wrote:
->
+On 18/07/2019 09:21, Herbert Xu wrote:
 > On Thu, Jul 18, 2019 at 09:15:39AM +0200, Ard Biesheuvel wrote:
-> >
-> > Not just the generic implementation: there are numerous synchronous
-> > and asynchronous implementations of xts(aes) in the kernel that would
-> > have to be fixed, while there are no in-kernel users that actually
-> > rely on CTS. Also, in the cbc case, we support CTS by wrapping it into
-> > another template, i.e., cts(cbc(aes)).
-> >
-> > So retroactively redefining what xts(...) means seems like a bad idea
-> > to me. If we want to support XTS ciphertext stealing for the benefit
-> > of userland, let's do so via the existing cts template, and add
-> > support for wrapping XTS to it.
->
+>>
+>> Not just the generic implementation: there are numerous synchronous
+>> and asynchronous implementations of xts(aes) in the kernel that would
+>> have to be fixed, while there are no in-kernel users that actually
+>> rely on CTS. Also, in the cbc case, we support CTS by wrapping it into
+>> another template, i.e., cts(cbc(aes)).
+>>
+>> So retroactively redefining what xts(...) means seems like a bad idea
+>> to me. If we want to support XTS ciphertext stealing for the benefit
+>> of userland, let's do so via the existing cts template, and add
+>> support for wrapping XTS to it.
+> 
 > XTS without stealing should be renamed as XEX.  Sure you can then
 > wrap it inside cts to form xts but the end result needs to be called
 > xts.
->
 
-If we were adding XTS to the kernel today, then I would agree with
-you. But xts() has an established meaning now, and I don't think it
-makes sense to update all implementations for a theoretical use case,
-given that no portable userland code can rely on the correct semantics
-today, since CAAM is the only one that implements them correctly.
+While I fully agree here from the technical point of view,
+academically XEX, XEX* is a different mode.
+It would create even more confusion.
 
-In any case, I won't have time to fix the ARM or arm64 implementations
-(or review the changes if someone else steps up) until the end of
-September.
+Couldn't resist, but this is a nice example of what happens when academic,
+standardization, and reality meets in one place :)
+
+XTS is already implemented in gcrypt and OpenSSL.
+IMO all the implementation should be exactly the same.
+
+I agree with Herbert that the proper way is to implement ciphertext stealing.
+Otherwise, it is just incomplete implementation, not a redefining XTS mode!
+
+See the reference in generic code - the 3rd line - link to the IEEE standard.
+We do not implement it properly - for more than 12 years!
+
+Reality check - nobody in block layer needs ciphertext stealing, we are always
+aligned to block. AF_ALG is a different story, though.
+
+Milan
+
