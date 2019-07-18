@@ -2,140 +2,107 @@ Return-Path: <SRS0=4UBR=VP=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98E53C76191
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jul 2019 11:19:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91E87C76196
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jul 2019 11:25:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6ACD121019
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jul 2019 11:19:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6A5B4217F4
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jul 2019 11:25:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fiRi2Hl+"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="M1FLy5Kk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727754AbfGRLTp (ORCPT
+        id S1727806AbfGRLZq (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 18 Jul 2019 07:19:45 -0400
-Received: from mail-wm1-f42.google.com ([209.85.128.42]:37922 "EHLO
-        mail-wm1-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727670AbfGRLTp (ORCPT
+        Thu, 18 Jul 2019 07:25:46 -0400
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:38639 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727655AbfGRLZn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 Jul 2019 07:19:45 -0400
-Received: by mail-wm1-f42.google.com with SMTP id s15so3907809wmj.3
-        for <linux-crypto@vger.kernel.org>; Thu, 18 Jul 2019 04:19:43 -0700 (PDT)
+        Thu, 18 Jul 2019 07:25:43 -0400
+Received: by mail-pl1-f194.google.com with SMTP id az7so13722954plb.5
+        for <linux-crypto@vger.kernel.org>; Thu, 18 Jul 2019 04:25:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=dVSqJxHc4hCvBMkoZU5D2dsbrzY2xQ+hZ5J9LTcwpq0=;
-        b=fiRi2Hl+UrQDj+8dcNWYCnG1fNGF8sOVkl4NDNgxWp93/6q89O2hkW7pxrD6eahVWr
-         hqWNLJNJJpenvEAcVSNdoN94+FnBvRFhqS+S223Vl+KHhXZKCwKGxi1L3wv7yQMgqyT6
-         xd16JL6y4iBZImcqbChMkiqlWBrur1IhVHxGeMlVJM4aecueogn54AHZLPT1AXWYjfJK
-         gN5YRzdt5sgRfRMhjmAZL/m/Ux/jGWf56/jtJg5dpUW8zp8JsqJl3nA+rHX2XLFCxhuR
-         LJiia4/RTQFD3POvLh9V5nn2gTs3xQlB3W5s4hbpC1lMOq8Cxyf4MmT9GRfbJEb3NHLA
-         tdHA==
+        d=linaro.org; s=google;
+        h=from:to:cc:subject:date:message-id;
+        bh=k3a2v4scLqCzIgsIewhCrR8or1GEYNGppEVY9Fy2O/U=;
+        b=M1FLy5Kk4LfikIbzpeaUWtN1zq1XlK5JvCef3h2YeRK38Wr6CrReh7qdmTSxBKd0tr
+         o+bCMkEycBSfB22Ym3qrIiJhVXMF9RRjehkyX4ib2C30YhMXPk/zH6IB8r7T/nzqnuEx
+         ldwsWbOg/J27MJz09b6pj/NMbBOco/WX3y3STg9Qgzjq5H3TaRXVvFHplilz8xmCFaRq
+         2SlV3Yy6NxfGr3rWKGOpKjJbtACX48g85y5OprttVWZBrMtKLjw8FkeXjowey0P+3cWN
+         oc/Yh0GZ+8n27tCHhwfoDVKKZ5PuL/GM+tRgRcQ9pLybCrQ79gy1bTYJ1liiVoE73HeL
+         VkSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=dVSqJxHc4hCvBMkoZU5D2dsbrzY2xQ+hZ5J9LTcwpq0=;
-        b=JNWh54KMwVUFxIPINb2vXf0Ag/uSDAeCscMMqoWDoBp497vQNXMDgwOthXqHGC24Ff
-         8Ursm1QgDPt3ZkqYpXmbRJJxIkZGBtDnD3mkDQ+GPoOVGLV8xPnXm4EaFk69wAMyFXgd
-         kQcHCGfN92+SuQoJ8gcCUgQCQ74/ID7ImnjDX9cRNpFvQwAAUO6lDY0CAmnjbt6b8Mgb
-         +jpWVOcTpDfpzY2IZEqFU/K3jo8gMBusdRPVqA8tcT9alQQRvf00/PHytx0PKjX0Q9gv
-         +7416AcF0OwapDlZnK9UyJAlvJPhKx9LV/uFFal6/b3cqiHYyS3kgfltQOa6TDoH2wbe
-         tl3g==
-X-Gm-Message-State: APjAAAWhQ0NUUiRyR3hek2tnkA27U9xnv17411gs1XwdQquPXD6gFOJZ
-        NaWHXwkp6uAuWHcMypA3jDg5OjMcqXg=
-X-Google-Smtp-Source: APXvYqzoS0Ffmm8deRB6JwC01KjMLES3GLEqqD/hHGxw/p+yQnzvsULFfXSROWTJvD3KsbAEkR/TJg==
-X-Received: by 2002:a1c:35c2:: with SMTP id c185mr41379998wma.58.1563448783085;
-        Thu, 18 Jul 2019 04:19:43 -0700 (PDT)
-Received: from [172.22.36.64] (redhat-nat.vtp.fi.muni.cz. [78.128.215.6])
-        by smtp.gmail.com with ESMTPSA id v15sm27046226wrt.25.2019.07.18.04.19.42
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Thu, 18 Jul 2019 04:19:42 -0700 (PDT)
-Subject: Re: xts fuzz testing and lack of ciphertext stealing support
-To:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc:     Horia Geanta <horia.geanta@nxp.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>
-References: <VI1PR0402MB34858E4EF0ACA7CDB446FF5798CE0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
- <20190716221639.GA44406@gmail.com>
- <VI1PR0402MB34857BBB18C2BB8CBA2DEC7198C90@VI1PR0402MB3485.eurprd04.prod.outlook.com>
- <20190717172823.GA205944@gmail.com>
- <CAKv+Gu__offPaWvyURJr8v56ig58q-Deo16QhP26EJ32uf5m3w@mail.gmail.com>
- <20190718065223.4xaefcwjoxvujntw@gondor.apana.org.au>
- <CAKv+Gu9-EWNpJ9viSsjhYRdOZb=7a=Mpddmyt8SLEq9aFtawjg@mail.gmail.com>
- <20190718072154.m2umem24x4grbf6w@gondor.apana.org.au>
- <36e78459-1594-6d19-0ab4-95b03a6de036@gmail.com>
- <MN2PR20MB2973E61815F069E8C7D74177CAC80@MN2PR20MB2973.namprd20.prod.outlook.com>
-From:   Milan Broz <gmazyland@gmail.com>
-Openpgp: preference=signencrypt
-Message-ID: <b042649c-db98-9710-b063-242bdf520252@gmail.com>
-Date:   Thu, 18 Jul 2019 13:19:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <MN2PR20MB2973E61815F069E8C7D74177CAC80@MN2PR20MB2973.namprd20.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=k3a2v4scLqCzIgsIewhCrR8or1GEYNGppEVY9Fy2O/U=;
+        b=anIfjwpDhsBXSwx2pwXvJ9zL42xCx7T8r/1ZhOfwGkGBSms0kOdUIgNqXeBdanifX/
+         iyCsNudKHWW4WevEG7kbVCPxpmND8lP8I7my+bZ0/IKZRxavKFjxQ3PyNbWwcGGkapu3
+         Q0UbSExqJYB3iUakqUxowbcl2YCnWJAGrjm613dKRmWTvGyZVSXIswc+Pz26eQqtajSP
+         RvU0AWZ31JIGSA13AfaPwipUYUFQkE4Vhya7lxi/HuIp7AXxGPz7x/qH6+qHK2/zc2mC
+         FW5md5MnAVJpilOPY0FzMkVPUpYtqsYGU78aYztTuHe0Wt4ApAZI9E1rQeIb1FUaOVId
+         BboA==
+X-Gm-Message-State: APjAAAWMIYw+zahdbcXc6+vz00uVA/cqM+r5jyoVnYD+WQWPF66YWhxU
+        UiGapmrAkAuc5GRmrAw1cH9owg==
+X-Google-Smtp-Source: APXvYqzQf4CQsiQAtlZs4mdLJM/AQwjnWt8JUhNrsglzHFXFxeb6/N9wuQp9kLw/Y9rgnv3leMPvBw==
+X-Received: by 2002:a17:902:9a04:: with SMTP id v4mr48096653plp.95.1563449142612;
+        Thu, 18 Jul 2019 04:25:42 -0700 (PDT)
+Received: from localhost.localdomain ([117.252.69.63])
+        by smtp.gmail.com with ESMTPSA id 3sm29648436pfg.186.2019.07.18.04.25.33
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Thu, 18 Jul 2019 04:25:41 -0700 (PDT)
+From:   Sumit Garg <sumit.garg@linaro.org>
+To:     keyrings@vger.kernel.org, linux-integrity@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-security-module@vger.kernel.org
+Cc:     dhowells@redhat.com, herbert@gondor.apana.org.au,
+        davem@davemloft.net, jejb@linux.ibm.com,
+        jarkko.sakkinen@linux.intel.com, zohar@linux.ibm.com,
+        jmorris@namei.org, serge@hallyn.com, casey@schaufler-ca.com,
+        ard.biesheuvel@linaro.org, daniel.thompson@linaro.org,
+        linux-kernel@vger.kernel.org, tee-dev@lists.linaro.org,
+        Sumit Garg <sumit.garg@linaro.org>
+Subject: [RFC/RFT v2 0/2] KEYS: trusted: Add generic trusted keys framework
+Date:   Thu, 18 Jul 2019 16:54:44 +0530
+Message-Id: <1563449086-13183-1-git-send-email-sumit.garg@linaro.org>
+X-Mailer: git-send-email 2.7.4
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 18/07/2019 12:40, Pascal Van Leeuwen wrote:
-...
->> See the reference in generic code - the 3rd line - link to the IEEE standard.
->> We do not implement it properly - for more than 12 years!
->>
-> 
-> Full XTS is XEX-TCB-CTS so the proper terminology for "XTS without CTS" would be XEX-TCB.
-> But the problem there is that TCB and CTS are generic terms that do not imply a specific 
-> implementation for generating the tweak -or- performing the ciphertext stealing.
-> Only the *full* XTS operation is standardized (as IEEE Std P1619).
+This patch-set is an outcome of discussion here [1].
 
-Yes. Also XTS is allowed in FIPS now. Because the current code cannot submit
-anything else than aligned blocks, we are ok.
-(I hope. Speaking for disk encryption, dm-crypt, only).
+I have tested this framework with trusted keys support provided via TEE
+but I wasn't able to test it with a TPM device as I don't possess one. It
+would be really helpful if others could test this patch-set using a TPM
+device.
 
-> In fact, using the current cts template around the current xts template actually does NOT
-> implement standards compliant XTS at all, as the CTS *implementation* for XTS is 
-> different from the one for CBC as implemented by the current CTS template.
-> The actual implementation of the ciphertext stealing has (or may have) a security impact,
-> so the *combined* operation must be cryptanalyzed and adding some random CTS scheme
-> to some random block cipher mode would be a case of "roll your own crypto" (i.e. bad).
+[1] https://www.mail-archive.com/linux-doc@vger.kernel.org/msg30591.html
 
-> From that perspective - to prevent people from doing cryptographically stupid things -
-> IMHO it would be better to just pull the CTS into the XTS implementation i.e. make
-> xts natively support blocks that are not a multiple of (but >=) the cipher blocksize ...
+Changes in v2:
 
-I would definitely prefer adding CTS directly to XTS (as it is in gcrypt or OpenSSL now)
-instead of some new compositions.
+Split trusted keys abstraction patch for ease of review.
 
-Also, I would like to avoid another "just because it is nicer" module dependence (XTS->XEX->ECB).
-Last time (when XTS was reimplemented using ECB) we have many reports with initramfs
-missing ECB module preventing boot from AES-XTS encrypted root after kernel upgrade...
-Just saying. (Despite the last time it was keyring what broke encrypted boot ;-)
+Sumit Garg (2):
+  KEYS: trusted: create trusted keys subsystem
+  KEYS: trusted: Add generic trusted keys framework
 
-(That said, I will try to find some volunteer to help with CTS in XTS implementation, if needed.)
+ crypto/asymmetric_keys/asym_tpm.c                  |   2 +-
+ include/keys/trusted-type.h                        |  45 +++
+ include/keys/{trusted.h => trusted_tpm.h}          |  19 +-
+ security/keys/Makefile                             |   2 +-
+ security/keys/trusted-keys/Makefile                |   7 +
+ .../keys/{trusted.c => trusted-keys/trusted-tpm.c} | 347 ++++-----------------
+ security/keys/trusted-keys/trusted.c               | 343 ++++++++++++++++++++
+ 7 files changed, 458 insertions(+), 307 deletions(-)
+ rename include/keys/{trusted.h => trusted_tpm.h} (85%)
+ create mode 100644 security/keys/trusted-keys/Makefile
+ rename security/keys/{trusted.c => trusted-keys/trusted-tpm.c} (77%)
+ create mode 100644 security/keys/trusted-keys/trusted.c
 
->> Reality check - nobody in block layer needs ciphertext stealing, we are always
->> aligned to block. AF_ALG is a different story, though.
-> 
-> So you don't support odd sector sizes like 520 , 528, 4112, 4160 or 4224 bytes?
+-- 
+2.7.4
 
-No. Dm-crypt supports only power of two blocks, up to 4k (IOW: 512, 1024, 2048, 4096 bytes).
-(Not more, because of compatible page size - this could be fixed in future though.)
-
-The 520 hw sector is usually 512 + 8 bytes for DIF (data integrity field).
-We can emulate something similar with dm-integrity, but the data section (input to encryption)
-must be always as specified above (rest is in integrity bio section).
-
-Milan
