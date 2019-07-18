@@ -2,76 +2,123 @@ Return-Path: <SRS0=4UBR=VP=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95318C7618F
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jul 2019 15:51:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49462C7618F
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jul 2019 16:18:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6EDB9208C0
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jul 2019 15:51:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2A1EF21850
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jul 2019 16:18:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727687AbfGRPvt (ORCPT
+        id S1727685AbfGRQSk (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 18 Jul 2019 11:51:49 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:54624 "EHLO deadmen.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726040AbfGRPvt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 Jul 2019 11:51:49 -0400
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1ho8h6-0001Xh-KV; Thu, 18 Jul 2019 23:51:44 +0800
-Received: from herbert by gondobar with local (Exim 4.89)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1ho8h2-0006ja-UW; Thu, 18 Jul 2019 23:51:40 +0800
-Date:   Thu, 18 Jul 2019 23:51:40 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
-Cc:     Milan Broz <gmazyland@gmail.com>,
+        Thu, 18 Jul 2019 12:18:40 -0400
+Received: from smtprelay0025.hostedemail.com ([216.40.44.25]:36818 "EHLO
+        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1729774AbfGRQSk (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 18 Jul 2019 12:18:40 -0400
+Received: from filter.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
+        by smtprelay03.hostedemail.com (Postfix) with ESMTP id 568338023D98;
+        Thu, 18 Jul 2019 16:18:38 +0000 (UTC)
+X-Session-Marker: 6A6F6540706572636865732E636F6D
+X-HE-Tag: deer25_684dc6a622a40
+X-Filterd-Recvd-Size: 4295
+Received: from XPS-9350 (cpe-23-242-196-136.socal.res.rr.com [23.242.196.136])
+        (Authenticated sender: joe@perches.com)
+        by omf05.hostedemail.com (Postfix) with ESMTPA;
+        Thu, 18 Jul 2019 16:18:36 +0000 (UTC)
+Message-ID: <db0a363fa35f1582f20e529d79927995a5512c0d.camel@perches.com>
+Subject: Re: [PATCH] crypto: aegis: fix badly optimized clang output
+From:   Joe Perches <joe@perches.com>
+To:     Arnd Bergmann <arnd@arndb.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Cc:     Ondrej Mosnacek <omosnacek@gmail.com>,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>
-Subject: Re: xts fuzz testing and lack of ciphertext stealing support
-Message-ID: <20190718155140.b6ig3zq22askmfpy@gondor.apana.org.au>
-References: <VI1PR0402MB34857BBB18C2BB8CBA2DEC7198C90@VI1PR0402MB3485.eurprd04.prod.outlook.com>
- <20190717172823.GA205944@gmail.com>
- <CAKv+Gu__offPaWvyURJr8v56ig58q-Deo16QhP26EJ32uf5m3w@mail.gmail.com>
- <20190718065223.4xaefcwjoxvujntw@gondor.apana.org.au>
- <CAKv+Gu9-EWNpJ9viSsjhYRdOZb=7a=Mpddmyt8SLEq9aFtawjg@mail.gmail.com>
- <20190718072154.m2umem24x4grbf6w@gondor.apana.org.au>
- <36e78459-1594-6d19-0ab4-95b03a6de036@gmail.com>
- <MN2PR20MB2973E61815F069E8C7D74177CAC80@MN2PR20MB2973.namprd20.prod.outlook.com>
- <20190718152908.xiuze3kb3fdc7ov6@gondor.apana.org.au>
- <MN2PR20MB2973E1A367986303566E80FCCAC80@MN2PR20MB2973.namprd20.prod.outlook.com>
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        clang-built-linux@googlegroups.com
+Date:   Thu, 18 Jul 2019 09:18:35 -0700
+In-Reply-To: <20190718135017.2493006-1-arnd@arndb.de>
+References: <20190718135017.2493006-1-arnd@arndb.de>
+Content-Type: text/plain; charset="ISO-8859-1"
+User-Agent: Evolution 3.30.5-0ubuntu0.18.10.1 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <MN2PR20MB2973E1A367986303566E80FCCAC80@MN2PR20MB2973.namprd20.prod.outlook.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jul 18, 2019 at 03:43:28PM +0000, Pascal Van Leeuwen wrote:
->
-> Hmmm ... so the generic CTS template would have to figure out whether it is wrapped 
-> around ECB, CBC, XTS or whatever and then adjust to that?
+On Thu, 2019-07-18 at 15:50 +0200, Arnd Bergmann wrote:
+> Clang sometimes makes very different inlining decisions from gcc.
+> In case of the aegis crypto algorithms, it decides to turn the innermost
+> primitives (and, xor, ...) into separate functions but inline most of
+> the rest.
 
-That's not hard to do.  Right now cts only supports cbc.  IOW
-if you pass it anything else it will refuse to instantiate.
+> This results in a huge amount of variables spilled on the stack, leading
+> to rather slow execution as well as kernel stack usage beyond the 32-bit
+> warning limit when CONFIG_KASAN is enabled:
+> 
+> crypto/aegis256.c:123:13: warning: stack frame size of 648 bytes in function 'crypto_aegis256_encrypt_chunk' [-Wframe-larger-than=]
+> crypto/aegis256.c:366:13: warning: stack frame size of 1264 bytes in function 'crypto_aegis256_crypt' [-Wframe-larger-than=]
+> crypto/aegis256.c:187:13: warning: stack frame size of 656 bytes in function 'crypto_aegis256_decrypt_chunk' [-Wframe-larger-than=]
+> crypto/aegis128l.c:135:13: warning: stack frame size of 832 bytes in function 'crypto_aegis128l_encrypt_chunk' [-Wframe-larger-than=]
+> crypto/aegis128l.c:415:13: warning: stack frame size of 1480 bytes in function 'crypto_aegis128l_crypt' [-Wframe-larger-than=]
+> crypto/aegis128l.c:218:13: warning: stack frame size of 848 bytes in function 'crypto_aegis128l_decrypt_chunk' [-Wframe-larger-than=]
+> crypto/aegis128.c:116:13: warning: stack frame size of 584 bytes in function 'crypto_aegis128_encrypt_chunk' [-Wframe-larger-than=]
+> crypto/aegis128.c:351:13: warning: stack frame size of 1064 bytes in function 'crypto_aegis128_crypt' [-Wframe-larger-than=]
+> crypto/aegis128.c:177:13: warning: stack frame size of 592 bytes in function 'crypto_aegis128_decrypt_chunk' [-Wframe-larger-than=]
+> 
+> Forcing the primitives to all get inlined avoids the issue and the
+> resulting code is similar to what gcc produces.
 
-> For XTS, you have this additional curve ball being thrown in called the "tweak".
-> For encryption, the underlying "xts" would need to be able to chain the tweak,
-> from what I've seen of the source the implementation cannot do that.
+Why weren't these functions in .h files
+not always marked with inline?
 
-You simply use the underlying xts for the first n - 2 blocks and
-do the last two by hand.
+Are there other static non-inlined function
+definitions in .h files that should also get
+this inline/__always_inline marking?
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+I presume there are but can't think of a
+reasonable way to find them off the top of
+my head.
+
+> 
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+>  crypto/aegis.h | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/crypto/aegis.h b/crypto/aegis.h
+> index 41a3090cda8e..efed7251c49d 100644
+> --- a/crypto/aegis.h
+> +++ b/crypto/aegis.h
+> @@ -34,21 +34,21 @@ static const union aegis_block crypto_aegis_const[2] = {
+>  	} },
+>  };
+>  
+> -static void crypto_aegis_block_xor(union aegis_block *dst,
+> +static __always_inline void crypto_aegis_block_xor(union aegis_block *dst,
+>  				   const union aegis_block *src)
+>  {
+>  	dst->words64[0] ^= src->words64[0];
+>  	dst->words64[1] ^= src->words64[1];
+>  }
+>  
+> -static void crypto_aegis_block_and(union aegis_block *dst,
+> +static __always_inline void crypto_aegis_block_and(union aegis_block *dst,
+>  				   const union aegis_block *src)
+>  {
+>  	dst->words64[0] &= src->words64[0];
+>  	dst->words64[1] &= src->words64[1];
+>  }
+>  
+> -static void crypto_aegis_aesenc(union aegis_block *dst,
+> +static __always_inline void crypto_aegis_aesenc(union aegis_block *dst,
+>  				const union aegis_block *src,
+>  				const union aegis_block *key)
+>  {
+
