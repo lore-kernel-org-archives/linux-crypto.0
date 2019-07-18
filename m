@@ -2,197 +2,355 @@ Return-Path: <SRS0=4UBR=VP=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB07EC7618F
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jul 2019 14:59:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 974CFC7618F
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jul 2019 15:01:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 88E972080D
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jul 2019 14:59:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="sLTIyOlZ"
+	by mail.kernel.org (Postfix) with ESMTP id 0F7A32173E
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jul 2019 15:01:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727623AbfGRO7m (ORCPT
+        id S1727848AbfGRPB6 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 18 Jul 2019 10:59:42 -0400
-Received: from mail-eopbgr140045.outbound.protection.outlook.com ([40.107.14.45]:18560
-        "EHLO EUR01-VE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726040AbfGRO7l (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 Jul 2019 10:59:41 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DU3ajOw9XKVDILdGE5+T+otORQ/aZdc8lH6SeHsyqVJfQ+ibBn2YeDZy1qf7QjW6c+HiwmYeOhKQ2JB/IQyFxmlPNTBX/dxJCnX2UwsSD0Lq7sSKpcR7MH4TgCFepM5dsdmLry/7wk9YNvJmR4yZu4VhlcInqThK7iFrrlheIlmtR7K1vbhyamDyzNjzJLofX3FrR+NpZMFKvVfsMw5B9R+pDObjJjTGa8I1XLO9ifxFlHirHw0cuwqETh1Jn6v14kITii9nXtNZTTqcu6z620l+GNfDbwKhRsy//UWBSzwunoHit7iVCpefnV7gv53Fd6xAsGOkYpWM4WTLEY2u7Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fOe7vdfm8fCk8XgvIb/oFm57CwzuPAuA6FeT0zxzzQE=;
- b=gdnGIz0t9JxBxI/VaHCjYy/Bw5vN3rJtGiN9SK/rxSz87hPUkxXaQjyciyurMfOw5fuMvNgEP00Lm+wjlz+fpFO4qzaX77uf4XnN8ALHqoJCb6HaeQ/rnmAJZX/5MJ1dMCe08H8zRkL4mxPWfiqbFgwou10pTednHWDQpKbaNZkRIIJaiLRn4SdcTYHtNmzygT38evZatxd0M5PfFLeF2qM0jK/O3iIVKFvPM76DHobTRfrnoaW4lSUs5tK2kWwnjIjB//ddKB+w0dcJK92Ge4RoJhRVfvuvuV0nRRH3N135v/iMH4sGQe74xxWVEQXafYnqwCfolXLCD/uHo3mSnw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
- smtp.mailfrom=nxp.com;dmarc=pass action=none header.from=nxp.com;dkim=pass
- header.d=nxp.com;arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=fOe7vdfm8fCk8XgvIb/oFm57CwzuPAuA6FeT0zxzzQE=;
- b=sLTIyOlZlQmT/F3Rrk0+HXMX7ID0aA84YoviUM6m2IhEtVhXeXOrigt8ZYD3GtTnOXsPXUmlWilKldImusJPks0zZMUOklx+jPjoW/L87HCp2aLXmSh0ccpSQ087EdEz2JvhfvqhiZGFiZhXrA3af2yTfuZr9pMCUHwFcamcEsw=
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
- VI1PR0402MB3648.eurprd04.prod.outlook.com (52.134.14.152) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2073.14; Thu, 18 Jul 2019 14:59:37 +0000
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::7c64:5296:4607:e10]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::7c64:5296:4607:e10%5]) with mapi id 15.20.2073.012; Thu, 18 Jul 2019
- 14:59:37 +0000
-From:   Horia Geanta <horia.geanta@nxp.com>
-To:     Iuliana Prodan <iuliana.prodan@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>
-CC:     "David S. Miller" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        dl-linux-imx <linux-imx@nxp.com>
-Subject: Re: [PATCH 03/14] crypto: caam - update IV only when crypto operation
- succeeds
-Thread-Topic: [PATCH 03/14] crypto: caam - update IV only when crypto
- operation succeeds
-Thread-Index: AQHVPXd3cwGqxppDGUKIXr9oiBjl2g==
-Date:   Thu, 18 Jul 2019 14:59:37 +0000
-Message-ID: <VI1PR0402MB34855E675A58E1221ACE7B9498C80@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-References: <1563461124-24641-1-git-send-email-iuliana.prodan@nxp.com>
- <1563461124-24641-4-git-send-email-iuliana.prodan@nxp.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=horia.geanta@nxp.com; 
-x-originating-ip: [212.146.100.6]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: a7f5eb99-9415-4d65-e077-08d70b908d89
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:VI1PR0402MB3648;
-x-ms-traffictypediagnostic: VI1PR0402MB3648:
-x-microsoft-antispam-prvs: <VI1PR0402MB364837C0D6FABE6A032AE3DB98C80@VI1PR0402MB3648.eurprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:7691;
-x-forefront-prvs: 01026E1310
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(376002)(39860400002)(136003)(346002)(396003)(366004)(199004)(189003)(478600001)(316002)(446003)(52536014)(2906002)(6246003)(6636002)(76176011)(15650500001)(8936002)(33656002)(26005)(8676002)(186003)(102836004)(5660300002)(229853002)(66446008)(66556008)(64756008)(81166006)(256004)(305945005)(81156014)(66066001)(476003)(6506007)(110136005)(53546011)(7696005)(55016002)(74316002)(66946007)(66476007)(76116006)(25786009)(86362001)(68736007)(6436002)(91956017)(9686003)(71190400001)(53936002)(14444005)(4326008)(14454004)(54906003)(44832011)(6116002)(99286004)(486006)(71200400001)(3846002)(7736002);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB3648;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: nxp.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: gEpMCRIrZQIndidZS6FcTiV7plb0qtRzcWgtuW2L6dyaatcqvBs3StpkhU3uwdc/lFPES9U6fXF7G0bdiGlfnXlwg/HXbLuzSjfn2B5geOaBQTG3CV+IOAmEeabI63kf97YvAtf7UQ30kaoBZ3FJ9O38lvqG5PMUWgZexZd2hQO5KyXBLiIZc4WqQQ2YPT4SUPer2nD4oAGlZyzrcf6MzpShlGesQXJ3MqmGxlq0AyyZAJI/ERKG95YXmOLlM1mKGD0Kx98S52CdHuwsj2DozciHebdaEM4ls7rvbxWDOzojRFjnGIxc6FV8LdruVPq4DgnANShg4qhOW9TizXvL7aMUW0PU3/H2EM9KNzF2c1YjAZEoif2xDY40EY7UNt7jdVpp7VzHype1bdqtNnUoFvfYoMyq1EkG0QX7JVE4zBA=
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
+        Thu, 18 Jul 2019 11:01:58 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:52544 "EHLO deadmen.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726040AbfGRPB6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 18 Jul 2019 11:01:58 -0400
+Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
+        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
+        id 1ho7un-0000Ue-E7; Thu, 18 Jul 2019 23:01:49 +0800
+Received: from herbert by gondobar with local (Exim 4.89)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1ho7uk-0006bA-7P; Thu, 18 Jul 2019 23:01:46 +0800
+Date:   Thu, 18 Jul 2019 23:01:46 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Daniel Jordan <daniel.m.jordan@oracle.com>
+Cc:     Steffen Klassert <steffen.klassert@secunet.com>,
+        Andrea Parri <andrea.parri@amarulasolutions.com>,
+        Boqun Feng <boqun.feng@gmail.com>,
+        "Paul E . McKenney" <paulmck@linux.ibm.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        linux-arch@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Mathias Krause <minipli@googlemail.com>
+Subject: [v2 PATCH] padata: Replace delayed timer with immediate workqueue in
+ padata_reorder
+Message-ID: <20190718150146.bztw3uugd5sqhdvk@gondor.apana.org.au>
+References: <c1bbbe94-dbdc-da14-e0c3-850c965d8b5d@oracle.com>
+ <20190716163253.24377-1-daniel.m.jordan@oracle.com>
+ <20190717111147.t776zlyhdqyl5dhc@gondor.apana.org.au>
+ <20190717183227.b3hqphukkndqumhw@ca-dmjordan1.us.oracle.com>
+ <20190718033131.4m4ypbq7tiucqcsl@gondor.apana.org.au>
+ <20190718142730.uhdkwx5onigdpxno@ca-dmjordan1.us.oracle.com>
+ <20190718145634.xagjemdqpoe44xxh@gondor.apana.org.au>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a7f5eb99-9415-4d65-e077-08d70b908d89
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Jul 2019 14:59:37.3724
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: horia.geanta@nxp.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3648
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190718145634.xagjemdqpoe44xxh@gondor.apana.org.au>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 7/18/2019 5:45 PM, Iuliana Prodan wrote:=0A=
-> From: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
-> =0A=
-> skcipher encryption might fail and in some cases, like (invalid) input=0A=
-> length smaller then block size, updating the IV would lead to panic=0A=
-> due to copying from a negative offset (req->cryptlen - ivsize).=0A=
-> =0A=
-The commit message is no longer in sync with the code base.=0A=
-=0A=
-More exactly, after commit=0A=
-334d37c9e263 ("crypto: caam - update IV using HW support")=0A=
-there shouldn't be any panic, only a useless IV copy in case HW issued=0A=
-an error.=0A=
-=0A=
-> Signed-off-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
-> Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>=0A=
-> ---=0A=
->  drivers/crypto/caam/caamalg.c     | 5 ++---=0A=
->  drivers/crypto/caam/caamalg_qi.c  | 4 +++-=0A=
->  drivers/crypto/caam/caamalg_qi2.c | 8 ++++++--=0A=
->  3 files changed, 11 insertions(+), 6 deletions(-)=0A=
-> =0A=
-> diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.=
-c=0A=
-> index 06b4f2d..28d55a0 100644=0A=
-> --- a/drivers/crypto/caam/caamalg.c=0A=
-> +++ b/drivers/crypto/caam/caamalg.c=0A=
-> @@ -990,10 +990,9 @@ static void skcipher_encrypt_done(struct device *jrd=
-ev, u32 *desc, u32 err,=0A=
->  	 * ciphertext block (CBC mode) or last counter (CTR mode).=0A=
->  	 * This is used e.g. by the CTS mode.=0A=
->  	 */=0A=
-> -	if (ivsize) {=0A=
-> +	if (ivsize && !ecode) {=0A=
->  		memcpy(req->iv, (u8 *)edesc->sec4_sg + edesc->sec4_sg_bytes,=0A=
->  		       ivsize);=0A=
-> -=0A=
->  		print_hex_dump_debug("dstiv  @"__stringify(__LINE__)": ",=0A=
->  				     DUMP_PREFIX_ADDRESS, 16, 4, req->iv,=0A=
->  				     edesc->src_nents > 1 ? 100 : ivsize, 1);=0A=
-> @@ -1030,7 +1029,7 @@ static void skcipher_decrypt_done(struct device *jr=
-dev, u32 *desc, u32 err,=0A=
->  	 * ciphertext block (CBC mode) or last counter (CTR mode).=0A=
->  	 * This is used e.g. by the CTS mode.=0A=
->  	 */=0A=
-> -	if (ivsize) {=0A=
-> +	if (ivsize && !ecode) {=0A=
->  		memcpy(req->iv, (u8 *)edesc->sec4_sg + edesc->sec4_sg_bytes,=0A=
->  		       ivsize);=0A=
->  =0A=
-> diff --git a/drivers/crypto/caam/caamalg_qi.c b/drivers/crypto/caam/caama=
-lg_qi.c=0A=
-> index ab263b1..66531d6 100644=0A=
-> --- a/drivers/crypto/caam/caamalg_qi.c=0A=
-> +++ b/drivers/crypto/caam/caamalg_qi.c=0A=
-> @@ -1201,7 +1201,9 @@ static void skcipher_done(struct caam_drv_req *drv_=
-req, u32 status)=0A=
->  	 * ciphertext block (CBC mode) or last counter (CTR mode).=0A=
->  	 * This is used e.g. by the CTS mode.=0A=
->  	 */=0A=
-> -	memcpy(req->iv, (u8 *)&edesc->sgt[0] + edesc->qm_sg_bytes, ivsize);=0A=
-> +	if (!ecode)=0A=
-> +		memcpy(req->iv, (u8 *)&edesc->sgt[0] + edesc->qm_sg_bytes,=0A=
-> +		       ivsize);=0A=
->  =0A=
->  	qi_cache_free(edesc);=0A=
->  	skcipher_request_complete(req, ecode);=0A=
-> diff --git a/drivers/crypto/caam/caamalg_qi2.c b/drivers/crypto/caam/caam=
-alg_qi2.c=0A=
-> index 2681581..bc370af 100644=0A=
-> --- a/drivers/crypto/caam/caamalg_qi2.c=0A=
-> +++ b/drivers/crypto/caam/caamalg_qi2.c=0A=
-> @@ -1358,7 +1358,9 @@ static void skcipher_encrypt_done(void *cbk_ctx, u3=
-2 status)=0A=
->  	 * ciphertext block (CBC mode) or last counter (CTR mode).=0A=
->  	 * This is used e.g. by the CTS mode.=0A=
->  	 */=0A=
-> -	memcpy(req->iv, (u8 *)&edesc->sgt[0] + edesc->qm_sg_bytes, ivsize);=0A=
-> +	if (!ecode)=0A=
-> +		memcpy(req->iv, (u8 *)&edesc->sgt[0] + edesc->qm_sg_bytes,=0A=
-> +		       ivsize);=0A=
->  =0A=
->  	qi_cache_free(edesc);=0A=
->  	skcipher_request_complete(req, ecode);=0A=
-> @@ -1394,7 +1396,9 @@ static void skcipher_decrypt_done(void *cbk_ctx, u3=
-2 status)=0A=
->  	 * ciphertext block (CBC mode) or last counter (CTR mode).=0A=
->  	 * This is used e.g. by the CTS mode.=0A=
->  	 */=0A=
-> -	memcpy(req->iv, (u8 *)&edesc->sgt[0] + edesc->qm_sg_bytes, ivsize);=0A=
-> +	if (!ecode)=0A=
-> +		memcpy(req->iv, (u8 *)&edesc->sgt[0] + edesc->qm_sg_bytes,=0A=
-> +		       ivsize);=0A=
->  =0A=
->  	qi_cache_free(edesc);=0A=
->  	skcipher_request_complete(req, ecode);=0A=
-> =0A=
+The function padata_reorder will use a timer when it cannot progress
+while completed jobs are outstanding (pd->reorder_objects > 0).  This
+is suboptimal as if we do end up using the timer then it would have
+introduced a gratuitous delay of one second.
+
+In fact we can easily distinguish between whether completed jobs
+are outstanding and whether we can make progress.  All we have to
+do is look at the next pqueue list.
+
+This patch does that by replacing pd->processed with pd->cpu so
+that the next pqueue is more accessible.
+
+A work queue is used instead of the original try_again to avoid
+hogging the CPU.
+
+Note that we don't bother removing the work queue in
+padata_flush_queues because the whole premise is broken.  You
+cannot flush async crypto requests so it makes no sense to even
+try.  A subsequent patch will fix it by replacing it with a ref
+counting scheme.
+
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/include/linux/padata.h b/include/linux/padata.h
+index 5d13d25da2c8..d803397a28f7 100644
+--- a/include/linux/padata.h
++++ b/include/linux/padata.h
+@@ -24,7 +24,6 @@
+ #include <linux/workqueue.h>
+ #include <linux/spinlock.h>
+ #include <linux/list.h>
+-#include <linux/timer.h>
+ #include <linux/notifier.h>
+ #include <linux/kobject.h>
+ 
+@@ -85,18 +84,14 @@ struct padata_serial_queue {
+  * @serial: List to wait for serialization after reordering.
+  * @pwork: work struct for parallelization.
+  * @swork: work struct for serialization.
+- * @pd: Backpointer to the internal control structure.
+  * @work: work struct for parallelization.
+- * @reorder_work: work struct for reordering.
+  * @num_obj: Number of objects that are processed by this cpu.
+  * @cpu_index: Index of the cpu.
+  */
+ struct padata_parallel_queue {
+        struct padata_list    parallel;
+        struct padata_list    reorder;
+-       struct parallel_data *pd;
+        struct work_struct    work;
+-       struct work_struct    reorder_work;
+        atomic_t              num_obj;
+        int                   cpu_index;
+ };
+@@ -122,10 +117,10 @@ struct padata_cpumask {
+  * @reorder_objects: Number of objects waiting in the reorder queues.
+  * @refcnt: Number of objects holding a reference on this parallel_data.
+  * @max_seq_nr:  Maximal used sequence number.
++ * @cpu: Next CPU to be processed.
+  * @cpumask: The cpumasks in use for parallel and serial workers.
++ * @reorder_work: work struct for reordering.
+  * @lock: Reorder lock.
+- * @processed: Number of already processed objects.
+- * @timer: Reorder timer.
+  */
+ struct parallel_data {
+ 	struct padata_instance		*pinst;
+@@ -134,10 +129,10 @@ struct parallel_data {
+ 	atomic_t			reorder_objects;
+ 	atomic_t			refcnt;
+ 	atomic_t			seq_nr;
++	int				cpu;
+ 	struct padata_cpumask		cpumask;
++	struct work_struct		reorder_work;
+ 	spinlock_t                      lock ____cacheline_aligned;
+-	unsigned int			processed;
+-	struct timer_list		timer;
+ };
+ 
+ /**
+diff --git a/kernel/padata.c b/kernel/padata.c
+index 15a8ad63f4ff..fbafca18597f 100644
+--- a/kernel/padata.c
++++ b/kernel/padata.c
+@@ -165,23 +165,12 @@ EXPORT_SYMBOL(padata_do_parallel);
+  */
+ static struct padata_priv *padata_get_next(struct parallel_data *pd)
+ {
+-	int cpu, num_cpus;
+-	unsigned int next_nr, next_index;
+ 	struct padata_parallel_queue *next_queue;
+ 	struct padata_priv *padata;
+ 	struct padata_list *reorder;
++	int cpu = pd->cpu;
+ 
+-	num_cpus = cpumask_weight(pd->cpumask.pcpu);
+-
+-	/*
+-	 * Calculate the percpu reorder queue and the sequence
+-	 * number of the next object.
+-	 */
+-	next_nr = pd->processed;
+-	next_index = next_nr % num_cpus;
+-	cpu = padata_index_to_cpu(pd, next_index);
+ 	next_queue = per_cpu_ptr(pd->pqueue, cpu);
+-
+ 	reorder = &next_queue->reorder;
+ 
+ 	spin_lock(&reorder->lock);
+@@ -192,7 +181,8 @@ static struct padata_priv *padata_get_next(struct parallel_data *pd)
+ 		list_del_init(&padata->list);
+ 		atomic_dec(&pd->reorder_objects);
+ 
+-		pd->processed++;
++		pd->cpu = cpumask_next_wrap(cpu, pd->cpumask.pcpu, -1,
++					    false);
+ 
+ 		spin_unlock(&reorder->lock);
+ 		goto out;
+@@ -215,6 +205,7 @@ static void padata_reorder(struct parallel_data *pd)
+ 	struct padata_priv *padata;
+ 	struct padata_serial_queue *squeue;
+ 	struct padata_instance *pinst = pd->pinst;
++	struct padata_parallel_queue *next_queue;
+ 
+ 	/*
+ 	 * We need to ensure that only one cpu can work on dequeueing of
+@@ -246,7 +237,6 @@ static void padata_reorder(struct parallel_data *pd)
+ 		 * so exit immediately.
+ 		 */
+ 		if (PTR_ERR(padata) == -ENODATA) {
+-			del_timer(&pd->timer);
+ 			spin_unlock_bh(&pd->lock);
+ 			return;
+ 		}
+@@ -265,70 +255,29 @@ static void padata_reorder(struct parallel_data *pd)
+ 
+ 	/*
+ 	 * The next object that needs serialization might have arrived to
+-	 * the reorder queues in the meantime, we will be called again
+-	 * from the timer function if no one else cares for it.
++	 * the reorder queues in the meantime.
+ 	 *
+-	 * Ensure reorder_objects is read after pd->lock is dropped so we see
+-	 * an increment from another task in padata_do_serial.  Pairs with
++	 * Ensure reorder queue is read after pd->lock is dropped so we see
++	 * new objects from another task in padata_do_serial.  Pairs with
+ 	 * smp_mb__after_atomic in padata_do_serial.
+ 	 */
+ 	smp_mb();
+-	if (atomic_read(&pd->reorder_objects)
+-			&& !(pinst->flags & PADATA_RESET))
+-		mod_timer(&pd->timer, jiffies + HZ);
+-	else
+-		del_timer(&pd->timer);
+ 
+-	return;
++	next_queue = per_cpu_ptr(pd->pqueue, pd->cpu);
++	if (!list_empty(&next_queue->reorder.list))
++		queue_work(pinst->wq, &pd->reorder_work);
+ }
+ 
+ static void invoke_padata_reorder(struct work_struct *work)
+ {
+-	struct padata_parallel_queue *pqueue;
+ 	struct parallel_data *pd;
+ 
+ 	local_bh_disable();
+-	pqueue = container_of(work, struct padata_parallel_queue, reorder_work);
+-	pd = pqueue->pd;
++	pd = container_of(work, struct parallel_data, reorder_work);
+ 	padata_reorder(pd);
+ 	local_bh_enable();
+ }
+ 
+-static void padata_reorder_timer(struct timer_list *t)
+-{
+-	struct parallel_data *pd = from_timer(pd, t, timer);
+-	unsigned int weight;
+-	int target_cpu, cpu;
+-
+-	cpu = get_cpu();
+-
+-	/* We don't lock pd here to not interfere with parallel processing
+-	 * padata_reorder() calls on other CPUs. We just need any CPU out of
+-	 * the cpumask.pcpu set. It would be nice if it's the right one but
+-	 * it doesn't matter if we're off to the next one by using an outdated
+-	 * pd->processed value.
+-	 */
+-	weight = cpumask_weight(pd->cpumask.pcpu);
+-	target_cpu = padata_index_to_cpu(pd, pd->processed % weight);
+-
+-	/* ensure to call the reorder callback on the correct CPU */
+-	if (cpu != target_cpu) {
+-		struct padata_parallel_queue *pqueue;
+-		struct padata_instance *pinst;
+-
+-		/* The timer function is serialized wrt itself -- no locking
+-		 * needed.
+-		 */
+-		pinst = pd->pinst;
+-		pqueue = per_cpu_ptr(pd->pqueue, target_cpu);
+-		queue_work_on(target_cpu, pinst->wq, &pqueue->reorder_work);
+-	} else {
+-		padata_reorder(pd);
+-	}
+-
+-	put_cpu();
+-}
+-
+ static void padata_serial_worker(struct work_struct *serial_work)
+ {
+ 	struct padata_serial_queue *squeue;
+@@ -376,9 +325,8 @@ void padata_do_serial(struct padata_priv *padata)
+ 
+ 	cpu = get_cpu();
+ 
+-	/* We need to run on the same CPU padata_do_parallel(.., padata, ..)
+-	 * was called on -- or, at least, enqueue the padata object into the
+-	 * correct per-cpu queue.
++	/* We need to enqueue the padata object into the correct
++	 * per-cpu queue.
+ 	 */
+ 	if (cpu != padata->cpu) {
+ 		reorder_via_wq = 1;
+@@ -388,12 +336,12 @@ void padata_do_serial(struct padata_priv *padata)
+ 	pqueue = per_cpu_ptr(pd->pqueue, cpu);
+ 
+ 	spin_lock(&pqueue->reorder.lock);
+-	atomic_inc(&pd->reorder_objects);
+ 	list_add_tail(&padata->list, &pqueue->reorder.list);
++	atomic_inc(&pd->reorder_objects);
+ 	spin_unlock(&pqueue->reorder.lock);
+ 
+ 	/*
+-	 * Ensure the atomic_inc of reorder_objects above is ordered correctly
++	 * Ensure the addition to the reorder list is ordered correctly
+ 	 * with the trylock of pd->lock in padata_reorder.  Pairs with smp_mb
+ 	 * in padata_reorder.
+ 	 */
+@@ -401,13 +349,7 @@ void padata_do_serial(struct padata_priv *padata)
+ 
+ 	put_cpu();
+ 
+-	/* If we're running on the wrong CPU, call padata_reorder() via a
+-	 * kernel worker.
+-	 */
+-	if (reorder_via_wq)
+-		queue_work_on(cpu, pd->pinst->wq, &pqueue->reorder_work);
+-	else
+-		padata_reorder(pd);
++	padata_reorder(pd);
+ }
+ EXPORT_SYMBOL(padata_do_serial);
+ 
+@@ -463,14 +405,12 @@ static void padata_init_pqueues(struct parallel_data *pd)
+ 			continue;
+ 		}
+ 
+-		pqueue->pd = pd;
+ 		pqueue->cpu_index = cpu_index;
+ 		cpu_index++;
+ 
+ 		__padata_list_init(&pqueue->reorder);
+ 		__padata_list_init(&pqueue->parallel);
+ 		INIT_WORK(&pqueue->work, padata_parallel_worker);
+-		INIT_WORK(&pqueue->reorder_work, invoke_padata_reorder);
+ 		atomic_set(&pqueue->num_obj, 0);
+ 	}
+ }
+@@ -498,12 +438,13 @@ static struct parallel_data *padata_alloc_pd(struct padata_instance *pinst,
+ 
+ 	padata_init_pqueues(pd);
+ 	padata_init_squeues(pd);
+-	timer_setup(&pd->timer, padata_reorder_timer, 0);
+ 	atomic_set(&pd->seq_nr, -1);
+ 	atomic_set(&pd->reorder_objects, 0);
+ 	atomic_set(&pd->refcnt, 0);
+ 	pd->pinst = pinst;
+ 	spin_lock_init(&pd->lock);
++	pd->cpu = cpumask_first(pcpumask);
++	INIT_WORK(&pd->reorder_work, invoke_padata_reorder);
+ 
+ 	return pd;
+ 
+@@ -538,8 +479,6 @@ static void padata_flush_queues(struct parallel_data *pd)
+ 		flush_work(&pqueue->work);
+ 	}
+ 
+-	del_timer_sync(&pd->timer);
+-
+ 	if (atomic_read(&pd->reorder_objects))
+ 		padata_reorder(pd);
+ 
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
