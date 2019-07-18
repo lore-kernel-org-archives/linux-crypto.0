@@ -2,32 +2,32 @@ Return-Path: <SRS0=4UBR=VP=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37CD9C76195
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9CDBC76196
 	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jul 2019 23:58:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 12DA120851
+	by mail.kernel.org (Postfix) with ESMTP id BDB0920851
 	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jul 2019 23:58:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726405AbfGRX6S (ORCPT
+        id S1726391AbfGRX6S (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Thu, 18 Jul 2019 19:58:18 -0400
-Received: from inva021.nxp.com ([92.121.34.21]:53200 "EHLO inva021.nxp.com"
+Received: from inva020.nxp.com ([92.121.34.13]:54474 "EHLO inva020.nxp.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726317AbfGRX6S (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 18 Jul 2019 19:58:18 -0400
-Received: from inva021.nxp.com (localhost [127.0.0.1])
-        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 7F8762003A4;
-        Fri, 19 Jul 2019 01:58:16 +0200 (CEST)
+        id S1726131AbfGRX6R (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 18 Jul 2019 19:58:17 -0400
+Received: from inva020.nxp.com (localhost [127.0.0.1])
+        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 420721A0244;
+        Fri, 19 Jul 2019 01:58:12 +0200 (CEST)
 Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
-        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 70A5D200003;
-        Fri, 19 Jul 2019 01:58:16 +0200 (CEST)
+        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 34D141A0135;
+        Fri, 19 Jul 2019 01:58:12 +0200 (CEST)
 Received: from lorenz.ea.freescale.net (lorenz.ea.freescale.net [10.171.71.5])
-        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 1E4B6205D1;
-        Fri, 19 Jul 2019 01:58:16 +0200 (CEST)
+        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id CBF10205D1;
+        Fri, 19 Jul 2019 01:58:11 +0200 (CEST)
 From:   Iuliana Prodan <iuliana.prodan@nxp.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         Horia Geanta <horia.geanta@nxp.com>,
@@ -35,43 +35,83 @@ To:     Herbert Xu <herbert@gondor.apana.org.au>,
 Cc:     "David S. Miller" <davem@davemloft.net>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-imx <linux-imx@nxp.com>
-Subject: [PATCH v2 11/14] crypto: caam - free resources in case caam_rng registration failed
-Date:   Fri, 19 Jul 2019 02:57:53 +0300
-Message-Id: <1563494276-3993-12-git-send-email-iuliana.prodan@nxp.com>
+Subject: [PATCH v2 00/14] crypto: caam - fixes for kernel v5.3
+Date:   Fri, 19 Jul 2019 02:57:42 +0300
+Message-Id: <1563494276-3993-1-git-send-email-iuliana.prodan@nxp.com>
 X-Mailer: git-send-email 2.1.0
-In-Reply-To: <1563494276-3993-1-git-send-email-iuliana.prodan@nxp.com>
-References: <1563494276-3993-1-git-send-email-iuliana.prodan@nxp.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Check the return value of the hardware registration for caam_rng and free
-resources in case of failure.
+The series solves:
+- the failures found with fuzz testing;
+- resources clean-up on caampkc/caamrng exit path.
 
-Fixes: 6e4e603a9 ("crypto: caam - Dynamic memory allocation for caam_rng_ctx object")
-Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>
+The first 10 patches solve the issues found with
+CONFIG_CRYPTO_MANAGER_EXTRA_TESTS enabled.
+They modify the drivers to provide a valid error (and not the hardware
+error ID) to the user, via completion callbacks.
+They check key length, assoclen, authsize and input size to solve the
+fuzz tests that expect -EINVAL to be returned when these values are
+not valid.
+
+The next 4 patches check the algorithm registration for caampkc
+module and unregister it only if the registration was successful.
+Also, on caampkc/caamrng, the exit point function is executed only if the
+registration was successful to avoid double freeing of resources in case
+the initialization function failed.
+
 ---
- drivers/crypto/caam/caamrng.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+Changes since V1:
+	- update commit description for ("crypto: caam - update IV only when crypto operation succeeds").
+---
 
-diff --git a/drivers/crypto/caam/caamrng.c b/drivers/crypto/caam/caamrng.c
-index 561bcb5..54c32d5 100644
---- a/drivers/crypto/caam/caamrng.c
-+++ b/drivers/crypto/caam/caamrng.c
-@@ -333,7 +333,10 @@ int caam_rng_init(struct device *ctrldev)
- 		goto free_rng_ctx;
- 
- 	dev_info(dev, "registering rng-caam\n");
--	return hwrng_register(&caam_rng);
-+
-+	err = hwrng_register(&caam_rng);
-+	if (!err)
-+		return err;
- 
- free_rng_ctx:
- 	kfree(rng_ctx);
+Horia Geantă (5):
+  crypto: caam/qi - fix error handling in ERN handler
+  crypto: caam - fix return code in completion callbacks
+  crypto: caam - update IV only when crypto operation succeeds
+  crypto: caam - keep both virtual and dma key addresses
+  crypto: caam - fix DKP for certain key lengths
+
+Iuliana Prodan (9):
+  crypto: caam - check key length
+  crypto: caam - check authsize
+  crypto: caam - check assoclen
+  crypto: caam - check zero-length input
+  crypto: caam - update rfc4106 sh desc to support zero length input
+  crypto: caam - free resources in case caam_rng registration failed
+  crypto: caam - execute module exit point only if necessary
+  crypto: caam - unregister algorithm only if the registration succeeded
+  crypto: caam - change return value in case CAAM has no MDHA
+
+ drivers/crypto/caam/Makefile        |   2 +-
+ drivers/crypto/caam/caamalg.c       | 226 ++++++++++++++++----------
+ drivers/crypto/caam/caamalg_desc.c  |  46 ++++--
+ drivers/crypto/caam/caamalg_desc.h  |   2 +-
+ drivers/crypto/caam/caamalg_qi.c    | 222 +++++++++++++++----------
+ drivers/crypto/caam/caamalg_qi2.c   | 316 ++++++++++++++++++++++++------------
+ drivers/crypto/caam/caamhash.c      | 113 ++++++++-----
+ drivers/crypto/caam/caamhash_desc.c |   5 +-
+ drivers/crypto/caam/caamhash_desc.h |   2 +-
+ drivers/crypto/caam/caampkc.c       |  80 ++++++---
+ drivers/crypto/caam/caamrng.c       |  17 +-
+ drivers/crypto/caam/common_if.c     |  88 ++++++++++
+ drivers/crypto/caam/common_if.h     |  19 +++
+ drivers/crypto/caam/desc_constr.h   |  34 ++--
+ drivers/crypto/caam/error.c         |  61 ++++---
+ drivers/crypto/caam/error.h         |   2 +-
+ drivers/crypto/caam/key_gen.c       |   5 +-
+ drivers/crypto/caam/qi.c            |  10 +-
+ drivers/crypto/caam/regs.h          |   1 +
+ 19 files changed, 851 insertions(+), 400 deletions(-)
+ create mode 100644 drivers/crypto/caam/common_if.c
+ create mode 100644 drivers/crypto/caam/common_if.h
+
 -- 
 2.1.0
 
