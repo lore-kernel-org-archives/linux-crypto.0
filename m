@@ -6,28 +6,28 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F36F9C76196
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jul 2019 23:58:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8767AC7618F
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jul 2019 23:58:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D665320851
-	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jul 2019 23:58:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6B0FD20851
+	for <linux-crypto@archiver.kernel.org>; Thu, 18 Jul 2019 23:58:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726379AbfGRX6o (ORCPT
+        id S1726418AbfGRX6T (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 18 Jul 2019 19:58:44 -0400
-Received: from inva021.nxp.com ([92.121.34.21]:53216 "EHLO inva021.nxp.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726357AbfGRX6T (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Thu, 18 Jul 2019 19:58:19 -0400
-Received: from inva021.nxp.com (localhost [127.0.0.1])
-        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id DE8332003BF;
-        Fri, 19 Jul 2019 01:58:16 +0200 (CEST)
+Received: from inva020.nxp.com ([92.121.34.13]:54520 "EHLO inva020.nxp.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726186AbfGRX6R (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 18 Jul 2019 19:58:17 -0400
+Received: from inva020.nxp.com (localhost [127.0.0.1])
+        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 341DA1A0362;
+        Fri, 19 Jul 2019 01:58:14 +0200 (CEST)
 Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
-        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id D210A200003;
-        Fri, 19 Jul 2019 01:58:16 +0200 (CEST)
+        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 27C221A010D;
+        Fri, 19 Jul 2019 01:58:14 +0200 (CEST)
 Received: from lorenz.ea.freescale.net (lorenz.ea.freescale.net [10.171.71.5])
-        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 7F54B205D1;
-        Fri, 19 Jul 2019 01:58:16 +0200 (CEST)
+        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id D16FB205D1;
+        Fri, 19 Jul 2019 01:58:13 +0200 (CEST)
 From:   Iuliana Prodan <iuliana.prodan@nxp.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         Horia Geanta <horia.geanta@nxp.com>,
@@ -35,9 +35,9 @@ To:     Herbert Xu <herbert@gondor.apana.org.au>,
 Cc:     "David S. Miller" <davem@davemloft.net>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-imx <linux-imx@nxp.com>
-Subject: [PATCH v2 12/14] crypto: caam - execute module exit point only if necessary
-Date:   Fri, 19 Jul 2019 02:57:54 +0300
-Message-Id: <1563494276-3993-13-git-send-email-iuliana.prodan@nxp.com>
+Subject: [PATCH v2 05/14] crypto: caam - check authsize
+Date:   Fri, 19 Jul 2019 02:57:47 +0300
+Message-Id: <1563494276-3993-6-git-send-email-iuliana.prodan@nxp.com>
 X-Mailer: git-send-email 2.1.0
 In-Reply-To: <1563494276-3993-1-git-send-email-iuliana.prodan@nxp.com>
 References: <1563494276-3993-1-git-send-email-iuliana.prodan@nxp.com>
@@ -47,120 +47,214 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Commit 1b46c90c8e00 ("crypto: caam - convert top level drivers to libraries")
-changed entry and exit points behavior for caamalg,
-caamalg_qi, caamalg_qi2, caamhash, caampkc, caamrng.
+Check authsize to solve the extra tests that expect -EINVAL to be
+returned when the authentication tag size is not valid.
 
-For example, previously caam_pkc_init() and caam_pkc_exit() were
-module entry/exit points. This means that if an error would happen
-in caam_pkc_init(), then caam_pkc_exit() wouldn't have been called.
-After the mentioned commit, caam_pkc_init() and caam_pkc_exit()
-are manually called - from jr.c. caam_pkc_exit() is called
-unconditionally, even if caam_pkc_init() failed.
+Validated authsize for GCM, RFC4106 and RFC4543.
 
-Added a global variable to keep the status of the algorithm
-registration and free of resources.
-The exit point of caampkc/caamrng module is executed only if the
-registration was successful. Therefore we avoid double free of
-resources in case the algorithm registration failed.
-
-Fixes: 1b46c90c8e00 ("crypto: caam - convert top level drivers to libraries")
 Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>
 ---
- drivers/crypto/caam/caampkc.c | 11 +++++++++++
- drivers/crypto/caam/caamrng.c | 14 +++++++++++++-
- 2 files changed, 24 insertions(+), 1 deletion(-)
+ drivers/crypto/caam/caamalg.c     | 13 +++++++++++++
+ drivers/crypto/caam/caamalg_qi.c  | 14 ++++++++++++++
+ drivers/crypto/caam/caamalg_qi2.c | 14 ++++++++++++++
+ drivers/crypto/caam/common_if.c   | 40 +++++++++++++++++++++++++++++++++++++++
+ drivers/crypto/caam/common_if.h   |  4 ++++
+ 5 files changed, 85 insertions(+)
 
-diff --git a/drivers/crypto/caam/caampkc.c b/drivers/crypto/caam/caampkc.c
-index 574428c7..cfdf7a2 100644
---- a/drivers/crypto/caam/caampkc.c
-+++ b/drivers/crypto/caam/caampkc.c
-@@ -29,6 +29,12 @@
- /* buffer filled with zeros, used for padding */
- static u8 *zero_buffer;
- 
-+/*
-+ * variable used to avoid double free of resources in case
-+ * algorithm registration was unsuccessful
-+ */
-+static bool init_done;
-+
- static void rsa_io_unmap(struct device *dev, struct rsa_edesc *edesc,
- 			 struct akcipher_request *req)
+diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
+index 6ac59b1..6682e67 100644
+--- a/drivers/crypto/caam/caamalg.c
++++ b/drivers/crypto/caam/caamalg.c
+@@ -377,6 +377,11 @@ static int gcm_set_sh_desc(struct crypto_aead *aead)
+ static int gcm_setauthsize(struct crypto_aead *authenc, unsigned int authsize)
  {
-@@ -1081,6 +1087,7 @@ int caam_pkc_init(struct device *ctrldev)
- 	struct caam_drv_private *priv = dev_get_drvdata(ctrldev);
- 	u32 pk_inst;
- 	int err;
-+	init_done = false;
- 
- 	/* Determine public key hardware accelerator presence. */
- 	if (priv->era < 10)
-@@ -1105,6 +1112,7 @@ int caam_pkc_init(struct device *ctrldev)
- 		dev_warn(ctrldev, "%s alg registration failed\n",
- 			 caam_rsa.base.cra_driver_name);
- 	} else {
-+		init_done = true;
- 		dev_info(ctrldev, "caam pkc algorithms registered in /proc/crypto\n");
- 	}
- 
-@@ -1113,6 +1121,9 @@ int caam_pkc_init(struct device *ctrldev)
- 
- void caam_pkc_exit(void)
- {
-+	if (!init_done)
-+		return;
+ 	struct caam_ctx *ctx = crypto_aead_ctx(authenc);
++	int err;
 +
- 	kfree(zero_buffer);
- 	crypto_unregister_akcipher(&caam_rsa);
++	err = check_gcm_authsize(authsize);
++	if (err)
++		return err;
+ 
+ 	ctx->authsize = authsize;
+ 	gcm_set_sh_desc(authenc);
+@@ -440,6 +445,11 @@ static int rfc4106_setauthsize(struct crypto_aead *authenc,
+ 			       unsigned int authsize)
+ {
+ 	struct caam_ctx *ctx = crypto_aead_ctx(authenc);
++	int err;
++
++	err = check_rfc4106_authsize(authsize);
++	if (err)
++		return err;
+ 
+ 	ctx->authsize = authsize;
+ 	rfc4106_set_sh_desc(authenc);
+@@ -504,6 +514,9 @@ static int rfc4543_setauthsize(struct crypto_aead *authenc,
+ {
+ 	struct caam_ctx *ctx = crypto_aead_ctx(authenc);
+ 
++	if (authsize != 16)
++		return -EINVAL;
++
+ 	ctx->authsize = authsize;
+ 	rfc4543_set_sh_desc(authenc);
+ 
+diff --git a/drivers/crypto/caam/caamalg_qi.c b/drivers/crypto/caam/caamalg_qi.c
+index 46097e3..5f9b14a 100644
+--- a/drivers/crypto/caam/caamalg_qi.c
++++ b/drivers/crypto/caam/caamalg_qi.c
+@@ -18,6 +18,7 @@
+ #include "qi.h"
+ #include "jr.h"
+ #include "caamalg_desc.h"
++#include "common_if.h"
+ 
+ /*
+  * crypto alg
+@@ -371,6 +372,11 @@ static int gcm_set_sh_desc(struct crypto_aead *aead)
+ static int gcm_setauthsize(struct crypto_aead *authenc, unsigned int authsize)
+ {
+ 	struct caam_ctx *ctx = crypto_aead_ctx(authenc);
++	int err;
++
++	err = check_gcm_authsize(authsize);
++	if (err)
++		return err;
+ 
+ 	ctx->authsize = authsize;
+ 	gcm_set_sh_desc(authenc);
+@@ -472,6 +478,11 @@ static int rfc4106_setauthsize(struct crypto_aead *authenc,
+ 			       unsigned int authsize)
+ {
+ 	struct caam_ctx *ctx = crypto_aead_ctx(authenc);
++	int err;
++
++	err = check_rfc4106_authsize(authsize);
++	if (err)
++		return err;
+ 
+ 	ctx->authsize = authsize;
+ 	rfc4106_set_sh_desc(authenc);
+@@ -581,6 +592,9 @@ static int rfc4543_setauthsize(struct crypto_aead *authenc,
+ {
+ 	struct caam_ctx *ctx = crypto_aead_ctx(authenc);
+ 
++	if (authsize != 16)
++		return -EINVAL;
++
+ 	ctx->authsize = authsize;
+ 	rfc4543_set_sh_desc(authenc);
+ 
+diff --git a/drivers/crypto/caam/caamalg_qi2.c b/drivers/crypto/caam/caamalg_qi2.c
+index da4abf1..0b4de21 100644
+--- a/drivers/crypto/caam/caamalg_qi2.c
++++ b/drivers/crypto/caam/caamalg_qi2.c
+@@ -10,6 +10,7 @@
+ #include "dpseci_cmd.h"
+ #include "desc_constr.h"
+ #include "error.h"
++#include "common_if.h"
+ #include "sg_sw_sec4.h"
+ #include "sg_sw_qm2.h"
+ #include "key_gen.h"
+@@ -719,6 +720,11 @@ static int gcm_set_sh_desc(struct crypto_aead *aead)
+ static int gcm_setauthsize(struct crypto_aead *authenc, unsigned int authsize)
+ {
+ 	struct caam_ctx *ctx = crypto_aead_ctx(authenc);
++	int err;
++
++	err = check_gcm_authsize(authsize);
++	if (err)
++		return err;
+ 
+ 	ctx->authsize = authsize;
+ 	gcm_set_sh_desc(authenc);
+@@ -811,6 +817,11 @@ static int rfc4106_setauthsize(struct crypto_aead *authenc,
+ 			       unsigned int authsize)
+ {
+ 	struct caam_ctx *ctx = crypto_aead_ctx(authenc);
++	int err;
++
++	err = check_rfc4106_authsize(authsize);
++	if (err)
++		return err;
+ 
+ 	ctx->authsize = authsize;
+ 	rfc4106_set_sh_desc(authenc);
+@@ -913,6 +924,9 @@ static int rfc4543_setauthsize(struct crypto_aead *authenc,
+ {
+ 	struct caam_ctx *ctx = crypto_aead_ctx(authenc);
+ 
++	if (authsize != 16)
++		return -EINVAL;
++
+ 	ctx->authsize = authsize;
+ 	rfc4543_set_sh_desc(authenc);
+ 
+diff --git a/drivers/crypto/caam/common_if.c b/drivers/crypto/caam/common_if.c
+index 859d4b4..fcf47e6 100644
+--- a/drivers/crypto/caam/common_if.c
++++ b/drivers/crypto/caam/common_if.c
+@@ -26,6 +26,46 @@ int check_aes_keylen(unsigned int keylen)
  }
-diff --git a/drivers/crypto/caam/caamrng.c b/drivers/crypto/caam/caamrng.c
-index 54c32d5..7fbda1b 100644
---- a/drivers/crypto/caam/caamrng.c
-+++ b/drivers/crypto/caam/caamrng.c
-@@ -80,6 +80,12 @@ struct caam_rng_ctx {
- 
- static struct caam_rng_ctx *rng_ctx;
+ EXPORT_SYMBOL(check_aes_keylen);
  
 +/*
-+ * Variable used to avoid double free of resources in case
-+ * algorithm registration was unsuccessful
++ * validate authentication tag for GCM
 + */
-+static bool init_done;
-+
- static inline void rng_unmap_buf(struct device *jrdev, struct buf_data *bd)
- {
- 	if (bd->addr)
-@@ -296,6 +302,9 @@ static struct hwrng caam_rng = {
- 
- void caam_rng_exit(void)
- {
-+	if (!init_done)
-+		return;
-+
- 	caam_jr_free(rng_ctx->jrdev);
- 	hwrng_unregister(&caam_rng);
- 	kfree(rng_ctx);
-@@ -307,6 +316,7 @@ int caam_rng_init(struct device *ctrldev)
- 	u32 rng_inst;
- 	struct caam_drv_private *priv = dev_get_drvdata(ctrldev);
- 	int err;
-+	init_done = false;
- 
- 	/* Check for an instantiated RNG before registration */
- 	if (priv->era < 10)
-@@ -335,8 +345,10 @@ int caam_rng_init(struct device *ctrldev)
- 	dev_info(dev, "registering rng-caam\n");
- 
- 	err = hwrng_register(&caam_rng);
--	if (!err)
-+	if (!err) {
-+		init_done = true;
- 		return err;
++int check_gcm_authsize(unsigned int authsize)
++{
++	switch (authsize) {
++	case 4:
++	case 8:
++	case 12:
++	case 13:
++	case 14:
++	case 15:
++	case 16:
++		break;
++	default:
++		return -EINVAL;
 +	}
++
++	return 0;
++}
++EXPORT_SYMBOL(check_gcm_authsize);
++
++/*
++ * validate authentication tag for RFC4106
++ */
++int check_rfc4106_authsize(unsigned int authsize)
++{
++	switch (authsize) {
++	case 8:
++	case 12:
++	case 16:
++		break;
++	default:
++		return -EINVAL;
++	}
++
++	return 0;
++}
++EXPORT_SYMBOL(check_rfc4106_authsize);
++
+ MODULE_LICENSE("GPL");
+ MODULE_DESCRIPTION("FSL CAAM drivers common location");
+ MODULE_AUTHOR("NXP Semiconductors");
+diff --git a/drivers/crypto/caam/common_if.h b/drivers/crypto/caam/common_if.h
+index 6964ba3..b17386a 100644
+--- a/drivers/crypto/caam/common_if.h
++++ b/drivers/crypto/caam/common_if.h
+@@ -10,4 +10,8 @@
  
- free_rng_ctx:
- 	kfree(rng_ctx);
+ int check_aes_keylen(unsigned int keylen);
+ 
++int check_gcm_authsize(unsigned int authsize);
++
++int check_rfc4106_authsize(unsigned int authsize);
++
+ #endif /* CAAM_COMMON_LOCATION_H */
 -- 
 2.1.0
 
