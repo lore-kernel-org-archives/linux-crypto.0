@@ -1,94 +1,112 @@
 Return-Path: <SRS0=r9n1=VQ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: *
-X-Spam-Status: No, score=1.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F82CC7618F
-	for <linux-crypto@archiver.kernel.org>; Fri, 19 Jul 2019 16:16:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84A46C7618F
+	for <linux-crypto@archiver.kernel.org>; Fri, 19 Jul 2019 16:22:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 431AB21873
-	for <linux-crypto@archiver.kernel.org>; Fri, 19 Jul 2019 16:16:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1563552971;
-	bh=wJnT+B2QEGr39J2Vpdt4EBBxIgOGj7241XVFhdejpF4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=HX+a3lFlwRhrcrYmofZo9SVG+giVMFFfKVnVBmaO4Q3mrxHtEMH7vzcVzNVS9l4fZ
-	 HkC609IWU8sKJyFHNtN0FkUeULXeF9FOeF9VRSP/yoFn1IBs18igkNgMk0CHs8nO3G
-	 qg946CHBGy819dUrmys+C3YIgCkAd5K0qfZ3+T0Y=
+	by mail.kernel.org (Postfix) with ESMTP id 50E6121872
+	for <linux-crypto@archiver.kernel.org>; Fri, 19 Jul 2019 16:22:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="kitO/d/X"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728376AbfGSQQK (ORCPT
+        id S1730618AbfGSQWd (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 19 Jul 2019 12:16:10 -0400
-Received: from mail.kernel.org ([198.145.29.99]:35024 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728346AbfGSQQK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 19 Jul 2019 12:16:10 -0400
-Received: from gmail.com (unknown [104.132.1.77])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 1F8A32184E;
-        Fri, 19 Jul 2019 16:16:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1563552969;
-        bh=wJnT+B2QEGr39J2Vpdt4EBBxIgOGj7241XVFhdejpF4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=IvbRyJ5L6Q5wW3atoi3O1XxLsnwxdZ21fv9Ek51X34DpvHvxN061j6AQhsS4/L0y/
-         DTfCP3PtO3lFZKK1COl0Ea5OT6mnqOXK7bvNzXvSonmv0sEdZjm5ZXEfovODZwqRJf
-         eYnw8TyopPJJ2KZG9Of2tEO/iASppRmV8mKQ0Ygs=
-Date:   Fri, 19 Jul 2019 09:16:07 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
-Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Fri, 19 Jul 2019 12:22:33 -0400
+Received: from mail-eopbgr40079.outbound.protection.outlook.com ([40.107.4.79]:31878
+        "EHLO EUR03-DB5-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728051AbfGSQWd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 19 Jul 2019 12:22:33 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=M22pN9Xr2NnF6NNBIELY2MKwfd/Ww442i97azfL6RE07Ur941UQh8KJS7gyj2gozPn4t8hC2JEfdOeOGzDnFAhvmuz65tlWtcSSZgK8z9vn01Jbbs/xB+cTx169v+Vz6cp/X24gjisrqFCecAYcGLOa517o3ainSC7U1nXS/T0G4TLf/wCmFMr3VAWfF11NcVmsarUIdJY/4uGjR5z/XmSqAUN4KizvEL+Jfd7v3D3xX7PCHIACOezoVwTFbM0g6HsR1MZFpswDx9bCsujVrlV0mQ3ukhHavr4/QY3VowE9VtXK9MGfe6ndbP24WjMbFYAtogfoJ21C92qbe+zyXaA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UXvMH3EYvtdQBLH+2TGWjHmrGTQAsV0nroFpuk2lFfQ=;
+ b=YneFolO4Y5biUhlAC4xFCPqzWvh6o6hlcbG2OnnPxeV2556lMHAIAeYXXHkS8n/5eiv3eti1kSDJxoseCB9WZzffwHrtVhd73APA4kgZ8cTY3vMxS6lyEhHK5EDSKt2p0Ar/2lkMfpGvDQKxRTLa4VmSj6D/PMh88dIH+gl8ApJtlDfn3r1P1PfWkjvdXX68AiHgTjX8Qqnwfe4tyA8qOCLs4ScRv6WS1Teb+6rXEZYQRUKZDt7DBEk/r9ySV7aan0UXd3+c67oPlFAdfJOctEQYGt1d/6ct0eUJwdli95cqzz4IjCnLJzJBBnjEqz/LBEY26yx0GOPBfdA0IL9npg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
+ smtp.mailfrom=nxp.com;dmarc=pass action=none header.from=nxp.com;dkim=pass
+ header.d=nxp.com;arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=UXvMH3EYvtdQBLH+2TGWjHmrGTQAsV0nroFpuk2lFfQ=;
+ b=kitO/d/XaOvd0UqYTODNG0QAPX+TPY2zty6cc6y34k2tZh+cYl5bukzXlYCwEt2tH1AReVARoHxA46siwg8ACNnXq5GSoXLXNYsiB2kw3PC5Q0SQO/6R0Gc6qehdEWn5x604bQ1pjBTAnyxCd0l7T5mxMbr1Ke3a0JkzLbStFyM=
+Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
+ VI1PR0402MB3503.eurprd04.prod.outlook.com (52.134.4.20) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2094.14; Fri, 19 Jul 2019 16:22:30 +0000
+Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
+ ([fe80::7c64:5296:4607:e10]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
+ ([fe80::7c64:5296:4607:e10%5]) with mapi id 15.20.2073.012; Fri, 19 Jul 2019
+ 16:22:30 +0000
+From:   Horia Geanta <horia.geanta@nxp.com>
+To:     Iuliana Prodan <iuliana.prodan@nxp.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>
-Subject: Re: ghash
-Message-ID: <20190719161606.GA1422@gmail.com>
-Mail-Followup-To: Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>
+CC:     "David S. Miller" <davem@davemloft.net>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>
-References: <MN2PR20MB29737F1F60B3CBACBC4BD287CACB0@MN2PR20MB2973.namprd20.prod.outlook.com>
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        dl-linux-imx <linux-imx@nxp.com>
+Subject: Re: [PATCH v2 13/14] crypto: caam - unregister algorithm only if the
+ registration succeeded
+Thread-Topic: [PATCH v2 13/14] crypto: caam - unregister algorithm only if the
+ registration succeeded
+Thread-Index: AQHVPcSsFwzUAMu1w0K2RlACiJdUtg==
+Date:   Fri, 19 Jul 2019 16:22:30 +0000
+Message-ID: <VI1PR0402MB34850F9DBB14236022D6B7E198CB0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+References: <1563494276-3993-1-git-send-email-iuliana.prodan@nxp.com>
+ <1563494276-3993-14-git-send-email-iuliana.prodan@nxp.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=horia.geanta@nxp.com; 
+x-originating-ip: [212.146.100.6]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 3d81a2ea-2a19-4b01-3951-08d70c654c38
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:VI1PR0402MB3503;
+x-ms-traffictypediagnostic: VI1PR0402MB3503:
+x-microsoft-antispam-prvs: <VI1PR0402MB350382D61736C692EC43303898CB0@VI1PR0402MB3503.eurprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:2089;
+x-forefront-prvs: 01039C93E4
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(136003)(376002)(39860400002)(346002)(366004)(396003)(189003)(199004)(71200400001)(71190400001)(8936002)(4326008)(486006)(99286004)(44832011)(4744005)(52536014)(86362001)(6246003)(81166006)(256004)(316002)(110136005)(54906003)(5660300002)(91956017)(476003)(81156014)(53936002)(66476007)(66556008)(66946007)(229853002)(446003)(66446008)(64756008)(76116006)(9686003)(55016002)(7736002)(305945005)(74316002)(3846002)(6636002)(66066001)(2906002)(186003)(6506007)(53546011)(26005)(25786009)(7696005)(76176011)(68736007)(8676002)(33656002)(6436002)(14454004)(6116002)(478600001)(102836004);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB3503;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: nxp.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: CD5lxbfX0PjbSZd47Gmo0ebeZpCAZ8wI5orK6dKyQ3M9PxRavLGoe7GDMh2xVsYjErIPdTGXTBjBusdert8tWGh1MEbSEJzOYVp4W0w34SauKwrdpV1MTpOGRdSV69DwMZc/NkLJ/XMX/8j4r8e01mF5Vj1ITmh1RmHNdo+li5DagWyAiJqtGqsFOWJBQbgfP23Nclu2HLJ3LCRqjqUvqhN+1Ayd/Zdw1tP5eDZbD+OTZWL70jcYWXS46YQhn8dmmwVLw1UvURrUuoHjTMm5tZ/yODX7pIG5+9GpfGT2eeRhVYpHAf+ogXNdccid+w/GDkt8rF58ogo/0vKF94BUrltq4LppzebgaSnp8h6sA6stoI+ZBBbvpItsvAVcR9oHf3zjWArRcm6NMcuhVNiov3cYZYvqm7tn+JABkcyAnIM=
+Content-Type: text/plain; charset="iso-8859-2"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <MN2PR20MB29737F1F60B3CBACBC4BD287CACB0@MN2PR20MB2973.namprd20.prod.outlook.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3d81a2ea-2a19-4b01-3951-08d70c654c38
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Jul 2019 16:22:30.5178
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: horia.geanta@nxp.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3503
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jul 19, 2019 at 02:05:01PM +0000, Pascal Van Leeuwen wrote:
-> Hi,
-> 
-> While implementing GHASH support for the inside-secure driver and wondering why I couldn't get 
-> the test vectors to pass I have come to the conclusion that ghash-generic.c actually does *not*
-> implement GHASH at all. It merely implements the underlying chained GF multiplication, which,
-> I understand, is convenient as a building block for e.g. aes-gcm but is is NOT the full GHASH.
-> Most importantly, it does NOT actually close the hash, so you can trivially add more data to the
-> authenticated block (i.e. the resulting output cannot be used directly without external closing)
-> 
-> GHASH is defined as GHASH(H,A,C) whereby you do this chained GF multiply on a block of AAD
-> data padded to 16 byte alignment with zeroes, followed by a block of ciphertext padded to 16
-> byte alignment with zeroes, followed by a block that contains both AAD and cipher length.
-> 
-> See also https://en.wikipedia.org/wiki/Galois/Counter_Mode
-> 
-> Regards,
-> Pascal van Leeuwen
-> Silicon IP Architect, Multi-Protocol Engines @ Verimatrix
-> www.insidesecure.com
-> 
-
-Yes that's correct.  The hash APIs don't support multi-argument hashes, so
-there's no natural way for it to be "full GHASH".  So it relies on the caller to
-format the AAD and ciphertext into a single stream.  IMO it really should be
-called something like "ghash_core".
-
-Do you have some question or suggestion, or was this just an observation?
-
-- Eric
+On 7/19/2019 2:58 AM, Iuliana Prodan wrote:=0A=
+> To know if a registration succeeded added a new struct,=0A=
+> caam_akcipher_alg, that keeps, also, the registration status.=0A=
+> This status is updated in caam_pkc_init and verified in=0A=
+> caam_pkc_exit to unregister an algorithm.=0A=
+> =0A=
+Fixes: 1b46c90c8e00 ("crypto: caam - convert top level drivers to libraries=
+")=0A=
+> Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>=0A=
+Reviewed-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
+=0A=
+Horia=0A=
