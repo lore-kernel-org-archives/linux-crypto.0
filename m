@@ -1,237 +1,101 @@
 Return-Path: <SRS0=r9n1=VQ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: *
+X-Spam-Status: No, score=1.2 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BEB9AC7618F
-	for <linux-crypto@archiver.kernel.org>; Fri, 19 Jul 2019 20:07:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D504C7618F
+	for <linux-crypto@archiver.kernel.org>; Fri, 19 Jul 2019 20:07:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 764F92186A
-	for <linux-crypto@archiver.kernel.org>; Fri, 19 Jul 2019 20:07:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=verimatrix.com header.i=@verimatrix.com header.b="WQ42vTnJ"
+	by mail.kernel.org (Postfix) with ESMTP id 12A0421873
+	for <linux-crypto@archiver.kernel.org>; Fri, 19 Jul 2019 20:07:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1563566835;
+	bh=80Hivj/nEVTRYUrxp0HNd0We587GJGRh9x+v/QGu+Xg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=qmH11TkJUawGsJkSAKRwl/8aV5egFij7HGIFSAUkWPwOAcsIMF8u+8oEaUz4mqcRf
+	 0G3s6+kpCJcPIbj1KNB9JeS4RtNJG89oDTgE2Vi2KuLSEqHDSa3h3gMEyA7Ufo6wwV
+	 zKxcljv42qP3DKjy5EF6+wQeJiQ/w0tDYYFRcYC0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729970AbfGSUHI (ORCPT
+        id S1730077AbfGSUHO (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 19 Jul 2019 16:07:08 -0400
-Received: from mail-eopbgr720080.outbound.protection.outlook.com ([40.107.72.80]:7632
-        "EHLO NAM05-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728812AbfGSUHI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 19 Jul 2019 16:07:08 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dukIlBTbExyDDu1562FY2oNLCzlKi4l0Pc08rMtW/UFv53Qpi5C1NeMUS6FZZOxnI/7uarq+CeNhZEncrjKKGrNvValV7vYbFqeUlY6b6t4dcnpyVOmtGoRdWIJvKMakCVbzOluzxc/V66IxlsB0ahTQmMQpCsSXiCMB1uD834PyADr56EDVKHA7LQNLSdbvTsk41YD0ddl3YdSLehtUmbAIJhp73cMhyBUkp0EO7sxnzpRFeSSIf5f9/6CK3dRKTxZxMbg8RX6lbEI8TUV/gWzD15qqCwP3Opu+/hcTaVi2oNnXlyCo9xTjX9gtJlcSQF7QpkBi/xTEEcc3J8YGhA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dxc55urufY1Fr+Doxthg3FKlT6DMq5qdi//GLJ69xHM=;
- b=OqaD9r9l9wTjqPLvuWnGB58/Tb6SOECmsu0NR1//zGvsU9CXX/sOqdC2Z/FjuU/+BHSkTOl54D8eonlrLcL1shAFkzRnrcuYHH3BKe3rJ/tzTucwxuMJpuFBse47NoW7ixf1Ia6jD4DYuG3wP8mlVQB6tSk2bSYJtFBj/sAhBG3WcJIHf1UALcmDJ6TWG4L4F+gj0tYJBBk/Pg16L4PSJCvCtzbpxAkTt3MHYQ6NPDoB5Car/u4eQ3thqY6G2GPAsGuX/1arBJ8OKZYcGN6+eDip/4XtX/IystGv92bErqcJxapu1xK9SwJI2qyVk2EuQ76ptuRJmpJSWlwr2x7YnQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
- smtp.mailfrom=verimatrix.com;dmarc=pass action=none
- header.from=verimatrix.com;dkim=pass header.d=verimatrix.com;arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verimatrix.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dxc55urufY1Fr+Doxthg3FKlT6DMq5qdi//GLJ69xHM=;
- b=WQ42vTnJJfFAyLCHgXgAaNfEa0uwAji8A2KVxqSL5Yk466kU3pCb0nLpMMhdtERm9q9QsFVfEOmghYivLaC78R9ACzUJMh8fw2ROfeM1ijdVje8cxYmdH4gXqOo6qKmqfc4RWD039gYHXZMyoOt4wjnpyISUJpHUh3f1xS7Hjbs=
-Received: from MN2PR20MB2973.namprd20.prod.outlook.com (52.132.172.146) by
- MN2PR20MB2704.namprd20.prod.outlook.com (20.178.252.92) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2073.14; Fri, 19 Jul 2019 20:07:00 +0000
-Received: from MN2PR20MB2973.namprd20.prod.outlook.com
- ([fe80::68d7:2bbb:af61:2e69]) by MN2PR20MB2973.namprd20.prod.outlook.com
- ([fe80::68d7:2bbb:af61:2e69%6]) with mapi id 15.20.2094.013; Fri, 19 Jul 2019
- 20:07:00 +0000
-From:   Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-CC:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Milan Broz <gmazyland@gmail.com>,
-        Horia Geanta <horia.geanta@nxp.com>,
+        Fri, 19 Jul 2019 16:07:14 -0400
+Received: from mail.kernel.org ([198.145.29.99]:41170 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728812AbfGSUHO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 19 Jul 2019 16:07:14 -0400
+Received: from gmail.com (unknown [104.132.1.77])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id EF10B2186A;
+        Fri, 19 Jul 2019 20:07:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1563566834;
+        bh=80Hivj/nEVTRYUrxp0HNd0We587GJGRh9x+v/QGu+Xg=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=PqyOHBUntjLeZ/GftUerdJ2Baqq2iqDMqCWASXFeBFAYc8kdtS2PM+6hqaPK9eSBE
+         TmC8rtN0elqyOodP5nGclq9DxLbbRi4aVCYoqbcve+MaaQKxrx3dLLp6W+95xUx8k6
+         mlMn7LYdCOZU18q7VhKewSK8x2lZVlR3xTppiljE=
+Date:   Fri, 19 Jul 2019 13:07:12 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Subject: Re: generic ahash question
+Message-ID: <20190719200711.GD1422@gmail.com>
+Mail-Followup-To: Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>
-Subject: RE: xts fuzz testing and lack of ciphertext stealing support
-Thread-Topic: xts fuzz testing and lack of ciphertext stealing support
-Thread-Index: AQHVO/5l0aVU4O6KC0WgPIqEsMQCDqbPEhUAgAALMYCAANVxgIAABoCAgAABwICAAAUbgIAAFRTAgABt8gCAAADKkIAABYEAgAAHwACAAAYnsIAA2AKAgAAZT1CAAKpYgIAAJukA
-Date:   Fri, 19 Jul 2019 20:07:00 +0000
-Message-ID: <MN2PR20MB2973140033DE87E663770DA4CACB0@MN2PR20MB2973.namprd20.prod.outlook.com>
-References: <VI1PR0402MB34857BBB18C2BB8CBA2DEC7198C90@VI1PR0402MB3485.eurprd04.prod.outlook.com>
- <20190717172823.GA205944@gmail.com>
- <CAKv+Gu__offPaWvyURJr8v56ig58q-Deo16QhP26EJ32uf5m3w@mail.gmail.com>
- <20190718065223.4xaefcwjoxvujntw@gondor.apana.org.au>
- <CAKv+Gu9-EWNpJ9viSsjhYRdOZb=7a=Mpddmyt8SLEq9aFtawjg@mail.gmail.com>
- <20190718072154.m2umem24x4grbf6w@gondor.apana.org.au>
- <36e78459-1594-6d19-0ab4-95b03a6de036@gmail.com>
- <MN2PR20MB2973E61815F069E8C7D74177CAC80@MN2PR20MB2973.namprd20.prod.outlook.com>
- <20190718152908.xiuze3kb3fdc7ov6@gondor.apana.org.au>
- <MN2PR20MB2973E1A367986303566E80FCCAC80@MN2PR20MB2973.namprd20.prod.outlook.com>
- <20190718155140.b6ig3zq22askmfpy@gondor.apana.org.au>
- <CAKv+Gu9qm8mDZASJasq18bW=4_oE-cKPGKvdF9+8=7VNo==_fA@mail.gmail.com>
- <MN2PR20MB2973DE308D0050DBF3F26870CAC80@MN2PR20MB2973.namprd20.prod.outlook.com>
- <CAKv+Gu8dE6EO1NOwni91cvEWJvPzieC3wKph73j2jWxzx_xKAw@mail.gmail.com>
- <MN2PR20MB297371CEE0F60E58E110C6FDCACB0@MN2PR20MB2973.namprd20.prod.outlook.com>
- <CAKv+Gu-_1Bv1WQw+7ENWmjgvbgncKXGYOfxSr2GhVfN3-U3VtQ@mail.gmail.com>
-In-Reply-To: <CAKv+Gu-_1Bv1WQw+7ENWmjgvbgncKXGYOfxSr2GhVfN3-U3VtQ@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=pvanleeuwen@verimatrix.com; 
-x-originating-ip: [188.204.2.113]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 8bd0ad41-cdaf-4cda-8a9c-08d70c84a8ba
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:MN2PR20MB2704;
-x-ms-traffictypediagnostic: MN2PR20MB2704:
-x-ms-exchange-purlcount: 1
-x-microsoft-antispam-prvs: <MN2PR20MB2704ACD8DCD7A2EDE7B31208CACB0@MN2PR20MB2704.namprd20.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-forefront-prvs: 01039C93E4
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(346002)(39850400004)(376002)(136003)(366004)(396003)(189003)(199004)(13464003)(2906002)(52536014)(55016002)(5660300002)(66446008)(9686003)(25786009)(64756008)(54906003)(53936002)(256004)(476003)(6116002)(3846002)(107886003)(6436002)(76116006)(66556008)(6246003)(26005)(8936002)(68736007)(66066001)(6916009)(66946007)(478600001)(446003)(316002)(8676002)(86362001)(6506007)(53546011)(14454004)(7696005)(33656002)(76176011)(15974865002)(14444005)(66476007)(102836004)(4326008)(186003)(74316002)(486006)(71190400001)(11346002)(81166006)(99286004)(229853002)(81156014)(71200400001)(305945005)(7736002)(18886075002);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR20MB2704;H:MN2PR20MB2973.namprd20.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: verimatrix.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: FTKVu13LqhvbGbncdJJbACiOaixAcg+F58BQQbieK9bE80HXban+J/WDdJdK8SgNKbspczRbAyWAureotM+tFunZwnCpQfcABVOBFBF77K8sw/SV1AADNFXVgAwPQ8RhcVGtGo60il1F7hpV2lPUW63h40aUtn91jl/+/yhg8JC9aJH4JN/nPmjspG3RMK8v5MjIxd54/Chei2x/mfdmEPM0ze9QPJDMiIiDAztIetCbBtBvdiNYS6sVYwUMaLjyHY16MOm26bezQYr8Hm5ngfRuyA0WMG8RlJlNyUB58qMnHyr6pkKzyMonmax3vqXbuTHN3jpHNGqORwAaop1LSNj+TlGiNdLEeXwggAmYiC5uBoCWZFYzfT1cUajfmlFAHBUMH9SrrzjDi5LPNJyJfJckunkcPe+f7DRUJc0nMUA=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+References: <MN2PR20MB297347B80C7E3DCD19127B05CACB0@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <20190719162303.GB1422@gmail.com>
+ <MN2PR20MB2973067B1373891A5899ECBBCACB0@MN2PR20MB2973.namprd20.prod.outlook.com>
 MIME-Version: 1.0
-X-OriginatorOrg: verimatrix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8bd0ad41-cdaf-4cda-8a9c-08d70c84a8ba
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Jul 2019 20:07:00.0509
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: dcb260f9-022d-4495-8602-eae51035a0d0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: pvanleeuwen@verimatrix.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR20MB2704
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <MN2PR20MB2973067B1373891A5899ECBBCACB0@MN2PR20MB2973.namprd20.prod.outlook.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-SGkgQXJkLA0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IEFyZCBCaWVz
-aGV1dmVsIDxhcmQuYmllc2hldXZlbEBsaW5hcm8ub3JnPg0KPiBTZW50OiBGcmlkYXksIEp1bHkg
-MTksIDIwMTkgNzoxNSBQTQ0KPiBUbzogUGFzY2FsIFZhbiBMZWV1d2VuIDxwdmFubGVldXdlbkB2
-ZXJpbWF0cml4LmNvbT4NCj4gQ2M6IEhlcmJlcnQgWHUgPGhlcmJlcnRAZ29uZG9yLmFwYW5hLm9y
-Zy5hdT47IE1pbGFuIEJyb3ogPGdtYXp5bGFuZEBnbWFpbC5jb20+OyBIb3JpYSBHZWFudGEgPGhv
-cmlhLmdlYW50YUBueHAuY29tPjsgbGludXgtDQo+IGNyeXB0b0B2Z2VyLmtlcm5lbC5vcmc7IGRt
-LWRldmVsQHJlZGhhdC5jb20NCj4gU3ViamVjdDogUmU6IHh0cyBmdXp6IHRlc3RpbmcgYW5kIGxh
-Y2sgb2YgY2lwaGVydGV4dCBzdGVhbGluZyBzdXBwb3J0DQo+IA0KPiBPbiBGcmksIDE5IEp1bCAy
-MDE5IGF0IDA5OjI5LCBQYXNjYWwgVmFuIExlZXV3ZW4NCj4gPHB2YW5sZWV1d2VuQHZlcmltYXRy
-aXguY29tPiB3cm90ZToNCj4gPg0KPiA+ID4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4g
-PiA+IEZyb206IEFyZCBCaWVzaGV1dmVsIDxhcmQuYmllc2hldXZlbEBsaW5hcm8ub3JnPg0KPiA+
-ID4gU2VudDogRnJpZGF5LCBKdWx5IDE5LCAyMDE5IDc6MzUgQU0NCj4gPiA+IFRvOiBQYXNjYWwg
-VmFuIExlZXV3ZW4gPHB2YW5sZWV1d2VuQHZlcmltYXRyaXguY29tPg0KPiA+ID4gQ2M6IEhlcmJl
-cnQgWHUgPGhlcmJlcnRAZ29uZG9yLmFwYW5hLm9yZy5hdT47IE1pbGFuIEJyb3ogPGdtYXp5bGFu
-ZEBnbWFpbC5jb20+OyBIb3JpYSBHZWFudGEgPGhvcmlhLmdlYW50YUBueHAuY29tPjsgbGludXgt
-DQo+ID4gPiBjcnlwdG9Admdlci5rZXJuZWwub3JnOyBkbS1kZXZlbEByZWRoYXQuY29tDQo+ID4g
-PiBTdWJqZWN0OiBSZTogeHRzIGZ1enogdGVzdGluZyBhbmQgbGFjayBvZiBjaXBoZXJ0ZXh0IHN0
-ZWFsaW5nIHN1cHBvcnQNCj4gPiAgPg0KPiA+ID4gSSB3b3VsZCBhcmd1ZSB0aGF0IHRoZXNlIGNh
-c2VzIGFyZSBkaWFtZXRyaWNhbGx5IG9wcG9zaXRlOiB5b3UNCj4gPiA+IHByb3Bvc2VkIHRvIHJl
-bW92ZSBzdXBwb3J0IGZvciB6ZXJvIGxlbmd0aCBpbnB1dCB2ZWN0b3JzIGZyb20gdGhlDQo+ID4g
-PiBlbnRpcmUgY3J5cHRvIEFQSSB0byBwcmV2ZW50IHlvdXIgZHJpdmVyIGZyb20gaGF2aW5nIHRv
-IGRlYWwgd2l0aA0KPiA+ID4gaW5wdXRzIHRoYXQgdGhlIGhhcmR3YXJlIGNhbm5vdCBoYW5kbGUu
-DQo+ID4gPg0KPiA+IEkgZGlkIG5vdCBwcm9wb3NlIGFueSBzdWNoIHRoaW5nIC0gSSBqdXN0IHBy
-b3Bvc2VkIHRvIG1ha2UgemVybyBsZW5ndGggaGFzaCBzdXBwb3J0ICpvcHRpb25hbCoNCj4gPiAo
-aS5lLiBkb24ndCBmYWlsIGFuZCBkaXNhYmxlIHRoZSBkcml2ZXIgb24gaXQpIGFzIGl0J3MgdG90
-YWxseSBpcnJlbGV2YW50IGZvciA5OS45OTk5OSUgb2YgdXNlIGNhc2VzLg0KPiA+IChpbmNsdWRp
-bmcgKmFsbCogdXNlIGNhc2VzIEkgY29uc2lkZXIgcmVsZXZhbnQgZm9yIEhXIGFjY2VsZXJhdGlv
-bikNCj4gPg0KPiANCj4gRmFpciBlbm91Z2guIEJ1dCBpdCBkaWQgaW52b2x2ZSBtYWtpbmcgbW9k
-aWZpY2F0aW9ucyB0byB0aGUgZ2VuZXJpYw0KPiBsYXllciwgc2luY2UgdGhlcmUgYXJlIGtub3du
-IHVzZXJzIG9mIHRoZSBBRl9BTEcgaW50ZXJmYWNlIHRoYXQgbWF5DQo+IHBhc3MgemVybyBsZW5n
-dGggaW5wdXRzIChlLmcuLCBzaGExc3VtKS4NCj4gDQpXaGljaCBpcyB3aHkgSSBnYXZlIHVwIGFu
-ZCBncnVkZ2luZ2x5IGltcGxlbWVudGVkIHRob3NlIHdvcmthcm91bmRzIDstKQ0KDQpCdXQgdGhl
-eSBjb21wbGljYXRlIHRoZSBkcml2ZXIgYnkgb3JkZXJzIG9mIGEgbWFnbml0dWRlIGFuZCBmb3Ig
-dGhhdCB0aGUNCnNhbWUgdmFsaWRhdGlvbiBhcmd1bWVudCB5b3UgZ2l2ZSBiZWxvdyBhcHBsaWVz
-OiB0aGVyZSdzIG5vdyBhIGxvdCBtb3JlDQotIGFuZCB3b3JzZTogYSBsb3QgbW9yZSBjb21wbGlj
-YXRlZCEgLSBjb2RlIHRvIHZhbGlkYXRlIGluIHRoaXMgZHJpdmVyLg0KDQpXaGlsZSBJIHNlcmlv
-dXNseSBxdWVzdGlvbiB0aGUgdmFsdWUgb2YgdGhhdCBjb250cmlidXRpb24gYXMgd2VsbDogSSBk
-b24ndA0KZXhwZWN0IHRoaXMgZHJpdmVyIHRvIGV2ZXIgYmUgdXNlZCBmb3IgdGhlc2UgY29ybmVy
-IGNhc2VzLCBhcyB5b3Ugd291bGQgDQpzaW1wbHkgbmV2ZXIgKnNlbGVjdCogaXQgZm9yIHRoZSBh
-cHBsaWNhdGlvbnMgdGhhdCBtaWdodCBoaXQgdGhlbSAob3IsIGlmDQp5b3UgdHJ5IGl0IGFuIHJ1
-biBpbnRvIHRyb3VibGUsIGp1c3Qgc2VsZWN0IGFub3RoZXIgaW1wbGVtZW50YXRpb24pLiBTbyAN
-Cml0cyByZWFsbHkganVzdCB0aGVyZSB0byBrZWVwIHRlc3RtZ3IgaGFwcHkgYW5kIG5vdGhpbmcg
-ZWxzZSAoSU1ITykuDQoNCkFsc286IGhhcmR3YXJlIG1heSBoYXZlIGEgbG90IG1vcmUgInByb2Js
-ZW1hdGljIiBsaW1pdGF0aW9ucyB0aGF0IGFyZSBub3QNCmN1cnJlbnRseSBoaXQgYnkgdGVzdG1n
-ci4gVGhlIGxpbWl0YXRpb25zIHRoYXQgYXJlIGhpdCBhcmUga2luZCBvZiBhcmJpdHJhcnkuDQoo
-YW5kIEknbSBub3QgZ29pbmcgdG8gc2hvb3QgbXlzZWxmIGluIHRoZSBmb290IGJ5IGdvaW5nIGlu
-dG8gZGV0YWlsIHRoZXJlIDstKQ0KDQo+ID4gPiBJIGFtIHByb3Bvc2luZyBub3QgdG8gYWRkIHN1
-cHBvcnQgZm9yIGNhc2VzIHRoYXQgd2UgaGF2ZSBubyBuZWVkIGZvci4NCj4gPiA+DQo+ID4gV2hp
-bGUgeW91IGFyZSBwcm9wb3NpbmcgdG8gc3RpY2sgd2l0aCBhbiBpbXBsZW1lbnRhdGlvbiB0aGF0
-IGNhbiBvbmx5IGRlYWwgd2l0aCA2LjI1JSAoMS8xNnRoKSBvZg0KPiA+ICpsZWdhbCogaW5wdXQg
-ZGF0YSBmb3IgWFRTIGFuZCBmYWlscyBvbiB0aGUgcmVtYWluaW5nIDkzLjc1JS4gVGhhdCdzIGhh
-cmRseSBhIGNvcm5lciBjYXNlIGFueW1vcmUuDQo+ID4NCj4gDQo+IEkgbmV2ZXIgc2FpZCBpdCB3
-YXMgYSBjb3JuZXIgY2FzZSwgbm9yIGRvZXMgaXQgbWFrZSBhIGxvdCBvZiBzZW5zZSB0bw0KPiBy
-ZWFzb24gYWJvdXQgZnJhY3Rpb25hbCBjb21wbGlhbmNlLCBnaXZlbiB0aGF0IDEwMCUgb2YgdGhl
-IGlucHV0cyB3ZQ0KPiBldmVyIGVuY291bnRlciBhcmUgY292ZXJlZCBieSB5b3VyIDYuMjUlIG9m
-IGxlZ2FsIGlucHV0IGRhdGEuDQo+IA0KPiBXaGF0IGkgZGlkIHNheSB3YXMgdGhhdCB0aGUgbW92
-aW5nIHBhcnRzIHdlIHdpbGwgYWRkIHRvIHRoZSBjb2RlIHdpbGwNCj4gbmV2ZXIgYmUgcHV0IGlu
-dG8gbW90aW9uLCB3aGlsZSB0aGV5IGRvIGluY3JlYXNlIHRoZSB2YWxpZGF0aW9uIHNwYWNlLA0K
-PiBhbmQgc28gdGhlIHZhbHVlIG9mIHRoZSBjb250cmlidXRpb24gd2lsbCBiZSBuZWdhdGl2ZS4N
-Cj4gDQpIb3cgY2FuIHlvdSBiZSBzbyBzdXJlIHRoYXQgaXQgd2lsbCBuZXZlciBiZSB1c2VkPw0K
-DQo+IFBlcmhhcHMgSSBzaG91bGQgZW1waGFzaXplIHRoYXQgbXkgY29uY2VybiBpcyBtYWlubHkg
-YWJvdXQgaW4ta2VybmVsDQo+IHVzYWdlIG9mIHRoZSBzeW5jIHNvZnR3YXJlIGNpcGhlcnMsIHNp
-bmNlIHRoZXkgdHlwaWNhbGx5IGhhdmUgbm8gdXNlDQo+IGZvciB1c2VybGFuZCwgZ2l2ZW4gdGhh
-dCB0aGV5IGNhbiBzaW1wbHkgaXNzdWUgdGhlIHNhbWUgaW5zdHJ1Y3Rpb25zDQo+IGRpcmVjdGx5
-LiBGb3IgQUZfQUxHLCBJIGFncmVlIHRoYXQgZXhwb3NpbmcgYSBub24tY29tcGxpYW50IFhUUw0K
-PiBpbXBsZW1lbnRhdGlvbiBpcyBhIGJhZCBpZGVhLg0KPiANCkFuZCBteSBjb25jZXJuIGlzIHRo
-YXQgSSB3YW50IHRvIGFjY2VsZXJhdGUgeHRzIGJ1dCBJIHdpbGwgbm93IGhhdmUgdG8gDQpjcmlw
-cGxlIG15IGRyaXZlciB0byByZXR1cm4gLUVJTlZBTCBvbiBub24tbXVsdGlwbGUtb2YtMTYgaW5w
-dXRzIHdoaWxlDQpteSBoYXJkd2FyZSBjYW4gYWN0dWFsbHkgaGFuZGxlIHRoYXQganVzdCBmaW5l
-LCBqdXN0IGJlY2F1c2UgdGhlIGFjdHVhbA0KInJlZmVyZW5jZSIgaW1wbGVtZW50YXRpb24gaXMg
-bm90IGNvbXBsaWFudC4gQW5kIGlmIEkgZG9uJ3QgbWF0Y2ggaXRzDQooaW5jb3JyZWN0ISkgYmVo
-YXZpb3IgKkkqIHdpbGwgYmUgdGhlIG9uZSBiZWluZyBmYWlsZWQgYnkgdGVzdG1nci4NCldoaWNo
-IHNlZW1zIHJhdGhlciB1bmZhaXIgOi0oDQoNCk5vdGUgdGhhdCBJJ20gbm90IGp1c3QgaW50ZXJl
-c3RlZCBpbiBwcm92aWRpbmcgc3VwcG9ydCB0byBleGlzdGluZyANCmltcGxlbWVudGF0aW9ucywg
-SSBtYXkgd2FudCB0byBzdXBwb3J0IGFkZGl0aW9uYWwgZmVhdHVyZXMgdG8gcHJvdmlkZQ0KdG8g
-bXkgY3VzdG9tZXJzIHRoYXQgdGhleSBjYW4gdXNlIGZyb20gdGhlaXIgb3duIGRyaXZlcnMvYXBw
-bGljYXRpb25zDQp0aGV5IGJ1aWxkIG9uIHRvcCBvZiBpdCAod2hpY2ggZG8gbm90IGV4aXN0IHll
-dCBhdCB0aGlzIG1vbWVudCkNCg0KPiA+ID4gWFRTIHdpdGhvdXQgQ1RTIGlzIGluZGlzdGluZ3Vp
-c2hhYmxlIGZyb20gWFRTIHdpdGggQ1RTIGlmIHRoZSBpbnB1dHMNCj4gPiA+IGFyZSBhbHdheXMg
-YSBtdWx0aXBsZSBvZiB0aGUgYmxvY2sgc2l6ZSwgYW5kIGluIDEyIHllYXJzLCBub2JvZHkgaGFz
-DQo+ID4gPiBldmVyIHJhaXNlZCB0aGUgaXNzdWUgdGhhdCBvdXIgc3VwcG9ydCBpcyBsaW1pdGVk
-IHRvIHRoYXQuIFNvIHdoYXQNCj4gPiA+IHByb2JsZW0gYXJlIHdlIGZpeGluZyBieSBjaGFuZ2lu
-ZyB0aGlzPyBkbS1jcnlwdCBkb2VzIG5vdCBjYXJlLA0KPiA+ID4gZnNjcnlwdCBkb2VzIG5vdCBj
-YXJlLCB1c2VybGFuZCBkb2VzIG5vdCBjYXJlIChnaXZlbiB0aGF0IGl0IGRvZXMgbm90DQo+ID4g
-PiB3b3JrIHRvZGF5IGFuZCB3ZSBhcmUgb25seSBmaW5kaW5nIG91dCBub3cgZHVlIHRvIHNvbWUg
-ZnV6eiB0ZXN0DQo+ID4gPiBmYWlsaW5nIG9uIENBQU0pDQo+ID4gPg0KPiA+IElmIGl0J3Mgbm90
-IHN1cHBvcnRlZCwgdGhlbiBpdCBjYW5ub3QgYmUgdXNlZC4gTW9zdCBwZW9wbGUgd291bGQgbm90
-IHN0YXJ0IGNvbXBsYWluaW5nIGFib3V0IHRoYXQsDQo+ID4gdGhleSB3b3VsZCBqdXN0IHJvbGwg
-dGhlaXIgb3duIGxvY2FsbHkgb3IgdGhleSdkIGdpdmUgdXAgYW5kL29yIHVzZSBzb21ldGhpbmcg
-ZWxzZS4NCj4gPiBTbyB0aGUgZmFjdCB0aGF0IGl0J3MgY3VycmVudGx5IG5vdCBiZWluZyB1c2Vk
-IGRvZXMgbm90IG1lYW4gYSB3aG9sZSBsb3QuIEFsc28sIGl0IGRvZXMgbm90IG1lYW4NCj4gPiB0
-aGF0IHRoZXJlIHdpbGwgbm90IGJlIGEgcmVsZXZhbnQgdXNlIGNhc2UgdG9tb3Jyb3cuIChhbmQg
-SSBjYW4gYXNzdXJlIHlvdSB0aGVyZSAqYXJlKiBkZWZpbml0ZWx5DQo+ID4gcmVhbC1saWZlIHVz
-ZSBjYXNlcywgc28gSSBoYXZlIHRvIGFzc3VtZSB0aGVzZSBhcmUgY3VycmVudGx5IGhhbmRsZWQg
-b3V0c2lkZSBvZiB0aGUgYmFzZSBrZXJuZWwpDQo+ID4NCj4gPiBJbiBhbnkgY2FzZSwgaWYgeW91
-IHRyeSB0byB1c2UgWFRTIHlvdSB3b3VsZCAqZXhwZWN0KiBpdCB0byB3b3JrIGZvciBhbnkgaW5w
-dXQgPj0gMTYgYnl0ZXMgYXMgdGhhdCdzDQo+ID4gaG93IHRoZSBhbGdvcml0aG0gaXMgKnNwZWNp
-ZmllZCouIFdpdGhvdXQgdGhlIENUUyBwYXJ0IGl0J3Mgc2ltcGx5IG5vdCBYVFMuDQo+ID4NCj4g
-DQo+IEkgcmVhbGx5IGRvbid0IGNhcmUgd2hhdCB3ZSBjYWxsIGl0LiBNeSBwb2ludCBpcyB0aGF0
-IHdlIGRvbid0IG5lZWQNCj4gZnVuY3Rpb25hbGl0eSB0aGF0IHdlIHdpbGwgbm90IHVzZSwgcmVn
-YXJkbGVzcyBvZiBob3cgaXQgaXMgY2FsbGVkLg0KPiANCklmIHlvdSBtYWtlIGFuIGltcGxlbWVu
-dGF0aW9uIHRoYXQgaXMgY29uc2lkZXJlZCAoZS5nLiBieSB0ZXN0bWdyIGZvciBmdXp6IHRlc3Rp
-bmcpDQp0byBiZSB0aGUgZ29sZGVuIHJlZmVyZW5jZSwgdGhlbiBpdCdkIGJldHRlciBiZSBmdWxs
-eSBjb21wbGlhbnQgd2l0aCB0aGUgcmVsZXZhbnQNCnNwZWNpZmljYXRpb24ocykuIEkgZ3Vlc3Mg
-dGhhdCdzIHRoZSByZWFsIHBvaW50IEknbSB0cnlpbmcgdG8gbWFrZS4gDQpOb3cgYSBmdWxseSBj
-b21wbGlhbnQgaW1wbGVtZW50YXRpb24gd291bGQgZ2V0IHBlbmFsaXplZCBmb3IgYmVpbmcgZnVs
-bHkgY29tcGxpYW50Lg0KDQo+ID4gPiA+IEkgcHJldHR5IG11Y2ggbWFkZSB0aGUgc2FtZSBhcmd1
-bWVudCBhYm91dCBhbGwgdGhlc2UgZHJpdmVyIHdvcmthcm91bmRzDQo+ID4gPiA+IHNsb3dpbmcg
-ZG93biBteSBkcml2ZXIgZmFzdCBwYXRoIGJ1dCB0aGF0IHdhcyBjb25zaWRlcmVkIGEgbm9uLWlz
-c3VlLg0KPiA+ID4gPg0KPiA+ID4gPiBJbiB0aGlzIHBhcnRpY3VsYXIgY2FzZSwgaXQgc2hvdWxk
-IG5vdCBuZWVkIHRvIGJlIG1vcmUgdGhhbjoNCj4gPiA+ID4NCj4gPiA+ID4gaWYgKHVubGlrZWx5
-KHNpemUgJiAxNSkpIHsNCj4gPiA+ID4gICB4dHNfd2l0aF9wYXJ0aWFsX2xhc3RfYmxvY2soKTsN
-Cj4gPiA+ID4gfSBlbHNlIHsNCj4gPiA+ID4gICB4dHNfd2l0aF9vbmx5X2Z1bGxfYmxvY2tzKCk7
-DQo+ID4gPiA+IH0NCj4gPiA+ID4NCj4gPiA+DQo+ID4gPiBPZiBjb3Vyc2UuIEJ1dCB3aHkgYWRk
-IHRoaXMgYXQgYWxsIGlmIGl0IGlzIGtub3duIHRvIGJlIGRlYWQgY29kZT8NCj4gPiA+DQo+ID4g
-QnV0IHRoYXQncyBqdXN0IGFuIGFzc3VtcHRpb24gYW5kIGFzc3VtcHRpb25zIGFyZSB0aGUgcm9v
-dCBvZiBhbGwgZXZpbCA7LSkNCj4gPg0KPiANCj4gSSB0aGluayBpdCB3YXMgcHJlbWF0dXJlIG9w
-dGltaXphdGlvbiB0aGF0IGlzIHRoZSByb290IG9mIGFsbCBldmlsLCBubz8NCg0KWW91IGFyZSB0
-YWxraW5nIHRvIGEgZ3V5IHdobyB1c2VkIHRvIHByZWZlciB0byB1c2UgaGFuZC1vcHRpbWl6ZWQg
-YXNzZW1ibHkgDQpmb3IgKmV2ZXJ5dGhpbmcqIDotRCBUaGVyZSdzIG5vIHN1Y2ggdGhpbmcgYXMg
-dGltZSB3YXN0ZWQgb24gb3B0aW1pemF0aW9uIQ0KKGlmIGl0IHdhc24ndCB1c2VmdWwsIGF0IGxl
-YXN0IGl0IHdhcyBmdW4gdG8gZG8hIDotUCkNCg0KUmVnYXJkcywNClBhc2NhbCB2YW4gTGVldXdl
-bg0KU2lsaWNvbiBJUCBBcmNoaXRlY3QsIE11bHRpLVByb3RvY29sIEVuZ2luZXMgQCBWZXJpbWF0
-cml4DQp3d3cuaW5zaWRlc2VjdXJlLmNvbQ0KDQo=
+On Fri, Jul 19, 2019 at 07:33:30PM +0000, Pascal Van Leeuwen wrote:
+> > -----Original Message-----
+> > From: linux-crypto-owner@vger.kernel.org <linux-crypto-owner@vger.kernel.org> On Behalf Of Eric Biggers
+> > Sent: Friday, July 19, 2019 6:23 PM
+> > To: Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+> > Cc: linux-crypto@vger.kernel.org; Herbert Xu <herbert@gondor.apana.org.au>; David S. Miller <davem@davemloft.net>
+> > Subject: Re: generic ahash question
+> > 
+> > On Fri, Jul 19, 2019 at 02:41:03PM +0000, Pascal Van Leeuwen wrote:
+> > > Hi,
+> > >
+> > > I recall reading somewhere in the Linux Crypto documentation that support for finup() and digest()
+> > > calls were explicitly added to support hardware that couldn't handle seperate init/update/final
+> > > calls so they could at least be used with e.g. the IPsec stack.  I also noticed that testmgr *does*
+> > >  attempt to verify these seperate calls ...
+> > >
+> > > So I'm guessing there must be some flags that I can set to indicate I'm not supporting seperate
+> > > init/update/final calls so that testmgr skips those specific tests? Which flag(s) do I need to set?
+> > >
+> > 
+> > Where does the documentation say that?
+> 
+> For finup:
+> "As some hardware cannot do update and final separately, this callback was added to allow such 
+> hardware to be used at least by IPsec"
+> 
+> For digest:
+> "Just like finup, this was added for hardware which cannot do even the finup, but can only do the 
+> whole transformation in one run."
+> 
+> Those statement sort of imply (to me) that it's OK to only support digest or only finup and digest.
+> 
+
+Can you send a patch to fix this documentation?
+
+- Eric
