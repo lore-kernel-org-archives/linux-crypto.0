@@ -2,121 +2,116 @@ Return-Path: <SRS0=r9n1=VQ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15636C76195
-	for <linux-crypto@archiver.kernel.org>; Fri, 19 Jul 2019 14:05:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83901C76188
+	for <linux-crypto@archiver.kernel.org>; Fri, 19 Jul 2019 14:21:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C916E21851
-	for <linux-crypto@archiver.kernel.org>; Fri, 19 Jul 2019 14:05:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 56A4C21849
+	for <linux-crypto@archiver.kernel.org>; Fri, 19 Jul 2019 14:21:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=verimatrix.com header.i=@verimatrix.com header.b="Ufp9CfU/"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="UnG+i2Qz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728760AbfGSOFF (ORCPT
+        id S1728873AbfGSOVu (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 19 Jul 2019 10:05:05 -0400
-Received: from mail-eopbgr800040.outbound.protection.outlook.com ([40.107.80.40]:40616
-        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728351AbfGSOFE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 19 Jul 2019 10:05:04 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MKGRDJ8uJ2MSexuXe9XCKChvqszTU8QuamuFpLuotFw0DCanevokIpW+rga+I0ROkeEBiXO8rTzcZWiPatlddl4MngJvct7jBBH410PgU4iV5JU3kRpPuIusN66geXtas+H+2fBp7oUn8sl6+yVmZTapF57JwYjjucO+OUOaJYfzz3EWJcaIUrYPRShL0cBCPZecfYls0BYBk1jjp7Njxf9qDLGKmYHLD+fjcFeDbU63di55sMbcW4GV3fTKNqxp11dSR8IitKTAf9rwnlvmqZjUM7k3AxAq969tIU0VC5KJcBj+VF1pmFtFLSht2aUfq0MOUVQ/F70FYM3ISTblHw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Srm0DVWXurea31F359ru7U46wBOAObLwr8U2c8AJ1Tw=;
- b=REKdM39KuRWKXTEf7MDS+48bl7VVI10tI0C0KcUXta58oW9OcaLM4nEZVw2gEyzhyjTNAPfRRdiOvco4yEog5tjMrBXd/HbMJXON2MFGXMkDNUnxq4y3Q+6UVB7K7mJ4Pb4XCV+50ze6M6seBGv7DDztaa5jVVZ0KT28+3Y6yo+w6V/p0TBMHfyNcfSnupola1JsjnwwC9Np57otBZDpc0rgye160klC2fvIfddBDse+M+nJwcSggSUERWO9PtUB0ckfgGDlqUCPrSSBFPhbeHRnS8AZK+KpF9JcVi4hVILHeedHeuMmVqUI5Pb2C8ToIDIIv2d41yh+hE+zhwzVIw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
- smtp.mailfrom=verimatrix.com;dmarc=pass action=none
- header.from=verimatrix.com;dkim=pass header.d=verimatrix.com;arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verimatrix.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Srm0DVWXurea31F359ru7U46wBOAObLwr8U2c8AJ1Tw=;
- b=Ufp9CfU/1KiXgl7TtB8wOdjSsa1ggz+mBcn126OFgkDBbHyLu9VeUhr1qBdgLWOxCEyW+C/0RlvHV0oYGsTdrshm4VjZ4vF22U7PeKGvB1qbbUi2Dk27z0miik3Zhfjw0piobkoYhqLd24DD0TihY66/WzK3N8UjXKGvafAtjgk=
-Received: from MN2PR20MB2973.namprd20.prod.outlook.com (52.132.172.146) by
- MN2PR20MB2717.namprd20.prod.outlook.com (20.178.253.218) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2094.12; Fri, 19 Jul 2019 14:05:02 +0000
-Received: from MN2PR20MB2973.namprd20.prod.outlook.com
- ([fe80::68d7:2bbb:af61:2e69]) by MN2PR20MB2973.namprd20.prod.outlook.com
- ([fe80::68d7:2bbb:af61:2e69%6]) with mapi id 15.20.2094.013; Fri, 19 Jul 2019
- 14:05:01 +0000
-From:   Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
-To:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-CC:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>
-Subject: ghash
-Thread-Topic: ghash
-Thread-Index: AdU+OcccbSpphUQDQMqR1uphPmes/w==
-Date:   Fri, 19 Jul 2019 14:05:01 +0000
-Message-ID: <MN2PR20MB29737F1F60B3CBACBC4BD287CACB0@MN2PR20MB2973.namprd20.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=pvanleeuwen@verimatrix.com; 
-x-originating-ip: [188.204.2.113]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 6be963e4-473a-4e33-fb28-08d70c5217a5
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:MN2PR20MB2717;
-x-ms-traffictypediagnostic: MN2PR20MB2717:
-x-ms-exchange-purlcount: 2
-x-microsoft-antispam-prvs: <MN2PR20MB27171E2A32126054B10218DECACB0@MN2PR20MB2717.namprd20.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-forefront-prvs: 01039C93E4
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(979002)(4636009)(396003)(376002)(366004)(39850400004)(136003)(346002)(199004)(189003)(25786009)(478600001)(305945005)(68736007)(966005)(7736002)(33656002)(4326008)(14454004)(74316002)(6506007)(26005)(102836004)(186003)(2501003)(256004)(14444005)(486006)(476003)(15974865002)(2906002)(7696005)(9686003)(6306002)(5640700003)(55016002)(66066001)(221733001)(6436002)(3846002)(6116002)(2351001)(52536014)(76116006)(7116003)(3480700005)(54906003)(6916009)(8936002)(99286004)(66556008)(66476007)(66946007)(66446008)(8676002)(64756008)(86362001)(71190400001)(217283003)(5660300002)(316002)(71200400001)(81166006)(81156014)(53936002)(133073001)(204593002)(220243001)(18886075002)(969003)(989001)(999001)(1009001)(1019001);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR20MB2717;H:MN2PR20MB2973.namprd20.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: verimatrix.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: EMkO7zF00mSri23A0+NczyB13DwItv7noVx2QryYw3vbLcgrIYqNmGWVXUJNLxZuW1iinbEfSlKz5NmLGYHN9XCKdPa1EONGTbDXeIX+FJ+4jAtiSzkslhGRHT2uYRVlcUFFGXJ8yZG1jeBeG7/BnXa/52GL6tHFpFZCTn9RitqVd2H0M/aoGDVg7+1kH4CGsns9/qL4ZSdUa4r0d5qtFGKU6n88VTz+MEYo1rXhA1JeQi9sptLCbsEzFhgM6lpy7Yygc0BQvbgiMWEUJ944LeafRgrvyRSRtwQb2sCRZStieH9SI3bNB0xboUFH12rbVKUYUOwwp62amcxEUKoF9x/Is3Z10sEhKWevezssiuPQCgvFh7tNgz2YJyMjRoXZwjeMPV4Zehw7xGnB5P81JYHO461XjG4vb7dZFeA/YQw=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Fri, 19 Jul 2019 10:21:50 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:58292 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728431AbfGSOVu (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 19 Jul 2019 10:21:50 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6JEJOt6064327;
+        Fri, 19 Jul 2019 14:21:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2018-07-02;
+ bh=JoKUOQKxcg3kwqP1OpLXnoOqq0N//AEKX/KNLj2ooPI=;
+ b=UnG+i2Qz8isDHZL9wS6kKik10qEXR1tR903rtD9h18XIXGS7M3NkY+XpJGnJGSDy4GAg
+ ezUuKV91EHBPlm41089NDyCxRwIU41VtA3tJAywXojy4I1eXgEpwjbFMij0VXycGCEtx
+ Eryn3HwG4JI8WDJITPXBmDtpi3T98ZIdAFwRrcycC3dnjTQ6B6r3zxFIEarABOA7DgXA
+ 8XeBFXbE+jU/5tdMJnHhrKZ12ja9LtmuykEmdwHuaxoHkwfseYE12a05WkZcpY0eAjzq
+ GmzmK8xlFD4H+PZ1vd/TEdb7qFL5ekXhM7JbbS+KrbQ3o79HU4qCVJV9X+1zSYIPGmmE hQ== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by aserp2120.oracle.com with ESMTP id 2tq78q70bw-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 19 Jul 2019 14:21:24 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6JEHcO7066582;
+        Fri, 19 Jul 2019 14:21:23 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by userp3020.oracle.com with ESMTP id 2tsmcdme6j-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 19 Jul 2019 14:21:23 +0000
+Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x6JELIri020806;
+        Fri, 19 Jul 2019 14:21:20 GMT
+Received: from ca-dmjordan1.us.oracle.com (/10.211.9.48)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 19 Jul 2019 14:21:17 +0000
+Date:   Fri, 19 Jul 2019 10:21:13 -0400
+From:   Daniel Jordan <daniel.m.jordan@oracle.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Daniel Jordan <daniel.m.jordan@oracle.com>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        Andrea Parri <andrea.parri@amarulasolutions.com>,
+        Boqun Feng <boqun.feng@gmail.com>,
+        "Paul E . McKenney" <paulmck@linux.ibm.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        linux-arch@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Mathias Krause <minipli@googlemail.com>
+Subject: Re: [PATCH] padata: Replace delayed timer with immediate workqueue
+ in padata_reorder
+Message-ID: <20190719142113.ixalfoikevwnhvaq@ca-dmjordan1.us.oracle.com>
+References: <c1bbbe94-dbdc-da14-e0c3-850c965d8b5d@oracle.com>
+ <20190716163253.24377-1-daniel.m.jordan@oracle.com>
+ <20190717111147.t776zlyhdqyl5dhc@gondor.apana.org.au>
+ <20190717232136.pboms73sqf6fdzic@ca-dmjordan1.us.oracle.com>
+ <20190718033008.wle67s7esg27mrtz@gondor.apana.org.au>
+ <20190718142515.teinr4da3gps5r7a@ca-dmjordan1.us.oracle.com>
+ <20190718144950.yc6sambgdsz7vrvq@gondor.apana.org.au>
 MIME-Version: 1.0
-X-OriginatorOrg: verimatrix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6be963e4-473a-4e33-fb28-08d70c5217a5
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Jul 2019 14:05:01.8070
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: dcb260f9-022d-4495-8602-eae51035a0d0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: pvanleeuwen@verimatrix.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR20MB2717
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190718144950.yc6sambgdsz7vrvq@gondor.apana.org.au>
+User-Agent: NeoMutt/20180323-268-5a959c
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9322 signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=526
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1810050000 definitions=main-1907190160
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9322 signatures=668688
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=578 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1810050000
+ definitions=main-1907190160
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi,
+On Thu, Jul 18, 2019 at 10:49:50PM +0800, Herbert Xu wrote:
+> On Thu, Jul 18, 2019 at 10:25:15AM -0400, Daniel Jordan wrote:
+> >
+> > Which memory barrier do you mean?  I think you're referring to the one that
+> > atomic_inc might provide?  If so, the memory model maintainers can correct me
+> > here, but my understanding is that RMW atomic ops that don't return values are
+> > unordered, so switching the lines has no effect.
+> > 
+> > Besides, the smp_mb__after_atomic is what orders the list insertion with the
+> > trylock of pd->lock.
+> 
+> The primitive smp_mb__after_atomic only provides a barrier when
+> used in conjunction with atomic_inc (and similar atomic ops).
+> 
+> The actual barrier may either be in smp_mb__after_atomic or the
+> atomic op itself (which is the case on x86).  Since we need the
+> barrier to occur after the list insertion we must move both of
+> these after the list_add_tail.
 
-While implementing GHASH support for the inside-secure driver and wondering=
- why I couldn't get=20
-the test vectors to pass I have come to the conclusion that ghash-generic.c=
- actually does *not*
-implement GHASH at all. It merely implements the underlying chained GF mult=
-iplication, which,
-I understand, is convenient as a building block for e.g. aes-gcm but is is =
-NOT the full GHASH.
-Most importantly, it does NOT actually close the hash, so you can trivially=
- add more data to the
-authenticated block (i.e. the resulting output cannot be used directly with=
-out external closing)
-
-GHASH is defined as GHASH(H,A,C) whereby you do this chained GF multiply on=
- a block of AAD
-data padded to 16 byte alignment with zeroes, followed by a block of cipher=
-text padded to 16
-byte alignment with zeroes, followed by a block that contains both AAD and =
-cipher length.
-
-See also https://en.wikipedia.org/wiki/Galois/Counter_Mode
-
-Regards,
-Pascal van Leeuwen
-Silicon IP Architect, Multi-Protocol Engines @ Verimatrix
-www.insidesecure.com
-
+Yes, my mistake!  Thanks for clarifying that.
