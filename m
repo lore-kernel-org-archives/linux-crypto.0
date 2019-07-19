@@ -2,117 +2,163 @@ Return-Path: <SRS0=r9n1=VQ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42464C7618F
-	for <linux-crypto@archiver.kernel.org>; Fri, 19 Jul 2019 16:54:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1D9CC7618F
+	for <linux-crypto@archiver.kernel.org>; Fri, 19 Jul 2019 17:15:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DE3342184E
-	for <linux-crypto@archiver.kernel.org>; Fri, 19 Jul 2019 16:54:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BD5B821872
+	for <linux-crypto@archiver.kernel.org>; Fri, 19 Jul 2019 17:15:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="CCXCB7/9"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mT9yffXq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730234AbfGSQy1 (ORCPT
+        id S1728139AbfGSRPD (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 19 Jul 2019 12:54:27 -0400
-Received: from mail-eopbgr00080.outbound.protection.outlook.com ([40.107.0.80]:54020
-        "EHLO EUR02-AM5-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727717AbfGSQy1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 19 Jul 2019 12:54:27 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Q3qvtkes1gMnIZhRO/KCADEcXvkW4cChBBjTUWIqvQ7e7d3qm+PH8n+KujCHpL7wj9IkLotEFgVUfN+X2YKDhNMwWQI/8jDdOnGJkvD+ZNhZcAUxstiAV4tXjILGJN/5AZzQxJ10yvtWIswFwVOe+wGlwPzITKFkp+WrIFxdIo6iALhW12QdV1yUfNT85wfo7UB8Q3g//3j1Yyiw9E9LpATWy/aO7kzeFIecjWMsNPcPSFufO/3Wve7cUYvRMhBUcf5PFXma/YVrr6QnlhLL2SEF7b9OKV0fFtmEOAAyL0KTz3ACvDI3GHrwFJ1Gy4qRZ3MepfvkLQe9WuAoG1aeiw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kja2S85RDloG+p8N6O3qZiR8zxkUy9/1g54+ViR6xxs=;
- b=dwc2aabElo7RzgLYgdZNiM2xAj0t3C4yXm6Nh/RIO1RF3wMikIPixakuJqKNm2TzfS+jwjJvLPQAcEK7cU9Q+mMtjDRGCKKPWzLidYGJwG9xfo0GZxleOnFLdP0IBNVJPherKqQcI7PfBC3eFziiY1/EOkVuWv9ZbN3mbjiWFbbXHZRWC9SevEsACkO27rnKoAg21f5eJnT/EFbfjyrrFvxWLUGuV6mQyHfU9wq52M8JXeghBDSMjNAI7dXZy96y5DjrCTSGeNyA2mHETvDw0ywZp1YgtLqvPtEqcND5L6elix25RK1S7TntqY2zUKTE0uWQI3MzII68g1C2uePKlQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
- smtp.mailfrom=nxp.com;dmarc=pass action=none header.from=nxp.com;dkim=pass
- header.d=nxp.com;arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kja2S85RDloG+p8N6O3qZiR8zxkUy9/1g54+ViR6xxs=;
- b=CCXCB7/97px9tTRxVDcgvr5e6u+u9SivxX5YLnVSILdJQaizpr9dAhvffyKREl6ExGiZQ4oYOFNgxP0G/ESThY+00kdM6072f9v856pOzmfUUJ0n3LeEpcPnZxXXWXaqeH62MrRa3LiBIYAgroHns9aAbutTYRu5Cps2DivgQic=
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
- VI1PR0402MB3471.eurprd04.prod.outlook.com (52.134.3.151) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2094.14; Fri, 19 Jul 2019 16:54:24 +0000
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::7c64:5296:4607:e10]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::7c64:5296:4607:e10%5]) with mapi id 15.20.2073.012; Fri, 19 Jul 2019
- 16:54:24 +0000
-From:   Horia Geanta <horia.geanta@nxp.com>
-To:     Iuliana Prodan <iuliana.prodan@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>
-CC:     "David S. Miller" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        dl-linux-imx <linux-imx@nxp.com>
-Subject: Re: [PATCH] crypto: caam - move shared symbols in a common location
-Thread-Topic: [PATCH] crypto: caam - move shared symbols in a common location
-Thread-Index: AQHVPXf545kw5yPbckquQ4tXhhNyVQ==
-Date:   Fri, 19 Jul 2019 16:54:24 +0000
-Message-ID: <VI1PR0402MB348518BD7B051CBA90DAFF4998CB0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-References: <1563461349-24876-1-git-send-email-iuliana.prodan@nxp.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=horia.geanta@nxp.com; 
-x-originating-ip: [212.146.100.6]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 2e7f8979-ff02-436e-e4ed-08d70c69c0da
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:VI1PR0402MB3471;
-x-ms-traffictypediagnostic: VI1PR0402MB3471:
-x-ms-exchange-purlcount: 2
-x-microsoft-antispam-prvs: <VI1PR0402MB347196C08EFEAE3ED11679C398CB0@VI1PR0402MB3471.eurprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:2803;
-x-forefront-prvs: 01039C93E4
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(376002)(396003)(346002)(136003)(39860400002)(366004)(199004)(189003)(6636002)(3846002)(74316002)(305945005)(2906002)(186003)(66066001)(6116002)(14454004)(7736002)(8676002)(33656002)(68736007)(102836004)(966005)(6436002)(478600001)(6506007)(53546011)(26005)(25786009)(7696005)(76176011)(53936002)(4744005)(81166006)(6246003)(86362001)(8936002)(71190400001)(71200400001)(99286004)(44832011)(4326008)(486006)(66946007)(66476007)(64756008)(66446008)(446003)(229853002)(66556008)(81156014)(476003)(91956017)(76116006)(6306002)(9686003)(55016002)(256004)(316002)(54906003)(110136005)(5660300002)(52536014);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB3471;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: nxp.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: gmSNR8F0myLoa86vGzMRWH+NmbfmT9NSgy1U+Qx9soyrHabZLqewLtINMEu9S9SSxd1DQaIkRpcxIFIRmbK8a2buTVY2pU8hxgbtDCb6Gk9Dbf5YbxjX3cRabE9hogPRkjVbFx5nySbFFdgwS+5/RW2e6w0LMRJ1No41SvGzyzLTdJ51EsW1ZgyW4GFmHVCPPcoyyscOAgNpMLiV0z8GaZNh8zYESBIwgTlNBuOunO7JeAm2duzeejhY7WSzjieLa3tgm6NkU4tCaEB7n7n60ZTll11fKrwMJGzw1JCr6uvisVbpNqoSC0hlyik1RhiB3w58euPSt0txAPPkIvv+En/mDzAY+wbZnvYh+4J3mWoIDKzzS70Pk8IkxOF9Ud/mkru//oVD9LlFlQTQ9KE0SxHJqVGK5wHQ2B8WBQYU+Dg=
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
+        Fri, 19 Jul 2019 13:15:03 -0400
+Received: from mail-wm1-f52.google.com ([209.85.128.52]:38027 "EHLO
+        mail-wm1-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727602AbfGSRPD (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 19 Jul 2019 13:15:03 -0400
+Received: by mail-wm1-f52.google.com with SMTP id s15so8338817wmj.3
+        for <linux-crypto@vger.kernel.org>; Fri, 19 Jul 2019 10:15:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=uEAqm1stTO9823fBrOpppjd8fzZPKzRMlZWQILPMn+g=;
+        b=mT9yffXq78ALikWp59ge7dfnWEvsfs/MazrFFbM1BQQG8pzRljsgYwI+fr1mKYe1w6
+         VzqOBVM28KOPQeDDekgxWquoEJPswvZyq4Pf4HvBc0Ad8CRVuCmaASwzT5hcheyhMnNZ
+         U6MEbiKNSnvfgNdYp7QH3+XfyMg3obCy6JinNzynOaWdV7EyvFboup/D3jH7t1UaWeCQ
+         6l9Dty7yLogV36VDwxs/D2CJvptX/7d23pFdwD7LGl66oECRLb+N7Za8Gn/C3z1vLD1M
+         YQ7AMBKQbo/DoGk6jLnbEchUT8X4tSCa4ikZeBBHbaPzTmmQ73AInEPJuHwdIGb6vJD7
+         SCzQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=uEAqm1stTO9823fBrOpppjd8fzZPKzRMlZWQILPMn+g=;
+        b=OyeLJzVMb95T0+PPrP9j/uhJ/z8YFzFwIF892ZK+1B3XVS+Q5ON7+10D4TNViDcC9w
+         hE3mS5ib/XNET8E2enmiKiUyRmnWgJgBKZ49ULs5X9U9Ue7J1fgXA6WveGjx+m2wlBCB
+         sLq5lq8curJ5lk+PnRUfpDyjBnbK80nH+jCm3jxw+V/A0jWLkODlp6j0JVhwZZhjvzIS
+         rIogQyZrc3ihmIhQZP8+U182KV3EVoXWcZXaWKSSu1NPF7IgwHDGXmft7DPkaC3N83zw
+         oWIQCVk8L0vboCHdwYhsLjZglQbUgkagZ9s4uOmE8OfKE+c0mTsw0M8jKrIGCQ+zw+9n
+         fCKw==
+X-Gm-Message-State: APjAAAUIPcGWknGU3p7fB3dTg9oQorC9ZPwFIXOQuZ82/wNSuYWXn8B3
+        08LPkTisvcpteqoOHC9P+v3mPOP1Ln0t5S92jMgDCQ==
+X-Google-Smtp-Source: APXvYqxPLiyDoU4Jv1g5iP/e8ZDOu8y7mC1ktjAQrga59UhOtU14oiDb7MS0KsRRoVPYZeLAryvpFMH2sdH6ngL0Js0=
+X-Received: by 2002:a05:600c:20c1:: with SMTP id y1mr50632500wmm.10.1563556500588;
+ Fri, 19 Jul 2019 10:15:00 -0700 (PDT)
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2e7f8979-ff02-436e-e4ed-08d70c69c0da
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Jul 2019 16:54:24.1895
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: horia.geanta@nxp.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3471
+References: <VI1PR0402MB34857BBB18C2BB8CBA2DEC7198C90@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+ <20190717172823.GA205944@gmail.com> <CAKv+Gu__offPaWvyURJr8v56ig58q-Deo16QhP26EJ32uf5m3w@mail.gmail.com>
+ <20190718065223.4xaefcwjoxvujntw@gondor.apana.org.au> <CAKv+Gu9-EWNpJ9viSsjhYRdOZb=7a=Mpddmyt8SLEq9aFtawjg@mail.gmail.com>
+ <20190718072154.m2umem24x4grbf6w@gondor.apana.org.au> <36e78459-1594-6d19-0ab4-95b03a6de036@gmail.com>
+ <MN2PR20MB2973E61815F069E8C7D74177CAC80@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <20190718152908.xiuze3kb3fdc7ov6@gondor.apana.org.au> <MN2PR20MB2973E1A367986303566E80FCCAC80@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <20190718155140.b6ig3zq22askmfpy@gondor.apana.org.au> <CAKv+Gu9qm8mDZASJasq18bW=4_oE-cKPGKvdF9+8=7VNo==_fA@mail.gmail.com>
+ <MN2PR20MB2973DE308D0050DBF3F26870CAC80@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <CAKv+Gu8dE6EO1NOwni91cvEWJvPzieC3wKph73j2jWxzx_xKAw@mail.gmail.com> <MN2PR20MB297371CEE0F60E58E110C6FDCACB0@MN2PR20MB2973.namprd20.prod.outlook.com>
+In-Reply-To: <MN2PR20MB297371CEE0F60E58E110C6FDCACB0@MN2PR20MB2973.namprd20.prod.outlook.com>
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date:   Fri, 19 Jul 2019 19:14:49 +0200
+Message-ID: <CAKv+Gu-_1Bv1WQw+7ENWmjgvbgncKXGYOfxSr2GhVfN3-U3VtQ@mail.gmail.com>
+Subject: Re: xts fuzz testing and lack of ciphertext stealing support
+To:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Milan Broz <gmazyland@gmail.com>,
+        Horia Geanta <horia.geanta@nxp.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 7/18/2019 5:49 PM, Iuliana Prodan wrote:=0A=
-> Moved to a common location the symbols shared by all CAAM drivers (jr,=0A=
-> qi, qi2).=0A=
-> =0A=
-> Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>=0A=
-Reviewed-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
-=0A=
-> ---=0A=
-> This patch depends on series:=0A=
-> https://patchwork.kernel.org/project/linux-crypto/list/?series=3D147479=
-=0A=
-> =0A=
-Note however that the patch will have to be respinned,=0A=
-since common_if needs to be reworked according to:=0A=
-https://lore.kernel.org/linux-crypto/20190719151526.uqvg4q4pbpztojnv@gondor=
-.apana.org.au/=0A=
-i.e. generic helpers should be moved into crypto API=0A=
-=0A=
-Horia=0A=
-=0A=
+On Fri, 19 Jul 2019 at 09:29, Pascal Van Leeuwen
+<pvanleeuwen@verimatrix.com> wrote:
+>
+> > -----Original Message-----
+> > From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> > Sent: Friday, July 19, 2019 7:35 AM
+> > To: Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+> > Cc: Herbert Xu <herbert@gondor.apana.org.au>; Milan Broz <gmazyland@gmail.com>; Horia Geanta <horia.geanta@nxp.com>; linux-
+> > crypto@vger.kernel.org; dm-devel@redhat.com
+> > Subject: Re: xts fuzz testing and lack of ciphertext stealing support
+>  >
+> > I would argue that these cases are diametrically opposite: you
+> > proposed to remove support for zero length input vectors from the
+> > entire crypto API to prevent your driver from having to deal with
+> > inputs that the hardware cannot handle.
+> >
+> I did not propose any such thing - I just proposed to make zero length hash support *optional*
+> (i.e. don't fail and disable the driver on it) as it's totally irrelevant for 99.99999% of use cases.
+> (including *all* use cases I consider relevant for HW acceleration)
+>
+
+Fair enough. But it did involve making modifications to the generic
+layer, since there are known users of the AF_ALG interface that may
+pass zero length inputs (e.g., sha1sum).
+
+> > I am proposing not to add support for cases that we have no need for.
+> >
+> While you are proposing to stick with an implementation that can only deal with 6.25% (1/16th) of
+> *legal* input data for XTS and fails on the remaining 93.75%. That's hardly a corner case anymore.
+>
+
+I never said it was a corner case, nor does it make a lot of sense to
+reason about fractional compliance, given that 100% of the inputs we
+ever encounter are covered by your 6.25% of legal input data.
+
+What i did say was that the moving parts we will add to the code will
+never be put into motion, while they do increase the validation space,
+and so the value of the contribution will be negative.
+
+Perhaps I should emphasize that my concern is mainly about in-kernel
+usage of the sync software ciphers, since they typically have no use
+for userland, given that they can simply issue the same instructions
+directly. For AF_ALG, I agree that exposing a non-compliant XTS
+implementation is a bad idea.
+
+> > XTS without CTS is indistinguishable from XTS with CTS if the inputs
+> > are always a multiple of the block size, and in 12 years, nobody has
+> > ever raised the issue that our support is limited to that. So what
+> > problem are we fixing by changing this? dm-crypt does not care,
+> > fscrypt does not care, userland does not care (given that it does not
+> > work today and we are only finding out now due to some fuzz test
+> > failing on CAAM)
+> >
+> If it's not supported, then it cannot be used. Most people would not start complaining about that,
+> they would just roll their own locally or they'd give up and/or use something else.
+> So the fact that it's currently not being used does not mean a whole lot. Also, it does not mean
+> that there will not be a relevant use case tomorrow. (and I can assure you there *are* definitely
+> real-life use cases, so I have to assume these are currently handled outside of the base kernel)
+>
+> In any case, if you try to use XTS you would *expect* it to work for any input >= 16 bytes as that's
+> how the algorithm is *specified*. Without the CTS part it's simply not XTS.
+>
+
+I really don't care what we call it. My point is that we don't need
+functionality that we will not use, regardless of how it is called.
+
+> > > I pretty much made the same argument about all these driver workarounds
+> > > slowing down my driver fast path but that was considered a non-issue.
+> > >
+> > > In this particular case, it should not need to be more than:
+> > >
+> > > if (unlikely(size & 15)) {
+> > >   xts_with_partial_last_block();
+> > > } else {
+> > >   xts_with_only_full_blocks();
+> > > }
+> > >
+> >
+> > Of course. But why add this at all if it is known to be dead code?
+> >
+> But that's just an assumption and assumptions are the root of all evil ;-)
+>
+
+I think it was premature optimization that is the root of all evil, no?
