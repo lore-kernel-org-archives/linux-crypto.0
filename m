@@ -2,138 +2,275 @@ Return-Path: <SRS0=CriU=VS=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C722EC76188
-	for <linux-crypto@archiver.kernel.org>; Sun, 21 Jul 2019 09:50:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63EDCC76188
+	for <linux-crypto@archiver.kernel.org>; Sun, 21 Jul 2019 09:51:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 883712085A
-	for <linux-crypto@archiver.kernel.org>; Sun, 21 Jul 2019 09:50:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 24BB72085A
+	for <linux-crypto@archiver.kernel.org>; Sun, 21 Jul 2019 09:51:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="y8XAoLGX"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Yn85RkPR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725868AbfGUJuV (ORCPT
+        id S1725989AbfGUJvO (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 21 Jul 2019 05:50:21 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:35967 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725851AbfGUJuU (ORCPT
+        Sun, 21 Jul 2019 05:51:14 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:39116 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725851AbfGUJvO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 21 Jul 2019 05:50:20 -0400
-Received: by mail-wm1-f65.google.com with SMTP id g67so28510990wme.1
-        for <linux-crypto@vger.kernel.org>; Sun, 21 Jul 2019 02:50:19 -0700 (PDT)
+        Sun, 21 Jul 2019 05:51:14 -0400
+Received: by mail-wr1-f67.google.com with SMTP id x4so36284625wrt.6
+        for <linux-crypto@vger.kernel.org>; Sun, 21 Jul 2019 02:51:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=RQaXx84yWJDYOO2wjLxF1QV6zoVPN9ZxOOdoAW7u+BM=;
-        b=y8XAoLGX2iH50XgryNmDwfuWVYGdZdKO60N8llqHSZxaim56KJI6E/96fwVOtTeas8
-         kmg0ecVjwc7CfZ5CIVqkbYmge0b5w+Y0qbwt21zcU7eOUr9FdXwqa5Ry1vFeH+ULOrSx
-         7ikSE99Ar0WahmR5qHw2hfP+Cq9nmEywvod0EFfIu/uXMzhRd1LpUmj7rJ6BsIchkndQ
-         YTVR5FcFgzXfN9333I5Pm6/OmmcEWCVFVKYpYBdw5Go3RPtQcDNON9XGJl8sRyBN5STL
-         RdQE5ulvc3wlRC4S8t3OO4b7V7LAws/U52hD9Ru8Ik4TwOfh7oWrH8/5YIhaNcicxrNu
-         NRKg==
+         :cc:content-transfer-encoding;
+        bh=Z53hRrHefOJhtDHfaXpJagunFHYavBL1a4i0yU/Dq9U=;
+        b=Yn85RkPRbwuTEgaXrTiRfWDTI0VMgsgSoMtA8IdmuWKicP5JEmaUUGtgQGTbJfiwOC
+         vpFiyR/jBRf4qSSYP8PHdCxvuhJmCUgBlbBCVo53lpCcKzhr3sN8EzritimAyvvMHeXM
+         JqHo04lZrwH9cUbKxH7+NqzUgotAToqy0Wj8EHTRIMEEJ/taENibtLkr15VzZfaXXDuC
+         3DicZ3rZ1aZU18qwPJZ52vS4Q2ZFJK/HQXw1QbloO9aoQ88U5QHIJpoOxkJCehgQbFG+
+         K5ayaEyss9diFgRJXOU8IznqvFzzKiBYFeaDRVInVeBoV9uegHrIqfXT34ANp8a+q5NS
+         dVng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=RQaXx84yWJDYOO2wjLxF1QV6zoVPN9ZxOOdoAW7u+BM=;
-        b=YwrfIv/em2KSa64Ox5HysoXU3oZsSa44BmmC2r7eW/iZaIofjv3s6OFgNYvwiqt2aU
-         WVdMas668H7r6yfqqvrrah9qrkFgKLoKz0haflipJepYVIFLh87YJMGCBjh8nv7+NZ2M
-         Lr3WiLyvySQNNCHEaiatRV/Wy6p9lZ8Gs+C8ggRmBvyYzXY3jlkrGO0NzSqQ6CHa90Zg
-         E8vZsQOXh5wwv6Ia7h4dkqdWYoAlzGR6UtaS3NBf4c4PCa/8uUYFyNU5ldkTHg9KxTwy
-         ptlOuS2d8huZQISvWtssL6vklltqO8crFdcBNTH5/ujHrqOFbNDuuSobijIoZxs/cTSY
-         uDnQ==
-X-Gm-Message-State: APjAAAWOVevt1WpbJX9BnUvnoXzWbmsHr9K/36rqwp/loPhl39iMsSxj
-        1/iUFnJX9S2hFejMFkBmaUTAuhk3ZuN0F2IoxeaCeQ==
-X-Google-Smtp-Source: APXvYqye8yDdcXSDxXz1NeD+aCt85eq+4ajcVUtTYtafRYlbuL+czLGoNh21v0Bdz5CxdHGa/NFkDT+w3ALqZg6jyZQ=
-X-Received: by 2002:a05:600c:20c1:: with SMTP id y1mr60152036wmm.10.1563702618401;
- Sun, 21 Jul 2019 02:50:18 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=Z53hRrHefOJhtDHfaXpJagunFHYavBL1a4i0yU/Dq9U=;
+        b=rV3fDH3LUExf8ffr/T64vWHMmd7ZuuHUKUboBLJ+z1qbIeQ6lksTqicpwf8g+oDDE4
+         QDHTLn0OffJffi0t7ob1dgvgKoeRt1p2I2zSnovSaiwMl2eEas6M64VtTGfm1M2+VcPT
+         AEuFAw6Komt7z5JtU0biyhl0uGualGIicOyGRtj9BC+IbA9daYiSEnTT1cfBm4x3q8mX
+         7qQ156lIhsArfqZ+zvijx+Gjw1fE4gXgM6kqDNQHX2KAXNGGhWju8w5B3YRU3sLnPVei
+         FlnInbn2nP5/G4c5tDxMQshJ4yD4AgwYhwB34V+5Gl1q4W49QMMtm7ptxbJCnLB4byuU
+         tqWw==
+X-Gm-Message-State: APjAAAX8RyLyISy/3+k9CknJ8vfEfSXd6Mq7Xejkp4uX3htSQIHPqbgP
+        H77dy5SxGwTTvPTksyPsxN/T64JSnbtxIqizsoc/hw==
+X-Google-Smtp-Source: APXvYqxliFPcuzeq8Ysnd9+fL7pyXWiKMKEYncCpQcmdc6ApDQQ+7IFA6y4HALDXdOKSMcdHxB2PVu16OcghDMWwDy8=
+X-Received: by 2002:a5d:6b07:: with SMTP id v7mr68418396wrw.169.1563702671127;
+ Sun, 21 Jul 2019 02:51:11 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190716221639.GA44406@gmail.com> <VI1PR0402MB34857BBB18C2BB8CBA2DEC7198C90@VI1PR0402MB3485.eurprd04.prod.outlook.com>
- <20190717172823.GA205944@gmail.com> <CAKv+Gu__offPaWvyURJr8v56ig58q-Deo16QhP26EJ32uf5m3w@mail.gmail.com>
- <20190718065223.4xaefcwjoxvujntw@gondor.apana.org.au> <CAKv+Gu9-EWNpJ9viSsjhYRdOZb=7a=Mpddmyt8SLEq9aFtawjg@mail.gmail.com>
- <20190718072154.m2umem24x4grbf6w@gondor.apana.org.au> <36e78459-1594-6d19-0ab4-95b03a6de036@gmail.com>
- <MN2PR20MB2973E61815F069E8C7D74177CAC80@MN2PR20MB2973.namprd20.prod.outlook.com>
- <b042649c-db98-9710-b063-242bdf520252@gmail.com> <20190720065807.GA711@sol.localdomain>
- <0d4d6387-777c-bfd3-e54a-e7244fde0096@gmail.com>
-In-Reply-To: <0d4d6387-777c-bfd3-e54a-e7244fde0096@gmail.com>
+References: <20190720060918.25880-1-ebiggers@kernel.org>
+In-Reply-To: <20190720060918.25880-1-ebiggers@kernel.org>
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Sun, 21 Jul 2019 12:50:06 +0300
-Message-ID: <CAKv+Gu9UF+a1UhVU19g1XcLaEqEaAwwkSm3-2wTHEAdD-q4mLQ@mail.gmail.com>
-Subject: Re: [dm-devel] xts fuzz testing and lack of ciphertext stealing support
-To:     Milan Broz <gmazyland@gmail.com>
-Cc:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>,
+Date:   Sun, 21 Jul 2019 12:51:00 +0300
+Message-ID: <CAKv+Gu8NGoNdt2ZEKToKjM0YMzLxUjAM+4yHPkQKBDx=7Wo_rw@mail.gmail.com>
+Subject: Re: [PATCH] crypto: ghash - add comment and improve help text
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Horia Geanta <horia.geanta@nxp.com>
+        Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, 20 Jul 2019 at 10:35, Milan Broz <gmazyland@gmail.com> wrote:
+On Sat, 20 Jul 2019 at 09:10, Eric Biggers <ebiggers@kernel.org> wrote:
 >
-> On 20/07/2019 08:58, Eric Biggers wrote:
-> > On Thu, Jul 18, 2019 at 01:19:41PM +0200, Milan Broz wrote:
-> >> Also, I would like to avoid another "just because it is nicer" module dependence (XTS->XEX->ECB).
-> >> Last time (when XTS was reimplemented using ECB) we have many reports with initramfs
-> >> missing ECB module preventing boot from AES-XTS encrypted root after kernel upgrade...
-> >> Just saying. (Despite the last time it was keyring what broke encrypted boot ;-)
-> >>
-> >
-> > Can't the "missing modules in initramfs" issue be solved by using a
-> > MODULE_SOFTDEP()?  Actually, why isn't that being used for xts -> ecb already?
-> >
-> > (There was also a bug where CONFIG_CRYPTO_XTS didn't select CONFIG_CRYPTO_ECB,
-> > but that was simply a bug, which was fixed.)
+> From: Eric Biggers <ebiggers@google.com>
 >
-> Sure, and it is solved now. (Some systems with a hardcoded list of modules
-> have to be manually updated etc., but that is just bad design).
-> It can be done properly from the beginning.
+> To help avoid confusion, add a comment to ghash-generic.c which explains
+> the convention that the kernel's implementation of GHASH uses.
 >
-> I just want to say that that switching to XEX looks like wasting time to me
-> for no additional benefit.
+> Also update the Kconfig help text and module descriptions to call GHASH
+> a "hash function" rather than a "message digest", since the latter
+> normally means a real cryptographic hash function, which GHASH is not.
 >
-> Fully implementing XTS does make much more sense for me, even though it is long-term
-> the effort and the only user, for now, would be testmgr.
->
-> So, there are no users because it does not work. It makes no sense
-> to implement it, because there are no users... (sorry, sounds like catch 22 :)
->
-> (Maybe someone can use it for keyslot encryption for keys not aligned to
-> block size, dunno. Actually, some filesystem encryption could have use for it.)
->
-> > Or "xts" and "xex" could go in the same kernel module xts.ko, which would make
-> > this a non-issue.
->
-> If it is not available for users, I really see no reason to introduce XEX when
-> it is just XTS with full blocks.
->
-> If it is visible to users, it needs some work in userspace - XEX (as XTS) need two keys,
-> people are already confused enough that 256bit key in AES-XTS means AES-128...
-> So the examples, hints, man pages need to be updated, at least.
->
+> Cc: Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 
-OK, consider me persuaded. We are already exposing xts(...) to
-userland, and since we already implement a proper subset of true XTS,
-it will be simply a matter of making sure that the existing XTS
-implementations don't regress in performance on the non-CTS code
-paths.
+Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-It would be useful, though, to have some generic helper functions,
-e.g., like the one we have for CBC, or the one I recently proposed for
-CTS, so that existing implementations (such as the bit sliced AES) can
-easily be augmented with a CTS code path (but performance may not be
-optimal in those cases). For the ARM implementations based on AES
-instructions, it should be reasonably straight forward to implement it
-close to optimally by reusing some of the code I added for CBC-CTS
-(but I won't get around to doing that for a while). If there are any
-volunteers for looking into the generic or x86/AES-NI implementations,
-please come forward :-) Also, if any of the publications that were
-quoted in this thread have suitable test vectors, that would be good
-to know.
+> ---
+>  arch/arm/crypto/ghash-ce-glue.c            |  2 +-
+>  arch/s390/crypto/ghash_s390.c              |  2 +-
+>  arch/x86/crypto/ghash-clmulni-intel_glue.c |  3 +--
+>  crypto/Kconfig                             | 11 ++++----
+>  crypto/ghash-generic.c                     | 31 +++++++++++++++++++---
+>  drivers/crypto/Kconfig                     |  6 ++---
+>  include/crypto/ghash.h                     |  2 +-
+>  7 files changed, 41 insertions(+), 16 deletions(-)
+>
+> diff --git a/arch/arm/crypto/ghash-ce-glue.c b/arch/arm/crypto/ghash-ce-g=
+lue.c
+> index 52d472a050e6a..bfdc557dc031c 100644
+> --- a/arch/arm/crypto/ghash-ce-glue.c
+> +++ b/arch/arm/crypto/ghash-ce-glue.c
+> @@ -17,7 +17,7 @@
+>  #include <linux/crypto.h>
+>  #include <linux/module.h>
+>
+> -MODULE_DESCRIPTION("GHASH secure hash using ARMv8 Crypto Extensions");
+> +MODULE_DESCRIPTION("GHASH hash function using ARMv8 Crypto Extensions");
+>  MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
+>  MODULE_LICENSE("GPL v2");
+>  MODULE_ALIAS_CRYPTO("ghash");
+> diff --git a/arch/s390/crypto/ghash_s390.c b/arch/s390/crypto/ghash_s390.=
+c
+> index eeeb6a7737a4a..a3e7400e031ca 100644
+> --- a/arch/s390/crypto/ghash_s390.c
+> +++ b/arch/s390/crypto/ghash_s390.c
+> @@ -153,4 +153,4 @@ module_exit(ghash_mod_exit);
+>  MODULE_ALIAS_CRYPTO("ghash");
+>
+>  MODULE_LICENSE("GPL");
+> -MODULE_DESCRIPTION("GHASH Message Digest Algorithm, s390 implementation"=
+);
+> +MODULE_DESCRIPTION("GHASH hash function, s390 implementation");
+> diff --git a/arch/x86/crypto/ghash-clmulni-intel_glue.c b/arch/x86/crypto=
+/ghash-clmulni-intel_glue.c
+> index ac76fe88ac4fd..04d72a5a8ce98 100644
+> --- a/arch/x86/crypto/ghash-clmulni-intel_glue.c
+> +++ b/arch/x86/crypto/ghash-clmulni-intel_glue.c
+> @@ -357,6 +357,5 @@ module_init(ghash_pclmulqdqni_mod_init);
+>  module_exit(ghash_pclmulqdqni_mod_exit);
+>
+>  MODULE_LICENSE("GPL");
+> -MODULE_DESCRIPTION("GHASH Message Digest Algorithm, "
+> -                  "accelerated by PCLMULQDQ-NI");
+> +MODULE_DESCRIPTION("GHASH hash function, accelerated by PCLMULQDQ-NI");
+>  MODULE_ALIAS_CRYPTO("ghash");
+> diff --git a/crypto/Kconfig b/crypto/Kconfig
+> index e801450bcb1cf..f14c457183c55 100644
+> --- a/crypto/Kconfig
+> +++ b/crypto/Kconfig
+> @@ -728,11 +728,12 @@ config CRYPTO_VPMSUM_TESTER
+>           Unless you are testing these algorithms, you don't need this.
+>
+>  config CRYPTO_GHASH
+> -       tristate "GHASH digest algorithm"
+> +       tristate "GHASH hash function"
+>         select CRYPTO_GF128MUL
+>         select CRYPTO_HASH
+>         help
+> -         GHASH is message digest algorithm for GCM (Galois/Counter Mode)=
+.
+> +         GHASH is the hash function used in GCM (Galois/Counter Mode).
+> +         It is not a general-purpose cryptographic hash function.
+>
+>  config CRYPTO_POLY1305
+>         tristate "Poly1305 authenticator algorithm"
+> @@ -1057,12 +1058,12 @@ config CRYPTO_WP512
+>           <http://www.larc.usp.br/~pbarreto/WhirlpoolPage.html>
+>
+>  config CRYPTO_GHASH_CLMUL_NI_INTEL
+> -       tristate "GHASH digest algorithm (CLMUL-NI accelerated)"
+> +       tristate "GHASH hash function (CLMUL-NI accelerated)"
+>         depends on X86 && 64BIT
+>         select CRYPTO_CRYPTD
+>         help
+> -         GHASH is message digest algorithm for GCM (Galois/Counter Mode)=
+.
+> -         The implementation is accelerated by CLMUL-NI of Intel.
+> +         This is the x86_64 CLMUL-NI accelerated implementation of
+> +         GHASH, the hash function used in GCM (Galois/Counter mode).
+>
+>  comment "Ciphers"
+>
+> diff --git a/crypto/ghash-generic.c b/crypto/ghash-generic.c
+> index dad9e1f91a783..5027b3461c921 100644
+> --- a/crypto/ghash-generic.c
+> +++ b/crypto/ghash-generic.c
+> @@ -1,12 +1,37 @@
+>  // SPDX-License-Identifier: GPL-2.0-only
+>  /*
+> - * GHASH: digest algorithm for GCM (Galois/Counter Mode).
+> + * GHASH: hash function for GCM (Galois/Counter Mode).
+>   *
+>   * Copyright (c) 2007 Nokia Siemens Networks - Mikko Herranen <mh1@iki.f=
+i>
+>   * Copyright (c) 2009 Intel Corp.
+>   *   Author: Huang Ying <ying.huang@intel.com>
+> + */
+> +
+> +/*
+> + * GHASH is a keyed hash function used in GCM authentication tag generat=
+ion.
+> + *
+> + * The original GCM paper [1] presents GHASH as a function GHASH(H, A, C=
+) which
+> + * takes a 16-byte hash key H, additional authenticated data A, and a ci=
+phertext
+> + * C.  It formats A and C into a single byte string X, interprets X as a
+> + * polynomial over GF(2^128), and evaluates this polynomial at the point=
+ H.
+> + *
+> + * However, the NIST standard for GCM [2] presents GHASH as GHASH(H, X) =
+where X
+> + * is the already-formatted byte string containing both A and C.
+> + *
+> + * "ghash" in the Linux crypto API uses the 'X' (pre-formatted) conventi=
+on,
+> + * since the API supports only a single data stream per hash.  Thus, the
+> + * formatting of 'A' and 'C' is done in the "gcm" template, not in "ghas=
+h".
+> + *
+> + * The reason "ghash" is separate from "gcm" is to allow "gcm" to use an
+> + * accelerated "ghash" when a standalone accelerated "gcm(aes)" is unava=
+ilable.
+> + * It is generally inappropriate to use "ghash" for other purposes, sinc=
+e it is
+> + * an "=CE=B5-almost-XOR-universal hash function", not a cryptographic h=
+ash function.
+> + * It can only be used securely in crypto modes specially designed to us=
+e it.
+>   *
+> - * The algorithm implementation is copied from gcm.c.
+> + * [1] The Galois/Counter Mode of Operation (GCM)
+> + *     (http://citeseerx.ist.psu.edu/viewdoc/download?doi=3D10.1.1.694.6=
+95&rep=3Drep1&type=3Dpdf)
+> + * [2] Recommendation for Block Cipher Modes of Operation: Galois/Counte=
+r Mode (GCM) and GMAC
+> + *     (https://csrc.nist.gov/publications/detail/sp/800-38d/final)
+>   */
+>
+>  #include <crypto/algapi.h>
+> @@ -156,6 +181,6 @@ subsys_initcall(ghash_mod_init);
+>  module_exit(ghash_mod_exit);
+>
+>  MODULE_LICENSE("GPL");
+> -MODULE_DESCRIPTION("GHASH Message Digest Algorithm");
+> +MODULE_DESCRIPTION("GHASH hash function");
+>  MODULE_ALIAS_CRYPTO("ghash");
+>  MODULE_ALIAS_CRYPTO("ghash-generic");
+> diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+> index 603413f28fa35..43c36533322f1 100644
+> --- a/drivers/crypto/Kconfig
+> +++ b/drivers/crypto/Kconfig
+> @@ -189,12 +189,12 @@ config S390_PRNG
+>           It is available as of z9.
+>
+>  config CRYPTO_GHASH_S390
+> -       tristate "GHASH digest algorithm"
+> +       tristate "GHASH hash function"
+>         depends on S390
+>         select CRYPTO_HASH
+>         help
+> -         This is the s390 hardware accelerated implementation of the
+> -         GHASH message digest algorithm for GCM (Galois/Counter Mode).
+> +         This is the s390 hardware accelerated implementation of GHASH,
+> +         the hash function used in GCM (Galois/Counter mode).
+>
+>           It is available as of z196.
+>
+> diff --git a/include/crypto/ghash.h b/include/crypto/ghash.h
+> index 9136301062a5c..f832c9f2aca30 100644
+> --- a/include/crypto/ghash.h
+> +++ b/include/crypto/ghash.h
+> @@ -1,6 +1,6 @@
+>  /* SPDX-License-Identifier: GPL-2.0 */
+>  /*
+> - * Common values for GHASH algorithms
+> + * Common values for the GHASH hash function
+>   */
+>
+>  #ifndef __CRYPTO_GHASH_H__
+> --
+> 2.22.0
+>
