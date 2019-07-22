@@ -2,117 +2,147 @@ Return-Path: <SRS0=h947=VT=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB51BC76188
-	for <linux-crypto@archiver.kernel.org>; Mon, 22 Jul 2019 12:55:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76FFEC76188
+	for <linux-crypto@archiver.kernel.org>; Mon, 22 Jul 2019 14:25:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A732D2084D
-	for <linux-crypto@archiver.kernel.org>; Mon, 22 Jul 2019 12:55:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 247232171F
+	for <linux-crypto@archiver.kernel.org>; Mon, 22 Jul 2019 14:25:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=verimatrix.com header.i=@verimatrix.com header.b="d8jqprcM"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="muQc5MZ+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728690AbfGVMzp (ORCPT
+        id S1728083AbfGVOZK (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 22 Jul 2019 08:55:45 -0400
-Received: from mail-eopbgr780079.outbound.protection.outlook.com ([40.107.78.79]:29224
-        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
+        Mon, 22 Jul 2019 10:25:10 -0400
+Received: from mail-eopbgr150042.outbound.protection.outlook.com ([40.107.15.42]:1921
+        "EHLO EUR01-DB5-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727164AbfGVMzp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 22 Jul 2019 08:55:45 -0400
+        id S1725907AbfGVOZJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 22 Jul 2019 10:25:09 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=l83oh4kHUGCbJtuYfK1xlsmoyKs6a2Okz6dO8GoxG4VD4w3XoLzJBDZiUAwhhFQi9DVDlu7uqG7M829zHI+2jGdblNozCBJghqqYdLxN7/f8yd4gOYmA2P4qKMNkJBljUcv5YsT7zqItExH9aU4vBCxBUtzM2+VeV9+UM74u+Sz0N175MPxvOzx6er/YUIiYuMX4QcnKQmySiivNhzJJhPRuf2K/8oP4wtgeQAhKXuKYXsSRvGiwZNSj9mIvoFGLRTcBpWMfCm2kqJulXfaVqyudjfaUSRVWGPkYzovYx8wXDXjEf4xzDoh5u3zLnUyXEhKusG5/xiV3iKwyX3coEw==
+ b=m9Jz1Xr/q4DMAr0nEqkM9wnla5WUy++cu83iMphuzDvvFHiDYSKUvSkG/dXBdGLkbSeQNJrqGOSNznrdh0Da2XmWukPiv7/x9tyYh3nkeMSmoFr41jlmhhkrH+40FYiuyIc9ejs/ruFQ85vDb5kk2Sq4wOknI4Moa+lF1J7MO3U0oKgq1Y2GG3WdSNbN1OmneGsZVyq/CqGNVMiuIUdDhWHJfWD5h8taC9VzczDkK5NmwLNgrYJkLFO/Zcbe9+IS0V7mVmf5eHJhlzugSVIypP+bA253XQbnSGojAIHqX7QX7KntbvhQX/VucgP8ISiFZLMpYRdYbBXNFEg/szJNeA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XmTj5bQmYBy37LeT4EIRyflZmSaKN+lpoiXzjPuzXx8=;
- b=ObCxAd1lZMeOgNFiFWqcEUB5J+uS/jnWpqeYXa5kucH/KmickOAiUORW7BuPRcJZkklaONuAphcDBS76K0Z+q/5kvgSH8EMV2Ix1fog22Y/wGMs/FSWkdd3lwkzTzjletsem4J1JMUne5twMi1N/ZAvDwPvaISe9u3X8vEbTVT3AB/yM7MWmEgKJvE5ZTnEgL5G3y6el18Q9KElHjZMTstevTEsTWUhXM34p2/CeD+KS/7tdWxZy24+Pa4Y82lzmVPw4h59a5HDTkoC2sMIyiULxoPqgjVicmLJfinko+sPXIrurll7jgE0XcmW+jW2007tUojecqGZn5gA5aHC33A==
+ bh=Ufbn9V4jX+amNR5V9UViiqFYwgUltjgIFiH20Xhmp5A=;
+ b=ceXfbZ0v2lIPi5humHy0Ms923tQhF7lrDX/GkNRwsUVj90br42fL+VpjwDWuwo4vWB4L9yZDzF+MT+jfcQh1wEqqF8fZmdupeKE6l/1qveYif+zDhX3Yxh/+fH5qck1knIh2Qdcv0iQyGJQlAYX5gi1d8j8G/SYqwggDodN3SycibZpnqqH/9yNLKsu7xHJR9fZYBPa7Y5vCTFnwRqeYqOLbRU9Gw+KXWjmviiWOXiJDG0507gxaFde7oEiqQFelqiq/GBI9C0PPfkbXxuaHLv1b4eBngUyj2Poy4mv+67RQL9NaEMD93sFVfPqqpwPWwPdSSA4A2uKjJ1zJfMCssQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
- smtp.mailfrom=verimatrix.com;dmarc=pass action=none
- header.from=verimatrix.com;dkim=pass header.d=verimatrix.com;arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verimatrix.com;
- s=selector2;
+ smtp.mailfrom=nxp.com;dmarc=pass action=none header.from=nxp.com;dkim=pass
+ header.d=nxp.com;arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=XmTj5bQmYBy37LeT4EIRyflZmSaKN+lpoiXzjPuzXx8=;
- b=d8jqprcM9uMiL3jbgI8vWY6INUec3B2uNww+jKKg4mlRndlC6/VJWye4OOFbdHR3ynl/vYly4fEin8u/4O0wUtfD0Zno6swSnCj115ieMetvJOEDUDMnmwwuS92CcHyIMRl0L90D4LZHYb3t4IlWHL+SIIyUDNgc6aaKCrHbdI8=
-Received: from MN2PR20MB2973.namprd20.prod.outlook.com (52.132.172.146) by
- MN2PR20MB2861.namprd20.prod.outlook.com (20.178.252.88) with Microsoft SMTP
+ bh=Ufbn9V4jX+amNR5V9UViiqFYwgUltjgIFiH20Xhmp5A=;
+ b=muQc5MZ+MAMzyoYZxgDXhFxPVzhGQiQWWPha+cKg8hjFqAPco8+sdN2EH81FyOEARHLkx5Qa54hqRWXwKGPm/eAPDa7i4LuHqj9hq665vY1aG/847J7coSfhiZCNqOf2hciMMaCQKydevTXQwlRS+zjTmotTMjLcRK2qhfF9ahE=
+Received: from AM0PR0402MB3476.eurprd04.prod.outlook.com (52.133.50.141) by
+ AM0PR0402MB3634.eurprd04.prod.outlook.com (52.133.34.29) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2094.16; Mon, 22 Jul 2019 12:55:39 +0000
-Received: from MN2PR20MB2973.namprd20.prod.outlook.com
- ([fe80::68d7:2bbb:af61:2e69]) by MN2PR20MB2973.namprd20.prod.outlook.com
- ([fe80::68d7:2bbb:af61:2e69%6]) with mapi id 15.20.2094.017; Mon, 22 Jul 2019
- 12:55:39 +0000
-From:   Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
-To:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-CC:     Eric Biggers <ebiggers@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>
-Subject: AEAD question
-Thread-Topic: AEAD question
-Thread-Index: AdVAg8AmA/XQEiKgTqyXrFAlioQdkw==
-Date:   Mon, 22 Jul 2019 12:55:39 +0000
-Message-ID: <MN2PR20MB29734143B4A5F5E418D55001CAC40@MN2PR20MB2973.namprd20.prod.outlook.com>
+ 15.20.2094.14; Mon, 22 Jul 2019 14:25:05 +0000
+Received: from AM0PR0402MB3476.eurprd04.prod.outlook.com
+ ([fe80::2080:6953:47fc:bcd]) by AM0PR0402MB3476.eurprd04.prod.outlook.com
+ ([fe80::2080:6953:47fc:bcd%7]) with mapi id 15.20.2094.011; Mon, 22 Jul 2019
+ 14:25:05 +0000
+From:   Horia Geanta <horia.geanta@nxp.com>
+To:     Vakul Garg <vakul.garg@nxp.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+CC:     Aymen Sghaier <aymen.sghaier@nxp.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
+Subject: Re: [PATCH v2] crypto: caam/qi2 - Add printing dpseci fq stats using
+ debugfs
+Thread-Topic: [PATCH v2] crypto: caam/qi2 - Add printing dpseci fq stats using
+ debugfs
+Thread-Index: AQHVPiRTTO5nYvxvX0qf2jZsStExEA==
+Date:   Mon, 22 Jul 2019 14:25:05 +0000
+Message-ID: <AM0PR0402MB3476F392D3A791DDE2F5B67898C40@AM0PR0402MB3476.eurprd04.prod.outlook.com>
+References: <20190719111821.21696-1-vakul.garg@nxp.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
 authentication-results: spf=none (sender IP is )
- smtp.mailfrom=pvanleeuwen@verimatrix.com; 
-x-originating-ip: [188.204.2.113]
+ smtp.mailfrom=horia.geanta@nxp.com; 
+x-originating-ip: [212.146.100.6]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 5b071073-64f5-45e6-2689-08d70ea3e5e5
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:MN2PR20MB2861;
-x-ms-traffictypediagnostic: MN2PR20MB2861:
-x-ms-exchange-purlcount: 1
-x-microsoft-antispam-prvs: <MN2PR20MB2861EE3A7EF77A2E5C0F26CFCAC40@MN2PR20MB2861.namprd20.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8273;
+x-ms-office365-filtering-correlation-id: b8a75d12-a172-4c61-aec1-08d70eb06425
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(5600148)(711020)(4605104)(1401327)(4618075)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);SRVR:AM0PR0402MB3634;
+x-ms-traffictypediagnostic: AM0PR0402MB3634:
+x-microsoft-antispam-prvs: <AM0PR0402MB3634FE69879A9688114F7E5298C40@AM0PR0402MB3634.eurprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:7691;
 x-forefront-prvs: 01068D0A20
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(376002)(346002)(366004)(39850400004)(396003)(136003)(199004)(189003)(6916009)(102836004)(6506007)(53936002)(33656002)(186003)(74316002)(52536014)(5660300002)(476003)(7696005)(6436002)(2906002)(5640700003)(26005)(9686003)(55016002)(3846002)(7736002)(6116002)(305945005)(68736007)(8676002)(71200400001)(71190400001)(2501003)(2351001)(3480700005)(4744005)(8936002)(221733001)(66066001)(66476007)(66946007)(66446008)(64756008)(15974865002)(66556008)(76116006)(81156014)(81166006)(14454004)(99286004)(256004)(54906003)(316002)(486006)(86362001)(25786009)(4326008)(7116003)(478600001)(18886075002);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR20MB2861;H:MN2PR20MB2973.namprd20.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: verimatrix.com does not designate
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(136003)(39860400002)(366004)(396003)(376002)(346002)(199004)(189003)(66066001)(76116006)(91956017)(66446008)(64756008)(66476007)(81156014)(81166006)(52536014)(66556008)(66946007)(3846002)(6246003)(6116002)(53936002)(478600001)(25786009)(229853002)(5660300002)(9686003)(2906002)(55016002)(86362001)(6436002)(14454004)(256004)(53546011)(7736002)(44832011)(6506007)(33656002)(7696005)(71200400001)(71190400001)(74316002)(305945005)(2501003)(316002)(476003)(110136005)(8676002)(446003)(76176011)(68736007)(8936002)(4326008)(26005)(99286004)(186003)(102836004)(486006)(54906003);DIR:OUT;SFP:1101;SCL:1;SRVR:AM0PR0402MB3634;H:AM0PR0402MB3476.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: nxp.com does not designate
  permitted sender hosts)
 x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: /iR9iKgTJfsiusNeNXNIsSr7+vkTfMox+NOdvhEjRzx0ZS8oPq59EOuBEgTlYj+HrZlBR9whoB0ZstznAJSX9CI4EW5f8SKekO02Fvmp1GcxSjCP7wTYBs1TCuNmtFSAweW2SCg34vYNvSfmvUF9G7koCGVzdp1CqkYJPf2JYEJbhQLdWGcUOhxm2Ceb84Po2ocdB+NmwBkXffSDIpnjsfLZ8bHC0tE6tPNZfsB3s4FV74w3KghD37IzuKR7yZ6xpS2v2RILZi038HR51K41c0HC6CMAD+NcenpmZS5/IV23CW75HAW1mJnWTFnl4m4Rw2dR/Xm9cstHX1kWKbzoM1Tw4Kgze/Mu1WexL/LjWgirB5G7yqg2T68SXLtmsoA//akqpVUp79SO7Xtu36nBGh7EkxSwsAYYJLfbZtORG6M=
+x-microsoft-antispam-message-info: rTTX87+ZyYr1Q9IyJLo8r8fWDUt6tL7AL9Slr7BrqVigxZDdQGyslRHns8iu9i919ghmrIpwHc4TAQrCXhYQ6P5FN4kfqDJmp+dxwxjK/kSqvRbDPIrfqJB6Eh+mJOp8HczCovd1+HG747Hips/keeeV03KJYNt9qGkfjHSO58Bg5rO6Ox/oAOKh3wgnrX4beWoX8RIigU1Xj1fCLjKFDlVPFzq6Ya6aPYeWJgOgcwgqiVoPXoQZQvAWh37y9+4fAGospwhqYESym4Tu6//WbqNAJP/mAL6xPyl82rcIou57fZKjXnbBMbGlt6MZygCh8snomsxQa9YkPCKfEKEQ2yC0T7g9eOn6TVAMSugyux7RVMK5WkLGTisFoaZbBSRtOyjaTlSpJ3Uvc/r+mfkgDmcmchcQsZaHycYGsHWgISk=
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-OriginatorOrg: verimatrix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5b071073-64f5-45e6-2689-08d70ea3e5e5
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Jul 2019 12:55:39.1355
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b8a75d12-a172-4c61-aec1-08d70eb06425
+X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Jul 2019 14:25:05.2928
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: dcb260f9-022d-4495-8602-eae51035a0d0
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: pvanleeuwen@verimatrix.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR20MB2861
+X-MS-Exchange-CrossTenant-userprincipalname: horia.geanta@nxp.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR0402MB3634
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Eric & Herbert,
-
-I noticed the testmgr fuzz tester generating (occasionally, see previous ma=
-il) tests cases with=20
-authsize=3D0 for the AEAD ciphers. I'm wondering if that is intentional. Or=
- actually, I'm wondering
-whether that should be considered a legal case.
-To me, it doesn't seem to make a whole lot of sense to do *authenticated* e=
-ncryption and then
-effectively throw away the authentication result ... (it's just a waste of =
-power and/or cycles)
-
-The reason for this question is that supporting this requires some specific=
- workaround in my=20
-driver (yet again). And yes, I'm aware of the fact that I can advertise I d=
-on't support zero length
-authentication tags, but then probably/likely testmgr will punish me for th=
-at instead.
-
-Regards,
-Pascal van Leeuwen
-Silicon IP Architect, Multi-Protocol Engines @ Verimatrix
-www.insidesecure.com
-
+On 7/19/2019 2:23 PM, Vakul Garg wrote:=0A=
+[...]=0A=
+> +if CRYPTO_DEV_FSL_DPAA2_CAAM=0A=
+> +=0A=
+> +config CRYPTO_DEV_FSL_DPAA2_CAAM_DEBUGFS=0A=
+> +	depends on DEBUG_FS=0A=
+> +	bool "Enable debugfs support"=0A=
+> +	help=0A=
+> +	  Selecting this will enable printing of various debug information=0A=
+> +          in the DPAA2 CAAM driver.=0A=
+> +=0A=
+> +endif=0A=
+Let's enable this based on CONFIG_DEBUG_FS.=0A=
+=0A=
+> diff --git a/drivers/crypto/caam/Makefile b/drivers/crypto/caam/Makefile=
+=0A=
+> index 9ab4e81ea21e..e4e9fa481a44 100644=0A=
+> --- a/drivers/crypto/caam/Makefile=0A=
+> +++ b/drivers/crypto/caam/Makefile=0A=
+> @@ -30,3 +30,4 @@ endif=0A=
+>  obj-$(CONFIG_CRYPTO_DEV_FSL_DPAA2_CAAM) +=3D dpaa2_caam.o=0A=
+>  =0A=
+>  dpaa2_caam-y    :=3D caamalg_qi2.o dpseci.o=0A=
+> +dpaa2_caam-$(CONFIG_CRYPTO_DEV_FSL_DPAA2_CAAM_DEBUGFS) +=3D dpseci-debug=
+fs.o=0A=
+dpaa2_caam-$(CONFIG_DEBUG_FS)=0A=
+=0A=
+[...]=0A=
+> diff --git a/drivers/crypto/caam/caamalg_qi2.h b/drivers/crypto/caam/caam=
+alg_qi2.h=0A=
+> index 973f6296bc6f..b450e2a25c1f 100644=0A=
+> --- a/drivers/crypto/caam/caamalg_qi2.h=0A=
+> +++ b/drivers/crypto/caam/caamalg_qi2.h=0A=
+> @@ -10,6 +10,7 @@=0A=
+>  #include <soc/fsl/dpaa2-io.h>=0A=
+>  #include <soc/fsl/dpaa2-fd.h>=0A=
+>  #include <linux/threads.h>=0A=
+> +#include <linux/netdevice.h>=0A=
+How is this change related to current patch?=0A=
+=0A=
+>  #include "dpseci.h"=0A=
+>  #include "desc_constr.h"=0A=
+>  =0A=
+> @@ -64,6 +65,7 @@ struct dpaa2_caam_priv {=0A=
+>  	struct iommu_domain *domain;=0A=
+>  =0A=
+>  	struct dpaa2_caam_priv_per_cpu __percpu *ppriv;=0A=
+> +	struct dentry *dfs_root;=0A=
+dfs_root is used only in dpseci-debugfs.c, let's have it there as global.=
+=0A=
+=0A=
+Horia=0A=
