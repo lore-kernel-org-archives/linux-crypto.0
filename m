@@ -1,276 +1,239 @@
-Return-Path: <SRS0=CriU=VS=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=h947=VT=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63EDCC76188
-	for <linux-crypto@archiver.kernel.org>; Sun, 21 Jul 2019 09:51:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A236C76195
+	for <linux-crypto@archiver.kernel.org>; Mon, 22 Jul 2019 08:43:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 24BB72085A
-	for <linux-crypto@archiver.kernel.org>; Sun, 21 Jul 2019 09:51:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5C61D21E6B
+	for <linux-crypto@archiver.kernel.org>; Mon, 22 Jul 2019 08:43:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Yn85RkPR"
+	dkim=pass (1024-bit key) header.d=verimatrix.com header.i=@verimatrix.com header.b="Vh38ajyZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725989AbfGUJvO (ORCPT
+        id S1728606AbfGVInZ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 21 Jul 2019 05:51:14 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:39116 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725851AbfGUJvO (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 21 Jul 2019 05:51:14 -0400
-Received: by mail-wr1-f67.google.com with SMTP id x4so36284625wrt.6
-        for <linux-crypto@vger.kernel.org>; Sun, 21 Jul 2019 02:51:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=Z53hRrHefOJhtDHfaXpJagunFHYavBL1a4i0yU/Dq9U=;
-        b=Yn85RkPRbwuTEgaXrTiRfWDTI0VMgsgSoMtA8IdmuWKicP5JEmaUUGtgQGTbJfiwOC
-         vpFiyR/jBRf4qSSYP8PHdCxvuhJmCUgBlbBCVo53lpCcKzhr3sN8EzritimAyvvMHeXM
-         JqHo04lZrwH9cUbKxH7+NqzUgotAToqy0Wj8EHTRIMEEJ/taENibtLkr15VzZfaXXDuC
-         3DicZ3rZ1aZU18qwPJZ52vS4Q2ZFJK/HQXw1QbloO9aoQ88U5QHIJpoOxkJCehgQbFG+
-         K5ayaEyss9diFgRJXOU8IznqvFzzKiBYFeaDRVInVeBoV9uegHrIqfXT34ANp8a+q5NS
-         dVng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=Z53hRrHefOJhtDHfaXpJagunFHYavBL1a4i0yU/Dq9U=;
-        b=rV3fDH3LUExf8ffr/T64vWHMmd7ZuuHUKUboBLJ+z1qbIeQ6lksTqicpwf8g+oDDE4
-         QDHTLn0OffJffi0t7ob1dgvgKoeRt1p2I2zSnovSaiwMl2eEas6M64VtTGfm1M2+VcPT
-         AEuFAw6Komt7z5JtU0biyhl0uGualGIicOyGRtj9BC+IbA9daYiSEnTT1cfBm4x3q8mX
-         7qQ156lIhsArfqZ+zvijx+Gjw1fE4gXgM6kqDNQHX2KAXNGGhWju8w5B3YRU3sLnPVei
-         FlnInbn2nP5/G4c5tDxMQshJ4yD4AgwYhwB34V+5Gl1q4W49QMMtm7ptxbJCnLB4byuU
-         tqWw==
-X-Gm-Message-State: APjAAAX8RyLyISy/3+k9CknJ8vfEfSXd6Mq7Xejkp4uX3htSQIHPqbgP
-        H77dy5SxGwTTvPTksyPsxN/T64JSnbtxIqizsoc/hw==
-X-Google-Smtp-Source: APXvYqxliFPcuzeq8Ysnd9+fL7pyXWiKMKEYncCpQcmdc6ApDQQ+7IFA6y4HALDXdOKSMcdHxB2PVu16OcghDMWwDy8=
-X-Received: by 2002:a5d:6b07:: with SMTP id v7mr68418396wrw.169.1563702671127;
- Sun, 21 Jul 2019 02:51:11 -0700 (PDT)
-MIME-Version: 1.0
+        Mon, 22 Jul 2019 04:43:25 -0400
+Received: from mail-eopbgr700048.outbound.protection.outlook.com ([40.107.70.48]:16097
+        "EHLO NAM04-SN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726481AbfGVInY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 22 Jul 2019 04:43:24 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=PBsIhSSOGkmJaCQhZ4ooxnYz/KRL73Y5eoNbUFT6p2lNL9IxIYu9OJmTIQRHrjwyWVlUiGmIK8izC+fIBEK/b+l+IXnhzfnN30C+3eb9Kan+sjk/C2K5Iwls4dWvdGYaJkBeX+cNfJMBgW3UHEfK+U/GO9k8ydJmCCsDRRCPV3nBPKN4j1NfmNp+3d+IqrjgkfnlUEAPjh6AmwiLxYZabzUOls00i+Rr4csSBzoN8DKbnA/2wXF5WytiyYLyxSG1z76hD4KfwrkksCkkmjf5VYyjdqMnudTuNi8a3jYwMNkdOz1371j7e68H+u3EX/PiESO9UA03efy7+9WaTpWvzQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=okhvR2vuN89RC5Hb0j7gOimME789aApbckSMWHQahnM=;
+ b=Ks5/iz7dfh4edKZf0ZxMNF4WeG11/cyH+dj4XnpUCCNu/d6aNr+GcsbDKj7P8fPlDssBenn79JTD9c4xz9P0LV+i7VIkt/aJNxOIo8lA4/0NVXpIOL5+KFQmeh1UcxxSZkUSqWvwgLzXqFxr59ATty4MsLdKyn/Ov8Ae8ikgucOFYKP7H/J67PO5uuNRci0lJ8arJxW+fP9V6Wl20AyGtVqFy+CjP5f4zdwdm/uJmP7rfRzclvtrrJqwdv6uSk8RgvTqRF8sDXUWmk7IEPNK4kCGCw0FaxoTqgxvl+/7GRPiufzZCaZOcQKl4N1f1Ltfq+RsiFOep68kXoGofzmGtw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
+ smtp.mailfrom=verimatrix.com;dmarc=pass action=none
+ header.from=verimatrix.com;dkim=pass header.d=verimatrix.com;arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verimatrix.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=okhvR2vuN89RC5Hb0j7gOimME789aApbckSMWHQahnM=;
+ b=Vh38ajyZFLiJ9+L0RaNftDL3wiSHhMuHIAm/WdwsWpN8MNHKX4zhP/MOyjYP8xG6qugtRc7bsj13p8T3Ba1hDpDIrkc2AEFB1JtAePFbcw79G7QXN0utCiqkXZzl1YlrTj2ufXxiQ9l9bs4o8ddDKikTuWR1WI1x+DWaphK9nqs=
+Received: from MN2PR20MB2973.namprd20.prod.outlook.com (52.132.172.146) by
+ MN2PR20MB2670.namprd20.prod.outlook.com (20.178.251.17) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2094.16; Mon, 22 Jul 2019 08:43:04 +0000
+Received: from MN2PR20MB2973.namprd20.prod.outlook.com
+ ([fe80::68d7:2bbb:af61:2e69]) by MN2PR20MB2973.namprd20.prod.outlook.com
+ ([fe80::68d7:2bbb:af61:2e69%6]) with mapi id 15.20.2094.017; Mon, 22 Jul 2019
+ 08:43:04 +0000
+From:   Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+To:     Eric Biggers <ebiggers@kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Subject: RE: [PATCH] crypto: ghash - add comment and improve help text
+Thread-Topic: [PATCH] crypto: ghash - add comment and improve help text
+Thread-Index: AQHVPsHaq4qjtk9gVUiVqL7/oLJW0abWU+6w
+Date:   Mon, 22 Jul 2019 08:43:04 +0000
+Message-ID: <MN2PR20MB2973AFCC9D5405056EAD58AACAC40@MN2PR20MB2973.namprd20.prod.outlook.com>
 References: <20190720060918.25880-1-ebiggers@kernel.org>
 In-Reply-To: <20190720060918.25880-1-ebiggers@kernel.org>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Sun, 21 Jul 2019 12:51:00 +0300
-Message-ID: <CAKv+Gu8NGoNdt2ZEKToKjM0YMzLxUjAM+4yHPkQKBDx=7Wo_rw@mail.gmail.com>
-Subject: Re: [PATCH] crypto: ghash - add comment and improve help text
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=pvanleeuwen@verimatrix.com; 
+x-originating-ip: [188.204.2.113]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 185d899f-547e-47d7-69a4-08d70e809c95
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:MN2PR20MB2670;
+x-ms-traffictypediagnostic: MN2PR20MB2670:
+x-ms-exchange-purlcount: 4
+x-microsoft-antispam-prvs: <MN2PR20MB2670BE647D3B4435D1B7852CCAC40@MN2PR20MB2670.namprd20.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:6430;
+x-forefront-prvs: 01068D0A20
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(396003)(136003)(346002)(366004)(376002)(39850400004)(13464003)(199004)(189003)(478600001)(7696005)(66066001)(446003)(476003)(102836004)(6436002)(66446008)(64756008)(66556008)(66476007)(76176011)(66946007)(76116006)(316002)(52536014)(86362001)(110136005)(55016002)(6306002)(26005)(11346002)(186003)(3846002)(6116002)(25786009)(2906002)(81156014)(81166006)(8936002)(71200400001)(71190400001)(229853002)(486006)(14444005)(256004)(7736002)(9686003)(8676002)(15974865002)(14454004)(2501003)(68736007)(53936002)(53546011)(6506007)(33656002)(5660300002)(305945005)(6246003)(74316002)(99286004)(18886075002);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR20MB2670;H:MN2PR20MB2973.namprd20.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: verimatrix.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: IUHPJg7l55TGgHXKxqEAZm6NsbZHFr5YG+8QgYx18tzRvF/fuRWW22scBg2OruDalvCi9jnmlPomZEg90FBCh5OxEjQymwt1CXb0S2kmn3wOsDp0Ll0PCesxEZoColqOCLi+79kng6bHA4DE66XNTaG5zxohvhmWGkmJaYEIT7WauXAGdtADW89EQMC90Y/kke0E5c7Uk4aREin+iQPI3k/sXlqKoD1lQkNGlQAVyVdxP6HWvIXVAIAeWzWcn52ae33mLW0dFJKUyMFNIJg/In6Wp1NyxnzVv96cSCZ2heDbnu2M9+9ejQRic5SYY3tCjzi1bDVOaDd15tXyYmMeDXP5N1WbP3GIvU3DsrgD+1JGpMfcIHUqe8hOkof+LQx8H86R4u5C6lJlK6Gb33rEoJ6hdrWfIHFYKv79/DiwrMs=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: verimatrix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 185d899f-547e-47d7-69a4-08d70e809c95
+X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Jul 2019 08:43:04.0655
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: dcb260f9-022d-4495-8602-eae51035a0d0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: pvanleeuwen@verimatrix.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR20MB2670
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, 20 Jul 2019 at 09:10, Eric Biggers <ebiggers@kernel.org> wrote:
->
-> From: Eric Biggers <ebiggers@google.com>
->
-> To help avoid confusion, add a comment to ghash-generic.c which explains
-> the convention that the kernel's implementation of GHASH uses.
->
-> Also update the Kconfig help text and module descriptions to call GHASH
-> a "hash function" rather than a "message digest", since the latter
-> normally means a real cryptographic hash function, which GHASH is not.
->
-> Cc: Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-
-Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-
-> ---
->  arch/arm/crypto/ghash-ce-glue.c            |  2 +-
->  arch/s390/crypto/ghash_s390.c              |  2 +-
->  arch/x86/crypto/ghash-clmulni-intel_glue.c |  3 +--
->  crypto/Kconfig                             | 11 ++++----
->  crypto/ghash-generic.c                     | 31 +++++++++++++++++++---
->  drivers/crypto/Kconfig                     |  6 ++---
->  include/crypto/ghash.h                     |  2 +-
->  7 files changed, 41 insertions(+), 16 deletions(-)
->
-> diff --git a/arch/arm/crypto/ghash-ce-glue.c b/arch/arm/crypto/ghash-ce-g=
-lue.c
-> index 52d472a050e6a..bfdc557dc031c 100644
-> --- a/arch/arm/crypto/ghash-ce-glue.c
-> +++ b/arch/arm/crypto/ghash-ce-glue.c
-> @@ -17,7 +17,7 @@
->  #include <linux/crypto.h>
->  #include <linux/module.h>
->
-> -MODULE_DESCRIPTION("GHASH secure hash using ARMv8 Crypto Extensions");
-> +MODULE_DESCRIPTION("GHASH hash function using ARMv8 Crypto Extensions");
->  MODULE_AUTHOR("Ard Biesheuvel <ard.biesheuvel@linaro.org>");
->  MODULE_LICENSE("GPL v2");
->  MODULE_ALIAS_CRYPTO("ghash");
-> diff --git a/arch/s390/crypto/ghash_s390.c b/arch/s390/crypto/ghash_s390.=
-c
-> index eeeb6a7737a4a..a3e7400e031ca 100644
-> --- a/arch/s390/crypto/ghash_s390.c
-> +++ b/arch/s390/crypto/ghash_s390.c
-> @@ -153,4 +153,4 @@ module_exit(ghash_mod_exit);
->  MODULE_ALIAS_CRYPTO("ghash");
->
->  MODULE_LICENSE("GPL");
-> -MODULE_DESCRIPTION("GHASH Message Digest Algorithm, s390 implementation"=
-);
-> +MODULE_DESCRIPTION("GHASH hash function, s390 implementation");
-> diff --git a/arch/x86/crypto/ghash-clmulni-intel_glue.c b/arch/x86/crypto=
-/ghash-clmulni-intel_glue.c
-> index ac76fe88ac4fd..04d72a5a8ce98 100644
-> --- a/arch/x86/crypto/ghash-clmulni-intel_glue.c
-> +++ b/arch/x86/crypto/ghash-clmulni-intel_glue.c
-> @@ -357,6 +357,5 @@ module_init(ghash_pclmulqdqni_mod_init);
->  module_exit(ghash_pclmulqdqni_mod_exit);
->
->  MODULE_LICENSE("GPL");
-> -MODULE_DESCRIPTION("GHASH Message Digest Algorithm, "
-> -                  "accelerated by PCLMULQDQ-NI");
-> +MODULE_DESCRIPTION("GHASH hash function, accelerated by PCLMULQDQ-NI");
->  MODULE_ALIAS_CRYPTO("ghash");
-> diff --git a/crypto/Kconfig b/crypto/Kconfig
-> index e801450bcb1cf..f14c457183c55 100644
-> --- a/crypto/Kconfig
-> +++ b/crypto/Kconfig
-> @@ -728,11 +728,12 @@ config CRYPTO_VPMSUM_TESTER
->           Unless you are testing these algorithms, you don't need this.
->
->  config CRYPTO_GHASH
-> -       tristate "GHASH digest algorithm"
-> +       tristate "GHASH hash function"
->         select CRYPTO_GF128MUL
->         select CRYPTO_HASH
->         help
-> -         GHASH is message digest algorithm for GCM (Galois/Counter Mode)=
-.
-> +         GHASH is the hash function used in GCM (Galois/Counter Mode).
-> +         It is not a general-purpose cryptographic hash function.
->
->  config CRYPTO_POLY1305
->         tristate "Poly1305 authenticator algorithm"
-> @@ -1057,12 +1058,12 @@ config CRYPTO_WP512
->           <http://www.larc.usp.br/~pbarreto/WhirlpoolPage.html>
->
->  config CRYPTO_GHASH_CLMUL_NI_INTEL
-> -       tristate "GHASH digest algorithm (CLMUL-NI accelerated)"
-> +       tristate "GHASH hash function (CLMUL-NI accelerated)"
->         depends on X86 && 64BIT
->         select CRYPTO_CRYPTD
->         help
-> -         GHASH is message digest algorithm for GCM (Galois/Counter Mode)=
-.
-> -         The implementation is accelerated by CLMUL-NI of Intel.
-> +         This is the x86_64 CLMUL-NI accelerated implementation of
-> +         GHASH, the hash function used in GCM (Galois/Counter mode).
->
->  comment "Ciphers"
->
-> diff --git a/crypto/ghash-generic.c b/crypto/ghash-generic.c
-> index dad9e1f91a783..5027b3461c921 100644
-> --- a/crypto/ghash-generic.c
-> +++ b/crypto/ghash-generic.c
-> @@ -1,12 +1,37 @@
->  // SPDX-License-Identifier: GPL-2.0-only
->  /*
-> - * GHASH: digest algorithm for GCM (Galois/Counter Mode).
-> + * GHASH: hash function for GCM (Galois/Counter Mode).
->   *
->   * Copyright (c) 2007 Nokia Siemens Networks - Mikko Herranen <mh1@iki.f=
-i>
->   * Copyright (c) 2009 Intel Corp.
->   *   Author: Huang Ying <ying.huang@intel.com>
-> + */
-> +
-> +/*
-> + * GHASH is a keyed hash function used in GCM authentication tag generat=
-ion.
-> + *
-> + * The original GCM paper [1] presents GHASH as a function GHASH(H, A, C=
-) which
-> + * takes a 16-byte hash key H, additional authenticated data A, and a ci=
-phertext
-> + * C.  It formats A and C into a single byte string X, interprets X as a
-> + * polynomial over GF(2^128), and evaluates this polynomial at the point=
- H.
-> + *
-> + * However, the NIST standard for GCM [2] presents GHASH as GHASH(H, X) =
-where X
-> + * is the already-formatted byte string containing both A and C.
-> + *
-> + * "ghash" in the Linux crypto API uses the 'X' (pre-formatted) conventi=
-on,
-> + * since the API supports only a single data stream per hash.  Thus, the
-> + * formatting of 'A' and 'C' is done in the "gcm" template, not in "ghas=
-h".
-> + *
-> + * The reason "ghash" is separate from "gcm" is to allow "gcm" to use an
-> + * accelerated "ghash" when a standalone accelerated "gcm(aes)" is unava=
-ilable.
-> + * It is generally inappropriate to use "ghash" for other purposes, sinc=
-e it is
-> + * an "=CE=B5-almost-XOR-universal hash function", not a cryptographic h=
-ash function.
-> + * It can only be used securely in crypto modes specially designed to us=
-e it.
->   *
-> - * The algorithm implementation is copied from gcm.c.
-> + * [1] The Galois/Counter Mode of Operation (GCM)
-> + *     (http://citeseerx.ist.psu.edu/viewdoc/download?doi=3D10.1.1.694.6=
-95&rep=3Drep1&type=3Dpdf)
-> + * [2] Recommendation for Block Cipher Modes of Operation: Galois/Counte=
-r Mode (GCM) and GMAC
-> + *     (https://csrc.nist.gov/publications/detail/sp/800-38d/final)
->   */
->
->  #include <crypto/algapi.h>
-> @@ -156,6 +181,6 @@ subsys_initcall(ghash_mod_init);
->  module_exit(ghash_mod_exit);
->
->  MODULE_LICENSE("GPL");
-> -MODULE_DESCRIPTION("GHASH Message Digest Algorithm");
-> +MODULE_DESCRIPTION("GHASH hash function");
->  MODULE_ALIAS_CRYPTO("ghash");
->  MODULE_ALIAS_CRYPTO("ghash-generic");
-> diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-> index 603413f28fa35..43c36533322f1 100644
-> --- a/drivers/crypto/Kconfig
-> +++ b/drivers/crypto/Kconfig
-> @@ -189,12 +189,12 @@ config S390_PRNG
->           It is available as of z9.
->
->  config CRYPTO_GHASH_S390
-> -       tristate "GHASH digest algorithm"
-> +       tristate "GHASH hash function"
->         depends on S390
->         select CRYPTO_HASH
->         help
-> -         This is the s390 hardware accelerated implementation of the
-> -         GHASH message digest algorithm for GCM (Galois/Counter Mode).
-> +         This is the s390 hardware accelerated implementation of GHASH,
-> +         the hash function used in GCM (Galois/Counter mode).
->
->           It is available as of z196.
->
-> diff --git a/include/crypto/ghash.h b/include/crypto/ghash.h
-> index 9136301062a5c..f832c9f2aca30 100644
-> --- a/include/crypto/ghash.h
-> +++ b/include/crypto/ghash.h
-> @@ -1,6 +1,6 @@
->  /* SPDX-License-Identifier: GPL-2.0 */
->  /*
-> - * Common values for GHASH algorithms
-> + * Common values for the GHASH hash function
->   */
->
->  #ifndef __CRYPTO_GHASH_H__
-> --
-> 2.22.0
->
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBFcmljIEJpZ2dlcnMgPGViaWdn
+ZXJzQGtlcm5lbC5vcmc+DQo+IFNlbnQ6IFNhdHVyZGF5LCBKdWx5IDIwLCAyMDE5IDg6MDkgQU0N
+Cj4gVG86IGxpbnV4LWNyeXB0b0B2Z2VyLmtlcm5lbC5vcmc7IEhlcmJlcnQgWHUgPGhlcmJlcnRA
+Z29uZG9yLmFwYW5hLm9yZy5hdT4NCj4gQ2M6IFBhc2NhbCBWYW4gTGVldXdlbiA8cHZhbmxlZXV3
+ZW5AdmVyaW1hdHJpeC5jb20+DQo+IFN1YmplY3Q6IFtQQVRDSF0gY3J5cHRvOiBnaGFzaCAtIGFk
+ZCBjb21tZW50IGFuZCBpbXByb3ZlIGhlbHAgdGV4dA0KPiANCj4gRnJvbTogRXJpYyBCaWdnZXJz
+IDxlYmlnZ2Vyc0Bnb29nbGUuY29tPg0KPiANCj4gVG8gaGVscCBhdm9pZCBjb25mdXNpb24sIGFk
+ZCBhIGNvbW1lbnQgdG8gZ2hhc2gtZ2VuZXJpYy5jIHdoaWNoIGV4cGxhaW5zDQo+IHRoZSBjb252
+ZW50aW9uIHRoYXQgdGhlIGtlcm5lbCdzIGltcGxlbWVudGF0aW9uIG9mIEdIQVNIIHVzZXMuDQo+
+IA0KPiBBbHNvIHVwZGF0ZSB0aGUgS2NvbmZpZyBoZWxwIHRleHQgYW5kIG1vZHVsZSBkZXNjcmlw
+dGlvbnMgdG8gY2FsbCBHSEFTSA0KPiBhICJoYXNoIGZ1bmN0aW9uIiByYXRoZXIgdGhhbiBhICJt
+ZXNzYWdlIGRpZ2VzdCIsIHNpbmNlIHRoZSBsYXR0ZXINCj4gbm9ybWFsbHkgbWVhbnMgYSByZWFs
+IGNyeXB0b2dyYXBoaWMgaGFzaCBmdW5jdGlvbiwgd2hpY2ggR0hBU0ggaXMgbm90Lg0KPiANCj4g
+Q2M6IFBhc2NhbCBWYW4gTGVldXdlbiA8cHZhbmxlZXV3ZW5AdmVyaW1hdHJpeC5jb20+DQo+IFNp
+Z25lZC1vZmYtYnk6IEVyaWMgQmlnZ2VycyA8ZWJpZ2dlcnNAZ29vZ2xlLmNvbT4NCg0KQWNrZWQt
+Ynk6IFBhc2NhbCBWYW4gTGVldXdlbiA8cHZhbmxlZXV3ZW5AdmVyaW1hdHJpeC5jb20+DQoNCj4g
+LS0tDQo+ICBhcmNoL2FybS9jcnlwdG8vZ2hhc2gtY2UtZ2x1ZS5jICAgICAgICAgICAgfCAgMiAr
+LQ0KPiAgYXJjaC9zMzkwL2NyeXB0by9naGFzaF9zMzkwLmMgICAgICAgICAgICAgIHwgIDIgKy0N
+Cj4gIGFyY2gveDg2L2NyeXB0by9naGFzaC1jbG11bG5pLWludGVsX2dsdWUuYyB8ICAzICstLQ0K
+PiAgY3J5cHRvL0tjb25maWcgICAgICAgICAgICAgICAgICAgICAgICAgICAgIHwgMTEgKysrKy0t
+LS0NCj4gIGNyeXB0by9naGFzaC1nZW5lcmljLmMgICAgICAgICAgICAgICAgICAgICB8IDMxICsr
+KysrKysrKysrKysrKysrKystLS0NCj4gIGRyaXZlcnMvY3J5cHRvL0tjb25maWcgICAgICAgICAg
+ICAgICAgICAgICB8ICA2ICsrLS0tDQo+ICBpbmNsdWRlL2NyeXB0by9naGFzaC5oICAgICAgICAg
+ICAgICAgICAgICAgfCAgMiArLQ0KPiAgNyBmaWxlcyBjaGFuZ2VkLCA0MSBpbnNlcnRpb25zKCsp
+LCAxNiBkZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9hcmNoL2FybS9jcnlwdG8vZ2hh
+c2gtY2UtZ2x1ZS5jIGIvYXJjaC9hcm0vY3J5cHRvL2doYXNoLWNlLWdsdWUuYw0KPiBpbmRleCA1
+MmQ0NzJhMDUwZTZhLi5iZmRjNTU3ZGMwMzFjIDEwMDY0NA0KPiAtLS0gYS9hcmNoL2FybS9jcnlw
+dG8vZ2hhc2gtY2UtZ2x1ZS5jDQo+ICsrKyBiL2FyY2gvYXJtL2NyeXB0by9naGFzaC1jZS1nbHVl
+LmMNCj4gQEAgLTE3LDcgKzE3LDcgQEANCj4gICNpbmNsdWRlIDxsaW51eC9jcnlwdG8uaD4NCj4g
+ICNpbmNsdWRlIDxsaW51eC9tb2R1bGUuaD4NCj4gDQo+IC1NT0RVTEVfREVTQ1JJUFRJT04oIkdI
+QVNIIHNlY3VyZSBoYXNoIHVzaW5nIEFSTXY4IENyeXB0byBFeHRlbnNpb25zIik7DQo+ICtNT0RV
+TEVfREVTQ1JJUFRJT04oIkdIQVNIIGhhc2ggZnVuY3Rpb24gdXNpbmcgQVJNdjggQ3J5cHRvIEV4
+dGVuc2lvbnMiKTsNCj4gIE1PRFVMRV9BVVRIT1IoIkFyZCBCaWVzaGV1dmVsIDxhcmQuYmllc2hl
+dXZlbEBsaW5hcm8ub3JnPiIpOw0KPiAgTU9EVUxFX0xJQ0VOU0UoIkdQTCB2MiIpOw0KPiAgTU9E
+VUxFX0FMSUFTX0NSWVBUTygiZ2hhc2giKTsNCj4gZGlmZiAtLWdpdCBhL2FyY2gvczM5MC9jcnlw
+dG8vZ2hhc2hfczM5MC5jIGIvYXJjaC9zMzkwL2NyeXB0by9naGFzaF9zMzkwLmMNCj4gaW5kZXgg
+ZWVlYjZhNzczN2E0YS4uYTNlNzQwMGUwMzFjYSAxMDA2NDQNCj4gLS0tIGEvYXJjaC9zMzkwL2Ny
+eXB0by9naGFzaF9zMzkwLmMNCj4gKysrIGIvYXJjaC9zMzkwL2NyeXB0by9naGFzaF9zMzkwLmMN
+Cj4gQEAgLTE1Myw0ICsxNTMsNCBAQCBtb2R1bGVfZXhpdChnaGFzaF9tb2RfZXhpdCk7DQo+ICBN
+T0RVTEVfQUxJQVNfQ1JZUFRPKCJnaGFzaCIpOw0KPiANCj4gIE1PRFVMRV9MSUNFTlNFKCJHUEwi
+KTsNCj4gLU1PRFVMRV9ERVNDUklQVElPTigiR0hBU0ggTWVzc2FnZSBEaWdlc3QgQWxnb3JpdGht
+LCBzMzkwIGltcGxlbWVudGF0aW9uIik7DQo+ICtNT0RVTEVfREVTQ1JJUFRJT04oIkdIQVNIIGhh
+c2ggZnVuY3Rpb24sIHMzOTAgaW1wbGVtZW50YXRpb24iKTsNCj4gZGlmZiAtLWdpdCBhL2FyY2gv
+eDg2L2NyeXB0by9naGFzaC1jbG11bG5pLWludGVsX2dsdWUuYyBiL2FyY2gveDg2L2NyeXB0by9n
+aGFzaC1jbG11bG5pLWludGVsX2dsdWUuYw0KPiBpbmRleCBhYzc2ZmU4OGFjNGZkLi4wNGQ3MmE1
+YThjZTk4IDEwMDY0NA0KPiAtLS0gYS9hcmNoL3g4Ni9jcnlwdG8vZ2hhc2gtY2xtdWxuaS1pbnRl
+bF9nbHVlLmMNCj4gKysrIGIvYXJjaC94ODYvY3J5cHRvL2doYXNoLWNsbXVsbmktaW50ZWxfZ2x1
+ZS5jDQo+IEBAIC0zNTcsNiArMzU3LDUgQEAgbW9kdWxlX2luaXQoZ2hhc2hfcGNsbXVscWRxbmlf
+bW9kX2luaXQpOw0KPiAgbW9kdWxlX2V4aXQoZ2hhc2hfcGNsbXVscWRxbmlfbW9kX2V4aXQpOw0K
+PiANCj4gIE1PRFVMRV9MSUNFTlNFKCJHUEwiKTsNCj4gLU1PRFVMRV9ERVNDUklQVElPTigiR0hB
+U0ggTWVzc2FnZSBEaWdlc3QgQWxnb3JpdGhtLCAiDQo+IC0JCSAgICJhY2NlbGVyYXRlZCBieSBQ
+Q0xNVUxRRFEtTkkiKTsNCj4gK01PRFVMRV9ERVNDUklQVElPTigiR0hBU0ggaGFzaCBmdW5jdGlv
+biwgYWNjZWxlcmF0ZWQgYnkgUENMTVVMUURRLU5JIik7DQo+ICBNT0RVTEVfQUxJQVNfQ1JZUFRP
+KCJnaGFzaCIpOw0KPiBkaWZmIC0tZ2l0IGEvY3J5cHRvL0tjb25maWcgYi9jcnlwdG8vS2NvbmZp
+Zw0KPiBpbmRleCBlODAxNDUwYmNiMWNmLi5mMTRjNDU3MTgzYzU1IDEwMDY0NA0KPiAtLS0gYS9j
+cnlwdG8vS2NvbmZpZw0KPiArKysgYi9jcnlwdG8vS2NvbmZpZw0KPiBAQCAtNzI4LDExICs3Mjgs
+MTIgQEAgY29uZmlnIENSWVBUT19WUE1TVU1fVEVTVEVSDQo+ICAJICBVbmxlc3MgeW91IGFyZSB0
+ZXN0aW5nIHRoZXNlIGFsZ29yaXRobXMsIHlvdSBkb24ndCBuZWVkIHRoaXMuDQo+IA0KPiAgY29u
+ZmlnIENSWVBUT19HSEFTSA0KPiAtCXRyaXN0YXRlICJHSEFTSCBkaWdlc3QgYWxnb3JpdGhtIg0K
+PiArCXRyaXN0YXRlICJHSEFTSCBoYXNoIGZ1bmN0aW9uIg0KPiAgCXNlbGVjdCBDUllQVE9fR0Yx
+MjhNVUwNCj4gIAlzZWxlY3QgQ1JZUFRPX0hBU0gNCj4gIAloZWxwDQo+IC0JICBHSEFTSCBpcyBt
+ZXNzYWdlIGRpZ2VzdCBhbGdvcml0aG0gZm9yIEdDTSAoR2Fsb2lzL0NvdW50ZXIgTW9kZSkuDQo+
+ICsJICBHSEFTSCBpcyB0aGUgaGFzaCBmdW5jdGlvbiB1c2VkIGluIEdDTSAoR2Fsb2lzL0NvdW50
+ZXIgTW9kZSkuDQo+ICsJICBJdCBpcyBub3QgYSBnZW5lcmFsLXB1cnBvc2UgY3J5cHRvZ3JhcGhp
+YyBoYXNoIGZ1bmN0aW9uLg0KPiANCj4gIGNvbmZpZyBDUllQVE9fUE9MWTEzMDUNCj4gIAl0cmlz
+dGF0ZSAiUG9seTEzMDUgYXV0aGVudGljYXRvciBhbGdvcml0aG0iDQo+IEBAIC0xMDU3LDEyICsx
+MDU4LDEyIEBAIGNvbmZpZyBDUllQVE9fV1A1MTINCj4gIAkgIDxodHRwOi8vd3d3LmxhcmMudXNw
+LmJyL35wYmFycmV0by9XaGlybHBvb2xQYWdlLmh0bWw+DQo+IA0KPiAgY29uZmlnIENSWVBUT19H
+SEFTSF9DTE1VTF9OSV9JTlRFTA0KPiAtCXRyaXN0YXRlICJHSEFTSCBkaWdlc3QgYWxnb3JpdGht
+IChDTE1VTC1OSSBhY2NlbGVyYXRlZCkiDQo+ICsJdHJpc3RhdGUgIkdIQVNIIGhhc2ggZnVuY3Rp
+b24gKENMTVVMLU5JIGFjY2VsZXJhdGVkKSINCj4gIAlkZXBlbmRzIG9uIFg4NiAmJiA2NEJJVA0K
+PiAgCXNlbGVjdCBDUllQVE9fQ1JZUFREDQo+ICAJaGVscA0KPiAtCSAgR0hBU0ggaXMgbWVzc2Fn
+ZSBkaWdlc3QgYWxnb3JpdGhtIGZvciBHQ00gKEdhbG9pcy9Db3VudGVyIE1vZGUpLg0KPiAtCSAg
+VGhlIGltcGxlbWVudGF0aW9uIGlzIGFjY2VsZXJhdGVkIGJ5IENMTVVMLU5JIG9mIEludGVsLg0K
+PiArCSAgVGhpcyBpcyB0aGUgeDg2XzY0IENMTVVMLU5JIGFjY2VsZXJhdGVkIGltcGxlbWVudGF0
+aW9uIG9mDQo+ICsJICBHSEFTSCwgdGhlIGhhc2ggZnVuY3Rpb24gdXNlZCBpbiBHQ00gKEdhbG9p
+cy9Db3VudGVyIG1vZGUpLg0KPiANCj4gIGNvbW1lbnQgIkNpcGhlcnMiDQo+IA0KPiBkaWZmIC0t
+Z2l0IGEvY3J5cHRvL2doYXNoLWdlbmVyaWMuYyBiL2NyeXB0by9naGFzaC1nZW5lcmljLmMNCj4g
+aW5kZXggZGFkOWUxZjkxYTc4My4uNTAyN2IzNDYxYzkyMSAxMDA2NDQNCj4gLS0tIGEvY3J5cHRv
+L2doYXNoLWdlbmVyaWMuYw0KPiArKysgYi9jcnlwdG8vZ2hhc2gtZ2VuZXJpYy5jDQo+IEBAIC0x
+LDEyICsxLDM3IEBADQo+ICAvLyBTUERYLUxpY2Vuc2UtSWRlbnRpZmllcjogR1BMLTIuMC1vbmx5
+DQo+ICAvKg0KPiAtICogR0hBU0g6IGRpZ2VzdCBhbGdvcml0aG0gZm9yIEdDTSAoR2Fsb2lzL0Nv
+dW50ZXIgTW9kZSkuDQo+ICsgKiBHSEFTSDogaGFzaCBmdW5jdGlvbiBmb3IgR0NNIChHYWxvaXMv
+Q291bnRlciBNb2RlKS4NCj4gICAqDQo+ICAgKiBDb3B5cmlnaHQgKGMpIDIwMDcgTm9raWEgU2ll
+bWVucyBOZXR3b3JrcyAtIE1pa2tvIEhlcnJhbmVuIDxtaDFAaWtpLmZpPg0KPiAgICogQ29weXJp
+Z2h0IChjKSAyMDA5IEludGVsIENvcnAuDQo+ICAgKiAgIEF1dGhvcjogSHVhbmcgWWluZyA8eWlu
+Zy5odWFuZ0BpbnRlbC5jb20+DQo+ICsgKi8NCj4gKw0KPiArLyoNCj4gKyAqIEdIQVNIIGlzIGEg
+a2V5ZWQgaGFzaCBmdW5jdGlvbiB1c2VkIGluIEdDTSBhdXRoZW50aWNhdGlvbiB0YWcgZ2VuZXJh
+dGlvbi4NCj4gKyAqDQo+ICsgKiBUaGUgb3JpZ2luYWwgR0NNIHBhcGVyIFsxXSBwcmVzZW50cyBH
+SEFTSCBhcyBhIGZ1bmN0aW9uIEdIQVNIKEgsIEEsIEMpIHdoaWNoDQo+ICsgKiB0YWtlcyBhIDE2
+LWJ5dGUgaGFzaCBrZXkgSCwgYWRkaXRpb25hbCBhdXRoZW50aWNhdGVkIGRhdGEgQSwgYW5kIGEg
+Y2lwaGVydGV4dA0KPiArICogQy4gIEl0IGZvcm1hdHMgQSBhbmQgQyBpbnRvIGEgc2luZ2xlIGJ5
+dGUgc3RyaW5nIFgsIGludGVycHJldHMgWCBhcyBhDQo+ICsgKiBwb2x5bm9taWFsIG92ZXIgR0Yo
+Ml4xMjgpLCBhbmQgZXZhbHVhdGVzIHRoaXMgcG9seW5vbWlhbCBhdCB0aGUgcG9pbnQgSC4NCj4g
+KyAqDQo+ICsgKiBIb3dldmVyLCB0aGUgTklTVCBzdGFuZGFyZCBmb3IgR0NNIFsyXSBwcmVzZW50
+cyBHSEFTSCBhcyBHSEFTSChILCBYKSB3aGVyZSBYDQo+ICsgKiBpcyB0aGUgYWxyZWFkeS1mb3Jt
+YXR0ZWQgYnl0ZSBzdHJpbmcgY29udGFpbmluZyBib3RoIEEgYW5kIEMuDQo+ICsgKg0KPiArICog
+ImdoYXNoIiBpbiB0aGUgTGludXggY3J5cHRvIEFQSSB1c2VzIHRoZSAnWCcgKHByZS1mb3JtYXR0
+ZWQpIGNvbnZlbnRpb24sDQo+ICsgKiBzaW5jZSB0aGUgQVBJIHN1cHBvcnRzIG9ubHkgYSBzaW5n
+bGUgZGF0YSBzdHJlYW0gcGVyIGhhc2guICBUaHVzLCB0aGUNCj4gKyAqIGZvcm1hdHRpbmcgb2Yg
+J0EnIGFuZCAnQycgaXMgZG9uZSBpbiB0aGUgImdjbSIgdGVtcGxhdGUsIG5vdCBpbiAiZ2hhc2gi
+Lg0KPiArICoNCj4gKyAqIFRoZSByZWFzb24gImdoYXNoIiBpcyBzZXBhcmF0ZSBmcm9tICJnY20i
+IGlzIHRvIGFsbG93ICJnY20iIHRvIHVzZSBhbg0KPiArICogYWNjZWxlcmF0ZWQgImdoYXNoIiB3
+aGVuIGEgc3RhbmRhbG9uZSBhY2NlbGVyYXRlZCAiZ2NtKGFlcykiIGlzIHVuYXZhaWxhYmxlLg0K
+PiArICogSXQgaXMgZ2VuZXJhbGx5IGluYXBwcm9wcmlhdGUgdG8gdXNlICJnaGFzaCIgZm9yIG90
+aGVyIHB1cnBvc2VzLCBzaW5jZSBpdCBpcw0KPiArICogYW4gIs61LWFsbW9zdC1YT1ItdW5pdmVy
+c2FsIGhhc2ggZnVuY3Rpb24iLCBub3QgYSBjcnlwdG9ncmFwaGljIGhhc2ggZnVuY3Rpb24uDQo+
+ICsgKiBJdCBjYW4gb25seSBiZSB1c2VkIHNlY3VyZWx5IGluIGNyeXB0byBtb2RlcyBzcGVjaWFs
+bHkgZGVzaWduZWQgdG8gdXNlIGl0Lg0KPiAgICoNCj4gLSAqIFRoZSBhbGdvcml0aG0gaW1wbGVt
+ZW50YXRpb24gaXMgY29waWVkIGZyb20gZ2NtLmMuDQo+ICsgKiBbMV0gVGhlIEdhbG9pcy9Db3Vu
+dGVyIE1vZGUgb2YgT3BlcmF0aW9uIChHQ00pDQo+ICsgKiAgICAgKGh0dHA6Ly9jaXRlc2Vlcngu
+aXN0LnBzdS5lZHUvdmlld2RvYy9kb3dubG9hZD9kb2k9MTAuMS4xLjY5NC42OTUmcmVwPXJlcDEm
+dHlwZT1wZGYpDQo+ICsgKiBbMl0gUmVjb21tZW5kYXRpb24gZm9yIEJsb2NrIENpcGhlciBNb2Rl
+cyBvZiBPcGVyYXRpb246IEdhbG9pcy9Db3VudGVyIE1vZGUgKEdDTSkgYW5kIEdNQUMNCj4gKyAq
+ICAgICAoaHR0cHM6Ly9jc3JjLm5pc3QuZ292L3B1YmxpY2F0aW9ucy9kZXRhaWwvc3AvODAwLTM4
+ZC9maW5hbCkNCj4gICAqLw0KPiANCj4gICNpbmNsdWRlIDxjcnlwdG8vYWxnYXBpLmg+DQo+IEBA
+IC0xNTYsNiArMTgxLDYgQEAgc3Vic3lzX2luaXRjYWxsKGdoYXNoX21vZF9pbml0KTsNCj4gIG1v
+ZHVsZV9leGl0KGdoYXNoX21vZF9leGl0KTsNCj4gDQo+ICBNT0RVTEVfTElDRU5TRSgiR1BMIik7
+DQo+IC1NT0RVTEVfREVTQ1JJUFRJT04oIkdIQVNIIE1lc3NhZ2UgRGlnZXN0IEFsZ29yaXRobSIp
+Ow0KPiArTU9EVUxFX0RFU0NSSVBUSU9OKCJHSEFTSCBoYXNoIGZ1bmN0aW9uIik7DQo+ICBNT0RV
+TEVfQUxJQVNfQ1JZUFRPKCJnaGFzaCIpOw0KPiAgTU9EVUxFX0FMSUFTX0NSWVBUTygiZ2hhc2gt
+Z2VuZXJpYyIpOw0KPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9jcnlwdG8vS2NvbmZpZyBiL2RyaXZl
+cnMvY3J5cHRvL0tjb25maWcNCj4gaW5kZXggNjAzNDEzZjI4ZmEzNS4uNDNjMzY1MzMzMjJmMSAx
+MDA2NDQNCj4gLS0tIGEvZHJpdmVycy9jcnlwdG8vS2NvbmZpZw0KPiArKysgYi9kcml2ZXJzL2Ny
+eXB0by9LY29uZmlnDQo+IEBAIC0xODksMTIgKzE4OSwxMiBAQCBjb25maWcgUzM5MF9QUk5HDQo+
+ICAJICBJdCBpcyBhdmFpbGFibGUgYXMgb2YgejkuDQo+IA0KPiAgY29uZmlnIENSWVBUT19HSEFT
+SF9TMzkwDQo+IC0JdHJpc3RhdGUgIkdIQVNIIGRpZ2VzdCBhbGdvcml0aG0iDQo+ICsJdHJpc3Rh
+dGUgIkdIQVNIIGhhc2ggZnVuY3Rpb24iDQo+ICAJZGVwZW5kcyBvbiBTMzkwDQo+ICAJc2VsZWN0
+IENSWVBUT19IQVNIDQo+ICAJaGVscA0KPiAtCSAgVGhpcyBpcyB0aGUgczM5MCBoYXJkd2FyZSBh
+Y2NlbGVyYXRlZCBpbXBsZW1lbnRhdGlvbiBvZiB0aGUNCj4gLQkgIEdIQVNIIG1lc3NhZ2UgZGln
+ZXN0IGFsZ29yaXRobSBmb3IgR0NNIChHYWxvaXMvQ291bnRlciBNb2RlKS4NCj4gKwkgIFRoaXMg
+aXMgdGhlIHMzOTAgaGFyZHdhcmUgYWNjZWxlcmF0ZWQgaW1wbGVtZW50YXRpb24gb2YgR0hBU0gs
+DQo+ICsJICB0aGUgaGFzaCBmdW5jdGlvbiB1c2VkIGluIEdDTSAoR2Fsb2lzL0NvdW50ZXIgbW9k
+ZSkuDQo+IA0KPiAgCSAgSXQgaXMgYXZhaWxhYmxlIGFzIG9mIHoxOTYuDQo+IA0KPiBkaWZmIC0t
+Z2l0IGEvaW5jbHVkZS9jcnlwdG8vZ2hhc2guaCBiL2luY2x1ZGUvY3J5cHRvL2doYXNoLmgNCj4g
+aW5kZXggOTEzNjMwMTA2MmE1Yy4uZjgzMmM5ZjJhY2EzMCAxMDA2NDQNCj4gLS0tIGEvaW5jbHVk
+ZS9jcnlwdG8vZ2hhc2guaA0KPiArKysgYi9pbmNsdWRlL2NyeXB0by9naGFzaC5oDQo+IEBAIC0x
+LDYgKzEsNiBAQA0KPiAgLyogU1BEWC1MaWNlbnNlLUlkZW50aWZpZXI6IEdQTC0yLjAgKi8NCj4g
+IC8qDQo+IC0gKiBDb21tb24gdmFsdWVzIGZvciBHSEFTSCBhbGdvcml0aG1zDQo+ICsgKiBDb21t
+b24gdmFsdWVzIGZvciB0aGUgR0hBU0ggaGFzaCBmdW5jdGlvbg0KPiAgICovDQo+IA0KPiAgI2lm
+bmRlZiBfX0NSWVBUT19HSEFTSF9IX18NCj4gLS0NCj4gMi4yMi4wDQoNClBhc2NhbCB2YW4gTGVl
+dXdlbg0KU2lsaWNvbiBJUCBBcmNoaXRlY3QsIE11bHRpLVByb3RvY29sIEVuZ2luZXMgQCBWZXJp
+bWF0cml4DQp3d3cuaW5zaWRlc2VjdXJlLmNvbQ0KDQo=
