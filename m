@@ -6,100 +6,89 @@ X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E812C7618F
-	for <linux-crypto@archiver.kernel.org>; Mon, 22 Jul 2019 16:06:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 166DCC76190
+	for <linux-crypto@archiver.kernel.org>; Mon, 22 Jul 2019 16:22:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0C1E621901
-	for <linux-crypto@archiver.kernel.org>; Mon, 22 Jul 2019 16:06:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D41A12190F
+	for <linux-crypto@archiver.kernel.org>; Mon, 22 Jul 2019 16:22:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1563811567;
-	bh=tPhWxppzQ9To3DzQHH984V//T4fEj7TpwRH9er1GsAE=;
+	s=default; t=1563812563;
+	bh=FKPLJ8Xmsiucyw9RaAzZc/XnpNt9bbZ30igXBhufMOY=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=k/iP7lYL+eW9JtH+u+xHg3k+6C6vGsH2OoXIGmTWWnLZgJ5q878R4dYZlIytJyV71
-	 w1C1C+R0IXwtmeSwHWHBFiNsCUdjcOkOXw8Pmnj2Tt0rqKnBQAHqCS16cT/INUeTo8
-	 RAeH9QPly08eGYEYqbWEGfgV2OLZCoUsAc3B4P1g=
+	b=U/Y++dwm4TCxAZmneKwJ287eWJI2IAXjdV9dT3fepfhT97tjsRukbjT7R3KSrImhC
+	 UtlhwyDpH+fObv5SajD2LxNNGdacutfiKCO4gZLUqKhaVt1b7FNex1aSL6uTqQr1fX
+	 gQurYQWZKXbQvpkaI8bhXou+Q7vE2xxcMdeEclcA=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729594AbfGVQGF (ORCPT
+        id S1729197AbfGVQWn (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 22 Jul 2019 12:06:05 -0400
-Received: from mail.kernel.org ([198.145.29.99]:35070 "EHLO mail.kernel.org"
+        Mon, 22 Jul 2019 12:22:43 -0400
+Received: from mail.kernel.org ([198.145.29.99]:41980 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729549AbfGVQGF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 22 Jul 2019 12:06:05 -0400
+        id S1727743AbfGVQWm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 22 Jul 2019 12:22:42 -0400
 Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id DF216218EA;
-        Mon, 22 Jul 2019 16:06:04 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4DC432190D;
+        Mon, 22 Jul 2019 16:22:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1563811565;
-        bh=tPhWxppzQ9To3DzQHH984V//T4fEj7TpwRH9er1GsAE=;
+        s=default; t=1563812562;
+        bh=FKPLJ8Xmsiucyw9RaAzZc/XnpNt9bbZ30igXBhufMOY=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=UAuJkNdXQhCOdAp0MT2zcXaS3tGuxAl12DW2j+YJoxuzi2U+ec4ipzNkhfrsJjopa
-         7YDOvKd2/rOafBd2ICaDU4ItVx9pO/lcE9CwDYsjpUtjC6gpVXSRuR1cXiOIBabLCE
-         oCH0c6BihHKKNecimmRUg1kB4l7iorwBvkcpJ+VY=
-Date:   Mon, 22 Jul 2019 09:06:03 -0700
+        b=ApHg5oTFwndcAdv+h48n6GnLSIvwiiqAcqkXSmYOcIHgrmQ7E7Y/c8/cxI8jQ3sOg
+         8zEfX9ysSUWVatbzAyHCE0twaOyTC61Ih8OO/zkhiu9ibz90kQe33AD+5lkJ/DpHvM
+         /SeCd5Qh0v7eYuD9kVdllJ77dIMtriOcMEkk3/fs=
+Date:   Mon, 22 Jul 2019 09:22:40 -0700
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
 Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "davem@davemloft.net" <davem@davemloft.net>
-Subject: Re: Testmgr fuzz testing
-Message-ID: <20190722160603.GA689@sol.localdomain>
+Subject: Re: AEAD question
+Message-ID: <20190722162240.GB689@sol.localdomain>
 Mail-Followup-To: Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "davem@davemloft.net" <davem@davemloft.net>
-References: <MN2PR20MB2973F2047FCE9EA5794E7DF7CAC40@MN2PR20MB2973.namprd20.prod.outlook.com>
+References: <MN2PR20MB29734143B4A5F5E418D55001CAC40@MN2PR20MB2973.namprd20.prod.outlook.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <MN2PR20MB2973F2047FCE9EA5794E7DF7CAC40@MN2PR20MB2973.namprd20.prod.outlook.com>
+In-Reply-To: <MN2PR20MB29734143B4A5F5E418D55001CAC40@MN2PR20MB2973.namprd20.prod.outlook.com>
 User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Pascal,
-
-On Mon, Jul 22, 2019 at 10:27:22AM +0000, Pascal Van Leeuwen wrote:
-> Eric,
+On Mon, Jul 22, 2019 at 12:55:39PM +0000, Pascal Van Leeuwen wrote:
+> Eric & Herbert,
 > 
-> While fixing some issues in the inside-secure driver reported by the fuzz, I noticed that the
-> results are actually not repeatable: odds are  high that on the next run, the error case is 
-> actually not hit anymore since they're typically very specific  corner cases.
+> I noticed the testmgr fuzz tester generating (occasionally, see previous mail) tests cases with 
+> authsize=0 for the AEAD ciphers. I'm wondering if that is intentional. Or actually, I'm wondering
+> whether that should be considered a legal case.
+> To me, it doesn't seem to make a whole lot of sense to do *authenticated* encryption and then
+> effectively throw away the authentication result ... (it's just a waste of power and/or cycles)
 > 
-> There's 2 problems with that:
-> a) Without repeatability, I cannot verify whether my fix actually worked. In fact, I cannot
-> even verify with any certainty that any modification I do won't fail somewhere else :-(
-> b) Odds are very significant that important corner cases are not hit by the fuzzing
-> 
-> Issue a) is usually solved by making the random generation deterministic, i.e. ensure
-> you seed it with a known constant and pull the random numbers strictly sequentially.
-> (you may or may not add the *option* to  pull the seed from some true random source)
-> 
-> Issue b) would be best solved by splitting the fuzz testing into two parts, a (properly
-> constrained!) random part and a part with fixed known corner cases where you use
-> constant parameters (like lengths and such) but depend on the generic implementation
-> for the actual vector generation (as specifications usually don't provide vectors for
-> all interesting corner cases but we consider the generic implementation to be correct) 
+> The reason for this question is that supporting this requires some specific workaround in my 
+> driver (yet again). And yes, I'm aware of the fact that I can advertise I don't support zero length
+> authentication tags, but then probably/likely testmgr will punish me for that instead.
 > 
 
-Sure, it's not always repeatable, but that's the nature of fuzz testing.  We
-*could* start with a constant seed, but then all the random numbers would change
-every time anyone made any minor change to the fuzz tests anyway.
+As before you're actually talking about the "authenc" template for IPSec and not
+about AEADs in general, right?  I'm not familiar with that algorithm, so you'll
+have to research what the specification says, and what's actually using it.
 
-In my experience the bugs found by the fuzz tests tend to be found within a
-couple hundred iterations, so are seen within a few boots at most with the
-default fuzz_iterations=100, and are "always" seen with fuzz_iterations=1000.
-Raising fuzz_iterations to 10000 didn't find anything else.
+Using an AEAD with authsize=0 is indeed silly, but perhaps someone using that in
+some badly designed protocol where authentication is optional.  Also AFAICS from
+the code, any authsize fits naturally into the algorithm; i.e., excluding 0
+would be a special case.
 
-If you find otherwise and come across some really rare case, you should either
-add a real test vector (i.e. not part of the fuzz tests) for it, or you should
-update the fuzz tests to generate the case more often so that it's likely to be
-hit with the default fuzz_iterations=100.  I don't think it's necessary to split
-the fuzz testing into 2 parts; instead we just need to boost the probability of
-generating known edge cases (e.g. see what generate_random_bytes() already does).
+But again, someone actually has to research this.  Maybe
+crypto_aead_setauthsize() should simply reject authsize=0 for all AEADs.
+
+What we should *not* do, IMO, is remove it from the tests and allow
+implementations to do whatever they want.  If it's wrong we should fix it
+everywhere, so that the behavior is consistent.
 
 - Eric
