@@ -2,232 +2,227 @@ Return-Path: <SRS0=h947=VT=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=1.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2C65C7618F
-	for <linux-crypto@archiver.kernel.org>; Mon, 22 Jul 2019 22:46:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99240C7618F
+	for <linux-crypto@archiver.kernel.org>; Mon, 22 Jul 2019 23:06:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 57E8921951
-	for <linux-crypto@archiver.kernel.org>; Mon, 22 Jul 2019 22:46:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=verimatrix.com header.i=@verimatrix.com header.b="poXqFvSJ"
+	by mail.kernel.org (Postfix) with ESMTP id 5B43D2199C
+	for <linux-crypto@archiver.kernel.org>; Mon, 22 Jul 2019 23:06:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1563836807;
+	bh=ZJvWdGAmjpwuROfulbFGFibDBCPC8E0IzD64NPvqyq4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=TbrUvgyu1TDmU4tCWjJRxFx8njV1sS+v9CIIuwJPNmsOmafoZO3i2C08W6U9CV7dc
+	 vmeES6nF2UKsVYEtHeTTGMqUGYy6qe8TvnRJtnp7e3g/xj4Yyueeq/xIXXdm0BdiYZ
+	 zk06BZvvxEwfWW984mTGiTwSWkSnHpY4b5uMzJAw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729248AbfGVWqu (ORCPT
+        id S1733133AbfGVXGq (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 22 Jul 2019 18:46:50 -0400
-Received: from mail-eopbgr800075.outbound.protection.outlook.com ([40.107.80.75]:11447
-        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729142AbfGVWqt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 22 Jul 2019 18:46:49 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Iiy3R2y+gaD3tH2wEpkZEjO6wmPae9r/trckHkUXnjP2a9qPTrJgsSBfqk5LGXoNLmJcFnX5EYtVsKUVmeTrOBZ1rYGRunz2gMlwM4YVyRwpQ8TXLXw365OFG62nSu2wfC0hYJj1jD2gZT9FEGYPi6UaVJqt6QbhPWP6NMF7BysQJwwcbJ1MN8eJXneU6XcjaJmCrS91aWSJTO19VORKSsuecrbldVfH4L6mZdnWGJbzD11X6uxkWs/pgC2T8x+9ihUkoEc1Oeg3CuLTTGfM80njaUjMGml7mlfzcemtHVHplqLAjr50utOa8Zi909mesmWN5mGiGBZZcjuBDAraOg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gITXjZjtTcPTKX+l+utf/6OOgisYpCh/L27ufsUySKc=;
- b=JrHp0hUElsXQ8WzI3y1szx1psNUoJdrBLaH+rX2MxMOs8XkGhV8DSDDHE61VuCHPy/hSZkK4gikCkAklYDjaNobR0IpIDvFcmtGzFe157ovKfvQEsZDXX/9kc6hGofCib1Z+XC83R+yWi4dy4akj62hmbHz+cMle8vTj4C/qFJ8PB3DClxO6kxE0mGyBDpsuYCyN98HiVISSUNenXnO5tTeaygn1GZmb/d8oJi8ptWcfuEVmYCQitO8kxJU7fvFwXvYVmnA29JiPvcIMs/GiWyYF/JXp4+uhbODejoy5Lp9TvFWPnMDMP7pqeG8oKn+qPCfBgDZjmdbtqaXaJLOrvw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
- smtp.mailfrom=verimatrix.com;dmarc=pass action=none
- header.from=verimatrix.com;dkim=pass header.d=verimatrix.com;arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verimatrix.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gITXjZjtTcPTKX+l+utf/6OOgisYpCh/L27ufsUySKc=;
- b=poXqFvSJ+00vcmGWBVA/obZOFdgUZN7prTTcggcjzbPyDtiCQSbcGSApMDZlP6OH5yDiyHyGHMEAjdRj6u9aWGQ4unYnF3dEBOsx9BsdfiGzX2bIZFWqRk1yrfn2UJOjw8KUVNGtbetg3cdYEFT3oT46DTTEL21a/6H7t0j9fgk=
-Received: from MN2PR20MB2973.namprd20.prod.outlook.com (52.132.172.146) by
- MN2PR20MB2847.namprd20.prod.outlook.com (20.178.254.25) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2094.16; Mon, 22 Jul 2019 22:46:40 +0000
-Received: from MN2PR20MB2973.namprd20.prod.outlook.com
- ([fe80::68d7:2bbb:af61:2e69]) by MN2PR20MB2973.namprd20.prod.outlook.com
- ([fe80::68d7:2bbb:af61:2e69%6]) with mapi id 15.20.2094.017; Mon, 22 Jul 2019
- 22:46:40 +0000
-From:   Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-CC:     Milan Broz <gmazyland@gmail.com>,
+        Mon, 22 Jul 2019 19:06:46 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40992 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728191AbfGVXGq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 22 Jul 2019 19:06:46 -0400
+Received: from gmail.com (unknown [104.132.1.77])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4941C21955;
+        Mon, 22 Jul 2019 23:06:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1563836804;
+        bh=ZJvWdGAmjpwuROfulbFGFibDBCPC8E0IzD64NPvqyq4=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=X8ovMaFJx/qiyD1WLqolunp3g8JR/gdWi44qe/m4BYzkdqXnw1ctkReuq6uu7PMWw
+         UNi0ATPua7LcCKF3VsL1C0dN/jh+BL6Jf+PnoOOt2SiR1TKg+bAcE5pLx5WJyUx5Wc
+         5fMCiRPCVX+1CWKhocUnVljn8WDxkcQoibBsLyh4=
+Date:   Mon, 22 Jul 2019 16:06:42 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "davem@davemloft.net" <davem@davemloft.net>
+Subject: Re: Testmgr fuzz testing
+Message-ID: <20190722230641.GA22126@gmail.com>
+Mail-Followup-To: Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Horia Geanta <horia.geanta@nxp.com>
-Subject: RE: [dm-devel] xts fuzz testing and lack of ciphertext stealing
- support
-Thread-Topic: [dm-devel] xts fuzz testing and lack of ciphertext stealing
- support
-Thread-Index: AQHVO/5l0aVU4O6KC0WgPIqEsMQCDqbPEhUAgAALMYCAANVxgIAABoCAgAABwICAAAUbgIAAFRTAgAAoQICAAtuUgIAACm4AgAG39ACAAYCLgIAAhUWAgABiaKA=
-Date:   Mon, 22 Jul 2019 22:46:40 +0000
-Message-ID: <MN2PR20MB2973BE1BDA98F1AA97B1AAFCCAC40@MN2PR20MB2973.namprd20.prod.outlook.com>
-References: <20190716221639.GA44406@gmail.com>
- <VI1PR0402MB34857BBB18C2BB8CBA2DEC7198C90@VI1PR0402MB3485.eurprd04.prod.outlook.com>
- <20190717172823.GA205944@gmail.com>
- <CAKv+Gu__offPaWvyURJr8v56ig58q-Deo16QhP26EJ32uf5m3w@mail.gmail.com>
- <20190718065223.4xaefcwjoxvujntw@gondor.apana.org.au>
- <CAKv+Gu9-EWNpJ9viSsjhYRdOZb=7a=Mpddmyt8SLEq9aFtawjg@mail.gmail.com>
- <20190718072154.m2umem24x4grbf6w@gondor.apana.org.au>
- <36e78459-1594-6d19-0ab4-95b03a6de036@gmail.com>
- <MN2PR20MB2973E61815F069E8C7D74177CAC80@MN2PR20MB2973.namprd20.prod.outlook.com>
- <b042649c-db98-9710-b063-242bdf520252@gmail.com>
- <20190720065807.GA711@sol.localdomain>
- <0d4d6387-777c-bfd3-e54a-e7244fde0096@gmail.com>
- <CAKv+Gu9UF+a1UhVU19g1XcLaEqEaAwwkSm3-2wTHEAdD-q4mLQ@mail.gmail.com>
- <MN2PR20MB2973B9C2DDC508A81AF4A207CAC40@MN2PR20MB2973.namprd20.prod.outlook.com>
- <CAKv+Gu9C2AEbb++W=QTVWbeA_88Fo57NcOwgU5R8HBvzFwXkJw@mail.gmail.com>
-In-Reply-To: <CAKv+Gu9C2AEbb++W=QTVWbeA_88Fo57NcOwgU5R8HBvzFwXkJw@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=pvanleeuwen@verimatrix.com; 
-x-originating-ip: [188.204.2.113]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: a07c3b14-5a88-43ba-a6bd-08d70ef67650
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:MN2PR20MB2847;
-x-ms-traffictypediagnostic: MN2PR20MB2847:
-x-ms-exchange-purlcount: 2
-x-microsoft-antispam-prvs: <MN2PR20MB28473FD8FBB87A9A3FF09B9ACAC40@MN2PR20MB2847.namprd20.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 01068D0A20
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(376002)(39850400004)(136003)(366004)(396003)(346002)(13464003)(199004)(189003)(66556008)(8936002)(64756008)(66446008)(486006)(76116006)(66946007)(66476007)(81156014)(81166006)(305945005)(7736002)(14444005)(256004)(5660300002)(68736007)(54906003)(15974865002)(316002)(71190400001)(6116002)(71200400001)(966005)(3846002)(66066001)(52536014)(74316002)(86362001)(229853002)(6916009)(53546011)(186003)(102836004)(25786009)(6436002)(14454004)(4326008)(76176011)(8676002)(53936002)(33656002)(99286004)(478600001)(7696005)(476003)(11346002)(6246003)(26005)(2906002)(6306002)(9686003)(446003)(6506007)(55016002)(18886075002);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR20MB2847;H:MN2PR20MB2973.namprd20.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: verimatrix.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: y6/e+2cUG9tnp1HaRm1n1HJMGKHf/xPNUTdlELysQqLFyRe7jpcvjkxZ68Rm3mTA1hAMNF7PWgEy41zO5x08sFb4U57ew8DD1Rx06WTsJXYagGFxU4tLT9Ye4f9p1/VCspkZ8A7rbdic0bHHlgWFi5MNkBn8fZrPRcNSakV99UnaNvFcs2G7meJfZrHHGX3cIvvKzlGtEtcWymGMfCR+63iuZmoB8GpQH9pQbxolxl1QeB0fJVJFF8qKVSQTVN2gDTlRQ9JxolYB2McIfC6CAujilqxUu8EV9HZtou6HUDiwfYAwBsxBUszBCnrW0IrZcIi0yzYWaDhJTnY7pv7DfiEPPLLOZNq4iCIa3i64TAsppYU9Xr9rbGera/GOwzAfH8KW1SdjqfX17/DIW8fDt9/2+xwWQLPcf0rlvNGULEI=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>
+References: <MN2PR20MB2973F2047FCE9EA5794E7DF7CAC40@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <20190722160603.GA689@sol.localdomain>
+ <MN2PR20MB2973E558C4C8732708EF3A06CAC40@MN2PR20MB2973.namprd20.prod.outlook.com>
 MIME-Version: 1.0
-X-OriginatorOrg: verimatrix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a07c3b14-5a88-43ba-a6bd-08d70ef67650
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Jul 2019 22:46:40.4506
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: dcb260f9-022d-4495-8602-eae51035a0d0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: pvanleeuwen@verimatrix.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR20MB2847
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <MN2PR20MB2973E558C4C8732708EF3A06CAC40@MN2PR20MB2973.namprd20.prod.outlook.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBBcmQgQmllc2hldXZlbCA8YXJk
-LmJpZXNoZXV2ZWxAbGluYXJvLm9yZz4NCj4gU2VudDogTW9uZGF5LCBKdWx5IDIyLCAyMDE5IDY6
-NDMgUE0NCj4gVG86IFBhc2NhbCBWYW4gTGVldXdlbiA8cHZhbmxlZXV3ZW5AdmVyaW1hdHJpeC5j
-b20+DQo+IENjOiBNaWxhbiBCcm96IDxnbWF6eWxhbmRAZ21haWwuY29tPjsgSGVyYmVydCBYdSA8
-aGVyYmVydEBnb25kb3IuYXBhbmEub3JnLmF1PjsgZG0tZGV2ZWxAcmVkaGF0LmNvbTsgbGludXgt
-DQo+IGNyeXB0b0B2Z2VyLmtlcm5lbC5vcmc7IEhvcmlhIEdlYW50YSA8aG9yaWEuZ2VhbnRhQG54
-cC5jb20+DQo+IFN1YmplY3Q6IFJlOiBbZG0tZGV2ZWxdIHh0cyBmdXp6IHRlc3RpbmcgYW5kIGxh
-Y2sgb2YgY2lwaGVydGV4dCBzdGVhbGluZyBzdXBwb3J0DQo+IA0KPiBPbiBNb24sIDIyIEp1bCAy
-MDE5IGF0IDEyOjQ0LCBQYXNjYWwgVmFuIExlZXV3ZW4NCj4gPHB2YW5sZWV1d2VuQHZlcmltYXRy
-aXguY29tPiB3cm90ZToNCj4gPg0KPiA+ID4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4g
-PiA+IEZyb206IEFyZCBCaWVzaGV1dmVsIDxhcmQuYmllc2hldXZlbEBsaW5hcm8ub3JnPg0KPiA+
-ID4gU2VudDogU3VuZGF5LCBKdWx5IDIxLCAyMDE5IDExOjUwIEFNDQo+ID4gPiBUbzogTWlsYW4g
-QnJveiA8Z21henlsYW5kQGdtYWlsLmNvbT4NCj4gPiA+IENjOiBQYXNjYWwgVmFuIExlZXV3ZW4g
-PHB2YW5sZWV1d2VuQHZlcmltYXRyaXguY29tPjsgSGVyYmVydCBYdSA8aGVyYmVydEBnb25kb3Iu
-YXBhbmEub3JnLmF1PjsgZG0tZGV2ZWxAcmVkaGF0LmNvbTsNCj4gbGludXgtDQo+ID4gPiBjcnlw
-dG9Admdlci5rZXJuZWwub3JnOyBIb3JpYSBHZWFudGEgPGhvcmlhLmdlYW50YUBueHAuY29tPg0K
-PiA+ID4gU3ViamVjdDogUmU6IFtkbS1kZXZlbF0geHRzIGZ1enogdGVzdGluZyBhbmQgbGFjayBv
-ZiBjaXBoZXJ0ZXh0IHN0ZWFsaW5nIHN1cHBvcnQNCj4gPiA+DQo+ID4gPiBPbiBTYXQsIDIwIEp1
-bCAyMDE5IGF0IDEwOjM1LCBNaWxhbiBCcm96IDxnbWF6eWxhbmRAZ21haWwuY29tPiB3cm90ZToN
-Cj4gPiA+ID4NCj4gPiA+ID4gT24gMjAvMDcvMjAxOSAwODo1OCwgRXJpYyBCaWdnZXJzIHdyb3Rl
-Og0KPiA+ID4gPiA+IE9uIFRodSwgSnVsIDE4LCAyMDE5IGF0IDAxOjE5OjQxUE0gKzAyMDAsIE1p
-bGFuIEJyb3ogd3JvdGU6DQo+ID4gPiA+ID4+IEFsc28sIEkgd291bGQgbGlrZSB0byBhdm9pZCBh
-bm90aGVyICJqdXN0IGJlY2F1c2UgaXQgaXMgbmljZXIiIG1vZHVsZSBkZXBlbmRlbmNlIChYVFMt
-PlhFWC0+RUNCKS4NCj4gPiA+ID4gPj4gTGFzdCB0aW1lICh3aGVuIFhUUyB3YXMgcmVpbXBsZW1l
-bnRlZCB1c2luZyBFQ0IpIHdlIGhhdmUgbWFueSByZXBvcnRzIHdpdGggaW5pdHJhbWZzDQo+ID4g
-PiA+ID4+IG1pc3NpbmcgRUNCIG1vZHVsZSBwcmV2ZW50aW5nIGJvb3QgZnJvbSBBRVMtWFRTIGVu
-Y3J5cHRlZCByb290IGFmdGVyIGtlcm5lbCB1cGdyYWRlLi4uDQo+ID4gPiA+ID4+IEp1c3Qgc2F5
-aW5nLiAoRGVzcGl0ZSB0aGUgbGFzdCB0aW1lIGl0IHdhcyBrZXlyaW5nIHdoYXQgYnJva2UgZW5j
-cnlwdGVkIGJvb3QgOy0pDQo+ID4gPiA+ID4+DQo+ID4gPiA+ID4NCj4gPiA+ID4gPiBDYW4ndCB0
-aGUgIm1pc3NpbmcgbW9kdWxlcyBpbiBpbml0cmFtZnMiIGlzc3VlIGJlIHNvbHZlZCBieSB1c2lu
-ZyBhDQo+ID4gPiA+ID4gTU9EVUxFX1NPRlRERVAoKT8gIEFjdHVhbGx5LCB3aHkgaXNuJ3QgdGhh
-dCBiZWluZyB1c2VkIGZvciB4dHMgLT4gZWNiIGFscmVhZHk/DQo+ID4gPiA+ID4NCj4gPiA+ID4g
-PiAoVGhlcmUgd2FzIGFsc28gYSBidWcgd2hlcmUgQ09ORklHX0NSWVBUT19YVFMgZGlkbid0IHNl
-bGVjdCBDT05GSUdfQ1JZUFRPX0VDQiwNCj4gPiA+ID4gPiBidXQgdGhhdCB3YXMgc2ltcGx5IGEg
-YnVnLCB3aGljaCB3YXMgZml4ZWQuKQ0KPiA+ID4gPg0KPiA+ID4gPiBTdXJlLCBhbmQgaXQgaXMg
-c29sdmVkIG5vdy4gKFNvbWUgc3lzdGVtcyB3aXRoIGEgaGFyZGNvZGVkIGxpc3Qgb2YgbW9kdWxl
-cw0KPiA+ID4gPiBoYXZlIHRvIGJlIG1hbnVhbGx5IHVwZGF0ZWQgZXRjLiwgYnV0IHRoYXQgaXMg
-anVzdCBiYWQgZGVzaWduKS4NCj4gPiA+ID4gSXQgY2FuIGJlIGRvbmUgcHJvcGVybHkgZnJvbSB0
-aGUgYmVnaW5uaW5nLg0KPiA+ID4gPg0KPiA+ID4gPiBJIGp1c3Qgd2FudCB0byBzYXkgdGhhdCB0
-aGF0IHN3aXRjaGluZyB0byBYRVggbG9va3MgbGlrZSB3YXN0aW5nIHRpbWUgdG8gbWUNCj4gPiA+
-ID4gZm9yIG5vIGFkZGl0aW9uYWwgYmVuZWZpdC4NCj4gPiA+ID4NCj4gPiA+ID4gRnVsbHkgaW1w
-bGVtZW50aW5nIFhUUyBkb2VzIG1ha2UgbXVjaCBtb3JlIHNlbnNlIGZvciBtZSwgZXZlbiB0aG91
-Z2ggaXQgaXMgbG9uZy10ZXJtDQo+ID4gPiA+IHRoZSBlZmZvcnQgYW5kIHRoZSBvbmx5IHVzZXIs
-IGZvciBub3csIHdvdWxkIGJlIHRlc3RtZ3IuDQo+ID4gPiA+DQo+ID4gPiA+IFNvLCB0aGVyZSBh
-cmUgbm8gdXNlcnMgYmVjYXVzZSBpdCBkb2VzIG5vdCB3b3JrLiBJdCBtYWtlcyBubyBzZW5zZQ0K
-PiA+ID4gPiB0byBpbXBsZW1lbnQgaXQsIGJlY2F1c2UgdGhlcmUgYXJlIG5vIHVzZXJzLi4uIChz
-b3JyeSwgc291bmRzIGxpa2UgY2F0Y2ggMjIgOikNCj4gPiA+ID4NCj4gPiA+ID4gKE1heWJlIHNv
-bWVvbmUgY2FuIHVzZSBpdCBmb3Iga2V5c2xvdCBlbmNyeXB0aW9uIGZvciBrZXlzIG5vdCBhbGln
-bmVkIHRvDQo+ID4gPiA+IGJsb2NrIHNpemUsIGR1bm5vLiBBY3R1YWxseSwgc29tZSBmaWxlc3lz
-dGVtIGVuY3J5cHRpb24gY291bGQgaGF2ZSB1c2UgZm9yIGl0LikNCj4gPiA+ID4NCj4gPiA+ID4g
-PiBPciAieHRzIiBhbmQgInhleCIgY291bGQgZ28gaW4gdGhlIHNhbWUga2VybmVsIG1vZHVsZSB4
-dHMua28sIHdoaWNoIHdvdWxkIG1ha2UNCj4gPiA+ID4gPiB0aGlzIGEgbm9uLWlzc3VlLg0KPiA+
-ID4gPg0KPiA+ID4gPiBJZiBpdCBpcyBub3QgYXZhaWxhYmxlIGZvciB1c2VycywgSSByZWFsbHkg
-c2VlIG5vIHJlYXNvbiB0byBpbnRyb2R1Y2UgWEVYIHdoZW4NCj4gPiA+ID4gaXQgaXMganVzdCBY
-VFMgd2l0aCBmdWxsIGJsb2Nrcy4NCj4gPiA+ID4NCj4gPiA+ID4gSWYgaXQgaXMgdmlzaWJsZSB0
-byB1c2VycywgaXQgbmVlZHMgc29tZSB3b3JrIGluIHVzZXJzcGFjZSAtIFhFWCAoYXMgWFRTKSBu
-ZWVkIHR3byBrZXlzLA0KPiA+ID4gPiBwZW9wbGUgYXJlIGFscmVhZHkgY29uZnVzZWQgZW5vdWdo
-IHRoYXQgMjU2Yml0IGtleSBpbiBBRVMtWFRTIG1lYW5zIEFFUy0xMjguLi4NCj4gPiA+ID4gU28g
-dGhlIGV4YW1wbGVzLCBoaW50cywgbWFuIHBhZ2VzIG5lZWQgdG8gYmUgdXBkYXRlZCwgYXQgbGVh
-c3QuDQo+ID4gPiA+DQo+ID4gPg0KPiA+ID4gT0ssIGNvbnNpZGVyIG1lIHBlcnN1YWRlZC4gV2Ug
-YXJlIGFscmVhZHkgZXhwb3NpbmcgeHRzKC4uLikgdG8NCj4gPiA+IHVzZXJsYW5kLCBhbmQgc2lu
-Y2Ugd2UgYWxyZWFkeSBpbXBsZW1lbnQgYSBwcm9wZXIgc3Vic2V0IG9mIHRydWUgWFRTLA0KPiA+
-ID4gaXQgd2lsbCBiZSBzaW1wbHkgYSBtYXR0ZXIgb2YgbWFraW5nIHN1cmUgdGhhdCB0aGUgZXhp
-c3RpbmcgWFRTDQo+ID4gPiBpbXBsZW1lbnRhdGlvbnMgZG9uJ3QgcmVncmVzcyBpbiBwZXJmb3Jt
-YW5jZSBvbiB0aGUgbm9uLUNUUyBjb2RlDQo+ID4gPiBwYXRocy4NCj4gPiA+DQo+ID4gPiBJdCB3
-b3VsZCBiZSB1c2VmdWwsIHRob3VnaCwgdG8gaGF2ZSBzb21lIGdlbmVyaWMgaGVscGVyIGZ1bmN0
-aW9ucywNCj4gPiA+IGUuZy4sIGxpa2UgdGhlIG9uZSB3ZSBoYXZlIGZvciBDQkMsIG9yIHRoZSBv
-bmUgSSByZWNlbnRseSBwcm9wb3NlZCBmb3INCj4gPiA+IENUUywgc28gdGhhdCBleGlzdGluZyBp
-bXBsZW1lbnRhdGlvbnMgKHN1Y2ggYXMgdGhlIGJpdCBzbGljZWQgQUVTKSBjYW4NCj4gPiA+IGVh
-c2lseSBiZSBhdWdtZW50ZWQgd2l0aCBhIENUUyBjb2RlIHBhdGggKGJ1dCBwZXJmb3JtYW5jZSBt
-YXkgbm90IGJlDQo+ID4gPiBvcHRpbWFsIGluIHRob3NlIGNhc2VzKS4gRm9yIHRoZSBBUk0gaW1w
-bGVtZW50YXRpb25zIGJhc2VkIG9uIEFFUw0KPiA+ID4gaW5zdHJ1Y3Rpb25zLCBpdCBzaG91bGQg
-YmUgcmVhc29uYWJseSBzdHJhaWdodCBmb3J3YXJkIHRvIGltcGxlbWVudCBpdA0KPiA+ID4gY2xv
-c2UgdG8gb3B0aW1hbGx5IGJ5IHJldXNpbmcgc29tZSBvZiB0aGUgY29kZSBJIGFkZGVkIGZvciBD
-QkMtQ1RTDQo+ID4gPiAoYnV0IEkgd29uJ3QgZ2V0IGFyb3VuZCB0byBkb2luZyB0aGF0IGZvciBh
-IHdoaWxlKS4gSWYgdGhlcmUgYXJlIGFueQ0KPiA+ID4gdm9sdW50ZWVycyBmb3IgbG9va2luZyBp
-bnRvIHRoZSBnZW5lcmljIG9yIHg4Ni9BRVMtTkkgaW1wbGVtZW50YXRpb25zLA0KPiA+ID4gcGxl
-YXNlIGNvbWUgZm9yd2FyZCA6LSkgQWxzbywgaWYgYW55IG9mIHRoZSBwdWJsaWNhdGlvbnMgdGhh
-dCB3ZXJlDQo+ID4gPiBxdW90ZWQgaW4gdGhpcyB0aHJlYWQgaGF2ZSBzdWl0YWJsZSB0ZXN0IHZl
-Y3RvcnMsIHRoYXQgd291bGQgYmUgZ29vZA0KPiA+ID4gdG8ga25vdy4NCj4gPg0KPiA+IFVuZm9y
-dHVuYXRlbHksIHRoZXNlIGFsZ29yaXRobSAmIHByb3RvY29sIHNwZWNpZmljYXRpb25zIHRlbmQg
-dG8gYmUgdmVyeSBmcnVnYWwgd2hlbiBpdA0KPiA+IGNvbWVzIHRvIHByb3ZpZGluZyB0ZXN0IHZl
-Y3RvcnMsIGJhcmVseSBzY3JhdGNoaW5nIHRoZSBzdXJmYWNlIG9mIGFueSBjb3JuZXIgY2FzZXMs
-IGJ1dA0KPiA+IGF0IGxlYXN0IHRoZXJlIGlzIG9uZSBub24tbXVsdGlwbGUtb2YtMTYgdmVjdG9y
-IGluIHRoZSBvcmlnaW5hbCBJRUVFIFAxNjE5IC8gRDE2DQo+ID4gc3BlY2lmaWNhdGlvbiBpbiBB
-bm5leCBCIFRlc3QgVmVjdG9ycyAobGFzdCB2ZWN0b3IsICJYVFMtQUVTLTEyOCBhcHBsaWVkIGZv
-ciBhIGRhdGEgdW5pdA0KPiA+IHRoYXQgaXMgbm90IGEgbXVsdGlwbGUgb2YgMTYgYnl0ZXMiKQ0K
-PiA+DQo+IA0KPiBBY3R1YWxseSwgdGhhdCBzcGVjIGhhcyBhIGNvdXBsZSBvZiB0ZXN0IHZlY3Rv
-cnMuIFVuZm9ydHVuYXRlbHksIHRoZXkNCj4gYXJlIGFsbCByYXRoZXIgc2hvcnQgKGV4Y2VwdCB0
-aGUgbGFzdCBvbmUgaW4gdGhlICdubyBtdWx0aXBsZSBvZiAxNg0KPiBieXRlcycgcGFyYWdyYXBo
-LCBidXQgdW5mb3J0dW5hdGVseSwgdGhhdCBvbmUgaXMgaW4gZmFjdCBhIG11bHRpcGxlIG9mDQo+
-IDE2IGJ5dGVzKQ0KPiANClllcywgYXMgdXN1YWwgaXQncyB2ZXJ5IGxpbWl0ZWQgYW5kIGRvZXMg
-bm90IGNvdmVyIGFsbCB0aGUgaW50ZXJlc3RpbmcgY2FzZXMuDQpJdCdzIHN0aWxsIGJldHRlciB0
-aGFuIG5vdGhpbmcsIHRob3VnaC4NClRoZSBmYWN0IHRoYXQgdGhlIGxhc3Qgb25lIGFjdHVhbGx5
-ICppcyogYSBtdWx0aXBsZSBvZiAxNiBpcyBxdWl0ZSBoaWxhcmlvdXMsIEkNCmhhZCBub3Qgc3Bv
-dHRlZCB0aGF0IG15c2VsZiB5ZXQgLi4uDQoNCj4gSSBhZGRlZCB0aGVtIGhlcmUgWzBdIGFsb25n
-IHdpdGggYW4gYXJtNjQgaW1wbGVtZW50YXRpb24gZm9yIHRoZSBBRVMNCj4gaW5zdHJ1Y3Rpb24g
-YmFzZWQgZHJpdmVyLiBDb3VsZCB5b3UgcGxlYXNlIGRvdWJsZSBjaGVjayB0aGF0IHRoZXNlDQo+
-IHdvcmsgYWdhaW5zdCB5b3VyIGRyaXZlcj8gVGhhdCB3b3VsZCBlc3RhYmxpc2ggYSBncm91bmQg
-dHJ1dGggYWdhaW5zdA0KPiB3aGljaCB3ZSBjYW4gaW1wbGVtZW50IHRoZSBnZW5lcmljIHZlcnNp
-b24gYXMgd2VsbC4NCj4gDQo+IFswXSBodHRwczovL2dpdC5rZXJuZWwub3JnL3B1Yi9zY20vbGlu
-dXgva2VybmVsL2dpdC9hcmRiL2xpbnV4LmdpdC9sb2cvP2g9eHRzLWN0cw0KPiANCkknZCBiZSBo
-YXBweSB0byBkbyB0aGF0IGV4Y2VwdCB0aGF0IGFkZGluZyBYVFMgc3VwcG9ydCB0byB0aGUgZHJp
-dmVyIGlzIHN0aWxsDQpvbiBteSB0b2RvIGxpc3QuIEkgd2FzIGFjdHVhbGx5IHdhaXRpbmcgZm9y
-IHNvbWUgb2YgbXkgZWFybGllciBwYXRjaGVzIHRvIGJlDQphY2tlZCBhcyB0aGUgc2l0dWF0aW9u
-IGlzIGJlY29taW5nIHJhdGhlciB1bm1hbmFnZWFibGUgZm9yIG1lIC4uLg0KDQpCdXQgSSBzdXBw
-b3NlIEkgY2FuIGdpdmUgaXQgYSBzaG90IGFueXdheSAtIGFkZGluZyBYVFMgc2hvdWxkIGJlIHJl
-bGF0aXZlbHkNCnNpbXBsZSBjb21wYXJlIHRvLCBzYXksIGFkZGluZyBBRVMtR0NNLiBCdXQgSSdt
-IHN1cmUgSSdsbCBzb21laG93IHJlZ3JldA0Kc2F5aW5nIHRoYXQuDQoNCj4gPiBCZXNpZGVzIHRo
-YXQsIEknZCBiZSBoYXBweSB0byBnZW5lcmF0ZSBzb21lIHRlc3R2ZWN0b3JzIGZyb20gb3VyIGRl
-ZmFjdG8tc3RhbmRhcmQNCj4gPiBpbXBsZW1lbnRhdGlvbiA7LSkNCj4gPg0KPiANCj4gT25lIG9y
-IHR3byBsYXJnZXIgb25lcyB3b3VsZCBiZSB1c2VmdWwsIHllcy4NCj4NCkl0IHdhcyBtb3JlIG9y
-IGxlc3MgYSBqb2tlIGFzIGhvdyB3b3VsZCB5b3Uga25vdyB0aGVtIHRvIGJlIGNvcnJlY3Q/DQoo
-bm90IHRoYXQgSSBkb24ndCB0cnVzdCBteSBoYXJkd2FyZSwgb2YgY291cnNlIC4uLikNCklmIGl0
-J3MganVzdCBmb3IgcGxheWluZyBhcm91bmQsIEkgY2FuIHByb3ZpZGUgc29tZSBsYXJnZXIgdmVj
-dG9ycywgbm8gcHJvYmxlbS4NCg0KUmVnYXJkcywNClBhc2NhbCB2YW4gTGVldXdlbg0KU2lsaWNv
-biBJUCBBcmNoaXRlY3QsIE11bHRpLVByb3RvY29sIEVuZ2luZXMgQCBWZXJpbWF0cml4DQp3d3cu
-aW5zaWRlc2VjdXJlLmNvbQ0KDQo=
+On Mon, Jul 22, 2019 at 10:09:03PM +0000, Pascal Van Leeuwen wrote:
+> > -----Original Message-----
+> > From: Eric Biggers <ebiggers@kernel.org>
+> > Sent: Monday, July 22, 2019 6:06 PM
+> > To: Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+> > Cc: linux-crypto@vger.kernel.org; Herbert Xu <herbert@gondor.apana.org.au>; davem@davemloft.net
+> > Subject: Re: Testmgr fuzz testing
+> > 
+> > Hi Pascal,
+> > 
+> > On Mon, Jul 22, 2019 at 10:27:22AM +0000, Pascal Van Leeuwen wrote:
+> > > Eric,
+> > >
+> > > While fixing some issues in the inside-secure driver reported by the fuzz, I noticed that the
+> > > results are actually not repeatable: odds are  high that on the next run, the error case is
+> > > actually not hit anymore since they're typically very specific  corner cases.
+> > >
+> > > There's 2 problems with that:
+> > > a) Without repeatability, I cannot verify whether my fix actually worked. In fact, I cannot
+> > > even verify with any certainty that any modification I do won't fail somewhere else :-(
+> > > b) Odds are very significant that important corner cases are not hit by the fuzzing
+> > >
+> > > Issue a) is usually solved by making the random generation deterministic, i.e. ensure
+> > > you seed it with a known constant and pull the random numbers strictly sequentially.
+> > > (you may or may not add the *option* to  pull the seed from some true random source)
+> > >
+> > > Issue b) would be best solved by splitting the fuzz testing into two parts, a (properly
+> > > constrained!) random part and a part with fixed known corner cases where you use
+> > > constant parameters (like lengths and such) but depend on the generic implementation
+> > > for the actual vector generation (as specifications usually don't provide vectors for
+> > > all interesting corner cases but we consider the generic implementation to be correct)
+> > >
+> > 
+> > Sure, it's not always repeatable, but that's the nature of fuzz testing.  
+> >
+> No. It's not repeatable *at all*. The odds of getting the exact same sequence of random
+> numbers should approach zero, assuming that random generator is half decent and 
+> properly seeded with another (true?) random value. 
+> 
+> For us hardware engineers, (constrained) random testing is our bread and butter.
+> Given the design complexity we're dealing with today and the fact that any serious bug may 
+> actually put us out of business (considering mask costs and respin turnaround), it's the only 
+> way to cope. So I have many years of experience and I can assure you that being "not always
+> repeatable" does not NEED to be the "nature of fuzz testing".  As one of the first things you 
+> learn (the hard way) is to log the random seed(s) and make them controllable ... somehow.
+> Because nothing is as frustrating as finding a bug after days of simulation and then
+> not being able to reproduce it with waves and debugging enabled ...
+> 
+> >We *could* start with a constant seed, but then all the random numbers would change
+> > every time anyone made any minor change to the fuzz tests anyway.
+> > 
+> Yes, this is a well known fact: any change to either the design, the test environment or
+> the test itself may affect the random generation and cause different behavior.
+> Which may be a problem if you want to hit a specific case with 100% certainty - in
+> which case you should indeed make a dedicated test for that instead.
+> (but usually, you don't realise the corner case exists until you first hit it ...)
+> 
+> *However* this is NOT relevant to the repeatability-for-debugging situation, as in
+> that case, you should should not change *anything* until you've thoroughly root-
+> caused the issue. (or created a baseline in your source control system such that you
+> can always go back to the *exact* situation  that caused the error).
+> This is (hardware) verification 101.
+
+I meant repeatable in the sense that the same bug is hit, even if the generated
+test case is not 100% identical.
+
+Anyway, you're welcome to send a patch changing the fuzzing code to use a
+constant seed, if you really think it would be useful and can provide proper
+justification for it.  I'm not sure why you keep sending these long rants, when
+you could simply send a patch yourself.
+
+> 
+> > In my experience the bugs found by the fuzz tests tend to be found within a
+> > couple hundred iterations, so are seen within a few boots at most with the
+> > default fuzz_iterations=100, and are "always" seen with fuzz_iterations=1000.
+> > Raising fuzz_iterations to 10000 didn't find anything else.
+> > 
+> That may be because you've been working mostly with software implementations
+> which were already in pretty good shape to begin with. Hardware tends to have 
+> many more (tricky) corner cases.
+> The odds of hitting a specific corner case in just 100 or 1000 vectors is really not
+> as high as you may think. Especially if many of the vectors being generated are
+> actually illegal and just test for proper error response from the driver.
+> 
+> Just try to compute the (current) odds of getting an AAD length and cipher text
+> length that are zero at the same time. Which is a relevant corner case at least for
+> our hardware. In fact, having the digestsize zero at the same time as well is yet 
+> another corner case requiring yet another workaround. The odds of those 3 
+> cases colliding while generating random lengths over a decent range are really,
+> really slim.
+> 
+> Also, how fast you can reboot depends very much on the platform you're 
+> working on. It quickly becomes annoying if rebooting takes minutes and plenty
+> of manual interaction. Speaking from experience.
+> 
+> > If you find otherwise and come across some really rare case, you should either
+> > add a real test vector (i.e. not part of the fuzz tests) for it, 
+> >
+> The problem with "generating a test vector for it" is that it requires a known-
+> good reference implementation, which is usually hard to find. And then you
+> have to convert it to testmgr.h format and add it there manually. Which is both
+> cumbersome and will cause testmgr.h (and kernel size) to explode at some point.
+> 
+> While in the overal majority of cases you don't really care about the input data
+> itself at all, so it's fine to generate that randomly, what you care about are things 
+> like specific lengths, alignments, sizes, IV (counter) values and combinations thereof.
+> 
+> Also, adding those as "normal" test vectors will cause the normal boot produre to
+> slow to a crawl verifying  loads of obscure corner cases that are really only relevant
+> during development anyway. 
+> 
+> And why bother if you have the generic implementation available to do all 
+> this on-the-fly and only with the extra tests enabled, just like you do with the full 
+> random vectors?
+> 
+> It was just a crazy idea anyway, based on a real-life observation I made.
+
+Being too lazy to add a test vector isn't really an excuse, and it won't bloat
+the kernel size or boot time unless you add a massive number of test vectors or
+if they use very large lengths.  We could even make certain test vectors
+conditional on CONFIG_CRYPTO_MANAGER_EXTRA_TESTS if it's an issue...
+
+> 
+> > or you should
+> > update the fuzz tests to generate the case more often so that it's likely to be
+> > hit with the default fuzz_iterations=100.  
+> >
+> Running just 10 times more iterations is really not going to be sufficient to hit
+> the really tricky *combinations* of parameters, considering the ranges of the
+> individual parameters. Just do some statistics on that and you'll soon realise.
+> 
+> Just some example for the AEAD corner case I mentioned before:
+> 
+> The odds of generating a zero authsize are 1/4 * 1/17 = 1/68. But that will still
+> need to coincide with all other parameters (including key sizes) being legal.
+> So there already, your 100 iterations come short.
+> 
+> A zero length AAD *and* plaintext happens only once every 8000+ vectors.
+> And that also still has to coincide with key sizes etc. being legal. So there even
+> 10000 iterations would not be enough to be *sure* to hit that.
+> 
+> To have some reasonable shot at hitting the combination those two cases
+> you'd need well over a million iterations ...
+> 
+> > I don't think it's necessary to split
+> > the fuzz testing into 2 parts; instead we just need to boost the probability of
+> > generating known edge cases (e.g. see what generate_random_bytes() already does).
+> > 
+> I guess somehow tweaking the random generation such that the probability of 
+> generating the interesting cases becomes *significantly* higher would work too.
+> To me, that's just implementation detail though.
+> 
+
+Like I said, if you encounter bugs that the fuzz tests should be finding but
+aren't, it would be really helpful if you added test vectors for them and/or
+updated the fuzz tests to generate those cases more often.  I was simply
+pointing out that to do the latter, we don't really need to split the tests into
+2 parts; it would be sufficient just to change the probabilities with which
+different things are generated.  Note that the probabilities can be conditional
+on other things, which can get around the issue where a bunch of small
+independent probabilities are multiplied together.
+
+- Eric
