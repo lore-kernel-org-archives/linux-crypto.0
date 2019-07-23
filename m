@@ -2,155 +2,149 @@ Return-Path: <SRS0=XUD9=VU=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 752E9C7618B
-	for <linux-crypto@archiver.kernel.org>; Tue, 23 Jul 2019 14:17:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F07B9C7618B
+	for <linux-crypto@archiver.kernel.org>; Tue, 23 Jul 2019 14:36:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2A52021842
-	for <linux-crypto@archiver.kernel.org>; Tue, 23 Jul 2019 14:17:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="F/IgDoO0"
+	by mail.kernel.org (Postfix) with ESMTP id BD29B227BE
+	for <linux-crypto@archiver.kernel.org>; Tue, 23 Jul 2019 14:36:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1563892562;
+	bh=RhgZmcSMrQfqbKW3yJR0qQgPijWPcwlwWIuyvyAMaj0=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=XVwyKK+A2g2b7ct1vAg4kbh5y+hqhryQceK1mMzPQBzc5D9Oc3lg0nw+bl6xK6L2V
+	 JAnk+MjP6NQu3WZs/uKTGQv8rb5JaxTn6GY5BnU6/2bqJwHEiOTt3JCPAGJFqdDH1N
+	 FrwNAurOA2wZvcA5im9kPfYlfYcgrdkMTrbqedfs=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388055AbfGWOR2 (ORCPT
+        id S2387987AbfGWOgB (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 23 Jul 2019 10:17:28 -0400
-Received: from mail-eopbgr10048.outbound.protection.outlook.com ([40.107.1.48]:8100
-        "EHLO EUR02-HE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1732972AbfGWOR2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 23 Jul 2019 10:17:28 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gm5QVtQ90s8ZTmx2OqsiI8Us4NiroSb9v3/SOJPiTaE1mDoRI0PFB5Kimr0msYnObSicFYenLKEon5RfP4BsQxOfKrRCXFd9jawPTP5JjWtmjOlRIzigxH/YRvuXxStJ41SOG40q/Aj507vav0RwPcvjDCXJCqJWjwKSKEaX1367st93WPzMWeanIEnpF586ICch4NLd02Fbnbzjow6vQfzmmSFKKdIuzU5lb85nBjdIpkQgvSekVzylaCPXuwBSFabBN644BiDUdUJyyayW30OEB51zGgVK4z02gpa4/pME9PTPWojWa7Q1Xtj81iUgyjMamJ0qaeAIGkwmZdWvdw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8hhXx5l9cykJ6eoTSz8YsUulV3YXes2hZ9BH4G99wYw=;
- b=e/SD48xjOUESNZgXoVgV3XebMX56urNywEkMC4ZEZLtTpxJQsF7T+Gc7OayJdbOtRn5N5MdzCA3BTy03UdVlV1GK3CzXWScp/NSrcfm1xfnN2FyxCGY+hbbGNtOZAhkHUT+wWS9b19jlAQgSiTQIcuSleEOarWnsxjmyzmEPEgdKzOMjv0z0DXTr6ZfYJSVNn7ntppCPUHsyc84G601GZsm7wZEqD2TlljJ/Kq1zmQl0B/ww85jvoaFoRcWg70BTNFBI29R2j/8a0s6KgJFEmZtui5xsE4On+u/I2oMYJrDQkH87MzuZ1vYYj5M61IYjmohMuknDHzt44URcMLS8vg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
- smtp.mailfrom=nxp.com;dmarc=pass action=none header.from=nxp.com;dkim=pass
- header.d=nxp.com;arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8hhXx5l9cykJ6eoTSz8YsUulV3YXes2hZ9BH4G99wYw=;
- b=F/IgDoO01LgTT1N8bNIDl6PUHuR1sdmyoj6kO5nuiAYKLy0f0Ez44qGF1wXur2SzWQ86siR9SJ4zBhmSC7K5+LQkmZXe2bktmjNYWNOYcsXzv/1mTFePUC6FWi9nT/nDSq0eifWG3IVA6fja6cE7Of5yf/BX5SbhH4ebOfhYppg=
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
- VI1PR0402MB3760.eurprd04.prod.outlook.com (52.134.15.154) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2073.14; Tue, 23 Jul 2019 14:17:23 +0000
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::7c64:5296:4607:e10]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::7c64:5296:4607:e10%5]) with mapi id 15.20.2094.017; Tue, 23 Jul 2019
- 14:17:23 +0000
-From:   Horia Geanta <horia.geanta@nxp.com>
-To:     Andrey Smirnov <andrew.smirnov@gmail.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-CC:     Leonard Crestez <leonard.crestez@nxp.com>,
-        Iuliana Prodan <iuliana.prodan@nxp.com>,
-        Chris Spencer <christopher.spencer@sea.co.uk>,
-        Cory Tusar <cory.tusar@zii.aero>,
-        Chris Healy <cphealy@gmail.com>,
-        Lucas Stach <l.stach@pengutronix.de>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v6 02/14] crypto: caam - simplfy clock initialization
-Thread-Topic: [PATCH v6 02/14] crypto: caam - simplfy clock initialization
-Thread-Index: AQHVPLPWYTLdMdHH1EGtW/zbNRZFgA==
-Date:   Tue, 23 Jul 2019 14:17:23 +0000
-Message-ID: <VI1PR0402MB3485E4DDB5E3BDCBC2AAAFE398C70@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-References: <20190717152458.22337-1-andrew.smirnov@gmail.com>
- <20190717152458.22337-3-andrew.smirnov@gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=horia.geanta@nxp.com; 
-x-originating-ip: [212.146.100.6]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: f02b2314-1c7d-4a36-3561-08d70f787b68
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:VI1PR0402MB3760;
-x-ms-traffictypediagnostic: VI1PR0402MB3760:
-x-microsoft-antispam-prvs: <VI1PR0402MB37608C70DE08E2AF3CF42E4498C70@VI1PR0402MB3760.eurprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:6430;
-x-forefront-prvs: 0107098B6C
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(366004)(346002)(39860400002)(376002)(396003)(136003)(189003)(199004)(14444005)(256004)(66066001)(305945005)(86362001)(7736002)(102836004)(476003)(6436002)(74316002)(99286004)(44832011)(486006)(316002)(6506007)(53546011)(8676002)(110136005)(54906003)(14454004)(478600001)(71190400001)(186003)(71200400001)(81156014)(81166006)(26005)(7696005)(2501003)(76176011)(25786009)(55016002)(76116006)(52536014)(91956017)(6246003)(2906002)(66946007)(446003)(229853002)(8936002)(5660300002)(33656002)(53936002)(66446008)(6116002)(3846002)(66476007)(68736007)(4326008)(66556008)(9686003)(64756008);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB3760;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: nxp.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: 0kJ+nsZ3uH2ZGJ/so2W0Nd0ouO0wJtokfXn0hVO8Y1qNRVx8/O6yaYX1XGXd7zvlfKXhP2QiC8FQVZ2gupd4AYiKueIvZJWsb95WDvQhUla+T7f7lNcVTqSC7N38zLIlStIbIfnly3ldHOqEVbko+NAiig4vPm6cgbjl0QwuBAcyY8NgRRgkhiqe1Qz8ArCtpMaHO3AXXefH2KqGywB0+wM9tGPFkM/zFXGXxAAkOR60uWR/F6kxbMKHHmyal4SniJRwH1srAMKyNuclcY2RDkkeFjGkNnocaZlcnd2QhCP5L/DY6M+ZkwSsZMND+VYl1oVVwr4TpBV4jLzS2QyFV0S036BkfMoW+qdGRDtRH9zp5W6u/tZ3E8pIBtwvjC9CoASYjeP+wNYCz7uwL9mpv6Dc5+y5X3mOincR2BGBgQI=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Tue, 23 Jul 2019 10:36:01 -0400
+Received: from mail.kernel.org ([198.145.29.99]:45980 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1732590AbfGWOgB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 23 Jul 2019 10:36:01 -0400
+Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 8D152227BE;
+        Tue, 23 Jul 2019 14:36:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1563892560;
+        bh=RhgZmcSMrQfqbKW3yJR0qQgPijWPcwlwWIuyvyAMaj0=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=wLzKco/ArT5Dvfhgx+RaF8Fzo9J01LD8d96HbTMMRKdSTPSycFxvhs5LCOraxZkJZ
+         JkUM874oADKHLP14egH8DMTatS/Yt2U7n9FBkCxywEqixwbZPny1z7mEeiOeM5TeiK
+         jnDroFl49M4ihJT2TP4q5KB7tPiKJpsXJPqPjJX8=
+Received: by mail-qk1-f170.google.com with SMTP id s22so31295834qkj.12;
+        Tue, 23 Jul 2019 07:36:00 -0700 (PDT)
+X-Gm-Message-State: APjAAAVnMfvA9112Z+IklUnI3TUlOV542NX0V7aAXidWh3Gwxr5cA9Se
+        BWWdbQQqCzkzoN2skbnvbzJTvQ833ug4/bsDPg==
+X-Google-Smtp-Source: APXvYqwO37a9Uf29MCK2pQZVWi4gKhtu8lPzPkbArTZ/nniUVYHOSr3nEpVeFoaSFAMyZM3mOkSYpKT/tr0qovfkO7M=
+X-Received: by 2002:a37:a48e:: with SMTP id n136mr51861407qke.223.1563892559731;
+ Tue, 23 Jul 2019 07:35:59 -0700 (PDT)
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f02b2314-1c7d-4a36-3561-08d70f787b68
-X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Jul 2019 14:17:23.5534
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: horia.geanta@nxp.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3760
+References: <1561361052-13072-1-git-send-email-neal.liu@mediatek.com>
+ <1561361052-13072-3-git-send-email-neal.liu@mediatek.com> <20190722171320.GA9806@bogus>
+ <1563848465.31451.4.camel@mtkswgap22>
+In-Reply-To: <1563848465.31451.4.camel@mtkswgap22>
+From:   Rob Herring <robh@kernel.org>
+Date:   Tue, 23 Jul 2019 08:35:47 -0600
+X-Gmail-Original-Message-ID: <CAL_Jsq+SRhd=-5O2G_CMfJX9Z188kvA05MQOXaU1J8iExwUixQ@mail.gmail.com>
+Message-ID: <CAL_Jsq+SRhd=-5O2G_CMfJX9Z188kvA05MQOXaU1J8iExwUixQ@mail.gmail.com>
+Subject: Re: [PATCH v4 2/3] dt-bindings: rng: add bindings for MediaTek ARMv8 SoCs
+To:     Neal Liu <neal.liu@mediatek.com>
+Cc:     Mark Rutland <mark.rutland@arm.com>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        wsd_upstream <wsd_upstream@mediatek.com>,
+        Sean Wang <sean.wang@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        =?UTF-8?B?Q3J5c3RhbCBHdW8gKOmDreaZtik=?= <Crystal.Guo@mediatek.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Matt Mackall <mpm@selenic.com>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        "linux-mediatek@lists.infradead.org" 
+        <linux-mediatek@lists.infradead.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 7/17/2019 6:25 PM, Andrey Smirnov wrote:=0A=
-> Simplify clock initialization code by converting it to use clk-bulk,=0A=
-> devres and soc_device_match() match table. No functional change=0A=
-> intended.=0A=
-> =0A=
-Thanks.=0A=
-Two nitpicks below.=0A=
-=0A=
-> +static int init_clocks(struct device *dev,=0A=
-> +		       struct caam_drv_private *ctrlpriv,=0A=
-> +		       const struct caam_imx_data *data)=0A=
-> +{=0A=
-> +	int ret;=0A=
-> +=0A=
-> +	ctrlpriv->num_clks =3D data->num_clks;=0A=
-> +	ctrlpriv->clks =3D devm_kmemdup(dev, data->clks,=0A=
-> +				      data->num_clks * sizeof(data->clks[0]),=0A=
-> +				      GFP_KERNEL);=0A=
-> +	if (!ctrlpriv->clks)=0A=
-> +		return -ENOMEM;=0A=
-> +=0A=
-> +	ret =3D devm_clk_bulk_get(dev, ctrlpriv->num_clks, ctrlpriv->clks);=0A=
-> +	if (ret) {=0A=
-> +		dev_err(dev,=0A=
-> +			"Failed to request all necessary clocks\n");=0A=
-> +		return ret;=0A=
-> +	}=0A=
-> +=0A=
-> +	ret =3D clk_bulk_prepare_enable(ctrlpriv->num_clks, ctrlpriv->clks);=0A=
-> +	if (ret) {=0A=
-> +		dev_err(dev,=0A=
-> +			"Failed to prepare/enable all necessary clocks\n");=0A=
-> +		return ret;=0A=
-> +	}=0A=
-> +=0A=
-> +	ret =3D devm_add_action_or_reset(dev, disable_clocks, ctrlpriv);=0A=
-> +	if (ret)=0A=
-> +		return ret;=0A=
-> +=0A=
-> +	return 0;=0A=
-Or directly:=0A=
-	return devm_add_action_or_reset(dev, disable_clocks, ctrlpriv);=0A=
-=0A=
-> +	imx_soc_match =3D soc_device_match(caam_imx_soc_table);=0A=
-> +	if (imx_soc_match) {=0A=
-> +		if (!imx_soc_match->data) {=0A=
-> +			dev_err(dev, "No clock data provided for i.MX SoC");=0A=
-> +			return -EINVAL;=0A=
-[...]=0A=
-> +		ret =3D init_clocks(dev, ctrlpriv, imx_soc_match->data);=0A=
-ctrlpriv can be retrieved using dev_get_drvdata(dev), thus there's no need=
-=0A=
-to pass it as parameter.=0A=
-=0A=
-Horia=0A=
+On Mon, Jul 22, 2019 at 8:21 PM Neal Liu <neal.liu@mediatek.com> wrote:
+>
+
+Please don't top post to lists.
+
+> Dear Rob,
+>         You can check my driver for detail:
+>         http://patchwork.kernel.org/patch/11012475/ or patchset 3/3
+
+I could, or you could just answer my question.
+
+>
+>         This driver is registered as hardware random number generator, and
+> combines with rng-core.
+>         We want to add one rng hw based on the dts. Is this proper or do you
+> have other suggestion to meet this requirement?
+
+It depends. There doesn't appear to be any resource configuration, so
+why does it need to be in DT. DT is not the only way instantiate
+drivers.
+
+Rob
+
+>
+>         Thanks
+>
+>
+> On Tue, 2019-07-23 at 01:13 +0800, Rob Herring wrote:
+> > On Mon, Jun 24, 2019 at 03:24:11PM +0800, Neal Liu wrote:
+> > > Document the binding used by the MediaTek ARMv8 SoCs random
+> > > number generator with TrustZone enabled.
+> > >
+> > > Signed-off-by: Neal Liu <neal.liu@mediatek.com>
+> > > ---
+> > >  .../devicetree/bindings/rng/mtk-sec-rng.txt        |   10 ++++++++++
+> > >  1 file changed, 10 insertions(+)
+> > >  create mode 100644 Documentation/devicetree/bindings/rng/mtk-sec-rng.txt
+> > >
+> > > diff --git a/Documentation/devicetree/bindings/rng/mtk-sec-rng.txt b/Documentation/devicetree/bindings/rng/mtk-sec-rng.txt
+> > > new file mode 100644
+> > > index 0000000..c04ce15
+> > > --- /dev/null
+> > > +++ b/Documentation/devicetree/bindings/rng/mtk-sec-rng.txt
+> > > @@ -0,0 +1,10 @@
+> > > +MediaTek random number generator with TrustZone enabled
+> > > +
+> > > +Required properties:
+> > > +- compatible : Should be "mediatek,mtk-sec-rng"
+> >
+> > What's the interface to access this?
+> >
+> > A node with a 'compatible' and nothing else is a sign of something that
+> > a parent device should instantiate and doesn't need to be in DT. IOW,
+> > what do complete bindings for firmware functions look like?
+> >
+> > > +
+> > > +Example:
+> > > +
+> > > +hwrng: hwrng {
+> > > +   compatible = "mediatek,mtk-sec-rng";
+> > > +}
+> > > --
+> > > 1.7.9.5
+> > >
+> >
+> > _______________________________________________
+> > Linux-mediatek mailing list
+> > Linux-mediatek@lists.infradead.org
+> > http://lists.infradead.org/mailman/listinfo/linux-mediatek
+>
+>
