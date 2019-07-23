@@ -2,295 +2,171 @@ Return-Path: <SRS0=XUD9=VU=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8EFFC7618F
-	for <linux-crypto@archiver.kernel.org>; Tue, 23 Jul 2019 01:09:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CD3DC7618F
+	for <linux-crypto@archiver.kernel.org>; Tue, 23 Jul 2019 01:20:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8083021955
-	for <linux-crypto@archiver.kernel.org>; Tue, 23 Jul 2019 01:09:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 21C7E21955
+	for <linux-crypto@archiver.kernel.org>; Tue, 23 Jul 2019 01:20:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="evpeTXl1"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="KiyldgTK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728208AbfGWBJb (ORCPT
+        id S1727855AbfGWBUu (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 22 Jul 2019 21:09:31 -0400
-Received: from mail-eopbgr50088.outbound.protection.outlook.com ([40.107.5.88]:7355
-        "EHLO EUR03-VE1-obe.outbound.protection.outlook.com"
+        Mon, 22 Jul 2019 21:20:50 -0400
+Received: from mail-eopbgr00048.outbound.protection.outlook.com ([40.107.0.48]:11074
+        "EHLO EUR02-AM5-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727619AbfGWBJb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 22 Jul 2019 21:09:31 -0400
+        id S1727088AbfGWBUu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 22 Jul 2019 21:20:50 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=h845XCqQ8YbBPUOjdSvvDCehEeBER6nuVQ3F0wLz6EH7zlXo4v5k7vqf1nV1igO26dmZ77q9soAamSEKFQ+35fETAWJtLbxyGs53CnaYRx39y54Zvg3XH/m/D3nXoLN0gz0wTi0gv25MThzu9kd+etvT0UZce6V1AcjsoiFswOH8OYOlr+Wj7s4MDJaLwMq4XJM6qaAz7phZFBqmuj3NHNJar12R3kFNmSQGErPvAMsB13lFgPUZAQv11I0smfV78n5L36HiN7g1x90afxHUYW7NAuhHk6sOO8ExVXJe3nTP7JJG+d8P4g9XnTS/DcjEaQ6H1oGh7pvmDvnQ5X0t1w==
+ b=fCzygrMpweUSWiFvjE2zpaG5hJHt9NtDj+GZ2k2JkDQlLliU3ZjJ3M89b2NCLdzZ7wAWnyCpfhTi8NaQpXegSZm76lEWZqTaFNuNu4NWg1ddkwDlq1+gzuSXnLb+8fFhtCjhaAyFi0/qtC+6OJACqkEu7artv0HXRrUq9x/Nznoe2olgtAkd6YvlD/ibX1AdoDe2/LWmjaX2tNS2N984oHofjLiFQu2nSQ/gcNGTdmFvrO/ph0mioxKXfhT4b7SvGP04kRr+4cgigLGPpG8gNUrm8Y7+YSyFtD1A5KS2u9p3YI2B4pTgMZ9zLIBndLG4jZjDgjodJoRfbSoW20MwIg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=twW1X+FbV+zkvDbdvEYeTas/pk/vrlLyZM4jdtI0pV4=;
- b=lRJnTYvnwYJkfmIQGr42EhLrmGEpfetrwsqq+F3ob9nqo/3Pf9Sksc8Ti8fQamHFFWNAH+F0hKNAffHquQ/CwISWQXCxU8k41xk6c6PH6C2zMo83U8GkbJg68XoYTFdI14sC7OxpKAQqrxDfh0Tg0RfWSupvAzF91DNvradg0o95jy5KQtMPE/Uc340s0CJqkq84TS3KmyGox5CkeaMave5wGpv5J77/8F+Tv9iEYzlpqzeE5Xz/uvbeCNh5DNIdGFkfS2LtbriNtMlu/s6eRqTdWkxJTwaYxeS64e4bh8MFudt/vEyKMWeyQdauz8S1B/5jaCr6mvN2Nf5l9TQhhQ==
+ bh=Jh1rulet5E9Uw0zSLca3pRCyf0NnLVPMvU4Ac7W6J0U=;
+ b=ahUFhuljfOv8Qg2cjJ7mz+zoy+0/3IxsWexpaJXqSw6hjMibYfRmaEX5O137CN/O3vCMO8TzIT3OydkwiORDl1bQK8kZ+pYDv1Se44iDRKsuduV46JLxow6rbCMx9jw/QX4SjzqGlGsxQeebkRNDkE39RzSIOTem7D3u7lg2Bwow5RyGFBR7jt81HXabDg0kihKXDz+uDzZ8u/ZPg8KBCYTy9eT5nMltSecUNuKcfYJHaaxlAA+rJRK5X92lGQryA/j9Kn7z1UYVkpxLIgp8NB8Ol1VCtIBBgXDpRPkovCFEFPoY0tMh0iLXP0VcYEYVFKimjmqQUgJzIWUA6xj78A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
  smtp.mailfrom=nxp.com;dmarc=pass action=none header.from=nxp.com;dkim=pass
  header.d=nxp.com;arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=twW1X+FbV+zkvDbdvEYeTas/pk/vrlLyZM4jdtI0pV4=;
- b=evpeTXl1N+U5W9WgQ48J5RQSOrnvwIvZ/nEnQQP7XtChT3PfGr2f5ZEJeHhklzaIH/kwisHLq1MmNLGqq10dloZG8jRKtoCbmYGB9/7ebINILM1m3F7bUlLjQd0656OAT2t2sdLaRe97BHCFUUcMnztifL4LIeOJnsdVR4f+hRg=
+ bh=Jh1rulet5E9Uw0zSLca3pRCyf0NnLVPMvU4Ac7W6J0U=;
+ b=KiyldgTK2AVp9g3wyhfBYPzYokAaUVmzZP5cv6/1nxTNJNBcWtGfgGNdAyiZXExzDHY7w4F/WIRBOb+OyDLTNTeP3rwGDvMz7iAnQ2EmBx45V/Le/5XCwtQQIMuIEgdZZCqKlIVesZ6Ir2Ph1QDmSMbkcTvfsOGGiDYcO2MGADs=
 Received: from DB7PR04MB4620.eurprd04.prod.outlook.com (52.135.140.28) by
- DB7PR04MB4171.eurprd04.prod.outlook.com (52.135.130.156) with Microsoft SMTP
+ DB7PR04MB3994.eurprd04.prod.outlook.com (52.135.128.15) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2094.16; Tue, 23 Jul 2019 01:09:27 +0000
+ 15.20.2094.16; Tue, 23 Jul 2019 01:20:46 +0000
 Received: from DB7PR04MB4620.eurprd04.prod.outlook.com
  ([fe80::94ce:fde8:cab7:873f]) by DB7PR04MB4620.eurprd04.prod.outlook.com
  ([fe80::94ce:fde8:cab7:873f%5]) with mapi id 15.20.2094.013; Tue, 23 Jul 2019
- 01:09:27 +0000
+ 01:20:46 +0000
 From:   Vakul Garg <vakul.garg@nxp.com>
-To:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-CC:     Horia Geanta <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        Vakul Garg <vakul.garg@nxp.com>
-Subject: [PATCH v3] crypto: caam/qi2 - Add printing dpseci fq stats using
+To:     Horia Geanta <horia.geanta@nxp.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+CC:     Aymen Sghaier <aymen.sghaier@nxp.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
+Subject: RE: [PATCH v2] crypto: caam/qi2 - Add printing dpseci fq stats using
  debugfs
-Thread-Topic: [PATCH v3] crypto: caam/qi2 - Add printing dpseci fq stats using
+Thread-Topic: [PATCH v2] crypto: caam/qi2 - Add printing dpseci fq stats using
  debugfs
-Thread-Index: AQHVQPNFiUhxEGdNN0KQge8kyFpioA==
-Date:   Tue, 23 Jul 2019 01:09:27 +0000
-Message-ID: <20190723010445.2990-1-vakul.garg@nxp.com>
+Thread-Index: AQHVPiRTTO5nYvxvX0qf2jZsStExEKbXa3hw
+Date:   Tue, 23 Jul 2019 01:20:46 +0000
+Message-ID: <DB7PR04MB46203BDE7B36E66FCD5D03D08BC70@DB7PR04MB4620.eurprd04.prod.outlook.com>
+References: <20190719111821.21696-1-vakul.garg@nxp.com>
+ <AM0PR0402MB3476F392D3A791DDE2F5B67898C40@AM0PR0402MB3476.eurprd04.prod.outlook.com>
+In-Reply-To: <AM0PR0402MB3476F392D3A791DDE2F5B67898C40@AM0PR0402MB3476.eurprd04.prod.outlook.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-x-clientproxiedby: MAXPR0101CA0063.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:a00:e::25) To DB7PR04MB4620.eurprd04.prod.outlook.com
- (2603:10a6:5:39::28)
 authentication-results: spf=none (sender IP is )
  smtp.mailfrom=vakul.garg@nxp.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-mailer: git-send-email 2.13.6
-x-originating-ip: [92.120.1.70]
+x-originating-ip: [103.92.41.140]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 96234543-76f4-4d9b-f0a7-08d70f0a6838
+x-ms-office365-filtering-correlation-id: 0ecef650-fb84-40d3-b331-08d70f0bfd28
 x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:DB7PR04MB4171;
-x-ms-traffictypediagnostic: DB7PR04MB4171:
-x-microsoft-antispam-prvs: <DB7PR04MB4171B2E14B2BCCCBEEBEEDFF8BC70@DB7PR04MB4171.eurprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:327;
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(5600148)(711020)(4605104)(1401327)(4618075)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);SRVR:DB7PR04MB3994;
+x-ms-traffictypediagnostic: DB7PR04MB3994:
+x-microsoft-antispam-prvs: <DB7PR04MB3994A17B3E508A26D4C9AA148BC70@DB7PR04MB3994.eurprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
 x-forefront-prvs: 0107098B6C
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(346002)(366004)(376002)(396003)(39860400002)(136003)(189003)(199004)(66556008)(66476007)(66946007)(2501003)(1076003)(64756008)(25786009)(66446008)(256004)(14444005)(2906002)(6486002)(7736002)(305945005)(5660300002)(86362001)(71190400001)(71200400001)(6512007)(81156014)(6436002)(81166006)(14454004)(99286004)(2351001)(6916009)(386003)(66066001)(102836004)(486006)(26005)(8676002)(8936002)(316002)(68736007)(3846002)(36756003)(2616005)(478600001)(476003)(44832011)(6116002)(54906003)(186003)(50226002)(6506007)(5640700003)(53936002)(52116002)(4326008);DIR:OUT;SFP:1101;SCL:1;SRVR:DB7PR04MB4171;H:DB7PR04MB4620.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(136003)(366004)(396003)(39860400002)(346002)(376002)(13464003)(189003)(199004)(99286004)(6436002)(14454004)(486006)(110136005)(9686003)(256004)(53936002)(3846002)(478600001)(8676002)(446003)(74316002)(55016002)(25786009)(44832011)(7736002)(11346002)(305945005)(316002)(6116002)(8936002)(66066001)(86362001)(476003)(229853002)(6506007)(71190400001)(26005)(102836004)(33656002)(66946007)(2501003)(7696005)(76176011)(68736007)(71200400001)(52536014)(64756008)(76116006)(66556008)(66446008)(66476007)(54906003)(81156014)(81166006)(2906002)(53546011)(5660300002)(4326008)(186003)(6246003);DIR:OUT;SFP:1101;SCL:1;SRVR:DB7PR04MB3994;H:DB7PR04MB4620.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
 received-spf: None (protection.outlook.com: nxp.com does not designate
  permitted sender hosts)
 x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: uFN+Ps/aaNDXRcg8vKx3DX4v8kHbFwbH4djquTsBRy05XsHwNZieIdOlZ/Y+KvfTrc+Q3BNQ9y2MX9hyImgQUkXQQARWUXk0Z6lAymPwoUfU5xXRhxkZXejq0vGmljMeUTPgm9y0onPecCeZ7ujYNpG9/dQrHWTYUQ2Sz8xHTWyQTxNLzX4rZRnutVvtGU5mmOBSoebQSzUoBXa0TD2fbL1Us7+me45hgEnscbWtfEuOsr4TRnAhvVvqOVEO6xaK7DewDU0nbdZbVTYGnwAkAQMvk+h2pFa9J1BsDvvTI77LmpIEL6SlOabPTcl5gNyya4Rj0eTnq82fD01+FIO/jV5yvxPBE5HrMI67D+Y2Oj9eihsaqzMoxDkKBYa7Jgclm6/SlXMxE2SUZtHPJ7YZyYfEhDJtAK7uG87k9GqxKkY=
-Content-Type: text/plain; charset="iso-8859-1"
+x-microsoft-antispam-message-info: nIlBTvPpkU3JYCXYNGbwbIeQTwwMpPxlAwjHIJAb6E9f87EABTSWq6Cm5iiuJSYddApFFe3r0hd/aKLB8pNwBKDJNCwCsZB0v1LmLR3/dgMwUWKPqaddJZ1CZUpxvit5iZwKxEmvEk+szWQ1243WYCm3bG9IVj4VWgOgoXAUmGSgX4nzhmltfNmjPmRzlJNZ82s6XKlzktcYAU3hOGuGi5jkEcOczSM98wZKLv3MviljVSmdj6fOiI48LQph+tbsr9FWK5iI7wJiKa7B82frX3T92qPdLt+Nqh7/3x7MT9skdVKZQQBncX40as3sSWVNW918PhWZyMwrXWdAUiRW+G/tuOeYvqOqd1s5ksyls2ZmCacBjMxemtSQjDAFQm2MQ7msPA6bnk/65bhiQiBrjqDzfT95DQnb0L1+4+AsjqM=
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 96234543-76f4-4d9b-f0a7-08d70f0a6838
-X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Jul 2019 01:09:27.1024
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0ecef650-fb84-40d3-b331-08d70f0bfd28
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Jul 2019 01:20:46.0665
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
 X-MS-Exchange-CrossTenant-userprincipalname: vakul.garg@nxp.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB7PR04MB4171
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB7PR04MB3994
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add support of printing the dpseci frame queue statistics using debugfs.
 
-Signed-off-by: Vakul Garg <vakul.garg@nxp.com>
----
 
-Changes v2 -> v3
-	- Removed CONFIG_CRYPTO_DEV_FSL_DPAA2_CAAM_DEBUGFS
-	- Moved var 'dfs_root' out of structure 'dpaa2_caam_priv'.
+> -----Original Message-----
+> From: Horia Geanta
+> Sent: Monday, July 22, 2019 7:55 PM
+> To: Vakul Garg <vakul.garg@nxp.com>; linux-crypto@vger.kernel.org
+> Cc: Aymen Sghaier <aymen.sghaier@nxp.com>;
+> herbert@gondor.apana.org.au
+> Subject: Re: [PATCH v2] crypto: caam/qi2 - Add printing dpseci fq stats u=
+sing
+> debugfs
+>=20
+> On 7/19/2019 2:23 PM, Vakul Garg wrote:
+> [...]
+> > +if CRYPTO_DEV_FSL_DPAA2_CAAM
+> > +
+> > +config CRYPTO_DEV_FSL_DPAA2_CAAM_DEBUGFS
+> > +	depends on DEBUG_FS
+> > +	bool "Enable debugfs support"
+> > +	help
+> > +	  Selecting this will enable printing of various debug information
+> > +          in the DPAA2 CAAM driver.
+> > +
+> > +endif
+> Let's enable this based on CONFIG_DEBUG_FS.
+>=20
+> > diff --git a/drivers/crypto/caam/Makefile
+> > b/drivers/crypto/caam/Makefile index 9ab4e81ea21e..e4e9fa481a44
+> 100644
+> > --- a/drivers/crypto/caam/Makefile
+> > +++ b/drivers/crypto/caam/Makefile
+> > @@ -30,3 +30,4 @@ endif
+> >  obj-$(CONFIG_CRYPTO_DEV_FSL_DPAA2_CAAM) +=3D dpaa2_caam.o
+> >
+> >  dpaa2_caam-y    :=3D caamalg_qi2.o dpseci.o
+> > +dpaa2_caam-$(CONFIG_CRYPTO_DEV_FSL_DPAA2_CAAM_DEBUGFS) +=3D
+> > +dpseci-debugfs.o
+> dpaa2_caam-$(CONFIG_DEBUG_FS)
+>=20
+> [...]
+> > diff --git a/drivers/crypto/caam/caamalg_qi2.h
+> > b/drivers/crypto/caam/caamalg_qi2.h
+> > index 973f6296bc6f..b450e2a25c1f 100644
+> > --- a/drivers/crypto/caam/caamalg_qi2.h
+> > +++ b/drivers/crypto/caam/caamalg_qi2.h
+> > @@ -10,6 +10,7 @@
+> >  #include <soc/fsl/dpaa2-io.h>
+> >  #include <soc/fsl/dpaa2-fd.h>
+> >  #include <linux/threads.h>
+> > +#include <linux/netdevice.h>
+> How is this change related to current patch?
+>=20
+> >  #include "dpseci.h"
+> >  #include "desc_constr.h"
+> >
+> > @@ -64,6 +65,7 @@ struct dpaa2_caam_priv {
+> >  	struct iommu_domain *domain;
+> >
+> >  	struct dpaa2_caam_priv_per_cpu __percpu *ppriv;
+> > +	struct dentry *dfs_root;
+> dfs_root is used only in dpseci-debugfs.c, let's have it there as global.
+>=20
 
- drivers/crypto/caam/Makefile         |  1 +
- drivers/crypto/caam/caamalg_qi2.c    |  5 +++
- drivers/crypto/caam/caamalg_qi2.h    |  1 +
- drivers/crypto/caam/dpseci-debugfs.c | 82 ++++++++++++++++++++++++++++++++=
-++++
- drivers/crypto/caam/dpseci-debugfs.h | 19 +++++++++
- 5 files changed, 108 insertions(+)
- create mode 100644 drivers/crypto/caam/dpseci-debugfs.c
- create mode 100644 drivers/crypto/caam/dpseci-debugfs.h
+I submitted this change in v3. There is still a minor issue with this patch=
+ version.=20
+Before submitting the next v4, I have a question.
 
-diff --git a/drivers/crypto/caam/Makefile b/drivers/crypto/caam/Makefile
-index c7b8c537ebfa..af5f64cb5e47 100644
---- a/drivers/crypto/caam/Makefile
-+++ b/drivers/crypto/caam/Makefile
-@@ -31,3 +31,4 @@ endif
- obj-$(CONFIG_CRYPTO_DEV_FSL_DPAA2_CAAM) +=3D dpaa2_caam.o
+Could there be a situation that there are multiple  dpseci objects assigned=
+ to kernel?
+In that case, we need to maintain dfs_root for each separately.
 =20
- dpaa2_caam-y    :=3D caamalg_qi2.o dpseci.o
-+dpaa2_caam-$(CONFIG_DEBUG_FS) +=3D dpseci-debugfs.o
-diff --git a/drivers/crypto/caam/caamalg_qi2.c b/drivers/crypto/caam/caamal=
-g_qi2.c
-index c7dad3c139e4..364206c99e6a 100644
---- a/drivers/crypto/caam/caamalg_qi2.c
-+++ b/drivers/crypto/caam/caamalg_qi2.c
-@@ -15,6 +15,7 @@
- #include "key_gen.h"
- #include "caamalg_desc.h"
- #include "caamhash_desc.h"
-+#include "dpseci-debugfs.h"
- #include <linux/fsl/mc.h>
- #include <soc/fsl/dpaa2-io.h>
- #include <soc/fsl/dpaa2-fd.h>
-@@ -5479,6 +5480,8 @@ static int dpaa2_caam_probe(struct fsl_mc_device *dps=
-eci_dev)
- 		goto err_bind;
- 	}
-=20
-+	dpaa2_dpseci_debugfs_init(priv);
-+
- 	/* register crypto algorithms the device supports */
- 	for (i =3D 0; i < ARRAY_SIZE(driver_algs); i++) {
- 		struct caam_skcipher_alg *t_alg =3D driver_algs + i;
-@@ -5646,6 +5649,8 @@ static int __cold dpaa2_caam_remove(struct fsl_mc_dev=
-ice *ls_dev)
- 	dev =3D &ls_dev->dev;
- 	priv =3D dev_get_drvdata(dev);
-=20
-+	dpaa2_dpseci_debugfs_exit(priv);
-+
- 	for (i =3D 0; i < ARRAY_SIZE(driver_aeads); i++) {
- 		struct caam_aead_alg *t_alg =3D driver_aeads + i;
-=20
-diff --git a/drivers/crypto/caam/caamalg_qi2.h b/drivers/crypto/caam/caamal=
-g_qi2.h
-index 8646a7883c63..486bdaa00027 100644
---- a/drivers/crypto/caam/caamalg_qi2.h
-+++ b/drivers/crypto/caam/caamalg_qi2.h
-@@ -10,6 +10,7 @@
- #include <soc/fsl/dpaa2-io.h>
- #include <soc/fsl/dpaa2-fd.h>
- #include <linux/threads.h>
-+#include <linux/netdevice.h>
- #include "dpseci.h"
- #include "desc_constr.h"
-=20
-diff --git a/drivers/crypto/caam/dpseci-debugfs.c b/drivers/crypto/caam/dps=
-eci-debugfs.c
-new file mode 100644
-index 000000000000..5a81e85f0b7e
---- /dev/null
-+++ b/drivers/crypto/caam/dpseci-debugfs.c
-@@ -0,0 +1,82 @@
-+/* SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause) */
-+/* Copyright 2019 NXP
-+ */
-+
-+#include <linux/module.h>
-+#include <linux/device.h>
-+#include <linux/debugfs.h>
-+#include "dpseci-debugfs.h"
-+
-+static struct dentry *dfs_root;
-+
-+static int dpseci_dbg_fqs_show(struct seq_file *file, void *offset)
-+{
-+	struct dpaa2_caam_priv *priv =3D (struct dpaa2_caam_priv *)file->private;
-+	u32 fqid, fcnt, bcnt;
-+	int i, err;
-+
-+	seq_printf(file, "FQ stats for %s:\n", dev_name(priv->dev));
-+	seq_printf(file, "%s%16s%16s\n",
-+		   "Rx-VFQID",
-+		   "Pending frames",
-+		   "Pending bytes");
-+
-+	for (i =3D 0; i <  priv->num_pairs; i++) {
-+		fqid =3D priv->rx_queue_attr[i].fqid;
-+		err =3D dpaa2_io_query_fq_count(NULL, fqid, &fcnt, &bcnt);
-+		if (err)
-+			continue;
-+
-+		seq_printf(file, "%5d%16u%16u\n", fqid, fcnt, bcnt);
-+	}
-+
-+	seq_printf(file, "%s%16s%16s\n",
-+		   "Tx-VFQID",
-+		   "Pending frames",
-+		   "Pending bytes");
-+
-+	for (i =3D 0; i <  priv->num_pairs; i++) {
-+		fqid =3D priv->tx_queue_attr[i].fqid;
-+		err =3D dpaa2_io_query_fq_count(NULL, fqid, &fcnt, &bcnt);
-+		if (err)
-+			continue;
-+
-+		seq_printf(file, "%5d%16u%16u\n", fqid, fcnt, bcnt);
-+	}
-+
-+	return 0;
-+}
-+
-+static int dpseci_dbg_fqs_open(struct inode *inode, struct file *file)
-+{
-+	int err;
-+	struct dpaa2_caam_priv *priv;
-+
-+	priv =3D (struct dpaa2_caam_priv *)inode->i_private;
-+
-+	err =3D single_open(file, dpseci_dbg_fqs_show, priv);
-+	if (err < 0)
-+		dev_err(priv->dev, "single_open() failed\n");
-+
-+	return err;
-+}
-+
-+static const struct file_operations dpseci_dbg_fq_ops =3D {
-+	.open =3D dpseci_dbg_fqs_open,
-+	.read =3D seq_read,
-+	.llseek =3D seq_lseek,
-+	.release =3D single_release,
-+};
-+
-+void dpaa2_dpseci_debugfs_init(struct dpaa2_caam_priv *priv)
-+{
-+	dfs_root =3D debugfs_create_dir(dev_name(priv->dev), NULL);
-+
-+	debugfs_create_file("fq_stats", 0444, dfs_root, priv,
-+			    &dpseci_dbg_fq_ops);
-+}
-+
-+void dpaa2_dpseci_debugfs_exit(struct dpaa2_caam_priv *priv)
-+{
-+	debugfs_remove_recursive(dfs_root);
-+}
-diff --git a/drivers/crypto/caam/dpseci-debugfs.h b/drivers/crypto/caam/dps=
-eci-debugfs.h
-new file mode 100644
-index 000000000000..1dbdb2587758
---- /dev/null
-+++ b/drivers/crypto/caam/dpseci-debugfs.h
-@@ -0,0 +1,19 @@
-+/* SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause) */
-+/* Copyright 2019 NXP
-+ */
-+
-+#ifndef DPSECI_DEBUGFS_H
-+#define DPSECI_DEBUGFS_H
-+
-+#include <linux/dcache.h>
-+#include "caamalg_qi2.h"
-+
-+#ifdef CONFIG_DEBUG_FS
-+void dpaa2_dpseci_debugfs_init(struct dpaa2_caam_priv *priv);
-+void dpaa2_dpseci_debugfs_exit(struct dpaa2_caam_priv *priv);
-+#else
-+static inline void dpaa2_dpseci_debugfs_init(struct dpaa2_caam_priv *priv)=
- {}
-+static inline void dpaa2_dpseci_debugfs_exit(struct dpaa2_caam_priv *priv)=
- {}
-+#endif /* CONFIG_DEBUG_FS */
-+
-+#endif /* DPSECI_DEBUGFS_H */
---=20
-2.13.6
 
+
+> Horia
