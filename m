@@ -2,104 +2,174 @@ Return-Path: <SRS0=XUD9=VU=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D506BC7618E
-	for <linux-crypto@archiver.kernel.org>; Tue, 23 Jul 2019 10:50:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E659C7618E
+	for <linux-crypto@archiver.kernel.org>; Tue, 23 Jul 2019 11:48:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 834212251A
-	for <linux-crypto@archiver.kernel.org>; Tue, 23 Jul 2019 10:50:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1CFFE20840
+	for <linux-crypto@archiver.kernel.org>; Tue, 23 Jul 2019 11:48:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="YtDhqwns"
+	dkim=pass (2048-bit key) header.d=nifty.com header.i=@nifty.com header.b="wqrcayfx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731211AbfGWKu2 (ORCPT
+        id S1731451AbfGWLsI (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 23 Jul 2019 06:50:28 -0400
-Received: from mail-eopbgr60047.outbound.protection.outlook.com ([40.107.6.47]:17126
-        "EHLO EUR04-DB3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728856AbfGWKu2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 23 Jul 2019 06:50:28 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YHToN0YKXzP5Dp1Oii6bbg5ka+j5OhP0O5RxluonrvbXg2ZrI78y0nCyNGOELTnAYkQE0LZKt2pP2n2z5IxJruv7hm98n3lfcyWQ1zTHM4DJoeDUWLn62cBMWd/Mt4YfXJ6h7jaguvMCu9abbvnPje2xn+JQuDlkmKLDHMCkmn8LFEnbTOO/Rkp5d/YZaZEBvT2ZWXbxH1phDEZHhjwZrSW6lbQohZXLE6fCZ4KcmMH9NWSd/f8w/if8jFS/8X1H9T3mqQ6BVXVhLYEDPAZG9DIUMyHkePZZoneNR3YvaV7rAj7fS+E8l0b3K241Dze8b5XsP3nlZytOf7dGmd4Zow==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZQ7deO9Zt9tnQaXfK/kgLBCxAXzcYjqx0sGXq3c33sU=;
- b=NR9FoRivesZDVsD76cMeCeZHjyg6gfdQi/uhdtcVIRwZLSKymABNVadcTKpMHavHByN0tpeaJ5HAtPgmQLD09FoBGCVszkX3+Njy6bKfYEZWHpllWs3g1gazxF4Hp/TGlBd1Iuv+/MhOV2G3pdFL93PqrTwH1ancVi6JUxCXSaC8Q28b3JqvUfTC0xOloxlrdsGgzwwLLrdRImebgZEc6qFEapk6q1dnT/AIrqOfTeD86J8n1bnpBpAPlG1pXp6j/lCqja5RVunIgf7zBVaf+UR4pg43qozyeeU7GcfxgAB9eXNKgygiuqliq4RjDPNSngfqXdPnMKlZB908cXfOHA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
- smtp.mailfrom=nxp.com;dmarc=pass action=none header.from=nxp.com;dkim=pass
- header.d=nxp.com;arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZQ7deO9Zt9tnQaXfK/kgLBCxAXzcYjqx0sGXq3c33sU=;
- b=YtDhqwnsdY7mzO6LAs4JspHYLSu5Z5ntvgkeu8NC8xaHO1C/ObMBkR3v1FG0OdOrp0FopUa0Ve0yCgTxRW/zCwo33rzYkVBlJFRWGCbuqDLh99tSolHdq9PNc97oYmSkyjl0oh2oVLJwvVvTAijkIeRI3JD46H5tryXa2gKnBxQ=
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
- VI1PR0402MB3758.eurprd04.prod.outlook.com (52.134.15.152) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2094.16; Tue, 23 Jul 2019 10:50:23 +0000
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::7c64:5296:4607:e10]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::7c64:5296:4607:e10%5]) with mapi id 15.20.2094.017; Tue, 23 Jul 2019
- 10:50:23 +0000
-From:   Horia Geanta <horia.geanta@nxp.com>
-To:     Vakul Garg <vakul.garg@nxp.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-CC:     Aymen Sghaier <aymen.sghaier@nxp.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH v5] crypto: caam/qi2 - Add printing dpseci fq stats using
- debugfs
-Thread-Topic: [PATCH v5] crypto: caam/qi2 - Add printing dpseci fq stats using
- debugfs
-Thread-Index: AQHVQTcF+gEt00n54EefuTviasufew==
-Date:   Tue, 23 Jul 2019 10:50:22 +0000
-Message-ID: <VI1PR0402MB348577149DA38E846EB09D0B98C70@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-References: <20190723091005.827-1-vakul.garg@nxp.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=horia.geanta@nxp.com; 
-x-originating-ip: [212.146.100.6]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 379c693b-59fc-49e0-8eca-08d70f5b9020
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:VI1PR0402MB3758;
-x-ms-traffictypediagnostic: VI1PR0402MB3758:
-x-microsoft-antispam-prvs: <VI1PR0402MB37580DB179330F96EF81177598C70@VI1PR0402MB3758.eurprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:1303;
-x-forefront-prvs: 0107098B6C
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(396003)(136003)(346002)(366004)(376002)(39860400002)(199004)(189003)(64756008)(66556008)(66946007)(66446008)(558084003)(91956017)(76116006)(53936002)(66066001)(2906002)(6246003)(71200400001)(52536014)(66476007)(71190400001)(25786009)(229853002)(99286004)(55016002)(6436002)(446003)(86362001)(81166006)(2501003)(9686003)(6506007)(44832011)(53546011)(3846002)(76176011)(305945005)(486006)(14454004)(478600001)(102836004)(7736002)(81156014)(26005)(8936002)(74316002)(8676002)(476003)(33656002)(186003)(316002)(5660300002)(68736007)(4326008)(54906003)(256004)(110136005)(6116002)(7696005);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB3758;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: nxp.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: kD82jKjQL8FfqZukydsNA0uoMtfQMJviaY2QNa4YlF6bWK4ct9FnCErHSuTkUEMdncEKKd+FbYgYv37+gZPmplfx/2OvDIn6VcZEYtZg44GvLSt8B36uIBjjopUQ4bt9PbYmDXQuc+Z+Imqr8qgskcHnrBK0S4wk20ruOBcpLIifODeKwkmBEpGQFJMGWy4GrVtiMZxTriOM+hOs7VPY5JJ6UBlktkBCmo9J+AW7GUEGURYers78ROlkfa2Na/E3Z2hwY0H9WiJPMo5CaKjnGSMD4+jGzT3CVEKEJMnCLS8wxcMqQaSPMQCD6HIvMyb2j7PcwoHHplG/MGwpB+wHa8rDV6N4v6ZArX8feHa2MnbtcOzzuf2vt2CNVIojkEYgRmPhPC+0B4cePm8lA6sOMufw1vCWQWHIoi4CYXElf+k=
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 379c693b-59fc-49e0-8eca-08d70f5b9020
-X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Jul 2019 10:50:22.9128
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: horia.geanta@nxp.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3758
+        Tue, 23 Jul 2019 07:48:08 -0400
+Received: from condef-08.nifty.com ([202.248.20.73]:58410 "EHLO
+        condef-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726575AbfGWLsH (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 23 Jul 2019 07:48:07 -0400
+Received: from conuserg-12.nifty.com ([10.126.8.75])by condef-08.nifty.com with ESMTP id x6NBiS1V002556
+        for <linux-crypto@vger.kernel.org>; Tue, 23 Jul 2019 20:44:28 +0900
+Received: from localhost.localdomain (p14092-ipngnfx01kyoto.kyoto.ocn.ne.jp [153.142.97.92]) (authenticated)
+        by conuserg-12.nifty.com with ESMTP id x6NBhmf0024789;
+        Tue, 23 Jul 2019 20:43:50 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-12.nifty.com x6NBhmf0024789
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1563882231;
+        bh=u6S/fgiuE+3dTn82HkRiRqcnW+Gorb07kShUnm4uj7Y=;
+        h=From:To:Cc:Subject:Date:From;
+        b=wqrcayfxFNlDjAC9RpZEL2PesO7h9y4nrwAe2czjUnSuiZ2zeu6Q8D1HrMinDwoUB
+         lGDwc0fiZicMX83K79xv4/L+NM+S3ZVjiRxnqJtddqqv00941jhO0h7uggos3hdX04
+         wBYl2LC+JytfzxmJoSfK8lfkK10l9UYTV5lz86DAP24AgS3X7LwvibFqpwAhzmjVxm
+         n0fwzRviw/a7RSkHTlCJj098Y9sy5WL4+93PEHwER86qeGULD+rQNYQfBjIuhibU1T
+         qDKk4fMTDp2fQa0cteHMDEUIyqJdcytDMgWj/rnY3PsEgn25IGLUOCB0X22hukOrWv
+         4kv6O/EJm61bA==
+X-Nifty-SrcIP: [153.142.97.92]
+From:   Masahiro Yamada <yamada.masahiro@socionext.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org
+Cc:     Masahiro Yamada <yamada.masahiro@socionext.com>,
+        Corentin Labbe <clabbe@baylibre.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v2 1/2] crypto: add header include guards
+Date:   Tue, 23 Jul 2019 20:43:43 +0900
+Message-Id: <20190723114344.18622-1-yamada.masahiro@socionext.com>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 7/23/2019 12:14 PM, Vakul Garg wrote:=0A=
-> Add support of printing the dpseci frame queue statistics using debugfs.=
-=0A=
-> =0A=
-> Signed-off-by: Vakul Garg <vakul.garg@nxp.com>=0A=
-Reviewed-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
-=0A=
-Thanks,=0A=
-Horia=0A=
+Add header include guards in case they are included multiple times.
+
+Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+---
+
+Changes in v2: None
+
+ include/crypto/sha1_base.h      | 5 +++++
+ include/crypto/sha256_base.h    | 5 +++++
+ include/crypto/sha512_base.h    | 5 +++++
+ include/crypto/sm3_base.h       | 5 +++++
+ include/uapi/linux/cryptouser.h | 5 +++++
+ 5 files changed, 25 insertions(+)
+
+diff --git a/include/crypto/sha1_base.h b/include/crypto/sha1_base.h
+index 63c14f2dc7bd..20fd1f7468af 100644
+--- a/include/crypto/sha1_base.h
++++ b/include/crypto/sha1_base.h
+@@ -5,6 +5,9 @@
+  * Copyright (C) 2015 Linaro Ltd <ard.biesheuvel@linaro.org>
+  */
+ 
++#ifndef _CRYPTO_SHA1_BASE_H
++#define _CRYPTO_SHA1_BASE_H
++
+ #include <crypto/internal/hash.h>
+ #include <crypto/sha.h>
+ #include <linux/crypto.h>
+@@ -101,3 +104,5 @@ static inline int sha1_base_finish(struct shash_desc *desc, u8 *out)
+ 	*sctx = (struct sha1_state){};
+ 	return 0;
+ }
++
++#endif /* _CRYPTO_SHA1_BASE_H */
+diff --git a/include/crypto/sha256_base.h b/include/crypto/sha256_base.h
+index 59159bc944f5..b50a035a2bc7 100644
+--- a/include/crypto/sha256_base.h
++++ b/include/crypto/sha256_base.h
+@@ -5,6 +5,9 @@
+  * Copyright (C) 2015 Linaro Ltd <ard.biesheuvel@linaro.org>
+  */
+ 
++#ifndef _CRYPTO_SHA256_BASE_H
++#define _CRYPTO_SHA256_BASE_H
++
+ #include <crypto/internal/hash.h>
+ #include <crypto/sha.h>
+ #include <linux/crypto.h>
+@@ -123,3 +126,5 @@ static inline int sha256_base_finish(struct shash_desc *desc, u8 *out)
+ 	*sctx = (struct sha256_state){};
+ 	return 0;
+ }
++
++#endif /* _CRYPTO_SHA256_BASE_H */
+diff --git a/include/crypto/sha512_base.h b/include/crypto/sha512_base.h
+index 099be8027f3f..fb19c77494dc 100644
+--- a/include/crypto/sha512_base.h
++++ b/include/crypto/sha512_base.h
+@@ -5,6 +5,9 @@
+  * Copyright (C) 2015 Linaro Ltd <ard.biesheuvel@linaro.org>
+  */
+ 
++#ifndef _CRYPTO_SHA512_BASE_H
++#define _CRYPTO_SHA512_BASE_H
++
+ #include <crypto/internal/hash.h>
+ #include <crypto/sha.h>
+ #include <linux/crypto.h>
+@@ -126,3 +129,5 @@ static inline int sha512_base_finish(struct shash_desc *desc, u8 *out)
+ 	*sctx = (struct sha512_state){};
+ 	return 0;
+ }
++
++#endif /* _CRYPTO_SHA512_BASE_H */
+diff --git a/include/crypto/sm3_base.h b/include/crypto/sm3_base.h
+index 31891b0dc7e3..1cbf9aa1fe52 100644
+--- a/include/crypto/sm3_base.h
++++ b/include/crypto/sm3_base.h
+@@ -6,6 +6,9 @@
+  * Written by Gilad Ben-Yossef <gilad@benyossef.com>
+  */
+ 
++#ifndef _CRYPTO_SM3_BASE_H
++#define _CRYPTO_SM3_BASE_H
++
+ #include <crypto/internal/hash.h>
+ #include <crypto/sm3.h>
+ #include <linux/crypto.h>
+@@ -104,3 +107,5 @@ static inline int sm3_base_finish(struct shash_desc *desc, u8 *out)
+ 	*sctx = (struct sm3_state){};
+ 	return 0;
+ }
++
++#endif /* _CRYPTO_SM3_BASE_H */
+diff --git a/include/uapi/linux/cryptouser.h b/include/uapi/linux/cryptouser.h
+index 4dc1603919ce..5730c67f0617 100644
+--- a/include/uapi/linux/cryptouser.h
++++ b/include/uapi/linux/cryptouser.h
+@@ -19,6 +19,9 @@
+  * 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
+  */
+ 
++#ifndef _UAPI_LINUX_CRYPTOUSER_H
++#define _UAPI_LINUX_CRYPTOUSER_H
++
+ #include <linux/types.h>
+ 
+ /* Netlink configuration messages.  */
+@@ -198,3 +201,5 @@ struct crypto_report_acomp {
+ 
+ #define CRYPTO_REPORT_MAXSIZE (sizeof(struct crypto_user_alg) + \
+ 			       sizeof(struct crypto_report_blkcipher))
++
++#endif /* _UAPI_LINUX_CRYPTOUSER_H */
+-- 
+2.17.1
+
