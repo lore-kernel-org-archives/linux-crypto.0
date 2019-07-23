@@ -2,155 +2,128 @@ Return-Path: <SRS0=XUD9=VU=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D7CBC7618B
-	for <linux-crypto@archiver.kernel.org>; Tue, 23 Jul 2019 09:16:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A58A1C7618E
+	for <linux-crypto@archiver.kernel.org>; Tue, 23 Jul 2019 09:57:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 57E89227B9
-	for <linux-crypto@archiver.kernel.org>; Tue, 23 Jul 2019 09:16:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7E5FC205C9
+	for <linux-crypto@archiver.kernel.org>; Tue, 23 Jul 2019 09:57:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="ZS1pe4f+"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="PrXQOQhu"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731554AbfGWJQW (ORCPT
+        id S1732236AbfGWJ5p (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 23 Jul 2019 05:16:22 -0400
-Received: from mail-eopbgr50077.outbound.protection.outlook.com ([40.107.5.77]:11160
-        "EHLO EUR03-VE1-obe.outbound.protection.outlook.com"
+        Tue, 23 Jul 2019 05:57:45 -0400
+Received: from mail-eopbgr30060.outbound.protection.outlook.com ([40.107.3.60]:42915
+        "EHLO EUR03-AM5-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729835AbfGWJQW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 23 Jul 2019 05:16:22 -0400
+        id S1731566AbfGWJ5p (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 23 Jul 2019 05:57:45 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JSV8zzvPWo0EH1TxpTeVVyZlHMrhyy+rfdFT8SZLGD+v7fG25CaZAzYOM4j4AgpN7g2lVamQno95OZCnat+2OlMXClIPV04mMJqNqyArgvnhVbbkw6muo3vANU4cU9oweuGLq43kFLUh6WN8boXdq+lfNJUa6Nwrsoz3XkS4sF/j/bMwmyP+iuMP96pOxsXbZGvxg+eCaNi80Kmls5Jg32x0vvo/1VaH41MI+KVHNyknN/Tv0K2EqQKltPvOnPUXi/ZhSIuAk5q48MQjnAE+OLY48V5L0JBjm6wsksR8GyACcMVhCqD3XSqtxuUkeLD4C6E0vJ0xHmoKPvW1bWlrXQ==
+ b=Qwsn99ZUdsWoQhGXaXYI6FYl0o0St+YUHaIEEbGB3zV/nBQFUU2pkYZpSJ4MJ3qq53bagkcdAWplurTvPU06K8XjVyvIFhrIvrA3Pe9zOvJz+NXsM5Nkm2ecSO+JrBXniDDzxNd1S8Cra2ewZ2FFkD3RGZ16VxrmtAvR4HxanKmexuPesEatN1WcPT2/tjyr659scyS58dfttmDPu0C+qhVcYrBthPBfVF+uIcJhvScFI9j/ID8qAvWgkcgG7UUg5VNeU7gllsDWhZ3j1GEbIh6UWFmFJLumnSxzh3hb7EUGJv7bDTVtFVRYnG0sWL8vuVKSgk/8Sv442AsDZVZhbQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=o5hFGxAX6rivvFJntNAEf+1SVj7Tif/xbHf5XaOtwjU=;
- b=LEQ6wMPMEEmyBwNpA1A97FZOpzmefFopPK9FbF2IcftqjA37GG9j8Kv2LcmRldVovhZH5RVRy9FByyTHGeJp7gTqEMX1Imwl80f62YJkRRvpJnqu4rET/pqpOyE/e/cWBNz3k3vRiNUurpvIrjyQH9BXSqjxjFhOTg93g3E+4ioO16gtOXJ5If5CRr1LbuRrWgXNi0JnB+0LchtgMqMzipxUVfYkuKDCgeNyvf76xTStj5w9eNNIESGvcuJguGy7AtmD9PMhgJAIQEZfe2M4Xb0q59mQI7R14WuocilCHHEvmDXl8vrAWNinznRoir54/1952+3eQsYScdTxoWb/cA==
+ bh=url5aL2aUBWr/vZUhF+a832Sbsb601B6OUEdSXOMWJ8=;
+ b=KWdVG8qjOF0pLuHj53vYOiY3ev5gY0CMMsNueftsLSDSgFJb+M2Dr5hMX1QHhfTptA+sEydrhbPjPbpNWW67Kkun0ZLSva7552Quo2YLrrbn/Vul5QzWge0+y2k+woW0k5GmJFPg0cKKGPNG7j97X/YEzVMK0Dxaz4dwJayHG9AomIYwk8lGBYaF7EThib964ni+7BMpNctD/0JAH5MhYDbTOupvwyE4uBcUSZnJ/WGTNSJtwVqVk+z7SHQzWiQdqcB2AntWWUNJRGrndJ6ggGwAWmwOgke3X2Ygl6oAwITOwY9C02c3mvZ650yF8cB9N40t1nTsb0ILYGolbNiDrQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
  smtp.mailfrom=nxp.com;dmarc=pass action=none header.from=nxp.com;dkim=pass
  header.d=nxp.com;arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=o5hFGxAX6rivvFJntNAEf+1SVj7Tif/xbHf5XaOtwjU=;
- b=ZS1pe4f+yZv2phrDiV/zsEiRmwZ0VZj6rZDXuQqsDJUeL8O6ppCsATUZQEN4wEtbVbitRj8jf+7sSW5C6qVGhr8ZoUBzhFDLL21lDEmWDCylRczXQjoNUHdO1VzwP9CPmnD08Aj2qr39XIjTCHiHwUZFwQSV8bSycazy9i+cO5o=
-Received: from DB7PR04MB4620.eurprd04.prod.outlook.com (52.135.140.28) by
- DB7PR04MB5290.eurprd04.prod.outlook.com (20.176.236.138) with Microsoft SMTP
+ bh=url5aL2aUBWr/vZUhF+a832Sbsb601B6OUEdSXOMWJ8=;
+ b=PrXQOQhutd+/ooed+7GjbAftWrczxATqvFBSoG5DKJkko6s1auGJ4ZfUhuQqxCMaIwP30pcPI/XNJ8nXgHMKHO6uapFdUB8pVYFXdyYUtCm2a5eDdPB8jjLT9wen0FVfZGMnb87vyDxAw1CJ8ZgtEoYoKQFUoBvMYUCxrVdtI9c=
+Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
+ VI1PR0402MB3760.eurprd04.prod.outlook.com (52.134.15.154) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2094.16; Tue, 23 Jul 2019 09:16:19 +0000
-Received: from DB7PR04MB4620.eurprd04.prod.outlook.com
- ([fe80::94ce:fde8:cab7:873f]) by DB7PR04MB4620.eurprd04.prod.outlook.com
- ([fe80::94ce:fde8:cab7:873f%5]) with mapi id 15.20.2094.013; Tue, 23 Jul 2019
- 09:16:19 +0000
-From:   Vakul Garg <vakul.garg@nxp.com>
-To:     Horia Geanta <horia.geanta@nxp.com>,
+ 15.20.2073.14; Tue, 23 Jul 2019 09:57:41 +0000
+Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
+ ([fe80::7c64:5296:4607:e10]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
+ ([fe80::7c64:5296:4607:e10%5]) with mapi id 15.20.2094.017; Tue, 23 Jul 2019
+ 09:57:41 +0000
+From:   Horia Geanta <horia.geanta@nxp.com>
+To:     Andrey Smirnov <andrew.smirnov@gmail.com>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-CC:     Aymen Sghaier <aymen.sghaier@nxp.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
-Subject: RE: [PATCH v4] crypto: caam/qi2 - Add printing dpseci fq stats using
- debugfs
-Thread-Topic: [PATCH v4] crypto: caam/qi2 - Add printing dpseci fq stats using
- debugfs
-Thread-Index: AQHVQTKZYEyobdVG002zgP86IbRAmKbX689w
-Date:   Tue, 23 Jul 2019 09:16:19 +0000
-Message-ID: <DB7PR04MB4620F5C78CFE5C1250CEB9C58BC70@DB7PR04MB4620.eurprd04.prod.outlook.com>
-References: <20190723083822.32523-1-vakul.garg@nxp.com>
- <VI1PR0402MB3485646A093D68040F78A3CF98C70@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-In-Reply-To: <VI1PR0402MB3485646A093D68040F78A3CF98C70@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+CC:     Chris Spencer <christopher.spencer@sea.co.uk>,
+        Cory Tusar <cory.tusar@zii.aero>,
+        Chris Healy <cphealy@gmail.com>,
+        Lucas Stach <l.stach@pengutronix.de>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Leonard Crestez <leonard.crestez@nxp.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v6 08/14] crypto: caam - make CAAM_PTR_SZ dynamic
+Thread-Topic: [PATCH v6 08/14] crypto: caam - make CAAM_PTR_SZ dynamic
+Thread-Index: AQHVPLPcllkBIju9kE+rcZ/lhM5x/Q==
+Date:   Tue, 23 Jul 2019 09:57:41 +0000
+Message-ID: <VI1PR0402MB3485472C45A477FB0848802498C70@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+References: <20190717152458.22337-1-andrew.smirnov@gmail.com>
+ <20190717152458.22337-9-andrew.smirnov@gmail.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
 authentication-results: spf=none (sender IP is )
- smtp.mailfrom=vakul.garg@nxp.com; 
-x-originating-ip: [92.120.0.2]
+ smtp.mailfrom=horia.geanta@nxp.com; 
+x-originating-ip: [212.146.100.6]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 6d204123-ad75-44ca-e838-08d70f4e6c45
+x-ms-office365-filtering-correlation-id: 2e601f15-d190-4229-ecb8-08d70f5433eb
 x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:DB7PR04MB5290;
-x-ms-traffictypediagnostic: DB7PR04MB5290:
-x-ms-exchange-purlcount: 2
-x-microsoft-antispam-prvs: <DB7PR04MB5290B66DDD83C3A810A6314D8BC70@DB7PR04MB5290.eurprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:3968;
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:VI1PR0402MB3760;
+x-ms-traffictypediagnostic: VI1PR0402MB3760:
+x-microsoft-antispam-prvs: <VI1PR0402MB37605BB0BF9F8E202C623AB198C70@VI1PR0402MB3760.eurprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:1169;
 x-forefront-prvs: 0107098B6C
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(376002)(346002)(136003)(39860400002)(366004)(396003)(199004)(189003)(13464003)(446003)(74316002)(486006)(71190400001)(11346002)(7736002)(8676002)(305945005)(476003)(81156014)(2501003)(68736007)(25786009)(229853002)(86362001)(102836004)(44832011)(81166006)(52536014)(66066001)(966005)(8936002)(256004)(71200400001)(6306002)(6436002)(3846002)(6116002)(55016002)(9686003)(4326008)(99286004)(54906003)(7696005)(53546011)(64756008)(66446008)(66476007)(76116006)(66556008)(6246003)(66946007)(76176011)(6506007)(316002)(110136005)(186003)(33656002)(26005)(5660300002)(53936002)(2906002)(14454004)(478600001);DIR:OUT;SFP:1101;SCL:1;SRVR:DB7PR04MB5290;H:DB7PR04MB4620.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(346002)(376002)(39860400002)(396003)(136003)(366004)(199004)(189003)(256004)(478600001)(6436002)(6116002)(2906002)(86362001)(229853002)(486006)(6246003)(3846002)(4744005)(4326008)(71200400001)(71190400001)(76176011)(25786009)(9686003)(5660300002)(33656002)(53546011)(55016002)(6506007)(14454004)(2501003)(476003)(7696005)(44832011)(54906003)(26005)(8936002)(186003)(446003)(8676002)(316002)(99286004)(110136005)(7736002)(68736007)(66066001)(305945005)(102836004)(66556008)(81156014)(14444005)(66946007)(53936002)(64756008)(66476007)(81166006)(74316002)(52536014)(76116006)(66446008);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB3760;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
 received-spf: None (protection.outlook.com: nxp.com does not designate
  permitted sender hosts)
 x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: bLYvOYJUHmSp9Aof5I8xrDGPYrTXsYGQqPMMlheAQpEKk78/t3zwC/BQBSI/r/hxHqJjkuThLpUu78RH0qRAdU+ck5u2YLm1rvSgSWC8VT9YLQykbBBmIiS7lAvgn2W37FnwQ/l3V03DI3lH+z5jRG2toj8LW7IUlwdIn5E5AEh7h+3UduM1Z8RXn0jvPaQOxaY2aN41j9HNP2dhs4r9xej+9NOSBN2rJ/asfgdc8T1v4OpA0jVVSmrDhDaerc8mHQFwtBZCOZCU9Ov+wC/sYsXx4fS3DIzfOlIHx+6ZO5XBNdOg331vNw0fR6CFE2/VwSYUVuw3JVjCWuLxHWHhNlAbWbrklNiCUC+l8anIQfuoiKfu/x7tyfXAm3Eo+VVQ1id87Z9emGXpgLL17SNDI3EjD35ZfPDlXa+KytaWA2k=
+x-microsoft-antispam-message-info: osmVcKj+ixELv/pRBlnLYFVxTIlXPdPN2dPMBtEGJGb1kI4VK2i//RQP+1kz2BvEsEYzv8PWHzb3xargG8j+cN6qNLEN5bRunaxOrLFNGhb12ABEFLAlqUqOxsZoC1+glv48rDxhoOAyhUFB8M6MIcCXBTiIGTJX6wRMlGS3Z3IYaGOS5/R+XyAN6bZRWI37NzCUizOzrRtqez/34moBoAAT5HKyLwwEhVgAom59LNII2jWoyxID7pQKWkT1PN7k2Of+Uqzf0av+6aMoUHN/avqK96QPEBQ/Z0Q7xZ1yg1XqTLS2O7RrRcyzyMcMaqYPjbcG0PrTwQaOp1Tcg2oKjcSAvz0bNQmoKBYpxW4jBYNlKWQlpwLAe0AgPaYh8WERkIGCiR88OBUz/ih4njl96uF7JaT3cBLo0RPmbCCSrZY=
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6d204123-ad75-44ca-e838-08d70f4e6c45
-X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Jul 2019 09:16:19.3501
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2e601f15-d190-4229-ecb8-08d70f5433eb
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Jul 2019 09:57:41.7774
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: vakul.garg@nxp.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB7PR04MB5290
+X-MS-Exchange-CrossTenant-userprincipalname: horia.geanta@nxp.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3760
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-
-
-> -----Original Message-----
-> From: Horia Geanta
-> Sent: Tuesday, July 23, 2019 2:38 PM
-> To: Vakul Garg <vakul.garg@nxp.com>; linux-crypto@vger.kernel.org
-> Cc: Aymen Sghaier <aymen.sghaier@nxp.com>;
-> herbert@gondor.apana.org.au
-> Subject: Re: [PATCH v4] crypto: caam/qi2 - Add printing dpseci fq stats u=
-sing
-> debugfs
->=20
-> On 7/23/2019 11:42 AM, Vakul Garg wrote:
-> > diff --git a/drivers/crypto/caam/dpseci-debugfs.c
-> > b/drivers/crypto/caam/dpseci-debugfs.c
-> > new file mode 100644
-> > index 000000000000..2e43ba9b7491
-> > --- /dev/null
-> > +++ b/drivers/crypto/caam/dpseci-debugfs.c
-> > @@ -0,0 +1,80 @@
-> > +/* SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause) */
-> > +/* Copyright 2019 NXP
-> > + */
->=20
-> .c and .h files have different syntax, see:
-> https://www.kernel.org/doc/html/latest/process/license-rules.html#license=
--
-> identifier-syntax
->
-
-Thanks for pointing them out.
-Earlier, I was not able to fix checkpatch warnings related to license heade=
-rs.
-
-> > diff --git a/drivers/crypto/caam/dpseci-debugfs.h
-> > b/drivers/crypto/caam/dpseci-debugfs.h
-> > new file mode 100644
-> > index 000000000000..1dbdb2587758
-> > --- /dev/null
-> > +++ b/drivers/crypto/caam/dpseci-debugfs.h
-> > @@ -0,0 +1,19 @@
-> > +/* SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause) */
-> > +/* Copyright 2019 NXP
-> > + */
->=20
-> Yet another nitpick: incorrect commenting style (for the 2nd comment)
-> https://www.kernel.org/doc/html/latest/process/coding-
-> style.html#commenting
->=20
-> Why not make it a single-line comment?
->=20
-> Sorry for not catching these earlier.
->=20
-
-
-> Horia
+On 7/17/2019 6:25 PM, Andrey Smirnov wrote:=0A=
+> In order to be able to configure CAAM pointer size at run-time, which=0A=
+> needed to support i.MX8MQ, which is 64-bit SoC with 32-bit pointer=0A=
+> size, convert CAAM_PTR_SZ to refer to a global variable of the same=0A=
+> name ("caam_ptr_sz") and adjust the rest of the code accordingly. No=0A=
+> functional change intended.=0A=
+> =0A=
+I am seeing compilation errors like:=0A=
+=0A=
+In file included from drivers/crypto/caam/ctrl.c:25:0:=0A=
+drivers/crypto/caam/qi.h:87:6: error: variably modified 'sh_desc' at file s=
+cope=0A=
+  u32 sh_desc[MAX_SDLEN];=0A=
+      ^=0A=
+=0A=
+Adding comments for this commit, since it looks like the fixes=0A=
+should be included here (related to DESC_JOB_IO_LEN vs. DESC_JOB_IO_LEN_MAX=
+).=0A=
+=0A=
+Please make sure caam/qi and and caam/qi2 drivers are at least compile-test=
+ed.=0A=
+=0A=
+By caam/qi I am referring to:=0A=
+CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API_QI=3Dy/m=0A=
+=0A=
+and caam/qi2:=0A=
+CONFIG_CRYPTO_DEV_FSL_DPAA2_CAAM=3Dy/m=0A=
+=0A=
+Horia=0A=
