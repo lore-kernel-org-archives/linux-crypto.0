@@ -2,255 +2,88 @@ Return-Path: <SRS0=LUcm=VV=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73035C7618B
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 Jul 2019 12:50:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3198EC7618B
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Jul 2019 16:07:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2492D229F3
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 Jul 2019 12:50:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=verimatrix.com header.i=@verimatrix.com header.b="wK7/yzOt"
+	by mail.kernel.org (Postfix) with ESMTP id ED9C42173B
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Jul 2019 16:07:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1563984435;
+	bh=96FrxNUCXMvPogW3TwPyyX6qG00JpbqSZqT2kyR9gdA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=rFu8DIXAu64reQ730+rgp+UEyO+r9BTyPfgIuqCkdXsDWUqS3DTdbBoDoV9A3QON8
+	 WBjaHY/8HNC94t9qRhWIoxWLKxub2ytKJLAHT1SzcHJKbFhxgSutGiHlwT7uYY/KDd
+	 +0l/V0oLFMMC0RpX1jxkMfkBPcJkvlOovCYUznvU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726148AbfGXMuK (ORCPT
+        id S1726115AbfGXQHO (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 24 Jul 2019 08:50:10 -0400
-Received: from mail-eopbgr740050.outbound.protection.outlook.com ([40.107.74.50]:64928
-        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726029AbfGXMuK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 Jul 2019 08:50:10 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BKYBz7/m9jrhpnXEe/GSoUywPReBL45mnlQm0/WXxu7tXizMGPkesG/MhHuEIj4XO9ZwOapB1hSLZ3ZNx5VUDobjCylxRgGN3Rjxwnp8yZwQSTeVfLYO0cx+uhM6s50kXYoyfmIWjWCFZZqjVWA9nk7ZhpeMgfpKjx5a/yrW5W/BVSMpwc3Zx+8Ecp/2+gTjrWZ2T5iDkzephYoxE+60RXUbQC3M3SJykly6H871bFK3fzZIc1d16jToq06Sfhp+B2htAtv+eGn8UXHJnbGi/H3P9R8ARfxpJWni11jVXoti4IBhYf/QJmjUY5kD4GomAmpQ6lKGlpH2biKwNqLIww==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Czo8POniPmbst401rRvwX5h/RUvsVUMoK3g57VpIlhw=;
- b=SlLHwM8WNp/O60r9cgG3eE7TSCiY96UANy4+H1kXfisM1uuiFWUgQQ7luxcl00Npy+oktsExjIhgvyLIk4yiK3hpubicBP3rr7BhY78TFhv+ke7dtCtIO+jmCRz8GGkz9QgWsTVzbms+Uv33FjAbYty9p2ArTZ6j8wAQ4lLqD4biLipHYfXeqt+STt6jIrD+cawtTQ9Cj+l57bgH9eli3TwgccxN3XhY2FqUy+uIH5MqS4sY9TgrNe3zyfAZr4k/5q9xYsFET/1ygVL8v3QZ2C4Yt6QWanONXicCTb1pw1dSoJOvNvw5d//mtKP8ROZlIkxZFeUuhOw51sE+0OzCRw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
- smtp.mailfrom=verimatrix.com;dmarc=pass action=none
- header.from=verimatrix.com;dkim=pass header.d=verimatrix.com;arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verimatrix.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Czo8POniPmbst401rRvwX5h/RUvsVUMoK3g57VpIlhw=;
- b=wK7/yzOtW1JQbE2UW/OJXHeeg8fXcCB3b0UDcmacp7kdzir1WeAt3nRkTsY9Y/3qlNrZBW8VQtW81ukC3AZxTZzYCgHx1aN2VKuMibiWLpIg5/wBCMzplMfeG7tYoxzfEILpf3MoJwEO8atHJNlu82a2MXFAhYPKqB/HhGMQv8w=
-Received: from MN2PR20MB2973.namprd20.prod.outlook.com (52.132.172.146) by
- MN2PR20MB2478.namprd20.prod.outlook.com (20.179.146.209) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2115.10; Wed, 24 Jul 2019 12:50:01 +0000
-Received: from MN2PR20MB2973.namprd20.prod.outlook.com
- ([fe80::68d7:2bbb:af61:2e69]) by MN2PR20MB2973.namprd20.prod.outlook.com
- ([fe80::68d7:2bbb:af61:2e69%6]) with mapi id 15.20.2094.017; Wed, 24 Jul 2019
- 12:50:01 +0000
-From:   Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
-To:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-CC:     Milan Broz <gmazyland@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Horia Geanta <horia.geanta@nxp.com>
-Subject: RE: [dm-devel] xts fuzz testing and lack of ciphertext stealing
- support
-Thread-Topic: [dm-devel] xts fuzz testing and lack of ciphertext stealing
- support
-Thread-Index: AQHVO/5l0aVU4O6KC0WgPIqEsMQCDqbPEhUAgAALMYCAANVxgIAABoCAgAABwICAAAUbgIAAFRTAgAAoQICAAtuUgIAACm4AgAG39ACAAYCLgIAAhUWAgALaEJCAAAhikA==
-Date:   Wed, 24 Jul 2019 12:50:01 +0000
-Message-ID: <MN2PR20MB2973131812A59B859A2AF02BCAC60@MN2PR20MB2973.namprd20.prod.outlook.com>
-References: <20190716221639.GA44406@gmail.com>
- <VI1PR0402MB34857BBB18C2BB8CBA2DEC7198C90@VI1PR0402MB3485.eurprd04.prod.outlook.com>
- <20190717172823.GA205944@gmail.com>
- <CAKv+Gu__offPaWvyURJr8v56ig58q-Deo16QhP26EJ32uf5m3w@mail.gmail.com>
- <20190718065223.4xaefcwjoxvujntw@gondor.apana.org.au>
- <CAKv+Gu9-EWNpJ9viSsjhYRdOZb=7a=Mpddmyt8SLEq9aFtawjg@mail.gmail.com>
- <20190718072154.m2umem24x4grbf6w@gondor.apana.org.au>
- <36e78459-1594-6d19-0ab4-95b03a6de036@gmail.com>
- <MN2PR20MB2973E61815F069E8C7D74177CAC80@MN2PR20MB2973.namprd20.prod.outlook.com>
- <b042649c-db98-9710-b063-242bdf520252@gmail.com>
- <20190720065807.GA711@sol.localdomain>
- <0d4d6387-777c-bfd3-e54a-e7244fde0096@gmail.com>
- <CAKv+Gu9UF+a1UhVU19g1XcLaEqEaAwwkSm3-2wTHEAdD-q4mLQ@mail.gmail.com>
- <MN2PR20MB2973B9C2DDC508A81AF4A207CAC40@MN2PR20MB2973.namprd20.prod.outlook.com>
- <CAKv+Gu9C2AEbb++W=QTVWbeA_88Fo57NcOwgU5R8HBvzFwXkJw@mail.gmail.com>
- <MN2PR20MB2973803167748E965235D460CAC60@MN2PR20MB2973.namprd20.prod.outlook.com>
-In-Reply-To: <MN2PR20MB2973803167748E965235D460CAC60@MN2PR20MB2973.namprd20.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=pvanleeuwen@verimatrix.com; 
-x-originating-ip: [188.204.2.113]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: dafa7e88-c761-496e-6056-08d71035715c
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:MN2PR20MB2478;
-x-ms-traffictypediagnostic: MN2PR20MB2478:
-x-ms-exchange-purlcount: 2
-x-microsoft-antispam-prvs: <MN2PR20MB24783005A6B4CBFB986275E4CAC60@MN2PR20MB2478.namprd20.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 0108A997B2
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(979002)(4636009)(396003)(136003)(39850400004)(376002)(366004)(346002)(13464003)(189003)(199004)(2906002)(53936002)(76116006)(55016002)(66066001)(6436002)(6506007)(966005)(52536014)(2940100002)(478600001)(86362001)(6306002)(9686003)(229853002)(5660300002)(4326008)(6246003)(305945005)(7736002)(64756008)(25786009)(53546011)(102836004)(74316002)(66446008)(66556008)(66476007)(66946007)(14454004)(26005)(186003)(7696005)(99286004)(33656002)(76176011)(110136005)(54906003)(316002)(14444005)(3846002)(6116002)(8676002)(81166006)(81156014)(8936002)(68736007)(486006)(11346002)(256004)(71190400001)(71200400001)(446003)(15974865002)(476003)(969003)(989001)(999001)(1009001)(1019001);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR20MB2478;H:MN2PR20MB2973.namprd20.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: verimatrix.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: Fl27MTR73Kvz69fcwQ1ZPfibJ/Tn/3vDbermVESwwy2bnWjAPASEEN/1bq3zNXbal0ik8Sq1D6QZ6634cKw7xKLOw0zhlShgFgceN0okkEHhAJdwdR9NDQyoz9lyp+bvgn+w7caEHtd9/O9L6WVuptMm8sZsNIjfXql+5ntUeWBYOGT1ZwP5o4L7wgChiaNQiNRIy8vn06Gh+ALUsogpEOq17DZles5H5M9A1lUKytr09d1N0WwP6kt69ULF/fh4JCoDb6gpxCjKGeDEhPZTciYW5UnJ2VPFT452yLi5vE61nH81AXAYrE24cglB4fkAFTH3CxhIRzhA8EKDHLfbDbnU0tQQusiQCRldnCrVpHXU9Bi7iBq0D44u88iGBUm8wSXIMYke39P8iyFpj0v1Ey0OkcG5lZoFe3jAAXe3CXc=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        Wed, 24 Jul 2019 12:07:14 -0400
+Received: from mail.kernel.org ([198.145.29.99]:36604 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726099AbfGXQHN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 24 Jul 2019 12:07:13 -0400
+Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 1443D21850;
+        Wed, 24 Jul 2019 16:07:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1563984433;
+        bh=96FrxNUCXMvPogW3TwPyyX6qG00JpbqSZqT2kyR9gdA=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=m8T+w3Zz3mHDzPZOVJL0jgJ6TYRTby1WvDsg8LPEhI5rWbN/NQFaOz1wpdVMAGvkI
+         jDEIalJDJWvBEK95Gbdt17sFToFIFRVzb94JsjkqDnV/KlqPgPkY+E+qARKeJYiwNy
+         K9VZLZDnOtG9A0HuNX1ZeRl5TFoR1QUps2bvI17k=
+Date:   Wed, 24 Jul 2019 09:07:11 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Jia-Ju Bai <baijiaju1990@gmail.com>
+Cc:     tytso@mit.edu, jaegeuk@kernel.org, linux-fscrypt@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH] fs: crypto: keyinfo: Fix a possible null-pointer
+ dereference in derive_key_aes()
+Message-ID: <20190724160711.GB673@sol.localdomain>
+Mail-Followup-To: Jia-Ju Bai <baijiaju1990@gmail.com>, tytso@mit.edu,
+        jaegeuk@kernel.org, linux-fscrypt@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org
+References: <20190724100204.2009-1-baijiaju1990@gmail.com>
 MIME-Version: 1.0
-X-OriginatorOrg: verimatrix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: dafa7e88-c761-496e-6056-08d71035715c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Jul 2019 12:50:01.6785
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: dcb260f9-022d-4495-8602-eae51035a0d0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: pvanleeuwen@verimatrix.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR20MB2478
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190724100204.2009-1-baijiaju1990@gmail.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-QWgsIHVnaCwgbXkgYmFkLiBJZ25vcmUgbXkgcHJldmlvdXMgbWFpbCBiZWxvdy4gVHVybnMgb3V0
-IHRoZSB0Zl94dHNfdHZfdGVtcGxhdGUgSSB3YXMgbG9va2luZw0KYXQgaXMgZm9yIHh0cyh0d29m
-aXNoKSBub3QgeHRzKGFlcykgLi4uIHdoaWNoIHdhcyBub3QgaW1tZWRpYXRlbHkgb2J2aW91cyBm
-cm9tIHRoZSBuYW1lLCBmb3IgbWUuDQoNClBhc2NhbCB2YW4gTGVldXdlbg0KU2lsaWNvbiBJUCBB
-cmNoaXRlY3QsIE11bHRpLVByb3RvY29sIEVuZ2luZXMgQCBWZXJpbWF0cml4DQp3d3cuaW5zaWRl
-c2VjdXJlLmNvbQ0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IGxpbnV4
-LWNyeXB0by1vd25lckB2Z2VyLmtlcm5lbC5vcmcgPGxpbnV4LWNyeXB0by1vd25lckB2Z2VyLmtl
-cm5lbC5vcmc+IE9uIEJlaGFsZiBPZiBQYXNjYWwgVmFuIExlZXV3ZW4NCj4gU2VudDogV2VkbmVz
-ZGF5LCBKdWx5IDI0LCAyMDE5IDI6MjMgUE0NCj4gVG86IEFyZCBCaWVzaGV1dmVsIDxhcmQuYmll
-c2hldXZlbEBsaW5hcm8ub3JnPg0KPiBDYzogTWlsYW4gQnJveiA8Z21henlsYW5kQGdtYWlsLmNv
-bT47IEhlcmJlcnQgWHUgPGhlcmJlcnRAZ29uZG9yLmFwYW5hLm9yZy5hdT47IGRtLWRldmVsQHJl
-ZGhhdC5jb207IGxpbnV4LQ0KPiBjcnlwdG9Admdlci5rZXJuZWwub3JnOyBIb3JpYSBHZWFudGEg
-PGhvcmlhLmdlYW50YUBueHAuY29tPg0KPiBTdWJqZWN0OiBSRTogW2RtLWRldmVsXSB4dHMgZnV6
-eiB0ZXN0aW5nIGFuZCBsYWNrIG9mIGNpcGhlcnRleHQgc3RlYWxpbmcgc3VwcG9ydA0KPiANCj4g
-QXJkLA0KPiANCj4gPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiA+IEZyb206IEFyZCBC
-aWVzaGV1dmVsIDxhcmQuYmllc2hldXZlbEBsaW5hcm8ub3JnPg0KPiA+IFNlbnQ6IE1vbmRheSwg
-SnVseSAyMiwgMjAxOSA2OjQzIFBNDQo+ID4gVG86IFBhc2NhbCBWYW4gTGVldXdlbiA8cHZhbmxl
-ZXV3ZW5AdmVyaW1hdHJpeC5jb20+DQo+ID4gQ2M6IE1pbGFuIEJyb3ogPGdtYXp5bGFuZEBnbWFp
-bC5jb20+OyBIZXJiZXJ0IFh1IDxoZXJiZXJ0QGdvbmRvci5hcGFuYS5vcmcuYXU+OyBkbS1kZXZl
-bEByZWRoYXQuY29tOyBsaW51eC0NCj4gPiBjcnlwdG9Admdlci5rZXJuZWwub3JnOyBIb3JpYSBH
-ZWFudGEgPGhvcmlhLmdlYW50YUBueHAuY29tPg0KPiA+IFN1YmplY3Q6IFJlOiBbZG0tZGV2ZWxd
-IHh0cyBmdXp6IHRlc3RpbmcgYW5kIGxhY2sgb2YgY2lwaGVydGV4dCBzdGVhbGluZyBzdXBwb3J0
-DQo+ID4NCj4gPiBPbiBNb24sIDIyIEp1bCAyMDE5IGF0IDEyOjQ0LCBQYXNjYWwgVmFuIExlZXV3
-ZW4NCj4gPiA8cHZhbmxlZXV3ZW5AdmVyaW1hdHJpeC5jb20+IHdyb3RlOg0KPiA+ID4NCj4gPiA+
-ID4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gPiA+ID4gRnJvbTogQXJkIEJpZXNoZXV2
-ZWwgPGFyZC5iaWVzaGV1dmVsQGxpbmFyby5vcmc+DQo+ID4gPiA+IFNlbnQ6IFN1bmRheSwgSnVs
-eSAyMSwgMjAxOSAxMTo1MCBBTQ0KPiA+ID4gPiBUbzogTWlsYW4gQnJveiA8Z21henlsYW5kQGdt
-YWlsLmNvbT4NCj4gPiA+ID4gQ2M6IFBhc2NhbCBWYW4gTGVldXdlbiA8cHZhbmxlZXV3ZW5AdmVy
-aW1hdHJpeC5jb20+OyBIZXJiZXJ0IFh1IDxoZXJiZXJ0QGdvbmRvci5hcGFuYS5vcmcuYXU+OyBk
-bS1kZXZlbEByZWRoYXQuY29tOw0KPiBsaW51eC0NCj4gPiA+ID4gY3J5cHRvQHZnZXIua2VybmVs
-Lm9yZzsgSG9yaWEgR2VhbnRhIDxob3JpYS5nZWFudGFAbnhwLmNvbT4NCj4gPiA+ID4gU3ViamVj
-dDogUmU6IFtkbS1kZXZlbF0geHRzIGZ1enogdGVzdGluZyBhbmQgbGFjayBvZiBjaXBoZXJ0ZXh0
-IHN0ZWFsaW5nIHN1cHBvcnQNCj4gPiA+ID4NCj4gPiA+ID4gT24gU2F0LCAyMCBKdWwgMjAxOSBh
-dCAxMDozNSwgTWlsYW4gQnJveiA8Z21henlsYW5kQGdtYWlsLmNvbT4gd3JvdGU6DQo+ID4gPiA+
-ID4NCj4gPiA+ID4gPiBPbiAyMC8wNy8yMDE5IDA4OjU4LCBFcmljIEJpZ2dlcnMgd3JvdGU6DQo+
-ID4gPiA+ID4gPiBPbiBUaHUsIEp1bCAxOCwgMjAxOSBhdCAwMToxOTo0MVBNICswMjAwLCBNaWxh
-biBCcm96IHdyb3RlOg0KPiA+ID4gPiA+ID4+IEFsc28sIEkgd291bGQgbGlrZSB0byBhdm9pZCBh
-bm90aGVyICJqdXN0IGJlY2F1c2UgaXQgaXMgbmljZXIiIG1vZHVsZSBkZXBlbmRlbmNlIChYVFMt
-PlhFWC0+RUNCKS4NCj4gPiA+ID4gPiA+PiBMYXN0IHRpbWUgKHdoZW4gWFRTIHdhcyByZWltcGxl
-bWVudGVkIHVzaW5nIEVDQikgd2UgaGF2ZSBtYW55IHJlcG9ydHMgd2l0aCBpbml0cmFtZnMNCj4g
-PiA+ID4gPiA+PiBtaXNzaW5nIEVDQiBtb2R1bGUgcHJldmVudGluZyBib290IGZyb20gQUVTLVhU
-UyBlbmNyeXB0ZWQgcm9vdCBhZnRlciBrZXJuZWwgdXBncmFkZS4uLg0KPiA+ID4gPiA+ID4+IEp1
-c3Qgc2F5aW5nLiAoRGVzcGl0ZSB0aGUgbGFzdCB0aW1lIGl0IHdhcyBrZXlyaW5nIHdoYXQgYnJv
-a2UgZW5jcnlwdGVkIGJvb3QgOy0pDQo+ID4gPiA+ID4gPj4NCj4gPiA+ID4gPiA+DQo+ID4gPiA+
-ID4gPiBDYW4ndCB0aGUgIm1pc3NpbmcgbW9kdWxlcyBpbiBpbml0cmFtZnMiIGlzc3VlIGJlIHNv
-bHZlZCBieSB1c2luZyBhDQo+ID4gPiA+ID4gPiBNT0RVTEVfU09GVERFUCgpPyAgQWN0dWFsbHks
-IHdoeSBpc24ndCB0aGF0IGJlaW5nIHVzZWQgZm9yIHh0cyAtPiBlY2IgYWxyZWFkeT8NCj4gPiA+
-ID4gPiA+DQo+ID4gPiA+ID4gPiAoVGhlcmUgd2FzIGFsc28gYSBidWcgd2hlcmUgQ09ORklHX0NS
-WVBUT19YVFMgZGlkbid0IHNlbGVjdCBDT05GSUdfQ1JZUFRPX0VDQiwNCj4gPiA+ID4gPiA+IGJ1
-dCB0aGF0IHdhcyBzaW1wbHkgYSBidWcsIHdoaWNoIHdhcyBmaXhlZC4pDQo+ID4gPiA+ID4NCj4g
-PiA+ID4gPiBTdXJlLCBhbmQgaXQgaXMgc29sdmVkIG5vdy4gKFNvbWUgc3lzdGVtcyB3aXRoIGEg
-aGFyZGNvZGVkIGxpc3Qgb2YgbW9kdWxlcw0KPiA+ID4gPiA+IGhhdmUgdG8gYmUgbWFudWFsbHkg
-dXBkYXRlZCBldGMuLCBidXQgdGhhdCBpcyBqdXN0IGJhZCBkZXNpZ24pLg0KPiA+ID4gPiA+IEl0
-IGNhbiBiZSBkb25lIHByb3Blcmx5IGZyb20gdGhlIGJlZ2lubmluZy4NCj4gPiA+ID4gPg0KPiA+
-ID4gPiA+IEkganVzdCB3YW50IHRvIHNheSB0aGF0IHRoYXQgc3dpdGNoaW5nIHRvIFhFWCBsb29r
-cyBsaWtlIHdhc3RpbmcgdGltZSB0byBtZQ0KPiA+ID4gPiA+IGZvciBubyBhZGRpdGlvbmFsIGJl
-bmVmaXQuDQo+ID4gPiA+ID4NCj4gPiA+ID4gPiBGdWxseSBpbXBsZW1lbnRpbmcgWFRTIGRvZXMg
-bWFrZSBtdWNoIG1vcmUgc2Vuc2UgZm9yIG1lLCBldmVuIHRob3VnaCBpdCBpcyBsb25nLXRlcm0N
-Cj4gPiA+ID4gPiB0aGUgZWZmb3J0IGFuZCB0aGUgb25seSB1c2VyLCBmb3Igbm93LCB3b3VsZCBi
-ZSB0ZXN0bWdyLg0KPiA+ID4gPiA+DQo+ID4gPiA+ID4gU28sIHRoZXJlIGFyZSBubyB1c2VycyBi
-ZWNhdXNlIGl0IGRvZXMgbm90IHdvcmsuIEl0IG1ha2VzIG5vIHNlbnNlDQo+ID4gPiA+ID4gdG8g
-aW1wbGVtZW50IGl0LCBiZWNhdXNlIHRoZXJlIGFyZSBubyB1c2Vycy4uLiAoc29ycnksIHNvdW5k
-cyBsaWtlIGNhdGNoIDIyIDopDQo+ID4gPiA+ID4NCj4gPiA+ID4gPiAoTWF5YmUgc29tZW9uZSBj
-YW4gdXNlIGl0IGZvciBrZXlzbG90IGVuY3J5cHRpb24gZm9yIGtleXMgbm90IGFsaWduZWQgdG8N
-Cj4gPiA+ID4gPiBibG9jayBzaXplLCBkdW5uby4gQWN0dWFsbHksIHNvbWUgZmlsZXN5c3RlbSBl
-bmNyeXB0aW9uIGNvdWxkIGhhdmUgdXNlIGZvciBpdC4pDQo+ID4gPiA+ID4NCj4gPiA+ID4gPiA+
-IE9yICJ4dHMiIGFuZCAieGV4IiBjb3VsZCBnbyBpbiB0aGUgc2FtZSBrZXJuZWwgbW9kdWxlIHh0
-cy5rbywgd2hpY2ggd291bGQgbWFrZQ0KPiA+ID4gPiA+ID4gdGhpcyBhIG5vbi1pc3N1ZS4NCj4g
-PiA+ID4gPg0KPiA+ID4gPiA+IElmIGl0IGlzIG5vdCBhdmFpbGFibGUgZm9yIHVzZXJzLCBJIHJl
-YWxseSBzZWUgbm8gcmVhc29uIHRvIGludHJvZHVjZSBYRVggd2hlbg0KPiA+ID4gPiA+IGl0IGlz
-IGp1c3QgWFRTIHdpdGggZnVsbCBibG9ja3MuDQo+ID4gPiA+ID4NCj4gPiA+ID4gPiBJZiBpdCBp
-cyB2aXNpYmxlIHRvIHVzZXJzLCBpdCBuZWVkcyBzb21lIHdvcmsgaW4gdXNlcnNwYWNlIC0gWEVY
-IChhcyBYVFMpIG5lZWQgdHdvIGtleXMsDQo+ID4gPiA+ID4gcGVvcGxlIGFyZSBhbHJlYWR5IGNv
-bmZ1c2VkIGVub3VnaCB0aGF0IDI1NmJpdCBrZXkgaW4gQUVTLVhUUyBtZWFucyBBRVMtMTI4Li4u
-DQo+ID4gPiA+ID4gU28gdGhlIGV4YW1wbGVzLCBoaW50cywgbWFuIHBhZ2VzIG5lZWQgdG8gYmUg
-dXBkYXRlZCwgYXQgbGVhc3QuDQo+ID4gPiA+ID4NCj4gPiA+ID4NCj4gPiA+ID4gT0ssIGNvbnNp
-ZGVyIG1lIHBlcnN1YWRlZC4gV2UgYXJlIGFscmVhZHkgZXhwb3NpbmcgeHRzKC4uLikgdG8NCj4g
-PiA+ID4gdXNlcmxhbmQsIGFuZCBzaW5jZSB3ZSBhbHJlYWR5IGltcGxlbWVudCBhIHByb3BlciBz
-dWJzZXQgb2YgdHJ1ZSBYVFMsDQo+ID4gPiA+IGl0IHdpbGwgYmUgc2ltcGx5IGEgbWF0dGVyIG9m
-IG1ha2luZyBzdXJlIHRoYXQgdGhlIGV4aXN0aW5nIFhUUw0KPiA+ID4gPiBpbXBsZW1lbnRhdGlv
-bnMgZG9uJ3QgcmVncmVzcyBpbiBwZXJmb3JtYW5jZSBvbiB0aGUgbm9uLUNUUyBjb2RlDQo+ID4g
-PiA+IHBhdGhzLg0KPiA+ID4gPg0KPiA+ID4gPiBJdCB3b3VsZCBiZSB1c2VmdWwsIHRob3VnaCwg
-dG8gaGF2ZSBzb21lIGdlbmVyaWMgaGVscGVyIGZ1bmN0aW9ucywNCj4gPiA+ID4gZS5nLiwgbGlr
-ZSB0aGUgb25lIHdlIGhhdmUgZm9yIENCQywgb3IgdGhlIG9uZSBJIHJlY2VudGx5IHByb3Bvc2Vk
-IGZvcg0KPiA+ID4gPiBDVFMsIHNvIHRoYXQgZXhpc3RpbmcgaW1wbGVtZW50YXRpb25zIChzdWNo
-IGFzIHRoZSBiaXQgc2xpY2VkIEFFUykgY2FuDQo+ID4gPiA+IGVhc2lseSBiZSBhdWdtZW50ZWQg
-d2l0aCBhIENUUyBjb2RlIHBhdGggKGJ1dCBwZXJmb3JtYW5jZSBtYXkgbm90IGJlDQo+ID4gPiA+
-IG9wdGltYWwgaW4gdGhvc2UgY2FzZXMpLiBGb3IgdGhlIEFSTSBpbXBsZW1lbnRhdGlvbnMgYmFz
-ZWQgb24gQUVTDQo+ID4gPiA+IGluc3RydWN0aW9ucywgaXQgc2hvdWxkIGJlIHJlYXNvbmFibHkg
-c3RyYWlnaHQgZm9yd2FyZCB0byBpbXBsZW1lbnQgaXQNCj4gPiA+ID4gY2xvc2UgdG8gb3B0aW1h
-bGx5IGJ5IHJldXNpbmcgc29tZSBvZiB0aGUgY29kZSBJIGFkZGVkIGZvciBDQkMtQ1RTDQo+ID4g
-PiA+IChidXQgSSB3b24ndCBnZXQgYXJvdW5kIHRvIGRvaW5nIHRoYXQgZm9yIGEgd2hpbGUpLiBJ
-ZiB0aGVyZSBhcmUgYW55DQo+ID4gPiA+IHZvbHVudGVlcnMgZm9yIGxvb2tpbmcgaW50byB0aGUg
-Z2VuZXJpYyBvciB4ODYvQUVTLU5JIGltcGxlbWVudGF0aW9ucywNCj4gPiA+ID4gcGxlYXNlIGNv
-bWUgZm9yd2FyZCA6LSkgQWxzbywgaWYgYW55IG9mIHRoZSBwdWJsaWNhdGlvbnMgdGhhdCB3ZXJl
-DQo+ID4gPiA+IHF1b3RlZCBpbiB0aGlzIHRocmVhZCBoYXZlIHN1aXRhYmxlIHRlc3QgdmVjdG9y
-cywgdGhhdCB3b3VsZCBiZSBnb29kDQo+ID4gPiA+IHRvIGtub3cuDQo+ID4gPg0KPiA+ID4gVW5m
-b3J0dW5hdGVseSwgdGhlc2UgYWxnb3JpdGhtICYgcHJvdG9jb2wgc3BlY2lmaWNhdGlvbnMgdGVu
-ZCB0byBiZSB2ZXJ5IGZydWdhbCB3aGVuIGl0DQo+ID4gPiBjb21lcyB0byBwcm92aWRpbmcgdGVz
-dCB2ZWN0b3JzLCBiYXJlbHkgc2NyYXRjaGluZyB0aGUgc3VyZmFjZSBvZiBhbnkgY29ybmVyIGNh
-c2VzLCBidXQNCj4gPiA+IGF0IGxlYXN0IHRoZXJlIGlzIG9uZSBub24tbXVsdGlwbGUtb2YtMTYg
-dmVjdG9yIGluIHRoZSBvcmlnaW5hbCBJRUVFIFAxNjE5IC8gRDE2DQo+ID4gPiBzcGVjaWZpY2F0
-aW9uIGluIEFubmV4IEIgVGVzdCBWZWN0b3JzIChsYXN0IHZlY3RvciwgIlhUUy1BRVMtMTI4IGFw
-cGxpZWQgZm9yIGEgZGF0YSB1bml0DQo+ID4gPiB0aGF0IGlzIG5vdCBhIG11bHRpcGxlIG9mIDE2
-IGJ5dGVzIikNCj4gPiA+DQo+ID4NCj4gPiBBY3R1YWxseSwgdGhhdCBzcGVjIGhhcyBhIGNvdXBs
-ZSBvZiB0ZXN0IHZlY3RvcnMuIFVuZm9ydHVuYXRlbHksIHRoZXkNCj4gPiBhcmUgYWxsIHJhdGhl
-ciBzaG9ydCAoZXhjZXB0IHRoZSBsYXN0IG9uZSBpbiB0aGUgJ25vIG11bHRpcGxlIG9mIDE2DQo+
-ID4gYnl0ZXMnIHBhcmFncmFwaCwgYnV0IHVuZm9ydHVuYXRlbHksIHRoYXQgb25lIGlzIGluIGZh
-Y3QgYSBtdWx0aXBsZSBvZg0KPiA+IDE2IGJ5dGVzKQ0KPiA+DQo+ID4gSSBhZGRlZCB0aGVtIGhl
-cmUgWzBdIGFsb25nIHdpdGggYW4gYXJtNjQgaW1wbGVtZW50YXRpb24gZm9yIHRoZSBBRVMNCj4g
-PiBpbnN0cnVjdGlvbiBiYXNlZCBkcml2ZXIuIENvdWxkIHlvdSBwbGVhc2UgZG91YmxlIGNoZWNr
-IHRoYXQgdGhlc2UNCj4gPiB3b3JrIGFnYWluc3QgeW91ciBkcml2ZXI/IFRoYXQgd291bGQgZXN0
-YWJsaXNoIGEgZ3JvdW5kIHRydXRoIGFnYWluc3QNCj4gPiB3aGljaCB3ZSBjYW4gaW1wbGVtZW50
-IHRoZSBnZW5lcmljIHZlcnNpb24gYXMgd2VsbC4NCj4gPg0KPiA+IFswXSBodHRwczovL2dpdC5r
-ZXJuZWwub3JnL3B1Yi9zY20vbGludXgva2VybmVsL2dpdC9hcmRiL2xpbnV4LmdpdC9sb2cvP2g9
-eHRzLWN0cw0KPiA+DQo+IEknbSB3b3JraW5nIG9uIG15IFhUUyBpbXBsZW1lbnRhdGlvbiBub3cg
-YW5kIEkgbm90aWNlZCBzb21ldGhpbmcgZnVubnkgd2l0aCB0aGUgdGVzdA0KPiB2ZWN0b3JzLiBU
-aGUgbmV3IENUUyBvbmVzIHlvdSBhZGRlZCBoZXJlLCBJIGNhbiBwZXJmZWN0bHkgdHJhY2UgYmFj
-ayB0byB0aGUgSUVFRSBzcGVjLA0KPiB0aGV5IG1hdGNoIGJ5dGUtZm9yLWJ5dGUuDQo+IA0KPiBI
-b3dldmVyLCB0aGUgb25lcyB0aGF0IGFscmVhZHkgZXhpc3RlZCBwdXp6bGUgbWUuIFRoZSBpbnB1
-dCBkYXRhIG1hdGNoZXMgdmVjdG9ycyBmcm9tDQo+IHRoZSBJRUVFIHNwZWMsIGhvd2V2ZXIgdGhl
-IGV4cGVjdGVkIG91dHB1dCBjaXBoZXIgdGV4dCBkb2VzIE5PVCA/Pz8/DQo+IA0KPiBDYXNlIGlu
-IHBvaW50LCB0aGUgdmVyeSBmaXJzdCB2ZWN0b3IsIHdoaWNoIGhhcyBhIGtleSBvZiBhbGwgemVy
-b2VzLCBhIHNlY3RvciBudW1iZXIgKElWKQ0KPiBvciBhbGwgemVyb2VzIGFuZCBhbiBhbGwgemVy
-b2VzIHBsYWludGV4dCBvZiAzMiBieXRlcywgd2hpY2ggbWF0Y2hlcyB0aGUgMXN0IHNwZWMgdmVj
-dG9yOg0KPiB0ZXN0bWdyLmggZXhwZWN0czoNCj4gICJceDRiXHhjOVx4NDRceDRhXHgxMVx4YTNc
-eGVmXHhhYyINCj4gICJceDMwXHg3NFx4ZTRceDQ0XHg1Mlx4NzdceDk3XHg0MyINCj4gICAiXHhh
-N1x4NjBceGIyXHg0NVx4MmVceGY5XHgwMFx4OTAiDQo+ICAgIlx4OWZceGFhXHhmZFx4ODlceDZl
-XHg5ZFx4NGFceGUwIg0KPiANCj4gQnV0IHRoZSBzcGVjaWZpY2F0aW9uIGV4cGVjdHM6DQo+IDkx
-N2NmNjllYmQ2OGIyZWM5YjlmZTlhM2VhZGRhNjkyY2Q0M2QyZjU5NTk4ZWQ4NThjMDJjMjY1MmZi
-ZjkyMmUNCj4gDQo+IFdoaWNoIGFsc28gaGFwcGVucyB0byBiZSB3aGF0IG91ciBoYXJkd2FyZSBk
-b2VzIC4uLg0KPiANCj4gRGlkIHlvdSBub3RpY2UgdGhlIHNhbWUgdGhpbmcgd2l0aCB5b3VyIGlt
-cGxlbWVudGF0aW9uPyBBbSBJIG1pc3Npbmcgc29tZXRoaW5nPz8NCj4gDQo+ID4gPiBCZXNpZGVz
-IHRoYXQsIEknZCBiZSBoYXBweSB0byBnZW5lcmF0ZSBzb21lIHRlc3R2ZWN0b3JzIGZyb20gb3Vy
-IGRlZmFjdG8tc3RhbmRhcmQNCj4gPiA+IGltcGxlbWVudGF0aW9uIDstKQ0KPiA+ID4NCj4gPg0K
-PiA+IE9uZSBvciB0d28gbGFyZ2VyIG9uZXMgd291bGQgYmUgdXNlZnVsLCB5ZXMuDQo+IA0KPiBS
-ZWdhcmRzLA0KPiBQYXNjYWwgdmFuIExlZXV3ZW4NCj4gU2lsaWNvbiBJUCBBcmNoaXRlY3QsIE11
-bHRpLVByb3RvY29sIEVuZ2luZXMgQCBWZXJpbWF0cml4DQo+IHd3dy5pbnNpZGVzZWN1cmUuY29t
-DQo+IA0KPiANCg0K
+[+Cc linux-crypto]
+
+On Wed, Jul 24, 2019 at 06:02:04PM +0800, Jia-Ju Bai wrote:
+> In derive_key_aes(), tfm is assigned to NULL on line 46, and then
+> crypto_free_skcipher(tfm) is executed.
+> 
+> crypto_free_skcipher(tfm)
+>     crypto_skcipher_tfm(tfm)
+>         return &tfm->base;
+> 
+> Thus, a possible null-pointer dereference may occur.
+
+This analysis is incorrect because only the address &tfm->base is taken.
+There's no pointer dereference.
+
+In fact all the crypto_free_*() functions are no-ops on NULL pointers, and many
+other callers rely on it.  So there's no bug here.
+
+It appears you've sent the same patch for some of these other callers
+(https://lore.kernel.org/lkml/?q=%22fix+a+possible+null-pointer%22), but none
+are Cc'ed to linux-crypto or another mailing list I'm subscribed to, so I can't
+respond to them.  But this feedback applies equally to them too.
+
+Note also that if there actually were a bug here (which again, there doesn't
+appear to be), we'd need to fix it in crypto_free_*(), not in the callers.
+
+- Eric
