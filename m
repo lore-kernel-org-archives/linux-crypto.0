@@ -2,169 +2,115 @@ Return-Path: <SRS0=g3pl=VW=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DATE_IN_PAST_06_12,
+	DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7ECBC76190
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Jul 2019 03:52:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23381C7618B
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Jul 2019 05:42:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 88E9021851
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Jul 2019 03:52:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TDriAVm9"
+	by mail.kernel.org (Postfix) with ESMTP id EF4D322C7D
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Jul 2019 05:42:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1564033366;
+	bh=ANVUNEMAe1jn6TZ1TL+1KmUas0lezeRrXvXkB9h6ki8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=VnkRrJLth3X+d9g3enQpMTfqWlZh6lelPxjsFaq4UntaCVZk2qmnY4r1yAKVOerja
+	 FzIhD2kEKmAHF4BJBj3ocebgJRv2tbdF4cll0CcMQIbHjGLxaVrqKJDMEgX7yggKhu
+	 GhzXWTH9jlcWujjUrm9IA38t9ScyoH2ugyTF/Qeg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390153AbfGYDwG (ORCPT
+        id S2390928AbfGYFmo (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 24 Jul 2019 23:52:06 -0400
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:33148 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390150AbfGYDwG (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 Jul 2019 23:52:06 -0400
-Received: by mail-pg1-f195.google.com with SMTP id f20so13041663pgj.0;
-        Wed, 24 Jul 2019 20:52:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:references:cc:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=Q/98t+M2Y8cT5VRhI3CXJllAGvqhT13uQ4iFZGPeAKQ=;
-        b=TDriAVm9iNGKXqNyY9jNLT67/TAZxSgx1zvErjGKOnYp4i3vmCPs51kg4wyBv5sNXW
-         9u2ToLoPJcyMJOK0cH/VvWhw+kgFLrV5aSlaYpmYgnipRFVBF7VSK6bhuw/b5D3ESIVe
-         wm6hsZ+L1oM8SP6oh7Tb6MfHOWQf/yyKO6UvInwdgQCj0YneqYLajq6kyiqvJbC5oKyk
-         n0e7Moam56yuIoMHnwIjnH3LeRU+85F65f4vzHfGFmII8JI+rYPldKP29ADzahfh8rgY
-         7ARHhdqfQM7JxIhPnTm8k/wTb7OxKhT2tkWb9n8nK0TrVLzCOg7HayVmr2y2KHuXpDzN
-         Em7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:cc:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=Q/98t+M2Y8cT5VRhI3CXJllAGvqhT13uQ4iFZGPeAKQ=;
-        b=hx3Opncb8LwrB8OBPOKNtc4rRTRtB/9CssEPkxTjASyloNVrI1y3L367Nf1aMOoMy8
-         zk8S4Q78GOHN2/nxF4KTVdOu7TAI2nB3C+uFn2VfR0qVir0ljQNToWyrXG1PSsJrXOr2
-         DZX7swVULjZVVqXORWot+CeNZrOETEuELAX5gt2BqdWYDupPZk3HztJihQR4CBb+nwJD
-         HwuY97T/VFQx+OoiM1sdb0B10GbqoosKnO3nWJG1H39TN1pEEm1r3ubCvleL9vqInygJ
-         s9OxJeqaSsFot5Op8y+EeQwQb12AhS3FXHwt5dP0RM0RGcAjlIYxGFR+7gttvC6r1P2+
-         xvhA==
-X-Gm-Message-State: APjAAAXt2Wud2xmm545EFv512fpK0TFd+pwlIvlKW91pRiEVZfPJ1f+F
-        X31XuUudgprYurhwKXpQ0gFeYW27WqU=
-X-Google-Smtp-Source: APXvYqxPCChHRFanP/sFGlhVTRTI3yWFc7fZq6TDXEsUJclACOL+YZ7jSqEE28G9RJ/P3W29GbPl0Q==
-X-Received: by 2002:a65:6108:: with SMTP id z8mr53000362pgu.289.1564026725425;
-        Wed, 24 Jul 2019 20:52:05 -0700 (PDT)
-Received: from ?IPv6:2402:f000:4:72:808::177e? ([2402:f000:4:72:808::177e])
-        by smtp.gmail.com with ESMTPSA id z6sm19026125pgk.18.2019.07.24.20.52.03
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 24 Jul 2019 20:52:05 -0700 (PDT)
-Subject: Re: [PATCH] fs: crypto: keyinfo: Fix a possible null-pointer
- dereference in derive_key_aes()
-To:     tytso@mit.edu, jaegeuk@kernel.org, ebiggers@kernel.org
-References: <20190724100204.2009-1-baijiaju1990@gmail.com>
- <20190724160711.GB673@sol.localdomain>
- <3d206c43-994e-6134-3f28-b4a500472760@gmail.com>
- <9740973d-6e59-e4df-7097-4e5d0da89235@gmail.com>
- <20190725033951.GA677@sol.localdomain>
-Cc:     linux-fscrypt@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-From:   Jia-Ju Bai <baijiaju1990@gmail.com>
-Message-ID: <33ae3693-9792-a793-5e9e-aca845c427a5@gmail.com>
-Date:   Thu, 25 Jul 2019 11:52:07 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Thu, 25 Jul 2019 01:42:44 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57646 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2390918AbfGYFml (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 25 Jul 2019 01:42:41 -0400
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id F10CE22CB8;
+        Thu, 25 Jul 2019 05:42:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1564033360;
+        bh=ANVUNEMAe1jn6TZ1TL+1KmUas0lezeRrXvXkB9h6ki8=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=vQ7H4HYNkuERzU6iLwlAmPgucZhfFIPhdWz9dPd2u/NW/+WDZCebY+9wVo+mbqhYj
+         AWg2SEYGU6ihCyWjMaZzMACrvepJZ1s6AIrXWHzzJYgf1V7nlnz+FLyee/U3YDQLkb
+         RNhhHzad4rXWjv8wrhzSED67WVivmqnh7oiHCy+Q=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        stable@vger.kernel.org, Wen Yang <wen.yang99@zte.com.cn>,
+        "David S. Miller" <davem@davemloft.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Allison Randal <allison@lohutok.net>,
+        Armijn Hemel <armijn@tjaldur.nl>,
+        Julia Lawall <Julia.Lawall@lip6.fr>,
+        linux-crypto@vger.kernel.org, Julia Lawall <julia.lawall@lip6.fr>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [PATCH 4.19 182/271] crypto: crypto4xx - fix a potential double free in ppc4xx_trng_probe
+Date:   Wed, 24 Jul 2019 21:20:51 +0200
+Message-Id: <20190724191710.728178886@linuxfoundation.org>
+X-Mailer: git-send-email 2.22.0
+In-Reply-To: <20190724191655.268628197@linuxfoundation.org>
+References: <20190724191655.268628197@linuxfoundation.org>
+User-Agent: quilt/0.66
 MIME-Version: 1.0
-In-Reply-To: <20190725033951.GA677@sol.localdomain>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+From: Wen Yang <wen.yang99@zte.com.cn>
+
+commit 95566aa75cd6b3b404502c06f66956b5481194b3 upstream.
+
+There is a possible double free issue in ppc4xx_trng_probe():
+
+85:	dev->trng_base = of_iomap(trng, 0);
+86:	of_node_put(trng);          ---> released here
+87:	if (!dev->trng_base)
+88:		goto err_out;
+...
+110:	ierr_out:
+111:		of_node_put(trng);  ---> double released here
+...
+
+This issue was detected by using the Coccinelle software.
+We fix it by removing the unnecessary of_node_put().
+
+Fixes: 5343e674f32f ("crypto4xx: integrate ppc4xx-rng into crypto4xx")
+Signed-off-by: Wen Yang <wen.yang99@zte.com.cn>
+Cc: <stable@vger.kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Allison Randal <allison@lohutok.net>
+Cc: Armijn Hemel <armijn@tjaldur.nl>
+Cc: Julia Lawall <Julia.Lawall@lip6.fr>
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Acked-by: Julia Lawall <julia.lawall@lip6.fr>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+---
+ drivers/crypto/amcc/crypto4xx_trng.c |    1 -
+ 1 file changed, 1 deletion(-)
+
+--- a/drivers/crypto/amcc/crypto4xx_trng.c
++++ b/drivers/crypto/amcc/crypto4xx_trng.c
+@@ -111,7 +111,6 @@ void ppc4xx_trng_probe(struct crypto4xx_
+ 	return;
+ 
+ err_out:
+-	of_node_put(trng);
+ 	iounmap(dev->trng_base);
+ 	kfree(rng);
+ 	dev->trng_base = NULL;
 
 
-On 2019/7/25 11:39, Eric Biggers wrote:
-> On Thu, Jul 25, 2019 at 11:33:53AM +0800, Jia-Ju Bai wrote:
->> Sorry, I forgot to send to Eric, so send it again.
->>
->> On 2019/7/25 11:30, Jia-Ju Bai wrote:
->>>
->>> On 2019/7/25 0:07, Eric Biggers wrote:
->>>> [+Cc linux-crypto]
->>>>
->>>> On Wed, Jul 24, 2019 at 06:02:04PM +0800, Jia-Ju Bai wrote:
->>>>> In derive_key_aes(), tfm is assigned to NULL on line 46, and then
->>>>> crypto_free_skcipher(tfm) is executed.
->>>>>
->>>>> crypto_free_skcipher(tfm)
->>>>>       crypto_skcipher_tfm(tfm)
->>>>>           return &tfm->base;
->>>>>
->>>>> Thus, a possible null-pointer dereference may occur.
->>>> This analysis is incorrect because only the address &tfm->base is taken.
->>>> There's no pointer dereference.
->>>>
->>>> In fact all the crypto_free_*() functions are no-ops on NULL
->>>> pointers, and many
->>>> other callers rely on it.  So there's no bug here.
->>> Thanks for the reply :)
->>> I admit that "&tfm->base" is not a null-pointer dereference when tfm is
->>> NULL.
->>> But I still think crypto_free_skcipher(tfm) can cause security problems
->>> when tfm is NULL.
->>>
->>> Looking at the code:
->>>
->>> static inline void crypto_free_skcipher(struct crypto_skcipher *tfm)
->>> {
->>>      crypto_destroy_tfm(tfm, crypto_skcipher_tfm(tfm));
->>> }
->>>
->>> static inline struct crypto_tfm *crypto_skcipher_tfm(
->>>      struct crypto_skcipher *tfm)
->>> {
->>>      return &tfm->base;
->>> }
->>>
->>> void crypto_destroy_tfm(void *mem, struct crypto_tfm *tfm)
->>> {
->>>      struct crypto_alg *alg;
->>>
->>>      if (unlikely(!mem))
->>>          return;
-> When the original pointer is NULL, mem == NULL here so crypto_destroy_tfm() is a
-> no-op.
-
-I overlooked this if statement, thanks for the pointer.
-
->
->>> Besides, I also find that some kernel modules check tfm before calling
->>> crypto_free_*(), such as:
->>>
->>> drivers/crypto/vmx/aes_xts.c:
->>>      if (ctx->fallback) {
->>>          crypto_free_skcipher(ctx->fallback);
->>>          ctx->fallback = NULL;
->>>      }
->>>
->>> net/rxrpc/rxkad.c:
->>>      if (conn->cipher)
->>>          crypto_free_skcipher(conn->cipher);
->>>
->>> drivers/crypto/chelsio/chcr_algo.c:
->>>      if (ablkctx->aes_generic)
->>>          crypto_free_cipher(ablkctx->aes_generic);
->>>
->>> net/mac80211/wep.c:
->>>      if (!IS_ERR(local->wep_tx_tfm))
->>>          crypto_free_cipher(local->wep_tx_tfm);
->>>
-> Well, people sometimes do that for kfree() too.  But that doesn't mean it's
-> needed, or that it's the preferred style (it's not).
-
-Okay.
-
-
-Best wishes,
-Jia-Ju Bai
