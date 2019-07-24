@@ -1,188 +1,151 @@
-Return-Path: <SRS0=XUD9=VU=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=LUcm=VV=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25A27C76186
-	for <linux-crypto@archiver.kernel.org>; Tue, 23 Jul 2019 22:39:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F460C7618B
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Jul 2019 05:04:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E5A7122387
-	for <linux-crypto@archiver.kernel.org>; Tue, 23 Jul 2019 22:39:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4E38E218DA
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Jul 2019 05:04:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731620AbfGWWju (ORCPT
+        id S1725900AbfGXFEL (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 23 Jul 2019 18:39:50 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:1924 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729299AbfGWWjt (ORCPT
+        Wed, 24 Jul 2019 01:04:11 -0400
+Received: from mailgw01.mediatek.com ([210.61.82.183]:59979 "EHLO
+        mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1725870AbfGXFEL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 23 Jul 2019 18:39:49 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x6NMavBK145068
-        for <linux-crypto@vger.kernel.org>; Tue, 23 Jul 2019 18:39:48 -0400
-Received: from e34.co.us.ibm.com (e34.co.us.ibm.com [32.97.110.152])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2tx97q4748-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <linux-crypto@vger.kernel.org>; Tue, 23 Jul 2019 18:39:48 -0400
-Received: from localhost
-        by e34.co.us.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-crypto@vger.kernel.org> from <bauerman@linux.ibm.com>;
-        Tue, 23 Jul 2019 23:39:47 +0100
-Received: from b03cxnp08025.gho.boulder.ibm.com (9.17.130.17)
-        by e34.co.us.ibm.com (192.168.1.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 23 Jul 2019 23:39:41 +0100
-Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
-        by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x6NMdemE46465390
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 23 Jul 2019 22:39:40 GMT
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 0D62C7805F;
-        Tue, 23 Jul 2019 22:39:40 +0000 (GMT)
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 3DDBF7805C;
-        Tue, 23 Jul 2019 22:39:32 +0000 (GMT)
-Received: from morokweng.localdomain (unknown [9.85.148.251])
-        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTPS;
-        Tue, 23 Jul 2019 22:39:31 +0000 (GMT)
-References: <20190628021934.4260-1-bauerman@linux.ibm.com> <20190628021934.4260-2-bauerman@linux.ibm.com> <20190701144752.GC25484@linux-8ccs> <87lfxel2q6.fsf@morokweng.localdomain> <20190704125427.31146026@laptop-ibm> <874l41ocf5.fsf@morokweng.localdomain> <20190705150000.372345b0@laptop-ibm>
-User-agent: mu4e 1.2.0; emacs 26.2
-From:   Thiago Jung Bauermann <bauerman@linux.ibm.com>
-To:     Philipp Rudo <prudo@linux.ibm.com>
-Cc:     Jessica Yu <jeyu@kernel.org>, linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
-        "James Morris" <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        "David Howells" <dhowells@redhat.com>,
-        David Woodhouse <dwmw2@infradead.org>,
+        Wed, 24 Jul 2019 01:04:11 -0400
+X-UUID: e0f47eec30464f22bd9e18ba89f1f95a-20190724
+X-UUID: e0f47eec30464f22bd9e18ba89f1f95a-20190724
+Received: from mtkmrs01.mediatek.inc [(172.21.131.159)] by mailgw01.mediatek.com
+        (envelope-from <neal.liu@mediatek.com>)
+        (mhqrelay.mediatek.com ESMTP with TLS)
+        with ESMTP id 29376682; Wed, 24 Jul 2019 13:04:03 +0800
+Received: from mtkcas09.mediatek.inc (172.21.101.178) by
+ mtkmbs07n1.mediatek.inc (172.21.101.16) with Microsoft SMTP Server (TLS) id
+ 15.0.1395.4; Wed, 24 Jul 2019 13:04:02 +0800
+Received: from [172.21.77.33] (172.21.77.33) by mtkcas09.mediatek.inc
+ (172.21.101.73) with Microsoft SMTP Server id 15.0.1395.4 via Frontend
+ Transport; Wed, 24 Jul 2019 13:04:02 +0800
+Message-ID: <1563944642.13531.0.camel@mtkswgap22>
+Subject: Re: [PATCH v4 2/3] dt-bindings: rng: add bindings for MediaTek
+ ARMv8 SoCs
+From:   Neal Liu <neal.liu@mediatek.com>
+To:     Rob Herring <robh@kernel.org>
+CC:     Mark Rutland <mark.rutland@arm.com>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jonathan Corbet <corbet@lwn.net>,
-        "AKASHI\, Takahiro" <takahiro.akashi@linaro.org>,
-        Heiko Carstens <heiko.carstens@de.ibm.com>,
-        linux-s390@vger.kernel.org
-Subject: Re: [PATCH v12 01/11] MODSIGN: Export module signature definitions
-In-reply-to: <20190705150000.372345b0@laptop-ibm>
-Date:   Tue, 23 Jul 2019 19:39:27 -0300
+        wsd_upstream <wsd_upstream@mediatek.com>,
+        Sean Wang <sean.wang@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Crystal Guo =?UTF-8?Q?=28=E9=83=AD=E6=99=B6=29?= 
+        <Crystal.Guo@mediatek.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Matt Mackall <mpm@selenic.com>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        "linux-mediatek@lists.infradead.org" 
+        <linux-mediatek@lists.infradead.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>
+Date:   Wed, 24 Jul 2019 13:04:02 +0800
+In-Reply-To: <CAL_Jsq+SRhd=-5O2G_CMfJX9Z188kvA05MQOXaU1J8iExwUixQ@mail.gmail.com>
+References: <1561361052-13072-1-git-send-email-neal.liu@mediatek.com>
+         <1561361052-13072-3-git-send-email-neal.liu@mediatek.com>
+         <20190722171320.GA9806@bogus> <1563848465.31451.4.camel@mtkswgap22>
+         <CAL_Jsq+SRhd=-5O2G_CMfJX9Z188kvA05MQOXaU1J8iExwUixQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.2.3-0ubuntu6 
+Content-Transfer-Encoding: 7bit
 MIME-Version: 1.0
-Content-Type: text/plain
-X-TM-AS-GCONF: 00
-x-cbid: 19072322-0016-0000-0000-000009D393BA
-X-IBM-SpamModules-Scores: 
-X-IBM-SpamModules-Versions: BY=3.00011484; HX=3.00000242; KW=3.00000007;
- PH=3.00000004; SC=3.00000287; SDB=6.01236487; UDB=6.00651706; IPR=6.01017844;
- MB=3.00027860; MTD=3.00000008; XFM=3.00000015; UTC=2019-07-23 22:39:46
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19072322-0017-0000-0000-0000442346CA
-Message-Id: <8736iw9y00.fsf@morokweng.localdomain>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-07-23_09:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1906280000 definitions=main-1907230230
+X-MTK:  N
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Tue, 2019-07-23 at 08:35 -0600, Rob Herring wrote:
+> On Mon, Jul 22, 2019 at 8:21 PM Neal Liu <neal.liu@mediatek.com> wrote:
+> >
+> 
+> Please don't top post to lists.
+> 
+> > Dear Rob,
+> >         You can check my driver for detail:
+> >         http://patchwork.kernel.org/patch/11012475/ or patchset 3/3
+> 
+> I could, or you could just answer my question.
+> 
+> >
+> >         This driver is registered as hardware random number generator, and
+> > combines with rng-core.
+> >         We want to add one rng hw based on the dts. Is this proper or do you
+> > have other suggestion to meet this requirement?
+> 
+> It depends. There doesn't appear to be any resource configuration, so
+> why does it need to be in DT. DT is not the only way instantiate
+> drivers.
+> 
+> Rob
 
-Hello Philipp,
+This hwrng is only supported on some chipsets. It needs DT to identify
+which platform is supported or not. Is there any better idea to meet
+this requirement?
 
+Neal
 
-Philipp Rudo <prudo@linux.ibm.com> writes:
+> >
+> >         Thanks
+> >
+> >
+> > On Tue, 2019-07-23 at 01:13 +0800, Rob Herring wrote:
+> > > On Mon, Jun 24, 2019 at 03:24:11PM +0800, Neal Liu wrote:
+> > > > Document the binding used by the MediaTek ARMv8 SoCs random
+> > > > number generator with TrustZone enabled.
+> > > >
+> > > > Signed-off-by: Neal Liu <neal.liu@mediatek.com>
+> > > > ---
+> > > >  .../devicetree/bindings/rng/mtk-sec-rng.txt        |   10 ++++++++++
+> > > >  1 file changed, 10 insertions(+)
+> > > >  create mode 100644 Documentation/devicetree/bindings/rng/mtk-sec-rng.txt
+> > > >
+> > > > diff --git a/Documentation/devicetree/bindings/rng/mtk-sec-rng.txt b/Documentation/devicetree/bindings/rng/mtk-sec-rng.txt
+> > > > new file mode 100644
+> > > > index 0000000..c04ce15
+> > > > --- /dev/null
+> > > > +++ b/Documentation/devicetree/bindings/rng/mtk-sec-rng.txt
+> > > > @@ -0,0 +1,10 @@
+> > > > +MediaTek random number generator with TrustZone enabled
+> > > > +
+> > > > +Required properties:
+> > > > +- compatible : Should be "mediatek,mtk-sec-rng"
+> > >
+> > > What's the interface to access this?
+> > >
+> > > A node with a 'compatible' and nothing else is a sign of something that
+> > > a parent device should instantiate and doesn't need to be in DT. IOW,
+> > > what do complete bindings for firmware functions look like?
+> > >
+> > > > +
+> > > > +Example:
+> > > > +
+> > > > +hwrng: hwrng {
+> > > > +   compatible = "mediatek,mtk-sec-rng";
+> > > > +}
+> > > > --
+> > > > 1.7.9.5
+> > > >
+> > >
+> > > _______________________________________________
+> > > Linux-mediatek mailing list
+> > > Linux-mediatek@lists.infradead.org
+> > > http://lists.infradead.org/mailman/listinfo/linux-mediatek
+> >
+> >
 
-> Hi Thiago,
->
-> On Thu, 04 Jul 2019 15:57:34 -0300
-> Thiago Jung Bauermann <bauerman@linux.ibm.com> wrote:
->
->> Hello Philipp,
->> 
->> Philipp Rudo <prudo@linux.ibm.com> writes:
->> 
->> > Hi Thiago,
->> >
->> >
->> > On Thu, 04 Jul 2019 03:42:57 -0300
->> > Thiago Jung Bauermann <bauerman@linux.ibm.com> wrote:
->> >  
->> >> Jessica Yu <jeyu@kernel.org> writes:
->> >>   
->> >> > +++ Thiago Jung Bauermann [27/06/19 23:19 -0300]:    
->> >> >>IMA will use the module_signature format for append signatures, so export
->> >> >>the relevant definitions and factor out the code which verifies that the
->> >> >>appended signature trailer is valid.
->> >> >>
->> >> >>Also, create a CONFIG_MODULE_SIG_FORMAT option so that IMA can select it
->> >> >>and be able to use mod_check_sig() without having to depend on either
->> >> >>CONFIG_MODULE_SIG or CONFIG_MODULES.
->> >> >>
->> >> >>Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
->> >> >>Reviewed-by: Mimi Zohar <zohar@linux.ibm.com>
->> >> >>Cc: Jessica Yu <jeyu@kernel.org>
->> >> >>---
->> >> >> include/linux/module.h           |  3 --
->> >> >> include/linux/module_signature.h | 44 +++++++++++++++++++++++++
->> >> >> init/Kconfig                     |  6 +++-
->> >> >> kernel/Makefile                  |  1 +
->> >> >> kernel/module.c                  |  1 +
->> >> >> kernel/module_signature.c        | 46 ++++++++++++++++++++++++++
->> >> >> kernel/module_signing.c          | 56 +++++---------------------------
->> >> >> scripts/Makefile                 |  2 +-
->> >> >> 8 files changed, 106 insertions(+), 53 deletions(-)
->> >> >>
->> >> >>diff --git a/include/linux/module.h b/include/linux/module.h
->> >> >>index 188998d3dca9..aa56f531cf1e 100644
->> >> >>--- a/include/linux/module.h
->> >> >>+++ b/include/linux/module.h
->> >> >>@@ -25,9 +25,6 @@
->> >> >> #include <linux/percpu.h>
->> >> >> #include <asm/module.h>
->> >> >>
->> >> >>-/* In stripped ARM and x86-64 modules, ~ is surprisingly rare. */
->> >> >>-#define MODULE_SIG_STRING "~Module signature appended~\n"
->> >> >>-    
->> >> >
->> >> > Hi Thiago, apologies for the delay.    
->> >> 
->> >> Hello Jessica, thanks for reviewing the patch!
->> >>   
->> >> > It looks like arch/s390/kernel/machine_kexec_file.c also relies on
->> >> > MODULE_SIG_STRING being defined, so module_signature.h will need to be
->> >> > included there too, otherwise we'll run into a compilation error.    
->> >> 
->> >> Indeed. Thanks for spotting that. The patch below fixes it. It's
->> >> identical to the previous version except for the changes in 
->> >> arch/s390/kernel/machine_kexec_file.c and their description in the
->> >> commit message. I'm also copying some s390 people in this email.  
->> >
->> > to me the s390 part looks good but for one minor nit.  
->> 
->> Thanks for the prompt review!
->> 
->> > In arch/s390/Kconfig KEXEC_VERIFY_SIG currently depends on
->> > SYSTEM_DATA_VERIFICATION. I'd prefer when you update this to the new
->> > MODULE_SIG_FORMAT. It shouldn't make any difference right now, as we don't
->> > use mod_check_sig in our code path. But it could cause problems in the future,
->> > when more code might be shared.  
->> 
->> Makes sense. Here is the updated patch with the Kconfig change.
->> 
->
-> The patch looks good now.
-
-Thanks! Can I add your Reviewed-by?
-
--- 
-Thiago Jung Bauermann
-IBM Linux Technology Center
 
