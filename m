@@ -2,866 +2,234 @@ Return-Path: <SRS0=LUcm=VV=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FD29C7618B
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 Jul 2019 10:38:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7F5EC7618B
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Jul 2019 12:23:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E84FA229ED
-	for <linux-crypto@archiver.kernel.org>; Wed, 24 Jul 2019 10:38:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A25B022CB8
+	for <linux-crypto@archiver.kernel.org>; Wed, 24 Jul 2019 12:23:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IZS6B8uR"
+	dkim=pass (1024-bit key) header.d=verimatrix.com header.i=@verimatrix.com header.b="hNCfLD6Z"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726481AbfGXKiD (ORCPT
+        id S1728269AbfGXMXW (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 24 Jul 2019 06:38:03 -0400
-Received: from mail-ed1-f68.google.com ([209.85.208.68]:41959 "EHLO
-        mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726070AbfGXKiC (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 24 Jul 2019 06:38:02 -0400
-Received: by mail-ed1-f68.google.com with SMTP id p15so46650799eds.8
-        for <linux-crypto@vger.kernel.org>; Wed, 24 Jul 2019 03:37:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=iOWIqTvQBkKoTPY8o+dEQlL2k+Zj1oLYbp0TIo1TFG0=;
-        b=IZS6B8uR9AmrXt/3BvGdKnz1CVbQ55IBcz0EKfl9R1xGH6EiLudCHMuNAMtcU0qxvx
-         fmZmn7J0y6UkPPDB2HwSHg5W7HVnqQFPC8lLpuA/HKxpEXM9M6Cd208B+P/DFTbR1a/T
-         ia+hqXTmN8MITTrxhSD5LSZ4NdAiFmF7QKeAKuk/H/akamQAMn250pnMjQXM8jGdbzt2
-         VZ6z+tnf59uSaoYb6RVOkAqBVKg+FM7IhNbb/XVdO9t29jSl5mAF4aIFiFPR2exDI4IC
-         6NwuhGHmXUeKM8ZNuAlz1FT1B2noXpG4Eucs7suDKBADtMQSZi3bBANaxGR3/yTjLNBD
-         6D/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=iOWIqTvQBkKoTPY8o+dEQlL2k+Zj1oLYbp0TIo1TFG0=;
-        b=p27EKDIvkJ/i/avDZkiR5pfwfgucP0wPsWYibaDoFvjvHq9f9BQ135GLzM4PWO/Jqj
-         0SvJqj1BEOg5y9RbhzPl+YZ6LMvazcD+kL5e6LFPx7XY1Ldi6WwVLr1KO88pbo1Ljycd
-         DjkPpiH1n/9Vuk0HLC3nIBwaChz/CCq/GiqPHOWDrK79hMbHjhQN216/QIEgTYunKlH9
-         KlN+d8x2IUNCFqyAWtqHoznZp28UhiSLzNxogeIx0WBnVNZwUOEEr5O26taR1sQMIRvJ
-         iR3i0A8pv/+/CvhCtxDOmG7e8cAHdoOQlcp/W5REa3Mtfj1ahzhPG3AvkJ7BSCLpxsj1
-         ZO0g==
-X-Gm-Message-State: APjAAAUJwqpLm6ivdxaO+AMgjMJgSAflHbcXMwXgR1X0Luf3UFnok3Se
-        htQjGuLxHeQQO44Qfcm+Y3uqI5dc
-X-Google-Smtp-Source: APXvYqx1ExtNeUT15ZbPwIRmVod8ZoddM/Yd2d9NuAlt3cjGWNkp5xCtZgxpYEDjWDopDf7X/jCm2A==
-X-Received: by 2002:a17:906:b6ce:: with SMTP id ec14mr51188302ejb.81.1563964678612;
-        Wed, 24 Jul 2019 03:37:58 -0700 (PDT)
-Received: from localhost.localdomain.com ([188.204.2.113])
-        by smtp.gmail.com with ESMTPSA id l1sm12326900edr.17.2019.07.24.03.37.57
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 24 Jul 2019 03:37:57 -0700 (PDT)
-From:   Pascal van Leeuwen <pascalvanl@gmail.com>
-X-Google-Original-From: Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
-To:     linux-crypto@vger.kernel.org
-Cc:     ebiggers@kernel.org, herbert@gondor.apana.org.au,
-        davem@davemloft.net,
-        Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
-Subject: [PATCH] crypto: testmgr - Improve randomization of params for AEAD fuzz testing
-Date:   Wed, 24 Jul 2019 11:35:17 +0200
-Message-Id: <1563960917-8236-1-git-send-email-pvanleeuwen@verimatrix.com>
-X-Mailer: git-send-email 1.8.3.1
+        Wed, 24 Jul 2019 08:23:22 -0400
+Received: from mail-eopbgr800059.outbound.protection.outlook.com ([40.107.80.59]:7232
+        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728286AbfGXMXW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 24 Jul 2019 08:23:22 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Bklc5d70dPmRj918WRFeeIf69ULXOeD1inuRtSKNq0R9a9zFgoiAVs9HkN4BqMfDHYDtjgkGtQ8UIbBhix+5i9lfmYBZIdnkTzkVryhqyaiV/Cy66e8ACBAFWkWhMQN3jARrbxWB5nlsGlGCpOyEBOxDqePJSG0p0PlHlszPXoL5MTVzLHd+SN1itOi9rcdqkPfFSWfsTM90LNatKnkXou6YFENAlZBBXz5Kw9C2otwi/BXUZM1F+1oIbMbAZxP34uUrY+Llzta62Vt5LLh4NejktPWgbtRbqdU5ab6XOu75udt9XbOf04GKpZoKi1rb7aZ1niMcVX5XD9AwZDE45A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LVcNjOKsSX51dlzuogs1l/4S6AvBDdvw9+Bbsa0sj1M=;
+ b=kvSZuYR+UucS+uiBoWsML8MFGse5KBZ0d1uHU4DFqE+DF4TjE4OjfoqJBzaBoicmd1S2Qy1Z0mvoOByUEXV2i1eryuQDHOUgqvDP6JjKQTdiPIVViPa5HLGoBfTxgnF9xZ6einOTjbZmrGgP+pNeWa0nP3GbxlgYsw6B1gPnR/a3JEI3kJyMLUd52l9qyPynwxjIGPe/g/TCQjAlNTh4bPRgDPzxY9JBtCSWJq2OKQ/pUghUq2XwlLHTgY9BpcFmtIaDXydEVnehTm0tsLqjzqlqH3gx21c5oHs+xCsweQE7EeLaA0twF9WZx8GHzse7eo6mH0DcMrvZoYG80S+CeQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
+ smtp.mailfrom=verimatrix.com;dmarc=pass action=none
+ header.from=verimatrix.com;dkim=pass header.d=verimatrix.com;arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verimatrix.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LVcNjOKsSX51dlzuogs1l/4S6AvBDdvw9+Bbsa0sj1M=;
+ b=hNCfLD6ZEMhZbal1WmE1cVm7EaVVLjzCBHm17/N3yjPdoug5DWzOtizmShyIeBVIAl+/M/5Afly/vE1WMijMq/7VacR+xUpm14iLril2ZAUGlvd0NBDn3GoWc/XFxP0DqVHY5XidjBwQmPN8dUzxrtA3kHw+WpI4a8dQcSsGtDI=
+Received: from MN2PR20MB2973.namprd20.prod.outlook.com (52.132.172.146) by
+ MN2PR20MB3085.namprd20.prod.outlook.com (52.132.174.22) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2115.10; Wed, 24 Jul 2019 12:23:18 +0000
+Received: from MN2PR20MB2973.namprd20.prod.outlook.com
+ ([fe80::68d7:2bbb:af61:2e69]) by MN2PR20MB2973.namprd20.prod.outlook.com
+ ([fe80::68d7:2bbb:af61:2e69%6]) with mapi id 15.20.2094.017; Wed, 24 Jul 2019
+ 12:23:17 +0000
+From:   Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+CC:     Milan Broz <gmazyland@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Horia Geanta <horia.geanta@nxp.com>
+Subject: RE: [dm-devel] xts fuzz testing and lack of ciphertext stealing
+ support
+Thread-Topic: [dm-devel] xts fuzz testing and lack of ciphertext stealing
+ support
+Thread-Index: AQHVO/5l0aVU4O6KC0WgPIqEsMQCDqbPEhUAgAALMYCAANVxgIAABoCAgAABwICAAAUbgIAAFRTAgAAoQICAAtuUgIAACm4AgAG39ACAAYCLgIAAhUWAgALaEJA=
+Date:   Wed, 24 Jul 2019 12:23:17 +0000
+Message-ID: <MN2PR20MB2973803167748E965235D460CAC60@MN2PR20MB2973.namprd20.prod.outlook.com>
+References: <20190716221639.GA44406@gmail.com>
+ <VI1PR0402MB34857BBB18C2BB8CBA2DEC7198C90@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+ <20190717172823.GA205944@gmail.com>
+ <CAKv+Gu__offPaWvyURJr8v56ig58q-Deo16QhP26EJ32uf5m3w@mail.gmail.com>
+ <20190718065223.4xaefcwjoxvujntw@gondor.apana.org.au>
+ <CAKv+Gu9-EWNpJ9viSsjhYRdOZb=7a=Mpddmyt8SLEq9aFtawjg@mail.gmail.com>
+ <20190718072154.m2umem24x4grbf6w@gondor.apana.org.au>
+ <36e78459-1594-6d19-0ab4-95b03a6de036@gmail.com>
+ <MN2PR20MB2973E61815F069E8C7D74177CAC80@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <b042649c-db98-9710-b063-242bdf520252@gmail.com>
+ <20190720065807.GA711@sol.localdomain>
+ <0d4d6387-777c-bfd3-e54a-e7244fde0096@gmail.com>
+ <CAKv+Gu9UF+a1UhVU19g1XcLaEqEaAwwkSm3-2wTHEAdD-q4mLQ@mail.gmail.com>
+ <MN2PR20MB2973B9C2DDC508A81AF4A207CAC40@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <CAKv+Gu9C2AEbb++W=QTVWbeA_88Fo57NcOwgU5R8HBvzFwXkJw@mail.gmail.com>
+In-Reply-To: <CAKv+Gu9C2AEbb++W=QTVWbeA_88Fo57NcOwgU5R8HBvzFwXkJw@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=pvanleeuwen@verimatrix.com; 
+x-originating-ip: [188.204.2.113]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: ac3b5ca6-e07f-43b1-370f-08d71031b568
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:MN2PR20MB3085;
+x-ms-traffictypediagnostic: MN2PR20MB3085:
+x-ms-exchange-purlcount: 2
+x-microsoft-antispam-prvs: <MN2PR20MB3085F8EC1FFDBAD5575A4550CAC60@MN2PR20MB3085.namprd20.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-forefront-prvs: 0108A997B2
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(346002)(376002)(366004)(39850400004)(136003)(396003)(199004)(189003)(13464003)(33656002)(76116006)(15974865002)(86362001)(5660300002)(25786009)(54906003)(52536014)(316002)(478600001)(8936002)(81166006)(81156014)(68736007)(76176011)(966005)(8676002)(14454004)(66066001)(7696005)(99286004)(66446008)(64756008)(66556008)(66476007)(66946007)(102836004)(53936002)(26005)(2906002)(6436002)(6506007)(53546011)(7736002)(305945005)(186003)(6246003)(74316002)(71200400001)(71190400001)(55016002)(6916009)(6306002)(229853002)(256004)(14444005)(9686003)(486006)(11346002)(476003)(4326008)(6116002)(3846002)(446003)(18886075002);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR20MB3085;H:MN2PR20MB2973.namprd20.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: verimatrix.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: x5hUnANYEdHuYxyZOXPnEdM0zE8xW0KqXfU8JJLKY+vjXeQerwJzihV1PIqulgkHqjquUh8flhmXtwML4rZ7Ejv3NRvjv86VN1N3LL5j22wwVC9VDcK/zye6VdxBQCl9+Bd5+RGSnSlZY+XItAJtaNLaXcWcHDjDf36FAk2GIVYrbAoDasMX4zlqQP6oDBrGXoEBFFQza3uBSNPo2Ikd0P0/9KycKOGD4c+gRWdWlh9NQI5gRYOakFi7G6K49jEFIa3LMS7TTJMKpCUJYcY3NSiV66fno6YYopmElOicPGiFuRYw/mwwL+NeSw/0PtAa0oDo0I8STnrVlxA1jaFneR9dJW5nZXYRhaFIwwKsgIAkl/DBaR/f/UDrHpZly3VBXoYv3NL14YXOugOWotq4vm+1tNN2Q8DkjGC9kGxlZUo=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: verimatrix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ac3b5ca6-e07f-43b1-370f-08d71031b568
+X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Jul 2019 12:23:17.7473
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: dcb260f9-022d-4495-8602-eae51035a0d0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: pvanleeuwen@verimatrix.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR20MB3085
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The probability of hitting specific input length corner cases relevant
-for certain hardware driver(s) (specifically: inside-secure) was found
-to be too low. Additionally, for authenc AEADs, the probability of
-generating a *legal* key blob approached zero, i.e. most vectors
-generated would only test the proper generation of a key blob error.
-
-This patch address both of these issues by improving the random
-generation of data lengths (for the key, but also for the ICV output
-and the AAD and plaintext inputs), making the random generation
-individually tweakable on a per-ciphersuite basis.
-
-Finally, this patch enables fuzz testing for AEAD ciphersuites that do
-not have a regular testsuite defined as it no longer depends on that
-regular testsuite for figuring out the key size.
-
-Signed-off-by: Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
----
- crypto/testmgr.c | 269 +++++++++++++++++++++++++++++++++++++++++++------
- crypto/testmgr.h | 298 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 535 insertions(+), 32 deletions(-)
-
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 2ba0c48..9c856d3 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -84,11 +84,24 @@ int alg_test(const char *driver, const char *alg, u32 type, u32 mask)
- #define ENCRYPT 1
- #define DECRYPT 0
- 
-+struct len_range_set {
-+	const struct len_range_sel *lensel;
-+	unsigned int count;
-+};
-+
- struct aead_test_suite {
- 	const struct aead_testvec *vecs;
- 	unsigned int count;
- };
- 
-+struct aead_test_params {
-+	struct len_range_set ckeylensel;
-+	struct len_range_set akeylensel;
-+	struct len_range_set authsizesel;
-+	struct len_range_set aadlensel;
-+	struct len_range_set ptxtlensel;
-+};
-+
- struct cipher_test_suite {
- 	const struct cipher_testvec *vecs;
- 	unsigned int count;
-@@ -143,6 +156,10 @@ struct alg_test_desc {
- 		struct akcipher_test_suite akcipher;
- 		struct kpp_test_suite kpp;
- 	} suite;
-+
-+	union {
-+		struct aead_test_params aead;
-+	} params;
- };
- 
- static void hexdump(unsigned char *buf, unsigned int len)
-@@ -189,9 +206,6 @@ static void testmgr_free_buf(char *buf[XBUFSIZE])
- 	__testmgr_free_buf(buf, 0);
- }
- 
--#define TESTMGR_POISON_BYTE	0xfe
--#define TESTMGR_POISON_LEN	16
--
- static inline void testmgr_poison(void *addr, size_t len)
- {
- 	memset(addr, TESTMGR_POISON_BYTE, len);
-@@ -2035,6 +2049,19 @@ static int test_aead_vec(const char *driver, int enc,
- }
- 
- #ifdef CONFIG_CRYPTO_MANAGER_EXTRA_TESTS
-+/* Select a random length value from a list of range specs */
-+int random_lensel(const struct len_range_set *lens)
-+{
-+	u32 i, sel = prandom_u32() % 1000;
-+
-+	for (i = 0; i < lens->count; i++)
-+		if (sel < lens->lensel[i].threshold)
-+			return (prandom_u32() % (lens->lensel[i].len_hi  -
-+						 lens->lensel[i].len_lo + 1)) +
-+				lens->lensel[i].len_lo;
-+	return -1;
-+}
-+
- /*
-  * Generate an AEAD test vector from the given implementation.
-  * Assumes the buffers in 'vec' were already allocated.
-@@ -2043,44 +2070,83 @@ static void generate_random_aead_testvec(struct aead_request *req,
- 					 struct aead_testvec *vec,
- 					 unsigned int maxkeysize,
- 					 unsigned int maxdatasize,
-+					 const struct aead_test_params *lengths,
- 					 char *name, size_t max_namelen)
- {
- 	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
- 	const unsigned int ivsize = crypto_aead_ivsize(tfm);
- 	unsigned int maxauthsize = crypto_aead_alg(tfm)->maxauthsize;
--	unsigned int authsize;
-+	int authsize, clen, alen;
- 	unsigned int total_len;
- 	int i;
- 	struct scatterlist src[2], dst;
- 	u8 iv[MAX_IVLEN];
- 	DECLARE_CRYPTO_WAIT(wait);
- 
--	/* Key: length in [0, maxkeysize], but usually choose maxkeysize */
--	vec->klen = maxkeysize;
--	if (prandom_u32() % 4 == 0)
--		vec->klen = prandom_u32() % (maxkeysize + 1);
--	generate_random_bytes((u8 *)vec->key, vec->klen);
-+	alen = random_lensel(&lengths->akeylensel);
-+	clen = random_lensel(&lengths->ckeylensel);
-+	if ((alen >= 0) && (clen >= 0)) {
-+		/* Corect blob header. TBD: Do we care about corrupting this? */
-+#ifdef __LITTLE_ENDIAN
-+		memcpy((void *)vec->key, "\x08\x00\x01\x00\x00\x00\x00\x10", 8);
-+#else
-+		memcpy((void *)vec->key, "\x00\x08\x00\x01\x00\x00\x00\x10", 8);
-+#endif
-+
-+		/* Generate keys based on length templates */
-+		generate_random_bytes((u8 *)(vec->key + 8), alen);
-+		generate_random_bytes((u8 *)(vec->key + 8 + alen),
-+				      clen);
-+
-+		vec->klen = 8 + alen + clen;
-+	} else {
-+		if (clen >= 0)
-+			maxkeysize = clen;
-+
-+		vec->klen = maxkeysize;
-+
-+		/*
-+		 * Key: length in [0, maxkeysize],
-+		 * but usually choose maxkeysize
-+		 */
-+		if (prandom_u32() % 4 == 0)
-+			vec->klen = prandom_u32() % (maxkeysize + 1);
-+		generate_random_bytes((u8 *)vec->key, vec->klen);
-+	}
- 	vec->setkey_error = crypto_aead_setkey(tfm, vec->key, vec->klen);
- 
- 	/* IV */
- 	generate_random_bytes((u8 *)vec->iv, ivsize);
- 
--	/* Tag length: in [0, maxauthsize], but usually choose maxauthsize */
--	authsize = maxauthsize;
--	if (prandom_u32() % 4 == 0)
--		authsize = prandom_u32() % (maxauthsize + 1);
-+	authsize = random_lensel(&lengths->authsizesel);
-+	if (authsize < 0) {
-+		/*
-+		 * Tag length: in [0, maxauthsize],
-+		 * but usually choose maxauthsize
-+		 */
-+		authsize = maxauthsize;
-+		if (prandom_u32() % 4 == 0)
-+			authsize = prandom_u32() % (maxauthsize + 1);
-+	}
- 	if (WARN_ON(authsize > maxdatasize))
- 		authsize = maxdatasize;
--	maxdatasize -= authsize;
- 	vec->setauthsize_error = crypto_aead_setauthsize(tfm, authsize);
- 
- 	/* Plaintext and associated data */
--	total_len = generate_random_length(maxdatasize);
--	if (prandom_u32() % 4 == 0)
--		vec->alen = 0;
--	else
--		vec->alen = generate_random_length(total_len);
--	vec->plen = total_len - vec->alen;
-+	alen = random_lensel(&lengths->aadlensel);
-+	clen = random_lensel(&lengths->ptxtlensel);
-+	maxdatasize -= authsize;
-+	if ((alen < 0) || (clen < 0) || ((alen + clen) > maxdatasize)) {
-+		total_len = generate_random_length(maxdatasize);
-+		if (prandom_u32() % 4 == 0)
-+			vec->alen = 0;
-+		else
-+			vec->alen = generate_random_length(total_len);
-+		vec->plen = total_len - vec->alen;
-+	} else {
-+		vec->alen = alen;
-+		vec->plen = clen;
-+	}
- 	generate_random_bytes((u8 *)vec->assoc, vec->alen);
- 	generate_random_bytes((u8 *)vec->ptext, vec->plen);
- 
-@@ -2133,7 +2199,7 @@ static int test_aead_vs_generic_impl(const char *driver,
- 	char _generic_driver[CRYPTO_MAX_ALG_NAME];
- 	struct crypto_aead *generic_tfm = NULL;
- 	struct aead_request *generic_req = NULL;
--	unsigned int maxkeysize;
-+	unsigned int maxkeysize, maxakeysize;
- 	unsigned int i;
- 	struct aead_testvec vec = { 0 };
- 	char vec_name[64];
-@@ -2203,9 +2269,27 @@ static int test_aead_vs_generic_impl(const char *driver,
- 	 */
- 
- 	maxkeysize = 0;
--	for (i = 0; i < test_desc->suite.aead.count; i++)
-+	for (i = 0; i < test_desc->params.aead.ckeylensel.count; i++)
- 		maxkeysize = max_t(unsigned int, maxkeysize,
--				   test_desc->suite.aead.vecs[i].klen);
-+			test_desc->params.aead.ckeylensel.lensel[i].len_hi);
-+
-+	if (maxkeysize && test_desc->params.aead.akeylensel.count) {
-+		/* authenc, explicit keylen ranges defined, use them */
-+		maxakeysize = 0;
-+		for (i = 0; i < test_desc->params.aead.akeylensel.count; i++)
-+			maxakeysize = max_t(unsigned int, maxakeysize,
-+			   test_desc->params.aead.akeylensel.lensel[i].len_hi);
-+		maxkeysize = 8 + maxkeysize + maxakeysize;
-+	} else if (!maxkeysize && test_desc->suite.aead.count) {
-+		/* attempt to derive from test vectors */
-+		for (i = 0; i < test_desc->suite.aead.count; i++)
-+			maxkeysize = max_t(unsigned int, maxkeysize,
-+					test_desc->suite.aead.vecs[i].klen);
-+	} else {
-+		pr_err("alg: aead: no key length templates or test vectors for %s - unable to fuzz\n",
-+		       driver);
-+		err = -EINVAL;
-+	}
- 
- 	vec.key = kmalloc(maxkeysize, GFP_KERNEL);
- 	vec.iv = kmalloc(ivsize, GFP_KERNEL);
-@@ -2220,6 +2304,7 @@ static int test_aead_vs_generic_impl(const char *driver,
- 	for (i = 0; i < fuzz_iterations * 8; i++) {
- 		generate_random_aead_testvec(generic_req, &vec,
- 					     maxkeysize, maxdatasize,
-+					     &test_desc->params.aead,
- 					     vec_name, sizeof(vec_name));
- 		generate_random_testvec_config(&cfg, cfgname, sizeof(cfgname));
- 
-@@ -2280,11 +2365,6 @@ static int alg_test_aead(const struct alg_test_desc *desc, const char *driver,
- 	struct cipher_test_sglists *tsgls = NULL;
- 	int err;
- 
--	if (suite->count <= 0) {
--		pr_err("alg: aead: empty test suite for %s\n", driver);
--		return -EINVAL;
--	}
--
- 	tfm = crypto_alloc_aead(driver, type, mask);
- 	if (IS_ERR(tfm)) {
- 		pr_err("alg: aead: failed to allocate transform for %s: %ld\n",
-@@ -2308,6 +2388,11 @@ static int alg_test_aead(const struct alg_test_desc *desc, const char *driver,
- 		goto out;
- 	}
- 
-+	if (suite->count <= 0) {
-+		pr_err("alg: aead: empty test suite for %s\n", driver);
-+		goto aead_skip_testsuite;
-+	}
-+
- 	err = test_aead(driver, ENCRYPT, suite, req, tsgls);
- 	if (err)
- 		goto out;
-@@ -2316,7 +2401,9 @@ static int alg_test_aead(const struct alg_test_desc *desc, const char *driver,
- 	if (err)
- 		goto out;
- 
-+aead_skip_testsuite:
- 	err = test_aead_vs_generic_impl(driver, desc, req, tsgls);
-+
- out:
- 	free_cipher_test_sglists(tsgls);
- 	aead_request_free(req);
-@@ -3834,6 +3921,7 @@ static int alg_test_null(const struct alg_test_desc *desc,
- }
- 
- #define __VECS(tv)	{ .vecs = tv, .count = ARRAY_SIZE(tv) }
-+#define __LENS(ls)	{ .lensel = ls, .count = ARRAY_SIZE(ls) }
- 
- /* Please keep this list sorted by algorithm name. */
- static const struct alg_test_desc alg_test_descs[] = {
-@@ -3887,12 +3975,30 @@ static int alg_test_null(const struct alg_test_desc *desc,
- 		.fips_allowed = 1,
- 		.suite = {
- 			.aead = __VECS(hmac_sha1_aes_cbc_tv_temp)
-+		},
-+		.params = {
-+			.aead = {
-+				.ckeylensel = __LENS(aes_klen_template),
-+				.akeylensel = __LENS(sha1_klen_template),
-+				.authsizesel = __LENS(sha1_alen_template),
-+				.aadlensel = __LENS(aead_alen_template),
-+				.ptxtlensel = __LENS(aead_plen_template),
-+			}
- 		}
- 	}, {
- 		.alg = "authenc(hmac(sha1),cbc(des))",
- 		.test = alg_test_aead,
- 		.suite = {
- 			.aead = __VECS(hmac_sha1_des_cbc_tv_temp)
-+		},
-+		.params = {
-+			.aead = {
-+				.ckeylensel = __LENS(des_klen_template),
-+				.akeylensel = __LENS(sha1_klen_template),
-+				.authsizesel = __LENS(sha1_alen_template),
-+				.aadlensel = __LENS(aead_alen_template),
-+				.ptxtlensel = __LENS(aead_plen_template),
-+			}
- 		}
- 	}, {
- 		.alg = "authenc(hmac(sha1),cbc(des3_ede))",
-@@ -3900,6 +4006,15 @@ static int alg_test_null(const struct alg_test_desc *desc,
- 		.fips_allowed = 1,
- 		.suite = {
- 			.aead = __VECS(hmac_sha1_des3_ede_cbc_tv_temp)
-+		},
-+		.params = {
-+			.aead = {
-+				.ckeylensel = __LENS(des3_klen_template),
-+				.akeylensel = __LENS(sha1_klen_template),
-+				.authsizesel = __LENS(sha1_alen_template),
-+				.aadlensel = __LENS(aead_alen_template),
-+				.ptxtlensel = __LENS(aead_plen_template),
-+			}
- 		}
- 	}, {
- 		.alg = "authenc(hmac(sha1),ctr(aes))",
-@@ -3913,8 +4028,29 @@ static int alg_test_null(const struct alg_test_desc *desc,
- 		}
- 	}, {
- 		.alg = "authenc(hmac(sha1),rfc3686(ctr(aes)))",
--		.test = alg_test_null,
-+		.test = alg_test_aead,
- 		.fips_allowed = 1,
-+		.params = {
-+			.aead = {
-+				.ckeylensel = __LENS(aes_klen_template),
-+				.akeylensel = __LENS(sha1_klen_template),
-+				.authsizesel = __LENS(sha1_alen_template),
-+				.aadlensel = __LENS(aead_alen_template),
-+				.ptxtlensel = __LENS(aead_plen_template),
-+			}
-+		}
-+	}, {
-+		.alg = "authenc(hmac(sha224),cbc(aes))",
-+		.test = alg_test_aead,
-+		.params = {
-+			.aead = {
-+				.ckeylensel = __LENS(aes_klen_template),
-+				.akeylensel = __LENS(sha224_klen_template),
-+				.authsizesel = __LENS(sha224_alen_template),
-+				.aadlensel = __LENS(aead_alen_template),
-+				.ptxtlensel = __LENS(aead_plen_template),
-+			}
-+		}
- 	}, {
- 		.alg = "authenc(hmac(sha224),cbc(des))",
- 		.test = alg_test_aead,
-@@ -3929,11 +4065,32 @@ static int alg_test_null(const struct alg_test_desc *desc,
- 			.aead = __VECS(hmac_sha224_des3_ede_cbc_tv_temp)
- 		}
- 	}, {
-+		.alg = "authenc(hmac(sha224),rfc3686(ctr(aes)))",
-+		.test = alg_test_aead,
-+		.params = {
-+			.aead = {
-+				.ckeylensel = __LENS(aes_klen_template),
-+				.akeylensel = __LENS(sha224_klen_template),
-+				.authsizesel = __LENS(sha224_alen_template),
-+				.aadlensel = __LENS(aead_alen_template),
-+				.ptxtlensel = __LENS(aead_plen_template),
-+			}
-+		}
-+	}, {
- 		.alg = "authenc(hmac(sha256),cbc(aes))",
- 		.test = alg_test_aead,
- 		.fips_allowed = 1,
- 		.suite = {
- 			.aead = __VECS(hmac_sha256_aes_cbc_tv_temp)
-+		},
-+		.params = {
-+			.aead = {
-+				.ckeylensel = __LENS(aes_klen_template),
-+				.akeylensel = __LENS(sha256_klen_template),
-+				.authsizesel = __LENS(sha256_alen_template),
-+				.aadlensel = __LENS(aead_alen_template),
-+				.ptxtlensel = __LENS(aead_plen_template),
-+			}
- 		}
- 	}, {
- 		.alg = "authenc(hmac(sha256),cbc(des))",
-@@ -3954,8 +4111,29 @@ static int alg_test_null(const struct alg_test_desc *desc,
- 		.fips_allowed = 1,
- 	}, {
- 		.alg = "authenc(hmac(sha256),rfc3686(ctr(aes)))",
--		.test = alg_test_null,
-+		.test = alg_test_aead,
- 		.fips_allowed = 1,
-+		.params = {
-+			.aead = {
-+				.ckeylensel = __LENS(aes_klen_template),
-+				.akeylensel = __LENS(sha256_klen_template),
-+				.authsizesel = __LENS(sha256_alen_template),
-+				.aadlensel = __LENS(aead_alen_template),
-+				.ptxtlensel = __LENS(aead_plen_template),
-+			}
-+		}
-+	}, {
-+		.alg = "authenc(hmac(sha384),cbc(aes))",
-+		.test = alg_test_aead,
-+		.params = {
-+			.aead = {
-+				.ckeylensel = __LENS(aes_klen_template),
-+				.akeylensel = __LENS(sha384_klen_template),
-+				.authsizesel = __LENS(sha384_alen_template),
-+				.aadlensel = __LENS(aead_alen_template),
-+				.ptxtlensel = __LENS(aead_plen_template),
-+			}
-+		}
- 	}, {
- 		.alg = "authenc(hmac(sha384),cbc(des))",
- 		.test = alg_test_aead,
-@@ -3975,14 +4153,32 @@ static int alg_test_null(const struct alg_test_desc *desc,
- 		.fips_allowed = 1,
- 	}, {
- 		.alg = "authenc(hmac(sha384),rfc3686(ctr(aes)))",
--		.test = alg_test_null,
-+		.test = alg_test_aead,
- 		.fips_allowed = 1,
-+		.params = {
-+			.aead = {
-+				.ckeylensel = __LENS(aes_klen_template),
-+				.akeylensel = __LENS(sha384_klen_template),
-+				.authsizesel = __LENS(sha384_alen_template),
-+				.aadlensel = __LENS(aead_alen_template),
-+				.ptxtlensel = __LENS(aead_plen_template),
-+			}
-+		}
- 	}, {
- 		.alg = "authenc(hmac(sha512),cbc(aes))",
- 		.fips_allowed = 1,
- 		.test = alg_test_aead,
- 		.suite = {
- 			.aead = __VECS(hmac_sha512_aes_cbc_tv_temp)
-+		},
-+		.params = {
-+			.aead = {
-+				.ckeylensel = __LENS(aes_klen_template),
-+				.akeylensel = __LENS(sha512_klen_template),
-+				.authsizesel = __LENS(sha512_alen_template),
-+				.aadlensel = __LENS(aead_alen_template),
-+				.ptxtlensel = __LENS(aead_plen_template),
-+			}
- 		}
- 	}, {
- 		.alg = "authenc(hmac(sha512),cbc(des))",
-@@ -4003,8 +4199,17 @@ static int alg_test_null(const struct alg_test_desc *desc,
- 		.fips_allowed = 1,
- 	}, {
- 		.alg = "authenc(hmac(sha512),rfc3686(ctr(aes)))",
--		.test = alg_test_null,
-+		.test = alg_test_aead,
- 		.fips_allowed = 1,
-+		.params = {
-+			.aead = {
-+				.ckeylensel = __LENS(aes_klen_template),
-+				.akeylensel = __LENS(sha512_klen_template),
-+				.authsizesel = __LENS(sha512_alen_template),
-+				.aadlensel = __LENS(aead_alen_template),
-+				.ptxtlensel = __LENS(aead_plen_template),
-+			}
-+		}
- 	}, {
- 		.alg = "cbc(aes)",
- 		.test = alg_test_skcipher,
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 6b459a6..105f2ce 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -28,6 +28,8 @@
- #include <linux/oid_registry.h>
- 
- #define MAX_IVLEN		32
-+#define TESTMGR_POISON_BYTE	0xfe
-+#define TESTMGR_POISON_LEN	16
- 
- /*
-  * hash_testvec:	structure to describe a hash (message digest) test
-@@ -176,6 +178,302 @@ struct kpp_testvec {
- static const char zeroed_string[48];
- 
- /*
-+ * length range declaration lo-hi plus selection threshold 0 - 1000
-+ */
-+struct len_range_sel {
-+	unsigned int len_lo;
-+	unsigned int len_hi;
-+	unsigned int threshold;
-+};
-+
-+/*
-+ * List of length ranges sorted on increasing threshold
-+ *
-+ * 25% of each of the legal key sizes (128, 192, 256 bits)
-+ * plus 25% of illegal sizes in between 0 and 1024 bits.
-+ */
-+static const struct len_range_sel aes_klen_template[] = {
-+	{
-+	.len_lo = 0,
-+	.len_hi = 15,
-+	.threshold = 25,
-+	}, {
-+	.len_lo = 16,
-+	.len_hi = 16,
-+	.threshold = 325,
-+	}, {
-+	.len_lo = 17,
-+	.len_hi = 23,
-+	.threshold = 350,
-+	}, {
-+	.len_lo = 24,
-+	.len_hi = 24,
-+	.threshold = 650,
-+	}, {
-+	.len_lo = 25,
-+	.len_hi = 31,
-+	.threshold = 675,
-+	}, {
-+	.len_lo = 32,
-+	.len_hi = 32,
-+	.threshold = 975,
-+	}, {
-+	.len_lo = 33,
-+	.len_hi = 128,
-+	.threshold = 1000,
-+	}
-+};
-+
-+/* 90% legal keys of size 8, rest illegal between 0 and 32 */
-+static const struct len_range_sel des_klen_template[] = {
-+	{
-+	.len_lo = 0,
-+	.len_hi = 7,
-+	.threshold = 50,
-+	}, {
-+	.len_lo = 8,
-+	.len_hi = 8,
-+	.threshold = 950,
-+	}, {
-+	.len_lo = 9,
-+	.len_hi = 32,
-+	.threshold = 1000,
-+	}
-+};
-+
-+/* 90% legal keys of size 24, rest illegal between 0 and 32 */
-+static const struct len_range_sel des3_klen_template[] = {
-+	{
-+	.len_lo = 0,
-+	.len_hi = 23,
-+	.threshold = 50,
-+	}, {
-+	.len_lo = 24,
-+	.len_hi = 24,
-+	.threshold = 950,
-+	}, {
-+	.len_lo = 25,
-+	.len_hi = 32,
-+	.threshold = 1000,
-+	}
-+};
-+
-+/*
-+ * For HMAC's, favour the actual digest size for both key
-+ * size and authenticator size, but do verify some tag
-+ * truncation cases and some larger keys, including keys
-+ * exceeding the block size.
-+ */
-+
-+static const struct len_range_sel md5_klen_template[] = {
-+	{
-+	.len_lo = 0, /* Allow 0 here? */
-+	.len_hi = 15,
-+	.threshold = 50,
-+	}, {
-+	.len_lo = 16,
-+	.len_hi = 16,
-+	.threshold = 950,
-+	}, {
-+	.len_lo = 17,
-+	.len_hi = 256,
-+	.threshold = 1000,
-+	}
-+};
-+
-+static const struct len_range_sel md5_alen_template[] = {
-+	{
-+	.len_lo = 0, /* Allow 0 here? */
-+	.len_hi = 15,
-+	.threshold = 100,
-+	}, {
-+	.len_lo = 16,
-+	.len_hi = 16,
-+	.threshold = 1000,
-+	}
-+};
-+
-+static const struct len_range_sel sha1_klen_template[] = {
-+	{
-+	.len_lo = 0, /* Allow 0 here? */
-+	.len_hi = 19,
-+	.threshold = 50,
-+	}, {
-+	.len_lo = 20,
-+	.len_hi = 20,
-+	.threshold = 950,
-+	}, {
-+	.len_lo = 21,
-+	.len_hi = 256,
-+	.threshold = 1000,
-+	}
-+};
-+
-+static const struct len_range_sel sha1_alen_template[] = {
-+	{
-+	.len_lo = 0, /* Allow 0 here? */
-+	.len_hi = 19,
-+	.threshold = 100,
-+	}, {
-+	.len_lo = 20,
-+	.len_hi = 20,
-+	.threshold = 1000,
-+	}
-+};
-+
-+static const struct len_range_sel sha224_klen_template[] = {
-+	{
-+	.len_lo = 0, /* Allow 0 here? */
-+	.len_hi = 23,
-+	.threshold = 50,
-+	}, {
-+	.len_lo = 24,
-+	.len_hi = 24,
-+	.threshold = 950,
-+	}, {
-+	.len_lo = 25,
-+	.len_hi = 256,
-+	.threshold = 1000,
-+	}
-+};
-+
-+static const struct len_range_sel sha224_alen_template[] = {
-+	{
-+	.len_lo = 0, /* Allow 0 here? */
-+	.len_hi = 23,
-+	.threshold = 100,
-+	}, {
-+	.len_lo = 24,
-+	.len_hi = 24,
-+	.threshold = 1000,
-+	}
-+};
-+
-+static const struct len_range_sel sha256_klen_template[] = {
-+	{
-+	.len_lo = 0, /* Allow 0 here? */
-+	.len_hi = 31,
-+	.threshold = 50,
-+	}, {
-+	.len_lo = 32,
-+	.len_hi = 32,
-+	.threshold = 950,
-+	}, {
-+	.len_lo = 33,
-+	.len_hi = 256,
-+	.threshold = 1000,
-+	}
-+};
-+
-+static const struct len_range_sel sha256_alen_template[] = {
-+	{
-+	.len_lo = 0, /* Allow 0 here? */
-+	.len_hi = 31,
-+	.threshold = 100,
-+	}, {
-+	.len_lo = 32,
-+	.len_hi = 32,
-+	.threshold = 1000,
-+	}
-+};
-+
-+static const struct len_range_sel sha384_klen_template[] = {
-+	{
-+	.len_lo = 0, /* Allow 0 here? */
-+	.len_hi = 47,
-+	.threshold = 50,
-+	}, {
-+	.len_lo = 48,
-+	.len_hi = 48,
-+	.threshold = 950,
-+	}, {
-+	.len_lo = 49,
-+	.len_hi = 256,
-+	.threshold = 1000,
-+	}
-+};
-+
-+static const struct len_range_sel sha384_alen_template[] = {
-+	{
-+	.len_lo = 0, /* Allow 0 here? */
-+	.len_hi = 47,
-+	.threshold = 100,
-+	}, {
-+	.len_lo = 48,
-+	.len_hi = 48,
-+	.threshold = 1000,
-+	}
-+};
-+
-+static const struct len_range_sel sha512_klen_template[] = {
-+	{
-+	.len_lo = 0, /* Allow 0 here? */
-+	.len_hi = 63,
-+	.threshold = 50,
-+	}, {
-+	.len_lo = 64,
-+	.len_hi = 64,
-+	.threshold = 950,
-+	}, {
-+	.len_lo = 65,
-+	.len_hi = 256,
-+	.threshold = 1000,
-+	}
-+};
-+
-+static const struct len_range_sel sha512_alen_template[] = {
-+	{
-+	.len_lo = 0, /* Allow 0 here? */
-+	.len_hi = 63,
-+	.threshold = 100,
-+	}, {
-+	.len_lo = 64,
-+	.len_hi = 64,
-+	.threshold = 1000,
-+	}
-+};
-+
-+static const struct len_range_sel aead_alen_template[] = {
-+	{
-+	.len_lo = 0,
-+	.len_hi = 0,
-+	.threshold = 200,
-+	}, {
-+	.len_lo = 1,
-+	.len_hi = 32,
-+	.threshold = 900,
-+	}, {
-+	.len_lo = 33,
-+	.len_hi = (2 * PAGE_SIZE) - TESTMGR_POISON_LEN,
-+	.threshold = 1000,
-+	}
-+};
-+
-+static const struct len_range_sel aead_plen_template[] = {
-+	{
-+	.len_lo = 0,
-+	.len_hi = 0,
-+	.threshold = 200,
-+	}, {
-+	.len_lo = 1,
-+	.len_hi = 63,
-+	.threshold = 400,
-+	}, {
-+	.len_lo = 64,
-+	.len_hi = 255,
-+	.threshold = 600,
-+	}, {
-+	.len_lo = 256,
-+	.len_hi = 1023,
-+	.threshold = 800,
-+	}, {
-+	.len_lo = 1024,
-+	.len_hi = (2 * PAGE_SIZE) - TESTMGR_POISON_LEN,
-+	.threshold = 1000,
-+	}
-+};
-+
-+/*
-  * RSA test vectors. Borrowed from openSSL.
-  */
- static const struct akcipher_testvec rsa_tv_template[] = {
--- 
-1.8.3.1
-
+QXJkLCANCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBBcmQgQmllc2hl
+dXZlbCA8YXJkLmJpZXNoZXV2ZWxAbGluYXJvLm9yZz4NCj4gU2VudDogTW9uZGF5LCBKdWx5IDIy
+LCAyMDE5IDY6NDMgUE0NCj4gVG86IFBhc2NhbCBWYW4gTGVldXdlbiA8cHZhbmxlZXV3ZW5AdmVy
+aW1hdHJpeC5jb20+DQo+IENjOiBNaWxhbiBCcm96IDxnbWF6eWxhbmRAZ21haWwuY29tPjsgSGVy
+YmVydCBYdSA8aGVyYmVydEBnb25kb3IuYXBhbmEub3JnLmF1PjsgZG0tZGV2ZWxAcmVkaGF0LmNv
+bTsgbGludXgtDQo+IGNyeXB0b0B2Z2VyLmtlcm5lbC5vcmc7IEhvcmlhIEdlYW50YSA8aG9yaWEu
+Z2VhbnRhQG54cC5jb20+DQo+IFN1YmplY3Q6IFJlOiBbZG0tZGV2ZWxdIHh0cyBmdXp6IHRlc3Rp
+bmcgYW5kIGxhY2sgb2YgY2lwaGVydGV4dCBzdGVhbGluZyBzdXBwb3J0DQo+IA0KPiBPbiBNb24s
+IDIyIEp1bCAyMDE5IGF0IDEyOjQ0LCBQYXNjYWwgVmFuIExlZXV3ZW4NCj4gPHB2YW5sZWV1d2Vu
+QHZlcmltYXRyaXguY29tPiB3cm90ZToNCj4gPg0KPiA+ID4gLS0tLS1PcmlnaW5hbCBNZXNzYWdl
+LS0tLS0NCj4gPiA+IEZyb206IEFyZCBCaWVzaGV1dmVsIDxhcmQuYmllc2hldXZlbEBsaW5hcm8u
+b3JnPg0KPiA+ID4gU2VudDogU3VuZGF5LCBKdWx5IDIxLCAyMDE5IDExOjUwIEFNDQo+ID4gPiBU
+bzogTWlsYW4gQnJveiA8Z21henlsYW5kQGdtYWlsLmNvbT4NCj4gPiA+IENjOiBQYXNjYWwgVmFu
+IExlZXV3ZW4gPHB2YW5sZWV1d2VuQHZlcmltYXRyaXguY29tPjsgSGVyYmVydCBYdSA8aGVyYmVy
+dEBnb25kb3IuYXBhbmEub3JnLmF1PjsgZG0tZGV2ZWxAcmVkaGF0LmNvbTsgbGludXgtDQo+ID4g
+PiBjcnlwdG9Admdlci5rZXJuZWwub3JnOyBIb3JpYSBHZWFudGEgPGhvcmlhLmdlYW50YUBueHAu
+Y29tPg0KPiA+ID4gU3ViamVjdDogUmU6IFtkbS1kZXZlbF0geHRzIGZ1enogdGVzdGluZyBhbmQg
+bGFjayBvZiBjaXBoZXJ0ZXh0IHN0ZWFsaW5nIHN1cHBvcnQNCj4gPiA+DQo+ID4gPiBPbiBTYXQs
+IDIwIEp1bCAyMDE5IGF0IDEwOjM1LCBNaWxhbiBCcm96IDxnbWF6eWxhbmRAZ21haWwuY29tPiB3
+cm90ZToNCj4gPiA+ID4NCj4gPiA+ID4gT24gMjAvMDcvMjAxOSAwODo1OCwgRXJpYyBCaWdnZXJz
+IHdyb3RlOg0KPiA+ID4gPiA+IE9uIFRodSwgSnVsIDE4LCAyMDE5IGF0IDAxOjE5OjQxUE0gKzAy
+MDAsIE1pbGFuIEJyb3ogd3JvdGU6DQo+ID4gPiA+ID4+IEFsc28sIEkgd291bGQgbGlrZSB0byBh
+dm9pZCBhbm90aGVyICJqdXN0IGJlY2F1c2UgaXQgaXMgbmljZXIiIG1vZHVsZSBkZXBlbmRlbmNl
+IChYVFMtPlhFWC0+RUNCKS4NCj4gPiA+ID4gPj4gTGFzdCB0aW1lICh3aGVuIFhUUyB3YXMgcmVp
+bXBsZW1lbnRlZCB1c2luZyBFQ0IpIHdlIGhhdmUgbWFueSByZXBvcnRzIHdpdGggaW5pdHJhbWZz
+DQo+ID4gPiA+ID4+IG1pc3NpbmcgRUNCIG1vZHVsZSBwcmV2ZW50aW5nIGJvb3QgZnJvbSBBRVMt
+WFRTIGVuY3J5cHRlZCByb290IGFmdGVyIGtlcm5lbCB1cGdyYWRlLi4uDQo+ID4gPiA+ID4+IEp1
+c3Qgc2F5aW5nLiAoRGVzcGl0ZSB0aGUgbGFzdCB0aW1lIGl0IHdhcyBrZXlyaW5nIHdoYXQgYnJv
+a2UgZW5jcnlwdGVkIGJvb3QgOy0pDQo+ID4gPiA+ID4+DQo+ID4gPiA+ID4NCj4gPiA+ID4gPiBD
+YW4ndCB0aGUgIm1pc3NpbmcgbW9kdWxlcyBpbiBpbml0cmFtZnMiIGlzc3VlIGJlIHNvbHZlZCBi
+eSB1c2luZyBhDQo+ID4gPiA+ID4gTU9EVUxFX1NPRlRERVAoKT8gIEFjdHVhbGx5LCB3aHkgaXNu
+J3QgdGhhdCBiZWluZyB1c2VkIGZvciB4dHMgLT4gZWNiIGFscmVhZHk/DQo+ID4gPiA+ID4NCj4g
+PiA+ID4gPiAoVGhlcmUgd2FzIGFsc28gYSBidWcgd2hlcmUgQ09ORklHX0NSWVBUT19YVFMgZGlk
+bid0IHNlbGVjdCBDT05GSUdfQ1JZUFRPX0VDQiwNCj4gPiA+ID4gPiBidXQgdGhhdCB3YXMgc2lt
+cGx5IGEgYnVnLCB3aGljaCB3YXMgZml4ZWQuKQ0KPiA+ID4gPg0KPiA+ID4gPiBTdXJlLCBhbmQg
+aXQgaXMgc29sdmVkIG5vdy4gKFNvbWUgc3lzdGVtcyB3aXRoIGEgaGFyZGNvZGVkIGxpc3Qgb2Yg
+bW9kdWxlcw0KPiA+ID4gPiBoYXZlIHRvIGJlIG1hbnVhbGx5IHVwZGF0ZWQgZXRjLiwgYnV0IHRo
+YXQgaXMganVzdCBiYWQgZGVzaWduKS4NCj4gPiA+ID4gSXQgY2FuIGJlIGRvbmUgcHJvcGVybHkg
+ZnJvbSB0aGUgYmVnaW5uaW5nLg0KPiA+ID4gPg0KPiA+ID4gPiBJIGp1c3Qgd2FudCB0byBzYXkg
+dGhhdCB0aGF0IHN3aXRjaGluZyB0byBYRVggbG9va3MgbGlrZSB3YXN0aW5nIHRpbWUgdG8gbWUN
+Cj4gPiA+ID4gZm9yIG5vIGFkZGl0aW9uYWwgYmVuZWZpdC4NCj4gPiA+ID4NCj4gPiA+ID4gRnVs
+bHkgaW1wbGVtZW50aW5nIFhUUyBkb2VzIG1ha2UgbXVjaCBtb3JlIHNlbnNlIGZvciBtZSwgZXZl
+biB0aG91Z2ggaXQgaXMgbG9uZy10ZXJtDQo+ID4gPiA+IHRoZSBlZmZvcnQgYW5kIHRoZSBvbmx5
+IHVzZXIsIGZvciBub3csIHdvdWxkIGJlIHRlc3RtZ3IuDQo+ID4gPiA+DQo+ID4gPiA+IFNvLCB0
+aGVyZSBhcmUgbm8gdXNlcnMgYmVjYXVzZSBpdCBkb2VzIG5vdCB3b3JrLiBJdCBtYWtlcyBubyBz
+ZW5zZQ0KPiA+ID4gPiB0byBpbXBsZW1lbnQgaXQsIGJlY2F1c2UgdGhlcmUgYXJlIG5vIHVzZXJz
+Li4uIChzb3JyeSwgc291bmRzIGxpa2UgY2F0Y2ggMjIgOikNCj4gPiA+ID4NCj4gPiA+ID4gKE1h
+eWJlIHNvbWVvbmUgY2FuIHVzZSBpdCBmb3Iga2V5c2xvdCBlbmNyeXB0aW9uIGZvciBrZXlzIG5v
+dCBhbGlnbmVkIHRvDQo+ID4gPiA+IGJsb2NrIHNpemUsIGR1bm5vLiBBY3R1YWxseSwgc29tZSBm
+aWxlc3lzdGVtIGVuY3J5cHRpb24gY291bGQgaGF2ZSB1c2UgZm9yIGl0LikNCj4gPiA+ID4NCj4g
+PiA+ID4gPiBPciAieHRzIiBhbmQgInhleCIgY291bGQgZ28gaW4gdGhlIHNhbWUga2VybmVsIG1v
+ZHVsZSB4dHMua28sIHdoaWNoIHdvdWxkIG1ha2UNCj4gPiA+ID4gPiB0aGlzIGEgbm9uLWlzc3Vl
+Lg0KPiA+ID4gPg0KPiA+ID4gPiBJZiBpdCBpcyBub3QgYXZhaWxhYmxlIGZvciB1c2VycywgSSBy
+ZWFsbHkgc2VlIG5vIHJlYXNvbiB0byBpbnRyb2R1Y2UgWEVYIHdoZW4NCj4gPiA+ID4gaXQgaXMg
+anVzdCBYVFMgd2l0aCBmdWxsIGJsb2Nrcy4NCj4gPiA+ID4NCj4gPiA+ID4gSWYgaXQgaXMgdmlz
+aWJsZSB0byB1c2VycywgaXQgbmVlZHMgc29tZSB3b3JrIGluIHVzZXJzcGFjZSAtIFhFWCAoYXMg
+WFRTKSBuZWVkIHR3byBrZXlzLA0KPiA+ID4gPiBwZW9wbGUgYXJlIGFscmVhZHkgY29uZnVzZWQg
+ZW5vdWdoIHRoYXQgMjU2Yml0IGtleSBpbiBBRVMtWFRTIG1lYW5zIEFFUy0xMjguLi4NCj4gPiA+
+ID4gU28gdGhlIGV4YW1wbGVzLCBoaW50cywgbWFuIHBhZ2VzIG5lZWQgdG8gYmUgdXBkYXRlZCwg
+YXQgbGVhc3QuDQo+ID4gPiA+DQo+ID4gPg0KPiA+ID4gT0ssIGNvbnNpZGVyIG1lIHBlcnN1YWRl
+ZC4gV2UgYXJlIGFscmVhZHkgZXhwb3NpbmcgeHRzKC4uLikgdG8NCj4gPiA+IHVzZXJsYW5kLCBh
+bmQgc2luY2Ugd2UgYWxyZWFkeSBpbXBsZW1lbnQgYSBwcm9wZXIgc3Vic2V0IG9mIHRydWUgWFRT
+LA0KPiA+ID4gaXQgd2lsbCBiZSBzaW1wbHkgYSBtYXR0ZXIgb2YgbWFraW5nIHN1cmUgdGhhdCB0
+aGUgZXhpc3RpbmcgWFRTDQo+ID4gPiBpbXBsZW1lbnRhdGlvbnMgZG9uJ3QgcmVncmVzcyBpbiBw
+ZXJmb3JtYW5jZSBvbiB0aGUgbm9uLUNUUyBjb2RlDQo+ID4gPiBwYXRocy4NCj4gPiA+DQo+ID4g
+PiBJdCB3b3VsZCBiZSB1c2VmdWwsIHRob3VnaCwgdG8gaGF2ZSBzb21lIGdlbmVyaWMgaGVscGVy
+IGZ1bmN0aW9ucywNCj4gPiA+IGUuZy4sIGxpa2UgdGhlIG9uZSB3ZSBoYXZlIGZvciBDQkMsIG9y
+IHRoZSBvbmUgSSByZWNlbnRseSBwcm9wb3NlZCBmb3INCj4gPiA+IENUUywgc28gdGhhdCBleGlz
+dGluZyBpbXBsZW1lbnRhdGlvbnMgKHN1Y2ggYXMgdGhlIGJpdCBzbGljZWQgQUVTKSBjYW4NCj4g
+PiA+IGVhc2lseSBiZSBhdWdtZW50ZWQgd2l0aCBhIENUUyBjb2RlIHBhdGggKGJ1dCBwZXJmb3Jt
+YW5jZSBtYXkgbm90IGJlDQo+ID4gPiBvcHRpbWFsIGluIHRob3NlIGNhc2VzKS4gRm9yIHRoZSBB
+Uk0gaW1wbGVtZW50YXRpb25zIGJhc2VkIG9uIEFFUw0KPiA+ID4gaW5zdHJ1Y3Rpb25zLCBpdCBz
+aG91bGQgYmUgcmVhc29uYWJseSBzdHJhaWdodCBmb3J3YXJkIHRvIGltcGxlbWVudCBpdA0KPiA+
+ID4gY2xvc2UgdG8gb3B0aW1hbGx5IGJ5IHJldXNpbmcgc29tZSBvZiB0aGUgY29kZSBJIGFkZGVk
+IGZvciBDQkMtQ1RTDQo+ID4gPiAoYnV0IEkgd29uJ3QgZ2V0IGFyb3VuZCB0byBkb2luZyB0aGF0
+IGZvciBhIHdoaWxlKS4gSWYgdGhlcmUgYXJlIGFueQ0KPiA+ID4gdm9sdW50ZWVycyBmb3IgbG9v
+a2luZyBpbnRvIHRoZSBnZW5lcmljIG9yIHg4Ni9BRVMtTkkgaW1wbGVtZW50YXRpb25zLA0KPiA+
+ID4gcGxlYXNlIGNvbWUgZm9yd2FyZCA6LSkgQWxzbywgaWYgYW55IG9mIHRoZSBwdWJsaWNhdGlv
+bnMgdGhhdCB3ZXJlDQo+ID4gPiBxdW90ZWQgaW4gdGhpcyB0aHJlYWQgaGF2ZSBzdWl0YWJsZSB0
+ZXN0IHZlY3RvcnMsIHRoYXQgd291bGQgYmUgZ29vZA0KPiA+ID4gdG8ga25vdy4NCj4gPg0KPiA+
+IFVuZm9ydHVuYXRlbHksIHRoZXNlIGFsZ29yaXRobSAmIHByb3RvY29sIHNwZWNpZmljYXRpb25z
+IHRlbmQgdG8gYmUgdmVyeSBmcnVnYWwgd2hlbiBpdA0KPiA+IGNvbWVzIHRvIHByb3ZpZGluZyB0
+ZXN0IHZlY3RvcnMsIGJhcmVseSBzY3JhdGNoaW5nIHRoZSBzdXJmYWNlIG9mIGFueSBjb3JuZXIg
+Y2FzZXMsIGJ1dA0KPiA+IGF0IGxlYXN0IHRoZXJlIGlzIG9uZSBub24tbXVsdGlwbGUtb2YtMTYg
+dmVjdG9yIGluIHRoZSBvcmlnaW5hbCBJRUVFIFAxNjE5IC8gRDE2DQo+ID4gc3BlY2lmaWNhdGlv
+biBpbiBBbm5leCBCIFRlc3QgVmVjdG9ycyAobGFzdCB2ZWN0b3IsICJYVFMtQUVTLTEyOCBhcHBs
+aWVkIGZvciBhIGRhdGEgdW5pdA0KPiA+IHRoYXQgaXMgbm90IGEgbXVsdGlwbGUgb2YgMTYgYnl0
+ZXMiKQ0KPiA+DQo+IA0KPiBBY3R1YWxseSwgdGhhdCBzcGVjIGhhcyBhIGNvdXBsZSBvZiB0ZXN0
+IHZlY3RvcnMuIFVuZm9ydHVuYXRlbHksIHRoZXkNCj4gYXJlIGFsbCByYXRoZXIgc2hvcnQgKGV4
+Y2VwdCB0aGUgbGFzdCBvbmUgaW4gdGhlICdubyBtdWx0aXBsZSBvZiAxNg0KPiBieXRlcycgcGFy
+YWdyYXBoLCBidXQgdW5mb3J0dW5hdGVseSwgdGhhdCBvbmUgaXMgaW4gZmFjdCBhIG11bHRpcGxl
+IG9mDQo+IDE2IGJ5dGVzKQ0KPiANCj4gSSBhZGRlZCB0aGVtIGhlcmUgWzBdIGFsb25nIHdpdGgg
+YW4gYXJtNjQgaW1wbGVtZW50YXRpb24gZm9yIHRoZSBBRVMNCj4gaW5zdHJ1Y3Rpb24gYmFzZWQg
+ZHJpdmVyLiBDb3VsZCB5b3UgcGxlYXNlIGRvdWJsZSBjaGVjayB0aGF0IHRoZXNlDQo+IHdvcmsg
+YWdhaW5zdCB5b3VyIGRyaXZlcj8gVGhhdCB3b3VsZCBlc3RhYmxpc2ggYSBncm91bmQgdHJ1dGgg
+YWdhaW5zdA0KPiB3aGljaCB3ZSBjYW4gaW1wbGVtZW50IHRoZSBnZW5lcmljIHZlcnNpb24gYXMg
+d2VsbC4NCj4gDQo+IFswXSBodHRwczovL2dpdC5rZXJuZWwub3JnL3B1Yi9zY20vbGludXgva2Vy
+bmVsL2dpdC9hcmRiL2xpbnV4LmdpdC9sb2cvP2g9eHRzLWN0cw0KPiANCkknbSB3b3JraW5nIG9u
+IG15IFhUUyBpbXBsZW1lbnRhdGlvbiBub3cgYW5kIEkgbm90aWNlZCBzb21ldGhpbmcgZnVubnkg
+d2l0aCB0aGUgdGVzdA0KdmVjdG9ycy4gVGhlIG5ldyBDVFMgb25lcyB5b3UgYWRkZWQgaGVyZSwg
+SSBjYW4gcGVyZmVjdGx5IHRyYWNlIGJhY2sgdG8gdGhlIElFRUUgc3BlYywNCnRoZXkgbWF0Y2gg
+Ynl0ZS1mb3ItYnl0ZS4NCg0KSG93ZXZlciwgdGhlIG9uZXMgdGhhdCBhbHJlYWR5IGV4aXN0ZWQg
+cHV6emxlIG1lLiBUaGUgaW5wdXQgZGF0YSBtYXRjaGVzIHZlY3RvcnMgZnJvbQ0KdGhlIElFRUUg
+c3BlYywgaG93ZXZlciB0aGUgZXhwZWN0ZWQgb3V0cHV0IGNpcGhlciB0ZXh0IGRvZXMgTk9UID8/
+Pz8NCg0KQ2FzZSBpbiBwb2ludCwgdGhlIHZlcnkgZmlyc3QgdmVjdG9yLCB3aGljaCBoYXMgYSBr
+ZXkgb2YgYWxsIHplcm9lcywgYSBzZWN0b3IgbnVtYmVyIChJVikNCm9yIGFsbCB6ZXJvZXMgYW5k
+IGFuIGFsbCB6ZXJvZXMgcGxhaW50ZXh0IG9mIDMyIGJ5dGVzLCB3aGljaCBtYXRjaGVzIHRoZSAx
+c3Qgc3BlYyB2ZWN0b3I6DQp0ZXN0bWdyLmggZXhwZWN0czoNCiAiXHg0Ylx4YzlceDQ0XHg0YVx4
+MTFceGEzXHhlZlx4YWMiDQogIlx4MzBceDc0XHhlNFx4NDRceDUyXHg3N1x4OTdceDQzIg0KICAi
+XHhhN1x4NjBceGIyXHg0NVx4MmVceGY5XHgwMFx4OTAiDQogICJceDlmXHhhYVx4ZmRceDg5XHg2
+ZVx4OWRceDRhXHhlMCINCg0KQnV0IHRoZSBzcGVjaWZpY2F0aW9uIGV4cGVjdHM6DQo5MTdjZjY5
+ZWJkNjhiMmVjOWI5ZmU5YTNlYWRkYTY5MmNkNDNkMmY1OTU5OGVkODU4YzAyYzI2NTJmYmY5MjJl
+DQoNCldoaWNoIGFsc28gaGFwcGVucyB0byBiZSB3aGF0IG91ciBoYXJkd2FyZSBkb2VzIC4uLg0K
+DQpEaWQgeW91IG5vdGljZSB0aGUgc2FtZSB0aGluZyB3aXRoIHlvdXIgaW1wbGVtZW50YXRpb24/
+IEFtIEkgbWlzc2luZyBzb21ldGhpbmc/Pw0KDQo+ID4gQmVzaWRlcyB0aGF0LCBJJ2QgYmUgaGFw
+cHkgdG8gZ2VuZXJhdGUgc29tZSB0ZXN0dmVjdG9ycyBmcm9tIG91ciBkZWZhY3RvLXN0YW5kYXJk
+DQo+ID4gaW1wbGVtZW50YXRpb24gOy0pDQo+ID4NCj4gDQo+IE9uZSBvciB0d28gbGFyZ2VyIG9u
+ZXMgd291bGQgYmUgdXNlZnVsLCB5ZXMuDQoNClJlZ2FyZHMsDQpQYXNjYWwgdmFuIExlZXV3ZW4N
+ClNpbGljb24gSVAgQXJjaGl0ZWN0LCBNdWx0aS1Qcm90b2NvbCBFbmdpbmVzIEAgVmVyaW1hdHJp
+eA0Kd3d3Lmluc2lkZXNlY3VyZS5jb20NCg0KDQoNCg==
