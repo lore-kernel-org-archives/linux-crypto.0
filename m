@@ -7,198 +7,151 @@ X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBE40C7618B
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Jul 2019 06:22:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EA8CC7618B
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Jul 2019 07:49:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 95AF4206B8
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Jul 2019 06:22:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 344282081B
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Jul 2019 07:49:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="X2+y/ViH"
+	dkim=pass (1024-bit key) header.d=verimatrix.com header.i=@verimatrix.com header.b="fYiuilfM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725800AbfGYGWi (ORCPT
+        id S2388262AbfGYHtj (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 25 Jul 2019 02:22:38 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:39057 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728120AbfGYGWi (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 Jul 2019 02:22:38 -0400
-Received: by mail-wm1-f65.google.com with SMTP id u25so33193364wmc.4
-        for <linux-crypto@vger.kernel.org>; Wed, 24 Jul 2019 23:22:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=XO+kLN/o2g5vVTMjJb2RVqXQqDH7sHAXIU/oFvB4D58=;
-        b=X2+y/ViHkdaapFZ4Gapey81vy+lCDfHRvsjtx5e7eRXXG5eOPfn4I5HSUn5Xbad9hc
-         mTDebNtdnwnAYWqPe7nsdr3hJK064CxBvmOcPLEMS5s0EgzREZRIasyeI9ARE42oMTOa
-         BTaOvGEOnp/nRDnKbPoHC5Rd7/Ga8StqTBSob4VPyPhZrFiZEiwrh79/04EXFhClE68E
-         11kfoKDjnJByas4QDg0cg/8x8fVdtYlBSr4zkVii+K4X2KTjVhzvZVzJ0BpY+KJq6/Ch
-         OqgWBpuPiw2m6b+bBYpaCTE/ngaKTgKZbuiY9fEf+uX81Li4XPgVc7R4v6BFNtqokjwc
-         2/8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=XO+kLN/o2g5vVTMjJb2RVqXQqDH7sHAXIU/oFvB4D58=;
-        b=toeRNupsGC8XQrAoOYn10awoDvLPcmTwixyVX/BvEa8JItiHnxHzeay3dCdb7s6a+Z
-         mjok9XIB0iW4YjazI142H+jOiazY7J9SmuLRRv6tm49OPVp7Sd0LhRQeaSZlu71UMDn4
-         yO7ae0Jy0pj7pzh+2VgXEX2ILq/sQeghVDwSvYDh/gPjFv/kA1p+yhgCveDJKcZ53RJY
-         PW07SXOnxxaQ5M2Ev5I92n+0/17r4mx+8nc+tl9HPWnMzkFWNRc1XKqhvBZEC+yMtr2U
-         xGu9rF639jy6P7m0bYkdccG7s+ggVpSBVty7rziKghkSb2tXIcSab/4Eqno13/usxr2P
-         NpIQ==
-X-Gm-Message-State: APjAAAVXko/4WejMZW3co+hIWEJ8Y0GNXWsf6JaDBE4/ialJAeZHxMCg
-        xbvY+Hz/1VhBqZeAHvxj3bRL6xJzGkTOhTnR9UFN1w==
-X-Google-Smtp-Source: APXvYqx8yMtnDp0E8NWqMSKzAEGxQ7jT1Iziv8+LDjVyXrWQuEJoxO7pWrKg3A1vzxVuevbR7CAi8+cLHR5HBe7G2Is=
-X-Received: by 2002:a05:600c:20c1:: with SMTP id y1mr80069769wmm.10.1564035755194;
- Wed, 24 Jul 2019 23:22:35 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190716221639.GA44406@gmail.com> <VI1PR0402MB34857BBB18C2BB8CBA2DEC7198C90@VI1PR0402MB3485.eurprd04.prod.outlook.com>
- <20190717172823.GA205944@gmail.com> <CAKv+Gu__offPaWvyURJr8v56ig58q-Deo16QhP26EJ32uf5m3w@mail.gmail.com>
- <20190718065223.4xaefcwjoxvujntw@gondor.apana.org.au> <CAKv+Gu9-EWNpJ9viSsjhYRdOZb=7a=Mpddmyt8SLEq9aFtawjg@mail.gmail.com>
- <20190718072154.m2umem24x4grbf6w@gondor.apana.org.au> <36e78459-1594-6d19-0ab4-95b03a6de036@gmail.com>
- <MN2PR20MB2973E61815F069E8C7D74177CAC80@MN2PR20MB2973.namprd20.prod.outlook.com>
- <b042649c-db98-9710-b063-242bdf520252@gmail.com> <20190720065807.GA711@sol.localdomain>
- <0d4d6387-777c-bfd3-e54a-e7244fde0096@gmail.com> <CAKv+Gu9UF+a1UhVU19g1XcLaEqEaAwwkSm3-2wTHEAdD-q4mLQ@mail.gmail.com>
- <MN2PR20MB2973B9C2DDC508A81AF4A207CAC40@MN2PR20MB2973.namprd20.prod.outlook.com>
- <CAKv+Gu9C2AEbb++W=QTVWbeA_88Fo57NcOwgU5R8HBvzFwXkJw@mail.gmail.com> <MN2PR20MB2973C378AE5674F9E3E29445CAC60@MN2PR20MB2973.namprd20.prod.outlook.com>
-In-Reply-To: <MN2PR20MB2973C378AE5674F9E3E29445CAC60@MN2PR20MB2973.namprd20.prod.outlook.com>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Thu, 25 Jul 2019 09:22:24 +0300
-Message-ID: <CAKv+Gu-8n_DoauycDQS_9zzRew1rTuPaLxHyg6xhXMmqEvMaCA@mail.gmail.com>
-Subject: Re: [dm-devel] xts fuzz testing and lack of ciphertext stealing support
-To:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
-Cc:     Milan Broz <gmazyland@gmail.com>,
+        Thu, 25 Jul 2019 03:49:39 -0400
+Received: from mail-eopbgr730058.outbound.protection.outlook.com ([40.107.73.58]:63772
+        "EHLO NAM05-DM3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S2387988AbfGYHti (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 25 Jul 2019 03:49:38 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Dpj694u2AMk8GEYeAKYilBzFmTzfz0TLT+sf3t+TZOcglLKggHa0oS9AANNJPcJmv8VB6xZJC9CtI6bJyhJykUeS0oD3+1dZxY5eB2BLJoxhR7lbn08oITSxK+3QQYszA2i9BhY7n3APRuUGL7zgKNE9KOCQzgqaNmKAeWPZ04IHYwZwSRp8MnPdVfBXEHJGzyK/vfFeFe2nBFJlYK+661YHVXBnvbD/OlWcoux52UgwPLjqFeBl4um25aLPrsRtYLNGx8i9caXNBeMDL0WvkNSSzXykYAnKe+ZhPS+ZVWByajSot2oSxt7Z9eHsfmy/P40Y2PKO6DrO6uaBgzfzew==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Amk0B1Q1fZv+NS+JIqPyqgc3OmRMNjd/n3u3G/oVUjI=;
+ b=dvdAJXqEX8DI+k1jfPdnr7/n7i8DlWzjcSI1l/xvfILLi5ErvK7qpGqjARxRc4CinJmCpFV9hmaHiV8Cvp7ImDRec9DQVi8aW5M3PIcFHPqrNKpH7/JqXvyULdvJBCoHRwTUrU3oE/YZLofSxDOQOwt6rRpdrL2daYmepXKtCxxqON1/QtMMmeoL0sHs87e0+Y4zQ2w7G5C+bhehHYn9FhhRmDK3VCgjldwb0qbQz56IvcmyJpPKo1yOUoLcIDmZfqyKeH/lzbK+nu7sWYSSm2mOm0m4i9VeNQjoxS2DrqTGZBn+sIG+jWBv3CRC1oA8mqvESvpSGHoVpl8oE1qJ3A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
+ smtp.mailfrom=verimatrix.com;dmarc=pass action=none
+ header.from=verimatrix.com;dkim=pass header.d=verimatrix.com;arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verimatrix.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Amk0B1Q1fZv+NS+JIqPyqgc3OmRMNjd/n3u3G/oVUjI=;
+ b=fYiuilfM4Mw0hpf9Ol1Uc7XV5IBt3W62RF8koYDaObF6ZMREw1B7cZxjK9urAW9PhuU0enpQuD2hQBGyBHfW+Y7vGiF0Cef3EWUrL260nBANu7p8Edn7vmZhkIIx2lEKDi4Ksxxww2RJkU7ukZ6N6JJMw1lEogf0TalSMs+APFc=
+Received: from MN2PR20MB2973.namprd20.prod.outlook.com (52.132.172.146) by
+ MN2PR20MB2335.namprd20.prod.outlook.com (20.179.148.86) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2115.13; Thu, 25 Jul 2019 07:49:34 +0000
+Received: from MN2PR20MB2973.namprd20.prod.outlook.com
+ ([fe80::68d7:2bbb:af61:2e69]) by MN2PR20MB2973.namprd20.prod.outlook.com
+ ([fe80::68d7:2bbb:af61:2e69%6]) with mapi id 15.20.2094.017; Thu, 25 Jul 2019
+ 07:49:34 +0000
+From:   Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+CC:     Milan Broz <gmazyland@gmail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "dm-devel@redhat.com" <dm-devel@redhat.com>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         Horia Geanta <horia.geanta@nxp.com>
-Content-Type: text/plain; charset="UTF-8"
+Subject: RE: [dm-devel] xts fuzz testing and lack of ciphertext stealing
+ support
+Thread-Topic: [dm-devel] xts fuzz testing and lack of ciphertext stealing
+ support
+Thread-Index: AQHVO/5l0aVU4O6KC0WgPIqEsMQCDqbPEhUAgAALMYCAANVxgIAABoCAgAABwICAAAUbgIAAFRTAgAAoQICAAtuUgIAACm4AgAG39ACAAYCLgIAAhUWAgAMXB/CAAPJ1AIAAFx2g
+Date:   Thu, 25 Jul 2019 07:49:34 +0000
+Message-ID: <MN2PR20MB2973CAE4E9CFFE1F417B2509CAC10@MN2PR20MB2973.namprd20.prod.outlook.com>
+References: <20190716221639.GA44406@gmail.com>
+ <VI1PR0402MB34857BBB18C2BB8CBA2DEC7198C90@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+ <20190717172823.GA205944@gmail.com>
+ <CAKv+Gu__offPaWvyURJr8v56ig58q-Deo16QhP26EJ32uf5m3w@mail.gmail.com>
+ <20190718065223.4xaefcwjoxvujntw@gondor.apana.org.au>
+ <CAKv+Gu9-EWNpJ9viSsjhYRdOZb=7a=Mpddmyt8SLEq9aFtawjg@mail.gmail.com>
+ <20190718072154.m2umem24x4grbf6w@gondor.apana.org.au>
+ <36e78459-1594-6d19-0ab4-95b03a6de036@gmail.com>
+ <MN2PR20MB2973E61815F069E8C7D74177CAC80@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <b042649c-db98-9710-b063-242bdf520252@gmail.com>
+ <20190720065807.GA711@sol.localdomain>
+ <0d4d6387-777c-bfd3-e54a-e7244fde0096@gmail.com>
+ <CAKv+Gu9UF+a1UhVU19g1XcLaEqEaAwwkSm3-2wTHEAdD-q4mLQ@mail.gmail.com>
+ <MN2PR20MB2973B9C2DDC508A81AF4A207CAC40@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <CAKv+Gu9C2AEbb++W=QTVWbeA_88Fo57NcOwgU5R8HBvzFwXkJw@mail.gmail.com>
+ <MN2PR20MB2973C378AE5674F9E3E29445CAC60@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <CAKv+Gu-8n_DoauycDQS_9zzRew1rTuPaLxHyg6xhXMmqEvMaCA@mail.gmail.com>
+In-Reply-To: <CAKv+Gu-8n_DoauycDQS_9zzRew1rTuPaLxHyg6xhXMmqEvMaCA@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=pvanleeuwen@verimatrix.com; 
+x-originating-ip: [188.204.2.113]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: e9fdb71e-3063-4b33-5ec1-08d710d4a2d7
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:MN2PR20MB2335;
+x-ms-traffictypediagnostic: MN2PR20MB2335:
+x-ms-exchange-purlcount: 2
+x-microsoft-antispam-prvs: <MN2PR20MB233587DCD7457E88510781CFCAC10@MN2PR20MB2335.namprd20.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:7219;
+x-forefront-prvs: 0109D382B0
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(366004)(346002)(376002)(39850400004)(396003)(136003)(189003)(199004)(13464003)(51914003)(74316002)(6246003)(66946007)(76116006)(66476007)(66556008)(64756008)(316002)(86362001)(53936002)(2906002)(66446008)(6916009)(71190400001)(71200400001)(25786009)(4326008)(81156014)(81166006)(8676002)(7696005)(33656002)(53546011)(6506007)(6436002)(76176011)(68736007)(99286004)(54906003)(8936002)(3846002)(6116002)(229853002)(15974865002)(102836004)(14444005)(305945005)(52536014)(66066001)(966005)(478600001)(5660300002)(256004)(7736002)(26005)(446003)(186003)(476003)(11346002)(6306002)(486006)(55016002)(14454004)(9686003)(18886075002);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR20MB2335;H:MN2PR20MB2973.namprd20.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: verimatrix.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: vVb7wqE1ikYCCK8S43uSxEMuffJngOPmC9b2HxVasszH9vd61DhbHcruzOQeZPbdHoCPwNxfBijeTczx+iCARJRJ4L7KP5n5iDX9orlKPko925hrhi6GEN6OzJjbAnW1xym4vmK/FlFdM8p5aXbxPuTnJAxyNr1W72tXltR2fFamcG5HKsAta5gkJ5btVg0ZFbC4xp/H1guefJWePE5Wvrkk/1DO4ceIx94wUPqkaAfhPZbtaYzTnN/W7IqML9BchyT373Ov//3SfGrQaGi5qtGDwu+PeurKn2afd7aiGv0oLGdyZhQlPjDrlEu0XUUgN6MfnlPsff+80UFHyZ5oxupCEyYrLjxkDV8HMeba1YAxCn7u3YtSBuR3E3RNCWOv7l+lAm6OExgsRsosluH7DOxwAHVYsFaN2tbBegrPdgc=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: verimatrix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e9fdb71e-3063-4b33-5ec1-08d710d4a2d7
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Jul 2019 07:49:34.3651
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: dcb260f9-022d-4495-8602-eae51035a0d0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: pvanleeuwen@verimatrix.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR20MB2335
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 24 Jul 2019 at 19:10, Pascal Van Leeuwen
-<pvanleeuwen@verimatrix.com> wrote:
->
-> Ard,
->
-> > -----Original Message-----
-> > From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> > Sent: Monday, July 22, 2019 6:43 PM
-> > To: Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
-> > Cc: Milan Broz <gmazyland@gmail.com>; Herbert Xu <herbert@gondor.apana.org.au>; dm-devel@redhat.com; linux-
-> > crypto@vger.kernel.org; Horia Geanta <horia.geanta@nxp.com>
-> > Subject: Re: [dm-devel] xts fuzz testing and lack of ciphertext stealing support
-> >
-> > On Mon, 22 Jul 2019 at 12:44, Pascal Van Leeuwen
-> > <pvanleeuwen@verimatrix.com> wrote:
-> > >
-> > > > -----Original Message-----
-> > > > From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> > > > Sent: Sunday, July 21, 2019 11:50 AM
-> > > > To: Milan Broz <gmazyland@gmail.com>
-> > > > Cc: Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>; Herbert Xu <herbert@gondor.apana.org.au>; dm-devel@redhat.com; linux-
-> > > > crypto@vger.kernel.org; Horia Geanta <horia.geanta@nxp.com>
-> > > > Subject: Re: [dm-devel] xts fuzz testing and lack of ciphertext stealing support
-> > > >
-> > > > On Sat, 20 Jul 2019 at 10:35, Milan Broz <gmazyland@gmail.com> wrote:
-> > > > >
-> > > > > On 20/07/2019 08:58, Eric Biggers wrote:
-> > > > > > On Thu, Jul 18, 2019 at 01:19:41PM +0200, Milan Broz wrote:
-> > > > > >> Also, I would like to avoid another "just because it is nicer" module dependence (XTS->XEX->ECB).
-> > > > > >> Last time (when XTS was reimplemented using ECB) we have many reports with initramfs
-> > > > > >> missing ECB module preventing boot from AES-XTS encrypted root after kernel upgrade...
-> > > > > >> Just saying. (Despite the last time it was keyring what broke encrypted boot ;-)
-> > > > > >>
-> > > > > >
-> > > > > > Can't the "missing modules in initramfs" issue be solved by using a
-> > > > > > MODULE_SOFTDEP()?  Actually, why isn't that being used for xts -> ecb already?
-> > > > > >
-> > > > > > (There was also a bug where CONFIG_CRYPTO_XTS didn't select CONFIG_CRYPTO_ECB,
-> > > > > > but that was simply a bug, which was fixed.)
-> > > > >
-> > > > > Sure, and it is solved now. (Some systems with a hardcoded list of modules
-> > > > > have to be manually updated etc., but that is just bad design).
-> > > > > It can be done properly from the beginning.
-> > > > >
-> > > > > I just want to say that that switching to XEX looks like wasting time to me
-> > > > > for no additional benefit.
-> > > > >
-> > > > > Fully implementing XTS does make much more sense for me, even though it is long-term
-> > > > > the effort and the only user, for now, would be testmgr.
-> > > > >
-> > > > > So, there are no users because it does not work. It makes no sense
-> > > > > to implement it, because there are no users... (sorry, sounds like catch 22 :)
-> > > > >
-> > > > > (Maybe someone can use it for keyslot encryption for keys not aligned to
-> > > > > block size, dunno. Actually, some filesystem encryption could have use for it.)
-> > > > >
-> > > > > > Or "xts" and "xex" could go in the same kernel module xts.ko, which would make
-> > > > > > this a non-issue.
-> > > > >
-> > > > > If it is not available for users, I really see no reason to introduce XEX when
-> > > > > it is just XTS with full blocks.
-> > > > >
-> > > > > If it is visible to users, it needs some work in userspace - XEX (as XTS) need two keys,
-> > > > > people are already confused enough that 256bit key in AES-XTS means AES-128...
-> > > > > So the examples, hints, man pages need to be updated, at least.
-> > > > >
-> > > >
-> > > > OK, consider me persuaded. We are already exposing xts(...) to
-> > > > userland, and since we already implement a proper subset of true XTS,
-> > > > it will be simply a matter of making sure that the existing XTS
-> > > > implementations don't regress in performance on the non-CTS code
-> > > > paths.
-> > > >
-> > > > It would be useful, though, to have some generic helper functions,
-> > > > e.g., like the one we have for CBC, or the one I recently proposed for
-> > > > CTS, so that existing implementations (such as the bit sliced AES) can
-> > > > easily be augmented with a CTS code path (but performance may not be
-> > > > optimal in those cases). For the ARM implementations based on AES
-> > > > instructions, it should be reasonably straight forward to implement it
-> > > > close to optimally by reusing some of the code I added for CBC-CTS
-> > > > (but I won't get around to doing that for a while). If there are any
-> > > > volunteers for looking into the generic or x86/AES-NI implementations,
-> > > > please come forward :-) Also, if any of the publications that were
-> > > > quoted in this thread have suitable test vectors, that would be good
-> > > > to know.
-> > >
-> > > Unfortunately, these algorithm & protocol specifications tend to be very frugal when it
-> > > comes to providing test vectors, barely scratching the surface of any corner cases, but
-> > > at least there is one non-multiple-of-16 vector in the original IEEE P1619 / D16
-> > > specification in Annex B Test Vectors (last vector, "XTS-AES-128 applied for a data unit
-> > > that is not a multiple of 16 bytes")
-> > >
-> >
-> > Actually, that spec has a couple of test vectors. Unfortunately, they
-> > are all rather short (except the last one in the 'no multiple of 16
-> > bytes' paragraph, but unfortunately, that one is in fact a multiple of
-> > 16 bytes)
-> >
-> > I added them here [0] along with an arm64 implementation for the AES
-> > instruction based driver. Could you please double check that these
-> > work against your driver?
-> >
-> I got XTS working with the inside-secure driver and these (and all other) vectors pass :-)
->
-
-Excellent, thanks for the report. May I add your Tested-by when I post
-the patch? (just the one that adds the test vectors)
-
-> > That would establish a ground truth against
-> > which we can implement the generic version as well.
-> >
-> > [0] https://git.kernel.org/pub/scm/linux/kernel/git/ardb/linux.git/log/?h=xts-cts
-> >
-> > > Besides that, I'd be happy to generate some testvectors from our defacto-standard
-> > > implementation ;-)
-> > >
-> >
-> > One or two larger ones would be useful, yes.
-> >
-> I'll see if I can extract some suitable vectors from our verification suite ...
->
-
-Great. Once available, I'll run them against my implementations and report back.
+DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IEFyZCBCaWVzaGV1dmVsIDxh
+cmQuYmllc2hldXZlbEBsaW5hcm8ub3JnPg0KPiBTZW50OiBUaHVyc2RheSwgSnVseSAyNSwgMjAx
+OSA4OjIyIEFNDQo+IFRvOiBQYXNjYWwgVmFuIExlZXV3ZW4gPHB2YW5sZWV1d2VuQHZlcmltYXRy
+aXguY29tPg0KPiBDYzogTWlsYW4gQnJveiA8Z21henlsYW5kQGdtYWlsLmNvbT47IEhlcmJlcnQg
+WHUgPGhlcmJlcnRAZ29uZG9yLmFwYW5hLm9yZy5hdT47IGRtLWRldmVsQHJlZGhhdC5jb207IGxp
+bnV4LQ0KPiBjcnlwdG9Admdlci5rZXJuZWwub3JnOyBIb3JpYSBHZWFudGEgPGhvcmlhLmdlYW50
+YUBueHAuY29tPg0KPiBTdWJqZWN0OiBSZTogW2RtLWRldmVsXSB4dHMgZnV6eiB0ZXN0aW5nIGFu
+ZCBsYWNrIG9mIGNpcGhlcnRleHQgc3RlYWxpbmcgc3VwcG9ydA0KPiANCj4gPiA+DQo+ID4gPiBB
+Y3R1YWxseSwgdGhhdCBzcGVjIGhhcyBhIGNvdXBsZSBvZiB0ZXN0IHZlY3RvcnMuIFVuZm9ydHVu
+YXRlbHksIHRoZXkNCj4gPiA+IGFyZSBhbGwgcmF0aGVyIHNob3J0IChleGNlcHQgdGhlIGxhc3Qg
+b25lIGluIHRoZSAnbm8gbXVsdGlwbGUgb2YgMTYNCj4gPiA+IGJ5dGVzJyBwYXJhZ3JhcGgsIGJ1
+dCB1bmZvcnR1bmF0ZWx5LCB0aGF0IG9uZSBpcyBpbiBmYWN0IGEgbXVsdGlwbGUgb2YNCj4gPiA+
+IDE2IGJ5dGVzKQ0KPiA+ID4NCj4gPiA+IEkgYWRkZWQgdGhlbSBoZXJlIFswXSBhbG9uZyB3aXRo
+IGFuIGFybTY0IGltcGxlbWVudGF0aW9uIGZvciB0aGUgQUVTDQo+ID4gPiBpbnN0cnVjdGlvbiBi
+YXNlZCBkcml2ZXIuIENvdWxkIHlvdSBwbGVhc2UgZG91YmxlIGNoZWNrIHRoYXQgdGhlc2UNCj4g
+PiA+IHdvcmsgYWdhaW5zdCB5b3VyIGRyaXZlcj8NCj4gPiA+DQo+ID4gSSBnb3QgWFRTIHdvcmtp
+bmcgd2l0aCB0aGUgaW5zaWRlLXNlY3VyZSBkcml2ZXIgYW5kIHRoZXNlIChhbmQgYWxsIG90aGVy
+KSB2ZWN0b3JzIHBhc3MgOi0pDQo+ID4NCj4gDQo+IEV4Y2VsbGVudCwgdGhhbmtzIGZvciB0aGUg
+cmVwb3J0LiBNYXkgSSBhZGQgeW91ciBUZXN0ZWQtYnkgd2hlbiBJIHBvc3QNCj4gdGhlIHBhdGNo
+PyAoanVzdCB0aGUgb25lIHRoYXQgYWRkcyB0aGUgdGVzdCB2ZWN0b3JzKQ0KPiANClN1cmUsIGZl
+ZWwgZnJlZQ0KDQo+ID4gPiBUaGF0IHdvdWxkIGVzdGFibGlzaCBhIGdyb3VuZCB0cnV0aCBhZ2Fp
+bnN0DQo+ID4gPiB3aGljaCB3ZSBjYW4gaW1wbGVtZW50IHRoZSBnZW5lcmljIHZlcnNpb24gYXMg
+d2VsbC4NCj4gPiA+DQo+ID4gPiBbMF0gaHR0cHM6Ly9naXQua2VybmVsLm9yZy9wdWIvc2NtL2xp
+bnV4L2tlcm5lbC9naXQvYXJkYi9saW51eC5naXQvbG9nLz9oPXh0cy1jdHMNCj4gPiA+DQo+ID4g
+PiA+IEJlc2lkZXMgdGhhdCwgSSdkIGJlIGhhcHB5IHRvIGdlbmVyYXRlIHNvbWUgdGVzdHZlY3Rv
+cnMgZnJvbSBvdXIgZGVmYWN0by1zdGFuZGFyZA0KPiA+ID4gPiBpbXBsZW1lbnRhdGlvbiA7LSkN
+Cj4gPiA+ID4NCj4gPiA+DQo+ID4gPiBPbmUgb3IgdHdvIGxhcmdlciBvbmVzIHdvdWxkIGJlIHVz
+ZWZ1bCwgeWVzLg0KPiA+ID4NCj4gPiBJJ2xsIHNlZSBpZiBJIGNhbiBleHRyYWN0IHNvbWUgc3Vp
+dGFibGUgdmVjdG9ycyBmcm9tIG91ciB2ZXJpZmljYXRpb24gc3VpdGUgLi4uDQo+ID4NCj4gDQo+
+IEdyZWF0LiBPbmNlIGF2YWlsYWJsZSwgSSdsbCBydW4gdGhlbSBhZ2FpbnN0IG15IGltcGxlbWVu
+dGF0aW9ucyBhbmQgcmVwb3J0IGJhY2suDQo+DQpKdXN0IHdvbmRlcmluZyAuLi4gZG8geW91IGhh
+dmUgYW55IHBhcnRpY3VsYXIgcmVxdWlyZW1lbnRzIG9uIHRoZSBzaXplcz8NCkZyb20gbXkgaW1w
+bGVtZW50YXRpb24ncyBwZXJzcGVjdGl2ZSwgaXQgZG9lc24ndCBtYWtlIGEgd2hvbGUgbG90IG9m
+IHNlbnNlIHRvIHRlc3QgdmVjdG9ycyANCm9mIG1vcmUgdGhhbiAzIHRpbWVzIHRoZSBjaXBoZXIg
+YmxvY2sgc2l6ZSwgYnV0IHRoZW4gSSByZWFsaXplZCB0aGF0IHlvdSBwcm9iYWJseSBuZWVkDQps
+YXJnZXIgdmVjdG9ycyBkdWUgdG8gdGhlIGxvb3AgdW5yb2xsaW5nIHlvdSBkbyBmb3IgdGhlIHZl
+Y3RvciBpbXBsZW1lbnRhdGlvbnM/DQpZb3UgYWxzbyBkb24ndCB3YW50IHRoZW0gdG8gYmUgdG9v
+IGJpZyBhcyB0aGV5IHRha2UgdXAgc3BhY2UgaW4gdGhlIGtlcm5lbCBpbWFnZSAuLi4NCg0KUmVn
+YXJkcywNClBhc2NhbCB2YW4gTGVldXdlbg0KU2lsaWNvbiBJUCBBcmNoaXRlY3QsIE11bHRpLVBy
+b3RvY29sIEVuZ2luZXMgQCBWZXJpbWF0cml4DQp3d3cuaW5zaWRlc2VjdXJlLmNvbQ0K
