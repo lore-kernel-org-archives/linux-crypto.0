@@ -7,28 +7,28 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6EBBC7618B
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Jul 2019 13:59:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6407C76191
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Jul 2019 13:59:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AA78A2075E
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Jul 2019 13:59:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AC2FB2075E
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Jul 2019 13:59:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404119AbfGYN7P (ORCPT
+        id S2404209AbfGYN7Y (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 25 Jul 2019 09:59:15 -0400
-Received: from inva021.nxp.com ([92.121.34.21]:58424 "EHLO inva021.nxp.com"
+        Thu, 25 Jul 2019 09:59:24 -0400
+Received: from inva021.nxp.com ([92.121.34.21]:58268 "EHLO inva021.nxp.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2404265AbfGYN6m (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S2404173AbfGYN6m (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Thu, 25 Jul 2019 09:58:42 -0400
 Received: from inva021.nxp.com (localhost [127.0.0.1])
-        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 5DC70200724;
-        Thu, 25 Jul 2019 15:58:40 +0200 (CEST)
+        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 4353A200172;
+        Thu, 25 Jul 2019 15:58:37 +0200 (CEST)
 Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
-        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 4F13C200053;
-        Thu, 25 Jul 2019 15:58:40 +0200 (CEST)
+        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 32D8B200053;
+        Thu, 25 Jul 2019 15:58:37 +0200 (CEST)
 Received: from lorenz.ea.freescale.net (lorenz.ea.freescale.net [10.171.71.5])
-        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 025EE205E8;
-        Thu, 25 Jul 2019 15:58:39 +0200 (CEST)
+        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id D1CE3205E8;
+        Thu, 25 Jul 2019 15:58:36 +0200 (CEST)
 From:   Iuliana Prodan <iuliana.prodan@nxp.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         Horia Geanta <horia.geanta@nxp.com>,
@@ -36,9 +36,9 @@ To:     Herbert Xu <herbert@gondor.apana.org.au>,
 Cc:     "David S. Miller" <davem@davemloft.net>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-imx <linux-imx@nxp.com>
-Subject: [PATCH v3 10/14] crypto: caam - fix MDHA key derivation for certain user key lengths
-Date:   Thu, 25 Jul 2019 16:58:22 +0300
-Message-Id: <1564063106-9552-11-git-send-email-iuliana.prodan@nxp.com>
+Subject: [PATCH v3 02/14] crypto: caam - fix return code in completion callbacks
+Date:   Thu, 25 Jul 2019 16:58:14 +0300
+Message-Id: <1564063106-9552-3-git-send-email-iuliana.prodan@nxp.com>
 X-Mailer: git-send-email 2.1.0
 In-Reply-To: <1564063106-9552-1-git-send-email-iuliana.prodan@nxp.com>
 References: <1564063106-9552-1-git-send-email-iuliana.prodan@nxp.com>
@@ -53,507 +53,689 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Horia Geantă <horia.geanta@nxp.com>
 
-Fuzz testing uncovered an issue when |user key| > |derived key|.
-Derived key generation has to be fixed in two cases:
+Modify drive to provide a valid errno (and not the HW error ID)
+to the user, via completion callbacks.
 
-1. Era >= 6 (DKP is available)
-DKP cannot be used with immediate input key if |user key| > |derived key|,
-since the resulting descriptor (after DKP execution) would be invalid -
-having a few bytes from user key left in descriptor buffer
-as incorrect opcodes.
+A "valid errno" is currently not explicitly mentioned in the docs,
+however the error code is expected to match the one returned by the
+generic SW implementation.
 
-Fix DKP usage both in standalone hmac and in authenc algorithms.
-For authenc the logic is simplified, by always storing both virtual
-and dma key addresses.
+Note: in most error cases caam/qi and caam/qi2 returned -EIO; align all
+caam drivers to return -EINVAL.
 
-2. Era < 6
-The same case (|user key| > |derived key|) fails when DKP
-is not available.
-Make sure gen_split_key() dma maps max(|user key|, |derived key|),
-since this is an in-place (bidirectional) operation.
+While here, ratelimit prints triggered by fuzz testing, such that
+console is not flooded.
 
 Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
-
-Changes since v2:
-- fix MDHA key derivation for CAAM with era < 6.
+Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>
 ---
- drivers/crypto/caam/caamalg.c     | 42 +++++++-----------------
- drivers/crypto/caam/caamalg_qi.c  | 42 +++++++-----------------
- drivers/crypto/caam/caamalg_qi2.c | 67 +++++++++++++++++++++++++++------------
- drivers/crypto/caam/caamhash.c    | 53 ++++++++++++++++++++++---------
- drivers/crypto/caam/desc_constr.h | 24 ++++++++++----
- drivers/crypto/caam/key_gen.c     |  9 +++---
- 6 files changed, 132 insertions(+), 105 deletions(-)
+ drivers/crypto/caam/caamalg.c     | 26 ++++++++--------
+ drivers/crypto/caam/caamalg_qi.c  | 21 ++++---------
+ drivers/crypto/caam/caamalg_qi2.c | 62 ++++++++++++---------------------------
+ drivers/crypto/caam/caamhash.c    | 20 ++++++++-----
+ drivers/crypto/caam/caampkc.c     | 20 ++++++++-----
+ drivers/crypto/caam/error.c       | 60 +++++++++++++++++++++++--------------
+ drivers/crypto/caam/error.h       |  2 +-
+ drivers/crypto/caam/key_gen.c     |  5 ++--
+ drivers/crypto/caam/qi.c          |  5 ++--
+ 9 files changed, 104 insertions(+), 117 deletions(-)
 
 diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index b14a13b..3cc9d5c 100644
+index 43f1825..06b4f2d 100644
 --- a/drivers/crypto/caam/caamalg.c
 +++ b/drivers/crypto/caam/caamalg.c
-@@ -205,6 +205,18 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
- 				ctx->cdata.keylen - CTR_RFC3686_NONCE_SIZE);
- 	}
+@@ -930,19 +930,20 @@ static void aead_encrypt_done(struct device *jrdev, u32 *desc, u32 err,
+ {
+ 	struct aead_request *req = context;
+ 	struct aead_edesc *edesc;
++	int ecode = 0;
  
-+	/*
-+	 * In case |user key| > |derived key|, using DKP<imm,imm>
-+	 * would result in invalid opcodes (last bytes of user key) in
-+	 * the resulting descriptor. Use DKP<ptr,imm> instead => both
-+	 * virtual and dma key addresses are needed.
-+	 */
-+	ctx->adata.key_virt = ctx->key;
-+	ctx->adata.key_dma = ctx->key_dma;
-+
-+	ctx->cdata.key_virt = ctx->key + ctx->adata.keylen_pad;
-+	ctx->cdata.key_dma = ctx->key_dma + ctx->adata.keylen_pad;
-+
- 	data_len[0] = ctx->adata.keylen_pad;
- 	data_len[1] = ctx->cdata.keylen;
+ 	dev_dbg(jrdev, "%s %d: err 0x%x\n", __func__, __LINE__, err);
  
-@@ -221,16 +233,6 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
- 			      ARRAY_SIZE(data_len)) < 0)
- 		return -EINVAL;
+ 	edesc = container_of(desc, struct aead_edesc, hw_desc[0]);
  
--	if (inl_mask & 1)
--		ctx->adata.key_virt = ctx->key;
--	else
--		ctx->adata.key_dma = ctx->key_dma;
+ 	if (err)
+-		caam_jr_strstatus(jrdev, err);
++		ecode = caam_jr_strstatus(jrdev, err);
+ 
+ 	aead_unmap(jrdev, edesc, req);
+ 
+ 	kfree(edesc);
+ 
+-	aead_request_complete(req, err);
++	aead_request_complete(req, ecode);
+ }
+ 
+ static void aead_decrypt_done(struct device *jrdev, u32 *desc, u32 err,
+@@ -950,25 +951,20 @@ static void aead_decrypt_done(struct device *jrdev, u32 *desc, u32 err,
+ {
+ 	struct aead_request *req = context;
+ 	struct aead_edesc *edesc;
++	int ecode = 0;
+ 
+ 	dev_dbg(jrdev, "%s %d: err 0x%x\n", __func__, __LINE__, err);
+ 
+ 	edesc = container_of(desc, struct aead_edesc, hw_desc[0]);
+ 
+ 	if (err)
+-		caam_jr_strstatus(jrdev, err);
++		ecode = caam_jr_strstatus(jrdev, err);
+ 
+ 	aead_unmap(jrdev, edesc, req);
+ 
+-	/*
+-	 * verify hw auth check passed else return -EBADMSG
+-	 */
+-	if ((err & JRSTA_CCBERR_ERRID_MASK) == JRSTA_CCBERR_ERRID_ICVCHK)
+-		err = -EBADMSG;
 -
--	if (inl_mask & 2)
--		ctx->cdata.key_virt = ctx->key + ctx->adata.keylen_pad;
--	else
--		ctx->cdata.key_dma = ctx->key_dma + ctx->adata.keylen_pad;
--
- 	ctx->adata.key_inline = !!(inl_mask & 1);
- 	ctx->cdata.key_inline = !!(inl_mask & 2);
+ 	kfree(edesc);
  
-@@ -253,16 +255,6 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
- 			      ARRAY_SIZE(data_len)) < 0)
- 		return -EINVAL;
+-	aead_request_complete(req, err);
++	aead_request_complete(req, ecode);
+ }
  
--	if (inl_mask & 1)
--		ctx->adata.key_virt = ctx->key;
--	else
--		ctx->adata.key_dma = ctx->key_dma;
--
--	if (inl_mask & 2)
--		ctx->cdata.key_virt = ctx->key + ctx->adata.keylen_pad;
--	else
--		ctx->cdata.key_dma = ctx->key_dma + ctx->adata.keylen_pad;
--
- 	ctx->adata.key_inline = !!(inl_mask & 1);
- 	ctx->cdata.key_inline = !!(inl_mask & 2);
+ static void skcipher_encrypt_done(struct device *jrdev, u32 *desc, u32 err,
+@@ -978,13 +974,14 @@ static void skcipher_encrypt_done(struct device *jrdev, u32 *desc, u32 err,
+ 	struct skcipher_edesc *edesc;
+ 	struct crypto_skcipher *skcipher = crypto_skcipher_reqtfm(req);
+ 	int ivsize = crypto_skcipher_ivsize(skcipher);
++	int ecode = 0;
  
-@@ -287,16 +279,6 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
- 			      ARRAY_SIZE(data_len)) < 0)
- 		return -EINVAL;
+ 	dev_dbg(jrdev, "%s %d: err 0x%x\n", __func__, __LINE__, err);
  
--	if (inl_mask & 1)
--		ctx->adata.key_virt = ctx->key;
--	else
--		ctx->adata.key_dma = ctx->key_dma;
--
--	if (inl_mask & 2)
--		ctx->cdata.key_virt = ctx->key + ctx->adata.keylen_pad;
--	else
--		ctx->cdata.key_dma = ctx->key_dma + ctx->adata.keylen_pad;
--
- 	ctx->adata.key_inline = !!(inl_mask & 1);
- 	ctx->cdata.key_inline = !!(inl_mask & 2);
+ 	edesc = container_of(desc, struct skcipher_edesc, hw_desc[0]);
  
+ 	if (err)
+-		caam_jr_strstatus(jrdev, err);
++		ecode = caam_jr_strstatus(jrdev, err);
+ 
+ 	skcipher_unmap(jrdev, edesc, req);
+ 
+@@ -1008,7 +1005,7 @@ static void skcipher_encrypt_done(struct device *jrdev, u32 *desc, u32 err,
+ 
+ 	kfree(edesc);
+ 
+-	skcipher_request_complete(req, err);
++	skcipher_request_complete(req, ecode);
+ }
+ 
+ static void skcipher_decrypt_done(struct device *jrdev, u32 *desc, u32 err,
+@@ -1018,12 +1015,13 @@ static void skcipher_decrypt_done(struct device *jrdev, u32 *desc, u32 err,
+ 	struct skcipher_edesc *edesc;
+ 	struct crypto_skcipher *skcipher = crypto_skcipher_reqtfm(req);
+ 	int ivsize = crypto_skcipher_ivsize(skcipher);
++	int ecode = 0;
+ 
+ 	dev_dbg(jrdev, "%s %d: err 0x%x\n", __func__, __LINE__, err);
+ 
+ 	edesc = container_of(desc, struct skcipher_edesc, hw_desc[0]);
+ 	if (err)
+-		caam_jr_strstatus(jrdev, err);
++		ecode = caam_jr_strstatus(jrdev, err);
+ 
+ 	skcipher_unmap(jrdev, edesc, req);
+ 
+@@ -1047,7 +1045,7 @@ static void skcipher_decrypt_done(struct device *jrdev, u32 *desc, u32 err,
+ 
+ 	kfree(edesc);
+ 
+-	skcipher_request_complete(req, err);
++	skcipher_request_complete(req, ecode);
+ }
+ 
+ /*
 diff --git a/drivers/crypto/caam/caamalg_qi.c b/drivers/crypto/caam/caamalg_qi.c
-index 452467c..6fe6713 100644
+index 32f0f8a..ab263b1 100644
 --- a/drivers/crypto/caam/caamalg_qi.c
 +++ b/drivers/crypto/caam/caamalg_qi.c
-@@ -105,6 +105,18 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
- 				ctx->cdata.keylen - CTR_RFC3686_NONCE_SIZE);
- 	}
+@@ -884,20 +884,8 @@ static void aead_done(struct caam_drv_req *drv_req, u32 status)
  
-+	/*
-+	 * In case |user key| > |derived key|, using DKP<imm,imm> would result
-+	 * in invalid opcodes (last bytes of user key) in the resulting
-+	 * descriptor. Use DKP<ptr,imm> instead => both virtual and dma key
-+	 * addresses are needed.
-+	 */
-+	ctx->adata.key_virt = ctx->key;
-+	ctx->adata.key_dma = ctx->key_dma;
-+
-+	ctx->cdata.key_virt = ctx->key + ctx->adata.keylen_pad;
-+	ctx->cdata.key_dma = ctx->key_dma + ctx->adata.keylen_pad;
-+
- 	data_len[0] = ctx->adata.keylen_pad;
- 	data_len[1] = ctx->cdata.keylen;
+ 	qidev = caam_ctx->qidev;
  
-@@ -118,16 +130,6 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
- 			      ARRAY_SIZE(data_len)) < 0)
- 		return -EINVAL;
- 
--	if (inl_mask & 1)
--		ctx->adata.key_virt = ctx->key;
--	else
--		ctx->adata.key_dma = ctx->key_dma;
+-	if (unlikely(status)) {
+-		u32 ssrc = status & JRSTA_SSRC_MASK;
+-		u8 err_id = status & JRSTA_CCBERR_ERRID_MASK;
 -
--	if (inl_mask & 2)
--		ctx->cdata.key_virt = ctx->key + ctx->adata.keylen_pad;
--	else
--		ctx->cdata.key_dma = ctx->key_dma + ctx->adata.keylen_pad;
--
- 	ctx->adata.key_inline = !!(inl_mask & 1);
- 	ctx->cdata.key_inline = !!(inl_mask & 2);
+-		caam_jr_strstatus(qidev, status);
+-		/*
+-		 * verify hw auth check passed else return -EBADMSG
+-		 */
+-		if (ssrc == JRSTA_SSRC_CCB_ERROR &&
+-		    err_id == JRSTA_CCBERR_ERRID_ICVCHK)
+-			ecode = -EBADMSG;
+-		else
+-			ecode = -EIO;
+-	}
++	if (unlikely(status))
++		ecode = caam_jr_strstatus(qidev, status);
  
-@@ -143,16 +145,6 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
- 			      ARRAY_SIZE(data_len)) < 0)
- 		return -EINVAL;
+ 	edesc = container_of(drv_req, typeof(*edesc), drv_req);
+ 	aead_unmap(qidev, edesc, aead_req);
+@@ -1190,13 +1178,14 @@ static void skcipher_done(struct caam_drv_req *drv_req, u32 status)
+ 	struct caam_ctx *caam_ctx = crypto_skcipher_ctx(skcipher);
+ 	struct device *qidev = caam_ctx->qidev;
+ 	int ivsize = crypto_skcipher_ivsize(skcipher);
++	int ecode = 0;
  
--	if (inl_mask & 1)
--		ctx->adata.key_virt = ctx->key;
--	else
--		ctx->adata.key_dma = ctx->key_dma;
--
--	if (inl_mask & 2)
--		ctx->cdata.key_virt = ctx->key + ctx->adata.keylen_pad;
--	else
--		ctx->cdata.key_dma = ctx->key_dma + ctx->adata.keylen_pad;
--
- 	ctx->adata.key_inline = !!(inl_mask & 1);
- 	ctx->cdata.key_inline = !!(inl_mask & 2);
+ 	dev_dbg(qidev, "%s %d: status 0x%x\n", __func__, __LINE__, status);
  
-@@ -171,16 +163,6 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
- 			      ARRAY_SIZE(data_len)) < 0)
- 		return -EINVAL;
+ 	edesc = container_of(drv_req, typeof(*edesc), drv_req);
  
--	if (inl_mask & 1)
--		ctx->adata.key_virt = ctx->key;
--	else
--		ctx->adata.key_dma = ctx->key_dma;
--
--	if (inl_mask & 2)
--		ctx->cdata.key_virt = ctx->key + ctx->adata.keylen_pad;
--	else
--		ctx->cdata.key_dma = ctx->key_dma + ctx->adata.keylen_pad;
--
- 	ctx->adata.key_inline = !!(inl_mask & 1);
- 	ctx->cdata.key_inline = !!(inl_mask & 2);
+ 	if (status)
+-		caam_jr_strstatus(qidev, status);
++		ecode = caam_jr_strstatus(qidev, status);
  
+ 	print_hex_dump_debug("dstiv  @" __stringify(__LINE__)": ",
+ 			     DUMP_PREFIX_ADDRESS, 16, 4, req->iv,
+@@ -1215,7 +1204,7 @@ static void skcipher_done(struct caam_drv_req *drv_req, u32 status)
+ 	memcpy(req->iv, (u8 *)&edesc->sgt[0] + edesc->qm_sg_bytes, ivsize);
+ 
+ 	qi_cache_free(edesc);
+-	skcipher_request_complete(req, status);
++	skcipher_request_complete(req, ecode);
+ }
+ 
+ static struct skcipher_edesc *skcipher_edesc_alloc(struct skcipher_request *req,
 diff --git a/drivers/crypto/caam/caamalg_qi2.c b/drivers/crypto/caam/caamalg_qi2.c
-index c1eca99..66228e7 100644
+index 06bf32c..2681581 100644
 --- a/drivers/crypto/caam/caamalg_qi2.c
 +++ b/drivers/crypto/caam/caamalg_qi2.c
-@@ -198,6 +198,18 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
- 				ctx->cdata.keylen - CTR_RFC3686_NONCE_SIZE);
- 	}
+@@ -1227,10 +1227,8 @@ static void aead_encrypt_done(void *cbk_ctx, u32 status)
  
-+	/*
-+	 * In case |user key| > |derived key|, using DKP<imm,imm> would result
-+	 * in invalid opcodes (last bytes of user key) in the resulting
-+	 * descriptor. Use DKP<ptr,imm> instead => both virtual and dma key
-+	 * addresses are needed.
-+	 */
-+	ctx->adata.key_virt = ctx->key;
-+	ctx->adata.key_dma = ctx->key_dma;
-+
-+	ctx->cdata.key_virt = ctx->key + ctx->adata.keylen_pad;
-+	ctx->cdata.key_dma = ctx->key_dma + ctx->adata.keylen_pad;
-+
- 	data_len[0] = ctx->adata.keylen_pad;
- 	data_len[1] = ctx->cdata.keylen;
+ 	dev_dbg(ctx->dev, "%s %d: err 0x%x\n", __func__, __LINE__, status);
  
-@@ -209,16 +221,6 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
- 			      ARRAY_SIZE(data_len)) < 0)
- 		return -EINVAL;
+-	if (unlikely(status)) {
+-		caam_qi2_strstatus(ctx->dev, status);
+-		ecode = -EIO;
+-	}
++	if (unlikely(status))
++		ecode = caam_qi2_strstatus(ctx->dev, status);
  
--	if (inl_mask & 1)
--		ctx->adata.key_virt = ctx->key;
--	else
--		ctx->adata.key_dma = ctx->key_dma;
+ 	aead_unmap(ctx->dev, edesc, req);
+ 	qi_cache_free(edesc);
+@@ -1250,17 +1248,8 @@ static void aead_decrypt_done(void *cbk_ctx, u32 status)
+ 
+ 	dev_dbg(ctx->dev, "%s %d: err 0x%x\n", __func__, __LINE__, status);
+ 
+-	if (unlikely(status)) {
+-		caam_qi2_strstatus(ctx->dev, status);
+-		/*
+-		 * verify hw auth check passed else return -EBADMSG
+-		 */
+-		if ((status & JRSTA_CCBERR_ERRID_MASK) ==
+-		     JRSTA_CCBERR_ERRID_ICVCHK)
+-			ecode = -EBADMSG;
+-		else
+-			ecode = -EIO;
+-	}
++	if (unlikely(status))
++		ecode = caam_qi2_strstatus(ctx->dev, status);
+ 
+ 	aead_unmap(ctx->dev, edesc, req);
+ 	qi_cache_free(edesc);
+@@ -1352,10 +1341,8 @@ static void skcipher_encrypt_done(void *cbk_ctx, u32 status)
+ 
+ 	dev_dbg(ctx->dev, "%s %d: err 0x%x\n", __func__, __LINE__, status);
+ 
+-	if (unlikely(status)) {
+-		caam_qi2_strstatus(ctx->dev, status);
+-		ecode = -EIO;
+-	}
++	if (unlikely(status))
++		ecode = caam_qi2_strstatus(ctx->dev, status);
+ 
+ 	print_hex_dump_debug("dstiv  @" __stringify(__LINE__)": ",
+ 			     DUMP_PREFIX_ADDRESS, 16, 4, req->iv,
+@@ -1390,10 +1377,8 @@ static void skcipher_decrypt_done(void *cbk_ctx, u32 status)
+ 
+ 	dev_dbg(ctx->dev, "%s %d: err 0x%x\n", __func__, __LINE__, status);
+ 
+-	if (unlikely(status)) {
+-		caam_qi2_strstatus(ctx->dev, status);
+-		ecode = -EIO;
+-	}
++	if (unlikely(status))
++		ecode = caam_qi2_strstatus(ctx->dev, status);
+ 
+ 	print_hex_dump_debug("dstiv  @" __stringify(__LINE__)": ",
+ 			     DUMP_PREFIX_ADDRESS, 16, 4, req->iv,
+@@ -3094,10 +3079,7 @@ static void split_key_sh_done(void *cbk_ctx, u32 err)
+ 
+ 	dev_dbg(res->dev, "%s %d: err 0x%x\n", __func__, __LINE__, err);
+ 
+-	if (err)
+-		caam_qi2_strstatus(res->dev, err);
 -
--	if (inl_mask & 2)
--		ctx->cdata.key_virt = ctx->key + ctx->adata.keylen_pad;
--	else
--		ctx->cdata.key_dma = ctx->key_dma + ctx->adata.keylen_pad;
--
- 	ctx->adata.key_inline = !!(inl_mask & 1);
- 	ctx->cdata.key_inline = !!(inl_mask & 2);
- 
-@@ -247,16 +249,6 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
- 			      ARRAY_SIZE(data_len)) < 0)
- 		return -EINVAL;
- 
--	if (inl_mask & 1)
--		ctx->adata.key_virt = ctx->key;
--	else
--		ctx->adata.key_dma = ctx->key_dma;
--
--	if (inl_mask & 2)
--		ctx->cdata.key_virt = ctx->key + ctx->adata.keylen_pad;
--	else
--		ctx->cdata.key_dma = ctx->key_dma + ctx->adata.keylen_pad;
--
- 	ctx->adata.key_inline = !!(inl_mask & 1);
- 	ctx->cdata.key_inline = !!(inl_mask & 2);
- 
-@@ -2998,6 +2990,7 @@ enum hash_optype {
- /**
-  * caam_hash_ctx - ahash per-session context
-  * @flc: Flow Contexts array
-+ * @key: authentication key
-  * @flc_dma: I/O virtual addresses of the Flow Contexts
-  * @dev: dpseci device
-  * @ctx_len: size of Context Register
-@@ -3005,6 +2998,7 @@ enum hash_optype {
-  */
- struct caam_hash_ctx {
- 	struct caam_flc flc[HASH_NUM_OP];
-+	u8 key[CAAM_MAX_HASH_BLOCK_SIZE] ____cacheline_aligned;
- 	dma_addr_t flc_dma[HASH_NUM_OP];
- 	struct device *dev;
- 	int ctx_len;
-@@ -3305,6 +3299,19 @@ static int ahash_setkey(struct crypto_ahash *ahash, const u8 *key,
- 	ctx->adata.key_virt = key;
- 	ctx->adata.key_inline = true;
- 
-+	/*
-+	 * In case |user key| > |derived key|, using DKP<imm,imm> would result
-+	 * in invalid opcodes (last bytes of user key) in the resulting
-+	 * descriptor. Use DKP<ptr,imm> instead => both virtual and dma key
-+	 * addresses are needed.
-+	 */
-+	if (keylen > ctx->adata.keylen_pad) {
-+		memcpy(ctx->key, key, keylen);
-+		dma_sync_single_for_device(ctx->dev, ctx->adata.key_dma,
-+					   ctx->adata.keylen_pad,
-+					   DMA_TO_DEVICE);
-+	}
-+
- 	ret = ahash_set_sh_desc(ahash);
- 	kfree(hashed_key);
- 	return ret;
-@@ -4535,11 +4542,27 @@ static int caam_hash_cra_init(struct crypto_tfm *tfm)
- 
- 	ctx->dev = caam_hash->dev;
- 
-+	if (alg->setkey) {
-+		ctx->adata.key_dma = dma_map_single_attrs(ctx->dev, ctx->key,
-+							  ARRAY_SIZE(ctx->key),
-+							  DMA_TO_DEVICE,
-+							  DMA_ATTR_SKIP_CPU_SYNC);
-+		if (dma_mapping_error(ctx->dev, ctx->adata.key_dma)) {
-+			dev_err(ctx->dev, "unable to map key\n");
-+			return -ENOMEM;
-+		}
-+	}
-+
- 	dma_addr = dma_map_single_attrs(ctx->dev, ctx->flc, sizeof(ctx->flc),
- 					DMA_BIDIRECTIONAL,
- 					DMA_ATTR_SKIP_CPU_SYNC);
- 	if (dma_mapping_error(ctx->dev, dma_addr)) {
- 		dev_err(ctx->dev, "unable to map shared descriptors\n");
-+		if (ctx->adata.key_dma)
-+			dma_unmap_single_attrs(ctx->dev, ctx->adata.key_dma,
-+					       ARRAY_SIZE(ctx->key),
-+					       DMA_TO_DEVICE,
-+					       DMA_ATTR_SKIP_CPU_SYNC);
- 		return -ENOMEM;
- 	}
- 
-@@ -4565,6 +4588,10 @@ static void caam_hash_cra_exit(struct crypto_tfm *tfm)
- 
- 	dma_unmap_single_attrs(ctx->dev, ctx->flc_dma[0], sizeof(ctx->flc),
- 			       DMA_BIDIRECTIONAL, DMA_ATTR_SKIP_CPU_SYNC);
-+	if (ctx->adata.key_dma)
-+		dma_unmap_single_attrs(ctx->dev, ctx->adata.key_dma,
-+				       ARRAY_SIZE(ctx->key), DMA_TO_DEVICE,
-+				       DMA_ATTR_SKIP_CPU_SYNC);
+-	res->err = err;
++	res->err = err ? caam_qi2_strstatus(res->dev, err) : 0;
+ 	complete(&res->completion);
  }
  
- static struct caam_hash_alg *caam_hash_alloc(struct device *dev,
+@@ -3282,10 +3264,8 @@ static void ahash_done(void *cbk_ctx, u32 status)
+ 
+ 	dev_dbg(ctx->dev, "%s %d: err 0x%x\n", __func__, __LINE__, status);
+ 
+-	if (unlikely(status)) {
+-		caam_qi2_strstatus(ctx->dev, status);
+-		ecode = -EIO;
+-	}
++	if (unlikely(status))
++		ecode = caam_qi2_strstatus(ctx->dev, status);
+ 
+ 	ahash_unmap_ctx(ctx->dev, edesc, req, DMA_FROM_DEVICE);
+ 	memcpy(req->result, state->caam_ctx, digestsize);
+@@ -3310,10 +3290,8 @@ static void ahash_done_bi(void *cbk_ctx, u32 status)
+ 
+ 	dev_dbg(ctx->dev, "%s %d: err 0x%x\n", __func__, __LINE__, status);
+ 
+-	if (unlikely(status)) {
+-		caam_qi2_strstatus(ctx->dev, status);
+-		ecode = -EIO;
+-	}
++	if (unlikely(status))
++		ecode = caam_qi2_strstatus(ctx->dev, status);
+ 
+ 	ahash_unmap_ctx(ctx->dev, edesc, req, DMA_BIDIRECTIONAL);
+ 	switch_buf(state);
+@@ -3343,10 +3321,8 @@ static void ahash_done_ctx_src(void *cbk_ctx, u32 status)
+ 
+ 	dev_dbg(ctx->dev, "%s %d: err 0x%x\n", __func__, __LINE__, status);
+ 
+-	if (unlikely(status)) {
+-		caam_qi2_strstatus(ctx->dev, status);
+-		ecode = -EIO;
+-	}
++	if (unlikely(status))
++		ecode = caam_qi2_strstatus(ctx->dev, status);
+ 
+ 	ahash_unmap_ctx(ctx->dev, edesc, req, DMA_BIDIRECTIONAL);
+ 	memcpy(req->result, state->caam_ctx, digestsize);
+@@ -3371,10 +3347,8 @@ static void ahash_done_ctx_dst(void *cbk_ctx, u32 status)
+ 
+ 	dev_dbg(ctx->dev, "%s %d: err 0x%x\n", __func__, __LINE__, status);
+ 
+-	if (unlikely(status)) {
+-		caam_qi2_strstatus(ctx->dev, status);
+-		ecode = -EIO;
+-	}
++	if (unlikely(status))
++		ecode = caam_qi2_strstatus(ctx->dev, status);
+ 
+ 	ahash_unmap_ctx(ctx->dev, edesc, req, DMA_FROM_DEVICE);
+ 	switch_buf(state);
+@@ -4700,7 +4674,7 @@ static void dpaa2_caam_process_fd(struct dpaa2_caam_priv *priv,
+ 
+ 	fd_err = dpaa2_fd_get_ctrl(fd) & FD_CTRL_ERR_MASK;
+ 	if (unlikely(fd_err))
+-		dev_err(priv->dev, "FD error: %08x\n", fd_err);
++		dev_err_ratelimited(priv->dev, "FD error: %08x\n", fd_err);
+ 
+ 	/*
+ 	 * FD[ADDR] is guaranteed to be valid, irrespective of errors reported
 diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
-index 49ab6ca..7147190 100644
+index e4ac5d5..73abefa 100644
 --- a/drivers/crypto/caam/caamhash.c
 +++ b/drivers/crypto/caam/caamhash.c
-@@ -96,6 +96,7 @@ struct caam_hash_ctx {
- 	dma_addr_t sh_desc_fin_dma;
- 	dma_addr_t sh_desc_digest_dma;
- 	enum dma_data_direction dir;
-+	enum dma_data_direction key_dir;
- 	struct device *jrdev;
- 	int ctx_len;
- 	struct alginfo adata;
-@@ -476,6 +477,18 @@ static int ahash_setkey(struct crypto_ahash *ahash,
- 			goto bad_free_key;
+@@ -584,12 +584,13 @@ static void ahash_done(struct device *jrdev, u32 *desc, u32 err,
+ 	int digestsize = crypto_ahash_digestsize(ahash);
+ 	struct caam_hash_state *state = ahash_request_ctx(req);
+ 	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
++	int ecode = 0;
  
- 		memcpy(ctx->key, key, keylen);
-+
-+		/*
-+		 * In case |user key| > |derived key|, using DKP<imm,imm>
-+		 * would result in invalid opcodes (last bytes of user key) in
-+		 * the resulting descriptor. Use DKP<ptr,imm> instead => both
-+		 * virtual and dma key addresses are needed.
-+		 */
-+		if (keylen > ctx->adata.keylen_pad)
-+			dma_sync_single_for_device(ctx->jrdev,
-+						   ctx->adata.key_dma,
-+						   ctx->adata.keylen_pad,
-+						   DMA_TO_DEVICE);
- 	} else {
- 		ret = gen_split_key(ctx->jrdev, ctx->key, &ctx->adata, key,
- 				    keylen, CAAM_MAX_HASH_KEY_SIZE);
-@@ -1825,40 +1838,50 @@ static int caam_hash_cra_init(struct crypto_tfm *tfm)
+ 	dev_dbg(jrdev, "%s %d: err 0x%x\n", __func__, __LINE__, err);
  
- 	if (is_xcbc_aes(caam_hash->alg_type)) {
- 		ctx->dir = DMA_TO_DEVICE;
-+		ctx->key_dir = DMA_BIDIRECTIONAL;
- 		ctx->adata.algtype = OP_TYPE_CLASS1_ALG | caam_hash->alg_type;
- 		ctx->ctx_len = 48;
--
--		ctx->adata.key_dma = dma_map_single_attrs(ctx->jrdev, ctx->key,
--							  ARRAY_SIZE(ctx->key),
--							  DMA_BIDIRECTIONAL,
--							  DMA_ATTR_SKIP_CPU_SYNC);
--		if (dma_mapping_error(ctx->jrdev, ctx->adata.key_dma)) {
--			dev_err(ctx->jrdev, "unable to map key\n");
--			caam_jr_free(ctx->jrdev);
--			return -ENOMEM;
--		}
- 	} else if (is_cmac_aes(caam_hash->alg_type)) {
- 		ctx->dir = DMA_TO_DEVICE;
-+		ctx->key_dir = DMA_NONE;
- 		ctx->adata.algtype = OP_TYPE_CLASS1_ALG | caam_hash->alg_type;
- 		ctx->ctx_len = 32;
- 	} else {
--		ctx->dir = priv->era >= 6 ? DMA_BIDIRECTIONAL : DMA_TO_DEVICE;
-+		if (priv->era >= 6) {
-+			ctx->dir = DMA_BIDIRECTIONAL;
-+			ctx->key_dir = alg->setkey ? DMA_TO_DEVICE : DMA_NONE;
-+		} else {
-+			ctx->dir = DMA_TO_DEVICE;
-+			ctx->key_dir = DMA_NONE;
-+		}
- 		ctx->adata.algtype = OP_TYPE_CLASS2_ALG | caam_hash->alg_type;
- 		ctx->ctx_len = runninglen[(ctx->adata.algtype &
- 					   OP_ALG_ALGSEL_SUBMASK) >>
- 					  OP_ALG_ALGSEL_SHIFT];
- 	}
+ 	edesc = container_of(desc, struct ahash_edesc, hw_desc[0]);
+ 	if (err)
+-		caam_jr_strstatus(jrdev, err);
++		ecode = caam_jr_strstatus(jrdev, err);
  
-+	if (ctx->key_dir != DMA_NONE) {
-+		ctx->adata.key_dma = dma_map_single_attrs(ctx->jrdev, ctx->key,
-+							  ARRAY_SIZE(ctx->key),
-+							  ctx->key_dir,
-+							  DMA_ATTR_SKIP_CPU_SYNC);
-+		if (dma_mapping_error(ctx->jrdev, ctx->adata.key_dma)) {
-+			dev_err(ctx->jrdev, "unable to map key\n");
-+			caam_jr_free(ctx->jrdev);
-+			return -ENOMEM;
-+		}
-+	}
-+
- 	dma_addr = dma_map_single_attrs(ctx->jrdev, ctx->sh_desc_update,
- 					offsetof(struct caam_hash_ctx, key),
- 					ctx->dir, DMA_ATTR_SKIP_CPU_SYNC);
- 	if (dma_mapping_error(ctx->jrdev, dma_addr)) {
- 		dev_err(ctx->jrdev, "unable to map shared descriptors\n");
+ 	ahash_unmap_ctx(jrdev, edesc, req, digestsize, DMA_FROM_DEVICE);
+ 	memcpy(req->result, state->caam_ctx, digestsize);
+@@ -599,7 +600,7 @@ static void ahash_done(struct device *jrdev, u32 *desc, u32 err,
+ 			     DUMP_PREFIX_ADDRESS, 16, 4, state->caam_ctx,
+ 			     ctx->ctx_len, 1);
  
--		if (is_xcbc_aes(caam_hash->alg_type))
-+		if (ctx->key_dir != DMA_NONE)
- 			dma_unmap_single_attrs(ctx->jrdev, ctx->adata.key_dma,
- 					       ARRAY_SIZE(ctx->key),
--					       DMA_BIDIRECTIONAL,
-+					       ctx->key_dir,
- 					       DMA_ATTR_SKIP_CPU_SYNC);
- 
- 		caam_jr_free(ctx->jrdev);
-@@ -1891,9 +1914,9 @@ static void caam_hash_cra_exit(struct crypto_tfm *tfm)
- 	dma_unmap_single_attrs(ctx->jrdev, ctx->sh_desc_update_dma,
- 			       offsetof(struct caam_hash_ctx, key),
- 			       ctx->dir, DMA_ATTR_SKIP_CPU_SYNC);
--	if (is_xcbc_aes(ctx->adata.algtype))
-+	if (ctx->key_dir != DMA_NONE)
- 		dma_unmap_single_attrs(ctx->jrdev, ctx->adata.key_dma,
--				       ARRAY_SIZE(ctx->key), DMA_BIDIRECTIONAL,
-+				       ARRAY_SIZE(ctx->key), ctx->key_dir,
- 				       DMA_ATTR_SKIP_CPU_SYNC);
- 	caam_jr_free(ctx->jrdev);
+-	req->base.complete(&req->base, err);
++	req->base.complete(&req->base, ecode);
  }
-diff --git a/drivers/crypto/caam/desc_constr.h b/drivers/crypto/caam/desc_constr.h
-index 8154174..536f360 100644
---- a/drivers/crypto/caam/desc_constr.h
-+++ b/drivers/crypto/caam/desc_constr.h
-@@ -533,14 +533,26 @@ static inline void append_proto_dkp(u32 * const desc, struct alginfo *adata)
- 	if (adata->key_inline) {
- 		int words;
  
--		append_operation(desc, OP_TYPE_UNI_PROTOCOL | protid |
--				 OP_PCL_DKP_SRC_IMM | OP_PCL_DKP_DST_IMM |
--				 adata->keylen);
--		append_data(desc, adata->key_virt, adata->keylen);
-+		if (adata->keylen > adata->keylen_pad) {
-+			append_operation(desc, OP_TYPE_UNI_PROTOCOL | protid |
-+					 OP_PCL_DKP_SRC_PTR |
-+					 OP_PCL_DKP_DST_IMM | adata->keylen);
-+			append_ptr(desc, adata->key_dma);
-+
-+			words = (ALIGN(adata->keylen_pad, CAAM_CMD_SZ) -
-+				 CAAM_PTR_SZ) / CAAM_CMD_SZ;
-+		} else {
-+			append_operation(desc, OP_TYPE_UNI_PROTOCOL | protid |
-+					 OP_PCL_DKP_SRC_IMM |
-+					 OP_PCL_DKP_DST_IMM | adata->keylen);
-+			append_data(desc, adata->key_virt, adata->keylen);
-+
-+			words = (ALIGN(adata->keylen_pad, CAAM_CMD_SZ) -
-+				 ALIGN(adata->keylen, CAAM_CMD_SZ)) /
-+				CAAM_CMD_SZ;
-+		}
+ static void ahash_done_bi(struct device *jrdev, u32 *desc, u32 err,
+@@ -611,12 +612,13 @@ static void ahash_done_bi(struct device *jrdev, u32 *desc, u32 err,
+ 	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
+ 	struct caam_hash_state *state = ahash_request_ctx(req);
+ 	int digestsize = crypto_ahash_digestsize(ahash);
++	int ecode = 0;
  
- 		/* Reserve space in descriptor buffer for the derived key */
--		words = (ALIGN(adata->keylen_pad, CAAM_CMD_SZ) -
--			 ALIGN(adata->keylen, CAAM_CMD_SZ)) / CAAM_CMD_SZ;
- 		if (words)
- 			(*desc) = cpu_to_caam32(caam32_to_cpu(*desc) + words);
- 	} else {
+ 	dev_dbg(jrdev, "%s %d: err 0x%x\n", __func__, __LINE__, err);
+ 
+ 	edesc = container_of(desc, struct ahash_edesc, hw_desc[0]);
+ 	if (err)
+-		caam_jr_strstatus(jrdev, err);
++		ecode = caam_jr_strstatus(jrdev, err);
+ 
+ 	ahash_unmap_ctx(jrdev, edesc, req, ctx->ctx_len, DMA_BIDIRECTIONAL);
+ 	switch_buf(state);
+@@ -630,7 +632,7 @@ static void ahash_done_bi(struct device *jrdev, u32 *desc, u32 err,
+ 				     DUMP_PREFIX_ADDRESS, 16, 4, req->result,
+ 				     digestsize, 1);
+ 
+-	req->base.complete(&req->base, err);
++	req->base.complete(&req->base, ecode);
+ }
+ 
+ static void ahash_done_ctx_src(struct device *jrdev, u32 *desc, u32 err,
+@@ -642,12 +644,13 @@ static void ahash_done_ctx_src(struct device *jrdev, u32 *desc, u32 err,
+ 	int digestsize = crypto_ahash_digestsize(ahash);
+ 	struct caam_hash_state *state = ahash_request_ctx(req);
+ 	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
++	int ecode = 0;
+ 
+ 	dev_dbg(jrdev, "%s %d: err 0x%x\n", __func__, __LINE__, err);
+ 
+ 	edesc = container_of(desc, struct ahash_edesc, hw_desc[0]);
+ 	if (err)
+-		caam_jr_strstatus(jrdev, err);
++		ecode = caam_jr_strstatus(jrdev, err);
+ 
+ 	ahash_unmap_ctx(jrdev, edesc, req, digestsize, DMA_BIDIRECTIONAL);
+ 	memcpy(req->result, state->caam_ctx, digestsize);
+@@ -657,7 +660,7 @@ static void ahash_done_ctx_src(struct device *jrdev, u32 *desc, u32 err,
+ 			     DUMP_PREFIX_ADDRESS, 16, 4, state->caam_ctx,
+ 			     ctx->ctx_len, 1);
+ 
+-	req->base.complete(&req->base, err);
++	req->base.complete(&req->base, ecode);
+ }
+ 
+ static void ahash_done_ctx_dst(struct device *jrdev, u32 *desc, u32 err,
+@@ -669,12 +672,13 @@ static void ahash_done_ctx_dst(struct device *jrdev, u32 *desc, u32 err,
+ 	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
+ 	struct caam_hash_state *state = ahash_request_ctx(req);
+ 	int digestsize = crypto_ahash_digestsize(ahash);
++	int ecode = 0;
+ 
+ 	dev_dbg(jrdev, "%s %d: err 0x%x\n", __func__, __LINE__, err);
+ 
+ 	edesc = container_of(desc, struct ahash_edesc, hw_desc[0]);
+ 	if (err)
+-		caam_jr_strstatus(jrdev, err);
++		ecode = caam_jr_strstatus(jrdev, err);
+ 
+ 	ahash_unmap_ctx(jrdev, edesc, req, ctx->ctx_len, DMA_FROM_DEVICE);
+ 	switch_buf(state);
+@@ -688,7 +692,7 @@ static void ahash_done_ctx_dst(struct device *jrdev, u32 *desc, u32 err,
+ 				     DUMP_PREFIX_ADDRESS, 16, 4, req->result,
+ 				     digestsize, 1);
+ 
+-	req->base.complete(&req->base, err);
++	req->base.complete(&req->base, ecode);
+ }
+ 
+ /*
+diff --git a/drivers/crypto/caam/caampkc.c b/drivers/crypto/caam/caampkc.c
+index 8057410..574428c7 100644
+--- a/drivers/crypto/caam/caampkc.c
++++ b/drivers/crypto/caam/caampkc.c
+@@ -107,9 +107,10 @@ static void rsa_pub_done(struct device *dev, u32 *desc, u32 err, void *context)
+ {
+ 	struct akcipher_request *req = context;
+ 	struct rsa_edesc *edesc;
++	int ecode = 0;
+ 
+ 	if (err)
+-		caam_jr_strstatus(dev, err);
++		ecode = caam_jr_strstatus(dev, err);
+ 
+ 	edesc = container_of(desc, struct rsa_edesc, hw_desc[0]);
+ 
+@@ -117,7 +118,7 @@ static void rsa_pub_done(struct device *dev, u32 *desc, u32 err, void *context)
+ 	rsa_io_unmap(dev, edesc, req);
+ 	kfree(edesc);
+ 
+-	akcipher_request_complete(req, err);
++	akcipher_request_complete(req, ecode);
+ }
+ 
+ static void rsa_priv_f1_done(struct device *dev, u32 *desc, u32 err,
+@@ -125,9 +126,10 @@ static void rsa_priv_f1_done(struct device *dev, u32 *desc, u32 err,
+ {
+ 	struct akcipher_request *req = context;
+ 	struct rsa_edesc *edesc;
++	int ecode = 0;
+ 
+ 	if (err)
+-		caam_jr_strstatus(dev, err);
++		ecode = caam_jr_strstatus(dev, err);
+ 
+ 	edesc = container_of(desc, struct rsa_edesc, hw_desc[0]);
+ 
+@@ -135,7 +137,7 @@ static void rsa_priv_f1_done(struct device *dev, u32 *desc, u32 err,
+ 	rsa_io_unmap(dev, edesc, req);
+ 	kfree(edesc);
+ 
+-	akcipher_request_complete(req, err);
++	akcipher_request_complete(req, ecode);
+ }
+ 
+ static void rsa_priv_f2_done(struct device *dev, u32 *desc, u32 err,
+@@ -143,9 +145,10 @@ static void rsa_priv_f2_done(struct device *dev, u32 *desc, u32 err,
+ {
+ 	struct akcipher_request *req = context;
+ 	struct rsa_edesc *edesc;
++	int ecode = 0;
+ 
+ 	if (err)
+-		caam_jr_strstatus(dev, err);
++		ecode = caam_jr_strstatus(dev, err);
+ 
+ 	edesc = container_of(desc, struct rsa_edesc, hw_desc[0]);
+ 
+@@ -153,7 +156,7 @@ static void rsa_priv_f2_done(struct device *dev, u32 *desc, u32 err,
+ 	rsa_io_unmap(dev, edesc, req);
+ 	kfree(edesc);
+ 
+-	akcipher_request_complete(req, err);
++	akcipher_request_complete(req, ecode);
+ }
+ 
+ static void rsa_priv_f3_done(struct device *dev, u32 *desc, u32 err,
+@@ -161,9 +164,10 @@ static void rsa_priv_f3_done(struct device *dev, u32 *desc, u32 err,
+ {
+ 	struct akcipher_request *req = context;
+ 	struct rsa_edesc *edesc;
++	int ecode = 0;
+ 
+ 	if (err)
+-		caam_jr_strstatus(dev, err);
++		ecode = caam_jr_strstatus(dev, err);
+ 
+ 	edesc = container_of(desc, struct rsa_edesc, hw_desc[0]);
+ 
+@@ -171,7 +175,7 @@ static void rsa_priv_f3_done(struct device *dev, u32 *desc, u32 err,
+ 	rsa_io_unmap(dev, edesc, req);
+ 	kfree(edesc);
+ 
+-	akcipher_request_complete(req, err);
++	akcipher_request_complete(req, ecode);
+ }
+ 
+ /**
+diff --git a/drivers/crypto/caam/error.c b/drivers/crypto/caam/error.c
+index 95da6ae..b7fbf1b 100644
+--- a/drivers/crypto/caam/error.c
++++ b/drivers/crypto/caam/error.c
+@@ -211,8 +211,8 @@ static const char * const rng_err_id_list[] = {
+ 	"Secure key generation",
+ };
+ 
+-static void report_ccb_status(struct device *jrdev, const u32 status,
+-			      const char *error)
++static int report_ccb_status(struct device *jrdev, const u32 status,
++			     const char *error)
+ {
+ 	u8 cha_id = (status & JRSTA_CCBERR_CHAID_MASK) >>
+ 		    JRSTA_CCBERR_CHAID_SHIFT;
+@@ -248,22 +248,27 @@ static void report_ccb_status(struct device *jrdev, const u32 status,
+ 	 * CCB ICV check failures are part of normal operation life;
+ 	 * we leave the upper layers to do what they want with them.
+ 	 */
+-	if (err_id != JRSTA_CCBERR_ERRID_ICVCHK)
+-		dev_err(jrdev, "%08x: %s: %s %d: %s%s: %s%s\n",
+-			status, error, idx_str, idx,
+-			cha_str, cha_err_code,
+-			err_str, err_err_code);
++	if (err_id == JRSTA_CCBERR_ERRID_ICVCHK)
++		return -EBADMSG;
++
++	dev_err_ratelimited(jrdev, "%08x: %s: %s %d: %s%s: %s%s\n", status,
++			    error, idx_str, idx, cha_str, cha_err_code,
++			    err_str, err_err_code);
++
++	return -EINVAL;
+ }
+ 
+-static void report_jump_status(struct device *jrdev, const u32 status,
+-			       const char *error)
++static int report_jump_status(struct device *jrdev, const u32 status,
++			      const char *error)
+ {
+ 	dev_err(jrdev, "%08x: %s: %s() not implemented\n",
+ 		status, error, __func__);
++
++	return -EINVAL;
+ }
+ 
+-static void report_deco_status(struct device *jrdev, const u32 status,
+-			       const char *error)
++static int report_deco_status(struct device *jrdev, const u32 status,
++			      const char *error)
+ {
+ 	u8 err_id = status & JRSTA_DECOERR_ERROR_MASK;
+ 	u8 idx = (status & JRSTA_DECOERR_INDEX_MASK) >>
+@@ -289,10 +294,12 @@ static void report_deco_status(struct device *jrdev, const u32 status,
+ 
+ 	dev_err(jrdev, "%08x: %s: %s %d: %s%s\n",
+ 		status, error, idx_str, idx, err_str, err_err_code);
++
++	return -EINVAL;
+ }
+ 
+-static void report_qi_status(struct device *qidev, const u32 status,
+-			     const char *error)
++static int report_qi_status(struct device *qidev, const u32 status,
++			    const char *error)
+ {
+ 	u8 err_id = status & JRSTA_QIERR_ERROR_MASK;
+ 	const char *err_str = "unidentified error value 0x";
+@@ -310,27 +317,33 @@ static void report_qi_status(struct device *qidev, const u32 status,
+ 
+ 	dev_err(qidev, "%08x: %s: %s%s\n",
+ 		status, error, err_str, err_err_code);
++
++	return -EINVAL;
+ }
+ 
+-static void report_jr_status(struct device *jrdev, const u32 status,
+-			     const char *error)
++static int report_jr_status(struct device *jrdev, const u32 status,
++			    const char *error)
+ {
+ 	dev_err(jrdev, "%08x: %s: %s() not implemented\n",
+ 		status, error, __func__);
++
++	return -EINVAL;
+ }
+ 
+-static void report_cond_code_status(struct device *jrdev, const u32 status,
+-				    const char *error)
++static int report_cond_code_status(struct device *jrdev, const u32 status,
++				   const char *error)
+ {
+ 	dev_err(jrdev, "%08x: %s: %s() not implemented\n",
+ 		status, error, __func__);
++
++	return -EINVAL;
+ }
+ 
+-void caam_strstatus(struct device *jrdev, u32 status, bool qi_v2)
++int caam_strstatus(struct device *jrdev, u32 status, bool qi_v2)
+ {
+ 	static const struct stat_src {
+-		void (*report_ssed)(struct device *jrdev, const u32 status,
+-				    const char *error);
++		int (*report_ssed)(struct device *jrdev, const u32 status,
++				   const char *error);
+ 		const char *error;
+ 	} status_src[16] = {
+ 		{ NULL, "No error" },
+@@ -358,11 +371,14 @@ void caam_strstatus(struct device *jrdev, u32 status, bool qi_v2)
+ 	 * Otherwise print the error source name.
+ 	 */
+ 	if (status_src[ssrc].report_ssed)
+-		status_src[ssrc].report_ssed(jrdev, status, error);
+-	else if (error)
++		return status_src[ssrc].report_ssed(jrdev, status, error);
++
++	if (error)
+ 		dev_err(jrdev, "%d: %s\n", ssrc, error);
+ 	else
+ 		dev_err(jrdev, "%d: unknown error source\n", ssrc);
++
++	return -EINVAL;
+ }
+ EXPORT_SYMBOL(caam_strstatus);
+ 
+diff --git a/drivers/crypto/caam/error.h b/drivers/crypto/caam/error.h
+index d9726e6..16809fa 100644
+--- a/drivers/crypto/caam/error.h
++++ b/drivers/crypto/caam/error.h
+@@ -12,7 +12,7 @@
+ 
+ #define CAAM_ERROR_STR_MAX 302
+ 
+-void caam_strstatus(struct device *dev, u32 status, bool qi_v2);
++int caam_strstatus(struct device *dev, u32 status, bool qi_v2);
+ 
+ #define caam_jr_strstatus(jrdev, status) caam_strstatus(jrdev, status, false)
+ #define caam_qi2_strstatus(qidev, status) caam_strstatus(qidev, status, true)
 diff --git a/drivers/crypto/caam/key_gen.c b/drivers/crypto/caam/key_gen.c
-index c6f8375..5a851dd 100644
+index 48dd353..c6f8375 100644
 --- a/drivers/crypto/caam/key_gen.c
 +++ b/drivers/crypto/caam/key_gen.c
-@@ -48,18 +48,20 @@ int gen_split_key(struct device *jrdev, u8 *key_out,
- 	u32 *desc;
- 	struct split_key_result result;
- 	dma_addr_t dma_addr;
-+	unsigned int local_max;
- 	int ret = -ENOMEM;
+@@ -15,13 +15,14 @@ void split_key_done(struct device *dev, u32 *desc, u32 err,
+ 			   void *context)
+ {
+ 	struct split_key_result *res = context;
++	int ecode = 0;
  
- 	adata->keylen = split_key_len(adata->algtype & OP_ALG_ALGSEL_MASK);
- 	adata->keylen_pad = split_key_pad_len(adata->algtype &
- 					      OP_ALG_ALGSEL_MASK);
-+	local_max = max(keylen, adata->keylen_pad);
+ 	dev_dbg(dev, "%s %d: err 0x%x\n", __func__, __LINE__, err);
  
- 	dev_dbg(jrdev, "split keylen %d split keylen padded %d\n",
- 		adata->keylen, adata->keylen_pad);
- 	print_hex_dump_debug("ctx.key@" __stringify(__LINE__)": ",
- 			     DUMP_PREFIX_ADDRESS, 16, 4, key_in, keylen, 1);
+ 	if (err)
+-		caam_jr_strstatus(dev, err);
++		ecode = caam_jr_strstatus(dev, err);
  
--	if (adata->keylen_pad > max_keylen)
-+	if (local_max > max_keylen)
- 		return -EINVAL;
+-	res->err = err;
++	res->err = ecode;
  
- 	desc = kmalloc(CAAM_CMD_SZ * 6 + CAAM_PTR_SZ * 2, GFP_KERNEL | GFP_DMA);
-@@ -70,8 +72,7 @@ int gen_split_key(struct device *jrdev, u8 *key_out,
+ 	complete(&res->completion);
+ }
+diff --git a/drivers/crypto/caam/qi.c b/drivers/crypto/caam/qi.c
+index 19a378b..378f627 100644
+--- a/drivers/crypto/caam/qi.c
++++ b/drivers/crypto/caam/qi.c
+@@ -577,8 +577,9 @@ static enum qman_cb_dqrr_result caam_rsp_fq_dqrr_cb(struct qman_portal *p,
  
- 	memcpy(key_out, key_in, keylen);
- 
--	dma_addr = dma_map_single(jrdev, key_out, adata->keylen_pad,
--				  DMA_BIDIRECTIONAL);
-+	dma_addr = dma_map_single(jrdev, key_out, local_max, DMA_BIDIRECTIONAL);
- 	if (dma_mapping_error(jrdev, dma_addr)) {
- 		dev_err(jrdev, "unable to map key memory\n");
- 		goto out_free;
-@@ -117,7 +118,7 @@ int gen_split_key(struct device *jrdev, u8 *key_out,
- 				     adata->keylen_pad, 1);
+ 		if (ssrc != JRSTA_SSRC_CCB_ERROR ||
+ 		    err_id != JRSTA_CCBERR_ERRID_ICVCHK)
+-			dev_err(qidev, "Error: %#x in CAAM response FD\n",
+-				status);
++			dev_err_ratelimited(qidev,
++					    "Error: %#x in CAAM response FD\n",
++					    status);
  	}
  
--	dma_unmap_single(jrdev, dma_addr, adata->keylen_pad, DMA_BIDIRECTIONAL);
-+	dma_unmap_single(jrdev, dma_addr, local_max, DMA_BIDIRECTIONAL);
- out_free:
- 	kfree(desc);
- 	return ret;
+ 	if (unlikely(qm_fd_get_format(fd) != qm_fd_compound)) {
 -- 
 2.1.0
 
