@@ -2,180 +2,155 @@ Return-Path: <SRS0=g3pl=VW=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DATE_IN_PAST_06_12,
-	DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CB15C76194
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Jul 2019 05:48:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62C2CC76194
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Jul 2019 05:57:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 65ADA2075C
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Jul 2019 05:48:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1564033704;
-	bh=l2GgUcWotZtTGa/g0fbn9MHmnXq6w1je5UVn5OXKTA4=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=Hxkg48hH3wXtS7PgqXm7THT/Qfd4BljUnBWLHKBAX4JbzvCaUvsBvNLfK1mNQk+Z4
-	 4MiLtAH2HS6b3d/KhjMHsMXlGvQviFGRCbLNg4v23X6l4QooeUdFz2g7DSkYWUOPAL
-	 95fyVP5Px9IscXEw5mox3s1+H545pnIFdHouTHYE=
+	by mail.kernel.org (Postfix) with ESMTP id 314B5206DD
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Jul 2019 05:57:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="avWtvc28"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391589AbfGYFsO (ORCPT
+        id S1728732AbfGYF5d (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 25 Jul 2019 01:48:14 -0400
-Received: from mail.kernel.org ([198.145.29.99]:34080 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2391425AbfGYFq1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 Jul 2019 01:46:27 -0400
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id C36D620657;
-        Thu, 25 Jul 2019 05:46:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1564033586;
-        bh=l2GgUcWotZtTGa/g0fbn9MHmnXq6w1je5UVn5OXKTA4=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=DkIZYlmcd6Km8Q53l7PTo9LBiEjTSaqHAkMlcsKQOi1iSn2c1gexfxJ6o+6gz4Hrc
-         54DD1m0OZ1oa+F0mrfuEB2PSLUdg9BVvwzgq9HzrULZyl4Yp5zYxml+6uhTkArF1ZL
-         XK5wCChaomIV89kV3fGpbdDVkwz4+88B8H0lS2qk=
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        stable@vger.kernel.org, Daniel Jordan <daniel.m.jordan@oracle.com>,
-        Andrea Parri <andrea.parri@amarulasolutions.com>,
-        Boqun Feng <boqun.feng@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "Paul E. McKenney" <paulmck@linux.ibm.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        linux-arch@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: [PATCH 4.19 218/271] padata: use smp_mb in padata_reorder to avoid orphaned padata jobs
-Date:   Wed, 24 Jul 2019 21:21:27 +0200
-Message-Id: <20190724191713.782742418@linuxfoundation.org>
-X-Mailer: git-send-email 2.22.0
-In-Reply-To: <20190724191655.268628197@linuxfoundation.org>
-References: <20190724191655.268628197@linuxfoundation.org>
-User-Agent: quilt/0.66
+        Thu, 25 Jul 2019 01:57:33 -0400
+Received: from mail-eopbgr70072.outbound.protection.outlook.com ([40.107.7.72]:18230
+        "EHLO EUR04-HE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728660AbfGYF5c (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 25 Jul 2019 01:57:32 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=iRmMODcGucD5gaIlYRs52mWlf9mt5vnQactYhhU8aDyCdVjiDzo1+W3v6Al43QqBqOD3dpT0a6hrG/36+y1BrFwOLorkfJ7DbCGp2ii+RbWmx2CjSY0nqvRxPlqTYQEy0Hccf81DL22Z7krK2zUqcQh/16mpWlK2MWYN2zwu6JR91wXmdU9VaqlVqO/0q+vMPv4+8/wT2X9FEb3lXohmz2X4/RY5imMDVIQ2i+e49eCY8IhiH1Wlc/RUaxU5ViMfS1d9WUrFsjG+2AfjSWsJ7t2RnzvJf1my0rMslV3qMcf4uO/r1t8rjy4V3W+Ihvzo+hFObRVX3GNQzXni4znZEw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BxIixHS6XV3lXoUW3Kh64YP3d/5AXKJ+ghq0NUXKWjg=;
+ b=KGa2QhLdIETr36PkMm+smmCsiRZ+9pKhPoSJpaD88UOak0+BmseY8dD8dkN1rgw7gsGeB5KVOKWL8dP1xwtaarnhLUubv/7HAV+5zPRFJ5iqbXA/efGaB5DCVGtUnS2GJVb/tDiwgfBgd/+P3vf+LOY36vAS/31o/V571mtFkqQT04JNM5ZDCxOXJpfzIHdP4nR8Q8HT2NLGCHm7XLJqMYRSu8dzkoCSpzlHjKtECGIWyrF4sn697VSLh4JD1jgkQpwbUdiP7+NE2rbQVMTcaA117ZjkI5dBXfsYFPGbmtpIhmXTT5tK8IWIIlSyNAedCJMB5rgWxyrPKnv5iFcngA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
+ smtp.mailfrom=nxp.com;dmarc=pass action=none header.from=nxp.com;dkim=pass
+ header.d=nxp.com;arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BxIixHS6XV3lXoUW3Kh64YP3d/5AXKJ+ghq0NUXKWjg=;
+ b=avWtvc28K91xMSovzByN+xZ9SUSTY02BuppuW6jlJRaplRDJ7nf77KJW1lhUrI1KtkHk5FXR7n1Oge25PCro5/G348//+vD7rHmWhFEN7Ihe7NWMa7aqUk2XjtE9y8hbBw0IAXqWAnU3tHg1hjsJKF4eJBLo1naVTVddVYOwfRE=
+Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
+ VI1PR0402MB2799.eurprd04.prod.outlook.com (10.175.20.144) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2094.16; Thu, 25 Jul 2019 05:57:28 +0000
+Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
+ ([fe80::7c64:5296:4607:e10]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
+ ([fe80::7c64:5296:4607:e10%5]) with mapi id 15.20.2094.017; Thu, 25 Jul 2019
+ 05:57:28 +0000
+From:   Horia Geanta <horia.geanta@nxp.com>
+To:     Richard Weinberger <richard@nod.at>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>
+CC:     Aymen Sghaier <aymen.sghaier@nxp.com>, david <david@sigma-star.at>,
+        Baolin Wang <baolin.wang@linaro.org>
+Subject: Re: Backlog support for CAAM?
+Thread-Topic: Backlog support for CAAM?
+Thread-Index: ARBzCkuiRpn89WxIsrxtpCssT2oQQg==
+Date:   Thu, 25 Jul 2019 05:57:28 +0000
+Message-ID: <VI1PR0402MB3485A27D2D9643F70E1873A398C10@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+References: <839258138.49105.1564003328543.JavaMail.zimbra@nod.at>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=horia.geanta@nxp.com; 
+x-originating-ip: [212.146.100.6]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 9548ee40-3a2e-4ba7-4288-08d710c4f99b
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:VI1PR0402MB2799;
+x-ms-traffictypediagnostic: VI1PR0402MB2799:
+x-ms-exchange-purlcount: 5
+x-microsoft-antispam-prvs: <VI1PR0402MB2799D3A48C46BD13057664F098C10@VI1PR0402MB2799.eurprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8273;
+x-forefront-prvs: 0109D382B0
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(39860400002)(396003)(376002)(346002)(136003)(366004)(199004)(189003)(66556008)(7696005)(6306002)(102836004)(476003)(53546011)(86362001)(44832011)(186003)(66476007)(256004)(66446008)(5660300002)(55016002)(76176011)(14444005)(64756008)(2906002)(486006)(26005)(76116006)(53936002)(4326008)(52536014)(6506007)(6246003)(966005)(478600001)(14454004)(446003)(9686003)(91956017)(66946007)(305945005)(74316002)(81156014)(68736007)(81166006)(3846002)(8936002)(7736002)(6116002)(316002)(66066001)(2501003)(71190400001)(229853002)(110136005)(54906003)(33656002)(3480700005)(71200400001)(25786009)(99286004)(6436002)(8676002);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB2799;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: nxp.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: qISRV5ez/5hlreqJq452u82zuj3req+WisHdXGAzH2QhkqPv31YIWzW4Y/llxxnnhqi8EkEXD8RQiNJ3juMuCfICm6wDNRXFHx4AY4RIsdezSk4raq12w8IlqvgsOJNSFWK8ParZf+CoVPuS6wPAL9pP6o+LpXQGkv2qb4qs4KgnrAt9kXR1p8cbydmgBmo2FEr8wv/8C2GEcK3wFduH9ywXgiH2jsk/zQWat2gvIuV9ASQKVhxtnDTTaMHwFZ8npVSBAaiIUpPoBdxwtmip6UI6uUnbYUfCa4NCK0q7hcTbhw6Vsw6Y7B2VZ2w12/b95Hp78se93KnCMx1zDhBBdEpuvjtscfzzbgcTDVhp1/Z1z60tQv0g6rC8ghAhwecZQFjtBgl2e+U1Ifr9U69t7p2SG0TBF0I7OMM3xbherV0=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9548ee40-3a2e-4ba7-4288-08d710c4f99b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Jul 2019 05:57:28.1871
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: horia.geanta@nxp.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB2799
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Daniel Jordan <daniel.m.jordan@oracle.com>
-
-commit cf144f81a99d1a3928f90b0936accfd3f45c9a0a upstream.
-
-Testing padata with the tcrypt module on a 5.2 kernel...
-
-    # modprobe tcrypt alg="pcrypt(rfc4106(gcm(aes)))" type=3
-    # modprobe tcrypt mode=211 sec=1
-
-...produces this splat:
-
-    INFO: task modprobe:10075 blocked for more than 120 seconds.
-          Not tainted 5.2.0-base+ #16
-    modprobe        D    0 10075  10064 0x80004080
-    Call Trace:
-     ? __schedule+0x4dd/0x610
-     ? ring_buffer_unlock_commit+0x23/0x100
-     schedule+0x6c/0x90
-     schedule_timeout+0x3b/0x320
-     ? trace_buffer_unlock_commit_regs+0x4f/0x1f0
-     wait_for_common+0x160/0x1a0
-     ? wake_up_q+0x80/0x80
-     { crypto_wait_req }             # entries in braces added by hand
-     { do_one_aead_op }
-     { test_aead_jiffies }
-     test_aead_speed.constprop.17+0x681/0xf30 [tcrypt]
-     do_test+0x4053/0x6a2b [tcrypt]
-     ? 0xffffffffa00f4000
-     tcrypt_mod_init+0x50/0x1000 [tcrypt]
-     ...
-
-The second modprobe command never finishes because in padata_reorder,
-CPU0's load of reorder_objects is executed before the unlocking store in
-spin_unlock_bh(pd->lock), causing CPU0 to miss CPU1's increment:
-
-CPU0                                 CPU1
-
-padata_reorder                       padata_do_serial
-  LOAD reorder_objects  // 0
-                                       INC reorder_objects  // 1
-                                       padata_reorder
-                                         TRYLOCK pd->lock   // failed
-  UNLOCK pd->lock
-
-CPU0 deletes the timer before returning from padata_reorder and since no
-other job is submitted to padata, modprobe waits indefinitely.
-
-Add a pair of full barriers to guarantee proper ordering:
-
-CPU0                                 CPU1
-
-padata_reorder                       padata_do_serial
-  UNLOCK pd->lock
-  smp_mb()
-  LOAD reorder_objects
-                                       INC reorder_objects
-                                       smp_mb__after_atomic()
-                                       padata_reorder
-                                         TRYLOCK pd->lock
-
-smp_mb__after_atomic is needed so the read part of the trylock operation
-comes after the INC, as Andrea points out.   Thanks also to Andrea for
-help with writing a litmus test.
-
-Fixes: 16295bec6398 ("padata: Generic parallelization/serialization interface")
-Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
-Cc: <stable@vger.kernel.org>
-Cc: Andrea Parri <andrea.parri@amarulasolutions.com>
-Cc: Boqun Feng <boqun.feng@gmail.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Paul E. McKenney <paulmck@linux.ibm.com>
-Cc: Peter Zijlstra <peterz@infradead.org>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: linux-arch@vger.kernel.org
-Cc: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-
----
- kernel/padata.c |   12 ++++++++++++
- 1 file changed, 12 insertions(+)
-
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -267,7 +267,12 @@ static void padata_reorder(struct parall
- 	 * The next object that needs serialization might have arrived to
- 	 * the reorder queues in the meantime, we will be called again
- 	 * from the timer function if no one else cares for it.
-+	 *
-+	 * Ensure reorder_objects is read after pd->lock is dropped so we see
-+	 * an increment from another task in padata_do_serial.  Pairs with
-+	 * smp_mb__after_atomic in padata_do_serial.
- 	 */
-+	smp_mb();
- 	if (atomic_read(&pd->reorder_objects)
- 			&& !(pinst->flags & PADATA_RESET))
- 		mod_timer(&pd->timer, jiffies + HZ);
-@@ -387,6 +392,13 @@ void padata_do_serial(struct padata_priv
- 	list_add_tail(&padata->list, &pqueue->reorder.list);
- 	spin_unlock(&pqueue->reorder.lock);
- 
-+	/*
-+	 * Ensure the atomic_inc of reorder_objects above is ordered correctly
-+	 * with the trylock of pd->lock in padata_reorder.  Pairs with smp_mb
-+	 * in padata_reorder.
-+	 */
-+	smp_mb__after_atomic();
-+
- 	put_cpu();
- 
- 	/* If we're running on the wrong CPU, call padata_reorder() via a
-
-
+On 7/25/2019 12:22 AM, Richard Weinberger wrote:=0A=
+> Hi!=0A=
+> =0A=
+> Recently I had the pleasure to debug a lockup on a imx6 based platform.=
+=0A=
+> It turned out that the lockup was caused by the CAAM driver because it=0A=
+> just returns -EBUSY upon a full job ring.=0A=
+> =0A=
+> Then I found commits:=0A=
+> 0618764cb25f ("dm crypt: fix deadlock when async crypto algorithm returns=
+ -EBUSY")=0A=
+> c0403ec0bb5a ("Revert "dm crypt: fix deadlock when async crypto algorithm=
+ returns -EBUSY"")=0A=
+> =0A=
+Truly sorry for the inconvenience.=0A=
+Indeed this is a caam driver issue, and not a dm-crypt one.=0A=
+=0A=
+> Is there a reason why the driver has still no proper backlog support?=0A=
+> =0A=
+We've been rejected a few times or the implementation had performance issue=
+s:=0A=
+v1: https://patchwork.kernel.org/patch/7144701=0A=
+v2: https://patchwork.kernel.org/patch/7199241=0A=
+v3: https://patchwork.kernel.org/patch/7221941=0A=
+v4: https://patchwork.kernel.org/patch/7230241=0A=
+v5: https://patchwork.kernel.org/patch/9033121=0A=
+=0A=
+and we haven't been persistent enough.=0A=
+=0A=
+> If it is just a matter of -ENOPATCH, I have some cycles left an can help.=
+=0A=
+> But before working on this topic I'd like to figure what the current stat=
+e=0A=
+> or plans are. :-)=0A=
+> =0A=
+Right now we're evaluating two options:=0A=
+-reworking v5 above=0A=
+-using crypto engine (crypto/crypto_engine.c)=0A=
+=0A=
+Ideally crypto engine should be the way to go.=0A=
+However we need to make sure performance degradation is negligible,=0A=
+which unfortunately is not case.=0A=
+=0A=
+Currently it seems that crypto engine has an issue with sending=0A=
+multiple crypto requests from (SW) engine queue -> (HW) caam queue.=0A=
+=0A=
+More exactly, crypto_pump_requests() performs this check:=0A=
+        /* Make sure we are not already running a request */=0A=
+        if (engine->cur_req)=0A=
+                goto out;=0A=
+=0A=
+thus it's not possible to add more crypto requests to the caam queue=0A=
+until HW finishes the work on the current crypto request and=0A=
+calls crypto_finalize_request():=0A=
+        if (finalize_cur_req) {=0A=
+		[...]=0A=
+                engine->cur_req =3D NULL;=0A=
+=0A=
+Horia=0A=
+=0A=
