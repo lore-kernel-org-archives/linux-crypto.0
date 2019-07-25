@@ -2,32 +2,33 @@ Return-Path: <SRS0=g3pl=VW=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DC9FC7618B
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Jul 2019 13:58:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99F10C7618B
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Jul 2019 13:58:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0D0542075E
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Jul 2019 13:58:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7B6EE22BF5
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Jul 2019 13:58:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404183AbfGYN6j (ORCPT
+        id S1728865AbfGYN6n (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 25 Jul 2019 09:58:39 -0400
-Received: from inva021.nxp.com ([92.121.34.21]:58250 "EHLO inva021.nxp.com"
+        Thu, 25 Jul 2019 09:58:43 -0400
+Received: from inva020.nxp.com ([92.121.34.13]:49066 "EHLO inva020.nxp.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2404172AbfGYN6j (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 Jul 2019 09:58:39 -0400
-Received: from inva021.nxp.com (localhost [127.0.0.1])
-        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id D0706200710;
-        Thu, 25 Jul 2019 15:58:36 +0200 (CEST)
+        id S1728459AbfGYN6n (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 25 Jul 2019 09:58:43 -0400
+Received: from inva020.nxp.com (localhost [127.0.0.1])
+        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id EF1EA1A071B;
+        Thu, 25 Jul 2019 15:58:41 +0200 (CEST)
 Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
-        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id C3540200053;
-        Thu, 25 Jul 2019 15:58:36 +0200 (CEST)
+        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id E35C71A0709;
+        Thu, 25 Jul 2019 15:58:41 +0200 (CEST)
 Received: from lorenz.ea.freescale.net (lorenz.ea.freescale.net [10.171.71.5])
-        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 78783205E8;
-        Thu, 25 Jul 2019 15:58:36 +0200 (CEST)
+        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 8CEB6205EE;
+        Thu, 25 Jul 2019 15:58:41 +0200 (CEST)
 From:   Iuliana Prodan <iuliana.prodan@nxp.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         Horia Geanta <horia.geanta@nxp.com>,
@@ -35,89 +36,44 @@ To:     Herbert Xu <herbert@gondor.apana.org.au>,
 Cc:     "David S. Miller" <davem@davemloft.net>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-imx <linux-imx@nxp.com>
-Subject: [PATCH v3 01/14] crypto: caam/qi - fix error handling in ERN handler
-Date:   Thu, 25 Jul 2019 16:58:13 +0300
-Message-Id: <1564063106-9552-2-git-send-email-iuliana.prodan@nxp.com>
+Subject: [PATCH v3 14/14] crypto: caam - change return value in case CAAM has no MDHA
+Date:   Thu, 25 Jul 2019 16:58:26 +0300
+Message-Id: <1564063106-9552-15-git-send-email-iuliana.prodan@nxp.com>
 X-Mailer: git-send-email 2.1.0
 In-Reply-To: <1564063106-9552-1-git-send-email-iuliana.prodan@nxp.com>
 References: <1564063106-9552-1-git-send-email-iuliana.prodan@nxp.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Horia Geantă <horia.geanta@nxp.com>
+To be consistent with other CAAM modules, caamhash should return 0
+instead of -ENODEV in case CAAM has no MDHA.
 
-ERN handler calls the caam/qi frontend "done" callback with a status
-of -EIO. This is incorrect, since the callback expects a status value
-meaningful for the crypto engine - hence the cryptic messages
-like the one below:
-platform caam_qi: 15: unknown error source
+Based on commit 1b46c90c8e00 ("crypto: caam - convert top level drivers to libraries")
+the value returned by entry point is never checked and
+the exit point is always executed.
 
-Fix this by providing the callback with:
--the status returned by the crypto engine (fd[status]) in case
-it contains an error, OR
--a QI "No error" code otherwise; this will trigger the message:
-platform caam_qi: 50000000: Queue Manager Interface: No error
-which is fine, since QMan driver provides details about the cause of
-failure
-
-Cc: <stable@vger.kernel.org> # v5.1+
-Fixes: 67c2315d ("crypto: caam - add Queue Interface (QI) backend support")
-Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
+Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>
+Reviewed-by: Horia Geanta <horia.geanta@nxp.com>
 ---
-Changes since v2:
--update stable version
----
- drivers/crypto/caam/error.c | 1 +
- drivers/crypto/caam/qi.c    | 5 ++++-
- drivers/crypto/caam/regs.h  | 1 +
- 3 files changed, 6 insertions(+), 1 deletion(-)
+ drivers/crypto/caam/caamhash.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/caam/error.c b/drivers/crypto/caam/error.c
-index 4f0d458..95da6ae 100644
---- a/drivers/crypto/caam/error.c
-+++ b/drivers/crypto/caam/error.c
-@@ -118,6 +118,7 @@ static const struct {
- 	u8 value;
- 	const char *error_text;
- } qi_error_list[] = {
-+	{ 0x00, "No error" },
- 	{ 0x1F, "Job terminated by FQ or ICID flush" },
- 	{ 0x20, "FD format error"},
- 	{ 0x21, "FD command format error"},
-diff --git a/drivers/crypto/caam/qi.c b/drivers/crypto/caam/qi.c
-index 0fe618e..19a378b 100644
---- a/drivers/crypto/caam/qi.c
-+++ b/drivers/crypto/caam/qi.c
-@@ -163,7 +163,10 @@ static void caam_fq_ern_cb(struct qman_portal *qm, struct qman_fq *fq,
- 	dma_unmap_single(drv_req->drv_ctx->qidev, qm_fd_addr(fd),
- 			 sizeof(drv_req->fd_sgt), DMA_BIDIRECTIONAL);
+diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
+index 7147190..3a1dfd2 100644
+--- a/drivers/crypto/caam/caamhash.c
++++ b/drivers/crypto/caam/caamhash.c
+@@ -2007,7 +2007,7 @@ int caam_algapi_hash_init(struct device *ctrldev)
+ 	 * is not present.
+ 	 */
+ 	if (!md_inst)
+-		return -ENODEV;
++		return 0;
  
--	drv_req->cbk(drv_req, -EIO);
-+	if (fd->status)
-+		drv_req->cbk(drv_req, be32_to_cpu(fd->status));
-+	else
-+		drv_req->cbk(drv_req, JRSTA_SSRC_QI);
- }
- 
- static struct qman_fq *create_caam_req_fq(struct device *qidev,
-diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h
-index 8591914..7c7ea8a 100644
---- a/drivers/crypto/caam/regs.h
-+++ b/drivers/crypto/caam/regs.h
-@@ -641,6 +641,7 @@ struct caam_job_ring {
- #define JRSTA_SSRC_CCB_ERROR        0x20000000
- #define JRSTA_SSRC_JUMP_HALT_USER   0x30000000
- #define JRSTA_SSRC_DECO             0x40000000
-+#define JRSTA_SSRC_QI               0x50000000
- #define JRSTA_SSRC_JRERROR          0x60000000
- #define JRSTA_SSRC_JUMP_HALT_CC     0x70000000
- 
+ 	/* Limit digest size based on LP256 */
+ 	if (md_vid == CHA_VER_VID_MD_LP256)
 -- 
 2.1.0
 
