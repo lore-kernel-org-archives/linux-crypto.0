@@ -2,150 +2,334 @@ Return-Path: <SRS0=g3pl=VW=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E562BC7618B
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Jul 2019 08:01:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FE33C7618B
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Jul 2019 08:02:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9657521901
-	for <linux-crypto@archiver.kernel.org>; Thu, 25 Jul 2019 08:01:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DE5EC21901
+	for <linux-crypto@archiver.kernel.org>; Thu, 25 Jul 2019 08:02:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sI5ZGVHQ"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ejWQUWNE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388842AbfGYIBy (ORCPT
+        id S2388916AbfGYICH (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 25 Jul 2019 04:01:54 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:39418 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388596AbfGYIBy (ORCPT
+        Thu, 25 Jul 2019 04:02:07 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:42604 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388596AbfGYICH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 25 Jul 2019 04:01:54 -0400
-Received: by mail-wm1-f65.google.com with SMTP id u25so33447931wmc.4
-        for <linux-crypto@vger.kernel.org>; Thu, 25 Jul 2019 01:01:52 -0700 (PDT)
+        Thu, 25 Jul 2019 04:02:07 -0400
+Received: by mail-pf1-f196.google.com with SMTP id q10so22322025pff.9;
+        Thu, 25 Jul 2019 01:02:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=IPV+5nYuHvPip1in8zVbGa9yz5HxPYcILBTs+OS2gzU=;
-        b=sI5ZGVHQRajJ75UblxSdXtL2Tg9vKFcnI1Bbbc+Pdg0DcHOerTl82uWjHrxBBBaJYo
-         w41fLdG8OgOSXnCkAvmob6PhKwmAboLjZ8IiCguewmXdOwBT25vw92Z08WjNJTHpjOzC
-         d2s1CyruhfZMZ5iY0spEeL2pblTpii1S+hexeQdI5tNtI7yf48l66X4Tw1Z+74nlV4QW
-         1AKWmGHuWuLSxWBBXEe+Bh6GwIy/h33FimJ8by4V7QtTd0X7bOB6Zcd9k2/hX4Ry1t8U
-         Cku12EOS2zTbJG9hTa8wVgiIgGv5c2+PFptNK2fNW61gqhzr/LjksvBjPtBMoM3WbXq6
-         Fg7Q==
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=yJ0esR3gqyjabjnRdkv3xq8sELXYTmCusEQ+i32vrcQ=;
+        b=ejWQUWNE/qfPXJAbUOv1iSK/jBAEsTxBG7WHLr+jBvLhnFCl2Wn8FqmDwIWiwvm+PS
+         JrW0EU3VVY/weHtzAy1FOLU1HNs1jqXOS3bTX2m+yMk3tFxAcxrlu2cd/rjrGrxwMfsV
+         8PNLURtPsJfIeKBwQFbxx6UY6VtW1G8BuO/ySnnZ4Jvn7VkuIiRd7CcbPQ7ZdzWDIagl
+         Yb1+i7FufmI8y6PrFrWzVsf7O7gXRorMJlN3qjibgF7cqwoUIEptILF5jUfswOERuT2t
+         RrPnHheuxAhCN8Frphy8iH3cSOhwZ1WU+iMBZN46lHz0nKVrsAqf7jHeW24Z/r/BY9sd
+         Wz5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=IPV+5nYuHvPip1in8zVbGa9yz5HxPYcILBTs+OS2gzU=;
-        b=A7k/lLjPLjsOiQJ7zn7AgMfuSHKMgxcw9MMFbC7rQ0rfNaAb3IPUz2Rxq2hG/9pCNO
-         6xqe/jRh6ZOOSCLhNM7vpd52qq0yKX3W75KqwhIedCBiC/8/8jXcFqIS2kE1FkRK0xvr
-         LGB1yRzKzG9z/59yaCtN9dFHWNcx7njgnw65BB3DfLPTOJgtGbmZqhacwLXd1Y1IKQoR
-         7tCm2a/XcOwBhndr60D5879L74xjD99uS9ol8JayGky+It8LRZEiGWGv4CKs1sdP247X
-         VPCwUILNK0ybhByeujVvutpJ9/AZ0RxCRShP81Dbebrx/mOTirmPaVq872YBFhoLKSPK
-         jm9g==
-X-Gm-Message-State: APjAAAUeV/6fa/qjl62DrwTb7/0ZVt5rc5o1oTAjPBHw6Jpa1j2FePS4
-        9IArjuKq0YufSA7dm6okYpN7BOkPcxnT1IQZuzoTBA==
-X-Google-Smtp-Source: APXvYqwMqa+2T5HCA0DRhMyVsHLssDvqMHodAKEXLQTRGl8hAGbjSUU0X9nw3G/LFfBx7/k4ksnQ0fXHiLMeTGZtwr8=
-X-Received: by 2002:a05:600c:21d4:: with SMTP id x20mr71796865wmj.61.1564041711747;
- Thu, 25 Jul 2019 01:01:51 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190716221639.GA44406@gmail.com> <VI1PR0402MB34857BBB18C2BB8CBA2DEC7198C90@VI1PR0402MB3485.eurprd04.prod.outlook.com>
- <20190717172823.GA205944@gmail.com> <CAKv+Gu__offPaWvyURJr8v56ig58q-Deo16QhP26EJ32uf5m3w@mail.gmail.com>
- <20190718065223.4xaefcwjoxvujntw@gondor.apana.org.au> <CAKv+Gu9-EWNpJ9viSsjhYRdOZb=7a=Mpddmyt8SLEq9aFtawjg@mail.gmail.com>
- <20190718072154.m2umem24x4grbf6w@gondor.apana.org.au> <36e78459-1594-6d19-0ab4-95b03a6de036@gmail.com>
- <MN2PR20MB2973E61815F069E8C7D74177CAC80@MN2PR20MB2973.namprd20.prod.outlook.com>
- <b042649c-db98-9710-b063-242bdf520252@gmail.com> <20190720065807.GA711@sol.localdomain>
- <0d4d6387-777c-bfd3-e54a-e7244fde0096@gmail.com> <CAKv+Gu9UF+a1UhVU19g1XcLaEqEaAwwkSm3-2wTHEAdD-q4mLQ@mail.gmail.com>
- <MN2PR20MB2973B9C2DDC508A81AF4A207CAC40@MN2PR20MB2973.namprd20.prod.outlook.com>
- <CAKv+Gu9C2AEbb++W=QTVWbeA_88Fo57NcOwgU5R8HBvzFwXkJw@mail.gmail.com>
- <MN2PR20MB2973C378AE5674F9E3E29445CAC60@MN2PR20MB2973.namprd20.prod.outlook.com>
- <CAKv+Gu-8n_DoauycDQS_9zzRew1rTuPaLxHyg6xhXMmqEvMaCA@mail.gmail.com> <MN2PR20MB2973CAE4E9CFFE1F417B2509CAC10@MN2PR20MB2973.namprd20.prod.outlook.com>
-In-Reply-To: <MN2PR20MB2973CAE4E9CFFE1F417B2509CAC10@MN2PR20MB2973.namprd20.prod.outlook.com>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Thu, 25 Jul 2019 11:01:40 +0300
-Message-ID: <CAKv+Gu-j-8-bQS2A46-Kf1KHtkoPJ5Htk8WratqzyngnVu-wpw@mail.gmail.com>
-Subject: Re: [dm-devel] xts fuzz testing and lack of ciphertext stealing support
-To:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
-Cc:     Milan Broz <gmazyland@gmail.com>,
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=yJ0esR3gqyjabjnRdkv3xq8sELXYTmCusEQ+i32vrcQ=;
+        b=FfiQ1nWOpht5ltjpIqGPqPEop9JWCDYv75tBN7XByoHyJ+9/om8TA6Eh8tqiGt0aP5
+         62trkM0rZlslgAU+qHDQzcA6o8CYpjYkIsYu/zImTnY12mjfbg/xtQPQ2qTP//Vm/bjW
+         +SdgazCgrh8qU1BpgawX8x+2d+uOBGnqtmv1zcLzSTxfqzHVUrDFePYNjaZSegvTfPmn
+         Ur8AarR56piuYd9BuN7MUE1WAmbwkOyTzvgtcyy9KKJTYWLkgRlEfSfSf/ymTf0AlcCm
+         M+mNYTOiEZl5V7RjEypD/zCGZ/ut0z/tsa0YRKFjj5VrWCj0b5OXNeq4G+6itp3Li/Z9
+         PuNA==
+X-Gm-Message-State: APjAAAWZ3qpFSjNcDBzdG+rH1jZiQm3gMpN+P5ytCOBIxEoA/xv3+CHL
+        TnH0lA4KPMoRa0+tGkNfTCE=
+X-Google-Smtp-Source: APXvYqwrO63J65nlVcYLjmqxh6lIEg38q2Kxx1VcwpM359myqL+zdL88hj1oGtrgK48MaYQXJeZIdA==
+X-Received: by 2002:a62:483:: with SMTP id 125mr15831288pfe.245.1564041725605;
+        Thu, 25 Jul 2019 01:02:05 -0700 (PDT)
+Received: from suzukaze.ipads-lab.se.sjtu.edu.cn ([89.31.126.54])
+        by smtp.gmail.com with ESMTPSA id p27sm73176877pfq.136.2019.07.25.01.01.59
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Thu, 25 Jul 2019 01:02:04 -0700 (PDT)
+From:   Chuhong Yuan <hslester96@gmail.com>
+Cc:     Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Horia Geanta <horia.geanta@nxp.com>
-Content-Type: text/plain; charset="UTF-8"
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Nicolas Ferre <nicolas.ferre@microchip.com>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Ludovic Desroches <ludovic.desroches@microchip.com>,
+        =?UTF-8?q?=C5=81ukasz=20Stelmach?= <l.stelmach@samsung.com>,
+        Kukjin Kim <kgene@kernel.org>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Deepak Saxena <dsaxena@plexity.net>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Patrice Chotard <patrice.chotard@st.com>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, Chuhong Yuan <hslester96@gmail.com>
+Subject: [PATCH] hwrng: Use device-managed registration API
+Date:   Thu, 25 Jul 2019 16:01:55 +0800
+Message-Id: <20190725080155.19875-1-hslester96@gmail.com>
+X-Mailer: git-send-email 2.20.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+To:     unlisted-recipients:; (no To-header on input)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 25 Jul 2019 at 10:49, Pascal Van Leeuwen
-<pvanleeuwen@verimatrix.com> wrote:
->
->
-> > -----Original Message-----
-> > From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> > Sent: Thursday, July 25, 2019 8:22 AM
-> > To: Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
-> > Cc: Milan Broz <gmazyland@gmail.com>; Herbert Xu <herbert@gondor.apana.org.au>; dm-devel@redhat.com; linux-
-> > crypto@vger.kernel.org; Horia Geanta <horia.geanta@nxp.com>
-> > Subject: Re: [dm-devel] xts fuzz testing and lack of ciphertext stealing support
-> >
-> > > >
-> > > > Actually, that spec has a couple of test vectors. Unfortunately, they
-> > > > are all rather short (except the last one in the 'no multiple of 16
-> > > > bytes' paragraph, but unfortunately, that one is in fact a multiple of
-> > > > 16 bytes)
-> > > >
-> > > > I added them here [0] along with an arm64 implementation for the AES
-> > > > instruction based driver. Could you please double check that these
-> > > > work against your driver?
-> > > >
-> > > I got XTS working with the inside-secure driver and these (and all other) vectors pass :-)
-> > >
-> >
-> > Excellent, thanks for the report. May I add your Tested-by when I post
-> > the patch? (just the one that adds the test vectors)
-> >
-> Sure, feel free
->
+Use devm_hwrng_register to simplify the implementation.
+Manual unregistration and some remove functions can be
+removed now.
 
-Thanks
+Signed-off-by: Chuhong Yuan <hslester96@gmail.com>
+---
+ drivers/char/hw_random/atmel-rng.c     |  3 +--
+ drivers/char/hw_random/cavium-rng-vf.c | 11 +----------
+ drivers/char/hw_random/exynos-trng.c   |  3 +--
+ drivers/char/hw_random/n2-drv.c        |  4 +---
+ drivers/char/hw_random/nomadik-rng.c   |  3 +--
+ drivers/char/hw_random/omap-rng.c      |  3 +--
+ drivers/char/hw_random/powernv-rng.c   | 10 +---------
+ drivers/char/hw_random/st-rng.c        |  4 +---
+ drivers/char/hw_random/xgene-rng.c     |  4 +---
+ 9 files changed, 9 insertions(+), 36 deletions(-)
 
-> > > > That would establish a ground truth against
-> > > > which we can implement the generic version as well.
-> > > >
-> > > > [0] https://git.kernel.org/pub/scm/linux/kernel/git/ardb/linux.git/log/?h=xts-cts
-> > > >
-> > > > > Besides that, I'd be happy to generate some testvectors from our defacto-standard
-> > > > > implementation ;-)
-> > > > >
-> > > >
-> > > > One or two larger ones would be useful, yes.
-> > > >
-> > > I'll see if I can extract some suitable vectors from our verification suite ...
-> > >
-> >
-> > Great. Once available, I'll run them against my implementations and report back.
-> >
-> Just wondering ... do you have any particular requirements on the sizes?
-> From my implementation's perspective, it doesn't make a whole lot of sense to test vectors
-> of more than 3 times the cipher block size, but then I realized that you probably need
-> larger vectors due to the loop unrolling you do for the vector implementations?
-> You also don't want them to be too big as they take up space in the kernel image ...
->
+diff --git a/drivers/char/hw_random/atmel-rng.c b/drivers/char/hw_random/atmel-rng.c
+index 433426242b87..e55705745d5e 100644
+--- a/drivers/char/hw_random/atmel-rng.c
++++ b/drivers/char/hw_random/atmel-rng.c
+@@ -86,7 +86,7 @@ static int atmel_trng_probe(struct platform_device *pdev)
+ 	trng->rng.name = pdev->name;
+ 	trng->rng.read = atmel_trng_read;
+ 
+-	ret = hwrng_register(&trng->rng);
++	ret = devm_hwrng_register(&pdev->dev, &trng->rng);
+ 	if (ret)
+ 		goto err_register;
+ 
+@@ -103,7 +103,6 @@ static int atmel_trng_remove(struct platform_device *pdev)
+ {
+ 	struct atmel_trng *trng = platform_get_drvdata(pdev);
+ 
+-	hwrng_unregister(&trng->rng);
+ 
+ 	atmel_trng_disable(trng);
+ 	clk_disable_unprepare(trng->clk);
+diff --git a/drivers/char/hw_random/cavium-rng-vf.c b/drivers/char/hw_random/cavium-rng-vf.c
+index 2d1352b67168..3de4a6a443ef 100644
+--- a/drivers/char/hw_random/cavium-rng-vf.c
++++ b/drivers/char/hw_random/cavium-rng-vf.c
+@@ -67,7 +67,7 @@ static int cavium_rng_probe_vf(struct	pci_dev		*pdev,
+ 
+ 	pci_set_drvdata(pdev, rng);
+ 
+-	ret = hwrng_register(&rng->ops);
++	ret = devm_hwrng_register(&pdev->dev, &rng->ops);
+ 	if (ret) {
+ 		dev_err(&pdev->dev, "Error registering device as HWRNG.\n");
+ 		return ret;
+@@ -76,14 +76,6 @@ static int cavium_rng_probe_vf(struct	pci_dev		*pdev,
+ 	return 0;
+ }
+ 
+-/* Remove the VF */
+-static void  cavium_rng_remove_vf(struct pci_dev *pdev)
+-{
+-	struct cavium_rng *rng;
+-
+-	rng = pci_get_drvdata(pdev);
+-	hwrng_unregister(&rng->ops);
+-}
+ 
+ static const struct pci_device_id cavium_rng_vf_id_table[] = {
+ 	{ PCI_DEVICE(PCI_VENDOR_ID_CAVIUM, 0xa033), 0, 0, 0},
+@@ -95,7 +87,6 @@ static struct pci_driver cavium_rng_vf_driver = {
+ 	.name		= "cavium_rng_vf",
+ 	.id_table	= cavium_rng_vf_id_table,
+ 	.probe		= cavium_rng_probe_vf,
+-	.remove		= cavium_rng_remove_vf,
+ };
+ module_pci_driver(cavium_rng_vf_driver);
+ 
+diff --git a/drivers/char/hw_random/exynos-trng.c b/drivers/char/hw_random/exynos-trng.c
+index 94235761955c..b4b52ab23b6b 100644
+--- a/drivers/char/hw_random/exynos-trng.c
++++ b/drivers/char/hw_random/exynos-trng.c
+@@ -153,7 +153,7 @@ static int exynos_trng_probe(struct platform_device *pdev)
+ 		goto err_clock;
+ 	}
+ 
+-	ret = hwrng_register(&trng->rng);
++	ret = devm_hwrng_register(&pdev->dev, &trng->rng);
+ 	if (ret) {
+ 		dev_err(&pdev->dev, "Could not register hwrng device.\n");
+ 		goto err_register;
+@@ -179,7 +179,6 @@ static int exynos_trng_remove(struct platform_device *pdev)
+ {
+ 	struct exynos_trng_dev *trng =  platform_get_drvdata(pdev);
+ 
+-	hwrng_unregister(&trng->rng);
+ 	clk_disable_unprepare(trng->clk);
+ 
+ 	pm_runtime_put_sync(&pdev->dev);
+diff --git a/drivers/char/hw_random/n2-drv.c b/drivers/char/hw_random/n2-drv.c
+index d4cab105796f..2d256b3470db 100644
+--- a/drivers/char/hw_random/n2-drv.c
++++ b/drivers/char/hw_random/n2-drv.c
+@@ -768,7 +768,7 @@ static int n2rng_probe(struct platform_device *op)
+ 	np->hwrng.data_read = n2rng_data_read;
+ 	np->hwrng.priv = (unsigned long) np;
+ 
+-	err = hwrng_register(&np->hwrng);
++	err = devm_hwrng_register(&pdev->dev, &np->hwrng);
+ 	if (err)
+ 		goto out_hvapi_unregister;
+ 
+@@ -793,8 +793,6 @@ static int n2rng_remove(struct platform_device *op)
+ 
+ 	cancel_delayed_work_sync(&np->work);
+ 
+-	hwrng_unregister(&np->hwrng);
+-
+ 	sun4v_hvapi_unregister(HV_GRP_RNG);
+ 
+ 	return 0;
+diff --git a/drivers/char/hw_random/nomadik-rng.c b/drivers/char/hw_random/nomadik-rng.c
+index fc0f6b0cb80d..74ed29f42e4f 100644
+--- a/drivers/char/hw_random/nomadik-rng.c
++++ b/drivers/char/hw_random/nomadik-rng.c
+@@ -57,7 +57,7 @@ static int nmk_rng_probe(struct amba_device *dev, const struct amba_id *id)
+ 	if (!base)
+ 		goto out_release;
+ 	nmk_rng.priv = (unsigned long)base;
+-	ret = hwrng_register(&nmk_rng);
++	ret = devm_hwrng_register(&dev->dev, &nmk_rng);
+ 	if (ret)
+ 		goto out_release;
+ 	return 0;
+@@ -71,7 +71,6 @@ static int nmk_rng_probe(struct amba_device *dev, const struct amba_id *id)
+ 
+ static int nmk_rng_remove(struct amba_device *dev)
+ {
+-	hwrng_unregister(&nmk_rng);
+ 	amba_release_regions(dev);
+ 	clk_disable(rng_clk);
+ 	return 0;
+diff --git a/drivers/char/hw_random/omap-rng.c b/drivers/char/hw_random/omap-rng.c
+index e9b6ac61fb7f..b27f39688b5e 100644
+--- a/drivers/char/hw_random/omap-rng.c
++++ b/drivers/char/hw_random/omap-rng.c
+@@ -500,7 +500,7 @@ static int omap_rng_probe(struct platform_device *pdev)
+ 	if (ret)
+ 		goto err_register;
+ 
+-	ret = hwrng_register(&priv->rng);
++	ret = devm_hwrng_register(&pdev->dev, &priv->rng);
+ 	if (ret)
+ 		goto err_register;
+ 
+@@ -525,7 +525,6 @@ static int omap_rng_remove(struct platform_device *pdev)
+ {
+ 	struct omap_rng_dev *priv = platform_get_drvdata(pdev);
+ 
+-	hwrng_unregister(&priv->rng);
+ 
+ 	priv->pdata->cleanup(priv);
+ 
+diff --git a/drivers/char/hw_random/powernv-rng.c b/drivers/char/hw_random/powernv-rng.c
+index f2e8272e276a..8da1d7917bdc 100644
+--- a/drivers/char/hw_random/powernv-rng.c
++++ b/drivers/char/hw_random/powernv-rng.c
+@@ -33,18 +33,11 @@ static struct hwrng powernv_hwrng = {
+ 	.read = powernv_rng_read,
+ };
+ 
+-static int powernv_rng_remove(struct platform_device *pdev)
+-{
+-	hwrng_unregister(&powernv_hwrng);
+-
+-	return 0;
+-}
+-
+ static int powernv_rng_probe(struct platform_device *pdev)
+ {
+ 	int rc;
+ 
+-	rc = hwrng_register(&powernv_hwrng);
++	rc = devm_hwrng_register(&pdev->dev, &powernv_hwrng);
+ 	if (rc) {
+ 		/* We only register one device, ignore any others */
+ 		if (rc == -EEXIST)
+@@ -70,7 +63,6 @@ static struct platform_driver powernv_rng_driver = {
+ 		.of_match_table = powernv_rng_match,
+ 	},
+ 	.probe	= powernv_rng_probe,
+-	.remove = powernv_rng_remove,
+ };
+ module_platform_driver(powernv_rng_driver);
+ 
+diff --git a/drivers/char/hw_random/st-rng.c b/drivers/char/hw_random/st-rng.c
+index bd6a98b3479b..863448360a7d 100644
+--- a/drivers/char/hw_random/st-rng.c
++++ b/drivers/char/hw_random/st-rng.c
+@@ -102,7 +102,7 @@ static int st_rng_probe(struct platform_device *pdev)
+ 
+ 	dev_set_drvdata(&pdev->dev, ddata);
+ 
+-	ret = hwrng_register(&ddata->ops);
++	ret = devm_hwrng_register(&pdev->dev, &ddata->ops);
+ 	if (ret) {
+ 		dev_err(&pdev->dev, "Failed to register HW RNG\n");
+ 		clk_disable_unprepare(clk);
+@@ -118,8 +118,6 @@ static int st_rng_remove(struct platform_device *pdev)
+ {
+ 	struct st_rng_data *ddata = dev_get_drvdata(&pdev->dev);
+ 
+-	hwrng_unregister(&ddata->ops);
+-
+ 	clk_disable_unprepare(ddata->clk);
+ 
+ 	return 0;
+diff --git a/drivers/char/hw_random/xgene-rng.c b/drivers/char/hw_random/xgene-rng.c
+index 8c6f9f63da5e..7e568db87ae2 100644
+--- a/drivers/char/hw_random/xgene-rng.c
++++ b/drivers/char/hw_random/xgene-rng.c
+@@ -361,7 +361,7 @@ static int xgene_rng_probe(struct platform_device *pdev)
+ 
+ 	xgene_rng_func.priv = (unsigned long) ctx;
+ 
+-	rc = hwrng_register(&xgene_rng_func);
++	rc = devm_hwrng_register(&pdev->dev, &xgene_rng_func);
+ 	if (rc) {
+ 		dev_err(&pdev->dev, "RNG registering failed error %d\n", rc);
+ 		if (!IS_ERR(ctx->clk))
+@@ -375,7 +375,6 @@ static int xgene_rng_probe(struct platform_device *pdev)
+ 			rc);
+ 		if (!IS_ERR(ctx->clk))
+ 			clk_disable_unprepare(ctx->clk);
+-		hwrng_unregister(&xgene_rng_func);
+ 		return rc;
+ 	}
+ 
+@@ -392,7 +391,6 @@ static int xgene_rng_remove(struct platform_device *pdev)
+ 		dev_err(&pdev->dev, "RNG init wakeup failed error %d\n", rc);
+ 	if (!IS_ERR(ctx->clk))
+ 		clk_disable_unprepare(ctx->clk);
+-	hwrng_unregister(&xgene_rng_func);
+ 
+ 	return rc;
+ }
+-- 
+2.20.1
 
-We have code that operates on 1 block, 3 blocks (ARM), 4-5 blocks
-(arm64) or 8 blocks (ARM,arm64) at a time. However, the most important
-thing is to test the handover between the block based loop and the
-epilogue that operates on the final 17-31 bytes when ciphertext
-stealing is being done.
-
-So ideally, we'd have 1 full block + 1 full/1 partial, 3 full blocks +
-1 full/1 partial, and so on for 4, 5 and 8 blocks, to cover all the
-code flows, but since the unrolled routines all support arbitrary
-block counts (and so the handover between the multiblock and the
-single block handling is already covered), just having the first two
-would  be sufficient IMO.
