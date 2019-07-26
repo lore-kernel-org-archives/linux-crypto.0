@@ -2,505 +2,472 @@ Return-Path: <SRS0=5D8e=VX=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B19C4C76190
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jul 2019 11:07:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFD94C7618B
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jul 2019 11:32:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 640CF21852
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jul 2019 11:07:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="H9gy8ZmQ"
+	by mail.kernel.org (Postfix) with ESMTP id A063A229F3
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jul 2019 11:32:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1564140739;
+	bh=bSSrU6dU3r3lwmo73wM/Cp6y1FcE1bQgwzAta+XJW38=;
+	h=From:Cc:Subject:Date:In-Reply-To:References:To:List-ID:From;
+	b=azgpOnc/8tzmUIrhpMeOTiLoCge5pzh3X2YyMCIYnRpmpe15TkPYmDmX/xE1Tuew/
+	 2t/5pA0WzacoJs/0lBQKF3p01Fo8oDqUZQgVqTEuKI5tC4+hu2eBY6l+M24yPxMNtl
+	 3iSXi6Fa4b5ePk8plJPkesnHgZbRCcoUW5Bvokqs=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726722AbfGZLH5 (ORCPT
+        id S1726102AbfGZLcS (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 26 Jul 2019 07:07:57 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:46946 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725953AbfGZLH5 (ORCPT
+        Fri, 26 Jul 2019 07:32:18 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:40554 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726023AbfGZLcS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 Jul 2019 07:07:57 -0400
-Received: by mail-wr1-f68.google.com with SMTP id z1so53981673wru.13
-        for <linux-crypto@vger.kernel.org>; Fri, 26 Jul 2019 04:07:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to
-         :user-agent;
-        bh=CfW0/Uj1OgAggtKrBTbEluQPIpf1ADip0TgDY/n68yM=;
-        b=H9gy8ZmQFhfwK/04UZqTffDrq05VKUzZ0toGbjsNDisYjzr++WESm7BDwRM1BOoL2J
-         GaepTcD69gvy4afuLlUBuQ93SNVWdkb0y+ipecR7PE6ZQt0eUjkzHRaLm1CMjc3sWEVV
-         n6GSzlEQss2s371yXAFwb/Vj7DM9fTH75z1XQXuT55LW735B1f3fIHxFQ7/ScQAw33qq
-         6gZa7oG+aGn028a8ggGe1DE/1V/BDSTB1rypcAAsnd3omzxF4UoxACdvt9ZirSs5cGEn
-         WGHZ8SU/ibqDwZuuf4T5EXjHQUzsZ6BSuMDL/7+aEvIiW4ZEov6tApl+3L1AGNkAUxmE
-         ByIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=CfW0/Uj1OgAggtKrBTbEluQPIpf1ADip0TgDY/n68yM=;
-        b=rCiejpMvkZL6xNswOhc2dk76/iqvPfZPN8Y/KclYdM7unNZkL5RH3OrPlA97BYXhtQ
-         oXaatG88UJZQmoyQeQ4fFWMGO2vNfl2AYFKfhoxctbZUXSsp4ejbLjKWdTXaseTqhmLd
-         AH7ioeVe/A/xe+6cb7KSp0pn45ySBooyXcxZcRJoxQ0wPOcBymePZlZZy7EdTbksjU49
-         Xj68wK71sa6+ZjlsF67Ee6uMhJC5zUF8B0+aXcJRPvrIWk4ctMrqfKrNQM3CLM5GM754
-         ra3Bh60KQmeofp0A/zMbYQMaMe+ORld7Y8xlr5HZQNE7od0cenTgW5VTRwax9YsOab0k
-         /t2A==
-X-Gm-Message-State: APjAAAVfn+2Bq3/VjmHz4la/GWjLOuSnl9FIQSmJlwygz424rt9PWrDx
-        S3dhFQnYdbyjSQ0fgToeqjy9Txfl5WWRGA==
-X-Google-Smtp-Source: APXvYqz7heSi7NZtHOrsIecix+aMQfN+iBoiq92ThzNeOYFJ/Xli6ocLaDh4cykImILuYbhpjDCg7A==
-X-Received: by 2002:a5d:6389:: with SMTP id p9mr74414005wru.297.1564139271233;
-        Fri, 26 Jul 2019 04:07:51 -0700 (PDT)
-Received: from Red ([2a01:cb1d:147:7200:2e56:dcff:fed2:c6d6])
-        by smtp.googlemail.com with ESMTPSA id v65sm59674596wme.31.2019.07.26.04.07.48
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 26 Jul 2019 04:07:50 -0700 (PDT)
-Date:   Fri, 26 Jul 2019 13:07:47 +0200
-From:   LABBE Corentin <clabbe@baylibre.com>
-To:     Rob Herring <robh+dt@kernel.org>
-Cc:     David Miller <davem@davemloft.net>,
+        Fri, 26 Jul 2019 07:32:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Sender:Content-Transfer-Encoding:
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
+        Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
+        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=OuafK/TTQcFkrbP+suIfTDa/h6nPmDJ0gGHTBNIInGY=; b=bdXD4iNcznYpRIDy+A6+1cNPrh
+        cV+a+fbj4fYJ2Mg+9eyczrEI2wWXXZTikDxJeLis7Y2vV/8BCmFckYIL7TCyk5M1UlhUv6eR0U/+h
+        HADLDxuO1Q1CF//PiXXy0UDgcevCFLZ3asloJtgzcFkgQmVi7C0JHTCA41LhbF69P6sC6/YUdHbYm
+        vr8rpNRfDH9dQWEAeOOqCB7xoWDgGnMbkTAJdXAALiYFU+WirA1kBnPgwfDhk4IAO74wPC5VozQrO
+        jMgKffk5q0vLdNtCiNftcTQw4rkeTh1nUc6iunzfA4KkG3jbvCm6cK/h2pCh1bEIzKYaBgeblz8ex
+        tKsbR5fg==;
+Received: from [179.95.31.157] (helo=bombadil.infradead.org)
+        by bombadil.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
+        id 1hqyRb-0005vN-Ss; Fri, 26 Jul 2019 11:31:28 +0000
+Received: from mchehab by bombadil.infradead.org with local (Exim 4.92)
+        (envelope-from <mchehab@bombadil.infradead.org>)
+        id 1hqyRZ-0008Eq-NT; Fri, 26 Jul 2019 08:31:25 -0300
+From:   Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
+Cc:     Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Kevin Hilman <khilman@baylibre.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        devicetree@vger.kernel.org, linux-amlogic@lists.infradead.org,
-        "moderated list:ARM/FREESCALE IMX / MXC ARM ARCHITECTURE" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        baylibre-upstreaming@groups.io
-Subject: Re: [PATCH 1/4] dt-bindings: crypto: Add DT bindings documentation
- for amlogic-crypto
-Message-ID: <20190726110747.GA14435@Red>
-References: <1564083776-20540-1-git-send-email-clabbe@baylibre.com>
- <1564083776-20540-2-git-send-email-clabbe@baylibre.com>
- <CAL_JsqLbYwRpNWHGkYbomWLMpum_DXW4OjNNRrwTRM=w86dONw@mail.gmail.com>
+        "David S. Miller" <davem@davemloft.net>,
+        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+        Maxime Ripard <maxime.ripard@bootlin.com>,
+        Sean Paul <sean@poorly.run>, David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        Yoshinori Sato <ysato@users.sourceforge.jp>,
+        Rich Felker <dalias@libc.org>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Takashi Iwai <tiwai@suse.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+        linux-doc@vger.kernel.org, linux-crypto@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, linux-input@vger.kernel.org,
+        netdev@vger.kernel.org, linux-sh@vger.kernel.org,
+        alsa-devel@alsa-project.org
+Subject: [PATCH v2 10/10] docs: remove extra conf.py files
+Date:   Fri, 26 Jul 2019 08:31:24 -0300
+Message-Id: <4b04d4e7df9b638de0919417da31af491833400f.1564139914.git.mchehab+samsung@kernel.org>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <cover.1564139914.git.mchehab+samsung@kernel.org>
+References: <cover.1564139914.git.mchehab+samsung@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAL_JsqLbYwRpNWHGkYbomWLMpum_DXW4OjNNRrwTRM=w86dONw@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+To:     unlisted-recipients:; (no To-header on input)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jul 25, 2019 at 04:55:30PM -0600, Rob Herring wrote:
-> On Thu, Jul 25, 2019 at 1:43 PM Corentin Labbe <clabbe@baylibre.com> wrote:
-> >
-> > This patch adds documentation for Device-Tree bindings for the
-> > Amlogic GXL cryptographic offloader driver.
-> >
-> > Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
-> > ---
-> >  .../bindings/crypto/amlogic-gxl-crypto.yaml   | 45 +++++++++++++++++++
-> 
-> Follow the compatible string for the filename: amlogic,gxl-crypto.yaml
-> 
-> >  1 file changed, 45 insertions(+)
-> >  create mode 100644 Documentation/devicetree/bindings/crypto/amlogic-gxl-crypto.yaml
-> >
-> > diff --git a/Documentation/devicetree/bindings/crypto/amlogic-gxl-crypto.yaml b/Documentation/devicetree/bindings/crypto/amlogic-gxl-crypto.yaml
-> > new file mode 100644
-> > index 000000000000..41265e57c00b
-> > --- /dev/null
-> > +++ b/Documentation/devicetree/bindings/crypto/amlogic-gxl-crypto.yaml
-> > @@ -0,0 +1,45 @@
-> > +# SPDX-License-Identifier: GPL-2.0
-> 
-> Dual (GPL-2.0 OR BSD-2-Clause) is preferred for new bindings. Not a
-> requirement though.
-> 
-> > +%YAML 1.2
-> > +---
-> > +$id: http://devicetree.org/schemas/crypto/amlogic-gxl-crypto.yaml#
-> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> > +
-> > +title: Amlogic GXL Cryptographic Offloader
-> > +
-> > +maintainers:
-> > +  - Corentin Labbe <clabbe@baylibre.com>
-> > +
-> > +properties:
-> > +  compatible:
-> > +    oneOf:
-> 
-> Don't need 'oneOf' when there is only 1.
-> 
-> > +      - const: amlogic,gxl-crypto
-> > +
-> > +  reg:
-> > +    maxItems: 1
-> > +
-> > +  interrupts:
-> > +    maxItems: 1
-> > +
-> > +  clocks:
-> > +    maxItems: 1
-> > +
-> > +  clock-names:
-> > +    const: blkmv
-> > +
-> > +required:
-> > +  - compatible
-> > +  - reg
-> > +  - interrupts
-> > +  - clocks
-> > +  - clock-names
-> > +
-> > +examples:
-> > +  - |
-> > +    crypto: crypto@c883e000 {
-> > +        compatible = "amlogic,gxl-crypto";
-> > +        reg = <0x0 0xc883e000 0x0 0x36>;
-> 
-> This should throw errors because the default size on examples are 1
-> cell. But validating the examples with the schema only just landed in
-> 5.3-rc1.
-> 
-> > +        interrupts = <GIC_SPI 188 IRQ_TYPE_EDGE_RISING>,
-> > +            <GIC_SPI 189 IRQ_TYPE_EDGE_RISING>;
-> 
-> This doesn't match the schema.
-> 
-> > +        clocks = <&clkc CLKID_BLKMV>;
-> > +        clock-names = "blkmv";
-> > +    };
-> > --
-> > 2.21.0
-> >
+Now that the latex_documents are handled automatically, we can
+remove those extra conf.py files.
 
-Hello
+Signed-off-by: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
+---
+ Documentation/admin-guide/conf.py      | 10 ----------
+ Documentation/core-api/conf.py         | 10 ----------
+ Documentation/crypto/conf.py           | 10 ----------
+ Documentation/dev-tools/conf.py        | 10 ----------
+ Documentation/doc-guide/conf.py        | 10 ----------
+ Documentation/driver-api/80211/conf.py | 10 ----------
+ Documentation/driver-api/conf.py       | 10 ----------
+ Documentation/driver-api/pm/conf.py    | 10 ----------
+ Documentation/filesystems/conf.py      | 10 ----------
+ Documentation/gpu/conf.py              | 10 ----------
+ Documentation/input/conf.py            | 10 ----------
+ Documentation/kernel-hacking/conf.py   | 10 ----------
+ Documentation/maintainer/conf.py       | 10 ----------
+ Documentation/media/conf.py            | 12 ------------
+ Documentation/networking/conf.py       | 10 ----------
+ Documentation/process/conf.py          | 10 ----------
+ Documentation/sh/conf.py               | 10 ----------
+ Documentation/sound/conf.py            | 10 ----------
+ Documentation/userspace-api/conf.py    | 10 ----------
+ Documentation/vm/conf.py               | 10 ----------
+ Documentation/x86/conf.py              | 10 ----------
+ 21 files changed, 212 deletions(-)
+ delete mode 100644 Documentation/admin-guide/conf.py
+ delete mode 100644 Documentation/core-api/conf.py
+ delete mode 100644 Documentation/crypto/conf.py
+ delete mode 100644 Documentation/dev-tools/conf.py
+ delete mode 100644 Documentation/doc-guide/conf.py
+ delete mode 100644 Documentation/driver-api/80211/conf.py
+ delete mode 100644 Documentation/driver-api/conf.py
+ delete mode 100644 Documentation/driver-api/pm/conf.py
+ delete mode 100644 Documentation/filesystems/conf.py
+ delete mode 100644 Documentation/gpu/conf.py
+ delete mode 100644 Documentation/input/conf.py
+ delete mode 100644 Documentation/kernel-hacking/conf.py
+ delete mode 100644 Documentation/maintainer/conf.py
+ delete mode 100644 Documentation/media/conf.py
+ delete mode 100644 Documentation/networking/conf.py
+ delete mode 100644 Documentation/process/conf.py
+ delete mode 100644 Documentation/sh/conf.py
+ delete mode 100644 Documentation/sound/conf.py
+ delete mode 100644 Documentation/userspace-api/conf.py
+ delete mode 100644 Documentation/vm/conf.py
+ delete mode 100644 Documentation/x86/conf.py
 
-I will fix all your remarks.
-I have tried to valide them but fail to do it:
-make ARCH=arm64 CROSS_COMPILE=aarch64-unknown-linux-gnu- KBUILD_OUTPUT=~/crossbuild/next/arm64/default/defconfig/ dt_binding_check
-make[1] : on entre dans le répertoire « /usr/src/crossbuild/next/arm64/default/defconfig »
-arch/arm64/Makefile:56: CROSS_COMPILE_COMPAT not defined or empty, the compat vDSO will not be built
-  GEN     Makefile
-scripts/kconfig/conf  --syncconfig Kconfig
-arch/arm64/Makefile:56: CROSS_COMPILE_COMPAT not defined or empty, the compat vDSO will not be built
-  SCHEMA  Documentation/devicetree/bindings/processed-schema.yaml
-/linux-next/Documentation/devicetree/bindings/arm/atmel-at91.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/arm/atmel-at91.yaml
-/linux-next/Documentation/devicetree/bindings/arm/axxia.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/arm/axxia.yaml
-/linux-next/Documentation/devicetree/bindings/arm/amlogic.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/arm/amlogic.yaml
-/linux-next/Documentation/devicetree/bindings/arm/renesas.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/arm/renesas.yaml
-/linux-next/Documentation/devicetree/bindings/arm/sirf.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/arm/sirf.yaml
-/linux-next/Documentation/devicetree/bindings/arm/spear.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/arm/spear.yaml
-/linux-next/Documentation/devicetree/bindings/arm/qcom.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/arm/qcom.yaml
-/linux-next/Documentation/devicetree/bindings/arm/pmu.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/arm/pmu.yaml
-/linux-next/Documentation/devicetree/bindings/arm/digicolor.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/arm/digicolor.yaml
-/linux-next/Documentation/devicetree/bindings/arm/sunxi.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/arm/sunxi.yaml
-/linux-next/Documentation/devicetree/bindings/arm/zte.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/arm/zte.yaml
-/linux-next/Documentation/devicetree/bindings/arm/altera/socfpga-clk-manager.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/arm/altera/socfpga-clk-manager.yaml
-/linux-next/Documentation/devicetree/bindings/arm/cpus.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/arm/cpus.yaml
-/linux-next/Documentation/devicetree/bindings/arm/rda.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/arm/rda.yaml
-/linux-next/Documentation/devicetree/bindings/arm/psci.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/arm/psci.yaml
-/linux-next/Documentation/devicetree/bindings/arm/calxeda.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/arm/calxeda.yaml
-/linux-next/Documentation/devicetree/bindings/arm/ti/nspire.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/arm/ti/nspire.yaml
-/linux-next/Documentation/devicetree/bindings/arm/ti/ti,davinci.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/arm/ti/ti,davinci.yaml
-/linux-next/Documentation/devicetree/bindings/arm/fsl.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/arm/fsl.yaml
-/linux-next/Documentation/devicetree/bindings/arm/xilinx.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/arm/xilinx.yaml
-/linux-next/Documentation/devicetree/bindings/arm/intel-ixp4xx.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/arm/intel-ixp4xx.yaml
-/linux-next/Documentation/devicetree/bindings/arm/altera.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/arm/altera.yaml
-/linux-next/Documentation/devicetree/bindings/arm/rockchip.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/arm/rockchip.yaml
-/linux-next/Documentation/devicetree/bindings/arm/mediatek.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/arm/mediatek.yaml
-/linux-next/Documentation/devicetree/bindings/arm/vt8500.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/arm/vt8500.yaml
-/linux-next/Documentation/devicetree/bindings/arm/al,alpine.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/arm/al,alpine.yaml
-/linux-next/Documentation/devicetree/bindings/arm/l2c2x0.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/arm/l2c2x0.yaml
-/linux-next/Documentation/devicetree/bindings/arm/moxart.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/arm/moxart.yaml
-/linux-next/Documentation/devicetree/bindings/arm/sti.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/arm/sti.yaml
-/linux-next/Documentation/devicetree/bindings/arm/primecell.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/arm/primecell.yaml
-/linux-next/Documentation/devicetree/bindings/arm/bitmain.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/arm/bitmain.yaml
-/linux-next/Documentation/devicetree/bindings/arm/socionext/milbeaut.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/arm/socionext/milbeaut.yaml
-/linux-next/Documentation/devicetree/bindings/arm/stm32/stm32.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/arm/stm32/stm32.yaml
-/linux-next/Documentation/devicetree/bindings/arm/nxp/lpc32xx.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/arm/nxp/lpc32xx.yaml
-/linux-next/Documentation/devicetree/bindings/arm/tegra.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/arm/tegra.yaml
-/linux-next/Documentation/devicetree/bindings/bus/allwinner,sun8i-a23-rsb.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/bus/allwinner,sun8i-a23-rsb.yaml
-/linux-next/Documentation/devicetree/bindings/bus/allwinner,sun50i-a64-de2.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/bus/allwinner,sun50i-a64-de2.yaml
-/linux-next/Documentation/devicetree/bindings/clock/milbeaut-clock.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/clock/milbeaut-clock.yaml
-/linux-next/Documentation/devicetree/bindings/clock/allwinner,sun4i-a10-ccu.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/clock/allwinner,sun4i-a10-ccu.yaml
-/linux-next/Documentation/devicetree/bindings/clock/imx8mn-clock.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/clock/imx8mn-clock.yaml
-/linux-next/Documentation/devicetree/bindings/clock/fixed-factor-clock.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/clock/fixed-factor-clock.yaml
-/linux-next/Documentation/devicetree/bindings/clock/fixed-clock.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/clock/fixed-clock.yaml
-/linux-next/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
-/linux-next/Documentation/devicetree/bindings/crypto/allwinner,sun4i-a10-crypto.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/crypto/allwinner,sun4i-a10-crypto.yaml
-/linux-next/Documentation/devicetree/bindings/display/simple-framebuffer.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/display/simple-framebuffer.yaml
-/linux-next/Documentation/devicetree/bindings/display/allwinner,sun6i-a31-mipi-dsi.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/display/allwinner,sun6i-a31-mipi-dsi.yaml
-/linux-next/Documentation/devicetree/bindings/display/panel/pda,91-00156-a0.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/display/panel/pda,91-00156-a0.yaml
-/linux-next/Documentation/devicetree/bindings/display/panel/bananapi,s070wv20-ct16.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/display/panel/bananapi,s070wv20-ct16.yaml
-/linux-next/Documentation/devicetree/bindings/display/panel/lvds.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/display/panel/lvds.yaml
-/linux-next/Documentation/devicetree/bindings/display/panel/panel-common.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/display/panel/panel-common.yaml
-/linux-next/Documentation/devicetree/bindings/display/panel/armadeus,st0700-adapt.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/display/panel/armadeus,st0700-adapt.yaml
-/linux-next/Documentation/devicetree/bindings/display/panel/sgd,gktw70sdae4se.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/display/panel/sgd,gktw70sdae4se.yaml
-/linux-next/Documentation/devicetree/bindings/display/panel/ronbo,rb070d30.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/display/panel/ronbo,rb070d30.yaml
-/linux-next/Documentation/devicetree/bindings/display/panel/tpo,tpg110.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/display/panel/tpo,tpg110.yaml
-/linux-next/Documentation/devicetree/bindings/display/panel/ampire,am-480272h3tmqw-t01h.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/display/panel/ampire,am-480272h3tmqw-t01h.yaml
-/linux-next/Documentation/devicetree/bindings/display/panel/innolux,ee101ia-01d.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/display/panel/innolux,ee101ia-01d.yaml
-/linux-next/Documentation/devicetree/bindings/display/panel/mitsubishi,aa121td01.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/display/panel/mitsubishi,aa121td01.yaml
-/linux-next/Documentation/devicetree/bindings/display/panel/mitsubishi,aa104xd12.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/display/panel/mitsubishi,aa104xd12.yaml
-/linux-next/Documentation/devicetree/bindings/display/panel/raspberrypi,7inch-touchscreen.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/display/panel/raspberrypi,7inch-touchscreen.yaml
-/linux-next/Documentation/devicetree/bindings/display/panel/tfc,s9700rtwv43tr-01b.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/display/panel/tfc,s9700rtwv43tr-01b.yaml
-/linux-next/Documentation/devicetree/bindings/display/panel/dlc,dlc0700yzg-1.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/display/panel/dlc,dlc0700yzg-1.yaml
-/linux-next/Documentation/devicetree/bindings/example-schema.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/example-schema.yaml
-/linux-next/Documentation/devicetree/bindings/firmware/intel,ixp4xx-network-processing-engine.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/firmware/intel,ixp4xx-network-processing-engine.yaml
-/linux-next/Documentation/devicetree/bindings/gpio/pl061-gpio.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/gpio/pl061-gpio.yaml
-/linux-next/Documentation/devicetree/bindings/i2c/allwinner,sun6i-a31-p2wi.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/i2c/allwinner,sun6i-a31-p2wi.yaml
-/linux-next/Documentation/devicetree/bindings/i2c/marvell,mv64xxx-i2c.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/i2c/marvell,mv64xxx-i2c.yaml
-/linux-next/Documentation/devicetree/bindings/i2c/i2c-gpio.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/i2c/i2c-gpio.yaml
-/linux-next/Documentation/devicetree/bindings/iio/adc/avia-hx711.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/iio/adc/avia-hx711.yaml
-/linux-next/Documentation/devicetree/bindings/iio/adc/adi,ad7780.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/iio/adc/adi,ad7780.yaml
-/linux-next/Documentation/devicetree/bindings/iio/adc/adi,ad7124.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/iio/adc/adi,ad7124.yaml
-/linux-next/Documentation/devicetree/bindings/iio/accel/adi,adxl345.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/iio/accel/adi,adxl345.yaml
-/linux-next/Documentation/devicetree/bindings/iio/accel/adi,adxl372.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/iio/accel/adi,adxl372.yaml
-/linux-next/Documentation/devicetree/bindings/iio/frequency/adf4371.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/iio/frequency/adf4371.yaml
-/linux-next/Documentation/devicetree/bindings/iio/light/tsl2583.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/iio/light/tsl2583.yaml
-/linux-next/Documentation/devicetree/bindings/iio/light/isl29018.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/iio/light/isl29018.yaml
-/linux-next/Documentation/devicetree/bindings/iio/light/tsl2772.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/iio/light/tsl2772.yaml
-/linux-next/Documentation/devicetree/bindings/iio/chemical/sensirion,sps30.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/iio/chemical/sensirion,sps30.yaml
-/linux-next/Documentation/devicetree/bindings/iio/pressure/bmp085.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/iio/pressure/bmp085.yaml
-/linux-next/Documentation/devicetree/bindings/iio/proximity/devantech-srf04.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/iio/proximity/devantech-srf04.yaml
-/linux-next/Documentation/devicetree/bindings/input/gpio-vibrator.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/input/gpio-vibrator.yaml
-/linux-next/Documentation/devicetree/bindings/input/allwinner,sun4i-a10-lradc-keys.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/input/allwinner,sun4i-a10-lradc-keys.yaml
-/linux-next/Documentation/devicetree/bindings/interrupt-controller/arm,gic.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/interrupt-controller/arm,gic.yaml
-/linux-next/Documentation/devicetree/bindings/interrupt-controller/arm,gic-v3.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/interrupt-controller/arm,gic-v3.yaml
-/linux-next/Documentation/devicetree/bindings/interrupt-controller/intel,ixp4xx-interrupt.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/interrupt-controller/intel,ixp4xx-interrupt.yaml
-/linux-next/Documentation/devicetree/bindings/leds/backlight/lm3630a-backlight.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/leds/backlight/lm3630a-backlight.yaml
-/linux-next/Documentation/devicetree/bindings/misc/intel,ixp4xx-queue-manager.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/misc/intel,ixp4xx-queue-manager.yaml
-/linux-next/Documentation/devicetree/bindings/mmc/allwinner,sun4i-a10-mmc.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/mmc/allwinner,sun4i-a10-mmc.yaml
-/linux-next/Documentation/devicetree/bindings/mmc/mmc-controller.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/mmc/mmc-controller.yaml
-/linux-next/Documentation/devicetree/bindings/mtd/nand-controller.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/mtd/nand-controller.yaml
-/linux-next/Documentation/devicetree/bindings/mtd/allwinner,sun4i-a10-nand.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/mtd/allwinner,sun4i-a10-nand.yaml
-/linux-next/Documentation/devicetree/bindings/net/allwinner,sun8i-a83t-emac.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/net/allwinner,sun8i-a83t-emac.yaml
-/linux-next/Documentation/devicetree/bindings/net/allwinner,sun4i-a10-emac.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/net/allwinner,sun4i-a10-emac.yaml
-/linux-next/Documentation/devicetree/bindings/net/snps,dwmac.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-/linux-next/Documentation/devicetree/bindings/net/allwinner,sun7i-a20-gmac.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/net/allwinner,sun7i-a20-gmac.yaml
-/linux-next/Documentation/devicetree/bindings/net/ethernet-phy.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/net/ethernet-phy.yaml
-/linux-next/Documentation/devicetree/bindings/net/mdio.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/net/mdio.yaml
-/linux-next/Documentation/devicetree/bindings/net/ethernet-controller.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/net/ethernet-controller.yaml
-/linux-next/Documentation/devicetree/bindings/net/allwinner,sun4i-a10-mdio.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/net/allwinner,sun4i-a10-mdio.yaml
-/linux-next/Documentation/devicetree/bindings/nvmem/nvmem.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/nvmem/nvmem.yaml
-/linux-next/Documentation/devicetree/bindings/nvmem/allwinner,sun4i-a10-sid.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/nvmem/allwinner,sun4i-a10-sid.yaml
-/linux-next/Documentation/devicetree/bindings/nvmem/nvmem-consumer.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/nvmem/nvmem-consumer.yaml
-/linux-next/Documentation/devicetree/bindings/phy/allwinner,sun6i-a31-mipi-dphy.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/phy/allwinner,sun6i-a31-mipi-dphy.yaml
-/linux-next/Documentation/devicetree/bindings/pinctrl/aspeed,ast2400-pinctrl.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/pinctrl/aspeed,ast2400-pinctrl.yaml
-/linux-next/Documentation/devicetree/bindings/pinctrl/aspeed,ast2500-pinctrl.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/pinctrl/aspeed,ast2500-pinctrl.yaml
-/linux-next/Documentation/devicetree/bindings/pinctrl/st,stm32-pinctrl.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/pinctrl/st,stm32-pinctrl.yaml
-/linux-next/Documentation/devicetree/bindings/pwm/allwinner,sun4i-a10-pwm.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/pwm/allwinner,sun4i-a10-pwm.yaml
-/linux-next/Documentation/devicetree/bindings/regulator/gpio-regulator.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/regulator/gpio-regulator.yaml
-/linux-next/Documentation/devicetree/bindings/regulator/max8660.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/regulator/max8660.yaml
-/linux-next/Documentation/devicetree/bindings/regulator/fixed-regulator.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/regulator/fixed-regulator.yaml
-/linux-next/Documentation/devicetree/bindings/regulator/regulator.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/regulator/regulator.yaml
-/linux-next/Documentation/devicetree/bindings/riscv/cpus.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/riscv/cpus.yaml
-/linux-next/Documentation/devicetree/bindings/riscv/sifive.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/riscv/sifive.yaml
-/linux-next/Documentation/devicetree/bindings/rtc/rtc.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/rtc/rtc.yaml
-/linux-next/Documentation/devicetree/bindings/rtc/trivial-rtc.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/rtc/trivial-rtc.yaml
-/linux-next/Documentation/devicetree/bindings/rtc/allwinner,sun6i-a31-rtc.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/rtc/allwinner,sun6i-a31-rtc.yaml
-/linux-next/Documentation/devicetree/bindings/rtc/allwinner,sun4i-a10-rtc.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/rtc/allwinner,sun4i-a10-rtc.yaml
-/linux-next/Documentation/devicetree/bindings/serial/pl011.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/serial/pl011.yaml
-/linux-next/Documentation/devicetree/bindings/serial/snps-dw-apb-uart.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/serial/snps-dw-apb-uart.yaml
-/linux-next/Documentation/devicetree/bindings/sound/allwinner,sun4i-a10-spdif.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/sound/allwinner,sun4i-a10-spdif.yaml
-/linux-next/Documentation/devicetree/bindings/sound/allwinner,sun4i-a10-i2s.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/sound/allwinner,sun4i-a10-i2s.yaml
-/linux-next/Documentation/devicetree/bindings/spi/spi-pl022.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/spi/spi-pl022.yaml
-/linux-next/Documentation/devicetree/bindings/spi/spi-controller.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/spi/spi-controller.yaml
-/linux-next/Documentation/devicetree/bindings/spi/allwinner,sun4i-a10-spi.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/spi/allwinner,sun4i-a10-spi.yaml
-/linux-next/Documentation/devicetree/bindings/spi/spi-gpio.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/spi/spi-gpio.yaml
-/linux-next/Documentation/devicetree/bindings/spi/allwinner,sun6i-a31-spi.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/spi/allwinner,sun6i-a31-spi.yaml
-/linux-next/Documentation/devicetree/bindings/timer/arm,arch_timer.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/timer/arm,arch_timer.yaml
-/linux-next/Documentation/devicetree/bindings/timer/arm,global_timer.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/timer/arm,global_timer.yaml
-/linux-next/Documentation/devicetree/bindings/timer/arm,arch_timer_mmio.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/timer/arm,arch_timer_mmio.yaml
-/linux-next/Documentation/devicetree/bindings/timer/intel,ixp4xx-timer.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/timer/intel,ixp4xx-timer.yaml
-/linux-next/Documentation/devicetree/bindings/trivial-devices.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/trivial-devices.yaml
-/linux-next/Documentation/devicetree/bindings/usb/generic-ohci.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/usb/generic-ohci.yaml
-/linux-next/Documentation/devicetree/bindings/usb/usb-hcd.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/usb/usb-hcd.yaml
-/linux-next/Documentation/devicetree/bindings/usb/generic-ehci.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/usb/generic-ehci.yaml
-/linux-next/Documentation/devicetree/bindings/vendor-prefixes.yaml: ignoring, error parsing file
-warning: no schema found in file: /linux-next/Documentation/devicetree/bindings/vendor-prefixes.yaml
-/usr/lib64/python3.6/site-packages/dtschema/schemas/serial.yaml: ignoring, error parsing file
-Traceback (most recent call last):
-  File "/usr/lib64/python3.6/site-packages/jsonschema/validators.py", line 739, in resolve_from_url
-    document = self.store[url]
-  File "/usr/lib64/python3.6/site-packages/jsonschema/_utils.py", line 23, in __getitem__
-    return self.store[self.normalize(uri)]
-KeyError: 'http://devicetree.org/meta-schemas/base.yaml'
+diff --git a/Documentation/admin-guide/conf.py b/Documentation/admin-guide/conf.py
+deleted file mode 100644
+index 86f738953799..000000000000
+--- a/Documentation/admin-guide/conf.py
++++ /dev/null
+@@ -1,10 +0,0 @@
+-# -*- coding: utf-8; mode: python -*-
+-
+-project = 'Linux Kernel User Documentation'
+-
+-tags.add("subproject")
+-
+-latex_documents = [
+-    ('index', 'linux-user.tex', 'Linux Kernel User Documentation',
+-     'The kernel development community', 'manual'),
+-]
+diff --git a/Documentation/core-api/conf.py b/Documentation/core-api/conf.py
+deleted file mode 100644
+index db1f7659f3da..000000000000
+--- a/Documentation/core-api/conf.py
++++ /dev/null
+@@ -1,10 +0,0 @@
+-# -*- coding: utf-8; mode: python -*-
+-
+-project = "Core-API Documentation"
+-
+-tags.add("subproject")
+-
+-latex_documents = [
+-    ('index', 'core-api.tex', project,
+-     'The kernel development community', 'manual'),
+-]
+diff --git a/Documentation/crypto/conf.py b/Documentation/crypto/conf.py
+deleted file mode 100644
+index 4335d251ddf3..000000000000
+--- a/Documentation/crypto/conf.py
++++ /dev/null
+@@ -1,10 +0,0 @@
+-# -*- coding: utf-8; mode: python -*-
+-
+-project = 'Linux Kernel Crypto API'
+-
+-tags.add("subproject")
+-
+-latex_documents = [
+-    ('index', 'crypto-api.tex', 'Linux Kernel Crypto API manual',
+-     'The kernel development community', 'manual'),
+-]
+diff --git a/Documentation/dev-tools/conf.py b/Documentation/dev-tools/conf.py
+deleted file mode 100644
+index 7faafa3f7888..000000000000
+--- a/Documentation/dev-tools/conf.py
++++ /dev/null
+@@ -1,10 +0,0 @@
+-# -*- coding: utf-8; mode: python -*-
+-
+-project = "Development tools for the kernel"
+-
+-tags.add("subproject")
+-
+-latex_documents = [
+-    ('index', 'dev-tools.tex', project,
+-     'The kernel development community', 'manual'),
+-]
+diff --git a/Documentation/doc-guide/conf.py b/Documentation/doc-guide/conf.py
+deleted file mode 100644
+index fd3731182d5a..000000000000
+--- a/Documentation/doc-guide/conf.py
++++ /dev/null
+@@ -1,10 +0,0 @@
+-# -*- coding: utf-8; mode: python -*-
+-
+-project = 'Linux Kernel Documentation Guide'
+-
+-tags.add("subproject")
+-
+-latex_documents = [
+-    ('index', 'kernel-doc-guide.tex', 'Linux Kernel Documentation Guide',
+-     'The kernel development community', 'manual'),
+-]
+diff --git a/Documentation/driver-api/80211/conf.py b/Documentation/driver-api/80211/conf.py
+deleted file mode 100644
+index 4424b4b0b9c3..000000000000
+--- a/Documentation/driver-api/80211/conf.py
++++ /dev/null
+@@ -1,10 +0,0 @@
+-# -*- coding: utf-8; mode: python -*-
+-
+-project = "Linux 802.11 Driver Developer's Guide"
+-
+-tags.add("subproject")
+-
+-latex_documents = [
+-    ('index', '80211.tex', project,
+-     'The kernel development community', 'manual'),
+-]
+diff --git a/Documentation/driver-api/conf.py b/Documentation/driver-api/conf.py
+deleted file mode 100644
+index 202726d20088..000000000000
+--- a/Documentation/driver-api/conf.py
++++ /dev/null
+@@ -1,10 +0,0 @@
+-# -*- coding: utf-8; mode: python -*-
+-
+-project = "The Linux driver implementer's API guide"
+-
+-tags.add("subproject")
+-
+-latex_documents = [
+-    ('index', 'driver-api.tex', project,
+-     'The kernel development community', 'manual'),
+-]
+diff --git a/Documentation/driver-api/pm/conf.py b/Documentation/driver-api/pm/conf.py
+deleted file mode 100644
+index a89fac11272f..000000000000
+--- a/Documentation/driver-api/pm/conf.py
++++ /dev/null
+@@ -1,10 +0,0 @@
+-# -*- coding: utf-8; mode: python -*-
+-
+-project = "Device Power Management"
+-
+-tags.add("subproject")
+-
+-latex_documents = [
+-    ('index', 'pm.tex', project,
+-     'The kernel development community', 'manual'),
+-]
+diff --git a/Documentation/filesystems/conf.py b/Documentation/filesystems/conf.py
+deleted file mode 100644
+index ea44172af5c4..000000000000
+--- a/Documentation/filesystems/conf.py
++++ /dev/null
+@@ -1,10 +0,0 @@
+-# -*- coding: utf-8; mode: python -*-
+-
+-project = "Linux Filesystems API"
+-
+-tags.add("subproject")
+-
+-latex_documents = [
+-    ('index', 'filesystems.tex', project,
+-     'The kernel development community', 'manual'),
+-]
+diff --git a/Documentation/gpu/conf.py b/Documentation/gpu/conf.py
+deleted file mode 100644
+index 1757b040fb32..000000000000
+--- a/Documentation/gpu/conf.py
++++ /dev/null
+@@ -1,10 +0,0 @@
+-# -*- coding: utf-8; mode: python -*-
+-
+-project = "Linux GPU Driver Developer's Guide"
+-
+-tags.add("subproject")
+-
+-latex_documents = [
+-    ('index', 'gpu.tex', project,
+-     'The kernel development community', 'manual'),
+-]
+diff --git a/Documentation/input/conf.py b/Documentation/input/conf.py
+deleted file mode 100644
+index d2352fdc92ed..000000000000
+--- a/Documentation/input/conf.py
++++ /dev/null
+@@ -1,10 +0,0 @@
+-# -*- coding: utf-8; mode: python -*-
+-
+-project = "The Linux input driver subsystem"
+-
+-tags.add("subproject")
+-
+-latex_documents = [
+-    ('index', 'linux-input.tex', project,
+-     'The kernel development community', 'manual'),
+-]
+diff --git a/Documentation/kernel-hacking/conf.py b/Documentation/kernel-hacking/conf.py
+deleted file mode 100644
+index 3d8acf0f33ad..000000000000
+--- a/Documentation/kernel-hacking/conf.py
++++ /dev/null
+@@ -1,10 +0,0 @@
+-# -*- coding: utf-8; mode: python -*-
+-
+-project = "Kernel Hacking Guides"
+-
+-tags.add("subproject")
+-
+-latex_documents = [
+-    ('index', 'kernel-hacking.tex', project,
+-     'The kernel development community', 'manual'),
+-]
+diff --git a/Documentation/maintainer/conf.py b/Documentation/maintainer/conf.py
+deleted file mode 100644
+index 81e9eb7a7884..000000000000
+--- a/Documentation/maintainer/conf.py
++++ /dev/null
+@@ -1,10 +0,0 @@
+-# -*- coding: utf-8; mode: python -*-
+-
+-project = 'Linux Kernel Development Documentation'
+-
+-tags.add("subproject")
+-
+-latex_documents = [
+-    ('index', 'maintainer.tex', 'Linux Kernel Development Documentation',
+-     'The kernel development community', 'manual'),
+-]
+diff --git a/Documentation/media/conf.py b/Documentation/media/conf.py
+deleted file mode 100644
+index 1f194fcd2cae..000000000000
+--- a/Documentation/media/conf.py
++++ /dev/null
+@@ -1,12 +0,0 @@
+-# -*- coding: utf-8; mode: python -*-
+-
+-# SPDX-License-Identifier: GPL-2.0
+-
+-project = 'Linux Media Subsystem Documentation'
+-
+-tags.add("subproject")
+-
+-latex_documents = [
+-    ('index', 'media.tex', 'Linux Media Subsystem Documentation',
+-     'The kernel development community', 'manual'),
+-]
+diff --git a/Documentation/networking/conf.py b/Documentation/networking/conf.py
+deleted file mode 100644
+index 40f69e67a883..000000000000
+--- a/Documentation/networking/conf.py
++++ /dev/null
+@@ -1,10 +0,0 @@
+-# -*- coding: utf-8; mode: python -*-
+-
+-project = "Linux Networking Documentation"
+-
+-tags.add("subproject")
+-
+-latex_documents = [
+-    ('index', 'networking.tex', project,
+-     'The kernel development community', 'manual'),
+-]
+diff --git a/Documentation/process/conf.py b/Documentation/process/conf.py
+deleted file mode 100644
+index 1b01a80ad9ce..000000000000
+--- a/Documentation/process/conf.py
++++ /dev/null
+@@ -1,10 +0,0 @@
+-# -*- coding: utf-8; mode: python -*-
+-
+-project = 'Linux Kernel Development Documentation'
+-
+-tags.add("subproject")
+-
+-latex_documents = [
+-    ('index', 'process.tex', 'Linux Kernel Development Documentation',
+-     'The kernel development community', 'manual'),
+-]
+diff --git a/Documentation/sh/conf.py b/Documentation/sh/conf.py
+deleted file mode 100644
+index 1eb684a13ac8..000000000000
+--- a/Documentation/sh/conf.py
++++ /dev/null
+@@ -1,10 +0,0 @@
+-# -*- coding: utf-8; mode: python -*-
+-
+-project = "SuperH architecture implementation manual"
+-
+-tags.add("subproject")
+-
+-latex_documents = [
+-    ('index', 'sh.tex', project,
+-     'The kernel development community', 'manual'),
+-]
+diff --git a/Documentation/sound/conf.py b/Documentation/sound/conf.py
+deleted file mode 100644
+index 3f1fc5e74e7b..000000000000
+--- a/Documentation/sound/conf.py
++++ /dev/null
+@@ -1,10 +0,0 @@
+-# -*- coding: utf-8; mode: python -*-
+-
+-project = "Linux Sound Subsystem Documentation"
+-
+-tags.add("subproject")
+-
+-latex_documents = [
+-    ('index', 'sound.tex', project,
+-     'The kernel development community', 'manual'),
+-]
+diff --git a/Documentation/userspace-api/conf.py b/Documentation/userspace-api/conf.py
+deleted file mode 100644
+index 2eaf59f844e5..000000000000
+--- a/Documentation/userspace-api/conf.py
++++ /dev/null
+@@ -1,10 +0,0 @@
+-# -*- coding: utf-8; mode: python -*-
+-
+-project = "The Linux kernel user-space API guide"
+-
+-tags.add("subproject")
+-
+-latex_documents = [
+-    ('index', 'userspace-api.tex', project,
+-     'The kernel development community', 'manual'),
+-]
+diff --git a/Documentation/vm/conf.py b/Documentation/vm/conf.py
+deleted file mode 100644
+index 3b0b601af558..000000000000
+--- a/Documentation/vm/conf.py
++++ /dev/null
+@@ -1,10 +0,0 @@
+-# -*- coding: utf-8; mode: python -*-
+-
+-project = "Linux Memory Management Documentation"
+-
+-tags.add("subproject")
+-
+-latex_documents = [
+-    ('index', 'memory-management.tex', project,
+-     'The kernel development community', 'manual'),
+-]
+diff --git a/Documentation/x86/conf.py b/Documentation/x86/conf.py
+deleted file mode 100644
+index 33c5c3142e20..000000000000
+--- a/Documentation/x86/conf.py
++++ /dev/null
+@@ -1,10 +0,0 @@
+-# -*- coding: utf-8; mode: python -*-
+-
+-project = "X86 architecture specific documentation"
+-
+-tags.add("subproject")
+-
+-latex_documents = [
+-    ('index', 'x86.tex', project,
+-     'The kernel development community', 'manual'),
+-]
+-- 
+2.21.0
 
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "/usr/lib64/python3.6/site-packages/jsonschema/validators.py", line 742, in resolve_from_url
-    document = self.resolve_remote(url)
-  File "/usr/lib64/python3.6/site-packages/jsonschema/validators.py", line 821, in resolve_remote
-    result = self.handlers[scheme](uri)
-  File "/usr/lib64/python3.6/site-packages/dtschema/lib.py", line 523, in http_handler
-    return load_schema(uri.replace(schema_base_url, ''))
-  File "/usr/lib64/python3.6/site-packages/dtschema/lib.py", line 102, in load_schema
-    return yaml.load(f.read())
-  File "/usr/lib64/python3.6/site-packages/ruamel/yaml/main.py", line 266, in load
-    return constructor.get_single_data()
-  File "/usr/lib64/python3.6/site-packages/ruamel/yaml/constructor.py", line 102, in get_single_data
-    node = self.composer.get_single_node()
-  File "_ruamel_yaml.pyx", line 703, in _ruamel_yaml.CParser.get_single_node (ext/_ruamel_yaml.c:9583)
-  File "_ruamel_yaml.pyx", line 904, in _ruamel_yaml.CParser._parse_next_event (ext/_ruamel_yaml.c:12818)
-ruamel.yaml.parser.ParserError: found incompatible YAML document
-  in "<unicode string>", line 4, column 1
-
-During handling of the above exception, another exception occurred:
-
-Traceback (most recent call last):
-  File "/usr/lib/python-exec/python3.6/dt-mk-schema", line 32, in <module>
-    schemas = dtschema.process_schemas(args.schemas, core_schema=(not args.useronly))
-  File "/usr/lib64/python3.6/site-packages/dtschema/lib.py", line 487, in process_schemas
-    sch = process_schema(os.path.abspath(filename))
-  File "/usr/lib64/python3.6/site-packages/dtschema/lib.py", line 428, in process_schema
-    DTValidator.check_schema(schema)
-  File "/usr/lib64/python3.6/site-packages/dtschema/lib.py", line 572, in check_schema
-    meta_schema = cls.resolver.resolve_from_url(schema['$schema'])
-  File "/usr/lib64/python3.6/site-packages/jsonschema/validators.py", line 744, in resolve_from_url
-    raise exceptions.RefResolutionError(exc)
-jsonschema.exceptions.RefResolutionError: found incompatible YAML document
-  in "<unicode string>", line 4, column 1
-make[2]: *** [/linux-next/Documentation/devicetree/bindings/Makefile:31: Documentation/devicetree/bindings/processed-schema.yaml] Error 1
-make[1]: *** [/linux-next/Makefile:1278: dt_binding_check] Error 2
-make[1] : on quitte le répertoire « /usr/src/crossbuild/next/arm64/default/defconfig »
-make: *** [Makefile:179: sub-make] Error 2
-
-Do you know what happens ?
-
-Regards
