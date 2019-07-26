@@ -2,65 +2,77 @@ Return-Path: <SRS0=5D8e=VX=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=FAKE_REPLY_C,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0 tests=FAKE_REPLY_C,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22D13C7618B
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jul 2019 12:32:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64A60C7618B
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jul 2019 12:33:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0666722ADA
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jul 2019 12:32:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 39F4022ADA
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jul 2019 12:33:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726408AbfGZMcn (ORCPT
+        id S1726998AbfGZMdA (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 26 Jul 2019 08:32:43 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:46422 "EHLO fornost.hmeau.com"
+        Fri, 26 Jul 2019 08:33:00 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:46436 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726366AbfGZMcn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 Jul 2019 08:32:43 -0400
+        id S1726366AbfGZMdA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 26 Jul 2019 08:33:00 -0400
 Received: from gondolin.me.apana.org.au ([192.168.0.6] helo=gondolin.hengli.com.au)
         by fornost.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1hqzOZ-0003mN-43; Fri, 26 Jul 2019 22:32:23 +1000
+        id 1hqzP8-0003pj-1X; Fri, 26 Jul 2019 22:32:58 +1000
 Received: from herbert by gondolin.hengli.com.au with local (Exim 4.80)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1hqzOW-00028y-Br; Fri, 26 Jul 2019 22:32:20 +1000
-Date:   Fri, 26 Jul 2019 22:32:20 +1000
+        id 1hqzP2-00029d-1a; Fri, 26 Jul 2019 22:32:52 +1000
+Date:   Fri, 26 Jul 2019 22:32:51 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc:     linux-kernel@vger.kernel.org, tglx@linutronix.de,
-        peterz@infradead.org, bigeasy@linutronix.de, davem@davemloft.net,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 1/7] crypto: ux500: Use spinlock_t instead of struct
- spinlock
-Message-ID: <20190726123220.GA8221@gondor.apana.org.au>
+To:     Ondrej Mosnacek <omosnace@redhat.com>
+Cc:     linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
+        davem@davemloft.net, smueller@chronox.de,
+        steffen.klassert@secunet.com, dzickus@redhat.com
+Subject: Re: [PATCH] crypto: user - make NETLINK_CRYPTO work inside netns
+Message-ID: <20190726123251.GA8274@gondor.apana.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190704153803.12739-2-bigeasy@linutronix.de>
+In-Reply-To: <20190709111124.31127-1-omosnace@redhat.com>
 Organization: Core
-X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel
+X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.netdev
 User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Sebastian Andrzej Siewior <bigeasy@linutronix.de> wrote:
-> For spinlocks the type spinlock_t should be used instead of "struct
-> spinlock".
+Ondrej Mosnacek <omosnace@redhat.com> wrote:
+> Currently, NETLINK_CRYPTO works only in the init network namespace. It
+> doesn't make much sense to cut it out of the other network namespaces,
+> so do the minor plumbing work necessary to make it work in any network
+> namespace. Code inspired by net/core/sock_diag.c.
 > 
-> Use spinlock_t for spinlock's definition.
+> Tested using kcapi-dgst from libkcapi [1]:
+> Before:
+>    # unshare -n kcapi-dgst -c sha256 </dev/null | wc -c
+>    libkcapi - Error: Netlink error: sendmsg failed
+>    libkcapi - Error: Netlink error: sendmsg failed
+>    libkcapi - Error: NETLINK_CRYPTO: cannot obtain cipher information for hmac(sha512) (is required crypto_user.c patch missing? see documentation)
+>    0
 > 
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: linux-crypto@vger.kernel.org
-> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> After:
+>    # unshare -n kcapi-dgst -c sha256 </dev/null | wc -c
+>    32
+> 
+> [1] https://github.com/smuellerDD/libkcapi
+> 
+> Signed-off-by: Ondrej Mosnacek <omosnace@redhat.com>
 > ---
-> drivers/crypto/ux500/cryp/cryp.h     | 4 ++--
-> drivers/crypto/ux500/hash/hash_alg.h | 4 ++--
-> 2 files changed, 4 insertions(+), 4 deletions(-)
+> crypto/crypto_user_base.c            | 37 +++++++++++++++++++---------
+> crypto/crypto_user_stat.c            |  4 ++-
+> include/crypto/internal/cryptouser.h |  2 --
+> include/net/net_namespace.h          |  3 +++
+> 4 files changed, 31 insertions(+), 15 deletions(-)
 
 Patch applied.  Thanks.
 -- 
