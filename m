@@ -6,37 +6,37 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=FAKE_REPLY_C,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAB3EC76191
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jul 2019 12:35:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCB54C7618B
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jul 2019 12:36:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A394D22ADA
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jul 2019 12:35:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9BF1D22ADA
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jul 2019 12:36:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727034AbfGZMft (ORCPT
+        id S1727206AbfGZMgC (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 26 Jul 2019 08:35:49 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:46530 "EHLO fornost.hmeau.com"
+        Fri, 26 Jul 2019 08:36:02 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:46542 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727206AbfGZMft (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 Jul 2019 08:35:49 -0400
+        id S1726591AbfGZMgB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 26 Jul 2019 08:36:01 -0400
 Received: from gondolin.me.apana.org.au ([192.168.0.6] helo=gondolin.hengli.com.au)
         by fornost.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1hqzRg-00040d-2g; Fri, 26 Jul 2019 22:35:36 +1000
+        id 1hqzRy-00042T-46; Fri, 26 Jul 2019 22:35:54 +1000
 Received: from herbert by gondolin.hengli.com.au with local (Exim 4.80)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1hqzRe-0002E3-BI; Fri, 26 Jul 2019 22:35:34 +1000
-Date:   Fri, 26 Jul 2019 22:35:34 +1000
+        id 1hqzRx-0002EN-Fm; Fri, 26 Jul 2019 22:35:53 +1000
+Date:   Fri, 26 Jul 2019 22:35:53 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     davem@davemloft.net, arnd@arndb.de, omosnacek@gmail.com,
-        ard.biesheuvel@linaro.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, clang-built-linux@googlegroups.com
-Subject: Re: [PATCH] crypto: aegis: fix badly optimized clang output
-Message-ID: <20190726123534.GA8490@gondor.apana.org.au>
+To:     Iuliana Prodan <iuliana.prodan@nxp.com>
+Cc:     davem@davemloft.net, gilad@benyossef.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-imx@nxp.com
+Subject: Re: [PATCH 1/2] crypto: ccree - check assoclen for rfc4543
+Message-ID: <20190726123553.GA8568@gondor.apana.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190718135017.2493006-1-arnd@arndb.de>
+In-Reply-To: <1563520164-1153-1-git-send-email-iuliana.prodan@nxp.com>
 Organization: Core
 X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel
 User-Agent: Mutt/1.5.21 (2010-09-15)
@@ -45,35 +45,22 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Arnd Bergmann <arnd@arndb.de> wrote:
-> Clang sometimes makes very different inlining decisions from gcc.
-> In case of the aegis crypto algorithms, it decides to turn the innermost
-> primitives (and, xor, ...) into separate functions but inline most of
-> the rest.
+Iuliana Prodan <iuliana.prodan@nxp.com> wrote:
+> Check assoclen to solve the extra tests that expect -EINVAL to be
+> returned when the associated data size is not valid.
 > 
-> This results in a huge amount of variables spilled on the stack, leading
-> to rather slow execution as well as kernel stack usage beyond the 32-bit
-> warning limit when CONFIG_KASAN is enabled:
+> Validated assoclen for RFC4543 which expects an assoclen
+> of 16 or 20, the same as RFC4106.
+> Based on seqiv, IPsec ESP and RFC4543/RFC4106 the assoclen is sizeof
+> IP Header (spi, seq_no, extended seq_no) and IV len. This can be 16 or
+> 20 bytes.
 > 
-> crypto/aegis256.c:123:13: warning: stack frame size of 648 bytes in function 'crypto_aegis256_encrypt_chunk' [-Wframe-larger-than=]
-> crypto/aegis256.c:366:13: warning: stack frame size of 1264 bytes in function 'crypto_aegis256_crypt' [-Wframe-larger-than=]
-> crypto/aegis256.c:187:13: warning: stack frame size of 656 bytes in function 'crypto_aegis256_decrypt_chunk' [-Wframe-larger-than=]
-> crypto/aegis128l.c:135:13: warning: stack frame size of 832 bytes in function 'crypto_aegis128l_encrypt_chunk' [-Wframe-larger-than=]
-> crypto/aegis128l.c:415:13: warning: stack frame size of 1480 bytes in function 'crypto_aegis128l_crypt' [-Wframe-larger-than=]
-> crypto/aegis128l.c:218:13: warning: stack frame size of 848 bytes in function 'crypto_aegis128l_decrypt_chunk' [-Wframe-larger-than=]
-> crypto/aegis128.c:116:13: warning: stack frame size of 584 bytes in function 'crypto_aegis128_encrypt_chunk' [-Wframe-larger-than=]
-> crypto/aegis128.c:351:13: warning: stack frame size of 1064 bytes in function 'crypto_aegis128_crypt' [-Wframe-larger-than=]
-> crypto/aegis128.c:177:13: warning: stack frame size of 592 bytes in function 'crypto_aegis128_decrypt_chunk' [-Wframe-larger-than=]
-> 
-> Forcing the primitives to all get inlined avoids the issue and the
-> resulting code is similar to what gcc produces.
-> 
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>
 > ---
-> crypto/aegis.h | 6 +++---
-> 1 file changed, 3 insertions(+), 3 deletions(-)
+> drivers/crypto/ccree/cc_aead.c | 26 ++++++++++++++++++++------
+> 1 file changed, 20 insertions(+), 6 deletions(-)
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
