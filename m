@@ -2,120 +2,105 @@ Return-Path: <SRS0=5D8e=VX=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFA1BC7618B
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jul 2019 13:46:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E363EC76191
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jul 2019 13:47:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C01F522CE8
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jul 2019 13:46:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BC84022CE8
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jul 2019 13:47:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I6up5k5j"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388333AbfGZNqp (ORCPT
+        id S2388077AbfGZNrn (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 26 Jul 2019 09:46:45 -0400
-Received: from relay12.mail.gandi.net ([217.70.178.232]:43335 "EHLO
-        relay12.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387830AbfGZNqo (ORCPT
+        Fri, 26 Jul 2019 09:47:43 -0400
+Received: from mail-ed1-f49.google.com ([209.85.208.49]:41646 "EHLO
+        mail-ed1-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388296AbfGZNpw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 Jul 2019 09:46:44 -0400
-Received: from localhost (lfbn-1-17395-211.w86-250.abo.wanadoo.fr [86.250.200.211])
-        (Authenticated sender: antoine.tenart@bootlin.com)
-        by relay12.mail.gandi.net (Postfix) with ESMTPSA id 19CA9200004;
-        Fri, 26 Jul 2019 13:46:41 +0000 (UTC)
-Date:   Fri, 26 Jul 2019 15:46:40 +0200
-From:   Antoine Tenart <antoine.tenart@bootlin.com>
-To:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
-Cc:     Antoine Tenart <antoine.tenart@bootlin.com>,
-        Pascal van Leeuwen <pascalvanl@gmail.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>
-Subject: Re: [PATCH 2/3] crypto: inside-secure - added support for
- rfc3686(ctr(aes))
-Message-ID: <20190726134640.GD5031@kwain>
-References: <1562309364-942-1-git-send-email-pvanleeuwen@verimatrix.com>
- <1562309364-942-3-git-send-email-pvanleeuwen@verimatrix.com>
- <20190726123305.GD3235@kwain>
- <MN2PR20MB2973C6D05EED9B878D2EC4B9CAC00@MN2PR20MB2973.namprd20.prod.outlook.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <MN2PR20MB2973C6D05EED9B878D2EC4B9CAC00@MN2PR20MB2973.namprd20.prod.outlook.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
+        Fri, 26 Jul 2019 09:45:52 -0400
+Received: by mail-ed1-f49.google.com with SMTP id p15so53297258eds.8
+        for <linux-crypto@vger.kernel.org>; Fri, 26 Jul 2019 06:45:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=fFB59i/KR1NFPnF58ScmWzSYAxJrvQ5w2m22vY6o9Q4=;
+        b=I6up5k5jF5TcM2gFSkA0bQyN0zOjnQJlr+eJPrPB7TbqFpjBNTKTNTEej1rNsO2aYE
+         RcX8jfWSxPBcAnrNrFFdjicX1LIeqG+xF40mu9KI1beH2R0iE7hMt0Sut2Jk7XGAwOaa
+         kKII90mt2wKzUgJV9hs/3v8ipx2i6Nq9h2hBrDMcd7W5UypkjFzIremc17IrzuBJTVAB
+         CcR6hv+OdB9kac4b65xNMFdG5nb8JhmgdVKfQsEUu/6VWavNcYGjOjjWWjA0kXctek3H
+         kuks9CUZ4T1+N660HvkyByRpbQ/WGM2hGgUj2vIuOhc9Oia21eHqMU58Gh1u3INuJLOx
+         ddQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=fFB59i/KR1NFPnF58ScmWzSYAxJrvQ5w2m22vY6o9Q4=;
+        b=S4yKC/si0aOeudEJYkQdhHndn8sTumKVo376GpY246eJtNNy4PK5V3dAj5WdatgNP/
+         bYOdUSO6pX+KU0wpJCZpVjb8j78qmGYqnsQ1SbhRPffuDQrEpO2iE5d4NPP7z5lcxWlb
+         sKSJJPwZy2UEM0vdQupqhX2s33gKHYwNm7p5yXO0zL6OL8O6RmHChAd5mE73Jll03IBg
+         fB9T//BbfOOdeVQHd2P4oBIYh08Ttc95qZwlk3xxlUnUDByBR62WqEvmgiPChbhaLqvK
+         w0rVYniILtmZHye428K3B+J0jDaI3TJ4+a8Nz/33C6MKXaACMkz96Tc6wZyfKj1eCoDX
+         e4gA==
+X-Gm-Message-State: APjAAAUKXYc/77HZGua29EaXfpwEzpt4WG87pMD3mC2FEuD8IQO+x5Rr
+        m5n+pSetcNI/8djQ2DoOXG2H7tH/
+X-Google-Smtp-Source: APXvYqzm4XatAl2zC4IFzpMpp+EfOwNiJXm5wmU/kDbx8/mmn8FqKJol8O3NMrQ9jXsnmqT+KaWPFQ==
+X-Received: by 2002:a50:922a:: with SMTP id i39mr82185648eda.219.1564148749982;
+        Fri, 26 Jul 2019 06:45:49 -0700 (PDT)
+Received: from localhost.localdomain.com ([188.204.2.113])
+        by smtp.gmail.com with ESMTPSA id 34sm14061423eds.5.2019.07.26.06.45.49
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 26 Jul 2019 06:45:49 -0700 (PDT)
+From:   Pascal van Leeuwen <pascalvanl@gmail.com>
+X-Google-Original-From: Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
+To:     linux-crypto@vger.kernel.org
+Cc:     antoine.tenart@bootlin.com, herbert@gondor.apana.org.au,
+        davem@davemloft.net,
+        Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
+Subject: [PATCHv2 0/3] crypto: inside-secure - broaden driver scope 
+Date:   Fri, 26 Jul 2019 14:43:22 +0200
+Message-Id: <1564145005-26731-1-git-send-email-pvanleeuwen@verimatrix.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Pascal,
+This is a first baby step towards making the inside-secure crypto driver
+more broadly useful. The current driver only works for Marvell Armada HW
+and requires proprietary firmware, only available under NDA from Marvell,
+to be installed. This patch set allows the driver to be used with other
+hardware and removes the dependence on that proprietary firmware.
 
-On Fri, Jul 26, 2019 at 01:28:13PM +0000, Pascal Van Leeuwen wrote:
-> > On Fri, Jul 05, 2019 at 08:49:23AM +0200, Pascal van Leeuwen wrote:
-> 
-> > > -		/* H/W capabilities selection */
-> > > -		val = EIP197_FUNCTION_RSVD;
-> > > -		val |= EIP197_PROTOCOL_ENCRYPT_ONLY | EIP197_PROTOCOL_HASH_ONLY;
-> > > -		val |= EIP197_PROTOCOL_ENCRYPT_HASH | EIP197_PROTOCOL_HASH_DECRYPT;
-> > > -		val |= EIP197_ALG_DES_ECB | EIP197_ALG_DES_CBC;
-> > > -		val |= EIP197_ALG_3DES_ECB | EIP197_ALG_3DES_CBC;
-> > > -		val |= EIP197_ALG_AES_ECB | EIP197_ALG_AES_CBC;
-> > > -		val |= EIP197_ALG_MD5 | EIP197_ALG_HMAC_MD5;
-> > > -		val |= EIP197_ALG_SHA1 | EIP197_ALG_HMAC_SHA1;
-> > > -		val |= EIP197_ALG_SHA2 | EIP197_ALG_HMAC_SHA2;
-> > > -		writel(val, EIP197_PE(priv) + EIP197_PE_EIP96_FUNCTION_EN(pe));
-> > > +		/* H/W capabilities selection: just enable everything */
-> > > +		writel(EIP197_FUNCTION_ALL,
-> > > +		       EIP197_PE(priv) + EIP197_PE_EIP96_FUNCTION_EN(pe));
-> > 
-> > This should be in a separate patch.
-> >
-> It was added specifically to  get this functionality working as CTR mode was not
-> enabled.  So I don't see why it should be a seperate patch, really?
-> Instead of adding CTR mode to the list (which would have been perfectly valid
-> in this context anyway), I just chose to enable everything instead.
+changes since v1:
+- changed dev_info's into dev_dbg to reduce normal verbosity
+- terminate all message strings with \n
+- use priv->version field strictly to enumerate device context
+- fixed some code & comment style issues
+- removed EIP97/197 references from messages
+- use #if(IS_ENABLED(CONFIG_PCI)) to remove all PCI related code
+- use #if(IS_ENABLED(CONFIG_OF)) to remove all device tree related code
+- do not inline the minifw but read it from /lib/firmware instead
 
-Because it's not the same thing to enable everything and to add one extra
-alg. This makes bissecting the driver harder because one would not except
-this change in this kind of patch.
+Pascal van Leeuwen (3):
+  crypto: inside-secure - make driver selectable for non-Marvell
+    hardware
+  crypto: inside-secure - add support for PCI based FPGA development
+    board
+  crypto: inside-secure - add support for using the EIP197 without
+    vendor firmware
 
-> > I'm also not sure about it, as
-> > controlling exactly what algs are enabled in the h/w could prevent
-> > misconfiguration issues in the control descriptors.
-> > 
-> That's not really what it's supposed to be used for. It's supposed to be used for
-> disabling algorithms the application is not ALLOWED to use e.g. because they are
-> not deemed secure enough (in case you have to comply, with,  say, FIPS or so).
-
-OK, that answer my question and this makes sense.
-
-> > > @@ -62,9 +63,9 @@ static void safexcel_skcipher_token(struct safexcel_cipher_ctx *ctx, u8 *iv,
-> > >  				    u32 length)
-> > > -	if (ctx->mode == CONTEXT_CONTROL_CRYPTO_MODE_CBC) {
-> > > +	if (ctx->mode != CONTEXT_CONTROL_CRYPTO_MODE_ECB) {
-> > 
-> > I think it's better for maintenance and readability to have something
-> > like:
-> > 
-> >   if (ctx->mode == CONTEXT_CONTROL_CRYPTO_MODE_CBC ||
-> >       ctx->mode == CONTEXT_CONTROL_CRYPTO_MODE_CTR_LOAD)
-> > 
-> Not really. I *really* want to execute that for any mode other than ECB,
-> ECB being the *only* mode that does not require an IV (which I know
-> for a fact, being the architect and all :-).
-> And I don't believe a long list of modes that *do* require an IV would 
-> be  more readable or easy to maintain than this single compare ...
-
-That's where I disagree as you need extra knowledge to be aware of this.
-Being explicit removes any possible question one may ask. But that's a
-small point really :)
-
-Thanks!
-Antoine
+ drivers/crypto/Kconfig                         |  12 +-
+ drivers/crypto/inside-secure/safexcel.c        | 748 +++++++++++++++++--------
+ drivers/crypto/inside-secure/safexcel.h        |  36 +-
+ drivers/crypto/inside-secure/safexcel_cipher.c |  11 -
+ drivers/crypto/inside-secure/safexcel_hash.c   |  12 -
+ drivers/crypto/inside-secure/safexcel_ring.c   |   3 +-
+ 6 files changed, 569 insertions(+), 253 deletions(-)
 
 -- 
-Antoine Ténart, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+1.8.3.1
+
