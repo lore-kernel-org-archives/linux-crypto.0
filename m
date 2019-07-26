@@ -2,472 +2,154 @@ Return-Path: <SRS0=5D8e=VX=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFD94C7618B
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jul 2019 11:32:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEA24C7618B
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jul 2019 11:33:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A063A229F3
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jul 2019 11:32:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1564140739;
-	bh=bSSrU6dU3r3lwmo73wM/Cp6y1FcE1bQgwzAta+XJW38=;
-	h=From:Cc:Subject:Date:In-Reply-To:References:To:List-ID:From;
-	b=azgpOnc/8tzmUIrhpMeOTiLoCge5pzh3X2YyMCIYnRpmpe15TkPYmDmX/xE1Tuew/
-	 2t/5pA0WzacoJs/0lBQKF3p01Fo8oDqUZQgVqTEuKI5tC4+hu2eBY6l+M24yPxMNtl
-	 3iSXi6Fa4b5ePk8plJPkesnHgZbRCcoUW5Bvokqs=
+	by mail.kernel.org (Postfix) with ESMTP id 971FE216C8
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jul 2019 11:33:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=verimatrix.com header.i=@verimatrix.com header.b="VHn+lZsB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726102AbfGZLcS (ORCPT
+        id S1726023AbfGZLdN (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 26 Jul 2019 07:32:18 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:40554 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726023AbfGZLcS (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 Jul 2019 07:32:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Sender:Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
-        Reply-To:Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
-        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=OuafK/TTQcFkrbP+suIfTDa/h6nPmDJ0gGHTBNIInGY=; b=bdXD4iNcznYpRIDy+A6+1cNPrh
-        cV+a+fbj4fYJ2Mg+9eyczrEI2wWXXZTikDxJeLis7Y2vV/8BCmFckYIL7TCyk5M1UlhUv6eR0U/+h
-        HADLDxuO1Q1CF//PiXXy0UDgcevCFLZ3asloJtgzcFkgQmVi7C0JHTCA41LhbF69P6sC6/YUdHbYm
-        vr8rpNRfDH9dQWEAeOOqCB7xoWDgGnMbkTAJdXAALiYFU+WirA1kBnPgwfDhk4IAO74wPC5VozQrO
-        jMgKffk5q0vLdNtCiNftcTQw4rkeTh1nUc6iunzfA4KkG3jbvCm6cK/h2pCh1bEIzKYaBgeblz8ex
-        tKsbR5fg==;
-Received: from [179.95.31.157] (helo=bombadil.infradead.org)
-        by bombadil.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
-        id 1hqyRb-0005vN-Ss; Fri, 26 Jul 2019 11:31:28 +0000
-Received: from mchehab by bombadil.infradead.org with local (Exim 4.92)
-        (envelope-from <mchehab@bombadil.infradead.org>)
-        id 1hqyRZ-0008Eq-NT; Fri, 26 Jul 2019 08:31:25 -0300
-From:   Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
-Cc:     Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-        Maxime Ripard <maxime.ripard@bootlin.com>,
-        Sean Paul <sean@poorly.run>, David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Yoshinori Sato <ysato@users.sourceforge.jp>,
-        Rich Felker <dalias@libc.org>,
-        Jaroslav Kysela <perex@perex.cz>,
-        Takashi Iwai <tiwai@suse.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        linux-doc@vger.kernel.org, linux-crypto@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, linux-input@vger.kernel.org,
-        netdev@vger.kernel.org, linux-sh@vger.kernel.org,
-        alsa-devel@alsa-project.org
-Subject: [PATCH v2 10/10] docs: remove extra conf.py files
-Date:   Fri, 26 Jul 2019 08:31:24 -0300
-Message-Id: <4b04d4e7df9b638de0919417da31af491833400f.1564139914.git.mchehab+samsung@kernel.org>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <cover.1564139914.git.mchehab+samsung@kernel.org>
-References: <cover.1564139914.git.mchehab+samsung@kernel.org>
+        Fri, 26 Jul 2019 07:33:13 -0400
+Received: from mail-eopbgr790042.outbound.protection.outlook.com ([40.107.79.42]:52288
+        "EHLO NAM03-CO1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725903AbfGZLdM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 26 Jul 2019 07:33:12 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Dhy1amP+EwfvxUYQlWAljxdyQj7rq4nYlQpDsIJ14ZXbO3lpfsu+1Qh6XLIL6sQ5yiFWdcZjFFWBAncoy+RERFLhxlGQGTH4rNwkcgULn0+SJ+emG6r6z77BH8ruvEDqz8SMuW4u/WSV/q0cELX2J8aZWEoxM8joJKP+0OadUcwoGCTSVi4+wrNNSySCWYLREGxPRrLTnCl2dxt05Axy5wSegTPcKRS8pYLmkxxXVfWJRqCQN2CUeGD4O8L6c5vd8XylhYMlD2WOxFW+WOo4gJVPcLrOyXHSWTMap6ppD1UBkYD5EGxc0U1uZvueCxGRwSJ8N2AwMvX/yWJY55l5oA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=HDGr0Mfqb8nHnBeux66O4qj3KI4qk/+CIPutITGvFpw=;
+ b=nQkDphuyvUWmMEZksA1f1bbEyVP7amb/0RMcgILH55uABYtSLuxFIR6JjwOXaOgCyo0txvpf2tibONKpL3TVa0Gu8GoFmfNntuJ1arlyeToEwKl/sK6ZiGR5ptph0blKzpaW8DvU0OUvo4hUIAV9MHsrTYzq//r/wfkM0jppzIVIlati1YkuTn4wtVG5juW4OJYgY2UnzhvuuXy6P/Hirzx2U5XCtB2V/U9/PKeQprFZvJIajVzVO7yQiSYEaOVdU7SirvleeLmLVpMBYroINMc4mxA9gnl8i1ATGKviz90Nkk/ZX7/4x3d2Tz9QdqusL0vbywQHNZ7zc+RxwBQyhg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
+ smtp.mailfrom=verimatrix.com;dmarc=pass action=none
+ header.from=verimatrix.com;dkim=pass header.d=verimatrix.com;arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verimatrix.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=HDGr0Mfqb8nHnBeux66O4qj3KI4qk/+CIPutITGvFpw=;
+ b=VHn+lZsBNZGssIIUucDQMFVGz9kk4GiXIKo8N9X2pdHVtH3P21MpTEC5pD77BQGxiV7O/Swuwb+kq///9HiHvK6r7i2rFJcpzGaClnicyYRJxDUNqUoMxxAFz3y7S3Fa8QI7fuO9ehhufXTybm+dE4wHx61qRplNsvYashXd9ao=
+Received: from MN2PR20MB2973.namprd20.prod.outlook.com (52.132.172.146) by
+ MN2PR20MB3005.namprd20.prod.outlook.com (52.132.173.18) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2115.14; Fri, 26 Jul 2019 11:33:07 +0000
+Received: from MN2PR20MB2973.namprd20.prod.outlook.com
+ ([fe80::68d7:2bbb:af61:2e69]) by MN2PR20MB2973.namprd20.prod.outlook.com
+ ([fe80::68d7:2bbb:af61:2e69%6]) with mapi id 15.20.2094.017; Fri, 26 Jul 2019
+ 11:33:07 +0000
+From:   Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+To:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+CC:     "antoine.tenart@bootlin.com" <antoine.tenart@bootlin.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>
+Subject: RE: [PATCHv2 0/3] crypto: inside-secure - broaden driver scope 
+Thread-Topic: [PATCHv2 0/3] crypto: inside-secure - broaden driver scope 
+Thread-Index: AQHVK2PPZerQVZ6WRkuW8hpHhbt/sKbc9NLQ
+Date:   Fri, 26 Jul 2019 11:33:07 +0000
+Message-ID: <MN2PR20MB2973DAAEF813270C88BB941CCAC00@MN2PR20MB2973.namprd20.prod.outlook.com>
+References: <1561469816-7871-1-git-send-email-pleeuwen@localhost.localdomain>
+In-Reply-To: <1561469816-7871-1-git-send-email-pleeuwen@localhost.localdomain>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=pvanleeuwen@verimatrix.com; 
+x-originating-ip: [188.204.2.113]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 3c955409-53db-4917-527e-08d711bd07f9
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:MN2PR20MB3005;
+x-ms-traffictypediagnostic: MN2PR20MB3005:
+x-ms-exchange-purlcount: 1
+x-microsoft-antispam-prvs: <MN2PR20MB30054D1D3C300807DE5B9CABCAC00@MN2PR20MB3005.namprd20.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8273;
+x-forefront-prvs: 01106E96F6
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(396003)(39850400004)(346002)(136003)(366004)(376002)(189003)(199004)(13464003)(52536014)(15974865002)(8676002)(26005)(33656002)(76176011)(316002)(5660300002)(54906003)(8936002)(446003)(71200400001)(476003)(2351001)(66946007)(14444005)(486006)(256004)(11346002)(76116006)(81166006)(81156014)(66446008)(68736007)(229853002)(64756008)(66556008)(66476007)(102836004)(9686003)(6246003)(2501003)(6436002)(53546011)(71190400001)(6506007)(55016002)(5640700003)(53936002)(25786009)(478600001)(6116002)(66066001)(14454004)(3846002)(186003)(74316002)(86362001)(7736002)(2906002)(4743002)(7696005)(305945005)(99286004)(6916009)(4326008)(18886075002);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR20MB3005;H:MN2PR20MB2973.namprd20.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: verimatrix.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: AcH1XJtwxna23A5QVAwHdlhGMN+NMaYSTA99nbukZ5TTo6+UXRQYkdyn+iiFLmRabiK6G1OvOpV/RD6gG/8RH1WVSwRxaBfB02l2qVPRrkjlQI6CETlXXzuFBSiJm+8HFF/W34s07zRFYvbicybcXJCX5DrFqkovte5uLdJXwEWAowaXWAu8pVgnfawwokfjipCy4/NQaqC3b2DDEX43++/SPJ1QsupWHo4/umVvbjIwNzdMyN2BUy+HyZcI3DG8yxYGw5osTL6X3w6/WRhaewBdkNz63qQRqYadbm7ocQDeNE5LTHj6BllknMizUgFoXF4xp2lfWTB4uiUt8h5QU6vNYj3RUHufC560PxqhIKhZ9q3CwDGapFO0+SQu+5syKGOYbHTYtrSC0N35rJAGF9HQH4TtcjiRIxKYdvsAYXw=
+Content-Type: text/plain; charset="Windows-1252"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-To:     unlisted-recipients:; (no To-header on input)
+X-OriginatorOrg: verimatrix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3c955409-53db-4917-527e-08d711bd07f9
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Jul 2019 11:33:07.5456
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: dcb260f9-022d-4495-8602-eae51035a0d0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: pvanleeuwen@verimatrix.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR20MB3005
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Now that the latex_documents are handled automatically, we can
-remove those extra conf.py files.
+Hi,
 
-Signed-off-by: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
----
- Documentation/admin-guide/conf.py      | 10 ----------
- Documentation/core-api/conf.py         | 10 ----------
- Documentation/crypto/conf.py           | 10 ----------
- Documentation/dev-tools/conf.py        | 10 ----------
- Documentation/doc-guide/conf.py        | 10 ----------
- Documentation/driver-api/80211/conf.py | 10 ----------
- Documentation/driver-api/conf.py       | 10 ----------
- Documentation/driver-api/pm/conf.py    | 10 ----------
- Documentation/filesystems/conf.py      | 10 ----------
- Documentation/gpu/conf.py              | 10 ----------
- Documentation/input/conf.py            | 10 ----------
- Documentation/kernel-hacking/conf.py   | 10 ----------
- Documentation/maintainer/conf.py       | 10 ----------
- Documentation/media/conf.py            | 12 ------------
- Documentation/networking/conf.py       | 10 ----------
- Documentation/process/conf.py          | 10 ----------
- Documentation/sh/conf.py               | 10 ----------
- Documentation/sound/conf.py            | 10 ----------
- Documentation/userspace-api/conf.py    | 10 ----------
- Documentation/vm/conf.py               | 10 ----------
- Documentation/x86/conf.py              | 10 ----------
- 21 files changed, 212 deletions(-)
- delete mode 100644 Documentation/admin-guide/conf.py
- delete mode 100644 Documentation/core-api/conf.py
- delete mode 100644 Documentation/crypto/conf.py
- delete mode 100644 Documentation/dev-tools/conf.py
- delete mode 100644 Documentation/doc-guide/conf.py
- delete mode 100644 Documentation/driver-api/80211/conf.py
- delete mode 100644 Documentation/driver-api/conf.py
- delete mode 100644 Documentation/driver-api/pm/conf.py
- delete mode 100644 Documentation/filesystems/conf.py
- delete mode 100644 Documentation/gpu/conf.py
- delete mode 100644 Documentation/input/conf.py
- delete mode 100644 Documentation/kernel-hacking/conf.py
- delete mode 100644 Documentation/maintainer/conf.py
- delete mode 100644 Documentation/media/conf.py
- delete mode 100644 Documentation/networking/conf.py
- delete mode 100644 Documentation/process/conf.py
- delete mode 100644 Documentation/sh/conf.py
- delete mode 100644 Documentation/sound/conf.py
- delete mode 100644 Documentation/userspace-api/conf.py
- delete mode 100644 Documentation/vm/conf.py
- delete mode 100644 Documentation/x86/conf.py
+Just a gentle ping to remind people that this patch set - which incorporate=
+s the feedback I=20
+got on an earlier version thereof - has been pending for over a month now w=
+ithout=20
+receiving any feedback on it whatsoever ...
 
-diff --git a/Documentation/admin-guide/conf.py b/Documentation/admin-guide/conf.py
-deleted file mode 100644
-index 86f738953799..000000000000
---- a/Documentation/admin-guide/conf.py
-+++ /dev/null
-@@ -1,10 +0,0 @@
--# -*- coding: utf-8; mode: python -*-
--
--project = 'Linux Kernel User Documentation'
--
--tags.add("subproject")
--
--latex_documents = [
--    ('index', 'linux-user.tex', 'Linux Kernel User Documentation',
--     'The kernel development community', 'manual'),
--]
-diff --git a/Documentation/core-api/conf.py b/Documentation/core-api/conf.py
-deleted file mode 100644
-index db1f7659f3da..000000000000
---- a/Documentation/core-api/conf.py
-+++ /dev/null
-@@ -1,10 +0,0 @@
--# -*- coding: utf-8; mode: python -*-
--
--project = "Core-API Documentation"
--
--tags.add("subproject")
--
--latex_documents = [
--    ('index', 'core-api.tex', project,
--     'The kernel development community', 'manual'),
--]
-diff --git a/Documentation/crypto/conf.py b/Documentation/crypto/conf.py
-deleted file mode 100644
-index 4335d251ddf3..000000000000
---- a/Documentation/crypto/conf.py
-+++ /dev/null
-@@ -1,10 +0,0 @@
--# -*- coding: utf-8; mode: python -*-
--
--project = 'Linux Kernel Crypto API'
--
--tags.add("subproject")
--
--latex_documents = [
--    ('index', 'crypto-api.tex', 'Linux Kernel Crypto API manual',
--     'The kernel development community', 'manual'),
--]
-diff --git a/Documentation/dev-tools/conf.py b/Documentation/dev-tools/conf.py
-deleted file mode 100644
-index 7faafa3f7888..000000000000
---- a/Documentation/dev-tools/conf.py
-+++ /dev/null
-@@ -1,10 +0,0 @@
--# -*- coding: utf-8; mode: python -*-
--
--project = "Development tools for the kernel"
--
--tags.add("subproject")
--
--latex_documents = [
--    ('index', 'dev-tools.tex', project,
--     'The kernel development community', 'manual'),
--]
-diff --git a/Documentation/doc-guide/conf.py b/Documentation/doc-guide/conf.py
-deleted file mode 100644
-index fd3731182d5a..000000000000
---- a/Documentation/doc-guide/conf.py
-+++ /dev/null
-@@ -1,10 +0,0 @@
--# -*- coding: utf-8; mode: python -*-
--
--project = 'Linux Kernel Documentation Guide'
--
--tags.add("subproject")
--
--latex_documents = [
--    ('index', 'kernel-doc-guide.tex', 'Linux Kernel Documentation Guide',
--     'The kernel development community', 'manual'),
--]
-diff --git a/Documentation/driver-api/80211/conf.py b/Documentation/driver-api/80211/conf.py
-deleted file mode 100644
-index 4424b4b0b9c3..000000000000
---- a/Documentation/driver-api/80211/conf.py
-+++ /dev/null
-@@ -1,10 +0,0 @@
--# -*- coding: utf-8; mode: python -*-
--
--project = "Linux 802.11 Driver Developer's Guide"
--
--tags.add("subproject")
--
--latex_documents = [
--    ('index', '80211.tex', project,
--     'The kernel development community', 'manual'),
--]
-diff --git a/Documentation/driver-api/conf.py b/Documentation/driver-api/conf.py
-deleted file mode 100644
-index 202726d20088..000000000000
---- a/Documentation/driver-api/conf.py
-+++ /dev/null
-@@ -1,10 +0,0 @@
--# -*- coding: utf-8; mode: python -*-
--
--project = "The Linux driver implementer's API guide"
--
--tags.add("subproject")
--
--latex_documents = [
--    ('index', 'driver-api.tex', project,
--     'The kernel development community', 'manual'),
--]
-diff --git a/Documentation/driver-api/pm/conf.py b/Documentation/driver-api/pm/conf.py
-deleted file mode 100644
-index a89fac11272f..000000000000
---- a/Documentation/driver-api/pm/conf.py
-+++ /dev/null
-@@ -1,10 +0,0 @@
--# -*- coding: utf-8; mode: python -*-
--
--project = "Device Power Management"
--
--tags.add("subproject")
--
--latex_documents = [
--    ('index', 'pm.tex', project,
--     'The kernel development community', 'manual'),
--]
-diff --git a/Documentation/filesystems/conf.py b/Documentation/filesystems/conf.py
-deleted file mode 100644
-index ea44172af5c4..000000000000
---- a/Documentation/filesystems/conf.py
-+++ /dev/null
-@@ -1,10 +0,0 @@
--# -*- coding: utf-8; mode: python -*-
--
--project = "Linux Filesystems API"
--
--tags.add("subproject")
--
--latex_documents = [
--    ('index', 'filesystems.tex', project,
--     'The kernel development community', 'manual'),
--]
-diff --git a/Documentation/gpu/conf.py b/Documentation/gpu/conf.py
-deleted file mode 100644
-index 1757b040fb32..000000000000
---- a/Documentation/gpu/conf.py
-+++ /dev/null
-@@ -1,10 +0,0 @@
--# -*- coding: utf-8; mode: python -*-
--
--project = "Linux GPU Driver Developer's Guide"
--
--tags.add("subproject")
--
--latex_documents = [
--    ('index', 'gpu.tex', project,
--     'The kernel development community', 'manual'),
--]
-diff --git a/Documentation/input/conf.py b/Documentation/input/conf.py
-deleted file mode 100644
-index d2352fdc92ed..000000000000
---- a/Documentation/input/conf.py
-+++ /dev/null
-@@ -1,10 +0,0 @@
--# -*- coding: utf-8; mode: python -*-
--
--project = "The Linux input driver subsystem"
--
--tags.add("subproject")
--
--latex_documents = [
--    ('index', 'linux-input.tex', project,
--     'The kernel development community', 'manual'),
--]
-diff --git a/Documentation/kernel-hacking/conf.py b/Documentation/kernel-hacking/conf.py
-deleted file mode 100644
-index 3d8acf0f33ad..000000000000
---- a/Documentation/kernel-hacking/conf.py
-+++ /dev/null
-@@ -1,10 +0,0 @@
--# -*- coding: utf-8; mode: python -*-
--
--project = "Kernel Hacking Guides"
--
--tags.add("subproject")
--
--latex_documents = [
--    ('index', 'kernel-hacking.tex', project,
--     'The kernel development community', 'manual'),
--]
-diff --git a/Documentation/maintainer/conf.py b/Documentation/maintainer/conf.py
-deleted file mode 100644
-index 81e9eb7a7884..000000000000
---- a/Documentation/maintainer/conf.py
-+++ /dev/null
-@@ -1,10 +0,0 @@
--# -*- coding: utf-8; mode: python -*-
--
--project = 'Linux Kernel Development Documentation'
--
--tags.add("subproject")
--
--latex_documents = [
--    ('index', 'maintainer.tex', 'Linux Kernel Development Documentation',
--     'The kernel development community', 'manual'),
--]
-diff --git a/Documentation/media/conf.py b/Documentation/media/conf.py
-deleted file mode 100644
-index 1f194fcd2cae..000000000000
---- a/Documentation/media/conf.py
-+++ /dev/null
-@@ -1,12 +0,0 @@
--# -*- coding: utf-8; mode: python -*-
--
--# SPDX-License-Identifier: GPL-2.0
--
--project = 'Linux Media Subsystem Documentation'
--
--tags.add("subproject")
--
--latex_documents = [
--    ('index', 'media.tex', 'Linux Media Subsystem Documentation',
--     'The kernel development community', 'manual'),
--]
-diff --git a/Documentation/networking/conf.py b/Documentation/networking/conf.py
-deleted file mode 100644
-index 40f69e67a883..000000000000
---- a/Documentation/networking/conf.py
-+++ /dev/null
-@@ -1,10 +0,0 @@
--# -*- coding: utf-8; mode: python -*-
--
--project = "Linux Networking Documentation"
--
--tags.add("subproject")
--
--latex_documents = [
--    ('index', 'networking.tex', project,
--     'The kernel development community', 'manual'),
--]
-diff --git a/Documentation/process/conf.py b/Documentation/process/conf.py
-deleted file mode 100644
-index 1b01a80ad9ce..000000000000
---- a/Documentation/process/conf.py
-+++ /dev/null
-@@ -1,10 +0,0 @@
--# -*- coding: utf-8; mode: python -*-
--
--project = 'Linux Kernel Development Documentation'
--
--tags.add("subproject")
--
--latex_documents = [
--    ('index', 'process.tex', 'Linux Kernel Development Documentation',
--     'The kernel development community', 'manual'),
--]
-diff --git a/Documentation/sh/conf.py b/Documentation/sh/conf.py
-deleted file mode 100644
-index 1eb684a13ac8..000000000000
---- a/Documentation/sh/conf.py
-+++ /dev/null
-@@ -1,10 +0,0 @@
--# -*- coding: utf-8; mode: python -*-
--
--project = "SuperH architecture implementation manual"
--
--tags.add("subproject")
--
--latex_documents = [
--    ('index', 'sh.tex', project,
--     'The kernel development community', 'manual'),
--]
-diff --git a/Documentation/sound/conf.py b/Documentation/sound/conf.py
-deleted file mode 100644
-index 3f1fc5e74e7b..000000000000
---- a/Documentation/sound/conf.py
-+++ /dev/null
-@@ -1,10 +0,0 @@
--# -*- coding: utf-8; mode: python -*-
--
--project = "Linux Sound Subsystem Documentation"
--
--tags.add("subproject")
--
--latex_documents = [
--    ('index', 'sound.tex', project,
--     'The kernel development community', 'manual'),
--]
-diff --git a/Documentation/userspace-api/conf.py b/Documentation/userspace-api/conf.py
-deleted file mode 100644
-index 2eaf59f844e5..000000000000
---- a/Documentation/userspace-api/conf.py
-+++ /dev/null
-@@ -1,10 +0,0 @@
--# -*- coding: utf-8; mode: python -*-
--
--project = "The Linux kernel user-space API guide"
--
--tags.add("subproject")
--
--latex_documents = [
--    ('index', 'userspace-api.tex', project,
--     'The kernel development community', 'manual'),
--]
-diff --git a/Documentation/vm/conf.py b/Documentation/vm/conf.py
-deleted file mode 100644
-index 3b0b601af558..000000000000
---- a/Documentation/vm/conf.py
-+++ /dev/null
-@@ -1,10 +0,0 @@
--# -*- coding: utf-8; mode: python -*-
--
--project = "Linux Memory Management Documentation"
--
--tags.add("subproject")
--
--latex_documents = [
--    ('index', 'memory-management.tex', project,
--     'The kernel development community', 'manual'),
--]
-diff --git a/Documentation/x86/conf.py b/Documentation/x86/conf.py
-deleted file mode 100644
-index 33c5c3142e20..000000000000
---- a/Documentation/x86/conf.py
-+++ /dev/null
-@@ -1,10 +0,0 @@
--# -*- coding: utf-8; mode: python -*-
--
--project = "X86 architecture specific documentation"
--
--tags.add("subproject")
--
--latex_documents = [
--    ('index', 'x86.tex', project,
--     'The kernel development community', 'manual'),
--]
--- 
-2.21.0
+> -----Original Message-----
+> From: Pascal van Leeuwen <pleeuwen@localhost.localdomain>
+> Sent: Tuesday, June 25, 2019 3:37 PM
+> To: linux-crypto@vger.kernel.org
+> Cc: antoine.tenart@bootlin.com; herbert@gondor.apana.org.au; davem@daveml=
+oft.net; Pascal Van Leeuwen
+> <pvanleeuwen@insidesecure.com>
+> Subject: [PATCHv2 0/3] crypto: inside-secure - broaden driver scope
+>=20
+> From: Pascal van Leeuwen <pvanleeuwen@insidesecure.com>
+>=20
+> This is a first baby step towards making the inside-secure crypto driver
+> more broadly useful. The current driver only works for Marvell Armada HW
+> and requires proprietary firmware, only available under NDA from Marvell,
+> to be installed. This patch set allows the driver to be used with other
+> hardware and removes the dependence on that proprietary firmware.
+>=20
+> changes since v1:
+> - changed dev_info's into dev_dbg to reduce normal verbosity
+> - terminate all message strings with \n
+> - use priv->version field strictly to enumerate device context
+> - fixed some code & comment style issues
+> - removed EIP97/197 references from messages
+> - use #if(IS_ENABLED(CONFIG_PCI)) to remove all PCI related code
+> - use #if(IS_ENABLED(CONFIG_OF)) to remove all device tree related code
+> - do not inline the minifw but read it from /lib/firmware instead
+>=20
+> Pascal van Leeuwen (3):
+>   crypto: inside-secure - make driver selectable for non-Marvell
+>     hardware
+>   crypto: inside-secure - add support for PCI based FPGA development
+>     board
+>   crypto: inside-secure - add support for using the EIP197 without
+>     vendor firmware
+>=20
+>  drivers/crypto/Kconfig                         |  12 +-
+>  drivers/crypto/inside-secure/safexcel.c        | 748 +++++++++++++++++--=
+------
+>  drivers/crypto/inside-secure/safexcel.h        |  36 +-
+>  drivers/crypto/inside-secure/safexcel_cipher.c |  11 -
+>  drivers/crypto/inside-secure/safexcel_hash.c   |  12 -
+>  drivers/crypto/inside-secure/safexcel_ring.c   |   3 +-
+>  6 files changed, 569 insertions(+), 253 deletions(-)
+>=20
+> --
+> 1.8.3.1
 
+Regards,
+Pascal van Leeuwen
+Silicon IP Architect, Multi-Protocol Engines @ Verimatrix
+www.insidesecure.com
