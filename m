@@ -8,242 +8,90 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0EE9C76194
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jul 2019 16:03:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2898EC7618B
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jul 2019 16:33:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A88F521852
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jul 2019 16:03:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F06DE21734
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jul 2019 16:33:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qOB6Ip7Q"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LxA0F/3j"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726890AbfGZQDG (ORCPT
+        id S2387517AbfGZQdg (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 26 Jul 2019 12:03:06 -0400
-Received: from mail-ed1-f65.google.com ([209.85.208.65]:43195 "EHLO
-        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727025AbfGZQDG (ORCPT
+        Fri, 26 Jul 2019 12:33:36 -0400
+Received: from mail-ed1-f66.google.com ([209.85.208.66]:32980 "EHLO
+        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387452AbfGZQdg (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 Jul 2019 12:03:06 -0400
-Received: by mail-ed1-f65.google.com with SMTP id e3so53733208edr.10
-        for <linux-crypto@vger.kernel.org>; Fri, 26 Jul 2019 09:03:04 -0700 (PDT)
+        Fri, 26 Jul 2019 12:33:36 -0400
+Received: by mail-ed1-f66.google.com with SMTP id i11so53807154edq.0
+        for <linux-crypto@vger.kernel.org>; Fri, 26 Jul 2019 09:33:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=NWF94khR4K+lzIhRbFdBUSbaFUVIY/Or7GKqM3qR0RI=;
-        b=qOB6Ip7QK0RG8ebsUiUJWkuIFOLlNJBDMzE9Q/0OCjdz+QUbxojRAfBPg+jgvA7N2u
-         qFua5imqNfF9xW4FQsXycgLca4DyaIPUJQ9RyuD8u3WZ9/CvLHaAnrGtiz7ZYve6Ae99
-         5Y4yU0PVN2rYY/lP/9PjW76HeWqG5BOc3IJH99LqH2Nv4sYQDL80eXBS3zkKWP1fDJQu
-         TDEuANcrllSHuGlSO6y7hc4prQpHdZuDdTWodIa73jGMPEJyj7YgmPTQ7AUZ6oSIQi9v
-         2kbFMLUcLr3Ea67ihqZEOFbNXCNy7FRS49MbWVBUaOy6/MYm9aWvKFoE24z8ln81atOe
-         xUkg==
+        h=from:to:cc:subject:date:message-id;
+        bh=S6euVoy8QlkvbZ6+lhMwn1mZCaz8K1ZLx31+D9Nmww4=;
+        b=LxA0F/3jBlWBqpHNGTvRvtPCpGLo44Gu5RxlUkbaT5Gf1mfgfpgmhMIDX15aidSSHA
+         raNSKQ2WjiuAaalj1g2cy+sowLltRnE1iYwDRgyDirUrEY6FvHJ1BPrHfVUW4IbHgkHi
+         SWtA2LuYhOq8yQcGlvO0M7IROBzJoxDymNrkc5Y76LdA3ZuS6vAUYo61jVCQP2Lv4Str
+         1cc/3CSgTxO6di4AZZfLT+7gRJawsg2aZnBx6wOGNbbcmnIJKqaK5TyZoCNzHCF/Xa/Q
+         GIgRFtBYBoL5qHBMeJl7fXmsUbPRhPY9Pr4/ZwkUCkMb6/pVAZYpF5wcDIL6GZFrpm1K
+         7gQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=NWF94khR4K+lzIhRbFdBUSbaFUVIY/Or7GKqM3qR0RI=;
-        b=qN9Yq9+0UtV2cdPoX0Fte18AGivyKt4EpMbJRckRohLmQxnXA2Vhw9yplEV7pSiZbh
-         EaL8ihXdmmIMWUTaMWmwG8SrK8Bst1nXov2g0ibON+oKyLCie1X3zSB4DR92fBkbBRqm
-         RgzgSzopE7RePw1R4mL7R4DBx7d44RxIyNNy18wUOGEU5AdF88fk7trMWfgCDMX0ruh9
-         BgjRS0RgNLzCPzywepX+i+dMajYbFbrFhK67tt04ONTpivzR2gK2nAsopVdEkOOhVh9s
-         8O2alNj7capZ1sqBorMjPXaE0JvN1/4SbtKflR/7ZxFdXv5s/126EH8tciSrbLH4Axmd
-         YYCQ==
-X-Gm-Message-State: APjAAAXTp8y6LIz7QNYrkHBVPUBOlF8wkaRMJgsWmJI75nCHoN54erq0
-        cERcsesKePGpetYGCveZ//K/OXza
-X-Google-Smtp-Source: APXvYqyEPj95qdPKw6virQ56oxa+MV4VFeZ/i8st0bQsK6VzqyErnAMKIi47oa9zdDsu+v2hc1L+nA==
-X-Received: by 2002:a50:c081:: with SMTP id k1mr82636640edf.19.1564156983843;
-        Fri, 26 Jul 2019 09:03:03 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=S6euVoy8QlkvbZ6+lhMwn1mZCaz8K1ZLx31+D9Nmww4=;
+        b=YppeGV7BV+aL/4e1hHWxqYBjnjohxpr1kDOpu5Tjg1oZ9scP15flx1wHSjsJgYbsly
+         6IVMNe3toaaNDVp6NQns7UdaKotUZLtqex/4n1RZ1iZiHcqe5KERDv7tPAADa2cWptHu
+         rmPWtaLiaMdVsNGCd4PfyKWzJbv+trtYrRd736lkuEOLcaRZtpoBwxadvY4BcQgwx78x
+         ZDupQ/C49Mxn4aZLppjvU4rrXWCsWuMih4bMruPhokcFZkCVetMe4MtL7vRupCORH5N8
+         OpXiUeiuYQR6Mhch5s9mLbfGcFc8GndiUkV5umUOoXcilWdxBmyUYsq4U8IoP+9PXAi5
+         MOTQ==
+X-Gm-Message-State: APjAAAX4cmcaxIqoRm/kVJxI7vEoFBprl1RwWNuNkfUXPDaHNCW5/NQ4
+        Jk2awrfbPr9o0lZXCaNLiQM6GXo5
+X-Google-Smtp-Source: APXvYqx8oNTPbA3TQrQokrBAmm4adUKFUMhrTdFRbIv6SBlAtGP9u7Gn0bgUa/Z13ySOKeo/DyZ6Lw==
+X-Received: by 2002:aa7:cf0c:: with SMTP id a12mr83559731edy.146.1564158814942;
+        Fri, 26 Jul 2019 09:33:34 -0700 (PDT)
 Received: from localhost.localdomain.com ([188.204.2.113])
-        by smtp.gmail.com with ESMTPSA id y9sm13780258eds.15.2019.07.26.09.03.02
+        by smtp.gmail.com with ESMTPSA id c53sm14414865ede.84.2019.07.26.09.33.34
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 26 Jul 2019 09:03:02 -0700 (PDT)
+        Fri, 26 Jul 2019 09:33:34 -0700 (PDT)
 From:   Pascal van Leeuwen <pascalvanl@gmail.com>
 X-Google-Original-From: Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
 To:     linux-crypto@vger.kernel.org
 Cc:     antoine.tenart@bootlin.com, herbert@gondor.apana.org.au,
         davem@davemloft.net,
         Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
-Subject: [PATCH 2/2] crypto: inside-secure - Add support for the AES-XTS algorithm
-Date:   Fri, 26 Jul 2019 17:00:33 +0200
-Message-Id: <1564153233-29390-3-git-send-email-pvanleeuwen@verimatrix.com>
+Subject: [PATCH] crypto: inside-secure - Fix null ptr derefence on rmmod for macchiatobin
+Date:   Fri, 26 Jul 2019 17:31:09 +0200
+Message-Id: <1564155069-18491-1-git-send-email-pvanleeuwen@verimatrix.com>
 X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1564153233-29390-1-git-send-email-pvanleeuwen@verimatrix.com>
-References: <1564153233-29390-1-git-send-email-pvanleeuwen@verimatrix.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch adds support for the AES-XTS skcipher algorithm.
+This small patch fixes a null pointer derefence panic that occurred when
+unloading the driver (using rmmod) on macchiatobin due to not setting
+the platform driver data properly in the probe routine.
 
 Signed-off-by: Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
 ---
- drivers/crypto/inside-secure/safexcel.c        |   1 +
- drivers/crypto/inside-secure/safexcel.h        |   2 +
- drivers/crypto/inside-secure/safexcel_cipher.c | 102 ++++++++++++++++++++++++-
- 3 files changed, 101 insertions(+), 4 deletions(-)
+ drivers/crypto/inside-secure/safexcel.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
 diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
-index ca84119..45443bf 100644
+index 45443bf..423ea2d 100644
 --- a/drivers/crypto/inside-secure/safexcel.c
 +++ b/drivers/crypto/inside-secure/safexcel.c
-@@ -1004,6 +1004,7 @@ static int safexcel_request_ring_irq(void *pdev, int irqid,
- 	&safexcel_alg_authenc_hmac_sha256_ctr_aes,
- 	&safexcel_alg_authenc_hmac_sha384_ctr_aes,
- 	&safexcel_alg_authenc_hmac_sha512_ctr_aes,
-+	&safexcel_alg_xts_aes,
- };
-
- static int safexcel_register_algorithms(struct safexcel_crypto_priv *priv)
-diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
-index 6687ff9..dcc060c 100644
---- a/drivers/crypto/inside-secure/safexcel.h
-+++ b/drivers/crypto/inside-secure/safexcel.h
-@@ -329,6 +329,7 @@ struct safexcel_context_record {
- #define CONTEXT_CONTROL_CRYPTO_MODE_ECB		(0 << 0)
- #define CONTEXT_CONTROL_CRYPTO_MODE_CBC		(1 << 0)
- #define CONTEXT_CONTROL_CRYPTO_MODE_CTR_LOAD	(6 << 0)
-+#define CONTEXT_CONTROL_CRYPTO_MODE_XTS		(7 << 0)
- #define CONTEXT_CONTROL_IV0			BIT(5)
- #define CONTEXT_CONTROL_IV1			BIT(6)
- #define CONTEXT_CONTROL_IV2			BIT(7)
-@@ -744,5 +745,6 @@ int safexcel_hmac_setkey(const char *alg, const u8 *key, unsigned int keylen,
- extern struct safexcel_alg_template safexcel_alg_authenc_hmac_sha256_ctr_aes;
- extern struct safexcel_alg_template safexcel_alg_authenc_hmac_sha384_ctr_aes;
- extern struct safexcel_alg_template safexcel_alg_authenc_hmac_sha512_ctr_aes;
-+extern struct safexcel_alg_template safexcel_alg_xts_aes;
-
- #endif
-diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-secure/safexcel_cipher.c
-index 45b83a3..d65e5f7 100644
---- a/drivers/crypto/inside-secure/safexcel_cipher.c
-+++ b/drivers/crypto/inside-secure/safexcel_cipher.c
-@@ -39,9 +39,9 @@ struct safexcel_cipher_ctx {
- 	enum safexcel_cipher_alg alg;
- 	bool aead;
-
--	__le32 key[8];
-+	__le32 key[16];
- 	u32 nonce;
--	unsigned int key_len;
-+	unsigned int key_len, xts;
-
- 	/* All the below is AEAD specific */
- 	u32 hash_alg;
-@@ -368,7 +368,7 @@ static int safexcel_context_control(struct safexcel_cipher_ctx *ctx,
- 	} else if (ctx->alg == SAFEXCEL_3DES) {
- 		cdesc->control_data.control0 |= CONTEXT_CONTROL_CRYPTO_ALG_3DES;
- 	} else if (ctx->alg == SAFEXCEL_AES) {
--		switch (ctx->key_len) {
-+		switch (ctx->key_len >> ctx->xts) {
- 		case AES_KEYSIZE_128:
- 			cdesc->control_data.control0 |= CONTEXT_CONTROL_CRYPTO_ALG_AES128;
- 			break;
-@@ -380,7 +380,7 @@ static int safexcel_context_control(struct safexcel_cipher_ctx *ctx,
- 			break;
- 		default:
- 			dev_err(priv->dev, "aes keysize not supported: %u\n",
--				ctx->key_len);
-+				ctx->key_len >> ctx->xts);
- 			return -EINVAL;
- 		}
- 	}
-@@ -1769,3 +1769,97 @@ struct safexcel_alg_template safexcel_alg_authenc_hmac_sha384_ctr_aes = {
- 		},
- 	},
- };
+@@ -1274,6 +1274,8 @@ static int safexcel_probe(struct platform_device *pdev)
+ 	priv->dev = dev;
+ 	priv->version = (enum safexcel_eip_version)of_device_get_match_data(dev);
+ 
++	platform_set_drvdata(pdev, priv);
 +
-+static int safexcel_skcipher_aesxts_setkey(struct crypto_skcipher *ctfm,
-+					   const u8 *key, unsigned int len)
-+{
-+	struct crypto_tfm *tfm = crypto_skcipher_tfm(ctfm);
-+	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
-+	struct safexcel_crypto_priv *priv = ctx->priv;
-+	struct crypto_aes_ctx aes;
-+	int ret, i;
-+	unsigned int keylen;
-+
-+	/* Only half of the key data is cipher key */
-+	keylen = (len >> 1) + (len & 1);
-+	ret = crypto_aes_expand_key(&aes, key, keylen);
-+	if (ret) {
-+		crypto_skcipher_set_flags(ctfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
-+		return ret;
-+	}
-+
-+	if (priv->flags & EIP197_TRC_CACHE && ctx->base.ctxr_dma) {
-+		for (i = 0; i < keylen / sizeof(u32); i++) {
-+			if (ctx->key[i] != cpu_to_le32(aes.key_enc[i])) {
-+				ctx->base.needs_inv = true;
-+				break;
-+			}
-+		}
-+	}
-+
-+	for (i = 0; i < keylen / sizeof(u32); i++)
-+		ctx->key[i] = cpu_to_le32(aes.key_enc[i]);
-+
-+	/* The other half is the tweak key */
-+	ret = crypto_aes_expand_key(&aes, (u8 *)(key + keylen), keylen);
-+	if (ret) {
-+		crypto_skcipher_set_flags(ctfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
-+		return ret;
-+	}
-+
-+	if (priv->flags & EIP197_TRC_CACHE && ctx->base.ctxr_dma) {
-+		for (i = 0; i < keylen / sizeof(u32); i++) {
-+			if (ctx->key[i + keylen / sizeof(u32)] !=
-+			    cpu_to_le32(aes.key_enc[i])) {
-+				ctx->base.needs_inv = true;
-+				break;
-+			}
-+		}
-+	}
-+
-+	for (i = 0; i < keylen / sizeof(u32); i++)
-+		ctx->key[i + keylen / sizeof(u32)] =
-+			cpu_to_le32(aes.key_enc[i]);
-+
-+	ctx->key_len = keylen << 1;
-+
-+	memzero_explicit(&aes, sizeof(aes));
-+	return 0;
-+}
-+
-+static int safexcel_skcipher_aes_xts_cra_init(struct crypto_tfm *tfm)
-+{
-+	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
-+
-+	safexcel_skcipher_cra_init(tfm);
-+	ctx->alg  = SAFEXCEL_AES;
-+	ctx->xts  = 1;
-+	ctx->mode = CONTEXT_CONTROL_CRYPTO_MODE_XTS;
-+	return 0;
-+}
-+
-+struct safexcel_alg_template safexcel_alg_xts_aes = {
-+	.type = SAFEXCEL_ALG_TYPE_SKCIPHER,
-+	.alg.skcipher = {
-+		.setkey = safexcel_skcipher_aesxts_setkey,
-+		.encrypt = safexcel_encrypt,
-+		.decrypt = safexcel_decrypt,
-+		/* Add 4 to include the 4 byte nonce! */
-+		.min_keysize = AES_MIN_KEY_SIZE * 2,
-+		.max_keysize = AES_MAX_KEY_SIZE * 2,
-+		.ivsize = 16,
-+		.base = {
-+			.cra_name = "xts(aes)",
-+			.cra_driver_name = "safexcel-xts-aes",
-+			.cra_priority = 300,
-+			.cra_flags = CRYPTO_ALG_ASYNC |
-+				     CRYPTO_ALG_KERN_DRIVER_ONLY,
-+			.cra_blocksize = 1,
-+			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
-+			.cra_alignmask = 0,
-+			.cra_init = safexcel_skcipher_aes_xts_cra_init,
-+			.cra_exit = safexcel_skcipher_cra_exit,
-+			.cra_module = THIS_MODULE,
-+		},
-+	},
-+};
---
+ 	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+ 	priv->base = devm_ioremap_resource(dev, res);
+ 	if (IS_ERR(priv->base)) {
+-- 
 1.8.3.1
+
