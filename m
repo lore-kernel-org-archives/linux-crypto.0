@@ -7,44 +7,44 @@ X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C90EC76191
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jul 2019 15:04:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62E89C7618B
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jul 2019 15:19:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EA57721901
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jul 2019 15:04:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 36E9C216B7
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jul 2019 15:19:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="qsKKrKxE"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="OFtWV+bB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727467AbfGZPEU (ORCPT
+        id S1727100AbfGZPTW (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 26 Jul 2019 11:04:20 -0400
-Received: from mail-eopbgr50048.outbound.protection.outlook.com ([40.107.5.48]:49805
-        "EHLO EUR03-VE1-obe.outbound.protection.outlook.com"
+        Fri, 26 Jul 2019 11:19:22 -0400
+Received: from mail-eopbgr140053.outbound.protection.outlook.com ([40.107.14.53]:42469
+        "EHLO EUR01-VE1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727353AbfGZPEU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 Jul 2019 11:04:20 -0400
+        id S1726681AbfGZPTW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 26 Jul 2019 11:19:22 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=P+psOjGiPHXW0s9kZgcGbkP60Ca2lIysmxrLe2u+2K6qLBxuZPy0IZtDPigyUorwcuMriDF+MRdjAkV84RfkqljAQvzUfg8sP7JWNWI8zLbzDgxtg3g4DzpOe6NiFHmWrJHf5oJcJwIIOD9qhwIAWS/kNKnKl8w/MkB7EMRLIA0e4me1oPK2Lrj+1Sl2LK17ujvt9EogHb1je9WCTGRtWtm/hpg0+FOGu1ti5TfaeT6yzJUrh+NdIhaE+mNb/Dkw8NlwhtNuBKIvb4hDRY1PKWYbBtzNFW5Fq2na/9Ht/Bed92NsGtqHHV3ktQa8jZwJZ8JPUtX7ZG1vr8HTVu3H0w==
+ b=c+oNplWQAaolRCP+bxsHDba066ndJh7f7MY6cJdeKq2fg3j9MBxI61Lp6J8R6s4krPOb7sfarUwwan1GHMpS5nW9Ux5gmxcA1tNTducpDUKvWIB/ucnONaVglz3C2REnU5qcZq8Gx1ppt3Mx/Sg2ncbjfW+szB0YtjFJIUjN8lF/Ps7OVPv7oTWj8NAPVRAVdt+mYGKrXXGse+iy0qsaEEyYVNTCIJbGqcQ5tUG2tHCVxlrOvtvMpWnY1RHy1TYGsl0+r4LQb+ytN1J7nEVFxjxhRWXFMkQWK297AZQ+zPTI/xVsOUmUAzM3oPDNr0nnZavMpX8of9DXiF2AdDJLYw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=43YXod2O3iV908iaNSdsdmohWAooGNc78354QQ6Q+5Q=;
- b=LWy3p9K1WCTUMuLgILAXHV2PJDU/OyjjDNG3qXCqVth/OvhgDjlMEBYddbvaXnvAU/BV05LJKK9L59RtDOEmSuVTaZ1EEAk6jih7kO6zJyM6iWtALkngYEU3rboa73WCcLKNEaJDZH0q9+46tfBb82FNIedVp9ZqM1HS6AFUP4CLMvLgktMnJLdKjfTBJaQwmLRr14ubzMCWs4TCtVBLumhDaFjlfuVR6mn5Xdian42D02C98125WcF7X8jIPgXEtizo1e9uWhueuvs5GjZNecwD7Xx00bZEXIASRHR45YQPe3yNHoc1sOYJAB4uhjvGy4wYolTHRf0kbO+Tg3h5RQ==
+ bh=Xjs7Bp6nmdbHMVAEZ3BZ3jW1f5VMrUB9oWN0BudQTNk=;
+ b=gZ3wBE55S9So21vvV+HTyL5JDodnGeBDWO0AGct8FkfaAkeMO8W3YEFk7WsoB1hokdW5Oxzi+t/cBjtdnPf1u7gJqXFcDnXAQk/V/b4Jj6fPyXchULRoNXr/NSyqT1iQVDey/xqVStv2fFvYffxH4MT6mXbw/maconrXgyYKs7qOUh6qASN4L0ukciQQdU9BCGQJgVd/hGXE2FcvCI0TDpXB1ovSQPWLDVtoYymmeKnc5uUZAs8cbiDrHFdg3YpMdlQQKJuzrhIvv95EQW10UpOCW3bHVQ56ut0hn5p+QFonrmhn4+o0TGLqT/0Dn+r/IYihBeIS06GlRm1m6LvoRQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
  smtp.mailfrom=nxp.com;dmarc=pass action=none header.from=nxp.com;dkim=pass
  header.d=nxp.com;arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=43YXod2O3iV908iaNSdsdmohWAooGNc78354QQ6Q+5Q=;
- b=qsKKrKxEe3wxBZmsQauRbJD1xgwxvF84KX3/mecOFzH3zZr8pboE3+4/h4Q/m2Dd1uCL6uIPl/nGptv33/wyAH3V7wZu3osyTTVYb31lMgsUB0cKp5UT/SPC7uR3qY9ThsK8/5K61v0ndgGEiSAJeFnIpjM2gEvuw6dMgsZgec0=
+ bh=Xjs7Bp6nmdbHMVAEZ3BZ3jW1f5VMrUB9oWN0BudQTNk=;
+ b=OFtWV+bBM36mXwFMdJ0/aVTjwRlplBdBrvjNdf39utEU6MZHvS6cIe8DmGHzugzHIQ1mmKoasRbGoxGm4/rOCO62y6ZgI8DPDPSBFLAWP6Y8s7rbwPdLr/uG1ynxGrk3tLkDeQa8KDVPV0bEfvcIIHYpElCxq9F062zfF65l6eU=
 Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
- VI1PR0402MB3837.eurprd04.prod.outlook.com (52.134.16.145) with Microsoft SMTP
+ VI1PR0402MB3742.eurprd04.prod.outlook.com (52.134.15.148) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2094.17; Fri, 26 Jul 2019 15:04:14 +0000
+ 15.20.2115.14; Fri, 26 Jul 2019 15:19:19 +0000
 Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
  ([fe80::7c64:5296:4607:e10]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
  ([fe80::7c64:5296:4607:e10%5]) with mapi id 15.20.2094.017; Fri, 26 Jul 2019
- 15:04:14 +0000
+ 15:19:18 +0000
 From:   Horia Geanta <horia.geanta@nxp.com>
 To:     Iuliana Prodan <iuliana.prodan@nxp.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -53,15 +53,13 @@ CC:     "David S. Miller" <davem@davemloft.net>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         dl-linux-imx <linux-imx@nxp.com>
-Subject: Re: [PATCH v3 10/14] crypto: caam - fix MDHA key derivation for
- certain user key lengths
-Thread-Topic: [PATCH v3 10/14] crypto: caam - fix MDHA key derivation for
- certain user key lengths
-Thread-Index: AQHVQvEQ8S5ZgmW6u06kgrYkZT+jBg==
-Date:   Fri, 26 Jul 2019 15:04:14 +0000
-Message-ID: <VI1PR0402MB34854EC43A55241885C7C87598C00@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+Subject: Re: [PATCH v3 04/14] crypto: caam - check key length
+Thread-Topic: [PATCH v3 04/14] crypto: caam - check key length
+Thread-Index: AQHVQvEQZTrNEftHI0aaBTmv2mddVQ==
+Date:   Fri, 26 Jul 2019 15:19:18 +0000
+Message-ID: <VI1PR0402MB3485A18BFAC50302DB3DF72F98C00@VI1PR0402MB3485.eurprd04.prod.outlook.com>
 References: <1564063106-9552-1-git-send-email-iuliana.prodan@nxp.com>
- <1564063106-9552-11-git-send-email-iuliana.prodan@nxp.com>
+ <1564063106-9552-5-git-send-email-iuliana.prodan@nxp.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -70,64 +68,43 @@ authentication-results: spf=none (sender IP is )
  smtp.mailfrom=horia.geanta@nxp.com; 
 x-originating-ip: [79.118.216.219]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: ea971012-6e48-43ff-f08f-08d711da85fb
+x-ms-office365-filtering-correlation-id: f30882d2-1a4b-4a46-f765-08d711dca11e
 x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:VI1PR0402MB3837;
-x-ms-traffictypediagnostic: VI1PR0402MB3837:
-x-microsoft-antispam-prvs: <VI1PR0402MB383748CFE97A2B6A503AD30698C00@VI1PR0402MB3837.eurprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8273;
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:VI1PR0402MB3742;
+x-ms-traffictypediagnostic: VI1PR0402MB3742:
+x-microsoft-antispam-prvs: <VI1PR0402MB37427F7291C747E11EF2382298C00@VI1PR0402MB3742.eurprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:6790;
 x-forefront-prvs: 01106E96F6
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(136003)(39860400002)(396003)(366004)(346002)(376002)(54534003)(199004)(189003)(81156014)(64756008)(55016002)(76176011)(478600001)(6436002)(7696005)(25786009)(6636002)(9686003)(52536014)(54906003)(66066001)(53936002)(14454004)(66556008)(5660300002)(6246003)(66446008)(91956017)(229853002)(86362001)(66476007)(26005)(76116006)(102836004)(2906002)(8936002)(316002)(7736002)(110136005)(8676002)(74316002)(71200400001)(66946007)(4326008)(71190400001)(305945005)(81166006)(53546011)(256004)(6506007)(476003)(186003)(3846002)(44832011)(33656002)(68736007)(99286004)(486006)(446003)(6116002);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB3837;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(39860400002)(396003)(346002)(136003)(366004)(376002)(189003)(199004)(52536014)(6116002)(6436002)(3846002)(86362001)(5660300002)(66446008)(64756008)(66556008)(66476007)(66946007)(76116006)(91956017)(14454004)(53546011)(6506007)(102836004)(76176011)(2906002)(7696005)(229853002)(478600001)(486006)(305945005)(14444005)(256004)(44832011)(476003)(7736002)(9686003)(71190400001)(99286004)(68736007)(71200400001)(81166006)(81156014)(8676002)(55016002)(110136005)(54906003)(316002)(8936002)(6636002)(74316002)(25786009)(558084003)(6246003)(186003)(66066001)(4326008)(446003)(53936002)(26005)(33656002);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB3742;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
 received-spf: None (protection.outlook.com: nxp.com does not designate
  permitted sender hosts)
 x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: jL5Ey8tEZdA0xxR7ln3Fo/FjXqZ+DUvtl82va/r7oR72IHSwog5H7eeY5c0fzdo1M3zd5GkHmFz3y4hA77x0vJUR4KiYmXi1ztirR/xpyL0I/3bgkhvHk1+lZuXE7iMgX7HWQeiCx7pdnPMG6Aq5ArjlYEZitnibImSR2iuSPQ120FKSL9/w3e6FLEAmdBDWcECX3uWSPGYfeWQYY6Dlbu++KFw6rjzSYQrdjQVsmqx30L6+Lo5Pi/liLcdE/bE3QrvxMZIrMYyRU0Pf2siqupkCZnR+FaT00mcj9MB98/rOCQV416/USSppfd5Au53Q0z9hDEN3UJVQstj26DInDKRe9kAr8lKI1yhp69udBR7x951IaDIfVfGbZ49VsFxXq0yhxrjNGSIHxXBzz+shxVoTm6x/EnvEtTt/ZIWZNIU=
+x-microsoft-antispam-message-info: PgrQTZwRu/IOMxnM28HOgf8n+XnxT25ABNxHarBE5ldfcco14jTuG2Uyif5p6W45tColbmlVcFo53Y8zHd2m+0LanmInnZuFZVMHPlpzFDRkLl63K7UVf/8L6lzmKUEV0bOhaUcBLdgPFKb9MN37DPrL/+rcdZT1+0N9FLrfAWC4JedWl/+uYhDccDmtrRXMyggNi4Hl5sQJmodvRQZilNxvXprT9vKsyHWgiNJThbkbkzDnPkcFAz1mlHeazFO9553fYvq2r2t+LXSo+biTLx6Jo0vyt0Y+b8Up5EeInTtkUzatvmq8xRe3cJhmqMzcuT5q1TvZOLHhkXGydZLeprQBNg4LisppXwTKiUsuXdhwn8vqKZ9EVPcMqqWjw5z026vqmqMCJ4Wn2y1tHE/gI0YqioLVVP48zpILzQxm1Ug=
 Content-Type: text/plain; charset="iso-8859-2"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ea971012-6e48-43ff-f08f-08d711da85fb
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Jul 2019 15:04:14.3448
+X-MS-Exchange-CrossTenant-Network-Message-Id: f30882d2-1a4b-4a46-f765-08d711dca11e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Jul 2019 15:19:18.9403
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
 X-MS-Exchange-CrossTenant-userprincipalname: horia.geanta@nxp.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3837
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3742
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 On 7/25/2019 4:58 PM, Iuliana Prodan wrote:=0A=
-> From: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
+> Check key length to solve the extra tests that expect -EINVAL to be=0A=
+> returned when the key size is not valid.=0A=
 > =0A=
-> Fuzz testing uncovered an issue when |user key| > |derived key|.=0A=
-> Derived key generation has to be fixed in two cases:=0A=
+> Validated AES keylen for skcipher, ahash and aead.=0A=
 > =0A=
-> 1. Era >=3D 6 (DKP is available)=0A=
-> DKP cannot be used with immediate input key if |user key| > |derived key|=
-,=0A=
-> since the resulting descriptor (after DKP execution) would be invalid -=
+> Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>=0A=
+Reviewed-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
 =0A=
-> having a few bytes from user key left in descriptor buffer=0A=
-> as incorrect opcodes.=0A=
-> =0A=
-> Fix DKP usage both in standalone hmac and in authenc algorithms.=0A=
-> For authenc the logic is simplified, by always storing both virtual=0A=
-> and dma key addresses.=0A=
-> =0A=
-> 2. Era < 6=0A=
-> The same case (|user key| > |derived key|) fails when DKP=0A=
-> is not available.=0A=
-> Make sure gen_split_key() dma maps max(|user key|, |derived key|),=0A=
-> since this is an in-place (bidirectional) operation.=0A=
-> =0A=
-> Signed-off-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
-> =0A=
-> Changes since v2:=0A=
-> - fix MDHA key derivation for CAAM with era < 6.=0A=
-> ---=0A=
-The change log shouldn't be included in the commit message.=0A=
-=0A=
+Thanks,=0A=
 Horia=0A=
