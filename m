@@ -6,69 +6,63 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=FAKE_REPLY_C,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9BCBC7618B
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jul 2019 12:34:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 699E1C7618B
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jul 2019 12:35:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7F2A322ADA
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jul 2019 12:34:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 46C1722ADA
+	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jul 2019 12:35:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726434AbfGZMep (ORCPT
+        id S1726385AbfGZMfM (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 26 Jul 2019 08:34:45 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:46482 "EHLO fornost.hmeau.com"
+        Fri, 26 Jul 2019 08:35:12 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:46492 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726130AbfGZMep (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 Jul 2019 08:34:45 -0400
+        id S1726130AbfGZMfM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 26 Jul 2019 08:35:12 -0400
 Received: from gondolin.me.apana.org.au ([192.168.0.6] helo=gondolin.hengli.com.au)
         by fornost.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1hqzQg-0003wt-T7; Fri, 26 Jul 2019 22:34:35 +1000
+        id 1hqzRF-0003yl-9S; Fri, 26 Jul 2019 22:35:09 +1000
 Received: from herbert by gondolin.hengli.com.au with local (Exim 4.80)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1hqzQa-0002BM-72; Fri, 26 Jul 2019 22:34:28 +1000
-Date:   Fri, 26 Jul 2019 22:34:28 +1000
+        id 1hqzRF-0002CS-20; Fri, 26 Jul 2019 22:35:09 +1000
+Date:   Fri, 26 Jul 2019 22:35:08 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     thomas.lendacky@amd.com, gary.hook@amd.com, davem@davemloft.net,
-        arnd@arndb.de, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, clang-built-linux@googlegroups.com
-Subject: Re: [PATCH] crypto: ccp - Reduce maximum stack usage
-Message-ID: <20190726123428.GA8381@gondor.apana.org.au>
+To:     Vakul Garg <vakul.garg@nxp.com>
+Cc:     linux-crypto@vger.kernel.org, horia.geanta@nxp.com,
+        aymen.sghaier@nxp.com, vakul.garg@nxp.com
+Subject: Re: [PATCH] crypto: caam/qi2 - Increase napi budget to process more
+ caam responses
+Message-ID: <20190726123508.GA8449@gondor.apana.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190712085937.4157934-1-arnd@arndb.de>
+In-Reply-To: <20190718112440.4052-1-vakul.garg@nxp.com>
 Organization: Core
-X-Newsgroups: apana.lists.os.linux.cryptoapi,apana.lists.os.linux.kernel
+X-Newsgroups: apana.lists.os.linux.cryptoapi
 User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Arnd Bergmann <arnd@arndb.de> wrote:
-> Each of the operations in ccp_run_cmd() needs several hundred
-> bytes of kernel stack. Depending on the inlining, these may
-> need separate stack slots that add up to more than the warning
-> limit, as shown in this clang based build:
+Vakul Garg <vakul.garg@nxp.com> wrote:
+> While running ipsec processing for traffic through multiple network
+> interfaces, it is observed that caam driver gets less time to poll
+> responses from caam block compared to ethernet driver. This is because
+> ethernet driver has as many napi instances per cpu as the number of
+> ethernet interfaces in system. Therefore, caam driver's napi executes
+> lesser than the ethernet driver's napi instances. This results in
+> situation that we end up submitting more requests to caam (which it is
+> able to finish off quite fast), but don't dequeue the responses at same
+> rate. This makes caam response FQs bloat with large number of frames. In
+> some situations, it makes kernel crash due to out-of-memory. To prevent
+> it We increase the napi budget of dpseci driver to a big value so that
+> caam driver is able to drain its response queues at enough rate.
 > 
-> drivers/crypto/ccp/ccp-ops.c:871:12: error: stack frame size of 1164 bytes in function 'ccp_run_aes_cmd' [-Werror,-Wframe-larger-than=]
-> static int ccp_run_aes_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
-> 
-> The problem may also happen when there is no warning, e.g. in the
-> ccp_run_cmd()->ccp_run_aes_cmd()->ccp_run_aes_gcm_cmd() call chain with
-> over 2000 bytes.
-> 
-> Mark each individual function as 'noinline_for_stack' to prevent
-> this from happening, and move the calls to the two special cases for aes
-> into the top-level function. This will keep the actual combined stack
-> usage to the mimimum: 828 bytes for ccp_run_aes_gcm_cmd() and
-> at most 524 bytes for each of the other cases.
-> 
-> Fixes: 63b945091a07 ("crypto: ccp - CCP device driver and interface support")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> Signed-off-by: Vakul Garg <vakul.garg@nxp.com>
 > ---
-> drivers/crypto/ccp/ccp-ops.c | 52 +++++++++++++++++++++---------------
-> 1 file changed, 31 insertions(+), 21 deletions(-)
+> drivers/crypto/caam/caamalg_qi2.h | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 
 Patch applied.  Thanks.
 -- 
