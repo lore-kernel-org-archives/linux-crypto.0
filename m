@@ -1,246 +1,145 @@
-Return-Path: <SRS0=5D8e=VX=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=7d9E=VY=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F24E5C76191
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jul 2019 22:46:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89EFEC76190
+	for <linux-crypto@archiver.kernel.org>; Sat, 27 Jul 2019 05:39:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C7F5720657
-	for <linux-crypto@archiver.kernel.org>; Fri, 26 Jul 2019 22:46:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1564181193;
-	bh=GzelVGHPqkbkaf9RW/Q47B0yPhCAPUbNJ2m3SxNTfR8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=ErMtq14LiD92vrl8TlJenLJpl7Rp7FfNncb40wTPe0haxAXAh85LybThmmn5jQnST
-	 fxMQDZfaCD2s3YERYrINK0tlm8SAmDe/+ApKquxmtbWN+rKtR/Ukpvq2QkZmOtHp4l
-	 sVDmTx6SFiUwxme+Brs9WBh9Ikm0sS65tPmmFWH4=
+	by mail.kernel.org (Postfix) with ESMTP id 61F8020840
+	for <linux-crypto@archiver.kernel.org>; Sat, 27 Jul 2019 05:39:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EdvLuNMV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728764AbfGZWp5 (ORCPT
+        id S1726058AbfG0FjX (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 26 Jul 2019 18:45:57 -0400
-Received: from mail.kernel.org ([198.145.29.99]:52386 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728759AbfGZWp5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 26 Jul 2019 18:45:57 -0400
-Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 2E9E922C7E;
-        Fri, 26 Jul 2019 22:45:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1564181156;
-        bh=GzelVGHPqkbkaf9RW/Q47B0yPhCAPUbNJ2m3SxNTfR8=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Hh5g3og90qEqztUsE2t9s4ZaGbo4PHm8PgOIZ7Cn88aQmQ9I09rlPTTjq97xIXllH
-         AUGhcFEEwjX9yMubzc1MeH5jr9nKF7Yx1d3Bhyqy6AmzHwgH/My3CQdZT1V63fWgl1
-         8KH/yL2CJ6SuUTYu8mmJNGSxxSXoc65+TBganzjA=
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     linux-fscrypt@vger.kernel.org
-Cc:     linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net,
-        linux-mtd@lists.infradead.org, linux-api@vger.kernel.org,
-        linux-crypto@vger.kernel.org, keyrings@vger.kernel.org,
-        Paul Crowley <paulcrowley@google.com>,
-        Satya Tangirala <satyat@google.com>
-Subject: [PATCH v7 01/16] fs, fscrypt: move uapi definitions to new header <linux/fscrypt.h>
-Date:   Fri, 26 Jul 2019 15:41:26 -0700
-Message-Id: <20190726224141.14044-2-ebiggers@kernel.org>
-X-Mailer: git-send-email 2.22.0
-In-Reply-To: <20190726224141.14044-1-ebiggers@kernel.org>
-References: <20190726224141.14044-1-ebiggers@kernel.org>
+        Sat, 27 Jul 2019 01:39:23 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:40778 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726046AbfG0FjX (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 27 Jul 2019 01:39:23 -0400
+Received: by mail-wm1-f65.google.com with SMTP id v19so49260795wmj.5
+        for <linux-crypto@vger.kernel.org>; Fri, 26 Jul 2019 22:39:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=MUVETRd5jGXNj319q2hmPRDJzjSos23f23Rl11EPouA=;
+        b=EdvLuNMV7jhFKSns1ldkH4GCbJ0g1ZLoSbu87dsGP/8WFobdd2gPZpvGvGopDuGCrO
+         NAhClaioZe9t3QF+E68aQIqEGhYofXiezJCZRKv95d9qdljFZ1g4dj3kx5749R7ajExW
+         9HIozlw1j7shQqGCp3+dD2eF5aJXqxJzvy6noDoSaVULiP4kD5S6KE4x36cyEiU9cnmt
+         xHbBbit2+LdsFgPtS9HMZqE3vEKfCgEmI6ElZuatUpqkdO/s/S2d2AQtUiHs518+eIJe
+         dqE9O/qZZ7RHu4fquRjH88kalLbQjm0sj8gKbN2lHAtW7q36SCUDoC2Myfp62Y7JDOnJ
+         4T4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=MUVETRd5jGXNj319q2hmPRDJzjSos23f23Rl11EPouA=;
+        b=BqfUusGPHfIh7h8sfZPoMPhjzTPDfa8mDezIkPjzvc85iTudXKcNI1Dqt66/EGVvSn
+         +GLbZhtYIoj1MRV+lWH7MYFoafaAu+tiSXPbkFjAhfY/rsjjnSU2amyHsGW76JbQYlJj
+         Wb91QICy+Xow4FoLalYsNtvQipchNz+Yfje7BGkIIzDiaFSYeZblRqmNrmP+yBrx+lac
+         XhtH4rRJtSBFvn5iSe49qdptGxNBDnMd7eACqi4L+25kM60K/woAQLH/Zepe0VzosIYI
+         jUuTO/gfxIMyLXUtcuxa4H879ZTJV1hPZDAmKFblK3ZSLHhyxKp5z6xhj0hHCGxGugwF
+         DSJg==
+X-Gm-Message-State: APjAAAUytGB4bX5+pIGf4nxganvuGwC0noxoiqm5DARJffXFYxZUymTP
+        qNLk3fdiln8M6V/rLg+rZcHaEKYIR+bXJeaHeB4GVg==
+X-Google-Smtp-Source: APXvYqzQcd1U5wjYDSIVkLNIWAzSCfPsOd836HkHWKRCZZe7ICMAEtbgEEDDcZhW+g42/wWElyBMKBZJOguOPJsC3FU=
+X-Received: by 2002:a1c:720e:: with SMTP id n14mr7388848wmc.53.1564205960368;
+ Fri, 26 Jul 2019 22:39:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20190716221639.GA44406@gmail.com> <VI1PR0402MB34857BBB18C2BB8CBA2DEC7198C90@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+ <20190717172823.GA205944@gmail.com> <CAKv+Gu__offPaWvyURJr8v56ig58q-Deo16QhP26EJ32uf5m3w@mail.gmail.com>
+ <20190718065223.4xaefcwjoxvujntw@gondor.apana.org.au> <CAKv+Gu9-EWNpJ9viSsjhYRdOZb=7a=Mpddmyt8SLEq9aFtawjg@mail.gmail.com>
+ <20190718072154.m2umem24x4grbf6w@gondor.apana.org.au> <36e78459-1594-6d19-0ab4-95b03a6de036@gmail.com>
+ <MN2PR20MB2973E61815F069E8C7D74177CAC80@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <b042649c-db98-9710-b063-242bdf520252@gmail.com> <20190720065807.GA711@sol.localdomain>
+ <0d4d6387-777c-bfd3-e54a-e7244fde0096@gmail.com> <CAKv+Gu9UF+a1UhVU19g1XcLaEqEaAwwkSm3-2wTHEAdD-q4mLQ@mail.gmail.com>
+ <MN2PR20MB2973B9C2DDC508A81AF4A207CAC40@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <CAKv+Gu9C2AEbb++W=QTVWbeA_88Fo57NcOwgU5R8HBvzFwXkJw@mail.gmail.com>
+ <MN2PR20MB2973C378AE5674F9E3E29445CAC60@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <CAKv+Gu-8n_DoauycDQS_9zzRew1rTuPaLxHyg6xhXMmqEvMaCA@mail.gmail.com>
+ <MN2PR20MB2973CAE4E9CFFE1F417B2509CAC10@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <CAKv+Gu-j-8-bQS2A46-Kf1KHtkoPJ5Htk8WratqzyngnVu-wpw@mail.gmail.com>
+ <MN2PR20MB29739591E1A3E54E7A8A8E18CAC00@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <VI1PR0402MB34850A016F3228124C0D360698C00@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+ <MN2PR20MB29732C3B360EB809EDFBFAC5CAC00@MN2PR20MB2973.namprd20.prod.outlook.com>
+In-Reply-To: <MN2PR20MB29732C3B360EB809EDFBFAC5CAC00@MN2PR20MB2973.namprd20.prod.outlook.com>
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date:   Sat, 27 Jul 2019 08:39:12 +0300
+Message-ID: <CAKv+Gu9krpqWYuD2mQFBTspo3y_TwrN6Arbvkcs=e4MpTeitHA@mail.gmail.com>
+Subject: Re: [dm-devel] xts fuzz testing and lack of ciphertext stealing support
+To:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+Cc:     Horia Geanta <horia.geanta@nxp.com>,
+        Milan Broz <gmazyland@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+On Sat, 27 Jul 2019 at 00:43, Pascal Van Leeuwen
+<pvanleeuwen@verimatrix.com> wrote:
+>
+> > -----Original Message-----
+> > From: Horia Geanta <horia.geanta@nxp.com>
+> > Sent: Friday, July 26, 2019 9:59 PM
+> > To: Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>; Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> > Cc: Milan Broz <gmazyland@gmail.com>; Herbert Xu <herbert@gondor.apana.org.au>; dm-devel@redhat.com; linux-
+> > crypto@vger.kernel.org
+> > Subject: Re: [dm-devel] xts fuzz testing and lack of ciphertext stealing support
+> >
+> > On 7/26/2019 1:31 PM, Pascal Van Leeuwen wrote:
+> > > Ok, find below a patch file that adds your vectors from the specification
+> > > plus my set of additional vectors covering all CTS alignments combined
+> > > with the block sizes you desired. Please note though that these vectors
+> > > are from our in-house home-grown model so no warranties.
+> > I've checked the test vectors against caam (HW + driver).
+> >
+> > Test vectors from IEEE 1619-2007 (i.e. up to and including "XTS-AES 18")
+> > are fine.
+> >
+> > caam complains when /* Additional vectors to increase CTS coverage */
+> > section starts:
+> > alg: skcipher: xts-aes-caam encryption test failed (wrong result) on test vector 9, cfg="in-place"
+> >
+> > (Unfortunately it seems that testmgr lost the capability of dumping
+> > the incorrect output.)
+> >
+> > IMO we can't rely on test vectors if they are not taken
+> > straight out of a spec, or cross-checked with other implementations.
+> >
+>
+> First off, I fully agree with your statement, which is why I did not post this as a straight
+> patch. The problem is that specification vectors usually (or actuaclly, always) don't cover
+> all the relevant corner cases needed for verification. And "reference" implementations
+> by academics are usually shady at best as well.
+>
+> In this particular case, the reference vectors only cover 5 out of 16 possible alignment
+> cases and the current situation proves that this is not sufficient. As we have 2 imple-
+> mentations (or actually more, if you count the models used for vector generation)
+> that are considered to be correct that disagree on results.
+>
+> Which is very interesting, because which one is correct? I know that our model and
+> hardware implementation were independently developed (by 2 different engineers)
+> from the IEEE spec and match on results. And our hardware has been used "out in
+> the field" for many years already in disk controllers from major silicon vendors.
+> But that's still not a guarantee .... So how do we resolve this? Majority vote? ;-)
+>
 
-More fscrypt definitions are being added, and we shouldn't use a
-disproportionate amount of space in <linux/fs.h> for fscrypt stuff.
-So move the fscrypt definitions to a new header <linux/fscrypt.h>.
+Thanks for the additional test vectors. They work fine with my SIMD
+implementations for ARM [0], so this looks like it might be a CAAM
+problem, not a problem with the test vectors.
 
-For source compatibility with existing userspace programs, <linux/fs.h>
-still includes the new header.
+I will try to find some time today to run them through OpenSSL to double check.
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- MAINTAINERS                  |  1 +
- include/linux/fscrypt.h      |  1 +
- include/uapi/linux/fs.h      | 54 ++-----------------------------
- include/uapi/linux/fscrypt.h | 61 ++++++++++++++++++++++++++++++++++++
- 4 files changed, 66 insertions(+), 51 deletions(-)
- create mode 100644 include/uapi/linux/fscrypt.h
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 783569e3c4b48..e7c473fb08163 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -6598,6 +6598,7 @@ T:	git git://git.kernel.org/pub/scm/fs/fscrypt/fscrypt.git
- S:	Supported
- F:	fs/crypto/
- F:	include/linux/fscrypt*.h
-+F:	include/uapi/linux/fscrypt.h
- F:	Documentation/filesystems/fscrypt.rst
- 
- FSI SUBSYSTEM
-diff --git a/include/linux/fscrypt.h b/include/linux/fscrypt.h
-index bd8f207a2fb68..81c0c754f8b21 100644
---- a/include/linux/fscrypt.h
-+++ b/include/linux/fscrypt.h
-@@ -16,6 +16,7 @@
- #include <linux/fs.h>
- #include <linux/mm.h>
- #include <linux/slab.h>
-+#include <uapi/linux/fscrypt.h>
- 
- #define FS_CRYPTO_BLOCK_SIZE		16
- 
-diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
-index 59c71fa8c553a..41bd84d25a980 100644
---- a/include/uapi/linux/fs.h
-+++ b/include/uapi/linux/fs.h
-@@ -13,6 +13,9 @@
- #include <linux/limits.h>
- #include <linux/ioctl.h>
- #include <linux/types.h>
-+#ifndef __KERNEL__
-+#include <linux/fscrypt.h>
-+#endif
- 
- /* Use of MS_* flags within the kernel is restricted to core mount(2) code. */
- #if !defined(__KERNEL__)
-@@ -212,57 +215,6 @@ struct fsxattr {
- #define FS_IOC_GETFSLABEL		_IOR(0x94, 49, char[FSLABEL_MAX])
- #define FS_IOC_SETFSLABEL		_IOW(0x94, 50, char[FSLABEL_MAX])
- 
--/*
-- * File system encryption support
-- */
--/* Policy provided via an ioctl on the topmost directory */
--#define FS_KEY_DESCRIPTOR_SIZE	8
--
--#define FS_POLICY_FLAGS_PAD_4		0x00
--#define FS_POLICY_FLAGS_PAD_8		0x01
--#define FS_POLICY_FLAGS_PAD_16		0x02
--#define FS_POLICY_FLAGS_PAD_32		0x03
--#define FS_POLICY_FLAGS_PAD_MASK	0x03
--#define FS_POLICY_FLAG_DIRECT_KEY	0x04	/* use master key directly */
--#define FS_POLICY_FLAGS_VALID		0x07
--
--/* Encryption algorithms */
--#define FS_ENCRYPTION_MODE_INVALID		0
--#define FS_ENCRYPTION_MODE_AES_256_XTS		1
--#define FS_ENCRYPTION_MODE_AES_256_GCM		2
--#define FS_ENCRYPTION_MODE_AES_256_CBC		3
--#define FS_ENCRYPTION_MODE_AES_256_CTS		4
--#define FS_ENCRYPTION_MODE_AES_128_CBC		5
--#define FS_ENCRYPTION_MODE_AES_128_CTS		6
--#define FS_ENCRYPTION_MODE_SPECK128_256_XTS	7 /* Removed, do not use. */
--#define FS_ENCRYPTION_MODE_SPECK128_256_CTS	8 /* Removed, do not use. */
--#define FS_ENCRYPTION_MODE_ADIANTUM		9
--
--struct fscrypt_policy {
--	__u8 version;
--	__u8 contents_encryption_mode;
--	__u8 filenames_encryption_mode;
--	__u8 flags;
--	__u8 master_key_descriptor[FS_KEY_DESCRIPTOR_SIZE];
--};
--
--#define FS_IOC_SET_ENCRYPTION_POLICY	_IOR('f', 19, struct fscrypt_policy)
--#define FS_IOC_GET_ENCRYPTION_PWSALT	_IOW('f', 20, __u8[16])
--#define FS_IOC_GET_ENCRYPTION_POLICY	_IOW('f', 21, struct fscrypt_policy)
--
--/* Parameters for passing an encryption key into the kernel keyring */
--#define FS_KEY_DESC_PREFIX		"fscrypt:"
--#define FS_KEY_DESC_PREFIX_SIZE		8
--
--/* Structure that userspace passes to the kernel keyring */
--#define FS_MAX_KEY_SIZE			64
--
--struct fscrypt_key {
--	__u32 mode;
--	__u8 raw[FS_MAX_KEY_SIZE];
--	__u32 size;
--};
--
- /*
-  * Inode flags (FS_IOC_GETFLAGS / FS_IOC_SETFLAGS)
-  *
-diff --git a/include/uapi/linux/fscrypt.h b/include/uapi/linux/fscrypt.h
-new file mode 100644
-index 0000000000000..26f6d2c19afd3
---- /dev/null
-+++ b/include/uapi/linux/fscrypt.h
-@@ -0,0 +1,61 @@
-+/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
-+/*
-+ * fscrypt user API
-+ *
-+ * These ioctls can be used on filesystems that support fscrypt.  See the
-+ * "User API" section of Documentation/filesystems/fscrypt.rst.
-+ */
-+#ifndef _UAPI_LINUX_FSCRYPT_H
-+#define _UAPI_LINUX_FSCRYPT_H
-+
-+#include <linux/types.h>
-+
-+#define FS_KEY_DESCRIPTOR_SIZE	8
-+
-+/* Encryption policy flags */
-+#define FS_POLICY_FLAGS_PAD_4		0x00
-+#define FS_POLICY_FLAGS_PAD_8		0x01
-+#define FS_POLICY_FLAGS_PAD_16		0x02
-+#define FS_POLICY_FLAGS_PAD_32		0x03
-+#define FS_POLICY_FLAGS_PAD_MASK	0x03
-+#define FS_POLICY_FLAG_DIRECT_KEY	0x04	/* use master key directly */
-+#define FS_POLICY_FLAGS_VALID		0x07
-+
-+/* Encryption algorithms */
-+#define FS_ENCRYPTION_MODE_INVALID		0
-+#define FS_ENCRYPTION_MODE_AES_256_XTS		1
-+#define FS_ENCRYPTION_MODE_AES_256_GCM		2
-+#define FS_ENCRYPTION_MODE_AES_256_CBC		3
-+#define FS_ENCRYPTION_MODE_AES_256_CTS		4
-+#define FS_ENCRYPTION_MODE_AES_128_CBC		5
-+#define FS_ENCRYPTION_MODE_AES_128_CTS		6
-+#define FS_ENCRYPTION_MODE_SPECK128_256_XTS	7 /* Removed, do not use. */
-+#define FS_ENCRYPTION_MODE_SPECK128_256_CTS	8 /* Removed, do not use. */
-+#define FS_ENCRYPTION_MODE_ADIANTUM		9
-+
-+struct fscrypt_policy {
-+	__u8 version;
-+	__u8 contents_encryption_mode;
-+	__u8 filenames_encryption_mode;
-+	__u8 flags;
-+	__u8 master_key_descriptor[FS_KEY_DESCRIPTOR_SIZE];
-+};
-+
-+#define FS_IOC_SET_ENCRYPTION_POLICY	_IOR('f', 19, struct fscrypt_policy)
-+#define FS_IOC_GET_ENCRYPTION_PWSALT	_IOW('f', 20, __u8[16])
-+#define FS_IOC_GET_ENCRYPTION_POLICY	_IOW('f', 21, struct fscrypt_policy)
-+
-+/* Parameters for passing an encryption key into the kernel keyring */
-+#define FS_KEY_DESC_PREFIX		"fscrypt:"
-+#define FS_KEY_DESC_PREFIX_SIZE		8
-+
-+/* Structure that userspace passes to the kernel keyring */
-+#define FS_MAX_KEY_SIZE			64
-+
-+struct fscrypt_key {
-+	__u32 mode;
-+	__u8 raw[FS_MAX_KEY_SIZE];
-+	__u32 size;
-+};
-+
-+#endif /* _UAPI_LINUX_FSCRYPT_H */
--- 
-2.22.0
-
+[0] https://git.kernel.org/pub/scm/linux/kernel/git/ardb/linux.git/commit/?h=xts-cts
