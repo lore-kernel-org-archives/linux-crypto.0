@@ -2,97 +2,99 @@ Return-Path: <SRS0=rw2L=VZ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C33EC7618F
-	for <linux-crypto@archiver.kernel.org>; Sun, 28 Jul 2019 19:40:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0466AC7618F
+	for <linux-crypto@archiver.kernel.org>; Sun, 28 Jul 2019 19:42:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4EF5320578
-	for <linux-crypto@archiver.kernel.org>; Sun, 28 Jul 2019 19:40:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D1DDB20578
+	for <linux-crypto@archiver.kernel.org>; Sun, 28 Jul 2019 19:42:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="kBrMw64w"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726173AbfG1TkK (ORCPT
+        id S1726312AbfG1TmR (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 28 Jul 2019 15:40:10 -0400
-Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:46025 "EHLO
-        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726108AbfG1TkJ (ORCPT
+        Sun, 28 Jul 2019 15:42:17 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:52623 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726195AbfG1TmQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 28 Jul 2019 15:40:09 -0400
-Received: from callcc.thunk.org (96-72-102-169-static.hfc.comcastbusiness.net [96.72.102.169] (may be forged))
-        (authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id x6SJdo7V012074
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sun, 28 Jul 2019 15:39:52 -0400
-Received: by callcc.thunk.org (Postfix, from userid 15806)
-        id C00FF4202F5; Sun, 28 Jul 2019 15:39:49 -0400 (EDT)
-Date:   Sun, 28 Jul 2019 15:39:49 -0400
-From:   "Theodore Y. Ts'o" <tytso@mit.edu>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        linux-mtd@lists.infradead.org, linux-api@vger.kernel.org,
-        linux-crypto@vger.kernel.org, keyrings@vger.kernel.org,
-        Paul Crowley <paulcrowley@google.com>,
-        Satya Tangirala <satyat@google.com>
-Subject: Re: [PATCH v7 09/16] fscrypt: add an HKDF-SHA512 implementation
-Message-ID: <20190728193949.GI6088@mit.edu>
-References: <20190726224141.14044-1-ebiggers@kernel.org>
- <20190726224141.14044-10-ebiggers@kernel.org>
+        Sun, 28 Jul 2019 15:42:16 -0400
+Received: by mail-wm1-f66.google.com with SMTP id s3so51961928wms.2
+        for <linux-crypto@vger.kernel.org>; Sun, 28 Jul 2019 12:42:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=cZDsP6Vjh3qAchq5bA/Y9mmlq5ggucZoGBTvUsBqZwY=;
+        b=kBrMw64w8gKf1todfhDdsIKKZmXKC6CCIhiFXHRQnj8umEefttWPZlBNP8Zo5WYV+s
+         JU3IcM1QagwKNUKJIWn7RjXL/rZBHj2Fd3AjEW67vicePxs8sbnKzjgFOJYfkU7oNEdR
+         cjsuNjxPfeHfTV/FknaxlGZZEPWo/ivyeuoCJ12E8U0Durrq7T5LKDaIHT1Xhiz8jiKc
+         s6LeT1DX7/gLob/k/Dxio+0kUTvxqCv5RsdZQZtFQz51kMqT5tFNXJS9ZvSE7liLDAfZ
+         rCZ1568QBESuMV1b/QktAYD3Jv6miQYVwvhH30OaP86iiW8oGr7Dp4W+QMIMRLLV7KGm
+         mKWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=cZDsP6Vjh3qAchq5bA/Y9mmlq5ggucZoGBTvUsBqZwY=;
+        b=rEgVCqh/+oppehYP02wvej3OkQ76/G4xQUX8SjmmPpU/JfwAgzelgMkedXOgX1/vmT
+         hEX+EKR3tPYc2abad9nRSUeCQuhVIrP7UWeDGoULFOQqBSbWFiQ01nBnQGMlTDmGCBNp
+         WhtwzHrdkLlVMJsQpQ59lezi7SIRoyS1uS1u2lddjBFpOOZnFE3mMnJTOmNu/Jcblsyl
+         ZHGrBbqP1PISjX4JjUgPglck8jMGgWYi8LPKUoX2LolyB8Z81SDpJf0IRNuutTrWXJqs
+         O51n2546hj16u0EjH8RMP39zFLz14braWlByZ7ALwK7b+BFu1UKzgovIaa66qL+XrZTj
+         qNEw==
+X-Gm-Message-State: APjAAAWnKfXCujZeZUOq8B/TelwZjjiWdDWs/VtnzLrEPmpqAq8UVAJC
+        mdvvFS/pso4EKxCXvFDC7J8Gfg==
+X-Google-Smtp-Source: APXvYqzIGsx/VwsniuHVTl0QO3Oov9lrT/Mj3/pwgJwPSU5voW/QBxHEjrOMbARMEqeEAiO9dnkabg==
+X-Received: by 2002:a7b:c081:: with SMTP id r1mr45595665wmh.76.1564342934763;
+        Sun, 28 Jul 2019 12:42:14 -0700 (PDT)
+Received: from Red ([2a01:cb1d:147:7200:2e56:dcff:fed2:c6d6])
+        by smtp.googlemail.com with ESMTPSA id o24sm65369199wmh.2.2019.07.28.12.42.13
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sun, 28 Jul 2019 12:42:14 -0700 (PDT)
+Date:   Sun, 28 Jul 2019 21:42:11 +0200
+From:   LABBE Corentin <clabbe@baylibre.com>
+To:     davem@davemloft.net, herbert@gondor.apana.org.au,
+        khilman@baylibre.com, mark.rutland@arm.com, robh+dt@kernel.org,
+        devicetree@vger.kernel.org, linux-amlogic@lists.infradead.org,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, baylibre-upstreaming@groups.io
+Subject: Re: [PATCH 0/4] crypto: add amlogic crypto offloader driver
+Message-ID: <20190728194211.GA29444@Red>
+References: <1564083776-20540-1-git-send-email-clabbe@baylibre.com>
+ <20190728184803.GA14920@sol.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190726224141.14044-10-ebiggers@kernel.org>
+In-Reply-To: <20190728184803.GA14920@sol.localdomain>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jul 26, 2019 at 03:41:34PM -0700, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
+On Sun, Jul 28, 2019 at 11:48:03AM -0700, Eric Biggers wrote:
+> Hi Corentin,
 > 
-> Add an implementation of HKDF (RFC 5869) to fscrypt, for the purpose of
-> deriving additional key material from the fscrypt master keys for v2
-> encryption policies.  HKDF is a key derivation function built on top of
-> HMAC.  We choose SHA-512 for the underlying unkeyed hash, and use an
-> "hmac(sha512)" transform allocated from the crypto API.
+> On Thu, Jul 25, 2019 at 07:42:52PM +0000, Corentin Labbe wrote:
+> > Hello
+> > 
+> > This serie adds support for the crypto offloader present on amlogic GXL
+> > SoCs.
+> > 
+> > Tested on meson-gxl-s905x-khadas-vim and meson-gxl-s905x-libretech-cc
+> > 
+> > Regards
+> > 
 > 
-> We'll be using this to replace the AES-ECB based KDF currently used to
-> derive the per-file encryption keys.  While the AES-ECB based KDF is
-> believed to meet the original security requirements, it is nonstandard
-> and has problems that don't exist in modern KDFs such as HKDF:
+> Does this new driver pass all the crypto self-tests?
+> Including with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y?
 > 
-> 1. It's reversible.  Given a derived key and nonce, an attacker can
->    easily compute the master key.  This is okay if the master key and
->    derived keys are equally hard to compromise, but now we'd like to be
->    more robust against threats such as a derived key being compromised
->    through a timing attack, or a derived key for an in-use file being
->    compromised after the master key has already been removed.
-> 
-> 2. It doesn't evenly distribute the entropy from the master key; each 16
->    input bytes only affects the corresponding 16 output bytes.
-> 
-> 3. It isn't easily extensible to deriving other values or keys, such as
->    a public hash for securely identifying the key, or per-mode keys.
->    Per-mode keys will be immediately useful for Adiantum encryption, for
->    which fscrypt currently uses the master key directly, introducing
->    unnecessary usage constraints.  Per-mode keys will also be useful for
->    hardware inline encryption, which is currently being worked on.
-> 
-> HKDF solves all the above problems.
-> 
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
 
-Unless I missed something there's nothing here which is fscrypt
-specific.  Granted that it's somewhat unlikely that someone would want
-to implement (the very bloated) IKE from IPSEC in the kernel, I wonder
-if there might be other users of HKDF, and whether this would be
-better placed in lib/ or crypto/ instead of fs/crypto?
+Yes it pass all extra self-tests.
+I forgot to write it in the cover letter.
 
-Other than that, looks good.  Feel free to add:
-
-Reviewed-by: Theodore Ts'o <tytso@mit.edu>
-
+Regards
