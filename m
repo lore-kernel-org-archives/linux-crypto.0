@@ -2,83 +2,94 @@ Return-Path: <SRS0=rw2L=VZ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18752C433FF
-	for <linux-crypto@archiver.kernel.org>; Sun, 28 Jul 2019 18:48:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 794DDC433FF
+	for <linux-crypto@archiver.kernel.org>; Sun, 28 Jul 2019 18:50:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E19F12085A
-	for <linux-crypto@archiver.kernel.org>; Sun, 28 Jul 2019 18:48:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1564339688;
-	bh=4DYiX1iZmDAb/6QIy02mrj5YucN4V4gh5wPN40oeVcU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=VeHljq0+im3qUo7HG2rCb74bENjc3pgBi6sno18rcuCJV612dZV3BXAXnA8ast+3l
-	 W9oZ6x5K83TcnXPVE1JCxLPl0ICsMm4Dp24ws+LvOKJkFSf1IKstdpkj+utUqcISpN
-	 pJBsgE54XCFltfgPVOnz6pH4XP9H1QkVxvpkwIIs=
+	by mail.kernel.org (Postfix) with ESMTP id 5E0A1206A2
+	for <linux-crypto@archiver.kernel.org>; Sun, 28 Jul 2019 18:50:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726109AbfG1SsG (ORCPT
+        id S1726193AbfG1Su0 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 28 Jul 2019 14:48:06 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48006 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726098AbfG1SsG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 28 Jul 2019 14:48:06 -0400
-Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 1F4F9206A2;
-        Sun, 28 Jul 2019 18:48:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1564339685;
-        bh=4DYiX1iZmDAb/6QIy02mrj5YucN4V4gh5wPN40oeVcU=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=1x6CdvMFhhJpAqMrHpTg8s1dw/3onqj82ebkAM634Qi9JtPrLS2d41BDRyleQF8rc
-         z8ez9kt631w8KhvzEa8NB2GGiD7L2QdgmE8nUQeZdO0Bm2BPRmjruLsOjQh4v3nMJC
-         lBf5+MClR7Io/D3CHcsbKBpNz5sfw37TOm+n1UPI=
-Date:   Sun, 28 Jul 2019 11:48:03 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Corentin Labbe <clabbe@baylibre.com>
-Cc:     davem@davemloft.net, herbert@gondor.apana.org.au,
-        khilman@baylibre.com, mark.rutland@arm.com, robh+dt@kernel.org,
-        devicetree@vger.kernel.org, linux-amlogic@lists.infradead.org,
-        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, baylibre-upstreaming@groups.io
-Subject: Re: [PATCH 0/4] crypto: add amlogic crypto offloader driver
-Message-ID: <20190728184803.GA14920@sol.localdomain>
-Mail-Followup-To: Corentin Labbe <clabbe@baylibre.com>, davem@davemloft.net,
-        herbert@gondor.apana.org.au, khilman@baylibre.com,
-        mark.rutland@arm.com, robh+dt@kernel.org,
-        devicetree@vger.kernel.org, linux-amlogic@lists.infradead.org,
-        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, baylibre-upstreaming@groups.io
-References: <1564083776-20540-1-git-send-email-clabbe@baylibre.com>
+        Sun, 28 Jul 2019 14:50:26 -0400
+Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:36980 "EHLO
+        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726098AbfG1Su0 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 28 Jul 2019 14:50:26 -0400
+Received: from callcc.thunk.org (96-72-102-169-static.hfc.comcastbusiness.net [96.72.102.169] (may be forged))
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id x6SIo4Jb028047
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 28 Jul 2019 14:50:05 -0400
+Received: by callcc.thunk.org (Postfix, from userid 15806)
+        id 68A2E4202F5; Sun, 28 Jul 2019 14:50:03 -0400 (EDT)
+Date:   Sun, 28 Jul 2019 14:50:03 -0400
+From:   "Theodore Y. Ts'o" <tytso@mit.edu>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        linux-mtd@lists.infradead.org, linux-api@vger.kernel.org,
+        linux-crypto@vger.kernel.org, keyrings@vger.kernel.org,
+        Paul Crowley <paulcrowley@google.com>,
+        Satya Tangirala <satyat@google.com>
+Subject: Re: [PATCH v7 06/16] fscrypt: add FS_IOC_ADD_ENCRYPTION_KEY ioctl
+Message-ID: <20190728185003.GF6088@mit.edu>
+References: <20190726224141.14044-1-ebiggers@kernel.org>
+ <20190726224141.14044-7-ebiggers@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1564083776-20540-1-git-send-email-clabbe@baylibre.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+In-Reply-To: <20190726224141.14044-7-ebiggers@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Corentin,
+On Fri, Jul 26, 2019 at 03:41:31PM -0700, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
+> 
+> Add a new fscrypt ioctl, FS_IOC_ADD_ENCRYPTION_KEY.  This ioctl adds an
+> encryption key to the filesystem's fscrypt keyring ->s_master_keys,
+> making any files encrypted with that key appear "unlocked".
 
-On Thu, Jul 25, 2019 at 07:42:52PM +0000, Corentin Labbe wrote:
-> Hello
-> 
-> This serie adds support for the crypto offloader present on amlogic GXL
-> SoCs.
-> 
-> Tested on meson-gxl-s905x-khadas-vim and meson-gxl-s905x-libretech-cc
-> 
-> Regards
-> 
+Note: it think it's going to be useful to make the keyring id
+available someplace like /sys/fs/<fs>/<blkdev>/keyring, or preferably
+in the new fsinfo system call.  Yes, the system administrator can paw
+through /proc/keys and try to figure it out, but it will be nicer if
+there's a direct way to do that.
 
-Does this new driver pass all the crypto self-tests?
-Including with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y?
+For that matter, we could just add a new ioctl which returns the file
+system's keyring id.  That way an application program won't have to
+try to figure out what a file's underlying sb->s_id happens to be.
+(Especially if things like overlayfs are involved.)
 
-- Eric
+> diff --git a/include/uapi/linux/fscrypt.h b/include/uapi/linux/fscrypt.h
+> index 29a945d165def..93d6eabaa7de4 100644
+> --- a/include/uapi/linux/fscrypt.h
+> +++ b/include/uapi/linux/fscrypt.h
+> +
+> +struct fscrypt_key_specifier {
+> +#define FSCRYPT_KEY_SPEC_TYPE_DESCRIPTOR	1
+> +	__u32 type;
+> +	__u32 __reserved;
+
+Can you move the definition of FSCRYPT_KEY_SPEC_TYPE_DESCRIPTOR
+outside of the structure definition, and then add a comment about what
+is a "descriptor" key spec?  (And then in a later patch, please add a
+comment about what is an "identifier" key type.)  There's an
+explanation in Documentation/filesystems/fscrypt.rst, I know, but a
+one or two line comment plus a pointer to
+Documentation/filesystems/fscrypt.rst in the header file would be
+really helpful.
+
+Otherwise, it looks good.   Feel free to add:
+
+Reviewed-by: Theodore Ts'o <tytso@mit.edu>
+
+						- Ted
