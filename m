@@ -2,99 +2,107 @@ Return-Path: <SRS0=rw2L=VZ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0466AC7618F
-	for <linux-crypto@archiver.kernel.org>; Sun, 28 Jul 2019 19:42:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92C19C7618F
+	for <linux-crypto@archiver.kernel.org>; Sun, 28 Jul 2019 20:50:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D1DDB20578
-	for <linux-crypto@archiver.kernel.org>; Sun, 28 Jul 2019 19:42:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="kBrMw64w"
+	by mail.kernel.org (Postfix) with ESMTP id 6622A2070D
+	for <linux-crypto@archiver.kernel.org>; Sun, 28 Jul 2019 20:50:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726312AbfG1TmR (ORCPT
+        id S1726103AbfG1Uuj convert rfc822-to-8bit (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 28 Jul 2019 15:42:17 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:52623 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726195AbfG1TmQ (ORCPT
+        Sun, 28 Jul 2019 16:50:39 -0400
+Received: from lithops.sigma-star.at ([195.201.40.130]:49728 "EHLO
+        lithops.sigma-star.at" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726089AbfG1Uui (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 28 Jul 2019 15:42:16 -0400
-Received: by mail-wm1-f66.google.com with SMTP id s3so51961928wms.2
-        for <linux-crypto@vger.kernel.org>; Sun, 28 Jul 2019 12:42:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=cZDsP6Vjh3qAchq5bA/Y9mmlq5ggucZoGBTvUsBqZwY=;
-        b=kBrMw64w8gKf1todfhDdsIKKZmXKC6CCIhiFXHRQnj8umEefttWPZlBNP8Zo5WYV+s
-         JU3IcM1QagwKNUKJIWn7RjXL/rZBHj2Fd3AjEW67vicePxs8sbnKzjgFOJYfkU7oNEdR
-         cjsuNjxPfeHfTV/FknaxlGZZEPWo/ivyeuoCJ12E8U0Durrq7T5LKDaIHT1Xhiz8jiKc
-         s6LeT1DX7/gLob/k/Dxio+0kUTvxqCv5RsdZQZtFQz51kMqT5tFNXJS9ZvSE7liLDAfZ
-         rCZ1568QBESuMV1b/QktAYD3Jv6miQYVwvhH30OaP86iiW8oGr7Dp4W+QMIMRLLV7KGm
-         mKWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=cZDsP6Vjh3qAchq5bA/Y9mmlq5ggucZoGBTvUsBqZwY=;
-        b=rEgVCqh/+oppehYP02wvej3OkQ76/G4xQUX8SjmmPpU/JfwAgzelgMkedXOgX1/vmT
-         hEX+EKR3tPYc2abad9nRSUeCQuhVIrP7UWeDGoULFOQqBSbWFiQ01nBnQGMlTDmGCBNp
-         WhtwzHrdkLlVMJsQpQ59lezi7SIRoyS1uS1u2lddjBFpOOZnFE3mMnJTOmNu/Jcblsyl
-         ZHGrBbqP1PISjX4JjUgPglck8jMGgWYi8LPKUoX2LolyB8Z81SDpJf0IRNuutTrWXJqs
-         O51n2546hj16u0EjH8RMP39zFLz14braWlByZ7ALwK7b+BFu1UKzgovIaa66qL+XrZTj
-         qNEw==
-X-Gm-Message-State: APjAAAWnKfXCujZeZUOq8B/TelwZjjiWdDWs/VtnzLrEPmpqAq8UVAJC
-        mdvvFS/pso4EKxCXvFDC7J8Gfg==
-X-Google-Smtp-Source: APXvYqzIGsx/VwsniuHVTl0QO3Oov9lrT/Mj3/pwgJwPSU5voW/QBxHEjrOMbARMEqeEAiO9dnkabg==
-X-Received: by 2002:a7b:c081:: with SMTP id r1mr45595665wmh.76.1564342934763;
-        Sun, 28 Jul 2019 12:42:14 -0700 (PDT)
-Received: from Red ([2a01:cb1d:147:7200:2e56:dcff:fed2:c6d6])
-        by smtp.googlemail.com with ESMTPSA id o24sm65369199wmh.2.2019.07.28.12.42.13
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 28 Jul 2019 12:42:14 -0700 (PDT)
-Date:   Sun, 28 Jul 2019 21:42:11 +0200
-From:   LABBE Corentin <clabbe@baylibre.com>
-To:     davem@davemloft.net, herbert@gondor.apana.org.au,
-        khilman@baylibre.com, mark.rutland@arm.com, robh+dt@kernel.org,
-        devicetree@vger.kernel.org, linux-amlogic@lists.infradead.org,
-        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, baylibre-upstreaming@groups.io
-Subject: Re: [PATCH 0/4] crypto: add amlogic crypto offloader driver
-Message-ID: <20190728194211.GA29444@Red>
-References: <1564083776-20540-1-git-send-email-clabbe@baylibre.com>
- <20190728184803.GA14920@sol.localdomain>
+        Sun, 28 Jul 2019 16:50:38 -0400
+Received: from localhost (localhost [127.0.0.1])
+        by lithops.sigma-star.at (Postfix) with ESMTP id 1A5206063691;
+        Sun, 28 Jul 2019 22:50:36 +0200 (CEST)
+Received: from lithops.sigma-star.at ([127.0.0.1])
+        by localhost (lithops.sigma-star.at [127.0.0.1]) (amavisd-new, port 10032)
+        with ESMTP id kXJ_7xXHcsr5; Sun, 28 Jul 2019 22:50:35 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+        by lithops.sigma-star.at (Postfix) with ESMTP id C6C54608F452;
+        Sun, 28 Jul 2019 22:50:35 +0200 (CEST)
+Received: from lithops.sigma-star.at ([127.0.0.1])
+        by localhost (lithops.sigma-star.at [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id Pl5qRPmIRfAF; Sun, 28 Jul 2019 22:50:35 +0200 (CEST)
+Received: from lithops.sigma-star.at (lithops.sigma-star.at [195.201.40.130])
+        by lithops.sigma-star.at (Postfix) with ESMTP id 9A2CA6063691;
+        Sun, 28 Jul 2019 22:50:35 +0200 (CEST)
+Date:   Sun, 28 Jul 2019 22:50:35 +0200 (CEST)
+From:   Richard Weinberger <richard@nod.at>
+To:     horia geanta <horia.geanta@nxp.com>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        aymen sghaier <aymen.sghaier@nxp.com>,
+        david <david@sigma-star.at>, Baolin Wang <baolin.wang@linaro.org>
+Message-ID: <1174635359.52770.1564347035533.JavaMail.zimbra@nod.at>
+In-Reply-To: <VI1PR0402MB3485A27D2D9643F70E1873A398C10@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+References: <839258138.49105.1564003328543.JavaMail.zimbra@nod.at> <VI1PR0402MB3485A27D2D9643F70E1873A398C10@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+Subject: Re: Backlog support for CAAM?
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190728184803.GA14920@sol.localdomain>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
+X-Originating-IP: [195.201.40.130]
+X-Mailer: Zimbra 8.8.12_GA_3807 (ZimbraWebClient - FF60 (Linux)/8.8.12_GA_3809)
+Thread-Topic: Backlog support for CAAM?
+Thread-Index: ARBzCkuiRpn89WxIsrxtpCssT2oQQsW0dt3g
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Jul 28, 2019 at 11:48:03AM -0700, Eric Biggers wrote:
-> Hi Corentin,
+----- Ursprüngliche Mail -----
+> Right now we're evaluating two options:
+> -reworking v5 above
+> -using crypto engine (crypto/crypto_engine.c)
 > 
-> On Thu, Jul 25, 2019 at 07:42:52PM +0000, Corentin Labbe wrote:
-> > Hello
-> > 
-> > This serie adds support for the crypto offloader present on amlogic GXL
-> > SoCs.
-> > 
-> > Tested on meson-gxl-s905x-khadas-vim and meson-gxl-s905x-libretech-cc
-> > 
-> > Regards
-> > 
+> Ideally crypto engine should be the way to go.
+> However we need to make sure performance degradation is negligible,
+> which unfortunately is not case.
 > 
-> Does this new driver pass all the crypto self-tests?
-> Including with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y?
+> Currently it seems that crypto engine has an issue with sending
+> multiple crypto requests from (SW) engine queue -> (HW) caam queue.
 > 
+> More exactly, crypto_pump_requests() performs this check:
+>        /* Make sure we are not already running a request */
+>        if (engine->cur_req)
+>                goto out;
+> 
+> thus it's not possible to add more crypto requests to the caam queue
+> until HW finishes the work on the current crypto request and
+> calls crypto_finalize_request():
+>        if (finalize_cur_req) {
+>		[...]
+>                engine->cur_req = NULL;
 
-Yes it pass all extra self-tests.
-I forgot to write it in the cover letter.
+Did you consider using a hybrid approach?
 
-Regards
+Please let me sketch my idea:
+
+- Let's have a worker thread which serves a software queue.
+- The software queue is a linked list of requests.
+- Upon job submission the driver checks whether the software queue is empty.
+- If the software queue is empty the regular submission continues.
+- Is the hardware queue full at this point, the request is put on the software
+  queue and we return EBUSY.
+- If upon job submission the software queue not empty, the new job is also put
+  on the software queue.
+- The worker thread is woken up every time a new job is put on the software
+  queue and every time CAAM processed a job.
+
+That way we can keep the fast path fast. If hardware queue not full, software queue
+can be bypassed completely.
+If the software queue is used once it will become empty as soon jobs are getting
+submitted at a slower rate and the fast path will be used again.
+
+What do you think?
+
+Thanks,
+//richard
