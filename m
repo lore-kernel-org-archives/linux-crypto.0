@@ -2,199 +2,154 @@ Return-Path: <SRS0=zv6R=V2=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DF5CC76186
-	for <linux-crypto@archiver.kernel.org>; Mon, 29 Jul 2019 23:00:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17F23C76186
+	for <linux-crypto@archiver.kernel.org>; Mon, 29 Jul 2019 23:53:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 31D1E2073F
-	for <linux-crypto@archiver.kernel.org>; Mon, 29 Jul 2019 23:00:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="iUit0JoG"
+	by mail.kernel.org (Postfix) with ESMTP id E2C522073F
+	for <linux-crypto@archiver.kernel.org>; Mon, 29 Jul 2019 23:53:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1564444390;
+	bh=UN0jOoxpDETHiH+HWW//MyP8iFqFuu/5XMZ9YO3sgg4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=iYV2xmo1jVXwnOrEH7FRECT5p+8zhjOL4FxYGs4p/NZLh4Fl5nLmY0rKKkZjtr/4i
+	 FtRAYyTVVjF2n94EooDVld87Um7OIexsUEWyZv8svib5rlgpLBhdJLAmxWc3kKACDz
+	 vqsfsBmDMonusRFdhwsMU2+M2YL/jCc/kfsKHnXY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727617AbfG2XAl (ORCPT
+        id S1728808AbfG2XxI (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 29 Jul 2019 19:00:41 -0400
-Received: from gateway33.websitewelcome.com ([192.185.146.85]:37671 "EHLO
-        gateway33.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727708AbfG2XAl (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 29 Jul 2019 19:00:41 -0400
-X-Greylist: delayed 1339 seconds by postgrey-1.27 at vger.kernel.org; Mon, 29 Jul 2019 19:00:40 EDT
-Received: from cm12.websitewelcome.com (cm12.websitewelcome.com [100.42.49.8])
-        by gateway33.websitewelcome.com (Postfix) with ESMTP id 8860B64790
-        for <linux-crypto@vger.kernel.org>; Mon, 29 Jul 2019 17:38:21 -0500 (CDT)
-Received: from gator4166.hostgator.com ([108.167.133.22])
-        by cmsmtp with SMTP
-        id sEHdhVmx2iQersEHdhurqH; Mon, 29 Jul 2019 17:38:21 -0500
-X-Authority-Reason: nr=8
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
-        MIME-Version:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:Content-ID:
-        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-        :Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
-        List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=rY9Fx/sfJ0n15tzASJL3RTxSvMsm8xpo7ZmCsEw7YbA=; b=iUit0JoGefCef9w589D6lHBzJd
-        ++RVPVB+lzPpMy9ljKOZXuMs1jVDb4DveNp+P+lhh/KwA/yVOj4efzHUX74mYFU+n8SeT1v1noyLP
-        oBgYX2oHr+bU33ZSfSYOMAyPJfWB+Y68kojDf7ohs9anNBRXJAoFb52JYZiBzCXhM3rXFtSjz9pii
-        vPOQcbLw7o7BLUMekzMXWl/DkcOtZ0iBXi0c4TjTD2D0WsC4/HMhLhXUbDz4p9cz9o+CaqI/N4ZSl
-        GADG0aHz6/LPojbW0f1CWAqPbhVZEao6bI7+0KZVzJBAb3Y5kN7iZmiTwRkn8rUxzGpkt1cEhyTH6
-        f7ZFD7kQ==;
-Received: from [187.192.11.120] (port=60884 helo=embeddedor)
-        by gator4166.hostgator.com with esmtpa (Exim 4.92)
-        (envelope-from <gustavo@embeddedor.com>)
-        id 1hsEHc-0029mb-93; Mon, 29 Jul 2019 17:38:20 -0500
-Date:   Mon, 29 Jul 2019 17:38:19 -0500
-From:   "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        Kees Cook <keescook@chromium.org>
-Subject: [PATCH] crypto: ux500/crypt: Mark expected switch fall-throughs
-Message-ID: <20190729223819.GA21985@embeddedor>
+        Mon, 29 Jul 2019 19:53:08 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40818 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728275AbfG2XxH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 29 Jul 2019 19:53:07 -0400
+Received: from gmail.com (unknown [104.132.1.77])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 1BC3D206BA;
+        Mon, 29 Jul 2019 23:53:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1564444387;
+        bh=UN0jOoxpDETHiH+HWW//MyP8iFqFuu/5XMZ9YO3sgg4=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=x1jdAsxTe2OKiJVPF5gwp1rKTqjyRdOYB12MsQSJbzHsPQ1OmbVnwCb6uxUcLKbzO
+         hrYtZ4OYZB9JBhCFCiMI3DgGefcu34JLdLaaeZM0jKRM0o7wh9UCwHp5uWa0mKAYYM
+         uMNERPWWWMlmiDTBfr6dI1fQvVONBCE26V5V+CIE=
+Date:   Mon, 29 Jul 2019 16:53:05 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Pascal van Leeuwen <pascalvanl@gmail.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "davem@davemloft.net" <davem@davemloft.net>
+Subject: Re: [PATCH] crypto: testmgr - Improve randomization of params for
+ AEAD fuzz testing
+Message-ID: <20190729235304.GJ169027@gmail.com>
+Mail-Followup-To: Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Pascal van Leeuwen <pascalvanl@gmail.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "davem@davemloft.net" <davem@davemloft.net>
+References: <1563960917-8236-1-git-send-email-pvanleeuwen@verimatrix.com>
+ <20190728173040.GA699@sol.localdomain>
+ <MN2PR20MB29737962BC74CCA790470C0BCADD0@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <20190729181738.GB169027@gmail.com>
+ <MN2PR20MB2973C131062F1D1CABA77015CADD0@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <20190729223112.GA7529@gondor.apana.org.au>
+ <MN2PR20MB29736A0F55875B91587142D9CADD0@MN2PR20MB2973.namprd20.prod.outlook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - embeddedor.com
-X-BWhitelist: no
-X-Source-IP: 187.192.11.120
-X-Source-L: No
-X-Exim-ID: 1hsEHc-0029mb-93
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: (embeddedor) [187.192.11.120]:60884
-X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 34
-X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
-X-Local-Domain: yes
+In-Reply-To: <MN2PR20MB29736A0F55875B91587142D9CADD0@MN2PR20MB2973.namprd20.prod.outlook.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Mark switch cases where we are expecting to fall through.
+On Mon, Jul 29, 2019 at 10:49:38PM +0000, Pascal Van Leeuwen wrote:
+> Herbert,
+> 
+> > -----Original Message-----
+> > From: Herbert Xu <herbert@gondor.apana.org.au>
+> > Sent: Tuesday, July 30, 2019 12:31 AM
+> > To: Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+> > Cc: Eric Biggers <ebiggers@kernel.org>; Pascal van Leeuwen <pascalvanl@gmail.com>; linux-
+> > crypto@vger.kernel.org; davem@davemloft.net
+> > Subject: Re: [PATCH] crypto: testmgr - Improve randomization of params for AEAD fuzz testing
+> > 
+> > On Mon, Jul 29, 2019 at 10:16:48PM +0000, Pascal Van Leeuwen wrote:
+> > >
+> > > > EINVAL is for invalid lengths while EBADMSG is for inauthentic inputs.
+> > > > Inauthentic test vectors aren't yet automatically generated (even after this
+> > > > patch), so I don't think EBADMSG should be seen here.  Are you sure there isn't
+> > > > a bug in your patch that's causing this?
+> > > >
+> > > As far as I understand it, the output of the encryption is fed back in to
+> > > decrypt. However, if the encryption didn't work due to blocksize mismatch,
+> > > there would not be any valid encrypted and authenticated data written out.
+> > > So, if the (generic) driver checks that for decryption, it would result in
+> > > -EINVAL. If it wouldn't check that, it would try to decrypt and authentica
+> > > te the data, which would almost certainly result in a tag mismatch and
+> > > thus an -EBADMSG error being reported.
+> > >
+> > > So actually, the witnessed issue can be perfectly explained from a missing
+> > > block size check in aesni.
+> > 
+> > The same input can indeed fail for multiple reasons.  I think in
+> > such cases it is unreasonable to expect all implementations to
+> > return the same error value.
+> > 
+> Hmmm ... first off, testmgr expects error codes to match exactly. So if
+> you're saying that's not always the case, it would need to be changed.
+> (but then, what difference would still be acceptable?)
+> But so far it seems to have worked pretty well, except for this now.
+> 
+> You're the expert, but shouldn't there be some priority to the checks
+> being performed? To me, it seems reasonable to do things like length
+> checks prior to even *starting* decryption and authentication.
+> Therefore, it makes more sense to get -EINVAL than -EBADMSG in this 
+> case. IMHO you should only get -EBADMSG if the message was properly
+> formatted, but the tags eventually mismatched. From a security point
+> of view it can be very important to have a very clear distinction
+> between those 2 cases.
+> 
 
-This patch fixes the following warning (Building: arm):
+Oh, I see.  Currently the fuzz tests assume that if encryption fails with an
+error (such as EINVAL), then decryption fails with that same error.
 
-drivers/crypto/ux500/cryp/cryp.c: In function ‘cryp_save_device_context’:
-drivers/crypto/ux500/cryp/cryp.c:316:16: warning: this statement may fall through [-Wimplicit-fallthrough=]
-   ctx->key_4_r = readl_relaxed(&src_reg->key_4_r);
-drivers/crypto/ux500/cryp/cryp.c:318:2: note: here
-  case CRYP_KEY_SIZE_192:
-  ^~~~
-drivers/crypto/ux500/cryp/cryp.c:320:16: warning: this statement may fall through [-Wimplicit-fallthrough=]
-   ctx->key_3_r = readl_relaxed(&src_reg->key_3_r);
-drivers/crypto/ux500/cryp/cryp.c:322:2: note: here
-  case CRYP_KEY_SIZE_128:
-  ^~~~
-drivers/crypto/ux500/cryp/cryp.c:324:16: warning: this statement may fall through [-Wimplicit-fallthrough=]
-   ctx->key_2_r = readl_relaxed(&src_reg->key_2_r);
-drivers/crypto/ux500/cryp/cryp.c:326:2: note: here
-  default:
-  ^~~~~~~
-In file included from ./include/linux/io.h:13:0,
-                 from drivers/crypto/ux500/cryp/cryp_p.h:14,
-                 from drivers/crypto/ux500/cryp/cryp.c:15:
-drivers/crypto/ux500/cryp/cryp.c: In function ‘cryp_restore_device_context’:
-./arch/arm/include/asm/io.h:92:22: warning: this statement may fall through [-Wimplicit-fallthrough=]
- #define __raw_writel __raw_writel
-                      ^
-./arch/arm/include/asm/io.h:299:29: note: in expansion of macro ‘__raw_writel’
- #define writel_relaxed(v,c) __raw_writel((__force u32) cpu_to_le32(v),c)
-                             ^~~~~~~~~~~~
-drivers/crypto/ux500/cryp/cryp.c:363:3: note: in expansion of macro ‘writel_relaxed’
-   writel_relaxed(ctx->key_4_r, &reg->key_4_r);
-   ^~~~~~~~~~~~~~
-drivers/crypto/ux500/cryp/cryp.c:365:2: note: here
-  case CRYP_KEY_SIZE_192:
-  ^~~~
-In file included from ./include/linux/io.h:13:0,
-                 from drivers/crypto/ux500/cryp/cryp_p.h:14,
-                 from drivers/crypto/ux500/cryp/cryp.c:15:
-./arch/arm/include/asm/io.h:92:22: warning: this statement may fall through [-Wimplicit-fallthrough=]
- #define __raw_writel __raw_writel
-                      ^
-./arch/arm/include/asm/io.h:299:29: note: in expansion of macro ‘__raw_writel’
- #define writel_relaxed(v,c) __raw_writel((__force u32) cpu_to_le32(v),c)
-                             ^~~~~~~~~~~~
-drivers/crypto/ux500/cryp/cryp.c:367:3: note: in expansion of macro ‘writel_relaxed’
-   writel_relaxed(ctx->key_3_r, &reg->key_3_r);
-   ^~~~~~~~~~~~~~
-drivers/crypto/ux500/cryp/cryp.c:369:2: note: here
-  case CRYP_KEY_SIZE_128:
-  ^~~~
-In file included from ./include/linux/io.h:13:0,
-                 from drivers/crypto/ux500/cryp/cryp_p.h:14,
-                 from drivers/crypto/ux500/cryp/cryp.c:15:
-./arch/arm/include/asm/io.h:92:22: warning: this statement may fall through [-Wimplicit-fallthrough=]
- #define __raw_writel __raw_writel
-                      ^
-./arch/arm/include/asm/io.h:299:29: note: in expansion of macro ‘__raw_writel’
- #define writel_relaxed(v,c) __raw_writel((__force u32) cpu_to_le32(v),c)
-                             ^~~~~~~~~~~~
-drivers/crypto/ux500/cryp/cryp.c:371:3: note: in expansion of macro ‘writel_relaxed’
-   writel_relaxed(ctx->key_2_r, &reg->key_2_r);
-   ^~~~~~~~~~~~~~
-drivers/crypto/ux500/cryp/cryp.c:373:2: note: here
-  default:
-  ^~~~~~~
+Regardless of what we think the correct decryption error is, running the
+decryption test at all in this case is sort of broken, since the ciphertext
+buffer was never initialized.  So for now we probably should just sidestep this
+issue by skipping the decryption test if encryption failed, like this:
 
-Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
----
- drivers/crypto/ux500/cryp/cryp.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 96e5923889b9c1..0413bdad9f6974 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -2330,10 +2330,12 @@ static int test_aead_vs_generic_impl(const char *driver,
+ 					req, tsgls);
+ 		if (err)
+ 			goto out;
+-		err = test_aead_vec_cfg(driver, DECRYPT, &vec, vec_name, cfg,
+-					req, tsgls);
+-		if (err)
+-			goto out;
++		if (vec.crypt_error != 0) {
++			err = test_aead_vec_cfg(driver, DECRYPT, &vec, vec_name,
++						cfg, req, tsgls);
++			if (err)
++				goto out;
++		}
+ 		cond_resched();
+ 	}
+ 	err = 0;
 
-diff --git a/drivers/crypto/ux500/cryp/cryp.c b/drivers/crypto/ux500/cryp/cryp.c
-index ece83a363e11..f22f6fa612b3 100644
---- a/drivers/crypto/ux500/cryp/cryp.c
-+++ b/drivers/crypto/ux500/cryp/cryp.c
-@@ -314,14 +314,17 @@ void cryp_save_device_context(struct cryp_device_data *device_data,
- 	case CRYP_KEY_SIZE_256:
- 		ctx->key_4_l = readl_relaxed(&src_reg->key_4_l);
- 		ctx->key_4_r = readl_relaxed(&src_reg->key_4_r);
-+		/* Fall through */
- 
- 	case CRYP_KEY_SIZE_192:
- 		ctx->key_3_l = readl_relaxed(&src_reg->key_3_l);
- 		ctx->key_3_r = readl_relaxed(&src_reg->key_3_r);
-+		/* Fall through */
- 
- 	case CRYP_KEY_SIZE_128:
- 		ctx->key_2_l = readl_relaxed(&src_reg->key_2_l);
- 		ctx->key_2_r = readl_relaxed(&src_reg->key_2_r);
-+		/* Fall through */
- 
- 	default:
- 		ctx->key_1_l = readl_relaxed(&src_reg->key_1_l);
-@@ -361,14 +364,17 @@ void cryp_restore_device_context(struct cryp_device_data *device_data,
- 	case CRYP_KEY_SIZE_256:
- 		writel_relaxed(ctx->key_4_l, &reg->key_4_l);
- 		writel_relaxed(ctx->key_4_r, &reg->key_4_r);
-+		/* Fall through */
- 
- 	case CRYP_KEY_SIZE_192:
- 		writel_relaxed(ctx->key_3_l, &reg->key_3_l);
- 		writel_relaxed(ctx->key_3_r, &reg->key_3_r);
-+		/* Fall through */
- 
- 	case CRYP_KEY_SIZE_128:
- 		writel_relaxed(ctx->key_2_l, &reg->key_2_l);
- 		writel_relaxed(ctx->key_2_r, &reg->key_2_r);
-+		/* Fall through */
- 
- 	default:
- 		writel_relaxed(ctx->key_1_l, &reg->key_1_l);
--- 
-2.22.0
+I'm planning to (at some point) update the AEAD tests to intentionally generate
+some inauthentic inputs, but that will take some more work.
 
+- Eric
