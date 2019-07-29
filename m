@@ -2,104 +2,180 @@ Return-Path: <SRS0=zv6R=V2=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E9C6C433FF
-	for <linux-crypto@archiver.kernel.org>; Mon, 29 Jul 2019 20:08:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80D43C433FF
+	for <linux-crypto@archiver.kernel.org>; Mon, 29 Jul 2019 20:11:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F2CB82064C
-	for <linux-crypto@archiver.kernel.org>; Mon, 29 Jul 2019 20:08:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4CD27205F4
+	for <linux-crypto@archiver.kernel.org>; Mon, 29 Jul 2019 20:11:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1564430937;
-	bh=35ZwmfXjVkjcTD49ueQekrtcYmxgdRwDGATcxQouXLg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=AGvIT1uPf/ukmF+auzbxJAJo5rajzg34UPcrmxtJutSc7wg/zF3mjBS/MEuCXfqyh
-	 pp5OXYjZk6HoYTQWOgrDYoxWI1CpF++bCxFOXp2vdJHFdV4tIxrDiEm1IE8PTLy8At
-	 ZTlXziSar1CBS3B+7Mztt7yVNNxAhuFm8wRSiCvY=
+	s=default; t=1564431099;
+	bh=nS+P0xEdNX2Rityxe+sq+lJ71ZCbNvBhaBhuLMPIssY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=xN801lU/VvLu5PQyjNM/sImGxGbjGfp612E1Ef7/+3o+oMZSnjyhiH52ux72vbM4V
+	 7ai6OKorboyaZyJbrIPmROFC7BwB3ZXIIhaNErCMOJXQJs5F6y2yU5VkjeqUMGb4UX
+	 yuNxNsmdcwstB4O2Y9pXA8RkT6rToi7uN6jPKt6w=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388755AbfG2Thp (ORCPT
+        id S1729804AbfG2TdJ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 29 Jul 2019 15:37:45 -0400
-Received: from mail.kernel.org ([198.145.29.99]:52608 "EHLO mail.kernel.org"
+        Mon, 29 Jul 2019 15:33:09 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47060 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388750AbfG2Tho (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 29 Jul 2019 15:37:44 -0400
-Received: from gmail.com (unknown [104.132.1.77])
+        id S1729812AbfG2TdI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 29 Jul 2019 15:33:08 -0400
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 6E126206DD;
-        Mon, 29 Jul 2019 19:37:43 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id D226F21773;
+        Mon, 29 Jul 2019 19:33:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1564429063;
-        bh=35ZwmfXjVkjcTD49ueQekrtcYmxgdRwDGATcxQouXLg=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=QgTCz2CWqZ9GLFMzgaQtbnyPki0Oxg8qrvTR97l00Gc8CQzx+zc2oXmp7EWb24DL7
-         lqI1c/qw8hCySTW9XZjhkJGofi5da7NFa4tbNNzKq3SlAVuvZteu0lZkG1ZnucaL4j
-         QUyqoTdTCGY36VS+Fv9/JDNLvuGsN+DnFosM0q6c=
-Date:   Mon, 29 Jul 2019 12:37:42 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     "Theodore Y. Ts'o" <tytso@mit.edu>
-Cc:     linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        linux-mtd@lists.infradead.org, linux-api@vger.kernel.org,
-        linux-crypto@vger.kernel.org, keyrings@vger.kernel.org,
-        Paul Crowley <paulcrowley@google.com>,
-        Satya Tangirala <satyat@google.com>
-Subject: Re: [PATCH v7 05/16] fscrypt: refactor v1 policy key setup into
- keysetup_legacy.c
-Message-ID: <20190729193740.GD169027@gmail.com>
-Mail-Followup-To: "Theodore Y. Ts'o" <tytso@mit.edu>,
-        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        linux-mtd@lists.infradead.org, linux-api@vger.kernel.org,
-        linux-crypto@vger.kernel.org, keyrings@vger.kernel.org,
-        Paul Crowley <paulcrowley@google.com>,
-        Satya Tangirala <satyat@google.com>
-References: <20190726224141.14044-1-ebiggers@kernel.org>
- <20190726224141.14044-6-ebiggers@kernel.org>
- <20190728154032.GE6088@mit.edu>
+        s=default; t=1564428787;
+        bh=nS+P0xEdNX2Rityxe+sq+lJ71ZCbNvBhaBhuLMPIssY=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=h7ZKI7BfrfRh16KfBRNpVDgoPCTJv81EAoiocddUC33F5JR1nLNkxFP7X7jFeZ49t
+         bp7iCVR7/qt7oT7opP9XNpIJGBpkR6QV48IiEx+7acJ/PgCQ7BUHi2CxLQx2Z/vvvR
+         zcgwwFMxKIPrdz72uM3mVScLC4txoWvgNRjKB1CU=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        stable@vger.kernel.org, Daniel Jordan <daniel.m.jordan@oracle.com>,
+        Andrea Parri <andrea.parri@amarulasolutions.com>,
+        Boqun Feng <boqun.feng@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "Paul E. McKenney" <paulmck@linux.ibm.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        linux-arch@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: [PATCH 4.14 147/293] padata: use smp_mb in padata_reorder to avoid orphaned padata jobs
+Date:   Mon, 29 Jul 2019 21:20:38 +0200
+Message-Id: <20190729190835.818681103@linuxfoundation.org>
+X-Mailer: git-send-email 2.22.0
+In-Reply-To: <20190729190820.321094988@linuxfoundation.org>
+References: <20190729190820.321094988@linuxfoundation.org>
+User-Agent: quilt/0.66
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190728154032.GE6088@mit.edu>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Ted, thanks for the review!
+From: Daniel Jordan <daniel.m.jordan@oracle.com>
 
-On Sun, Jul 28, 2019 at 11:40:32AM -0400, Theodore Y. Ts'o wrote:
-> On Fri, Jul 26, 2019 at 03:41:30PM -0700, Eric Biggers wrote:
-> > From: Eric Biggers <ebiggers@google.com>
-> > 
-> > In preparation for introducing v2 encryption policies which will find
-> > and derive encryption keys differently from the current v1 encryption
-> > policies, refactor the v1 policy-specific key setup code from keyinfo.c
-> > into keysetup_legacy.c.  Then rename keyinfo.c to keysetup.c.
-> 
-> I'd use keysetup_v1.c, myself.  We can hope that we've gotten it right
-> with v2 and we'll never need to do another version, but *something* is
-> going to come up eventually which will require a v3 keysetup , whether
-> it's post-quantuum cryptography or something else we can't anticipate
-> right now.
-> 
-> For an example of the confusion that can result, one good example is
-> in the fs/quota subsystem, where QFMT_VFS_OLD, QFMT_VFS_V0, and
-> QFMT_VFS_V1 maps to quota_v1 and quota_v2 in an amusing and
-> non-obvious way.  (Go ahead, try to guess before you go look at the
-> code.  :-)
-> 
-> Other than that, looks good.  We can always move code around or rename
-> files in the future, so I'm not going to insist on doing it now (but
-> it would be my preference).
-> 
-> Reviewed-by: Theodore Ts'o <tytso@mit.edu>
-> 
+commit cf144f81a99d1a3928f90b0936accfd3f45c9a0a upstream.
 
-Agreed, I'll call it keysetup_v1.c instead.
+Testing padata with the tcrypt module on a 5.2 kernel...
 
-- Eric
+    # modprobe tcrypt alg="pcrypt(rfc4106(gcm(aes)))" type=3
+    # modprobe tcrypt mode=211 sec=1
+
+...produces this splat:
+
+    INFO: task modprobe:10075 blocked for more than 120 seconds.
+          Not tainted 5.2.0-base+ #16
+    modprobe        D    0 10075  10064 0x80004080
+    Call Trace:
+     ? __schedule+0x4dd/0x610
+     ? ring_buffer_unlock_commit+0x23/0x100
+     schedule+0x6c/0x90
+     schedule_timeout+0x3b/0x320
+     ? trace_buffer_unlock_commit_regs+0x4f/0x1f0
+     wait_for_common+0x160/0x1a0
+     ? wake_up_q+0x80/0x80
+     { crypto_wait_req }             # entries in braces added by hand
+     { do_one_aead_op }
+     { test_aead_jiffies }
+     test_aead_speed.constprop.17+0x681/0xf30 [tcrypt]
+     do_test+0x4053/0x6a2b [tcrypt]
+     ? 0xffffffffa00f4000
+     tcrypt_mod_init+0x50/0x1000 [tcrypt]
+     ...
+
+The second modprobe command never finishes because in padata_reorder,
+CPU0's load of reorder_objects is executed before the unlocking store in
+spin_unlock_bh(pd->lock), causing CPU0 to miss CPU1's increment:
+
+CPU0                                 CPU1
+
+padata_reorder                       padata_do_serial
+  LOAD reorder_objects  // 0
+                                       INC reorder_objects  // 1
+                                       padata_reorder
+                                         TRYLOCK pd->lock   // failed
+  UNLOCK pd->lock
+
+CPU0 deletes the timer before returning from padata_reorder and since no
+other job is submitted to padata, modprobe waits indefinitely.
+
+Add a pair of full barriers to guarantee proper ordering:
+
+CPU0                                 CPU1
+
+padata_reorder                       padata_do_serial
+  UNLOCK pd->lock
+  smp_mb()
+  LOAD reorder_objects
+                                       INC reorder_objects
+                                       smp_mb__after_atomic()
+                                       padata_reorder
+                                         TRYLOCK pd->lock
+
+smp_mb__after_atomic is needed so the read part of the trylock operation
+comes after the INC, as Andrea points out.   Thanks also to Andrea for
+help with writing a litmus test.
+
+Fixes: 16295bec6398 ("padata: Generic parallelization/serialization interface")
+Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
+Cc: <stable@vger.kernel.org>
+Cc: Andrea Parri <andrea.parri@amarulasolutions.com>
+Cc: Boqun Feng <boqun.feng@gmail.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Paul E. McKenney <paulmck@linux.ibm.com>
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: linux-arch@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+---
+ kernel/padata.c |   12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+--- a/kernel/padata.c
++++ b/kernel/padata.c
+@@ -265,7 +265,12 @@ static void padata_reorder(struct parall
+ 	 * The next object that needs serialization might have arrived to
+ 	 * the reorder queues in the meantime, we will be called again
+ 	 * from the timer function if no one else cares for it.
++	 *
++	 * Ensure reorder_objects is read after pd->lock is dropped so we see
++	 * an increment from another task in padata_do_serial.  Pairs with
++	 * smp_mb__after_atomic in padata_do_serial.
+ 	 */
++	smp_mb();
+ 	if (atomic_read(&pd->reorder_objects)
+ 			&& !(pinst->flags & PADATA_RESET))
+ 		mod_timer(&pd->timer, jiffies + HZ);
+@@ -334,6 +339,13 @@ void padata_do_serial(struct padata_priv
+ 	list_add_tail(&padata->list, &pqueue->reorder.list);
+ 	spin_unlock(&pqueue->reorder.lock);
+ 
++	/*
++	 * Ensure the atomic_inc of reorder_objects above is ordered correctly
++	 * with the trylock of pd->lock in padata_reorder.  Pairs with smp_mb
++	 * in padata_reorder.
++	 */
++	smp_mb__after_atomic();
++
+ 	put_cpu();
+ 
+ 	padata_reorder(pd);
+
+
