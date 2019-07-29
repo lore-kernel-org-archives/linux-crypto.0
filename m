@@ -2,95 +2,104 @@ Return-Path: <SRS0=zv6R=V2=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 544E6C76186
-	for <linux-crypto@archiver.kernel.org>; Mon, 29 Jul 2019 20:03:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E9C6C433FF
+	for <linux-crypto@archiver.kernel.org>; Mon, 29 Jul 2019 20:08:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 224E5205F4
-	for <linux-crypto@archiver.kernel.org>; Mon, 29 Jul 2019 20:03:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F2CB82064C
+	for <linux-crypto@archiver.kernel.org>; Mon, 29 Jul 2019 20:08:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1564430621;
-	bh=S61VxJ+X0q7OMIDxTuUqvsnEaogyD56TxSWgEzgvQTM=;
+	s=default; t=1564430937;
+	bh=35ZwmfXjVkjcTD49ueQekrtcYmxgdRwDGATcxQouXLg=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=fDMiXHiLsc2y+Jsf9Nf90ksixwUicaYs2fQP8Y1+5ZxtC0zIVuY1/Cg/MtUb8A00a
-	 dxEi0bwnQD4++BIxT/O/4V9SqUA4Toi6QqTj8hawvabAVpTmikRBHEgCMOPo1m7I8y
-	 ZbCVsDVI/ENb9NfxghYZ0ROGWMUgkmXHirxnn6zE=
+	b=AGvIT1uPf/ukmF+auzbxJAJo5rajzg34UPcrmxtJutSc7wg/zF3mjBS/MEuCXfqyh
+	 pp5OXYjZk6HoYTQWOgrDYoxWI1CpF++bCxFOXp2vdJHFdV4tIxrDiEm1IE8PTLy8At
+	 ZTlXziSar1CBS3B+7Mztt7yVNNxAhuFm8wRSiCvY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728178AbfG2UDf (ORCPT
+        id S2388755AbfG2Thp (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 29 Jul 2019 16:03:35 -0400
-Received: from mail-pg1-f175.google.com ([209.85.215.175]:37137 "EHLO
-        mail-pg1-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390195AbfG2Tql (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 29 Jul 2019 15:46:41 -0400
-Received: by mail-pg1-f175.google.com with SMTP id i70so18025115pgd.4;
-        Mon, 29 Jul 2019 12:46:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=U4ngIyFeX8ApEnWIFC9G2C/8xAz/EgLX+z1iJ+q2AHg=;
-        b=BcPkRXVdhSe1/iAVct8pHAcEytxqGvtsr8oidFPs9ZtP4+b4rwvBznPjZ9hGIqtSc8
-         31WUEFWoVjWz0/Va6HDRBCM358AqiEAZ5F5zFpnoazM7ONH/m2mpzjL85UYHOc7vo7FI
-         C85UofKIElrJRGQcHss1zvKt7935lfz/KW3peqUJ6P/QPPBKeIxPDdWjlbxPHGhKW6rd
-         ylu0Iohugj8GIrW79G9a7Tyg7WASqsnPjCqToXXqHq5w2tXgD7rMx4IOXdhFm5liescS
-         H5uhP2FKYoDvwfHZ8IkoNNIKeIT+sNYlTCHLNLvOZuQcm2Sc8XtX0K2bJ+gjqJKv6NBm
-         oclg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=U4ngIyFeX8ApEnWIFC9G2C/8xAz/EgLX+z1iJ+q2AHg=;
-        b=CROnH3EbDhl4wsWZ7XZI9RNtXrQjlcvFu8ymq0Ha3FuhDB3Rdq0jiMvzoqyxwpozJC
-         NMNxNl3ordeaoZdZgg44KwyuN18tzHACDe6vP8q+z/UaTyvoMPwimz+CI6dFFa7Q4Amt
-         Oqndl/l/rW5NYBPLlZY6tFvpd/1HtN6IIUtUEOSLLX5HLcDAKq3tq0hKbhP2hgqR8LeE
-         VQUTa6PMdNskfgMj1quOg4RY5cTBewsNqPVrwEZCyYNoXQ9xZ9UBfwQsjn61ypByW6D9
-         a5HWQ/nGp8Y3IjVOe1jyP0qLGc+neNvnuKQ5PtUTBIkjy5mRmf+J+lRzol4zQekB8R2/
-         iNaA==
-X-Gm-Message-State: APjAAAX4XEiF1sIWTlq/z2kqJSvWb19k0HMs2MEz982MifR0jAWZVvfV
-        /GrMq5yq6cUE337e5RMBpLQ=
-X-Google-Smtp-Source: APXvYqwP1f0WiMeLnf541ppBHx0xe7jId0bWUnETovczbdtzGdDYlbp9osWMQ0Z62AYVqlz/EiuiZg==
-X-Received: by 2002:a63:3fc9:: with SMTP id m192mr107730991pga.429.1564429600629;
-        Mon, 29 Jul 2019 12:46:40 -0700 (PDT)
-Received: from localhost ([2620:10d:c091:500::1:309b])
-        by smtp.gmail.com with ESMTPSA id j10sm28183281pfn.188.2019.07.29.12.46.39
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 29 Jul 2019 12:46:39 -0700 (PDT)
-Date:   Mon, 29 Jul 2019 12:46:37 -0700
-From:   Tejun Heo <tj@kernel.org>
-To:     Daniel Jordan <daniel.m.jordan@oracle.com>
-Cc:     Steffen Klassert <steffen.klassert@secunet.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC 2/9] workqueue: unconfine alloc/apply/free_workqueue_attrs()
-Message-ID: <20190729194637.GF569612@devbig004.ftw2.facebook.com>
-References: <20190725212505.15055-1-daniel.m.jordan@oracle.com>
- <20190725212505.15055-3-daniel.m.jordan@oracle.com>
+        Mon, 29 Jul 2019 15:37:45 -0400
+Received: from mail.kernel.org ([198.145.29.99]:52608 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2388750AbfG2Tho (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 29 Jul 2019 15:37:44 -0400
+Received: from gmail.com (unknown [104.132.1.77])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 6E126206DD;
+        Mon, 29 Jul 2019 19:37:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1564429063;
+        bh=35ZwmfXjVkjcTD49ueQekrtcYmxgdRwDGATcxQouXLg=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=QgTCz2CWqZ9GLFMzgaQtbnyPki0Oxg8qrvTR97l00Gc8CQzx+zc2oXmp7EWb24DL7
+         lqI1c/qw8hCySTW9XZjhkJGofi5da7NFa4tbNNzKq3SlAVuvZteu0lZkG1ZnucaL4j
+         QUyqoTdTCGY36VS+Fv9/JDNLvuGsN+DnFosM0q6c=
+Date:   Mon, 29 Jul 2019 12:37:42 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     "Theodore Y. Ts'o" <tytso@mit.edu>
+Cc:     linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        linux-mtd@lists.infradead.org, linux-api@vger.kernel.org,
+        linux-crypto@vger.kernel.org, keyrings@vger.kernel.org,
+        Paul Crowley <paulcrowley@google.com>,
+        Satya Tangirala <satyat@google.com>
+Subject: Re: [PATCH v7 05/16] fscrypt: refactor v1 policy key setup into
+ keysetup_legacy.c
+Message-ID: <20190729193740.GD169027@gmail.com>
+Mail-Followup-To: "Theodore Y. Ts'o" <tytso@mit.edu>,
+        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        linux-mtd@lists.infradead.org, linux-api@vger.kernel.org,
+        linux-crypto@vger.kernel.org, keyrings@vger.kernel.org,
+        Paul Crowley <paulcrowley@google.com>,
+        Satya Tangirala <satyat@google.com>
+References: <20190726224141.14044-1-ebiggers@kernel.org>
+ <20190726224141.14044-6-ebiggers@kernel.org>
+ <20190728154032.GE6088@mit.edu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190725212505.15055-3-daniel.m.jordan@oracle.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <20190728154032.GE6088@mit.edu>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jul 25, 2019 at 05:24:58PM -0400, Daniel Jordan wrote:
-> padata will use these these interfaces in a later patch, so unconfine them.
+Hi Ted, thanks for the review!
+
+On Sun, Jul 28, 2019 at 11:40:32AM -0400, Theodore Y. Ts'o wrote:
+> On Fri, Jul 26, 2019 at 03:41:30PM -0700, Eric Biggers wrote:
+> > From: Eric Biggers <ebiggers@google.com>
+> > 
+> > In preparation for introducing v2 encryption policies which will find
+> > and derive encryption keys differently from the current v1 encryption
+> > policies, refactor the v1 policy-specific key setup code from keyinfo.c
+> > into keysetup_legacy.c.  Then rename keyinfo.c to keysetup.c.
 > 
-> Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
+> I'd use keysetup_v1.c, myself.  We can hope that we've gotten it right
+> with v2 and we'll never need to do another version, but *something* is
+> going to come up eventually which will require a v3 keysetup , whether
+> it's post-quantuum cryptography or something else we can't anticipate
+> right now.
+> 
+> For an example of the confusion that can result, one good example is
+> in the fs/quota subsystem, where QFMT_VFS_OLD, QFMT_VFS_V0, and
+> QFMT_VFS_V1 maps to quota_v1 and quota_v2 in an amusing and
+> non-obvious way.  (Go ahead, try to guess before you go look at the
+> code.  :-)
+> 
+> Other than that, looks good.  We can always move code around or rename
+> files in the future, so I'm not going to insist on doing it now (but
+> it would be my preference).
+> 
+> Reviewed-by: Theodore Ts'o <tytso@mit.edu>
+> 
 
-Acked-by: Tejun Heo <tj@kernel.org>
+Agreed, I'll call it keysetup_v1.c instead.
 
-Thanks.
-
--- 
-tejun
+- Eric
