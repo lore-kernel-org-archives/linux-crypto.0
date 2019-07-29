@@ -7,44 +7,44 @@ X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B33EBC7618E
-	for <linux-crypto@archiver.kernel.org>; Mon, 29 Jul 2019 15:29:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FC99C433FF
+	for <linux-crypto@archiver.kernel.org>; Mon, 29 Jul 2019 15:32:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 832B7216C8
-	for <linux-crypto@archiver.kernel.org>; Mon, 29 Jul 2019 15:29:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C4F542070D
+	for <linux-crypto@archiver.kernel.org>; Mon, 29 Jul 2019 15:32:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="svYMTYg4"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="E6yCMYHK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388058AbfG2P3o (ORCPT
+        id S2388020AbfG2PcK (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 29 Jul 2019 11:29:44 -0400
-Received: from mail-eopbgr70080.outbound.protection.outlook.com ([40.107.7.80]:10451
-        "EHLO EUR04-HE1-obe.outbound.protection.outlook.com"
+        Mon, 29 Jul 2019 11:32:10 -0400
+Received: from mail-eopbgr10042.outbound.protection.outlook.com ([40.107.1.42]:58880
+        "EHLO EUR02-HE1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2387854AbfG2P3m (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 29 Jul 2019 11:29:42 -0400
+        id S2387874AbfG2PcK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 29 Jul 2019 11:32:10 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VL7zQWWddgOmQJw13s9iu4Aq1TejNfiDTQuBhO/ISASuzKHq8k9K4FxfaLZtghhp7Q1kF3RQYKINMhB5PknOx7EHDfl4KpdHlHeEfUQfsaU9ctK3pUxN9evxBU8XS2VEYpUtrbJjznOGCuGT7GO9/zS8bKfcAN7tiKMK+YS9W8yf0ABxFSu5JgB6EJ23Zjgj0M0fmKSPXRzY2Wg1UZUUIv9JXnPk0TGqakwXe5D9eD+2OElqUqMNqrKrINmOuYL4kxh97t/+17pvNbWz3CohFS5e5MNd0D98kDjzOCk1pzQNqO36jE0Sj6NXW3GCwa7oPWhX3x8EP1cePJQVZlN+RQ==
+ b=XZuhm9/ILqb77YsncBV9ZlZpLE7sJMUUsu5E4l4JhXRsnndQ0t2n65a2XwmR3DTFPHo4YWVmBhF1zh2Va1LbbMVQbDsboeo0eU3uvpetMWYU92KkAXpsFK39cshQDzFA8NfEtEwrA6NGRazMsDr3ZDoGfekv5Mda3fWQ4i/298zjLohqxv3q6npLOaC4d4gcr8QpCXZujOjHbOqY9PCdLIv/rW/HM3qfezlu9EyA6HDLoN54eNmP/p7x/zPX850SDxswOFgzut6PJjUMH08DTIT4q+b07Q8/a2xweqvl4dhQUY393DvCG9oCs/f7+PdK6dpQ5e91sFtSXMVPjcQ92Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HSZSVZWilgBQX88P0WqXdqHiSal/rNN+OHJljliFfXk=;
- b=Kn86z2IAk+LEIs+sIhrB8Mk8jHfKCJEioFgKGyifYiAaX2qUzmCOj/OJTZeTMq7a8lzoK40KjQQ1Dvk80n+4ay2NkU0FiWDoH8NHtfKv39ZjczaU8worQJ7TiHVEvsu+8bjFwy/c0ND2031aRWebjPtgYIpSy+bZPF+9JB0fyt2KtMjcuc0ZTOJ/5nqmxaF7MYCXemQwoyRTbGRgu66bVj6fTvsF6b1W0eLGD9t8R/sUuyeAxX8mGYNzUg8FK5WU+xOo270siWgli0W3UvHnh6Mr8jT5E1R4ubEIA0wPh/3Zhoe8KgjHt70KAyDXh1FGpPG7lV5KY+YDev0JH+PJtQ==
+ bh=AvTQPq0i76V89WvPjQt+1HXRG9BzKxSHkpLPxs7F5kU=;
+ b=m4yczPCsSUEjbdEl31xJhcc2a8dPqYpRErQpvGWlPQmB/omCJAkqLBMlW6ArpLcxHIqRAcLFHxsyET46C21z90+dq6NAgmE8/qhF1riLm2c0/mHcZrr3vHyQuTY2J/D3AyEsq4/R62F88lMBTK7lSkyDbB2KJFU4Nxv7pdQOtCvneoFs8hrcNPh1enEF81AZazKtDwHcDCKeNxmO9tsuC3Xd8S9bTzZh9R8JfDY+KXM/oDWTy6Q3lrF3vomR8n5vpkpGoPYJTCwrPHEKNcn6bsLVUlc6VWsRml2wfZVWtJWWii+pz+RFxn3FXpL3duvNJ5e4L+06e0a6Zk0VIMTvTg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
  smtp.mailfrom=nxp.com;dmarc=pass action=none header.from=nxp.com;dkim=pass
  header.d=nxp.com;arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HSZSVZWilgBQX88P0WqXdqHiSal/rNN+OHJljliFfXk=;
- b=svYMTYg4R8lps5v+8L7hX1vvVn2rGQKlFAKjltT3KC+QT6IfPUdPsoTIFZ7m1oZam3Z0lWNE73fWGnOU9+83fYcHzUW6K2uTydjrtKeWpW5Py0O0gvVCPm939MzNO7Jfk/qPwlLiFnHLSDaFqimVVqpbv76Kl71JQlHI37Wpevk=
+ bh=AvTQPq0i76V89WvPjQt+1HXRG9BzKxSHkpLPxs7F5kU=;
+ b=E6yCMYHKP40xma0QUHyU4UTQeKiSGOEOUpiFx/UWUFdcYSHM4ihvb5D3BB+A5bxfVpZoZaID9Kyo9Ksg16K6yuDNgArUljfAq2YxHuwO2DhBjC6bsYSM9l19gCqnc3Nwkk0di9bvlnw71MUyt7N+5VXx0Wbed7xZObd/rKNYz+4=
 Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
- VI1PR0402MB3343.eurprd04.prod.outlook.com (52.134.8.143) with Microsoft SMTP
+ VI1PR0402MB3920.eurprd04.prod.outlook.com (52.134.17.140) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2115.13; Mon, 29 Jul 2019 15:29:36 +0000
+ 15.20.2115.10; Mon, 29 Jul 2019 15:32:03 +0000
 Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
  ([fe80::7c64:5296:4607:e10]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
  ([fe80::7c64:5296:4607:e10%5]) with mapi id 15.20.2094.017; Mon, 29 Jul 2019
- 15:29:36 +0000
+ 15:32:03 +0000
 From:   Horia Geanta <horia.geanta@nxp.com>
 To:     Andrey Smirnov <andrew.smirnov@gmail.com>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
@@ -54,17 +54,14 @@ CC:     Chris Spencer <christopher.spencer@sea.co.uk>,
         Lucas Stach <l.stach@pengutronix.de>,
         Aymen Sghaier <aymen.sghaier@nxp.com>,
         Leonard Crestez <leonard.crestez@nxp.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        dl-linux-imx <linux-imx@nxp.com>
-Subject: Re: [PATCH v6 05/14] crytpo: caam - make use of iowrite64*_hi_lo in
- wr_reg64
-Thread-Topic: [PATCH v6 05/14] crytpo: caam - make use of iowrite64*_hi_lo in
- wr_reg64
-Thread-Index: AQHVPLPZuXz6nKwNWUa1sVwtAoTZEA==
-Date:   Mon, 29 Jul 2019 15:29:36 +0000
-Message-ID: <VI1PR0402MB3485A34CA7FE29F53D3C273298DD0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v6 06/14] crypto: caam - use ioread64*_hi_lo in rd_reg64
+Thread-Topic: [PATCH v6 06/14] crypto: caam - use ioread64*_hi_lo in rd_reg64
+Thread-Index: AQHVPLPasN7jCYpIIEeSBtcbrn61Wg==
+Date:   Mon, 29 Jul 2019 15:32:03 +0000
+Message-ID: <VI1PR0402MB3485637BE588C0E819B05B1398DD0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
 References: <20190717152458.22337-1-andrew.smirnov@gmail.com>
- <20190717152458.22337-6-andrew.smirnov@gmail.com>
+ <20190717152458.22337-7-andrew.smirnov@gmail.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -73,136 +70,42 @@ authentication-results: spf=none (sender IP is )
  smtp.mailfrom=horia.geanta@nxp.com; 
 x-originating-ip: [212.146.100.6]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: decbe59b-f0bc-487f-c41b-08d714399049
+x-ms-office365-filtering-correlation-id: 2363ec3f-9b44-4587-fdac-08d71439e7da
 x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:VI1PR0402MB3343;
-x-ms-traffictypediagnostic: VI1PR0402MB3343:
-x-ms-exchange-purlcount: 1
-x-microsoft-antispam-prvs: <VI1PR0402MB334365C316297C39A9926DE898DD0@VI1PR0402MB3343.eurprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8273;
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:VI1PR0402MB3920;
+x-ms-traffictypediagnostic: VI1PR0402MB3920:
+x-microsoft-antispam-prvs: <VI1PR0402MB3920166C4565605519DE712A98DD0@VI1PR0402MB3920.eurprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:597;
 x-forefront-prvs: 01136D2D90
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(376002)(39860400002)(136003)(366004)(346002)(396003)(199004)(189003)(476003)(14444005)(229853002)(8676002)(6506007)(25786009)(44832011)(53546011)(6116002)(55016002)(53936002)(316002)(81156014)(2501003)(486006)(3846002)(6306002)(478600001)(45080400002)(102836004)(186003)(76176011)(81166006)(446003)(6246003)(8936002)(7696005)(71190400001)(26005)(71200400001)(99286004)(4326008)(9686003)(66066001)(14454004)(52536014)(86362001)(74316002)(68736007)(7736002)(54906003)(6436002)(110136005)(76116006)(66946007)(33656002)(91956017)(66446008)(66556008)(64756008)(66476007)(2906002)(256004)(305945005)(5660300002)(966005);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB3343;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(39860400002)(396003)(376002)(346002)(366004)(136003)(199004)(189003)(71200400001)(2501003)(229853002)(76176011)(102836004)(71190400001)(4326008)(74316002)(99286004)(256004)(53546011)(7696005)(446003)(86362001)(186003)(5660300002)(55016002)(26005)(2906002)(53936002)(478600001)(6436002)(6246003)(8936002)(476003)(110136005)(66066001)(66556008)(68736007)(54906003)(3846002)(6116002)(66946007)(66446008)(52536014)(486006)(7736002)(305945005)(14454004)(25786009)(9686003)(33656002)(44832011)(558084003)(8676002)(66476007)(76116006)(91956017)(316002)(64756008)(81166006)(6506007)(81156014);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB3920;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
 received-spf: None (protection.outlook.com: nxp.com does not designate
  permitted sender hosts)
 x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: MZwKiA3UW2AP1oTMoT/8zjHSZuOTy3i13jayPzoEa2Bw6q9ewTJ+YMWgmNmAMWi6g7njK3uHSnirtdkRAl0TXqUI3KGgk3JXiWBV6xlqzbT0/ugSqmwSZKkpJ4BYIJpfvNOj+APtsSn/RLjWGuG5xpvcBsJ+XSy7L4z5evcyxljwvsqPjAceDOykNl6EkWWnBNHHn7QGDd/rr4pwm3uclmtZq9pNNj2MqWtJve3mMBNukpJ/tf1zaxYpkZaOgLxtyCVqlmlM4eydPlnyMRWvuIrraq2Bits4tNqZn8SwKFO7v0BOp8RXIIPtj6gBLK/ifDkQjkprSVHKgBCTkh9pp+cDEmrY+r1DrvpuyjSxlRPmglMZsiAOKEGVZb1agSRmTVCT+WoqxtWC2123kpGLEdDpyq9JPDh0lJRNTJqzxt4=
+x-microsoft-antispam-message-info: 62dbtpnQaQzcQ2F1ITedDujQFGR/N9SEFM8obYV0cLaxptOEYqjysQRhDPSCL76xQffrR5wgou3yHeK7JAoDgUtBC5w3mIgXUT9hRs9bKw+CMQy1cOVdl6mVF2qFRCQGxmWga8HRAnDtJeien+QnOBVX7h8s7KiAX94DjVhjPUff3KuEUrB50byLwpjLSD7xpUUWY7QEiFIUdkLNej3yJm5b2HCWeWL+1I4yNWlI53fI0CuDNoWn65/KzHbR1svWGAKFbm+m0VMrdshxV3lP/PMu/n7WBijy9xqxNFfrGZ/qMcUge9698spwU6tDe2Wa6seDCaNUwCVaXHQwN8Xlj4SkCG//zoNbkQt/yOsoFgtZyjKZsYtoXPEOSlUcieMx36wCFhAqq9QN3YgRbUVHW51dbIembPU1qkRXVzvZ9Wg=
 Content-Type: text/plain; charset="iso-8859-2"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: decbe59b-f0bc-487f-c41b-08d714399049
-X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Jul 2019 15:29:36.1460
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2363ec3f-9b44-4587-fdac-08d71439e7da
+X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Jul 2019 15:32:03.0195
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
 X-MS-Exchange-CrossTenant-userprincipalname: horia.geanta@nxp.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3343
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3920
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 On 7/17/2019 6:25 PM, Andrey Smirnov wrote:=0A=
-> In order to be able to unify 64 and 32 bit implementations of=0A=
-> wr_reg64, let's convert it to use helpers from=0A=
-> <linux/io-64-nonatomic-hi-lo.h> first. Here are the steps of the=0A=
-> transformation:=0A=
-> =0A=
-> 1. Inline wr_reg32 helpers:=0A=
-> =0A=
-> 	if (!caam_imx && caam_little_end) {=0A=
-> 		if (caam_little_end) {=0A=
-> 			iowrite32(data >> 32, (u32 __iomem *)(reg) + 1);=0A=
-> 			iowrite32(data, (u32 __iomem *)(reg));=0A=
-> 		} else {=0A=
-> 			iowrite32be(data >> 32, (u32 __iomem *)(reg) + 1);=0A=
-> 			iowrite32be(data, (u32 __iomem *)(reg));=0A=
-> 		}=0A=
-> 	} else {=0A=
-> 		if (caam_little_end) {=0A=
-> 			iowrite32(data >> 32, (u32 __iomem *)(reg));=0A=
-> 			iowrite32(data, (u32 __iomem *)(reg) + 1);=0A=
-> 		} else {=0A=
-> 			iowrite32be(data >> 32, (u32 __iomem *)(reg));=0A=
-> 			iowrite32be(data, (u32 __iomem *)(reg) + 1);=0A=
-> 		}=0A=
-> 	}=0A=
-> =0A=
-> 2. Transfrom the conditionals such that the check for=0A=
-> 'caam_little_end' is at the top level:=0A=
-> =0A=
-> 	if (caam_little_end) {=0A=
-> 		if (!caam_imx) {=0A=
-> 			iowrite32(data >> 32, (u32 __iomem *)(reg) + 1);=0A=
-> 			iowrite32(data, (u32 __iomem *)(reg));=0A=
-> 		} else {=0A=
-> 			iowrite32(data >> 32, (u32 __iomem *)(reg));=0A=
-> 			iowrite32(data, (u32 __iomem *)(reg) + 1);=0A=
-> 		}=0A=
-> 	} else {=0A=
-> 		iowrite32be(data >> 32, (u32 __iomem *)(reg));=0A=
-> 		iowrite32be(data, (u32 __iomem *)(reg) + 1);=0A=
-> 	}=0A=
-> =0A=
-> 3. Invert the check for !caam_imx:=0A=
-> =0A=
-> 	if (caam_little_end) {=0A=
-> 		if (caam_imx) {=0A=
-> 			iowrite32(data >> 32, (u32 __iomem *)(reg));=0A=
-> 			iowrite32(data, (u32 __iomem *)(reg) + 1);=0A=
-> 		} else {=0A=
-> 			iowrite32(data >> 32, (u32 __iomem *)(reg) + 1);=0A=
-> 			iowrite32(data, (u32 __iomem *)(reg));=0A=
-> 		}=0A=
-> 	} else {=0A=
-> 		iowrite32be(data >> 32, (u32 __iomem *)(reg));=0A=
-> 		iowrite32be(data, (u32 __iomem *)(reg) + 1);=0A=
-> 	}=0A=
-> =0A=
-> 4. Make use of iowrite64* helpers from <linux/io-64-nonatomic-hi-lo.h>=0A=
-> =0A=
-> 	if (caam_little_end) {=0A=
-> 		if (caam_imx) {=0A=
-> 			iowrite32(data >> 32, (u32 __iomem *)(reg));=0A=
-> 			iowrite32(data, (u32 __iomem *)(reg) + 1);=0A=
-> 		} else {=0A=
-> 			iowrite64(data, reg);=0A=
-> 		}=0A=
-> 	} else {=0A=
-> 		iowrite64be(data, reg);=0A=
-> 	}=0A=
-> =0A=
-> No functional change intended.=0A=
+> Following the same transformation logic as outlined in previous commit=0A=
+> converting wr_reg64, convert rd_reg64 to use helpers from=0A=
+> <linux/io-64-nonatomic-hi-lo.h> first. No functional change intended.=0A=
 > =0A=
 > Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>=0A=
 Reviewed-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
 =0A=
-Just to clarify one thing.=0A=
-=0A=
-For a previous patch I mentioned:=0A=
-> To be consistent with CAAM engine HW spec: in case of 64-bit registers,=
-=0A=
-> irrespective of device endianness, the lower address should be read from=
-=0A=
-> / written to first, followed by the upper address.=0A=
-https://lore.kernel.org/linux-crypto/VI1PR0401MB259145C2DFDB5E4084EA5DFC98D=
-20@VI1PR0401MB2591.eurprd04.prod.outlook.com/=0A=
-=0A=
-I've checked again and actually there is no limitation wrt. the order in wh=
-ich=0A=
-the two 32-bit parts of 64-bit registers are read from / written to,=0A=
-except for performance counters (only available on DN parts, not on i.MX).=
-=0A=
-However, performance counters do not user {rd,wr}_reg64 and should be fixed=
-=0A=
-separately.=0A=
-=0A=
-In conclusion, it's ok to use either hi_lo or lo_hi semantics (which is _da=
-ta_=0A=
-semantics btw).=0A=
-It makes more sense for this patch to include io-64-nonatomic-hi-lo.h since=
-=0A=
-that's what regs.h currently uses.=0A=
-=0A=
+Thanks,=0A=
 Horia=0A=
