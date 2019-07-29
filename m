@@ -2,180 +2,73 @@ Return-Path: <SRS0=zv6R=V2=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80D43C433FF
-	for <linux-crypto@archiver.kernel.org>; Mon, 29 Jul 2019 20:11:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5AA1C41514
+	for <linux-crypto@archiver.kernel.org>; Mon, 29 Jul 2019 20:15:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4CD27205F4
-	for <linux-crypto@archiver.kernel.org>; Mon, 29 Jul 2019 20:11:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1564431099;
-	bh=nS+P0xEdNX2Rityxe+sq+lJ71ZCbNvBhaBhuLMPIssY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=xN801lU/VvLu5PQyjNM/sImGxGbjGfp612E1Ef7/+3o+oMZSnjyhiH52ux72vbM4V
-	 7ai6OKorboyaZyJbrIPmROFC7BwB3ZXIIhaNErCMOJXQJs5F6y2yU5VkjeqUMGb4UX
-	 yuNxNsmdcwstB4O2Y9pXA8RkT6rToi7uN6jPKt6w=
+	by mail.kernel.org (Postfix) with ESMTP id 868AE205F4
+	for <linux-crypto@archiver.kernel.org>; Mon, 29 Jul 2019 20:15:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729804AbfG2TdJ (ORCPT
+        id S1730128AbfG2UPP (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 29 Jul 2019 15:33:09 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47060 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729812AbfG2TdI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 29 Jul 2019 15:33:08 -0400
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id D226F21773;
-        Mon, 29 Jul 2019 19:33:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1564428787;
-        bh=nS+P0xEdNX2Rityxe+sq+lJ71ZCbNvBhaBhuLMPIssY=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=h7ZKI7BfrfRh16KfBRNpVDgoPCTJv81EAoiocddUC33F5JR1nLNkxFP7X7jFeZ49t
-         bp7iCVR7/qt7oT7opP9XNpIJGBpkR6QV48IiEx+7acJ/PgCQ7BUHi2CxLQx2Z/vvvR
-         zcgwwFMxKIPrdz72uM3mVScLC4txoWvgNRjKB1CU=
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        stable@vger.kernel.org, Daniel Jordan <daniel.m.jordan@oracle.com>,
-        Andrea Parri <andrea.parri@amarulasolutions.com>,
-        Boqun Feng <boqun.feng@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "Paul E. McKenney" <paulmck@linux.ibm.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        linux-arch@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: [PATCH 4.14 147/293] padata: use smp_mb in padata_reorder to avoid orphaned padata jobs
-Date:   Mon, 29 Jul 2019 21:20:38 +0200
-Message-Id: <20190729190835.818681103@linuxfoundation.org>
-X-Mailer: git-send-email 2.22.0
-In-Reply-To: <20190729190820.321094988@linuxfoundation.org>
-References: <20190729190820.321094988@linuxfoundation.org>
-User-Agent: quilt/0.66
+        Mon, 29 Jul 2019 16:15:15 -0400
+Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:41355 "EHLO
+        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1729147AbfG2UPK (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 29 Jul 2019 16:15:10 -0400
+Received: from callcc.thunk.org (96-72-102-169-static.hfc.comcastbusiness.net [96.72.102.169] (may be forged))
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id x6TKElfw026772
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 29 Jul 2019 16:14:48 -0400
+Received: by callcc.thunk.org (Postfix, from userid 15806)
+        id AC8394202F5; Mon, 29 Jul 2019 16:14:45 -0400 (EDT)
+Date:   Mon, 29 Jul 2019 16:14:45 -0400
+From:   "Theodore Y. Ts'o" <tytso@mit.edu>
+To:     linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        linux-mtd@lists.infradead.org, linux-api@vger.kernel.org,
+        linux-crypto@vger.kernel.org, keyrings@vger.kernel.org,
+        Paul Crowley <paulcrowley@google.com>,
+        Satya Tangirala <satyat@google.com>
+Subject: Re: [PATCH v7 06/16] fscrypt: add FS_IOC_ADD_ENCRYPTION_KEY ioctl
+Message-ID: <20190729201445.GA16445@mit.edu>
+References: <20190726224141.14044-1-ebiggers@kernel.org>
+ <20190726224141.14044-7-ebiggers@kernel.org>
+ <20190728185003.GF6088@mit.edu>
+ <20190729194644.GE169027@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190729194644.GE169027@gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Daniel Jordan <daniel.m.jordan@oracle.com>
+On Mon, Jul 29, 2019 at 12:46:45PM -0700, Eric Biggers wrote:
+> > For that matter, we could just add a new ioctl which returns the file
+> > system's keyring id.  That way an application program won't have to
+> > try to figure out what a file's underlying sb->s_id happens to be.
+> > (Especially if things like overlayfs are involved.)
+> 
+> Keep in mind that the new ioctls (FS_IOC_ADD_ENCRYPTION_KEY,
+> FS_IOC_REMOVE_ENCRYPTION_KEY, FS_IOC_GET_ENCRYPTION_KEY_STATUS) don't take the
+> keyring ID as a parameter, since it's already known from the filesystem the
+> ioctl is executed on.  So there actually isn't much that can be done with the
+> keyring ID.  But sure, if it's needed later we can add an API to get it.
 
-commit cf144f81a99d1a3928f90b0936accfd3f45c9a0a upstream.
+Yeah, I was thinking about for testing/debugging purposes so that we
+could use keyctl to examine the per-file system keyring and see what
+keys are attached to a file system.  This is only going to be usable
+by root, so I guess we can just try to figure it out by going through
+/proc/keys and searching by sb->s_id.  If there are ambiguities that
+make this hard to do, we can add an interface to make this easier.
 
-Testing padata with the tcrypt module on a 5.2 kernel...
-
-    # modprobe tcrypt alg="pcrypt(rfc4106(gcm(aes)))" type=3
-    # modprobe tcrypt mode=211 sec=1
-
-...produces this splat:
-
-    INFO: task modprobe:10075 blocked for more than 120 seconds.
-          Not tainted 5.2.0-base+ #16
-    modprobe        D    0 10075  10064 0x80004080
-    Call Trace:
-     ? __schedule+0x4dd/0x610
-     ? ring_buffer_unlock_commit+0x23/0x100
-     schedule+0x6c/0x90
-     schedule_timeout+0x3b/0x320
-     ? trace_buffer_unlock_commit_regs+0x4f/0x1f0
-     wait_for_common+0x160/0x1a0
-     ? wake_up_q+0x80/0x80
-     { crypto_wait_req }             # entries in braces added by hand
-     { do_one_aead_op }
-     { test_aead_jiffies }
-     test_aead_speed.constprop.17+0x681/0xf30 [tcrypt]
-     do_test+0x4053/0x6a2b [tcrypt]
-     ? 0xffffffffa00f4000
-     tcrypt_mod_init+0x50/0x1000 [tcrypt]
-     ...
-
-The second modprobe command never finishes because in padata_reorder,
-CPU0's load of reorder_objects is executed before the unlocking store in
-spin_unlock_bh(pd->lock), causing CPU0 to miss CPU1's increment:
-
-CPU0                                 CPU1
-
-padata_reorder                       padata_do_serial
-  LOAD reorder_objects  // 0
-                                       INC reorder_objects  // 1
-                                       padata_reorder
-                                         TRYLOCK pd->lock   // failed
-  UNLOCK pd->lock
-
-CPU0 deletes the timer before returning from padata_reorder and since no
-other job is submitted to padata, modprobe waits indefinitely.
-
-Add a pair of full barriers to guarantee proper ordering:
-
-CPU0                                 CPU1
-
-padata_reorder                       padata_do_serial
-  UNLOCK pd->lock
-  smp_mb()
-  LOAD reorder_objects
-                                       INC reorder_objects
-                                       smp_mb__after_atomic()
-                                       padata_reorder
-                                         TRYLOCK pd->lock
-
-smp_mb__after_atomic is needed so the read part of the trylock operation
-comes after the INC, as Andrea points out.   Thanks also to Andrea for
-help with writing a litmus test.
-
-Fixes: 16295bec6398 ("padata: Generic parallelization/serialization interface")
-Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
-Cc: <stable@vger.kernel.org>
-Cc: Andrea Parri <andrea.parri@amarulasolutions.com>
-Cc: Boqun Feng <boqun.feng@gmail.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Paul E. McKenney <paulmck@linux.ibm.com>
-Cc: Peter Zijlstra <peterz@infradead.org>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: linux-arch@vger.kernel.org
-Cc: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-
----
- kernel/padata.c |   12 ++++++++++++
- 1 file changed, 12 insertions(+)
-
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -265,7 +265,12 @@ static void padata_reorder(struct parall
- 	 * The next object that needs serialization might have arrived to
- 	 * the reorder queues in the meantime, we will be called again
- 	 * from the timer function if no one else cares for it.
-+	 *
-+	 * Ensure reorder_objects is read after pd->lock is dropped so we see
-+	 * an increment from another task in padata_do_serial.  Pairs with
-+	 * smp_mb__after_atomic in padata_do_serial.
- 	 */
-+	smp_mb();
- 	if (atomic_read(&pd->reorder_objects)
- 			&& !(pinst->flags & PADATA_RESET))
- 		mod_timer(&pd->timer, jiffies + HZ);
-@@ -334,6 +339,13 @@ void padata_do_serial(struct padata_priv
- 	list_add_tail(&padata->list, &pqueue->reorder.list);
- 	spin_unlock(&pqueue->reorder.lock);
- 
-+	/*
-+	 * Ensure the atomic_inc of reorder_objects above is ordered correctly
-+	 * with the trylock of pd->lock in padata_reorder.  Pairs with smp_mb
-+	 * in padata_reorder.
-+	 */
-+	smp_mb__after_atomic();
-+
- 	put_cpu();
- 
- 	padata_reorder(pd);
-
-
+     	       	      	     - Ted
