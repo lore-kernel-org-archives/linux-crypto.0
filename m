@@ -2,250 +2,156 @@ Return-Path: <SRS0=RABd=V3=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B115DC0650F
-	for <linux-crypto@archiver.kernel.org>; Tue, 30 Jul 2019 13:42:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13CBAC433FF
+	for <linux-crypto@archiver.kernel.org>; Tue, 30 Jul 2019 14:01:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 81B75206B8
-	for <linux-crypto@archiver.kernel.org>; Tue, 30 Jul 2019 13:42:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BB687206E0
+	for <linux-crypto@archiver.kernel.org>; Tue, 30 Jul 2019 14:01:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=verimatrix.com header.i=@verimatrix.com header.b="VxhqR18Y"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726428AbfG3Nmg (ORCPT
+        id S1729523AbfG3OBt (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 30 Jul 2019 09:42:36 -0400
-Received: from relay4-d.mail.gandi.net ([217.70.183.196]:59741 "EHLO
-        relay4-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725793AbfG3Nmg (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 30 Jul 2019 09:42:36 -0400
-X-Originating-IP: 86.250.200.211
-Received: from localhost (lfbn-1-17395-211.w86-250.abo.wanadoo.fr [86.250.200.211])
-        (Authenticated sender: antoine.tenart@bootlin.com)
-        by relay4-d.mail.gandi.net (Postfix) with ESMTPSA id 674A9E000B;
-        Tue, 30 Jul 2019 13:42:33 +0000 (UTC)
-Date:   Tue, 30 Jul 2019 15:42:32 +0200
-From:   Antoine Tenart <antoine.tenart@bootlin.com>
-To:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
-Cc:     Antoine Tenart <antoine.tenart@bootlin.com>,
-        Pascal van Leeuwen <pascalvanl@gmail.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Tue, 30 Jul 2019 10:01:49 -0400
+Received: from mail-eopbgr710082.outbound.protection.outlook.com ([40.107.71.82]:42432
+        "EHLO NAM05-BY2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727323AbfG3OBt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 30 Jul 2019 10:01:49 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=mhEszgS6wS1gJMkkOQTkmfWl9xQz5SP122bGidueBN10R7j1Dfq77E5TerVsg733s0fJ+jcY3lSHPaiwCe6B6lZ3l3npKkXHtNeqaukC8qKD6sDMrkNIgOc3r8Z+utVlKYG/2+vwtPVlQCuGL8nuURl6T4jl+RqspCYmNbnJ9/HsFQXb0u6+c2bDGP7v9kT9wKaE/VxSnFx4EbFX9ivepPS0qk5rj+9QNOZtC1KBGEgaC6TnKJB7oSHBpOhyGV4nNahQZRcmVelOKF60Po1asjQohE+Udwmi8Vq6tWtJ3OYOF9vIo4IBk4HHh/+Hv+nNmSsDu5uDVO07uU0Az/qozw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bu58fsBV851B9cM2UkM6f4tTk98YX1UOn9foxIfzmG8=;
+ b=UyZecbV33MNYDbj3v0ARkS4vtTgKc05kjeP6MYMm6Ehdu9/aeHUExU9pFd7824NOIT0giZw61LG491zCyuUqoVBo4mpZ2eLyhSrWxCqjiTNLDhW+TsV25qzPziWPtjgGQ0jWbq++TD2hR+DZ2PIGmH7YfFW0Ma+E1SC9kyKcmz5AiXH8tSY0A8UuVa29Bjx0ol2tlG4rUCbmZDSpibx152MglQar42ui2Kt5KMQhgpI9kChlSyFn2d0SQWnDYbyGqXQcJcyaiSWusMXHPMMfc83Bg2XkOefK/CAwFwIR5vTlQBq/9tCaIND2jdC5fgV9rfNaqVi47IAg0u6O2cMMTQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
+ smtp.mailfrom=verimatrix.com;dmarc=pass action=none
+ header.from=verimatrix.com;dkim=pass header.d=verimatrix.com;arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verimatrix.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bu58fsBV851B9cM2UkM6f4tTk98YX1UOn9foxIfzmG8=;
+ b=VxhqR18Y1r3uY2WsNBk1sFYuozC45C0/HLVysniA+6r1rblktpXR4diG4/UheQ2I0QePAXhXRWgg3aXmJ5azdqN3Q0imdm1y44o81ckXmbcAbAwq3ixoPLprTvTlwvgViu1gnJSvVHdV4yR8/zaEgmw5CYpYUbuCAHbFdvKSGvE=
+Received: from MN2PR20MB2973.namprd20.prod.outlook.com (52.132.172.146) by
+ MN2PR20MB3280.namprd20.prod.outlook.com (52.132.175.205) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2115.13; Tue, 30 Jul 2019 14:01:46 +0000
+Received: from MN2PR20MB2973.namprd20.prod.outlook.com
+ ([fe80::d96f:39b2:19f4:c7c1]) by MN2PR20MB2973.namprd20.prod.outlook.com
+ ([fe80::d96f:39b2:19f4:c7c1%7]) with mapi id 15.20.2115.005; Tue, 30 Jul 2019
+ 14:01:46 +0000
+From:   Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+To:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>,
+        Antoine Tenart <antoine.tenart@bootlin.com>,
+        Pascal van Leeuwen <pascalvanl@gmail.com>
+CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
         "davem@davemloft.net" <davem@davemloft.net>
-Subject: Re: [PATCHv2 2/3] crypto: inside-secure - add support for PCI based
- FPGA development board
-Message-ID: <20190730134232.GG3108@kwain>
-References: <1564145005-26731-1-git-send-email-pvanleeuwen@verimatrix.com>
- <1564145005-26731-3-git-send-email-pvanleeuwen@verimatrix.com>
- <20190730090811.GF3108@kwain>
- <MN2PR20MB2973B37C90FBD6E6C97B8E09CADC0@MN2PR20MB2973.namprd20.prod.outlook.com>
+Subject: RE: [PATCH 1/3] crypto: inside-secure - add support for
+ authenc(hmac(sha1),cbc(des3_ede))
+Thread-Topic: [PATCH 1/3] crypto: inside-secure - add support for
+ authenc(hmac(sha1),cbc(des3_ede))
+Thread-Index: AQHVMwaxl7vezQ4XF0yNrfTnczMQM6bc8rsAgAAGFCCABl5P0A==
+Date:   Tue, 30 Jul 2019 14:01:46 +0000
+Message-ID: <MN2PR20MB297366400B400A2BD77A0BCFCADC0@MN2PR20MB2973.namprd20.prod.outlook.com>
+References: <1562309364-942-1-git-send-email-pvanleeuwen@verimatrix.com>
+ <1562309364-942-2-git-send-email-pvanleeuwen@verimatrix.com>
+ <20190726121938.GC3235@kwain>
+ <MN2PR20MB2973B64FD27EA16A6FADBAFBCAC00@MN2PR20MB2973.namprd20.prod.outlook.com>
+In-Reply-To: <MN2PR20MB2973B64FD27EA16A6FADBAFBCAC00@MN2PR20MB2973.namprd20.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=pvanleeuwen@verimatrix.com; 
+x-originating-ip: [188.204.2.113]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 1470a7d2-fe9d-4bb0-19c9-08d714f6757c
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:MN2PR20MB3280;
+x-ms-traffictypediagnostic: MN2PR20MB3280:
+x-ms-exchange-purlcount: 2
+x-microsoft-antispam-prvs: <MN2PR20MB328008064F0FC0AB113D8C7ACADC0@MN2PR20MB3280.namprd20.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-forefront-prvs: 0114FF88F6
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(136003)(376002)(346002)(39850400004)(396003)(366004)(199004)(189003)(13464003)(81156014)(81166006)(8936002)(102836004)(66476007)(6506007)(53546011)(66556008)(76116006)(53936002)(7696005)(4326008)(68736007)(966005)(476003)(486006)(6116002)(66946007)(3846002)(6436002)(446003)(11346002)(6306002)(55016002)(66574012)(2906002)(15974865002)(478600001)(64756008)(76176011)(8676002)(25786009)(6246003)(71190400001)(33656002)(14454004)(186003)(71200400001)(66446008)(54906003)(110136005)(99286004)(66066001)(9686003)(229853002)(305945005)(316002)(86362001)(74316002)(256004)(52536014)(7736002)(26005)(5660300002)(18886075002);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR20MB3280;H:MN2PR20MB2973.namprd20.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: verimatrix.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: 2KE9xbpxBP+36ilTtxOrrK6fW4xdrI7G0Yy/IWGtR5m7zr6c963uWVl3CDp7ZH958ZbPymtQsNS+DM4Jpo5NMSTUBn1d3gAahzjt/yOas/BraLfRzJ/xTmv9ROz4+gecZDU0FtDGiDuyzc9EG+oQddylP1JMWsMqrI6PON6Om9wYmWucstuq4JEuTesmD7raSQgypjLSu4CaE4DogJENf6oD4g6NPQ35Jjr2kojFM2dn4cC+KTcpliUi1EH9+ZrdFIRiI/vVLczLNjhCDEW6MBm4nS10a7+YIZ6s4jphzMqdAsCgC/PiuSbRIFRIkBw1eQJQPl/4MCMAP++phUXuN/ksd2mcCeWxxH1J7AMe1EdlcAlHpdEVIDHK4VYbqMLCqfOuX0bn/YR0V04/4kO5eK27LIB85sP94/P18qvXf74=
+Content-Type: text/plain; charset="Windows-1252"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <MN2PR20MB2973B37C90FBD6E6C97B8E09CADC0@MN2PR20MB2973.namprd20.prod.outlook.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
+X-OriginatorOrg: verimatrix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1470a7d2-fe9d-4bb0-19c9-08d714f6757c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Jul 2019 14:01:46.1192
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: dcb260f9-022d-4495-8602-eae51035a0d0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: pvanleeuwen@verimatrix.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR20MB3280
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Pascal,
+> -----Original Message-----
+> From: linux-crypto-owner@vger.kernel.org <linux-crypto-owner@vger.kernel.=
+org> On Behalf Of
+> Pascal Van Leeuwen
+> Sent: Friday, July 26, 2019 2:57 PM
+> To: Antoine Tenart <antoine.tenart@bootlin.com>; Pascal van Leeuwen <pasc=
+alvanl@gmail.com>
+> Cc: linux-crypto@vger.kernel.org; herbert@gondor.apana.org.au; davem@dave=
+mloft.net
+> Subject: RE: [PATCH 1/3] crypto: inside-secure - add support for
+> authenc(hmac(sha1),cbc(des3_ede))
+>=20
+> Antoine,
+>=20
+>=20
+> > > +	.alg.aead =3D {
+> > > +		.setkey =3D safexcel_aead_setkey,
+> > > +		.encrypt =3D safexcel_aead_encrypt_3des,
+> > > +		.decrypt =3D safexcel_aead_decrypt_3des,
+> > > +		.ivsize =3D DES3_EDE_BLOCK_SIZE,
+> > > +		.maxauthsize =3D SHA1_DIGEST_SIZE,
+> > > +		.base =3D {
+> > > +			.cra_name =3D "authenc(hmac(sha1),cbc(des3_ede))",
+> > > +			.cra_driver_name =3D "safexcel-authenc-hmac-sha1-cbc-des3_ede",
+> >
+> > You could drop "_ede" here, or s/_/-/.
+> >
+> Agree the underscore should not be there.
+> Our HW does not support any other form of 3DES so EDE doesn't
+> really add much here, therefore I will just remove "_ede" entirely.
+>
+Actually, while looking into fixing this, I noticed that this=20
+naming style is actually consistent with the already existing
+3des ecb and cbc ciphersuites, e.g.: "safexcel-cbc-des3_ebe",
+so for consistency I would then suggest keeping it (or=20
+change the other 2 3des references at the same time, but I
+don't know if that would break any legacy dependency).
 
-On Tue, Jul 30, 2019 at 10:20:43AM +0000, Pascal Van Leeuwen wrote:
-> > On Fri, Jul 26, 2019 at 02:43:24PM +0200, Pascal van Leeuwen wrote:
-> 
-> > Is there a reason to have this one linked to Marvell? Aren't there other
-> > EIP197 (or EIP97) engines not on Marvell SoCs? (I'm pretty sure I know
-> > at least one).
-> > 
-> Yes, there is a very good reason. These flags control features that are
-> very specific to those three Marvell socs and have nothing to do with 
-> 'generic' EIP97IES's, EIP197B's or EIP197D's (these are just high-level
-> marketing/sales denominators and do not cover all the intricate config
-> details of the actual delivery that the driver needs to know about, so
-> this naive approach would not be maintainable scaling to other devices) 
-> Therefore, I wanted to make that abundantly clear, hence the prefix.
-> (Renaming them to the specific Marvell SoC names was another option,
-> if only I knew which engine ended up in which SoC ...)
-> 
-> While there are many SoC's out there with EIP97 and EIP197 engines,
-> the driver in its current form will NOT work (properly) on them, for
-> that there is still much work to be done beyond the patches I already
-> submitted. I already have the implementation for that (you tested that
-> already!), but chopping it into bits and submitting it all will take 
-> a lot more time. But you have to understand that, without that, it's 
-> totally useless to either me or Verimatrix.
-> 
-> TL;DR: These flags are really just for controlling anything specific
-> to those particular Marvell instances and nothing else.
+>=20
+> > Apart from those small comments, the patch looks good.
+> >
+> > Thanks!
+> > Antoine
+> >
+> > --
+> > Antoine T=E9nart, Bootlin
+> > Embedded Linux and Kernel engineering
+> > https://bootlin.com
+>=20
 
-I had this driver running on another non-Marvell SoC with very minor
-modifications, so there's then at least one hardware which is similar
-enough. In this case I don't see why this should be named "Marvell".
-
-What are the features specific to those Marvell SoC that won't be used
-in other integrations? I'm pretty sure there are common features between
-all those EIP97 engines on different SoCs.
-
-> > > -	switch (priv->version) {
-> > > -	case EIP197B:
-> > > -		dir = "eip197b";
-> > > -		break;
-> > > -	case EIP197D:
-> > > -		dir = "eip197d";
-> > > -		break;
-> > > -	default:
-> > > +	if (priv->version == EIP97IES_MRVL)
-> > >  		/* No firmware is required */
-> > >  		return 0;
-> > > -	}
-> > > +	else if (priv->version == EIP197D_MRVL)
-> > > +		dir = "eip197d";
-> > > +	else
-> > > +		/* Default to minimum EIP197 config */
-> > > +		dir = "eip197b";
-> > 
-> > You're moving the default choice from "no firmware" to being a specific
-> > one.
-> > 
-> The EIP97 being the exception as the only firmware-less engine.
-> This makes EIP197_DEVBRD fall through to EIP197B firmware until
-> my patches supporting other EIP197 configs eventually get merged,
-> after which this part will change anyway.
-
-We don't know when/in what shape those patches will be merged, so in
-the meantime please make the "no firmware" the default choice.
-
-> > > -			/* Fallback to the old firmware location for the
-> > > +			/*
-> > > +			 * Fallback to the old firmware location for the
-> > 
-> > This is actually the expected comment style in net/ and crypto/. (There
-> > are other examples).
-> > 
-> Not according to the Linux coding style (which only makes an exception
-> for /net) and not in most other crypto code I've seen. So maybe both
-> styles are allowed(?) and they are certainly both used, but this style
-> seems to be prevalent ...
-
-I agree having non-written rules is not good (I don't make them), but
-not everything is described in the documentation or in the coding style.
-I don't really care about the comment style when adding new ones, but
-those are valid (& recommended) in crypto/ and it just make the patch
-bigger.
-
-> > >  	/* For EIP197 set maximum number of TX commands to 2^5 = 32 */
-> > > -	if (priv->version == EIP197B || priv->version == EIP197D)
-> > > +	if (priv->version != EIP97IES_MRVL)
-> > 
-> > I would really prefer having explicit checks here. More engines will be
-> > supported in the future and doing will help. (There are others).
-> > 
-> Same situation as with the crypto mode: I know for a fact the EIP97
-> is the *only* configuration that *doesn't* need this code. So why
-> would I have a long list of configurations there (that will keep
-> growing indefinitely) that *do* need that code? That will for sure
-> not improve maintainability ...
-
-OK, I won't debate this for hours. At least add a comment, for when
-*others* will add support for new hardware (because that really is the
-point, *others* might update and modify the driver).
-
-> > > @@ -869,9 +898,6 @@ static int safexcel_register_algorithms(struct safexcel_crypto_priv
-> > *priv)
-> > >  	for (i = 0; i < ARRAY_SIZE(safexcel_algs); i++) {
-> > >  		safexcel_algs[i]->priv = priv;
-> > >
-> > > -		if (!(safexcel_algs[i]->engines & priv->version))
-> > > -			continue;
-> > 
-> > You should remove the 'engines' flag in a separate patch. I'm really not
-> > sure about this. I don't think all the IS EIP engines support the same
-> > sets of algorithms?
-> > 
-> All algorithms provided at this moment are available from all engines
-> currently supported. So the whole mechanism, so far, is redundant.
-> 
-> This will change as I add support for generic (non-Marvell) engines,
-> but the approach taken here is not scalable or maintainable. So I will
-> end up doing it differently, eventually. I don't see the point in
-> maintaining dead/unused/redundant code I'm about to replace anyway.
-
-But it's not done yet and we might discuss how you'll handle this. You
-can't know for sure you'll end up with a different approach.
-
-At least remove this in a separate patch.
-
-> > > +	if (IS_ENABLED(CONFIG_PCI) && (priv->version == EIP197_DEVBRD)) {
-> > 
-> > You have extra parenthesis here.
-> > 
-> Our internal coding style (as well as my personal preference) 
-> actually mandates to put parenthesis around everything so expect
-> that to happen a lot going forward as I've been doing it like that
-> for nearly 30 years now.
-> 
-> Does the Linux coding style actually *prohibit* the use of these
-> "extra" parenthesis? I don't recall reading that anywhere ...
-
-I don't know if this is a written rule (as many others), but you'll find
-plenty of examples of reviews asking not to have extra parenthesis.
-
-> > > +	if (priv->version == EIP197_DEVBRD) {
-> > 
-> > It seems to me this is mixing an engine version information and a board
-> > were the engine is integrated. Are there differences in the engine
-> > itself, or only in the way it's wired?
-> > 
-> Actually, no. The way I see it, priv->version does not convey any engine
-> information, just integration context (i.e. a specific Marvell SoC or, in 
-> this case, our FPGA dev board), see also my explanation at the beginning.
-
-So that's really the point here :) This variable was introduced to
-convey the engine information, not the way it is integrated. There are
-EIP97 engines not on Marvell SoC which will just work out of the box (or
-with let's say a one liner adding support for using a clock). And the
-version could be in both cases something like 'EIP97'.
-
-> Conveying engine information through a simple set of flags or some
-> integer or whatever is just not going to fly. No two of our engines
-> are ever the same, so that would quickly blow up in your face.
-
-Well, you have more info about this than I do, I can only trust you on
-this (it's just weird based on the experience I described just before,
-it seems to me the differences are not that big, but again, you know the
-h/w better).
-
-I just don't want to end up with:
-
-  if (version == EIP97_MRVL || version == EIP97_XXX || ...)
-
-> > We had this discussion on the v1. Your point was that you wanted this
-> > information to be in .data. One solution I proposed then was to use a
-> > struct (with both a 'version' and a 'flag' variable inside) instead of
-> > a single 'version' variable, so that we still can make checks on the
-> > version itself and not on something too specific.
-> > 
-> As a result of that discussion, I kept your original version field
-> as intact as I could, knowing what I know and where I want to go.
-> 
-> But to truly support generic engines, we really need all the stuff
-> that I added. Because it simply has that many parameters that are
-> different for each individual instance. But at the same time these
-> parameters can all be probed from the hardware directly, so
-> maintaining huge if statements all over the place decoding some 
-> artificial version field is not the way to go (not maintainable).
-> Just probe all the parameters from the hardware and use them 
-> directly where needed ... which my future patch set will do.
-
-OK, I do think this would be a good solution :)
-
-Thanks!
-Antoine
-
--- 
-Antoine Ténart, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+Regards,
+Pascal van Leeuwen
+Silicon IP Architect, Multi-Protocol Engines @ Verimatrix
+www.insidesecure.com
