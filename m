@@ -2,104 +2,122 @@ Return-Path: <SRS0=RABd=V3=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 936D1C76186
-	for <linux-crypto@archiver.kernel.org>; Tue, 30 Jul 2019 01:54:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 874EFC761A9
+	for <linux-crypto@archiver.kernel.org>; Tue, 30 Jul 2019 04:26:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6A7022171F
-	for <linux-crypto@archiver.kernel.org>; Tue, 30 Jul 2019 01:54:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Bxk8nfhQ"
+	by mail.kernel.org (Postfix) with ESMTP id 5CEF02089E
+	for <linux-crypto@archiver.kernel.org>; Tue, 30 Jul 2019 04:26:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1564460792;
+	bh=1q7efFxt0n1/Q6WBtRnJVyYiA7yYxENtcYDLXaZtXeU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=A1ErLX1lldvYS70nDe77MTW75Hw/BuHqRNleW5Ws6eaS/+SCSXK1+yBCb6oT85ev4
+	 a7ZidpxMH5hN6In+g8hlyAp8ncyn/6gfjY8YSR7e18RnWRZrA9QCVBq8LzEtWu45Od
+	 Fd+7VRP4glWx2Q77vtFXrcOfdhs+1/Y7K6Hi+QlM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727788AbfG3ByK (ORCPT
+        id S1727009AbfG3E0b (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 29 Jul 2019 21:54:10 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:54578 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727589AbfG3ByK (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 29 Jul 2019 21:54:10 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6U1cuHp039393;
-        Tue, 30 Jul 2019 01:53:50 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2018-07-02;
- bh=f9BTSG278YCddMybE8N0n7tZAlikyRiUgbx4cTXrEZY=;
- b=Bxk8nfhQhPW6zvVXbPjFUAohvmKJHGHnWZTRS4AQnSlb+E+1mTGqLJi6sGbX+1hWyzQU
- G84JuH/MNIzx+zAMj0Y0xJ7lfJJrpYgB6Tf8KofAlj3b5kYDNibmbTUp7UIAqV1uCwL7
- YHwFFw/Nhk2rHflIt1wPrM8RxkGnfmAGIPOl0Pj/l9U9hSRcUFlLLowPLUX+R8pGA8u8
- fp0O3VZQ0RGNV6/D3dqSdMFn+0w/lhuMmEP+o5FZCXqDQnibHkGO2M1ZzHw4ejwG6vGf
- DrS8llofUk3FkH/GhO0mYN3Hz7JwuyNFtQH3g2/46Xg6iJRO3RKyITFbCr6XzEQBVhF1 Dw== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2120.oracle.com with ESMTP id 2u0f8qu23y-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 30 Jul 2019 01:53:50 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x6U1h2JG132064;
-        Tue, 30 Jul 2019 01:53:50 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by userp3030.oracle.com with ESMTP id 2u0bqttk8c-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 30 Jul 2019 01:53:50 +0000
-Received: from abhmp0020.oracle.com (abhmp0020.oracle.com [141.146.116.26])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x6U1rl5b002255;
-        Tue, 30 Jul 2019 01:53:47 GMT
-Received: from ca-dmjordan1.us.oracle.com (/10.211.9.48)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 29 Jul 2019 18:53:47 -0700
-Date:   Mon, 29 Jul 2019 21:53:43 -0400
-From:   Daniel Jordan <daniel.m.jordan@oracle.com>
-To:     Tejun Heo <tj@kernel.org>
-Cc:     Daniel Jordan <daniel.m.jordan@oracle.com>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
+        Tue, 30 Jul 2019 00:26:31 -0400
+Received: from mail.kernel.org ([198.145.29.99]:36838 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726510AbfG3E0a (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 30 Jul 2019 00:26:30 -0400
+Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 3EF2320693;
+        Tue, 30 Jul 2019 04:26:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1564460789;
+        bh=1q7efFxt0n1/Q6WBtRnJVyYiA7yYxENtcYDLXaZtXeU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=VSqMNHFr/Rv3LAAluYhoGAvkQ9bJs7eaIwuLMHf7cp3K1AMlfy6RntV8AMk6W/N6I
+         5Dwd4tNrgbN2E2laY70Svh6jww/ZvN68yq0w3Pp/iYMHnzl1MzPyklG9GlGy1pF+oK
+         oTTbgLK2V4ntMhR6Gsu56N6Bpu5oM9d0IYYQqYp0=
+Date:   Mon, 29 Jul 2019 21:26:27 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Pascal van Leeuwen <pascalvanl@gmail.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "davem@davemloft.net" <davem@davemloft.net>
+Subject: Re: [PATCH] crypto: testmgr - Improve randomization of params for
+ AEAD fuzz testing
+Message-ID: <20190730042627.GC1966@sol.localdomain>
+Mail-Followup-To: Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC 3/9] workqueue: require CPU hotplug read exclusion for
- apply_workqueue_attrs
-Message-ID: <20190730015343.lgj4hxejorofibmo@ca-dmjordan1.us.oracle.com>
-References: <20190725212505.15055-1-daniel.m.jordan@oracle.com>
- <20190725212505.15055-4-daniel.m.jordan@oracle.com>
- <20190729194721.GG569612@devbig004.ftw2.facebook.com>
+        Pascal van Leeuwen <pascalvanl@gmail.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "davem@davemloft.net" <davem@davemloft.net>
+References: <20190728173040.GA699@sol.localdomain>
+ <MN2PR20MB29737962BC74CCA790470C0BCADD0@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <20190729181738.GB169027@gmail.com>
+ <MN2PR20MB2973C131062F1D1CABA77015CADD0@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <20190729223112.GA7529@gondor.apana.org.au>
+ <MN2PR20MB29736A0F55875B91587142D9CADD0@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <20190729235304.GJ169027@gmail.com>
+ <MN2PR20MB2973302B66749E5E6EC4F444CADC0@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <20190730005532.GL169027@gmail.com>
+ <MN2PR20MB297328E526D41CE90707DAFACADC0@MN2PR20MB2973.namprd20.prod.outlook.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190729194721.GG569612@devbig004.ftw2.facebook.com>
-User-Agent: NeoMutt/20180323-268-5a959c
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9333 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=785
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1906280000 definitions=main-1907300016
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9333 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=832 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
- definitions=main-1907300016
+In-Reply-To: <MN2PR20MB297328E526D41CE90707DAFACADC0@MN2PR20MB2973.namprd20.prod.outlook.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jul 29, 2019 at 12:47:21PM -0700, Tejun Heo wrote:
-> On Thu, Jul 25, 2019 at 05:24:59PM -0400, Daniel Jordan wrote:
-> > Change the calling convention for apply_workqueue_attrs to require CPU
-> > hotplug read exclusion.
+On Tue, Jul 30, 2019 at 01:26:17AM +0000, Pascal Van Leeuwen wrote:
+> > > > Oh, I see.  Currently the fuzz tests assume that if encryption fails with an
+> > > > error (such as EINVAL), then decryption fails with that same error.
+> > > >
+> > > Ah ok, oops. It should really log the error that was returned by the
+> > > generic decryption instead. Which should just be a matter of annotating
+> > > it back to vec.crypt_error?
+> > >
 > > 
-> > Avoids lockdep complaints about nested calls to get_online_cpus in a
-> > future patch where padata calls apply_workqueue_attrs when changing
-> > other CPU-hotplug-sensitive data structures with the CPU read lock
-> > already held.
+> > It doesn't do the generic decryption yet though, only the generic encryption.
 > > 
-> > Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
-> 
-> Acked-by: Tejun Heo <tj@kernel.org>
+> I didn't look at the code in enough detail to pick that up, I was expecting
+> it do do generic decryption and compare that to decryption with the algorithm
+> being fuzzed. So what does it do then? Compare to the original input to the
+> encryption? Ok, I guess that would save a generic decryption pass but, as we
+> see here, it would not be able to capture all the details of the API.
 
-Thanks, Tejun!
+Currently to generate an AEAD test vector the code just generates a "random"
+plaintext and encrypts it with the generic implementation.
+
+My plan is to extend the tests to also sometimes generate a "random" ciphertext
+and try to decrypt it; and also sometimes try to decrypt a corrupted ciphertext.
+
+> 
+> > > > Regardless of what we think the correct decryption error is, running the
+> > > > decryption test at all in this case is sort of broken, since the ciphertext
+> > > > buffer was never initialized.
+> > > >
+> > > You could consider it broken or just some convenient way of getting
+> > > vectors that don't authenticate without needing to spend any effort ...
+> > >
+> > 
+> > It's not okay for it to be potentially using uninitialized memory though, even
+> > if just in the fuzz tests.
+> > 
+> Well, in this particular case things should fail before you even hit the
+> actual processing, so memory contents should be irrelevant really.
+> (by that same reasoning you would not actually hit vectors that don't
+> authenticate, by the way, there was an error in my thinking there)
+
+But the problem is that that's not what's actually happening, right?  "authenc"
+actually does the authentication (of uninitialized memory, in this case) before
+it gets around to failing due to the cbc length restriction.
+
+Anyway, I suggest sending the patch I suggested as 1 of 2 to avoid this case (so
+your patch does not cause test failures), then this patch as 2 of 2.
+
+- Eric
