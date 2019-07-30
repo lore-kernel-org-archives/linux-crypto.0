@@ -2,201 +2,322 @@ Return-Path: <SRS0=RABd=V3=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50136C0650F
-	for <linux-crypto@archiver.kernel.org>; Tue, 30 Jul 2019 18:01:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 481B9C433FF
+	for <linux-crypto@archiver.kernel.org>; Tue, 30 Jul 2019 18:20:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1946D2089E
-	for <linux-crypto@archiver.kernel.org>; Tue, 30 Jul 2019 18:01:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 16D342089E
+	for <linux-crypto@archiver.kernel.org>; Tue, 30 Jul 2019 18:20:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="fbKhNQxz"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="FXvvR/2y"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728827AbfG3SB4 (ORCPT
+        id S1728534AbfG3SQE (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 30 Jul 2019 14:01:56 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:35313 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728722AbfG3SBy (ORCPT
+        Tue, 30 Jul 2019 14:16:04 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:35377 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728581AbfG3SQD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 30 Jul 2019 14:01:54 -0400
-Received: by mail-pg1-f193.google.com with SMTP id s1so24155310pgr.2
-        for <linux-crypto@vger.kernel.org>; Tue, 30 Jul 2019 11:01:53 -0700 (PDT)
+        Tue, 30 Jul 2019 14:16:03 -0400
+Received: by mail-pg1-f194.google.com with SMTP id s1so24174456pgr.2
+        for <linux-crypto@vger.kernel.org>; Tue, 30 Jul 2019 11:16:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=e4oBhvl2JGL/g7znlpJb17wcZ4f4c/GlFLmGamjl13c=;
-        b=fbKhNQxzz82g4sdnAhZ57A0hb0uBcdzsGtvJIewH6J8HFiWd4v1DbjhZme3+FPpHN+
-         CgVrRWW5s0YuozJII/YB+2NZ5r573QGkU38HNUz7maBvW4CAJRPZpo9gRRMOu66NfgT1
-         4s1JAmGCs8uLjMqep+2ShT7MpdeLsB0l8QKaU=
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=fZ2yGRGixrVq89SE/3sUKGnRTFmWEruiAwAYLTHr6iY=;
+        b=FXvvR/2yf25eczobuvXsgNunlgZNY0w3KhFqp/peC1Vfp8XTZDqlFWrAX8IcwcOHaP
+         g/U3o0f467WY9KTNoTrBopxtNFpKP9Ppy1yxmOUhRURRAfQdzNJBbh13/H+MWokPkdY0
+         MsSaYfCKcwFJ5ppHmd2/BC6UTnye7AmtQfA7s=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=e4oBhvl2JGL/g7znlpJb17wcZ4f4c/GlFLmGamjl13c=;
-        b=HWPN0dxAsoELytEEeRXvQKy3l/LgIVFTpS3W0nDL69FFwnH0LeLRmY6GN07aEPt2mc
-         Q2oIEMSdphAWfKo+S7c1qm1fB5qGnWsHoWSGQtE+CXLiHbI3V7GkwwmRBN3gHYkLhPPb
-         rFMv06k4/otPHXnszX2GT1JdjEVsOiOt0uR6hvAhN+Yzms2MPhrFGZb2+iavHmjt9/Jj
-         TJy/qGiELj2oU1zdoP20CTPf6lqEv4c+kIkdfN+HgD7myBvRI52mqSTYrQj/A2pod7Rc
-         i3R7OwgYY6T9+iYMEA44mYqapPy8JsoJ35OuhgsMDbuw8VVNfIoNPoxyRkuFANNmABbe
-         m9LQ==
-X-Gm-Message-State: APjAAAUXT1VFcRdH+ycZVAYg1jihXVnw6wfuJn4OMoaP9UQZJmcrwkNa
-        xhoZvKbADHoK1jJEIHqiWnJVrA==
-X-Google-Smtp-Source: APXvYqxjt+I4v/sdEnywIDMFxpX9dhohJ2h/xcn+2r0A6Nitb41VcNHFgzjYokT3yWbk7qgmF27dvQ==
-X-Received: by 2002:a17:90a:cb12:: with SMTP id z18mr112668727pjt.82.1564509712356;
-        Tue, 30 Jul 2019 11:01:52 -0700 (PDT)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id c7sm7783391pgq.31.2019.07.30.11.01.51
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 30 Jul 2019 11:01:51 -0700 (PDT)
-Date:   Tue, 30 Jul 2019 11:01:50 -0700
-From:   Kees Cook <keescook@chromium.org>
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     Thomas Garnier <thgarnie@chromium.org>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        kernel-hardening@lists.openwall.com, kristen@linux.intel.com,
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=fZ2yGRGixrVq89SE/3sUKGnRTFmWEruiAwAYLTHr6iY=;
+        b=XBrYHl0/wd88tY8vIKpiNXv0PBnlMO+Sy6PGVKhQf1unSaIBjHLdJAiQWSSF3F6k3G
+         CpVPoJchdfeBZIRoRB7S4kvWyIOLkqd1xlEhhxVtq4GSR9fjMsv5pMm0pUpPj1Xv89/b
+         7MdjiDZvrb96N141Lg1cR3zbS0z9fHw2VV8OM/pDCbQLI9XaNlhhKc9ch1nTgIfy4P01
+         qArtm2jSSF3SEjJ7pkaLAunyMkOTsqR64m6DwqJxiHIqcoilMji2z8P4WdwF5IMFxofi
+         ITyLyDmLyluovKjq4WrksXAkOhvO5xyRjJWYpi7bqLl3NQMufy7Ytnag0Dhws2OA3oXa
+         D/gg==
+X-Gm-Message-State: APjAAAVmvUJmV5wR59bVxSCh2uvGYybvpFwgZIZUNQ3iAX1xNLdqcboo
+        YmyGgPpz9zxxm5SntosG6NeDlw==
+X-Google-Smtp-Source: APXvYqyiiAzX8h4LCwCDfWYOHM9e437/81BC/cMc60TLDu9DxFcuvWiVPFE3ffhnCZnbhnBdgGJrvQ==
+X-Received: by 2002:aa7:8383:: with SMTP id u3mr43265233pfm.175.1564510563046;
+        Tue, 30 Jul 2019 11:16:03 -0700 (PDT)
+Received: from smtp.gmail.com ([2620:15c:202:1:fa53:7765:582b:82b9])
+        by smtp.gmail.com with ESMTPSA id g1sm106744083pgg.27.2019.07.30.11.16.02
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Tue, 30 Jul 2019 11:16:02 -0700 (PDT)
+From:   Stephen Boyd <swboyd@chromium.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        Andy Lutomirski <luto@kernel.org>,
-        Juergen Gross <jgross@suse.com>,
-        Alok Kataria <akataria@vmware.com>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Nadav Amit <namit@vmware.com>, Jann Horn <jannh@google.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Feng Tang <feng.tang@intel.com>,
-        Maran Wilson <maran.wilson@oracle.com>,
-        Enrico Weigelt <info@metux.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Alexios Zavras <alexios.zavras@intel.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, linux-pm@vger.kernel.org
-Subject: Re: [PATCH v8 00/11] x86: PIE support to extend KASLR randomization
-Message-ID: <201907301100.90BB865078@keescook>
-References: <20190708174913.123308-1-thgarnie@chromium.org>
+        linux-crypto@vger.kernel.org
+Subject: [PATCH v6 05/57] crypto: Remove dev_err() usage after platform_get_irq()
+Date:   Tue, 30 Jul 2019 11:15:05 -0700
+Message-Id: <20190730181557.90391-6-swboyd@chromium.org>
+X-Mailer: git-send-email 2.22.0.709.g102302147b-goog
+In-Reply-To: <20190730181557.90391-1-swboyd@chromium.org>
+References: <20190730181557.90391-1-swboyd@chromium.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190708174913.123308-1-thgarnie@chromium.org>
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jul 08, 2019 at 10:48:53AM -0700, Thomas Garnier wrote:
-> Splitting the previous series in two. This part contains assembly code
-> changes required for PIE but without any direct dependencies with the
-> rest of the patchset.
-> 
-> Changes:
->  - patch v8 (assembly):
->    - Fix issues in crypto changes (thanks to Eric Biggers).
->    - Remove unnecessary jump table change.
->    - Change author and signoff to chromium email address.
+We don't need dev_err() messages when platform_get_irq() fails now that
+platform_get_irq() prints an error message itself when something goes
+wrong. Let's remove these prints with a simple semantic patch.
 
-With -rc2 done, is this a good time for this to land in -tip? Are there
-more steps needed for review?
+// <smpl>
+@@
+expression ret;
+struct platform_device *E;
+@@
 
-Thanks!
+ret =
+(
+platform_get_irq(E, ...)
+|
+platform_get_irq_byname(E, ...)
+);
 
--Kees
+if ( \( ret < 0 \| ret <= 0 \) )
+{
+(
+-if (ret != -EPROBE_DEFER)
+-{ ...
+-dev_err(...);
+-... }
+|
+...
+-dev_err(...);
+)
+...
+}
+// </smpl>
 
->  - patch v7 (assembly):
->    - Split patchset and reorder changes.
->  - patch v6:
->    - Rebase on latest changes in jump tables and crypto.
->    - Fix wording on couple commits.
->    - Revisit checkpatch warnings.
->    - Moving to @chromium.org.
->  - patch v5:
->    - Adapt new crypto modules for PIE.
->    - Improve per-cpu commit message.
->    - Fix xen 32-bit build error with .quad.
->    - Remove extra code for ftrace.
->  - patch v4:
->    - Simplify early boot by removing global variables.
->    - Modify the mcount location script for __mcount_loc intead of the address
->      read in the ftrace implementation.
->    - Edit commit description to explain better where the kernel can be located.
->    - Streamlined the testing done on each patch proposal. Always testing
->      hibernation, suspend, ftrace and kprobe to ensure no regressions.
->  - patch v3:
->    - Update on message to describe longer term PIE goal.
->    - Minor change on ftrace if condition.
->    - Changed code using xchgq.
->  - patch v2:
->    - Adapt patch to work post KPTI and compiler changes
->    - Redo all performance testing with latest configs and compilers
->    - Simplify mov macro on PIE (MOVABS now)
->    - Reduce GOT footprint
->  - patch v1:
->    - Simplify ftrace implementation.
->    - Use gcc mstack-protector-guard-reg=%gs with PIE when possible.
->  - rfc v3:
->    - Use --emit-relocs instead of -pie to reduce dynamic relocation space on
->      mapped memory. It also simplifies the relocation process.
->    - Move the start the module section next to the kernel. Remove the need for
->      -mcmodel=large on modules. Extends module space from 1 to 2G maximum.
->    - Support for XEN PVH as 32-bit relocations can be ignored with
->      --emit-relocs.
->    - Support for GOT relocations previously done automatically with -pie.
->    - Remove need for dynamic PLT in modules.
->    - Support dymamic GOT for modules.
->  - rfc v2:
->    - Add support for global stack cookie while compiler default to fs without
->      mcmodel=kernel
->    - Change patch 7 to correctly jump out of the identity mapping on kexec load
->      preserve.
-> 
-> These patches make some of the changes necessary to build the kernel as
-> Position Independent Executable (PIE) on x86_64. Another patchset will
-> add the PIE option and larger architecture changes.
-> 
-> The patches:
->  - 1, 3-11: Change in assembly code to be PIE compliant.
->  - 2: Add a new _ASM_MOVABS macro to fetch a symbol address generically.
-> 
-> diffstat:
->  crypto/aegis128-aesni-asm.S         |    6 +-
->  crypto/aegis128l-aesni-asm.S        |    8 +--
->  crypto/aegis256-aesni-asm.S         |    6 +-
->  crypto/aes-x86_64-asm_64.S          |   45 ++++++++++------
->  crypto/aesni-intel_asm.S            |    8 +--
->  crypto/aesni-intel_avx-x86_64.S     |    3 -
->  crypto/camellia-aesni-avx-asm_64.S  |   42 +++++++--------
->  crypto/camellia-aesni-avx2-asm_64.S |   44 ++++++++--------
->  crypto/camellia-x86_64-asm_64.S     |    8 +--
->  crypto/cast5-avx-x86_64-asm_64.S    |   50 ++++++++++--------
->  crypto/cast6-avx-x86_64-asm_64.S    |   44 +++++++++-------
->  crypto/des3_ede-asm_64.S            |   96 ++++++++++++++++++++++++------------
->  crypto/ghash-clmulni-intel_asm.S    |    4 -
->  crypto/glue_helper-asm-avx.S        |    4 -
->  crypto/glue_helper-asm-avx2.S       |    6 +-
->  crypto/morus1280-avx2-asm.S         |    4 -
->  crypto/morus1280-sse2-asm.S         |    8 +--
->  crypto/morus640-sse2-asm.S          |    6 +-
->  crypto/sha256-avx2-asm.S            |   18 ++++--
->  entry/entry_64.S                    |   16 ++++--
->  include/asm/alternative.h           |    6 +-
->  include/asm/asm.h                   |    1 
->  include/asm/paravirt_types.h        |   25 +++++++--
->  include/asm/pm-trace.h              |    2 
->  include/asm/processor.h             |    6 +-
->  kernel/acpi/wakeup_64.S             |   31 ++++++-----
->  kernel/head_64.S                    |   16 +++---
->  kernel/relocate_kernel_64.S         |    2 
->  power/hibernate_asm_64.S            |    4 -
->  29 files changed, 306 insertions(+), 213 deletions(-)
-> 
-> Patchset is based on next-20190708.
-> 
-> 
+While we're here, remove braces on if statements that only have one
+statement (manually).
 
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: <linux-crypto@vger.kernel.org>
+Signed-off-by: Stephen Boyd <swboyd@chromium.org>
+---
+
+Please apply directly to subsystem trees
+
+ drivers/crypto/atmel-aes.c             | 1 -
+ drivers/crypto/atmel-sha.c             | 1 -
+ drivers/crypto/atmel-tdes.c            | 1 -
+ drivers/crypto/ccree/cc_driver.c       | 4 +---
+ drivers/crypto/img-hash.c              | 1 -
+ drivers/crypto/mediatek/mtk-platform.c | 4 +---
+ drivers/crypto/mxs-dcp.c               | 8 ++------
+ drivers/crypto/omap-aes.c              | 1 -
+ drivers/crypto/omap-des.c              | 1 -
+ drivers/crypto/omap-sham.c             | 1 -
+ drivers/crypto/sahara.c                | 4 +---
+ drivers/crypto/stm32/stm32-cryp.c      | 4 +---
+ drivers/crypto/stm32/stm32-hash.c      | 4 +---
+ 13 files changed, 7 insertions(+), 28 deletions(-)
+
+diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
+index 2b7af44c7b85..026f193556f9 100644
+--- a/drivers/crypto/atmel-aes.c
++++ b/drivers/crypto/atmel-aes.c
+@@ -2673,7 +2673,6 @@ static int atmel_aes_probe(struct platform_device *pdev)
+ 	/* Get the IRQ */
+ 	aes_dd->irq = platform_get_irq(pdev,  0);
+ 	if (aes_dd->irq < 0) {
+-		dev_err(dev, "no IRQ resource info\n");
+ 		err = aes_dd->irq;
+ 		goto res_err;
+ 	}
+diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
+index ab0cfe748931..84cb8748a795 100644
+--- a/drivers/crypto/atmel-sha.c
++++ b/drivers/crypto/atmel-sha.c
+@@ -2779,7 +2779,6 @@ static int atmel_sha_probe(struct platform_device *pdev)
+ 	/* Get the IRQ */
+ 	sha_dd->irq = platform_get_irq(pdev,  0);
+ 	if (sha_dd->irq < 0) {
+-		dev_err(dev, "no IRQ resource info\n");
+ 		err = sha_dd->irq;
+ 		goto res_err;
+ 	}
+diff --git a/drivers/crypto/atmel-tdes.c b/drivers/crypto/atmel-tdes.c
+index fa76620281e8..6256883a89ed 100644
+--- a/drivers/crypto/atmel-tdes.c
++++ b/drivers/crypto/atmel-tdes.c
+@@ -1281,7 +1281,6 @@ static int atmel_tdes_probe(struct platform_device *pdev)
+ 	/* Get the IRQ */
+ 	tdes_dd->irq = platform_get_irq(pdev,  0);
+ 	if (tdes_dd->irq < 0) {
+-		dev_err(dev, "no IRQ resource info\n");
+ 		err = tdes_dd->irq;
+ 		goto res_err;
+ 	}
+diff --git a/drivers/crypto/ccree/cc_driver.c b/drivers/crypto/ccree/cc_driver.c
+index 980aa04b655b..d611cfe6e8e5 100644
+--- a/drivers/crypto/ccree/cc_driver.c
++++ b/drivers/crypto/ccree/cc_driver.c
+@@ -339,10 +339,8 @@ static int init_cc_resources(struct platform_device *plat_dev)
+ 
+ 	/* Then IRQ */
+ 	new_drvdata->irq = platform_get_irq(plat_dev, 0);
+-	if (new_drvdata->irq < 0) {
+-		dev_err(dev, "Failed getting IRQ resource\n");
++	if (new_drvdata->irq < 0)
+ 		return new_drvdata->irq;
+-	}
+ 
+ 	init_completion(&new_drvdata->hw_queue_avail);
+ 
+diff --git a/drivers/crypto/img-hash.c b/drivers/crypto/img-hash.c
+index d27c812c3d8d..6754eaafdc85 100644
+--- a/drivers/crypto/img-hash.c
++++ b/drivers/crypto/img-hash.c
+@@ -980,7 +980,6 @@ static int img_hash_probe(struct platform_device *pdev)
+ 
+ 	irq = platform_get_irq(pdev, 0);
+ 	if (irq < 0) {
+-		dev_err(dev, "no IRQ resource info\n");
+ 		err = irq;
+ 		goto res_err;
+ 	}
+diff --git a/drivers/crypto/mediatek/mtk-platform.c b/drivers/crypto/mediatek/mtk-platform.c
+index 125318a88cd4..4f43318ca14b 100644
+--- a/drivers/crypto/mediatek/mtk-platform.c
++++ b/drivers/crypto/mediatek/mtk-platform.c
+@@ -495,10 +495,8 @@ static int mtk_crypto_probe(struct platform_device *pdev)
+ 
+ 	for (i = 0; i < MTK_IRQ_NUM; i++) {
+ 		cryp->irq[i] = platform_get_irq(pdev, i);
+-		if (cryp->irq[i] < 0) {
+-			dev_err(cryp->dev, "no IRQ:%d resource info\n", i);
++		if (cryp->irq[i] < 0)
+ 			return cryp->irq[i];
+-		}
+ 	}
+ 
+ 	cryp->clk_cryp = devm_clk_get(&pdev->dev, "cryp");
+diff --git a/drivers/crypto/mxs-dcp.c b/drivers/crypto/mxs-dcp.c
+index f1fa637cb029..bf8d2197bc11 100644
+--- a/drivers/crypto/mxs-dcp.c
++++ b/drivers/crypto/mxs-dcp.c
+@@ -994,16 +994,12 @@ static int mxs_dcp_probe(struct platform_device *pdev)
+ 	}
+ 
+ 	dcp_vmi_irq = platform_get_irq(pdev, 0);
+-	if (dcp_vmi_irq < 0) {
+-		dev_err(dev, "Failed to get IRQ: (%d)!\n", dcp_vmi_irq);
++	if (dcp_vmi_irq < 0)
+ 		return dcp_vmi_irq;
+-	}
+ 
+ 	dcp_irq = platform_get_irq(pdev, 1);
+-	if (dcp_irq < 0) {
+-		dev_err(dev, "Failed to get IRQ: (%d)!\n", dcp_irq);
++	if (dcp_irq < 0)
+ 		return dcp_irq;
+-	}
+ 
+ 	sdcp = devm_kzalloc(dev, sizeof(*sdcp), GFP_KERNEL);
+ 	if (!sdcp)
+diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
+index 45a4647f7030..2f53fbb74100 100644
+--- a/drivers/crypto/omap-aes.c
++++ b/drivers/crypto/omap-aes.c
+@@ -1180,7 +1180,6 @@ static int omap_aes_probe(struct platform_device *pdev)
+ 
+ 		irq = platform_get_irq(pdev, 0);
+ 		if (irq < 0) {
+-			dev_err(dev, "can't get IRQ resource\n");
+ 			err = irq;
+ 			goto err_irq;
+ 		}
+diff --git a/drivers/crypto/omap-des.c b/drivers/crypto/omap-des.c
+index 1ee69a979677..484a693122af 100644
+--- a/drivers/crypto/omap-des.c
++++ b/drivers/crypto/omap-des.c
+@@ -1049,7 +1049,6 @@ static int omap_des_probe(struct platform_device *pdev)
+ 
+ 		irq = platform_get_irq(pdev, 0);
+ 		if (irq < 0) {
+-			dev_err(dev, "can't get IRQ resource: %d\n", irq);
+ 			err = irq;
+ 			goto err_irq;
+ 		}
+diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
+index e8e2907bd9f4..ac80bc6af093 100644
+--- a/drivers/crypto/omap-sham.c
++++ b/drivers/crypto/omap-sham.c
+@@ -1989,7 +1989,6 @@ static int omap_sham_get_res_pdev(struct omap_sham_dev *dd,
+ 	/* Get the IRQ */
+ 	dd->irq = platform_get_irq(pdev, 0);
+ 	if (dd->irq < 0) {
+-		dev_err(dev, "no IRQ resource info\n");
+ 		err = dd->irq;
+ 		goto err;
+ 	}
+diff --git a/drivers/crypto/sahara.c b/drivers/crypto/sahara.c
+index b0b8e3d48aef..8ac8ec6decd5 100644
+--- a/drivers/crypto/sahara.c
++++ b/drivers/crypto/sahara.c
+@@ -1403,10 +1403,8 @@ static int sahara_probe(struct platform_device *pdev)
+ 
+ 	/* Get the IRQ */
+ 	irq = platform_get_irq(pdev,  0);
+-	if (irq < 0) {
+-		dev_err(&pdev->dev, "failed to get irq resource\n");
++	if (irq < 0)
+ 		return irq;
+-	}
+ 
+ 	err = devm_request_irq(&pdev->dev, irq, sahara_irq_handler,
+ 			       0, dev_name(&pdev->dev), dev);
+diff --git a/drivers/crypto/stm32/stm32-cryp.c b/drivers/crypto/stm32/stm32-cryp.c
+index 98ae02826e8f..72f86063b046 100644
+--- a/drivers/crypto/stm32/stm32-cryp.c
++++ b/drivers/crypto/stm32/stm32-cryp.c
+@@ -1975,10 +1975,8 @@ static int stm32_cryp_probe(struct platform_device *pdev)
+ 		return PTR_ERR(cryp->regs);
+ 
+ 	irq = platform_get_irq(pdev, 0);
+-	if (irq < 0) {
+-		dev_err(dev, "Cannot get IRQ resource\n");
++	if (irq < 0)
+ 		return irq;
+-	}
+ 
+ 	ret = devm_request_threaded_irq(dev, irq, stm32_cryp_irq,
+ 					stm32_cryp_irq_thread, IRQF_ONESHOT,
+diff --git a/drivers/crypto/stm32/stm32-hash.c b/drivers/crypto/stm32/stm32-hash.c
+index 2b70d8796f25..cfc8e0e37bee 100644
+--- a/drivers/crypto/stm32/stm32-hash.c
++++ b/drivers/crypto/stm32/stm32-hash.c
+@@ -1450,10 +1450,8 @@ static int stm32_hash_probe(struct platform_device *pdev)
+ 		return ret;
+ 
+ 	irq = platform_get_irq(pdev, 0);
+-	if (irq < 0) {
+-		dev_err(dev, "Cannot get IRQ resource\n");
++	if (irq < 0)
+ 		return irq;
+-	}
+ 
+ 	ret = devm_request_threaded_irq(dev, irq, stm32_hash_irq_handler,
+ 					stm32_hash_irq_thread, IRQF_ONESHOT,
 -- 
-Kees Cook
+Sent by a computer through tubes
+
