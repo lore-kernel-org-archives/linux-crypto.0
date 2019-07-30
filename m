@@ -1,155 +1,130 @@
-Return-Path: <SRS0=zv6R=V2=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=RABd=V3=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17F23C76186
-	for <linux-crypto@archiver.kernel.org>; Mon, 29 Jul 2019 23:53:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0117BC76186
+	for <linux-crypto@archiver.kernel.org>; Tue, 30 Jul 2019 00:17:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E2C522073F
-	for <linux-crypto@archiver.kernel.org>; Mon, 29 Jul 2019 23:53:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CC3CD208E3
+	for <linux-crypto@archiver.kernel.org>; Tue, 30 Jul 2019 00:17:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1564444390;
-	bh=UN0jOoxpDETHiH+HWW//MyP8iFqFuu/5XMZ9YO3sgg4=;
+	s=default; t=1564445846;
+	bh=uNWL3nAuQhLKy7P4HMS9rxU4DNFN9LxDKnVvSzSoYto=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=iYV2xmo1jVXwnOrEH7FRECT5p+8zhjOL4FxYGs4p/NZLh4Fl5nLmY0rKKkZjtr/4i
-	 FtRAYyTVVjF2n94EooDVld87Um7OIexsUEWyZv8svib5rlgpLBhdJLAmxWc3kKACDz
-	 vqsfsBmDMonusRFdhwsMU2+M2YL/jCc/kfsKHnXY=
+	b=CeFJg+0tXrmIg3QD51lMdMRA2Ittuh8ENvgJEm7C45qeUwgaLV64dYFjqH47zoKZB
+	 RmeRYTTgDy6rBUAEzfX+nYYbJ9gui1NsvKQ4d9+ZQkV02HQKRfn+QWL3bpJVNd1FqI
+	 GaNgEeEV3pqvh+5f0BVli50uQQ+/cbZiH64x9yFc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728808AbfG2XxI (ORCPT
+        id S1729547AbfG3ARZ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 29 Jul 2019 19:53:08 -0400
-Received: from mail.kernel.org ([198.145.29.99]:40818 "EHLO mail.kernel.org"
+        Mon, 29 Jul 2019 20:17:25 -0400
+Received: from mail.kernel.org ([198.145.29.99]:44084 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728275AbfG2XxH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 29 Jul 2019 19:53:07 -0400
+        id S1728195AbfG3ARZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 29 Jul 2019 20:17:25 -0400
 Received: from gmail.com (unknown [104.132.1.77])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 1BC3D206BA;
-        Mon, 29 Jul 2019 23:53:07 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 7A3DF20679;
+        Tue, 30 Jul 2019 00:17:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1564444387;
-        bh=UN0jOoxpDETHiH+HWW//MyP8iFqFuu/5XMZ9YO3sgg4=;
+        s=default; t=1564445844;
+        bh=uNWL3nAuQhLKy7P4HMS9rxU4DNFN9LxDKnVvSzSoYto=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=x1jdAsxTe2OKiJVPF5gwp1rKTqjyRdOYB12MsQSJbzHsPQ1OmbVnwCb6uxUcLKbzO
-         hrYtZ4OYZB9JBhCFCiMI3DgGefcu34JLdLaaeZM0jKRM0o7wh9UCwHp5uWa0mKAYYM
-         uMNERPWWWMlmiDTBfr6dI1fQvVONBCE26V5V+CIE=
-Date:   Mon, 29 Jul 2019 16:53:05 -0700
+        b=YaED0/ZtySKKxDafTCEfd/G3ixQs2UTwJLxrbreciePD0eCLbHCViaskq2OvWUa/s
+         Yd22oSXpRkbe0bOd8fhpeL2KlCOicZEEqbd1Mw3/U4/6J+nCVm2Eo1GFP/NKpz4Pze
+         LIkVIGKmXwxL08L8cbnwW+o7hAJLrN9T/rnOgTyY=
+Date:   Mon, 29 Jul 2019 17:17:23 -0700
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Pascal van Leeuwen <pascalvanl@gmail.com>,
+Cc:     Pascal van Leeuwen <pascalvanl@gmail.com>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
         "davem@davemloft.net" <davem@davemloft.net>
 Subject: Re: [PATCH] crypto: testmgr - Improve randomization of params for
  AEAD fuzz testing
-Message-ID: <20190729235304.GJ169027@gmail.com>
+Message-ID: <20190730001722.GK169027@gmail.com>
 Mail-Followup-To: Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
         Pascal van Leeuwen <pascalvanl@gmail.com>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
         "davem@davemloft.net" <davem@davemloft.net>
 References: <1563960917-8236-1-git-send-email-pvanleeuwen@verimatrix.com>
  <20190728173040.GA699@sol.localdomain>
  <MN2PR20MB29737962BC74CCA790470C0BCADD0@MN2PR20MB2973.namprd20.prod.outlook.com>
  <20190729181738.GB169027@gmail.com>
  <MN2PR20MB2973C131062F1D1CABA77015CADD0@MN2PR20MB2973.namprd20.prod.outlook.com>
- <20190729223112.GA7529@gondor.apana.org.au>
- <MN2PR20MB29736A0F55875B91587142D9CADD0@MN2PR20MB2973.namprd20.prod.outlook.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <MN2PR20MB29736A0F55875B91587142D9CADD0@MN2PR20MB2973.namprd20.prod.outlook.com>
+In-Reply-To: <MN2PR20MB2973C131062F1D1CABA77015CADD0@MN2PR20MB2973.namprd20.prod.outlook.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jul 29, 2019 at 10:49:38PM +0000, Pascal Van Leeuwen wrote:
-> Herbert,
-> 
-> > -----Original Message-----
-> > From: Herbert Xu <herbert@gondor.apana.org.au>
-> > Sent: Tuesday, July 30, 2019 12:31 AM
-> > To: Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
-> > Cc: Eric Biggers <ebiggers@kernel.org>; Pascal van Leeuwen <pascalvanl@gmail.com>; linux-
-> > crypto@vger.kernel.org; davem@davemloft.net
-> > Subject: Re: [PATCH] crypto: testmgr - Improve randomization of params for AEAD fuzz testing
-> > 
-> > On Mon, Jul 29, 2019 at 10:16:48PM +0000, Pascal Van Leeuwen wrote:
-> > >
-> > > > EINVAL is for invalid lengths while EBADMSG is for inauthentic inputs.
-> > > > Inauthentic test vectors aren't yet automatically generated (even after this
-> > > > patch), so I don't think EBADMSG should be seen here.  Are you sure there isn't
-> > > > a bug in your patch that's causing this?
+On Mon, Jul 29, 2019 at 10:16:48PM +0000, Pascal Van Leeuwen wrote:
+> > > > Note that the "empty test suite" message shouldn't be printed (especially not at
+> > > > KERN_ERR level!) if it's working as intended.
 > > > >
-> > > As far as I understand it, the output of the encryption is fed back in to
-> > > decrypt. However, if the encryption didn't work due to blocksize mismatch,
-> > > there would not be any valid encrypted and authenticated data written out.
-> > > So, if the (generic) driver checks that for decryption, it would result in
-> > > -EINVAL. If it wouldn't check that, it would try to decrypt and authentica
-> > > te the data, which would almost certainly result in a tag mismatch and
-> > > thus an -EBADMSG error being reported.
+> > > That's not my code, that was already there. I already got these messages before my
+> > > modifications, for some ciphersuites. Of course if we don't want that, we can make
+> > > it a pr_warn pr_dbg?
+> > 
+> > I didn't get these error messages before this patch.  They start showing up
+> > because this patch changes alg_test_null to alg_test_aead for algorithms with no
+> > test vectors.
+> >
+> Ok, I guess I caused it for some additional ciphersuites by forcing them
+> to be at least fuzz tested. But there were some ciphersuites without test
+> vectors already reporting this in my situation because they did not point
+> to alg_test_null in the first place. 
+
+Are you sure?  I don't see anything that had no test vectors but didn't use
+alg_test_null.
+
+> So it wasn't entirely clear what the
+> whole intention was in the first place, as it wasn't consistent.
+> If we all agree on the logging level we want for this message, then I can
+> make that change.
+
+I suggest at least downgrading it to KERN_INFO, since that's the level used for
+logging that there wasn't any test description found at all:
+
+	printk(KERN_INFO "alg: No test for %s (%s)\n", alg, driver);
+
+> 
+> > > > Why not put these new fields in the existing 'struct aead_test_suite'?
+> > > >
+> > > > I don't see the point of the separate 'params' struct.  It just confuses things.
+> > > >
+> > > Mostly because I'm not that familiar with C datastructures (I'm not a programmer
+> > > and this is pretty much my first serious experience with C), so I didn't know how
+> > > to do that / didn't want to break anything else :-)
 > > >
-> > > So actually, the witnessed issue can be perfectly explained from a missing
-> > > block size check in aesni.
+> > > So if you can provide some example on how to do that ...
 > > 
-> > The same input can indeed fail for multiple reasons.  I think in
-> > such cases it is unreasonable to expect all implementations to
-> > return the same error value.
+> > I'm simply suggesting adding the fields of 'struct aead_test_params' to
+> > 'struct aead_test_suite'.
 > > 
-> Hmmm ... first off, testmgr expects error codes to match exactly. So if
-> you're saying that's not always the case, it would need to be changed.
-> (but then, what difference would still be acceptable?)
-> But so far it seems to have worked pretty well, except for this now.
-> 
-> You're the expert, but shouldn't there be some priority to the checks
-> being performed? To me, it seems reasonable to do things like length
-> checks prior to even *starting* decryption and authentication.
-> Therefore, it makes more sense to get -EINVAL than -EBADMSG in this 
-> case. IMHO you should only get -EBADMSG if the message was properly
-> formatted, but the tags eventually mismatched. From a security point
-> of view it can be very important to have a very clear distinction
-> between those 2 cases.
+> My next mail tried to explain why that's not so simple ...
+
+The only actual issue is that you can't reuse the __VECS() macro because it adds
+an extra level of braces, right?
+
+> Actually, the patch *should* (didn't try yet) make it work for both: if both
+> alen and clen are valid (>=0) then it creates a key blob from those ranges. 
+> If only clen is valid (>=0) but a alen is not (i.e., -1), then it will just
+> generate a random key the "normal" way with length clen.
+> So, for authenc you define both ranges, for other AEAD you define only a
+> cipher key length range with the auth key range count at 0.
 > 
 
-Oh, I see.  Currently the fuzz tests assume that if encryption fails with an
-error (such as EINVAL), then decryption fails with that same error.
-
-Regardless of what we think the correct decryption error is, running the
-decryption test at all in this case is sort of broken, since the ciphertext
-buffer was never initialized.  So for now we probably should just sidestep this
-issue by skipping the decryption test if encryption failed, like this:
-
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 96e5923889b9c1..0413bdad9f6974 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -2330,10 +2330,12 @@ static int test_aead_vs_generic_impl(const char *driver,
- 					req, tsgls);
- 		if (err)
- 			goto out;
--		err = test_aead_vec_cfg(driver, DECRYPT, &vec, vec_name, cfg,
--					req, tsgls);
--		if (err)
--			goto out;
-+		if (vec.crypt_error != 0) {
-+			err = test_aead_vec_cfg(driver, DECRYPT, &vec, vec_name,
-+						cfg, req, tsgls);
-+			if (err)
-+				goto out;
-+		}
- 		cond_resched();
- 	}
- 	err = 0;
-
-I'm planning to (at some point) update the AEAD tests to intentionally generate
-some inauthentic inputs, but that will take some more work.
+Okay, I guess that makes sense.  It wasn't obvious to me though.
 
 - Eric
