@@ -2,126 +2,147 @@ Return-Path: <SRS0=RABd=V3=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E767C433FF
-	for <linux-crypto@archiver.kernel.org>; Tue, 30 Jul 2019 20:07:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2163C433FF
+	for <linux-crypto@archiver.kernel.org>; Tue, 30 Jul 2019 20:15:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0DD182087F
-	for <linux-crypto@archiver.kernel.org>; Tue, 30 Jul 2019 20:07:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1564517244;
-	bh=f+Eu4tb5w3GVrB5631a9gp39VYC92cikasjorCsdeC4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=ooC2ll3MER8uJmc99VtBKwpijnmPQooHaSJcpL1YX/EbBfMNDVD/EclkB2NO+wfoP
-	 MA2oyvyi23tFpu6hNPrZSeq3EW7zKcgX+B6NF2Z5tlpQzNxKnlPNNigOt67EFPwI7Y
-	 NdZ22uI0JNXMT80uaTAS/GgkUNHoGdB1KgrSPHpg=
+	by mail.kernel.org (Postfix) with ESMTP id A7A1720693
+	for <linux-crypto@archiver.kernel.org>; Tue, 30 Jul 2019 20:15:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel-com.20150623.gappssmtp.com header.i=@intel-com.20150623.gappssmtp.com header.b="Zwx0RQpM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727357AbfG3UHX (ORCPT
+        id S1728054AbfG3UPS (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 30 Jul 2019 16:07:23 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59404 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726174AbfG3UHX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 30 Jul 2019 16:07:23 -0400
-Received: from gmail.com (unknown [104.132.1.77])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 494ED20693;
-        Tue, 30 Jul 2019 20:07:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1564517242;
-        bh=f+Eu4tb5w3GVrB5631a9gp39VYC92cikasjorCsdeC4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=WrCYn36EKyg1VtwvxOoJ9n1a/1wvy7UGA/zco2sqr9SYgiYWuyao/QbLYA+rA61vy
-         /saIKnI4qn8V/ma3Gy4WWtcngJOS+QEuG5clmu9iUj9BZOQtfPgJGdMivhOHcbQmYD
-         ahrXjcvoDxudjJb6olUrSdmjzMmXhg3RieQwZOrc=
-Date:   Tue, 30 Jul 2019 13:07:20 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Hans de Goede <hdegoede@redhat.com>
-Cc:     Stephan Mueller <smueller@chronox.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Andy Lutomirski <luto@kernel.org>,
-        linux-crypto@vger.kernel.org,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [RFC 3/3] crypto/sha256: Build the SHA256 core separately from
- the crypto module
-Message-ID: <20190730200719.GB27287@gmail.com>
-Mail-Followup-To: Hans de Goede <hdegoede@redhat.com>,
-        Stephan Mueller <smueller@chronox.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Andy Lutomirski <luto@kernel.org>, linux-crypto@vger.kernel.org,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-References: <20190730123835.10283-1-hdegoede@redhat.com>
- <20190730123835.10283-4-hdegoede@redhat.com>
- <4384403.bebDo606LH@tauon.chronox.de>
- <20190730160335.GA27287@gmail.com>
- <cb888bfa-dd46-de7a-3b90-b54fa79fa3d4@redhat.com>
+        Tue, 30 Jul 2019 16:15:18 -0400
+Received: from mail-ot1-f68.google.com ([209.85.210.68]:38551 "EHLO
+        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727958AbfG3UPF (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 30 Jul 2019 16:15:05 -0400
+Received: by mail-ot1-f68.google.com with SMTP id d17so67723024oth.5
+        for <linux-crypto@vger.kernel.org>; Tue, 30 Jul 2019 13:15:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=intel-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=5RzApq6XFoztBnIqNk8vSnTrtbUfODyGJJfunMohfoM=;
+        b=Zwx0RQpMg/Mqj/9z5S89A3ZEJVMpYC9h+xxOXAaZcuU5PCAM8m9Gqaz//RnKDBGDqW
+         9liyDLB1BwWzU+ZNcxIkUlAhEM4dwaxEWMetA5zngGXxvLUm9KzmX8yqMCHjIc+8qA1I
+         4Kz3jT1Z/FAcCfiuMTNuiLT9z2kiwc9S0x8YZz6OVlR8h69bqZIY4y5U2CziwyfAHt6S
+         8CcPZTmDK53Mwk0qwS3iX6X/MjsfAEfTAQNYo9qJOCNeLP9BFCn9fMgZ4bp/B5yi3zOB
+         uh6pK4X9QLjcA5W2PzdnflMG8qYA3C40MW87vpeyNAEv23qLtzsWi1Ofnp3dkIf+XH59
+         Buzg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=5RzApq6XFoztBnIqNk8vSnTrtbUfODyGJJfunMohfoM=;
+        b=JbmcW9Ulv1MU+3w3ksde9EXT+UoiWl2N0zN0qfg74AzyIdHFLUTNaX2XBfk7Mtf8yy
+         fWsC0fllw47CAqhPlrV13K3X9gn0ZzQWs9byxy3UtT/tDI7QDc3BZE6tw1BHGRZIpbk8
+         KwULM4jroTU093UxUjJoMDOOGUPJmyGKN0KnDCkZoh90XbyhI2C0h8rj9TUitAZq569k
+         YS5N1RdKqz988l344VbVUze4g9y1ABMpOTOhOLcKTQGLVC8tGQWZInOIAbqtubMldt9r
+         ST4mb3bXv9eivaRYZzlSWUCVoAXuYVeJF72+KVo+ptMQzhFQdcZTstszQUvMgGUXEtua
+         qEzA==
+X-Gm-Message-State: APjAAAXF5tx90M55kWD8+LvfusG8yFit14l+T1zPRHRHkO8UCO47Y3QD
+        yLrqMduHoYfXRPOLafU4ag7cWQwg4CcU74SZDCb2RQ==
+X-Google-Smtp-Source: APXvYqw9ObVuL9+XuGR4o0J2QBLrDkVcN3aYitNJvsGPbv5ZPcYvxRI6eCPCNx+pUD4yOvd0Fq+ICTQ9s+BKXhNpUpI=
+X-Received: by 2002:a9d:7248:: with SMTP id a8mr23671169otk.363.1564517704838;
+ Tue, 30 Jul 2019 13:15:04 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cb888bfa-dd46-de7a-3b90-b54fa79fa3d4@redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <20190730192552.4014288-1-arnd@arndb.de> <20190730195819.901457-1-arnd@arndb.de>
+In-Reply-To: <20190730195819.901457-1-arnd@arndb.de>
+From:   Dan Williams <dan.j.williams@intel.com>
+Date:   Tue, 30 Jul 2019 13:14:52 -0700
+Message-ID: <CAPcyv4i_nHzV155RcgnAQ189aq2Lfd2g8pA1D5NbZqo9E_u+Dw@mail.gmail.com>
+Subject: Re: [PATCH v5 13/29] compat_ioctl: move more drivers to compat_ptr_ioctl
+To:     Arnd Bergmann <arnd@arndb.de>
+Cc:     Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-iio@vger.kernel.org, Daniel Vetter <daniel.vetter@ffwll.ch>,
+        linux-pci@vger.kernel.org, linux-nvme@lists.infradead.org,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        sparclinux@vger.kernel.org,
+        Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
+        linux-scsi <linux-scsi@vger.kernel.org>,
+        linux-nvdimm <linux-nvdimm@lists.01.org>,
+        linux-rdma <linux-rdma@vger.kernel.org>, qat-linux@intel.com,
+        amd-gfx list <amd-gfx@lists.freedesktop.org>,
+        Jason Gunthorpe <jgg@mellanox.com>,
+        linux-input@vger.kernel.org, Darren Hart <dvhart@infradead.org>,
+        "Linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
+        linux-remoteproc@vger.kernel.org,
+        "moderated list:DMA BUFFER SHARING FRAMEWORK" 
+        <linaro-mm-sig@lists.linaro.org>,
+        Maling list - DRI developers 
+        <dri-devel@lists.freedesktop.org>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        David Sterba <dsterba@suse.com>,
+        platform-driver-x86@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        USB list <linux-usb@vger.kernel.org>,
+        Linux Wireless List <linux-wireless@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        tee-dev@lists.linaro.org,
+        linux-crypto <linux-crypto@vger.kernel.org>,
+        Netdev <netdev@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-btrfs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jul 30, 2019 at 06:07:54PM +0200, Hans de Goede wrote:
-> Hi,
-> 
-> On 30-07-19 18:03, Eric Biggers wrote:
-> > On Tue, Jul 30, 2019 at 03:15:35PM +0200, Stephan Mueller wrote:
-> > > Am Dienstag, 30. Juli 2019, 14:38:35 CEST schrieb Hans de Goede:
-> > > 
-> > > Hi Hans,
-> > > 
-> > > > From: Andy Lutomirski <luto@kernel.org>
-> > > > 
-> > > > This just moves code around -- no code changes in this patch.  This
-> > > > wil let BPF-based tracing link against the SHA256 core code without
-> > > > depending on the crypto core.
-> > > > 
-> > > > Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> > > > Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> > > > Signed-off-by: Andy Lutomirski <luto@kernel.org>
-> > > > ---
-> > > >   crypto/Kconfig                               |   8 +
-> > > >   crypto/Makefile                              |   1 +
-> > > >   crypto/{sha256_generic.c => sha256_direct.c} | 103 +--------
-> > > 
-> > > There is a similar standalone code present for SHA-1 or ChaCha20. However,
-> > > this code lives in lib/.
-> > > 
-> > > Thus, shouldn't the SHA-256 core code be moved to lib/ as well?
-> > > 
-> > > Ciao
-> > > Stephan
-> > > 
-> > > 
-> > 
-> > What's wrong with lib/sha256.c?  It's already there.
-> 
-> That is currently not build under lib/ it is only build as part of
-> the helper executable which deals with transitioning from one kernel to
-> the next on kexec, specifically it is used by arch/x86/purgatory/purgatory.c
-> and also be the s390 purgatory code.
-> 
-> Since the purgatory use is in a separate binary / name space AFAICT, we
-> could add sha256.o to lib/Makefile and then I could use that, but then the
-> normal kernel image would have 2 SHA256 implementations.
-> 
+On Tue, Jul 30, 2019 at 12:59 PM Arnd Bergmann <arnd@arndb.de> wrote:
+>
+> The .ioctl and .compat_ioctl file operations have the same prototype so
+> they can both point to the same function, which works great almost all
+> the time when all the commands are compatible.
+>
+> One exception is the s390 architecture, where a compat pointer is only
+> 31 bit wide, and converting it into a 64-bit pointer requires calling
+> compat_ptr(). Most drivers here will never run in s390, but since we now
+> have a generic helper for it, it's easy enough to use it consistently.
+>
+> I double-checked all these drivers to ensure that all ioctl arguments
+> are used as pointers or are ignored, but are not interpreted as integer
+> values.
+>
+> Acked-by: Jason Gunthorpe <jgg@mellanox.com>
+> Acked-by: Daniel Vetter <daniel.vetter@ffwll.ch>
+> Acked-by: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
+> Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Acked-by: David Sterba <dsterba@suse.com>
+> Acked-by: Darren Hart (VMware) <dvhart@infradead.org>
+> Acked-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+> Acked-by: Bjorn Andersson <bjorn.andersson@linaro.org>
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+>  drivers/nvdimm/bus.c                        | 4 ++--
+[..]
+> diff --git a/drivers/nvdimm/bus.c b/drivers/nvdimm/bus.c
+> index 798c5c4aea9c..6ca142d833ab 100644
+> --- a/drivers/nvdimm/bus.c
+> +++ b/drivers/nvdimm/bus.c
+> @@ -1229,7 +1229,7 @@ static const struct file_operations nvdimm_bus_fops = {
+>         .owner = THIS_MODULE,
+>         .open = nd_open,
+>         .unlocked_ioctl = bus_ioctl,
+> -       .compat_ioctl = bus_ioctl,
+> +       .compat_ioctl = compat_ptr_ioctl,
+>         .llseek = noop_llseek,
+>  };
+>
+> @@ -1237,7 +1237,7 @@ static const struct file_operations nvdimm_fops = {
+>         .owner = THIS_MODULE,
+>         .open = nd_open,
+>         .unlocked_ioctl = dimm_ioctl,
+> -       .compat_ioctl = dimm_ioctl,
+> +       .compat_ioctl = compat_ptr_ioctl,
+>         .llseek = noop_llseek,
+>  };
 
-Well, seems like the solution needs to involve unifying the implementations.
-
-Note that Ard Biesheuvel recently added the arc4 and aes algorithms to
-lib/crypto/, with options CONFIG_CRYPTO_LIB_ARC4 and CONFIG_CRYPTO_LIB_AES.  How
-about following the same convention, rather than doing everything slightly
-differently w.r.t. code organization, function naming, Kconfig option, etc.?
-
-- Eric
+Acked-by: Dan Williams <dan.j.williams@intel.com>
