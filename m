@@ -7,27 +7,27 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD211C0650F
-	for <linux-crypto@archiver.kernel.org>; Tue, 30 Jul 2019 11:07:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CD64C433FF
+	for <linux-crypto@archiver.kernel.org>; Tue, 30 Jul 2019 11:07:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BD01D20693
-	for <linux-crypto@archiver.kernel.org>; Tue, 30 Jul 2019 11:07:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4BF5320693
+	for <linux-crypto@archiver.kernel.org>; Tue, 30 Jul 2019 11:07:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729654AbfG3LHX (ORCPT
+        id S1730364AbfG3LGz (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 30 Jul 2019 07:07:23 -0400
-Received: from inva020.nxp.com ([92.121.34.13]:37056 "EHLO inva020.nxp.com"
+        Tue, 30 Jul 2019 07:06:55 -0400
+Received: from inva021.nxp.com ([92.121.34.21]:55642 "EHLO inva021.nxp.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730306AbfG3LG4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 30 Jul 2019 07:06:56 -0400
-Received: from inva020.nxp.com (localhost [127.0.0.1])
-        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 100E61A067C;
-        Tue, 30 Jul 2019 13:06:53 +0200 (CEST)
+        id S1730305AbfG3LGz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 30 Jul 2019 07:06:55 -0400
+Received: from inva021.nxp.com (localhost [127.0.0.1])
+        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 8C832200672;
+        Tue, 30 Jul 2019 13:06:52 +0200 (CEST)
 Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
-        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 029B91A0676;
-        Tue, 30 Jul 2019 13:06:53 +0200 (CEST)
+        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 7EF0C20066A;
+        Tue, 30 Jul 2019 13:06:52 +0200 (CEST)
 Received: from lorenz.ea.freescale.net (lorenz.ea.freescale.net [10.171.71.5])
-        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 978B6204D6;
+        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 152E9204D6;
         Tue, 30 Jul 2019 13:06:52 +0200 (CEST)
 From:   Iuliana Prodan <iuliana.prodan@nxp.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
@@ -36,236 +36,126 @@ To:     Herbert Xu <herbert@gondor.apana.org.au>,
 Cc:     "David S. Miller" <davem@davemloft.net>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-imx <linux-imx@nxp.com>
-Subject: [PATCH v4 09/14] crypto: caam - keep both virtual and dma key addresses
-Date:   Tue, 30 Jul 2019 14:06:40 +0300
-Message-Id: <1564484805-28735-10-git-send-email-iuliana.prodan@nxp.com>
+Subject: [PATCH v4 08/14] crypto: caam - update rfc4106 sh desc to support zero length input
+Date:   Tue, 30 Jul 2019 14:06:39 +0300
+Message-Id: <1564484805-28735-9-git-send-email-iuliana.prodan@nxp.com>
 X-Mailer: git-send-email 2.1.0
 In-Reply-To: <1564484805-28735-1-git-send-email-iuliana.prodan@nxp.com>
 References: <1564484805-28735-1-git-send-email-iuliana.prodan@nxp.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Horia Geantă <horia.geanta@nxp.com>
+Update share descriptor for rfc4106 to skip instructions in case
+cryptlen is zero. If no instructions are jumped the DECO hangs and a
+timeout error is thrown.
 
-Update alginfo struct to keep both virtual and dma key addresses,
-so that descriptors have them at hand.
-One example where this is needed is in the xcbc(aes) shared descriptors,
-which are updated in current patch.
-Another example is the upcoming fix for DKP.
-
-Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
+Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>
 ---
- drivers/crypto/caam/caamhash.c      | 37 +++++++++++++++++--------------------
- drivers/crypto/caam/caamhash_desc.c |  5 ++---
- drivers/crypto/caam/caamhash_desc.h |  2 +-
- drivers/crypto/caam/desc_constr.h   | 10 ++++------
- 4 files changed, 24 insertions(+), 30 deletions(-)
+Changes since v3:
+- move the erratum workaround to reduce the chances of DECO stalling.
+---
+ drivers/crypto/caam/caamalg_desc.c | 47 ++++++++++++++++++++++++++------------
+ drivers/crypto/caam/caamalg_desc.h |  2 +-
+ 2 files changed, 33 insertions(+), 16 deletions(-)
 
-diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
-index f3fef79..2c2e378 100644
---- a/drivers/crypto/caam/caamhash.c
-+++ b/drivers/crypto/caam/caamhash.c
-@@ -95,7 +95,6 @@ struct caam_hash_ctx {
- 	dma_addr_t sh_desc_update_first_dma;
- 	dma_addr_t sh_desc_fin_dma;
- 	dma_addr_t sh_desc_digest_dma;
--	dma_addr_t key_dma;
- 	enum dma_data_direction dir;
- 	struct device *jrdev;
- 	int ctx_len;
-@@ -282,13 +281,10 @@ static int axcbc_set_sh_desc(struct crypto_ahash *ahash)
- 	struct device *jrdev = ctx->jrdev;
- 	u32 *desc;
- 
--	/* key is loaded from memory for UPDATE and FINALIZE states */
--	ctx->adata.key_dma = ctx->key_dma;
--
- 	/* shared descriptor for ahash_update */
- 	desc = ctx->sh_desc_update;
- 	cnstr_shdsc_sk_hash(desc, &ctx->adata, OP_ALG_AS_UPDATE,
--			    ctx->ctx_len, ctx->ctx_len, 0);
-+			    ctx->ctx_len, ctx->ctx_len);
- 	dma_sync_single_for_device(jrdev, ctx->sh_desc_update_dma,
- 				   desc_bytes(desc), ctx->dir);
- 	print_hex_dump_debug("axcbc update shdesc@" __stringify(__LINE__)" : ",
-@@ -298,7 +294,7 @@ static int axcbc_set_sh_desc(struct crypto_ahash *ahash)
- 	/* shared descriptor for ahash_{final,finup} */
- 	desc = ctx->sh_desc_fin;
- 	cnstr_shdsc_sk_hash(desc, &ctx->adata, OP_ALG_AS_FINALIZE,
--			    digestsize, ctx->ctx_len, 0);
-+			    digestsize, ctx->ctx_len);
- 	dma_sync_single_for_device(jrdev, ctx->sh_desc_fin_dma,
- 				   desc_bytes(desc), ctx->dir);
- 	print_hex_dump_debug("axcbc finup shdesc@" __stringify(__LINE__)" : ",
-@@ -311,7 +307,7 @@ static int axcbc_set_sh_desc(struct crypto_ahash *ahash)
- 	/* shared descriptor for first invocation of ahash_update */
- 	desc = ctx->sh_desc_update_first;
- 	cnstr_shdsc_sk_hash(desc, &ctx->adata, OP_ALG_AS_INIT, ctx->ctx_len,
--			    ctx->ctx_len, ctx->key_dma);
-+			    ctx->ctx_len);
- 	dma_sync_single_for_device(jrdev, ctx->sh_desc_update_first_dma,
- 				   desc_bytes(desc), ctx->dir);
- 	print_hex_dump_debug("axcbc update first shdesc@" __stringify(__LINE__)
-@@ -321,7 +317,7 @@ static int axcbc_set_sh_desc(struct crypto_ahash *ahash)
- 	/* shared descriptor for ahash_digest */
- 	desc = ctx->sh_desc_digest;
- 	cnstr_shdsc_sk_hash(desc, &ctx->adata, OP_ALG_AS_INITFINAL,
--			    digestsize, ctx->ctx_len, 0);
-+			    digestsize, ctx->ctx_len);
- 	dma_sync_single_for_device(jrdev, ctx->sh_desc_digest_dma,
- 				   desc_bytes(desc), ctx->dir);
- 	print_hex_dump_debug("axcbc digest shdesc@" __stringify(__LINE__)" : ",
-@@ -340,7 +336,7 @@ static int acmac_set_sh_desc(struct crypto_ahash *ahash)
- 	/* shared descriptor for ahash_update */
- 	desc = ctx->sh_desc_update;
- 	cnstr_shdsc_sk_hash(desc, &ctx->adata, OP_ALG_AS_UPDATE,
--			    ctx->ctx_len, ctx->ctx_len, 0);
-+			    ctx->ctx_len, ctx->ctx_len);
- 	dma_sync_single_for_device(jrdev, ctx->sh_desc_update_dma,
- 				   desc_bytes(desc), ctx->dir);
- 	print_hex_dump_debug("acmac update shdesc@" __stringify(__LINE__)" : ",
-@@ -350,7 +346,7 @@ static int acmac_set_sh_desc(struct crypto_ahash *ahash)
- 	/* shared descriptor for ahash_{final,finup} */
- 	desc = ctx->sh_desc_fin;
- 	cnstr_shdsc_sk_hash(desc, &ctx->adata, OP_ALG_AS_FINALIZE,
--			    digestsize, ctx->ctx_len, 0);
-+			    digestsize, ctx->ctx_len);
- 	dma_sync_single_for_device(jrdev, ctx->sh_desc_fin_dma,
- 				   desc_bytes(desc), ctx->dir);
- 	print_hex_dump_debug("acmac finup shdesc@" __stringify(__LINE__)" : ",
-@@ -360,7 +356,7 @@ static int acmac_set_sh_desc(struct crypto_ahash *ahash)
- 	/* shared descriptor for first invocation of ahash_update */
- 	desc = ctx->sh_desc_update_first;
- 	cnstr_shdsc_sk_hash(desc, &ctx->adata, OP_ALG_AS_INIT, ctx->ctx_len,
--			    ctx->ctx_len, 0);
-+			    ctx->ctx_len);
- 	dma_sync_single_for_device(jrdev, ctx->sh_desc_update_first_dma,
- 				   desc_bytes(desc), ctx->dir);
- 	print_hex_dump_debug("acmac update first shdesc@" __stringify(__LINE__)
-@@ -370,7 +366,7 @@ static int acmac_set_sh_desc(struct crypto_ahash *ahash)
- 	/* shared descriptor for ahash_digest */
- 	desc = ctx->sh_desc_digest;
- 	cnstr_shdsc_sk_hash(desc, &ctx->adata, OP_ALG_AS_INITFINAL,
--			    digestsize, ctx->ctx_len, 0);
-+			    digestsize, ctx->ctx_len);
- 	dma_sync_single_for_device(jrdev, ctx->sh_desc_digest_dma,
- 				   desc_bytes(desc), ctx->dir);
- 	print_hex_dump_debug("acmac digest shdesc@" __stringify(__LINE__)" : ",
-@@ -507,7 +503,8 @@ static int axcbc_setkey(struct crypto_ahash *ahash, const u8 *key,
- 	}
- 
- 	memcpy(ctx->key, key, keylen);
--	dma_sync_single_for_device(jrdev, ctx->key_dma, keylen, DMA_TO_DEVICE);
-+	dma_sync_single_for_device(jrdev, ctx->adata.key_dma, keylen,
-+				   DMA_TO_DEVICE);
- 	ctx->adata.keylen = keylen;
- 
- 	print_hex_dump_debug("axcbc ctx.key@" __stringify(__LINE__)" : ",
-@@ -1831,11 +1828,11 @@ static int caam_hash_cra_init(struct crypto_tfm *tfm)
- 		ctx->adata.algtype = OP_TYPE_CLASS1_ALG | caam_hash->alg_type;
- 		ctx->ctx_len = 48;
- 
--		ctx->key_dma = dma_map_single_attrs(ctx->jrdev, ctx->key,
--						    ARRAY_SIZE(ctx->key),
--						    DMA_BIDIRECTIONAL,
--						    DMA_ATTR_SKIP_CPU_SYNC);
--		if (dma_mapping_error(ctx->jrdev, ctx->key_dma)) {
-+		ctx->adata.key_dma = dma_map_single_attrs(ctx->jrdev, ctx->key,
-+							  ARRAY_SIZE(ctx->key),
-+							  DMA_BIDIRECTIONAL,
-+							  DMA_ATTR_SKIP_CPU_SYNC);
-+		if (dma_mapping_error(ctx->jrdev, ctx->adata.key_dma)) {
- 			dev_err(ctx->jrdev, "unable to map key\n");
- 			caam_jr_free(ctx->jrdev);
- 			return -ENOMEM;
-@@ -1859,7 +1856,7 @@ static int caam_hash_cra_init(struct crypto_tfm *tfm)
- 		dev_err(ctx->jrdev, "unable to map shared descriptors\n");
- 
- 		if (is_xcbc_aes(caam_hash->alg_type))
--			dma_unmap_single_attrs(ctx->jrdev, ctx->key_dma,
-+			dma_unmap_single_attrs(ctx->jrdev, ctx->adata.key_dma,
- 					       ARRAY_SIZE(ctx->key),
- 					       DMA_BIDIRECTIONAL,
- 					       DMA_ATTR_SKIP_CPU_SYNC);
-@@ -1895,7 +1892,7 @@ static void caam_hash_cra_exit(struct crypto_tfm *tfm)
- 			       offsetof(struct caam_hash_ctx, key),
- 			       ctx->dir, DMA_ATTR_SKIP_CPU_SYNC);
- 	if (is_xcbc_aes(ctx->adata.algtype))
--		dma_unmap_single_attrs(ctx->jrdev, ctx->key_dma,
-+		dma_unmap_single_attrs(ctx->jrdev, ctx->adata.key_dma,
- 				       ARRAY_SIZE(ctx->key), DMA_BIDIRECTIONAL,
- 				       DMA_ATTR_SKIP_CPU_SYNC);
- 	caam_jr_free(ctx->jrdev);
-diff --git a/drivers/crypto/caam/caamhash_desc.c b/drivers/crypto/caam/caamhash_desc.c
-index 71d0183..78383d7 100644
---- a/drivers/crypto/caam/caamhash_desc.c
-+++ b/drivers/crypto/caam/caamhash_desc.c
-@@ -83,10 +83,9 @@ EXPORT_SYMBOL(cnstr_shdsc_ahash);
-  * @state: algorithm state OP_ALG_AS_{INIT, FINALIZE, INITFINALIZE, UPDATE}
-  * @digestsize: algorithm's digest size
-  * @ctx_len: size of Context Register
-- * @key_dma: I/O Virtual Address of the key
+diff --git a/drivers/crypto/caam/caamalg_desc.c b/drivers/crypto/caam/caamalg_desc.c
+index 7253183..5ddaf61 100644
+--- a/drivers/crypto/caam/caamalg_desc.c
++++ b/drivers/crypto/caam/caamalg_desc.c
+@@ -843,13 +843,16 @@ EXPORT_SYMBOL(cnstr_shdsc_gcm_decap);
+  * @ivsize: initialization vector size
+  * @icvsize: integrity check value (ICV) size (truncated or full)
+  * @is_qi: true when called from caam/qi
++ *
++ * Input sequence: AAD | PTXT
++ * Output sequence: AAD | CTXT | ICV
++ * AAD length (assoclen), which includes the IV length, is available in Math3.
   */
- void cnstr_shdsc_sk_hash(u32 * const desc, struct alginfo *adata, u32 state,
--			 int digestsize, int ctx_len, dma_addr_t key_dma)
-+			 int digestsize, int ctx_len)
+ void cnstr_shdsc_rfc4106_encap(u32 * const desc, struct alginfo *cdata,
+ 			       unsigned int ivsize, unsigned int icvsize,
+ 			       const bool is_qi)
  {
- 	u32 *skip_key_load;
+-	u32 *key_jump_cmd;
+-
++	u32 *key_jump_cmd, *zero_cryptlen_jump_cmd, *skip_instructions;
+ 	init_sh_desc(desc, HDR_SHARE_SERIAL);
  
-@@ -136,7 +135,7 @@ void cnstr_shdsc_sk_hash(u32 * const desc, struct alginfo *adata, u32 state,
+ 	/* Skip key loading if it is loaded due to sharing */
+@@ -892,24 +895,26 @@ void cnstr_shdsc_rfc4106_encap(u32 * const desc, struct alginfo *cdata,
+ 	append_math_sub_imm_u32(desc, VARSEQINLEN, REG3, IMM, ivsize);
+ 	append_math_add(desc, VARSEQOUTLEN, ZERO, REG3, CAAM_CMD_SZ);
+ 
+-	/* Read assoc data */
+-	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS1 | FIFOLDST_VLF |
+-			     FIFOLD_TYPE_AAD | FIFOLD_TYPE_FLUSH1);
++	/* Skip AAD */
++	append_seq_fifo_store(desc, 0, FIFOST_TYPE_SKIP | FIFOLDST_VLF);
+ 
+-	/* Skip IV */
+-	append_seq_fifo_load(desc, ivsize, FIFOLD_CLASS_SKIP);
++	/* Read cryptlen and set this value into VARSEQOUTLEN */
++	append_math_sub(desc, VARSEQOUTLEN, SEQINLEN, REG3, CAAM_CMD_SZ);
+ 
+-	/* Will read cryptlen bytes */
+-	append_math_sub(desc, VARSEQINLEN, SEQINLEN, REG0, CAAM_CMD_SZ);
++	/* If cryptlen is ZERO jump to AAD command */
++	zero_cryptlen_jump_cmd = append_jump(desc, JUMP_TEST_ALL |
++					    JUMP_COND_MATH_Z);
+ 
+-	/* Workaround for erratum A-005473 (simultaneous SEQ FIFO skips) */
+-	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS1 | FIFOLD_TYPE_MSG);
++	/* Read AAD data */
++	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS1 | FIFOLDST_VLF |
++			     FIFOLD_TYPE_AAD | FIFOLD_TYPE_FLUSH1);
+ 
+-	/* Skip assoc data */
+-	append_seq_fifo_store(desc, 0, FIFOST_TYPE_SKIP | FIFOLDST_VLF);
++	/* Workaround for erratum A-005473 (simultaneous SEQ FIFO skips) */
++	append_seq_fifo_store(desc, 0, FIFOST_TYPE_MESSAGE_DATA);
+ 
+-	/* cryptlen = seqoutlen - assoclen */
+-	append_math_sub(desc, VARSEQOUTLEN, VARSEQINLEN, REG0, CAAM_CMD_SZ);
++	/* Skip IV */
++	append_seq_fifo_load(desc, ivsize, FIFOLD_CLASS_SKIP);
++	append_math_add(desc, VARSEQINLEN, VARSEQOUTLEN, REG0, CAAM_CMD_SZ);
+ 
+ 	/* Write encrypted data */
+ 	append_seq_fifo_store(desc, 0, FIFOST_TYPE_MESSAGE_DATA | FIFOLDST_VLF);
+@@ -918,6 +923,18 @@ void cnstr_shdsc_rfc4106_encap(u32 * const desc, struct alginfo *cdata,
+ 	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS1 | FIFOLDST_VLF |
+ 			     FIFOLD_TYPE_MSG | FIFOLD_TYPE_LAST1);
+ 
++	/* Jump instructions to avoid double reading of AAD */
++	skip_instructions = append_jump(desc, JUMP_TEST_ALL);
++
++	/* There is no input data, cryptlen = 0 */
++	set_jump_tgt_here(desc, zero_cryptlen_jump_cmd);
++
++	/* Read AAD */
++	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_CLASS1 | FIFOLDST_VLF |
++			     FIFOLD_TYPE_AAD | FIFOLD_TYPE_LAST1);
++
++	set_jump_tgt_here(desc, skip_instructions);
++
+ 	/* Write ICV */
+ 	append_seq_store(desc, icvsize, LDST_CLASS_1_CCB |
  			 LDST_SRCDST_BYTE_CONTEXT);
- 	if (is_xcbc_aes(adata->algtype) && state == OP_ALG_AS_INIT)
- 		/* Save K1 */
--		append_fifo_store(desc, key_dma, adata->keylen,
-+		append_fifo_store(desc, adata->key_dma, adata->keylen,
- 				  LDST_CLASS_1_CCB | FIFOST_TYPE_KEY_KEK);
- }
- EXPORT_SYMBOL(cnstr_shdsc_sk_hash);
-diff --git a/drivers/crypto/caam/caamhash_desc.h b/drivers/crypto/caam/caamhash_desc.h
-index 6947ee1..4f369b8 100644
---- a/drivers/crypto/caam/caamhash_desc.h
-+++ b/drivers/crypto/caam/caamhash_desc.h
-@@ -25,5 +25,5 @@ void cnstr_shdsc_ahash(u32 * const desc, struct alginfo *adata, u32 state,
- 		       int digestsize, int ctx_len, bool import_ctx, int era);
+diff --git a/drivers/crypto/caam/caamalg_desc.h b/drivers/crypto/caam/caamalg_desc.h
+index da4a4ee..a6146ea 100644
+--- a/drivers/crypto/caam/caamalg_desc.h
++++ b/drivers/crypto/caam/caamalg_desc.h
+@@ -31,7 +31,7 @@
+ #define DESC_QI_GCM_DEC_LEN		(DESC_GCM_DEC_LEN + 3 * CAAM_CMD_SZ)
  
- void cnstr_shdsc_sk_hash(u32 * const desc, struct alginfo *adata, u32 state,
--			 int digestsize, int ctx_len, dma_addr_t key_dma);
-+			 int digestsize, int ctx_len);
- #endif /* _CAAMHASH_DESC_H_ */
-diff --git a/drivers/crypto/caam/desc_constr.h b/drivers/crypto/caam/desc_constr.h
-index 5988a26..8154174 100644
---- a/drivers/crypto/caam/desc_constr.h
-+++ b/drivers/crypto/caam/desc_constr.h
-@@ -457,8 +457,8 @@ do { \
-  *           functions where it is used.
-  * @keylen: length of the provided algorithm key, in bytes
-  * @keylen_pad: padded length of the provided algorithm key, in bytes
-- * @key: address where algorithm key resides; virtual address if key_inline
-- *       is true, dma (bus) address if key_inline is false.
-+ * @key_dma: dma (bus) address where algorithm key resides
-+ * @key_virt: virtual address where algorithm key resides
-  * @key_inline: true - key can be inlined in the descriptor; false - key is
-  *              referenced by the descriptor
-  */
-@@ -466,10 +466,8 @@ struct alginfo {
- 	u32 algtype;
- 	unsigned int keylen;
- 	unsigned int keylen_pad;
--	union {
--		dma_addr_t key_dma;
--		const void *key_virt;
--	};
-+	dma_addr_t key_dma;
-+	const void *key_virt;
- 	bool key_inline;
- };
- 
+ #define DESC_RFC4106_BASE		(3 * CAAM_CMD_SZ)
+-#define DESC_RFC4106_ENC_LEN		(DESC_RFC4106_BASE + 13 * CAAM_CMD_SZ)
++#define DESC_RFC4106_ENC_LEN		(DESC_RFC4106_BASE + 16 * CAAM_CMD_SZ)
+ #define DESC_RFC4106_DEC_LEN		(DESC_RFC4106_BASE + 13 * CAAM_CMD_SZ)
+ #define DESC_QI_RFC4106_ENC_LEN		(DESC_RFC4106_ENC_LEN + 5 * CAAM_CMD_SZ)
+ #define DESC_QI_RFC4106_DEC_LEN		(DESC_RFC4106_DEC_LEN + 5 * CAAM_CMD_SZ)
 -- 
 2.1.0
 
