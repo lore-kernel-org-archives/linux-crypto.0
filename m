@@ -2,108 +2,146 @@ Return-Path: <SRS0=mqYf=V4=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17A99C433FF
-	for <linux-crypto@archiver.kernel.org>; Wed, 31 Jul 2019 13:35:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4200C32751
+	for <linux-crypto@archiver.kernel.org>; Wed, 31 Jul 2019 14:08:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E2D7F208E3
-	for <linux-crypto@archiver.kernel.org>; Wed, 31 Jul 2019 13:35:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8B008206A3
+	for <linux-crypto@archiver.kernel.org>; Wed, 31 Jul 2019 14:08:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="k/w82AxF"
+	dkim=pass (1024-bit key) header.d=verimatrix.com header.i=@verimatrix.com header.b="tjPGs5sU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728245AbfGaNfe (ORCPT
+        id S1727614AbfGaOIZ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 31 Jul 2019 09:35:34 -0400
-Received: from mail-eopbgr00055.outbound.protection.outlook.com ([40.107.0.55]:16931
-        "EHLO EUR02-AM5-obe.outbound.protection.outlook.com"
+        Wed, 31 Jul 2019 10:08:25 -0400
+Received: from mail-eopbgr730085.outbound.protection.outlook.com ([40.107.73.85]:20864
+        "EHLO NAM05-DM3-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726219AbfGaNfd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 31 Jul 2019 09:35:33 -0400
+        id S1726607AbfGaOIZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 31 Jul 2019 10:08:25 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=eX47rG0WgLo8GDGC4m97tTj0smBjEnUEYsXhEDqxLta6dFBy8sTtu3jocQf6cDOKIMTShYjKlhMGjETY7mtg6/LRnUKqiK8yEpeliMbWZcLj/HIFHPfbQwVOShi+EeXdAKqsfeBd0FPWSNAB3dxskViXSjj1iBIWY0J4uXAZiCBWJHF5K+gG5LJ0RqNzMyoGh+zAA4CA/wYhxKsriS+UE4rD6buxH30ie/cpUnAaQs58dyj49C4b9Lxwl+GK2dMKJimm737L62mSO6Y5vTuB6UVEeNshg1COqvOR6PSOxNWSAul7I29pltHI2W/g+yhMrT1hbQZJ6Uf+gTgwmoaOMA==
+ b=E6cd0KuHPi8/Qk2BE5P+HxOJ37jrZli8sTlBaH+iSszn2UqcCUdY6WcQzVJCpg0X1Hg/fmuCItHovpMYDNgMUppuixDW+g0N0fJnM0ELCUofINypc9HHoup4P9xM7aaemVU1RHG6uiCy5t6rF0TnG6Lyy8T4IWyO3L5o5ufdj3MY4Y+2pSc+eTK5YM5KFmoeYoisyoWFvkM36DuteTTXRZkz3MYDs18WSv1/6wcSwRMvCuGpVsDN71xGg7BWVlMTbD00saXb5IOaqfquthGqeUEd/aY2GE+asz/Lfmqn+JzHkDdd8Ab2cM1udSZ8EnCwqfE8e20Gsf/kvKwVwYb4bQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NYBCiFoR4tOzFJKhdTO64d/9ZhXVoURedETAtik4p/s=;
- b=VvmzJ2hxX9JqB1GLFH/gY65Wp5tr9ySzKKh+//DLUdj+cUCIfr2H+8u6U1yvAL6a3BmNu3klGtvBoPk4KihNGfxiAjD0hgIJSxEFV6WDp5v7RgAihLyMVaqrvd6HCUQiK5nmE/f6gfzJUP6cI+zu4bDyYlwjhwXHp+VxGdtQIreKCSXoRhdPa/GxIvj+bEE4Yp6svMRRIQqPeF8v5QYvn3M+hgWHTMhf9eS426c7KE/wy9OY5PXwng24gxwMgVwK2+hGphuvWnHt0WUNDrUsx5QD7f2/sbFuOSgUk43zTrWpiDqiD5AQ5myM3jMUDyWps6hdkHoF3yNG8YZQP5R01g==
+ bh=AxqZ/S3m8p/TE1gjcHGMM+XokeMYNSs0iHZf1czWA6Q=;
+ b=ekJGT9Ju229wPI+ZKyOdwL4ptt47KJWdgFC8uaIkNEb5G/8pvFauizaiP8HFYNyA2a/GNuPU3058WgJ7fXWxspzNLBHL8F8N7HLu96PfJ2r1mHBHRJmQeHuE1AjuIly5ekPTR+L3Gb5HgyhU0JcM5emrl/vy+VicpQh+RDcr7GXtIQJsN/UJ1KIybhfunDsPp5z3tN6IADZUdQdPWAJvnWOMcq9mxpqAeZxSi+HbNEW1R2g/Ds83L3RlVHYZUiqe/pD4HgjJ04dDZyMWlHgSA+DarauGxVgCRxva+b1uIraGSSNqnFhYAj46g8yY8AXPNPB00KkHYVjbUPmv63IpGA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
- smtp.mailfrom=nxp.com;dmarc=pass action=none header.from=nxp.com;dkim=pass
- header.d=nxp.com;arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ smtp.mailfrom=verimatrix.com;dmarc=pass action=none
+ header.from=verimatrix.com;dkim=pass header.d=verimatrix.com;arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verimatrix.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NYBCiFoR4tOzFJKhdTO64d/9ZhXVoURedETAtik4p/s=;
- b=k/w82AxFFgXcgkppxFSq6v+0N5Sxlkc3fwuS1oJJMZ7KjMYdoyCH6bsWE3GtTZQ4fIiSuEUub9IUurXpumv8oRKXGfmxUtLkhlvBQjh56+FjyWJBakqIOd+9FuLnrrGNctF/vtk/pLMyd48oYuluvKWZl1v1zelw4FTqWYDnRn0=
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
- VI1PR0402MB2766.eurprd04.prod.outlook.com (10.172.255.138) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2115.10; Wed, 31 Jul 2019 13:35:30 +0000
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::7c64:5296:4607:e10]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::7c64:5296:4607:e10%5]) with mapi id 15.20.2094.017; Wed, 31 Jul 2019
- 13:35:30 +0000
-From:   Horia Geanta <horia.geanta@nxp.com>
-To:     Iuliana Prodan <iuliana.prodan@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        dl-linux-imx <linux-imx@nxp.com>
-Subject: Re: [PATCH v3 0/2] crypto: validate inputs for gcm and aes
-Thread-Topic: [PATCH v3 0/2] crypto: validate inputs for gcm and aes
-Thread-Index: AQHVR6TR78bS9d+svUKdGLQI7wpYQg==
-Date:   Wed, 31 Jul 2019 13:35:30 +0000
-Message-ID: <VI1PR0402MB348576458A879D8F162D01C098DF0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-References: <1564578355-9639-1-git-send-email-iuliana.prodan@nxp.com>
+ bh=AxqZ/S3m8p/TE1gjcHGMM+XokeMYNSs0iHZf1czWA6Q=;
+ b=tjPGs5sUe4/Zs+++4ocPbWR4+gEEZoAtlbfPCuptwjVLAWUdd9dqi/TjZ82i8vmy/63n7Uv/Wcc4KVd8R+SK2LysRpHoZApQt/B9GclWerUkEcwLFpxt+FuHOfl0bgppiAHwo3+8pu4MbKWeBmIaJCThllGjWgQKX+oRNP5oGI8=
+Received: from MN2PR20MB2973.namprd20.prod.outlook.com (52.132.172.146) by
+ MN2PR20MB3277.namprd20.prod.outlook.com (52.132.175.202) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2136.16; Wed, 31 Jul 2019 14:08:21 +0000
+Received: from MN2PR20MB2973.namprd20.prod.outlook.com
+ ([fe80::d96f:39b2:19f4:c7c1]) by MN2PR20MB2973.namprd20.prod.outlook.com
+ ([fe80::d96f:39b2:19f4:c7c1%7]) with mapi id 15.20.2115.005; Wed, 31 Jul 2019
+ 14:08:21 +0000
+From:   Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+To:     Antoine Tenart <antoine.tenart@bootlin.com>
+CC:     Pascal van Leeuwen <pascalvanl@gmail.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>
+Subject: RE: [PATCHv2 2/3] crypto: inside-secure - add support for PCI based
+ FPGA development board
+Thread-Topic: [PATCHv2 2/3] crypto: inside-secure - add support for PCI based
+ FPGA development board
+Thread-Index: AQHVQ7iGiGasvxZ/1k28+z4dWUzE9abi5S6AgAAAqWCAAEv+AIAADciwgAFrh4CAAAWWEA==
+Date:   Wed, 31 Jul 2019 14:08:21 +0000
+Message-ID: <MN2PR20MB2973F926269582FA8A10DDE0CADF0@MN2PR20MB2973.namprd20.prod.outlook.com>
+References: <1564145005-26731-1-git-send-email-pvanleeuwen@verimatrix.com>
+ <1564145005-26731-3-git-send-email-pvanleeuwen@verimatrix.com>
+ <20190730090811.GF3108@kwain>
+ <MN2PR20MB2973B37C90FBD6E6C97B8E09CADC0@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <20190730134232.GG3108@kwain>
+ <MN2PR20MB2973FA07F5AB41D99A9FADD4CADC0@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <20190731121259.GB3579@kwain>
+In-Reply-To: <20190731121259.GB3579@kwain>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
 authentication-results: spf=none (sender IP is )
- smtp.mailfrom=horia.geanta@nxp.com; 
-x-originating-ip: [212.146.100.6]
+ smtp.mailfrom=pvanleeuwen@verimatrix.com; 
+x-originating-ip: [188.204.2.113]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: f8c093ef-8629-4a8e-1a9c-08d715bbf4bf
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:VI1PR0402MB2766;
-x-ms-traffictypediagnostic: VI1PR0402MB2766:
-x-microsoft-antispam-prvs: <VI1PR0402MB276602047B23FC4D90F4116F98DF0@VI1PR0402MB2766.eurprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:7219;
+x-ms-office365-filtering-correlation-id: 6c108f58-89e1-483c-682d-08d715c08bc7
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:MN2PR20MB3277;
+x-ms-traffictypediagnostic: MN2PR20MB3277:
+x-ms-exchange-purlcount: 1
+x-microsoft-antispam-prvs: <MN2PR20MB3277CC1BA31609560FFC6BC8CADF0@MN2PR20MB3277.namprd20.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
 x-forefront-prvs: 011579F31F
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(366004)(396003)(376002)(346002)(39860400002)(136003)(189003)(199004)(74316002)(66946007)(305945005)(66476007)(66446008)(64756008)(66556008)(53936002)(4744005)(81166006)(81156014)(256004)(14454004)(99286004)(8676002)(91956017)(76116006)(110136005)(229853002)(25786009)(66066001)(6246003)(52536014)(71190400001)(54906003)(5660300002)(478600001)(7736002)(2906002)(316002)(33656002)(6436002)(8936002)(86362001)(102836004)(4326008)(76176011)(53546011)(446003)(6506007)(71200400001)(68736007)(55016002)(186003)(9686003)(26005)(486006)(7696005)(44832011)(3846002)(476003)(6116002);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB2766;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: nxp.com does not designate
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(39850400004)(136003)(346002)(396003)(376002)(366004)(13464003)(199004)(189003)(86362001)(11346002)(3846002)(55016002)(446003)(8936002)(476003)(66066001)(8676002)(52536014)(6246003)(486006)(81166006)(81156014)(4326008)(6436002)(33656002)(229853002)(74316002)(15974865002)(186003)(26005)(25786009)(102836004)(53546011)(6506007)(6116002)(6916009)(76176011)(305945005)(76116006)(478600001)(256004)(2906002)(66946007)(66556008)(64756008)(66446008)(66476007)(54906003)(7696005)(5660300002)(68736007)(53936002)(14454004)(9686003)(7736002)(71200400001)(71190400001)(316002)(99286004)(18886075002);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR20MB3277;H:MN2PR20MB2973.namprd20.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: verimatrix.com does not designate
  permitted sender hosts)
 x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: Ir2t7ERCnew1icxjoFUXWKPtSGI2M5/h2BL1ujv1PQAvvIu1YW4DS/+cPzKr/GP/rxcDLGuUkrXJp9xzN0LjKVbarJm7YwtmF9yf5E+nIAat0DNMZ6FvAs2/ohKju++e/v2khC70UOcf9iVU8ixBDETEWE8gjAeJYgBFfNpvkQX9p5MTWj3EMTVhuXkzDXodoOeZtuzgf8Puly54G2wb9IUpkPioGAMXetB7iB7iDHbDtmJqHKVQ9PnSQ1daJQJPHqcokp3HZew42mmfZcFEwLPeG18W//I3Mk9lEWk7FMZBbtMfzL4D1b9KWpUM5HjdVyPddA2fN+70pZVB4sqjkGvAhUt/+gpn4fpzjs94dZcANjnX6aZ4uRLG+VCFGviCtmbo796LgX+WGJG63kF28mHrYd3VqySIWOUr1Y6FEcA=
-Content-Type: text/plain; charset="iso-8859-2"
+x-microsoft-antispam-message-info: wJizDOrZGQDCW38LnPDzvJkt6LLIyeAN5qcBXyW+3CB8dAqA3dn3EAFIdsqMN3wiNEQNARa5At2QtkKsNFJen1fiSD3JIwgEZ/A8r/g03mnWhNx8WGqrPuKomFXURvmuIZ0CDUKXWDy8Ycjcqt1PzgfrIhJABE5Nlvz/rR20jVNL14shZnXJ6QL/51LyK5WTfuWJ65XZSXpHJZ45UZXze0XDpH/Xm73eyq7IVaQHaMdmxQILe4W5Gir5MYCycpzPp3pzE6WYOBh/Lvw0Q13qCKYSeYVDlQ4HiCZwtbYh4DbmQ6ycIMlQBphOa/GNKnPPZocn3ankf0dp7/ZAPGOrT8S5ET0NhxZOFdhJ1S1RewUkmfivIZ3btxAP8zkX20m22fZFvK6C8trMj3hXYwQrH31vTG1I7lQTOW+6M1sHiyU=
+Content-Type: text/plain; charset="Windows-1252"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f8c093ef-8629-4a8e-1a9c-08d715bbf4bf
-X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Jul 2019 13:35:30.4127
+X-OriginatorOrg: verimatrix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6c108f58-89e1-483c-682d-08d715c08bc7
+X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Jul 2019 14:08:21.4732
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-id: dcb260f9-022d-4495-8602-eae51035a0d0
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: horia.geanta@nxp.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB2766
+X-MS-Exchange-CrossTenant-userprincipalname: pvanleeuwen@verimatrix.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR20MB3277
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 7/31/2019 4:06 PM, Iuliana Prodan wrote:=0A=
-> Added inline helper functions to check authsize and assoclen for=0A=
-> gcm, rfc4106 and rfc4543.  =0A=
-> Added, also, inline helper function to check key length for AES algorithm=
-s.=0A=
-> These are used in the generic implementation of gcm/rfc4106/rfc4543=0A=
-> and aes.=0A=
-> =0A=
-For the series:=0A=
-Reviewed-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
-=0A=
-Thanks,=0A=
-Horia=0A=
+> -----Original Message-----
+> From: Antoine Tenart <antoine.tenart@bootlin.com>
+> Sent: Wednesday, July 31, 2019 2:13 PM
+> To: Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+> Cc: Antoine Tenart <antoine.tenart@bootlin.com>; Pascal van Leeuwen
+> <pascalvanl@gmail.com>; linux-crypto@vger.kernel.org; herbert@gondor.apan=
+a.org.au;
+> davem@davemloft.net
+> Subject: Re: [PATCHv2 2/3] crypto: inside-secure - add support for PCI ba=
+sed FPGA
+> development board
+>=20
+> > > > > You're moving the default choice from "no firmware" to being a sp=
+ecific
+> > > > > one.
+> > > > >
+> > > > The EIP97 being the exception as the only firmware-less engine.
+> > > > This makes EIP197_DEVBRD fall through to EIP197B firmware until
+> > > > my patches supporting other EIP197 configs eventually get merged,
+> > > > after which this part will change anyway.
+> > >
+> > > We don't know when/in what shape those patches will be merged, so in
+> > > the meantime please make the "no firmware" the default choice.
+> > >
+> > "No firmware" is not possible with an EIP197. Trying to use it without
+> > loading firmware will cause it to hang, which I don't believe is what
+> > you would want. So the alternative would be to return an error, which
+> > is fine by me, so then I'll change it into that as default.
+>=20
+> Sure. When you look at this it's just weird to have a specific firmware
+> tied to an 'else' without having a check for a given version. Having the
+> "no firmware" option as the default option or not does not change
+> anything at runtime in practice here. If you prefer throwing an error if
+> the version isn't supported, I'm OK with it as well.
+>=20
+Agree that it was weird, not loading anything was bad too.
+Glad that we both agree on throwing an error :-)
+
+Regards,
+Pascal van Leeuwen
+Silicon IP Architect, Multi-Protocol Engines @ Verimatrix
+www.insidesecure.com
