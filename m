@@ -2,170 +2,140 @@ Return-Path: <SRS0=mqYf=V4=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8C8DC433FF
-	for <linux-crypto@archiver.kernel.org>; Wed, 31 Jul 2019 00:03:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD076C32751
+	for <linux-crypto@archiver.kernel.org>; Wed, 31 Jul 2019 05:33:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3E0E12089E
-	for <linux-crypto@archiver.kernel.org>; Wed, 31 Jul 2019 00:03:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 78664206A2
+	for <linux-crypto@archiver.kernel.org>; Wed, 31 Jul 2019 05:33:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="SDhLnPyV"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aEiIEPSp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728140AbfGaADb (ORCPT
+        id S1726238AbfGaFdG (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 30 Jul 2019 20:03:31 -0400
-Received: from mail-eopbgr730046.outbound.protection.outlook.com ([40.107.73.46]:47328
-        "EHLO NAM05-DM3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728130AbfGaADb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 30 Jul 2019 20:03:31 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hAvc3v4Av73w4LPWb5GI+7NlGUsWS+H6B5UNyYhiIa22IcBgQP+Q8s89bpdcIBRtU3e5pVHYeyjH6ytX/oq60+XuCGmNjK6+uwDYGGdy0ew/xgyxrgp03C5dCIiSPnHgTcoaPw2/H9Tder9qaULEUxj4aMmmOK8f4RoSwmxbg4SURby5jxhHIvD7+R1H5XCgkrp9RcGzB19mKmsU65W/APCwssNyZZCSsiYlzTjSb+j2+AXceqA7eYpkdbO22Y2hJsjOWUfAZk5LaEMhTXiuWZh8xkSR5QIU7aA3WrrQis49aPAOtdumdX2wy1hmqh7ihcgDdqWsGogyvDZ9unsIVw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aO1XjK3kBdNI7AwuFzLTvx5UH3uuCa6EzJc6Wp7nrnM=;
- b=hOTI/tkSrEMcC5DKPxHEORmYji5ZhjXte0ECodhufFZy7E4dNht1TM33U3IkhpBkOqLY7hUhXpsD/VUOQmWJaGJIv3znrsPNo0QIZ8w9HXWaosYJGQLMbl5dna3yq98XhVA6abUbFYW4j141i+87tKFtm/fFmD2UQ5z5PZ1dJugoJsqrkhW73+HxPajAtJ9zPfisSK9XoZl/vC7+S3sfIYxgSYHQ4R2tx81Q2jxbcfHZNvaUT1rhFDOgS5+Q8DtvOGDFrxseybw9LUS69sXYVFrWNaRbX7tJl/jRZc3IYXLmPHTmX+Danrb1sIRFv54vuNOVcVIh9wHWVwzBoaMwlg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
- smtp.mailfrom=amd.com;dmarc=pass action=none header.from=amd.com;dkim=pass
- header.d=amd.com;arc=none
+        Wed, 31 Jul 2019 01:33:06 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:43481 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726192AbfGaFdG (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 31 Jul 2019 01:33:06 -0400
+Received: by mail-wr1-f67.google.com with SMTP id p13so68133569wru.10
+        for <linux-crypto@vger.kernel.org>; Tue, 30 Jul 2019 22:33:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector1-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aO1XjK3kBdNI7AwuFzLTvx5UH3uuCa6EzJc6Wp7nrnM=;
- b=SDhLnPyVC39dtfOJIFsMK97hF/gwF/2Ba5/tUSDb+f2f0BPVe/R33MvuVEh4aie5r6uktoqG9QTIDnajI0IlvzAbl8ie7WVDW22JnGxiJRY56RQYG+c8XElqXLkysc3UE3PeFOASanw231Iir8nJujgT+TDBwffuU1iHCBHsmsA=
-Received: from DM5PR12MB1449.namprd12.prod.outlook.com (10.172.40.14) by
- DM5PR12MB1386.namprd12.prod.outlook.com (10.168.238.137) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2094.16; Wed, 31 Jul 2019 00:03:26 +0000
-Received: from DM5PR12MB1449.namprd12.prod.outlook.com
- ([fe80::58b8:4b33:20a5:5e3a]) by DM5PR12MB1449.namprd12.prod.outlook.com
- ([fe80::58b8:4b33:20a5:5e3a%8]) with mapi id 15.20.2115.005; Wed, 31 Jul 2019
- 00:03:25 +0000
-From:   "Hook, Gary" <Gary.Hook@amd.com>
-To:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-CC:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "Hook, Gary" <Gary.Hook@amd.com>
-Subject: [PATCH v2] crypto:ccp - Clean up and exit correctly on allocation
- failure
-Thread-Topic: [PATCH v2] crypto:ccp - Clean up and exit correctly on
- allocation failure
-Thread-Index: AQHVRzNgbmg25gCgCUSZnKfafgHhkQ==
-Date:   Wed, 31 Jul 2019 00:03:25 +0000
-Message-ID: <20190731000314.2839-1-gary.hook@amd.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: SN6PR02CA0015.namprd02.prod.outlook.com
- (2603:10b6:805:a2::28) To DM5PR12MB1449.namprd12.prod.outlook.com
- (2603:10b6:4:10::14)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Gary.Hook@amd.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-mailer: git-send-email 2.17.1
-x-originating-ip: [165.204.78.2]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: a8639538-0706-472b-a73d-08d7154a8267
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:DM5PR12MB1386;
-x-ms-traffictypediagnostic: DM5PR12MB1386:
-x-microsoft-antispam-prvs: <DM5PR12MB138601339B4FABB0815ACCB7FDDF0@DM5PR12MB1386.namprd12.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:2043;
-x-forefront-prvs: 011579F31F
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(376002)(346002)(366004)(136003)(396003)(39860400002)(189003)(199004)(50226002)(186003)(14454004)(6916009)(2351001)(305945005)(36756003)(26005)(6116002)(256004)(8936002)(2906002)(7736002)(71200400001)(71190400001)(66066001)(3846002)(1076003)(6436002)(81156014)(81166006)(8676002)(2616005)(66476007)(64756008)(5660300002)(6512007)(2501003)(486006)(316002)(86362001)(66946007)(53936002)(4326008)(6506007)(386003)(99286004)(54906003)(476003)(66446008)(6486002)(25786009)(478600001)(66556008)(52116002)(5640700003)(102836004)(68736007);DIR:OUT;SFP:1101;SCL:1;SRVR:DM5PR12MB1386;H:DM5PR12MB1449.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: amd.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: 5Ny0/9kmxyasFPUmSuntvZrsGfPiAhRl9t5qfLf/8CkQW7cmm+etYIBUaLiKEGgcL4QO7oV8Xs0HQ8NvtUGVmL7AJ6cSNVgYTzBAaZ9AIvaIM0bHBfu8GstIVnnLd/MOn7VF8kOUCXimVWQt36BqMqbAA7luzjxOdwR/GZz/RxWOP9Qb7KHOliHbS+PTLLdU4TjASVfjyOMfqMYYjfx7oed/Q9M/yciYInLjcqAVhUQ2d+P1z+BgDrYsGD8SefyJY9Ns8Lafa2Idey+AlxVoWaYScdJ5bpmk01VgRe/QhZcM3RtPDf8CDGNGFK6bItqMuL6gtZN8o860xkk/kXwHlgY0u0b49DrGWThiGGVczXXsd7Lo/KywoxoWSotSWax3CHHbLInGcniPnZt5iCPzDM8DMN0N9AOFZ0qBBZbLSCg=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-ID: <B3DA028353B47F45B076C1825001D207@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=loiK9wXUCOiEY9KsTjnNAjKwl1yaWs5jTqxh2hr1suU=;
+        b=aEiIEPSp1AJ2+tVsqc5bS6kU/EOdjHNsSwpNEKGjlrbsV2rNvXmgTJpWFoA7vGEdOU
+         9EdsC+YaQVZM6b6VE89HsgoAhA70wVUfvEXl8SZ+x7T1fR1n5vCj+glb7dqPUfUWR0WI
+         p1j4JzNul4oGnXuhq8GYssbzgZPjUR7A6oLx0zGEpwpHJSGCwh0E3Y9ycnlIc2C2OqTi
+         nEvaZQCVFtpb9dkIJKnCR+AO1wc0i2cYn6j3tIg/bpOflUiTTPBCBx5EHQpWSRLI8+lt
+         BiHv8u1U9Q7JweVygK+icmqR3gb2F7cE+XG7JQVyhq0ZiPFgAoR+CjGLU61YpfcHdSBb
+         yC4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=loiK9wXUCOiEY9KsTjnNAjKwl1yaWs5jTqxh2hr1suU=;
+        b=JBB3iQy5OArwz51sHT2UOhnTB1deZagmHCsU6uhB9ubbO80Iq4suXCdA5GI1dJBVkE
+         h+a8DfplaIk9/lItU10EawNbP3/fafRLf+/rX2P1HfiR9dAF9ZeMaCXKltyqDOiRGlvV
+         yienA7jSQVK10mg02hGB3rEXHVesnu/0UJbWF5K7Wl0zEA+IxaBnRCIwllOqJkma2pSB
+         yl9kcT7R/2wYg8TWMcxgv6y7nzZ6bsZWUS1hAVYFgDAnn0ff4hEmWigbwr7bobaReoZp
+         5I/P043U0JcYvJGYxNz+CwSq9JL/TLEvEX5mvzhTp69NZCQ85gQV89Cro9THgOPsiq/s
+         n8BA==
+X-Gm-Message-State: APjAAAX695ACMCMJk+26nh1ewa7OLxCBAQTErvvrQXgvYlRjYDjWO6A+
+        pqJMbMcxz7X7MPoOWs5Nrjq8c4nxrD+BB4ifTScFkg==
+X-Google-Smtp-Source: APXvYqxhshVQRxJPu9P5SIvWuW4Sa8P4b92k4Xh507OU4+Jac8/nsKvirOJ8JOEIXH82zG39w5tN3qwlUoh6wirKz+w=
+X-Received: by 2002:a5d:46cf:: with SMTP id g15mr136343841wrs.93.1564551183914;
+ Tue, 30 Jul 2019 22:33:03 -0700 (PDT)
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a8639538-0706-472b-a73d-08d7154a8267
-X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Jul 2019 00:03:25.8611
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ghook@amd.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1386
+References: <1564482824-26581-1-git-send-email-iuliana.prodan@nxp.com> <1564482824-26581-3-git-send-email-iuliana.prodan@nxp.com>
+In-Reply-To: <1564482824-26581-3-git-send-email-iuliana.prodan@nxp.com>
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date:   Wed, 31 Jul 2019 08:32:53 +0300
+Message-ID: <CAKv+Gu_VEEZFPpJfv2JbB02vhmc_1_wpxNDBHf__pv-t7BvN0A@mail.gmail.com>
+Subject: Re: [PATCH v2 2/2] crypto: aes - helper function to validate key
+ length for AES algorithms
+To:     Iuliana Prodan <iuliana.prodan@nxp.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-imx <linux-imx@nxp.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Gary R Hook <gary.hook@amd.com>
+On Tue, 30 Jul 2019 at 13:33, Iuliana Prodan <iuliana.prodan@nxp.com> wrote:
+>
+> Add inline helper function to check key length for AES algorithms.
+> The key can be 128, 192 or 256 bits size.
+> This function is used in the generic aes implementation.
+>
+> Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>
+> ---
+>  include/crypto/aes.h | 17 +++++++++++++++++
+>  lib/crypto/aes.c     |  8 ++++----
+>  2 files changed, 21 insertions(+), 4 deletions(-)
+>
+> diff --git a/include/crypto/aes.h b/include/crypto/aes.h
+> index 8e0f4cf..8ee07a8 100644
+> --- a/include/crypto/aes.h
+> +++ b/include/crypto/aes.h
+> @@ -31,6 +31,23 @@ struct crypto_aes_ctx {
+>  extern const u32 crypto_ft_tab[4][256] ____cacheline_aligned;
+>  extern const u32 crypto_it_tab[4][256] ____cacheline_aligned;
+>
+> +/*
+> + * validate key length for AES algorithms
+> + */
+> +static inline int crypto_aes_check_keylen(unsigned int keylen)
 
-Return and fail driver initialization if a DMA pool or coherent memory
-can't be allocated. Be sure to clean up allocated memory.
+Please rename this to aes_check_keylen()
 
-Fixes: 4b394a232df7 ("crypto: ccp - Let a v5 CCP provide the same function =
-as v3")
-
-Signed-off-by: Gary R Hook <gary.hook@amd.com>
----
-
-Changes since v1:
- - Switch to devm allocation where appropriate
-
- drivers/crypto/ccp/ccp-dev-v5.c | 14 ++++----------
- 1 file changed, 4 insertions(+), 10 deletions(-)
-
-diff --git a/drivers/crypto/ccp/ccp-dev-v5.c b/drivers/crypto/ccp/ccp-dev-v=
-5.c
-index f146b51a23a5..9ee72cf46a0f 100644
---- a/drivers/crypto/ccp/ccp-dev-v5.c
-+++ b/drivers/crypto/ccp/ccp-dev-v5.c
-@@ -803,6 +803,7 @@ static int ccp5_init(struct ccp_device *ccp)
- 		if (!dma_pool) {
- 			dev_err(dev, "unable to allocate dma pool\n");
- 			ret =3D -ENOMEM;
-+			goto e_pool;
- 		}
-=20
- 		cmd_q =3D &ccp->cmd_q[ccp->cmd_q_count];
-@@ -816,9 +817,9 @@ static int ccp5_init(struct ccp_device *ccp)
- 		/* Page alignment satisfies our needs for N <=3D 128 */
- 		BUILD_BUG_ON(COMMANDS_PER_QUEUE > 128);
- 		cmd_q->qsize =3D Q_SIZE(Q_DESC_SIZE);
--		cmd_q->qbase =3D dma_alloc_coherent(dev, cmd_q->qsize,
--						  &cmd_q->qbase_dma,
--						  GFP_KERNEL);
-+		cmd_q->qbase =3D dmam_alloc_coherent(dev, cmd_q->qsize,
-+						   &cmd_q->qbase_dma,
-+						   GFP_KERNEL);
- 		if (!cmd_q->qbase) {
- 			dev_err(dev, "unable to allocate command queue\n");
- 			ret =3D -ENOMEM;
-@@ -994,7 +995,6 @@ static int ccp5_init(struct ccp_device *ccp)
-=20
- static void ccp5_destroy(struct ccp_device *ccp)
- {
--	struct device *dev =3D ccp->dev;
- 	struct ccp_cmd_queue *cmd_q;
- 	struct ccp_cmd *cmd;
- 	unsigned int i;
-@@ -1037,12 +1037,6 @@ static void ccp5_destroy(struct ccp_device *ccp)
-=20
- 	sp_free_ccp_irq(ccp->sp, ccp);
-=20
--	for (i =3D 0; i < ccp->cmd_q_count; i++) {
--		cmd_q =3D &ccp->cmd_q[i];
--		dma_free_coherent(dev, cmd_q->qsize, cmd_q->qbase,
--				  cmd_q->qbase_dma);
--	}
--
- 	/* Flush the cmd and backlog queue */
- 	while (!list_empty(&ccp->cmd)) {
- 		/* Invoke the callback directly with an error code */
---=20
-2.17.1
-
+> +{
+> +       switch (keylen) {
+> +       case AES_KEYSIZE_128:
+> +       case AES_KEYSIZE_192:
+> +       case AES_KEYSIZE_256:
+> +               break;
+> +       default:
+> +               return -EINVAL;
+> +       }
+> +
+> +       return 0;
+> +}
+> +
+>  int crypto_aes_set_key(struct crypto_tfm *tfm, const u8 *in_key,
+>                 unsigned int key_len);
+>
+> diff --git a/lib/crypto/aes.c b/lib/crypto/aes.c
+> index 4e100af..3407b01 100644
+> --- a/lib/crypto/aes.c
+> +++ b/lib/crypto/aes.c
+> @@ -187,11 +187,11 @@ int aes_expandkey(struct crypto_aes_ctx *ctx, const u8 *in_key,
+>  {
+>         u32 kwords = key_len / sizeof(u32);
+>         u32 rc, i, j;
+> +       int err;
+>
+> -       if (key_len != AES_KEYSIZE_128 &&
+> -           key_len != AES_KEYSIZE_192 &&
+> -           key_len != AES_KEYSIZE_256)
+> -               return -EINVAL;
+> +       err = crypto_aes_check_keylen(key_len);
+> +       if (err)
+> +               return err;
+>
+>         ctx->key_length = key_len;
+>
+> --
+> 2.1.0
+>
