@@ -8,63 +8,64 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DBF7C32753
-	for <linux-crypto@archiver.kernel.org>; Wed, 31 Jul 2019 16:28:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C05CDC32751
+	for <linux-crypto@archiver.kernel.org>; Wed, 31 Jul 2019 16:28:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5E3D3206B8
-	for <linux-crypto@archiver.kernel.org>; Wed, 31 Jul 2019 16:28:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8EB0A206B8
+	for <linux-crypto@archiver.kernel.org>; Wed, 31 Jul 2019 16:28:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MpAPeOui"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oz1kCWfV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728028AbfGaQ2H (ORCPT
+        id S1727370AbfGaQ2J (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 31 Jul 2019 12:28:07 -0400
-Received: from mail-ed1-f68.google.com ([209.85.208.68]:32854 "EHLO
+        Wed, 31 Jul 2019 12:28:09 -0400
+Received: from mail-ed1-f68.google.com ([209.85.208.68]:37048 "EHLO
         mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727370AbfGaQ2H (ORCPT
+        with ESMTP id S1727485AbfGaQ2I (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 31 Jul 2019 12:28:07 -0400
-Received: by mail-ed1-f68.google.com with SMTP id i11so2752914edq.0
-        for <linux-crypto@vger.kernel.org>; Wed, 31 Jul 2019 09:28:05 -0700 (PDT)
+        Wed, 31 Jul 2019 12:28:08 -0400
+Received: by mail-ed1-f68.google.com with SMTP id w13so66288537eds.4
+        for <linux-crypto@vger.kernel.org>; Wed, 31 Jul 2019 09:28:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=hckyxnFmmC5eFF40x0zC34+Nf9FW2cPmEr4HjJBosxY=;
-        b=MpAPeOuiwghb5jZgQUbXnp76Amoy0101qphZV3IhlL3IvaiDYk6Tgai3RG/sT9QiNl
-         2XBMmcbrzSkgixuuQDy2nj2T1f926ohG6sr5Sgqp+NBhUlXqLMguqegmY/hrc49rkgp9
-         3jFeKGt3QCx/1aR2Xyur+V2lPHckGMv11vLZKsiBX23V5DTYM6M1wAxVhQF843CCAoMA
-         jc/+yUiMr5EEEqM9qf/KFAxg9QpxsowjyA7dML6OpsgzWLYr5k2ZHeakPWDV1HIbXSpI
-         Lgmv1KOeS0mmydl7Y3nZFtwb7ktPO3LEi/rmFi7LnA4jU1b5+UrAXBoIuWbDpEn9DSh0
-         u/dA==
+        bh=URNIiMG5C3pXi37zNqMRpwOCONUF9jRh+65X8cu30FQ=;
+        b=oz1kCWfV0IRJYJHAOviPwvnht7AuNgvbTF4J22GA1OuMYpk5HaUEz+dNLHmfYoGUwO
+         xYZoHnPeHW9vs7SMD4fbtOkWxA1df4TxyzsOql3l3FZ3eKq60dEM9Pnn0ZdbcVzaKds3
+         51FHZO+/lb0wE08f2SK5dw/J3zOjb6LdSNBnqHCPG3YUP0Zp8hPmcpe4LCZf57Wzl7yq
+         DA4ai5/VrumuxLrqOXcg4J6SS9myNRjOYYLaWZuxKBQi0lx/L6u2rpvzkhk7X9pEH50+
+         xJkCqpEagq4zbrzwsv1w8CnhK/D4s3yYBhcP1v5+H9Ugb7DqSY/NOUw/mdS5y2cP5mgK
+         9bPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=hckyxnFmmC5eFF40x0zC34+Nf9FW2cPmEr4HjJBosxY=;
-        b=Zqkds/kD5HYC5Tf6cKegtFaUTDwO1uSLwk2XpDle6giw9S9QL4IYfYVkh2AIHb6x9D
-         9212Dqeh/atk88DJvmWYXMA7xCrGMp+RU9Kl2x1Oe027hYXQ1nqTo4ptMGxpcDQ+PhNo
-         9pMJRm8oqj+2J2LNPrhhQmdjwFsl2Tdm0HCzYB449Pw8AnOLQWJPla5/LeWrI/jjE7iW
-         R3CnLCoO2zjmsnWiHDMj9artDxf3lo30T0PAH1ljnQGJv4gcg5XX2OAlgEx/62diXlPA
-         ZghSyvs9+qSZ1gQKZIHqaemSz+cSRzAZ/FxmmYBPzy9cSXWB6Zs1564bAATP1E2fpm/j
-         3eHg==
-X-Gm-Message-State: APjAAAXjtJWbIHaEISi1lkWU/hwdR+jw0Go/22LML3F229EMsdgr2rUs
-        emIuukJv0jM8A3cl3j9ALD8pJj9G
-X-Google-Smtp-Source: APXvYqx3iBtI8B6RwN+HMZsBazxP2dbCtuhRpJuK60um5Dbq5+nvUqS+BGz5k2FmQedvfc50RjxDLA==
-X-Received: by 2002:a17:906:154d:: with SMTP id c13mr97279628ejd.208.1564590484938;
-        Wed, 31 Jul 2019 09:28:04 -0700 (PDT)
+        bh=URNIiMG5C3pXi37zNqMRpwOCONUF9jRh+65X8cu30FQ=;
+        b=IP5PIYqmqoTP9QO0+rHH9K9GBdItb6SlieAaEJD85V6+r4VYeE5KnokL26/MAqYpAs
+         Y8HOu+nnxQ1UFqwl02w92cM5/1eWXY08KQ3CbyNYbZCsdIguYJQNTfnACcSNO8IGA5C7
+         yYpGlSrcOn6tt5NEa807vno9kSUt6KYafB81OEWDD7jADS5KkNVf4ruFQAGnrmT/7ZaL
+         SehSM8p2RNPs9GJ6rR0QsxvaZzcY0d1NKzWlHzvDFIqpV/4KOmZAcXz9synCIkH+QOzt
+         ErKxQFEurB/42codt/+ftC09Qu0ffoANpbqnRAaztfxKpqEW02hcxbSNj1dkiVOhPtMT
+         3aVQ==
+X-Gm-Message-State: APjAAAWPbN1yi5j9oIxq4WaWhuXejNE8YWEYO3G4PT6UnAZMfm5FFsc+
+        MhlEs2P0sLSt2FM/vMXKiEfWtoih
+X-Google-Smtp-Source: APXvYqxaXzjrdRbdnAkjOCfHOG0Hv4atVZm3isCNyu/8LUd3UZTyazzSZsFBNgIx7fy3N5TezDJa4w==
+X-Received: by 2002:a17:906:19c6:: with SMTP id h6mr7408075ejd.262.1564590486599;
+        Wed, 31 Jul 2019 09:28:06 -0700 (PDT)
 Received: from localhost.localdomain.com ([188.204.2.113])
-        by smtp.gmail.com with ESMTPSA id w35sm17418264edd.32.2019.07.31.09.28.04
+        by smtp.gmail.com with ESMTPSA id w35sm17418264edd.32.2019.07.31.09.28.05
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 31 Jul 2019 09:28:04 -0700 (PDT)
+        Wed, 31 Jul 2019 09:28:06 -0700 (PDT)
 From:   Pascal van Leeuwen <pascalvanl@gmail.com>
 X-Google-Original-From: Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
 To:     linux-crypto@vger.kernel.org
 Cc:     antoine.tenart@bootlin.com, herbert@gondor.apana.org.au,
         davem@davemloft.net,
+        Pascal van Leeuwen <pvanleeuwen@insidesecure.com>,
         Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
-Subject: [PATCH 2/4] crypto: inside-secure - Remove redundant algo to engine mapping code
-Date:   Wed, 31 Jul 2019 17:25:28 +0200
-Message-Id: <1564586730-9629-3-git-send-email-pvanleeuwen@verimatrix.com>
+Subject: [PATCH 4/4] crypto: inside-secure - add support for using the EIP197 without vendor firmware
+Date:   Wed, 31 Jul 2019 17:25:30 +0200
+Message-Id: <1564586730-9629-5-git-send-email-pvanleeuwen@verimatrix.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1564586730-9629-1-git-send-email-pvanleeuwen@verimatrix.com>
 References: <1564586730-9629-1-git-send-email-pvanleeuwen@verimatrix.com>
@@ -73,260 +74,310 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This removes some code determine which engine has which algorithms which
-was effectively redundant (may have been forward-looking?) due to always
-enabling all algorithms for all currently supported engines.
-A future patch will use a different, more scalable approach to achieve
-this. This is removed now because otherwise the next patch will add new
-hardware which would otherwise have to be added to all algorithms, so
-now is a convenient time to just get rid of this.
+From: Pascal van Leeuwen <pvanleeuwen@insidesecure.com>
+
+Until now, the inside-secure driver required a set of firmware images
+supplied by the silicon vendor, typically under NDA, to be present in
+/lib/firmware/inside-secure in order to be able to function.
+This patch removes the dependence on this official vendor firmware by
+falling back to generic "mini" FW - developed specifically for this
+driver - that can be provided under GPL 2.0 through linux-firmwares.
 
 Signed-off-by: Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
 ---
- drivers/crypto/inside-secure/safexcel.c        |  9 ---------
- drivers/crypto/inside-secure/safexcel.h        |  1 -
- drivers/crypto/inside-secure/safexcel_cipher.c | 11 -----------
- drivers/crypto/inside-secure/safexcel_hash.c   | 12 ------------
- 4 files changed, 33 deletions(-)
+ drivers/crypto/inside-secure/safexcel.c | 194 ++++++++++++++++++++++++--------
+ drivers/crypto/inside-secure/safexcel.h |  12 ++
+ 2 files changed, 161 insertions(+), 45 deletions(-)
 
 diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
-index df43a2c..a066152 100644
+index 01e03ca..e25beef 100644
 --- a/drivers/crypto/inside-secure/safexcel.c
 +++ b/drivers/crypto/inside-secure/safexcel.c
-@@ -869,9 +869,6 @@ static int safexcel_register_algorithms(struct safexcel_crypto_priv *priv)
- 	for (i = 0; i < ARRAY_SIZE(safexcel_algs); i++) {
- 		safexcel_algs[i]->priv = priv;
+@@ -108,44 +108,143 @@ static void eip197_trc_cache_init(struct safexcel_crypto_priv *priv)
+ 	writel(val, priv->base + EIP197_TRC_PARAMS);
+ }
  
--		if (!(safexcel_algs[i]->engines & priv->version))
--			continue;
--
- 		if (safexcel_algs[i]->type == SAFEXCEL_ALG_TYPE_SKCIPHER)
- 			ret = crypto_register_skcipher(&safexcel_algs[i]->alg.skcipher);
- 		else if (safexcel_algs[i]->type == SAFEXCEL_ALG_TYPE_AEAD)
-@@ -887,9 +884,6 @@ static int safexcel_register_algorithms(struct safexcel_crypto_priv *priv)
+-static void eip197_write_firmware(struct safexcel_crypto_priv *priv,
+-				  const struct firmware *fw, int pe, u32 ctrl,
+-				  u32 prog_en)
++static void eip197_init_firmware(struct safexcel_crypto_priv *priv)
+ {
+-	const u32 *data = (const u32 *)fw->data;
++	int pe, i;
+ 	u32 val;
+-	int i;
  
- fail:
- 	for (j = 0; j < i; j++) {
--		if (!(safexcel_algs[j]->engines & priv->version))
--			continue;
--
- 		if (safexcel_algs[j]->type == SAFEXCEL_ALG_TYPE_SKCIPHER)
- 			crypto_unregister_skcipher(&safexcel_algs[j]->alg.skcipher);
- 		else if (safexcel_algs[j]->type == SAFEXCEL_ALG_TYPE_AEAD)
-@@ -906,9 +900,6 @@ static void safexcel_unregister_algorithms(struct safexcel_crypto_priv *priv)
- 	int i;
+-	/* Reset the engine to make its program memory accessible */
+-	writel(EIP197_PE_ICE_x_CTRL_SW_RESET |
+-	       EIP197_PE_ICE_x_CTRL_CLR_ECC_CORR |
+-	       EIP197_PE_ICE_x_CTRL_CLR_ECC_NON_CORR,
+-	       EIP197_PE(priv) + ctrl);
++	for (pe = 0; pe < priv->config.pes; pe++) {
++		/* Configure the token FIFO's */
++		writel(3, EIP197_PE(priv) + EIP197_PE_ICE_PUTF_CTRL(pe));
++		writel(0, EIP197_PE(priv) + EIP197_PE_ICE_PPTF_CTRL(pe));
++
++		/* Clear the ICE scratchpad memory */
++		val = readl(EIP197_PE(priv) + EIP197_PE_ICE_SCRATCH_CTRL(pe));
++		val |= EIP197_PE_ICE_SCRATCH_CTRL_CHANGE_TIMER |
++		       EIP197_PE_ICE_SCRATCH_CTRL_TIMER_EN |
++		       EIP197_PE_ICE_SCRATCH_CTRL_SCRATCH_ACCESS |
++		       EIP197_PE_ICE_SCRATCH_CTRL_CHANGE_ACCESS;
++		writel(val, EIP197_PE(priv) + EIP197_PE_ICE_SCRATCH_CTRL(pe));
++
++		/* clear the scratchpad RAM using 32 bit writes only */
++		for (i = 0; i < EIP197_NUM_OF_SCRATCH_BLOCKS; i++)
++			writel(0, EIP197_PE(priv) +
++				  EIP197_PE_ICE_SCRATCH_RAM(pe) + (i<<2));
++
++		/* Reset the IFPP engine to make its program mem accessible */
++		writel(EIP197_PE_ICE_x_CTRL_SW_RESET |
++		       EIP197_PE_ICE_x_CTRL_CLR_ECC_CORR |
++		       EIP197_PE_ICE_x_CTRL_CLR_ECC_NON_CORR,
++		       EIP197_PE(priv) + EIP197_PE_ICE_FPP_CTRL(pe));
++
++		/* Reset the IPUE engine to make its program mem accessible */
++		writel(EIP197_PE_ICE_x_CTRL_SW_RESET |
++		       EIP197_PE_ICE_x_CTRL_CLR_ECC_CORR |
++		       EIP197_PE_ICE_x_CTRL_CLR_ECC_NON_CORR,
++		       EIP197_PE(priv) + EIP197_PE_ICE_PUE_CTRL(pe));
++
++		/* Enable access to all IFPP program memories */
++		writel(EIP197_PE_ICE_RAM_CTRL_FPP_PROG_EN,
++		       EIP197_PE(priv) + EIP197_PE_ICE_RAM_CTRL(pe));
++	}
++
++}
  
- 	for (i = 0; i < ARRAY_SIZE(safexcel_algs); i++) {
--		if (!(safexcel_algs[i]->engines & priv->version))
--			continue;
--
- 		if (safexcel_algs[i]->type == SAFEXCEL_ALG_TYPE_SKCIPHER)
- 			crypto_unregister_skcipher(&safexcel_algs[i]->alg.skcipher);
- 		else if (safexcel_algs[i]->type == SAFEXCEL_ALG_TYPE_AEAD)
+-	/* Enable access to the program memory */
+-	writel(prog_en, EIP197_PE(priv) + EIP197_PE_ICE_RAM_CTRL(pe));
++static int eip197_write_firmware(struct safexcel_crypto_priv *priv,
++				  const struct firmware *fw)
++{
++	const u32 *data = (const u32 *)fw->data;
++	int i;
+ 
+ 	/* Write the firmware */
+ 	for (i = 0; i < fw->size / sizeof(u32); i++)
+ 		writel(be32_to_cpu(data[i]),
+ 		       priv->base + EIP197_CLASSIFICATION_RAMS + i * sizeof(u32));
+ 
+-	/* Disable access to the program memory */
+-	writel(0, EIP197_PE(priv) + EIP197_PE_ICE_RAM_CTRL(pe));
++	/* Exclude final 2 NOPs from size */
++	return i - EIP197_FW_TERMINAL_NOPS;
++}
++
++/*
++ * If FW is actual production firmware, then poll for its initialization
++ * to complete and check if it is good for the HW, otherwise just return OK.
++ */
++static bool poll_fw_ready(struct safexcel_crypto_priv *priv, int fpp)
++{
++	int pe, pollcnt;
++	u32 base, pollofs;
++
++	if (fpp)
++		pollofs  = EIP197_FW_FPP_READY;
++	else
++		pollofs  = EIP197_FW_PUE_READY;
+ 
+-	/* Release engine from reset */
+-	val = readl(EIP197_PE(priv) + ctrl);
+-	val &= ~EIP197_PE_ICE_x_CTRL_SW_RESET;
+-	writel(val, EIP197_PE(priv) + ctrl);
++	for (pe = 0; pe < priv->config.pes; pe++) {
++		base = EIP197_PE_ICE_SCRATCH_RAM(pe);
++		pollcnt = EIP197_FW_START_POLLCNT;
++		while (pollcnt &&
++		       (readl_relaxed(EIP197_PE(priv) + base +
++			      pollofs) != 1)) {
++			pollcnt--;
++		}
++		if (!pollcnt) {
++			dev_err(priv->dev, "FW(%d) for PE %d failed to start\n",
++				fpp, pe);
++			return false;
++		}
++	}
++	return true;
++}
++
++static bool eip197_start_firmware(struct safexcel_crypto_priv *priv,
++				  int ipuesz, int ifppsz, int minifw)
++{
++	int pe;
++	u32 val;
++
++	for (pe = 0; pe < priv->config.pes; pe++) {
++		/* Disable access to all program memory */
++		writel(0, EIP197_PE(priv) + EIP197_PE_ICE_RAM_CTRL(pe));
++
++		/* Start IFPP microengines */
++		if (minifw)
++			val = 0;
++		else
++			val = EIP197_PE_ICE_UENG_START_OFFSET((ifppsz - 1) &
++					EIP197_PE_ICE_UENG_INIT_ALIGN_MASK) |
++				EIP197_PE_ICE_UENG_DEBUG_RESET;
++		writel(val, EIP197_PE(priv) + EIP197_PE_ICE_FPP_CTRL(pe));
++
++		/* Start IPUE microengines */
++		if (minifw)
++			val = 0;
++		else
++			val = EIP197_PE_ICE_UENG_START_OFFSET((ipuesz - 1) &
++					EIP197_PE_ICE_UENG_INIT_ALIGN_MASK) |
++				EIP197_PE_ICE_UENG_DEBUG_RESET;
++		writel(val, EIP197_PE(priv) + EIP197_PE_ICE_PUE_CTRL(pe));
++	}
++
++	/* For miniFW startup, there is no initialization, so always succeed */
++	if (minifw)
++		return true;
++
++	/* Wait until all the firmwares have properly started up */
++	if (!poll_fw_ready(priv, 1))
++		return false;
++	if (!poll_fw_ready(priv, 0))
++		return false;
++
++	return true;
+ }
+ 
+ static int eip197_load_firmwares(struct safexcel_crypto_priv *priv)
+ {
+ 	const char *fw_name[] = {"ifpp.bin", "ipue.bin"};
+ 	const struct firmware *fw[FW_NB];
+-	char fw_path[31], *dir = NULL;
++	char fw_path[37], *dir = NULL;
+ 	int i, j, ret = 0, pe;
+-	u32 val;
++	int ipuesz, ifppsz, minifw = 0;
+ 
+ 	if (priv->version == EIP197D_MRVL)
+ 		dir = "eip197d";
+@@ -155,51 +254,56 @@ static int eip197_load_firmwares(struct safexcel_crypto_priv *priv)
+ 	else
+ 		return -ENODEV;
+ 
++retry_fw:
+ 	for (i = 0; i < FW_NB; i++) {
+-		snprintf(fw_path, 31, "inside-secure/%s/%s", dir, fw_name[i]);
+-		ret = request_firmware(&fw[i], fw_path, priv->dev);
++		snprintf(fw_path, 37, "inside-secure/%s/%s", dir, fw_name[i]);
++		ret = firmware_request_nowarn(&fw[i], fw_path, priv->dev);
+ 		if (ret) {
+-			if (priv->version != EIP197B_MRVL)
++			if (minifw || priv->version != EIP197B_MRVL)
+ 				goto release_fw;
+ 
+ 			/* Fallback to the old firmware location for the
+ 			 * EIP197b.
+ 			 */
+-			ret = request_firmware(&fw[i], fw_name[i], priv->dev);
+-			if (ret) {
+-				dev_err(priv->dev,
+-					"Failed to request firmware %s (%d)\n",
+-					fw_name[i], ret);
++			ret = firmware_request_nowarn(&fw[i], fw_name[i],
++						      priv->dev);
++			if (ret)
+ 				goto release_fw;
+-			}
+ 		}
+ 	}
+ 
+-	for (pe = 0; pe < priv->config.pes; pe++) {
+-		/* Clear the scratchpad memory */
+-		val = readl(EIP197_PE(priv) + EIP197_PE_ICE_SCRATCH_CTRL(pe));
+-		val |= EIP197_PE_ICE_SCRATCH_CTRL_CHANGE_TIMER |
+-		       EIP197_PE_ICE_SCRATCH_CTRL_TIMER_EN |
+-		       EIP197_PE_ICE_SCRATCH_CTRL_SCRATCH_ACCESS |
+-		       EIP197_PE_ICE_SCRATCH_CTRL_CHANGE_ACCESS;
+-		writel(val, EIP197_PE(priv) + EIP197_PE_ICE_SCRATCH_CTRL(pe));
++	eip197_init_firmware(priv);
+ 
+-		memset_io(EIP197_PE(priv) + EIP197_PE_ICE_SCRATCH_RAM(pe), 0,
+-			  EIP197_NUM_OF_SCRATCH_BLOCKS * sizeof(u32));
++	ifppsz = eip197_write_firmware(priv, fw[FW_IFPP]);
+ 
+-		eip197_write_firmware(priv, fw[FW_IFPP], pe,
+-				      EIP197_PE_ICE_FPP_CTRL(pe),
+-				      EIP197_PE_ICE_RAM_CTRL_FPP_PROG_EN);
++	/* Enable access to IPUE program memories */
++	for (pe = 0; pe < priv->config.pes; pe++)
++		writel(EIP197_PE_ICE_RAM_CTRL_PUE_PROG_EN,
++		       EIP197_PE(priv) + EIP197_PE_ICE_RAM_CTRL(pe));
+ 
+-		eip197_write_firmware(priv, fw[FW_IPUE], pe,
+-				      EIP197_PE_ICE_PUE_CTRL(pe),
+-				      EIP197_PE_ICE_RAM_CTRL_PUE_PROG_EN);
++	ipuesz = eip197_write_firmware(priv, fw[FW_IPUE]);
++
++	if (eip197_start_firmware(priv, ipuesz, ifppsz, minifw)) {
++		dev_dbg(priv->dev, "Firmware loaded successfully");
++		return 0;
+ 	}
+ 
++	ret = -ENODEV;
++
+ release_fw:
+ 	for (j = 0; j < i; j++)
+ 		release_firmware(fw[j]);
+ 
++	if (!minifw) {
++		/* Retry with minifw path */
++		dev_dbg(priv->dev, "Firmware set not (fully) present or init failed, falling back to BCLA mode\n");
++		dir = "eip197_minifw";
++		minifw = 1;
++		goto retry_fw;
++	}
++
++	dev_dbg(priv->dev, "Firmware load failed.\n");
++
+ 	return ret;
+ }
+ 
 diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
-index e0c202f..e53c232 100644
+index a9a239b..ffb1c66 100644
 --- a/drivers/crypto/inside-secure/safexcel.h
 +++ b/drivers/crypto/inside-secure/safexcel.h
-@@ -655,7 +655,6 @@ struct safexcel_ahash_export_state {
- struct safexcel_alg_template {
- 	struct safexcel_crypto_priv *priv;
- 	enum safexcel_alg_type type;
--	u32 engines;
- 	union {
- 		struct skcipher_alg skcipher;
- 		struct aead_alg aead;
-diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-secure/safexcel_cipher.c
-index 8cdbdbe..ee8a0c3 100644
---- a/drivers/crypto/inside-secure/safexcel_cipher.c
-+++ b/drivers/crypto/inside-secure/safexcel_cipher.c
-@@ -881,7 +881,6 @@ static void safexcel_aead_cra_exit(struct crypto_tfm *tfm)
+@@ -136,8 +136,10 @@
+ #define EIP197_PE_IN_TBUF_THRES(n)		(0x0100 + (0x2000 * (n)))
+ #define EIP197_PE_ICE_SCRATCH_RAM(n)		(0x0800 + (0x2000 * (n)))
+ #define EIP197_PE_ICE_PUE_CTRL(n)		(0x0c80 + (0x2000 * (n)))
++#define EIP197_PE_ICE_PUTF_CTRL(n)		(0x0d00 + (0x2000 * (n)))
+ #define EIP197_PE_ICE_SCRATCH_CTRL(n)		(0x0d04 + (0x2000 * (n)))
+ #define EIP197_PE_ICE_FPP_CTRL(n)		(0x0d80 + (0x2000 * (n)))
++#define EIP197_PE_ICE_PPTF_CTRL(n)		(0x0e00 + (0x2000 * (n)))
+ #define EIP197_PE_ICE_RAM_CTRL(n)		(0x0ff0 + (0x2000 * (n)))
+ #define EIP197_PE_EIP96_TOKEN_CTRL(n)		(0x1000 + (0x2000 * (n)))
+ #define EIP197_PE_EIP96_FUNCTION_EN(n)		(0x1004 + (0x2000 * (n)))
+@@ -228,6 +230,11 @@
+ #define EIP197_DxE_THR_CTRL_EN			BIT(30)
+ #define EIP197_DxE_THR_CTRL_RESET_PE		BIT(31)
  
- struct safexcel_alg_template safexcel_alg_ecb_aes = {
- 	.type = SAFEXCEL_ALG_TYPE_SKCIPHER,
--	.engines = EIP97IES | EIP197B | EIP197D,
- 	.alg.skcipher = {
- 		.setkey = safexcel_skcipher_aes_setkey,
- 		.encrypt = safexcel_ecb_aes_encrypt,
-@@ -920,7 +919,6 @@ static int safexcel_cbc_aes_decrypt(struct skcipher_request *req)
++/* EIP197_PE_ICE_PUE/FPP_CTRL */
++#define EIP197_PE_ICE_UENG_START_OFFSET(n)	((n) << 16)
++#define EIP197_PE_ICE_UENG_INIT_ALIGN_MASK	0x7ff0
++#define EIP197_PE_ICE_UENG_DEBUG_RESET		BIT(3)
++
+ /* EIP197_HIA_AIC_G_ENABLED_STAT */
+ #define EIP197_G_IRQ_DFE(n)			BIT((n) << 1)
+ #define EIP197_G_IRQ_DSE(n)			BIT(((n) << 1) + 1)
+@@ -530,6 +537,11 @@ struct safexcel_command_desc {
+  * Internal structures & functions
+  */
  
- struct safexcel_alg_template safexcel_alg_cbc_aes = {
- 	.type = SAFEXCEL_ALG_TYPE_SKCIPHER,
--	.engines = EIP97IES | EIP197B | EIP197D,
- 	.alg.skcipher = {
- 		.setkey = safexcel_skcipher_aes_setkey,
- 		.encrypt = safexcel_cbc_aes_encrypt,
-@@ -990,7 +988,6 @@ static int safexcel_des_setkey(struct crypto_skcipher *ctfm, const u8 *key,
- 
- struct safexcel_alg_template safexcel_alg_cbc_des = {
- 	.type = SAFEXCEL_ALG_TYPE_SKCIPHER,
--	.engines = EIP97IES | EIP197B | EIP197D,
- 	.alg.skcipher = {
- 		.setkey = safexcel_des_setkey,
- 		.encrypt = safexcel_cbc_des_encrypt,
-@@ -1030,7 +1027,6 @@ static int safexcel_ecb_des_decrypt(struct skcipher_request *req)
- 
- struct safexcel_alg_template safexcel_alg_ecb_des = {
- 	.type = SAFEXCEL_ALG_TYPE_SKCIPHER,
--	.engines = EIP97IES | EIP197B | EIP197D,
- 	.alg.skcipher = {
- 		.setkey = safexcel_des_setkey,
- 		.encrypt = safexcel_ecb_des_encrypt,
-@@ -1093,7 +1089,6 @@ static int safexcel_des3_ede_setkey(struct crypto_skcipher *ctfm,
- 
- struct safexcel_alg_template safexcel_alg_cbc_des3_ede = {
- 	.type = SAFEXCEL_ALG_TYPE_SKCIPHER,
--	.engines = EIP97IES | EIP197B | EIP197D,
- 	.alg.skcipher = {
- 		.setkey = safexcel_des3_ede_setkey,
- 		.encrypt = safexcel_cbc_des3_ede_encrypt,
-@@ -1133,7 +1128,6 @@ static int safexcel_ecb_des3_ede_decrypt(struct skcipher_request *req)
- 
- struct safexcel_alg_template safexcel_alg_ecb_des3_ede = {
- 	.type = SAFEXCEL_ALG_TYPE_SKCIPHER,
--	.engines = EIP97IES | EIP197B | EIP197D,
- 	.alg.skcipher = {
- 		.setkey = safexcel_des3_ede_setkey,
- 		.encrypt = safexcel_ecb_des3_ede_encrypt,
-@@ -1203,7 +1197,6 @@ static int safexcel_aead_sha1_cra_init(struct crypto_tfm *tfm)
- 
- struct safexcel_alg_template safexcel_alg_authenc_hmac_sha1_cbc_aes = {
- 	.type = SAFEXCEL_ALG_TYPE_AEAD,
--	.engines = EIP97IES | EIP197B | EIP197D,
- 	.alg.aead = {
- 		.setkey = safexcel_aead_aes_setkey,
- 		.encrypt = safexcel_aead_encrypt,
-@@ -1238,7 +1231,6 @@ static int safexcel_aead_sha256_cra_init(struct crypto_tfm *tfm)
- 
- struct safexcel_alg_template safexcel_alg_authenc_hmac_sha256_cbc_aes = {
- 	.type = SAFEXCEL_ALG_TYPE_AEAD,
--	.engines = EIP97IES | EIP197B | EIP197D,
- 	.alg.aead = {
- 		.setkey = safexcel_aead_aes_setkey,
- 		.encrypt = safexcel_aead_encrypt,
-@@ -1273,7 +1265,6 @@ static int safexcel_aead_sha224_cra_init(struct crypto_tfm *tfm)
- 
- struct safexcel_alg_template safexcel_alg_authenc_hmac_sha224_cbc_aes = {
- 	.type = SAFEXCEL_ALG_TYPE_AEAD,
--	.engines = EIP97IES | EIP197B | EIP197D,
- 	.alg.aead = {
- 		.setkey = safexcel_aead_aes_setkey,
- 		.encrypt = safexcel_aead_encrypt,
-@@ -1308,7 +1299,6 @@ static int safexcel_aead_sha512_cra_init(struct crypto_tfm *tfm)
- 
- struct safexcel_alg_template safexcel_alg_authenc_hmac_sha512_cbc_aes = {
- 	.type = SAFEXCEL_ALG_TYPE_AEAD,
--	.engines = EIP97IES | EIP197B | EIP197D,
- 	.alg.aead = {
- 		.setkey = safexcel_aead_aes_setkey,
- 		.encrypt = safexcel_aead_encrypt,
-@@ -1343,7 +1333,6 @@ static int safexcel_aead_sha384_cra_init(struct crypto_tfm *tfm)
- 
- struct safexcel_alg_template safexcel_alg_authenc_hmac_sha384_cbc_aes = {
- 	.type = SAFEXCEL_ALG_TYPE_AEAD,
--	.engines = EIP97IES | EIP197B | EIP197D,
- 	.alg.aead = {
- 		.setkey = safexcel_aead_aes_setkey,
- 		.encrypt = safexcel_aead_encrypt,
-diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
-index a80a5e7..2c31536 100644
---- a/drivers/crypto/inside-secure/safexcel_hash.c
-+++ b/drivers/crypto/inside-secure/safexcel_hash.c
-@@ -802,7 +802,6 @@ static void safexcel_ahash_cra_exit(struct crypto_tfm *tfm)
- 
- struct safexcel_alg_template safexcel_alg_sha1 = {
- 	.type = SAFEXCEL_ALG_TYPE_AHASH,
--	.engines = EIP97IES | EIP197B | EIP197D,
- 	.alg.ahash = {
- 		.init = safexcel_sha1_init,
- 		.update = safexcel_ahash_update,
-@@ -1035,7 +1034,6 @@ static int safexcel_hmac_sha1_setkey(struct crypto_ahash *tfm, const u8 *key,
- 
- struct safexcel_alg_template safexcel_alg_hmac_sha1 = {
- 	.type = SAFEXCEL_ALG_TYPE_AHASH,
--	.engines = EIP97IES | EIP197B | EIP197D,
- 	.alg.ahash = {
- 		.init = safexcel_hmac_sha1_init,
- 		.update = safexcel_ahash_update,
-@@ -1099,7 +1097,6 @@ static int safexcel_sha256_digest(struct ahash_request *areq)
- 
- struct safexcel_alg_template safexcel_alg_sha256 = {
- 	.type = SAFEXCEL_ALG_TYPE_AHASH,
--	.engines = EIP97IES | EIP197B | EIP197D,
- 	.alg.ahash = {
- 		.init = safexcel_sha256_init,
- 		.update = safexcel_ahash_update,
-@@ -1162,7 +1159,6 @@ static int safexcel_sha224_digest(struct ahash_request *areq)
- 
- struct safexcel_alg_template safexcel_alg_sha224 = {
- 	.type = SAFEXCEL_ALG_TYPE_AHASH,
--	.engines = EIP97IES | EIP197B | EIP197D,
- 	.alg.ahash = {
- 		.init = safexcel_sha224_init,
- 		.update = safexcel_ahash_update,
-@@ -1218,7 +1214,6 @@ static int safexcel_hmac_sha224_digest(struct ahash_request *areq)
- 
- struct safexcel_alg_template safexcel_alg_hmac_sha224 = {
- 	.type = SAFEXCEL_ALG_TYPE_AHASH,
--	.engines = EIP97IES | EIP197B | EIP197D,
- 	.alg.ahash = {
- 		.init = safexcel_hmac_sha224_init,
- 		.update = safexcel_ahash_update,
-@@ -1275,7 +1270,6 @@ static int safexcel_hmac_sha256_digest(struct ahash_request *areq)
- 
- struct safexcel_alg_template safexcel_alg_hmac_sha256 = {
- 	.type = SAFEXCEL_ALG_TYPE_AHASH,
--	.engines = EIP97IES | EIP197B | EIP197D,
- 	.alg.ahash = {
- 		.init = safexcel_hmac_sha256_init,
- 		.update = safexcel_ahash_update,
-@@ -1347,7 +1341,6 @@ static int safexcel_sha512_digest(struct ahash_request *areq)
- 
- struct safexcel_alg_template safexcel_alg_sha512 = {
- 	.type = SAFEXCEL_ALG_TYPE_AHASH,
--	.engines = EIP97IES | EIP197B | EIP197D,
- 	.alg.ahash = {
- 		.init = safexcel_sha512_init,
- 		.update = safexcel_ahash_update,
-@@ -1418,7 +1411,6 @@ static int safexcel_sha384_digest(struct ahash_request *areq)
- 
- struct safexcel_alg_template safexcel_alg_sha384 = {
- 	.type = SAFEXCEL_ALG_TYPE_AHASH,
--	.engines = EIP97IES | EIP197B | EIP197D,
- 	.alg.ahash = {
- 		.init = safexcel_sha384_init,
- 		.update = safexcel_ahash_update,
-@@ -1474,7 +1466,6 @@ static int safexcel_hmac_sha512_digest(struct ahash_request *areq)
- 
- struct safexcel_alg_template safexcel_alg_hmac_sha512 = {
- 	.type = SAFEXCEL_ALG_TYPE_AHASH,
--	.engines = EIP97IES | EIP197B | EIP197D,
- 	.alg.ahash = {
- 		.init = safexcel_hmac_sha512_init,
- 		.update = safexcel_ahash_update,
-@@ -1531,7 +1522,6 @@ static int safexcel_hmac_sha384_digest(struct ahash_request *areq)
- 
- struct safexcel_alg_template safexcel_alg_hmac_sha384 = {
- 	.type = SAFEXCEL_ALG_TYPE_AHASH,
--	.engines = EIP97IES | EIP197B | EIP197D,
- 	.alg.ahash = {
- 		.init = safexcel_hmac_sha384_init,
- 		.update = safexcel_ahash_update,
-@@ -1591,7 +1581,6 @@ static int safexcel_md5_digest(struct ahash_request *areq)
- 
- struct safexcel_alg_template safexcel_alg_md5 = {
- 	.type = SAFEXCEL_ALG_TYPE_AHASH,
--	.engines = EIP97IES | EIP197B | EIP197D,
- 	.alg.ahash = {
- 		.init = safexcel_md5_init,
- 		.update = safexcel_ahash_update,
-@@ -1647,7 +1636,6 @@ static int safexcel_hmac_md5_digest(struct ahash_request *areq)
- 
- struct safexcel_alg_template safexcel_alg_hmac_md5 = {
- 	.type = SAFEXCEL_ALG_TYPE_AHASH,
--	.engines = EIP97IES | EIP197B | EIP197D,
- 	.alg.ahash = {
- 		.init = safexcel_hmac_md5_init,
- 		.update = safexcel_ahash_update,
++#define EIP197_FW_TERMINAL_NOPS		2
++#define EIP197_FW_START_POLLCNT		16
++#define EIP197_FW_PUE_READY		0x14
++#define EIP197_FW_FPP_READY		0x18
++
+ enum eip197_fw {
+ 	FW_IFPP = 0,
+ 	FW_IPUE,
 -- 
 1.8.3.1
 
