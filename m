@@ -2,177 +2,365 @@ Return-Path: <SRS0=mqYf=V4=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86B0EC433FF
-	for <linux-crypto@archiver.kernel.org>; Wed, 31 Jul 2019 11:37:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03D1CC32751
+	for <linux-crypto@archiver.kernel.org>; Wed, 31 Jul 2019 12:02:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 46B942089E
-	for <linux-crypto@archiver.kernel.org>; Wed, 31 Jul 2019 11:37:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=verimatrix.com header.i=@verimatrix.com header.b="Xnmu1xfk"
+	by mail.kernel.org (Postfix) with ESMTP id C51D6206A3
+	for <linux-crypto@archiver.kernel.org>; Wed, 31 Jul 2019 12:02:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726641AbfGaLhO (ORCPT
+        id S1727887AbfGaMCV (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 31 Jul 2019 07:37:14 -0400
-Received: from mail-eopbgr680083.outbound.protection.outlook.com ([40.107.68.83]:41768
-        "EHLO NAM04-BN3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726396AbfGaLhN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 31 Jul 2019 07:37:13 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Ggdl9eFM+mab0bRUHOEtO9XaqM+dUM0LAFVek2Rw0MsbPmT/FsEhaAfraDolCp89sRYPL45IUw+pmPsDl4ULDp7CApDfZv7Dy8fJkzQxklvUMqHTy63Ekf0ySZgBCVPGqwXU4EoycpqH87a9XU6KipMHPiTm6nUDabA2NIVhhfdjIHW5UEs75xGwSt9hagGx1OawYiS2h1KQkNF6zZC2CnM+AzZG6TPl8z1B219jzODqB8E9JGzeGunAJDKqQF57KSaJYyFWAIaykp9yv/wfSVTtuhdooTEmJq+no7p3IOmyXKZqHUv+HGMkQq8nXvFS5pNFbUu6emX4Eq8iwEqWzA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3yoOaXqP85pO2VmKQM/3CTqBFMy6n4mzQPx01OqDkmI=;
- b=TEzDlw9t0P6ed0r0jZx0GKGjAl0cEZHpAVzj2q9k+TzsIPkLlgCZaglUQsjkeHTDXyjSTdq1JzzISt0akw/i7rqC4fUx6xcpH3StkKpta663uitx57mWBsha2NqweWcgSlpNkKHEWb5aVmNG6YQUYO7mK041MoHjk4QKuF/X2/3tgZmSYxcgdEDP3iNJ1EdHBRbNueqmclobM0LlG38/rb0AbS/qKUUahfKCifR+XT/wtI8G0M/FO9jjfdFPUQYOH5QsdqlIYW4ubYMsPDh6r351qbS7+RDF2YCI+l+uzD9qcTz1tWvNNGF37rRTAFouWvW1whNecBWngmyVQsTaSA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
- smtp.mailfrom=verimatrix.com;dmarc=pass action=none
- header.from=verimatrix.com;dkim=pass header.d=verimatrix.com;arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verimatrix.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3yoOaXqP85pO2VmKQM/3CTqBFMy6n4mzQPx01OqDkmI=;
- b=Xnmu1xfkvUTkCy9+KrhFx2l3TGAOjaS9dwaffbsaO58GGN2gcLgIRE898v/g82nCwSyGejlHIppksvfnJlpsCulsvIq7/08JH3J5RzDyUd9+VNFbB9yHvOIpgh8hjZFsk0/A5RZWZFpD/RbicKBJLXef98FSuj2f4U4nInWOWgE=
-Received: from MN2PR20MB2973.namprd20.prod.outlook.com (52.132.172.146) by
- MN2PR20MB2495.namprd20.prod.outlook.com (20.179.144.155) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2115.14; Wed, 31 Jul 2019 11:37:09 +0000
-Received: from MN2PR20MB2973.namprd20.prod.outlook.com
- ([fe80::d96f:39b2:19f4:c7c1]) by MN2PR20MB2973.namprd20.prod.outlook.com
- ([fe80::d96f:39b2:19f4:c7c1%7]) with mapi id 15.20.2115.005; Wed, 31 Jul 2019
- 11:37:08 +0000
-From:   Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-CC:     Antoine Tenart <antoine.tenart@bootlin.com>,
-        Pascal van Leeuwen <pascalvanl@gmail.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "davem@davemloft.net" <davem@davemloft.net>
-Subject: RE: [PATCHv2 2/3] crypto: inside-secure - add support for PCI based
- FPGA development board
-Thread-Topic: [PATCHv2 2/3] crypto: inside-secure - add support for PCI based
- FPGA development board
-Thread-Index: AQHVQ7iGiGasvxZ/1k28+z4dWUzE9abi5S6AgAAAqWCAAaFIAIAAEdEAgAABQFA=
-Date:   Wed, 31 Jul 2019 11:37:08 +0000
-Message-ID: <MN2PR20MB29731297E57536B08BF82A56CADF0@MN2PR20MB2973.namprd20.prod.outlook.com>
-References: <1564145005-26731-1-git-send-email-pvanleeuwen@verimatrix.com>
- <1564145005-26731-3-git-send-email-pvanleeuwen@verimatrix.com>
- <20190730090811.GF3108@kwain>
- <MN2PR20MB2973B37C90FBD6E6C97B8E09CADC0@MN2PR20MB2973.namprd20.prod.outlook.com>
- <MN2PR20MB29734DDABC5D2812EAFEFBABCADF0@MN2PR20MB2973.namprd20.prod.outlook.com>
- <20190731110750.GA20643@gondor.apana.org.au>
-In-Reply-To: <20190731110750.GA20643@gondor.apana.org.au>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=pvanleeuwen@verimatrix.com; 
-x-originating-ip: [188.204.2.113]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 42cadadd-79a8-4e78-1c7d-08d715ab6be4
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:MN2PR20MB2495;
-x-ms-traffictypediagnostic: MN2PR20MB2495:
-x-ms-exchange-purlcount: 3
-x-microsoft-antispam-prvs: <MN2PR20MB24950B8CE14176BF11CA8CE8CADF0@MN2PR20MB2495.namprd20.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-forefront-prvs: 011579F31F
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(39850400004)(136003)(346002)(366004)(396003)(376002)(13464003)(199004)(189003)(33656002)(86362001)(486006)(256004)(305945005)(6916009)(3846002)(74316002)(66066001)(76116006)(186003)(2906002)(68736007)(66556008)(64756008)(476003)(66476007)(66446008)(54906003)(52536014)(66946007)(81156014)(81166006)(11346002)(8936002)(446003)(6116002)(7696005)(966005)(229853002)(14454004)(478600001)(6436002)(102836004)(99286004)(5660300002)(25786009)(6246003)(4326008)(8676002)(316002)(53546011)(6506007)(7736002)(26005)(6306002)(55016002)(9686003)(76176011)(15974865002)(71190400001)(71200400001)(53936002)(18886075002);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR20MB2495;H:MN2PR20MB2973.namprd20.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: verimatrix.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: n/Whp2Bp3U8/ac77YdvR/XSkwPajXBSJ9qCXnCVrBGwQ9+XJuhDr4XE/DU07+NsGfRlET9b4cC0P3CaSqNZLpwWM6rIyLEQXHEVmuUpBn7oOozOKM2CmqtQdyNeEsPiBP929sjtpuorQ5NbnfT1dQ6cYweLUej9WqFHD7IJIPG+SelbCgPTkYEQMGV5rOUNHBoUHe+mk4IUqN3wigUlC3ybGOrVNGogKxUw0YG/iHkMX87TuGTT+Q/0yXAdcNEEQ8I/AcQHB0n50dtMydBLNZEsPwkY88x837DJfshyM6/Vp9OK4bNhBccxZOa7v2JI4ukEYyznlDXPjAMtNOnkEXxxn3Y8BWoG9EtwGSUxG3rrKKem/4BNjVQ4mKm3gFdB0y7ZskXucx7A3q8IGmHC9OK5m8DWhRZmd4UVA0m2LPQg=
-Content-Type: text/plain; charset="Windows-1252"
-Content-Transfer-Encoding: quoted-printable
+        Wed, 31 Jul 2019 08:02:21 -0400
+Received: from esa6.microchip.iphmx.com ([216.71.154.253]:58815 "EHLO
+        esa6.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725935AbfGaMCV (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 31 Jul 2019 08:02:21 -0400
+Received-SPF: Pass (esa6.microchip.iphmx.com: domain of
+  Ludovic.Desroches@microchip.com designates 198.175.253.82 as
+  permitted sender) identity=mailfrom;
+  client-ip=198.175.253.82; receiver=esa6.microchip.iphmx.com;
+  envelope-from="Ludovic.Desroches@microchip.com";
+  x-sender="Ludovic.Desroches@microchip.com";
+  x-conformance=spf_only; x-record-type="v=spf1";
+  x-record-text="v=spf1 mx a:ushub1.microchip.com
+  a:smtpout.microchip.com a:mx1.microchip.iphmx.com
+  a:mx2.microchip.iphmx.com include:servers.mcsv.net
+  include:mktomail.com include:spf.protection.outlook.com ~all"
+Received-SPF: None (esa6.microchip.iphmx.com: no sender
+  authenticity information available from domain of
+  postmaster@email.microchip.com) identity=helo;
+  client-ip=198.175.253.82; receiver=esa6.microchip.iphmx.com;
+  envelope-from="Ludovic.Desroches@microchip.com";
+  x-sender="postmaster@email.microchip.com";
+  x-conformance=spf_only
+Authentication-Results: esa6.microchip.iphmx.com; dkim=none (message not signed) header.i=none; spf=Pass smtp.mailfrom=Ludovic.Desroches@microchip.com; spf=None smtp.helo=postmaster@email.microchip.com; dmarc=pass (p=none dis=none) d=microchip.com
+IronPort-SDR: aOXXuc5p8mcm9W4svbErvAw8zDEnWX/xu0aNxswsJyJuhyMe99u47Jm1prVHQolWOyNCDfjIuz
+ 2KyP8Vie8Ke/iYGSsF9kTc/4qyYziM4P3uVCki6ZJ2Ec/JwzXlPUKsPcJW/zR8JoVLWIFTKGv3
+ SSFveGNhVDFv/PkILzMw7ZbwXVZwQBzAn9G7yEgxBnVmom/o6CWRWha/JTkYBQjgXwF7LiJq2l
+ PwF15dCwaJq6eekR8qgPW6a62S/Vq7HQUUQUHKOIh1ah/aubb5L2m2DbWcI2soprYL8bXzyJ09
+ 8ww=
+X-IronPort-AV: E=Sophos;i="5.64,330,1559545200"; 
+   d="scan'208";a="40418042"
+Received: from smtpout.microchip.com (HELO email.microchip.com) ([198.175.253.82])
+  by esa6.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 31 Jul 2019 05:02:17 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Wed, 31 Jul 2019 05:02:17 -0700
+Received: from localhost (10.10.85.251) by chn-vm-ex01.mchp-main.com
+ (10.10.85.143) with Microsoft SMTP Server id 15.1.1713.5 via Frontend
+ Transport; Wed, 31 Jul 2019 05:02:15 -0700
+Date:   Wed, 31 Jul 2019 14:01:21 +0200
+From:   Ludovic Desroches <ludovic.desroches@microchip.com>
+To:     Chuhong Yuan <hslester96@gmail.com>
+CC:     Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Nicolas Ferre <nicolas.ferre@microchip.com>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        "=?utf-8?Q?=C5=81ukasz?= Stelmach" <l.stelmach@samsung.com>,
+        Kukjin Kim <kgene@kernel.org>,
+        "Krzysztof Kozlowski" <krzk@kernel.org>,
+        Deepak Saxena <dsaxena@plexity.net>,
+        "Benjamin Herrenschmidt" <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Patrice Chotard <patrice.chotard@st.com>,
+        <linux-crypto@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>,
+        <linux-samsung-soc@vger.kernel.org>,
+        <linuxppc-dev@lists.ozlabs.org>
+Subject: Re: [PATCH] hwrng: Use device-managed registration API
+Message-ID: <20190731120121.yarswvuz3avyc6re@M43218.corp.atmel.com>
+Mail-Followup-To: Chuhong Yuan <hslester96@gmail.com>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Nicolas Ferre <nicolas.ferre@microchip.com>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        =?utf-8?Q?=C5=81ukasz?= Stelmach <l.stelmach@samsung.com>,
+        Kukjin Kim <kgene@kernel.org>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Deepak Saxena <dsaxena@plexity.net>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Patrice Chotard <patrice.chotard@st.com>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org
+References: <20190725080155.19875-1-hslester96@gmail.com>
 MIME-Version: 1.0
-X-OriginatorOrg: verimatrix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 42cadadd-79a8-4e78-1c7d-08d715ab6be4
-X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Jul 2019 11:37:08.5209
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: dcb260f9-022d-4495-8602-eae51035a0d0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: pvanleeuwen@verimatrix.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR20MB2495
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20190725080155.19875-1-hslester96@gmail.com>
+User-Agent: NeoMutt/20180716
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-> -----Original Message-----
-> From: Herbert Xu <herbert@gondor.apana.org.au>
-> Sent: Wednesday, July 31, 2019 1:08 PM
-> To: Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
-> Cc: Antoine Tenart <antoine.tenart@bootlin.com>; Pascal van Leeuwen
-> <pascalvanl@gmail.com>; linux-crypto@vger.kernel.org; davem@davemloft.net
-> Subject: Re: [PATCHv2 2/3] crypto: inside-secure - add support for PCI ba=
-sed FPGA
-> development board
->=20
-> On Wed, Jul 31, 2019 at 10:11:46AM +0000, Pascal Van Leeuwen wrote:
-> >
-> > > > > +static int __init crypto_is_init(void)
-> > > > > +{
-> > > > > +	int rc;
-> > > > > +
-> > > > > +	#if (IS_ENABLED(CONFIG_OF))
-> > > > > +		/* Register platform driver */
-> > > > > +		platform_driver_register(&crypto_safexcel);
-> > > > > +	#endif
-> > > >
-> > > > When used in the code directly, you should use:
-> > > >
-> > > >   if (IS_ENABLED(CONFIG_OF))
-> > > >
-> > > Oops, I missed that one, will fix.
-> > >
-> > Actually, I tried that first, but it doesn't work in this particular ca=
-se.
-> > The #if is really necessary here to avoid compile errors due to
-> > references to datastructures that are within another #if ... (which ref=
-er
-> > to functions with the #if etc. so it's a whole dependency chain)
->=20
-> If you're going to use a #if then please don't indent it as that's
-> not the kernel coding style.
->=20
-Ok, I can do that
+On Thu, Jul 25, 2019 at 04:01:55PM +0800, Chuhong Yuan wrote:
+> External E-Mail
+> 
+> 
+> Use devm_hwrng_register to simplify the implementation.
+> Manual unregistration and some remove functions can be
+> removed now.
+> 
+> Signed-off-by: Chuhong Yuan <hslester96@gmail.com>
+> ---
+>  drivers/char/hw_random/atmel-rng.c     |  3 +--
 
-> I see why you can't use a straight "if" because you've moved
-> crypto_safexcel inside a #if, but what if you got rid of that
-> #if too?
->
-Then it won't compile either because it references stuff outside of the=20
-module that don't exist. Originally (previous version of the patch) I=20
-had a different solution removing those function bodies using regular=20
-if's but for some reason I don't remember anymore that didn't fly and=20
-I had to change it into this.
+Acked-by: Ludovic Desroches <ludovic.desroches@microchip.com>
 
-> IOW what would it take to make the probe function compile
-> with CONFIG_OF off?
->=20
-That's how I came up with the current code using #if's. If anyone has a=20
-better solution, I'm happy to hear it. But I don't really want to spend
-more time on it doing trial-and-error and not getting anywhere.
+Thanks
 
-> In general we want to maximise compiler coverage under all config
-> options so if we can make it compiler without too much effort that
-> would be the preferred solution.
->
-I understand that, and I tried to do that initially, but that wouldn't
-work so I ended up with this as a compromise ...
-
-> Cheers,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
-
-Regards,
-Pascal van Leeuwen
-Silicon IP Architect, Multi-Protocol Engines @ Verimatrix
-www.insidesecure.com
-
+>  drivers/char/hw_random/cavium-rng-vf.c | 11 +----------
+>  drivers/char/hw_random/exynos-trng.c   |  3 +--
+>  drivers/char/hw_random/n2-drv.c        |  4 +---
+>  drivers/char/hw_random/nomadik-rng.c   |  3 +--
+>  drivers/char/hw_random/omap-rng.c      |  3 +--
+>  drivers/char/hw_random/powernv-rng.c   | 10 +---------
+>  drivers/char/hw_random/st-rng.c        |  4 +---
+>  drivers/char/hw_random/xgene-rng.c     |  4 +---
+>  9 files changed, 9 insertions(+), 36 deletions(-)
+> 
+> diff --git a/drivers/char/hw_random/atmel-rng.c b/drivers/char/hw_random/atmel-rng.c
+> index 433426242b87..e55705745d5e 100644
+> --- a/drivers/char/hw_random/atmel-rng.c
+> +++ b/drivers/char/hw_random/atmel-rng.c
+> @@ -86,7 +86,7 @@ static int atmel_trng_probe(struct platform_device *pdev)
+>  	trng->rng.name = pdev->name;
+>  	trng->rng.read = atmel_trng_read;
+>  
+> -	ret = hwrng_register(&trng->rng);
+> +	ret = devm_hwrng_register(&pdev->dev, &trng->rng);
+>  	if (ret)
+>  		goto err_register;
+>  
+> @@ -103,7 +103,6 @@ static int atmel_trng_remove(struct platform_device *pdev)
+>  {
+>  	struct atmel_trng *trng = platform_get_drvdata(pdev);
+>  
+> -	hwrng_unregister(&trng->rng);
+>  
+>  	atmel_trng_disable(trng);
+>  	clk_disable_unprepare(trng->clk);
+> diff --git a/drivers/char/hw_random/cavium-rng-vf.c b/drivers/char/hw_random/cavium-rng-vf.c
+> index 2d1352b67168..3de4a6a443ef 100644
+> --- a/drivers/char/hw_random/cavium-rng-vf.c
+> +++ b/drivers/char/hw_random/cavium-rng-vf.c
+> @@ -67,7 +67,7 @@ static int cavium_rng_probe_vf(struct	pci_dev		*pdev,
+>  
+>  	pci_set_drvdata(pdev, rng);
+>  
+> -	ret = hwrng_register(&rng->ops);
+> +	ret = devm_hwrng_register(&pdev->dev, &rng->ops);
+>  	if (ret) {
+>  		dev_err(&pdev->dev, "Error registering device as HWRNG.\n");
+>  		return ret;
+> @@ -76,14 +76,6 @@ static int cavium_rng_probe_vf(struct	pci_dev		*pdev,
+>  	return 0;
+>  }
+>  
+> -/* Remove the VF */
+> -static void  cavium_rng_remove_vf(struct pci_dev *pdev)
+> -{
+> -	struct cavium_rng *rng;
+> -
+> -	rng = pci_get_drvdata(pdev);
+> -	hwrng_unregister(&rng->ops);
+> -}
+>  
+>  static const struct pci_device_id cavium_rng_vf_id_table[] = {
+>  	{ PCI_DEVICE(PCI_VENDOR_ID_CAVIUM, 0xa033), 0, 0, 0},
+> @@ -95,7 +87,6 @@ static struct pci_driver cavium_rng_vf_driver = {
+>  	.name		= "cavium_rng_vf",
+>  	.id_table	= cavium_rng_vf_id_table,
+>  	.probe		= cavium_rng_probe_vf,
+> -	.remove		= cavium_rng_remove_vf,
+>  };
+>  module_pci_driver(cavium_rng_vf_driver);
+>  
+> diff --git a/drivers/char/hw_random/exynos-trng.c b/drivers/char/hw_random/exynos-trng.c
+> index 94235761955c..b4b52ab23b6b 100644
+> --- a/drivers/char/hw_random/exynos-trng.c
+> +++ b/drivers/char/hw_random/exynos-trng.c
+> @@ -153,7 +153,7 @@ static int exynos_trng_probe(struct platform_device *pdev)
+>  		goto err_clock;
+>  	}
+>  
+> -	ret = hwrng_register(&trng->rng);
+> +	ret = devm_hwrng_register(&pdev->dev, &trng->rng);
+>  	if (ret) {
+>  		dev_err(&pdev->dev, "Could not register hwrng device.\n");
+>  		goto err_register;
+> @@ -179,7 +179,6 @@ static int exynos_trng_remove(struct platform_device *pdev)
+>  {
+>  	struct exynos_trng_dev *trng =  platform_get_drvdata(pdev);
+>  
+> -	hwrng_unregister(&trng->rng);
+>  	clk_disable_unprepare(trng->clk);
+>  
+>  	pm_runtime_put_sync(&pdev->dev);
+> diff --git a/drivers/char/hw_random/n2-drv.c b/drivers/char/hw_random/n2-drv.c
+> index d4cab105796f..2d256b3470db 100644
+> --- a/drivers/char/hw_random/n2-drv.c
+> +++ b/drivers/char/hw_random/n2-drv.c
+> @@ -768,7 +768,7 @@ static int n2rng_probe(struct platform_device *op)
+>  	np->hwrng.data_read = n2rng_data_read;
+>  	np->hwrng.priv = (unsigned long) np;
+>  
+> -	err = hwrng_register(&np->hwrng);
+> +	err = devm_hwrng_register(&pdev->dev, &np->hwrng);
+>  	if (err)
+>  		goto out_hvapi_unregister;
+>  
+> @@ -793,8 +793,6 @@ static int n2rng_remove(struct platform_device *op)
+>  
+>  	cancel_delayed_work_sync(&np->work);
+>  
+> -	hwrng_unregister(&np->hwrng);
+> -
+>  	sun4v_hvapi_unregister(HV_GRP_RNG);
+>  
+>  	return 0;
+> diff --git a/drivers/char/hw_random/nomadik-rng.c b/drivers/char/hw_random/nomadik-rng.c
+> index fc0f6b0cb80d..74ed29f42e4f 100644
+> --- a/drivers/char/hw_random/nomadik-rng.c
+> +++ b/drivers/char/hw_random/nomadik-rng.c
+> @@ -57,7 +57,7 @@ static int nmk_rng_probe(struct amba_device *dev, const struct amba_id *id)
+>  	if (!base)
+>  		goto out_release;
+>  	nmk_rng.priv = (unsigned long)base;
+> -	ret = hwrng_register(&nmk_rng);
+> +	ret = devm_hwrng_register(&dev->dev, &nmk_rng);
+>  	if (ret)
+>  		goto out_release;
+>  	return 0;
+> @@ -71,7 +71,6 @@ static int nmk_rng_probe(struct amba_device *dev, const struct amba_id *id)
+>  
+>  static int nmk_rng_remove(struct amba_device *dev)
+>  {
+> -	hwrng_unregister(&nmk_rng);
+>  	amba_release_regions(dev);
+>  	clk_disable(rng_clk);
+>  	return 0;
+> diff --git a/drivers/char/hw_random/omap-rng.c b/drivers/char/hw_random/omap-rng.c
+> index e9b6ac61fb7f..b27f39688b5e 100644
+> --- a/drivers/char/hw_random/omap-rng.c
+> +++ b/drivers/char/hw_random/omap-rng.c
+> @@ -500,7 +500,7 @@ static int omap_rng_probe(struct platform_device *pdev)
+>  	if (ret)
+>  		goto err_register;
+>  
+> -	ret = hwrng_register(&priv->rng);
+> +	ret = devm_hwrng_register(&pdev->dev, &priv->rng);
+>  	if (ret)
+>  		goto err_register;
+>  
+> @@ -525,7 +525,6 @@ static int omap_rng_remove(struct platform_device *pdev)
+>  {
+>  	struct omap_rng_dev *priv = platform_get_drvdata(pdev);
+>  
+> -	hwrng_unregister(&priv->rng);
+>  
+>  	priv->pdata->cleanup(priv);
+>  
+> diff --git a/drivers/char/hw_random/powernv-rng.c b/drivers/char/hw_random/powernv-rng.c
+> index f2e8272e276a..8da1d7917bdc 100644
+> --- a/drivers/char/hw_random/powernv-rng.c
+> +++ b/drivers/char/hw_random/powernv-rng.c
+> @@ -33,18 +33,11 @@ static struct hwrng powernv_hwrng = {
+>  	.read = powernv_rng_read,
+>  };
+>  
+> -static int powernv_rng_remove(struct platform_device *pdev)
+> -{
+> -	hwrng_unregister(&powernv_hwrng);
+> -
+> -	return 0;
+> -}
+> -
+>  static int powernv_rng_probe(struct platform_device *pdev)
+>  {
+>  	int rc;
+>  
+> -	rc = hwrng_register(&powernv_hwrng);
+> +	rc = devm_hwrng_register(&pdev->dev, &powernv_hwrng);
+>  	if (rc) {
+>  		/* We only register one device, ignore any others */
+>  		if (rc == -EEXIST)
+> @@ -70,7 +63,6 @@ static struct platform_driver powernv_rng_driver = {
+>  		.of_match_table = powernv_rng_match,
+>  	},
+>  	.probe	= powernv_rng_probe,
+> -	.remove = powernv_rng_remove,
+>  };
+>  module_platform_driver(powernv_rng_driver);
+>  
+> diff --git a/drivers/char/hw_random/st-rng.c b/drivers/char/hw_random/st-rng.c
+> index bd6a98b3479b..863448360a7d 100644
+> --- a/drivers/char/hw_random/st-rng.c
+> +++ b/drivers/char/hw_random/st-rng.c
+> @@ -102,7 +102,7 @@ static int st_rng_probe(struct platform_device *pdev)
+>  
+>  	dev_set_drvdata(&pdev->dev, ddata);
+>  
+> -	ret = hwrng_register(&ddata->ops);
+> +	ret = devm_hwrng_register(&pdev->dev, &ddata->ops);
+>  	if (ret) {
+>  		dev_err(&pdev->dev, "Failed to register HW RNG\n");
+>  		clk_disable_unprepare(clk);
+> @@ -118,8 +118,6 @@ static int st_rng_remove(struct platform_device *pdev)
+>  {
+>  	struct st_rng_data *ddata = dev_get_drvdata(&pdev->dev);
+>  
+> -	hwrng_unregister(&ddata->ops);
+> -
+>  	clk_disable_unprepare(ddata->clk);
+>  
+>  	return 0;
+> diff --git a/drivers/char/hw_random/xgene-rng.c b/drivers/char/hw_random/xgene-rng.c
+> index 8c6f9f63da5e..7e568db87ae2 100644
+> --- a/drivers/char/hw_random/xgene-rng.c
+> +++ b/drivers/char/hw_random/xgene-rng.c
+> @@ -361,7 +361,7 @@ static int xgene_rng_probe(struct platform_device *pdev)
+>  
+>  	xgene_rng_func.priv = (unsigned long) ctx;
+>  
+> -	rc = hwrng_register(&xgene_rng_func);
+> +	rc = devm_hwrng_register(&pdev->dev, &xgene_rng_func);
+>  	if (rc) {
+>  		dev_err(&pdev->dev, "RNG registering failed error %d\n", rc);
+>  		if (!IS_ERR(ctx->clk))
+> @@ -375,7 +375,6 @@ static int xgene_rng_probe(struct platform_device *pdev)
+>  			rc);
+>  		if (!IS_ERR(ctx->clk))
+>  			clk_disable_unprepare(ctx->clk);
+> -		hwrng_unregister(&xgene_rng_func);
+>  		return rc;
+>  	}
+>  
+> @@ -392,7 +391,6 @@ static int xgene_rng_remove(struct platform_device *pdev)
+>  		dev_err(&pdev->dev, "RNG init wakeup failed error %d\n", rc);
+>  	if (!IS_ERR(ctx->clk))
+>  		clk_disable_unprepare(ctx->clk);
+> -	hwrng_unregister(&xgene_rng_func);
+>  
+>  	return rc;
+>  }
+> -- 
+> 2.20.1
+> 
+> 
