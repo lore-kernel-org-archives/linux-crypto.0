@@ -2,182 +2,99 @@ Return-Path: <SRS0=q4N3=V5=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D903C433FF
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Aug 2019 01:11:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9644C41514
+	for <linux-crypto@archiver.kernel.org>; Thu,  1 Aug 2019 02:11:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 06ED62067D
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Aug 2019 01:11:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1564621906;
-	bh=H1VGC39qmcqOsG5Rnv48x88mYEzA6Ram+Ziuu/hGRjA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=la0zBJYf5xY6ZnU3Ro2etj95QWEGHJKVu2bHUo16gfqPzpeNuif45DThu2gMWyqwE
-	 ELlWJcXlfm2Ny0eEOMImGdJfbUvH+zplMeH/aOYWVDWVwnJPnbzla/nh03zbmBJvCO
-	 OSrABABrELfBS0wik9EqfXvsHYY3Y3mpoRvOfLbE=
+	by mail.kernel.org (Postfix) with ESMTP id 916CA20693
+	for <linux-crypto@archiver.kernel.org>; Thu,  1 Aug 2019 02:11:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727360AbfHABLn (ORCPT
+        id S1726984AbfHACLr (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 31 Jul 2019 21:11:43 -0400
-Received: from mail.kernel.org ([198.145.29.99]:32832 "EHLO mail.kernel.org"
+        Wed, 31 Jul 2019 22:11:47 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:43240 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725942AbfHABLn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 31 Jul 2019 21:11:43 -0400
-Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id D166420665;
-        Thu,  1 Aug 2019 01:11:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1564621902;
-        bh=H1VGC39qmcqOsG5Rnv48x88mYEzA6Ram+Ziuu/hGRjA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=e8Dwci5xbYFe0C6i+Jry/mUax6YutZbfR3b/Gv6NL6rFOTDCCnd/C6LBkT2KI54v8
-         CsswFjk1ORn0BeQh+I/EUKIkcKyQOl9CS/Sr8D605d28SIESBmwR0cw69VcDq8gpU3
-         Qniz1oJ5alZPULLLVyiKg5WFquPGWnvOd3X3n8cE=
-Date:   Wed, 31 Jul 2019 18:11:40 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     "Theodore Y. Ts'o" <tytso@mit.edu>
-Cc:     linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        linux-mtd@lists.infradead.org, linux-api@vger.kernel.org,
-        linux-crypto@vger.kernel.org, keyrings@vger.kernel.org,
-        Paul Crowley <paulcrowley@google.com>,
-        Satya Tangirala <satyat@google.com>
-Subject: Re: [f2fs-dev] [PATCH v7 07/16] fscrypt: add
- FS_IOC_REMOVE_ENCRYPTION_KEY ioctl
-Message-ID: <20190801011140.GB687@sol.localdomain>
-Mail-Followup-To: "Theodore Y. Ts'o" <tytso@mit.edu>,
-        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        linux-mtd@lists.infradead.org, linux-api@vger.kernel.org,
-        linux-crypto@vger.kernel.org, keyrings@vger.kernel.org,
-        Paul Crowley <paulcrowley@google.com>,
-        Satya Tangirala <satyat@google.com>
-References: <20190726224141.14044-1-ebiggers@kernel.org>
- <20190726224141.14044-8-ebiggers@kernel.org>
- <20190728192417.GG6088@mit.edu>
- <20190729195827.GF169027@gmail.com>
- <20190731183802.GA687@sol.localdomain>
- <20190731233843.GA2769@mit.edu>
+        id S1726448AbfHACLr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 31 Jul 2019 22:11:47 -0400
+Received: from gondolin.me.apana.org.au ([192.168.0.6] helo=gondolin.hengli.com.au)
+        by fornost.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
+        id 1ht0Z6-0001dL-KY; Thu, 01 Aug 2019 12:11:36 +1000
+Received: from herbert by gondolin.hengli.com.au with local (Exim 4.80)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1ht0Z3-0000Of-W1; Thu, 01 Aug 2019 12:11:33 +1000
+Date:   Thu, 1 Aug 2019 12:11:33 +1000
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Stephen Rothwell <sfr@canb.auug.org.au>
+Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH] asm-generic: Remove redundant arch-specific rules for simd.h
+Message-ID: <20190801021133.GA1428@gondor.apana.org.au>
+References: <20190801115346.77439e35@canb.auug.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190731233843.GA2769@mit.edu>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+In-Reply-To: <20190801115346.77439e35@canb.auug.org.au>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jul 31, 2019 at 07:38:43PM -0400, Theodore Y. Ts'o wrote:
-> On Wed, Jul 31, 2019 at 11:38:02AM -0700, Eric Biggers wrote:
-> > 
-> > This is perhaps different from what users expect from unlink().  It's well known
-> > that unlink() just deletes the filename, not the file itself if it's still open
-> > or has other links.  And unlink() by itself isn't meant for use cases where the
-> > file absolutely must be securely erased.  But FS_IOC_REMOVE_ENCRYPTION_KEY
-> > really is meant primarily for that sort of thing.
+On Thu, Aug 01, 2019 at 11:53:46AM +1000, Stephen Rothwell wrote:
+> Hi all,
 > 
-> Seems to me that part of the confusion is FS_IOC_REMOVE_ENCRYPTION_KEY
-> does two things.  One is "remove the user's handle on the key".  The
-> other is "purge all keys" (which requires root).  So it does two
-> different things with one ioctl.
+> After merging the crypto tree, today's linux-next build (arm
+> multi_v7_defconfig) produced this warning:
 > 
-
-Well, it's either
-
-1a. Remove the user's handle.
-	OR 
-1b. Remove all users' handles.  (FSCRYPT_REMOVE_KEY_FLAG_ALL_USERS)
-
-Then
-
-2. If no handles remain, try to evict all inodes that use the key.
-
-By "purge all keys" do you mean step (2)?  Note that it doesn't require root by
-itself; root is only required to remove other users' handles (1b).
-
-It could be argued that (2) should be a separate ioctl, so we'd have UNLINK_KEY
-then LOCK_KEY.  But is there a real use case for this split?  I.e. would anyone
-ever want to UNLINK_KEY without also LOCK_KEY?  Is that really something we
-want/need to support?  I'd really like the API to be as straightforward as
-possible for the normal use case of locking a directory, and not require some
-series of multiple ioctl's, which would be more difficult to use correctly.
-
-> > To give a concrete example: my patch for the userspace tool
-> > https://github.com/google/fscrypt adds a command 'fscrypt lock' which locks an
-> > encrypted directory.  If, say, someone runs 'fscrypt unlock' as uid 0 and then
-> > 'fscrypt lock' as uid 1000, then FS_IOC_REMOVE_ENCRYPTION_KEY can't actually
-> > remove the key.  I need to make the tool show a proper error message in this
-> > case.  To do so, it would help to get a unique error code (e.g. EUSERS) from
-> > FS_IOC_REMOVE_ENCRYPTION_KEY, rather than get the ambiguous error code ENOKEY
-> > and have to call FS_IOC_GET_ENCRYPTION_KEY_STATUS to get the real status.
+> scripts/Makefile.asm-generic:25: redundant generic-y found in arch/arm/include/asm/Kbuild: simd.h
 > 
-> What about having "fscrypt lock" call FS_IOC_GET_ENCRYPTION_KEY_STATUS
-> and print a warning message saying, "we can't lock it because N other
-> users who have registered a key".  I'd argue fscrypt should do this
-> regardless of whether or not FS_IOC_REMOVE_ENCRYPTION_KEY returns
-> EUSERS or not.
-
-Shouldn't "fscrypt lock" still remove the user's handle, as opposed to refuse to
-do anything, though?  So it would still need to call
-FS_IOC_REMOVE_ENCRYPTION_KEY, and could get the status from it rather than also
-needing to call FS_IOC_GET_ENCRYPTION_KEY_STATUS.
-
-Though, FS_IOC_GET_ENCRYPTION_KEY_STATUS would be needed if we wanted to show
-the specific count of other users.
-
+> Introduced by commit
 > 
-> > Also, we already have the EBUSY case.  This means that the ioctl removed the
-> > master key secret itself; however, some files were still in-use, so the key
-> > remains in the "incompletely removed" state.  If we were actually going for
-> > unlink() semantics, then for consistency this case really ought to return 0 and
-> > unlink the key object, and people who care about in-use files would need to use
-> > FS_IOC_GET_ENCRYPTION_KEY_STATUS.  But most people *will* care about this, and
-> > may even want to retry the ioctl later, which isn't something youh can do with
-> > pure unlink() semantics.
+>   82cb54856874 ("asm-generic: make simd.h a mandatory include/asm header")
 > 
-> It seems to me that the EBUSY and EUSERS errors should be status bits
-> which gets returned to the user in a bitfield --- and if the key has
-> been removed, or the user's claim on the key's existence has been
-> removed, the ioctl returns success.
+> Also the powerpc ppc64_defconfig build produced this warning:
 > 
-> That way we don't have to deal with the semantic disconnect where some
-> errors don't actually change system state, and other errors that *do*
-> change system state (as in, the key gets removed, or the user's claim
-> on the key gets removed), but still returns than error.
-> 
-> We could also add a flag which indicates where if there are files that
-> are still busy, or there are other users keeping a key in use, the
-> ioctl fails hard and returns an error.  At least that way we keep
-> consistency where an error means, "nothing has changed".
-> 
-> 	    	     	   	  	   - Ted
+> scripts/Makefile.asm-generic:25: redundant generic-y found in arch/powerpc/include/asm/Kbuild: simd.h
 
-Do you mean use a positive return value, or do you mean add an output field to
-the struct passed to the ioctl?
+Thanks for the heads up Stephen.  This patch should fix the
+warnings.
 
-The latter might be more error-prone, since it invites bugs where a directory
-silently fails to be locked, because the second field was not checked.
+---8<---
+Now that simd.h is in include/asm-generic/Kbuild we don't need
+the arch-specific Kbuild rules for them.
 
-Either way note that it doesn't really need to be a bitfield, since you can't
-have both statuses at the same time.  I.e. if there are still other users, we
-couldn't have even gotten to checking for in-use files.
+Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
+Fixes: 82cb54856874 ("asm-generic: make simd.h a mandatory...")
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-> 
-> P.S.  BTW, one of the comments which I didn't make was the
-> documentation didn't adequately explain which error codes means,
-> "success but with a caveat", and which errors means, "we failed and
-> didn't do anything".  But since I was arguing for changing the
-> behavior, I decided not to complain about the documentation.
-> 
-
-Yes, in any case the FS_IOC_REMOVE_ENCRYPTION_KEY documentation needs
-improvement.  I have some updates pending for it.
-
-- Eric
+diff --git a/arch/arm/include/asm/Kbuild b/arch/arm/include/asm/Kbuild
+index 6b2dc15..68ca86f 100644
+--- a/arch/arm/include/asm/Kbuild
++++ b/arch/arm/include/asm/Kbuild
+@@ -17,7 +17,6 @@ generic-y += parport.h
+ generic-y += preempt.h
+ generic-y += seccomp.h
+ generic-y += serial.h
+-generic-y += simd.h
+ generic-y += trace_clock.h
+ 
+ generated-y += mach-types.h
+diff --git a/arch/powerpc/include/asm/Kbuild b/arch/powerpc/include/asm/Kbuild
+index 9a1d2fc..64870c7 100644
+--- a/arch/powerpc/include/asm/Kbuild
++++ b/arch/powerpc/include/asm/Kbuild
+@@ -11,4 +11,3 @@ generic-y += mcs_spinlock.h
+ generic-y += preempt.h
+ generic-y += vtime.h
+ generic-y += msi.h
+-generic-y += simd.h
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
