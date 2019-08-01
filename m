@@ -2,126 +2,139 @@ Return-Path: <SRS0=q4N3=V5=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41E3AC19759
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Aug 2019 12:46:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 505EBC32753
+	for <linux-crypto@archiver.kernel.org>; Thu,  1 Aug 2019 13:56:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 12CF220665
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Aug 2019 12:46:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2574F214DA
+	for <linux-crypto@archiver.kernel.org>; Thu,  1 Aug 2019 13:56:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="vUXnXx5k"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="13O0vL5D"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731374AbfHAMqZ (ORCPT
+        id S1730546AbfHAN4v (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 1 Aug 2019 08:46:25 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:52098 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731349AbfHAMqY (ORCPT
+        Thu, 1 Aug 2019 09:56:51 -0400
+Received: from mail-wm1-f46.google.com ([209.85.128.46]:35305 "EHLO
+        mail-wm1-f46.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730516AbfHAN4u (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Aug 2019 08:46:24 -0400
-Received: by mail-wm1-f68.google.com with SMTP id 207so64537594wma.1
-        for <linux-crypto@vger.kernel.org>; Thu, 01 Aug 2019 05:46:23 -0700 (PDT)
+        Thu, 1 Aug 2019 09:56:50 -0400
+Received: by mail-wm1-f46.google.com with SMTP id l2so63261627wmg.0
+        for <linux-crypto@vger.kernel.org>; Thu, 01 Aug 2019 06:56:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=baylibre-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=cZCY92RMfghZJsFP1Vz0w4UO7UoxBKe+hI+aMfOaKM8=;
-        b=vUXnXx5kNtIFZ0huFPiV/HxhJIbQdYlkFxXwCPijUEreVyNC/1pxQMald0tr6/5oU+
-         Ku4JTGZOhL69MmV/Q5dbk4vWDah5/JPXEMYMNks43DojB8zmCbVBMLURc1fImEZ3YdI2
-         doKD9u7bejJ/UhT/GPcMTjZ3kZuOJbdM7J2rwAqwTZGpSbztlqyjT6hvwS7ltXOWjcBk
-         TrrLVnQKDRIuXxZS6tfQvsGHNDhV8M+CJGdf4t3WAuO9zvRHvrl20GzPHvRRlfXh2a0J
-         Ljef/yOoYB7o1JF7ZWTjXgMEN9MOgFo75dmzLwOg0n27FcmGHiQyvs9PyZVPgyw/6NZ0
-         KxRA==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=lIm81eDhukyw6fbCl/+3h+QPFrHXYcRhnM9vCZm0FBU=;
+        b=13O0vL5DX2cs4dd++hzfRHv1CPifo+nEBZIfEK/xPAm8LBOTVk9bmKI2ZMbRTH1Qny
+         gGc5Etb+oieTHOJzEcqzxWDGO6QQqX8ZqANnbyLDBv2TvisCVoaDgG+Sk1kHTmon4u7p
+         23GDtno64u2hTvVK4IASbns2pDTl99MQ9lBi+m6sVEXUkUpyjOdGM2BNfLvVc5T/fqbP
+         9RYMi1RBDw8zjzxwomGDcNw8yXfmP3fnwqKgmxCfWTSa6c7Ru6292ZJe91J3mLvVO1do
+         1LdLqXyr4MpjfSurQz0trb5nuP2J9ZMxqd5XwmuOpZpWwQRuERRQeyL/kh7Wen7RuCof
+         AwZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=cZCY92RMfghZJsFP1Vz0w4UO7UoxBKe+hI+aMfOaKM8=;
-        b=qL8zg0Qao5J6XO5GXKV4pCV0G8oaQkCsVgulbyDKTui9hOxbMsHWEHSkZXHd2SpRAJ
-         ui4v1q12rrkvgqfGNgBPKfJBwshkfxYAMTwxIL2j9nLbFHdAli8H+n9feSV3M4e8Hv1f
-         hr4EUa7pvJ1iynsEnvn4X4lta+3RXZAnSSRz1GbZSYs0unpuOsZcSbHkih+H+0msRbGN
-         NAoCoT0/Cb2B5AdUdTNdlznQtXDTbMQzDJueNaWD7EUxv+u17cgmmlFoa9k20D+Ihtzp
-         BQxWKRzPXLoBGf5G2G+Al8GZuIXrMfuAe6t79TqF8/yY4NX1D0ibAykD23hcfJJLLWgF
-         UEJQ==
-X-Gm-Message-State: APjAAAXn7DVQWJ8fT+b2BeHuUu62TlN3+zwvs0fmX8pNq2e1FbxJ3MAG
-        Gms8EQvgG2pDPFGIhEtTUlKkNA==
-X-Google-Smtp-Source: APXvYqx/EB+krQbuHfDMiwKikaXaFO+7qwPqB2cAqkBDAaRdrKTmsFkpl+/WGtL6bOLXv0IkeDY/3A==
-X-Received: by 2002:a1c:3cc4:: with SMTP id j187mr110992050wma.36.1564663582722;
-        Thu, 01 Aug 2019 05:46:22 -0700 (PDT)
-Received: from Red ([2a01:cb1d:147:7200:2e56:dcff:fed2:c6d6])
-        by smtp.googlemail.com with ESMTPSA id f70sm96317715wme.22.2019.08.01.05.46.20
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 01 Aug 2019 05:46:21 -0700 (PDT)
-Date:   Thu, 1 Aug 2019 14:46:18 +0200
-From:   LABBE Corentin <clabbe@baylibre.com>
-To:     Martin Blumenstingl <martin.blumenstingl@googlemail.com>
-Cc:     davem@davemloft.net, herbert@gondor.apana.org.au,
-        khilman@baylibre.com, mark.rutland@arm.com, robh+dt@kernel.org,
-        devicetree@vger.kernel.org, baylibre-upstreaming@groups.io,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-amlogic@lists.infradead.org,
-        linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH 2/4] crypto: amlogic: Add crypto accelerator for amlogic
- GXL
-Message-ID: <20190801124618.GA30316@Red>
-References: <1564083776-20540-1-git-send-email-clabbe@baylibre.com>
- <1564083776-20540-3-git-send-email-clabbe@baylibre.com>
- <CAFBinCD7pgUaBJgeGHTOu-uZRA9a6K2kxPsu+huKe23wcnKPoA@mail.gmail.com>
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=lIm81eDhukyw6fbCl/+3h+QPFrHXYcRhnM9vCZm0FBU=;
+        b=hkambDM8+0KM/5haepcxXAEIUFo28lhjCFPkpvaHZW8R5uy9jtWsd63fVc30tf9Lbf
+         XFWek/WPqr4lSgG1w8hm29NjLcgh2jhWxzBYJbZjBlAm4ddPl0gY/AB2SXvwGq78YPiX
+         itiU9CihtHbnhdmkB69YWWb5XXbU4OpmHVPg7yKkmdAtWChrDB0K9boTR7/ZvrQAkc/U
+         /KVC5uopZEkKhfSeAymOVi9df0dVhkxMd6kNb+pRHp/uoEPOlpPoNzIJTzzPoqlBwlfZ
+         Hsfh9lvu6vsuh796xQd/cL9g5Fsibtpz7iXHzDlWylevhYg/RgXkIdcDnzQRtLvqdWnl
+         Vkmg==
+X-Gm-Message-State: APjAAAVoUKteSfc9yj/d7kxmJE9NNGgMC5DjsCXYOn1TnrF9h0uT5jNH
+        yhDK9/JfjoaPyg3sn6JMc38jb4LSBKA=
+X-Google-Smtp-Source: APXvYqz463HiGivdjA4sUX+UrCKICPNW2Wd+t3590qMCqsuXMkM9GjxeAukrBa4PObzWj+jGQXbYjg==
+X-Received: by 2002:a1c:ef0c:: with SMTP id n12mr111159574wmh.132.1564667808166;
+        Thu, 01 Aug 2019 06:56:48 -0700 (PDT)
+Received: from bender.baylibre.local (lmontsouris-657-1-212-31.w90-63.abo.wanadoo.fr. [90.63.244.31])
+        by smtp.gmail.com with ESMTPSA id u6sm69659952wml.9.2019.08.01.06.56.47
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Thu, 01 Aug 2019 06:56:47 -0700 (PDT)
+From:   Neil Armstrong <narmstrong@baylibre.com>
+To:     robh+dt@kernel.org
+Cc:     Neil Armstrong <narmstrong@baylibre.com>,
+        linux-amlogic@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-serial@vger.kernel.org, linux-spi@vger.kernel.org,
+        linux-watchdog@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
+        jassisinghbrar@gmail.com, kishon@ti.com, p.zabel@pengutronix.de
+Subject: [RFC 0/9] dt-bindings: first tentative of conversion to yaml format
+Date:   Thu,  1 Aug 2019 15:56:35 +0200
+Message-Id: <20190801135644.12843-1-narmstrong@baylibre.com>
+X-Mailer: git-send-email 2.22.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFBinCD7pgUaBJgeGHTOu-uZRA9a6K2kxPsu+huKe23wcnKPoA@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Jul 27, 2019 at 02:17:38PM +0200, Martin Blumenstingl wrote:
-> Hi Corentin,
-> 
-> it's great to see you working on this :)
-> 
-> On Thu, Jul 25, 2019 at 9:45 PM Corentin Labbe <clabbe@baylibre.com> wrote:
-> >
-> > This patch adds support for the amlogic GXL cryptographic offloader present
-> > on GXL SoCs.
-> >
-> > This driver supports AES cipher in CBC/ECB mode.
-> >
-> > Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
-> > ---
-> >  drivers/crypto/Kconfig                  |   2 +
-> >  drivers/crypto/Makefile                 |   1 +
-> >  drivers/crypto/amlogic/Kconfig          |  24 ++
-> >  drivers/crypto/amlogic/Makefile         |   2 +
-> >  drivers/crypto/amlogic/amlogic-cipher.c | 358 ++++++++++++++++++++++++
-> >  drivers/crypto/amlogic/amlogic-core.c   | 326 +++++++++++++++++++++
-> >  drivers/crypto/amlogic/amlogic.h        | 172 ++++++++++++
-> >  7 files changed, 885 insertions(+)
-> >  create mode 100644 drivers/crypto/amlogic/Kconfig
-> >  create mode 100644 drivers/crypto/amlogic/Makefile
-> >  create mode 100644 drivers/crypto/amlogic/amlogic-cipher.c
-> >  create mode 100644 drivers/crypto/amlogic/amlogic-core.c
-> >  create mode 100644 drivers/crypto/amlogic/amlogic.h
-> there are two different crypto IPs on Amlogic SoCs:
-> - GXL and newer use the "BLKMV" crypto IP
-> - GXBB, Meson8/Meson8b/Meson8m2 (and probably older SoCs) use the
-> "NDMA" crypto IP
-> 
+This is a first tentative to convert some of the simplest Amlogic
+dt-bindings to the yaml format.
 
-I believed it was the opposite. (BLKMV the older, NDMA the newer)
-Anyway, on the datasheet I found (s905d), neither NDMA or BLKMV is mentioned, it is just called Crypto Engine.
-So I think GXL is the best choice.
+All have been tested using :
+$ make ARCH=arm64 dtbs_check
 
-> personally I think it makes sense to either have the IP name (blkmv)
-> or SoC name (GXL) in the file or directory names as well as being
-> consistent with that in the Kconfig option names
+Issues with the amlogic arm64 DTs has already been identified thanks
+to the validation scripts. The DT fixes will be pushed once these yaml
+bindings are acked.
 
-Ok I will rename files to amlogic-gxl-xxx
+Neil Armstrong (9):
+  dt-bindings: mailbox: meson-mhu: convert to yaml
+  dt-bindings: rng: amlogic,meson-rng: convert to yaml
+  dt-bindings: spi: meson: convert to yaml
+  dt-bindings: reset: amlogic,meson-reset: convert to yaml
+  dt-bindings: arm: amlogic: amlogic,meson-gx-ao-secure: convert to yaml
+  dt-bindings: phy: meson-g12a-usb2-phy: convert to yaml
+  dt-bindings: phy: meson-g12a-usb3-pcie-phy: convert to yaml
+  dt-bindings: serial: meson-uart: convert to yaml
+  dt-bindings: watchdog: meson-gxbb-wdt: convert to yaml
 
-Thanks
+ .../amlogic/amlogic,meson-gx-ao-secure.txt    | 28 -------
+ .../amlogic/amlogic,meson-gx-ao-secure.yaml   | 42 +++++++++++
+ .../devicetree/bindings/mailbox/meson-mhu.txt | 34 ---------
+ .../bindings/mailbox/meson-mhu.yaml           | 53 +++++++++++++
+ .../bindings/phy/meson-g12a-usb2-phy.txt      | 22 ------
+ .../bindings/phy/meson-g12a-usb2-phy.yaml     | 67 +++++++++++++++++
+ .../bindings/phy/meson-g12a-usb3-pcie-phy.txt | 22 ------
+ .../phy/meson-g12a-usb3-pcie-phy.yaml         | 61 +++++++++++++++
+ .../bindings/reset/amlogic,meson-reset.txt    | 19 -----
+ .../bindings/reset/amlogic,meson-reset.yaml   | 40 ++++++++++
+ .../bindings/rng/amlogic,meson-rng.txt        | 21 ------
+ .../bindings/rng/amlogic,meson-rng.yaml       | 37 +++++++++
+ .../bindings/serial/amlogic,meson-uart.txt    | 38 ----------
+ .../bindings/serial/amlogic,meson-uart.yaml   | 75 +++++++++++++++++++
+ .../bindings/spi/amlogic,meson-gx-spicc.yaml  | 74 ++++++++++++++++++
+ .../bindings/spi/amlogic,meson6-spifc.yaml    | 57 ++++++++++++++
+ .../devicetree/bindings/spi/spi-meson.txt     | 55 --------------
+ .../bindings/watchdog/meson-gxbb-wdt.txt      | 16 ----
+ .../bindings/watchdog/meson-gxbb-wdt.yaml     | 37 +++++++++
+ 19 files changed, 543 insertions(+), 255 deletions(-)
+ delete mode 100644 Documentation/devicetree/bindings/arm/amlogic/amlogic,meson-gx-ao-secure.txt
+ create mode 100644 Documentation/devicetree/bindings/arm/amlogic/amlogic,meson-gx-ao-secure.yaml
+ delete mode 100644 Documentation/devicetree/bindings/mailbox/meson-mhu.txt
+ create mode 100644 Documentation/devicetree/bindings/mailbox/meson-mhu.yaml
+ delete mode 100644 Documentation/devicetree/bindings/phy/meson-g12a-usb2-phy.txt
+ create mode 100644 Documentation/devicetree/bindings/phy/meson-g12a-usb2-phy.yaml
+ delete mode 100644 Documentation/devicetree/bindings/phy/meson-g12a-usb3-pcie-phy.txt
+ create mode 100644 Documentation/devicetree/bindings/phy/meson-g12a-usb3-pcie-phy.yaml
+ delete mode 100644 Documentation/devicetree/bindings/reset/amlogic,meson-reset.txt
+ create mode 100644 Documentation/devicetree/bindings/reset/amlogic,meson-reset.yaml
+ delete mode 100644 Documentation/devicetree/bindings/rng/amlogic,meson-rng.txt
+ create mode 100644 Documentation/devicetree/bindings/rng/amlogic,meson-rng.yaml
+ delete mode 100644 Documentation/devicetree/bindings/serial/amlogic,meson-uart.txt
+ create mode 100644 Documentation/devicetree/bindings/serial/amlogic,meson-uart.yaml
+ create mode 100644 Documentation/devicetree/bindings/spi/amlogic,meson-gx-spicc.yaml
+ create mode 100644 Documentation/devicetree/bindings/spi/amlogic,meson6-spifc.yaml
+ delete mode 100644 Documentation/devicetree/bindings/spi/spi-meson.txt
+ delete mode 100644 Documentation/devicetree/bindings/watchdog/meson-gxbb-wdt.txt
+ create mode 100644 Documentation/devicetree/bindings/watchdog/meson-gxbb-wdt.yaml
+
+-- 
+2.22.0
 
