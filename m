@@ -2,219 +2,147 @@ Return-Path: <SRS0=q4N3=V5=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 864F7C19759
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Aug 2019 05:02:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 237BCC32754
+	for <linux-crypto@archiver.kernel.org>; Thu,  1 Aug 2019 05:31:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4A19620B7C
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Aug 2019 05:02:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dol+D83w"
+	by mail.kernel.org (Postfix) with ESMTP id EF1C1206A3
+	for <linux-crypto@archiver.kernel.org>; Thu,  1 Aug 2019 05:31:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728861AbfHAFCK (ORCPT
+        id S1728150AbfHAFba (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 1 Aug 2019 01:02:10 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:39057 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728442AbfHAFCJ (ORCPT
+        Thu, 1 Aug 2019 01:31:30 -0400
+Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:39061 "EHLO
+        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726514AbfHAFba (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Aug 2019 01:02:09 -0400
-Received: by mail-wm1-f66.google.com with SMTP id u25so51523587wmc.4
-        for <linux-crypto@vger.kernel.org>; Wed, 31 Jul 2019 22:02:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=lMqNv0u8vBtruasmPaSSkIba00POWJCMhQidPLWHY2M=;
-        b=dol+D83wA19zSVl89V10SNxHVy3VlznKnl5Umucz1gmDWVF7T8xfFC2TsjaHKxbd5p
-         MWqtlXDMw9eXmw49icqt8ZgKuwj6EkQkGCJZ2yeGvcEy9ofj0w0wSG3gk1nMsx14MEEo
-         zAv965eqloPiIVBPO2FOXLVcKgZlOupIwdZJky3vmh+gPvQhmxK459/wGlQ2S0RUzW8N
-         6U7n4UHPgVStZErjETjSp2udtUh+I7TLF5PveAGoONlFJzPlMKazI2ZHhWIMGWwgKzH3
-         X5T7KrYIUyMOcO3cYiej1UpibwurUn/vZVF8VPIn60bQwSZ6+r1RUOHl+Kj3tG1HnOM+
-         N4rg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=lMqNv0u8vBtruasmPaSSkIba00POWJCMhQidPLWHY2M=;
-        b=UAZGLyqSTjnZtrG7BtSmhSPdmmlLU8qC9QttclkmNCu3+QigJAmYyCMihQgRwcAkYs
-         nXTfyrbf3NQkX2uhMUfrb8cubTgrzj8cJs/12YgoVxBivBMLJI9BfQThJnKDnMEgN6Rz
-         ntDBwcGfXsNTj10Z4xAX4Ie3ui1Fu7meX/+F5B7mE2QDiJqtmqfNf5upoGFE9etSLoNz
-         CQo0GKJE+62APe8Fb1v0QDsMhTk7TWbnf7M6LbxZ8h4uoeFk/0KJtsV/rJLMXR12mXxz
-         VTz4Z0/WThZ/tje37WklzLeDI7BDiSUitbry85f7Qh/HrILoylV1UujZYEIufyeSCCXO
-         cfdg==
-X-Gm-Message-State: APjAAAX+TApHkBtUt2hMAde/0VMgPdrgtu4X+ENUdazIISoKuBUgeqHh
-        pYBqj86JzJlYovaSoNbBX61HemTgOI7kRwYpiW+Hag==
-X-Google-Smtp-Source: APXvYqzW9Hm/OljmGnTNE3pQDpI/o8Ig99QXpNTASPVxDa38zfbVgd64ARE5k51pWFYGwCPqbIFwrAG+M8Ie4C+Isp4=
-X-Received: by 2002:a1c:b706:: with SMTP id h6mr110550423wmf.119.1564635726867;
- Wed, 31 Jul 2019 22:02:06 -0700 (PDT)
+        Thu, 1 Aug 2019 01:31:30 -0400
+Received: from callcc.thunk.org (96-72-102-169-static.hfc.comcastbusiness.net [96.72.102.169] (may be forged))
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id x715V9Rn013938
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 1 Aug 2019 01:31:10 -0400
+Received: by callcc.thunk.org (Postfix, from userid 15806)
+        id EEE8D4202F5; Thu,  1 Aug 2019 01:31:08 -0400 (EDT)
+Date:   Thu, 1 Aug 2019 01:31:08 -0400
+From:   "Theodore Y. Ts'o" <tytso@mit.edu>
+To:     linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        linux-mtd@lists.infradead.org, linux-api@vger.kernel.org,
+        linux-crypto@vger.kernel.org, keyrings@vger.kernel.org,
+        Paul Crowley <paulcrowley@google.com>,
+        Satya Tangirala <satyat@google.com>
+Subject: Re: [f2fs-dev] [PATCH v7 07/16] fscrypt: add
+ FS_IOC_REMOVE_ENCRYPTION_KEY ioctl
+Message-ID: <20190801053108.GD2769@mit.edu>
+References: <20190726224141.14044-1-ebiggers@kernel.org>
+ <20190726224141.14044-8-ebiggers@kernel.org>
+ <20190728192417.GG6088@mit.edu>
+ <20190729195827.GF169027@gmail.com>
+ <20190731183802.GA687@sol.localdomain>
+ <20190731233843.GA2769@mit.edu>
+ <20190801011140.GB687@sol.localdomain>
 MIME-Version: 1.0
-References: <13353.1564635114@turing-police>
-In-Reply-To: <13353.1564635114@turing-police>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Thu, 1 Aug 2019 08:01:54 +0300
-Message-ID: <CAKv+Gu8EF3R05hLWHh7mgbgkUyzBwELctdVvSFMq+6Crw6Tf4A@mail.gmail.com>
-Subject: Re: [PATCH] linux-next 20190731 - aegis128-core.c fails to build
-To:     =?UTF-8?Q?Valdis_Kl=C4=93tnieks?= <valdis.kletnieks@vt.edu>,
-        Arnd Bergmann <arnd@arndb.de>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190801011140.GB687@sol.localdomain>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-(+ Arnd)
+On Wed, Jul 31, 2019 at 06:11:40PM -0700, Eric Biggers wrote:
+> 
+> Well, it's either
+> 
+> 1a. Remove the user's handle.
+> 	OR 
+> 1b. Remove all users' handles.  (FSCRYPT_REMOVE_KEY_FLAG_ALL_USERS)
+> 
+> Then
+> 
+> 2. If no handles remain, try to evict all inodes that use the key.
+> 
+> By "purge all keys" do you mean step (2)?  Note that it doesn't require root by
+> itself; root is only required to remove other users' handles (1b).
 
-On Thu, 1 Aug 2019 at 07:52, Valdis Kl=C4=93tnieks <valdis.kletnieks@vt.edu=
-> wrote:
->
-> The recent NEON SIMD patches break the build if CONFIG_CRYPTO_AEGIS128_SI=
-MD isn't set:
->
->   MODPOST 558 modules
-> ERROR: "crypto_aegis128_decrypt_chunk_simd" [crypto/aegis128.ko] undefine=
-d!
-> ERROR: "crypto_aegis128_update_simd" [crypto/aegis128.ko] undefined!
-> ERROR: "crypto_aegis128_encrypt_chunk_simd" [crypto/aegis128.ko] undefine=
-d!
-> make[1]: *** [scripts/Makefile.modpost:105: modules-modpost] Error 1
-> make: *** [Makefile:1299: modules] Error 2
->
-> Add proper definitions and stubs to aegis.h so it builds both ways. This
-> necessitated moving other stuff from aegis128-core.c to aegis.h so things=
- were
-> defined in the proper order.
->
-> Signed-off-by: Valdis Kletnieks <valdis.kletnieks@vt.edu>
+No, I was talking about 1b.  I'd argue that 1a and 1b should be
+different ioctl.  1b requires root, and 1a doesn't.
 
-Which compiler version are you using? All references to the
-crypt_aegis128_xx_simd() routines should disappear if
-CONFIG_CRYPTO_AEGIS128_SIMD is not set (in which case have_simd will
-always be false and so the compiler should optimize away those calls).
+And 1a should just mean, "I don't need to use the encrypted files any
+more".  In the PAM passphrase case, when you are just logging out, 1a
+is what's needed, and success is just fine.  pam_session won't *care*
+whether or not there are other users keeping the key in use.
 
+The problem with "fscrypt lock" is that the non-privileged user sort
+of wants to do REMOVE_FLAG_KEY_FLAG_FOR_ALL_USERS, but they doesn't
+have the privileges to do it, and they are hoping that removing their
+own key removes it the key from the system.  That to me seems to be
+the fundamental disconnect.  The "fscrypt unlock" and "fscrypt lock"
+commands comes from the v1 key management, and requires root.  It's
+the translation to unprivileged mode where "fscrypt lock" seems to
+have problems.
 
-> ---
-> diff --git a/crypto/aegis.h b/crypto/aegis.h
-> index 4d56a85aea49..50a7496ca4ae 100644
-> --- a/crypto/aegis.h
-> +++ b/crypto/aegis.h
-> @@ -13,6 +13,11 @@
->  #include <linux/bitops.h>
->  #include <linux/types.h>
->
-> +#define AEGIS128_NONCE_SIZE 16
-> +#define AEGIS128_STATE_BLOCKS 5
-> +#define AEGIS128_KEY_SIZE 16
-> +#define AEGIS128_MIN_AUTH_SIZE 8
-> +#define AEGIS128_MAX_AUTH_SIZE 16
->  #define AEGIS_BLOCK_SIZE 16
->
->  union aegis_block {
-> @@ -21,6 +26,39 @@ union aegis_block {
->         u8 bytes[AEGIS_BLOCK_SIZE];
->  };
->
-> +struct aegis_state {
-> +       union aegis_block blocks[AEGIS128_STATE_BLOCKS];
-> +};
-> +
-> +struct aegis_ctx {
-> +       union aegis_block key;
-> +};
-> +
-> +struct aegis128_ops {
-> +       int (*skcipher_walk_init)(struct skcipher_walk *walk,
-> +                                 struct aead_request *req, bool atomic);
-> +
-> +       void (*crypt_chunk)(struct aegis_state *state, u8 *dst,
-> +                           const u8 *src, unsigned int size);
-> +};
-> +
-> +
-> +#ifdef CONFIG_CRYPTO_AEGIS128_SIMD
-> +bool crypto_aegis128_have_simd(void);
-> +void crypto_aegis128_update_simd(struct aegis_state *state, const void *=
-msg);
-> +void crypto_aegis128_encrypt_chunk_simd(struct aegis_state *state, u8 *d=
-st,
-> +                                       const u8 *src, unsigned int size)=
-;
-> +void crypto_aegis128_decrypt_chunk_simd(struct aegis_state *state, u8 *d=
-st,
-> +                                       const u8 *src, unsigned int size)=
-;
-> +#else
-> +static inline bool crypto_aegis128_have_simd(void) { return false; }
-> +static inline void crypto_aegis128_update_simd(struct aegis_state *state=
-, const void *msg) { }
-> +static inline void crypto_aegis128_encrypt_chunk_simd(struct aegis_state=
- *state, u8 *dst,
-> +                                       const u8 *src, unsigned int size)=
- { }
-> +static inline void crypto_aegis128_decrypt_chunk_simd(struct aegis_state=
- *state, u8 *dst,
-> +                                       const u8 *src, unsigned int size)=
- { }
-> +#endif
-> +
->  #define AEGIS_BLOCK_ALIGN (__alignof__(union aegis_block))
->  #define AEGIS_ALIGNED(p) IS_ALIGNED((uintptr_t)p, AEGIS_BLOCK_ALIGN)
->
-> diff --git a/crypto/aegis128-core.c b/crypto/aegis128-core.c
-> index f815b4685156..8b738128a921 100644
-> --- a/crypto/aegis128-core.c
-> +++ b/crypto/aegis128-core.c
-> @@ -20,37 +20,8 @@
->
->  #include "aegis.h"
->
-> -#define AEGIS128_NONCE_SIZE 16
-> -#define AEGIS128_STATE_BLOCKS 5
-> -#define AEGIS128_KEY_SIZE 16
-> -#define AEGIS128_MIN_AUTH_SIZE 8
-> -#define AEGIS128_MAX_AUTH_SIZE 16
-> -
-> -struct aegis_state {
-> -       union aegis_block blocks[AEGIS128_STATE_BLOCKS];
-> -};
-> -
-> -struct aegis_ctx {
-> -       union aegis_block key;
-> -};
-> -
-> -struct aegis128_ops {
-> -       int (*skcipher_walk_init)(struct skcipher_walk *walk,
-> -                                 struct aead_request *req, bool atomic);
-> -
-> -       void (*crypt_chunk)(struct aegis_state *state, u8 *dst,
-> -                           const u8 *src, unsigned int size);
-> -};
-> -
->  static bool have_simd;
->
-> -bool crypto_aegis128_have_simd(void);
-> -void crypto_aegis128_update_simd(struct aegis_state *state, const void *=
-msg);
-> -void crypto_aegis128_encrypt_chunk_simd(struct aegis_state *state, u8 *d=
-st,
-> -                                       const u8 *src, unsigned int size)=
-;
-> -void crypto_aegis128_decrypt_chunk_simd(struct aegis_state *state, u8 *d=
-st,
-> -                                       const u8 *src, unsigned int size)=
-;
-> -
->  static void crypto_aegis128_update(struct aegis_state *state)
->  {
->         union aegis_block tmp;
->
+> > What about having "fscrypt lock" call FS_IOC_GET_ENCRYPTION_KEY_STATUS
+> > and print a warning message saying, "we can't lock it because N other
+> > users who have registered a key".  I'd argue fscrypt should do this
+> > regardless of whether or not FS_IOC_REMOVE_ENCRYPTION_KEY returns
+> > EUSERS or not.
+> 
+> Shouldn't "fscrypt lock" still remove the user's handle, as opposed to refuse to
+> do anything, though?  So it would still need to callh
+> FS_IOC_REMOVE_ENCRYPTION_KEY, and could get the status from it rather than also
+> needing to call FS_IOC_GET_ENCRYPTION_KEY_STATUS.
+> 
+> Though, FS_IOC_GET_ENCRYPTION_KEY_STATUS would be needed if we wanted to show
+> the specific count of other users.
+ 
+So my perspective is that the ioctl's should have very clean
+semantics, and errors should be consistent with how the Unix system
+calls and error reporting.
+
+If we need to make "fscrypt lock" and "fscrypt unlock" have semantics
+that are more consistent with previous user interface choices, then
+fscrypt can use FS_IOC_GET_ENCRYPTION_KEY_STATUS to print the warning
+before it calls FS_IOC_REMOVE_ENCRYPTION_KEY --- with "fscrypt purge_keys"
+calling something like FS_IOC_REMOVE_ALL_USER_ENCRYPTION_KEYS.
+
+> > It seems to me that the EBUSY and EUSERS errors should be status bits
+> > which gets returned to the user in a bitfield --- and if the key has
+> > been removed, or the user's claim on the key's existence has been
+> > removed, the ioctl returns success.
+> > 
+> > That way we don't have to deal with the semantic disconnect where some
+> > errors don't actually change system state, and other errors that *do*
+> > change system state (as in, the key gets removed, or the user's claim
+> > on the key gets removed), but still returns than error.
+> > 
+> 
+> Do you mean use a positive return value, or do you mean add an output field to
+> the struct passed to the ioctl?
+
+I meant adding an output field.  I see EBUSY and EUSERS as status bits
+which *some* use cases might find useful.  Other use cases, such as in
+the pam_keys session logout code, we won't care at *all* about those
+status reporting (or error codes).  So if EBUSY and EUSERS are
+returned as errors, then it adds to complexity of those programs
+whichd don't care.  (And even for those that do, it's still a bit more
+complex since they has to distinguish between EBUSY, EUSERS, or other
+errors --- in fact, *all* programs which use
+FS_IOC_REMOVE_ENCRYPTION_KEY will *have* to check for EBUSY and
+ESUSERS whether they care or not.)
+
+> Either way note that it doesn't really need to be a bitfield, since you can't
+> have both statuses at the same time.  I.e. if there are still other users, we
+> couldn't have even gotten to checking for in-use files.
+
+That's actually an implementation detail, though, right?  In theory,
+we could check to see if there are any in-use files, independently of
+whether there are any users or not.
+
+					- Ted
