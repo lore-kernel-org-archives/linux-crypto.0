@@ -2,90 +2,124 @@ Return-Path: <SRS0=q4N3=V5=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B1C0C19759
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Aug 2019 07:14:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54E71C19759
+	for <linux-crypto@archiver.kernel.org>; Thu,  1 Aug 2019 07:16:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5B2B3206B8
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Aug 2019 07:14:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0DC71206B8
+	for <linux-crypto@archiver.kernel.org>; Thu,  1 Aug 2019 07:16:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kGxY5Un9"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jpFxYnQm"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730531AbfHAHOO (ORCPT
+        id S1730282AbfHAHQe (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 1 Aug 2019 03:14:14 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:42094 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729116AbfHAHOO (ORCPT
+        Thu, 1 Aug 2019 03:16:34 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:53486 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729266AbfHAHQe (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Aug 2019 03:14:14 -0400
-Received: by mail-wr1-f67.google.com with SMTP id x1so22454741wrr.9
-        for <linux-crypto@vger.kernel.org>; Thu, 01 Aug 2019 00:14:12 -0700 (PDT)
+        Thu, 1 Aug 2019 03:16:34 -0400
+Received: by mail-wm1-f68.google.com with SMTP id x15so63453595wmj.3
+        for <linux-crypto@vger.kernel.org>; Thu, 01 Aug 2019 00:16:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=ZtpEMYtf9IHdV3/wzdyegV2uPdXRwuCeceSmuY7Qe2Q=;
-        b=kGxY5Un9HMbrQVikYl7BdRGEJNk5seUr9xeLQkOJDxIPzBL8ZCOo5hZEehQdRAPkM2
-         OYSdq91UyJHcAXWkOS3fXNHZxPyQnrxo+Ulaf61evzNTscYjfi+7Cbehk+1E8m71/6mC
-         U13xfhTyg6+jd90DZaFh0A0KMY2LjWgUkLkn+OkzulwZD2J+oyygxJdv3WJPQVymFs3U
-         sYVSGFPXXiMGIgm0d6zF2kJtYo8sbLMA2okHxV9UWYZgZwDcwaR4342v7sjwNc+enXO9
-         chXU8y7gejR3HdyXdtx+tSVGh00n063k6lp/OlfmcsCP+Uo4pszNnccKOwxJod40odcD
-         BYng==
+         :cc;
+        bh=NnB2nDFWI5ec51xZpRNS0eGeVvyyeRajJNG5CTwO4OU=;
+        b=jpFxYnQm1en+21QoCMtdXajNs+goTe/CRGRqjtrMaD9G6dr71nskYBTTdLoHUbfyNe
+         dx60QgPZ72uI7pOr6AulRt1DkxBoXL8edSnrawZAHTg3D+ptHu/oPdEe4O3CkKs7L9LZ
+         wOwYQPQ61qBH0sqoHR3/jvCca09FY1BZLoakTnXMJQz++/j+Fa75z6MrTPT5urUf7W5e
+         keXbitgVe4JTb/Vn4UyX6sLk7ZQYsqVrTx32OOB3lWlhLT0f4xjyTtXBNofJ700mBVim
+         SLDY4UyceVgWtsPBbtn9Oqv7d3f5T/17uZQyN5TFLwCDvT+eA2PC7uVecrp6xJktEOsb
+         CUrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=ZtpEMYtf9IHdV3/wzdyegV2uPdXRwuCeceSmuY7Qe2Q=;
-        b=UtoPcPUxS5z4JheOapN/5xiYcpmkSDO7cY9Pqi0sgfKZGYeOuLBvUYrhuwDcJimT8S
-         eOVEjf+mJgQrxG/DtglZUSoG4VNaklHvEWjJPg5gMP0gZZiOh/HwMYJqP4/7zY7J+uTA
-         9LukKklBWpY55T6L5SNuOjnR+BcHK7/xyrs6qyxBcu0jDwS3io1d0MaK5NwN/ZCeBJrI
-         GHxuLtyozYv1awVXkIr9qid0jVv5O82jfPQWOnonssR2kle+ahGBUu5IQkYSkFz6zI0X
-         OGyaGkqqfu0uhSJHzg73pRP7G38idzJ/z5bKwZ1h0M0qC2t2XwKgS/GMj8ECOqdXPSrh
-         ZO6g==
-X-Gm-Message-State: APjAAAXeQkoOCceqj8N9QmMgGx/Xm+C7UHuvyeXQcZW0XG45nclIyJgK
-        7pJiOkLf2yRlRMrSfvJ10nQssG5KFnqqPpgcIaDRhMJNvRQ=
-X-Google-Smtp-Source: APXvYqz2wqSKzTJIvgWm78hO385N0YvtpdJKQHPyq2WJg3IG6jUfYtbKcjYdcOtacK8hJh3nvmsajE/Vpys+rxreSuE=
-X-Received: by 2002:a5d:46cf:: with SMTP id g15mr1158635wrs.93.1564643652032;
- Thu, 01 Aug 2019 00:14:12 -0700 (PDT)
+         :message-id:subject:to:cc;
+        bh=NnB2nDFWI5ec51xZpRNS0eGeVvyyeRajJNG5CTwO4OU=;
+        b=Xr6QZOQG0TVrSTt/L3osJEkbvujdRSysUVua4wUC7MbrejglYjoeAzLgz3Y1VWihh6
+         MU1Qw1Y3GFH6hL9NCBGEmpKqhZDWDugwQZ657Mq1JlUnYEG3h783RV6amNRHgzN/1uhA
+         q28bxrQ3ZcZlogu35yT7gZmiqUSSIj1vodZWoaPboTEMkkvqZ84rxcVMUtSou1B0ZMV9
+         0ODbSqKPD91eOFRihu4PZScfF8on9UaUUyiBneNSTk0YiGgqIavnHpW2wzxiUWfrWDg7
+         USHIp1qVXtUahSy9F92t5NTSs65uOhNTdx5RZBdMfoRTgcJoF/Sq0qyBkTooT6DW+qac
+         SCWA==
+X-Gm-Message-State: APjAAAWqopKlLtO5dPOamem9yf77T/BxGkRV4y4v2CKD4o7uKSvD8J/J
+        8Kii6UkS2SES1SmgooRuAIdRiJtwnUHrNPdeqBmZrg==
+X-Google-Smtp-Source: APXvYqxs68atl0y996xjePC7x7rIgCrytEqFiRB74cPlgPYNA6yMTSx1VN9AUIgMKSNjSXYDwpUJb4m5lNmbJr7t08o=
+X-Received: by 2002:a1c:b706:: with SMTP id h6mr111148067wmf.119.1564643792026;
+ Thu, 01 Aug 2019 00:16:32 -0700 (PDT)
 MIME-Version: 1.0
-References: <1564578355-9639-1-git-send-email-iuliana.prodan@nxp.com> <VI1PR0402MB348576458A879D8F162D01C098DF0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-In-Reply-To: <VI1PR0402MB348576458A879D8F162D01C098DF0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+References: <20190801115346.77439e35@canb.auug.org.au> <20190801021133.GA1428@gondor.apana.org.au>
+In-Reply-To: <20190801021133.GA1428@gondor.apana.org.au>
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Thu, 1 Aug 2019 10:14:00 +0300
-Message-ID: <CAKv+Gu9LTy4Qpo8hDdjuv62NiecMHDuUu5H19WoCqY+UupeBRw@mail.gmail.com>
-Subject: Re: [PATCH v3 0/2] crypto: validate inputs for gcm and aes
-To:     Horia Geanta <horia.geanta@nxp.com>
-Cc:     Iuliana Prodan <iuliana.prodan@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        dl-linux-imx <linux-imx@nxp.com>
+Date:   Thu, 1 Aug 2019 10:16:21 +0300
+Message-ID: <CAKv+Gu-Yo72DQvh_M3P4NW9pOKDh5YH-DN3cH+MQZkdACwcb3g@mail.gmail.com>
+Subject: Re: [PATCH] asm-generic: Remove redundant arch-specific rules for simd.h
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Stephen Rothwell <sfr@canb.auug.org.au>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 31 Jul 2019 at 16:35, Horia Geanta <horia.geanta@nxp.com> wrote:
+On Thu, 1 Aug 2019 at 05:11, Herbert Xu <herbert@gondor.apana.org.au> wrote:
 >
-> On 7/31/2019 4:06 PM, Iuliana Prodan wrote:
-> > Added inline helper functions to check authsize and assoclen for
-> > gcm, rfc4106 and rfc4543.
-> > Added, also, inline helper function to check key length for AES algorit=
-hms.
-> > These are used in the generic implementation of gcm/rfc4106/rfc4543
-> > and aes.
+> On Thu, Aug 01, 2019 at 11:53:46AM +1000, Stephen Rothwell wrote:
+> > Hi all,
 > >
-> For the series:
-> Reviewed-by: Horia Geant=C4=83 <horia.geanta@nxp.com>
+> > After merging the crypto tree, today's linux-next build (arm
+> > multi_v7_defconfig) produced this warning:
+> >
+> > scripts/Makefile.asm-generic:25: redundant generic-y found in arch/arm/include/asm/Kbuild: simd.h
+> >
+> > Introduced by commit
+> >
+> >   82cb54856874 ("asm-generic: make simd.h a mandatory include/asm header")
+> >
+> > Also the powerpc ppc64_defconfig build produced this warning:
+> >
+> > scripts/Makefile.asm-generic:25: redundant generic-y found in arch/powerpc/include/asm/Kbuild: simd.h
 >
+> Thanks for the heads up Stephen.  This patch should fix the
+> warnings.
+>
+> ---8<---
+> Now that simd.h is in include/asm-generic/Kbuild we don't need
+> the arch-specific Kbuild rules for them.
+>
+> Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
+> Fixes: 82cb54856874 ("asm-generic: make simd.h a mandatory...")
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+>
+> diff --git a/arch/arm/include/asm/Kbuild b/arch/arm/include/asm/Kbuild
+> index 6b2dc15..68ca86f 100644
+> --- a/arch/arm/include/asm/Kbuild
+> +++ b/arch/arm/include/asm/Kbuild
+> @@ -17,7 +17,6 @@ generic-y += parport.h
+>  generic-y += preempt.h
+>  generic-y += seccomp.h
+>  generic-y += serial.h
+> -generic-y += simd.h
+>  generic-y += trace_clock.h
+>
+>  generated-y += mach-types.h
+> diff --git a/arch/powerpc/include/asm/Kbuild b/arch/powerpc/include/asm/Kbuild
+> index 9a1d2fc..64870c7 100644
+> --- a/arch/powerpc/include/asm/Kbuild
+> +++ b/arch/powerpc/include/asm/Kbuild
+> @@ -11,4 +11,3 @@ generic-y += mcs_spinlock.h
+>  generic-y += preempt.h
+>  generic-y += vtime.h
+>  generic-y += msi.h
+> -generic-y += simd.h
 
-Likewise,
-
-Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Acked-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
