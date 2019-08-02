@@ -2,88 +2,123 @@ Return-Path: <SRS0=PsuD=V6=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97E04C32750
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 19:38:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 855B0C433FF
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 22:32:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6BF502067D
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 19:38:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5628920B7C
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 22:32:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1564785160;
+	bh=z6ytUlp+CIECyVYgzsmKAgNAlD3y+8CHq71PuCQ0D+c=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:List-ID:From;
+	b=ntp7uLuWOv3OYz3ls5PYopa0sAsjqJbC9tBZCr3Jo10bU1VCsLDnGJ492XLQAc60O
+	 L9gpfTLiqkdmS7pLhLw4XErthWXOmyhXNzwN7mGVm5wkv8mYuIhYFcCBIXxJfYikqW
+	 isoEgl8rgSUNhPJmGSdZ4NqrUwBktPH4jWF6mpPM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406099AbfHBTiL (ORCPT
+        id S2388697AbfHBWcj (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 2 Aug 2019 15:38:11 -0400
-Received: from mga05.intel.com ([192.55.52.43]:16635 "EHLO mga05.intel.com"
+        Fri, 2 Aug 2019 18:32:39 -0400
+Received: from mail.kernel.org ([198.145.29.99]:44032 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2403792AbfHBTiL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Aug 2019 15:38:11 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 02 Aug 2019 12:38:09 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,339,1559545200"; 
-   d="scan'208";a="201764551"
-Received: from psathya-mobl1.ger.corp.intel.com (HELO localhost) ([10.252.36.242])
-  by fmsmga002.fm.intel.com with ESMTP; 02 Aug 2019 12:38:03 -0700
-Date:   Fri, 2 Aug 2019 22:38:02 +0300
-From:   Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-To:     Sumit Garg <sumit.garg@linaro.org>
-Cc:     keyrings@vger.kernel.org, linux-integrity@vger.kernel.org,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        linux-security-module@vger.kernel.org, dhowells@redhat.com,
-        Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
-        jejb@linux.ibm.com, Mimi Zohar <zohar@linux.ibm.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Casey Schaufler <casey@schaufler-ca.com>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Daniel Thompson <daniel.thompson@linaro.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "tee-dev @ lists . linaro . org" <tee-dev@lists.linaro.org>
-Subject: Re: [RFC/RFT v2 1/2] KEYS: trusted: create trusted keys subsystem
-Message-ID: <20190802193802.jn56jhoz5crebggt@linux.intel.com>
-References: <1563449086-13183-1-git-send-email-sumit.garg@linaro.org>
- <1563449086-13183-2-git-send-email-sumit.garg@linaro.org>
- <20190801172310.cldcftfdoh5vyfjg@linux.intel.com>
- <CAFA6WYM+FQuXA9Saj5+ffOGsc-shhiF5Uos4g14Qndvu6w97Sg@mail.gmail.com>
+        id S1729919AbfHBWci (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 2 Aug 2019 18:32:38 -0400
+Received: from tleilax.poochiereds.net (cpe-71-70-156-158.nc.res.rr.com [71.70.156.158])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 58F57206A3;
+        Fri,  2 Aug 2019 22:32:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1564785158;
+        bh=z6ytUlp+CIECyVYgzsmKAgNAlD3y+8CHq71PuCQ0D+c=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=cpjIBy8JqGDmfo2YvJ1zHX2H3F5SzV7XyBEUvKOoDGfZiHGtVeJHlsiNF8f/o/lw/
+         1IriX/50tm1jxxFU6BHxnU7AmYr31cK1qfEIW7FiUI67JvLd42gEz50jymZEZTSESa
+         2e28o/zwwAXm5Iq/SkAmipJbFc8z+f7/iU9PnXtA=
+Message-ID: <2f0d5993e9731808b73b0018f5fc4b3335fc6373.camel@kernel.org>
+Subject: Re: [PATCH 03/34] net/ceph: convert put_page() to put_user_page*()
+From:   Jeff Layton <jlayton@kernel.org>
+To:     john.hubbard@gmail.com, Andrew Morton <akpm@linux-foundation.org>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Chinner <david@fromorbit.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        =?ISO-8859-1?Q?J=E9r=F4me?= Glisse <jglisse@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        amd-gfx@lists.freedesktop.org, ceph-devel@vger.kernel.org,
+        devel@driverdev.osuosl.org, devel@lists.orangefs.org,
+        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-fbdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-mm@kvack.org,
+        linux-nfs@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-rpi-kernel@lists.infradead.org, linux-xfs@vger.kernel.org,
+        netdev@vger.kernel.org, rds-devel@oss.oracle.com,
+        sparclinux@vger.kernel.org, x86@kernel.org,
+        xen-devel@lists.xenproject.org, John Hubbard <jhubbard@nvidia.com>,
+        Ilya Dryomov <idryomov@gmail.com>, Sage Weil <sage@redhat.com>,
+        "David S . Miller" <davem@davemloft.net>
+Date:   Fri, 02 Aug 2019 18:32:33 -0400
+In-Reply-To: <20190802022005.5117-4-jhubbard@nvidia.com>
+References: <20190802022005.5117-1-jhubbard@nvidia.com>
+         <20190802022005.5117-4-jhubbard@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.32.4 (3.32.4-1.fc30) 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFA6WYM+FQuXA9Saj5+ffOGsc-shhiF5Uos4g14Qndvu6w97Sg@mail.gmail.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-User-Agent: NeoMutt/20180716
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Aug 02, 2019 at 11:20:09AM +0530, Sumit Garg wrote:
-> On Thu, 1 Aug 2019 at 22:54, Jarkko Sakkinen
-> <jarkko.sakkinen@linux.intel.com> wrote:
-> >
-> > On Thu, Jul 18, 2019 at 04:54:45PM +0530, Sumit Garg wrote:
-> > > Move existing code to trusted keys subsystem. Also, rename files with
-> > > "tpm" as suffix which provides the underlying implementation.
-> > >
-> > > Suggested-by: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-> > > Signed-off-by: Sumit Garg <sumit.garg@linaro.org>
-> >
-> > What about TPM2 trusted keys code?
+On Thu, 2019-08-01 at 19:19 -0700, john.hubbard@gmail.com wrote:
+> From: John Hubbard <jhubbard@nvidia.com>
 > 
-> Isn't TPM2 code located here: "drivers/char/tpm/"? Would you like to
-> move that code under trusted keys subsystem only?
+> For pages that were retained via get_user_pages*(), release those pages
+> via the new put_user_page*() routines, instead of via put_page() or
+> release_pages().
+> 
+> This is part a tree-wide conversion, as described in commit fc1d8e7cca2d
+> ("mm: introduce put_user_page*(), placeholder versions").
+> 
+> Cc: Ilya Dryomov <idryomov@gmail.com>
+> Cc: Sage Weil <sage@redhat.com>
+> Cc: David S. Miller <davem@davemloft.net>
+> Cc: ceph-devel@vger.kernel.org
+> Cc: netdev@vger.kernel.org
+> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+> ---
+>  net/ceph/pagevec.c | 8 +-------
+>  1 file changed, 1 insertion(+), 7 deletions(-)
+> 
+> diff --git a/net/ceph/pagevec.c b/net/ceph/pagevec.c
+> index 64305e7056a1..c88fff2ab9bd 100644
+> --- a/net/ceph/pagevec.c
+> +++ b/net/ceph/pagevec.c
+> @@ -12,13 +12,7 @@
+>  
+>  void ceph_put_page_vector(struct page **pages, int num_pages, bool dirty)
+>  {
+> -	int i;
+> -
+> -	for (i = 0; i < num_pages; i++) {
+> -		if (dirty)
+> -			set_page_dirty_lock(pages[i]);
+> -		put_page(pages[i]);
+> -	}
+> +	put_user_pages_dirty_lock(pages, num_pages, dirty);
+>  	kvfree(pages);
+>  }
+>  EXPORT_SYMBOL(ceph_put_page_vector);
 
-Yeah, we need a design decision here. What I care is that they should
-be in the same subsystem. I did trusted keys directly to TPM 2.0 subsys
-because the subsystem was not too robust back then.
+This patch looks sane enough. Assuming that the earlier patches are OK:
 
-Right now I think it would be feasible to implement TPM2 trusted keys
-outside TPM driver since the whole transmit functionality is way more
-robust.
+Acked-by: Jeff Layton <jlayton@kernel.org>
 
-/Jarkko
