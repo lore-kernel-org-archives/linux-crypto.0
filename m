@@ -2,122 +2,88 @@ Return-Path: <SRS0=PsuD=V6=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78A73C433FF
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 19:34:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97E04C32750
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 19:38:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4899A20880
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 19:34:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="pA8Qugcw"
+	by mail.kernel.org (Postfix) with ESMTP id 6BF502067D
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 19:38:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392225AbfHBTew (ORCPT
+        id S2406099AbfHBTiL (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 2 Aug 2019 15:34:52 -0400
-Received: from hqemgate14.nvidia.com ([216.228.121.143]:17795 "EHLO
-        hqemgate14.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2391971AbfHBTew (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Aug 2019 15:34:52 -0400
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate14.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5d44905c0000>; Fri, 02 Aug 2019 12:34:52 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Fri, 02 Aug 2019 12:34:51 -0700
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Fri, 02 Aug 2019 12:34:51 -0700
-Received: from [10.2.171.217] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 2 Aug
- 2019 19:34:50 +0000
-Subject: Re: [PATCH 00/34] put_user_pages(): miscellaneous call sites
-To:     Peter Zijlstra <peterz@infradead.org>, <john.hubbard@gmail.com>
-CC:     Andrew Morton <akpm@linux-foundation.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Chinner <david@fromorbit.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        <amd-gfx@lists.freedesktop.org>, <ceph-devel@vger.kernel.org>,
-        <devel@driverdev.osuosl.org>, <devel@lists.orangefs.org>,
-        <dri-devel@lists.freedesktop.org>,
-        <intel-gfx@lists.freedesktop.org>, <kvm@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-block@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <linux-fbdev@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
-        <linux-media@vger.kernel.org>, <linux-mm@kvack.org>,
-        <linux-nfs@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-        <linux-rpi-kernel@lists.infradead.org>,
-        <linux-xfs@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <rds-devel@oss.oracle.com>, <sparclinux@vger.kernel.org>,
-        <x86@kernel.org>, <xen-devel@lists.xenproject.org>
-References: <20190802021653.4882-1-jhubbard@nvidia.com>
- <20190802080554.GD2332@hirez.programming.kicks-ass.net>
-X-Nvconfidentiality: public
-From:   John Hubbard <jhubbard@nvidia.com>
-Message-ID: <8968c928-5712-03a9-68df-051f5b58fdbc@nvidia.com>
-Date:   Fri, 2 Aug 2019 12:33:13 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Fri, 2 Aug 2019 15:38:11 -0400
+Received: from mga05.intel.com ([192.55.52.43]:16635 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2403792AbfHBTiL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 2 Aug 2019 15:38:11 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 02 Aug 2019 12:38:09 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,339,1559545200"; 
+   d="scan'208";a="201764551"
+Received: from psathya-mobl1.ger.corp.intel.com (HELO localhost) ([10.252.36.242])
+  by fmsmga002.fm.intel.com with ESMTP; 02 Aug 2019 12:38:03 -0700
+Date:   Fri, 2 Aug 2019 22:38:02 +0300
+From:   Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+To:     Sumit Garg <sumit.garg@linaro.org>
+Cc:     keyrings@vger.kernel.org, linux-integrity@vger.kernel.org,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        linux-security-module@vger.kernel.org, dhowells@redhat.com,
+        Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
+        jejb@linux.ibm.com, Mimi Zohar <zohar@linux.ibm.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Casey Schaufler <casey@schaufler-ca.com>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Daniel Thompson <daniel.thompson@linaro.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "tee-dev @ lists . linaro . org" <tee-dev@lists.linaro.org>
+Subject: Re: [RFC/RFT v2 1/2] KEYS: trusted: create trusted keys subsystem
+Message-ID: <20190802193802.jn56jhoz5crebggt@linux.intel.com>
+References: <1563449086-13183-1-git-send-email-sumit.garg@linaro.org>
+ <1563449086-13183-2-git-send-email-sumit.garg@linaro.org>
+ <20190801172310.cldcftfdoh5vyfjg@linux.intel.com>
+ <CAFA6WYM+FQuXA9Saj5+ffOGsc-shhiF5Uos4g14Qndvu6w97Sg@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190802080554.GD2332@hirez.programming.kicks-ass.net>
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL104.nvidia.com (172.18.146.11) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1564774492; bh=+4YFr8hVqt3rnBZzpE/CDXaE3u2NtyGgeA2+CHyqUUg=;
-        h=X-PGP-Universal:Subject:To:CC:References:X-Nvconfidentiality:From:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=pA8QugcwnL1HNNctuTXTMAa7CrBYZtv2cc2QzVDHg2S/Xz0x5cf9O8eGtP0C46aN6
-         a197cn16D9E9xYsYwbovYwvjP0hTnTIrSK10+fiYfbToCUN0I9g4iXpjbE6kGTwrAp
-         ncKdQLJTA/SOQtWLtiZt5vxeEAtfkDytTOFqyC79V99rQnUwNH1zBFEyzb+BV4yCcg
-         0Lb+HCJur/Jv3WTiflqOcCteevFh1AJi/C8c1Ka1hIgLd+uE9NAbY1wcjbuQJmv03/
-         F2ke8dbjLXpL5/tEd8euZ6kSYJfMWxVRqMIbW34EAHrZytttzmbzNNCLzf8Qy6VEOi
-         6Ny99XF1JiDWQ==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFA6WYM+FQuXA9Saj5+ffOGsc-shhiF5Uos4g14Qndvu6w97Sg@mail.gmail.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+User-Agent: NeoMutt/20180716
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 8/2/19 1:05 AM, Peter Zijlstra wrote:
-> On Thu, Aug 01, 2019 at 07:16:19PM -0700, john.hubbard@gmail.com wrote:
+On Fri, Aug 02, 2019 at 11:20:09AM +0530, Sumit Garg wrote:
+> On Thu, 1 Aug 2019 at 22:54, Jarkko Sakkinen
+> <jarkko.sakkinen@linux.intel.com> wrote:
+> >
+> > On Thu, Jul 18, 2019 at 04:54:45PM +0530, Sumit Garg wrote:
+> > > Move existing code to trusted keys subsystem. Also, rename files with
+> > > "tpm" as suffix which provides the underlying implementation.
+> > >
+> > > Suggested-by: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+> > > Signed-off-by: Sumit Garg <sumit.garg@linaro.org>
+> >
+> > What about TPM2 trusted keys code?
 > 
->> This is part a tree-wide conversion, as described in commit fc1d8e7cca2d
->> ("mm: introduce put_user_page*(), placeholder versions"). That commit
->> has an extensive description of the problem and the planned steps to
->> solve it, but the highlites are:
-> 
-> That is one horridly mangled Changelog there :-/ It looks like it's
-> partially duplicated.
+> Isn't TPM2 code located here: "drivers/char/tpm/"? Would you like to
+> move that code under trusted keys subsystem only?
 
-Yeah. It took so long to merge that I think I was no longer able to
-actually see the commit description, after N readings. sigh
+Yeah, we need a design decision here. What I care is that they should
+be in the same subsystem. I did trusted keys directly to TPM 2.0 subsys
+because the subsystem was not too robust back then.
 
-> 
-> Anyway; no objections to any of that, but I just wanted to mention that
-> there are other problems with long term pinning that haven't been
-> mentioned, notably they inhibit compaction.
-> 
-> A long time ago I proposed an interface to mark pages as pinned, such
-> that we could run compaction before we actually did the pinning.
-> 
+Right now I think it would be feasible to implement TPM2 trusted keys
+outside TPM driver since the whole transmit functionality is way more
+robust.
 
-This is all heading toward marking pages as pinned, so we should finally
-get there.  I'll post the RFC for tracking pinned pages shortly.
-
-
-thanks,
--- 
-John Hubbard
-NVIDIA
+/Jarkko
