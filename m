@@ -2,60 +2,61 @@ Return-Path: <SRS0=PsuD=V6=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18FBDC19759
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 02:17:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FB3CC433FF
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 02:17:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E516C2080C
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 02:17:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 667EE2080C
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 02:17:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pAxzsc9v"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ri/g8fH5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731491AbfHBCRA (ORCPT
+        id S2390659AbfHBCRD (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 1 Aug 2019 22:17:00 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:37847 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728255AbfHBCQ7 (ORCPT
+        Thu, 1 Aug 2019 22:17:03 -0400
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:38226 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728255AbfHBCRD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Aug 2019 22:16:59 -0400
-Received: by mail-pg1-f194.google.com with SMTP id d1so2414548pgp.4;
-        Thu, 01 Aug 2019 19:16:58 -0700 (PDT)
+        Thu, 1 Aug 2019 22:17:03 -0400
+Received: by mail-pf1-f194.google.com with SMTP id y15so35157527pfn.5;
+        Thu, 01 Aug 2019 19:17:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=3GzlMAdD/Fj4tpT1z/PK8Fr3raamoGX6ZwkHP2yb6K8=;
-        b=pAxzsc9vmHAK9ZK89AacBmqXQvuHXeShpu27WlEkAV6xBcEz/H1GAWLFbWBo+u7caH
-         KIqDnTL+IS2r069Sqit6niTwIVD3yHwM2oL4UXxooa0ZG6T9kc1SZGdEzbmbTAJoZkzv
-         Zbj81BMMiMsLujqrLP+vNRoPoAfxuyhBIJfz/EZgUl0FsiQZK3MgWkswQuDuhoaZBO9G
-         KrSO58P9Rr9KxqN5N1BphpFtggyeHWY4ZqA08b5SYu2LL+896Hx8WIi0vBM/z3/TtXKP
-         sQF/9gkVaL/sxZPp1Zgqo9a2gtCNNW4Q0F26WcstDN/wMJyWuPSmF5s5FUO43iGXa+xl
-         t4bA==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=qSYlns3rxzw4u/DyjG2ivKH4pSlvpz3tTvNpv+Vzl0A=;
+        b=ri/g8fH5EMbaRGeRCBUMa0gqvf5sZKxxRTcoGNlKvndtobuEMarAmuyiWR0Or0yt3d
+         ZgeLr0P+kW4cqW28KQH/rOYsII5pR9Pk0M0WFYUApB7SKz6vEgjXY+F34hxONagLYY9L
+         Py6Blyj3NR1ZdTatlTm5llaJcajjxdcYrAkl23WVqTVg9XAD+0Qg+cC1rauwop+vVeNx
+         bVVFBfM1nAEvoH8ncIKlerRWnqRBlhjzlfCDLJ981KoDXyQRyzFGpLUw/iRcSWFkJ5xl
+         t+5zV5laKnX+3Bq/BiZ3lREDjIqp5Q8qRulPXvOqGHi7pfUVWIrfUbywjbnDPsqYnoHP
+         +z/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=3GzlMAdD/Fj4tpT1z/PK8Fr3raamoGX6ZwkHP2yb6K8=;
-        b=pxUI9uQSiPkrdaYjjCg63ri9x81eIH4tA4uNKQeuSqnlbqNn68GBhlo1oliYAZkNd+
-         f/ff4lrJJ5FSq+dMmai39K50JTR6skZNK1/SYJ6xIrqIpgkFnWhXD5JpEcImySXufeEc
-         5lpHw1QNCji0YtLFogyj9Q0GQwgqHEzmaCLzfQ916IcJeLVOXBHgnucF9EVAt2P87WgL
-         IFSg8UxticbZBM5vxmmfLzemLMpqv52ujuBqI+d1A9G1kG0XP6vAnBxZ5HOVasgRB9yz
-         +PY/9Fn4sTf2CDLEHuzFlDv+TctiwF4Ed2SZXRoCLsimOeNz1TMScSe8+f5sIAOswLTV
-         Mrbw==
-X-Gm-Message-State: APjAAAU77NZ/WZfIFO8YjVlx1yPL3pTLoRIOlIhqJbQom5/1tFn6nADk
-        sGNLf+j83301UXEmh6cqCSM=
-X-Google-Smtp-Source: APXvYqzWsTlsiBNw6waYjgVc0NeqKYlyVqx46uMvNCwkUysDnG1IH1bMSSj1oKU/Y8CdBrk8llU2wQ==
-X-Received: by 2002:a63:dd16:: with SMTP id t22mr90672497pgg.140.1564712218248;
-        Thu, 01 Aug 2019 19:16:58 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=qSYlns3rxzw4u/DyjG2ivKH4pSlvpz3tTvNpv+Vzl0A=;
+        b=XZMe4VWepSzRYP8UfKwIQgcNVPi7T4oWjUKoJ/zaLDDn9OKiQ/4TFUtBI9K0iBeWFu
+         GshMR9aCMIazDL2sP9SlMzF2d60qV7HsniUuLNuzIr93tQ2c0P3vfYQvH6XPdmiLZfzY
+         cVbmpIs0FqXAjbQp/24n7DNFkbwon6xycMfrH8WryCEQwGMw9CwC5HMeX/oEPwny9i4q
+         Q9SQ4OuuDWKkC+5uW+5whsaV/Pn4gBSfTn3DFjHDWyLCHSjG++1WP/WrCNz8ijslmXAw
+         LvA3tDHg//dawpNGtEqmA7+X+5GNk1PV5Rs97z1b9uotfNu/LPZcr297Gy24RssPy5QJ
+         ECDQ==
+X-Gm-Message-State: APjAAAW9ErcAfOpiOx8HQwtIH0T4zToF5mWK8tf1miYJQmEB1pG8GpJ4
+        xhL6yvGSwLkZC3QiKNE1BSU=
+X-Google-Smtp-Source: APXvYqzbu0fqyx1S9wHk9TZWdOKFNLR8W4aJ20JQpVBVWnaUPwqEe+RFqTrVv58Rvjaf0s5gNM1HPA==
+X-Received: by 2002:a17:90a:ba93:: with SMTP id t19mr1809345pjr.139.1564712221494;
+        Thu, 01 Aug 2019 19:17:01 -0700 (PDT)
 Received: from blueforge.nvidia.com (searspoint.nvidia.com. [216.228.112.21])
-        by smtp.gmail.com with ESMTPSA id p187sm118200292pfg.89.2019.08.01.19.16.56
+        by smtp.gmail.com with ESMTPSA id p187sm118200292pfg.89.2019.08.01.19.16.59
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 01 Aug 2019 19:16:57 -0700 (PDT)
+        Thu, 01 Aug 2019 19:17:00 -0700 (PDT)
 From:   john.hubbard@gmail.com
 X-Google-Original-From: jhubbard@nvidia.com
 To:     Andrew Morton <akpm@linux-foundation.org>
@@ -78,13 +79,16 @@ Cc:     Christoph Hellwig <hch@infradead.org>,
         linux-rpi-kernel@lists.infradead.org, linux-xfs@vger.kernel.org,
         netdev@vger.kernel.org, rds-devel@oss.oracle.com,
         sparclinux@vger.kernel.org, x86@kernel.org,
-        xen-devel@lists.xenproject.org, John Hubbard <jhubbard@nvidia.com>
-Subject: [PATCH 00/34] put_user_pages(): miscellaneous call sites
-Date:   Thu,  1 Aug 2019 19:16:19 -0700
-Message-Id: <20190802021653.4882-1-jhubbard@nvidia.com>
+        xen-devel@lists.xenproject.org, John Hubbard <jhubbard@nvidia.com>,
+        Santosh Shilimkar <santosh.shilimkar@oracle.com>,
+        "David S . Miller" <davem@davemloft.net>
+Subject: [PATCH 02/34] net/rds: convert put_page() to put_user_page*()
+Date:   Thu,  1 Aug 2019 19:16:21 -0700
+Message-Id: <20190802021653.4882-3-jhubbard@nvidia.com>
 X-Mailer: git-send-email 2.22.0
+In-Reply-To: <20190802021653.4882-1-jhubbard@nvidia.com>
+References: <20190802021653.4882-1-jhubbard@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 X-NVConfidentiality: public
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
@@ -94,136 +98,116 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: John Hubbard <jhubbard@nvidia.com>
 
-Hi,
-
-These are best characterized as miscellaneous conversions: many (not all)
-call sites that don't involve biovec or iov_iter, nor mm/. It also leaves
-out a few call sites that require some more work. These are mostly pretty
-simple ones.
-
-It's probably best to send all of these via Andrew's -mm tree, assuming
-that there are no significant merge conflicts with ongoing work in other
-trees (which I doubt, given that these are small changes).
-
-These patches apply to the latest linux.git. Patch #1 is also already in
-Andrew's tree, but given the broad non-linux-mm Cc list, I thought it
-would be more convenient to just include that patch here, so that people
-can use linux.git as the base--even though these are probably destined
-for linux-mm.
+For pages that were retained via get_user_pages*(), release those pages
+via the new put_user_page*() routines, instead of via put_page() or
+release_pages().
 
 This is part a tree-wide conversion, as described in commit fc1d8e7cca2d
-("mm: introduce put_user_page*(), placeholder versions"). That commit
-has an extensive description of the problem and the planned steps to
-solve it, but the highlites are:
+("mm: introduce put_user_page*(), placeholder versions").
 
-1) Provide put_user_page*() routines, intended to be used
-for releasing pages that were pinned via get_user_pages*().
+Cc: Santosh Shilimkar <santosh.shilimkar@oracle.com>
+Cc: David S. Miller <davem@davemloft.net>
+Cc: netdev@vger.kernel.org
+Cc: linux-rdma@vger.kernel.org
+Cc: rds-devel@oss.oracle.com
+Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+---
+ net/rds/info.c    |  5 ++---
+ net/rds/message.c |  2 +-
+ net/rds/rdma.c    | 15 +++++++--------
+ 3 files changed, 10 insertions(+), 12 deletions(-)
 
-2) Convert all of the call sites for get_user_pages*(), to
-invoke put_user_page*(), instead of put_page(). This involves dozens of
-call sites, and will take some time.
-
-3) After (2) is complete, use get_user_pages*() and put_user_page*() to
-implement tracking of these pages. This tracking will be separate from
-the existing struct page refcounting.
-
-4) Use the tracking and identification of these pages, to implement
-special handling (especially in writeback paths) when the pages are
-backed by a filesystem.
-
-And a few references, also from that commit:
-
-[1] https://lwn.net/Articles/774411/ : "DMA and get_user_pages()"
-[2] https://lwn.net/Articles/753027/ : "The Trouble with get_user_pages()"
-
-
-Ira Weiny (1):
-  fs/binfmt_elf: convert put_page() to put_user_page*()
-
-John Hubbard (33):
-  mm/gup: add make_dirty arg to put_user_pages_dirty_lock()
-  net/rds: convert put_page() to put_user_page*()
-  net/ceph: convert put_page() to put_user_page*()
-  x86/kvm: convert put_page() to put_user_page*()
-  drm/etnaviv: convert release_pages() to put_user_pages()
-  drm/i915: convert put_page() to put_user_page*()
-  drm/radeon: convert put_page() to put_user_page*()
-  media/ivtv: convert put_page() to put_user_page*()
-  media/v4l2-core/mm: convert put_page() to put_user_page*()
-  genwqe: convert put_page() to put_user_page*()
-  scif: convert put_page() to put_user_page*()
-  vmci: convert put_page() to put_user_page*()
-  rapidio: convert put_page() to put_user_page*()
-  oradax: convert put_page() to put_user_page*()
-  staging/vc04_services: convert put_page() to put_user_page*()
-  drivers/tee: convert put_page() to put_user_page*()
-  vfio: convert put_page() to put_user_page*()
-  fbdev/pvr2fb: convert put_page() to put_user_page*()
-  fsl_hypervisor: convert put_page() to put_user_page*()
-  xen: convert put_page() to put_user_page*()
-  fs/exec.c: convert put_page() to put_user_page*()
-  orangefs: convert put_page() to put_user_page*()
-  uprobes: convert put_page() to put_user_page*()
-  futex: convert put_page() to put_user_page*()
-  mm/frame_vector.c: convert put_page() to put_user_page*()
-  mm/gup_benchmark.c: convert put_page() to put_user_page*()
-  mm/memory.c: convert put_page() to put_user_page*()
-  mm/madvise.c: convert put_page() to put_user_page*()
-  mm/process_vm_access.c: convert put_page() to put_user_page*()
-  crypt: convert put_page() to put_user_page*()
-  nfs: convert put_page() to put_user_page*()
-  goldfish_pipe: convert put_page() to put_user_page*()
-  kernel/events/core.c: convert put_page() to put_user_page*()
-
- arch/x86/kvm/svm.c                            |   4 +-
- crypto/af_alg.c                               |   7 +-
- drivers/gpu/drm/etnaviv/etnaviv_gem.c         |   4 +-
- drivers/gpu/drm/i915/gem/i915_gem_userptr.c   |   9 +-
- drivers/gpu/drm/radeon/radeon_ttm.c           |   2 +-
- drivers/infiniband/core/umem.c                |   5 +-
- drivers/infiniband/hw/hfi1/user_pages.c       |   5 +-
- drivers/infiniband/hw/qib/qib_user_pages.c    |   5 +-
- drivers/infiniband/hw/usnic/usnic_uiom.c      |   5 +-
- drivers/infiniband/sw/siw/siw_mem.c           |  10 +-
- drivers/media/pci/ivtv/ivtv-udma.c            |  14 +--
- drivers/media/pci/ivtv/ivtv-yuv.c             |  10 +-
- drivers/media/v4l2-core/videobuf-dma-sg.c     |   3 +-
- drivers/misc/genwqe/card_utils.c              |  17 +--
- drivers/misc/mic/scif/scif_rma.c              |  17 ++-
- drivers/misc/vmw_vmci/vmci_context.c          |   2 +-
- drivers/misc/vmw_vmci/vmci_queue_pair.c       |  11 +-
- drivers/platform/goldfish/goldfish_pipe.c     |   9 +-
- drivers/rapidio/devices/rio_mport_cdev.c      |   9 +-
- drivers/sbus/char/oradax.c                    |   2 +-
- .../interface/vchiq_arm/vchiq_2835_arm.c      |  10 +-
- drivers/tee/tee_shm.c                         |  10 +-
- drivers/vfio/vfio_iommu_type1.c               |   8 +-
- drivers/video/fbdev/pvr2fb.c                  |   3 +-
- drivers/virt/fsl_hypervisor.c                 |   7 +-
- drivers/xen/gntdev.c                          |   5 +-
- drivers/xen/privcmd.c                         |   7 +-
- fs/binfmt_elf.c                               |   2 +-
- fs/binfmt_elf_fdpic.c                         |   2 +-
- fs/exec.c                                     |   2 +-
- fs/nfs/direct.c                               |   4 +-
- fs/orangefs/orangefs-bufmap.c                 |   7 +-
- include/linux/mm.h                            |   5 +-
- kernel/events/core.c                          |   2 +-
- kernel/events/uprobes.c                       |   6 +-
- kernel/futex.c                                |  10 +-
- mm/frame_vector.c                             |   4 +-
- mm/gup.c                                      | 115 ++++++++----------
- mm/gup_benchmark.c                            |   2 +-
- mm/madvise.c                                  |   2 +-
- mm/memory.c                                   |   2 +-
- mm/process_vm_access.c                        |  18 +--
- net/ceph/pagevec.c                            |   8 +-
- net/rds/info.c                                |   5 +-
- net/rds/message.c                             |   2 +-
- net/rds/rdma.c                                |  15 ++-
- virt/kvm/kvm_main.c                           |   4 +-
- 47 files changed, 151 insertions(+), 266 deletions(-)
-
+diff --git a/net/rds/info.c b/net/rds/info.c
+index 03f6fd56d237..ca6af2889adf 100644
+--- a/net/rds/info.c
++++ b/net/rds/info.c
+@@ -162,7 +162,6 @@ int rds_info_getsockopt(struct socket *sock, int optname, char __user *optval,
+ 	struct rds_info_lengths lens;
+ 	unsigned long nr_pages = 0;
+ 	unsigned long start;
+-	unsigned long i;
+ 	rds_info_func func;
+ 	struct page **pages = NULL;
+ 	int ret;
+@@ -235,8 +234,8 @@ int rds_info_getsockopt(struct socket *sock, int optname, char __user *optval,
+ 		ret = -EFAULT;
+ 
+ out:
+-	for (i = 0; pages && i < nr_pages; i++)
+-		put_page(pages[i]);
++	if (pages)
++		put_user_pages(pages, nr_pages);
+ 	kfree(pages);
+ 
+ 	return ret;
+diff --git a/net/rds/message.c b/net/rds/message.c
+index 50f13f1d4ae0..d7b0d266c437 100644
+--- a/net/rds/message.c
++++ b/net/rds/message.c
+@@ -404,7 +404,7 @@ static int rds_message_zcopy_from_user(struct rds_message *rm, struct iov_iter *
+ 			int i;
+ 
+ 			for (i = 0; i < rm->data.op_nents; i++)
+-				put_page(sg_page(&rm->data.op_sg[i]));
++				put_user_page(sg_page(&rm->data.op_sg[i]));
+ 			mmp = &rm->data.op_mmp_znotifier->z_mmp;
+ 			mm_unaccount_pinned_pages(mmp);
+ 			ret = -EFAULT;
+diff --git a/net/rds/rdma.c b/net/rds/rdma.c
+index 916f5ec373d8..6762e8696b99 100644
+--- a/net/rds/rdma.c
++++ b/net/rds/rdma.c
+@@ -162,8 +162,7 @@ static int rds_pin_pages(unsigned long user_addr, unsigned int nr_pages,
+ 				  pages);
+ 
+ 	if (ret >= 0 && ret < nr_pages) {
+-		while (ret--)
+-			put_page(pages[ret]);
++		put_user_pages(pages, ret);
+ 		ret = -EFAULT;
+ 	}
+ 
+@@ -276,7 +275,7 @@ static int __rds_rdma_map(struct rds_sock *rs, struct rds_get_mr_args *args,
+ 
+ 	if (IS_ERR(trans_private)) {
+ 		for (i = 0 ; i < nents; i++)
+-			put_page(sg_page(&sg[i]));
++			put_user_page(sg_page(&sg[i]));
+ 		kfree(sg);
+ 		ret = PTR_ERR(trans_private);
+ 		goto out;
+@@ -464,9 +463,10 @@ void rds_rdma_free_op(struct rm_rdma_op *ro)
+ 		 * to local memory */
+ 		if (!ro->op_write) {
+ 			WARN_ON(!page->mapping && irqs_disabled());
+-			set_page_dirty(page);
++			put_user_pages_dirty_lock(&page, 1, true);
++		} else {
++			put_user_page(page);
+ 		}
+-		put_page(page);
+ 	}
+ 
+ 	kfree(ro->op_notifier);
+@@ -481,8 +481,7 @@ void rds_atomic_free_op(struct rm_atomic_op *ao)
+ 	/* Mark page dirty if it was possibly modified, which
+ 	 * is the case for a RDMA_READ which copies from remote
+ 	 * to local memory */
+-	set_page_dirty(page);
+-	put_page(page);
++	put_user_pages_dirty_lock(&page, 1, true);
+ 
+ 	kfree(ao->op_notifier);
+ 	ao->op_notifier = NULL;
+@@ -867,7 +866,7 @@ int rds_cmsg_atomic(struct rds_sock *rs, struct rds_message *rm,
+ 	return ret;
+ err:
+ 	if (page)
+-		put_page(page);
++		put_user_page(page);
+ 	rm->atomic.op_active = 0;
+ 	kfree(rm->atomic.op_notifier);
+ 
 -- 
 2.22.0
 
