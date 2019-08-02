@@ -2,92 +2,180 @@ Return-Path: <SRS0=PsuD=V6=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65E24C32750
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 09:19:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BB65C32750
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 09:39:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4AB7D217D4
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 09:19:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D94262086A
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 09:39:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1564738777;
+	bh=lGLaNYRdP0eiFGTeLWXnmLByn/7p1vnP/YPhYWVSy8o=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=aCc/17WbJVHfuSnGuyvVojXYTWueoL0MvP8sm8Y4tW3c6gJ1bo0KnBm53EhbaFYpc
+	 +MT1Q7xdtFn92TAztA12SsoN4rrjSiLw5TpjcCK4ZvdXQamMuFTc8PIOButcPHUQg8
+	 zpKm7p8UJZOy8bCmvQRB+ewZqWgSHrNXpPsca2BI=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387895AbfHBJTf convert rfc822-to-8bit (ORCPT
+        id S2391311AbfHBJdh (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 2 Aug 2019 05:19:35 -0400
-Received: from mga09.intel.com ([134.134.136.24]:11805 "EHLO mga09.intel.com"
+        Fri, 2 Aug 2019 05:33:37 -0400
+Received: from mail.kernel.org ([198.145.29.99]:33030 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387890AbfHBJTf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Aug 2019 05:19:35 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 02 Aug 2019 02:19:33 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,337,1559545200"; 
-   d="scan'208";a="178105348"
-Received: from jlahtine-desk.ger.corp.intel.com (HELO localhost) ([10.252.3.11])
-  by orsmga006.jf.intel.com with ESMTP; 02 Aug 2019 02:19:23 -0700
-Content-Type: text/plain; charset="utf-8"
+        id S1733262AbfHBJdg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 2 Aug 2019 05:33:36 -0400
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id D827221842;
+        Fri,  2 Aug 2019 09:33:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1564738415;
+        bh=lGLaNYRdP0eiFGTeLWXnmLByn/7p1vnP/YPhYWVSy8o=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=N7hhwaA+8/12mE/t0NS9jAL7iGg7RXReXWsquzunnyRGHIcnCY3U18GMcAZsw9/Gq
+         vlBs5BZHHKv42NLetP1IBFMOJ/j4/4epFCLk/vHyiN8sf3jaMbMDlx2HUF1GYhb97B
+         k3eo8vKk7OEf23HFghi4g6gM1URxNGhH+0Y1ka8w=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        stable@vger.kernel.org, Daniel Jordan <daniel.m.jordan@oracle.com>,
+        Andrea Parri <andrea.parri@amarulasolutions.com>,
+        Boqun Feng <boqun.feng@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "Paul E. McKenney" <paulmck@linux.ibm.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        linux-arch@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: [PATCH 4.4 068/158] padata: use smp_mb in padata_reorder to avoid orphaned padata jobs
+Date:   Fri,  2 Aug 2019 11:28:09 +0200
+Message-Id: <20190802092217.814889890@linuxfoundation.org>
+X-Mailer: git-send-email 2.22.0
+In-Reply-To: <20190802092203.671944552@linuxfoundation.org>
+References: <20190802092203.671944552@linuxfoundation.org>
+User-Agent: quilt/0.66
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8BIT
-To:     Andrew Morton <akpm@linux-foundation.org>, john.hubbard@gmail.com
-From:   Joonas Lahtinen <joonas.lahtinen@linux.intel.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-In-Reply-To: <20190802022005.5117-7-jhubbard@nvidia.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Chinner <david@fromorbit.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        =?utf-8?b?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        amd-gfx@lists.freedesktop.org, ceph-devel@vger.kernel.org,
-        devel@driverdev.osuosl.org, devel@lists.orangefs.org,
-        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-fbdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-mm@kvack.org,
-        linux-nfs@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-rpi-kernel@lists.infradead.org, linux-xfs@vger.kernel.org,
-        netdev@vger.kernel.org, rds-devel@oss.oracle.com,
-        sparclinux@vger.kernel.org, x86@kernel.org,
-        xen-devel@lists.xenproject.org, John Hubbard <jhubbard@nvidia.com>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        David Airlie <airlied@linux.ie>
-References: <20190802022005.5117-1-jhubbard@nvidia.com>
- <20190802022005.5117-7-jhubbard@nvidia.com>
-Message-ID: <156473756254.19842.12384378926183716632@jlahtine-desk.ger.corp.intel.com>
-User-Agent: alot/0.7
-Subject: Re: [PATCH 06/34] drm/i915: convert put_page() to put_user_page*()
-Date:   Fri, 02 Aug 2019 12:19:22 +0300
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Quoting john.hubbard@gmail.com (2019-08-02 05:19:37)
-> From: John Hubbard <jhubbard@nvidia.com>
-> 
-> For pages that were retained via get_user_pages*(), release those pages
-> via the new put_user_page*() routines, instead of via put_page() or
-> release_pages().
-> 
-> This is part a tree-wide conversion, as described in commit fc1d8e7cca2d
-> ("mm: introduce put_user_page*(), placeholder versions").
-> 
-> Note that this effectively changes the code's behavior in
-> i915_gem_userptr_put_pages(): it now calls set_page_dirty_lock(),
-> instead of set_page_dirty(). This is probably more accurate.
+From: Daniel Jordan <daniel.m.jordan@oracle.com>
 
-We've already fixed this in drm-tip where the current code uses
-set_page_dirty_lock().
+commit cf144f81a99d1a3928f90b0936accfd3f45c9a0a upstream.
 
-This would conflict with our tree. Rodrigo is handling
-drm-intel-next for 5.4, so you guys want to coordinate how
-to merge.
+Testing padata with the tcrypt module on a 5.2 kernel...
 
-Regards, Joonas
+    # modprobe tcrypt alg="pcrypt(rfc4106(gcm(aes)))" type=3
+    # modprobe tcrypt mode=211 sec=1
+
+...produces this splat:
+
+    INFO: task modprobe:10075 blocked for more than 120 seconds.
+          Not tainted 5.2.0-base+ #16
+    modprobe        D    0 10075  10064 0x80004080
+    Call Trace:
+     ? __schedule+0x4dd/0x610
+     ? ring_buffer_unlock_commit+0x23/0x100
+     schedule+0x6c/0x90
+     schedule_timeout+0x3b/0x320
+     ? trace_buffer_unlock_commit_regs+0x4f/0x1f0
+     wait_for_common+0x160/0x1a0
+     ? wake_up_q+0x80/0x80
+     { crypto_wait_req }             # entries in braces added by hand
+     { do_one_aead_op }
+     { test_aead_jiffies }
+     test_aead_speed.constprop.17+0x681/0xf30 [tcrypt]
+     do_test+0x4053/0x6a2b [tcrypt]
+     ? 0xffffffffa00f4000
+     tcrypt_mod_init+0x50/0x1000 [tcrypt]
+     ...
+
+The second modprobe command never finishes because in padata_reorder,
+CPU0's load of reorder_objects is executed before the unlocking store in
+spin_unlock_bh(pd->lock), causing CPU0 to miss CPU1's increment:
+
+CPU0                                 CPU1
+
+padata_reorder                       padata_do_serial
+  LOAD reorder_objects  // 0
+                                       INC reorder_objects  // 1
+                                       padata_reorder
+                                         TRYLOCK pd->lock   // failed
+  UNLOCK pd->lock
+
+CPU0 deletes the timer before returning from padata_reorder and since no
+other job is submitted to padata, modprobe waits indefinitely.
+
+Add a pair of full barriers to guarantee proper ordering:
+
+CPU0                                 CPU1
+
+padata_reorder                       padata_do_serial
+  UNLOCK pd->lock
+  smp_mb()
+  LOAD reorder_objects
+                                       INC reorder_objects
+                                       smp_mb__after_atomic()
+                                       padata_reorder
+                                         TRYLOCK pd->lock
+
+smp_mb__after_atomic is needed so the read part of the trylock operation
+comes after the INC, as Andrea points out.   Thanks also to Andrea for
+help with writing a litmus test.
+
+Fixes: 16295bec6398 ("padata: Generic parallelization/serialization interface")
+Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
+Cc: <stable@vger.kernel.org>
+Cc: Andrea Parri <andrea.parri@amarulasolutions.com>
+Cc: Boqun Feng <boqun.feng@gmail.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Paul E. McKenney <paulmck@linux.ibm.com>
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: linux-arch@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+---
+ kernel/padata.c |   12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+--- a/kernel/padata.c
++++ b/kernel/padata.c
+@@ -273,7 +273,12 @@ static void padata_reorder(struct parall
+ 	 * The next object that needs serialization might have arrived to
+ 	 * the reorder queues in the meantime, we will be called again
+ 	 * from the timer function if no one else cares for it.
++	 *
++	 * Ensure reorder_objects is read after pd->lock is dropped so we see
++	 * an increment from another task in padata_do_serial.  Pairs with
++	 * smp_mb__after_atomic in padata_do_serial.
+ 	 */
++	smp_mb();
+ 	if (atomic_read(&pd->reorder_objects)
+ 			&& !(pinst->flags & PADATA_RESET))
+ 		mod_timer(&pd->timer, jiffies + HZ);
+@@ -342,6 +347,13 @@ void padata_do_serial(struct padata_priv
+ 	list_add_tail(&padata->list, &pqueue->reorder.list);
+ 	spin_unlock(&pqueue->reorder.lock);
+ 
++	/*
++	 * Ensure the atomic_inc of reorder_objects above is ordered correctly
++	 * with the trylock of pd->lock in padata_reorder.  Pairs with smp_mb
++	 * in padata_reorder.
++	 */
++	smp_mb__after_atomic();
++
+ 	put_cpu();
+ 
+ 	padata_reorder(pd);
+
+
