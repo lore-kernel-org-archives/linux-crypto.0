@@ -2,114 +2,101 @@ Return-Path: <SRS0=PsuD=V6=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58E63C32754
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 02:39:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8992EC433FF
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 03:55:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3049920840
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 02:39:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="aftmkmmN"
+	by mail.kernel.org (Postfix) with ESMTP id 65BB6206A3
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 03:55:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726704AbfHBCjE (ORCPT
+        id S1730682AbfHBDzc (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 1 Aug 2019 22:39:04 -0400
-Received: from hqemgate15.nvidia.com ([216.228.121.64]:11756 "EHLO
-        hqemgate15.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726654AbfHBCjE (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Aug 2019 22:39:04 -0400
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate15.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5d43a24e0000>; Thu, 01 Aug 2019 19:39:10 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Thu, 01 Aug 2019 19:39:01 -0700
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Thu, 01 Aug 2019 19:39:01 -0700
-Received: from [10.110.48.28] (172.20.13.39) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 2 Aug
- 2019 02:39:00 +0000
-Subject: Re: [PATCH 00/34] put_user_pages(): miscellaneous call sites
-To:     <john.hubbard@gmail.com>, Andrew Morton <akpm@linux-foundation.org>
-CC:     Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Chinner <david@fromorbit.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        <amd-gfx@lists.freedesktop.org>, <ceph-devel@vger.kernel.org>,
-        <devel@driverdev.osuosl.org>, <devel@lists.orangefs.org>,
-        <dri-devel@lists.freedesktop.org>,
-        <intel-gfx@lists.freedesktop.org>, <kvm@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-block@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <linux-fbdev@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
-        <linux-media@vger.kernel.org>, <linux-mm@kvack.org>,
-        <linux-nfs@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-        <linux-rpi-kernel@lists.infradead.org>,
-        <linux-xfs@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <rds-devel@oss.oracle.com>, <sparclinux@vger.kernel.org>,
-        <x86@kernel.org>, <xen-devel@lists.xenproject.org>
-References: <20190802021653.4882-1-jhubbard@nvidia.com>
-From:   John Hubbard <jhubbard@nvidia.com>
-X-Nvconfidentiality: public
-Message-ID: <ec87b662-0fc2-0951-1337-a91b4888201b@nvidia.com>
-Date:   Thu, 1 Aug 2019 19:39:00 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Thu, 1 Aug 2019 23:55:32 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:48416 "EHLO fornost.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729624AbfHBDzb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 1 Aug 2019 23:55:31 -0400
+Received: from gondolin.me.apana.org.au ([192.168.0.6] helo=gondolin.hengli.com.au)
+        by fornost.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
+        id 1htOez-00054h-1w; Fri, 02 Aug 2019 13:55:17 +1000
+Received: from herbert by gondolin.hengli.com.au with local (Exim 4.80)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1htOex-00047c-GU; Fri, 02 Aug 2019 13:55:15 +1000
+Date:   Fri, 2 Aug 2019 13:55:15 +1000
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>, Eric Biggers <ebiggers@google.com>,
+        device-mapper development <dm-devel@redhat.com>,
+        linux-fscrypt@vger.kernel.org,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Milan Broz <gmazyland@gmail.com>
+Subject: Re: [PATCH v8 1/7] crypto: essiv - create wrapper template for ESSIV
+ generation
+Message-ID: <20190802035515.GA15758@gondor.apana.org.au>
+References: <20190704183017.31570-2-ard.biesheuvel@linaro.org>
+ <20190726043117.GA654@gondor.apana.org.au>
+ <CAKv+Gu_Pir7uU4h6GQfh2my2Fu-j2AGPLWNZKzc9_iG6n4xJNA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190802021653.4882-1-jhubbard@nvidia.com>
-X-Originating-IP: [172.20.13.39]
-X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1564713550; bh=uB7qKWJf2vIk7MCI51NrKGKnU0tjP3n9YQM4FSsQ99A=;
-        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=aftmkmmNomCdfG4/nsU7QFjmse0kzSiVn7k6qdyITGQKtpIb7fXB3ira93x2ikjhP
-         hh9fWh6OxSH7I4ITUxx9rk4nMXoUcCl6xE7j7d8OaKs0QzK3tWjGXYe1PPsA5+CMkF
-         sKiN+5/hdBTh4TsmJWAPetkvcksKG1W7KX4K24lGpfHw6t/QQ4fbKf5zlriq/zHiCI
-         WN7lLvY4tFrWOLTfdOFRIa/sFBuq00RVcHrLnsHi/Dnbw2dVeWXrugMTAYnP04jnRA
-         tXP1GLNpYcsDC/T0sb/csl6pvYXC87xnKjlVca8dQdSp/cuFTGUobSHcHyKfqM9q/X
-         eCw5n+JFkzHyg==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKv+Gu_Pir7uU4h6GQfh2my2Fu-j2AGPLWNZKzc9_iG6n4xJNA@mail.gmail.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 8/1/19 7:16 PM, john.hubbard@gmail.com wrote:
-> From: John Hubbard <jhubbard@nvidia.com>
-> 
-> Hi,
-> 
-> These are best characterized as miscellaneous conversions: many (not all)
-> call sites that don't involve biovec or iov_iter, nor mm/. It also leaves
-> out a few call sites that require some more work. These are mostly pretty
-> simple ones.
-> 
-> It's probably best to send all of these via Andrew's -mm tree, assuming
-> that there are no significant merge conflicts with ongoing work in other
-> trees (which I doubt, given that these are small changes).
-> 
+On Fri, Jul 26, 2019 at 12:00:20PM +0300, Ard Biesheuvel wrote:
+>
+> For Y and Z, it is not straightforward either: since the crypto API
+> permits the use of driver names in addition to the plain CRA names,
+> we'd have to infer from the first parameter which cipher is being
+> used.
 
-In case anyone is wondering, this truncated series is due to a script failure:
-git-send-email chokes when it hits email addresses whose names have a
-comma in them, as happened here with patch 0003.  
+We don't really permit that.  It might work but it is certainly not
+guaranteed to work.  The only thing we guarantee is that the
+algorithm name and the canonical driver name will work.  For example,
+with gcm you can either say gcm(aes) or gcm_base(drv_name1, drv_name2).
 
-Please disregard this set and reply to the other thread.
+Anything else is not supported.
 
-thanks,
+So I would envisage something similar for essiv where essiv just has
+U, X and Y (as you said that U and X are independent) while you can
+then have an essiv_base that spells everything out in detail.
+
+Also, do we allow anything other than HMAC for X? If not then that
+should be encoded either into the name by dropping the hmac in the
+algorithm name and adding it through the driver name, or by checking
+for it in the template creation function.
+
+What I'd like to achieve is a state where we support only what is
+currently supported and no more.
+
+> > Because this is legacy stuff, I don't want it to support any more
+> > than what is currently being supported by dm-crypt.
+> >
+> > Similary for the skcipher case, given
+> >
+> >         essiv(cbc(X),Y,Z)
+> >
+> > is it ever possible for X != Y? If not then we should just make the
+> > algorithm name essiv(X,Z).
+> >
+> 
+> Same problem. We'd need to instantiate the skcipher and parse the cra_name.
+> 
+> Perhaps we should introduce a crypto API call that infers the cra_name
+> from a cra_driver_name?
+
+You don't need to do that.  Just copy whatever gcm does in its
+creation function when you invoke it as gcm_base.
+
+Thanks,
 -- 
-John Hubbard
-NVIDIA
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
