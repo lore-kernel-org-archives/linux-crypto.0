@@ -2,100 +2,229 @@ Return-Path: <SRS0=PsuD=V6=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79728C433FF
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 05:50:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2195BC32750
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 06:10:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4A7912073D
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 05:50:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="X3oq7lAk"
+	by mail.kernel.org (Postfix) with ESMTP id EBD562087C
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 06:10:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388193AbfHBFuW (ORCPT
+        id S2388420AbfHBGKN (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 2 Aug 2019 01:50:22 -0400
-Received: from mail-lj1-f196.google.com ([209.85.208.196]:36859 "EHLO
-        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388195AbfHBFuW (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Aug 2019 01:50:22 -0400
-Received: by mail-lj1-f196.google.com with SMTP id i21so71677399ljj.3
-        for <linux-crypto@vger.kernel.org>; Thu, 01 Aug 2019 22:50:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Vwz8Yfm4Cow2GeEvNxlf9aEZE7OVt1rKT7raAjp8VpA=;
-        b=X3oq7lAkHf3gv2MqFLGGzBIFgglHgG5rRPhA3IA/fycv6qEgWi/E/L84U6E0mZJF5k
-         HaeRuMoGJlD1AnH/ujS8Un7jZdQyUMaemOE5kq531tVfuOAnjD/LU5AJx52J+CGFad+M
-         jFedj9VOB/NnqbRUoJFCIu0uLsAjmh4zr0n2QpQes0qqSw36DYgPoBTlCdlefz4yPDzf
-         ZDHoh285WC5GUXxkKWfRJJJ/jy4JL86Kqy8qWDtY1HoxHInqDQbFsced+bOAVZGpUwdZ
-         Gcz9jma3dRlxxMCgIJpxiWALuPHaN0nxFpjSnOh3TSquP4VcgUfapw+xPsm/8Iv003js
-         NRVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Vwz8Yfm4Cow2GeEvNxlf9aEZE7OVt1rKT7raAjp8VpA=;
-        b=E4tKElPo6IeRU8Lzts2BOQE1yPtLCayR5IuluJ5RmwNeEyy1pnXN8OvPqedysQ6Q3S
-         cKTa06Bdy1JP9GmA1LBWfGTz8RkDqKv/1bBeCWdOK0X40Jdt630pEqIlPX1WSddxFqpM
-         EIRH84epOtNKNULOBOHSmjxZXvuMJnMVJfQNu33vOSm+QqQaLZz0+6c2ZwrmCLZYx+Ho
-         O6/lFATFQitN4xj27O3zsHW1L9s9pq6fLbE/wbteL8GhMye8bqV3kfz6iuqapkVRwNAD
-         PFrBeioaqAprVPaA6tBzlq0Ku8IKiMvW6XlXAOJ3JX+SwVa3nI23zoBpSWIK52gtSgme
-         /OkQ==
-X-Gm-Message-State: APjAAAV0EBenK5klYvSa6i7cgdxr+Hv4tkNfLseGXmjuAP+pf1yL4S4b
-        ZlacH30yEBJa8GrSwvZQv2WYyDv+hYhCzux8vI0mCA==
-X-Google-Smtp-Source: APXvYqxa1pCtNqv5a9orx+jqYo5gAuz4nI99d0UZk2C8opZTrYtKmFiLmrw+zaVFcZxMgM+dWW013yJe1zTceqVxnvo=
-X-Received: by 2002:a2e:301a:: with SMTP id w26mr68823438ljw.76.1564725020734;
- Thu, 01 Aug 2019 22:50:20 -0700 (PDT)
+        Fri, 2 Aug 2019 02:10:13 -0400
+Received: from mx2.suse.de ([195.135.220.15]:33608 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727403AbfHBGKN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 2 Aug 2019 02:10:13 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 95267B634;
+        Fri,  2 Aug 2019 06:10:09 +0000 (UTC)
+Subject: Re: [PATCH 20/34] xen: convert put_page() to put_user_page*()
+To:     John Hubbard <jhubbard@nvidia.com>, john.hubbard@gmail.com,
+        Andrew Morton <akpm@linux-foundation.org>
+Cc:     devel@driverdev.osuosl.org, Dave Chinner <david@fromorbit.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Ira Weiny <ira.weiny@intel.com>, x86@kernel.org,
+        linux-mm@kvack.org, Dave Hansen <dave.hansen@linux.intel.com>,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-rpi-kernel@lists.infradead.org, devel@lists.orangefs.org,
+        xen-devel@lists.xenproject.org,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        rds-devel@oss.oracle.com,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Jan Kara <jack@suse.cz>, ceph-devel@vger.kernel.org,
+        kvm@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-fbdev@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        linux-media@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-xfs@vger.kernel.org,
+        netdev@vger.kernel.org, sparclinux@vger.kernel.org,
+        Jason Gunthorpe <jgg@ziepe.ca>
+References: <20190802022005.5117-1-jhubbard@nvidia.com>
+ <20190802022005.5117-21-jhubbard@nvidia.com>
+ <4471e9dc-a315-42c1-0c3c-55ba4eeeb106@suse.com>
+ <d5140833-e9ee-beb5-ff0a-2d13a4fe819f@nvidia.com>
+From:   Juergen Gross <jgross@suse.com>
+Message-ID: <d4931311-db01-e8c3-0f8c-d64685dc2143@suse.com>
+Date:   Fri, 2 Aug 2019 08:10:07 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <1563449086-13183-1-git-send-email-sumit.garg@linaro.org>
- <1563449086-13183-2-git-send-email-sumit.garg@linaro.org> <20190801172310.cldcftfdoh5vyfjg@linux.intel.com>
-In-Reply-To: <20190801172310.cldcftfdoh5vyfjg@linux.intel.com>
-From:   Sumit Garg <sumit.garg@linaro.org>
-Date:   Fri, 2 Aug 2019 11:20:09 +0530
-Message-ID: <CAFA6WYM+FQuXA9Saj5+ffOGsc-shhiF5Uos4g14Qndvu6w97Sg@mail.gmail.com>
-Subject: Re: [RFC/RFT v2 1/2] KEYS: trusted: create trusted keys subsystem
-To:     Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-Cc:     keyrings@vger.kernel.org, linux-integrity@vger.kernel.org,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        linux-security-module@vger.kernel.org, dhowells@redhat.com,
-        Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
-        jejb@linux.ibm.com, Mimi Zohar <zohar@linux.ibm.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Casey Schaufler <casey@schaufler-ca.com>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Daniel Thompson <daniel.thompson@linaro.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "tee-dev @ lists . linaro . org" <tee-dev@lists.linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <d5140833-e9ee-beb5-ff0a-2d13a4fe819f@nvidia.com>
+Content-Type: multipart/mixed;
+ boundary="------------8BBD3C4A32BE2A4FA02D8356"
+Content-Language: de-DE
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 1 Aug 2019 at 22:54, Jarkko Sakkinen
-<jarkko.sakkinen@linux.intel.com> wrote:
->
-> On Thu, Jul 18, 2019 at 04:54:45PM +0530, Sumit Garg wrote:
-> > Move existing code to trusted keys subsystem. Also, rename files with
-> > "tpm" as suffix which provides the underlying implementation.
-> >
-> > Suggested-by: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-> > Signed-off-by: Sumit Garg <sumit.garg@linaro.org>
->
-> What about TPM2 trusted keys code?
+This is a multi-part message in MIME format.
+--------------8BBD3C4A32BE2A4FA02D8356
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Isn't TPM2 code located here: "drivers/char/tpm/"? Would you like to
-move that code under trusted keys subsystem only?
+On 02.08.19 07:48, John Hubbard wrote:
+> On 8/1/19 9:36 PM, Juergen Gross wrote:
+>> On 02.08.19 04:19, john.hubbard@gmail.com wrote:
+>>> From: John Hubbard <jhubbard@nvidia.com>
+> ...
+>>> diff --git a/drivers/xen/privcmd.c b/drivers/xen/privcmd.c
+>>> index 2f5ce7230a43..29e461dbee2d 100644
+>>> --- a/drivers/xen/privcmd.c
+>>> +++ b/drivers/xen/privcmd.c
+>>> @@ -611,15 +611,10 @@ static int lock_pages(
+>>>   static void unlock_pages(struct page *pages[], unsigned int nr_pages)
+>>>   {
+>>> -    unsigned int i;
+>>> -
+>>>       if (!pages)
+>>>           return;
+>>> -    for (i = 0; i < nr_pages; i++) {
+>>> -        if (pages[i])
+>>> -            put_page(pages[i]);
+>>> -    }
+>>> +    put_user_pages(pages, nr_pages);
+>>
+>> You are not handling the case where pages[i] is NULL here. Or am I
+>> missing a pending patch to put_user_pages() here?
+>>
+> 
+> Hi Juergen,
+> 
+> You are correct--this no longer handles the cases where pages[i]
+> is NULL. It's intentional, though possibly wrong. :)
+> 
+> I see that I should have added my standard blurb to this
+> commit description. I missed this one, but some of the other patches
+> have it. It makes the following, possibly incorrect claim:
+> 
+> "This changes the release code slightly, because each page slot in the
+> page_list[] array is no longer checked for NULL. However, that check
+> was wrong anyway, because the get_user_pages() pattern of usage here
+> never allowed for NULL entries within a range of pinned pages."
+> 
+> The way I've seen these page arrays used with get_user_pages(),
+> things are either done single page, or with a contiguous range. So
+> unless I'm missing a case where someone is either
+> 
+> a) releasing individual pages within a range (and thus likely messing
+> up their count of pages they have), or
+> 
+> b) allocating two gup ranges within the same pages[] array, with a
+> gap between the allocations,
+> 
+> ...then it should be correct. If so, then I'll add the above blurb
+> to this patch's commit description.
+> 
+> If that's not the case (both here, and in 3 or 4 other patches in this
+> series, then as you said, I should add NULL checks to put_user_pages()
+> and put_user_pages_dirty_lock().
 
--Sumit
+In this case it is not correct, but can easily be handled. The NULL case
+can occur only in an error case with the pages array filled partially or
+not at all.
 
->
-> /Jarkko
+I'd prefer something like the attached patch here.
+
+
+Juergen
+
+--------------8BBD3C4A32BE2A4FA02D8356
+Content-Type: text/x-patch;
+ name="gup.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="gup.patch"
+
+diff --git a/drivers/xen/privcmd.c b/drivers/xen/privcmd.c
+index 2f5ce7230a43..12bd3154126d 100644
+--- a/drivers/xen/privcmd.c
++++ b/drivers/xen/privcmd.c
+@@ -582,10 +582,11 @@ static long privcmd_ioctl_mmap_batch(
+ 
+ static int lock_pages(
+ 	struct privcmd_dm_op_buf kbufs[], unsigned int num,
+-	struct page *pages[], unsigned int nr_pages)
++	struct page *pages[], unsigned int *nr_pages)
+ {
+-	unsigned int i;
++	unsigned int i, free = *nr_pages;
+ 
++	*nr_pages = 0;
+ 	for (i = 0; i < num; i++) {
+ 		unsigned int requested;
+ 		int pinned;
+@@ -593,35 +594,22 @@ static int lock_pages(
+ 		requested = DIV_ROUND_UP(
+ 			offset_in_page(kbufs[i].uptr) + kbufs[i].size,
+ 			PAGE_SIZE);
+-		if (requested > nr_pages)
++		if (requested > free)
+ 			return -ENOSPC;
+ 
+ 		pinned = get_user_pages_fast(
+ 			(unsigned long) kbufs[i].uptr,
+-			requested, FOLL_WRITE, pages);
++			requested, FOLL_WRITE, pages + *nr_pages);
+ 		if (pinned < 0)
+ 			return pinned;
+ 
+-		nr_pages -= pinned;
+-		pages += pinned;
++		free -= pinned;
++		*nr_pages += pinned;
+ 	}
+ 
+ 	return 0;
+ }
+ 
+-static void unlock_pages(struct page *pages[], unsigned int nr_pages)
+-{
+-	unsigned int i;
+-
+-	if (!pages)
+-		return;
+-
+-	for (i = 0; i < nr_pages; i++) {
+-		if (pages[i])
+-			put_page(pages[i]);
+-	}
+-}
+-
+ static long privcmd_ioctl_dm_op(struct file *file, void __user *udata)
+ {
+ 	struct privcmd_data *data = file->private_data;
+@@ -681,11 +669,12 @@ static long privcmd_ioctl_dm_op(struct file *file, void __user *udata)
+ 
+ 	xbufs = kcalloc(kdata.num, sizeof(*xbufs), GFP_KERNEL);
+ 	if (!xbufs) {
++		nr_pages = 0;
+ 		rc = -ENOMEM;
+ 		goto out;
+ 	}
+ 
+-	rc = lock_pages(kbufs, kdata.num, pages, nr_pages);
++	rc = lock_pages(kbufs, kdata.num, pages, &nr_pages);
+ 	if (rc)
+ 		goto out;
+ 
+@@ -699,7 +688,8 @@ static long privcmd_ioctl_dm_op(struct file *file, void __user *udata)
+ 	xen_preemptible_hcall_end();
+ 
+ out:
+-	unlock_pages(pages, nr_pages);
++	if (pages)
++		put_user_pages(pages, nr_pages);
+ 	kfree(xbufs);
+ 	kfree(pages);
+ 	kfree(kbufs);
+
+--------------8BBD3C4A32BE2A4FA02D8356--
