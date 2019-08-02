@@ -1,214 +1,152 @@
-Return-Path: <SRS0=q4N3=V5=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=PsuD=V6=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7765BC433FF
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Aug 2019 22:04:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14245C433FF
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 00:24:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4117720838
-	for <linux-crypto@archiver.kernel.org>; Thu,  1 Aug 2019 22:04:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1564697080;
-	bh=07USxmiW0wtvQgurj28XmaQedZTzoWvNahQ2mQLPE40=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=MRCOmK6N8lIz8zvSrh57chD2nOoqQ4vGafu8YciCL0jJqTbsBZgPeG3YIXheWAJN/
-	 frUXfRVui3hPdf8ONzUKHxZuknptCIeb6AyLstR9M6NwSkcT61d2fmhh+o0TbST1AC
-	 gmlTZp/yxUzDuUs9PYJ3QSyf3n/cu6L5LrABFjLY=
+	by mail.kernel.org (Postfix) with ESMTP id DE36E2084C
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 00:24:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=verimatrix.com header.i=@verimatrix.com header.b="qwk2KhKz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729007AbfHAWEi (ORCPT
+        id S1731327AbfHBAYI (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 1 Aug 2019 18:04:38 -0400
-Received: from mail.kernel.org ([198.145.29.99]:40106 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727987AbfHAWEh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Aug 2019 18:04:37 -0400
-Received: from gmail.com (unknown [104.132.1.77])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E97252080C;
-        Thu,  1 Aug 2019 22:04:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1564697076;
-        bh=07USxmiW0wtvQgurj28XmaQedZTzoWvNahQ2mQLPE40=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=VyQIbpB73/IBrBsSm9YeYQnFLmTIy28sYuRF8s6RYL7nqJKJ112SS0SRAy86NcU0Y
-         NUoU7/xJWwMVS7ybkxaoN3+1sgnzVsFJAVHL2LeNghpDv4XI/jzN86P/Jh7cd3rr4s
-         z0PmTWHZGt4c9txOtJfO/FZcPvn5tty+jGDMKHLc=
-Date:   Thu, 1 Aug 2019 15:04:34 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     "Theodore Y. Ts'o" <tytso@mit.edu>
-Cc:     linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        linux-mtd@lists.infradead.org, linux-api@vger.kernel.org,
-        linux-crypto@vger.kernel.org, keyrings@vger.kernel.org,
-        Paul Crowley <paulcrowley@google.com>,
-        Satya Tangirala <satyat@google.com>
-Subject: Re: [PATCH v7 07/16] fscrypt: add FS_IOC_REMOVE_ENCRYPTION_KEY ioctl
-Message-ID: <20190801220432.GC223822@gmail.com>
-Mail-Followup-To: "Theodore Y. Ts'o" <tytso@mit.edu>,
-        linux-fscrypt@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        linux-mtd@lists.infradead.org, linux-api@vger.kernel.org,
-        linux-crypto@vger.kernel.org, keyrings@vger.kernel.org,
-        Paul Crowley <paulcrowley@google.com>,
-        Satya Tangirala <satyat@google.com>
-References: <20190726224141.14044-1-ebiggers@kernel.org>
- <20190726224141.14044-8-ebiggers@kernel.org>
- <20190728192417.GG6088@mit.edu>
- <20190729195827.GF169027@gmail.com>
- <20190731183802.GA687@sol.localdomain>
- <20190731233843.GA2769@mit.edu>
- <20190801011140.GB687@sol.localdomain>
- <20190801053108.GD2769@mit.edu>
+        Thu, 1 Aug 2019 20:24:08 -0400
+Received: from mail-eopbgr770049.outbound.protection.outlook.com ([40.107.77.49]:9699
+        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729359AbfHBAYH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 1 Aug 2019 20:24:07 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ofqiR0aH5P7bQwt+EWwqX35PQiOQnr/q0MpNdzBCOo8V944/C3WjzFXAbWiorKxIKCV8FzKVt1uvpfiHilyHyC1p7/X+WWStsqGTY/q6iZR0UpmYMAoKeEfVYCVZs29I8Di0peMiqoUpKWzoWeOezJcQEISrd1QWT1wDXlQaZaUaf4AWZCFIUFtMwgafdxD78vwbq2bzIHAPuq5gZTSQAsLWtiUFF2xaPUCsVdswDVVxL/H4otDiWZlvD69rL575ir/4CH5o1tRQqXC0Uc+kMODbaviK9BBGEJtz6Tykxa9IONEhxwkZtSFGSxtkhohYmvMw3AX8vJauNPWWy/wSKw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5nwFhwPpZm/41poRA13bAhifEH9AncNH3+pNYzi3ED8=;
+ b=PCRtWXiTdLWpViPslv+scHwx4XCzTlcJ7GTLNQFdgZw4+KtUoXnlHWRu9Yc+C56B31042M5kddGY5scqgJx1/WYwFN41yGrcx/umnz++sB+kByroH9Ktf1yopFmorQ1/8McwXsQYAsbU0MjtQpQ2ib4+kgU1Lf6xRBk3Xm5uBDOPesCGQePonNZleut5h9yZnY8b22kGWE3iucYEMzuXQ2hNl7pEQL0Qn4RU/5/uP2LVFoqrUZw+eCmcos4edn/spki2UsMZJFeqpTWqiCp4VnGvKMwYbs6f46VKbDlSrfk/XbCmS0jREmN45uRDI2DE1PNy+7xgLznBqZxiRv1Taw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
+ smtp.mailfrom=verimatrix.com;dmarc=pass action=none
+ header.from=verimatrix.com;dkim=pass header.d=verimatrix.com;arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verimatrix.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5nwFhwPpZm/41poRA13bAhifEH9AncNH3+pNYzi3ED8=;
+ b=qwk2KhKzw573/Sgh2iMZy3c8BAnqgssbDKcyd0p2tvn86ZHkbiXXSvwdnLqBnpZR+mok/rhBYlRMfWLxvC3rm9eYDN656fpxO+n/sOmABenOPlF2xM0lLiOyNFHQBKWFjC8/QTwrjRbfv0dwgHN5vkeUbBIHmKaxqnNwrRn0tf4=
+Received: from MN2PR20MB2973.namprd20.prod.outlook.com (52.132.172.146) by
+ MN2PR20MB3120.namprd20.prod.outlook.com (52.132.174.145) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2136.17; Fri, 2 Aug 2019 00:24:04 +0000
+Received: from MN2PR20MB2973.namprd20.prod.outlook.com
+ ([fe80::d96f:39b2:19f4:c7c1]) by MN2PR20MB2973.namprd20.prod.outlook.com
+ ([fe80::d96f:39b2:19f4:c7c1%7]) with mapi id 15.20.2115.005; Fri, 2 Aug 2019
+ 00:24:04 +0000
+From:   Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+To:     Corentin Labbe <clabbe.montjoie@gmail.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: Need help with failling gcm_base(ctr,ghash-generic) selftest
+Thread-Topic: Need help with failling gcm_base(ctr,ghash-generic) selftest
+Thread-Index: AQHVSKFY6oVMoifWy0S5Dl262GlQMabm/nnw
+Date:   Fri, 2 Aug 2019 00:24:04 +0000
+Message-ID: <MN2PR20MB297372F8FB158C59BF4F6F2FCAD90@MN2PR20MB2973.namprd20.prod.outlook.com>
+References: <20190801194249.GA18705@Red>
+In-Reply-To: <20190801194249.GA18705@Red>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=pvanleeuwen@verimatrix.com; 
+x-originating-ip: [188.204.2.113]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 4384dd67-989a-4ef9-dca2-08d716dfb981
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:MN2PR20MB3120;
+x-ms-traffictypediagnostic: MN2PR20MB3120:
+x-ms-exchange-purlcount: 1
+x-microsoft-antispam-prvs: <MN2PR20MB3120F5BDFA1C78B40D3C9925CAD90@MN2PR20MB3120.namprd20.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8273;
+x-forefront-prvs: 011787B9DD
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(39850400004)(396003)(346002)(366004)(136003)(376002)(13464003)(199004)(189003)(33656002)(68736007)(6436002)(476003)(2501003)(11346002)(446003)(9686003)(14454004)(486006)(55016002)(229853002)(478600001)(66066001)(2201001)(6116002)(71200400001)(71190400001)(2906002)(25786009)(3846002)(256004)(8676002)(7696005)(4326008)(86362001)(52536014)(15974865002)(316002)(66476007)(66946007)(66446008)(102836004)(5660300002)(6246003)(64756008)(186003)(81156014)(26005)(305945005)(66556008)(53936002)(7736002)(110136005)(81166006)(6506007)(99286004)(74316002)(53546011)(8936002)(76176011)(76116006)(41533002)(142933001)(18886075002);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR20MB3120;H:MN2PR20MB2973.namprd20.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: verimatrix.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: IB7EpWyN2rgLSCNMR3gFfaSCK/OfpXQ9JBK1YimKioHbIQga+8o+joZGQ0o78/Ts7vdt7uO6RNG7HBnCQlt65UQxrPtMlyF95qw1gzknMx3whDZmTdhn+Y5tAq5rut39wI0jj+xYoWEOm6vEC9ExsuMKreZX2blr/Q/3+01Sh/lguRdNEstsvQM1IvCQn+/4vy1I6zKPs/UQ903a/HhZbrBGyAYzbh7VVaXW/8ykOPalVape9SrJpD06vLjkAyiHNh9Aec20q2aUdR6PQ6qJkCEO6jSu41T1KcAzePKgKt8ZVHyGAn/vgZhp1LMCBsKJvEGYihE+oNtkLDR5v1hehhv3Si9vv82kNGRgUQ7KSwwnk0NK408wYxdUYwMDqK/SXzy0zekOe2LF4IB/tzACIsLhUrw0e9T8vJSarDSx2IA=
+Content-Type: text/plain; charset="Windows-1252"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190801053108.GD2769@mit.edu>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+X-OriginatorOrg: verimatrix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4384dd67-989a-4ef9-dca2-08d716dfb981
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Aug 2019 00:24:04.0908
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: dcb260f9-022d-4495-8602-eae51035a0d0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: pvanleeuwen@verimatrix.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR20MB3120
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Aug 01, 2019 at 01:31:08AM -0400, Theodore Y. Ts'o wrote:
-> On Wed, Jul 31, 2019 at 06:11:40PM -0700, Eric Biggers wrote:
-> > 
-> > Well, it's either
-> > 
-> > 1a. Remove the user's handle.
-> > 	OR 
-> > 1b. Remove all users' handles.  (FSCRYPT_REMOVE_KEY_FLAG_ALL_USERS)
-> > 
-> > Then
-> > 
-> > 2. If no handles remain, try to evict all inodes that use the key.
-> > 
-> > By "purge all keys" do you mean step (2)?  Note that it doesn't require root by
-> > itself; root is only required to remove other users' handles (1b).
-> 
-> No, I was talking about 1b.  I'd argue that 1a and 1b should be
-> different ioctl.  1b requires root, and 1a doesn't.
-> 
-[...]
-> > 
-> > Do you mean use a positive return value, or do you mean add an output field to
-> > the struct passed to the ioctl?
-> 
-> I meant adding an output field.  I see EBUSY and EUSERS as status bits
-> which *some* use cases might find useful.
+> -----Original Message-----
+> From: linux-crypto-owner@vger.kernel.org <linux-crypto-owner@vger.kernel.=
+org> On Behalf Of
+> Corentin Labbe
+> Sent: Thursday, August 1, 2019 9:43 PM
+> To: herbert@gondor.apana.org.au; linux-crypto@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Subject: Need help with failling gcm_base(ctr,ghash-generic) selftest
+>=20
+> Hello
+>=20
+> I am writing the Allwinner sun8i-ce driver and when running tcrypt I got
+> [   30.201739] alg: aead: gcm_base(ctr-aes-sun8i-ce,ghash-generic) decryp=
+tion failed on test
+> vector 3; expected_error=3D0, actual_error=3D-74, cfg=3D\"random: may_sle=
+ep use_digest
+> src_divs=3D[100.0%@+2614] dst_divs=3D[5.90%@alignmask+3015, 60.56%@+3996,=
+ 17.92%@+865,
+> 15.62%@+10]\"
+> or
+>
+The decryption reports only an -EBADMSG here, which means the decryption it=
+self went
+fine, but the authentication tag mismatched.
 
-Ted, would you be happy with the following API?
 
-Removing keys
--------------
+> [  148.613537] alg: aead: gcm_base(ctr-aes-sun8i-ce,ghash-generic) encryp=
+tion test failed
+> (wrong result) on test vector 2, cfg=3D\"random: may_sleep use_final src_=
+divs=3D[100.0%@+0]
+> iv_offset=3D20\"
+>=20
+Can't say for sure, but considering the decrypt error, this is most likely =
+just a
+mismatch on the appended authentication tag.
 
-Two ioctls are available for removing a key that was added by
-FS_IOC_ADD_ENCRYPTION_KEY: FS_IOC_REMOVE_ENCRYPTION_KEY and
-FS_IOC_REMOVE_ENCRYPTION_KEY_ALL_USERS.  They differ only in cases
-where v2 policy keys are added or removed by non-root users.
+> Since ctr-aes-sun8i-ce is passing the ctr(aes) selftest, I dont understan=
+d what could be
+> wrong.
+>=20
+That is possible, as this appears to be a problem with the authentication p=
+art,
+not the encryption part. So possibly a problem with the way you setup the=20
+authentication key (which is actually derived from the encryption key, but =
+I don't
+know if your hardware does this autonomously, mine doesn't) and/or operatio=
+n?
 
-These ioctls don't work on keys that were added via the legacy
-process-subscribed keyrings mechanism.
+> Thanks
+> Regards
 
-Before using these ioctls, read the `Kernel memory compromise`_
-section for a discussion of the security goals and limitations of
-these ioctls.
 
-FS_IOC_REMOVE_ENCRYPTION_KEY
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The FS_IOC_REMOVE_ENCRYPTION_KEY ioctl removes a claim to an fscrypt
-master encryption key from the filesystem, and possibly removes the
-key itself.  It can be executed on any file or directory on the target
-filesystem, but using the filesystem's root directory is recommended.
-It takes in a pointer to a :c:type:`struct fscrypt_remove_key_arg`,
-defined as follows::
-
-    struct fscrypt_remove_key_arg {
-            struct fscrypt_key_specifier key_spec;
-    #define FSCRYPT_KEY_REMOVAL_STATUS_FLAG_OTHER_USERS     0x00000001
-    #define FSCRYPT_KEY_REMOVAL_STATUS_FLAG_FILES_BUSY      0x00000002
-            __u32 removal_status_flags;     /* output */
-            __u32 __reserved[5];
-    };
-
-This structure must be zeroed, then initialized as follows:
-
-- The key to remove is specified by ``key_spec``:
-
-    - To remove a key used by v1 encryption policies, set
-      ``key_spec.type`` to FSCRYPT_KEY_SPEC_TYPE_DESCRIPTOR and fill
-      in ``key_spec.u.descriptor``.  To remove this type of key, the
-      calling process must have the CAP_SYS_ADMIN capability in the
-      initial user namespace.
-
-    - To remove a key used by v2 encryption policies, set
-      ``key_spec.type`` to FSCRYPT_KEY_SPEC_TYPE_IDENTIFIER and fill
-      in ``key_spec.u.identifier``.  To remove this type of key, no
-      privileges are needed.  However, users can only remove keys that
-      they added themselves, subject to privileged override with
-      FSCRYPT_REMOVE_KEY_FLAG_ALL_USERS.
-
-For v2 policy keys, this ioctl is usable by non-root users.  However,
-to make this possible, it actually just removes the current user's
-claim to the key, undoing a single call to FS_IOC_ADD_ENCRYPTION_KEY.
-Only after all claims are removed is the key really removed.
-
-For example, if FS_IOC_ADD_ENCRYPTION_KEY was called with uid 1000,
-then the key will be "claimed" by uid 1000, and
-FS_IOC_REMOVE_ENCRYPTION_KEY will only succeed as uid 1000.  Or, if
-both uids 1000 and 2000 added the key, then for each uid
-FS_IOC_REMOVE_ENCRYPTION_KEY will only remove their own claim.  Only
-once *both* are removed is the key really removed.  (Think of it like
-unlinking a file that may have hard links.)
-
-If FS_IOC_REMOVE_ENCRYPTION_KEY really removes the key, it will also
-try to "lock" all files that had been unlocked with the key.  It won't
-lock files that are still in-use.  If necessary, the ioctl can be
-executed again later to retry locking any remaining files.
-
-FS_IOC_REMOVE_ENCRYPTION_KEY returns 0 if either the key was removed
-(but may still have files remaining to be locked), the user's claim to
-the key was removed, or the key was already removed but had files
-remaining to be the locked so the ioctl retried locking them.  In any
-of these cases, ``removal_status_flags`` is filled in with the
-following informational status flags:
-
-- ``FSCRYPT_KEY_REMOVAL_STATUS_FLAG_OTHER_USERS``: set if only the
-  user's claim to the key was removed, not the key itself
-- ``FSCRYPT_KEY_REMOVAL_STATUS_FLAG_FILES_BUSY``: set if some file(s)
-  are still in-use.  Not guaranteed to be set in the case where only
-  the user's claim to the key was removed.
-
-FS_IOC_REMOVE_ENCRYPTION_KEY can fail with the following errors:
-
-- ``EACCES``: The FSCRYPT_KEY_SPEC_TYPE_DESCRIPTOR key specifier type
-  was specified, but the caller does not have the CAP_SYS_ADMIN
-  capability in the initial user namespace
-- ``EINVAL``: invalid flags or key specifier type, or reserved bits
-  were set
-- ``ENOKEY``: the key object was not found at all, i.e. it was never
-  added in the first place or was already fully removed including all
-  files locked; or, the user does not have a claim to the key.
-- ``ENOTTY``: this type of filesystem does not implement encryption
-- ``EOPNOTSUPP``: the kernel was not configured with encryption
-  support for this filesystem, or the filesystem superblock has not
-  had encryption enabled on it
-
-FS_IOC_REMOVE_ENCRYPTION_KEY_ALL_USERS
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-FS_IOC_REMOVE_ENCRYPTION_KEY_ALL_USERS is exactly the same as
-FS_IOC_REMOVE_ENCRYPTION_KEY, except that for v2 policy keys, the
-ALL_USERS version of the ioctl will remove all users' claims to the
-key, not just the current user's.  I.e., the key itself will always be
-removed, no matter how many users have added it.  This difference is
-only meaningful if non-root users are adding and removing keys.
-
-Because of this, FS_IOC_REMOVE_ENCRYPTION_KEY_ALL_USERS also requires
-"root", namely the CAP_SYS_ADMIN capability in the initial user
-namespace.  Otherwise it will fail with ``EACCES``.
+Regards,
+Pascal van Leeuwen
+Silicon IP Architect, Multi-Protocol Engines @ Verimatrix
+www.insidesecure.com
