@@ -4,55 +4,55 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8361C32750
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 09:51:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A285C32750
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 10:01:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 93BF02064A
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 09:51:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EE2E12087E
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 10:01:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1564739486;
-	bh=g8KWgr1ZQlCWTUNqQfSrcz81PoGrK0zQ8XSSLreRjlg=;
+	s=default; t=1564740068;
+	bh=ANVUNEMAe1jn6TZ1TL+1KmUas0lezeRrXvXkB9h6ki8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=CklAJ510OmVJjEg8fr214pF6CBcIV3RdFSUCYG8XiWMPwQlCcsOjoCmuDBpt03cLN
-	 KJk2Cpd7xEbm+yp2yjdR1aJF4Zwjcnw0bA5jMrA6GYWm66bJ3j5DBVaeyftZhl4FgG
-	 Hx0hqAo0QXUcgQkp0vces9KuqwD3HZhmHBS8rvVM=
+	b=zwDCJCXSnhjXMAW+T87xOty8PclDD3mWFAh6nWYO6wD8qgIwCBXAhlfNqvIWw/Lmm
+	 RvDP0gHh95WiJom9qWlq9YIhTlmQoSHV0KcbaRELzM0NJUVFZzWbUuo9ZI9j6kdj0D
+	 c5YhkHydcW5rfXdOJXB86MYGDOVkHBje8Nd65QAQ=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405278AbfHBJop (ORCPT
+        id S2407069AbfHBKBH (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 2 Aug 2019 05:44:45 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48166 "EHLO mail.kernel.org"
+        Fri, 2 Aug 2019 06:01:07 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47694 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2405275AbfHBJon (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Aug 2019 05:44:43 -0400
+        id S2405225AbfHBJoU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 2 Aug 2019 05:44:20 -0400
 Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 804EE2086A;
-        Fri,  2 Aug 2019 09:44:42 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4CD49206A2;
+        Fri,  2 Aug 2019 09:44:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1564739083;
-        bh=g8KWgr1ZQlCWTUNqQfSrcz81PoGrK0zQ8XSSLreRjlg=;
+        s=default; t=1564739060;
+        bh=ANVUNEMAe1jn6TZ1TL+1KmUas0lezeRrXvXkB9h6ki8=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=vBoRgyaMGMgwWP7l5QEC9CAqAriXR11AaTjGCi+2rwljQ6f1LK/bS0VykNYKmceIo
-         AP94fMgj9ycZe7Qt+M6tfIWOBASD34VECeJYaka1E1WQI+KgbCeqyLCcZ4DKfVT2wk
-         ICmqy5kBq3j22qPY8jNG0NOn4J8PmQIngv1zk3fw=
+        b=JNl9bSuAKp8PzD2ZPn71l9XX76zY82cFpbfSANiunDsMbMuehK0cRgUQJfBOMETtu
+         CTodjy83u0Llq1vByh0dFKsS56WrJZu7OZwTBq4x5LgLhhGqdbzz0OuzZ3+z9GK/g7
+         yzXJm+F2gFz86GtbK4F3JbxTwY0HfqsDl8AqOgFs=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        stable@vger.kernel.org, Daniel Jordan <daniel.m.jordan@oracle.com>,
-        Andrea Parri <andrea.parri@amarulasolutions.com>,
-        Boqun Feng <boqun.feng@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "Paul E. McKenney" <paulmck@linux.ibm.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        linux-arch@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: [PATCH 4.9 098/223] padata: use smp_mb in padata_reorder to avoid orphaned padata jobs
-Date:   Fri,  2 Aug 2019 11:35:23 +0200
-Message-Id: <20190802092245.526242418@linuxfoundation.org>
+        stable@vger.kernel.org, Wen Yang <wen.yang99@zte.com.cn>,
+        "David S. Miller" <davem@davemloft.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Allison Randal <allison@lohutok.net>,
+        Armijn Hemel <armijn@tjaldur.nl>,
+        Julia Lawall <Julia.Lawall@lip6.fr>,
+        linux-crypto@vger.kernel.org, Julia Lawall <julia.lawall@lip6.fr>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [PATCH 4.9 082/223] crypto: crypto4xx - fix a potential double free in ppc4xx_trng_probe
+Date:   Fri,  2 Aug 2019 11:35:07 +0200
+Message-Id: <20190802092244.274402583@linuxfoundation.org>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <20190802092238.692035242@linuxfoundation.org>
 References: <20190802092238.692035242@linuxfoundation.org>
@@ -65,117 +65,52 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Daniel Jordan <daniel.m.jordan@oracle.com>
+From: Wen Yang <wen.yang99@zte.com.cn>
 
-commit cf144f81a99d1a3928f90b0936accfd3f45c9a0a upstream.
+commit 95566aa75cd6b3b404502c06f66956b5481194b3 upstream.
 
-Testing padata with the tcrypt module on a 5.2 kernel...
+There is a possible double free issue in ppc4xx_trng_probe():
 
-    # modprobe tcrypt alg="pcrypt(rfc4106(gcm(aes)))" type=3
-    # modprobe tcrypt mode=211 sec=1
+85:	dev->trng_base = of_iomap(trng, 0);
+86:	of_node_put(trng);          ---> released here
+87:	if (!dev->trng_base)
+88:		goto err_out;
+...
+110:	ierr_out:
+111:		of_node_put(trng);  ---> double released here
+...
 
-...produces this splat:
+This issue was detected by using the Coccinelle software.
+We fix it by removing the unnecessary of_node_put().
 
-    INFO: task modprobe:10075 blocked for more than 120 seconds.
-          Not tainted 5.2.0-base+ #16
-    modprobe        D    0 10075  10064 0x80004080
-    Call Trace:
-     ? __schedule+0x4dd/0x610
-     ? ring_buffer_unlock_commit+0x23/0x100
-     schedule+0x6c/0x90
-     schedule_timeout+0x3b/0x320
-     ? trace_buffer_unlock_commit_regs+0x4f/0x1f0
-     wait_for_common+0x160/0x1a0
-     ? wake_up_q+0x80/0x80
-     { crypto_wait_req }             # entries in braces added by hand
-     { do_one_aead_op }
-     { test_aead_jiffies }
-     test_aead_speed.constprop.17+0x681/0xf30 [tcrypt]
-     do_test+0x4053/0x6a2b [tcrypt]
-     ? 0xffffffffa00f4000
-     tcrypt_mod_init+0x50/0x1000 [tcrypt]
-     ...
-
-The second modprobe command never finishes because in padata_reorder,
-CPU0's load of reorder_objects is executed before the unlocking store in
-spin_unlock_bh(pd->lock), causing CPU0 to miss CPU1's increment:
-
-CPU0                                 CPU1
-
-padata_reorder                       padata_do_serial
-  LOAD reorder_objects  // 0
-                                       INC reorder_objects  // 1
-                                       padata_reorder
-                                         TRYLOCK pd->lock   // failed
-  UNLOCK pd->lock
-
-CPU0 deletes the timer before returning from padata_reorder and since no
-other job is submitted to padata, modprobe waits indefinitely.
-
-Add a pair of full barriers to guarantee proper ordering:
-
-CPU0                                 CPU1
-
-padata_reorder                       padata_do_serial
-  UNLOCK pd->lock
-  smp_mb()
-  LOAD reorder_objects
-                                       INC reorder_objects
-                                       smp_mb__after_atomic()
-                                       padata_reorder
-                                         TRYLOCK pd->lock
-
-smp_mb__after_atomic is needed so the read part of the trylock operation
-comes after the INC, as Andrea points out.   Thanks also to Andrea for
-help with writing a litmus test.
-
-Fixes: 16295bec6398 ("padata: Generic parallelization/serialization interface")
-Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
+Fixes: 5343e674f32f ("crypto4xx: integrate ppc4xx-rng into crypto4xx")
+Signed-off-by: Wen Yang <wen.yang99@zte.com.cn>
 Cc: <stable@vger.kernel.org>
-Cc: Andrea Parri <andrea.parri@amarulasolutions.com>
-Cc: Boqun Feng <boqun.feng@gmail.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Paul E. McKenney <paulmck@linux.ibm.com>
-Cc: Peter Zijlstra <peterz@infradead.org>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: linux-arch@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Allison Randal <allison@lohutok.net>
+Cc: Armijn Hemel <armijn@tjaldur.nl>
+Cc: Julia Lawall <Julia.Lawall@lip6.fr>
 Cc: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
+Acked-by: Julia Lawall <julia.lawall@lip6.fr>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
 ---
- kernel/padata.c |   12 ++++++++++++
- 1 file changed, 12 insertions(+)
+ drivers/crypto/amcc/crypto4xx_trng.c |    1 -
+ 1 file changed, 1 deletion(-)
 
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -274,7 +274,12 @@ static void padata_reorder(struct parall
- 	 * The next object that needs serialization might have arrived to
- 	 * the reorder queues in the meantime, we will be called again
- 	 * from the timer function if no one else cares for it.
-+	 *
-+	 * Ensure reorder_objects is read after pd->lock is dropped so we see
-+	 * an increment from another task in padata_do_serial.  Pairs with
-+	 * smp_mb__after_atomic in padata_do_serial.
- 	 */
-+	smp_mb();
- 	if (atomic_read(&pd->reorder_objects)
- 			&& !(pinst->flags & PADATA_RESET))
- 		mod_timer(&pd->timer, jiffies + HZ);
-@@ -343,6 +348,13 @@ void padata_do_serial(struct padata_priv
- 	list_add_tail(&padata->list, &pqueue->reorder.list);
- 	spin_unlock(&pqueue->reorder.lock);
+--- a/drivers/crypto/amcc/crypto4xx_trng.c
++++ b/drivers/crypto/amcc/crypto4xx_trng.c
+@@ -111,7 +111,6 @@ void ppc4xx_trng_probe(struct crypto4xx_
+ 	return;
  
-+	/*
-+	 * Ensure the atomic_inc of reorder_objects above is ordered correctly
-+	 * with the trylock of pd->lock in padata_reorder.  Pairs with smp_mb
-+	 * in padata_reorder.
-+	 */
-+	smp_mb__after_atomic();
-+
- 	put_cpu();
- 
- 	padata_reorder(pd);
+ err_out:
+-	of_node_put(trng);
+ 	iounmap(dev->trng_base);
+ 	kfree(rng);
+ 	dev->trng_base = NULL;
 
 
