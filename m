@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D73DC32753
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 15:15:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4ECA5C32750
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 15:15:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DE09B21726
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 15:15:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 15FDD21726
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 15:15:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xAV1eWOX"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="N5USse0H"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726043AbfHBPPh (ORCPT
+        id S1728719AbfHBPPi (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 2 Aug 2019 11:15:37 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:39972 "EHLO
+        Fri, 2 Aug 2019 11:15:38 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:39120 "EHLO
         mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728719AbfHBPPg (ORCPT
+        with ESMTP id S1730768AbfHBPPi (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Aug 2019 11:15:36 -0400
-Received: by mail-wr1-f65.google.com with SMTP id r1so77523917wrl.7
-        for <linux-crypto@vger.kernel.org>; Fri, 02 Aug 2019 08:15:35 -0700 (PDT)
+        Fri, 2 Aug 2019 11:15:38 -0400
+Received: by mail-wr1-f65.google.com with SMTP id x4so24395781wrt.6
+        for <linux-crypto@vger.kernel.org>; Fri, 02 Aug 2019 08:15:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=WBpXCKjdfq1yPU+OJBvQfW6gPuB8RZ7Tc8kFP902ZIM=;
-        b=xAV1eWOXnKSlyjUUvRgQczTqwhWrBaoCDZpN2QvpQFkUN5fWbg0w46FwfkU4HxyzWJ
-         Its1EPcaWIbX23Dw7v9IphRu1JxcNgVEsDjjOc5F9C8EPW/HLBZAk+vMQvaMqiG79tJ/
-         FjfAtHvxSr8y4AJE321zj8RzdXGeqLF1Jju1UW0epWiHjo32SIAezDBQs8wA37ffThoH
-         XXtqhONDI8bgRvzrRJNypLOQQUolWdYQdkwNJ6dn1YtM92t/fvz9qmBaFy2RFnKg6q+Q
-         ggYy5epCLi3BG4/INN0u/4fAYr0hasfZlpM0vBXfIc26aL6/H03EgxavxHzh/N6zdVl8
-         6xUQ==
+        bh=6MjRlqrn3P70hh91PKjMhPGxJWADii10UYJ6g7r4VNA=;
+        b=N5USse0HRfJTt0ebwWGUI/Lsy8ERDEI0nT4jTq0pGIIjjCHj4UIEzEXjzwp5m90fbl
+         hJH+sMLLCkwvbTCLdODZn6+l8Qoyg7nmsz2PCZD7JeZnOE56wgNiil4LqC8EhajmDt0q
+         l3l9KHjBNxylCG7Pz3o09sp0G26f7XH1fn5+kdXuEyjLeBzliQltFc6QHO0AIwnaVWBm
+         G5Q7QlbLQOzhjOSzrOv302Z5C7lbbJBMOPQv/87XmNKDoIWxv2otEy2k2VHysCZnaax2
+         IMZLaI/MJBj7lQEHPR0aRoNiOQ6pEjBaWr15SUUe8kcW5KQ/HFCbLiPIyUDdcBPzmrKX
+         gCEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=WBpXCKjdfq1yPU+OJBvQfW6gPuB8RZ7Tc8kFP902ZIM=;
-        b=jWqk3bNNAJcWTR2qLDE+zZHYMYuYeM6vtDsBE7iWJbDKF/+Skp+jBLltOHBDQ+9vfu
-         m6bhsmIvGrj7AMMNlXmrKySTxaEg9/9s4sIGux11qAQ26OaVYVTNlL+v0MnPEYdGjZ5k
-         tlySbJ5gkE4lYmiK7VhzH6bz+dTH7guOoYKdaGPEui1FQhdQ2i5tlM983hxVO9QiRGH3
-         N4rZ3uqKKEgPW9qdOmyVEqi6pvvw2mkR9qeQidw5ROKA69VC41Aej4SjJtkEWnWE++nA
-         TRTqqCWO1+eWtPACgg9QIEXqhvxjcgo7XdwAryrgBJChOHsuBsxxssk5qZMRaj5X9dg6
-         i4ng==
-X-Gm-Message-State: APjAAAXsszRF+Iek+jsFwcM8YkIXmNJFIFd+3dvB8z589fS+ZuVcUSWK
-        Jqym1jKsvrI6+T+dFU36E6BilHoeBrvRsg==
-X-Google-Smtp-Source: APXvYqx1VZyrzud4LFLAsIkPbAiZprbq1Hht9eMYEiZcNUN7CL0zbAYG+dUodFq8V/Df0HuKGicBVg==
-X-Received: by 2002:a5d:668e:: with SMTP id l14mr89119870wru.156.1564758934848;
-        Fri, 02 Aug 2019 08:15:34 -0700 (PDT)
+        bh=6MjRlqrn3P70hh91PKjMhPGxJWADii10UYJ6g7r4VNA=;
+        b=b02/ycXf+l/71m56safKY2O4QF15KX+w8C0s7tIrV+D+aZHS32cIXg5+NOVV91It3m
+         aShjG7iFCGPbOi5+PECaufLv1AkCzAecStp3iH6ecnx6FxSI0y3+dLtmve2blNgLB7Bw
+         04YK7GrrauZXV4urMpVhg8LieJTt5X9d+/errkhtP3jfngmnGTdQihEwd/XIWe++XKvz
+         0El19azprqDORM5JiR2zt4FHBgmlkuLsLHW9fQoCOhyuxAtKwBvBJx1WOnk6LKEOKU0X
+         zbf6xNPo6uIcXMA9qkkN2b0mh9OvnHrqSFL2zGLMDm3e3/3r0x5xUwiQTQQ/pu3IdcDm
+         38qw==
+X-Gm-Message-State: APjAAAWzxL8EStsF1Kk+0OjtOau00aXse+FWzBE8lKVcIJJdZAu2D8A4
+        hAQYV6BzXXBxXblemX34AKFfGqS1oIF+kw==
+X-Google-Smtp-Source: APXvYqzk+PLCyrxSZnRTE75wKvNtw17eCrUroTjJdOzgzl1JowqGlgivnzn21qhiE17KQ/EiuW0Q3A==
+X-Received: by 2002:adf:f186:: with SMTP id h6mr19463533wro.274.1564758936393;
+        Fri, 02 Aug 2019 08:15:36 -0700 (PDT)
 Received: from localhost.localdomain ([2a02:587:a424:b400:cc84:8d83:a434:dd7])
-        by smtp.gmail.com with ESMTPSA id o3sm63294321wrs.59.2019.08.02.08.15.33
+        by smtp.gmail.com with ESMTPSA id o3sm63294321wrs.59.2019.08.02.08.15.35
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 02 Aug 2019 08:15:34 -0700 (PDT)
+        Fri, 02 Aug 2019 08:15:35 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     herbert@gondor.apana.org.au, ebiggers@kernel.org,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH resend 1/3] crypto: aegis128 - add support for SIMD acceleration
-Date:   Fri,  2 Aug 2019 18:15:08 +0300
-Message-Id: <20190802151510.17074-2-ard.biesheuvel@linaro.org>
+Subject: [PATCH resend 2/3] crypto: aegis128 - provide a SIMD implementation based on NEON intrinsics
+Date:   Fri,  2 Aug 2019 18:15:09 +0300
+Message-Id: <20190802151510.17074-3-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190802151510.17074-1-ard.biesheuvel@linaro.org>
 References: <20190802151510.17074-1-ard.biesheuvel@linaro.org>
@@ -70,157 +70,269 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add some plumbing to allow the AEGIS128 code to be built with SIMD
-routines for acceleration.
+Provide an accelerated implementation of aegis128 by wiring up the
+SIMD hooks in the generic driver to an implementation based on NEON
+intrinsics, which can be compiled to both ARM and arm64 code.
+
+This results in a performance of 2.2 cycles per byte on Cortex-A53,
+which is a performance increase of ~11x compared to the generic
+code.
 
 Reviewed-by: Ondrej Mosnacek <omosnace@redhat.com>
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- crypto/Makefile                        |  1 +
- crypto/{aegis128.c => aegis128-core.c} | 52 ++++++++++++++++++--
- 2 files changed, 49 insertions(+), 4 deletions(-)
+ crypto/Kconfig               |   5 +
+ crypto/Makefile              |  12 ++
+ crypto/aegis128-neon-inner.c | 151 ++++++++++++++++++++
+ crypto/aegis128-neon.c       |  43 ++++++
+ 4 files changed, 211 insertions(+)
 
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 8880c1fc51d8..455a3354e291 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -306,6 +306,11 @@ config CRYPTO_AEGIS128
+ 	help
+ 	 Support for the AEGIS-128 dedicated AEAD algorithm.
+ 
++config CRYPTO_AEGIS128_SIMD
++	bool "Support SIMD acceleration for AEGIS-128"
++	depends on CRYPTO_AEGIS128 && ((ARM || ARM64) && KERNEL_MODE_NEON)
++	default y
++
+ config CRYPTO_AEGIS128_AESNI_SSE2
+ 	tristate "AEGIS-128 AEAD algorithm (x86_64 AESNI+SSE2 implementation)"
+ 	depends on X86 && 64BIT
 diff --git a/crypto/Makefile b/crypto/Makefile
-index cfcc954e59f9..92e985714ff6 100644
+index 92e985714ff6..99a9fa9087d1 100644
 --- a/crypto/Makefile
 +++ b/crypto/Makefile
-@@ -90,6 +90,7 @@ obj-$(CONFIG_CRYPTO_GCM) += gcm.o
- obj-$(CONFIG_CRYPTO_CCM) += ccm.o
+@@ -91,6 +91,18 @@ obj-$(CONFIG_CRYPTO_CCM) += ccm.o
  obj-$(CONFIG_CRYPTO_CHACHA20POLY1305) += chacha20poly1305.o
  obj-$(CONFIG_CRYPTO_AEGIS128) += aegis128.o
-+aegis128-y := aegis128-core.o
+ aegis128-y := aegis128-core.o
++
++ifeq ($(ARCH),arm)
++CFLAGS_aegis128-neon-inner.o += -ffreestanding -march=armv7-a -mfloat-abi=softfp
++CFLAGS_aegis128-neon-inner.o += -mfpu=crypto-neon-fp-armv8
++aegis128-$(CONFIG_CRYPTO_AEGIS128_SIMD) += aegis128-neon.o aegis128-neon-inner.o
++endif
++ifeq ($(ARCH),arm64)
++CFLAGS_aegis128-neon-inner.o += -ffreestanding -mcpu=generic+crypto
++CFLAGS_REMOVE_aegis128-neon-inner.o += -mgeneral-regs-only
++aegis128-$(CONFIG_CRYPTO_AEGIS128_SIMD) += aegis128-neon.o aegis128-neon-inner.o
++endif
++
  obj-$(CONFIG_CRYPTO_PCRYPT) += pcrypt.o
  obj-$(CONFIG_CRYPTO_CRYPTD) += cryptd.o
  obj-$(CONFIG_CRYPTO_DES) += des_generic.o
-diff --git a/crypto/aegis128.c b/crypto/aegis128-core.c
-similarity index 89%
-rename from crypto/aegis128.c
-rename to crypto/aegis128-core.c
-index 32840d5e7f65..fa69e99968e2 100644
---- a/crypto/aegis128.c
-+++ b/crypto/aegis128-core.c
-@@ -8,6 +8,7 @@
- 
- #include <crypto/algapi.h>
- #include <crypto/internal/aead.h>
-+#include <crypto/internal/simd.h>
- #include <crypto/internal/skcipher.h>
- #include <crypto/scatterwalk.h>
- #include <linux/err.h>
-@@ -16,6 +17,8 @@
- #include <linux/module.h>
- #include <linux/scatterlist.h>
- 
-+#include <asm/simd.h>
+diff --git a/crypto/aegis128-neon-inner.c b/crypto/aegis128-neon-inner.c
+new file mode 100644
+index 000000000000..6aca2f425b6d
+--- /dev/null
++++ b/crypto/aegis128-neon-inner.c
+@@ -0,0 +1,151 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * Copyright (C) 2019 Linaro, Ltd. <ard.biesheuvel@linaro.org>
++ */
 +
- #include "aegis.h"
- 
- #define AEGIS128_NONCE_SIZE 16
-@@ -40,6 +43,24 @@ struct aegis128_ops {
- 			    const u8 *src, unsigned int size);
- };
- 
-+static bool have_simd;
++#ifdef CONFIG_ARM64
++#include <asm/neon-intrinsics.h>
 +
-+static bool aegis128_do_simd(void)
-+{
-+#ifdef CONFIG_CRYPTO_AEGIS128_SIMD
-+	if (have_simd)
-+		return crypto_simd_usable();
++#define AES_ROUND	"aese %0.16b, %1.16b \n\t aesmc %0.16b, %0.16b"
++#else
++#include <arm_neon.h>
++
++#define AES_ROUND	"aese.8 %q0, %q1 \n\t aesmc.8 %q0, %q0"
 +#endif
-+	return false;
++
++#define AEGIS_BLOCK_SIZE	16
++
++#include <stddef.h>
++
++void *memcpy(void *dest, const void *src, size_t n);
++void *memset(void *s, int c, size_t n);
++
++struct aegis128_state {
++	uint8x16_t v[5];
++};
++
++static struct aegis128_state aegis128_load_state_neon(const void *state)
++{
++	return (struct aegis128_state){ {
++		vld1q_u8(state),
++		vld1q_u8(state + 16),
++		vld1q_u8(state + 32),
++		vld1q_u8(state + 48),
++		vld1q_u8(state + 64)
++	} };
 +}
 +
-+bool crypto_aegis128_have_simd(void);
-+void crypto_aegis128_update_simd(struct aegis_state *state, const void *msg);
-+void crypto_aegis128_encrypt_chunk_simd(struct aegis_state *state, u8 *dst,
-+					const u8 *src, unsigned int size);
-+void crypto_aegis128_decrypt_chunk_simd(struct aegis_state *state, u8 *dst,
-+					const u8 *src, unsigned int size);
++static void aegis128_save_state_neon(struct aegis128_state st, void *state)
++{
++	vst1q_u8(state, st.v[0]);
++	vst1q_u8(state + 16, st.v[1]);
++	vst1q_u8(state + 32, st.v[2]);
++	vst1q_u8(state + 48, st.v[3]);
++	vst1q_u8(state + 64, st.v[4]);
++}
 +
- static void crypto_aegis128_update(struct aegis_state *state)
- {
- 	union aegis_block tmp;
-@@ -55,12 +76,22 @@ static void crypto_aegis128_update(struct aegis_state *state)
- static void crypto_aegis128_update_a(struct aegis_state *state,
- 				     const union aegis_block *msg)
- {
-+	if (aegis128_do_simd()) {
-+		crypto_aegis128_update_simd(state, msg);
-+		return;
++static inline __attribute__((always_inline))
++uint8x16_t aegis_aes_round(uint8x16_t w)
++{
++	uint8x16_t z = {};
++
++	/*
++	 * We use inline asm here instead of the vaeseq_u8/vaesmcq_u8 intrinsics
++	 * to force the compiler to issue the aese/aesmc instructions in pairs.
++	 * This is much faster on many cores, where the instruction pair can
++	 * execute in a single cycle.
++	 */
++	asm(AES_ROUND : "+w"(w) : "w"(z));
++	return w;
++}
++
++static inline __attribute__((always_inline))
++struct aegis128_state aegis128_update_neon(struct aegis128_state st,
++					   uint8x16_t m)
++{
++	uint8x16_t t;
++
++	t        = aegis_aes_round(st.v[3]);
++	st.v[3] ^= aegis_aes_round(st.v[2]);
++	st.v[2] ^= aegis_aes_round(st.v[1]);
++	st.v[1] ^= aegis_aes_round(st.v[0]);
++	st.v[0] ^= aegis_aes_round(st.v[4]) ^ m;
++	st.v[4] ^= t;
++
++	return st;
++}
++
++void crypto_aegis128_update_neon(void *state, const void *msg)
++{
++	struct aegis128_state st = aegis128_load_state_neon(state);
++
++	st = aegis128_update_neon(st, vld1q_u8(msg));
++
++	aegis128_save_state_neon(st, state);
++}
++
++void crypto_aegis128_encrypt_chunk_neon(void *state, void *dst, const void *src,
++					unsigned int size)
++{
++	struct aegis128_state st = aegis128_load_state_neon(state);
++	uint8x16_t tmp;
++
++	while (size >= AEGIS_BLOCK_SIZE) {
++		uint8x16_t s = vld1q_u8(src);
++
++		tmp = s ^ st.v[1] ^ (st.v[2] & st.v[3]) ^ st.v[4];
++		st = aegis128_update_neon(st, s);
++		vst1q_u8(dst, tmp);
++
++		size -= AEGIS_BLOCK_SIZE;
++		src += AEGIS_BLOCK_SIZE;
++		dst += AEGIS_BLOCK_SIZE;
 +	}
 +
- 	crypto_aegis128_update(state);
- 	crypto_aegis_block_xor(&state->blocks[0], msg);
- }
- 
- static void crypto_aegis128_update_u(struct aegis_state *state, const void *msg)
- {
-+	if (aegis128_do_simd()) {
-+		crypto_aegis128_update_simd(state, msg);
-+		return;
++	if (size > 0) {
++		uint8_t buf[AEGIS_BLOCK_SIZE] = {};
++		uint8x16_t msg;
++
++		memcpy(buf, src, size);
++		msg = vld1q_u8(buf);
++		tmp = msg ^ st.v[1] ^ (st.v[2] & st.v[3]) ^ st.v[4];
++		st = aegis128_update_neon(st, msg);
++		vst1q_u8(buf, tmp);
++		memcpy(dst, buf, size);
 +	}
 +
- 	crypto_aegis128_update(state);
- 	crypto_xor(state->blocks[0].bytes, msg, AEGIS_BLOCK_SIZE);
- }
-@@ -365,7 +396,7 @@ static void crypto_aegis128_crypt(struct aead_request *req,
- 
- static int crypto_aegis128_encrypt(struct aead_request *req)
- {
--	static const struct aegis128_ops ops = {
-+	const struct aegis128_ops *ops = &(struct aegis128_ops){
- 		.skcipher_walk_init = skcipher_walk_aead_encrypt,
- 		.crypt_chunk = crypto_aegis128_encrypt_chunk,
- 	};
-@@ -375,7 +406,12 @@ static int crypto_aegis128_encrypt(struct aead_request *req)
- 	unsigned int authsize = crypto_aead_authsize(tfm);
- 	unsigned int cryptlen = req->cryptlen;
- 
--	crypto_aegis128_crypt(req, &tag, cryptlen, &ops);
-+	if (aegis128_do_simd())
-+		ops = &(struct aegis128_ops){
-+			.skcipher_walk_init = skcipher_walk_aead_encrypt,
-+			.crypt_chunk = crypto_aegis128_encrypt_chunk_simd };
++	aegis128_save_state_neon(st, state);
++}
 +
-+	crypto_aegis128_crypt(req, &tag, cryptlen, ops);
- 
- 	scatterwalk_map_and_copy(tag.bytes, req->dst, req->assoclen + cryptlen,
- 				 authsize, 1);
-@@ -384,7 +420,7 @@ static int crypto_aegis128_encrypt(struct aead_request *req)
- 
- static int crypto_aegis128_decrypt(struct aead_request *req)
- {
--	static const struct aegis128_ops ops = {
-+	const struct aegis128_ops *ops = &(struct aegis128_ops){
- 		.skcipher_walk_init = skcipher_walk_aead_decrypt,
- 		.crypt_chunk = crypto_aegis128_decrypt_chunk,
- 	};
-@@ -398,7 +434,12 @@ static int crypto_aegis128_decrypt(struct aead_request *req)
- 	scatterwalk_map_and_copy(tag.bytes, req->src, req->assoclen + cryptlen,
- 				 authsize, 0);
- 
--	crypto_aegis128_crypt(req, &tag, cryptlen, &ops);
-+	if (aegis128_do_simd())
-+		ops = &(struct aegis128_ops){
-+			.skcipher_walk_init = skcipher_walk_aead_decrypt,
-+			.crypt_chunk = crypto_aegis128_decrypt_chunk_simd };
++void crypto_aegis128_decrypt_chunk_neon(void *state, void *dst, const void *src,
++					unsigned int size)
++{
++	struct aegis128_state st = aegis128_load_state_neon(state);
++	uint8x16_t tmp;
 +
-+	crypto_aegis128_crypt(req, &tag, cryptlen, ops);
- 
- 	return crypto_memneq(tag.bytes, zeros, authsize) ? -EBADMSG : 0;
- }
-@@ -429,6 +470,9 @@ static struct aead_alg crypto_aegis128_alg = {
- 
- static int __init crypto_aegis128_module_init(void)
- {
-+	if (IS_ENABLED(CONFIG_CRYPTO_AEGIS128_SIMD))
-+		have_simd = crypto_aegis128_have_simd();
++	while (size >= AEGIS_BLOCK_SIZE) {
++		tmp = vld1q_u8(src) ^ st.v[1] ^ (st.v[2] & st.v[3]) ^ st.v[4];
++		st = aegis128_update_neon(st, tmp);
++		vst1q_u8(dst, tmp);
 +
- 	return crypto_register_aead(&crypto_aegis128_alg);
- }
- 
++		size -= AEGIS_BLOCK_SIZE;
++		src += AEGIS_BLOCK_SIZE;
++		dst += AEGIS_BLOCK_SIZE;
++	}
++
++	if (size > 0) {
++		uint8_t buf[AEGIS_BLOCK_SIZE] = {};
++		uint8x16_t msg;
++
++		memcpy(buf, src, size);
++		msg = vld1q_u8(buf) ^ st.v[1] ^ (st.v[2] & st.v[3]) ^ st.v[4];
++		vst1q_u8(buf, msg);
++		memcpy(dst, buf, size);
++
++		memset(buf + size, 0, AEGIS_BLOCK_SIZE - size);
++		msg = vld1q_u8(buf);
++		st = aegis128_update_neon(st, msg);
++	}
++
++	aegis128_save_state_neon(st, state);
++}
+diff --git a/crypto/aegis128-neon.c b/crypto/aegis128-neon.c
+new file mode 100644
+index 000000000000..c1c0a1686f67
+--- /dev/null
++++ b/crypto/aegis128-neon.c
+@@ -0,0 +1,43 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * Copyright (C) 2019 Linaro Ltd <ard.biesheuvel@linaro.org>
++ */
++
++#include <asm/cpufeature.h>
++#include <asm/neon.h>
++
++#include "aegis.h"
++
++void crypto_aegis128_update_neon(void *state, const void *msg);
++void crypto_aegis128_encrypt_chunk_neon(void *state, void *dst, const void *src,
++					unsigned int size);
++void crypto_aegis128_decrypt_chunk_neon(void *state, void *dst, const void *src,
++					unsigned int size);
++
++bool crypto_aegis128_have_simd(void)
++{
++	return cpu_have_feature(cpu_feature(AES));
++}
++
++void crypto_aegis128_update_simd(union aegis_block *state, const void *msg)
++{
++	kernel_neon_begin();
++	crypto_aegis128_update_neon(state, msg);
++	kernel_neon_end();
++}
++
++void crypto_aegis128_encrypt_chunk_simd(union aegis_block *state, u8 *dst,
++					const u8 *src, unsigned int size)
++{
++	kernel_neon_begin();
++	crypto_aegis128_encrypt_chunk_neon(state, dst, src, size);
++	kernel_neon_end();
++}
++
++void crypto_aegis128_decrypt_chunk_simd(union aegis_block *state, u8 *dst,
++					const u8 *src, unsigned int size)
++{
++	kernel_neon_begin();
++	crypto_aegis128_decrypt_chunk_neon(state, dst, src, size);
++	kernel_neon_end();
++}
 -- 
 2.17.1
 
