@@ -6,64 +6,60 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39207C32750
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 04:54:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC58FC433FF
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 04:55:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 122742073D
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 04:54:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C6B712073D
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 04:55:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732075AbfHBEyt (ORCPT
+        id S1731908AbfHBEzI (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 2 Aug 2019 00:54:49 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:48626 "EHLO fornost.hmeau.com"
+        Fri, 2 Aug 2019 00:55:08 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:48636 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732011AbfHBEyt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Aug 2019 00:54:49 -0400
+        id S1726723AbfHBEzH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 2 Aug 2019 00:55:07 -0400
 Received: from gondolin.me.apana.org.au ([192.168.0.6] helo=gondolin.hengli.com.au)
         by fornost.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1htPaZ-0006Gc-0t; Fri, 02 Aug 2019 14:54:47 +1000
+        id 1htPam-0006H6-8g; Fri, 02 Aug 2019 14:55:00 +1000
 Received: from herbert by gondolin.hengli.com.au with local (Exim 4.80)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1htPaX-0004iT-SP; Fri, 02 Aug 2019 14:54:45 +1000
-Date:   Fri, 2 Aug 2019 14:54:45 +1000
+        id 1htPak-0004io-QE; Fri, 02 Aug 2019 14:54:58 +1000
+Date:   Fri, 2 Aug 2019 14:54:58 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Vakul Garg <vakul.garg@nxp.com>
-Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>
-Subject: Re: [PATCH v5] crypto: caam/qi2 - Add printing dpseci fq stats using
- debugfs
-Message-ID: <20190802045445.GC18077@gondor.apana.org.au>
-References: <20190723091005.827-1-vakul.garg@nxp.com>
+To:     Masahiro Yamada <yamada.masahiro@socionext.com>
+Cc:     linux-crypto@vger.kernel.org, Corentin Labbe <clabbe@baylibre.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 1/2] crypto: add header include guards
+Message-ID: <20190802045458.GD18077@gondor.apana.org.au>
+References: <20190723114344.18622-1-yamada.masahiro@socionext.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190723091005.827-1-vakul.garg@nxp.com>
+In-Reply-To: <20190723114344.18622-1-yamada.masahiro@socionext.com>
 User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jul 23, 2019 at 09:14:24AM +0000, Vakul Garg wrote:
-> Add support of printing the dpseci frame queue statistics using debugfs.
+On Tue, Jul 23, 2019 at 08:43:43PM +0900, Masahiro Yamada wrote:
+> Add header include guards in case they are included multiple times.
 > 
-> Signed-off-by: Vakul Garg <vakul.garg@nxp.com>
+> Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
 > ---
 > 
-> Changes since v4:
-> 	- Corrected license header commenting style
+> Changes in v2: None
 > 
->  drivers/crypto/caam/Makefile         |  1 +
->  drivers/crypto/caam/caamalg_qi2.c    |  5 +++
->  drivers/crypto/caam/caamalg_qi2.h    |  2 +
->  drivers/crypto/caam/dpseci-debugfs.c | 79 ++++++++++++++++++++++++++++++++++++
->  drivers/crypto/caam/dpseci-debugfs.h | 18 ++++++++
->  5 files changed, 105 insertions(+)
->  create mode 100644 drivers/crypto/caam/dpseci-debugfs.c
->  create mode 100644 drivers/crypto/caam/dpseci-debugfs.h
+>  include/crypto/sha1_base.h      | 5 +++++
+>  include/crypto/sha256_base.h    | 5 +++++
+>  include/crypto/sha512_base.h    | 5 +++++
+>  include/crypto/sm3_base.h       | 5 +++++
+>  include/uapi/linux/cryptouser.h | 5 +++++
+>  5 files changed, 25 insertions(+)
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
