@@ -2,229 +2,155 @@ Return-Path: <SRS0=PsuD=V6=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CBDBC433FF
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 15:16:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09554C32750
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 16:10:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 357D5204EC
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 15:16:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zo26S0Go"
+	by mail.kernel.org (Postfix) with ESMTP id D03A02087C
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 16:10:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392898AbfHBPQJ (ORCPT
+        id S2389660AbfHBQJt (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 2 Aug 2019 11:16:09 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:43394 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730768AbfHBPPk (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Aug 2019 11:15:40 -0400
-Received: by mail-wr1-f66.google.com with SMTP id p13so3009125wru.10
-        for <linux-crypto@vger.kernel.org>; Fri, 02 Aug 2019 08:15:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=TlVvhVRKhldZAjA+dsxP3GAvHSktet3CoiBjkDLc8JY=;
-        b=zo26S0Go0qqUPlu9DsiOLCEiDOQMgUYzLWsC0x4LLrnJxvx/UTxGD6euyFhCIFdEoo
-         2pnZfDCr9CqM3wzeP7SoHt2wgki6Rxt2VuYTk8GKXE4Qo2tsiHW0xVKiGQvqEU7YqfxP
-         g+KU7N2YkulYt/eQrYQldeIM0JoluwGpm43QDiz7b1Lv4lZrDvLiX1oQSEmuUrqotlR+
-         Ke1RTDdvSceeRPUT3dBuka3mJxYCi/+v1X2Ew/Y+PryKb8q1u/YsFMfCb6uMf/vC03fL
-         bxbPQ07D/XOXTKjaDwb8izOVyeZ8ZA9hwsWtLvZo9KN01o2QMmqPzdKrErOduepcvsgY
-         07Ww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=TlVvhVRKhldZAjA+dsxP3GAvHSktet3CoiBjkDLc8JY=;
-        b=WuB9ArhyZscfo/sSHbB2I2nIB22Bqx2McA3Oe/hBjROIgQr1h3hq6dbRb1xyxstjMB
-         fPRSh7i6pjvil5v0zEo14l+yCz6cNURl/VRwmmIlYKLAczKN3qMI2EcowDboRHlT4O3h
-         DFcyrbgiMUz3Gt0c73PUTyWYVFo98hkxay5tLiNXh50sUiMsjurB/HF7AbCp0pVUvtw3
-         nb1uDZoGj2xJHIh2HYEOUsk06/pdIRsG2cnxesi6q3a7qOHCufDsk98WRfau08526iQQ
-         tmaJZuYwYAtuWOahyu8ybXwcv/PBTbUyzBd0zaCmSO3sgBOl8o5M9goTV38i/6ip5kyP
-         /RQg==
-X-Gm-Message-State: APjAAAVB9MzSrf2DcwSLZvBu5dehYJMidYOHbqJMO9Kipd7IOSTuR9Td
-        L5hhwE7laqleWE56YCHux1AGzoVkSRsBBA==
-X-Google-Smtp-Source: APXvYqxi65WjCD+1q8we+utV6Veq+dy9xlkb0WZngfyvMstQKS3vanRDi7ZuvkrxavSXROIzu8T3aQ==
-X-Received: by 2002:a5d:46cf:: with SMTP id g15mr10403366wrs.93.1564758937944;
-        Fri, 02 Aug 2019 08:15:37 -0700 (PDT)
-Received: from localhost.localdomain ([2a02:587:a424:b400:cc84:8d83:a434:dd7])
-        by smtp.gmail.com with ESMTPSA id o3sm63294321wrs.59.2019.08.02.08.15.36
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 02 Aug 2019 08:15:37 -0700 (PDT)
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To:     linux-crypto@vger.kernel.org
-Cc:     herbert@gondor.apana.org.au, ebiggers@kernel.org,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Nick Desaulniers <ndesaulniers@google.com>
-Subject: [PATCH RFC 3/3] crypto: arm64/aegis128 - implement plain NEON version
-Date:   Fri,  2 Aug 2019 18:15:10 +0300
-Message-Id: <20190802151510.17074-4-ard.biesheuvel@linaro.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20190802151510.17074-1-ard.biesheuvel@linaro.org>
-References: <20190802151510.17074-1-ard.biesheuvel@linaro.org>
+        Fri, 2 Aug 2019 12:09:49 -0400
+Received: from mga12.intel.com ([192.55.52.136]:15837 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2389527AbfHBQJt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 2 Aug 2019 12:09:49 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 02 Aug 2019 09:09:48 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,338,1559545200"; 
+   d="scan'208";a="372996055"
+Received: from fmsmsx108.amr.corp.intel.com ([10.18.124.206])
+  by fmsmga006.fm.intel.com with ESMTP; 02 Aug 2019 09:09:47 -0700
+Received: from fmsmsx122.amr.corp.intel.com (10.18.125.37) by
+ FMSMSX108.amr.corp.intel.com (10.18.124.206) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 2 Aug 2019 09:09:48 -0700
+Received: from crsmsx103.amr.corp.intel.com (172.18.63.31) by
+ fmsmsx122.amr.corp.intel.com (10.18.125.37) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Fri, 2 Aug 2019 09:09:47 -0700
+Received: from crsmsx101.amr.corp.intel.com ([169.254.1.115]) by
+ CRSMSX103.amr.corp.intel.com ([169.254.4.51]) with mapi id 14.03.0439.000;
+ Fri, 2 Aug 2019 10:09:45 -0600
+From:   "Weiny, Ira" <ira.weiny@intel.com>
+To:     Juergen Gross <jgross@suse.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        "john.hubbard@gmail.com" <john.hubbard@gmail.com>,
+        Andrew Morton <akpm@linux-foundation.org>
+CC:     "devel@driverdev.osuosl.org" <devel@driverdev.osuosl.org>,
+        Dave Chinner <david@fromorbit.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        "Williams, Dan J" <dan.j.williams@intel.com>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        "amd-gfx@lists.freedesktop.org" <amd-gfx@lists.freedesktop.org>,
+        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-rpi-kernel@lists.infradead.org" 
+        <linux-rpi-kernel@lists.infradead.org>,
+        "devel@lists.orangefs.org" <devel@lists.orangefs.org>,
+        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        "rds-devel@oss.oracle.com" <rds-devel@oss.oracle.com>,
+        =?utf-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        Jan Kara <jack@suse.cz>,
+        "ceph-devel@vger.kernel.org" <ceph-devel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-fbdev@vger.kernel.org" <linux-fbdev@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
+        "linux-nfs@vger.kernel.org" <linux-nfs@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "sparclinux@vger.kernel.org" <sparclinux@vger.kernel.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>
+Subject: RE: [PATCH 20/34] xen: convert put_page() to put_user_page*()
+Thread-Topic: [PATCH 20/34] xen: convert put_page() to put_user_page*()
+Thread-Index: AQHVSNjlYWPmavKIo0aaO/eIo60VTqbnqrGAgAAT84CAAAYcgIAAQruQ
+Date:   Fri, 2 Aug 2019 16:09:44 +0000
+Message-ID: <2807E5FD2F6FDA4886F6618EAC48510E79E66216@CRSMSX101.amr.corp.intel.com>
+References: <20190802022005.5117-1-jhubbard@nvidia.com>
+ <20190802022005.5117-21-jhubbard@nvidia.com>
+ <4471e9dc-a315-42c1-0c3c-55ba4eeeb106@suse.com>
+ <d5140833-e9ee-beb5-ff0a-2d13a4fe819f@nvidia.com>
+ <d4931311-db01-e8c3-0f8c-d64685dc2143@suse.com>
+In-Reply-To: <d4931311-db01-e8c3-0f8c-d64685dc2143@suse.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiZTRmN2E3MTYtMGM4Yi00ZWFmLTk2Y2YtNDU3NGNhMWI3OGZmIiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoicmZLd2FNcXRLU2Rkc2k3dFluUytKTjZ2XC9UUlFtczVETG53ZjA3V1hcL0FrcFBtWE5EdUh2U1dwRnZrV1dScDdtIn0=
+x-ctpclassification: CTP_NT
+dlp-product: dlpe-windows
+dlp-version: 11.0.600.7
+dlp-reaction: no-action
+x-originating-ip: [172.18.205.10]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Provide a version of the core AES transform to the aegis128 SIMD
-code that does not rely on the special AES instructions, but uses
-plain NEON instructions instead. This allows the SIMD version of
-the aegis128 driver to be used on arm64 systems that do not
-implement those instructions (which are not mandatory in the
-architecture), such as the Raspberry Pi 3.
-
-Cc: Nick Desaulniers <ndesaulniers@google.com>
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
----
- crypto/Makefile              |  5 ++
- crypto/aegis128-neon-inner.c | 53 ++++++++++++++++++++
- crypto/aegis128-neon.c       | 16 +++++-
- 3 files changed, 73 insertions(+), 1 deletion(-)
-
-diff --git a/crypto/Makefile b/crypto/Makefile
-index 99a9fa9087d1..c3760c7616ac 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -99,6 +99,11 @@ aegis128-$(CONFIG_CRYPTO_AEGIS128_SIMD) += aegis128-neon.o aegis128-neon-inner.o
- endif
- ifeq ($(ARCH),arm64)
- CFLAGS_aegis128-neon-inner.o += -ffreestanding -mcpu=generic+crypto
-+CFLAGS_aegis128-neon-inner.o += -ffixed-q14 -ffixed-q15
-+CFLAGS_aegis128-neon-inner.o += -ffixed-q16 -ffixed-q17 -ffixed-q18 -ffixed-q19
-+CFLAGS_aegis128-neon-inner.o += -ffixed-q20 -ffixed-q21 -ffixed-q22 -ffixed-q23
-+CFLAGS_aegis128-neon-inner.o += -ffixed-q24 -ffixed-q25 -ffixed-q26 -ffixed-q27
-+CFLAGS_aegis128-neon-inner.o += -ffixed-q28 -ffixed-q29 -ffixed-q30 -ffixed-q31
- CFLAGS_REMOVE_aegis128-neon-inner.o += -mgeneral-regs-only
- aegis128-$(CONFIG_CRYPTO_AEGIS128_SIMD) += aegis128-neon.o aegis128-neon-inner.o
- endif
-diff --git a/crypto/aegis128-neon-inner.c b/crypto/aegis128-neon-inner.c
-index 6aca2f425b6d..7aa4cef3c2de 100644
---- a/crypto/aegis128-neon-inner.c
-+++ b/crypto/aegis128-neon-inner.c
-@@ -17,6 +17,8 @@
- 
- #include <stddef.h>
- 
-+extern int aegis128_have_aes_insn;
-+
- void *memcpy(void *dest, const void *src, size_t n);
- void *memset(void *s, int c, size_t n);
- 
-@@ -49,6 +51,32 @@ uint8x16_t aegis_aes_round(uint8x16_t w)
- {
- 	uint8x16_t z = {};
- 
-+#ifdef CONFIG_ARM64
-+	if (!__builtin_expect(aegis128_have_aes_insn, 1)) {
-+		uint8x16_t v;
-+
-+		// shift rows
-+		asm("tbl %0.16b, {%0.16b}, v14.16b" : "+w"(w));
-+
-+		// sub bytes
-+		asm("tbl %0.16b, {v16.16b-v19.16b}, %1.16b" : "=w"(v) : "w"(w));
-+		w -= 0x40;
-+		asm("tbx %0.16b, {v20.16b-v23.16b}, %1.16b" : "+w"(v) : "w"(w));
-+		w -= 0x40;
-+		asm("tbx %0.16b, {v24.16b-v27.16b}, %1.16b" : "+w"(v) : "w"(w));
-+		w -= 0x40;
-+		asm("tbx %0.16b, {v28.16b-v31.16b}, %1.16b" : "+w"(v) : "w"(w));
-+
-+		// mix columns
-+		w = (v << 1) ^ (uint8x16_t)(((int8x16_t)v >> 7) & 0x1b);
-+		w ^= (uint8x16_t)vrev32q_u16((uint16x8_t)v);
-+		asm("tbl %0.16b, {%1.16b}, v15.16b" : "=w"(v) : "w"(v ^ w));
-+		w ^= v;
-+
-+		return w;
-+	}
-+#endif
-+
- 	/*
- 	 * We use inline asm here instead of the vaeseq_u8/vaesmcq_u8 intrinsics
- 	 * to force the compiler to issue the aese/aesmc instructions in pairs.
-@@ -149,3 +177,28 @@ void crypto_aegis128_decrypt_chunk_neon(void *state, void *dst, const void *src,
- 
- 	aegis128_save_state_neon(st, state);
- }
-+
-+#ifdef CONFIG_ARM64
-+void crypto_aegis128_init_neon(void)
-+{
-+	u64 tmp;
-+
-+	asm volatile(
-+	    "adrp		%0, crypto_aes_sbox		\n\t"
-+	    "add		%0, %0, :lo12:crypto_aes_sbox	\n\t"
-+	    "mov		v14.16b, %1.16b			\n\t"
-+	    "mov		v15.16b, %2.16b			\n\t"
-+	    "ld1		{v16.16b-v19.16b}, [%0], #64	\n\t"
-+	    "ld1		{v20.16b-v23.16b}, [%0], #64	\n\t"
-+	    "ld1		{v24.16b-v27.16b}, [%0], #64	\n\t"
-+	    "ld1		{v28.16b-v31.16b}, [%0]		\n\t"
-+	    : "=&r"(tmp)
-+	    : "w"((uint8x16_t){ // shift rows permutation vector
-+			0x0, 0x5, 0xa, 0xf, 0x4, 0x9, 0xe, 0x3,
-+			0x8, 0xd, 0x2, 0x7, 0xc, 0x1, 0x6, 0xb, }),
-+	      "w"((uint8x16_t){ // ror32 permutation vector
-+			0x1, 0x2, 0x3, 0x0, 0x5, 0x6, 0x7, 0x4,
-+			0x9, 0xa, 0xb, 0x8, 0xd, 0xe, 0xf, 0xc,	})
-+	);
-+}
-+#endif
-diff --git a/crypto/aegis128-neon.c b/crypto/aegis128-neon.c
-index c1c0a1686f67..72f9d48e4963 100644
---- a/crypto/aegis128-neon.c
-+++ b/crypto/aegis128-neon.c
-@@ -14,14 +14,24 @@ void crypto_aegis128_encrypt_chunk_neon(void *state, void *dst, const void *src,
- void crypto_aegis128_decrypt_chunk_neon(void *state, void *dst, const void *src,
- 					unsigned int size);
- 
-+void crypto_aegis128_init_neon(void);
-+
-+int aegis128_have_aes_insn __ro_after_init;
-+
- bool crypto_aegis128_have_simd(void)
- {
--	return cpu_have_feature(cpu_feature(AES));
-+	if (cpu_have_feature(cpu_feature(AES))) {
-+		aegis128_have_aes_insn = 1;
-+		return true;
-+	}
-+	return IS_ENABLED(CONFIG_ARM64);
- }
- 
- void crypto_aegis128_update_simd(union aegis_block *state, const void *msg)
- {
- 	kernel_neon_begin();
-+	if (IS_ENABLED(CONFIG_ARM64) && !aegis128_have_aes_insn)
-+		crypto_aegis128_init_neon();
- 	crypto_aegis128_update_neon(state, msg);
- 	kernel_neon_end();
- }
-@@ -30,6 +40,8 @@ void crypto_aegis128_encrypt_chunk_simd(union aegis_block *state, u8 *dst,
- 					const u8 *src, unsigned int size)
- {
- 	kernel_neon_begin();
-+	if (IS_ENABLED(CONFIG_ARM64) && !aegis128_have_aes_insn)
-+		crypto_aegis128_init_neon();
- 	crypto_aegis128_encrypt_chunk_neon(state, dst, src, size);
- 	kernel_neon_end();
- }
-@@ -38,6 +50,8 @@ void crypto_aegis128_decrypt_chunk_simd(union aegis_block *state, u8 *dst,
- 					const u8 *src, unsigned int size)
- {
- 	kernel_neon_begin();
-+	if (IS_ENABLED(CONFIG_ARM64) && !aegis128_have_aes_insn)
-+		crypto_aegis128_init_neon();
- 	crypto_aegis128_decrypt_chunk_neon(state, dst, src, size);
- 	kernel_neon_end();
- }
--- 
-2.17.1
-
+PiANCj4gT24gMDIuMDguMTkgMDc6NDgsIEpvaG4gSHViYmFyZCB3cm90ZToNCj4gPiBPbiA4LzEv
+MTkgOTozNiBQTSwgSnVlcmdlbiBHcm9zcyB3cm90ZToNCj4gPj4gT24gMDIuMDguMTkgMDQ6MTks
+IGpvaG4uaHViYmFyZEBnbWFpbC5jb20gd3JvdGU6DQo+ID4+PiBGcm9tOiBKb2huIEh1YmJhcmQg
+PGpodWJiYXJkQG52aWRpYS5jb20+DQo+ID4gLi4uDQo+ID4+PiBkaWZmIC0tZ2l0IGEvZHJpdmVy
+cy94ZW4vcHJpdmNtZC5jIGIvZHJpdmVycy94ZW4vcHJpdmNtZC5jIGluZGV4DQo+ID4+PiAyZjVj
+ZTcyMzBhNDMuLjI5ZTQ2MWRiZWUyZCAxMDA2NDQNCj4gPj4+IC0tLSBhL2RyaXZlcnMveGVuL3By
+aXZjbWQuYw0KPiA+Pj4gKysrIGIvZHJpdmVycy94ZW4vcHJpdmNtZC5jDQo+ID4+PiBAQCAtNjEx
+LDE1ICs2MTEsMTAgQEAgc3RhdGljIGludCBsb2NrX3BhZ2VzKA0KPiA+Pj4gwqAgc3RhdGljIHZv
+aWQgdW5sb2NrX3BhZ2VzKHN0cnVjdCBwYWdlICpwYWdlc1tdLCB1bnNpZ25lZCBpbnQNCj4gPj4+
+IG5yX3BhZ2VzKQ0KPiA+Pj4gwqAgew0KPiA+Pj4gLcKgwqDCoCB1bnNpZ25lZCBpbnQgaTsNCj4g
+Pj4+IC0NCj4gPj4+IMKgwqDCoMKgwqAgaWYgKCFwYWdlcykNCj4gPj4+IMKgwqDCoMKgwqDCoMKg
+wqDCoCByZXR1cm47DQo+ID4+PiAtwqDCoMKgIGZvciAoaSA9IDA7IGkgPCBucl9wYWdlczsgaSsr
+KSB7DQo+ID4+PiAtwqDCoMKgwqDCoMKgwqAgaWYgKHBhZ2VzW2ldKQ0KPiA+Pj4gLcKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqAgcHV0X3BhZ2UocGFnZXNbaV0pOw0KPiA+Pj4gLcKgwqDCoCB9DQo+ID4+
+PiArwqDCoMKgIHB1dF91c2VyX3BhZ2VzKHBhZ2VzLCBucl9wYWdlcyk7DQo+ID4+DQo+ID4+IFlv
+dSBhcmUgbm90IGhhbmRsaW5nIHRoZSBjYXNlIHdoZXJlIHBhZ2VzW2ldIGlzIE5VTEwgaGVyZS4g
+T3IgYW0gSQ0KPiA+PiBtaXNzaW5nIGEgcGVuZGluZyBwYXRjaCB0byBwdXRfdXNlcl9wYWdlcygp
+IGhlcmU/DQo+ID4+DQo+ID4NCj4gPiBIaSBKdWVyZ2VuLA0KPiA+DQo+ID4gWW91IGFyZSBjb3Jy
+ZWN0LS10aGlzIG5vIGxvbmdlciBoYW5kbGVzIHRoZSBjYXNlcyB3aGVyZSBwYWdlc1tpXSBpcw0K
+PiA+IE5VTEwuIEl0J3MgaW50ZW50aW9uYWwsIHRob3VnaCBwb3NzaWJseSB3cm9uZy4gOikNCj4g
+Pg0KPiA+IEkgc2VlIHRoYXQgSSBzaG91bGQgaGF2ZSBhZGRlZCBteSBzdGFuZGFyZCBibHVyYiB0
+byB0aGlzIGNvbW1pdA0KPiA+IGRlc2NyaXB0aW9uLiBJIG1pc3NlZCB0aGlzIG9uZSwgYnV0IHNv
+bWUgb2YgdGhlIG90aGVyIHBhdGNoZXMgaGF2ZSBpdC4NCj4gPiBJdCBtYWtlcyB0aGUgZm9sbG93
+aW5nLCBwb3NzaWJseSBpbmNvcnJlY3QgY2xhaW06DQo+ID4NCj4gPiAiVGhpcyBjaGFuZ2VzIHRo
+ZSByZWxlYXNlIGNvZGUgc2xpZ2h0bHksIGJlY2F1c2UgZWFjaCBwYWdlIHNsb3QgaW4gdGhlDQo+
+ID4gcGFnZV9saXN0W10gYXJyYXkgaXMgbm8gbG9uZ2VyIGNoZWNrZWQgZm9yIE5VTEwuIEhvd2V2
+ZXIsIHRoYXQgY2hlY2sNCj4gPiB3YXMgd3JvbmcgYW55d2F5LCBiZWNhdXNlIHRoZSBnZXRfdXNl
+cl9wYWdlcygpIHBhdHRlcm4gb2YgdXNhZ2UgaGVyZQ0KPiA+IG5ldmVyIGFsbG93ZWQgZm9yIE5V
+TEwgZW50cmllcyB3aXRoaW4gYSByYW5nZSBvZiBwaW5uZWQgcGFnZXMuIg0KPiA+DQo+ID4gVGhl
+IHdheSBJJ3ZlIHNlZW4gdGhlc2UgcGFnZSBhcnJheXMgdXNlZCB3aXRoIGdldF91c2VyX3BhZ2Vz
+KCksIHRoaW5ncw0KPiA+IGFyZSBlaXRoZXIgZG9uZSBzaW5nbGUgcGFnZSwgb3Igd2l0aCBhIGNv
+bnRpZ3VvdXMgcmFuZ2UuIFNvIHVubGVzcyBJJ20NCj4gPiBtaXNzaW5nIGEgY2FzZSB3aGVyZSBz
+b21lb25lIGlzIGVpdGhlcg0KPiA+DQo+ID4gYSkgcmVsZWFzaW5nIGluZGl2aWR1YWwgcGFnZXMg
+d2l0aGluIGEgcmFuZ2UgKGFuZCB0aHVzIGxpa2VseSBtZXNzaW5nDQo+ID4gdXAgdGhlaXIgY291
+bnQgb2YgcGFnZXMgdGhleSBoYXZlKSwgb3INCj4gPg0KPiA+IGIpIGFsbG9jYXRpbmcgdHdvIGd1
+cCByYW5nZXMgd2l0aGluIHRoZSBzYW1lIHBhZ2VzW10gYXJyYXksIHdpdGggYSBnYXANCj4gPiBi
+ZXR3ZWVuIHRoZSBhbGxvY2F0aW9ucywNCj4gPg0KPiA+IC4uLnRoZW4gaXQgc2hvdWxkIGJlIGNv
+cnJlY3QuIElmIHNvLCB0aGVuIEknbGwgYWRkIHRoZSBhYm92ZSBibHVyYiB0bw0KPiA+IHRoaXMg
+cGF0Y2gncyBjb21taXQgZGVzY3JpcHRpb24uDQo+ID4NCj4gPiBJZiB0aGF0J3Mgbm90IHRoZSBj
+YXNlIChib3RoIGhlcmUsIGFuZCBpbiAzIG9yIDQgb3RoZXIgcGF0Y2hlcyBpbiB0aGlzDQo+ID4g
+c2VyaWVzLCB0aGVuIGFzIHlvdSBzYWlkLCBJIHNob3VsZCBhZGQgTlVMTCBjaGVja3MgdG8gcHV0
+X3VzZXJfcGFnZXMoKQ0KPiA+IGFuZCBwdXRfdXNlcl9wYWdlc19kaXJ0eV9sb2NrKCkuDQo+IA0K
+PiBJbiB0aGlzIGNhc2UgaXQgaXMgbm90IGNvcnJlY3QsIGJ1dCBjYW4gZWFzaWx5IGJlIGhhbmRs
+ZWQuIFRoZSBOVUxMIGNhc2UgY2FuDQo+IG9jY3VyIG9ubHkgaW4gYW4gZXJyb3IgY2FzZSB3aXRo
+IHRoZSBwYWdlcyBhcnJheSBmaWxsZWQgcGFydGlhbGx5IG9yIG5vdCBhdCBhbGwuDQo+IA0KPiBJ
+J2QgcHJlZmVyIHNvbWV0aGluZyBsaWtlIHRoZSBhdHRhY2hlZCBwYXRjaCBoZXJlLg0KDQpJJ20g
+bm90IGFuIGV4cGVydCBpbiB0aGlzIGNvZGUgYW5kIGhhdmUgbm90IGxvb2tlZCBhdCBpdCBjYXJl
+ZnVsbHkgYnV0IHRoYXQgcGF0Y2ggZG9lcyBzZWVtIHRvIGJlIHRoZSBiZXR0ZXIgZml4IHRoYW4g
+Zm9yY2luZyBOVUxMIGNoZWNrcyBvbiBldmVyeW9uZS4NCg0KSXJhDQoNCg==
