@@ -5,58 +5,58 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0493C32756
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 02:26:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DBCBC41517
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 02:26:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C7DDD2083B
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 02:26:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 103B9206A3
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 02:26:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="t5NAqE3V"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JHrYMRfe"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729823AbfHBCZw (ORCPT
+        id S2390735AbfHBCU2 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 1 Aug 2019 22:25:52 -0400
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:37925 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390756AbfHBCUa (ORCPT
+        Thu, 1 Aug 2019 22:20:28 -0400
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:35195 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390704AbfHBCUY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 1 Aug 2019 22:20:30 -0400
-Received: by mail-pg1-f195.google.com with SMTP id f5so26416078pgu.5;
-        Thu, 01 Aug 2019 19:20:29 -0700 (PDT)
+        Thu, 1 Aug 2019 22:20:24 -0400
+Received: by mail-pl1-f196.google.com with SMTP id w24so33011752plp.2;
+        Thu, 01 Aug 2019 19:20:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=34zW6BJN89MycamN6XZc+aPi3iIpUXsyW4mngm2d11Q=;
-        b=t5NAqE3Vka8KgkTsGoLz9ngltlH4Rvcpb6lwK1UP3GX3tIbQ8zi6/BtK7Yp4TzERha
-         wSeLot/t6ZWJImnvKBZhoEDQI6w3o5UiMaJgEpqqKVxcZT34GhcoUwN2IZVyDwqCPKlC
-         a7Buv+1Wht5mLnbtK6+0hFPG1gydiYPwhnLgxc7zgGLfQhg2ssESYfy+n2RPvUdztRim
-         jUlI8gdPL0+PZqp56ewu9yAP9JBceuh2IC1TKvQK+F/6hCHCM/byLJfkcX1hvyboPVI9
-         xbVnybXy2ozmgwqFr15PYWmG4HhsZR295UWof1NeRQ0AKr4kLzhdz4MTCgaGRcNk5CYS
-         eE0w==
+        bh=o2GwgSJoRuvPfZ2J7Awdgxw+WyrY01QvDnyFb1fV9Xk=;
+        b=JHrYMRfeJbxJPRvVu2mUWlOPSRz5X9TsMoYGj7w11YGTme72BLb2VCmJtiT1crMj8E
+         WFW+MhbnbkJpTwkrKMzEtbVI7vTqXv+SI+hFx6FZWh0IsKOr81DSRZrT3ou0zge/dnd5
+         EXgsdat7mGxiPUC4r8AnIJEtDvOIZL+G3eepAaSt906tZ2zy13M8CWEIWzA2V9xqXZwe
+         3r8aKK6oVTx9NMfrfbSmVNdddYS2ismfu/I+qiVZNMv3LWt0KFKP68hGnbZ9FH7YXxJX
+         ux6o95ZiuMx2wtoGxh0CwNNs1fyU+QkDE3uHv/C0GSypFYyOdTrFbpn3G312jKYOi/u7
+         rhUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=34zW6BJN89MycamN6XZc+aPi3iIpUXsyW4mngm2d11Q=;
-        b=H1DfNlvPxfwHWeznFt6aqkjUY6SBN9oImbANW99Fi7Y2hqIFINTsx71zEsxV2QCyJ6
-         tg3txAEqMpMlEyiJtPOtKo8BUdvISwlk6SOWp9mrJjt1BLlaN3HHlR8+/nMh47FfwA9K
-         c1cAGU0d1f4ugflIBjChNEJHmWepTl7SJu1QwEbSdWJ/hfUVQrwiOOVcFvg+8G7+8Xq4
-         pUEA81p6RdoYK1QJUWz2mVOJG/A1trCum/j13rMkx10zpGKztXFGT6QARvNpVMOda/uB
-         Ji07jCS4+2bWCkHvJlyWqEQRNj5h61/yZp/oXdCkmq3D4oemz1QNGWZeNhYOxOvTC3iD
-         cfCA==
-X-Gm-Message-State: APjAAAVW7XulXQkRBuXOE0e+8MWD3ZnZ5+oDnuO0Mx0ucRyAbISs/cdg
-        rprpW6Ma9sHgaAJfGzRlbEw=
-X-Google-Smtp-Source: APXvYqzeCy+7cVID+Rr3XWOFQDSekWzD7T6/ZvL7pRVEGXoHJuKXgEeLRZGzPIVKoEslJMD2nH6qbg==
-X-Received: by 2002:a65:6454:: with SMTP id s20mr122064853pgv.15.1564712429240;
-        Thu, 01 Aug 2019 19:20:29 -0700 (PDT)
+        bh=o2GwgSJoRuvPfZ2J7Awdgxw+WyrY01QvDnyFb1fV9Xk=;
+        b=RVOgkgzP1W5ApdZT6dPDdesNg+AFXGrnw47X9S8qompGJHk4Eig8n4E/mhsicMwZ6m
+         58B6O2at+oPrLZ7E7BdXJtj6PuCpzMKuUcBwLVLZZBqOxKbhK1x+XQy2AeWup027oMM/
+         0XXzmA5qSEbfeNN5G7Z/KBV21opgE+BQ9fZqAhVaHCSLD9wX5Fg6ao7bLeerr6kpsysq
+         EcFHFXQHJnWUNaUu41mcIxBAzZW5VlfGi2ZjY5TsjM87ofA0LaYpHAgdNSjGtGXdus7w
+         dZ8YQx5Yqli9bbIJeGr/Zp4K2jL3/WWC7SgTkFmvO3B4ZlLp6elNgyKeBxq/LlzGpfVQ
+         WYxg==
+X-Gm-Message-State: APjAAAXpx603NQZ+H8yZbGF4eFlJsiy5FdPLQWRZEZCikXtMDC/XDqjs
+        tWzyyH+8i8MRb56zx+YwToI=
+X-Google-Smtp-Source: APXvYqzAaZbEuJQ23N6QFJdC6uFCaO+rLm14VcZtE9+tOy9uyfg9aPHBipIj9sgNkOpEwRVfN6Xk3w==
+X-Received: by 2002:a17:902:9688:: with SMTP id n8mr126124101plp.227.1564712422766;
+        Thu, 01 Aug 2019 19:20:22 -0700 (PDT)
 Received: from blueforge.nvidia.com (searspoint.nvidia.com. [216.228.112.21])
-        by smtp.gmail.com with ESMTPSA id u9sm38179744pgc.5.2019.08.01.19.20.27
+        by smtp.gmail.com with ESMTPSA id u9sm38179744pgc.5.2019.08.01.19.20.21
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Thu, 01 Aug 2019 19:20:28 -0700 (PDT)
+        Thu, 01 Aug 2019 19:20:22 -0700 (PDT)
 From:   john.hubbard@gmail.com
 X-Google-Original-From: jhubbard@nvidia.com
 To:     Andrew Morton <akpm@linux-foundation.org>
@@ -80,18 +80,18 @@ Cc:     Christoph Hellwig <hch@infradead.org>,
         netdev@vger.kernel.org, rds-devel@oss.oracle.com,
         sparclinux@vger.kernel.org, x86@kernel.org,
         xen-devel@lists.xenproject.org, John Hubbard <jhubbard@nvidia.com>,
-        Sudeep Dutt <sudeep.dutt@intel.com>,
-        Ashutosh Dixit <ashutosh.dixit@intel.com>,
-        Arnd Bergmann <arnd@arndb.de>, Joerg Roedel <jroedel@suse.de>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Zhen Lei <thunder.leizhen@huawei.com>
-Subject: [PATCH 11/34] scif: convert put_page() to put_user_page*()
-Date:   Thu,  1 Aug 2019 19:19:42 -0700
-Message-Id: <20190802022005.5117-12-jhubbard@nvidia.com>
+        Alex Deucher <alexander.deucher@amd.com>,
+        =?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+        David Zhou <David1.Zhou@amd.com>,
+        David Airlie <airlied@linux.ie>
+Subject: [PATCH 07/34] drm/radeon: convert put_page() to put_user_page*()
+Date:   Thu,  1 Aug 2019 19:19:38 -0700
+Message-Id: <20190802022005.5117-8-jhubbard@nvidia.com>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <20190802022005.5117-1-jhubbard@nvidia.com>
 References: <20190802022005.5117-1-jhubbard@nvidia.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-NVConfidentiality: public
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
@@ -108,55 +108,30 @@ release_pages().
 This is part a tree-wide conversion, as described in commit fc1d8e7cca2d
 ("mm: introduce put_user_page*(), placeholder versions").
 
-Cc: Sudeep Dutt <sudeep.dutt@intel.com>
-Cc: Ashutosh Dixit <ashutosh.dixit@intel.com>
-Cc: Arnd Bergmann <arnd@arndb.de>
-Cc: Joerg Roedel <jroedel@suse.de>
-Cc: Robin Murphy <robin.murphy@arm.com>
-Cc: Zhen Lei <thunder.leizhen@huawei.com>
+Cc: Alex Deucher <alexander.deucher@amd.com>
+Cc: Christian König <christian.koenig@amd.com>
+Cc: David (ChunMing) Zhou <David1.Zhou@amd.com>
+Cc: David Airlie <airlied@linux.ie>
+Cc: amd-gfx@lists.freedesktop.org
+Cc: dri-devel@lists.freedesktop.org
 Signed-off-by: John Hubbard <jhubbard@nvidia.com>
 ---
- drivers/misc/mic/scif/scif_rma.c | 17 ++++++++---------
- 1 file changed, 8 insertions(+), 9 deletions(-)
+ drivers/gpu/drm/radeon/radeon_ttm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/misc/mic/scif/scif_rma.c b/drivers/misc/mic/scif/scif_rma.c
-index 01e27682ea30..d84ed9466920 100644
---- a/drivers/misc/mic/scif/scif_rma.c
-+++ b/drivers/misc/mic/scif/scif_rma.c
-@@ -113,13 +113,14 @@ static int scif_destroy_pinned_pages(struct scif_pinned_pages *pin)
- 	int writeable = pin->prot & SCIF_PROT_WRITE;
- 	int kernel = SCIF_MAP_KERNEL & pin->map_flags;
+diff --git a/drivers/gpu/drm/radeon/radeon_ttm.c b/drivers/gpu/drm/radeon/radeon_ttm.c
+index fb3696bc616d..4c9943fa10df 100644
+--- a/drivers/gpu/drm/radeon/radeon_ttm.c
++++ b/drivers/gpu/drm/radeon/radeon_ttm.c
+@@ -540,7 +540,7 @@ static int radeon_ttm_tt_pin_userptr(struct ttm_tt *ttm)
+ 	kfree(ttm->sg);
  
--	for (j = 0; j < pin->nr_pages; j++) {
--		if (pin->pages[j] && !kernel) {
-+	if (kernel) {
-+		for (j = 0; j < pin->nr_pages; j++) {
- 			if (writeable)
--				SetPageDirty(pin->pages[j]);
-+				set_page_dirty_lock(pin->pages[j]);
- 			put_page(pin->pages[j]);
- 		}
--	}
-+	} else
-+		put_user_pages_dirty_lock(pin->pages, pin->nr_pages, writeable);
+ release_pages:
+-	release_pages(ttm->pages, pinned);
++	put_user_pages(ttm->pages, pinned);
+ 	return r;
+ }
  
- 	scif_free(pin->pages,
- 		  pin->nr_pages * sizeof(*pin->pages));
-@@ -1385,11 +1386,9 @@ int __scif_pin_pages(void *addr, size_t len, int *out_prot,
- 				if (ulimit)
- 					__scif_dec_pinned_vm_lock(mm, nr_pages);
- 				/* Roll back any pinned pages */
--				for (i = 0; i < pinned_pages->nr_pages; i++) {
--					if (pinned_pages->pages[i])
--						put_page(
--						pinned_pages->pages[i]);
--				}
-+				put_user_pages(pinned_pages->pages,
-+					       pinned_pages->nr_pages);
-+
- 				prot &= ~SCIF_PROT_WRITE;
- 				try_upgrade = false;
- 				goto retry;
 -- 
 2.22.0
 
