@@ -2,94 +2,101 @@ Return-Path: <SRS0=PsuD=V6=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0457CC433FF
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 12:41:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFA2AC433FF
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 13:31:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DB1762087E
-	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 12:41:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C126321855
+	for <linux-crypto@archiver.kernel.org>; Fri,  2 Aug 2019 13:31:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387804AbfHBMlv (ORCPT
+        id S2404413AbfHBNbO (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 2 Aug 2019 08:41:51 -0400
-Received: from mx2.suse.de ([195.135.220.15]:35710 "EHLO mx1.suse.de"
+        Fri, 2 Aug 2019 09:31:14 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:50602 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728404AbfHBMlv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 2 Aug 2019 08:41:51 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 20E6FAF94;
-        Fri,  2 Aug 2019 12:41:48 +0000 (UTC)
-Received: by quack2.suse.cz (Postfix, from userid 1000)
-        id F40A51E3F4D; Fri,  2 Aug 2019 14:41:46 +0200 (CEST)
-Date:   Fri, 2 Aug 2019 14:41:46 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Michal Hocko <mhocko@kernel.org>
-Cc:     john.hubbard@gmail.com, Andrew Morton <akpm@linux-foundation.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Chinner <david@fromorbit.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        amd-gfx@lists.freedesktop.org, ceph-devel@vger.kernel.org,
-        devel@driverdev.osuosl.org, devel@lists.orangefs.org,
-        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-fbdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-mm@kvack.org,
-        linux-nfs@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-rpi-kernel@lists.infradead.org, linux-xfs@vger.kernel.org,
-        netdev@vger.kernel.org, rds-devel@oss.oracle.com,
-        sparclinux@vger.kernel.org, x86@kernel.org,
-        xen-devel@lists.xenproject.org, John Hubbard <jhubbard@nvidia.com>
-Subject: Re: [PATCH 00/34] put_user_pages(): miscellaneous call sites
-Message-ID: <20190802124146.GL25064@quack2.suse.cz>
-References: <20190802022005.5117-1-jhubbard@nvidia.com>
- <20190802091244.GD6461@dhcp22.suse.cz>
+        id S2404401AbfHBNbK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 2 Aug 2019 09:31:10 -0400
+Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 98B08AA14CE5C9058219;
+        Fri,  2 Aug 2019 21:31:07 +0800 (CST)
+Received: from localhost (10.133.213.239) by DGGEMS414-HUB.china.huawei.com
+ (10.3.19.214) with Microsoft SMTP Server id 14.3.439.0; Fri, 2 Aug 2019
+ 21:30:59 +0800
+From:   YueHaibing <yuehaibing@huawei.com>
+To:     <herbert@gondor.apana.org.au>, <lars.persson@axis.com>,
+        <jesper.nilsson@axis.com>, <davem@davemloft.net>,
+        <thomas.lendacky@amd.com>, <gary.hook@amd.com>, <krzk@kernel.org>,
+        <kgene@kernel.org>, <antoine.tenart@bootlin.com>,
+        <matthias.bgg@gmail.com>, <jamie@jamieiles.com>,
+        <agross@kernel.org>, <heiko@sntech.de>,
+        <mcoquelin.stm32@gmail.com>, <alexandre.torgue@st.com>,
+        <clabbe.montjoie@gmail.com>, <mripard@kernel.org>, <wens@csie.org>
+CC:     <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <linux-arm-kernel@axis.com>, <linux-samsung-soc@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-mediatek@lists.infradead.org>,
+        <linux-arm-msm@vger.kernel.org>,
+        <linux-rockchip@lists.infradead.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        YueHaibing <yuehaibing@huawei.com>
+Subject: [PATCH -next 00/12] crypto: use devm_platform_ioremap_resource() to simplify code
+Date:   Fri, 2 Aug 2019 21:27:57 +0800
+Message-ID: <20190802132809.8116-1-yuehaibing@huawei.com>
+X-Mailer: git-send-email 2.10.2.windows.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190802091244.GD6461@dhcp22.suse.cz>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain
+X-Originating-IP: [10.133.213.239]
+X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri 02-08-19 11:12:44, Michal Hocko wrote:
-> On Thu 01-08-19 19:19:31, john.hubbard@gmail.com wrote:
-> [...]
-> > 2) Convert all of the call sites for get_user_pages*(), to
-> > invoke put_user_page*(), instead of put_page(). This involves dozens of
-> > call sites, and will take some time.
-> 
-> How do we make sure this is the case and it will remain the case in the
-> future? There must be some automagic to enforce/check that. It is simply
-> not manageable to do it every now and then because then 3) will simply
-> be never safe.
-> 
-> Have you considered coccinele or some other scripted way to do the
-> transition? I have no idea how to deal with future changes that would
-> break the balance though.
+devm_platform_ioremap_resource() internally have platform_get_resource()
+and devm_ioremap_resource() in it. So instead of calling them separately
+use devm_platform_ioremap_resource() directly.
 
-Yeah, that's why I've been suggesting at LSF/MM that we may need to create
-a gup wrapper - say vaddr_pin_pages() - and track which sites dropping
-references got converted by using this wrapper instead of gup. The
-counterpart would then be more logically named as unpin_page() or whatever
-instead of put_user_page().  Sure this is not completely foolproof (you can
-create new callsite using vaddr_pin_pages() and then just drop refs using
-put_page()) but I suppose it would be a high enough barrier for missed
-conversions... Thoughts?
+YueHaibing (12):
+  crypto: artpec6 - use devm_platform_ioremap_resource() to simplify
+    code
+  crypto: ccp - use devm_platform_ioremap_resource() to simplify code
+  crypto: exynos - use devm_platform_ioremap_resource() to simplify code
+  crypto: img-hash - use devm_platform_ioremap_resource() to simplify
+    code
+  crypto: inside-secure - use devm_platform_ioremap_resource() to
+    simplify code
+  crypto: mediatek - use devm_platform_ioremap_resource() to simplify
+    code
+  crypto: picoxcell - use devm_platform_ioremap_resource() to simplify
+    code
+  crypto: sunxi-ss - use devm_platform_ioremap_resource() to simplify
+    code
+  crypto: rockchip - use devm_platform_ioremap_resource() to simplify
+    code
+  crypto: stm32 - use devm_platform_ioremap_resource() to simplify code
+  crypto: qce - use devm_platform_ioremap_resource() to simplify code
+  crypto: qcom-rng - use devm_platform_ioremap_resource() to simplify
+    code
 
-								Honza
+ drivers/crypto/axis/artpec6_crypto.c    | 4 +---
+ drivers/crypto/ccp/sp-platform.c        | 4 +---
+ drivers/crypto/exynos-rng.c             | 4 +---
+ drivers/crypto/img-hash.c               | 4 +---
+ drivers/crypto/inside-secure/safexcel.c | 4 +---
+ drivers/crypto/mediatek/mtk-platform.c  | 3 +--
+ drivers/crypto/picoxcell_crypto.c       | 5 ++---
+ drivers/crypto/qce/core.c               | 4 +---
+ drivers/crypto/qcom-rng.c               | 4 +---
+ drivers/crypto/rockchip/rk3288_crypto.c | 4 +---
+ drivers/crypto/stm32/stm32-crc32.c      | 4 +---
+ drivers/crypto/stm32/stm32-cryp.c       | 4 +---
+ drivers/crypto/sunxi-ss/sun4i-ss-core.c | 4 +---
+ 13 files changed, 14 insertions(+), 38 deletions(-)
 
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+2.7.4
+
+
