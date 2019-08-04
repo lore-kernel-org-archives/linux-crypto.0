@@ -1,156 +1,112 @@
-Return-Path: <SRS0=Wt+L=V7=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=yZoL=WA=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D4E2C31E40
-	for <linux-crypto@archiver.kernel.org>; Sat,  3 Aug 2019 20:03:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10CECC19759
+	for <linux-crypto@archiver.kernel.org>; Sun,  4 Aug 2019 08:36:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 423A92075C
-	for <linux-crypto@archiver.kernel.org>; Sat,  3 Aug 2019 20:03:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CDF3B206C1
+	for <linux-crypto@archiver.kernel.org>; Sun,  4 Aug 2019 08:36:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="I2YSIJHt"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gZQuXkDa"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728518AbfHCUDI (ORCPT
+        id S1725993AbfHDIgj (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 3 Aug 2019 16:03:08 -0400
-Received: from hqemgate16.nvidia.com ([216.228.121.65]:10527 "EHLO
-        hqemgate16.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727585AbfHCUDI (ORCPT
+        Sun, 4 Aug 2019 04:36:39 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:50840 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725987AbfHDIgj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 3 Aug 2019 16:03:08 -0400
-Received: from hqpgpgate102.nvidia.com (Not Verified[216.228.121.13]) by hqemgate16.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5d45e87a0000>; Sat, 03 Aug 2019 13:03:06 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate102.nvidia.com (PGP Universal service);
-  Sat, 03 Aug 2019 13:03:06 -0700
-X-PGP-Universal: processed;
-        by hqpgpgate102.nvidia.com on Sat, 03 Aug 2019 13:03:06 -0700
-Received: from [10.110.48.28] (172.20.13.39) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Sat, 3 Aug
- 2019 20:03:05 +0000
-Subject: Re: [PATCH 06/34] drm/i915: convert put_page() to put_user_page*()
-From:   John Hubbard <jhubbard@nvidia.com>
-To:     Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        <john.hubbard@gmail.com>
-CC:     Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Chinner <david@fromorbit.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        <amd-gfx@lists.freedesktop.org>, <ceph-devel@vger.kernel.org>,
-        <devel@driverdev.osuosl.org>, <devel@lists.orangefs.org>,
-        <dri-devel@lists.freedesktop.org>,
-        <intel-gfx@lists.freedesktop.org>, <kvm@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-block@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <linux-fbdev@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
-        <linux-media@vger.kernel.org>, <linux-mm@kvack.org>,
-        <linux-nfs@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-        <linux-rpi-kernel@lists.infradead.org>,
-        <linux-xfs@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <rds-devel@oss.oracle.com>, <sparclinux@vger.kernel.org>,
-        <x86@kernel.org>, <xen-devel@lists.xenproject.org>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        David Airlie <airlied@linux.ie>
-References: <20190802022005.5117-1-jhubbard@nvidia.com>
- <20190802022005.5117-7-jhubbard@nvidia.com>
- <156473756254.19842.12384378926183716632@jlahtine-desk.ger.corp.intel.com>
- <7d9a9c57-4322-270b-b636-7214019f87e9@nvidia.com>
-X-Nvconfidentiality: public
-Message-ID: <22c309f6-a7ca-2624-79c3-b16a1487f488@nvidia.com>
-Date:   Sat, 3 Aug 2019 13:03:05 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Sun, 4 Aug 2019 04:36:39 -0400
+Received: by mail-wm1-f68.google.com with SMTP id v15so71984346wml.0
+        for <linux-crypto@vger.kernel.org>; Sun, 04 Aug 2019 01:36:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=S5z3diwrj3LTNJL99A/1OowPibFl4kOSfl1ebMrUQAM=;
+        b=gZQuXkDa92Cg03NJBMuifLv2d00BelHmlNmbsuBjP/1HV2Jot7X3S36dFGBXMo32TO
+         pkH1RiRWaspaELe4VXwWZS+b5aL0k3utLiRrvRDiuWI57ppEyxSbQnUYHNltOM8TsIW3
+         MDJKTS2VfidcnNerS6p5N+KalylRTweD9Fdj9ZylNJivZOJnG/xy02sAdkyEL6l4DGli
+         6MKls/brtzzYOHF76Qp9PvNcdKo0QKPBfDvkzCiOaF9bDdogY3QFeaG//ubRpmrcCDOf
+         F2DeR1mTxT4KH7asc3pl8biSGI8PBvT+OzBqWdrVY4PUJAJvLQ67NsaYTh8ZxY6m2rVM
+         7u3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=S5z3diwrj3LTNJL99A/1OowPibFl4kOSfl1ebMrUQAM=;
+        b=Jd/7MxCMgWxXnfmlkKCNPts9v5Tqt6Za9COS64eHfjL6Iky4oL4SXhsZDfxeuzE/+l
+         FTUH3+fIhdBsbWtfMrfJeDV3Z5YRvABZCyjJvn2VTDZKmi7MfIqQy0bbB92gNm688RtF
+         om2LYbQY67u6mlpjjicru5IOA6eN/HnOQFeu4WnAIIB85rokcH29oaYpL+catVpLJyJS
+         /y87fhibK24k1znC1ePSO/YxV7rtkcbtyKt7TfuiR0u0uYQZphDq3SXbjpIcDN1vaT12
+         5ZYz48VjIKH9odd0gKoFDr0O8d1NNbrCDKyiZSIStQKeD+N786X0+6wf2Q8u4DwE4hRV
+         lBTw==
+X-Gm-Message-State: APjAAAX9NHnebmb3G/oxfS960BnV2SndnYTAQhmRcD7JmYiEkEhC439Y
+        AJGCDmmV1c8FEUswEvPCGQaK3vvu2AFSsEyd1B6oBQ==
+X-Google-Smtp-Source: APXvYqzwfFFMUOMV4ujWhOonieSQIcv9qD5u01lkqbHt35xWftkOx8hC38QvI2mu4JjWc36l0PN9p6bAjlX2GLNcllI=
+X-Received: by 2002:a05:600c:21d4:: with SMTP id x20mr11976048wmj.61.1564907797099;
+ Sun, 04 Aug 2019 01:36:37 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <7d9a9c57-4322-270b-b636-7214019f87e9@nvidia.com>
-X-Originating-IP: [172.20.13.39]
-X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1564862587; bh=ilU/8cKxAxLoWjJW9QtQ++HPyf9Kp7C47ReaMR8aBDk=;
-        h=X-PGP-Universal:Subject:From:To:CC:References:X-Nvconfidentiality:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=I2YSIJHtEvh6s6ys5+qZOy9oK09e18lfnMQt77fXZCyrgzqntxCUGfZ7oWikmHJt5
-         4V1+y4MySAejsYy1JLbf4x7KQ0hiidb6jg5xsakkPPG/MxjywoS180jIN6uhV11y/O
-         011sP6dgxSCe7CPHZfVmc5h9v3h4EFz6CzWGnO3zjeLQA+xNf7n8Aq4VIo5dqejc1s
-         ogxZqWO3QmjUKVwNVzjjVrVg9ptoPI8+f8bAuuTtyZ6ixyHn7fxeF7f3r5zkr6u4id
-         LKe10E8R/74E4Fa+DG9GwiVmNsBu++raNIZCy4+8RyCJBTlO14Pl8lc8yCIpDgUHCO
-         oxDfeJ3aA6pnw==
+References: <20190716221639.GA44406@gmail.com> <20190720065807.GA711@sol.localdomain>
+ <0d4d6387-777c-bfd3-e54a-e7244fde0096@gmail.com> <CAKv+Gu9UF+a1UhVU19g1XcLaEqEaAwwkSm3-2wTHEAdD-q4mLQ@mail.gmail.com>
+ <MN2PR20MB2973B9C2DDC508A81AF4A207CAC40@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <CAKv+Gu9C2AEbb++W=QTVWbeA_88Fo57NcOwgU5R8HBvzFwXkJw@mail.gmail.com>
+ <MN2PR20MB2973C378AE5674F9E3E29445CAC60@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <CAKv+Gu-8n_DoauycDQS_9zzRew1rTuPaLxHyg6xhXMmqEvMaCA@mail.gmail.com>
+ <MN2PR20MB2973CAE4E9CFFE1F417B2509CAC10@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <CAKv+Gu-j-8-bQS2A46-Kf1KHtkoPJ5Htk8WratqzyngnVu-wpw@mail.gmail.com>
+ <MN2PR20MB29739591E1A3E54E7A8A8E18CAC00@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <VI1PR0402MB34850A016F3228124C0D360698C00@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+ <MN2PR20MB29732C3B360EB809EDFBFAC5CAC00@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <CAKv+Gu9krpqWYuD2mQFBTspo3y_TwrN6Arbvkcs=e4MpTeitHA@mail.gmail.com> <97532fae-4c17-bb8f-d245-04bf97cef4d1@gmail.com>
+In-Reply-To: <97532fae-4c17-bb8f-d245-04bf97cef4d1@gmail.com>
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date:   Sun, 4 Aug 2019 11:36:25 +0300
+Message-ID: <CAKv+Gu9JuXJspTO9tYbBgkdgmUznhgW+DWc029JWR2bqNsW_Bw@mail.gmail.com>
+Subject: Re: [dm-devel] xts fuzz testing and lack of ciphertext stealing support
+To:     Milan Broz <gmazyland@gmail.com>
+Cc:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>,
+        Horia Geanta <horia.geanta@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 8/2/19 11:48 AM, John Hubbard wrote:
-> On 8/2/19 2:19 AM, Joonas Lahtinen wrote:
->> Quoting john.hubbard@gmail.com (2019-08-02 05:19:37)
->>> From: John Hubbard <jhubbard@nvidia.com>
-...
-> In order to deal with the merge problem, I'll drop this patch from my ser=
-ies,
-> and I'd recommend that the drm-intel-next take the following approach:
+On Sat, 27 Jul 2019 at 19:04, Milan Broz <gmazyland@gmail.com> wrote:
+>
+> On 27/07/2019 07:39, Ard Biesheuvel wrote:
+> > Thanks for the additional test vectors. They work fine with my SIMD
+> > implementations for ARM [0], so this looks like it might be a CAAM
+> > problem, not a problem with the test vectors.
+> >
+> > I will try to find some time today to run them through OpenSSL to double check.
+>
+> I shamelessly copied your test vectors to my vector test for cryptsetup backend.
+>
+> Both OpenSSL and gcrypt XTS implementation passed all tests here!
+>
+> If interested - this is copy of backend we have in cryptsetup, vectors added in crypto-vectors.c
+> (there are some hard defines in Makefile, cryptsetup uses autoconf instead).
+>   OpenSSL: https://github.com/mbroz/cryptsetup_backend_test
+>   gcrypt branch: https://github.com/mbroz/cryptsetup_backend_test/tree/gcrypt
+>
+> Once kernel AF_ALG supports it, I can easily test it the same way.
+>
 
-Actually, I just pulled the latest linux.git, and there are a few changes:
+Thanks for confirming. So we can be reasonably confident that the test
+vectors contributed by Pascal are sound.
 
->=20
-> 1) For now, s/put_page/put_user_page/ in i915_gem_userptr_put_pages(),
-> and fix up the set_page_dirty() --> set_page_dirty_lock() issue, like thi=
-s
-> (based against linux.git):
->=20
-> diff --git a/drivers/gpu/drm/i915/gem/i915_gem_userptr.c b/drivers/gpu/dr=
-m/i915/gem/i915_gem_userptr.c
-> index 528b61678334..94721cc0093b 100644
-> --- a/drivers/gpu/drm/i915/gem/i915_gem_userptr.c
-> +++ b/drivers/gpu/drm/i915/gem/i915_gem_userptr.c
-> @@ -664,10 +664,10 @@ i915_gem_userptr_put_pages(struct drm_i915_gem_obje=
-ct *obj,
->=20
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 for_each_sgt_page(page, sgt_it=
-er, pages) {
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 if (obj->mm.dirty)
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 set_page_dirty=
-(page);
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 set_page_dirty=
-_lock(page);
-
-I see you've already applied this fix to your tree, in linux.git already.
-
->=20
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 mark_page_accessed(page);
-> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 put_page(page);
-> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 put_user_page(page);
-
-But this conversion still needs doing. So I'll repost a patch that only doe=
-s=20
-this (plus the other call sites).=20
-
-That can go in via either your tree, or Andrew's -mm tree, without generati=
-ng
-any conflicts.
-
-thanks,
---=20
-John Hubbard
-NVIDIA
+I'll try to send out my ARM/arm64 changes shortly. However, I won't
+have any access to hardware until end of next month, so they are
+tested on QEMU only, which means I won't be able to provide any
+performance numbers.
