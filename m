@@ -2,113 +2,137 @@ Return-Path: <SRS0=yZoL=WA=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 801B7C433FF
-	for <linux-crypto@archiver.kernel.org>; Sun,  4 Aug 2019 09:42:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63786C32750
+	for <linux-crypto@archiver.kernel.org>; Sun,  4 Aug 2019 22:50:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4AD372085B
-	for <linux-crypto@archiver.kernel.org>; Sun,  4 Aug 2019 09:42:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1564911739;
-	bh=eHZ3LbVmL56YmqVlqrvOvSSJqzheWzSMhiY9l05NP2o=;
-	h=From:Subject:To:References:Date:In-Reply-To:List-ID:From;
-	b=k10KKrId6P38iN1Ot5ZeCclc406H+mTWl0b590f6SqapSu9W3+XDWvyGaZhuJ8JgO
-	 9bcBoiJGYI6tuNVr3Is8tWZzTHR9ATW7MsyIdV3T0IsCH2QbC7foRhyN3qohFZARQM
-	 BxmfIwb9VR4JxPEkiy165/WRVZ5pcbAYFWS3M2ZQ=
+	by mail.kernel.org (Postfix) with ESMTP id 3A4FE217D9
+	for <linux-crypto@archiver.kernel.org>; Sun,  4 Aug 2019 22:50:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YPOY1YFd"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726155AbfHDJmS (ORCPT
+        id S1727857AbfHDWuO (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 4 Aug 2019 05:42:18 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49874 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726037AbfHDJmR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 4 Aug 2019 05:42:17 -0400
-Received: from [192.168.0.101] (unknown [180.111.32.87])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4A5C02070D;
-        Sun,  4 Aug 2019 09:42:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1564911736;
-        bh=eHZ3LbVmL56YmqVlqrvOvSSJqzheWzSMhiY9l05NP2o=;
-        h=From:Subject:To:References:Date:In-Reply-To:From;
-        b=cLRH8T6ZTkrZK5qS1nnzFT8DjeL2x+uywKyjzjXJH2irPLsvRPe4dqQc6Tk1XuxHC
-         6Y7KEfgh9+Y+tAVpgnfmZoe7NCQJeOKo/g4Y1DJ1F/afQry2WGDSwmae1pj6bLGNCO
-         QJsggE08iTcD2KYJ7TcVNyDvJjt5HHfWLe/X0wDI=
-From:   Chao Yu <chao@kernel.org>
-Subject: [f2fs-dev] [PATCH v7 14/16] f2fs: wire up new fscrypt ioctls
-To:     Chao Yu <yuchao0@huawei.com>, linux-fscrypt@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net,
-        linux-mtd@lists.infradead.org, linux-api@vger.kernel.org,
-        linux-crypto@vger.kernel.org, keyrings@vger.kernel.org,
-        Paul Crowley <paulcrowley@google.com>,
-        Satya Tangirala <satyat@google.com>
-References: <20190726224141.14044-1-ebiggers@kernel.org>
- <20190726224141.14044-15-ebiggers@kernel.org>
- <e3cf53a7-faf2-0321-22de-07d2e2783752@huawei.com>
- <20190802173148.GA51937@gmail.com>
-Message-ID: <88479efb-6625-8778-f802-e159ec60a374@kernel.org>
-Date:   Sun, 4 Aug 2019 17:42:11 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.9.1
+        Sun, 4 Aug 2019 18:50:14 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:46133 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727833AbfHDWuM (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 4 Aug 2019 18:50:12 -0400
+Received: by mail-pf1-f196.google.com with SMTP id c3so15459771pfa.13;
+        Sun, 04 Aug 2019 15:50:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=rv0dCo+fqAQ13SgPxACDlFOa16RsKjSPlFe+eBoZNRU=;
+        b=YPOY1YFdr7iX/mwZQqcGNXlBs0EVKoyeBFEUqInEu6rA0ndI8Mif+0ZPJeKKJ5iFwE
+         NKOF3uvUa5VJ+UGiH9nbc87NqjJWsSl0scr9GeK88ydFUly3DCHseKqxTpEd0IfXvu5q
+         jcaFXkdAdHJL26lkS0kDgmBvj/6IRTs5wSna3kfRs+vwcKzTL9APp6Wsc+o3ppVF+IRl
+         wjQCOTSjcDQ7GQjBBXsLdt+Iue6eXN2thWrje4Rt9XoDAoEpWZdNECCtZUxO8cwujSm4
+         fowCwuwgU3C+BFfj4zTJJ1Y4PbaxN4OhvtwxUy9pYDnCK6XNpmRXg/q/Jb/Qj5fLadYM
+         mSpA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=rv0dCo+fqAQ13SgPxACDlFOa16RsKjSPlFe+eBoZNRU=;
+        b=p0RQPw7V2j67sPntsztBCkUfSg+ohRh26pa9tq+N/cj3pn5qoSfZXrl1tLS4GP4lMr
+         fV4r+nP5BO/yOC7MVqUC8T4dV21RKl5A6FSaavJ3cBeqQ5DBN5doCuCkBoCSXpLrl1kS
+         SRDFFdfRmorr7KwKWoKn0zn3SZheLUen/OXqyG1O5xb3QPxHbVgdQSNuvDvd2/M3aisj
+         GgQzL0/X2/t6oEbFpoSD9aw5a/K0ESOuB6xiptsPzEq6PGYoAJVfvG3PhtSo8DmGLYGM
+         ejPcZyFBPruaSjYRpWILGamBCqmtXcOxqnLt281WhnL4IC+SY8n4eHQpbZ0/LMQwsZ1S
+         Ya+w==
+X-Gm-Message-State: APjAAAV4icaxZdRyeaZLoRFBfoW4nX/Ky8boHz28hclItFGhY3JlHk14
+        8JITuTgjUAM18vJcxPrD6RI=
+X-Google-Smtp-Source: APXvYqxvM1qX7vPDXvngph7SDjRt5A72CS0QHjJHMrDwzL+npYmbY1LXNKjG2Jciqo+k4AO5Wz8/Mw==
+X-Received: by 2002:a17:90a:b883:: with SMTP id o3mr15076411pjr.50.1564959011569;
+        Sun, 04 Aug 2019 15:50:11 -0700 (PDT)
+Received: from blueforge.nvidia.com (searspoint.nvidia.com. [216.228.112.21])
+        by smtp.gmail.com with ESMTPSA id r6sm35946836pjb.22.2019.08.04.15.50.10
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Sun, 04 Aug 2019 15:50:11 -0700 (PDT)
+From:   john.hubbard@gmail.com
+X-Google-Original-From: jhubbard@nvidia.com
+To:     Andrew Morton <akpm@linux-foundation.org>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Chinner <david@fromorbit.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        amd-gfx@lists.freedesktop.org, ceph-devel@vger.kernel.org,
+        devel@driverdev.osuosl.org, devel@lists.orangefs.org,
+        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-fbdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-mm@kvack.org,
+        linux-nfs@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-rpi-kernel@lists.infradead.org, linux-xfs@vger.kernel.org,
+        netdev@vger.kernel.org, rds-devel@oss.oracle.com,
+        sparclinux@vger.kernel.org, x86@kernel.org,
+        xen-devel@lists.xenproject.org, John Hubbard <jhubbard@nvidia.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Jiri Olsa <jolsa@redhat.com>,
+        Namhyung Kim <namhyung@kernel.org>
+Subject: [PATCH v2 33/34] kernel/events/core.c: convert put_page() to put_user_page*()
+Date:   Sun,  4 Aug 2019 15:49:14 -0700
+Message-Id: <20190804224915.28669-34-jhubbard@nvidia.com>
+X-Mailer: git-send-email 2.22.0
+In-Reply-To: <20190804224915.28669-1-jhubbard@nvidia.com>
+References: <20190804224915.28669-1-jhubbard@nvidia.com>
 MIME-Version: 1.0
-In-Reply-To: <20190802173148.GA51937@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-NVConfidentiality: public
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2019-8-3 1:31, Eric Biggers wrote:
-> On Fri, Aug 02, 2019 at 04:10:15PM +0800, Chao Yu wrote:
->> Hi Eric,
->>
->> On 2019/7/27 6:41, Eric Biggers wrote:
->>> From: Eric Biggers <ebiggers@google.com>
->>>
->>> Wire up the new ioctls for adding and removing fscrypt keys to/from the
->>> filesystem, and the new ioctl for retrieving v2 encryption policies.
->>>
->>> FS_IOC_REMOVE_ENCRYPTION_KEY also required making f2fs_drop_inode() call
->>> fscrypt_drop_inode().
->>>
->>> For more details see Documentation/filesystems/fscrypt.rst and the
->>> fscrypt patches that added the implementation of these ioctls.
->>>
->>> Signed-off-by: Eric Biggers <ebiggers@google.com>
->>
->> Reviewed-by: Chao Yu <yuchao0@huawei.com>
->>
->> BTW, do you think it needs to make xxfs_has_support_encrypt() function be a
->> common interface defined in struct fscrypt_operations, as I see all
->> fscrypt_ioctl_*() needs to check with it, tho such cleanup is minor...
->>
-> 
-> Maybe.  It would work nicely for ext4 and f2fs, but ubifs does things
-> differently since it automatically enables the encryption feature if needed.
-> So we'd have to make the callback optional.
+From: John Hubbard <jhubbard@nvidia.com>
 
-Correct, ubifs can leave the callback as NULL function pointer.
+For pages that were retained via get_user_pages*(), release those pages
+via the new put_user_page*() routines, instead of via put_page() or
+release_pages().
 
-> 
-> In any case, I think this should be separate from this patchset.
+This is part a tree-wide conversion, as described in commit fc1d8e7cca2d
+("mm: introduce put_user_page*(), placeholder versions").
 
-Yup, it can be done in a separated patch if need.
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Arnaldo Carvalho de Melo <acme@kernel.org>
+Cc: Alexander Shishkin <alexander.shishkin@linux.intel.com>
+Cc: Jiri Olsa <jolsa@redhat.com>
+Cc: Namhyung Kim <namhyung@kernel.org>
+Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+---
+ kernel/events/core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thanks,
+diff --git a/kernel/events/core.c b/kernel/events/core.c
+index 0463c1151bae..7be52bbbfe87 100644
+--- a/kernel/events/core.c
++++ b/kernel/events/core.c
+@@ -6426,7 +6426,7 @@ static u64 perf_virt_to_phys(u64 virt)
+ 			phys_addr = page_to_phys(p) + virt % PAGE_SIZE;
+ 
+ 		if (p)
+-			put_page(p);
++			put_user_page(p);
+ 	}
+ 
+ 	return phys_addr;
+-- 
+2.22.0
 
-> 
-> - Eric
-> 
-> 
-> _______________________________________________
-> Linux-f2fs-devel mailing list
-> Linux-f2fs-devel@lists.sourceforge.net
-> https://lists.sourceforge.net/lists/listinfo/linux-f2fs-devel
-> 
