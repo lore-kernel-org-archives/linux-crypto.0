@@ -2,153 +2,84 @@ Return-Path: <SRS0=2Ix1=WB=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4E12C433FF
-	for <linux-crypto@archiver.kernel.org>; Mon,  5 Aug 2019 20:00:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3799EC0650F
+	for <linux-crypto@archiver.kernel.org>; Mon,  5 Aug 2019 21:00:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AAD722054F
-	for <linux-crypto@archiver.kernel.org>; Mon,  5 Aug 2019 20:00:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=c-s.fr header.i=@c-s.fr header.b="SURmVZ86"
+	by mail.kernel.org (Postfix) with ESMTP id 0924A20C01
+	for <linux-crypto@archiver.kernel.org>; Mon,  5 Aug 2019 21:00:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728831AbfHEUAx (ORCPT
+        id S1730600AbfHEVAJ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 5 Aug 2019 16:00:53 -0400
-Received: from pegase1.c-s.fr ([93.17.236.30]:12231 "EHLO pegase1.c-s.fr"
+        Mon, 5 Aug 2019 17:00:09 -0400
+Received: from mga02.intel.com ([134.134.136.20]:45420 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727830AbfHEUAx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 5 Aug 2019 16:00:53 -0400
-Received: from localhost (mailhub1-int [192.168.12.234])
-        by localhost (Postfix) with ESMTP id 462TCg5rBbz9ty2B;
-        Mon,  5 Aug 2019 22:00:47 +0200 (CEST)
-Authentication-Results: localhost; dkim=pass
-        reason="1024-bit key; insecure key"
-        header.d=c-s.fr header.i=@c-s.fr header.b=SURmVZ86; dkim-adsp=pass;
-        dkim-atps=neutral
-X-Virus-Scanned: Debian amavisd-new at c-s.fr
-Received: from pegase1.c-s.fr ([192.168.12.234])
-        by localhost (pegase1.c-s.fr [192.168.12.234]) (amavisd-new, port 10024)
-        with ESMTP id g9geWnIk7yUW; Mon,  5 Aug 2019 22:00:47 +0200 (CEST)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-        by pegase1.c-s.fr (Postfix) with ESMTP id 462TCg4g8rz9ty26;
-        Mon,  5 Aug 2019 22:00:47 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=c-s.fr; s=mail;
-        t=1565035247; bh=rwMfEg/bO0WFaZBML2KPkLXU25VS1HK0tM4ZHGyTba8=;
-        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
-        b=SURmVZ86Xzt7rfSr5dvqWCmhTXzo0XOWhZA6lCrS1Dz8c5vbfp4rjBhcM1OPsOk++
-         sr25OfHGONW6KD/xe4N/A9OO5OlBoiL5hnXNmIsAZU48jqZD/BXSIiE1av4zD0oNHz
-         iqAYm+Nzte5oxy9ksGOgbBTGe15bpYRM7BLtybo0=
-Received: from localhost (localhost [127.0.0.1])
-        by messagerie.si.c-s.fr (Postfix) with ESMTP id CC0DC8B7D1;
-        Mon,  5 Aug 2019 22:00:47 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-        by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-        with ESMTP id rnxZG8YdvVpZ; Mon,  5 Aug 2019 22:00:47 +0200 (CEST)
-Received: from [192.168.4.90] (unknown [192.168.4.90])
-        by messagerie.si.c-s.fr (Postfix) with ESMTP id 722098B7B7;
-        Mon,  5 Aug 2019 22:00:47 +0200 (CEST)
-Subject: Re: [PATCH v4 23/30] crypto: talitos/des - switch to new verification
- routines
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        linux-crypto@vger.kernel.org
-Cc:     herbert@gondor.apana.org.au, ebiggers@kernel.org,
-        horia.geanta@nxp.com
-References: <20190805170037.31330-1-ard.biesheuvel@linaro.org>
- <20190805170037.31330-24-ard.biesheuvel@linaro.org>
-From:   Christophe Leroy <christophe.leroy@c-s.fr>
-Message-ID: <bb4e8b45-93cc-e849-bd1b-60660da85c21@c-s.fr>
-Date:   Mon, 5 Aug 2019 22:00:47 +0200
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        id S1730036AbfHEVAJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 5 Aug 2019 17:00:09 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Aug 2019 13:59:20 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,350,1559545200"; 
+   d="scan'208";a="181782659"
+Received: from unknown (HELO localhost) ([10.252.52.83])
+  by FMSMGA003.fm.intel.com with ESMTP; 05 Aug 2019 13:59:15 -0700
+Date:   Mon, 5 Aug 2019 23:59:15 +0300
+From:   Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+To:     Sumit Garg <sumit.garg@linaro.org>
+Cc:     keyrings@vger.kernel.org, linux-integrity@vger.kernel.org,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        linux-security-module@vger.kernel.org, dhowells@redhat.com,
+        Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
+        jejb@linux.ibm.com, Mimi Zohar <zohar@linux.ibm.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Casey Schaufler <casey@schaufler-ca.com>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Daniel Thompson <daniel.thompson@linaro.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "tee-dev @ lists . linaro . org" <tee-dev@lists.linaro.org>
+Subject: Re: [RFC/RFT v2 1/2] KEYS: trusted: create trusted keys subsystem
+Message-ID: <20190805205915.k5enrfob2cocqyff@linux.intel.com>
+References: <1563449086-13183-1-git-send-email-sumit.garg@linaro.org>
+ <1563449086-13183-2-git-send-email-sumit.garg@linaro.org>
+ <20190801172310.cldcftfdoh5vyfjg@linux.intel.com>
+ <CAFA6WYM+FQuXA9Saj5+ffOGsc-shhiF5Uos4g14Qndvu6w97Sg@mail.gmail.com>
+ <20190802193802.jn56jhoz5crebggt@linux.intel.com>
+ <CAFA6WYOMXc2y=vXOwRv+PYyF8oBV70G7CrJ81jvD5yJT41zLZw@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20190805170037.31330-24-ard.biesheuvel@linaro.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFA6WYOMXc2y=vXOwRv+PYyF8oBV70G7CrJ81jvD5yJT41zLZw@mail.gmail.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+User-Agent: NeoMutt/20180716
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Mon, Aug 05, 2019 at 10:32:59AM +0530, Sumit Garg wrote:
+> Okay, I will try to move TPM2 trusted keys code also.
 
+I'm definitely for extending trusted keys beyond TPMs. Before that can be
+done, however, the current mess needs to be cleaned up.
 
-Le 05/08/2019 à 19:00, Ard Biesheuvel a écrit :
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+I did a lot of work recently [1] to clean up TPM transmit code to better
+suited to be used outside of the TPM drivers (remove recursive calls,
+put the whole stack use tpm_buf for everything).
 
-Reviewed-by: Christophe Leroy <christophe.leroy@c-s.fr>
+What still needs to be done is to move tpm_buf stuff to include/linux in
+order to be usable in the keyring code. Also for TPM 2.0 trusted keys,
+TPM2 constants need to be moved to include/linux. For the latter, I'd
+suggest to move all protocol constants there and not just what is
+required for trusted keys. Better to have them in one place.
 
-> ---
->   drivers/crypto/talitos.c | 34 ++++----------------
->   1 file changed, 7 insertions(+), 27 deletions(-)
-> 
-> diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-> index c9d686a0e805..890cf52007f2 100644
-> --- a/drivers/crypto/talitos.c
-> +++ b/drivers/crypto/talitos.c
-> @@ -30,7 +30,7 @@
->   
->   #include <crypto/algapi.h>
->   #include <crypto/aes.h>
-> -#include <crypto/des.h>
-> +#include <crypto/internal/des.h>
->   #include <crypto/sha.h>
->   #include <crypto/md5.h>
->   #include <crypto/internal/aead.h>
-> @@ -939,12 +939,9 @@ static int aead_des3_setkey(struct crypto_aead *authenc,
->   	if (keys.enckeylen != DES3_EDE_KEY_SIZE)
->   		goto badkey;
->   
-> -	flags = crypto_aead_get_flags(authenc);
-> -	err = __des3_verify_key(&flags, keys.enckey);
-> -	if (unlikely(err)) {
-> -		crypto_aead_set_flags(authenc, flags);
-> +	err = crypto_des3_ede_verify_key(crypto_aead_tfm(authenc), keys.enckey);
-> +	if (err)
->   		goto out;
-> -	}
->   
->   	if (ctx->keylen)
->   		dma_unmap_single(dev, ctx->dma_key, ctx->keylen, DMA_TO_DEVICE);
-> @@ -1517,32 +1514,15 @@ static int ablkcipher_setkey(struct crypto_ablkcipher *cipher,
->   static int ablkcipher_des_setkey(struct crypto_ablkcipher *cipher,
->   				 const u8 *key, unsigned int keylen)
->   {
-> -	u32 tmp[DES_EXPKEY_WORDS];
-> -
-> -	if (unlikely(crypto_ablkcipher_get_flags(cipher) &
-> -		     CRYPTO_TFM_REQ_FORBID_WEAK_KEYS) &&
-> -	    !des_ekey(tmp, key)) {
-> -		crypto_ablkcipher_set_flags(cipher, CRYPTO_TFM_RES_WEAK_KEY);
-> -		return -EINVAL;
-> -	}
-> -
-> -	return ablkcipher_setkey(cipher, key, keylen);
-> +	return crypto_des_verify_key(crypto_ablkcipher_tfm(cipher), key) ?:
-> +	       ablkcipher_setkey(cipher, key, keylen);
->   }
->   
->   static int ablkcipher_des3_setkey(struct crypto_ablkcipher *cipher,
->   				  const u8 *key, unsigned int keylen)
->   {
-> -	u32 flags;
-> -	int err;
-> -
-> -	flags = crypto_ablkcipher_get_flags(cipher);
-> -	err = __des3_verify_key(&flags, key);
-> -	if (unlikely(err)) {
-> -		crypto_ablkcipher_set_flags(cipher, flags);
-> -		return err;
-> -	}
-> -
-> -	return ablkcipher_setkey(cipher, key, keylen);
-> +	return crypto_des3_ede_verify_key(crypto_ablkcipher_tfm(cipher), key) ?:
-> +	       ablkcipher_setkey(cipher, key, keylen);
->   }
->   
->   static int ablkcipher_aes_setkey(struct crypto_ablkcipher *cipher,
-> 
+[1] https://lkml.org/lkml/2019/2/13/176
+
+/Jarkko
