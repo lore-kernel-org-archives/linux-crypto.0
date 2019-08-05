@@ -2,107 +2,131 @@ Return-Path: <SRS0=2Ix1=WB=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F7EEC433FF
-	for <linux-crypto@archiver.kernel.org>; Mon,  5 Aug 2019 21:51:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11BF1C433FF
+	for <linux-crypto@archiver.kernel.org>; Mon,  5 Aug 2019 23:32:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 12E56208E3
-	for <linux-crypto@archiver.kernel.org>; Mon,  5 Aug 2019 21:51:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1565041911;
-	bh=MgPcfIWpdlyaz/4ct/wZ0UcAXhmKA32yt1LEiLncyHQ=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=10wvitjdDbz8c0gVVqsZ8FVNXkyLlxNfRCoYQI2AoTWXr7SQhgl9gPxmUXFm+0NGT
-	 2oQK8qHfG6wWxzGvtCBzX6E0RnWxZySH/mtMKxpxmbMTm3yx8Ljh3xnz97CAngaPmY
-	 YkesNuwTdN/8VT4gK/YCPzV5KTLGiezZZDOmnGJw=
+	by mail.kernel.org (Postfix) with ESMTP id D957E2070D
+	for <linux-crypto@archiver.kernel.org>; Mon,  5 Aug 2019 23:32:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="BVla6KTE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728892AbfHEVvu (ORCPT
+        id S1730733AbfHEXcn (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 5 Aug 2019 17:51:50 -0400
-Received: from mail.kernel.org ([198.145.29.99]:52756 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728483AbfHEVvt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 5 Aug 2019 17:51:49 -0400
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id D270F2173C;
-        Mon,  5 Aug 2019 21:51:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1565041909;
-        bh=MgPcfIWpdlyaz/4ct/wZ0UcAXhmKA32yt1LEiLncyHQ=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=R0xHCpb0g7SHZbZSfnCgdwnbwgS4Xbgluirjaa3QaWH2G8g6B6sd7z9ojk6VdPM5u
-         sx386MjPhHOvVxN/Ck5kcqoSwqN9ySJco3QIyEVapQpi+x8U3ZqAV5MDC/oRHyG0To
-         gGGmgUyaF2zeJxhxDhuWoXYUJ1qK3tjP3Mi2LDHg=
-Received: by mail-qt1-f173.google.com with SMTP id d17so3616700qtj.8;
-        Mon, 05 Aug 2019 14:51:48 -0700 (PDT)
-X-Gm-Message-State: APjAAAVWQ9TIQq7HlTwEpLEo73hUek5j1oIbfu/g865Esm6fG1i5Sh6S
-        FzBUzHHaNBLx7z/w1DppMQ0zXIDNNbPp7WJW9g==
-X-Google-Smtp-Source: APXvYqxZCbKR4+PbJDpQLUsmi/4xl7NR/p4fqmhm9SFCdgM1DYmSwogal7/7LXK8ld8NUdCwOW78bsSs41kuNcTohmI=
-X-Received: by 2002:a0c:acef:: with SMTP id n44mr147329qvc.39.1565041907997;
- Mon, 05 Aug 2019 14:51:47 -0700 (PDT)
+        Mon, 5 Aug 2019 19:32:43 -0400
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:40986 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728870AbfHEXcn (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 5 Aug 2019 19:32:43 -0400
+Received: by mail-pf1-f194.google.com with SMTP id m30so40429230pff.8
+        for <linux-crypto@vger.kernel.org>; Mon, 05 Aug 2019 16:32:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=pkJZsBEn/CiiuZNhsnLr0nSUJKwxAQY9KFBx3uOaLzo=;
+        b=BVla6KTEpKUsi2JPfceTSbxAKyqH5jrH4XqqkmrMT1+57w231S3ir7e9VLkaSMDJlz
+         FEuw5OnOBz+gBdON/yvqKUU+A1gTri8F7kEHVSGNS3YH9ES9+uDhp/Q+xeNyCrGzZJjw
+         B0RcRCta5/6rpmtTYdJuwA2qMrR0Oln/7LTRE=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=pkJZsBEn/CiiuZNhsnLr0nSUJKwxAQY9KFBx3uOaLzo=;
+        b=Ytg/P7n4MdkM+NL9Q61yX3InrKoEzsIx4al2b/WZhfa2zwDr2lGImu4BxO6uVK7LPE
+         JxIqg5zkVZMFIJSw0K755gYN6FZEJRANtvwGh7xRSVl8W46WNGALO56e1m4vBri1o/G8
+         3jBo8f5hIs9UrmFeH/K6NKyGiEozYgZAAM78x3Knnm9k6EO0c79mmwvuLfrLu4MBwjN7
+         VfA8xmnuK92twZeqAqPWElqrrU8HjpmTwwSdYcTjKu5SwhRdrG5YwSWa/R3rLjsYnJIQ
+         tOIp5QmP753inoSM7JvlAwbSeP+uvVVqMML+N4rmvNkr00CZb8TwovImMNy2gGP1V0y+
+         v4ag==
+X-Gm-Message-State: APjAAAU+yPfbZVR2tz2VI+EYlOJFypLW3Y5+JmHn/S4a5aKWpsZslQB8
+        w+pSkOvaJDNowyP1pZmYUEtb9w==
+X-Google-Smtp-Source: APXvYqz2ZiBz50jumbmTgWp5vdv/wsrJgV24UFUfx0VjaX+bimV63+csf6KP0Pd3/yyEgfaO+elfYg==
+X-Received: by 2002:a17:90a:c588:: with SMTP id l8mr228070pjt.16.1565047962658;
+        Mon, 05 Aug 2019 16:32:42 -0700 (PDT)
+Received: from smtp.gmail.com ([2620:15c:202:1:fa53:7765:582b:82b9])
+        by smtp.gmail.com with ESMTPSA id u128sm97748195pfu.48.2019.08.05.16.32.41
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Mon, 05 Aug 2019 16:32:42 -0700 (PDT)
+From:   Stephen Boyd <swboyd@chromium.org>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Andrey Pronin <apronin@chromium.org>,
+        Duncan Laurie <dlaurie@chromium.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>, Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Guenter Roeck <groeck@chromium.org>,
+        Alexander Steffen <Alexander.Steffen@infineon.com>
+Subject: [PATCH v3] hwrng: core: Freeze khwrng thread during suspend
+Date:   Mon,  5 Aug 2019 16:32:41 -0700
+Message-Id: <20190805233241.220521-1-swboyd@chromium.org>
+X-Mailer: git-send-email 2.22.0.770.g0f2c4a37fd-goog
 MIME-Version: 1.0
-References: <20190805120320.32282-1-narmstrong@baylibre.com>
-In-Reply-To: <20190805120320.32282-1-narmstrong@baylibre.com>
-From:   Rob Herring <robh+dt@kernel.org>
-Date:   Mon, 5 Aug 2019 15:51:36 -0600
-X-Gmail-Original-Message-ID: <CAL_JsqJzwtSXX0nrS7RBP8u-e=16SiWOBjLrvy8Amc08PfpXag@mail.gmail.com>
-Message-ID: <CAL_JsqJzwtSXX0nrS7RBP8u-e=16SiWOBjLrvy8Amc08PfpXag@mail.gmail.com>
-Subject: Re: [RFCv2 0/9] dt-bindings: first tentative of conversion to yaml format
-To:     Neil Armstrong <narmstrong@baylibre.com>
-Cc:     linux-amlogic@lists.infradead.org,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        "open list:SERIAL DRIVERS" <linux-serial@vger.kernel.org>,
-        linux-spi <linux-spi@vger.kernel.org>,
-        LINUX-WATCHDOG <linux-watchdog@vger.kernel.org>,
-        "moderated list:ARM/FREESCALE IMX / MXC ARM ARCHITECTURE" 
-        <linux-arm-kernel@lists.infradead.org>, devicetree@vger.kernel.org,
-        Jassi Brar <jassisinghbrar@gmail.com>,
-        Kishon Vijay Abraham I <kishon@ti.com>,
-        Philipp Zabel <p.zabel@pengutronix.de>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Aug 5, 2019 at 6:03 AM Neil Armstrong <narmstrong@baylibre.com> wrote:
->
-> This is a first tentative to convert some of the simplest Amlogic
-> dt-bindings to the yaml format.
->
-> All have been tested using :
-> $ make ARCH=arm64 dtbs_check
->
-> Issues with the amlogic arm64 DTs has already been identified thanks
-> to the validation scripts. The DT fixes will be pushed once these yaml
-> bindings are acked.
->
-> Changes since rfc v1:
-> - Fixed bindings according to Rob's comments
-> - Added commit log
-> - renamed yaml files using amlogic prefix
->
-> Neil Armstrong (9):
->   dt-bindings: mailbox: meson-mhu: convert to yaml
->   dt-bindings: rng: amlogic,meson-rng: convert to yaml
->   dt-bindings: spi: meson: convert to yaml
->   dt-bindings: reset: amlogic,meson-reset: convert to yaml
->   dt-bindings: arm: amlogic: amlogic,meson-gx-ao-secure: convert to yaml
->   dt-bindings: phy: meson-g12a-usb2-phy: convert to yaml
->   dt-bindings: phy: meson-g12a-usb3-pcie-phy: convert to yaml
->   dt-bindings: serial: meson-uart: convert to yaml
->   dt-bindings: watchdog: meson-gxbb-wdt: convert to yaml
+The hwrng_fill() function can run while devices are suspending and
+resuming. If the hwrng is behind a bus such as i2c or SPI and that bus
+is suspended, the hwrng may hang the bus while attempting to add some
+randomness. It's been observed on ChromeOS devices with suspend-to-idle
+(s2idle) and an i2c based hwrng that this kthread may run and ask the
+hwrng device for randomness before the i2c bus has been resumed.
 
-For the series,
+Let's make this kthread freezable so that we don't try to touch the
+hwrng during suspend/resume. This ensures that we can't cause the hwrng
+backing driver to get into a bad state because the device is guaranteed
+to be resumed before the hwrng kthread is thawed.
 
-Reviewed-by: Rob Herring <robh@kernel.org>
+Cc: Andrey Pronin <apronin@chromium.org>
+Cc: Duncan Laurie <dlaurie@chromium.org>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Arnd Bergmann <arnd@arndb.de>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Guenter Roeck <groeck@chromium.org>
+Cc: Alexander Steffen <Alexander.Steffen@infineon.com>
+Signed-off-by: Stephen Boyd <swboyd@chromium.org>
+---
 
-What's your merge plan? Do you want me to take the whole series?
+I'm splitting this patch off of the larger series so it can
+go through the crypto tree. See [1] for the prevoius round.
+Nothing has changed in this patch since then.
 
-Rob
+[1] https://lkml.kernel.org/r/20190716224518.62556-2-swboyd@chromium.org
+
+ drivers/char/hw_random/core.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
+index 95be7228f327..3b88af3149a7 100644
+--- a/drivers/char/hw_random/core.c
++++ b/drivers/char/hw_random/core.c
+@@ -13,6 +13,7 @@
+ #include <linux/delay.h>
+ #include <linux/device.h>
+ #include <linux/err.h>
++#include <linux/freezer.h>
+ #include <linux/fs.h>
+ #include <linux/hw_random.h>
+ #include <linux/kernel.h>
+@@ -421,7 +422,9 @@ static int hwrng_fillfn(void *unused)
+ {
+ 	long rc;
+ 
+-	while (!kthread_should_stop()) {
++	set_freezable();
++
++	while (!kthread_freezable_should_stop(NULL)) {
+ 		struct hwrng *rng;
+ 
+ 		rng = get_current_rng();
+-- 
+Sent by a computer through tubes
+
