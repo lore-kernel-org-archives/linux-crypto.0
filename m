@@ -2,43 +2,43 @@ Return-Path: <SRS0=2Ix1=WB=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECF76C433FF
-	for <linux-crypto@archiver.kernel.org>; Mon,  5 Aug 2019 16:28:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F031CC0650F
+	for <linux-crypto@archiver.kernel.org>; Mon,  5 Aug 2019 16:28:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B97E5216B7
-	for <linux-crypto@archiver.kernel.org>; Mon,  5 Aug 2019 16:28:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B1330216B7
+	for <linux-crypto@archiver.kernel.org>; Mon,  5 Aug 2019 16:28:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1565022513;
-	bh=LqkJPwRbIJWtTHNU/mQ+ZTHl9Y6z46DQPE4wViYyWpY=;
-	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=rLjEkMb++emSZUYmwfdxsZ5z0vbSeNkf6mQcxbalQ/dHFEKOdn569bYtXt3t8N0el
-	 TKOjmCSCkFk2cwkQOyVbqzsdlAxd/V4AL163nYBGVA0UuqKoC1DJ6Mjtp3hfcllIDn
-	 LdrJPvVUTwMeEjhSCYA+GFHSbAljZkOM4tpVBGGw=
+	s=default; t=1565022514;
+	bh=epgWC0ic0Vps9mf8jLO74TmbrQ7mXtNVzjvNBHhYtO0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=YjRMCA/So5WcDGqNip1I/k9dB8bsZ5dXumTnOPi8JCOjuzZTlTumYvnQ5hF6gStOS
+	 AdHZ2r7d3UzuUSmJxbjDmweMAOxoypoOC0GCl/kDwLgLYYJGtsJXf0gNvVAxRML+N4
+	 1SrIUTH3YgEIfKKpsGkJFZaIUa68/A2oFzVJL8FM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728871AbfHEQ2c (ORCPT
+        id S1729845AbfHEQ2e (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 5 Aug 2019 12:28:32 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60394 "EHLO mail.kernel.org"
+        Mon, 5 Aug 2019 12:28:34 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60434 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728867AbfHEQ2b (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 5 Aug 2019 12:28:31 -0400
+        id S1729464AbfHEQ2d (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 5 Aug 2019 12:28:33 -0400
 Received: from ebiggers-linuxstation.mtv.corp.google.com (unknown [104.132.1.77])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id BEDFE2086D;
-        Mon,  5 Aug 2019 16:28:29 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 541512173C;
+        Mon,  5 Aug 2019 16:28:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1565022510;
-        bh=LqkJPwRbIJWtTHNU/mQ+ZTHl9Y6z46DQPE4wViYyWpY=;
-        h=From:To:Cc:Subject:Date:From;
-        b=Jj9v+7sB6Z88nnGXHknp8hg9fJROfiKAgjPeVw69CrAucIln0d0DJMQ8AjcBHurFS
-         oCanS3XIpi2kEGEJEjduU5NrseXQo6VwAuIhAXTzwT8wZWfPSNjJI9iVlRkd9NLINP
-         BRUZpvXPd5Wr5zolve8SVg4hxAZQQpQa18Gx5x+g=
+        s=default; t=1565022511;
+        bh=epgWC0ic0Vps9mf8jLO74TmbrQ7mXtNVzjvNBHhYtO0=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=iL8ffAThr+Gi7Gg5KnfSYSShTTe7zTREtSFWglr3trXQmR4zCUT5N4Xexvm+mxqGo
+         D49FIKmYwplqgEGMHTUdQi2RTHHNjzVxl9B7sDidVTK+Ppy9Lt05lhCln+b4FIQ/LB
+         RHDuxHoq8owTmjlqOUrN2mWYksredhOHSGPt1fVU=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-fscrypt@vger.kernel.org
 Cc:     linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
@@ -47,10 +47,12 @@ Cc:     linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
         linux-api@vger.kernel.org, Satya Tangirala <satyat@google.com>,
         Paul Crowley <paulcrowley@google.com>,
         Theodore Ts'o <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>
-Subject: [PATCH v8 00/20] fscrypt: key management improvements
-Date:   Mon,  5 Aug 2019 09:25:01 -0700
-Message-Id: <20190805162521.90882-1-ebiggers@kernel.org>
+Subject: [PATCH v8 03/20] fscrypt: use FSCRYPT_* definitions, not FS_*
+Date:   Mon,  5 Aug 2019 09:25:04 -0700
+Message-Id: <20190805162521.90882-4-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.22.0.770.g0f2c4a37fd-goog
+In-Reply-To: <20190805162521.90882-1-ebiggers@kernel.org>
+References: <20190805162521.90882-1-ebiggers@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
@@ -58,239 +60,378 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello,
+From: Eric Biggers <ebiggers@google.com>
 
-[Note: I'd like to apply this for v5.4.  Additional review is greatly
- appreciated, especially of the API before it's set in stone.  Thanks!]
+Update fs/crypto/ to use the new names for the UAPI constants rather
+than the old names, then make the old definitions conditional on
+!__KERNEL__.
 
-This patchset makes major improvements to how keys are added, removed,
-and derived in fscrypt, aka ext4/f2fs/ubifs encryption.  It does this by
-adding new ioctls that add and remove encryption keys directly to/from
-the filesystem, and by adding a new encryption policy version ("v2")
-where the user-provided keys are only used as input to HKDF-SHA512 and
-are identified by their cryptographic hash.
+Reviewed-by: Theodore Ts'o <tytso@mit.edu>
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ fs/crypto/crypto.c           |  2 +-
+ fs/crypto/fname.c            |  2 +-
+ fs/crypto/fscrypt_private.h  | 16 +++++------
+ fs/crypto/keyinfo.c          | 53 ++++++++++++++++++------------------
+ fs/crypto/policy.c           | 14 +++++-----
+ include/uapi/linux/fscrypt.h |  2 ++
+ 6 files changed, 46 insertions(+), 43 deletions(-)
 
-All new APIs and all cryptosystem changes are documented in
-Documentation/filesystems/fscrypt.rst.  Userspace can use the new key
-management ioctls with existing encrypted directories, but migrating to
-v2 encryption policies is needed for the full benefits.
-
-These changes solve four interrelated problems:
-
-(1) Providing fscrypt keys via process-subscribed keyrings is abusing
-    encryption as an OS-level access control mechanism, causing many
-    bugs where processes don't get access to the keys they need -- e.g.,
-    when a 'sudo' command or a system service needs to access encrypted
-    files.  It's also inconsistent with the filesystem/VFS "view" of
-    encrypted files which is global, so sometimes things randomly happen
-    to work anyway due to caching.  Regardless, currently almost all
-    fscrypt users actually do need global keys, so they're having to use
-    workarounds that heavily abuse the session or user keyrings, e.g.
-    Android and Chromium OS both use a systemwide "session keyring" and
-    the 'fscrypt' tool links all user keyrings into root's user keyring.
-
-(2) Currently there's no way to securely and efficiently remove a
-    fscrypt key such that not only is the original key wiped, but also
-    all files and directories protected by that key are "locked" and
-    their per-file keys wiped.  Many users want this and are using
-    'echo 2 > /proc/sys/vm/drop_caches' as a workaround, but this is
-    root-only, and also is overkill so can be a performance disaster.
-
-(3) The key derivation function (KDF) that fscrypt uses to derive
-    per-file keys is nonstandard, inflexible, and has some weaknesses
-    such as being reversible and not evenly distributing the entropy
-    from the user-provided keys.
-
-(4) fscrypt doesn't check that the correct key was supplied.  This can
-    be a security vulnerability, since it allows malicious local users
-    to associate the wrong key with files to which they have read-only
-    access, causing other users' processes to read/write the wrong data.
-
-Ultimately, the solutions to these problems all tie into each other.  By
-adding a filesystem-level encryption keyring with ioctls to add/remove
-keys to/from it, the keys are made usable filesystem-wide (solves
-problem #1).  It also becomes easy to track the inodes that were
-"unlocked" with each key, so they can be evicted when the key is removed
-(solves problem #2).  Moreover, the filesystem-level keyring is a
-natural place to store an HMAC transform keyed by each key, thus making
-it easy and efficient to switch the KDF to HKDF (solves problem #3).
-
-Finally, to check that the correct key was supplied, I use HKDF to
-derive a cryptographically secure key_identifier for each key (solves
-problem #4).  This in combination with key quotas and other careful
-precautions also makes it safe to allow non-root users to add and remove
-keys to/from the filesystem-level keyring.  Thus, all problems are
-solved without having to restrict the fscrypt API to root only.
-
-The patchset is organized as follows:
-
-- Patches 1-8 create a dedicated UAPI header for fscrypt and do various
-  refactoring and cleanups in preparation for the later patches.
-
-- Patches 9-11 add new ioctls FS_IOC_ADD_ENCRYPTION_KEY,
-  FS_IOC_REMOVE_ENCRYPTION_KEY, and FS_IOC_GET_ENCRYPTION_KEY_STATUS.
-  Adding a key logically "unlocks" all files on the filesystem that are
-  protected by that key; removing a key "locks" them again.
-
-- Patches 12-16 add support for v2 encryption policies.
-
-- Patches 17-19 wire up the new ioctls to ext4, f2fs, and ubifs.
-
-- Patch 20 updates the fscrypt documentation for all the changes.
-
-This patchset applies to v5.3-rc3 with the pending fscrypt cleanup
-patches applied (https://patchwork.kernel.org/patch/11057589/ and
-https://patchwork.kernel.org/cover/11057583/).
-You can also get it from git at:
-
-	Repository:   https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git
-	Branch:       fscrypt-key-mgmt-improvements-v8
-
-I've written xfstests for the new APIs.  They test the APIs themselves
-as well as verify the correctness of the ciphertext stored on-disk for
-v2 encryption policies.  The tests can be found at:
-
-	Repository:   https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/xfstests-dev.git
-	Branch:       fscrypt-key-mgmt-improvements
-
-The xfstests depend on new xfs_io commands which can be found at:
-
-	Repository:   https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/xfsprogs-dev.git
-	Branch:       fscrypt-key-mgmt-improvements
-
-This patchset also passes all the existing encryption tests in xfstests,
-including the ciphertext verification tests which verify that there are
-no regressions in the crypto for any existing encryption settings.
-
-I've also made proof-of-concept changes to the 'fscrypt' userspace
-program (https://github.com/google/fscrypt) to make it support v2
-encryption policies.  You can find these changes in git at:
-
-	Repository:   https://github.com/ebiggers/fscrypt.git
-	Branch:       fscrypt-key-mgmt-improvements
-
-To make the 'fscrypt' userspace program experimentally use v2 encryption
-policies on new encrypted directories, add the following to
-/etc/fscrypt.conf within the "options" section:
-
-	"policy_version": "2"
-
-Finally, it's also planned for Android and Chromium OS to switch to the
-new ioctls and eventually to v2 encryption policies.  Work-in-progress,
-proof-of-concept changes by Satya Tangirala for AOSP can be found at
-https://android-review.googlesource.com/q/topic:fscrypt-key-mgmt-improvements
-
-Changes v7 => v8:
-    - Replace -EUSERS and -EBUSY statuses for
-      FS_IOC_REMOVE_ENCRYPTION_KEY with informational status flags.
-    - Replace FSCRYPT_REMOVE_KEY_FLAG_ALL_USERS with a separate ioctl,
-      FS_IOC_REMOVE_ENCRYPTION_KEY_ALL_USERS.
-    - Improve the documentation.
-    - Improve some comments.
-    - Rename keysetup_legacy.c => keysetup_v1.c, and split the keyinfo.c
-      refactoring into multiple patches to make it easier to review.
-    - Avoid checks like 'if (v1 policy) { ... } else { ... }' even when
-      the policy version was already validated.  Instead handle v1, v2,
-      and default case explicitly.
-    - In warning messages that refer to keys in the fs-level keyring,
-      say "descriptor" or "identifier" instead of "description".
-    - Restore a fscrypt_warn() that was accidentally lost when rebasing.
-    - Rebase onto v5.3-rc3.
-    - Other small cleanups.
-
-Changes v6 => v7:
-    - Rebase onto v5.3-rc1 and the pending fscrypt cleanups.
-    - Work around false positive compile-time buffer overflow check in
-      copy_from_user() in fscrypt_ioctl_set_policy() when building an
-      i386 kernel in a specific config with an old gcc version.
-    - A few very minor cleanups.
-
-Changes v5 => v6:
-    - Change HKDF to use the specification-defined default salt rather
-      than a custom fixed salt, and prepend the string "fscrypt" to
-      'info' instead.  This is arguably needed to match how RFC 5869 and
-      SP 800-56C are worded.  Both ways are secure in this context, so
-      prefer the "boring" way that clearly matches the standards.
-    - Rebase onto v5.2-rc1.
-    - A few small cleanups.
-
-Changes v4 => v5:
-    - Simplify shrink_dcache_inode(), as suggested by Al Viro;
-      also move it into fs/crypto/.
-    - Fix a build error on some architectures by calling
-      copy_from_user() rather than get_user() with a __u64 pointer.
-
-Changes v3 => v4:
-    - Introduce fscrypt_sb_free() to avoid an extra #ifdef.
-    - Fix UBIFS's ->drop_inode().
-    - Add 'version' to union fscrypt_policy and union fscrypt_context.
-
-Changes v2 => v3:
-    - Use ->drop_inode() to trigger the inode eviction during/after
-      FS_IOC_REMOVE_ENCRYPTION_KEY, as suggested by Dave Chinner.
-    - A few small cleanups.
-
-v1 of this patchset was sent in October 2017 with title "fscrypt:
-filesystem-level keyring and v2 policy support".  This revived version
-follows the same basic design but incorporates numerous improvements,
-such as splitting keyinfo.c into multiple files for much better
-understandability, and introducing "per-mode" encryption keys to
-implement the semantics of the DIRECT_KEY encryption policy flag.
-
-Eric Biggers (20):
-  fs, fscrypt: move uapi definitions to new header <linux/fscrypt.h>
-  fscrypt: use FSCRYPT_ prefix for uapi constants
-  fscrypt: use FSCRYPT_* definitions, not FS_*
-  fscrypt: add ->ci_inode to fscrypt_info
-  fscrypt: rename fscrypt_master_key to fscrypt_direct_key
-  fscrypt: refactor key setup code in preparation for v2 policies
-  fscrypt: move v1 policy key setup to keysetup_v1.c
-  fscrypt: rename keyinfo.c to keysetup.c
-  fscrypt: add FS_IOC_ADD_ENCRYPTION_KEY ioctl
-  fscrypt: add FS_IOC_REMOVE_ENCRYPTION_KEY ioctl
-  fscrypt: add FS_IOC_GET_ENCRYPTION_KEY_STATUS ioctl
-  fscrypt: add an HKDF-SHA512 implementation
-  fscrypt: v2 encryption policy support
-  fscrypt: allow unprivileged users to add/remove keys for v2 policies
-  fscrypt: add FS_IOC_REMOVE_ENCRYPTION_KEY_ALL_USERS ioctl
-  fscrypt: require that key be added when setting a v2 encryption policy
-  ext4: wire up new fscrypt ioctls
-  f2fs: wire up new fscrypt ioctls
-  ubifs: wire up new fscrypt ioctls
-  fscrypt: document the new ioctls and policy version
-
- Documentation/filesystems/fscrypt.rst | 755 ++++++++++++++++----
- MAINTAINERS                           |   1 +
- fs/crypto/Kconfig                     |   2 +
- fs/crypto/Makefile                    |  10 +-
- fs/crypto/crypto.c                    |  12 +-
- fs/crypto/fname.c                     |   5 +-
- fs/crypto/fscrypt_private.h           | 389 +++++++++-
- fs/crypto/hkdf.c                      | 181 +++++
- fs/crypto/keyinfo.c                   | 627 ----------------
- fs/crypto/keyring.c                   | 981 ++++++++++++++++++++++++++
- fs/crypto/keysetup.c                  | 591 ++++++++++++++++
- fs/crypto/keysetup_v1.c               | 340 +++++++++
- fs/crypto/policy.c                    | 434 +++++++++---
- fs/ext4/ioctl.c                       |  30 +
- fs/ext4/super.c                       |   3 +
- fs/f2fs/file.c                        |  58 ++
- fs/f2fs/super.c                       |   2 +
- fs/super.c                            |   2 +
- fs/ubifs/ioctl.c                      |  20 +
- fs/ubifs/super.c                      |  11 +
- include/linux/fs.h                    |   1 +
- include/linux/fscrypt.h               |  55 +-
- include/uapi/linux/fs.h               |  54 +-
- include/uapi/linux/fscrypt.h          | 181 +++++
- 24 files changed, 3787 insertions(+), 958 deletions(-)
- create mode 100644 fs/crypto/hkdf.c
- delete mode 100644 fs/crypto/keyinfo.c
- create mode 100644 fs/crypto/keyring.c
- create mode 100644 fs/crypto/keysetup.c
- create mode 100644 fs/crypto/keysetup_v1.c
- create mode 100644 include/uapi/linux/fscrypt.h
-
+diff --git a/fs/crypto/crypto.c b/fs/crypto/crypto.c
+index 3e4624cfe4b54d..7502c1f0ede9e9 100644
+--- a/fs/crypto/crypto.c
++++ b/fs/crypto/crypto.c
+@@ -141,7 +141,7 @@ void fscrypt_generate_iv(union fscrypt_iv *iv, u64 lblk_num,
+ 	memset(iv, 0, ci->ci_mode->ivsize);
+ 	iv->lblk_num = cpu_to_le64(lblk_num);
+ 
+-	if (ci->ci_flags & FS_POLICY_FLAG_DIRECT_KEY)
++	if (ci->ci_flags & FSCRYPT_POLICY_FLAG_DIRECT_KEY)
+ 		memcpy(iv->nonce, ci->ci_nonce, FS_KEY_DERIVATION_NONCE_SIZE);
+ 
+ 	if (ci->ci_essiv_tfm != NULL)
+diff --git a/fs/crypto/fname.c b/fs/crypto/fname.c
+index 5cab3bb2d1fc00..f4977d44d69b81 100644
+--- a/fs/crypto/fname.c
++++ b/fs/crypto/fname.c
+@@ -182,7 +182,7 @@ bool fscrypt_fname_encrypted_size(const struct inode *inode, u32 orig_len,
+ 				  u32 max_len, u32 *encrypted_len_ret)
+ {
+ 	int padding = 4 << (inode->i_crypt_info->ci_flags &
+-			    FS_POLICY_FLAGS_PAD_MASK);
++			    FSCRYPT_POLICY_FLAGS_PAD_MASK);
+ 	u32 encrypted_len;
+ 
+ 	if (orig_len > max_len)
+diff --git a/fs/crypto/fscrypt_private.h b/fs/crypto/fscrypt_private.h
+index 4d715708c6e1f7..fae411b2f78dcb 100644
+--- a/fs/crypto/fscrypt_private.h
++++ b/fs/crypto/fscrypt_private.h
+@@ -34,7 +34,7 @@ struct fscrypt_context {
+ 	u8 contents_encryption_mode;
+ 	u8 filenames_encryption_mode;
+ 	u8 flags;
+-	u8 master_key_descriptor[FS_KEY_DESCRIPTOR_SIZE];
++	u8 master_key_descriptor[FSCRYPT_KEY_DESCRIPTOR_SIZE];
+ 	u8 nonce[FS_KEY_DERIVATION_NONCE_SIZE];
+ } __packed;
+ 
+@@ -84,7 +84,7 @@ struct fscrypt_info {
+ 	u8 ci_data_mode;
+ 	u8 ci_filename_mode;
+ 	u8 ci_flags;
+-	u8 ci_master_key_descriptor[FS_KEY_DESCRIPTOR_SIZE];
++	u8 ci_master_key_descriptor[FSCRYPT_KEY_DESCRIPTOR_SIZE];
+ 	u8 ci_nonce[FS_KEY_DERIVATION_NONCE_SIZE];
+ };
+ 
+@@ -98,16 +98,16 @@ typedef enum {
+ static inline bool fscrypt_valid_enc_modes(u32 contents_mode,
+ 					   u32 filenames_mode)
+ {
+-	if (contents_mode == FS_ENCRYPTION_MODE_AES_128_CBC &&
+-	    filenames_mode == FS_ENCRYPTION_MODE_AES_128_CTS)
++	if (contents_mode == FSCRYPT_MODE_AES_128_CBC &&
++	    filenames_mode == FSCRYPT_MODE_AES_128_CTS)
+ 		return true;
+ 
+-	if (contents_mode == FS_ENCRYPTION_MODE_AES_256_XTS &&
+-	    filenames_mode == FS_ENCRYPTION_MODE_AES_256_CTS)
++	if (contents_mode == FSCRYPT_MODE_AES_256_XTS &&
++	    filenames_mode == FSCRYPT_MODE_AES_256_CTS)
+ 		return true;
+ 
+-	if (contents_mode == FS_ENCRYPTION_MODE_ADIANTUM &&
+-	    filenames_mode == FS_ENCRYPTION_MODE_ADIANTUM)
++	if (contents_mode == FSCRYPT_MODE_ADIANTUM &&
++	    filenames_mode == FSCRYPT_MODE_ADIANTUM)
+ 		return true;
+ 
+ 	return false;
+diff --git a/fs/crypto/keyinfo.c b/fs/crypto/keyinfo.c
+index 2129943002335c..22345ddede1199 100644
+--- a/fs/crypto/keyinfo.c
++++ b/fs/crypto/keyinfo.c
+@@ -20,7 +20,7 @@
+ 
+ static struct crypto_shash *essiv_hash_tfm;
+ 
+-/* Table of keys referenced by FS_POLICY_FLAG_DIRECT_KEY policies */
++/* Table of keys referenced by DIRECT_KEY policies */
+ static DEFINE_HASHTABLE(fscrypt_master_keys, 6); /* 6 bits = 64 buckets */
+ static DEFINE_SPINLOCK(fscrypt_master_keys_lock);
+ 
+@@ -77,7 +77,7 @@ static int derive_key_aes(const u8 *master_key,
+  */
+ static struct key *
+ find_and_lock_process_key(const char *prefix,
+-			  const u8 descriptor[FS_KEY_DESCRIPTOR_SIZE],
++			  const u8 descriptor[FSCRYPT_KEY_DESCRIPTOR_SIZE],
+ 			  unsigned int min_keysize,
+ 			  const struct fscrypt_key **payload_ret)
+ {
+@@ -87,7 +87,7 @@ find_and_lock_process_key(const char *prefix,
+ 	const struct fscrypt_key *payload;
+ 
+ 	description = kasprintf(GFP_NOFS, "%s%*phN", prefix,
+-				FS_KEY_DESCRIPTOR_SIZE, descriptor);
++				FSCRYPT_KEY_DESCRIPTOR_SIZE, descriptor);
+ 	if (!description)
+ 		return ERR_PTR(-ENOMEM);
+ 
+@@ -105,7 +105,7 @@ find_and_lock_process_key(const char *prefix,
+ 	payload = (const struct fscrypt_key *)ukp->data;
+ 
+ 	if (ukp->datalen != sizeof(struct fscrypt_key) ||
+-	    payload->size < 1 || payload->size > FS_MAX_KEY_SIZE) {
++	    payload->size < 1 || payload->size > FSCRYPT_MAX_KEY_SIZE) {
+ 		fscrypt_warn(NULL,
+ 			     "key with description '%s' has invalid payload",
+ 			     key->description);
+@@ -129,32 +129,32 @@ find_and_lock_process_key(const char *prefix,
+ }
+ 
+ static struct fscrypt_mode available_modes[] = {
+-	[FS_ENCRYPTION_MODE_AES_256_XTS] = {
++	[FSCRYPT_MODE_AES_256_XTS] = {
+ 		.friendly_name = "AES-256-XTS",
+ 		.cipher_str = "xts(aes)",
+ 		.keysize = 64,
+ 		.ivsize = 16,
+ 	},
+-	[FS_ENCRYPTION_MODE_AES_256_CTS] = {
++	[FSCRYPT_MODE_AES_256_CTS] = {
+ 		.friendly_name = "AES-256-CTS-CBC",
+ 		.cipher_str = "cts(cbc(aes))",
+ 		.keysize = 32,
+ 		.ivsize = 16,
+ 	},
+-	[FS_ENCRYPTION_MODE_AES_128_CBC] = {
++	[FSCRYPT_MODE_AES_128_CBC] = {
+ 		.friendly_name = "AES-128-CBC",
+ 		.cipher_str = "cbc(aes)",
+ 		.keysize = 16,
+ 		.ivsize = 16,
+ 		.needs_essiv = true,
+ 	},
+-	[FS_ENCRYPTION_MODE_AES_128_CTS] = {
++	[FSCRYPT_MODE_AES_128_CTS] = {
+ 		.friendly_name = "AES-128-CTS-CBC",
+ 		.cipher_str = "cts(cbc(aes))",
+ 		.keysize = 16,
+ 		.ivsize = 16,
+ 	},
+-	[FS_ENCRYPTION_MODE_ADIANTUM] = {
++	[FSCRYPT_MODE_ADIANTUM] = {
+ 		.friendly_name = "Adiantum",
+ 		.cipher_str = "adiantum(xchacha12,aes)",
+ 		.keysize = 32,
+@@ -192,7 +192,7 @@ static int find_and_derive_key(const struct inode *inode,
+ 	const struct fscrypt_key *payload;
+ 	int err;
+ 
+-	key = find_and_lock_process_key(FS_KEY_DESC_PREFIX,
++	key = find_and_lock_process_key(FSCRYPT_KEY_DESC_PREFIX,
+ 					ctx->master_key_descriptor,
+ 					mode->keysize, &payload);
+ 	if (key == ERR_PTR(-ENOKEY) && inode->i_sb->s_cop->key_prefix) {
+@@ -203,7 +203,7 @@ static int find_and_derive_key(const struct inode *inode,
+ 	if (IS_ERR(key))
+ 		return PTR_ERR(key);
+ 
+-	if (ctx->flags & FS_POLICY_FLAG_DIRECT_KEY) {
++	if (ctx->flags & FSCRYPT_POLICY_FLAG_DIRECT_KEY) {
+ 		if (mode->ivsize < offsetofend(union fscrypt_iv, nonce)) {
+ 			fscrypt_warn(inode,
+ 				     "Direct key mode not allowed with %s",
+@@ -272,14 +272,14 @@ allocate_skcipher_for_mode(struct fscrypt_mode *mode, const u8 *raw_key,
+ 	return ERR_PTR(err);
+ }
+ 
+-/* Master key referenced by FS_POLICY_FLAG_DIRECT_KEY policy */
++/* Master key referenced by DIRECT_KEY policy */
+ struct fscrypt_master_key {
+ 	struct hlist_node mk_node;
+ 	refcount_t mk_refcount;
+ 	const struct fscrypt_mode *mk_mode;
+ 	struct crypto_skcipher *mk_ctfm;
+-	u8 mk_descriptor[FS_KEY_DESCRIPTOR_SIZE];
+-	u8 mk_raw[FS_MAX_KEY_SIZE];
++	u8 mk_descriptor[FSCRYPT_KEY_DESCRIPTOR_SIZE];
++	u8 mk_raw[FSCRYPT_MAX_KEY_SIZE];
+ };
+ 
+ static void free_master_key(struct fscrypt_master_key *mk)
+@@ -320,13 +320,13 @@ find_or_insert_master_key(struct fscrypt_master_key *to_insert,
+ 	 * raw key, and use crypto_memneq() when comparing raw keys.
+ 	 */
+ 
+-	BUILD_BUG_ON(sizeof(hash_key) > FS_KEY_DESCRIPTOR_SIZE);
++	BUILD_BUG_ON(sizeof(hash_key) > FSCRYPT_KEY_DESCRIPTOR_SIZE);
+ 	memcpy(&hash_key, ci->ci_master_key_descriptor, sizeof(hash_key));
+ 
+ 	spin_lock(&fscrypt_master_keys_lock);
+ 	hash_for_each_possible(fscrypt_master_keys, mk, mk_node, hash_key) {
+ 		if (memcmp(ci->ci_master_key_descriptor, mk->mk_descriptor,
+-			   FS_KEY_DESCRIPTOR_SIZE) != 0)
++			   FSCRYPT_KEY_DESCRIPTOR_SIZE) != 0)
+ 			continue;
+ 		if (mode != mk->mk_mode)
+ 			continue;
+@@ -370,7 +370,7 @@ fscrypt_get_master_key(const struct fscrypt_info *ci, struct fscrypt_mode *mode,
+ 		goto err_free_mk;
+ 	}
+ 	memcpy(mk->mk_descriptor, ci->ci_master_key_descriptor,
+-	       FS_KEY_DESCRIPTOR_SIZE);
++	       FSCRYPT_KEY_DESCRIPTOR_SIZE);
+ 	memcpy(mk->mk_raw, raw_key, mode->keysize);
+ 
+ 	return find_or_insert_master_key(mk, raw_key, mode, ci);
+@@ -448,8 +448,8 @@ static int init_essiv_generator(struct fscrypt_info *ci, const u8 *raw_key,
+ 
+ /*
+  * Given the encryption mode and key (normally the derived key, but for
+- * FS_POLICY_FLAG_DIRECT_KEY mode it's the master key), set up the inode's
+- * symmetric cipher transform object(s).
++ * DIRECT_KEY mode it's the master key), set up the inode's symmetric cipher
++ * transform object(s).
+  */
+ static int setup_crypto_transform(struct fscrypt_info *ci,
+ 				  struct fscrypt_mode *mode,
+@@ -459,7 +459,7 @@ static int setup_crypto_transform(struct fscrypt_info *ci,
+ 	struct crypto_skcipher *ctfm;
+ 	int err;
+ 
+-	if (ci->ci_flags & FS_POLICY_FLAG_DIRECT_KEY) {
++	if (ci->ci_flags & FSCRYPT_POLICY_FLAG_DIRECT_KEY) {
+ 		mk = fscrypt_get_master_key(ci, mode, raw_key, inode);
+ 		if (IS_ERR(mk))
+ 			return PTR_ERR(mk);
+@@ -476,7 +476,7 @@ static int setup_crypto_transform(struct fscrypt_info *ci,
+ 	if (mode->needs_essiv) {
+ 		/* ESSIV implies 16-byte IVs which implies !DIRECT_KEY */
+ 		WARN_ON(mode->ivsize != AES_BLOCK_SIZE);
+-		WARN_ON(ci->ci_flags & FS_POLICY_FLAG_DIRECT_KEY);
++		WARN_ON(ci->ci_flags & FSCRYPT_POLICY_FLAG_DIRECT_KEY);
+ 
+ 		err = init_essiv_generator(ci, raw_key, mode->keysize);
+ 		if (err) {
+@@ -530,9 +530,10 @@ int fscrypt_get_encryption_info(struct inode *inode)
+ 		/* Fake up a context for an unencrypted directory */
+ 		memset(&ctx, 0, sizeof(ctx));
+ 		ctx.format = FS_ENCRYPTION_CONTEXT_FORMAT_V1;
+-		ctx.contents_encryption_mode = FS_ENCRYPTION_MODE_AES_256_XTS;
+-		ctx.filenames_encryption_mode = FS_ENCRYPTION_MODE_AES_256_CTS;
+-		memset(ctx.master_key_descriptor, 0x42, FS_KEY_DESCRIPTOR_SIZE);
++		ctx.contents_encryption_mode = FSCRYPT_MODE_AES_256_XTS;
++		ctx.filenames_encryption_mode = FSCRYPT_MODE_AES_256_CTS;
++		memset(ctx.master_key_descriptor, 0x42,
++		       FSCRYPT_KEY_DESCRIPTOR_SIZE);
+ 	} else if (res != sizeof(ctx)) {
+ 		fscrypt_warn(inode,
+ 			     "Unknown encryption context size (%d bytes)", res);
+@@ -545,7 +546,7 @@ int fscrypt_get_encryption_info(struct inode *inode)
+ 		return -EINVAL;
+ 	}
+ 
+-	if (ctx.flags & ~FS_POLICY_FLAGS_VALID) {
++	if (ctx.flags & ~FSCRYPT_POLICY_FLAGS_VALID) {
+ 		fscrypt_warn(inode, "Unknown encryption context flags (0x%02x)",
+ 			     ctx.flags);
+ 		return -EINVAL;
+@@ -559,7 +560,7 @@ int fscrypt_get_encryption_info(struct inode *inode)
+ 	crypt_info->ci_data_mode = ctx.contents_encryption_mode;
+ 	crypt_info->ci_filename_mode = ctx.filenames_encryption_mode;
+ 	memcpy(crypt_info->ci_master_key_descriptor, ctx.master_key_descriptor,
+-	       FS_KEY_DESCRIPTOR_SIZE);
++	       FSCRYPT_KEY_DESCRIPTOR_SIZE);
+ 	memcpy(crypt_info->ci_nonce, ctx.nonce, FS_KEY_DERIVATION_NONCE_SIZE);
+ 
+ 	mode = select_encryption_mode(crypt_info, inode);
+diff --git a/fs/crypto/policy.c b/fs/crypto/policy.c
+index 4941fe8471ceff..da7ae9c8b4ad0b 100644
+--- a/fs/crypto/policy.c
++++ b/fs/crypto/policy.c
+@@ -22,7 +22,7 @@ static bool is_encryption_context_consistent_with_policy(
+ 				const struct fscrypt_policy *policy)
+ {
+ 	return memcmp(ctx->master_key_descriptor, policy->master_key_descriptor,
+-		      FS_KEY_DESCRIPTOR_SIZE) == 0 &&
++		      FSCRYPT_KEY_DESCRIPTOR_SIZE) == 0 &&
+ 		(ctx->flags == policy->flags) &&
+ 		(ctx->contents_encryption_mode ==
+ 		 policy->contents_encryption_mode) &&
+@@ -37,13 +37,13 @@ static int create_encryption_context_from_policy(struct inode *inode,
+ 
+ 	ctx.format = FS_ENCRYPTION_CONTEXT_FORMAT_V1;
+ 	memcpy(ctx.master_key_descriptor, policy->master_key_descriptor,
+-					FS_KEY_DESCRIPTOR_SIZE);
++					FSCRYPT_KEY_DESCRIPTOR_SIZE);
+ 
+ 	if (!fscrypt_valid_enc_modes(policy->contents_encryption_mode,
+ 				     policy->filenames_encryption_mode))
+ 		return -EINVAL;
+ 
+-	if (policy->flags & ~FS_POLICY_FLAGS_VALID)
++	if (policy->flags & ~FSCRYPT_POLICY_FLAGS_VALID)
+ 		return -EINVAL;
+ 
+ 	ctx.contents_encryption_mode = policy->contents_encryption_mode;
+@@ -128,7 +128,7 @@ int fscrypt_ioctl_get_policy(struct file *filp, void __user *arg)
+ 	policy.filenames_encryption_mode = ctx.filenames_encryption_mode;
+ 	policy.flags = ctx.flags;
+ 	memcpy(policy.master_key_descriptor, ctx.master_key_descriptor,
+-				FS_KEY_DESCRIPTOR_SIZE);
++				FSCRYPT_KEY_DESCRIPTOR_SIZE);
+ 
+ 	if (copy_to_user(arg, &policy, sizeof(policy)))
+ 		return -EFAULT;
+@@ -202,7 +202,7 @@ int fscrypt_has_permitted_context(struct inode *parent, struct inode *child)
+ 	if (parent_ci && child_ci) {
+ 		return memcmp(parent_ci->ci_master_key_descriptor,
+ 			      child_ci->ci_master_key_descriptor,
+-			      FS_KEY_DESCRIPTOR_SIZE) == 0 &&
++			      FSCRYPT_KEY_DESCRIPTOR_SIZE) == 0 &&
+ 			(parent_ci->ci_data_mode == child_ci->ci_data_mode) &&
+ 			(parent_ci->ci_filename_mode ==
+ 			 child_ci->ci_filename_mode) &&
+@@ -219,7 +219,7 @@ int fscrypt_has_permitted_context(struct inode *parent, struct inode *child)
+ 
+ 	return memcmp(parent_ctx.master_key_descriptor,
+ 		      child_ctx.master_key_descriptor,
+-		      FS_KEY_DESCRIPTOR_SIZE) == 0 &&
++		      FSCRYPT_KEY_DESCRIPTOR_SIZE) == 0 &&
+ 		(parent_ctx.contents_encryption_mode ==
+ 		 child_ctx.contents_encryption_mode) &&
+ 		(parent_ctx.filenames_encryption_mode ==
+@@ -257,7 +257,7 @@ int fscrypt_inherit_context(struct inode *parent, struct inode *child,
+ 	ctx.filenames_encryption_mode = ci->ci_filename_mode;
+ 	ctx.flags = ci->ci_flags;
+ 	memcpy(ctx.master_key_descriptor, ci->ci_master_key_descriptor,
+-	       FS_KEY_DESCRIPTOR_SIZE);
++	       FSCRYPT_KEY_DESCRIPTOR_SIZE);
+ 	get_random_bytes(ctx.nonce, FS_KEY_DERIVATION_NONCE_SIZE);
+ 	BUILD_BUG_ON(sizeof(ctx) != FSCRYPT_SET_CONTEXT_MAX_SIZE);
+ 	res = parent->i_sb->s_cop->set_context(child, &ctx,
+diff --git a/include/uapi/linux/fscrypt.h b/include/uapi/linux/fscrypt.h
+index 674b0452ef5759..29a945d165def3 100644
+--- a/include/uapi/linux/fscrypt.h
++++ b/include/uapi/linux/fscrypt.h
+@@ -55,6 +55,7 @@ struct fscrypt_key {
+ /**********************************************************************/
+ 
+ /* old names; don't add anything new here! */
++#ifndef __KERNEL__
+ #define FS_KEY_DESCRIPTOR_SIZE		FSCRYPT_KEY_DESCRIPTOR_SIZE
+ #define FS_POLICY_FLAGS_PAD_4		FSCRYPT_POLICY_FLAGS_PAD_4
+ #define FS_POLICY_FLAGS_PAD_8		FSCRYPT_POLICY_FLAGS_PAD_8
+@@ -76,5 +77,6 @@ struct fscrypt_key {
+ #define FS_KEY_DESC_PREFIX		FSCRYPT_KEY_DESC_PREFIX
+ #define FS_KEY_DESC_PREFIX_SIZE		FSCRYPT_KEY_DESC_PREFIX_SIZE
+ #define FS_MAX_KEY_SIZE			FSCRYPT_MAX_KEY_SIZE
++#endif /* !__KERNEL__ */
+ 
+ #endif /* _UAPI_LINUX_FSCRYPT_H */
 -- 
-2.22.0
+2.22.0.770.g0f2c4a37fd-goog
 
