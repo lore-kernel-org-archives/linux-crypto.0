@@ -2,84 +2,107 @@ Return-Path: <SRS0=2Ix1=WB=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3799EC0650F
-	for <linux-crypto@archiver.kernel.org>; Mon,  5 Aug 2019 21:00:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F7EEC433FF
+	for <linux-crypto@archiver.kernel.org>; Mon,  5 Aug 2019 21:51:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0924A20C01
-	for <linux-crypto@archiver.kernel.org>; Mon,  5 Aug 2019 21:00:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 12E56208E3
+	for <linux-crypto@archiver.kernel.org>; Mon,  5 Aug 2019 21:51:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1565041911;
+	bh=MgPcfIWpdlyaz/4ct/wZ0UcAXhmKA32yt1LEiLncyHQ=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=10wvitjdDbz8c0gVVqsZ8FVNXkyLlxNfRCoYQI2AoTWXr7SQhgl9gPxmUXFm+0NGT
+	 2oQK8qHfG6wWxzGvtCBzX6E0RnWxZySH/mtMKxpxmbMTm3yx8Ljh3xnz97CAngaPmY
+	 YkesNuwTdN/8VT4gK/YCPzV5KTLGiezZZDOmnGJw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730600AbfHEVAJ (ORCPT
+        id S1728892AbfHEVvu (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 5 Aug 2019 17:00:09 -0400
-Received: from mga02.intel.com ([134.134.136.20]:45420 "EHLO mga02.intel.com"
+        Mon, 5 Aug 2019 17:51:50 -0400
+Received: from mail.kernel.org ([198.145.29.99]:52756 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730036AbfHEVAJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 5 Aug 2019 17:00:09 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Aug 2019 13:59:20 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,350,1559545200"; 
-   d="scan'208";a="181782659"
-Received: from unknown (HELO localhost) ([10.252.52.83])
-  by FMSMGA003.fm.intel.com with ESMTP; 05 Aug 2019 13:59:15 -0700
-Date:   Mon, 5 Aug 2019 23:59:15 +0300
-From:   Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-To:     Sumit Garg <sumit.garg@linaro.org>
-Cc:     keyrings@vger.kernel.org, linux-integrity@vger.kernel.org,
+        id S1728483AbfHEVvt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 5 Aug 2019 17:51:49 -0400
+Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id D270F2173C;
+        Mon,  5 Aug 2019 21:51:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1565041909;
+        bh=MgPcfIWpdlyaz/4ct/wZ0UcAXhmKA32yt1LEiLncyHQ=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=R0xHCpb0g7SHZbZSfnCgdwnbwgS4Xbgluirjaa3QaWH2G8g6B6sd7z9ojk6VdPM5u
+         sx386MjPhHOvVxN/Ck5kcqoSwqN9ySJco3QIyEVapQpi+x8U3ZqAV5MDC/oRHyG0To
+         gGGmgUyaF2zeJxhxDhuWoXYUJ1qK3tjP3Mi2LDHg=
+Received: by mail-qt1-f173.google.com with SMTP id d17so3616700qtj.8;
+        Mon, 05 Aug 2019 14:51:48 -0700 (PDT)
+X-Gm-Message-State: APjAAAVWQ9TIQq7HlTwEpLEo73hUek5j1oIbfu/g865Esm6fG1i5Sh6S
+        FzBUzHHaNBLx7z/w1DppMQ0zXIDNNbPp7WJW9g==
+X-Google-Smtp-Source: APXvYqxZCbKR4+PbJDpQLUsmi/4xl7NR/p4fqmhm9SFCdgM1DYmSwogal7/7LXK8ld8NUdCwOW78bsSs41kuNcTohmI=
+X-Received: by 2002:a0c:acef:: with SMTP id n44mr147329qvc.39.1565041907997;
+ Mon, 05 Aug 2019 14:51:47 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190805120320.32282-1-narmstrong@baylibre.com>
+In-Reply-To: <20190805120320.32282-1-narmstrong@baylibre.com>
+From:   Rob Herring <robh+dt@kernel.org>
+Date:   Mon, 5 Aug 2019 15:51:36 -0600
+X-Gmail-Original-Message-ID: <CAL_JsqJzwtSXX0nrS7RBP8u-e=16SiWOBjLrvy8Amc08PfpXag@mail.gmail.com>
+Message-ID: <CAL_JsqJzwtSXX0nrS7RBP8u-e=16SiWOBjLrvy8Amc08PfpXag@mail.gmail.com>
+Subject: Re: [RFCv2 0/9] dt-bindings: first tentative of conversion to yaml format
+To:     Neil Armstrong <narmstrong@baylibre.com>
+Cc:     linux-amlogic@lists.infradead.org,
         "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
         <linux-crypto@vger.kernel.org>,
-        linux-security-module@vger.kernel.org, dhowells@redhat.com,
-        Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
-        jejb@linux.ibm.com, Mimi Zohar <zohar@linux.ibm.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Casey Schaufler <casey@schaufler-ca.com>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Daniel Thompson <daniel.thompson@linaro.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "tee-dev @ lists . linaro . org" <tee-dev@lists.linaro.org>
-Subject: Re: [RFC/RFT v2 1/2] KEYS: trusted: create trusted keys subsystem
-Message-ID: <20190805205915.k5enrfob2cocqyff@linux.intel.com>
-References: <1563449086-13183-1-git-send-email-sumit.garg@linaro.org>
- <1563449086-13183-2-git-send-email-sumit.garg@linaro.org>
- <20190801172310.cldcftfdoh5vyfjg@linux.intel.com>
- <CAFA6WYM+FQuXA9Saj5+ffOGsc-shhiF5Uos4g14Qndvu6w97Sg@mail.gmail.com>
- <20190802193802.jn56jhoz5crebggt@linux.intel.com>
- <CAFA6WYOMXc2y=vXOwRv+PYyF8oBV70G7CrJ81jvD5yJT41zLZw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFA6WYOMXc2y=vXOwRv+PYyF8oBV70G7CrJ81jvD5yJT41zLZw@mail.gmail.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-User-Agent: NeoMutt/20180716
+        "open list:SERIAL DRIVERS" <linux-serial@vger.kernel.org>,
+        linux-spi <linux-spi@vger.kernel.org>,
+        LINUX-WATCHDOG <linux-watchdog@vger.kernel.org>,
+        "moderated list:ARM/FREESCALE IMX / MXC ARM ARCHITECTURE" 
+        <linux-arm-kernel@lists.infradead.org>, devicetree@vger.kernel.org,
+        Jassi Brar <jassisinghbrar@gmail.com>,
+        Kishon Vijay Abraham I <kishon@ti.com>,
+        Philipp Zabel <p.zabel@pengutronix.de>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Aug 05, 2019 at 10:32:59AM +0530, Sumit Garg wrote:
-> Okay, I will try to move TPM2 trusted keys code also.
+On Mon, Aug 5, 2019 at 6:03 AM Neil Armstrong <narmstrong@baylibre.com> wrote:
+>
+> This is a first tentative to convert some of the simplest Amlogic
+> dt-bindings to the yaml format.
+>
+> All have been tested using :
+> $ make ARCH=arm64 dtbs_check
+>
+> Issues with the amlogic arm64 DTs has already been identified thanks
+> to the validation scripts. The DT fixes will be pushed once these yaml
+> bindings are acked.
+>
+> Changes since rfc v1:
+> - Fixed bindings according to Rob's comments
+> - Added commit log
+> - renamed yaml files using amlogic prefix
+>
+> Neil Armstrong (9):
+>   dt-bindings: mailbox: meson-mhu: convert to yaml
+>   dt-bindings: rng: amlogic,meson-rng: convert to yaml
+>   dt-bindings: spi: meson: convert to yaml
+>   dt-bindings: reset: amlogic,meson-reset: convert to yaml
+>   dt-bindings: arm: amlogic: amlogic,meson-gx-ao-secure: convert to yaml
+>   dt-bindings: phy: meson-g12a-usb2-phy: convert to yaml
+>   dt-bindings: phy: meson-g12a-usb3-pcie-phy: convert to yaml
+>   dt-bindings: serial: meson-uart: convert to yaml
+>   dt-bindings: watchdog: meson-gxbb-wdt: convert to yaml
 
-I'm definitely for extending trusted keys beyond TPMs. Before that can be
-done, however, the current mess needs to be cleaned up.
+For the series,
 
-I did a lot of work recently [1] to clean up TPM transmit code to better
-suited to be used outside of the TPM drivers (remove recursive calls,
-put the whole stack use tpm_buf for everything).
+Reviewed-by: Rob Herring <robh@kernel.org>
 
-What still needs to be done is to move tpm_buf stuff to include/linux in
-order to be usable in the keyring code. Also for TPM 2.0 trusted keys,
-TPM2 constants need to be moved to include/linux. For the latter, I'd
-suggest to move all protocol constants there and not just what is
-required for trusted keys. Better to have them in one place.
+What's your merge plan? Do you want me to take the whole series?
 
-[1] https://lkml.org/lkml/2019/2/13/176
-
-/Jarkko
+Rob
