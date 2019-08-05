@@ -2,78 +2,138 @@ Return-Path: <SRS0=2Ix1=WB=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A776C433FF
-	for <linux-crypto@archiver.kernel.org>; Mon,  5 Aug 2019 16:32:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A672C433FF
+	for <linux-crypto@archiver.kernel.org>; Mon,  5 Aug 2019 16:53:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F3D912086D
-	for <linux-crypto@archiver.kernel.org>; Mon,  5 Aug 2019 16:32:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=alien8.de header.i=@alien8.de header.b="YwSydi+q"
+	by mail.kernel.org (Postfix) with ESMTP id 18E552147A
+	for <linux-crypto@archiver.kernel.org>; Mon,  5 Aug 2019 16:53:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726779AbfHEQcJ (ORCPT
+        id S1728871AbfHEQxN (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 5 Aug 2019 12:32:09 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:39300 "EHLO mail.skyhub.de"
+        Mon, 5 Aug 2019 12:53:13 -0400
+Received: from mga12.intel.com ([192.55.52.136]:43074 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726620AbfHEQcJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 5 Aug 2019 12:32:09 -0400
-Received: from zn.tnic (p200300EC2F065B00683A29B48F14DC99.dip0.t-ipconnect.de [IPv6:2003:ec:2f06:5b00:683a:29b4:8f14:dc99])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id A405F1EC0C31;
-        Mon,  5 Aug 2019 18:32:07 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1565022728;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=g+cTmbSEFfoz2KUZz+uvRnfYrlj//AwDFvYHV2OvsKQ=;
-        b=YwSydi+q2UAgpz8CC6RgebD3zV7GEPqVPv5pRN0M6jox/WccOZt9CR/6wdUcBGgHFie+wH
-        jGJIrKZSCnOA/4dXXVZ8d+KRrEUpIJO9cO/h4qAWyis7lZ28NvwoVi/AS9506pyVZldV3P
-        1Z2Jbc3INpkKJPe/0i3ikL9HuH4XOog=
-Date:   Mon, 5 Aug 2019 18:32:02 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Thomas Garnier <thgarnie@chromium.org>
-Cc:     kernel-hardening@lists.openwall.com, kristen@linux.intel.com,
-        keescook@chromium.org, Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v9 01/11] x86/crypto: Adapt assembly for PIE support
-Message-ID: <20190805163202.GD18785@zn.tnic>
-References: <20190730191303.206365-1-thgarnie@chromium.org>
- <20190730191303.206365-2-thgarnie@chromium.org>
+        id S1728760AbfHEQxN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 5 Aug 2019 12:53:13 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Aug 2019 09:53:12 -0700
+X-IronPort-AV: E=Sophos;i="5.64,350,1559545200"; 
+   d="scan'208";a="168030649"
+Received: from rdvivi-losangeles.jf.intel.com (HELO intel.com) ([10.7.196.65])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Aug 2019 09:53:12 -0700
+Date:   Mon, 5 Aug 2019 09:53:46 -0700
+From:   Rodrigo Vivi <rodrigo.vivi@intel.com>
+To:     john.hubbard@gmail.com
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        linux-fbdev@vger.kernel.org, Jan Kara <jack@suse.cz>,
+        kvm@vger.kernel.org, David Airlie <airlied@linux.ie>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Dave Chinner <david@fromorbit.com>,
+        dri-devel@lists.freedesktop.org, linux-mm@kvack.org,
+        sparclinux@vger.kernel.org, Ira Weiny <ira.weiny@intel.com>,
+        ceph-devel@vger.kernel.org, devel@driverdev.osuosl.org,
+        rds-devel@oss.oracle.com, linux-rdma@vger.kernel.org,
+        x86@kernel.org, amd-gfx@lists.freedesktop.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>, xen-devel@lists.xenproject.org,
+        devel@lists.orangefs.org, linux-media@vger.kernel.org,
+        John Hubbard <jhubbard@nvidia.com>,
+        intel-gfx@lists.freedesktop.org, linux-block@vger.kernel.org,
+        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+        linux-rpi-kernel@lists.infradead.org,
+        Dan Williams <dan.j.williams@intel.com>,
+        linux-arm-kernel@lists.infradead.org, linux-nfs@vger.kernel.org,
+        netdev@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        linux-xfs@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org
+Subject: Re: [PATCH v2 06/34] drm/i915: convert put_page() to put_user_page*()
+Message-ID: <20190805165346.GB25953@intel.com>
+References: <20190804224915.28669-1-jhubbard@nvidia.com>
+ <20190804224915.28669-7-jhubbard@nvidia.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190730191303.206365-2-thgarnie@chromium.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20190804224915.28669-7-jhubbard@nvidia.com>
+User-Agent: Mutt/1.11.3 (2019-02-01)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jul 30, 2019 at 12:12:45PM -0700, Thomas Garnier wrote:
-> Change the assembly code to use only relative references of symbols for the
-> kernel to be PIE compatible.
+On Sun, Aug 04, 2019 at 03:48:47PM -0700, john.hubbard@gmail.com wrote:
+> From: John Hubbard <jhubbard@nvidia.com>
 > 
-> Position Independent Executable (PIE) support will allow to extend the
-> KASLR randomization range below 0xffffffff80000000.
+> For pages that were retained via get_user_pages*(), release those pages
+> via the new put_user_page*() routines, instead of via put_page() or
+> release_pages().
+> 
+> This is part a tree-wide conversion, as described in commit fc1d8e7cca2d
+> ("mm: introduce put_user_page*(), placeholder versions").
+> 
+> This is a merge-able version of the fix, because it restricts
+> itself to put_user_page() and put_user_pages(), both of which
+> have not changed their APIs. Later, i915_gem_userptr_put_pages()
+> can be simplified to use put_user_pages_dirty_lock().
 
-I believe in previous reviews I asked about why this sentence is being
-replicated in every commit message and now it is still in every commit
-message except in 2/11.
+Thanks for that.
+with this version we won't have any conflict.
 
-Why do you need it everywhere and not once in the 0th mail?
+Ack for going through mm tree.
 
--- 
-Regards/Gruss,
-    Boris.
-
-Good mailing practices for 400: avoid top-posting and trim the reply.
+> 
+> Cc: Jani Nikula <jani.nikula@linux.intel.com>
+> Cc: Joonas Lahtinen <joonas.lahtinen@linux.intel.com>
+> Cc: Rodrigo Vivi <rodrigo.vivi@intel.com>
+> Cc: David Airlie <airlied@linux.ie>
+> Cc: intel-gfx@lists.freedesktop.org
+> Cc: dri-devel@lists.freedesktop.org
+> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+> ---
+>  drivers/gpu/drm/i915/gem/i915_gem_userptr.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/gpu/drm/i915/gem/i915_gem_userptr.c b/drivers/gpu/drm/i915/gem/i915_gem_userptr.c
+> index 2caa594322bc..76dda2923cf1 100644
+> --- a/drivers/gpu/drm/i915/gem/i915_gem_userptr.c
+> +++ b/drivers/gpu/drm/i915/gem/i915_gem_userptr.c
+> @@ -527,7 +527,7 @@ __i915_gem_userptr_get_pages_worker(struct work_struct *_work)
+>  	}
+>  	mutex_unlock(&obj->mm.lock);
+>  
+> -	release_pages(pvec, pinned);
+> +	put_user_pages(pvec, pinned);
+>  	kvfree(pvec);
+>  
+>  	i915_gem_object_put(obj);
+> @@ -640,7 +640,7 @@ static int i915_gem_userptr_get_pages(struct drm_i915_gem_object *obj)
+>  		__i915_gem_userptr_set_active(obj, true);
+>  
+>  	if (IS_ERR(pages))
+> -		release_pages(pvec, pinned);
+> +		put_user_pages(pvec, pinned);
+>  	kvfree(pvec);
+>  
+>  	return PTR_ERR_OR_ZERO(pages);
+> @@ -675,7 +675,7 @@ i915_gem_userptr_put_pages(struct drm_i915_gem_object *obj,
+>  			set_page_dirty_lock(page);
+>  
+>  		mark_page_accessed(page);
+> -		put_page(page);
+> +		put_user_page(page);
+>  	}
+>  	obj->mm.dirty = false;
+>  
+> -- 
+> 2.22.0
+> 
+> _______________________________________________
+> dri-devel mailing list
+> dri-devel@lists.freedesktop.org
+> https://lists.freedesktop.org/mailman/listinfo/dri-devel
