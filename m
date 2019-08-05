@@ -2,114 +2,153 @@ Return-Path: <SRS0=2Ix1=WB=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79F46C0650F
-	for <linux-crypto@archiver.kernel.org>; Mon,  5 Aug 2019 17:53:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4E12C433FF
+	for <linux-crypto@archiver.kernel.org>; Mon,  5 Aug 2019 20:00:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4E87620880
-	for <linux-crypto@archiver.kernel.org>; Mon,  5 Aug 2019 17:53:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AAD722054F
+	for <linux-crypto@archiver.kernel.org>; Mon,  5 Aug 2019 20:00:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="XfOUnVg5"
+	dkim=pass (1024-bit key) header.d=c-s.fr header.i=@c-s.fr header.b="SURmVZ86"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728837AbfHERx4 (ORCPT
+        id S1728831AbfHEUAx (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 5 Aug 2019 13:53:56 -0400
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:36941 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726559AbfHERx4 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 5 Aug 2019 13:53:56 -0400
-Received: by mail-ed1-f66.google.com with SMTP id w13so79708715eds.4
-        for <linux-crypto@vger.kernel.org>; Mon, 05 Aug 2019 10:53:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=EZ8m1iqTznWb8vi5XPTFdc0ZbQusxg4ERCrVoyD9ISg=;
-        b=XfOUnVg5KOyMkHHbMLHfSyWW3eShErC1ZO7KaeuVE4c54XbH0wRE4McEEJQN83CJv7
-         vlEx46cX8pvZJ4EDx1NikoDX7WrjLnpOIy7MO2/56Otw5kV7wyI3yDsbvoN3ZpT5D/O6
-         ANPGCeMkcoH/YNWa/o+tvNrJPHEu96Dp3rLi8=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=EZ8m1iqTznWb8vi5XPTFdc0ZbQusxg4ERCrVoyD9ISg=;
-        b=JNdyig/VmB04rUyvuXeT3n5oFkCXCn+39+R+wpAMX+K+UP5O6ppo7Bi9CHfTUDx1sn
-         G0pJ2EjfShFybBTg1i0SA7CH3N3Kf7uw14W77Lf+gCqenFiiZVaMhd+pdnVqbPpNYf2D
-         QbQE5KqOBrd2bWq23b5UXRkAGhv+zSDMdsNyl0wNCRSSJxYmLln5fJyegZqO9uQCT+Hz
-         1ive9s6x1gduI2umLa/dEPH7EMewf3X9eRtDwAuHbv2AZskyyIGBBaGCNHukxmI7Nm0F
-         6Qub0l3xqHEO7q4N+12OiijPVaV7JQOMa1UtgzwjRzkwfeACh1V7nDUqmj0IaNtrCuUW
-         +DMg==
-X-Gm-Message-State: APjAAAXE8kG4GPqylgQphQxB1l3xW7PQjeC0Q1hxYs6FkYoiu6rkdWEa
-        mmSgQL6LCqUBVwqPsxFHhJPGRn0+vkQ=
-X-Google-Smtp-Source: APXvYqx3OwDsE/rRCF5A7BQIw9oSrGbfag8Z9iLJp2AR2wnl0UQy8hG7lysHkuHUHtdINkBkCLchKQ==
-X-Received: by 2002:a17:906:7092:: with SMTP id b18mr120191473ejk.40.1565027634221;
-        Mon, 05 Aug 2019 10:53:54 -0700 (PDT)
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com. [209.85.128.54])
-        by smtp.gmail.com with ESMTPSA id q21sm14493861ejo.76.2019.08.05.10.53.53
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Mon, 05 Aug 2019 10:53:53 -0700 (PDT)
-Received: by mail-wm1-f54.google.com with SMTP id l2so73822908wmg.0
-        for <linux-crypto@vger.kernel.org>; Mon, 05 Aug 2019 10:53:53 -0700 (PDT)
-X-Received: by 2002:a1c:7c11:: with SMTP id x17mr18318882wmc.22.1565027633048;
- Mon, 05 Aug 2019 10:53:53 -0700 (PDT)
+        Mon, 5 Aug 2019 16:00:53 -0400
+Received: from pegase1.c-s.fr ([93.17.236.30]:12231 "EHLO pegase1.c-s.fr"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727830AbfHEUAx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 5 Aug 2019 16:00:53 -0400
+Received: from localhost (mailhub1-int [192.168.12.234])
+        by localhost (Postfix) with ESMTP id 462TCg5rBbz9ty2B;
+        Mon,  5 Aug 2019 22:00:47 +0200 (CEST)
+Authentication-Results: localhost; dkim=pass
+        reason="1024-bit key; insecure key"
+        header.d=c-s.fr header.i=@c-s.fr header.b=SURmVZ86; dkim-adsp=pass;
+        dkim-atps=neutral
+X-Virus-Scanned: Debian amavisd-new at c-s.fr
+Received: from pegase1.c-s.fr ([192.168.12.234])
+        by localhost (pegase1.c-s.fr [192.168.12.234]) (amavisd-new, port 10024)
+        with ESMTP id g9geWnIk7yUW; Mon,  5 Aug 2019 22:00:47 +0200 (CEST)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+        by pegase1.c-s.fr (Postfix) with ESMTP id 462TCg4g8rz9ty26;
+        Mon,  5 Aug 2019 22:00:47 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=c-s.fr; s=mail;
+        t=1565035247; bh=rwMfEg/bO0WFaZBML2KPkLXU25VS1HK0tM4ZHGyTba8=;
+        h=Subject:To:Cc:References:From:Date:In-Reply-To:From;
+        b=SURmVZ86Xzt7rfSr5dvqWCmhTXzo0XOWhZA6lCrS1Dz8c5vbfp4rjBhcM1OPsOk++
+         sr25OfHGONW6KD/xe4N/A9OO5OlBoiL5hnXNmIsAZU48jqZD/BXSIiE1av4zD0oNHz
+         iqAYm+Nzte5oxy9ksGOgbBTGe15bpYRM7BLtybo0=
+Received: from localhost (localhost [127.0.0.1])
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id CC0DC8B7D1;
+        Mon,  5 Aug 2019 22:00:47 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+        by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+        with ESMTP id rnxZG8YdvVpZ; Mon,  5 Aug 2019 22:00:47 +0200 (CEST)
+Received: from [192.168.4.90] (unknown [192.168.4.90])
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id 722098B7B7;
+        Mon,  5 Aug 2019 22:00:47 +0200 (CEST)
+Subject: Re: [PATCH v4 23/30] crypto: talitos/des - switch to new verification
+ routines
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        linux-crypto@vger.kernel.org
+Cc:     herbert@gondor.apana.org.au, ebiggers@kernel.org,
+        horia.geanta@nxp.com
+References: <20190805170037.31330-1-ard.biesheuvel@linaro.org>
+ <20190805170037.31330-24-ard.biesheuvel@linaro.org>
+From:   Christophe Leroy <christophe.leroy@c-s.fr>
+Message-ID: <bb4e8b45-93cc-e849-bd1b-60660da85c21@c-s.fr>
+Date:   Mon, 5 Aug 2019 22:00:47 +0200
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20190730191303.206365-1-thgarnie@chromium.org>
- <20190730191303.206365-2-thgarnie@chromium.org> <20190805163202.GD18785@zn.tnic>
- <201908050952.BC1F7C3@keescook> <20190805172733.GE18785@zn.tnic>
-In-Reply-To: <20190805172733.GE18785@zn.tnic>
-From:   Thomas Garnier <thgarnie@chromium.org>
-Date:   Mon, 5 Aug 2019 10:53:41 -0700
-X-Gmail-Original-Message-ID: <CAJcbSZEnPeCnkpc+uHmBWRJeaaw4TPy9HPkSGeriDb6mN6HR1g@mail.gmail.com>
-Message-ID: <CAJcbSZEnPeCnkpc+uHmBWRJeaaw4TPy9HPkSGeriDb6mN6HR1g@mail.gmail.com>
-Subject: Re: [PATCH v9 01/11] x86/crypto: Adapt assembly for PIE support
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     Kees Cook <keescook@chromium.org>,
-        Kernel Hardening <kernel-hardening@lists.openwall.com>,
-        Kristen Carlson Accardi <kristen@linux.intel.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20190805170037.31330-24-ard.biesheuvel@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Aug 5, 2019 at 10:27 AM Borislav Petkov <bp@alien8.de> wrote:
->
-> On Mon, Aug 05, 2019 at 09:54:44AM -0700, Kees Cook wrote:
-> > I think there was some long-ago feedback from someone (Ingo?) about
-> > giving context for the patch so looking at one individually would let
-> > someone know that it was part of a larger series.
 
-That's correct.
 
->
-> Strange. But then we'd have to "mark" all patches which belong to a
-> larger series this way, no? And we don't do that...
->
-> > Do you think it should just be dropped in each patch?
->
-> I think reading it once is enough. If the change alone in some commit
-> message is not clear why it is being done - to support PIE - then sure,
-> by all means. But slapping it everywhere...
+Le 05/08/2019 à 19:00, Ard Biesheuvel a écrit :
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-I assume the last sentence could be removed in most cases.
+Reviewed-by: Christophe Leroy <christophe.leroy@c-s.fr>
 
->
-> --
-> Regards/Gruss,
->     Boris.
->
-> Good mailing practices for 400: avoid top-posting and trim the reply.
+> ---
+>   drivers/crypto/talitos.c | 34 ++++----------------
+>   1 file changed, 7 insertions(+), 27 deletions(-)
+> 
+> diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+> index c9d686a0e805..890cf52007f2 100644
+> --- a/drivers/crypto/talitos.c
+> +++ b/drivers/crypto/talitos.c
+> @@ -30,7 +30,7 @@
+>   
+>   #include <crypto/algapi.h>
+>   #include <crypto/aes.h>
+> -#include <crypto/des.h>
+> +#include <crypto/internal/des.h>
+>   #include <crypto/sha.h>
+>   #include <crypto/md5.h>
+>   #include <crypto/internal/aead.h>
+> @@ -939,12 +939,9 @@ static int aead_des3_setkey(struct crypto_aead *authenc,
+>   	if (keys.enckeylen != DES3_EDE_KEY_SIZE)
+>   		goto badkey;
+>   
+> -	flags = crypto_aead_get_flags(authenc);
+> -	err = __des3_verify_key(&flags, keys.enckey);
+> -	if (unlikely(err)) {
+> -		crypto_aead_set_flags(authenc, flags);
+> +	err = crypto_des3_ede_verify_key(crypto_aead_tfm(authenc), keys.enckey);
+> +	if (err)
+>   		goto out;
+> -	}
+>   
+>   	if (ctx->keylen)
+>   		dma_unmap_single(dev, ctx->dma_key, ctx->keylen, DMA_TO_DEVICE);
+> @@ -1517,32 +1514,15 @@ static int ablkcipher_setkey(struct crypto_ablkcipher *cipher,
+>   static int ablkcipher_des_setkey(struct crypto_ablkcipher *cipher,
+>   				 const u8 *key, unsigned int keylen)
+>   {
+> -	u32 tmp[DES_EXPKEY_WORDS];
+> -
+> -	if (unlikely(crypto_ablkcipher_get_flags(cipher) &
+> -		     CRYPTO_TFM_REQ_FORBID_WEAK_KEYS) &&
+> -	    !des_ekey(tmp, key)) {
+> -		crypto_ablkcipher_set_flags(cipher, CRYPTO_TFM_RES_WEAK_KEY);
+> -		return -EINVAL;
+> -	}
+> -
+> -	return ablkcipher_setkey(cipher, key, keylen);
+> +	return crypto_des_verify_key(crypto_ablkcipher_tfm(cipher), key) ?:
+> +	       ablkcipher_setkey(cipher, key, keylen);
+>   }
+>   
+>   static int ablkcipher_des3_setkey(struct crypto_ablkcipher *cipher,
+>   				  const u8 *key, unsigned int keylen)
+>   {
+> -	u32 flags;
+> -	int err;
+> -
+> -	flags = crypto_ablkcipher_get_flags(cipher);
+> -	err = __des3_verify_key(&flags, key);
+> -	if (unlikely(err)) {
+> -		crypto_ablkcipher_set_flags(cipher, flags);
+> -		return err;
+> -	}
+> -
+> -	return ablkcipher_setkey(cipher, key, keylen);
+> +	return crypto_des3_ede_verify_key(crypto_ablkcipher_tfm(cipher), key) ?:
+> +	       ablkcipher_setkey(cipher, key, keylen);
+>   }
+>   
+>   static int ablkcipher_aes_setkey(struct crypto_ablkcipher *cipher,
+> 
