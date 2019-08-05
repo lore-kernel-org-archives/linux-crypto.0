@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBF86C32751
-	for <linux-crypto@archiver.kernel.org>; Mon,  5 Aug 2019 17:02:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 033CEC32754
+	for <linux-crypto@archiver.kernel.org>; Mon,  5 Aug 2019 17:02:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B10062075B
-	for <linux-crypto@archiver.kernel.org>; Mon,  5 Aug 2019 17:02:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CB77C2075B
+	for <linux-crypto@archiver.kernel.org>; Mon,  5 Aug 2019 17:02:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ve7cF51U"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="obbR8EMZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729962AbfHERCf (ORCPT
+        id S1729334AbfHERCh (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 5 Aug 2019 13:02:35 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:53826 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729439AbfHERCe (ORCPT
+        Mon, 5 Aug 2019 13:02:37 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:46569 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729914AbfHERCg (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 5 Aug 2019 13:02:34 -0400
-Received: by mail-wm1-f65.google.com with SMTP id x15so75470295wmj.3
-        for <linux-crypto@vger.kernel.org>; Mon, 05 Aug 2019 10:02:33 -0700 (PDT)
+        Mon, 5 Aug 2019 13:02:36 -0400
+Received: by mail-wr1-f66.google.com with SMTP id z1so85138707wru.13
+        for <linux-crypto@vger.kernel.org>; Mon, 05 Aug 2019 10:02:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=6OhjbF2M4HRdeN0EH1XAkAXt0Z8G30cJBFEK1XTbAV0=;
-        b=ve7cF51UDM8GKtpnt3c0ZOMXwuYbMzLdGmkJNZFrwyl8m2/bvpwtP5076qo7fWKvzV
-         moI1ez+/fU3iIaRuFnFS84anGgzFD2hxYtgFxMEIcZgcXBnYDDGDOnB54WCen6g2Ezjg
-         YG80M/DYx5Di8X8gAPZyrsQ4PWG9uRn8eoXQgAh9CpU/K93MRSuKvBywUL1PKva7SBh5
-         639M7HQAWH/4F4Q2ed/94+SBZuhOKIIttFa2EFBRqDjJihpj5/7FGExqXylWyMNugXw2
-         1lTsd8wZh+0FWUtkqEIwEO25PbHsfJvIIsCeN6UTXFGduFv/ydTm0yESQvXQ/nn1Mw7O
-         YxcA==
+        bh=BotHPKD3g+g+mUZQ/dtkowLHJlOQtGFVF7+kbySZOcU=;
+        b=obbR8EMZnX9a6vmvwBmSWBGnOOKN1dVJCGQ4ifjqJajW1phHKR4LOZA7JiismaEyz1
+         92MA1noE3SpLmLqwHS+E8ytPal+A7ID2yxssz1aVbouVCJociz2IC2UjHm9LWmXRPa3w
+         Hm7tykA2xhBRF0S47SN17wyZkAm4T/K37yPOYSSvw4WqVSxhmFLRkM+JsJqdQl+/3YhK
+         Mn9L4PyKH6b1yy5y8JCaeDkmLTnQ20EVo/MVul9dFlCn/ikynHw3tZJP32EEtooszfvt
+         C6gFPdorWwsmgVV5YdiTm8YZWOoI2Bt5uGyyXVdgj6Ib6ZMmkinGlwN82GVXs1E0hpfx
+         joGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=6OhjbF2M4HRdeN0EH1XAkAXt0Z8G30cJBFEK1XTbAV0=;
-        b=siE6gLzSLv2iKtAmwCicPkhdhlOGzCPcqgqrSO7vArVi5IKccm0x3MkQCz9s1b/3mM
-         dAKnwbA0cgF2kFOri+PiJF50qPbMJKJYlQ18I2zJkrZJyGe/HHFtfGNXrzIaA58sAp+o
-         IIPT1R/ktRVrV2MvA4zbUi0C65WOKu9qiw5oJpOZgljfipWyFTWcSgSG6CeMfOKWB7JZ
-         NfKHSB2Tk9+J58HoVjRj8DD2DN1nbqi6GUo7aj+wRfA6tfwn8gtugtWkZ/mN+MIwfQzz
-         69L138DLZ8tIGkKX+USC0bf0E0YCwGTlOAEGfuNBfQ544/e2VTkhEyh3M4vCWXeUAU/d
-         WQwQ==
-X-Gm-Message-State: APjAAAU9nHhMxfQ0ZAaolNNpkdZf88oUD2uVkfhJIaREvFOtism5JpcA
-        uTcFyoOP91QlOakxwyQpAFewYg0U+BtlIw==
-X-Google-Smtp-Source: APXvYqyrNusodS6at8McQUF16hI8QSbd0HfG4qr2CWTbQ73UUEfkov64PPP4/CEgHlFtCPmMkWrVCA==
-X-Received: by 2002:a1c:4054:: with SMTP id n81mr19962693wma.78.1565024552290;
-        Mon, 05 Aug 2019 10:02:32 -0700 (PDT)
+        bh=BotHPKD3g+g+mUZQ/dtkowLHJlOQtGFVF7+kbySZOcU=;
+        b=R1aU3qUEMIS2c2vd6oi9qfLySa7XEnPxV4YGCrM6NWKPO4TthCXXGlUjZSU045f7i3
+         8QBzjIus6jcoWheXfFMNEQtPGzt3VZOUYssdBvfiL5z4vWvshGPtCnjxQB7wFwXt2Dov
+         MvXtkeOl4QxgQAgOLOmYGFKTScVi4Fl8Crfc4Gz4xeoZB6EZWBf0ArAaxpq8rBWj2qAV
+         Vxjs47KxpXD4MU7tqr0fYNi2H53kL4AXW8sTjHLtReRN/3Gospfo0QPesRLSgzOhiB2s
+         7KWmXQ6BQqV8AkUB8fKJtf1aytl9gJ7nrStm6onh8ITmPdhjsp3nq3N7sukvKTa6/rUk
+         IdYw==
+X-Gm-Message-State: APjAAAVREYYHCh+t+8YgA7yIqFe8WaxyK/OP3J0qEsKu2by+0llKxTet
+        HlohGBxSad4JcEcdxd4oy2D2gBKywXBVhw==
+X-Google-Smtp-Source: APXvYqz0Baj6RzjYC3ThTptCo4X5kmfC782hm31L+uQpdBH/78XDaCY/tLbK4i1w3JiVq0bmiP4eFw==
+X-Received: by 2002:adf:8364:: with SMTP id 91mr161963813wrd.13.1565024554417;
+        Mon, 05 Aug 2019 10:02:34 -0700 (PDT)
 Received: from localhost.localdomain ([2a02:587:a407:da00:582f:8334:9cd9:7241])
-        by smtp.gmail.com with ESMTPSA id j9sm95669383wrn.81.2019.08.05.10.02.30
+        by smtp.gmail.com with ESMTPSA id j9sm95669383wrn.81.2019.08.05.10.02.32
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 05 Aug 2019 10:02:31 -0700 (PDT)
+        Mon, 05 Aug 2019 10:02:33 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     herbert@gondor.apana.org.au, ebiggers@kernel.org,
         horia.geanta@nxp.com, Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v4 29/30] crypto: des - remove now unused __des3_ede_setkey()
-Date:   Mon,  5 Aug 2019 20:00:36 +0300
-Message-Id: <20190805170037.31330-30-ard.biesheuvel@linaro.org>
+Subject: [PATCH v4 30/30] fs: cifs: move from the crypto cipher API to the new DES library interface
+Date:   Mon,  5 Aug 2019 20:00:37 +0300
+Message-Id: <20190805170037.31330-31-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190805170037.31330-1-ard.biesheuvel@linaro.org>
 References: <20190805170037.31330-1-ard.biesheuvel@linaro.org>
@@ -70,48 +70,93 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Some legacy code in the CIFS driver uses single DES to calculate
+some password hash, and uses the crypto cipher API to do so. Given
+that there is no point in invoking an accelerated cipher for doing
+56-bit symmetric encryption on a single 8-byte block of input, the
+flexibility of the crypto cipher API does not add much value here,
+and so we're much better off using a library call into the generic
+C implementation.
+
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- crypto/des_generic.c | 13 -------------
- include/crypto/des.h |  3 ---
- 2 files changed, 16 deletions(-)
+ fs/cifs/Kconfig      |  2 +-
+ fs/cifs/cifsfs.c     |  1 -
+ fs/cifs/smbencrypt.c | 18 +++++++++---------
+ 3 files changed, 10 insertions(+), 11 deletions(-)
 
-diff --git a/crypto/des_generic.c b/crypto/des_generic.c
-index e021a321f584..6e13a4a29ecb 100644
---- a/crypto/des_generic.c
-+++ b/crypto/des_generic.c
-@@ -51,19 +51,6 @@ static void crypto_des_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
- 	des_decrypt(dctx, dst, src);
- }
+diff --git a/fs/cifs/Kconfig b/fs/cifs/Kconfig
+index b16219e5dac9..350bc3061656 100644
+--- a/fs/cifs/Kconfig
++++ b/fs/cifs/Kconfig
+@@ -16,7 +16,7 @@ config CIFS
+ 	select CRYPTO_GCM
+ 	select CRYPTO_ECB
+ 	select CRYPTO_AES
+-	select CRYPTO_DES
++	select CRYPTO_LIB_DES
+ 	select KEYS
+ 	help
+ 	  This is the client VFS module for the SMB3 family of NAS protocols,
+diff --git a/fs/cifs/cifsfs.c b/fs/cifs/cifsfs.c
+index 3289b566463f..4e2f74894e9b 100644
+--- a/fs/cifs/cifsfs.c
++++ b/fs/cifs/cifsfs.c
+@@ -1601,7 +1601,6 @@ MODULE_DESCRIPTION
+ 	("VFS to access SMB3 servers e.g. Samba, Macs, Azure and Windows (and "
+ 	"also older servers complying with the SNIA CIFS Specification)");
+ MODULE_VERSION(CIFS_VERSION);
+-MODULE_SOFTDEP("pre: des");
+ MODULE_SOFTDEP("pre: ecb");
+ MODULE_SOFTDEP("pre: hmac");
+ MODULE_SOFTDEP("pre: md4");
+diff --git a/fs/cifs/smbencrypt.c b/fs/cifs/smbencrypt.c
+index 2b6d87bfdf8e..39a938443e3e 100644
+--- a/fs/cifs/smbencrypt.c
++++ b/fs/cifs/smbencrypt.c
+@@ -11,13 +11,14 @@
  
--int __des3_ede_setkey(u32 *expkey, u32 *flags, const u8 *key,
--		      unsigned int keylen)
--{
--	int err;
--
--	des_ekey(expkey, key); expkey += DES_EXPKEY_WORDS; key += DES_KEY_SIZE;
--	dkey(expkey, key); expkey += DES_EXPKEY_WORDS; key += DES_KEY_SIZE;
--	des_ekey(expkey, key);
--
--	return 0;
--}
--EXPORT_SYMBOL_GPL(__des3_ede_setkey);
--
- static int des3_ede_setkey(struct crypto_tfm *tfm, const u8 *key,
- 			   unsigned int keylen)
+ */
+ 
+-#include <linux/crypto.h>
+ #include <linux/module.h>
+ #include <linux/slab.h>
++#include <linux/fips.h>
+ #include <linux/fs.h>
+ #include <linux/string.h>
+ #include <linux/kernel.h>
+ #include <linux/random.h>
++#include <crypto/des.h>
+ #include "cifs_fs_sb.h"
+ #include "cifs_unicode.h"
+ #include "cifspdu.h"
+@@ -58,19 +59,18 @@ static int
+ smbhash(unsigned char *out, const unsigned char *in, unsigned char *key)
  {
-diff --git a/include/crypto/des.h b/include/crypto/des.h
-index 2c864a4e6707..7812b4331ae4 100644
---- a/include/crypto/des.h
-+++ b/include/crypto/des.h
-@@ -54,7 +54,4 @@ int des_expand_key(struct des_ctx *ctx, const u8 *key, unsigned int keylen);
- int des3_ede_expand_key(struct des3_ede_ctx *ctx, const u8 *key,
- 			unsigned int keylen);
+ 	unsigned char key2[8];
+-	struct crypto_cipher *tfm_des;
++	struct des_ctx ctx;
  
--extern int __des3_ede_setkey(u32 *expkey, u32 *flags, const u8 *key,
--			     unsigned int keylen);
--
- #endif /* __CRYPTO_DES_H */
+ 	str_to_key(key, key2);
+ 
+-	tfm_des = crypto_alloc_cipher("des", 0, 0);
+-	if (IS_ERR(tfm_des)) {
+-		cifs_dbg(VFS, "could not allocate des crypto API\n");
+-		return PTR_ERR(tfm_des);
++	if (fips_enabled) {
++		cifs_dbg(VFS, "FIPS compliance enabled: DES not permitted\n");
++		return -ENOENT;
+ 	}
+ 
+-	crypto_cipher_setkey(tfm_des, key2, 8);
+-	crypto_cipher_encrypt_one(tfm_des, out, in);
+-	crypto_free_cipher(tfm_des);
++	des_expand_key(&ctx, key2, DES_KEY_SIZE);
++	des_encrypt(&ctx, out, in);
++	memzero_explicit(&ctx, sizeof(ctx));
+ 
+ 	return 0;
+ }
 -- 
 2.17.1
 
