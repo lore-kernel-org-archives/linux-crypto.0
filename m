@@ -2,78 +2,115 @@ Return-Path: <SRS0=2Ix1=WB=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE1CAC433FF
-	for <linux-crypto@archiver.kernel.org>; Mon,  5 Aug 2019 13:12:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D16FC0650F
+	for <linux-crypto@archiver.kernel.org>; Mon,  5 Aug 2019 14:26:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B3B9E2075B
-	for <linux-crypto@archiver.kernel.org>; Mon,  5 Aug 2019 13:12:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F032A2086D
+	for <linux-crypto@archiver.kernel.org>; Mon,  5 Aug 2019 14:25:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729544AbfHENMR (ORCPT
+        id S1729152AbfHEOZ6 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 5 Aug 2019 09:12:17 -0400
-Received: from relay3-d.mail.gandi.net ([217.70.183.195]:52875 "EHLO
-        relay3-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729181AbfHENMQ (ORCPT
+        Mon, 5 Aug 2019 10:25:58 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:30476 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728149AbfHEOZ4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 5 Aug 2019 09:12:16 -0400
-X-Originating-IP: 86.250.200.211
-Received: from localhost (lfbn-1-17395-211.w86-250.abo.wanadoo.fr [86.250.200.211])
-        (Authenticated sender: antoine.tenart@bootlin.com)
-        by relay3-d.mail.gandi.net (Postfix) with ESMTPSA id 8CCE060008;
-        Mon,  5 Aug 2019 13:12:14 +0000 (UTC)
-Date:   Mon, 5 Aug 2019 15:12:13 +0200
-From:   Antoine Tenart <antoine.tenart@bootlin.com>
-To:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
-Cc:     Antoine Tenart <antoine.tenart@bootlin.com>,
-        Pascal van Leeuwen <pascalvanl@gmail.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>
-Subject: Re: [PATCHv3 4/4] crypto: inside-secure - add support for using the
- EIP197 without vendor firmware
-Message-ID: <20190805131213.GM14470@kwain>
-References: <1564586959-9963-1-git-send-email-pvanleeuwen@verimatrix.com>
- <1564586959-9963-5-git-send-email-pvanleeuwen@verimatrix.com>
- <20190805090725.GH14470@kwain>
- <MN2PR20MB29730648846013A67753624ECADA0@MN2PR20MB2973.namprd20.prod.outlook.com>
- <20190805095424.GJ14470@kwain>
- <MN2PR20MB2973944BBF39EB11537E3163CADA0@MN2PR20MB2973.namprd20.prod.outlook.com>
- <20190805124328.GK14470@kwain>
- <MN2PR20MB2973ECE2AB0598E32E088EDECADA0@MN2PR20MB2973.namprd20.prod.outlook.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+        Mon, 5 Aug 2019 10:25:56 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x75ELtLB090210
+        for <linux-crypto@vger.kernel.org>; Mon, 5 Aug 2019 10:25:55 -0400
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2u6kch17uk-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <linux-crypto@vger.kernel.org>; Mon, 05 Aug 2019 10:25:54 -0400
+Received: from localhost
+        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-crypto@vger.kernel.org> from <zohar@linux.ibm.com>;
+        Mon, 5 Aug 2019 15:25:51 +0100
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (9.149.109.194)
+        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Mon, 5 Aug 2019 15:25:46 +0100
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x75EPiE337486818
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 5 Aug 2019 14:25:44 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 01BDAA405E;
+        Mon,  5 Aug 2019 14:25:44 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 11DCBA4057;
+        Mon,  5 Aug 2019 14:25:42 +0000 (GMT)
+Received: from dhcp-9-31-103-47.watson.ibm.com (unknown [9.31.103.47])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon,  5 Aug 2019 14:25:41 +0000 (GMT)
+Subject: Re: [PATCH v12 01/11] MODSIGN: Export module signature definitions
+From:   Mimi Zohar <zohar@linux.ibm.com>
+To:     Philipp Rudo <prudo@linux.ibm.com>,
+        Thiago Jung Bauermann <bauerman@linux.ibm.com>
+Cc:     Jessica Yu <jeyu@kernel.org>, linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jonathan Corbet <corbet@lwn.net>,
+        "AKASHI, Takahiro" <takahiro.akashi@linaro.org>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>,
+        linux-s390@vger.kernel.org
+Date:   Mon, 05 Aug 2019 10:25:41 -0400
+In-Reply-To: <20190805151123.12510d72@laptop-ibm>
+References: <20190628021934.4260-1-bauerman@linux.ibm.com>
+         <20190628021934.4260-2-bauerman@linux.ibm.com>
+         <20190701144752.GC25484@linux-8ccs> <87lfxel2q6.fsf@morokweng.localdomain>
+         <20190704125427.31146026@laptop-ibm> <874l41ocf5.fsf@morokweng.localdomain>
+         <20190705150000.372345b0@laptop-ibm> <8736iw9y00.fsf@morokweng.localdomain>
+         <20190805151123.12510d72@laptop-ibm>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.20.5 (3.20.5-1.fc24) 
+Mime-Version: 1.0
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <MN2PR20MB2973ECE2AB0598E32E088EDECADA0@MN2PR20MB2973.namprd20.prod.outlook.com>
-User-Agent: Mutt/1.12.0 (2019-05-25)
+X-TM-AS-GCONF: 00
+x-cbid: 19080514-0016-0000-0000-0000029A6FB3
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19080514-0017-0000-0000-000032F977CF
+Message-Id: <1565015141.11223.145.camel@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-08-05_07:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=3 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=953 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1908050159
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Aug 05, 2019 at 01:02:08PM +0000, Pascal Van Leeuwen wrote:
-> > From: Antoine Tenart <antoine.tenart@bootlin.com>
+On Mon, 2019-08-05 at 15:11 +0200, Philipp Rudo wrote:
+> Hi Thiago,
+> 
+> > > The patch looks good now.  
 > > 
-> > Using this function that is designed to sleep with a delay of 0 and
-> > designed to timeout with a value of 1 does not seem to follow what the
-> > function is designed for :) It could work but I would suggest to keep
-> > the polling as it is in the patch in this case.
-> > 
-> Ok, will do. Does that mean that patch 4/4 is good as is?
-> i.e. can I add an "Acked-by: Antoine Tenart" line when I resubmit?
+> > Thanks! Can I add your Reviewed-by?
+> 
+> sorry, for the late answer, but I was on vacation the last two weeks. I hope
+> it's not too late now.
+> 
+> Reviewed-by: Philipp Rudo <prudo@linux.ibm.com>
 
-Sure, the rest of the patch looked good and you can add:
+Thanks!  This patch set is still in the #next-queued-testing
+branch.  I'm still hoping for a few more tags, before pushing it out
+to the #next-integrity branch later today.
 
-Acked-by: Antoine Tenart <antoine.tenart@bootlin.com>
+Mimi
 
-Thanks!
-Antoine
-
--- 
-Antoine T�nart, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
