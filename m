@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4398C433FF
-	for <linux-crypto@archiver.kernel.org>; Mon,  5 Aug 2019 17:01:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99B5FC433FF
+	for <linux-crypto@archiver.kernel.org>; Mon,  5 Aug 2019 17:01:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A7C952054F
-	for <linux-crypto@archiver.kernel.org>; Mon,  5 Aug 2019 17:01:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6A0D72147A
+	for <linux-crypto@archiver.kernel.org>; Mon,  5 Aug 2019 17:01:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hE16ffik"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="unGbFAsL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728871AbfHERBu (ORCPT
+        id S1729818AbfHERBy (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 5 Aug 2019 13:01:50 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:51817 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729780AbfHERBt (ORCPT
+        Mon, 5 Aug 2019 13:01:54 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:51826 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729765AbfHERBx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 5 Aug 2019 13:01:49 -0400
-Received: by mail-wm1-f67.google.com with SMTP id 207so75474062wma.1
-        for <linux-crypto@vger.kernel.org>; Mon, 05 Aug 2019 10:01:49 -0700 (PDT)
+        Mon, 5 Aug 2019 13:01:53 -0400
+Received: by mail-wm1-f68.google.com with SMTP id 207so75474189wma.1
+        for <linux-crypto@vger.kernel.org>; Mon, 05 Aug 2019 10:01:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=ebKJGCN9vei2NZ41HobpihwjzZEEneemyNbb+2I2Vi4=;
-        b=hE16ffikpFg5KluY4EIhjXP1l87Zw8OlUUUbZDkhnOyQeav0oqhK63QK8ewWaXCsHG
-         41P4UCw1fNC5kYtkMuJf932qYoefI47AoA6jo1uoZDVleFuCjq1KD/aA/0ZmyayNev3s
-         DS7HXI8GI4BWldcx04nZr0p78/fLsF1BBak3K83zpyAQX0H32vKxuOCwugbc8e6a5vaF
-         SP6r2nwOEj1j+9uZ/JzsRrjtLSCTiIa6ispJS1K8VYf7KTIKz+7QGdNWQxX09/hWAMhd
-         fAbovueVdmYMm8lshk2ES/LXaFBjKChNqeUnfaiHO4MLkCPwUaunBv1GV1R3OgR7sY7C
-         F3Bw==
+        bh=HxDFvWt3ENFa7ihAescSzZPGut8ewm6FCVY9y62ZOIM=;
+        b=unGbFAsLk108V04tov9lOxG8yXySP3JkDWYvyvReB7oiwev5ujlcxO7enHCDq3G61K
+         NwKe+LhPMmp+Cvs8DajN/kWA/DRtn2dic5ZmXo4oxxjh2WZoKiZdNPuOR61I2q91nBHq
+         Wi5erpP3Ok6IYvGdBKJBsSdsdY2EvjLX5Dd9p6UJMXnf3/84N7L6eDBwcfpWVaEWUZrd
+         AKnb00/57/+3AdbJ1c7lItY+g0NYS3AYsAaU36DjWNu4ORK+uG5Zl6JhTHY83M9rl64t
+         fAVe7NXilIMF98OFeDwNqTAwarqixHmZEX/43WM8Mxm96QTI5YppQ1dlNpxmsp5HKdR9
+         eKIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=ebKJGCN9vei2NZ41HobpihwjzZEEneemyNbb+2I2Vi4=;
-        b=CYcUUtzJzG/qzCpLONxrdYdoF5K7jqu66O5YFTMfVnAqtzkVlOFydbjdLiW178dJiW
-         HqEChVNsrqO/UPtP4dHFzCP94UAHv9SEVJQe8cTzGc+Z2RYVKiyJgYVoajnbwTYKKF6n
-         ZLlKo6M2EiZgFzCquG3lt6NoRl+PgnKQduT6fFDOwsyNPOEEpUWniwaYHo0pCfInD8bO
-         8Jl7sKAA7bCCTAQzqTN9K127yfOsNCPj+5Rrbm9IyTvxIWrmCh+maicw56WgCc8x8DdW
-         asC90GbDK8zdwxCNRyUiuu6vj5IviAVq9/PJYqnUXDQRQPwWoz6SyAz2QsE9wb7FIniS
-         C03A==
-X-Gm-Message-State: APjAAAUV1rNU86Yju+iwSX4H36ve+PuRDxfagalMiYAV2r3FZez9RYdF
-        nsVBn1J7Z0ynhs6w1iMDZQkRSakP72ydYQ==
-X-Google-Smtp-Source: APXvYqwr13nl5oOj5fffjZVnFR7G2VpPp+jUCPz+zM+pU/Ja1XTInk5q5A22dX0gnZX1PVAPDdJA5Q==
-X-Received: by 2002:a1c:5f87:: with SMTP id t129mr20677270wmb.150.1565024508294;
-        Mon, 05 Aug 2019 10:01:48 -0700 (PDT)
+        bh=HxDFvWt3ENFa7ihAescSzZPGut8ewm6FCVY9y62ZOIM=;
+        b=CRIhas4bYc1L+HkLYhLy7uISZWtpwI1nbDScK/Ovc+aI9PtPM3cRBTwgHA7PGOkZ+D
+         OZwmXeNzB8pQhtmuK0JBpz53hgxbUKycfQzbaSxyyttanV8fXUXjTPy8KSG7oP0J7xGQ
+         jNkkY0EI21Dea/V/qZKZH2e2CruCPz8uVYE3k7fJNjHY/4dBoyVTy2ogt9PpIMBgPoHU
+         hIZSN0PtxBX3ZAsUkgL5ZcRDzoC2b0WlfGwWiX/h0mRYpz95MBPTxjAnZ9dQ1gSE3iBH
+         RVhrV/7lIIwlP6VdDcTp4BSveVh/FI0V30OaxRCUKj9zZselOTyvVv5bWm9FF2XtEDeQ
+         6xsQ==
+X-Gm-Message-State: APjAAAWr6Ltooe1JHTgsmz1EGYhM+NowUtvKIKCv4Ezhzc/kVKqcVnet
+        zNqfBnrO78uMC+b07tnLNKGxSXP401iaUQ==
+X-Google-Smtp-Source: APXvYqzOS5FkCY4CywFt0HeAY+5fkIXNZZURoK6w/s+fbaXra20CmrHqPCkvVp0cojhzXsmqrSbM6g==
+X-Received: by 2002:a1c:a8d7:: with SMTP id r206mr19757735wme.47.1565024510809;
+        Mon, 05 Aug 2019 10:01:50 -0700 (PDT)
 Received: from localhost.localdomain ([2a02:587:a407:da00:582f:8334:9cd9:7241])
-        by smtp.gmail.com with ESMTPSA id j9sm95669383wrn.81.2019.08.05.10.01.45
+        by smtp.gmail.com with ESMTPSA id j9sm95669383wrn.81.2019.08.05.10.01.48
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 05 Aug 2019 10:01:47 -0700 (PDT)
+        Mon, 05 Aug 2019 10:01:50 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     herbert@gondor.apana.org.au, ebiggers@kernel.org,
         horia.geanta@nxp.com, Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v4 13/30] crypto: safexcel/des - switch to new verification routines
-Date:   Mon,  5 Aug 2019 20:00:20 +0300
-Message-Id: <20190805170037.31330-14-ard.biesheuvel@linaro.org>
+Subject: [PATCH v4 14/30] crypto: ixp4xx/des - switch to new verification routines
+Date:   Mon,  5 Aug 2019 20:00:21 +0300
+Message-Id: <20190805170037.31330-15-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190805170037.31330-1-ard.biesheuvel@linaro.org>
 References: <20190805170037.31330-1-ard.biesheuvel@linaro.org>
@@ -72,71 +72,85 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- drivers/crypto/inside-secure/safexcel_cipher.c | 27 ++++++--------------
- 1 file changed, 8 insertions(+), 19 deletions(-)
+ drivers/crypto/ixp4xx_crypto.c | 28 +++++++-------------
+ 1 file changed, 9 insertions(+), 19 deletions(-)
 
-diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-secure/safexcel_cipher.c
-index 477e0ec35f45..b49e7587ba07 100644
---- a/drivers/crypto/inside-secure/safexcel_cipher.c
-+++ b/drivers/crypto/inside-secure/safexcel_cipher.c
-@@ -219,7 +219,6 @@ static int safexcel_aead_setkey(struct crypto_aead *ctfm, const u8 *key,
- 	struct safexcel_crypto_priv *priv = ctx->priv;
- 	struct crypto_authenc_keys keys;
- 	struct crypto_aes_ctx aes;
--	u32 flags;
- 	int err = -EINVAL;
+diff --git a/drivers/crypto/ixp4xx_crypto.c b/drivers/crypto/ixp4xx_crypto.c
+index acedafe3fa98..d3d683107050 100644
+--- a/drivers/crypto/ixp4xx_crypto.c
++++ b/drivers/crypto/ixp4xx_crypto.c
+@@ -17,7 +17,7 @@
+ #include <linux/module.h>
  
- 	if (crypto_authenc_extractkeys(&keys, key, len) != 0)
-@@ -238,12 +237,10 @@ static int safexcel_aead_setkey(struct crypto_aead *ctfm, const u8 *key,
- 	/* Encryption key */
- 	switch (ctx->alg) {
- 	case SAFEXCEL_3DES:
--		if (keys.enckeylen != 24)
-+		if (keys.enckeylen != DES3_EDE_KEY_SIZE)
- 			goto badkey;
--		flags = crypto_aead_get_flags(ctfm);
--		err = __des3_verify_key(&flags, keys.enckey);
--		crypto_aead_set_flags(ctfm, flags);
--
-+		err = crypto_des3_ede_verify_key(crypto_aead_tfm(ctfm),
-+						 keys.enckey);
- 		if (unlikely(err))
- 			goto badkey_expflags;
- 		break;
-@@ -1191,19 +1188,11 @@ static int safexcel_des_setkey(struct crypto_skcipher *ctfm, const u8 *key,
+ #include <crypto/ctr.h>
+-#include <crypto/des.h>
++#include <crypto/internal/des.h>
+ #include <crypto/aes.h>
+ #include <crypto/hmac.h>
+ #include <crypto/sha.h>
+@@ -756,10 +756,7 @@ static int setup_cipher(struct crypto_tfm *tfm, int encrypt,
+ 		}
+ 		cipher_cfg |= keylen_cfg;
+ 	} else {
+-		u32 tmp[DES_EXPKEY_WORDS];
+-		if (des_ekey(tmp, key) == 0) {
+-			*flags |= CRYPTO_TFM_RES_WEAK_KEY;
+-		}
++		crypto_des_verify_key(tfm, key, key_len);
+ 	}
+ 	/* write cfg word to cryptinfo */
+ 	*(u32*)cinfo = cpu_to_be32(cipher_cfg);
+@@ -851,14 +848,8 @@ static int ablk_setkey(struct crypto_ablkcipher *tfm, const u8 *key,
+ static int ablk_des3_setkey(struct crypto_ablkcipher *tfm, const u8 *key,
+ 			    unsigned int key_len)
  {
- 	struct crypto_tfm *tfm = crypto_skcipher_tfm(ctfm);
- 	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
--	u32 tmp[DES_EXPKEY_WORDS];
- 	int ret;
- 
--	if (len != DES_KEY_SIZE) {
--		crypto_skcipher_set_flags(ctfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
--		return -EINVAL;
--	}
+-	u32 flags = crypto_ablkcipher_get_flags(tfm);
+-	int err;
 -
--	ret = des_ekey(tmp, key);
--	if (!ret && (tfm->crt_flags & CRYPTO_TFM_REQ_FORBID_WEAK_KEYS)) {
--		tfm->crt_flags |= CRYPTO_TFM_RES_WEAK_KEY;
--		return -EINVAL;
--	}
-+	ret = crypto_des_verify_key(tfm, key);
-+	if (ret)
-+		return ret;
+-	err = __des3_verify_key(&flags, key);
+-	if (unlikely(err))
+-		crypto_ablkcipher_set_flags(tfm, flags);
+-
+-	return ablk_setkey(tfm, key, key_len);
++	return crypto_des3_ede_verify_key(crypto_ablkcipher_tfm(tfm), key) ?:
++	       ablk_setkey(tfm, key, key_len);
+ }
  
- 	/* if context exits and key changed, need to invalidate it */
- 	if (ctx->base.ctxr_dma)
-@@ -1301,8 +1290,8 @@ static int safexcel_des3_ede_setkey(struct crypto_skcipher *ctfm,
- 	struct safexcel_cipher_ctx *ctx = crypto_skcipher_ctx(ctfm);
+ static int ablk_rfc3686_setkey(struct crypto_ablkcipher *tfm, const u8 *key,
+@@ -1181,7 +1172,6 @@ static int des3_aead_setkey(struct crypto_aead *tfm, const u8 *key,
+ 			    unsigned int keylen)
+ {
+ 	struct ixp_ctx *ctx = crypto_aead_ctx(tfm);
+-	u32 flags = CRYPTO_TFM_RES_BAD_KEY_LEN;
+ 	struct crypto_authenc_keys keys;
  	int err;
  
--	err = des3_verify_key(ctfm, key);
--	if (unlikely(err))
-+	err = crypto_des3_ede_verify_key(crypto_skcipher_tfm(ctfm), key);
-+	if (err)
- 		return err;
+@@ -1193,12 +1183,13 @@ static int des3_aead_setkey(struct crypto_aead *tfm, const u8 *key,
+ 	if (keys.authkeylen > sizeof(ctx->authkey))
+ 		goto badkey;
  
- 	/* if context exits and key changed, need to invalidate it */
+-	if (keys.enckeylen != DES3_EDE_KEY_SIZE)
++	if (keys.enckeylen != DES3_EDE_KEY_SIZE) {
++		crypto_aead_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
+ 		goto badkey;
++	}
+ 
+-	flags = crypto_aead_get_flags(tfm);
+-	err = __des3_verify_key(&flags, keys.enckey);
+-	if (unlikely(err))
++	err = crypto_des3_ede_verify_key(crypto_aead_tfm(tfm), keys.enckey);
++	if (err)
+ 		goto badkey;
+ 
+ 	memcpy(ctx->authkey, keys.authkey, keys.authkeylen);
+@@ -1209,7 +1200,6 @@ static int des3_aead_setkey(struct crypto_aead *tfm, const u8 *key,
+ 	memzero_explicit(&keys, sizeof(keys));
+ 	return aead_setup(tfm, crypto_aead_authsize(tfm));
+ badkey:
+-	crypto_aead_set_flags(tfm, flags);
+ 	memzero_explicit(&keys, sizeof(keys));
+ 	return err;
+ }
 -- 
 2.17.1
 
