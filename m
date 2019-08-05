@@ -2,208 +2,218 @@ Return-Path: <SRS0=2Ix1=WB=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04B5AC0650F
-	for <linux-crypto@archiver.kernel.org>; Mon,  5 Aug 2019 17:00:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96B60C0650F
+	for <linux-crypto@archiver.kernel.org>; Mon,  5 Aug 2019 17:00:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C0C142147A
-	for <linux-crypto@archiver.kernel.org>; Mon,  5 Aug 2019 17:00:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6BDCE2147A
+	for <linux-crypto@archiver.kernel.org>; Mon,  5 Aug 2019 17:00:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="w6KQNL0R"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="m6Yb3zCN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727460AbfHERAz (ORCPT
+        id S1727328AbfHERA6 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 5 Aug 2019 13:00:55 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:43087 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726693AbfHERAy (ORCPT
+        Mon, 5 Aug 2019 13:00:58 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:55457 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726693AbfHERA5 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 5 Aug 2019 13:00:54 -0400
-Received: by mail-wr1-f68.google.com with SMTP id p13so10568306wru.10
-        for <linux-crypto@vger.kernel.org>; Mon, 05 Aug 2019 10:00:52 -0700 (PDT)
+        Mon, 5 Aug 2019 13:00:57 -0400
+Received: by mail-wm1-f67.google.com with SMTP id a15so75447277wmj.5
+        for <linux-crypto@vger.kernel.org>; Mon, 05 Aug 2019 10:00:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=blBuI15MMY0MGa+yP7ydP9PfuIXdWhGkChiZpEAVEHI=;
-        b=w6KQNL0Rea0c2paIi1nKkPs7W8jcYJz/5bggkkct1gsdxleeF97S8gBizyEyUipNkw
-         UjRpapjtBHZq5h+2f2z2gZ5XuRc79xxjcOC22ILXuiPwlQnfYzKaqxeEmLWg3bP74983
-         lVjN3ELcSCj1AOMyBmEfNMLEgQ8OpEpG2oBc3SJ52aBpAKw/r0ZL8TUWxP06NBYYkYnA
-         FNZo8UeLtKvmN7h12J8QpY+ym+e/tYeEJ2Z2HiuIAcpFUxplJoUEZyQw67FWhzx8MKlS
-         IdgPB8QblP60Zc4ObTv/wnaK1mlle94UN/4bybyJqzGd/l+ipOyiyXYtMLsZjK90M1oK
-         BYXg==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=hSDBYKF708e7z4RH+WD+TNa+d9tldjOVBDmu19DDFN8=;
+        b=m6Yb3zCNoVTrTSaM6L9mYp1v08xefp+vqvxrs//Ue6rmrU6JrZAB8DwQT4Ml2f1rA2
+         a67K/MvM/VyZWwmJ/HzxWaYhxodMc25uLwe/Jfmn6Jajvub/XjorxjoSkJpCs3SdpXCX
+         qaJrgC9zC1h4VDlNl8MV+HxBOJfsBuYaCWizcWcAgghyjhmqlW/dl4QSOPvfM3uNHtwl
+         J+n71fwrz6lWy6cZHZnMbu2tsfBxgVQDDTL07/DbUKbagGIAeogjr/ZQ1J0fQPscjxbH
+         gLZkLnyIdRg+Go6SNI5Qbq3vQFK0pjMfunOzcn7fxIIAo/16bRzihmbBiPX2A6+k0kuu
+         Vntw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=blBuI15MMY0MGa+yP7ydP9PfuIXdWhGkChiZpEAVEHI=;
-        b=VRrsxhCiTf0seOig48BTCbxJXchz3/0cefPdUS+yDCJgGqGbMsCTCQKpC0LxS1t0Qj
-         Dr+Jl76KhW7/kOB3ySfnLPLjhxzpkTxgGVI967XA67F57ku7pezsSAsqVhibO8CMq96k
-         TL/9+sp9T50VgFdvT92vzhWfyW2XjHkuo/PcEwpohBNiECXSZkqS2lIq4LrQk0bvTzUB
-         RPiUazo5AV47v+3yIqej3nYxPgREf3Jo78jxW0dH0zBmGc+E+SpwpJNUvW8dgRw1nOfI
-         FK7pSpBcegW3FyacA709iNxLImuRfPDwuMeECpodm9TZxzcJINuaNXzmYc2MfymzCrrN
-         eLgw==
-X-Gm-Message-State: APjAAAWgMQXCncLMqS0NYYzaFDNmqE2YVvI9xJ7fJqpPqAb9zHaod801
-        bJsKBjsOWcBnYEtSpcWV/jypYRhT/cF2Cg==
-X-Google-Smtp-Source: APXvYqzzzxls1cGZLYjOIMp+EqnaAymkr5DqK8AH+UGFSkSZ48BKhm8FKFOGn+r8gGCkoCLHTSJtvg==
-X-Received: by 2002:adf:b60c:: with SMTP id f12mr129765643wre.231.1565024451482;
-        Mon, 05 Aug 2019 10:00:51 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=hSDBYKF708e7z4RH+WD+TNa+d9tldjOVBDmu19DDFN8=;
+        b=ChPp7RFg80BKiDxrwBidG2/ccrJVESzoYL1wOKqKqZGsJfEWWMRegTLB+ssUVhe6g4
+         OqwuE+GKEpBD+ERFM2Cnb/PA4GfsJ/yp7sNHm4rsd1jAQXMM0Sf+oRKXjPiXpvSgcLAo
+         ml2igfa52hN5T4dSbdnq2epXXje+3jU9hFsDAJ1cVyBJzqggrnAtWblyBmkOgj324hOr
+         btIeiqwm0MR+7b1MwG30J74uR1/eWBOA/U3IYWXcsdRhet8/ogMxXMC8C0lYhh1Rvbzo
+         WrA8bbfgf7fe6Kb7Pqn2vSWN5VyuzgFYM/Tn6PHLbLumuixPiOF8ANiKLqySSMUI6CCt
+         p2sQ==
+X-Gm-Message-State: APjAAAWU2H38GMoq9sz3m+xMsBaNd8Bu32NRPdwLwyQwTgWSKsOb+kHL
+        OERcROpfcstcAa9eYOmGkZLR6D+fuytj+w==
+X-Google-Smtp-Source: APXvYqy28n0Q+MCAWzOHm2eBVBqaxUmR0uFGgVtX5lcxqLHBGGStewS4h4F/PhBLvlU6vooqKKoHWA==
+X-Received: by 2002:a1c:4d05:: with SMTP id o5mr19268112wmh.63.1565024454701;
+        Mon, 05 Aug 2019 10:00:54 -0700 (PDT)
 Received: from localhost.localdomain ([2a02:587:a407:da00:582f:8334:9cd9:7241])
-        by smtp.gmail.com with ESMTPSA id j9sm95669383wrn.81.2019.08.05.10.00.48
+        by smtp.gmail.com with ESMTPSA id j9sm95669383wrn.81.2019.08.05.10.00.51
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 05 Aug 2019 10:00:50 -0700 (PDT)
+        Mon, 05 Aug 2019 10:00:54 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     herbert@gondor.apana.org.au, ebiggers@kernel.org,
         horia.geanta@nxp.com, Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v4 00/30] crypto: DES/3DES cleanup
-Date:   Mon,  5 Aug 2019 20:00:07 +0300
-Message-Id: <20190805170037.31330-1-ard.biesheuvel@linaro.org>
+Subject: [PATCH v4 01/30] crypto: des/3des_ede - add new helpers to verify keys
+Date:   Mon,  5 Aug 2019 20:00:08 +0300
+Message-Id: <20190805170037.31330-2-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.17.1
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190805170037.31330-1-ard.biesheuvel@linaro.org>
+References: <20190805170037.31330-1-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-In my effort to remove crypto_alloc_cipher() invocations from non-crypto
-code, i ran into a DES call in the CIFS driver. This is addressed in
-patch #30.
+The recently added helper routine to perform key strength validation
+of triple DES keys is slightly inadequate, since it comes in two versions,
+neither of which are highly useful for anything other than skciphers (and
+many drivers still use the older blkcipher interfaces).
 
-The other patches are cleanups for the quirky DES interface, and lots
-of duplication of the weak key checks etc.
+So let's add a new helper and, considering that this is a helper function
+that is only intended to be used by crypto code itself, put it in a new
+des.h header under crypto/internal.
 
-Changes since v3:
-- rebase onto today's cryptodev/master
-- update safexcel patch to address code that has been added in the mean time
-- replace memzero_explicit() calls with memset() if they don't operate on
-  stack buffers
-- add T-b's from Horia and Corentin
+While at it, implement a similar helper for single DES, so that we can
+start replacing the pattern of calling des_ekey() into a temp buffer
+that occurs in many drivers in drivers/crypto.
+
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+---
+ crypto/des_generic.c          | 13 ---
+ include/crypto/internal/des.h | 95 ++++++++++++++++++++
+ 2 files changed, 95 insertions(+), 13 deletions(-)
+
+diff --git a/crypto/des_generic.c b/crypto/des_generic.c
+index dc085514408a..c4d8ecda4ddf 100644
+--- a/crypto/des_generic.c
++++ b/crypto/des_generic.c
+@@ -841,19 +841,6 @@ static void des_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
+ 	d[1] = cpu_to_le32(L);
+ }
  
-Changes since v2:
-- fixed another couple of build errors that I missed, apologies to the
-  reviewers for failing to spot these
-- use/retain a simplified 'return verify() ?: setkey()' pattern where possible
-  (as suggested by Horia)
-- ensure that the setkey() routines using the helpers return -EINVAL on weak
-  keys when disallowed by the tfm's weak key policy
-- remove many pointless unlikely() annotations on ice-cold setkey() paths
-
-Changes since v1/RFC:
-- fix build errors in various drivers that i failed to catch in my
-  initial testing
-- put all caam changes into the correct patch
-- fix weak key handling error flagged by the self tests, as reported
-  by Eric.
-- add ack from Harald to patch #2
-
-The KASAN error reported by Eric failed to reproduce for me, so I
-didn't include a fix for that. Please check if it still reproduces for
-you.
-
-Patch #1 adds new helpers to verify DES keys to crypto/internal.des.h
-
-The next 23 patches move all existing users of DES routines to the
-new interface.
-
-Patch #25 and #26 are preparatory patches for the new DES library
-introduced in patch #27, which replaces the various DES related
-functions exported to other drivers with a sane library interface.
-
-Patch #28 switches the x86 asm code to the new librar interface.
-
-Patch #29 removes code that is no longer used at this point.
-
-Code can be found here:
-https://git.kernel.org/pub/scm/linux/kernel/git/ardb/linux.git/log/?h=des-cleanup-v4
-
-Ard Biesheuvel (30):
-  crypto: des/3des_ede - add new helpers to verify keys
-  crypto: s390/des - switch to new verification routines
-  crypto: sparc/des - switch to new verification routines
-  crypto: atmel/des - switch to new verification routines
-  crypto: bcm/des - switch to new verification routines
-  crypto: caam/des - switch to new verification routines
-  crypto: cpt/des - switch to new verification routines
-  crypto: nitrox/des - switch to new verification routines
-  crypto: ccp/des - switch to new verification routines
-  crypto: ccree/des - switch to new verification routines
-  crypto: hifn/des - switch to new verification routines
-  crypto: hisilicon/des - switch to new verification routines
-  crypto: safexcel/des - switch to new verification routines
-  crypto: ixp4xx/des - switch to new verification routines
-  crypto: cesa/des - switch to new verification routines
-  crypto: n2/des - switch to new verification routines
-  crypto: omap/des - switch to new verification routines
-  crypto: picoxcell/des - switch to new verification routines
-  crypto: qce/des - switch to new verification routines
-  crypto: rk3288/des - switch to new verification routines
-  crypto: stm32/des - switch to new verification routines
-  crypto: sun4i/des - switch to new verification routines
-  crypto: talitos/des - switch to new verification routines
-  crypto: ux500/des - switch to new verification routines
-  crypto: 3des - move verification out of exported routine
-  crypto: des - remove unused function
-  crypto: des - split off DES library from generic DES cipher driver
-  crypto: x86/des - switch to library interface
-  crypto: des - remove now unused __des3_ede_setkey()
-  fs: cifs: move from the crypto cipher API to the new DES library
-    interface
-
- arch/s390/crypto/des_s390.c                   |  25 +-
- arch/sparc/crypto/des_glue.c                  |  37 +-
- arch/x86/crypto/des3_ede_glue.c               |  38 +-
- crypto/Kconfig                                |   8 +-
- crypto/des_generic.c                          | 945 +-----------------
- drivers/crypto/Kconfig                        |  28 +-
- drivers/crypto/atmel-tdes.c                   |  28 +-
- drivers/crypto/bcm/cipher.c                   |  82 +-
- drivers/crypto/caam/Kconfig                   |   2 +-
- drivers/crypto/caam/caamalg.c                 |  38 +-
- drivers/crypto/caam/caamalg_qi.c              |  13 +-
- drivers/crypto/caam/caamalg_qi2.c             |  13 +-
- drivers/crypto/caam/compat.h                  |   2 +-
- drivers/crypto/cavium/cpt/cptvf_algs.c        |  26 +-
- drivers/crypto/cavium/nitrox/Kconfig          |   2 +-
- .../crypto/cavium/nitrox/nitrox_skcipher.c    |   4 +-
- drivers/crypto/ccp/ccp-crypto-des3.c          |   7 +-
- drivers/crypto/ccree/cc_aead.c                |  13 +-
- drivers/crypto/ccree/cc_cipher.c              |  15 +-
- drivers/crypto/hifn_795x.c                    |  29 +-
- drivers/crypto/hisilicon/sec/sec_algs.c       |  18 +-
- .../crypto/inside-secure/safexcel_cipher.c    |  29 +-
- drivers/crypto/ixp4xx_crypto.c                |  28 +-
- drivers/crypto/marvell/cipher.c               |  22 +-
- drivers/crypto/n2_core.c                      |  26 +-
- drivers/crypto/omap-des.c                     |  25 +-
- drivers/crypto/picoxcell_crypto.c             |  21 +-
- drivers/crypto/qce/ablkcipher.c               |  55 +-
- drivers/crypto/rockchip/rk3288_crypto.h       |   2 +-
- .../rockchip/rk3288_crypto_ablkcipher.c       |  21 +-
- drivers/crypto/stm32/Kconfig                  |   2 +-
- drivers/crypto/stm32/stm32-cryp.c             |  30 +-
- drivers/crypto/sunxi-ss/sun4i-ss-cipher.c     |  26 +-
- drivers/crypto/sunxi-ss/sun4i-ss.h            |   2 +-
- drivers/crypto/talitos.c                      |  34 +-
- drivers/crypto/ux500/Kconfig                  |   2 +-
- drivers/crypto/ux500/cryp/cryp_core.c         |  31 +-
- fs/cifs/Kconfig                               |   2 +-
- fs/cifs/cifsfs.c                              |   1 -
- fs/cifs/smbencrypt.c                          |  18 +-
- include/crypto/des.h                          |  77 +-
- include/crypto/internal/des.h                 | 106 ++
- lib/crypto/Makefile                           |   3 +
- lib/crypto/des.c                              | 902 +++++++++++++++++
- 44 files changed, 1357 insertions(+), 1481 deletions(-)
- create mode 100644 include/crypto/internal/des.h
- create mode 100644 lib/crypto/des.c
-
+-/*
+- * RFC2451:
+- *
+- *   For DES-EDE3, there is no known need to reject weak or
+- *   complementation keys.  Any weakness is obviated by the use of
+- *   multiple keys.
+- *
+- *   However, if the first two or last two independent 64-bit keys are
+- *   equal (k1 == k2 or k2 == k3), then the DES3 operation is simply the
+- *   same as DES.  Implementers MUST reject keys that exhibit this
+- *   property.
+- *
+- */
+ int __des3_ede_setkey(u32 *expkey, u32 *flags, const u8 *key,
+ 		      unsigned int keylen)
+ {
+diff --git a/include/crypto/internal/des.h b/include/crypto/internal/des.h
+new file mode 100644
+index 000000000000..aad576bad8ad
+--- /dev/null
++++ b/include/crypto/internal/des.h
+@@ -0,0 +1,95 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * DES & Triple DES EDE key verification helpers
++ */
++
++#ifndef __CRYPTO_INTERNAL_DES_H
++#define __CRYPTO_INTERNAL_DES_H
++
++#include <linux/crypto.h>
++#include <linux/fips.h>
++#include <crypto/des.h>
++
++/**
++ * crypto_des_verify_key - Check whether a DES is weak
++ * @tfm: the crypto algo
++ * @key: the key buffer
++ *
++ * Returns -EINVAL if the key is weak and the crypto TFM does not permit weak
++ * keys. Otherwise, 0 is returned.
++ *
++ * It is the job of the caller to ensure that the size of the key equals
++ * DES_KEY_SIZE.
++ */
++static inline int crypto_des_verify_key(struct crypto_tfm *tfm, const u8 *key)
++{
++	u32 tmp[DES_EXPKEY_WORDS];
++	int err = 0;
++
++	if (!(crypto_tfm_get_flags(tfm) & CRYPTO_TFM_REQ_FORBID_WEAK_KEYS))
++		return 0;
++
++	if (!des_ekey(tmp, key)) {
++		crypto_tfm_set_flags(tfm, CRYPTO_TFM_RES_WEAK_KEY);
++		err = -EINVAL;
++	}
++
++	memzero_explicit(tmp, sizeof(tmp));
++	return err;
++}
++
++/*
++ * RFC2451:
++ *
++ *   For DES-EDE3, there is no known need to reject weak or
++ *   complementation keys.  Any weakness is obviated by the use of
++ *   multiple keys.
++ *
++ *   However, if the first two or last two independent 64-bit keys are
++ *   equal (k1 == k2 or k2 == k3), then the DES3 operation is simply the
++ *   same as DES.  Implementers MUST reject keys that exhibit this
++ *   property.
++ *
++ */
++
++/**
++ * crypto_des3_ede_verify_key - Check whether a DES3-EDE is weak
++ * @tfm: the crypto algo
++ * @key: the key buffer
++ *
++ * Returns -EINVAL if the key is weak and the crypto TFM does not permit weak
++ * keys or when running in FIPS mode. Otherwise, 0 is returned. Note that some
++ * keys are rejected in FIPS mode even if weak keys are permitted by the TFM
++ * flags.
++ *
++ * It is the job of the caller to ensure that the size of the key equals
++ * DES3_EDE_KEY_SIZE.
++ */
++static inline int crypto_des3_ede_verify_key(struct crypto_tfm *tfm,
++					     const u8 *key)
++{
++	int err = -EINVAL;
++	u32 K[6];
++
++	memcpy(K, key, DES3_EDE_KEY_SIZE);
++
++	if ((!((K[0] ^ K[2]) | (K[1] ^ K[3])) ||
++	     !((K[2] ^ K[4]) | (K[3] ^ K[5]))) &&
++	    (fips_enabled || (crypto_tfm_get_flags(tfm) &
++		              CRYPTO_TFM_REQ_FORBID_WEAK_KEYS)))
++		goto bad;
++
++	if ((!((K[0] ^ K[4]) | (K[1] ^ K[5]))) && fips_enabled)
++		goto bad;
++
++	err = 0;
++out:
++	memzero_explicit(K, DES3_EDE_KEY_SIZE);
++	return err;
++
++bad:
++	crypto_tfm_set_flags(tfm, CRYPTO_TFM_RES_WEAK_KEY);
++	goto out;
++}
++
++#endif /* __CRYPTO_INTERNAL_DES_H */
 -- 
 2.17.1
 
