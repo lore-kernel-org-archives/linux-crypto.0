@@ -2,124 +2,120 @@ Return-Path: <SRS0=y31I=WC=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A30DC31E40
-	for <linux-crypto@archiver.kernel.org>; Tue,  6 Aug 2019 12:17:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57AF4C433FF
+	for <linux-crypto@archiver.kernel.org>; Tue,  6 Aug 2019 12:54:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DEC6020B1F
-	for <linux-crypto@archiver.kernel.org>; Tue,  6 Aug 2019 12:17:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1CFF420B1F
+	for <linux-crypto@archiver.kernel.org>; Tue,  6 Aug 2019 12:54:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zhsryLY5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IfRbbjGu"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726092AbfHFMRt (ORCPT
+        id S1729506AbfHFMyj (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 6 Aug 2019 08:17:49 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:33544 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726036AbfHFMRt (ORCPT
+        Tue, 6 Aug 2019 08:54:39 -0400
+Received: from mail-lj1-f178.google.com ([209.85.208.178]:35173 "EHLO
+        mail-lj1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728918AbfHFMyj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Aug 2019 08:17:49 -0400
-Received: by mail-wm1-f68.google.com with SMTP id h19so8825639wme.0
-        for <linux-crypto@vger.kernel.org>; Tue, 06 Aug 2019 05:17:48 -0700 (PDT)
+        Tue, 6 Aug 2019 08:54:39 -0400
+Received: by mail-lj1-f178.google.com with SMTP id x25so82224371ljh.2
+        for <linux-crypto@vger.kernel.org>; Tue, 06 Aug 2019 05:54:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=E45FnivbPqKcsfGpty7g0LI8JR/YbnVdWPgdzzyZ8l0=;
-        b=zhsryLY5ezEpM2wJSrHlUJ2yOPeDDT8X9D/yM9kU0zwraM1GOWynxFvK+Rg9phJMna
-         QSdb0HGiAdgRVHUC7oImVgjvA01Aq0eDYXKXZmHqruI/vKBdNW7/wmnKhNKgxI3LmE7K
-         mDBL+nk01XdDrOj60gf/jAN5OICJJsLWbk04y4OUD2UrqtWux/6yyXoLl9AWWr91IA8V
-         BdgvRikMKffqzrke0xFGSWNg2wNPGy3Dc7VyBc5qHMQE2YiFHDI/cjKtBWcX2uXVI4cY
-         lL7uEc6SnT9fZZc9ZF3yUMFvSHZq5uOFbYvJzG4EJcsQA8R+PCQo8IejwfOuf58ge5e1
-         k68w==
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=oGcUuvQkMqJuyLxeUSXyAzFKKfBgYSzIUmeWfk8uSh8=;
+        b=IfRbbjGumscr4zZ4+SvX2dfuyaJ3vcjrO1igeRruEqCXqkaHoXBAGiUig+9YcIT8x7
+         qbkjslapT/6bUAvSFRnY7J+hnh96yXUCi9a6eHqMZ3yrOFM68q9ZlANh60I3EdABpvJP
+         ilKdrDGUtr4SVkc4M+BhcuqhIMGpWkXROiQw24UHAYQ0W+qu6mu23Cv7+05GEVDLOodX
+         CuYIYr3vu9auLU+Cl719UxzXRfUMEKG/GAWeEWzsTudP9qDm2/twvZ0qohV2l+ZJi0Lk
+         y6vmH2xUZc02DgNtieAkYx3B/2UE5GW80Gzh9U5HeaRSd3u6wK4bfx/1ifgXjsqpMY37
+         gfiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=E45FnivbPqKcsfGpty7g0LI8JR/YbnVdWPgdzzyZ8l0=;
-        b=ahTofHszHtH4kap6bAYNkUCHsmNhumdUX819ZYRbBK3CRtQx5WqaM+Yx1dA9JCTqBg
-         DUQycCVN8s5ooWI3l/cUJxlcBt6cbfe+tK3spQpyqPG0EhQhNWXj65jM14J491uwcdnd
-         ZU5FnOymwpgye0V5cM/tj5LD2omUa3oA3+cze6dXMiEyGsnYt+WGguOPGjlICpdzGtP4
-         fGI8ReWC8T7SPHG81iqDizdAPNXM9KLV1BDJ58oyiRrgyrlddm5pSkiB2nJitzusGRrw
-         clPUnYnduD4q96O8OmYmZ1PTmbVIo58xCVVPZA7Jb6GZV18vVvrNdGsRy7UNWdsK0oIw
-         04fw==
-X-Gm-Message-State: APjAAAU3kHV9/wOeV6tLMOC9P0L2VCxCkE69RphODlkg2R4/T+TsBNsc
-        CnTKkck1XiU5pHWGN7fHaUooWi2cbFYL03xIgTvBbA==
-X-Google-Smtp-Source: APXvYqw4xhdMYu6PeQSd8jt0KIbWrrCarttfBeILCOrC7Z39wvCWaB+sg/8duCT9s57+m+mDn63caNW3QLYsl1clec8=
-X-Received: by 2002:a1c:b706:: with SMTP id h6mr4506053wmf.119.1565093867280;
- Tue, 06 Aug 2019 05:17:47 -0700 (PDT)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=oGcUuvQkMqJuyLxeUSXyAzFKKfBgYSzIUmeWfk8uSh8=;
+        b=P9SscoUX6YJkoQY8MbH0pYlarYzYy5nk6fHbzKW7nMsXN2311osv4o6m7TfOAtOZAi
+         cuOAAOkkfsuvLpd4y4yPaowJJ17punRzEwWBYnUUsQSJ+Trb1freDQa9iXbtiiFccCl5
+         Jh/QrVVmnh9DnzwtfB28ZY4gz2+UYH0SML0+UPMRn1CH5cI7ndvj3j0+/r5u5ZTzyJEB
+         1y7VbCHGeU8AUae4H0B+1pYYVjygKxH0PVHnGUnHlgzIclaXtX0nc9zWsEz8XsyP7ktj
+         eYxziBKIbyVwT/wy5OHVYjQvhmMTay6Zw9fTLLBT/9pM7YNB4ldu45sV+OxUZwRxHFv/
+         DswA==
+X-Gm-Message-State: APjAAAVT0uWaZzIO1wN96sc+sKtsVNd1xQRD2uKhw264mjPaJVobWn6r
+        SfKS/ZSZQhSJVu2a0fXycqkBAQHys7ahVNfnzKKxPP+R
+X-Google-Smtp-Source: APXvYqxomcHM5CTwxb2/pzIFSGOGA6T9mmXaqMvox9vUtmrG41DBflQO+6X8V7rG30K11NURBrQWatCXJhKGhNlmmp4=
+X-Received: by 2002:a05:651c:20d:: with SMTP id y13mr1674650ljn.204.1565096076879;
+ Tue, 06 Aug 2019 05:54:36 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190806080234.27998-1-ard.biesheuvel@linaro.org>
- <20190806080234.27998-3-ard.biesheuvel@linaro.org> <22f5bfd5-7563-b85b-925e-6d46e7584966@gmail.com>
-In-Reply-To: <22f5bfd5-7563-b85b-925e-6d46e7584966@gmail.com>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Tue, 6 Aug 2019 15:17:36 +0300
-Message-ID: <CAKv+Gu_LQwtM47njiksCJL2tMx_Zv8Paoegfkah--T6Mh55u3A@mail.gmail.com>
-Subject: Re: [RFC PATCH 2/2] md/dm-crypt - switch to AES library for EBOIV
-To:     Milan Broz <gmazyland@gmail.com>
-Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Eric Biggers <ebiggers@kernel.org>,
-        "Alasdair G. Kergon" <agk@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>,
-        device-mapper development <dm-devel@redhat.com>
+From:   Pascal van Leeuwen <pascalvanl@gmail.com>
+Date:   Tue, 6 Aug 2019 14:54:26 +0200
+Message-ID: <CAK9qPMA=-MnkdpkUE_CU5FRmZ6LSk2FzfBJNsB0XRiaYxy9UWA@mail.gmail.com>
+Subject: [GIT PULL] inside-secure: add new GPLv2 "mini" firmware for the
+ EIP197 driver
+To:     linux-firmware@kernel.org
+Cc:     linux-crypto@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 6 Aug 2019 at 13:43, Milan Broz <gmazyland@gmail.com> wrote:
->
-> On 06/08/2019 10:02, Ard Biesheuvel wrote:
-> > The EBOIV IV mode reuses the same AES encryption key that is used for
-> > encrypting the data, and uses it to perform a single block encryption
-> > of the byte offset to produce the IV.
-> >
-> > Since table-based AES is known to be susceptible to known-plaintext
-> > attacks on the key, and given that the same key is used to encrypt
-> > the byte offset (which is known to an attacker), we should be
-> > careful not to permit arbitrary instantiations where the allocated
-> > AES cipher is provided by aes-generic or other table-based drivers
-> > that are known to be time variant and thus susceptible to this kind
-> > of attack.
-> >
-> > Instead, let's switch to the new AES library, which has a D-cache
-> > footprint that is only 1/32th of the generic AES driver, and which
-> > contains some mitigations to reduce the timing variance even further.
->
-> NACK.
->
-> We discussed here that we will not limit combinations inside dm-crypt.
-> For generic crypto API, this policy should be different, but I really
-> do not want these IVs to be visible outside of dm-crypt.
->
-> Allowing arbitrary combinations of a cipher, mode, and IV is how dm-crypt
-> works since the beginning, and I really do not see the reason to change it.
->
-> This IV mode is intended to be used for accessing old BitLocker images,
-> so I do not care about performance much.
->
+The following changes since commit dff98c6c57383fe343407bcb7b6e775e0b87274f:
 
-Apologies for being blunt, but you are basically driving home the
-point I made before about why the cipher API should become internal to
-the crypto subsystem.
+  Merge branch 'master' of git://github.com/skeggsb/linux-firmware
+(2019-07-26 07:32:37 -0400)
 
-Even though EBOIV is explicitly only intended for accessing old
-BitLocker images, you prioritize non-functional properties like API
-symmetry and tradition over sound cryptographic engineering practice,
-even after I pointed out to you that
-a) the way EBOIV uses the same symmetric key for two different
-purposes is a bad idea in general, and
-b) table based AES in particular is a hazard for this mode, since the
-way the IV is generated is susceptible to exactly the attack that
-table based AES is most criticized for.
+are available in the git repository at:
 
-So if you insist on supporting EBOIV in combination with arbitrary
-skciphers or AEADs (or AES on systems where crypto_alloc_cipher()
-produces a table based AES driver), how do you intend to mitigate
-these issues?
+
+  https://github.com/pvanleeuwen/linux-firmware-clean.git is_driver_fw
+
+for you to fetch changes up to fbfe41f92f941d19b840ec0e282f422379982ccb:
+
+  inside-secure: add new GPLv2 "mini" firmware for the EIP197 driver
+(2019-08-06 13:19:44 +0200)
+
+----------------------------------------------------------------
+Pascal van Leeuwen (1):
+      inside-secure: add new GPLv2 "mini" firmware for the EIP197 driver
+
+ WHENCE                               |  10 ++++++++++
+ inside-secure/eip197_minifw/ifpp.bin | Bin 0 -> 100 bytes
+ inside-secure/eip197_minifw/ipue.bin | Bin 0 -> 108 bytes
+ 3 files changed, 10 insertions(+)
+ create mode 100644 inside-secure/eip197_minifw/ifpp.bin
+ create mode 100644 inside-secure/eip197_minifw/ipue.bin
+
+diff --git a/WHENCE b/WHENCE
+index 31edbd4..fce2ef7 100644
+--- a/WHENCE
++++ b/WHENCE
+@@ -4514,3 +4514,13 @@ File: meson/vdec/gxl_mpeg4_5.bin
+ File: meson/vdec/gxm_h264.bin
+
+ Licence: Redistributable. See LICENSE.amlogic_vdec for details.
++
++--------------------------------------------------------------------------
++
++Driver: inside-secure -- Inside Secure EIP197 crypto driver
++
++File: inside-secure/eip197_minifw/ipue.bin
++File: inside-secure/eip197_minifw/ifpp.bin
++
++Licence: GPLv2. See GPL-2 for details.
++
+diff --git a/inside-secure/eip197_minifw/ifpp.bin
+b/inside-secure/eip197_minifw/ifpp.bin
+new file mode 100644
+index 0000000..b4a8322
+Binary files /dev/null and b/inside-secure/eip197_minifw/ifpp.bin differ
+diff --git a/inside-secure/eip197_minifw/ipue.bin
+b/inside-secure/eip197_minifw/ipue.bin
+new file mode 100644
+index 0000000..2f54999
+Binary files /dev/null and b/inside-secure/eip197_minifw/ipue.bin differ
