@@ -1,132 +1,169 @@
-Return-Path: <SRS0=2Ix1=WB=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=y31I=WC=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11BF1C433FF
-	for <linux-crypto@archiver.kernel.org>; Mon,  5 Aug 2019 23:32:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 714CCC31E40
+	for <linux-crypto@archiver.kernel.org>; Tue,  6 Aug 2019 06:12:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D957E2070D
-	for <linux-crypto@archiver.kernel.org>; Mon,  5 Aug 2019 23:32:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="BVla6KTE"
+	by mail.kernel.org (Postfix) with ESMTP id 4C85B2086D
+	for <linux-crypto@archiver.kernel.org>; Tue,  6 Aug 2019 06:12:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730733AbfHEXcn (ORCPT
+        id S1731594AbfHFGM6 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 5 Aug 2019 19:32:43 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:40986 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728870AbfHEXcn (ORCPT
+        Tue, 6 Aug 2019 02:12:58 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:5464 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1731560AbfHFGM6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 5 Aug 2019 19:32:43 -0400
-Received: by mail-pf1-f194.google.com with SMTP id m30so40429230pff.8
-        for <linux-crypto@vger.kernel.org>; Mon, 05 Aug 2019 16:32:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=pkJZsBEn/CiiuZNhsnLr0nSUJKwxAQY9KFBx3uOaLzo=;
-        b=BVla6KTEpKUsi2JPfceTSbxAKyqH5jrH4XqqkmrMT1+57w231S3ir7e9VLkaSMDJlz
-         FEuw5OnOBz+gBdON/yvqKUU+A1gTri8F7kEHVSGNS3YH9ES9+uDhp/Q+xeNyCrGzZJjw
-         B0RcRCta5/6rpmtTYdJuwA2qMrR0Oln/7LTRE=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=pkJZsBEn/CiiuZNhsnLr0nSUJKwxAQY9KFBx3uOaLzo=;
-        b=Ytg/P7n4MdkM+NL9Q61yX3InrKoEzsIx4al2b/WZhfa2zwDr2lGImu4BxO6uVK7LPE
-         JxIqg5zkVZMFIJSw0K755gYN6FZEJRANtvwGh7xRSVl8W46WNGALO56e1m4vBri1o/G8
-         3jBo8f5hIs9UrmFeH/K6NKyGiEozYgZAAM78x3Knnm9k6EO0c79mmwvuLfrLu4MBwjN7
-         VfA8xmnuK92twZeqAqPWElqrrU8HjpmTwwSdYcTjKu5SwhRdrG5YwSWa/R3rLjsYnJIQ
-         tOIp5QmP753inoSM7JvlAwbSeP+uvVVqMML+N4rmvNkr00CZb8TwovImMNy2gGP1V0y+
-         v4ag==
-X-Gm-Message-State: APjAAAU+yPfbZVR2tz2VI+EYlOJFypLW3Y5+JmHn/S4a5aKWpsZslQB8
-        w+pSkOvaJDNowyP1pZmYUEtb9w==
-X-Google-Smtp-Source: APXvYqz2ZiBz50jumbmTgWp5vdv/wsrJgV24UFUfx0VjaX+bimV63+csf6KP0Pd3/yyEgfaO+elfYg==
-X-Received: by 2002:a17:90a:c588:: with SMTP id l8mr228070pjt.16.1565047962658;
-        Mon, 05 Aug 2019 16:32:42 -0700 (PDT)
-Received: from smtp.gmail.com ([2620:15c:202:1:fa53:7765:582b:82b9])
-        by smtp.gmail.com with ESMTPSA id u128sm97748195pfu.48.2019.08.05.16.32.41
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Mon, 05 Aug 2019 16:32:42 -0700 (PDT)
-From:   Stephen Boyd <swboyd@chromium.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Andrey Pronin <apronin@chromium.org>,
-        Duncan Laurie <dlaurie@chromium.org>,
-        Jason Gunthorpe <jgg@ziepe.ca>, Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Guenter Roeck <groeck@chromium.org>,
-        Alexander Steffen <Alexander.Steffen@infineon.com>
-Subject: [PATCH v3] hwrng: core: Freeze khwrng thread during suspend
-Date:   Mon,  5 Aug 2019 16:32:41 -0700
-Message-Id: <20190805233241.220521-1-swboyd@chromium.org>
-X-Mailer: git-send-email 2.22.0.770.g0f2c4a37fd-goog
+        Tue, 6 Aug 2019 02:12:58 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x766CNMI038798
+        for <linux-crypto@vger.kernel.org>; Tue, 6 Aug 2019 02:12:57 -0400
+Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2u732g9wjy-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <linux-crypto@vger.kernel.org>; Tue, 06 Aug 2019 02:12:56 -0400
+Received: from localhost
+        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-crypto@vger.kernel.org> from <freude@linux.ibm.com>;
+        Tue, 6 Aug 2019 07:12:54 +0100
+Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
+        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Tue, 6 Aug 2019 07:12:51 +0100
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x766CoDv23199800
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 6 Aug 2019 06:12:50 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BAB654204B;
+        Tue,  6 Aug 2019 06:12:50 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7383A4203F;
+        Tue,  6 Aug 2019 06:12:50 +0000 (GMT)
+Received: from [10.0.2.15] (unknown [9.152.224.114])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue,  6 Aug 2019 06:12:50 +0000 (GMT)
+Subject: Re: [PATCH v4 02/30] crypto: s390/des - switch to new verification
+ routines
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        linux-crypto@vger.kernel.org
+Cc:     herbert@gondor.apana.org.au, ebiggers@kernel.org,
+        horia.geanta@nxp.com
+References: <20190805170037.31330-1-ard.biesheuvel@linaro.org>
+ <20190805170037.31330-3-ard.biesheuvel@linaro.org>
+From:   Harald Freudenberger <freude@linux.ibm.com>
+Date:   Tue, 6 Aug 2019 08:12:51 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190805170037.31330-3-ard.biesheuvel@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+x-cbid: 19080606-0008-0000-0000-00000305AC71
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19080606-0009-0000-0000-0000A17FB431
+Message-Id: <db6265bc-b460-a4a0-f3ed-9635cc618b6e@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-08-06_03:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1908060074
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The hwrng_fill() function can run while devices are suspending and
-resuming. If the hwrng is behind a bus such as i2c or SPI and that bus
-is suspended, the hwrng may hang the bus while attempting to add some
-randomness. It's been observed on ChromeOS devices with suspend-to-idle
-(s2idle) and an i2c based hwrng that this kthread may run and ask the
-hwrng device for randomness before the i2c bus has been resumed.
+On 05.08.19 19:00, Ard Biesheuvel wrote:
+> Acked-by: Harald Freudenberger <freude@linux.ibm.com>
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> ---
+>  arch/s390/crypto/des_s390.c | 25 +++++++++-----------
+>  1 file changed, 11 insertions(+), 14 deletions(-)
+>
+> diff --git a/arch/s390/crypto/des_s390.c b/arch/s390/crypto/des_s390.c
+> index 374b42fc7637..f56a84751fdb 100644
+> --- a/arch/s390/crypto/des_s390.c
+> +++ b/arch/s390/crypto/des_s390.c
+> @@ -16,7 +16,7 @@
+>  #include <linux/fips.h>
+>  #include <linux/mutex.h>
+>  #include <crypto/algapi.h>
+> -#include <crypto/des.h>
+> +#include <crypto/internal/des.h>
+>  #include <asm/cpacf.h>
+>
+>  #define DES3_KEY_SIZE	(3 * DES_KEY_SIZE)
+> @@ -35,27 +35,24 @@ static int des_setkey(struct crypto_tfm *tfm, const u8 *key,
+>  		      unsigned int key_len)
+>  {
+>  	struct s390_des_ctx *ctx = crypto_tfm_ctx(tfm);
+> -	u32 tmp[DES_EXPKEY_WORDS];
+> +	int err;
+>
+> -	/* check for weak keys */
+> -	if (!des_ekey(tmp, key) &&
+> -	    (tfm->crt_flags & CRYPTO_TFM_REQ_FORBID_WEAK_KEYS)) {
+> -		tfm->crt_flags |= CRYPTO_TFM_RES_WEAK_KEY;
+> -		return -EINVAL;
+> -	}
+> +	err = crypto_des_verify_key(tfm, key);
+> +	if (err)
+> +		return err;
+>
+>  	memcpy(ctx->key, key, key_len);
+>  	return 0;
+>  }
+>
+> -static void des_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+> +static void crypto_des_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+>  {
+>  	struct s390_des_ctx *ctx = crypto_tfm_ctx(tfm);
+>
+>  	cpacf_km(CPACF_KM_DEA, ctx->key, out, in, DES_BLOCK_SIZE);
+>  }
+>
+> -static void des_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+> +static void crypto_des_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+>  {
+>  	struct s390_des_ctx *ctx = crypto_tfm_ctx(tfm);
+>
+> @@ -76,8 +73,8 @@ static struct crypto_alg des_alg = {
+>  			.cia_min_keysize	=	DES_KEY_SIZE,
+>  			.cia_max_keysize	=	DES_KEY_SIZE,
+>  			.cia_setkey		=	des_setkey,
+> -			.cia_encrypt		=	des_encrypt,
+> -			.cia_decrypt		=	des_decrypt,
+> +			.cia_encrypt		=	crypto_des_encrypt,
+> +			.cia_decrypt		=	crypto_des_decrypt,
+>  		}
+>  	}
+>  };
+> @@ -227,8 +224,8 @@ static int des3_setkey(struct crypto_tfm *tfm, const u8 *key,
+>  	struct s390_des_ctx *ctx = crypto_tfm_ctx(tfm);
+>  	int err;
+>
+> -	err = __des3_verify_key(&tfm->crt_flags, key);
+> -	if (unlikely(err))
+> +	err = crypto_des3_ede_verify_key(tfm, key);
+> +	if (err)
+>  		return err;
+>
+>  	memcpy(ctx->key, key, key_len);
 
-Let's make this kthread freezable so that we don't try to touch the
-hwrng during suspend/resume. This ensures that we can't cause the hwrng
-backing driver to get into a bad state because the device is guaranteed
-to be resumed before the hwrng kthread is thawed.
+add my
 
-Cc: Andrey Pronin <apronin@chromium.org>
-Cc: Duncan Laurie <dlaurie@chromium.org>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Arnd Bergmann <arnd@arndb.de>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Guenter Roeck <groeck@chromium.org>
-Cc: Alexander Steffen <Alexander.Steffen@infineon.com>
-Signed-off-by: Stephen Boyd <swboyd@chromium.org>
----
+reviewed-by Harald Freudenberger <freude@de.ibm.com>
 
-I'm splitting this patch off of the larger series so it can
-go through the crypto tree. See [1] for the prevoius round.
-Nothing has changed in this patch since then.
-
-[1] https://lkml.kernel.org/r/20190716224518.62556-2-swboyd@chromium.org
-
- drivers/char/hw_random/core.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
-index 95be7228f327..3b88af3149a7 100644
---- a/drivers/char/hw_random/core.c
-+++ b/drivers/char/hw_random/core.c
-@@ -13,6 +13,7 @@
- #include <linux/delay.h>
- #include <linux/device.h>
- #include <linux/err.h>
-+#include <linux/freezer.h>
- #include <linux/fs.h>
- #include <linux/hw_random.h>
- #include <linux/kernel.h>
-@@ -421,7 +422,9 @@ static int hwrng_fillfn(void *unused)
- {
- 	long rc;
- 
--	while (!kthread_should_stop()) {
-+	set_freezable();
-+
-+	while (!kthread_freezable_should_stop(NULL)) {
- 		struct hwrng *rng;
- 
- 		rng = get_current_rng();
--- 
-Sent by a computer through tubes
+however, could you please choose another prefix when there's a symbol
+collision instead of the "crypto_" maybe "s390_" or something like "des_s390_xxx".
+Thanks
 
