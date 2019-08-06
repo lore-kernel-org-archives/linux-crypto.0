@@ -2,43 +2,53 @@ Return-Path: <SRS0=y31I=WC=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8CDCC433FF
-	for <linux-crypto@archiver.kernel.org>; Tue,  6 Aug 2019 15:43:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCA92C433FF
+	for <linux-crypto@archiver.kernel.org>; Tue,  6 Aug 2019 15:51:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A794620717
-	for <linux-crypto@archiver.kernel.org>; Tue,  6 Aug 2019 15:43:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B16B720717
+	for <linux-crypto@archiver.kernel.org>; Tue,  6 Aug 2019 15:51:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=alien8.de header.i=@alien8.de header.b="dt2cjv9c"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="omsCdPaW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731664AbfHFPnu (ORCPT
+        id S1733249AbfHFPvc (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 6 Aug 2019 11:43:50 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:35336 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728558AbfHFPnu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Aug 2019 11:43:50 -0400
-Received: from zn.tnic (p200300EC2F0DA00008E04FA4C58F7CE4.dip0.t-ipconnect.de [IPv6:2003:ec:2f0d:a000:8e0:4fa4:c58f:7ce4])
+        Tue, 6 Aug 2019 11:51:32 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:58694 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732048AbfHFPvb (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 6 Aug 2019 11:51:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=SncjWrmoRC5b495lasgofj0Rqb2mQTyyh5dUq+5um6c=; b=omsCdPaWcnXHcWz6QUOPsZ1pH
+        m4nhZmOCV5hlYYIM86PIwoYv97n1noOSx61nqdD5Rvo9OhGQQJ+ZPRQzx7OSmkV0g38j23wJVV0Wu
+        OA6nibDOjqa3aQAvytDJ1hR4rA9LfBGjXdSQASh7g9TEaQ8ZQXZk5SLvA35tGtSk8QSRL8vagnuRA
+        grsvsDLfqhl+NiT+Dqly9Tn8qDyLmrA6YcWPBssLEypNK8woJHz1tPHv/fxvUgbTsilr6PrnL7CMY
+        86FQfGDuo3nB2UVQvSwY6mHsHIHy7t5NB7g5s7yo2yQLb4vLc/RxZQGZgFdwDXYBYoVrN3i/SKjrc
+        dsPnU77wA==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by bombadil.infradead.org with esmtpsa (Exim 4.92 #3 (Red Hat Linux))
+        id 1hv1ji-0001tD-Q5; Tue, 06 Aug 2019 15:50:54 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 42CB21EC0C42;
-        Tue,  6 Aug 2019 17:43:48 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1565106228;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=TDFDazt6//hwNfwRMzmVKFiu4ldxLz+yMwXDE8Lj5Eo=;
-        b=dt2cjv9ck6Riog7ad+ewdarAX2dM8UrmZhk8qdfxpW8EfZWGjwleuVrU4g1cmXqrcn8Kh+
-        TWcpA8A1qy+/qbzkXNRCP6wNTc/+TBGiGV3muxnmmGbdGi77lel3IPkl79O3Iqqfn0x3XN
-        2iqBRrkAzDyyrAqpiKzGnDMqxESTm0c=
-Date:   Tue, 6 Aug 2019 17:43:47 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Thomas Garnier <thgarnie@chromium.org>
-Cc:     kernel-hardening@lists.openwall.com, kristen@linux.intel.com,
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 55E2F3077A6;
+        Tue,  6 Aug 2019 17:50:09 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id B8089201B3F8E; Tue,  6 Aug 2019 17:50:34 +0200 (CEST)
+Date:   Tue, 6 Aug 2019 17:50:34 +0200
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     Thomas Garnier <thgarnie@chromium.org>,
+        kernel-hardening@lists.openwall.com, kristen@linux.intel.com,
         keescook@chromium.org, Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
         Thomas Gleixner <tglx@linutronix.de>,
@@ -50,7 +60,6 @@ Cc:     kernel-hardening@lists.openwall.com, kristen@linux.intel.com,
         "VMware, Inc." <pv-drivers@vmware.com>,
         "Rafael J. Wysocki" <rjw@rjwysocki.net>,
         Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
-        Peter Zijlstra <peterz@infradead.org>,
         Nadav Amit <namit@vmware.com>, Jann Horn <jannh@google.com>,
         Feng Tang <feng.tang@intel.com>,
         Maran Wilson <maran.wilson@oracle.com>,
@@ -60,36 +69,34 @@ Cc:     kernel-hardening@lists.openwall.com, kristen@linux.intel.com,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         virtualization@lists.linux-foundation.org, linux-pm@vger.kernel.org
 Subject: Re: [PATCH v9 00/11] x86: PIE support to extend KASLR randomization
-Message-ID: <20190806154347.GD25897@zn.tnic>
+Message-ID: <20190806155034.GP2349@hirez.programming.kicks-ass.net>
 References: <20190730191303.206365-1-thgarnie@chromium.org>
+ <20190806154347.GD25897@zn.tnic>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190730191303.206365-1-thgarnie@chromium.org>
+In-Reply-To: <20190806154347.GD25897@zn.tnic>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jul 30, 2019 at 12:12:44PM -0700, Thomas Garnier wrote:
-> These patches make some of the changes necessary to build the kernel as
-> Position Independent Executable (PIE) on x86_64. Another patchset will
-> add the PIE option and larger architecture changes.
+On Tue, Aug 06, 2019 at 05:43:47PM +0200, Borislav Petkov wrote:
+> On Tue, Jul 30, 2019 at 12:12:44PM -0700, Thomas Garnier wrote:
+> > These patches make some of the changes necessary to build the kernel as
+> > Position Independent Executable (PIE) on x86_64. Another patchset will
+> > add the PIE option and larger architecture changes.
+> 
+> Yeah, about this: do we have a longer writeup about the actual benefits
+> of all this and why we should take this all? After all, after looking
+> at the first couple of asm patches, it is posing restrictions to how
+> we deal with virtual addresses in asm (only RIP-relative addressing in
+> 64-bit mode, MOVs with 64-bit immediates, etc, for example) and I'm
+> willing to bet money that some future unrelated change will break PIE
+> sooner or later.
 
-Yeah, about this: do we have a longer writeup about the actual benefits
-of all this and why we should take this all? After all, after looking
-at the first couple of asm patches, it is posing restrictions to how
-we deal with virtual addresses in asm (only RIP-relative addressing in
-64-bit mode, MOVs with 64-bit immediates, etc, for example) and I'm
-willing to bet money that some future unrelated change will break PIE
-sooner or later. And I'd like to have a better justification why we
-should enforce those new "rules" unconditionally.
+Possibly objtool can help here; it should be possible to teach it about
+these rules, and then it will yell when violated. That should avoid
+regressions.
 
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-Good mailing practices for 400: avoid top-posting and trim the reply.
