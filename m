@@ -2,121 +2,122 @@ Return-Path: <SRS0=y31I=WC=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C79CC31E40
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5B08C41514
 	for <linux-crypto@archiver.kernel.org>; Tue,  6 Aug 2019 08:48:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 704262086D
+	by mail.kernel.org (Postfix) with ESMTP id 9C849208C3
 	for <linux-crypto@archiver.kernel.org>; Tue,  6 Aug 2019 08:48:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="n47NlMdN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CUmRP+iQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732172AbfHFIs6 (ORCPT
+        id S1732197AbfHFIs7 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 6 Aug 2019 04:48:58 -0400
-Received: from mail-ed1-f53.google.com ([209.85.208.53]:33593 "EHLO
-        mail-ed1-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728998AbfHFIs6 (ORCPT
+        Tue, 6 Aug 2019 04:48:59 -0400
+Received: from mail-ed1-f66.google.com ([209.85.208.66]:39510 "EHLO
+        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730068AbfHFIs6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Tue, 6 Aug 2019 04:48:58 -0400
-Received: by mail-ed1-f53.google.com with SMTP id i11so18087192edq.0
-        for <linux-crypto@vger.kernel.org>; Tue, 06 Aug 2019 01:48:56 -0700 (PDT)
+Received: by mail-ed1-f66.google.com with SMTP id m10so81562291edv.6
+        for <linux-crypto@vger.kernel.org>; Tue, 06 Aug 2019 01:48:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=XVCUkJ1Z0CTBeEk4/z5EzWcCX52bucZ5Fq5MKXTsrPI=;
-        b=n47NlMdN/sWpqGYZrBjh5jO4pwfbFpxPcAxvgykx0BvoUJYtjsQ4tlW+xor3X6x2/4
-         TpuXCQLkSvlFE5ZTQ57WcycNmqvQERUO92jVQ2AY2wqSwgFd7Ftypxsk2J9sHmPFWsdv
-         bdEtnWzc/BmAp7al2xrFTzO9OPtkEvuDoHFS0tqtoWZ2DH/ln1R5WnM2NvBjLbry6LZG
-         deN48mASRjS/R0yXKXcV6wFMkvdn+RNtBOvH13gYZRzx8Lk0KY+WP/3n4xjw38rtSxXa
-         Xe2nh1IhdBYVRK6aD4v+1WSjnRPlFgOVIlr3CwIH+VrWbfLwcMpS5cVuDyjFIzNlWLgQ
-         P6Gw==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=62m5UUmZDXEKny7dNaeClSz/HMOjGJwsnVchvvDoSqc=;
+        b=CUmRP+iQKqoERC4MOKh6WNNjIZ4ExaCQ5zHlbu0lyz+eH06E//UiY+YTtsDYhFFCAY
+         aefN3seA8FQqMxSiZXI91/TJa1z3OulK7fBAisqdD167AQnjrJOem1PF4cD9Kko3jlSJ
+         kSye1rQTDB27XY9F/iD9NWTjA3Oa90V4IfRbehpWJTGEx4dtjIjVxVbDtWJMS6x8NaZQ
+         trCRbqOVLJewtzZmXdo8VWjBsC7okREyKHCMyUi78bbFPpDuu3Y7k8ZljlgZhEjU9EU3
+         48yXmEMFcXexD3HjIKRdApFvfn2ARFoCh0AV6jhqYosmeAueQw1JVVNNiE4xzcSohIwJ
+         iJ9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=XVCUkJ1Z0CTBeEk4/z5EzWcCX52bucZ5Fq5MKXTsrPI=;
-        b=atQuGHL+pYyDh3aMkmCNzRDZRyAm9gfnC70BexBkdVOMkP1Sfcazm2CEwxx815/2rl
-         dccgi5SvDfQ5E+x10w4gFC1wpWZNcOWiSYeRQSTwfqpwCsg+WZXgpRY/Qw4yGdCUfm7W
-         ZBmK58r3LfDRyE1TZYPcQjKatfnlAsGeI6aBS7CsWn2ur8vCLQDOL+Wu371duypf0JR/
-         vtSQ0MFLvJ4ajrq0bdQphFS8cTDNtjdFobKLjqmIEj6MmZW74hBq2e1CamOqVruHjIET
-         mRNQP5sNXkIMGNvlYCvgc8IjDgd4bTJ1wN+6zwG+xdae7KumwZA8o4zb7NDLyM6Uu3xD
-         AaoA==
-X-Gm-Message-State: APjAAAW2nVpwxVW3tFj2QziehgvubULGCwArhO3WPGqD43l9nVwOPppS
-        XhjOjAYtcTNUTL4SXx1q1I8yR3f3
-X-Google-Smtp-Source: APXvYqxqCbKLR9NfemE9Ho7ghdQK/TuAkU21Phka9khWML1e2LJjhNPMwxXfcRWKE6mcsQCaeoSAjg==
-X-Received: by 2002:a50:9177:: with SMTP id f52mr2616841eda.294.1565081335991;
-        Tue, 06 Aug 2019 01:48:55 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=62m5UUmZDXEKny7dNaeClSz/HMOjGJwsnVchvvDoSqc=;
+        b=bTnUbqNuDYtogMaihpeGLHOdL3s833t9Nc+YXv2oeJYKzYc2k2tFtTxvNIJfDndx1A
+         mDRJG+Y4kcVWA0az9zSqtYqnMIjczcCDNKgS4iTuV5yFVuLkDBWQi0DOcOHh4a8WAQ7v
+         ooJfgFEbIS4ACSysLCB3LQPq8BPweQVBk82pAt3KDm6GG0XNsFAskMzKVLzCULF/taTZ
+         MgVNCvuobtwwDjppSs8RbwGFHESMIIFT+nwxH7qMZ62hDFmDFixWo7bZCqezJy+XOAR3
+         v9zux7NO320Kf05rH2roIIGnCZIACSg8+3Q4NSEvyryxHNdEg12nELzt+aNhj3k5FVWY
+         rADw==
+X-Gm-Message-State: APjAAAW9zryrykeOawv+iMGSGKX7zEgk66ixe7yF7kxVs3g0VI+aIy2E
+        3hcueCEE5U6kQuwPF9FTmrmtdJzz
+X-Google-Smtp-Source: APXvYqwh4Z6AgmDiF8z1niHNUN/9sx0v4mHgbvL6ox5aZiSaUbM7iPr6RXxR4gQndsUPFOqPAqMYbA==
+X-Received: by 2002:a17:906:6a54:: with SMTP id n20mr2101280ejs.232.1565081336938;
+        Tue, 06 Aug 2019 01:48:56 -0700 (PDT)
 Received: from localhost.localdomain.com ([188.204.2.113])
-        by smtp.gmail.com with ESMTPSA id f21sm19980304edj.36.2019.08.06.01.48.54
+        by smtp.gmail.com with ESMTPSA id f21sm19980304edj.36.2019.08.06.01.48.56
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 06 Aug 2019 01:48:54 -0700 (PDT)
+        Tue, 06 Aug 2019 01:48:56 -0700 (PDT)
 From:   Pascal van Leeuwen <pascalvanl@gmail.com>
 X-Google-Original-From: Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
 To:     linux-crypto@vger.kernel.org
 Cc:     antoine.tenart@bootlin.com, herbert@gondor.apana.org.au,
         davem@davemloft.net,
         Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
-Subject: [PATCHv4 0/4] crypto: inside-secure - broaden driver scope
-Date:   Tue,  6 Aug 2019 09:46:22 +0200
-Message-Id: <1565077586-27814-1-git-send-email-pvanleeuwen@verimatrix.com>
+Subject: [PATCHv4 1/4] crypto: inside-secure - make driver selectable for non-Marvell hardware
+Date:   Tue,  6 Aug 2019 09:46:23 +0200
+Message-Id: <1565077586-27814-2-git-send-email-pvanleeuwen@verimatrix.com>
 X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1565077586-27814-1-git-send-email-pvanleeuwen@verimatrix.com>
+References: <1565077586-27814-1-git-send-email-pvanleeuwen@verimatrix.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This is a first baby step towards making the inside-secure crypto driver
-more broadly useful. The current driver only works for Marvell Armada HW
-and requires proprietary firmware, only available under NDA from Marvell,
-to be installed. This patch set allows the driver to be used with other
-hardware and removes the dependence on that proprietary firmware.
+While being a generic EIP97/EIP197 driver, the driver was only selectable
+for Marvell Armada hardware. This fix makes the driver selectable for any
+Device Tree supporting kernel configuration, allowing it to be used for
+other compatible hardware by just adding the correct device tree entry.
 
-changes since v1:
-- changed dev_info's into dev_dbg to reduce normal verbosity
-- terminate all message strings with \n
-- use priv->version field strictly to enumerate device context
-- fixed some code & comment style issues
-- removed EIP97/197 references from messages
-- use #if(IS_ENABLED(CONFIG_PCI)) to remove all PCI related code
-- use #if(IS_ENABLED(CONFIG_OF)) to remove all device tree related code
-- do not inline the minifw but read it from /lib/firmware instead
+It also allows the driver to be selected for PCI(E) supporting kernel con-
+figurations, to be able to use it with PCIE based FPGA development boards
+for pre-silicon driver development by both Inside Secure and its IP custo-
+mers.
 
-changes since v2:
-- split off removal of alg to engine mapping code into separate patch
-- replaced some constants with nice defines
-- added missing \n to some error messages
-- removed some redundant parenthesis
-- aligned some #if's properly
-- added some comments to clarify code
-- report error on FW load for unknown HW instead of loading EIP197B FW
-- use readl_relaxed() instead of readl() + cpu_relax() in polling loop
-- merged patch "fix null ptr dereference on rmmod for macchiatobin" here
-- merged patch "removed unused struct entry"
+Signed-off-by: Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
+Acked-by: Antoine Tenart <antoine.tenart@bootlin.com>
+---
+ drivers/crypto/Kconfig | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-changes since v3:
-- reverted comment style from generic back to network
-- changed prefix "crypto_is_" to "safexcel_" for consistency
+diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+index 67af688..0d9f67d 100644
+--- a/drivers/crypto/Kconfig
++++ b/drivers/crypto/Kconfig
+@@ -716,8 +716,7 @@ source "drivers/crypto/stm32/Kconfig"
 
-Pascal van Leeuwen (4):
-  crypto: inside-secure - make driver selectable for non-Marvell
-    hardware
-  crypto: inside-secure - Remove redundant algo to engine mapping code
-  crypto: inside-secure - add support for PCI based FPGA development
-    board
-  crypto: inside-secure - add support for using the EIP197 without
-    vendor firmware
+ config CRYPTO_DEV_SAFEXCEL
+ 	tristate "Inside Secure's SafeXcel cryptographic engine driver"
+-	depends on OF
+-	depends on (ARM64 && ARCH_MVEBU) || (COMPILE_TEST && 64BIT)
++	depends on OF || PCI || COMPILE_TEST
+ 	select CRYPTO_AES
+ 	select CRYPTO_AUTHENC
+ 	select CRYPTO_BLKCIPHER
+@@ -729,10 +728,11 @@ config CRYPTO_DEV_SAFEXCEL
+ 	select CRYPTO_SHA256
+ 	select CRYPTO_SHA512
+ 	help
+-	  This driver interfaces with the SafeXcel EIP-197 cryptographic engine
+-	  designed by Inside Secure. Select this if you want to use CBC/ECB
+-	  chain mode, AES cipher mode and SHA1/SHA224/SHA256/SHA512 hash
+-	  algorithms.
++	  This driver interfaces with the SafeXcel EIP-97 and EIP-197 cryptographic
++	  engines designed by Inside Secure. It currently accelerates DES, 3DES and
++	  AES block ciphers in ECB and CBC mode, as well as SHA1, SHA224, SHA256,
++	  SHA384 and SHA512 hash algorithms for both basic hash and HMAC.
++	  Additionally, it accelerates combined AES-CBC/HMAC-SHA AEAD operations.
 
- drivers/crypto/Kconfig                         |  12 +-
- drivers/crypto/inside-secure/safexcel.c        | 744 +++++++++++++++++--------
- drivers/crypto/inside-secure/safexcel.h        |  43 +-
- drivers/crypto/inside-secure/safexcel_cipher.c |  11 -
- drivers/crypto/inside-secure/safexcel_hash.c   |  12 -
- drivers/crypto/inside-secure/safexcel_ring.c   |   3 +-
- 6 files changed, 573 insertions(+), 252 deletions(-)
-
+ config CRYPTO_DEV_ARTPEC6
+ 	tristate "Support for Axis ARTPEC-6/7 hardware crypto acceleration."
 --
 1.8.3.1
