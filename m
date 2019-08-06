@@ -2,417 +2,156 @@ Return-Path: <SRS0=y31I=WC=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54400C31E40
-	for <linux-crypto@archiver.kernel.org>; Tue,  6 Aug 2019 17:39:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADBB1C433FF
+	for <linux-crypto@archiver.kernel.org>; Tue,  6 Aug 2019 18:34:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1A1DA214C6
-	for <linux-crypto@archiver.kernel.org>; Tue,  6 Aug 2019 17:39:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7F4962086D
+	for <linux-crypto@archiver.kernel.org>; Tue,  6 Aug 2019 18:34:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hGgZAmjD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387583AbfHFRjy (ORCPT
+        id S1732780AbfHFSev (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 6 Aug 2019 13:39:54 -0400
-Received: from mga12.intel.com ([192.55.52.136]:3801 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387490AbfHFRjx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Aug 2019 13:39:53 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 06 Aug 2019 10:39:46 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,353,1559545200"; 
-   d="scan'208";a="174242846"
-Received: from iweiny-desk2.sc.intel.com ([10.3.52.157])
-  by fmsmga008.fm.intel.com with ESMTP; 06 Aug 2019 10:39:46 -0700
-Date:   Tue, 6 Aug 2019 10:39:46 -0700
-From:   Ira Weiny <ira.weiny@intel.com>
-To:     john.hubbard@gmail.com
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Chinner <david@fromorbit.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Jan Kara <jack@suse.cz>, Jason Gunthorpe <jgg@ziepe.ca>,
-        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        amd-gfx@lists.freedesktop.org, ceph-devel@vger.kernel.org,
-        devel@driverdev.osuosl.org, devel@lists.orangefs.org,
-        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-fbdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-mm@kvack.org,
-        linux-nfs@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-rpi-kernel@lists.infradead.org, linux-xfs@vger.kernel.org,
-        netdev@vger.kernel.org, rds-devel@oss.oracle.com,
-        sparclinux@vger.kernel.org, x86@kernel.org,
-        xen-devel@lists.xenproject.org, John Hubbard <jhubbard@nvidia.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Matthew Wilcox <willy@infradead.org>
-Subject: Re: [PATCH v2 01/34] mm/gup: add make_dirty arg to
- put_user_pages_dirty_lock()
-Message-ID: <20190806173945.GA4748@iweiny-DESK2.sc.intel.com>
-References: <20190804224915.28669-1-jhubbard@nvidia.com>
- <20190804224915.28669-2-jhubbard@nvidia.com>
+        Tue, 6 Aug 2019 14:34:51 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:33413 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728836AbfHFSev (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 6 Aug 2019 14:34:51 -0400
+Received: by mail-wr1-f67.google.com with SMTP id n9so88980181wru.0
+        for <linux-crypto@vger.kernel.org>; Tue, 06 Aug 2019 11:34:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=CI9j1og32UjyhgiHPcwb7Ud6XFvku0B2Oz7BksyYGQs=;
+        b=hGgZAmjD1omOOURPQFn3sCZFJBvFZ0CqGqT8WIXRXpyuXI1eZMDR0a0lpFLGVYcvqz
+         giGsweNDkbLS8o+puCAyOn6Kw1QZcfdprH5zegE5XT6dG8jJ2HPf0OQ2UphoMvoiS3IK
+         O/6ABp5FLD0Nm10615g6mOxnI0nQs8vAUaGUWVVFIHXGwdxdLwL1ftXrQVoee7RVWrKv
+         ORVuZWZO/DgEfpTzUkUs+5sS9jdxunlaAv8r3hPqgxJ49jAvum3ge2y4EyNxjqoeaAKI
+         Lj9zg8u5KrEzFeNt+e/MCUx5vNCk6vKRli+3cMCQinqvMoyKLh34Ldrf6mloOFdtPxCe
+         KUtg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=CI9j1og32UjyhgiHPcwb7Ud6XFvku0B2Oz7BksyYGQs=;
+        b=VyxUB4vadPO9l/z1k0Rkhu2qgWLpB8HL/ujH1otLZ3shjm4OR1qSO77IFzvX3I8Dnx
+         M5srlD3I7suMY9PESYuu/A1BBZPkkUnFu0PbszzUaH+eTbPcu9Aye+1GXyfdgP64ftir
+         emrKVm4sOkL2QPHo7ZcKYmxuPnpNKr4k+hQeaBOPc3cqCYAdFpRbEzfKg1O5xrjtay06
+         ffFsjWuWTI6UXZwEQF6haQ8VO/yyKO6M+ykmxbS2/ztq0YZuSeYGzoNg5yB6FrWjZwMF
+         WrdPGyctuyI41UztSmC4i6ib9udaR5+odkEhTuyZ9RgQyi039hGVTkOHZhgeLxqx43xZ
+         IPKQ==
+X-Gm-Message-State: APjAAAXgr3lGeaoYI+xz+VooiBNRzQFuZzKO/+xDsWcGQiskW2bTk2Ny
+        V4EviVdzDVu9nheQ0HSTwYI=
+X-Google-Smtp-Source: APXvYqycXMF9cJmto2rqd1KTC2jJI8FiBkqWWlUuvUN0jPj/uL+vkClCghViV213It/Pm1gKD1dEpg==
+X-Received: by 2002:a5d:4101:: with SMTP id l1mr6332385wrp.202.1565116488286;
+        Tue, 06 Aug 2019 11:34:48 -0700 (PDT)
+Received: from [192.168.2.28] (39.35.broadband4.iol.cz. [85.71.35.39])
+        by smtp.gmail.com with ESMTPSA id g2sm79751259wmh.0.2019.08.06.11.34.47
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Tue, 06 Aug 2019 11:34:47 -0700 (PDT)
+Subject: Re: [PATCH] crypto: xts - Add support for Cipher Text Stealing
+To:     Pascal van Leeuwen <pascalvanl@gmail.com>,
+        linux-crypto@vger.kernel.org
+Cc:     rsnel@cube.dyndns.org, herbert@gondor.apana.org.au,
+        davem@davemloft.net,
+        Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
+References: <1565074510-8480-1-git-send-email-pvanleeuwen@verimatrix.com>
+From:   Milan Broz <gmazyland@gmail.com>
+Openpgp: preference=signencrypt
+Message-ID: <5bf9d0be-3ba4-8903-f1b9-93aa32106274@gmail.com>
+Date:   Tue, 6 Aug 2019 20:34:46 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190804224915.28669-2-jhubbard@nvidia.com>
-User-Agent: Mutt/1.11.1 (2018-12-01)
+In-Reply-To: <1565074510-8480-1-git-send-email-pvanleeuwen@verimatrix.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Aug 04, 2019 at 03:48:42PM -0700, john.hubbard@gmail.com wrote:
-> From: John Hubbard <jhubbard@nvidia.com>
+On 06/08/2019 08:55, Pascal van Leeuwen wrote:
+> This adds support for Cipher Text Stealing for data blocks that are not an
+> integer multiple of the cipher block size in size, bringing it fully in
+> line with the IEEE P1619/D16 standard.
 > 
-> Provide a more capable variation of put_user_pages_dirty_lock(),
-> and delete put_user_pages_dirty(). This is based on the
-> following:
+> This has been tested with the AES-XTS test vectors from the IEEE P1619/D16
+> specification as well as some additional test vectors supplied to the
+> linux_crypto mailing list previously. It has also been fuzzed against
+> Inside Secure AES-XTS hardware which has been actively used in the field
+> for more than a decade already.
 > 
-> 1. Lots of call sites become simpler if a bool is passed
-> into put_user_page*(), instead of making the call site
-> choose which put_user_page*() variant to call.
-> 
-> 2. Christoph Hellwig's observation that set_page_dirty_lock()
-> is usually correct, and set_page_dirty() is usually a
-> bug, or at least questionable, within a put_user_page*()
-> calling chain.
-> 
-> This leads to the following API choices:
-> 
->     * put_user_pages_dirty_lock(page, npages, make_dirty)
-> 
->     * There is no put_user_pages_dirty(). You have to
->       hand code that, in the rare case that it's
->       required.
-> 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Cc: Matthew Wilcox <willy@infradead.org>
-> Cc: Jan Kara <jack@suse.cz>
-> Cc: Ira Weiny <ira.weiny@intel.com>
-> Cc: Jason Gunthorpe <jgg@ziepe.ca>
-> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
-> ---
->  drivers/infiniband/core/umem.c             |   5 +-
->  drivers/infiniband/hw/hfi1/user_pages.c    |   5 +-
->  drivers/infiniband/hw/qib/qib_user_pages.c |  13 +--
->  drivers/infiniband/hw/usnic/usnic_uiom.c   |   5 +-
->  drivers/infiniband/sw/siw/siw_mem.c        |  19 +---
->  include/linux/mm.h                         |   5 +-
->  mm/gup.c                                   | 115 +++++++++------------
->  7 files changed, 61 insertions(+), 106 deletions(-)
-> 
-> diff --git a/drivers/infiniband/core/umem.c b/drivers/infiniband/core/umem.c
-> index 08da840ed7ee..965cf9dea71a 100644
-> --- a/drivers/infiniband/core/umem.c
-> +++ b/drivers/infiniband/core/umem.c
-> @@ -54,10 +54,7 @@ static void __ib_umem_release(struct ib_device *dev, struct ib_umem *umem, int d
->  
->  	for_each_sg_page(umem->sg_head.sgl, &sg_iter, umem->sg_nents, 0) {
->  		page = sg_page_iter_page(&sg_iter);
-> -		if (umem->writable && dirty)
-> -			put_user_pages_dirty_lock(&page, 1);
-> -		else
-> -			put_user_page(page);
-> +		put_user_pages_dirty_lock(&page, 1, umem->writable && dirty);
->  	}
->  
->  	sg_free_table(&umem->sg_head);
-> diff --git a/drivers/infiniband/hw/hfi1/user_pages.c b/drivers/infiniband/hw/hfi1/user_pages.c
-> index b89a9b9aef7a..469acb961fbd 100644
-> --- a/drivers/infiniband/hw/hfi1/user_pages.c
-> +++ b/drivers/infiniband/hw/hfi1/user_pages.c
-> @@ -118,10 +118,7 @@ int hfi1_acquire_user_pages(struct mm_struct *mm, unsigned long vaddr, size_t np
->  void hfi1_release_user_pages(struct mm_struct *mm, struct page **p,
->  			     size_t npages, bool dirty)
->  {
-> -	if (dirty)
-> -		put_user_pages_dirty_lock(p, npages);
-> -	else
-> -		put_user_pages(p, npages);
-> +	put_user_pages_dirty_lock(p, npages, dirty);
->  
->  	if (mm) { /* during close after signal, mm can be NULL */
->  		atomic64_sub(npages, &mm->pinned_vm);
-> diff --git a/drivers/infiniband/hw/qib/qib_user_pages.c b/drivers/infiniband/hw/qib/qib_user_pages.c
-> index bfbfbb7e0ff4..26c1fb8d45cc 100644
-> --- a/drivers/infiniband/hw/qib/qib_user_pages.c
-> +++ b/drivers/infiniband/hw/qib/qib_user_pages.c
-> @@ -37,15 +37,6 @@
->  
->  #include "qib.h"
->  
-> -static void __qib_release_user_pages(struct page **p, size_t num_pages,
-> -				     int dirty)
-> -{
-> -	if (dirty)
-> -		put_user_pages_dirty_lock(p, num_pages);
-> -	else
-> -		put_user_pages(p, num_pages);
-> -}
-> -
->  /**
->   * qib_map_page - a safety wrapper around pci_map_page()
->   *
-> @@ -124,7 +115,7 @@ int qib_get_user_pages(unsigned long start_page, size_t num_pages,
->  
->  	return 0;
->  bail_release:
-> -	__qib_release_user_pages(p, got, 0);
-> +	put_user_pages_dirty_lock(p, got, false);
->  bail:
->  	atomic64_sub(num_pages, &current->mm->pinned_vm);
->  	return ret;
-> @@ -132,7 +123,7 @@ int qib_get_user_pages(unsigned long start_page, size_t num_pages,
->  
->  void qib_release_user_pages(struct page **p, size_t num_pages)
->  {
-> -	__qib_release_user_pages(p, num_pages, 1);
-> +	put_user_pages_dirty_lock(p, num_pages, true);
->  
->  	/* during close after signal, mm can be NULL */
->  	if (current->mm)
-> diff --git a/drivers/infiniband/hw/usnic/usnic_uiom.c b/drivers/infiniband/hw/usnic/usnic_uiom.c
-> index 0b0237d41613..62e6ffa9ad78 100644
-> --- a/drivers/infiniband/hw/usnic/usnic_uiom.c
-> +++ b/drivers/infiniband/hw/usnic/usnic_uiom.c
-> @@ -75,10 +75,7 @@ static void usnic_uiom_put_pages(struct list_head *chunk_list, int dirty)
->  		for_each_sg(chunk->page_list, sg, chunk->nents, i) {
->  			page = sg_page(sg);
->  			pa = sg_phys(sg);
-> -			if (dirty)
-> -				put_user_pages_dirty_lock(&page, 1);
-> -			else
-> -				put_user_page(page);
-> +			put_user_pages_dirty_lock(&page, 1, dirty);
->  			usnic_dbg("pa: %pa\n", &pa);
->  		}
->  		kfree(chunk);
-> diff --git a/drivers/infiniband/sw/siw/siw_mem.c b/drivers/infiniband/sw/siw/siw_mem.c
-> index 67171c82b0c4..1e197753bf2f 100644
-> --- a/drivers/infiniband/sw/siw/siw_mem.c
-> +++ b/drivers/infiniband/sw/siw/siw_mem.c
-> @@ -60,20 +60,6 @@ struct siw_mem *siw_mem_id2obj(struct siw_device *sdev, int stag_index)
->  	return NULL;
->  }
->  
-> -static void siw_free_plist(struct siw_page_chunk *chunk, int num_pages,
-> -			   bool dirty)
-> -{
-> -	struct page **p = chunk->plist;
-> -
-> -	while (num_pages--) {
-> -		if (!PageDirty(*p) && dirty)
-> -			put_user_pages_dirty_lock(p, 1);
-> -		else
-> -			put_user_page(*p);
-> -		p++;
-> -	}
-> -}
-> -
->  void siw_umem_release(struct siw_umem *umem, bool dirty)
->  {
->  	struct mm_struct *mm_s = umem->owning_mm;
-> @@ -82,8 +68,9 @@ void siw_umem_release(struct siw_umem *umem, bool dirty)
->  	for (i = 0; num_pages; i++) {
->  		int to_free = min_t(int, PAGES_PER_CHUNK, num_pages);
->  
-> -		siw_free_plist(&umem->page_chunk[i], to_free,
-> -			       umem->writable && dirty);
-> +		put_user_pages_dirty_lock(umem->page_chunk[i].plist,
-> +					  to_free,
-> +					  umem->writable && dirty);
->  		kfree(umem->page_chunk[i].plist);
->  		num_pages -= to_free;
->  	}
-> diff --git a/include/linux/mm.h b/include/linux/mm.h
-> index 0334ca97c584..9759b6a24420 100644
-> --- a/include/linux/mm.h
-> +++ b/include/linux/mm.h
-> @@ -1057,8 +1057,9 @@ static inline void put_user_page(struct page *page)
->  	put_page(page);
->  }
->  
-> -void put_user_pages_dirty(struct page **pages, unsigned long npages);
-> -void put_user_pages_dirty_lock(struct page **pages, unsigned long npages);
-> +void put_user_pages_dirty_lock(struct page **pages, unsigned long npages,
-> +			       bool make_dirty);
-> +
->  void put_user_pages(struct page **pages, unsigned long npages);
->  
->  #if defined(CONFIG_SPARSEMEM) && !defined(CONFIG_SPARSEMEM_VMEMMAP)
-> diff --git a/mm/gup.c b/mm/gup.c
-> index 98f13ab37bac..7fefd7ab02c4 100644
-> --- a/mm/gup.c
-> +++ b/mm/gup.c
-> @@ -29,85 +29,70 @@ struct follow_page_context {
->  	unsigned int page_mask;
->  };
->  
-> -typedef int (*set_dirty_func_t)(struct page *page);
-> -
-> -static void __put_user_pages_dirty(struct page **pages,
-> -				   unsigned long npages,
-> -				   set_dirty_func_t sdf)
-> -{
-> -	unsigned long index;
-> -
-> -	for (index = 0; index < npages; index++) {
-> -		struct page *page = compound_head(pages[index]);
-> -
-> -		/*
-> -		 * Checking PageDirty at this point may race with
-> -		 * clear_page_dirty_for_io(), but that's OK. Two key cases:
-> -		 *
-> -		 * 1) This code sees the page as already dirty, so it skips
-> -		 * the call to sdf(). That could happen because
-> -		 * clear_page_dirty_for_io() called page_mkclean(),
-> -		 * followed by set_page_dirty(). However, now the page is
-> -		 * going to get written back, which meets the original
-> -		 * intention of setting it dirty, so all is well:
-> -		 * clear_page_dirty_for_io() goes on to call
-> -		 * TestClearPageDirty(), and write the page back.
-> -		 *
-> -		 * 2) This code sees the page as clean, so it calls sdf().
-> -		 * The page stays dirty, despite being written back, so it
-> -		 * gets written back again in the next writeback cycle.
-> -		 * This is harmless.
-> -		 */
-> -		if (!PageDirty(page))
-> -			sdf(page);
-> -
-> -		put_user_page(page);
-> -	}
-> -}
-> -
->  /**
-> - * put_user_pages_dirty() - release and dirty an array of gup-pinned pages
-> - * @pages:  array of pages to be marked dirty and released.
-> + * put_user_pages_dirty_lock() - release and optionally dirty gup-pinned pages
-> + * @pages:  array of pages to be maybe marked dirty, and definitely released.
+> Signed-off-by: Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
 
-Better would be.
+Wow, it was quick... thanks for this! :)
 
-@pages:  array of pages to be put
+I tried to test with my wrapper through AF_ALG (with the discussed test vectors),
+but it crashed my 32bit i686 VM (Linus tree with your patch applied)
 
->   * @npages: number of pages in the @pages array.
-> + * @make_dirty: whether to mark the pages dirty
->   *
->   * "gup-pinned page" refers to a page that has had one of the get_user_pages()
->   * variants called on that page.
->   *
->   * For each page in the @pages array, make that page (or its head page, if a
-> - * compound page) dirty, if it was previously listed as clean. Then, release
-> - * the page using put_user_page().
-> + * compound page) dirty, if @make_dirty is true, and if the page was previously
-> + * listed as clean. In any case, releases all pages using put_user_page(),
-> + * possibly via put_user_pages(), for the non-dirty case.
+To reproduce it, run this "kernel" af_alg branch of extracted cryptsetup vector testsuite:
+https://github.com/mbroz/cryptsetup_backend_test/tree/kernel
 
-I don't think users of this interface need this level of detail.  I think
-something like.
-
- * For each page in the @pages array, release the page.  If @make_dirty is
- * true, mark the page dirty prior to release.
+(output) ...
+CIPHER vector 00: [aes-ecb,128bits][serpent-ecb,128bits]
+CIPHER vector 01: [aes-cbc,128bits][serpent-cbc,128bits]
+CIPHER vector 02: [aes-ecb,256bits][serpent-ecb,256bits]
+CIPHER vector 03: [aes-cbc,256bits][serpent-cbc,256bits]
+CIPHER vector 04: [aes-xts,256bits][serpent-xts,256bits]
+CIPHER vector 05: [aes-xts,512bits][serpent-xts,512bits]
+CIPHER vector 06: [xchacha12,aes-adiantum,256bits][xchacha20,aes-adiantum,256bits]
+Segmentation fault
 
 
->   *
->   * Please see the put_user_page() documentation for details.
->   *
-> - * set_page_dirty(), which does not lock the page, is used here.
-> - * Therefore, it is the caller's responsibility to ensure that this is
-> - * safe. If not, then put_user_pages_dirty_lock() should be called instead.
-> + * set_page_dirty_lock() is used internally. If instead, set_page_dirty() is
-> + * required, then the caller should a) verify that this is really correct,
-> + * because _lock() is usually required, and b) hand code it:
-> + * set_page_dirty_lock(), put_user_page().
->   *
->   */
-> -void put_user_pages_dirty(struct page **pages, unsigned long npages)
-> +void put_user_pages_dirty_lock(struct page **pages, unsigned long npages,
-> +			       bool make_dirty)
->  {
-> -	__put_user_pages_dirty(pages, npages, set_page_dirty);
-> -}
-> -EXPORT_SYMBOL(put_user_pages_dirty);
-> +	unsigned long index;
->  
-> -/**
-> - * put_user_pages_dirty_lock() - release and dirty an array of gup-pinned pages
-> - * @pages:  array of pages to be marked dirty and released.
-> - * @npages: number of pages in the @pages array.
-> - *
-> - * For each page in the @pages array, make that page (or its head page, if a
-> - * compound page) dirty, if it was previously listed as clean. Then, release
-> - * the page using put_user_page().
-> - *
-> - * Please see the put_user_page() documentation for details.
-> - *
-> - * This is just like put_user_pages_dirty(), except that it invokes
-> - * set_page_dirty_lock(), instead of set_page_dirty().
-> - *
-> - */
-> -void put_user_pages_dirty_lock(struct page **pages, unsigned long npages)
-> -{
-> -	__put_user_pages_dirty(pages, npages, set_page_dirty_lock);
-> +	/*
-> +	 * TODO: this can be optimized for huge pages: if a series of pages is
-> +	 * physically contiguous and part of the same compound page, then a
-> +	 * single operation to the head page should suffice.
-> +	 */
+(If you cannot reproduce it, I'll check it tomorrow. It is quite possible
+I have a bug in wrapper, but it should definitely not OOPS the kernel...
+moreover, this crash is possible from a user context)
 
-I think this comment belongs to the for loop below...  or just something about
-how to make this and put_user_pages() more efficient.  It is odd, that this is
-the same comment as in put_user_pages()...
+Thanks,
+Milan
 
-The code is good.  So... Other than the comments.
 
-Reviewed-by: Ira Weiny <ira.weiny@intel.com>
+OOPS log here:
 
-Ira
+kernel: detected buffer overflow in memcpy
+kernel: ------------[ cut here ]------------
+kernel: kernel BUG at lib/string.c:1115!
+kernel: invalid opcode: 0000 [#1] PREEMPT SMP
+kernel: CPU: 1 PID: 2303 Comm: tst Not tainted 5.3.0-rc3+ #572
+kernel: Hardware name: VMware, Inc. VMware Virtual Platform/440BX Desktop Reference Platform, BIOS 6.00 04/13/2018
+kernel: EIP: fortify_panic+0xe/0x19
+kernel: Code: b6 00 00 00 00 8b 45 e4 83 c4 10 5b 5e 29 f8 5f 5d c3 0f b6 c2 0f b6 f3 29 f0 eb ce 55 89 e5 50 68 70 03 8d c1 e8 cc 27 a6 ff <0f> 0b 90 90 90 90 90 90 90 90 90 55 89 e5 57 56 53 89 d3 83 ec 04
+kernel: EAX: 00000022 EBX: f1418dc8 ECX: f40ab784 EDX: 00000001
+kernel: ESI: f317a318 EDI: 00000020 EBP: f0c2bdf4 ESP: f0c2bdec
+kernel: DS: 007b ES: 007b FS: 00d8 GS: 00e0 SS: 0068 EFLAGS: 00010286
+kernel: CR0: 80050033 CR2: b7f543a0 CR3: 30e2a000 CR4: 00140690
+kernel: Call Trace:
+kernel:  encrypt_finish_cts.cold+0xa/0xa
+kernel:  encrypt+0xe7/0x100
+kernel:  crypto_skcipher_encrypt+0xe/0x20
+kernel:  skcipher_recvmsg+0x2f5/0x390 [algif_skcipher]
+kernel:  sock_read_iter+0x86/0xd0
+kernel:  __vfs_read+0x140/0x1f0
+kernel:  vfs_read+0x8b/0x150
+kernel:  ksys_read+0x5c/0xd0
+kernel:  sys_read+0x11/0x20
+kernel:  do_int80_syscall_32+0x4b/0x1a0
+kernel:  entry_INT80_32+0xfb/0xfb
+kernel: EIP: 0xb7f64092
+kernel: Code: 00 00 00 e9 90 ff ff ff ff a3 24 00 00 00 68 30 00 00 00 e9 80 ff ff ff ff a3 2c 00 00 00 66 90 00 00 00 00 00 00 00 00 cd 80 <c3> 8d b4 26 00 00 00 00 8d b6 00 00 00 00 8b 1c 24 c3 8d b4 26 00
+kernel: EAX: ffffffda EBX: 00000004 ECX: bfde1d3c EDX: 00000025
+kernel: ESI: b7f57000 EDI: 00000000 EBP: bfde1cb8 ESP: bfde1bcc
+kernel: DS: 007b ES: 007b FS: 0000 GS: 0033 SS: 007b EFLAGS: 00000282
+kernel: Modules linked in: nhpoly1305 chacha_generic adiantum poly1305_generic serpent_sse2_i586 serpent_generic glue_helper algif_skcipher rmd160 wp512 sha512_generic sha1_generic algif_hash af_alg loop dm_mod pktcdvd crc32_pclmul crc32c_intel aesni_intel aes_i586 crypto_simd cryptd ata_piix
+kernel: ---[ end trace 29d18b04feffc139 ]---
 
-> +
-> +	if (!make_dirty) {
-> +		put_user_pages(pages, npages);
-> +		return;
-> +	}
-> +
-> +	for (index = 0; index < npages; index++) {
-> +		struct page *page = compound_head(pages[index]);
-> +		/*
-> +		 * Checking PageDirty at this point may race with
-> +		 * clear_page_dirty_for_io(), but that's OK. Two key
-> +		 * cases:
-> +		 *
-> +		 * 1) This code sees the page as already dirty, so it
-> +		 * skips the call to set_page_dirty(). That could happen
-> +		 * because clear_page_dirty_for_io() called
-> +		 * page_mkclean(), followed by set_page_dirty().
-> +		 * However, now the page is going to get written back,
-> +		 * which meets the original intention of setting it
-> +		 * dirty, so all is well: clear_page_dirty_for_io() goes
-> +		 * on to call TestClearPageDirty(), and write the page
-> +		 * back.
-> +		 *
-> +		 * 2) This code sees the page as clean, so it calls
-> +		 * set_page_dirty(). The page stays dirty, despite being
-> +		 * written back, so it gets written back again in the
-> +		 * next writeback cycle. This is harmless.
-> +		 */
-> +		if (!PageDirty(page))
-> +			set_page_dirty_lock(page);
-> +		put_user_page(page);
-> +	}
->  }
->  EXPORT_SYMBOL(put_user_pages_dirty_lock);
->  
-> -- 
-> 2.22.0
-> 
