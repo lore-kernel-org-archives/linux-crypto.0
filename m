@@ -2,101 +2,111 @@ Return-Path: <SRS0=y31I=WC=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0766C433FF
-	for <linux-crypto@archiver.kernel.org>; Tue,  6 Aug 2019 08:02:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C343EC31E40
+	for <linux-crypto@archiver.kernel.org>; Tue,  6 Aug 2019 08:02:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 83D7F2054F
-	for <linux-crypto@archiver.kernel.org>; Tue,  6 Aug 2019 08:02:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9AB4F2054F
+	for <linux-crypto@archiver.kernel.org>; Tue,  6 Aug 2019 08:02:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RlE497f7"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uGsaTM/M"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732045AbfHFICn (ORCPT
+        id S1727259AbfHFICq (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 6 Aug 2019 04:02:43 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:39266 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727259AbfHFICn (ORCPT
+        Tue, 6 Aug 2019 04:02:46 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:39270 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732160AbfHFICq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Aug 2019 04:02:43 -0400
-Received: by mail-wr1-f65.google.com with SMTP id x4so33716277wrt.6
-        for <linux-crypto@vger.kernel.org>; Tue, 06 Aug 2019 01:02:42 -0700 (PDT)
+        Tue, 6 Aug 2019 04:02:46 -0400
+Received: by mail-wr1-f66.google.com with SMTP id x4so33716364wrt.6
+        for <linux-crypto@vger.kernel.org>; Tue, 06 Aug 2019 01:02:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id;
-        bh=LPxrPr3q5T9XtnaxYFQ5MHNB86Gds1XCyjunFknCBCg=;
-        b=RlE497f7kLUSLf4mV597Si4ml7zHS2egprS8akgckGS4RA1YP4GqcmZHvmPQk4Tgm5
-         2/pKmkGJlCek74lO5Rd9WHtWeMvI1M7DQtLGH9T+avk/4v4wf6qMZmwcG0FDyFnbFx38
-         VzDWvZoYnNYcbKmTfDWOA9b3Oh1/uwmQ3O7Yz6n02JvPj04C/PFG1TULau4EJwIPzUTx
-         dJE/FiJqvcV2nwup9SZYXA45CIuLbnp9YMVhTErIKmk5udQ90LKxRf3WBwKTLtS0qrjH
-         4pqwrkEgAyPtkuC2OR99Vt+MfTYQpgdwcWoz0a12nxUBU9JN1SCpZfBZl93fOtZoGI9s
-         Oq9A==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=9eCxiU7trAIwWtoYhqWEWGHnQv1gzwh/Q9h6ScO5S58=;
+        b=uGsaTM/M2gCO96HNT2CT+L0/NsYOQP5WwmmlN+ya7tI16k5RMO2HwcYWh6H6R3oYHm
+         rAzdwy+lnPGdSNHSO1FV3Crk5TwyEYOTLawosrkK1bSB0Ypn33n9eBbZXhy9wY6QNR3S
+         amR1DiMRY2rT94FVuPH5ZMNe0BS2+l9qybrY3769M6HE/Fi2yk/NyDTlLcmW4DDJfDRm
+         8/3szwCVQVOO/b231zSJdRgRtJQTLJ/3KKLUxisOaBJpzZOBhiIZxOBqyS+o68pY/jBw
+         KfuEtggPHIGXBSjQq6RTjYiXzRgy4LhaB1z90bfk5rsi782P9hTmgRJ/c8Be1kI77Sfj
+         hwNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=LPxrPr3q5T9XtnaxYFQ5MHNB86Gds1XCyjunFknCBCg=;
-        b=m/g4+C7S0kR4ZPFGYU2ivmN096QfjBXeHT5sR5y3muAqEZAIXj068/eCzXQ4ljjGYA
-         4U0Im7Ou5i+pOh9a5xuh0FPeu1IZ9rNX6pERF3U5CP3B7c102BM2nouoHqxOqOWmyjdd
-         FO/HBp64KzxMDDYf0Y6HDdq2fdojaMesP8J8k0v2srRI2VSYEc5fvvPiIQGwR+Yjs0op
-         rNLyG2ptCrnpIOM4xU6lXtwm3j+KXddaj0oDpKPUnrz5jSYnQLeJQQUYaMSnR5RVSBEi
-         n1zkzbrz0pzIwa1yQqHLTU8Ehr29l4J6uZ11WpoHAlR2G5XEP4xgzv6HkH7jWovl6lkX
-         souQ==
-X-Gm-Message-State: APjAAAW55g0vE6a6wBdXxUColJu1hkIwZF1IHVnosRFGiFvw3Lg6W7Bn
-        yQl0BE64qqeemBrvgH5UohGfzy0M53M+cA==
-X-Google-Smtp-Source: APXvYqzSjUHqVv3p94bbd0GUC+Orah/QZCx7GT1jK2qKN7lBk5fYqPKu7RuMoW3+YbpduUpR/VMPnw==
-X-Received: by 2002:adf:de10:: with SMTP id b16mr2946471wrm.296.1565078561540;
-        Tue, 06 Aug 2019 01:02:41 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=9eCxiU7trAIwWtoYhqWEWGHnQv1gzwh/Q9h6ScO5S58=;
+        b=mXvH1BFel9m/gXtvLgWkOIuR/JxWfDOwBrXgNAOlMpMnPysZHpw5ZOJ5PafgrdMGwk
+         TPX7O6zingCdnoeRMXfVJCUZE7Yr7aw5qifxNzd+PQegBLpuHK3rZDfMxZBrKWZH14BK
+         ZM8B/WxvRZk0eL0KXBLEIFblPLKSUg8dxyO1KPObOqJhoLfG99cwBkyQOj6n/NZf9KN3
+         hb2STO/QoFoPZYaAgBG9f0eV99RQqeXRiNMhI84tqKjT/RA4DL4iJYWS15iF7PbqG+DU
+         9mq1gzTgp9fmoFZbZ/nNO8TUrftoxfnB3//o5KRI8Ry0IijiFXhoKsbOhyEYT+om5D7B
+         mUvw==
+X-Gm-Message-State: APjAAAWe55msFvNTomXpY7ZuR5w07lrtE4AT20C4NkU0bsVe4zIMSj14
+        RuPhN/XUDs4QKMSN81TxsWq0QOMx6c34sg==
+X-Google-Smtp-Source: APXvYqx3eVQe//5zmmtHda+AHpMkDhzZCnwtpz2EpeHXLmtnqf3YRw+KKwvbS6VL0M/WsBChtG66rg==
+X-Received: by 2002:a5d:4e02:: with SMTP id p2mr3054604wrt.182.1565078563578;
+        Tue, 06 Aug 2019 01:02:43 -0700 (PDT)
 Received: from localhost.localdomain ([2a02:587:a407:da00:582f:8334:9cd9:7241])
-        by smtp.gmail.com with ESMTPSA id g12sm123785475wrv.9.2019.08.06.01.02.39
+        by smtp.gmail.com with ESMTPSA id g12sm123785475wrv.9.2019.08.06.01.02.41
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 06 Aug 2019 01:02:40 -0700 (PDT)
+        Tue, 06 Aug 2019 01:02:42 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     herbert@gondor.apana.org.au, ebiggers@kernel.org, agk@redhat.com,
         snitzer@redhat.com, dm-devel@redhat.com, gmazyland@gmail.com,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [RFC PATCH 0/2] dm-crypt: get rid of cipher API for EBOIV
-Date:   Tue,  6 Aug 2019 11:02:32 +0300
-Message-Id: <20190806080234.27998-1-ard.biesheuvel@linaro.org>
+Subject: [RFC PATCH 1/2] md/dm-crypt - restrict EBOIV to cbc(aes)
+Date:   Tue,  6 Aug 2019 11:02:33 +0300
+Message-Id: <20190806080234.27998-2-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190806080234.27998-1-ard.biesheuvel@linaro.org>
+References: <20190806080234.27998-1-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This is a follow-up to the discussion [0] started by regarding adding
-new uses of the cipher API to dm-crypt. In particular, the discussion
-was about EBOIV, which is used by BitLocker to generate IVs from byte
-offsets, to be used for AES encryption in CBC mode.
+Support for the EBOIV IV mode was introduced this cycle, and is
+explicitly intended for interoperability with BitLocker, which
+only uses it combined with AES in CBC mode.
 
-The way EBOIV support is currently integrated does not restrict it at
-all, which means we may paint ourselves into a corner where we are
-forced to support unexpected and novel ways users have decided to
-wire up EBOIV. This may become a maintenance burden going forward,
-and given that EBOIV uses the same key for generating the IV via
-AES encryption as the one used for the data, it may produce configurations
-that are not entirely safe.
+Using EBOIV in combination with any other skcipher or aead mode
+is not recommended, and so there is no need to support this.
+However, the way the EBOIV support is currently integrated permits
+it to be combined with other skcipher or aead modes, and once the
+cat is out of the bag, we will need to support it indefinitely.
 
-So let's restrict EBOIV to cbc(aes) (patch #1), to prevent it from
-being used in arbitrary cipher cocktails, and avoid ending up with
-a disproportionate maintenance burden on the crypto API side.
+So let's restrict EBOIV to cbc(aes), and reject attempts to
+instantiate it with other modes.
 
-Patch #2 switches the IV generation to the AES library, which avoids
-potential key leaks due to the use of aes-generic as the cipher used
-for IV generation.
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+---
+ drivers/md/dm-crypt.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-[0] https://www.redhat.com/archives/dm-devel/2019-July/msg00041.html
-
-Ard Biesheuvel (2):
-  md/dm-crypt - restrict EBOIV to cbc(aes)
-  md/dm-crypt - switch to AES library for EBOIV
-
- drivers/md/dm-crypt.c | 34 ++++++++------------
- 1 file changed, 13 insertions(+), 21 deletions(-)
-
+diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
+index d5216bcc4649..a5e8d5bc1581 100644
+--- a/drivers/md/dm-crypt.c
++++ b/drivers/md/dm-crypt.c
+@@ -861,6 +861,13 @@ static int crypt_iv_eboiv_ctr(struct crypt_config *cc, struct dm_target *ti,
+ 	struct iv_eboiv_private *eboiv = &cc->iv_gen_private.eboiv;
+ 	struct crypto_cipher *tfm;
+ 
++	if (test_bit(CRYPT_MODE_INTEGRITY_AEAD, &cc->cipher_flags) ||
++	    strcmp("cbc(aes)",
++	           crypto_tfm_alg_name(crypto_skcipher_tfm(any_tfm(cc))))) {
++		ti->error = "Unsupported encryption mode for EBOIV";
++		return -EINVAL;
++	}
++
+ 	tfm = crypto_alloc_cipher(cc->cipher, 0, 0);
+ 	if (IS_ERR(tfm)) {
+ 		ti->error = "Error allocating crypto tfm for EBOIV";
 -- 
 2.17.1
 
