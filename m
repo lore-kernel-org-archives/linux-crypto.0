@@ -8,55 +8,55 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07099C41514
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Aug 2019 01:34:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7882C32751
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Aug 2019 01:34:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D1DC1217D7
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Aug 2019 01:34:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9EFD521743
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Aug 2019 01:34:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="o1iMd41+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L/mKoqNB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729109AbfHGBeI (ORCPT
+        id S1729589AbfHGBeZ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 6 Aug 2019 21:34:08 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:46215 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729017AbfHGBeG (ORCPT
+        Tue, 6 Aug 2019 21:34:25 -0400
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:39214 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729578AbfHGBeY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Aug 2019 21:34:06 -0400
-Received: by mail-pf1-f193.google.com with SMTP id c3so19358460pfa.13;
-        Tue, 06 Aug 2019 18:34:05 -0700 (PDT)
+        Tue, 6 Aug 2019 21:34:24 -0400
+Received: by mail-pl1-f194.google.com with SMTP id b7so38640258pls.6;
+        Tue, 06 Aug 2019 18:34:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=34zW6BJN89MycamN6XZc+aPi3iIpUXsyW4mngm2d11Q=;
-        b=o1iMd41+ccZkK09IMPd2AYRK2nxxj4luxr/oXYf1r5zvl1rB+5Njvw5+yOF9jzdNKW
-         0sOvnAPF3Qav8GrCrICbMqDOV9qASg1Kx51KsLT3kM/WuvVdMW7XrY8CvDI8Q5dEWx12
-         oQbwqpjSWiFbIsNFbcpYcVrmKluAqCipM9FxALoNB6s3X2SZRLlz53JQRsVYPh0pH9nV
-         Kc9qcjAV7p7rTzqe2/MHBF1cE8sJ8msPeJl3VFMqaq2A+nfaaBpGi8bFHG/baDlwWEny
-         MHNVdhC+ELal559VaRapllf9o6PzvZgYyIKj0wGmpTTu6N66MHuYIC1lBVMp4ydMH/rt
-         +u0Q==
+        bh=3zvxFRr3gjg9t3ZKCwZWoMY3PeLUGF9FofBT0j+JfJs=;
+        b=L/mKoqNBpvGTGBp3epVJp9Jwmcabm5Zof/TP6cMpNTp5QyY/bNS8ra/phjhs5sRAaN
+         E5tTttcEItcQL3b5Zem0k5qJxKcKktTUshMTiNWzGKXLywBoBoQ5bitV/RkFpPMu2On5
+         4WHRSoAhmad+Sq/Uze+Lrqj/EHMra+wpLWdL/I1wMa19gtn+2FmmEpJ2BiwYWrwVtu4s
+         ErDZEb/zzGVZaJO6WBAU6eZcAtQlFXpJrdCTpwcNxdnIPyz2Lta4bzP9L9aVvEMuLhxO
+         FtQSTpdSuYFA1RpMOlExoKqI8fe7oDB8Q9BkX/iI0jL+EMoGr57KcyP7PRTXBQFgsK3f
+         6S2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=34zW6BJN89MycamN6XZc+aPi3iIpUXsyW4mngm2d11Q=;
-        b=DqR2KJ0VRCG9poFvInCRpThf7Qq7hpTtH9YTLzRJrmJeG4z5tzCRfnm9OmPjv6CuH8
-         EtuDpE79clvIchhhaEWew6Kw6H43wI44UdVrjr2Jd+Cv7mg7Z4RmNgzI2kzjG03EuFme
-         xJOk616q3uxS0FU8caf7RJKTHYWFJXV5k++t2p8sx4Cn9K9/mGiARgiYzWOBF1Jpg+5J
-         WqE82ltvrO1HviEyO6um18Ub8Gxpigt5k22wWhD8lq6o98iR8+fjjXpeTVCSTlbgnvjO
-         UCotqswGuBv6+JK/eRfi+YlixkqaYC1eIQBwpUaHPefdoTWx2SV10H24jCDiitwQhuDj
-         GpzQ==
-X-Gm-Message-State: APjAAAUNLBbYucWSEY5jAKdb4Go5HTNb26iq75pEtTbB0vncKLJGJbNi
-        3mCqkh8iMmiz5W5WZwh9pp0=
-X-Google-Smtp-Source: APXvYqwDlo4CFJorDrBurduwUa2oSyS2Jx2b29d9K5TbsKnQqNAY6ckzALOmtrds4Hd5oSsH/O3vaA==
-X-Received: by 2002:a17:90a:1b0c:: with SMTP id q12mr6044962pjq.76.1565141645264;
-        Tue, 06 Aug 2019 18:34:05 -0700 (PDT)
+        bh=3zvxFRr3gjg9t3ZKCwZWoMY3PeLUGF9FofBT0j+JfJs=;
+        b=Wiku0SIadoGoJZyG8QeTGcnc3A71j180wVszEapG6nwv43TpkXveXZJiIK7KM2kTTC
+         ut3iv3Bb61tIujGuehAkgwQSghrKL962BzPPG02AP1yMf+eI71fwF6j9M5baLc71GzZ5
+         oBig2royLLzO5ZSyVQJiditdyLIYekkTjxBAugAqJff0EtQHAvYtG0JN/39bZoIrWMPv
+         ZnalwY0wg27/jMquK6Tek8NYUz7+yA7bY1lR/BV/QGQvpAz4jJGWYgB1eYXX0KJ9sUhD
+         d6W0mULnB+UzDUT9LfglM8CrjJIz+T5QbjYpnElHX/I1LFRABjpqSPK9W/ZM3zQcZLy+
+         yOBQ==
+X-Gm-Message-State: APjAAAVUVMB35CXpFn6r9x0Xfud5yjqAXMZN1PACIV0ID4up/Na87Un+
+        8v8yqIPZgYZEDROsYBtT3yXyup4J
+X-Google-Smtp-Source: APXvYqw776L+7/s1i5+0uj4rHYr4XOYwzb6gLf8HmDykG/CGNwoS9owiEzaUd2cmiWPaV4acbHnsQA==
+X-Received: by 2002:a17:902:4683:: with SMTP id p3mr5420824pld.31.1565141663334;
+        Tue, 06 Aug 2019 18:34:23 -0700 (PDT)
 Received: from blueforge.nvidia.com (searspoint.nvidia.com. [216.228.112.21])
-        by smtp.gmail.com with ESMTPSA id u69sm111740800pgu.77.2019.08.06.18.34.03
+        by smtp.gmail.com with ESMTPSA id u69sm111740800pgu.77.2019.08.06.18.34.21
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Tue, 06 Aug 2019 18:34:04 -0700 (PDT)
+        Tue, 06 Aug 2019 18:34:22 -0700 (PDT)
 From:   john.hubbard@gmail.com
 X-Google-Original-From: jhubbard@nvidia.com
 To:     Andrew Morton <akpm@linux-foundation.org>
@@ -80,14 +80,11 @@ Cc:     Christoph Hellwig <hch@infradead.org>,
         netdev@vger.kernel.org, rds-devel@oss.oracle.com,
         sparclinux@vger.kernel.org, x86@kernel.org,
         xen-devel@lists.xenproject.org, John Hubbard <jhubbard@nvidia.com>,
-        Sudeep Dutt <sudeep.dutt@intel.com>,
-        Ashutosh Dixit <ashutosh.dixit@intel.com>,
-        Arnd Bergmann <arnd@arndb.de>, Joerg Roedel <jroedel@suse.de>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Zhen Lei <thunder.leizhen@huawei.com>
-Subject: [PATCH v3 13/41] scif: convert put_page() to put_user_page*()
-Date:   Tue,  6 Aug 2019 18:33:12 -0700
-Message-Id: <20190807013340.9706-14-jhubbard@nvidia.com>
+        Mike Marshall <hubcap@omnibond.com>,
+        Martin Brandenburg <martin@omnibond.com>
+Subject: [PATCH v3 24/41] orangefs: convert put_page() to put_user_page*()
+Date:   Tue,  6 Aug 2019 18:33:23 -0700
+Message-Id: <20190807013340.9706-25-jhubbard@nvidia.com>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <20190807013340.9706-1-jhubbard@nvidia.com>
 References: <20190807013340.9706-1-jhubbard@nvidia.com>
@@ -108,55 +105,39 @@ release_pages().
 This is part a tree-wide conversion, as described in commit fc1d8e7cca2d
 ("mm: introduce put_user_page*(), placeholder versions").
 
-Cc: Sudeep Dutt <sudeep.dutt@intel.com>
-Cc: Ashutosh Dixit <ashutosh.dixit@intel.com>
-Cc: Arnd Bergmann <arnd@arndb.de>
-Cc: Joerg Roedel <jroedel@suse.de>
-Cc: Robin Murphy <robin.murphy@arm.com>
-Cc: Zhen Lei <thunder.leizhen@huawei.com>
+Cc: Mike Marshall <hubcap@omnibond.com>
+Cc: Martin Brandenburg <martin@omnibond.com>
+Cc: devel@lists.orangefs.org
 Signed-off-by: John Hubbard <jhubbard@nvidia.com>
 ---
- drivers/misc/mic/scif/scif_rma.c | 17 ++++++++---------
- 1 file changed, 8 insertions(+), 9 deletions(-)
+ fs/orangefs/orangefs-bufmap.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/misc/mic/scif/scif_rma.c b/drivers/misc/mic/scif/scif_rma.c
-index 01e27682ea30..d84ed9466920 100644
---- a/drivers/misc/mic/scif/scif_rma.c
-+++ b/drivers/misc/mic/scif/scif_rma.c
-@@ -113,13 +113,14 @@ static int scif_destroy_pinned_pages(struct scif_pinned_pages *pin)
- 	int writeable = pin->prot & SCIF_PROT_WRITE;
- 	int kernel = SCIF_MAP_KERNEL & pin->map_flags;
+diff --git a/fs/orangefs/orangefs-bufmap.c b/fs/orangefs/orangefs-bufmap.c
+index 2bb916d68576..f2f33a16d604 100644
+--- a/fs/orangefs/orangefs-bufmap.c
++++ b/fs/orangefs/orangefs-bufmap.c
+@@ -168,10 +168,7 @@ static DEFINE_SPINLOCK(orangefs_bufmap_lock);
+ static void
+ orangefs_bufmap_unmap(struct orangefs_bufmap *bufmap)
+ {
+-	int i;
+-
+-	for (i = 0; i < bufmap->page_count; i++)
+-		put_page(bufmap->page_array[i]);
++	put_user_pages(bufmap->page_array, bufmap->page_count);
+ }
  
--	for (j = 0; j < pin->nr_pages; j++) {
--		if (pin->pages[j] && !kernel) {
-+	if (kernel) {
-+		for (j = 0; j < pin->nr_pages; j++) {
- 			if (writeable)
--				SetPageDirty(pin->pages[j]);
-+				set_page_dirty_lock(pin->pages[j]);
- 			put_page(pin->pages[j]);
+ static void
+@@ -280,7 +277,7 @@ orangefs_bufmap_map(struct orangefs_bufmap *bufmap,
+ 
+ 		for (i = 0; i < ret; i++) {
+ 			SetPageError(bufmap->page_array[i]);
+-			put_page(bufmap->page_array[i]);
++			put_user_page(bufmap->page_array[i]);
  		}
--	}
-+	} else
-+		put_user_pages_dirty_lock(pin->pages, pin->nr_pages, writeable);
- 
- 	scif_free(pin->pages,
- 		  pin->nr_pages * sizeof(*pin->pages));
-@@ -1385,11 +1386,9 @@ int __scif_pin_pages(void *addr, size_t len, int *out_prot,
- 				if (ulimit)
- 					__scif_dec_pinned_vm_lock(mm, nr_pages);
- 				/* Roll back any pinned pages */
--				for (i = 0; i < pinned_pages->nr_pages; i++) {
--					if (pinned_pages->pages[i])
--						put_page(
--						pinned_pages->pages[i]);
--				}
-+				put_user_pages(pinned_pages->pages,
-+					       pinned_pages->nr_pages);
-+
- 				prot &= ~SCIF_PROT_WRITE;
- 				try_upgrade = false;
- 				goto retry;
+ 		return -ENOMEM;
+ 	}
 -- 
 2.22.0
 
