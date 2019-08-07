@@ -5,58 +5,58 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25472C41514
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Aug 2019 01:34:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16CAEC4152F
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Aug 2019 01:35:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F080E217D9
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Aug 2019 01:34:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DE65521743
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Aug 2019 01:35:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TH7xsIR8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eabm6eV7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730041AbfHGBes (ORCPT
+        id S1730163AbfHGBex (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 6 Aug 2019 21:34:48 -0400
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:45793 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730008AbfHGBep (ORCPT
+        Tue, 6 Aug 2019 21:34:53 -0400
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:33457 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730091AbfHGBev (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Aug 2019 21:34:45 -0400
-Received: by mail-pl1-f195.google.com with SMTP id y8so38603236plr.12;
-        Tue, 06 Aug 2019 18:34:44 -0700 (PDT)
+        Tue, 6 Aug 2019 21:34:51 -0400
+Received: by mail-pf1-f195.google.com with SMTP id g2so42502899pfq.0;
+        Tue, 06 Aug 2019 18:34:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=S+0IdzDd5LiY8AHwrYdqvSEMzcb9gWZ2lznukLTa4fI=;
-        b=TH7xsIR8mdN6BLY7JG8/eF6RsdDCkk2cRD3dBopErpIToembDlJ6DvjPGThWxgNDHN
-         izZnY8v+rrCTqbMQXBbwMmFJJ4/nvmF6zRWW4Xs6qUrfZ8o0czAW/fGIDrwD7Q1ygI7M
-         9Zf8Re7QredxsFLkJT7ZLJf014g9dC9bvOiPKF2NgNaHSnsjvFjfZ4bBzwffrRrGp9/v
-         vlT+JVAmAuL0sqc4zONRKIioMJS5mLcrWMkUTsb2T5dvyeXECRBNXvR++1qedsjna65N
-         Bpeio/uU7dJ/a25yv6b3onr0A5BIr5z5tUmsUB0sHub+eppjPv5sJ1ZexYmVLUXkgvRa
-         bJaw==
+        bh=iyBF/TunLLNE9m64WGZW5xnvl+XVp1Tkb/4cWK4Q28U=;
+        b=eabm6eV7x6nJ3H6jB3OWHKTAjJ5hccshhWRSvyF8YaL4Xb3kcN3FPSj+mrT7hdf1FM
+         0MWhm5PqlQFyy6zw76EwLtyOlQEQTOAPUCRq2cKY8d4yFrfincU70ZRfebLbmlijIWR2
+         wTENuQ2R1ycfB8EIZdvDLYgUy7fahn8NbpOFjvcP7wPItsW4fy1klzu0bIomS6ZhLV9L
+         FATmBTkmPO3bz1bBRYsOrrqOVmLfRrGMChgnyEYGXYwKFOo3GWkjWYe147H72f0kIcVc
+         Tr73f17ZMCrLU+eCYt8HTv90LoBSVz+pg0lUMLNh1TQmkPNzI1sbpCYBSoNZ3shE6svq
+         cn7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=S+0IdzDd5LiY8AHwrYdqvSEMzcb9gWZ2lznukLTa4fI=;
-        b=LRymV5gLf9ueWfhdXNeVK6k2qapEZreM12FOedqkw7boO4g3lHS6v12agEk9R0GuDh
-         HK2sxbay3SKEfJlGE7iPlhCC2FqguxGDha+/qBvLqvCxcS7wnDWdIPu3OERDy1+Yfews
-         BcrptiUnE9XCkBn3kNGcLs4Lm7X1cJoo7d/cS0au3brU1tno59bKX/ZuLp2yGcJwB6Z/
-         6vEbADfgHPFSQvfgr0CKsF6zfthsQsghCPDvOvvBgd0G9r3kI8t0ERjt17yDC7yyFXCb
-         1mVw9KcHWl/Z0CO2Kg4c2aDQjFuAcQ/7pF5VUqOwiavKeCqi9eAh1m7Qtrn3FLfmliLa
-         Ba4A==
-X-Gm-Message-State: APjAAAUFPN9o7Yly9kLnnR0M2d60FrmGDp4Ek16Ilg+gU2Dy347811XB
-        7GRHnZWpGRFdVZ17rJUwC84=
-X-Google-Smtp-Source: APXvYqwBIISXTWf4C+eZPMoIO/o34tgUz/S5eMQixOLDQAsdZlLcpYV/uzVG2wEPWDAc94LDsKhJ9w==
-X-Received: by 2002:a17:902:9a49:: with SMTP id x9mr5953327plv.282.1565141683818;
-        Tue, 06 Aug 2019 18:34:43 -0700 (PDT)
+        bh=iyBF/TunLLNE9m64WGZW5xnvl+XVp1Tkb/4cWK4Q28U=;
+        b=jxYZj1IpMxFlnfyQjbmcVYmRAXDbrRGaNsQo9KLj8UPFM2Ztimt9SzcQ8VejwQ6hp2
+         xEXXqR2TF1GpEHbubXsItY8AhqKbh5b3qieKSkp515efhI8Zau7JqkWpqdhRaVu/oqob
+         eFsa8R0hyqah/ymi78AMJzw3fiGee7JI0Eymws7uBpBioQsAK2JnkiazHRDM37h/GQt2
+         hUPZYVXOO37HMLZwy+BUoqxAHCl9GaC+IqC+dVzatOML7FSfN4dVLpEo4orzkIQ9cj7M
+         NW2ySjvlawz5T9H0ymhkxcj1KZceDmWjjhsELqj6NyZHranAzHZXU7DS2Wm1rDVG0ifX
+         aCsQ==
+X-Gm-Message-State: APjAAAUAR0O0DWusQDC1+F81F8nf6AV1eO3KwLs0Hw8lnA976z/M95EM
+        g28VuVh/pAEiCrIMZRLyr6Y=
+X-Google-Smtp-Source: APXvYqz3mrxPCB1S0CW+dxLuweNihe5G+Md2rLL8K5hOTJIrjMzyu1ZdPrsndXXUg8jjoSZHHVCyxA==
+X-Received: by 2002:a62:14c4:: with SMTP id 187mr6515801pfu.241.1565141690166;
+        Tue, 06 Aug 2019 18:34:50 -0700 (PDT)
 Received: from blueforge.nvidia.com (searspoint.nvidia.com. [216.228.112.21])
-        by smtp.gmail.com with ESMTPSA id u69sm111740800pgu.77.2019.08.06.18.34.42
+        by smtp.gmail.com with ESMTPSA id u69sm111740800pgu.77.2019.08.06.18.34.48
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Tue, 06 Aug 2019 18:34:43 -0700 (PDT)
+        Tue, 06 Aug 2019 18:34:49 -0700 (PDT)
 From:   john.hubbard@gmail.com
 X-Google-Original-From: jhubbard@nvidia.com
 To:     Andrew Morton <akpm@linux-foundation.org>
@@ -80,16 +80,17 @@ Cc:     Christoph Hellwig <hch@infradead.org>,
         netdev@vger.kernel.org, rds-devel@oss.oracle.com,
         sparclinux@vger.kernel.org, x86@kernel.org,
         xen-devel@lists.xenproject.org, John Hubbard <jhubbard@nvidia.com>,
-        Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
-        Kentaro Takeda <takedakn@nttdata.co.jp>,
-        linux-security-module@vger.kernel.org
-Subject: [PATCH v3 37/41] security/tomoyo: convert put_page() to put_user_page*()
-Date:   Tue,  6 Aug 2019 18:33:36 -0700
-Message-Id: <20190807013340.9706-38-jhubbard@nvidia.com>
+        Daniel Black <daniel@linux.ibm.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Mike Kravetz <mike.kravetz@oracle.com>
+Subject: [PATCH v3 41/41] mm/ksm: convert put_page() to put_user_page*()
+Date:   Tue,  6 Aug 2019 18:33:40 -0700
+Message-Id: <20190807013340.9706-42-jhubbard@nvidia.com>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <20190807013340.9706-1-jhubbard@nvidia.com>
 References: <20190807013340.9706-1-jhubbard@nvidia.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-NVConfidentiality: public
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
@@ -106,28 +107,79 @@ release_pages().
 This is part a tree-wide conversion, as described in commit fc1d8e7cca2d
 ("mm: introduce put_user_page*(), placeholder versions").
 
-Acked-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-
-Cc: Kentaro Takeda <takedakn@nttdata.co.jp>
-Cc: linux-security-module@vger.kernel.org
+Cc: Dan Williams <dan.j.williams@intel.com>
+Cc: Daniel Black <daniel@linux.ibm.com>
+Cc: Jan Kara <jack@suse.cz>
+Cc: Jérôme Glisse <jglisse@redhat.com>
+Cc: Matthew Wilcox <willy@infradead.org>
+Cc: Mike Kravetz <mike.kravetz@oracle.com>
 Signed-off-by: John Hubbard <jhubbard@nvidia.com>
 ---
- security/tomoyo/domain.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ mm/ksm.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/security/tomoyo/domain.c b/security/tomoyo/domain.c
-index 8526a0a74023..6887beecfb6e 100644
---- a/security/tomoyo/domain.c
-+++ b/security/tomoyo/domain.c
-@@ -931,7 +931,7 @@ bool tomoyo_dump_page(struct linux_binprm *bprm, unsigned long pos,
+diff --git a/mm/ksm.c b/mm/ksm.c
+index 3dc4346411e4..e10ee4d5fdd8 100644
+--- a/mm/ksm.c
++++ b/mm/ksm.c
+@@ -456,7 +456,7 @@ static inline bool ksm_test_exit(struct mm_struct *mm)
+  * We use break_ksm to break COW on a ksm page: it's a stripped down
+  *
+  *	if (get_user_pages(addr, 1, 1, 1, &page, NULL) == 1)
+- *		put_page(page);
++ *		put_user_page(page);
+  *
+  * but taking great care only to touch a ksm page, in a VM_MERGEABLE vma,
+  * in case the application has unmapped and remapped mm,addr meanwhile.
+@@ -483,7 +483,7 @@ static int break_ksm(struct vm_area_struct *vma, unsigned long addr)
+ 					FAULT_FLAG_WRITE | FAULT_FLAG_REMOTE);
+ 		else
+ 			ret = VM_FAULT_WRITE;
+-		put_page(page);
++		put_user_page(page);
+ 	} while (!(ret & (VM_FAULT_WRITE | VM_FAULT_SIGBUS | VM_FAULT_SIGSEGV | VM_FAULT_OOM)));
+ 	/*
+ 	 * We must loop because handle_mm_fault() may back out if there's
+@@ -568,7 +568,7 @@ static struct page *get_mergeable_page(struct rmap_item *rmap_item)
+ 		flush_anon_page(vma, page, addr);
+ 		flush_dcache_page(page);
+ 	} else {
+-		put_page(page);
++		put_user_page(page);
+ out:
+ 		page = NULL;
  	}
- 	/* Same with put_arg_page(page) in fs/exec.c */
- #ifdef CONFIG_MMU
--	put_page(page);
-+	put_user_page(page);
- #endif
- 	return true;
- }
+@@ -1974,10 +1974,10 @@ struct rmap_item *unstable_tree_search_insert(struct rmap_item *rmap_item,
+ 
+ 		parent = *new;
+ 		if (ret < 0) {
+-			put_page(tree_page);
++			put_user_page(tree_page);
+ 			new = &parent->rb_left;
+ 		} else if (ret > 0) {
+-			put_page(tree_page);
++			put_user_page(tree_page);
+ 			new = &parent->rb_right;
+ 		} else if (!ksm_merge_across_nodes &&
+ 			   page_to_nid(tree_page) != nid) {
+@@ -1986,7 +1986,7 @@ struct rmap_item *unstable_tree_search_insert(struct rmap_item *rmap_item,
+ 			 * it will be flushed out and put in the right unstable
+ 			 * tree next time: only merge with it when across_nodes.
+ 			 */
+-			put_page(tree_page);
++			put_user_page(tree_page);
+ 			return NULL;
+ 		} else {
+ 			*tree_pagep = tree_page;
+@@ -2328,7 +2328,7 @@ static struct rmap_item *scan_get_next_rmap_item(struct page **page)
+ 							&rmap_item->rmap_list;
+ 					ksm_scan.address += PAGE_SIZE;
+ 				} else
+-					put_page(*page);
++					put_user_page(*page);
+ 				up_read(&mm->mmap_sem);
+ 				return rmap_item;
+ 			}
 -- 
 2.22.0
 
