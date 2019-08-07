@@ -8,55 +8,55 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47E5CC32751
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Aug 2019 01:35:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A860C31E40
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Aug 2019 01:35:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1BA752173C
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Aug 2019 01:35:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 612AD2173C
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Aug 2019 01:35:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UuxFmnJc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g67RvuXx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730221AbfHGBfT (ORCPT
+        id S1730035AbfHGBes (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 6 Aug 2019 21:35:19 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:35691 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730045AbfHGBet (ORCPT
+        Tue, 6 Aug 2019 21:34:48 -0400
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:38796 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730025AbfHGBeq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Aug 2019 21:34:49 -0400
-Received: by mail-pg1-f193.google.com with SMTP id n4so813395pgv.2;
-        Tue, 06 Aug 2019 18:34:48 -0700 (PDT)
+        Tue, 6 Aug 2019 21:34:46 -0400
+Received: by mail-pg1-f195.google.com with SMTP id z14so5311476pga.5;
+        Tue, 06 Aug 2019 18:34:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=A5i3Rg5kn+067MlNxvjupwCb7OvZHoHIUYxhc992JlI=;
-        b=UuxFmnJcCEiWt0xY93+zMuXrIr0kVOIbVkqb6dZDNdX573lgx/iGModXW3xzK9pGPY
-         cX+tzVZPKgXMZcfG6ZQsPBSt7kseMu7toLWYUmZdBZq9AOoIRDIMFVmbrRQtXe8+kp+2
-         xuf5cY8DkN1gTDTxNyizBF6w883Echl9BWKspGn3wAfNIa3ZXNbfw60ziAuU+jfpWm00
-         aE3B42LRws0QrKz6yT/I5rdSznH6+bxJbanBI1rpoulc0fyM/bumlMmxK+EefqH3NUEF
-         FOd2q6meN4oVnduhVeiU1hQqU48TiRdVBcpR/X7lAMOhtHAMxLBvoHxdz/5tEjOACTof
-         BpeA==
+        bh=30MQZ7ywyXKAPoZ0MqYExKYsjkeLdKEHUByfnmRZCb0=;
+        b=g67RvuXxl/7UgwJ5Nsn5m7mCWAd1eJK19OdXPfHISavNg0/hlxqTRWRiZsiObbIxd1
+         z7nTlGaqHPYV4ywgcbsmss6gPc+YHifTLpOQY0K91PQUhyOYukJschqLsfaVLze8bLh+
+         aV53NaTAotE5e+jR4GjhaqKTLNaydraqrAumktndCtlF4SiNrqRjpIehSehjFa47DX/L
+         ADmdLxhsKJt3PHVHlUoQeH6o3x8T/NrnTA5b/OM8c9NkahQxV1Hajc7XXSthUzvuQiX4
+         tXYs8SD3Ckew9oHpIJy9DZatkhmnngs/Je/q+s3mKD0DprEGB/SuCd9kYNKpjjLfUk8q
+         m4IA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=A5i3Rg5kn+067MlNxvjupwCb7OvZHoHIUYxhc992JlI=;
-        b=H2ZUOiQ/JcARqDST7E2Nv/ZqN4L5/CPGmfKAvD1D+G1GZ663DCevNoO/i5CI6KJen7
-         KNO6bqFc6dFo7K/AtS25ZgFNiDbG0xhCBkCiOW2llhlTGzd9XhLxllfFlk7c86XExxgW
-         3TPi2ZAhOH0OSR1Tvfjt2DFujkJkNkKSvyV6+DQ651vpVAZ6eLOgSZSs5eChMCR5ASpb
-         YMbT/7Ik/sSN35ozW2ECFCMLCQxaWrLHFqmUVf1BQly2J3XfnRpoRuRPkbOnc+KT7oTN
-         KWbhZcIMgd680sq0MSn4Kn0DPQJ7c5dDT7nezA0hgq6eNdzGmJLjCKVJOraKFaazeNbE
-         CoLw==
-X-Gm-Message-State: APjAAAUfHFXJpnAKHlGZdxvoODsdCA9IHAGeJri+yOWZ58qDs8lvuk1u
-        Hhzkf1+aIejbcVjjgCgfOUo=
-X-Google-Smtp-Source: APXvYqxXaYo+gh0YYtTix+CeaO6wRH87rvrphHjKjanKlk0flLMZdWbR1kBDDX6DGd+bDWORU88dWA==
-X-Received: by 2002:a62:82c2:: with SMTP id w185mr6984715pfd.202.1565141688648;
-        Tue, 06 Aug 2019 18:34:48 -0700 (PDT)
+        bh=30MQZ7ywyXKAPoZ0MqYExKYsjkeLdKEHUByfnmRZCb0=;
+        b=f6QyoaEfbxuo9tTZknFSAJWqbXuIhDFPUwVE3hdKY/KhN0tssL28PgEds41wQe8rQ7
+         Mc2KMTcGIcN1oMTYw7EZDVWkX/ES3FEIFu5dyCFNbtAK2m0mxNL5X3YQMi3n0mMloYCf
+         hrxC1dfEzBW06UGbsrqBcqaaSnrzpJ7sVHF7/fuJjUabtXAChd5EYTU+261qU2AVgHek
+         mZbFsyWomhkVZqlLnAlgDt9jk5QdzHy25qQp3HMFLcHa+wASsDrLt+4o9RN5SQqYnb4f
+         nsBi2Quz0YLewB+ul/h2CVL7j+PDv6MgKZPozLm7HNNj3WHNOpEbJZtwwz/xcJLEUVnc
+         4OIg==
+X-Gm-Message-State: APjAAAVn0m9D4Y7TjhBzxMxE5E88b1AlbaoYmKoT6aJKB1EXWAHIYp6q
+        sy2AOcgFeJv4bhOy16WhWM0=
+X-Google-Smtp-Source: APXvYqw4IyvxT+a447mG7S7T32nq/0vx/OylsLzm55tU7UOjf2NCx+Dmal9oDg9eNuXVr0J1x2ZUyQ==
+X-Received: by 2002:a63:36cc:: with SMTP id d195mr5452828pga.157.1565141685421;
+        Tue, 06 Aug 2019 18:34:45 -0700 (PDT)
 Received: from blueforge.nvidia.com (searspoint.nvidia.com. [216.228.112.21])
-        by smtp.gmail.com with ESMTPSA id u69sm111740800pgu.77.2019.08.06.18.34.47
+        by smtp.gmail.com with ESMTPSA id u69sm111740800pgu.77.2019.08.06.18.34.43
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Tue, 06 Aug 2019 18:34:48 -0700 (PDT)
+        Tue, 06 Aug 2019 18:34:44 -0700 (PDT)
 From:   john.hubbard@gmail.com
 X-Google-Original-From: jhubbard@nvidia.com
 To:     Andrew Morton <akpm@linux-foundation.org>
@@ -80,17 +80,13 @@ Cc:     Christoph Hellwig <hch@infradead.org>,
         netdev@vger.kernel.org, rds-devel@oss.oracle.com,
         sparclinux@vger.kernel.org, x86@kernel.org,
         xen-devel@lists.xenproject.org, John Hubbard <jhubbard@nvidia.com>,
-        Andrea Arcangeli <aarcange@redhat.com>,
-        Anshuman Khandual <anshuman.khandual@arm.com>,
-        David Rientjes <rientjes@google.com>,
-        Dominik Brodowski <linux@dominikbrodowski.net>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        Michal Hocko <mhocko@suse.com>,
-        Vlastimil Babka <vbabka@suse.cz>,
-        zhong jiang <zhongjiang@huawei.com>
-Subject: [PATCH v3 40/41] mm/mempolicy.c: convert put_page() to put_user_page*()
-Date:   Tue,  6 Aug 2019 18:33:39 -0700
-Message-Id: <20190807013340.9706-41-jhubbard@nvidia.com>
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        linuxppc-dev@lists.ozlabs.org
+Subject: [PATCH v3 38/41] powerpc: convert put_page() to put_user_page*()
+Date:   Tue,  6 Aug 2019 18:33:37 -0700
+Message-Id: <20190807013340.9706-39-jhubbard@nvidia.com>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <20190807013340.9706-1-jhubbard@nvidia.com>
 References: <20190807013340.9706-1-jhubbard@nvidia.com>
@@ -111,32 +107,138 @@ release_pages().
 This is part a tree-wide conversion, as described in commit fc1d8e7cca2d
 ("mm: introduce put_user_page*(), placeholder versions").
 
-Cc: Andrea Arcangeli <aarcange@redhat.com>
-Cc: Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: David Rientjes <rientjes@google.com>
-Cc: Dominik Brodowski <linux@dominikbrodowski.net>
-Cc: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-Cc: Michal Hocko <mhocko@suse.com>
-Cc: Vlastimil Babka <vbabka@suse.cz>
-Cc: zhong jiang <zhongjiang@huawei.com>
+Note that this effectively changes the code's behavior in
+mm_iommu_unpin(): it now ultimately calls set_page_dirty_lock(),
+instead of set_page_dirty(). This is probably more accurate.
+
+As Christoph Hellwig put it, "set_page_dirty() is only safe if we are
+dealing with a file backed page where we have reference on the inode it
+hangs off." [1]
+
+[1] https://lore.kernel.org/r/20190723153640.GB720@lst.de
+
+Cc: Benjamin Herrenschmidt <benh@kernel.crashing.org>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Michael Ellerman <mpe@ellerman.id.au>
+Cc: linuxppc-dev@lists.ozlabs.org
 Signed-off-by: John Hubbard <jhubbard@nvidia.com>
 ---
- mm/mempolicy.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/powerpc/kvm/book3s_64_mmu_hv.c    |  4 ++--
+ arch/powerpc/kvm/book3s_64_mmu_radix.c | 19 ++++++++++++++-----
+ arch/powerpc/kvm/e500_mmu.c            |  3 +--
+ arch/powerpc/mm/book3s64/iommu_api.c   | 11 +++++------
+ 4 files changed, 22 insertions(+), 15 deletions(-)
 
-diff --git a/mm/mempolicy.c b/mm/mempolicy.c
-index f48693f75b37..76a8e935e2e6 100644
---- a/mm/mempolicy.c
-+++ b/mm/mempolicy.c
-@@ -832,7 +832,7 @@ static int lookup_node(struct mm_struct *mm, unsigned long addr)
- 	err = get_user_pages_locked(addr & PAGE_MASK, 1, 0, &p, &locked);
- 	if (err >= 0) {
- 		err = page_to_nid(p);
--		put_page(p);
-+		put_user_page(p);
+diff --git a/arch/powerpc/kvm/book3s_64_mmu_hv.c b/arch/powerpc/kvm/book3s_64_mmu_hv.c
+index 9a75f0e1933b..18646b738ce1 100644
+--- a/arch/powerpc/kvm/book3s_64_mmu_hv.c
++++ b/arch/powerpc/kvm/book3s_64_mmu_hv.c
+@@ -731,7 +731,7 @@ int kvmppc_book3s_hv_page_fault(struct kvm_run *run, struct kvm_vcpu *vcpu,
+ 		 * we have to drop the reference on the correct tail
+ 		 * page to match the get inside gup()
+ 		 */
+-		put_page(pages[0]);
++		put_user_page(pages[0]);
  	}
- 	if (locked)
- 		up_read(&mm->mmap_sem);
+ 	return ret;
+ 
+@@ -1206,7 +1206,7 @@ void kvmppc_unpin_guest_page(struct kvm *kvm, void *va, unsigned long gpa,
+ 	unsigned long gfn;
+ 	int srcu_idx;
+ 
+-	put_page(page);
++	put_user_page(page);
+ 
+ 	if (!dirty)
+ 		return;
+diff --git a/arch/powerpc/kvm/book3s_64_mmu_radix.c b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+index 2d415c36a61d..f53273fbfa2d 100644
+--- a/arch/powerpc/kvm/book3s_64_mmu_radix.c
++++ b/arch/powerpc/kvm/book3s_64_mmu_radix.c
+@@ -821,8 +821,12 @@ int kvmppc_book3s_instantiate_page(struct kvm_vcpu *vcpu,
+ 	 */
+ 	if (!ptep) {
+ 		local_irq_enable();
+-		if (page)
+-			put_page(page);
++		if (page) {
++			if (upgrade_write)
++				put_user_page(page);
++			else
++				put_page(page);
++		}
+ 		return RESUME_GUEST;
+ 	}
+ 	pte = *ptep;
+@@ -870,9 +874,14 @@ int kvmppc_book3s_instantiate_page(struct kvm_vcpu *vcpu,
+ 		*levelp = level;
+ 
+ 	if (page) {
+-		if (!ret && (pte_val(pte) & _PAGE_WRITE))
+-			set_page_dirty_lock(page);
+-		put_page(page);
++		bool dirty = !ret && (pte_val(pte) & _PAGE_WRITE);
++		if (upgrade_write)
++			put_user_pages_dirty_lock(&page, 1, dirty);
++		else {
++			if (dirty)
++				set_page_dirty_lock(page);
++			put_page(page);
++		}
+ 	}
+ 
+ 	/* Increment number of large pages if we (successfully) inserted one */
+diff --git a/arch/powerpc/kvm/e500_mmu.c b/arch/powerpc/kvm/e500_mmu.c
+index 2d910b87e441..67bb8d59d4b1 100644
+--- a/arch/powerpc/kvm/e500_mmu.c
++++ b/arch/powerpc/kvm/e500_mmu.c
+@@ -850,8 +850,7 @@ int kvm_vcpu_ioctl_config_tlb(struct kvm_vcpu *vcpu,
+  free_privs_first:
+ 	kfree(privs[0]);
+  put_pages:
+-	for (i = 0; i < num_pages; i++)
+-		put_page(pages[i]);
++	put_user_pages(pages, num_pages);
+  free_pages:
+ 	kfree(pages);
+ 	return ret;
+diff --git a/arch/powerpc/mm/book3s64/iommu_api.c b/arch/powerpc/mm/book3s64/iommu_api.c
+index b056cae3388b..e126193ba295 100644
+--- a/arch/powerpc/mm/book3s64/iommu_api.c
++++ b/arch/powerpc/mm/book3s64/iommu_api.c
+@@ -170,9 +170,8 @@ static long mm_iommu_do_alloc(struct mm_struct *mm, unsigned long ua,
+ 	return 0;
+ 
+ free_exit:
+-	/* free the reference taken */
+-	for (i = 0; i < pinned; i++)
+-		put_page(mem->hpages[i]);
++	/* free the references taken */
++	put_user_pages(mem->hpages, pinned);
+ 
+ 	vfree(mem->hpas);
+ 	kfree(mem);
+@@ -203,6 +202,7 @@ static void mm_iommu_unpin(struct mm_iommu_table_group_mem_t *mem)
+ {
+ 	long i;
+ 	struct page *page = NULL;
++	bool dirty = false;
+ 
+ 	if (!mem->hpas)
+ 		return;
+@@ -215,10 +215,9 @@ static void mm_iommu_unpin(struct mm_iommu_table_group_mem_t *mem)
+ 		if (!page)
+ 			continue;
+ 
+-		if (mem->hpas[i] & MM_IOMMU_TABLE_GROUP_PAGE_DIRTY)
+-			SetPageDirty(page);
++		dirty = mem->hpas[i] & MM_IOMMU_TABLE_GROUP_PAGE_DIRTY;
+ 
+-		put_page(page);
++		put_user_pages_dirty_lock(&page, 1, dirty);
+ 		mem->hpas[i] = 0;
+ 	}
+ }
 -- 
 2.22.0
 
