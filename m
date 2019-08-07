@@ -6,146 +6,219 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6D1EC433FF
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Aug 2019 15:13:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65C00C32751
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Aug 2019 15:39:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 52C9E218FE
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Aug 2019 15:13:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2DF9121E6C
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Aug 2019 15:39:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=verimatrix.com header.i=@verimatrix.com header.b="BFtQBVdd"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FJnc6SsQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729998AbfHGPNO (ORCPT
+        id S2388667AbfHGPjw (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 7 Aug 2019 11:13:14 -0400
-Received: from mail-eopbgr710054.outbound.protection.outlook.com ([40.107.71.54]:55699
-        "EHLO NAM05-BY2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726773AbfHGPNO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Aug 2019 11:13:14 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=K1jBU4PCaIdgVZHXbzICVDLD7qe8ticaIlIVkjUFd3xJsBZQsgd5cxnOPUl6iR/NtkEL8LhCa087ldwkTfNcyhp0akfkHQM/HOfu6wWXYeokbidzenDaB87J31O+uPH+x04IQ/EiG9RJN1d+QvYpYM48KQ0u+39HsV9xNY2CZjqKBkMI5iSsMysR4tqxd41wQci2j4d8H/Lo6PE0Fi/B/NPT1VaWA5iYTpyJDEeIt7K0KAC+3y6xFgIVvd3jYu6M+E0wtr4qio/rcwkvxxuDaQZGEba3O3NYrG9q9w46yPCqNh7QoXw0YVlRfBes8VLGa9fK9uGXQt2MmyVVqN4eTA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HWoWQbT0Hr7V2Csvg7MzYRBoQnddBAx6A+RW8YJYFYM=;
- b=ToY9UaYV7Y54mNnvPVJbgAdku/DVqW34u+Ov9gUs3bhiHIm1k+Nd/u3mq/crkxNoWUPPnS1FYe9XGTJEwUSUocf6KKxOxfrFwhf9Y/WN3U7NnH7DVbK3Pdtyrl8jGW6N3j+VjyHglDztpyRNKDa58Dwaid9fbl2L0dF0mgdp6oYWi74cybwZl4ZnCVjckwXxYcwBwNKw5KUSpUj8KrCtBVMnUvqfJS+yeS+iDKhgKKTQvlyqjF4jcJSg0D2IDLjLVtCht6ue1Xrax7G2NtIE4xqe1fle2ksF+FaEh9pXqFSRW98lTJdyhhgjtgUEoG62ACaBcQmrAovBBd5eHg0PrQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=verimatrix.com; dmarc=pass action=none
- header.from=verimatrix.com; dkim=pass header.d=verimatrix.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verimatrix.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HWoWQbT0Hr7V2Csvg7MzYRBoQnddBAx6A+RW8YJYFYM=;
- b=BFtQBVdd7We2VoOuOfPRxwxd5DlH2BRzNuZntFhP9BhhSVFQZjnf4pU2Ooy3pIgeBR+hP3M5v2ik/Dsc5Pfwx9rul1hdZXzhruUqrTRZqn8q5gvBwrYCu9S0qpX7SOh59KtzgvgfOl9Xy73C+SErOkLXBjjh6ykL8lwpeTSAc6c=
-Received: from MN2PR20MB2973.namprd20.prod.outlook.com (52.132.172.146) by
- MN2PR20MB2365.namprd20.prod.outlook.com (20.179.146.27) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2157.14; Wed, 7 Aug 2019 15:13:09 +0000
-Received: from MN2PR20MB2973.namprd20.prod.outlook.com
- ([fe80::d96f:39b2:19f4:c7c1]) by MN2PR20MB2973.namprd20.prod.outlook.com
- ([fe80::d96f:39b2:19f4:c7c1%7]) with mapi id 15.20.2136.018; Wed, 7 Aug 2019
- 15:13:09 +0000
-From:   Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
-To:     Milan Broz <gmazyland@gmail.com>,
-        Pascal van Leeuwen <pascalvanl@gmail.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-CC:     "rsnel@cube.dyndns.org" <rsnel@cube.dyndns.org>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>
-Subject: RE: [PATCH] crypto: xts - Add support for Cipher Text Stealing
-Thread-Topic: [PATCH] crypto: xts - Add support for Cipher Text Stealing
-Thread-Index: AQHVTCyrZ3LTVlRuCkCwUQoLONEbf6bucuQAgAAMd6CAANdjsIAANO6AgAABheCAAASpAIAAODmg
-Date:   Wed, 7 Aug 2019 15:13:09 +0000
-Message-ID: <MN2PR20MB2973C4EAF89D158B779CDBDACAD40@MN2PR20MB2973.namprd20.prod.outlook.com>
-References: <1565074510-8480-1-git-send-email-pvanleeuwen@verimatrix.com>
- <5bf9d0be-3ba4-8903-f1b9-93aa32106274@gmail.com>
- <MN2PR20MB29734CFE2795639436C3CC91CAD50@MN2PR20MB2973.namprd20.prod.outlook.com>
- <MN2PR20MB2973A38A300804281CA6A109CAD40@MN2PR20MB2973.namprd20.prod.outlook.com>
- <a0e3ce44-3e47-b8d9-2152-3fd8ba99f09a@gmail.com>
- <MN2PR20MB297333F0024F94C647D71AA2CAD40@MN2PR20MB2973.namprd20.prod.outlook.com>
- <52a11506-0047-a7e7-4fa0-ba8d465b843c@gmail.com>
-In-Reply-To: <52a11506-0047-a7e7-4fa0-ba8d465b843c@gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=pvanleeuwen@verimatrix.com; 
-x-originating-ip: [188.204.2.113]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 9fce779e-5167-495f-520f-08d71b49c20c
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:MN2PR20MB2365;
-x-ms-traffictypediagnostic: MN2PR20MB2365:
-x-ms-exchange-purlcount: 1
-x-microsoft-antispam-prvs: <MN2PR20MB23659A83DC6F5EB5896A8B70CAD40@MN2PR20MB2365.namprd20.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 01221E3973
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(366004)(396003)(136003)(376002)(39850400004)(346002)(199004)(189003)(13464003)(25786009)(229853002)(6436002)(14454004)(53936002)(6246003)(4326008)(71200400001)(71190400001)(33656002)(55016002)(9686003)(81166006)(8936002)(68736007)(26005)(81156014)(446003)(186003)(486006)(476003)(11346002)(102836004)(478600001)(316002)(54906003)(110136005)(2906002)(66066001)(7696005)(6506007)(76176011)(256004)(14444005)(99286004)(53546011)(5660300002)(8676002)(3846002)(6116002)(76116006)(66446008)(66476007)(64756008)(66946007)(86362001)(2501003)(66556008)(52536014)(7736002)(74316002)(305945005)(15974865002)(18886075002);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR20MB2365;H:MN2PR20MB2973.namprd20.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: verimatrix.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: 9jpLmhA+qKN4hRYnyBOq734L98dKjH20lJEMyyU1kZwvBx/2pFEfIhn2rV9sX1HhmyQA9NjRGtZ+U9Bl6QXBKn/5WBbH9pQhgDBeYWJ1Q13pjNIapXIAB34oNf/nZs5ItGMHVbEwrleelCv3h0JVTaJYwHDJtxU4FIUGFquoc5I+bVLz6BrCPIYFKU4irvBFPFaj+TK4XIkCHfXEt20mUlN4p7IUU6LPN0dujPjHmI8Y2ASzTwvC/ZsQEy3f+mCHStOO+/ViPKA3NsThEW4QAzN+HT6HCQJK0ThEwFlXKdBCeRym7v9qSDih77r0VeDqBO8H/a5pELg95gGcwEk8bY5HQiddQdtjCNRDlNDB4+MaE5CVE4YTDErOjU5vPiaRN/1GdnsPB3sQAIKw7qcSBOG8btBE5fEHsky22d64ICk=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        Wed, 7 Aug 2019 11:39:52 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:34028 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387827AbfHGPjv (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 7 Aug 2019 11:39:51 -0400
+Received: by mail-wm1-f65.google.com with SMTP id e8so1634112wme.1
+        for <linux-crypto@vger.kernel.org>; Wed, 07 Aug 2019 08:39:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=YWxgVNpYmEPiSTo+I2yStJWF8suB8MPId69UGn4wFqw=;
+        b=FJnc6SsQmgXYt4ITNpeEFlbi4lcQUMLwAu3EqbZWyBNDbQs7Hl/LIScaPhYgUN2UV5
+         z2lSFoN7jAOzUOyCrw5NxzzxVADptx4F0iGhQrcdc7M3oTKTBBc8EtHzrBys+vUr5JU9
+         ieYpr7aV63mU1jyEEHvLHPHpW27/CWcYFPKJkvXwKWRd9lrO49e9WtDyjN1af0s/czaV
+         55NPvxepGsrv8xoU555xOTUO02ZChc4rg9SxQJs+L6GG+TDsYxQaztGfas0m2m+meoeW
+         yPql0tsVg8zJsSBkWLlHFNlPBp3hb6BNWRWK8x6lQvdXftJNEsjZLDbXd726dDh4zxqU
+         aoCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=YWxgVNpYmEPiSTo+I2yStJWF8suB8MPId69UGn4wFqw=;
+        b=nC9s4fd2jV0Vw9lauMYrMunH+jEgx5qHWKbw/TYjR5UumVAr4KLQS14/C+FDNT+qze
+         38wjAEeZY/9Z28TgHH4g0kZz0oWruR9w7BvbzePqXXSOTka/pUiqxEp9E4zgMh1zHJNR
+         o2iTxakRNvX5X7doeqhkwr2M1uf1/d89mlrX9Xr4g3amsFRFh1UdntkANmvNt6lB3avg
+         qAqmu0pp45XIl4RGV1uIlDKgaYf53wcHOqy8V0yrYcpMDVV/o0VEaQP0kPo4dUUUTRS/
+         2IuCwB7ga+XZEgIMdSWmQxLohsJjpk5FAbBQHKE+aMaIUSBnae8Bx+LDd+a+TH9JbOfk
+         8wxQ==
+X-Gm-Message-State: APjAAAULaH1+pzDHH2dWthfqRHsFV2DBBJAhCdUFwJd+HOlqKXtSaajy
+        vdk6VKlVC68EnO3kmFmva+U1X/dt6B1rX15jVIEcRA==
+X-Google-Smtp-Source: APXvYqyC69Jbe4sCGrB9dARvVyw9P0wGHblYhz21sBM6xskVUYZNp2ovAXOitL8yRTrLwnJjew/vLzMCppVmUrWig4o=
+X-Received: by 2002:a1c:b706:: with SMTP id h6mr503051wmf.119.1565192388510;
+ Wed, 07 Aug 2019 08:39:48 -0700 (PDT)
 MIME-Version: 1.0
-X-OriginatorOrg: verimatrix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9fce779e-5167-495f-520f-08d71b49c20c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Aug 2019 15:13:09.6595
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: dcb260f9-022d-4495-8602-eae51035a0d0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: pvanleeuwen@verimatrix.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR20MB2365
+References: <20190807055022.15551-1-ard.biesheuvel@linaro.org>
+ <MN2PR20MB297336108DF89337DDEEE2F6CAD40@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <CAKv+Gu_jFW26boEhpnAZg9sjWWZf60FXSWuSqNvC5FJiL7EVSA@mail.gmail.com> <MN2PR20MB2973A02FC4D6F1D11BA80792CAD40@MN2PR20MB2973.namprd20.prod.outlook.com>
+In-Reply-To: <MN2PR20MB2973A02FC4D6F1D11BA80792CAD40@MN2PR20MB2973.namprd20.prod.outlook.com>
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date:   Wed, 7 Aug 2019 18:39:40 +0300
+Message-ID: <CAKv+Gu8fgg=gt4LSnCfShnf0-PZ=B1TNwM3zdQr+V6hkozgDOA@mail.gmail.com>
+Subject: Re: [RFC PATCH v2] md/dm-crypt - reuse eboiv skcipher for IV generation
+To:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "ebiggers@kernel.org" <ebiggers@kernel.org>,
+        "agk@redhat.com" <agk@redhat.com>,
+        "snitzer@redhat.com" <snitzer@redhat.com>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "gmazyland@gmail.com" <gmazyland@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBNaWxhbiBCcm96IDxnbWF6eWxh
-bmRAZ21haWwuY29tPg0KPiBTZW50OiBXZWRuZXNkYXksIEF1Z3VzdCA3LCAyMDE5IDE6NDIgUE0N
-Cj4gVG86IFBhc2NhbCBWYW4gTGVldXdlbiA8cHZhbmxlZXV3ZW5AdmVyaW1hdHJpeC5jb20+OyBQ
-YXNjYWwgdmFuIExlZXV3ZW4NCj4gPHBhc2NhbHZhbmxAZ21haWwuY29tPjsgbGludXgtY3J5cHRv
-QHZnZXIua2VybmVsLm9yZw0KPiBDYzogcnNuZWxAY3ViZS5keW5kbnMub3JnOyBoZXJiZXJ0QGdv
-bmRvci5hcGFuYS5vcmcuYXU7IGRhdmVtQGRhdmVtbG9mdC5uZXQNCj4gU3ViamVjdDogUmU6IFtQ
-QVRDSF0gY3J5cHRvOiB4dHMgLSBBZGQgc3VwcG9ydCBmb3IgQ2lwaGVyIFRleHQgU3RlYWxpbmcN
-Cj4gDQo+IE9uIDA3LzA4LzIwMTkgMTM6MjcsIFBhc2NhbCBWYW4gTGVldXdlbiB3cm90ZToNCj4g
-Pj4gT24gMDcvMDgvMjAxOSAxMDoxNSwgUGFzY2FsIFZhbiBMZWV1d2VuIHdyb3RlOg0KPiA+Pj4g
-SSB3ZW50IHRocm91Z2ggdGhlIGNvZGUgYSBjb3VwbGUgb2YgdGltZXMsIGJ1dCBJIGNhbm5vdCBz
-cG90IGFueSBtaXN0YWtlcyBpbg0KPiA+Pj4gdGhlIGxlbmd0aHMgSSdtIHVzaW5nLiBJcyBpdCBw
-b3NzaWJsZSB0aGF0IHlvdXIgYXBwbGljYXRpb24gaXMgc3VwcGx5aW5nIGENCj4gPj4+IGJ1ZmZl
-ciB0aGF0IGlzIGp1c3Qgbm90IGxhcmdlIGVub3VnaD8NCj4gPj4NCj4gPj4gU2VlbXMgdGhlcmUg
-aXMgbm8gbWlzdGFrZSBpbiB5b3VyIGNvZGUsIGl0IGlzIHNvbWUgYnVnIGluIGFlc25pX2ludGVs
-IGltcGxlbWVudGF0aW9uLg0KPiA+PiBJZiBJIGRpc2FibGUgdGhpcyBtb2R1bGUsIGl0IHdvcmtz
-IGFzIGV4cGVjdGVkICh3aXRoIGFlcyBnZW5lcmljIGFuZCBhZXNfaTU4NikuDQo+ID4+DQo+ID4g
-VGhhdCdzIG9kZCB0aG91Z2gsIGNvbnNpZGVyaW5nIHRoZXJlIGlzIGEgZGVkaWNhdGVkIHh0cy1h
-ZXMtbmkgaW1wbGVtZW50YXRpb24sDQo+ID4gaS5lLiBJIHdvdWxkIG5vdCBleHBlY3QgdGhhdCB0
-byBlbmQgdXAgYXQgdGhlIGdlbmVyaWMgeHRzIHdyYXBwZXIgYXQgYWxsPw0KPiANCj4gTm90ZSBp
-dCBpcyAzMmJpdCBzeXN0ZW0sIEFFU05JIFhUUyBpcyB1bmRlciAjaWZkZWYgQ09ORklHX1g4Nl82
-NCBzbyBpdCBpcyBub3QgdXNlZC4NCj4gDQpPaywgc28gSSBndWVzcyBubyBvbmUgYm90aGVyZWQg
-dG8gbWFrZSBhbiBvcHRpbWl6ZWQgWFRTIHZlcnNpb24gZm9yIGkzODYuDQpJIHF1aWNrbHkgYnJv
-d3NlZCB0aHJvdWdoIHRoZSBjb2RlIC0gdG9vayBtZSBhIHdoaWxlIHRvIHJlYWxpc2UgdGhlIGFz
-c2VtYmx5IGlzDQoiYmFja3dhcmRzIiBjb21wYXJlZCB0byB0aGUgb3JpZ2luYWwgSW50ZWwgZGVm
-aW5pdGlvbiA6LSkgLSBidXQgSSBkaWQgbm90IHNwb3QNCmFueXRoaW5nIG9idmlvdXMgOi0oDQoN
-Cj4gSSBndWVzcyBpdCBvbmx5IEVDQiBwYXJ0IC4uLg0KPiANCj4gPj4gU2VlbXMgc29tZXRoaW5n
-IGlzIHJld3JpdHRlbiBpbiBjYWxsDQo+ID4+ICAgY3J5cHRvX3NrY2lwaGVyX2VuY3J5cHQoc3Vi
-cmVxKTsNCj4gPj4NCj4gPj4gKGFmdGVyIHRoYXQgY2FsbCwgSSBzZWUgcmN0eC0+cmVtX2J5dGVz
-IHNldCB0byAzMiwgdGhhdCBkb2VzIG5vdCBtYWtlIHNlbnNlLi4uKQ0KPiA+Pg0KRGVwZW5kaW5n
-IG9uIHdoYXQgeW91IGhhdmUgb2JzZXJ2ZWQgc28gZmFyLCBpdCBjb3VsZCBhbHNvIGJlIGNvcnJ1
-cHRlZCBlYXJsaWVyLA0KaS5lLiBkdXJpbmcgb25lIG9mIHRoZSBza2NpcGhlcl9yZXF1ZXN0KiBj
-YWxscyBpbnNpZGUgaW5pdF9jcnlwdD8NCg0KTm90YWJseSwgdGhlIHJlbV9ieXRlcyB2YXJpYWJs
-ZSBpcyBpbW1lZGlhdGVseSBiZWhpbmQgdGhlIHN1YnJlcSBzdHJ1Y3QgaW5zaWRlDQpyY3R4LCBi
-dXQgb2J2aW91c2x5IHRoZXNlIGNhbGxzIHNob3VsZCBub3Qgd3JpdGUgYmV5b25kIHRoZSBlbmQg
-b2YgdGhhdCBzdHJ1Y3QNCihhcyB3aXRob3V0IHRob3NlIGFkZGVkIHZhcmlhYmxlcywgdGhvc2Ug
-d3JpdGVzIHdvdWxkIGVuZCB1cCBvdXRzaWRlIG9mIHRoZQ0KYWxsb2NhdGVkIHJjdHggc3RydWN0
-KQ0KDQo+ID4gRWggLi4uIG5vLCBpdCBzaG91bGQgbmV2ZXIgYmVjb21lID4gMTUgLi4uIGlmIGl0
-IGdldHMgc2V0IHRvIDMyIHNvbWVob3csDQo+ID4gdGhlbiBJIGNhbiBhdCBsZWFzdCBleHBsYWlu
-IHdoeSB0aGF0IHdvdWxkIHJlc3VsdCBpbiBhIGJ1ZmZlciBvdmVyZmxvdyA6LSkNCj4gDQo+IFll
-cywgdGhhdCBleHBsYWlucyBpdC4NCj4gDQo+IChBbmQgcmV3cml0aW5nIHRoaXMgdmFsdWUgYmFj
-ayBkb2VzIG5vdCBoZWxwLCBJIGdvdCBkaWZmZXJlbnQgdGVzdCB2ZWN0b3Igb3V0cHV0LCBidXQg
-bm8NCj4gY3Jhc2guKQ0KPiANCldlbGwsIHRoZXJlJ3MgYWxzbyBhbiBpc19lbmNyeXB0IGZsYWcg
-aW1tZWRpYXRlbHkgYmVoaW5kIHJlbV9ieXRlcyB0aGF0DQpsaWtlbHkgYWxzbyBnZXRzIGNvcnJ1
-cHRlZD8NCg0KPiBNaWxhbg0KDQpSZWdhcmRzLA0KUGFzY2FsIHZhbiBMZWV1d2VuDQpTaWxpY29u
-IElQIEFyY2hpdGVjdCwgTXVsdGktUHJvdG9jb2wgRW5naW5lcyBAIFZlcmltYXRyaXgNCnd3dy5p
-bnNpZGVzZWN1cmUuY29tDQo=
+On Wed, 7 Aug 2019 at 16:52, Pascal Van Leeuwen
+<pvanleeuwen@verimatrix.com> wrote:
+>
+> Ard,
+>
+> > -----Original Message-----
+> > From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> > Sent: Wednesday, August 7, 2019 3:17 PM
+> > To: Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+> > Cc: linux-crypto@vger.kernel.org; herbert@gondor.apana.org.au; ebiggers@kernel.org;
+> > agk@redhat.com; snitzer@redhat.com; dm-devel@redhat.com; gmazyland@gmail.com
+> > Subject: Re: [RFC PATCH v2] md/dm-crypt - reuse eboiv skcipher for IV generation
+> >
+> > On Wed, 7 Aug 2019 at 10:28, Pascal Van Leeuwen
+> > <pvanleeuwen@verimatrix.com> wrote:
+> > >
+> > > Ard,
+> > >
+> > > I've actually been following this discussion with some interest, as it has
+> > > some relevance for some of the things I am doing at the moment as well.
+> > >
+> > > For example, for my CTS implementation I need to crypt one or two
+> > > seperate blocks and for the inside-secure driver I sometimes need to do
+> > > some single crypto block precomputes. (the XTS driver additionally
+> > > also already did such a single block encrypt for the tweak, also using
+> > > a seperate (non-sk)cipher instance - very similar to your IV case)
+> > >
+> > > Long story short, the current approach is to allocate a seperate
+> > > cipher instance so you can conveniently do crypto_cipher_en/decrypt_one.
+> > > (it would be nice to have a matching crypto_skcipher_en/decrypt_one
+> > > function available from the crypto API for these purposes?)
+> > > But if I understand you correctly, you may end up with an insecure
+> > > table-based implementation if you do that. Not what I want :-(
+> > >
+> >
+> > Table based AES is known to be vulnerable to plaintext attacks on the
+> > key, since each byte of the input xor'ed with the key is used as an
+> > index for doing Sbox lookups, and so with enough samples, there is an
+> > exploitable statistical correlation between the response time and the
+> > key.
+> >
+> > So in the context of EBOIV, where the user might specify a SIMD based
+> > time invariant skcipher, it would be really bad if the known plaintext
+> > encryptions of the byte offsets that occur with the *same* key would
+> > happen with a different cipher that is allocated implicitly and ends
+> > up being fulfilled by, e.g., aes-generic, since in that case, each
+> > block en/decryption is preceded by a single, time-variant AES
+> > invocation with an easily guessable input.
+> >
+> No need to tell me, doing crypto has been my dayjob for nearly 18.5 years
+> now :-)
+>
+
+I didn't mean to imply that you don't know your stuff :-) I am just
+reiterating the EBOIV issue so we can compare it to the issue you are
+bringing up
+
+> > In your case, we are not dealing with known plaintext attacks,
+> >
+> Since this is XTS, which is used for disk encryption, I would argue
+> we do! For the tweak encryption, the sector number is known plaintext,
+> same as for EBOIV. Also, you may be able to control data being written
+> to the disk encrypted, either directly or indirectly.
+> OK, part of the data into the CTS encryption will be previous ciphertext,
+> but that may be just 1 byte with the rest being the known plaintext.
+>
+
+The tweak encryption uses a dedicated key, so leaking it does not have
+the same impact as it does in the EBOIV case. And a plaintext attack
+on the data encryption part of XTS involves knowing the value of the
+tweak as well, so you'd have to successfully attack the tweak before
+you can attack the data. So while your point is valid, it's definitely
+less broken than EBOIV.
+
+> > and the
+> > higher latency of h/w accelerated crypto makes me less worried that
+> > the final, user observable latency would strongly correlate the way
+> > aes-generic in isolation does.
+> >
+> If that latency is constant - which it usually is - then it doesn't
+> really matter for correlation, it just filters out.
+>
+
+Due to the asynchronous nature of the driver, we'll usually be calling
+into the OS scheduler after queuing one or perhaps several blocks for
+processing by the hardware. Even if the processing time is fixed, the
+time it takes for the OS to respond to the completion IRQ and process
+the output is unlikely to correlate the way a table based software
+implementation does, especially if several blocks can be in flight at
+the same time.
+
+But note that we are basically in agreement here: falling back to
+table based AES is undesirable, but for EBOIV it is just much worse
+than for other modes.
+
+> > > However, in many cases there would actually be a very good reason
+> > > NOT to want to use the main skcipher for this. As that is some
+> > > hardware accelerator with terrible latency that you wouldn't want
+> > > to use to process just one cipher block. For that, you want to have
+> > > some SW implementation that is efficient on a single block instead.
+> > >
+> >
+> > Indeed. Note that for EBOIV, such performance concerns are deemed
+> > irrelevant, but it is an issue in the general case.
+> >
+> Yes, my interest was purely in the generic case.
+>
+> > > In my humble opinion, such insecure table based implementations just
+> > > shouldn't exist at all - you can always do better, possibly at the
+> > > expense of some performance degradation. Or you should at least have
+> > > some flag  available to specify you have some security requirements
+> > > and such an implementation is not an acceptable response.
+> > >
+> >
+> > We did some work to reduce the time variance of AES: there is the
+> > aes-ti driver, and there is now also the AES library, which is known
+> > to be slower than aes-generic, but does include some mitigations for
+> > cache timing attacks.
+> >
+> > Other than that, I have little to offer, given that the performance vs
+> > security tradeoffs were decided long before security became a thing
+> > like it is today, and so removing aes-generic is not an option,
+> > especially since the scalar alternatives we have are not truly time
+> > invariant either.
+> >
+> Replacing aes-generic with a truly time-invariant implementation could
+> be an option.
+
+If you can find a truly time-invariant C implementation of AES that
+isn't orders of magnitude slower than aes-generic, I'm sure we can
+merge it.
+
+> Or selecting aes-generic only if some (new) "allow_insecure"
+> flag is set on the cipher request. (Obviously, you want to default to
+> secure, not insecure. Speaking as someone who earns his living doing
+> security :-)
+>
+
+We all do. But we all have different use cases to worry about, and
+different experiences and backgrounds :-)
+
+The main problem is that banning aes-generic is a bit too rigorous
+imo. It highly depends on whether there is known plaintext and whether
+there are observable latencies in the first place.
+
+> (Disclaimer: I do not know anything about the aes-generic implementation,
+> I'm just taking your word for it that it is not secure (enough) ...)
+>
