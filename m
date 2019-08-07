@@ -1,141 +1,141 @@
-Return-Path: <SRS0=y31I=WC=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=TZua=WD=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B979CC31E40
-	for <linux-crypto@archiver.kernel.org>; Tue,  6 Aug 2019 20:45:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 465D3C32757
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Aug 2019 01:33:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 88BDC216F4
-	for <linux-crypto@archiver.kernel.org>; Tue,  6 Aug 2019 20:45:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 128B5218A4
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Aug 2019 01:33:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dHVvyaXF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SVC7DSqJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726788AbfHFUpL (ORCPT
+        id S1728680AbfHGBdv (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 6 Aug 2019 16:45:11 -0400
-Received: from mail-lf1-f66.google.com ([209.85.167.66]:41214 "EHLO
-        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726238AbfHFUpK (ORCPT
+        Tue, 6 Aug 2019 21:33:51 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:41939 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728654AbfHGBdu (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Aug 2019 16:45:10 -0400
-Received: by mail-lf1-f66.google.com with SMTP id 62so57410601lfa.8
-        for <linux-crypto@vger.kernel.org>; Tue, 06 Aug 2019 13:45:09 -0700 (PDT)
+        Tue, 6 Aug 2019 21:33:50 -0400
+Received: by mail-pg1-f194.google.com with SMTP id x15so32192406pgg.8;
+        Tue, 06 Aug 2019 18:33:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=qNvWstZCi3NXF5KJDOazsGSKWj42nw3rueoSXYGmGRc=;
-        b=dHVvyaXFUfwdTrXm8Qxe3g47TjDPWLCdOevoaBSnsuB2cWvNXEXQshBBZ2xZ66S7gF
-         dDcbZzQwewKYPA4UdVMJKe+OULJcTBNQRzBEpqMJtuldr2635kPtBlgaOJqp7jvup6Ax
-         2vW3nYb6r+xDz87ptI4JAiQyQuYpbmMXpvlUN04K30/rtTwPeJM0ZXVBbg5JrFVgVC6X
-         TBupMMeehgE7wdlI130er0HeQc0ZJzdmc/c0HBvb/zb3EkUecBEQJthkHIywW1i3UI3k
-         hoUKHmZFqSoR2uZzN5Z42y/WAneWxoHJkgWOGaDPO+v7fcApJ9Sd6+EPurKzfbO0Qzx7
-         FJvg==
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=GHzc1obwFKwJgG7nswfPGhmCYytguM8zaNUDmj5ciqU=;
+        b=SVC7DSqJ1aViuFyLacSuD9ekUuon1nsbmGXQ+rccZqQD0M5OpWv4FInOJYOUS0zDrw
+         iiaUKlpU3oYT6EB+TLC7fde9FCQbqLPjcDOo/pPYr/Dy4w9ZLyTeVh++4NmqxXNEZ0Um
+         gS5DfjjL21uHhIzIHJrVsnAGurOzAGDNfpv0OIjYG3RHWT96uJJIGB6LIuNQuZVc7Ym2
+         eeEnUQ4CldleB6IB/9Fxp6/W0nXsF/e4MjOETkKBsrMtb7StZJlqXJT9WcIpX7tnyI6X
+         9gewZeHtS0mR3vhC08tQKk4aqf3pL5knJE/hrGJP04i1jVNIaCHMRTQVdWFD0VLC/Xeg
+         c3+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=qNvWstZCi3NXF5KJDOazsGSKWj42nw3rueoSXYGmGRc=;
-        b=kzyUIInFxwnF/NVFflii8tFIlmZBdsmIv2Ns3OFbaJDWjWwcxF9PHASwBqD5RrqnH9
-         7SKAFnBfGDZqDL43CrfbZEo9aZiQLKpmiX0W9o3HV1RhMdZtqNtQ8yilaOcqQzx+nae5
-         Sg3b/zaUMypk+z69PxWFBhmr1eHjau9Ojm8O6pptP3O6HutzQgFCJfqJxeH2iqsaj6AY
-         6xJxIgj1lpGg2as6yONtwJ8Qc/GDTdULpOyZrXNcPeDdCkbeYHMXJTb4KmQUfCwd6EqN
-         cHSid2/f+Fokk5C9uzezYVzBuA0JRZVAXlqR8U+6dT15OM1HfKYqES3taqEjs0Dt+iwt
-         jDVg==
-X-Gm-Message-State: APjAAAVULnEEtouHDeDrfYjwBKFCdzzXBBwAgiAmnMxpPcjvFyyBPnUD
-        iV9cm1Ea1uRMVydcJagXH7Tufiuvk6SW+oaMPA60BQ==
-X-Google-Smtp-Source: APXvYqytA61jT3xOdp0Ac43cHqnLjnFVkdCXmd0Vh+wU5xDCKIN1tOrExheH0FZXClBUGoxDy7me4b7UmNyIp24tkW4=
-X-Received: by 2002:ac2:54bc:: with SMTP id w28mr3504887lfk.17.1565124308213;
- Tue, 06 Aug 2019 13:45:08 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=GHzc1obwFKwJgG7nswfPGhmCYytguM8zaNUDmj5ciqU=;
+        b=cOfbVzM+PrU74DhiOEMUXussskP/9CaxgiwTAt9LuZ+P6TyuJDJ48GM+Oa8GIfHZU0
+         cuOWuMv8uXhLrMQUVDhlaG8IcDCEHDgV9ag+O63VRPlnAuOJYRj4UazHEjPuVezwUq+k
+         aDhkjLqdQPazzXzkmbn1EHrSjbr6lv3A57pnxxFpNR1ErkQmZgfyXD1P+tr+C4uRkZfC
+         ZACwVAF81mBC4YRHi9mc06q3ZtB4/5lyYhf8UgllT+JXcbNIbR3VaMyMBvitwFDhDFTr
+         VuWMucgcvul7vGgZ1D4dTCo8e0rlImzAtnhw8a9EUWG/+ZIS5oLse6QFmvuF4RbocIAf
+         P4KA==
+X-Gm-Message-State: APjAAAUZKt/Nj59i4FgJbxNvcbPuGRZP5WjY5s4CdN3TJJh64Pi4p0aL
+        uZkfXImwuCznRxvAYZ6bTas=
+X-Google-Smtp-Source: APXvYqxeOvPea8wN4/1KbcpbOcv0WCKYw/yUT+8N/xQtvHJFmkBBq3xYGl9YYXdHhoFcN7NXCSJlJw==
+X-Received: by 2002:a17:90a:e397:: with SMTP id b23mr5992770pjz.117.1565141629443;
+        Tue, 06 Aug 2019 18:33:49 -0700 (PDT)
+Received: from blueforge.nvidia.com (searspoint.nvidia.com. [216.228.112.21])
+        by smtp.gmail.com with ESMTPSA id u69sm111740800pgu.77.2019.08.06.18.33.47
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Tue, 06 Aug 2019 18:33:48 -0700 (PDT)
+From:   john.hubbard@gmail.com
+X-Google-Original-From: jhubbard@nvidia.com
+To:     Andrew Morton <akpm@linux-foundation.org>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Chinner <david@fromorbit.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        =?UTF-8?q?J=C3=A9r=C3=B4me=20Glisse?= <jglisse@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        amd-gfx@lists.freedesktop.org, ceph-devel@vger.kernel.org,
+        devel@driverdev.osuosl.org, devel@lists.orangefs.org,
+        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-fbdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-mm@kvack.org,
+        linux-nfs@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-rpi-kernel@lists.infradead.org, linux-xfs@vger.kernel.org,
+        netdev@vger.kernel.org, rds-devel@oss.oracle.com,
+        sparclinux@vger.kernel.org, x86@kernel.org,
+        xen-devel@lists.xenproject.org, John Hubbard <jhubbard@nvidia.com>,
+        =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn.topel@intel.com>,
+        Magnus Karlsson <magnus.karlsson@intel.com>,
+        "David S . Miller" <davem@davemloft.net>
+Subject: [PATCH v3 03/41] net/xdp: convert put_page() to put_user_page*()
+Date:   Tue,  6 Aug 2019 18:33:02 -0700
+Message-Id: <20190807013340.9706-4-jhubbard@nvidia.com>
+X-Mailer: git-send-email 2.22.0
+In-Reply-To: <20190807013340.9706-1-jhubbard@nvidia.com>
+References: <20190807013340.9706-1-jhubbard@nvidia.com>
 MIME-Version: 1.0
-References: <20190805162521.90882-1-ebiggers@kernel.org> <20190805162521.90882-14-ebiggers@kernel.org>
-In-Reply-To: <20190805162521.90882-14-ebiggers@kernel.org>
-From:   Paul Crowley <paulcrowley@google.com>
-Date:   Tue, 6 Aug 2019 13:44:56 -0700
-Message-ID: <CA+_SqcAWniLLTk4eqWX81ypgMqnh2_9N=0JDKs3JopeV6XX_HA@mail.gmail.com>
-Subject: Re: [PATCH v8 13/20] fscrypt: v2 encryption policy support
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-fscrypt@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net,
-        linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-api@vger.kernel.org, Satya Tangirala <satyat@google.com>,
-        "Theodore Ts'o" <tytso@mit.edu>, Jaegeuk Kim <jaegeuk@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+X-NVConfidentiality: public
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 5 Aug 2019 at 09:28, Eric Biggers <ebiggers@kernel.org> wrote:
->
-> From: Eric Biggers <ebiggers@google.com>
->
-> Add a new fscrypt policy version, "v2".  It has the following changes
-> from the original policy version, which we call "v1" (*):
->
-> - Master keys (the user-provided encryption keys) are only ever used as
->   input to HKDF-SHA512.  This is more flexible and less error-prone, and
->   it avoids the quirks and limitations of the AES-128-ECB based KDF.
->   Three classes of cryptographically isolated subkeys are defined:
->
->     - Per-file keys, like used in v1 policies except for the new KDF.
->
->     - Per-mode keys.  These implement the semantics of the DIRECT_KEY
->       flag, which for v1 policies made the master key be used directly.
->       These are also planned to be used for inline encryption when
->       support for it is added.
->
->     - Key identifiers (see below).
->
-> - Each master key is identified by a 16-byte master_key_identifier,
->   which is derived from the key itself using HKDF-SHA512.  This prevents
->   users from associating the wrong key with an encrypted file or
->   directory.  This was easily possible with v1 policies, which
->   identified the key by an arbitrary 8-byte master_key_descriptor.
->
-> - The key must be provided in the filesystem-level keyring, not in a
->   process-subscribed keyring.
->
-> The following UAPI additions are made:
->
-> - The existing ioctl FS_IOC_SET_ENCRYPTION_POLICY can now be passed a
->   fscrypt_policy_v2 to set a v2 encryption policy.  It's disambiguated
->   from fscrypt_policy/fscrypt_policy_v1 by the version code prefix.
->
-> - A new ioctl FS_IOC_GET_ENCRYPTION_POLICY_EX is added.  It allows
->   getting the v1 or v2 encryption policy of an encrypted file or
->   directory.  The existing FS_IOC_GET_ENCRYPTION_POLICY ioctl could not
->   be used because it did not have a way for userspace to indicate which
->   policy structure is expected.  The new ioctl includes a size field, so
->   it is extensible to future fscrypt policy versions.
->
-> - The ioctls FS_IOC_ADD_ENCRYPTION_KEY, FS_IOC_REMOVE_ENCRYPTION_KEY,
->   and FS_IOC_GET_ENCRYPTION_KEY_STATUS now support managing keys for v2
->   encryption policies.  Such keys are kept logically separate from keys
->   for v1 encryption policies, and are identified by 'identifier' rather
->   than by 'descriptor'.  The 'identifier' need not be provided when
->   adding a key, since the kernel will calculate it anyway.
->
-> This patch temporarily keeps adding/removing v2 policy keys behind the
-> same permission check done for adding/removing v1 policy keys:
-> capable(CAP_SYS_ADMIN).  However, the next patch will carefully take
-> advantage of the cryptographically secure master_key_identifier to allow
-> non-root users to add/remove v2 policy keys, thus providing a full
-> replacement for v1 policies.
->
-> (*) Actually, in the API fscrypt_policy::version is 0 while on-disk
->     fscrypt_context::format is 1.  But I believe it makes the most sense
->     to advance both to '2' to have them be in sync, and to consider the
->     numbering to start at 1 except for the API quirk.
->
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
+From: John Hubbard <jhubbard@nvidia.com>
 
-Looks good, feel free to add:
+For pages that were retained via get_user_pages*(), release those pages
+via the new put_user_page*() routines, instead of via put_page() or
+release_pages().
 
-Reviewed-by: Paul Crowley <paulcrowley@google.com>
+This is part a tree-wide conversion, as described in commit fc1d8e7cca2d
+("mm: introduce put_user_page*(), placeholder versions").
+
+Acked-by: Björn Töpel <bjorn.topel@intel.com>
+Cc: Magnus Karlsson <magnus.karlsson@intel.com>
+Cc: David S. Miller <davem@davemloft.net>
+Cc: netdev@vger.kernel.org
+Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+---
+ net/xdp/xdp_umem.c | 9 +--------
+ 1 file changed, 1 insertion(+), 8 deletions(-)
+
+diff --git a/net/xdp/xdp_umem.c b/net/xdp/xdp_umem.c
+index 83de74ca729a..17c4b3d3dc34 100644
+--- a/net/xdp/xdp_umem.c
++++ b/net/xdp/xdp_umem.c
+@@ -166,14 +166,7 @@ void xdp_umem_clear_dev(struct xdp_umem *umem)
+ 
+ static void xdp_umem_unpin_pages(struct xdp_umem *umem)
+ {
+-	unsigned int i;
+-
+-	for (i = 0; i < umem->npgs; i++) {
+-		struct page *page = umem->pgs[i];
+-
+-		set_page_dirty_lock(page);
+-		put_page(page);
+-	}
++	put_user_pages_dirty_lock(umem->pgs, umem->npgs, true);
+ 
+ 	kfree(umem->pgs);
+ 	umem->pgs = NULL;
+-- 
+2.22.0
+
