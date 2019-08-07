@@ -2,225 +2,146 @@ Return-Path: <SRS0=TZua=WD=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64F75C19759
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Aug 2019 08:15:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EBCAC433FF
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Aug 2019 08:37:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1FEEB229EC
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Aug 2019 08:15:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=verimatrix.com header.i=@verimatrix.com header.b="XQpEuhpA"
+	by mail.kernel.org (Postfix) with ESMTP id E70DD22ADB
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Aug 2019 08:37:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728327AbfHGIPo (ORCPT
+        id S1728073AbfHGIhb (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 7 Aug 2019 04:15:44 -0400
-Received: from mail-eopbgr700050.outbound.protection.outlook.com ([40.107.70.50]:34784
-        "EHLO NAM04-SN1-obe.outbound.protection.outlook.com"
+        Wed, 7 Aug 2019 04:37:31 -0400
+Received: from mx2.suse.de ([195.135.220.15]:51764 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728235AbfHGIPo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Aug 2019 04:15:44 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=M/BgGmgQrp/4j5AQM7R8gCBcUah7UtHzzTPFocES5gTiIDSA2CUqfGlufKHWYt6iey2yXK8C460ZXQ3pE8wvaYKhWUXq2dLoDDVE2+oZIwGcgUa7w6dP7HqUqXGEv5x7R7EB7/kwOT7h9tAgw26vny2RafJAmQ9CxDIdB6+ie7B1K5/kyeGPPaXBo0wC7jAUfApjVCHZAoU1Ye4ZHem/Dn8lZvfn+oateL62mpvFeN6x6BUF53QSm+xPYYprCvZTXBiGsvoBsNfC6V8ESOCqdBEDnN1/H3o+6rbo3e9h6kCvuJpFwvzsoA2JAAucdmYxPO0TR13duNUUy2p2sBaJAg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=i8HKsiNurZC43BcAgmwg8m839Vgi56y5XZK7aYOeSVs=;
- b=Wp0OwpH0SshDXukb0oWb4YngzHLeQhAnMrAUmw0xgkmRyhcjf8nqAUfEposdmzf0ZqbtjYrdMjLaTNbuQTfZc4xoBY7kaJu2osAeq63pZW1z6dZTVvv6Y15/P8vR2QpfmAf99JX4J/3omcxeuDaKK10o3B6vmrc9NYCQqoJbsjWYA7rLguZjZfxqQTuCefaR1HQOWoWRbLzFlw90gsTjWh6/kXHnrhcMxfU4M9SEQQnsvGejASnybzUuHiUpdVOPte5gZhI1NW5sGsfP+zsFEUAARIfQk0WpqK3EI9lrhY65WfKGOQoJGhBvzAmgc4fpxchlSR/mt/wlOlcMddBtLA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=verimatrix.com; dmarc=pass action=none
- header.from=verimatrix.com; dkim=pass header.d=verimatrix.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verimatrix.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=i8HKsiNurZC43BcAgmwg8m839Vgi56y5XZK7aYOeSVs=;
- b=XQpEuhpAcsZNemat7ZND5Dfus5CMJ4A3TFRz5a7g9an0KYUMTezBEwnOFCCyre2GLpE6+7lMFHdHpuiy0j8OtXPdPkzHO9RZHrIvcBoikflEETi+PpmKOZ620rwOdOZokTCfgEWeR8vRRovTg1oW+k1WZb5ZGedSBMIaInVc1Vs=
-Received: from MN2PR20MB2973.namprd20.prod.outlook.com (52.132.172.146) by
- MN2PR20MB3037.namprd20.prod.outlook.com (52.132.173.138) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2157.14; Wed, 7 Aug 2019 08:15:36 +0000
-Received: from MN2PR20MB2973.namprd20.prod.outlook.com
- ([fe80::d96f:39b2:19f4:c7c1]) by MN2PR20MB2973.namprd20.prod.outlook.com
- ([fe80::d96f:39b2:19f4:c7c1%7]) with mapi id 15.20.2136.018; Wed, 7 Aug 2019
- 08:15:36 +0000
-From:   Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
-To:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>,
-        Milan Broz <gmazyland@gmail.com>,
-        Pascal van Leeuwen <pascalvanl@gmail.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-CC:     "rsnel@cube.dyndns.org" <rsnel@cube.dyndns.org>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>
-Subject: RE: [PATCH] crypto: xts - Add support for Cipher Text Stealing
-Thread-Topic: [PATCH] crypto: xts - Add support for Cipher Text Stealing
-Thread-Index: AQHVTCyrZ3LTVlRuCkCwUQoLONEbf6bucuQAgAAMd6CAANdjsA==
-Date:   Wed, 7 Aug 2019 08:15:36 +0000
-Message-ID: <MN2PR20MB2973A38A300804281CA6A109CAD40@MN2PR20MB2973.namprd20.prod.outlook.com>
-References: <1565074510-8480-1-git-send-email-pvanleeuwen@verimatrix.com>
- <5bf9d0be-3ba4-8903-f1b9-93aa32106274@gmail.com>
- <MN2PR20MB29734CFE2795639436C3CC91CAD50@MN2PR20MB2973.namprd20.prod.outlook.com>
-In-Reply-To: <MN2PR20MB29734CFE2795639436C3CC91CAD50@MN2PR20MB2973.namprd20.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=pvanleeuwen@verimatrix.com; 
-x-originating-ip: [188.204.2.113]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: dcfa3994-3e9c-4d26-af81-08d71b0f6cf8
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:MN2PR20MB3037;
-x-ms-traffictypediagnostic: MN2PR20MB3037:
-x-ms-exchange-purlcount: 2
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MN2PR20MB3037AEB00E191F93FD1F10D2CAD40@MN2PR20MB3037.namprd20.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-forefront-prvs: 01221E3973
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(376002)(396003)(366004)(136003)(346002)(39850400004)(199004)(189003)(13464003)(102836004)(66066001)(6506007)(53546011)(256004)(25786009)(486006)(476003)(99286004)(7696005)(76176011)(26005)(4326008)(229853002)(6436002)(186003)(2906002)(71190400001)(71200400001)(6246003)(33656002)(55016002)(6306002)(9686003)(53936002)(54906003)(7736002)(74316002)(45080400002)(5660300002)(86362001)(478600001)(316002)(2501003)(110136005)(6116002)(3846002)(8676002)(446003)(8936002)(305945005)(66446008)(66946007)(66476007)(66556008)(64756008)(966005)(68736007)(81166006)(81156014)(76116006)(52536014)(14454004)(11346002)(15974865002)(473944003)(18886075002);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR20MB3037;H:MN2PR20MB2973.namprd20.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: verimatrix.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: KKcmqlrSoBb2uwBAjYry6iV0RHyiLGNgeUGIqhdYpKF1yb9nUh95diIO/6hHmoVi2ZP7Fz5CWlWJCd3FsQ2sRzO8uY4meekIqNJiliWOEJc18AI09IJtagHj15wNzgdFJu9IrTtQXQRpEbpr7glKZr9dWJNjd1JqR6l8r+akjkp17FokSQi8kW+AWexUG8wvyKxVJn/O/9ImodNooMUp0ys9c9Ib2RnAXE742cTnHriKSBHq6daHOoeT9tkEgVFz3xn4EQ50PFPvKLhbapu2Vm4ADmjWCWEFdI7v726zk3SiKPqr3WiX1V9KQp/fbc+6ipWaf5k9bYVSWVZlXxa1AYfyjPw/UzTmIYhmyxC+wyjvcnn690Ut/qf5w00xxzGQmXcBVl7hygRniGC9SDfX5ea2EiotOwMRrZ++MUxTtVU=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        id S1727753AbfHGIhb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 7 Aug 2019 04:37:31 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id F237BAF41;
+        Wed,  7 Aug 2019 08:37:26 +0000 (UTC)
+Received: by quack2.suse.cz (Postfix, from userid 1000)
+        id 9D5DC1E3551; Wed,  7 Aug 2019 10:37:26 +0200 (CEST)
+Date:   Wed, 7 Aug 2019 10:37:26 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     Jan Kara <jack@suse.cz>, Matthew Wilcox <willy@infradead.org>,
+        Michal Hocko <mhocko@kernel.org>, john.hubbard@gmail.com,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Chinner <david@fromorbit.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        =?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        amd-gfx@lists.freedesktop.org, ceph-devel@vger.kernel.org,
+        devel@driverdev.osuosl.org, devel@lists.orangefs.org,
+        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-fbdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-media@vger.kernel.org, linux-mm@kvack.org,
+        linux-nfs@vger.kernel.org, linux-rdma@vger.kernel.org,
+        linux-rpi-kernel@lists.infradead.org, linux-xfs@vger.kernel.org,
+        netdev@vger.kernel.org, rds-devel@oss.oracle.com,
+        sparclinux@vger.kernel.org, x86@kernel.org,
+        xen-devel@lists.xenproject.org
+Subject: Re: [PATCH 00/34] put_user_pages(): miscellaneous call sites
+Message-ID: <20190807083726.GA14658@quack2.suse.cz>
+References: <20190802022005.5117-1-jhubbard@nvidia.com>
+ <20190802091244.GD6461@dhcp22.suse.cz>
+ <20190802124146.GL25064@quack2.suse.cz>
+ <20190802142443.GB5597@bombadil.infradead.org>
+ <20190802145227.GQ25064@quack2.suse.cz>
+ <076e7826-67a5-4829-aae2-2b90f302cebd@nvidia.com>
 MIME-Version: 1.0
-X-OriginatorOrg: verimatrix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: dcfa3994-3e9c-4d26-af81-08d71b0f6cf8
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Aug 2019 08:15:36.0432
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: dcb260f9-022d-4495-8602-eae51035a0d0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: pvanleeuwen@verimatrix.com
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR20MB3037
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <076e7826-67a5-4829-aae2-2b90f302cebd@nvidia.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-TWlsYW4sDQoNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBsaW51eC1j
-cnlwdG8tb3duZXJAdmdlci5rZXJuZWwub3JnIDxsaW51eC1jcnlwdG8tb3duZXJAdmdlci5rZXJu
-ZWwub3JnPiBPbiBCZWhhbGYgT2YNCj4gUGFzY2FsIFZhbiBMZWV1d2VuDQo+IFNlbnQ6IFR1ZXNk
-YXksIEF1Z3VzdCA2LCAyMDE5IDk6MzcgUE0NCj4gVG86IE1pbGFuIEJyb3ogPGdtYXp5bGFuZEBn
-bWFpbC5jb20+OyBQYXNjYWwgdmFuIExlZXV3ZW4gPHBhc2NhbHZhbmxAZ21haWwuY29tPjsgbGlu
-dXgtDQo+IGNyeXB0b0B2Z2VyLmtlcm5lbC5vcmcNCj4gQ2M6IHJzbmVsQGN1YmUuZHluZG5zLm9y
-ZzsgaGVyYmVydEBnb25kb3IuYXBhbmEub3JnLmF1OyBkYXZlbUBkYXZlbWxvZnQubmV0DQo+IFN1
-YmplY3Q6IFJFOiBbUEFUQ0hdIGNyeXB0bzogeHRzIC0gQWRkIHN1cHBvcnQgZm9yIENpcGhlciBU
-ZXh0IFN0ZWFsaW5nDQo+IA0KPiBNaWxhbiwNCj4gDQo+IFRoYW5rcyBmb3IgdHJ5aW5nIDotKQ0K
-PiANCj4gPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiA+IEZyb206IE1pbGFuIEJyb3og
-PGdtYXp5bGFuZEBnbWFpbC5jb20+DQo+ID4gU2VudDogVHVlc2RheSwgQXVndXN0IDYsIDIwMTkg
-ODozNSBQTQ0KPiA+IFRvOiBQYXNjYWwgdmFuIExlZXV3ZW4gPHBhc2NhbHZhbmxAZ21haWwuY29t
-PjsgbGludXgtY3J5cHRvQHZnZXIua2VybmVsLm9yZw0KPiA+IENjOiByc25lbEBjdWJlLmR5bmRu
-cy5vcmc7IGhlcmJlcnRAZ29uZG9yLmFwYW5hLm9yZy5hdTsgZGF2ZW1AZGF2ZW1sb2Z0Lm5ldDsg
-UGFzY2FsIFZhbg0KPiA+IExlZXV3ZW4gPHB2YW5sZWV1d2VuQHZlcmltYXRyaXguY29tPg0KPiA+
-IFN1YmplY3Q6IFJlOiBbUEFUQ0hdIGNyeXB0bzogeHRzIC0gQWRkIHN1cHBvcnQgZm9yIENpcGhl
-ciBUZXh0IFN0ZWFsaW5nDQo+ID4NCj4gPiBPbiAwNi8wOC8yMDE5IDA4OjU1LCBQYXNjYWwgdmFu
-IExlZXV3ZW4gd3JvdGU6DQo+ID4gPiBUaGlzIGFkZHMgc3VwcG9ydCBmb3IgQ2lwaGVyIFRleHQg
-U3RlYWxpbmcgZm9yIGRhdGEgYmxvY2tzIHRoYXQgYXJlIG5vdCBhbg0KPiA+ID4gaW50ZWdlciBt
-dWx0aXBsZSBvZiB0aGUgY2lwaGVyIGJsb2NrIHNpemUgaW4gc2l6ZSwgYnJpbmdpbmcgaXQgZnVs
-bHkgaW4NCj4gPiA+IGxpbmUgd2l0aCB0aGUgSUVFRSBQMTYxOS9EMTYgc3RhbmRhcmQuDQo+ID4g
-Pg0KPiA+ID4gVGhpcyBoYXMgYmVlbiB0ZXN0ZWQgd2l0aCB0aGUgQUVTLVhUUyB0ZXN0IHZlY3Rv
-cnMgZnJvbSB0aGUgSUVFRSBQMTYxOS9EMTYNCj4gPiA+IHNwZWNpZmljYXRpb24gYXMgd2VsbCBh
-cyBzb21lIGFkZGl0aW9uYWwgdGVzdCB2ZWN0b3JzIHN1cHBsaWVkIHRvIHRoZQ0KPiA+ID4gbGlu
-dXhfY3J5cHRvIG1haWxpbmcgbGlzdCBwcmV2aW91c2x5LiBJdCBoYXMgYWxzbyBiZWVuIGZ1enpl
-ZCBhZ2FpbnN0DQo+ID4gPiBJbnNpZGUgU2VjdXJlIEFFUy1YVFMgaGFyZHdhcmUgd2hpY2ggaGFz
-IGJlZW4gYWN0aXZlbHkgdXNlZCBpbiB0aGUgZmllbGQNCj4gPiA+IGZvciBtb3JlIHRoYW4gYSBk
-ZWNhZGUgYWxyZWFkeS4NCj4gPiA+DQo+ID4gPiBTaWduZWQtb2ZmLWJ5OiBQYXNjYWwgdmFuIExl
-ZXV3ZW4gPHB2YW5sZWV1d2VuQHZlcmltYXRyaXguY29tPg0KPiA+DQo+ID4gV293LCBpdCB3YXMg
-cXVpY2suLi4gdGhhbmtzIGZvciB0aGlzISA6KQ0KPiA+DQo+ID4gSSB0cmllZCB0byB0ZXN0IHdp
-dGggbXkgd3JhcHBlciB0aHJvdWdoIEFGX0FMRyAod2l0aCB0aGUgZGlzY3Vzc2VkIHRlc3QgdmVj
-dG9ycyksDQo+ID4gYnV0IGl0IGNyYXNoZWQgbXkgMzJiaXQgaTY4NiBWTSAoTGludXMgdHJlZSB3
-aXRoIHlvdXIgcGF0Y2ggYXBwbGllZCkNCj4gPg0KPiBPaywgSSBoYXZlIHRvIGFkbWl0IEkgb25s
-eSB0cmllZCBpdCBvbiBvbmUgcGFydGljdWxhciBrZXJuZWwgY29uZmlndXJhdGlvbi4NCj4gSSBk
-b24ndCByZWFsbHkgaGF2ZSB0aGUgdGltZSBub3IgdGhlIHJlc291cmNlcyAoSSBhbHNvIGhhdmUg
-dG8gd29yayBvbiB0aGlzDQo+IG1hY2hpbmUsIHNvIEkgbmVlZCBpdCB0byBiZSBzdGFibGUgLi4u
-KSB0byByZWFsbHkgdHJ5IG90aGVyIGNvbmZpZ3VyYXRpb25zLg0KPiANCj4gPiBUbyByZXByb2R1
-Y2UgaXQsIHJ1biB0aGlzICJrZXJuZWwiIGFmX2FsZyBicmFuY2ggb2YgZXh0cmFjdGVkIGNyeXB0
-c2V0dXAgdmVjdG9yDQo+IHRlc3RzdWl0ZToNCj4gPiBodHRwczovL2dpdGh1Yi5jb20vbWJyb3ov
-Y3J5cHRzZXR1cF9iYWNrZW5kX3Rlc3QvdHJlZS9rZXJuZWwNCj4gPg0KPiBJJ2xsIHRyeSB0aGF0
-IHRvbW9ycm93IGlmIEkgY2FuIGdldCBpdCB0byB3b3JrIHdpdGhvdXQgdG9vIG11Y2ggZWZmb3J0
-Lg0KPiANCk9rLCBJIHRyaWVkIHRoaXMgb24gbXkga2VybmVsIGJ1dCBpdCB3b3JrcyBqdXN0IGZp
-bmUuDQpCdXQgaWYgSSB1bmRlcnN0YW5kIGNvcnJlY3RseSwgeW91IHJ1biBhIDMyIGJpdCBrZXJu
-ZWwgdW5kZXIgc29tZSBWTSBvciBzbz8NClBlcmhhcHMgdGhhdCBkb2VzIHNvbWUgc3RyaWN0ZXIg
-YnVmZmVyIG92ZXJmbG93IGNoZWNrcz8gSW4gYW55IGNhc2UsIEkNCndvdWxkbid0IGtub3cgaG93
-IHRvIGRvIHRoYXQgLi4uDQoNCj4gPiAob3V0cHV0KSAuLi4NCj4gPiBDSVBIRVIgdmVjdG9yIDAw
-OiBbYWVzLWVjYiwxMjhiaXRzXVtzZXJwZW50LWVjYiwxMjhiaXRzXQ0KPiA+IENJUEhFUiB2ZWN0
-b3IgMDE6IFthZXMtY2JjLDEyOGJpdHNdW3NlcnBlbnQtY2JjLDEyOGJpdHNdDQo+ID4gQ0lQSEVS
-IHZlY3RvciAwMjogW2Flcy1lY2IsMjU2Yml0c11bc2VycGVudC1lY2IsMjU2Yml0c10NCj4gPiBD
-SVBIRVIgdmVjdG9yIDAzOiBbYWVzLWNiYywyNTZiaXRzXVtzZXJwZW50LWNiYywyNTZiaXRzXQ0K
-PiA+IENJUEhFUiB2ZWN0b3IgMDQ6IFthZXMteHRzLDI1NmJpdHNdW3NlcnBlbnQteHRzLDI1NmJp
-dHNdDQo+ID4gQ0lQSEVSIHZlY3RvciAwNTogW2Flcy14dHMsNTEyYml0c11bc2VycGVudC14dHMs
-NTEyYml0c10NCj4gPiBDSVBIRVIgdmVjdG9yIDA2OiBbeGNoYWNoYTEyLGFlcy1hZGlhbnR1bSwy
-NTZiaXRzXVt4Y2hhY2hhMjAsYWVzLWFkaWFudHVtLDI1NmJpdHNdDQo+ID4gU2VnbWVudGF0aW9u
-IGZhdWx0DQo+ID4NCj4gSSBhbHNvIG5vdGljZWQgc29tZSBhbGdvcml0aG1zIHRoYXQgSSBkb24n
-dCB0aGluayBJIGhhdmUgY29uZmlndXJlZCBpbnRvIG15DQo+IGtlcm5lbCBhdCB0aGUgbW9tZW50
-IChuZXZlciBvY2N1cnJlZCB0byBtZSByZWFsbHksIEkgdHJ5IG5vdCB0byB0b3VjaCBteSBrZXJu
-ZWwNCj4gY29uZmlnIHNvIEkgZG9uJ3QgYnJlYWsgaXQgYW5kIEkgd2Fzbid0IG9yaWdpbmFsbHkg
-aW50ZXJlc3RlZCBpbiB0aGVzZSBhcyBJIGNhbid0DQo+IHRoaW5rIG9mIGFueSB1c2UgY2FzZSBm
-b3IgdGhlbSksIG1heWJlIEkgc2hvdWxkIHRyeSBlbmFibGluZyB0aG9zZSB3aXRoIG15IGtlcm5l
-bA0KPiBmaXJzdC4NCj4gDQpBY3R1YWxseSwgaXQgdHVybnMgb3V0IEkgaGFkIGV2ZXJ5dGhpbmcg
-ZW5hYmxlZCBhbHJlYWR5IGV4Y2VwdCBhZGlhbnR1bSwgd2hpY2gNCnNob3VsZCBub3QgYmUgcmVs
-ZXZhbnQgZm9yIFhUUyBhbnl3YXkuIEJ1dCBpdCBhY3R1YWxseSBkb2Vzbid0IG1hdHRlciBtdWNo
-LA0Kc2luY2UgKG15KSB0ZXN0bWdyIG9ubHkgaGFzIENUUyB2ZWN0b3JzIGZvciBBRVMsIHNvIHRo
-ZSBDVFMgY29kZSBpcyBub3QgaGl0IGZvcg0KYW55dGhpbmcgZWxzZSB1bmxlc3MgeW91IHJ1biBz
-b21lIGFwcGxpY2F0aW9uIHRoYXQgZG9lcyBzby4NCg0KPiBJIGtub3cgdGhlcmUncyBwYXJ0IG9m
-IHRoZSBjb2RlIEkgY2FuJ3QgaGl0IHdpdGggeHRzKGFlcyksIGJ1dCBJIGFsc28gZGlkbid0IGtu
-b3cNCj4gaG93IHRvIG90aGVyd2lzZSBoaXQgaXQsIG1heWJlIG9uZSBvZiB0aGVzZSBkb2VzIGhp
-dCB0aGF0IGFuZCByZXZlYWxzIGEgYnVnIHRoZXJlLg0KPiANCj4gPg0KPiA+IChJZiB5b3UgY2Fu
-bm90IHJlcHJvZHVjZSBpdCwgSSdsbCBjaGVjayBpdCB0b21vcnJvdy4gSXQgaXMgcXVpdGUgcG9z
-c2libGUNCj4gPiBJIGhhdmUgYSBidWcgaW4gd3JhcHBlciwgYnV0IGl0IHNob3VsZCBkZWZpbml0
-ZWx5IG5vdCBPT1BTIHRoZSBrZXJuZWwuLi4NCj4gPiBtb3Jlb3ZlciwgdGhpcyBjcmFzaCBpcyBw
-b3NzaWJsZSBmcm9tIGEgdXNlciBjb250ZXh0KQ0KPiA+DQo+ID4gVGhhbmtzLA0KPiA+IE1pbGFu
-DQo+ID4NCj4gPg0KPiA+IE9PUFMgbG9nIGhlcmU6DQo+ID4NCj4gPiBrZXJuZWw6IGRldGVjdGVk
-IGJ1ZmZlciBvdmVyZmxvdyBpbiBtZW1jcHkNCj4gPg0KPiBPaywgc28gSSBwcm9iYWJseSBtZXNz
-ZWQgdXAgc29tZSBsZW5ndGggc29tZXdoZXJlIDotKQ0KPiBMZXQncyBzZWUgaWYgSSBjYW4gc3Bv
-dCBpdCBieSBjYXJlZnVsIHJldmlldyAuLi4NCj4gDQpJIHdlbnQgdGhyb3VnaCB0aGUgY29kZSBh
-IGNvdXBsZSBvZiB0aW1lcywgYnV0IEkgY2Fubm90IHNwb3QgYW55IG1pc3Rha2VzIGluDQp0aGUg
-bGVuZ3RocyBJJ20gdXNpbmcuIElzIGl0IHBvc3NpYmxlIHRoYXQgeW91ciBhcHBsaWNhdGlvbiBp
-cyBzdXBwbHlpbmcgYQ0KYnVmZmVyIHRoYXQgaXMganVzdCBub3QgbGFyZ2UgZW5vdWdoPw0KDQo+
-ID4ga2VybmVsOiAtLS0tLS0tLS0tLS1bIGN1dCBoZXJlIF0tLS0tLS0tLS0tLS0NCj4gPiBrZXJu
-ZWw6IGtlcm5lbCBCVUcgYXQgbGliL3N0cmluZy5jOjExMTUhDQo+ID4ga2VybmVsOiBpbnZhbGlk
-IG9wY29kZTogMDAwMCBbIzFdIFBSRUVNUFQgU01QDQo+ID4ga2VybmVsOiBDUFU6IDEgUElEOiAy
-MzAzIENvbW06IHRzdCBOb3QgdGFpbnRlZCA1LjMuMC1yYzMrICM1NzINCj4gPiBrZXJuZWw6IEhh
-cmR3YXJlIG5hbWU6IFZNd2FyZSwgSW5jLiBWTXdhcmUgVmlydHVhbCBQbGF0Zm9ybS80NDBCWCBE
-ZXNrdG9wIFJlZmVyZW5jZQ0KPiBQbGF0Zm9ybSwNCj4gPiBCSU9TIDYuMDAgMDQvMTMvMjAxOA0K
-PiA+IGtlcm5lbDogRUlQOiBmb3J0aWZ5X3BhbmljKzB4ZS8weDE5DQo+ID4ga2VybmVsOiBDb2Rl
-OiBiNiAwMCAwMCAwMCAwMCA4YiA0NSBlNCA4MyBjNCAxMCA1YiA1ZSAyOSBmOCA1ZiA1ZCBjMyAw
-ZiBiNiBjMiAwZiBiNiBmMyAyOQ0KPiBmMA0KPiA+IGViIGNlIDU1IDg5IGU1IDUwIDY4IDcwIDAz
-IDhkIGMxIGU4IGNjIDI3IGE2IGZmIDwwZj4gMGIgOTAgOTAgOTAgOTAgOTAgOTAgOTAgOTAgOTAg
-NTUgODkNCj4gZTUNCj4gPiA1NyA1NiA1MyA4OSBkMyA4MyBlYyAwNA0KPiA+IGtlcm5lbDogRUFY
-OiAwMDAwMDAyMiBFQlg6IGYxNDE4ZGM4IEVDWDogZjQwYWI3ODQgRURYOiAwMDAwMDAwMQ0KPiA+
-IGtlcm5lbDogRVNJOiBmMzE3YTMxOCBFREk6IDAwMDAwMDIwIEVCUDogZjBjMmJkZjQgRVNQOiBm
-MGMyYmRlYw0KPiA+IGtlcm5lbDogRFM6IDAwN2IgRVM6IDAwN2IgRlM6IDAwZDggR1M6IDAwZTAg
-U1M6IDAwNjggRUZMQUdTOiAwMDAxMDI4Ng0KPiA+IGtlcm5lbDogQ1IwOiA4MDA1MDAzMyBDUjI6
-IGI3ZjU0M2EwIENSMzogMzBlMmEwMDAgQ1I0OiAwMDE0MDY5MA0KPiA+IGtlcm5lbDogQ2FsbCBU
-cmFjZToNCj4gPiBrZXJuZWw6ICBlbmNyeXB0X2ZpbmlzaF9jdHMuY29sZCsweGEvMHhhDQo+ID4g
-a2VybmVsOiAgZW5jcnlwdCsweGU3LzB4MTAwDQo+ID4ga2VybmVsOiAgY3J5cHRvX3NrY2lwaGVy
-X2VuY3J5cHQrMHhlLzB4MjANCj4gPiBrZXJuZWw6ICBza2NpcGhlcl9yZWN2bXNnKzB4MmY1LzB4
-MzkwIFthbGdpZl9za2NpcGhlcl0NCj4gPiBrZXJuZWw6ICBzb2NrX3JlYWRfaXRlcisweDg2LzB4
-ZDANCj4gPiBrZXJuZWw6ICBfX3Zmc19yZWFkKzB4MTQwLzB4MWYwDQo+ID4ga2VybmVsOiAgdmZz
-X3JlYWQrMHg4Yi8weDE1MA0KPiA+IGtlcm5lbDogIGtzeXNfcmVhZCsweDVjLzB4ZDANCj4gPiBr
-ZXJuZWw6ICBzeXNfcmVhZCsweDExLzB4MjANCj4gPiBrZXJuZWw6ICBkb19pbnQ4MF9zeXNjYWxs
-XzMyKzB4NGIvMHgxYTANCj4gPiBrZXJuZWw6ICBlbnRyeV9JTlQ4MF8zMisweGZiLzB4ZmINCj4g
-PiBrZXJuZWw6IEVJUDogMHhiN2Y2NDA5Mg0KPiA+IGtlcm5lbDogQ29kZTogMDAgMDAgMDAgZTkg
-OTAgZmYgZmYgZmYgZmYgYTMgMjQgMDAgMDAgMDAgNjggMzAgMDAgMDAgMDAgZTkgODAgZmYgZmYg
-ZmYgZmYNCj4gYTMNCj4gPiAyYyAwMCAwMCAwMCA2NiA5MCAwMCAwMCAwMCAwMCAwMCAwMCAwMCAw
-MCBjZCA4MCA8YzM+IDhkIGI0IDI2IDAwIDAwIDAwIDAwIDhkIGI2IDAwIDAwIDAwDQo+IDAwDQo+
-ID4gOGIgMWMgMjQgYzMgOGQgYjQgMjYgMDANCj4gPiBrZXJuZWw6IEVBWDogZmZmZmZmZGEgRUJY
-OiAwMDAwMDAwNCBFQ1g6IGJmZGUxZDNjIEVEWDogMDAwMDAwMjUNCj4gPiBrZXJuZWw6IEVTSTog
-YjdmNTcwMDAgRURJOiAwMDAwMDAwMCBFQlA6IGJmZGUxY2I4IEVTUDogYmZkZTFiY2MNCj4gPiBr
-ZXJuZWw6IERTOiAwMDdiIEVTOiAwMDdiIEZTOiAwMDAwIEdTOiAwMDMzIFNTOiAwMDdiIEVGTEFH
-UzogMDAwMDAyODINCj4gPiBrZXJuZWw6IE1vZHVsZXMgbGlua2VkIGluOiBuaHBvbHkxMzA1IGNo
-YWNoYV9nZW5lcmljIGFkaWFudHVtIHBvbHkxMzA1X2dlbmVyaWMNCj4gPiBzZXJwZW50X3NzZTJf
-aTU4NiBzZXJwZW50X2dlbmVyaWMgZ2x1ZV9oZWxwZXIgYWxnaWZfc2tjaXBoZXIgcm1kMTYwIHdw
-NTEyIHNoYTUxMl9nZW5lcmljDQo+ID4gc2hhMV9nZW5lcmljIGFsZ2lmX2hhc2ggYWZfYWxnIGxv
-b3AgZG1fbW9kIHBrdGNkdmQgY3JjMzJfcGNsbXVsIGNyYzMyY19pbnRlbCBhZXNuaV9pbnRlbA0K
-PiA+IGFlc19pNTg2IGNyeXB0b19zaW1kIGNyeXB0ZCBhdGFfcGlpeA0KPiA+IGtlcm5lbDogLS0t
-WyBlbmQgdHJhY2UgMjlkMThiMDRmZWZmYzEzOSBdLS0tDQo+IA0KPiBSZWdhcmRzLA0KPiBQYXNj
-YWwgdmFuIExlZXV3ZW4NCj4gU2lsaWNvbiBJUCBBcmNoaXRlY3QsIE11bHRpLVByb3RvY29sIEVu
-Z2luZXMgQCBWZXJpbWF0cml4DQo+IHd3dy5pbnNpZGVzZWN1cmUuY29tDQoNClJlZ2FyZHMsDQpQ
-YXNjYWwgdmFuIExlZXV3ZW4NClNpbGljb24gSVAgQXJjaGl0ZWN0LCBNdWx0aS1Qcm90b2NvbCBF
-bmdpbmVzIEAgVmVyaW1hdHJpeA0Kd3d3Lmluc2lkZXNlY3VyZS5jb20NCg==
+On Fri 02-08-19 12:14:09, John Hubbard wrote:
+> On 8/2/19 7:52 AM, Jan Kara wrote:
+> > On Fri 02-08-19 07:24:43, Matthew Wilcox wrote:
+> > > On Fri, Aug 02, 2019 at 02:41:46PM +0200, Jan Kara wrote:
+> > > > On Fri 02-08-19 11:12:44, Michal Hocko wrote:
+> > > > > On Thu 01-08-19 19:19:31, john.hubbard@gmail.com wrote:
+> > > > > [...]
+> > > > > > 2) Convert all of the call sites for get_user_pages*(), to
+> > > > > > invoke put_user_page*(), instead of put_page(). This involves dozens of
+> > > > > > call sites, and will take some time.
+> > > > > 
+> > > > > How do we make sure this is the case and it will remain the case in the
+> > > > > future? There must be some automagic to enforce/check that. It is simply
+> > > > > not manageable to do it every now and then because then 3) will simply
+> > > > > be never safe.
+> > > > > 
+> > > > > Have you considered coccinele or some other scripted way to do the
+> > > > > transition? I have no idea how to deal with future changes that would
+> > > > > break the balance though.
+> 
+> Hi Michal,
+> 
+> Yes, I've thought about it, and coccinelle falls a bit short (it's not smart
+> enough to know which put_page()'s to convert). However, there is a debug
+> option planned: a yet-to-be-posted commit [1] uses struct page extensions
+> (obviously protected by CONFIG_DEBUG_GET_USER_PAGES_REFERENCES) to add
+> a redundant counter. That allows:
+> 
+> void __put_page(struct page *page)
+> {
+> 	...
+> 	/* Someone called put_page() instead of put_user_page() */
+> 	WARN_ON_ONCE(atomic_read(&page_ext->pin_count) > 0);
+> 
+> > > > 
+> > > > Yeah, that's why I've been suggesting at LSF/MM that we may need to create
+> > > > a gup wrapper - say vaddr_pin_pages() - and track which sites dropping
+> > > > references got converted by using this wrapper instead of gup. The
+> > > > counterpart would then be more logically named as unpin_page() or whatever
+> > > > instead of put_user_page().  Sure this is not completely foolproof (you can
+> > > > create new callsite using vaddr_pin_pages() and then just drop refs using
+> > > > put_page()) but I suppose it would be a high enough barrier for missed
+> > > > conversions... Thoughts?
+> 
+> The debug option above is still a bit simplistic in its implementation
+> (and maybe not taking full advantage of the data it has), but I think
+> it's preferable, because it monitors the "core" and WARNs.
+> 
+> Instead of the wrapper, I'm thinking: documentation and the passage of
+> time, plus the debug option (perhaps enhanced--probably once I post it
+> someone will notice opportunities), yes?
+
+So I think your debug option and my suggested renaming serve a bit
+different purposes (and thus both make sense). If you do the renaming, you
+can just grep to see unconverted sites. Also when someone merges new GUP
+user (unaware of the new rules) while you switch GUP to use pins instead of
+ordinary references, you'll get compilation error in case of renaming
+instead of hard to debug refcount leak without the renaming. And such
+conflict is almost bound to happen given the size of GUP patch set... Also
+the renaming serves against the "coding inertia" - i.e., GUP is around for
+ages so people just use it without checking any documentation or comments.
+After switching how GUP works, what used to be correct isn't anymore so
+renaming the function serves as a warning that something has really
+changed.
+
+Your refcount debug patches are good to catch bugs in the conversions done
+but that requires you to be able to excercise the code path in the first
+place which may require particular HW or so, and you also have to enable
+the debug option which means you already aim at verifying the GUP
+references are treated properly.
+
+								Honza
+
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
