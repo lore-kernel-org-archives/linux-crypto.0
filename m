@@ -2,127 +2,72 @@ Return-Path: <SRS0=TZua=WD=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1445C32751
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Aug 2019 17:24:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58100C32751
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Aug 2019 18:59:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 94777222FC
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Aug 2019 17:24:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NeuZX4IL"
+	by mail.kernel.org (Postfix) with ESMTP id 35FBF21EF2
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Aug 2019 18:59:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730180AbfHGRYd (ORCPT
+        id S1729278AbfHGS7a (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 7 Aug 2019 13:24:33 -0400
-Received: from mail-wr1-f44.google.com ([209.85.221.44]:44858 "EHLO
-        mail-wr1-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729804AbfHGRYd (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Aug 2019 13:24:33 -0400
-Received: by mail-wr1-f44.google.com with SMTP id p17so92149949wrf.11
-        for <linux-crypto@vger.kernel.org>; Wed, 07 Aug 2019 10:24:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=wo3nEGAkLOpA+UYnrX7HewWZPxXPoldMl2fw5CMEKQY=;
-        b=NeuZX4ILVKJaqD+Mub9t4ESBnhqQDy/d2+pKZJqMje+BOjXlR1sEYkyiZngEe1OrNp
-         EKBA7XgOw8bttAAc2Snkoo65J3FP3x+BnpzeWpQuPbGjPCYfXdDcggFiu/1kv9cHHP0c
-         Csct/zoPff7MrA439MSypSH8MEN9udGp2Ppw6MCGesWojxdSE0Z2+JrbORvPhoEaQqT/
-         l6xV+FBO1TPms3VnyFWuzpc6GGfLEKTzy/INlVOrdrg1M5IFz7i+ib44n/CylD7qfbxx
-         nFPiUF+XEJIhjRDSp7uh+My1WWzGeuH3yIxxN5LS2vjNPITpTICqumndxIGFHucxmyia
-         SDew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=wo3nEGAkLOpA+UYnrX7HewWZPxXPoldMl2fw5CMEKQY=;
-        b=ecMI75AvQ/57dY5kbNuZWhpKRG93BRduiaVaCnADR/GDgOrAd0jzP4/Wnx4rheysBd
-         7969HuhkVLmRJuZZPG65tQuSCoUEn02Z50+rXsPAykAyNjDFcJIO9D8vxrsxf5k/Hiar
-         MLEKeNsGcR7ypYfCHrTlpcCmYrTN4HLlkWLVg+aNCb7w+kGypvgKfo/vMtDiESC41QdM
-         FT+pxIVHU5vU1r3ZYZPTg81UNX5HdaBQTPgZPW/8XD2g3M4UD/VOKBijj2i231InIfoN
-         Kd0BWZy2cpc5m2BVVrDIQeH/jKZdR2MdgfFEqc3EYFi9lXQYP/GgucNHU6JKsMJRL67v
-         dGCw==
-X-Gm-Message-State: APjAAAUybmobzkiLZJZHfsygmzxA3KY0HRLWFEqRsvAEvKmf23BNgWSE
-        f2CF8+HG1W8wcXjULx1aFYQAqFRJRyI=
-X-Google-Smtp-Source: APXvYqyNLi/svvuoG+3fKLV4B57pReEluEzAmpg0iN9cwpHEa1Jca2dcnZ+QxoDp1rt+GPZxiiHSJw==
-X-Received: by 2002:a5d:618d:: with SMTP id j13mr11826320wru.195.1565198671385;
-        Wed, 07 Aug 2019 10:24:31 -0700 (PDT)
-Received: from [192.168.2.28] (39.35.broadband4.iol.cz. [85.71.35.39])
-        by smtp.gmail.com with ESMTPSA id s2sm344971wmj.33.2019.08.07.10.24.30
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Wed, 07 Aug 2019 10:24:30 -0700 (PDT)
-Subject: Re: [PATCH] crypto: xts - Add support for Cipher Text Stealing
-To:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>,
-        Pascal van Leeuwen <pascalvanl@gmail.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Cc:     "rsnel@cube.dyndns.org" <rsnel@cube.dyndns.org>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>
-References: <1565074510-8480-1-git-send-email-pvanleeuwen@verimatrix.com>
- <5bf9d0be-3ba4-8903-f1b9-93aa32106274@gmail.com>
- <MN2PR20MB29734CFE2795639436C3CC91CAD50@MN2PR20MB2973.namprd20.prod.outlook.com>
- <MN2PR20MB2973A38A300804281CA6A109CAD40@MN2PR20MB2973.namprd20.prod.outlook.com>
- <a0e3ce44-3e47-b8d9-2152-3fd8ba99f09a@gmail.com>
- <MN2PR20MB297333F0024F94C647D71AA2CAD40@MN2PR20MB2973.namprd20.prod.outlook.com>
- <52a11506-0047-a7e7-4fa0-ba8d465b843c@gmail.com>
- <MN2PR20MB2973C4EAF89D158B779CDBDACAD40@MN2PR20MB2973.namprd20.prod.outlook.com>
-From:   Milan Broz <gmazyland@gmail.com>
-Openpgp: preference=signencrypt
-Message-ID: <46f76b06-004e-c08a-3ef3-4ba9fdc61d91@gmail.com>
-Date:   Wed, 7 Aug 2019 19:24:29 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Wed, 7 Aug 2019 14:59:30 -0400
+Received: from mga18.intel.com ([134.134.136.126]:7649 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727213AbfHGS73 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 7 Aug 2019 14:59:29 -0400
+X-Amp-Result: UNSCANNABLE
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 07 Aug 2019 11:59:28 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,358,1559545200"; 
+   d="scan'208";a="198766417"
+Received: from geyerral-mobl1.ger.corp.intel.com (HELO localhost) ([10.252.37.199])
+  by fmsmga004.fm.intel.com with ESMTP; 07 Aug 2019 11:59:21 -0700
+Date:   Wed, 7 Aug 2019 21:59:21 +0300
+From:   Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+To:     Sumit Garg <sumit.garg@linaro.org>
+Cc:     keyrings@vger.kernel.org, linux-integrity@vger.kernel.org,
+        linux-crypto@vger.kernel.org,
+        linux-security-module@vger.kernel.org, dhowells@redhat.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        peterhuewe@gmx.de, jgg@ziepe.ca, jejb@linux.ibm.com, arnd@arndb.de,
+        gregkh@linuxfoundation.org, zohar@linux.ibm.com, jmorris@namei.org,
+        serge@hallyn.com, casey@schaufler-ca.com,
+        ard.biesheuvel@linaro.org, daniel.thompson@linaro.org,
+        linux-kernel@vger.kernel.org, tee-dev@lists.linaro.org
+Subject: Re: [RFC/RFT v3 1/3] KEYS: trusted: create trusted keys subsystem
+Message-ID: <20190807185921.lhdt3ek6tphj33bo@linux.intel.com>
+References: <1565098640-12536-1-git-send-email-sumit.garg@linaro.org>
+ <1565098640-12536-2-git-send-email-sumit.garg@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <MN2PR20MB2973C4EAF89D158B779CDBDACAD40@MN2PR20MB2973.namprd20.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1565098640-12536-2-git-send-email-sumit.garg@linaro.org>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+User-Agent: NeoMutt/20180716
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 07/08/2019 17:13, Pascal Van Leeuwen wrote:
->>>> Seems there is no mistake in your code, it is some bug in aesni_intel implementation.
->>>> If I disable this module, it works as expected (with aes generic and aes_i586).
->>>>
->>> That's odd though, considering there is a dedicated xts-aes-ni implementation,
->>> i.e. I would not expect that to end up at the generic xts wrapper at all?
->>
->> Note it is 32bit system, AESNI XTS is under #ifdef CONFIG_X86_64 so it is not used.
->>
-> Ok, so I guess no one bothered to make an optimized XTS version for i386.
-> I quickly browsed through the code - took me a while to realise the assembly is
-> "backwards" compared to the original Intel definition :-) - but I did not spot
-> anything obvious :-(
+On Tue, Aug 06, 2019 at 07:07:18PM +0530, Sumit Garg wrote:
+> Move existing code to trusted keys subsystem. Also, rename files with
+> "tpm" as suffix which provides the underlying implementation.
 > 
->> I guess it only ECB part ...
+> Suggested-by: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+> Signed-off-by: Sumit Garg <sumit.garg@linaro.org>
 
-Mystery solved, the skcipher subreq must be te last member in the struct.
-(Some comments in Adiantum code mentions it too, so I do not think it
-just hides the corruption after the struct. Seems like another magic requirement
-in crypto API :-)
+The name for should be still trusted.ko even if new backends are added.
+Must be done in order not to break user space.
 
-This chunk is enough to fix it for me:
+Situation is quite similar as when new backends were added to tpm_tis
+some time ago: MMIO backed implementation was kept as tpm_tis.ko, the
+core module was named as tpm_tis_core and SPI backed implementation was
+named as tpm_tis_spi.ko.
 
---- a/crypto/xts.c
-+++ b/crypto/xts.c
-@@ -33,8 +33,8 @@ struct xts_instance_ctx {
- 
- struct rctx {
-        le128 t, tcur;
--       struct skcipher_request subreq;
-        int rem_bytes, is_encrypt;
-+       struct skcipher_request subreq;
- };
-
-While at it, shouldn't be is_encrypt bool?
-
-Thanks,
-Milan
+/Jarkko
