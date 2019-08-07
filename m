@@ -8,55 +8,55 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68953C32751
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Aug 2019 01:34:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25472C41514
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Aug 2019 01:34:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3EFFE217D9
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Aug 2019 01:34:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F080E217D9
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Aug 2019 01:34:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L6PrjOsr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TH7xsIR8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729749AbfHGBec (ORCPT
+        id S1730041AbfHGBes (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 6 Aug 2019 21:34:32 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:47054 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729738AbfHGBeb (ORCPT
+        Tue, 6 Aug 2019 21:34:48 -0400
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:45793 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730008AbfHGBep (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Aug 2019 21:34:31 -0400
-Received: by mail-pg1-f196.google.com with SMTP id w3so5333781pgt.13;
-        Tue, 06 Aug 2019 18:34:30 -0700 (PDT)
+        Tue, 6 Aug 2019 21:34:45 -0400
+Received: by mail-pl1-f195.google.com with SMTP id y8so38603236plr.12;
+        Tue, 06 Aug 2019 18:34:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=uQGOdku7Vl3REPvOJ8nTMNJxS9zoi9IIquO7PYdcYIA=;
-        b=L6PrjOsrS6boUIN/DOymS83vV7YlAKPpT9Xdrfk7ax1OcCgE7PAsCiB8I3wTJde6P0
-         jWSZSVN0MQGqPFzlI9I6nQdqRL1oXS8MVgrMBG2RUC/9SCRR/2JXuxH0Bc1AbFhAasOV
-         xWwwBWKfNUqmzHZ9usEoeFIoZA0TFhsqfa1vxdEBmkB+UHsGh6j98UqgUEfpOkZ8azEw
-         XctfU3/I30ArTXSEYH2C9KRaAbt0v2hqFYnx8WGIkLVSjGqesnYt/lo+Nif4WusFAWAo
-         kwn89YnMjOOYX9/SsgW6zCkgnnE6VjyidKN7erx1BI5f02v6uid8cXohhKk4FwCmi1FI
-         cYgw==
+        bh=S+0IdzDd5LiY8AHwrYdqvSEMzcb9gWZ2lznukLTa4fI=;
+        b=TH7xsIR8mdN6BLY7JG8/eF6RsdDCkk2cRD3dBopErpIToembDlJ6DvjPGThWxgNDHN
+         izZnY8v+rrCTqbMQXBbwMmFJJ4/nvmF6zRWW4Xs6qUrfZ8o0czAW/fGIDrwD7Q1ygI7M
+         9Zf8Re7QredxsFLkJT7ZLJf014g9dC9bvOiPKF2NgNaHSnsjvFjfZ4bBzwffrRrGp9/v
+         vlT+JVAmAuL0sqc4zONRKIioMJS5mLcrWMkUTsb2T5dvyeXECRBNXvR++1qedsjna65N
+         Bpeio/uU7dJ/a25yv6b3onr0A5BIr5z5tUmsUB0sHub+eppjPv5sJ1ZexYmVLUXkgvRa
+         bJaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=uQGOdku7Vl3REPvOJ8nTMNJxS9zoi9IIquO7PYdcYIA=;
-        b=AtcMSFh0U5imUlPpqf0ap4oYH36SIPatoRKBWM5yfrx8+GMT6KCYpi+5NP7X8dQxNl
-         7LjYWToA6DOAmXj4Y69ul4+XRDOZWIM4wxhwtc27Bu8w1TEhpf5hh8SRmTD6EQaWU7Vg
-         sJfVA64SAsXf/W/accrUAu8fXUyBpMZY+e4SNTMN9a/TKhJLpVdo0tW42YsycQ9cVhz8
-         p0oOF0qTY5YandeaN2Q1ujLdXC62PIR/FN4M0bw3h/pcL54LA5I2EfkitClFLwERM9FB
-         G9he6Hm0IN+U4qi6bvvhz8uzCHVEQmuSZJ3Wgrs44HJMk7aS5K3AuBJNwYQW0sZCO8uv
-         TWqg==
-X-Gm-Message-State: APjAAAWrf23IMcXMEe8XgwlDmhmMJ7iLp0Qzip40a+qksGKnbUGgsNDg
-        GODeM7hhMQKp7kOC/xPDUgI=
-X-Google-Smtp-Source: APXvYqyaoKmDNdUJQD7xvZFSQjCmYuVY+zKJwqcOsFMJXKJ76CQxjmhpKXdBBVyw94JCP/lkY4QWYw==
-X-Received: by 2002:aa7:8f2c:: with SMTP id y12mr6988234pfr.38.1565141669837;
-        Tue, 06 Aug 2019 18:34:29 -0700 (PDT)
+        bh=S+0IdzDd5LiY8AHwrYdqvSEMzcb9gWZ2lznukLTa4fI=;
+        b=LRymV5gLf9ueWfhdXNeVK6k2qapEZreM12FOedqkw7boO4g3lHS6v12agEk9R0GuDh
+         HK2sxbay3SKEfJlGE7iPlhCC2FqguxGDha+/qBvLqvCxcS7wnDWdIPu3OERDy1+Yfews
+         BcrptiUnE9XCkBn3kNGcLs4Lm7X1cJoo7d/cS0au3brU1tno59bKX/ZuLp2yGcJwB6Z/
+         6vEbADfgHPFSQvfgr0CKsF6zfthsQsghCPDvOvvBgd0G9r3kI8t0ERjt17yDC7yyFXCb
+         1mVw9KcHWl/Z0CO2Kg4c2aDQjFuAcQ/7pF5VUqOwiavKeCqi9eAh1m7Qtrn3FLfmliLa
+         Ba4A==
+X-Gm-Message-State: APjAAAUFPN9o7Yly9kLnnR0M2d60FrmGDp4Ek16Ilg+gU2Dy347811XB
+        7GRHnZWpGRFdVZ17rJUwC84=
+X-Google-Smtp-Source: APXvYqwBIISXTWf4C+eZPMoIO/o34tgUz/S5eMQixOLDQAsdZlLcpYV/uzVG2wEPWDAc94LDsKhJ9w==
+X-Received: by 2002:a17:902:9a49:: with SMTP id x9mr5953327plv.282.1565141683818;
+        Tue, 06 Aug 2019 18:34:43 -0700 (PDT)
 Received: from blueforge.nvidia.com (searspoint.nvidia.com. [216.228.112.21])
-        by smtp.gmail.com with ESMTPSA id u69sm111740800pgu.77.2019.08.06.18.34.28
+        by smtp.gmail.com with ESMTPSA id u69sm111740800pgu.77.2019.08.06.18.34.42
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Tue, 06 Aug 2019 18:34:29 -0700 (PDT)
+        Tue, 06 Aug 2019 18:34:43 -0700 (PDT)
 From:   john.hubbard@gmail.com
 X-Google-Original-From: jhubbard@nvidia.com
 To:     Andrew Morton <akpm@linux-foundation.org>
@@ -80,15 +80,12 @@ Cc:     Christoph Hellwig <hch@infradead.org>,
         netdev@vger.kernel.org, rds-devel@oss.oracle.com,
         sparclinux@vger.kernel.org, x86@kernel.org,
         xen-devel@lists.xenproject.org, John Hubbard <jhubbard@nvidia.com>,
-        Keith Busch <keith.busch@intel.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>,
-        "Michael S . Tsirkin" <mst@redhat.com>,
-        YueHaibing <yuehaibing@huawei.com>
-Subject: [PATCH v3 28/41] mm/gup_benchmark.c: convert put_page() to put_user_page*()
-Date:   Tue,  6 Aug 2019 18:33:27 -0700
-Message-Id: <20190807013340.9706-29-jhubbard@nvidia.com>
+        Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+        Kentaro Takeda <takedakn@nttdata.co.jp>,
+        linux-security-module@vger.kernel.org
+Subject: [PATCH v3 37/41] security/tomoyo: convert put_page() to put_user_page*()
+Date:   Tue,  6 Aug 2019 18:33:36 -0700
+Message-Id: <20190807013340.9706-38-jhubbard@nvidia.com>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <20190807013340.9706-1-jhubbard@nvidia.com>
 References: <20190807013340.9706-1-jhubbard@nvidia.com>
@@ -109,32 +106,28 @@ release_pages().
 This is part a tree-wide conversion, as described in commit fc1d8e7cca2d
 ("mm: introduce put_user_page*(), placeholder versions").
 
-Reviewed-by: Keith Busch <keith.busch@intel.com>
+Acked-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
 
-Cc: Dan Carpenter <dan.carpenter@oracle.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Keith Busch <keith.busch@intel.com>
-Cc: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Cc: YueHaibing <yuehaibing@huawei.com>
+Cc: Kentaro Takeda <takedakn@nttdata.co.jp>
+Cc: linux-security-module@vger.kernel.org
 Signed-off-by: John Hubbard <jhubbard@nvidia.com>
 ---
- mm/gup_benchmark.c | 2 +-
+ security/tomoyo/domain.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/mm/gup_benchmark.c b/mm/gup_benchmark.c
-index 7dd602d7f8db..515ac8eeb6ee 100644
---- a/mm/gup_benchmark.c
-+++ b/mm/gup_benchmark.c
-@@ -79,7 +79,7 @@ static int __gup_benchmark_ioctl(unsigned int cmd,
- 	for (i = 0; i < nr_pages; i++) {
- 		if (!pages[i])
- 			break;
--		put_page(pages[i]);
-+		put_user_page(pages[i]);
+diff --git a/security/tomoyo/domain.c b/security/tomoyo/domain.c
+index 8526a0a74023..6887beecfb6e 100644
+--- a/security/tomoyo/domain.c
++++ b/security/tomoyo/domain.c
+@@ -931,7 +931,7 @@ bool tomoyo_dump_page(struct linux_binprm *bprm, unsigned long pos,
  	}
- 	end_time = ktime_get();
- 	gup->put_delta_usec = ktime_us_delta(end_time, start_time);
+ 	/* Same with put_arg_page(page) in fs/exec.c */
+ #ifdef CONFIG_MMU
+-	put_page(page);
++	put_user_page(page);
+ #endif
+ 	return true;
+ }
 -- 
 2.22.0
 
