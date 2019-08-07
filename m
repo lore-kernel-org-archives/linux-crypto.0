@@ -8,55 +8,55 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAF0DC31E40
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Aug 2019 01:40:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA971C31E40
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Aug 2019 01:41:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B1FC621743
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Aug 2019 01:40:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8D3B421743
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Aug 2019 01:41:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="abC7vf0m"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K8d7XfBV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729448AbfHGBkh (ORCPT
+        id S1728812AbfHGBk6 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 6 Aug 2019 21:40:37 -0400
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:38763 "EHLO
+        Tue, 6 Aug 2019 21:40:58 -0400
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:45749 "EHLO
         mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729043AbfHGBeH (ORCPT
+        with ESMTP id S1728828AbfHGBeE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 6 Aug 2019 21:34:07 -0400
-Received: by mail-pl1-f195.google.com with SMTP id az7so38558213plb.5;
-        Tue, 06 Aug 2019 18:34:07 -0700 (PDT)
+        Tue, 6 Aug 2019 21:34:04 -0400
+Received: by mail-pl1-f195.google.com with SMTP id y8so38602500plr.12;
+        Tue, 06 Aug 2019 18:34:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=j5bjFl/k0oxV1FIP4HazX0NuQurNmMvZSnaBil5PKNk=;
-        b=abC7vf0m4NHfC38BFCAMKWrCml8VHI8/tyJOz6tyKPGPsXxu0DOdz37V6xN3Thg1Zd
-         UpeVYry5AG+h4scE5ih6O8+arLoECywsGCioTsrKWxm7sB389EG9oJuSV29/gE7h0LS0
-         y5iguaVXKirIQlusYbxFmgE9r3+yptBAJLiq272v0Sl/QhyMLH3XCxKVguovo2yydY/e
-         hPsoqdmsX1oREmKqBP2kENq5c26aaO0nlO2uQS585/gxX2DEptCDorR5OVzgCXwYNt2m
-         opAr5jpbK/bXJNfg691sG72tAWDskEyT8B3AWzTTbwOCvmhfW6ETVYtk14IOwNSue0Fc
-         R2QA==
+        bh=wKnEf1dGeTf0vHOLp5WCTJvqak8NT8hcLNnzrVdQpMI=;
+        b=K8d7XfBVJ8I/mb7D/So0s6zKV29K6nxqxOt+bscjBjWDfj0QC4+NZ8AYd4oczxdsUX
+         7wYPGKgQnoRkCSwDEzT5rYkfZH7JJhJa6zaR/ydsa7uoMZJ2HjI2/BwiodCRxy0cgQ7K
+         XR5LIHl94MzAJMcKyHWewTAlNkEf03nHhilsBgX1FcYreTK5la4X960fbNds2SN0gwIm
+         bKXQLrcvXV5StThdICG212KTTY6r0QHSstMpGRVtwfJea1D8uaBa/9MN3hrGQMnPOq1P
+         vjikEXBKeoKeYn0bHuTZu93yS1xwpaeL4dzZeJbSwqGj8iWMWHA9ZukGsRqP3BMDHZZx
+         L72g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=j5bjFl/k0oxV1FIP4HazX0NuQurNmMvZSnaBil5PKNk=;
-        b=mKK8qN/4FAsrAo4l4qI8FkzRn+jKMz3ovn2xAKVzlvi9vWn/Hh8g/iUPxeU7Bd6fSJ
-         /sa9OHSRU4GGwglL2Wqh9Jk9TqqYHZlG34NaLpRvUYWihUqbJ4v5FYfQznMdECaz7eIB
-         tIbihp5ytWahKFYAS3Fe+6m8Pc0YsjReQo2p8gaU0u3dH+TlJiOJTkSp2g8btEngj9kN
-         YSRElXRZIaYGO+0vU8nEsT5NeLnh2y91NPFc5vcwKRUmXFSwcIZVtHxEVme/PEWDSXk+
-         d3tsiO6XGOI1/CzBJjBw+7900t9QxhkaG7M1a1pe8XIumOhuHC8u+E/w7bxsKTgoPUaT
-         3qVQ==
-X-Gm-Message-State: APjAAAXpiuyVBUgbX9YrIwCcFIdbstS/xsiE7fFiqWrKQgGSOcVzM0Vi
-        0TALysoiO9z7V1g47xLaM/A=
-X-Google-Smtp-Source: APXvYqw7+dnuyU0Y8q/AKeAaMraB2bbAgVOsWO8V26J8bDVfSW5vhARN1nLU2+DyCWOsFFzTtXKGNQ==
-X-Received: by 2002:a17:902:e2:: with SMTP id a89mr5940458pla.210.1565141646808;
-        Tue, 06 Aug 2019 18:34:06 -0700 (PDT)
+        bh=wKnEf1dGeTf0vHOLp5WCTJvqak8NT8hcLNnzrVdQpMI=;
+        b=DqdjRNBtHbOLmaEBpRyj/1/qZaWsSnp0iPjL/l7hlkDjlBShkHnngJUmjyRQK+0A1g
+         OmsBnr2j3lHp5NWxn99lprXdLZWOfg//sXa2aTP7BvteSwQG5hQi3lu1sYHanOXBNHTV
+         Rm0WI/1UiaIpdzgvhC89PNFyHS+yFB+k1OKysK1596F5XqThjVh+xRhKofy9hlY1bDBi
+         edFZkLn5gE+8yg83+aDQLHj9Ui6fhChUr/8yJb/R0Am7s+cmoMeIivfUE4ct+OyOc4kZ
+         SPOh8Ai5Z4LexAcGidqZ9YS5+U03Bi5Z2jFzkJagKlNpTaPvO3kMl11AOKQd9ZQqyZ3M
+         rN9w==
+X-Gm-Message-State: APjAAAVkEmft6UXoIzuJVdTCz0bl7/TGPDbQGQMpjOOhx2vJazJa3N//
+        1VlEp18hYrDNgggE/vd35Ns=
+X-Google-Smtp-Source: APXvYqyq3BsS9DZUg5HbsH/cxAQFP71mzzuud27zN7KWsFT/18m4ES12yBRl2dAxm3nkOU3YhT47jw==
+X-Received: by 2002:a17:902:e30b:: with SMTP id cg11mr5920567plb.335.1565141643695;
+        Tue, 06 Aug 2019 18:34:03 -0700 (PDT)
 Received: from blueforge.nvidia.com (searspoint.nvidia.com. [216.228.112.21])
-        by smtp.gmail.com with ESMTPSA id u69sm111740800pgu.77.2019.08.06.18.34.05
+        by smtp.gmail.com with ESMTPSA id u69sm111740800pgu.77.2019.08.06.18.34.02
         (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Tue, 06 Aug 2019 18:34:06 -0700 (PDT)
+        Tue, 06 Aug 2019 18:34:03 -0700 (PDT)
 From:   john.hubbard@gmail.com
 X-Google-Original-From: jhubbard@nvidia.com
 To:     Andrew Morton <akpm@linux-foundation.org>
@@ -80,13 +80,13 @@ Cc:     Christoph Hellwig <hch@infradead.org>,
         netdev@vger.kernel.org, rds-devel@oss.oracle.com,
         sparclinux@vger.kernel.org, x86@kernel.org,
         xen-devel@lists.xenproject.org, John Hubbard <jhubbard@nvidia.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        "Gustavo A . R . Silva" <gustavo@embeddedor.com>,
-        Kees Cook <keescook@chromium.org>
-Subject: [PATCH v3 14/41] vmci: convert put_page() to put_user_page*()
-Date:   Tue,  6 Aug 2019 18:33:13 -0700
-Message-Id: <20190807013340.9706-15-jhubbard@nvidia.com>
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Frank Haverkamp <haver@linux.vnet.ibm.com>,
+        "Guilherme G . Piccoli" <gpiccoli@linux.vnet.ibm.com>,
+        Arnd Bergmann <arnd@arndb.de>
+Subject: [PATCH v3 12/41] genwqe: convert put_page() to put_user_page*()
+Date:   Tue,  6 Aug 2019 18:33:11 -0700
+Message-Id: <20190807013340.9706-13-jhubbard@nvidia.com>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <20190807013340.9706-1-jhubbard@nvidia.com>
 References: <20190807013340.9706-1-jhubbard@nvidia.com>
@@ -107,61 +107,54 @@ release_pages().
 This is part a tree-wide conversion, as described in commit fc1d8e7cca2d
 ("mm: introduce put_user_page*(), placeholder versions").
 
-Note that this effectively changes the code's behavior in
-qp_release_pages(): it now ultimately calls set_page_dirty_lock(),
-instead of set_page_dirty(). This is probably more accurate.
+This changes the release code slightly, because each page slot in the
+page_list[] array is no longer checked for NULL. However, that check
+was wrong anyway, because the get_user_pages() pattern of usage here
+never allowed for NULL entries within a range of pinned pages.
 
-As Christoph Hellwig put it, "set_page_dirty() is only safe if we are
-dealing with a file backed page where we have reference on the inode it
-hangs off." [1]
+Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
-[1] https://lore.kernel.org/r/20190723153640.GB720@lst.de
-
+Cc: Frank Haverkamp <haver@linux.vnet.ibm.com>
+Cc: Guilherme G. Piccoli <gpiccoli@linux.vnet.ibm.com>
 Cc: Arnd Bergmann <arnd@arndb.de>
-Cc: Al Viro <viro@zeniv.linux.org.uk>
-Cc: Gustavo A. R. Silva <gustavo@embeddedor.com>
-Cc: Kees Cook <keescook@chromium.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Signed-off-by: John Hubbard <jhubbard@nvidia.com>
 ---
- drivers/misc/vmw_vmci/vmci_context.c    |  2 +-
- drivers/misc/vmw_vmci/vmci_queue_pair.c | 11 ++---------
- 2 files changed, 3 insertions(+), 10 deletions(-)
+ drivers/misc/genwqe/card_utils.c | 17 +++--------------
+ 1 file changed, 3 insertions(+), 14 deletions(-)
 
-diff --git a/drivers/misc/vmw_vmci/vmci_context.c b/drivers/misc/vmw_vmci/vmci_context.c
-index 16695366ec92..9daa52ee63b7 100644
---- a/drivers/misc/vmw_vmci/vmci_context.c
-+++ b/drivers/misc/vmw_vmci/vmci_context.c
-@@ -587,7 +587,7 @@ void vmci_ctx_unset_notify(struct vmci_ctx *context)
- 
- 	if (notify_page) {
- 		kunmap(notify_page);
--		put_page(notify_page);
-+		put_user_page(notify_page);
- 	}
- }
- 
-diff --git a/drivers/misc/vmw_vmci/vmci_queue_pair.c b/drivers/misc/vmw_vmci/vmci_queue_pair.c
-index 8531ae781195..e5434551d0ef 100644
---- a/drivers/misc/vmw_vmci/vmci_queue_pair.c
-+++ b/drivers/misc/vmw_vmci/vmci_queue_pair.c
-@@ -626,15 +626,8 @@ static void qp_release_queue_mutex(struct vmci_queue *queue)
- static void qp_release_pages(struct page **pages,
- 			     u64 num_pages, bool dirty)
+diff --git a/drivers/misc/genwqe/card_utils.c b/drivers/misc/genwqe/card_utils.c
+index 2e1c4d2905e8..2a888f31d2c5 100644
+--- a/drivers/misc/genwqe/card_utils.c
++++ b/drivers/misc/genwqe/card_utils.c
+@@ -517,24 +517,13 @@ int genwqe_free_sync_sgl(struct genwqe_dev *cd, struct genwqe_sgl *sgl)
+ /**
+  * genwqe_free_user_pages() - Give pinned pages back
+  *
+- * Documentation of get_user_pages is in mm/gup.c:
+- *
+- * If the page is written to, set_page_dirty (or set_page_dirty_lock,
+- * as appropriate) must be called after the page is finished with, and
+- * before put_page is called.
++ * The pages may have been written to, so we call put_user_pages_dirty_lock(),
++ * rather than put_user_pages().
+  */
+ static int genwqe_free_user_pages(struct page **page_list,
+ 			unsigned int nr_pages, int dirty)
  {
--	int i;
+-	unsigned int i;
 -
--	for (i = 0; i < num_pages; i++) {
--		if (dirty)
--			set_page_dirty(pages[i]);
--
--		put_page(pages[i]);
--		pages[i] = NULL;
+-	for (i = 0; i < nr_pages; i++) {
+-		if (page_list[i] != NULL) {
+-			if (dirty)
+-				set_page_dirty_lock(page_list[i]);
+-			put_page(page_list[i]);
+-		}
 -	}
-+	put_user_pages_dirty_lock(pages, num_pages, dirty);
-+	memset(pages, 0, num_pages * sizeof(struct page *));
++	put_user_pages_dirty_lock(page_list, nr_pages, dirty);
+ 	return 0;
  }
  
- /*
 -- 
 2.22.0
 
