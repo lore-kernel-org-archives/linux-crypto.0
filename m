@@ -2,116 +2,298 @@ Return-Path: <SRS0=TZua=WD=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69E2DC32751
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Aug 2019 11:41:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5659AC32751
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Aug 2019 13:17:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 39146218FE
-	for <linux-crypto@archiver.kernel.org>; Wed,  7 Aug 2019 11:41:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1788221E6B
+	for <linux-crypto@archiver.kernel.org>; Wed,  7 Aug 2019 13:17:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AWLZIy4q"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LMxKvnLG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726860AbfHGLly (ORCPT
+        id S2388144AbfHGNR0 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 7 Aug 2019 07:41:54 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:35365 "EHLO
+        Wed, 7 Aug 2019 09:17:26 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:45705 "EHLO
         mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726773AbfHGLlx (ORCPT
+        with ESMTP id S2387982AbfHGNR0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Aug 2019 07:41:53 -0400
-Received: by mail-wr1-f65.google.com with SMTP id k2so5177167wrq.2
-        for <linux-crypto@vger.kernel.org>; Wed, 07 Aug 2019 04:41:52 -0700 (PDT)
+        Wed, 7 Aug 2019 09:17:26 -0400
+Received: by mail-wr1-f65.google.com with SMTP id q12so1081123wrj.12
+        for <linux-crypto@vger.kernel.org>; Wed, 07 Aug 2019 06:17:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=lZEjv/tSJ4XQ75HSv1v6c/RWLiy7l88goEGobpWk0+Q=;
-        b=AWLZIy4qEkkWVPEL85DyMlL76SBf/KU1OpzlaYRoUWfmLg+/4UYWXOm0TN2sEbcxWW
-         cbQWfJhnJZQS8rYj9RKxA4WzO0eD7p/x5izXq1JnuA3vdM4twm/aST0+o6PFqYTUOoDb
-         RlarSLZJ6mdpvpI7WiD09KPUZ6mVyhU5kWiztjfsXD3Qc85KNpRSlkCco3cGUmiEUYbS
-         GGgujqMn2DaNfvTCS8UeUnz/v5K3w9fdATljx8OPB9q+UDrbO8PQiQgSYanzRsnA4nLF
-         tsf2OTQSYeC1WksdPqr2pe2hAL4LFY9e/ra8/6cnJlk/5t0IZdi81PwazmLbDxkT2oAx
-         Qilw==
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=LIwwnq+LH+wfwk2ZofLN/BZ4Mpy/yetSxoWKfADaX8s=;
+        b=LMxKvnLGHshHkfpNm2LsHe1rcRXAGJhRzb9L5e76XWuqAOM3Aw/M1S43ujhCZ11xJN
+         u84Xfaiz29X6LIehRQyV2BMU92pJq3UpNB/UO12xUUsd3OQfq7doj5BSRxOREFvxrZFq
+         GM2ajqGDlLc5I3YuRIMz3fNrGFtT9ANyw98Wcocf3lqc6dJQ8aSSB/KdB/6V4n4xMa/8
+         yVUwT3hiwCqUi0sdMN/Bs6uikCx00KXOz6jWHefBhSgqB5dyDYBFA6+6gvnmX/8I/h//
+         Ig2VtOKDfDX4bqdE/3IagKN6LZsyap95yQZW/UBupqtLapuGPwEAE0BFdGEKq2GD0LO9
+         JEBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=lZEjv/tSJ4XQ75HSv1v6c/RWLiy7l88goEGobpWk0+Q=;
-        b=TojIemT4Wf91ZrpVq8PZ8PaA+1AKGGkYw97CrvHGrGV/utXdqjx1rWD+0ihyNgtAHT
-         z5dMAZpT0sg5FOtmWaF2rM7VJMuVEtE+NnpqDUprnDSLptvfLauvuf3t8LBe1JXZle1S
-         E49rbcMrjT1JgNOSL7LpgyHe2AJ7Ue2Z/tiq9TsX11VdOHC2Fs3EStJO9N+GsTL/uIrc
-         NumGaRdRvvo0XXzJqg4+Y0s1P21GM8QJkRdG3K+XzNSu7KMjDbMbb7U9ZIpJ0N/d8eSl
-         NXlr2IfJCtm+cxaEK+QZX747spxCc4ufweI45VTiDWEQlI4KizvDlmmvSVbzJgrq95Ud
-         lhTQ==
-X-Gm-Message-State: APjAAAWFp7pZLHJv3ZcDRBQXeqIuWMpczV9G0FxgHz6jvDLcozh5vzWJ
-        tF4ikvdiscaQYMF5CgU2UCs=
-X-Google-Smtp-Source: APXvYqzOagnfvoFJ1u0lR7qcuv6CiR+kqOaiEEE6uxPbSzr6/Ay2frx7k/XcbFXu0yEyFEZJkgWvGg==
-X-Received: by 2002:a5d:4ecc:: with SMTP id s12mr10728818wrv.157.1565178111703;
-        Wed, 07 Aug 2019 04:41:51 -0700 (PDT)
-Received: from [10.43.17.10] (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id n12sm99897545wmc.24.2019.08.07.04.41.50
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Wed, 07 Aug 2019 04:41:51 -0700 (PDT)
-Subject: Re: [PATCH] crypto: xts - Add support for Cipher Text Stealing
-To:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>,
-        Pascal van Leeuwen <pascalvanl@gmail.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Cc:     "rsnel@cube.dyndns.org" <rsnel@cube.dyndns.org>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>
-References: <1565074510-8480-1-git-send-email-pvanleeuwen@verimatrix.com>
- <5bf9d0be-3ba4-8903-f1b9-93aa32106274@gmail.com>
- <MN2PR20MB29734CFE2795639436C3CC91CAD50@MN2PR20MB2973.namprd20.prod.outlook.com>
- <MN2PR20MB2973A38A300804281CA6A109CAD40@MN2PR20MB2973.namprd20.prod.outlook.com>
- <a0e3ce44-3e47-b8d9-2152-3fd8ba99f09a@gmail.com>
- <MN2PR20MB297333F0024F94C647D71AA2CAD40@MN2PR20MB2973.namprd20.prod.outlook.com>
-From:   Milan Broz <gmazyland@gmail.com>
-Openpgp: preference=signencrypt
-Message-ID: <52a11506-0047-a7e7-4fa0-ba8d465b843c@gmail.com>
-Date:   Wed, 7 Aug 2019 13:41:50 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=LIwwnq+LH+wfwk2ZofLN/BZ4Mpy/yetSxoWKfADaX8s=;
+        b=ufXWmHjxl4pFeobr3AZJ523dpWYEKX+HXcGyybdgiugCSUMXEto2UL3XNj6vTU+WbQ
+         JmLi/XBBIuaYq1rs+f6NYneUOJlOlBn30M8TOFMl5o/dLA+GRraNXCCZsiMwSfcnBYLV
+         iQslT3WFWhq9hKY6Eg8aPpgmUg+Yy31lhcO4Q1vAqaA10e25KIOtycvHCmTc/LNbeJ+r
+         qQTMIfzCbEu9H9RCg7HXiX24BUCAGpu0CbNaVw07Fj6CqHglPKdRUtHIeOOTUkKJo1xi
+         AS6ApBXHdSQNx/8WU6SDRjMb1iGsr9TBEhnvpcN5xJkaXcvVfC8VC7/y5odNObR76IP9
+         4l0g==
+X-Gm-Message-State: APjAAAXx+pdJf30kqj4St12yz+7hfwFxWdp5nDiFN39b3geuNHLTWPRF
+        30ZVewwC90FVyRAr4NmtCOhj6KMu2FfH9vNQVsrAew==
+X-Google-Smtp-Source: APXvYqwe4bR/2BjNrMK0E52EYt8a2PTBVYlx9qD2wKkNKrz1qNTKPfn5aD4oqvJu19H2tmznt/KWZ9dNvlhwt5BE6YE=
+X-Received: by 2002:a5d:46cf:: with SMTP id g15mr11376129wrs.93.1565183842685;
+ Wed, 07 Aug 2019 06:17:22 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <MN2PR20MB297333F0024F94C647D71AA2CAD40@MN2PR20MB2973.namprd20.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20190807055022.15551-1-ard.biesheuvel@linaro.org> <MN2PR20MB297336108DF89337DDEEE2F6CAD40@MN2PR20MB2973.namprd20.prod.outlook.com>
+In-Reply-To: <MN2PR20MB297336108DF89337DDEEE2F6CAD40@MN2PR20MB2973.namprd20.prod.outlook.com>
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date:   Wed, 7 Aug 2019 16:17:14 +0300
+Message-ID: <CAKv+Gu_jFW26boEhpnAZg9sjWWZf60FXSWuSqNvC5FJiL7EVSA@mail.gmail.com>
+Subject: Re: [RFC PATCH v2] md/dm-crypt - reuse eboiv skcipher for IV generation
+To:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "ebiggers@kernel.org" <ebiggers@kernel.org>,
+        "agk@redhat.com" <agk@redhat.com>,
+        "snitzer@redhat.com" <snitzer@redhat.com>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "gmazyland@gmail.com" <gmazyland@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 07/08/2019 13:27, Pascal Van Leeuwen wrote:
->> On 07/08/2019 10:15, Pascal Van Leeuwen wrote:
->>> I went through the code a couple of times, but I cannot spot any mistakes in
->>> the lengths I'm using. Is it possible that your application is supplying a
->>> buffer that is just not large enough?
->>
->> Seems there is no mistake in your code, it is some bug in aesni_intel implementation.
->> If I disable this module, it works as expected (with aes generic and aes_i586).
->>
-> That's odd though, considering there is a dedicated xts-aes-ni implementation,
-> i.e. I would not expect that to end up at the generic xts wrapper at all?
+On Wed, 7 Aug 2019 at 10:28, Pascal Van Leeuwen
+<pvanleeuwen@verimatrix.com> wrote:
+>
+> Ard,
+>
+> I've actually been following this discussion with some interest, as it has
+> some relevance for some of the things I am doing at the moment as well.
+>
+> For example, for my CTS implementation I need to crypt one or two
+> seperate blocks and for the inside-secure driver I sometimes need to do
+> some single crypto block precomputes. (the XTS driver additionally
+> also already did such a single block encrypt for the tweak, also using
+> a seperate (non-sk)cipher instance - very similar to your IV case)
+>
+> Long story short, the current approach is to allocate a seperate
+> cipher instance so you can conveniently do crypto_cipher_en/decrypt_one.
+> (it would be nice to have a matching crypto_skcipher_en/decrypt_one
+> function available from the crypto API for these purposes?)
+> But if I understand you correctly, you may end up with an insecure
+> table-based implementation if you do that. Not what I want :-(
+>
 
-Note it is 32bit system, AESNI XTS is under #ifdef CONFIG_X86_64 so it is not used.
+Table based AES is known to be vulnerable to plaintext attacks on the
+key, since each byte of the input xor'ed with the key is used as an
+index for doing Sbox lookups, and so with enough samples, there is an
+exploitable statistical correlation between the response time and the
+key.
 
-I guess it only ECB part ...
+So in the context of EBOIV, where the user might specify a SIMD based
+time invariant skcipher, it would be really bad if the known plaintext
+encryptions of the byte offsets that occur with the *same* key would
+happen with a different cipher that is allocated implicitly and ends
+up being fulfilled by, e.g., aes-generic, since in that case, each
+block en/decryption is preceded by a single, time-variant AES
+invocation with an easily guessable input.
 
->> Seems something is rewritten in call
->>   crypto_skcipher_encrypt(subreq);
->>
->> (after that call, I see rctx->rem_bytes set to 32, that does not make sense...)
->>
-> Eh ... no, it should never become > 15 ... if it gets set to 32 somehow,
-> then I can at least explain why that would result in a buffer overflow :-)
+In your case, we are not dealing with known plaintext attacks, and the
+higher latency of h/w accelerated crypto makes me less worried that
+the final, user observable latency would strongly correlate the way
+aes-generic in isolation does.
 
-Yes, that explains it.
+> However, in many cases there would actually be a very good reason
+> NOT to want to use the main skcipher for this. As that is some
+> hardware accelerator with terrible latency that you wouldn't want
+> to use to process just one cipher block. For that, you want to have
+> some SW implementation that is efficient on a single block instead.
+>
 
-(And rewriting this value back does not help, I got different test vector output, but no crash.)
+Indeed. Note that for EBOIV, such performance concerns are deemed
+irrelevant, but it is an issue in the general case.
 
-Milan
+> In my humble opinion, such insecure table based implementations just
+> shouldn't exist at all - you can always do better, possibly at the
+> expense of some performance degradation. Or you should at least have
+> some flag  available to specify you have some security requirements
+> and such an implementation is not an acceptable response.
+>
+
+We did some work to reduce the time variance of AES: there is the
+aes-ti driver, and there is now also the AES library, which is known
+to be slower than aes-generic, but does include some mitigations for
+cache timing attacks.
+
+Other than that, I have little to offer, given that the performance vs
+security tradeoffs were decided long before security became a thing
+like it is today, and so removing aes-generic is not an option,
+especially since the scalar alternatives we have are not truly time
+invariant either.
+
+
+> > -----Original Message-----
+> > From: linux-crypto-owner@vger.kernel.org <linux-crypto-owner@vger.kernel.org> On Behalf Of
+> > Ard Biesheuvel
+> > Sent: Wednesday, August 7, 2019 7:50 AM
+> > To: linux-crypto@vger.kernel.org
+> > Cc: herbert@gondor.apana.org.au; ebiggers@kernel.org; agk@redhat.com; snitzer@redhat.com;
+> > dm-devel@redhat.com; gmazyland@gmail.com; Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> > Subject: [RFC PATCH v2] md/dm-crypt - reuse eboiv skcipher for IV generation
+> >
+> > Instead of instantiating a separate cipher to perform the encryption
+> > needed to produce the IV, reuse the skcipher used for the block data
+> > and invoke it one additional time for each block to encrypt a zero
+> > vector and use the output as the IV.
+> >
+> > For CBC mode, this is equivalent to using the bare block cipher, but
+> > without the risk of ending up with a non-time invariant implementation
+> > of AES when the skcipher itself is time variant (e.g., arm64 without
+> > Crypto Extensions has a NEON based time invariant implementation of
+> > cbc(aes) but no time invariant implementation of the core cipher other
+> > than aes-ti, which is not enabled by default)
+> >
+> > This approach is a compromise between dm-crypt API flexibility and
+> > reducing dependence on parts of the crypto API that should not usually
+> > be exposed to other subsystems, such as the bare cipher API.
+> >
+> > Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> > ---
+> >  drivers/md/dm-crypt.c | 70 ++++++++++++++-----------------------------
+> >  1 file changed, 22 insertions(+), 48 deletions(-)
+> >
+> > diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
+> > index d5216bcc4649..48cd76c88d77 100644
+> > --- a/drivers/md/dm-crypt.c
+> > +++ b/drivers/md/dm-crypt.c
+> > @@ -120,10 +120,6 @@ struct iv_tcw_private {
+> >       u8 *whitening;
+> >  };
+> >
+> > -struct iv_eboiv_private {
+> > -     struct crypto_cipher *tfm;
+> > -};
+> > -
+> >  /*
+> >   * Crypt: maps a linear range of a block device
+> >   * and encrypts / decrypts at the same time.
+> > @@ -163,7 +159,6 @@ struct crypt_config {
+> >               struct iv_benbi_private benbi;
+> >               struct iv_lmk_private lmk;
+> >               struct iv_tcw_private tcw;
+> > -             struct iv_eboiv_private eboiv;
+> >       } iv_gen_private;
+> >       u64 iv_offset;
+> >       unsigned int iv_size;
+> > @@ -847,65 +842,47 @@ static int crypt_iv_random_gen(struct crypt_config *cc, u8 *iv,
+> >       return 0;
+> >  }
+> >
+> > -static void crypt_iv_eboiv_dtr(struct crypt_config *cc)
+> > -{
+> > -     struct iv_eboiv_private *eboiv = &cc->iv_gen_private.eboiv;
+> > -
+> > -     crypto_free_cipher(eboiv->tfm);
+> > -     eboiv->tfm = NULL;
+> > -}
+> > -
+> >  static int crypt_iv_eboiv_ctr(struct crypt_config *cc, struct dm_target *ti,
+> >                           const char *opts)
+> >  {
+> > -     struct iv_eboiv_private *eboiv = &cc->iv_gen_private.eboiv;
+> > -     struct crypto_cipher *tfm;
+> > -
+> > -     tfm = crypto_alloc_cipher(cc->cipher, 0, 0);
+> > -     if (IS_ERR(tfm)) {
+> > -             ti->error = "Error allocating crypto tfm for EBOIV";
+> > -             return PTR_ERR(tfm);
+> > +     if (test_bit(CRYPT_MODE_INTEGRITY_AEAD, &cc->cipher_flags)) {
+> > +             ti->error = "AEAD transforms not supported for EBOIV";
+> > +             return -EINVAL;
+> >       }
+> >
+> > -     if (crypto_cipher_blocksize(tfm) != cc->iv_size) {
+> > +     if (crypto_skcipher_blocksize(any_tfm(cc)) != cc->iv_size) {
+> >               ti->error = "Block size of EBOIV cipher does "
+> >                           "not match IV size of block cipher";
+> > -             crypto_free_cipher(tfm);
+> >               return -EINVAL;
+> >       }
+> >
+> > -     eboiv->tfm = tfm;
+> >       return 0;
+> >  }
+> >
+> > -static int crypt_iv_eboiv_init(struct crypt_config *cc)
+> > +static int crypt_iv_eboiv_gen(struct crypt_config *cc, u8 *iv,
+> > +                         struct dm_crypt_request *dmreq)
+> >  {
+> > -     struct iv_eboiv_private *eboiv = &cc->iv_gen_private.eboiv;
+> > +     u8 buf[MAX_CIPHER_BLOCKSIZE] __aligned(__alignof__(__le64));
+> > +     struct skcipher_request *req;
+> > +     struct scatterlist src, dst;
+> > +     struct crypto_wait wait;
+> >       int err;
+> >
+> > -     err = crypto_cipher_setkey(eboiv->tfm, cc->key, cc->key_size);
+> > -     if (err)
+> > -             return err;
+> > -
+> > -     return 0;
+> > -}
+> > -
+> > -static int crypt_iv_eboiv_wipe(struct crypt_config *cc)
+> > -{
+> > -     /* Called after cc->key is set to random key in crypt_wipe() */
+> > -     return crypt_iv_eboiv_init(cc);
+> > -}
+> > +     req = skcipher_request_alloc(any_tfm(cc), GFP_KERNEL | GFP_NOFS);
+> > +     if (!req)
+> > +             return -ENOMEM;
+> >
+> > -static int crypt_iv_eboiv_gen(struct crypt_config *cc, u8 *iv,
+> > -                         struct dm_crypt_request *dmreq)
+> > -{
+> > -     struct iv_eboiv_private *eboiv = &cc->iv_gen_private.eboiv;
+> > +     memset(buf, 0, cc->iv_size);
+> > +     *(__le64 *)buf = cpu_to_le64(dmreq->iv_sector * cc->sector_size);
+> >
+> > -     memset(iv, 0, cc->iv_size);
+> > -     *(__le64 *)iv = cpu_to_le64(dmreq->iv_sector * cc->sector_size);
+> > -     crypto_cipher_encrypt_one(eboiv->tfm, iv, iv);
+> > +     sg_init_one(&src, page_address(ZERO_PAGE(0)), cc->iv_size);
+> > +     sg_init_one(&dst, iv, cc->iv_size);
+> > +     skcipher_request_set_crypt(req, &src, &dst, cc->iv_size, buf);
+> > +     skcipher_request_set_callback(req, 0, crypto_req_done, &wait);
+> > +     err = crypto_wait_req(crypto_skcipher_encrypt(req), &wait);
+> > +     skcipher_request_free(req);
+> >
+> > -     return 0;
+> > +     return err;
+> >  }
+> >
+> >  static const struct crypt_iv_operations crypt_iv_plain_ops = {
+> > @@ -962,9 +939,6 @@ static struct crypt_iv_operations crypt_iv_random_ops = {
+> >
+> >  static struct crypt_iv_operations crypt_iv_eboiv_ops = {
+> >       .ctr       = crypt_iv_eboiv_ctr,
+> > -     .dtr       = crypt_iv_eboiv_dtr,
+> > -     .init      = crypt_iv_eboiv_init,
+> > -     .wipe      = crypt_iv_eboiv_wipe,
+> >       .generator = crypt_iv_eboiv_gen
+> >  };
+> >
+> > --
+> > 2.17.1
+>
