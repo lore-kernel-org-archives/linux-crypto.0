@@ -2,89 +2,84 @@ Return-Path: <SRS0=IdBJ=WE=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4502C433FF
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Aug 2019 12:52:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54D1AC433FF
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Aug 2019 13:11:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7029B21883
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Aug 2019 12:52:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 27F9F2184E
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Aug 2019 13:11:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i1KjPVL7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lw9P/Ahs"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732610AbfHHMwh (ORCPT
+        id S1732912AbfHHNLP (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 8 Aug 2019 08:52:37 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:35318 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728980AbfHHMwh (ORCPT
+        Thu, 8 Aug 2019 09:11:15 -0400
+Received: from mail-wm1-f53.google.com ([209.85.128.53]:39146 "EHLO
+        mail-wm1-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732645AbfHHNLO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 8 Aug 2019 08:52:37 -0400
-Received: by mail-wr1-f65.google.com with SMTP id k2so8964495wrq.2
-        for <linux-crypto@vger.kernel.org>; Thu, 08 Aug 2019 05:52:35 -0700 (PDT)
+        Thu, 8 Aug 2019 09:11:14 -0400
+Received: by mail-wm1-f53.google.com with SMTP id u25so2368419wmc.4
+        for <linux-crypto@vger.kernel.org>; Thu, 08 Aug 2019 06:11:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=YWHYbWqY351NKxb89r4Xk4spZ3MRrynqi74kHBEauB4=;
-        b=i1KjPVL7wuLeDIrZtcsn++lCvUh8QZ1KjRwNMn1TdhsFIfY4/fMa1AINrFpJ/9xTbB
-         2M23mbb3hV81tjHLQ43l4vzcIKxkguqHM//x56/q7KHVa2s7wsuTHXoGYZD3QNa/pdML
-         UlpdHY2kPVLO8Chzw3Uu+lRLPbCviV0EK+DUdmXCn1PiZ71EYsTyfvyGx5+5GAuxKnzo
-         s0I/yGL+IlUaZfMbjfLmdSI5p4TR0DEs4fwnNfHik7S+G+IOHEFcfMvea3+awkwVHf3r
-         vTUn9ugtP7qxSww3O91a+0yntuGu/MLElK/QgskXcLrxruB8gaTAqKV5ZmAwTC4RTnzu
-         IQhw==
+        bh=H9YOmFmn+dobIgV9UHgPg756iVEpHTNA5mVXaVj8BrA=;
+        b=Lw9P/Ahs3xvyfSma97fMbcUcEqmVMndFpmFuzJ5zYLss3gBnE4wWeDP+hgFR26tYcx
+         Gt5QIbaQf+4/mzdLVgxmyGPwOcMwVCuns8eoQeaNxeRQOyUfWLrvGZclIIdcN5hn0qPV
+         uEzc9nCHKxCX1+t8VmAHnLsM5xSznrpTNMJo8l8Ub7983vA4OdXNFfOJ2CSLyQsBYMfH
+         rouRr34PYompL8naiXqtfdn8/ONdVSyT8FrGR9nucc8YzRlxk5C/j5Rp//Rx8C2vR5pT
+         lII46+EV66hL3nVTT+gq8t4OuyUd5Ilts6snyT6XBD1MlCsnyNt2WZDCrzmMqK0RsRjx
+         zZ3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
          :date:user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=YWHYbWqY351NKxb89r4Xk4spZ3MRrynqi74kHBEauB4=;
-        b=qOf/4iGWRFTxeGvbWR/snSdiVPJifDQ0ExzC5ABy7681KxnM8w2fbUqomgXfK4XGOe
-         siiUxKnVKFyUvWud8zr56vq+GAqf3K60XoipD9Dlpj9feIYbhqPn68my7UyS65yyVEtb
-         eoJotTOB2VLEXXWKPgElMml9ID4xi1N60QR7cvA33xOWzKUMVRsABzDWXbfXjYkX0Ft/
-         cU7EpJsO8FHnVHAdFsE3APIyuE+VMLw7fLsyBKfZZd0Hvw9H3tZq2Y1ncuUxVRx1kCzk
-         ggswAX2VedxL1djk7WwJr9S0TsimrgQLJ7cduY1gILMcOGTNGgliiePv11Ah+lI7KY+e
-         rX2w==
-X-Gm-Message-State: APjAAAWBv/jnEgnjQRJswedeGXFFYbRd6p+AivfSBkj+aXpaRGIFx1lD
-        x9nT6esIy3oF82SkKy5wIVU=
-X-Google-Smtp-Source: APXvYqwqFr4h3LasP+XLgrOCuHThAVepCGECBX6Wbxnwn5oAu/fVhwaE63/A28aEDyOvT3GAzQnuTQ==
-X-Received: by 2002:adf:cf02:: with SMTP id o2mr16943806wrj.352.1565268754588;
-        Thu, 08 Aug 2019 05:52:34 -0700 (PDT)
+        bh=H9YOmFmn+dobIgV9UHgPg756iVEpHTNA5mVXaVj8BrA=;
+        b=d6IS+q43k6puOVH87+0iENfEtEdbcZbPxwKIUlbO/flxCYEAK5RshuuOj0qVbOHZlA
+         2e4a04Z5FXttp8xtXUXNSyez2db+dvwYsZBJvoQ60YBfluN/vBKlXFeDPvcDyNVkhZDC
+         IA2I36RXlZG7QBsDR0r4PSYyVZiz/wzCLAhpLJyVp2CsJKsRccchC2mavhSh9GOrk6UO
+         T7JAxNStVLWqKpsCSk5Ln+Ym1mJgDmYYISvQY2Ua2WSSpiazVZl+HTjzlh+iVTHJi3Fo
+         dE4idqnEyLQXAqT4iHSaimb+plrM8mreooZJQAFYgk90luQQqQtuCu+akcTyFcXC1E+u
+         V3ig==
+X-Gm-Message-State: APjAAAWgrH2oM+VH4np0Ou/ArOOPNN7Z1VRJSpzi8LJk3v/Qt5TpHjNW
+        i7rR3AuAraZ/7Gf9FEgU9Uxmt7n+Mcg=
+X-Google-Smtp-Source: APXvYqwHfFNzx8+f/kqP6Vo4vUxL+tvMJAW+KHyol8pT5rz4M6TRJDw92OaG69IFJKHG7Nobir8mTw==
+X-Received: by 2002:a05:600c:2218:: with SMTP id z24mr4402430wml.84.1565269872766;
+        Thu, 08 Aug 2019 06:11:12 -0700 (PDT)
 Received: from [10.43.17.10] (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id g25sm2386442wmk.18.2019.08.08.05.52.33
+        by smtp.gmail.com with ESMTPSA id 4sm220376865wro.78.2019.08.08.06.11.11
         (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Thu, 08 Aug 2019 05:52:33 -0700 (PDT)
-Subject: Re: [RFC PATCH v2] md/dm-crypt - reuse eboiv skcipher for IV
- generation
-To:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>,
-        Eric Biggers <ebiggers@kernel.org>
-Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "agk@redhat.com" <agk@redhat.com>,
-        "snitzer@redhat.com" <snitzer@redhat.com>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>
-References: <20190807055022.15551-1-ard.biesheuvel@linaro.org>
- <MN2PR20MB297336108DF89337DDEEE2F6CAD40@MN2PR20MB2973.namprd20.prod.outlook.com>
- <CAKv+Gu_jFW26boEhpnAZg9sjWWZf60FXSWuSqNvC5FJiL7EVSA@mail.gmail.com>
- <MN2PR20MB2973A02FC4D6F1D11BA80792CAD40@MN2PR20MB2973.namprd20.prod.outlook.com>
- <CAKv+Gu8fgg=gt4LSnCfShnf0-PZ=B1TNwM3zdQr+V6hkozgDOA@mail.gmail.com>
- <MN2PR20MB29733EEF59CCD754256D5621CAD40@MN2PR20MB2973.namprd20.prod.outlook.com>
- <20190808083059.GB5319@sol.localdomain>
- <MN2PR20MB297328E243D74E03C1EF54ACCAD70@MN2PR20MB2973.namprd20.prod.outlook.com>
+        Thu, 08 Aug 2019 06:11:12 -0700 (PDT)
+Subject: Re: [PATCHv2] crypto: xts - Add support for Cipher Text Stealing
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+Cc:     Pascal van Leeuwen <pascalvanl@gmail.com>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+References: <1565245094-8584-1-git-send-email-pvanleeuwen@verimatrix.com>
+ <CAKv+Gu_r+iF=gWk_sMesKSyxSZB5Z5pC6jNQmi8uf+0cY7K-6g@mail.gmail.com>
+ <CH2PR20MB296824F38C44E32D8C82D0B8CAD70@CH2PR20MB2968.namprd20.prod.outlook.com>
+ <CAKv+Gu_uzt-cQF9ZPuM=4zot7UTogifWk3Pjr7Rcz1QWnqKaog@mail.gmail.com>
+ <MN2PR20MB297393DA81B7FFE9C1B904DBCAD70@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <CAKv+Gu-vT2tf-UEyxMSE2kRsWEYy+ab6T+37pF23jy_0+M-z2Q@mail.gmail.com>
 From:   Milan Broz <gmazyland@gmail.com>
 Openpgp: preference=signencrypt
-Message-ID: <67b4f0ee-b169-8af4-d7af-1c53a66ba587@gmail.com>
-Date:   Thu, 8 Aug 2019 14:52:33 +0200
+Message-ID: <1353558c-ea2f-b94b-a570-4ca8f3a653ee@gmail.com>
+Date:   Thu, 8 Aug 2019 15:11:11 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <MN2PR20MB297328E243D74E03C1EF54ACCAD70@MN2PR20MB2973.namprd20.prod.outlook.com>
-Content-Type: text/plain; charset=windows-1252
+In-Reply-To: <CAKv+Gu-vT2tf-UEyxMSE2kRsWEYy+ab6T+37pF23jy_0+M-z2Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
@@ -92,60 +87,35 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 08/08/2019 11:31, Pascal Van Leeuwen wrote:
->> -----Original Message-----
->> From: Eric Biggers <ebiggers@kernel.org>
->> Sent: Thursday, August 8, 2019 10:31 AM
->> To: Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
->> Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>; linux-crypto@vger.kernel.org;
->> herbert@gondor.apana.org.au; agk@redhat.com; snitzer@redhat.com; dm-devel@redhat.com;
->> gmazyland@gmail.com
->> Subject: Re: [RFC PATCH v2] md/dm-crypt - reuse eboiv skcipher for IV generation
->>
->> On Wed, Aug 07, 2019 at 04:14:22PM +0000, Pascal Van Leeuwen wrote:
->>>>>> In your case, we are not dealing with known plaintext attacks,
->>>>>>
->>>>> Since this is XTS, which is used for disk encryption, I would argue
->>>>> we do! For the tweak encryption, the sector number is known plaintext,
->>>>> same as for EBOIV. Also, you may be able to control data being written
->>>>> to the disk encrypted, either directly or indirectly.
->>>>> OK, part of the data into the CTS encryption will be previous ciphertext,
->>>>> but that may be just 1 byte with the rest being the known plaintext.
->>>>>
->>>>
->>>> The tweak encryption uses a dedicated key, so leaking it does not have
->>>> the same impact as it does in the EBOIV case.
->>>>
->>> Well ... yes and no. The spec defines them as seperately controllable -
->>> deviating from the original XEX definition - but in most practicle use cases
->>> I've seen, the same key is used for both, as having 2 keys just increases
->>> key  storage requirements and does not actually improve effective security
->>> (of the algorithm itself, implementation peculiarities like this one aside
->>> :-), as  XEX has been proven secure using a single key. And the security
->>> proof for XTS actually builds on that while using 2 keys deviates from it.
+On 08/08/2019 12:37, Ard Biesheuvel wrote:
+>>> True. Which is another historical mistake imo, since XTS is only
+>>> specified for AES, but I digress ... :-)
 >>>
+>> Yes, I was also surprised by the use of XTS with other blockciphers.
+>> It sort of violates the don't roll your own crypto paradigm ...
+>> (although some might argue that XTS is supposed to be secure if the
+>> underlying blockcipher is, regardless of what that cipher actually is)
 >>
->> This is a common misconception.  Actually, XTS needs 2 distinct keys to be a
->> CCA-secure tweakable block cipher, due to another subtle difference from XEX:
->> XEX (by which I really mean "XEX[E,2]") builds the sequence of masks starting
->> with x^1, while XTS starts with x^0.  If only 1 key is used, the inclusion of
->> the 0th power in XTS allows the attack described in Section 6 of the XEX paper
->> (https://web.cs.ucdavis.edu/~rogaway/papers/offsets.pdf).
->>
-> Interesting ... I'm not a cryptographer, just a humble HW engineer specialized
-> in implementing crypto. I'm basing my views mostly on the Liskov/Minematsu
-> "Comments on XTS", who assert that using 2 keys in XTS was misguided. 
-> (and I never saw any follow-on comments asserting that this view was wrong ...)
-> On not avoiding j=0 in the XTS spec they actually comment:
-> "This difference is significant in security, but has no impact on effectiveness 
-> for practical applications.", which I read as "not relevant for normal use".
 > 
-> In any case, it's frequently *used* with both keys being equal for performance
-> and key storage reasons.
+> That doesn't really matter. What matters is that nobody took a careful
+> look whether XTS combined with other ciphers is a good idea before
+> throwing it out into the world.
 
-There is already check in kernel for XTS "weak" keys (tweak and encryption keys must not be the same).
-  https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/include/crypto/xts.h#n27
+Couldn't resist, but tell that to TrueCrypt authors (if you know them :)
 
-For now it applies only in FIPS mode... (and if I see correctly it is duplicated in all drivers).
+They used XTS for other AES candidates (Serpent, Twofish, also in
+chained modes together).
+
+Older versions used LRW mode, doing the same.
+Even implementing LRW over Blowfish that has 8-byte block size, so you
+need GF(2^64) operations - that is luckily not implemented in Linux kernel
+crypto API :-)
+
+VeraCrypt continued the tradition, adding the Camellia and
+Kuznyetchik (actually discussed GOST standard) to the XTS mix.
+
+But without sarcasm, I do want to support this for users,
+we can map (but not create) such images in cryptsetup, and it is partially
+reason I want dm-crypt to be fully configurable...
 
 Milan
