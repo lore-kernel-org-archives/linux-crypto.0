@@ -2,120 +2,126 @@ Return-Path: <SRS0=IdBJ=WE=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54D1AC433FF
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Aug 2019 13:11:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12E3AC32754
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Aug 2019 13:21:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 27F9F2184E
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Aug 2019 13:11:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DDF3D208C3
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Aug 2019 13:21:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lw9P/Ahs"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VnEIalSf"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732912AbfHHNLP (ORCPT
+        id S2389844AbfHHNVy (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 8 Aug 2019 09:11:15 -0400
-Received: from mail-wm1-f53.google.com ([209.85.128.53]:39146 "EHLO
-        mail-wm1-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732645AbfHHNLO (ORCPT
+        Thu, 8 Aug 2019 09:21:54 -0400
+Received: from mail-lf1-f68.google.com ([209.85.167.68]:36623 "EHLO
+        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389860AbfHHNVw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 8 Aug 2019 09:11:14 -0400
-Received: by mail-wm1-f53.google.com with SMTP id u25so2368419wmc.4
-        for <linux-crypto@vger.kernel.org>; Thu, 08 Aug 2019 06:11:13 -0700 (PDT)
+        Thu, 8 Aug 2019 09:21:52 -0400
+Received: by mail-lf1-f68.google.com with SMTP id j17so12818315lfp.3
+        for <linux-crypto@vger.kernel.org>; Thu, 08 Aug 2019 06:21:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=H9YOmFmn+dobIgV9UHgPg756iVEpHTNA5mVXaVj8BrA=;
-        b=Lw9P/Ahs3xvyfSma97fMbcUcEqmVMndFpmFuzJ5zYLss3gBnE4wWeDP+hgFR26tYcx
-         Gt5QIbaQf+4/mzdLVgxmyGPwOcMwVCuns8eoQeaNxeRQOyUfWLrvGZclIIdcN5hn0qPV
-         uEzc9nCHKxCX1+t8VmAHnLsM5xSznrpTNMJo8l8Ub7983vA4OdXNFfOJ2CSLyQsBYMfH
-         rouRr34PYompL8naiXqtfdn8/ONdVSyT8FrGR9nucc8YzRlxk5C/j5Rp//Rx8C2vR5pT
-         lII46+EV66hL3nVTT+gq8t4OuyUd5Ilts6snyT6XBD1MlCsnyNt2WZDCrzmMqK0RsRjx
-         zZ3Q==
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=yPRSbt/ERroXQ3CLHiXg6WnTxTB+hRN/pv9SKNLhs4Y=;
+        b=VnEIalSfu0SZj1Vm/7X2ReQgboUTXdytq3Ju8ZMCLD0t3tVftiaZQuk+TGh7D/LUAa
+         gaJaZK+auUmyKPLOORwZmJFQiOa1ihPZgxLYmqTdU8rB/57WqFu9TtOa5uA20I7UgE+3
+         hlphlO0UxK7JErrmwkGtDe4+fieeQpbxTcEr9701DA3NfDdfJaSMaDWW6uMdHChjnTxs
+         c7obhEnph33x5gT/xTjbhUcev8i0z9IHueN7LM/Nj0+821pA2r/BLVCjqtKE7qdaOENC
+         ts+fBmh/V6Fk09XKlbD70WrSjLEs1MNWTmkYJYa4UFM30KkQvAf/nYNhcMDAvtHbjAzX
+         tcrQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=H9YOmFmn+dobIgV9UHgPg756iVEpHTNA5mVXaVj8BrA=;
-        b=d6IS+q43k6puOVH87+0iENfEtEdbcZbPxwKIUlbO/flxCYEAK5RshuuOj0qVbOHZlA
-         2e4a04Z5FXttp8xtXUXNSyez2db+dvwYsZBJvoQ60YBfluN/vBKlXFeDPvcDyNVkhZDC
-         IA2I36RXlZG7QBsDR0r4PSYyVZiz/wzCLAhpLJyVp2CsJKsRccchC2mavhSh9GOrk6UO
-         T7JAxNStVLWqKpsCSk5Ln+Ym1mJgDmYYISvQY2Ua2WSSpiazVZl+HTjzlh+iVTHJi3Fo
-         dE4idqnEyLQXAqT4iHSaimb+plrM8mreooZJQAFYgk90luQQqQtuCu+akcTyFcXC1E+u
-         V3ig==
-X-Gm-Message-State: APjAAAWgrH2oM+VH4np0Ou/ArOOPNN7Z1VRJSpzi8LJk3v/Qt5TpHjNW
-        i7rR3AuAraZ/7Gf9FEgU9Uxmt7n+Mcg=
-X-Google-Smtp-Source: APXvYqwHfFNzx8+f/kqP6Vo4vUxL+tvMJAW+KHyol8pT5rz4M6TRJDw92OaG69IFJKHG7Nobir8mTw==
-X-Received: by 2002:a05:600c:2218:: with SMTP id z24mr4402430wml.84.1565269872766;
-        Thu, 08 Aug 2019 06:11:12 -0700 (PDT)
-Received: from [10.43.17.10] (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id 4sm220376865wro.78.2019.08.08.06.11.11
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Thu, 08 Aug 2019 06:11:12 -0700 (PDT)
-Subject: Re: [PATCHv2] crypto: xts - Add support for Cipher Text Stealing
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
-Cc:     Pascal van Leeuwen <pascalvanl@gmail.com>,
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=yPRSbt/ERroXQ3CLHiXg6WnTxTB+hRN/pv9SKNLhs4Y=;
+        b=hx7lyMslDr/qWxCE8OT5becKeHX9mIHTvXulUrWlsiGhqxwcx193GoCqmN+e/pGixe
+         VPlK4UPBp5RXYhwEVWJPkOSeY+yaCp11O5dn6MwN+YDb1pZ7QvI1TXhxpGS6G0t7tDMb
+         laxS/ASzRXbQ34zlLCBT7Tim4Is0HSNcbeBrdGfOf5I7of1OLP/nniQG+5S4roPxyJRi
+         2sNQeaG4u9CKxHXpS10hkiwEpa7lQAvDjQW0ImnhcG7PE8PVJSyRjFkqO7WtY1SnrE3U
+         S1BoWLLCbppHLHM+XsFnpxACnbCTYaXoDgUbAT0BKOtFekvP3QJnr8EEKbqCLP7/kzmY
+         ecJA==
+X-Gm-Message-State: APjAAAVIzXc/NpS9zSBX20/EuD7bOj4tRfEqtBimBFqoUyl8Gvhqf8Zx
+        ysXI0RbWg98n6GbhUkro75bpWjdCCKJ1bh4F6dZjZA==
+X-Google-Smtp-Source: APXvYqw4VebWjEwpo3i9J0LRc5h0s+ynpfKok3QYD7qKC4/j06X+QGgIcDtFC+QCcnhYJmwAPh6zR54jEVVZOZgyJm8=
+X-Received: by 2002:ac2:4901:: with SMTP id n1mr9552721lfi.0.1565270510135;
+ Thu, 08 Aug 2019 06:21:50 -0700 (PDT)
+MIME-Version: 1.0
+References: <1565098640-12536-1-git-send-email-sumit.garg@linaro.org>
+ <1565098640-12536-3-git-send-email-sumit.garg@linaro.org> <20190807190320.th4sbnsnmwb7myzx@linux.intel.com>
+In-Reply-To: <20190807190320.th4sbnsnmwb7myzx@linux.intel.com>
+From:   Sumit Garg <sumit.garg@linaro.org>
+Date:   Thu, 8 Aug 2019 18:51:38 +0530
+Message-ID: <CAFA6WYN-6MpP2TZQEz49BmjSQiMSqghVFWRZCCY0o1UVad1AFw@mail.gmail.com>
+Subject: Re: [RFC/RFT v3 2/3] KEYS: trusted: move tpm2 trusted keys code
+To:     Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+Cc:     keyrings@vger.kernel.org, linux-integrity@vger.kernel.org,
         "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
         <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-References: <1565245094-8584-1-git-send-email-pvanleeuwen@verimatrix.com>
- <CAKv+Gu_r+iF=gWk_sMesKSyxSZB5Z5pC6jNQmi8uf+0cY7K-6g@mail.gmail.com>
- <CH2PR20MB296824F38C44E32D8C82D0B8CAD70@CH2PR20MB2968.namprd20.prod.outlook.com>
- <CAKv+Gu_uzt-cQF9ZPuM=4zot7UTogifWk3Pjr7Rcz1QWnqKaog@mail.gmail.com>
- <MN2PR20MB297393DA81B7FFE9C1B904DBCAD70@MN2PR20MB2973.namprd20.prod.outlook.com>
- <CAKv+Gu-vT2tf-UEyxMSE2kRsWEYy+ab6T+37pF23jy_0+M-z2Q@mail.gmail.com>
-From:   Milan Broz <gmazyland@gmail.com>
-Openpgp: preference=signencrypt
-Message-ID: <1353558c-ea2f-b94b-a570-4ca8f3a653ee@gmail.com>
-Date:   Thu, 8 Aug 2019 15:11:11 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <CAKv+Gu-vT2tf-UEyxMSE2kRsWEYy+ab6T+37pF23jy_0+M-z2Q@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        linux-security-module@vger.kernel.org, dhowells@redhat.com,
+        Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
+        peterhuewe@gmx.de, jgg@ziepe.ca, jejb@linux.ibm.com,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Casey Schaufler <casey@schaufler-ca.com>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Daniel Thompson <daniel.thompson@linaro.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "tee-dev @ lists . linaro . org" <tee-dev@lists.linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 08/08/2019 12:37, Ard Biesheuvel wrote:
->>> True. Which is another historical mistake imo, since XTS is only
->>> specified for AES, but I digress ... :-)
->>>
->> Yes, I was also surprised by the use of XTS with other blockciphers.
->> It sort of violates the don't roll your own crypto paradigm ...
->> (although some might argue that XTS is supposed to be secure if the
->> underlying blockcipher is, regardless of what that cipher actually is)
->>
-> 
-> That doesn't really matter. What matters is that nobody took a careful
-> look whether XTS combined with other ciphers is a good idea before
-> throwing it out into the world.
+On Thu, 8 Aug 2019 at 00:33, Jarkko Sakkinen
+<jarkko.sakkinen@linux.intel.com> wrote:
+>
+> On Tue, Aug 06, 2019 at 07:07:19PM +0530, Sumit Garg wrote:
+> > Move TPM2 trusted keys code to trusted keys subsystem.
+>
+> Missing a long description. The reason is that it is better consolidate
+> all trusted keys code to a single location so that it can be maintained
+> sanely and it should be stated here.
 
-Couldn't resist, but tell that to TrueCrypt authors (if you know them :)
+Sure will extend the description.
 
-They used XTS for other AES candidates (Serpent, Twofish, also in
-chained modes together).
+>
+> > Suggested-by: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+> > Signed-off-by: Sumit Garg <sumit.garg@linaro.org>
+>
+> I would suggest adding at least two commits before this:
+>
+> - A commit that just exports tpm_buf stuff and TPM2 constants to
+>   include/linux
 
-Older versions used LRW mode, doing the same.
-Even implementing LRW over Blowfish that has 8-byte block size, so you
-need GF(2^64) operations - that is luckily not implemented in Linux kernel
-crypto API :-)
+Okay, will create a separate patch for this.
 
-VeraCrypt continued the tradition, adding the Camellia and
-Kuznyetchik (actually discussed GOST standard) to the XTS mix.
+> - A commit that just changes the existing TPM 1.x trusted keys
+>   code to use tpm_buf.
 
-But without sarcasm, I do want to support this for users,
-we can map (but not create) such images in cryptsetup, and it is partially
-reason I want dm-crypt to be fully configurable...
+It seems to be a functional change which I think requires proper unit
+testing. I am afraid that I don't posses a TPM device to test this and
+also very less conversant with tpm_buf code.
 
-Milan
+So what I have done here is to rename existing TPM 1.x trusted keys
+code to use tpm1_buf.
+
+And I would be happy to integrate a tested patch if anyone familiar
+could work on this.
+
+-Sumit
+
+>
+> These should be before the current 1/3 commit.
+>
+> /Jarkko
