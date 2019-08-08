@@ -2,239 +2,321 @@ Return-Path: <SRS0=IdBJ=WE=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59250C433FF
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Aug 2019 11:53:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EACA4C0650F
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Aug 2019 12:17:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 212D721874
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Aug 2019 11:53:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9D57A214C6
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Aug 2019 12:17:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NjSJoJ6O"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="IMrwVsIM";
+	dkim=pass (1024-bit key) header.d=marvell.onmicrosoft.com header.i=@marvell.onmicrosoft.com header.b="QkCpfVyw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726285AbfHHLxQ (ORCPT
+        id S1729410AbfHHMRu (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 8 Aug 2019 07:53:16 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:46672 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726721AbfHHLxQ (ORCPT
+        Thu, 8 Aug 2019 08:17:50 -0400
+Received: from mx0a-0016f401.pphosted.com ([67.231.148.174]:50766 "EHLO
+        mx0b-0016f401.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727242AbfHHMRu (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 8 Aug 2019 07:53:16 -0400
-Received: by mail-wr1-f67.google.com with SMTP id z1so94631378wru.13
-        for <linux-crypto@vger.kernel.org>; Thu, 08 Aug 2019 04:53:14 -0700 (PDT)
+        Thu, 8 Aug 2019 08:17:50 -0400
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+        by mx0a-0016f401.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id x78C9xs1014128;
+        Thu, 8 Aug 2019 05:17:43 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : content-type : content-transfer-encoding :
+ mime-version; s=pfpt0818; bh=ieZtFjnLiFCfQq5o/B18+SCUiq8TcKOGpOWbx5Drf8Y=;
+ b=IMrwVsIMp0s7JRY5ONvv3HThR1D4mHuMggrT8sMxxyIvKpglCSX/M7A9iW96XvxnSLrF
+ 1C1QdC1+1bpzi6Vhjaig3f7W5K/39QgkxPEr1iK6KDXkoBzf29+Cj8Q+k9LFXRsXStti
+ CXbhMMlmdinohIJoS11PaLZGM8d8/sDz0AJNLKW/smVEPLKzi37MRsMyEOwEIdkRqZqb
+ klLsnfOkmy9ZTJkQAckqGqEPa1un+KKV5/IPeKwjYBqTwyj8SGQBNWwYYAknoV8FpY3I
+ aWFMH+GnL889JFmCDVS+rB+gRWKLOiHiaMAvD5ESNlwx4nKUko/rdDoObtpwIHMV6+2R 4w== 
+Received: from sc-exch04.marvell.com ([199.233.58.184])
+        by mx0a-0016f401.pphosted.com with ESMTP id 2u8cqj9efe-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+        Thu, 08 Aug 2019 05:17:43 -0700
+Received: from SC-EXCH03.marvell.com (10.93.176.83) by SC-EXCH04.marvell.com
+ (10.93.176.84) with Microsoft SMTP Server (TLS) id 15.0.1367.3; Thu, 8 Aug
+ 2019 05:17:42 -0700
+Received: from NAM04-BN3-obe.outbound.protection.outlook.com (104.47.46.58) by
+ SC-EXCH03.marvell.com (10.93.176.83) with Microsoft SMTP Server (TLS) id
+ 15.0.1367.3 via Frontend Transport; Thu, 8 Aug 2019 05:17:42 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=m0/1aBjqutSG4P3srApE8CHKpAo+DjT7MkM1OHKgycBWwvwgvfbiMrppwZpXeHrr9wMO8GvK07szIFgLih16Q2ZPsA7jivQX5Msq8VWDK0Zn0OMKnQb8anjN07ofWhYjrE6DKaAYSLBCGrtDPdQcQBjmAXRHBlvYoyPNpkB09onh9+hZMc5mqIPe3oc4jo431Hc+wQKxQ4rPI9WYWuOfEsL4Yor8bB02vXYjBA7+edDgbCRjbV/5eWpkxJLkjK36VMlX6n5xUsvHc/yWKVuhkni5yFOfJTynkiUuQYqrguME8fCYgaVl6xCN+IuUqzSkoJs4Q72wbEgmun8PSlickg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ieZtFjnLiFCfQq5o/B18+SCUiq8TcKOGpOWbx5Drf8Y=;
+ b=BfCXW0iVuQkYKIroECGZjtYG5SVpDOasCo/+hQSlvG391e4vTO7LyJgh7EKEdkWpXNWVJ1/2vWa2l4OIK8Z8NpCBaL5I+rhh+eW1845g8bINaxfEu4/ZTVz9ecYUAYtQKds+GQTkVYcq4JdNj6fyEkUdDhPMqEj0QrWl7DGTlrBjg/EERMxqkKGCPjziVfIEURFdpJ85NAHcjCjcm2DXkyHTqVAJMi6wtpV4X7LSWQ7jLFZeKNgBP9zdxDcI9t9Vz83FaKoLvet36PU4TT9puEn4BQPicGwenGADY0OVKHkWeKprEuLTdy14ofc29N7lCIU6QlfRMmurWRuxHZpYLQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
+ dkim=pass header.d=marvell.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=vILGCjKtV3eGAFYGxVaZEjKfTjQI0RrbwrN7GVSVEp4=;
-        b=NjSJoJ6OshZWe6QGnwvrZhuR9NFMXymXAvOePeDJ7RBvXNgPuPHQ3mdEpkMW0Ks4LJ
-         FR72b0/q4C7nZNL5/Lpebz1xDzAVOIpyDl5kThlgJECt4h4ZjT8tzjeg1XyPOFuIG4k8
-         vYylheCi4ZquCIPZT4Gu9CUzAb5OLmz8Xvat5q5oh/3UbsGsr5/lNUCVbeaMVnI4dTLU
-         oxF0TBDGblXa1+3SFW2n/hSjB0ulDOv32fNG//kZTZkGGZkuJ6az2hP7BemIDngzdoFW
-         Zpossbf0oE7cFPX/2g2eBsdOr8hGU7FrtyXTLdwjY5a/RL3HtroI1mJyGw9yE+SvvfUP
-         olNQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=vILGCjKtV3eGAFYGxVaZEjKfTjQI0RrbwrN7GVSVEp4=;
-        b=YngjqaR8mhovTdSas7fbz76yEsA20MY57H5ldpS6XTHyxVAQrA7BPf+wmTRffOhn4B
-         tPbEMr+2bvhkHM1x4Pa+w91EE7gglysYSw92OzoWvT2y+lZhVROrsWL849XGyRsaJmFB
-         IsMtF8nYRGT6g51eFuCTVgPBcQ+jM+dSNB2W5FBrFZzdBHvVf+N00hb4bdAd+DkLXuVt
-         bzzq7jHikGS0nh0TyNN5//hHz2Qt2bMtYZ5/DHNlxmDzg+dGZnLMHEdFr6QxGHJkKEqo
-         wxitmAl+rtSxVZbkDzIxQjqh6W2mk5yLUPkujKJ6OB9sgicSM1MexF5l488S43Z6xA77
-         AhJA==
-X-Gm-Message-State: APjAAAUaI0dEBB8LZybsXosibT3aoZuj1ppX5iVEHhBSy/rTm4AO2+YO
-        aUdqgMmAP5CckwGawnh26GE=
-X-Google-Smtp-Source: APXvYqxm780O8ckDgYoEDh8DvDZ5LgviPaPxu/Ldk3Lgsd9780EhXxKJqwqCrOND8kBKjKxQ26FpoA==
-X-Received: by 2002:a5d:4950:: with SMTP id r16mr695153wrs.347.1565265193339;
-        Thu, 08 Aug 2019 04:53:13 -0700 (PDT)
-Received: from [10.43.17.10] (nat-pool-brq-t.redhat.com. [213.175.37.10])
-        by smtp.gmail.com with ESMTPSA id u130sm3196942wmg.28.2019.08.08.04.53.12
-        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
-        Thu, 08 Aug 2019 04:53:12 -0700 (PDT)
-Subject: Re: [RFC PATCH v2] md/dm-crypt - reuse eboiv skcipher for IV
- generation
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        linux-crypto@vger.kernel.org
-Cc:     herbert@gondor.apana.org.au, ebiggers@kernel.org, agk@redhat.com,
-        snitzer@redhat.com, dm-devel@redhat.com
-References: <20190807055022.15551-1-ard.biesheuvel@linaro.org>
-From:   Milan Broz <gmazyland@gmail.com>
-Openpgp: preference=signencrypt
-Message-ID: <e13525a4-4885-e0f3-6711-efd83dd4a9fb@gmail.com>
-Date:   Thu, 8 Aug 2019 13:53:11 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
-MIME-Version: 1.0
-In-Reply-To: <20190807055022.15551-1-ard.biesheuvel@linaro.org>
-Content-Type: text/plain; charset=utf-8
+ d=marvell.onmicrosoft.com; s=selector2-marvell-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ieZtFjnLiFCfQq5o/B18+SCUiq8TcKOGpOWbx5Drf8Y=;
+ b=QkCpfVywM/1o4YNKP9fdE9DyzyJARdyneP/4c1gBCy2XtgUngmiBwy76lHwWQmwEUsv2d3wZz5xGK2Y1xkCO9bJewBkfAIfqD2xQsi1sivQs0FH/jrvo5fj2bLf7RQvJaTdFfUAjnX5qAidmveZLFRBKmlmUY79yEU8n8Y2j1L0=
+Received: from MN2PR18MB2605.namprd18.prod.outlook.com (20.179.83.161) by
+ MN2PR18MB3230.namprd18.prod.outlook.com (10.255.237.15) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2157.14; Thu, 8 Aug 2019 12:17:37 +0000
+Received: from MN2PR18MB2605.namprd18.prod.outlook.com
+ ([fe80::2dbc:3002:6213:bc9a]) by MN2PR18MB2605.namprd18.prod.outlook.com
+ ([fe80::2dbc:3002:6213:bc9a%3]) with mapi id 15.20.2136.018; Thu, 8 Aug 2019
+ 12:17:37 +0000
+From:   Phani Kiran Hemadri <phemadri@marvell.com>
+To:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
+CC:     "davem@davemloft.net" <davem@davemloft.net>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "Phani Kiran Hemadri" <phemadri@marvell.com>
+Subject: [PATCH 1/2] crypto: cavium/nitrox - Allocate asymmetric crypto
+ command queues
+Thread-Topic: [PATCH 1/2] crypto: cavium/nitrox - Allocate asymmetric crypto
+ command queues
+Thread-Index: AQHVTeNDaUG9EbiZ40GDR1+KZa+d4g==
+Date:   Thu, 8 Aug 2019 12:17:37 +0000
+Message-ID: <20190808121711.26495-1-phemadri@marvell.com>
+Accept-Language: en-IN, en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: PN1PR01CA0077.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c00:1::17) To MN2PR18MB2605.namprd18.prod.outlook.com
+ (2603:10b6:208:106::33)
+x-ms-exchange-messagesentrepresentingtype: 1
+x-mailer: git-send-email 2.17.2
+x-originating-ip: [115.113.156.2]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: e630e2b5-4145-4c8d-62ab-08d71bfa6667
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:MN2PR18MB3230;
+x-ms-traffictypediagnostic: MN2PR18MB3230:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <MN2PR18MB3230FC424F9D0C21E1ECF5BDD6D70@MN2PR18MB3230.namprd18.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:200;
+x-forefront-prvs: 012349AD1C
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(136003)(366004)(376002)(396003)(346002)(39850400004)(199004)(189003)(6436002)(6116002)(66446008)(66556008)(66946007)(386003)(64756008)(7736002)(186003)(2616005)(2351001)(476003)(6506007)(99286004)(478600001)(50226002)(8676002)(305945005)(102836004)(25786009)(316002)(2501003)(256004)(14444005)(66066001)(54906003)(107886003)(6916009)(486006)(53936002)(6512007)(1076003)(5640700003)(55236004)(66476007)(6486002)(52116002)(1730700003)(3846002)(36756003)(81156014)(5660300002)(4326008)(86362001)(14454004)(26005)(2906002)(71200400001)(71190400001)(81166006)(8936002);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR18MB3230;H:MN2PR18MB2605.namprd18.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: marvell.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: 237MyBn45I0riWcy75pshXSUhu3u6jhTpJnOmEfUdUhfYhW+1q1K3p3KIIwpjSXbdle5M2IYhZx8oBC1Bfb6vv2aX1fdJ0jZZTO5NVvnhRRMUqRa0wLePOOS7V2uWXj2zwM9iJgm610ZQmuNb35/LiD9JuLd2XXL7o5v8BnE+Llw0SuUGd5H8luU+hB18MTCe9EQh1h3Z6KcCFkoyvAu2aWIuy8fQxmkWeTkkdYoWm9kXyTwy87iWddZe/FmUCRg71GzirkQQ7MKN919UoQBqqUfFRWeA7IN+tBwTKccV27sOm4F7+PDFL0piTDhj6i591/TwcxqhXX89azzf1RKREjtMFJv/81CTEOB9TpKr4TVXKp4xQrsdIHijzjxcIMsLPxorEtPr+tRNmhT6JV3XgllUoU0Ct+Uipmm02M/RaU=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-Network-Message-Id: e630e2b5-4145-4c8d-62ab-08d71bfa6667
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Aug 2019 12:17:37.2198
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: phemadri@marvell.com
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR18MB3230
+X-OriginatorOrg: marvell.com
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:5.22.84,1.0.8
+ definitions=2019-08-08_06:2019-08-07,2019-08-08 signatures=0
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi,
+This patch adds support to allocate CNN55XX device AQMQ command queues
+required for submitting asymmetric crypto requests.
 
-On 07/08/2019 07:50, Ard Biesheuvel wrote:
-> Instead of instantiating a separate cipher to perform the encryption
-> needed to produce the IV, reuse the skcipher used for the block data
-> and invoke it one additional time for each block to encrypt a zero
-> vector and use the output as the IV.
-> 
-> For CBC mode, this is equivalent to using the bare block cipher, but
-> without the risk of ending up with a non-time invariant implementation
-> of AES when the skcipher itself is time variant (e.g., arm64 without
-> Crypto Extensions has a NEON based time invariant implementation of
-> cbc(aes) but no time invariant implementation of the core cipher other
-> than aes-ti, which is not enabled by default)
-> 
-> This approach is a compromise between dm-crypt API flexibility and
-> reducing dependence on parts of the crypto API that should not usually
-> be exposed to other subsystems, such as the bare cipher API.
-> 
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Signed-off-by: Phani Kiran Hemadri <phemadri@marvell.com>
+Reviewed-by: Srikanth Jampala <jsrikanth@marvell.com>
+---
+ drivers/crypto/cavium/nitrox/nitrox_dev.h |  4 ++
+ drivers/crypto/cavium/nitrox/nitrox_lib.c | 66 ++++++++++++++++++++++-
+ drivers/crypto/cavium/nitrox/nitrox_req.h | 30 +++++++++++
+ 3 files changed, 99 insertions(+), 1 deletion(-)
 
-For now I have just pair of images here to test, but seems checksums are ok.
+diff --git a/drivers/crypto/cavium/nitrox/nitrox_dev.h b/drivers/crypto/cav=
+ium/nitrox/nitrox_dev.h
+index 5ee98eca728c..2217a2736c8e 100644
+--- a/drivers/crypto/cavium/nitrox/nitrox_dev.h
++++ b/drivers/crypto/cavium/nitrox/nitrox_dev.h
+@@ -10,6 +10,8 @@
+ #define VERSION_LEN 32
+ /* Maximum queues in PF mode */
+ #define MAX_PF_QUEUES	64
++/* Maximum device queues */
++#define MAX_DEV_QUEUES (MAX_PF_QUEUES)
+ /* Maximum UCD Blocks */
+ #define CNN55XX_MAX_UCD_BLOCKS	8
+=20
+@@ -208,6 +210,7 @@ enum vf_mode {
+  * @mode: Device mode PF/VF
+  * @ctx_pool: DMA pool for crypto context
+  * @pkt_inq: Packet input rings
++ * @aqmq: AQM command queues
+  * @qvec: MSI-X queue vectors information
+  * @iov: SR-IOV informatin
+  * @num_vecs: number of MSI-X vectors
+@@ -234,6 +237,7 @@ struct nitrox_device {
+=20
+ 	struct dma_pool *ctx_pool;
+ 	struct nitrox_cmdq *pkt_inq;
++	struct nitrox_cmdq *aqmq[MAX_DEV_QUEUES] ____cacheline_aligned_in_smp;
+=20
+ 	struct nitrox_q_vector *qvec;
+ 	struct nitrox_iov iov;
+diff --git a/drivers/crypto/cavium/nitrox/nitrox_lib.c b/drivers/crypto/cav=
+ium/nitrox/nitrox_lib.c
+index 4ace9bcd603a..5cbc64b851b9 100644
+--- a/drivers/crypto/cavium/nitrox/nitrox_lib.c
++++ b/drivers/crypto/cavium/nitrox/nitrox_lib.c
+@@ -19,6 +19,8 @@
+=20
+ /* packet inuput ring alignments */
+ #define PKTIN_Q_ALIGN_BYTES 16
++/* AQM Queue input alignments */
++#define AQM_Q_ALIGN_BYTES 32
+=20
+ static int nitrox_cmdq_init(struct nitrox_cmdq *cmdq, int align_bytes)
+ {
+@@ -57,11 +59,15 @@ static void nitrox_cmdq_reset(struct nitrox_cmdq *cmdq)
+=20
+ static void nitrox_cmdq_cleanup(struct nitrox_cmdq *cmdq)
+ {
+-	struct nitrox_device *ndev =3D cmdq->ndev;
++	struct nitrox_device *ndev;
++
++	if (!cmdq)
++		return;
+=20
+ 	if (!cmdq->unalign_base)
+ 		return;
+=20
++	ndev =3D cmdq->ndev;
+ 	cancel_work_sync(&cmdq->backlog_qflush);
+=20
+ 	dma_free_coherent(DEV(ndev), cmdq->qsize,
+@@ -78,6 +84,57 @@ static void nitrox_cmdq_cleanup(struct nitrox_cmdq *cmdq=
+)
+ 	cmdq->instr_size =3D 0;
+ }
+=20
++static void nitrox_free_aqm_queues(struct nitrox_device *ndev)
++{
++	int i;
++
++	for (i =3D 0; i < ndev->nr_queues; i++) {
++		nitrox_cmdq_cleanup(ndev->aqmq[i]);
++		kzfree(ndev->aqmq[i]);
++		ndev->aqmq[i] =3D NULL;
++	}
++}
++
++static int nitrox_alloc_aqm_queues(struct nitrox_device *ndev)
++{
++	int i, err;
++
++	for (i =3D 0; i < ndev->nr_queues; i++) {
++		struct nitrox_cmdq *cmdq;
++		u64 offset;
++
++		cmdq =3D kzalloc_node(sizeof(*cmdq), GFP_KERNEL, ndev->node);
++		if (!cmdq) {
++			err =3D -ENOMEM;
++			goto aqmq_fail;
++		}
++
++		cmdq->ndev =3D ndev;
++		cmdq->qno =3D i;
++		cmdq->instr_size =3D sizeof(struct aqmq_command_s);
++
++		/* AQM Queue Doorbell Counter Register Address */
++		offset =3D AQMQ_DRBLX(i);
++		cmdq->dbell_csr_addr =3D NITROX_CSR_ADDR(ndev, offset);
++		/* AQM Queue Commands Completed Count Register Address */
++		offset =3D AQMQ_CMD_CNTX(i);
++		cmdq->compl_cnt_csr_addr =3D NITROX_CSR_ADDR(ndev, offset);
++
++		err =3D nitrox_cmdq_init(cmdq, AQM_Q_ALIGN_BYTES);
++		if (err) {
++			kzfree(cmdq);
++			goto aqmq_fail;
++		}
++		ndev->aqmq[i] =3D cmdq;
++	}
++
++	return 0;
++
++aqmq_fail:
++	nitrox_free_aqm_queues(ndev);
++	return err;
++}
++
+ static void nitrox_free_pktin_queues(struct nitrox_device *ndev)
+ {
+ 	int i;
+@@ -222,6 +279,12 @@ int nitrox_common_sw_init(struct nitrox_device *ndev)
+ 	if (err)
+ 		destroy_crypto_dma_pool(ndev);
+=20
++	err =3D nitrox_alloc_aqm_queues(ndev);
++	if (err) {
++		nitrox_free_pktin_queues(ndev);
++		destroy_crypto_dma_pool(ndev);
++	}
++
+ 	return err;
+ }
+=20
+@@ -231,6 +294,7 @@ int nitrox_common_sw_init(struct nitrox_device *ndev)
+  */
+ void nitrox_common_sw_cleanup(struct nitrox_device *ndev)
+ {
++	nitrox_free_aqm_queues(ndev);
+ 	nitrox_free_pktin_queues(ndev);
+ 	destroy_crypto_dma_pool(ndev);
+ }
+diff --git a/drivers/crypto/cavium/nitrox/nitrox_req.h b/drivers/crypto/cav=
+ium/nitrox/nitrox_req.h
+index efdbd0fc3e3b..f69ba02c4d25 100644
+--- a/drivers/crypto/cavium/nitrox/nitrox_req.h
++++ b/drivers/crypto/cavium/nitrox/nitrox_req.h
+@@ -399,6 +399,36 @@ struct nps_pkt_instr {
+ 	u64 fdata[2];
+ };
+=20
++/**
++ * struct aqmq_command_s - The 32 byte command for AE processing.
++ * @opcode: Request opcode
++ * @param1: Request control parameter 1
++ * @param2: Request control parameter 2
++ * @dlen: Input length
++ * @dptr: Input pointer points to buffer in remote host
++ * @rptr: Result pointer points to buffer in remote host
++ * @grp: AQM Group (0..7)
++ * @cptr: Context pointer
++ */
++struct aqmq_command_s {
++	__be16 opcode;
++	__be16 param1;
++	__be16 param2;
++	__be16 dlen;
++	__be64 dptr;
++	__be64 rptr;
++	union {
++		__be64 word3;
++#if defined(__BIG_ENDIAN_BITFIELD)
++		u64 grp : 3;
++		u64 cptr : 61;
++#else
++		u64 cptr : 61;
++		u64 grp : 3;
++#endif
++	};
++};
++
+ /**
+  * struct ctx_hdr - Book keeping data about the crypto context
+  * @pool: Pool used to allocate crypto context
+--=20
+2.17.2
 
-Tested-by: Milan Broz <gmazyland@gmail.com>
-
-I talked with Mike already, so it should go through DM tree now.
-
-Thanks!
-Milan
-
-
-> ---
->  drivers/md/dm-crypt.c | 70 ++++++++++++++-----------------------------
->  1 file changed, 22 insertions(+), 48 deletions(-)
-> 
-> diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
-> index d5216bcc4649..48cd76c88d77 100644
-> --- a/drivers/md/dm-crypt.c
-> +++ b/drivers/md/dm-crypt.c
-> @@ -120,10 +120,6 @@ struct iv_tcw_private {
->  	u8 *whitening;
->  };
->  
-> -struct iv_eboiv_private {
-> -	struct crypto_cipher *tfm;
-> -};
-> -
->  /*
->   * Crypt: maps a linear range of a block device
->   * and encrypts / decrypts at the same time.
-> @@ -163,7 +159,6 @@ struct crypt_config {
->  		struct iv_benbi_private benbi;
->  		struct iv_lmk_private lmk;
->  		struct iv_tcw_private tcw;
-> -		struct iv_eboiv_private eboiv;
->  	} iv_gen_private;
->  	u64 iv_offset;
->  	unsigned int iv_size;
-> @@ -847,65 +842,47 @@ static int crypt_iv_random_gen(struct crypt_config *cc, u8 *iv,
->  	return 0;
->  }
->  
-> -static void crypt_iv_eboiv_dtr(struct crypt_config *cc)
-> -{
-> -	struct iv_eboiv_private *eboiv = &cc->iv_gen_private.eboiv;
-> -
-> -	crypto_free_cipher(eboiv->tfm);
-> -	eboiv->tfm = NULL;
-> -}
-> -
->  static int crypt_iv_eboiv_ctr(struct crypt_config *cc, struct dm_target *ti,
->  			    const char *opts)
->  {
-> -	struct iv_eboiv_private *eboiv = &cc->iv_gen_private.eboiv;
-> -	struct crypto_cipher *tfm;
-> -
-> -	tfm = crypto_alloc_cipher(cc->cipher, 0, 0);
-> -	if (IS_ERR(tfm)) {
-> -		ti->error = "Error allocating crypto tfm for EBOIV";
-> -		return PTR_ERR(tfm);
-> +	if (test_bit(CRYPT_MODE_INTEGRITY_AEAD, &cc->cipher_flags)) {
-> +		ti->error = "AEAD transforms not supported for EBOIV";
-> +		return -EINVAL;
->  	}
->  
-> -	if (crypto_cipher_blocksize(tfm) != cc->iv_size) {
-> +	if (crypto_skcipher_blocksize(any_tfm(cc)) != cc->iv_size) {
->  		ti->error = "Block size of EBOIV cipher does "
->  			    "not match IV size of block cipher";
-> -		crypto_free_cipher(tfm);
->  		return -EINVAL;
->  	}
->  
-> -	eboiv->tfm = tfm;
->  	return 0;
->  }
->  
-> -static int crypt_iv_eboiv_init(struct crypt_config *cc)
-> +static int crypt_iv_eboiv_gen(struct crypt_config *cc, u8 *iv,
-> +			    struct dm_crypt_request *dmreq)
->  {
-> -	struct iv_eboiv_private *eboiv = &cc->iv_gen_private.eboiv;
-> +	u8 buf[MAX_CIPHER_BLOCKSIZE] __aligned(__alignof__(__le64));
-> +	struct skcipher_request *req;
-> +	struct scatterlist src, dst;
-> +	struct crypto_wait wait;
->  	int err;
->  
-> -	err = crypto_cipher_setkey(eboiv->tfm, cc->key, cc->key_size);
-> -	if (err)
-> -		return err;
-> -
-> -	return 0;
-> -}
-> -
-> -static int crypt_iv_eboiv_wipe(struct crypt_config *cc)
-> -{
-> -	/* Called after cc->key is set to random key in crypt_wipe() */
-> -	return crypt_iv_eboiv_init(cc);
-> -}
-> +	req = skcipher_request_alloc(any_tfm(cc), GFP_KERNEL | GFP_NOFS);
-> +	if (!req)
-> +		return -ENOMEM;
->  
-> -static int crypt_iv_eboiv_gen(struct crypt_config *cc, u8 *iv,
-> -			    struct dm_crypt_request *dmreq)
-> -{
-> -	struct iv_eboiv_private *eboiv = &cc->iv_gen_private.eboiv;
-> +	memset(buf, 0, cc->iv_size);
-> +	*(__le64 *)buf = cpu_to_le64(dmreq->iv_sector * cc->sector_size);
->  
-> -	memset(iv, 0, cc->iv_size);
-> -	*(__le64 *)iv = cpu_to_le64(dmreq->iv_sector * cc->sector_size);
-> -	crypto_cipher_encrypt_one(eboiv->tfm, iv, iv);
-> +	sg_init_one(&src, page_address(ZERO_PAGE(0)), cc->iv_size);
-> +	sg_init_one(&dst, iv, cc->iv_size);
-> +	skcipher_request_set_crypt(req, &src, &dst, cc->iv_size, buf);
-> +	skcipher_request_set_callback(req, 0, crypto_req_done, &wait);
-> +	err = crypto_wait_req(crypto_skcipher_encrypt(req), &wait);
-> +	skcipher_request_free(req);
->  
-> -	return 0;
-> +	return err;
->  }
->  
->  static const struct crypt_iv_operations crypt_iv_plain_ops = {
-> @@ -962,9 +939,6 @@ static struct crypt_iv_operations crypt_iv_random_ops = {
->  
->  static struct crypt_iv_operations crypt_iv_eboiv_ops = {
->  	.ctr	   = crypt_iv_eboiv_ctr,
-> -	.dtr	   = crypt_iv_eboiv_dtr,
-> -	.init	   = crypt_iv_eboiv_init,
-> -	.wipe	   = crypt_iv_eboiv_wipe,
->  	.generator = crypt_iv_eboiv_gen
->  };
->  
-> 
