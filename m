@@ -6,59 +6,58 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 257A6C0650F
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Aug 2019 13:43:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DBDDC433FF
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Aug 2019 14:50:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C7AD72171F
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Aug 2019 13:43:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 355002173E
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Aug 2019 14:50:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=verimatrix.com header.i=@verimatrix.com header.b="O+yh4ijC"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="FQtk1seb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732518AbfHHNnk (ORCPT
+        id S1732811AbfHHOu1 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 8 Aug 2019 09:43:40 -0400
-Received: from mail-eopbgr820050.outbound.protection.outlook.com ([40.107.82.50]:11553
-        "EHLO NAM01-SN1-obe.outbound.protection.outlook.com"
+        Thu, 8 Aug 2019 10:50:27 -0400
+Received: from mail-eopbgr150051.outbound.protection.outlook.com ([40.107.15.51]:16849
+        "EHLO EUR01-DB5-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1732297AbfHHNnk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 8 Aug 2019 09:43:40 -0400
+        id S1730678AbfHHOu1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 8 Aug 2019 10:50:27 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MNsn+xLkOlbTeJwUhlC6g1PF+yFhFENYGwFklj5Qat7B2Qxmnt7kJwiRPKjttoy4gCUl63tkM6yXxvAKl5ZCv+fSTXufLBwHG+2QvShierNbEOvFE56d3A629l57i7I/qq2rUT/A5u9TAZT/FmQAmykiW4oYF9e/o9ogwqh4lup7tfSclRx2m7ufoWpiPbHdxD/yZMrq3F6BGyZQVkgKt+Y+nEQbrBxjNO3lNQUA3GVz7Kh1P043khg1JraqaD6pPCktxbX9xDmmUM6GXc5q16xETX/BaogDIJa2/N0qE6/7jxbwYEpGuzit0IuAuqoyroLGwGxU4svtbQmvIyRfjg==
+ b=bCJ+bwIJTF9aVvSH+PesrPX/VK+JlMzHij/EiDHMYVAGgNZRri2TwAvhU+6UhUFNMPAZ5oMLAtlAPV54QSZGJLWRNqhC9Bj0a4FaiTwlMuV5cqjYXYGSQsoGk7128IgvIar63Ps5NBXl79NkYJfTz1rqorGEQjvJt9JIYjqJuDfJtjAPlMhsRbnXYl+1tfipMX55ux/GG042OkPzKgzZMmBhwo0Ye6fJJqglW1ijIWjOl/ZmCPHJDRXFG0s+NaH5dYCPWb+WJRljHLKCyZN+WW2WxCdimpR3FmckVVuLNUzKZRbZYPlCz0NHjSPJV94TaekbKWDH+hzahMQNDQfXeA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sWA2DcVfk163/QKJgE5V5FMF7czdOz1qRQeldHfORho=;
- b=UrHhUVtDXKAxyUINckHhMYh5YFaq7Bjv70XZAd7yKRLOz6XurNF1qGfeahQgxyZLrTtbdmCjF2lmfp9nia3JLPMOQ2FBFLFydzIuarF4u2q3UAi4YHhnZB+spyEt5ANQLwgVNRqNiqU5IxjKoa4oD51vSn3a5V7pdHj977xJb/HUkm6cZDO1f9Yv5ZkvRIsSiMeCgY2FFC9eZ0B7iEwfXTC+/uR/IgzJCnY3RhRJEx2n9d67YcN0mlFDCYoGIGssnfSG9Wd8XbpRg+ge9xiV3piwiFp7t5d+7uewUbdUiGfvwv/5sfF8KQIWBgpxgiDbHy28W8C4BK2CVKmWX3l3UA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=verimatrix.com; dmarc=pass action=none
- header.from=verimatrix.com; dkim=pass header.d=verimatrix.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verimatrix.com;
- s=selector2;
+ bh=hvNGNRud8Hdr8KXbq8H82j5TqhMCpM8tR2jaROCvTdo=;
+ b=RR2GqU8C5hQC1d5YuhIrSKKSKaD+d9t5M6f3htF7eYYcEpDanBGnPsvAWJ85lVVqMVnsfyYrIT2x5B6c7EJ96Nn7YxLMD+8YC29Oq8Si2Ylp32u0wQjugxNS7mbFkzly73hzZb2ozH3O5bl/Oz7K8WYhPvYQJ2lbshaDAwa3LP3KAap5rurG5xAgTEF2SmkEF/LAKJRH7wyQd9CjAEDhatKYYVnLsPvZpAAcpWyZO4L9uEzf/AjN8CzFvbugOu5gciHi00nJor3g4G3m6YCdLw+nXetUarTtONJ4B7sl3FqGkkNYvtyGxmTglYNDY2lkbURP1O4Jh15JhBojkP9hLQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
+ smtp.mailfrom=nxp.com;dmarc=pass action=none header.from=nxp.com;dkim=pass
+ header.d=nxp.com;arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sWA2DcVfk163/QKJgE5V5FMF7czdOz1qRQeldHfORho=;
- b=O+yh4ijCZAfVyJBKeArtGIOrbxjDPbwtrfvZqEVq9xe4rrd8V7jjBoAtQJS3jB7VDZDoE/vfemreOLlHy7oXiMTJUMKSxkKRdAIct9drJHM5WyZGkPsT1MiZbmAMNVPLl9dFk13s57J9qamII7T7j3pi/heixEWzgJ6PCMV18JA=
-Received: from MN2PR20MB2973.namprd20.prod.outlook.com (52.132.172.146) by
- MN2PR20MB2238.namprd20.prod.outlook.com (20.179.145.22) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2157.16; Thu, 8 Aug 2019 13:43:30 +0000
-Received: from MN2PR20MB2973.namprd20.prod.outlook.com
- ([fe80::d96f:39b2:19f4:c7c1]) by MN2PR20MB2973.namprd20.prod.outlook.com
- ([fe80::d96f:39b2:19f4:c7c1%7]) with mapi id 15.20.2157.015; Thu, 8 Aug 2019
- 13:43:30 +0000
-From:   Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
-To:     Horia Geanta <horia.geanta@nxp.com>,
+ bh=hvNGNRud8Hdr8KXbq8H82j5TqhMCpM8tR2jaROCvTdo=;
+ b=FQtk1sebTa+kwnd7y6RwaFmfXHOyb7g3ilaO0pqJ6nDQyZNgWr0+PFPQxbqHKqSvGIkEDevo9qBatGKgnPYbwXx8Iur8z1EexDIi4o6HChO1ET7GS4qa8+nYPT2/iUQhlzTG/o95Mo2WDE9QCspY5Upk7AmYEr466v+vr1tMS6g=
+Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
+ VI1PR0402MB2703.eurprd04.prod.outlook.com (10.172.255.137) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2136.17; Thu, 8 Aug 2019 14:50:19 +0000
+Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
+ ([fe80::a070:859:ccf8:3617]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
+ ([fe80::a070:859:ccf8:3617%7]) with mapi id 15.20.2157.015; Thu, 8 Aug 2019
+ 14:50:19 +0000
+From:   Horia Geanta <horia.geanta@nxp.com>
+To:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>
 CC:     Milan Broz <gmazyland@gmail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "dm-devel@redhat.com" <dm-devel@redhat.com>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Subject: RE: [dm-devel] xts fuzz testing and lack of ciphertext stealing
+Subject: Re: [dm-devel] xts fuzz testing and lack of ciphertext stealing
  support
 Thread-Topic: [dm-devel] xts fuzz testing and lack of ciphertext stealing
  support
-Thread-Index: AQHVO/5l0aVU4O6KC0WgPIqEsMQCDqbxZB+w
-Date:   Thu, 8 Aug 2019 13:43:30 +0000
-Message-ID: <MN2PR20MB2973127E4C159A8F5CFDD0C9CAD70@MN2PR20MB2973.namprd20.prod.outlook.com>
+Thread-Index: AQHVO/5l0aVU4O6KC0WgPIqEsMQCDg==
+Date:   Thu, 8 Aug 2019 14:50:19 +0000
+Message-ID: <VI1PR0402MB34859FF5C6129DAE01B1CA0098D70@VI1PR0402MB3485.eurprd04.prod.outlook.com>
 References: <20190716221639.GA44406@gmail.com>
  <20190718072154.m2umem24x4grbf6w@gondor.apana.org.au>
  <36e78459-1594-6d19-0ab4-95b03a6de036@gmail.com>
@@ -76,311 +75,146 @@ References: <20190716221639.GA44406@gmail.com>
  <MN2PR20MB29739591E1A3E54E7A8A8E18CAC00@MN2PR20MB2973.namprd20.prod.outlook.com>
  <20f4832e-e3af-e3c2-d946-13bf8c367a60@nxp.com>
  <VI1PR0402MB34856F03FCE57AB62FC2257998D40@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-In-Reply-To: <VI1PR0402MB34856F03FCE57AB62FC2257998D40@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+ <MN2PR20MB2973C16264CA748F147834E9CAD40@MN2PR20MB2973.namprd20.prod.outlook.com>
 Accept-Language: en-US
 Content-Language: en-US
-X-MS-Has-Attach: yes
+X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
 authentication-results: spf=none (sender IP is )
- smtp.mailfrom=pvanleeuwen@verimatrix.com; 
-x-originating-ip: [188.204.2.113]
+ smtp.mailfrom=horia.geanta@nxp.com; 
+x-originating-ip: [82.137.9.55]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 3c25ef11-c134-4c30-d983-08d71c066601
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(49563074)(7193020);SRVR:MN2PR20MB2238;
-x-ms-traffictypediagnostic: MN2PR20MB2238:
-x-ms-exchange-purlcount: 1
-x-microsoft-antispam-prvs: <MN2PR20MB2238EE30E99D10A5E35A0939CAD70@MN2PR20MB2238.namprd20.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-ms-office365-filtering-correlation-id: 3c380af5-71bc-4dc0-3224-08d71c0fbb76
+x-ms-office365-filtering-ht: Tenant
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:VI1PR0402MB2703;
+x-ms-traffictypediagnostic: VI1PR0402MB2703:
+x-microsoft-antispam-prvs: <VI1PR0402MB2703903BB99EB259BA62657198D70@VI1PR0402MB2703.eurprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:4714;
 x-forefront-prvs: 012349AD1C
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(136003)(39840400004)(346002)(376002)(366004)(396003)(13464003)(199004)(189003)(99286004)(86362001)(99936001)(7736002)(305945005)(4326008)(7696005)(74316002)(76176011)(6436002)(66946007)(66446008)(66476007)(52536014)(9686003)(66616009)(81156014)(8676002)(6246003)(15974865002)(5660300002)(55016002)(478600001)(66556008)(81166006)(8936002)(14454004)(53936002)(256004)(25786009)(2906002)(33656002)(229853002)(54906003)(64756008)(76116006)(6116002)(3846002)(110136005)(316002)(53546011)(66066001)(476003)(6506007)(71200400001)(71190400001)(486006)(446003)(11346002)(26005)(14444005)(186003)(102836004);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR20MB2238;H:MN2PR20MB2973.namprd20.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: verimatrix.com does not designate
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(366004)(13464003)(199004)(189003)(76176011)(186003)(110136005)(81156014)(8936002)(81166006)(2906002)(55016002)(8676002)(26005)(33656002)(53936002)(4326008)(54906003)(498600001)(9686003)(5660300002)(3846002)(52536014)(91956017)(6116002)(6246003)(76116006)(64756008)(66946007)(66446008)(66476007)(66556008)(71200400001)(71190400001)(44832011)(486006)(14444005)(86362001)(99286004)(6436002)(25786009)(7736002)(305945005)(229853002)(74316002)(14454004)(53546011)(102836004)(66066001)(256004)(6506007)(446003)(7696005)(476003);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB2703;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: nxp.com does not designate
  permitted sender hosts)
 x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: m5ntLZkoCroInNIvrHcqpHNGeWGVguRnBp0NffQvILVhNF+mOvFQu16hX1Y6S5IEWJ1njcc9Jtgu4DUlRaFECqe/lDFZ5F6Ayh00b8WxmpRJvKBnZq6kOZ6hyhbdC7OC6/fD9Hr8jkFJX63lynT5eSOLDuljdiinPBYiFf3UmlX6hQLMvcdlRAZsL1G9spt38+Pzl9Acr0dkf42Tr6CEkdlB9sU3HfC3SHPmg4YJQ5y+Ir8gpo25b1RMyWKakGfj78J7Mo0kuzi8br0vA5r5rZMTGkWfQpjuhxX9AnFssMd0MjhgkO3g2kjniTc6GCanfuByv8o2oCwLZZ/KqNq74ra2sxquQz5fWJCtDMv/r3yIcZ9ke1bW4MhnsV1Ox9ansj34NK00c/8JN6Q0TMFedZtQVOJmEIuPqEKowdx7x7E=
-x-ms-exchange-transport-forked: True
-Content-Type: multipart/mixed;
-        boundary="_002_MN2PR20MB2973127E4C159A8F5CFDD0C9CAD70MN2PR20MB2973namp_"
+x-microsoft-antispam-message-info: 8DcXBqJtg5Fwo4vh260NIJPazdtask/k3U6aQDEnHsTXQMm2S50vr2zGERTg3kWZfV9ccn+k/rLzxCDEAOUe4l0YLChNoZgS0Lngbw+dlLQvQnGej/aDQDpsOdAVqNInBX8SGKtLvkYYUclETkMbaA2XWzmDJkJbWNUbRUPqFaVmJO512SEwEQJ7DueQquoJAz7CVXNsVh1+rDrvJqU5M598uphn82bd9EC1JeHwQVWG60moNqGvICQHSo6Gd6ffR1WvWm/fa0+XId8G6Qlve7tKIkw3/wChWSBtxnYIKp+AIITH4BRxPNEMxajc/6J8FakZnCpcldIQzw9Z40qxKreWxNgS+37gkGJxH/t4DtD2JYPokl9VoRNaZdxcJtzzggh6JhRFw1bA0ZO1xf4Nw30g6J/NdO8OLCs1ppBCy24=
+Content-Type: text/plain; charset="iso-8859-2"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-OriginatorOrg: verimatrix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3c25ef11-c134-4c30-d983-08d71c066601
-X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Aug 2019 13:43:30.1554
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3c380af5-71bc-4dc0-3224-08d71c0fbb76
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Aug 2019 14:50:19.0837
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: dcb260f9-022d-4495-8602-eae51035a0d0
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: aZAkDVgkjDm7JrelNKJD98cD2FxguXVitv8EE0wspfjF+cF/jE8yiXCGC+ciF7JjlbHWMOEuPBBCtV9CSJ8OxSEAyzbYSQZTR8c69uMMtaE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR20MB2238
+X-MS-Exchange-CrossTenant-userprincipalname: 1BgL0kaI4lq0qXEESiN2e0iE0223idy5xt1XdPDxbpOlaThwKVHEBQCDbZzpew5VF0GQRfiK/BleENHr1cy/tQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB2703
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
---_002_MN2PR20MB2973127E4C159A8F5CFDD0C9CAD70MN2PR20MB2973namp_
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
-
-Hi Horia,
-
-This is the best I can do on short notice w.r.t vectors with 8 byte IV.
-Format is actually equivalent to that of the XTS specification, with
-the sector number being referred to as "H".
-
-Actually, the input keys, plaintext and IV should be the same as before,
-with the exception of the IV being truncated to 64 bits, so that should
-give you some reference regarding byte order etc.
-
-Regards,
-Pascal van Leeuwen
-Silicon IP Architect, Multi-Protocol Engines @ Verimatrix
-www.insidesecure.com
-
-> -----Original Message-----
-> From: Horia Geanta <horia.geanta@nxp.com>
-> Sent: Wednesday, August 7, 2019 5:52 PM
-> To: Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>; Ard Biesheuvel
-> <ard.biesheuvel@linaro.org>
-> Cc: Milan Broz <gmazyland@gmail.com>; Herbert Xu <herbert@gondor.apana.or=
-g.au>; dm-
-> devel@redhat.com; linux-crypto@vger.kernel.org
-> Subject: Re: [dm-devel] xts fuzz testing and lack of ciphertext stealing =
-support
->=20
-> On 7/26/2019 10:59 PM, Horia Geant=E3 wrote:
-> > On 7/26/2019 1:31 PM, Pascal Van Leeuwen wrote:
-> >> Ok, find below a patch file that adds your vectors from the specificat=
-ion
-> >> plus my set of additional vectors covering all CTS alignments combined
-> >> with the block sizes you desired. Please note though that these vector=
-s
-> >> are from our in-house home-grown model so no warranties.
-> > I've checked the test vectors against caam (HW + driver).
-> >
-> > Test vectors from IEEE 1619-2007 (i.e. up to and including "XTS-AES 18"=
-)
-> > are fine.
-> >
-> > caam complains when /* Additional vectors to increase CTS coverage */
-> > section starts:
-> > alg: skcipher: xts-aes-caam encryption test failed (wrong result) on te=
-st vector 9,
-> cfg=3D"in-place"
-> >
-> I've nailed this down to a caam hw limitation.
-> Except for lx2160a and ls1028a SoCs, all the (older) SoCs allow only for
-> 8-byte wide IV (sector index).
-> Will follow up with 16-byte IV support for the above-mentioned SoCs.
->=20
-> Pascal,
->=20
-> Could you also generate a few test vectors covering CTS with 8-byte IV?
->=20
-> Thanks,
-> Horia
-
---_002_MN2PR20MB2973127E4C159A8F5CFDD0C9CAD70MN2PR20MB2973namp_
-Content-Type: application/octet-stream; name="linuxdrv_256enc2.out"
-Content-Description: linuxdrv_256enc2.out
-Content-Disposition: attachment; filename="linuxdrv_256enc2.out"; size=11229;
-	creation-date="Thu, 08 Aug 2019 07:46:19 GMT";
-	modification-date="Thu, 08 Aug 2019 07:50:28 GMT"
-Content-Transfer-Encoding: base64
-
-Ly8gU3RhcnQgb2YgUmVjb3JkIDogMQovLyBBRVMgWFRTIG9wZXJhdGlvbiB3aXRoIENUUwovLyBF
-bmNyeXB0Ci8vIEtleQovLyBLZXkyCi8vIGkKLy8gVGV4dAovLyBObyBqIGlucHV0Ci8vIEluY3Jl
-bWVudCB2YWx1ZSAwMDAwMDAwMQovLyBPdXRwdXQgdGV4dApLICAgICAgICAgICAgICAgOiBhMTM0
-MGU0OTM4ZmQ4YmY2NDU2MDY3MDcwZjUwYTgyYgogICAgICAgICAgICAgICAgOiBhOGYxZmU3ZWY0
-ZjA0N2NkZmQ5MTc4ZjkxNDhiN2QyNwpLMiAgICAgICAgICAgICAgOiAwZWRjY2FlNmY0ZmNkNzRm
-MTk4Y2QwZTY5ZTJmZjg3NQogICAgICAgICAgICAgICAgOiBiNWUyNDgwMDRmMDdkOWExNDJiYzlk
-ZmMxNzk4MDA0OApIICAgICAgICAgICAgICAgOiBjYjM1NDc1YTdhMDYyOGI5MDAwMDAwMDAwMDAw
-MDAwMApQICAgICAgICAgICAgICAgOiAwNDUyYzg3ZmIwNWExMmM1OTY0NzZiZjRiYzJlZGI3NAog
-ICAgICAgICAgICAgICAgOiBkMjIwMjQzMmU1ODRiNjI1NGMyZjk2Yzc1NTljOTA2ZgogICAgICAg
-ICAgICAgICAgOiAwZTk2OTQ2OGY0CkMgICAgICAgICAgICAgICA6IDczZmE2OTBiMWMyMTNhNjE4
-Mzg4NWU1N2UzZjI3OTFmCiAgICAgICAgICAgICAgICA6IDZhNjQ3OWZmYTJhYWYyNzA2N2Y1MDZm
-OTQ4YjI5NmE0CiAgICAgICAgICAgICAgICA6IGQ3ZDU0ODI2YzkKSVYgcmVzICAgICAgICAgIDog
-MTdlOWYyYzVmYWFhMjQ3MTFhZDFkZTU5MTc4YzU5NmMKICAgICAgICAgICAgICAgIDogMmVkMmU1
-OGJmNTU1NDllMjM0YTJiZGIzMmUxOGIzZDgKICAgICAgICAgICAgICAgIDogZGJhNGNiMTdlYmFi
-OTJjNDY5NDQ3YjY3NWQzMDY2YjEKLy8gRW5kIG9mIFJlY29yZAovLy8vLy8vLy8vLy8vLy8vLy8v
-Ly8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLwovLyBTdGFydCBvZiBSZWNvcmQgOiAyCi8v
-IEFFUyBYVFMgb3BlcmF0aW9uIHdpdGggQ1RTCi8vIEVuY3J5cHQKLy8gS2V5Ci8vIEtleTIKLy8g
-aQovLyBUZXh0Ci8vIE5vIGogaW5wdXQKLy8gT3V0cHV0IHRleHQKSyAgICAgICAgICAgICAgIDog
-Zjc4Nzc1ZGYzNjIwZTdjYjIwNWQ0OTk2ODEzZDFkODAKICAgICAgICAgICAgICAgIDogYzcxODdl
-YmYyYTBmNzliYTA2YjU0YjYzMDNmYmI4NDkKSzIgICAgICAgICAgICAgIDogOTMyZDg1NWI5NTFm
-NzhlYTdjMWVmNTVkMDJjNmVjYjAKICAgICAgICAgICAgICAgIDogZjBhYTNkMGEwNGUxNjc4MDJh
-YmU0ZTczYzkxMWNjNmMKSCAgICAgICAgICAgICAgIDogZWJiYTU1MjRmYzhmMjU3YzAwMDAwMDAw
-MDAwMDAwMDAKUCAgICAgICAgICAgICAgIDogNDA3NTFiNzIyYWM4YmZlZjBjOTIzZTE5YzUwOTA3
-MzgKICAgICAgICAgICAgICAgIDogNGQ4NzVjYjhkNjRmMWEzOThjZWVhNTIyNDExMmUxMjIKICAg
-ICAgICAgICAgICAgIDogYjU0YmQ3ZWIwMmZhYWFmODk0NDcwNDVkOGFiNTQwMTIKICAgICAgICAg
-ICAgICAgIDogMDQ2MjNkZTQxOThhZWJiM2Y5YTM3ZGI2ZWI1N2Y5YjgKICAgICAgICAgICAgICAg
-IDogN2ZhOGZhMmQ3NTJkCkMgICAgICAgICAgICAgICA6IGU2OWU0YjFiMjdmN2MwMGJmOTM5YTZm
-YTQyNTE0YjRmCiAgICAgICAgICAgICAgICA6IDcyYmFlZWJmM2FlNjk3MjE2NDI5Y2QzMGFlMzg2
-NmNhCiAgICAgICAgICAgICAgICA6IDJiZmYxZGYzZDUzZGUxZjVhOThiN2EzYWRhMTExMzcxCiAg
-ICAgICAgICAgICAgICA6IDJjMWVkMzJiNDM3MzUzM2I2ZmM3ZmRmYzFmNTk5ZTk5CiAgICAgICAg
-ICAgICAgICA6IDM5OTA0MmNkMGMzOApJViByZXMgICAgICAgICAgOiAyOGYyNTZiYzBhZWM0NjNj
-N2I4NzIzODNhNThmY2NiNAogICAgICAgICAgICAgICAgOiBkN2U0YWQ3ODE1ZDg4ZDc4ZjYwZTQ3
-MDY0YjFmOTk2OQogICAgICAgICAgICAgICAgOiBhZWM5NWJmMTJhYjAxYmYxZWMxZDhlMGM5NjNl
-MzJkMwogICAgICAgICAgICAgICAgOiBkYjkzYjdlMjU1NjAzN2UyZDkzYjFjMTkyYzdkNjRhNgog
-ICAgICAgICAgICAgICAgOiAzMTI3NmZjNWFiYzA2ZWM0YjM3NzM4MzI1OGZhYzg0YwovLyBFbmQg
-b2YgUmVjb3JkCi8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8v
-Ly8vCi8vIFN0YXJ0IG9mIFJlY29yZCA6IDMKLy8gQUVTIFhUUyBvcGVyYXRpb24gd2l0aCBDVFMK
-Ly8gRW5jcnlwdAovLyBLZXkKLy8gS2V5MgovLyBpCi8vIFRleHQKLy8gTm8gaiBpbnB1dAovLyBP
-dXRwdXQgdGV4dApLICAgICAgICAgICAgICAgOiA0ODA5YWI0OGQ2Y2E3ZGIxOTBhMDAwZDgzMzhh
-MjA3OQogICAgICAgICAgICAgICAgOiA3Y2JjMGMwYzVmNDFiY2JjODJhZjQxODEyMzkzY2JjNwpL
-MiAgICAgICAgICAgICAgOiA2MTdiODMxMzE2YjEzZTdjY2NhZWRhY2E3OGM3YWIxOAogICAgICAg
-ICAgICAgICAgOiA2OWI2NTgzZTVjMTk1ZmVkN2JjZjcwYjk3NjAwZDhjOQpIICAgICAgICAgICAg
-ICAgOiAyZTIwMzZmNGEzMjI1ZGQ4MDAwMDAwMDAwMDAwMDAwMApQICAgICAgICAgICAgICAgOiA3
-OTNjNzM5OTY1MjFlMWI5YTBmZDIyYjI1N2MwN2ZmNAogICAgICAgICAgICAgICAgOiA3Zjk3MzZh
-ZmY4OGQ3M2UxMGQ4NWU5ZDUzZDgyYjM0OQogICAgICAgICAgICAgICAgOiA4OTI1MzAxZjBkY2E1
-Yzk1NjQzMTAyMTcxMTA4OGYzMgogICAgICAgICAgICAgICAgOiBiYzM3MjM0ZjAzOTg5MTRhNTBl
-MjU4YTg5YjY0MDllMAogICAgICAgICAgICAgICAgOiBjZTk5YzliMGE4MjE3M2I3MmQ0YjE5YmE4
-MTgzOTljZQogICAgICAgICAgICAgICAgOiBhMDdhZDA5ZjI3ZjY4YQpDICAgICAgICAgICAgICAg
-OiAxYTg3NjIyYjA1MDk1ZTA2OTQxNmQxYTVhZWQ4MzQ4NgogICAgICAgICAgICAgICAgOiAxZjEy
-ODBlZmI5N2MwMDdmZjhkYTg5ZDE4NTBjMGY3OQogICAgICAgICAgICAgICAgOiAxNDk2OWE1NDVj
-MGYxMWUxZDgyYjIwMjhiOGU1OGI3MwogICAgICAgICAgICAgICAgOiA4MzkwYjNjNjFlMDAwNzIy
-OGJjODBjNWExZDc0ZjFmYwogICAgICAgICAgICAgICAgOiAzMWZkODBkYmZkNjNjOGQ4ODAyN2Nj
-YjYzYjcwNThjMgogICAgICAgICAgICAgICAgOiBlZjUyNTk0ZGU0OWU0ZQpJViByZXMgICAgICAg
-ICAgOiA2N2Q3ZWU3NDRkZmZkNTUzMmJiYTk4ZDRlYWMwNmEwYQogICAgICAgICAgICAgICAgOiBj
-ZWFlZGRlOTlhZmVhYmE3NTY3NDMxYTlkNTgxZDUxNAogICAgICAgICAgICAgICAgOiA5YzVkYmJk
-MzM1ZmQ1NzRmYWRlODYyNTJhYjAzYWIyOQogICAgICAgICAgICAgICAgOiAzOGJiNzZhNzZiZmFh
-ZjllNWFkMWM1YTQ1NjA3NTY1MwogICAgICAgICAgICAgICAgOiA3MDc2ZWQ0ZWQ3ZjQ1ZjNkYjVh
-MjhiNDlhZDBlYWNhNgogICAgICAgICAgICAgICAgOiA2N2VjZGE5ZGFlZTliZjdhNmE0NTE3OTM1
-YTFkNTg0ZAovLyBFbmQgb2YgUmVjb3JkCi8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8v
-Ly8vLy8vLy8vLy8vLy8vLy8vCi8vIFN0YXJ0IG9mIFJlY29yZCA6IDQKLy8gQUVTIFhUUyBvcGVy
-YXRpb24gd2l0aCBDVFMKLy8gRW5jcnlwdAovLyBLZXkKLy8gS2V5MgovLyBpCi8vIFRleHQKLy8g
-Tm8gaiBpbnB1dAovLyBPdXRwdXQgdGV4dApLICAgICAgICAgICAgICAgOiA4Y2Y0NGNlNTkxOGY3
-MmU5MmZmOGMwM2M4Nzc2MTZhNAogICAgICAgICAgICAgICAgOiAyMGFiNjYzOTM0MTBkNjkxZjE5
-OTJjZjFkNmMzZGEzOApLMiAgICAgICAgICAgICAgOiBlZDJhNGM4MGY0YTU1NjI4MWExYzc5NzI2
-YzkzMDg4NgogICAgICAgICAgICAgICAgOiA4ZjhhYWFjZGYxOGNjYWU3MGFlOGVlMGMxY2MyYThl
-YQpIICAgICAgICAgICAgICAgOiA5YTllYmNlNGM5ZjNlZjlmMDAwMDAwMDAwMDAwMDAwMApQICAg
-ICAgICAgICAgICAgOiBjMWRlNjYxYTdlNjBkMzNiNjZkNjI5ODY5OWM2ZDdjOAogICAgICAgICAg
-ICAgICAgOiAyOWJmMDA1N2FiMjEwNjI0ZDA5MmVmZTZiNTFlMjBiOQogICAgICAgICAgICAgICAg
-OiBiNzdiZDcxODg4ZjhkN2UzOTA2MWNkNzMyYmExYjVjNwogICAgICAgICAgICAgICAgOiAzM2Vm
-YjVmMjQ1ZjY5MjUzOTE5OGY4NWEyMDc1NGNhOAogICAgICAgICAgICAgICAgOiBmMWY2MDEyNmJj
-YmE0Y2FjY2JjMjZkYjYyYzNjMzg2MQogICAgICAgICAgICAgICAgOiBlMzk4N2YzZTk4YmRlY2Nl
-YzBiNTc0MjM0MzI0N2I3ZQogICAgICAgICAgICAgICAgOiAzZmVkY2JkYTg4Njc2ZjlhCkMgICAg
-ICAgICAgICAgICA6IGU1YjQwMmFjMDEzYmE4NzM5ZTViYTQ3MjllNDE4NTBmCiAgICAgICAgICAg
-ICAgICA6IDYwMTM2YmM1N2VkZDMyOWMyZjk1NWU5NTNlYmM3YTY1CiAgICAgICAgICAgICAgICA6
-IDFjZjYwZDYxNTg4NzFlZmY5NmI4MDE4NjVmZTIzNjg0CiAgICAgICAgICAgICAgICA6IDYxZjM5
-OTJjMDY4ZDAwYzNlZjA3ZjUyNGY3NmRhYzExCiAgICAgICAgICAgICAgICA6IDBkNDAxZmU3OTRj
-ZDAyM2VkMmQ4Njc3MTA4YWQ4YzcxCiAgICAgICAgICAgICAgICA6IGFjMjFjNzA5OTIzYzU5ZDg5
-MWZiNDNmMjJhNjdjYTk3CiAgICAgICAgICAgICAgICA6IDNjYzM3ODQ0YTk5MGQ4NGIKSVYgcmVz
-ICAgICAgICAgIDogZmYxODFhMTQyMGUxMDlkMmI5ZjE5NTgxOWFmN2MyYmQKICAgICAgICAgICAg
-ICAgIDogNzkzMTM0Mjg0MGMyMTNhNDczZTMyYjAzMzVlZjg1N2IKICAgICAgICAgICAgICAgIDog
-ZjI2MjY4NTA4MDg0Mjc0OGU3YzY1NzA2NmFkZTBiZjcKICAgICAgICAgICAgICAgIDogNjNjNWQw
-YTAwMDA5NGY5MGNlOGRhZjBjZDRiYzE3ZWUKICAgICAgICAgICAgICAgIDogNDE4YWExNDEwMTEy
-OWUyMDlkMWI1ZjE5YTg3OTJmZGMKICAgICAgICAgICAgICAgIDogMDUxNDQzODMwMjI0M2M0MTNh
-MzdiZTMyNTBmMzVlYjgKICAgICAgICAgICAgICAgIDogOGQyODg2MDYwNTQ4Nzg4Mjc0NmU3YzY1
-YTBlNmJkNzAKLy8gRW5kIG9mIFJlY29yZAovLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8v
-Ly8vLy8vLy8vLy8vLy8vLy8vLwovLyBTdGFydCBvZiBSZWNvcmQgOiA1Ci8vIEFFUyBYVFMgb3Bl
-cmF0aW9uIHdpdGggQ1RTCi8vIEVuY3J5cHQKLy8gS2V5Ci8vIEtleTIKLy8gaQovLyBUZXh0Ci8v
-IE5vIGogaW5wdXQKLy8gT3V0cHV0IHRleHQKSyAgICAgICAgICAgICAgIDogNzAxODA5OTMxMDNh
-MGNhOTAyMGIxMTEwYWUzNDk4ZGIKICAgICAgICAgICAgICAgIDogMTBiNWVlOGM0OWJjNTI4ZTRi
-ZjcwYTM2MTY4YWY3MDYKSzIgICAgICAgICAgICAgIDogYjU5NDUyNTRiOWMxNGQyMGEyZjA2ZTE5
-N2Y2NzFlYWEKICAgICAgICAgICAgICAgIDogOTQ2Y2VlNTQxOWZjOTY5NTA0ODUwMDUzN2MzOTVm
-ZWIKSCAgICAgICAgICAgICAgIDogMzY4NzhmOWQ3NGU5NTJmYjAwMDAwMDAwMDAwMDAwMDAKUCAg
-ICAgICAgICAgICAgIDogOTUwOGVlZmU4N2IyNGY5MzAxZWVmMzc3MGRiYmZiMjYKICAgICAgICAg
-ICAgICAgIDogM2ViMzM0MjBlZTUxZDY0MGIxNjRhZWQ5ZmQ3MThmOTMKICAgICAgICAgICAgICAg
-IDogYTU4NWZmNzRjY2QzZmQ1ZWMyZmM0OWRhYTgzYTk0MjkKICAgICAgICAgICAgICAgIDogYTI1
-OTkwMzQyNmJiYTAzNDVkNDczM2YyYTg3NzkwOTgKICAgICAgICAgICAgICAgIDogOGRmZDM4NjAy
-MzFlNTBhMTY3NGQ4ZDA5ZTA3ZDMwZTMKICAgICAgICAgICAgICAgIDogZGQzOTkxZDQ3MDY4YmIw
-NjRlMTFiMjI2MGE4NTczZjYKICAgICAgICAgICAgICAgIDogMzdiNjE1ZDA3N2VlNDM3Yjc3MTNl
-OWI5ODQyYjM0YWIKICAgICAgICAgICAgICAgIDogNDljMTI3OTEyZWEzY2FlNWE3Nzk0NWJhMzY5
-NzQ5NDQKICAgICAgICAgICAgICAgIDogZjc1NzliZDdhY2IzZmQ2YTFjZDFmYzFjZGY2Zjk0YWMK
-ICAgICAgICAgICAgICAgIDogOTVmNDUwN2FjOGMzOGM2MDNjCkMgICAgICAgICAgICAgICA6IDkx
-ZTUzNWYyNzJjYzE1YmIyZWEzNmQ4MDI1YWRiMjE0CiAgICAgICAgICAgICAgICA6IDNlMGViODMz
-NjhjNmMwM2YyMTJiMDJiYzkwOTdlZWYwCiAgICAgICAgICAgICAgICA6IDcyMGJhOTVlZmM5NWFm
-MzAxNDVjODNlZDk3NGZkYTYxCiAgICAgICAgICAgICAgICA6IGYzNTNmZjZmY2QwYWIzZjU1ZmRk
-NDZhOWYwOGE1YThiCiAgICAgICAgICAgICAgICA6IGViOTkyYTA3OWYxNjQ5YTliZTRlM2I5M2Ez
-YmUxN2ExCiAgICAgICAgICAgICAgICA6IGEzNTE4NzQ5MjU5NDI3OGU0OTM4N2JmYmU0YWE2YWI5
-CiAgICAgICAgICAgICAgICA6IDg1YTIzYWEzMGU4YzBkMDNhMmJmZTQ3ZDcxMWI0YjRmCiAgICAg
-ICAgICAgICAgICA6IGFlNGViZGZmOTRlZTIyYmNiOTQ3MGU3YzJjZDRhOGI1CiAgICAgICAgICAg
-ICAgICA6IGUyYWFhOWJmZTdhZGRjNjlmYTUxOTUwYjkwMTA1M2NiCiAgICAgICAgICAgICAgICA6
-IGM0OGJjOWNmZWMwZWM2YzM0ZgpJViByZXMgICAgICAgICAgOiBjYTcyMjMzZjI0NDRlMWJiY2Q4
-NjdiOThmYzNhOWQyNwogICAgICAgICAgICAgICAgOiA5NGU1NDY3ZTQ4ODhjMjc3OWIwZGY3MzBm
-OTc1M2E0ZgogICAgICAgICAgICAgICAgOiAyOGNiOGRmYzkwMTA4NWVmMzYxYmVlNjFmMmViNzQ5
-ZQogICAgICAgICAgICAgICAgOiBkNzk2MWJmOTIxMjEwYWRmNmQzNmRjYzNlNGQ3ZTkzYwogICAg
-ICAgICAgICAgICAgOiBhZTJkMzdmMjQzNDIxNGJlZGI2Y2I4ODdjOWFmZDM3OQogICAgICAgICAg
-ICAgICAgOiA1YzViNmVlNDg3ODQyODdjYjdkOTcwMGY5MzVmYTdmMwogICAgICAgICAgICAgICAg
-OiAzZmI2ZGNjODBmMDk1MWY4NmViM2UxMWUyNmJmNGVlNwogICAgICAgICAgICAgICAgOiBmOTZj
-Yjk5MTFmMTJhMmYwZGQ2NmMzM2Q0YzdlOWRjZQogICAgICAgICAgICAgICAgOiA3NWQ5NzIyMzNm
-MjQ0NGUxYmJjZDg2N2I5OGZjM2E5ZAogICAgICAgICAgICAgICAgOiA2ZGIyZTU0NjdlNDg4OGMy
-Nzc5YjBkZjczMGY5NzUzYQovLyBFbmQgb2YgUmVjb3JkCi8vLy8vLy8vLy8vLy8vLy8vLy8vLy8v
-Ly8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vCi8vIFN0YXJ0IG9mIFJlY29yZCA6IDYKLy8gQUVT
-IFhUUyBvcGVyYXRpb24gd2l0aCBDVFMKLy8gRW5jcnlwdAovLyBLZXkKLy8gS2V5MgovLyBpCi8v
-IFRleHQKLy8gTm8gaiBpbnB1dAovLyBPdXRwdXQgdGV4dApLICAgICAgICAgICAgICAgOiA1YTM4
-M2Y5YzBjNTMxNzZjNjA3MjIzMjZiYWZlYTFiNwogICAgICAgICAgICAgICAgOiAwM2E4ZmVhMDdj
-ZmY3ODRjN2Q4NDJmMjQ4NDc3ZWM2ZgpLMiAgICAgICAgICAgICAgOiA4OGM4MzZlMmNiNTIzY2I0
-MzlhYzM3ZmE0MThiYzQ1OQogICAgICAgICAgICAgICAgOiAyNDAzZTE1MWM5NTQ3ZGI3YTNkZTkx
-NDQ4ZDE2OTcyMgpIICAgICAgICAgICAgICAgOiBmYjdmM2Q2MDI2MGEzYTNkMDAwMDAwMDAwMDAw
-MDAwMApQICAgICAgICAgICAgICAgOiBmYjU2OTc2NTdjZDg2YzNjNWRkM2VhYTZhNDgzZjc5ZAog
-ICAgICAgICAgICAgICAgOiA5ZDg5MmM4NWI4ZDlkNGYwMWFhZApDICAgICAgICAgICAgICAgOiA3
-NjRmNjI4ZjQ2NTA5M2RjZWViMjkyMDA0ODU4MGYwYgogICAgICAgICAgICAgICAgOiBiMDQ3Yjk3
-MDFhYTM4MTE5MzRlZgpJViByZXMgICAgICAgICAgOiAwOWJlMDA4YzhhYzgyYTQ4NTQ5NTUwODA1
-ZGI4MjUyZAogICAgICAgICAgICAgICAgOiAxMjdjMDExODE1OTE1NTkwYTgyYWExMDBiYjcwNGI1
-YQovLyBFbmQgb2YgUmVjb3JkCi8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8v
-Ly8vLy8vLy8vLy8vCi8vIFN0YXJ0IG9mIFJlY29yZCA6IDcKLy8gQUVTIFhUUyBvcGVyYXRpb24g
-d2l0aCBDVFMKLy8gRW5jcnlwdAovLyBLZXkKLy8gS2V5MgovLyBpCi8vIFRleHQKLy8gTm8gaiBp
-bnB1dAovLyBPdXRwdXQgdGV4dApLICAgICAgICAgICAgICAgOiBjMGNmNTdhMjNjYTI0YmY2NWQz
-NjdiZDcxZDE2YzMyZgogICAgICAgICAgICAgICAgOiA1MGM2MGFiMmZkZTgyNGZjMzNjZjczZmRl
-MGU5YTVkMQpLMiAgICAgICAgICAgICAgOiA5OGZjZDYxNmRkZmQ2ZGFiNDRiYzM3OWRhYjViMWRm
-MgogICAgICAgICAgICAgICAgOiA2ZjVkYmU2YjE0MTRjNzc0YmI5MTI0NGI1MmNiNzgzMQpIICAg
-ICAgICAgICAgICAgOiA1Y2MxM2RiNmExNmEyZDFmMDAwMDAwMDAwMDAwMDAwMApQICAgICAgICAg
-ICAgICAgOiAwMjk1M2FhYmFjM2JjZGNkNjNjNzRjN2NlNTc1ZWUwMwogICAgICAgICAgICAgICAg
-OiA5NGM3ZmZlOGUwZTk4NjJhZDNjN2U0CkMgICAgICAgICAgICAgICA6IGQ1MDgzMjFhNWQ5M2Jj
-NjJkNjFlYzQ4ZjQyMTJlM2MxCiAgICAgICAgICAgICAgICA6IDBlYjU5OTBjNmI2NDFjNDBlMzBm
-NGYKSVYgcmVzICAgICAgICAgIDogNWMwZDg0MzY5NmZjNzE4Mjg1ZjViMDRlZDgxNGY0ZGQKICAg
-ICAgICAgICAgICAgIDogM2YxYTA4NmQyY2Y5ZTMwNDBiZWI2MTlkYjAyOWU4YmIKLy8gRW5kIG9m
-IFJlY29yZAovLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8v
-LwovLyBTdGFydCBvZiBSZWNvcmQgOiA4Ci8vIEFFUyBYVFMgb3BlcmF0aW9uIHdpdGggQ1RTCi8v
-IEVuY3J5cHQKLy8gS2V5Ci8vIEtleTIKLy8gaQovLyBUZXh0Ci8vIE5vIGogaW5wdXQKLy8gT3V0
-cHV0IHRleHQKSyAgICAgICAgICAgICAgIDogMGI1YjFkYzhiMTNmOGZjZDg3ZDI1ODI4MzZjNjM0
-ZmIKICAgICAgICAgICAgICAgIDogMDRlOGYxYjc5MTMwZGE3NTY2NGE3MjkwMDkzOTAyMTkKSzIg
-ICAgICAgICAgICAgIDogNjIyZGU5MjQ5NTBlODc0MzRjYzc5NmU0YzkzMTZhMTMKICAgICAgICAg
-ICAgICAgIDogMTYxMGVmMzQ5Yjk4MTlmMThiMTQzODNmZjg3NWNjNzYKSCAgICAgICAgICAgICAg
-IDogMGMyYzU1MmNkYTQwZTFhYjAwMDAwMDAwMDAwMDAwMDAKUCAgICAgICAgICAgICAgIDogYmU4
-NGQzZmVlNmI0Mjk2N2ZkMjk3ODQxM2RlOTgxNGUKICAgICAgICAgICAgICAgIDogM2NmOWY0ZjUz
-ZmQ4MGVjZDYzNzM2NWYzCkMgICAgICAgICAgICAgICA6IDVjYTEyMTUzOTZkY2ViMTNmOTkxMzE4
-YTY1YzYzMjRmCiAgICAgICAgICAgICAgICA6IGVhYTYzZTcwZDJmYTM3Y2Y5YmNiYzM0YQpJViBy
-ZXMgICAgICAgICAgOiA1NzcyZjRjN2E0N2Y5NGY4Yjc4ODE5Yzg4MjVjMTIwNAogICAgICAgICAg
-ICAgICAgOiBhZWU0ZTg4ZjQ5ZmYyOGYxNmYxMTMzOTAwNWI5MjQwOAovLyBFbmQgb2YgUmVjb3Jk
-Ci8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vCi8vIFN0
-YXJ0IG9mIFJlY29yZCA6IDkKLy8gQUVTIFhUUyBvcGVyYXRpb24gd2l0aCBDVFMKLy8gRW5jcnlw
-dAovLyBLZXkKLy8gS2V5MgovLyBpCi8vIFRleHQKLy8gTm8gaiBpbnB1dAovLyBPdXRwdXQgdGV4
-dApLICAgICAgICAgICAgICAgOiBkYzRjZGMyMGIxMzQ4OWE0ZDBiNjc3MDVlYTBjY2M2OAogICAg
-ICAgICAgICAgICAgOiBiMWQ2ZjdmZGE3MGE1YjgxMmQ0ZGEzNjVkMGFiYTEwMgpLMiAgICAgICAg
-ICAgICAgOiA4NTRiMzNlYTUxMTY1MDEyM2IyNWJhMTNiYTdjYmIzYQogICAgICAgICAgICAgICAg
-OiBlNGZkYjM5Yzg4OGJiODMwN2E5N2NmOTU1ZDY5N2IxZApIICAgICAgICAgICAgICAgOiBlNzY5
-ZWRkMjU0NWQ0YTI5MDAwMDAwMDAwMDAwMDAwMApQICAgICAgICAgICAgICAgOiAzNzIyMTE2MmEw
-NzQ5MjYyNDA0ZTJiMGE4YmFiZDgyOAogICAgICAgICAgICAgICAgOiA4YWQyZWJhNThlZTE0MmM4
-NDllZjlhZWMxYgpDICAgICAgICAgICAgICAgOiA1MTY0OWQ5MjQ2NjRlMWM2YjczODI2MmI3NDE0
-MjQzZAogICAgICAgICAgICAgICAgOiBiYTE3YzQ4ZjcyYzJhNDAxMzk0ODE5NzQ2OQpJViByZXMg
-ICAgICAgICAgOiAyYjczMDUwMjVlNjkzYzQ4ODBiNWEzZWQ2MjM1YWUxYQogICAgICAgICAgICAg
-ICAgOiA1NmU2MGEwNGJjZDI3ODkwMDA2YjQ3ZGJjNTZhNWMzNQovLyBFbmQgb2YgUmVjb3JkCi8v
-Ly8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vCi8vIFN0YXJ0
-IG9mIFJlY29yZCA6IDEwCi8vIEFFUyBYVFMgb3BlcmF0aW9uIHdpdGggQ1RTCi8vIEVuY3J5cHQK
-Ly8gS2V5Ci8vIEtleTIKLy8gaQovLyBUZXh0Ci8vIE5vIGogaW5wdXQKLy8gT3V0cHV0IHRleHQK
-SyAgICAgICAgICAgICAgIDogNzI5YWY1NTM1NWRkMGZlZmZjNzU2ZjAzODhjOGJhODgKICAgICAg
-ICAgICAgICAgIDogYjc2NTg5NWQwMzg2MjEyMmI4NDI4N2Q5YTk4MzllOWMKSzIgICAgICAgICAg
-ICAgIDogY2EyOGExZDJiNmQwYTY2Y2Y4NTc0MjdjNzNmYzdiMGEKICAgICAgICAgICAgICAgIDog
-YmMzYzU3N2I1YTM5NjE1NWI3MjVlOWYxYzRiYjA0MjgKSCAgICAgICAgICAgICAgIDogOGEzODIy
-YmFlYTVlMWRhNDAwMDAwMDAwMDAwMDAwMDAKUCAgICAgICAgICAgICAgIDogMDZmZGJiYTkyZTU2
-MDU1ZmYyYTczNjc2MjZkM2IzNDkKICAgICAgICAgICAgICAgIDogN2NlMmUzYmUxZjY1ZDIxNzY1
-ZTJiMzBlYjE5MwpDICAgICAgICAgICAgICAgOiA4NTgzZTA4YzBhNGU2OGIxZTQzZjY0MDMwYmY4
-NzI3NgogICAgICAgICAgICAgICAgOiBkZDllZTA5MmU2ZWQ3ZWZkZGQ4NjQ4YjE4ZTJkCklWIHJl
-cyAgICAgICAgICA6IDZmODM4OTM1YjYyNDA5ZWQ4NTNmNDExZTE4ZDM1YTJiCiAgICAgICAgICAg
-ICAgICA6IGRlMDYxMzZiNmM0OTEyZGEwYjdmODIzYzMwYTZiNTU2Ci8vIEVuZCBvZiBSZWNvcmQK
-Ly8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8KLy8gU3Rh
-cnQgb2YgUmVjb3JkIDogMTEKLy8gQUVTIFhUUyBvcGVyYXRpb24gd2l0aCBDVFMKLy8gRW5jcnlw
-dAovLyBLZXkKLy8gS2V5MgovLyBpCi8vIFRleHQKLy8gTm8gaiBpbnB1dAovLyBPdXRwdXQgdGV4
-dApLICAgICAgICAgICAgICAgOiBjZTA2NDU1MzI1ODFkMmIyZGRjOTU3ZmViYmY2ODMwNwogICAg
-ICAgICAgICAgICAgOiAyOGQ4MmFmZjUzZjg1N2M2NjM1MGQ0M2UyYTU0Mzc1MQpLMiAgICAgICAg
-ICAgICAgOiAwNzNiMjM2MzNjMzE1NzBkZDM1OTIwZjJkMDg1YWNjNQogICAgICAgICAgICAgICAg
-OiAzZmExNzQ5MDBhM2ZmNDEwMTJmMDFiMmJlZmNiODY3NApIICAgICAgICAgICAgICAgOiA2ZDNl
-NjI5NDc1NDM3NGVhMDAwMDAwMDAwMDAwMDAwMApQICAgICAgICAgICAgICAgOiA2YWU2YTM2Njdl
-NzhlZjQyOGIyODA4MjRkYWQ0ZDY0MgogICAgICAgICAgICAgICAgOiAzZGI2NDg3ZTUxYTY5MjY1
-OTg4NjI2OTgzNzQyYTUKQyAgICAgICAgICAgICAgIDogODQ0YjE0MWY4ZWJjZWRlMzk1MDg3ZDZl
-NWI2MmY5YmUKICAgICAgICAgICAgICAgIDogODIwODVkYTJmZWFjMzlmMzA1ZmEyNDc4ZjM5NjZl
-CklWIHJlcyAgICAgICAgICA6IDhkYTk1MzVhYzIzYjhkYTEyNTEzYTU2ZjVmYzc5OWI3CiAgICAg
-ICAgICAgICAgICA6IDlkNTNhN2I0ODQ3NzFhNDM0YjI2NGFkZmJlOGUzMzZmCi8vIEVuZCBvZiBS
-ZWNvcmQKLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8vLy8K
-
---_002_MN2PR20MB2973127E4C159A8F5CFDD0C9CAD70MN2PR20MB2973namp_--
+On 8/7/2019 11:58 PM, Pascal Van Leeuwen wrote:=0A=
+>> -----Original Message-----=0A=
+>> From: Horia Geanta <horia.geanta@nxp.com>=0A=
+>> Sent: Wednesday, August 7, 2019 5:52 PM=0A=
+>> To: Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>; Ard Biesheuvel=0A=
+>> <ard.biesheuvel@linaro.org>=0A=
+>> Cc: Milan Broz <gmazyland@gmail.com>; Herbert Xu <herbert@gondor.apana.o=
+rg.au>; dm-=0A=
+>> devel@redhat.com; linux-crypto@vger.kernel.org=0A=
+>> Subject: Re: [dm-devel] xts fuzz testing and lack of ciphertext stealing=
+ support=0A=
+>>=0A=
+>> On 7/26/2019 10:59 PM, Horia Geant=E3 wrote:=0A=
+>>> On 7/26/2019 1:31 PM, Pascal Van Leeuwen wrote:=0A=
+>>>> Ok, find below a patch file that adds your vectors from the specificat=
+ion=0A=
+>>>> plus my set of additional vectors covering all CTS alignments combined=
+=0A=
+>>>> with the block sizes you desired. Please note though that these vector=
+s=0A=
+>>>> are from our in-house home-grown model so no warranties.=0A=
+>>> I've checked the test vectors against caam (HW + driver).=0A=
+>>>=0A=
+>>> Test vectors from IEEE 1619-2007 (i.e. up to and including "XTS-AES 18"=
+)=0A=
+>>> are fine.=0A=
+>>>=0A=
+>>> caam complains when /* Additional vectors to increase CTS coverage */=
+=0A=
+>>> section starts:=0A=
+>>> alg: skcipher: xts-aes-caam encryption test failed (wrong result) on te=
+st vector 9,=0A=
+>> cfg=3D"in-place"=0A=
+>>>=0A=
+>> I've nailed this down to a caam hw limitation.=0A=
+>> Except for lx2160a and ls1028a SoCs, all the (older) SoCs allow only for=
+=0A=
+>> 8-byte wide IV (sector index).=0A=
+>>=0A=
+> I guess it's easy to say now, but I already suspected a problem with full=
+ 16 =0A=
+> byte random IV's. A problem with CTS itself seemed implausible due to the=
+ base=0A=
+> vectors from the spec running fine and I did happen to notice that all =
+=0A=
+> vectors from the spec only use up to the lower 40 bits of the sector numb=
+er.=0A=
+> While my vectors randomize all 16 bytes.=0A=
+> =0A=
+> So I guess that means that 16 byte multiples (i.e. not needing CTS) with=
+=0A=
+> full 16 byte sector numbers will probably also fail on caam HW ...=0A=
+> 	=0A=
+Yes, the limitation applies for all input sizes.=0A=
+=0A=
+It's actually mentioned in the commit that added xts support few years back=
+:=0A=
+c6415a6016bf ("crypto: caam - add support for acipher xts(aes)")=0A=
+=0A=
+    sector index - HW limitation: CAAM device supports sector index of only=
+=0A=
+    8 bytes to be used for sector index inside IV, instead of whole 16 byte=
+s=0A=
+    received on request. This represents 2 ^ 64 =3D 16,777,216 Tera of poss=
+ible=0A=
+    values for sector index.=0A=
+=0A=
+> As for the tweak size, with very close scrutiny of the IEEE spec I actual=
+ly=0A=
+> noticed some inconsistencies:=0A=
+> =0A=
+> - the text very clearly defines the tweak as 128 bit and starting from an=
+ =0A=
+> *arbitrary* non-negative integer, this is what I based my implementation =
+on=0A=
+> =0A=
+> - all text examples and test vectors max out at 40 bits ... just examples=
+,=0A=
+> but odd nonetheless (why 40 anyway?)=0A=
+> =0A=
+> - the example code fragment in Annex C actually has the S data unit numbe=
+r=0A=
+> input as an u64b, further commented as "64 bits" (but then loops 16 times=
+ to=0A=
+> convert it to a byte string ...)=0A=
+> =0A=
+The input I received from our HW design team was something like:=0A=
+=0A=
+- some P1619 drafts used LRW (instead of XTS), where the tweak "T"=0A=
+was 16B-wide=0A=
+=0A=
+- at some point P1619 drafts switched (and eventually standardized) XTS,=0A=
+where "T" is no longer the tweak - "i" is the (public) tweak, "T" being=0A=
+an intermediate (hidden) result in the encryption scheme=0A=
+=0A=
+- since for XTS "i" is supposed to be the sector number,=0A=
+there is no need to support 16B values - 8B being deemed sufficient=0A=
+=0A=
+Agree, limiting "i" (XTS tweak) to 8B is out-of-spec - irrespective of the=
+=0A=
+usefulness of the full 16B.=0A=
+That's why latest Freescale / NXP SoCs support 16B tweaks.=0A=
+=0A=
+Thanks,=0A=
+Horia=0A=
