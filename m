@@ -2,147 +2,127 @@ Return-Path: <SRS0=IdBJ=WE=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 905F5C433FF
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Aug 2019 03:46:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E7E2C0650F
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Aug 2019 04:35:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6162520880
-	for <linux-crypto@archiver.kernel.org>; Thu,  8 Aug 2019 03:46:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5D51B21743
+	for <linux-crypto@archiver.kernel.org>; Thu,  8 Aug 2019 04:35:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="caNdsK+H"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N2OTy1Y1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387536AbfHHDqy (ORCPT
+        id S1726106AbfHHEfh (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 7 Aug 2019 23:46:54 -0400
-Received: from hqemgate16.nvidia.com ([216.228.121.65]:14417 "EHLO
-        hqemgate16.nvidia.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728167AbfHHDqy (ORCPT
+        Thu, 8 Aug 2019 00:35:37 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:41353 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726047AbfHHEfg (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 7 Aug 2019 23:46:54 -0400
-Received: from hqpgpgate101.nvidia.com (Not Verified[216.228.121.13]) by hqemgate16.nvidia.com (using TLS: TLSv1.2, DES-CBC3-SHA)
-        id <B5d4b9b2c0000>; Wed, 07 Aug 2019 20:46:53 -0700
-Received: from hqmail.nvidia.com ([172.20.161.6])
-  by hqpgpgate101.nvidia.com (PGP Universal service);
-  Wed, 07 Aug 2019 20:46:51 -0700
-X-PGP-Universal: processed;
-        by hqpgpgate101.nvidia.com on Wed, 07 Aug 2019 20:46:51 -0700
-Received: from ngvpn01-164-84.dyn.scz.us.nvidia.com (172.20.13.39) by
- HQMAIL107.nvidia.com (172.20.187.13) with Microsoft SMTP Server (TLS) id
- 15.0.1473.3; Thu, 8 Aug 2019 03:46:50 +0000
-Subject: Re: [PATCH 00/34] put_user_pages(): miscellaneous call sites
-To:     Ira Weiny <ira.weiny@intel.com>, Michal Hocko <mhocko@kernel.org>
-CC:     Jan Kara <jack@suse.cz>, Matthew Wilcox <willy@infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Chinner <david@fromorbit.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        <amd-gfx@lists.freedesktop.org>, <ceph-devel@vger.kernel.org>,
-        <devel@driverdev.osuosl.org>, <devel@lists.orangefs.org>,
-        <dri-devel@lists.freedesktop.org>,
-        <intel-gfx@lists.freedesktop.org>, <kvm@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-block@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <linux-fbdev@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
-        <linux-media@vger.kernel.org>, <linux-mm@kvack.org>,
-        <linux-nfs@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-        <linux-rpi-kernel@lists.infradead.org>,
-        <linux-xfs@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <rds-devel@oss.oracle.com>, <sparclinux@vger.kernel.org>,
-        <x86@kernel.org>, <xen-devel@lists.xenproject.org>
-References: <20190802022005.5117-1-jhubbard@nvidia.com>
- <20190802091244.GD6461@dhcp22.suse.cz>
- <20190802124146.GL25064@quack2.suse.cz>
- <20190802142443.GB5597@bombadil.infradead.org>
- <20190802145227.GQ25064@quack2.suse.cz>
- <076e7826-67a5-4829-aae2-2b90f302cebd@nvidia.com>
- <20190807083726.GA14658@quack2.suse.cz>
- <20190807084649.GQ11812@dhcp22.suse.cz>
- <20190808023637.GA1508@iweiny-DESK2.sc.intel.com>
-From:   John Hubbard <jhubbard@nvidia.com>
-X-Nvconfidentiality: public
-Message-ID: <e648a7f3-6a1b-c9ea-1121-7ab69b6b173d@nvidia.com>
-Date:   Wed, 7 Aug 2019 20:46:50 -0700
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
- Gecko/20100101 Thunderbird/60.8.0
+        Thu, 8 Aug 2019 00:35:36 -0400
+Received: by mail-wr1-f65.google.com with SMTP id c2so90241961wrm.8
+        for <linux-crypto@vger.kernel.org>; Wed, 07 Aug 2019 21:35:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=Ngm09LcMWzK5Dpc9mQ1Xk+4OLg15tMcivduX4L7QMO0=;
+        b=N2OTy1Y1W5JEwy50H3DYwWXRE1DG6Zz4YMq0BRiabmlp83mWlQ0niuBPZKD+5rcfjQ
+         3nvU6mw7vLOHTupA6v0h/NMirWqtWbfOZ17E/oGoUIjvTWOCS3+lhJAINaaLPnveBVw7
+         neX6K329hVRE80GCDTX7fOe22JramM4Pwo7pBaVU3Yg7TEaTENlKKKprKvTku6w8ccnU
+         zs7XAXDIq08HqPqLpZt/SW3V9Vq5p+QZ+dWo/YXNixx+YNhejwPDjMv02SUVvE5rXKGg
+         Uu9dDXfgDkpvPDJc/8c2MjRliteNhLaZVNNs2h1lVM2ZHfpkw/JLbKa5Nm0MXUPpMKZi
+         r9WQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Ngm09LcMWzK5Dpc9mQ1Xk+4OLg15tMcivduX4L7QMO0=;
+        b=L2IQmOIoeTaHVafZ0cSacm8Jy7/KrZadlJyU2tKgxoh0Xjo8D2DrCeklWDvgDH37Sq
+         zebHBHbfhH5lWl+VAwj03hWuSAHXtvERXJ6kqTG6tPpuXtftFDE8XVMFuHpoPGkUpz+f
+         Q7nGmwq1Bpl09RARfcw1m53yGoRbxSfWIusj+G+CmPeH95laRGNQWIpsRnq6Cn/wwHQf
+         q5urvwgmk+qj7BE5oHRh/XYhhtKcXtE6Ba5xZQTgmpjzsFz8CLZKhwAieC3hvaYrNqst
+         plHxKmAH98On8fmW4V55QwamI9tgpuSS15n1qHKzACo9s5Q6tZJd9ZO+qWeFLJ5WNztx
+         foZw==
+X-Gm-Message-State: APjAAAX79Tia9fpOtCfnd1blIBdFf9J5KNtGWS4wtcro8YktK6TC3nuP
+        NUaeiyfprQ/8VZ/uivVWK7U=
+X-Google-Smtp-Source: APXvYqzkdeImeQ2ZII/p/z1QPMwTwTN9r8z0sz3/k18Z4407VxqjxihlE06NeP/y8hQTOeiaFrVC5Q==
+X-Received: by 2002:adf:f2c4:: with SMTP id d4mr13928897wrp.3.1565238934782;
+        Wed, 07 Aug 2019 21:35:34 -0700 (PDT)
+Received: from [192.168.2.28] (39.35.broadband4.iol.cz. [85.71.35.39])
+        by smtp.gmail.com with ESMTPSA id z7sm1001192wmg.22.2019.08.07.21.35.33
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Wed, 07 Aug 2019 21:35:34 -0700 (PDT)
+Subject: Re: [PATCH] crypto: xts - Add support for Cipher Text Stealing
+To:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>,
+        =?UTF-8?B?T25kcmVqIE1vc27DocSNZWs=?= <omosnacek@gmail.com>
+Cc:     Pascal van Leeuwen <pascalvanl@gmail.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "rsnel@cube.dyndns.org" <rsnel@cube.dyndns.org>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>
+References: <1565074510-8480-1-git-send-email-pvanleeuwen@verimatrix.com>
+ <5bf9d0be-3ba4-8903-f1b9-93aa32106274@gmail.com>
+ <MN2PR20MB29734CFE2795639436C3CC91CAD50@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <MN2PR20MB2973A38A300804281CA6A109CAD40@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <a0e3ce44-3e47-b8d9-2152-3fd8ba99f09a@gmail.com>
+ <MN2PR20MB297333F0024F94C647D71AA2CAD40@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <52a11506-0047-a7e7-4fa0-ba8d465b843c@gmail.com>
+ <MN2PR20MB2973C4EAF89D158B779CDBDACAD40@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <46f76b06-004e-c08a-3ef3-4ba9fdc61d91@gmail.com>
+ <CAAUqJDuMUHqd4J7TNRbMiEDNeb_GCJPhJUQJoOJo5zXKmL72nQ@mail.gmail.com>
+ <MN2PR20MB297367EE650DBA3308ADD134CAD40@MN2PR20MB2973.namprd20.prod.outlook.com>
+From:   Milan Broz <gmazyland@gmail.com>
+Openpgp: preference=signencrypt
+Message-ID: <fcf6c4b2-b871-6fdc-7803-f94134148299@gmail.com>
+Date:   Thu, 8 Aug 2019 06:35:33 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <20190808023637.GA1508@iweiny-DESK2.sc.intel.com>
-X-Originating-IP: [172.20.13.39]
-X-ClientProxiedBy: HQMAIL107.nvidia.com (172.20.187.13) To
- HQMAIL107.nvidia.com (172.20.187.13)
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <MN2PR20MB297367EE650DBA3308ADD134CAD40@MN2PR20MB2973.namprd20.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
-        t=1565236013; bh=oa/UlzMF1BY8hfwSUK2E34E4BK86wv0rI2GL87o8kWQ=;
-        h=X-PGP-Universal:Subject:To:CC:References:From:X-Nvconfidentiality:
-         Message-ID:Date:User-Agent:MIME-Version:In-Reply-To:
-         X-Originating-IP:X-ClientProxiedBy:Content-Type:Content-Language:
-         Content-Transfer-Encoding;
-        b=caNdsK+H718e8IaMHboxAo7N5kSDjdO0aPPP7qMD/uXC6LIuseTU5yocCYztoyhLS
-         A8theOeNn9DFbaKSyltNZVy/0B3VPZPEr/7HwHnfipqBI1W9E/1RXgk4cYboMCcd2v
-         K1AubOjDxM7RJmlTd1q1ZO/DARZkbUQqfdDa7AtzCGn8CgjUMfboXlhtit5supcfVJ
-         t3SF5BlWoOZ+ktHQ+Gy0QbysjhXaepl4K0zI9Pv3YsYauPp0cOOqMsTfKIdJYZp847
-         qDjXLEk745BEl9a58mwF6yYg4Z7StCZBL718mfzBDBCPCwNZsIoTbJbWCkazTDd50+
-         NvHzitKycTv2g==
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 8/7/19 7:36 PM, Ira Weiny wrote:
-> On Wed, Aug 07, 2019 at 10:46:49AM +0200, Michal Hocko wrote:
->> On Wed 07-08-19 10:37:26, Jan Kara wrote:
->>> On Fri 02-08-19 12:14:09, John Hubbard wrote:
->>>> On 8/2/19 7:52 AM, Jan Kara wrote:
->>>>> On Fri 02-08-19 07:24:43, Matthew Wilcox wrote:
->>>>>> On Fri, Aug 02, 2019 at 02:41:46PM +0200, Jan Kara wrote:
->>>>>>> On Fri 02-08-19 11:12:44, Michal Hocko wrote:
->>>>>>>> On Thu 01-08-19 19:19:31, john.hubbard@gmail.com wrote:
-  [...]
-> Before I go on, I would like to say that the "imbalance" of get_user_pages()
-> and put_page() bothers me from a purist standpoint...  However, since this
-> discussion cropped up I went ahead and ported my work to Linus' current master
-> (5.3-rc3+) and in doing so I only had to steal a bit of Johns code...  Sorry
-> John...  :-(
-> 
-> I don't have the commit messages all cleaned up and I know there may be some
-> discussion on these new interfaces but I wanted to throw this series out there
-> because I think it may be what Jan and Michal are driving at (or at least in
-> that direction.
-> 
-> Right now only RDMA and DAX FS's are supported.  Other users of GUP will still
-> fail on a DAX file and regular files will still be at risk.[2]
-> 
-> I've pushed this work (based 5.3-rc3+ (33920f1ec5bf)) here[3]:
-> 
-> https://github.com/weiny2/linux-kernel/tree/linus-rdmafsdax-b0-v3
-> 
-> I think the most relevant patch to this conversation is:
-> 
-> https://github.com/weiny2/linux-kernel/commit/5d377653ba5cf11c3b716f904b057bee6641aaf6
-> 
+Hi,
 
-ohhh...can you please avoid using the old __put_user_pages_dirty()
-function? I thought I'd caught things early enough to get away with
-the rename and deletion of that. You could either:
+On 07/08/2019 23:13, Pascal Van Leeuwen wrote:
+>> It is a bit confusing, but it is the only reasonable way to support
+>> variably sized context and at the same time keep the whole request in
+>> a single allocation.
 
-a) open code an implementation of vaddr_put_pages_dirty_lock() that
-doesn't call any of the *put_user_pages_dirty*() variants, or
+Yes, and the reason here it was detected only for aesni_intel is that
+it is submitted though more layers, these depends on variable context length
+(at least it run through crypt_simd layer).
 
-b) include my first patch ("") are part of your series, or
+I think all other implementations on this 32bit machine were called directly,
+so no corruption seen there.
 
-c) base this on Andrews's tree, which already has merged in my first patch.
+> Ah, ok, I did not know anything about that ... so there's really no way
+> I could've done this correctly or to have found the problem myself really.
+> Good that it's resolved now, though.
+> 
+> I fixed a couple of other minor things already, is it OK if I roll this
+> into an update to my original patch?
 
+Sure, feel free to fold in my change in v2 patch.
+I'll test it and provide Tested-by later.
 
-thanks,
--- 
-John Hubbard
-NVIDIA
+Maybe it would be good to also include /* must be the last */ comment
+to the req in struct, though.
+
+Also, maybe this req should have CRYPTO_MINALIGN_ATTR attribute also?
+
+I expect req can be run through exotic hw accelerators later with some
+memory alignment requirements. Ondra will know better here, though ;-)
+
+Thanks!
+Milan
