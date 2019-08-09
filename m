@@ -2,190 +2,127 @@ Return-Path: <SRS0=Ue/q=WF=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF983C433FF
-	for <linux-crypto@archiver.kernel.org>; Fri,  9 Aug 2019 11:38:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06107C433FF
+	for <linux-crypto@archiver.kernel.org>; Fri,  9 Aug 2019 11:39:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B4DB321880
-	for <linux-crypto@archiver.kernel.org>; Fri,  9 Aug 2019 11:38:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B262F21743
+	for <linux-crypto@archiver.kernel.org>; Fri,  9 Aug 2019 11:39:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="F4jCspHo"
+	dkim=pass (1024-bit key) header.d=verimatrix.com header.i=@verimatrix.com header.b="WQ6ERYR6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726164AbfHILik (ORCPT
+        id S2406567AbfHILjR (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 9 Aug 2019 07:38:40 -0400
-Received: from mailout2.w1.samsung.com ([210.118.77.12]:59138 "EHLO
-        mailout2.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726037AbfHILik (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 9 Aug 2019 07:38:40 -0400
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20190809113835euoutp0203cf6a40c6ba20e7419068b4b083de35~5Pi6zKulA2402024020euoutp02V;
-        Fri,  9 Aug 2019 11:38:35 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20190809113835euoutp0203cf6a40c6ba20e7419068b4b083de35~5Pi6zKulA2402024020euoutp02V
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1565350715;
-        bh=ciOb6spUFxEopuASAxMYr4OicRDjbbeUQNl3/3W2RC0=;
-        h=Subject:To:Cc:From:Date:In-Reply-To:References:From;
-        b=F4jCspHo1ZNymcum0RJ4SAewCj16GaDlAVZIDT2iz4G3oLIcVNFv7QZq1tB9+Mno+
-         zjxkidwYaZ/byaK+48GmSjpyd4EP3CVVtb2hsnlR4r3Xd9Txb3fjCp02LLNQjfvbhA
-         LfZtr2jIlfH7OXIPbRApNOZfFUcXc5fICbOu4WY0=
-Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
-        20190809113835eucas1p164d330c27bd3a49537b7450fadf60f2f~5Pi6eb4BE0165101651eucas1p1R;
-        Fri,  9 Aug 2019 11:38:35 +0000 (GMT)
-Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
-        eusmges3new.samsung.com (EUCPMTA) with SMTP id 1E.84.04374.B3B5D4D5; Fri,  9
-        Aug 2019 12:38:35 +0100 (BST)
-Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-        20190809113834eucas1p1ff05719f819b28ade78ac677ea76b915~5Pi5VNrUE2548825488eucas1p1t;
-        Fri,  9 Aug 2019 11:38:34 +0000 (GMT)
-Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
-        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20190809113833eusmtrp1d0d26c18325a624784804f5dcd2b3a9f~5Pi5F7Mcq0891408914eusmtrp1l;
-        Fri,  9 Aug 2019 11:38:33 +0000 (GMT)
-X-AuditID: cbfec7f5-4f7ff70000001116-2d-5d4d5b3beff2
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-        eusmgms1.samsung.com (EUCPMTA) with SMTP id A2.7E.04166.93B5D4D5; Fri,  9
-        Aug 2019 12:38:33 +0100 (BST)
-Received: from [106.120.51.71] (unknown [106.120.51.71]) by
-        eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-        20190809113832eusmtip25484f3be8e362eb8076e0844f903c912~5Pi3tqsfV0444004440eusmtip2N;
-        Fri,  9 Aug 2019 11:38:32 +0000 (GMT)
-Subject: Re: [PATCH v3 20/41] fbdev/pvr2fb: convert put_page() to
- put_user_page*()
-To:     john.hubbard@gmail.com
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Chinner <david@fromorbit.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        amd-gfx@lists.freedesktop.org, ceph-devel@vger.kernel.org,
-        devel@driverdev.osuosl.org, devel@lists.orangefs.org,
-        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
-        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-fbdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-mm@kvack.org,
-        linux-nfs@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-rpi-kernel@lists.infradead.org, linux-xfs@vger.kernel.org,
-        netdev@vger.kernel.org, rds-devel@oss.oracle.com,
-        sparclinux@vger.kernel.org, x86@kernel.org,
-        xen-devel@lists.xenproject.org, John Hubbard <jhubbard@nvidia.com>,
-        Kees Cook <keescook@chromium.org>,
-        Al Viro <viro@zeniv.linux.org.uk>,
-        Bhumika Goyal <bhumirks@gmail.com>,
-        Arvind Yadav <arvind.yadav.cs@gmail.com>
-From:   Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
-Message-ID: <1f1656b4-3411-3237-726f-8fb7b73ae363@samsung.com>
-Date:   Fri, 9 Aug 2019 13:38:31 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-        Thunderbird/60.6.1
-MIME-Version: 1.0
-In-Reply-To: <20190807013340.9706-21-jhubbard@nvidia.com>
+        Fri, 9 Aug 2019 07:39:17 -0400
+Received: from mail-eopbgr730043.outbound.protection.outlook.com ([40.107.73.43]:58386
+        "EHLO NAM05-DM3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S2406551AbfHILjR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 9 Aug 2019 07:39:17 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=OuV2QgjvwdDgacwkmPWv6YGi+odixHogcsGtZDvCkdk5BDoDoxMddTPMUJ4nWSjjsShF2WuvNaI/c6fKu+tm1vsO4URVYGCviLUH12mzitGAvppDMN8FMjrMGO6k/yCCULDAkc9J/S9V/SV1eriK5H9PJAC4ZnI7cVdYyVKiJL9gqTcNly6VzwjTfm7tIqIJLVbdl/mHq+W+aYzeG6qiXvGz5CSfOezBsWxGRPrEIzZjEInC3eXEw2sqD2z1in2ETwwkg7O+Zwk9FlXSle+BQt+Jt3XBFgz8QVetRePmsSIBB2p4Zbf/hWgHD7x7i/kQaBzx7Ptr355Hohxf7mcbqA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jsyocIw1Ej3rIis2VyqiMYLFwxO66VrZPkXK7P+zx0k=;
+ b=Ez2F8Va+4ro92Sp2RCM+kp6fshcR8t64wJmfOKuuBPWmsBrdkA01C7gN8YtIQdxzyRBAg3SFzPGgqZBzSl8dwaqHKaNKweClgvmsbwjoB1HVnrFgfntafdrI2JJ+KU9QPoTOSeyqVSZ2+VJ67HumGBkqfEk8hi+4NXWhJcAe3MFFB3hMTr2RVfubWTHcgxuMUSQwU+OL6g64QqJZeRRbiPeijM1IKtTTjzr28upRr3K88/mfrHIH7M5CdQEoRSa4EAIixbnCzsY/cogAe74hdWgrQiYrmCc+RXspRGEKVFj3xquCbXYA9j7KOrB2g7IDAXUqgahG1sen4MiJLVVewA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=verimatrix.com; dmarc=pass action=none
+ header.from=verimatrix.com; dkim=pass header.d=verimatrix.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verimatrix.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jsyocIw1Ej3rIis2VyqiMYLFwxO66VrZPkXK7P+zx0k=;
+ b=WQ6ERYR6lSnD931iozKEwFEo8lAnEJZu1xe2bXgDzaomcQ1xJoQEg/h8swhXUyMyiQoxdiYtr4BcGF7Ii6d6sSE42m5h/zR7i4RxkMWwzivGj6q3CpocwT0AJRHTr1/6Z/uEtZ2rxi3WO0uzeE0ZeC50IwxxlkbbOoKyiytaNoo=
+Received: from MN2PR20MB2973.namprd20.prod.outlook.com (52.132.172.146) by
+ MN2PR20MB2845.namprd20.prod.outlook.com (20.178.253.150) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2157.16; Fri, 9 Aug 2019 11:39:12 +0000
+Received: from MN2PR20MB2973.namprd20.prod.outlook.com
+ ([fe80::d96f:39b2:19f4:c7c1]) by MN2PR20MB2973.namprd20.prod.outlook.com
+ ([fe80::d96f:39b2:19f4:c7c1%7]) with mapi id 15.20.2157.020; Fri, 9 Aug 2019
+ 11:39:12 +0000
+From:   Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+To:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        Eric Biggers <ebiggers@kernel.org>
+Subject: XTS template wrapping question
+Thread-Topic: XTS template wrapping question
+Thread-Index: AdVOpvQVifejpBWTRVyvNwtV/QL5zQ==
+Date:   Fri, 9 Aug 2019 11:39:12 +0000
+Message-ID: <MN2PR20MB2973BB8A78D663C6A3D6A223CAD60@MN2PR20MB2973.namprd20.prod.outlook.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA02TfUxTVxjGd+53O8uuBcYJui02fs1F3aLLXsfGXObiNY6o0UQzZbOTm2JG
-        q7ZW5wxZWZOpIBsFG6RtHOsmXyrUtlPsUExJWqBYcRKiTMsyBBmIVhwiCDrKHRn//c7zPs/7
-        8cfhSOUIk8zt1O0V9Tp1loqRU+cCI1cXp2xNS3+zzyIDR81pBk7W5LDQnv8TCYORHxiI3iwk
-        oNjaiqDXdQiBNxBBUNcyykK95xgBbUMPGAgVOAmwF3gIqO++S4G92ExAyfFGNEG9BJztdrLQ
-        fFkHLXlacFj3gLurnYaLHW9AZ2SEgMbvozTUXWyi4LrPwcBR1680RE4/p6H1coiGHn8+BZY/
-        XCz4xmpZCJS+DGHPIxpMTRU0XB0P0vDE1UXDsLeIWLlAsJuuUULkUgMlNDuxcMF2mxU8FYuE
-        n+v+JgR31RFGcA8WskLj8aeUcKJpg9CZFyQEzy/fCCZrByM0RNsoId98nxFay+4x6xM/lb+X
-        IWbt3Cfql6Zul2eOdRcTu6+8+JWzb5wxoVuyXCTjML8cO6usZIyVfAXCd/uTcpF8gv9BuLrQ
-        S0mPRwhHwy30VOL5/QYkJcoRPjO0XDINIHyqpXLSFM9vwnn1FirGCXwyDpcN0zETyffJcDRU
-        ysYKDP8uthyqmuyk4FNxyeMTRC7iOIqfi3uc62JyIr8FdwZctGSZiZtK7kz2lPEr8M171ZNt
-        SD4Jd9z5kZD4NXx+wEHGZmE+IsOu3zyktPUq7HNXIInjcV/Qy0o8G4eKjlJSoBrh8cO9/6XP
-        I1xe9IyRXCm4IXiNjm1H8q/jGt9SSf4Qh59GmJiM+Th8Y2CmtEQcLjxXTEqyAh/+Tim552NX
-        mYuZGpt7oZIsQCrbtNNs086xTTvH9v/cUkRVoSTRaNBqRMMynbh/iUGtNRh1miU7dmndaOJD
-        hJ4Fh2rRpbEv/IjnkGqGwjTnk3Qlrd5nOKD1I8yRqgRFG5eWrlRkqA98Lep3fa43ZokGP5rF
-        UaokxcEX/tyq5DXqveKXorhb1E9VCU6WbELV9tTrlg17nJqxUILm4w/Mt0rtgXcs+7dZj/Q/
-        nKU522zNijNnZx6rNG/b/urgbbsiSHw2I/vBvJyXcjr/ypFTa953Zhu9K1albmE3r155I1C+
-        8Qno1ywMP/xo+Hds9H27cV1oYXuGvz/Fspbumfv26OgrJ1cv6xnkuhy1O9amxc9OVFGGTPVb
-        i0i9Qf0vm535fAwEAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA02SbUxTVxiAc+53mTV3BfTIpmCHmvhRVxD71rhu2X54YzTbMmOm2GiHN1Cl
-        LfYWNrfEdUGDgGzg+JC2YawOwgiT0ooioUPLpCBMwTEScas/ED+ZNuhkOhxrbUz495zzPk9O
-        TvJypOIYk8QZzTbRajbkKpk4auC/YGiNNnOr/s3Dfg24WlsYaGj9ioXRsu9JmAp9w0D42nEC
-        aqqGENzxFCE43RtC0DX4jIVuXyUBI38/ZGCg3E2As9xHQPfEbQqcNYUE1J7oQxG6Q0DbhJuF
-        S+fNMFhqAlfVAfCOj9LgH1sFN0JPCej7OkxDl7+fgt86XQwc87TTEGqZpWHo/AANtwJlFFRc
-        97DQOdPBQm/9Arjse0SDvb+JhivPgzT84xmnYfr0t8Q7KwSnfZgSQj/3UMIlNxbOOf5kBV/T
-        SuFk111C8DYXM4J36jgr9J34lxLq+j8UbpQGCcH3w5eCvWqMEXrCI5RQVviAEYYaJ5kPEneq
-        Nlot+TYxJcci2d5SZqohTaXWgiptnValTtfoN6RlKNfqNu4Vc40FonWtbo8qZ2aihsj79ZXP
-        3PeeM3b0h6wEyTjMr8OzD3pQCYrjFHwDws8aGyIHLjJ4HQdbC2JOPJ4ZLWFizn2Ep6uDKDqI
-        57fh0u4KKsoJfBK+3DhNRyWSn5Th6qFfiFjRifBU+2MmajH8BlxR1PyilvM6XPukjoi+RvGp
-        +Jb7/eh1Iv8xHnzYRMWUV3F/7c0XLOO1+NrkKTbKJL8Cz9RdJWO8EI/d/I6IcTI++5eLLEcK
-        x5zcMSdxzEkcc5J6RDWjBDFfMmWbJLVKMpikfHO2Ksti8qLIJp7pferrQFfbPgognkPKeXL7
-        0i16BW0okA6aAghzpDJBPsJt1Svkew0HPxetlt3W/FxRCqCMyN8qyKTELEtkr8223eoMtQa0
-        ak26Jn09KBfKj/IXdin4bINN3C+KeaL1ZUdwsiQ7emPe2K5FR+zJhf7h5mUp21sWHyKu3C20
-        fjJ5XTPwZHP8uympgUypM1y5+bWWYuUXxpx9QclZbKz/Pfnx4cXoovHkGo/ZoF++I8Fl0507
-        ui1U+XaKM7y+J7XL/ukZuiHrYkfm8I8/+TctKaredKBt/nurb5/Sld6LGz+U184umPV6HjFK
-        SsoxqFeSVsnwP1w/tA+fAwAA
-X-CMS-MailID: 20190809113834eucas1p1ff05719f819b28ade78ac677ea76b915
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20190807013420epcas1p1a38f499e39127e66501040b7e9e788ba
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20190807013420epcas1p1a38f499e39127e66501040b7e9e788ba
-References: <20190807013340.9706-1-jhubbard@nvidia.com>
-        <CGME20190807013420epcas1p1a38f499e39127e66501040b7e9e788ba@epcas1p1.samsung.com>
-        <20190807013340.9706-21-jhubbard@nvidia.com>
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=pvanleeuwen@verimatrix.com; 
+x-originating-ip: [188.204.2.113]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 537af8c5-0861-41b0-d95e-08d71cbe335d
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:MN2PR20MB2845;
+x-ms-traffictypediagnostic: MN2PR20MB2845:
+x-ms-exchange-purlcount: 1
+x-microsoft-antispam-prvs: <MN2PR20MB28455475334FDCA73927ABE8CAD60@MN2PR20MB2845.namprd20.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-forefront-prvs: 01244308DF
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(346002)(136003)(396003)(366004)(39850400004)(376002)(199004)(189003)(55016002)(3480700005)(7736002)(305945005)(5660300002)(53936002)(9686003)(71190400001)(74316002)(86362001)(15974865002)(71200400001)(52536014)(25786009)(66066001)(476003)(2201001)(6116002)(486006)(186003)(8936002)(110136005)(81166006)(81156014)(8676002)(14454004)(316002)(7696005)(3846002)(99286004)(33656002)(256004)(66446008)(478600001)(102836004)(66556008)(64756008)(66476007)(76116006)(66946007)(2906002)(6506007)(6436002)(2501003)(26005)(18886075002);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR20MB2845;H:MN2PR20MB2973.namprd20.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: verimatrix.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: U0bDRN0cJU23wv12u/7xNRvl1Ou9/4gidvuFs4ityZf9U5LbeR+wM4cva5CTnsHTAp8ytpyIyps3bVt1u+HG58umuIpiV+7pYDYf/MAB1nfK8GS0CmqVviCrlI5r0k7ftt8zsbaFvBCX1ScbvaozrWRdcskxuO70nfJeK57UmDG8rnN3knzKb6pavjCW7WGuPlHYLiOgR3idPcDlT8aC6S0o4cA9FYhw8P7LJw/OSHWOlUT/lF72x0ApJI4JCNLWIj/Q69TFWf3vvX7g0LsDD+IsgNIy1EPARU6JZ1Y41gayMQMMLPJTGjM/RRQXtjuTsBRH8NuIJg7ghNSpIsnshuRVgS1n2zRxd6daeyZDqXTSiGKHtWne5jLZqxIuG1jAg/WqWOQhonCdrUUKgPPXC4tZ5EvWP951Uqg6pfE63XI=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: verimatrix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 537af8c5-0861-41b0-d95e-08d71cbe335d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Aug 2019 11:39:12.6377
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: dcb260f9-022d-4495-8602-eae51035a0d0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: uEaoBUkjbdOVQkzY6rhTOVeuiEPNm02r8JVl1qWHdeivXUkovd4MCC8/us1pbDcqcgCga5VJfelrVAnFCpxDvMDpRc4xV0Pd1/vt7ge/8Rs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR20MB2845
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Herbert, Eric,
 
-On 8/7/19 3:33 AM, john.hubbard@gmail.com wrote:
-> From: John Hubbard <jhubbard@nvidia.com>
-> 
-> For pages that were retained via get_user_pages*(), release those pages
-> via the new put_user_page*() routines, instead of via put_page() or
-> release_pages().
-> 
-> This is part a tree-wide conversion, as described in commit fc1d8e7cca2d
-> ("mm: introduce put_user_page*(), placeholder versions").
-> 
-> Cc: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
-> Cc: Kees Cook <keescook@chromium.org>
-> Cc: Al Viro <viro@zeniv.linux.org.uk>
-> Cc: Bhumika Goyal <bhumirks@gmail.com>
-> Cc: Arvind Yadav <arvind.yadav.cs@gmail.com>
-> Cc: dri-devel@lists.freedesktop.org
-> Cc: linux-fbdev@vger.kernel.org
-> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+While working on the XTS template, I noticed that it is being used=20
+(e.g. from testmgr, but also when explictly exported from other drivers)
+as e.g. "xts(aes)", with the generic driver actually being=20
+"xts(ecb(aes-generic))".=20
 
-Acked-by: Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+While what I would expect would be "xts(ecb(aes))", the reason being
+that plain "aes" is defined as a single block cipher while the XTS
+template actually efficiently wraps an skcipher (like ecb(aes)).
+The generic driver reference actually proves this point.
 
-Best regards,
---
-Bartlomiej Zolnierkiewicz
-Samsung R&D Institute Poland
-Samsung Electronics
+The problem with XTS being used without the ecb template in between,
+is that hardware accelerators will typically advertise an ecb(aes)
+skcipher and the current approach makes it impossible to leverage
+that for XTS (while the XTS template *could* actually do that
+efficiently, from what I understand from the code ...).
+Advertising a single block "aes" cipher from a hardware accelerator
+unfortunately defeats the purpose of acceleration.
 
-> ---
->  drivers/video/fbdev/pvr2fb.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/drivers/video/fbdev/pvr2fb.c b/drivers/video/fbdev/pvr2fb.c
-> index 7ff4b6b84282..0e4f9aa6444d 100644
-> --- a/drivers/video/fbdev/pvr2fb.c
-> +++ b/drivers/video/fbdev/pvr2fb.c
-> @@ -700,8 +700,7 @@ static ssize_t pvr2fb_write(struct fb_info *info, const char *buf,
->  	ret = count;
->  
->  out_unmap:
-> -	for (i = 0; i < nr_pages; i++)
-> -		put_page(pages[i]);
-> +	put_user_pages(pages, nr_pages);
->  
->  	kfree(pages);
+I also wonder what happens if aes-generic is the only AES=20
+implementation available? How would the crypto API know it needs to=20
+do "xts(aes)" as "xts(ecb(aes))" without some explicit export?
+(And I don't see how xts(aes) would work directly, considering=20
+that only seems to handle single cipher blocks? Or ... will
+the crypto API actually wrap some multi-block skcipher thing=20
+around the single block cipher instance automatically??)
+
+Regards,
+Pascal van Leeuwen
+Silicon IP Architect, Multi-Protocol Engines @ Verimatrix
+www.insidesecure.com
+
