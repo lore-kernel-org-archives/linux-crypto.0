@@ -6,45 +6,45 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B11BFC31E40
-	for <linux-crypto@archiver.kernel.org>; Fri,  9 Aug 2019 21:49:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67175C433FF
+	for <linux-crypto@archiver.kernel.org>; Fri,  9 Aug 2019 21:55:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7831220B7C
-	for <linux-crypto@archiver.kernel.org>; Fri,  9 Aug 2019 21:49:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 22E102089E
+	for <linux-crypto@archiver.kernel.org>; Fri,  9 Aug 2019 21:55:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=verimatrix.com header.i=@verimatrix.com header.b="OtJ26TqV"
+	dkim=pass (1024-bit key) header.d=verimatrix.com header.i=@verimatrix.com header.b="MV3NVQXa"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726263AbfHIVtG (ORCPT
+        id S1726652AbfHIVzp (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 9 Aug 2019 17:49:06 -0400
-Received: from mail-eopbgr790045.outbound.protection.outlook.com ([40.107.79.45]:46704
+        Fri, 9 Aug 2019 17:55:45 -0400
+Received: from mail-eopbgr790084.outbound.protection.outlook.com ([40.107.79.84]:44400
         "EHLO NAM03-CO1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726078AbfHIVtG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 9 Aug 2019 17:49:06 -0400
+        id S1726140AbfHIVzp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 9 Aug 2019 17:55:45 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=V8XGCfy/kEzaGNb+9gW0w4PHZu309cC7OqmxANQMC42eUm8gqMzyaZ9bglyJNMPudcb2uwfQTm9bJh8tPESe4PSBg59css6LWaANFt0LPgN1MTvYFGyZLmG7G0jQROV7y/TnJKZTz89J+kpAiPItQiqUEGlI1XWRa8wfpXQp+PM9qDlcfOfDsUNT/qP8G1p8OPj2CJW5Z3XKnOiEZx2drPgY7HzvVAYrqCD2qjgL++5q0DJOLX8Rg13/nOhXP15GUL/qlGgLUYgh0kTrmVyNQZzepaYoMe4jz2QgWKmcok7QkMgeTuCJKmpux2jmZQ0+UjVtYr8kMSbAcjvMdBy+7A==
+ b=VrgghtUNq/RHPi2CGm9QFdvgK3zlsX89BCAM2HEtwmWI1cnRWMIXhcse63gO9aSqbkbgg9YFQ595QM0bCDECQl+1QDYTeJ3zWElxJNhLhiLaY91W2AWkMMEZ4JrzgHiiynxxIuIHAXbKsEZ9ZKPZfhS6qLTDTDE8IEbS6ky03BZ2QsakFus3RMSnALxMzjhL2vZ4PCMYps+jC5NKJ9+CcAgHw67dnCGkfO8cMvI7E8vERQn439TuRV6oE/SajN9Hr1kB17vA76nP/3ilNdiS7gHDH1y80Mp+MkvaOWdmU1eUuwILhls8S6jsYf/5dsAd2QM5T+WkG3KQZxyqWBLpDg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cciVWgeXzrtbIb6NSIk4CRo7udYuejx1MsQypWHOE2Y=;
- b=bdtaR9yZR8lTnHsWvAgwdeDW86Qix4+ZBsc3MKn41YY8cCsfhKc50kC6OgF/G6Eac7sydrOr7dZFpAYXH3cWjbznGtrNeIS1u5oQGlfAJzoM3Tc8Xv4y+qwkzZ3pKqNFrhc82OJ86Lei3XZDwvW72KNvicW4IQQ1I3T9i4XUapjFyEbQGlwD/gDOIpjl9te+M6exYkShce+sX8GQdU49FkU5k5/lOqCW1owMezQ/wpjY19kFHwpURsbSQFghyAprgQYK7gCbH/fSd5UaItuuzL+74AwMxwUBFPYZkBRyAGZbYsUlXo0sBSHLlx2XB93NNeJMm+LktzgfMZWWS9b/oA==
+ bh=lsvOHeR3fNO+Pn7zwoh/IGl//IxKA8O+iimbsGSB/cE=;
+ b=SMQz+2d++Jipfpi92d8EYKKCa156oDT+6xz3bT6hvLpVSKuwE14HZUx+nnnVzAfpIwhPSCV99o6hBR+GiUDG02TDe/WllTf2/MH3Eq5xAQXPvz+DGa2Gm3+gjQl7qPYwWiwdu+oTXq2FAm5Drxk9uGlf6+Ood5boyrnPF55ABzx1uP1z0I6b32QIFoJC52gc5LWs1bcaVHD0P4CzRPf+osUq0gdzwvCEIDT6H2cE1iWAvc7H9EdzFHXIS2uunVUj95R/MGz6J+nn9mAkrR1jgNk+XKa/+5b+rkSKyLlwdCGsYgoyLrz7Yj4tx0cRDQw3bc0CZ6igzosyuTXu6ESlGA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=verimatrix.com; dmarc=pass action=none
  header.from=verimatrix.com; dkim=pass header.d=verimatrix.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verimatrix.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cciVWgeXzrtbIb6NSIk4CRo7udYuejx1MsQypWHOE2Y=;
- b=OtJ26TqVPdPpAN1IDuU49LY+fkAT8nZMS/9ltsLZMfZkAWyZ9j0lEwtaAmOPZne7nqRRixd61jJjp9octno/iE03xGR/3z6cI7ZSdqg5m6e8ibBMuWY3PEfT+/7MRGCS3lDM0VoarhVX1lbOWTN7GoFXZbOygsl+bsN/sqd2Ohk=
+ bh=lsvOHeR3fNO+Pn7zwoh/IGl//IxKA8O+iimbsGSB/cE=;
+ b=MV3NVQXaEbmkcY2O8zvRsDIk3olgUSeO3pcGKG3kSe5Rwg9BWo8LiRMbqNKHbkbvNsT1EwYyIbs0nGegv1znP90N8mUVXAqtI9j5QaXBcaa6Ps+44+rBSTigGvLvwTj2UDc/Dvoi5RhRhL7QGMFMWJeRchpiSGqtwEuHCqKY5wI=
 Received: from MN2PR20MB2973.namprd20.prod.outlook.com (52.132.172.146) by
  MN2PR20MB2975.namprd20.prod.outlook.com (52.132.172.148) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2157.18; Fri, 9 Aug 2019 21:49:02 +0000
+ 15.20.2157.18; Fri, 9 Aug 2019 21:55:39 +0000
 Received: from MN2PR20MB2973.namprd20.prod.outlook.com
  ([fe80::d96f:39b2:19f4:c7c1]) by MN2PR20MB2973.namprd20.prod.outlook.com
  ([fe80::d96f:39b2:19f4:c7c1%7]) with mapi id 15.20.2157.020; Fri, 9 Aug 2019
- 21:49:02 +0000
+ 21:55:39 +0000
 From:   Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
 To:     Eric Biggers <ebiggers@kernel.org>
 CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
@@ -52,12 +52,14 @@ CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         "davem@davemloft.net" <davem@davemloft.net>
 Subject: RE: XTS template wrapping question
 Thread-Topic: XTS template wrapping question
-Thread-Index: AdVOpvQVifejpBWTRVyvNwtV/QL5zQAKv5cAAAoo/XA=
-Date:   Fri, 9 Aug 2019 21:49:02 +0000
-Message-ID: <MN2PR20MB297335494F2E0A07A8E6E892CAD60@MN2PR20MB2973.namprd20.prod.outlook.com>
+Thread-Index: AdVOpvQVifejpBWTRVyvNwtV/QL5zQABu5aQAASi1wAABRfaAAAJ7OhA
+Date:   Fri, 9 Aug 2019 21:55:39 +0000
+Message-ID: <MN2PR20MB29737B2D4F7627225805550ACAD60@MN2PR20MB2973.namprd20.prod.outlook.com>
 References: <MN2PR20MB2973BB8A78D663C6A3D6A223CAD60@MN2PR20MB2973.namprd20.prod.outlook.com>
- <20190809164610.GA658@sol.localdomain>
-In-Reply-To: <20190809164610.GA658@sol.localdomain>
+ <MN2PR20MB29737E7D905FE0B9D3CE3A68CAD60@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <MN2PR20MB2973782AD2114D66B2A0807ECAD60@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <20190809170636.GB658@sol.localdomain>
+In-Reply-To: <20190809170636.GB658@sol.localdomain>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -66,30 +68,30 @@ authentication-results: spf=none (sender IP is )
  smtp.mailfrom=pvanleeuwen@verimatrix.com; 
 x-originating-ip: [188.204.2.113]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: f1600a94-9914-4497-021d-08d71d136485
+x-ms-office365-filtering-correlation-id: df2de1dd-0b0f-4a25-1340-08d71d145132
 x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:MN2PR20MB2975;
 x-ms-traffictypediagnostic: MN2PR20MB2975:
-x-ms-exchange-purlcount: 1
-x-microsoft-antispam-prvs: <MN2PR20MB2975B585869AC2266FF171BFCAD60@MN2PR20MB2975.namprd20.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-ms-exchange-purlcount: 2
+x-microsoft-antispam-prvs: <MN2PR20MB2975219073FDF66DC8461D32CAD60@MN2PR20MB2975.namprd20.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
 x-forefront-prvs: 01244308DF
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(376002)(346002)(366004)(396003)(136003)(39850400004)(189003)(199004)(13464003)(6436002)(53936002)(186003)(99286004)(6246003)(316002)(3480700005)(305945005)(15974865002)(54906003)(74316002)(7736002)(6506007)(53546011)(102836004)(66066001)(26005)(4326008)(52536014)(55016002)(76176011)(9686003)(66476007)(8936002)(7696005)(25786009)(76116006)(3846002)(5660300002)(2906002)(486006)(66946007)(64756008)(66446008)(6116002)(66556008)(81166006)(6916009)(8676002)(81156014)(71190400001)(71200400001)(256004)(229853002)(476003)(11346002)(86362001)(14454004)(478600001)(33656002)(446003)(18886075002);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR20MB2975;H:MN2PR20MB2973.namprd20.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(39840400004)(136003)(396003)(366004)(346002)(376002)(13464003)(189003)(199004)(5660300002)(3846002)(76116006)(66946007)(2906002)(486006)(8936002)(7696005)(55016002)(66476007)(9686003)(76176011)(6306002)(25786009)(11346002)(476003)(14454004)(86362001)(229853002)(446003)(478600001)(33656002)(966005)(6916009)(66446008)(64756008)(8676002)(81166006)(66556008)(6116002)(71200400001)(71190400001)(81156014)(256004)(6246003)(305945005)(15974865002)(3480700005)(316002)(6436002)(186003)(99286004)(53936002)(102836004)(53546011)(6506007)(4326008)(52536014)(26005)(66066001)(74316002)(7736002)(54906003)(18886075002);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR20MB2975;H:MN2PR20MB2973.namprd20.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
 received-spf: None (protection.outlook.com: verimatrix.com does not designate
  permitted sender hosts)
 x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: ZAA67xPNXRgvnGUR9IZxZUtGyVMqja20ZySZdLQ0ajJIP7jGvDXhzI+BrhUET4aOG5nBwIQiy7j1wlTMCcvtmDnKTzAtUYKVWOlv3i7g0DeOMl+MfyRK9w/8IMSH1jYwRNJKLp/UejC+rLThrIY3wWS3VtpPXz6Kuprj6X1KZkKD/pvvDaPUR8nEFhdBPy3cWPDJ/KZqicZ41Qw9hwXIYzAQFSuQqAfomwKUnReOjCLbVhg2iAW0Oot1PZl7H1z9GekAIoughDusYL6TWz11kdEOp3upGKljhkE6stBl9Igl4INSB0BlE8XdJNEdI4G9Fa8pos0Z2p9Ej6NEfrv+fjgukdN95qCjqtuznmznSwK4q/KGvaQFpBNpC5nG+LxnesvVmK1y5851/6TwedwcJuDIQqJor8ZqjuaJTj79gVI=
+x-microsoft-antispam-message-info: 6sd6GCbsWH0DjFHHW/JHD4fi6cIOHQbS6v4EP8MPAhjyNPxk3OZERqCqwRcIuJUCpvJagl7idDOHAmEOYmcw4dKdKhRU0qmShfgXGasEXjC5d4PdIZevkVLXetsUnzswhg2P0LJzFBdWc1YtfULyGvwW3eZytZ4CBpvFxrrdCzBQ+khZmMT3HGa1eEE3MhL3T4GmLfxHoxMbo0u7fdkq/6ru0aqMpUIpWaXMsCF3aRJxZfzFI7hVLk/fNswhvT/P2r8mRAHCKGrJdS13AMgPpAIQcjF3AfeZ5+zfuEbeTArU95HL10EPKmH8Yj+n8muH0FmJsbNN338IS10BGcXITxhVsasxIxTmhccX36Vvzn8ypmeSDrB3m5rAyOtvx1WCfAUBk4R1Nx5ZLozsOFhXBgKUmSSoeKt+KINTUwywbv4=
 x-ms-exchange-transport-forked: True
 Content-Type: text/plain; charset="Windows-1252"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: verimatrix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f1600a94-9914-4497-021d-08d71d136485
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Aug 2019 21:49:02.2228
+X-MS-Exchange-CrossTenant-Network-Message-Id: df2de1dd-0b0f-4a25-1340-08d71d145132
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Aug 2019 21:55:39.3093
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: dcb260f9-022d-4495-8602-eae51035a0d0
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: xLVwAekH9xL9bQ0HalSitz0hjvFH3iZJ5HlBsZo4r/jF+a43MMs1BoBeYRwFeXY+J/Iz8unC+oucuGVzCXzO27qi4NPGo9nGED/DgKh+pHM=
+X-MS-Exchange-CrossTenant-userprincipalname: OE18Oftr0HNUts2/f1XzukfOij7SjGCkPiUMvUyu5N/AAaFW+ueVZsG8yBrI58sEhV70HTaDHxXtBm4CdxnJ5LB74CAwocekaZAQSkYSK+0=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR20MB2975
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
@@ -98,80 +100,143 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 > -----Original Message-----
 > From: Eric Biggers <ebiggers@kernel.org>
-> Sent: Friday, August 9, 2019 6:46 PM
+> Sent: Friday, August 9, 2019 7:07 PM
 > To: Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
 > Cc: linux-crypto@vger.kernel.org; herbert@gondor.apana.org.au; davem@dave=
 mloft.net
 > Subject: Re: XTS template wrapping question
 >=20
-> On Fri, Aug 09, 2019 at 11:39:12AM +0000, Pascal Van Leeuwen wrote:
-> > Herbert, Eric,
-> >
-> > While working on the XTS template, I noticed that it is being used
-> > (e.g. from testmgr, but also when explictly exported from other drivers=
-)
-> > as e.g. "xts(aes)", with the generic driver actually being
-> > "xts(ecb(aes-generic))".
-> >
-> > While what I would expect would be "xts(ecb(aes))", the reason being
-> > that plain "aes" is defined as a single block cipher while the XTS
-> > template actually efficiently wraps an skcipher (like ecb(aes)).
-> > The generic driver reference actually proves this point.
-> >
-> > The problem with XTS being used without the ecb template in between,
-> > is that hardware accelerators will typically advertise an ecb(aes)
-> > skcipher and the current approach makes it impossible to leverage
-> > that for XTS (while the XTS template *could* actually do that
-> > efficiently, from what I understand from the code ...).
-> > Advertising a single block "aes" cipher from a hardware accelerator
-> > unfortunately defeats the purpose of acceleration.
-> >
-> > I also wonder what happens if aes-generic is the only AES
-> > implementation available? How would the crypto API know it needs to
-> > do "xts(aes)" as "xts(ecb(aes))" without some explicit export?
-> > (And I don't see how xts(aes) would work directly, considering
-> > that only seems to handle single cipher blocks? Or ... will
-> > the crypto API actually wrap some multi-block skcipher thing
-> > around the single block cipher instance automatically??)
-> >
+> On Fri, Aug 09, 2019 at 03:06:23PM +0000, Pascal Van Leeuwen wrote:
+> > > -----Original Message-----
+> > > From: Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+> > > Sent: Friday, August 9, 2019 4:18 PM
+> > > To: Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>; linux-crypto@vge=
+r.kernel.org;
+> > > herbert@gondor.apana.org.au; davem@davemloft.net; Eric Biggers <ebigg=
+ers@kernel.org>
+> > > Subject: RE: XTS template wrapping question
+> > >
+> > > > -----Original Message-----
+> > > > From: linux-crypto-owner@vger.kernel.org <linux-crypto-owner@vger.k=
+ernel.org> On Behalf
+> > > Of
+> > > > Pascal Van Leeuwen
+> > > > Sent: Friday, August 9, 2019 1:39 PM
+> > > > To: linux-crypto@vger.kernel.org; herbert@gondor.apana.org.au; dave=
+m@davemloft.net;
+> Eric
+> > > > Biggers <ebiggers@kernel.org>
+> > > > Subject: XTS template wrapping question
+> > > >
+> > > > Herbert, Eric,
+> > > >
+> > > > While working on the XTS template, I noticed that it is being used
+> > > > (e.g. from testmgr, but also when explictly exported from other dri=
+vers)
+> > > > as e.g. "xts(aes)", with the generic driver actually being
+> > > > "xts(ecb(aes-generic))".
+> > > >
+> > > > While what I would expect would be "xts(ecb(aes))", the reason bein=
+g
+> > > > that plain "aes" is defined as a single block cipher while the XTS
+> > > > template actually efficiently wraps an skcipher (like ecb(aes)).
+> > > > The generic driver reference actually proves this point.
+> > > >
+> > > > The problem with XTS being used without the ecb template in between=
+,
+> > > > is that hardware accelerators will typically advertise an ecb(aes)
+> > > > skcipher and the current approach makes it impossible to leverage
+> > > > that for XTS (while the XTS template *could* actually do that
+> > > > efficiently, from what I understand from the code ...).
+> > > > Advertising a single block "aes" cipher from a hardware accelerator
+> > > > unfortunately defeats the purpose of acceleration.
+> > > >
+> > > > I also wonder what happens if aes-generic is the only AES
+> > > > implementation available? How would the crypto API know it needs to
+> > > > do "xts(aes)" as "xts(ecb(aes))" without some explicit export?
+> > > > (And I don't see how xts(aes) would work directly, considering
+> > > > that only seems to handle single cipher blocks? Or ... will
+> > > > the crypto API actually wrap some multi-block skcipher thing
+> > > > around the single block cipher instance automatically??)
+> > > >
+> > > Actually, the above was based on observations from testmgr, which
+> > > doesn't seem to test xts(safexcel-ecb-aes) even though I gave that
+> > > a very high .cra_priority as well as that what is advertised under
+> > > /proc/crypto, which does not include such a thing either.
+> > >
+> > > However, playing with tcrypt mode=3D600 shows some interesting
+> > > results:
+> > >
+> > > WITHOUT the inside-secure driver loaded, both LRW encrypt and
+> > > decrypt run on top of ecb-aes-aesni as you would expect.
+> > > Both xts encrypt and decrypt give a "failed to load transform"
+> > > with an error code of -80. Strange ... -80 =3D ELIBBAD??
+> > > (Do note that the selftest of xts(aes) using xts-aesni worked
+> > > just fine according to /proc/crypto!)
+> > >
+> > > WITH the inside-secure driver loaded, NOT advertising xts(aes)
+> > > itself and everything at cra_priority of 300: same (expected).
+> > >
+> > > WITH the inside-secure driver loaded, NOT advertising xts(aes)
+> > > itself and everything safexcel at cra_priority of 2000:
+> > > LRW decrypt now runs on top of safexcel-ecb-aes, but LRW
+> > > encrypt now runs on top of aes-generic? This makes no sense as
+> > > the encrypt datapath structure is the same as for decrypt so
+> > > it should run just fine on top of safexcel-ecb-aes. And besides
+> > > that, why drop from aesni all the way down to aes-generic??
+> > > xts encrypt and decrypt still give the -80 error, while you
+> > > would expect that to now run using the xts wrapper around
+> > > safexcel-ecb-aes (but no way to tell if that's happening).
+> > >
+> > > WITH the inside-secure driver loaded, advertising xts(aes)
+> > > itself and everything at cra_priority of 2000:
+> > > still the same LRW assymmetry as mentioned above, but
+> > > xts encrypt and decrypt now work fine using safexcel-aes-xts
+> > >
+> > > Conclusions from the above:
+> > >
+> > > - There's something fishy with the selection of the underlying
+> > >   AES cipher for LRW encrypt (but not for LRW decrypt).
+> > >
+> > Actually, this makes no sense at all as crypto_skcipher_alloc
+> > does not even see the direction you're going to use in your
+> > requests. Still, it is what I consistently see happening in
+> > the tcrypt logging. Weird!
 >=20
-> "xts(aes)" is the cra_name for AES-XTS, while everything else (e.g.
-> "xts(ecb(aes-generic))", "xts-aes-aesni", "xts(ecb-aes-aesni)")
-> is a cra_driver_name for AES-XTS.
+> There's a known bug when the extra self-tests are enabled, where the firs=
+t
+> allocation of an algorithm actually returns the generic implementation, n=
+ot the
+> highest priority implementation.  See:
+> https://lkml.kernel.org/linux-crypto/20190409181608.GA122471@gmail.com/
+> Does that explain what you saw?
 >=20
-> "xts(ecb(aes))" doesn't make sense, as it's neither the cra_name nor does=
- it
-> name a specific implementation.
->=20
-Hmmm ... but if xts(aes) wants to wrap around an aes skcipher implementatio=
-n,
-it will have to search for "ecb(aes)". Since "aes" would give it a single
-cipher block (generic) implementation that wouldn't work.
-And it adds the "ecb(" somewhere under water in the wrapper, which is very
-confusing if you don't know about that.
-As it is confusing that there is an "aes" and an "ecb(aes)", aes being a
-blockcipher and ecb not being a mode at all, but just the bare cipher.
+Ah! That must indeed be the same problem. Encrypt is first here, so
+that apparently gets generic and then decrypt gets the hw version.
+So I guess that bug does not just apply to the self tests then ...(!)
 
-Considering my hw driver actually exports ecb(aes) and NOT aes due to this,
-xts(ecb(aes)) actually would have made MORE sense, IMNSHO.
-(implementation wise, not semantically)
-
-The whole thing would have been different if "ecb(aes)" had been just "aes"=
-.
-
-> See create() in crypto/xts.c.  It allows the XTS template to be passed ei=
-ther
-> the string "aes", *or* a string which names an *implementation* of "ecb(a=
-es)",
-> like "ecb(aes-generic)" or "ecb-aes-aesni".  In the first case it allocat=
-es
-> "ecb(aes)" so it gets the highest priority AES-ECB implementation.
+> >
+> > > - xts-aes-aesni (and the xts.c wrapper?) appear(s) broken in
+> > >   some way not detected by testmgr but affecting tcrypt use,
+> > >   while the inside-secure driver's local xts works just fine
+> > >
 >=20
-> So in both cases the XTS template uses AES-ECB via the skcipher API.
+> Is this reproducible without any local patches?  If so, can you provide c=
+lear
+> reproduction steps?
 >=20
+I'm not aware of any local patches. I tried it after backing out the=20
+xts.c stuff Ard and I have been working on regarding CTS and that still=20
+failed.
+
+Just try:
+modprobe tcrypt mode=3D600 sec=3D1 num_mb=3D100
+
+On a system that has aesni has the highest priority implementation.
+
 > - Eric
->
-Yes, thanks I figured that out by now ...
+
+
 
 Regards,
 Pascal van Leeuwen
