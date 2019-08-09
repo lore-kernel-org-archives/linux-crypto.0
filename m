@@ -2,171 +2,175 @@ Return-Path: <SRS0=Ue/q=WF=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F349DC433FF
-	for <linux-crypto@archiver.kernel.org>; Fri,  9 Aug 2019 21:08:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41CB6C31E40
+	for <linux-crypto@archiver.kernel.org>; Fri,  9 Aug 2019 21:33:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BBE0A2085A
-	for <linux-crypto@archiver.kernel.org>; Fri,  9 Aug 2019 21:08:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EE65B208C3
+	for <linux-crypto@archiver.kernel.org>; Fri,  9 Aug 2019 21:33:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="VPi+kpqy";
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="VgLe7xqr"
+	dkim=pass (1024-bit key) header.d=verimatrix.com header.i=@verimatrix.com header.b="u3OY3bOO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726125AbfHIVI0 (ORCPT
+        id S1726078AbfHIVd5 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 9 Aug 2019 17:08:26 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:45396 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726078AbfHIVI0 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 9 Aug 2019 17:08:26 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x79L5ckN070468;
-        Fri, 9 Aug 2019 21:08:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=corp-2019-08-05;
- bh=qPGkfFOzCb8gidKvwQnil0iLWuNYNpWlWuUd78n126c=;
- b=VPi+kpqy0bi3E9ra/RYYGrfhuQgzF7z+//srmIaL+tCfXJ35FGn/4vcqn/1T05mJXxLd
- YIjGYfJbUxhJPrOgtzeoKfTQoB/YpIAZhvZdvjYCOzfKZu33yVpHOUtEeFthlA+8hE7v
- YletivaSHwBNNRLnqHcvOra4hJKYBDadgVP1UQbBPTpT3FDgT35hEYu2/Sz69QEKgaUB
- JV6B3IYPrvaFh3p5XKEYOrHbBVDFIMCx6nJXhZ3KnaYUkJWjYbNh+B61S70ZliMaEi3B
- 8Qfmg1z0/anJu2lOTkd45QRDDH8kIpWomV6uWI6qqHS3KYpDIrHpcq4F1mSUGlgLKUpt lg== 
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=corp-2018-07-02;
- bh=qPGkfFOzCb8gidKvwQnil0iLWuNYNpWlWuUd78n126c=;
- b=VgLe7xqr47J3KwzCUURxYaKc0fZO3TdQT9zUVnIs1dSjA94hBriLCvOlJOVmk7JoZS9f
- U+EfgT/NkB6rM1KcouHBKM2lck2twbzXUVE2/ZMhFeLdkObfuF21kRH9P1gNKNxviGtp
- s840uWwedscVlhuw5n12MXMc7okF0f5rLYeD1ossyRGAGi9Zz++wAkdzYC5km0Idq5Mp
- WfyQW1GBqUpL8sOobw3TITDkBd5vr6fwDkUFqfy6mAOWDDA2jox56XTbNd3bArO1MzTp
- RZmMDJtofx2tfU08RpCiShqoct14NbE9UH/xJPW8aMgHPwZmiorG/CiNNtlvWD211sZk fA== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by aserp2120.oracle.com with ESMTP id 2u8hasj5rq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 09 Aug 2019 21:08:15 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x79L49hm015714;
-        Fri, 9 Aug 2019 21:06:15 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by aserp3020.oracle.com with ESMTP id 2u8x9fwp4b-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 09 Aug 2019 21:06:15 +0000
-Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x79L6DGG016522;
-        Fri, 9 Aug 2019 21:06:14 GMT
-Received: from localhost.localdomain (/73.60.114.248)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 09 Aug 2019 14:06:13 -0700
-From:   Daniel Jordan <daniel.m.jordan@oracle.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Steffen Klassert <steffen.klassert@secunet.com>
-Cc:     Daniel Jordan <daniel.m.jordan@oracle.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v2] padata: validate cpumask without removed CPU during offline
-Date:   Fri,  9 Aug 2019 17:06:03 -0400
-Message-Id: <20190809210603.20900-1-daniel.m.jordan@oracle.com>
-X-Mailer: git-send-email 2.22.0
-In-Reply-To: <20190809192857.26585-2-daniel.m.jordan@oracle.com>
-References: <20190809192857.26585-2-daniel.m.jordan@oracle.com>
+        Fri, 9 Aug 2019 17:33:57 -0400
+Received: from mail-eopbgr690059.outbound.protection.outlook.com ([40.107.69.59]:59203
+        "EHLO NAM04-CO1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726022AbfHIVd4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 9 Aug 2019 17:33:56 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=TRIojsVw8oHubRbB8mtfYcDsGp/Vdc3/j/XrmIDvvluIs4QX/Ynwfg1zAAouzogYH3TAsW9pmQp41gZWe9nEOxdTmYlKQLwLKEaHmXJzEJ5DbscSa5oFV3UNfZp3cPS+JiOewlIX83D1bmnB8vtFiNhGyr1ayMtA/BCrPWWssgv1l6PtTQPKMseoYJyUqzwbi9UiO90IyFLZCMeDgNq6qFt1ixn263DeosCVm1DbdUT78/wm16EYTjCBQEq2y83C1BxkyThFL+2mk3m4LCzOplHiDJK7IhvDDMI6vdQO1mgoeteIOeRSgVw/IVESzHDKH5gCpfF2UKgBHlo49cyDGw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Kml/gosS12HqNnqP4V+ulH9f5o5DZYpqog23z0UNHi8=;
+ b=WvwIcMGSC+hjnv347iWyx9V4Vfpwn6RDXXhyzU0uNuFGVcjnxoZD+UD/Y7VyjIz53ohW7Tj7nbhP5rvMioNDTMNNq/ycn/IT5uCcm+NG3pvUH14o33HZ4kRZaphr6SQTIA6XPxLPAwlXPjMiOf/sGgPBLXBJ+f+NdnzHAv+SK9LH1dwtg3vQs0Q7zOIBoxRmEZo2zTF0aHPiBy+dLoHXQrajq5TW7xKkLyS48mSjCI1l+OC6d3d4EWTRUCWjHaVB/y9SaJNUyXTwS0c8tCwqNRYR/CaDhjRDPw5jyHHoXHdZAfpi55+LDosqBuh3julbKKZ3xpX8R0FpPd8ubMCMdA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=verimatrix.com; dmarc=pass action=none
+ header.from=verimatrix.com; dkim=pass header.d=verimatrix.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verimatrix.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Kml/gosS12HqNnqP4V+ulH9f5o5DZYpqog23z0UNHi8=;
+ b=u3OY3bOOrJ6zS25Sh1gIp212TWFZjD5LX7bYDzgpWch/4nrwyir9r5n16ewHCVBhE74ltCtmDwOIGu31XoFLwalZsyYUBevKXJ7fo6no4acAwWZF+9Yxo7PSHtpnF9sg6Rhonl9ptAXp6X2SxU5nr6zjkisCbQyeIIXgDMB2RTw=
+Received: from MN2PR20MB2973.namprd20.prod.outlook.com (52.132.172.146) by
+ MN2PR20MB2303.namprd20.prod.outlook.com (20.179.148.151) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2157.16; Fri, 9 Aug 2019 21:33:14 +0000
+Received: from MN2PR20MB2973.namprd20.prod.outlook.com
+ ([fe80::d96f:39b2:19f4:c7c1]) by MN2PR20MB2973.namprd20.prod.outlook.com
+ ([fe80::d96f:39b2:19f4:c7c1%7]) with mapi id 15.20.2157.020; Fri, 9 Aug 2019
+ 21:33:14 +0000
+From:   Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+To:     Eric Biggers <ebiggers@kernel.org>
+CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Subject: RE: [RFC PATCH v2] md/dm-crypt - reuse eboiv skcipher for IV
+ generation
+Thread-Topic: [RFC PATCH v2] md/dm-crypt - reuse eboiv skcipher for IV
+ generation
+Thread-Index: AQHVTOQKWnTPkdATo0i/D1XZtRSIkqbvRQ3wgABmBgCAAAHhUIAAJeoAgAAASmCAARpFgIAAAIWQgABIkICAAAcZkIAAQkcAgAEBE3CAAJHdAIAAM6SQgAAJhoCAAAKAEA==
+Date:   Fri, 9 Aug 2019 21:33:14 +0000
+Message-ID: <MN2PR20MB29736FF8E67D83FEA5A52E14CAD60@MN2PR20MB2973.namprd20.prod.outlook.com>
+References: <CAKv+Gu8fgg=gt4LSnCfShnf0-PZ=B1TNwM3zdQr+V6hkozgDOA@mail.gmail.com>
+ <MN2PR20MB29733EEF59CCD754256D5621CAD40@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <20190808083059.GB5319@sol.localdomain>
+ <MN2PR20MB297328E243D74E03C1EF54ACCAD70@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <67b4f0ee-b169-8af4-d7af-1c53a66ba587@gmail.com>
+ <MN2PR20MB29739B9D16130F5C06831C92CAD70@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <20190808171508.GA201004@gmail.com>
+ <MN2PR20MB2973387C1A083138866EE45FCAD60@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <20190809171720.GC658@sol.localdomain>
+ <MN2PR20MB2973BE617D7BC075BB7BB1ACCAD60@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <20190809205614.GB100971@gmail.com>
+In-Reply-To: <20190809205614.GB100971@gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=pvanleeuwen@verimatrix.com; 
+x-originating-ip: [188.204.2.113]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 7ed6626b-4f73-44c1-2655-08d71d112f7a
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(5600148)(711020)(4605104)(1401327)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);SRVR:MN2PR20MB2303;
+x-ms-traffictypediagnostic: MN2PR20MB2303:
+x-ms-exchange-purlcount: 1
+x-microsoft-antispam-prvs: <MN2PR20MB2303DFF0121EED6D2EC58372CAD60@MN2PR20MB2303.namprd20.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-forefront-prvs: 01244308DF
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(376002)(136003)(39840400004)(366004)(396003)(346002)(189003)(13464003)(199004)(33656002)(102836004)(256004)(26005)(66066001)(316002)(3846002)(6116002)(186003)(71190400001)(229853002)(99286004)(2906002)(7696005)(14444005)(76176011)(71200400001)(9686003)(76116006)(8676002)(6916009)(66476007)(81156014)(64756008)(5660300002)(476003)(14454004)(486006)(66446008)(6246003)(66946007)(55016002)(66556008)(53936002)(52536014)(25786009)(81166006)(74316002)(86362001)(15974865002)(6436002)(7736002)(478600001)(53546011)(305945005)(6506007)(11346002)(446003)(4326008)(8936002)(18886075002);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR20MB2303;H:MN2PR20MB2973.namprd20.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: verimatrix.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: B5ul+80AiB4enXWWzFKGqeh5OTNph3EmtM1lsq8U5Towgb36HwkOISVv3x5hP8j6nf5WF4AFzsVtAMHGyLwp52L4r4kyG0TYNYOntELU6OPXKAUXbITG8YcKYbQIDNpe/qBRW3hkwM7H7XYzXIZl2BE71v2T55rB3dWPKsq2WIbabI6hx0LV/Kx0br1heYr9s3QPI96q5bxhqYGPC+QIL3PHS+G9vQpRtoSLjxf1dAnlEqTeOSqHbNjTGlF4ZjTWU4oG7pCulFR0ND4Mdb3G6p0j3QBZo52BzGKPE+6by7Qzrhnr64UYdLQlpbuSd+MP5qzMEtV1BQ3Kgg5aWMZ257Kq/rd4oF7y5LA4blz4WKRTbiE9/8JdXVo7JAA/lNwZZvuYXcYs0kNtv97/fZPOT479/SK5EyaRxMYeGP/o0Lg=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="Windows-1252"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9344 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1906280000 definitions=main-1908090206
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9344 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
- definitions=main-1908090206
+X-OriginatorOrg: verimatrix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7ed6626b-4f73-44c1-2655-08d71d112f7a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Aug 2019 21:33:14.2349
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: dcb260f9-022d-4495-8602-eae51035a0d0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: rjwFuWAwC0kRK+BafFd5wT5mWlxKLbg0RV9D2RB7z3pqGTR93UrH4Mif0xUiC/+HodMeKBWHDfOjbOG4Q39UjGOU3bsynzyklWi4QuP0v0w=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR20MB2303
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Configuring an instance's parallel mask without any online CPUs...
+> -----Original Message-----
+> From: Eric Biggers <ebiggers@kernel.org>
+> Sent: Friday, August 9, 2019 10:56 PM
+> To: Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+> Cc: linux-crypto@vger.kernel.org
+> Subject: Re: [RFC PATCH v2] md/dm-crypt - reuse eboiv skcipher for IV gen=
+eration
+>=20
+> On Fri, Aug 09, 2019 at 08:29:59PM +0000, Pascal Van Leeuwen wrote:
+> > >
+> > > There's no proof that other attacks don't exist.
+> > >
+> > As you can't prove something doesn't exist ...
+>=20
+> Of course you can, that's what the security proofs for crypto constructio=
+ns
+> always do.  They prove that no efficient attack exists (in some attack mo=
+del)
+> unless the underlying crypto primitives are weak.
+>=20
+> >
+> > > If you're going to advocate
+> > > for using it regardless, then you need to choose a different (weaker)=
+ attack
+> > > model, then formally prove that the construction is secure under that=
+ model.
+> > > Or show where someone else has done so.
+> > >
+> > I'm certainly NOT advocating the use of this. I was merely pointing out=
+ a
+> > legacy use case that happens to be very relevant to people stuck with i=
+t,
+> > which therefore should not be dismissed so easily.
+> > And how this legacy use case may have further security implications (li=
+ke
+> > the tweak encryption being more sensitive than was being assumed, so yo=
+u
+> > don't want to run that through an insecure implementation).
+>=20
+> Obviously there are people already using bad crypto, whether this or some=
+thing
+> else, and they often need to continue to be supported.  I'm not disputing=
+ that.
+>=20
+> What I'm disputing is your willingness to argue that it's not really that=
+ bad,
+> without a corresponding formal proof which crypto constructions always ha=
+ve.
+>=20
+Real life designs require all kinds of trade-offs and compromises.
+If you want to make something twice as expensive, you'd better have a=20
+really solid reason for doing so. So yes, I do believe it is useful to
+be sceptical and question these things. But I always listen to good=20
+arguments, so just convince me I got it wrong *for my particular use
+case* (I'm not generally interested in the generic case).
 
-  echo 2 > /sys/kernel/pcrypt/pencrypt/parallel_cpumask
-  echo 0 > /sys/devices/system/cpu/cpu1/online
+I mean, we were talking XTS here. Which is basically better-than-
+nothing crypto anyway. It's one big compromise to be doing something
+really fast without needing to expand the data. Good crypto would not
+work on narrow blocks and/or include authentication as well ...
 
-...crashes like this:
+> - Eric
 
-  divide error: 0000 [#1] SMP PTI
-  CPU: 4 PID: 281 Comm: modprobe Not tainted 5.2.0-padata-base+ #25
-  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.12.0-<snip>
-  RIP: 0010:padata_do_parallel+0xf1/0x270
-  ...
-  Call Trace:
-   pcrypt_do_parallel+0xed/0x1e0 [pcrypt]
-   pcrypt_aead_encrypt+0xbf/0xd0 [pcrypt]
-   do_mult_aead_op+0x68/0x112 [tcrypt]
-   test_mb_aead_speed.constprop.0.cold+0x21a/0x55a [tcrypt]
-   do_test+0x2280/0x4ca2 [tcrypt]
-   tcrypt_mod_init+0x55/0x1000 [tcrypt]
-   ...
 
-The cpumask_weight call in padata_cpu_hash returns 0, causing the
-division error, because the mask has no CPUs, which is expected in this
-situation.  The problem is __padata_remove_cpu doesn't mark the instance
-PADATA_INVALID as expected, which would have made padata_do_parallel
-return error before doing the division, because it checks for valid
-masks too early.
 
-Fix by moving the checks after the masks have been adjusted for the
-offlined CPU.  Only do the second check if the first succeeded to avoid
-inadvertently clearing PADATA_INVALID.
-
-Stop the instance unconditionally and start again if the masks are
-valid.  Stopping the instance only after an invalid mask is found risks
-this div-by-0 crash since a padata_do_parallel call in another task
-could happen between cpumask_clear_cpu and padata_validate_cpumask.
-
-Fixes: 33e54450683c ("padata: Handle empty padata cpumasks")
-Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
----
-
-v2: Don't leave the instance stopped if the masks are valid.
-
- kernel/padata.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/kernel/padata.c b/kernel/padata.c
-index d056276a96ce..01460ea1d160 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -702,10 +702,7 @@ static int __padata_remove_cpu(struct padata_instance *pinst, int cpu)
- 	struct parallel_data *pd = NULL;
- 
- 	if (cpumask_test_cpu(cpu, cpu_online_mask)) {
--
--		if (!padata_validate_cpumask(pinst, pinst->cpumask.pcpu) ||
--		    !padata_validate_cpumask(pinst, pinst->cpumask.cbcpu))
--			__padata_stop(pinst);
-+		__padata_stop(pinst);
- 
- 		pd = padata_alloc_pd(pinst, pinst->cpumask.pcpu,
- 				     pinst->cpumask.cbcpu);
-@@ -716,6 +713,9 @@ static int __padata_remove_cpu(struct padata_instance *pinst, int cpu)
- 
- 		cpumask_clear_cpu(cpu, pd->cpumask.cbcpu);
- 		cpumask_clear_cpu(cpu, pd->cpumask.pcpu);
-+		if (padata_validate_cpumask(pinst, pd->cpumask.pcpu) &&
-+		    padata_validate_cpumask(pinst, pd->cpumask.cbcpu))
-+			__padata_start(pinst);
- 	}
- 
- 	return 0;
--- 
-2.22.0
-
+Regards,
+Pascal van Leeuwen
+Silicon IP Architect, Multi-Protocol Engines @ Verimatrix
+www.insidesecure.com
