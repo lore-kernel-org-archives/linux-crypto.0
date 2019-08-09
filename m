@@ -6,67 +6,58 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41CB6C31E40
-	for <linux-crypto@archiver.kernel.org>; Fri,  9 Aug 2019 21:33:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B11BFC31E40
+	for <linux-crypto@archiver.kernel.org>; Fri,  9 Aug 2019 21:49:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EE65B208C3
-	for <linux-crypto@archiver.kernel.org>; Fri,  9 Aug 2019 21:33:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7831220B7C
+	for <linux-crypto@archiver.kernel.org>; Fri,  9 Aug 2019 21:49:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=verimatrix.com header.i=@verimatrix.com header.b="u3OY3bOO"
+	dkim=pass (1024-bit key) header.d=verimatrix.com header.i=@verimatrix.com header.b="OtJ26TqV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726078AbfHIVd5 (ORCPT
+        id S1726263AbfHIVtG (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 9 Aug 2019 17:33:57 -0400
-Received: from mail-eopbgr690059.outbound.protection.outlook.com ([40.107.69.59]:59203
-        "EHLO NAM04-CO1-obe.outbound.protection.outlook.com"
+        Fri, 9 Aug 2019 17:49:06 -0400
+Received: from mail-eopbgr790045.outbound.protection.outlook.com ([40.107.79.45]:46704
+        "EHLO NAM03-CO1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726022AbfHIVd4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 9 Aug 2019 17:33:56 -0400
+        id S1726078AbfHIVtG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 9 Aug 2019 17:49:06 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TRIojsVw8oHubRbB8mtfYcDsGp/Vdc3/j/XrmIDvvluIs4QX/Ynwfg1zAAouzogYH3TAsW9pmQp41gZWe9nEOxdTmYlKQLwLKEaHmXJzEJ5DbscSa5oFV3UNfZp3cPS+JiOewlIX83D1bmnB8vtFiNhGyr1ayMtA/BCrPWWssgv1l6PtTQPKMseoYJyUqzwbi9UiO90IyFLZCMeDgNq6qFt1ixn263DeosCVm1DbdUT78/wm16EYTjCBQEq2y83C1BxkyThFL+2mk3m4LCzOplHiDJK7IhvDDMI6vdQO1mgoeteIOeRSgVw/IVESzHDKH5gCpfF2UKgBHlo49cyDGw==
+ b=V8XGCfy/kEzaGNb+9gW0w4PHZu309cC7OqmxANQMC42eUm8gqMzyaZ9bglyJNMPudcb2uwfQTm9bJh8tPESe4PSBg59css6LWaANFt0LPgN1MTvYFGyZLmG7G0jQROV7y/TnJKZTz89J+kpAiPItQiqUEGlI1XWRa8wfpXQp+PM9qDlcfOfDsUNT/qP8G1p8OPj2CJW5Z3XKnOiEZx2drPgY7HzvVAYrqCD2qjgL++5q0DJOLX8Rg13/nOhXP15GUL/qlGgLUYgh0kTrmVyNQZzepaYoMe4jz2QgWKmcok7QkMgeTuCJKmpux2jmZQ0+UjVtYr8kMSbAcjvMdBy+7A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Kml/gosS12HqNnqP4V+ulH9f5o5DZYpqog23z0UNHi8=;
- b=WvwIcMGSC+hjnv347iWyx9V4Vfpwn6RDXXhyzU0uNuFGVcjnxoZD+UD/Y7VyjIz53ohW7Tj7nbhP5rvMioNDTMNNq/ycn/IT5uCcm+NG3pvUH14o33HZ4kRZaphr6SQTIA6XPxLPAwlXPjMiOf/sGgPBLXBJ+f+NdnzHAv+SK9LH1dwtg3vQs0Q7zOIBoxRmEZo2zTF0aHPiBy+dLoHXQrajq5TW7xKkLyS48mSjCI1l+OC6d3d4EWTRUCWjHaVB/y9SaJNUyXTwS0c8tCwqNRYR/CaDhjRDPw5jyHHoXHdZAfpi55+LDosqBuh3julbKKZ3xpX8R0FpPd8ubMCMdA==
+ bh=cciVWgeXzrtbIb6NSIk4CRo7udYuejx1MsQypWHOE2Y=;
+ b=bdtaR9yZR8lTnHsWvAgwdeDW86Qix4+ZBsc3MKn41YY8cCsfhKc50kC6OgF/G6Eac7sydrOr7dZFpAYXH3cWjbznGtrNeIS1u5oQGlfAJzoM3Tc8Xv4y+qwkzZ3pKqNFrhc82OJ86Lei3XZDwvW72KNvicW4IQQ1I3T9i4XUapjFyEbQGlwD/gDOIpjl9te+M6exYkShce+sX8GQdU49FkU5k5/lOqCW1owMezQ/wpjY19kFHwpURsbSQFghyAprgQYK7gCbH/fSd5UaItuuzL+74AwMxwUBFPYZkBRyAGZbYsUlXo0sBSHLlx2XB93NNeJMm+LktzgfMZWWS9b/oA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=verimatrix.com; dmarc=pass action=none
  header.from=verimatrix.com; dkim=pass header.d=verimatrix.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verimatrix.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Kml/gosS12HqNnqP4V+ulH9f5o5DZYpqog23z0UNHi8=;
- b=u3OY3bOOrJ6zS25Sh1gIp212TWFZjD5LX7bYDzgpWch/4nrwyir9r5n16ewHCVBhE74ltCtmDwOIGu31XoFLwalZsyYUBevKXJ7fo6no4acAwWZF+9Yxo7PSHtpnF9sg6Rhonl9ptAXp6X2SxU5nr6zjkisCbQyeIIXgDMB2RTw=
+ bh=cciVWgeXzrtbIb6NSIk4CRo7udYuejx1MsQypWHOE2Y=;
+ b=OtJ26TqVPdPpAN1IDuU49LY+fkAT8nZMS/9ltsLZMfZkAWyZ9j0lEwtaAmOPZne7nqRRixd61jJjp9octno/iE03xGR/3z6cI7ZSdqg5m6e8ibBMuWY3PEfT+/7MRGCS3lDM0VoarhVX1lbOWTN7GoFXZbOygsl+bsN/sqd2Ohk=
 Received: from MN2PR20MB2973.namprd20.prod.outlook.com (52.132.172.146) by
- MN2PR20MB2303.namprd20.prod.outlook.com (20.179.148.151) with Microsoft SMTP
+ MN2PR20MB2975.namprd20.prod.outlook.com (52.132.172.148) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2157.16; Fri, 9 Aug 2019 21:33:14 +0000
+ 15.20.2157.18; Fri, 9 Aug 2019 21:49:02 +0000
 Received: from MN2PR20MB2973.namprd20.prod.outlook.com
  ([fe80::d96f:39b2:19f4:c7c1]) by MN2PR20MB2973.namprd20.prod.outlook.com
  ([fe80::d96f:39b2:19f4:c7c1%7]) with mapi id 15.20.2157.020; Fri, 9 Aug 2019
- 21:33:14 +0000
+ 21:49:02 +0000
 From:   Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
 To:     Eric Biggers <ebiggers@kernel.org>
-CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Subject: RE: [RFC PATCH v2] md/dm-crypt - reuse eboiv skcipher for IV
- generation
-Thread-Topic: [RFC PATCH v2] md/dm-crypt - reuse eboiv skcipher for IV
- generation
-Thread-Index: AQHVTOQKWnTPkdATo0i/D1XZtRSIkqbvRQ3wgABmBgCAAAHhUIAAJeoAgAAASmCAARpFgIAAAIWQgABIkICAAAcZkIAAQkcAgAEBE3CAAJHdAIAAM6SQgAAJhoCAAAKAEA==
-Date:   Fri, 9 Aug 2019 21:33:14 +0000
-Message-ID: <MN2PR20MB29736FF8E67D83FEA5A52E14CAD60@MN2PR20MB2973.namprd20.prod.outlook.com>
-References: <CAKv+Gu8fgg=gt4LSnCfShnf0-PZ=B1TNwM3zdQr+V6hkozgDOA@mail.gmail.com>
- <MN2PR20MB29733EEF59CCD754256D5621CAD40@MN2PR20MB2973.namprd20.prod.outlook.com>
- <20190808083059.GB5319@sol.localdomain>
- <MN2PR20MB297328E243D74E03C1EF54ACCAD70@MN2PR20MB2973.namprd20.prod.outlook.com>
- <67b4f0ee-b169-8af4-d7af-1c53a66ba587@gmail.com>
- <MN2PR20MB29739B9D16130F5C06831C92CAD70@MN2PR20MB2973.namprd20.prod.outlook.com>
- <20190808171508.GA201004@gmail.com>
- <MN2PR20MB2973387C1A083138866EE45FCAD60@MN2PR20MB2973.namprd20.prod.outlook.com>
- <20190809171720.GC658@sol.localdomain>
- <MN2PR20MB2973BE617D7BC075BB7BB1ACCAD60@MN2PR20MB2973.namprd20.prod.outlook.com>
- <20190809205614.GB100971@gmail.com>
-In-Reply-To: <20190809205614.GB100971@gmail.com>
+CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>
+Subject: RE: XTS template wrapping question
+Thread-Topic: XTS template wrapping question
+Thread-Index: AdVOpvQVifejpBWTRVyvNwtV/QL5zQAKv5cAAAoo/XA=
+Date:   Fri, 9 Aug 2019 21:49:02 +0000
+Message-ID: <MN2PR20MB297335494F2E0A07A8E6E892CAD60@MN2PR20MB2973.namprd20.prod.outlook.com>
+References: <MN2PR20MB2973BB8A78D663C6A3D6A223CAD60@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <20190809164610.GA658@sol.localdomain>
+In-Reply-To: <20190809164610.GA658@sol.localdomain>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -75,31 +66,31 @@ authentication-results: spf=none (sender IP is )
  smtp.mailfrom=pvanleeuwen@verimatrix.com; 
 x-originating-ip: [188.204.2.113]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 7ed6626b-4f73-44c1-2655-08d71d112f7a
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(5600148)(711020)(4605104)(1401327)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);SRVR:MN2PR20MB2303;
-x-ms-traffictypediagnostic: MN2PR20MB2303:
+x-ms-office365-filtering-correlation-id: f1600a94-9914-4497-021d-08d71d136485
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:MN2PR20MB2975;
+x-ms-traffictypediagnostic: MN2PR20MB2975:
 x-ms-exchange-purlcount: 1
-x-microsoft-antispam-prvs: <MN2PR20MB2303DFF0121EED6D2EC58372CAD60@MN2PR20MB2303.namprd20.prod.outlook.com>
+x-microsoft-antispam-prvs: <MN2PR20MB2975B585869AC2266FF171BFCAD60@MN2PR20MB2975.namprd20.prod.outlook.com>
 x-ms-oob-tlc-oobclassifiers: OLM:9508;
 x-forefront-prvs: 01244308DF
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(376002)(136003)(39840400004)(366004)(396003)(346002)(189003)(13464003)(199004)(33656002)(102836004)(256004)(26005)(66066001)(316002)(3846002)(6116002)(186003)(71190400001)(229853002)(99286004)(2906002)(7696005)(14444005)(76176011)(71200400001)(9686003)(76116006)(8676002)(6916009)(66476007)(81156014)(64756008)(5660300002)(476003)(14454004)(486006)(66446008)(6246003)(66946007)(55016002)(66556008)(53936002)(52536014)(25786009)(81166006)(74316002)(86362001)(15974865002)(6436002)(7736002)(478600001)(53546011)(305945005)(6506007)(11346002)(446003)(4326008)(8936002)(18886075002);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR20MB2303;H:MN2PR20MB2973.namprd20.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(376002)(346002)(366004)(396003)(136003)(39850400004)(189003)(199004)(13464003)(6436002)(53936002)(186003)(99286004)(6246003)(316002)(3480700005)(305945005)(15974865002)(54906003)(74316002)(7736002)(6506007)(53546011)(102836004)(66066001)(26005)(4326008)(52536014)(55016002)(76176011)(9686003)(66476007)(8936002)(7696005)(25786009)(76116006)(3846002)(5660300002)(2906002)(486006)(66946007)(64756008)(66446008)(6116002)(66556008)(81166006)(6916009)(8676002)(81156014)(71190400001)(71200400001)(256004)(229853002)(476003)(11346002)(86362001)(14454004)(478600001)(33656002)(446003)(18886075002);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR20MB2975;H:MN2PR20MB2973.namprd20.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
 received-spf: None (protection.outlook.com: verimatrix.com does not designate
  permitted sender hosts)
 x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: B5ul+80AiB4enXWWzFKGqeh5OTNph3EmtM1lsq8U5Towgb36HwkOISVv3x5hP8j6nf5WF4AFzsVtAMHGyLwp52L4r4kyG0TYNYOntELU6OPXKAUXbITG8YcKYbQIDNpe/qBRW3hkwM7H7XYzXIZl2BE71v2T55rB3dWPKsq2WIbabI6hx0LV/Kx0br1heYr9s3QPI96q5bxhqYGPC+QIL3PHS+G9vQpRtoSLjxf1dAnlEqTeOSqHbNjTGlF4ZjTWU4oG7pCulFR0ND4Mdb3G6p0j3QBZo52BzGKPE+6by7Qzrhnr64UYdLQlpbuSd+MP5qzMEtV1BQ3Kgg5aWMZ257Kq/rd4oF7y5LA4blz4WKRTbiE9/8JdXVo7JAA/lNwZZvuYXcYs0kNtv97/fZPOT479/SK5EyaRxMYeGP/o0Lg=
+x-microsoft-antispam-message-info: ZAA67xPNXRgvnGUR9IZxZUtGyVMqja20ZySZdLQ0ajJIP7jGvDXhzI+BrhUET4aOG5nBwIQiy7j1wlTMCcvtmDnKTzAtUYKVWOlv3i7g0DeOMl+MfyRK9w/8IMSH1jYwRNJKLp/UejC+rLThrIY3wWS3VtpPXz6Kuprj6X1KZkKD/pvvDaPUR8nEFhdBPy3cWPDJ/KZqicZ41Qw9hwXIYzAQFSuQqAfomwKUnReOjCLbVhg2iAW0Oot1PZl7H1z9GekAIoughDusYL6TWz11kdEOp3upGKljhkE6stBl9Igl4INSB0BlE8XdJNEdI4G9Fa8pos0Z2p9Ej6NEfrv+fjgukdN95qCjqtuznmznSwK4q/KGvaQFpBNpC5nG+LxnesvVmK1y5851/6TwedwcJuDIQqJor8ZqjuaJTj79gVI=
 x-ms-exchange-transport-forked: True
 Content-Type: text/plain; charset="Windows-1252"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: verimatrix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7ed6626b-4f73-44c1-2655-08d71d112f7a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Aug 2019 21:33:14.2349
+X-MS-Exchange-CrossTenant-Network-Message-Id: f1600a94-9914-4497-021d-08d71d136485
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Aug 2019 21:49:02.2228
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: dcb260f9-022d-4495-8602-eae51035a0d0
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: rjwFuWAwC0kRK+BafFd5wT5mWlxKLbg0RV9D2RB7z3pqGTR93UrH4Mif0xUiC/+HodMeKBWHDfOjbOG4Q39UjGOU3bsynzyklWi4QuP0v0w=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR20MB2303
+X-MS-Exchange-CrossTenant-userprincipalname: xLVwAekH9xL9bQ0HalSitz0hjvFH3iZJ5HlBsZo4r/jF+a43MMs1BoBeYRwFeXY+J/Iz8unC+oucuGVzCXzO27qi4NPGo9nGED/DgKh+pHM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR20MB2975
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
@@ -107,70 +98,83 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 > -----Original Message-----
 > From: Eric Biggers <ebiggers@kernel.org>
-> Sent: Friday, August 9, 2019 10:56 PM
+> Sent: Friday, August 9, 2019 6:46 PM
 > To: Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
-> Cc: linux-crypto@vger.kernel.org
-> Subject: Re: [RFC PATCH v2] md/dm-crypt - reuse eboiv skcipher for IV gen=
-eration
+> Cc: linux-crypto@vger.kernel.org; herbert@gondor.apana.org.au; davem@dave=
+mloft.net
+> Subject: Re: XTS template wrapping question
 >=20
-> On Fri, Aug 09, 2019 at 08:29:59PM +0000, Pascal Van Leeuwen wrote:
-> > >
-> > > There's no proof that other attacks don't exist.
-> > >
-> > As you can't prove something doesn't exist ...
->=20
-> Of course you can, that's what the security proofs for crypto constructio=
-ns
-> always do.  They prove that no efficient attack exists (in some attack mo=
-del)
-> unless the underlying crypto primitives are weak.
->=20
+> On Fri, Aug 09, 2019 at 11:39:12AM +0000, Pascal Van Leeuwen wrote:
+> > Herbert, Eric,
 > >
-> > > If you're going to advocate
-> > > for using it regardless, then you need to choose a different (weaker)=
- attack
-> > > model, then formally prove that the construction is secure under that=
- model.
-> > > Or show where someone else has done so.
-> > >
-> > I'm certainly NOT advocating the use of this. I was merely pointing out=
- a
-> > legacy use case that happens to be very relevant to people stuck with i=
-t,
-> > which therefore should not be dismissed so easily.
-> > And how this legacy use case may have further security implications (li=
-ke
-> > the tweak encryption being more sensitive than was being assumed, so yo=
-u
-> > don't want to run that through an insecure implementation).
+> > While working on the XTS template, I noticed that it is being used
+> > (e.g. from testmgr, but also when explictly exported from other drivers=
+)
+> > as e.g. "xts(aes)", with the generic driver actually being
+> > "xts(ecb(aes-generic))".
+> >
+> > While what I would expect would be "xts(ecb(aes))", the reason being
+> > that plain "aes" is defined as a single block cipher while the XTS
+> > template actually efficiently wraps an skcipher (like ecb(aes)).
+> > The generic driver reference actually proves this point.
+> >
+> > The problem with XTS being used without the ecb template in between,
+> > is that hardware accelerators will typically advertise an ecb(aes)
+> > skcipher and the current approach makes it impossible to leverage
+> > that for XTS (while the XTS template *could* actually do that
+> > efficiently, from what I understand from the code ...).
+> > Advertising a single block "aes" cipher from a hardware accelerator
+> > unfortunately defeats the purpose of acceleration.
+> >
+> > I also wonder what happens if aes-generic is the only AES
+> > implementation available? How would the crypto API know it needs to
+> > do "xts(aes)" as "xts(ecb(aes))" without some explicit export?
+> > (And I don't see how xts(aes) would work directly, considering
+> > that only seems to handle single cipher blocks? Or ... will
+> > the crypto API actually wrap some multi-block skcipher thing
+> > around the single block cipher instance automatically??)
+> >
 >=20
-> Obviously there are people already using bad crypto, whether this or some=
-thing
-> else, and they often need to continue to be supported.  I'm not disputing=
- that.
+> "xts(aes)" is the cra_name for AES-XTS, while everything else (e.g.
+> "xts(ecb(aes-generic))", "xts-aes-aesni", "xts(ecb-aes-aesni)")
+> is a cra_driver_name for AES-XTS.
 >=20
-> What I'm disputing is your willingness to argue that it's not really that=
- bad,
-> without a corresponding formal proof which crypto constructions always ha=
-ve.
+> "xts(ecb(aes))" doesn't make sense, as it's neither the cra_name nor does=
+ it
+> name a specific implementation.
 >=20
-Real life designs require all kinds of trade-offs and compromises.
-If you want to make something twice as expensive, you'd better have a=20
-really solid reason for doing so. So yes, I do believe it is useful to
-be sceptical and question these things. But I always listen to good=20
-arguments, so just convince me I got it wrong *for my particular use
-case* (I'm not generally interested in the generic case).
+Hmmm ... but if xts(aes) wants to wrap around an aes skcipher implementatio=
+n,
+it will have to search for "ecb(aes)". Since "aes" would give it a single
+cipher block (generic) implementation that wouldn't work.
+And it adds the "ecb(" somewhere under water in the wrapper, which is very
+confusing if you don't know about that.
+As it is confusing that there is an "aes" and an "ecb(aes)", aes being a
+blockcipher and ecb not being a mode at all, but just the bare cipher.
 
-I mean, we were talking XTS here. Which is basically better-than-
-nothing crypto anyway. It's one big compromise to be doing something
-really fast without needing to expand the data. Good crypto would not
-work on narrow blocks and/or include authentication as well ...
+Considering my hw driver actually exports ecb(aes) and NOT aes due to this,
+xts(ecb(aes)) actually would have made MORE sense, IMNSHO.
+(implementation wise, not semantically)
 
+The whole thing would have been different if "ecb(aes)" had been just "aes"=
+.
+
+> See create() in crypto/xts.c.  It allows the XTS template to be passed ei=
+ther
+> the string "aes", *or* a string which names an *implementation* of "ecb(a=
+es)",
+> like "ecb(aes-generic)" or "ecb-aes-aesni".  In the first case it allocat=
+es
+> "ecb(aes)" so it gets the highest priority AES-ECB implementation.
+>=20
+> So in both cases the XTS template uses AES-ECB via the skcipher API.
+>=20
 > - Eric
-
-
+>
+Yes, thanks I figured that out by now ...
 
 Regards,
 Pascal van Leeuwen
 Silicon IP Architect, Multi-Protocol Engines @ Verimatrix
 www.insidesecure.com
+
