@@ -2,116 +2,225 @@ Return-Path: <SRS0=+H67=WH=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B1DBC433FF
-	for <linux-crypto@archiver.kernel.org>; Sun, 11 Aug 2019 22:59:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0247AC0650F
+	for <linux-crypto@archiver.kernel.org>; Sun, 11 Aug 2019 22:59:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0A1CF2085B
-	for <linux-crypto@archiver.kernel.org>; Sun, 11 Aug 2019 22:59:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C0EBB2084D
+	for <linux-crypto@archiver.kernel.org>; Sun, 11 Aug 2019 22:59:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MGN4ecvb"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kCofGDQR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726155AbfHKW70 (ORCPT
+        id S1726014AbfHKW72 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 11 Aug 2019 18:59:26 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:37012 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726014AbfHKW7Z (ORCPT
+        Sun, 11 Aug 2019 18:59:28 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:39835 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726144AbfHKW71 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 11 Aug 2019 18:59:25 -0400
-Received: by mail-wm1-f65.google.com with SMTP id z23so10184432wmf.2
-        for <linux-crypto@vger.kernel.org>; Sun, 11 Aug 2019 15:59:24 -0700 (PDT)
+        Sun, 11 Aug 2019 18:59:27 -0400
+Received: by mail-wr1-f66.google.com with SMTP id t16so12925074wra.6
+        for <linux-crypto@vger.kernel.org>; Sun, 11 Aug 2019 15:59:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id;
-        bh=/tNZwOFvVQgW3Q3LEkFArhFgiZFUVCSFYAfHFcwsvMY=;
-        b=MGN4ecvbcpj5SpsE+uvsZTJQgIEL1VaeVc/I3SK5gWS96Mah4Whgg/utWV4jVinjEu
-         u7gbnlDqL7meLp4IeUops9LBq3hn0VXLoD1xj8Sd21XvG5Vd6c/qkQD8Emy0D7RnFnhm
-         t2FXq/tOb9Dg6Xt2sEt6+Wz4W5g5FWC8ljYKH5A2G6UdRJP6nOK3miln1Ww7lulTmCXQ
-         Z42/5D4laLs9MZX1DZSWaE/LTjpG1Js2o0fo1uX74IIAPu1dQlOl570X00t/wd5LRdKi
-         huamKsANG1S9kXA5iIw30QWmyd6LQynz2T/himOPcmCIAN0xMRrv/6XRdTh9LhI/DxYm
-         Tsjg==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=WBpXCKjdfq1yPU+OJBvQfW6gPuB8RZ7Tc8kFP902ZIM=;
+        b=kCofGDQRD+qKmOAJWzOnSnR6Wwz3Y9bYdcIfvJWQa1nk/Nnm8BgcQvgttireKoC9i4
+         ZhRJBbwXTXAil6kuWzTLxLgxUBrB4DqBxWjDgKCnT0jNVaRnvTUkm/pa9qLwCMx3EQA+
+         slZ+LKH/Z3EDpse+Qr0PhDq5mMt10BPSx2FSaGL2OfjZFMdCiZWaZPQSHrHpoYaqcm2d
+         4Mv5K/NUqtSUGqJslAsSTRtrSrK4FKGWKxXrngRBx147X5CwzS1m71p3gu4zXxHeuBLt
+         t47ZnwSxcebtwTrcRbjsboIR8EHe3FYQKtFEv+pRVMNlPVkM18VWZ/mqpUE6enpUFZy1
+         gbdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=/tNZwOFvVQgW3Q3LEkFArhFgiZFUVCSFYAfHFcwsvMY=;
-        b=XwG8CFXm9A2Bns5h6f3mUrMGkr18KrSXwYItxnWN9WHVbyG6yAj9O6U4iNAtQbTJzy
-         Zp8OnPDAX7qq893KgCjrV0QNYoRVwciYs7mflP/LIgsvj50/gQpMAEuWqdQfj76qc5JM
-         noqWT3jY/Jfo+/a40lzHAUcfjeWNGnXpDoUycm0LekqV2VobBi9N2dES4PEFbn4UR0Lr
-         Xtoz1atvRLkzvHQ2CpZD0gFutaswPeH6oAayb8CDpOIfFdLlDAPnimvM2/JSa6FL/oDx
-         ZtkAu42P2JRgjgo6f7OkqyIJ0I4pP9B9Fauoj3/hRpoh88V29XIH+vUAeCXHSgLK5/nv
-         hqHg==
-X-Gm-Message-State: APjAAAXZ9lNG8TNqzpzSW9HYUaQWEw5ogRx6bxr8F1jix1az4d/FRETA
-        8jRTb4NufVRLyfqjZGE+GVrQO6QgQWpu+A==
-X-Google-Smtp-Source: APXvYqznwY/uZTeoSeceh+sD2Djv7+dWTnJNlomh9LFkwDUmLD/mtxciOewWEbxvUzNnDtqae3DZNQ==
-X-Received: by 2002:a1c:1d08:: with SMTP id d8mr23598731wmd.22.1565564363227;
-        Sun, 11 Aug 2019 15:59:23 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=WBpXCKjdfq1yPU+OJBvQfW6gPuB8RZ7Tc8kFP902ZIM=;
+        b=STMNTzDavXuJCiAb3bPdb2bDn9NJDoat1SuHjlalRtEAfZvE49mphA4dJqaRjNgMYF
+         87vStBem2m//qqMd7JFjMTXtUA6OhUHmdL1QIXMeO0VI95PD74lzbcwpWUqCClwGGxTj
+         7FWuR2fdG0Mh3p5QbhuNZ+LSGhmapiQSgaXelbJW2HUZc/Y68KHKcQsFe4/uZPSaWefr
+         hhBrcp++3TTxlllrs3OiafSWf9toWmAUHLWIBLudjiGWiNJr+EWuQmneX0Khrg4SbZQ5
+         u2tT32E5kaVdI9D0/dZnjgV8joljP/xcUqpe70V923cwshkMKp0pii1RRT3molXg5Mal
+         5IKQ==
+X-Gm-Message-State: APjAAAWO1+9rODBJO23Ou1dZp9WHPV5h9R5nXqAxtBOeIF4CHbUAGfRV
+        KMhkFLYOKePlmztcZIX1Z2Obykiq6WXZug==
+X-Google-Smtp-Source: APXvYqwNeOvn8OGLFcFwne3f/5KXZFeXbvl/XTwD3j+KLcZuFebcUFtpjmrkX1JUouUphdHFACnecA==
+X-Received: by 2002:adf:9224:: with SMTP id 33mr23351134wrj.238.1565564364796;
+        Sun, 11 Aug 2019 15:59:24 -0700 (PDT)
 Received: from localhost.localdomain ([2a02:587:a407:da00:5df1:4fcc:7bd1:4860])
-        by smtp.gmail.com with ESMTPSA id a17sm5930888wmm.47.2019.08.11.15.59.21
+        by smtp.gmail.com with ESMTPSA id a17sm5930888wmm.47.2019.08.11.15.59.23
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 11 Aug 2019 15:59:22 -0700 (PDT)
+        Sun, 11 Aug 2019 15:59:24 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     herbert@gondor.apana.org.au, ebiggers@kernel.org,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v2 0/3] crypto: aegis128 followup
-Date:   Mon, 12 Aug 2019 01:59:09 +0300
-Message-Id: <20190811225912.19412-1-ard.biesheuvel@linaro.org>
+Subject: [PATCH v2 1/3] crypto: aegis128 - add support for SIMD acceleration
+Date:   Mon, 12 Aug 2019 01:59:10 +0300
+Message-Id: <20190811225912.19412-2-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20190811225912.19412-1-ard.biesheuvel@linaro.org>
+References: <20190811225912.19412-1-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This series resubmits the aegis128 SIMD patches that were reverted due to
-the fact that the compiler's optimization behavior wrt variables with static
-linkage does not turn out to guarantee that function calls that are
-conditional on the value of such a variable are optimized away if the value
-is a compile time constant and the condition evaluates to false at compile
-time as well.
+Add some plumbing to allow the AEGIS128 code to be built with SIMD
+routines for acceleration.
 
-Changes since v1:
-- minor tweaks to #2 to drop a memset() invocation from the decrypt path,
-  and some temp vars in various places
-- update the NEON code in #3 so it builds with Clang as well as GCC (and
-  drop the RFC annotation)
+Reviewed-by: Ondrej Mosnacek <omosnace@redhat.com>
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+---
+ crypto/Makefile                        |  1 +
+ crypto/{aegis128.c => aegis128-core.c} | 52 ++++++++++++++++++--
+ 2 files changed, 49 insertions(+), 4 deletions(-)
 
-Patch #1 reintroduces the changes to the generic code to permit SIMD
-routines to be attached to the aegis128 driver. This time, the conditional
-check is pulled into a helper function which collapses to 'return false'
-if the CONFIG_CRYPTO_AEGIS128_SIMD Kconfig symbol is not set. (This has
-been confirmed by one of the reporters of the original issue as sufficient
-to address the problem).
-
-Patch #2 is mostly unchanged wrt the version that got reverted, only some
-inline annotations were added back.
-
-Patch #3 is new and implements the SIMD routines for arm64 without using
-the optional AES instructions, but using plain SIMD arithmetic instead.
-This is much slower than AES instructions, but still substantially more
-efficient than table based scalar AES on systems where memory accesses are
-expensive, such as the Raspberry Pi 3 (which does not implement the AES
-instructions)
-
-Ard Biesheuvel (3):
-  crypto: aegis128 - add support for SIMD acceleration
-  crypto: aegis128 - provide a SIMD implementation based on NEON
-    intrinsics
-  crypto: arm64/aegis128 - implement plain NEON version
-
- crypto/Kconfig                         |   5 +
- crypto/Makefile                        |  20 ++
- crypto/{aegis128.c => aegis128-core.c} |  52 ++++-
- crypto/aegis128-neon-inner.c           | 212 ++++++++++++++++++++
- crypto/aegis128-neon.c                 |  49 +++++
- 5 files changed, 334 insertions(+), 4 deletions(-)
- rename crypto/{aegis128.c => aegis128-core.c} (89%)
- create mode 100644 crypto/aegis128-neon-inner.c
- create mode 100644 crypto/aegis128-neon.c
-
+diff --git a/crypto/Makefile b/crypto/Makefile
+index cfcc954e59f9..92e985714ff6 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -90,6 +90,7 @@ obj-$(CONFIG_CRYPTO_GCM) += gcm.o
+ obj-$(CONFIG_CRYPTO_CCM) += ccm.o
+ obj-$(CONFIG_CRYPTO_CHACHA20POLY1305) += chacha20poly1305.o
+ obj-$(CONFIG_CRYPTO_AEGIS128) += aegis128.o
++aegis128-y := aegis128-core.o
+ obj-$(CONFIG_CRYPTO_PCRYPT) += pcrypt.o
+ obj-$(CONFIG_CRYPTO_CRYPTD) += cryptd.o
+ obj-$(CONFIG_CRYPTO_DES) += des_generic.o
+diff --git a/crypto/aegis128.c b/crypto/aegis128-core.c
+similarity index 89%
+rename from crypto/aegis128.c
+rename to crypto/aegis128-core.c
+index 32840d5e7f65..fa69e99968e2 100644
+--- a/crypto/aegis128.c
++++ b/crypto/aegis128-core.c
+@@ -8,6 +8,7 @@
+ 
+ #include <crypto/algapi.h>
+ #include <crypto/internal/aead.h>
++#include <crypto/internal/simd.h>
+ #include <crypto/internal/skcipher.h>
+ #include <crypto/scatterwalk.h>
+ #include <linux/err.h>
+@@ -16,6 +17,8 @@
+ #include <linux/module.h>
+ #include <linux/scatterlist.h>
+ 
++#include <asm/simd.h>
++
+ #include "aegis.h"
+ 
+ #define AEGIS128_NONCE_SIZE 16
+@@ -40,6 +43,24 @@ struct aegis128_ops {
+ 			    const u8 *src, unsigned int size);
+ };
+ 
++static bool have_simd;
++
++static bool aegis128_do_simd(void)
++{
++#ifdef CONFIG_CRYPTO_AEGIS128_SIMD
++	if (have_simd)
++		return crypto_simd_usable();
++#endif
++	return false;
++}
++
++bool crypto_aegis128_have_simd(void);
++void crypto_aegis128_update_simd(struct aegis_state *state, const void *msg);
++void crypto_aegis128_encrypt_chunk_simd(struct aegis_state *state, u8 *dst,
++					const u8 *src, unsigned int size);
++void crypto_aegis128_decrypt_chunk_simd(struct aegis_state *state, u8 *dst,
++					const u8 *src, unsigned int size);
++
+ static void crypto_aegis128_update(struct aegis_state *state)
+ {
+ 	union aegis_block tmp;
+@@ -55,12 +76,22 @@ static void crypto_aegis128_update(struct aegis_state *state)
+ static void crypto_aegis128_update_a(struct aegis_state *state,
+ 				     const union aegis_block *msg)
+ {
++	if (aegis128_do_simd()) {
++		crypto_aegis128_update_simd(state, msg);
++		return;
++	}
++
+ 	crypto_aegis128_update(state);
+ 	crypto_aegis_block_xor(&state->blocks[0], msg);
+ }
+ 
+ static void crypto_aegis128_update_u(struct aegis_state *state, const void *msg)
+ {
++	if (aegis128_do_simd()) {
++		crypto_aegis128_update_simd(state, msg);
++		return;
++	}
++
+ 	crypto_aegis128_update(state);
+ 	crypto_xor(state->blocks[0].bytes, msg, AEGIS_BLOCK_SIZE);
+ }
+@@ -365,7 +396,7 @@ static void crypto_aegis128_crypt(struct aead_request *req,
+ 
+ static int crypto_aegis128_encrypt(struct aead_request *req)
+ {
+-	static const struct aegis128_ops ops = {
++	const struct aegis128_ops *ops = &(struct aegis128_ops){
+ 		.skcipher_walk_init = skcipher_walk_aead_encrypt,
+ 		.crypt_chunk = crypto_aegis128_encrypt_chunk,
+ 	};
+@@ -375,7 +406,12 @@ static int crypto_aegis128_encrypt(struct aead_request *req)
+ 	unsigned int authsize = crypto_aead_authsize(tfm);
+ 	unsigned int cryptlen = req->cryptlen;
+ 
+-	crypto_aegis128_crypt(req, &tag, cryptlen, &ops);
++	if (aegis128_do_simd())
++		ops = &(struct aegis128_ops){
++			.skcipher_walk_init = skcipher_walk_aead_encrypt,
++			.crypt_chunk = crypto_aegis128_encrypt_chunk_simd };
++
++	crypto_aegis128_crypt(req, &tag, cryptlen, ops);
+ 
+ 	scatterwalk_map_and_copy(tag.bytes, req->dst, req->assoclen + cryptlen,
+ 				 authsize, 1);
+@@ -384,7 +420,7 @@ static int crypto_aegis128_encrypt(struct aead_request *req)
+ 
+ static int crypto_aegis128_decrypt(struct aead_request *req)
+ {
+-	static const struct aegis128_ops ops = {
++	const struct aegis128_ops *ops = &(struct aegis128_ops){
+ 		.skcipher_walk_init = skcipher_walk_aead_decrypt,
+ 		.crypt_chunk = crypto_aegis128_decrypt_chunk,
+ 	};
+@@ -398,7 +434,12 @@ static int crypto_aegis128_decrypt(struct aead_request *req)
+ 	scatterwalk_map_and_copy(tag.bytes, req->src, req->assoclen + cryptlen,
+ 				 authsize, 0);
+ 
+-	crypto_aegis128_crypt(req, &tag, cryptlen, &ops);
++	if (aegis128_do_simd())
++		ops = &(struct aegis128_ops){
++			.skcipher_walk_init = skcipher_walk_aead_decrypt,
++			.crypt_chunk = crypto_aegis128_decrypt_chunk_simd };
++
++	crypto_aegis128_crypt(req, &tag, cryptlen, ops);
+ 
+ 	return crypto_memneq(tag.bytes, zeros, authsize) ? -EBADMSG : 0;
+ }
+@@ -429,6 +470,9 @@ static struct aead_alg crypto_aegis128_alg = {
+ 
+ static int __init crypto_aegis128_module_init(void)
+ {
++	if (IS_ENABLED(CONFIG_CRYPTO_AEGIS128_SIMD))
++		have_simd = crypto_aegis128_have_simd();
++
+ 	return crypto_register_aead(&crypto_aegis128_alg);
+ }
+ 
 -- 
 2.17.1
 
