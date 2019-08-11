@@ -6,201 +6,281 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 243CCC0650F
-	for <linux-crypto@archiver.kernel.org>; Sun, 11 Aug 2019 21:39:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B655FC433FF
+	for <linux-crypto@archiver.kernel.org>; Sun, 11 Aug 2019 22:24:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DC81920818
-	for <linux-crypto@archiver.kernel.org>; Sun, 11 Aug 2019 21:39:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6546C20818
+	for <linux-crypto@archiver.kernel.org>; Sun, 11 Aug 2019 22:24:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=verimatrix.com header.i=@verimatrix.com header.b="GCEr6LmX"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tVmQyDZr"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726055AbfHKVjx (ORCPT
+        id S1725870AbfHKWYR (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 11 Aug 2019 17:39:53 -0400
-Received: from mail-eopbgr690080.outbound.protection.outlook.com ([40.107.69.80]:40455
-        "EHLO NAM04-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726011AbfHKVjx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 11 Aug 2019 17:39:53 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=X3PDSAcRPMItYSSjUnJu61B7eauPaUiCqBVq/9ERCdm9z/W33pT/cEOW1k0rNthD7FILn5T1z2xUQflPUYaV3WCdKbf0oaelAKeWyaljlePe1GFZUDrqRhXjv1iGphW0vmYikIJfQB90dnKDQHk4b0+MkKA7dfLLxEISRtZql34Jj18tBEIYoKgx8DIHP2/vxtyE+41qRFp1ejT0GmX70EClMLKLcrd8dMsaz3Zh3HEs+JEdv4H8Ov0p/81MbUQmJthcch+unbLp6tqj35nPR+eNBfB56IQAnynrfhwwtNV0Uakn+1vAaEEdBMMJfebazGJ4ublA7olKC0zxkQu18g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TrjdK6xZqryVzpTRMH/td0xqc2QwJ7p3z5Vax9XahvU=;
- b=byAweqN28xoS586a5JIKS8wJzNHEAib4XutGuUXcLPosuaz4Mbp16lZuUUzMGAWCCvV2nmdy8uRrmAea0aQKTbAvBLF0me3DEELwGL6oqKsipHRui6sJ8+1nm1+zCD9KsuJQc4egn+COtS5yumzW9vHAu7T59eEgpj2pILw0nqxphMOmM4wEbWt+EsBUjFFC1YY0gQ+EiF37Z1Oec3Ikew2LRdwfqczXtit+Ai8Hq2iJ1lSe/UIYmGMxzYr28FAMdh6CG9mk84lxzEuqIfemJWMjn4ZWfMLrpOiYDBFLeGNf5Eo7E7TEIAdNqdqblPy2cPUOUGafb764SMjDB8qniA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1;spf=pass
- smtp.mailfrom=verimatrix.com;dmarc=pass action=none
- header.from=verimatrix.com;dkim=pass header.d=verimatrix.com;arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verimatrix.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TrjdK6xZqryVzpTRMH/td0xqc2QwJ7p3z5Vax9XahvU=;
- b=GCEr6LmXRsMV16bsfc5l/09jhrcv+HdVMoG0WUBHiAyYtVEW6uChci/DIupTzryoB1wjggARBAAZOXksPBHsHFmt35wdGZsvZq4ZPSoF4bVFPZNxSZZwEwHACkMIg+PNrQx0V35bEztQ/r/2VoskIevTH59hyktP4I5ZgFY1MlI=
-Received: from MN2PR20MB2973.namprd20.prod.outlook.com (52.132.172.146) by
- MN2PR20MB2702.namprd20.prod.outlook.com (20.178.252.90) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2136.17; Sun, 11 Aug 2019 21:39:46 +0000
-Received: from MN2PR20MB2973.namprd20.prod.outlook.com
- ([fe80::d96f:39b2:19f4:c7c1]) by MN2PR20MB2973.namprd20.prod.outlook.com
- ([fe80::d96f:39b2:19f4:c7c1%7]) with mapi id 15.20.2157.022; Sun, 11 Aug 2019
- 21:39:46 +0000
-From:   Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
-To:     Eric Biggers <ebiggers@kernel.org>,
-        Milan Broz <gmazyland@gmail.com>
-CC:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Subject: RE: [dm-devel] xts fuzz testing and lack of ciphertext stealing
- support
-Thread-Topic: [dm-devel] xts fuzz testing and lack of ciphertext stealing
- support
-Thread-Index: AQHVO/5l0aVU4O6KC0WgPIqEsMQCDqbzPYWAgAAwjTCAAIUtAIACADgAgACcyQCAABGx8A==
-Date:   Sun, 11 Aug 2019 21:39:46 +0000
-Message-ID: <MN2PR20MB29731377CA325722EDD6582ACAD00@MN2PR20MB2973.namprd20.prod.outlook.com>
-References: <VI1PR0402MB34856F03FCE57AB62FC2257998D40@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+        Sun, 11 Aug 2019 18:24:17 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:37411 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725855AbfHKWYQ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 11 Aug 2019 18:24:16 -0400
+Received: by mail-wr1-f66.google.com with SMTP id z11so1062271wrt.4
+        for <linux-crypto@vger.kernel.org>; Sun, 11 Aug 2019 15:24:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=UXheENEMiRpgx2l6HkzAtHl2f0d7ytelj0WtAc62Ha0=;
+        b=tVmQyDZrNXdTVWjioFWRR37q8KXJyu4G4B/cKGJGbM5UXmCDqTej1nhHdhd4QSg/yM
+         TyZ0nWPvmnbaDndVMl4+VIYUqteUi3gOw0bhNqvkmOqEJUw6/NzyxBkORLNtlrhQYfrI
+         Xkc96YRtmHgrutqsDI0Slqkc087opl3fb8Uy7MdhZP6Y99wW3Lx1qcEq53FChhsnGlCX
+         Ma5/OtC01h3DFYC7lOQXc3NFerXKCvfIfWNiPwGCEiYkft9qk5guUHPQUGPpl1TjX6iR
+         3nrue6UhtYzecY3emWdp2y333nNo59xTPVgXlSxHNQsX89LBYrtuzW6bYD4LZ8LvpMyZ
+         w3qA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=UXheENEMiRpgx2l6HkzAtHl2f0d7ytelj0WtAc62Ha0=;
+        b=ACOpNxnj6Eg91lX4onkjVfSV/X4bfIe1ak+4LH98iVPncFNj3bhQAzr2NBCu9/TqWZ
+         NlgdP0EWeknXUSEvnbO4647GpdjKf13pklYQeHMTikvZCiq9SEbZ5XcLGNAOxdXnhS2G
+         dVkTN+J+Uz3msHXs9y+YemMC2y1WSNK1SuTkgi6z7mdLHXvO5klkHZoCunlcvybPuHgg
+         UA5oflsGiOcupKIGZE8qSGhL5aPf5okTPzfImvKEewr4zwRoGv7DYXFoITYiNyrWBhW5
+         7Z6aNfAbWhs37/C+MyyOy6gO8/JOWEKXerFPdM14updMFzIzFTSAlCXjN17jAaYP/9YH
+         CejQ==
+X-Gm-Message-State: APjAAAVanBMfOmaJdd73LowKZofeQH8Xa22XpN3zT8qyhH4jbzaFEEpp
+        qo3tCoRDkKTHc/2MfjHci9Q3eauCd3iB2PbB7fHDhg==
+X-Google-Smtp-Source: APXvYqw6Ev3hyJ7dNxBOhgSeR7z4IWHGk/fD2e8yCKsFjFKifWc6y6YL3gfwufpYXQm0DsIx7JFuOE2tNkltBRWGEHU=
+X-Received: by 2002:adf:aa09:: with SMTP id p9mr15199324wrd.174.1565562252915;
+ Sun, 11 Aug 2019 15:24:12 -0700 (PDT)
+MIME-Version: 1.0
+References: <CAKv+Gu9C2AEbb++W=QTVWbeA_88Fo57NcOwgU5R8HBvzFwXkJw@mail.gmail.com>
+ <MN2PR20MB2973C378AE5674F9E3E29445CAC60@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <CAKv+Gu-8n_DoauycDQS_9zzRew1rTuPaLxHyg6xhXMmqEvMaCA@mail.gmail.com>
+ <MN2PR20MB2973CAE4E9CFFE1F417B2509CAC10@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <CAKv+Gu-j-8-bQS2A46-Kf1KHtkoPJ5Htk8WratqzyngnVu-wpw@mail.gmail.com>
+ <MN2PR20MB29739591E1A3E54E7A8A8E18CAC00@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <20f4832e-e3af-e3c2-d946-13bf8c367a60@nxp.com> <VI1PR0402MB34856F03FCE57AB62FC2257998D40@VI1PR0402MB3485.eurprd04.prod.outlook.com>
  <MN2PR20MB2973127E4C159A8F5CFDD0C9CAD70@MN2PR20MB2973.namprd20.prod.outlook.com>
  <VI1PR0402MB3485689B4B65C879BC1D137398D70@VI1PR0402MB3485.eurprd04.prod.outlook.com>
- <20190809024821.GA7186@gondor.apana.org.au>
- <CAKv+Gu9hk=PGpsAWWOU61VrA3mVQd10LudA1qg0LbiX7DG9RjA@mail.gmail.com>
+ <20190809024821.GA7186@gondor.apana.org.au> <CAKv+Gu9hk=PGpsAWWOU61VrA3mVQd10LudA1qg0LbiX7DG9RjA@mail.gmail.com>
  <VI1PR0402MB3485F94AECC495F133F6B3D798D60@VI1PR0402MB3485.eurprd04.prod.outlook.com>
  <CAKv+Gu-_WObNm+ySXDWjhqe2YPzajX83MofuF-WKPSdLg5t4Ew@mail.gmail.com>
  <MN2PR20MB297361CA3C29C236D6D8F6F4CAD60@MN2PR20MB2973.namprd20.prod.outlook.com>
- <CAKv+Gu-xWxZ58tzyYoH_jDKfJoM+KzOWWpzCeHEmOXQ39Bv15g@mail.gmail.com>
- <d6d0b155-476b-d495-3418-4b171003cdd7@gmail.com>
- <20190811203406.GA17421@sol.localdomain>
-In-Reply-To: <20190811203406.GA17421@sol.localdomain>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=pvanleeuwen@verimatrix.com; 
-x-originating-ip: [188.204.2.113]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: a87a6c93-21b6-4ebb-bc87-08d71ea46ded
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:MN2PR20MB2702;
-x-ms-traffictypediagnostic: MN2PR20MB2702:
-x-ms-exchange-purlcount: 1
-x-microsoft-antispam-prvs: <MN2PR20MB2702B4163C279F375CA1E5DDCAD00@MN2PR20MB2702.namprd20.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 0126A32F74
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(136003)(376002)(366004)(396003)(346002)(39840400004)(13464003)(189003)(199004)(229853002)(6436002)(53936002)(99286004)(71200400001)(74316002)(4326008)(25786009)(71190400001)(5660300002)(86362001)(2906002)(316002)(55016002)(7696005)(6506007)(53546011)(110136005)(54906003)(76176011)(8936002)(7736002)(305945005)(33656002)(446003)(14454004)(81166006)(9686003)(102836004)(81156014)(8676002)(256004)(14444005)(476003)(76116006)(478600001)(26005)(11346002)(66476007)(66946007)(6246003)(486006)(66556008)(66446008)(66066001)(64756008)(186003)(3846002)(6116002)(15974865002)(52536014)(18886075002);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR20MB2702;H:MN2PR20MB2973.namprd20.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: verimatrix.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: JnhOTfNVwDyMt1RESEYvjR8wlsnXb3eBYoR+q2dtt1a2ZvXfHTZdEgt08LHX2UzjrGPz8LDDZU10SppWCd42GhznKN5l51NXHsDotKGbg27BBmAVof0+kwc1oXYCz+Xf5VrBkamQgdMxKGHrKhvj5nd86WGyYqd6NLTeFqSXJ67ZPXGdFH9oZyxmuHxdCfdLap3GpzJqj3tuKCmA8kazjOgyVj9ipCbMT7t5t+ibsdExwy0ZGTBmC32mD8uzFR3fH8mFum83C5CDUtu3BIHvS46YD2XS+f54yrRixqfzlrC/jeb7c5ESm2TPBe4FNMimu/TZlBukHIUOaNBulJQGZ9hMhKQSgfLE+f3TpJ4+amzhLCbZhgZtzw1i8WA/TgkLt9ndt9Q3mq825BcynvFooiodPL23kKSwEV4q698wxrc=
-Content-Type: text/plain; charset="Windows-1252"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-X-OriginatorOrg: verimatrix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a87a6c93-21b6-4ebb-bc87-08d71ea46ded
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Aug 2019 21:39:46.3011
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: dcb260f9-022d-4495-8602-eae51035a0d0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: wK6lDT5NjJ+dGKkXOM+0x+/SPH+DxQOeUy0AdYcr1e5nD6tQzCEUXqIeWrIkg4U7D1dqKCaU5m3Wl6ERK5T1P+fpXLRf/4zguOXjM/4Sjeo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR20MB2702
+ <CAKv+Gu-xWxZ58tzyYoH_jDKfJoM+KzOWWpzCeHEmOXQ39Bv15g@mail.gmail.com> <MN2PR20MB2973A43F0995479489E583A7CAD00@MN2PR20MB2973.namprd20.prod.outlook.com>
+In-Reply-To: <MN2PR20MB2973A43F0995479489E583A7CAD00@MN2PR20MB2973.namprd20.prod.outlook.com>
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date:   Mon, 12 Aug 2019 01:24:01 +0300
+Message-ID: <CAKv+Gu8YEXBLqt32i=NPMd32Eq8Ui4POKzE4R14en=SNcGeYWw@mail.gmail.com>
+Subject: Re: [dm-devel] xts fuzz testing and lack of ciphertext stealing support
+To:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+Cc:     Horia Geanta <horia.geanta@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Milan Broz <gmazyland@gmail.com>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-> -----Original Message-----
-> From: Eric Biggers <ebiggers@kernel.org>
-> Sent: Sunday, August 11, 2019 10:34 PM
-> To: Milan Broz <gmazyland@gmail.com>
-> Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>; Pascal Van Leeuwen
-> <pvanleeuwen@verimatrix.com>; dm-devel@redhat.com; Herbert Xu <herbert@go=
-ndor.apana.org.au>;
-> Horia Geanta <horia.geanta@nxp.com>; linux-crypto@vger.kernel.org
-> Subject: Re: [dm-devel] xts fuzz testing and lack of ciphertext stealing =
-support
->=20
-> On Sun, Aug 11, 2019 at 01:12:56PM +0200, Milan Broz wrote:
-> > On 10/08/2019 06:39, Ard Biesheuvel wrote:
-> > > Truncated IVs are a huge issue, since we already expose the correct
-> > > API via AF_ALG (without any restrictions on how many of the IV bits
-> > > are populated), and apparently, if your AF_ALG request for xts(aes)
-> > > happens to be fulfilled by the CAAM driver and your implementation
-> > > uses more than 64 bits for the IV, the top bits get truncated silentl=
-y
-> > > and your data might get eaten.
-> >
-> > Actually, I think we have already serious problem with in in kernel (no=
- AF_ALG needed).
-> >
-> > I do not have the hardware, but please could you check that dm-crypt bi=
-g-endian IV
-> > (plain64be) produces the same output on CAAM?
-> >
-> > It is 64bit IV, but big-endian and we use size of cipher block (16bytes=
-) here,
-> > so the first 8 bytes are zero in this case.
-> >
-> > I would expect data corruption in comparison to generic implementation,
-> > if it supports only the first 64bit...
-> >
-> > Try this:
-> >
-> > # create small null device of 8 sectors,  we use zeroes as fixed cipher=
-text
-> > dmsetup create zero --table "0 8 zero"
-> >
-> > # create crypt device on top of it (with some key), using plain64be IV
-> > dmsetup create crypt --table "0 8 crypt aes-xts-plain64be
-> e8cfa3dbfe373b536be43c5637387786c01be00ba5f730aacb039e86f3eb72f3 0 /dev/m=
-apper/zero 0"
-> >
-> > # and compare it with and without your driver, this is what I get here:
-> > # sha256sum /dev/mapper/crypt
-> > 532f71198d0d84d823b8e410738c6f43bc3e149d844dd6d37fa5b36d150501e1  /dev/=
-mapper/crypt
-> > # dmsetup remove crypt
-> >
-> > You can try little-endian version (plain64), this should always work ev=
-en with CAAM
-> > dmsetup create crypt --table "0 8 crypt aes-xts-plain64
-> e8cfa3dbfe373b536be43c5637387786c01be00ba5f730aacb039e86f3eb72f3 0 /dev/m=
-apper/zero 0"
-> >
-> > # sha256sum /dev/mapper/crypt
-> > f17abd27dedee4e539758eabdb6c15fa619464b509cf55f16433e6a25da42857  /dev/=
-mapper/crypt
-> > # dmsetup remove crypt
-> >
-> > # dmsetup remove zero
-> >
-> >
-> > If you get different plaintext in the first case, your driver is actual=
-ly creating
-> > data corruption in this configuration and it should be fixed!
-> > (Only the first sector must be the same, because it has IV =3D=3D 0.)
-> >
-> > Milan
-> >
-> > p.s.
-> > If you ask why we have this IV, it was added per request to allow map s=
-ome chipset-based
-> > encrypted drives directly. I guess it is used for some data forensic th=
-ings.
-> >
->=20
-> Also, if the CAAM driver is really truncating the IV for "xts(aes)", it s=
-hould
-> already be failing the extra crypto self-tests, since the fuzz testing in
-> test_skcipher_vs_generic_impl() uses random IVs.
->=20
-> - Eric
+On Mon, 12 Aug 2019 at 00:15, Pascal Van Leeuwen
+<pvanleeuwen@verimatrix.com> wrote:
 >
-Yes, good point. Although that is only seen during development and not=20
-during "normal" use ...
+> > -----Original Message-----
+> > From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> > Sent: Saturday, August 10, 2019 6:40 AM
+> > To: Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+> > Cc: Horia Geanta <horia.geanta@nxp.com>; Herbert Xu <herbert@gondor.apana.org.au>; Milan Broz
+> > <gmazyland@gmail.com>; dm-devel@redhat.com; linux-crypto@vger.kernel.org
+> > Subject: Re: [dm-devel] xts fuzz testing and lack of ciphertext stealing support
+> >
+> > On Fri, 9 Aug 2019 at 23:57, Pascal Van Leeuwen
+> > <pvanleeuwen@verimatrix.com> wrote:
+> > >
+> > > > -----Original Message-----
+> > > > From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> > > > Sent: Friday, August 9, 2019 7:49 PM
+> > > > To: Horia Geanta <horia.geanta@nxp.com>
+> > > > Cc: Herbert Xu <herbert@gondor.apana.org.au>; Pascal Van Leeuwen
+> > > > <pvanleeuwen@verimatrix.com>; Milan Broz <gmazyland@gmail.com>; dm-devel@redhat.com;
+> > linux-
+> > > > crypto@vger.kernel.org
+> > > > Subject: Re: [dm-devel] xts fuzz testing and lack of ciphertext stealing support
+> > > >
+> > > > On Fri, 9 Aug 2019 at 10:44, Horia Geanta <horia.geanta@nxp.com> wrote:
+> > > > >
+> > > > > On 8/9/2019 9:45 AM, Ard Biesheuvel wrote:
+> > > > > > On Fri, 9 Aug 2019 at 05:48, Herbert Xu <herbert@gondor.apana.org.au> wrote:
+> > > > > >>
+> > > > > >> On Thu, Aug 08, 2019 at 06:01:49PM +0000, Horia Geanta wrote:
+> > > > > >>>
+> > > > > >>> -- >8 --
+> > > > > >>>
+> > > > > >>> Subject: [PATCH] crypto: testmgr - Add additional AES-XTS vectors for covering
+> > > > > >>>  CTS (part II)
+> > > > > >>
+> > > > > >> Patchwork doesn't like it when you do this and it'll discard
+> > > > > >> your patch.  To make it into patchwork you need to put the new
+> > > > > >> Subject in the email headers.
+> > > > > >>
+> > > > > >
+> > > > > > IMO, pretending that your XTS implementation is compliant by only
+> > > > > I've never said that.
+> > > > > Some parts are compliant, some are not.
+> > > > >
+> > > > > > providing test vectors with the last 8 bytes of IV cleared is not the
+> > > > > > right fix for this issue. If you want to be compliant, you will need
+> > > > > It's not a fix.
+> > > > > It's adding test vectors which are not provided in the P1619 standard,
+> > > > > where "data unit sequence number" is at most 5B.
+> > > > >
+> > > >
+> > > > Indeed. But I would prefer not to limit ourselves to 5 bytes of sector
+> > > > numbers in the test vectors. However, we should obviously not add test
+> > > > vectors that are known to cause breakages on hardware that works fine
+> > > > in practice.
+> > > >
+> > > Well, obviously, the full 16 byte sector number vectors fail on existing
+> > > CAAM hardware, which I do assume to work fine in practice. And you know
+> > > I'm not in favor of building all kinds of workarounds into the drivers.
+> > >
+> > > Fact is, we know there are no current users that need more than 64 bits
+> > > of IV. Fact is also that having 64 bits of IV in the vectors is already
+> > > an improvement over the 40 bits in the original vectors. And unlike CTS,
+> > > I am not aware of any real use case for more than 64 bits.
+> > > Finally, another fact is that limiting the *vectors* to 64 bits of IV
+> > > does not prohibit anyone from *using* a full 128 bit IV on an
+> > > implementation that *does* support this. I would think most users of
+> > > XTS, like dmcrypt, would allow you to specify the cra_drivername
+> > > explictly anyway, so just don't select legacy CAAM if you need that.
+> > > (heck, if it would be reading and writing its own data, and not need
+> > > compatibility with other implementations, it wouldn't even matter)
+> > >
+> > > So yes, the specs are quite clear on the sector number being a full
+> > > 128 bits. But that doesn't prevent us from specifying that the
+> > > crypto API implementation currently only supports 64 bits, with the
+> > > remaining bits being forced to 0. We can always revisit that when
+> > > an actual use case for more than 64 bits arises ...
+> > >
+> >
+> > You have got it completely backwards:
+> >
+> > CTS has never worked in any kernel implementation, so regardless of
+> > what the spec says, supporting it in the kernel is not a high priority
+> > issue whichever way you put it.
+> >
+> I never said it was a high priority, I merely pointed out it's not spec
+> compliant. Apparently, you feel that that's only important insofar that
+> it matches current kernel use cases?
+>
+> Anyway, as far as I understand, there are no users that need more than
+> 64 bits of IV in the kernel (i.e. dmcrypt uses only 64 bits), so I see
+> no fundamental difference with CTS except that most(?) implementations
+> possibly already "accidentally" (since unverified!) did it correctly.
+>
+
+Well, as Milan points out, dm-crypt may use the upper bits as well,
+but the point I was making was about the userland interface. If you
+care about spec compliance for the sake of it, I don't understand why
+you dismiss a broken userland->kernel interface that silently fails
+and corrupts your data as something we should just live with, and just
+assume nobody will ever be silly enough to use it the way the spec
+describes it, and use all the available IV bits.
+
+> Not that I have any interest in restricting the IV size: "my" hardware
+> handles full 128 bit IV's just fine. So why do I even bother ... :-)
+>
+> > Now is the first time anyone has asked
+> > for it in 12 years, and only because someone spotted a deviation
+> > between a h/w and a s/w implementation, not because anyone tried to
+> > use it and failed. (Note that passing anything other than a multiple
+> > of the block size will cause an error rather than fail silently)
+> >
+> Yes, failing silently is not such a good idea, I think we agree on that.
+> Although we also need  to keep in mind that that's exactly what the CAAM
+> driver has been doing all those years, and, before my vectors, nobody
+> noticed or cared.
+
+True. But now that the cat is out of the bag, we have an obligation to
+our users to ensure that a known problem does not corrupt their data.
+
+> Without my involvement, this would have probably gone
+> unnoticed for many years to come (so I feel some responsibility ;-).
+>
+> > Truncated IVs are a huge issue, since we already expose the correct
+> > API via AF_ALG (without any restrictions on how many of the IV bits
+> > are populated), and apparently, if your AF_ALG request for xts(aes)
+> > happens to be fulfilled by the CAAM driver and your implementation
+> > uses more than 64 bits for the IV, the top bits get truncated silently
+> > and your data might get eaten.
+> >
+> Apparently, not such a "huge" issue at all, see previous remark.
+>
+> As a precaution, the CAAM driver could return -EINVAL if the upper IV
+> bytes are non-zero.
+
+Then we'd still have two implementations that behave differently, and
+this is not how abstractions work. If a driver implements xts(aes),
+then it should produce the same output (and return value) for every
+input.
+
+> But then testmgr would have to do less strict error
+> return code checking so we don't force this upon drivers that CAN do it.
+>
+> Implementing a full SW fallback for that in the driver just seems like
+> massive overkill, as you normally specify the driver for dmcrypt explictly
+> anyway (or at least, you can do that if the default fails).
+>
+
+How would you find out if the default fails? Either it corrupts your
+data, or it fails with an error that is specific to CAAM, and so we
+would have to update the dm-crypt code to deal with en/decryption
+failures that can only occur in this particular case. This is
+*exactly* the thing I argued against before, when we discussed zero
+length inputs: the reason we want the workaround in the driver is
+because it is contained, and its peculiarities don't leak into other
+layers.
+
+> I don't like the idea of HW drivers doing SW fallbacks because it clouds
+> the whole picture of what is actually done by a certain HW device.
+>
+
+Well, the reality is that we OS guys get to clean up after the h/w
+guys all the time. I agree that explicit failure is better than silent
+corruption, but that still means there are corner cases where things
+just don't work. So the only acceptable way to me is to fix this with
+a s/w workaround, and as I already pointed out, this could simply be
+the xts template wrapped around the accelerated ECB implementation
+exposed by the driver.
 
 
-Regards,
-Pascal van Leeuwen
-Silicon IP Architect, Multi-Protocol Engines @ Verimatrix
-www.insidesecure.com
+> > In my experience, users tend to care more about the latter than the former.
+> >
+> >
+> > > > > > to provide a s/w fallback for these cases.
+> > > > > >
+> > > > > Yes, the plan is to:
+> > > > >
+> > > > > -add 16B IV support for caam versions supporting it - caam Era 9+,
+> > > > > currently deployed in lx2160a and ls108a
+> > > > >
+> > > > > -remove current 8B IV support and add s/w fallback for affected caam versions
+> > > > > I'd assume this could be done dynamically, i.e. depending on IV provided
+> > > > > in the crypto request to use either the caam engine or s/w fallback.
+> > > > >
+> > > >
+> > > > Yes. If the IV received from the caller has bytes 8..15 cleared, you
+> > > > use the limited XTS h/w implementation, otherwise you fall back to
+> > > > xts(ecb-aes-caam..).
+> > >
+> > > Regards,
+> > > Pascal van Leeuwen
+> > > Silicon IP Architect, Multi-Protocol Engines @ Verimatrix
+> > > www.insidesecure.com
+> > >
+>
+> Regards,
+> Pascal van Leeuwen
+> Silicon IP Architect, Multi-Protocol Engines @ Verimatrix
+> www.insidesecure.com
+>
