@@ -2,65 +2,66 @@ Return-Path: <SRS0=O5Fb=WI=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE421C433FF
-	for <linux-crypto@archiver.kernel.org>; Mon, 12 Aug 2019 17:22:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D572C31E40
+	for <linux-crypto@archiver.kernel.org>; Mon, 12 Aug 2019 17:31:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4C18E2067D
-	for <linux-crypto@archiver.kernel.org>; Mon, 12 Aug 2019 17:22:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E67AE2075B
+	for <linux-crypto@archiver.kernel.org>; Mon, 12 Aug 2019 17:31:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qZpgwtOV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fp+SCcIb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726453AbfHLRWu (ORCPT
+        id S1727103AbfHLRbh (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 12 Aug 2019 13:22:50 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:37313 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726263AbfHLRWu (ORCPT
+        Mon, 12 Aug 2019 13:31:37 -0400
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:42607 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727067AbfHLRbg (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 12 Aug 2019 13:22:50 -0400
-Received: by mail-wr1-f67.google.com with SMTP id z11so3328291wrt.4
-        for <linux-crypto@vger.kernel.org>; Mon, 12 Aug 2019 10:22:46 -0700 (PDT)
+        Mon, 12 Aug 2019 13:31:36 -0400
+Received: by mail-pl1-f196.google.com with SMTP id ay6so48196089plb.9
+        for <linux-crypto@vger.kernel.org>; Mon, 12 Aug 2019 10:31:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
+        d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=77EULQTi+lcMMtUXvpApMpiWTHKHSGAJc6/9iAQNBcA=;
-        b=qZpgwtOVUG/RJBHeO0hjLAP9Z8Dv1P8ljjatCoArNoQt/GzRvSxQ1OEpVRjS4/E28w
-         PZ6pQaSx83MlMl7qlGOff2y8eL76/PkoakIwAMs3WbaeB6sSCYjQyaqNMN3vJj1NqkrR
-         EuuaHv2/dOb4OjDOK515RKWLmyLvYPl/KtpQUX9eYqNQKdxD+IuDHZCbK5TyzuwxP4DC
-         cBUvkpA2dwePdnoz849qLs1K8s+On9Ps4GnOq1ulD11sS/ZSEp3//8rL63wQoeiM/eV3
-         oozxGbTazFOteUiPQphCjjUXwSQSEsKuups5etPnVTdrW0u5ZXXWa1+6YaMHGfPUtHR/
-         f90A==
+        bh=xZ1P69bCy5klgv2VIXX39SeNII1vbEy/cgF/CbLJCqg=;
+        b=fp+SCcIb4H6VDhyYodItsBkz4CTCT7P8ft9KYeVtimUmcFttvb7pSpShNqdfo2xAq+
+         iSD+svRNsuylwYVcb5r6sAyYxy9p0XdI09qN8iO1vbsJUuxNTSQuxsLYQ4eCuV3vMbF6
+         vsHkC89RVRnu9EZouj2xqlfs9ki69D07C/ypfQORq9zdM4sQpLwwYp5k79DegjhUQNtS
+         i2etiBKz2HPXKUUbb3Lxl26YLgeEt2W0Pd8Qi18etVlvOZviRjW9JquLikqFpQLfdQ4k
+         4bf1t4g2AqxVZs9gogXZn9ObrPHBVzoun5IQwI8d1YIbl6o99i86GhciTRmDiC20t2ia
+         dD/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=77EULQTi+lcMMtUXvpApMpiWTHKHSGAJc6/9iAQNBcA=;
-        b=WnCAsJTZ0mFthUOri7xpwXUr+4Bft6++Omgu60wZ9JCw842ECsXuz5fAPuPNwlsZlE
-         7yQiVFmKmbcbMO2oTycFTN1S52X74lUEl0nJhLS6NCqzRM5sDQjPSGKHqTIzIaV88rcI
-         j9B1o+l8OwETFTMR7fxYxm5hWQFu9iOrhUrvn6M5w+rJg/CtT7gJouqygQeYWv6/4ehD
-         95A4ngTA497U/T+QzhhMt4X65+qX8Kp62lqJkJ9q21mZ8KuBNJ9+M5L2wejVqP8ZfBqQ
-         OGS4nBTR/VI84ZypObDmTjMaw8jb8pneT9l36rwxBW7Uaf7TPkz3jS/iXoMqWx83KTH/
-         fdEw==
-X-Gm-Message-State: APjAAAXR4VeyImOy1Ek0M1T5lcoRaNGwIrJg251QgrOLezvoDGLDLcN7
-        hfstssNl5qnWUfbjHapBfllaPe1EBwG7R0UuF8iQWQ==
-X-Google-Smtp-Source: APXvYqxYMq/lD/z02S+LGXtIf8gAcFoVAKhaU6QtgZvGiZngUaZHLblZAjTK/dfnuKF5DBOEEHp4d9p1ZI8cBzEckLE=
-X-Received: by 2002:adf:aa09:: with SMTP id p9mr19546796wrd.174.1565630565948;
- Mon, 12 Aug 2019 10:22:45 -0700 (PDT)
+        bh=xZ1P69bCy5klgv2VIXX39SeNII1vbEy/cgF/CbLJCqg=;
+        b=MFU+RhOnQUNuXnXKlatItpANdgjY4SjwtbycCZzoYa9DtfBGrUvd6IEG7FKtXwqyiN
+         OkrelqC0NxALhFrpddCea4iGRcb/JtXpDcEk88Zqtqgvaq6WnTf0CTW1e7reOAS3AO5m
+         JnuIm5Q7MR5mmo6Eni2q90B6FbBEBqzGFQczyFGVcYpl9pW1atWmkliQT3SD/4fUhxoT
+         HhZ2cYIR5k0SyENGcG+P5/hwpN9wo/AXTpopkGBvWzElAhxe4yaEE86FbW1WNKAFFW6Y
+         xOFNgeh5brDEOgjloX65YCPuK2zNrPR3HCQBqZQgdvxslrHgLNeCe/xY8eFRk7Dxhmec
+         7fnA==
+X-Gm-Message-State: APjAAAVpsygn3C6FzHZLxiwEpi6PnhEV2cHu7jF7E/vtgcU+YXLYv1Hq
+        fZSFLULTx85CdzJDq6Sk0eCgRcPsuwjLcJvlcac+vE7ZFL4=
+X-Google-Smtp-Source: APXvYqxRqMfOTc+G8aKjQtVVcC9fCDLVEEJT1s83XGgIeeO5MxP4OoqwVkbFbgXFecspNhcrWnvtY6psvy0WSt1jxao=
+X-Received: by 2002:a17:902:3363:: with SMTP id a90mr32338228plc.119.1565631095499;
+ Mon, 12 Aug 2019 10:31:35 -0700 (PDT)
 MIME-Version: 1.0
 References: <20190811225912.19412-1-ard.biesheuvel@linaro.org>
  <20190811225912.19412-4-ard.biesheuvel@linaro.org> <CAKwvOd=uxi8qmQEjOudvSUVW6vc42b-SmoV91DeWfBkp3kOJcQ@mail.gmail.com>
-In-Reply-To: <CAKwvOd=uxi8qmQEjOudvSUVW6vc42b-SmoV91DeWfBkp3kOJcQ@mail.gmail.com>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Mon, 12 Aug 2019 20:22:33 +0300
-Message-ID: <CAKv+Gu9KKvCXAm=1hJ-owkL4BTi=hmCXA8ag_rTvdnUgn_zvUg@mail.gmail.com>
+ <CAKv+Gu9KKvCXAm=1hJ-owkL4BTi=hmCXA8ag_rTvdnUgn_zvUg@mail.gmail.com>
+In-Reply-To: <CAKv+Gu9KKvCXAm=1hJ-owkL4BTi=hmCXA8ag_rTvdnUgn_zvUg@mail.gmail.com>
+From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Mon, 12 Aug 2019 10:31:24 -0700
+Message-ID: <CAKwvOd=9KP9j7SkyCJ6xBWmVQn8nSsP78PasdtBO5aDFcSm2Rg@mail.gmail.com>
 Subject: Re: [PATCH v2 3/3] crypto: arm64/aegis128 - implement plain NEON version
-To:     Nick Desaulniers <ndesaulniers@google.com>
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
         <linux-crypto@vger.kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -71,259 +72,57 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 12 Aug 2019 at 19:50, Nick Desaulniers <ndesaulniers@google.com> wrote:
+On Mon, Aug 12, 2019 at 10:22 AM Ard Biesheuvel
+<ard.biesheuvel@linaro.org> wrote:
 >
-> On Sun, Aug 11, 2019 at 3:59 PM Ard Biesheuvel
-> <ard.biesheuvel@linaro.org> wrote:
+> On Mon, 12 Aug 2019 at 19:50, Nick Desaulniers <ndesaulniers@google.com> wrote:
 > >
-> > Provide a version of the core AES transform to the aegis128 SIMD
-> > code that does not rely on the special AES instructions, but uses
-> > plain NEON instructions instead. This allows the SIMD version of
-> > the aegis128 driver to be used on arm64 systems that do not
-> > implement those instructions (which are not mandatory in the
-> > architecture), such as the Raspberry Pi 3.
+> > On Sun, Aug 11, 2019 at 3:59 PM Ard Biesheuvel
+> > <ard.biesheuvel@linaro.org> wrote:
+> > > diff --git a/crypto/Makefile b/crypto/Makefile
+> > > index 99a9fa9087d1..0d2cdd523fd9 100644
+> > > --- a/crypto/Makefile
+> > > +++ b/crypto/Makefile
+> > > @@ -98,7 +98,14 @@ CFLAGS_aegis128-neon-inner.o += -mfpu=crypto-neon-fp-armv8
+> > >  aegis128-$(CONFIG_CRYPTO_AEGIS128_SIMD) += aegis128-neon.o aegis128-neon-inner.o
+> > >  endif
+> > >  ifeq ($(ARCH),arm64)
+> > > -CFLAGS_aegis128-neon-inner.o += -ffreestanding -mcpu=generic+crypto
+> > > +aegis128-cflags-y := -ffreestanding -mcpu=generic+crypto
+> > > +aegis128-cflags-$(CONFIG_CC_IS_GCC) += -ffixed-q16 -ffixed-q17 -ffixed-q18 \
+> > > +                                      -ffixed-q19 -ffixed-q20 -ffixed-q21 \
+> > > +                                      -ffixed-q22 -ffixed-q23 -ffixed-q24 \
+> > > +                                      -ffixed-q25 -ffixed-q26 -ffixed-q27 \
+> > > +                                      -ffixed-q28 -ffixed-q29 -ffixed-q30 \
+> > > +                                      -ffixed-q31
 > >
-> > Since GCC makes a mess of this when using the tbl/tbx intrinsics
-> > to perform the sbox substitution, preload the Sbox into v16..v31
-> > in this case and use inline asm to emit the tbl/tbx instructions.
-> > Clang does not support this approach, nor does it require it, since
-> > it does a much better job at code generation, so there we use the
-> > intrinsics as usual.
+> > I've filed https://bugs.llvm.org/show_bug.cgi?id=42974 for a feature
+> > request for this in Clang.
+> >
 >
-> Oh, great job getting it working with Clang, too. I appreciate that.
-> Certainly getting SIMD working exactly how you want across compilers
-> can be tricky.
+> Good. But even GCC has issues here. Most notably, something like
 >
+> register uint8x16_t foo asm ("v16");
+>
+> should permit a register that is excluded from general allocation to
+> be used explicitly, but this throws a warning on GCC and an error with
+> Clang.
 
-Indeed.
+Consider filing bugs against GCC's issue tracker so that they're aware
+of the issue if you think there's more that can be improved on their
+end (for bugs in Clang, I'm always happy to help submit bug reports).
+What is the warning?
 
-> >
-> > Cc: Nick Desaulniers <ndesaulniers@google.com>
-> > Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> > ---
-> >  crypto/Makefile              |  9 ++-
-> >  crypto/aegis128-neon-inner.c | 65 ++++++++++++++++++++
-> >  crypto/aegis128-neon.c       |  8 ++-
-> >  3 files changed, 80 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/crypto/Makefile b/crypto/Makefile
-> > index 99a9fa9087d1..0d2cdd523fd9 100644
-> > --- a/crypto/Makefile
-> > +++ b/crypto/Makefile
-> > @@ -98,7 +98,14 @@ CFLAGS_aegis128-neon-inner.o += -mfpu=crypto-neon-fp-armv8
-> >  aegis128-$(CONFIG_CRYPTO_AEGIS128_SIMD) += aegis128-neon.o aegis128-neon-inner.o
-> >  endif
-> >  ifeq ($(ARCH),arm64)
-> > -CFLAGS_aegis128-neon-inner.o += -ffreestanding -mcpu=generic+crypto
-> > +aegis128-cflags-y := -ffreestanding -mcpu=generic+crypto
-> > +aegis128-cflags-$(CONFIG_CC_IS_GCC) += -ffixed-q16 -ffixed-q17 -ffixed-q18 \
-> > +                                      -ffixed-q19 -ffixed-q20 -ffixed-q21 \
-> > +                                      -ffixed-q22 -ffixed-q23 -ffixed-q24 \
-> > +                                      -ffixed-q25 -ffixed-q26 -ffixed-q27 \
-> > +                                      -ffixed-q28 -ffixed-q29 -ffixed-q30 \
-> > +                                      -ffixed-q31
->
-> I've filed https://bugs.llvm.org/show_bug.cgi?id=42974 for a feature
-> request for this in Clang.
->
+for -ffixed-q* and `asm ("v16")`, on aarch64, what are the q registers
+and v registers?  I assume they're related to NEON, but I'd only even
+worked with w* and x* GPRs.  I *think* the explicit register syntax
+works for GPRs in Clang; maybe the v* and q* registers being broken is
+just oversight and can be fixed.
 
-Good. But even GCC has issues here. Most notably, something like
-
-register uint8x16_t foo asm ("v16");
-
-should permit a register that is excluded from general allocation to
-be used explicitly, but this throws a warning on GCC and an error with
-Clang.
-
-> > +CFLAGS_aegis128-neon-inner.o += $(aegis128-cflags-y)
-> >  CFLAGS_REMOVE_aegis128-neon-inner.o += -mgeneral-regs-only
-> >  aegis128-$(CONFIG_CRYPTO_AEGIS128_SIMD) += aegis128-neon.o aegis128-neon-inner.o
-> >  endif
-> > diff --git a/crypto/aegis128-neon-inner.c b/crypto/aegis128-neon-inner.c
-> > index 3d8043c4832b..ed55568afd1b 100644
-> > --- a/crypto/aegis128-neon-inner.c
-> > +++ b/crypto/aegis128-neon-inner.c
-> > @@ -17,6 +17,8 @@
-> >
-> >  #include <stddef.h>
-> >
-> > +extern int aegis128_have_aes_insn;
-> > +
-> >  void *memcpy(void *dest, const void *src, size_t n);
-> >  void *memset(void *s, int c, size_t n);
-> >
-> > @@ -24,6 +26,8 @@ struct aegis128_state {
-> >         uint8x16_t v[5];
-> >  };
-> >
-> > +extern const uint8x16x4_t crypto_aes_sbox[];
->
-> extern const uint8x16x4_t *crypto_aes_sbox;
->
-
-Ehm, nope. crypto_aes_sbox is an array of u8, not a pointer variable,
-so the former is the only correct way to declare it.
-
-> > +
-> >  static struct aegis128_state aegis128_load_state_neon(const void *state)
-> >  {
-> >         return (struct aegis128_state){ {
-> > @@ -49,6 +53,46 @@ uint8x16_t aegis_aes_round(uint8x16_t w)
-> >  {
-> >         uint8x16_t z = {};
-> >
-> > +#ifdef CONFIG_ARM64
-> > +       if (!__builtin_expect(aegis128_have_aes_insn, 1)) {
-> > +               static const uint8x16_t shift_rows = {
-> > +                       0x0, 0x5, 0xa, 0xf, 0x4, 0x9, 0xe, 0x3,
-> > +                       0x8, 0xd, 0x2, 0x7, 0xc, 0x1, 0x6, 0xb,
-> > +               };
-> > +               static const uint8x16_t ror32by8 = {
-> > +                       0x1, 0x2, 0x3, 0x0, 0x5, 0x6, 0x7, 0x4,
-> > +                       0x9, 0xa, 0xb, 0x8, 0xd, 0xe, 0xf, 0xc,
-> > +               };
-> > +               uint8x16_t v;
-> > +
-> > +               // shift rows
-> > +               w = vqtbl1q_u8(w, shift_rows);
-> > +
-> > +               // sub bytes
-> > +               if (!IS_ENABLED(CONFIG_CC_IS_GCC)) {
-> > +                       v = vqtbl4q_u8(crypto_aes_sbox[0], w);
-> > +                       v = vqtbx4q_u8(v, crypto_aes_sbox[1], w - 0x40);
-> > +                       v = vqtbx4q_u8(v, crypto_aes_sbox[2], w - 0x80);
-> > +                       v = vqtbx4q_u8(v, crypto_aes_sbox[3], w - 0xc0);
-> > +               } else {
-> > +                       asm("tbl %0.16b, {v16.16b-v19.16b}, %1.16b" : "=w"(v) : "w"(w));
-> > +                       w -= 0x40;
-> > +                       asm("tbx %0.16b, {v20.16b-v23.16b}, %1.16b" : "+w"(v) : "w"(w));
-> > +                       w -= 0x40;
-> > +                       asm("tbx %0.16b, {v24.16b-v27.16b}, %1.16b" : "+w"(v) : "w"(w));
-> > +                       w -= 0x40;
-> > +                       asm("tbx %0.16b, {v28.16b-v31.16b}, %1.16b" : "+w"(v) : "w"(w));
-> > +               }
->
-> I find negation in a if condition that also has an else to be a code
-> smell.  Consider replacing:
->
-> if !foo:
->   bar()
-> else:
->   baz()
->
-> with:
->
-> if foo:
->   baz()
-> else:
->   bar()
->
-> (CONFIG_CC_IS_CLANG may be helpful here, too).
->
-
-This was intentional. Since GCC is the compiler that needs the
-workaround, I test for GCC not Clang. Since the !GCC case is the
-default/correct case, I put it first.
-
-> With those 2 recommendations:
-> Acked-by: Nick Desaulniers <ndesaulniers@google.com>
-> in regards to compiling w/ Clang.  Someone else should review the
-> implementation of this crypto routine.
->
-> > +
-> > +               // mix columns
-> > +               w = (v << 1) ^ (uint8x16_t)(((int8x16_t)v >> 7) & 0x1b);
-> > +               w ^= (uint8x16_t)vrev32q_u16((uint16x8_t)v);
-> > +               w ^= vqtbl1q_u8(v ^ w, ror32by8);
-> > +
-> > +               return w;
-> > +       }
-> > +#endif
-> > +
-> >         /*
-> >          * We use inline asm here instead of the vaeseq_u8/vaesmcq_u8 intrinsics
-> >          * to force the compiler to issue the aese/aesmc instructions in pairs.
-> > @@ -73,10 +117,27 @@ struct aegis128_state aegis128_update_neon(struct aegis128_state st,
-> >         return st;
-> >  }
-> >
-> > +static inline __attribute__((always_inline))
-> > +void preload_sbox(void)
-> > +{
-> > +       if (!IS_ENABLED(CONFIG_ARM64) ||
-> > +           !IS_ENABLED(CONFIG_CC_IS_GCC) ||
-> > +           __builtin_expect(aegis128_have_aes_insn, 1))
-> > +               return;
-> > +
-> > +       asm("ld1        {v16.16b-v19.16b}, [%0], #64    \n\t"
-> > +           "ld1        {v20.16b-v23.16b}, [%0], #64    \n\t"
-> > +           "ld1        {v24.16b-v27.16b}, [%0], #64    \n\t"
-> > +           "ld1        {v28.16b-v31.16b}, [%0]         \n\t"
-> > +           :: "r"(crypto_aes_sbox));
-> > +}
-> > +
-> >  void crypto_aegis128_update_neon(void *state, const void *msg)
-> >  {
-> >         struct aegis128_state st = aegis128_load_state_neon(state);
-> >
-> > +       preload_sbox();
-> > +
-> >         st = aegis128_update_neon(st, vld1q_u8(msg));
-> >
-> >         aegis128_save_state_neon(st, state);
-> > @@ -88,6 +149,8 @@ void crypto_aegis128_encrypt_chunk_neon(void *state, void *dst, const void *src,
-> >         struct aegis128_state st = aegis128_load_state_neon(state);
-> >         uint8x16_t msg;
-> >
-> > +       preload_sbox();
-> > +
-> >         while (size >= AEGIS_BLOCK_SIZE) {
-> >                 uint8x16_t s = st.v[1] ^ (st.v[2] & st.v[3]) ^ st.v[4];
-> >
-> > @@ -120,6 +183,8 @@ void crypto_aegis128_decrypt_chunk_neon(void *state, void *dst, const void *src,
-> >         struct aegis128_state st = aegis128_load_state_neon(state);
-> >         uint8x16_t msg;
-> >
-> > +       preload_sbox();
-> > +
-> >         while (size >= AEGIS_BLOCK_SIZE) {
-> >                 msg = vld1q_u8(src) ^ st.v[1] ^ (st.v[2] & st.v[3]) ^ st.v[4];
-> >                 st = aegis128_update_neon(st, msg);
-> > diff --git a/crypto/aegis128-neon.c b/crypto/aegis128-neon.c
-> > index c1c0a1686f67..751f9c195aa4 100644
-> > --- a/crypto/aegis128-neon.c
-> > +++ b/crypto/aegis128-neon.c
-> > @@ -14,9 +14,15 @@ void crypto_aegis128_encrypt_chunk_neon(void *state, void *dst, const void *src,
-> >  void crypto_aegis128_decrypt_chunk_neon(void *state, void *dst, const void *src,
-> >                                         unsigned int size);
-> >
-> > +int aegis128_have_aes_insn __ro_after_init;
-> > +
-> >  bool crypto_aegis128_have_simd(void)
-> >  {
-> > -       return cpu_have_feature(cpu_feature(AES));
-> > +       if (cpu_have_feature(cpu_feature(AES))) {
-> > +               aegis128_have_aes_insn = 1;
->
-> If aegis128_have_aes_insn is __ro_after_init, is
-> crypto_aegis128_have_simd() called exclusively from .init sectioned
-> code?
->
-
-Yes. the core aegis128 calls this only from the module init routine
-(which is turned into an initcall if the module is builtin).
-
-> > +               return true;
-> > +       }
-> > +       return IS_ENABLED(CONFIG_ARM64);
-> >  }
-> >
-> >  void crypto_aegis128_update_simd(union aegis_block *state, const void *msg)
-> > --
-> > 2.17.1
-> >
->
->
-> --
-> Thanks,
-> ~Nick Desaulniers
+> > With those 2 recommendations:
+> > Acked-by: Nick Desaulniers <ndesaulniers@google.com>
+> > in regards to compiling w/ Clang.  Someone else should review the
+> > implementation of this crypto routine.
+-- 
+Thanks,
+~Nick Desaulniers
