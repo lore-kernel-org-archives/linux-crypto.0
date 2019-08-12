@@ -2,127 +2,137 @@ Return-Path: <SRS0=O5Fb=WI=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D572C31E40
-	for <linux-crypto@archiver.kernel.org>; Mon, 12 Aug 2019 17:31:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC7C3C31E40
+	for <linux-crypto@archiver.kernel.org>; Mon, 12 Aug 2019 17:56:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E67AE2075B
-	for <linux-crypto@archiver.kernel.org>; Mon, 12 Aug 2019 17:31:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9FB8E20663
+	for <linux-crypto@archiver.kernel.org>; Mon, 12 Aug 2019 17:56:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fp+SCcIb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mux8a8LR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727103AbfHLRbh (ORCPT
+        id S1726537AbfHLR4Y (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 12 Aug 2019 13:31:37 -0400
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:42607 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727067AbfHLRbg (ORCPT
+        Mon, 12 Aug 2019 13:56:24 -0400
+Received: from mail-ot1-f67.google.com ([209.85.210.67]:40022 "EHLO
+        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726185AbfHLR4X (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 12 Aug 2019 13:31:36 -0400
-Received: by mail-pl1-f196.google.com with SMTP id ay6so48196089plb.9
-        for <linux-crypto@vger.kernel.org>; Mon, 12 Aug 2019 10:31:36 -0700 (PDT)
+        Mon, 12 Aug 2019 13:56:23 -0400
+Received: by mail-ot1-f67.google.com with SMTP id c34so22133999otb.7;
+        Mon, 12 Aug 2019 10:56:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
+        d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=xZ1P69bCy5klgv2VIXX39SeNII1vbEy/cgF/CbLJCqg=;
-        b=fp+SCcIb4H6VDhyYodItsBkz4CTCT7P8ft9KYeVtimUmcFttvb7pSpShNqdfo2xAq+
-         iSD+svRNsuylwYVcb5r6sAyYxy9p0XdI09qN8iO1vbsJUuxNTSQuxsLYQ4eCuV3vMbF6
-         vsHkC89RVRnu9EZouj2xqlfs9ki69D07C/ypfQORq9zdM4sQpLwwYp5k79DegjhUQNtS
-         i2etiBKz2HPXKUUbb3Lxl26YLgeEt2W0Pd8Qi18etVlvOZviRjW9JquLikqFpQLfdQ4k
-         4bf1t4g2AqxVZs9gogXZn9ObrPHBVzoun5IQwI8d1YIbl6o99i86GhciTRmDiC20t2ia
-         dD/Q==
+        bh=DwkJnZQwcd2vdtvKtixBQGDvtW9rbIGj3aJiuLEEfEw=;
+        b=Mux8a8LRF8dsI5HB6we1YRsuzPlDkVt/DE+bSeIlvt5J4wTpRiAMlxErc2mSeE8f5x
+         Ars+Buig/NYgI/C8GATm4HWWMrLMFIrgmPjcjRgnEtNoUcnrhnnUh6wRB4Erkco0b/5G
+         hp9C21qRYKvHXaEywD0D+Z3Kno+R6OKsKKXW1xHwOAAjUwkOg4GAiGsbkQNvaYMfVAXr
+         SjV/DIsIwfCQGFryADIe0tge0yDGBezynvYiMn+lbiuK8N/kbzV+9IsHgCAegQvmeGol
+         rS034sRa2Th+HSNdzjVzjEwQWInBZxxDY2EG8S1IduwwWjHTIhny76MJ25mgzpLY4bDs
+         +YWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=xZ1P69bCy5klgv2VIXX39SeNII1vbEy/cgF/CbLJCqg=;
-        b=MFU+RhOnQUNuXnXKlatItpANdgjY4SjwtbycCZzoYa9DtfBGrUvd6IEG7FKtXwqyiN
-         OkrelqC0NxALhFrpddCea4iGRcb/JtXpDcEk88Zqtqgvaq6WnTf0CTW1e7reOAS3AO5m
-         JnuIm5Q7MR5mmo6Eni2q90B6FbBEBqzGFQczyFGVcYpl9pW1atWmkliQT3SD/4fUhxoT
-         HhZ2cYIR5k0SyENGcG+P5/hwpN9wo/AXTpopkGBvWzElAhxe4yaEE86FbW1WNKAFFW6Y
-         xOFNgeh5brDEOgjloX65YCPuK2zNrPR3HCQBqZQgdvxslrHgLNeCe/xY8eFRk7Dxhmec
-         7fnA==
-X-Gm-Message-State: APjAAAVpsygn3C6FzHZLxiwEpi6PnhEV2cHu7jF7E/vtgcU+YXLYv1Hq
-        fZSFLULTx85CdzJDq6Sk0eCgRcPsuwjLcJvlcac+vE7ZFL4=
-X-Google-Smtp-Source: APXvYqxRqMfOTc+G8aKjQtVVcC9fCDLVEEJT1s83XGgIeeO5MxP4OoqwVkbFbgXFecspNhcrWnvtY6psvy0WSt1jxao=
-X-Received: by 2002:a17:902:3363:: with SMTP id a90mr32338228plc.119.1565631095499;
- Mon, 12 Aug 2019 10:31:35 -0700 (PDT)
+        bh=DwkJnZQwcd2vdtvKtixBQGDvtW9rbIGj3aJiuLEEfEw=;
+        b=EkdqB1nwTi5DCV/ZEXu+qJHnRuaAA6iyBbYdpMTyDRAVquhibrBv3FKcH2GAj7KXXR
+         9SvYShEZX15zIxuF/PeXlXELmpmKRHyN29vw2lBChgdsSRMgT6NF5G4BE9JtzdxQBh/w
+         m+HY55vDOBf62hR3+O/F7+Sgs5cEw14dE2d/CdxRggOufo2GyDOSiLhUyZWiwqkofJPO
+         5OKQmEiWgM82WXb7cAQtG/cVQJZXIuRgy/lzcm6xmsfxhU//x/DOQaEh/Gze0iTjveCP
+         hpPNdMGdJ0IwtnFX6GnYJG82Owbxynf5rCSbGlUCyp1pQmi0HA1XoJvmioJ/KqIP52Fy
+         xVpQ==
+X-Gm-Message-State: APjAAAWmwJJcKVIkkCXM5A2E2/HtO/OJqniK9qBXTzDwmvbc6OBVBaJD
+        amp3BenJ1fS5sHQRCil1CHv35LLUiTlNYlnGq10=
+X-Google-Smtp-Source: APXvYqx3ZW8jVc7kI7rD18JChyHGb8gtCcVTNL5M4EJrHiQf0uMaV9kOvHszHGopenJZP0cGJ2qTzgDhoLL6yyjHdFY=
+X-Received: by 2002:a02:16c5:: with SMTP id a188mr22241140jaa.86.1565632582885;
+ Mon, 12 Aug 2019 10:56:22 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190811225912.19412-1-ard.biesheuvel@linaro.org>
- <20190811225912.19412-4-ard.biesheuvel@linaro.org> <CAKwvOd=uxi8qmQEjOudvSUVW6vc42b-SmoV91DeWfBkp3kOJcQ@mail.gmail.com>
- <CAKv+Gu9KKvCXAm=1hJ-owkL4BTi=hmCXA8ag_rTvdnUgn_zvUg@mail.gmail.com>
-In-Reply-To: <CAKv+Gu9KKvCXAm=1hJ-owkL4BTi=hmCXA8ag_rTvdnUgn_zvUg@mail.gmail.com>
-From:   Nick Desaulniers <ndesaulniers@google.com>
-Date:   Mon, 12 Aug 2019 10:31:24 -0700
-Message-ID: <CAKwvOd=9KP9j7SkyCJ6xBWmVQn8nSsP78PasdtBO5aDFcSm2Rg@mail.gmail.com>
-Subject: Re: [PATCH v2 3/3] crypto: arm64/aegis128 - implement plain NEON version
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Eric Biggers <ebiggers@kernel.org>
+References: <20190717152458.22337-1-andrew.smirnov@gmail.com>
+ <20190717152458.22337-3-andrew.smirnov@gmail.com> <VI1PR0402MB3485E4DDB5E3BDCBC2AAAFE398C70@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+In-Reply-To: <VI1PR0402MB3485E4DDB5E3BDCBC2AAAFE398C70@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+From:   Andrey Smirnov <andrew.smirnov@gmail.com>
+Date:   Mon, 12 Aug 2019 10:56:11 -0700
+Message-ID: <CAHQ1cqF=7h=mcKSBNRoYX5mkRetEbvb8dGkDyqHcDf1TCpr40w@mail.gmail.com>
+Subject: Re: [PATCH v6 02/14] crypto: caam - simplfy clock initialization
+To:     Horia Geanta <horia.geanta@nxp.com>
+Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Leonard Crestez <leonard.crestez@nxp.com>,
+        Iuliana Prodan <iuliana.prodan@nxp.com>,
+        Chris Spencer <christopher.spencer@sea.co.uk>,
+        Cory Tusar <cory.tusar@zii.aero>,
+        Chris Healy <cphealy@gmail.com>,
+        Lucas Stach <l.stach@pengutronix.de>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Aug 12, 2019 at 10:22 AM Ard Biesheuvel
-<ard.biesheuvel@linaro.org> wrote:
+On Tue, Jul 23, 2019 at 7:17 AM Horia Geanta <horia.geanta@nxp.com> wrote:
 >
-> On Mon, 12 Aug 2019 at 19:50, Nick Desaulniers <ndesaulniers@google.com> wrote:
+> On 7/17/2019 6:25 PM, Andrey Smirnov wrote:
+> > Simplify clock initialization code by converting it to use clk-bulk,
+> > devres and soc_device_match() match table. No functional change
+> > intended.
 > >
-> > On Sun, Aug 11, 2019 at 3:59 PM Ard Biesheuvel
-> > <ard.biesheuvel@linaro.org> wrote:
-> > > diff --git a/crypto/Makefile b/crypto/Makefile
-> > > index 99a9fa9087d1..0d2cdd523fd9 100644
-> > > --- a/crypto/Makefile
-> > > +++ b/crypto/Makefile
-> > > @@ -98,7 +98,14 @@ CFLAGS_aegis128-neon-inner.o += -mfpu=crypto-neon-fp-armv8
-> > >  aegis128-$(CONFIG_CRYPTO_AEGIS128_SIMD) += aegis128-neon.o aegis128-neon-inner.o
-> > >  endif
-> > >  ifeq ($(ARCH),arm64)
-> > > -CFLAGS_aegis128-neon-inner.o += -ffreestanding -mcpu=generic+crypto
-> > > +aegis128-cflags-y := -ffreestanding -mcpu=generic+crypto
-> > > +aegis128-cflags-$(CONFIG_CC_IS_GCC) += -ffixed-q16 -ffixed-q17 -ffixed-q18 \
-> > > +                                      -ffixed-q19 -ffixed-q20 -ffixed-q21 \
-> > > +                                      -ffixed-q22 -ffixed-q23 -ffixed-q24 \
-> > > +                                      -ffixed-q25 -ffixed-q26 -ffixed-q27 \
-> > > +                                      -ffixed-q28 -ffixed-q29 -ffixed-q30 \
-> > > +                                      -ffixed-q31
-> >
-> > I've filed https://bugs.llvm.org/show_bug.cgi?id=42974 for a feature
-> > request for this in Clang.
-> >
+> Thanks.
+> Two nitpicks below.
 >
-> Good. But even GCC has issues here. Most notably, something like
+> > +static int init_clocks(struct device *dev,
+> > +                    struct caam_drv_private *ctrlpriv,
+> > +                    const struct caam_imx_data *data)
+> > +{
+> > +     int ret;
+> > +
+> > +     ctrlpriv->num_clks = data->num_clks;
+> > +     ctrlpriv->clks = devm_kmemdup(dev, data->clks,
+> > +                                   data->num_clks * sizeof(data->clks[0]),
+> > +                                   GFP_KERNEL);
+> > +     if (!ctrlpriv->clks)
+> > +             return -ENOMEM;
+> > +
+> > +     ret = devm_clk_bulk_get(dev, ctrlpriv->num_clks, ctrlpriv->clks);
+> > +     if (ret) {
+> > +             dev_err(dev,
+> > +                     "Failed to request all necessary clocks\n");
+> > +             return ret;
+> > +     }
+> > +
+> > +     ret = clk_bulk_prepare_enable(ctrlpriv->num_clks, ctrlpriv->clks);
+> > +     if (ret) {
+> > +             dev_err(dev,
+> > +                     "Failed to prepare/enable all necessary clocks\n");
+> > +             return ret;
+> > +     }
+> > +
+> > +     ret = devm_add_action_or_reset(dev, disable_clocks, ctrlpriv);
+> > +     if (ret)
+> > +             return ret;
+> > +
+> > +     return 0;
+> Or directly:
+>         return devm_add_action_or_reset(dev, disable_clocks, ctrlpriv);
 >
-> register uint8x16_t foo asm ("v16");
+> > +     imx_soc_match = soc_device_match(caam_imx_soc_table);
+> > +     if (imx_soc_match) {
+> > +             if (!imx_soc_match->data) {
+> > +                     dev_err(dev, "No clock data provided for i.MX SoC");
+> > +                     return -EINVAL;
+> [...]
+> > +             ret = init_clocks(dev, ctrlpriv, imx_soc_match->data);
+> ctrlpriv can be retrieved using dev_get_drvdata(dev), thus there's no need
+> to pass it as parameter.
 >
-> should permit a register that is excluded from general allocation to
-> be used explicitly, but this throws a warning on GCC and an error with
-> Clang.
 
-Consider filing bugs against GCC's issue tracker so that they're aware
-of the issue if you think there's more that can be improved on their
-end (for bugs in Clang, I'm always happy to help submit bug reports).
-What is the warning?
+Will fix in v7.
 
-for -ffixed-q* and `asm ("v16")`, on aarch64, what are the q registers
-and v registers?  I assume they're related to NEON, but I'd only even
-worked with w* and x* GPRs.  I *think* the explicit register syntax
-works for GPRs in Clang; maybe the v* and q* registers being broken is
-just oversight and can be fixed.
-
-> > With those 2 recommendations:
-> > Acked-by: Nick Desaulniers <ndesaulniers@google.com>
-> > in regards to compiling w/ Clang.  Someone else should review the
-> > implementation of this crypto routine.
--- 
 Thanks,
-~Nick Desaulniers
+Andrey Smirnov
