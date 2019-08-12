@@ -2,73 +2,151 @@ Return-Path: <SRS0=O5Fb=WI=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AE1DC433FF
-	for <linux-crypto@archiver.kernel.org>; Mon, 12 Aug 2019 04:51:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A489EC31E40
+	for <linux-crypto@archiver.kernel.org>; Mon, 12 Aug 2019 06:33:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EE67720663
-	for <linux-crypto@archiver.kernel.org>; Mon, 12 Aug 2019 04:51:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 69A8A2085A
+	for <linux-crypto@archiver.kernel.org>; Mon, 12 Aug 2019 06:33:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VB9Vzg2C"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725774AbfHLEvd (ORCPT
+        id S1726405AbfHLGdh (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 12 Aug 2019 00:51:33 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:53644 "EHLO fornost.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725648AbfHLEvd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 12 Aug 2019 00:51:33 -0400
-Received: from gondolin.me.apana.org.au ([192.168.0.6] helo=gondolin.hengli.com.au)
-        by fornost.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1hx2Ij-0004WY-3n; Mon, 12 Aug 2019 14:51:21 +1000
-Received: from herbert by gondolin.hengli.com.au with local (Exim 4.80)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1hx2Ig-0004X1-Lf; Mon, 12 Aug 2019 14:51:18 +1000
-Date:   Mon, 12 Aug 2019 14:51:18 +1000
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
-Cc:     Milan Broz <gmazyland@gmail.com>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Subject: Re: [dm-devel] xts fuzz testing and lack of ciphertext stealing
- support
-Message-ID: <20190812045118.GA17383@gondor.apana.org.au>
-References: <MN2PR20MB2973127E4C159A8F5CFDD0C9CAD70@MN2PR20MB2973.namprd20.prod.outlook.com>
- <VI1PR0402MB3485689B4B65C879BC1D137398D70@VI1PR0402MB3485.eurprd04.prod.outlook.com>
- <20190809024821.GA7186@gondor.apana.org.au>
- <CAKv+Gu9hk=PGpsAWWOU61VrA3mVQd10LudA1qg0LbiX7DG9RjA@mail.gmail.com>
- <VI1PR0402MB3485F94AECC495F133F6B3D798D60@VI1PR0402MB3485.eurprd04.prod.outlook.com>
- <CAKv+Gu-_WObNm+ySXDWjhqe2YPzajX83MofuF-WKPSdLg5t4Ew@mail.gmail.com>
- <MN2PR20MB297361CA3C29C236D6D8F6F4CAD60@MN2PR20MB2973.namprd20.prod.outlook.com>
- <CAKv+Gu-xWxZ58tzyYoH_jDKfJoM+KzOWWpzCeHEmOXQ39Bv15g@mail.gmail.com>
- <d6d0b155-476b-d495-3418-4b171003cdd7@gmail.com>
- <MN2PR20MB2973D499FDBC5652CC3FEE6BCAD00@MN2PR20MB2973.namprd20.prod.outlook.com>
+        Mon, 12 Aug 2019 02:33:37 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:35921 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725819AbfHLGdh (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 12 Aug 2019 02:33:37 -0400
+Received: by mail-wm1-f66.google.com with SMTP id g67so10724961wme.1;
+        Sun, 11 Aug 2019 23:33:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=uZyZcBmr9tVQIt83TCEOc/l00emIgBlhTZYad4aAofw=;
+        b=VB9Vzg2C9ADIvBOZK9/oZVxZHuPoA4uuMdlM8v54Tv/uS97hoV7BuBu5+Z7yoS+ssX
+         OkmTggCX9e7unzkHVMuPMNBO7uR+NNeCOc9L6vU8aXow7MtKz5lybDdSMnvxyhHHE1KA
+         3fxzEUqmmns1Qxl4ZHamdt48JWZASK3HjeItTT4r9fO3nN3d4GO0S46Oly6ZwfES+gJP
+         7IhlzA5mWNZO9TyIEmm7rdJSoqDQtunFccbHv7e13O4plYnBzm34gQke+G61boJx+x/C
+         KgkZunb7wLsqOAN/wSh1fNA8KKoPT3ghh5C11bCDSS9a+fwJpecz83ll2JNA0dhJH68+
+         RYEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=uZyZcBmr9tVQIt83TCEOc/l00emIgBlhTZYad4aAofw=;
+        b=g8pZO34FlhRP/Vny1m3GOYAgsL4u+p4qU1ixaH/CJvv3g9W6629warOJ7XHrRvuSdy
+         Hf1eKeJYvkQO29Xb7xyjj5nMSgYX2mtIlXWpFNmpXGypK1DFwBvCXiRtGP1nS4f7SKnH
+         0ujQwyHu99bFU5exDYzhXXNa2hXGjgKQSOlJadLF0vYvMx2ODAjjxqeJLwnLnZmVGoVu
+         p67bfzE2/Yy3xx/0El05JC8TCjMT6J44FbgtVevW2SEEH2+T5tuUfS+5sih1MxBKszya
+         ubKmyMWj4cdQpgEutjx6vLcbWNHtoPjktwbzIDOyBTRIbK4mN2psyLeB8lu+tmJ/vJpH
+         x9EQ==
+X-Gm-Message-State: APjAAAWrfL2yQ3Td+jjbkPZntLUoY9oL+Ycq+fwAg/xqgzNUaPPT9jv+
+        As6I0i2+/ZGklHfuetfHqZQ=
+X-Google-Smtp-Source: APXvYqyDs4Fx8K1sJ9CuUzgdhWOaNLbFjtMOEQR57ZK8iKqg6uKUoYsR6eSGr711E939zjTFoQ0l1w==
+X-Received: by 2002:a7b:c21a:: with SMTP id x26mr15527259wmi.61.1565591614527;
+        Sun, 11 Aug 2019 23:33:34 -0700 (PDT)
+Received: from [172.22.36.64] (redhat-nat.vtp.fi.muni.cz. [78.128.215.6])
+        by smtp.gmail.com with ESMTPSA id r15sm110324859wrj.68.2019.08.11.23.33.33
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Sun, 11 Aug 2019 23:33:33 -0700 (PDT)
+Subject: Re: [PATCH v9 3/7] md: dm-crypt: switch to ESSIV crypto API template
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        linux-crypto@vger.kernel.org
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Eric Biggers <ebiggers@google.com>, dm-devel@redhat.com,
+        linux-fscrypt@vger.kernel.org,
+        Gilad Ben-Yossef <gilad@benyossef.com>
+References: <20190810094053.7423-1-ard.biesheuvel@linaro.org>
+ <20190810094053.7423-4-ard.biesheuvel@linaro.org>
+From:   Milan Broz <gmazyland@gmail.com>
+Openpgp: preference=signencrypt
+Message-ID: <8679d2f5-b005-cd89-957e-d79440b78086@gmail.com>
+Date:   Mon, 12 Aug 2019 08:33:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <MN2PR20MB2973D499FDBC5652CC3FEE6BCAD00@MN2PR20MB2973.namprd20.prod.outlook.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <20190810094053.7423-4-ard.biesheuvel@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Aug 11, 2019 at 09:29:38PM +0000, Pascal Van Leeuwen wrote:
->
-> It will very likely fail with that CAAM h/w, but that only proves that you
-> should not use plain64be IV's together with CAAM h/w. Which should be
+Hi,
 
-It doesn't matter whether it's wrong or not.
+On 10/08/2019 11:40, Ard Biesheuvel wrote:
+> Replace the explicit ESSIV handling in the dm-crypt driver with calls
+> into the crypto API, which now possesses the capability to perform
+> this processing within the crypto subsystem.
+> 
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> ---
+>  drivers/md/Kconfig    |   1 +
+>  drivers/md/dm-crypt.c | 194 ++++----------------
+>  2 files changed, 33 insertions(+), 162 deletions(-)
+> 
+> diff --git a/drivers/md/Kconfig b/drivers/md/Kconfig
+> index 3834332f4963..b727e8f15264 100644
+> --- a/drivers/md/Kconfig
+> +++ b/drivers/md/Kconfig
+...
+> @@ -2493,6 +2339,20 @@ static int crypt_ctr_cipher_new(struct dm_target *ti, char *cipher_in, char *key
+>  	if (*ivmode && !strcmp(*ivmode, "lmk"))
+>  		cc->tfms_count = 64;
+>  
+> +	if (*ivmode && !strcmp(*ivmode, "essiv")) {
+> +		if (!*ivopts) {
+> +			ti->error = "Digest algorithm missing for ESSIV mode";
+> +			return -EINVAL;
+> +		}
+> +		ret = snprintf(buf, CRYPTO_MAX_ALG_NAME, "essiv(%s,%s)",
+> +			       cipher_api, *ivopts);
 
-The fact is that this is an interface that we export to user-space
-and we must NEVER break that.  So if your driver is breaking this
-interface then your driver is broken and needs to be fixed.
+This is wrong. It works only in length-preserving modes, not in AEAD modes.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Try for example
+# cryptsetup luksFormat /dev/sdc -c aes-cbc-essiv:sha256 --integrity hmac-sha256 -q -i1
+
+It should produce Crypto API string
+  authenc(hmac(sha256),essiv(cbc(aes),sha256))
+while it produces
+  essiv(authenc(hmac(sha256),cbc(aes)),sha256)
+(and fails).
+
+You can run "luks2-integrity-test" from cryptsetup test suite to detect it.
+
+Just the test does not fail, it prints N/A for ESSIV use cases - we need to deal with older kernels...
+I can probable change it to fail unconditionally though.
+
+...
+> @@ -2579,9 +2439,19 @@ static int crypt_ctr_cipher_old(struct dm_target *ti, char *cipher_in, char *key
+>  	if (!cipher_api)
+>  		goto bad_mem;
+>  
+> -	ret = snprintf(cipher_api, CRYPTO_MAX_ALG_NAME,
+> -		       "%s(%s)", chainmode, cipher);
+> -	if (ret < 0) {
+> +	if (*ivmode && !strcmp(*ivmode, "essiv")) {
+> +		if (!*ivopts) {
+> +			ti->error = "Digest algorithm missing for ESSIV mode";
+> +			kfree(cipher_api);
+> +			return -EINVAL;
+> +		}
+> +		ret = snprintf(cipher_api, CRYPTO_MAX_ALG_NAME,
+> +			       "essiv(%s(%s),%s)", chainmode, cipher, *ivopts);
+
+I guess here it is ok, because old forma cannot use AEAD.
+
+Thanks,
+Milan
