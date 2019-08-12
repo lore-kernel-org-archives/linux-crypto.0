@@ -2,139 +2,190 @@ Return-Path: <SRS0=O5Fb=WI=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-14.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4788AC31E40
-	for <linux-crypto@archiver.kernel.org>; Mon, 12 Aug 2019 19:27:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07065C433FF
+	for <linux-crypto@archiver.kernel.org>; Mon, 12 Aug 2019 19:36:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F0423206C1
-	for <linux-crypto@archiver.kernel.org>; Mon, 12 Aug 2019 19:27:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CF6262085A
+	for <linux-crypto@archiver.kernel.org>; Mon, 12 Aug 2019 19:36:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="o2QA/lHt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L+vcXW+K"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726735AbfHLT1w (ORCPT
+        id S1726681AbfHLTgJ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 12 Aug 2019 15:27:52 -0400
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:34737 "EHLO
-        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726681AbfHLT1v (ORCPT
+        Mon, 12 Aug 2019 15:36:09 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:35503 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726880AbfHLTgI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 12 Aug 2019 15:27:51 -0400
-Received: by mail-ot1-f67.google.com with SMTP id n5so163333113otk.1;
-        Mon, 12 Aug 2019 12:27:51 -0700 (PDT)
+        Mon, 12 Aug 2019 15:36:08 -0400
+Received: by mail-wr1-f66.google.com with SMTP id k2so19761991wrq.2;
+        Mon, 12 Aug 2019 12:36:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ILsSYtoFc2CKUlsvQby1NfpnXmUVs1DoYSPvAsEfls8=;
-        b=o2QA/lHtWsZXoUWoPCY1fi2EbjP3gU2sfs7+RY7eESxVYX8lLeUmip9oXzJ7XGDJIR
-         MR0abaxb3jMRolf3wgB78dNbWcvM0hnBgRq22Ta8W21hxFjeSgc6TpXFToll2I/kqPvd
-         jghGveeNTsg30U1mIIgM4bo23kl3dE/Z1hrXuQRC3MPbjgCPIVe6hSCaLTXOfCmLJeWl
-         PojFObeFGcz37hrOMnRu1e2xlwmCyyeuUJ2kaiLIxIPNuqhfrsdaJ5jcvogDB0GMOqwn
-         sZC4TbnU8vDoEqfmxaFXkPrji8il2qEl0gGVkzlGC1uNCptGdCT9wegAPhltsU1T4ycC
-         nToA==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=k2Q5Zs7N8/j45SfwYDhEjobCOU8g/47tJEkHFeIxHdQ=;
+        b=L+vcXW+KZ8BQTvrEhjNTM9/4fNSXashX2Z9MybFGgXHOgLaxQrwJaCZIw8tyuMHQbW
+         oAI5ft/lKpjXyHMpeFPuVksxq3JQfhfXjNYkF1lbSDiy+gb8Xem7Hlz7OW9uBiMyLGU5
+         t0/hPwXrEiZMfO0L7cw9BacR+cu+KpzHaOYoAVQMWS3pqGBFdgcoGoMiQifCB3Is8CxJ
+         qJewGM+821XESthu8Qp2EFHTARjMpbjmSuagNrZ0if4y05JOIGEBF5ZDh4AKxS8OZty1
+         s/ctoFI0rUGmTXxdr1EvvpwLj9Pa8F/3mtWmnEcHi/vOVca9MCmVJPRpUPNx74ElYrJq
+         oVwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ILsSYtoFc2CKUlsvQby1NfpnXmUVs1DoYSPvAsEfls8=;
-        b=ZCHiW31uACdNKcpr92+17y556Yxj+1iIQtTByh5vKpHAH+IHd8IzMq5gCBoBE02DWg
-         g75W3YDfj/1VjmX3nuxs1asJZ8MyzWuzSOi7TGksrxVqP1OZl6J24mQeTPs+nZcmGXjP
-         +MAfG08rVHNmDxBgjVU3sDOcvW6lvq1nqmKkrVvKqoG2b7SpN6EDXBa8YmZQKCV2jNGv
-         qqXgvcmyclw/SaLH4RF5Vgy1bev/AlR5y6U30mReGmwHJ2uZ3SDwqGhO67VmQmVPH3Li
-         5xGqYLZmBcwpR0N+xwn95wKf5+h0LFlpENpb9qQBjQIKr8tt4Pzbwq/KdWxX0ZH2CuyC
-         9r7A==
-X-Gm-Message-State: APjAAAXFvZyvCGP9E6rR+8oSdh4MmBT55PFLavRiHOcrGauah82H/zrL
-        ErXBVQ129brykx45CaYSLofDRia3/DoygztUid4=
-X-Google-Smtp-Source: APXvYqyFv5k85LuUb92ftiZ5NcKrsW1BBLp8/X85YaDKrUsvOGGM29LDofD561J6Qe5XmNJQ26XFzrsVX+X/wKpwUOc=
-X-Received: by 2002:a6b:4107:: with SMTP id n7mr11786212ioa.12.1565638070771;
- Mon, 12 Aug 2019 12:27:50 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=k2Q5Zs7N8/j45SfwYDhEjobCOU8g/47tJEkHFeIxHdQ=;
+        b=Of8ciqMrej3C44n72Ki/BZ8ZumtHk+Nnr4lFa5tf8lokdT+j72v4WVMbV/cY/MEqCd
+         46ciy1ucTx/8CWQQM6DBeFTn5xzYk9ilhXBS06PvNFtTG5Xr+dVexfjYImHm1aHepXdI
+         kt6OlZDptricKN9TNpeBBtLREMbbkZgSubG79mGbnqeBvd/7YrtXFG8DLrN4H3gu0nB4
+         heLj5I89kQvzqjGtBa73C2nGSj1FbRWvytsmJSir4gD9zFyKe+iiDUXSmuaBnK4Gbf3m
+         XH8MFG0LHEfzc5LqRZ0VkpQYvilRKDPlcLBV69JfKdzKk37VITbbtm9r4GW+1oWS4x3R
+         Ym9g==
+X-Gm-Message-State: APjAAAXdYqYTbpQSltPPUoifGRUqYUcexcW/aW6os+Ul/a8sVT8hmxkm
+        GR9qkw6H6IPW/Mj14luLdSk=
+X-Google-Smtp-Source: APXvYqzswoVYVjt/R00117iT42wlOz4HmNFFf19yfz3oM8qk/uVTrP34TUwKNyiEzRSwhGx5aTwW8g==
+X-Received: by 2002:adf:fe08:: with SMTP id n8mr40819056wrr.60.1565638566277;
+        Mon, 12 Aug 2019 12:36:06 -0700 (PDT)
+Received: from localhost.localdomain ([2a01:4f8:222:2f1b::2])
+        by smtp.gmail.com with ESMTPSA id l3sm26874346wrb.41.2019.08.12.12.36.04
+        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
+        Mon, 12 Aug 2019 12:36:05 -0700 (PDT)
+From:   Nathan Chancellor <natechancellor@gmail.com>
+To:     Ralf Baechle <ralf@linux-mips.org>,
+        James Hogan <jhogan@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     linux-mips@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, clang-built-linux@googlegroups.com,
+        Nathan Chancellor <natechancellor@gmail.com>,
+        Nick Desaulniers <ndesaulniers@google.com>
+Subject: [PATCH v2] lib/mpi: Eliminate unused umul_ppmm definitions for MIPS
+Date:   Mon, 12 Aug 2019 12:32:57 -0700
+Message-Id: <20190812193256.55103-1-natechancellor@gmail.com>
+X-Mailer: git-send-email 2.23.0.rc2
 MIME-Version: 1.0
-References: <20190717152458.22337-1-andrew.smirnov@gmail.com>
- <20190717152458.22337-13-andrew.smirnov@gmail.com> <VI1PR0402MB348580480F5EAF5F539B585A98DA0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-In-Reply-To: <VI1PR0402MB348580480F5EAF5F539B585A98DA0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-From:   Andrey Smirnov <andrew.smirnov@gmail.com>
-Date:   Mon, 12 Aug 2019 12:27:38 -0700
-Message-ID: <CAHQ1cqEiCkXP+-w9WUc33oW6vDhHza2Jq_kQsXjKZ+__T5g77g@mail.gmail.com>
-Subject: Re: [PATCH v6 12/14] crypto: caam - force DMA address to 32-bit on
- 64-bit i.MX SoCs
-To:     Horia Geanta <horia.geanta@nxp.com>
-Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Chris Spencer <christopher.spencer@sea.co.uk>,
-        Cory Tusar <cory.tusar@zii.aero>,
-        Chris Healy <cphealy@gmail.com>,
-        Lucas Stach <l.stach@pengutronix.de>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Leonard Crestez <leonard.crestez@nxp.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+X-Patchwork-Bot: notify
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Aug 5, 2019 at 1:23 AM Horia Geanta <horia.geanta@nxp.com> wrote:
->
-> On 7/17/2019 6:25 PM, Andrey Smirnov wrote:
-> > i.MX8 SoC still use 32-bit addresses in its CAAM implmentation, so
-> i.MX8 SoC or i.MX8 mScale?
-> Looking at the documentation, some i.MX8 parts (for e.g. QM and QXP)
-> allow for 36-bit addresses.
->
+Clang errors out when building this macro:
 
-mScale. Will update the message.
+lib/mpi/generic_mpih-mul1.c:37:24: error: invalid use of a cast in a
+inline asm context requiring an l-value: remove the cast or build with
+-fheinous-gnu-extensions
+                umul_ppmm(prod_high, prod_low, s1_ptr[j], s2_limb);
+                ~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+lib/mpi/longlong.h:652:20: note: expanded from macro 'umul_ppmm'
+        : "=l" ((USItype)(w0)), \
+                ~~~~~~~~~~^~~
+lib/mpi/generic_mpih-mul1.c:37:3: error: invalid output constraint '=h'
+in asm
+                umul_ppmm(prod_high, prod_low, s1_ptr[j], s2_limb);
+                ^
+lib/mpi/longlong.h:653:7: note: expanded from macro 'umul_ppmm'
+             "=h" ((USItype)(w1)) \
+             ^
+2 errors generated.
 
-> > change all of the code to be able to handle that.
-> >
-> Shouldn't this case (32-bit CAAM and CONFIG_ARCH_DMA_ADDR_T_64BIT=y) work
-> for any ARMv8 SoC, i.e. how is this i.MX-specific?
->
+The C version that is used for GCC 4.4 and up works well with clang;
+however, it is not currently being used because Clang masks itself
+as GCC 4.2.1 for compatibility reasons. As Nick points out, we require
+GCC 4.6 and newer in the kernel so we can eliminate all of the
+versioning checks and just use the C version of umul_ppmm for all
+supported compilers.
 
-It's a generic change.
+Link: https://github.com/ClangBuiltLinux/linux/issues/605
+Suggested-by: Nick Desaulniers <ndesaulniers@google.com>
+Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
+---
 
-> > @@ -603,11 +603,13 @@ static int caam_probe(struct platform_device *pdev)
-> >               ret = init_clocks(dev, ctrlpriv, imx_soc_match->data);
-> >               if (ret)
-> >                       return ret;
-> > +
-> > +             caam_ptr_sz = sizeof(u32);
-> > +     } else {
-> > +             caam_ptr_sz = sizeof(dma_addr_t);
-> caam_ptr_sz should be deduced by reading MCFGR[PS] bit, i.e. decoupled
-> from dma_addr_t.
->
+This supersedes the following two patches:
 
-MCFGR[PS] is not mentioned in i.MX8MQ SRM and MCFG_PS in CTPR_MS is
-documented as set to "0" (seems to match in real HW as well). Doesn't
-seem like a workable solution for i.MX8MQ. Is there something I am
-missing?
+https://lore.kernel.org/lkml/20190812033120.43013-4-natechancellor@gmail.com/
 
-> There is another configuration that should be considered
-> (even though highly unlikely):
-> caam_ptr_sz=1  - > 32-bit addresses for CAAM
-> CONFIG_ARCH_DMA_ADDR_T_64BIT=n - 32-bit dma_addr_t
-> so the logic has to be carefully evaluated.
->
+https://lore.kernel.org/lkml/20190812033120.43013-5-natechancellor@gmail.com/
 
-I don't understand what you mean here. 32-bit CAAM + 32-bit dma_addr_t
-should already be the case for i.MX6, etc. how is what you describe
-different?
+I labelled this as a v2 so those don't get applied.
 
-> > @@ -191,7 +191,8 @@ static inline u64 caam_dma64_to_cpu(u64 value)
-> >
-> >  static inline u64 cpu_to_caam_dma(u64 value)
-> >  {
-> > -     if (IS_ENABLED(CONFIG_ARCH_DMA_ADDR_T_64BIT))
-> > +     if (IS_ENABLED(CONFIG_ARCH_DMA_ADDR_T_64BIT) &&
-> > +         !caam_imx)
-> Related to my previous comment (i.MX-specific vs. SoC-generic),
-> this should probably change to smth. like: caam_ptr_sz == sizeof(u64)
->
+ lib/mpi/longlong.h | 36 +-----------------------------------
+ 1 file changed, 1 insertion(+), 35 deletions(-)
 
-Makes sense, will do here and in other places.
+diff --git a/lib/mpi/longlong.h b/lib/mpi/longlong.h
+index 3bb6260d8f42..2dceaca27489 100644
+--- a/lib/mpi/longlong.h
++++ b/lib/mpi/longlong.h
+@@ -639,30 +639,12 @@ do { \
+ 	**************  MIPS  *****************
+ 	***************************************/
+ #if defined(__mips__) && W_TYPE_SIZE == 32
+-#if (__GNUC__ >= 5) || (__GNUC__ >= 4 && __GNUC_MINOR__ >= 4)
+ #define umul_ppmm(w1, w0, u, v)			\
+ do {						\
+ 	UDItype __ll = (UDItype)(u) * (v);	\
+ 	w1 = __ll >> 32;			\
+ 	w0 = __ll;				\
+ } while (0)
+-#elif __GNUC__ > 2 || __GNUC_MINOR__ >= 7
+-#define umul_ppmm(w1, w0, u, v) \
+-	__asm__ ("multu %2,%3" \
+-	: "=l" ((USItype)(w0)), \
+-	     "=h" ((USItype)(w1)) \
+-	: "d" ((USItype)(u)), \
+-	     "d" ((USItype)(v)))
+-#else
+-#define umul_ppmm(w1, w0, u, v) \
+-	__asm__ ("multu %2,%3\n" \
+-	   "mflo %0\n" \
+-	   "mfhi %1" \
+-	: "=d" ((USItype)(w0)), \
+-	     "=d" ((USItype)(w1)) \
+-	: "d" ((USItype)(u)), \
+-	     "d" ((USItype)(v)))
+-#endif
+ #define UMUL_TIME 10
+ #define UDIV_TIME 100
+ #endif /* __mips__ */
+@@ -687,7 +669,7 @@ do {									\
+ 		 : "d" ((UDItype)(u)),					\
+ 		   "d" ((UDItype)(v)));					\
+ } while (0)
+-#elif (__GNUC__ >= 5) || (__GNUC__ >= 4 && __GNUC_MINOR__ >= 4)
++#else
+ #define umul_ppmm(w1, w0, u, v) \
+ do {									\
+ 	typedef unsigned int __ll_UTItype __attribute__((mode(TI)));	\
+@@ -695,22 +677,6 @@ do {									\
+ 	w1 = __ll >> 64;						\
+ 	w0 = __ll;							\
+ } while (0)
+-#elif __GNUC__ > 2 || __GNUC_MINOR__ >= 7
+-#define umul_ppmm(w1, w0, u, v) \
+-	__asm__ ("dmultu %2,%3" \
+-	: "=l" ((UDItype)(w0)), \
+-	     "=h" ((UDItype)(w1)) \
+-	: "d" ((UDItype)(u)), \
+-	     "d" ((UDItype)(v)))
+-#else
+-#define umul_ppmm(w1, w0, u, v) \
+-	__asm__ ("dmultu %2,%3\n" \
+-	   "mflo %0\n" \
+-	   "mfhi %1" \
+-	: "=d" ((UDItype)(w0)), \
+-	     "=d" ((UDItype)(w1)) \
+-	: "d" ((UDItype)(u)), \
+-	     "d" ((UDItype)(v)))
+ #endif
+ #define UMUL_TIME 20
+ #define UDIV_TIME 140
+-- 
+2.23.0.rc2
 
-Thanks,
-Andrey Smirnov
