@@ -2,150 +2,73 @@ Return-Path: <SRS0=O5Fb=WI=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92D8BC31E40
-	for <linux-crypto@archiver.kernel.org>; Mon, 12 Aug 2019 03:21:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AE1DC433FF
+	for <linux-crypto@archiver.kernel.org>; Mon, 12 Aug 2019 04:51:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 64B9220842
-	for <linux-crypto@archiver.kernel.org>; Mon, 12 Aug 2019 03:21:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="ZAhhPwdq"
+	by mail.kernel.org (Postfix) with ESMTP id EE67720663
+	for <linux-crypto@archiver.kernel.org>; Mon, 12 Aug 2019 04:51:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726452AbfHLDV3 (ORCPT
+        id S1725774AbfHLEvd (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 11 Aug 2019 23:21:29 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:55657 "EHLO ozlabs.org"
+        Mon, 12 Aug 2019 00:51:33 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:53644 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726358AbfHLDV2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 11 Aug 2019 23:21:28 -0400
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 466LjH69nZz9sNF;
-        Mon, 12 Aug 2019 13:21:23 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
-        s=201702; t=1565580084;
-        bh=VE6hHYFEFEkKzkHzw/++zYvbgNMOO5CoC34mA1gSgTc=;
-        h=Date:From:To:Cc:Subject:From;
-        b=ZAhhPwdq2HJ2yGJiTIe+DmwFmQQfsvPDP/qS75fDKFw3/qSoG5KNES4cMiOLf+yd3
-         LQeIontON34/UZTuBVG4y+VaikTVtzzw6lJymEDxKk59+v9sOYBGdn/4eWpQJstX3T
-         TsydNZmR0jI2VcuviHhHDvRR4y3+wge6avS+uT38wUG5rOPQdsIH3qLOXbF851t77M
-         7IwqiNhLR40kqsmtDrnLc+muu4NVobhdqwoZ3zGwp5GitL0V7OYyGElZkSR4++mU+5
-         x+5EE7XtyPVkyO6b5RMb+kPRyM1uH9kj3jh9IrvjMtBcQisgvlCGMVdXJ7rfC2Ax6W
-         VYc/+qV37kjww==
-Date:   Mon, 12 Aug 2019 13:21:21 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto List <linux-crypto@vger.kernel.org>
-Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        Shiju Jose <shiju.jose@huawei.com>,
-        Kenneth Lee <liguozhu@hisilicon.com>,
-        Hao Fang <fanghao11@huawei.com>,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        John Garry <john.garry@huawei.com>
-Subject: linux-next: build failure after merge of the crypto tree
-Message-ID: <20190812132122.22ea1bb5@canb.auug.org.au>
+        id S1725648AbfHLEvd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 12 Aug 2019 00:51:33 -0400
+Received: from gondolin.me.apana.org.au ([192.168.0.6] helo=gondolin.hengli.com.au)
+        by fornost.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
+        id 1hx2Ij-0004WY-3n; Mon, 12 Aug 2019 14:51:21 +1000
+Received: from herbert by gondolin.hengli.com.au with local (Exim 4.80)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1hx2Ig-0004X1-Lf; Mon, 12 Aug 2019 14:51:18 +1000
+Date:   Mon, 12 Aug 2019 14:51:18 +1000
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+Cc:     Milan Broz <gmazyland@gmail.com>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Horia Geanta <horia.geanta@nxp.com>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Subject: Re: [dm-devel] xts fuzz testing and lack of ciphertext stealing
+ support
+Message-ID: <20190812045118.GA17383@gondor.apana.org.au>
+References: <MN2PR20MB2973127E4C159A8F5CFDD0C9CAD70@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <VI1PR0402MB3485689B4B65C879BC1D137398D70@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+ <20190809024821.GA7186@gondor.apana.org.au>
+ <CAKv+Gu9hk=PGpsAWWOU61VrA3mVQd10LudA1qg0LbiX7DG9RjA@mail.gmail.com>
+ <VI1PR0402MB3485F94AECC495F133F6B3D798D60@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+ <CAKv+Gu-_WObNm+ySXDWjhqe2YPzajX83MofuF-WKPSdLg5t4Ew@mail.gmail.com>
+ <MN2PR20MB297361CA3C29C236D6D8F6F4CAD60@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <CAKv+Gu-xWxZ58tzyYoH_jDKfJoM+KzOWWpzCeHEmOXQ39Bv15g@mail.gmail.com>
+ <d6d0b155-476b-d495-3418-4b171003cdd7@gmail.com>
+ <MN2PR20MB2973D499FDBC5652CC3FEE6BCAD00@MN2PR20MB2973.namprd20.prod.outlook.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/IZnzAHBtUJNT9g/KJliSAhQ";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <MN2PR20MB2973D499FDBC5652CC3FEE6BCAD00@MN2PR20MB2973.namprd20.prod.outlook.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
---Sig_/IZnzAHBtUJNT9g/KJliSAhQ
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Sun, Aug 11, 2019 at 09:29:38PM +0000, Pascal Van Leeuwen wrote:
+>
+> It will very likely fail with that CAAM h/w, but that only proves that you
+> should not use plain64be IV's together with CAAM h/w. Which should be
 
-Hi all,
+It doesn't matter whether it's wrong or not.
 
-After merging the crypto tree, today's linux-next build (x86_64
-allmodconfig) failed like this:
+The fact is that this is an interface that we export to user-space
+and we must NEVER break that.  So if your driver is breaking this
+interface then your driver is broken and needs to be fixed.
 
-drivers/crypto/hisilicon/qm.c: Assembler messages:
-drivers/crypto/hisilicon/qm.c:334: Error: no such instruction: `ldp %rdx,%r=
-cx,%bl'
-drivers/crypto/hisilicon/qm.c:335: Error: no such instruction: `stp %rdx,%r=
-cx,%al'
-drivers/crypto/hisilicon/qm.c:336: Error: number of operands mismatch for `=
-ds'
-
-Caused by commit
-
-  62c455ca853e ("crypto: hisilicon - add HiSilicon ZIP accelerator support")
-
-I also got the following warnings:
-
-WARNING: unmet direct dependencies detected for CRYPTO_DEV_HISI_QM
-  Depends on [n]: CRYPTO [=3Dy] && CRYPTO_HW [=3Dy] && ARM64 && PCI [=3Dy] =
-&& PCI_MSI [=3Dy]
-  Selected by [m]:
-  - CRYPTO_DEV_HISI_ZIP [=3Dm] && CRYPTO [=3Dy] && CRYPTO_HW [=3Dy]
-
-WARNING: unmet direct dependencies detected for CRYPTO_HISI_SGL
-  Depends on [n]: CRYPTO [=3Dy] && CRYPTO_HW [=3Dy] && ARM64
-  Selected by [m]:
-  - CRYPTO_DEV_HISI_ZIP [=3Dm] && CRYPTO [=3Dy] && CRYPTO_HW [=3Dy]
-
-WARNING: unmet direct dependencies detected for CRYPTO_DEV_HISI_QM
-  Depends on [n]: CRYPTO [=3Dy] && CRYPTO_HW [=3Dy] && ARM64 && PCI [=3Dy] =
-&& PCI_MSI [=3Dy]
-  Selected by [m]:
-  - CRYPTO_DEV_HISI_ZIP [=3Dm] && CRYPTO [=3Dy] && CRYPTO_HW [=3Dy]
-
-WARNING: unmet direct dependencies detected for CRYPTO_HISI_SGL
-  Depends on [n]: CRYPTO [=3Dy] && CRYPTO_HW [=3Dy] && ARM64
-  Selected by [m]:
-  - CRYPTO_DEV_HISI_ZIP [=3Dm] && CRYPTO [=3Dy] && CRYPTO_HW [=3Dy]
-
-WARNING: unmet direct dependencies detected for CRYPTO_DEV_HISI_QM
-  Depends on [n]: CRYPTO [=3Dy] && CRYPTO_HW [=3Dy] && ARM64 && PCI [=3Dy] =
-&& PCI_MSI [=3Dy]
-  Selected by [m]:
-  - CRYPTO_DEV_HISI_ZIP [=3Dm] && CRYPTO [=3Dy] && CRYPTO_HW [=3Dy]
-
-WARNING: unmet direct dependencies detected for CRYPTO_HISI_SGL
-  Depends on [n]: CRYPTO [=3Dy] && CRYPTO_HW [=3Dy] && ARM64
-  Selected by [m]:
-  - CRYPTO_DEV_HISI_ZIP [=3Dm] && CRYPTO [=3Dy] && CRYPTO_HW [=3Dy]
-drivers/crypto/hisilicon/sgl.c: In function 'hisi_acc_sg_buf_map_to_hw_sgl':
-drivers/crypto/hisilicon/sgl.c:181:14: warning: 'curr_sgl_dma' may be used =
-uninitialized in this function [-Wmaybe-uninitialized]
-  *hw_sgl_dma =3D curr_sgl_dma;
-  ~~~~~~~~~~~~^~~~~~~~~~~~~~
-
-This latter from commit
-
-  dfed0098ab91 ("crypto: hisilicon - add hardware SGL support")
-
-I have disabled CRYPTO_DEV_HISI_ZIP for now.  You should not select
-CONFIG options that have dependencies (without also depending on the
-same things and being very careful).
-
---=20
 Cheers,
-Stephen Rothwell
-
---Sig_/IZnzAHBtUJNT9g/KJliSAhQ
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl1Q2zIACgkQAVBC80lX
-0GxkVgf+Or94Jq7IrJ+eQoYm2XPoBpCj7fpHFsxdJh/fcVCYtk7ce03/iSeoja10
-KfbipxX2LrVn5Zt5cLA1Rj1VA1tOnFHAp2Yc9389bFlGruepm+xfaOCQHcXI52w5
-yy8eFYeKFVuyxH6KUU7TNE1aoJ4qgXbSEVQMWB/UxApt7A0imtKVbhvQO5xEWcLN
-IDfk5h7N/tZGbWje5DrpT5ucz3/How16HmS+QQO8uzbw3jZeDKt5CnkvcIBb3s9i
-e8I3zPLn77eDzG0dee6VVUyb47dw8eMf7XgJDzzO6XRGVXAqhFwVBDIi/GCnptLa
-SkcoeBY3qZJuMnI8WmxyFFqyfRktlg==
-=ObT8
------END PGP SIGNATURE-----
-
---Sig_/IZnzAHBtUJNT9g/KJliSAhQ--
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
