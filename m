@@ -2,125 +2,150 @@ Return-Path: <SRS0=O5Fb=WI=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DC2DC433FF
-	for <linux-crypto@archiver.kernel.org>; Mon, 12 Aug 2019 10:50:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C6A0C31E40
+	for <linux-crypto@archiver.kernel.org>; Mon, 12 Aug 2019 13:51:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 35E5C2085A
-	for <linux-crypto@archiver.kernel.org>; Mon, 12 Aug 2019 10:50:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0CFD620665
+	for <linux-crypto@archiver.kernel.org>; Mon, 12 Aug 2019 13:51:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DIKKpbK7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727917AbfHLKuD (ORCPT
+        id S1727184AbfHLNvN (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 12 Aug 2019 06:50:03 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:54820 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727235AbfHLKuD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 12 Aug 2019 06:50:03 -0400
-Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 941E4761203E8FFCC3F5;
-        Mon, 12 Aug 2019 18:50:01 +0800 (CST)
-Received: from [127.0.0.1] (10.63.139.185) by DGGEMS406-HUB.china.huawei.com
- (10.3.19.206) with Microsoft SMTP Server id 14.3.439.0; Mon, 12 Aug 2019
- 18:49:54 +0800
-Subject: Re: [cryptodev:master 124/144] drivers/crypto/hisilicon/qm.c:322:2:
- error: impossible constraint in 'asm'
-To:     kbuild test robot <lkp@intel.com>
-References: <201908092005.GIPAS1Oq%lkp@intel.com>
-CC:     <kbuild-all@01.org>, <linux-crypto@vger.kernel.org>,
+        Mon, 12 Aug 2019 09:51:13 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:38270 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727103AbfHLNvM (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 12 Aug 2019 09:51:12 -0400
+Received: by mail-wm1-f66.google.com with SMTP id m125so7787679wmm.3;
+        Mon, 12 Aug 2019 06:51:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=rBbM+UdJ5ZjF04CiXCd6y2tkG1h3M6zsC0WpzRFsUIQ=;
+        b=DIKKpbK7MTnkOm83W/loz9snj3ua+vVVx7sWii6rL6U7FiE6ngBOI8ozRpV3njikkE
+         2eeQiuTX3UiBBh8WL0OwXy4/EW0AW8Qi95jB0GK2XuQ0q5rq4q/Z7315cE5LKZetPgy+
+         0QIuQGM4EMMvHuYvLpRW8q8kJp2xGf3i/bfRjdTLIN5ZyEw0LK7aOXhSxz/n1E1pSknF
+         pPISm8xkLwRI/XBPxQNMEo/TGyBLJA1x56OAxr8gyfY4LUFjPUSmw21ScbQiprleWxEr
+         SzgVgsTNx0JzUKHxXUN85Sk+tUNaRZ1nBEPjHn9u8TMcSzpJKuTf6xnlX97REZXhvqFT
+         Cdjg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=rBbM+UdJ5ZjF04CiXCd6y2tkG1h3M6zsC0WpzRFsUIQ=;
+        b=GagR6Xs85GFSQPF3+XIgwuI1LhYSo/ykuwZG1VGm0j6HGNvZDaqyd2VWYXcKjdNbqW
+         6YJr3Eq8v5SXR8etOFLH9gDaotlpR9UKA0e13UV2t0VoOi6uANI+VWqUwauxH5Sg4lIq
+         6o7dnOpxNJjk6mvEwfCQd5AZbO0PIN1jBc3KbkFAb71Ueo2/WziKgvI7TPOsQDKQLF63
+         nhQyMXgaBigmdiEbgnpdtH3DpbVbfBT7awspPm01R/Q1hsrU74Bh0yJx5Et6hgdZdCYg
+         V4pKpNcrB1i/FEwfWvTLct5gkuCVBDhhBDa330gaAYxbZ355gU8YKQODwENfqDvGjAz0
+         ja/g==
+X-Gm-Message-State: APjAAAXqa3Nhw8oQqrjMUCRTwL7rE6eloutCoVixxWmROKm5Wlv72DS/
+        x5nGMnySLxJm7QguIriCDis=
+X-Google-Smtp-Source: APXvYqydyG0HxLjtoA5pPzW3JZSa52vifGyk5rD7QL125itbnnPxp17aqg2nTfJDRX/Epo3eoRVuEA==
+X-Received: by 2002:a1c:6087:: with SMTP id u129mr27021088wmb.108.1565617870305;
+        Mon, 12 Aug 2019 06:51:10 -0700 (PDT)
+Received: from [172.22.36.64] (redhat-nat.vtp.fi.muni.cz. [78.128.215.6])
+        by smtp.gmail.com with ESMTPSA id e11sm13985393wrc.4.2019.08.12.06.51.08
+        (version=TLS1_3 cipher=AEAD-AES128-GCM-SHA256 bits=128/128);
+        Mon, 12 Aug 2019 06:51:09 -0700 (PDT)
+Subject: Re: [PATCH v9 3/7] md: dm-crypt: switch to ESSIV crypto API template
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Shiju Jose <shiju.jose@huawei.com>,
-        "Kenneth Lee" <liguozhu@hisilicon.com>,
-        Hao Fang <fanghao11@huawei.com>,
-        "Jonathan Cameron" <Jonathan.Cameron@huawei.com>,
-        John Garry <john.garry@huawei.com>
-From:   Zhou Wang <wangzhou1@hisilicon.com>
-Message-ID: <5D514451.5000001@hisilicon.com>
-Date:   Mon, 12 Aug 2019 18:49:53 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:38.0) Gecko/20100101
- Thunderbird/38.5.1
+        Eric Biggers <ebiggers@google.com>,
+        device-mapper development <dm-devel@redhat.com>,
+        linux-fscrypt@vger.kernel.org,
+        Gilad Ben-Yossef <gilad@benyossef.com>
+References: <20190810094053.7423-1-ard.biesheuvel@linaro.org>
+ <20190810094053.7423-4-ard.biesheuvel@linaro.org>
+ <8679d2f5-b005-cd89-957e-d79440b78086@gmail.com>
+ <CAKv+Gu-ZPPR5xQSR6T4o+8yJvsHY2a3xXZ5zsM_aGS3frVChgQ@mail.gmail.com>
+ <82a87cae-8eb7-828c-35c3-fb39a9abe692@gmail.com>
+ <CAKv+Gu_d+3NsTKFZbS+xeuxf5uCz=ENmPX-a=s-2kgLrW4d7cQ@mail.gmail.com>
+From:   Milan Broz <gmazyland@gmail.com>
+Openpgp: preference=signencrypt
+Message-ID: <7b3365a9-42ca-5426-660f-e87898bb9f7a@gmail.com>
+Date:   Mon, 12 Aug 2019 15:51:07 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <201908092005.GIPAS1Oq%lkp@intel.com>
-Content-Type: text/plain; charset="windows-1252"
+In-Reply-To: <CAKv+Gu_d+3NsTKFZbS+xeuxf5uCz=ENmPX-a=s-2kgLrW4d7cQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.63.139.185]
-X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2019/8/9 20:20, kbuild test robot wrote:
-> tree:   https://kernel.googlesource.com/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-> head:   ec9c7d19336ee98ecba8de80128aa405c45feebb
-> commit: 62c455ca853e3e352e465d66a6cc39f1f88caa60 [124/144] crypto: hisilicon - add HiSilicon ZIP accelerator support
-> config: sparc64-allmodconfig (attached as .config)
-> compiler: sparc64-linux-gcc (GCC) 7.4.0
-> reproduce:
->         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
->         chmod +x ~/bin/make.cross
->         git checkout 62c455ca853e3e352e465d66a6cc39f1f88caa60
->         # save the attached .config to linux build tree
->         GCC_VERSION=7.4.0 make.cross ARCH=sparc64 
+On 12/08/2019 09:50, Ard Biesheuvel wrote:
+> On Mon, 12 Aug 2019 at 10:44, Milan Broz <gmazyland@gmail.com> wrote:
+>>
+>> On 12/08/2019 08:54, Ard Biesheuvel wrote:
+>>> On Mon, 12 Aug 2019 at 09:33, Milan Broz <gmazyland@gmail.com> wrote:
+>>>> Try for example
+>>>> # cryptsetup luksFormat /dev/sdc -c aes-cbc-essiv:sha256 --integrity hmac-sha256 -q -i1
+>>>>
+>>>> It should produce Crypto API string
+>>>>   authenc(hmac(sha256),essiv(cbc(aes),sha256))
+>>>> while it produces
+>>>>   essiv(authenc(hmac(sha256),cbc(aes)),sha256)
+>>>> (and fails).
+>>>>
+>>>
+>>> No. I don't know why it fails, but the latter is actually the correct
+>>> string. The essiv template is instantiated either as a skcipher or as
+>>> an aead, and it encapsulates the entire transformation. (This is
+>>> necessary considering that the IV is passed via the AAD and so the
+>>> ESSIV handling needs to touch that as well)
+>>
+>> Hm. Constructing these strings seems to be more confusing than dmcrypt mode combinations :-)
+>>
+>> But you are right, I actually tried the former string (authenc(hmac(sha256),essiv(cbc(aes),sha256)))
+>> and it worked, but I guess the authenticated IV (AAD) was actually the input to IV (plain sector number)
+>> not the output of ESSIV? Do I understand it correctly now?
+>>
 > 
-> If you fix the issue, kindly add following tag
-> Reported-by: kbuild test robot <lkp@intel.com>
+> Indeed. The former string instantiates the skcipher version of the
+> ESSIV template, and so the AAD handling is omitted, and we end up
+> using the plain IV in the authentication rather than the encrypted IV.
 > 
-> All error/warnings (new ones prefixed by >>):
-> 
->    drivers/crypto/hisilicon/qm.c: In function 'qm_mb.constprop':
->>> drivers/crypto/hisilicon/qm.c:322:2: warning: asm operand 3 probably doesn't match constraints
->      asm volatile("ldp %0, %1, %3\n"
->      ^~~
->    drivers/crypto/hisilicon/qm.c:322:2: warning: asm operand 4 probably doesn't match constraints
->>> drivers/crypto/hisilicon/qm.c:322:2: error: impossible constraint in 'asm'
-> --
->    drivers/crypto/hisilicon/sgl.c: In function 'hisi_acc_sg_buf_map_to_hw_sgl':
->>> drivers/crypto/hisilicon/sgl.c:181:14: warning: 'curr_sgl_dma' may be used uninitialized in this function [-Wmaybe-uninitialized]
->      *hw_sgl_dma = curr_sgl_dma;
->      ~~~~~~~~~~~~^~~~~~~~~~~~~~
+> So when using the latter string, does it produce any error messages
+> when it fails?
 
-Hi Herbert,
+The error is
+table: 253:1: crypt: Error decoding and setting key
 
-I will fix this and set dependency on arm64 for zip.
+and it is failing in crypt_setkey() int this  crypto_aead_setkey();
 
-Should I just post a fix patch or repost the whole series
-([PATCH v3 0/7] crypto: hisilicon: Add HiSilicon QM and ZIP controller driver) with fixes?
+And it is because it now wrongly calculates MAC key length.
+(We have two keys here - one for length-preserving CBC-ESSIV encryption
+and one for HMAC.)
 
-Best,
-Zhou
+This super-ugly hotfix helps here... I guess it can be done better :-)
 
-> 
-> vim +/asm +322 drivers/crypto/hisilicon/qm.c
-> 
-> 263c9959c9376e Zhou Wang 2019-08-02  315  
-> 263c9959c9376e Zhou Wang 2019-08-02  316  /* 128 bit should be written to hardware at one time to trigger a mailbox */
-> 263c9959c9376e Zhou Wang 2019-08-02  317  static void qm_mb_write(struct hisi_qm *qm, const void *src)
-> 263c9959c9376e Zhou Wang 2019-08-02  318  {
-> 263c9959c9376e Zhou Wang 2019-08-02  319  	void __iomem *fun_base = qm->io_base + QM_MB_CMD_SEND_BASE;
-> 263c9959c9376e Zhou Wang 2019-08-02  320  	unsigned long tmp0 = 0, tmp1 = 0;
-> 263c9959c9376e Zhou Wang 2019-08-02  321  
-> 263c9959c9376e Zhou Wang 2019-08-02 @322  	asm volatile("ldp %0, %1, %3\n"
-> 263c9959c9376e Zhou Wang 2019-08-02  323  		     "stp %0, %1, %2\n"
-> 263c9959c9376e Zhou Wang 2019-08-02  324  		     "dsb sy\n"
-> 263c9959c9376e Zhou Wang 2019-08-02  325  		     : "=&r" (tmp0),
-> 263c9959c9376e Zhou Wang 2019-08-02  326  		       "=&r" (tmp1),
-> 263c9959c9376e Zhou Wang 2019-08-02  327  		       "+Q" (*((char *)fun_base))
-> 263c9959c9376e Zhou Wang 2019-08-02  328  		     : "Q" (*((char *)src))
-> 263c9959c9376e Zhou Wang 2019-08-02  329  		     : "memory");
-> 263c9959c9376e Zhou Wang 2019-08-02  330  }
-> 263c9959c9376e Zhou Wang 2019-08-02  331  
-> 
-> :::::: The code at line 322 was first introduced by commit
-> :::::: 263c9959c9376ec0217d6adc61222a53469eed3c crypto: hisilicon - add queue management driver for HiSilicon QM module
-> 
-> :::::: TO: Zhou Wang <wangzhou1@hisilicon.com>
-> :::::: CC: Herbert Xu <herbert@gondor.apana.org.au>
-> 
-> ---
-> 0-DAY kernel test infrastructure                Open Source Technology Center
-> https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
-> 
-
+diff --git a/drivers/md/dm-crypt.c b/drivers/md/dm-crypt.c
+index e9a0093c88ee..7b06d975a2e1 100644
+--- a/drivers/md/dm-crypt.c
++++ b/drivers/md/dm-crypt.c
+@@ -2342,6 +2342,9 @@ static int crypt_ctr_auth_cipher(struct crypt_config *cc, char *cipher_api)
+        char *start, *end, *mac_alg = NULL;
+        struct crypto_ahash *mac;
+ 
++       if (strstarts(cipher_api, "essiv(authenc("))
++               cipher_api += strlen("essiv(");
++
+        if (!strstarts(cipher_api, "authenc("))
+                return 0;
+ 
+Milan
