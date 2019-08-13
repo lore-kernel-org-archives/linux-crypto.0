@@ -7,61 +7,58 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B800C32750
-	for <linux-crypto@archiver.kernel.org>; Tue, 13 Aug 2019 18:50:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0FCBC433FF
+	for <linux-crypto@archiver.kernel.org>; Tue, 13 Aug 2019 18:51:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0348E2054F
-	for <linux-crypto@archiver.kernel.org>; Tue, 13 Aug 2019 18:50:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A41FC2054F
+	for <linux-crypto@archiver.kernel.org>; Tue, 13 Aug 2019 18:51:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tFi1hOTN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kl/pWKzV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726155AbfHMSuq (ORCPT
+        id S1726900AbfHMSvY (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 13 Aug 2019 14:50:46 -0400
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:38026 "EHLO
-        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726137AbfHMSup (ORCPT
+        Tue, 13 Aug 2019 14:51:24 -0400
+Received: from mail-ot1-f66.google.com ([209.85.210.66]:40666 "EHLO
+        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726137AbfHMSvY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 13 Aug 2019 14:50:45 -0400
-Received: by mail-ot1-f67.google.com with SMTP id r20so26590243ota.5;
-        Tue, 13 Aug 2019 11:50:45 -0700 (PDT)
+        Tue, 13 Aug 2019 14:51:24 -0400
+Received: by mail-ot1-f66.google.com with SMTP id c34so36440461otb.7;
+        Tue, 13 Aug 2019 11:51:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=NHzbEGdc+m7R0uItpjFfL5xI7qf8YOLbAGx8I9P0xM4=;
-        b=tFi1hOTN/g0N4nYbGmv16uNB1sJlgBLsRyxyOcrXliBsxx0a0+FKKKERtj9BDGi4D4
-         cg4XfUACWDQ8nmML0RdtB+TUbEiVlDpE4giTFY3EZSoFBibg3BbQ2mInYsoA1F9GFhOH
-         +JhlPlwOivxI/72ol9nbtzi5zBrxkKy1nlkWqSUT2W3fHAWbupS0ZYeWS1azxTspM/Xj
-         58hiJUAQz4QB9ZbKO+AZno1V/lJbmcN5L2lJR3GHzENOeacxigv6WdNJUnSGbhAeSu2b
-         FDIRfdsACp14MStRCVhie1IUHs6qsLyeeqEQzhHPpC/6tjB6RvBCdMqDIJ72zZKkpJtu
-         lENg==
+        bh=b1Ocmmg17vAyCpqu4Pu+8MBoc/VHasvcMG1VyB/RThs=;
+        b=kl/pWKzVWrAM3hq5DLpwHsChhKvxHCarJXzH6axT6D8KRc/19ZOylq6+pbUoIteIVZ
+         NvwoeCJj2MIhFXlf3P2ZwKQ2HNQTXagCTP0la2BKMF5H0v+9S1ZIpoinfdVj7oAOXiGi
+         EtyvdvAirIXXGBpTnMgooFBLvFW9y6qHWDt8GioIMKz2D4Xj/LirZoAxHiAAYMOGpCZm
+         FSJopc8e/fmopdC3W1WSVI5GFE5dfdjCbjdsqu/qNOayVE5sZLrnJDCRcteBiYH2vKCa
+         +vOFEetu2aKH0XvDjGh8OLlpbUWwAryj4nOfhmeuMXN0QXLD9evazJ0zIB4SDx+KxZan
+         i4qw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=NHzbEGdc+m7R0uItpjFfL5xI7qf8YOLbAGx8I9P0xM4=;
-        b=f+8JXHzvGz/jv5gj4y/mo/kMGgiGKv/VAE6FcfjU9tvScjN/DgfdWQYi/q/lZZ8p/r
-         RlBNc27gF8k2+Ms+PUCjFEtMcqNqlAJqyNCTTD3xzG0A7NoDg8yDzp61442WtylawOTZ
-         UFtL02Mq/vF8sk+BTQN5IxsFLe1jU/NiOMKZiJYHKc+0Ae+ypDo6W2/IEdl216B9HLru
-         aecZkLqWJ2XykLX35JgavLkFhJcbq1BEGX8tUmhSu93QxR4RjC1DAN35Lg7ux4MjCX2A
-         ey9KMfEBvAp2oe76H5Q+0br/Di+2vIgkGcr8I9kXzGnNBlrQhpJuQ0UeXommuLDvUYBK
-         7Sbg==
-X-Gm-Message-State: APjAAAX9Sxep+bdVogxTOz6eUbY7lm81ZkwBCH+qnuDMxj8EfuzSpiR/
-        z1hF7vaTWacUtGkwla+t/F9PA4+614etup1wC9s=
-X-Google-Smtp-Source: APXvYqwAxlPUcfHt3Cl4V2jTRcAnGGDPbRirnOjYgD6lQETWjM7nhi/2p7Hs5DRVY5l0F7oDTWhEvVBZ8KdooWqpW1g=
-X-Received: by 2002:a6b:4107:: with SMTP id n7mr16705742ioa.12.1565722244792;
- Tue, 13 Aug 2019 11:50:44 -0700 (PDT)
+        bh=b1Ocmmg17vAyCpqu4Pu+8MBoc/VHasvcMG1VyB/RThs=;
+        b=T7HF48qQIzMhbDT59XZK06spW5bbPeLoaj4lvOFMicgecj+MLqzaQY9YUl61vbCd0X
+         L3ZaK9UL9KFaDHIq5ppNhXdj7BPqiT68gLgg9ls68GcxeBBihtQ8tUca1sI3oncdC01C
+         Bp0S0trKS88KJ0uTmJUz3g9gEsSRC6qxAW3mFIpZlipHAwRQf9XOKu8sGbGGLRCeSl0m
+         nvJAJY+xtDSm8DfeCUCpoE7BEUksqkr9XGhB/RUPdkPnQ8houQnC4X2ommbFWUk4OIJd
+         30QUmih4Ij9L5x3dtlc3ummryRbRkD21jf9LBB9aJ7ZGFj0kdClO3WXBM5K4ga2eWrPe
+         Sg0g==
+X-Gm-Message-State: APjAAAWrFgYm+1gNZytJaNsL/nwcrCmjwtJ0IaXKRGaQq6ETgiNtRPgu
+        gXZZmEOMeNvAO1m4qXBuCIxyvNJAulgelcTHGy0=
+X-Google-Smtp-Source: APXvYqy4ljRyrVOBed//32I64TnhVm+nXcOSRZoCJhp4ZSA9RJmbXxUcaD9xylbf2jl8UnB/UTqAKzxaostDKTz5j6c=
+X-Received: by 2002:a6b:f607:: with SMTP id n7mr27088775ioh.263.1565722283708;
+ Tue, 13 Aug 2019 11:51:23 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190717152458.22337-1-andrew.smirnov@gmail.com>
- <20190717152458.22337-13-andrew.smirnov@gmail.com> <VI1PR0402MB348580480F5EAF5F539B585A98DA0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
- <CAHQ1cqEiCkXP+-w9WUc33oW6vDhHza2Jq_kQsXjKZ+__T5g77g@mail.gmail.com> <VI1PR0402MB3485AE1FD97765AF1D43BAF298D20@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-In-Reply-To: <VI1PR0402MB3485AE1FD97765AF1D43BAF298D20@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+References: <20190812200739.30389-1-andrew.smirnov@gmail.com> <VI1PR0402MB34857B6486BDFE28B75A642398D20@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+In-Reply-To: <VI1PR0402MB34857B6486BDFE28B75A642398D20@VI1PR0402MB3485.eurprd04.prod.outlook.com>
 From:   Andrey Smirnov <andrew.smirnov@gmail.com>
-Date:   Tue, 13 Aug 2019 11:50:33 -0700
-Message-ID: <CAHQ1cqGdT8Td_1iDCKuCazti53hCJ9HC3-mJMCo+g6FzZBnEOw@mail.gmail.com>
-Subject: Re: [PATCH v6 12/14] crypto: caam - force DMA address to 32-bit on
- 64-bit i.MX SoCs
+Date:   Tue, 13 Aug 2019 11:51:11 -0700
+Message-ID: <CAHQ1cqE1UOaWUghuFC69+LVGZcp3TiV4uNPCS=86KMroEWrZcg@mail.gmail.com>
+Subject: Re: [PATCH v7 00/15] crypto: caam - Add i.MX8MQ support
 To:     Horia Geanta <horia.geanta@nxp.com>
 Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         Chris Spencer <christopher.spencer@sea.co.uk>,
@@ -77,61 +74,35 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Aug 13, 2019 at 6:38 AM Horia Geanta <horia.geanta@nxp.com> wrote:
+On Tue, Aug 13, 2019 at 6:59 AM Horia Geanta <horia.geanta@nxp.com> wrote:
 >
-> On 8/12/2019 10:27 PM, Andrey Smirnov wrote:
-> > On Mon, Aug 5, 2019 at 1:23 AM Horia Geanta <horia.geanta@nxp.com> wrote:
-> >>
-> >> On 7/17/2019 6:25 PM, Andrey Smirnov wrote:
-> >>> @@ -603,11 +603,13 @@ static int caam_probe(struct platform_device *pdev)
-> >>>               ret = init_clocks(dev, ctrlpriv, imx_soc_match->data);
-> >>>               if (ret)
-> >>>                       return ret;
-> >>> +
-> >>> +             caam_ptr_sz = sizeof(u32);
-> >>> +     } else {
-> >>> +             caam_ptr_sz = sizeof(dma_addr_t);
-> >> caam_ptr_sz should be deduced by reading MCFGR[PS] bit, i.e. decoupled
-> >> from dma_addr_t.
-> >>
+> On 8/12/2019 11:08 PM, Andrey Smirnov wrote:
+> > Everyone:
 > >
-> > MCFGR[PS] is not mentioned in i.MX8MQ SRM and MCFG_PS in CTPR_MS is
-> > documented as set to "0" (seems to match in real HW as well). Doesn't
-> > seem like a workable solution for i.MX8MQ. Is there something I am
-> > missing?
+> > Picking up where Chris left off (I chatted with him privately
+> > beforehead), this series adds support for i.MX8MQ to CAAM driver. Just
+> > like [v1], this series is i.MX8MQ only.
 > >
-> If CTPR_MS[PS]=0, this means CAAM does not allow choosing the "pointer size"
-> via MCFGR[PS]. Usually in this case the RM does not document MCFGR[PS] bit,
-> which is identical to MCFGR[PS]=0.
->
-> Thus the logic should be smth. like:
->         caam_ptr_sz = CTPR_MS[PS] && MCFGR[PS] ? 64 : 32;
+> > Feedback is welcome!
+> > Thanks,
+> > Andrey Smirnov
+> >
+> > Changes since [v6]:
+> >
+> >   - Fixed build problems in "crypto: caam - make CAAM_PTR_SZ dynamic"
+> >
+> >   - Collected Reviewied-by from Horia
+> >
+> >   - "crypto: caam - force DMA address to 32-bit on 64-bit i.MX SoCs"
+> >     is changed to check 'caam_ptr_sz' instead of using 'caam_imx'
+> >
+> >   - Incorporated feedback for "crypto: caam - request JR IRQ as the
+> >     last step" and "crypto: caam - simplfy clock initialization"
+> >
+> FYI - the series does not apply cleanly on current cryptodev-2.6 tree.
 >
 
-Where is PS located in MCFGR? Same as in CTPR_MS, i.e. BIT(17)?
-
-> >> There is another configuration that should be considered
-> >> (even though highly unlikely):
-> >> caam_ptr_sz=1  - > 32-bit addresses for CAAM
-> >> CONFIG_ARCH_DMA_ADDR_T_64BIT=n - 32-bit dma_addr_t
-> >> so the logic has to be carefully evaluated.
-> >>
-> >
-> > I don't understand what you mean here. 32-bit CAAM + 32-bit dma_addr_t
-> > should already be the case for i.MX6, etc. how is what you describe
-> > different?
-> >
-> Sorry for not being clear.
->
-> caam_ptr_sz=1  - > 32-bit addresses for CAAM
-> should have been
-> caam_ptr_sz=*64*  - > 32-bit addresses for CAAM
-> i.e. CAAM address has "more than" (>) 32 bits (exact number of bits is
-> SoC / chassis specific) and thus will be represented on 8 bytes.
->
-
-Ah, I see. Can this use-case be addressed in a separate series when
-the need for it arises?
+OK, sorry about that, will fix.
 
 Thanks,
 Andrey Smirnov
