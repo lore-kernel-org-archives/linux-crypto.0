@@ -8,61 +8,61 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 458D3C433FF
-	for <linux-crypto@archiver.kernel.org>; Tue, 13 Aug 2019 00:53:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06CBCC31E40
+	for <linux-crypto@archiver.kernel.org>; Tue, 13 Aug 2019 00:53:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0E39820842
+	by mail.kernel.org (Postfix) with ESMTP id C903D20842
 	for <linux-crypto@archiver.kernel.org>; Tue, 13 Aug 2019 00:53:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="HlwQtVGb";
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="DkQB1mqV"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="kGq6Z3wM";
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="TSDDB9z7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726820AbfHMAxK (ORCPT
+        id S1726812AbfHMAxK (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Mon, 12 Aug 2019 20:53:10 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:48098 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726498AbfHMAxJ (ORCPT
+Received: from userp2120.oracle.com ([156.151.31.85]:57688 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726479AbfHMAxJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Mon, 12 Aug 2019 20:53:09 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7D0nNNl156563;
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7D0nLGK169568;
         Tue, 13 Aug 2019 00:52:44 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=corp-2019-08-05;
- bh=M4oXMvoTBLloJuSqSl5KYNM8ldE67NMnEqMu9kD+Do4=;
- b=HlwQtVGb7I7XmMyvLJMfPrNGbwgDwPvJAa++gZUNdIrqFtSxMGNiDaYyGkXtqEQxG9hr
- T+vKlkFEIxq9zqdWRCMgHITyOyqMt0NDT0FTPSNbbpMVEot+wm/JrQPAkHdtMZVZFdK5
- mLNmWOF06lD6jZjWAhTMybZd1rSYWivKjMDw3MdSC3RinDi83nT9Xn0oeZw7AfAN2P2U
- iTulDQP/RI2z9AL6VMRiDKGdzxsmiqx0/pv9BRstiiKDZ64LoAPLrFQC29qDRS1j9VDE
- uDS/ly3IQwosJ4nU2vmjVOaPd3nwuGQHbRVNBGBvL7Cc7Xy+xK6u24Q6Ri189PGfHUuP rw== 
+ bh=+UFpeHPZGWbRDyVWDlcfr2GRxu8zhevSNwDBLd7lC84=;
+ b=kGq6Z3wMGroOOFbgvS/Xezf0bZgL5zXJMATCYqq3JnhGJuA4u2S0n2S5v6WYk/XXmLxt
+ iLBzpsnZP6OSglqrm7Yr2fWKzhHo5AWF+7IFGhsbqCxx/0IAK47JtSkzNwNMnthjiC0E
+ X68VlTiZUoQDfWTbj9CxWENwCIILjLvCk0iC9+Igdo0ShkTizdtkTmFsGzppFojIKFeW
+ p8EwsXiptpWK6ZhhnVMaYRywy7OKx0BR7eoF4cvArhcMUw/vmNI22Gnwraqlv8AzcVma
+ UgOdetArehFxK6zYPXCvT7G3kAatTEZ3LFHtO7B4NqRzFFLHkIgyp4pcaIhABGM8iqU/ dw== 
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=corp-2018-07-02;
- bh=M4oXMvoTBLloJuSqSl5KYNM8ldE67NMnEqMu9kD+Do4=;
- b=DkQB1mqVWVZ0WPvXusl14Z28vpg30Ccma2wjKQRDiqbvn2BXYyt3U6VLBKVyObs1bBxt
- Cw1R6PWUXOcTn3fEznSsYI3or0zkZ+DvHds/rPoPkYn+peBoMsWL9nAD4bC05nTmcXnS
- EEr55O/yamouD0lX6qCuLR/zoBxwlyJjGWOh4UUM3M2Rgb1aLFWlEAs4ByyR/aKkvZvA
- 4Z6Ktiz/b1cEbSLGx/nUTzMmdiPY8KY0MjWtMN8lHDiJorXtgPSNiNvWyFY/CkoBQ/0G
- HIr8Eaw1buGe6/Vj1X9ymOBh1dFeLwxrYaK4M4IVkP82cxfwYQfl0QxmCvMJl/83WlfG Sw== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by userp2130.oracle.com with ESMTP id 2u9nbtaux0-1
+ bh=+UFpeHPZGWbRDyVWDlcfr2GRxu8zhevSNwDBLd7lC84=;
+ b=TSDDB9z7vlZUdIQxmrNCMGtVy+rEFGe9u1vv/9kOFEl9fB/mxVji5UgRMD4Sl2XbBn1v
+ a7a3HTsYk2hYNIz4TJNXuTRGS7ztExLT5EUkUMWGqOUzHq0FdUFKFhrKWZTyCjCR9FAq
+ rIDmDXsBDWHJ28cLif6ftqcQGLRaVsZfplAB9j/ZQ63BvXBklUhR9tpbBzz1Vdm8i9gj
+ 3VaXiPUq3JtZBo7EPI7DSpwinpXcqL+DHR48usrTiIhIOkddP7YkEBCRbUfMGtTtmPEe
+ fu96QSRJc6G6qIlYsamhkL/Q7FW+RIfYWctwmPSZPtdpABUv+SSmk4vmgieyDFmoDD5E uA== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2120.oracle.com with ESMTP id 2u9pjqarhp-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Tue, 13 Aug 2019 00:52:44 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7D0mxtZ039130;
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7D0nDSL113020;
         Tue, 13 Aug 2019 00:52:43 GMT
 Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by aserp3030.oracle.com with ESMTP id 2u9m0ar7k4-1
+        by aserp3020.oracle.com with ESMTP id 2u9nrees0r-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Tue, 13 Aug 2019 00:52:43 +0000
 Received: from abhmp0022.oracle.com (abhmp0022.oracle.com [141.146.116.28])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x7D0qdT8017984;
-        Tue, 13 Aug 2019 00:52:40 GMT
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x7D0qg0b018000;
+        Tue, 13 Aug 2019 00:52:42 GMT
 Received: from parnassus.us.oracle.com (/10.39.240.231)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 12 Aug 2019 17:52:39 -0700
+        with ESMTP ; Mon, 12 Aug 2019 17:52:41 -0700
 From:   Daniel Jordan <daniel.m.jordan@oracle.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         Steffen Klassert <steffen.klassert@secunet.com>
@@ -71,22 +71,22 @@ Cc:     Lai Jiangshan <jiangshanlai@gmail.com>,
         Tejun Heo <tj@kernel.org>,
         Daniel Jordan <daniel.m.jordan@oracle.com>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 1/9] padata: allocate workqueue internally
-Date:   Mon, 12 Aug 2019 20:52:16 -0400
-Message-Id: <20190813005224.30779-2-daniel.m.jordan@oracle.com>
+Subject: [PATCH 3/9] workqueue: require CPU hotplug read exclusion for apply_workqueue_attrs
+Date:   Mon, 12 Aug 2019 20:52:18 -0400
+Message-Id: <20190813005224.30779-4-daniel.m.jordan@oracle.com>
 X-Mailer: git-send-email 2.22.0
 In-Reply-To: <20190813005224.30779-1-daniel.m.jordan@oracle.com>
 References: <20190813005224.30779-1-daniel.m.jordan@oracle.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9347 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2 malwarescore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
  phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
  adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.0.1-1906280000 definitions=main-1908130005
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9347 signatures=668685
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
  lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
  definitions=main-1908130005
@@ -95,214 +95,78 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Move workqueue allocation inside of padata to prepare for further
-changes to how padata uses workqueues.
+Change the calling convention for apply_workqueue_attrs to require CPU
+hotplug read exclusion.
 
-Guarantees the workqueue is created with max_active=1, which padata
-relies on to work correctly.  No functional change.
+Avoids lockdep complaints about nested calls to get_online_cpus in a
+future patch where padata calls apply_workqueue_attrs when changing
+other CPU-hotplug-sensitive data structures with the CPU read lock
+already held.
 
 Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
+Acked-by: Tejun Heo <tj@kernel.org>
 Cc: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: Lai Jiangshan <jiangshanlai@gmail.com>
 Cc: Peter Zijlstra <peterz@infradead.org>
 Cc: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: Tejun Heo <tj@kernel.org>
 Cc: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
 ---
- Documentation/padata.txt | 12 ++++++------
- crypto/pcrypt.c          | 13 ++-----------
- include/linux/padata.h   |  3 +--
- kernel/padata.c          | 24 +++++++++++++++---------
- 4 files changed, 24 insertions(+), 28 deletions(-)
+ kernel/workqueue.c | 19 ++++++++++++++-----
+ 1 file changed, 14 insertions(+), 5 deletions(-)
 
-diff --git a/Documentation/padata.txt b/Documentation/padata.txt
-index b103d0c82000..b37ba1eaace3 100644
---- a/Documentation/padata.txt
-+++ b/Documentation/padata.txt
-@@ -16,10 +16,12 @@ overall control of how tasks are to be run::
- 
-     #include <linux/padata.h>
- 
--    struct padata_instance *padata_alloc(struct workqueue_struct *wq,
-+    struct padata_instance *padata_alloc(const char *name,
- 					 const struct cpumask *pcpumask,
- 					 const struct cpumask *cbcpumask);
- 
-+'name' simply identifies the instance.
-+
- The pcpumask describes which processors will be used to execute work
- submitted to this instance in parallel. The cbcpumask defines which
- processors are allowed to be used as the serialization callback processor.
-@@ -128,8 +130,7 @@ in that CPU mask or about a not running instance.
- 
- Each task submitted to padata_do_parallel() will, in turn, be passed to
- exactly one call to the above-mentioned parallel() function, on one CPU, so
--true parallelism is achieved by submitting multiple tasks.  Despite the
--fact that the workqueue is used to make these calls, parallel() is run with
-+true parallelism is achieved by submitting multiple tasks.  parallel() runs with
- software interrupts disabled and thus cannot sleep.  The parallel()
- function gets the padata_priv structure pointer as its lone parameter;
- information about the actual work to be done is probably obtained by using
-@@ -148,7 +149,7 @@ fact with a call to::
- At some point in the future, padata_do_serial() will trigger a call to the
- serial() function in the padata_priv structure.  That call will happen on
- the CPU requested in the initial call to padata_do_parallel(); it, too, is
--done through the workqueue, but with local software interrupts disabled.
-+run with local software interrupts disabled.
- Note that this call may be deferred for a while since the padata code takes
- pains to ensure that tasks are completed in the order in which they were
- submitted.
-@@ -159,5 +160,4 @@ when a padata instance is no longer needed::
-     void padata_free(struct padata_instance *pinst);
- 
- This function will busy-wait while any remaining tasks are completed, so it
--might be best not to call it while there is work outstanding.  Shutting
--down the workqueue, if necessary, should be done separately.
-+might be best not to call it while there is work outstanding.
-diff --git a/crypto/pcrypt.c b/crypto/pcrypt.c
-index 0edf5b54fc77..d67293063c7f 100644
---- a/crypto/pcrypt.c
-+++ b/crypto/pcrypt.c
-@@ -20,7 +20,6 @@
- 
- struct padata_pcrypt {
- 	struct padata_instance *pinst;
--	struct workqueue_struct *wq;
- 
- 	/*
- 	 * Cpumask for callback CPUs. It should be
-@@ -397,14 +396,9 @@ static int pcrypt_init_padata(struct padata_pcrypt *pcrypt,
- 
- 	get_online_cpus();
- 
--	pcrypt->wq = alloc_workqueue("%s", WQ_MEM_RECLAIM | WQ_CPU_INTENSIVE,
--				     1, name);
--	if (!pcrypt->wq)
--		goto err;
--
--	pcrypt->pinst = padata_alloc_possible(pcrypt->wq);
-+	pcrypt->pinst = padata_alloc_possible(name);
- 	if (!pcrypt->pinst)
--		goto err_destroy_workqueue;
-+		goto err;
- 
- 	mask = kmalloc(sizeof(*mask), GFP_KERNEL);
- 	if (!mask)
-@@ -437,8 +431,6 @@ static int pcrypt_init_padata(struct padata_pcrypt *pcrypt,
- 	kfree(mask);
- err_free_padata:
- 	padata_free(pcrypt->pinst);
--err_destroy_workqueue:
--	destroy_workqueue(pcrypt->wq);
- err:
- 	put_online_cpus();
- 
-@@ -452,7 +444,6 @@ static void pcrypt_fini_padata(struct padata_pcrypt *pcrypt)
- 
- 	padata_stop(pcrypt->pinst);
- 	padata_unregister_cpumask_notifier(pcrypt->pinst, &pcrypt->nblock);
--	destroy_workqueue(pcrypt->wq);
- 	padata_free(pcrypt->pinst);
- }
- 
-diff --git a/include/linux/padata.h b/include/linux/padata.h
-index 8da673861d99..839d9319920a 100644
---- a/include/linux/padata.h
-+++ b/include/linux/padata.h
-@@ -151,8 +151,7 @@ struct padata_instance {
- #define	PADATA_INVALID	4
- };
- 
--extern struct padata_instance *padata_alloc_possible(
--					struct workqueue_struct *wq);
-+extern struct padata_instance *padata_alloc_possible(const char *name);
- extern void padata_free(struct padata_instance *pinst);
- extern int padata_do_parallel(struct padata_instance *pinst,
- 			      struct padata_priv *padata, int cb_cpu);
-diff --git a/kernel/padata.c b/kernel/padata.c
-index c1002ac4720c..ee0108c0265e 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -815,6 +815,7 @@ static void __padata_free(struct padata_instance *pinst)
- 	padata_free_pd(pinst->pd);
- 	free_cpumask_var(pinst->cpumask.pcpu);
- 	free_cpumask_var(pinst->cpumask.cbcpu);
-+	destroy_workqueue(pinst->wq);
- 	kfree(pinst);
- }
- 
-@@ -948,13 +949,13 @@ static struct kobj_type padata_attr_type = {
-  * padata_alloc - allocate and initialize a padata instance and specify
-  *                cpumasks for serial and parallel workers.
+diff --git a/kernel/workqueue.c b/kernel/workqueue.c
+index f53705ff3ff1..bc2e09a8ea61 100644
+--- a/kernel/workqueue.c
++++ b/kernel/workqueue.c
+@@ -4030,6 +4030,8 @@ static int apply_workqueue_attrs_locked(struct workqueue_struct *wq,
   *
-- * @wq: workqueue to use for the allocated padata instance
-+ * @name: used to identify the instance
-  * @pcpumask: cpumask that will be used for padata parallelization
-  * @cbcpumask: cpumask that will be used for padata serialization
+  * Performs GFP_KERNEL allocations.
   *
-  * Must be called from a cpus_read_lock() protected region
++ * Assumes caller has CPU hotplug read exclusion, i.e. get_online_cpus().
++ *
+  * Return: 0 on success and -errno on failure.
   */
--static struct padata_instance *padata_alloc(struct workqueue_struct *wq,
-+static struct padata_instance *padata_alloc(const char *name,
- 					    const struct cpumask *pcpumask,
- 					    const struct cpumask *cbcpumask)
+ int apply_workqueue_attrs(struct workqueue_struct *wq,
+@@ -4037,9 +4039,11 @@ int apply_workqueue_attrs(struct workqueue_struct *wq,
  {
-@@ -965,11 +966,16 @@ static struct padata_instance *padata_alloc(struct workqueue_struct *wq,
- 	if (!pinst)
- 		goto err;
+ 	int ret;
  
--	if (!alloc_cpumask_var(&pinst->cpumask.pcpu, GFP_KERNEL))
-+	pinst->wq = alloc_workqueue("%s", WQ_MEM_RECLAIM | WQ_CPU_INTENSIVE,
-+				    1, name);
-+	if (!pinst->wq)
- 		goto err_free_inst;
+-	apply_wqattrs_lock();
++	lockdep_assert_cpus_held();
 +
-+	if (!alloc_cpumask_var(&pinst->cpumask.pcpu, GFP_KERNEL))
-+		goto err_free_wq;
- 	if (!alloc_cpumask_var(&pinst->cpumask.cbcpu, GFP_KERNEL)) {
- 		free_cpumask_var(pinst->cpumask.pcpu);
--		goto err_free_inst;
-+		goto err_free_wq;
++	mutex_lock(&wq_pool_mutex);
+ 	ret = apply_workqueue_attrs_locked(wq, attrs);
+-	apply_wqattrs_unlock();
++	mutex_unlock(&wq_pool_mutex);
+ 
+ 	return ret;
+ }
+@@ -4152,16 +4156,21 @@ static int alloc_and_link_pwqs(struct workqueue_struct *wq)
+ 			mutex_unlock(&wq->mutex);
+ 		}
+ 		return 0;
+-	} else if (wq->flags & __WQ_ORDERED) {
++	}
++
++	get_online_cpus();
++	if (wq->flags & __WQ_ORDERED) {
+ 		ret = apply_workqueue_attrs(wq, ordered_wq_attrs[highpri]);
+ 		/* there should only be single pwq for ordering guarantee */
+ 		WARN(!ret && (wq->pwqs.next != &wq->dfl_pwq->pwqs_node ||
+ 			      wq->pwqs.prev != &wq->dfl_pwq->pwqs_node),
+ 		     "ordering guarantee broken for workqueue %s\n", wq->name);
+-		return ret;
+ 	} else {
+-		return apply_workqueue_attrs(wq, unbound_std_wq_attrs[highpri]);
++		ret = apply_workqueue_attrs(wq, unbound_std_wq_attrs[highpri]);
  	}
- 	if (!padata_validate_cpumask(pinst, pcpumask) ||
- 	    !padata_validate_cpumask(pinst, cbcpumask))
-@@ -981,8 +987,6 @@ static struct padata_instance *padata_alloc(struct workqueue_struct *wq,
- 
- 	rcu_assign_pointer(pinst->pd, pd);
- 
--	pinst->wq = wq;
--
- 	cpumask_copy(pinst->cpumask.pcpu, pcpumask);
- 	cpumask_copy(pinst->cpumask.cbcpu, cbcpumask);
- 
-@@ -1000,6 +1004,8 @@ static struct padata_instance *padata_alloc(struct workqueue_struct *wq,
- err_free_masks:
- 	free_cpumask_var(pinst->cpumask.pcpu);
- 	free_cpumask_var(pinst->cpumask.cbcpu);
-+err_free_wq:
-+	destroy_workqueue(pinst->wq);
- err_free_inst:
- 	kfree(pinst);
- err:
-@@ -1011,14 +1017,14 @@ static struct padata_instance *padata_alloc(struct workqueue_struct *wq,
-  *                         Use the cpu_possible_mask for serial and
-  *                         parallel workers.
-  *
-- * @wq: workqueue to use for the allocated padata instance
-+ * @name: used to identify the instance
-  *
-  * Must be called from a cpus_read_lock() protected region
-  */
--struct padata_instance *padata_alloc_possible(struct workqueue_struct *wq)
-+struct padata_instance *padata_alloc_possible(const char *name)
- {
- 	lockdep_assert_cpus_held();
--	return padata_alloc(wq, cpu_possible_mask, cpu_possible_mask);
-+	return padata_alloc(name, cpu_possible_mask, cpu_possible_mask);
++	put_online_cpus();
++
++	return ret;
  }
- EXPORT_SYMBOL(padata_alloc_possible);
  
+ static int wq_clamp_max_active(int max_active, unsigned int flags,
 -- 
 2.22.0
 
