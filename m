@@ -2,149 +2,112 @@ Return-Path: <SRS0=ZPwR=WJ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1E3EC433FF
-	for <linux-crypto@archiver.kernel.org>; Tue, 13 Aug 2019 05:18:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB506C433FF
+	for <linux-crypto@archiver.kernel.org>; Tue, 13 Aug 2019 05:24:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C1F96206C2
-	for <linux-crypto@archiver.kernel.org>; Tue, 13 Aug 2019 05:18:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="w5qmuoq9"
+	by mail.kernel.org (Postfix) with ESMTP id A8C1020651
+	for <linux-crypto@archiver.kernel.org>; Tue, 13 Aug 2019 05:24:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726005AbfHMFSK (ORCPT
+        id S1725903AbfHMFYq (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 13 Aug 2019 01:18:10 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:39828 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725298AbfHMFSK (ORCPT
+        Tue, 13 Aug 2019 01:24:46 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:39199 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725781AbfHMFYq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 13 Aug 2019 01:18:10 -0400
-Received: by mail-wr1-f65.google.com with SMTP id t16so16405754wra.6
-        for <linux-crypto@vger.kernel.org>; Mon, 12 Aug 2019 22:18:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=vjknMuAeSc0x7oeuMDtq2tLSIl2orQ+1iduGgKWbGiw=;
-        b=w5qmuoq9X3Ml79Oe1T1zepUjvQjsv5b3F4f3sRbDxivdoqN+9fmOkhtVxNVieqI/V0
-         1UwDPWvUG7SLBcRYLtyKb5wdQ6jb2GAkmuCqCks4MLYK/Nht/6Yxrqzr5ugKIz7Jk2X0
-         J3H8XX512BzYf9tbFQhBoOz1DxSRardaf5QQPj3bYPEd6Q8q28AV24jQy+Th02Mt4Hb5
-         oSBrKROm9BjZy1kuqABp6BKAHYiQWwZSwCb2ERMycX5krB8CBagv6coSo2nB6bAJKlJc
-         UxY6mxBtdJdWdgBWzIbiy51QIrnyTWxqrXwrmrzenSgkfWTlRJ5guihgG8C5I2lfnSeA
-         JuBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=vjknMuAeSc0x7oeuMDtq2tLSIl2orQ+1iduGgKWbGiw=;
-        b=h+1U6mRuKxzdr8/XPW5RvvxR9Xy3beEUlg56tqZ3hPvGOhho8+fqiYbBhqTO7dC1G/
-         gR4astMmGC32ab/AaRumDsfbzgQQMUpiXMBP3sx/9vv1DTLNuNVzR7elbOl+YrkrTR6P
-         kYsrBcHI6+e2ATPpKqmmwhztz01kTkU2dS54uhiu8SF3OX1/Jc8FamDqgj+VPW8f9BM8
-         H2QKQKlgaLsGVWpTTRTuuQtu4HVwCHDyEMzMDRrtxjKEHZ5EhQKNi/0Bngtd/VIc0Nl6
-         9clk6JmLOi5qcQjEEBTBhBcOLCGAwX2MLZ/X0pGv8V4SbA23opd1ctgrIBPT1DnpiC9B
-         YfMg==
-X-Gm-Message-State: APjAAAX9/Hy4ZbE223xL/RhQEprBuVKOUgiYdCVEo2RtXJBcjmkkXsmM
-        Jd6IuGCLPU/tM0ZKo89t2ChWHRzW+O75zcsIx4+8Sg==
-X-Google-Smtp-Source: APXvYqyT1D3REzaL959a3ymyuxK4owGKfnAIBTa58BY2l3RptzUHdepEU1bThGxSjSVPCPLqjkiSL+3E6lYeF4pkbOM=
-X-Received: by 2002:a5d:6b07:: with SMTP id v7mr33607676wrw.169.1565673487792;
- Mon, 12 Aug 2019 22:18:07 -0700 (PDT)
+        Tue, 13 Aug 2019 01:24:46 -0400
+Received: from [192.168.178.60] ([109.104.47.130]) by mrelayeu.kundenserver.de
+ (mreue107 [212.227.15.183]) with ESMTPSA (Nemesis) id
+ 1MPGiR-1hevT50O45-00PbYR; Tue, 13 Aug 2019 07:23:46 +0200
+Subject: Re: [PATCH v2 15/34] staging/vc04_services: convert put_page() to
+ put_user_page*()
+To:     john.hubbard@gmail.com, Andrew Morton <akpm@linux-foundation.org>
+Cc:     linux-fbdev@vger.kernel.org, Jan Kara <jack@suse.cz>,
+        kvm@vger.kernel.org, Dave Hansen <dave.hansen@linux.intel.com>,
+        Dave Chinner <david@fromorbit.com>,
+        dri-devel@lists.freedesktop.org, linux-mm@kvack.org,
+        sparclinux@vger.kernel.org, Ira Weiny <ira.weiny@intel.com>,
+        ceph-devel@vger.kernel.org, devel@driverdev.osuosl.org,
+        rds-devel@oss.oracle.com, linux-rdma@vger.kernel.org,
+        Suniel Mahesh <sunil.m@techveda.org>, x86@kernel.org,
+        amd-gfx@lists.freedesktop.org,
+        Christoph Hellwig <hch@infradead.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Mihaela Muraru <mihaela.muraru21@gmail.com>,
+        xen-devel@lists.xenproject.org, devel@lists.orangefs.org,
+        linux-media@vger.kernel.org, John Hubbard <jhubbard@nvidia.com>,
+        intel-gfx@lists.freedesktop.org,
+        Kishore KP <kishore.p@techveda.org>,
+        linux-block@vger.kernel.org,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
+        linux-rpi-kernel@lists.infradead.org,
+        Dan Williams <dan.j.williams@intel.com>,
+        Sidong Yang <realwakka@gmail.com>,
+        linux-arm-kernel@lists.infradead.org, linux-nfs@vger.kernel.org,
+        Eric Anholt <eric@anholt.net>, netdev@vger.kernel.org,
+        LKML <linux-kernel@vger.kernel.org>, linux-xfs@vger.kernel.org,
+        linux-crypto@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-fsdevel@vger.kernel.org, Al Viro <viro@zeniv.linux.org.uk>
+References: <20190804224915.28669-1-jhubbard@nvidia.com>
+ <20190804224915.28669-16-jhubbard@nvidia.com>
+From:   Stefan Wahren <stefan.wahren@i2se.com>
+Message-ID: <f92a9b35-072c-a452-3248-ded047a9ee7e@i2se.com>
+Date:   Tue, 13 Aug 2019 07:23:36 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20190812145324.27090-1-ard.biesheuvel@linaro.org>
- <20190812145324.27090-2-ard.biesheuvel@linaro.org> <20190812193849.GA131059@gmail.com>
-In-Reply-To: <20190812193849.GA131059@gmail.com>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Tue, 13 Aug 2019 08:17:56 +0300
-Message-ID: <CAKv+Gu-Nk0tMST32d3cwuiwGmZmXgKRDd2h9BuW-iPeoqSN5tA@mail.gmail.com>
-Subject: Re: [PATCH v10 1/7] crypto: essiv - create wrapper template for ESSIV generation
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        device-mapper development <dm-devel@redhat.com>,
-        linux-fscrypt@vger.kernel.org,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Milan Broz <gmazyland@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20190804224915.28669-16-jhubbard@nvidia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Provags-ID: V03:K1:WLtnGHSdIdsSOgSCw9gLWN/He07a3vhG8P/jw9q/ZsKCLbsJUeS
+ 5llVNlt7KE/tvHn+5EOmDYYv4pX1cHVWKOXHtrw4HQWAHuCkTohFsgxlEY0fExapDm8vR8t
+ zVIsUr/Bms6Kvxj5sCY8IbKiNL01LBum+j6x95pPZHXG9iG9KDUI7QIiVK2/58tc3NB1jnX
+ y7VHJG/KIA+fGCfAbINIQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:e2tiG/LoUCE=:MfCllk8c06iYHLUWJWcKAL
+ cdQ1fi1ypP4tC6pu8XAt4M+fU5mGlkjM5ziFPw9nAP5+ICbjFLhxsiDLATVpll3xwUgna69cS
+ Ev9bpFgmBYRqbHsiOVM335kNgAU19xY/LXN/GzEuigzotpDhc5IdC4FGsNTdqmIYi0Bx4dgCw
+ bLM/SrMXG40Mg1UArtxdqWQvHnINj7yK6JacwPswBAo33CV5S5U4U1PS67DpEMKA7dX0oduGb
+ 5fQtkN1kvCZEg2/ekJnnb+PAR6KRS8Eu0zqK7cwQwWxs+nxHFNvcdfFolT7waPuKj24rhpnjW
+ ZntPcErm15w8EJ72vFuARtCUk4Lh4jU+zYNtoDE6B8RJqr/+yxycmwEDucEbNXrujkaPH72RU
+ fWCHjlXjsJS29DRMlBs91cqiKMaK/ktbzSpegz+iLEJq/HkDuPh/jiz/b8w2crkMXTYEXfcIb
+ WqkuI5hHrAdEh99xa/X99FupD8F6iZ52Pv/g2glNHL9WlKL41btCn/KodqBqy/glIqHZeYzq2
+ SXjRol/t4oy36qgSCQmUGiCt1lssYLkBWOzcxjui5lZUL2V9O7wn91tHl7G+DbqjQzgMyVtBP
+ 60iHHkwkWe3su3M3o+o4m8sWd9OG5XIToU/4cSDhBQohrRIKKqoUbXAyCJH96bxaYdq/zseIf
+ oMsHaN/31pBaLs6MtsAa2tu5PRj9qlBX5kso+Y5up4mj5gl7CfIWyGwpM4gPWtVKv1En5k3ZR
+ HR/0MJ6spaP8P86u5+VALfxj2aM5bbcj+ZVczoVE2BIVl4lPQEesVoHHwFc=
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 12 Aug 2019 at 22:38, Eric Biggers <ebiggers@kernel.org> wrote:
+On 05.08.19 00:48, john.hubbard@gmail.com wrote:
+> From: John Hubbard <jhubbard@nvidia.com>
 >
-> On Mon, Aug 12, 2019 at 05:53:18PM +0300, Ard Biesheuvel wrote:
-> > +     switch (type) {
-> > +     case CRYPTO_ALG_TYPE_BLKCIPHER:
-> > +             skcipher_inst = kzalloc(sizeof(*skcipher_inst) +
-> > +                                     sizeof(*ictx), GFP_KERNEL);
-> > +             if (!skcipher_inst)
-> > +                     return -ENOMEM;
-> > +             inst = skcipher_crypto_instance(skcipher_inst);
-> > +             base = &skcipher_inst->alg.base;
-> > +             ictx = crypto_instance_ctx(inst);
-> > +
-> > +             /* Block cipher, e.g. "cbc(aes)" */
-> > +             crypto_set_skcipher_spawn(&ictx->u.skcipher_spawn, inst);
-> > +             err = crypto_grab_skcipher(&ictx->u.skcipher_spawn,
-> > +                                        inner_cipher_name, 0,
-> > +                                        crypto_requires_sync(algt->type,
-> > +                                                             algt->mask));
-> > +             if (err)
-> > +                     goto out_free_inst;
+> For pages that were retained via get_user_pages*(), release those pages
+> via the new put_user_page*() routines, instead of via put_page() or
+> release_pages().
 >
-> This should say "Symmetric cipher", not "Block cipher".
+> This is part a tree-wide conversion, as described in commit fc1d8e7cca2d
+> ("mm: introduce put_user_page*(), placeholder versions").
 >
-> > +
-> > +     if (!parse_cipher_name(essiv_cipher_name, block_base->cra_name)) {
-> > +             pr_warn("Failed to parse ESSIV cipher name from skcipher cra_name\n");
-> > +             goto out_drop_skcipher;
-> > +     }
+> Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 >
-> This is missing:
->
->                 err = -EINVAL;
->
-> > +     if (type == CRYPTO_ALG_TYPE_BLKCIPHER) {
-> > +             skcipher_inst->alg.setkey       = essiv_skcipher_setkey;
-> > +             skcipher_inst->alg.encrypt      = essiv_skcipher_encrypt;
-> > +             skcipher_inst->alg.decrypt      = essiv_skcipher_decrypt;
-> > +             skcipher_inst->alg.init         = essiv_skcipher_init_tfm;
-> > +             skcipher_inst->alg.exit         = essiv_skcipher_exit_tfm;
-> > +
-> > +             skcipher_inst->alg.min_keysize  = crypto_skcipher_alg_min_keysize(skcipher_alg);
-> > +             skcipher_inst->alg.max_keysize  = crypto_skcipher_alg_max_keysize(skcipher_alg);
-> > +             skcipher_inst->alg.ivsize       = crypto_skcipher_alg_ivsize(skcipher_alg);
-> > +             skcipher_inst->alg.chunksize    = crypto_skcipher_alg_chunksize(skcipher_alg);
-> > +             skcipher_inst->alg.walksize     = crypto_skcipher_alg_walksize(skcipher_alg);
-> > +
-> > +             skcipher_inst->free             = essiv_skcipher_free_instance;
-> > +
-> > +             err = skcipher_register_instance(tmpl, skcipher_inst);
-> > +     } else {
-> > +             aead_inst->alg.setkey           = essiv_aead_setkey;
-> > +             aead_inst->alg.setauthsize      = essiv_aead_setauthsize;
-> > +             aead_inst->alg.encrypt          = essiv_aead_encrypt;
-> > +             aead_inst->alg.decrypt          = essiv_aead_decrypt;
-> > +             aead_inst->alg.init             = essiv_aead_init_tfm;
-> > +             aead_inst->alg.exit             = essiv_aead_exit_tfm;
-> > +
-> > +             aead_inst->alg.ivsize           = crypto_aead_alg_ivsize(aead_alg);
-> > +             aead_inst->alg.maxauthsize      = crypto_aead_alg_maxauthsize(aead_alg);
-> > +             aead_inst->alg.chunksize        = crypto_aead_alg_chunksize(aead_alg);
-> > +
-> > +             aead_inst->free                 = essiv_aead_free_instance;
-> > +
-> > +             err = aead_register_instance(tmpl, aead_inst);
-> > +     }
->
-> 'ivsize' is already in a variable, so could use
->
->                 skcipher_inst->alg.ivsize       = ivsize;
->
->         and
->                 aead_inst->alg.ivsize           = ivsize;
->
-
-Thanks Eric. These will all be fixed in the next respin.
+> Cc: Eric Anholt <eric@anholt.net>
+> Cc: Stefan Wahren <stefan.wahren@i2se.com>
+> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Cc: Mihaela Muraru <mihaela.muraru21@gmail.com>
+> Cc: Suniel Mahesh <sunil.m@techveda.org>
+> Cc: Al Viro <viro@zeniv.linux.org.uk>
+> Cc: Sidong Yang <realwakka@gmail.com>
+> Cc: Kishore KP <kishore.p@techveda.org>
+> Cc: linux-rpi-kernel@lists.infradead.org
+> Cc: linux-arm-kernel@lists.infradead.org
+> Cc: devel@driverdev.osuosl.org
+> Signed-off-by: John Hubbard <jhubbard@nvidia.com>
+Acked-by: Stefan Wahren <stefan.wahren@i2se.com>
