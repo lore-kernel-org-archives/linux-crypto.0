@@ -1,106 +1,78 @@
-Return-Path: <SRS0=O5Fb=WI=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=ZPwR=WJ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71EC4C31E40
-	for <linux-crypto@archiver.kernel.org>; Mon, 12 Aug 2019 23:36:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 114BEC433FF
+	for <linux-crypto@archiver.kernel.org>; Tue, 13 Aug 2019 00:07:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 43CDB20665
-	for <linux-crypto@archiver.kernel.org>; Mon, 12 Aug 2019 23:36:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1565652987;
-	bh=BM4sVVQhsgV0eA0tvBOKqoxFmCiLYfxMnLfacEen5tc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=YVeSRFx5gDXMN/sRNK4nls8JGbx42DbF4SrTbg55uC8j2vLPDn9wNcpsd9F3Ppd0H
-	 9iRAfyUqd/6dPvcHBIQ9Bi9+7kUk5Pb2K0Db2KejgiLYg+HCfgg8JSeJ99WWsAEXRq
-	 clmNPehHSYVws++LNnAdZkQHj1LgzIlNsbeRP+iQ=
+	by mail.kernel.org (Postfix) with ESMTP id D732620651
+	for <linux-crypto@archiver.kernel.org>; Tue, 13 Aug 2019 00:07:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726765AbfHLXg0 (ORCPT
+        id S1726710AbfHMAHD (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 12 Aug 2019 19:36:26 -0400
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:45901 "EHLO
-        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726358AbfHLXg0 (ORCPT
+        Mon, 12 Aug 2019 20:07:03 -0400
+Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:33893 "EHLO
+        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726890AbfHMAHD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 12 Aug 2019 19:36:26 -0400
-Received: by mail-ot1-f67.google.com with SMTP id m24so12665375otp.12;
-        Mon, 12 Aug 2019 16:36:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=JUhoBbFfJyoEZHhxE0yhHd01Inh7+bhFFQBfYp/6IHI=;
-        b=C0wtaisBxNDTA6BgfyRVYslK5Mgpvp8Twaar+oyBoQ34Ki+jw7ss98bZDh0R+Azdf5
-         mjLxbOQR0WD65SsY/fv/7nJFyxUgo7OIRx9kwnnXRF4LHvWvEoQhkY14bA2CJqby5yVt
-         FyFBJ62lQhqIIULcn5eEfN/Cyvy+J2Fj4qazcuU/Cn1mlceF4CAw0jAO6sFj6pGN8AJv
-         Nc4MCl6B6/QTlPlGgFsR1BohWGNOaZl881LMuAXHZxV7jMyrtWBAwx8Fq5rGx6sqVTHH
-         GPgkiBNTtT1WAjRaIGwPF1pmBDh6mikJdcQoiQHMx4/OnVM7eMVzSMCsaReu3YlzcpQy
-         lAUA==
-X-Gm-Message-State: APjAAAV9QRXUUPTCVwvRVJTTDz9Kwz/qSp0f+7+nAReaGPimqs/37kqu
-        fHDH5fcjczCKBw96QnqTE3/PxQw=
-X-Google-Smtp-Source: APXvYqz7S8FkR6SwClag3erlK+yDMUQoYwEC/imJe9WJrw+kMtxqR06+H2rRmQKOwlNcvAwWgGSluQ==
-X-Received: by 2002:a5e:8c11:: with SMTP id n17mr313906ioj.64.1565652984885;
-        Mon, 12 Aug 2019 16:36:24 -0700 (PDT)
-Received: from localhost ([64.188.179.254])
-        by smtp.gmail.com with ESMTPSA id i4sm131555614iog.31.2019.08.12.16.36.24
-        (version=TLS1_3 cipher=AEAD-AES256-GCM-SHA384 bits=256/256);
-        Mon, 12 Aug 2019 16:36:24 -0700 (PDT)
-Date:   Mon, 12 Aug 2019 17:36:23 -0600
-From:   Rob Herring <robh@kernel.org>
-To:     Tomer Maimon <tmaimon77@gmail.com>
-Cc:     mpm@selenic.com, herbert@gondor.apana.org.au, arnd@arndb.de,
-        gregkh@linuxfoundation.org, mark.rutland@arm.com,
-        avifishman70@gmail.com, tali.perry1@gmail.com, venture@google.com,
-        yuenn@google.com, benjaminfair@google.com, sumit.garg@linaro.org,
-        jens.wiklander@linaro.org, vkoul@kernel.org, tglx@linutronix.de,
-        joel@jms.id.au, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        openbmc@lists.ozlabs.org
-Subject: Re: [PATCH v1 1/2] dt-binding: hwrng: add NPCM RNG documentation
-Message-ID: <20190812233623.GA24924@bogus>
-References: <20190722150241.345609-1-tmaimon77@gmail.com>
- <20190722150241.345609-2-tmaimon77@gmail.com>
+        Mon, 12 Aug 2019 20:07:03 -0400
+Received: from callcc.thunk.org (guestnat-104-133-9-109.corp.google.com [104.133.9.109] (may be forged))
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id x7D06i57014906
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 12 Aug 2019 20:06:46 -0400
+Received: by callcc.thunk.org (Postfix, from userid 15806)
+        id 3F35E4218EF; Mon, 12 Aug 2019 20:06:44 -0400 (EDT)
+Date:   Mon, 12 Aug 2019 20:06:44 -0400
+From:   "Theodore Y. Ts'o" <tytso@mit.edu>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-fscrypt@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net,
+        linux-mtd@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-api@vger.kernel.org, Satya Tangirala <satyat@google.com>,
+        Paul Crowley <paulcrowley@google.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>
+Subject: Re: [PATCH v8 10/20] fscrypt: add FS_IOC_REMOVE_ENCRYPTION_KEY ioctl
+Message-ID: <20190813000644.GH28705@mit.edu>
+References: <20190805162521.90882-1-ebiggers@kernel.org>
+ <20190805162521.90882-11-ebiggers@kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190722150241.345609-2-tmaimon77@gmail.com>
+In-Reply-To: <20190805162521.90882-11-ebiggers@kernel.org>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jul 22, 2019 at 06:02:40PM +0300, Tomer Maimon wrote:
-> Added device tree binding documentation for Nuvoton BMC
-> NPCM Random Number Generator (RNG).
-> 
-> Signed-off-by: Tomer Maimon <tmaimon77@gmail.com>
-> ---
->  .../bindings/rng/nuvoton,npcm-rng.txt           | 17 +++++++++++++++++
->  1 file changed, 17 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/rng/nuvoton,npcm-rng.txt
-> 
-> diff --git a/Documentation/devicetree/bindings/rng/nuvoton,npcm-rng.txt b/Documentation/devicetree/bindings/rng/nuvoton,npcm-rng.txt
-> new file mode 100644
-> index 000000000000..a697b4425fb3
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/rng/nuvoton,npcm-rng.txt
-> @@ -0,0 +1,17 @@
-> +NPCM SoC Random Number Generator
-> +
-> +Required properties:
-> +- compatible  : "nuvoton,npcm750-rng" for the NPCM7XX BMC.
-> +- reg         : Specifies physical base address and size of the registers.
-> +
-> +Optional property:
-> +- quality : estimated number of bits of true entropy per 1024 bits
-> +			read from the rng.
-> +			If this property is not defined, it defaults to 1000.
+> +		/* Some inodes still reference this key; try to evict them. */
+> +		if (try_to_lock_encrypted_files(sb, mk) != 0)
+> +			status_flags |=
+> +				FSCRYPT_KEY_REMOVAL_STATUS_FLAG_FILES_BUSY;
+> +	}
 
-This would need a vendor prefix, however, I think it should be implied 
-by the compatible string. It is fixed per SoC, right?
+try_to_lock_encrypted_files() can return other errors besides -EBUSY;
+in particular sync_filesystem() can return other errors, such as -EIO
+or -EFSCORUPTED.  In that case, I think we're better off returning the
+relevant status code back to the user.  We will have already wiped the
+master key, but this situation will only happen in exceptional
+conditions (e.g., user has ejected the sdcard, etc.), so it's not
+worth it to try to undo the master key wipe to try to restore things
+to the pre-ioctl execution state.
+
+So I think we should capture the return code from
+try_to_lock_encrypted_files, and if it is EBUSY, we can set FILES_BUSY
+flag and return success.  Otherwise, we should return the error.
+
+If you agree, please fix that up and then feel free to add:
+
+Reviewed-by: Theodore Ts'o <tytso@mit.edu>
+
+						- Ted
