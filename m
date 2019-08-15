@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AB1CC31E40
-	for <linux-crypto@archiver.kernel.org>; Thu, 15 Aug 2019 09:02:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08D51C32757
+	for <linux-crypto@archiver.kernel.org>; Thu, 15 Aug 2019 09:02:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 27DA3218A6
+	by mail.kernel.org (Postfix) with ESMTP id D3B2D218A6
 	for <linux-crypto@archiver.kernel.org>; Thu, 15 Aug 2019 09:02:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="F441Umy/"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dYD58Uvi"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730862AbfHOJCS (ORCPT
+        id S1730867AbfHOJCU (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 15 Aug 2019 05:02:18 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:33104 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730823AbfHOJCS (ORCPT
+        Thu, 15 Aug 2019 05:02:20 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:39266 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730213AbfHOJCT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Aug 2019 05:02:18 -0400
-Received: by mail-wm1-f67.google.com with SMTP id p77so592948wme.0
-        for <linux-crypto@vger.kernel.org>; Thu, 15 Aug 2019 02:02:17 -0700 (PDT)
+        Thu, 15 Aug 2019 05:02:19 -0400
+Received: by mail-wm1-f66.google.com with SMTP id i63so678112wmg.4
+        for <linux-crypto@vger.kernel.org>; Thu, 15 Aug 2019 02:02:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=uMoPWG7ZtNqmAOxM6E+qCA9KIAAzgWl56JeFS/8CuPA=;
-        b=F441Umy/1KJ6iJyvfwZoAuD8zpROKzYiD0r0+XQQiL48PNrrojPbbLSaFEcn7jnyBD
-         CcEKgpvvWc+2sLCSTb24PokyQHKybx4OxD9eJ/b1F9OkzE4cmOf7PKXk5IQL9i2gui2A
-         ZIdGaAdUPq+i9C4o2lpp7SWCelAg0pE5WR2EVRPF76r7KxuCNpWD8Np34U26Z6trTVpE
-         8c3ZtE/cf02jcoaCZCHdKb64wFv76enxWSe1Ux5LRDlkUK+7EPM4CFRw/Zq6QrPW6Ji2
-         5GTK/MyT9kmdcYKxWylf4tW9BnPDHQUiVF7RnaCqka/J1i42xWmkyz7q9QzWMoH0Fnlu
-         6/5g==
+        bh=6OhjbF2M4HRdeN0EH1XAkAXt0Z8G30cJBFEK1XTbAV0=;
+        b=dYD58UviyQoaqUX0Ufh5LH392urYuVBmdfTxlfeu4vZIhEPoJieDnCAHjViHnMA96Q
+         1LFZ+a9mTb30FunM54tEir8xdwB6AxzpZrS0YuF1wZNyQAuYvlUYbOwvXy5nMS1hdxNW
+         gek5jdntD6WcQbQgLS0TfLeP2sA6YH7ModgaZ9y/BWS3YxiWUq65wQ2R9XkOgXPidsGX
+         F4/3shClIptKCYbkurnxGkGxgpufK04bT+UHDkqfOAGfaPncGJHOBEZTaoJT7Pm1+NJB
+         gZm5OPLJMuKDRlxU/qaBQfXHPOQDlvU/pmKRJ0rHoXqJgDq2NBmtsbojCvxDjIKC7oEy
+         iWRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=uMoPWG7ZtNqmAOxM6E+qCA9KIAAzgWl56JeFS/8CuPA=;
-        b=Kt7MvvexbgmkS1XNXf8EXD1OLJdw9CLRz7aO7NptrZ9lfN+6IN8Y6kP9fDakpKB/0I
-         cuqnV/vX0bgH/8GSH1Azw6ABpGZ4mwxFFSEzuaMQjc3Cle/TynhzSNcs48fMTxWBz6WQ
-         P7qZKSgtStihp9woXQNJiryv9c6vgTLVBmAA5ZoRcughe51fysiP5FOGTPJRIxFpOK5I
-         J5j/v+H32+biRqGf0Ewu2jaLGbCdpdLu8x2aq9fCI3ue3Vel1hYfJn9OUAGIrmdm4XiO
-         eTaaVkDHCPyAFKU9HrG83HSjZzwR6qLuIQJzlcDw/iaNaNa6BFK6xqLC0OXoAYXLfah/
-         pyVA==
-X-Gm-Message-State: APjAAAVbYFrIDZ00f/wj9dbuVk38VVA36C9zR32EJAJSp76CPtClf4JZ
-        DOkw+U5aBiKEIohL5NARiJV6kTutNGFrLcoh
-X-Google-Smtp-Source: APXvYqwkePq09Uwx7KU+zUf7kNn+P6rkZ48kbErsJrh+TrCOnb41k+pD9f2z5NvFyfhWyM4wcEte/w==
-X-Received: by 2002:a7b:ca5a:: with SMTP id m26mr1600238wml.134.1565859736265;
-        Thu, 15 Aug 2019 02:02:16 -0700 (PDT)
+        bh=6OhjbF2M4HRdeN0EH1XAkAXt0Z8G30cJBFEK1XTbAV0=;
+        b=BKYTSyF/bP3A5SwIRUbJS98j/qlnBif7nUnTWmIFYcXe7PxRANQ3Q1rxQkDiYMe+Of
+         YprmIcE8sXEeEitBZiJ6hCMPa6sOoopgUHXvnWFINpQNiICHJ7Ps6SEoHajUY6HxMd6o
+         SGPxqfHVizrGOx8BewNOB9si22HkmvSdrUURJliyPLHWtGHA+QakyEaPjeYc2MOzu5t3
+         pYc7l9et5yjrwYaEG9XS9P9ztGPtRLCZnb467WVIaHebJe2QUFqubFnQzex+TAtjncbS
+         6gxEuRP2Hubb/fm1AI+OKtEc8IAcI++Ns5oNeoMDAterZCfBCaFFGJFUGnFAncA4WXJp
+         B0og==
+X-Gm-Message-State: APjAAAUMPpnD0p3a9G0Z2ghfSawGC33EeAfuUesgi/LEMosXF6wgytR7
+        U3uOAo7g9Lcy5nfxX8vOMBEU0FWG6gILJzt6
+X-Google-Smtp-Source: APXvYqwKMbbd07RBfAVJQ/h0iRUkL6f24jCHfnnZULS5lQkNqHtk2f37sXjYZqRRFlk0aI/Em/PmoA==
+X-Received: by 2002:a7b:c157:: with SMTP id z23mr1699974wmi.104.1565859737719;
+        Thu, 15 Aug 2019 02:02:17 -0700 (PDT)
 Received: from localhost.localdomain ([2a02:587:a407:da00:f1b5:e68c:5f7f:79e7])
-        by smtp.gmail.com with ESMTPSA id x20sm3857533wrg.10.2019.08.15.02.02.14
+        by smtp.gmail.com with ESMTPSA id x20sm3857533wrg.10.2019.08.15.02.02.16
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 15 Aug 2019 02:02:15 -0700 (PDT)
+        Thu, 15 Aug 2019 02:02:17 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     herbert@gondor.apana.org.au,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v5 28/30] crypto: x86/des - switch to library interface
-Date:   Thu, 15 Aug 2019 12:01:10 +0300
-Message-Id: <20190815090112.9377-29-ard.biesheuvel@linaro.org>
+Subject: [PATCH v5 29/30] crypto: des - remove now unused __des3_ede_setkey()
+Date:   Thu, 15 Aug 2019 12:01:11 +0300
+Message-Id: <20190815090112.9377-30-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190815090112.9377-1-ard.biesheuvel@linaro.org>
 References: <20190815090112.9377-1-ard.biesheuvel@linaro.org>
@@ -72,126 +72,46 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/x86/crypto/des3_ede_glue.c | 42 +++++++++++---------
- 1 file changed, 23 insertions(+), 19 deletions(-)
+ crypto/des_generic.c | 13 -------------
+ include/crypto/des.h |  3 ---
+ 2 files changed, 16 deletions(-)
 
-diff --git a/arch/x86/crypto/des3_ede_glue.c b/arch/x86/crypto/des3_ede_glue.c
-index f730a312ce35..89830e531350 100644
---- a/arch/x86/crypto/des3_ede_glue.c
-+++ b/arch/x86/crypto/des3_ede_glue.c
-@@ -11,7 +11,7 @@
-  */
+diff --git a/crypto/des_generic.c b/crypto/des_generic.c
+index e021a321f584..6e13a4a29ecb 100644
+--- a/crypto/des_generic.c
++++ b/crypto/des_generic.c
+@@ -51,19 +51,6 @@ static void crypto_des_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
+ 	des_decrypt(dctx, dst, src);
+ }
  
- #include <crypto/algapi.h>
--#include <crypto/internal/des.h>
-+#include <crypto/des.h>
- #include <crypto/internal/skcipher.h>
- #include <linux/crypto.h>
- #include <linux/init.h>
-@@ -19,8 +19,8 @@
- #include <linux/types.h>
- 
- struct des3_ede_x86_ctx {
--	u32 enc_expkey[DES3_EDE_EXPKEY_WORDS];
--	u32 dec_expkey[DES3_EDE_EXPKEY_WORDS];
-+	struct des3_ede_ctx enc;
-+	struct des3_ede_ctx dec;
- };
- 
- /* regular block cipher functions */
-@@ -34,7 +34,7 @@ asmlinkage void des3_ede_x86_64_crypt_blk_3way(const u32 *expkey, u8 *dst,
- static inline void des3_ede_enc_blk(struct des3_ede_x86_ctx *ctx, u8 *dst,
- 				    const u8 *src)
+-int __des3_ede_setkey(u32 *expkey, u32 *flags, const u8 *key,
+-		      unsigned int keylen)
+-{
+-	int err;
+-
+-	des_ekey(expkey, key); expkey += DES_EXPKEY_WORDS; key += DES_KEY_SIZE;
+-	dkey(expkey, key); expkey += DES_EXPKEY_WORDS; key += DES_KEY_SIZE;
+-	des_ekey(expkey, key);
+-
+-	return 0;
+-}
+-EXPORT_SYMBOL_GPL(__des3_ede_setkey);
+-
+ static int des3_ede_setkey(struct crypto_tfm *tfm, const u8 *key,
+ 			   unsigned int keylen)
  {
--	u32 *enc_ctx = ctx->enc_expkey;
-+	u32 *enc_ctx = ctx->enc.expkey;
+diff --git a/include/crypto/des.h b/include/crypto/des.h
+index 2c864a4e6707..7812b4331ae4 100644
+--- a/include/crypto/des.h
++++ b/include/crypto/des.h
+@@ -54,7 +54,4 @@ int des_expand_key(struct des_ctx *ctx, const u8 *key, unsigned int keylen);
+ int des3_ede_expand_key(struct des3_ede_ctx *ctx, const u8 *key,
+ 			unsigned int keylen);
  
- 	des3_ede_x86_64_crypt_blk(enc_ctx, dst, src);
- }
-@@ -42,7 +42,7 @@ static inline void des3_ede_enc_blk(struct des3_ede_x86_ctx *ctx, u8 *dst,
- static inline void des3_ede_dec_blk(struct des3_ede_x86_ctx *ctx, u8 *dst,
- 				    const u8 *src)
- {
--	u32 *dec_ctx = ctx->dec_expkey;
-+	u32 *dec_ctx = ctx->dec.expkey;
- 
- 	des3_ede_x86_64_crypt_blk(dec_ctx, dst, src);
- }
-@@ -50,7 +50,7 @@ static inline void des3_ede_dec_blk(struct des3_ede_x86_ctx *ctx, u8 *dst,
- static inline void des3_ede_enc_blk_3way(struct des3_ede_x86_ctx *ctx, u8 *dst,
- 					 const u8 *src)
- {
--	u32 *enc_ctx = ctx->enc_expkey;
-+	u32 *enc_ctx = ctx->enc.expkey;
- 
- 	des3_ede_x86_64_crypt_blk_3way(enc_ctx, dst, src);
- }
-@@ -58,7 +58,7 @@ static inline void des3_ede_enc_blk_3way(struct des3_ede_x86_ctx *ctx, u8 *dst,
- static inline void des3_ede_dec_blk_3way(struct des3_ede_x86_ctx *ctx, u8 *dst,
- 					 const u8 *src)
- {
--	u32 *dec_ctx = ctx->dec_expkey;
-+	u32 *dec_ctx = ctx->dec.expkey;
- 
- 	des3_ede_x86_64_crypt_blk_3way(dec_ctx, dst, src);
- }
-@@ -122,7 +122,7 @@ static int ecb_encrypt(struct skcipher_request *req)
- 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
- 	struct des3_ede_x86_ctx *ctx = crypto_skcipher_ctx(tfm);
- 
--	return ecb_crypt(req, ctx->enc_expkey);
-+	return ecb_crypt(req, ctx->enc.expkey);
- }
- 
- static int ecb_decrypt(struct skcipher_request *req)
-@@ -130,7 +130,7 @@ static int ecb_decrypt(struct skcipher_request *req)
- 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
- 	struct des3_ede_x86_ctx *ctx = crypto_skcipher_ctx(tfm);
- 
--	return ecb_crypt(req, ctx->dec_expkey);
-+	return ecb_crypt(req, ctx->dec.expkey);
- }
- 
- static unsigned int __cbc_encrypt(struct des3_ede_x86_ctx *ctx,
-@@ -348,24 +348,28 @@ static int des3_ede_x86_setkey(struct crypto_tfm *tfm, const u8 *key,
- 	u32 i, j, tmp;
- 	int err;
- 
--	err = crypto_des3_ede_verify_key(tfm, key);
--	if (err)
--		return err;
-+	err = des3_ede_expand_key(&ctx->enc, key, keylen);
-+	if (err == -ENOKEY) {
-+		if (crypto_tfm_get_flags(tfm) & CRYPTO_TFM_REQ_FORBID_WEAK_KEYS)
-+			err = -EINVAL;
-+		else
-+			err = 0;
-+	}
- 
--	/* Generate encryption context using generic implementation. */
--	err = __des3_ede_setkey(ctx->enc_expkey, &tfm->crt_flags, key, keylen);
--	if (err < 0)
-+	if (err) {
-+		memset(ctx, 0, sizeof(*ctx));
- 		return err;
-+	}
- 
- 	/* Fix encryption context for this implementation and form decryption
- 	 * context. */
- 	j = DES3_EDE_EXPKEY_WORDS - 2;
- 	for (i = 0; i < DES3_EDE_EXPKEY_WORDS; i += 2, j -= 2) {
--		tmp = ror32(ctx->enc_expkey[i + 1], 4);
--		ctx->enc_expkey[i + 1] = tmp;
-+		tmp = ror32(ctx->enc.expkey[i + 1], 4);
-+		ctx->enc.expkey[i + 1] = tmp;
- 
--		ctx->dec_expkey[j + 0] = ctx->enc_expkey[i + 0];
--		ctx->dec_expkey[j + 1] = tmp;
-+		ctx->dec.expkey[j + 0] = ctx->enc.expkey[i + 0];
-+		ctx->dec.expkey[j + 1] = tmp;
- 	}
- 
- 	return 0;
+-extern int __des3_ede_setkey(u32 *expkey, u32 *flags, const u8 *key,
+-			     unsigned int keylen);
+-
+ #endif /* __CRYPTO_DES_H */
 -- 
 2.17.1
 
