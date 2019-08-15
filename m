@@ -6,81 +6,76 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1861C433FF
-	for <linux-crypto@archiver.kernel.org>; Thu, 15 Aug 2019 11:36:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C48FC433FF
+	for <linux-crypto@archiver.kernel.org>; Thu, 15 Aug 2019 11:37:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 84B4620665
-	for <linux-crypto@archiver.kernel.org>; Thu, 15 Aug 2019 11:36:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E128C2083B
+	for <linux-crypto@archiver.kernel.org>; Thu, 15 Aug 2019 11:37:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730533AbfHOLgE (ORCPT
+        id S1731294AbfHOLhh (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 15 Aug 2019 07:36:04 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:57148 "EHLO fornost.hmeau.com"
+        Thu, 15 Aug 2019 07:37:37 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:57156 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726008AbfHOLgD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Aug 2019 07:36:03 -0400
+        id S1726008AbfHOLhh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 15 Aug 2019 07:37:37 -0400
 Received: from gondolin.me.apana.org.au ([192.168.0.6] helo=gondolin.hengli.com.au)
         by fornost.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1hyE2o-0002lm-65; Thu, 15 Aug 2019 21:35:50 +1000
+        id 1hyE4U-0002nS-L7; Thu, 15 Aug 2019 21:37:34 +1000
 Received: from herbert by gondolin.hengli.com.au with local (Exim 4.80)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1hyE2m-0007Es-JS; Thu, 15 Aug 2019 21:35:48 +1000
-Date:   Thu, 15 Aug 2019 21:35:48 +1000
+        id 1hyE4S-0007FI-Oq; Thu, 15 Aug 2019 21:37:32 +1000
+Date:   Thu, 15 Aug 2019 21:37:32 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
 To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>, Eric Biggers <ebiggers@google.com>,
-        device-mapper development <dm-devel@redhat.com>,
-        linux-fscrypt@vger.kernel.org,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Milan Broz <gmazyland@gmail.com>
-Subject: Re: [PATCH v11 1/4] crypto: essiv - create wrapper template for
- ESSIV generation
-Message-ID: <20190815113548.GA27723@gondor.apana.org.au>
-References: <20190814163746.3525-1-ard.biesheuvel@linaro.org>
- <20190814163746.3525-2-ard.biesheuvel@linaro.org>
- <20190815023734.GB23782@gondor.apana.org.au>
- <CAKv+Gu_maif=kZk-HRMx7pP=ths1vuTgcu4kFpzz0tCkO2+DFA@mail.gmail.com>
- <20190815051320.GA24982@gondor.apana.org.au>
- <CAKv+Gu_OVUfXW6t+j1RHA4_Uc43o50Sspke2KkVw9djbFDd04g@mail.gmail.com>
+        <linux-crypto@vger.kernel.org>, Eric Biggers <ebiggers@kernel.org>,
+        Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
+Subject: Re: [PATCH v4 06/30] crypto: caam/des - switch to new verification
+ routines
+Message-ID: <20190815113732.GB27723@gondor.apana.org.au>
+References: <20190805170037.31330-1-ard.biesheuvel@linaro.org>
+ <20190805170037.31330-7-ard.biesheuvel@linaro.org>
+ <20190815045421.GA24765@gondor.apana.org.au>
+ <CAKv+Gu93e1T0nzZYgzfvMdzQ6x=3WKHBTQ1vx7n+UHecQLVS6Q@mail.gmail.com>
+ <CAKv+Gu8aX_QQ4WuydX6pu+GZeRzi8_vZ24Dp0dJddpNLfcTxfQ@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAKv+Gu_OVUfXW6t+j1RHA4_Uc43o50Sspke2KkVw9djbFDd04g@mail.gmail.com>
+In-Reply-To: <CAKv+Gu8aX_QQ4WuydX6pu+GZeRzi8_vZ24Dp0dJddpNLfcTxfQ@mail.gmail.com>
 User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Aug 15, 2019 at 08:15:29AM +0300, Ard Biesheuvel wrote:
+On Thu, Aug 15, 2019 at 08:43:38AM +0300, Ard Biesheuvel wrote:
+>
+> So I will end up with
 > 
-> So what about checking that the cipher key size matches the shash
-> digest size, or that the cipher block size matches the skcipher IV
-> size? This all moves to the TFM init function?
+> static inline int verify_skcipher_des_key(struct crypto_skcipher *tfm,
+>   const u8 *key)
+> static inline int verify_skcipher_des3_key(struct crypto_skcipher *tfm,
+>    const u8 *key)
+> static inline int verify_ablkcipher_des_key(struct crypto_skcipher *tfm,
+>     const u8 *key)
+> static inline int verify_ablkcipher_des3_key(struct crypto_skcipher *tfm,
+>      const u8 *key)
+> static inline int verify_aead_des3_key(struct crypto_aead *tfm, const u8 *key,
+>        int keylen)
+> static inline int verify_aead_des_key(struct crypto_aead *tfm, const u8 *key,
+>       int keylen)
+> 
+> Is that what you had in mind?
 
-I don't think you need to check those things.  If the shash produces
-an incorrect key size the setkey will just fail naturally.  As to
-the block size matching the IV size, in the kernel it's not actually
-possible to get an underlying cipher with different block size
-than the cbc mode that you used to derive it.
+Yes and hopefully we will be able to get rid of ablkcipher at some
+point.
 
-The size checks that we have in general are to stop people from
-making crazy combinations such as lrw(des3_ede), it's not there
-to test the correctness of a given implementation.  That is,
-we assume that whoever provides "aes" will give it the correct
-geometry for it.
+As a rule we want to make the job as easy as possible for driver
+authors so we should leave the burden of such trivial things with
+the API.
 
-Sure we haven't made it explicit (which we should at some point)
-but as it stands, it can only occur if we have a bug or someone
-loads a malicious kernel module in which case none of this matters.
-
-> Are there any existing templates that use this approach?
-
-I'm not sure of templates doing this but this is similar to fallbacks.
-In fact we don't check any gemoetry on the fallbacks at all.
-
-Cheers,
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
