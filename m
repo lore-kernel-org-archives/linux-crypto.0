@@ -2,204 +2,65 @@ Return-Path: <SRS0=pRBs=WL=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58D2FC3A589
-	for <linux-crypto@archiver.kernel.org>; Thu, 15 Aug 2019 22:31:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8203C3A589
+	for <linux-crypto@archiver.kernel.org>; Thu, 15 Aug 2019 22:42:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 144052133F
-	for <linux-crypto@archiver.kernel.org>; Thu, 15 Aug 2019 22:31:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="fYzraTRk"
+	by mail.kernel.org (Postfix) with ESMTP id 7EC902086C
+	for <linux-crypto@archiver.kernel.org>; Thu, 15 Aug 2019 22:42:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733095AbfHOWbx (ORCPT
+        id S1732335AbfHOWmL (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 15 Aug 2019 18:31:53 -0400
-Received: from mail-eopbgr730087.outbound.protection.outlook.com ([40.107.73.87]:20896
-        "EHLO NAM05-DM3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1733099AbfHOWbw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Aug 2019 18:31:52 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=k0/LJy1tWi1BGhSu0g9Rv0146Z+TXNYOnWZz+vlcu2EdlBysWQShMwGVdveJHxAYCTLPiVuwSdo9bEMuV49Spk9AqzEdWcE7x1QC1bSZ/F4ybaS4GiwVdtS8Wk+Y89fojihLV+CIRKiGjmibvLr0U6MF4BW/RJVM78S1XY9UJBeF2fMAcjQrogIQBYxf0Uae2JT6l9P8jXR+xC50Zqok3yIg5wuTqOPzDHDT1lJOiWdah/5JgHY/f1l3Vftd8Y5CJqbIq6ueEhmy3hDvveqXjMSkvFAOb7FJ1ItPzuqBF6xjoH1nx8GEypLbQ8291OAuo3dVqZBWbyE7UdCVn8DUHg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=EUlkj0HFikVUCqdQxiPEYPF+rxNL400Mkn6dpUwgVUE=;
- b=c7OvTF1OI/cEsqJp9rzM5dFEjGISLNxQZstbdIoTveuVf+Jwi+atIs4Pxigt3GlpU5iAe2+azJAl1FvVsQw95G/a3cxz2mCTSMKg1CzhCTSqDt3NIwEd0zlo0dzefFYte/NKsjX85pHpjIRIyq4kvm0qmVGvjXVDeWiE51aCSbc2KagPMUqH62ByZc4hUso2vtYhwPLl6shWvdICkJv6jzgc2PUiAuA5OqLgI1PqSq7rezePzMZP7853a0KWXuxGWFfho0yO6d3AVSl3iAzRM2BCYDY0iZntero904XIOlq7nEUm8146ZM189GHa+TBfPKt45AECwmM2IAdcDa1Row==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=EUlkj0HFikVUCqdQxiPEYPF+rxNL400Mkn6dpUwgVUE=;
- b=fYzraTRk2Ru6zbQO9vuCj7XrlmPnfH3TiZsmrcMeYeRwz38IFCgQ5AaE5aTh7qD9XscUBgplCm2f6zhgI8ZPW4NwphGsfyVx4Y5j5V4H4+4XqDD9UxDb61Zwk+haB9pvEEgxt2f3QxSSmvsDepsYp35Ny8gcpVVD6P+skv+/GqQ=
-Received: from DM5PR12MB1449.namprd12.prod.outlook.com (10.172.40.14) by
- DM5PR12MB2503.namprd12.prod.outlook.com (52.132.141.146) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2157.21; Thu, 15 Aug 2019 22:31:49 +0000
-Received: from DM5PR12MB1449.namprd12.prod.outlook.com
- ([fe80::f9ec:92b6:9a0f:30ca]) by DM5PR12MB1449.namprd12.prod.outlook.com
- ([fe80::f9ec:92b6:9a0f:30ca%6]) with mapi id 15.20.2157.022; Thu, 15 Aug 2019
- 22:31:48 +0000
-From:   Gary R Hook <ghook@amd.com>
-To:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Subject: Crypto driver callback problem
-Thread-Topic: Crypto driver callback problem
-Thread-Index: AQHVU7k5B/tL3QLcxUi+mfgRL8Y82w==
-Date:   Thu, 15 Aug 2019 22:31:48 +0000
-Message-ID: <d43e443c-58d9-6684-798a-4b5c584f9e1d@amd.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: SN4PR0401CA0002.namprd04.prod.outlook.com
- (2603:10b6:803:21::12) To DM5PR12MB1449.namprd12.prod.outlook.com
- (2603:10b6:4:10::14)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Gary.Hook@amd.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-originating-ip: [165.204.77.1]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 97c65a23-c869-41de-a92d-08d721d05c20
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600148)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:DM5PR12MB2503;
-x-ms-traffictypediagnostic: DM5PR12MB2503:
-x-microsoft-antispam-prvs: <DM5PR12MB2503293C86DF978563ED036CFDAC0@DM5PR12MB2503.namprd12.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 01304918F3
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(136003)(39850400004)(396003)(346002)(366004)(376002)(189003)(199004)(2351001)(8936002)(3480700005)(53936002)(31696002)(2906002)(6436002)(5640700003)(81166006)(81156014)(14454004)(478600001)(8676002)(6512007)(2616005)(316002)(99286004)(6486002)(476003)(36756003)(25786009)(52116002)(5660300002)(71190400001)(71200400001)(66556008)(64756008)(66446008)(305945005)(7736002)(486006)(66946007)(66476007)(6116002)(31686004)(6506007)(386003)(102836004)(186003)(66066001)(6916009)(3846002)(14444005)(256004)(2501003)(26005);DIR:OUT;SFP:1101;SCL:1;SRVR:DM5PR12MB2503;H:DM5PR12MB1449.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: amd.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: aL/Cet24lb2UxowlWFgI/6qDjSHsVCEGIXN59ErTr2ricryJVjBw3mwV4GJ+EusEHf955zHV5Ie5vHKzW+P88hqaDuoDCdfA6R0P4SYdeel1Ypmk3XhnO8eqPV/FpSFlZeaCJG/WQcANjFJYj1bb7DAOif/Y4albPIoeDifNK6PMz5AgBmP7pLlHH4kPs5YOwHpPj6C0QyCCE6g88aO/HWYqSt7+hNaAxyUNZpAARVC9e2Q9dY3AH6U0iS9JxfXYOKdE1PbYmpbz5O8BzDsLMNd+zOrNrqJGyw55twHr1EzwUbVrVvnfpVulaQbyDlhoQ6TDc1GOXRyuZ28Co5hAbzCwwI7HFixlC9Bv0C7lp0CJ0LXnfoaDcsEXAycQqi41bCKoj8mqNanxHVQzPWgRzEawJ1CdkcMgOlVN1Bc4sOI=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <5AB0E634FB2A2B4CBC1158F005F59E14@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        Thu, 15 Aug 2019 18:42:11 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:57358 "EHLO fornost.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1731244AbfHOWmL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 15 Aug 2019 18:42:11 -0400
+Received: from gondolin.me.apana.org.au ([192.168.0.6] helo=gondolin.hengli.com.au)
+        by fornost.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
+        id 1hyORd-0008M7-0C; Fri, 16 Aug 2019 08:42:09 +1000
+Received: from herbert by gondolin.hengli.com.au with local (Exim 4.80)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1hyORb-0000ny-7G; Fri, 16 Aug 2019 08:42:07 +1000
+Date:   Fri, 16 Aug 2019 08:42:07 +1000
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Zhou Wang <wangzhou1@hisilicon.com>
+Cc:     linux-crypto@vger.kernel.org
+Subject: Re: crypto: hisilicon - Fix warning on printing %p with dma_addr_t
+Message-ID: <20190815224207.GA3047@gondor.apana.org.au>
+References: <20190815120313.GA29253@gondor.apana.org.au>
+ <5D556981.2080309@hisilicon.com>
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 97c65a23-c869-41de-a92d-08d721d05c20
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Aug 2019 22:31:48.5430
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: bl0sgj02FTKOoTMXXwmBCPlp+V8Ic6xyC6VWhmoNQB57aZXOANyFBHYt5ysceMR0
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB2503
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5D556981.2080309@hisilicon.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Q29udGV4dDoNCldlJ3ZlIHJ1biBpbnRvIGEgcG9zc2libGUgbG9ja2luZyBpc3N1ZSB3aGVuIHVz
-aW5nIHRoZSBBTUQgQ0NQIGRldmljZSANCmZvciBjcnlwdG8gb2ZmbG9hZCwgd2l0aCB0aGUgbmV3
-IGV4dHJhIHRlc3RzLCBhbmQgd2l0aCBsb2NrIGRlYnVnZ2luZyANCmVuYWJsZWQuDQoNClByZS1y
-ZXFzOg0KICAgICAgICAgRW5hYmxlIHRoZSBjcnlwdG8gc2VsZi10ZXN0cyBhbmQgZXh0cmEgdGVz
-dHMNCiAgICAgICAgIEJ1aWxkIHRoZSBjcnlwdG8gdGVzdGluZyBtb2R1bGUgKHRjcnlwdCkNCiAg
-ICAgICAgIEVuYWJsZSB0aGUga2VybmVsIGhhY2tpbmcvbG9jayBkZWJ1Z2dpbmcgb3B0aW9uDQog
-ICAgICAgICAgICAgInByb3ZlIGxvY2tpbmcgY29ycmVjdG5lc3MiIChDT05GSUdfUFJPVkVfTE9D
-S0lORz15KQ0KDQpQcm9ibGVtOg0KQWZ0ZXIgYm9vdGluZyB0aGlzIGtlcm5lbCwgYW5kIGxvYWRp
-bmcgb3VyIGNjcC1jcnlwdG8gbW9kdWxlLCBydW4gdGhlIA0KdGVzdHMgd2l0aCAibW9kcHJvYmUg
-dGNyeXB0IiBhbmQgd2UgZ2V0IHRoZSBkbWVzZyBvdXRwdXQgc2hvd24gZm9sbG93aW5nLg0KDQpX
-aXRoIHNvbWUgaW52ZXN0aWdhdGlvbiB3ZSBkaXNjb3ZlcmVkIHRoYXQgaW4gdGhlIHNpdHVhdGlv
-biBiZWluZyANCnJlcG9ydGVkIGhlcmUsIHRoZSBjYWxsYmFjayBpcyBleGVjdXRlZCBhcyBhIHRh
-c2tsZXQsIHdoZXJlIHdlJ3JlIG5vdCANCmFsbG93ZWQgdG8gc2xlZXAuIFRoZSBjYWxsZWQgcm91
-dGluZSBiZWdhbiBpdHMgY3J5cHRvIG9wZXJhdGlvbiB3aXRoIHRoZSANCk1BWV9TTEVFUCBmbGFn
-IHNldCwgYW5kIGFsbG9jYXRlcyBtZW1vcnkgdXNpbmcgR0ZQX0tFUk5FTC4NCg0KVGhlIHRlc3Qg
-aXRzZWxmIHJ1bnMgaW4gYSB0eXBpY2FsIGNvbnRleHQsIGFuZCBtYXkgc2xlZXA7IHRoZSBjYWxs
-YmFjaywgDQpob3dldmVyLCBydW5zIGFzIGEgdGFza2xldCB5ZXQgdGhpbmtzIGl0IGNhbiBzbGVl
-cCBiYXNlZCBvbiB0aGUgDQpDUllQVE9fVEZNX1JFUV9NQVlfU0xFRVAgZmxhZyBzZXQgaW4gdGhl
-IHJlcXVlc3QuDQoNCkRyaXZlcnMgZm9yIGNyeXB0byBhcmUgcmVxdWlyZWQgKGFzIHdlIHVuZGVy
-c3RhbmQgaXQpIHRvIHVzZSBhIHRhc2tsZXQgDQphcHByb2FjaCBmb3IgY2FsbGJhY2tzLCB3aGlj
-aCBpcyBuZWVkZWQgKGZvciBvbmUgZXhhbXBsZSkgdG8gc3VwcG9ydCANCklQU2VjLiAgKE4uQi4g
-d2UgZGlkIHNvbWUgcG9raW5nIGFyb3VuZCBpbiBvdGhlciwgc2ltaWxhciBjcnlwdG8gDQpkcml2
-ZXJzLCBhbmQgYWxsIGFwcGVhciB0byBiZSB1c2luZyB0YXNrbGV0cy4pDQoNCldlJ3JlIGxvb2tp
-bmcgZm9yIHRoZSBiZXN0IGFwcHJvYWNoIHRvIHJlc29sdmUgdGhpcy4gVGhvdWdodHM/DQoNCkdh
-cnkNCg0KWyAgIDU4LjgxNTU5Ml0gYWxnOiBza2NpcGhlcjogc2tpcHBpbmcgY29tcGFyaXNvbiB0
-ZXN0cyBmb3Igb2ZiKGFlcykgDQpiZWNhdXNlIG9mYihhZXMtZ2VuZXJpYykgaXMgdW5hdmFpbGFi
-bGUNClsgICA1OS4xMDU0MzddIGFsZzogc2tjaXBoZXI6IHNraXBwaW5nIGNvbXBhcmlzb24gdGVz
-dHMgZm9yIGNmYihhZXMpIA0KYmVjYXVzZSBjZmIoYWVzLWdlbmVyaWMpIGlzIHVuYXZhaWxhYmxl
-DQpbICAgNjQuMDI0MzQ3XSBhbGc6IGhhc2g6IGZhaWxlZCB0byBhbGxvY2F0ZSB0cmFuc2Zvcm0g
-Zm9yIHN0cmVlYm9nMjU2OiAtMg0KWyAgIDY0LjAzOTg1MV0gYWxnOiBoYXNoOiBmYWlsZWQgdG8g
-YWxsb2NhdGUgdHJhbnNmb3JtIGZvciBzdHJlZWJvZzUxMjogLTINClsgICA2Ny42OTg3ODldIGFs
-ZzogaGFzaDogZmFpbGVkIHRvIGFsbG9jYXRlIHRyYW5zZm9ybSBmb3IgDQpobWFjKHN0cmVlYm9n
-MjU2KTogLTINClsgICA2Ny43MjA3MzVdIGFsZzogaGFzaDogZmFpbGVkIHRvIGFsbG9jYXRlIHRy
-YW5zZm9ybSBmb3IgDQpobWFjKHN0cmVlYm9nNTEyKTogLTINCg0KWyAgIDY4LjgwMzc0NV0gPT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0NClsgICA2OC44MDg1MTVdIFdBUk5JTkc6IGlu
-Y29uc2lzdGVudCBsb2NrIHN0YXRlDQpbICAgNjguODEzMjg0XSA1LjMuMC1yYzItb29wc2Noaysg
-IzYyIFRhaW50ZWQ6IEcgICAgICAgICAgICBFDQpbICAgNjguODE5Nzk2XSAtLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLQ0KWyAgIDY4LjgyNDU2NV0gaW5jb25zaXN0ZW50IHtTT0ZUSVJR
-LU9OLVd9IC0+IHtJTi1TT0ZUSVJRLVd9IHVzYWdlLg0KWyAgIDY4LjgzMTI3Ml0ga3NvZnRpcnFk
-LzU2LzI5OSBbSEMwWzBdOlNDMVsxXTpIRTE6U0UwXSB0YWtlczoNClsgICA2OC44Mzc0OTZdIDAw
-MDAwMDAwMzM0ZDJhZjAgKGZzX3JlY2xhaW0peysuPy59LCBhdDogDQpmc19yZWNsYWltX2FjcXVp
-cmUucGFydC4xMDErMHg1LzB4MzANClsgICA2OC44NDY2MzddIHtTT0ZUSVJRLU9OLVd9IHN0YXRl
-IHdhcyByZWdpc3RlcmVkIGF0Og0KWyAgIDY4Ljg1MjA3OF0gICBsb2NrX2FjcXVpcmUrMHhhMy8w
-eDE4MA0KWyAgIDY4Ljg1NjE2N10gICBmc19yZWNsYWltX2FjcXVpcmUucGFydC4xMDErMHgyOS8w
-eDMwDQpbICAgNjguODYxNjE0XSAgIGZzX3JlY2xhaW1fYWNxdWlyZSsweDE5LzB4MjANClsgICA2
-OC44NjYxODddICAgc2xhYl9wcmVfYWxsb2NfaG9vaysweDE5LzB4NzANClsgICA2OC44NzA4NDdd
-ICAgX19rbWFsbG9jX25vZGUrMHg1MS8weDFmMA0KWyAgIDY4Ljg3NTEzNF0gICBhbGxvY19jcHVt
-YXNrX3Zhcl9ub2RlKzB4MWYvMHgzMA0KWyAgIDY4Ljg4MDA5Nl0gICB6YWxsb2NfY3B1bWFza192
-YXIrMHgxNC8weDIwDQpbICAgNjguODg0NjczXSAgIG5hdGl2ZV9zbXBfcHJlcGFyZV9jcHVzKzB4
-ZDcvMHgyOGUNClsgICA2OC44ODk4MjldICAga2VybmVsX2luaXRfZnJlZWFibGUrMHgxMzYvMHgy
-ZDANClsgICA2OC44OTQ3OTFdICAga2VybmVsX2luaXQrMHhlLzB4MTEwDQpbICAgNjguODk4Njkw
-XSAgIHJldF9mcm9tX2ZvcmsrMHgyNy8weDUwDQpbICAgNjguOTAyNzc2XSBpcnEgZXZlbnQgc3Rh
-bXA6IDUzNzY0DQpbICAgNjguOTA2NTc3XSBoYXJkaXJxcyBsYXN0ICBlbmFibGVkIGF0ICg1Mzc2
-NCk6IFs8ZmZmZmZmZmY4ZTRkMWIzNz5dIA0Kc2xhYl9mcmVlX2ZyZWVsaXN0X2hvb2srMHhkNy8w
-eDFjMA0KWyAgIDY4LjkxNjk2OF0gaGFyZGlycXMgbGFzdCBkaXNhYmxlZCBhdCAoNTM3NjMpOiBb
-PGZmZmZmZmZmOGU0ZDFiMTg+XSANCnNsYWJfZnJlZV9mcmVlbGlzdF9ob29rKzB4YjgvMHgxYzAN
-ClsgICA2OC45MjczNjNdIHNvZnRpcnFzIGxhc3QgIGVuYWJsZWQgYXQgKDUzNzUyKTogWzxmZmZm
-ZmZmZjhmMDAwMzVlPl0gDQpfX2RvX3NvZnRpcnErMHgzNWUvMHgzZmUNClsgICA2OC45MzY3OTFd
-IHNvZnRpcnFzIGxhc3QgZGlzYWJsZWQgYXQgKDUzNzU3KTogWzxmZmZmZmZmZjhlMmEwNDY1Pl0g
-DQpydW5fa3NvZnRpcnFkKzB4MzUvMHg1MA0KWyAgIDY4Ljk0NjExNV0NCiAgICAgICAgICAgICAg
-ICBvdGhlciBpbmZvIHRoYXQgbWlnaHQgaGVscCB1cyBkZWJ1ZyB0aGlzOg0KWyAgIDY4Ljk1MzQw
-M10gIFBvc3NpYmxlIHVuc2FmZSBsb2NraW5nIHNjZW5hcmlvOg0KDQpbICAgNjguOTYwMDA0XSAg
-ICAgICAgQ1BVMA0KWyAgIDY4Ljk2MjczMl0gICAgICAgIC0tLS0NClsgICA2OC45NjU0NjNdICAg
-bG9jayhmc19yZWNsYWltKTsNClsgICA2OC45Njg5NjNdICAgPEludGVycnVwdD4NClsgICA2OC45
-NzE4ODhdICAgICBsb2NrKGZzX3JlY2xhaW0pOw0KWyAgIDY4Ljk3NTU4NV0NCiAgICAgICAgICAg
-ICAgICAgKioqIERFQURMT0NLICoqKg0KDQpbICAgNjguOTgyMTk3XSBubyBsb2NrcyBoZWxkIGJ5
-IGtzb2Z0aXJxZC81Ni8yOTkuDQpbICAgNjguOTg3MTU3XQ0KICAgICAgICAgICAgICAgIHN0YWNr
-IGJhY2t0cmFjZToNClsgICA2OC45OTIwMjVdIENQVTogNTYgUElEOiAyOTkgQ29tbToga3NvZnRp
-cnFkLzU2IFRhaW50ZWQ6IEcgRSANCjUuMy4wLXJjMi1vb3BzY2hrKyAjNjINClsgICA2OS4wMDIw
-MjZdIEhhcmR3YXJlIG5hbWU6IEFNRCBDb3Jwb3JhdGlvbiBEaWVzZWwvRGllc2VsLCBCSU9TIA0K
-UkRMMTAwQkIgMTEvMTQvMjAxOA0KWyAgIDY5LjAxMDQ4MF0gQ2FsbCBUcmFjZToNClsgICA2OS4w
-MTMyMTJdICBkdW1wX3N0YWNrKzB4OGUvMHhkNQ0KWyAgIDY5LjAxNjkxNV0gIHByaW50X3VzYWdl
-X2J1ZysweDFkZC8weDFmMA0KWyAgIDY5LjAyMTI5OF0gIG1hcmtfbG9jaysweDQ1NC8weDRmMA0K
-WyAgIDY5LjAyNTA5NF0gID8gZmluZF9oZWxkX2xvY2srMHgzNS8weGEwDQpbICAgNjkuMDI5Mzc2
-XSAgPyBjaGVja191c2FnZV9iYWNrd2FyZHMrMHgxODAvMHgxODANClsgICA2OS4wMzQ1MjZdICBf
-X2xvY2tfYWNxdWlyZSsweDU4Ni8weDE0NzANClsgICA2OS4wMzg5MDldICA/IHRyYWNlX2hhcmRp
-cnFzX29mZisweDNiLzB4ZTANClsgICA2OS4wNDM1ODRdICBsb2NrX2FjcXVpcmUrMHhhMy8weDE4
-MA0KWyAgIDY5LjA0NzU3N10gID8gZnNfcmVjbGFpbV9hY3F1aXJlLnBhcnQuMTAxKzB4NS8weDMw
-DQpbICAgNjkuMDUzMDIzXSAgZnNfcmVjbGFpbV9hY3F1aXJlLnBhcnQuMTAxKzB4MjkvMHgzMA0K
-WyAgIDY5LjA1ODM3M10gID8gZnNfcmVjbGFpbV9hY3F1aXJlLnBhcnQuMTAxKzB4NS8weDMwDQpb
-ICAgNjkuMDYzODE5XSAgZnNfcmVjbGFpbV9hY3F1aXJlKzB4MTkvMHgyMA0KWyAgIDY5LjA2ODI5
-OV0gIHNsYWJfcHJlX2FsbG9jX2hvb2srMHgxOS8weDcwDQpbICAgNjkuMDcyODc1XSAgX19rbWFs
-bG9jKzB4NGUvMHgyNzANClsgICA2OS4wNzY1NzhdICA/IHNrY2lwaGVyX3dhbGtfbmV4dCsweDFj
-OS8weDU3MA0KWyAgIDY5LjA4MTQ0NF0gIHNrY2lwaGVyX3dhbGtfbmV4dCsweDFjOS8weDU3MA0K
-WyAgIDY5LjA4NjExNV0gIHNrY2lwaGVyX3dhbGtfZmlyc3QrMHg0Ni8weDExMA0KWyAgIDY5LjA5
-MDc4OF0gIHNrY2lwaGVyX3dhbGtfc2tjaXBoZXIrMHhiNy8weGQwDQpbICAgNjkuMDk1NjU2XSAg
-c2tjaXBoZXJfd2Fsa192aXJ0KzB4MmIvMHg2MA0KWyAgIDY5LjEwMDE0NV0gIGNiY19kZWNyeXB0
-KzB4NGQvMHhlMCBbYWVzbmlfaW50ZWxdDQpbICAgNjkuMTA1MzEwXSAgY3J5cHRvX3NrY2lwaGVy
-X2RlY3J5cHQrMHgxYi8weDMwDQpbICAgNjkuMTEwMjczXSAgPyBjcnlwdG9fc2tjaXBoZXJfZGVj
-cnlwdCsweDFiLzB4MzANClsgICA2OS4xMTU0MzFdICBzaW1kX3NrY2lwaGVyX2RlY3J5cHQrMHhi
-ZS8weGQwIFtjcnlwdG9fc2ltZF0NClsgICA2OS4xMjE1NTddICBjcnlwdG9fc2tjaXBoZXJfZGVj
-cnlwdCsweDFiLzB4MzANClsgICA2OS4xMjY1MjVdICBjcnlwdG9fYXV0aGVuY19kZWNyeXB0X3Rh
-aWwuaXNyYS4yKzB4ZWUvMHgxMTANClsgICA2OS4xMzI2NTRdICBhdXRoZW5jX3ZlcmlmeV9haGFz
-aF9kb25lKzB4MmUvMHg0MA0KWyAgIDY5LjEzNzgxMl0gIGNjcF9jcnlwdG9fY29tcGxldGUrMHhk
-ZS8weDE5MA0KWyAgIDY5LjE0MjQ4OF0gIGNjcF9kb19jbWRfY29tcGxldGUrMHgyNy8weDQwDQpb
-ICAgNjkuMTQ3MDY3XSAgdGFza2xldF9hY3Rpb25fY29tbW9uLmlzcmEuMjErMHg4MS8weDFhMA0K
-WyAgIDY5LjE1MjcwOV0gIHRhc2tsZXRfYWN0aW9uKzB4MjIvMHgzMA0KWyAgIDY5LjE1Njc5Nl0g
-IF9fZG9fc29mdGlycSsweGNkLzB4M2ZlDQpbICAgNjkuMTYwNzkwXSAgPyBsb2NrZGVwX2hhcmRp
-cnFzX29uKzB4ZmIvMHgxOTANClsgICA2OS4xNjU2NTVdICBydW5fa3NvZnRpcnFkKzB4MzUvMHg1
-MA0KWyAgIDY5LjE2OTY0OV0gIHNtcGJvb3RfdGhyZWFkX2ZuKzB4ZmMvMHgxNzANClsgICA2OS4x
-NzQxMzBdICBrdGhyZWFkKzB4MTIxLzB4MTQwDQpbICAgNjkuMTc3NzM1XSAgPyBzb3J0X3Jhbmdl
-KzB4MzAvMHgzMA0KWyAgIDY5LjE4MTYzMF0gID8ga3RocmVhZF9wYXJrKzB4YjAvMHhiMA0KWyAg
-IDY5LjE4NTcyMF0gIHJldF9mcm9tX2ZvcmsrMHgyNy8weDUwDQpbICAgNzAuODUwNjE3XSBhbGc6
-IHNrY2lwaGVyOiBmYWlsZWQgdG8gYWxsb2NhdGUgdHJhbnNmb3JtIGZvciBlY2Ioc200KTogLTIN
-ClsgICA3MC44NjYzMDJdIGFsZzogc2tjaXBoZXI6IGZhaWxlZCB0byBhbGxvY2F0ZSB0cmFuc2Zv
-cm0gZm9yIGNiYyhzbTQpOiAtMg0KWyAgIDcwLjg4MTY0Nl0gYWxnOiBza2NpcGhlcjogZmFpbGVk
-IHRvIGFsbG9jYXRlIHRyYW5zZm9ybSBmb3IgY3RyKHNtNCk6IC0yDQpbICAgNzAuODg5MTYxXSB0
-Y3J5cHQ6IG9uZSBvciBtb3JlIHRlc3RzIGZhaWxlZCENCg==
+On Thu, Aug 15, 2019 at 10:17:37PM +0800, Zhou Wang wrote:
+>
+> > -	dev_dbg(&qm->pdev->dev, "QM mailbox request to q%u: %u-%pad\n", queue,
+> > -		cmd, dma_addr);
+> > +	dev_dbg(&qm->pdev->dev, "QM mailbox request to q%u: %u-%#lxad\n",
+> > +		queue, cmd, (unsigned long)dma_addr);
+> 
+> Thanks. However, to be honest I can't get why we fix it like this.
+> Can you give me a clue?
+
+dma_addr_t is not a pointer.  It's an integer type and therefore
+you need to print it out as such.
+
+Actually my patch is buggy too, on some architectures it can be
+a long long so we need to cast is such.
+
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
