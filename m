@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63F68C31E40
-	for <linux-crypto@archiver.kernel.org>; Thu, 15 Aug 2019 09:01:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0582DC31E40
+	for <linux-crypto@archiver.kernel.org>; Thu, 15 Aug 2019 09:01:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3B61C218A6
-	for <linux-crypto@archiver.kernel.org>; Thu, 15 Aug 2019 09:01:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C588C218A6
+	for <linux-crypto@archiver.kernel.org>; Thu, 15 Aug 2019 09:01:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kwL3DwGm"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rVFgaPdx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730787AbfHOJBb (ORCPT
+        id S1730789AbfHOJBd (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 15 Aug 2019 05:01:31 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:39189 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730775AbfHOJBb (ORCPT
+        Thu, 15 Aug 2019 05:01:33 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:36272 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730786AbfHOJBd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Aug 2019 05:01:31 -0400
-Received: by mail-wm1-f67.google.com with SMTP id i63so676043wmg.4
-        for <linux-crypto@vger.kernel.org>; Thu, 15 Aug 2019 02:01:29 -0700 (PDT)
+        Thu, 15 Aug 2019 05:01:33 -0400
+Received: by mail-wr1-f67.google.com with SMTP id r3so1598039wrt.3
+        for <linux-crypto@vger.kernel.org>; Thu, 15 Aug 2019 02:01:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=Er+86N+2cIZoohxTF9t6iACtueSxaqn6lRZ33S62JII=;
-        b=kwL3DwGmEiYfTPsqBIEpCPTFvQxO2oS+c5ZwwQKE/bi1v9nndMErM3vAXZ15Ndaa/x
-         w69jA9loiu+jMhVHiXkLG00NPXsZznelGbaAYp0n+cvFED3p5wFw/5J9Aod73/V9tyYD
-         U2wbmC6Z2TQziCK9+LzDNaG7u4FIzroRIg+lzmEK607L8FfPnqWwSC6YJU0eVlTlPZZI
-         5Doq+YOYJ8OyOqokdd/6J2fUGgB51vvdvT0IazwKM0L9/HU0cS9EaMgl+80ZHb432OzV
-         u7nGAtQu8qdc9R4xqG0COuFVvd0xYNRWQOBWZh2U9hPX9MVo53IsTm6QSX1Wz1yBoI4R
-         PXTA==
+        bh=rdyePxh79O5cxOEfR+t7TLBYxhR+49UWEAWghHr6ZEw=;
+        b=rVFgaPdx5jR/vH2Y8Q+hpDquwPjUatdPmd33Q88NnIHRtzOZY/gradDoPlbaaJzJkq
+         Yxwfaw7I0NP3F3a3t37wwcQr6mpHX3xeL+dpakXYILjmRXYhjfPNX0ma/j2Wt+Fc5v1L
+         jaJhYD09MFAtVBwuxByo/AoIgcO7E7PELP8yeziMJDTGRv63aiftpJX+QHdL7XHHPB46
+         FK5csTBPvtt5hBa3qAV4lm913/SX0RIkQrRLIAWKxH9o+zdtEoRpA0XR2wNI2Hls/qvj
+         MeMKe29BH68imRAF1uPrCqAPGC++jM2gxO2NNolaMvF9vRtbTVhCiPtyguFLUtZ2Ee/x
+         qJSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=Er+86N+2cIZoohxTF9t6iACtueSxaqn6lRZ33S62JII=;
-        b=UOMfOQPDeuQDpti70AlaBA/SFvGB8hVJlIeaxh05kI6yQOT4zzFZsLAFB3T1nwg6iI
-         bS5uUmQPoXMHZLBkAiF3Y+B76g/rMoAeYE9mpz0HYpBtnHS6FaXbAL8vriJaCM8N/P0c
-         njJeGEpUo1iPsXZH2Y8shclar2Ow704RJuMr9kL5VJkNObjVoqMTq3GmrpyHYA0Iparl
-         nwN1j6FNFt7uIWpyKybO9Nx7sG1hakB7tfvBu6aqHcj7aiym44Zg41v7+tSXeaPG+35f
-         9NzruIuHZKyRbCOeCeEXooPZK6lXVcr7M+3JoH2ZnBWWTsMbQNk9az/tOw8Ba+UTnql6
-         3K5Q==
-X-Gm-Message-State: APjAAAWIz7JK/WzIIUjKb5xtWie+B8ICisuUrALRC2z0p8VuZMl55gz7
-        cOc57iyIbJr9u7DLecq7tu7TA96HUFNduMC6
-X-Google-Smtp-Source: APXvYqxglgAx5H+qaPx0O0xRN6pM1hNsdOf89/6u2weevSDphqhoSg3zhmLeF+vNNqknwr1MJNQ7ww==
-X-Received: by 2002:a7b:c157:: with SMTP id z23mr1696307wmi.104.1565859688695;
-        Thu, 15 Aug 2019 02:01:28 -0700 (PDT)
+        bh=rdyePxh79O5cxOEfR+t7TLBYxhR+49UWEAWghHr6ZEw=;
+        b=LGWjDHPZUrjfD45V3PeHot6GJ/+X529cYKHdaJT7dCpIieHYostPHgNLSqtBN0rDNG
+         FcV6RCczdEBZ6bTo5fU96/ofnnhXE4qVxvP2aB7fNcQshM3DBaI9rihEy+hRmiui3OUc
+         FKpiROV9fbyw+Zb9Gvk8VyQxVLI0AOvNcS8DCp4i88LQ6blaac9Ko+kA1RpkE6nNEGkH
+         xyDgDYblspgMDHLF7Ll3x5ZuY2gmvP4KauNh358/zjf1Kt8/2qEJbctrC9fAChQQbsUk
+         pHpMGOH/azA8ppl+M3JmYT/NoPTm8Hn4j2aotT7zOHjCQ2FJWXVpi5D8/iI549JmlvW8
+         f1AA==
+X-Gm-Message-State: APjAAAWqNBpJNhYi/AjCWPB3Xjjid6+2eVfWpiPBFVs8QeQFIMmR7jyi
+        UHCRsMM1l7HlfHi6z0OW9rZBIFxfPnkKQsB1
+X-Google-Smtp-Source: APXvYqwElgqRF0EXHGFFoFlYNOQWtxIoHln8XczVJbhBMk+uLkkvu07PBMaWTuSolb+rPy9kGnRyug==
+X-Received: by 2002:adf:dc03:: with SMTP id t3mr4127450wri.80.1565859690772;
+        Thu, 15 Aug 2019 02:01:30 -0700 (PDT)
 Received: from localhost.localdomain ([2a02:587:a407:da00:f1b5:e68c:5f7f:79e7])
-        by smtp.gmail.com with ESMTPSA id x20sm3857533wrg.10.2019.08.15.02.01.27
+        by smtp.gmail.com with ESMTPSA id x20sm3857533wrg.10.2019.08.15.02.01.28
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 15 Aug 2019 02:01:28 -0700 (PDT)
+        Thu, 15 Aug 2019 02:01:29 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     herbert@gondor.apana.org.au,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v5 03/30] crypto: sparc/des - switch to new verification routines
-Date:   Thu, 15 Aug 2019 12:00:45 +0300
-Message-Id: <20190815090112.9377-4-ard.biesheuvel@linaro.org>
+Subject: [PATCH v5 04/30] crypto: atmel/des - switch to new verification routines
+Date:   Thu, 15 Aug 2019 12:00:46 +0300
+Message-Id: <20190815090112.9377-5-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190815090112.9377-1-ard.biesheuvel@linaro.org>
 References: <20190815090112.9377-1-ard.biesheuvel@linaro.org>
@@ -70,128 +70,69 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Switch to the refactored DES key verification routines. While at it,
-rename the DES encrypt/decrypt routines so they will not conflict with
-the DES library later on.
-
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/sparc/crypto/des_glue.c | 37 +++++++++-----------
- 1 file changed, 16 insertions(+), 21 deletions(-)
+ drivers/crypto/atmel-tdes.c | 28 +++++---------------
+ 1 file changed, 7 insertions(+), 21 deletions(-)
 
-diff --git a/arch/sparc/crypto/des_glue.c b/arch/sparc/crypto/des_glue.c
-index 281448f72c90..db6010b4e52e 100644
---- a/arch/sparc/crypto/des_glue.c
-+++ b/arch/sparc/crypto/des_glue.c
-@@ -12,7 +12,7 @@
- #include <linux/mm.h>
- #include <linux/types.h>
+diff --git a/drivers/crypto/atmel-tdes.c b/drivers/crypto/atmel-tdes.c
+index 6256883a89ed..1a6c86ae6148 100644
+--- a/drivers/crypto/atmel-tdes.c
++++ b/drivers/crypto/atmel-tdes.c
+@@ -33,7 +33,7 @@
+ #include <linux/cryptohash.h>
+ #include <crypto/scatterwalk.h>
  #include <crypto/algapi.h>
 -#include <crypto/des.h>
 +#include <crypto/internal/des.h>
- 
- #include <asm/fpumacro.h>
- #include <asm/pstate.h>
-@@ -45,19 +45,15 @@ static int des_set_key(struct crypto_tfm *tfm, const u8 *key,
- 		       unsigned int keylen)
+ #include <crypto/hash.h>
+ #include <crypto/internal/hash.h>
+ #include <linux/platform_data/crypto-atmel.h>
+@@ -773,22 +773,12 @@ static void atmel_tdes_dma_cleanup(struct atmel_tdes_dev *dd)
+ static int atmel_des_setkey(struct crypto_ablkcipher *tfm, const u8 *key,
+ 			   unsigned int keylen)
  {
- 	struct des_sparc64_ctx *dctx = crypto_tfm_ctx(tfm);
--	u32 *flags = &tfm->crt_flags;
 -	u32 tmp[DES_EXPKEY_WORDS];
--	int ret;
+-	int err;
+-	struct crypto_tfm *ctfm = crypto_ablkcipher_tfm(tfm);
+-
+ 	struct atmel_tdes_ctx *ctx = crypto_ablkcipher_ctx(tfm);
 +	int err;
  
- 	/* Even though we have special instructions for key expansion,
--	 * we call des_ekey() so that we don't have to write our own
-+	 * we call des_verify_key() so that we don't have to write our own
- 	 * weak key detection code.
- 	 */
--	ret = des_ekey(tmp, key);
--	if (unlikely(ret == 0) && (*flags & CRYPTO_TFM_REQ_FORBID_WEAK_KEYS)) {
--		*flags |= CRYPTO_TFM_RES_WEAK_KEY;
+-	if (keylen != DES_KEY_SIZE) {
+-		crypto_ablkcipher_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
 -		return -EINVAL;
 -	}
-+	err = crypto_des_verify_key(tfm, key);
+-
+-	err = des_ekey(tmp, key);
+-	if (err == 0 && (ctfm->crt_flags & CRYPTO_TFM_REQ_FORBID_WEAK_KEYS)) {
+-		ctfm->crt_flags |= CRYPTO_TFM_RES_WEAK_KEY;
+-		return -EINVAL;
+-	}
++	err = verify_ablkcipher_des_key(tfm, key);
 +	if (err)
 +		return err;
  
- 	des_sparc64_key_expand((const u32 *) key, &dctx->encrypt_expkey[0]);
- 	encrypt_to_decrypt(&dctx->decrypt_expkey[0], &dctx->encrypt_expkey[0]);
-@@ -68,7 +64,7 @@ static int des_set_key(struct crypto_tfm *tfm, const u8 *key,
- extern void des_sparc64_crypt(const u64 *key, const u64 *input,
- 			      u64 *output);
- 
--static void des_encrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
-+static void sparc_des_encrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
+ 	memcpy(ctx->key, key, keylen);
+ 	ctx->keylen = keylen;
+@@ -800,15 +790,11 @@ static int atmel_tdes_setkey(struct crypto_ablkcipher *tfm, const u8 *key,
+ 			   unsigned int keylen)
  {
- 	struct des_sparc64_ctx *ctx = crypto_tfm_ctx(tfm);
- 	const u64 *K = ctx->encrypt_expkey;
-@@ -76,7 +72,7 @@ static void des_encrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
- 	des_sparc64_crypt(K, (const u64 *) src, (u64 *) dst);
- }
- 
--static void des_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
-+static void sparc_des_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
- {
- 	struct des_sparc64_ctx *ctx = crypto_tfm_ctx(tfm);
- 	const u64 *K = ctx->decrypt_expkey;
-@@ -202,14 +198,13 @@ static int des3_ede_set_key(struct crypto_tfm *tfm, const u8 *key,
- 			    unsigned int keylen)
- {
- 	struct des3_ede_sparc64_ctx *dctx = crypto_tfm_ctx(tfm);
--	u32 *flags = &tfm->crt_flags;
- 	u64 k1[DES_EXPKEY_WORDS / 2];
- 	u64 k2[DES_EXPKEY_WORDS / 2];
- 	u64 k3[DES_EXPKEY_WORDS / 2];
+ 	struct atmel_tdes_ctx *ctx = crypto_ablkcipher_ctx(tfm);
+-	u32 flags;
  	int err;
  
--	err = __des3_verify_key(flags, key);
--	if (unlikely(err))
-+	err = crypto_des3_ede_verify_key(tfm, key);
+-	flags = crypto_ablkcipher_get_flags(tfm);
+-	err = __des3_verify_key(&flags, key);
+-	if (unlikely(err)) {
+-		crypto_ablkcipher_set_flags(tfm, flags);
++	err = verify_ablkcipher_des3_key(tfm, key);
 +	if (err)
  		return err;
+-	}
  
- 	des_sparc64_key_expand((const u32 *)key, k1);
-@@ -235,7 +230,7 @@ static int des3_ede_set_key(struct crypto_tfm *tfm, const u8 *key,
- extern void des3_ede_sparc64_crypt(const u64 *key, const u64 *input,
- 				   u64 *output);
- 
--static void des3_ede_encrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
-+static void sparc_des3_ede_encrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
- {
- 	struct des3_ede_sparc64_ctx *ctx = crypto_tfm_ctx(tfm);
- 	const u64 *K = ctx->encrypt_expkey;
-@@ -243,7 +238,7 @@ static void des3_ede_encrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
- 	des3_ede_sparc64_crypt(K, (const u64 *) src, (u64 *) dst);
- }
- 
--static void des3_ede_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
-+static void sparc_des3_ede_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
- {
- 	struct des3_ede_sparc64_ctx *ctx = crypto_tfm_ctx(tfm);
- 	const u64 *K = ctx->decrypt_expkey;
-@@ -390,8 +385,8 @@ static struct crypto_alg algs[] = { {
- 			.cia_min_keysize	= DES_KEY_SIZE,
- 			.cia_max_keysize	= DES_KEY_SIZE,
- 			.cia_setkey		= des_set_key,
--			.cia_encrypt		= des_encrypt,
--			.cia_decrypt		= des_decrypt
-+			.cia_encrypt		= sparc_des_encrypt,
-+			.cia_decrypt		= sparc_des_decrypt
- 		}
- 	}
- }, {
-@@ -447,8 +442,8 @@ static struct crypto_alg algs[] = { {
- 			.cia_min_keysize	= DES3_EDE_KEY_SIZE,
- 			.cia_max_keysize	= DES3_EDE_KEY_SIZE,
- 			.cia_setkey		= des3_ede_set_key,
--			.cia_encrypt		= des3_ede_encrypt,
--			.cia_decrypt		= des3_ede_decrypt
-+			.cia_encrypt		= sparc_des3_ede_encrypt,
-+			.cia_decrypt		= sparc_des3_ede_decrypt
- 		}
- 	}
- }, {
+ 	memcpy(ctx->key, key, keylen);
+ 	ctx->keylen = keylen;
 -- 
 2.17.1
 
