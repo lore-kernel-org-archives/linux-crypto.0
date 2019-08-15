@@ -2,75 +2,113 @@ Return-Path: <SRS0=pRBs=WL=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89C5EC31E40
-	for <linux-crypto@archiver.kernel.org>; Thu, 15 Aug 2019 04:54:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91583C31E40
+	for <linux-crypto@archiver.kernel.org>; Thu, 15 Aug 2019 04:59:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 674BB208C2
-	for <linux-crypto@archiver.kernel.org>; Thu, 15 Aug 2019 04:54:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5A576208C2
+	for <linux-crypto@archiver.kernel.org>; Thu, 15 Aug 2019 04:59:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="biAYEOQh"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726193AbfHOEy0 (ORCPT
+        id S1726098AbfHOE7r (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 15 Aug 2019 00:54:26 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:57012 "EHLO fornost.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726139AbfHOEy0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 15 Aug 2019 00:54:26 -0400
-Received: from gondolin.me.apana.org.au ([192.168.0.6] helo=gondolin.hengli.com.au)
-        by fornost.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1hy7mJ-0004v7-SW; Thu, 15 Aug 2019 14:54:23 +1000
-Received: from herbert by gondolin.hengli.com.au with local (Exim 4.80)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1hy7mH-0006S4-J2; Thu, 15 Aug 2019 14:54:21 +1000
-Date:   Thu, 15 Aug 2019 14:54:21 +1000
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc:     linux-crypto@vger.kernel.org, ebiggers@kernel.org,
-        horia.geanta@nxp.com
-Subject: Re: [PATCH v4 06/30] crypto: caam/des - switch to new verification
- routines
-Message-ID: <20190815045421.GA24765@gondor.apana.org.au>
-References: <20190805170037.31330-1-ard.biesheuvel@linaro.org>
- <20190805170037.31330-7-ard.biesheuvel@linaro.org>
+        Thu, 15 Aug 2019 00:59:47 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:56098 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726139AbfHOE7r (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 15 Aug 2019 00:59:47 -0400
+Received: by mail-wm1-f66.google.com with SMTP id f72so250431wmf.5
+        for <linux-crypto@vger.kernel.org>; Wed, 14 Aug 2019 21:59:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Y7r3GrsKm+2UK/xPfP/njs6YmgftMt6txBYE2dN+ouo=;
+        b=biAYEOQhtytUlyJpOiXnvcSnR1/7WJ1nuhw+ACmwN7VWYcOabJ+0N6FwIk+o7Z3R3v
+         /TEYgrwFC18O2PnT7sb7CH0ANCHfPu3fyUT4Xc/N7V4dugNfHi64+T6++WE5I/kizwdG
+         hcbcqWE06u9C2S34QcPjTlULJhF8uf1GDy5a6x3OhpYWTAofcZDvl+6Y827E3vgb6gJL
+         kchw4gC/kygPZNUJCJyTrwH+VJn0bVBQfnpgWxaDGoEThwbVXHyqyRNZbtc7sO2g3ToK
+         QZzuyIjJJO4VgggVBgCnSTJEqhFD2LF5lE37dhFxSioDmydW/euBlOLxgFQrzdmsyLy9
+         QfXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Y7r3GrsKm+2UK/xPfP/njs6YmgftMt6txBYE2dN+ouo=;
+        b=Ho645oE89j4mPjPfRRszdRIUJBNGIu3bZFyTlqT6KjEdhmhfoNH7a65cDKvFdBisT0
+         guMSKV/6MAUmcKLGTfbdp4fMTGNnqWxk+qq5MEG9IL6diP0LNS7k9eTFV1dDwloULAC4
+         P/2z/gd8sKzwAiw8jtBYhmJcBpPsrHZjAPpJiEmwpWlCjiunthXxcQV6nh9OdGHTsRzV
+         CyK7rw0c/yda/mOwWuag52IUjkhMF+xCZOaZHiJUcM+J0Wip7X55WkIQZCSdD55oQorZ
+         j1nyOia5MMzG8TEsPJmHhU3WV1USBfos/9Et/MqctG3M280LHeed/h8H/65OHWWgbS4q
+         YhFA==
+X-Gm-Message-State: APjAAAWsyoHkvl6yGEzpw8xwtaI2z0si75wcwPQsM8eqyOVfh5qhSm+L
+        KPri93VmJmv+uo0b0l/ic7kQ/iNgu53F2ZOWxCdXiA==
+X-Google-Smtp-Source: APXvYqxGcPdaMer0ONFG2I2gsJ4PSUhsr7GYEUw376kmI/NVQmX1WUdUJmFOqfEcyjlzXmrI51RmTQ21n7xDGi0W5Z4=
+X-Received: by 2002:a7b:c21a:: with SMTP id x26mr635593wmi.61.1565845185178;
+ Wed, 14 Aug 2019 21:59:45 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190805170037.31330-7-ard.biesheuvel@linaro.org>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+References: <20190814163746.3525-1-ard.biesheuvel@linaro.org>
+ <20190814163746.3525-2-ard.biesheuvel@linaro.org> <20190815023734.GB23782@gondor.apana.org.au>
+In-Reply-To: <20190815023734.GB23782@gondor.apana.org.au>
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date:   Thu, 15 Aug 2019 07:59:34 +0300
+Message-ID: <CAKv+Gu_maif=kZk-HRMx7pP=ths1vuTgcu4kFpzz0tCkO2+DFA@mail.gmail.com>
+Subject: Re: [PATCH v11 1/4] crypto: essiv - create wrapper template for ESSIV generation
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>, Eric Biggers <ebiggers@google.com>,
+        device-mapper development <dm-devel@redhat.com>,
+        linux-fscrypt@vger.kernel.org,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Milan Broz <gmazyland@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Aug 05, 2019 at 08:00:13PM +0300, Ard Biesheuvel wrote:
+On Thu, 15 Aug 2019 at 05:37, Herbert Xu <herbert@gondor.apana.org.au> wrote:
 >
-> @@ -644,14 +643,8 @@ static int des3_aead_setkey(struct crypto_aead *aead, const u8 *key,
->  	if (keys.enckeylen != DES3_EDE_KEY_SIZE)
->  		goto badkey;
->  
-> -	flags = crypto_aead_get_flags(aead);
-> -	err = __des3_verify_key(&flags, keys.enckey);
-> -	if (unlikely(err)) {
-> -		crypto_aead_set_flags(aead, flags);
-> -		goto out;
-> -	}
-> -
-> -	err = aead_setkey(aead, key, keylen);
-> +	err = crypto_des3_ede_verify_key(crypto_aead_tfm(aead), keys.enckey) ?:
-> +	      aead_setkey(aead, key, keylen);
+> On Wed, Aug 14, 2019 at 07:37:43PM +0300, Ard Biesheuvel wrote:
+> >
+> > +     /* Block cipher, e.g., "aes" */
+> > +     crypto_set_spawn(&ictx->essiv_cipher_spawn, inst);
+> > +     err = crypto_grab_spawn(&ictx->essiv_cipher_spawn, essiv_cipher_name,
+> > +                             CRYPTO_ALG_TYPE_CIPHER, CRYPTO_ALG_TYPE_MASK);
+> > +     if (err)
+> > +             goto out_drop_skcipher;
+> > +     essiv_cipher_alg = ictx->essiv_cipher_spawn.alg;
+> > +
+> > +     /* Synchronous hash, e.g., "sha256" */
+> > +     _hash_alg = crypto_alg_mod_lookup(shash_name,
+> > +                                       CRYPTO_ALG_TYPE_SHASH,
+> > +                                       CRYPTO_ALG_TYPE_MASK);
+> > +     if (IS_ERR(_hash_alg)) {
+> > +             err = PTR_ERR(_hash_alg);
+> > +             goto out_drop_essiv_cipher;
+> > +     }
+> > +     hash_alg = __crypto_shash_alg(_hash_alg);
+> > +     err = crypto_init_shash_spawn(&ictx->hash_spawn, hash_alg, inst);
+> > +     if (err)
+> > +             goto out_put_hash;
+>
+> I wouldn't use spawns for these two algorithms.  The point of
+> spawns is mainly to serve as a notification channel so we can
+> tear down the top-level instance when a better underlying spawn
+> implementation is added to the system.
+>
+> For these two algorithms, we don't really care about their performance
+> to do such a tear-down since they only operate on small pieces of
+> data.
+>
+> Therefore just keep things simple and allocate them in the tfm
+> init function.
+>
 
-Please don't use crypto_aead_tfm in new code (except in core crypto
-API code).
-
-You should instead provide separate helpers that are type-specific.
-So crypto_aead_des3_ede_verify_key or verify_aead_des3_key to be
-more succinct.
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+So how do I ensure that the cipher and shash are actually loaded at
+create() time, and that they are still loaded at TFM init time?
