@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25B05C31E40
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F4AFC433FF
 	for <linux-crypto@archiver.kernel.org>; Thu, 15 Aug 2019 09:01:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E70C0218A6
-	for <linux-crypto@archiver.kernel.org>; Thu, 15 Aug 2019 09:01:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3CAAD218A6
+	for <linux-crypto@archiver.kernel.org>; Thu, 15 Aug 2019 09:01:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZBzs54Jx"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VcaU+n5R"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730781AbfHOJB3 (ORCPT
+        id S1730783AbfHOJB3 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Thu, 15 Aug 2019 05:01:29 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:37603 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730775AbfHOJB3 (ORCPT
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:37392 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730774AbfHOJB3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Thu, 15 Aug 2019 05:01:29 -0400
-Received: by mail-wm1-f68.google.com with SMTP id z23so681722wmf.2
-        for <linux-crypto@vger.kernel.org>; Thu, 15 Aug 2019 02:01:26 -0700 (PDT)
+Received: by mail-wr1-f65.google.com with SMTP id z11so1597247wrt.4
+        for <linux-crypto@vger.kernel.org>; Thu, 15 Aug 2019 02:01:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=3e2r3FOBL6j9iIvv8ejDaqbpez9yR+KjkK0z8y6sTy4=;
-        b=ZBzs54JxjasIE9zXkcHOSaxoSJtCfjasy9gTPfsbnUhNZ09AVgBcFEcpyEdGK55eTa
-         DZbdcesQ5BY0S2ClFh87V435c2qBOYN2cZJI62iZxgC+bztejgShWAKviwsz2PpoHltC
-         vYM/kU81U1TeE5FDmXMYKGsmsmlH9qMjyQgYoFsE2JAHLKswValBXAqVWIUI7+WWLFKx
-         sifztdmq30Jw1b6Fcb4ac6Y7tr943srTqE69nsJCgvY0hGvCUPT92kyPSbD6RQfFjbEG
-         c/9N5WkvgYdWlpFyI+iiZgzacEk8LFN1ZiltzBCPBV3PdwSTcoE2L9r8Y/bKUDgVlL1l
-         smQg==
+        bh=ODcjsTe5qXMA4WZkrKmlnC58iAmLOZMMRVocLXEZvzE=;
+        b=VcaU+n5RpAF30HGVzg5qX7yBeDSBRiw6u9nrkKRw6HWgzWlFzEnHeJSyETvJ5lEkHp
+         g1EEIooQdPq9I+jp3Id39fnyH5Lk7yrtCvLX+xA/OryirnlvSHvMW+lDPrnNXhpcNRHk
+         Rbygt55ncquhe1aQn0izmdfcgXNZ/6wx6XJM618QD/FNZwlAYVDTm9ulRub1Eg84fUlu
+         9WCewfW3ZP2a/5rivLVrY3D3ioy79LOnMDCvfdSlQQ8Ge/OKr8SDyQCBWlB7bOFnHV2n
+         GsP26IgsFcoqyirG1cgDoGP/mlNzfkZIH4dzTpF0Mxmub1G8AjkR2aIZdeWgnJBkscu6
+         4iKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=3e2r3FOBL6j9iIvv8ejDaqbpez9yR+KjkK0z8y6sTy4=;
-        b=il8T5kJKEzSpQsJvU99e4jZ2v7erIN+cLvyAyDTIUEiYCXEzujoL9Ah8dC3ZhXncVT
-         30OmujU1Pqh4fW+5O68OkQz595s/p3XS7mGwIY7RSMNIHSHBnjUzf4fh2a/YY0voJtLQ
-         TFDgtcWFYXHWyVmcAlBeBorOo00nM6bi+SMrAdeTODTh35vjtPhLfsxX9b60t7yWEXX+
-         BpGYmuWg08l46XnyWhLCCHBRpegCkcGEcn6YeQ7s78/7vc7gWnliNyM9xhqrDj+3Klpb
-         OO1laK8QzgmjEIytBAj/WOGX5pwKB4vi0K+aBu5eLP5z+hT8NwACJ3DmbCWeWxvZExUx
-         TOJQ==
-X-Gm-Message-State: APjAAAU2E2jbO9uTazmChEoL3X86MJ0hLwE6rrvjCZu+Ti+NCsFPVumE
-        DfqLoRf7avTt6AcQAsS+3tHZJ+em6sQRyVxu
-X-Google-Smtp-Source: APXvYqyrCypr4I+DpjxqM5fRVk30LBctPb49Ir8rFkAvVMHMOSHViwKrdhSZmgF0IIDvOgKW1DH8ww==
-X-Received: by 2002:a7b:ca54:: with SMTP id m20mr704720wml.102.1565859685962;
-        Thu, 15 Aug 2019 02:01:25 -0700 (PDT)
+        bh=ODcjsTe5qXMA4WZkrKmlnC58iAmLOZMMRVocLXEZvzE=;
+        b=KA5QOqfL/Y+293CpKyudcrWRHQMIQRZy2HlyfI70DaQf2h3cBACFint7TxppVkwNdI
+         hjnD6EHHSU5DbmVFV4wec50NVSH2ERs+ig5jW+05cN1kyReVmiNdlKux1E42QrjOwUhJ
+         8OCbPNHfEoeu3xNaAyZxqnHrmD6W2fXe2B/OjYnXh5Q5YAQmeiToCo+Z0HugqsLgm6Ko
+         wGILdZIutfHwzFtK3MTlRpR1Vhl5Rx3foX0IpSXLsYcrPrvnWf0xn9NSAGBoFzMfW+LA
+         Fj66h53t3VxqkslWk+D3JznR3yWPJQudlpiK8WphvwEGmbFtxL4/jTdVnq2eQR3CBcKP
+         ORAg==
+X-Gm-Message-State: APjAAAU4v6dIe06OCDY83C9sUi3CtGpNQG04jtsNHldo6NalXZQfmQ7W
+        rSqwwKbnPHybKcI+45LyEZyBamEQ1eDdJR2r
+X-Google-Smtp-Source: APXvYqySe4df8HiKgixP8T1219ys+AHQk2WqORhM5me9OyB621FAkzCRQrp2E7OxBFFLk3YE3MBA3g==
+X-Received: by 2002:adf:fc81:: with SMTP id g1mr4242015wrr.78.1565859687305;
+        Thu, 15 Aug 2019 02:01:27 -0700 (PDT)
 Received: from localhost.localdomain ([2a02:587:a407:da00:f1b5:e68c:5f7f:79e7])
-        by smtp.gmail.com with ESMTPSA id x20sm3857533wrg.10.2019.08.15.02.01.24
+        by smtp.gmail.com with ESMTPSA id x20sm3857533wrg.10.2019.08.15.02.01.26
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 15 Aug 2019 02:01:25 -0700 (PDT)
+        Thu, 15 Aug 2019 02:01:26 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     herbert@gondor.apana.org.au,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v5 01/30] crypto: des/3des_ede - add new helpers to verify keys
-Date:   Thu, 15 Aug 2019 12:00:43 +0300
-Message-Id: <20190815090112.9377-2-ard.biesheuvel@linaro.org>
+Subject: [PATCH v5 02/30] crypto: s390/des - switch to new verification routines
+Date:   Thu, 15 Aug 2019 12:00:44 +0300
+Message-Id: <20190815090112.9377-3-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190815090112.9377-1-ard.biesheuvel@linaro.org>
 References: <20190815090112.9377-1-ard.biesheuvel@linaro.org>
@@ -70,196 +70,85 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The recently added helper routine to perform key strength validation
-of triple DES keys is slightly inadequate, since it comes in two versions,
-neither of which are highly useful for anything other than skciphers (and
-many drivers still use the older blkcipher interfaces).
+Switch to the refactored DES key verification routines. While at it,
+rename the DES encrypt/decrypt routines so they will not conflict with
+the DES library later on.
 
-So let's add a new helper and, considering that this is a helper function
-that is only intended to be used by crypto code itself, put it in a new
-des.h header under crypto/internal.
-
-While at it, implement a similar helper for single DES, so that we can
-start replacing the pattern of calling des_ekey() into a temp buffer
-that occurs in many drivers in drivers/crypto.
-
+Reviewed-by: Harald Freudenberger <freude@linux.ibm.com>
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- crypto/des_generic.c          |  13 --
- include/crypto/internal/des.h | 141 ++++++++++++++++++++
- 2 files changed, 141 insertions(+), 13 deletions(-)
+ arch/s390/crypto/des_s390.c | 25 +++++++++-----------
+ 1 file changed, 11 insertions(+), 14 deletions(-)
 
-diff --git a/crypto/des_generic.c b/crypto/des_generic.c
-index dc085514408a..c4d8ecda4ddf 100644
---- a/crypto/des_generic.c
-+++ b/crypto/des_generic.c
-@@ -841,19 +841,6 @@ static void des_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
- 	d[1] = cpu_to_le32(L);
+diff --git a/arch/s390/crypto/des_s390.c b/arch/s390/crypto/des_s390.c
+index 374b42fc7637..439b100c6f2e 100644
+--- a/arch/s390/crypto/des_s390.c
++++ b/arch/s390/crypto/des_s390.c
+@@ -16,7 +16,7 @@
+ #include <linux/fips.h>
+ #include <linux/mutex.h>
+ #include <crypto/algapi.h>
+-#include <crypto/des.h>
++#include <crypto/internal/des.h>
+ #include <asm/cpacf.h>
+ 
+ #define DES3_KEY_SIZE	(3 * DES_KEY_SIZE)
+@@ -35,27 +35,24 @@ static int des_setkey(struct crypto_tfm *tfm, const u8 *key,
+ 		      unsigned int key_len)
+ {
+ 	struct s390_des_ctx *ctx = crypto_tfm_ctx(tfm);
+-	u32 tmp[DES_EXPKEY_WORDS];
++	int err;
+ 
+-	/* check for weak keys */
+-	if (!des_ekey(tmp, key) &&
+-	    (tfm->crt_flags & CRYPTO_TFM_REQ_FORBID_WEAK_KEYS)) {
+-		tfm->crt_flags |= CRYPTO_TFM_RES_WEAK_KEY;
+-		return -EINVAL;
+-	}
++	err = crypto_des_verify_key(tfm, key);
++	if (err)
++		return err;
+ 
+ 	memcpy(ctx->key, key, key_len);
+ 	return 0;
  }
  
--/*
-- * RFC2451:
-- *
-- *   For DES-EDE3, there is no known need to reject weak or
-- *   complementation keys.  Any weakness is obviated by the use of
-- *   multiple keys.
-- *
-- *   However, if the first two or last two independent 64-bit keys are
-- *   equal (k1 == k2 or k2 == k3), then the DES3 operation is simply the
-- *   same as DES.  Implementers MUST reject keys that exhibit this
-- *   property.
-- *
-- */
- int __des3_ede_setkey(u32 *expkey, u32 *flags, const u8 *key,
- 		      unsigned int keylen)
+-static void des_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
++static void s390_des_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
  {
-diff --git a/include/crypto/internal/des.h b/include/crypto/internal/des.h
-new file mode 100644
-index 000000000000..f5d2e696522e
---- /dev/null
-+++ b/include/crypto/internal/des.h
-@@ -0,0 +1,141 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * DES & Triple DES EDE key verification helpers
-+ */
-+
-+#ifndef __CRYPTO_INTERNAL_DES_H
-+#define __CRYPTO_INTERNAL_DES_H
-+
-+#include <linux/crypto.h>
-+#include <linux/fips.h>
-+#include <crypto/des.h>
-+#include <crypto/aead.h>
-+#include <crypto/skcipher.h>
-+
-+/**
-+ * crypto_des_verify_key - Check whether a DES key is weak
-+ * @tfm: the crypto algo
-+ * @key: the key buffer
-+ *
-+ * Returns -EINVAL if the key is weak and the crypto TFM does not permit weak
-+ * keys. Otherwise, 0 is returned.
-+ *
-+ * It is the job of the caller to ensure that the size of the key equals
-+ * DES_KEY_SIZE.
-+ */
-+static inline int crypto_des_verify_key(struct crypto_tfm *tfm, const u8 *key)
-+{
-+	u32 tmp[DES_EXPKEY_WORDS];
-+	int err = 0;
-+
-+	if (!(crypto_tfm_get_flags(tfm) & CRYPTO_TFM_REQ_FORBID_WEAK_KEYS))
-+		return 0;
-+
-+	if (!des_ekey(tmp, key)) {
-+		crypto_tfm_set_flags(tfm, CRYPTO_TFM_RES_WEAK_KEY);
-+		err = -EINVAL;
-+	}
-+
-+	memzero_explicit(tmp, sizeof(tmp));
-+	return err;
-+}
-+
-+/*
-+ * RFC2451:
-+ *
-+ *   For DES-EDE3, there is no known need to reject weak or
-+ *   complementation keys.  Any weakness is obviated by the use of
-+ *   multiple keys.
-+ *
-+ *   However, if the first two or last two independent 64-bit keys are
-+ *   equal (k1 == k2 or k2 == k3), then the DES3 operation is simply the
-+ *   same as DES.  Implementers MUST reject keys that exhibit this
-+ *   property.
-+ *
-+ */
-+
-+/**
-+ * crypto_des3_ede_verify_key - Check whether a DES3-EDE key is weak
-+ * @tfm: the crypto algo
-+ * @key: the key buffer
-+ *
-+ * Returns -EINVAL if the key is weak and the crypto TFM does not permit weak
-+ * keys or when running in FIPS mode. Otherwise, 0 is returned. Note that some
-+ * keys are rejected in FIPS mode even if weak keys are permitted by the TFM
-+ * flags.
-+ *
-+ * It is the job of the caller to ensure that the size of the key equals
-+ * DES3_EDE_KEY_SIZE.
-+ */
-+static inline int crypto_des3_ede_verify_key(struct crypto_tfm *tfm,
-+					     const u8 *key)
-+{
-+	int err = -EINVAL;
-+	u32 K[6];
-+
-+	memcpy(K, key, DES3_EDE_KEY_SIZE);
-+
-+	if ((!((K[0] ^ K[2]) | (K[1] ^ K[3])) ||
-+	     !((K[2] ^ K[4]) | (K[3] ^ K[5]))) &&
-+	    (fips_enabled || (crypto_tfm_get_flags(tfm) &
-+		              CRYPTO_TFM_REQ_FORBID_WEAK_KEYS)))
-+		goto bad;
-+
-+	if ((!((K[0] ^ K[4]) | (K[1] ^ K[5]))) && fips_enabled)
-+		goto bad;
-+
-+	err = 0;
-+out:
-+	memzero_explicit(K, DES3_EDE_KEY_SIZE);
-+	return err;
-+
-+bad:
-+	crypto_tfm_set_flags(tfm, CRYPTO_TFM_RES_WEAK_KEY);
-+	goto out;
-+}
-+
-+static inline int verify_skcipher_des_key(struct crypto_skcipher *tfm,
-+					  const u8 *key)
-+{
-+	return crypto_des_verify_key(crypto_skcipher_tfm(tfm), key);
-+}
-+
-+static inline int verify_skcipher_des3_key(struct crypto_skcipher *tfm,
-+					   const u8 *key)
-+{
-+	return crypto_des3_ede_verify_key(crypto_skcipher_tfm(tfm), key);
-+}
-+
-+static inline int verify_ablkcipher_des_key(struct crypto_ablkcipher *tfm,
-+					    const u8 *key)
-+{
-+	return crypto_des_verify_key(crypto_ablkcipher_tfm(tfm), key);
-+}
-+
-+static inline int verify_ablkcipher_des3_key(struct crypto_ablkcipher *tfm,
-+					     const u8 *key)
-+{
-+	return crypto_des3_ede_verify_key(crypto_ablkcipher_tfm(tfm), key);
-+}
-+
-+static inline int verify_aead_des_key(struct crypto_aead *tfm, const u8 *key,
-+				      int keylen)
-+{
-+	if (keylen != DES_KEY_SIZE) {
-+		crypto_aead_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
-+		return -EINVAL;
-+	}
-+	return crypto_des_verify_key(crypto_aead_tfm(tfm), key);
-+}
-+
-+static inline int verify_aead_des3_key(struct crypto_aead *tfm, const u8 *key,
-+				       int keylen)
-+{
-+	if (keylen != DES3_EDE_KEY_SIZE) {
-+		crypto_aead_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
-+		return -EINVAL;
-+	}
-+	return crypto_des3_ede_verify_key(crypto_aead_tfm(tfm), key);
-+}
-+
-+#endif /* __CRYPTO_INTERNAL_DES_H */
+ 	struct s390_des_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
+ 	cpacf_km(CPACF_KM_DEA, ctx->key, out, in, DES_BLOCK_SIZE);
+ }
+ 
+-static void des_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
++static void s390_des_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
+ {
+ 	struct s390_des_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
+@@ -76,8 +73,8 @@ static struct crypto_alg des_alg = {
+ 			.cia_min_keysize	=	DES_KEY_SIZE,
+ 			.cia_max_keysize	=	DES_KEY_SIZE,
+ 			.cia_setkey		=	des_setkey,
+-			.cia_encrypt		=	des_encrypt,
+-			.cia_decrypt		=	des_decrypt,
++			.cia_encrypt		=	s390_des_encrypt,
++			.cia_decrypt		=	s390_des_decrypt,
+ 		}
+ 	}
+ };
+@@ -227,8 +224,8 @@ static int des3_setkey(struct crypto_tfm *tfm, const u8 *key,
+ 	struct s390_des_ctx *ctx = crypto_tfm_ctx(tfm);
+ 	int err;
+ 
+-	err = __des3_verify_key(&tfm->crt_flags, key);
+-	if (unlikely(err))
++	err = crypto_des3_ede_verify_key(tfm, key);
++	if (err)
+ 		return err;
+ 
+ 	memcpy(ctx->key, key, key_len);
 -- 
 2.17.1
 
