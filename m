@@ -2,122 +2,108 @@ Return-Path: <SRS0=FgZY=WM=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89E90C3A59C
-	for <linux-crypto@archiver.kernel.org>; Fri, 16 Aug 2019 08:26:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0285FC3A59C
+	for <linux-crypto@archiver.kernel.org>; Fri, 16 Aug 2019 08:31:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6050320644
-	for <linux-crypto@archiver.kernel.org>; Fri, 16 Aug 2019 08:26:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C79B420578
+	for <linux-crypto@archiver.kernel.org>; Fri, 16 Aug 2019 08:31:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PRw7PPE4"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oCj+GOx8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726835AbfHPI0Z (ORCPT
+        id S1726921AbfHPIbd (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 16 Aug 2019 04:26:25 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:37457 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725945AbfHPI0Y (ORCPT
+        Fri, 16 Aug 2019 04:31:33 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:42662 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726893AbfHPIbd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 16 Aug 2019 04:26:24 -0400
-Received: by mail-wr1-f67.google.com with SMTP id z11so744040wrt.4;
-        Fri, 16 Aug 2019 01:26:22 -0700 (PDT)
+        Fri, 16 Aug 2019 04:31:33 -0400
+Received: by mail-wr1-f66.google.com with SMTP id b16so742515wrq.9
+        for <linux-crypto@vger.kernel.org>; Fri, 16 Aug 2019 01:31:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=56fPS/dgJdCSM/wPNRnGXBen8t9t2W1bcanq5wh0TUQ=;
-        b=PRw7PPE4b5LWXqiKs/xktokPR+OlURF/RNAvkR94hWvmbIsBuK7puDw+UFq7xRA1FL
-         OIAs+ufv3BHCchuwmyq7w10SCIdzC3O60RbCS5kIRtlg81B9C+J8UY9dHBahbqW5hXPp
-         KtrQTsqX66YqtX0EksHtPZGqQ1oK7AtuWJnDbX3BXh7fRo/GdhY0njCYS+lEjN6Y6uMK
-         VIqNj92B+wmEKRmbUSFfeoIfFAy2Ng8LzVXI/ZjuF5j6CdEMuw0cMRCyRo6L5ipuLCDW
-         nS2JTw5tQCjMBELlp2Ebh7TIUb0i5slThjRilKBgRS+WKuSQ2AN1BLtsP+envGss2N6n
-         vy4Q==
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=nMteWjiol09LnNTGAtg+qqwxoUC+aePsLIm1kIpTrJs=;
+        b=oCj+GOx8zj3DZDR8aTDgqrL6lshNRYHcEJ9xc7u/k5AAXmEozG5CiyjIcN62uoR4yk
+         /dZXF2qmsL6jlDXs1GlkR2A/kSPm/FFMDejUbnIKqNjQtHvOcl4zAg6VDFE80jvid6MD
+         52rJCbC9f15qQ3tWLYI9mE+Qjr2VSBI/Xc+5cXxFil0vTyG3GnDha7zPP8OJddjUr/Hq
+         kon3JPJo1IcTbdJL2KaVY8vLnRPATMCLI5ZJACiqczFx0h7wXsZNpPh56pMC+YTAO9cW
+         6XPg2vjaqtITAY9hZVyE6bhzL/BLKppzKSylT9ZNyy0Rn17zbVd0dOqMqj5AMFhpoO7L
+         oyPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
-         :date:user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=56fPS/dgJdCSM/wPNRnGXBen8t9t2W1bcanq5wh0TUQ=;
-        b=ACZgiySydOHfPepqxcR2Mh7Dsni2VCEklMcxcdrqzFdroCZil9LydnZQEndRdfGi59
-         m8GOnDayNSa6nXu9q6K2eJ6i2QbJ042Ez0mS1/M2P/kR06jpKyKBS4IjXjia/xDZ+wHX
-         0uk7muLPZj8UyjwhqxePK3IodVfp7fRsnzZRmtoJsVvlctDVshLmGEGC/6fk3m2QhtFt
-         WdsbX70f7Zxa7nAXG0QVod1sfxX9e0r8I/vcN/lGmBDd+lcHMgvIWWscstHNOGw8W2ji
-         2p63517a3d0R1DGxiKDm/IY5D2tKQN8j2ebrKpNzxnGEh7SAyKxsXTXGAnqPHa68mkQe
-         YdHA==
-X-Gm-Message-State: APjAAAUwz/oe27EPNawSjXu3Jz2zzTZA8OsS3LXMLG329SE09EZkMKUt
-        sQ1dmBGU1OxBrPLZZ7s9sk4=
-X-Google-Smtp-Source: APXvYqyGOIj1aB2EpmHGuZNQG3fAHhYs4PTy/JhagxqHTt62717Sh77M0+5CTHy949ACc/NSB0K/Wg==
-X-Received: by 2002:adf:fe08:: with SMTP id n8mr8983932wrr.60.1565943982177;
-        Fri, 16 Aug 2019 01:26:22 -0700 (PDT)
-Received: from [192.168.2.27] (39.35.broadband4.iol.cz. [85.71.35.39])
-        by smtp.gmail.com with ESMTPSA id m23sm6314419wml.41.2019.08.16.01.26.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 16 Aug 2019 01:26:21 -0700 (PDT)
-Subject: Re: [PATCH v12 0/4] crypto: switch to crypto API for ESSIV generation
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Eric Biggers <ebiggers@google.com>,
-        device-mapper development <dm-devel@redhat.com>,
-        linux-fscrypt@vger.kernel.org,
-        Gilad Ben-Yossef <gilad@benyossef.com>
-References: <20190815192858.28125-1-ard.biesheuvel@linaro.org>
- <1463bca3-77dc-42be-7624-e8eaf5cfbf32@gmail.com>
- <CAKv+Gu9CtMMAjtjfR=uuB-+x0Lhy8gnme2HhExckW+eVZ8B_Ow@mail.gmail.com>
-From:   Milan Broz <gmazyland@gmail.com>
-Openpgp: preference=signencrypt
-Message-ID: <d509ce52-1ae1-f785-fe5a-7d5a0e2bc8d0@gmail.com>
-Date:   Fri, 16 Aug 2019 10:26:20 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=nMteWjiol09LnNTGAtg+qqwxoUC+aePsLIm1kIpTrJs=;
+        b=ShtCdn7Yo2iD6AAxBfwRsHaaAuIUq+CRKjyd5h8Fz4WRqIDef+ilZQYAJSUGO0xnyd
+         JYGnkuxLLGuwtO9VxKFJjdvoF2hcUtUwgYar2CkJYDIGdrWlIWEsvbAmNLHvS0/t6MTE
+         6e8RsZ+AwGyxiPkG10Z/lJ+wf6FJUpWgJrUvO0AuzsNiz9QvaXWsFd2l0h6tPLCma/Et
+         QSI21F+ScTqqpWIMSBjjsQPXYKZB8jqhlrwkrSRiQ1OH2M5Gn4CmjE+B/r5TDsU/XhWz
+         LL2J0ADn/SxaV3kNcRcWANQgcnDDCqqx1SrgUPorS0uns48avP8KSX9vX0fQC/D/FKJT
+         pGSw==
+X-Gm-Message-State: APjAAAUxuhdsmNR+8Hg2gyuGCIP3ccR7r5lcJa/jCxrFcM3Q3jHLIzX8
+        k9M4iNrX6vB87XVtCsyZAMBLYhh8cFCRuI8REeDsOQ==
+X-Google-Smtp-Source: APXvYqwh5XDkO7F2xERL7f+E+ehgrXGdbgDaiyV9najpnyy1GfPAMnxMomE45gSsbegm0OpSlpcxM0Q0s5kDUvwvH7k=
+X-Received: by 2002:adf:e8c2:: with SMTP id k2mr9106596wrn.198.1565944291339;
+ Fri, 16 Aug 2019 01:31:31 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAKv+Gu9CtMMAjtjfR=uuB-+x0Lhy8gnme2HhExckW+eVZ8B_Ow@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <20190816065936.12214-1-contact@christina-quast.de>
+In-Reply-To: <20190816065936.12214-1-contact@christina-quast.de>
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date:   Fri, 16 Aug 2019 11:31:23 +0300
+Message-ID: <CAKv+Gu-qbwCJzH2TMpe5hEh8UAO3XQ66Zzf9Nx4UqBXd3Lr79w@mail.gmail.com>
+Subject: Re: [PATCH 0/2] Use ccm(aes) aead transform in staging drivers
+To:     Christina Quast <contact@christina-quast.de>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Payal Kshirsagar <payal.s.kshirsagar.98@gmail.com>,
+        Eric Biggers <ebiggers@google.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "open list:ANDROID DRIVERS" <devel@driverdev.osuosl.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Anushka Shukla <anushkacharu9@gmail.com>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Zach Turner <turnerzdp@gmail.com>,
+        "<linux-wireless@vger.kernel.org>" <linux-wireless@vger.kernel.org>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        "David S. Miller" <davem@davemloft.net>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 16/08/2019 10:18, Ard Biesheuvel wrote:
-> On Fri, 16 Aug 2019 at 10:29, Milan Broz <gmazyland@gmail.com> wrote:
->>
->> Hi Ard,
->>
->> On 15/08/2019 21:28, Ard Biesheuvel wrote:
->>> Changes since v10:
->>> - Drop patches against fscrypt and dm-crypt - these will be routed via the
->>>   respective maintainer trees during the next cycle
->>
->> I tested the previous dm-crypt patches (I also try to keep them in my kernel.org tree),
->> it works and looks fine to me (and I like the final cleanup :)
->>
->> Once all maintainers are happy with the current state, I think it should go to
->> the next release (5.4; IMO both ESSIV API and dm-crypt changes).
->> Maybe you could keep sending dm-crypt patches in the end of the series (to help testing it)?
->>
-> 
-> OK. But we'll need to coordinate a bit so that the first patch (the
-> one that introduces the template) is available in both branches,
-> otherwise ESSIV will be broken in the dm branch until it hits another
-> branch (-next or mainline) that also contains cryptodev.
+On Fri, 16 Aug 2019 at 10:00, Christina Quast
+<contact@christina-quast.de> wrote:
+>
+> Use ccm(aes) aead transform instead of invoking the AES block cipher
+> block by block.
+>
 
-Yes, I know. I'll ask Mike what is his preference here...
-For now, it should appear at least in the cryptodev tree :)
+Thanks! This eliminates another two users of the bare cipher API,
+which is not the right abstraction for drivers to use.
 
-...
- 
-> Any idea about the status of the EBOIV patch?
+Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-It is in the queue for 5.4 (should be in linux-next already), I guess 5.4 target is ok here.
+I don't have the hardware, so I can't test this.
 
-https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git/log/?h=dm-5.4
-
-Milan
+> Christina Quast (2):
+>   staging: rtl8192u: ieee80211: ieee80211_crypt_ccmp.c: Use crypto API
+>     ccm(aes)
+>   staging: rtl8192e: rtllib_crypt_ccmp.c: Use crypto API ccm(aes)
+>
+>  drivers/staging/rtl8192e/Kconfig              |   1 +
+>  drivers/staging/rtl8192e/rtllib_crypt_ccmp.c  | 187 ++++++++----------
+>  drivers/staging/rtl8192u/Kconfig              |   2 +
+>  .../rtl8192u/ieee80211/ieee80211_crypt_ccmp.c | 187 ++++++++----------
+>  4 files changed, 159 insertions(+), 218 deletions(-)
+>
+> --
+> 2.20.1
+>
