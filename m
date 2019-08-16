@@ -2,151 +2,117 @@ Return-Path: <SRS0=FgZY=WM=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24204C3A59D
-	for <linux-crypto@archiver.kernel.org>; Fri, 16 Aug 2019 04:58:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7E0BC3A59C
+	for <linux-crypto@archiver.kernel.org>; Fri, 16 Aug 2019 05:21:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E4788206C2
-	for <linux-crypto@archiver.kernel.org>; Fri, 16 Aug 2019 04:58:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8D5192064A
+	for <linux-crypto@archiver.kernel.org>; Fri, 16 Aug 2019 05:21:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Pkm0NUQn"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qYarr+xJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725818AbfHPE6f (ORCPT
+        id S1726609AbfHPFVm (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 16 Aug 2019 00:58:35 -0400
-Received: from mail-lj1-f195.google.com ([209.85.208.195]:38053 "EHLO
-        mail-lj1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726088AbfHPE6e (ORCPT
+        Fri, 16 Aug 2019 01:21:42 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:39866 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726425AbfHPFVm (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 16 Aug 2019 00:58:34 -0400
-Received: by mail-lj1-f195.google.com with SMTP id x3so114549lji.5
-        for <linux-crypto@vger.kernel.org>; Thu, 15 Aug 2019 21:58:33 -0700 (PDT)
+        Fri, 16 Aug 2019 01:21:42 -0400
+Received: by mail-wr1-f65.google.com with SMTP id t16so346998wra.6
+        for <linux-crypto@vger.kernel.org>; Thu, 15 Aug 2019 22:21:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=IheryZV9rrbjkhsApKF0cQrN+bCYQHiVbxfyC+R8SPs=;
-        b=Pkm0NUQnQb+EOlq0h2SHmWadPKkaD/lCieO0yl74TZLlE/hgCgdzeCX4S8UkDiGIJ9
-         BJDXA7BSwFx1nj8YDpy96wWOePcZc7DiQoSImn5lsCMjr0P/8rXzMbFPwUkG4bIchl0M
-         3TGiEBV74UlCnVimN3ovM3xBSjDWvCfWp8kQGm7FRAuRDKOdk6IpaHooO8XopSDU2/ZN
-         CGR/BXMk6C3YfQofU4kHRctOCZ8a3R+PWmzsirXmXvXffLwS+ej5SnA7wcjC8AwIjYgp
-         /Wa2TSaGzuCpODuxIvQMKMxXW083gzlu8L5ieGUeWoYdQ1rFSesMW+iNs8b5YFrgiGst
-         CPkQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+        bh=xU+VDH6kiQjQ9W6hrOKC4/ZWIEXkEKPeqD+ZZxurrAw=;
+        b=qYarr+xJ0harmpsA45MNfnEHq3uRgTK/UmEGixNr2bfL+GURF6QFyHUqtrWLFg+EjQ
+         QTEZq9UnaNYcI6spZoIKtdQTgpqhzhDfBCb6dRP0oydf0FKKfj8TbaJ4q0tv+kkej8sK
+         DL57wpqFszPMeA5HOZwixd8CooXUe79k3BfqbWAwsdZBIYmMeesWuJoTJfTeGMLMibuB
+         PWH8pl8b9bebgCyulpV3iuM5Jg6Alkys0fzk99owNmox2oQIb9GKAi3xYR21mLcx01Ht
+         XS3Rj4gxOh5aFoxT8Epqxj5QKMBj9Dmg0FIt1zQLKp6QgzYm+JFmMNddfhNP25lvZriD
+         rpCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=IheryZV9rrbjkhsApKF0cQrN+bCYQHiVbxfyC+R8SPs=;
-        b=Q0Kg7UW4uQarAOCju/Fvp9KRQTyazadQ1+Uf1sxR7sw0bGqavHEljjxZ+ZmxPM4Ew5
-         VTfUTiv5EERV/0V1CX6UcXS2CWpix+yXrng5ExqSLYefPGVtB9BbuZfypkSiwM/eyuAu
-         C6njlad4lrrkFm+UPmu1ayQbszN/SRw3dqPNka7a5yl80LpV2F9F9zH4+QKYde82YqXd
-         q6gJ7vdJdCmGQdij30iyGmRE/FQ88O6Nlxb9o9aAriRv4TzMgsOMpVnld/oqojS4dgMR
-         z4Fbe4yWVFwTF5UJn+IRBwN2f8VAg9Cz6sCyiasRHK3KcQuCnDlp1AP0IY5rXlOspBGj
-         QydA==
-X-Gm-Message-State: APjAAAUE04TS6oj+5S7phiw6qvcuiL2Ojx8BIO3Jds9Wk6SP2ssN86DV
-        Ong01X60vQRSaWNQhiAVBGDyuRiNUCuCtdXwMoGzpQ==
-X-Google-Smtp-Source: APXvYqxdE1bhaVDU9yTjzsEua1cP967Nm4UBkfxH/OnLVUEy/YR6cxGtDtFMt3bbGlA7IqY5OwWGuO6PaUbetFnVF7M=
-X-Received: by 2002:a2e:760f:: with SMTP id r15mr4316685ljc.92.1565931512710;
- Thu, 15 Aug 2019 21:58:32 -0700 (PDT)
+         :message-id:subject:to;
+        bh=xU+VDH6kiQjQ9W6hrOKC4/ZWIEXkEKPeqD+ZZxurrAw=;
+        b=MBMJ3gE3jgDIKHkEThfqQMv7l/YRTR3YMsH3QbQ+lQP9i/V2DvXm+WD7quil7AXAlp
+         hfJyATAV2/tHs2lDnDB8jUr+rU8cIZfaTwE8f1av7rNcDv0lEGzNXWV9gtgtKG5oYwsR
+         87G1G79vpMkIEmWUMrFVSdnKMOG2i9Uxvhe7mvOPkTXyFOTERjOZ0LAEt88MJDDo2GLh
+         5118yL1jI1iZFFxABX8bANJ9veRQANz7rpGukcqVLPX8aPiN5uL6j5L5FdtvuTHL0qV3
+         reAmrNEncNCDH1WKOdOJArwX9MArJ2p80r5pM0OL+jMgP0bu6cilx0XaqXjyEI+Av79x
+         2i4g==
+X-Gm-Message-State: APjAAAXrRnkdBkdYrlgwHIn4ug2Schf/PznLVvGqTS3SewfYiOiJZg7X
+        rBYbERnp2wASw7TNnd62BD/qxMoMcrY3/O/1O6sSsrTPR9YBimVL
+X-Google-Smtp-Source: APXvYqzutkJxO4ku4lzEDNY0PGt9devjON7liekFbnki5eJNNlrNJCMGEAZoFCmlm9wNlNfGCsBjvELOYn+7AneuJ/M=
+X-Received: by 2002:a05:6000:128d:: with SMTP id f13mr8489397wrx.241.1565932900111;
+ Thu, 15 Aug 2019 22:21:40 -0700 (PDT)
 MIME-Version: 1.0
-References: <1565682784-10234-1-git-send-email-sumit.garg@linaro.org>
- <1565789078.10490.10.camel@kernel.org> <CAFA6WYPU0oREaHROhhRsEXJTijvER8G4riBk4e4=Bd5XgGFqtQ@mail.gmail.com>
- <1565881609.9424.7.camel@kernel.org>
-In-Reply-To: <1565881609.9424.7.camel@kernel.org>
-From:   Sumit Garg <sumit.garg@linaro.org>
-Date:   Fri, 16 Aug 2019 10:28:20 +0530
-Message-ID: <CAFA6WYOREs37p0TF4=E0=Z66DLGFJi92FfJo9VyAD67cLpALGA@mail.gmail.com>
-Subject: Re: [RFC/RFT v4 0/5] Add generic trusted keys framework/subsystem
-To:     Mimi Zohar <zohar@kernel.org>
-Cc:     keyrings@vger.kernel.org, linux-integrity@vger.kernel.org,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        linux-security-module@vger.kernel.org, dhowells@redhat.com,
-        Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
-        peterhuewe@gmx.de, jgg@ziepe.ca, jejb@linux.ibm.com,
-        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Casey Schaufler <casey@schaufler-ca.com>,
+References: <20190809171457.12400-1-ard.biesheuvel@linaro.org>
+ <20190815120800.GI29355@gondor.apana.org.au> <20190816010233.GA653@sol.localdomain>
+In-Reply-To: <20190816010233.GA653@sol.localdomain>
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date:   Fri, 16 Aug 2019 08:21:30 +0300
+Message-ID: <CAKv+Gu8ieCRH_R2EqwC-LMae5zaVrHMq_BuTDsN=5X1+u_CoWw@mail.gmail.com>
+Subject: Re: [PATCH v2] crypto: xts - add support for ciphertext stealing
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Daniel Thompson <daniel.thompson@linaro.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "tee-dev @ lists . linaro . org" <tee-dev@lists.linaro.org>
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>, Milan Broz <gmazyland@gmail.com>,
+        Pascal van Leeuwen <pvanleeuwen@verimatrix.com>,
+        Ondrej Mosnacek <omosnace@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 15 Aug 2019 at 20:36, Mimi Zohar <zohar@kernel.org> wrote:
+On Fri, 16 Aug 2019 at 04:02, Eric Biggers <ebiggers@kernel.org> wrote:
 >
-> On Thu, 2019-08-15 at 18:33 +0530, Sumit Garg wrote:
-> > Hi Mimi,
+> On Thu, Aug 15, 2019 at 10:08:00PM +1000, Herbert Xu wrote:
+> > On Fri, Aug 09, 2019 at 08:14:57PM +0300, Ard Biesheuvel wrote:
+> > > Add support for the missing ciphertext stealing part of the XTS-AES
+> > > specification, which permits inputs of any size >= the block size.
+> > >
+> > > Cc: Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
+> > > Cc: Ondrej Mosnacek <omosnace@redhat.com>
+> > > Tested-by: Milan Broz <gmazyland@gmail.com>
+> > > Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> > > ---
+> > > v2: fix scatterlist issue in async handling
+> > >     remove stale comment
+> > >
+> > >  crypto/xts.c | 152 +++++++++++++++++---
+> > >  1 file changed, 132 insertions(+), 20 deletions(-)
 > >
-> > On Wed, 14 Aug 2019 at 18:54, Mimi Zohar <zohar@kernel.org> wrote:
-> > >
-> > > Hi Sumit,
-> > >
-> > > On Tue, 2019-08-13 at 13:22 +0530, Sumit Garg wrote:
-> > > > This patch-set is an outcome of discussion here [1]. It has evolved very
-> > > > much since v1 to create, consolidate and generalize trusted keys
-> > > > subsystem.
-> > > >
-> > > > This framework has been tested with trusted keys support provided via TEE
-> > > > but I wasn't able to test it with a TPM device as I don't possess one. It
-> > > > would be really helpful if others could test this patch-set using a TPM
-> > > > device.
-> > >
-> > > With the "CONFIG_HEADER_TEST" and "CONFIG_KERNEL_HEADER_TEST" config
-> > > options enabled, which is required for linux-next, it fails to build.
-> > >
-> >
-> > TBH, I wasn't aware about this test feature for headers.
+> > Patch applied.  Thanks.
+> > --
 >
-> It's new to me too.
->
-> > It looks like
-> > the header which fails this test is "include/keys/trusted_tpm.h" which
-> > is basically a rename of "include/keys/trusted.h" plus changes in this
-> > patch-set.
-> >
-> > And "include/keys/trusted.h" header is already put under blacklist
-> > here: "include/Kbuild +68" as it fails to build. So its that rename
-> > due to which build failure is observed now.
-> >
-> > It seems to be an easy fix for this build failure via following changes:
-> >
-> > diff --git a/include/keys/trusted_tpm.h b/include/keys/trusted_tpm.h
-> > index 7b593447920b..ca1bec0ef65d 100644
-> > --- a/include/keys/trusted_tpm.h
-> > +++ b/include/keys/trusted_tpm.h
-> > @@ -2,6 +2,9 @@
-> >  #ifndef __TRUSTED_TPM_H
-> >  #define __TRUSTED_TPM_H
-> >
-> > +#include <keys/trusted-type.h>
-> > +#include <linux/tpm_command.h>
-> > +
-> >  /* implementation specific TPM constants */
-> >  #define MAX_BUF_SIZE                   1024
-> >  #define TPM_GETRANDOM_SIZE             14
-> >
-> > So I will include above changes in this patch-set and also remove
-> > "include/keys/trusted.h" header from the blacklist.
->
-> That works, thanks.  With this patch set, at least the EVM trusted key
-> is properly being decrypted by the encrypted key with both a TPM 1.2
-> and PTT TPM 2.0.  My laptop still boots properly.  Over the weekend
-> I'll try to actually review the patches.
+> I'm confused why this was applied as-is, since there are no test vectors for
+> this added yet.  Nor were any other XTS implementations updated yet, so now
+> users see inconsistent behavior, and all the XTS comparison fuzz tests fail.
+> What is the plan for addressing these?  I had assumed that as much as possible
+> would be fixed up at once.
 >
 
-Thanks Mimi for testing this patch-set.
+I have the ARM/arm64 changes mostly ready to go [0], but I haven't had
+the opportunity to test them on actual hardware yet (nor will I until
+the end of next month). This branch contains the test vectors as well,
+which check out against these implementations and the generic one (and
+Pascal's safexcel one), but obviously, we cannot merge those until all
+drivers are fixed.
 
--Sumit
+The fuzz tests failing transiently is not a huge deal, IMO, but we do
+need a deadline when we apply the test vectors.
 
-> Mimi
+We'll need volunteers to fix the x86, powerpc and s390 code. My branch
+adds some helpers that could be useful here, but it really needs the
+attention of people who can understand the code and are able to test
+it.
+
+
+[0] https://git.kernel.org/pub/scm/linux/kernel/git/ardb/linux.git/log/?h=xts-cts
