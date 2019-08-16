@@ -2,63 +2,64 @@ Return-Path: <SRS0=FgZY=WM=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7C83C3A59C
-	for <linux-crypto@archiver.kernel.org>; Fri, 16 Aug 2019 08:18:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89E90C3A59C
+	for <linux-crypto@archiver.kernel.org>; Fri, 16 Aug 2019 08:26:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 96FC1206C2
-	for <linux-crypto@archiver.kernel.org>; Fri, 16 Aug 2019 08:18:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6050320644
+	for <linux-crypto@archiver.kernel.org>; Fri, 16 Aug 2019 08:26:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cCd14CNN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PRw7PPE4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726703AbfHPISw (ORCPT
+        id S1726835AbfHPI0Z (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 16 Aug 2019 04:18:52 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:38876 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726596AbfHPISw (ORCPT
+        Fri, 16 Aug 2019 04:26:25 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:37457 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725945AbfHPI0Y (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 16 Aug 2019 04:18:52 -0400
-Received: by mail-wr1-f68.google.com with SMTP id g17so720971wrr.5
-        for <linux-crypto@vger.kernel.org>; Fri, 16 Aug 2019 01:18:50 -0700 (PDT)
+        Fri, 16 Aug 2019 04:26:24 -0400
+Received: by mail-wr1-f67.google.com with SMTP id z11so744040wrt.4;
+        Fri, 16 Aug 2019 01:26:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ZcH6rMZvfV+AWG20Wz62KwN247zGorzKSm/4I04o3LQ=;
-        b=cCd14CNN5mMt9CV6CF8mCUtajynKfYi7A+J1JpHrouYzbBelRZ60UWEeinu8qlzukB
-         m1TCcsjifzBHRbiotjwN/6An3iBWNetR/jDBVZeJW8HW+DxTZ7qzzwcJYcaUKWx+PdXA
-         ABttoTzZlnWM4MPyQbZiOyX6RapIUtJMwgiC+Kvs0e0m9iTFaQKQ3gUdMaLp7HuoyPUy
-         2DREkn+90+ZBbCUN4F2pgwssQlIVThUDn6J9D0YCwymwk5nWsNV6okwyw/mN1jSJeBc/
-         cQr23j6de0yJ0xDOobXv3o8/FhAXkeCX1viFXO4NNPIwR5BkxIRLdXtVcaaBKCd+mR7l
-         R1dw==
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:openpgp:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=56fPS/dgJdCSM/wPNRnGXBen8t9t2W1bcanq5wh0TUQ=;
+        b=PRw7PPE4b5LWXqiKs/xktokPR+OlURF/RNAvkR94hWvmbIsBuK7puDw+UFq7xRA1FL
+         OIAs+ufv3BHCchuwmyq7w10SCIdzC3O60RbCS5kIRtlg81B9C+J8UY9dHBahbqW5hXPp
+         KtrQTsqX66YqtX0EksHtPZGqQ1oK7AtuWJnDbX3BXh7fRo/GdhY0njCYS+lEjN6Y6uMK
+         VIqNj92B+wmEKRmbUSFfeoIfFAy2Ng8LzVXI/ZjuF5j6CdEMuw0cMRCyRo6L5ipuLCDW
+         nS2JTw5tQCjMBELlp2Ebh7TIUb0i5slThjRilKBgRS+WKuSQ2AN1BLtsP+envGss2N6n
+         vy4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ZcH6rMZvfV+AWG20Wz62KwN247zGorzKSm/4I04o3LQ=;
-        b=MJXsgXNR8LuxkHF95JjswT08WXBekrd6x0e2pvDhYDnveQpMDg336MbPOrVD9Q9sfP
-         5Ud8Dtk/orUYGC9O9lEMSqVfYJ3nMAvJcRXvfeddY5EryNkfeJCvbD14pwitqMMgMokH
-         dQasI+JxeGB6+q9rfNxUf7W6f1/GheGh+HHqsYp2QODsbnzLUlAgGBcKyr9kHJd5SFBn
-         1aplrbu0eoNc8ApoPn75xZ6rHOFivgyrkHjIN2JiLf7L7XipGQkD0JFE8ymGQcf39ieg
-         Yqw6KHpmm5RNCG/UwMnEaS3agCrmRMu0VLQpH/I02WAEvJXqUzi4ZUuLOcwGm/jfCMwi
-         zdtg==
-X-Gm-Message-State: APjAAAWjJa4XeGIp5bus8r3Q9A3VZydtEmm53oR7Yi9p+UaTKwQS4Zbz
-        2+Qu4LnUeDv1cok7d8nS462D1w8VSM4fOG6to6EZvQ==
-X-Google-Smtp-Source: APXvYqxeQeZx1iVRlwBZ8rNxXcZKYFGi5/bmoO7bFdHlbPQMPwBFag3R4qGLhble1xA9sPq1K5et96602Yk8vSTI+Nw=
-X-Received: by 2002:adf:9222:: with SMTP id 31mr7891179wrj.93.1565943530202;
- Fri, 16 Aug 2019 01:18:50 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190815192858.28125-1-ard.biesheuvel@linaro.org> <1463bca3-77dc-42be-7624-e8eaf5cfbf32@gmail.com>
-In-Reply-To: <1463bca3-77dc-42be-7624-e8eaf5cfbf32@gmail.com>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Fri, 16 Aug 2019 11:18:42 +0300
-Message-ID: <CAKv+Gu9CtMMAjtjfR=uuB-+x0Lhy8gnme2HhExckW+eVZ8B_Ow@mail.gmail.com>
+        h=x-gm-message-state:subject:to:cc:references:from:openpgp:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=56fPS/dgJdCSM/wPNRnGXBen8t9t2W1bcanq5wh0TUQ=;
+        b=ACZgiySydOHfPepqxcR2Mh7Dsni2VCEklMcxcdrqzFdroCZil9LydnZQEndRdfGi59
+         m8GOnDayNSa6nXu9q6K2eJ6i2QbJ042Ez0mS1/M2P/kR06jpKyKBS4IjXjia/xDZ+wHX
+         0uk7muLPZj8UyjwhqxePK3IodVfp7fRsnzZRmtoJsVvlctDVshLmGEGC/6fk3m2QhtFt
+         WdsbX70f7Zxa7nAXG0QVod1sfxX9e0r8I/vcN/lGmBDd+lcHMgvIWWscstHNOGw8W2ji
+         2p63517a3d0R1DGxiKDm/IY5D2tKQN8j2ebrKpNzxnGEh7SAyKxsXTXGAnqPHa68mkQe
+         YdHA==
+X-Gm-Message-State: APjAAAUwz/oe27EPNawSjXu3Jz2zzTZA8OsS3LXMLG329SE09EZkMKUt
+        sQ1dmBGU1OxBrPLZZ7s9sk4=
+X-Google-Smtp-Source: APXvYqyGOIj1aB2EpmHGuZNQG3fAHhYs4PTy/JhagxqHTt62717Sh77M0+5CTHy949ACc/NSB0K/Wg==
+X-Received: by 2002:adf:fe08:: with SMTP id n8mr8983932wrr.60.1565943982177;
+        Fri, 16 Aug 2019 01:26:22 -0700 (PDT)
+Received: from [192.168.2.27] (39.35.broadband4.iol.cz. [85.71.35.39])
+        by smtp.gmail.com with ESMTPSA id m23sm6314419wml.41.2019.08.16.01.26.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 16 Aug 2019 01:26:21 -0700 (PDT)
 Subject: Re: [PATCH v12 0/4] crypto: switch to crypto API for ESSIV generation
-To:     Milan Broz <gmazyland@gmail.com>
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
         <linux-crypto@vger.kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -66,39 +67,57 @@ Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
         device-mapper development <dm-devel@redhat.com>,
         linux-fscrypt@vger.kernel.org,
         Gilad Ben-Yossef <gilad@benyossef.com>
-Content-Type: text/plain; charset="UTF-8"
+References: <20190815192858.28125-1-ard.biesheuvel@linaro.org>
+ <1463bca3-77dc-42be-7624-e8eaf5cfbf32@gmail.com>
+ <CAKv+Gu9CtMMAjtjfR=uuB-+x0Lhy8gnme2HhExckW+eVZ8B_Ow@mail.gmail.com>
+From:   Milan Broz <gmazyland@gmail.com>
+Openpgp: preference=signencrypt
+Message-ID: <d509ce52-1ae1-f785-fe5a-7d5a0e2bc8d0@gmail.com>
+Date:   Fri, 16 Aug 2019 10:26:20 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <CAKv+Gu9CtMMAjtjfR=uuB-+x0Lhy8gnme2HhExckW+eVZ8B_Ow@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 16 Aug 2019 at 10:29, Milan Broz <gmazyland@gmail.com> wrote:
->
-> Hi Ard,
->
-> On 15/08/2019 21:28, Ard Biesheuvel wrote:
-> > Changes since v10:
-> > - Drop patches against fscrypt and dm-crypt - these will be routed via the
-> >   respective maintainer trees during the next cycle
->
-> I tested the previous dm-crypt patches (I also try to keep them in my kernel.org tree),
-> it works and looks fine to me (and I like the final cleanup :)
->
-> Once all maintainers are happy with the current state, I think it should go to
-> the next release (5.4; IMO both ESSIV API and dm-crypt changes).
-> Maybe you could keep sending dm-crypt patches in the end of the series (to help testing it)?
->
+On 16/08/2019 10:18, Ard Biesheuvel wrote:
+> On Fri, 16 Aug 2019 at 10:29, Milan Broz <gmazyland@gmail.com> wrote:
+>>
+>> Hi Ard,
+>>
+>> On 15/08/2019 21:28, Ard Biesheuvel wrote:
+>>> Changes since v10:
+>>> - Drop patches against fscrypt and dm-crypt - these will be routed via the
+>>>   respective maintainer trees during the next cycle
+>>
+>> I tested the previous dm-crypt patches (I also try to keep them in my kernel.org tree),
+>> it works and looks fine to me (and I like the final cleanup :)
+>>
+>> Once all maintainers are happy with the current state, I think it should go to
+>> the next release (5.4; IMO both ESSIV API and dm-crypt changes).
+>> Maybe you could keep sending dm-crypt patches in the end of the series (to help testing it)?
+>>
+> 
+> OK. But we'll need to coordinate a bit so that the first patch (the
+> one that introduces the template) is available in both branches,
+> otherwise ESSIV will be broken in the dm branch until it hits another
+> branch (-next or mainline) that also contains cryptodev.
 
-OK. But we'll need to coordinate a bit so that the first patch (the
-one that introduces the template) is available in both branches,
-otherwise ESSIV will be broken in the dm branch until it hits another
-branch (-next or mainline) that also contains cryptodev.
+Yes, I know. I'll ask Mike what is his preference here...
+For now, it should appear at least in the cryptodev tree :)
 
-As I suggested before, I can easily create a branch based on v5.3-rc1
-containing just the first ESSIV patch (once Herbert is happy with it),
-and merge that both into cryptodev and dm. That way, both will
-continue to work without having too much overlap. Since adding a
-template/file that has no users yet is highly unlikely to break
-anything, it doesn't even matter which branch gets pulled first.
+...
+ 
+> Any idea about the status of the EBOIV patch?
 
-Any idea about the status of the EBOIV patch?
+It is in the queue for 5.4 (should be in linux-next already), I guess 5.4 target is ok here.
+
+https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git/log/?h=dm-5.4
+
+Milan
