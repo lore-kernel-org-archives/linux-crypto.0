@@ -2,76 +2,89 @@ Return-Path: <SRS0=FgZY=WM=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E218C3A59C
-	for <linux-crypto@archiver.kernel.org>; Fri, 16 Aug 2019 10:22:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67383C3A59C
+	for <linux-crypto@archiver.kernel.org>; Fri, 16 Aug 2019 12:06:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 86BE420644
-	for <linux-crypto@archiver.kernel.org>; Fri, 16 Aug 2019 10:22:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 310DD2086C
+	for <linux-crypto@archiver.kernel.org>; Fri, 16 Aug 2019 12:06:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="IXMjB7y9"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VtMZclr4"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727093AbfHPKWv (ORCPT
+        id S1727116AbfHPMGJ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 16 Aug 2019 06:22:51 -0400
-Received: from mo4-p01-ob.smtp.rzone.de ([85.215.255.54]:8902 "EHLO
-        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727092AbfHPKWv (ORCPT
+        Fri, 16 Aug 2019 08:06:09 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:40211 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727110AbfHPMGJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 16 Aug 2019 06:22:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1565950967;
-        s=strato-dkim-0002; d=chronox.de;
-        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
-        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-        bh=QiyRZBfcO0+IQvexnI8yZrDpG2eQxw6YceEbwDoBGxw=;
-        b=IXMjB7y9GycOm7g6YOH1p9g76zRXizal2I7bx45fsmZCUlxlamratYBbVVaZRnV66U
-        GrgJ/jNqu+rSXN1iPULc8GPfvUAwk/7b2ep81ykLqhs5lG7/01S6TUh9UjnraTsmwuhY
-        sHqjwxK048cG5IhEORcdxEnKQXCTCEsN7qFGX9P7xkwFJdK6aYUFWgVl/TdbvBNFAem+
-        8lIjz5ebzNNCn4yTGmr6cIXhyD0c84369HtuwXfokLwsjCDzpd88GVGMAr4K489FOUWd
-        KUS4osMJFTrouw28oykRUjKJ//vb3JQrO7cDY+saNhsPLPD3XnH/jsy2a4zOFMwM76si
-        PdtQ==
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPZIvSfYak+"
-X-RZG-CLASS-ID: mo00
-Received: from tauon.chronox.de
-        by smtp.strato.de (RZmta 44.26.1 DYNA|AUTH)
-        with ESMTPSA id u073a8v7GAMWIHn
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (curve secp521r1 with 521 ECDH bits, eq. 15360 bits RSA))
-        (Client did not present a certificate);
-        Fri, 16 Aug 2019 12:22:32 +0200 (CEST)
-From:   Stephan Mueller <smueller@chronox.de>
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc:     linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-        ebiggers@kernel.org
-Subject: Re: [RFC/RFT PATCH] crypto: aes/xts - implement support for ciphertext stealing
-Date:   Fri, 16 Aug 2019 12:22:32 +0200
-Message-ID: <2570709.znztaGfihb@tauon.chronox.de>
-In-Reply-To: <20190816101021.7837-1-ard.biesheuvel@linaro.org>
-References: <20190816101021.7837-1-ard.biesheuvel@linaro.org>
+        Fri, 16 Aug 2019 08:06:09 -0400
+Received: by mail-wm1-f68.google.com with SMTP id v19so3885272wmj.5
+        for <linux-crypto@vger.kernel.org>; Fri, 16 Aug 2019 05:06:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=G/IOsrDjCPmyiQgDW1R1C9KY/7Kx5j4J9045NMie3Pg=;
+        b=VtMZclr4fxU+PcpgonzKmiHRNi6QFaED6r7NnI/wrNzrEZNdy5NajJ2uavTnjaQo8B
+         uuE+WSvSYlLx7QCsULHayeUbuL/NKvwfSQGrWwIpbZU3M+C+r11NXLoTK9H9vA2UUi1Z
+         oDFPgAfoTLZ612ATViVRt5GhxF+8yQKND/w2BuEphCynGqdxVQAhZ3mzUE1uAvoAejSw
+         zzd+Sj9GBunu++S29wOpygJNw2N8SYYHv1gS2sI/Sk+Evezgf6wie8S6VbwVLNbVp4F1
+         TdC5GBnn0Q2D0xOlEm8vSkqmChShzcKOTtUAyQfGtmvAZFChccDORHpV80SDX8cAYc7U
+         7tFg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=G/IOsrDjCPmyiQgDW1R1C9KY/7Kx5j4J9045NMie3Pg=;
+        b=FsLD3uv9Www3jqG00vyT9uMErLsEPlozR6skQx5r+XTFsaDrx0MDMhNLSPDZKFn1ej
+         gCgk8NM/vgv7+OX7b/zZ929IY/t445skMp4LIFyDzUzQ5hVXhmtxSWOEPtoWtcA4nqGB
+         4e4M1Eg6IHvOoHuPd2SbFNqtZrRBW4avePdxAnRjOj6H5mV6W2GaWXKmXk/czvEmsI6C
+         SBqR/A//B++Fy0oNTsLUo4n0o5iMQU623TdOv9W/xkgsPK1y6gEAOP7EE2LtPgaJNnVZ
+         GcrTFxymrnBjH5iEPi3xw0KZfKHZSv1Xeeo0Bd9YfMu1WPRWyKbFFi1KoWRPGHK4+r7v
+         fPVA==
+X-Gm-Message-State: APjAAAUSP1eq26K9pj52158SJKis68KsNg9uCussyVrGXBvZojHE/7AI
+        GDnmauJahMW3fuOXRa/McFl6J5PWAByl0AjLgM0zEg==
+X-Google-Smtp-Source: APXvYqxAqDamDqzKNXx3HxiYFC96DGYrR9F55fAuVQt0SRECiobSQaWvk0megvlwswetTlZuzmoGNTog0gZ8auaSChE=
+X-Received: by 2002:a05:600c:2255:: with SMTP id a21mr6892444wmm.119.1565957163582;
+ Fri, 16 Aug 2019 05:06:03 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+References: <20190816101021.7837-1-ard.biesheuvel@linaro.org> <2570709.znztaGfihb@tauon.chronox.de>
+In-Reply-To: <2570709.znztaGfihb@tauon.chronox.de>
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date:   Fri, 16 Aug 2019 15:05:52 +0300
+Message-ID: <CAKv+Gu_COGP0073-d3Ksmd9Sp_5qwN0HTDcfny=COQQTpP=PDg@mail.gmail.com>
+Subject: Re: [RFC/RFT PATCH] crypto: aes/xts - implement support for
+ ciphertext stealing
+To:     Stephan Mueller <smueller@chronox.de>
+Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Eric Biggers <ebiggers@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Freitag, 16. August 2019, 12:10:21 CEST schrieb Ard Biesheuvel:
+On Fri, 16 Aug 2019 at 13:22, Stephan Mueller <smueller@chronox.de> wrote:
+>
+> Am Freitag, 16. August 2019, 12:10:21 CEST schrieb Ard Biesheuvel:
+>
+> Hi Ard,
+>
+> > Align the x86 code with the generic XTS template, which now supports
+> > ciphertext stealing as described by the IEEE XTS-AES spec P1619.
+>
+> After applying the patch, the boot is successful even with the extra tests.
+> >
+> > Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+>
+> Tested-by: Stephan Mueller <smueller@chronox.de>
+>
 
-Hi Ard,
-
-> Align the x86 code with the generic XTS template, which now supports
-> ciphertext stealing as described by the IEEE XTS-AES spec P1619.
-
-After applying the patch, the boot is successful even with the extra tests.
-> 
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-
-Tested-by: Stephan Mueller <smueller@chronox.de>
-
-Ciao
-Stephan
-
-
+Thanks!
