@@ -2,114 +2,102 @@ Return-Path: <SRS0=KYaN=WN=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB8DEC3A59D
-	for <linux-crypto@archiver.kernel.org>; Sat, 17 Aug 2019 02:02:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5713C41514
+	for <linux-crypto@archiver.kernel.org>; Sat, 17 Aug 2019 05:13:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B24F221019
-	for <linux-crypto@archiver.kernel.org>; Sat, 17 Aug 2019 02:02:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=netronome-com.20150623.gappssmtp.com header.i=@netronome-com.20150623.gappssmtp.com header.b="mcrBVju/"
+	by mail.kernel.org (Postfix) with ESMTP id 7CA2621773
+	for <linux-crypto@archiver.kernel.org>; Sat, 17 Aug 2019 05:13:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1566018803;
+	bh=kZh/mBQKvBcCKVRcP4EwaxzK6sS4usQe5ZFCButursw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=yGR2rPvl+3vKh5IFHyx/fP+xVL5kH8GXf4L7lGWgH98yJGvsWbKP9UOjvlbdFioUr
+	 KebwSZY4bQUafNSJXgvDyQKFzuCy0Jt7/1LRPSnYMpD11mSMLqXdneXM0Txbgj1yi5
+	 cK1MitmGb68JNtS+s2K40dp+KcEIU29S4Pkm/WY0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726023AbfHQCCy (ORCPT
+        id S1725791AbfHQFNW (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 16 Aug 2019 22:02:54 -0400
-Received: from mail-qk1-f194.google.com ([209.85.222.194]:44362 "EHLO
-        mail-qk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725911AbfHQCCy (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 16 Aug 2019 22:02:54 -0400
-Received: by mail-qk1-f194.google.com with SMTP id d79so6260106qke.11
-        for <linux-crypto@vger.kernel.org>; Fri, 16 Aug 2019 19:02:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=netronome-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:in-reply-to:references
-         :organization:mime-version:content-transfer-encoding;
-        bh=x7XMRdgCt2pdutYjeOA8x9Ig7Wjm5vmCkdNaXQUT6Gk=;
-        b=mcrBVju/QdoZkaoB86phY6BSIh7IESknpTqtDe3XtRMD7Xy5pTRaU/N/J6F9daxjdq
-         NniNEg5UUDIRIyZRt6UbPX+niko9VyYxxbJkBKgKe2XjuQ2qa0MhDcp6DhrTnqIT1hfz
-         0EnzaX0R/41+BqO0OORepLUzJRBtkQIMPMwDmQ2XcvBARvt65s0fPrzSa75czg8a2q0q
-         FVfM/RNjC5wMHXa1y7p5xTYzjBwIFKm1bDVMqZKQfaxq1KHdcjmJ4DdSH1Pug46UhQNm
-         MF0BUzCsTKr9cxRJhrBFIxt0IHsAdQvJy3FLykz5j4PUGQrH8Ekm4lzrHGmlnQ7n9JGB
-         FrCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=x7XMRdgCt2pdutYjeOA8x9Ig7Wjm5vmCkdNaXQUT6Gk=;
-        b=gRUgdsixy7K8peB0qukLi/HzYeHjEkfYljJfrWDzDG12PI8qWxxcoK9kzpVur9nLR/
-         GfdGoDA3mPs5YXDvTpOs9b2gMl5m/npb8UtaGcFlGIAKXBqB0zu7gg17RexDFWoz3r7p
-         TrOoO0JI/HWEYdkAhXLBVId0IjK1Z8cRTgGfpPtnw5BLB6OgyPVJ4urRFZb0iQTXhrvW
-         RbqgEOY7zo2EtKLhfKy22b0oBleOyGxdxnmOHcJQVgSYOgAEO5p0eUD92HLJuURRtiA2
-         AQ6G6Kf4f/ui0sPOqwmI0tmqVYvSJhhdLAy6JatxvaMr2EKC2+wate63WlWC84D/I2CJ
-         TfxA==
-X-Gm-Message-State: APjAAAUu33vUNXFWpJSlj36bgVQ5wq6ExDfQ4G4od/n8ryi8SQNClnx+
-        c1l/usfnRw3gruo71GszmLoOWw==
-X-Google-Smtp-Source: APXvYqzyDoDO9llEcgmuHCL2c+5J0/6rXwZo5GnScn31o/Yxbn/n4i5y6q8FE01IE8WdHDZ1LkS6qw==
-X-Received: by 2002:a05:620a:1355:: with SMTP id c21mr10818956qkl.97.1566007373239;
-        Fri, 16 Aug 2019 19:02:53 -0700 (PDT)
-Received: from cakuba.netronome.com ([66.60.152.14])
-        by smtp.gmail.com with ESMTPSA id x145sm1678748qka.106.2019.08.16.19.02.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Aug 2019 19:02:53 -0700 (PDT)
-Date:   Fri, 16 Aug 2019 19:02:34 -0700
-From:   Jakub Kicinski <jakub.kicinski@netronome.com>
-To:     syzbot <syzbot+6a9ff159672dfbb41c95@syzkaller.appspotmail.com>
-Cc:     ast@kernel.org, aviadye@mellanox.com, borisp@mellanox.com,
-        bpf@vger.kernel.org, daniel@iogearbox.net, davejwatson@fb.com,
-        davem@davemloft.net, hdanton@sina.com, john.fastabend@gmail.com,
-        netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
-Subject: Re: INFO: task hung in tls_sw_release_resources_tx
-Message-ID: <20190816190234.2aaab5b6@cakuba.netronome.com>
-In-Reply-To: <000000000000e75f1805902bb919@google.com>
-References: <000000000000523ea3059025b11d@google.com>
-        <000000000000e75f1805902bb919@google.com>
-Organization: Netronome Systems, Ltd.
+        Sat, 17 Aug 2019 01:13:22 -0400
+Received: from mail.kernel.org ([198.145.29.99]:55568 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725267AbfHQFNW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 17 Aug 2019 01:13:22 -0400
+Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 6D9DA2133F;
+        Sat, 17 Aug 2019 05:13:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1566018800;
+        bh=kZh/mBQKvBcCKVRcP4EwaxzK6sS4usQe5ZFCButursw=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=LW4xRrhQIFVOT24Fgp2vrKGf2kebp4b3LBSiU/MLAWsYLp5zIeScwbGm6krOqoyqA
+         pJeC9gs6BA4hnoomq7x1Zrw1Rf2tTKlm9Ub+8zQ6ck4+uYmFx83ccjiKiBpxCJG9T9
+         mpMHw1z55iBZwBiiNSU4DR200QwxuVHUKn6xUslo=
+Date:   Fri, 16 Aug 2019 22:13:18 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Hans de Goede <hdegoede@redhat.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 6/6] crypto: sha256_generic - Use sha256_transform from
+ generic sha256 lib
+Message-ID: <20190817051318.GA8209@sol.localdomain>
+Mail-Followup-To: Hans de Goede <hdegoede@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20190816211611.2568-1-hdegoede@redhat.com>
+ <20190816211611.2568-7-hdegoede@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190816211611.2568-7-hdegoede@redhat.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 15 Aug 2019 11:06:00 -0700, syzbot wrote:
-> syzbot has bisected this bug to:
+On Fri, Aug 16, 2019 at 11:16:11PM +0200, Hans de Goede wrote:
+> Drop the duplicate sha256_transform function from crypto/sha256_generic.c
+> and use the implementation from lib/crypto/sha256.c instead.
+> "diff -u lib/crypto/sha256.c sha256_generic.c"
+> shows that both implementations are identical.
 > 
-> commit 130b392c6cd6b2aed1b7eb32253d4920babb4891
-> Author: Dave Watson <davejwatson@fb.com>
-> Date:   Wed Jan 30 21:58:31 2019 +0000
-> 
->      net: tls: Add tls 1.3 support
-> 
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=118e8dee600000
-> start commit:   6d5afe20 sctp: fix memleak in sctp_send_reset_streams
-> git tree:       net
-> final crash:    https://syzkaller.appspot.com/x/report.txt?x=138e8dee600000
-> console output: https://syzkaller.appspot.com/x/log.txt?x=158e8dee600000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=a4c9e9f08e9e8960
-> dashboard link: https://syzkaller.appspot.com/bug?extid=6a9ff159672dfbb41c95
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17cb0502600000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14d5dc22600000
-> 
-> Reported-by: syzbot+6a9ff159672dfbb41c95@syzkaller.appspotmail.com
-> Fixes: 130b392c6cd6 ("net: tls: Add tls 1.3 support")
-> 
-> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
 
-CC Herbert, linux-crypto
+Hi Hans, thanks for doing this!
 
-This is got to be something in the crypto code :S 
+I'm a little concerned that the only sha256 lib function which sha256_generic.c
+calls is sha256_transform().  This means that sha256_init(), sha256_update(),
+and sha256_final() are not tested by the crypto self-tests.  They could be
+broken and we wouldn't know.
 
-The test case opens a ktls socket and back log writes to it.
-Then it opens a AF_ALG socket, binds "pcrypt(gcm(aes))" and dies.
+IMO, it would be better to make sha256_generic.c use sha256_init(),
+sha256_update(), and sha256_final() rather than using sha256_base.h.
+Then we'd get test coverage of both the sha256 lib, and of sha256_base.h
+via the architecture-specific implementations.
 
-The ktls socket upon close waits for async crypto callbacks, but they
-never come. If I unset CRYPTO_USER_API_AEAD or change the alg to bind
-to "gcm(aes)" the bug does not trigger.
+To do this you'll also need to add sha224_init(), sha224_update(), and
+sha224_final().  But that's straightforward.
 
-Any suggestions?
+- Eric
