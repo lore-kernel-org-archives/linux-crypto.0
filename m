@@ -4,29 +4,29 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DCC1C3A59F
-	for <linux-crypto@archiver.kernel.org>; Sat, 17 Aug 2019 14:24:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4825DC3A59F
+	for <linux-crypto@archiver.kernel.org>; Sat, 17 Aug 2019 14:25:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6F00C20880
-	for <linux-crypto@archiver.kernel.org>; Sat, 17 Aug 2019 14:24:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1E3A120880
+	for <linux-crypto@archiver.kernel.org>; Sat, 17 Aug 2019 14:25:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726265AbfHQOYx (ORCPT
+        id S1726363AbfHQOZC (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 17 Aug 2019 10:24:53 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:58822 "EHLO mx1.redhat.com"
+        Sat, 17 Aug 2019 10:25:02 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:38904 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725925AbfHQOYx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 17 Aug 2019 10:24:53 -0400
+        id S1726357AbfHQOY7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 17 Aug 2019 10:24:59 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id CB2027BDA9;
-        Sat, 17 Aug 2019 14:24:52 +0000 (UTC)
+        by mx1.redhat.com (Postfix) with ESMTPS id EBA221E201E;
+        Sat, 17 Aug 2019 14:24:58 +0000 (UTC)
 Received: from shalem.localdomain.com (ovpn-116-22.ams2.redhat.com [10.36.116.22])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 0E56F4E;
-        Sat, 17 Aug 2019 14:24:49 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2FC774E;
+        Sat, 17 Aug 2019 14:24:56 +0000 (UTC)
 From:   Hans de Goede <hdegoede@redhat.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         Thomas Gleixner <tglx@linutronix.de>,
@@ -41,80 +41,112 @@ Cc:     Hans de Goede <hdegoede@redhat.com>,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         linux-crypto@vger.kernel.org, x86@kernel.org,
         linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v2 4/7] crypto: sha256 - Use get/put_unaligned_be32 to get input, memzero_explicit
-Date:   Sat, 17 Aug 2019 16:24:32 +0200
-Message-Id: <20190817142435.8532-5-hdegoede@redhat.com>
+Subject: [PATCH v2 6/7] crypto: sha256 - Add sha224 support to sha256 library code
+Date:   Sat, 17 Aug 2019 16:24:34 +0200
+Message-Id: <20190817142435.8532-7-hdegoede@redhat.com>
 In-Reply-To: <20190817142435.8532-1-hdegoede@redhat.com>
 References: <20190817142435.8532-1-hdegoede@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.26]); Sat, 17 Aug 2019 14:24:52 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.71]); Sat, 17 Aug 2019 14:24:59 +0000 (UTC)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Use get/put_unaligned_be32 in lib/crypto/sha256.c to load / store data
-so that it can be used with unaligned buffers too, making it more generic.
+Add sha224 support to the lib/crypto/sha256 library code. This will allow
+us to replace both the sha256 and sha224 parts of crypto/sha256_generic.c
+when we remove the code duplication in further patches in this series.
 
-And use memzero_explicit for better clearing of sensitive data.
-
-Note unlike other patches in this series this commit actually makes
-functional changes to the sha256 code as used by the purgatory code.
-
-This fully aligns the lib/crypto/sha256.c sha256 implementation with the
-one from crypto/sha256_generic.c allowing us to remove the latter in
-further patches in this series.
-
+Suggested-by: Eric Biggers <ebiggers@kernel.org>
 Signed-off-by: Hans de Goede <hdegoede@redhat.com>
 ---
-Changes in v2:
-- Also switch to put_unaligned_be32 to store the hash
----
- lib/crypto/sha256.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ include/crypto/sha256.h |  5 +++++
+ lib/crypto/sha256.c     | 37 +++++++++++++++++++++++++++++++++++--
+ 2 files changed, 40 insertions(+), 2 deletions(-)
 
+diff --git a/include/crypto/sha256.h b/include/crypto/sha256.h
+index 9cbb3589b8b3..a75998d65a41 100644
+--- a/include/crypto/sha256.h
++++ b/include/crypto/sha256.h
+@@ -26,4 +26,9 @@ extern int sha256_update(struct sha256_state *sctx, const u8 *input,
+ 			 unsigned int length);
+ extern int sha256_final(struct sha256_state *sctx, u8 *hash);
+ 
++extern int sha224_init(struct sha256_state *sctx);
++extern int sha224_update(struct sha256_state *sctx, const u8 *input,
++			 unsigned int length);
++extern int sha224_final(struct sha256_state *sctx, u8 *hash);
++
+ #endif /* SHA256_H */
 diff --git a/lib/crypto/sha256.c b/lib/crypto/sha256.c
-index b8114028d06f..1458a20d53a5 100644
+index f2ed75ae6910..45ad87520769 100644
 --- a/lib/crypto/sha256.c
 +++ b/lib/crypto/sha256.c
-@@ -14,7 +14,7 @@
- #include <linux/bitops.h>
- #include <linux/string.h>
- #include <crypto/sha256.h>
--#include <asm/byteorder.h>
-+#include <asm/unaligned.h>
- 
- static inline u32 Ch(u32 x, u32 y, u32 z)
- {
-@@ -33,7 +33,7 @@ static inline u32 Maj(u32 x, u32 y, u32 z)
- 
- static inline void LOAD_OP(int I, u32 *W, const u8 *input)
- {
--	W[I] = __be32_to_cpu(((__be32 *)(input))[I]);
-+	W[I] = get_unaligned_be32((__u32 *)input + I);
+@@ -221,6 +221,22 @@ int sha256_init(struct sha256_state *sctx)
  }
+ EXPORT_SYMBOL(sha256_init);
  
- static inline void BLEND_OP(int I, u32 *W)
-@@ -201,7 +201,7 @@ static void sha256_transform(u32 *state, const u8 *input)
- 
- 	/* clear any sensitive info... */
- 	a = b = c = d = e = f = g = h = t1 = t2 = 0;
--	memset(W, 0, 64 * sizeof(u32));
-+	memzero_explicit(W, 64 * sizeof(u32));
++int sha224_init(struct sha256_state *sctx)
++{
++	sctx->state[0] = SHA224_H0;
++	sctx->state[1] = SHA224_H1;
++	sctx->state[2] = SHA224_H2;
++	sctx->state[3] = SHA224_H3;
++	sctx->state[4] = SHA224_H4;
++	sctx->state[5] = SHA224_H5;
++	sctx->state[6] = SHA224_H6;
++	sctx->state[7] = SHA224_H7;
++	sctx->count = 0;
++
++	return 0;
++}
++EXPORT_SYMBOL(sha224_init);
++
+ int sha256_update(struct sha256_state *sctx, const u8 *data, unsigned int len)
+ {
+ 	unsigned int partial, done;
+@@ -252,7 +268,13 @@ int sha256_update(struct sha256_state *sctx, const u8 *data, unsigned int len)
  }
+ EXPORT_SYMBOL(sha256_update);
  
- int sha256_init(struct sha256_state *sctx)
-@@ -270,7 +270,7 @@ int sha256_final(struct sha256_state *sctx, u8 *out)
+-int sha256_final(struct sha256_state *sctx, u8 *out)
++int sha224_update(struct sha256_state *sctx, const u8 *data, unsigned int len)
++{
++	return sha256_update(sctx, data, len);
++}
++EXPORT_SYMBOL(sha224_update);
++
++static int __sha256_final(struct sha256_state *sctx, u8 *out, int digest_words)
+ {
+ 	__be32 *dst = (__be32 *)out;
+ 	__be64 bits;
+@@ -272,7 +294,7 @@ int sha256_final(struct sha256_state *sctx, u8 *out)
+ 	sha256_update(sctx, (const u8 *)&bits, sizeof(bits));
  
  	/* Store state in digest */
- 	for (i = 0; i < 8; i++)
--		dst[i] = cpu_to_be32(sctx->state[i]);
-+		put_unaligned_be32(sctx->state[i], &dst[i]);
+-	for (i = 0; i < 8; i++)
++	for (i = 0; i < digest_words; i++)
+ 		put_unaligned_be32(sctx->state[i], &dst[i]);
  
  	/* Zeroize sensitive information. */
- 	memset(sctx, 0, sizeof(*sctx));
+@@ -280,4 +302,15 @@ int sha256_final(struct sha256_state *sctx, u8 *out)
+ 
+ 	return 0;
+ }
++
++int sha256_final(struct sha256_state *sctx, u8 *out)
++{
++	return __sha256_final(sctx, out, 8);
++}
+ EXPORT_SYMBOL(sha256_final);
++
++int sha224_final(struct sha256_state *sctx, u8 *out)
++{
++	return __sha256_final(sctx, out, 7);
++}
++EXPORT_SYMBOL(sha224_final);
 -- 
 2.23.0.rc2
 
