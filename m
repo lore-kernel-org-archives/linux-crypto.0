@@ -2,93 +2,166 @@ Return-Path: <SRS0=LpGJ=WP=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACD3DC3A5A0
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Aug 2019 14:14:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73B0AC3A5A0
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Aug 2019 14:15:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 80860206BB
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Aug 2019 14:14:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 456A5206C1
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Aug 2019 14:15:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XFkdapvj"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aTrG2WNj"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726742AbfHSOO3 (ORCPT
+        id S1726736AbfHSOPD (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 19 Aug 2019 10:14:29 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:40935 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726211AbfHSOO2 (ORCPT
+        Mon, 19 Aug 2019 10:15:03 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:51186 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725536AbfHSOPD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Aug 2019 10:14:28 -0400
-Received: by mail-wr1-f65.google.com with SMTP id c3so8907776wrd.7
-        for <linux-crypto@vger.kernel.org>; Mon, 19 Aug 2019 07:14:27 -0700 (PDT)
+        Mon, 19 Aug 2019 10:15:03 -0400
+Received: by mail-wm1-f67.google.com with SMTP id v15so1781678wml.0
+        for <linux-crypto@vger.kernel.org>; Mon, 19 Aug 2019 07:15:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=wac/8K0PlB5YqvgpI9XB84WnEjzGgiNR49Px3uNmKW4=;
-        b=XFkdapvjB9ydQEoU7RWQdtlXojOwik5hizdLU9r2m8gd/IMDBuB1WcWbX6GxKduW06
-         eqfg/JzDDnFlhRAb3Zjg1PMHT/2+lIZDLxwtPzakUBcxeeih7FVPqv2b2dSq1hwIJ2qk
-         IBMbtHQ4TCDt1a8B6opSINSLFpvToXarInaeq3ntBbVSmSMmAw+jz0Z1J6Q8opDqmOn2
-         JCYj4LcgzpcebgU4w4n//XHtfjKUV/DwL+rFvZ/6La2TcOVHb59BvhcNvgMqWiiuLS7S
-         bCUN0+cxlt5dQ+AP15mSrdAbsMRm9m3tpLEZCnAsihJhYy6R6f4XotpJfNYDS1d1ZHkI
-         oICw==
+        h=from:to:cc:subject:date:message-id;
+        bh=0rdXhafMVjaKUUvPLb/wKqjrVAJEWD02wI54kwgy7/8=;
+        b=aTrG2WNj4nhYSYaFtYaZJ5Gsrrt6i2JczZV9rzkdjXnbsRrhP2s+JDcrtiCgg5Wbop
+         YYtQpjiwCviXq702LJ79A+n13Ai2eTRWqysoNdl0CCpYA68Hjcsa9kviUPizw6wKy4mG
+         rSXbgXK9u+/I4IIEiNw+o1J0Jh0cfSbZ9Gvh8fep9fPnZEenLCdObs9S8/6aCfijv/qF
+         91I4rP/NpPlP3wEBJ75eSaIk/6sWf95vKG96WlXKuFmplZn53xVdriOxWGOlgRhX2MwZ
+         kl1/u+APeI9GnC2tQuvrcO0hb1N9kazdA81wYVRW3oS7d8vnFRsnGEy0ben8YR+Uw8YV
+         BDPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=wac/8K0PlB5YqvgpI9XB84WnEjzGgiNR49Px3uNmKW4=;
-        b=kCF55Lao4XhPGSzfmzPGZn5Ez8ZoKv+FwmAoVBJTbf1t2EouZTJHL4GEAi4yAhS133
-         Cfjn5Kba7eQKcM3SIn1yMsetaCGwLmFeRMic/ol42zcPi6II1FD3ULBtMwGloKgdIdpl
-         BJ//j8c+sYZjZoT0aY03AgyDcpEixlQlFP4TKFYMspsc60RW0dE739waIUtt9BrzL55l
-         Tw74/UbLGAqACuaqDjOXN2dl77mx5I2KTotpiE5E25oEMOO8cnVEYiI5cgDkyVojNOUr
-         EVKZ99Ix5vM5Mahl6yG7G63JdqgRfCsIpKV5j0kM+Q7tlisMCS6ZsDE5kQ2IvdmqkkSf
-         2tAw==
-X-Gm-Message-State: APjAAAWvqc+uxYaO9x5uZIkXPXsEvda8VsSDdHY2Wq1w2xiylJd1hpNF
-        0iZ1gwbQa/U+FeI1qZsiPT4Eu0eyihgAEvABeOMt0g==
-X-Google-Smtp-Source: APXvYqyBE/UN01L8CYsSaZNoiACjd0jezpOPjy9k/djrhLklovSa5FgtQ4n+jR3Kahaa/J3jbjg98BO3QOEQVhK/O3w=
-X-Received: by 2002:a5d:5450:: with SMTP id w16mr14907929wrv.174.1566224066287;
- Mon, 19 Aug 2019 07:14:26 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190815192858.28125-1-ard.biesheuvel@linaro.org>
- <20190815192858.28125-2-ard.biesheuvel@linaro.org> <20190819063218.GA31821@gondor.apana.org.au>
-In-Reply-To: <20190819063218.GA31821@gondor.apana.org.au>
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=0rdXhafMVjaKUUvPLb/wKqjrVAJEWD02wI54kwgy7/8=;
+        b=QkOyiq3AVeW+QH0TITouUI2SUAEYWQTF/BYHkehCr/WpnGc9Hs6zoPIcTsAS5SoI/N
+         wkCudbdx+AhH8mZS8tDCg02jxmpSItAcksGKUBnhbl6dwWx4fUSOh5yQRxhSafW4e2iv
+         2eDIKMp5mOshsPW8q82rqwwL0e/P6g2r9PfmK7nB09Vt7r34o6IkppDtM+WMhMDx9eD/
+         2/Fh5Hqduy94xyvciPKGshT3pWojhuz8knUIh1PtpbN6/gmkHC1Xud4GS1TVqYh3MzkX
+         hlGleFVU6jQDMT3GGCooEdt5F2J317E7j4Ed+1qttuuBOkM3vNtVQo60NrfHOdAkWm2K
+         yz2g==
+X-Gm-Message-State: APjAAAVTz5uozqwwplPaGQGjFDkDii1kLCWNVtiYZdCcRuWxWgbFgB9E
+        7f3yCn5zC45lu9OXScXuzIkyn3Fz/rkfWQ==
+X-Google-Smtp-Source: APXvYqwBEMblDHhPa+BftLCq+ukB32ByuKEAqDjGhBB0hGhYk4Re8l29h4EMINdWWr1O5A5pBIr1rA==
+X-Received: by 2002:a05:600c:24d0:: with SMTP id 16mr20217200wmu.83.1566224101068;
+        Mon, 19 Aug 2019 07:15:01 -0700 (PDT)
+Received: from localhost.localdomain (11.172.185.81.rev.sfr.net. [81.185.172.11])
+        by smtp.gmail.com with ESMTPSA id r4sm11604141wrq.82.2019.08.19.07.14.58
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 19 Aug 2019 07:15:00 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Mon, 19 Aug 2019 17:14:25 +0300
-Message-ID: <CAKv+Gu9Zcaq5gygGtgmf5f4L6U6sBDd0CVAzrBydjiLDenyrag@mail.gmail.com>
-Subject: Re: [PATCH v12 1/4] crypto: essiv - create wrapper template for ESSIV generation
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>, Eric Biggers <ebiggers@google.com>,
-        device-mapper development <dm-devel@redhat.com>,
-        linux-fscrypt@vger.kernel.org,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Milan Broz <gmazyland@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-crypto@vger.kernel.org
+Cc:     herbert@gondor.apana.org.au, natechancellor@gmail.com,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: [PATCH] crypto: arm64/aegis128 - use explicit vector load for permute vectors
+Date:   Mon, 19 Aug 2019 17:15:00 +0300
+Message-Id: <20190819141500.1070-1-ard.biesheuvel@linaro.org>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 19 Aug 2019 at 09:32, Herbert Xu <herbert@gondor.apana.org.au> wrote:
->
-> On Thu, Aug 15, 2019 at 10:28:55PM +0300, Ard Biesheuvel wrote:
-> >
-> > +     /* Synchronous hash, e.g., "sha256" */
-> > +     ictx->hash = crypto_alloc_shash(shash_name, 0, 0);
-> > +     if (IS_ERR(ictx->hash)) {
-> > +             err = PTR_ERR(ictx->hash);
-> > +             goto out_drop_skcipher;
-> > +     }
->
-> Holding a reference to this algorithm for the life-time of the
-> instance is not nice.  How about just doing a lookup as you were
-> doing before with crypto_alg_mod_lookup and getting the cra_name
-> from that?
->
+When building the new aegis128 NEON code in big endian mode, Clang
+complains about the const uint8x16_t permute vectors in the following
+way:
 
-OK, but it should be the cra_driver_name not the cra_name. Otherwise,
-allocating essiv(cbc(aes),sha256-generic) may end up using a different
-implementation of sha256, which would be bad.
+  crypto/aegis128-neon-inner.c:58:40: warning: vector initializers are not
+      compatible with NEON intrinsics in big endian mode
+      [-Wnonportable-vector-initialization]
+                static const uint8x16_t shift_rows = {
+                                                     ^
+  crypto/aegis128-neon-inner.c:58:40: note: consider using vld1q_u8() to
+      initialize a vector from memory, or vcombine_u8(vcreate_u8(), vcreate_u8())
+      to initialize from integer constants
+
+Since the same issue applies to the uint8x16x4_t loads of the AES Sbox,
+update those references as well. However, since GCC does not implement
+the vld1q_u8_x4() intrinsic, switch from IS_ENABLED() to a preprocessor
+conditional to conditionally include this code.
+
+Reported-by: Nathan Chancellor <natechancellor@gmail.com>
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+---
+ crypto/aegis128-neon-inner.c | 38 ++++++++++----------
+ 1 file changed, 19 insertions(+), 19 deletions(-)
+
+diff --git a/crypto/aegis128-neon-inner.c b/crypto/aegis128-neon-inner.c
+index ed55568afd1b..f05310ca22aa 100644
+--- a/crypto/aegis128-neon-inner.c
++++ b/crypto/aegis128-neon-inner.c
+@@ -26,7 +26,7 @@ struct aegis128_state {
+ 	uint8x16_t v[5];
+ };
+ 
+-extern const uint8x16x4_t crypto_aes_sbox[];
++extern const uint8_t crypto_aes_sbox[];
+ 
+ static struct aegis128_state aegis128_load_state_neon(const void *state)
+ {
+@@ -55,39 +55,39 @@ uint8x16_t aegis_aes_round(uint8x16_t w)
+ 
+ #ifdef CONFIG_ARM64
+ 	if (!__builtin_expect(aegis128_have_aes_insn, 1)) {
+-		static const uint8x16_t shift_rows = {
++		static const uint8_t shift_rows[] = {
+ 			0x0, 0x5, 0xa, 0xf, 0x4, 0x9, 0xe, 0x3,
+ 			0x8, 0xd, 0x2, 0x7, 0xc, 0x1, 0x6, 0xb,
+ 		};
+-		static const uint8x16_t ror32by8 = {
++		static const uint8_t ror32by8[] = {
+ 			0x1, 0x2, 0x3, 0x0, 0x5, 0x6, 0x7, 0x4,
+ 			0x9, 0xa, 0xb, 0x8, 0xd, 0xe, 0xf, 0xc,
+ 		};
+ 		uint8x16_t v;
+ 
+ 		// shift rows
+-		w = vqtbl1q_u8(w, shift_rows);
++		w = vqtbl1q_u8(w, vld1q_u8(shift_rows));
+ 
+ 		// sub bytes
+-		if (!IS_ENABLED(CONFIG_CC_IS_GCC)) {
+-			v = vqtbl4q_u8(crypto_aes_sbox[0], w);
+-			v = vqtbx4q_u8(v, crypto_aes_sbox[1], w - 0x40);
+-			v = vqtbx4q_u8(v, crypto_aes_sbox[2], w - 0x80);
+-			v = vqtbx4q_u8(v, crypto_aes_sbox[3], w - 0xc0);
+-		} else {
+-			asm("tbl %0.16b, {v16.16b-v19.16b}, %1.16b" : "=w"(v) : "w"(w));
+-			w -= 0x40;
+-			asm("tbx %0.16b, {v20.16b-v23.16b}, %1.16b" : "+w"(v) : "w"(w));
+-			w -= 0x40;
+-			asm("tbx %0.16b, {v24.16b-v27.16b}, %1.16b" : "+w"(v) : "w"(w));
+-			w -= 0x40;
+-			asm("tbx %0.16b, {v28.16b-v31.16b}, %1.16b" : "+w"(v) : "w"(w));
+-		}
++#ifndef CONFIG_CC_IS_GCC
++		v = vqtbl4q_u8(vld1q_u8_x4(crypto_aes_sbox), w);
++		v = vqtbx4q_u8(v, vld1q_u8_x4(crypto_aes_sbox + 0x40), w - 0x40);
++		v = vqtbx4q_u8(v, vld1q_u8_x4(crypto_aes_sbox + 0x80), w - 0x80);
++		v = vqtbx4q_u8(v, vld1q_u8_x4(crypto_aes_sbox + 0xc0), w - 0xc0);
++#else
++		asm("tbl %0.16b, {v16.16b-v19.16b}, %1.16b" : "=w"(v) : "w"(w));
++		w -= 0x40;
++		asm("tbx %0.16b, {v20.16b-v23.16b}, %1.16b" : "+w"(v) : "w"(w));
++		w -= 0x40;
++		asm("tbx %0.16b, {v24.16b-v27.16b}, %1.16b" : "+w"(v) : "w"(w));
++		w -= 0x40;
++		asm("tbx %0.16b, {v28.16b-v31.16b}, %1.16b" : "+w"(v) : "w"(w));
++#endif
+ 
+ 		// mix columns
+ 		w = (v << 1) ^ (uint8x16_t)(((int8x16_t)v >> 7) & 0x1b);
+ 		w ^= (uint8x16_t)vrev32q_u16((uint16x8_t)v);
+-		w ^= vqtbl1q_u8(v ^ w, ror32by8);
++		w ^= vqtbl1q_u8(v ^ w, vld1q_u8(ror32by8));
+ 
+ 		return w;
+ 	}
+-- 
+2.17.1
+
