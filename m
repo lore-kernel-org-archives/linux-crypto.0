@@ -2,75 +2,76 @@ Return-Path: <SRS0=LpGJ=WP=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BACFEC3A5A0
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Aug 2019 21:10:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F44CC3A5A2
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Aug 2019 21:13:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 89DD0214DA
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Aug 2019 21:10:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E905F214DA
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Aug 2019 21:13:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=netronome-com.20150623.gappssmtp.com header.i=@netronome-com.20150623.gappssmtp.com header.b="d9zbuePb"
+	dkim=pass (2048-bit key) header.d=netronome-com.20150623.gappssmtp.com header.i=@netronome-com.20150623.gappssmtp.com header.b="VneBgzz0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728360AbfHSVKO (ORCPT
+        id S1728353AbfHSVNF (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 19 Aug 2019 17:10:14 -0400
-Received: from mail-qk1-f193.google.com ([209.85.222.193]:44672 "EHLO
-        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728387AbfHSVKJ (ORCPT
+        Mon, 19 Aug 2019 17:13:05 -0400
+Received: from mail-qk1-f196.google.com ([209.85.222.196]:34262 "EHLO
+        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728014AbfHSVNF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Aug 2019 17:10:09 -0400
-Received: by mail-qk1-f193.google.com with SMTP id d79so2696039qke.11
-        for <linux-crypto@vger.kernel.org>; Mon, 19 Aug 2019 14:10:08 -0700 (PDT)
+        Mon, 19 Aug 2019 17:13:05 -0400
+Received: by mail-qk1-f196.google.com with SMTP id m10so2725362qkk.1
+        for <linux-crypto@vger.kernel.org>; Mon, 19 Aug 2019 14:13:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=netronome-com.20150623.gappssmtp.com; s=20150623;
         h=date:from:to:cc:subject:message-id:in-reply-to:references
          :organization:mime-version:content-transfer-encoding;
-        bh=gNko8uYZ/iSVAQkfn2DxMOBCbut/oBDTcq1NiXuMq1Q=;
-        b=d9zbuePbVfnVj+QN/ZFdPRmQgkE8/L2bKlSBU+iTJaTACwicNRb8RIVd/OgSurHSl2
-         3K/wKETiXla57BE/k/VWoPOvW9Qwmho+85Q09Wu0PiiB8JyZWKVNP3QW5DFwhLAORm6E
-         egJnME5xBnx+TAu/y0VP12DBd+NSnNJcM8buHsmNZN+WcBsPmtqbmlWSW+cf5l4apqzH
-         /koqgZ8IbY+5QPCVkbjXl/nBdtU+GaDAWxT7CEga7brX3Oj+Di9slysot7Pki7CrZp8x
-         FSN8caxSyLv5RXg+eHlkrdrZH169XjGnlHDJUJSZdgyZwegqUtlXXqmaCkts42Sp+d3B
-         LV1A==
+        bh=zcVnTkmaXZnvPzlslFpXTMQ+JyK8DgeCTABL7ZZHlNU=;
+        b=VneBgzz0zlwlbD+l25IEANd6GZochFewROcYaBQgFYjKrQTYV7b9Enr3aOVpRzYlHD
+         uCCmm6sRFPRnhKlctdECpZ/4OkRUTWuY7XvzXvfY4FBNOXxZP0urwnOgzmgszTbPPUqu
+         I7offB5XiFLr76whtKbv/7zyhDKvitkCTGSMj0A4cJi44sl2i0U6qked42BxpM00dzdI
+         kQgTrGUgQO5oCuBA1WQQvUYYa1hGWG5hoOPJ75v3LkR3r6a85fE0IBGm97o9IUpHHamk
+         ztNpnA3Wax0FBRwaUJOoFmMfWLXhMTTvhx0Mcg3FzRYDekOWNAtbo03YZDNRf3CE+s8J
+         5YSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
          :references:organization:mime-version:content-transfer-encoding;
-        bh=gNko8uYZ/iSVAQkfn2DxMOBCbut/oBDTcq1NiXuMq1Q=;
-        b=Rve/bbQphP8lhfEQ984V13Zg8LsZIvONeKDU5w/GhAHOiZoetJmrXnTxK3CIbPcnYr
-         gts5uqzuykXd4/HJxRT1pu0mdf+/s34b0AfAdKF5NTE79AExSFmEk5B8dcg9h+3U2hkN
-         ONIb6mCfut46L1ANTwn8IT1xln4uXWJrubVJgFPSaXjDsWmXXkiD/OAy6lGkWm+Q6POt
-         R/8LG7AScMucQJ6iZ+sa7y0qRy+eYCW+V+tapLycoEovaGW3/zTj2OhffVS7hY6J1Fh2
-         +9KpHX8WL+5/k3Roiduti7qBGSbu6eJjTD4WIrPM5t/HsHczt53sHTPD+qipBM+BxmWb
-         Meqw==
-X-Gm-Message-State: APjAAAUialY1bzj4khHi2T3643BanBwbcwrlfNyRjT39B4fgb4fBttOO
-        kwHCLUFGqenssLsKYATGCCjpWQ==
-X-Google-Smtp-Source: APXvYqxbOHmZq2qLpckgNNtItEsJCIiUrNJX2RlAGSln7w+nCPcQfnCWxfv/mTB9PQZBdMUL2wpgYw==
-X-Received: by 2002:a37:7c02:: with SMTP id x2mr23287096qkc.298.1566249008458;
-        Mon, 19 Aug 2019 14:10:08 -0700 (PDT)
+        bh=zcVnTkmaXZnvPzlslFpXTMQ+JyK8DgeCTABL7ZZHlNU=;
+        b=jLy7ozfcWni9a/qkaocFvpir+Oss9MIpM2Y2XNVHzvI9ipH006lXmKHLUE1kkoT7mR
+         X1WxgsucU/Y1auVlMIxzxwv9wNU1/6EAKWaJxTnO0upEdhr3DkksOnfsiGDiQf2b/PDD
+         ZhxcbH+lHbNA6zUYm7P40Ykg3GXiMfn40OtwvO1OL3WQNOZ0nEN1YXiYBVyPN8G2vmr5
+         qfOsahfq1K0CrUTC3AIGOCZdBbeC5IV4F4Ej1D4RZt/+jSOcppAPID3S7WeXuSzjRvCY
+         C5QBEN63QzIKj3Is5vPTnA0OkaL3skG3SWsm0hRjLkPtBIj2AIIWMyX/e+esLZ0hBX5O
+         kIqg==
+X-Gm-Message-State: APjAAAVjunb0i9lun70+Msv2BOXsNUKd2V8N2DiO5TiA6p089r/YlQO2
+        BPPT9mIUwO7jZf4tkvVVR9uD4w==
+X-Google-Smtp-Source: APXvYqwLaN0yohHtVfe4XZyjRKdXGEk5nnPYe9Tav4wl1k/s/Fsnb6Cem5zSCOnY6T+lv/oZaKquFA==
+X-Received: by 2002:a05:620a:4c8:: with SMTP id 8mr21380405qks.366.1566249184021;
+        Mon, 19 Aug 2019 14:13:04 -0700 (PDT)
 Received: from cakuba.netronome.com ([66.60.152.14])
-        by smtp.gmail.com with ESMTPSA id t13sm7579042qkm.117.2019.08.19.14.10.06
+        by smtp.gmail.com with ESMTPSA id o29sm8527788qtf.19.2019.08.19.14.13.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 19 Aug 2019 14:10:08 -0700 (PDT)
-Date:   Mon, 19 Aug 2019 14:09:59 -0700
+        Mon, 19 Aug 2019 14:13:03 -0700 (PDT)
+Date:   Mon, 19 Aug 2019 14:12:55 -0700
 From:   Jakub Kicinski <jakub.kicinski@netronome.com>
-To:     syzbot <syzbot+8a6df99c3b1812093b70@syzkaller.appspotmail.com>
-Cc:     ast@kernel.org, aviadye@mellanox.com, borisp@mellanox.com,
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Steffen Klassert <steffen.klassert@secunet.com>,
+        syzbot <syzbot+6a9ff159672dfbb41c95@syzkaller.appspotmail.com>,
+        ast@kernel.org, aviadye@mellanox.com, borisp@mellanox.com,
         bpf@vger.kernel.org, daniel@iogearbox.net, davejwatson@fb.com,
-        davem@davemloft.net, john.fastabend@gmail.com, kafai@fb.com,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        songliubraving@fb.com, syzkaller-bugs@googlegroups.com, yhs@fb.com,
-        Eric Biggers <ebiggers@kernel.org>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        linux-crypto@vger.kernel.org
-Subject: Re: INFO: task hung in tls_sw_sendmsg
-Message-ID: <20190819140959.72a419d8@cakuba.netronome.com>
-In-Reply-To: <0000000000006a71990583cd3d9c@google.com>
-References: <0000000000006a71990583cd3d9c@google.com>
+        davem@davemloft.net, hdanton@sina.com, john.fastabend@gmail.com,
+        netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
+Subject: Re: INFO: task hung in tls_sw_release_resources_tx
+Message-ID: <20190819141255.010a323a@cakuba.netronome.com>
+In-Reply-To: <20190817054743.GE8209@sol.localdomain>
+References: <000000000000523ea3059025b11d@google.com>
+        <000000000000e75f1805902bb919@google.com>
+        <20190816190234.2aaab5b6@cakuba.netronome.com>
+        <20190817054743.GE8209@sol.localdomain>
 Organization: Netronome Systems, Ltd.
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
@@ -80,29 +81,63 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 11 Mar 2019 01:20:05 -0700, syzbot wrote:
-> Hello,
+On Fri, 16 Aug 2019 22:47:43 -0700, Eric Biggers wrote:
+> [+Steffen, who is the maintainer of pcrypt]
 > 
-> syzbot found the following crash on:
+> On Fri, Aug 16, 2019 at 07:02:34PM -0700, Jakub Kicinski wrote:
+> > On Thu, 15 Aug 2019 11:06:00 -0700, syzbot wrote:  
+> > > syzbot has bisected this bug to:
+> > > 
+> > > commit 130b392c6cd6b2aed1b7eb32253d4920babb4891
+> > > Author: Dave Watson <davejwatson@fb.com>
+> > > Date:   Wed Jan 30 21:58:31 2019 +0000
+> > > 
+> > >      net: tls: Add tls 1.3 support
+> > > 
+> > > bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=118e8dee600000
+> > > start commit:   6d5afe20 sctp: fix memleak in sctp_send_reset_streams
+> > > git tree:       net
+> > > final crash:    https://syzkaller.appspot.com/x/report.txt?x=138e8dee600000
+> > > console output: https://syzkaller.appspot.com/x/log.txt?x=158e8dee600000
+> > > kernel config:  https://syzkaller.appspot.com/x/.config?x=a4c9e9f08e9e8960
+> > > dashboard link: https://syzkaller.appspot.com/bug?extid=6a9ff159672dfbb41c95
+> > > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17cb0502600000
+> > > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14d5dc22600000
+> > > 
+> > > Reported-by: syzbot+6a9ff159672dfbb41c95@syzkaller.appspotmail.com
+> > > Fixes: 130b392c6cd6 ("net: tls: Add tls 1.3 support")
+> > > 
+> > > For information about bisection process see: https://goo.gl/tpsmEJ#bisection  
+> > 
+> > CC Herbert, linux-crypto
+> > 
+> > This is got to be something in the crypto code :S 
+> > 
+> > The test case opens a ktls socket and back log writes to it.
+> > Then it opens a AF_ALG socket, binds "pcrypt(gcm(aes))" and dies.
+> > 
+> > The ktls socket upon close waits for async crypto callbacks, but they
+> > never come. If I unset CRYPTO_USER_API_AEAD or change the alg to bind
+> > to "gcm(aes)" the bug does not trigger.
+> > 
+> > Any suggestions?  
 > 
-> HEAD commit:    d9862cfb Merge tag 'mips_5.1' of git://git.kernel.org/pub/..
-> git tree:       net-next
-> console output: https://syzkaller.appspot.com/x/log.txt?x=16e9d977200000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=73d88a42238825ad
-> dashboard link: https://syzkaller.appspot.com/bug?extid=8a6df99c3b1812093b70
-> compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-> userspace arch: amd64
+> Seeing as pcrypt is involved and this is a "task hung" bug, this is probably
+> caused by the recursive pcrypt deadlock, which is yet to be fixed.
 > 
-> Unfortunately, I don't have any reproducer for this crash yet.
+> See the original thread for more info:
 > 
-> IMPORTANT: if you fix the bug, please add the following tag to the commit:
-> Reported-by: syzbot+8a6df99c3b1812093b70@syzkaller.appspotmail.com
+> 	https://groups.google.com/forum/#!msg/syzkaller-bugs/1_CXUd3gBcg/BvsRLH0lAgAJ
+> 
+> And the syzbot dashboard link:
+> 
+> 	https://syzkaller.appspot.com/bug?id=178f2528d10720d563091fb51dceb4cb20f75525
+> 
+> Let's tell syzbot this is a duplicate:
+> 
+> #syz dup: INFO: task hung in aead_recvmsg
 
-Looks like the TLS bugs which involve pcrypt may be a pcrypt issue.
-There seems to be no clear explanation for these in TLS code.
+Thanks for the suggestion Eric!
 
-#syz dup: INFO: task hung in aead_recvmsg
-
-This is similar to:
-https://syzkaller.appspot.com/bug?id=44ae4b4fa7e6c6e92aa921d2ec20ce9fbee97939
-(INFO: task hung in tls_sw_free_resources_tx)
+Looks like the dup didn't tickle syzbot the right way. Let me retry
+sending this directly to the original report.
