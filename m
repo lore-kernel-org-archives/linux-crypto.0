@@ -2,76 +2,110 @@ Return-Path: <SRS0=LpGJ=WP=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F762C3A5A2
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Aug 2019 17:14:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95083C3A5A0
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Aug 2019 17:58:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6290F22CEB
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Aug 2019 17:14:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6A0AE22CEB
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Aug 2019 17:58:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NCQb6hAh"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727709AbfHSROc (ORCPT
+        id S1728076AbfHSR6B (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 19 Aug 2019 13:14:32 -0400
-Received: from mga02.intel.com ([134.134.136.20]:13280 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726918AbfHSROc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Aug 2019 13:14:32 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 19 Aug 2019 09:56:35 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,405,1559545200"; 
-   d="scan'208";a="179474448"
-Received: from jsakkine-mobl1.tm.intel.com (HELO localhost) ([10.237.50.125])
-  by fmsmga007.fm.intel.com with ESMTP; 19 Aug 2019 09:56:29 -0700
-Date:   Mon, 19 Aug 2019 19:56:29 +0300
-From:   Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-To:     Sumit Garg <sumit.garg@linaro.org>
-Cc:     keyrings@vger.kernel.org, linux-integrity@vger.kernel.org,
-        linux-crypto@vger.kernel.org,
-        linux-security-module@vger.kernel.org, dhowells@redhat.com,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        peterhuewe@gmx.de, jgg@ziepe.ca, jejb@linux.ibm.com, arnd@arndb.de,
-        gregkh@linuxfoundation.org, zohar@linux.ibm.com, jmorris@namei.org,
-        serge@hallyn.com, casey@schaufler-ca.com,
-        ard.biesheuvel@linaro.org, daniel.thompson@linaro.org,
-        linux-kernel@vger.kernel.org, tee-dev@lists.linaro.org
-Subject: Re: [RFC/RFT v4 1/5] tpm: move tpm_buf code to include/linux/
-Message-ID: <20190819165629.qv7cmg6kiwb6oxig@linux.intel.com>
-References: <1565682784-10234-1-git-send-email-sumit.garg@linaro.org>
- <1565682784-10234-2-git-send-email-sumit.garg@linaro.org>
+        Mon, 19 Aug 2019 13:58:01 -0400
+Received: from mail-ot1-f65.google.com ([209.85.210.65]:34250 "EHLO
+        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726987AbfHSR6B (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 19 Aug 2019 13:58:01 -0400
+Received: by mail-ot1-f65.google.com with SMTP id c7so2502639otp.1;
+        Mon, 19 Aug 2019 10:58:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=SPx17Q+G7qGGeLjARILuLl6TW51F+Z4DXKMa+q1QhGQ=;
+        b=NCQb6hAhIGnsCpdzTs7j+nh0saNaP8AahXNLtJPcx1sEJlMVEaUUkdrJHEOBuIqTgZ
+         NVXt998/bfTuQbaaYo1B+BNvEiAzmXxkp16nsDCBJQXJqaUEsn9Kewve9kBgmWebj8uT
+         wbCqB6FZAGC/j9q+MVM0GZR2/9a5bLDKbneZhY59ofsCMutEW9ZpxeJSgArfpJTFGthB
+         OXpUIP0rRSGRaZKM3oYHTEhTjfsdTR6crmS++gVDdHmqCYXY9ULwIj6pcQU3ZOAaJumZ
+         JY/sfkFIud7yT9Uh5B1Nv3KEOMdktqW34TQke4QfT1EARCsB2CxEbY9QrVAv2a7zVGKf
+         7fyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+         :date:user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=SPx17Q+G7qGGeLjARILuLl6TW51F+Z4DXKMa+q1QhGQ=;
+        b=P5/L+h3Xj3hdYocZ3W4390+jU6iz9Zk7fQi9y2xjaPtkdp6DHgfLWtc3oZzyenKdOx
+         MQ8NcRjQrDaRS7q87vEQFrxRCpO3Kvgn08Z53VOm7ma7UkUON09IHNb/vg3MMFn2WcvF
+         ICG6WY0na7fD51XI1VRjFJIhRIom+CSLSW9858cwE6pDY0I0OLSnXDBhBUPeW5Ha1iCB
+         gBLwsYUja3bw0Ievl0KkdxWZ1ex5PZm/tIUsbZl8aVH3uxKVvG3X3LQLUOkjuTHmfapX
+         i/EmW2hVUX+ZZH+pwSFnjn5LAGtX/SqCxTXJX1qaFWActs2yxnajZoJj6yLn1K37TorK
+         XWZQ==
+X-Gm-Message-State: APjAAAVq6qGLbhHXduDL5yZiUNd9js7pFYCBiD833B8XIJfv8jWbXLSX
+        a2JLY31LxnbQDu0KfzGC27nXfa6r
+X-Google-Smtp-Source: APXvYqyoPbNGTmlnGTEcpz7fO0lq6n2L2EKn43BGGRvx/2q3Uayz1zGl3G1y2NZkto8hfZQLFmFHeQ==
+X-Received: by 2002:a05:6830:1592:: with SMTP id i18mr13058312otr.86.1566237480027;
+        Mon, 19 Aug 2019 10:58:00 -0700 (PDT)
+Received: from [192.168.1.153] (cpe-24-31-245-230.kc.res.rr.com. [24.31.245.230])
+        by smtp.gmail.com with ESMTPSA id 20sm5706479oth.43.2019.08.19.10.57.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 19 Aug 2019 10:57:59 -0700 (PDT)
+Subject: Re: [PATCH 2/2] staging: rtl8192e: rtllib_crypt_ccmp.c: Use crypto
+ API ccm(aes)
+To:     Christina Quast <contact@christina-quast.de>,
+        ard.biesheuvel@linaro.org
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Payal Kshirsagar <payal.s.kshirsagar.98@gmail.com>,
+        Eric Biggers <ebiggers@google.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        devel@driverdev.osuosl.org, linux-kernel@vger.kernel.org,
+        Anushka Shukla <anushkacharu9@gmail.com>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Zach Turner <turnerzdp@gmail.com>,
+        linux-wireless@vger.kernel.org,
+        Johannes Berg <johannes@sipsolutions.net>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org
+References: <20190816065936.12214-1-contact@christina-quast.de>
+ <20190816065936.12214-3-contact@christina-quast.de>
+From:   Larry Finger <Larry.Finger@lwfinger.net>
+Message-ID: <767c52c9-71ba-6639-631d-6f3cb0d6951c@lwfinger.net>
+Date:   Mon, 19 Aug 2019 12:57:57 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1565682784-10234-2-git-send-email-sumit.garg@linaro.org>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-User-Agent: NeoMutt/20180716
+In-Reply-To: <20190816065936.12214-3-contact@christina-quast.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Aug 13, 2019 at 01:23:00PM +0530, Sumit Garg wrote:
-> Move tpm_buf code to common include/linux/tpm.h header so that it can
-> be reused via other subsystems like trusted keys etc.
+On 8/16/19 1:59 AM, Christina Quast wrote:
+> Use ccm(aes) aead transform instead of invoking the AES block cipher
+> block by block.
 > 
-> Also rename trusted keys TPM 1.x buffer implementation to tpm1_buf to
-> avoid any compilation errors.
-> 
-> Suggested-by: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-> Signed-off-by: Sumit Garg <sumit.garg@linaro.org>
+> Signed-off-by: Christina Quast <contact@christina-quast.de>
+> ---
+>   drivers/staging/rtl8192e/Kconfig             |   1 +
+>   drivers/staging/rtl8192e/rtllib_crypt_ccmp.c | 187 ++++++++-----------
+>   2 files changed, 78 insertions(+), 110 deletions(-)
 
-A question: did you try to do this as mechanically as you ever could
-or did you do any other code changes? I did go through it but it is
-possible that I missed something.
+Tested-by: Larry Finger <Larry.finger@lwfinger.net>
 
-In this type of changes it is mandatory be extra strict on not doing
-anything extra (the rename you would was not of course extra because
-it was necessary to do).
+This change for the RTL8192E works. I do not have the hardware for testing the 
+equivalent change for r8192u, but as the changes look the same, that one is 
+likely OK as well.
 
-/Jarkko
+Thanks for the change,
+
+Larry
