@@ -2,69 +2,67 @@ Return-Path: <SRS0=LpGJ=WP=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C28EC41514
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Aug 2019 05:18:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18F69C3A59B
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Aug 2019 06:32:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0B8092086C
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Aug 2019 05:18:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E802C20851
+	for <linux-crypto@archiver.kernel.org>; Mon, 19 Aug 2019 06:32:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726132AbfHSFSm (ORCPT
+        id S1725946AbfHSGcc (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 19 Aug 2019 01:18:42 -0400
-Received: from smtp10.smtpout.orange.fr ([80.12.242.132]:26759 "EHLO
-        smtp.smtpout.orange.fr" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725768AbfHSFSl (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Aug 2019 01:18:41 -0400
-Received: from localhost.localdomain ([92.140.207.10])
-        by mwinf5d86 with ME
-        id qtJc200090Dzhgk03tJcua; Mon, 19 Aug 2019 07:18:39 +0200
-X-ME-Helo: localhost.localdomain
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Mon, 19 Aug 2019 07:18:39 +0200
-X-ME-IP: 92.140.207.10
-From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-To:     herbert@gondor.apana.org.au, davem@davemloft.net
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-janitors@vger.kernel.org,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Subject: [PATCH] crypto: picoxcell - Fix the name of the module in the description of CRYPTO_DEV_PICOXCELL
-Date:   Mon, 19 Aug 2019 07:18:33 +0200
-Message-Id: <20190819051833.6622-1-christophe.jaillet@wanadoo.fr>
-X-Mailer: git-send-email 2.20.1
+        Mon, 19 Aug 2019 02:32:32 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:57698 "EHLO fornost.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725308AbfHSGcb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 19 Aug 2019 02:32:31 -0400
+Received: from gondolin.me.apana.org.au ([192.168.0.6] helo=gondolin.hengli.com.au)
+        by fornost.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
+        id 1hzbDI-0007E9-Fk; Mon, 19 Aug 2019 16:32:20 +1000
+Received: from herbert by gondolin.hengli.com.au with local (Exim 4.80)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1hzbDG-0008Jt-7T; Mon, 19 Aug 2019 16:32:18 +1000
+Date:   Mon, 19 Aug 2019 16:32:18 +1000
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     linux-crypto@vger.kernel.org, Eric Biggers <ebiggers@google.com>,
+        dm-devel@redhat.com, linux-fscrypt@vger.kernel.org,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Milan Broz <gmazyland@gmail.com>
+Subject: Re: [PATCH v12 1/4] crypto: essiv - create wrapper template for
+ ESSIV generation
+Message-ID: <20190819063218.GA31821@gondor.apana.org.au>
+References: <20190815192858.28125-1-ard.biesheuvel@linaro.org>
+ <20190815192858.28125-2-ard.biesheuvel@linaro.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190815192858.28125-2-ard.biesheuvel@linaro.org>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The help section says that the module will be called 'pipcoxcell_crypto'.
-This is likely a typo.
-Use 'picoxcell_crypto' instead
+On Thu, Aug 15, 2019 at 10:28:55PM +0300, Ard Biesheuvel wrote:
+>
+> +	/* Synchronous hash, e.g., "sha256" */
+> +	ictx->hash = crypto_alloc_shash(shash_name, 0, 0);
+> +	if (IS_ERR(ictx->hash)) {
+> +		err = PTR_ERR(ictx->hash);
+> +		goto out_drop_skcipher;
+> +	}
 
-Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
----
- drivers/crypto/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Holding a reference to this algorithm for the life-time of the
+instance is not nice.  How about just doing a lookup as you were
+doing before with crypto_alg_mod_lookup and getting the cra_name
+from that?
 
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index b8c50871f11b..2305416c2393 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -393,7 +393,7 @@ config CRYPTO_DEV_PICOXCELL
- 	  Picochip picoXcell SoC devices. Select this for IPSEC ESP offload
- 	  and for 3gpp Layer 2 ciphering support.
- 
--	  Saying m here will build a module named pipcoxcell_crypto.
-+	  Saying m here will build a module named picoxcell_crypto.
- 
- config CRYPTO_DEV_SAHARA
- 	tristate "Support for SAHARA crypto accelerator"
+Thanks,
 -- 
-2.20.1
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
