@@ -1,206 +1,128 @@
-Return-Path: <SRS0=LpGJ=WP=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=8F2V=WQ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35DB5C3A5A0
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Aug 2019 23:44:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B029C3A589
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Aug 2019 05:47:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EE9D722CF8
-	for <linux-crypto@archiver.kernel.org>; Mon, 19 Aug 2019 23:44:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1B8B822CF4
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Aug 2019 05:47:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="K/sy7g3s"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ONrMQaez"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728578AbfHSXoT (ORCPT
+        id S1729206AbfHTFq7 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 19 Aug 2019 19:44:19 -0400
-Received: from mailout3.samsung.com ([203.254.224.33]:22201 "EHLO
-        mailout3.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728305AbfHSXoT (ORCPT
+        Tue, 20 Aug 2019 01:46:59 -0400
+Received: from mail-lf1-f41.google.com ([209.85.167.41]:45612 "EHLO
+        mail-lf1-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729203AbfHTFq7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 19 Aug 2019 19:44:19 -0400
-Received: from epcas1p2.samsung.com (unknown [182.195.41.46])
-        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20190819234417epoutp033129d52a2ab68cfe307c50bcfb50c6ec~8d5Yp4_yK0433904339epoutp03H
-        for <linux-crypto@vger.kernel.org>; Mon, 19 Aug 2019 23:44:17 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20190819234417epoutp033129d52a2ab68cfe307c50bcfb50c6ec~8d5Yp4_yK0433904339epoutp03H
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1566258257;
-        bh=vmQQpSvhO+NOIFRR33czksndsdtC6ZWE3vrlipr9SU0=;
-        h=Subject:To:From:Date:In-Reply-To:References:From;
-        b=K/sy7g3sqhM5o09aJf2zg2WLLjCgcs0fqBl/q2EfBLQisuIDhGHKQrMqgwXZuQ+DD
-         N3YQu4nb6oatCniNUuMak9wQZJhDm6QkEQwmezy/E7nMrUEngwDrgIrrcDtAsEmqrZ
-         zGxE6feVtqnVVUDoM9xeMJ0hHHPH/ki4BcHO4/Xo=
-Received: from epsnrtp5.localdomain (unknown [182.195.42.166]) by
-        epcas1p4.samsung.com (KnoxPortal) with ESMTP id
-        20190819234416epcas1p47ce8684570146aa0344c59cabf337814~8d5YR6nyQ1517015170epcas1p4M;
-        Mon, 19 Aug 2019 23:44:16 +0000 (GMT)
-Received: from epsmges1p3.samsung.com (unknown [182.195.40.157]) by
-        epsnrtp5.localdomain (Postfix) with ESMTP id 46C9W23v0FzMqYkf; Mon, 19 Aug
-        2019 23:44:14 +0000 (GMT)
-Received: from epcas1p4.samsung.com ( [182.195.41.48]) by
-        epsmges1p3.samsung.com (Symantec Messaging Gateway) with SMTP id
-        FC.91.04066.E443B5D5; Tue, 20 Aug 2019 08:44:14 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-        epcas1p3.samsung.com (KnoxPortal) with ESMTPA id
-        20190819234413epcas1p39f66a61fda4a86b7913d6f9bd7ba8c55~8d5U9KjTh0081300813epcas1p3-;
-        Mon, 19 Aug 2019 23:44:13 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20190819234413epsmtrp2e632f52582d069a8cc20b205d1a4a5b2~8d5U8NuEm2043620436epsmtrp2Q;
-        Mon, 19 Aug 2019 23:44:13 +0000 (GMT)
-X-AuditID: b6c32a37-e27ff70000000fe2-c5-5d5b344e3b33
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        91.42.03706.D443B5D5; Tue, 20 Aug 2019 08:44:13 +0900 (KST)
-Received: from [10.113.221.102] (unknown [10.113.221.102]) by
-        epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-        20190819234412epsmtip12cb3f8d7a40f36bb54864a1ce6b17f1e~8d5UpZc081355113551epsmtip19;
-        Mon, 19 Aug 2019 23:44:12 +0000 (GMT)
-Subject: Re: [PATCH] MAINTAINERS: Extend patterns for Samsung SoC, Security
- Subsystem and clock drivers
-To:     Krzysztof Kozlowski <krzk@kernel.org>,
-        Kukjin Kim <kgene@kernel.org>,
-        Vladimir Zapolskiy <vz@mleia.com>,
-        Kamil Konieczny <k.konieczny@partner.samsung.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Sylwester Nawrocki <s.nawrocki@samsung.com>,
-        Tomasz Figa <tomasz.figa@gmail.com>,
-        Michael Turquette <mturquette@baylibre.com>,
-        Stephen Boyd <sboyd@kernel.org>,
-        linux-arm-kernel@lists.infradead.org,
-        linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-clk@vger.kernel.org,
-        "cpgs (cpgs@samsung.com)" <cpgs@samsung.com>
-From:   Chanwoo Choi <cw00.choi@samsung.com>
-Organization: Samsung Electronics
-Message-ID: <0bc1c3a5-cdf2-eeab-e547-97598ca1fbd1@samsung.com>
-Date:   Tue, 20 Aug 2019 08:48:07 +0900
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
-        Thunderbird/60.8.0
+        Tue, 20 Aug 2019 01:46:59 -0400
+Received: by mail-lf1-f41.google.com with SMTP id a30so3124054lfk.12
+        for <linux-crypto@vger.kernel.org>; Mon, 19 Aug 2019 22:46:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=w/16MSoB080+HPdEFGeDYjIeK82W9jRb08AH0y5e7ug=;
+        b=ONrMQaez/cE4lLvCHTz83wtZhsB6/S4LzrA9EZrBW2K3t2ECG+uxRDWV23qT9rLzpN
+         1z3IWOd8jc1HkoLiDGbFYVOMNA6odIeqAnNGVhbYia9Hts4arGeJW6Y6NJOvCLd/3ST+
+         Zx5c8d1x7LnZisVXAmLmVMQRX9O1ye60gMU638z3Yrup9N0o4Yeq8zJ14bzMFirSydY9
+         HK8q5i/NI6Wdw90AuotXYccM85of5EJzPuPozi5EsiNpb6/QY52qzmvWjo2zFjRk7gg7
+         xJ2sGUa8uxrHMISm2XaEQ5+EyKQWPzc7vMAjHtlVpEpEhIPS+55ytCUNUjSiQ+EuOFz2
+         JaLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=w/16MSoB080+HPdEFGeDYjIeK82W9jRb08AH0y5e7ug=;
+        b=PslANN36u5g52j4+yQci4RyBKlK35MJU2UB7wGegRUw1ZgfQBKdWM5xF70EHCprq4d
+         XHlrGQOO/9smpQqvAkNvqMH0/1uC9BhveYfiGy7ZQq79jJlq7rSIgpI4peZm90PT1Fcd
+         gvLI/kRNJ8upz6Kwyb562nJjuIQBMHF7C+u7GHFmWe837W/ZgQr36+dRc3IDtx9uOL5P
+         LIC3mo/cnWe9WYTZXUoVk+OJbJJ07YvxEiUVIIrSSUu5ErH9KekdY2hKfzbjSJfyBWYk
+         odXwlwmdxo5oHQEdj0rNsECsRb+Y02qMV8NY8nrGP93+2c2xfNasRFK+F9lCNCL9615C
+         zmxA==
+X-Gm-Message-State: APjAAAWUYK0t7mGmoWfrzMB0jdVY+3sktf3WA4+OqcVuvVbRqHng+VMA
+        0lVwsLabh1iW86wAn8Pr9JLaQEpm2WJfiDBHZY9sVw==
+X-Google-Smtp-Source: APXvYqzXgsI4jHSs1KfPdhgjOlMxnhbURzhgo1Vij0mJo5HH0MGoR46f8bFCz8tBN4/AFA4sE2vR/FBxk0cIvZrvyJk=
+X-Received: by 2002:ac2:5637:: with SMTP id b23mr14863080lff.186.1566280017646;
+ Mon, 19 Aug 2019 22:46:57 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20190818172750.20921-1-krzk@kernel.org>
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrOJsWRmVeSWpSXmKPExsWy7bCmga6fSXSswdn10hYvD2lazDnfwmLR
-        /UrGom/ff0aL/sevmS3On9/AbrHp8TVWi48991gt7t/7yWRxedccNosZ5/cxWVw85Wpx+E07
-        q8W/axtZLFbt+sNo8f9XM7ODgMf7G63sHltW3mTy2DnrLrvHtgOqHptWdbJ5bF5S7/Fv4RQW
-        j4Pv9jB59G1ZxejxeZNcAFdUtk1GamJKapFCal5yfkpmXrqtkndwvHO8qZmBoa6hpYW5kkJe
-        Ym6qrZKLT4CuW2YO0B9KCmWJOaVAoYDE4mIlfTubovzSklSFjPziElul1IKUnALLAr3ixNzi
-        0rx0veT8XCtDAwMjU6DChOyMv525BUeFK17/ucvYwHhOoIuRk0NCwERiweL9LF2MXBxCAjsY
-        JT4vvM0I4XxilNg2aw2U841R4sej3cwwLQ3zX7JBJPYySlxcfpgJwnnPKPHn9lwWkCphgUyJ
-        /et/gbWLCLxnkVixeDY7SIJNQEti/4sbbCA2v4CixNUfjxlBbF4BO4ntPc/BbBYBVYkv358y
-        gdiiAhESnx4cZoWoEZQ4OfMJ2AJOAVOJmzv+gp3ELCAucevJfCYIW16ieetsZpDFEgKH2CXe
-        Nr5ng7jbReLy+WusELawxKvjW9ghbCmJz+/2QtVUS6w8eYQNormDUWLL/gtQDcYS+5dOBtrA
-        AbRBU2L9Ln2IsKLEzt9zGSFsXomGjb/ZIY7gk3j3tYcVpBwk3tEmBFGiLHH5wV0mCFtSYnF7
-        J9sERqVZSF6bheSdWUjemYWweAEjyypGsdSC4tz01GLDAmPk6N7ECE7kWuY7GDec8znEKMDB
-        qMTD6zEtKlaINbGsuDL3EKMEB7OSCG/FHKAQb0piZVVqUX58UWlOavEhRlNgyE9klhJNzgdm
-        mbySeENTI2NjYwsTQzNTQ0Mlcd6FPyxihQTSE0tSs1NTC1KLYPqYODilGhgFTl/iu3ZLcmn8
-        kc2Gn2LfbzqnKqL78JLhnsR54m/O6wUUORzdp8I0Mf+/0RqlIy+27tZNeirwrulcStPG5bJS
-        UZO2vp50tub6D6OypX89zR3M2oXuv529vc7JqNV2q88e5ytOHLM9r7jZ7N7VJynXdKJVs8j4
-        2yUznRdL1u9ll83T9GJWfjBZiaU4I9FQi7moOBEAmBA7/PoDAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrKIsWRmVeSWpSXmKPExsWy7bCSnK6vSXSswcF+NouXhzQt5pxvYbHo
-        fiVj0bfvP6NF/+PXzBbnz29gt9j0+Bqrxceee6wW9+/9ZLK4vGsOm8WM8/uYLC6ecrU4/Kad
-        1eLftY0sFqt2/WG0+P+rmdlBwOP9jVZ2jy0rbzJ57Jx1l91j2wFVj02rOtk8Ni+p9/i3cAqL
-        x8F3e5g8+rasYvT4vEkugCuKyyYlNSezLLVI3y6BK+NvZ27BUeGK13/uMjYwnhPoYuTkkBAw
-        kWiY/5Kti5GLQ0hgN6PEnblrWSESkhLTLh5l7mLkALKFJQ4fLoaoecsosX3hTjaQGmGBTIn9
-        638xgiREBL6ySDy/vI8FoqqDUeLMhVZ2kCo2AS2J/S9ugHXwCyhKXP3xmBHE5hWwk9je8xzM
-        ZhFQlfjy/SkTiC0qECFxeMcsqBpBiZMzn7CA2JwCphI3d/xlBrGZBdQl/sy7BGWLS9x6Mp8J
-        wpaXaN46m3kCo9AsJO2zkLTMQtIyC0nLAkaWVYySqQXFuem5xYYFhnmp5XrFibnFpXnpesn5
-        uZsYwZGrpbmD8fKS+EOMAhyMSjy8HtOiYoVYE8uKK3MPMUpwMCuJ8FbMAQrxpiRWVqUW5ccX
-        leakFh9ilOZgURLnfZp3LFJIID2xJDU7NbUgtQgmy8TBKdXAuE5MkVdHNyGI8+gTps332Lo7
-        Sr49qVO8oLLr1NbleT8qDeWv+77JPtuvmr/y7+RHTcb/Hiu5pynFzJgVoJacnpN2IEZsft/S
-        4yVOL+I1Awzazv5jXCCyT8+Zf8GZ5X98yysPrtnKE9f76pZ+jq/KpHulW6fc8Jz+SjPt0Z8F
-        F7fJR5w3dfBWV2Ipzkg01GIuKk4EAOjbrsTYAgAA
-X-CMS-MailID: 20190819234413epcas1p39f66a61fda4a86b7913d6f9bd7ba8c55
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: SVC_REQ_APPROVE
-X-CPGSPASS: Y
-CMS-TYPE: 101P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20190818172803epcas1p32db0707cb391c5ca1795ba2690284a56
-References: <CGME20190818172803epcas1p32db0707cb391c5ca1795ba2690284a56@epcas1p3.samsung.com>
-        <20190818172750.20921-1-krzk@kernel.org>
+References: <1565682784-10234-1-git-send-email-sumit.garg@linaro.org> <20190819165400.xsgpbtbj26y7d2wb@linux.intel.com>
+In-Reply-To: <20190819165400.xsgpbtbj26y7d2wb@linux.intel.com>
+From:   Sumit Garg <sumit.garg@linaro.org>
+Date:   Tue, 20 Aug 2019 11:16:46 +0530
+Message-ID: <CAFA6WYMCjKCf=aCVEXrQtZJ57V+2MCLNZKov6t37unzgpLmc0A@mail.gmail.com>
+Subject: Re: [RFC/RFT v4 0/5] Add generic trusted keys framework/subsystem
+To:     Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+Cc:     keyrings@vger.kernel.org, linux-integrity@vger.kernel.org,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        linux-security-module@vger.kernel.org, dhowells@redhat.com,
+        Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
+        peterhuewe@gmx.de, jgg@ziepe.ca, jejb@linux.ibm.com,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Casey Schaufler <casey@schaufler-ca.com>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Daniel Thompson <daniel.thompson@linaro.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "tee-dev @ lists . linaro . org" <tee-dev@lists.linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Krzysztof,
+On Mon, 19 Aug 2019 at 22:24, Jarkko Sakkinen
+<jarkko.sakkinen@linux.intel.com> wrote:
+>
+> On Tue, Aug 13, 2019 at 01:22:59PM +0530, Sumit Garg wrote:
+> > This patch-set is an outcome of discussion here [1]. It has evolved very
+> > much since v1 to create, consolidate and generalize trusted keys
+> > subsystem.
+> >
+> > This framework has been tested with trusted keys support provided via TEE
+> > but I wasn't able to test it with a TPM device as I don't possess one. It
+> > would be really helpful if others could test this patch-set using a TPM
+> > device.
+>
+> I think 1/5-4/5 make up a non-RFC patch set that needs to reviewed,
+> tested and merged as a separate entity.
+>
 
-On 19. 8. 19. 오전 2:27, Krzysztof Kozlowski wrote:
-> Extend the patterns to cover all related files in respective
-> categories:
-> 1. Samsung Exynos ARM architecture: add soc drivers headers and make
->    directory matches consistent,
-> 2. Samsung Security SubSystem driver (crypto): add bindings,
-> 3. Samsung SoC clock drivers: add S3C24xx, S3C64xx and S5Pv210 bindings.
-> 
-> Cc: Kukjin Kim <kgene@kernel.org>
-> Cc: Vladimir Zapolskiy <vz@mleia.com>
-> Cc: Kamil Konieczny <k.konieczny@partner.samsung.com>
-> Cc: Sylwester Nawrocki <s.nawrocki@samsung.com>
-> Cc: Tomasz Figa <tomasz.figa@gmail.com>
-> Cc: Chanwoo Choi <cw00.choi@samsung.com>
-> Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
-> 
-> ---
-> 
-> Cc: linux-arm-kernel@lists.infradead.org
-> Cc: linux-samsung-soc@vger.kernel.org
-> Cc: linux-crypto@vger.kernel.org
-> Cc: linux-clk@vger.kernel.org
-> ---
->  MAINTAINERS | 9 +++++++--
->  1 file changed, 7 insertions(+), 2 deletions(-)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 420567d1519a..35a4002ac58b 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -2199,8 +2199,9 @@ F:	drivers/*/*s3c24*
->  F:	drivers/*/*/*s3c24*
->  F:	drivers/*/*s3c64xx*
->  F:	drivers/*/*s5pv210*
-> -F:	drivers/memory/samsung/*
-> -F:	drivers/soc/samsung/*
-> +F:	drivers/memory/samsung/
-> +F:	drivers/soc/samsung/
-> +F:	include/linux/soc/samsung/
->  F:	Documentation/arm/samsung/
->  F:	Documentation/devicetree/bindings/arm/samsung/
->  F:	Documentation/devicetree/bindings/sram/samsung-sram.txt
-> @@ -14174,6 +14175,8 @@ M:	Kamil Konieczny <k.konieczny@partner.samsung.com>
->  L:	linux-crypto@vger.kernel.org
->  L:	linux-samsung-soc@vger.kernel.org
->  S:	Maintained
-> +F:	Documentation/devicetree/bindings/crypto/samsung-slimsss.txt
-> +F:	Documentation/devicetree/bindings/crypto/samsung-sss.txt
->  F:	drivers/crypto/s5p-sss.c
->  
->  SAMSUNG S5P/EXYNOS4 SOC SERIES CAMERA SUBSYSTEM DRIVERS
-> @@ -14194,6 +14197,8 @@ T:	git git://git.kernel.org/pub/scm/linux/kernel/git/snawrocki/clk.git
->  F:	drivers/clk/samsung/
->  F:	include/dt-bindings/clock/exynos*.h
->  F:	Documentation/devicetree/bindings/clock/exynos*.txt
-> +F:	Documentation/devicetree/bindings/clock/samsung,s3c*
-> +F:	Documentation/devicetree/bindings/clock/samsung,s5p*
->  
->  SAMSUNG SPI DRIVERS
->  M:	Kukjin Kim <kgene@kernel.org>
-> 
+Okay.
 
-For clock part,
-Acked-by: Chanwoo Choi <cw00.choi@samsung.com>
+> On the other hand 5/5 cannot be merged even if I fully agreed on
+> the code change as without TEE patch it does not add any value for
+> Linux.
+>
 
+I agree here that 5/5 should go along with TEE patch-set. But if you
+look at initial v1 patch-set, the idea was to get feedback on trusted
+keys abstraction as a standalone patch along with testing using a TPM
+(1.x or 2.0).
 
--- 
-Best Regards,
-Chanwoo Choi
-Samsung Electronics
+Since Mimi has tested this patch-set with TPM (1.x & 2.0), I am happy
+to merge 5/5 with TEE patch-set. But it would be nice if I could get
+feedback on 5/5 before I send next version of TEE patch-set.
+
+> To straighten up thing I would suggest that the next patch set
+> version would only consists of the first four patches and we meld
+> them to the shape so that we can land them to the mainline. Then
+> it should be way more easier to concentrate the actual problem you
+> are trying to resolve.
+>
+
+Okay will send next patch-set version with first four patches only.
+
+-Sumit
+
+> /Jarkko
