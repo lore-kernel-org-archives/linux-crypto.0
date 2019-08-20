@@ -8,69 +8,69 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBE8FC3A589
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Aug 2019 20:25:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70D5FC3A589
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Aug 2019 20:25:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A0A7122DA7
-	for <linux-crypto@archiver.kernel.org>; Tue, 20 Aug 2019 20:25:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3D91C20656
+	for <linux-crypto@archiver.kernel.org>; Tue, 20 Aug 2019 20:25:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b2j97Yov"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FIyKFSdk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730868AbfHTUYa (ORCPT
+        id S1730701AbfHTUZy (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 20 Aug 2019 16:24:30 -0400
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:37498 "EHLO
+        Tue, 20 Aug 2019 16:25:54 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:37499 "EHLO
         mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730945AbfHTUY2 (ORCPT
+        with ESMTP id S1730960AbfHTUYa (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 20 Aug 2019 16:24:28 -0400
-Received: by mail-pg1-f193.google.com with SMTP id d1so3854903pgp.4;
-        Tue, 20 Aug 2019 13:24:28 -0700 (PDT)
+        Tue, 20 Aug 2019 16:24:30 -0400
+Received: by mail-pg1-f193.google.com with SMTP id d1so3854925pgp.4;
+        Tue, 20 Aug 2019 13:24:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=A5lDnd8eVvfq+kCvLcv1hClJ0+Pl3iOhVfhCY8P+8Co=;
-        b=b2j97YovLIHp5xxOdugL7nr3uSzmUNhxWA3K/ajdWSRMqJlOND2Hiy09Uq+IcRNrNo
-         r+kA7q69WTT2p4myq66y+dBQ9/UMvnSRQ/dG3GuZUl5b0mxgVbrbB9Py9VD/PXeYIPAv
-         mIMqForviqqPvQtzDBVlESERyI2H74bysVZrnzrqJdpJbQEmzR2ypKzR3VtxLhXVYDSn
-         LeKDlpNqLcEzkkyE8fGodZeJUqIdFIV0dR1/DeMOKdiAOigiWKwH27VH35rUq+Chq5E/
-         aQ5bV9UMw4PnYycqea+xSyd2KIu1XKm7UTwNMS2h5A+XdnUcvYsaLtgG7pQsrr9DtjU+
-         rQmQ==
+        bh=EkecJex3KsSic/Qy+1RssDASBZDazMTOQb79fcVzmGs=;
+        b=FIyKFSdk7qUTXkHbGlwLUztwVgFcwW31bVjjsblf2gW+yoCwDVkBU9wZ/5cnklME9d
+         F6B7a8OUrvRnr9zOpNxinE9eFckBXtLAnk2u5H51YOg2tZBe7PmoNEpEuelZPdwutXxG
+         7OOwgZsWMzkkeclMxBcDMY430ZtpJOl5LL+qliyBKY22Ch09eZUqaFkBr1vhnW+rVvzX
+         fp9gkFwjTIUjwqWBvPIoz45DDWZ9ZMNAWvpZLSQ4lEMlFUeGHOMIBsGQnM+a9EqBoNQ2
+         APzfEfRoBwO9GNwC79jkUuyhspWh5c53fTRKfUL/oSzaL4AXOifRD6jDJAtLhAeInCIb
+         dGVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=A5lDnd8eVvfq+kCvLcv1hClJ0+Pl3iOhVfhCY8P+8Co=;
-        b=jAu7IPjL3rybSQSYT+ZkeLbG5Lg7aeKZMofqLmXWEB2D0kwoigispjcs60XirvBd2z
-         XFnVrXg2o92/Oi7gyCcHxr7d0p2nO0r98Pf7PIDtTKw6AfuFR578yXlBya0Ri6P6hJ1f
-         DyDNFq46gma/lYZI7QtIDx/PZptfASngzqCx0i/wH78nBOlRqRJh/zX7gXVbq6Vqr4RD
-         CPXiDgAsHfJULxDl/jFji2CCd0SEhju5cbqZSWBfEY05jzXOT3QJzGKq/LMB/LHssZIb
-         jwKuNRrT0eZGoUIlQMgtdQUjhft23v/o2hyE3flWAN3rUpEWvjHBpQXULnkPaEOZRZ1F
-         KLQQ==
-X-Gm-Message-State: APjAAAX7dZS5HAJ9TC+DTDPRl3r+cr98L+MVjcrOVpwKl4iiQceiuBdI
-        oJA+5rFhVJfSKueQsnDZ7cMu0HitEug=
-X-Google-Smtp-Source: APXvYqyx/FGXC5cukzWgJfw79w47kkpkESOi82nAP1ZIFqMDXLcy0s/ZmGJ91Yg7dNdMzX0kl5usgA==
-X-Received: by 2002:a63:e5a:: with SMTP id 26mr25375895pgo.3.1566332667476;
-        Tue, 20 Aug 2019 13:24:27 -0700 (PDT)
+        bh=EkecJex3KsSic/Qy+1RssDASBZDazMTOQb79fcVzmGs=;
+        b=sCNTMQWeU2aZdCOJI12RaPg44aNKlqzJyyDxjOoXTJhoquL2FV1RYRO3fbBxEO8XVM
+         80HHSPlfODXrp7xJiey7O8KET7ttWuWDE3KhDb49g9oxv2GReqEqvBG/fEaOJR4di+ZL
+         FLy2jnPQTSETRm6IeX774Z7tM6fOCLyA6ZJaVrQTjtzxzjoyO2zGjRQHyi8oONJtxAVh
+         okdGMPyOCNbrlpA9J5P65GlNszLAMEi6OwtbS/Uj3ur+cs11XiJkm3R5+uIJZP5cbAyd
+         sPn1DJml1g0PV/9E98ba2rBS0vP9SJvobdELgn/Ss90s3bgf9dKRtpw83pBYyj4Usfw2
+         /pmw==
+X-Gm-Message-State: APjAAAUUxnh+mWAMh/awOirZ5N4iMJ2GH8NFerjPzAUjOy4dGnrJ762s
+        39ppXgL9rPic/HpQ5JFbw0SHhiMh/lc=
+X-Google-Smtp-Source: APXvYqz/ScGXXgxfEg+x1r2hsIGpLKBY4u1tcq3OYr/X+lZGRB7g63CXow/92LVCPvlQwHRSbMwnRg==
+X-Received: by 2002:a17:90a:148:: with SMTP id z8mr1733381pje.96.1566332669015;
+        Tue, 20 Aug 2019 13:24:29 -0700 (PDT)
 Received: from localhost.lan (c-67-185-54-80.hsd1.wa.comcast.net. [67.185.54.80])
-        by smtp.gmail.com with ESMTPSA id k3sm36149846pfg.23.2019.08.20.13.24.26
+        by smtp.gmail.com with ESMTPSA id k3sm36149846pfg.23.2019.08.20.13.24.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Aug 2019 13:24:26 -0700 (PDT)
+        Tue, 20 Aug 2019 13:24:28 -0700 (PDT)
 From:   Andrey Smirnov <andrew.smirnov@gmail.com>
 To:     linux-crypto@vger.kernel.org
 Cc:     Andrey Smirnov <andrew.smirnov@gmail.com>,
-        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
         Chris Spencer <christopher.spencer@sea.co.uk>,
         Cory Tusar <cory.tusar@zii.aero>,
         Chris Healy <cphealy@gmail.com>,
         Lucas Stach <l.stach@pengutronix.de>,
+        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
         Aymen Sghaier <aymen.sghaier@nxp.com>,
         Leonard Crestez <leonard.crestez@nxp.com>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v8 07/16] crypto: caam - drop 64-bit only wr/rd_reg64()
-Date:   Tue, 20 Aug 2019 13:23:53 -0700
-Message-Id: <20190820202402.24951-8-andrew.smirnov@gmail.com>
+Subject: [PATCH v8 08/16] crypto: caam - share definition for MAX_SDLEN
+Date:   Tue, 20 Aug 2019 13:23:54 -0700
+Message-Id: <20190820202402.24951-9-andrew.smirnov@gmail.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190820202402.24951-1-andrew.smirnov@gmail.com>
 References: <20190820202402.24951-1-andrew.smirnov@gmail.com>
@@ -82,11 +82,10 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Since 32-bit of both wr_reg64 and rd_reg64 now use 64-bit IO helpers,
-these functions should no longer be necessary. No functional change intended.
+Both qi.h and cammalg_qi2.h seem to define identical versions of
+MAX_SDLEN. Move it to desc_constr.h to avoid duplication.
 
 Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
-Reviewed-by: Horia Geantă <horia.geanta@nxp.com>
 Cc: Chris Spencer <christopher.spencer@sea.co.uk>
 Cc: Cory Tusar <cory.tusar@zii.aero>
 Cc: Chris Healy <cphealy@gmail.com>
@@ -97,46 +96,124 @@ Cc: Leonard Crestez <leonard.crestez@nxp.com>
 Cc: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
 ---
- drivers/crypto/caam/regs.h | 19 -------------------
- 1 file changed, 19 deletions(-)
+ drivers/crypto/caam/caamalg_qi2.h | 27 ---------------------------
+ drivers/crypto/caam/desc_constr.h | 27 +++++++++++++++++++++++++++
+ drivers/crypto/caam/qi.h          | 26 --------------------------
+ 3 files changed, 27 insertions(+), 53 deletions(-)
 
-diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h
-index 4efc10534873..489d6c1eec7d 100644
---- a/drivers/crypto/caam/regs.h
-+++ b/drivers/crypto/caam/regs.h
-@@ -138,24 +138,6 @@ static inline void clrsetbits_32(void __iomem *reg, u32 clear, u32 set)
-  *    base + 0x0000 : least-significant 32 bits
-  *    base + 0x0004 : most-significant 32 bits
-  */
--#ifdef CONFIG_64BIT
--static inline void wr_reg64(void __iomem *reg, u64 data)
--{
--	if (caam_little_end)
--		iowrite64(data, reg);
--	else
--		iowrite64be(data, reg);
--}
--
--static inline u64 rd_reg64(void __iomem *reg)
--{
--	if (caam_little_end)
--		return ioread64(reg);
--	else
--		return ioread64be(reg);
--}
--
--#else /* CONFIG_64BIT */
- static inline void wr_reg64(void __iomem *reg, u64 data)
- {
- 	if (caam_little_end) {
-@@ -187,7 +169,6 @@ static inline u64 rd_reg64(void __iomem *reg)
- 		return ioread64be(reg);
- 	}
- }
--#endif /* CONFIG_64BIT  */
+diff --git a/drivers/crypto/caam/caamalg_qi2.h b/drivers/crypto/caam/caamalg_qi2.h
+index b450e2a25c1f..706736776b47 100644
+--- a/drivers/crypto/caam/caamalg_qi2.h
++++ b/drivers/crypto/caam/caamalg_qi2.h
+@@ -92,33 +92,6 @@ struct dpaa2_caam_priv_per_cpu {
+ 	struct dpaa2_io *dpio;
+ };
  
- static inline u64 cpu_to_caam_dma64(dma_addr_t value)
- {
+-/*
+- * The CAAM QI hardware constructs a job descriptor which points
+- * to shared descriptor (as pointed by context_a of FQ to CAAM).
+- * When the job descriptor is executed by deco, the whole job
+- * descriptor together with shared descriptor gets loaded in
+- * deco buffer which is 64 words long (each 32-bit).
+- *
+- * The job descriptor constructed by QI hardware has layout:
+- *
+- *	HEADER		(1 word)
+- *	Shdesc ptr	(1 or 2 words)
+- *	SEQ_OUT_PTR	(1 word)
+- *	Out ptr		(1 or 2 words)
+- *	Out length	(1 word)
+- *	SEQ_IN_PTR	(1 word)
+- *	In ptr		(1 or 2 words)
+- *	In length	(1 word)
+- *
+- * The shdesc ptr is used to fetch shared descriptor contents
+- * into deco buffer.
+- *
+- * Apart from shdesc contents, the total number of words that
+- * get loaded in deco buffer are '8' or '11'. The remaining words
+- * in deco buffer can be used for storing shared descriptor.
+- */
+-#define MAX_SDLEN	((CAAM_DESC_BYTES_MAX - DESC_JOB_IO_LEN) / CAAM_CMD_SZ)
+-
+ /* Length of a single buffer in the QI driver memory cache */
+ #define CAAM_QI_MEMCACHE_SIZE	512
+ 
+diff --git a/drivers/crypto/caam/desc_constr.h b/drivers/crypto/caam/desc_constr.h
+index 536f360bf131..1fe50a4fefaa 100644
+--- a/drivers/crypto/caam/desc_constr.h
++++ b/drivers/crypto/caam/desc_constr.h
+@@ -18,6 +18,33 @@
+ #define CAAM_DESC_BYTES_MAX (CAAM_CMD_SZ * MAX_CAAM_DESCSIZE)
+ #define DESC_JOB_IO_LEN (CAAM_CMD_SZ * 5 + CAAM_PTR_SZ * 3)
+ 
++/*
++ * The CAAM QI hardware constructs a job descriptor which points
++ * to shared descriptor (as pointed by context_a of FQ to CAAM).
++ * When the job descriptor is executed by deco, the whole job
++ * descriptor together with shared descriptor gets loaded in
++ * deco buffer which is 64 words long (each 32-bit).
++ *
++ * The job descriptor constructed by QI hardware has layout:
++ *
++ *	HEADER		(1 word)
++ *	Shdesc ptr	(1 or 2 words)
++ *	SEQ_OUT_PTR	(1 word)
++ *	Out ptr		(1 or 2 words)
++ *	Out length	(1 word)
++ *	SEQ_IN_PTR	(1 word)
++ *	In ptr		(1 or 2 words)
++ *	In length	(1 word)
++ *
++ * The shdesc ptr is used to fetch shared descriptor contents
++ * into deco buffer.
++ *
++ * Apart from shdesc contents, the total number of words that
++ * get loaded in deco buffer are '8' or '11'. The remaining words
++ * in deco buffer can be used for storing shared descriptor.
++ */
++#define MAX_SDLEN	((CAAM_DESC_BYTES_MAX - DESC_JOB_IO_LEN) / CAAM_CMD_SZ)
++
+ #ifdef DEBUG
+ #define PRINT_POS do { printk(KERN_DEBUG "%02d: %s\n", desc_len(desc),\
+ 			      &__func__[sizeof("append")]); } while (0)
+diff --git a/drivers/crypto/caam/qi.h b/drivers/crypto/caam/qi.h
+index f93c9c7ed430..db0549549e3b 100644
+--- a/drivers/crypto/caam/qi.h
++++ b/drivers/crypto/caam/qi.h
+@@ -14,32 +14,6 @@
+ #include "desc.h"
+ #include "desc_constr.h"
+ 
+-/*
+- * CAAM hardware constructs a job descriptor which points to a shared descriptor
+- * (as pointed by context_a of to-CAAM FQ).
+- * When the job descriptor is executed by DECO, the whole job descriptor
+- * together with shared descriptor gets loaded in DECO buffer, which is
+- * 64 words (each 32-bit) long.
+- *
+- * The job descriptor constructed by CAAM hardware has the following layout:
+- *
+- *	HEADER		(1 word)
+- *	Shdesc ptr	(1 or 2 words)
+- *	SEQ_OUT_PTR	(1 word)
+- *	Out ptr		(1 or 2 words)
+- *	Out length	(1 word)
+- *	SEQ_IN_PTR	(1 word)
+- *	In ptr		(1 or 2 words)
+- *	In length	(1 word)
+- *
+- * The shdesc ptr is used to fetch shared descriptor contents into DECO buffer.
+- *
+- * Apart from shdesc contents, the total number of words that get loaded in DECO
+- * buffer are '8' or '11'. The remaining words in DECO buffer can be used for
+- * storing shared descriptor.
+- */
+-#define MAX_SDLEN	((CAAM_DESC_BYTES_MAX - DESC_JOB_IO_LEN) / CAAM_CMD_SZ)
+-
+ /* Length of a single buffer in the QI driver memory cache */
+ #define CAAM_QI_MEMCACHE_SIZE	768
+ 
 -- 
 2.21.0
 
