@@ -2,33 +2,34 @@ Return-Path: <SRS0=bUM2=WR=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F593C3A5A1
-	for <linux-crypto@archiver.kernel.org>; Wed, 21 Aug 2019 19:12:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCF45C3A59E
+	for <linux-crypto@archiver.kernel.org>; Wed, 21 Aug 2019 19:14:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 64C35216F4
-	for <linux-crypto@archiver.kernel.org>; Wed, 21 Aug 2019 19:12:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8A4D5216F4
+	for <linux-crypto@archiver.kernel.org>; Wed, 21 Aug 2019 19:14:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729641AbfHUTMw (ORCPT
+        id S1729731AbfHUTOD (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 21 Aug 2019 15:12:52 -0400
-Received: from mga18.intel.com ([134.134.136.126]:22807 "EHLO mga18.intel.com"
+        Wed, 21 Aug 2019 15:14:03 -0400
+Received: from mga11.intel.com ([192.55.52.93]:18917 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729635AbfHUTMw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 21 Aug 2019 15:12:52 -0400
-X-Amp-Result: UNSCANNABLE
+        id S1727038AbfHUTOD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 21 Aug 2019 15:14:03 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 21 Aug 2019 12:12:51 -0700
+  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 21 Aug 2019 12:14:02 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.64,412,1559545200"; 
-   d="scan'208";a="178596098"
+   d="scan'208";a="178596414"
 Received: from kumarsh1-mobl.ger.corp.intel.com (HELO localhost) ([10.249.33.104])
-  by fmsmga008.fm.intel.com with ESMTP; 21 Aug 2019 12:12:43 -0700
-Date:   Wed, 21 Aug 2019 22:12:42 +0300
+  by fmsmga008.fm.intel.com with ESMTP; 21 Aug 2019 12:13:55 -0700
+Date:   Wed, 21 Aug 2019 22:13:54 +0300
 From:   Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
 To:     Sumit Garg <sumit.garg@linaro.org>
 Cc:     keyrings@vger.kernel.org, linux-integrity@vger.kernel.org,
@@ -47,15 +48,16 @@ Cc:     keyrings@vger.kernel.org, linux-integrity@vger.kernel.org,
         Daniel Thompson <daniel.thompson@linaro.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         "tee-dev @ lists . linaro . org" <tee-dev@lists.linaro.org>
-Subject: Re: [RFC/RFT v4 0/5] Add generic trusted keys framework/subsystem
-Message-ID: <20190821191242.7z3en7om2few4tao@linux.intel.com>
+Subject: Re: [RFC/RFT v4 1/5] tpm: move tpm_buf code to include/linux/
+Message-ID: <20190821191354.4redyuo5j2njkruy@linux.intel.com>
 References: <1565682784-10234-1-git-send-email-sumit.garg@linaro.org>
- <20190819165400.xsgpbtbj26y7d2wb@linux.intel.com>
- <CAFA6WYMCjKCf=aCVEXrQtZJ57V+2MCLNZKov6t37unzgpLmc0A@mail.gmail.com>
+ <1565682784-10234-2-git-send-email-sumit.garg@linaro.org>
+ <20190819165629.qv7cmg6kiwb6oxig@linux.intel.com>
+ <CAFA6WYMoX95UcuGb2UdrUMnq=4wYJChwcMgm8pHHPs_Lg=5iNg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAFA6WYMCjKCf=aCVEXrQtZJ57V+2MCLNZKov6t37unzgpLmc0A@mail.gmail.com>
+In-Reply-To: <CAFA6WYMoX95UcuGb2UdrUMnq=4wYJChwcMgm8pHHPs_Lg=5iNg@mail.gmail.com>
 Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 User-Agent: NeoMutt/20180716
 Sender: linux-crypto-owner@vger.kernel.org
@@ -63,16 +65,27 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Aug 20, 2019 at 11:16:46AM +0530, Sumit Garg wrote:
-> I agree here that 5/5 should go along with TEE patch-set. But if you
-> look at initial v1 patch-set, the idea was to get feedback on trusted
-> keys abstraction as a standalone patch along with testing using a TPM
-> (1.x or 2.0).
+On Tue, Aug 20, 2019 at 11:22:05AM +0530, Sumit Garg wrote:
+> On Mon, 19 Aug 2019 at 22:26, Jarkko Sakkinen
+> <jarkko.sakkinen@linux.intel.com> wrote:
+> >
+> > On Tue, Aug 13, 2019 at 01:23:00PM +0530, Sumit Garg wrote:
+> > > Move tpm_buf code to common include/linux/tpm.h header so that it can
+> > > be reused via other subsystems like trusted keys etc.
+> > >
+> > > Also rename trusted keys TPM 1.x buffer implementation to tpm1_buf to
+> > > avoid any compilation errors.
+> > >
+> > > Suggested-by: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+> > > Signed-off-by: Sumit Garg <sumit.garg@linaro.org>
+> >
+> > A question: did you try to do this as mechanically as you ever could
+> > or did you do any other code changes? I did go through it but it is
+> > possible that I missed something.
+> >
 > 
-> Since Mimi has tested this patch-set with TPM (1.x & 2.0), I am happy
-> to merge 5/5 with TEE patch-set. But it would be nice if I could get
-> feedback on 5/5 before I send next version of TEE patch-set.
+> There aren't any other code changes apart from "tpm1_buf" rename.
 
-OK, that is understandable. I'll check it out tomorrow.
+Thanks. I had to ask because it would be hard to check it manually.
 
 /Jarkko
