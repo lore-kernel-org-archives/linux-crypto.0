@@ -2,95 +2,216 @@ Return-Path: <SRS0=bUM2=WR=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C631C3A59E
-	for <linux-crypto@archiver.kernel.org>; Wed, 21 Aug 2019 04:15:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B93EFC3A5A1
+	for <linux-crypto@archiver.kernel.org>; Wed, 21 Aug 2019 06:37:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5E2B622DD3
-	for <linux-crypto@archiver.kernel.org>; Wed, 21 Aug 2019 04:15:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="OA8QEXLt"
+	by mail.kernel.org (Postfix) with ESMTP id 8F3792087E
+	for <linux-crypto@archiver.kernel.org>; Wed, 21 Aug 2019 06:37:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727397AbfHUEPq (ORCPT
+        id S1728026AbfHUGhI (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 21 Aug 2019 00:15:46 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:39010 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725866AbfHUEPp (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 21 Aug 2019 00:15:45 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7L4E1Jk135181;
-        Wed, 21 Aug 2019 04:15:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=s9qTOfA4d5BMcENzLGFCUjg8Btuu3dasH6vLkzDj+6M=;
- b=OA8QEXLt5yyXLtF09f5Wi8wrSSo5fLPm/h2eMnBBCyUzHRS5k5RTsDBj8D7zLPuKRKQI
- zrIjrOcceYtn3nH1RPMNsr44A5AcP8YFctSJdBgB9Z7i1oIIWHGhrtqC+neh2CGRHJHX
- U3oooCXHfxedTEQlbatlj5zqG3KtP4+699QVojGavN+0qRLkZVki1bUsshSfiOwtuR2W
- AHx+o3EI7BCTsLiJuSUt+ICy1Rl51q1TO1Ynzg7Tnofc6zFpUZ8blhELDF8eStzyUnG3
- 22/Ztjf2LbnYZgT/YTlXDLgxNnslyGxq5osit0uqxmh+/g/VjCx+suKOVq+mlWVzp4PD Ng== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by aserp2120.oracle.com with ESMTP id 2ue9hpjjb6-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 21 Aug 2019 04:15:22 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7L4Dqha143352;
-        Wed, 21 Aug 2019 04:15:22 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by aserp3020.oracle.com with ESMTP id 2ugj7peb84-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 21 Aug 2019 04:15:22 +0000
-Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x7L4FKrh024184;
-        Wed, 21 Aug 2019 04:15:20 GMT
-Received: from [192.168.1.218] (/98.229.125.203)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 20 Aug 2019 21:15:19 -0700
-Subject: Re: [PATCH 0/9] padata: use unbound workqueues for parallel jobs
-To:     Steffen Klassert <steffen.klassert@secunet.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Tejun Heo <tj@kernel.org>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20190813005224.30779-1-daniel.m.jordan@oracle.com>
- <20190820060726.GL2879@gauss3.secunet.de>
-From:   Daniel Jordan <daniel.m.jordan@oracle.com>
-Message-ID: <dd6a7e57-d4ed-c27e-4450-8850762ef042@oracle.com>
-Date:   Wed, 21 Aug 2019 00:15:18 -0400
+        Wed, 21 Aug 2019 02:37:08 -0400
+Received: from a.mx.secunet.com ([62.96.220.36]:43188 "EHLO a.mx.secunet.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727841AbfHUGhI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 21 Aug 2019 02:37:08 -0400
+Received: from localhost (localhost [127.0.0.1])
+        by a.mx.secunet.com (Postfix) with ESMTP id 9F41020571;
+        Wed, 21 Aug 2019 08:37:06 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from a.mx.secunet.com ([127.0.0.1])
+        by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id 4021cwcMpGel; Wed, 21 Aug 2019 08:37:05 +0200 (CEST)
+Received: from mail-essen-01.secunet.de (mail-essen-01.secunet.de [10.53.40.204])
+        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by a.mx.secunet.com (Postfix) with ESMTPS id 5029A200AC;
+        Wed, 21 Aug 2019 08:37:05 +0200 (CEST)
+Received: from gauss2.secunet.de (10.182.7.193) by mail-essen-01.secunet.de
+ (10.53.40.204) with Microsoft SMTP Server id 14.3.439.0; Wed, 21 Aug 2019
+ 08:37:05 +0200
+Received: by gauss2.secunet.de (Postfix, from userid 1000)      id E4FFE31827CE;
+ Wed, 21 Aug 2019 08:37:04 +0200 (CEST)
+Date:   Wed, 21 Aug 2019 08:37:04 +0200
+From:   Steffen Klassert <steffen.klassert@secunet.com>
+To:     Jakub Kicinski <jakub.kicinski@netronome.com>,
+        syzbot <syzbot+6a9ff159672dfbb41c95@syzkaller.appspotmail.com>,
+        <ast@kernel.org>, <aviadye@mellanox.com>, <borisp@mellanox.com>,
+        <bpf@vger.kernel.org>, <daniel@iogearbox.net>,
+        <davejwatson@fb.com>, <davem@davemloft.net>, <hdanton@sina.com>,
+        <john.fastabend@gmail.com>, <netdev@vger.kernel.org>,
+        <syzkaller-bugs@googlegroups.com>, <herbert@gondor.apana.org.au>,
+        <linux-crypto@vger.kernel.org>
+Subject: Re: INFO: task hung in tls_sw_release_resources_tx
+Message-ID: <20190821063704.GM2879@gauss3.secunet.de>
+References: <000000000000523ea3059025b11d@google.com>
+ <000000000000e75f1805902bb919@google.com>
+ <20190816190234.2aaab5b6@cakuba.netronome.com>
+ <20190817054743.GE8209@sol.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20190820060726.GL2879@gauss3.secunet.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9355 signatures=668684
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1906280000 definitions=main-1908210044
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9355 signatures=668684
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
- definitions=main-1908210044
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20190817054743.GE8209@sol.localdomain>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 8/20/19 2:07 AM, Steffen Klassert wrote:
-> Looks good!
+On Fri, Aug 16, 2019 at 10:47:43PM -0700, Eric Biggers wrote:
+> [+Steffen, who is the maintainer of pcrypt]
 > 
-> I did a test with IPsec pcrypt and it seems to work as expected.
-> Crypto load gets distributed, no network packet reordering.
+> On Fri, Aug 16, 2019 at 07:02:34PM -0700, Jakub Kicinski wrote:
+> > On Thu, 15 Aug 2019 11:06:00 -0700, syzbot wrote:
+> > > syzbot has bisected this bug to:
+> > > 
+> > > commit 130b392c6cd6b2aed1b7eb32253d4920babb4891
+> > > Author: Dave Watson <davejwatson@fb.com>
+> > > Date:   Wed Jan 30 21:58:31 2019 +0000
+> > > 
+> > >      net: tls: Add tls 1.3 support
+> > > 
+> > > bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=118e8dee600000
+> > > start commit:   6d5afe20 sctp: fix memleak in sctp_send_reset_streams
+> > > git tree:       net
+> > > final crash:    https://syzkaller.appspot.com/x/report.txt?x=138e8dee600000
+> > > console output: https://syzkaller.appspot.com/x/log.txt?x=158e8dee600000
+> > > kernel config:  https://syzkaller.appspot.com/x/.config?x=a4c9e9f08e9e8960
+> > > dashboard link: https://syzkaller.appspot.com/bug?extid=6a9ff159672dfbb41c95
+> > > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17cb0502600000
+> > > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14d5dc22600000
+> > > 
+> > > Reported-by: syzbot+6a9ff159672dfbb41c95@syzkaller.appspotmail.com
+> > > Fixes: 130b392c6cd6 ("net: tls: Add tls 1.3 support")
+> > > 
+> > > For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+> > 
+> > CC Herbert, linux-crypto
+> > 
+> > This is got to be something in the crypto code :S 
+> > 
+> > The test case opens a ktls socket and back log writes to it.
+> > Then it opens a AF_ALG socket, binds "pcrypt(gcm(aes))" and dies.
+> > 
+> > The ktls socket upon close waits for async crypto callbacks, but they
+> > never come. If I unset CRYPTO_USER_API_AEAD or change the alg to bind
+> > to "gcm(aes)" the bug does not trigger.
+> > 
+> > Any suggestions?
 > 
-> Acked-by: Steffen Klassert <steffen.klassert@secunet.com>
+> Seeing as pcrypt is involved and this is a "task hung" bug, this is probably
+> caused by the recursive pcrypt deadlock, which is yet to be fixed.
+> 
+> See the original thread for more info:
+> 
+> 	https://groups.google.com/forum/#!msg/syzkaller-bugs/1_CXUd3gBcg/BvsRLH0lAgAJ
+> 
+> And the syzbot dashboard link:
+> 
+> 	https://syzkaller.appspot.com/bug?id=178f2528d10720d563091fb51dceb4cb20f75525
+> 
+> Let's tell syzbot this is a duplicate:
+> 
+> #syz dup: INFO: task hung in aead_recvmsg
+> 
+> 
+> Steffen, do you have any plan to fix this?
 
-Thanks for testing this, Steffen!
+I've tried to use different padata instances for each pcrypt template,
+but then each pcrypt template needs to expose its cpumask configuration
+to a new file in /sys/kernel/pcrypt/. Currently we have one file
+there for the encrytion and on for the decryption cpumask. If we have
+more than these two files, we need some naming convention to now which
+pcrypt template we want to configure. That would be a bit odd because
+a such a nested pcrypt in pcrypt algorithm would not make sense at all.
+
+I still think we should somehow forbid these nested configurations.
+If I remember correct, the only objection to your original patch
+was that it would still deadlock if an underlying algorithm uses
+pcrypt as a fallback.
+
+Maybe we can use your patch and also refuse instanitating if an
+underlying algorithm needs a fallback.
+
+The patch would look like this then:
+
+Subject: [PATCH] crypto: pcrypt - forbid recursive instantiation
+
+If the pcrypt template is used multiple times in an algorithm, then a
+deadlock occurs because all pcrypt instances share the same
+padata_instance, which completes requests in the order submitted.  That
+is, the inner pcrypt request waits for the outer pcrypt request while
+the outer request is already waiting for the inner.
+
+Fix this by making pcrypt forbid instantiation if pcrypt appears in the
+underlying ->cra_driver_name and if an underlying algorithm needs a
+fallback.  This is somewhat of a hack, but it's a simple fix that should
+be sufficient to prevent the deadlock.
+
+Reproducer:
+
+	#include <linux/if_alg.h>
+	#include <sys/socket.h>
+	#include <unistd.h>
+
+	int main()
+	{
+		struct sockaddr_alg addr = {
+			.salg_type = "aead",
+			.salg_name = "pcrypt(pcrypt(rfc4106-gcm-aesni))"
+		};
+		int algfd, reqfd;
+		char buf[32] = { 0 };
+
+		algfd = socket(AF_ALG, SOCK_SEQPACKET, 0);
+		bind(algfd, (void *)&addr, sizeof(addr));
+		setsockopt(algfd, SOL_ALG, ALG_SET_KEY, buf, 20);
+		reqfd = accept(algfd, 0, 0);
+		write(reqfd, buf, 32);
+		read(reqfd, buf, 16);
+	}
+
+Reported-by: syzbot+56c7151cad94eec37c521f0e47d2eee53f9361c4@syzkaller.appspotmail.com
+Fixes: 5068c7a883d1 ("crypto: pcrypt - Add pcrypt crypto parallelization wrapper")
+Cc: <stable@vger.kernel.org> # v2.6.34+
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+---
+ crypto/pcrypt.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/crypto/pcrypt.c b/crypto/pcrypt.c
+index 543792e0ebf0..932a77b61b47 100644
+--- a/crypto/pcrypt.c
++++ b/crypto/pcrypt.c
+@@ -198,6 +198,12 @@ static void pcrypt_free(struct aead_instance *inst)
+ static int pcrypt_init_instance(struct crypto_instance *inst,
+ 				struct crypto_alg *alg)
+ {
++	/* Recursive pcrypt deadlocks due to the shared padata_instance */
++	if (!strncmp(alg->cra_driver_name, "pcrypt(", 7) ||
++	    strstr(alg->cra_driver_name, "(pcrypt(") ||
++	    strstr(alg->cra_driver_name, ",pcrypt("))
++		return -EINVAL;
++
+ 	if (snprintf(inst->alg.cra_driver_name, CRYPTO_MAX_ALG_NAME,
+ 		     "pcrypt(%s)", alg->cra_driver_name) >= CRYPTO_MAX_ALG_NAME)
+ 		return -ENAMETOOLONG;
+@@ -236,7 +242,7 @@ static int pcrypt_create_aead(struct crypto_template *tmpl, struct rtattr **tb,
+ 	ctx = aead_instance_ctx(inst);
+ 	crypto_set_aead_spawn(&ctx->spawn, aead_crypto_instance(inst));
+ 
+-	err = crypto_grab_aead(&ctx->spawn, name, 0, 0);
++	err = crypto_grab_aead(&ctx->spawn, name, 0, CRYPTO_ALG_NEED_FALLBACK);
+ 	if (err)
+ 		goto out_free_inst;
+ 
+-- 
+2.17.1
+
