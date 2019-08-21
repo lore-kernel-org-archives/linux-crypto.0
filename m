@@ -2,65 +2,72 @@ Return-Path: <SRS0=bUM2=WR=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C59EC3A5A1
-	for <linux-crypto@archiver.kernel.org>; Wed, 21 Aug 2019 06:42:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91D40C3A5A1
+	for <linux-crypto@archiver.kernel.org>; Wed, 21 Aug 2019 06:42:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1D6E5206BA
-	for <linux-crypto@archiver.kernel.org>; Wed, 21 Aug 2019 06:42:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 663C72089E
+	for <linux-crypto@archiver.kernel.org>; Wed, 21 Aug 2019 06:42:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="KgvXEC03"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="clS10835"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727210AbfHUGmP (ORCPT
+        id S1728116AbfHUGma (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 21 Aug 2019 02:42:15 -0400
-Received: from mailout2.samsung.com ([203.254.224.25]:59984 "EHLO
-        mailout2.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726694AbfHUGmO (ORCPT
+        Wed, 21 Aug 2019 02:42:30 -0400
+Received: from mailout1.samsung.com ([203.254.224.24]:10159 "EHLO
+        mailout1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727793AbfHUGm3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 21 Aug 2019 02:42:14 -0400
-Received: from epcas2p4.samsung.com (unknown [182.195.41.56])
-        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20190821064211epoutp0215b345fa7b34ea9b9e7127eb69a65bea~83Pi6QbHh1088410884epoutp02c
-        for <linux-crypto@vger.kernel.org>; Wed, 21 Aug 2019 06:42:11 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20190821064211epoutp0215b345fa7b34ea9b9e7127eb69a65bea~83Pi6QbHh1088410884epoutp02c
+        Wed, 21 Aug 2019 02:42:29 -0400
+Received: from epcas2p1.samsung.com (unknown [182.195.41.53])
+        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20190821064227epoutp014150eab18f048a43ab2bb487f914892e~83Px9-Vtq1005410054epoutp019
+        for <linux-crypto@vger.kernel.org>; Wed, 21 Aug 2019 06:42:27 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20190821064227epoutp014150eab18f048a43ab2bb487f914892e~83Px9-Vtq1005410054epoutp019
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1566369731;
-        bh=6nvViRArjV4omK6peQr/VJEo362MQawOvuOjWNtcvUc=;
-        h=From:To:Subject:Date:References:From;
-        b=KgvXEC03C4r1U97r7bQ5DRRMTIXhvVfcvuv//kqB9AfekkM1a6r6AlK/dwkzmj1/j
-         6Da8kMqM2aSH3vsPYueOGpcP367QkCqp/Un1AsgIkKYcR0YdMlJuZ47ea/iHjqaU9V
-         dzZJioeQWALlclkJ5xlW0pzJ4Wntvqon2nNSykqw=
-Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
-        epcas2p2.samsung.com (KnoxPortal) with ESMTP id
-        20190821064210epcas2p2b0753f2c58b6ebb1f39566c7be44018c~83PiaFvVa1369213692epcas2p22;
-        Wed, 21 Aug 2019 06:42:10 +0000 (GMT)
-Received: from epsmges2p1.samsung.com (unknown [182.195.40.184]) by
-        epsnrtp3.localdomain (Postfix) with ESMTP id 46Cykl2yFmzMqYkV; Wed, 21 Aug
-        2019 06:42:07 +0000 (GMT)
-Received: from epcas2p4.samsung.com ( [182.195.41.56]) by
-        epsmges2p1.samsung.com (Symantec Messaging Gateway) with SMTP id
-        3F.AD.04156.FB7EC5D5; Wed, 21 Aug 2019 15:42:07 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        s=mail20170921; t=1566369747;
+        bh=RufiVNT5+Lb2KOyQZLDZhzg9HYJCDXGJWlH0uDh9Bn0=;
+        h=From:To:Cc:Subject:Date:References:From;
+        b=clS10835/affNGODFrWo2NUHKtnZdFS5lP+/Aw0A0qBoqhK7QHQ73e6PeySgDsPPs
+         hA3xePmpCtsxVnPnPa6b8QZe6cCy7LM52IiYYce3ekI0ze+cbhc8gyydsTEqHxCCoq
+         ZVGxIeV2mqit5FKe6+6VHbiGTkuA5I9Z+1LrNWcQ=
+Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
+        epcas2p1.samsung.com (KnoxPortal) with ESMTP id
+        20190821064226epcas2p1753a8812f10c55908a889b5f613f6935~83PxEH5Fd0242202422epcas2p1s;
+        Wed, 21 Aug 2019 06:42:26 +0000 (GMT)
+Received: from epsmges2p4.samsung.com (unknown [182.195.40.189]) by
+        epsnrtp2.localdomain (Postfix) with ESMTP id 46Cyl36Fy8zMqYkf; Wed, 21 Aug
+        2019 06:42:23 +0000 (GMT)
+Received: from epcas2p1.samsung.com ( [182.195.41.53]) by
+        epsmges2p4.samsung.com (Symantec Messaging Gateway) with SMTP id
+        7C.0F.04112.FC7EC5D5; Wed, 21 Aug 2019 15:42:23 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
         epcas2p1.samsung.com (KnoxPortal) with ESMTPA id
-        20190821064206epcas2p1d1bcaae142416506bcedb3201d9a6658~83PeydRUI2328923289epcas2p1F;
-        Wed, 21 Aug 2019 06:42:06 +0000 (GMT)
-Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
-        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20190821064206epsmtrp2200b095c38c04c7c0825b9bbdffaf76e~83PesuNc52242122421epsmtrp2E;
-        Wed, 21 Aug 2019 06:42:06 +0000 (GMT)
-X-AuditID: b6c32a45-df7ff7000000103c-24-5d5ce7bf38af
+        20190821064223epcas2p18a14724427711e22c6c76b24bce1c8e0~83PuUy3oh1228312283epcas2p1R;
+        Wed, 21 Aug 2019 06:42:23 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20190821064223epsmtrp10047dd5905b9e4fa8ae715493939ee58~83PuTsqjI2011020110epsmtrp1X;
+        Wed, 21 Aug 2019 06:42:23 +0000 (GMT)
+X-AuditID: b6c32a48-f1fff70000001010-90-5d5ce7cfaa31
 Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-        epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        EF.C2.03638.EB7EC5D5; Wed, 21 Aug 2019 15:42:06 +0900 (KST)
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        8D.02.03706.FC7EC5D5; Wed, 21 Aug 2019 15:42:23 +0900 (KST)
 Received: from KORDO035251 (unknown [12.36.165.204]) by epsmtip1.samsung.com
         (KnoxPortal) with ESMTPA id
-        20190821064206epsmtip198eaffa6242c7b1b17cfbe143230c99b~83PeSZEq23087530875epsmtip17;
-        Wed, 21 Aug 2019 06:42:06 +0000 (GMT)
+        20190821064222epsmtip169b78fa5e45597d9ba7e035be2ddd798~83PtgT-AE0460704607epsmtip1G;
+        Wed, 21 Aug 2019 06:42:22 +0000 (GMT)
 From:   "boojin.kim" <boojin.kim@samsung.com>
-To:     "'Herbert Xu'" <herbert@gondor.apana.org.au>,
+To:     "'Ulf Hansson'" <ulf.hansson@linaro.org>,
+        "'Kukjin Kim'" <kgene@kernel.org>,
+        "'Krzysztof Kozlowski'" <krzk@kernel.org>,
+        <linux-mmc@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-samsung-soc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Cc:     "'Herbert Xu'" <herbert@gondor.apana.org.au>,
         "'David S. Miller'" <davem@davemloft.net>,
         "'Eric Biggers'" <ebiggers@kernel.org>,
         "'Theodore Y. Ts'o'" <tytso@mit.edu>,
@@ -83,176 +90,232 @@ To:     "'Herbert Xu'" <herbert@gondor.apana.org.au>,
         <linux-samsung-soc@vger.kernel.org>,
         <linux-arm-kernel@lists.infradead.org>,
         <linux-fsdevel@vger.kernel.org>
-Subject: [PATCH 0/9] Flash Memory Protector Support
-Date:   Wed, 21 Aug 2019 15:42:06 +0900
-Message-ID: <003c01d557eb$8ca76790$a5f636b0$@samsung.com>
+Subject: [PATCH 4/9] mmc: dw_mmc-exynos: support FMP
+Date:   Wed, 21 Aug 2019 15:42:22 +0900
+Message-ID: <004001d557eb$9697f5d0$c3c7e170$@samsung.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 X-Mailer: Microsoft Outlook 14.0
-Thread-Index: AdVX55ZGLpDJ2oWzRvaIZpriXB0iug==
+Thread-Index: AdVX6FzCeDd/I620REGbQnBHWgE56Q==
 Content-Language: ko
-X-Brightmail-Tracker: H4sIAAAAAAAAA01Tf2wTZRjOd9e765DK2VX9qEbq4Yh0rrRlnd+EGhIRzsgfM8Qgc828rJdu
-        sb/Sa2HTRFC37ofT6YgySjcGEpCNMrbVucA6cPwozNVFl+JAnIThkE4n7gdJB4i93Yz773nf
-        93nyPc/35pXjygZKLS9xenmPk7Mz5CJZ15mVKOvUzQKL/tjRdDQzXSVDbf3ncdT6Sx2Jvvs8
-        hqHgYLkMRSb2EijUcw9HHyWeRDfaAjganvUTqG50HEeDg8cp1DF6iUCRK5no15EkhvY0XSXR
-        jwc2okTTHRnqiVyUoaETQRKdfVAHUMNgL4b87TMAVdQmKRQNbVm3lA0fuYyx5Z3b2a7TGexQ
-        zMd2tFST7NVLPSTbeXAHe7J5CmM/GDiHs3/1xkn2k3ALYKc6nspbnG9fW8xzVt6j4Z1FLmuJ
-        02ZmXt1c+FKhKUdvyDLkoucZjZNz8GZm/aa8rA0l9lR2RrONs/tSrTxOEJhVL671uHxeXlPs
-        Erxmhndb7W6Dwa0TOIfgc9p0RS7HCwa93mhKMd+yFw8nGgj3cW3p7n0fEztBYlkNSJNDOhv2
-        V8aJGrBIrqS7ATwai+NSMQlgW3zffHEHwK7yC2QNkM9JIjGdqFbSEQCH2ldInFsAhn+YBuKA
-        pDNhZ7QFiAMV/Q8Fd19rwsVBOr0aVtTeJkQsozPgofq/MREr6Fx4IRgjJfwIvLjnhkzEOL0M
-        fvNnEJe8amB3bHzuARWtg/XfjhASRwX3VvvnOUkKvh+0SHg93NU3jkk4HSaiYUrCajg1ESEl
-        vAPGD31JiUYhXQvgwKx/nrQaBsYqgZgYp1fCthOrpPDL4dkr89YehlVn7lNSWwGr/EpJ+Axs
-        nBzCpLYa3q59T2qzsL4xiknfZoHRUzeJT4EmsCBvYEHewIJcgf8tNANZC3iMdwsOGy8Y3YaF
-        q+4Ac1ehfbkbNHy/qQ/QcsAsViQLCixKgtsmlDn6AJTjjEpRGsy3KBVWruwd3uMq9PjsvNAH
-        TKl1fIarHy1ypW7M6S00mIw5OfpcEzLlGBHzuKLzocsFStrGefm3ed7Ne/7TYfI09U5QTa3J
-        sD7R/AcfMs90TWjH/EvXNfKv478fO7B9VJs2AkvDoa8P02P5jtYt1w1jd835/Tbd/jW7nE3d
-        2ZWZ0x9u5OKHt664db56Sbbm2k+/Ddz7ufnkF61bqbLJ5P2vjhhVT9v50Onrr8lf2XxOeKB8
-        82DF9HPe4SW976bdfbbyjfYN0VlGJhRzBi3uEbh/ASwhXbYrBAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrHIsWRmVeSWpSXmKPExsWy7bCSnO6+5zGxBrfnaFh8/dLBYrH+1DFm
+X-Brightmail-Tracker: H4sIAAAAAAAAA01TbUxTVxjOuV8taJdr6bZjs7h6h1vAgb0d7Q4OFpPpvIkuqdmPJSphN3BH
+        if2yt3Uwk0mUVUQEpjMZbSWEmUW7mc7SuCKUmeIkKKzLmN1AYYswP2CuCyALOHEtt2T8e973
+        fZ7zvE/eHDmu9MnU8kqrU3BYeTNDZRKXenP0ebF7e0u08dM69Gi2jkCB69dw9NVoE4VunB7E
+        kC9WS6DIX14SXej+F0fHJ19AEwEPjn5dcJOoaXwKR7HYNzIUHI+TKDKyEf02No+hltbbFPqp
+        fTuabJ0jUHekn0BDl30Uuvq0CaDPYz0Ycl98BNAnDfMy1HfhvS1rudD5YYyr7fiQu3RlAzc0
+        6OKC/mMUdzveTXEdZw9xXW0zGHd44HucS/TcpLjGkB9wM8F1xtW7zUUmgS8XHBrBWmYrr7RW
+        FDM73i19q1Rv0LJ5bCF6ndFYeYtQzGzdacx7u9KczM5oDvBmV7Jl5EWR2fRmkcPmcgoak010
+        FjOCvdxsZ1l7vshbRJe1Ir/MZtnMarU6fZL5vtk0OjVN2e/lVHXFD4MaMLC+HmTIIV0A/znS
+        Q9aDTLmSDgPYOz6LS8U0gD/eaU0XcwCeHwxiyxJvuD09iABYk6jDpOIBgIudM2SKRdEbYUef
+        H6QGKroeg72Nx6lUgdOLMjgxHSVSrKzkW2cW+pcwQW+A34WeUimsoAvh7IkWTMJrYH/LxBIH
+        p1+E3z704dIeGhgenAIprKLz4czcQJqjgt5j7qX9IP1EBhe7RghJsBWeqE2kQ2TByb6QTMJq
+        +KDJncaH4M0vv5BJ4gYABxaWB69Bz92jSTd50iEHBi5vSkFIvwSvjqR9n4F1vU9kUlsB69xK
+        SZgNz0wPYVJbDf9u+Fhqc3D87M9kM1jvWRHSsyKkZ0UYz/+2bYDwg+cEu2ipEESdvWDluYNg
+        6WfkcmFw5YedUUDLAbNaER7eU6Ik+QNitSUKoBxnVIoq3+4SpaKcr/5IcNhKHS6zIEaBPnmD
+        T3H1s2W25D+zOktZvc5g0Bbqkd6gQ8zziuCq4b1KuoJ3CvsEwS44lnWYPENdA2QO48uv7hfZ
+        yCpN7n6nlS+q7jR36NsSgV9O/bGZzGo/yLCn+h9/VqN7SK29futip+FWZllxa4m3sfncwYLH
+        TLNprNCt2bOODFz74J0b9wnv7/vGQDzjyGhf950tRu0O/3zPG9lHE7uKqqJ3XzFtI8XQtsBJ
+        z/01Yu7X8eyTf6qaGUI08Wwu7hD5/wBB5vuoLwQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrNIsWRmVeSWpSXmKPExsWy7bCSnO755zGxBqe3S1h8/dLBYrH+1DFm
         i9V3+9ksTk89y2Qx53wLi8Xed7NZLdbu+cNs0f1KxuLJ+lnMFjd+tbFa9D9+zWxx/vwGdotN
         j6+xWuy9pW1x/95PJouZ8+6wWVxa5G7xat43Fos9e0+yWFzeNYfN4sj/fkaLGef3MVm0bfzK
         aNHa85Pd4vjacAdJjy0rbzJ5tGwu99h2QNXj8tlSj02rOtk87lzbw+axeUm9x+4Fn5k8ms4c
-        ZfZ4v+8qm0ffllWMHp83yQXwRHHZpKTmZJalFunbJXBl3Hg1g7Vgg1bF9Pm9rA2Mr+S7GDk4
-        JARMJPae1eti5OQQEtjNKHHriTyILSEgJbG1fQ8zhC0scb/lCGsXIxdQzXNGiW9LXrKAJNgE
-        tCU2H1/FCJIQEZjGIfGjdTZYQljAWKK15wMriM0ioCqxbNJHJhCbV8BS4sScs2wQtqDEyZlP
-        WECOYBbQk2jbyAgSZhaQl9j+dg7UYgWJHWdfg8VFgEomHbzHClEjIjG7s415AqPALCSTZiFM
-        moVk0iwkHQsYWVYxSqYWFOem5xYbFhjlpZbrFSfmFpfmpesl5+duYgTHupbWDsYTJ+IPMQpw
-        MCrx8O64GR0rxJpYVlyZe4hRgoNZSYS3Yk5UrBBvSmJlVWpRfnxRaU5q8SFGaQ4WJXFe+fxj
-        kUIC6YklqdmpqQWpRTBZJg5OqQZG1zfv+6S1qyQq73im+HoYzs6IOW60odkhWaVaybJ9is3n
-        1qNBR77Omempbhj+TMxljtS71x7zdyhdcPiw4NoxrVZvt9xrd+8e2yKtFd7Q2u3XKdN8tv29
-        0TmNfee6c5/bHPG8IVXi3jMjbM7z+FgDx1ddvDXbLl87fbDoqW2QFK/Vt1+L9SOUWIozEg21
-        mIuKEwHPOnoc8QIAAA==
-X-CMS-MailID: 20190821064206epcas2p1d1bcaae142416506bcedb3201d9a6658
+        ZfZ4v+8qm0ffllWMHp83yQXwRHHZpKTmZJalFunbJXBl3H39ia3guWbF7mtNjA2MZxS7GDk5
+        JARMJGbvWMQMYgsJ7GaU+D27GCIuJbG1fQ8zhC0scb/lCGsXIxdQzXNGiW+TG1hBEmwC2hKb
+        j69iBEmICExgkviz9SEjSIJZYBqHxK4P4iC2MNCGub9OsoDYLAKqEvu3/GcDsXkFLCW+9M5k
+        grAFJU7OfAJUwwHUqyfRthFqjLzE9rdzoI5QkNhx9jVYXASo5PO3MywQNSISszvbmCcwCs5C
+        MmkWwqRZSCbNQtKxgJFlFaNkakFxbnpusWGBYV5quV5xYm5xaV66XnJ+7iZGcBLQ0tzBeHlJ
+        /CFGAQ5GJR7eHTejY4VYE8uKK3MPMUpwMCuJ8FbMiYoV4k1JrKxKLcqPLyrNSS0+xCjNwaIk
+        zvs071ikkEB6YklqdmpqQWoRTJaJg1OqgVHhnceZwqzN89gnLRBa+uNUtFhtgx+r7833Ra3H
+        Pk2Ve70h+GeXM8PXJm5T0/IHW018C2r0Toiryvd2cf6+saswlGdu0WK2DD0Fl4vVR51vOoRc
+        PPrzidzTjqlut7s5m912dgVPeyi5Uucgi+N1je4DrbY39JpU66NZak7u22eZvtF/3zXldiWW
+        4oxEQy3mouJEAAakvEn+AgAA
+X-CMS-MailID: 20190821064223epcas2p18a14724427711e22c6c76b24bce1c8e0
 X-Msg-Generator: CA
 Content-Type: text/plain; charset="utf-8"
 X-Sendblock-Type: AUTO_CONFIDENTIAL
 CMS-TYPE: 102P
 DLP-Filter: Pass
 X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20190821064206epcas2p1d1bcaae142416506bcedb3201d9a6658
-References: <CGME20190821064206epcas2p1d1bcaae142416506bcedb3201d9a6658@epcas2p1.samsung.com>
+X-CMS-RootMailID: 20190821064223epcas2p18a14724427711e22c6c76b24bce1c8e0
+References: <CGME20190821064223epcas2p18a14724427711e22c6c76b24bce1c8e0@epcas2p1.samsung.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Exynos has a H/W block called FMP (Flash Memory Protector) to protect data
-stored on storage device.
-FMP interworks with the storage controller to encrypt a data before writing
-to the storage device and decrypt the data after reading from storage
-device.
-FMP is a kind of ICE (inline crypto engines), which is generally known
-as being used for the above role.
+Exynos MMC uses FMP to encrypt data stored on MMC device.
+FMP H/W reads crypto information from MMC descriptor.
+So, when using FMP H/W, the format of MMC descriptor should be extended.
+The FMP driver is registered with the diskcipher algorithm,
+so exynos MMC calls diskcipher API to use FMP.
 
-To use FMP, the modification of various layers such as Fscrypt, ext4, f2fs,
-DM-crypt, storage controller driver and block is required.
-FMP solution introduces a new diskcipher similar to the existing skcipher
-in crypo API in order to minimize the modification of these layers and
-to improve the code readability.
+Cc: Ulf Hansson <ulf.hansson@linaro.org>
+Cc: Kukjin Kim <kgene@kernel.org>
+Cc: Krzysztof Kozlowski <krzk@kernel.org>
+Signed-off-by: Boojin Kim <boojin.kim@samsung.com>
+---
+ drivers/mmc/host/Kconfig         |  8 ++++++
+ drivers/mmc/host/dw_mmc-exynos.c | 62
+++++++++++++++++++++++++++++++++++++++++
+ drivers/mmc/host/dw_mmc.c        | 26 +++++++++++++++++
+ 3 files changed, 96 insertions(+)
 
-This patchset includes the following for using FMP:
-- Diskcipher and FMP are added to crypto API.
-- The crypto users such as dm-crypt and fscrypt are modified to support
-  diskcipher.
-- The bio submitters such as f2fs, ext4, dm-crypt are modified to support
-  diskcipher.
-- Block layer is modified to pass diskcipher to storage controller driver.
-- Storage controller driver is modified to support crypto operation.
-
-Exynos FMP solution consists of Diskcipher and FMP driver.
-Diskcipher is a symmetric key cipher of crypto API that supports inline
-crypto engine like FMP.
-FMP driver is a cipher algorithm running on diskcipher.
-FMP driver registers 'cbc(aes)-disk' and 'xts(aes)-disk' algorithms to
-crypto API.
-FMP can be tested with various test vectors in testmgr of crypto API.
-
-When encrypting using FMP, additional control is required to deliver and
-manage encryption information between encryption users (fscrypt, DM-crypt)
-and FMP drivers. Diskcipher provides this control.
-
-The encryption using FMP is made up of 4 steps.
-The first step is to assign a password and set a key.
-Encryption users such as Fscrypt or DM-crypt assign diskcipher, and set key
-to the diskcipher.
-The second step is to deliver diskcipher that has crypto information to
-storage drivers such as UFS and MMC. BIO is used to this delivery.
-The BIO submitters, such as ext4, f2fs and DM-crypt, checks if there is
-diskcipher in crypto configuration before issuing BIO. If there are
-diskcipher, the submitter sets it to BIO.
-In addition, the BIO submitter skips the task of encrypting data before BIO
-and decrypting data after BIO is completed.
-In the third step, the storage driver gets the diskcipher from the BIO and
-requests the FMP to encrypt.
-In the final step, the FMP extracts crypto information from the diskcipher
-and writes it in the descriptor area allocated for FMP H/W.
-The FMP H/W uses the descriptor of the storage controller to contain crypto
-information. So the descriptor of storage controller should be expanded
-for FMP.
-
-Boojin Kim (9):
-  crypt: Add diskcipher
-  crypto: fmp: add Flash Memory Protector driver
-  mmc: dw_mmc: support crypto operation
-  mmc: dw_mmc-exynos: support FMP
-  block: support diskcipher
-  dm crypt: support diskcipher
-  fscrypt: support diskcipher
-  fs: ext4: support diskcipher
-  fs: f2fs: support diskcipher
-
- block/bio.c                      |   1 +
- block/blk-merge.c                |  19 +-
- block/bounce.c                   |   5 +-
- crypto/Kconfig                   |   9 +
- crypto/Makefile                  |   1 +
- crypto/diskcipher.c              | 349 +++++++++++++++++++++++
- crypto/testmgr.c                 | 157 +++++++++++
- drivers/crypto/Kconfig           |   2 +
- drivers/crypto/Makefile          |   1 +
- drivers/crypto/fmp/Kconfig       |  13 +
- drivers/crypto/fmp/Makefile      |   1 +
- drivers/crypto/fmp/fmp.c         | 595
-+++++++++++++++++++++++++++++++++++++++
- drivers/crypto/fmp/fmp_crypt.c   | 243 ++++++++++++++++
- drivers/crypto/fmp/fmp_test.c    | 310 ++++++++++++++++++++
- drivers/crypto/fmp/fmp_test.h    |  30 ++
- drivers/md/dm-crypt.c            | 112 +++++++-
- drivers/mmc/host/Kconfig         |   8 +
- drivers/mmc/host/dw_mmc-exynos.c |  62 ++++
- drivers/mmc/host/dw_mmc.c        |  48 +++-
- drivers/mmc/host/dw_mmc.h        |   6 +
- fs/buffer.c                      |   2 +
- fs/crypto/bio.c                  |  43 ++-
- fs/crypto/fscrypt_private.h      |  28 +-
- fs/crypto/keysetup.c             |  60 +++-
- fs/crypto/keysetup_v1.c          |   2 +-
- fs/ext4/inode.c                  |  39 ++-
- fs/ext4/page-io.c                |   8 +-
- fs/ext4/readpage.c               |   7 +
- fs/f2fs/data.c                   |  98 ++++++-
- fs/f2fs/f2fs.h                   |   2 +-
- include/crypto/diskcipher.h      | 245 ++++++++++++++++
- include/crypto/fmp.h             | 324 +++++++++++++++++++++
- include/linux/bio.h              |  10 +
- include/linux/blk_types.h        |   4 +
- include/linux/bvec.h             |   3 +
- include/linux/crypto.h           |   1 +
- include/linux/fscrypt.h          |  19 ++
- include/uapi/linux/fscrypt.h     |   2 +
- tools/include/uapi/linux/fs.h    |   1 +
- 39 files changed, 2837 insertions(+), 33 deletions(-)
- create mode 100644 crypto/diskcipher.c
- create mode 100644 drivers/crypto/fmp/Kconfig
- create mode 100644 drivers/crypto/fmp/Makefile
- create mode 100644 drivers/crypto/fmp/fmp.c
- create mode 100644 drivers/crypto/fmp/fmp_crypt.c
- create mode 100644 drivers/crypto/fmp/fmp_test.c
- create mode 100644 drivers/crypto/fmp/fmp_test.h
- create mode 100644 include/crypto/diskcipher.h
- create mode 100644 include/crypto/fmp.h
-
+diff --git a/drivers/mmc/host/Kconfig b/drivers/mmc/host/Kconfig
+index 14d89a1..f6c5a54 100644
+--- a/drivers/mmc/host/Kconfig
++++ b/drivers/mmc/host/Kconfig
+@@ -761,6 +761,14 @@ config MMC_DW_EXYNOS
+ 	  Synopsys DesignWare Memory Card Interface driver. Select this
+option
+ 	  for platforms based on Exynos4 and Exynos5 SoC's.
+ 
++config MMC_DW_EXYNOS_FMP
++	tristate "EXYNOS Flash Memory Protector for MMC_DW"
++	depends on MMC_DW_EXYNOS
++	---help---
++	  This selects the EXYNOS MMC_DW FMP Driver.
++
++	  If you have a controller with this interface, say Y or M here.
++
+ config MMC_DW_HI3798CV200
+ 	tristate "Hi3798CV200 specific extensions for Synopsys DW Memory
+Card Interface"
+ 	depends on MMC_DW
+diff --git a/drivers/mmc/host/dw_mmc-exynos.c
+b/drivers/mmc/host/dw_mmc-exynos.c
+index 5e3d95b..d3848ba 100644
+--- a/drivers/mmc/host/dw_mmc-exynos.c
++++ b/drivers/mmc/host/dw_mmc-exynos.c
+@@ -14,10 +14,12 @@
+ #include <linux/of_gpio.h>
+ #include <linux/pm_runtime.h>
+ #include <linux/slab.h>
++#include <crypto/fmp.h>
+ 
+ #include "dw_mmc.h"
+ #include "dw_mmc-pltfm.h"
+ #include "dw_mmc-exynos.h"
++#include "../core/queue.h"
+ 
+ /* Variations in Exynos specific dw-mshc controller */
+ enum dw_mci_exynos_type {
+@@ -508,6 +510,62 @@ static int dw_mci_exynos_prepare_hs400_tuning(struct
+dw_mci *host,
+ 	return 0;
+ }
+ 
++#ifdef CONFIG_MMC_DW_EXYNOS_FMP
++static struct bio *get_bio(struct dw_mci *host,
++				struct mmc_data *data, bool cmdq_enabled)
++{
++	struct bio *bio = NULL;
++	struct mmc_queue_req *mq_rq = NULL;
++	struct request *req = NULL;
++	struct mmc_blk_request *brq = NULL;
++
++	if (!host || !data) {
++		pr_err("%s: Invalid MMC:%p data:%p\n", __func__, host,
+data);
++		return NULL;
++	}
++
++	if (cmdq_enabled) {
++		pr_err("%s: no support cmdq yet:%p\n", __func__, host);
++		bio = NULL;
++	} else {
++		brq = container_of(data, struct mmc_blk_request, data);
++		if (!brq)
++			return NULL;
++
++		mq_rq = container_of(brq, struct mmc_queue_req, brq);
++		if (virt_addr_valid(mq_rq))
++			req = mmc_queue_req_to_req(mq_rq);
++			if (virt_addr_valid(req))
++				bio = req->bio;
++	}
++	return bio;
++}
++
++static int dw_mci_exynos_crypto_engine_cfg(struct dw_mci *host,
++					void *desc, struct mmc_data *data,
++					struct page *page, int page_index,
++					int sector_offset, bool
+cmdq_enabled)
++{
++	struct bio *bio = get_bio(host, host->data, cmdq_enabled);
++
++	if (!bio)
++		return 0;
++
++	return exynos_fmp_crypt_cfg(bio, desc, page_index, sector_offset);
++}
++
++static int dw_mci_exynos_crypto_engine_clear(struct dw_mci *host,
++					void *desc, bool cmdq_enabled)
++{
++	struct bio *bio = get_bio(host, host->data, cmdq_enabled);
++
++	if (!bio)
++		return 0;
++
++	return exynos_fmp_crypt_clear(bio, desc);
++}
++#endif
++
+ /* Common capabilities of Exynos4/Exynos5 SoC */
+ static unsigned long exynos_dwmmc_caps[4] = {
+ 	MMC_CAP_1_8V_DDR | MMC_CAP_8_BIT_DATA | MMC_CAP_CMD23,
+@@ -524,6 +582,10 @@ static const struct dw_mci_drv_data exynos_drv_data = {
+ 	.parse_dt		= dw_mci_exynos_parse_dt,
+ 	.execute_tuning		= dw_mci_exynos_execute_tuning,
+ 	.prepare_hs400_tuning	= dw_mci_exynos_prepare_hs400_tuning,
++#ifdef CONFIG_MMC_DW_EXYNOS_FMP
++	.crypto_engine_cfg = dw_mci_exynos_crypto_engine_cfg,
++	.crypto_engine_clear = dw_mci_exynos_crypto_engine_clear,
++#endif
+ };
+ 
+ static const struct of_device_id dw_mci_exynos_match[] = {
+diff --git a/drivers/mmc/host/dw_mmc.c b/drivers/mmc/host/dw_mmc.c
+index 0cdf574..4de476a 100644
+--- a/drivers/mmc/host/dw_mmc.c
++++ b/drivers/mmc/host/dw_mmc.c
+@@ -79,6 +79,32 @@ struct idmac_desc_64addr {
+ 
+ 	u32		des6;	/* Lower 32-bits of Next Descriptor Address
+*/
+ 	u32		des7;	/* Upper 32-bits of Next Descriptor Address
+*/
++#if defined(CONFIG_MMC_DW_EXYNOS_FMP)
++	u32 des8;		/* File IV 0 */
++	u32 des9;		/* File IV 1 */
++	u32 des10;		/* File IV 2 */
++	u32 des11;		/* File IV 3 */
++	u32 des12;		/* File EncKey 0 */
++	u32 des13;		/* File EncKey 1 */
++	u32 des14;		/* File EncKey 2 */
++	u32 des15;		/* File EncKey 3 */
++	u32 des16;		/* File EncKey 4 */
++	u32 des17;		/* File EncKey 5 */
++	u32 des18;		/* File EncKey 6 */
++	u32 des19;		/* File EncKey 7 */
++	u32 des20;		/* File TwKey 0 */
++	u32 des21;		/* File TwKey 1 */
++	u32 des22;		/* File TwKey 2 */
++	u32 des23;		/* File TwKey 3 */
++	u32 des24;		/* File TwKey 4 */
++	u32 des25;		/* File TwKey 5 */
++	u32 des26;		/* File TwKey 6 */
++	u32 des27;		/* File TwKey 7 */
++	u32 des28;		/* Disk IV 0 */
++	u32 des29;		/* Disk IV 1 */
++	u32 des30;		/* Disk IV 2 */
++	u32 des31;		/* Disk IV 3 */
++#endif
+ };
+ 
+ struct idmac_desc {
 -- 
 2.7.4
 
