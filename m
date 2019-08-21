@@ -2,216 +2,257 @@ Return-Path: <SRS0=bUM2=WR=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B93EFC3A5A1
-	for <linux-crypto@archiver.kernel.org>; Wed, 21 Aug 2019 06:37:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C59EC3A5A1
+	for <linux-crypto@archiver.kernel.org>; Wed, 21 Aug 2019 06:42:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8F3792087E
-	for <linux-crypto@archiver.kernel.org>; Wed, 21 Aug 2019 06:37:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1D6E5206BA
+	for <linux-crypto@archiver.kernel.org>; Wed, 21 Aug 2019 06:42:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="KgvXEC03"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728026AbfHUGhI (ORCPT
+        id S1727210AbfHUGmP (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 21 Aug 2019 02:37:08 -0400
-Received: from a.mx.secunet.com ([62.96.220.36]:43188 "EHLO a.mx.secunet.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727841AbfHUGhI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 21 Aug 2019 02:37:08 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by a.mx.secunet.com (Postfix) with ESMTP id 9F41020571;
-        Wed, 21 Aug 2019 08:37:06 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-        by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id 4021cwcMpGel; Wed, 21 Aug 2019 08:37:05 +0200 (CEST)
-Received: from mail-essen-01.secunet.de (mail-essen-01.secunet.de [10.53.40.204])
-        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by a.mx.secunet.com (Postfix) with ESMTPS id 5029A200AC;
-        Wed, 21 Aug 2019 08:37:05 +0200 (CEST)
-Received: from gauss2.secunet.de (10.182.7.193) by mail-essen-01.secunet.de
- (10.53.40.204) with Microsoft SMTP Server id 14.3.439.0; Wed, 21 Aug 2019
- 08:37:05 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)      id E4FFE31827CE;
- Wed, 21 Aug 2019 08:37:04 +0200 (CEST)
-Date:   Wed, 21 Aug 2019 08:37:04 +0200
-From:   Steffen Klassert <steffen.klassert@secunet.com>
-To:     Jakub Kicinski <jakub.kicinski@netronome.com>,
-        syzbot <syzbot+6a9ff159672dfbb41c95@syzkaller.appspotmail.com>,
-        <ast@kernel.org>, <aviadye@mellanox.com>, <borisp@mellanox.com>,
-        <bpf@vger.kernel.org>, <daniel@iogearbox.net>,
-        <davejwatson@fb.com>, <davem@davemloft.net>, <hdanton@sina.com>,
-        <john.fastabend@gmail.com>, <netdev@vger.kernel.org>,
-        <syzkaller-bugs@googlegroups.com>, <herbert@gondor.apana.org.au>,
-        <linux-crypto@vger.kernel.org>
-Subject: Re: INFO: task hung in tls_sw_release_resources_tx
-Message-ID: <20190821063704.GM2879@gauss3.secunet.de>
-References: <000000000000523ea3059025b11d@google.com>
- <000000000000e75f1805902bb919@google.com>
- <20190816190234.2aaab5b6@cakuba.netronome.com>
- <20190817054743.GE8209@sol.localdomain>
+        Wed, 21 Aug 2019 02:42:15 -0400
+Received: from mailout2.samsung.com ([203.254.224.25]:59984 "EHLO
+        mailout2.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726694AbfHUGmO (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 21 Aug 2019 02:42:14 -0400
+Received: from epcas2p4.samsung.com (unknown [182.195.41.56])
+        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20190821064211epoutp0215b345fa7b34ea9b9e7127eb69a65bea~83Pi6QbHh1088410884epoutp02c
+        for <linux-crypto@vger.kernel.org>; Wed, 21 Aug 2019 06:42:11 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20190821064211epoutp0215b345fa7b34ea9b9e7127eb69a65bea~83Pi6QbHh1088410884epoutp02c
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1566369731;
+        bh=6nvViRArjV4omK6peQr/VJEo362MQawOvuOjWNtcvUc=;
+        h=From:To:Subject:Date:References:From;
+        b=KgvXEC03C4r1U97r7bQ5DRRMTIXhvVfcvuv//kqB9AfekkM1a6r6AlK/dwkzmj1/j
+         6Da8kMqM2aSH3vsPYueOGpcP367QkCqp/Un1AsgIkKYcR0YdMlJuZ47ea/iHjqaU9V
+         dzZJioeQWALlclkJ5xlW0pzJ4Wntvqon2nNSykqw=
+Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
+        epcas2p2.samsung.com (KnoxPortal) with ESMTP id
+        20190821064210epcas2p2b0753f2c58b6ebb1f39566c7be44018c~83PiaFvVa1369213692epcas2p22;
+        Wed, 21 Aug 2019 06:42:10 +0000 (GMT)
+Received: from epsmges2p1.samsung.com (unknown [182.195.40.184]) by
+        epsnrtp3.localdomain (Postfix) with ESMTP id 46Cykl2yFmzMqYkV; Wed, 21 Aug
+        2019 06:42:07 +0000 (GMT)
+Received: from epcas2p4.samsung.com ( [182.195.41.56]) by
+        epsmges2p1.samsung.com (Symantec Messaging Gateway) with SMTP id
+        3F.AD.04156.FB7EC5D5; Wed, 21 Aug 2019 15:42:07 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas2p1.samsung.com (KnoxPortal) with ESMTPA id
+        20190821064206epcas2p1d1bcaae142416506bcedb3201d9a6658~83PeydRUI2328923289epcas2p1F;
+        Wed, 21 Aug 2019 06:42:06 +0000 (GMT)
+Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20190821064206epsmtrp2200b095c38c04c7c0825b9bbdffaf76e~83PesuNc52242122421epsmtrp2E;
+        Wed, 21 Aug 2019 06:42:06 +0000 (GMT)
+X-AuditID: b6c32a45-df7ff7000000103c-24-5d5ce7bf38af
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        EF.C2.03638.EB7EC5D5; Wed, 21 Aug 2019 15:42:06 +0900 (KST)
+Received: from KORDO035251 (unknown [12.36.165.204]) by epsmtip1.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20190821064206epsmtip198eaffa6242c7b1b17cfbe143230c99b~83PeSZEq23087530875epsmtip17;
+        Wed, 21 Aug 2019 06:42:06 +0000 (GMT)
+From:   "boojin.kim" <boojin.kim@samsung.com>
+To:     "'Herbert Xu'" <herbert@gondor.apana.org.au>,
+        "'David S. Miller'" <davem@davemloft.net>,
+        "'Eric Biggers'" <ebiggers@kernel.org>,
+        "'Theodore Y. Ts'o'" <tytso@mit.edu>,
+        "'Chao Yu'" <chao@kernel.org>,
+        "'Jaegeuk Kim'" <jaegeuk@kernel.org>,
+        "'Andreas Dilger'" <adilger.kernel@dilger.ca>,
+        "'Theodore Ts'o'" <tytso@mit.edu>, <dm-devel@redhat.com>,
+        "'Mike Snitzer'" <snitzer@redhat.com>,
+        "'Alasdair Kergon'" <agk@redhat.com>,
+        "'Jens Axboe'" <axboe@kernel.dk>,
+        "'Krzysztof Kozlowski'" <krzk@kernel.org>,
+        "'Kukjin Kim'" <kgene@kernel.org>,
+        "'Jaehoon Chung'" <jh80.chung@samsung.com>,
+        "'Ulf Hansson'" <ulf.hansson@linaro.org>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-fscrypt@vger.kernel.org>, <linux-mmc@vger.kernel.org>,
+        <linux-samsung-soc@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-ext4@vger.kernel.org>,
+        <linux-f2fs-devel@lists.sourceforge.net>,
+        <linux-samsung-soc@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-fsdevel@vger.kernel.org>
+Subject: [PATCH 0/9] Flash Memory Protector Support
+Date:   Wed, 21 Aug 2019 15:42:06 +0900
+Message-ID: <003c01d557eb$8ca76790$a5f636b0$@samsung.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20190817054743.GE8209@sol.localdomain>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 14.0
+Thread-Index: AdVX55ZGLpDJ2oWzRvaIZpriXB0iug==
+Content-Language: ko
+X-Brightmail-Tracker: H4sIAAAAAAAAA01Tf2wTZRjOd9e765DK2VX9qEbq4Yh0rrRlnd+EGhIRzsgfM8Qgc828rJdu
+        sb/Sa2HTRFC37ofT6YgySjcGEpCNMrbVucA6cPwozNVFl+JAnIThkE4n7gdJB4i93Yz773nf
+        93nyPc/35pXjygZKLS9xenmPk7Mz5CJZ15mVKOvUzQKL/tjRdDQzXSVDbf3ncdT6Sx2Jvvs8
+        hqHgYLkMRSb2EijUcw9HHyWeRDfaAjganvUTqG50HEeDg8cp1DF6iUCRK5no15EkhvY0XSXR
+        jwc2okTTHRnqiVyUoaETQRKdfVAHUMNgL4b87TMAVdQmKRQNbVm3lA0fuYyx5Z3b2a7TGexQ
+        zMd2tFST7NVLPSTbeXAHe7J5CmM/GDiHs3/1xkn2k3ALYKc6nspbnG9fW8xzVt6j4Z1FLmuJ
+        02ZmXt1c+FKhKUdvyDLkoucZjZNz8GZm/aa8rA0l9lR2RrONs/tSrTxOEJhVL671uHxeXlPs
+        Erxmhndb7W6Dwa0TOIfgc9p0RS7HCwa93mhKMd+yFw8nGgj3cW3p7n0fEztBYlkNSJNDOhv2
+        V8aJGrBIrqS7ATwai+NSMQlgW3zffHEHwK7yC2QNkM9JIjGdqFbSEQCH2ldInFsAhn+YBuKA
+        pDNhZ7QFiAMV/Q8Fd19rwsVBOr0aVtTeJkQsozPgofq/MREr6Fx4IRgjJfwIvLjnhkzEOL0M
+        fvNnEJe8amB3bHzuARWtg/XfjhASRwX3VvvnOUkKvh+0SHg93NU3jkk4HSaiYUrCajg1ESEl
+        vAPGD31JiUYhXQvgwKx/nrQaBsYqgZgYp1fCthOrpPDL4dkr89YehlVn7lNSWwGr/EpJ+Axs
+        nBzCpLYa3q59T2qzsL4xiknfZoHRUzeJT4EmsCBvYEHewIJcgf8tNANZC3iMdwsOGy8Y3YaF
+        q+4Ac1ehfbkbNHy/qQ/QcsAsViQLCixKgtsmlDn6AJTjjEpRGsy3KBVWruwd3uMq9PjsvNAH
+        TKl1fIarHy1ypW7M6S00mIw5OfpcEzLlGBHzuKLzocsFStrGefm3ed7Ne/7TYfI09U5QTa3J
+        sD7R/AcfMs90TWjH/EvXNfKv478fO7B9VJs2AkvDoa8P02P5jtYt1w1jd835/Tbd/jW7nE3d
+        2ZWZ0x9u5OKHt664db56Sbbm2k+/Ddz7ufnkF61bqbLJ5P2vjhhVT9v50Onrr8lf2XxOeKB8
+        82DF9HPe4SW976bdfbbyjfYN0VlGJhRzBi3uEbh/ASwhXbYrBAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrHIsWRmVeSWpSXmKPExsWy7bCSnO6+5zGxBrfnaFh8/dLBYrH+1DFm
+        i9V3+9ksTk89y2Qx53wLi8Xed7NZLdbu+cNs0f1KxuLJ+lnMFjd+tbFa9D9+zWxx/vwGdotN
+        j6+xWuy9pW1x/95PJouZ8+6wWVxa5G7xat43Fos9e0+yWFzeNYfN4sj/fkaLGef3MVm0bfzK
+        aNHa85Pd4vjacAdJjy0rbzJ5tGwu99h2QNXj8tlSj02rOtk87lzbw+axeUm9x+4Fn5k8ms4c
+        ZfZ4v+8qm0ffllWMHp83yQXwRHHZpKTmZJalFunbJXBl3Hg1g7Vgg1bF9Pm9rA2Mr+S7GDk4
+        JARMJPae1eti5OQQEtjNKHHriTyILSEgJbG1fQ8zhC0scb/lCGsXIxdQzXNGiW9LXrKAJNgE
+        tCU2H1/FCJIQEZjGIfGjdTZYQljAWKK15wMriM0ioCqxbNJHJhCbV8BS4sScs2wQtqDEyZlP
+        WECOYBbQk2jbyAgSZhaQl9j+dg7UYgWJHWdfg8VFgEomHbzHClEjIjG7s415AqPALCSTZiFM
+        moVk0iwkHQsYWVYxSqYWFOem5xYbFhjlpZbrFSfmFpfmpesl5+duYgTHupbWDsYTJ+IPMQpw
+        MCrx8O64GR0rxJpYVlyZe4hRgoNZSYS3Yk5UrBBvSmJlVWpRfnxRaU5q8SFGaQ4WJXFe+fxj
+        kUIC6YklqdmpqQWpRTBZJg5OqQZG1zfv+6S1qyQq73im+HoYzs6IOW60odkhWaVaybJ9is3n
+        1qNBR77Omempbhj+TMxljtS71x7zdyhdcPiw4NoxrVZvt9xrd+8e2yKtFd7Q2u3XKdN8tv29
+        0TmNfee6c5/bHPG8IVXi3jMjbM7z+FgDx1ddvDXbLl87fbDoqW2QFK/Vt1+L9SOUWIozEg21
+        mIuKEwHPOnoc8QIAAA==
+X-CMS-MailID: 20190821064206epcas2p1d1bcaae142416506bcedb3201d9a6658
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: AUTO_CONFIDENTIAL
+CMS-TYPE: 102P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20190821064206epcas2p1d1bcaae142416506bcedb3201d9a6658
+References: <CGME20190821064206epcas2p1d1bcaae142416506bcedb3201d9a6658@epcas2p1.samsung.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Aug 16, 2019 at 10:47:43PM -0700, Eric Biggers wrote:
-> [+Steffen, who is the maintainer of pcrypt]
-> 
-> On Fri, Aug 16, 2019 at 07:02:34PM -0700, Jakub Kicinski wrote:
-> > On Thu, 15 Aug 2019 11:06:00 -0700, syzbot wrote:
-> > > syzbot has bisected this bug to:
-> > > 
-> > > commit 130b392c6cd6b2aed1b7eb32253d4920babb4891
-> > > Author: Dave Watson <davejwatson@fb.com>
-> > > Date:   Wed Jan 30 21:58:31 2019 +0000
-> > > 
-> > >      net: tls: Add tls 1.3 support
-> > > 
-> > > bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=118e8dee600000
-> > > start commit:   6d5afe20 sctp: fix memleak in sctp_send_reset_streams
-> > > git tree:       net
-> > > final crash:    https://syzkaller.appspot.com/x/report.txt?x=138e8dee600000
-> > > console output: https://syzkaller.appspot.com/x/log.txt?x=158e8dee600000
-> > > kernel config:  https://syzkaller.appspot.com/x/.config?x=a4c9e9f08e9e8960
-> > > dashboard link: https://syzkaller.appspot.com/bug?extid=6a9ff159672dfbb41c95
-> > > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17cb0502600000
-> > > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14d5dc22600000
-> > > 
-> > > Reported-by: syzbot+6a9ff159672dfbb41c95@syzkaller.appspotmail.com
-> > > Fixes: 130b392c6cd6 ("net: tls: Add tls 1.3 support")
-> > > 
-> > > For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-> > 
-> > CC Herbert, linux-crypto
-> > 
-> > This is got to be something in the crypto code :S 
-> > 
-> > The test case opens a ktls socket and back log writes to it.
-> > Then it opens a AF_ALG socket, binds "pcrypt(gcm(aes))" and dies.
-> > 
-> > The ktls socket upon close waits for async crypto callbacks, but they
-> > never come. If I unset CRYPTO_USER_API_AEAD or change the alg to bind
-> > to "gcm(aes)" the bug does not trigger.
-> > 
-> > Any suggestions?
-> 
-> Seeing as pcrypt is involved and this is a "task hung" bug, this is probably
-> caused by the recursive pcrypt deadlock, which is yet to be fixed.
-> 
-> See the original thread for more info:
-> 
-> 	https://groups.google.com/forum/#!msg/syzkaller-bugs/1_CXUd3gBcg/BvsRLH0lAgAJ
-> 
-> And the syzbot dashboard link:
-> 
-> 	https://syzkaller.appspot.com/bug?id=178f2528d10720d563091fb51dceb4cb20f75525
-> 
-> Let's tell syzbot this is a duplicate:
-> 
-> #syz dup: INFO: task hung in aead_recvmsg
-> 
-> 
-> Steffen, do you have any plan to fix this?
+Exynos has a H/W block called FMP (Flash Memory Protector) to protect data
+stored on storage device.
+FMP interworks with the storage controller to encrypt a data before writing
+to the storage device and decrypt the data after reading from storage
+device.
+FMP is a kind of ICE (inline crypto engines), which is generally known
+as being used for the above role.
 
-I've tried to use different padata instances for each pcrypt template,
-but then each pcrypt template needs to expose its cpumask configuration
-to a new file in /sys/kernel/pcrypt/. Currently we have one file
-there for the encrytion and on for the decryption cpumask. If we have
-more than these two files, we need some naming convention to now which
-pcrypt template we want to configure. That would be a bit odd because
-a such a nested pcrypt in pcrypt algorithm would not make sense at all.
+To use FMP, the modification of various layers such as Fscrypt, ext4, f2fs,
+DM-crypt, storage controller driver and block is required.
+FMP solution introduces a new diskcipher similar to the existing skcipher
+in crypo API in order to minimize the modification of these layers and
+to improve the code readability.
 
-I still think we should somehow forbid these nested configurations.
-If I remember correct, the only objection to your original patch
-was that it would still deadlock if an underlying algorithm uses
-pcrypt as a fallback.
+This patchset includes the following for using FMP:
+- Diskcipher and FMP are added to crypto API.
+- The crypto users such as dm-crypt and fscrypt are modified to support
+  diskcipher.
+- The bio submitters such as f2fs, ext4, dm-crypt are modified to support
+  diskcipher.
+- Block layer is modified to pass diskcipher to storage controller driver.
+- Storage controller driver is modified to support crypto operation.
 
-Maybe we can use your patch and also refuse instanitating if an
-underlying algorithm needs a fallback.
+Exynos FMP solution consists of Diskcipher and FMP driver.
+Diskcipher is a symmetric key cipher of crypto API that supports inline
+crypto engine like FMP.
+FMP driver is a cipher algorithm running on diskcipher.
+FMP driver registers 'cbc(aes)-disk' and 'xts(aes)-disk' algorithms to
+crypto API.
+FMP can be tested with various test vectors in testmgr of crypto API.
 
-The patch would look like this then:
+When encrypting using FMP, additional control is required to deliver and
+manage encryption information between encryption users (fscrypt, DM-crypt)
+and FMP drivers. Diskcipher provides this control.
 
-Subject: [PATCH] crypto: pcrypt - forbid recursive instantiation
+The encryption using FMP is made up of 4 steps.
+The first step is to assign a password and set a key.
+Encryption users such as Fscrypt or DM-crypt assign diskcipher, and set key
+to the diskcipher.
+The second step is to deliver diskcipher that has crypto information to
+storage drivers such as UFS and MMC. BIO is used to this delivery.
+The BIO submitters, such as ext4, f2fs and DM-crypt, checks if there is
+diskcipher in crypto configuration before issuing BIO. If there are
+diskcipher, the submitter sets it to BIO.
+In addition, the BIO submitter skips the task of encrypting data before BIO
+and decrypting data after BIO is completed.
+In the third step, the storage driver gets the diskcipher from the BIO and
+requests the FMP to encrypt.
+In the final step, the FMP extracts crypto information from the diskcipher
+and writes it in the descriptor area allocated for FMP H/W.
+The FMP H/W uses the descriptor of the storage controller to contain crypto
+information. So the descriptor of storage controller should be expanded
+for FMP.
 
-If the pcrypt template is used multiple times in an algorithm, then a
-deadlock occurs because all pcrypt instances share the same
-padata_instance, which completes requests in the order submitted.  That
-is, the inner pcrypt request waits for the outer pcrypt request while
-the outer request is already waiting for the inner.
+Boojin Kim (9):
+  crypt: Add diskcipher
+  crypto: fmp: add Flash Memory Protector driver
+  mmc: dw_mmc: support crypto operation
+  mmc: dw_mmc-exynos: support FMP
+  block: support diskcipher
+  dm crypt: support diskcipher
+  fscrypt: support diskcipher
+  fs: ext4: support diskcipher
+  fs: f2fs: support diskcipher
 
-Fix this by making pcrypt forbid instantiation if pcrypt appears in the
-underlying ->cra_driver_name and if an underlying algorithm needs a
-fallback.  This is somewhat of a hack, but it's a simple fix that should
-be sufficient to prevent the deadlock.
+ block/bio.c                      |   1 +
+ block/blk-merge.c                |  19 +-
+ block/bounce.c                   |   5 +-
+ crypto/Kconfig                   |   9 +
+ crypto/Makefile                  |   1 +
+ crypto/diskcipher.c              | 349 +++++++++++++++++++++++
+ crypto/testmgr.c                 | 157 +++++++++++
+ drivers/crypto/Kconfig           |   2 +
+ drivers/crypto/Makefile          |   1 +
+ drivers/crypto/fmp/Kconfig       |  13 +
+ drivers/crypto/fmp/Makefile      |   1 +
+ drivers/crypto/fmp/fmp.c         | 595
++++++++++++++++++++++++++++++++++++++++
+ drivers/crypto/fmp/fmp_crypt.c   | 243 ++++++++++++++++
+ drivers/crypto/fmp/fmp_test.c    | 310 ++++++++++++++++++++
+ drivers/crypto/fmp/fmp_test.h    |  30 ++
+ drivers/md/dm-crypt.c            | 112 +++++++-
+ drivers/mmc/host/Kconfig         |   8 +
+ drivers/mmc/host/dw_mmc-exynos.c |  62 ++++
+ drivers/mmc/host/dw_mmc.c        |  48 +++-
+ drivers/mmc/host/dw_mmc.h        |   6 +
+ fs/buffer.c                      |   2 +
+ fs/crypto/bio.c                  |  43 ++-
+ fs/crypto/fscrypt_private.h      |  28 +-
+ fs/crypto/keysetup.c             |  60 +++-
+ fs/crypto/keysetup_v1.c          |   2 +-
+ fs/ext4/inode.c                  |  39 ++-
+ fs/ext4/page-io.c                |   8 +-
+ fs/ext4/readpage.c               |   7 +
+ fs/f2fs/data.c                   |  98 ++++++-
+ fs/f2fs/f2fs.h                   |   2 +-
+ include/crypto/diskcipher.h      | 245 ++++++++++++++++
+ include/crypto/fmp.h             | 324 +++++++++++++++++++++
+ include/linux/bio.h              |  10 +
+ include/linux/blk_types.h        |   4 +
+ include/linux/bvec.h             |   3 +
+ include/linux/crypto.h           |   1 +
+ include/linux/fscrypt.h          |  19 ++
+ include/uapi/linux/fscrypt.h     |   2 +
+ tools/include/uapi/linux/fs.h    |   1 +
+ 39 files changed, 2837 insertions(+), 33 deletions(-)
+ create mode 100644 crypto/diskcipher.c
+ create mode 100644 drivers/crypto/fmp/Kconfig
+ create mode 100644 drivers/crypto/fmp/Makefile
+ create mode 100644 drivers/crypto/fmp/fmp.c
+ create mode 100644 drivers/crypto/fmp/fmp_crypt.c
+ create mode 100644 drivers/crypto/fmp/fmp_test.c
+ create mode 100644 drivers/crypto/fmp/fmp_test.h
+ create mode 100644 include/crypto/diskcipher.h
+ create mode 100644 include/crypto/fmp.h
 
-Reproducer:
-
-	#include <linux/if_alg.h>
-	#include <sys/socket.h>
-	#include <unistd.h>
-
-	int main()
-	{
-		struct sockaddr_alg addr = {
-			.salg_type = "aead",
-			.salg_name = "pcrypt(pcrypt(rfc4106-gcm-aesni))"
-		};
-		int algfd, reqfd;
-		char buf[32] = { 0 };
-
-		algfd = socket(AF_ALG, SOCK_SEQPACKET, 0);
-		bind(algfd, (void *)&addr, sizeof(addr));
-		setsockopt(algfd, SOL_ALG, ALG_SET_KEY, buf, 20);
-		reqfd = accept(algfd, 0, 0);
-		write(reqfd, buf, 32);
-		read(reqfd, buf, 16);
-	}
-
-Reported-by: syzbot+56c7151cad94eec37c521f0e47d2eee53f9361c4@syzkaller.appspotmail.com
-Fixes: 5068c7a883d1 ("crypto: pcrypt - Add pcrypt crypto parallelization wrapper")
-Cc: <stable@vger.kernel.org> # v2.6.34+
-Signed-off-by: Eric Biggers <ebiggers@google.com>
-Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
----
- crypto/pcrypt.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
-
-diff --git a/crypto/pcrypt.c b/crypto/pcrypt.c
-index 543792e0ebf0..932a77b61b47 100644
---- a/crypto/pcrypt.c
-+++ b/crypto/pcrypt.c
-@@ -198,6 +198,12 @@ static void pcrypt_free(struct aead_instance *inst)
- static int pcrypt_init_instance(struct crypto_instance *inst,
- 				struct crypto_alg *alg)
- {
-+	/* Recursive pcrypt deadlocks due to the shared padata_instance */
-+	if (!strncmp(alg->cra_driver_name, "pcrypt(", 7) ||
-+	    strstr(alg->cra_driver_name, "(pcrypt(") ||
-+	    strstr(alg->cra_driver_name, ",pcrypt("))
-+		return -EINVAL;
-+
- 	if (snprintf(inst->alg.cra_driver_name, CRYPTO_MAX_ALG_NAME,
- 		     "pcrypt(%s)", alg->cra_driver_name) >= CRYPTO_MAX_ALG_NAME)
- 		return -ENAMETOOLONG;
-@@ -236,7 +242,7 @@ static int pcrypt_create_aead(struct crypto_template *tmpl, struct rtattr **tb,
- 	ctx = aead_instance_ctx(inst);
- 	crypto_set_aead_spawn(&ctx->spawn, aead_crypto_instance(inst));
- 
--	err = crypto_grab_aead(&ctx->spawn, name, 0, 0);
-+	err = crypto_grab_aead(&ctx->spawn, name, 0, CRYPTO_ALG_NEED_FALLBACK);
- 	if (err)
- 		goto out_free_inst;
- 
 -- 
-2.17.1
+2.7.4
 
