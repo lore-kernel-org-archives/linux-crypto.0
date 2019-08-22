@@ -2,95 +2,223 @@ Return-Path: <SRS0=w8RP=WS=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FFF9C3A59D
-	for <linux-crypto@archiver.kernel.org>; Thu, 22 Aug 2019 05:58:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32EB2C41514
+	for <linux-crypto@archiver.kernel.org>; Thu, 22 Aug 2019 08:37:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1ADE321848
-	for <linux-crypto@archiver.kernel.org>; Thu, 22 Aug 2019 05:58:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0503E2341A
+	for <linux-crypto@archiver.kernel.org>; Thu, 22 Aug 2019 08:37:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1566463063;
+	bh=XE3xK9iG8Wy7wo/kPx8rxFjUegSzi/UaDRIOdgmeG7Q=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=CcOFWl3TsL9OCLItfqjI8180ErzvsH1I+defV8ktbUVoIWGjbKIQRj3Svv7YKoT/K
+	 rTC+dN2E6PhszQENK2RJdzbMvcTB0FZFFe0zbvwIaXtaxgrrisLD0jcpr7aU7MW4fo
+	 gMUHVj2gwFIq4lQI9D1MH7kU9w2FCuGWdtLffnXA=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731541AbfHVF6C (ORCPT
+        id S1731714AbfHVIhl (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 22 Aug 2019 01:58:02 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:58452 "EHLO fornost.hmeau.com"
+        Thu, 22 Aug 2019 04:37:41 -0400
+Received: from mail.kernel.org ([198.145.29.99]:41742 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731523AbfHVF6C (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 22 Aug 2019 01:58:02 -0400
-Received: from gondolin.me.apana.org.au ([192.168.0.6] helo=gondolin.hengli.com.au)
-        by fornost.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1i0g6K-00030i-Oa; Thu, 22 Aug 2019 15:57:36 +1000
-Received: from herbert by gondolin.hengli.com.au with local (Exim 4.80)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1i0g6G-00013W-Es; Thu, 22 Aug 2019 15:57:32 +1000
-Date:   Thu, 22 Aug 2019 15:57:32 +1000
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Hans de Goede <hdegoede@redhat.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        Heiko Carstens <heiko.carstens@de.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-s390@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 0/7] crypto: sha256 - Merge 2 separate C
- implementations into 1, put into separate library
-Message-ID: <20190822055732.GI3860@gondor.apana.org.au>
-References: <20190817142435.8532-1-hdegoede@redhat.com>
+        id S1731984AbfHVIhl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 22 Aug 2019 04:37:41 -0400
+Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 339BF23427;
+        Thu, 22 Aug 2019 08:37:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1566463059;
+        bh=XE3xK9iG8Wy7wo/kPx8rxFjUegSzi/UaDRIOdgmeG7Q=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=jhs218aNaLA4Bq8OPujJ/oKGM90+zjHunggojHGSt42VmXqMKgeNTPazw8Mmev1Je
+         JwhDX50NdqNblLusEM/+477jQps0EsJvAhuJqHOEuGRyDPBMUO588mLhb49EyqUQu8
+         uON7wCWTLLCkC28QdqMP+2McwTT40RKkfLdU2OOE=
+Received: by mail-lj1-f179.google.com with SMTP id h15so4731563ljg.10;
+        Thu, 22 Aug 2019 01:37:39 -0700 (PDT)
+X-Gm-Message-State: APjAAAUcc0ABIBYnRNScEKkjjmWx5PaRSzszsLzE/+EP/xYyiZg5h/FE
+        Sa9AOW+KamagdVqYkkTgrrcY3FsZEDr0mzYDlhc=
+X-Google-Smtp-Source: APXvYqxXD3xVQJzrJLwcWiHpcv+TEgK10V+ZrGUMTV7We6eP5yS2aPqV9SO+VlhvYHW+opZdR7L81464kePe1T4gEFc=
+X-Received: by 2002:a2e:b4d4:: with SMTP id r20mr21412900ljm.5.1566463057314;
+ Thu, 22 Aug 2019 01:37:37 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190817142435.8532-1-hdegoede@redhat.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+References: <CGME20190821064211epcas2p43ed73f4fd126bcc5b470c9136db6aabc@epcas2p4.samsung.com>
+ <003d01d557eb$8f6ca210$ae45e630$@samsung.com>
+In-Reply-To: <003d01d557eb$8f6ca210$ae45e630$@samsung.com>
+From:   Krzysztof Kozlowski <krzk@kernel.org>
+Date:   Thu, 22 Aug 2019 10:37:26 +0200
+X-Gmail-Original-Message-ID: <CAJKOXPdK3ZzQXjzPZLzu5q0HZsL1vohQ4UxYTONcWdtDbEe2ng@mail.gmail.com>
+Message-ID: <CAJKOXPdK3ZzQXjzPZLzu5q0HZsL1vohQ4UxYTONcWdtDbEe2ng@mail.gmail.com>
+Subject: Re: [PATCH 1/9] crypt: Add diskcipher
+To:     "boojin.kim" <boojin.kim@samsung.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Eric Biggers <ebiggers@kernel.org>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>, Chao Yu <chao@kernel.org>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Andreas Dilger <adilger.kernel@dilger.ca>, dm-devel@redhat.com,
+        Mike Snitzer <snitzer@redhat.com>,
+        Alasdair Kergon <agk@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        Kukjin Kim <kgene@kernel.org>,
+        Jaehoon Chung <jh80.chung@samsung.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        linux-fscrypt@vger.kernel.org, linux-mmc@vger.kernel.org,
+        "linux-samsung-soc@vger.kernel.org" 
+        <linux-samsung-soc@vger.kernel.org>, linux-block@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        linux-arm-kernel@lists.infradead.org, linux-fsdevel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Aug 17, 2019 at 04:24:28PM +0200, Hans de Goede wrote:
-> Hi All,
-> 
-> Here is v2 of my patch series refactoring the current 2 separate SHA256
-> C implementations into 1 and put it into a separate library.
-> 
-> There are 3 reasons for this:
-> 
-> 1) Remove the code duplication of having 2 separate implementations
-> 
-> 2) Offer a separate library SHA256 implementation which can be used
-> without having to call crypto_alloc_shash first. This is especially
-> useful for use during early boot when crypto_alloc_shash does not
-> work yet.
-> 
-> 3) Having the purgatory code using the same code as the crypto subsys means
-> that the purgratory code will be tested by the crypto subsys selftests.
-> 
-> This has been tested on x86, including checking that kecec still works.
-> 
-> This has NOT been tested on s390, if someone with access to s390 can
-> test that things still build with this series applied and that
-> kexec still works, that would be great.
-> 
-> Changes in v2:
-> - Use put_unaligned_be32 to store the hash to allow callers to use an
->   unaligned buffer for storing the hash
-> - Add a comment to include/crypto/sha256.h explaining that these functions
->   now may be used outside of the purgatory too (and that using the crypto
->   API instead is preferred)
-> - Add sha224 support to the lib/crypto/sha256 library code
-> - Make crypto/sha256_generic.c not only use sha256_transform from
->   lib/crypto/sha256.c but also switch it to using sha256_init, sha256_update
->   and sha256_final from there so that the crypto subsys selftests fully test
->   the lib/crypto/sha256.c implementation
+On Wed, 21 Aug 2019 at 08:42, boojin.kim <boojin.kim@samsung.com> wrote:
+>
+> Diskcipher supports cryptographic operations of inline crypto engines like
+> FMP. Inline crypto engine refers to hardware and solutions implemented
+> to encrypt data stored in storage device.
+>
+> When encrypting using the FMP, Additional control is required
+> to carry and maintain the crypto information between
+> the encryption user(fscrypt, DM-crypt) and FMP driver.
+> Diskcipher provides this control.
+>
+> Diskcipher is a symmetric key cipher in linux crypto API to support FMP.
+> FMP are registered with the cihper algorithm that uses diskcipher.
+>
+> Diskcipher has three major steps.
+> The first step is to assign a cipher and set the key.
+> The second step is to pass the cipher through the BIO to the storage
+> driver.
+> The third step is to get the cipher from BIO and request a crypt
+> to FMP algorithm.
+>
+> In the first step, encryption users such as fscrypt or dm-crypt
+> allocate/release a diskcipher and set key into the diskcipher.
+> Diskcipher provides allocate(), free(), and setkey() that are similar
+> to existing ciphers.
+>
+> In the second step, BIO is used to pass the diskcipher to the storage
+> driver.
+> The BIO submitters such as ext4, f2fs and DM-crypt set diskcipher to BIO.
+> Diskcipher provides the set () API for this.
+>
+> In the third step, the storage driver extracts the diskcipher from the BIO
+> and requests the actual encryption behavior to inline crypto engine driver.
+> Diskcipher provides get() and crypt() APIs for this.
+>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: David S. Miller <davem@davemloft.net>
+> Signed-off-by: Boojin Kim <boojin.kim@samsung.com>
+> ---
+>  crypto/Kconfig              |   9 ++
+>  crypto/Makefile             |   1 +
+>  crypto/diskcipher.c         | 349
+> ++++++++++++++++++++++++++++++++++++++++++++
+>  crypto/testmgr.c            | 157 ++++++++++++++++++++
+>  include/crypto/diskcipher.h | 245 +++++++++++++++++++++++++++++++
+>  include/linux/crypto.h      |   1 +
+>  6 files changed, 762 insertions(+)
+>  create mode 100644 crypto/diskcipher.c
+>  create mode 100644 include/crypto/diskcipher.h
+>
+> diff --git a/crypto/Kconfig b/crypto/Kconfig
+> index 455a335..382d43a 100644
+> --- a/crypto/Kconfig
+> +++ b/crypto/Kconfig
+> @@ -1636,6 +1636,15 @@ config CRYPTO_TWOFISH_AVX_X86_64
+>           See also:
+>           <http://www.schneier.com/twofish.html>
+>
+> +config CRYPTO_DISKCIPHER
+> +       bool "Diskcipher support"
+> +       default n
+> +       help
+> +         Disk cipher algorithm
+> +
+> +         This cipher supports the crypt operation of the block host device
+> +         that has inline crypto engine.
+> +
+>  comment "Compression"
+>
+>  config CRYPTO_DEFLATE
+> diff --git a/crypto/Makefile b/crypto/Makefile
+> index 0d2cdd5..71df76a 100644
+> --- a/crypto/Makefile
+> +++ b/crypto/Makefile
+> @@ -165,6 +165,7 @@ obj-$(CONFIG_CRYPTO_USER_API_AEAD) += algif_aead.o
+>  obj-$(CONFIG_CRYPTO_ZSTD) += zstd.o
+>  obj-$(CONFIG_CRYPTO_OFB) += ofb.o
+>  obj-$(CONFIG_CRYPTO_ECC) += ecc.o
+> +obj-$(CONFIG_CRYPTO_DISKCIPHER) += diskcipher.o
+>
+>  ecdh_generic-y += ecdh.o
+>  ecdh_generic-y += ecdh_helper.o
+> diff --git a/crypto/diskcipher.c b/crypto/diskcipher.c
+> new file mode 100644
+> index 0000000..ffe95a5
+> --- /dev/null
+> +++ b/crypto/diskcipher.c
+> @@ -0,0 +1,349 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +/*
+> + * Copyright (C) 2017 Samsung Electronics Co., Ltd.
+> + *
+> + * This program is free software; you can redistribute it and/or modify
+> + * it under the terms of the GNU General Public License as published by
+> + * the Free Software Foundation; either version 2 of the License, or
+> + * (at your option) any later version.
+> + */
+> +
+> +#include <linux/kernel.h>
+> +#include <linux/blkdev.h>
+> +#include <linux/errno.h>
+> +#include <linux/module.h>
+> +#include <linux/seq_file.h>
+> +#include <linux/string.h>
+> +#include <linux/crypto.h>
+> +#include <crypto/algapi.h>
+> +#include <crypto/diskcipher.h>
+> +#include <linux/delay.h>
+> +#include <linux/mm_types.h>
+> +#include <linux/fs.h>
+> +#include <linux/fscrypt.h>
+> +
+> +#include "internal.h"
+> +
+> +static int crypto_diskcipher_check(struct bio *bio)
+> +{
+> +       struct crypto_diskcipher *ci = NULL;
+> +       struct inode *inode = NULL;
+> +       struct page *page = NULL;
+> +
+> +       if (!bio) {
+> +               pr_err("%s: doesn't exist bio\n", __func__);
+> +               return 0;
+> +       }
+> +
+> +       /* enc without fscrypt */
+> +       ci = bio->bi_aux_private;
+> +       if (!ci->inode)
+> +               return 0;
+> +       if (ci->algo == 0)
+> +               return 0;
+> +
+> +       page = bio->bi_io_vec[0].bv_page;
+> +       if (!page || PageAnon(page) || !page->mapping ||
+> !page->mapping->host)
 
-All applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Your patch looks corrupted - wrapped by mailer. The easiest way
+usually is to use git format-patch and git send-email - then you do
+not have to worry about formatting etc.
+
+Best regards,
+Krzysztof
