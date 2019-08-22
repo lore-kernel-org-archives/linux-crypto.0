@@ -2,102 +2,134 @@ Return-Path: <SRS0=w8RP=WS=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B3F3C3A5A1
-	for <linux-crypto@archiver.kernel.org>; Thu, 22 Aug 2019 15:47:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4321C3A5A1
+	for <linux-crypto@archiver.kernel.org>; Thu, 22 Aug 2019 22:10:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D5C2823400
-	for <linux-crypto@archiver.kernel.org>; Thu, 22 Aug 2019 15:47:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7DADD21744
+	for <linux-crypto@archiver.kernel.org>; Thu, 22 Aug 2019 22:10:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NAKrHCFJ"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="J+4MXTXA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387888AbfHVPri (ORCPT
+        id S2390423AbfHVWKq (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 22 Aug 2019 11:47:38 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:54244 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387880AbfHVPri (ORCPT
+        Thu, 22 Aug 2019 18:10:46 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:41426 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390232AbfHVWKq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 22 Aug 2019 11:47:38 -0400
-Received: by mail-wm1-f68.google.com with SMTP id 10so6121472wmp.3
-        for <linux-crypto@vger.kernel.org>; Thu, 22 Aug 2019 08:47:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id;
-        bh=ePEhvI4Ou85as0xCHV2LBgE4jtxI043xEpOM+J7yQmU=;
-        b=NAKrHCFJmq8WKxoxGP/IRY1YFhYN7z4m+YH8w/gA21gZ44+QyW5djQ+Fkb8KEguhQ5
-         UZUmxVoot1+faBVGjFdbM2rTTz6NLrBgminmlzDxGXgl+grvpIyx8kkcTLN21cybjAaw
-         k2hXF9320G1s2xOTSFqMjprtVCL7UwE8PwvvalPtFBuztq41tC6urXcFDMqudAyiNip6
-         jvPMxh6AY16oVhUwSqX0tZT/GP3WIdae07NMKzicBpajyhlA8cIH0Gs3xYilVkVTbRB4
-         qYwL1j30y70gCMEr9XUU3ysBM7lRSguW41bFtOT2F9pS9U3o1H7wHtsstkQlaRRzwgC4
-         HgDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=ePEhvI4Ou85as0xCHV2LBgE4jtxI043xEpOM+J7yQmU=;
-        b=tKTLPFMK2MDNI/L85JbV0xJt4McdTCcyFsL/wQ0SK6k/Lgfa0ORq1GI8PuMan0cD4O
-         RGOw7apoEYX1pd/kgwgPeGcPWopQZoB+Bzuu7v3aMYs6SB6nZGmbantpWSV1mVsqv2tH
-         GlnwXbiC0eJH2yAH400O+HXS1NhHLeiohSP2Wmt9iC0FauQUFmVSWDD4uqPqzHCEPYsT
-         9/V9SozrV+aR4jT+nL1j9lLQHMAk4Fk+W0/rmg3LQb5Y5W6H/ypuDpIjlIKLmOxIxAKK
-         ocsrMZIKtNfv4ux/9PSH5J5cmGaZlXPhTegsGpa9NixiobzlbaNvx3HV6xLMHhRPo2Sr
-         qzTQ==
-X-Gm-Message-State: APjAAAUrglpD1oi3xbGKd2MKpQPi0TyZp1FrbjQ0dVyGTC/OCXMajKu6
-        BBsLeGRueWeSvTA/sDYBxosEdJktS2VdMw==
-X-Google-Smtp-Source: APXvYqyNKdZtQJW2eRwHXoJNvpP5SXDzLDDLHDeCqNh2NEYwxtolQbqEAiuY3M1FSHXXsBPLg90c3w==
-X-Received: by 2002:a05:600c:24cf:: with SMTP id 15mr7265597wmu.76.1566488856953;
-        Thu, 22 Aug 2019 08:47:36 -0700 (PDT)
-Received: from localhost.localdomain (adsl-91.109.242.50.tellas.gr. [109.242.50.91])
-        by smtp.gmail.com with ESMTPSA id e10sm637wrn.33.2019.08.22.08.47.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Aug 2019 08:47:36 -0700 (PDT)
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-To:     linux-crypto@vger.kernel.org
-Cc:     herbert@gondor.apana.org.au,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Gary Hook <gary.hook@amd.com>
-Subject: [PATCH] crypto: ccp - invoke fallback for XTS ciphertext stealing
-Date:   Thu, 22 Aug 2019 18:47:31 +0300
-Message-Id: <20190822154731.13301-1-ard.biesheuvel@linaro.org>
-X-Mailer: git-send-email 2.17.1
+        Thu, 22 Aug 2019 18:10:46 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7MM3w4H119755;
+        Thu, 22 Aug 2019 22:10:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=corp-2019-08-05;
+ bh=kdQSfdcoBBmXRsKBaEBdADzGlfbRY2+yF9PElnHHdXI=;
+ b=J+4MXTXA0z4xtlZc2SDM3R3MYJ/j6QQgsUneQ9g6E2ABUIXTkE8NuMMpM+mAaB8oohNL
+ wRC9VES2lZJcoHx0B1b2lbR/F0n52rCBn24PcMc+7k/3bM7KaPWw6JoAhvmrFnknheY2
+ 9Kn2ao8+pkKUtOjQURt6Imk2yGjR8F6N8E52bB+0LO1arG63RLgHcvcXSHPKjX42tNnn
+ tCvK08XH3TlqJXPu58P5EcSx2ybPg5gXnBmDxWXBPRZR6i3mFSBJwz83ID4siEEXXXeu
+ afP971Ym9kXHwAVqNRHFQ8QLtK3efzBfV18FTjX8t1VtoJ8GBfUZgTw919EGiTf8EC5u Sw== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by aserp2120.oracle.com with ESMTP id 2ue9hq0s2r-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 22 Aug 2019 22:10:34 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7MM3gcp099962;
+        Thu, 22 Aug 2019 22:10:34 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3030.oracle.com with ESMTP id 2uhuseyupd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 22 Aug 2019 22:10:34 +0000
+Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x7MMAVZB004472;
+        Thu, 22 Aug 2019 22:10:32 GMT
+Received: from [192.168.1.219] (/98.229.125.203)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 22 Aug 2019 15:10:31 -0700
+Subject: Re: [PATCH v2] padata: validate cpumask without removed CPU during
+ offline
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Steffen Klassert <steffen.klassert@secunet.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20190809192857.26585-2-daniel.m.jordan@oracle.com>
+ <20190809210603.20900-1-daniel.m.jordan@oracle.com>
+ <20190822035005.GA32551@gondor.apana.org.au>
+From:   Daniel Jordan <daniel.m.jordan@oracle.com>
+Message-ID: <6a15a323-7e61-79b5-d3db-3c8717f50196@oracle.com>
+Date:   Thu, 22 Aug 2019 18:10:30 -0400
+MIME-Version: 1.0
+In-Reply-To: <20190822035005.GA32551@gondor.apana.org.au>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9357 signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1906280000 definitions=main-1908220194
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9357 signatures=668684
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
+ definitions=main-1908220194
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-For correctness and compliance with the XTS-AES specification, we are
-adding support for ciphertext stealing to XTS implementations, even
-though no use cases are known that will be enabled by this.
+On 8/21/19 11:50 PM, Herbert Xu wrote:
+> On Fri, Aug 09, 2019 at 05:06:03PM -0400, Daniel Jordan wrote:
+>> diff --git a/kernel/padata.c b/kernel/padata.c
+>> index d056276a96ce..01460ea1d160 100644
+>> --- a/kernel/padata.c
+>> +++ b/kernel/padata.c
+>> @@ -702,10 +702,7 @@ static int __padata_remove_cpu(struct padata_instance *pinst, int cpu)
+>>   	struct parallel_data *pd = NULL;
+>>   
+>>   	if (cpumask_test_cpu(cpu, cpu_online_mask)) {
+>> -
+>> -		if (!padata_validate_cpumask(pinst, pinst->cpumask.pcpu) ||
+>> -		    !padata_validate_cpumask(pinst, pinst->cpumask.cbcpu))
+>> -			__padata_stop(pinst);
+>> +		__padata_stop(pinst);
+>>   
+>>   		pd = padata_alloc_pd(pinst, pinst->cpumask.pcpu,
+>>   				     pinst->cpumask.cbcpu);
+>> @@ -716,6 +713,9 @@ static int __padata_remove_cpu(struct padata_instance *pinst, int cpu)
+>>   
+>>   		cpumask_clear_cpu(cpu, pd->cpumask.cbcpu);
+>>   		cpumask_clear_cpu(cpu, pd->cpumask.pcpu);
+>> +		if (padata_validate_cpumask(pinst, pd->cpumask.pcpu) &&
+>> +		    padata_validate_cpumask(pinst, pd->cpumask.cbcpu))
+>> +			__padata_start(pinst);
+>>   	}
+> 
+> I looked back at the original code and in fact the original
+> assumption is to call this after cpu_online_mask has been modified.
+> 
+> So I suspect we need to change the state at which this is called
+> by CPU hotplug.
 
-Since the ccp driver already has a fallback skcipher standby for
-dealing with input sizes other than [16, 512, 1024, 2048, 4096],
-just drop the check against the block size.
+Yes the state idea is good, it's cleaner to have the CPU out of the online mask ahead of time.
 
-Cc: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: Gary Hook <gary.hook@amd.com>
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
----
- drivers/crypto/ccp/ccp-crypto-aes-xts.c | 3 ---
- 1 file changed, 3 deletions(-)
+I think we'll need two states.  We want a CPU being offlined to already be removed from the online cpumask so and'ing the user-supplied and online masks reflects conditions after the hotplug operation is finished.  For the same reason we want a CPU being onlined to already be in the online mask, and we can use the existing hotplug state for that, though we'd need a new padata-specific state for the offline case.
 
-diff --git a/drivers/crypto/ccp/ccp-crypto-aes-xts.c b/drivers/crypto/ccp/ccp-crypto-aes-xts.c
-index 783ba75e0618..8e4a531f4f70 100644
---- a/drivers/crypto/ccp/ccp-crypto-aes-xts.c
-+++ b/drivers/crypto/ccp/ccp-crypto-aes-xts.c
-@@ -116,9 +116,6 @@ static int ccp_aes_xts_crypt(struct ablkcipher_request *req,
- 	if (!ctx->u.aes.key_len)
- 		return -EINVAL;
- 
--	if (req->nbytes & (AES_BLOCK_SIZE - 1))
--		return -EINVAL;
--
- 	if (!req->info)
- 		return -EINVAL;
- 
--- 
-2.17.1
+> IOW the commit that broke this is 30e92153b4e6.
 
+I don't think 30e92153b4e6 is the one since the commit before that only allows __padata_remove_cpu to do its work if @cpu is in the online mask, so the call happens before cpu_online_mask has been modified.  Same story for the very first padata commit, so it seems like that should actually be Fixes.
+
+> This would also allow us to get rid of the two cpumask_clear_cpu
+> calls on pd->cpumask which is just bogus as you should only ever
+> modify the pd->cpumask prior to the padata_repalce call (because
+> the readers are not serialised with respect to this).
+
+Yeah, makes sense.
+
+Daniel
