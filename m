@@ -2,86 +2,94 @@ Return-Path: <SRS0=w8RP=WS=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.2 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ED4FC3A5A1
-	for <linux-crypto@archiver.kernel.org>; Thu, 22 Aug 2019 05:55:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5473C3A59D
+	for <linux-crypto@archiver.kernel.org>; Thu, 22 Aug 2019 05:55:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D93AD21848
-	for <linux-crypto@archiver.kernel.org>; Thu, 22 Aug 2019 05:55:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C4ED0233A2
+	for <linux-crypto@archiver.kernel.org>; Thu, 22 Aug 2019 05:55:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730611AbfHVFz3 (ORCPT
+        id S1731469AbfHVFzt (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 22 Aug 2019 01:55:29 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:58364 "EHLO fornost.hmeau.com"
+        Thu, 22 Aug 2019 01:55:49 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:58378 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729690AbfHVFz3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 22 Aug 2019 01:55:29 -0400
+        id S1726857AbfHVFzs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 22 Aug 2019 01:55:48 -0400
 Received: from gondolin.me.apana.org.au ([192.168.0.6] helo=gondolin.hengli.com.au)
         by fornost.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1i0g4A-0002vT-4S; Thu, 22 Aug 2019 15:55:22 +1000
+        id 1i0g4T-0002wN-LB; Thu, 22 Aug 2019 15:55:41 +1000
 Received: from herbert by gondolin.hengli.com.au with local (Exim 4.80)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1i0g47-000117-Op; Thu, 22 Aug 2019 15:55:19 +1000
-Date:   Thu, 22 Aug 2019 15:55:19 +1000
+        id 1i0g4P-00011O-Qy; Thu, 22 Aug 2019 15:55:37 +1000
+Date:   Thu, 22 Aug 2019 15:55:37 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Stephen Boyd <swboyd@chromium.org>
-Cc:     linux-kernel@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>,
-        linux-crypto@vger.kernel.org, Matt Mackall <mpm@selenic.com>,
-        Keerthy <j-keerthy@ti.com>
-Subject: Re: [PATCH] random: Support freezable kthreads in
- add_hwgenerator_randomness()
-Message-ID: <20190822055519.GB3860@gondor.apana.org.au>
-References: <20190819150245.176587-1-swboyd@chromium.org>
+To:     Nathan Chancellor <natechancellor@gmail.com>
+Cc:     Ralf Baechle <ralf@linux-mips.org>,
+        James Hogan <jhogan@kernel.org>, linux-mips@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        clang-built-linux@googlegroups.com,
+        Nick Desaulniers <ndesaulniers@google.com>
+Subject: Re: [PATCH v2] lib/mpi: Eliminate unused umul_ppmm definitions for
+ MIPS
+Message-ID: <20190822055537.GC3860@gondor.apana.org.au>
+References: <20190812193256.55103-1-natechancellor@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190819150245.176587-1-swboyd@chromium.org>
+In-Reply-To: <20190812193256.55103-1-natechancellor@gmail.com>
 User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Aug 19, 2019 at 08:02:45AM -0700, Stephen Boyd wrote:
-> The kthread calling this function is freezable after commit 03a3bb7ae631
-> ("hwrng: core - Freeze khwrng thread during suspend") is applied.
-> Unfortunately, this function uses wait_event_interruptible() but doesn't
-> check for the kthread being woken up by the fake freezer signal. When a
-> user suspends the system, this kthread will wake up and if it fails the
-> entropy size check it will immediately go back to sleep and not go into
-> the freezer. Eventually, suspend will fail because the task never froze
-> and a warning message like this may appear:
+On Mon, Aug 12, 2019 at 12:32:57PM -0700, Nathan Chancellor wrote:
+> Clang errors out when building this macro:
 > 
->  PM: suspend entry (deep)
->  Filesystems sync: 0.000 seconds
->  Freezing user space processes ... (elapsed 0.001 seconds) done.
->  OOM killer disabled.
->  Freezing remaining freezable tasks ...
->  Freezing of tasks failed after 20.003 seconds (1 tasks refusing to freeze, wq_busy=0):
->  hwrng           R  running task        0   289      2 0x00000020
->  [<c08c64c4>] (__schedule) from [<c08c6a10>] (schedule+0x3c/0xc0)
->  [<c08c6a10>] (schedule) from [<c05dbd8c>] (add_hwgenerator_randomness+0xb0/0x100)
->  [<c05dbd8c>] (add_hwgenerator_randomness) from [<bf1803c8>] (hwrng_fillfn+0xc0/0x14c [rng_core])
->  [<bf1803c8>] (hwrng_fillfn [rng_core]) from [<c015abec>] (kthread+0x134/0x148)
->  [<c015abec>] (kthread) from [<c01010e8>] (ret_from_fork+0x14/0x2c)
+> lib/mpi/generic_mpih-mul1.c:37:24: error: invalid use of a cast in a
+> inline asm context requiring an l-value: remove the cast or build with
+> -fheinous-gnu-extensions
+>                 umul_ppmm(prod_high, prod_low, s1_ptr[j], s2_limb);
+>                 ~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> lib/mpi/longlong.h:652:20: note: expanded from macro 'umul_ppmm'
+>         : "=l" ((USItype)(w0)), \
+>                 ~~~~~~~~~~^~~
+> lib/mpi/generic_mpih-mul1.c:37:3: error: invalid output constraint '=h'
+> in asm
+>                 umul_ppmm(prod_high, prod_low, s1_ptr[j], s2_limb);
+>                 ^
+> lib/mpi/longlong.h:653:7: note: expanded from macro 'umul_ppmm'
+>              "=h" ((USItype)(w1)) \
+>              ^
+> 2 errors generated.
 > 
-> Check for a freezer signal here and skip adding any randomness if the
-> task wakes up because it was frozen. This should make the kthread freeze
-> properly and suspend work again.
+> The C version that is used for GCC 4.4 and up works well with clang;
+> however, it is not currently being used because Clang masks itself
+> as GCC 4.2.1 for compatibility reasons. As Nick points out, we require
+> GCC 4.6 and newer in the kernel so we can eliminate all of the
+> versioning checks and just use the C version of umul_ppmm for all
+> supported compilers.
 > 
-> Fixes: 03a3bb7ae631 ("hwrng: core - Freeze khwrng thread during suspend")
-> Reported-by: Keerthy <j-keerthy@ti.com>
-> Tested-by: Keerthy <j-keerthy@ti.com>
-> Signed-off-by: Stephen Boyd <swboyd@chromium.org>
+> Link: https://github.com/ClangBuiltLinux/linux/issues/605
+> Suggested-by: Nick Desaulniers <ndesaulniers@google.com>
+> Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
 > ---
 > 
-> Probably needs to go via Herbert who routed the patch this is fixing.
+> This supersedes the following two patches:
 > 
->  drivers/char/random.c | 10 +++++++---
->  1 file changed, 7 insertions(+), 3 deletions(-)
+> https://lore.kernel.org/lkml/20190812033120.43013-4-natechancellor@gmail.com/
+> 
+> https://lore.kernel.org/lkml/20190812033120.43013-5-natechancellor@gmail.com/
+> 
+> I labelled this as a v2 so those don't get applied.
+> 
+>  lib/mpi/longlong.h | 36 +-----------------------------------
+>  1 file changed, 1 insertion(+), 35 deletions(-)
 
 Patch applied.  Thanks.
 -- 
