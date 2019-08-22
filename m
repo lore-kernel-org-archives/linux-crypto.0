@@ -4,34 +4,37 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F03D2C3A5A2
-	for <linux-crypto@archiver.kernel.org>; Thu, 22 Aug 2019 14:42:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4388BC3A5A1
+	for <linux-crypto@archiver.kernel.org>; Thu, 22 Aug 2019 14:47:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C25982341E
-	for <linux-crypto@archiver.kernel.org>; Thu, 22 Aug 2019 14:42:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 16A17233A1
+	for <linux-crypto@archiver.kernel.org>; Thu, 22 Aug 2019 14:47:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732447AbfHVOl7 (ORCPT
+        id S1731126AbfHVOq7 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 22 Aug 2019 10:41:59 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:5197 "EHLO huawei.com"
+        Thu, 22 Aug 2019 10:46:59 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:46972 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726332AbfHVOl7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 22 Aug 2019 10:41:59 -0400
-Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 8FD855261A6D262269E9;
-        Thu, 22 Aug 2019 22:41:49 +0800 (CST)
-Received: from localhost (10.133.213.239) by DGGEMS407-HUB.china.huawei.com
- (10.3.19.207) with Microsoft SMTP Server id 14.3.439.0; Thu, 22 Aug 2019
- 22:41:43 +0800
+        id S1731964AbfHVOq7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 22 Aug 2019 10:46:59 -0400
+Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 2ACEC49C283CA29A4ED7;
+        Thu, 22 Aug 2019 22:45:42 +0800 (CST)
+Received: from localhost (10.133.213.239) by DGGEMS405-HUB.china.huawei.com
+ (10.3.19.205) with Microsoft SMTP Server id 14.3.439.0; Thu, 22 Aug 2019
+ 22:45:34 +0800
 From:   YueHaibing <yuehaibing@huawei.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        YueHaibing <yuehaibing@huawei.com>
-Subject: [PATCH -next] crypto: aegis128 - Fix -Wunused-const-variable warning
-Date:   Thu, 22 Aug 2019 22:41:38 +0800
-Message-ID: <20190822144138.75904-1-yuehaibing@huawei.com>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <nicolas.ferre@microchip.com>, <alexandre.belloni@bootlin.com>,
+        <ludovic.desroches@microchip.com>
+CC:     <linux-crypto@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>, YueHaibing <yuehaibing@huawei.com>
+Subject: [PATCH -next] crypto: atmel - Fix -Wunused-const-variable warning
+Date:   Thu, 22 Aug 2019 22:44:44 +0800
+Message-ID: <20190822144444.74872-1-yuehaibing@huawei.com>
 X-Mailer: git-send-email 2.10.2.windows.1
 MIME-Version: 1.0
 Content-Type: text/plain
@@ -42,63 +45,65 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-crypto/aegis.h:27:32: warning:
- crypto_aegis_const defined but not used [-Wunused-const-variable=]
+drivers/crypto/atmel-i2c.h:68:3: warning:
+ error_list defined but not used [-Wunused-const-variable=]
 
-crypto_aegis_const is only used in aegis128-core.c,
-just move the definition over there.
+error_list is only used in atmel-i2c.c,
+so just move the definition over there.
 
 Reported-by: Hulk Robot <hulkci@huawei.com>
 Signed-off-by: YueHaibing <yuehaibing@huawei.com>
 ---
- crypto/aegis.h         | 11 -----------
- crypto/aegis128-core.c | 11 +++++++++++
- 2 files changed, 11 insertions(+), 11 deletions(-)
+ drivers/crypto/atmel-i2c.c | 12 ++++++++++++
+ drivers/crypto/atmel-i2c.h | 12 ------------
+ 2 files changed, 12 insertions(+), 12 deletions(-)
 
-diff --git a/crypto/aegis.h b/crypto/aegis.h
-index 4d56a85..6920ebe 100644
---- a/crypto/aegis.h
-+++ b/crypto/aegis.h
-@@ -24,17 +24,6 @@ union aegis_block {
- #define AEGIS_BLOCK_ALIGN (__alignof__(union aegis_block))
- #define AEGIS_ALIGNED(p) IS_ALIGNED((uintptr_t)p, AEGIS_BLOCK_ALIGN)
+diff --git a/drivers/crypto/atmel-i2c.c b/drivers/crypto/atmel-i2c.c
+index dc876fab..1d33559 100644
+--- a/drivers/crypto/atmel-i2c.c
++++ b/drivers/crypto/atmel-i2c.c
+@@ -21,6 +21,18 @@
+ #include <linux/workqueue.h>
+ #include "atmel-i2c.h"
  
--static const union aegis_block crypto_aegis_const[2] = {
--	{ .words64 = {
--		cpu_to_le64(U64_C(0x0d08050302010100)),
--		cpu_to_le64(U64_C(0x6279e99059372215)),
--	} },
--	{ .words64 = {
--		cpu_to_le64(U64_C(0xf12fc26d55183ddb)),
--		cpu_to_le64(U64_C(0xdd28b57342311120)),
--	} },
--};
--
- static __always_inline void crypto_aegis_block_xor(union aegis_block *dst,
- 						   const union aegis_block *src)
- {
-diff --git a/crypto/aegis128-core.c b/crypto/aegis128-core.c
-index fa69e99..80e7361 100644
---- a/crypto/aegis128-core.c
-+++ b/crypto/aegis128-core.c
-@@ -45,6 +45,17 @@ struct aegis128_ops {
- 
- static bool have_simd;
- 
-+static const union aegis_block crypto_aegis_const[2] = {
-+	{ .words64 = {
-+		cpu_to_le64(U64_C(0x0d08050302010100)),
-+		cpu_to_le64(U64_C(0x6279e99059372215)),
-+	} },
-+	{ .words64 = {
-+		cpu_to_le64(U64_C(0xf12fc26d55183ddb)),
-+		cpu_to_le64(U64_C(0xdd28b57342311120)),
-+	} },
++static const struct {
++	u8 value;
++	const char *error_text;
++} error_list[] = {
++	{ 0x01, "CheckMac or Verify miscompare" },
++	{ 0x03, "Parse Error" },
++	{ 0x05, "ECC Fault" },
++	{ 0x0F, "Execution Error" },
++	{ 0xEE, "Watchdog about to expire" },
++	{ 0xFF, "CRC or other communication error" },
 +};
 +
- static bool aegis128_do_simd(void)
- {
- #ifdef CONFIG_CRYPTO_AEGIS128_SIMD
+ /**
+  * atmel_i2c_checksum() - Generate 16-bit CRC as required by ATMEL ECC.
+  * CRC16 verification of the count, opcode, param1, param2 and data bytes.
+diff --git a/drivers/crypto/atmel-i2c.h b/drivers/crypto/atmel-i2c.h
+index 21860b9..63b97b1 100644
+--- a/drivers/crypto/atmel-i2c.h
++++ b/drivers/crypto/atmel-i2c.h
+@@ -62,18 +62,6 @@ struct atmel_i2c_cmd {
+ #define STATUS_NOERR			0x00
+ #define STATUS_WAKE_SUCCESSFUL		0x11
+ 
+-static const struct {
+-	u8 value;
+-	const char *error_text;
+-} error_list[] = {
+-	{ 0x01, "CheckMac or Verify miscompare" },
+-	{ 0x03, "Parse Error" },
+-	{ 0x05, "ECC Fault" },
+-	{ 0x0F, "Execution Error" },
+-	{ 0xEE, "Watchdog about to expire" },
+-	{ 0xFF, "CRC or other communication error" },
+-};
+-
+ /* Definitions for eeprom organization */
+ #define CONFIG_ZONE			0
+ 
 -- 
 2.7.4
 
