@@ -2,79 +2,101 @@ Return-Path: <SRS0=iGjW=WT=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3731C3A589
-	for <linux-crypto@archiver.kernel.org>; Fri, 23 Aug 2019 04:29:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29791C3A5A2
+	for <linux-crypto@archiver.kernel.org>; Fri, 23 Aug 2019 07:18:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8125D2341F
-	for <linux-crypto@archiver.kernel.org>; Fri, 23 Aug 2019 04:29:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EF63420679
+	for <linux-crypto@archiver.kernel.org>; Fri, 23 Aug 2019 07:18:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729566AbfHWE3C (ORCPT
+        id S1730411AbfHWHSI (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 23 Aug 2019 00:29:02 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:58676 "EHLO fornost.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726283AbfHWE3C (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 23 Aug 2019 00:29:02 -0400
-Received: from gondolin.me.apana.org.au ([192.168.0.6] helo=gondolin.hengli.com.au)
-        by fornost.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1i11At-0006rg-Aj; Fri, 23 Aug 2019 14:27:43 +1000
-Received: from herbert by gondolin.hengli.com.au with local (Exim 4.80)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1i11AE-0004RC-MF; Fri, 23 Aug 2019 14:27:02 +1000
-Date:   Fri, 23 Aug 2019 14:27:02 +1000
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     "boojin.kim" <boojin.kim@samsung.com>
-Cc:     "'David S. Miller'" <davem@davemloft.net>,
-        'Eric Biggers' <ebiggers@kernel.org>,
-        "'Theodore Y. Ts'o'" <tytso@mit.edu>, 'Chao Yu' <chao@kernel.org>,
-        'Jaegeuk Kim' <jaegeuk@kernel.org>,
-        'Andreas Dilger' <adilger.kernel@dilger.ca>,
-        dm-devel@redhat.com, 'Mike Snitzer' <snitzer@redhat.com>,
-        'Alasdair Kergon' <agk@redhat.com>,
-        'Jens Axboe' <axboe@kernel.dk>,
-        'Krzysztof Kozlowski' <krzk@kernel.org>,
-        'Kukjin Kim' <kgene@kernel.org>,
-        'Jaehoon Chung' <jh80.chung@samsung.com>,
-        'Ulf Hansson' <ulf.hansson@linaro.org>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-samsung-soc@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        linux-arm-kernel@lists.infradead.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH 6/9] dm crypt: support diskcipher
-Message-ID: <20190823042702.GA17034@gondor.apana.org.au>
-References: <CGME20190823042038epcas2p2000738f3ca7f5f3d92ea1c32de2bcf99@epcas2p2.samsung.com>
- <017901d5596a$1df3a590$59daf0b0$@samsung.com>
+        Fri, 23 Aug 2019 03:18:08 -0400
+Received: from regular1.263xmail.com ([211.150.70.199]:36998 "EHLO
+        regular1.263xmail.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728493AbfHWHSH (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 23 Aug 2019 03:18:07 -0400
+X-Greylist: delayed 459 seconds by postgrey-1.27 at vger.kernel.org; Fri, 23 Aug 2019 03:18:03 EDT
+Received: from zhangzj?rock-chips.com (unknown [192.168.167.172])
+        by regular1.263xmail.com (Postfix) with ESMTP id AEDB0407
+        for <linux-crypto@vger.kernel.org>; Fri, 23 Aug 2019 15:10:09 +0800 (CST)
+X-263anti-spam: KSV:0;BIG:0;
+X-MAIL-GRAY: 0
+X-MAIL-DELIVERY: 1
+X-KSVirus-check: 0
+X-ADDR-CHECKED4: 1
+X-ABS-CHECKED: 1
+X-SKE-CHECKED: 1
+X-ANTISPAM-LEVEL: 2
+Received: from [172.16.9.224] (unknown [58.22.7.114])
+        by smtp.263.net (postfix) whith ESMTP id P7360T140429191169792S1566544207442490_;
+        Fri, 23 Aug 2019 15:10:08 +0800 (CST)
+X-IP-DOMAINF: 1
+X-UNIQUE-TAG: <d99d501476352652c40f794ffd33ecda>
+X-RL-SENDER: zhangzj@rock-chips.com
+X-SENDER: zhangzj@rock-chips.com
+X-LOGIN-NAME: zhangzj@rock-chips.com
+X-FST-TO: ebiggers@kernel.org
+X-SENDER-IP: 58.22.7.114
+X-ATTACHMENT-NUM: 0
+X-DNS-TYPE: 0
+Subject: Re: cbc mode broken in rk3288 driver
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Eric Biggers <ebiggers@kernel.org>
+References: <CAKv+Gu8mjM7o+CuP9VrGX+cuix_zRupfozUoDbEWXHVGsW8syw@mail.gmail.com>
+From:   Elon Zhang <zhangzj@rock-chips.com>
+Message-ID: <cdf08891-3b55-e123-1e13-23866af3b289@rock-chips.com>
+Date:   Fri, 23 Aug 2019 15:10:09 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <017901d5596a$1df3a590$59daf0b0$@samsung.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <CAKv+Gu8mjM7o+CuP9VrGX+cuix_zRupfozUoDbEWXHVGsW8syw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Aug 23, 2019 at 01:20:37PM +0900, boojin.kim wrote:
+Hi Ard,
+
+I will try to fix this bug. Furthermore, I will submit a patch to  set 
+crypto node default disable in rk3288.dtsi.
+
+On 8/20/2019 23:45, Ard Biesheuvel wrote:
+> Hello all,
 >
-> If yes, I think the following API needs to be added to skcipher:  
-> - _set(): BIO submitter (dm-crypt, f2fs, ext4) sets cipher to BIO.
-> - _mergeable(): Block layer checks if two BIOs have the same cipher.
-> - _get(): Storage driver gets cipher from BIO.
-> - _set_crypt(): Storage driver gets crypto information from cipher and 
-> writes it on the descriptor of Storage controller.
-> Is it acceptable to skcipher ?
+> While playing around with the fuzz tests on kernelci.org (which has a
+> couple of rk3288 based boards for boot testing), I noticed that the
+> rk3288 cbc mode driver is still broken (both AES and DES fail).
+>
+> For instance, one of the runs failed with
+>
+>   alg: skcipher: cbc-aes-rk encryption test failed (wrong result) on
+> test vector \"random: len=6848 klen=32\", cfg=\"random: may_sleep
+> use_digest src_divs=[93.41%@+1655, 2.19%@+3968, 4.40%@+22]\"
+>
+> (but see below for the details of a few runs)
+>
+> However, more importantly, it looks like the driver violates the
+> scatterlist API, by assuming that sg entries are always mapped and
+> that sg_virt() and/or page_address(sg_page()) can always be called on
+> arbitrary scatterlist entries
+>
+> The failures in question all occur with inputs whose size > PAGE_SIZE,
+> so it looks like the PAGE_SIZE limit is interacting poorly with the
+> way the next IV is obtained.
+>
+> Broken CBC is a recipe for disaster, and so this should really be
+> fixed, or the driver disabled.
+>
 
-No.  If you're after total offload then the crypto API is not for
-you.  What we can support is the offloading of encryption/decryption
-over many sectors.
 
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
