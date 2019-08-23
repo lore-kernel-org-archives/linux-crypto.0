@@ -2,143 +2,128 @@ Return-Path: <SRS0=iGjW=WT=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2CCFC3A5A2
-	for <linux-crypto@archiver.kernel.org>; Fri, 23 Aug 2019 02:35:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0626C41514
+	for <linux-crypto@archiver.kernel.org>; Fri, 23 Aug 2019 03:08:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9228A23402
-	for <linux-crypto@archiver.kernel.org>; Fri, 23 Aug 2019 02:35:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8622F23407
+	for <linux-crypto@archiver.kernel.org>; Fri, 23 Aug 2019 03:08:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="flcLM5FZ"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="qnJ03ZvU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391010AbfHWCf3 (ORCPT
+        id S2389719AbfHWDIr (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 22 Aug 2019 22:35:29 -0400
-Received: from mail-io1-f65.google.com ([209.85.166.65]:35709 "EHLO
-        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732967AbfHWCf2 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 22 Aug 2019 22:35:28 -0400
-Received: by mail-io1-f65.google.com with SMTP id b10so7542466ioj.2
-        for <linux-crypto@vger.kernel.org>; Thu, 22 Aug 2019 19:35:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=2Ob+A4xxX2bRSxLGz92/UzTEvC1yWM8JcjhiXKDPfB8=;
-        b=flcLM5FZxA1UdTl+5MfostzBYwQfyv1yb87DaSzrnDrUwd/ZNj4K4T/rHszC/sFQMH
-         ADUFV/N/N6vulg+PsFB9LiJOba7WYzMsXqe7TkwmxiwQw++HUI5Q9lwxgsadqj5kp36o
-         7ir9Ftxz3Frpzbh7dbD9IWl/fAPy+uyEwFD9Qu0xwImVT/66UuNo3m+3vDu9rqcZdHGP
-         dJuOAFAhp3e0iD0AWnqz3VAQtqcjnUDCLFkZZiPVDrJq83kU9d3bg+KlteAnZK+XFKE6
-         M2BK3WAwQy2tydaBr0xJ2dcLV8QJVxM3CxkgnlBsNXoibdFYaWIIutqUzeXdd2gExoTy
-         FEcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=2Ob+A4xxX2bRSxLGz92/UzTEvC1yWM8JcjhiXKDPfB8=;
-        b=kXVirNQD8liETTUqaTHP5NvAwk5YV7gkr2FC8m+X/53NQCzjCBrI6rb4W0Tu0UA2Hs
-         251U0p6g9U2edhHtuXO+QNXsEO4tvte7BT1jBmPyuX4yus4h/Y5HFE8tH0Qi0O+sK9Aj
-         SGSmNyQ3mI9p6WRg6D0ffCaiHmW77HULXMV27DhXR1pHUAsWleP+30pDHjduVKj0y7Zh
-         Q82GyX7Mx2vP7iMzKhLQQsfYqVIyv218H1LHlH/U+bWN33qaag+3zBUO6sc6xzPtRlQE
-         iJYC2pQ1u9VOYO+zmuVVge2nYHwnXX858ayuD+FNzF+kTdo6yi7AfyFIvkTOYFTQCzsW
-         gS0g==
-X-Gm-Message-State: APjAAAW73yeOgTwRWOgyR5xp3dC+xdugTBrJdg3H3ex7tgEIy5RMZCPs
-        usXPdpZftaZ+H5qO+6JsqvmQAXRDwMJz9JdRxHAM9Q==
-X-Google-Smtp-Source: APXvYqxk0KBtXTDXCH7sq1BDWGn2tzcj3BOrK9VJXXJYjin28Niwi8IhH6bIWJT+jY7Hn20R6XsnRrLk/vFE/AUzyqo=
-X-Received: by 2002:a6b:c581:: with SMTP id v123mr3719443iof.158.1566527727590;
- Thu, 22 Aug 2019 19:35:27 -0700 (PDT)
+        Thu, 22 Aug 2019 23:08:47 -0400
+Received: from ozlabs.org ([203.11.71.1]:56123 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2389290AbfHWDIr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 22 Aug 2019 23:08:47 -0400
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 46F5vb6dQrz9s7T;
+        Fri, 23 Aug 2019 13:08:43 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
+        s=201702; t=1566529724;
+        bh=Y4rV12y4MwnYpN7mGIgEqqv5HK0SPrggGd2iqOCrVoA=;
+        h=Date:From:To:Cc:Subject:From;
+        b=qnJ03ZvU26qzYJkcJYFaoXYxEA8vxKAutntLOldqizpk6kpdN9h1RakdMaX9olX7z
+         MXTf4lwr73ks4UFzERbTlHig3W8kblik2MzzVakT78Niy/eIVme+3LKtvyv5DcDuAP
+         xQ9dQ+nS35o3FSOlC2NNsMYGxvlXgwoAngFlReXuxcl9+etK/blKasLZLGO471n05J
+         yL3Iv6um507c51kBF9ikkZkaTmxp6E4FdzhicFsaCSJAiMn3QA6Ws3ZHcXV+Bluy1F
+         1PwvLAm8hdnCc7GF+4GddCw3ceYgX6SFBvc18ljYnkIjEe9/0FpoMu/Bk2WJ+o8No7
+         o8csPDam9RBPA==
+Date:   Fri, 23 Aug 2019 13:08:41 +1000
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto List <linux-crypto@vger.kernel.org>
+Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Hans de Goede <hdegoede@redhat.com>
+Subject: linux-next: manual merge of the crypto tree with Linus' tree
+Message-ID: <20190823130841.4fdbda61@canb.auug.org.au>
 MIME-Version: 1.0
-References: <CGME20190821064226epcas2p2835b8a9084988b79107e54abfc5e7dab@epcas2p2.samsung.com>
- <004101d557eb$98b00060$ca100120$@samsung.com> <6ea5e5db-4dd4-719f-3b3e-b89099636ea6@kernel.dk>
-In-Reply-To: <6ea5e5db-4dd4-719f-3b3e-b89099636ea6@kernel.dk>
-From:   Satya Tangirala <satyat@google.com>
-Date:   Thu, 22 Aug 2019 19:35:16 -0700
-Message-ID: <CAA+FYZc6G0xk7Dhx0b9xNRoK+b+DpfuS+OK4wn4bpKpFPiiGUQ@mail.gmail.com>
-Subject: Re: [PATCH 5/9] block: support diskcipher
-To:     Jens Axboe <axboe@kernel.dk>, boojin.kim@samsung.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Biggers <ebiggers@kernel.org>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>, Chao Yu <chao@kernel.org>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Andreas Dilger <adilger.kernel@dilger.ca>, dm-devel@redhat.com,
-        Mike Snitzer <snitzer@redhat.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        Kukjin Kim <kgene@kernel.org>,
-        Jaehoon Chung <jh80.chung@samsung.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        linux-crypto@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-        linux-mmc@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        linux-arm-kernel@lists.infradead.org, linux-fsdevel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; boundary="Sig_/=xcZ.RUWj2DDJGdJ2qm19.r";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Aug 21, 2019 at 5:10 AM Jens Axboe <axboe@kernel.dk> wrote:
->
-> On 8/21/19 12:42 AM, boojin.kim wrote:
-> > This patch supports crypto information to be maintained via BIO
-> > and passed to the storage driver.
-> >
-> > To do this, 'bi_aux_private', 'REQ_CYPTE' and 'bi_dun' are added
-> > to the block layer.
-> >
-> > 'bi_aux_private' is added for loading additional private information into
-> > BIO.
-> > 'REQ_CRYPT' is added to distinguish that bi_aux_private is being used
-> > for diskcipher.
-> > F2FS among encryption users uses DUN(device unit number) as
-> > the IV(initial vector) for cryptographic operations.
-> > DUN is stored in 'bi_dun' of bi_iter as a specific value for each BIO.
-> >
-> > Before attempting to merge the two BIOs, the operation is also added to
-> > verify that the crypto information contained in two BIOs is consistent.
->
-> This isn't going to happen. With this, and the inline encryption
-> proposed by Google, we'll bloat the bio even more. At least the Google
-> approach didn't include bio iter changes as well.
->
-> Please work it out between yourselves so we can have a single, clean
-> abstraction that works for both.
->
-> --
-> Jens Axboe
->
+--Sig_/=xcZ.RUWj2DDJGdJ2qm19.r
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Hi Boojin,
+Hi all,
 
-We're very keen to make sure that our approach to inline encryption can
-work with diverse hardware, including Samsung's FMP hardware; if you
-can see any issues with using our approach with your hardware please
-let us know.
+Today's linux-next merge of the crypto tree got a conflict in:
 
-We understand that a possible concern for getting FMP working with our
-patch series for Inline Encryption Support at
+  arch/x86/purgatory/Makefile
 
-https://lore.kernel.org/linux-block/20190821075714.65140-1-satyat@google.com/
+between commit:
 
-is that unlike some inline encryption hardware (and also unlike the JEDEC
-UFS v2.1 spec), FMP doesn't have the concept of a limited number of
-keyslots - to address that difference we have a "passthrough keyslot
-manager", which we put up on top of our patch series for inline encryption
-support at
+  4ce97317f41d ("x86/purgatory: Do not use __builtin_memcpy and __builtin_m=
+emset")
 
-https://android-review.googlesource.com/c/kernel/common/+/980137/2
+from Linus' tree and commit:
 
-Setting up a passthrough keyslot manager in the request queue of a
-device allows the device to receive a bio's encryption context as-is with
-the bio, which is what FMP would prefer. Are there any issues with
-using the passthrough keyslot manager for FMP?
+  ad767ee858b3 ("crypto: sha256 - Move lib/sha256.c to lib/crypto")
 
-Thanks!
-Satya
+from the crypto tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc arch/x86/purgatory/Makefile
+index 8901a1f89cf5,ea86982aba27..000000000000
+--- a/arch/x86/purgatory/Makefile
++++ b/arch/x86/purgatory/Makefile
+@@@ -6,12 -6,11 +6,14 @@@ purgatory-y :=3D purgatory.o stack.o setu
+  targets +=3D $(purgatory-y)
+  PURGATORY_OBJS =3D $(addprefix $(obj)/,$(purgatory-y))
+ =20
+ +$(obj)/string.o: $(srctree)/arch/x86/boot/compressed/string.c FORCE
+ +	$(call if_changed_rule,cc_o_c)
+ +
+- $(obj)/sha256.o: $(srctree)/lib/sha256.c FORCE
++ $(obj)/sha256.o: $(srctree)/lib/crypto/sha256.c FORCE
+  	$(call if_changed_rule,cc_o_c)
+ =20
++ CFLAGS_sha256.o :=3D -D__DISABLE_EXPORTS
++=20
+  LDFLAGS_purgatory.ro :=3D -e purgatory_start -r --no-undefined -nostdlib =
+-z nodefaultlib
+  targets +=3D purgatory.ro
+ =20
+
+--Sig_/=xcZ.RUWj2DDJGdJ2qm19.r
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl1fWLkACgkQAVBC80lX
+0GzRMgf/X7CRbOkevCxmPAir1DvqbNEOGARqOtal9Ky+ADu1LxKZbnCkUO9fqKWP
+lGGt84IxUT6Xd1alfY34+0p+EVw0eQI4DecRDFgyd00tK5Z2lYrKhcmSHoxVbKUG
+wOPEwuxOnC0bw0nIsb+pNmzJt+ts8C9pYDlOkWMwW4ok0HKvpAXJB9lYn/Xn16hK
+xtLA+AAtYOR6VOV8nrMNsW+1RCw22mZVAdajrIqV0MOyJCfrnc8BC+ZCPg0DXvri
+xUk4sGXIxr3iIPkK/HRwC1cpv+8c8alATo56xWlBwo3CzCIviO94OCVoKlxYi4+j
+I3mqvUxw6qlffEIbjbZdQX4GaIaaGg==
+=kX1i
+-----END PGP SIGNATURE-----
+
+--Sig_/=xcZ.RUWj2DDJGdJ2qm19.r--
