@@ -1,139 +1,156 @@
-Return-Path: <SRS0=w8RP=WS=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=iGjW=WT=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22B67C3A5A1
-	for <linux-crypto@archiver.kernel.org>; Thu, 22 Aug 2019 22:53:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC21EC3A5A1
+	for <linux-crypto@archiver.kernel.org>; Fri, 23 Aug 2019 00:50:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CAE2F21848
-	for <linux-crypto@archiver.kernel.org>; Thu, 22 Aug 2019 22:53:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A074E23401
+	for <linux-crypto@archiver.kernel.org>; Fri, 23 Aug 2019 00:50:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="NVV8kon+"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="qjJP3CPD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405322AbfHVWxX (ORCPT
+        id S1729018AbfHWAut (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 22 Aug 2019 18:53:23 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:51958 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2405321AbfHVWxX (ORCPT
+        Thu, 22 Aug 2019 20:50:49 -0400
+Received: from mailout1.samsung.com ([203.254.224.24]:11100 "EHLO
+        mailout1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730756AbfHWAut (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 22 Aug 2019 18:53:23 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7MMiR8f137545;
-        Thu, 22 Aug 2019 22:53:10 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=subject : from : to :
- cc : references : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=corp-2019-08-05;
- bh=vpVu2VZRtNah6ylpgnywGvA55NJhIJGRcvAqj+DChyw=;
- b=NVV8kon+IlvlvC423xl7cR5HmEvnrJ2TgEOHtaqMdQLZvfV+GH7bfnbEBMPaiW+H5Uux
- +S2tBikRm8BWXBAaM7V23EEhj99jNTUPxCMd0bR1iEvER+6kOTh6AZXljSrt0reFhYOe
- Fro4Xasfz/ZxMHev65VDkFcRQK3f/NQStfZIY2sx+lRgRXkqnwYTUyj13Pgx6JhaYhm2
- UTHZfJh2KM0ckKkQOt8D/4ibYMYGsrtIf1Cxd3iob4xFc5Mhj45TXCJoY6A/miwCavAF
- 0q6EexfYl7cuERK24nvg6IXYXMOKl8e0JQyxWIdsgo6BRtGWL4838Sd2RejIXb2zx6SQ Gw== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2120.oracle.com with ESMTP id 2uea7r9003-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 22 Aug 2019 22:53:10 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7MMhXOd043707;
-        Thu, 22 Aug 2019 22:53:09 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by aserp3020.oracle.com with ESMTP id 2uj1xyuhdm-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 22 Aug 2019 22:53:09 +0000
-Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x7MMr7p7026926;
-        Thu, 22 Aug 2019 22:53:08 GMT
-Received: from [192.168.1.219] (/98.229.125.203)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 22 Aug 2019 15:53:07 -0700
-Subject: Re: [PATCH v2] padata: validate cpumask without removed CPU during
- offline
-From:   Daniel Jordan <daniel.m.jordan@oracle.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Steffen Klassert <steffen.klassert@secunet.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20190809192857.26585-2-daniel.m.jordan@oracle.com>
- <20190809210603.20900-1-daniel.m.jordan@oracle.com>
- <20190822035005.GA32551@gondor.apana.org.au>
- <6a15a323-7e61-79b5-d3db-3c8717f50196@oracle.com>
-Message-ID: <b341a330-0e85-e386-1f74-89219c4f511f@oracle.com>
-Date:   Thu, 22 Aug 2019 18:53:06 -0400
+        Thu, 22 Aug 2019 20:50:49 -0400
+Received: from epcas2p3.samsung.com (unknown [182.195.41.55])
+        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20190823005045epoutp019d140f6c6ddabdfec653ca8977287a74~9ZvRk9oWK0808908089epoutp01M
+        for <linux-crypto@vger.kernel.org>; Fri, 23 Aug 2019 00:50:45 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20190823005045epoutp019d140f6c6ddabdfec653ca8977287a74~9ZvRk9oWK0808908089epoutp01M
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1566521445;
+        bh=f2ThUHwqU6SxyDkaBykTiPQlcm0wcRMy3IpQiQiChcs=;
+        h=From:To:Cc:Subject:Date:References:From;
+        b=qjJP3CPDZUoPqC+TllhSHlEzayDCNEEA/ZeZhRffZlSa6IWzZNyyy/WghomGNCSH3
+         Ll12acSDQNebr7Gm85XsT73lLM+iAcMPvCd+fTuz8IXicflKfBccxTrV2stA77r50K
+         SbznIaYWExt+HtvjAggHXAnol3/leqScWyxLjaic=
+Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
+        epcas2p4.samsung.com (KnoxPortal) with ESMTP id
+        20190823005044epcas2p4d26d2085b61ee54bd5954b1c574ebbe6~9ZvRA3S2Y1951719517epcas2p4w;
+        Fri, 23 Aug 2019 00:50:44 +0000 (GMT)
+Received: from epsmges2p2.samsung.com (unknown [182.195.40.184]) by
+        epsnrtp2.localdomain (Postfix) with ESMTP id 46F2rL3vD7zMqYkk; Fri, 23 Aug
+        2019 00:50:42 +0000 (GMT)
+Received: from epcas2p4.samsung.com ( [182.195.41.56]) by
+        epsmges2p2.samsung.com (Symantec Messaging Gateway) with SMTP id
+        5E.38.04149.2683F5D5; Fri, 23 Aug 2019 09:50:42 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+        epcas2p3.samsung.com (KnoxPortal) with ESMTPA id
+        20190823005041epcas2p3c8550c3fabbd6a6db6429cb06dbbf3a6~9ZvObUZVL1059310593epcas2p3U;
+        Fri, 23 Aug 2019 00:50:41 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20190823005041epsmtrp1e67b842e0eeb29d74f2dcb22b227f249~9ZvOaIzfb2194621946epsmtrp1o;
+        Fri, 23 Aug 2019 00:50:41 +0000 (GMT)
+X-AuditID: b6c32a46-fd5ff70000001035-b2-5d5f38625f08
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        F7.1A.03706.1683F5D5; Fri, 23 Aug 2019 09:50:41 +0900 (KST)
+Received: from KORDO035251 (unknown [12.36.165.204]) by epsmtip2.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20190823005041epsmtip2748af0669304060f493849067826a76f~9ZvOI_Fjj0682606826epsmtip2h;
+        Fri, 23 Aug 2019 00:50:41 +0000 (GMT)
+From:   "boojin.kim" <boojin.kim@samsung.com>
+To:     "'Krzysztof Kozlowski'" <krzk@kernel.org>
+Cc:     "'Herbert Xu'" <herbert@gondor.apana.org.au>,
+        "'David S. Miller'" <davem@davemloft.net>,
+        "'Eric Biggers'" <ebiggers@kernel.org>,
+        "'Theodore Y. Ts'o'" <tytso@mit.edu>,
+        "'Chao Yu'" <chao@kernel.org>,
+        "'Jaegeuk Kim'" <jaegeuk@kernel.org>,
+        "'Andreas Dilger'" <adilger.kernel@dilger.ca>,
+        "'Theodore Ts'o'" <tytso@mit.edu>, <dm-devel@redhat.com>,
+        "'Mike Snitzer'" <snitzer@redhat.com>,
+        "'Alasdair Kergon'" <agk@redhat.com>,
+        "'Jens Axboe'" <axboe@kernel.dk>,
+        "'Krzysztof Kozlowski'" <krzk@kernel.org>,
+        "'Kukjin Kim'" <kgene@kernel.org>,
+        "'Jaehoon Chung'" <jh80.chung@samsung.com>,
+        "'Ulf Hansson'" <ulf.hansson@linaro.org>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-fscrypt@vger.kernel.org>, <linux-mmc@vger.kernel.org>,
+        <linux-samsung-soc@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-ext4@vger.kernel.org>,
+        <linux-f2fs-devel@lists.sourceforge.net>,
+        <linux-samsung-soc@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-fsdevel@vger.kernel.org>
+Subject: Re: [PATCH 1/9] crypt: Add diskcipher
+Date:   Fri, 23 Aug 2019 09:50:41 +0900
+Message-ID: <00da01d5594c$c9d87390$5d895ab0$@samsung.com>
 MIME-Version: 1.0
-In-Reply-To: <6a15a323-7e61-79b5-d3db-3c8717f50196@oracle.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9357 signatures=668684
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1906280000 definitions=main-1908220199
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9357 signatures=668684
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=1 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
- definitions=main-1908220199
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 14.0
+Thread-Index: AdVZTE1TDvDE+uWuReO+5O58h7ifGg==
+Content-Language: ko
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprFLsWRmVeSWpSXmKPExsWy7bCmhW6SRXysweKVkhZfv3SwWKw/dYzZ
+        YvXdfjaL01PPMlnMOd/CYrH33WxWi7V7/jBbdL+SsXiyfhazxY1fbawW/Y9fM1ucP7+B3WLT
+        42usFntvaVvcv/eTyWLmvDtsFpcWuVu8mveNxWLP3pMsFpd3zWGzOPK/n9Fixvl9TBZtG78y
+        WrT2/GS3OL423EHSY8vKm0weLZvLPbYdUPW4fLbUY9OqTjaPO9f2sHlsXlLvsXvBZyaPpjNH
+        mT3e77vK5tG3ZRWjx+dNcgE8UTk2GamJKalFCql5yfkpmXnptkrewfHO8aZmBoa6hpYW5koK
+        eYm5qbZKLj4Bum6ZOUC/KymUJeaUAoUCEouLlfTtbIryS0tSFTLyi0tslVILUnIKDA0L9IoT
+        c4tL89L1kvNzrQwNDIxMgSoTcjI6Ly5kKvjFXLFyz1PWBsaJzF2MnBwSAiYSL6bdBLK5OIQE
+        djBKHLn/Csr5xCix9PRDFgjnG6PEowUX2GFafl3vYoNI7GWUuPn/HVTLS0aJna+nsoBUsQlo
+        S2w+vooRxBYR0JXYfGM5O0gRs8A/doknnw6BFQkL6EnMeLCYCcRmEVCV2PysF2gsBwevgKXE
+        q49qIGFeAUGJkzOfgJUzC8hLbH87B+pwBYkdZ19DzdeTeN4xnR2iRkRidmcb2EESAj/ZJSb9
+        ameBaHCR6JtwBcoWlnh1fAvUO1ISL/vboOx6iavLFrNDNPcwSpz5BZMwlpj1rJ0R5DhmAU2J
+        9bv0QUwJAWWJI7egbuOT6Dj8lx0izCvR0SYE0agiMffTZSaIsJTEh546iLCHRPPBDrYJjIqz
+        kDw5C8mTs5A8Mwth7QJGllWMYqkFxbnpqcVGBUbIkb2JEZwvtNx2MC4553OIUYCDUYmHt6Aj
+        LlaINbGsuDL3EKMEB7OSCG/ZRKAQb0piZVVqUX58UWlOavEhRlNgFExklhJNzgfmsrySeENT
+        IzMzA0tTC1MzIwslcd5N3DdjhATSE0tSs1NTC1KLYPqYODilGhhb2VZ9bj/4j9m9Iuf7vUUs
+        J3MWHf0j1lTS2eO4QTdzw8b5G6K8pjDqvjtzN9nhxX13G1vnkq0G1TZrtL/4bHvHupRDP5rx
+        VqSo+KHqV+sObK02DLrOElD9o+/Xi+W1bfOcdJRutyZXXz9cM4dTcjbnAX/x5gzHh1uvntDf
+        efu79KO5c470TF6hxFKckWioxVxUnAgA7+Q96S0EAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrFIsWRmVeSWpSXmKPExsWy7bCSvG6iRXyswZrzuhZfv3SwWKw/dYzZ
+        YvXdfjaL01PPMlnMOd/CYrH33WxWi7V7/jBbdL+SsXiyfhazxY1fbawW/Y9fM1ucP7+B3WLT
+        42usFntvaVvcv/eTyWLmvDtsFpcWuVu8mveNxWLP3pMsFpd3zWGzOPK/n9Fixvl9TBZtG78y
+        WrT2/GS3OL423EHSY8vKm0weLZvLPbYdUPW4fLbUY9OqTjaPO9f2sHlsXlLvsXvBZyaPpjNH
+        mT3e77vK5tG3ZRWjx+dNcgE8UVw2Kak5mWWpRfp2CVwZnRcXMhX8Yq5YuecpawPjROYuRk4O
+        CQETiV/Xu9i6GLk4hAR2M0qc+72aHSIhJbG1fQ9UkbDE/ZYjrBBFzxklDhw4BVbEJqAtsfn4
+        KkYQW0RAV2LzjeVgcWaBaRwSuz6Ig9jCAnoSMx4sZgKxWQRUJTY/6wXaxsHBK2Ap8eqjGkiY
+        V0BQ4uTMJywgYWag8raNjBBT5CW2v50DdYKCxI6zr6E26Uk875gOtUlEYnZnG/MERsFZSCbN
+        Qpg0C8mkWUg6FjCyrGKUTC0ozk3PLTYsMMxLLdcrTswtLs1L10vOz93ECE4BWpo7GC8viT/E
+        KMDBqMTDW9ARFyvEmlhWXJl7iFGCg1lJhLdsIlCINyWxsiq1KD++qDQntfgQozQHi5I479O8
+        Y5FCAumJJanZqakFqUUwWSYOTqkGxpkCz5+oMws9PX3b/Iwkf+SF3W8rQ53jHge67jXfcttX
+        XfWf/YkDt2PWHm6XO/JJRet0fPHMFRtncfxadl8yhy+f9dwq5ZWcKeFMbiHrX7L3Sj37OZvd
+        4obsuk/CfvZi882OzLqbKXEtsXAff8/CwM0+Hnof3BSz71z2LO/ouybA31ka2n+AWYmlOCPR
+        UIu5qDgRAIuCqND9AgAA
+X-CMS-MailID: 20190823005041epcas2p3c8550c3fabbd6a6db6429cb06dbbf3a6
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: AUTO_CONFIDENTIAL
+CMS-TYPE: 102P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20190823005041epcas2p3c8550c3fabbd6a6db6429cb06dbbf3a6
+References: <CGME20190823005041epcas2p3c8550c3fabbd6a6db6429cb06dbbf3a6@epcas2p3.samsung.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Wed, 22 Aug 2019 at 17:37, Krzysztof Kozlowski <krzk@kernel.org> wrote:
+>
+> Your patch looks corrupted - wrapped by mailer. The easiest way
+> usually is to use git format-patch and git send-email - then you do
+> not have to worry about formatting etc.
+>
+> Best regards,
+> Krzysztof
 
+I'm using outlook instead of 'git send-email' because of workplace policy.
+It's probably broken when I copied the code.
+Thanks for your notice. I will be more careful.
 
-On 8/22/19 6:10 PM, Daniel Jordan wrote:
-> On 8/21/19 11:50 PM, Herbert Xu wrote:
->> On Fri, Aug 09, 2019 at 05:06:03PM -0400, Daniel Jordan wrote:
->>> diff --git a/kernel/padata.c b/kernel/padata.c
->>> index d056276a96ce..01460ea1d160 100644
->>> --- a/kernel/padata.c
->>> +++ b/kernel/padata.c
->>> @@ -702,10 +702,7 @@ static int __padata_remove_cpu(struct padata_instance *pinst, int cpu)
->>>       struct parallel_data *pd = NULL;
->>>       if (cpumask_test_cpu(cpu, cpu_online_mask)) {
->>> -
->>> -        if (!padata_validate_cpumask(pinst, pinst->cpumask.pcpu) ||
->>> -            !padata_validate_cpumask(pinst, pinst->cpumask.cbcpu))
->>> -            __padata_stop(pinst);
->>> +        __padata_stop(pinst);
->>>           pd = padata_alloc_pd(pinst, pinst->cpumask.pcpu,
->>>                        pinst->cpumask.cbcpu);
->>> @@ -716,6 +713,9 @@ static int __padata_remove_cpu(struct padata_instance *pinst, int cpu)
->>>           cpumask_clear_cpu(cpu, pd->cpumask.cbcpu);
->>>           cpumask_clear_cpu(cpu, pd->cpumask.pcpu);
->>> +        if (padata_validate_cpumask(pinst, pd->cpumask.pcpu) &&
->>> +            padata_validate_cpumask(pinst, pd->cpumask.cbcpu))
->>> +            __padata_start(pinst);
->>>       }
->>
->> I looked back at the original code and in fact the original
->> assumption is to call this after cpu_online_mask has been modified.
->>
->> So I suspect we need to change the state at which this is called
->> by CPU hotplug.
-> 
-> Yes the state idea is good, it's cleaner to have the CPU out of the online mask ahead of time.
-> 
-> I think we'll need two states.  We want a CPU being offlined to already be removed from the online cpumask so and'ing the user-supplied and online masks reflects conditions after the hotplug operation is finished.  For the same reason we want a CPU being onlined to already be in the online mask, and we can use the existing hotplug state for that, though we'd need a new padata-specific state for the offline case.
+Thanks for your reply
+Boojin Kim.
 
-The new state would be something before CPUHP_BRINGUP_CPU so the cpu isn't in the online mask yet.
-
-> 
->> IOW the commit that broke this is 30e92153b4e6.
-> 
-> I don't think 30e92153b4e6 is the one since the commit before that only allows __padata_remove_cpu to do its work if @cpu is in the online mask, so the call happens before cpu_online_mask has been modified.  Same story for the very first padata commit, so it seems like that should actually be Fixes.
-> 
->> This would also allow us to get rid of the two cpumask_clear_cpu
->> calls on pd->cpumask which is just bogus as you should only ever
->> modify the pd->cpumask prior to the padata_repalce call (because
->> the readers are not serialised with respect to this).
-> 
-> Yeah, makes sense.
-> 
-> Daniel
