@@ -1,86 +1,145 @@
-Return-Path: <SRS0=39WF=WV=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=hp4v=WW=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F7CDC41514
-	for <linux-crypto@archiver.kernel.org>; Sun, 25 Aug 2019 18:18:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97E6EC3A59E
+	for <linux-crypto@archiver.kernel.org>; Mon, 26 Aug 2019 06:57:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id ECC79206E0
-	for <linux-crypto@archiver.kernel.org>; Sun, 25 Aug 2019 18:18:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 40A39217F4
+	for <linux-crypto@archiver.kernel.org>; Mon, 26 Aug 2019 06:57:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=c-s.fr header.i=@c-s.fr header.b="nz82GQfv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728755AbfHYSSr (ORCPT
+        id S1729437AbfHZG5t (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 25 Aug 2019 14:18:47 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:43790 "EHLO mx1.redhat.com"
+        Mon, 26 Aug 2019 02:57:49 -0400
+Received: from pegase1.c-s.fr ([93.17.236.30]:16400 "EHLO pegase1.c-s.fr"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728727AbfHYSSq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 25 Aug 2019 14:18:46 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 8A02AA28883;
-        Sun, 25 Aug 2019 18:18:46 +0000 (UTC)
-Received: from shalem.localdomain.com (ovpn-116-52.ams2.redhat.com [10.36.116.52])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 2DD6E5D6A3;
-        Sun, 25 Aug 2019 18:18:42 +0000 (UTC)
-From:   Hans de Goede <hdegoede@redhat.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        Heiko Carstens <heiko.carstens@de.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>
-Cc:     Hans de Goede <hdegoede@redhat.com>,
-        Marc Zyngier <marc.zyngier@arm.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-s390@vger.kernel.org, linux-efi@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: sha256 - Add missing MODULE_LICENSE() to lib/crypto/sha256.c
-Date:   Sun, 25 Aug 2019 20:18:41 +0200
-Message-Id: <20190825181841.2494-1-hdegoede@redhat.com>
+        id S1728033AbfHZG5s (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 26 Aug 2019 02:57:48 -0400
+Received: from localhost (mailhub1-int [192.168.12.234])
+        by localhost (Postfix) with ESMTP id 46H2rQ3Q7Kz9vBLK;
+        Mon, 26 Aug 2019 08:57:42 +0200 (CEST)
+Authentication-Results: localhost; dkim=pass
+        reason="1024-bit key; insecure key"
+        header.d=c-s.fr header.i=@c-s.fr header.b=nz82GQfv; dkim-adsp=pass;
+        dkim-atps=neutral
+X-Virus-Scanned: Debian amavisd-new at c-s.fr
+Received: from pegase1.c-s.fr ([192.168.12.234])
+        by localhost (pegase1.c-s.fr [192.168.12.234]) (amavisd-new, port 10024)
+        with ESMTP id 0BLECxZKWJfM; Mon, 26 Aug 2019 08:57:42 +0200 (CEST)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+        by pegase1.c-s.fr (Postfix) with ESMTP id 46H2rQ1rCSz9vBLJ;
+        Mon, 26 Aug 2019 08:57:42 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=c-s.fr; s=mail;
+        t=1566802662; bh=aZYAcTNAf9puWpxcoR1X89KPq8JXWoAVBzsU7UH1tsU=;
+        h=Subject:To:References:From:Cc:Date:In-Reply-To:From;
+        b=nz82GQfvMScr0AQjq5gO9D3xMdPBK1dL9EyzLQ9i2VgfCsDkNp6F/+2AP8R5nJAzj
+         nF6/zjSs/jGJylOK62HZC5U8kMMX9/raGKskxjzIDp04gKXrneYXVXQIAE9ytEF+Dd
+         d8E1TgohuGVCTCH9yJJKfY8JrgZ7IaswU7qxmK04=
+Received: from localhost (localhost [127.0.0.1])
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id E01F78B7CE;
+        Mon, 26 Aug 2019 08:57:46 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+        by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+        with ESMTP id 6xB2eY4bRtgG; Mon, 26 Aug 2019 08:57:46 +0200 (CEST)
+Received: from [172.25.230.103] (po15451.idsi0.si.c-s.fr [172.25.230.103])
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id BDFF68B7B9;
+        Mon, 26 Aug 2019 08:57:46 +0200 (CEST)
+Subject: Re: Data size error interrupt with Talitos driver on 4.9.82 kernel
+To:     Mukul Joshi <mukuljoshi2011@gmail.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+References: <CANaw-r4i6qHXYNDFu5dZ4DsHedyPonk5N+-F9Mu4JvLRrD50sQ@mail.gmail.com>
+From:   Christophe Leroy <christophe.leroy@c-s.fr>
+Cc:     Kim Phillips <kim.phillips@arm.com>
+Message-ID: <d20ab826-5a7a-e0e4-6591-4c7d4bdae5d8@c-s.fr>
+Date:   Mon, 26 Aug 2019 08:57:46 +0200
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
+In-Reply-To: <CANaw-r4i6qHXYNDFu5dZ4DsHedyPonk5N+-F9Mu4JvLRrD50sQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.68]); Sun, 25 Aug 2019 18:18:46 +0000 (UTC)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-lib/crypto/sha256.c / lib/crypto/libsha256.o may end up being a module,
-so it needs a MODULE_LICENSE() line, add this.
+Hi Mukul
 
-Signed-off-by: Hans de Goede <hdegoede@redhat.com>
----
- lib/crypto/sha256.c | 3 +++
- 1 file changed, 3 insertions(+)
+Le 24/08/2019 à 18:40, Mukul Joshi a écrit :
+> Hi Christophe,
 
-diff --git a/lib/crypto/sha256.c b/lib/crypto/sha256.c
-index 45ad87520769..42d75e490a97 100644
---- a/lib/crypto/sha256.c
-+++ b/lib/crypto/sha256.c
-@@ -13,6 +13,7 @@
- 
- #include <linux/bitops.h>
- #include <linux/export.h>
-+#include <linux/module.h>
- #include <linux/string.h>
- #include <crypto/sha256.h>
- #include <asm/unaligned.h>
-@@ -314,3 +315,5 @@ int sha224_final(struct sha256_state *sctx, u8 *out)
- 	return __sha256_final(sctx, out, 7);
- }
- EXPORT_SYMBOL(sha224_final);
-+
-+MODULE_LICENSE("GPL");
--- 
-2.23.0
+[...]
 
+> 
+> I am working with MPC8360E SoC  and trying to setup IPSEC tunnel between 
+> 2 hosts.
+> I am able to setup the tunnel but I am seeing issues with packet 
+> decryption. The sender side doesn't seem to have a problem and the 
+> packet is also being encrypted by the EU.
+> 
+> Upon reception of packet, I am seeing Data size error interrupt go up in 
+> the Interrupt status register of the EU.
+> I see the problem with both AES and 3DES algos.
+> 
+> Here are the logs that I see in dmesg:
+> AES:
+> [  832.041102] talitos e0030000.crypto: AESUISR *0x00000000_00000100*
+> [  832.041120] talitos e0030000.crypto: MDEUISR 0x00000000_00000000
+> [  832.041131] talitos e0030000.crypto: DESCBUF 0x60235c0b_00000000
+> [  832.041142] talitos e0030000.crypto: DESCBUF 0x00140000_0c8d353c
+> [  832.041154] talitos e0030000.crypto: DESCBUF 0x00180000_12f57920
+> [  832.041165] talitos e0030000.crypto: DESCBUF 0x00100000_144e3e40
+> [  832.041176] talitos e0030000.crypto: DESCBUF 0x00100000_0c8d3550
+> [  832.041188] talitos e0030000.crypto: DESCBUF 0x006c0000_12f57938
+> [  832.041199] talitos e0030000.crypto: DESCBUF 0x00600c00_12f57938
+> [  832.041210] talitos e0030000.crypto: DESCBUF 0x00100000_0c8d35dc
+> 
+> 3DES:
+> [ 313.635521] talitos e0030000.crypto: DEUISR *0x00000000_00000100*
+>   [  313.635539] talitos e0030000.crypto: DEUDSR *0x00000000_00000320*
+>   [  313.635549] talitos e0030000.crypto: DEURCR 0x00000000_00000000
+>   [  313.635560] talitos e0030000.crypto: DEUSR 0x00000000_00000025
+>   [  313.635572] talitos e0030000.crypto: DEUICR 0x00000000_00003000
+>   [  313.635583] talitos e0030000.crypto: MDEUISR 0x00000000_00000000
+>   [  313.635594] talitos e0030000.crypto: DESCBUF 0x20635e0b_00000000
+>   [  313.635605] talitos e0030000.crypto: DESCBUF 0x00100000_1abbc03c
+>   [  313.635617] talitos e0030000.crypto: DESCBUF 0x00100000_1ef2f226
+>   [  313.635628] talitos e0030000.crypto: DESCBUF 0x00080000_1abbdc80
+>   [  313.635639] talitos e0030000.crypto: DESCBUF 0x00180000_1abbc04c
+>   [  313.635650] talitos e0030000.crypto: DESCBUF 0x00640000_1ef2f236
+> [  313.635726] talitos e0030000.crypto: DESCBUF 0x00580c00_1ef2f236
+>   [  313.635738] talitos e0030000.crypto: DESCBUF 0x00080000_1abbc0dc
+> 
+> I was able to dump the data size register value for DES and it shows a 
+> value of 0x320 in LO word.
+> This shows that the Data size for decryption is not 64-bit multiple 
+> which causes the Data size error interrupt to go up but I don't know how 
+> this value gets written and why is the value as 0x320 when the the 
+> tcpdump on the receive side shows a packet size of 112 bytes of 
+> encrypted packets received.
+
+Yes that's strange. The pointers in the descriptors dumped above all 
+have valid size. The input data has size 0x64 ie 100 bytes, and the 
+output data has size 88 + 12 bytes HMAC out.
+
+Have you activated crypto tests at boot time ? Do they all pass ?
+
+Can you have a look at CCPSR register ?
+
+> 
+> Can you please give me a few pointers about what could be causing this 
+> issue and where else can I look further.
+
+Can you try with kernel 4.9.190 ?
+
+Have you tried with a newer LTS kernel, for instance 4.14.x or 4.19.x ?
+
+Christophe
