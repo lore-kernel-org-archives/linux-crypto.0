@@ -2,83 +2,80 @@ Return-Path: <SRS0=hp4v=WW=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56177C3A59F
-	for <linux-crypto@archiver.kernel.org>; Mon, 26 Aug 2019 11:56:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28297C3A59F
+	for <linux-crypto@archiver.kernel.org>; Mon, 26 Aug 2019 22:47:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2F4692184D
-	for <linux-crypto@archiver.kernel.org>; Mon, 26 Aug 2019 11:56:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EFB7E2186A
+	for <linux-crypto@archiver.kernel.org>; Mon, 26 Aug 2019 22:46:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727901AbfHZLz6 (ORCPT
+        id S1726543AbfHZWq7 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 26 Aug 2019 07:55:58 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:5657 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727182AbfHZLz6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 26 Aug 2019 07:55:58 -0400
-Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id B26E09BD827BE9E9B2A1;
-        Mon, 26 Aug 2019 19:55:53 +0800 (CST)
-Received: from localhost.localdomain.localdomain (10.175.113.25) by
- DGGEMS404-HUB.china.huawei.com (10.3.19.204) with Microsoft SMTP Server id
- 14.3.439.0; Mon, 26 Aug 2019 19:55:44 +0800
-From:   Mao Wenan <maowenan@huawei.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <wangzhou1@hisilicon.com>, <liguozhu@hisilicon.com>,
-        <john.garry@huawei.com>, <Jonathan.Cameron@huawei.com>
-CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kernel-janitors@vger.kernel.org>, Mao Wenan <maowenan@huawei.com>
-Subject: [PATCH -next] crypto: hisilicon: select CRYPTO_LIB_DES while compiling SEC driver
-Date:   Mon, 26 Aug 2019 19:59:14 +0800
-Message-ID: <20190826115914.182700-1-maowenan@huawei.com>
-X-Mailer: git-send-email 2.20.1
+        Mon, 26 Aug 2019 18:46:59 -0400
+Received: from linux.microsoft.com ([13.77.154.182]:36240 "EHLO
+        linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725817AbfHZWq6 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 26 Aug 2019 18:46:58 -0400
+Received: from [10.91.6.157] (unknown [167.220.2.157])
+        by linux.microsoft.com (Postfix) with ESMTPSA id D15B720B7186;
+        Mon, 26 Aug 2019 15:46:57 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com D15B720B7186
+Subject: Re: [PATCH v12 00/11] Appended signatures support for IMA appraisal
+To:     Thiago Jung Bauermann <bauerman@linux.ibm.com>,
+        linux-integrity@vger.kernel.org
+Cc:     linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Jessica Yu <jeyu@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jonathan Corbet <corbet@lwn.net>,
+        "AKASHI, Takahiro" <takahiro.akashi@linaro.org>
+References: <20190628021934.4260-1-bauerman@linux.ibm.com>
+From:   Jordan Hand <jorhand@linux.microsoft.com>
+Message-ID: <9682b5d0-1634-2dd0-2cbb-eb1fa8ba7423@linux.microsoft.com>
+Date:   Mon, 26 Aug 2019 15:46:57 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.113.25]
-X-CFilter-Loop: Reflected
+In-Reply-To: <20190628021934.4260-1-bauerman@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-When CRYPTO_DEV_HISI_SEC=y, below compilation error is found after 
-'commit 894b68d8be4b ("crypto: hisilicon/des - switch to new verification routines")':
+On 6/27/19 7:19 PM, Thiago Jung Bauermann wrote:
+> On the OpenPOWER platform, secure boot and trusted boot are being
+> implemented using IMA for taking measurements and verifying signatures.
+> Since the kernel image on Power servers is an ELF binary, kernels are
+> signed using the scripts/sign-file tool and thus use the same signature
+> format as signed kernel modules.
+> 
+> This patch series adds support in IMA for verifying those signatures.
+> It adds flexibility to OpenPOWER secure boot, because it allows it to boot
+> kernels with the signature appended to them as well as kernels where the
+> signature is stored in the IMA extended attribute.
 
-drivers/crypto/hisilicon/sec/sec_algs.o: In function `sec_alg_skcipher_setkey_des_cbc':
-sec_algs.c:(.text+0x11f0): undefined reference to `des_expand_key'
-drivers/crypto/hisilicon/sec/sec_algs.o: In function `sec_alg_skcipher_setkey_des_ecb':
-sec_algs.c:(.text+0x1390): undefined reference to `des_expand_key'
-make: *** [vmlinux] Error 1
+I know this is pretty late, but I just wanted to let you know that I
+tested this patch set on x86_64 with QEMU.
 
-This because DES library has been moved to lib/crypto in this commit 
-'04007b0e6cbb ("crypto: des - split off DES library from generic DES cipher driver")'.
-Fix this by selecting CRYPTO_LIB_DES in CRYPTO_DEV_HISI_SEC.
+That is, I enrolled a key to _ima keyring, signed my kernel and modules
+with appended signatures (with scripts/sign-file), set the IMA policy to
+appraise and measure my kernel and modules. Also tested kexec appraisal.
 
-Fixes: 915e4e8413da ("crypto: hisilicon - SEC security accelerator driver")
-Fixes: 04007b0e6cbb ("crypto: des - split off DES library from generic DES cipher driver")
-Fixes: 894b68d8be4b ("crypto: hisilicon/des - switch to new verification routines")
+You can add my tested-by if you'd like.
 
-Signed-off-by: Mao Wenan <maowenan@huawei.com>
----
- drivers/crypto/hisilicon/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/crypto/hisilicon/Kconfig b/drivers/crypto/hisilicon/Kconfig
-index fa8aa06..ebaf91e 100644
---- a/drivers/crypto/hisilicon/Kconfig
-+++ b/drivers/crypto/hisilicon/Kconfig
-@@ -4,6 +4,7 @@ config CRYPTO_DEV_HISI_SEC
- 	tristate "Support for Hisilicon SEC crypto block cipher accelerator"
- 	select CRYPTO_BLKCIPHER
- 	select CRYPTO_ALGAPI
-+	select CRYPTO_LIB_DES
- 	select SG_SPLIT
- 	depends on ARM64 || COMPILE_TEST
- 	depends on HAS_IOMEM
--- 
-2.7.4
-
+-Jordan
