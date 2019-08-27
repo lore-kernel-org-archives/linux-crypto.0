@@ -2,186 +2,108 @@ Return-Path: <SRS0=DMoR=WX=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02AB0C3A5A4
-	for <linux-crypto@archiver.kernel.org>; Tue, 27 Aug 2019 08:33:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01ED2C3A5A3
+	for <linux-crypto@archiver.kernel.org>; Tue, 27 Aug 2019 12:57:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C46092173E
-	for <linux-crypto@archiver.kernel.org>; Tue, 27 Aug 2019 08:33:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="XieTwwnC"
+	by mail.kernel.org (Postfix) with ESMTP id D64DA206BF
+	for <linux-crypto@archiver.kernel.org>; Tue, 27 Aug 2019 12:57:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729470AbfH0Idl (ORCPT
+        id S1728612AbfH0M5s (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 27 Aug 2019 04:33:41 -0400
-Received: from mailout2.samsung.com ([203.254.224.25]:27914 "EHLO
-        mailout2.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729391AbfH0Idl (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 27 Aug 2019 04:33:41 -0400
-Received: from epcas2p2.samsung.com (unknown [182.195.41.54])
-        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20190827083339epoutp022d692d447d87c3c675970b7e9b323f73~_uolLZQJe2718627186epoutp02f
-        for <linux-crypto@vger.kernel.org>; Tue, 27 Aug 2019 08:33:39 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20190827083339epoutp022d692d447d87c3c675970b7e9b323f73~_uolLZQJe2718627186epoutp02f
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1566894819;
-        bh=GR9SjpQC1GTjk5IEkgnMXdybEfO+M4pHWDvq1CPw910=;
-        h=From:To:Cc:Subject:Date:References:From;
-        b=XieTwwnC97cxvDUoQbpnT0JSA6n+Fk+S7VdNGOrPiXy28E/jsUBLsPbTLacpBVmq4
-         bf6CJ3I4sO0pBCk0d7teQmVffD1IwjV4K5W0fRZ5VVEidrxI4HknvQW4rKJFd+yMLG
-         kHKbAIJD4wTWpVa9zk1tfYfSw5p+LvA6qAUlqSxI=
-Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
-        epcas2p1.samsung.com (KnoxPortal) with ESMTP id
-        20190827083338epcas2p1bd702579931911d8ebfa6ae3218ca896~_uokazBY00556005560epcas2p1x;
-        Tue, 27 Aug 2019 08:33:38 +0000 (GMT)
-Received: from epsmges2p3.samsung.com (unknown [182.195.40.190]) by
-        epsnrtp4.localdomain (Postfix) with ESMTP id 46Hhwc2X60zMqYkg; Tue, 27 Aug
-        2019 08:33:36 +0000 (GMT)
-Received: from epcas2p3.samsung.com ( [182.195.41.55]) by
-        epsmges2p3.samsung.com (Symantec Messaging Gateway) with SMTP id
-        F2.4A.04068.FDAE46D5; Tue, 27 Aug 2019 17:33:35 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-        epcas2p1.samsung.com (KnoxPortal) with ESMTPA id
-        20190827083334epcas2p115d479190b9a72c886f66569add78203~_uog_kpL90324603246epcas2p1z;
-        Tue, 27 Aug 2019 08:33:34 +0000 (GMT)
-Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
-        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20190827083334epsmtrp1f673cf2781a7bd9de3d4862d267c9cf9~_uog9Ynxl2654126541epsmtrp1O;
-        Tue, 27 Aug 2019 08:33:34 +0000 (GMT)
-X-AuditID: b6c32a47-5a1ff70000000fe4-07-5d64eadfc43f
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-        epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        07.26.03638.EDAE46D5; Tue, 27 Aug 2019 17:33:34 +0900 (KST)
-Received: from KORDO035251 (unknown [12.36.165.204]) by epsmtip1.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20190827083334epsmtip186318bd933a57fdbaadd80afd23bc675~_uogrxHdu2027020270epsmtip14;
-        Tue, 27 Aug 2019 08:33:34 +0000 (GMT)
-From:   "boojin.kim" <boojin.kim@samsung.com>
-To:     "'Satya Tangirala'" <satyat@google.com>
-Cc:     "'Herbert Xu'" <herbert@gondor.apana.org.au>,
-        "'David S. Miller'" <davem@davemloft.net>,
-        "'Eric Biggers'" <ebiggers@kernel.org>,
-        "'Theodore Y. Ts'o'" <tytso@mit.edu>,
-        "'Chao Yu'" <chao@kernel.org>,
-        "'Jaegeuk Kim'" <jaegeuk@kernel.org>,
-        "'Andreas Dilger'" <adilger.kernel@dilger.ca>,
-        "'Theodore Ts'o'" <tytso@mit.edu>, <dm-devel@redhat.com>,
-        "'Mike Snitzer'" <snitzer@redhat.com>,
-        "'Alasdair Kergon'" <agk@redhat.com>,
-        "'Jens Axboe'" <axboe@kernel.dk>,
-        "'Krzysztof Kozlowski'" <krzk@kernel.org>,
-        "'Kukjin Kim'" <kgene@kernel.org>,
-        "'Jaehoon Chung'" <jh80.chung@samsung.com>,
-        "'Ulf Hansson'" <ulf.hansson@linaro.org>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-fscrypt@vger.kernel.org>, <linux-mmc@vger.kernel.org>,
-        <linux-samsung-soc@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-ext4@vger.kernel.org>,
-        <linux-f2fs-devel@lists.sourceforge.net>,
-        <linux-samsung-soc@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-fsdevel@vger.kernel.org>
-Subject: Re: [PATCH 5/9] block: support diskcipher
-Date:   Tue, 27 Aug 2019 17:33:33 +0900
-Message-ID: <03b201d55cb2$1d4d31b0$57e79510$@samsung.com>
+        Tue, 27 Aug 2019 08:57:48 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:41296 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726278AbfH0M5s (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 27 Aug 2019 08:57:48 -0400
+Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id A1D90A53E12960B49B43;
+        Tue, 27 Aug 2019 20:57:44 +0800 (CST)
+Received: from localhost (10.47.86.181) by DGGEMS409-HUB.china.huawei.com
+ (10.3.19.209) with Microsoft SMTP Server id 14.3.439.0; Tue, 27 Aug 2019
+ 20:57:35 +0800
+Date:   Tue, 27 Aug 2019 13:57:22 +0100
+From:   Jonathan Cameron <jonathan.cameron@huawei.com>
+To:     Mao Wenan <maowenan@huawei.com>
+CC:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <wangzhou1@hisilicon.com>, <liguozhu@hisilicon.com>,
+        <john.garry@huawei.com>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <kernel-janitors@vger.kernel.org>
+Subject: Re: [PATCH -next] crypto: hisilicon: select CRYPTO_LIB_DES while
+ compiling SEC driver
+Message-ID: <20190827135722.00000e6a@huawei.com>
+In-Reply-To: <20190826115914.182700-1-maowenan@huawei.com>
+References: <20190826115914.182700-1-maowenan@huawei.com>
+Organization: Huawei
+X-Mailer: Claws Mail 3.17.3 (GTK+ 2.24.32; i686-w64-mingw32)
 MIME-Version: 1.0
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 14.0
-Thread-Index: AdVcd9wJ7O+zjwFDS522TgVlMugkdw==
-Content-Language: ko
-X-Brightmail-Tracker: H4sIAAAAAAAAA01TfUwTdxjOr3e9nrguR0H2S/dhd9Nk1VDaasuPTUyjZl4y48jIdDGScmkv
-        hawfl16LuizDIdRa2TqzGWZhDnSTWUNwhQFDSqQyGIyPRSIBo9PMzii6LxASiI71OMz473mf
-        93nyfuUlMVWDQk2Wun2c1806aSINb7uizc2+NWUv0ne3pKHZR0EcNQ/2YejCzTCBfj45LEN1
-        o5U4iv9ZK0dNXY8xdHzqBZRsjmBoYiEgR+E7DzA0OnpRgWJ3xuUofn0juvXrvAydOn2DQFfP
-        7ERTp+dw1BUfwNFYZx2BehfDAH0x2i1D4Qs3CRT4bhagqup5Bepv2mtRM63nJ2VMZcsBpu3y
-        eqY+5mfGhv1MLHqMYG6MdxFMy9flzKX6GRlTMfQjxvzVfY1gPmmNAmYm9lKBcp9zSwnH2jmv
-        hnPbPPZStyOffrPQut1qMusN2YY8lEtr3KyLy6d37CrIfqPUmVoCrSljnf4UVcAKAp2zdYvX
-        4/dxmhKP4MunOd7u5A0GXiewLsHvduhsHtdrBr3eaEopi50lE008P688ONb3EDsMaleHAElC
-        ajP8aOSDEEgjVVQHgPfOHsGlYBrAip/qZCGwKhXMARjvyxCxaKhcuKeQRHEAByd+B1JwH8C5
-        2k6FqCKojbClPwpEnJnCv109LxdFGPWvAianE7iYyKCMsCp0fKkETq2HwcV/CBErqTzYM9AA
-        JJwOB04ll/QYtRa2/1GHSW1oYMfwg+UCOjgTGpZLmkxYeyyAicUgVUXCiiO9QDLsgPUnLi+b
-        M+BUf6tCwmp4PxxYxuXw2rmzCslcDeDQwtPEJhi5exSIG8MoLWzuzJGW9wrsvb7c27MweOWJ
-        QqKVMBhQScZ18MvpMZlEq+Hf1R9KNAOrex+CT8HLkRVDRlYMGVkxTOT/svUAj4IsjhdcDk4w
-        8ptWnjoGlt5jw84O0DayKwEoEtDPKOGQrUglZ8uEQ64EgCRGZyqdOWyRSmlnD73PeT1Wr9/J
-        CQlgSt3gBKZeY/Okns3tsxpMRrNZn2dCJrMR0c8pY6sn96soB+vj3uM4nvM+9cnIVerDIN02
-        fu57SyxrbXLP0OdvJb552/bxtjaQ9Qt99N2yrdp9dw2O8FfrZm9nYo4n6WHLyeIcoX22/VEj
-        z4Efgo7bI9pOy+sN5c9/++rg9sLduYXbbKhmT7Jmc4PHduazdw7WWCcDOosR2ot79Iv7df12
-        VmjcbT4QfzzQ+OKilulJdERpXChhDRswr8D+B8P/EWw0BAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrMIsWRmVeSWpSXmKPExsWy7bCSnO69VymxBrcXqlh8/dLBYrH+1DFm
-        i9V3+9ksTk89y2Qx53wLi8Xed7NZLdbu+cNs0f1KxuLJ+lnMFjd+tbFa9D9+zWxx/vwGdotN
-        j6+xWuy9pW1x/95PJouZ8+6wWVxa5G7xat43Fos9e0+yWFzeNYfN4sj/fkaLGef3MVn0r77L
-        ZtG28SujRWvPT3aL42vDHaQ8tqy8yeTRsrncY9sBVY8Fm0o9Lp8t9di0qpPN4861PWwem5fU
-        e+xe8JnJo+nMUWaP9/uusnn0bVnF6PF5k1wAbxSXTUpqTmZZapG+XQJXxo21BQU/eSsuH3vD
-        3MA4m7uLkZNDQsBEouXXC/YuRi4OIYHdjBKXOpcxQySkJLa274GyhSXutxxhhSh6ziix7Mtx
-        FpAEm4C2xObjqxhBbBEg+9GllawgNrPANA6JXR/EQWxhASOJ1q5uJhCbRUBVouP/RzYQm1fA
-        UuLgyYWMELagxMmZT4BmcgD16km0bWSEGCMvsf3tHKgbFCR2nH0NtUpP4nPXWahVIhKzO9uY
-        JzAKzkIyaRbCpFlIJs1C0rGAkWUVo2RqQXFuem6xYYFRXmq5XnFibnFpXrpecn7uJkZwUtDS
-        2sF44kT8IUYBDkYlHl6JM8mxQqyJZcWVuYcYJTiYlUR4c/QTY4V4UxIrq1KL8uOLSnNSiw8x
-        SnOwKInzyucfixQSSE8sSc1OTS1ILYLJMnFwSjUwzu+6tX/72stKzWKemrbqW3KZJgeK77oX
-        vnmD0Nlwy8yz3/uF2aTDk6Q9mT01RQOT/X7MEFBaXeui9Fboo4K3zMMdi7im3nry/vQ537ua
-        eclstddPhB5dfjO89nnTGwtpTb6aTJ2Dh/PtuYV0nv6MZ5ELzkkLcbJeUyojuOHt6spPUS78
-        wjxKLMUZiYZazEXFiQDWZLGyBgMAAA==
-X-CMS-MailID: 20190827083334epcas2p115d479190b9a72c886f66569add78203
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: AUTO_CONFIDENTIAL
-CMS-TYPE: 102P
-DLP-Filter: Pass
+X-Originating-IP: [10.47.86.181]
 X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20190827083334epcas2p115d479190b9a72c886f66569add78203
-References: <CGME20190827083334epcas2p115d479190b9a72c886f66569add78203@epcas2p1.samsung.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Aug 21, 2019 at 5:10 AM Satya Tangirala <satyat@kernel.dk> wrote:
+On Mon, 26 Aug 2019 19:59:14 +0800
+Mao Wenan <maowenan@huawei.com> wrote:
+
+> When CRYPTO_DEV_HISI_SEC=y, below compilation error is found after 
+> 'commit 894b68d8be4b ("crypto: hisilicon/des - switch to new verification routines")':
 > 
-> Hi Boojin,
->
-> We're very keen to make sure that our approach to inline encryption can
-> work with diverse hardware, including Samsung's FMP hardware; if you
-> can see any issues with using our approach with your hardware please
-> let us know.
->
-> We understand that a possible concern for getting FMP working with our
-> patch series for Inline Encryption Support at
->
->
-https://lore.kernel.org/linux-block/20190821075714.65140-1-satyat@google.com
-/
->
-> is that unlike some inline encryption hardware (and also unlike the JEDEC
-> UFS v2.1 spec), FMP doesn't have the concept of a limited number of
-> keyslots - to address that difference we have a "passthrough keyslot
-> manager", which we put up on top of our patch series for inline encryption
-> support at
->
-> https://android-review.googlesource.com/c/kernel/common/+/980137/2
->
-> Setting up a passthrough keyslot manager in the request queue of a
-> device allows the device to receive a bio's encryption context as-is with
-> the bio, which is what FMP would prefer. Are there any issues with
-> using the passthrough keyslot manager for FMP?
->
-> Thanks!
-> Satya
+> drivers/crypto/hisilicon/sec/sec_algs.o: In function `sec_alg_skcipher_setkey_des_cbc':
+> sec_algs.c:(.text+0x11f0): undefined reference to `des_expand_key'
+> drivers/crypto/hisilicon/sec/sec_algs.o: In function `sec_alg_skcipher_setkey_des_ecb':
+> sec_algs.c:(.text+0x1390): undefined reference to `des_expand_key'
+> make: *** [vmlinux] Error 1
+> 
+> This because DES library has been moved to lib/crypto in this commit 
+> '04007b0e6cbb ("crypto: des - split off DES library from generic DES cipher driver")'.
+> Fix this by selecting CRYPTO_LIB_DES in CRYPTO_DEV_HISI_SEC.
+> 
+> Fixes: 915e4e8413da ("crypto: hisilicon - SEC security accelerator driver")
+> Fixes: 04007b0e6cbb ("crypto: des - split off DES library from generic DES cipher driver")
+> Fixes: 894b68d8be4b ("crypto: hisilicon/des - switch to new verification routines")
+> 
+> Signed-off-by: Mao Wenan <maowenan@huawei.com>
 
-Dear Satya.
-Keyslot manager is a good solution for ICE. And probably no issue for FMP.
-But, I think it's complicated for FMP because FMP doesn't need
-any keyslot control.
-Crypto API that FMP's using is simply, stable, and supports test. 
-FMP has been mass producing and certificating using crypto APIs
-for several years. 
-So I wants to keep  our current crypto API solution.
-But, I'm looking at your patch.  And I will keep examining at your patch
-because our goal is to run the FMP on the mainline kernel.
+Ah. It's that that third one that really introduced the dependency so possibly
+only that one should be listed with a fixes tag.  However the right fix
+at that point was to select CRYPTO_DES which then changed to CRYPTO_LIB_DES
+only after the second patch.
 
-Thanks for your reply.
-Boojin Kim.
+It's not a fix for the first patch so that should probably not be there.
+
+Otherwise, looks correct to me.
+
+Acked-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+
+thanks,
+
+Jonathan
+
+
+
+> ---
+>  drivers/crypto/hisilicon/Kconfig | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/drivers/crypto/hisilicon/Kconfig b/drivers/crypto/hisilicon/Kconfig
+> index fa8aa06..ebaf91e 100644
+> --- a/drivers/crypto/hisilicon/Kconfig
+> +++ b/drivers/crypto/hisilicon/Kconfig
+> @@ -4,6 +4,7 @@ config CRYPTO_DEV_HISI_SEC
+>  	tristate "Support for Hisilicon SEC crypto block cipher accelerator"
+>  	select CRYPTO_BLKCIPHER
+>  	select CRYPTO_ALGAPI
+> +	select CRYPTO_LIB_DES
+>  	select SG_SPLIT
+>  	depends on ARM64 || COMPILE_TEST
+>  	depends on HAS_IOMEM
+
 
