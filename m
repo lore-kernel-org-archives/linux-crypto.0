@@ -2,56 +2,55 @@ Return-Path: <SRS0=KXmQ=WY=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2618C3A5A1
-	for <linux-crypto@archiver.kernel.org>; Wed, 28 Aug 2019 22:18:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97B36C3A5A1
+	for <linux-crypto@archiver.kernel.org>; Wed, 28 Aug 2019 23:39:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6935622DA7
-	for <linux-crypto@archiver.kernel.org>; Wed, 28 Aug 2019 22:18:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6947E2189D
+	for <linux-crypto@archiver.kernel.org>; Wed, 28 Aug 2019 23:39:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="lZTMkDlh"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="mrdP4VYF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727438AbfH1WS4 (ORCPT
+        id S1726928AbfH1XjA (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 28 Aug 2019 18:18:56 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:40564 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726839AbfH1WS4 (ORCPT
+        Wed, 28 Aug 2019 19:39:00 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:44904 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726926AbfH1XjA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 28 Aug 2019 18:18:56 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7SMHIY2115541;
-        Wed, 28 Aug 2019 22:18:32 GMT
+        Wed, 28 Aug 2019 19:39:00 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7SNYPiU177339;
+        Wed, 28 Aug 2019 23:38:41 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=corp-2019-08-05;
- bh=q8UPrkMM/CujGokBaxFV4506SVYZkFz/veRW9ukkyvA=;
- b=lZTMkDlh6Dr2ZxANHoruFlDG3UO6nz6SA2jvkXZX2kksbMz1s9ypxfP2yHnA/ov4gUIm
- gQWGTTSm5TSZ6Ok6vL+7cQU7Cw8dib2QvT42jBC2ezuAlGr6W76WQMYgyzOD6cyC3bHZ
- UVfPu1+BE5jKGWozX9KbPDEvq6G8LmBN6MhIE1n+VnGOVs7V8v69r3uXmBWWKnLlDrXK
- z4laFGxF6GxmCTLAXad8ak0JZYkBbYOpOUyMKpVzoHOBbAYtiNCNUmZEFKTB6XLnnj7Z
- imZAdWncEZ8fYWV1DBoPgTIOtkzsSfTFp2vFneMw5RsTGtiTjqqvgVQU8CLJzrFLTqQo Qg== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by userp2130.oracle.com with ESMTP id 2up296g0h1-1
+ subject : date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2019-08-05; bh=GhdPiCSY9MkVGCnGCBcOj7hNHDN3GuDPlSlaUmyDeaA=;
+ b=mrdP4VYFIrZ7wKh/BPHh4lSBwfF2lL+RgLlZ49TRtLNel2CxpcCIR6W4ZPcm2UzX6M92
+ aMTm1hTbtLxcfUfjeyco8ePZ3R9+badhp/75jqHFYX92PFRlnLp3XT4WU0Af5VHre3cq
+ J1sqJZXrqZuqm93cxB3IK6GjwckSemYKyv817WehRTrfo3Pw3+3SCQA4I5qyuHv0y4cM
+ gMvWjqwFiuvpdQxmag3tWZ99Ap1XcEpAz87FbFQt0D4I8IG30OwaDaPWyiiphWryvcUx
+ u+od6gxEfxLmyy77eW/PhdhsPTJmQE7A2VyJqp9x4uVzS10pqMVRPFUEZ2TuVRiLmABu 8g== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by aserp2120.oracle.com with ESMTP id 2up3d5g0g5-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 28 Aug 2019 22:18:32 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7SMDOiP007293;
-        Wed, 28 Aug 2019 22:16:32 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by userp3020.oracle.com with ESMTP id 2untetyqh2-1
+        Wed, 28 Aug 2019 23:38:41 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7SMEVCV043222;
+        Wed, 28 Aug 2019 22:16:31 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3020.oracle.com with ESMTP id 2undw7xt84-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Wed, 28 Aug 2019 22:16:31 +0000
 Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id x7SMGU3i020531;
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x7SMGUwp010166;
         Wed, 28 Aug 2019 22:16:30 GMT
 Received: from zissou.us.oracle.com (/10.152.34.58)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 28 Aug 2019 15:16:30 -0700
+        with ESMTP ; Wed, 28 Aug 2019 15:16:29 -0700
 From:   Daniel Jordan <daniel.m.jordan@oracle.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         Steffen Klassert <steffen.klassert@secunet.com>
@@ -59,181 +58,76 @@ Cc:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
         Thomas Gleixner <tglx@linutronix.de>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         Daniel Jordan <daniel.m.jordan@oracle.com>
-Subject: [PATCH v2 1/5] padata: make flushing work with async users
-Date:   Wed, 28 Aug 2019 18:14:21 -0400
-Message-Id: <20190828221425.22701-2-daniel.m.jordan@oracle.com>
+Subject: [PATCH v2 0/5] padata flushing and CPU hotplug fixes
+Date:   Wed, 28 Aug 2019 18:14:20 -0400
+Message-Id: <20190828221425.22701-1-daniel.m.jordan@oracle.com>
 X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20190828221425.22701-1-daniel.m.jordan@oracle.com>
-References: <20190828221425.22701-1-daniel.m.jordan@oracle.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9363 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2 malwarescore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
  phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
  adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.0.1-1906280000 definitions=main-1908280214
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9363 signatures=668685
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
  lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
- definitions=main-1908280214
+ definitions=main-1908280219
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-padata_flush_queues() is broken for an async ->parallel() function
-because flush_work() can't wait on it:
+Hi,
+Here are some miscellaneous padata fixes, mostly to do with CPU hotplug.
+This time around there's a new hotplug state to make the CPU remove path
+cleaner, and the CC list grew a bit.
 
-  # modprobe tcrypt alg="pcrypt(cryptd(rfc4106(gcm_base(ctr(aes-generic),ghash-generic))))" type=3
-  # modprobe tcrypt mode=215 sec=1 &
-  # sleep 5; echo 7 > /sys/kernel/pcrypt/pencrypt/parallel_cpumask
+Daniel
 
-  kernel BUG at kernel/padata.c:473!
-  invalid opcode: 0000 [#1] SMP PTI
-  CPU: 0 PID: 282 Comm: sh Not tainted 5.3.0-rc5-padata-base+ #3
-  RIP: 0010:padata_flush_queues+0xa7/0xb0
-  Call Trace:
-   padata_replace+0xa1/0x110
-   padata_set_cpumask+0xae/0x130
-   store_cpumask+0x75/0xa0
-   padata_sysfs_store+0x20/0x30
-   ...
+v2:
+ - patches 1-3 are new; 4-5 have changed since v1[*]
+ - attempted to fix padata flushing as requested (Herbert)
+ - changed hotplug state in which __padata_remove_cpu() is
+   called (Herbert)
+ - purged cpumask_clear_cpu() calls from same function (Herbert)
+ - dropped v1's patch 3/2 (Herbert)
+ - after more thought, left the Fixes: tag on the last patch the same
 
-Wait instead for the parallel_data (pd) object's refcount to drop to
-zero.
+testing:
+ - testcase was tcrypt mode=215 sec=1 throughout
+ - ran all cpumask combos among parallel cpumasks, serial cpumasks, and CPU
+   hotplug in a 3-CPU VM
+ - lockdep to check patch 4
+ - tested at each patch in this set with and without
+   CONFIG_CRYPTO_PCRYPT
 
-Simplify by taking an initial reference on a pd when allocating an
-instance.  That ref is dropped during flushing, which allows calling
-wait_for_completion() unconditionally.
+Series based on recent mainline plus all padata patches in cryptodev:
+    git://oss.oracle.com/git/linux-dmjordan.git padata-cpuhp-v2
 
-If the initial ref weren't used, the only other alternative I could
-think of is that complete() would be conditional on !PADATA_INIT or
-PADATA_REPLACE (in addition to zero pd->refcnt), and
-wait_for_completion() on nonzero pd->refcnt.  But then complete() could
-be called without a matching wait:
+[*] https://lore.kernel.org/linux-crypto/20190809192857.26585-1-daniel.m.jordan@oracle.com/
 
-completer                     waiter
----------                     ------
-DEC pd->refcnt    // 0
-                              pinst->flags |= PADATA_REPLACE
-LOAD pinst->flags // REPLACE
-                              LOAD pd->refcnt // 0
-                              /* return without wait_for_completion() */
-complete()
+Daniel Jordan (5):
+  padata: make flushing work with async users
+  padata: remove reorder_objects
+  padata: get rid of padata_remove_cpu() for real
+  padata: always acquire cpu_hotplug_lock before pinst->lock
+  padata: validate cpumask without removed CPU during offline
 
-No more flushing per-CPU work items, so no more CPU hotplug lock in
-__padata_stop.
+ Documentation/padata.txt   | 18 ++------
+ include/linux/cpuhotplug.h |  1 +
+ include/linux/padata.h     |  5 +-
+ kernel/padata.c            | 95 +++++++++++---------------------------
+ 4 files changed, 36 insertions(+), 83 deletions(-)
 
-Fixes: 2b73b07ab8a4 ("padata: Flush the padata queues actively")
-Reported-by: Herbert Xu <herbert@gondor.apana.org.au>
-Suggested-by: Steffen Klassert <steffen.klassert@secunet.com>
-Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
-Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
----
- include/linux/padata.h |  3 +++
- kernel/padata.c        | 32 ++++++++++++--------------------
- 2 files changed, 15 insertions(+), 20 deletions(-)
 
-diff --git a/include/linux/padata.h b/include/linux/padata.h
-index 8da673861d99..1c73f9cc7b72 100644
---- a/include/linux/padata.h
-+++ b/include/linux/padata.h
-@@ -14,6 +14,7 @@
- #include <linux/list.h>
- #include <linux/notifier.h>
- #include <linux/kobject.h>
-+#include <linux/completion.h>
- 
- #define PADATA_CPU_SERIAL   0x01
- #define PADATA_CPU_PARALLEL 0x02
-@@ -104,6 +105,7 @@ struct padata_cpumask {
-  * @squeue: percpu padata queues used for serialuzation.
-  * @reorder_objects: Number of objects waiting in the reorder queues.
-  * @refcnt: Number of objects holding a reference on this parallel_data.
-+ * @flushing_done: Wait for all objects to be sent out.
-  * @max_seq_nr:  Maximal used sequence number.
-  * @cpu: Next CPU to be processed.
-  * @cpumask: The cpumasks in use for parallel and serial workers.
-@@ -116,6 +118,7 @@ struct parallel_data {
- 	struct padata_serial_queue	__percpu *squeue;
- 	atomic_t			reorder_objects;
- 	atomic_t			refcnt;
-+	struct completion		flushing_done;
- 	atomic_t			seq_nr;
- 	int				cpu;
- 	struct padata_cpumask		cpumask;
-diff --git a/kernel/padata.c b/kernel/padata.c
-index b60cc3dcee58..958166e23123 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -301,7 +301,8 @@ static void padata_serial_worker(struct work_struct *serial_work)
- 		list_del_init(&padata->list);
- 
- 		padata->serial(padata);
--		atomic_dec(&pd->refcnt);
-+		if (atomic_dec_return(&pd->refcnt) == 0)
-+			complete(&pd->flushing_done);
- 	}
- 	local_bh_enable();
- }
-@@ -423,7 +424,9 @@ static struct parallel_data *padata_alloc_pd(struct padata_instance *pinst,
- 	padata_init_squeues(pd);
- 	atomic_set(&pd->seq_nr, -1);
- 	atomic_set(&pd->reorder_objects, 0);
--	atomic_set(&pd->refcnt, 0);
-+	/* Initial ref dropped in padata_flush_queues. */
-+	atomic_set(&pd->refcnt, 1);
-+	init_completion(&pd->flushing_done);
- 	pd->pinst = pinst;
- 	spin_lock_init(&pd->lock);
- 	pd->cpu = cpumask_first(pd->cpumask.pcpu);
-@@ -453,24 +456,15 @@ static void padata_free_pd(struct parallel_data *pd)
- /* Flush all objects out of the padata queues. */
- static void padata_flush_queues(struct parallel_data *pd)
- {
--	int cpu;
--	struct padata_parallel_queue *pqueue;
--	struct padata_serial_queue *squeue;
--
--	for_each_cpu(cpu, pd->cpumask.pcpu) {
--		pqueue = per_cpu_ptr(pd->pqueue, cpu);
--		flush_work(&pqueue->work);
--	}
--
--	if (atomic_read(&pd->reorder_objects))
--		padata_reorder(pd);
-+	if (!(pd->pinst->flags & PADATA_INIT))
-+		return;
- 
--	for_each_cpu(cpu, pd->cpumask.cbcpu) {
--		squeue = per_cpu_ptr(pd->squeue, cpu);
--		flush_work(&squeue->work);
--	}
-+	if (atomic_dec_return(&pd->refcnt) == 0)
-+		complete(&pd->flushing_done);
- 
--	BUG_ON(atomic_read(&pd->refcnt) != 0);
-+	wait_for_completion(&pd->flushing_done);
-+	reinit_completion(&pd->flushing_done);
-+	atomic_set(&pd->refcnt, 1);
- }
- 
- static void __padata_start(struct padata_instance *pinst)
-@@ -487,9 +481,7 @@ static void __padata_stop(struct padata_instance *pinst)
- 
- 	synchronize_rcu();
- 
--	get_online_cpus();
- 	padata_flush_queues(pinst->pd);
--	put_online_cpus();
- }
- 
- /* Replace the internal control structure with a new one. */
+base-commit: d1abaeb3be7b5fa6d7a1fbbd2e14e3310005c4c1
+prerequisite-patch-id: a5bfed8ea60d5a784b8b3e21ccb5657ced2aa1e3
+prerequisite-patch-id: 96d53aecccb5af242ba5ee342d75810ecd9bfb84
+prerequisite-patch-id: 965d8a63c1461f00219aec2d817f2ca85d49cfb3
+prerequisite-patch-id: 8e6c2988331b46c9467ac568157c6c575cbe6578
 -- 
 2.23.0
 
