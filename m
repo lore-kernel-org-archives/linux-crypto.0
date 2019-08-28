@@ -2,88 +2,128 @@ Return-Path: <SRS0=KXmQ=WY=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50B74C3A5A1
-	for <linux-crypto@archiver.kernel.org>; Wed, 28 Aug 2019 08:04:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B7DFC3A5A6
+	for <linux-crypto@archiver.kernel.org>; Wed, 28 Aug 2019 13:43:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2E6ED2339E
-	for <linux-crypto@archiver.kernel.org>; Wed, 28 Aug 2019 08:04:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 38C15233A1
+	for <linux-crypto@archiver.kernel.org>; Wed, 28 Aug 2019 13:43:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726609AbfH1IE0 (ORCPT
+        id S1726607AbfH1Nnz (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 28 Aug 2019 04:04:26 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:56940 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726545AbfH1IEZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 28 Aug 2019 04:04:25 -0400
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id C6AC9ECEE8D10C340F99;
-        Wed, 28 Aug 2019 16:04:22 +0800 (CST)
-Received: from localhost.localdomain.localdomain (10.175.113.25) by
- DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server id
- 14.3.439.0; Wed, 28 Aug 2019 16:04:15 +0800
-From:   Mao Wenan <maowenan@huawei.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <jonathan.cameron@huawei.com>, <wangzhou1@hisilicon.com>,
-        <liguozhu@hisilicon.com>, <john.garry@huawei.com>,
-        <Jonathan.Cameron@huawei.com>
-CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kernel-janitors@vger.kernel.org>, Mao Wenan <maowenan@huawei.com>
-Subject: [PATCH v2 -next] crypto: hisilicon: select CRYPTO_LIB_DES while compiling SEC driver
-Date:   Wed, 28 Aug 2019 16:07:40 +0800
-Message-ID: <20190828080740.43244-1-maowenan@huawei.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <affd8de1-ae35-a1d0-534a-d9cdfac90de8@huawei.com>
-References: <affd8de1-ae35-a1d0-534a-d9cdfac90de8@huawei.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.113.25]
-X-CFilter-Loop: Reflected
+        Wed, 28 Aug 2019 09:43:55 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:7722 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726341AbfH1Nnz (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 28 Aug 2019 09:43:55 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x7SDe1DJ115556
+        for <linux-crypto@vger.kernel.org>; Wed, 28 Aug 2019 09:43:54 -0400
+Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2unrh35ngq-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <linux-crypto@vger.kernel.org>; Wed, 28 Aug 2019 09:43:53 -0400
+Received: from localhost
+        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-crypto@vger.kernel.org> from <zohar@linux.ibm.com>;
+        Wed, 28 Aug 2019 14:43:51 +0100
+Received: from b06cxnps4076.portsmouth.uk.ibm.com (9.149.109.198)
+        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Wed, 28 Aug 2019 14:43:46 +0100
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06cxnps4076.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x7SDhjxr37879864
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 28 Aug 2019 13:43:45 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8D0A311C052;
+        Wed, 28 Aug 2019 13:43:45 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 8A6C111C05C;
+        Wed, 28 Aug 2019 13:43:42 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.85.129.156])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed, 28 Aug 2019 13:43:42 +0000 (GMT)
+Subject: Re: [PATCH v12 00/11] Appended signatures support for IMA appraisal
+From:   Mimi Zohar <zohar@linux.ibm.com>
+To:     Jordan Hand <jorhand@linux.microsoft.com>,
+        Thiago Jung Bauermann <bauerman@linux.ibm.com>,
+        linux-integrity@vger.kernel.org
+Cc:     linux-security-module@vger.kernel.org, keyrings@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Dmitry Kasatkin <dmitry.kasatkin@gmail.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        David Howells <dhowells@redhat.com>,
+        David Woodhouse <dwmw2@infradead.org>,
+        Jessica Yu <jeyu@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jonathan Corbet <corbet@lwn.net>,
+        "AKASHI, Takahiro" <takahiro.akashi@linaro.org>
+Date:   Wed, 28 Aug 2019 09:43:41 -0400
+In-Reply-To: <9682b5d0-1634-2dd0-2cbb-eb1fa8ba7423@linux.microsoft.com>
+References: <20190628021934.4260-1-bauerman@linux.ibm.com>
+         <9682b5d0-1634-2dd0-2cbb-eb1fa8ba7423@linux.microsoft.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.20.5 (3.20.5-1.fc24) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19082813-4275-0000-0000-0000035E558B
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19082813-4276-0000-0000-0000387089DF
+Message-Id: <1566999821.6115.14.camel@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-08-28_06:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=868 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1906280000 definitions=main-1908280144
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-When CRYPTO_DEV_HISI_SEC=y, below compilation error is found after 
-'commit 894b68d8be4b ("crypto: hisilicon/des - switch to new verification routines")':
+Hi Jordan,
 
-drivers/crypto/hisilicon/sec/sec_algs.o: In function `sec_alg_skcipher_setkey_des_cbc':
-sec_algs.c:(.text+0x11f0): undefined reference to `des_expand_key'
-drivers/crypto/hisilicon/sec/sec_algs.o: In function `sec_alg_skcipher_setkey_des_ecb':
-sec_algs.c:(.text+0x1390): undefined reference to `des_expand_key'
-make: *** [vmlinux] Error 1
+On Mon, 2019-08-26 at 15:46 -0700, Jordan Hand wrote:
+> On 6/27/19 7:19 PM, Thiago Jung Bauermann wrote:
+> > On the OpenPOWER platform, secure boot and trusted boot are being
+> > implemented using IMA for taking measurements and verifying signatures.
+> > Since the kernel image on Power servers is an ELF binary, kernels are
+> > signed using the scripts/sign-file tool and thus use the same signature
+> > format as signed kernel modules.
+> > 
+> > This patch series adds support in IMA for verifying those signatures.
+> > It adds flexibility to OpenPOWER secure boot, because it allows it to boot
+> > kernels with the signature appended to them as well as kernels where the
+> > signature is stored in the IMA extended attribute.
+> 
+> I know this is pretty late, but I just wanted to let you know that I
+> tested this patch set on x86_64 with QEMU.
+> 
+> That is, I enrolled a key to _ima keyring, signed my kernel and modules
+> with appended signatures (with scripts/sign-file), set the IMA policy to
+> appraise and measure my kernel and modules. Also tested kexec appraisal.
+> 
+> You can add my tested-by if you'd like.
 
-This because DES library has been moved to lib/crypto in this commit 
-'04007b0e6cbb ("crypto: des - split off DES library from generic DES cipher driver")'.
-Fix this by selecting CRYPTO_LIB_DES in CRYPTO_DEV_HISI_SEC.
+I really appreciate your testing.  Based on the recent
+Documentation/maintainer/rebasing-and-merging.rst,  I'm trying not to
+rebase patches already staged in linux-next.  Patches are first being
+staged in the next-queued-testing branch.
 
-Fixes: 04007b0e6cbb ("crypto: des - split off DES library from generic DES cipher driver")
-Fixes: 894b68d8be4b ("crypto: hisilicon/des - switch to new verification routines")
+FYI, I just posted a patch that adds IMA appended signature support to
+test_kexec_file_load.sh.
 
-Signed-off-by: Mao Wenan <maowenan@huawei.com>
-Acked-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
----
- v2: remove fix tag 915e4e8413da ("crypto: hisilicon - SEC security accelerator driver") 
- drivers/crypto/hisilicon/Kconfig | 1 +
- 1 file changed, 1 insertion(+)
+thanks,
 
-diff --git a/drivers/crypto/hisilicon/Kconfig b/drivers/crypto/hisilicon/Kconfig
-index fa8aa06..ebaf91e 100644
---- a/drivers/crypto/hisilicon/Kconfig
-+++ b/drivers/crypto/hisilicon/Kconfig
-@@ -4,6 +4,7 @@ config CRYPTO_DEV_HISI_SEC
- 	tristate "Support for Hisilicon SEC crypto block cipher accelerator"
- 	select CRYPTO_BLKCIPHER
- 	select CRYPTO_ALGAPI
-+	select CRYPTO_LIB_DES
- 	select SG_SPLIT
- 	depends on ARM64 || COMPILE_TEST
- 	depends on HAS_IOMEM
--- 
-2.7.4
+Mimi
 
