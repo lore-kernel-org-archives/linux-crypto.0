@@ -7,51 +7,51 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC1CFC3A59F
-	for <linux-crypto@archiver.kernel.org>; Thu, 29 Aug 2019 17:34:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE04CC3A59F
+	for <linux-crypto@archiver.kernel.org>; Thu, 29 Aug 2019 17:37:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7ED8B2189D
-	for <linux-crypto@archiver.kernel.org>; Thu, 29 Aug 2019 17:34:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B4E1721726
+	for <linux-crypto@archiver.kernel.org>; Thu, 29 Aug 2019 17:37:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Y44Q+1Mu"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="nN1Wq0mR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726973AbfH2Re4 (ORCPT
+        id S1727364AbfH2Rhy (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 29 Aug 2019 13:34:56 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:47160 "EHLO
+        Thu, 29 Aug 2019 13:37:54 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:52768 "EHLO
         userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727410AbfH2Re4 (ORCPT
+        with ESMTP id S1727352AbfH2Rhy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 29 Aug 2019 13:34:56 -0400
+        Thu, 29 Aug 2019 13:37:54 -0400
 Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7THTscS121544;
-        Thu, 29 Aug 2019 17:32:40 GMT
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7THY7eo125836;
+        Thu, 29 Aug 2019 17:37:41 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=corp-2019-08-05;
- bh=iZ4QyHpnZ3dJ0ZjVi3s0EvKqwDLy7Ecmy+dhvh8PM68=;
- b=Y44Q+1MuaTD1Ln8/DNfqVK765JLPzp5FHBxnbIgStfH6EEaQptW2achD6m0fMIrEsD3v
- iLztDlSHc2KEvesH7ZvvUzIvH5dAnwQ99r+R+BGOyrPr4mi270emlEaRixozvRLCg7Ke
- VjhNyvPr5jf4iPqA5Lj8dU6tQ2CRA1hi82CouBm2Zd1pSHDWIvL1wDbIuqWuFQ4+GO5g
- nU54u8cLEB4AGHmkI+lumlBrA5Poh6RADRJWh6GfjC6JCNJ05Vjs7heMJkuNS/GQjJj4
- zeuOyg2PCVAE2iVm/VcFwMNLcBe+0dcXMRdHaT583JTvuk1/XN3AkNTCzRfAG+HLKcd+ NQ== 
+ bh=wZpwXmqOxWqhR0DvbaLn0ZKC1APUcFkWjxi8qiwEj3Q=;
+ b=nN1Wq0mRVz22FSmhc0bCowTcreptKdPzGUyUzBYb7nU1VjnhhMjh53W246hfv+vaL3VE
+ LiOw5H/muOR8sMEfQwIYxeGUKkCFmvdpBX2B3K5XzI3ffYTWAYOHOy3T66mOV4NJ0+bg
+ HVoH+7Aoz03/+RzzUe6Dvh89KUrPwjyzalb10dy/sv4SvAAwLOCYJump7cv4BbNcXQHZ
+ TQaGIvcrkGVitRirkWNCri4VElU+RNSTvU63GtHRP/vUKCfd1DNf/nT/YiRsgcejMAqF
+ +U+8bvefRjFs1I8gD9PQtD/CTYsx8VcT3vmrIhBTx521gstsuw4qcvNCOZODnmjxE3ak 2A== 
 Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2130.oracle.com with ESMTP id 2upk56r0r2-1
+        by userp2130.oracle.com with ESMTP id 2upk56r2bb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 29 Aug 2019 17:37:41 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7THWb4a008107;
+        Thu, 29 Aug 2019 17:32:41 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by userp3030.oracle.com with ESMTP id 2unvu0b2cp-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
         Thu, 29 Aug 2019 17:32:40 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x7THWbVR008176;
-        Thu, 29 Aug 2019 17:32:40 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by userp3030.oracle.com with ESMTP id 2unvu0b2bv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 29 Aug 2019 17:32:39 +0000
 Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x7THWchh015178;
-        Thu, 29 Aug 2019 17:32:38 GMT
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x7THWePC022063;
+        Thu, 29 Aug 2019 17:32:40 GMT
 Received: from zissou.us.oracle.com (/10.152.34.58)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 29 Aug 2019 10:32:37 -0700
+        with ESMTP ; Thu, 29 Aug 2019 10:32:39 -0700
 From:   Daniel Jordan <daniel.m.jordan@oracle.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         Steffen Klassert <steffen.klassert@secunet.com>
@@ -60,9 +60,9 @@ Cc:     Lai Jiangshan <jiangshanlai@gmail.com>,
         Tejun Heo <tj@kernel.org>, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         Daniel Jordan <daniel.m.jordan@oracle.com>
-Subject: [PATCH v2 2/9] workqueue: unconfine alloc/apply/free_workqueue_attrs()
-Date:   Thu, 29 Aug 2019 13:30:31 -0400
-Message-Id: <20190829173038.21040-3-daniel.m.jordan@oracle.com>
+Subject: [PATCH v2 5/9] pcrypt: remove padata cpumask notifier
+Date:   Thu, 29 Aug 2019 13:30:34 -0400
+Message-Id: <20190829173038.21040-6-daniel.m.jordan@oracle.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20190829173038.21040-1-daniel.m.jordan@oracle.com>
 References: <20190829173038.21040-1-daniel.m.jordan@oracle.com>
@@ -78,73 +78,224 @@ X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=150
  suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
  lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
- definitions=main-1908290185
+ definitions=main-1908290186
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-padata will use these these interfaces in a later patch, so unconfine them.
+Now that padata_do_parallel takes care of finding an alternate callback
+CPU, there's no need for pcrypt's callback cpumask, so remove it and the
+notifier callback that keeps it in sync.
 
 Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
-Acked-by: Tejun Heo <tj@kernel.org>
 Acked-by: Steffen Klassert <steffen.klassert@secunet.com>
 Cc: Herbert Xu <herbert@gondor.apana.org.au>
 Cc: Lai Jiangshan <jiangshanlai@gmail.com>
 Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: Tejun Heo <tj@kernel.org>
 Cc: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
 ---
- include/linux/workqueue.h | 4 ++++
- kernel/workqueue.c        | 6 +++---
- 2 files changed, 7 insertions(+), 3 deletions(-)
+ crypto/pcrypt.c | 125 +++++++-----------------------------------------
+ 1 file changed, 18 insertions(+), 107 deletions(-)
 
-diff --git a/include/linux/workqueue.h b/include/linux/workqueue.h
-index b7c585b5ec1c..4261d1c6e87b 100644
---- a/include/linux/workqueue.h
-+++ b/include/linux/workqueue.h
-@@ -435,6 +435,10 @@ struct workqueue_struct *alloc_workqueue(const char *fmt,
+diff --git a/crypto/pcrypt.c b/crypto/pcrypt.c
+index efca962ab12a..2ec36e6a132f 100644
+--- a/crypto/pcrypt.c
++++ b/crypto/pcrypt.c
+@@ -18,33 +18,8 @@
+ #include <linux/cpu.h>
+ #include <crypto/pcrypt.h>
  
- extern void destroy_workqueue(struct workqueue_struct *wq);
+-struct padata_pcrypt {
+-	struct padata_instance *pinst;
+-
+-	/*
+-	 * Cpumask for callback CPUs. It should be
+-	 * equal to serial cpumask of corresponding padata instance,
+-	 * so it is updated when padata notifies us about serial
+-	 * cpumask change.
+-	 *
+-	 * cb_cpumask is protected by RCU. This fact prevents us from
+-	 * using cpumask_var_t directly because the actual type of
+-	 * cpumsak_var_t depends on kernel configuration(particularly on
+-	 * CONFIG_CPUMASK_OFFSTACK macro). Depending on the configuration
+-	 * cpumask_var_t may be either a pointer to the struct cpumask
+-	 * or a variable allocated on the stack. Thus we can not safely use
+-	 * cpumask_var_t with RCU operations such as rcu_assign_pointer or
+-	 * rcu_dereference. So cpumask_var_t is wrapped with struct
+-	 * pcrypt_cpumask which makes possible to use it with RCU.
+-	 */
+-	struct pcrypt_cpumask {
+-		cpumask_var_t mask;
+-	} *cb_cpumask;
+-	struct notifier_block nblock;
+-};
+-
+-static struct padata_pcrypt pencrypt;
+-static struct padata_pcrypt pdecrypt;
++static struct padata_instance *pencrypt;
++static struct padata_instance *pdecrypt;
+ static struct kset           *pcrypt_kset;
  
-+struct workqueue_attrs *alloc_workqueue_attrs(void);
-+void free_workqueue_attrs(struct workqueue_attrs *attrs);
-+int apply_workqueue_attrs(struct workqueue_struct *wq,
-+			  const struct workqueue_attrs *attrs);
- int workqueue_set_unbound_cpumask(cpumask_var_t cpumask);
+ struct pcrypt_instance_ctx {
+@@ -128,7 +103,7 @@ static int pcrypt_aead_encrypt(struct aead_request *req)
+ 			       req->cryptlen, req->iv);
+ 	aead_request_set_ad(creq, req->assoclen);
  
- extern bool queue_work_on(int cpu, struct workqueue_struct *wq,
-diff --git a/kernel/workqueue.c b/kernel/workqueue.c
-index 601d61150b65..f53705ff3ff1 100644
---- a/kernel/workqueue.c
-+++ b/kernel/workqueue.c
-@@ -3329,7 +3329,7 @@ EXPORT_SYMBOL_GPL(execute_in_process_context);
-  *
-  * Undo alloc_workqueue_attrs().
-  */
--static void free_workqueue_attrs(struct workqueue_attrs *attrs)
-+void free_workqueue_attrs(struct workqueue_attrs *attrs)
- {
- 	if (attrs) {
- 		free_cpumask_var(attrs->cpumask);
-@@ -3345,7 +3345,7 @@ static void free_workqueue_attrs(struct workqueue_attrs *attrs)
-  *
-  * Return: The allocated new workqueue_attr on success. %NULL on failure.
-  */
--static struct workqueue_attrs *alloc_workqueue_attrs(void)
-+struct workqueue_attrs *alloc_workqueue_attrs(void)
- {
- 	struct workqueue_attrs *attrs;
+-	err = padata_do_parallel(pencrypt.pinst, padata, &ctx->cb_cpu);
++	err = padata_do_parallel(pencrypt, padata, &ctx->cb_cpu);
+ 	if (!err)
+ 		return -EINPROGRESS;
  
-@@ -4032,7 +4032,7 @@ static int apply_workqueue_attrs_locked(struct workqueue_struct *wq,
-  *
-  * Return: 0 on success and -errno on failure.
-  */
--static int apply_workqueue_attrs(struct workqueue_struct *wq,
-+int apply_workqueue_attrs(struct workqueue_struct *wq,
- 			  const struct workqueue_attrs *attrs)
+@@ -170,7 +145,7 @@ static int pcrypt_aead_decrypt(struct aead_request *req)
+ 			       req->cryptlen, req->iv);
+ 	aead_request_set_ad(creq, req->assoclen);
+ 
+-	err = padata_do_parallel(pdecrypt.pinst, padata, &ctx->cb_cpu);
++	err = padata_do_parallel(pdecrypt, padata, &ctx->cb_cpu);
+ 	if (!err)
+ 		return -EINPROGRESS;
+ 
+@@ -317,36 +292,6 @@ static int pcrypt_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 	return -EINVAL;
+ }
+ 
+-static int pcrypt_cpumask_change_notify(struct notifier_block *self,
+-					unsigned long val, void *data)
+-{
+-	struct padata_pcrypt *pcrypt;
+-	struct pcrypt_cpumask *new_mask, *old_mask;
+-	struct padata_cpumask *cpumask = (struct padata_cpumask *)data;
+-
+-	if (!(val & PADATA_CPU_SERIAL))
+-		return 0;
+-
+-	pcrypt = container_of(self, struct padata_pcrypt, nblock);
+-	new_mask = kmalloc(sizeof(*new_mask), GFP_KERNEL);
+-	if (!new_mask)
+-		return -ENOMEM;
+-	if (!alloc_cpumask_var(&new_mask->mask, GFP_KERNEL)) {
+-		kfree(new_mask);
+-		return -ENOMEM;
+-	}
+-
+-	old_mask = pcrypt->cb_cpumask;
+-
+-	cpumask_copy(new_mask->mask, cpumask->cbcpu);
+-	rcu_assign_pointer(pcrypt->cb_cpumask, new_mask);
+-	synchronize_rcu();
+-
+-	free_cpumask_var(old_mask->mask);
+-	kfree(old_mask);
+-	return 0;
+-}
+-
+ static int pcrypt_sysfs_add(struct padata_instance *pinst, const char *name)
  {
  	int ret;
+@@ -359,63 +304,29 @@ static int pcrypt_sysfs_add(struct padata_instance *pinst, const char *name)
+ 	return ret;
+ }
+ 
+-static int pcrypt_init_padata(struct padata_pcrypt *pcrypt,
+-			      const char *name)
++static int pcrypt_init_padata(struct padata_instance **pinst, const char *name)
+ {
+ 	int ret = -ENOMEM;
+-	struct pcrypt_cpumask *mask;
+ 
+ 	get_online_cpus();
+ 
+-	pcrypt->pinst = padata_alloc_possible(name);
+-	if (!pcrypt->pinst)
+-		goto err;
+-
+-	mask = kmalloc(sizeof(*mask), GFP_KERNEL);
+-	if (!mask)
+-		goto err_free_padata;
+-	if (!alloc_cpumask_var(&mask->mask, GFP_KERNEL)) {
+-		kfree(mask);
+-		goto err_free_padata;
+-	}
+-
+-	cpumask_and(mask->mask, cpu_possible_mask, cpu_online_mask);
+-	rcu_assign_pointer(pcrypt->cb_cpumask, mask);
+-
+-	pcrypt->nblock.notifier_call = pcrypt_cpumask_change_notify;
+-	ret = padata_register_cpumask_notifier(pcrypt->pinst, &pcrypt->nblock);
+-	if (ret)
+-		goto err_free_cpumask;
++	*pinst = padata_alloc_possible(name);
++	if (!*pinst)
++		return ret;
+ 
+-	ret = pcrypt_sysfs_add(pcrypt->pinst, name);
++	ret = pcrypt_sysfs_add(*pinst, name);
+ 	if (ret)
+-		goto err_unregister_notifier;
++		padata_free(*pinst);
+ 
+ 	put_online_cpus();
+ 
+-	return ret;
+-
+-err_unregister_notifier:
+-	padata_unregister_cpumask_notifier(pcrypt->pinst, &pcrypt->nblock);
+-err_free_cpumask:
+-	free_cpumask_var(mask->mask);
+-	kfree(mask);
+-err_free_padata:
+-	padata_free(pcrypt->pinst);
+-err:
+-	put_online_cpus();
+-
+ 	return ret;
+ }
+ 
+-static void pcrypt_fini_padata(struct padata_pcrypt *pcrypt)
++static void pcrypt_fini_padata(struct padata_instance *pinst)
+ {
+-	free_cpumask_var(pcrypt->cb_cpumask->mask);
+-	kfree(pcrypt->cb_cpumask);
+-
+-	padata_stop(pcrypt->pinst);
+-	padata_unregister_cpumask_notifier(pcrypt->pinst, &pcrypt->nblock);
+-	padata_free(pcrypt->pinst);
++	padata_stop(pinst);
++	padata_free(pinst);
+ }
+ 
+ static struct crypto_template pcrypt_tmpl = {
+@@ -440,13 +351,13 @@ static int __init pcrypt_init(void)
+ 	if (err)
+ 		goto err_deinit_pencrypt;
+ 
+-	padata_start(pencrypt.pinst);
+-	padata_start(pdecrypt.pinst);
++	padata_start(pencrypt);
++	padata_start(pdecrypt);
+ 
+ 	return crypto_register_template(&pcrypt_tmpl);
+ 
+ err_deinit_pencrypt:
+-	pcrypt_fini_padata(&pencrypt);
++	pcrypt_fini_padata(pencrypt);
+ err_unreg_kset:
+ 	kset_unregister(pcrypt_kset);
+ err:
+@@ -455,8 +366,8 @@ static int __init pcrypt_init(void)
+ 
+ static void __exit pcrypt_exit(void)
+ {
+-	pcrypt_fini_padata(&pencrypt);
+-	pcrypt_fini_padata(&pdecrypt);
++	pcrypt_fini_padata(pencrypt);
++	pcrypt_fini_padata(pdecrypt);
+ 
+ 	kset_unregister(pcrypt_kset);
+ 	crypto_unregister_template(&pcrypt_tmpl);
 -- 
 2.23.0
 
