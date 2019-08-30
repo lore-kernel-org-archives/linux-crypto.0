@@ -1,129 +1,121 @@
-Return-Path: <SRS0=oY6L=WZ=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=VSoq=W2=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 322D9C3A5A3
-	for <linux-crypto@archiver.kernel.org>; Thu, 29 Aug 2019 20:00:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2735DC3A59F
+	for <linux-crypto@archiver.kernel.org>; Fri, 30 Aug 2019 01:30:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 015D32080F
-	for <linux-crypto@archiver.kernel.org>; Thu, 29 Aug 2019 20:00:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ED6FE21726
+	for <linux-crypto@archiver.kernel.org>; Fri, 30 Aug 2019 01:30:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="U75GJORV"
+	dkim=pass (2048-bit key) header.d=omnibond-com.20150623.gappssmtp.com header.i=@omnibond-com.20150623.gappssmtp.com header.b="tRuQF9NG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728132AbfH2UAU (ORCPT
+        id S1727664AbfH3BaI (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 29 Aug 2019 16:00:20 -0400
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:46821 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726518AbfH2UAT (ORCPT
+        Thu, 29 Aug 2019 21:30:08 -0400
+Received: from mail-yw1-f67.google.com ([209.85.161.67]:41356 "EHLO
+        mail-yw1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727110AbfH3BaB (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 29 Aug 2019 16:00:19 -0400
-Received: by mail-ed1-f66.google.com with SMTP id z51so5324046edz.13
-        for <linux-crypto@vger.kernel.org>; Thu, 29 Aug 2019 13:00:18 -0700 (PDT)
+        Thu, 29 Aug 2019 21:30:01 -0400
+Received: by mail-yw1-f67.google.com with SMTP id 129so1213910ywb.8
+        for <linux-crypto@vger.kernel.org>; Thu, 29 Aug 2019 18:30:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
+        d=omnibond-com.20150623.gappssmtp.com; s=20150623;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=aYf/lCZC1gwMIR9/lhwT5M/JPgKzeUqjFNgwUcFRWFg=;
-        b=U75GJORVMHIr0iUVnntJaP5CkG0L6J04X+1V/ZPN5uW3dQqnBj8pdaROlXs8b4Z1SG
-         DR1yBHet2NvJnJhuzP0i5c/qQ5sBWpaG0KlB9URDDEL2UqurL8fMaEild5hR6irruZ3I
-         WwlNUWnUuDyL8bRkDmAo8qYqSmnG/ayXfekSo=
+        bh=yDmQxANGbqTJGtO1OhTa4PkciZSXcUVcA6Y2VnUF5Ug=;
+        b=tRuQF9NGsWriwh9rOUGWV/XnpvxEIfrIBLDnzsNlL2DcXYptI5uYx9v9XRgXG9ikj+
+         lAdRFBmN8WWgzpxjYwMBvOBMGH9vQkyzn/bAHiywFTqTy8Rv0zmy7NK3LdyKNjjgvNdr
+         mcLlIarH9lbZWT5t7oU7MIVWXKIhgWd4FFEn+XvtJUHOlIO0rItLGA+Zt6tlzfYijXTt
+         MmEvGy0xnlwDGgt/OUq/OkC9egtS+p7sT3eJ3BcAb9vNf6OatXnbSWZ0hHXVonsgbMVH
+         pMy2zHMasv+EgzYrXDb3idQdrvXUOVYyNS1FKC2EzXUecfAda8U+O/uwCTXSTJ6SOTSm
+         T3ow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=aYf/lCZC1gwMIR9/lhwT5M/JPgKzeUqjFNgwUcFRWFg=;
-        b=DBun3p7SX2tn4H4k4fKd8Q9wblOhAT5/mOkfOE8eHGBt30BnaI3EPVu30UU2gCq46+
-         GtyaYV9S+K4RybDmbFZj7N5jtS2bvwuApWdtVIcdK5xdvE9sSTAiB+iMOH8TS3979hk0
-         QREl8TmMkA5PwPUg0bTxeGkJR8szvU7/HxFJLQEUqv+WNjQgiRWuuarq/pl+3sODkg1P
-         6UbPGdclmwFiGoKmvWVA6tzPODrUEamlGqui9EzRI0BYZHK5lmING38LAEp8isQNmrnH
-         yhgqsEJ4oQ+ROUDltuV+E12TeasXnAzRUHR8JN9jBOQUGRbTFWT0pdSRcOwy5OrTQrig
-         Exwg==
-X-Gm-Message-State: APjAAAVclk3UowlC+PcKsOuNnK4hMplkQ0DrnQsh/AJBopMNnS8DwYnV
-        KLKPiKSCoHWjy6h/YsIpttRoNmkwp/U=
-X-Google-Smtp-Source: APXvYqzPdB0oLyxq+DXZGI8bqSgItR55AdgIe+NVyEoii7KCMMvtSaLp+VqG/a/0cWy+TNZIYz03Jw==
-X-Received: by 2002:a50:f592:: with SMTP id u18mr11689146edm.296.1567108817644;
-        Thu, 29 Aug 2019 13:00:17 -0700 (PDT)
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com. [209.85.221.42])
-        by smtp.gmail.com with ESMTPSA id j2sm507760ejj.34.2019.08.29.13.00.17
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 29 Aug 2019 13:00:17 -0700 (PDT)
-Received: by mail-wr1-f42.google.com with SMTP id b16so4646722wrq.9
-        for <linux-crypto@vger.kernel.org>; Thu, 29 Aug 2019 13:00:17 -0700 (PDT)
-X-Received: by 2002:a5d:4a4e:: with SMTP id v14mr13235010wrs.200.1567108513590;
- Thu, 29 Aug 2019 12:55:13 -0700 (PDT)
+        bh=yDmQxANGbqTJGtO1OhTa4PkciZSXcUVcA6Y2VnUF5Ug=;
+        b=jcixhqKNAkNA7wPp24aU03bMKaxEC7MN9/d6MxEDLoIc7qtwLwTibi0oQ1KOsVOCbt
+         RY2CIkGil2/ted0pV5ta9HktaqPbbnga88Q1X4SodN0u1tXZrcg3JcR7qxvGpylwLRPR
+         MewXG+TSZB1tmSTw4xOt3fU0k3Sprm1TJ2seMdd0FbnkZIa0aN3THPJmhojCWcXlQqNm
+         zxnN80bST74LQSx6v5XYRfiYf5yTdW3pwyBE1/BmcOgWr4LYfvvbvO33aR9VtuZNb/FX
+         nc8LN/PWgxCqpPxgsz3Mo4xj5Rh0rBxHLkLgHhk5L42+0UfbZZ+5tNkwpupcAHD1+G0t
+         OMkg==
+X-Gm-Message-State: APjAAAU8Rkw7FluVfzCIapNufA2qjDcH58wx0yM3qzNPm/j/s7Q4unrf
+        GoqWLPWML4JJEXGXyovJeNufQDcPfi840DYx1UrOOA==
+X-Google-Smtp-Source: APXvYqyIDKOrxjb28zWL9kagM4gqNHMvZYp0EWQP/d+eBC6/dEWbXTKwXclpCyHxrYDHzsr0mwrMijbohn/hHGTlziQ=
+X-Received: by 2002:a81:3681:: with SMTP id d123mr9802172ywa.348.1567128600919;
+ Thu, 29 Aug 2019 18:30:00 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190730191303.206365-1-thgarnie@chromium.org>
- <20190806154347.GD25897@zn.tnic> <20190806155034.GP2349@hirez.programming.kicks-ass.net>
-In-Reply-To: <20190806155034.GP2349@hirez.programming.kicks-ass.net>
-From:   Thomas Garnier <thgarnie@chromium.org>
-Date:   Thu, 29 Aug 2019 12:55:00 -0700
-X-Gmail-Original-Message-ID: <CAJcbSZETvvQYmh6U_Oauptdsrp-emmSG_QsAZzKLv+0-b2Yxig@mail.gmail.com>
-Message-ID: <CAJcbSZETvvQYmh6U_Oauptdsrp-emmSG_QsAZzKLv+0-b2Yxig@mail.gmail.com>
-Subject: Re: [PATCH v9 00/11] x86: PIE support to extend KASLR randomization
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Borislav Petkov <bp@alien8.de>,
-        Kernel Hardening <kernel-hardening@lists.openwall.com>,
-        Kristen Carlson Accardi <kristen@linux.intel.com>,
-        Kees Cook <keescook@chromium.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Juergen Gross <jgross@suse.com>,
-        Thomas Hellstrom <thellstrom@vmware.com>,
-        "VMware, Inc." <pv-drivers@vmware.com>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
-        Nadav Amit <namit@vmware.com>, Jann Horn <jannh@google.com>,
-        Feng Tang <feng.tang@intel.com>,
-        Maran Wilson <maran.wilson@oracle.com>,
-        Enrico Weigelt <info@metux.net>,
-        Allison Randal <allison@lohutok.net>,
-        Alexios Zavras <alexios.zavras@intel.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+References: <20190807013340.9706-1-jhubbard@nvidia.com> <912eb2bd-4102-05c1-5571-c261617ad30b@nvidia.com>
+In-Reply-To: <912eb2bd-4102-05c1-5571-c261617ad30b@nvidia.com>
+From:   Mike Marshall <hubcap@omnibond.com>
+Date:   Thu, 29 Aug 2019 21:29:50 -0400
+Message-ID: <CAOg9mSQKGDywcMde2DE42diUS7J8m74Hdv+xp_PJhC39EXZQuw@mail.gmail.com>
+Subject: Re: [PATCH v3 00/39] put_user_pages(): miscellaneous call sites
+To:     John Hubbard <jhubbard@nvidia.com>
+Cc:     john.hubbard@gmail.com, Andrew Morton <akpm@linux-foundation.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Chinner <david@fromorbit.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Ira Weiny <ira.weiny@intel.com>, Jan Kara <jack@suse.cz>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        =?UTF-8?B?SsOpcsO0bWUgR2xpc3Nl?= <jglisse@redhat.com>,
         LKML <linux-kernel@vger.kernel.org>,
-        virtualization@lists.linux-foundation.org,
-        Linux PM list <linux-pm@vger.kernel.org>
+        amd-gfx@lists.freedesktop.org,
+        ceph-devel <ceph-devel@vger.kernel.org>,
+        devel@driverdev.osuosl.org, devel@lists.orangefs.org,
+        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+        kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-fbdev@vger.kernel.org,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-media@vger.kernel.org, linux-mm <linux-mm@kvack.org>,
+        Linux NFS Mailing List <linux-nfs@vger.kernel.org>,
+        linux-rdma@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
+        linux-xfs@vger.kernel.org, netdev@vger.kernel.org,
+        rds-devel@oss.oracle.com, sparclinux@vger.kernel.org,
+        x86@kernel.org, xen-devel@lists.xenproject.org
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Aug 6, 2019 at 8:51 AM Peter Zijlstra <peterz@infradead.org> wrote:
+Hi John...
+
+I added this patch series on top of Linux 5.3rc6 and ran
+xfstests with no regressions...
+
+Acked-by: Mike Marshall <hubcap@omnibond.com>
+
+-Mike
+
+On Tue, Aug 6, 2019 at 9:50 PM John Hubbard <jhubbard@nvidia.com> wrote:
 >
-> On Tue, Aug 06, 2019 at 05:43:47PM +0200, Borislav Petkov wrote:
-> > On Tue, Jul 30, 2019 at 12:12:44PM -0700, Thomas Garnier wrote:
-> > > These patches make some of the changes necessary to build the kernel as
-> > > Position Independent Executable (PIE) on x86_64. Another patchset will
-> > > add the PIE option and larger architecture changes.
+> On 8/6/19 6:32 PM, john.hubbard@gmail.com wrote:
+> > From: John Hubbard <jhubbard@nvidia.com>
+> > ...
 > >
-> > Yeah, about this: do we have a longer writeup about the actual benefits
-> > of all this and why we should take this all? After all, after looking
-> > at the first couple of asm patches, it is posing restrictions to how
-> > we deal with virtual addresses in asm (only RIP-relative addressing in
-> > 64-bit mode, MOVs with 64-bit immediates, etc, for example) and I'm
-> > willing to bet money that some future unrelated change will break PIE
-> > sooner or later.
-
-The goal is being able to extend the range of addresses where the
-kernel can be placed with KASLR. I will look at clarifying that in the
-future.
-
+> > John Hubbard (38):
+> >   mm/gup: add make_dirty arg to put_user_pages_dirty_lock()
+> ...
+> >  54 files changed, 191 insertions(+), 323 deletions(-)
+> >
+> ahem, yes, apparently this is what happens if I add a few patches while editing
+> the cover letter... :)
 >
-> Possibly objtool can help here; it should be possible to teach it about
-> these rules, and then it will yell when violated. That should avoid
-> regressions.
+> The subject line should read "00/41", and the list of files affected here is
+> therefore under-reported in this cover letter. However, the patch series itself is
+> intact and ready for submission.
 >
-
-I will look into that as well.
+> thanks,
+> --
+> John Hubbard
+> NVIDIA
