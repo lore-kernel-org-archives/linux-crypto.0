@@ -6,56 +6,57 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00EBFC3A5A4
-	for <linux-crypto@archiver.kernel.org>; Fri, 30 Aug 2019 08:25:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEBA3C3A5A4
+	for <linux-crypto@archiver.kernel.org>; Fri, 30 Aug 2019 08:25:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CDACD208CB
-	for <linux-crypto@archiver.kernel.org>; Fri, 30 Aug 2019 08:25:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9CCBF208CB
+	for <linux-crypto@archiver.kernel.org>; Fri, 30 Aug 2019 08:25:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727873AbfH3IZC (ORCPT
+        id S1725822AbfH3IZE (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 30 Aug 2019 04:25:02 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:59664 "EHLO fornost.hmeau.com"
+        Fri, 30 Aug 2019 04:25:04 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:59666 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725822AbfH3IZC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 30 Aug 2019 04:25:02 -0400
+        id S1728174AbfH3IZD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 30 Aug 2019 04:25:03 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
-        id 1i3cD6-0005f7-8c; Fri, 30 Aug 2019 18:24:45 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 30 Aug 2019 18:24:41 +1000
-Date:   Fri, 30 Aug 2019 18:24:41 +1000
+        id 1i3cDL-0005gh-8q; Fri, 30 Aug 2019 18:25:00 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 30 Aug 2019 18:24:57 +1000
+Date:   Fri, 30 Aug 2019 18:24:57 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     YueHaibing <yuehaibing@huawei.com>
-Cc:     davem@davemloft.net, nicolas.ferre@microchip.com,
-        alexandre.belloni@bootlin.com, ludovic.desroches@microchip.com,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH -next] crypto: atmel - Fix -Wunused-const-variable warning
-Message-ID: <20190830082441.GF8033@gondor.apana.org.au>
-References: <20190822144444.74872-1-yuehaibing@huawei.com>
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     linux-crypto@vger.kernel.org,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Gary Hook <gary.hook@amd.com>
+Subject: Re: [PATCH] crypto: ccp - invoke fallback for XTS ciphertext stealing
+Message-ID: <20190830082457.GH8033@gondor.apana.org.au>
+References: <20190822154731.13301-1-ard.biesheuvel@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190822144444.74872-1-yuehaibing@huawei.com>
+In-Reply-To: <20190822154731.13301-1-ard.biesheuvel@linaro.org>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Aug 22, 2019 at 10:44:44PM +0800, YueHaibing wrote:
-> drivers/crypto/atmel-i2c.h:68:3: warning:
->  error_list defined but not used [-Wunused-const-variable=]
+On Thu, Aug 22, 2019 at 06:47:31PM +0300, Ard Biesheuvel wrote:
+> For correctness and compliance with the XTS-AES specification, we are
+> adding support for ciphertext stealing to XTS implementations, even
+> though no use cases are known that will be enabled by this.
 > 
-> error_list is only used in atmel-i2c.c,
-> so just move the definition over there.
+> Since the ccp driver already has a fallback skcipher standby for
+> dealing with input sizes other than [16, 512, 1024, 2048, 4096],
+> just drop the check against the block size.
 > 
-> Reported-by: Hulk Robot <hulkci@huawei.com>
-> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> Cc: Gary Hook <gary.hook@amd.com>
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 > ---
->  drivers/crypto/atmel-i2c.c | 12 ++++++++++++
->  drivers/crypto/atmel-i2c.h | 12 ------------
->  2 files changed, 12 insertions(+), 12 deletions(-)
+>  drivers/crypto/ccp/ccp-crypto-aes-xts.c | 3 ---
+>  1 file changed, 3 deletions(-)
 
 Patch applied.  Thanks.
 -- 
