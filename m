@@ -2,64 +2,81 @@ Return-Path: <SRS0=VSoq=W2=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 761B5C3A5A3
-	for <linux-crypto@archiver.kernel.org>; Fri, 30 Aug 2019 04:58:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE89CC3A5A3
+	for <linux-crypto@archiver.kernel.org>; Fri, 30 Aug 2019 07:39:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4442721874
-	for <linux-crypto@archiver.kernel.org>; Fri, 30 Aug 2019 04:58:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B55AF215EA
+	for <linux-crypto@archiver.kernel.org>; Fri, 30 Aug 2019 07:39:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725774AbfH3E6h (ORCPT
+        id S1727144AbfH3HjR (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 30 Aug 2019 00:58:37 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:59506 "EHLO fornost.hmeau.com"
+        Fri, 30 Aug 2019 03:39:17 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:59558 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725648AbfH3E6h (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 30 Aug 2019 00:58:37 -0400
-Received: from [192.168.0.7] (helo=gwarestrin.arnor.me.apana.org.au)
+        id S1726975AbfH3HjR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 30 Aug 2019 03:39:17 -0400
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
-        id 1i3YzR-0007ro-7D; Fri, 30 Aug 2019 14:58:26 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 30 Aug 2019 14:58:23 +1000
-Date:   Fri, 30 Aug 2019 14:58:23 +1000
+        id 1i3bUz-0003Fw-79; Fri, 30 Aug 2019 17:39:10 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 30 Aug 2019 17:39:06 +1000
+Date:   Fri, 30 Aug 2019 17:39:06 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc:     linux-crypto@vger.kernel.org, Eric Biggers <ebiggers@google.com>,
-        dm-devel@redhat.com, linux-fscrypt@vger.kernel.org,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Milan Broz <gmazyland@gmail.com>
-Subject: Re: [PATCH v13 1/6] crypto: essiv - create wrapper template for
- ESSIV generation
-Message-ID: <20190830045822.GA17901@gondor.apana.org.au>
-References: <20190819141738.1231-1-ard.biesheuvel@linaro.org>
- <20190819141738.1231-2-ard.biesheuvel@linaro.org>
+To:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [GIT] Crypto Fixes for 5.3
+Message-ID: <20190830073906.GA4579@gondor.apana.org.au>
+References: <20180829033353.agnzxra3jk2r2mzg@gondor.apana.org.au>
+ <20181116063146.e7a3mep3ghnfltxe@gondor.apana.org.au>
+ <20181207061409.xflg423nknleuddw@gondor.apana.org.au>
+ <20190118104006.ye5amhxkgd4xrbmc@gondor.apana.org.au>
+ <20190201054204.ehl7u7aaqmkdh5b6@gondor.apana.org.au>
+ <20190215024738.fynl64d5u5htcy2l@gondor.apana.org.au>
+ <20190312045818.bgpiuxogmaxyscdv@gondor.apana.org.au>
+ <20190515060552.ecfwhazt2fnthepg@gondor.apana.org.au>
+ <20190719031206.nxyxk4vj6dg7hwxg@gondor.apana.org.au>
+ <20190809061548.GA10530@gondor.apana.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190819141738.1231-2-ard.biesheuvel@linaro.org>
+In-Reply-To: <20190809061548.GA10530@gondor.apana.org.au>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Aug 19, 2019 at 05:17:33PM +0300, Ard Biesheuvel wrote:
-> Implement a template that wraps a (skcipher,shash) or (aead,shash) tuple
-> so that we can consolidate the ESSIV handling in fscrypt and dm-crypt and
-> move it into the crypto API. This will result in better test coverage, and
-> will allow future changes to make the bare cipher interface internal to the
-> crypto subsystem, in order to increase robustness of the API against misuse.
-> 
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> ---
->  crypto/Kconfig  |  28 +
->  crypto/Makefile |   1 +
->  crypto/essiv.c  | 663 ++++++++++++++++++++
->  3 files changed, 692 insertions(+)
+Hi Linus: 
 
-Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+This push fixes a potential crash in the ccp driver.
+
+
+The following changes since commit e2664ecbb2f26225ac6646876f2899558ffb2604:
+
+  crypto: ccp - Ignore tag length when decrypting GCM ciphertext (2019-08-02 14:36:36 +1000)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+
+for you to fetch changes up to 5871cd93692c8071fb9358daccb715b5081316ac:
+
+  crypto: ccp - Ignore unconfigured CCP device on suspend/resume (2019-08-22 14:22:43 +1000)
+
+----------------------------------------------------------------
+Gary R Hook (1):
+      crypto: ccp - Ignore unconfigured CCP device on suspend/resume
+
+ drivers/crypto/ccp/ccp-dev.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
