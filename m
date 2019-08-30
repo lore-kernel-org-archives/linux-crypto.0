@@ -2,102 +2,151 @@ Return-Path: <SRS0=VSoq=W2=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C3FCC3A59B
-	for <linux-crypto@archiver.kernel.org>; Fri, 30 Aug 2019 20:37:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D564BC3A59B
+	for <linux-crypto@archiver.kernel.org>; Fri, 30 Aug 2019 21:01:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0D0F72343A
-	for <linux-crypto@archiver.kernel.org>; Fri, 30 Aug 2019 20:37:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A5AB223429
+	for <linux-crypto@archiver.kernel.org>; Fri, 30 Aug 2019 21:01:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qvTqGDHH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VlV7OCds"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728072AbfH3UhH (ORCPT
+        id S1728008AbfH3VBz (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 30 Aug 2019 16:37:07 -0400
-Received: from mail-io1-f67.google.com ([209.85.166.67]:39480 "EHLO
-        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727963AbfH3UhG (ORCPT
+        Fri, 30 Aug 2019 17:01:55 -0400
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:36098 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727991AbfH3VBz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 30 Aug 2019 16:37:06 -0400
-Received: by mail-io1-f67.google.com with SMTP id d25so14192751iob.6;
-        Fri, 30 Aug 2019 13:37:06 -0700 (PDT)
+        Fri, 30 Aug 2019 17:01:55 -0400
+Received: by mail-pg1-f195.google.com with SMTP id l21so4128226pgm.3;
+        Fri, 30 Aug 2019 14:01:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=0JUNhfkrZqLY9KN3K5zh26VHBBeMbBG5ArZ82Gj/QyU=;
-        b=qvTqGDHH7or7n6VUh01Oe1iaqtd+FjKc2/UTCYhp5J9UwxdydcutSEiz3KTpDC3YxG
-         rDyj+e1FNAJfuzhP4apRCX71oZnr0MhA1ZtWIDnVs1gG6cegdKteJoHiNWa9sSpxbKVb
-         tsmIDTu2Q4BMibcK5rCX5v0GD8ZsndBalEDGIjaXChwUGnFCTT7KAq95PZkefH3+cHGD
-         n9q8ZNyo6n9+vBGKL53OK6HCTpJQEL1qEgy8DBYreiQrOV2FvlhwbPffeYpwAZRInxne
-         irjak/VX5lxQSAt/GxqT3F+SGNy3L9PnE5Y3sY4NO8Fwo36ql2BTWJ6R0Nq+vp/t/rvc
-         95Mg==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=9HWgbMIqRserk4twrMsOkgXr9R1mUbhAHHKsL/aOnKI=;
+        b=VlV7OCdsjLM+wpxDQO2Ki5ulx8r2y9In1A8QiMj/bphFBjCi6YohJe4YAw7c4lZRsD
+         nO7TrJeZ1h2eO7+1TRb2KUEUIoskX8q4evdFUQbiC9l8+C88IZxS1+bVCCiAXext0VyL
+         YNuIUMFFv0LbI6LZL3A9ul+858LAB9m/UZGKC7enDHIclEwb6tbO872Bk/XYM4kZ0kfB
+         PlRLy1654G/vU2tkc/StrIYRXFWl2QyCOoE3tM/vRjdM/RtZJHcwF9c8+ZzdhW1Xyp6n
+         mJQaKy0abZ51fLyPSJuxU3kXdbysnQ3ZjQQZe04KlxEE5e8zY/P98/KRTzaehnc15pOW
+         4Yww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=0JUNhfkrZqLY9KN3K5zh26VHBBeMbBG5ArZ82Gj/QyU=;
-        b=IDhAFvp2J0SMmcJ29nDKCObRTNwWxmMR/UJfZM/ar7b7sxZM83BROI+zeS8Y2vN4PQ
-         DJjd0KLOpxHv60xyhrUXBrzXwnVaPqNh3uYoRnqzOd+TBri/JCDrhNXOES2szngVRZaq
-         XOV0pyPLZlnYqsFIGQopAeCDkqwNX/JL9GaZ2M7U3aDdr401GO+F3xoOmV9bSw/EPp++
-         pXG8W/mz5A0dtR4mNp8P4PrvBvNlvJ86Rxn8BzUvfMWSkkufrQEPi3v53F6XI709rlt9
-         EUHa9oTwWFXv7EMqHeN8ImC/tSYx9qyonbXxJXdHTTlzHIQpVw9oNPBVziixgctwuLsf
-         PB4Q==
-X-Gm-Message-State: APjAAAV5BRv88YlR0QqZfmKQ/Q9Qv7mOPc/E8c58NZ2gDeXLocuXnz4R
-        rjhna+urCBDLMVtZKlX9e8TScFZLxVCQSDiLm5w=
-X-Google-Smtp-Source: APXvYqz+s6vgax/O8s/+ztnS4mJsISNhBbsquvh/Fry1XjMzc3kv04A/xu8SEGtbqkaHIImTwNjCvKCfLH6cnyiWIs8=
-X-Received: by 2002:a6b:6013:: with SMTP id r19mr832881iog.94.1567197425925;
- Fri, 30 Aug 2019 13:37:05 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190830082320.GA8729@gondor.apana.org.au> <VI1PR04MB444580B237A9F57A7BAAF32B8CBD0@VI1PR04MB4445.eurprd04.prod.outlook.com>
- <20190830131547.GA27480@gondor.apana.org.au> <VI1PR04MB4445AE3FE7AD09C4544D155C8CBD0@VI1PR04MB4445.eurprd04.prod.outlook.com>
-In-Reply-To: <VI1PR04MB4445AE3FE7AD09C4544D155C8CBD0@VI1PR04MB4445.eurprd04.prod.outlook.com>
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=9HWgbMIqRserk4twrMsOkgXr9R1mUbhAHHKsL/aOnKI=;
+        b=TuOP9lUjW4mJv6Pe9I+3Cvt1FIGjQuspk3XaX8Wq7qDgA5tEPeSuqYHSpDgmvPb4A1
+         WogKvrhKPXO78OsMDf9ERaykL7bb2aQTFqR5Ew4Ntad7x8zrNxXsqeDmMU/RjSqa65/c
+         6fkGQH+eMxtslF0H66IGNL+gPbK9a/vPhxT7dKxcBovPxLfhyrV8+EOyCClCHkm7eZeH
+         0WelLAL9yUO8q760h6Sla6J0mqs+XBh1ABtayiKDmyLid7B5MrCIO5IwERKsFQ03ggB4
+         l01ygPnva59/P49OTRDnv8y+7Ws2IZ7spcyU3v/ai8QkIpA8w0jKRx0Doj2chxAD0Fn7
+         IhSg==
+X-Gm-Message-State: APjAAAWSu+9CpFnL1Wgg0L1D14m7Uk6LPnvDlM7M9MZ2Xs3qlFDlQ0rF
+        Zwk2YxwF+IM5Hs49wctYvsw=
+X-Google-Smtp-Source: APXvYqxmYdyiEHAwhEfe49D9XpVmFYBRI7a3/7LC/SEYCOBepCEDYPjhOeSD7Up2X2PJwOHkWa9Lfw==
+X-Received: by 2002:a63:4c5a:: with SMTP id m26mr14237469pgl.270.1567198913959;
+        Fri, 30 Aug 2019 14:01:53 -0700 (PDT)
+Received: from localhost.lan (c-67-185-54-80.hsd1.wa.comcast.net. [67.185.54.80])
+        by smtp.gmail.com with ESMTPSA id fa14sm5732456pjb.12.2019.08.30.14.01.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 30 Aug 2019 14:01:53 -0700 (PDT)
 From:   Andrey Smirnov <andrew.smirnov@gmail.com>
-Date:   Fri, 30 Aug 2019 13:36:54 -0700
-Message-ID: <CAHQ1cqHMCvHkCA+Y07W05F08VQJC4jF1VrJmvNno983+3Pn8Og@mail.gmail.com>
-Subject: Re: [PATCH v8 00/16] crypto: caam - Add i.MX8MQ support
-To:     Iuliana Prodan <iuliana.prodan@nxp.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "christopher.spencer@sea.co.uk" <christopher.spencer@sea.co.uk>,
-        "cory.tusar@zii.aero" <cory.tusar@zii.aero>,
-        "cphealy@gmail.com" <cphealy@gmail.com>,
-        "l.stach@pengutronix.de" <l.stach@pengutronix.de>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Leonard Crestez <leonard.crestez@nxp.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Shawn Guo <shawnguo@kernel.org>
+Cc:     Andrey Smirnov <andrew.smirnov@gmail.com>,
+        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+        Cory Tusar <cory.tusar@zii.aero>,
+        Chris Healy <cphealy@gmail.com>,
+        Lucas Stach <l.stach@pengutronix.de>,
+        Iuliana Prodan <iuliana.prodan@nxp.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] arm64: dts: imx8mq: Add CAAM node
+Date:   Fri, 30 Aug 2019 14:01:39 -0700
+Message-Id: <20190830210139.7028-1-andrew.smirnov@gmail.com>
+X-Mailer: git-send-email 2.21.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Aug 30, 2019 at 6:35 AM Iuliana Prodan <iuliana.prodan@nxp.com> wrote:
->
-> On 8/30/2019 4:16 PM, Herbert Xu wrote:
-> > On Fri, Aug 30, 2019 at 09:15:12AM +0000, Iuliana Prodan wrote:
-> >>
-> >> Can you, please, add, also, the device tree patch ("arm64: dts: imx8mq:
-> >> Add CAAM node") in cryptodev tree?
-> >> Unfortunately Shawn Guo wasn't cc-ed on this patch and, to have the
-> >> complete support for imx8mq, in kernel v5.4, we need the node in dts.
-> >
-> > If Shawn can ack this then I'm happy to apply this patch.
-> >
-> > Thanks,
-> >
->
-> Thanks, Herbert!
->
-> Andrey can you, please, resend the dts patch and cc Shawn Guo?
->
+Add node for CAAM - Cryptographic Acceleration and Assurance Module.
 
-Will do.
+Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
+Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+Cc: Cory Tusar <cory.tusar@zii.aero>
+Cc: Chris Healy <cphealy@gmail.com>
+Cc: Lucas Stach <l.stach@pengutronix.de>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Shawn Guo <shawnguo@kernel.org>
+Cc: Iuliana Prodan <iuliana.prodan@nxp.com>
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+---
+
+Shawn:
+
+Just a bit of a context: as per this thread
+https://lore.kernel.org/linux-crypto/20190830131547.GA27480@gondor.apana.org.au/
+I am hoping I can get and Ack from you for this patch, so it can go
+via cryptodev tree.
 
 Thanks,
 Andrey Smirnov
+
+ arch/arm64/boot/dts/freescale/imx8mq.dtsi | 30 +++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/freescale/imx8mq.dtsi b/arch/arm64/boot/dts/freescale/imx8mq.dtsi
+index d09b808eff87..752d5a61878c 100644
+--- a/arch/arm64/boot/dts/freescale/imx8mq.dtsi
++++ b/arch/arm64/boot/dts/freescale/imx8mq.dtsi
+@@ -728,6 +728,36 @@
+ 				status = "disabled";
+ 			};
+ 
++			crypto: crypto@30900000 {
++				compatible = "fsl,sec-v4.0";
++				#address-cells = <1>;
++				#size-cells = <1>;
++				reg = <0x30900000 0x40000>;
++				ranges = <0 0x30900000 0x40000>;
++				interrupts = <GIC_SPI 91 IRQ_TYPE_LEVEL_HIGH>;
++				clocks = <&clk IMX8MQ_CLK_AHB>,
++					 <&clk IMX8MQ_CLK_IPG_ROOT>;
++				clock-names = "aclk", "ipg";
++
++				sec_jr0: jr@1000 {
++					compatible = "fsl,sec-v4.0-job-ring";
++					reg = <0x1000 0x1000>;
++					interrupts = <GIC_SPI 105 IRQ_TYPE_LEVEL_HIGH>;
++				};
++
++				sec_jr1: jr@2000 {
++					compatible = "fsl,sec-v4.0-job-ring";
++					reg = <0x2000 0x1000>;
++					interrupts = <GIC_SPI 106 IRQ_TYPE_LEVEL_HIGH>;
++				};
++
++				sec_jr2: jr@3000 {
++					compatible = "fsl,sec-v4.0-job-ring";
++					reg = <0x3000 0x1000>;
++					interrupts = <GIC_SPI 114 IRQ_TYPE_LEVEL_HIGH>;
++				};
++			};
++
+ 			i2c1: i2c@30a20000 {
+ 				compatible = "fsl,imx8mq-i2c", "fsl,imx21-i2c";
+ 				reg = <0x30a20000 0x10000>;
+-- 
+2.21.0
+
