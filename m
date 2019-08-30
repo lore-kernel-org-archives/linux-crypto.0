@@ -4,59 +4,70 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34B02C3A5A4
-	for <linux-crypto@archiver.kernel.org>; Fri, 30 Aug 2019 08:25:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 074F9C3A5A4
+	for <linux-crypto@archiver.kernel.org>; Fri, 30 Aug 2019 08:25:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 12B7B21897
-	for <linux-crypto@archiver.kernel.org>; Fri, 30 Aug 2019 08:25:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CE79521874
+	for <linux-crypto@archiver.kernel.org>; Fri, 30 Aug 2019 08:25:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728197AbfH3IZb (ORCPT
+        id S1727015AbfH3IZ1 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 30 Aug 2019 04:25:31 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:59708 "EHLO fornost.hmeau.com"
+        Fri, 30 Aug 2019 04:25:27 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:59702 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726325AbfH3IZa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 30 Aug 2019 04:25:30 -0400
+        id S1726325AbfH3IZ1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 30 Aug 2019 04:25:27 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
-        id 1i3cDE-0005fd-OT; Fri, 30 Aug 2019 18:24:53 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 30 Aug 2019 18:24:47 +1000
-Date:   Fri, 30 Aug 2019 18:24:47 +1000
+        id 1i3cDe-0005jc-1a; Fri, 30 Aug 2019 18:25:19 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 30 Aug 2019 18:25:16 +1000
+Date:   Fri, 30 Aug 2019 18:25:16 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     YueHaibing <yuehaibing@huawei.com>
-Cc:     leitao@debian.org, nayna@linux.ibm.com, pfsmorigo@gmail.com,
-        benh@kernel.crashing.org, paulus@samba.org, mpe@ellerman.id.au,
-        davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH -next] crypto: nx - remove unused variables
- 'nx_driver_string' and 'nx_driver_version'
-Message-ID: <20190830082447.GG8033@gondor.apana.org.au>
-References: <20190822144649.19880-1-yuehaibing@huawei.com>
+To:     Mao Wenan <maowenan@huawei.com>
+Cc:     davem@davemloft.net, jonathan.cameron@huawei.com,
+        wangzhou1@hisilicon.com, liguozhu@hisilicon.com,
+        john.garry@huawei.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH v2 -next] crypto: hisilicon: select CRYPTO_LIB_DES while
+ compiling SEC driver
+Message-ID: <20190830082516.GJ8033@gondor.apana.org.au>
+References: <affd8de1-ae35-a1d0-534a-d9cdfac90de8@huawei.com>
+ <20190828080740.43244-1-maowenan@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190822144649.19880-1-yuehaibing@huawei.com>
+In-Reply-To: <20190828080740.43244-1-maowenan@huawei.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Aug 22, 2019 at 10:46:49PM +0800, YueHaibing wrote:
-> drivers/crypto/nx/nx.h:12:19: warning:
->  nx_driver_string defined but not used [-Wunused-const-variable=]
-> drivers/crypto/nx/nx.h:13:19: warning:
->  nx_driver_version defined but not used [-Wunused-const-variable=]
+On Wed, Aug 28, 2019 at 04:07:40PM +0800, Mao Wenan wrote:
+> When CRYPTO_DEV_HISI_SEC=y, below compilation error is found after 
+> 'commit 894b68d8be4b ("crypto: hisilicon/des - switch to new verification routines")':
 > 
-> They are never used, so just remove it.
+> drivers/crypto/hisilicon/sec/sec_algs.o: In function `sec_alg_skcipher_setkey_des_cbc':
+> sec_algs.c:(.text+0x11f0): undefined reference to `des_expand_key'
+> drivers/crypto/hisilicon/sec/sec_algs.o: In function `sec_alg_skcipher_setkey_des_ecb':
+> sec_algs.c:(.text+0x1390): undefined reference to `des_expand_key'
+> make: *** [vmlinux] Error 1
 > 
-> Reported-by: Hulk Robot <hulkci@huawei.com>
-> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+> This because DES library has been moved to lib/crypto in this commit 
+> '04007b0e6cbb ("crypto: des - split off DES library from generic DES cipher driver")'.
+> Fix this by selecting CRYPTO_LIB_DES in CRYPTO_DEV_HISI_SEC.
+> 
+> Fixes: 04007b0e6cbb ("crypto: des - split off DES library from generic DES cipher driver")
+> Fixes: 894b68d8be4b ("crypto: hisilicon/des - switch to new verification routines")
+> 
+> Signed-off-by: Mao Wenan <maowenan@huawei.com>
+> Acked-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 > ---
->  drivers/crypto/nx/nx.h | 3 ---
->  1 file changed, 3 deletions(-)
+>  v2: remove fix tag 915e4e8413da ("crypto: hisilicon - SEC security accelerator driver") 
+>  drivers/crypto/hisilicon/Kconfig | 1 +
+>  1 file changed, 1 insertion(+)
 
 Patch applied.  Thanks.
 -- 
