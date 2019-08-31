@@ -2,79 +2,89 @@ Return-Path: <SRS0=ef2Z=W3=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC8E1C3A59B
-	for <linux-crypto@archiver.kernel.org>; Sat, 31 Aug 2019 02:10:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADF05C3A59F
+	for <linux-crypto@archiver.kernel.org>; Sat, 31 Aug 2019 12:04:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 860F223711
-	for <linux-crypto@archiver.kernel.org>; Sat, 31 Aug 2019 02:10:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1567217409;
-	bh=+rpYjFz/gK9mI2ubcksMopnmlCrYO26/OTwsyxCeN5A=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
-	b=FP9sCfdZjpNfr/BcorIGiWztq2Pwreqj1xu6W1vWLFmLvIjCl+VjoVbTuKUdYgNSv
-	 fwIfTQ9DGNNaXHE75az3E240qqcSXyee3dfB422g9RHUazddwpgQ30KkgD7gCelqUZ
-	 KUc1xH2QAgzVG9qfo6KpRfMP1t4AL+LxyRSWgVEY=
+	by mail.kernel.org (Postfix) with ESMTP id 8463422CE9
+	for <linux-crypto@archiver.kernel.org>; Sat, 31 Aug 2019 12:04:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728289AbfHaCKI (ORCPT
+        id S1726453AbfHaMEZ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 30 Aug 2019 22:10:08 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56048 "EHLO mail.kernel.org"
+        Sat, 31 Aug 2019 08:04:25 -0400
+Received: from mail.bugwerft.de ([46.23.86.59]:48774 "EHLO mail.bugwerft.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726406AbfHaCKI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 30 Aug 2019 22:10:08 -0400
-Subject: Re: [GIT] Crypto Fixes for 5.3
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1567217407;
-        bh=+rpYjFz/gK9mI2ubcksMopnmlCrYO26/OTwsyxCeN5A=;
-        h=From:In-Reply-To:References:Date:To:Cc:From;
-        b=bC6MBoifjzLlzLjhGZ0x5f8U4Ph/Le5T2zYiLu5XdMnzU8oGLi9aGwaPcNRtLI40Y
-         tCFwp1kSxM3pvXVAwEziwrRIpLZKTQdqcsN+lLRZj4lAZI/72q3yjOc1D7DoiahRAf
-         gO/nPjkvLZx4Lf7oVbpSTnw0k8iBgiowrjsCGZ2E=
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20190830073906.GA4579@gondor.apana.org.au>
-References: <20180829033353.agnzxra3jk2r2mzg@gondor.apana.org.au>
- <20181116063146.e7a3mep3ghnfltxe@gondor.apana.org.au>
- <20181207061409.xflg423nknleuddw@gondor.apana.org.au>
- <20190118104006.ye5amhxkgd4xrbmc@gondor.apana.org.au>
- <20190201054204.ehl7u7aaqmkdh5b6@gondor.apana.org.au>
- <20190215024738.fynl64d5u5htcy2l@gondor.apana.org.au>
- <20190312045818.bgpiuxogmaxyscdv@gondor.apana.org.au>
- <20190515060552.ecfwhazt2fnthepg@gondor.apana.org.au>
- <20190719031206.nxyxk4vj6dg7hwxg@gondor.apana.org.au>
- <20190809061548.GA10530@gondor.apana.org.au>
- <20190830073906.GA4579@gondor.apana.org.au>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20190830073906.GA4579@gondor.apana.org.au>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
-X-PR-Tracked-Commit-Id: 5871cd93692c8071fb9358daccb715b5081316ac
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: e0f14b8ca3882988d15f0b1b853ae3c29d8c9a83
-Message-Id: <156721740767.9496.7852872597014015021.pr-tracker-bot@kernel.org>
-Date:   Sat, 31 Aug 2019 02:10:07 +0000
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+        id S1726354AbfHaMEZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 31 Aug 2019 08:04:25 -0400
+X-Greylist: delayed 501 seconds by postgrey-1.27 at vger.kernel.org; Sat, 31 Aug 2019 08:04:24 EDT
+Received: from localhost.localdomain (p57BC9339.dip0.t-ipconnect.de [87.188.147.57])
+        by mail.bugwerft.de (Postfix) with ESMTPSA id 07A9A29F9FC;
+        Sat, 31 Aug 2019 11:51:42 +0000 (UTC)
+From:   Daniel Mack <daniel@zonque.org>
+To:     mpm@selenic.com, herbert@gondor.apana.org.au,
+        gregkh@linuxfoundation.org
+Cc:     linux-crypto@vger.kernel.org, Daniel Mack <daniel@zonque.org>
+Subject: [PATCH] hw_random: timeriomem_rng: relax check on memory resource size
+Date:   Sat, 31 Aug 2019 13:55:55 +0200
+Message-Id: <20190831115555.11708-1-daniel@zonque.org>
+X-Mailer: git-send-email 2.21.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The pull request you sent on Fri, 30 Aug 2019 17:39:06 +1000:
+The timeriomem_rng driver only accesses the first 4 bytes of the given
+memory area and currently, it also forces that memory resource to be
+exactly 4 bytes in size.
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+This, however, is problematic when used with device-trees that are
+generated from things like FPGA toolchains, where the minimum size
+of an exposed memory block may be something like 4k.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/e0f14b8ca3882988d15f0b1b853ae3c29d8c9a83
+Hence, let's only check for what's needed for the driver to operate
+properly; namely that we have enough memory available to read the
+random data from.
 
-Thank you!
+Signed-off-by: Daniel Mack <daniel@zonque.org>
+---
+ Documentation/devicetree/bindings/rng/timeriomem_rng.txt | 2 +-
+ drivers/char/hw_random/timeriomem-rng.c                  | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
+diff --git a/Documentation/devicetree/bindings/rng/timeriomem_rng.txt b/Documentation/devicetree/bindings/rng/timeriomem_rng.txt
+index 214940093b55..fb4846160047 100644
+--- a/Documentation/devicetree/bindings/rng/timeriomem_rng.txt
++++ b/Documentation/devicetree/bindings/rng/timeriomem_rng.txt
+@@ -12,7 +12,7 @@ Optional properties:
+             which disables using this rng to automatically fill the kernel's
+             entropy pool.
+ 
+-N.B. currently 'reg' must be four bytes wide and aligned
++N.B. currently 'reg' must be at least four bytes wide and 32-bit aligned
+ 
+ Example:
+ 
+diff --git a/drivers/char/hw_random/timeriomem-rng.c b/drivers/char/hw_random/timeriomem-rng.c
+index f615684028af..dc0194d85d80 100644
+--- a/drivers/char/hw_random/timeriomem-rng.c
++++ b/drivers/char/hw_random/timeriomem-rng.c
+@@ -120,9 +120,9 @@ static int timeriomem_rng_probe(struct platform_device *pdev)
+ 	if (!res)
+ 		return -ENXIO;
+ 
+-	if (res->start % 4 != 0 || resource_size(res) != 4) {
++	if (res->start % 4 != 0 || resource_size(res) < 4) {
+ 		dev_err(&pdev->dev,
+-			"address must be four bytes wide and aligned\n");
++			"address must be at least four bytes wide and 32-bit aligned\n");
+ 		return -EINVAL;
+ 	}
+ 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.wiki.kernel.org/userdoc/prtracker
+2.21.0
+
