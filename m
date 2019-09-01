@@ -2,31 +2,31 @@ Return-Path: <SRS0=DBcK=W4=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C59EC3A5A9
-	for <linux-crypto@archiver.kernel.org>; Sun,  1 Sep 2019 20:36:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A69BC3A5A4
+	for <linux-crypto@archiver.kernel.org>; Sun,  1 Sep 2019 20:36:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6BA1B21897
-	for <linux-crypto@archiver.kernel.org>; Sun,  1 Sep 2019 20:36:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3891521897
+	for <linux-crypto@archiver.kernel.org>; Sun,  1 Sep 2019 20:36:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729158AbfIAUfy (ORCPT
+        id S1729043AbfIAUfu (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 1 Sep 2019 16:35:54 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:51006 "EHLO mx1.redhat.com"
+        Sun, 1 Sep 2019 16:35:50 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:37100 "EHLO mx1.redhat.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725955AbfIAUfx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 1 Sep 2019 16:35:53 -0400
+        id S1725955AbfIAUft (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 1 Sep 2019 16:35:49 -0400
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id F0FE536887;
-        Sun,  1 Sep 2019 20:35:52 +0000 (UTC)
-Received: from shalem.localdomain.com (ovpn-116-36.ams2.redhat.com [10.36.116.36])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id C1FD560920;
+        by mx1.redhat.com (Postfix) with ESMTPS id 7BDFE8535D;
         Sun,  1 Sep 2019 20:35:48 +0000 (UTC)
+Received: from shalem.localdomain.com (ovpn-116-36.ams2.redhat.com [10.36.116.36])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4872060606;
+        Sun,  1 Sep 2019 20:35:44 +0000 (UTC)
 From:   Hans de Goede <hdegoede@redhat.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S . Miller" <davem@davemloft.net>,
@@ -49,15 +49,15 @@ Cc:     Hans de Goede <hdegoede@redhat.com>,
         linux-crypto@vger.kernel.org, x86@kernel.org,
         linux-s390@vger.kernel.org, linux-efi@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 3/9] crypto: s390 - Rename functions to avoid conflict with crypto/sha256.h
-Date:   Sun,  1 Sep 2019 22:35:26 +0200
-Message-Id: <20190901203532.2615-4-hdegoede@redhat.com>
+Subject: [PATCH 2/9] crypto: arm64 - Rename functions to avoid conflict with crypto/sha256.h
+Date:   Sun,  1 Sep 2019 22:35:25 +0200
+Message-Id: <20190901203532.2615-3-hdegoede@redhat.com>
 In-Reply-To: <20190901203532.2615-1-hdegoede@redhat.com>
 References: <20190901203532.2615-1-hdegoede@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.30]); Sun, 01 Sep 2019 20:35:53 +0000 (UTC)
+X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.5.16 (mx1.redhat.com [10.5.110.25]); Sun, 01 Sep 2019 20:35:48 +0000 (UTC)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
@@ -70,49 +70,69 @@ This is a preparation patch for folding crypto/sha256.h into crypto/sha.h.
 
 Signed-off-by: Hans de Goede <hdegoede@redhat.com>
 ---
- arch/s390/crypto/sha256_s390.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ arch/arm64/crypto/sha256-glue.c | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
 
-diff --git a/arch/s390/crypto/sha256_s390.c b/arch/s390/crypto/sha256_s390.c
-index af7505148f80..b52c87e44939 100644
---- a/arch/s390/crypto/sha256_s390.c
-+++ b/arch/s390/crypto/sha256_s390.c
-@@ -17,7 +17,7 @@
+diff --git a/arch/arm64/crypto/sha256-glue.c b/arch/arm64/crypto/sha256-glue.c
+index 04b9d17b0733..e273faca924f 100644
+--- a/arch/arm64/crypto/sha256-glue.c
++++ b/arch/arm64/crypto/sha256-glue.c
+@@ -30,15 +30,15 @@ EXPORT_SYMBOL(sha256_block_data_order);
+ asmlinkage void sha256_block_neon(u32 *digest, const void *data,
+ 				  unsigned int num_blks);
  
- #include "sha.h"
- 
--static int sha256_init(struct shash_desc *desc)
-+static int s390_sha256_init(struct shash_desc *desc)
+-static int sha256_update(struct shash_desc *desc, const u8 *data,
+-			 unsigned int len)
++static int crypto_sha256_arm64_update(struct shash_desc *desc, const u8 *data,
++				      unsigned int len)
  {
- 	struct s390_sha_ctx *sctx = shash_desc_ctx(desc);
+ 	return sha256_base_do_update(desc, data, len,
+ 				(sha256_block_fn *)sha256_block_data_order);
+ }
  
-@@ -60,7 +60,7 @@ static int sha256_import(struct shash_desc *desc, const void *in)
- 
- static struct shash_alg sha256_alg = {
- 	.digestsize	=	SHA256_DIGEST_SIZE,
--	.init		=	sha256_init,
-+	.init		=	s390_sha256_init,
- 	.update		=	s390_sha_update,
- 	.final		=	s390_sha_final,
- 	.export		=	sha256_export,
-@@ -76,7 +76,7 @@ static struct shash_alg sha256_alg = {
- 	}
- };
- 
--static int sha224_init(struct shash_desc *desc)
-+static int s390_sha224_init(struct shash_desc *desc)
+-static int sha256_finup(struct shash_desc *desc, const u8 *data,
+-			unsigned int len, u8 *out)
++static int crypto_sha256_arm64_finup(struct shash_desc *desc, const u8 *data,
++				     unsigned int len, u8 *out)
  {
- 	struct s390_sha_ctx *sctx = shash_desc_ctx(desc);
+ 	if (len)
+ 		sha256_base_do_update(desc, data, len,
+@@ -49,17 +49,17 @@ static int sha256_finup(struct shash_desc *desc, const u8 *data,
+ 	return sha256_base_finish(desc, out);
+ }
  
-@@ -96,7 +96,7 @@ static int sha224_init(struct shash_desc *desc)
+-static int sha256_final(struct shash_desc *desc, u8 *out)
++static int crypto_sha256_arm64_final(struct shash_desc *desc, u8 *out)
+ {
+-	return sha256_finup(desc, NULL, 0, out);
++	return crypto_sha256_arm64_finup(desc, NULL, 0, out);
+ }
  
- static struct shash_alg sha224_alg = {
- 	.digestsize	=	SHA224_DIGEST_SIZE,
--	.init		=	sha224_init,
-+	.init		=	s390_sha224_init,
- 	.update		=	s390_sha_update,
- 	.final		=	s390_sha_final,
- 	.export		=	sha256_export,
+ static struct shash_alg algs[] = { {
+ 	.digestsize		= SHA256_DIGEST_SIZE,
+ 	.init			= sha256_base_init,
+-	.update			= sha256_update,
+-	.final			= sha256_final,
+-	.finup			= sha256_finup,
++	.update			= crypto_sha256_arm64_update,
++	.final			= crypto_sha256_arm64_final,
++	.finup			= crypto_sha256_arm64_finup,
+ 	.descsize		= sizeof(struct sha256_state),
+ 	.base.cra_name		= "sha256",
+ 	.base.cra_driver_name	= "sha256-arm64",
+@@ -69,9 +69,9 @@ static struct shash_alg algs[] = { {
+ }, {
+ 	.digestsize		= SHA224_DIGEST_SIZE,
+ 	.init			= sha224_base_init,
+-	.update			= sha256_update,
+-	.final			= sha256_final,
+-	.finup			= sha256_finup,
++	.update			= crypto_sha256_arm64_update,
++	.final			= crypto_sha256_arm64_final,
++	.finup			= crypto_sha256_arm64_finup,
+ 	.descsize		= sizeof(struct sha256_state),
+ 	.base.cra_name		= "sha224",
+ 	.base.cra_driver_name	= "sha224-arm64",
 -- 
 2.23.0
 
