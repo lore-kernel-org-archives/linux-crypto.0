@@ -2,371 +2,103 @@ Return-Path: <SRS0=lOaP=W5=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A55BEC3A59B
-	for <linux-crypto@archiver.kernel.org>; Mon,  2 Sep 2019 06:59:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0649BC3A59B
+	for <linux-crypto@archiver.kernel.org>; Mon,  2 Sep 2019 09:05:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 663A521881
-	for <linux-crypto@archiver.kernel.org>; Mon,  2 Sep 2019 06:59:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F2AB120644
+	for <linux-crypto@archiver.kernel.org>; Mon,  2 Sep 2019 09:05:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gNXVl2UG"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="VPPv9Hkk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729620AbfIBG7B (ORCPT
+        id S1730445AbfIBJF0 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 2 Sep 2019 02:59:01 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:35930 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729619AbfIBG7B (ORCPT
+        Mon, 2 Sep 2019 05:05:26 -0400
+Received: from mo4-p00-ob.smtp.rzone.de ([81.169.146.217]:22573 "EHLO
+        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730308AbfIBJF0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 2 Sep 2019 02:59:01 -0400
-Received: by mail-wm1-f66.google.com with SMTP id p13so13369235wmh.1;
-        Sun, 01 Sep 2019 23:58:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=5AF32yjhGbbOvKpLT0QnkitaASa0bJqQFXYiSlxM9BU=;
-        b=gNXVl2UG6lgFfc0QyBzFSW2tSehhEaX+qyC/fIy+E/ot2IAkiLyixz0Y7Ch0LwZ9g3
-         stsC0NgyHbUYDDSfmsydh4YPG7WXDUonWlYIWWwWA4aUEcBo/zdDmb1IoA/co11oTmfo
-         o0zK1QJGLAo6yrZqaHEL/+KviP86DQZR6AZ9QPYngijtHdcJObxPEZIQkshC4GMN3hSM
-         gGnKStQowGQY4QgMe/3iIdL8m4Qc0O9QXuX3/y449ADpum0WKfsbKAbUWKjRTHJy0M0j
-         iJVAhv3+LOHjNB87eyntntCuudLBewzSEr2PhuswfyXVcfc3pLJvfiPFXYL1PmsVTI0Z
-         YwVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=5AF32yjhGbbOvKpLT0QnkitaASa0bJqQFXYiSlxM9BU=;
-        b=tiRWLaSqb0m4eKsoPN0owJ13/a7mG48EdhtLDB4MYp6FPvtWQ/0MZzEn7YkW6EO9gV
-         TEj6jUJoD65Zw1E6LEdfXC3VPKCoqTLg8X81Pjn93P/FR/VZ6KjQM2yfG7MgNPankJM5
-         OadLF9diPmN1ads4p1UzinYx9nCvtk+tg0rHxlPDRCfNVj/xdsny4cE9JbMhFvfbOFVj
-         6fw4V2P0VYdLMYtUvJGFyTtz9Z/3gEcGyPQvbiCztVuYSFbLsxXTxSvcAm5RP3hYZmGE
-         Z8xuUyPV9akPddAAd1YOxxFcBMquD1gPwmZJez1ZPFJNjXGh2fraNJNNWkAXXJmQkeqb
-         UL0A==
-X-Gm-Message-State: APjAAAV7X904qzTkhV/2sLGtVGC4E4D0jaVAOZk/GdzJpz+WGj3oB7qG
-        tvPvrR/q4X1NjeVpqaQ9BnA=
-X-Google-Smtp-Source: APXvYqweYciAqINF0LptZvUegqJRZK0cdpf1zntScf0vjs3F3MTX3o6XMZJ4CSQhXfaLyagt38aA9A==
-X-Received: by 2002:a05:600c:2047:: with SMTP id p7mr7532151wmg.13.1567407538017;
-        Sun, 01 Sep 2019 23:58:58 -0700 (PDT)
-Received: from Red ([2a01:cb1d:147:7200:2e56:dcff:fed2:c6d6])
-        by smtp.googlemail.com with ESMTPSA id x5sm6155601wrg.69.2019.09.01.23.58.56
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 01 Sep 2019 23:58:57 -0700 (PDT)
-Date:   Mon, 2 Sep 2019 08:58:54 +0200
-From:   Corentin Labbe <clabbe.montjoie@gmail.com>
-To:     Kalyani Akula <kalyani.akula@xilinx.com>
-Cc:     herbert@gondor.apana.org.au, kstewart@linuxfoundation.org,
-        gregkh@linuxfoundation.org, tglx@linutronix.de,
-        pombredanne@nexb.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        Kalyani Akula <kalyania@xilinx.com>
-Subject: Re: [PATCH V2 4/4] crypto: Add Xilinx AES driver
-Message-ID: <20190902065854.GA28750@Red>
-References: <1567346098-27927-1-git-send-email-kalyani.akula@xilinx.com>
- <1567346098-27927-5-git-send-email-kalyani.akula@xilinx.com>
+        Mon, 2 Sep 2019 05:05:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1567415121;
+        s=strato-dkim-0002; d=chronox.de;
+        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
+        bh=PdyLS7N7QHu+lSOKHmnQSTNeXM0u9qkzU1qvZUNp5o8=;
+        b=VPPv9HkkVvtlwKVv/hbXVCYkeOXP3uoaRNNciel1TjOY/BKF0TK7A9pREQpRAmeiBJ
+        qskqpf1b1iAV3BWnyJt4A/CTZXD4R7U7ucFasFM4iumr0fyqxcYdXFLjFRZLCesfXVF0
+        ZOlOXR0b+Z4XwxouHhgqbh7KnTQM0HeuFghqJVU+kcaUIMqMDkWIMzDo3FkJXPwecXU4
+        4c6daXGy3icwjJ1TkIfa3+UV2kFgczCVx7zT36hOY/845wOv2Q+c9svi8093ES0usWhX
+        8y3jfHqSZFwwzbvZDaF47DnTP6LEeLN3ieZG3VphqIT+mMJS4gkip45aJe1t96PQvb+u
+        FrAA==
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9zmwdN52krmXIc+RZmA=="
+X-RZG-CLASS-ID: mo00
+Received: from tauon.chronox.de
+        by smtp.strato.de (RZmta 44.27.0 AUTH)
+        with ESMTPSA id t0367bv8295LVNo
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (curve secp521r1 with 521 ECDH bits, eq. 15360 bits RSA))
+        (Client did not present a certificate);
+        Mon, 2 Sep 2019 11:05:21 +0200 (CEST)
+From:   Stephan Mueller <smueller@chronox.de>
+To:     "Bhat, Jayalakshmi Manjunath" <jayalakshmi.bhat@hp.com>
+Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Subject: Re: How to use nonce in DRBG functions.
+Date:   Mon, 02 Sep 2019 11:05:19 +0200
+Message-ID: <4456652.e1v30m9lHF@tauon.chronox.de>
+In-Reply-To: <TU4PR8401MB0544172FD34CD6FB6F2269CBF6BF0@TU4PR8401MB0544.NAMPRD84.PROD.OUTLOOK.COM>
+References: <TU4PR8401MB0544172FD34CD6FB6F2269CBF6BF0@TU4PR8401MB0544.NAMPRD84.PROD.OUTLOOK.COM>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1567346098-27927-5-git-send-email-kalyani.akula@xilinx.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Sep 01, 2019 at 07:24:58PM +0530, Kalyani Akula wrote:
-> This patch adds AES driver support for the Xilinx
-> ZynqMP SoC.
+Am Sonntag, 1. September 2019, 20:52:24 CEST schrieb Bhat, Jayalakshmi 
+Manjunath:
+
+Hi Jayalakshmi,
+
+> Hi All,
 > 
-> Signed-off-by: Kalyani Akula <kalyani.akula@xilinx.com>
-> ---
-
-Hello
-
-I have some comment below
-
->  drivers/crypto/Kconfig          |  11 ++
->  drivers/crypto/Makefile         |   1 +
->  drivers/crypto/zynqmp-aes-gcm.c | 297 ++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 309 insertions(+)
->  create mode 100644 drivers/crypto/zynqmp-aes-gcm.c
+> I am trying to implement DRBG CAVS test harness function for Linux Kernel
+> crypto DRBG with the following requirements. 1.	Derivate function is
+> enabled.
+> 	2.	prediction resistance is not enabled
+> 	3.	Entropy input length is 256
+> 	4.	Nonce length is 256
+> 	5.	Mode is AES-CTR 256
+> 	6.	Reseed is supported
+> 	7.	Intended use generate.
 > 
-> diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-> index 603413f..a0d058a 100644
-> --- a/drivers/crypto/Kconfig
-> +++ b/drivers/crypto/Kconfig
-> @@ -677,6 +677,17 @@ config CRYPTO_DEV_ROCKCHIP
->  	  This driver interfaces with the hardware crypto accelerator.
->  	  Supporting cbc/ecb chainmode, and aes/des/des3_ede cipher mode.
->  
-> +config CRYPTO_DEV_ZYNQMP_AES
-> +	tristate "Support for Xilinx ZynqMP AES hw accelerator"
-> +	depends on ARCH_ZYNQMP || COMPILE_TEST
-> +	select CRYPTO_AES
-> +	select CRYPTO_SKCIPHER
-> +	help
-> +	  Xilinx ZynqMP has AES-GCM engine used for symmetric key
-> +	  encryption and decryption. This driver interfaces with AES hw
-> +	  accelerator. Select this if you want to use the ZynqMP module
-> +	  for AES algorithms.
-> +
->  config CRYPTO_DEV_MEDIATEK
->  	tristate "MediaTek's EIP97 Cryptographic Engine driver"
->  	depends on (ARM && ARCH_MEDIATEK) || COMPILE_TEST
-> diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
-> index afc4753..c99663a 100644
-> --- a/drivers/crypto/Makefile
-> +++ b/drivers/crypto/Makefile
-> @@ -48,3 +48,4 @@ obj-$(CONFIG_CRYPTO_DEV_BCM_SPU) += bcm/
->  obj-$(CONFIG_CRYPTO_DEV_SAFEXCEL) += inside-secure/
->  obj-$(CONFIG_CRYPTO_DEV_ARTPEC6) += axis/
->  obj-y += hisilicon/
-> +obj-$(CONFIG_CRYPTO_DEV_ZYNQMP_AES) += zynqmp-aes-gcm.o
-> diff --git a/drivers/crypto/zynqmp-aes-gcm.c b/drivers/crypto/zynqmp-aes-gcm.c
-> new file mode 100644
-> index 0000000..d65f038
-> --- /dev/null
-> +++ b/drivers/crypto/zynqmp-aes-gcm.c
-> @@ -0,0 +1,297 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Xilinx ZynqMP AES Driver.
-> + * Copyright (c) 2019 Xilinx Inc.
-> + */
-> +
-> +#include <crypto/aes.h>
-> +#include <crypto/scatterwalk.h>
-> +#include <linux/kernel.h>
-> +#include <linux/module.h>
-> +#include <linux/of_device.h>
-> +#include <linux/scatterlist.h>
-> +#include <linux/firmware/xlnx-zynqmp.h>
-> +
-> +#define ZYNQMP_AES_IV_SIZE			12
-> +#define ZYNQMP_AES_GCM_SIZE			16
-> +#define ZYNQMP_AES_KEY_SIZE			32
-> +
-> +#define ZYNQMP_AES_DECRYPT			0
-> +#define ZYNQMP_AES_ENCRYPT			1
-> +
-> +#define ZYNQMP_AES_KUP_KEY			0
-> +#define ZYNQMP_AES_DEVICE_KEY			1
-> +#define ZYNQMP_AES_PUF_KEY			2
-> +
-> +#define ZYNQMP_AES_GCM_TAG_MISMATCH_ERR		0x01
-> +#define ZYNQMP_AES_SIZE_ERR			0x06
-> +#define ZYNQMP_AES_WRONG_KEY_SRC_ERR		0x13
-> +#define ZYNQMP_AES_PUF_NOT_PROGRAMMED		0xE300
-> +
-> +#define ZYNQMP_AES_BLOCKSIZE			0x04
-> +
-> +static const struct zynqmp_eemi_ops *eemi_ops;
-> +struct zynqmp_aes_dev *aes_dd;
+> Thus inputs are
+> 	1.	Entropy Input
+> 	2.	Nonce
+> 	3.	Entropy Additional Input
+> 
+> Flow goes something like below
+> 	drbg_string_fill(&testentropy, test->entropy, test->entropylen);
+> 	drbg_string_fill(&pers, test->pers, test->perslen);
+> 	ret = crypto_drbg_reset_test(drng, &pers, &test_data);
+> 	drbg_string_fill(&addtl, test->addtla, test->addtllen);
+> 	ret = crypto_drbg_get_bytes_addtl(drng, buf, test->expectedlen, 
+&addtl);
+> 
+> I am not finding a way to input nonce. Please can anyone tell me how to
+> input nonce.
 
-I still think that using a global variable for storing device driver data is bad.
+The entropy string for the DRBG is the CAVS entropy concatenated with the 
+nonce as defined in SP800-90A for each instantiate process of each DRBG.
+> 
+> Regards,
+> Jayalakshmi
 
-> +
-> +struct zynqmp_aes_dev {
-> +	struct device *dev;
-> +};
-> +
-> +struct zynqmp_aes_op {
-> +	struct zynqmp_aes_dev *dd;
-> +	void *src;
-> +	void *dst;
-> +	int len;
-> +	u8 key[ZYNQMP_AES_KEY_SIZE];
-> +	u8 *iv;
-> +	u32 keylen;
-> +	u32 keytype;
-> +};
-> +
-> +struct zynqmp_aes_data {
-> +	u64 src;
-> +	u64 iv;
-> +	u64 key;
-> +	u64 dst;
-> +	u64 size;
-> +	u64 optype;
-> +	u64 keysrc;
-> +};
-> +
-> +static int zynqmp_setkey_blk(struct crypto_tfm *tfm, const u8 *key,
-> +			     unsigned int len)
-> +{
-> +	struct zynqmp_aes_op *op = crypto_tfm_ctx(tfm);
-> +
-> +	if (((len != 1) && (len !=  ZYNQMP_AES_KEY_SIZE)) || (!key))
 
-typo, two space
 
-> +		return -EINVAL;
-> +
-> +	if (len == 1) {
-> +		op->keytype = *key;
-> +
-> +		if ((op->keytype < ZYNQMP_AES_KUP_KEY) ||
-> +			(op->keytype > ZYNQMP_AES_PUF_KEY))
-> +			return -EINVAL;
-> +
-> +	} else if (len == ZYNQMP_AES_KEY_SIZE) {
-> +		op->keytype = ZYNQMP_AES_KUP_KEY;
-> +		op->keylen = len;
-> +		memcpy(op->key, key, len);
-> +	}
-> +
-> +	return 0;
-> +}
+Ciao
+Stephan
 
-It seems your driver does not support AES keysize of 128/196, you need to fallback in that case.
-You need to comment the keylen=1 usecase and use a define for this value.
 
-> +
-> +static int zynqmp_aes_xcrypt(struct blkcipher_desc *desc,
-> +			     struct scatterlist *dst,
-> +			     struct scatterlist *src,
-> +			     unsigned int nbytes,
-> +			     unsigned int flags)
-> +{
-> +	struct zynqmp_aes_op *op = crypto_blkcipher_ctx(desc->tfm);
-> +	struct zynqmp_aes_dev *dd = aes_dd;
-> +	int err, ret, copy_bytes, src_data = 0, dst_data = 0;
-> +	dma_addr_t dma_addr, dma_addr_buf;
-> +	struct zynqmp_aes_data *abuf;
-> +	struct blkcipher_walk walk;
-> +	unsigned int data_size;
-> +	size_t dma_size;
-> +	char *kbuf;
-> +
-> +	if (!eemi_ops->aes)
-> +		return -ENOTSUPP;
-> +
-> +	if (op->keytype == ZYNQMP_AES_KUP_KEY)
-> +		dma_size = nbytes + ZYNQMP_AES_KEY_SIZE
-> +			+ ZYNQMP_AES_IV_SIZE;
-> +	else
-> +		dma_size = nbytes + ZYNQMP_AES_IV_SIZE;
-> +
-> +	kbuf = dma_alloc_coherent(dd->dev, dma_size, &dma_addr, GFP_KERNEL);
-> +	if (!kbuf)
-> +		return -ENOMEM;
-> +
-> +	abuf = dma_alloc_coherent(dd->dev, sizeof(struct zynqmp_aes_data),
-> +				  &dma_addr_buf, GFP_KERNEL);
-> +	if (!abuf) {
-> +		dma_free_coherent(dd->dev, dma_size, kbuf, dma_addr);
-> +		return -ENOMEM;
-> +	}
-> +
-> +	data_size = nbytes;
-> +	blkcipher_walk_init(&walk, dst, src, data_size);
-> +	err = blkcipher_walk_virt(desc, &walk);
-> +	op->iv = walk.iv;
-> +
-> +	while ((nbytes = walk.nbytes)) {
-> +		op->src = walk.src.virt.addr;
-> +		memcpy(kbuf + src_data, op->src, nbytes);
-> +		src_data = src_data + nbytes;
-> +		nbytes &= (ZYNQMP_AES_BLOCKSIZE - 1);
-> +		err = blkcipher_walk_done(desc, &walk, nbytes);
-> +	}
-> +	memcpy(kbuf + data_size, op->iv, ZYNQMP_AES_IV_SIZE);
-> +	abuf->src = dma_addr;
-> +	abuf->dst = dma_addr;
-> +	abuf->iv = abuf->src + data_size;
-> +	abuf->size = data_size - ZYNQMP_AES_GCM_SIZE;
-> +	abuf->optype = flags;
-> +	abuf->keysrc = op->keytype;
-> +
-> +	if (op->keytype == ZYNQMP_AES_KUP_KEY) {
-> +		memcpy(kbuf + data_size + ZYNQMP_AES_IV_SIZE,
-> +		       op->key, ZYNQMP_AES_KEY_SIZE);
-> +
-> +		abuf->key = abuf->src + data_size + ZYNQMP_AES_IV_SIZE;
-> +	} else {
-> +		abuf->key = 0;
-> +	}
-> +	eemi_ops->aes(dma_addr_buf, &ret);
-> +
-> +	if (ret != 0) {
-> +		switch (ret) {
-> +		case ZYNQMP_AES_GCM_TAG_MISMATCH_ERR:
-> +			dev_err(dd->dev, "ERROR: Gcm Tag mismatch\n\r");
-> +			break;
-> +		case ZYNQMP_AES_SIZE_ERR:
-> +			dev_err(dd->dev, "ERROR : Non word aligned data\n\r");
-> +			break;
-> +		case ZYNQMP_AES_WRONG_KEY_SRC_ERR:
-> +			dev_err(dd->dev, "ERROR: Wrong KeySrc, enable secure mode\n\r");
-> +			break;
-> +		case ZYNQMP_AES_PUF_NOT_PROGRAMMED:
-> +			dev_err(dd->dev, "ERROR: PUF is not registered\r\n");
-> +			break;
-> +		default:
-> +			dev_err(dd->dev, "ERROR: Invalid");
-> +			break;
-> +		}
-> +		goto END;
-> +	}
-> +	if (flags)
-> +		copy_bytes = data_size;
-> +	else
-> +		copy_bytes = data_size - ZYNQMP_AES_GCM_SIZE;
-> +
-> +	blkcipher_walk_init(&walk, dst, src, copy_bytes);
-> +	err = blkcipher_walk_virt(desc, &walk);
-> +
-> +	while ((nbytes = walk.nbytes)) {
-> +		memcpy(walk.dst.virt.addr, kbuf + dst_data, nbytes);
-> +		dst_data = dst_data + nbytes;
-> +		nbytes &= (ZYNQMP_AES_BLOCKSIZE - 1);
-> +		err = blkcipher_walk_done(desc, &walk, nbytes);
-> +	}
-> +END:
-> +	memset(kbuf, 0, dma_size);
-> +	memset(abuf, 0, sizeof(struct zynqmp_aes_data));
-> +	dma_free_coherent(dd->dev, dma_size, kbuf, dma_addr);
-> +	dma_free_coherent(dd->dev, sizeof(struct zynqmp_aes_data),
-> +			  abuf, dma_addr_buf);
-> +	return err;
-> +}
-> +
-> +static int zynqmp_aes_decrypt(struct blkcipher_desc *desc,
-> +			      struct scatterlist *dst,
-> +			      struct scatterlist *src,
-> +			      unsigned int nbytes)
-> +{
-> +	return zynqmp_aes_xcrypt(desc, dst, src, nbytes, ZYNQMP_AES_DECRYPT);
-> +}
-> +
-> +static int zynqmp_aes_encrypt(struct blkcipher_desc *desc,
-> +			      struct scatterlist *dst,
-> +			      struct scatterlist *src,
-> +			      unsigned int nbytes)
-> +{
-> +	return zynqmp_aes_xcrypt(desc, dst, src, nbytes, ZYNQMP_AES_ENCRYPT);
-> +}
-> +
-> +static struct crypto_alg zynqmp_alg = {
-> +	.cra_name		=	"xilinx-zynqmp-aes",
-> +	.cra_driver_name	=	"zynqmp-aes-gcm",
-> +	.cra_priority		=	400,
-> +	.cra_flags		=	CRYPTO_ALG_TYPE_BLKCIPHER |
-> +					CRYPTO_ALG_KERN_DRIVER_ONLY,
-> +	.cra_blocksize		=	ZYNQMP_AES_BLOCKSIZE,
-> +	.cra_ctxsize		=	sizeof(struct zynqmp_aes_op),
-> +	.cra_alignmask		=	15,
-> +	.cra_type		=	&crypto_blkcipher_type,
-> +	.cra_module		=	THIS_MODULE,
-> +	.cra_u			=	{
-> +	.blkcipher	=	{
-> +			.min_keysize	=	0,
-
-Are you sure to accept this a keysize of 0 ?
-
-Regards
