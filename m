@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E4ADC3A5A5
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Sep 2019 16:44:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B684DC3A5A2
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Sep 2019 16:44:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0D8AE21881
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Sep 2019 16:44:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 86D4621881
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Sep 2019 16:44:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="W9f1qQsT"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qT7FKLfO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730129AbfICQoB (ORCPT
+        id S1729692AbfICQoD (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 3 Sep 2019 12:44:01 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:38814 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728854AbfICQoB (ORCPT
+        Tue, 3 Sep 2019 12:44:03 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:33375 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728854AbfICQoD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Sep 2019 12:44:01 -0400
-Received: by mail-pg1-f194.google.com with SMTP id d10so4892269pgo.5
-        for <linux-crypto@vger.kernel.org>; Tue, 03 Sep 2019 09:44:01 -0700 (PDT)
+        Tue, 3 Sep 2019 12:44:03 -0400
+Received: by mail-pg1-f193.google.com with SMTP id n190so9465224pgn.0
+        for <linux-crypto@vger.kernel.org>; Tue, 03 Sep 2019 09:44:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=inENxCG3FHp1A7FxE00V5o6CRhf+tePDkDNu7R3bkwg=;
-        b=W9f1qQsTkJP3G6z7uAc5Pjz9DpJz5vYtdCzjM+Y78LMW3mIpOtfWNYjJO9NesY9JYX
-         8WwuPWLTuCBddkeFx9ir06sDmf48slBKsrCpMqB+l27wry2z/oj14RuXOQXhFqsZmnUp
-         Z0PSAqdTudKleBuqbGV2z6L/tzF7B/hhPJwlPi8J+kc1yEy1NYVdjm4uk7s5gb0/gXXD
-         r//7I05uBbAYTH+44aFTUXcmsNznVBd5jT3cf3z4KceOVQlNQ+I6857gs7v05eIOCir2
-         8Bbq50MzSLMFJRxMnKuywf45heHDvqjYFCY1xo/hEaghhk7svnuSqchdHiPrgvwXI9sv
-         6n+g==
+        bh=ss0hT+6FcmRtVnmYdaRt5cn9RrJ1dCb8Db0Ibbel/hM=;
+        b=qT7FKLfOPYRHLYOnoAcjsz6UTVdRycrjXPObzeviWggNsvsetYNOqR+isKEFyR1RLS
+         KV3wWpsfu1aWC4ezhzxuE9kTtCY8x9mnx5c2aIk/iLhD2MPWNCCiwJnmgjt4XPN8ymEh
+         JhICdej3GKCMwR4eF8ni6ydFiMR4vQ806K3+Z3+4fzGrcfy/dgRtiyg9WWZfEs2c/y24
+         6B2r5heX03jtWHdYZn9iAy+veE7OJWJdA4NfvUpIpNoia52IGIYPGDWrRtOIP0drh3f+
+         lCmsOAvCQgTZVembdOmRpvwTbGsaTlZl4DgNJTcJ1rfyVa1mCqfyzzlFoz/8pTjngGwe
+         vZ1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=inENxCG3FHp1A7FxE00V5o6CRhf+tePDkDNu7R3bkwg=;
-        b=Suqt6xQ7nt2Vyx58pDX+QKZLnEpZbH3WrsP8z5mXRh/ErOKPaTXi0UsTIJOAZpqWJI
-         q9zN/Ua4YQHmT6A5kXmsW03UX+HLSx1rt7VplLWNsf6sfFUyR4MLrb/moGAX2ZBheMTC
-         hxdIaU/I1y74FHOkoneBTXjqq0FC28JCPIBIEamwXwObFUg9Gp3MPQTyt/x5BdZdPpV0
-         mOj8D+LMpWQw6NszFWKpEq2FaWppu9c2Q0vSPwf1oX1NqBlEBxYrNE2rInJFVaiJ7dos
-         o4oqm35H8YyaYEy63MCajllAn/N4w5MJihlEeVeHF2Rb5Wf2uCqUn8wT93KieO0+hnmH
-         DNlg==
-X-Gm-Message-State: APjAAAWhYFo1biIne/1LppLB+QLXHolcmJzy2WLZWiyqsEKHiB2iMlnz
-        gC4WwzgEKcDWIRxxx2D0ukqozQo2Pil96Of6
-X-Google-Smtp-Source: APXvYqzavf7+7S8TtPdXisg14IAb4u/loO5kAfm7AF5p13+jiBzkNj7p8WSj8/2zKwlgmqL53liiMg==
-X-Received: by 2002:a17:90a:25a9:: with SMTP id k38mr261400pje.12.1567529040277;
-        Tue, 03 Sep 2019 09:44:00 -0700 (PDT)
+        bh=ss0hT+6FcmRtVnmYdaRt5cn9RrJ1dCb8Db0Ibbel/hM=;
+        b=QtQimRUF421rVFQXhZ6fclFw6sXf+VliWkF1NgGkBUfZAr7wTl3wpad066Q/Z/SJCN
+         HG2qw3B8HLLPGDIAvz4VTcq0OmviN3nA0J7EigVFO3Wpj0iCzFQDClECk7fgh0qCZlne
+         iNO0+lNLWtb7bA/ZCILsX5fnhfbBj5waUPUsHWPgOu2lIGZxlxq3DIc/Sz6KF/Q31iFf
+         x97A4Xxp24UWbkjXbSkZjYwJhEEUhd5XOonZrNuSVWpxpEhZ4s4C4vGegRRQoBsnm3QX
+         gQ1kwMnjmDXJQ3zYw2xy+1wyoE64I2BtA76uYcyhNTp9ZcjZd/dqaPDiVbyBRmp9aQIy
+         jhDQ==
+X-Gm-Message-State: APjAAAUjcLA/xKQkdPIT4cYhMNjqXrfmoi+qqCnJW0+iniNakbEK8qTU
+        xqt3C0IlMWh/F6SpcHttVbZ4wB3puc35j+LA
+X-Google-Smtp-Source: APXvYqzcmzskeJt5jrcMuOAWF9kneZ7u7WfiSttZoJiTtnCtA9R4KCkBssoI/wT13jL/Qmbd28U4Mg==
+X-Received: by 2002:a17:90a:b393:: with SMTP id e19mr230798pjr.118.1567529041664;
+        Tue, 03 Sep 2019 09:44:01 -0700 (PDT)
 Received: from e111045-lin.nice.arm.com ([104.133.8.102])
-        by smtp.gmail.com with ESMTPSA id b126sm20311847pfb.110.2019.09.03.09.43.58
+        by smtp.gmail.com with ESMTPSA id b126sm20311847pfb.110.2019.09.03.09.44.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Sep 2019 09:43:59 -0700 (PDT)
+        Tue, 03 Sep 2019 09:44:00 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     herbert@gondor.apana.org.au, ebiggers@kernel.org,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v2 12/17] crypto: arm64/aes-neonbs - implement ciphertext stealing for XTS
-Date:   Tue,  3 Sep 2019 09:43:34 -0700
-Message-Id: <20190903164339.27984-13-ard.biesheuvel@linaro.org>
+Subject: [PATCH v2 13/17] crypto: arm/aes-ce - implement ciphertext stealing for XTS
+Date:   Tue,  3 Sep 2019 09:43:35 -0700
+Message-Id: <20190903164339.27984-14-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190903164339.27984-1-ard.biesheuvel@linaro.org>
 References: <20190903164339.27984-1-ard.biesheuvel@linaro.org>
@@ -70,164 +70,244 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Update the AES-XTS implementation based on NEON instructions so that it
+Update the AES-XTS implementation based on AES instructions so that it
 can deal with inputs whose size is not a multiple of the cipher block
 size. This is part of the original XTS specification, but was never
 implemented before in the Linux kernel.
 
-Since the bit slicing driver is only faster if it can operate on at
-least 7 blocks of input at the same time, let's reuse the alternate
-path we are adding for CTS to process any data tail whose size is
-not a multiple of 128 bytes.
-
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm64/crypto/aes-ce.S          |   3 +
- arch/arm64/crypto/aes-glue.c        |   2 +
- arch/arm64/crypto/aes-modes.S       |   3 +
- arch/arm64/crypto/aes-neon.S        |   5 +
- arch/arm64/crypto/aes-neonbs-glue.c | 111 +++++++++++++++++---
- 5 files changed, 110 insertions(+), 14 deletions(-)
+ arch/arm/crypto/aes-ce-core.S | 103 ++++++++++++++--
+ arch/arm/crypto/aes-ce-glue.c | 128 ++++++++++++++++++--
+ 2 files changed, 208 insertions(+), 23 deletions(-)
 
-diff --git a/arch/arm64/crypto/aes-ce.S b/arch/arm64/crypto/aes-ce.S
-index 00bd2885feaa..c132c49c89a8 100644
---- a/arch/arm64/crypto/aes-ce.S
-+++ b/arch/arm64/crypto/aes-ce.S
-@@ -21,6 +21,9 @@
- 	.macro		xts_reload_mask, tmp
- 	.endm
+diff --git a/arch/arm/crypto/aes-ce-core.S b/arch/arm/crypto/aes-ce-core.S
+index bb6ec1844370..763e51604ab6 100644
+--- a/arch/arm/crypto/aes-ce-core.S
++++ b/arch/arm/crypto/aes-ce-core.S
+@@ -369,9 +369,9 @@ ENDPROC(ce_aes_ctr_encrypt)
  
-+	.macro		xts_cts_skip_tw, reg, lbl
-+	.endm
+ 	/*
+ 	 * aes_xts_encrypt(u8 out[], u8 const in[], u32 const rk1[], int rounds,
+-	 *		   int blocks, u8 iv[], u32 const rk2[], int first)
++	 *		   int bytes, u8 iv[], u32 const rk2[], int first)
+ 	 * aes_xts_decrypt(u8 out[], u8 const in[], u32 const rk1[], int rounds,
+-	 *		   int blocks, u8 iv[], u32 const rk2[], int first)
++	 *		   int bytes, u8 iv[], u32 const rk2[], int first)
+ 	 */
+ 
+ 	.macro		next_tweak, out, in, const, tmp
+@@ -414,7 +414,7 @@ ENTRY(ce_aes_xts_encrypt)
+ .Lxtsencloop4x:
+ 	next_tweak	q4, q4, q15, q10
+ .Lxtsenc4x:
+-	subs		r4, r4, #4
++	subs		r4, r4, #64
+ 	bmi		.Lxtsenc1x
+ 	vld1.8		{q0-q1}, [r1]!		@ get 4 pt blocks
+ 	vld1.8		{q2-q3}, [r1]!
+@@ -434,24 +434,58 @@ ENTRY(ce_aes_xts_encrypt)
+ 	vst1.8		{q2-q3}, [r0]!
+ 	vmov		q4, q7
+ 	teq		r4, #0
+-	beq		.Lxtsencout
++	beq		.Lxtsencret
+ 	b		.Lxtsencloop4x
+ .Lxtsenc1x:
+-	adds		r4, r4, #4
++	adds		r4, r4, #64
+ 	beq		.Lxtsencout
++	subs		r4, r4, #16
++	bmi		.LxtsencctsNx
+ .Lxtsencloop:
+ 	vld1.8		{q0}, [r1]!
++.Lxtsencctsout:
+ 	veor		q0, q0, q4
+ 	bl		aes_encrypt
+ 	veor		q0, q0, q4
+-	vst1.8		{q0}, [r0]!
+-	subs		r4, r4, #1
++	teq		r4, #0
+ 	beq		.Lxtsencout
++	subs		r4, r4, #16
+ 	next_tweak	q4, q4, q15, q6
++	bmi		.Lxtsenccts
++	vst1.8		{q0}, [r0]!
+ 	b		.Lxtsencloop
+ .Lxtsencout:
++	vst1.8		{q0}, [r0]
++.Lxtsencret:
+ 	vst1.8		{q4}, [r5]
+ 	pop		{r4-r6, pc}
 +
- 	/* preload all round keys */
- 	.macro		load_round_keys, rounds, rk
- 	cmp		\rounds, #12
-diff --git a/arch/arm64/crypto/aes-glue.c b/arch/arm64/crypto/aes-glue.c
-index eecb74fd2f61..327ac8d1489e 100644
---- a/arch/arm64/crypto/aes-glue.c
-+++ b/arch/arm64/crypto/aes-glue.c
-@@ -1073,5 +1073,7 @@ module_cpu_feature_match(AES, aes_init);
- module_init(aes_init);
- EXPORT_SYMBOL(neon_aes_ecb_encrypt);
- EXPORT_SYMBOL(neon_aes_cbc_encrypt);
-+EXPORT_SYMBOL(neon_aes_xts_encrypt);
-+EXPORT_SYMBOL(neon_aes_xts_decrypt);
- #endif
- module_exit(aes_exit);
-diff --git a/arch/arm64/crypto/aes-modes.S b/arch/arm64/crypto/aes-modes.S
-index f2c2ba739f36..131618389f1f 100644
---- a/arch/arm64/crypto/aes-modes.S
-+++ b/arch/arm64/crypto/aes-modes.S
-@@ -442,6 +442,7 @@ AES_ENTRY(aes_xts_encrypt)
- 	cbz		w7, .Lxtsencnotfirst
- 
- 	enc_prepare	w3, x5, x8
-+	xts_cts_skip_tw	w7, .LxtsencNx
- 	encrypt_block	v4, w3, x5, x8, w7		/* first tweak */
- 	enc_switch_key	w3, x2, x8
- 	b		.LxtsencNx
-@@ -530,10 +531,12 @@ AES_ENTRY(aes_xts_decrypt)
- 
- 	ld1		{v4.16b}, [x6]
- 	xts_load_mask	v8
-+	xts_cts_skip_tw	w7, .Lxtsdecskiptw
- 	cbz		w7, .Lxtsdecnotfirst
- 
- 	enc_prepare	w3, x5, x8
- 	encrypt_block	v4, w3, x5, x8, w7		/* first tweak */
-+.Lxtsdecskiptw:
- 	dec_prepare	w3, x2, x8
- 	b		.LxtsdecNx
- 
-diff --git a/arch/arm64/crypto/aes-neon.S b/arch/arm64/crypto/aes-neon.S
-index 0cac5df6c901..22d9b110cf78 100644
---- a/arch/arm64/crypto/aes-neon.S
-+++ b/arch/arm64/crypto/aes-neon.S
-@@ -19,6 +19,11 @@
- 	xts_load_mask	\tmp
- 	.endm
- 
-+	/* special case for the neon-bs driver calling into this one for CTS */
-+	.macro		xts_cts_skip_tw, reg, lbl
-+	tbnz		\reg, #1, \lbl
-+	.endm
++.LxtsencctsNx:
++	vmov		q0, q3
++	sub		r0, r0, #16
++.Lxtsenccts:
++	movw		ip, :lower16:.Lcts_permute_table
++	movt		ip, :upper16:.Lcts_permute_table
 +
- 	/* multiply by polynomial 'x' in GF(2^8) */
- 	.macro		mul_by_x, out, in, temp, const
- 	sshr		\temp, \in, #7
-diff --git a/arch/arm64/crypto/aes-neonbs-glue.c b/arch/arm64/crypto/aes-neonbs-glue.c
-index bafd2ebef8f1..ea873b8904c4 100644
---- a/arch/arm64/crypto/aes-neonbs-glue.c
-+++ b/arch/arm64/crypto/aes-neonbs-glue.c
-@@ -11,6 +11,7 @@
++	add		r1, r1, r4		@ rewind input pointer
++	add		r4, r4, #16		@ # bytes in final block
++	add		lr, ip, #32
++	add		ip, ip, r4
++	sub		lr, lr, r4
++	add		r4, r0, r4		@ output address of final block
++
++	vld1.8		{q1}, [r1]		@ load final partial block
++	vld1.8		{q2}, [ip]
++	vld1.8		{q3}, [lr]
++
++	vtbl.8		d4, {d0-d1}, d4
++	vtbl.8		d5, {d0-d1}, d5
++	vtbx.8		d0, {d2-d3}, d6
++	vtbx.8		d1, {d2-d3}, d7
++
++	vst1.8		{q2}, [r4]		@ overlapping stores
++	mov		r4, #0
++	b		.Lxtsencctsout
+ ENDPROC(ce_aes_xts_encrypt)
+ 
+ 
+@@ -462,13 +496,17 @@ ENTRY(ce_aes_xts_decrypt)
+ 	prepare_key	r2, r3
+ 	vmov		q4, q0
+ 
++	/* subtract 16 bytes if we are doing CTS */
++	tst		r4, #0xf
++	subne		r4, r4, #0x10
++
+ 	teq		r6, #0			@ start of a block?
+ 	bne		.Lxtsdec4x
+ 
+ .Lxtsdecloop4x:
+ 	next_tweak	q4, q4, q15, q10
+ .Lxtsdec4x:
+-	subs		r4, r4, #4
++	subs		r4, r4, #64
+ 	bmi		.Lxtsdec1x
+ 	vld1.8		{q0-q1}, [r1]!		@ get 4 ct blocks
+ 	vld1.8		{q2-q3}, [r1]!
+@@ -491,22 +529,55 @@ ENTRY(ce_aes_xts_decrypt)
+ 	beq		.Lxtsdecout
+ 	b		.Lxtsdecloop4x
+ .Lxtsdec1x:
+-	adds		r4, r4, #4
++	adds		r4, r4, #64
+ 	beq		.Lxtsdecout
++	subs		r4, r4, #16
+ .Lxtsdecloop:
+ 	vld1.8		{q0}, [r1]!
++	bmi		.Lxtsdeccts
++.Lxtsdecctsout:
+ 	veor		q0, q0, q4
+-	add		ip, r2, #32		@ 3rd round key
+ 	bl		aes_decrypt
+ 	veor		q0, q0, q4
+ 	vst1.8		{q0}, [r0]!
+-	subs		r4, r4, #1
++	teq		r4, #0
+ 	beq		.Lxtsdecout
++	subs		r4, r4, #16
+ 	next_tweak	q4, q4, q15, q6
+ 	b		.Lxtsdecloop
+ .Lxtsdecout:
+ 	vst1.8		{q4}, [r5]
+ 	pop		{r4-r6, pc}
++
++.Lxtsdeccts:
++	movw		ip, :lower16:.Lcts_permute_table
++	movt		ip, :upper16:.Lcts_permute_table
++
++	add		r1, r1, r4		@ rewind input pointer
++	add		r4, r4, #16		@ # bytes in final block
++	add		lr, ip, #32
++	add		ip, ip, r4
++	sub		lr, lr, r4
++	add		r4, r0, r4		@ output address of final block
++
++	next_tweak	q5, q4, q15, q6
++
++	vld1.8		{q1}, [r1]		@ load final partial block
++	vld1.8		{q2}, [ip]
++	vld1.8		{q3}, [lr]
++
++	veor		q0, q0, q5
++	bl		aes_decrypt
++	veor		q0, q0, q5
++
++	vtbl.8		d4, {d0-d1}, d4
++	vtbl.8		d5, {d0-d1}, d5
++	vtbx.8		d0, {d2-d3}, d6
++	vtbx.8		d1, {d2-d3}, d7
++
++	vst1.8		{q2}, [r4]		@ overlapping stores
++	mov		r4, #0
++	b		.Lxtsdecctsout
+ ENDPROC(ce_aes_xts_decrypt)
+ 
+ 	/*
+@@ -532,3 +603,13 @@ ENTRY(ce_aes_invert)
+ 	vst1.32		{q0}, [r0]
+ 	bx		lr
+ ENDPROC(ce_aes_invert)
++
++	.section	".rodata", "a"
++	.align		6
++.Lcts_permute_table:
++	.byte		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
++	.byte		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
++	.byte		 0x0,  0x1,  0x2,  0x3,  0x4,  0x5,  0x6,  0x7
++	.byte		 0x8,  0x9,  0xa,  0xb,  0xc,  0xd,  0xe,  0xf
++	.byte		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
++	.byte		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff
+diff --git a/arch/arm/crypto/aes-ce-glue.c b/arch/arm/crypto/aes-ce-glue.c
+index 486e862ae34a..c215792a2494 100644
+--- a/arch/arm/crypto/aes-ce-glue.c
++++ b/arch/arm/crypto/aes-ce-glue.c
+@@ -13,6 +13,7 @@
  #include <crypto/ctr.h>
  #include <crypto/internal/simd.h>
  #include <crypto/internal/skcipher.h>
 +#include <crypto/scatterwalk.h>
- #include <crypto/xts.h>
+ #include <linux/cpufeature.h>
  #include <linux/module.h>
+ #include <crypto/xts.h>
+@@ -39,10 +40,10 @@ asmlinkage void ce_aes_ctr_encrypt(u8 out[], u8 const in[], u32 const rk[],
+ 				   int rounds, int blocks, u8 ctr[]);
  
-@@ -45,6 +46,12 @@ asmlinkage void neon_aes_ecb_encrypt(u8 out[], u8 const in[], u32 const rk[],
- 				     int rounds, int blocks);
- asmlinkage void neon_aes_cbc_encrypt(u8 out[], u8 const in[], u32 const rk[],
- 				     int rounds, int blocks, u8 iv[]);
-+asmlinkage void neon_aes_xts_encrypt(u8 out[], u8 const in[],
-+				     u32 const rk1[], int rounds, int bytes,
-+				     u32 const rk2[], u8 iv[], int first);
-+asmlinkage void neon_aes_xts_decrypt(u8 out[], u8 const in[],
-+				     u32 const rk1[], int rounds, int bytes,
-+				     u32 const rk2[], u8 iv[], int first);
+ asmlinkage void ce_aes_xts_encrypt(u8 out[], u8 const in[], u32 const rk1[],
+-				   int rounds, int blocks, u8 iv[],
++				   int rounds, int bytes, u8 iv[],
+ 				   u32 const rk2[], int first);
+ asmlinkage void ce_aes_xts_decrypt(u8 out[], u8 const in[], u32 const rk1[],
+-				   int rounds, int blocks, u8 iv[],
++				   int rounds, int bytes, u8 iv[],
+ 				   u32 const rk2[], int first);
  
- struct aesbs_ctx {
- 	u8	rk[13 * (8 * AES_BLOCK_SIZE) + 32];
-@@ -64,6 +71,7 @@ struct aesbs_ctr_ctx {
- struct aesbs_xts_ctx {
- 	struct aesbs_ctx	key;
- 	u32			twkey[AES_MAX_KEYLENGTH_U32];
-+	struct crypto_aes_ctx	cts;
- };
- 
- static int aesbs_setkey(struct crypto_skcipher *tfm, const u8 *in_key,
-@@ -270,6 +278,10 @@ static int aesbs_xts_setkey(struct crypto_skcipher *tfm, const u8 *in_key,
- 		return err;
- 
- 	key_len /= 2;
-+	err = aes_expandkey(&ctx->cts, in_key, key_len);
-+	if (err)
-+		return err;
-+
- 	err = aes_expandkey(&rk, in_key + key_len, key_len);
- 	if (err)
- 		return err;
-@@ -302,48 +314,119 @@ static int ctr_encrypt_sync(struct skcipher_request *req)
- 	return ctr_encrypt(req);
- }
- 
--static int __xts_crypt(struct skcipher_request *req,
-+static int __xts_crypt(struct skcipher_request *req, bool encrypt,
- 		       void (*fn)(u8 out[], u8 const in[], u8 const rk[],
- 				  int rounds, int blocks, u8 iv[]))
- {
+ struct aes_block {
+@@ -317,20 +318,71 @@ static int xts_encrypt(struct skcipher_request *req)
  	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
- 	struct aesbs_xts_ctx *ctx = crypto_skcipher_ctx(tfm);
-+	int tail = req->cryptlen % (8 * AES_BLOCK_SIZE);
+ 	struct crypto_aes_xts_ctx *ctx = crypto_skcipher_ctx(tfm);
+ 	int err, first, rounds = num_rounds(&ctx->key1);
++	int tail = req->cryptlen % AES_BLOCK_SIZE;
 +	struct scatterlist sg_src[2], sg_dst[2];
 +	struct skcipher_request subreq;
 +	struct scatterlist *src, *dst;
  	struct skcipher_walk walk;
--	int err;
-+	int nbytes, err;
-+	int first = 1;
-+	u8 *out, *in;
+-	unsigned int blocks;
 +
 +	if (req->cryptlen < AES_BLOCK_SIZE)
 +		return -EINVAL;
-+
-+	/* ensure that the cts tail is covered by a single step */
-+	if (unlikely(tail > 0 && tail < AES_BLOCK_SIZE)) {
+ 
+ 	err = skcipher_walk_virt(&walk, req, false);
+ 
+-	for (first = 1; (blocks = (walk.nbytes / AES_BLOCK_SIZE)); first = 0) {
++	if (unlikely(tail > 0 && walk.nbytes < walk.total)) {
 +		int xts_blocks = DIV_ROUND_UP(req->cryptlen,
 +					      AES_BLOCK_SIZE) - 2;
++
++		skcipher_walk_abort(&walk);
 +
 +		skcipher_request_set_tfm(&subreq, tfm);
 +		skcipher_request_set_callback(&subreq,
@@ -237,62 +317,31 @@ index bafd2ebef8f1..ea873b8904c4 100644
 +					   xts_blocks * AES_BLOCK_SIZE,
 +					   req->iv);
 +		req = &subreq;
++		err = skcipher_walk_virt(&walk, req, false);
 +	} else {
 +		tail = 0;
 +	}
- 
- 	err = skcipher_walk_virt(&walk, req, false);
- 	if (err)
- 		return err;
- 
--	kernel_neon_begin();
--	neon_aes_ecb_encrypt(walk.iv, walk.iv, ctx->twkey, ctx->key.rounds, 1);
--	kernel_neon_end();
--
- 	while (walk.nbytes >= AES_BLOCK_SIZE) {
- 		unsigned int blocks = walk.nbytes / AES_BLOCK_SIZE;
- 
--		if (walk.nbytes < walk.total)
-+		if (walk.nbytes < walk.total || walk.nbytes % AES_BLOCK_SIZE)
- 			blocks = round_down(blocks,
- 					    walk.stride / AES_BLOCK_SIZE);
- 
-+		out = walk.dst.virt.addr;
-+		in = walk.src.virt.addr;
-+		nbytes = walk.nbytes;
++
++	for (first = 1; walk.nbytes >= AES_BLOCK_SIZE; first = 0) {
++		int nbytes = walk.nbytes;
++
++		if (walk.nbytes < walk.total)
++			nbytes &= ~(AES_BLOCK_SIZE - 1);
 +
  		kernel_neon_begin();
--		fn(walk.dst.virt.addr, walk.src.virt.addr, ctx->key.rk,
--		   ctx->key.rounds, blocks, walk.iv);
-+		if (likely(blocks > 6)) { /* plain NEON is faster otherwise */
-+			if (first)
-+				neon_aes_ecb_encrypt(walk.iv, walk.iv,
-+						     ctx->twkey,
-+						     ctx->key.rounds, 1);
-+			first = 0;
-+
-+			fn(out, in, ctx->key.rk, ctx->key.rounds, blocks,
-+			   walk.iv);
-+
-+			out += blocks * AES_BLOCK_SIZE;
-+			in += blocks * AES_BLOCK_SIZE;
-+			nbytes -= blocks * AES_BLOCK_SIZE;
-+		}
-+
-+		if (walk.nbytes == walk.total && nbytes > 0)
-+			goto xts_tail;
-+
+ 		ce_aes_xts_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
+-				   ctx->key1.key_enc, rounds, blocks, walk.iv,
++				   ctx->key1.key_enc, rounds, nbytes, walk.iv,
+ 				   ctx->key2.key_enc, first);
  		kernel_neon_end();
--		err = skcipher_walk_done(&walk,
--					 walk.nbytes - blocks * AES_BLOCK_SIZE);
-+		skcipher_walk_done(&walk, nbytes);
+-		err = skcipher_walk_done(&walk, walk.nbytes % AES_BLOCK_SIZE);
++		err = skcipher_walk_done(&walk, walk.nbytes - nbytes);
  	}
 -	return err;
 +
 +	if (err || likely(!tail))
 +		return err;
 +
-+	/* handle ciphertext stealing */
 +	dst = src = scatterwalk_ffwd(sg_src, req->src, req->cryptlen);
 +	if (req->dst != req->src)
 +		dst = scatterwalk_ffwd(sg_dst, req->dst, req->cryptlen);
@@ -304,36 +353,101 @@ index bafd2ebef8f1..ea873b8904c4 100644
 +	if (err)
 +		return err;
 +
-+	out = walk.dst.virt.addr;
-+	in = walk.src.virt.addr;
-+	nbytes = walk.nbytes;
-+
 +	kernel_neon_begin();
-+xts_tail:
-+	if (encrypt)
-+		neon_aes_xts_encrypt(out, in, ctx->cts.key_enc, ctx->key.rounds,
-+				     nbytes, ctx->twkey, walk.iv, first ?: 2);
-+	else
-+		neon_aes_xts_decrypt(out, in, ctx->cts.key_dec, ctx->key.rounds,
-+				     nbytes, ctx->twkey, walk.iv, first ?: 2);
++	ce_aes_xts_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
++			   ctx->key1.key_enc, rounds, walk.nbytes, walk.iv,
++			   ctx->key2.key_enc, first);
 +	kernel_neon_end();
 +
 +	return skcipher_walk_done(&walk, 0);
  }
  
- static int xts_encrypt(struct skcipher_request *req)
- {
--	return __xts_crypt(req, aesbs_xts_encrypt);
-+	return __xts_crypt(req, true, aesbs_xts_encrypt);
- }
- 
  static int xts_decrypt(struct skcipher_request *req)
- {
--	return __xts_crypt(req, aesbs_xts_decrypt);
-+	return __xts_crypt(req, false, aesbs_xts_decrypt);
+@@ -338,20 +390,71 @@ static int xts_decrypt(struct skcipher_request *req)
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+ 	struct crypto_aes_xts_ctx *ctx = crypto_skcipher_ctx(tfm);
+ 	int err, first, rounds = num_rounds(&ctx->key1);
++	int tail = req->cryptlen % AES_BLOCK_SIZE;
++	struct scatterlist sg_src[2], sg_dst[2];
++	struct skcipher_request subreq;
++	struct scatterlist *src, *dst;
+ 	struct skcipher_walk walk;
+-	unsigned int blocks;
++
++	if (req->cryptlen < AES_BLOCK_SIZE)
++		return -EINVAL;
+ 
+ 	err = skcipher_walk_virt(&walk, req, false);
+ 
+-	for (first = 1; (blocks = (walk.nbytes / AES_BLOCK_SIZE)); first = 0) {
++	if (unlikely(tail > 0 && walk.nbytes < walk.total)) {
++		int xts_blocks = DIV_ROUND_UP(req->cryptlen,
++					      AES_BLOCK_SIZE) - 2;
++
++		skcipher_walk_abort(&walk);
++
++		skcipher_request_set_tfm(&subreq, tfm);
++		skcipher_request_set_callback(&subreq,
++					      skcipher_request_flags(req),
++					      NULL, NULL);
++		skcipher_request_set_crypt(&subreq, req->src, req->dst,
++					   xts_blocks * AES_BLOCK_SIZE,
++					   req->iv);
++		req = &subreq;
++		err = skcipher_walk_virt(&walk, req, false);
++	} else {
++		tail = 0;
++	}
++
++	for (first = 1; walk.nbytes >= AES_BLOCK_SIZE; first = 0) {
++		int nbytes = walk.nbytes;
++
++		if (walk.nbytes < walk.total)
++			nbytes &= ~(AES_BLOCK_SIZE - 1);
++
+ 		kernel_neon_begin();
+ 		ce_aes_xts_decrypt(walk.dst.virt.addr, walk.src.virt.addr,
+-				   ctx->key1.key_dec, rounds, blocks, walk.iv,
++				   ctx->key1.key_dec, rounds, nbytes, walk.iv,
+ 				   ctx->key2.key_enc, first);
+ 		kernel_neon_end();
+-		err = skcipher_walk_done(&walk, walk.nbytes % AES_BLOCK_SIZE);
++		err = skcipher_walk_done(&walk, walk.nbytes - nbytes);
+ 	}
+-	return err;
++
++	if (err || likely(!tail))
++		return err;
++
++	dst = src = scatterwalk_ffwd(sg_src, req->src, req->cryptlen);
++	if (req->dst != req->src)
++		dst = scatterwalk_ffwd(sg_dst, req->dst, req->cryptlen);
++
++	skcipher_request_set_crypt(req, src, dst, AES_BLOCK_SIZE + tail,
++				   req->iv);
++
++	err = skcipher_walk_virt(&walk, req, false);
++	if (err)
++		return err;
++
++	kernel_neon_begin();
++	ce_aes_xts_decrypt(walk.dst.virt.addr, walk.src.virt.addr,
++			   ctx->key1.key_dec, rounds, walk.nbytes, walk.iv,
++			   ctx->key2.key_enc, first);
++	kernel_neon_end();
++
++	return skcipher_walk_done(&walk, 0);
  }
  
  static struct skcipher_alg aes_algs[] = { {
+@@ -426,6 +529,7 @@ static struct skcipher_alg aes_algs[] = { {
+ 	.min_keysize		= 2 * AES_MIN_KEY_SIZE,
+ 	.max_keysize		= 2 * AES_MAX_KEY_SIZE,
+ 	.ivsize			= AES_BLOCK_SIZE,
++	.walksize		= 2 * AES_BLOCK_SIZE,
+ 	.setkey			= xts_set_key,
+ 	.encrypt		= xts_encrypt,
+ 	.decrypt		= xts_decrypt,
 -- 
 2.17.1
 
