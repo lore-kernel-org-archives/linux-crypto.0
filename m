@@ -2,140 +2,95 @@ Return-Path: <SRS0=7iXC=W6=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 223E2C3A5A2
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Sep 2019 13:50:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F9BDC3A5A2
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Sep 2019 16:36:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E964F23711
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Sep 2019 13:50:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D1EDB2339D
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Sep 2019 16:36:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1567518626;
-	bh=jwDqtP9jUUTCcakKBXh0Rc1jrojcO4GPILrHYrKwzRY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=jgHj2+dHtAVOGzIz+LasbuH+YETj6oMId4K6GTDuo9Lz8BJbCylRR07BDDk9bj3fw
-	 8KNRW3LUr+CvLf+uG2d6tiOJQiHMRv0qo/HsS5yf4IS9HpWjXO3JZRGPblKIPWJNEF
-	 2aR8KffLCpY9BwjO5PwRmj/gXW4Qt0qd96WvN4iQ=
+	s=default; t=1567528610;
+	bh=UAiGUdrPfb+g2lb5wdRr2F7sPCY1m57xplW9JvOlQ/Q=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=alkjH/d5SFBLWpQZW4t353BjqWu0PatJqx42/T60prOIuOUK5HzkAe+UUXFlW1BNr
+	 qHgbvQDRumLCCyv9feyKNYuN2/vkHKi1e6NbmejI4dk7fwdqYqm/SksiHM7xGY0lwM
+	 nM8DvydLCXXxzWq4EDDsRWHNyLC0arVEZNn2Yfek=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729005AbfICNuZ (ORCPT
+        id S1730775AbfICQgt (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 3 Sep 2019 09:50:25 -0400
-Received: from mail.kernel.org ([198.145.29.99]:44396 "EHLO mail.kernel.org"
+        Tue, 3 Sep 2019 12:36:49 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48194 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728679AbfICNuY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Sep 2019 09:50:24 -0400
-Received: from zzz.localdomain (h184-61-154-48.mdsnwi.dsl.dynamic.tds.net [184.61.154.48])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1730766AbfICQ1D (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 3 Sep 2019 12:27:03 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8F90623697;
-        Tue,  3 Sep 2019 13:50:23 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 531F6238C7;
+        Tue,  3 Sep 2019 16:27:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1567518624;
-        bh=jwDqtP9jUUTCcakKBXh0Rc1jrojcO4GPILrHYrKwzRY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=lI2oxNnhqZsLhU190DLBO0I4xF6ILS70vckJC7FnoaoxHgk+tB5TaSNNoiHJb5Q/i
-         aEiivu6F+qB/oQjPWCrLvuXN4KQHfyoT9UwzKn99gvU6DBsKJCT/CuZSgPi3oE7z+i
-         hZQbr+PaWD6dQh2WW+0kCu4SV8lrLYy5xvCW9wZY=
-Date:   Tue, 3 Sep 2019 08:50:20 -0500
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>
-Subject: Re: crypto: skcipher - Unmap pages after an external error
-Message-ID: <20190903135020.GB5144@zzz.localdomain>
-Mail-Followup-To: Herbert Xu <herbert@gondor.apana.org.au>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" <linux-crypto@vger.kernel.org>
-References: <20190821143253.30209-1-ard.biesheuvel@linaro.org>
- <20190821143253.30209-9-ard.biesheuvel@linaro.org>
- <20190830080347.GA6677@gondor.apana.org.au>
- <CAKv+Gu-4QBvPcE7YUqgWbT31gdLM8vcHTPbdOCN+UnUMXreuPg@mail.gmail.com>
- <20190903065438.GA9372@gondor.apana.org.au>
+        s=default; t=1567528023;
+        bh=UAiGUdrPfb+g2lb5wdRr2F7sPCY1m57xplW9JvOlQ/Q=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=NVen0V82SYj3OwXJ/xZY4rm2TYBtDsVpWVFbloDGmQSHl+I0vyingezhH9vl1Zrp7
+         w3XHUvoQ1JIFNQ0UH9t33dGWUTwqzEoixkOFxqZCZfgGbFG2RyWhVoM96rk3dOFRZc
+         7uO5pD+ckVqUwBKWUKxmh1DDNRD6AhBV6TUc/oR0=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Gilad Ben-Yossef <gilad@benyossef.com>, stable@kernel.org,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.19 058/167] crypto: ccree - add missing inline qualifier
+Date:   Tue,  3 Sep 2019 12:23:30 -0400
+Message-Id: <20190903162519.7136-58-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20190903162519.7136-1-sashal@kernel.org>
+References: <20190903162519.7136-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190903065438.GA9372@gondor.apana.org.au>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Sep 03, 2019 at 04:54:38PM +1000, Herbert Xu wrote:
->  int skcipher_walk_done(struct skcipher_walk *walk, int err)
->  {
-> -	unsigned int n; /* bytes processed */
-> -	bool more;
-> -
-> -	if (unlikely(err < 0))
-> -		goto finish;
-> +	unsigned int n = walk->nbytes - err;
-> +	unsigned int nbytes;
->  
-> -	n = walk->nbytes - err;
-> -	walk->total -= n;
-> -	more = (walk->total != 0);
-> +	nbytes = walk->total - n;
->  
-> -	if (likely(!(walk->flags & (SKCIPHER_WALK_PHYS |
-> -				    SKCIPHER_WALK_SLOW |
-> -				    SKCIPHER_WALK_COPY |
-> -				    SKCIPHER_WALK_DIFF)))) {
-> +	if (unlikely(err < 0)) {
-> +		nbytes = 0;
-> +		n = 0;
-> +	} else if (likely(!(walk->flags & (SKCIPHER_WALK_PHYS |
-> +					   SKCIPHER_WALK_SLOW |
-> +					   SKCIPHER_WALK_COPY |
-> +					   SKCIPHER_WALK_DIFF)))) {
->  unmap_src:
->  		skcipher_unmap_src(walk);
->  	} else if (walk->flags & SKCIPHER_WALK_DIFF) {
-> @@ -134,25 +134,34 @@ int skcipher_walk_done(struct skcipher_walk *walk, int err)
->  			 * the algorithm requires it.
->  			 */
->  			err = -EINVAL;
-> -			goto finish;
-> -		}
-> -		skcipher_done_slow(walk, n);
-> -		goto already_advanced;
-> +			nbytes = 0;
-> +		} else
-> +			n = skcipher_done_slow(walk, n);
->  	}
->  
-> +	if (err > 0)
-> +		err = 0;
-> +
-> +	walk->total = nbytes;
-> +	walk->nbytes = nbytes;
-> +
->  	scatterwalk_advance(&walk->in, n);
->  	scatterwalk_advance(&walk->out, n);
-> -already_advanced:
-> -	scatterwalk_done(&walk->in, 0, more);
-> -	scatterwalk_done(&walk->out, 1, more);
-> +	scatterwalk_done(&walk->in, 0, nbytes);
-> +	scatterwalk_done(&walk->out, 1, nbytes);
->  
-> -	if (more) {
-> +	if (nbytes) {
->  		crypto_yield(walk->flags & SKCIPHER_WALK_SLEEP ?
->  			     CRYPTO_TFM_REQ_MAY_SLEEP : 0);
->  		return skcipher_walk_next(walk);
->  	}
-> -	err = 0;
-> -finish:
-> +
-> +	return skcipher_walk_unwind(walk, err);
-> +}
-> +EXPORT_SYMBOL_GPL(skcipher_walk_done);
+From: Gilad Ben-Yossef <gilad@benyossef.com>
 
-Doesn't this re-introduce the same bug that my patch fixed -- that
-scatterwalk_done() could be called after 0 bytes processed, causing a crash in
-scatterwalk_pagedone()?
+[ Upstream commit f1071c3e2473ae19a7f5d892a187c4cab1a61f2e ]
 
-- Eric
+Commit 1358c13a48c4 ("crypto: ccree - fix resume race condition on init")
+was missing a "inline" qualifier for stub function used when CONFIG_PM
+is not set causing a build warning.
+
+Fixes: 1358c13a48c4 ("crypto: ccree - fix resume race condition on init")
+Cc: stable@kernel.org # v4.20
+Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+Acked-by: Geert Uytterhoeven <geert@linux-m68k.org>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/crypto/ccree/cc_pm.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/ccree/cc_pm.h b/drivers/crypto/ccree/cc_pm.h
+index f626243570209..907a6db4d6c03 100644
+--- a/drivers/crypto/ccree/cc_pm.h
++++ b/drivers/crypto/ccree/cc_pm.h
+@@ -30,7 +30,7 @@ static inline int cc_pm_init(struct cc_drvdata *drvdata)
+ 	return 0;
+ }
+ 
+-static void cc_pm_go(struct cc_drvdata *drvdata) {}
++static inline void cc_pm_go(struct cc_drvdata *drvdata) {}
+ 
+ static inline void cc_pm_fini(struct cc_drvdata *drvdata) {}
+ 
+-- 
+2.20.1
+
