@@ -2,63 +2,57 @@ Return-Path: <SRS0=7iXC=W6=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88AA4C3A5A2
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Sep 2019 07:45:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7012C3A5A7
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Sep 2019 07:51:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 615B32053B
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Sep 2019 07:45:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=benyossef-com.20150623.gappssmtp.com header.i=@benyossef-com.20150623.gappssmtp.com header.b="ufwLEFax"
+	by mail.kernel.org (Postfix) with ESMTP id AD8942053B
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Sep 2019 07:51:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727930AbfICHpd (ORCPT
+        id S1726557AbfICHvR (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 3 Sep 2019 03:45:33 -0400
-Received: from mail-vs1-f65.google.com ([209.85.217.65]:35983 "EHLO
-        mail-vs1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726740AbfICHpd (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Sep 2019 03:45:33 -0400
-Received: by mail-vs1-f65.google.com with SMTP id r1so7865264vsq.3
-        for <linux-crypto@vger.kernel.org>; Tue, 03 Sep 2019 00:45:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=benyossef-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=cFrdK23ABQ4OmIay3wgO+JPOpB+v5jDpV220cb1264Q=;
-        b=ufwLEFaxFvvebslcyBbnlbc241i8XCEIlYE9wBiVJzjKucNO4eL1Na+LBUvtqz1FgL
-         0nI9xN8fOYPappYKOskoqbaYYxhCb3PvLx9y4Wny7CjinopqfC0cv3EIvJ/tIXAhI4vz
-         E2fyfXxycZQ1V9MaJ5KrZ8n//JHLSaT3S3mSjjxjsGU1LuBvEYlxEQyL5b/F3KVpIFiP
-         N3NFsrY+79vToYlc7OsQuMRZr4xpv8JWicFnaCsy143PuOIncx321v5ZzrJHufsTr/CI
-         BUGGU8MQvYhE3W+DRpd/1UQmERT3DAY8x7i5MtUQm23Ix019VfmAutO3WtSiyRx3lM8R
-         mOog==
+        Tue, 3 Sep 2019 03:51:17 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55348 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726698AbfICHvR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 3 Sep 2019 03:51:17 -0400
+Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com [209.85.208.71])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 4229D4ACA5
+        for <linux-crypto@vger.kernel.org>; Tue,  3 Sep 2019 07:51:16 +0000 (UTC)
+Received: by mail-ed1-f71.google.com with SMTP id z25so10044596edm.3
+        for <linux-crypto@vger.kernel.org>; Tue, 03 Sep 2019 00:51:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=cFrdK23ABQ4OmIay3wgO+JPOpB+v5jDpV220cb1264Q=;
-        b=Hox9zHlFfsGAx23nKCzFUyYvCc0d87QaSRV/QcG21kHrosH9EsLQQBxzjsxdRAUCkH
-         miRSQO+qiLLKS82amGT0Ke0d1OjBItKsjTJ2bnpSMu+/qVvzmlEqwBVRzKwgODTwO1To
-         YX/O7ZTH5YPehmzqJ29nYk3rgxBnYxb3Fyyj/8lzh5Ejv9dpCDxLhrSqNXTb//OJlkNK
-         /dLGZYEOyvJN3p5i/9y6k3oRLcUI8+Up4a/V/k7RujoezUdgp+lycg+26+F7RDMyX/qJ
-         cif+7XzXUJnMzX+BahsqWx1fIa+hFhjifpruV3ZDpiPwnZemewzuvwhjo8mh6lvQnznO
-         38/A==
-X-Gm-Message-State: APjAAAVV9TRu5Qu02iH6ZRsMmNmnMJvyWXMHZRw5rzqlUrVFNemhevYG
-        P6YR8+uU8cjVhfd+CvE/6wLoaPntdLIa8wsY2gYzlQ==
-X-Google-Smtp-Source: APXvYqwbodlz7C9/rGshgIf7/qYpAxUq0gr6cTRVIP3xE0GyOpy2iRluovRfONJrQ0fD8bl9acvTKe0dYnil3LY22UY=
-X-Received: by 2002:a67:e886:: with SMTP id x6mr9386146vsn.117.1567496732233;
- Tue, 03 Sep 2019 00:45:32 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190901203532.2615-1-hdegoede@redhat.com> <20190901203532.2615-6-hdegoede@redhat.com>
-In-Reply-To: <20190901203532.2615-6-hdegoede@redhat.com>
-From:   Gilad Ben-Yossef <gilad@benyossef.com>
-Date:   Tue, 3 Sep 2019 10:45:21 +0300
-Message-ID: <CAOtvUMdd+V5pesw+O-kk9_JB5YpxUM+hU+Uu=kiMvOL9d0AziQ@mail.gmail.com>
-Subject: Re: [PATCH 5/9] crypto: ccree - Rename arrays to avoid conflict with crypto/sha256.h
-To:     Hans de Goede <hdegoede@redhat.com>
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=w8HIPoxJeKQ6uWeXwaqzJnrwZeqZuyXyHwG4+Nh5f8I=;
+        b=N2HEi6V0FB/mV3CRCkJg/Ayfbc07ZGfFV/n7gybeBT3L0Q7lqrCm47/5WcBRKFt2qi
+         6kidp1R9VLltqVl3YgWNs9+JrTV3opFlcm7hf8JR/7Q6Qub8px2Xh+x1sJd9hrcuXlM8
+         WVX0nDf5y8VjrKZSpVspj6I20imNzhpnZ+eBGsA7EizzYmNOeJ5WlHesAOzlQB1/Tqgz
+         056SX2EVXwU4IfSQLzfzTAX/ywiTXMnYQvO98dhglqAhv5BNgzBZCJCXm1CxLIikWrjI
+         EVXCb7VjW8ktXJ6RHh+/BXSSKbZuRDgrWSN1TOh2Zh1ljTyAGOleFZwL4fvgW5V5GFlI
+         Cz9Q==
+X-Gm-Message-State: APjAAAXNjY19kACrf6ZXaWLi6LVd5XKD/VbOuKD/DdDXVorJCkHqT6l4
+        d0AT107yo6+JySJZb0P9Wiz3zEj/JsnKMdIPbQ6ulBisezfbvWe55kynUZxfEprUZwb1PtlOqYZ
+        zy5I6HgEcEvvmrnw5S3TnnRLp
+X-Received: by 2002:a17:906:d7a3:: with SMTP id pk3mr13383193ejb.97.1567497075044;
+        Tue, 03 Sep 2019 00:51:15 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqxcWpjWCgHm7od0lS3pQcg6L6ajmTNeMv46O7wYLrV4SdnJWrI2Vv4mBF3X9ZIiqJr2V6QZKg==
+X-Received: by 2002:a17:906:d7a3:: with SMTP id pk3mr13383184ejb.97.1567497074920;
+        Tue, 03 Sep 2019 00:51:14 -0700 (PDT)
+Received: from shalem.localdomain (84-106-84-65.cable.dynamic.v4.ziggo.nl. [84.106.84.65])
+        by smtp.gmail.com with ESMTPSA id c1sm3244417edr.37.2019.09.03.00.51.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 03 Sep 2019 00:51:14 -0700 (PDT)
+Subject: Re: [PATCH 5/9] crypto: ccree - Rename arrays to avoid conflict with
+ crypto/sha256.h
+To:     Gilad Ben-Yossef <gilad@benyossef.com>
 Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S . Miller" <davem@davemloft.net>,
         Thomas Gleixner <tglx@linutronix.de>,
@@ -80,22 +74,43 @@ Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
         linux-efi@vger.kernel.org,
         Linux kernel mailing list <linux-kernel@vger.kernel.org>,
         Linux ARM <linux-arm-kernel@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
+References: <20190901203532.2615-1-hdegoede@redhat.com>
+ <20190901203532.2615-6-hdegoede@redhat.com>
+ <CAOtvUMdd+V5pesw+O-kk9_JB5YpxUM+hU+Uu=kiMvOL9d0AziQ@mail.gmail.com>
+From:   Hans de Goede <hdegoede@redhat.com>
+Message-ID: <0d55a6a7-9cca-38cb-97a2-558280fdc122@redhat.com>
+Date:   Tue, 3 Sep 2019 09:51:12 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
+MIME-Version: 1.0
+In-Reply-To: <CAOtvUMdd+V5pesw+O-kk9_JB5YpxUM+hU+Uu=kiMvOL9d0AziQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Sep 1, 2019 at 11:36 PM Hans de Goede <hdegoede@redhat.com> wrote:
->
-> Rename the algo_init arrays to cc_algo_init so that they do not conflict
-> with the functions declared in crypto/sha256.h.
->
-> This is a preparation patch for folding crypto/sha256.h into crypto/sha.h.
+Hi,
 
-I'm fine with the renaming.
+On 03-09-19 09:45, Gilad Ben-Yossef wrote:
+> On Sun, Sep 1, 2019 at 11:36 PM Hans de Goede <hdegoede@redhat.com> wrote:
+>>
+>> Rename the algo_init arrays to cc_algo_init so that they do not conflict
+>> with the functions declared in crypto/sha256.h.
+>>
+>> This is a preparation patch for folding crypto/sha256.h into crypto/sha.h.
+> 
+> I'm fine with the renaming.
+> 
+> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 
-Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+Your Signed-off-by is only used when the patches passes through your hands,
+since Herbert will likely apply this directly that is not the case.
 
-Thanks,
-Gilad
+You want either Acked-by or Reviewed-by to signal that you are ok with this patch.
+
+Regards,
+
+Hans
