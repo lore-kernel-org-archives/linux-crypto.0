@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33B44C3A5A2
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Sep 2019 16:43:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8234CC3A5A2
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Sep 2019 16:43:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 00AFA22CED
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Sep 2019 16:43:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5375821881
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Sep 2019 16:43:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BrLC5uJN"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LruIlOMV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730057AbfICQnr (ORCPT
+        id S1730078AbfICQns (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 3 Sep 2019 12:43:47 -0400
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:43513 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728854AbfICQnr (ORCPT
+        Tue, 3 Sep 2019 12:43:48 -0400
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:44404 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728854AbfICQns (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Sep 2019 12:43:47 -0400
-Received: by mail-pl1-f194.google.com with SMTP id 4so8119413pld.10
-        for <linux-crypto@vger.kernel.org>; Tue, 03 Sep 2019 09:43:46 -0700 (PDT)
+        Tue, 3 Sep 2019 12:43:48 -0400
+Received: by mail-pg1-f195.google.com with SMTP id i18so9438249pgl.11
+        for <linux-crypto@vger.kernel.org>; Tue, 03 Sep 2019 09:43:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=iouKzcU6vzz3J8Cw/jp3uuc+QHFS3Cf59HMMjSOOWbs=;
-        b=BrLC5uJN4eOQS0EJ3ZdfeNolv1hkywi9MM4+6XIxCE8Yt9tSb3YBOrd5LKrmVYFSLd
-         ghyuGXYVA3RuWF21bD1Fk3ifO3IScM5Tm2dCUk9H4dA2AjzsMX4VAS1XsxrFkeDNRiC1
-         K7xmYTJIeSc1Mrv7Qd9wLRek6cMN8WGdWf7h/mh8MCW08A7bVttBdyxZk2sZYlqCgl/f
-         reCV+gkX1LTqVLYU3GIvnJdV60QZt4BcyUk0XcERV+LMSk8pjDgRxi8vDe/PM8b6yd4q
-         rKrdyMc7Mn5fpZfgNXph243dKvcVwHXmoDMNLr6qn4mH62qoqgsP68lmLE+7lVk0dK8U
-         zMkA==
+        bh=u8c7yjt2nGuO09VOjn5Nf28VuKqSVZEi1e4/jRpqUrQ=;
+        b=LruIlOMVykumLE+Kn6REj/Kf6l4eAtnBxB2V4x2mog96vRfdjUQBvf7OHYCdaHyENd
+         kX9IQKJ+BO11dvgIhjAfniDZPoip7cZWQ+fHmPH2U3zXA6FZhv91+VXKDNORi5da2cCQ
+         VtwYMkv1peXXk1AgLqkhEjfR2eYFCVOqIG+L9K1H7m8U4YvsWXUWf6knPZig3SYpHRUc
+         gNxRZQlFH7h6ThgktlnF+0hbBJhItD3dpa58XjB5X0Z77senmUP66bUw+SJFhiqSKv9B
+         0H+yiNuNBi0W5bYK5lSOPIHCTi1rhUxHgJRKXhVwhtA2Ofh4taOHACKM2nv3ox0518dz
+         2GnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=iouKzcU6vzz3J8Cw/jp3uuc+QHFS3Cf59HMMjSOOWbs=;
-        b=H/lRM81V58JFzXHm2luSOc7PJI/eOApqtdB4yPkYej+itPFgIp3Kh1euqEp73PkwvB
-         T9rF7e4DlH/C587SnWEuPeQmb3WEXupO7zeiqR2o6gbwu162/fn2stq8bSpy2jJYbLtB
-         ABxSkbpRGJhGWaDi7I9pWmBQdrvSqYUlgpGkfJCQfdTAQIbOaZGcP8gtwUnQF/MNa4xa
-         Mb01vtgebnOdWgA+iHx7bY0xjLh4oxy+TTS0zR9xy8lNpiMFU1iubxWAip6D3ogqoifa
-         1LZfQdREgckaiohG3h2wU3k0qdMsTQ0CPCd64xFzJdAytHZ/fRmcWPiC2UXgcEe8RHb4
-         7NRA==
-X-Gm-Message-State: APjAAAVuGdiEOnmi4u43f2nq6VmKXQzUqVyxRvaVsreQPsD6ydi1eSRx
-        uKGjD5LI+9uAZDBAaNjFP/m8Z0eii0TMiIdC
-X-Google-Smtp-Source: APXvYqyglBS77KvKLzQSxxFKJC+JGrOFZMBXGPhpE79nK8Wd9c1u4DvLvkLgPjwj6mjjCH2qsHBzCw==
-X-Received: by 2002:a17:902:543:: with SMTP id 61mr36243602plf.20.1567529025930;
-        Tue, 03 Sep 2019 09:43:45 -0700 (PDT)
+        bh=u8c7yjt2nGuO09VOjn5Nf28VuKqSVZEi1e4/jRpqUrQ=;
+        b=XUDqgV9R+8Y/Nh9jbokGXeXXC7C/79RW05GXgyRPeRJdYL8AOa1+wk+HOG8osCsdqN
+         Fi10aAfOZiteOgqYwMW/04TdNzj2ilV3Ala8PG5IDPkeiEsVr0jYqGW5FW6VpHf6vvxN
+         ZI8k1nAEGftiZCs1xjUB6UVXA8kW5TxnWeFnB1KoxTiJjtSVi9STCuUCs15WdZ9E8+rH
+         /xO6cn0yxHDMt6myk1OmVcqMmMDzNAu3gC8V/IqYaxdUxgbSs5L3V5UehFfFW2u41JKD
+         mQE34Se8F2yIROO18nf7temUcbmIjt7Y61a0QFUpCA8uk2IBVWnHBIpVA8Dxt/7nIxo2
+         ASxA==
+X-Gm-Message-State: APjAAAWk9AEdX9psrQ7Ujmjnb/FiNE0YQE8riniglqx1hDl2Recm0jRo
+        OE5kvB6eWUZYceXJX+9N1jyJZUH3hRIpCeeQ
+X-Google-Smtp-Source: APXvYqysJFRuAdws0qiUqgeqgn7SCWoWwHP3sXrqYYbgv3Hoj0krpMbegYUR4zn6gBFNanysHyKIFA==
+X-Received: by 2002:a63:1d0e:: with SMTP id d14mr31231670pgd.324.1567529027447;
+        Tue, 03 Sep 2019 09:43:47 -0700 (PDT)
 Received: from e111045-lin.nice.arm.com ([104.133.8.102])
-        by smtp.gmail.com with ESMTPSA id b126sm20311847pfb.110.2019.09.03.09.43.44
+        by smtp.gmail.com with ESMTPSA id b126sm20311847pfb.110.2019.09.03.09.43.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Sep 2019 09:43:45 -0700 (PDT)
+        Tue, 03 Sep 2019 09:43:46 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     herbert@gondor.apana.org.au, ebiggers@kernel.org,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH v2 02/17] crypto: arm/aes-ce - yield the SIMD unit between scatterwalk steps
-Date:   Tue,  3 Sep 2019 09:43:24 -0700
-Message-Id: <20190903164339.27984-3-ard.biesheuvel@linaro.org>
+Subject: [PATCH v2 03/17] crypto: arm/aes-ce - switch to 4x interleave
+Date:   Tue,  3 Sep 2019 09:43:25 -0700
+Message-Id: <20190903164339.27984-4-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20190903164339.27984-1-ard.biesheuvel@linaro.org>
 References: <20190903164339.27984-1-ard.biesheuvel@linaro.org>
@@ -70,289 +70,485 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Reduce the scope of the kernel_neon_begin/end regions so that the SIMD
-unit is released (and thus preemption re-enabled) if the crypto operation
-cannot be completed in a single scatterwalk step. This avoids scheduling
-blackouts due to preemption being enabled for unbounded periods, resulting
-in a more responsive system.
-
-After this change, we can also permit the cipher_walk infrastructure to
-sleep, so set the 'atomic' parameter to skcipher_walk_virt() to false as
-well.
+When the ARM AES instruction based crypto driver was introduced, there
+were no known implementations that could benefit from a 4-way interleave,
+and so a 3-way interleave was used instead. Since we have sufficient
+space in the SIMD register file, let's switch to a 4-way interleave to
+align with the 64-bit driver, and to ensure that we can reach optimum
+performance when running under emulation on high end 64-bit cores.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm/crypto/aes-ce-glue.c     | 47 ++++++++++----------
- arch/arm/crypto/aes-neonbs-glue.c | 22 ++++-----
- 2 files changed, 34 insertions(+), 35 deletions(-)
+ arch/arm/crypto/aes-ce-core.S | 263 +++++++++++---------
+ 1 file changed, 144 insertions(+), 119 deletions(-)
 
-diff --git a/arch/arm/crypto/aes-ce-glue.c b/arch/arm/crypto/aes-ce-glue.c
-index 75d2ff03a63e..486e862ae34a 100644
---- a/arch/arm/crypto/aes-ce-glue.c
-+++ b/arch/arm/crypto/aes-ce-glue.c
-@@ -177,15 +177,15 @@ static int ecb_encrypt(struct skcipher_request *req)
- 	unsigned int blocks;
- 	int err;
+diff --git a/arch/arm/crypto/aes-ce-core.S b/arch/arm/crypto/aes-ce-core.S
+index 1e0d45183590..a3ca4ac2d7bb 100644
+--- a/arch/arm/crypto/aes-ce-core.S
++++ b/arch/arm/crypto/aes-ce-core.S
+@@ -44,46 +44,56 @@
+ 	veor		q0, q0, \key3
+ 	.endm
  
--	err = skcipher_walk_virt(&walk, req, true);
-+	err = skcipher_walk_virt(&walk, req, false);
+-	.macro		enc_dround_3x, key1, key2
++	.macro		enc_dround_4x, key1, key2
+ 	enc_round	q0, \key1
+ 	enc_round	q1, \key1
+ 	enc_round	q2, \key1
++	enc_round	q3, \key1
+ 	enc_round	q0, \key2
+ 	enc_round	q1, \key2
+ 	enc_round	q2, \key2
++	enc_round	q3, \key2
+ 	.endm
  
--	kernel_neon_begin();
- 	while ((blocks = (walk.nbytes / AES_BLOCK_SIZE))) {
-+		kernel_neon_begin();
- 		ce_aes_ecb_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
- 				   ctx->key_enc, num_rounds(ctx), blocks);
-+		kernel_neon_end();
- 		err = skcipher_walk_done(&walk, walk.nbytes % AES_BLOCK_SIZE);
- 	}
--	kernel_neon_end();
- 	return err;
- }
+-	.macro		dec_dround_3x, key1, key2
++	.macro		dec_dround_4x, key1, key2
+ 	dec_round	q0, \key1
+ 	dec_round	q1, \key1
+ 	dec_round	q2, \key1
++	dec_round	q3, \key1
+ 	dec_round	q0, \key2
+ 	dec_round	q1, \key2
+ 	dec_round	q2, \key2
++	dec_round	q3, \key2
+ 	.endm
  
-@@ -197,15 +197,15 @@ static int ecb_decrypt(struct skcipher_request *req)
- 	unsigned int blocks;
- 	int err;
+-	.macro		enc_fround_3x, key1, key2, key3
++	.macro		enc_fround_4x, key1, key2, key3
+ 	enc_round	q0, \key1
+ 	enc_round	q1, \key1
+ 	enc_round	q2, \key1
++	enc_round	q3, \key1
+ 	aese.8		q0, \key2
+ 	aese.8		q1, \key2
+ 	aese.8		q2, \key2
++	aese.8		q3, \key2
+ 	veor		q0, q0, \key3
+ 	veor		q1, q1, \key3
+ 	veor		q2, q2, \key3
++	veor		q3, q3, \key3
+ 	.endm
  
--	err = skcipher_walk_virt(&walk, req, true);
-+	err = skcipher_walk_virt(&walk, req, false);
+-	.macro		dec_fround_3x, key1, key2, key3
++	.macro		dec_fround_4x, key1, key2, key3
+ 	dec_round	q0, \key1
+ 	dec_round	q1, \key1
+ 	dec_round	q2, \key1
++	dec_round	q3, \key1
+ 	aesd.8		q0, \key2
+ 	aesd.8		q1, \key2
+ 	aesd.8		q2, \key2
++	aesd.8		q3, \key2
+ 	veor		q0, q0, \key3
+ 	veor		q1, q1, \key3
+ 	veor		q2, q2, \key3
++	veor		q3, q3, \key3
+ 	.endm
  
--	kernel_neon_begin();
- 	while ((blocks = (walk.nbytes / AES_BLOCK_SIZE))) {
-+		kernel_neon_begin();
- 		ce_aes_ecb_decrypt(walk.dst.virt.addr, walk.src.virt.addr,
- 				   ctx->key_dec, num_rounds(ctx), blocks);
-+		kernel_neon_end();
- 		err = skcipher_walk_done(&walk, walk.nbytes % AES_BLOCK_SIZE);
- 	}
--	kernel_neon_end();
- 	return err;
- }
+ 	.macro		do_block, dround, fround
+@@ -114,8 +124,9 @@
+ 	 * transforms. These should preserve all registers except q0 - q2 and ip
+ 	 * Arguments:
+ 	 *   q0        : first in/output block
+-	 *   q1        : second in/output block (_3x version only)
+-	 *   q2        : third in/output block (_3x version only)
++	 *   q1        : second in/output block (_4x version only)
++	 *   q2        : third in/output block (_4x version only)
++	 *   q3        : fourth in/output block (_4x version only)
+ 	 *   q8        : first round key
+ 	 *   q9        : secound round key
+ 	 *   q14       : final round key
+@@ -136,16 +147,16 @@ aes_decrypt:
+ ENDPROC(aes_decrypt)
  
-@@ -217,16 +217,16 @@ static int cbc_encrypt(struct skcipher_request *req)
- 	unsigned int blocks;
- 	int err;
+ 	.align		6
+-aes_encrypt_3x:
++aes_encrypt_4x:
+ 	add		ip, r2, #32		@ 3rd round key
+-	do_block	enc_dround_3x, enc_fround_3x
+-ENDPROC(aes_encrypt_3x)
++	do_block	enc_dround_4x, enc_fround_4x
++ENDPROC(aes_encrypt_4x)
  
--	err = skcipher_walk_virt(&walk, req, true);
-+	err = skcipher_walk_virt(&walk, req, false);
+ 	.align		6
+-aes_decrypt_3x:
++aes_decrypt_4x:
+ 	add		ip, r2, #32		@ 3rd round key
+-	do_block	dec_dround_3x, dec_fround_3x
+-ENDPROC(aes_decrypt_3x)
++	do_block	dec_dround_4x, dec_fround_4x
++ENDPROC(aes_decrypt_4x)
  
--	kernel_neon_begin();
- 	while ((blocks = (walk.nbytes / AES_BLOCK_SIZE))) {
-+		kernel_neon_begin();
- 		ce_aes_cbc_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
- 				   ctx->key_enc, num_rounds(ctx), blocks,
- 				   walk.iv);
-+		kernel_neon_end();
- 		err = skcipher_walk_done(&walk, walk.nbytes % AES_BLOCK_SIZE);
- 	}
--	kernel_neon_end();
- 	return err;
- }
+ 	.macro		prepare_key, rk, rounds
+ 	add		ip, \rk, \rounds, lsl #4
+@@ -163,17 +174,17 @@ ENTRY(ce_aes_ecb_encrypt)
+ 	push		{r4, lr}
+ 	ldr		r4, [sp, #8]
+ 	prepare_key	r2, r3
+-.Lecbencloop3x:
+-	subs		r4, r4, #3
++.Lecbencloop4x:
++	subs		r4, r4, #4
+ 	bmi		.Lecbenc1x
+ 	vld1.8		{q0-q1}, [r1]!
+-	vld1.8		{q2}, [r1]!
+-	bl		aes_encrypt_3x
++	vld1.8		{q2-q3}, [r1]!
++	bl		aes_encrypt_4x
+ 	vst1.8		{q0-q1}, [r0]!
+-	vst1.8		{q2}, [r0]!
+-	b		.Lecbencloop3x
++	vst1.8		{q2-q3}, [r0]!
++	b		.Lecbencloop4x
+ .Lecbenc1x:
+-	adds		r4, r4, #3
++	adds		r4, r4, #4
+ 	beq		.Lecbencout
+ .Lecbencloop:
+ 	vld1.8		{q0}, [r1]!
+@@ -189,17 +200,17 @@ ENTRY(ce_aes_ecb_decrypt)
+ 	push		{r4, lr}
+ 	ldr		r4, [sp, #8]
+ 	prepare_key	r2, r3
+-.Lecbdecloop3x:
+-	subs		r4, r4, #3
++.Lecbdecloop4x:
++	subs		r4, r4, #4
+ 	bmi		.Lecbdec1x
+ 	vld1.8		{q0-q1}, [r1]!
+-	vld1.8		{q2}, [r1]!
+-	bl		aes_decrypt_3x
++	vld1.8		{q2-q3}, [r1]!
++	bl		aes_decrypt_4x
+ 	vst1.8		{q0-q1}, [r0]!
+-	vst1.8		{q2}, [r0]!
+-	b		.Lecbdecloop3x
++	vst1.8		{q2-q3}, [r0]!
++	b		.Lecbdecloop4x
+ .Lecbdec1x:
+-	adds		r4, r4, #3
++	adds		r4, r4, #4
+ 	beq		.Lecbdecout
+ .Lecbdecloop:
+ 	vld1.8		{q0}, [r1]!
+@@ -236,38 +247,40 @@ ENDPROC(ce_aes_cbc_encrypt)
+ ENTRY(ce_aes_cbc_decrypt)
+ 	push		{r4-r6, lr}
+ 	ldrd		r4, r5, [sp, #16]
+-	vld1.8		{q6}, [r5]		@ keep iv in q6
++	vld1.8		{q15}, [r5]		@ keep iv in q15
+ 	prepare_key	r2, r3
+-.Lcbcdecloop3x:
+-	subs		r4, r4, #3
++.Lcbcdecloop4x:
++	subs		r4, r4, #4
+ 	bmi		.Lcbcdec1x
+ 	vld1.8		{q0-q1}, [r1]!
+-	vld1.8		{q2}, [r1]!
+-	vmov		q3, q0
+-	vmov		q4, q1
+-	vmov		q5, q2
+-	bl		aes_decrypt_3x
+-	veor		q0, q0, q6
+-	veor		q1, q1, q3
+-	veor		q2, q2, q4
+-	vmov		q6, q5
++	vld1.8		{q2-q3}, [r1]!
++	vmov		q4, q0
++	vmov		q5, q1
++	vmov		q6, q2
++	vmov		q7, q3
++	bl		aes_decrypt_4x
++	veor		q0, q0, q15
++	veor		q1, q1, q4
++	veor		q2, q2, q5
++	veor		q3, q3, q6
++	vmov		q15, q7
+ 	vst1.8		{q0-q1}, [r0]!
+-	vst1.8		{q2}, [r0]!
+-	b		.Lcbcdecloop3x
++	vst1.8		{q2-q3}, [r0]!
++	b		.Lcbcdecloop4x
+ .Lcbcdec1x:
+-	adds		r4, r4, #3
++	adds		r4, r4, #4
+ 	beq		.Lcbcdecout
+-	vmov		q15, q14		@ preserve last round key
++	vmov		q6, q14			@ preserve last round key
+ .Lcbcdecloop:
+ 	vld1.8		{q0}, [r1]!		@ get next ct block
+ 	veor		q14, q15, q6		@ combine prev ct with last key
+-	vmov		q6, q0
++	vmov		q15, q0
+ 	bl		aes_decrypt
+ 	vst1.8		{q0}, [r0]!
+ 	subs		r4, r4, #1
+ 	bne		.Lcbcdecloop
+ .Lcbcdecout:
+-	vst1.8		{q6}, [r5]		@ keep iv in q6
++	vst1.8		{q15}, [r5]		@ keep iv in q15
+ 	pop		{r4-r6, pc}
+ ENDPROC(ce_aes_cbc_decrypt)
  
-@@ -238,16 +238,16 @@ static int cbc_decrypt(struct skcipher_request *req)
- 	unsigned int blocks;
- 	int err;
+@@ -278,46 +291,52 @@ ENDPROC(ce_aes_cbc_decrypt)
+ ENTRY(ce_aes_ctr_encrypt)
+ 	push		{r4-r6, lr}
+ 	ldrd		r4, r5, [sp, #16]
+-	vld1.8		{q6}, [r5]		@ load ctr
++	vld1.8		{q7}, [r5]		@ load ctr
+ 	prepare_key	r2, r3
+-	vmov		r6, s27			@ keep swabbed ctr in r6
++	vmov		r6, s31			@ keep swabbed ctr in r6
+ 	rev		r6, r6
+ 	cmn		r6, r4			@ 32 bit overflow?
+ 	bcs		.Lctrloop
+-.Lctrloop3x:
+-	subs		r4, r4, #3
++.Lctrloop4x:
++	subs		r4, r4, #4
+ 	bmi		.Lctr1x
+ 	add		r6, r6, #1
+-	vmov		q0, q6
+-	vmov		q1, q6
++	vmov		q0, q7
++	vmov		q1, q7
+ 	rev		ip, r6
+ 	add		r6, r6, #1
+-	vmov		q2, q6
++	vmov		q2, q7
+ 	vmov		s7, ip
+ 	rev		ip, r6
+ 	add		r6, r6, #1
++	vmov		q3, q7
+ 	vmov		s11, ip
+-	vld1.8		{q3-q4}, [r1]!
+-	vld1.8		{q5}, [r1]!
+-	bl		aes_encrypt_3x
+-	veor		q0, q0, q3
+-	veor		q1, q1, q4
+-	veor		q2, q2, q5
++	rev		ip, r6
++	add		r6, r6, #1
++	vmov		s15, ip
++	vld1.8		{q4-q5}, [r1]!
++	vld1.8		{q6}, [r1]!
++	vld1.8		{q15}, [r1]!
++	bl		aes_encrypt_4x
++	veor		q0, q0, q4
++	veor		q1, q1, q5
++	veor		q2, q2, q6
++	veor		q3, q3, q15
+ 	rev		ip, r6
+ 	vst1.8		{q0-q1}, [r0]!
+-	vst1.8		{q2}, [r0]!
+-	vmov		s27, ip
+-	b		.Lctrloop3x
++	vst1.8		{q2-q3}, [r0]!
++	vmov		s31, ip
++	b		.Lctrloop4x
+ .Lctr1x:
+-	adds		r4, r4, #3
++	adds		r4, r4, #4
+ 	beq		.Lctrout
+ .Lctrloop:
+-	vmov		q0, q6
++	vmov		q0, q7
+ 	bl		aes_encrypt
  
--	err = skcipher_walk_virt(&walk, req, true);
-+	err = skcipher_walk_virt(&walk, req, false);
+ 	adds		r6, r6, #1		@ increment BE ctr
+ 	rev		ip, r6
+-	vmov		s27, ip
++	vmov		s31, ip
+ 	bcs		.Lctrcarry
  
--	kernel_neon_begin();
- 	while ((blocks = (walk.nbytes / AES_BLOCK_SIZE))) {
-+		kernel_neon_begin();
- 		ce_aes_cbc_decrypt(walk.dst.virt.addr, walk.src.virt.addr,
- 				   ctx->key_dec, num_rounds(ctx), blocks,
- 				   walk.iv);
-+		kernel_neon_end();
- 		err = skcipher_walk_done(&walk, walk.nbytes % AES_BLOCK_SIZE);
- 	}
--	kernel_neon_end();
- 	return err;
- }
+ .Lctrcarrydone:
+@@ -329,7 +348,7 @@ ENTRY(ce_aes_ctr_encrypt)
+ 	bne		.Lctrloop
  
-@@ -258,13 +258,14 @@ static int ctr_encrypt(struct skcipher_request *req)
- 	struct skcipher_walk walk;
- 	int err, blocks;
+ .Lctrout:
+-	vst1.8		{q6}, [r5]		@ return next CTR value
++	vst1.8		{q7}, [r5]		@ return next CTR value
+ 	pop		{r4-r6, pc}
  
--	err = skcipher_walk_virt(&walk, req, true);
-+	err = skcipher_walk_virt(&walk, req, false);
+ .Lctrtailblock:
+@@ -337,7 +356,7 @@ ENTRY(ce_aes_ctr_encrypt)
+ 	b		.Lctrout
  
--	kernel_neon_begin();
- 	while ((blocks = (walk.nbytes / AES_BLOCK_SIZE))) {
-+		kernel_neon_begin();
- 		ce_aes_ctr_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
- 				   ctx->key_enc, num_rounds(ctx), blocks,
- 				   walk.iv);
-+		kernel_neon_end();
- 		err = skcipher_walk_done(&walk, walk.nbytes % AES_BLOCK_SIZE);
- 	}
- 	if (walk.nbytes) {
-@@ -278,13 +279,13 @@ static int ctr_encrypt(struct skcipher_request *req)
- 		 */
- 		blocks = -1;
+ .Lctrcarry:
+-	.irp		sreg, s26, s25, s24
++	.irp		sreg, s30, s29, s28
+ 	vmov		ip, \sreg		@ load next word of ctr
+ 	rev		ip, ip			@ ... to handle the carry
+ 	adds		ip, ip, #1
+@@ -368,8 +387,8 @@ ENDPROC(ce_aes_ctr_encrypt)
+ 	.quad		1, 0x87
  
-+		kernel_neon_begin();
- 		ce_aes_ctr_encrypt(tail, NULL, ctx->key_enc, num_rounds(ctx),
- 				   blocks, walk.iv);
-+		kernel_neon_end();
- 		crypto_xor_cpy(tdst, tsrc, tail, nbytes);
- 		err = skcipher_walk_done(&walk, 0);
- 	}
--	kernel_neon_end();
--
- 	return err;
- }
+ ce_aes_xts_init:
+-	vldr		d14, .Lxts_mul_x
+-	vldr		d15, .Lxts_mul_x + 8
++	vldr		d30, .Lxts_mul_x
++	vldr		d31, .Lxts_mul_x + 8
  
-@@ -319,17 +320,16 @@ static int xts_encrypt(struct skcipher_request *req)
- 	struct skcipher_walk walk;
- 	unsigned int blocks;
+ 	ldrd		r4, r5, [sp, #16]	@ load args
+ 	ldr		r6, [sp, #28]
+@@ -390,48 +409,51 @@ ENTRY(ce_aes_xts_encrypt)
  
--	err = skcipher_walk_virt(&walk, req, true);
-+	err = skcipher_walk_virt(&walk, req, false);
+ 	bl		ce_aes_xts_init		@ run shared prologue
+ 	prepare_key	r2, r3
+-	vmov		q3, q0
++	vmov		q4, q0
  
--	kernel_neon_begin();
- 	for (first = 1; (blocks = (walk.nbytes / AES_BLOCK_SIZE)); first = 0) {
-+		kernel_neon_begin();
- 		ce_aes_xts_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
- 				   ctx->key1.key_enc, rounds, blocks, walk.iv,
- 				   ctx->key2.key_enc, first);
-+		kernel_neon_end();
- 		err = skcipher_walk_done(&walk, walk.nbytes % AES_BLOCK_SIZE);
- 	}
--	kernel_neon_end();
--
- 	return err;
- }
+ 	teq		r6, #0			@ start of a block?
+-	bne		.Lxtsenc3x
++	bne		.Lxtsenc4x
  
-@@ -341,17 +341,16 @@ static int xts_decrypt(struct skcipher_request *req)
- 	struct skcipher_walk walk;
- 	unsigned int blocks;
+-.Lxtsencloop3x:
+-	next_tweak	q3, q3, q7, q6
+-.Lxtsenc3x:
+-	subs		r4, r4, #3
++.Lxtsencloop4x:
++	next_tweak	q4, q4, q15, q10
++.Lxtsenc4x:
++	subs		r4, r4, #4
+ 	bmi		.Lxtsenc1x
+-	vld1.8		{q0-q1}, [r1]!		@ get 3 pt blocks
+-	vld1.8		{q2}, [r1]!
+-	next_tweak	q4, q3, q7, q6
+-	veor		q0, q0, q3
+-	next_tweak	q5, q4, q7, q6
+-	veor		q1, q1, q4
+-	veor		q2, q2, q5
+-	bl		aes_encrypt_3x
+-	veor		q0, q0, q3
+-	veor		q1, q1, q4
+-	veor		q2, q2, q5
+-	vst1.8		{q0-q1}, [r0]!		@ write 3 ct blocks
+-	vst1.8		{q2}, [r0]!
+-	vmov		q3, q5
++	vld1.8		{q0-q1}, [r1]!		@ get 4 pt blocks
++	vld1.8		{q2-q3}, [r1]!
++	next_tweak	q5, q4, q15, q10
++	veor		q0, q0, q4
++	next_tweak	q6, q5, q15, q10
++	veor		q1, q1, q5
++	next_tweak	q7, q6, q15, q10
++	veor		q2, q2, q6
++	veor		q3, q3, q7
++	bl		aes_encrypt_4x
++	veor		q0, q0, q4
++	veor		q1, q1, q5
++	veor		q2, q2, q6
++	veor		q3, q3, q7
++	vst1.8		{q0-q1}, [r0]!		@ write 4 ct blocks
++	vst1.8		{q2-q3}, [r0]!
++	vmov		q4, q7
+ 	teq		r4, #0
+ 	beq		.Lxtsencout
+-	b		.Lxtsencloop3x
++	b		.Lxtsencloop4x
+ .Lxtsenc1x:
+-	adds		r4, r4, #3
++	adds		r4, r4, #4
+ 	beq		.Lxtsencout
+ .Lxtsencloop:
+ 	vld1.8		{q0}, [r1]!
+-	veor		q0, q0, q3
++	veor		q0, q0, q4
+ 	bl		aes_encrypt
+-	veor		q0, q0, q3
++	veor		q0, q0, q4
+ 	vst1.8		{q0}, [r0]!
+ 	subs		r4, r4, #1
+ 	beq		.Lxtsencout
+-	next_tweak	q3, q3, q7, q6
++	next_tweak	q4, q4, q15, q6
+ 	b		.Lxtsencloop
+ .Lxtsencout:
+-	vst1.8		{q3}, [r5]
++	vst1.8		{q4}, [r5]
+ 	pop		{r4-r6, pc}
+ ENDPROC(ce_aes_xts_encrypt)
  
--	err = skcipher_walk_virt(&walk, req, true);
-+	err = skcipher_walk_virt(&walk, req, false);
+@@ -441,49 +463,52 @@ ENTRY(ce_aes_xts_decrypt)
  
--	kernel_neon_begin();
- 	for (first = 1; (blocks = (walk.nbytes / AES_BLOCK_SIZE)); first = 0) {
-+		kernel_neon_begin();
- 		ce_aes_xts_decrypt(walk.dst.virt.addr, walk.src.virt.addr,
- 				   ctx->key1.key_dec, rounds, blocks, walk.iv,
- 				   ctx->key2.key_enc, first);
-+		kernel_neon_end();
- 		err = skcipher_walk_done(&walk, walk.nbytes % AES_BLOCK_SIZE);
- 	}
--	kernel_neon_end();
--
- 	return err;
- }
+ 	bl		ce_aes_xts_init		@ run shared prologue
+ 	prepare_key	r2, r3
+-	vmov		q3, q0
++	vmov		q4, q0
  
-diff --git a/arch/arm/crypto/aes-neonbs-glue.c b/arch/arm/crypto/aes-neonbs-glue.c
-index 45cd9818791e..9000d0796d5e 100644
---- a/arch/arm/crypto/aes-neonbs-glue.c
-+++ b/arch/arm/crypto/aes-neonbs-glue.c
-@@ -90,9 +90,8 @@ static int __ecb_crypt(struct skcipher_request *req,
- 	struct skcipher_walk walk;
- 	int err;
+ 	teq		r6, #0			@ start of a block?
+-	bne		.Lxtsdec3x
++	bne		.Lxtsdec4x
  
--	err = skcipher_walk_virt(&walk, req, true);
-+	err = skcipher_walk_virt(&walk, req, false);
+-.Lxtsdecloop3x:
+-	next_tweak	q3, q3, q7, q6
+-.Lxtsdec3x:
+-	subs		r4, r4, #3
++.Lxtsdecloop4x:
++	next_tweak	q4, q4, q15, q10
++.Lxtsdec4x:
++	subs		r4, r4, #4
+ 	bmi		.Lxtsdec1x
+-	vld1.8		{q0-q1}, [r1]!		@ get 3 ct blocks
+-	vld1.8		{q2}, [r1]!
+-	next_tweak	q4, q3, q7, q6
+-	veor		q0, q0, q3
+-	next_tweak	q5, q4, q7, q6
+-	veor		q1, q1, q4
+-	veor		q2, q2, q5
+-	bl		aes_decrypt_3x
+-	veor		q0, q0, q3
+-	veor		q1, q1, q4
+-	veor		q2, q2, q5
+-	vst1.8		{q0-q1}, [r0]!		@ write 3 pt blocks
+-	vst1.8		{q2}, [r0]!
+-	vmov		q3, q5
++	vld1.8		{q0-q1}, [r1]!		@ get 4 ct blocks
++	vld1.8		{q2-q3}, [r1]!
++	next_tweak	q5, q4, q15, q10
++	veor		q0, q0, q4
++	next_tweak	q6, q5, q15, q10
++	veor		q1, q1, q5
++	next_tweak	q7, q6, q15, q10
++	veor		q2, q2, q6
++	veor		q3, q3, q7
++	bl		aes_decrypt_4x
++	veor		q0, q0, q4
++	veor		q1, q1, q5
++	veor		q2, q2, q6
++	veor		q3, q3, q7
++	vst1.8		{q0-q1}, [r0]!		@ write 4 pt blocks
++	vst1.8		{q2-q3}, [r0]!
++	vmov		q4, q7
+ 	teq		r4, #0
+ 	beq		.Lxtsdecout
+-	b		.Lxtsdecloop3x
++	b		.Lxtsdecloop4x
+ .Lxtsdec1x:
+-	adds		r4, r4, #3
++	adds		r4, r4, #4
+ 	beq		.Lxtsdecout
+ .Lxtsdecloop:
+ 	vld1.8		{q0}, [r1]!
+-	veor		q0, q0, q3
++	veor		q0, q0, q4
+ 	add		ip, r2, #32		@ 3rd round key
+ 	bl		aes_decrypt
+-	veor		q0, q0, q3
++	veor		q0, q0, q4
+ 	vst1.8		{q0}, [r0]!
+ 	subs		r4, r4, #1
+ 	beq		.Lxtsdecout
+-	next_tweak	q3, q3, q7, q6
++	next_tweak	q4, q4, q15, q6
+ 	b		.Lxtsdecloop
+ .Lxtsdecout:
+-	vst1.8		{q3}, [r5]
++	vst1.8		{q4}, [r5]
+ 	pop		{r4-r6, pc}
+ ENDPROC(ce_aes_xts_decrypt)
  
--	kernel_neon_begin();
- 	while (walk.nbytes >= AES_BLOCK_SIZE) {
- 		unsigned int blocks = walk.nbytes / AES_BLOCK_SIZE;
- 
-@@ -100,12 +99,13 @@ static int __ecb_crypt(struct skcipher_request *req,
- 			blocks = round_down(blocks,
- 					    walk.stride / AES_BLOCK_SIZE);
- 
-+		kernel_neon_begin();
- 		fn(walk.dst.virt.addr, walk.src.virt.addr, ctx->rk,
- 		   ctx->rounds, blocks);
-+		kernel_neon_end();
- 		err = skcipher_walk_done(&walk,
- 					 walk.nbytes - blocks * AES_BLOCK_SIZE);
- 	}
--	kernel_neon_end();
- 
- 	return err;
- }
-@@ -159,9 +159,8 @@ static int cbc_decrypt(struct skcipher_request *req)
- 	struct skcipher_walk walk;
- 	int err;
- 
--	err = skcipher_walk_virt(&walk, req, true);
-+	err = skcipher_walk_virt(&walk, req, false);
- 
--	kernel_neon_begin();
- 	while (walk.nbytes >= AES_BLOCK_SIZE) {
- 		unsigned int blocks = walk.nbytes / AES_BLOCK_SIZE;
- 
-@@ -169,13 +168,14 @@ static int cbc_decrypt(struct skcipher_request *req)
- 			blocks = round_down(blocks,
- 					    walk.stride / AES_BLOCK_SIZE);
- 
-+		kernel_neon_begin();
- 		aesbs_cbc_decrypt(walk.dst.virt.addr, walk.src.virt.addr,
- 				  ctx->key.rk, ctx->key.rounds, blocks,
- 				  walk.iv);
-+		kernel_neon_end();
- 		err = skcipher_walk_done(&walk,
- 					 walk.nbytes - blocks * AES_BLOCK_SIZE);
- 	}
--	kernel_neon_end();
- 
- 	return err;
- }
-@@ -223,9 +223,8 @@ static int ctr_encrypt(struct skcipher_request *req)
- 	u8 buf[AES_BLOCK_SIZE];
- 	int err;
- 
--	err = skcipher_walk_virt(&walk, req, true);
-+	err = skcipher_walk_virt(&walk, req, false);
- 
--	kernel_neon_begin();
- 	while (walk.nbytes > 0) {
- 		unsigned int blocks = walk.nbytes / AES_BLOCK_SIZE;
- 		u8 *final = (walk.total % AES_BLOCK_SIZE) ? buf : NULL;
-@@ -236,8 +235,10 @@ static int ctr_encrypt(struct skcipher_request *req)
- 			final = NULL;
- 		}
- 
-+		kernel_neon_begin();
- 		aesbs_ctr_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
- 				  ctx->rk, ctx->rounds, blocks, walk.iv, final);
-+		kernel_neon_end();
- 
- 		if (final) {
- 			u8 *dst = walk.dst.virt.addr + blocks * AES_BLOCK_SIZE;
-@@ -252,7 +253,6 @@ static int ctr_encrypt(struct skcipher_request *req)
- 		err = skcipher_walk_done(&walk,
- 					 walk.nbytes - blocks * AES_BLOCK_SIZE);
- 	}
--	kernel_neon_end();
- 
- 	return err;
- }
-@@ -329,7 +329,6 @@ static int __xts_crypt(struct skcipher_request *req,
- 
- 	crypto_cipher_encrypt_one(ctx->tweak_tfm, walk.iv, walk.iv);
- 
--	kernel_neon_begin();
- 	while (walk.nbytes >= AES_BLOCK_SIZE) {
- 		unsigned int blocks = walk.nbytes / AES_BLOCK_SIZE;
- 
-@@ -337,12 +336,13 @@ static int __xts_crypt(struct skcipher_request *req,
- 			blocks = round_down(blocks,
- 					    walk.stride / AES_BLOCK_SIZE);
- 
-+		kernel_neon_begin();
- 		fn(walk.dst.virt.addr, walk.src.virt.addr, ctx->key.rk,
- 		   ctx->key.rounds, blocks, walk.iv);
-+		kernel_neon_end();
- 		err = skcipher_walk_done(&walk,
- 					 walk.nbytes - blocks * AES_BLOCK_SIZE);
- 	}
--	kernel_neon_end();
- 
- 	return err;
- }
 -- 
 2.17.1
 
