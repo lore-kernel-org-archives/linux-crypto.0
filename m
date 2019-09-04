@@ -2,149 +2,236 @@ Return-Path: <SRS0=oAbn=W7=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94405C3A5A7
-	for <linux-crypto@archiver.kernel.org>; Wed,  4 Sep 2019 12:26:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F285C3A5A8
+	for <linux-crypto@archiver.kernel.org>; Wed,  4 Sep 2019 12:27:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7368A20820
-	for <linux-crypto@archiver.kernel.org>; Wed,  4 Sep 2019 12:26:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2D81020820
+	for <linux-crypto@archiver.kernel.org>; Wed,  4 Sep 2019 12:27:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Yaru825M"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725965AbfIDM0i (ORCPT
+        id S1729934AbfIDM1f (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 4 Sep 2019 08:26:38 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:60328 "EHLO fornost.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725938AbfIDM0i (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 4 Sep 2019 08:26:38 -0400
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
-        by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
-        id 1i5UMR-0000kS-HM; Wed, 04 Sep 2019 22:26:08 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Wed, 04 Sep 2019 22:26:00 +1000
-Date:   Wed, 4 Sep 2019 22:26:00 +1000
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Bjorn Helgaas <bhelgaas@google.com>, linux-pci@vger.kernel.org
-Cc:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>,
-        YueHaibing <yuehaibing@huawei.com>,
+        Wed, 4 Sep 2019 08:27:35 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:39702 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725938AbfIDM1e (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 4 Sep 2019 08:27:34 -0400
+Received: by mail-wm1-f65.google.com with SMTP id q12so1699343wmj.4
+        for <linux-crypto@vger.kernel.org>; Wed, 04 Sep 2019 05:27:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=6NZ96D9puEHxfzquVc6He7xf5nQpmZ8JSWavhp3HobU=;
+        b=Yaru825MEoJOrDpdYOPMTkVcccBcPenEdQ38DAGjE1qc4fRskhwLtC4sJyTty778D5
+         Uva/akBI4ltEngcEiL8vK8QLEMSP8DStf2kuaEYfuxb59YZzk6I+it15TzFgudqSIvm/
+         JYpzqxdJcD9EL+6GNXO/cyWhsQ14m8hncM7bmi+RTx5+S797gfEX5t2+OzH4n+ct+r/z
+         6FZ/weoORBRjeNqBDdaPoxQkdkoxGF8yahuvLAse5qJrS6lwTsTBOhtBCaZdOqn9veCO
+         MQ+IroPD1KkuKJJH2ArS+/EAJfr5baX4eVXajylVTqGhD5eDTRm0JuGROl9JrnJVlMfb
+         b0iQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=6NZ96D9puEHxfzquVc6He7xf5nQpmZ8JSWavhp3HobU=;
+        b=LO3MnhnvsL2KBRl4JqwTS+R9Layy1Q0CQcsIqQfXgD2H0lo9WGtcJvu2ihqF1wHpOp
+         bPVAMNlALb84+u7mUFhxbW8jqzbeqymnPol5vTj9506DcQTYj1lFov5yPSUYSeUrLYqN
+         wMy1BhL2uxL4XWCqKMtuo6vtbmMq/zKqInWipMHX5LvziSY4s7K4hjSZ4e4bNesh1w7/
+         x4cx56rFxzUx8X+w7a/ytWglQeR/Nq1e6OaJF/90CdZmI2Cok4xp7/9ksjH8JaJZ62MC
+         k4+jYzpEW1fY4TJvrHrmutNWieioRhjRZUNZqhcX056pVDABnmRwZiPFWuVsGJTj+qKV
+         JXxg==
+X-Gm-Message-State: APjAAAVq4vuT9/s1PArI4sarKRwIes1NCn+umIDPThV8oLjDOWPo6izO
+        8LClvLGkIDevhoAzxkgDutVC3NCiSgiwYlnA21e8YA==
+X-Google-Smtp-Source: APXvYqzGSenGL1fOlhaP3eM0Wsxh9RQpnRMxJXsQ9c/jnvFT1eATCwySYBcKoufjBaezNjWYU7RdZ9CpNR/9m9WlHbc=
+X-Received: by 2002:a1c:2546:: with SMTP id l67mr4370373wml.10.1567600051587;
+ Wed, 04 Sep 2019 05:27:31 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190902141910.1080-1-yuehaibing@huawei.com> <20190903014518.20880-1-yuehaibing@huawei.com>
+ <MN2PR20MB29732EEECB217DDDF822EDA5CAB80@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <CAKv+Gu8PVYyA-mzjrhR6r6upMc=xzpAhsbkuKRtb8T2noo_2XQ@mail.gmail.com> <MN2PR20MB297342698B98343D49FC2C82CAB80@MN2PR20MB2973.namprd20.prod.outlook.com>
+In-Reply-To: <MN2PR20MB297342698B98343D49FC2C82CAB80@MN2PR20MB2973.namprd20.prod.outlook.com>
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date:   Wed, 4 Sep 2019 05:27:19 -0700
+Message-ID: <CAKv+Gu_EA8-=Vc3aAdJSz7399Y5WBeKNjw_T3LEq7yOY2XQ+BA@mail.gmail.com>
+Subject: Re: [PATCH v2 -next] crypto: inside-secure - Fix build error without CONFIG_PCI
+To:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+Cc:     YueHaibing <yuehaibing@huawei.com>,
         "antoine.tenart@bootlin.com" <antoine.tenart@bootlin.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
         "davem@davemloft.net" <davem@davemloft.net>,
         "pvanleeuwen@insidesecure.com" <pvanleeuwen@insidesecure.com>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: PCI: Add stub pci_irq_vector and others
-Message-ID: <20190904122600.GA28660@gondor.apana.org.au>
-References: <20190902141910.1080-1-yuehaibing@huawei.com>
- <20190903014518.20880-1-yuehaibing@huawei.com>
- <MN2PR20MB29732EEECB217DDDF822EDA5CAB80@MN2PR20MB2973.namprd20.prod.outlook.com>
- <CAKv+Gu8PVYyA-mzjrhR6r6upMc=xzpAhsbkuKRtb8T2noo_2XQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKv+Gu8PVYyA-mzjrhR6r6upMc=xzpAhsbkuKRtb8T2noo_2XQ@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Sep 04, 2019 at 05:10:34AM -0700, Ard Biesheuvel wrote:
+On Wed, 4 Sep 2019 at 05:25, Pascal Van Leeuwen
+<pvanleeuwen@verimatrix.com> wrote:
 >
-> This is the reason we have so many empty static inline functions in
-> header files - it ensures that the symbols are declared even if the
-> only invocations are from dead code.
+> > -----Original Message-----
+> > From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> > Sent: Wednesday, September 4, 2019 2:11 PM
+> > To: Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+> > Cc: YueHaibing <yuehaibing@huawei.com>; antoine.tenart@bootlin.com;
+> > herbert@gondor.apana.org.au; davem@davemloft.net; pvanleeuwen@insidesecure.com; linux-
+> > crypto@vger.kernel.org; linux-kernel@vger.kernel.org
+> > Subject: Re: [PATCH v2 -next] crypto: inside-secure - Fix build error without CONFIG_PCI
+> >
+> > On Wed, 4 Sep 2019 at 04:57, Pascal Van Leeuwen
+> > <pvanleeuwen@verimatrix.com> wrote:
+> > >
+> > >
+> > > > -----Original Message-----
+> > > > From: linux-crypto-owner@vger.kernel.org <linux-crypto-owner@vger.kernel.org> On
+> > Behalf Of
+> > > > YueHaibing
+> > > > Sent: Tuesday, September 3, 2019 3:45 AM
+> > > > To: antoine.tenart@bootlin.com; herbert@gondor.apana.org.au; davem@davemloft.net;
+> > > > pvanleeuwen@insidesecure.com
+> > > > Cc: linux-crypto@vger.kernel.org; linux-kernel@vger.kernel.org; YueHaibing
+> > > > <yuehaibing@huawei.com>
+> > > > Subject: [PATCH v2 -next] crypto: inside-secure - Fix build error without CONFIG_PCI
+> > > >
+> > > > If CONFIG_PCI is not set, building fails:
+> > > >
+> > > > rivers/crypto/inside-secure/safexcel.c: In function safexcel_request_ring_irq:
+> > > > drivers/crypto/inside-secure/safexcel.c:944:9: error: implicit declaration of function
+> > > > pci_irq_vector;
+> > > >  did you mean rcu_irq_enter? [-Werror=implicit-function-declaration]
+> > > >    irq = pci_irq_vector(pci_pdev, irqid);
+> > > >          ^~~~~~~~~~~~~~
+> > > >
+> > > > Use #ifdef block to guard this.
+> > > >
+> > > Actually, this is interesting. My *original* implementation was using
+> > > straight #ifdefs, but then I got review feedback stating that I should not
+> > > do that, as it's not compile testable, suggesting to use regular C if's
+> > > instead. Then there was quite some back-and-forth on the actual
+> > > implementation and I ended up with this.
+> > >
+> > > So now it turns out that doesn't work and I'm suggested to go full-circle
+> > > back to straight #ifdef's? Or is there some other way to make this work?
+> > > Because I don't know where to go from here ...
+> > >
+> >
+> >
+> > C conditionals are preferred over preprocessor conditional, but if the
+> > conditional code refers to symbols that are not declared when the
+> > Kconfig symbol is not defined, preprocessor conditionals are the only
+> > option.
+> >
+> Sure, I get that. But I *had* the #ifdef's and then other people told me
+> to get rid of them. How is one supposed to know when which symbols are
+> declared exactly? Moreover, I feel that if #ifdef's are sometimes the
+> only way, then you should be careful providing feedback on the subject.
+>
 
-Does this patch work?
+If you compile your code with and without the Kconfig symbol defined,
+the compiler will tell you if there is a problem or not.
 
----8<---
-This patch adds stub functions pci_alloc_irq_vectors_affinity and
-pci_irq_vector when CONFIG_PCI is off so that drivers can use them
-without resorting to ifdefs.
+> > This is the reason we have so many empty static inline functions in
+> > header files - it ensures that the symbols are declared even if the
+> > only invocations are from dead code.
+> >
+> This ties back into my previous question: how am I supposed to know whether
+> stuff is nicely covered by these empty static inlines or not? If this
+> happens to be a hit-and-miss affair.
+>
 
-It also moves the PCI_IRQ_* macros outside of the ifdefs so that
-they are always available.
+Indeed.
 
-Fixes: 625f269a5a7a ("crypto: inside-secure - add support for...")
-Reported-by: kbuild test robot <lkp@intel.com>
-Reported-by: YueHaibing <yuehaibing@huawei.com>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> Note that I tested the code with the 2 platforms at my disposal - actually
+> the only 2 relevant platforms for this driver, if you ask me - and they
+> both compiled just fine, so I had no way of finding this "problem" myself.
+>
 
-diff --git a/include/linux/pci.h b/include/linux/pci.h
-index 9e700d9f9f28..74415ee62211 100644
---- a/include/linux/pci.h
-+++ b/include/linux/pci.h
-@@ -925,6 +925,11 @@ enum {
- 	PCI_SCAN_ALL_PCIE_DEVS	= 0x00000040,	/* Scan all, not just dev 0 */
- };
- 
-+#define PCI_IRQ_LEGACY		(1 << 0) /* Allow legacy interrupts */
-+#define PCI_IRQ_MSI		(1 << 1) /* Allow MSI interrupts */
-+#define PCI_IRQ_MSIX		(1 << 2) /* Allow MSI-X interrupts */
-+#define PCI_IRQ_AFFINITY	(1 << 3) /* Auto-assign affinity */
-+
- /* These external functions are only available when PCI support is enabled */
- #ifdef CONFIG_PCI
- 
-@@ -1408,11 +1413,6 @@ resource_size_t pcibios_window_alignment(struct pci_bus *bus,
- int pci_set_vga_state(struct pci_dev *pdev, bool decode,
- 		      unsigned int command_bits, u32 flags);
- 
--#define PCI_IRQ_LEGACY		(1 << 0) /* Allow legacy interrupts */
--#define PCI_IRQ_MSI		(1 << 1) /* Allow MSI interrupts */
--#define PCI_IRQ_MSIX		(1 << 2) /* Allow MSI-X interrupts */
--#define PCI_IRQ_AFFINITY	(1 << 3) /* Auto-assign affinity */
--
- /*
-  * Virtual interrupts allow for more interrupts to be allocated
-  * than the device has interrupts for. These are not programmed
-@@ -1517,14 +1517,6 @@ static inline int pci_irq_get_node(struct pci_dev *pdev, int vec)
- }
- #endif
- 
--static inline int
--pci_alloc_irq_vectors(struct pci_dev *dev, unsigned int min_vecs,
--		      unsigned int max_vecs, unsigned int flags)
--{
--	return pci_alloc_irq_vectors_affinity(dev, min_vecs, max_vecs, flags,
--					      NULL);
--}
--
- /**
-  * pci_irqd_intx_xlate() - Translate PCI INTx value to an IRQ domain hwirq
-  * @d: the INTx IRQ domain
-@@ -1780,8 +1772,29 @@ static inline const struct pci_device_id *pci_match_id(const struct pci_device_i
- 							 struct pci_dev *dev)
- { return NULL; }
- static inline bool pci_ats_disabled(void) { return true; }
-+
-+static inline int pci_irq_vector(struct pci_dev *dev, unsigned int nr)
-+{
-+	return -EINVAL;
-+}
-+
-+static inline int
-+pci_alloc_irq_vectors_affinity(struct pci_dev *dev, unsigned int min_vecs,
-+			       unsigned int max_vecs, unsigned int flags,
-+			       struct irq_affinity *aff_desc)
-+{
-+	return -ENOSPC;
-+}
- #endif /* CONFIG_PCI */
- 
-+static inline int
-+pci_alloc_irq_vectors(struct pci_dev *dev, unsigned int min_vecs,
-+		      unsigned int max_vecs, unsigned int flags)
-+{
-+	return pci_alloc_irq_vectors_affinity(dev, min_vecs, max_vecs, flags,
-+					      NULL);
-+}
-+
- #ifdef CONFIG_PCI_ATS
- /* Address Translation Service */
- void pci_ats_init(struct pci_dev *dev);
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Did you try disabling CONFIG_PCI?
+
+> >
+> > > > Fixes: 625f269a5a7a ("crypto: inside-secure - add support for PCI based FPGA
+> > development
+> > > > board")
+> > > > Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+> > > > ---
+> > > > v2: use 'ifdef' instead of 'IS_ENABLED'
+> > > > ---
+> > > >  drivers/crypto/inside-secure/safexcel.c | 13 ++++++++++---
+> > > >  1 file changed, 10 insertions(+), 3 deletions(-)
+> > > >
+> > > > diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-
+> > > > secure/safexcel.c
+> > > > index e12a2a3..5253900 100644
+> > > > --- a/drivers/crypto/inside-secure/safexcel.c
+> > > > +++ b/drivers/crypto/inside-secure/safexcel.c
+> > > > @@ -937,7 +937,8 @@ static int safexcel_request_ring_irq(void *pdev, int irqid,
+> > > >       int ret, irq;
+> > > >       struct device *dev;
+> > > >
+> > > > -     if (IS_ENABLED(CONFIG_PCI) && is_pci_dev) {
+> > > > +#ifdef CONFIG_PCI
+> > > > +     if (is_pci_dev) {
+> > > >               struct pci_dev *pci_pdev = pdev;
+> > > >
+> > > >               dev = &pci_pdev->dev;
+> > > > @@ -947,7 +948,10 @@ static int safexcel_request_ring_irq(void *pdev, int irqid,
+> > > >                               irqid, irq);
+> > > >                       return irq;
+> > > >               }
+> > > > -     } else if (IS_ENABLED(CONFIG_OF)) {
+> > > > +     } else
+> > > > +#endif
+> > > > +     {
+> > > > +#ifdef CONFIG_OF
+> > > >               struct platform_device *plf_pdev = pdev;
+> > > >               char irq_name[6] = {0}; /* "ringX\0" */
+> > > >
+> > > > @@ -960,6 +964,7 @@ static int safexcel_request_ring_irq(void *pdev, int irqid,
+> > > >                               irq_name, irq);
+> > > >                       return irq;
+> > > >               }
+> > > > +#endif
+> > > >       }
+> > > >
+> > > >       ret = devm_request_threaded_irq(dev, irq, handler,
+> > > > @@ -1137,7 +1142,8 @@ static int safexcel_probe_generic(void *pdev,
+> > > >
+> > > >       safexcel_configure(priv);
+> > > >
+> > > > -     if (IS_ENABLED(CONFIG_PCI) && priv->version == EIP197_DEVBRD) {
+> > > > +#ifdef CONFIG_PCI
+> > > > +     if (priv->version == EIP197_DEVBRD) {
+> > > >               /*
+> > > >                * Request MSI vectors for global + 1 per ring -
+> > > >                * or just 1 for older dev images
+> > > > @@ -1153,6 +1159,7 @@ static int safexcel_probe_generic(void *pdev,
+> > > >                       return ret;
+> > > >               }
+> > > >       }
+> > > > +#endif
+> > > >
+> > > >       /* Register the ring IRQ handlers and configure the rings */
+> > > >       priv->ring = devm_kcalloc(dev, priv->config.rings,
+> > > > --
+> > > > 2.7.4
+> > > >
+> > >
+> > > Regards,
+> > > Pascal van Leeuwen
+> > > Silicon IP Architect, Multi-Protocol Engines @ Verimatrix
+> > > www.insidesecure.com
+>
+> Regards,
+> Pascal van Leeuwen
+> Silicon IP Architect, Multi-Protocol Engines @ Verimatrix
+> www.insidesecure.com
+>
