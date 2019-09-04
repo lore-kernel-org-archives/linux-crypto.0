@@ -2,87 +2,88 @@ Return-Path: <SRS0=oAbn=W7=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88EBCC3A5A7
-	for <linux-crypto@archiver.kernel.org>; Wed,  4 Sep 2019 13:38:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE68CC3A5A8
+	for <linux-crypto@archiver.kernel.org>; Wed,  4 Sep 2019 14:02:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 683192186A
-	for <linux-crypto@archiver.kernel.org>; Wed,  4 Sep 2019 13:38:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C0B8023402
+	for <linux-crypto@archiver.kernel.org>; Wed,  4 Sep 2019 14:02:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726495AbfIDNin (ORCPT
+        id S1730784AbfIDOAW (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 4 Sep 2019 09:38:43 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:41984 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730145AbfIDNim (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 4 Sep 2019 09:38:42 -0400
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id 4F31E109EFC7;
-        Wed,  4 Sep 2019 13:38:42 +0000 (UTC)
-Received: from localhost (unknown [10.18.25.174])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4753860166;
-        Wed,  4 Sep 2019 13:38:37 +0000 (UTC)
-Date:   Wed, 4 Sep 2019 09:38:36 -0400
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Milan Broz <gmazyland@gmail.com>
-Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
+        Wed, 4 Sep 2019 10:00:22 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:50196 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1730131AbfIDOAV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 4 Sep 2019 10:00:21 -0400
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 3F35049A685A57495C2A;
+        Wed,  4 Sep 2019 22:00:20 +0800 (CST)
+Received: from localhost.localdomain.localdomain (10.175.113.25) by
+ DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
+ 14.3.439.0; Wed, 4 Sep 2019 22:00:13 +0800
+From:   Wei Yongjun <weiyongjun1@huawei.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
         Eric Biggers <ebiggers@google.com>,
-        linux-fscrypt@vger.kernel.org,
-        Gilad Ben-Yossef <gilad@benyossef.com>, dm-devel@redhat.com
-Subject: Re: [PATCH v13 6/6] md: dm-crypt: omit parsing of the encapsulated
- cipher
-Message-ID: <20190904133836.GA17836@redhat.com>
-References: <20190819141738.1231-1-ard.biesheuvel@linaro.org>
- <20190819141738.1231-7-ard.biesheuvel@linaro.org>
- <20190903185827.GD13472@redhat.com>
- <403192f0-d1c4-0c60-5af1-7dee8516d629@gmail.com>
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Jan Glauber" <jglauber@cavium.com>,
+        Mahipal Challa <mahipalreddy2006@gmail.com>
+CC:     Wei Yongjun <weiyongjun1@huawei.com>,
+        <linux-crypto@vger.kernel.org>, <kernel-janitors@vger.kernel.org>
+Subject: [PATCH] crypto: cavium/zip - Add missing single_release()
+Date:   Wed, 4 Sep 2019 14:18:09 +0000
+Message-ID: <20190904141809.170277-1-weiyongjun1@huawei.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <403192f0-d1c4-0c60-5af1-7dee8516d629@gmail.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.65]); Wed, 04 Sep 2019 13:38:42 +0000 (UTC)
+Content-Type:   text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+X-Originating-IP: [10.175.113.25]
+X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Sep 04 2019 at  7:01am -0400,
-Milan Broz <gmazyland@gmail.com> wrote:
+When using single_open() for opening, single_release() should be
+used instead of seq_release(), otherwise there is a memory leak.
 
-> On 03/09/2019 20:58, Mike Snitzer wrote:
-> > On Mon, Aug 19 2019 at 10:17am -0400,
-> > Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
-> > 
-> >> Only the ESSIV IV generation mode used to use cc->cipher so it could
-> >> instantiate the bare cipher used to encrypt the IV. However, this is
-> >> now taken care of by the ESSIV template, and so no users of cc->cipher
-> >> remain. So remove it altogether.
-> >>
-> >> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> > 
-> > Acked-by: Mike Snitzer <snitzer@redhat.com>
-> > 
-> > Might be wise to bump the dm-crypt target's version number (from
-> > {1, 19, 0} to {1, 20, 0}) at the end of this patch too though...
-> 
-> The function should be exactly the same, dependencies on needed modules are set.
-> 
-> In cryptsetup we always report dm target + kernel version,
-> so we know that since version 5.4 it uses crypto API for ESSIV.
-> I think version bump here is really not so important.
-> 
-> Just my two cents :)
+Fixes: 09ae5d37e093 ("crypto: zip - Add Compression/Decompression statistics")
+Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
+---
+ drivers/crypto/cavium/zip/zip_main.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Yes, that's fine.. I staged it for 5.4 yesterday without the version bump.
+diff --git a/drivers/crypto/cavium/zip/zip_main.c b/drivers/crypto/cavium/zip/zip_main.c
+index a8447a3cf366..194624b4855b 100644
+--- a/drivers/crypto/cavium/zip/zip_main.c
++++ b/drivers/crypto/cavium/zip/zip_main.c
+@@ -593,6 +593,7 @@ static const struct file_operations zip_stats_fops = {
+ 	.owner = THIS_MODULE,
+ 	.open  = zip_stats_open,
+ 	.read  = seq_read,
++	.release = single_release,
+ };
+ 
+ static int zip_clear_open(struct inode *inode, struct file *file)
+@@ -604,6 +605,7 @@ static const struct file_operations zip_clear_fops = {
+ 	.owner = THIS_MODULE,
+ 	.open  = zip_clear_open,
+ 	.read  = seq_read,
++	.release = single_release,
+ };
+ 
+ static int zip_regs_open(struct inode *inode, struct file *file)
+@@ -615,6 +617,7 @@ static const struct file_operations zip_regs_fops = {
+ 	.owner = THIS_MODULE,
+ 	.open  = zip_regs_open,
+ 	.read  = seq_read,
++	.release = single_release,
+ };
+ 
+ /* Root directory for thunderx_zip debugfs entry */
 
-Thanks,
-Mike
+
+
