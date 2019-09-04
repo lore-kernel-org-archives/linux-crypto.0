@@ -8,55 +8,55 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73E73C3A5A2
-	for <linux-crypto@archiver.kernel.org>; Wed,  4 Sep 2019 02:35:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57E95C3A5A7
+	for <linux-crypto@archiver.kernel.org>; Wed,  4 Sep 2019 02:35:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4BE2722CF8
-	for <linux-crypto@archiver.kernel.org>; Wed,  4 Sep 2019 02:35:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3041022DBF
+	for <linux-crypto@archiver.kernel.org>; Wed,  4 Sep 2019 02:35:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PIelyfrA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uA7W+0Qu"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728046AbfIDCfk (ORCPT
+        id S1727995AbfIDCfo (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 3 Sep 2019 22:35:40 -0400
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:43241 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727222AbfIDCfj (ORCPT
+        Tue, 3 Sep 2019 22:35:44 -0400
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:35250 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728132AbfIDCfo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Sep 2019 22:35:39 -0400
-Received: by mail-pg1-f195.google.com with SMTP id u72so6147327pgb.10;
-        Tue, 03 Sep 2019 19:35:38 -0700 (PDT)
+        Tue, 3 Sep 2019 22:35:44 -0400
+Received: by mail-pl1-f193.google.com with SMTP id gn20so8847652plb.2;
+        Tue, 03 Sep 2019 19:35:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=VBYI9fYSI2nwboVcyiJxwUOgiBRwP/UdUW2a0Ojdh5g=;
-        b=PIelyfrAXDiumhGRN4EjKHVTz8kwW9LilaHYfvmElZBKbdCVullDzD9Ne6yDZZ1QOv
-         Wiq/+ts2cQaODhSncAwQ62j3JAmwFPBEwh/B+7l8WrJO91+Otn2FiJx0Qd0Tp3S+Fcwf
-         JnnEqzoMMSOqdFGe7nE7/t45YUHLSpiDIUsoNSLk/d4I8g3j4l2KgKA8UGf2bJ5q8glx
-         IKmi1h+HFfhFdHVMh1mS+ZFf983QuMrVVqnRbp/WJ8OHXbuk2igaW/h0033f84aC2kUw
-         09hA1ytd15j4zSVaag53xBnV/TnROOadTyxbleeyz7GDRmpPsQqtvBPpf/U2zxkwCyIV
-         m/Uw==
+        bh=BhpxphdWBSz1L2B9ZesztRoMGvUE4getK82ZLPQsGtU=;
+        b=uA7W+0QuGo4CfSUGJFtcIxVBeJHAXQr7NMTxwWhTSHPmEft7Y50uESN5XZhyYSvskD
+         oLnz4yfwXPto9dDkaWqTVvzzJUy3Kmmw3se8i7TQvlkspqQMwoWaFXCVmf29+AEV8xg/
+         7jQip18Y1VLk4UJ6QKxt1zcNzeCTkJ0acHsZzy2Sdlk6/RYB759lxDFLga4VVeRfJ0pr
+         CQ+ARLxflLHfqZ0/nCXGxuG2cv31mKP7PCAU4q6tJEazGiWpapEklyNL4WYWqPxNx/kw
+         /puwtHk/f+Dv4VCACQ84nCZ/avvUws7kWue0JTFoC9PKONA25/8abUOnG7gpJnp3JVa6
+         JYYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=VBYI9fYSI2nwboVcyiJxwUOgiBRwP/UdUW2a0Ojdh5g=;
-        b=QcKcLyRFQbB9/XLB7Clp5EMobzq/jYLwAh3JrLCb0+mbPQ9xk5HM7w27aoKiXJyK4T
-         byUMO4a5UhTu+XklrWlrik6LQ0PWLV/xaaVeS5yVv8KMyZy5hTx6Tl+e5vN9hcgZZqtj
-         ZzgTkYVW6E3XWzGutzIvtaeNz7XQ69qdQrxyahCWFsCunz8H5bZivYMUYjgojIUrDLtI
-         o1uoLdD5YT1d311M/ggddz56qCLRa+6PU7goZRt5PSfbvwZG9V7UfJ9yihfRN7qdvpfI
-         B7iEciJUcaak0AoKw70I+27HdGhUHdLsHLgDJ2RqaR1E2QzwImIw/cL9psC/5gA/cwDE
-         9lvw==
-X-Gm-Message-State: APjAAAUmDJWYr9PcG00RHFSnob6pGITwN4xrksyny1CuBo5nXN+ghILa
-        /tOnvp5tSUGZ1T8jmjsJcSIMCjHJFEE=
-X-Google-Smtp-Source: APXvYqwbNaCiBRsKe1mxnFrqF9NZwtUDANOKU0kvpPSpBPZk6/adsZ8v83rhU3tryOl/O0h96Xch9w==
-X-Received: by 2002:a62:63c1:: with SMTP id x184mr45048290pfb.11.1567564537345;
-        Tue, 03 Sep 2019 19:35:37 -0700 (PDT)
+        bh=BhpxphdWBSz1L2B9ZesztRoMGvUE4getK82ZLPQsGtU=;
+        b=OvrqDSUcdcLz9yen0WoVAHFVpZubaktRSqfDychewGORT4GkPmf+i5RwIjJHoF6ShD
+         9YBcJQCUQ8YdkEvqQXI3nmpJwuXkSVrgFD+R1u3CLbUzpzmk/XYGndBKbRNMOVQNPwzk
+         OHMjAHuGQYm7Iz1BKnqPs5c5Zau3MWdvT3S/Roz+IMnR1wn4uQyogrgi55ADonQ/0V/s
+         I/Y9wh/77B3RaWx7qeTRa5qj5mbWy6tZFuHOqZMfpq6GrDqctAtnE+fH9YCI/F0ZUvi8
+         0EqAsWQlZ629QOOXbCevfcmFCBsvWHHGywpcGFTGogpKf2Y5fKgnLIAz2kSWaF2XJ5xp
+         hTDg==
+X-Gm-Message-State: APjAAAUHZxRwcrmPe/6VR+FQGfUogAZlT8WcpEo6c2IAqnhrDa/JkGV3
+        ZBTU93CMSI1d1vLnw05MnKMM6XoYck8=
+X-Google-Smtp-Source: APXvYqw6FnMQh0U7BoqICAUQEf+gIXACPri+NLjJWx1LxnWK07lqcBLU657h8PWLnw8GSL5FgkQMPg==
+X-Received: by 2002:a17:902:758a:: with SMTP id j10mr31127712pll.233.1567564543249;
+        Tue, 03 Sep 2019 19:35:43 -0700 (PDT)
 Received: from localhost.lan (c-67-185-54-80.hsd1.wa.comcast.net. [67.185.54.80])
-        by smtp.gmail.com with ESMTPSA id i74sm7480250pfe.28.2019.09.03.19.35.36
+        by smtp.gmail.com with ESMTPSA id i74sm7480250pfe.28.2019.09.03.19.35.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Sep 2019 19:35:36 -0700 (PDT)
+        Tue, 03 Sep 2019 19:35:42 -0700 (PDT)
 From:   Andrey Smirnov <andrew.smirnov@gmail.com>
 To:     linux-crypto@vger.kernel.org
 Cc:     Andrey Smirnov <andrew.smirnov@gmail.com>,
@@ -66,9 +66,9 @@ Cc:     Andrey Smirnov <andrew.smirnov@gmail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Iuliana Prodan <iuliana.prodan@nxp.com>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 05/12] crypto: caam - use devres to unmap memory
-Date:   Tue,  3 Sep 2019 19:35:08 -0700
-Message-Id: <20190904023515.7107-6-andrew.smirnov@gmail.com>
+Subject: [PATCH 09/12] crypto: caam - user devres to populate platform devices
+Date:   Tue,  3 Sep 2019 19:35:12 -0700
+Message-Id: <20190904023515.7107-10-andrew.smirnov@gmail.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190904023515.7107-1-andrew.smirnov@gmail.com>
 References: <20190904023515.7107-1-andrew.smirnov@gmail.com>
@@ -80,7 +80,8 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Use devres to unmap memory and drop corresponding iounmap() call.
+Use devres to de-initialize the RNG and drop explicit de-initialization
+code in caam_remove().
 
 Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
 Cc: Chris Healy <cphealy@gmail.com>
@@ -91,95 +92,81 @@ Cc: Iuliana Prodan <iuliana.prodan@nxp.com>
 Cc: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
 ---
- drivers/crypto/caam/ctrl.c | 28 +++++++++-------------------
- 1 file changed, 9 insertions(+), 19 deletions(-)
+ drivers/crypto/caam/ctrl.c | 26 +++-----------------------
+ 1 file changed, 3 insertions(+), 23 deletions(-)
 
 diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-index db22777d59b4..35bf82d1bedc 100644
+index 37cd04f8ddb1..4a84c2701311 100644
 --- a/drivers/crypto/caam/ctrl.c
 +++ b/drivers/crypto/caam/ctrl.c
-@@ -308,11 +308,9 @@ static int caam_remove(struct platform_device *pdev)
- {
- 	struct device *ctrldev;
- 	struct caam_drv_private *ctrlpriv;
--	struct caam_ctrl __iomem *ctrl;
- 
- 	ctrldev = &pdev->dev;
- 	ctrlpriv = dev_get_drvdata(ctrldev);
--	ctrl = (struct caam_ctrl __iomem *)ctrlpriv->ctrl;
- 
- 	/* Remove platform devices under the crypto node */
- 	of_platform_depopulate(ctrldev);
-@@ -334,9 +332,6 @@ static int caam_remove(struct platform_device *pdev)
- 	debugfs_remove_recursive(ctrlpriv->dfs_root);
- #endif
- 
--	/* Unmap controller region */
--	iounmap(ctrl);
--
- 	return 0;
- }
- 
-@@ -611,10 +606,11 @@ static int caam_probe(struct platform_device *pdev)
- 
- 	/* Get configuration properties from device tree */
- 	/* First, get register page */
--	ctrl = of_iomap(nprop, 0);
--	if (!ctrl) {
-+	ctrl = devm_of_iomap(dev, nprop, 0, NULL);
-+	ret = PTR_ERR_OR_ZERO(ctrl);
-+	if (ret) {
- 		dev_err(dev, "caam: of_iomap() failed\n");
--		return -ENOMEM;
-+		return ret;
- 	}
- 
- 	caam_little_end = !(bool)(rd_reg32(&ctrl->perfmon.status) &
-@@ -632,22 +628,18 @@ static int caam_probe(struct platform_device *pdev)
- 	if (ctrlpriv->qi_present && !caam_dpaa2) {
- 		ret = qman_is_probed();
- 		if (!ret) {
--			ret = -EPROBE_DEFER;
--			goto iounmap_ctrl;
-+			return -EPROBE_DEFER;
- 		} else if (ret < 0) {
- 			dev_err(dev, "failing probe due to qman probe error\n");
--			ret = -ENODEV;
--			goto iounmap_ctrl;
-+			return -ENODEV;
- 		}
- 
- 		ret = qman_portals_probed();
- 		if (!ret) {
--			ret = -EPROBE_DEFER;
--			goto iounmap_ctrl;
-+			return -EPROBE_DEFER;
- 		} else if (ret < 0) {
- 			dev_err(dev, "failing probe due to qman portals probe error\n");
--			ret = -ENODEV;
--			goto iounmap_ctrl;
-+			return -ENODEV;
- 		}
- 	}
- #endif
-@@ -722,7 +714,7 @@ static int caam_probe(struct platform_device *pdev)
- 	ret = dma_set_mask_and_coherent(dev, caam_get_dma_mask(dev));
- 	if (ret) {
- 		dev_err(dev, "dma_set_mask_and_coherent failed (%d)\n", ret);
--		goto iounmap_ctrl;
-+		return ret;
- 	}
- 
- 	ctrlpriv->era = caam_get_era(ctrl);
-@@ -927,8 +919,6 @@ static int caam_probe(struct platform_device *pdev)
- 	if (ctrlpriv->qi_init)
- 		caam_qi_shutdown(dev);
- #endif
--iounmap_ctrl:
--	iounmap(ctrl);
+@@ -322,20 +322,6 @@ static int instantiate_rng(struct device *ctrldev, int state_handle_mask,
  	return ret;
  }
  
+-static int caam_remove(struct platform_device *pdev)
+-{
+-	struct device *ctrldev;
+-	struct caam_drv_private *ctrlpriv;
+-
+-	ctrldev = &pdev->dev;
+-	ctrlpriv = dev_get_drvdata(ctrldev);
+-
+-	/* Remove platform devices under the crypto node */
+-	of_platform_depopulate(ctrldev);
+-
+-	return 0;
+-}
+-
+ /*
+  * kick_trng - sets the various parameters for enabling the initialization
+  *	       of the RNG4 block in CAAM
+@@ -762,7 +748,7 @@ static int caam_probe(struct platform_device *pdev)
+ #endif
+ 	}
+ 
+-	ret = of_platform_populate(nprop, caam_match, NULL, dev);
++	ret = devm_of_platform_populate(dev);
+ 	if (ret) {
+ 		dev_err(dev, "JR platform devices creation error\n");
+ 		return ret;
+@@ -784,8 +770,7 @@ static int caam_probe(struct platform_device *pdev)
+ 	/* If no QI and no rings specified, quit and go home */
+ 	if ((!ctrlpriv->qi_present) && (!ctrlpriv->total_jobrs)) {
+ 		dev_err(dev, "no queues configured, terminating\n");
+-		ret = -ENOMEM;
+-		goto caam_remove;
++		return -ENOMEM;
+ 	}
+ 
+ 	if (ctrlpriv->era < 10)
+@@ -848,7 +833,7 @@ static int caam_probe(struct platform_device *pdev)
+ 		} while ((ret == -EAGAIN) && (ent_delay < RTSDCTL_ENT_DLY_MAX));
+ 		if (ret) {
+ 			dev_err(dev, "failed to instantiate RNG");
+-			goto caam_remove;
++			return ret;
+ 		}
+ 		/*
+ 		 * Set handles init'ed by this module as the complement of the
+@@ -922,10 +907,6 @@ static int caam_probe(struct platform_device *pdev)
+ 			    &ctrlpriv->ctl_tdsk_wrap);
+ #endif
+ 	return 0;
+-
+-caam_remove:
+-	caam_remove(pdev);
+-	return ret;
+ }
+ 
+ static struct platform_driver caam_driver = {
+@@ -934,7 +915,6 @@ static struct platform_driver caam_driver = {
+ 		.of_match_table = caam_match,
+ 	},
+ 	.probe       = caam_probe,
+-	.remove      = caam_remove,
+ };
+ 
+ module_platform_driver(caam_driver);
 -- 
 2.21.0
 
