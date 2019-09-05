@@ -2,109 +2,80 @@ Return-Path: <SRS0=9BFZ=XA=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B07FBC43331
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 Sep 2019 22:40:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CB99C43140
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 Sep 2019 22:54:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E8D80206DE
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 Sep 2019 22:40:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="p23Nw56N"
+	by mail.kernel.org (Postfix) with ESMTP id 5D760206DF
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 Sep 2019 22:54:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390323AbfIEWk0 (ORCPT
+        id S1730392AbfIEWx7 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 5 Sep 2019 18:40:26 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:55660 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731458AbfIEWkZ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 5 Sep 2019 18:40:25 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x85MXakO060612;
-        Thu, 5 Sep 2019 22:40:09 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2019-08-05;
- bh=j4duDJkDTLknvUpbMVOSUtirQmIgH4PjV/EQIrfRAgQ=;
- b=p23Nw56N0c1kF9pYFKppS2aA5ftLjfUjoyYmfwhIykDLBzxcuDJWKu1ooZYmk6vZQC1E
- FNNH7kyJ33KlkHRvmHsfjSEPy0Shw19WlVGGhuunRvhPlHJ9qR0jAqWF3SH/88QwyXgo
- Fja/nvxlShfb2/Jv7lFLoxUpgcv5Afcmgwtn3tyM3F4FqCxmKUaozfsHl8A92DbbK7AZ
- 5Hz2649uVsVEITfD5P/DdiejwkPhsZKYJo+4xXGDCwBmiNCT5XAyBhPIG+cJGOmrPgPm
- +QyJR/45vGn1dDa6ZpSEEXKoYL8tgIZajWWbgsw8/AMypcFtLxEYKKc0PQ2caxEwymHq wA== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by aserp2120.oracle.com with ESMTP id 2uub5yr17v-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 05 Sep 2019 22:40:08 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x85MXM9Y154410;
-        Thu, 5 Sep 2019 22:40:08 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by aserp3020.oracle.com with ESMTP id 2uthq289s1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 05 Sep 2019 22:40:08 +0000
-Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x85Me6Cm019154;
-        Thu, 5 Sep 2019 22:40:06 GMT
-Received: from ca-dmjordan1.us.oracle.com (/10.211.9.48)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 05 Sep 2019 15:40:06 -0700
-Date:   Thu, 5 Sep 2019 18:40:04 -0400
-From:   Daniel Jordan <daniel.m.jordan@oracle.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Daniel Jordan <daniel.m.jordan@oracle.com>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Lai Jiangshan <jiangshanlai@gmail.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Tejun Heo <tj@kernel.org>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 0/9] padata: use unbound workqueues for parallel jobs
-Message-ID: <20190905224004.jjavgjseaf4we3cm@ca-dmjordan1.us.oracle.com>
-References: <20190829173038.21040-1-daniel.m.jordan@oracle.com>
- <20190905043548.GA27131@gondor.apana.org.au>
+        Thu, 5 Sep 2019 18:53:59 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:60700 "EHLO fornost.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726837AbfIEWx7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 5 Sep 2019 18:53:59 -0400
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
+        by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
+        id 1i60dH-0003db-Tc; Fri, 06 Sep 2019 08:53:41 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 06 Sep 2019 08:53:32 +1000
+Date:   Fri, 6 Sep 2019 08:53:32 +1000
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Bjorn Helgaas <helgaas@kernel.org>
+Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        linux-pci@vger.kernel.org,
+        Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>,
+        YueHaibing <yuehaibing@huawei.com>,
+        "antoine.tenart@bootlin.com" <antoine.tenart@bootlin.com>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "pvanleeuwen@insidesecure.com" <pvanleeuwen@insidesecure.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: PCI: Add stub pci_irq_vector and others
+Message-ID: <20190905225332.GA4123@gondor.apana.org.au>
+References: <20190902141910.1080-1-yuehaibing@huawei.com>
+ <20190903014518.20880-1-yuehaibing@huawei.com>
+ <MN2PR20MB29732EEECB217DDDF822EDA5CAB80@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <CAKv+Gu8PVYyA-mzjrhR6r6upMc=xzpAhsbkuKRtb8T2noo_2XQ@mail.gmail.com>
+ <20190904122600.GA28660@gondor.apana.org.au>
+ <20190905210722.GH103977@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190905043548.GA27131@gondor.apana.org.au>
-User-Agent: NeoMutt/20180716
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9371 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=882
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1906280000 definitions=main-1909050210
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9371 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=946 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
- definitions=main-1909050210
+In-Reply-To: <20190905210722.GH103977@google.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Sep 05, 2019 at 02:35:48PM +1000, Herbert Xu wrote:
-> On Thu, Aug 29, 2019 at 01:30:29PM -0400, Daniel Jordan wrote:
-> > Hello,
+On Thu, Sep 05, 2019 at 04:07:22PM -0500, Bjorn Helgaas wrote:
+>
+> > This patch adds stub functions pci_alloc_irq_vectors_affinity and
+> > pci_irq_vector when CONFIG_PCI is off so that drivers can use them
+> > without resorting to ifdefs.
 > > 
-> > Everything in the Testing section has been rerun after the suggestion
-> > from Herbert last round.  Thanks again to Steffen for giving this a run.
+> > It also moves the PCI_IRQ_* macros outside of the ifdefs so that
+> > they are always available.
 > > 
-> > Any comments welcome.
-> > 
-> > Daniel
-> > 
-> > v1[*]  -> v2:
-> >  - Updated patch 8 to avoid queueing the reorder work if the next object
-> >    by sequence number isn't ready yet (Herbert)
-> >  - Added Steffen's ack to all but patch 8 since that one changed.
+> > Fixes: 625f269a5a7a ("crypto: inside-secure - add support for...")
 > 
-> This doesn't apply against cryptodev.  Perhaps it depends on the
-> flushing patch series? If that's the case please combine both into
-> one series.
+> I don't see this commit in Linus' tree yet.
+> 
+> I'd like to include the actual reason for this patch in the commit
+> log.  I assume it's fixing a build issue, but I'd like to be a little
+> more specific about it.
 
-I had developed this on top of the flushing series, but this doesn't depend on
-it, so I've rebased this onto today's cryptodev and will send it soon.
+The patch in question is
+
+https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git/commit/?id=625f269a5a7a3643771320387e474bd0a61d9654
+
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
