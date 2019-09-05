@@ -2,151 +2,175 @@ Return-Path: <SRS0=9BFZ=XA=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1897C43331
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 Sep 2019 16:41:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B725C00306
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 Sep 2019 21:07:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 62C512082E
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 Sep 2019 16:41:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="AWvrPwxF"
+	by mail.kernel.org (Postfix) with ESMTP id 46CB120828
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 Sep 2019 21:07:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1567717647;
+	bh=F0QccAvsqT3G/VxnqWYuBJOd6TGCLtEmx4DD9gWPJr0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=wFthNyHAjvNU32LMapfKPokNJS5AhUTXRp6iyuteDGfFGMHpcPEJ7vk4yawXRgpeB
+	 fdyJhgIGuHbYFOQjhNm6AzA2oBNm8MPdnDc6p/F7rfgTum2PRC4ugT6x0IFsCSutPA
+	 IwQ5bUvEGbQ+SSGpKdDI3Q2IWhpU8gNH2tuTTWf4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389712AbfIEQlS (ORCPT
+        id S1731437AbfIEVHZ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 5 Sep 2019 12:41:18 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:36147 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728601AbfIEQlP (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 5 Sep 2019 12:41:15 -0400
-Received: by mail-pg1-f194.google.com with SMTP id l21so1720437pgm.3
-        for <linux-crypto@vger.kernel.org>; Thu, 05 Sep 2019 09:41:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=+vE/xgq+/pjwKf8dfb2af/ZSiNrPKjB3ZwnjuHKxh+M=;
-        b=AWvrPwxFX1/Q8s8cSwYNJOo0vrKppZiENlQpkaiPEQ2JYZS5lWq5Z2vDi7AsX1zCLW
-         Nvu6jA/eDGPnrFojK14zGC20vRKhNafMGTEJwukIJ/vlaPD/ife4+h34NFTqDtIoiGKn
-         lW295l8jAE/tibwqfChidrQQOP13hur3oVsPQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=+vE/xgq+/pjwKf8dfb2af/ZSiNrPKjB3ZwnjuHKxh+M=;
-        b=OiEi7PNhJFm9qCTDqa6IgkieC4bi8yQ90TlAqcrFEIJ+fdcQ06JVGOU9L5irJEm0LR
-         w2h/Xdq0KjZNdQbP5PfDKQm+SVOSxPO+wulvUV9zA3AFcigi0SnVsKtDLeBNmp96dq+e
-         IN+eVElxdxQrGRj7DeeJ1H4SeN1U8ZQQqji60gTSHU4o9t0kROAP1DtZBzN1ewVBlvM9
-         hqxa5j+sGoNNSv1M0OD19hNfZ2stNlDg0NAGUpLD5oEofEHSLZZuDNj/+EsCOQm7CSjp
-         LH0tyfhHH6NcikMXGUWBVVr196LjB0GGexaMGpegwVw3TgydUuNHhEOq4+kVXpOo0V3H
-         L2EQ==
-X-Gm-Message-State: APjAAAVoy/mjLOAs7mHIk/y5HuofNY9Rbl69dNQhdh47UN1KAmL8wqn2
-        BZnhxS6QKMOhrdIcekB7vm0e+A==
-X-Google-Smtp-Source: APXvYqzbl/dgUIkoIncTvp0wI0Dzxf5yKuX2pH6zBh62SAMuFpYC8Nvl6x+3TLdpYI4Mj4kPxmn3Hg==
-X-Received: by 2002:a17:90a:630a:: with SMTP id e10mr4784273pjj.25.1567701674170;
-        Thu, 05 Sep 2019 09:41:14 -0700 (PDT)
-Received: from smtp.gmail.com ([2620:15c:202:1:fa53:7765:582b:82b9])
-        by smtp.gmail.com with ESMTPSA id f12sm2663012pgo.85.2019.09.05.09.41.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Sep 2019 09:41:13 -0700 (PDT)
-From:   Stephen Boyd <swboyd@chromium.org>
+        Thu, 5 Sep 2019 17:07:25 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40544 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726115AbfIEVHZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 5 Sep 2019 17:07:25 -0400
+Received: from localhost (unknown [69.71.4.100])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 04535206DF;
+        Thu,  5 Sep 2019 21:07:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1567717644;
+        bh=F0QccAvsqT3G/VxnqWYuBJOd6TGCLtEmx4DD9gWPJr0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=HbA9Rr2GXnyBxWpfnLlf/VmNlWOxLLa/gr/GklgbNkv2FvyjwdTNA0oeAlB5O0Wmi
+         i7E3MUwD1hZ36oMqwXT8mI0rh0MeHhvlGCM/rXj59oEz+RDHZULGHFCTPoJNKqo0PM
+         DH4quk04WsMxQLQlN/9Ig/Z5J5vJ2kPRPe/nz+dQ=
+Date:   Thu, 5 Sep 2019 16:07:22 -0500
+From:   Bjorn Helgaas <helgaas@kernel.org>
 To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     linux-kernel@vger.kernel.org, "Theodore Ts'o" <tytso@mit.edu>,
-        linux-crypto@vger.kernel.org,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        Keerthy <j-keerthy@ti.com>
-Subject: [PATCH] random: Use wait_event_freezable() in add_hwgenerator_randomness()
-Date:   Thu,  5 Sep 2019 09:41:12 -0700
-Message-Id: <20190905164112.245886-1-swboyd@chromium.org>
-X-Mailer: git-send-email 2.23.0.187.g17f5b7556c-goog
+Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        linux-pci@vger.kernel.org,
+        Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>,
+        YueHaibing <yuehaibing@huawei.com>,
+        "antoine.tenart@bootlin.com" <antoine.tenart@bootlin.com>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "pvanleeuwen@insidesecure.com" <pvanleeuwen@insidesecure.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: PCI: Add stub pci_irq_vector and others
+Message-ID: <20190905210722.GH103977@google.com>
+References: <20190902141910.1080-1-yuehaibing@huawei.com>
+ <20190903014518.20880-1-yuehaibing@huawei.com>
+ <MN2PR20MB29732EEECB217DDDF822EDA5CAB80@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <CAKv+Gu8PVYyA-mzjrhR6r6upMc=xzpAhsbkuKRtb8T2noo_2XQ@mail.gmail.com>
+ <20190904122600.GA28660@gondor.apana.org.au>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190904122600.GA28660@gondor.apana.org.au>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Sebastian reports that after commit ff296293b353 ("random: Support freezable
-kthreads in add_hwgenerator_randomness()") we can call might_sleep() when the
-task state is TASK_INTERRUPTIBLE (state=1). This leads to the following warning.
+On Wed, Sep 04, 2019 at 10:26:00PM +1000, Herbert Xu wrote:
+> On Wed, Sep 04, 2019 at 05:10:34AM -0700, Ard Biesheuvel wrote:
+> >
+> > This is the reason we have so many empty static inline functions in
+> > header files - it ensures that the symbols are declared even if the
+> > only invocations are from dead code.
+> 
+> Does this patch work?
+> 
+> ---8<---
+> This patch adds stub functions pci_alloc_irq_vectors_affinity and
+> pci_irq_vector when CONFIG_PCI is off so that drivers can use them
+> without resorting to ifdefs.
+> 
+> It also moves the PCI_IRQ_* macros outside of the ifdefs so that
+> they are always available.
+> 
+> Fixes: 625f269a5a7a ("crypto: inside-secure - add support for...")
 
- do not call blocking ops when !TASK_RUNNING; state=1 set at [<00000000349d1489>] prepare_to_wait_event+0x5a/0x180
- WARNING: CPU: 0 PID: 828 at kernel/sched/core.c:6741 __might_sleep+0x6f/0x80
- Modules linked in:
+I don't see this commit in Linus' tree yet.
 
- CPU: 0 PID: 828 Comm: hwrng Not tainted 5.3.0-rc7-next-20190903+ #46
- RIP: 0010:__might_sleep+0x6f/0x80
+I'd like to include the actual reason for this patch in the commit
+log.  I assume it's fixing a build issue, but I'd like to be a little
+more specific about it.
 
- Call Trace:
-  kthread_freezable_should_stop+0x1b/0x60
-  add_hwgenerator_randomness+0xdd/0x130
-  hwrng_fillfn+0xbf/0x120
-  kthread+0x10c/0x140
-  ret_from_fork+0x27/0x50
-
-We shouldn't call kthread_freezable_should_stop() from deep within the
-wait_event code because the task state is still set as
-TASK_INTERRUPTIBLE instead of TASK_RUNNING and
-kthread_freezable_should_stop() will try to call into the freezer with
-the task in the wrong state. Use wait_event_freezable() instead so that
-it calls schedule() in the right place and tries to enter the freezer
-when the task state is TASK_RUNNING instead.
-
-Reported-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Tested-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Keerthy <j-keerthy@ti.com>
-Fixes: ff296293b353 ("random: Support freezable kthreads in add_hwgenerator_randomness()")
-Signed-off-by: Stephen Boyd <swboyd@chromium.org>
----
-
-See https://lkml.kernel.org/r/20190904110038.2bx25byitrejlteu@flow for
-context on the bug report.
-
- drivers/char/random.c | 12 +++++-------
- 1 file changed, 5 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index 9b54cdb301d3..d3beed084c0a 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -327,6 +327,7 @@
- #include <linux/percpu.h>
- #include <linux/cryptohash.h>
- #include <linux/fips.h>
-+#include <linux/freezer.h>
- #include <linux/ptrace.h>
- #include <linux/workqueue.h>
- #include <linux/irq.h>
-@@ -2429,7 +2430,6 @@ void add_hwgenerator_randomness(const char *buffer, size_t count,
- 				size_t entropy)
- {
- 	struct entropy_store *poolp = &input_pool;
--	bool frozen = false;
- 
- 	if (unlikely(crng_init == 0)) {
- 		crng_fast_load(buffer, count);
-@@ -2440,13 +2440,11 @@ void add_hwgenerator_randomness(const char *buffer, size_t count,
- 	 * We'll be woken up again once below random_write_wakeup_thresh,
- 	 * or when the calling thread is about to terminate.
- 	 */
--	wait_event_interruptible(random_write_wait,
--			kthread_freezable_should_stop(&frozen) ||
-+	wait_event_freezable(random_write_wait,
-+			kthread_should_stop() ||
- 			ENTROPY_BITS(&input_pool) <= random_write_wakeup_bits);
--	if (!frozen) {
--		mix_pool_bytes(poolp, buffer, count);
--		credit_entropy_bits(poolp, entropy);
--	}
-+	mix_pool_bytes(poolp, buffer, count);
-+	credit_entropy_bits(poolp, entropy);
- }
- EXPORT_SYMBOL_GPL(add_hwgenerator_randomness);
- 
--- 
-Sent by a computer through tubes
-
+> Reported-by: kbuild test robot <lkp@intel.com>
+> Reported-by: YueHaibing <yuehaibing@huawei.com>
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> 
+> diff --git a/include/linux/pci.h b/include/linux/pci.h
+> index 9e700d9f9f28..74415ee62211 100644
+> --- a/include/linux/pci.h
+> +++ b/include/linux/pci.h
+> @@ -925,6 +925,11 @@ enum {
+>  	PCI_SCAN_ALL_PCIE_DEVS	= 0x00000040,	/* Scan all, not just dev 0 */
+>  };
+>  
+> +#define PCI_IRQ_LEGACY		(1 << 0) /* Allow legacy interrupts */
+> +#define PCI_IRQ_MSI		(1 << 1) /* Allow MSI interrupts */
+> +#define PCI_IRQ_MSIX		(1 << 2) /* Allow MSI-X interrupts */
+> +#define PCI_IRQ_AFFINITY	(1 << 3) /* Auto-assign affinity */
+> +
+>  /* These external functions are only available when PCI support is enabled */
+>  #ifdef CONFIG_PCI
+>  
+> @@ -1408,11 +1413,6 @@ resource_size_t pcibios_window_alignment(struct pci_bus *bus,
+>  int pci_set_vga_state(struct pci_dev *pdev, bool decode,
+>  		      unsigned int command_bits, u32 flags);
+>  
+> -#define PCI_IRQ_LEGACY		(1 << 0) /* Allow legacy interrupts */
+> -#define PCI_IRQ_MSI		(1 << 1) /* Allow MSI interrupts */
+> -#define PCI_IRQ_MSIX		(1 << 2) /* Allow MSI-X interrupts */
+> -#define PCI_IRQ_AFFINITY	(1 << 3) /* Auto-assign affinity */
+> -
+>  /*
+>   * Virtual interrupts allow for more interrupts to be allocated
+>   * than the device has interrupts for. These are not programmed
+> @@ -1517,14 +1517,6 @@ static inline int pci_irq_get_node(struct pci_dev *pdev, int vec)
+>  }
+>  #endif
+>  
+> -static inline int
+> -pci_alloc_irq_vectors(struct pci_dev *dev, unsigned int min_vecs,
+> -		      unsigned int max_vecs, unsigned int flags)
+> -{
+> -	return pci_alloc_irq_vectors_affinity(dev, min_vecs, max_vecs, flags,
+> -					      NULL);
+> -}
+> -
+>  /**
+>   * pci_irqd_intx_xlate() - Translate PCI INTx value to an IRQ domain hwirq
+>   * @d: the INTx IRQ domain
+> @@ -1780,8 +1772,29 @@ static inline const struct pci_device_id *pci_match_id(const struct pci_device_i
+>  							 struct pci_dev *dev)
+>  { return NULL; }
+>  static inline bool pci_ats_disabled(void) { return true; }
+> +
+> +static inline int pci_irq_vector(struct pci_dev *dev, unsigned int nr)
+> +{
+> +	return -EINVAL;
+> +}
+> +
+> +static inline int
+> +pci_alloc_irq_vectors_affinity(struct pci_dev *dev, unsigned int min_vecs,
+> +			       unsigned int max_vecs, unsigned int flags,
+> +			       struct irq_affinity *aff_desc)
+> +{
+> +	return -ENOSPC;
+> +}
+>  #endif /* CONFIG_PCI */
+>  
+> +static inline int
+> +pci_alloc_irq_vectors(struct pci_dev *dev, unsigned int min_vecs,
+> +		      unsigned int max_vecs, unsigned int flags)
+> +{
+> +	return pci_alloc_irq_vectors_affinity(dev, min_vecs, max_vecs, flags,
+> +					      NULL);
+> +}
+> +
+>  #ifdef CONFIG_PCI_ATS
+>  /* Address Translation Service */
+>  void pci_ats_init(struct pci_dev *dev);
+> -- 
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
