@@ -2,175 +2,139 @@ Return-Path: <SRS0=9BFZ=XA=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B725C00306
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 Sep 2019 21:07:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB3F0C43331
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 Sep 2019 22:38:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 46CB120828
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 Sep 2019 21:07:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1567717647;
-	bh=F0QccAvsqT3G/VxnqWYuBJOd6TGCLtEmx4DD9gWPJr0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=wFthNyHAjvNU32LMapfKPokNJS5AhUTXRp6iyuteDGfFGMHpcPEJ7vk4yawXRgpeB
-	 fdyJhgIGuHbYFOQjhNm6AzA2oBNm8MPdnDc6p/F7rfgTum2PRC4ugT6x0IFsCSutPA
-	 IwQ5bUvEGbQ+SSGpKdDI3Q2IWhpU8gNH2tuTTWf4=
+	by mail.kernel.org (Postfix) with ESMTP id 00A2D20825
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 Sep 2019 22:38:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="gd36TohF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731437AbfIEVHZ (ORCPT
+        id S1731969AbfIEWiZ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 5 Sep 2019 17:07:25 -0400
-Received: from mail.kernel.org ([198.145.29.99]:40544 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726115AbfIEVHZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 5 Sep 2019 17:07:25 -0400
-Received: from localhost (unknown [69.71.4.100])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 04535206DF;
-        Thu,  5 Sep 2019 21:07:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1567717644;
-        bh=F0QccAvsqT3G/VxnqWYuBJOd6TGCLtEmx4DD9gWPJr0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=HbA9Rr2GXnyBxWpfnLlf/VmNlWOxLLa/gr/GklgbNkv2FvyjwdTNA0oeAlB5O0Wmi
-         i7E3MUwD1hZ36oMqwXT8mI0rh0MeHhvlGCM/rXj59oEz+RDHZULGHFCTPoJNKqo0PM
-         DH4quk04WsMxQLQlN/9Ig/Z5J5vJ2kPRPe/nz+dQ=
-Date:   Thu, 5 Sep 2019 16:07:22 -0500
-From:   Bjorn Helgaas <helgaas@kernel.org>
+        Thu, 5 Sep 2019 18:38:25 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:53212 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726837AbfIEWiZ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 5 Sep 2019 18:38:25 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x85MYURF061084;
+        Thu, 5 Sep 2019 22:38:06 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2019-08-05;
+ bh=SMr5Wa1/JRqleE5iB2SBJYc1hjMDbWANCCSO+yo7+7A=;
+ b=gd36TohFcCgMahV+CDJYj5r05LKAiLCosdVUECyedsnKRj7lvI76xNyOFnwJ3pD3k1s/
+ TZ3Y1N5bvPtBRXU+iOjyRutGjuBjT6iVUucSN9XiWWTHHA6KJEOFTdew7i4AP/pIo/My
+ UiMQYzi3qDaEGZOZMMcTcWQG+1NaaIpjqmyy6NEhazHwdkr23lyjUcdZQ1z8Vc5k6MtG
+ V/H5uDMp1ViiwRU4lm1omUg0rIfspI0K/iTuOmC9TzUMT/Np//KdX4SayiPsuj8W6Cj2
+ fnxM2P9YkyqLCN6UpqLanR/pOiTghYtjmRiZPsVqCjLIw2kE+PqF9T1rWv5wgJYkiUhO hw== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by aserp2120.oracle.com with ESMTP id 2uub5yr117-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 05 Sep 2019 22:38:06 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x85MYHBO035022;
+        Thu, 5 Sep 2019 22:38:05 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3030.oracle.com with ESMTP id 2utpmby59r-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 05 Sep 2019 22:38:05 +0000
+Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x85Mc3iT012918;
+        Thu, 5 Sep 2019 22:38:03 GMT
+Received: from ca-dmjordan1.us.oracle.com (/10.211.9.48)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 05 Sep 2019 15:38:03 -0700
+Date:   Thu, 5 Sep 2019 18:37:56 -0400
+From:   Daniel Jordan <daniel.m.jordan@oracle.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        linux-pci@vger.kernel.org,
-        Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>,
-        YueHaibing <yuehaibing@huawei.com>,
-        "antoine.tenart@bootlin.com" <antoine.tenart@bootlin.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "pvanleeuwen@insidesecure.com" <pvanleeuwen@insidesecure.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: PCI: Add stub pci_irq_vector and others
-Message-ID: <20190905210722.GH103977@google.com>
-References: <20190902141910.1080-1-yuehaibing@huawei.com>
- <20190903014518.20880-1-yuehaibing@huawei.com>
- <MN2PR20MB29732EEECB217DDDF822EDA5CAB80@MN2PR20MB2973.namprd20.prod.outlook.com>
- <CAKv+Gu8PVYyA-mzjrhR6r6upMc=xzpAhsbkuKRtb8T2noo_2XQ@mail.gmail.com>
- <20190904122600.GA28660@gondor.apana.org.au>
+Cc:     Daniel Jordan <daniel.m.jordan@oracle.com>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 1/5] padata: make flushing work with async users
+Message-ID: <20190905223756.wmmjkjvztlerjzee@ca-dmjordan1.us.oracle.com>
+References: <20190828221425.22701-1-daniel.m.jordan@oracle.com>
+ <20190828221425.22701-2-daniel.m.jordan@oracle.com>
+ <20190905041734.GA25330@gondor.apana.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190904122600.GA28660@gondor.apana.org.au>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20190905041734.GA25330@gondor.apana.org.au>
+User-Agent: NeoMutt/20180716
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9371 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1906280000 definitions=main-1909050210
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9371 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
+ definitions=main-1909050210
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Sep 04, 2019 at 10:26:00PM +1000, Herbert Xu wrote:
-> On Wed, Sep 04, 2019 at 05:10:34AM -0700, Ard Biesheuvel wrote:
+On Thu, Sep 05, 2019 at 02:17:35PM +1000, Herbert Xu wrote:
+> On Wed, Aug 28, 2019 at 06:14:21PM -0400, Daniel Jordan wrote:
 > >
-> > This is the reason we have so many empty static inline functions in
-> > header files - it ensures that the symbols are declared even if the
-> > only invocations are from dead code.
+> > @@ -453,24 +456,15 @@ static void padata_free_pd(struct parallel_data *pd)
+> >  /* Flush all objects out of the padata queues. */
+> >  static void padata_flush_queues(struct parallel_data *pd)
+> >  {
+> > -	int cpu;
+> > -	struct padata_parallel_queue *pqueue;
+> > -	struct padata_serial_queue *squeue;
+> > -
+> > -	for_each_cpu(cpu, pd->cpumask.pcpu) {
+> > -		pqueue = per_cpu_ptr(pd->pqueue, cpu);
+> > -		flush_work(&pqueue->work);
+> > -	}
+> > -
+> > -	if (atomic_read(&pd->reorder_objects))
+> > -		padata_reorder(pd);
+> > +	if (!(pd->pinst->flags & PADATA_INIT))
+> > +		return;
+> >  
+> > -	for_each_cpu(cpu, pd->cpumask.cbcpu) {
+> > -		squeue = per_cpu_ptr(pd->squeue, cpu);
+> > -		flush_work(&squeue->work);
+> > -	}
+> > +	if (atomic_dec_return(&pd->refcnt) == 0)
+> > +		complete(&pd->flushing_done);
+> >  
+> > -	BUG_ON(atomic_read(&pd->refcnt) != 0);
+> > +	wait_for_completion(&pd->flushing_done);
+> > +	reinit_completion(&pd->flushing_done);
+> > +	atomic_set(&pd->refcnt, 1);
+> >  }
 > 
-> Does this patch work?
-> 
-> ---8<---
-> This patch adds stub functions pci_alloc_irq_vectors_affinity and
-> pci_irq_vector when CONFIG_PCI is off so that drivers can use them
-> without resorting to ifdefs.
-> 
-> It also moves the PCI_IRQ_* macros outside of the ifdefs so that
-> they are always available.
-> 
-> Fixes: 625f269a5a7a ("crypto: inside-secure - add support for...")
+> I don't think waiting is an option.  In a pathological case the
+> hardware may not return at all.  We cannot and should not hold off
+> CPU hotplug for an arbitrary amount of time when the event we are
+> waiting for isn't even occuring on that CPU.
 
-I don't see this commit in Linus' tree yet.
+Ok, I hadn't considered hardware not returning.
 
-I'd like to include the actual reason for this patch in the commit
-log.  I assume it's fixing a build issue, but I'd like to be a little
-more specific about it.
+> I don't think flushing is needed at all.  All we need to do is
+> maintain consistency before and after the CPU hotplug event.
 
-> Reported-by: kbuild test robot <lkp@intel.com>
-> Reported-by: YueHaibing <yuehaibing@huawei.com>
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> 
-> diff --git a/include/linux/pci.h b/include/linux/pci.h
-> index 9e700d9f9f28..74415ee62211 100644
-> --- a/include/linux/pci.h
-> +++ b/include/linux/pci.h
-> @@ -925,6 +925,11 @@ enum {
->  	PCI_SCAN_ALL_PCIE_DEVS	= 0x00000040,	/* Scan all, not just dev 0 */
->  };
->  
-> +#define PCI_IRQ_LEGACY		(1 << 0) /* Allow legacy interrupts */
-> +#define PCI_IRQ_MSI		(1 << 1) /* Allow MSI interrupts */
-> +#define PCI_IRQ_MSIX		(1 << 2) /* Allow MSI-X interrupts */
-> +#define PCI_IRQ_AFFINITY	(1 << 3) /* Auto-assign affinity */
-> +
->  /* These external functions are only available when PCI support is enabled */
->  #ifdef CONFIG_PCI
->  
-> @@ -1408,11 +1413,6 @@ resource_size_t pcibios_window_alignment(struct pci_bus *bus,
->  int pci_set_vga_state(struct pci_dev *pdev, bool decode,
->  		      unsigned int command_bits, u32 flags);
->  
-> -#define PCI_IRQ_LEGACY		(1 << 0) /* Allow legacy interrupts */
-> -#define PCI_IRQ_MSI		(1 << 1) /* Allow MSI interrupts */
-> -#define PCI_IRQ_MSIX		(1 << 2) /* Allow MSI-X interrupts */
-> -#define PCI_IRQ_AFFINITY	(1 << 3) /* Auto-assign affinity */
-> -
->  /*
->   * Virtual interrupts allow for more interrupts to be allocated
->   * than the device has interrupts for. These are not programmed
-> @@ -1517,14 +1517,6 @@ static inline int pci_irq_get_node(struct pci_dev *pdev, int vec)
->  }
->  #endif
->  
-> -static inline int
-> -pci_alloc_irq_vectors(struct pci_dev *dev, unsigned int min_vecs,
-> -		      unsigned int max_vecs, unsigned int flags)
-> -{
-> -	return pci_alloc_irq_vectors_affinity(dev, min_vecs, max_vecs, flags,
-> -					      NULL);
-> -}
-> -
->  /**
->   * pci_irqd_intx_xlate() - Translate PCI INTx value to an IRQ domain hwirq
->   * @d: the INTx IRQ domain
-> @@ -1780,8 +1772,29 @@ static inline const struct pci_device_id *pci_match_id(const struct pci_device_i
->  							 struct pci_dev *dev)
->  { return NULL; }
->  static inline bool pci_ats_disabled(void) { return true; }
-> +
-> +static inline int pci_irq_vector(struct pci_dev *dev, unsigned int nr)
-> +{
-> +	return -EINVAL;
-> +}
-> +
-> +static inline int
-> +pci_alloc_irq_vectors_affinity(struct pci_dev *dev, unsigned int min_vecs,
-> +			       unsigned int max_vecs, unsigned int flags,
-> +			       struct irq_affinity *aff_desc)
-> +{
-> +	return -ENOSPC;
-> +}
->  #endif /* CONFIG_PCI */
->  
-> +static inline int
-> +pci_alloc_irq_vectors(struct pci_dev *dev, unsigned int min_vecs,
-> +		      unsigned int max_vecs, unsigned int flags)
-> +{
-> +	return pci_alloc_irq_vectors_affinity(dev, min_vecs, max_vecs, flags,
-> +					      NULL);
-> +}
-> +
->  #ifdef CONFIG_PCI_ATS
->  /* Address Translation Service */
->  void pci_ats_init(struct pci_dev *dev);
-> -- 
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+I could imagine not flushing would work for replacing a pd.  The old pd could
+be freed by whatever drops the last reference and the new pd could be
+installed, all without flushing.
+
+In the case of freeing an instance, though, padata needs to wait for all the
+jobs to complete so they don't use the instance's data after it's been freed.
+Holding the CPU hotplug lock isn't necessary for this, though, so I think we're
+ok to wait here.
