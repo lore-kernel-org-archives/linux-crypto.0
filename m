@@ -2,62 +2,66 @@ Return-Path: <SRS0=9BFZ=XA=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=FAKE_REPLY_C,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7B04C3A5A5
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 Sep 2019 04:53:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAC75C3A5A5
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 Sep 2019 04:54:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 85908206DF
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 Sep 2019 04:53:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 98C6B206DF
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 Sep 2019 04:54:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730716AbfIEExw (ORCPT
+        id S1730780AbfIEEyN (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 5 Sep 2019 00:53:52 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:60518 "EHLO fornost.hmeau.com"
+        Thu, 5 Sep 2019 00:54:13 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:60534 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726042AbfIEExw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 5 Sep 2019 00:53:52 -0400
+        id S1726042AbfIEEyN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 5 Sep 2019 00:54:13 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
-        id 1i5jmG-0006Fq-WB; Thu, 05 Sep 2019 14:53:50 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 05 Sep 2019 14:53:48 +1000
-Date:   Thu, 5 Sep 2019 14:53:48 +1000
+        id 1i5jmW-0006HY-4U; Thu, 05 Sep 2019 14:54:05 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 05 Sep 2019 14:54:00 +1000
+Date:   Thu, 5 Sep 2019 14:54:00 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Pascal van Leeuwen <pascalvanl@gmail.com>
-Cc:     linux-crypto@vger.kernel.org, antoine.tenart@bootlin.com,
-        davem@davemloft.net, pvanleeuwen@verimatrix.com
-Subject: Re: [PATCH 0/4] Add support for AES-GCM, AES-CFB, AES-OFB and AES-CCM
-Message-ID: <20190905045348.GA32281@gondor.apana.org.au>
+To:     Daniel Mack <daniel@zonque.org>
+Cc:     mpm@selenic.com, gregkh@linuxfoundation.org,
+        linux-crypto@vger.kernel.org
+Subject: Re: [PATCH] hw_random: timeriomem_rng: relax check on memory
+ resource size
+Message-ID: <20190905045400.GB32038@gondor.apana.org.au>
+References: <20190831115555.11708-1-daniel@zonque.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1567151553-11108-1-git-send-email-pvanleeuwen@verimatrix.com>
-X-Newsgroups: apana.lists.os.linux.cryptoapi
+In-Reply-To: <20190831115555.11708-1-daniel@zonque.org>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Pascal van Leeuwen <pascalvanl@gmail.com> wrote:
-> This patchset adds support for the AES-GCM and AES-CCM AEAD ciphersuites
-> and the AES-CFB and AES-OFB feedback modes for AES.
+On Sat, Aug 31, 2019 at 01:55:55PM +0200, Daniel Mack wrote:
+> The timeriomem_rng driver only accesses the first 4 bytes of the given
+> memory area and currently, it also forces that memory resource to be
+> exactly 4 bytes in size.
 > 
-> Pascal van Leeuwen (4):
->  crypto: inside-secure - Added support for basic AES-GCM
->  crypto: inside-secure - Added AES-CFB support
->  crypto: inside-secure - Added AES-OFB support
->  crypto: inside-secure - Added support for basic AES-CCM
+> This, however, is problematic when used with device-trees that are
+> generated from things like FPGA toolchains, where the minimum size
+> of an exposed memory block may be something like 4k.
 > 
-> drivers/crypto/inside-secure/safexcel.c        |   4 +
-> drivers/crypto/inside-secure/safexcel.h        |  19 +-
-> drivers/crypto/inside-secure/safexcel_cipher.c | 508 ++++++++++++++++++++++---
-> drivers/crypto/inside-secure/safexcel_ring.c   |   8 +-
-> 4 files changed, 488 insertions(+), 51 deletions(-)
+> Hence, let's only check for what's needed for the driver to operate
+> properly; namely that we have enough memory available to read the
+> random data from.
+> 
+> Signed-off-by: Daniel Mack <daniel@zonque.org>
+> ---
+>  Documentation/devicetree/bindings/rng/timeriomem_rng.txt | 2 +-
+>  drivers/char/hw_random/timeriomem-rng.c                  | 4 ++--
+>  2 files changed, 3 insertions(+), 3 deletions(-)
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
