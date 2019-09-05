@@ -2,87 +2,151 @@ Return-Path: <SRS0=9BFZ=XA=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCEC2C43140
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 Sep 2019 16:31:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1897C43331
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 Sep 2019 16:41:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7BF14214D9
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 Sep 2019 16:31:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 62C512082E
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 Sep 2019 16:41:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="MWKovpwW"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="AWvrPwxF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387467AbfIEQb4 (ORCPT
+        id S2389712AbfIEQlS (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 5 Sep 2019 12:31:56 -0400
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:42444 "EHLO
+        Thu, 5 Sep 2019 12:41:18 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:36147 "EHLO
         mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732082AbfIEQb4 (ORCPT
+        with ESMTP id S1728601AbfIEQlP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 5 Sep 2019 12:31:56 -0400
-Received: by mail-pg1-f194.google.com with SMTP id p3so1691064pgb.9
-        for <linux-crypto@vger.kernel.org>; Thu, 05 Sep 2019 09:31:55 -0700 (PDT)
+        Thu, 5 Sep 2019 12:41:15 -0400
+Received: by mail-pg1-f194.google.com with SMTP id l21so1720437pgm.3
+        for <linux-crypto@vger.kernel.org>; Thu, 05 Sep 2019 09:41:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=message-id:mime-version:content-transfer-encoding:in-reply-to
-         :references:cc:subject:to:from:user-agent:date;
-        bh=SZRwWiwkgh1GK9Bkb/9Pdeq8WDYShoyhFDPtRHfeWLM=;
-        b=MWKovpwW8zTqMdmJ6SnU7bXm40Ky35yU73fI4bDwvGgxd2s8/Xi5imkfpb/SMKDLGD
-         sQ/CqCU7EsSTI11Ky2b1tigH/UCjk3cUgZim0eRbgflNIQ12hnhmSCO9H6FNoFUe+PgG
-         t3oQAlTtwlMWoTHLG7EFoVEpGTrLCyVTM+cAc=
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=+vE/xgq+/pjwKf8dfb2af/ZSiNrPKjB3ZwnjuHKxh+M=;
+        b=AWvrPwxFX1/Q8s8cSwYNJOo0vrKppZiENlQpkaiPEQ2JYZS5lWq5Z2vDi7AsX1zCLW
+         Nvu6jA/eDGPnrFojK14zGC20vRKhNafMGTEJwukIJ/vlaPD/ife4+h34NFTqDtIoiGKn
+         lW295l8jAE/tibwqfChidrQQOP13hur3oVsPQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:mime-version
-         :content-transfer-encoding:in-reply-to:references:cc:subject:to:from
-         :user-agent:date;
-        bh=SZRwWiwkgh1GK9Bkb/9Pdeq8WDYShoyhFDPtRHfeWLM=;
-        b=Y3eG1F1MxTg6Rcj5q2+/4Sdahze3bgzfsrxXQ6F8YvmxXSUS7/QPuPSy6aQQvUM9kO
-         HyJis1wsaqlzJ816SJg43nTTZaxDxZW6G/HzWE5KcS5T8nzvPCldDXvi81ZgzviVZ/FJ
-         7zW30hVAc7lUP6CZaRfzx3zSTCmQJczFknkTUbI6Piqye/LF6yRIDGq0GIdW9kv3ZWma
-         7le3ezIbk3sBhITuXG275U8PganC+vd+UN4wDiXB82hg/Nh4PtFafyv0GAGc0dCqoCH3
-         +tzRwWzEtOPtM2GFG/AHb5GabVuOJ43qzTguZ0FFunh59WGGxR6QrWhftdNcmDmMyOu6
-         b5fg==
-X-Gm-Message-State: APjAAAXVAhQ7Pbz/9QHOkeVd3olQZYViyxS5Mkm1cIzWSPiZSExwH0t9
-        lkHTdFcZJIQBbALmlNwrPcAxnw==
-X-Google-Smtp-Source: APXvYqyTceuhZnqbPWbDs3R8tZnE3eh1qj5gCXK7x6cT0077/9SMY7ws5QIdPLCSvBrgo6pYO+Lw5A==
-X-Received: by 2002:a63:3006:: with SMTP id w6mr4043307pgw.440.1567701115407;
-        Thu, 05 Sep 2019 09:31:55 -0700 (PDT)
-Received: from chromium.org ([2620:15c:202:1:fa53:7765:582b:82b9])
-        by smtp.gmail.com with ESMTPSA id em21sm2302534pjb.31.2019.09.05.09.31.54
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=+vE/xgq+/pjwKf8dfb2af/ZSiNrPKjB3ZwnjuHKxh+M=;
+        b=OiEi7PNhJFm9qCTDqa6IgkieC4bi8yQ90TlAqcrFEIJ+fdcQ06JVGOU9L5irJEm0LR
+         w2h/Xdq0KjZNdQbP5PfDKQm+SVOSxPO+wulvUV9zA3AFcigi0SnVsKtDLeBNmp96dq+e
+         IN+eVElxdxQrGRj7DeeJ1H4SeN1U8ZQQqji60gTSHU4o9t0kROAP1DtZBzN1ewVBlvM9
+         hqxa5j+sGoNNSv1M0OD19hNfZ2stNlDg0NAGUpLD5oEofEHSLZZuDNj/+EsCOQm7CSjp
+         LH0tyfhHH6NcikMXGUWBVVr196LjB0GGexaMGpegwVw3TgydUuNHhEOq4+kVXpOo0V3H
+         L2EQ==
+X-Gm-Message-State: APjAAAVoy/mjLOAs7mHIk/y5HuofNY9Rbl69dNQhdh47UN1KAmL8wqn2
+        BZnhxS6QKMOhrdIcekB7vm0e+A==
+X-Google-Smtp-Source: APXvYqzbl/dgUIkoIncTvp0wI0Dzxf5yKuX2pH6zBh62SAMuFpYC8Nvl6x+3TLdpYI4Mj4kPxmn3Hg==
+X-Received: by 2002:a17:90a:630a:: with SMTP id e10mr4784273pjj.25.1567701674170;
+        Thu, 05 Sep 2019 09:41:14 -0700 (PDT)
+Received: from smtp.gmail.com ([2620:15c:202:1:fa53:7765:582b:82b9])
+        by smtp.gmail.com with ESMTPSA id f12sm2663012pgo.85.2019.09.05.09.41.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 Sep 2019 09:31:54 -0700 (PDT)
-Message-ID: <5d71387a.1c69fb81.4fb28.5e25@mx.google.com>
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20190905074152.3oufn7yqr4flu3yc@linutronix.de>
-References: <20190904110038.2bx25byitrejlteu@flow> <5d700756.1c69fb81.77c08.9c82@mx.google.com> <20190905074152.3oufn7yqr4flu3yc@linutronix.de>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-kernel@vger.kernel.org, Theodore Ts'o <tytso@mit.edu>,
-        linux-crypto@vger.kernel.org, Matt Mackall <mpm@selenic.com>,
-        Keerthy <j-keerthy@ti.com>, Thomas Gleixner <tglx@linutronix.de>,
-        Peter Zijlstra <peterz@infradead.org>
-Subject: Re: [PATCH] random: Support freezable kthreads in add_hwgenerator_randomness()
-To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+        Thu, 05 Sep 2019 09:41:13 -0700 (PDT)
 From:   Stephen Boyd <swboyd@chromium.org>
-User-Agent: alot/0.8.1
-Date:   Thu, 05 Sep 2019 09:31:53 -0700
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     linux-kernel@vger.kernel.org, "Theodore Ts'o" <tytso@mit.edu>,
+        linux-crypto@vger.kernel.org,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        Keerthy <j-keerthy@ti.com>
+Subject: [PATCH] random: Use wait_event_freezable() in add_hwgenerator_randomness()
+Date:   Thu,  5 Sep 2019 09:41:12 -0700
+Message-Id: <20190905164112.245886-1-swboyd@chromium.org>
+X-Mailer: git-send-email 2.23.0.187.g17f5b7556c-goog
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Quoting Sebastian Andrzej Siewior (2019-09-05 00:41:52)
-> On 2019-09-04 11:49:57 [-0700], Stephen Boyd wrote:
-> > Can you try this?
->=20
-> yes, works.
->=20
+Sebastian reports that after commit ff296293b353 ("random: Support freezable
+kthreads in add_hwgenerator_randomness()") we can call might_sleep() when the
+task state is TASK_INTERRUPTIBLE (state=1). This leads to the following warning.
 
-Cool thanks. I'll send a proper patch with your tested-by then?
-Alternatively this can be squashed into this previous patch because it
-was all wrong and is basically reverting the patch and changing the
-wait_event call to be freezable.
+ do not call blocking ops when !TASK_RUNNING; state=1 set at [<00000000349d1489>] prepare_to_wait_event+0x5a/0x180
+ WARNING: CPU: 0 PID: 828 at kernel/sched/core.c:6741 __might_sleep+0x6f/0x80
+ Modules linked in:
+
+ CPU: 0 PID: 828 Comm: hwrng Not tainted 5.3.0-rc7-next-20190903+ #46
+ RIP: 0010:__might_sleep+0x6f/0x80
+
+ Call Trace:
+  kthread_freezable_should_stop+0x1b/0x60
+  add_hwgenerator_randomness+0xdd/0x130
+  hwrng_fillfn+0xbf/0x120
+  kthread+0x10c/0x140
+  ret_from_fork+0x27/0x50
+
+We shouldn't call kthread_freezable_should_stop() from deep within the
+wait_event code because the task state is still set as
+TASK_INTERRUPTIBLE instead of TASK_RUNNING and
+kthread_freezable_should_stop() will try to call into the freezer with
+the task in the wrong state. Use wait_event_freezable() instead so that
+it calls schedule() in the right place and tries to enter the freezer
+when the task state is TASK_RUNNING instead.
+
+Reported-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Tested-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: Keerthy <j-keerthy@ti.com>
+Fixes: ff296293b353 ("random: Support freezable kthreads in add_hwgenerator_randomness()")
+Signed-off-by: Stephen Boyd <swboyd@chromium.org>
+---
+
+See https://lkml.kernel.org/r/20190904110038.2bx25byitrejlteu@flow for
+context on the bug report.
+
+ drivers/char/random.c | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index 9b54cdb301d3..d3beed084c0a 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -327,6 +327,7 @@
+ #include <linux/percpu.h>
+ #include <linux/cryptohash.h>
+ #include <linux/fips.h>
++#include <linux/freezer.h>
+ #include <linux/ptrace.h>
+ #include <linux/workqueue.h>
+ #include <linux/irq.h>
+@@ -2429,7 +2430,6 @@ void add_hwgenerator_randomness(const char *buffer, size_t count,
+ 				size_t entropy)
+ {
+ 	struct entropy_store *poolp = &input_pool;
+-	bool frozen = false;
+ 
+ 	if (unlikely(crng_init == 0)) {
+ 		crng_fast_load(buffer, count);
+@@ -2440,13 +2440,11 @@ void add_hwgenerator_randomness(const char *buffer, size_t count,
+ 	 * We'll be woken up again once below random_write_wakeup_thresh,
+ 	 * or when the calling thread is about to terminate.
+ 	 */
+-	wait_event_interruptible(random_write_wait,
+-			kthread_freezable_should_stop(&frozen) ||
++	wait_event_freezable(random_write_wait,
++			kthread_should_stop() ||
+ 			ENTROPY_BITS(&input_pool) <= random_write_wakeup_bits);
+-	if (!frozen) {
+-		mix_pool_bytes(poolp, buffer, count);
+-		credit_entropy_bits(poolp, entropy);
+-	}
++	mix_pool_bytes(poolp, buffer, count);
++	credit_entropy_bits(poolp, entropy);
+ }
+ EXPORT_SYMBOL_GPL(add_hwgenerator_randomness);
+ 
+-- 
+Sent by a computer through tubes
 
