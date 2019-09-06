@@ -2,146 +2,150 @@ Return-Path: <SRS0=4a8U=XB=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D60BC43140
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 Sep 2019 18:46:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2D73C43331
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 Sep 2019 20:18:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 13916208C3
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 Sep 2019 18:46:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 89EF5207FC
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 Sep 2019 20:18:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VliEAdMq"
+	dkim=pass (1024-bit key) header.d=verimatrix.com header.i=@verimatrix.com header.b="Uu+yUQvU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2395361AbfIFSqH (ORCPT
+        id S2392691AbfIFUSp (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 6 Sep 2019 14:46:07 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:53010 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390567AbfIFSqG (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 6 Sep 2019 14:46:06 -0400
-Received: by mail-wm1-f67.google.com with SMTP id t17so7513944wmi.2;
-        Fri, 06 Sep 2019 11:46:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=UVVsUJ3cqxC7B0N9mD/oVG/ysz/2hMqLEdaltl6/SKo=;
-        b=VliEAdMqXCZEuavCqjEh6OTr7ebBnxrMGNbDl2ershs4s/Nu3eg5EQbTh3IHq1RrYU
-         6sjfvjcrb8dH+OW8JTbCr0hZ4zVdMvWooEFD5JQBPoi3B5+8FyIkdGspxnf2/Y34eaJe
-         wnT6Qj4WdcFJN1CKgrGjZQBghzuxkv/M5kPlNttWstId/gDVxTWjGtCwY2Pqjyi0fro4
-         1BtmmF4req7lbyPrLe/cjkdWNBaqTNUl/rTZZPIOX0vx/ssFR7CtsDgbN42TRjuKCqXH
-         Msieu8Zh8UulkL+6NTZhiqPzAyauh7tIEkHGb4EeOOH2pw/3hIxzEjH823o38S/Psu4M
-         jd8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=UVVsUJ3cqxC7B0N9mD/oVG/ysz/2hMqLEdaltl6/SKo=;
-        b=TZ1VCnOpOyUhT2bBEONwZGKBmiRFFShuIPNO25YTFhlEDyjwvPblsGW43AEMT85fU9
-         Ffnz+KIb86lojLKLysJWd4kGOo3mUMbZf+FPPD9liS4d3I9hKE2TppCNNIZZ1FcLfj3e
-         2w4b62T6OGaBm4flL+kihL7MlxTgKM6AOM1jzSYyhXDnAgl1YtoUkj+icvQWntd7DXMV
-         jh3m/wIEz10r9xGnTiSjwdJBywGTDvSFutyLrKFGgkh2RfK9Ze+Dx8qJ5GgoQ6O2U38H
-         mDDRgB8CKlKSQ0SDcCVK7d5MK85c1QsA9S3cH7Sj10ScR/GvFuf8YQTnU11Z9vRU3ZcI
-         yNGA==
-X-Gm-Message-State: APjAAAVauUCZJAXoEYIxAvCZ9pdY2/hzqQK/qISV1szYxrYFuyaO7lEl
-        gSoP8PUXuZB6PNaQwTIye0E=
-X-Google-Smtp-Source: APXvYqyjrzRBxxj7tYzXaXaxio1nphXp3XWOYZgyMvwziBQzHIPj2h/NUODsCwcJ/4g0/R25PDbU+Q==
-X-Received: by 2002:a1c:9a46:: with SMTP id c67mr8434773wme.115.1567795564198;
-        Fri, 06 Sep 2019 11:46:04 -0700 (PDT)
-Received: from Red.localdomain ([2a01:cb1d:147:7200:2e56:dcff:fed2:c6d6])
-        by smtp.googlemail.com with ESMTPSA id j1sm8677577wrg.24.2019.09.06.11.46.02
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 06 Sep 2019 11:46:03 -0700 (PDT)
-From:   Corentin Labbe <clabbe.montjoie@gmail.com>
-To:     davem@davemloft.net, herbert@gondor.apana.org.au,
-        linux@armlinux.org.uk, mark.rutland@arm.com, mripard@kernel.org,
-        robh+dt@kernel.org, wens@csie.org
-Cc:     devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-sunxi@googlegroups.com,
-        Corentin Labbe <clabbe.montjoie@gmail.com>
-Subject: [PATCH 1/9] crypto: Add allwinner subdirectory
-Date:   Fri,  6 Sep 2019 20:45:43 +0200
-Message-Id: <20190906184551.17858-2-clabbe.montjoie@gmail.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190906184551.17858-1-clabbe.montjoie@gmail.com>
-References: <20190906184551.17858-1-clabbe.montjoie@gmail.com>
+        Fri, 6 Sep 2019 16:18:45 -0400
+Received: from mail-eopbgr750078.outbound.protection.outlook.com ([40.107.75.78]:13958
+        "EHLO NAM02-BL2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S2392658AbfIFUSp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 6 Sep 2019 16:18:45 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=KAB4hIScEI5YVAIBZnNby/l8g2mkUYEX7vr2N6GXD7y8GH+fS31yJINXu0TxNHWnsbfBmSaKd96C0EvjSTqTxoUEh2/lHq79ELelqkERcSl9eEuvnU8KC1tGae4De2zylpt680H75fz/N8dx0gNqyPYfCLgqqz7abu9+PKIeqvw6BOD6/03Qzh1UESO7+Bo78P3xAq/259caiWu3MkBjZIJh2fkH+1lfkMQ66NS+wVHr1JPepmgXE5wLbSOObUD0HAzKN/6/kkOBDfz/tZC16ejUXF6VJYpJXKpcTeoEFbfG+2Ie8ofp8IR/xfOBHqOMA0SgQEt9n0pfdnMeuAHICg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Od7Nt/umOR8rhh+aqRVgwkURU5OTvBpYQLRVO6wpbSM=;
+ b=Hpf37S7thO9qQDVDkl8iC2/70mFqIpiUna/TznnJP0oBVDVwoo8nbENGwrc/tVT6DIK2TssL6qFi0/7r+7R1NlGa8Etg28KWmhNzEQq6WHbqq7xRKRf+B0dLCt8QD3KjHYOg8kSxsH7on/TjzmBtIICin3Q2hRFjpFTO2Fl7UCVcrGXH1352IkNQBgRO9HC4l7LogviwTiiKCEZg/RcTNzEc9dsudpABcyNL5n5igJyJW3+m/9/IGNAX0aB/JBdseZFiY2DwHUb8YWrp+SlJLapOnJIrKW+OuFASLwl2Uc/Zl5MPUulnvUPtNi++Gy1CZg9849vzeiAVRg61RPzg/A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=verimatrix.com; dmarc=pass action=none
+ header.from=verimatrix.com; dkim=pass header.d=verimatrix.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verimatrix.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Od7Nt/umOR8rhh+aqRVgwkURU5OTvBpYQLRVO6wpbSM=;
+ b=Uu+yUQvUvT7kXoombtf0BdP1ij2lY8/yifXagoH7R1qFvfHavefAS10qJyNIlmAcv7Uxvdwge10/FZirTQRhnRZzaS/Z28qzN6xwURrltJ9Ys5r/zVgE0BEFtn6Gy1D7xDflOYLBJ+hXSkeZqUrzv1EhL/W1R1oMPWTNw14p+y0=
+Received: from MN2PR20MB2973.namprd20.prod.outlook.com (52.132.172.146) by
+ MN2PR20MB2911.namprd20.prod.outlook.com (10.255.7.32) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2241.18; Fri, 6 Sep 2019 20:18:41 +0000
+Received: from MN2PR20MB2973.namprd20.prod.outlook.com
+ ([fe80::6d07:5f09:97bf:c717]) by MN2PR20MB2973.namprd20.prod.outlook.com
+ ([fe80::6d07:5f09:97bf:c717%7]) with mapi id 15.20.2241.014; Fri, 6 Sep 2019
+ 20:18:41 +0000
+From:   Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+To:     Arnd Bergmann <arnd@arndb.de>
+CC:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Antoine Tenart <antoine.tenart@bootlin.com>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Kees Cook <keescook@chromium.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH 1/2] crypto: inside-secure - fix uninitialized-variable
+ warning
+Thread-Topic: [PATCH 1/2] crypto: inside-secure - fix uninitialized-variable
+ warning
+Thread-Index: AQHVZMb9qMxHnA67BkKvoz9dTWlgFKcez7HQgAArtYCAABrUIA==
+Date:   Fri, 6 Sep 2019 20:18:41 +0000
+Message-ID: <MN2PR20MB29731C08A41B4018E9C2146FCABA0@MN2PR20MB2973.namprd20.prod.outlook.com>
+References: <20190906152250.1450649-1-arnd@arndb.de>
+ <MN2PR20MB297378A683764AF4F2171B7CCABA0@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <CAK8P3a13Ebqd51SWx9svUyvFxV4MKDJKOwKEozzKyga9azBqJA@mail.gmail.com>
+In-Reply-To: <CAK8P3a13Ebqd51SWx9svUyvFxV4MKDJKOwKEozzKyga9azBqJA@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=pvanleeuwen@verimatrix.com; 
+x-originating-ip: [188.204.2.113]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 5ece8be5-5521-4a3f-83af-08d7330768ef
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600166)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:MN2PR20MB2911;
+x-ms-traffictypediagnostic: MN2PR20MB2911:
+x-ms-exchange-purlcount: 1
+x-microsoft-antispam-prvs: <MN2PR20MB2911D894D587E3AC1BA2E4CFCABA0@MN2PR20MB2911.namprd20.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-forefront-prvs: 0152EBA40F
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(346002)(376002)(136003)(39850400004)(366004)(396003)(43544003)(189003)(199004)(13464003)(8676002)(25786009)(26005)(6916009)(71190400001)(71200400001)(256004)(14444005)(8936002)(6116002)(3846002)(66066001)(81166006)(15974865002)(81156014)(229853002)(66946007)(66476007)(66556008)(64756008)(66446008)(478600001)(52536014)(5660300002)(4326008)(14454004)(186003)(54906003)(33656002)(7696005)(76176011)(76116006)(74316002)(316002)(305945005)(2906002)(7736002)(86362001)(11346002)(6246003)(102836004)(6436002)(476003)(55016002)(9686003)(446003)(486006)(99286004)(53936002)(53546011)(6506007)(18886075002);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR20MB2911;H:MN2PR20MB2973.namprd20.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: verimatrix.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: jQEUkoSxdgW/LVMYmCVTOpvqVFXmM0tIIQiEAJKPdO3SuWDhVlahLxSMKPMd6f8pCagShrBtfrjnNYYnWscLQfDB0ykg9VMiFheVYNSWLdwi9naDnQvKlx2MTA5Hski7s6XGQm6JaSHVSCUVNEKApEP/pyrNNQ9UOaWddcwpxjaxICt5KfjrpVkNvy0AjKBH3i4KhDrcwxvVj7hNjzDlan6htNiIV38D92rNgsZ5WFOdUs4F82uatzQ4WH8S2gx1SmrVc1t5P1GUzwnSZHpAd8JzE+15XsADLXSPSsEAJ0HJKiNdtopd0k1a95VJ2HrlNPQXtHcDJTOYCC7UT2GaRqVg84e/qM8/uFKxP6A6kBZ5WcK6/xBsstGOcYfv7otOOO7p2e7KhAVIbNGG0Ze/OHDtN2aNIBbo6PLSsJx1gUU=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: verimatrix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5ece8be5-5521-4a3f-83af-08d7330768ef
+X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Sep 2019 20:18:41.3260
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: dcb260f9-022d-4495-8602-eae51035a0d0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: eC+dG5/76t5PAICUwWO1ig1km5t4tuuEjasqnqr9SR4Q0FynOlpAVAn0yD8hLr7mLQVP1a4FLmkH+vWYJXZIIt7tMygXA1ENG/gP+GSbcCc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR20MB2911
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Since a second Allwinner crypto driver will be added, it is better to
-create a dedicated subdirectory.
-
-Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
----
- MAINTAINERS                      | 6 ++++++
- drivers/crypto/Kconfig           | 2 ++
- drivers/crypto/Makefile          | 1 +
- drivers/crypto/allwinner/Kconfig | 6 ++++++
- 4 files changed, 15 insertions(+)
- create mode 100644 drivers/crypto/allwinner/Kconfig
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index ee4e873c0f9a..d62ddf8ff262 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -681,6 +681,12 @@ L:	linux-crypto@vger.kernel.org
- S:	Maintained
- F:	drivers/crypto/sunxi-ss/
- 
-+ALLWINNER CRYPTO ENGINE
-+M:	Corentin Labbe <clabbe.montjoie@gmail.com>
-+L:	linux-crypto@vger.kernel.org
-+S:	Maintained
-+F:	drivers/crypto/allwinner/
-+
- ALLWINNER VPU DRIVER
- M:	Maxime Ripard <mripard@kernel.org>
- M:	Paul Kocialkowski <paul.kocialkowski@bootlin.com>
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index 83271d944a96..fe90dd74797c 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -11,6 +11,8 @@ menuconfig CRYPTO_HW
- 
- if CRYPTO_HW
- 
-+source "drivers/crypto/allwinner/Kconfig"
-+
- config CRYPTO_DEV_PADLOCK
- 	tristate "Support for VIA PadLock ACE"
- 	depends on X86 && !UML
-diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
-index afc4753b5d28..90d60eff5ecc 100644
---- a/drivers/crypto/Makefile
-+++ b/drivers/crypto/Makefile
-@@ -1,4 +1,5 @@
- # SPDX-License-Identifier: GPL-2.0
-+obj-$(CONFIG_CRYPTO_DEV_ALLWINNER) += allwinner/
- obj-$(CONFIG_CRYPTO_DEV_ATMEL_AES) += atmel-aes.o
- obj-$(CONFIG_CRYPTO_DEV_ATMEL_SHA) += atmel-sha.o
- obj-$(CONFIG_CRYPTO_DEV_ATMEL_TDES) += atmel-tdes.o
-diff --git a/drivers/crypto/allwinner/Kconfig b/drivers/crypto/allwinner/Kconfig
-new file mode 100644
-index 000000000000..0c8a99f7959d
---- /dev/null
-+++ b/drivers/crypto/allwinner/Kconfig
-@@ -0,0 +1,6 @@
-+config CRYPTO_DEV_ALLWINNER
-+	bool "Support for Allwinner cryptographic offloader"
-+	depends on ARCH_SUNXI || COMPILE_TEST
-+	default y if ARCH_SUNXI
-+	help
-+	  Say Y here to get to see options for Allwinner hardware crypto devices
--- 
-2.21.0
-
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBBcm5kIEJlcmdtYW5uIDxhcm5k
+QGFybmRiLmRlPg0KPiBTZW50OiBGcmlkYXksIFNlcHRlbWJlciA2LCAyMDE5IDg6NDAgUE0NCj4g
+VG86IFBhc2NhbCBWYW4gTGVldXdlbiA8cHZhbmxlZXV3ZW5AdmVyaW1hdHJpeC5jb20+DQo+IENj
+OiBIZXJiZXJ0IFh1IDxoZXJiZXJ0QGdvbmRvci5hcGFuYS5vcmcuYXU+OyBEYXZpZCBTLiBNaWxs
+ZXIgPGRhdmVtQGRhdmVtbG9mdC5uZXQ+OyBBbnRvaW5lDQo+IFRlbmFydCA8YW50b2luZS50ZW5h
+cnRAYm9vdGxpbi5jb20+OyBBcmQgQmllc2hldXZlbCA8YXJkLmJpZXNoZXV2ZWxAbGluYXJvLm9y
+Zz47IEtlZXMgQ29vaw0KPiA8a2Vlc2Nvb2tAY2hyb21pdW0ub3JnPjsgbGludXgtY3J5cHRvQHZn
+ZXIua2VybmVsLm9yZzsgbGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZw0KPiBTdWJqZWN0OiBS
+ZTogW1BBVENIIDEvMl0gY3J5cHRvOiBpbnNpZGUtc2VjdXJlIC0gZml4IHVuaW5pdGlhbGl6ZWQt
+dmFyaWFibGUgd2FybmluZw0KPiANCj4gT24gRnJpLCBTZXAgNiwgMjAxOSBhdCA2OjA4IFBNIFBh
+c2NhbCBWYW4gTGVldXdlbg0KPiA8cHZhbmxlZXV3ZW5AdmVyaW1hdHJpeC5jb20+IHdyb3RlOg0K
+PiANCj4gPiA+DQo+ID4gPiAgY29uZmlnIENSWVBUT19ERVZfU0FGRVhDRUwNCj4gPiA+ICAgICAg
+IHRyaXN0YXRlICJJbnNpZGUgU2VjdXJlJ3MgU2FmZVhjZWwgY3J5cHRvZ3JhcGhpYyBlbmdpbmUg
+ZHJpdmVyIg0KPiA+ID4gLSAgICAgZGVwZW5kcyBvbiBPRiB8fCBQQ0kgfHwgQ09NUElMRV9URVNU
+DQo+ID4gPiArICAgICBkZXBlbmRzIG9uIE9GIHx8IFBDSQ0KPiA+ID4NCj4gPg0KPiA+IFRoaXMg
+c2VlbXMgbGlrZSBpdCBqdXN0IGlnbm9yZXMgdGhlIHByb2JsZW0gYnkgbm90IGFsbG93aW5nIGNv
+bXBpbGUgdGVzdGluZw0KPiA+IGFueW1vcmU/IFNvbWVob3cgdGhhdCBkb2VzIG5vdCBmZWVsIHJp
+Z2h0IC4uLg0KPiANCj4gTm8sIGl0IGp1c3QgaWdub3JlcyB0aGUgdW5pbnRlcmVzdGluZyBjYXNl
+LiBZb3UgY2FuIGNvbXBpbGUtdGVzdCB0aGlzIG9uDQo+IGFueSBhcmNoaXRlY3R1cmUgYnkgdHVy
+bmluZyBvbiBPRi4NCj4gDQpZb3UgYXJlIGVudGlyZWx5IGNvcnJlY3QuIEJlY2F1c2Ugb2YgdGhl
+IENPTVBJTEVfVEVTVCBpdCBjb3VsZCBiZSBjb21waWxlZA0Kd2l0aG91dCBlaXRoZXIgT0Ygb3Ig
+UENJIHN1cHBvcnQsIHdoaWNoIG1ha2VzIG5vIHNlbnNlIHdoYXRzb2V2ZXIgLi4uDQoNCj4gPiA+
+ICAgICAgIHNlbGVjdCBDUllQVE9fTElCX0FFUw0KPiA+ID4gICAgICAgc2VsZWN0IENSWVBUT19B
+VVRIRU5DDQo+ID4gPiAgICAgICBzZWxlY3QgQ1JZUFRPX0JMS0NJUEhFUg0KPiA+ID4gZGlmZiAt
+LWdpdCBhL2RyaXZlcnMvY3J5cHRvL2luc2lkZS1zZWN1cmUvc2FmZXhjZWwuYyBiL2RyaXZlcnMv
+Y3J5cHRvL2luc2lkZS0NCj4gPiA+IHNlY3VyZS9zYWZleGNlbC5jDQo+ID4gPiBpbmRleCBlMTJh
+MmEzYTU0MjIuLjljMGJjZTc3ZGUxNCAxMDA2NDQNCj4gPiA+IC0tLSBhL2RyaXZlcnMvY3J5cHRv
+L2luc2lkZS1zZWN1cmUvc2FmZXhjZWwuYw0KPiA+ID4gKysrIGIvZHJpdmVycy9jcnlwdG8vaW5z
+aWRlLXNlY3VyZS9zYWZleGNlbC5jDQo+ID4gPiBAQCAtOTM4LDYgKzkzOCw3IEBAIHN0YXRpYyBp
+bnQgc2FmZXhjZWxfcmVxdWVzdF9yaW5nX2lycSh2b2lkICpwZGV2LCBpbnQgaXJxaWQsDQo+ID4g
+PiAgICAgICBzdHJ1Y3QgZGV2aWNlICpkZXY7DQo+ID4gPg0KPiA+ID4gICAgICAgaWYgKElTX0VO
+QUJMRUQoQ09ORklHX1BDSSkgJiYgaXNfcGNpX2Rldikgew0KPiA+ID4gKyNpZmRlZiBDT05GSUdf
+UENJDQo+ID4gPg0KPiA+DQo+ID4gVGhlIHdob2xlIHBvaW50IHdhcyBOT1QgdG8gdXNlIHJlZ3Vs
+YXIgI2lmZGVmcyBzdWNoIHRoYXQgdGhlIGNvZGUgY2FuDQo+ID4gYmUgY29tcGlsZSB0ZXN0ZWQg
+d2l0aG91dCBuZWVkaW5nIHRvIHN3aXRjaCBjb25maWd1cmF0aW9ucy4NCj4gPiBUaGVyZSBpcyBh
+bHJlYWR5IGEgZGlmZmVyZW50IHNvbHV0aW9uIGluIHRoZSB3b3JrcyBpbnZvbHZpbmcgc29tZSBl
+bXB0eQ0KPiA+IGlubGluZSBzdHVicyBmb3IgdGhvc2UgcGNpIHJvdXRpbmVzLCBwbGVhc2Ugc2Vl
+IGFuIGVhcmxpZXIgbWFpbCBieSBIZXJiZXJ0DQo+ID4gdGl0bGVkICJQQ0k6IEFkZCBzdHViIHBj
+aV9pcnFfdmVjdG9yIGFuZCBvdGhlcnMiLg0KPiANCj4gQWgsIGdvb2QuIFRoYXQgc2hvdWxkIHRh
+a2UgY2FyZSBvZiBtb3N0IG9mIHRoZSBwcm9ibGVtcy4gSSB0aGluaw0KPiB3ZSBzdGlsbCBuZWVk
+IHRoZSBLY29uZmlnIGNoYW5nZSwgdW5sZXNzIHRoZSBzYWZleGNlbF9pbml0KCkNCj4gZnVuY3Rp
+b24gaXMgYWxzbyBjaGFuZ2VkIHRvIHVzZSBpZihJU19FTkFCTEVEKCkpIGNoZWNrcw0KPiBpbnN0
+ZWFkIG9mICNpZi4NCj4gDQo+ICAgICAgQXJuZA0KPg0KWWVzLCBJIGFncmVlLg0KDQoNClJlZ2Fy
+ZHMsDQpQYXNjYWwgdmFuIExlZXV3ZW4NClNpbGljb24gSVAgQXJjaGl0ZWN0LCBNdWx0aS1Qcm90
+b2NvbCBFbmdpbmVzIEAgVmVyaW1hdHJpeA0Kd3d3Lmluc2lkZXNlY3VyZS5jb20NCg0K
