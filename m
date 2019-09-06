@@ -2,161 +2,152 @@ Return-Path: <SRS0=4a8U=XB=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E95FCC43140
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 Sep 2019 03:13:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9FE1C00306
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 Sep 2019 03:25:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0910E206DE
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 Sep 2019 03:13:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DC94B206A3
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 Sep 2019 03:25:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="cqX6p5ID"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391352AbfIFDNK (ORCPT
+        id S2391329AbfIFDZ5 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 5 Sep 2019 23:13:10 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:60750 "EHLO fornost.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2390487AbfIFDNK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 5 Sep 2019 23:13:10 -0400
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
-        by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
-        id 1i64gN-0006a4-5O; Fri, 06 Sep 2019 13:13:08 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 06 Sep 2019 13:13:06 +1000
-Date:   Fri, 6 Sep 2019 13:13:06 +1000
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        linux-crypto@vger.kernel.org
-Subject: [v2 PATCH] crypto: skcipher - Unmap pages after an external error
-Message-ID: <20190906031306.GA20435@gondor.apana.org.au>
-References: <20190821143253.30209-9-ard.biesheuvel@linaro.org>
- <20190830080347.GA6677@gondor.apana.org.au>
- <CAKv+Gu-4QBvPcE7YUqgWbT31gdLM8vcHTPbdOCN+UnUMXreuPg@mail.gmail.com>
- <20190903065438.GA9372@gondor.apana.org.au>
- <20190903135020.GB5144@zzz.localdomain>
- <20190903223641.GA7430@gondor.apana.org.au>
- <20190905052217.GA722@sol.localdomain>
- <20190905054032.GA3022@gondor.apana.org.au>
- <20190906015753.GA803@sol.localdomain>
- <20190906021550.GA17115@gondor.apana.org.au>
+        Thu, 5 Sep 2019 23:25:57 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:59308 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2391320AbfIFDZ5 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 5 Sep 2019 23:25:57 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x863PACX068165;
+        Fri, 6 Sep 2019 03:25:39 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=corp-2019-08-05;
+ bh=XW7Ojx+pUK0p5QiMONWXWBE8OOEMf80urxVFCJSXtuQ=;
+ b=cqX6p5IDFND77MqTG5i+hn/gGBFt0oKpLb1RFhNaJ+VDUNN4hzKhwnRu6b8D38wdAxZ3
+ DyHTCsSKp5IgJ+sNGO2IBnKx48ClR7jM08uM0XtC90mSWxGDDynb91WCufdwo2Ze2trU
+ MkamE10IQy2TdCofgYF8TJADAjZT6JfEX7y3kRWD8WiSPCGM087NoQHw9LuqC4EX9WfF
+ ALP10dU36EHgyI3cVQGP5M17JV1Rwmjo46t6OVhcrj+2birt7V5kstMYg3uw3VWMZUga
+ wBGmbfk1jYEdmB+42D51Ns7VgeGqaaQCACpEcXc2YfCCpJIbPUQUZ4UbwofgwkxadKJb Xw== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by aserp2120.oracle.com with ESMTP id 2uuf51g2c1-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 06 Sep 2019 03:25:39 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id x861ciol071292;
+        Fri, 6 Sep 2019 01:40:45 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3020.oracle.com with ESMTP id 2utvr4fve4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 06 Sep 2019 01:40:45 +0000
+Received: from abhmp0009.oracle.com (abhmp0009.oracle.com [141.146.116.15])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id x861ei7Q021721;
+        Fri, 6 Sep 2019 01:40:44 GMT
+Received: from localhost.localdomain (/98.229.125.203)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Thu, 05 Sep 2019 18:40:44 -0700
+From:   Daniel Jordan <daniel.m.jordan@oracle.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Steffen Klassert <steffen.klassert@secunet.com>
+Cc:     Lai Jiangshan <jiangshanlai@gmail.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Tejun Heo <tj@kernel.org>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Daniel Jordan <daniel.m.jordan@oracle.com>
+Subject: [PATCH v3 9/9] padata: remove cpu_index from the parallel_queue
+Date:   Thu,  5 Sep 2019 21:40:29 -0400
+Message-Id: <20190906014029.3345-10-daniel.m.jordan@oracle.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20190906014029.3345-1-daniel.m.jordan@oracle.com>
+References: <20190906014029.3345-1-daniel.m.jordan@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190906021550.GA17115@gondor.apana.org.au>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9371 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1906280000 definitions=main-1909060015
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9371 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1906280000
+ definitions=main-1909060037
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-skcipher_walk_done may be called with an error by internal or
-external callers.  For those internal callers we shouldn't unmap
-pages but for external callers we must unmap any pages that are
-in use.
+With the removal of the ENODATA case from padata_get_next, the cpu_index
+field is no longer useful, so it can go away.
 
-This patch distinguishes between the two cases by checking whether
-walk->nbytes is zero or not.  For internal callers, we now set
-walk->nbytes to zero prior to the call.  For external callers,
-walk->nbytes has always been non-zero (as zero is used to indicate
-the termination of a walk).
+Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
+Acked-by: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Lai Jiangshan <jiangshanlai@gmail.com>
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: Tejun Heo <tj@kernel.org>
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+---
+ include/linux/padata.h |  2 --
+ kernel/padata.c        | 13 ++-----------
+ 2 files changed, 2 insertions(+), 13 deletions(-)
 
-Reported-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Fixes: 5cde0af2a982 ("[CRYPTO] cipher: Added block cipher type")
-Cc: <stable@vger.kernel.org>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/crypto/skcipher.c b/crypto/skcipher.c
-index 5d836fc3df3e..22753c1c7202 100644
---- a/crypto/skcipher.c
-+++ b/crypto/skcipher.c
-@@ -90,7 +90,7 @@ static inline u8 *skcipher_get_spot(u8 *start, unsigned int len)
- 	return max(start, end_page);
- }
+diff --git a/include/linux/padata.h b/include/linux/padata.h
+index 43d3fd9d17fc..23717eeaad23 100644
+--- a/include/linux/padata.h
++++ b/include/linux/padata.h
+@@ -75,14 +75,12 @@ struct padata_serial_queue {
+  * @swork: work struct for serialization.
+  * @work: work struct for parallelization.
+  * @num_obj: Number of objects that are processed by this cpu.
+- * @cpu_index: Index of the cpu.
+  */
+ struct padata_parallel_queue {
+        struct padata_list    parallel;
+        struct padata_list    reorder;
+        struct work_struct    work;
+        atomic_t              num_obj;
+-       int                   cpu_index;
+ };
  
--static void skcipher_done_slow(struct skcipher_walk *walk, unsigned int bsize)
-+static int skcipher_done_slow(struct skcipher_walk *walk, unsigned int bsize)
+ /**
+diff --git a/kernel/padata.c b/kernel/padata.c
+index 832224dcf2e1..c3fec1413295 100644
+--- a/kernel/padata.c
++++ b/kernel/padata.c
+@@ -400,21 +400,12 @@ static void padata_init_squeues(struct parallel_data *pd)
+ /* Initialize all percpu queues used by parallel workers */
+ static void padata_init_pqueues(struct parallel_data *pd)
  {
- 	u8 *addr;
+-	int cpu_index, cpu;
++	int cpu;
+ 	struct padata_parallel_queue *pqueue;
  
-@@ -98,19 +98,21 @@ static void skcipher_done_slow(struct skcipher_walk *walk, unsigned int bsize)
- 	addr = skcipher_get_spot(addr, bsize);
- 	scatterwalk_copychunks(addr, &walk->out, bsize,
- 			       (walk->flags & SKCIPHER_WALK_PHYS) ? 2 : 1);
-+	return 0;
- }
+-	cpu_index = 0;
+-	for_each_possible_cpu(cpu) {
++	for_each_cpu(cpu, pd->cpumask.pcpu) {
+ 		pqueue = per_cpu_ptr(pd->pqueue, cpu);
  
- int skcipher_walk_done(struct skcipher_walk *walk, int err)
- {
--	unsigned int n; /* bytes processed */
--	bool more;
-+	unsigned int n = walk->nbytes;
-+	unsigned int nbytes = 0;
- 
--	if (unlikely(err < 0))
-+	if (!n)
- 		goto finish;
- 
--	n = walk->nbytes - err;
--	walk->total -= n;
--	more = (walk->total != 0);
-+	if (likely(err >= 0)) {
-+		n -= err;
-+		nbytes = walk->total - n;
-+	}
- 
- 	if (likely(!(walk->flags & (SKCIPHER_WALK_PHYS |
- 				    SKCIPHER_WALK_SLOW |
-@@ -126,7 +128,7 @@ int skcipher_walk_done(struct skcipher_walk *walk, int err)
- 		memcpy(walk->dst.virt.addr, walk->page, n);
- 		skcipher_unmap_dst(walk);
- 	} else if (unlikely(walk->flags & SKCIPHER_WALK_SLOW)) {
--		if (err) {
-+		if (err > 0) {
- 			/*
- 			 * Didn't process all bytes.  Either the algorithm is
- 			 * broken, or this was the last step and it turned out
-@@ -134,27 +136,29 @@ int skcipher_walk_done(struct skcipher_walk *walk, int err)
- 			 * the algorithm requires it.
- 			 */
- 			err = -EINVAL;
--			goto finish;
+-		if (!cpumask_test_cpu(cpu, pd->cpumask.pcpu)) {
+-			pqueue->cpu_index = -1;
+-			continue;
 -		}
--		skcipher_done_slow(walk, n);
--		goto already_advanced;
-+			nbytes = 0;
-+		} else
-+			n = skcipher_done_slow(walk, n);
- 	}
- 
-+	if (err > 0)
-+		err = 0;
-+
-+	walk->total = nbytes;
-+	walk->nbytes = 0;
-+
- 	scatterwalk_advance(&walk->in, n);
- 	scatterwalk_advance(&walk->out, n);
--already_advanced:
--	scatterwalk_done(&walk->in, 0, more);
--	scatterwalk_done(&walk->out, 1, more);
-+	scatterwalk_done(&walk->in, 0, nbytes);
-+	scatterwalk_done(&walk->out, 1, nbytes);
- 
--	if (more) {
-+	if (nbytes) {
- 		crypto_yield(walk->flags & SKCIPHER_WALK_SLEEP ?
- 			     CRYPTO_TFM_REQ_MAY_SLEEP : 0);
- 		return skcipher_walk_next(walk);
- 	}
--	err = 0;
--finish:
--	walk->nbytes = 0;
- 
-+finish:
- 	/* Short-circuit for the common/fast path. */
- 	if (!((unsigned long)walk->buffer | (unsigned long)walk->page))
- 		goto out;
+-
+-		pqueue->cpu_index = cpu_index;
+-		cpu_index++;
+-
+ 		__padata_list_init(&pqueue->reorder);
+ 		__padata_list_init(&pqueue->parallel);
+ 		INIT_WORK(&pqueue->work, padata_parallel_worker);
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.23.0
+
