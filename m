@@ -2,99 +2,99 @@ Return-Path: <SRS0=4a8U=XB=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EEACC43331
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 Sep 2019 15:23:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D451C43331
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 Sep 2019 15:34:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E3E8A20838
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 Sep 2019 15:23:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D09C920842
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 Sep 2019 15:34:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iUgKYHUN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388396AbfIFPXg (ORCPT
+        id S2394869AbfIFPek (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 6 Sep 2019 11:23:36 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:57609 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726019AbfIFPXf (ORCPT
+        Fri, 6 Sep 2019 11:34:40 -0400
+Received: from mail-ed1-f67.google.com ([209.85.208.67]:39246 "EHLO
+        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2394867AbfIFPek (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 6 Sep 2019 11:23:35 -0400
-Received: from threadripper.lan ([149.172.19.189]) by mrelayeu.kundenserver.de
- (mreue106 [212.227.15.145]) with ESMTPA (Nemesis) id
- 1MC3L9-1i0zgF3HKf-00CQ6I; Fri, 06 Sep 2019 17:23:14 +0200
-From:   Arnd Bergmann <arnd@arndb.de>
-To:     Zhou Wang <wangzhou1@hisilicon.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     Arnd Bergmann <arnd@arndb.de>,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        Hao Fang <fanghao11@huawei.com>,
-        Kenneth Lee <liguozhu@hisilicon.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 2/2] crypto: hisilicon - avoid unused function warning
-Date:   Fri,  6 Sep 2019 17:22:30 +0200
-Message-Id: <20190906152250.1450649-2-arnd@arndb.de>
-X-Mailer: git-send-email 2.20.0
-In-Reply-To: <20190906152250.1450649-1-arnd@arndb.de>
-References: <20190906152250.1450649-1-arnd@arndb.de>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:ltG7Dz//KZqox/ulRWhNwr6SfqbMWug5c/0Q+nuvztJL6BD1vJA
- EmHRbJP1qdS6LHV68X6MZAAlJG0X0zCKPWwfoQuPwwOy5llTfWPGPYi7Zj45BMLWklrozkT
- xKHwcH9T6mMO5c4xJ4zh27kGw9XbnlTJfrQ+d9MTzb37QOjUaolFjo9vQHybDkA9bQR7viF
- ipY6Iu17Pt9qIK8PGMl+Q==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:1uFE00/QaKM=:RpHBHFJ7z5dUtAY8BG6QR+
- PXPkJAqDK11VOHtVg5HxdhFLKQ+dv/ca8OlweOakzJCAkjIs3YgBwZ7CfxItKbFwc1fZX0mEc
- OcDTEGGCOhC36+aAYf71NFoxz3SpDzq3nQhpeF+mjfdvcAvoxbDsDtpBl2XlHPYh6xoxuRILZ
- G5dVVc1XZC2R2AVqeiHpdOEcoiRLQdFM9s8+MOp843H5/kt0F1znnd1UVz0EBGu5g+qVguH4I
- 7Wl2S+TCgbGTrCKAmRd6ZBFRsgPeP1kYWxvtZRcy5TcD4CDaikGoShMSiFA2sNDW2S3U2yaLA
- CJd4Ref3oLxIQvj0l4ozsBEshGINdKP7RjxX8qhsBsi6MF1qS/j0ITT2t1u2ag9uKj4hoDXvC
- VRcNAaGawP1JaexgXFrCkBOLoO+/2qtx47EQBQGkblceVV0AxOrd2xggwfNlCdsHmdUOYPp3C
- eofed5/n/MO5X5bZd/LqgZ7LeykztBwws0w6hrCb4dFA4fi5CITEvnIXdAMjtVcafJpWjYBgk
- wbPZciDvGyvwz5zaaJ9BxVVjZUiv6P2IdEojIhhgKwP1EQFmpeu0jrqICOYr2qOGWiv0JZVdG
- L/n8IW91EQA0dbjoE5Rq/bZbbFSCD1gPwHiQYQqftj7YLquEvs3eQrs6CPtbdwfqeaYRAY0ty
- TmH/FXTsdxtA4FDaFdGAu5FNiYLiDUAZJw9Ja/MBhc8op4w685vGfeNZTyv7OlMpnGZH3wvJp
- A0cVeScbtsRqEh4ZfhgrrGxOLzdsdCCbgPrXQAL6MJRKZR99wONcWBxJHDkCojWZDJXxHXFzY
- C0fpJCXDkBSmo9cVpJLE9/hEBmaFrKdTfVOanF7laQKELtPrsM=
+        Fri, 6 Sep 2019 11:34:40 -0400
+Received: by mail-ed1-f67.google.com with SMTP id u6so6675609edq.6
+        for <linux-crypto@vger.kernel.org>; Fri, 06 Sep 2019 08:34:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=xmXgq4sTfpXoiBb6saXtkSOp4XFa2LPidX0QNz07xD8=;
+        b=iUgKYHUN7mISPWWHLFNkyLSFVqr4MGUofIPb0eHptlnWpBneUD4s5t9Ri9mWKyhqFC
+         +tsW7DXR5HCx4mtcC8fhEZgkhJPTVub4KiPII8IDG5MXivgS7jUz34qXcDkdmt8pUarO
+         QBmFEkT+g4CpUJ8KGVRMs2yJLvr0Klo7JUBXdvIIfBZyUC5Nauv9mT9Di5G1c6vHkaVP
+         kVnTk8ghTyemJEYcOcA6ZF3Za7M3CVAUncBKRu1EfCkeoLbUHW7QXWIz/4AmNtFFvf0t
+         //KH73CwMLVqlY5aR2vLVWkXCdJ1D0QwRAi31zN52EA7xH3pKXkYz6drMG4LkAl8Q1yH
+         R/3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=xmXgq4sTfpXoiBb6saXtkSOp4XFa2LPidX0QNz07xD8=;
+        b=GwvJA6Ni/np4qB0WLSXyJ1kljXentY/b/sNWm/l8K7cV6szZbzb5qIvIicZ0cYdnLf
+         392CAgH7PbQcqfi82eJSwtnQxB+lc2YwpwmRyWBCk532eMLcUWOx8hhOLicnRC7vquM/
+         S+M8RtxOHmZTaFKC3Ga/l/XH5P1EjEv/gkVuOHQqIx82lQUAjOkwxgwHOjVslYosVQzA
+         9vcfU4kjBK9Mqy6JoEGPS3lBeyl7jwfRP6/AFrLWRZoTHC5ZR2kL4dF76kp7S6Ug5oT7
+         BsnT9zBn3NF1I1RTc2dIgsvnJuBDy4rcFtXLFCFlyUuGA3XsuQAsIfNMYMoSq+4EjIlN
+         p9mA==
+X-Gm-Message-State: APjAAAUnVNeOJuMri93MuNHZhszWu+XMR6+ojQTmkzkNdEMesJmm8HBJ
+        Cj52SZOwTMMmFAyocGM5C1lKb5fF
+X-Google-Smtp-Source: APXvYqzra5/wH5xVifr7zbtxenuYis8H66z3x2OPddQxspA5grDsh4ZykulCzWHmLpt9x57oChKe6A==
+X-Received: by 2002:a50:9e65:: with SMTP id z92mr10227990ede.49.1567784078751;
+        Fri, 06 Sep 2019 08:34:38 -0700 (PDT)
+Received: from localhost.localdomain.com ([188.204.2.113])
+        by smtp.gmail.com with ESMTPSA id c22sm995218eds.30.2019.09.06.08.34.37
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 06 Sep 2019 08:34:38 -0700 (PDT)
+From:   Pascal van Leeuwen <pascalvanl@gmail.com>
+X-Google-Original-From: Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
+To:     linux-crypto@vger.kernel.org
+Cc:     antoine.tenart@bootlin.com, herbert@gondor.apana.org.au,
+        davem@davemloft.net,
+        Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
+Subject: [PATCH 0/6] crypto: inside-secure - Add supp. for non-Marvell HW
+Date:   Fri,  6 Sep 2019 16:31:47 +0200
+Message-Id: <1567780313-1579-1-git-send-email-pvanleeuwen@verimatrix.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The only caller of hisi_zip_vf_q_assign() is hidden in an #ifdef,
-so the function causes a warning when CONFIG_PCI_IOV is disabled:
+This patchset adds support for non-Marvell hardware, probing the HW
+configuration directly from the HW itself instead of making assumptions
+based on specific Marvell instances and applying appropriate settings.
+This should get most EIP97/EIP197 instances out there up and running,
+albeit not always with optimal settings yet.
 
-drivers/crypto/hisilicon/zip/zip_main.c:740:12: error: unused function 'hisi_zip_vf_q_assign' [-Werror,-Wunused-function]
+Still to be done:
+- support for EIP197 HW with 256 bit internal bus width
+- optimize settings for newer versions of the HW
 
-Move it into the same #ifdef.
+This was tested with both the Macchiatobin board, "similar to Marvell"
+HW on the Xilinx VCU118 devboard and a eip197c-iesb HW3.1 on the Xilinx 
+VCU118 devboard.
 
-Fixes: 79e09f30eeba ("crypto: hisilicon - add SRIOV support for ZIP")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- drivers/crypto/hisilicon/zip/zip_main.c | 2 ++
- 1 file changed, 2 insertions(+)
+Pascal van Leeuwen (6):
+  crypto: inside-secure - Add EIP97/EIP197 and endianness detection
+  crypto: inside-secure: Corrected configuration of EIP96_TOKEN_CTRL
+  crypto: inside-secure - Enable extended algorithms on newer HW
+  crypto: inside-secure - Base CD fetchcount on actual CD FIFO size
+  crypto: inside-secure - Base RD fetchcount on actual RD FIFO size
+  crypto: inside-secure - Probe transform record cache RAM sizes
 
-diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
-index 6e0ca75585d4..bd0283c2fa87 100644
---- a/drivers/crypto/hisilicon/zip/zip_main.c
-+++ b/drivers/crypto/hisilicon/zip/zip_main.c
-@@ -736,6 +736,7 @@ static int hisi_zip_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	return ret;
- }
- 
-+#ifdef CONFIG_PCI_IOV
- /* Currently we only support equal assignment */
- static int hisi_zip_vf_q_assign(struct hisi_zip *hisi_zip, int num_vfs)
- {
-@@ -764,6 +765,7 @@ static int hisi_zip_vf_q_assign(struct hisi_zip *hisi_zip, int num_vfs)
- 
- 	return 0;
- }
-+#endif
- 
- static int hisi_zip_clear_vft_config(struct hisi_zip *hisi_zip)
- {
+ drivers/crypto/inside-secure/safexcel.c | 459 ++++++++++++++++++++++++--------
+ drivers/crypto/inside-secure/safexcel.h |  78 ++++--
+ 2 files changed, 418 insertions(+), 119 deletions(-)
+
 -- 
-2.20.0
+1.8.3.1
 
