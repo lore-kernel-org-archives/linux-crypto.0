@@ -1,137 +1,195 @@
-Return-Path: <SRS0=4a8U=XB=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=JhmS=XC=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51B96C43331
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 Sep 2019 23:29:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCA63C43331
+	for <linux-crypto@archiver.kernel.org>; Sat,  7 Sep 2019 00:53:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1B7F4208C3
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 Sep 2019 23:29:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A6D5F208C3
+	for <linux-crypto@archiver.kernel.org>; Sat,  7 Sep 2019 00:53:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="CfxhObTV"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rTExvh5d"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392707AbfIFX3X (ORCPT
+        id S2393634AbfIGAxP (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 6 Sep 2019 19:29:23 -0400
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:34890 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2391276AbfIFX3X (ORCPT
+        Fri, 6 Sep 2019 20:53:15 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:50351 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2391367AbfIGAxP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 6 Sep 2019 19:29:23 -0400
-Received: by mail-ed1-f66.google.com with SMTP id t50so8021584edd.2
-        for <linux-crypto@vger.kernel.org>; Fri, 06 Sep 2019 16:29:22 -0700 (PDT)
+        Fri, 6 Sep 2019 20:53:15 -0400
+Received: by mail-wm1-f67.google.com with SMTP id c10so8173697wmc.0
+        for <linux-crypto@vger.kernel.org>; Fri, 06 Sep 2019 17:53:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
+        d=linaro.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=Eqinxltb4P+tBqyuO4WEtRUcfdT4qbszA3gfVj1CVng=;
-        b=CfxhObTVAmcNKpN/uttdeqMFFuot/dgQ8oBhunu1p3A2/KXMdnJc7eTmTJi6e2ocMn
-         NDFZD/Qh8ub6N+V6n8nGKJNHUKm6leUg+lflNX9keuez69bvdXFvHkCOlVvCSi5FCwQp
-         GqpsxbxIXF0lypQ9v5DbU9u4VRzHE/ky6Ttco=
+        bh=fPsBlQeiZODgFZA78wRPxMMkZep/F4eQmpcWJaVo2Xg=;
+        b=rTExvh5dzWJ90SWvbllCRvapshUgOV4YE1K3mlAwMeM6EMmIayEFe11ZECqQRwswq5
+         u0B0NEJl4pVyW280ip90HhBTl5LfT2lKGrJuXp/bjumCSd9dYU7euPXDaFhMjPo++9cu
+         FogP31GTyjB5YrMTfDgGTun0nZpwGW2nrLhf4yiKnUeYr/fdyxzhCCiEZn0+V2Ze2zrV
+         4eaCzshzaJVHBSMOQMPGUe7PZ/KxSFwtEsN6zXZxkwyv2UTQFfhdETT4dtzPKEtohn0B
+         PvKPUG3FbceHzjObJPh70g9PBbyN//GtbyYQJxDNone5DmjsCPm3oWf+zvE0hsg4Ajhs
+         O+eg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=Eqinxltb4P+tBqyuO4WEtRUcfdT4qbszA3gfVj1CVng=;
-        b=SsJ3dApIRRFVLpsunw0/6zcHoiSd6SEP9pIaAmgWZQLdacKzNM2KypUuRXDGoYx52x
-         63IZZJRnKel1zVs/RC/Ubty7NEVGLR7oyemoMZSefbqWMXJ+ZQuLf3eiZ8BuvVpvpEa7
-         R/fjITaSp2UR94SdNI2SR4w06gHGxtLl+vFayLQaxqmeGgzcEx2eVgnfn9NB4FZNd8hw
-         q8/LbvxL+/VM/2cyLxyWMjtopr5EznWNxFdkR1EpJnWTM88P5qbA6YqGJoeTQwzaAezo
-         ZHLKfs0dCvM3o3X6itj3Jk8duYyeN+Oje/GErDUozJdgrW/K077+Fb9rGTOLqNSMpIjs
-         ZYyA==
-X-Gm-Message-State: APjAAAVJDpAG/W19xIQ6aA4oj7+yHMQ17e4sGnN/NFQ96JR0CwoDKa+b
-        PO+lTvkDOnydlZRyZ01XJxt+jtuL9Cs=
-X-Google-Smtp-Source: APXvYqxTbQ+/RtCi92AZVDqPKceL4jQt2sqcxb3W8WmlfYyV/6bioz4ReKGoGehp2QVKQXllisoTGA==
-X-Received: by 2002:aa7:d456:: with SMTP id q22mr4657857edr.262.1567812561825;
-        Fri, 06 Sep 2019 16:29:21 -0700 (PDT)
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com. [209.85.221.49])
-        by smtp.gmail.com with ESMTPSA id f36sm1111125ede.28.2019.09.06.16.29.21
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 06 Sep 2019 16:29:21 -0700 (PDT)
-Received: by mail-wr1-f49.google.com with SMTP id w13so8143921wru.7
-        for <linux-crypto@vger.kernel.org>; Fri, 06 Sep 2019 16:29:21 -0700 (PDT)
-X-Received: by 2002:adf:de08:: with SMTP id b8mr8516944wrm.200.1567812179254;
- Fri, 06 Sep 2019 16:22:59 -0700 (PDT)
+        bh=fPsBlQeiZODgFZA78wRPxMMkZep/F4eQmpcWJaVo2Xg=;
+        b=Cx4yPDJeRDTiK//Az9HtAYMfbsn4pg9mlgl6Z9jxp+W5GVqI11xPIUvnaMatVcfnFY
+         N5AT8UJ4twMMGdl+CDCWLnOSyA2JdIszYayNeMrLE5lHk8vqP6yG9shqQR4oMIE8l9Zy
+         eVpIr+tgfbrOvOXEVAkn4X2Y/JG2F2Qd5jAfXMGj2rFr1cE29QMKxhcC6/kdFyKgmdXy
+         MQUnBHPChgqE1kxWRSuimWjohPKx+XwIHm3gr6YQiTvL8Xg8gqfEqy5ZbZ1qcVeoB4vl
+         OjTMcB/HdtYDAIJ+f2gZNlCr85+fv1ZY87yAZl//ThtgZC1e54b3ofz8attL5Ryc1VGe
+         L5vw==
+X-Gm-Message-State: APjAAAWTEKfRpErPqgSdDhBR/FPMDPbNjl2XQEhTPD5OXNXInbkybiyN
+        sH/ZgqRlbCuOjVAaxCjjoQWEczOE35W9C2BdtqUq+hfLWu9yuQ==
+X-Google-Smtp-Source: APXvYqzZlQZZ6cBosOj/j6vKHq+1ZrGz6T/ErJuXMCnB0PnioAemAXtnfBs9IRJOFCNxOwQCKJOjMCX3Sptwwr7Ycx8=
+X-Received: by 2002:a7b:cf37:: with SMTP id m23mr9595590wmg.53.1567817593179;
+ Fri, 06 Sep 2019 17:53:13 -0700 (PDT)
 MIME-Version: 1.0
-References: <20190730191303.206365-1-thgarnie@chromium.org>
- <20190806154347.GD25897@zn.tnic> <20190806155034.GP2349@hirez.programming.kicks-ass.net>
- <CAJcbSZETvvQYmh6U_Oauptdsrp-emmSG_QsAZzKLv+0-b2Yxig@mail.gmail.com>
-In-Reply-To: <CAJcbSZETvvQYmh6U_Oauptdsrp-emmSG_QsAZzKLv+0-b2Yxig@mail.gmail.com>
-From:   Thomas Garnier <thgarnie@chromium.org>
-Date:   Fri, 6 Sep 2019 16:22:47 -0700
-X-Gmail-Original-Message-ID: <CAJcbSZEc07UJtWyM5i-DGRpNTtoxoY7cDpdyDh3N-Bb+G3s0gA@mail.gmail.com>
-Message-ID: <CAJcbSZEc07UJtWyM5i-DGRpNTtoxoY7cDpdyDh3N-Bb+G3s0gA@mail.gmail.com>
-Subject: Re: [PATCH v9 00/11] x86: PIE support to extend KASLR randomization
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Borislav Petkov <bp@alien8.de>,
-        Kernel Hardening <kernel-hardening@lists.openwall.com>,
-        Kristen Carlson Accardi <kristen@linux.intel.com>,
-        Kees Cook <keescook@chromium.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Juergen Gross <jgross@suse.com>,
-        Thomas Hellstrom <thellstrom@vmware.com>,
-        "VMware, Inc." <pv-drivers@vmware.com>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
-        Nadav Amit <namit@vmware.com>, Jann Horn <jannh@google.com>,
-        Feng Tang <feng.tang@intel.com>,
-        Maran Wilson <maran.wilson@oracle.com>,
-        Enrico Weigelt <info@metux.net>,
-        Allison Randal <allison@lohutok.net>,
-        Alexios Zavras <alexios.zavras@intel.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        virtualization@lists.linux-foundation.org,
-        Linux PM list <linux-pm@vger.kernel.org>
+References: <20190821143253.30209-9-ard.biesheuvel@linaro.org>
+ <20190830080347.GA6677@gondor.apana.org.au> <CAKv+Gu-4QBvPcE7YUqgWbT31gdLM8vcHTPbdOCN+UnUMXreuPg@mail.gmail.com>
+ <20190903065438.GA9372@gondor.apana.org.au> <20190903135020.GB5144@zzz.localdomain>
+ <20190903223641.GA7430@gondor.apana.org.au> <20190905052217.GA722@sol.localdomain>
+ <20190905054032.GA3022@gondor.apana.org.au> <20190906015753.GA803@sol.localdomain>
+ <20190906021550.GA17115@gondor.apana.org.au> <20190906031306.GA20435@gondor.apana.org.au>
+In-Reply-To: <20190906031306.GA20435@gondor.apana.org.au>
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date:   Fri, 6 Sep 2019 17:52:56 -0700
+Message-ID: <CAKv+Gu8n5AtzzRG-avEsAjcrNSGKKcs73VRneDTJeTsNc+fUrA@mail.gmail.com>
+Subject: Re: [v2 PATCH] crypto: skcipher - Unmap pages after an external error
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Aug 29, 2019 at 12:55 PM Thomas Garnier <thgarnie@chromium.org> wrote:
+On Thu, 5 Sep 2019 at 20:13, Herbert Xu <herbert@gondor.apana.org.au> wrote:
 >
-> On Tue, Aug 6, 2019 at 8:51 AM Peter Zijlstra <peterz@infradead.org> wrote:
-> >
-> > On Tue, Aug 06, 2019 at 05:43:47PM +0200, Borislav Petkov wrote:
-> > > On Tue, Jul 30, 2019 at 12:12:44PM -0700, Thomas Garnier wrote:
-> > > > These patches make some of the changes necessary to build the kernel as
-> > > > Position Independent Executable (PIE) on x86_64. Another patchset will
-> > > > add the PIE option and larger architecture changes.
-> > >
-> > > Yeah, about this: do we have a longer writeup about the actual benefits
-> > > of all this and why we should take this all? After all, after looking
-> > > at the first couple of asm patches, it is posing restrictions to how
-> > > we deal with virtual addresses in asm (only RIP-relative addressing in
-> > > 64-bit mode, MOVs with 64-bit immediates, etc, for example) and I'm
-> > > willing to bet money that some future unrelated change will break PIE
-> > > sooner or later.
+> skcipher_walk_done may be called with an error by internal or
+> external callers.  For those internal callers we shouldn't unmap
+> pages but for external callers we must unmap any pages that are
+> in use.
 >
-> The goal is being able to extend the range of addresses where the
-> kernel can be placed with KASLR. I will look at clarifying that in the
-> future.
+> This patch distinguishes between the two cases by checking whether
+> walk->nbytes is zero or not.  For internal callers, we now set
+> walk->nbytes to zero prior to the call.  For external callers,
+> walk->nbytes has always been non-zero (as zero is used to indicate
+> the termination of a walk).
 >
-> >
-> > Possibly objtool can help here; it should be possible to teach it about
-> > these rules, and then it will yell when violated. That should avoid
-> > regressions.
-> >
+> Reported-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> Fixes: 5cde0af2a982 ("[CRYPTO] cipher: Added block cipher type")
+> Cc: <stable@vger.kernel.org>
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 >
-> I will look into that as well.
+> diff --git a/crypto/skcipher.c b/crypto/skcipher.c
+> index 5d836fc3df3e..22753c1c7202 100644
+> --- a/crypto/skcipher.c
+> +++ b/crypto/skcipher.c
+> @@ -90,7 +90,7 @@ static inline u8 *skcipher_get_spot(u8 *start, unsigned int len)
+>         return max(start, end_page);
+>  }
+>
+> -static void skcipher_done_slow(struct skcipher_walk *walk, unsigned int bsize)
+> +static int skcipher_done_slow(struct skcipher_walk *walk, unsigned int bsize)
+>  {
+>         u8 *addr;
+>
+> @@ -98,19 +98,21 @@ static void skcipher_done_slow(struct skcipher_walk *walk, unsigned int bsize)
+>         addr = skcipher_get_spot(addr, bsize);
+>         scatterwalk_copychunks(addr, &walk->out, bsize,
+>                                (walk->flags & SKCIPHER_WALK_PHYS) ? 2 : 1);
+> +       return 0;
+>  }
+>
+>  int skcipher_walk_done(struct skcipher_walk *walk, int err)
+>  {
+> -       unsigned int n; /* bytes processed */
+> -       bool more;
+> +       unsigned int n = walk->nbytes;
+> +       unsigned int nbytes = 0;
+>
+> -       if (unlikely(err < 0))
+> +       if (!n)
+>                 goto finish;
+>
+> -       n = walk->nbytes - err;
+> -       walk->total -= n;
+> -       more = (walk->total != 0);
+> +       if (likely(err >= 0)) {
+> +               n -= err;
+> +               nbytes = walk->total - n;
+> +       }
+>
+>         if (likely(!(walk->flags & (SKCIPHER_WALK_PHYS |
+>                                     SKCIPHER_WALK_SLOW |
 
-Following a discussion with Kees. I will explore objtool in the
-follow-up patchset as we still have more elaborate pie changes in the
-second set. I like the idea overall and I think it would be great if
-it works.
+With this change, we still copy out the output in the
+SKCIPHER_WALK_COPY or SKCIPHER_WALK_SLOW cases. I'd expect the failure
+case to only do the kunmap()s, but otherwise not make any changes that
+are visible to the caller.
+
+
+> @@ -126,7 +128,7 @@ int skcipher_walk_done(struct skcipher_walk *walk, int err)
+>                 memcpy(walk->dst.virt.addr, walk->page, n);
+>                 skcipher_unmap_dst(walk);
+>         } else if (unlikely(walk->flags & SKCIPHER_WALK_SLOW)) {
+> -               if (err) {
+> +               if (err > 0) {
+>                         /*
+>                          * Didn't process all bytes.  Either the algorithm is
+>                          * broken, or this was the last step and it turned out
+> @@ -134,27 +136,29 @@ int skcipher_walk_done(struct skcipher_walk *walk, int err)
+>                          * the algorithm requires it.
+>                          */
+>                         err = -EINVAL;
+> -                       goto finish;
+> -               }
+> -               skcipher_done_slow(walk, n);
+> -               goto already_advanced;
+> +                       nbytes = 0;
+> +               } else
+> +                       n = skcipher_done_slow(walk, n);
+>         }
+>
+> +       if (err > 0)
+> +               err = 0;
+> +
+> +       walk->total = nbytes;
+> +       walk->nbytes = 0;
+> +
+>         scatterwalk_advance(&walk->in, n);
+>         scatterwalk_advance(&walk->out, n);
+> -already_advanced:
+> -       scatterwalk_done(&walk->in, 0, more);
+> -       scatterwalk_done(&walk->out, 1, more);
+> +       scatterwalk_done(&walk->in, 0, nbytes);
+> +       scatterwalk_done(&walk->out, 1, nbytes);
+>
+> -       if (more) {
+> +       if (nbytes) {
+>                 crypto_yield(walk->flags & SKCIPHER_WALK_SLEEP ?
+>                              CRYPTO_TFM_REQ_MAY_SLEEP : 0);
+>                 return skcipher_walk_next(walk);
+>         }
+> -       err = 0;
+> -finish:
+> -       walk->nbytes = 0;
+>
+> +finish:
+>         /* Short-circuit for the common/fast path. */
+>         if (!((unsigned long)walk->buffer | (unsigned long)walk->page))
+>                 goto out;
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
