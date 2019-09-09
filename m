@@ -2,108 +2,90 @@ Return-Path: <SRS0=QtXc=XE=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E372C49ED5
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 Sep 2019 05:53:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38C9EC433EF
+	for <linux-crypto@archiver.kernel.org>; Mon,  9 Sep 2019 07:22:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 16F5021924
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 Sep 2019 05:53:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="Um5pUjFo"
+	by mail.kernel.org (Postfix) with ESMTP id 056BF21A4C
+	for <linux-crypto@archiver.kernel.org>; Mon,  9 Sep 2019 07:22:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727215AbfIIFx4 (ORCPT
+        id S2387610AbfIIHWJ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 9 Sep 2019 01:53:56 -0400
-Received: from gateway33.websitewelcome.com ([192.185.145.239]:35226 "EHLO
-        gateway33.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727181AbfIIFxz (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 9 Sep 2019 01:53:55 -0400
-X-Greylist: delayed 1371 seconds by postgrey-1.27 at vger.kernel.org; Mon, 09 Sep 2019 01:53:55 EDT
-Received: from cm17.websitewelcome.com (cm17.websitewelcome.com [100.42.49.20])
-        by gateway33.websitewelcome.com (Postfix) with ESMTP id 0DD0A49ABB
-        for <linux-crypto@vger.kernel.org>; Mon,  9 Sep 2019 00:29:57 -0500 (CDT)
-Received: from gator4166.hostgator.com ([108.167.133.22])
-        by cmsmtp with SMTP
-        id 7CFRiGu7f90on7CFRi0c9v; Mon, 09 Sep 2019 00:29:57 -0500
-X-Authority-Reason: nr=8
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=embeddedor.com; s=default; h=Content-Type:MIME-Version:Message-ID:Subject:
-        Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-        :Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
-        List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=ZeDC3momsOT8YDmWDluDBvJqw1Yr3vZVteUjPazb11I=; b=Um5pUjFoBY6v0BZ8qlZ+WKF0wl
-        k8adoXfVN1zPhyJVO9MqjIguf2vcuZ4qPTS5wVQN/rAYPNPK78j/tJfddGNWlpy7xp8MExbuDJJO1
-        a5HiMfKRoJzyFKVYUtI5qX4WV3zwWgjH9lR2q/oBmcJcj+pXQtuSEfcuYogyVR2ZZQJlUmWXNAAhi
-        hQe15/xbDYVIbCqo18WTqvRmD1Fggv1ARP2eCPVKpeeNzDw0vXPeoC3PtjxeTjZtbOHNirxxMVPJO
-        K67OdD73jDqR3IqhPp7GM9RP6xRxzAeAnoRgEgPIhGty/6Zm2+ShrtzyGg2BWsinqe5sMx503/Ghi
-        GaBOWeDQ==;
-Received: from [148.69.85.38] (port=16527 helo=embeddedor)
-        by gator4166.hostgator.com with esmtpa (Exim 4.92)
-        (envelope-from <gustavo@embeddedor.com>)
-        id 1i7CFP-001YEo-QC; Mon, 09 Sep 2019 00:29:55 -0500
-Date:   Mon, 9 Sep 2019 00:29:52 -0500
-From:   "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Subject: [PATCH] crypto: talitos - fix missing break in switch statement
-Message-ID: <20190909052952.GA32131@embeddedor>
+        Mon, 9 Sep 2019 03:22:09 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:32830 "EHLO fornost.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2387412AbfIIHWJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 9 Sep 2019 03:22:09 -0400
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
+        by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
+        id 1i7Dzq-0007AB-Pk; Mon, 09 Sep 2019 17:21:59 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Mon, 09 Sep 2019 17:21:55 +1000
+Date:   Mon, 9 Sep 2019 17:21:55 +1000
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Horia Geanta <horia.geanta@nxp.com>
+Cc:     Andrey Smirnov <andrew.smirnov@gmail.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Chris Healy <cphealy@gmail.com>,
+        Lucas Stach <l.stach@pengutronix.de>,
+        Iuliana Prodan <iuliana.prodan@nxp.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 01/12] crypto: caam - make sure clocks are enabled first
+Message-ID: <20190909072155.GA18825@gondor.apana.org.au>
+References: <20190904023515.7107-1-andrew.smirnov@gmail.com>
+ <20190904023515.7107-2-andrew.smirnov@gmail.com>
+ <VI1PR0402MB3485E5EBBC1DCEF17103964898BA0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - embeddedor.com
-X-BWhitelist: no
-X-Source-IP: 148.69.85.38
-X-Source-L: No
-X-Exim-ID: 1i7CFP-001YEo-QC
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: (embeddedor) [148.69.85.38]:16527
-X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 3
-X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
-X-Local-Domain: yes
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <VI1PR0402MB3485E5EBBC1DCEF17103964898BA0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add missing break statement in order to prevent the code from falling
-through to case CRYPTO_ALG_TYPE_AHASH.
+On Fri, Sep 06, 2019 at 11:18:19AM +0000, Horia Geanta wrote:
+> On 9/4/2019 5:35 AM, Andrey Smirnov wrote:
+> > In order to access IP block's registers we need to enable appropriate
+> > clocks first, otherwise we are risking hanging the CPU.
+> > 
+> > The problem becomes very apparent when trying to use CAAM driver built
+> > as a kernel module. In that case caam_probe() gets called after
+> > clk_disable_unused() which means all of the necessary clocks are
+> > guaranteed to be disabled.
+> > 
+> > Coincidentally, this change also fixes iomap leak introduced by early
+> > return (instead of "goto iounmap_ctrl") in commit
+> > 41fc54afae70 ("crypto: caam - simplfy clock initialization")
+> > 
+> > Tested on ZII i.MX6Q+ RDU2
+> > 
+> > Fixes: 176435ad2ac7 ("crypto: caam - defer probing until QMan is available")
+> > Fixes: 41fc54afae70 ("crypto: caam - simplfy clock initialization")
+> > Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+> > Cc: Chris Healy <cphealy@gmail.com>
+> > Cc: Lucas Stach <l.stach@pengutronix.de>
+> > Cc: Horia Geantă <horia.geanta@nxp.com>
+> > Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> > Cc: Iuliana Prodan <iuliana.prodan@nxp.com>
+> > Cc: linux-crypto@vger.kernel.org
+> > Cc: linux-kernel@vger.kernel.org
+> Tested-by: Horia Geantă <horia.geanta@nxp.com>
+> 
+> Considering this is a boot hang, in case this does not make into v5.4
+> I would appreciate appending:
+> Cc: <stable@vger.kernel.org>
 
-Fixes: aeb4c132f33d ("crypto: talitos - Convert to new AEAD interface")
-Cc: stable@vger.kernel.org
-Reported-by: kbuild test robot <lkp@intel.com>
-Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
----
- drivers/crypto/talitos.c | 1 +
- 1 file changed, 1 insertion(+)
+This patch does not apply against cryptodev or crypto.
 
-diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
-index c9d686a0e805..4818ae427098 100644
---- a/drivers/crypto/talitos.c
-+++ b/drivers/crypto/talitos.c
-@@ -3140,6 +3140,7 @@ static int talitos_remove(struct platform_device *ofdev)
- 			break;
- 		case CRYPTO_ALG_TYPE_AEAD:
- 			crypto_unregister_aead(&t_alg->algt.alg.aead);
-+			break;
- 		case CRYPTO_ALG_TYPE_AHASH:
- 			crypto_unregister_ahash(&t_alg->algt.alg.hash);
- 			break;
+Please rebase.
+
+Thanks,
 -- 
-2.23.0
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
