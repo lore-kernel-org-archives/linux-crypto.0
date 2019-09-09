@@ -2,80 +2,65 @@ Return-Path: <SRS0=QtXc=XE=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EFE8C4740A
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 Sep 2019 12:40:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3AA8C4740C
+	for <linux-crypto@archiver.kernel.org>; Mon,  9 Sep 2019 12:52:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 01D0821924
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 Sep 2019 12:40:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9582221920
+	for <linux-crypto@archiver.kernel.org>; Mon,  9 Sep 2019 12:52:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727828AbfIIMk1 (ORCPT
+        id S1726853AbfIIMw0 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 9 Sep 2019 08:40:27 -0400
-Received: from 212.199.177.27.static.012.net.il ([212.199.177.27]:42626 "EHLO
-        herzl.nuvoton.co.il" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727810AbfIIMk1 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 9 Sep 2019 08:40:27 -0400
-Received: from taln60.nuvoton.co.il (ntil-fw [212.199.177.25])
-        by herzl.nuvoton.co.il (8.13.8/8.13.8) with ESMTP id x89Ccfih029012;
-        Mon, 9 Sep 2019 15:38:41 +0300
-Received: by taln60.nuvoton.co.il (Postfix, from userid 10070)
-        id 23293628F1; Mon,  9 Sep 2019 15:38:41 +0300 (IDT)
-From:   Tomer Maimon <tmaimon77@gmail.com>
-To:     mpm@selenic.com, herbert@gondor.apana.org.au, arnd@arndb.de,
-        gregkh@linuxfoundation.org, robh+dt@kernel.org,
-        mark.rutland@arm.com, avifishman70@gmail.com,
-        tali.perry1@gmail.com, venture@google.com, yuenn@google.com,
-        benjaminfair@google.com, sumit.garg@linaro.org,
-        jens.wiklander@linaro.org, vkoul@kernel.org, tglx@linutronix.de,
-        joel@jms.id.au
-Cc:     devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, openbmc@lists.ozlabs.org,
-        Tomer Maimon <tmaimon77@gmail.com>
-Subject: [PATCH v2 0/2] hwrng: npcm: add NPCM RNG driver support
-Date:   Mon,  9 Sep 2019 15:38:38 +0300
-Message-Id: <20190909123840.154745-1-tmaimon77@gmail.com>
-X-Mailer: git-send-email 2.18.0
+        Mon, 9 Sep 2019 08:52:26 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:33026 "EHLO fornost.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726640AbfIIMw0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 9 Sep 2019 08:52:26 -0400
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
+        by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
+        id 1i7J9U-0005Fv-2L; Mon, 09 Sep 2019 22:52:17 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Mon, 09 Sep 2019 22:52:13 +1000
+Date:   Mon, 9 Sep 2019 22:52:13 +1000
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Horia Geanta <horia.geanta@nxp.com>
+Cc:     Andrey Smirnov <andrew.smirnov@gmail.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Chris Healy <cphealy@gmail.com>,
+        Lucas Stach <l.stach@pengutronix.de>,
+        Iuliana Prodan <iuliana.prodan@nxp.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 00/12] CAAM bugfixes, small improvements
+Message-ID: <20190909125213.GA8982@gondor.apana.org.au>
+References: <20190904023515.7107-1-andrew.smirnov@gmail.com>
+ <20190909075308.GC21364@gondor.apana.org.au>
+ <VI1PR0402MB3485DC32B1789CB76C16F23798B70@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <VI1PR0402MB3485DC32B1789CB76C16F23798B70@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch set adds Randon Number Generator (RNG) support 
-for the Nuvoton NPCM Baseboard Management Controller (BMC).
+On Mon, Sep 09, 2019 at 12:07:17PM +0000, Horia Geanta wrote:
+>
+> Why all?
+> I've ack-ed only 1 and 4.
+> 
+> Besides this, patches 11 and/or 12 break the functionality,
+> i.e. driver gets stuck during crypto self-tests.
 
-The RNG driver we use power consumption when the RNG 
-is not required.
+Should I back out 5-12 or everything but patch 1?
 
-The NPCM RNG driver tested on NPCM750 evaluation board.
+Patch 4 can't be applied without 2/3.
 
-Addressed comments from:.
- - Daniel Thompson, Milton Miller II : https://patchwork.ozlabs.org/patch/1154598/ 
-  
-Changes since version 1:
- - Define timout in real-world units.
- - Using readl_poll_timeout in rng_read function.
- - Honor wait parameter in rng_read function.
- - Using local variable instead of #ifndef.
- - Remove probe print.
-
-Tomer Maimon (2):
-  dt-binding: hwrng: add NPCM RNG documentation
-  hwrng: npcm: add NPCM RNG driver
-
- .../bindings/rng/nuvoton,npcm-rng.txt         |  17 ++
- drivers/char/hw_random/Kconfig                |  13 ++
- drivers/char/hw_random/Makefile               |   1 +
- drivers/char/hw_random/npcm-rng.c             | 203 ++++++++++++++++++
- 4 files changed, 234 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/rng/nuvoton,npcm-rng.txt
- create mode 100644 drivers/char/hw_random/npcm-rng.c
-
+Cheers,
 -- 
-2.18.0
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
