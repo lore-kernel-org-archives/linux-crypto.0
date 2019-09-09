@@ -2,138 +2,145 @@ Return-Path: <SRS0=QtXc=XE=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D2F9C4740A
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 Sep 2019 12:22:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75F00C433EF
+	for <linux-crypto@archiver.kernel.org>; Mon,  9 Sep 2019 12:23:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 407D121A4A
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 Sep 2019 12:22:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4DE70218DE
+	for <linux-crypto@archiver.kernel.org>; Mon,  9 Sep 2019 12:23:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=verimatrix.com header.i=@verimatrix.com header.b="b1SSD20B"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="gPLen9xB";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="gPLen9xB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387785AbfIIMWe (ORCPT
+        id S1731677AbfIIMW7 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 9 Sep 2019 08:22:34 -0400
-Received: from mail-eopbgr700043.outbound.protection.outlook.com ([40.107.70.43]:22369
-        "EHLO NAM04-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2387764AbfIIMWe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 9 Sep 2019 08:22:34 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gE3M5DZRy0FYUOsU+W8md14q+ytOujwWliq6G/dKeUt8gSt8ssuv5JdH5iTSapmZvDYF/S/bKTJ8dFYoS1aCihhYrTgpHr0vszH/EvSjr3gKzFX0GvT8o9oZ/5ch35ycEweoCj7TmEa/B/rCgYS4/AK9tkpVMRjDmurYRWrmWA6H9NM00XlJKUDiDN2tE5HOirVt/6DTx/8Ze8rbu4XKxLSTa0XMTDEOIxOFDtGOhz8CPBB4dRVWAqAFaT4bWAp58X3czeOpls6lE25a90ysvMMNDcstJFxC2RtEBj5dgH485o6IK38sLzO07kh/jSrvsZDQY9kHh4+p+vNqddPRWQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/bs9ZRtmctKHFA9Nf7uL/GaseZyPZtYP+gRR302qSK8=;
- b=c4cpn+G6+FwUG99nJBtP4/vY6q+U//hQiyt6Wa+QX4v6VkoANfVBj7EBZ6Mgp6nsnqijHjnKWohR97zD4iqVHWvcPrsQv/BkeXWsF08lbUJmAg5+6GpGDQElqpX0gwDVTez4y6dMNGYH14U387H19bI0JDP8sYsRE6UV7xq/benutx584yg7gM3PIomRF1b3jufT7KGizZ1yzqxwuVn8keFAG3LMlGCEFwmQ8d933sy/jpIMtSv+5Qphs4MdbwsdG4uNMlwTh/FcM2SjFCleRoFsk9lz+3V94n8SWUlLBMOQk/4rULmHpY3wrc1sHd+YkyykOQMoa64idyL9C3yEVQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=verimatrix.com; dmarc=pass action=none
- header.from=verimatrix.com; dkim=pass header.d=verimatrix.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verimatrix.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/bs9ZRtmctKHFA9Nf7uL/GaseZyPZtYP+gRR302qSK8=;
- b=b1SSD20BXkTr3J8BFK18IYRcWTmB6rHUMJJnCidkeANvEnR2Eh1Lphd/qHZuOZOqG2MFl17qG3dmaLBp22tnSyahm1kwDVnfO7mEfQ0o4caqVONkh9fzZoEk53MrEbFbXxcJct4KR3csMnBCk83pDvgNKiQhkh2YRIsR5qHBLzQ=
-Received: from MN2PR20MB2973.namprd20.prod.outlook.com (52.132.172.146) by
- MN2PR20MB2544.namprd20.prod.outlook.com (20.179.148.156) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2241.20; Mon, 9 Sep 2019 12:22:31 +0000
-Received: from MN2PR20MB2973.namprd20.prod.outlook.com
- ([fe80::6d07:5f09:97bf:c717]) by MN2PR20MB2973.namprd20.prod.outlook.com
- ([fe80::6d07:5f09:97bf:c717%7]) with mapi id 15.20.2241.018; Mon, 9 Sep 2019
- 12:22:31 +0000
-From:   Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-CC:     Pascal van Leeuwen <pascalvanl@gmail.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "antoine.tenart@bootlin.com" <antoine.tenart@bootlin.com>,
-        "davem@davemloft.net" <davem@davemloft.net>
-Subject: RE: [PATCH 0/3] crypto: inside-secure - Add support for the CBCMAC
-Thread-Topic: [PATCH 0/3] crypto: inside-secure - Add support for the CBCMAC
-Thread-Index: AQHVYv9asl0eADp8PE2B9pjhBKQu46ci/PoAgAAwu6CAAAPgMIAADa0AgAALdiA=
-Date:   Mon, 9 Sep 2019 12:22:31 +0000
-Message-ID: <MN2PR20MB2973FC7574231C059FB72567CAB70@MN2PR20MB2973.namprd20.prod.outlook.com>
-References: <1567582608-29177-1-git-send-email-pvanleeuwen@verimatrix.com>
- <20190909073752.GA20487@gondor.apana.org.au>
- <MN2PR20MB297379E80B6CD087822AD9CDCAB70@MN2PR20MB2973.namprd20.prod.outlook.com>
- <MN2PR20MB29735284B8567182E7B916D0CAB70@MN2PR20MB2973.namprd20.prod.outlook.com>
- <20190909113506.GA4011@gondor.apana.org.au>
-In-Reply-To: <20190909113506.GA4011@gondor.apana.org.au>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=pvanleeuwen@verimatrix.com; 
-x-originating-ip: [188.204.2.113]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 8fffa9ce-63b8-4bc9-8329-08d73520631f
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600166)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:MN2PR20MB2544;
-x-ms-traffictypediagnostic: MN2PR20MB2544:
-x-ms-exchange-purlcount: 3
-x-microsoft-antispam-prvs: <MN2PR20MB25448EDD23F18D709244DC3BCAB70@MN2PR20MB2544.namprd20.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:4502;
-x-forefront-prvs: 01559F388D
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(979002)(4636009)(366004)(39850400004)(396003)(346002)(136003)(376002)(199004)(189003)(13464003)(81156014)(229853002)(33656002)(9686003)(8676002)(186003)(76116006)(71190400001)(71200400001)(4326008)(53546011)(6246003)(6306002)(6436002)(6506007)(2906002)(26005)(55016002)(81166006)(8936002)(86362001)(53936002)(14444005)(256004)(102836004)(966005)(5660300002)(316002)(476003)(486006)(3846002)(6116002)(15974865002)(478600001)(74316002)(52536014)(14454004)(305945005)(25786009)(7736002)(66066001)(54906003)(11346002)(99286004)(66946007)(66476007)(66556008)(446003)(76176011)(64756008)(66446008)(6916009)(7696005)(18886075002)(969003)(989001)(999001)(1009001)(1019001);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR20MB2544;H:MN2PR20MB2973.namprd20.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: verimatrix.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: 34FNFD0DbnYbwEv7wb3cn58EWblYpx+5xTvYGoEHhQ6wm7yNKSDu857H6PUSlF440PS86MevE3qWAwXlD7eC6nTkEDIdCGa2JbuyELvbaTjONmU+kZ2MM7KQhtfxaqFRjornGjk7wGIa+5lOIZVqfLFLcfSsucFTYc5X86JANlQBzx9qzYOm+rVigu+kz0igP0HPF6I50lvC3wnr8rSFmzwdFhIGWCI2C7f0oe8UgISEDJz3I55oIHTeTcfFrab/dsVV+mK5YDqCfBtHTqNHxOzzuRADeK9srxhPGY0qfpAN/y5XI003eD/B4Mhd9RIY69rOfvU/vRbwn93ZfKpYL0Bg+oMHUrG/qMc4c2eGGBYDzge9KdZEDeRe18kPYuz61I5h2D+SxPbxB2Q5uipIffnR5ncjejARWOPmV5D4OtA=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="Windows-1252"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-X-OriginatorOrg: verimatrix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8fffa9ce-63b8-4bc9-8329-08d73520631f
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Sep 2019 12:22:31.2141
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: dcb260f9-022d-4495-8602-eae51035a0d0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: +/c1+gDbCIMG+xlItvUPNydO4SwIGViQhSF6FT9rEzg5BnxZIRegsFUGkMkF7iCNB/JuflPAHKSL/Ch2pDOYRzqX6W8PRUBHM+WBz9A+r50=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR20MB2544
+        Mon, 9 Sep 2019 08:22:59 -0400
+Received: from bedivere.hansenpartnership.com ([66.63.167.143]:48340 "EHLO
+        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726713AbfIIMW7 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 9 Sep 2019 08:22:59 -0400
+Received: from localhost (localhost [127.0.0.1])
+        by bedivere.hansenpartnership.com (Postfix) with ESMTP id 317EA8EE180;
+        Mon,  9 Sep 2019 05:22:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
+        s=20151216; t=1568031779;
+        bh=GNP+gHeI4s79+X5IM/V6E9d0xl0tXMpD96EM6vlgWyg=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=gPLen9xBqz2cZGnyZTq2J3USkSk2FoYuc1l2HlvDShPfY9bl6pI9UGUxwZCGz55WC
+         kg1rF0lWh2Wrf9sf2ad8AwSJWo+oZGoo0QoXof9DnQ+AHTNuio3ybNyk53ybatbDvy
+         sATKOpLq/DJqCPQtqoDWVAaZBXF3GHQ3HMZP9Yy0=
+Received: from bedivere.hansenpartnership.com ([127.0.0.1])
+        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id q71fB7vQDYMO; Mon,  9 Sep 2019 05:22:59 -0700 (PDT)
+Received: from [192.168.6.117] (unknown [148.69.85.38])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id DAEB68EE105;
+        Mon,  9 Sep 2019 05:22:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
+        s=20151216; t=1568031779;
+        bh=GNP+gHeI4s79+X5IM/V6E9d0xl0tXMpD96EM6vlgWyg=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=gPLen9xBqz2cZGnyZTq2J3USkSk2FoYuc1l2HlvDShPfY9bl6pI9UGUxwZCGz55WC
+         kg1rF0lWh2Wrf9sf2ad8AwSJWo+oZGoo0QoXof9DnQ+AHTNuio3ybNyk53ybatbDvy
+         sATKOpLq/DJqCPQtqoDWVAaZBXF3GHQ3HMZP9Yy0=
+Message-ID: <1568031775.6613.37.camel@HansenPartnership.com>
+Subject: [PATCH v6 08/12] tpm2: add session encryption protection to
+ tpm2_get_random()
+From:   James Bottomley <James.Bottomley@HansenPartnership.com>
+To:     linux-integrity@vger.kernel.org
+Cc:     linux-crypto@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+Date:   Mon, 09 Sep 2019 13:22:55 +0100
+In-Reply-To: <1568031408.6613.29.camel@HansenPartnership.com>
+References: <1568031408.6613.29.camel@HansenPartnership.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.26.6 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-> -----Original Message-----
-> From: linux-crypto-owner@vger.kernel.org <linux-crypto-owner@vger.kernel.=
-org> On Behalf
-> Of Herbert Xu
-> Sent: Monday, September 9, 2019 1:35 PM
-> To: Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
-> Cc: Pascal van Leeuwen <pascalvanl@gmail.com>; linux-crypto@vger.kernel.o=
-rg;
-> antoine.tenart@bootlin.com; davem@davemloft.net
-> Subject: Re: [PATCH 0/3] crypto: inside-secure - Add support for the CBCM=
-AC
->=20
-> On Mon, Sep 09, 2019 at 10:50:12AM +0000, Pascal Van Leeuwen wrote:
-> >
-> > So my suggestion would be to supply the CRC32 patch and
-> > then resubmit this patchset unmodified. Would that be OK?
->=20
-> That's fine.
->
-Ok, I just submitted a patch called "crypto: inside-secure - Added support
-for CRC32" and then resubmitted the "crypto: inside-secure - Added support
-for the AES-CMAC" patchset.
+If some entity is snooping the TPM bus, they can see the random
+numbers we're extracting from the TPM and do prediction attacks
+against their consumers.  Foil this attack by using response
+encryption to prevent the attacker from seeing the random sequence.
 
-If you apply them in the order I just sent them (i.e., CRC32 first), it=20
-should apply just fine.
+Signed-off-by: James Bottomley <James.Bottomley@HansenPartnership.com>
 
->=20
-> Cheers,
-> --
-> Email: Herbert Xu <herbert@gondor.apana.org.au>
-> Home Page: http://gondor.apana.org.au/~herbert/
-> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+---
 
-Regards,
-Pascal van Leeuwen
-Silicon IP Architect, Multi-Protocol Engines @ Verimatrix
-www.insidesecure.com
+v3: add error handling to sessions and redo to be outside loop
+---
+ drivers/char/tpm/tpm2-cmd.c | 21 +++++++++++++++++----
+ 1 file changed, 17 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/char/tpm/tpm2-cmd.c b/drivers/char/tpm/tpm2-cmd.c
+index 0012657d3617..572d05966b77 100644
+--- a/drivers/char/tpm/tpm2-cmd.c
++++ b/drivers/char/tpm/tpm2-cmd.c
+@@ -296,29 +296,40 @@ int tpm2_get_random(struct tpm_chip *chip, u8 *dest, size_t max)
+ 	int total = 0;
+ 	int retries = 5;
+ 	u8 *dest_ptr = dest;
++	struct tpm2_auth *auth;
+ 
+ 	if (!num_bytes || max > TPM_MAX_RNG_DATA)
+ 		return -EINVAL;
+ 
+-	err = tpm_buf_init(&buf, 0, 0);
++	err = tpm2_start_auth_session(chip, &auth);
+ 	if (err)
+ 		return err;
+ 
++	err = tpm_buf_init(&buf, 0, 0);
++	if (err) {
++		tpm2_end_auth_session(auth);
++		return err;
++	}
++
+ 	do {
+-		tpm_buf_reset(&buf, TPM2_ST_NO_SESSIONS, TPM2_CC_GET_RANDOM);
++		tpm_buf_reset(&buf, TPM2_ST_SESSIONS, TPM2_CC_GET_RANDOM);
++		tpm_buf_append_hmac_session_opt(&buf, auth, TPM2_SA_ENCRYPT
++						| TPM2_SA_CONTINUE_SESSION,
++						NULL, 0);
+ 		tpm_buf_append_u16(&buf, num_bytes);
++		tpm_buf_fill_hmac_session(&buf, auth);
+ 		err = tpm_transmit_cmd(chip, &buf,
+ 				       offsetof(struct tpm2_get_random_out,
+ 						buffer),
+ 				       "attempting get random");
++		err = tpm_buf_check_hmac_response(&buf, auth, err);
+ 		if (err) {
+ 			if (err > 0)
+ 				err = -EIO;
+ 			goto out;
+ 		}
+ 
+-		out = (struct tpm2_get_random_out *)
+-			&buf.data[TPM_HEADER_SIZE];
++		out = (struct tpm2_get_random_out *)tpm_buf_parameters(&buf);
+ 		recd = min_t(u32, be16_to_cpu(out->size), num_bytes);
+ 		if (tpm_buf_length(&buf) <
+ 		    TPM_HEADER_SIZE +
+@@ -335,6 +346,8 @@ int tpm2_get_random(struct tpm_chip *chip, u8 *dest, size_t max)
+ 	} while (retries-- && total < max);
+ 
+ 	tpm_buf_destroy(&buf);
++	tpm2_end_auth_session(auth);
++
+ 	return total ? total : -EIO;
+ out:
+ 	tpm_buf_destroy(&buf);
+-- 
+2.16.4
+
