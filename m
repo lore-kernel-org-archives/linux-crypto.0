@@ -2,156 +2,112 @@ Return-Path: <SRS0=06DT=XF=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E673FC4740C
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 Sep 2019 01:42:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5980C3A5A2
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 Sep 2019 06:04:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C4BB62082C
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 Sep 2019 01:42:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8A5612089F
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 Sep 2019 06:04:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=c-s.fr header.i=@c-s.fr header.b="dGp+kTd8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732370AbfIJBmI (ORCPT
+        id S2390412AbfIJGER (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 9 Sep 2019 21:42:08 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:33106 "EHLO fornost.hmeau.com"
+        Tue, 10 Sep 2019 02:04:17 -0400
+Received: from pegase1.c-s.fr ([93.17.236.30]:56985 "EHLO pegase1.c-s.fr"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726482AbfIJBmI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 9 Sep 2019 21:42:08 -0400
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
-        by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
-        id 1i7VAT-0001FV-Np; Tue, 10 Sep 2019 11:42:06 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Tue, 10 Sep 2019 11:42:05 +1000
-Date:   Tue, 10 Sep 2019 11:42:05 +1000
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [PATCH] crypto: algif_skcipher - Use chunksize instead of blocksize
-Message-ID: <20190910014205.GA26506@gondor.apana.org.au>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        id S1730054AbfIJGEQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 10 Sep 2019 02:04:16 -0400
+Received: from localhost (mailhub1-int [192.168.12.234])
+        by localhost (Postfix) with ESMTP id 46SDxp5XBpz9twm3;
+        Tue, 10 Sep 2019 08:04:14 +0200 (CEST)
+Authentication-Results: localhost; dkim=pass
+        reason="1024-bit key; insecure key"
+        header.d=c-s.fr header.i=@c-s.fr header.b=dGp+kTd8; dkim-adsp=pass;
+        dkim-atps=neutral
+X-Virus-Scanned: Debian amavisd-new at c-s.fr
+Received: from pegase1.c-s.fr ([192.168.12.234])
+        by localhost (pegase1.c-s.fr [192.168.12.234]) (amavisd-new, port 10024)
+        with ESMTP id 0jE7q2QeiFSq; Tue, 10 Sep 2019 08:04:14 +0200 (CEST)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+        by pegase1.c-s.fr (Postfix) with ESMTP id 46SDxp4Qjkz9twm2;
+        Tue, 10 Sep 2019 08:04:14 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=c-s.fr; s=mail;
+        t=1568095454; bh=gaHQgkUONjgM7e5sTpiG9hKW2wcu3sDKClNiLbQr+G0=;
+        h=From:Subject:To:Cc:Date:From;
+        b=dGp+kTd8MFb+A6ub88VAvyIgBL+gNtMDiPIk6eBeQK7XvuqYXkCQksKXTLZJuRGGv
+         edeH6l45cXSt2adFoPN8yzRPDhWXBeWKHwAsRVmfrBQtrh1EEkm/tOESAVTvLRGsJ0
+         5ACi3HRB8g0sQUBfz7t4mc4/f2XitC8NRbON+vAk=
+Received: from localhost (localhost [127.0.0.1])
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id 75ACC8B78E;
+        Tue, 10 Sep 2019 08:04:15 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+        by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+        with ESMTP id Ztk9dE8IcFel; Tue, 10 Sep 2019 08:04:15 +0200 (CEST)
+Received: from pc16032vm.idsi0.si.c-s.fr (unknown [192.168.4.90])
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id 35A448B754;
+        Tue, 10 Sep 2019 08:04:15 +0200 (CEST)
+Received: by localhost.localdomain (Postfix, from userid 0)
+        id C1E3D6B734; Tue, 10 Sep 2019 06:04:14 +0000 (UTC)
+From:   Christophe Leroy <christophe.leroy@c-s.fr>
+Subject: [PATCH] crypto: talitos - fix hash result for VMAP_STACK
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Biggers <ebiggers@google.com>
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org
+Message-Id: <20190910060414.C1E3D6B734@pc16032vm.idsi0.si.c-s.fr>
+Date:   Tue, 10 Sep 2019 06:04:14 +0000 (UTC)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-When algif_skcipher does a partial operation it always process data
-that is a multiple of blocksize.  However, for algorithms such as
-CTR this is wrong because even though it can process any number of
-bytes overall, the partial block must come at the very end and not
-in the middle.
+When VMAP_STACK is selected, stack cannot be DMA-mapped.
+Therefore, the hash result has to be DMA-mapped in the request
+context and copied into areq->result at completion.
 
-This is exactly what chunksize is meant to describe so this patch
-changes blocksize to chunksize.
+Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+---
+ drivers/crypto/talitos.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-Fixes: 8ff590903d5f ("crypto: algif_skcipher - User-space...")
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
-index c1601edd70e3..e2c8ab408bed 100644
---- a/crypto/algif_skcipher.c
-+++ b/crypto/algif_skcipher.c
-@@ -56,7 +56,7 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
- 	struct alg_sock *pask = alg_sk(psk);
- 	struct af_alg_ctx *ctx = ask->private;
- 	struct crypto_skcipher *tfm = pask->private;
--	unsigned int bs = crypto_skcipher_blocksize(tfm);
-+	unsigned int bs = crypto_skcipher_chunksize(tfm);
- 	struct af_alg_async_req *areq;
- 	int err = 0;
- 	size_t len = 0;
-diff --git a/include/crypto/internal/skcipher.h b/include/crypto/internal/skcipher.h
-index 734b6f7081b8..3175dfeaed2c 100644
---- a/include/crypto/internal/skcipher.h
-+++ b/include/crypto/internal/skcipher.h
-@@ -205,19 +205,6 @@ static inline unsigned int crypto_skcipher_alg_max_keysize(
- 	return alg->max_keysize;
- }
- 
--static inline unsigned int crypto_skcipher_alg_chunksize(
--	struct skcipher_alg *alg)
--{
--	if ((alg->base.cra_flags & CRYPTO_ALG_TYPE_MASK) ==
--	    CRYPTO_ALG_TYPE_BLKCIPHER)
--		return alg->base.cra_blocksize;
--
--	if (alg->base.cra_ablkcipher.encrypt)
--		return alg->base.cra_blocksize;
--
--	return alg->chunksize;
--}
--
- static inline unsigned int crypto_skcipher_alg_walksize(
- 	struct skcipher_alg *alg)
+diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+index c9d686a0e805..9bd9ff312e2d 100644
+--- a/drivers/crypto/talitos.c
++++ b/drivers/crypto/talitos.c
+@@ -1728,6 +1728,7 @@ static void common_nonsnoop_hash_unmap(struct device *dev,
+ 				       struct ahash_request *areq)
  {
-@@ -231,23 +218,6 @@ static inline unsigned int crypto_skcipher_alg_walksize(
- 	return alg->walksize;
- }
+ 	struct talitos_ahash_req_ctx *req_ctx = ahash_request_ctx(areq);
++	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
+ 	struct talitos_private *priv = dev_get_drvdata(dev);
+ 	bool is_sec1 = has_ftr_sec1(priv);
+ 	struct talitos_desc *desc = &edesc->desc;
+@@ -1738,6 +1739,9 @@ static void common_nonsnoop_hash_unmap(struct device *dev,
+ 	if (desc->next_desc &&
+ 	    desc->ptr[5].ptr != desc2->ptr[5].ptr)
+ 		unmap_single_talitos_ptr(dev, &desc2->ptr[5], DMA_FROM_DEVICE);
++	if (req_ctx->last)
++		memcpy(areq->result, req_ctx->hw_context,
++		       crypto_ahash_digestsize(tfm));
  
--/**
-- * crypto_skcipher_chunksize() - obtain chunk size
-- * @tfm: cipher handle
-- *
-- * The block size is set to one for ciphers such as CTR.  However,
-- * you still need to provide incremental updates in multiples of
-- * the underlying block size as the IV does not have sub-block
-- * granularity.  This is known in this API as the chunk size.
-- *
-- * Return: chunk size in bytes
-- */
--static inline unsigned int crypto_skcipher_chunksize(
--	struct crypto_skcipher *tfm)
--{
--	return crypto_skcipher_alg_chunksize(crypto_skcipher_alg(tfm));
--}
--
- /**
-  * crypto_skcipher_walksize() - obtain walk size
-  * @tfm: cipher handle
-diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
-index 37c164234d97..aada87916918 100644
---- a/include/crypto/skcipher.h
-+++ b/include/crypto/skcipher.h
-@@ -304,6 +304,36 @@ static inline unsigned int crypto_skcipher_blocksize(
- 	return crypto_tfm_alg_blocksize(crypto_skcipher_tfm(tfm));
- }
- 
-+static inline unsigned int crypto_skcipher_alg_chunksize(
-+	struct skcipher_alg *alg)
-+{
-+	if ((alg->base.cra_flags & CRYPTO_ALG_TYPE_MASK) ==
-+	    CRYPTO_ALG_TYPE_BLKCIPHER)
-+		return alg->base.cra_blocksize;
-+
-+	if (alg->base.cra_ablkcipher.encrypt)
-+		return alg->base.cra_blocksize;
-+
-+	return alg->chunksize;
-+}
-+
-+/**
-+ * crypto_skcipher_chunksize() - obtain chunk size
-+ * @tfm: cipher handle
-+ *
-+ * The block size is set to one for ciphers such as CTR.  However,
-+ * you still need to provide incremental updates in multiples of
-+ * the underlying block size as the IV does not have sub-block
-+ * granularity.  This is known in this API as the chunk size.
-+ *
-+ * Return: chunk size in bytes
-+ */
-+static inline unsigned int crypto_skcipher_chunksize(
-+	struct crypto_skcipher *tfm)
-+{
-+	return crypto_skcipher_alg_chunksize(crypto_skcipher_alg(tfm));
-+}
-+
- static inline unsigned int crypto_sync_skcipher_blocksize(
- 	struct crypto_sync_skcipher *tfm)
- {
+ 	if (req_ctx->psrc)
+ 		talitos_sg_unmap(dev, edesc, req_ctx->psrc, NULL, 0, 0);
+@@ -1869,7 +1873,7 @@ static int common_nonsnoop_hash(struct talitos_edesc *edesc,
+ 	if (req_ctx->last)
+ 		map_single_talitos_ptr(dev, &desc->ptr[5],
+ 				       crypto_ahash_digestsize(tfm),
+-				       areq->result, DMA_FROM_DEVICE);
++				       req_ctx->hw_context, DMA_FROM_DEVICE);
+ 	else
+ 		map_single_talitos_ptr_nosync(dev, &desc->ptr[5],
+ 					      req_ctx->hw_context_size,
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.13.3
+
