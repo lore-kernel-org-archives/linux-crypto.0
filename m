@@ -2,177 +2,119 @@ Return-Path: <SRS0=06DT=XF=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E66AC3A5A2
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 Sep 2019 12:42:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08523C3A5A2
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 Sep 2019 12:50:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 172712082C
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 Sep 2019 12:42:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C66EC208E4
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 Sep 2019 12:50:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pEwdeA+6"
+	dkim=pass (1024-bit key) header.d=verimatrix.com header.i=@verimatrix.com header.b="xYgeZdru"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2403831AbfIJMmz (ORCPT
+        id S1726043AbfIJMuJ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 10 Sep 2019 08:42:55 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:34882 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727945AbfIJMmy (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 10 Sep 2019 08:42:54 -0400
-Received: by mail-wr1-f65.google.com with SMTP id g7so19990292wrx.2
-        for <linux-crypto@vger.kernel.org>; Tue, 10 Sep 2019 05:42:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=Ub4SnTSb6gIhX0nmNU7ISH0G8O7vugmWfe28Zf8iviI=;
-        b=pEwdeA+6eJ8v3UkA9Jzqd5hUweTKn/5vjQBsphWKp3lGezCEmdxB0gkbJnCOEKhGrz
-         od2fxEWrNAXGFXdzA33ye3zBGBOj/TLNpu8qryAqCl36Q8YrMxPchxUjjH/s6iaAskST
-         nG14v8Olaqg4c72biCSQvDGbqyDto7+ftndjhrijahjXqLbo57GqwAN8Tu7vSi6kOGXL
-         dv6Mz5F+83dIbK/Fc3+of/C+73aiioDMEJ/03ccEPHtQpdIUlIxBolLpu6aWQe/SbT09
-         lz7f3H58FD/0HQqJttinWByYSGkebP5i289Jmv9hiLHi+8LDCuWuizCnIIOfEnizaqIK
-         tEyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=Ub4SnTSb6gIhX0nmNU7ISH0G8O7vugmWfe28Zf8iviI=;
-        b=LsT+RsovRFgs0YK3Qsj1c6KVPAXQnKZ0MTPkY640fIRZtaegeI4TZuXisWIhj0Fe68
-         v3qyswCYL9UzgYkGXwHgn9VTmRQ34FA6Kj3YStCfSqZ4FIUC/oT9k9BlSpWZ8GEcqB1k
-         Gq/bDnih1+gOOaSiYC4AsdgtCFOZ2raT2Rh6x0DTE00ZVt7EjKjh3ELlEhv5oh7EqDUx
-         M4WeLfF1INlXPtedfmjN8DLhMyDujw+WgyyLpmwbKwL5E1nmvgINbmm+SCvM6QwtDMwO
-         MYPEHw39RkCBnmesl5ehuwoYK5t0TQBYTII/yBx0TINwMhgcx4N9kBZhtfNYasATAvPV
-         5nzg==
-X-Gm-Message-State: APjAAAU8o7WWh4K6tXdwjfEV2S2M2wuoS82ogHWxXAJTx0dJvEbwzDt9
-        f0y9hgncx9OhypH2eGCmhqgRTg==
-X-Google-Smtp-Source: APXvYqxFgL8FIlOMUuSCgraQ22g8Zjq1m1xa+tcRMBGgUky84S5wpONFoqDvxPucL2VbgiLpgWRkng==
-X-Received: by 2002:a05:6000:12d1:: with SMTP id l17mr25805559wrx.91.1568119372913;
-        Tue, 10 Sep 2019 05:42:52 -0700 (PDT)
-Received: from holly.lan (cpc141214-aztw34-2-0-cust773.18-1.cable.virginm.net. [86.9.19.6])
-        by smtp.gmail.com with ESMTPSA id h5sm13118486wrr.10.2019.09.10.05.42.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 Sep 2019 05:42:52 -0700 (PDT)
-Date:   Tue, 10 Sep 2019 13:42:50 +0100
-From:   Daniel Thompson <daniel.thompson@linaro.org>
-To:     Tomer Maimon <tmaimon77@gmail.com>
-Cc:     mpm@selenic.com, herbert@gondor.apana.org.au,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Avi Fishman <avifishman70@gmail.com>,
-        Tali Perry <tali.perry1@gmail.com>,
-        Patrick Venture <venture@google.com>,
-        Nancy Yuen <yuenn@google.com>,
-        Benjamin Fair <benjaminfair@google.com>, sumit.garg@linaro.org,
-        jens.wiklander@linaro.org, vkoul@kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Joel Stanley <joel@jms.id.au>,
-        devicetree <devicetree@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-crypto@vger.kernel.org,
-        OpenBMC Maillist <openbmc@lists.ozlabs.org>
-Subject: Re: [PATCH v2 1/2] dt-binding: hwrng: add NPCM RNG documentation
-Message-ID: <20190910124250.2i5muqjt5c35kvgb@holly.lan>
-References: <20190909123840.154745-1-tmaimon77@gmail.com>
- <20190909123840.154745-2-tmaimon77@gmail.com>
- <20190910102505.vgyomi575ldrk2lq@holly.lan>
- <CAP6Zq1igPJ5PvaA2YaC-=ngQOnatt4PFJj-QzaJCueDf6KA19A@mail.gmail.com>
+        Tue, 10 Sep 2019 08:50:09 -0400
+Received: from mail-eopbgr800073.outbound.protection.outlook.com ([40.107.80.73]:11344
+        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729140AbfIJMuJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 10 Sep 2019 08:50:09 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=mA1G3QQ/xa8ylk75pMD1Z0eikBvnakXUOUwAL4DLe8S7CGrar2S9/+it8aOTpy/CzBp1mVVHRReUNf2bSiD710h1vTYkH48SgRjM/uBKkedVXarTomm9dSsIqImub/19ZByS3++mjuU2F7sU1/iXBhyNJQz6p+4YJSBoSU8cQxO1TS/aWzH4Ev3aoUzhY/pMIjsHsChF2/C2HF6WlirzopykH6wuMT1Khwa7bDAHNfHPQqN/TAi8tpN049SvkrKzzkPHxWOUisHfTBbw8xHhwmQ99XN1bDsnYXT8DPbaj+CTnIPqZDEenOnI43Scahonk9xcQ0FtP6UHTBhbkpRXjg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LI0nbS7ux38BGubUFAH2NskX+LB4HEIAuxcKXY13Yfc=;
+ b=SMlwDtV5CM0tnbxmXkrBGA/9ozAA+EkZcbZE9o5BV0+7Hgdkc3UiXnU1SrjdJWsp9iMydeCBQML5obNy5Ejgdj+qEM09UjKbKYRWb1HVAy8NkFHQrCWMUWiEQ0ibxe+Nesi+v7F6J8JhR1AhFRVuAIeYoamjLZE8vN3PAHU2FE8dQEugcK246RBMdDwqhfC8rYeFBh8xxq+CX6crqQIzXpKzBbGkPYVsF2BJ7e7o1Tg/EVwHfqtBe3IWgof9XD8BNdCBZEXfEq0plYjhhqV0/B3Eg/A/IasKCo3suGjQ8cmnjbeIZHpHMOz8GIBRJcp+nCCXLt4lf8cVSUtd6ZF7hg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=verimatrix.com; dmarc=pass action=none
+ header.from=verimatrix.com; dkim=pass header.d=verimatrix.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verimatrix.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LI0nbS7ux38BGubUFAH2NskX+LB4HEIAuxcKXY13Yfc=;
+ b=xYgeZdrubBcqoPlmAdJPgAQKiqbqvasWfaHUB+g9Uza4o5JtBKelf2kZeA8grd8YBB5BRia6fknNH2M5qFfdlsquhCW1XKoFWR+FB+8p3Ksy9PWOSLDG0mFv+MasuXrrmBJlrzCfoAW8TViAxx44s7TrMK8OTALAAjLJ28n+Mrs=
+Received: from MN2PR20MB2973.namprd20.prod.outlook.com (52.132.172.146) by
+ MN2PR20MB2320.namprd20.prod.outlook.com (20.179.145.145) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2241.15; Tue, 10 Sep 2019 12:50:05 +0000
+Received: from MN2PR20MB2973.namprd20.prod.outlook.com
+ ([fe80::6d07:5f09:97bf:c717]) by MN2PR20MB2973.namprd20.prod.outlook.com
+ ([fe80::6d07:5f09:97bf:c717%7]) with mapi id 15.20.2241.018; Tue, 10 Sep 2019
+ 12:50:04 +0000
+From:   Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+To:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+CC:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Eric Biggers <ebiggers@kernel.org>
+Subject: Interesting crypto manager behavior
+Thread-Topic: Interesting crypto manager behavior
+Thread-Index: AdVn1TV8jLDS1UVrTPOD3i+tUTHmBQ==
+Date:   Tue, 10 Sep 2019 12:50:04 +0000
+Message-ID: <MN2PR20MB2973C378D06E1694AE061983CAB60@MN2PR20MB2973.namprd20.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=pvanleeuwen@verimatrix.com; 
+x-originating-ip: [188.204.2.113]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 6896ca5c-cac3-4dce-9a75-08d735ed671b
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600166)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:MN2PR20MB2320;
+x-ms-traffictypediagnostic: MN2PR20MB2320:
+x-ms-exchange-purlcount: 1
+x-microsoft-antispam-prvs: <MN2PR20MB23208529EAD61A0A89AFDFD2CAB60@MN2PR20MB2320.namprd20.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-forefront-prvs: 01565FED4C
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(366004)(189003)(199004)(86362001)(81166006)(25786009)(476003)(2906002)(53936002)(5660300002)(186003)(15974865002)(71190400001)(76116006)(26005)(7696005)(66476007)(64756008)(66446008)(71200400001)(66946007)(66556008)(99286004)(102836004)(7736002)(54906003)(256004)(3480700005)(55016002)(2351001)(9686003)(74316002)(6916009)(14454004)(6116002)(305945005)(5640700003)(3846002)(6506007)(66066001)(498600001)(2501003)(6436002)(8676002)(52536014)(33656002)(4326008)(81156014)(8936002)(486006)(18886075002);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR20MB2320;H:MN2PR20MB2973.namprd20.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: verimatrix.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: 2v75hIrhzSmctZAU8l/GC2jxBMzKJewXTdEOzo3QpnYQL7TYhh1PZPYVPMXmv0aaSxpSoB4agssf6yXL49KO2r0HDI9L+HuRai4nkH04hrAX06gZ6roZxpAPauRWhZ9yrtJvu4swGGUhkEMaEiDmWnyIueZNPpMqfTZZe3b/t4J/wYD/+ZfaYRhy65ccnYm9h4Vf5AcfWRzuP+uTtSd/zg8hCnRMSU52I+SWtJmY6tlzJUUBwF68ROj45VyAFvIfq/kKwkipcmRvjQb8J+o66ZNFrdOJQReE816DwgLOorvE4AemHzLYP18AY9+VZ4EKn4ADcNUnzHkGPNx5o+rDpNuY6SN6GlWf5XfpT9ZM0ExCrSjt9TIAWFHujqCQFudXveaxMwBUTBk1gPsllfnmJcbeM1aD4vjeUal4Sz3Nvdc=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAP6Zq1igPJ5PvaA2YaC-=ngQOnatt4PFJj-QzaJCueDf6KA19A@mail.gmail.com>
-User-Agent: NeoMutt/20180716
+X-OriginatorOrg: verimatrix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6896ca5c-cac3-4dce-9a75-08d735ed671b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Sep 2019 12:50:04.7279
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: dcb260f9-022d-4495-8602-eae51035a0d0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: J32zElyN6yb4J+VU2JlM68rAcuq1He31y6awbx6QwbnkmCQPPPrIhdoubcUxaXot4yZAhkE+eLJZchSH2L+X4xHKcI/8lIbXXgNxxbEnoLc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR20MB2320
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Sep 10, 2019 at 02:55:44PM +0300, Tomer Maimon wrote:
-> Hi Daniel,
-> 
-> Sorry but I have probably miss it, thanks a lot for your comment
-> 
-> On Tue, 10 Sep 2019 at 13:25, Daniel Thompson <daniel.thompson@linaro.org>
-> wrote:
-> 
-> > On Mon, Sep 09, 2019 at 03:38:39PM +0300, Tomer Maimon wrote:
-> > > Added device tree binding documentation for Nuvoton BMC
-> > > NPCM Random Number Generator (RNG).
-> > >
-> > > Signed-off-by: Tomer Maimon <tmaimon77@gmail.com>
-> > > ---
-> > >  .../bindings/rng/nuvoton,npcm-rng.txt           | 17 +++++++++++++++++
-> > >  1 file changed, 17 insertions(+)
-> > >  create mode 100644
-> > Documentation/devicetree/bindings/rng/nuvoton,npcm-rng.txt
-> > >
-> > > diff --git a/Documentation/devicetree/bindings/rng/nuvoton,npcm-rng.txt
-> > b/Documentation/devicetree/bindings/rng/nuvoton,npcm-rng.txt
-> > > new file mode 100644
-> > > index 000000000000..a697b4425fb3
-> > > --- /dev/null
-> > > +++ b/Documentation/devicetree/bindings/rng/nuvoton,npcm-rng.txt
-> > > @@ -0,0 +1,17 @@
-> > > +NPCM SoC Random Number Generator
-> > > +
-> > > +Required properties:
-> > > +- compatible  : "nuvoton,npcm750-rng" for the NPCM7XX BMC.
-> > > +- reg         : Specifies physical base address and size of the
-> > registers.
-> > > +
-> > > +Optional property:
-> > > +- quality : estimated number of bits of true entropy per 1024 bits
-> > > +                     read from the rng.
-> > > +                     If this property is not defined, it defaults to
-> > 1000.
-> >
-> > There are pending unreplied review comments about this property (my own
-> > as it happens):
-> > https://patchwork.kernel.org/patch/11119371/
-> >
-> > No, there isn't different SoCs.
-> we had checked the quality of the hwrng and the results we got are set as
-> default.
-> we been asked from one of our client to have a dynamic quality, they will
-> like to be more strict when using the hwrng.
-> is it problematic to add it?
+Herbert, Eric,
 
-It's a slightly grey area but in general the role of devicetree is to
-describe the hardware. This parameter is not doing that.
+I noticed some interesting behavior from the crypto manager when=20
+dealing with a fallback cipher situation.
 
-If you view the quality assessment of this RNG to be a user preference
-it is better set the quality to zero which is what the vast majority of
-hwrng devices do. When the driver sets the quality to zero then the
-kernel does not stir the entropy pool automatically... instead it
-relies on the userspace rngd to do that. If the user wants the kernel
-to stir the pool automatically then the quality can be set using the
-default_quality kernel parameter.
+I'm allocating a fallback (AEAD) cipher to handle some corner cases
+my HW cannot handle, but I noticed that the fallback itself is being
+tested when I allocate it (or so it seems) and if the fallback itself
+fails on some testvector, it is not replaced by an alternative while
+such an alternative should be available. So I have to fail my entire
+init because the fallback could not be allocated.
 
+i.e. while requesting a fallback for rfc7539(chacha20, poly1305), it
+attempts rfc7539(safexcel-chacha20,poly1305-simd), which fails, but
+it could still fall back to e.g. rfc7539(chacha20-simd, poly1305-simd),
+which should work.
 
-Daniel.
+Actually, I really do not want the fallback to hit another algorithm
+of my own driver. Is there some way to prevent that from happening?
+(without actually referencing hard cra_driver_name's ...)
 
-> 
-> Having a controllable quality implies that the numeric quality of the
-> peripheral changes when it is stamped out on different SoCs (otherwise
-> the driver can confidently set the quality without needing any hint
-> from the DT). Is that really true here?
-> 
-> 
-> > Daniel.
-> >
-> > > +
-> > > +Example:
-> > > +
-> > > +rng: rng@f000b000 {
-> > > +     compatible = "nuvoton,npcm750-rng";
-> > > +     reg = <0xf000b000 0x8>;
-> > > +};
-> > > --
-> > > 2.18.0
-> > >
-> >
+Regards,
+Pascal van Leeuwen
+Silicon IP Architect, Multi-Protocol Engines @ Verimatrix
+www.insidesecure.com
+
