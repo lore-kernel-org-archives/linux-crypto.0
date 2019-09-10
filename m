@@ -2,150 +2,309 @@ Return-Path: <SRS0=06DT=XF=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A673BC49ED9
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 Sep 2019 18:58:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11755C5AE59
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 Sep 2019 20:53:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5CFB72084D
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 Sep 2019 18:58:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=verimatrix.com header.i=@verimatrix.com header.b="wcCkACYa"
+	by mail.kernel.org (Postfix) with ESMTP id DFD5F21924
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 Sep 2019 20:53:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726050AbfIJS6X (ORCPT
+        id S1725942AbfIJUxj convert rfc822-to-8bit (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 10 Sep 2019 14:58:23 -0400
-Received: from mail-eopbgr690041.outbound.protection.outlook.com ([40.107.69.41]:23211
-        "EHLO NAM04-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726084AbfIJS6X (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 10 Sep 2019 14:58:23 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Lq1G0UYVfpSXDChZtXOHtpKM8DWhPGTTNXHQ3LEoAB43hlR5ZdMRJhYRSsJegM3boh7J73gspYrvy6xZHq/h1rzCcGjwCk21Dhb6DlgaRpWc7YnvArPlnFX3UxJyR4qg2XSHQp5FPnZX2NsW1WDGDoqR995+Prpj0d09QyzoAlH6ZiwMz1A1TiXSXdN5Y5MSPnJXOyl8hVFbMb+fDvSnVMWvhnxgoJMkKyzvBFn4mi/YZDiSqtt+OYvhX50iHwrc4h8RbQXUnr8KDcG0z3rX3LLJ1QnWkiCE+jmx2YNdnyObEZFhHbZfdeM+KWbN1gk7pgGL8ec8vE4Nph9/ZBZTQA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qKWKpwhuHqwZYhaTmldPiNpQxxMEdEZ2CxMxlPH+cGI=;
- b=NVQrDST6cPambY1qlfhZXkisKLMJoIz/6PLq1/wEGvg2xx18u34wZ95PdfWDNinnP17YMnIR/303mVHGv+nVTF+bPJdIKbvUXdBtSC2z14HboA5v6C+XKk+WfsnFeXVIAGB3xM7qtbWNZjsLTUmssl+xbRZcAZaAB7eDm4HnB05hzh6iErUmozfqImCsjPUqdE6oqYiSRet8T/jDxQ/1hVgqJrq14z6FHbJzWH1/5N9op8GzM1RnYrdrJ5A9GV6Spnydq/N967bjvSn8io7MDYy6dgJHH6BoeG2/dN/4No5Ikko+OEuVEmHIXelVPLSAygGRDnhAu1wjaaBFxlBAGw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=verimatrix.com; dmarc=pass action=none
- header.from=verimatrix.com; dkim=pass header.d=verimatrix.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verimatrix.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qKWKpwhuHqwZYhaTmldPiNpQxxMEdEZ2CxMxlPH+cGI=;
- b=wcCkACYav5K9FtUVE3lAkysl6wlF5ipqF7qw+JjY/dltAapg596+Q5NsUw6TVAvvl9jsqNrqlLS9uyjRu8jF3tiNI8eO68P96FLsUwkarMsz3+vJiN8O32jnti4FNoFGzr8gg9EzI/VQkCSZuD4Mu/XVh3nLOgp2gqp7gAe1J2o=
-Received: from MN2PR20MB2973.namprd20.prod.outlook.com (52.132.172.146) by
- MN2PR20MB2366.namprd20.prod.outlook.com (20.179.146.28) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2241.18; Tue, 10 Sep 2019 18:58:19 +0000
-Received: from MN2PR20MB2973.namprd20.prod.outlook.com
- ([fe80::6d07:5f09:97bf:c717]) by MN2PR20MB2973.namprd20.prod.outlook.com
- ([fe80::6d07:5f09:97bf:c717%7]) with mapi id 15.20.2241.018; Tue, 10 Sep 2019
- 18:58:19 +0000
-From:   Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
-To:     Antoine Tenart <antoine.tenart@bootlin.com>,
-        Pascal van Leeuwen <pascalvanl@gmail.com>
-CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>
-Subject: RE: [PATCH 1/2] crypto: inside-secure - Added support for the
- CHACHA20 skcipher
-Thread-Topic: [PATCH 1/2] crypto: inside-secure - Added support for the
- CHACHA20 skcipher
-Thread-Index: AQHVZ+4odBpV2XL9NUuE4Wxeg5/uy6clK6gAgAAWOSA=
-Date:   Tue, 10 Sep 2019 18:58:18 +0000
-Message-ID: <MN2PR20MB297383846FB390299EFEA0C3CAB60@MN2PR20MB2973.namprd20.prod.outlook.com>
-References: <1568126293-4039-1-git-send-email-pvanleeuwen@verimatrix.com>
- <1568126293-4039-2-git-send-email-pvanleeuwen@verimatrix.com>
- <20190910173246.GA14055@kwain>
-In-Reply-To: <20190910173246.GA14055@kwain>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=pvanleeuwen@verimatrix.com; 
-x-originating-ip: [188.204.2.113]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 7852a2f9-51ae-4f85-82fb-08d73620d860
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600166)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:MN2PR20MB2366;
-x-ms-traffictypediagnostic: MN2PR20MB2366:
-x-ms-exchange-purlcount: 2
-x-microsoft-antispam-prvs: <MN2PR20MB2366E57278CEEDB1595960D4CAB60@MN2PR20MB2366.namprd20.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-forefront-prvs: 01565FED4C
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(396003)(366004)(39850400004)(346002)(136003)(376002)(13464003)(199004)(189003)(9686003)(6246003)(476003)(53936002)(4326008)(86362001)(99286004)(478600001)(966005)(316002)(7696005)(15974865002)(14454004)(110136005)(54906003)(229853002)(6436002)(8936002)(446003)(2906002)(66066001)(6116002)(81166006)(55016002)(8676002)(76176011)(6306002)(33656002)(11346002)(76116006)(25786009)(486006)(305945005)(66556008)(66476007)(3846002)(102836004)(6506007)(74316002)(64756008)(66446008)(53546011)(26005)(5660300002)(71200400001)(71190400001)(186003)(52536014)(81156014)(256004)(7736002)(66946007)(18886075002);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR20MB2366;H:MN2PR20MB2973.namprd20.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: verimatrix.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: NoCnRL3MEYI2xhYP6u7nP9w4BAIlULMxiOQbY4r4oK7HviwGYDlTU96QkATR+epzWJJeLFMEFCKIyd45KrbQR7X+BN1GOJyewtqsVYqD6q2NZOQxRB/v+zyEtt0efq7XbnkIQU/RkDglOA/PztYxByKcZzaanz8zwO4dxhk8a+gAynzDusWf0LtjduiYwl46d2WnH+pR07xu4pG1wG8hltVSupVW8Tflpw3W5p1WNX/UiO3tc5+uxBCzrSL1zSrdDTuvSwk/L0zuzzoY3NNjiisXhs642CET2sx7mQj2t7H9gNEVZWWSrdNiCLfu/mx8deVUCEkhrA+Rhw50G3TueOcyIA6WNyFr0nqkdTZ9Bj3R2sVLZP9tDIoCkVW0ybT1dY+sShW0ffC8Og7mdOZMyjDrBkgGJCRYbTIC2FuSY48=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="Windows-1252"
-Content-Transfer-Encoding: quoted-printable
+        Tue, 10 Sep 2019 16:53:39 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:51600 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725916AbfIJUxi (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 10 Sep 2019 16:53:38 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x8AKqxCX048465
+        for <linux-crypto@vger.kernel.org>; Tue, 10 Sep 2019 16:53:37 -0400
+Received: from smtp.notes.na.collabserv.com (smtp.notes.na.collabserv.com [192.155.248.81])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2uxgemw9k4-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <linux-crypto@vger.kernel.org>; Tue, 10 Sep 2019 16:53:37 -0400
+Received: from localhost
+        by smtp.notes.na.collabserv.com with smtp.notes.na.collabserv.com ESMTP
+        for <linux-crypto@vger.kernel.org> from <miltonm@us.ibm.com>;
+        Tue, 10 Sep 2019 20:53:36 -0000
+Received: from us1a3-smtp08.a3.dal06.isc4sb.com (10.146.103.57)
+        by smtp.notes.na.collabserv.com (10.106.227.88) with smtp.notes.na.collabserv.com ESMTP;
+        Tue, 10 Sep 2019 20:53:16 -0000
+Received: from us1a3-mail228.a3.dal06.isc4sb.com ([10.146.103.71])
+          by us1a3-smtp08.a3.dal06.isc4sb.com
+          with ESMTP id 2019091020531513-935522 ;
+          Tue, 10 Sep 2019 20:53:15 +0000 
+In-Reply-To: <20190909123840.154745-3-tmaimon77@gmail.com>
+From:   "Milton Miller II" <miltonm@us.ibm.com>
+To:     Tomer Maimon <tmaimon77@gmail.com>
+Cc:     mpm@selenic.com, herbert@gondor.apana.org.au, arnd@arndb.de,
+        gregkh@linuxfoundation.org, robh+dt@kernel.org,
+        mark.rutland@arm.com, avifishman70@gmail.com,
+        tali.perry1@gmail.com, venture@google.com, yuenn@google.com,
+        benjaminfair@google.com, sumit.garg@linaro.org,
+        jens.wiklander@linaro.org, vkoul@kernel.org, tglx@linutronix.de,
+        joel@jms.id.au, devicetree@vger.kernel.org,
+        openbmc@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org
+Date:   Tue, 10 Sep 2019 20:53:13 +0000
 MIME-Version: 1.0
-X-OriginatorOrg: verimatrix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7852a2f9-51ae-4f85-82fb-08d73620d860
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Sep 2019 18:58:18.9443
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: dcb260f9-022d-4495-8602-eae51035a0d0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: PNTABeH7CVVUlIXJke3MpSwCctTdWDxUOEdx9wHQlSNUCJTs27Jtk+HMCsx/yizZCGuA3ddTGtplcaDaAzr7iMSZZywJItk8GjAPZXmafks=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR20MB2366
+Sensitivity: 
+Importance: Normal
+X-Priority: 3 (Normal)
+References: <20190909123840.154745-3-tmaimon77@gmail.com>,<20190909123840.154745-1-tmaimon77@gmail.com>
+X-Mailer: IBM iNotes ($HaikuForm 1054) | IBM Domino Build
+ SCN1812108_20180501T0841_FP57 August 05, 2019 at 12:42
+X-LLNOutbound: False
+X-Disclaimed: 34479
+X-TNEFEvaluated: 1
+Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=UTF-8
+x-cbid: 19091020-3067-0000-0000-000000AA6B2C
+X-IBM-SpamModules-Scores: BY=0; FL=0; FP=0; FZ=0; HX=0; KW=0; PH=0;
+ SC=0.40962; ST=0; TS=0; UL=0; ISC=; MB=0.056169
+X-IBM-SpamModules-Versions: BY=3.00011750; HX=3.00000242; KW=3.00000007;
+ PH=3.00000004; SC=3.00000287; SDB=6.01259539; UDB=6.00665766; IPR=6.01041294;
+ MB=3.00028569; MTD=3.00000008; XFM=3.00000015; UTC=2019-09-10 20:53:31
+X-IBM-AV-DETECTION: SAVI=unsuspicious REMOTE=unsuspicious XFE=unused
+X-IBM-AV-VERSION: SAVI=2019-09-10 16:44:15 - 6.00010391
+x-cbparentid: 19091020-3068-0000-0000-000011BD12C5
+Message-Id: <OFDC101E51.54765CB8-ON00258471.006F34B7-00258471.0072BCA7@notes.na.collabserv.com>
+Subject: Re:  [PATCH v2 2/2] hwrng: npcm: add NPCM RNG driver
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-09-10_11:,,
+ signatures=0
+X-Proofpoint-Spam-Reason: safe
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-> -----Original Message-----
-> From: Antoine Tenart <antoine.tenart@bootlin.com>
-> Sent: Tuesday, September 10, 2019 7:33 PM
-> To: Pascal van Leeuwen <pascalvanl@gmail.com>
-> Cc: linux-crypto@vger.kernel.org; antoine.tenart@bootlin.com; herbert@gon=
-dor.apana.org.au;
-> davem@davemloft.net; Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
-> Subject: Re: [PATCH 1/2] crypto: inside-secure - Added support for the CH=
-ACHA20 skcipher
->=20
-> Hi Pascal,
->=20
-> On Tue, Sep 10, 2019 at 04:38:12PM +0200, Pascal van Leeuwen wrote:
-> >
-> > @@ -112,7 +123,7 @@ static void safexcel_cipher_token(struct safexcel_c=
-ipher_ctx *ctx, u8
-> *iv,
-> >  			block_sz =3D DES3_EDE_BLOCK_SIZE;
-> >  			cdesc->control_data.options |=3D EIP197_OPTION_2_TOKEN_IV_CMD;
-> >  			break;
-> > -		case SAFEXCEL_AES:
-> > +		default: /* case SAFEXCEL_AES */
->=20
-> Can't you keep an explicit case here?
->=20
-If I do that, the compiler will complain about SAFEXCEL_CHACHA20 not
-being covered. And Chacha20 won't even make it this far, so it doesn't
-make much sense to add that to the switch.
+On September 9, 2019 around 7:40AM in somet timezone, Tomer Maimon wrote:
+>+#define NPCM_RNG_TIMEOUT_USEC	20000
+>+#define NPCM_RNG_POLL_USEC	1000
 
-I suppose an explicit case plus an empty default would be an alternative?
-But I figured the comment should suffice to remind anyone working on that
-switch statement what it should really do. I'm fine with either approach.
+...
 
-> >  			block_sz =3D AES_BLOCK_SIZE;
-> >  			cdesc->control_data.options |=3D EIP197_OPTION_4_TOKEN_IV_CMD;
-> >  			break;
->=20
-> Thanks,
-> Antoine
->=20
-> --
-> Antoine T=E9nart, Bootlin
-> Embedded Linux and Kernel engineering
-> https://bootlin.com
+>+static int npcm_rng_init(struct hwrng *rng)
+>+{
+>+	struct npcm_rng *priv = to_npcm_rng(rng);
+>+	u32 val;
+>+
+>+	val = readl(priv->base + NPCM_RNGCS_REG);
+>+	val |= NPCM_RNG_ENABLE;
+>+	writel(val, priv->base + NPCM_RNGCS_REG);
+>+
+>+	return 0;
+>+}
+>+
+>+static void npcm_rng_cleanup(struct hwrng *rng)
+>+{
+>+	struct npcm_rng *priv = to_npcm_rng(rng);
+>+	u32 val;
+>+
+>+	val = readl(priv->base + NPCM_RNGCS_REG);
+>+	val &= ~NPCM_RNG_ENABLE;
+>+	writel(val, priv->base + NPCM_RNGCS_REG);
+>+}
+>+
+>+static int npcm_rng_read(struct hwrng *rng, void *buf, size_t max,
+>bool wait)
+>+{
+>+	struct npcm_rng *priv = to_npcm_rng(rng);
+>+	int retval = 0;
+>+	int ready;
+>+
+>+	pm_runtime_get_sync((struct device *)priv->rng.priv);
+>+
+>+	while (max >= sizeof(u32)) {
+>+		ready = readl(priv->base + NPCM_RNGCS_REG) &
+>+			NPCM_RNG_DATA_VALID;
+>+		if (!ready) {
+>+			if (wait) {
+>+				if (readl_poll_timeout(priv->base + NPCM_RNGCS_REG,
+>+						       ready,
+>+						       ready & NPCM_RNG_DATA_VALID,
+>+						       NPCM_RNG_POLL_USEC,
+>+						       NPCM_RNG_TIMEOUT_USEC))
+>+					break;
+>+			} else {
+>+				break;
 
-Regards,
-Pascal van Leeuwen
-Silicon IP Architect, Multi-Protocol Engines @ Verimatrix
-www.insidesecure.com
+This break is too far from the condition and deeply nested to follow.
+
+And looking further, readl_poll_timeout will read and check the condition before
+calling usleep, so the the initial readl and check is redundant
+
+Rearrange to make wait determine if you call readl_poll_timeout or 
+readl / compare / break.
+
+>+			}
+>+		}
+>+
+>+		*(u32 *)buf = readl(priv->base + NPCM_RNGD_REG);
+>+		retval += sizeof(u32);
+>+		buf += sizeof(u32);
+>+		max -= sizeof(u32);
+>+	}
+>+
+>+	pm_runtime_mark_last_busy((struct device *)priv->rng.priv);
+>+	pm_runtime_put_sync_autosuspend((struct device *)priv->rng.priv);
+>+
+>+	return retval || !wait ? retval : -EIO;
+>+}
+>+
+>+static int npcm_rng_probe(struct platform_device *pdev)
+>+{
+>+	struct npcm_rng *priv;
+>+	struct resource *res;
+>+	bool pm_dis = false;
+>+	u32 quality;
+>+	int ret;
+>+
+>+	priv = devm_kzalloc(&pdev->dev, sizeof(*priv), GFP_KERNEL);
+>+	if (!priv)
+>+		return -ENOMEM;
+>+
+>+	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+>+	priv->base = devm_ioremap_resource(&pdev->dev, res);
+>+	if (IS_ERR(priv->base))
+>+		return PTR_ERR(priv->base);
+>+
+>+	priv->rng.name = pdev->name;
+>+#ifndef CONFIG_PM
+>+	pm_dis = true;
+>+	priv->rng.init = npcm_rng_init;
+>+	priv->rng.cleanup = npcm_rng_cleanup;
+>+#endif
+
+if you move this down you can use one if (ENABLED_CONFIG_PM) {}
+
+>+	priv->rng.read = npcm_rng_read;
+>+	priv->rng.priv = (unsigned long)&pdev->dev;
+>+	if (of_property_read_u32(pdev->dev.of_node, "quality", &quality))
+>+		priv->rng.quality = 1000;
+>+	else
+>+		priv->rng.quality = quality;
+>+
+>+	writel(NPCM_RNG_M1ROSEL, priv->base + NPCM_RNGMODE_REG);
+>+	if (pm_dis)
+>+		writel(NPCM_RNG_CLK_SET_25MHZ, priv->base + NPCM_RNGCS_REG);
+>+	else
+>+		writel(NPCM_RNG_CLK_SET_25MHZ | NPCM_RNG_ENABLE,
+>+		       priv->base + NPCM_RNGCS_REG);
+
+wait ... if we know the whole value here, why read/modify/write the value
+in the init and cleanup hook?   Save the io read and write the known value
+ ... define the value to be written for clarity between enable/disable if
+needed
+
+
+
+>+
+>+	ret = devm_hwrng_register(&pdev->dev, &priv->rng);
+>+	if (ret) {
+>+		dev_err(&pdev->dev, "Failed to register rng device: %d\n",
+>+			ret);
+
+need to disable if CONFIG_PM ?
+
+>+		return ret;
+>+	}
+>+
+>+	dev_set_drvdata(&pdev->dev, priv);
+
+This should probably be before the register.
+
+>+	pm_runtime_set_autosuspend_delay(&pdev->dev, 100);
+
+So every 100ms power off, and if userspace does a read we
+will poll every 1ms for upto 20ms.
+
+If userspace says try once a second with -ENODELAY so no wait,
+it never gets data.
+
+
+Oh, and yes, rngd sets non-blocking, polls the descriptors,
+and falls back to slow expensive software if no hardware
+says it has data ready.
+
+>+	pm_runtime_use_autosuspend(&pdev->dev);
+>+	pm_runtime_enable(&pdev->dev);
+>+
+>+	return 0;
+>+}
+>+
+>+static int npcm_rng_remove(struct platform_device *pdev)
+>+{
+>+	struct npcm_rng *priv = platform_get_drvdata(pdev);
+>+
+>+	hwrng_unregister(&priv->rng);
+
+you did devm register, but call unregister directly?
+
+>+	pm_runtime_disable(&pdev->dev);
+>+	pm_runtime_set_suspended(&pdev->dev);
+>+
+>+	return 0;
+>+}
+>+
+>+#ifdef CONFIG_PM
+>+static int npcm_rng_runtime_suspend(struct device *dev)
+>+{
+>+	struct npcm_rng *priv = dev_get_drvdata(dev);
+>+
+>+	npcm_rng_cleanup(&priv->rng);
+>+
+>+	return 0;
+>+}
+>+
+>+static int npcm_rng_runtime_resume(struct device *dev)
+>+{
+>+	struct npcm_rng *priv = dev_get_drvdata(dev);
+>+
+>+	return npcm_rng_init(&priv->rng);
+>+}
+>+#endif
+>+
+>+static const struct dev_pm_ops npcm_rng_pm_ops = {
+>+	SET_RUNTIME_PM_OPS(npcm_rng_runtime_suspend,
+>+			   npcm_rng_runtime_resume, NULL)
+>+	SET_SYSTEM_SLEEP_PM_OPS(pm_runtime_force_suspend,
+>+				pm_runtime_force_resume)
+>+};
+>+
+>+static const struct of_device_id rng_dt_id[] = {
+>+	{ .compatible = "nuvoton,npcm750-rng",  },
+>+	{},
+>+};
+>+MODULE_DEVICE_TABLE(of, rng_dt_id);
+>+
+>+static struct platform_driver npcm_rng_driver = {
+>+	.driver = {
+>+		.name		= "npcm-rng",
+>+		.pm		= &npcm_rng_pm_ops,
+>+		.owner		= THIS_MODULE,
+
+module_platform_driver will set owner, remove it here.
+
+>+		.of_match_table = of_match_ptr(rng_dt_id),
+>+	},
+>+	.probe		= npcm_rng_probe,
+>+	.remove		= npcm_rng_remove,
+>+};
+>+
+>+module_platform_driver(npcm_rng_driver);
+>+
+>+MODULE_DESCRIPTION("Nuvoton NPCM Random Number Generator Driver");
+>+MODULE_AUTHOR("Tomer Maimon <tomer.maimon@nuvoton.com>");
+>+MODULE_LICENSE("GPL v2");
+>-- 
+>2.18.0
+>
+>
+
+milton
+
