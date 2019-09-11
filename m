@@ -8,64 +8,64 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E40CC5ACAE
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 Sep 2019 11:47:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08783C49ED6
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 Sep 2019 11:47:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1A2B620872
+	by mail.kernel.org (Postfix) with ESMTP id D396920CC7
 	for <linux-crypto@archiver.kernel.org>; Wed, 11 Sep 2019 11:47:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q1jZcqmW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P4lbFX7i"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727782AbfIKLq7 (ORCPT
+        id S1727762AbfIKLq6 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 11 Sep 2019 07:46:59 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:37553 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726657AbfIKLq6 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
         Wed, 11 Sep 2019 07:46:58 -0400
-Received: by mail-wm1-f65.google.com with SMTP id r195so3165012wme.2;
-        Wed, 11 Sep 2019 04:46:56 -0700 (PDT)
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:38838 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726696AbfIKLq5 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 11 Sep 2019 07:46:57 -0400
+Received: by mail-wm1-f67.google.com with SMTP id o184so3146689wme.3;
+        Wed, 11 Sep 2019 04:46:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=XLyQ3Vlb+rG+95957y6BztxIW1tdl5LgP7WaxmxVaO0=;
-        b=Q1jZcqmWsHMzgEghiccCanRSPHWlytaT/p73rkABDBpEVrVIdPyhVBsQRa83y7yMwk
-         8vVGvx30GcYDujSlS3VxDH5ZmkqUbcKICCbkOmPADFguytXS59u9yHhwAmSl5fDbd5YY
-         X2li4ZcxeJjFi6+DJyrRPSgpSsMU6SySDL60WMIS2gWFtEQie2Vnug5trHsGrDV8qLF0
-         ihFNv9p5QnRps0Xm7D//Dig9Y6f1hok8zIrdddu9wOkudYYpIYdHUh3+fyEJ465lg6Dw
-         wB7tnkq37MYs03eZ/B6bTZslAceoKcWexuBT6RYVxRTcq3GAL2lZ4E8CWlwiiMHhwBp2
-         Iruw==
+        bh=JgPahXjzwJ1FlZOqme8sddUdHnTiNo6i0GnstFUSooI=;
+        b=P4lbFX7igZ66ZuRooFnd4doxXIvDnTHfGnMDq6qWqE+hWs/lu7TnLfr+reaot9BhJU
+         VBGMoQacwjjlo5pU6kByJ82mXJZyZBl8p26EG9NKA7lDmk0ez9s1s1FPHDxicBoE/Kv6
+         GMhbuumfZUxwA1GI6DlKYeJjBfvLRmd3+rkT0Y8L1TmIVsq2TqhHj1HtLQMnVGCaaLNX
+         ImY4UkOJECA2GWNfdfUcjW9A+ET5T5LK4196gAZzSFlN/9HMJZXCo0mWRMtl+r7cxhrg
+         4zwlkvGBDCh3fcesptlSBusICqOaXCe0uf4pSBmxT1n9Wla8rSa6wG8QE1jcr0a2neNc
+         1eFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=XLyQ3Vlb+rG+95957y6BztxIW1tdl5LgP7WaxmxVaO0=;
-        b=VnAop/hBEewJpXGs5+PMwBPpSRqXpcgZoNj8g9bsmw77TOOiZVFepLH+8t9Vai7iR0
-         oqej2wY29ebvuEG+5OxQeekWQkBMhxGdnSrxLcNkSFPwLZUvMpdQt9yURCtghlAiWM9v
-         gHMVKhQGktAGPTF4fgxw8zBaMc0hBEM11jiTDXiUs38GgwtKcLZo9NvAyTPmveYiUgGp
-         McuH6K4PuA3W1FhExLuVkzq/W5Gh88YBnG+1dFoJkdAu1HjKZVEHqIX+iK6PkODAg+e0
-         IDBHlBsqYqz1mMcDTwvYH2Bc3fF7xCMl7yn5Jr+lh5406LCyJOrIhM8BjSClTGtHcrXq
-         eLkw==
-X-Gm-Message-State: APjAAAW6+FT7nunW7xA6QkCgqdM93iHWMGYPGsktd0sCYckRZNIBulrz
-        RftsyXTyAH5YWT15GpXcc18=
-X-Google-Smtp-Source: APXvYqw/b7RlrRsnWT6dq2slgxmNWcb7VI6HItkHhXi+DVQQc12hADdcTu7V5ysU+9FcYNW/Ovxx5g==
-X-Received: by 2002:a1c:f518:: with SMTP id t24mr3443917wmh.98.1568202416288;
-        Wed, 11 Sep 2019 04:46:56 -0700 (PDT)
-Received: from Red.localdomain ([2a01:cb1d:147:7200:2e56:dcff:fed2:c6d6])
-        by smtp.googlemail.com with ESMTPSA id h17sm4864705wme.6.2019.09.11.04.46.55
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        bh=JgPahXjzwJ1FlZOqme8sddUdHnTiNo6i0GnstFUSooI=;
+        b=IiUQNgZHzvi9jyVW6+uowM0JOnIHWx2n0bVJ91cnBImSi9+vLNeTyC/w/cm8iaYwFJ
+         6uh3swTFLAXylHljNO3z2IrHcAi9z8NQ6Y4r78ktPcK0dGPtOa54sfktCC9N/L9TniGU
+         ihubQb1Tn54MtLAooDtt9vyfl+kpSd6/zvW9HLQ88G666JUuFCxeMzrvavF6I/UlpSWD
+         EkzBGJl2AqY4X4l46lCDUnAZ+wnk5oxwmcrzPZj9LmCwr1IY/bHyWRHtNiM7SwR1g2jb
+         +Y7UWPm9QZjKpe+L6wo6ZR4wHG8HQhu+/vmppDZrMYVAQNvqF/ocn1MBUjuVjVKsFuO0
+         9Atw==
+X-Gm-Message-State: APjAAAUvsu/5HJBlbnqVLGXyFuw/jlcQS/K/4H1nCCDllssG9tOjL8Fb
+        DLueIe/U2PhJgGXW61edHdg=
+X-Google-Smtp-Source: APXvYqyRRmmBfhyhIZqCKiLtoNymxUAz/1znvD3aUph9HKxmo1InEcfcN5xqR9cw52jqGqSoTHbiKw==
+X-Received: by 2002:a1c:1d84:: with SMTP id d126mr3569473wmd.58.1568202415208;
         Wed, 11 Sep 2019 04:46:55 -0700 (PDT)
+Received: from Red.localdomain ([2a01:cb1d:147:7200:2e56:dcff:fed2:c6d6])
+        by smtp.googlemail.com with ESMTPSA id h17sm4864705wme.6.2019.09.11.04.46.54
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 11 Sep 2019 04:46:54 -0700 (PDT)
 From:   Corentin Labbe <clabbe.montjoie@gmail.com>
 To:     davem@davemloft.net, herbert@gondor.apana.org.au,
         mripard@kernel.org, wens@csie.org
 Cc:     linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-sunxi@googlegroups.com,
         Corentin Labbe <clabbe.montjoie@gmail.com>
-Subject: [PATCH 2/2] crypto: sun4i-ss: enable pm_runtime
-Date:   Wed, 11 Sep 2019 13:46:50 +0200
-Message-Id: <20190911114650.20567-3-clabbe.montjoie@gmail.com>
+Subject: [PATCH 1/2] crypto: sun4i-ss: simplify enable/disable of the device
+Date:   Wed, 11 Sep 2019 13:46:49 +0200
+Message-Id: <20190911114650.20567-2-clabbe.montjoie@gmail.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20190911114650.20567-1-clabbe.montjoie@gmail.com>
 References: <20190911114650.20567-1-clabbe.montjoie@gmail.com>
@@ -76,142 +76,127 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch enables power management on the Security System.
+This patch regroups resource enabling/disabling in dedicated function.
+This simplify error handling and will permit to support power
+management.
 
 Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
 ---
- drivers/crypto/sunxi-ss/sun4i-ss-cipher.c |  5 +++
- drivers/crypto/sunxi-ss/sun4i-ss-core.c   | 42 ++++++++++++++++++++++-
- 2 files changed, 46 insertions(+), 1 deletion(-)
+ drivers/crypto/sunxi-ss/sun4i-ss-core.c | 73 ++++++++++++++-----------
+ 1 file changed, 42 insertions(+), 31 deletions(-)
 
-diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c b/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
-index fa4b1b47822e..1fedec9e83b0 100644
---- a/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
-+++ b/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
-@@ -10,6 +10,8 @@
-  *
-  * You could find the datasheet in Documentation/arm/sunxi.rst
-  */
-+
-+#include <linux/pm_runtime.h>
- #include "sun4i-ss.h"
- 
- static int noinline_for_stack sun4i_ss_opti_poll(struct skcipher_request *areq)
-@@ -497,13 +499,16 @@ int sun4i_ss_cipher_init(struct crypto_tfm *tfm)
- 		return PTR_ERR(op->fallback_tfm);
- 	}
- 
-+	pm_runtime_get_sync(op->ss->dev);
- 	return 0;
- }
- 
- void sun4i_ss_cipher_exit(struct crypto_tfm *tfm)
- {
- 	struct sun4i_tfm_ctx *op = crypto_tfm_ctx(tfm);
-+
- 	crypto_free_sync_skcipher(op->fallback_tfm);
-+	pm_runtime_put_sync(op->ss->dev);
- }
- 
- /* check and set the AES key, prepare the mode to be used */
 diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-core.c b/drivers/crypto/sunxi-ss/sun4i-ss-core.c
-index 2c9ff01dddfc..5e6e1a308f60 100644
+index 9aa6fe081a27..2c9ff01dddfc 100644
 --- a/drivers/crypto/sunxi-ss/sun4i-ss-core.c
 +++ b/drivers/crypto/sunxi-ss/sun4i-ss-core.c
-@@ -14,6 +14,7 @@
- #include <linux/module.h>
- #include <linux/of.h>
- #include <linux/platform_device.h>
-+#include <linux/pm_runtime.h>
- #include <crypto/scatterwalk.h>
- #include <linux/scatterlist.h>
- #include <linux/interrupt.h>
-@@ -258,6 +259,37 @@ static int sun4i_ss_enable(struct sun4i_ss_ctx *ss)
- 	return err;
- }
+@@ -223,6 +223,41 @@ static struct sun4i_ss_alg_template ss_algs[] = {
+ #endif
+ };
  
-+#ifdef CONFIG_PM
-+static int sun4i_ss_pm_suspend(struct device *dev)
++static void sun4i_ss_disable(struct sun4i_ss_ctx *ss)
 +{
-+	struct sun4i_ss_ctx *ss = dev_get_drvdata(dev);
++	if (ss->reset)
++		reset_control_assert(ss->reset);
++	clk_disable_unprepare(ss->ssclk);
++	clk_disable_unprepare(ss->busclk);
++}
 +
++static int sun4i_ss_enable(struct sun4i_ss_ctx *ss)
++{
++	int err;
++
++	err = clk_prepare_enable(ss->busclk);
++	if (err) {
++		dev_err(ss->dev, "Cannot prepare_enable busclk\n");
++		goto err_enable;
++	}
++	err = clk_prepare_enable(ss->ssclk);
++	if (err) {
++		dev_err(ss->dev, "Cannot prepare_enable ssclk\n");
++		goto err_enable;
++	}
++	if (ss->reset) {
++		err = reset_control_deassert(ss->reset);
++		if (err) {
++			dev_err(ss->dev, "Cannot deassert reset control\n");
++			goto err_enable;
++		}
++	}
++	return err;
++err_enable:
 +	sun4i_ss_disable(ss);
-+	return 0;
-+}
-+
-+static int sun4i_ss_pm_resume(struct device *dev)
-+{
-+	struct sun4i_ss_ctx *ss = dev_get_drvdata(dev);
-+
-+	return sun4i_ss_enable(ss);
-+}
-+#endif
-+
-+const struct dev_pm_ops sun4i_ss_pm_ops = {
-+	SET_RUNTIME_PM_OPS(sun4i_ss_pm_suspend, sun4i_ss_pm_resume, NULL)
-+};
-+
-+static void sun4i_ss_pm_init(struct sun4i_ss_ctx *ss)
-+{
-+	pm_runtime_use_autosuspend(ss->dev);
-+	pm_runtime_set_autosuspend_delay(ss->dev, 1000);
-+
-+	pm_runtime_get_noresume(ss->dev);
-+	pm_runtime_set_active(ss->dev);
-+	pm_runtime_enable(ss->dev);
++	return err;
 +}
 +
  static int sun4i_ss_probe(struct platform_device *pdev)
  {
  	u32 v;
-@@ -357,9 +389,12 @@ static int sun4i_ss_probe(struct platform_device *pdev)
- 	writel(0, ss->base + SS_CTL);
+@@ -269,17 +304,9 @@ static int sun4i_ss_probe(struct platform_device *pdev)
+ 		ss->reset = NULL;
+ 	}
  
- 	ss->dev = &pdev->dev;
-+	platform_set_drvdata(pdev, ss);
+-	/* Enable both clocks */
+-	err = clk_prepare_enable(ss->busclk);
+-	if (err) {
+-		dev_err(&pdev->dev, "Cannot prepare_enable busclk\n");
+-		return err;
+-	}
+-	err = clk_prepare_enable(ss->ssclk);
+-	if (err) {
+-		dev_err(&pdev->dev, "Cannot prepare_enable ssclk\n");
+-		goto error_ssclk;
+-	}
++	err = sun4i_ss_enable(ss);
++	if (err)
++		goto error_enable;
  
- 	spin_lock_init(&ss->slock);
+ 	/*
+ 	 * Check that clock have the correct rates given in the datasheet
+@@ -288,16 +315,7 @@ static int sun4i_ss_probe(struct platform_device *pdev)
+ 	err = clk_set_rate(ss->ssclk, cr_mod);
+ 	if (err) {
+ 		dev_err(&pdev->dev, "Cannot set clock rate to ssclk\n");
+-		goto error_clk;
+-	}
+-
+-	/* Deassert reset if we have a reset control */
+-	if (ss->reset) {
+-		err = reset_control_deassert(ss->reset);
+-		if (err) {
+-			dev_err(&pdev->dev, "Cannot deassert reset control\n");
+-			goto error_clk;
+-		}
++		goto error_enable;
+ 	}
  
-+	sun4i_ss_pm_init(ss);
-+
- 	for (i = 0; i < ARRAY_SIZE(ss_algs); i++) {
- 		ss_algs[i].ss = ss;
- 		switch (ss_algs[i].type) {
-@@ -388,7 +423,8 @@ static int sun4i_ss_probe(struct platform_device *pdev)
+ 	/*
+@@ -387,12 +405,8 @@ static int sun4i_ss_probe(struct platform_device *pdev)
  			break;
  		}
  	}
--	platform_set_drvdata(pdev, ss);
-+
-+	pm_runtime_put_sync(ss->dev);
- 	return 0;
- error_alg:
- 	i--;
-@@ -405,6 +441,7 @@ static int sun4i_ss_probe(struct platform_device *pdev)
- 			break;
- 		}
- 	}
-+	pm_runtime_disable(ss->dev);
- error_enable:
- 	sun4i_ss_disable(ss);
+-	if (ss->reset)
+-		reset_control_assert(ss->reset);
+-error_clk:
+-	clk_disable_unprepare(ss->ssclk);
+-error_ssclk:
+-	clk_disable_unprepare(ss->busclk);
++error_enable:
++	sun4i_ss_disable(ss);
  	return err;
-@@ -429,6 +466,8 @@ static int sun4i_ss_remove(struct platform_device *pdev)
- 		}
+ }
+ 
+@@ -416,10 +430,7 @@ static int sun4i_ss_remove(struct platform_device *pdev)
  	}
  
-+	pm_runtime_disable(ss->dev);
-+
  	writel(0, ss->base + SS_CTL);
- 	sun4i_ss_disable(ss);
+-	if (ss->reset)
+-		reset_control_assert(ss->reset);
+-	clk_disable_unprepare(ss->busclk);
+-	clk_disable_unprepare(ss->ssclk);
++	sun4i_ss_disable(ss);
  	return 0;
-@@ -445,6 +484,7 @@ static struct platform_driver sun4i_ss_driver = {
- 	.remove         = sun4i_ss_remove,
- 	.driver         = {
- 		.name           = "sun4i-ss",
-+		.pm		= &sun4i_ss_pm_ops,
- 		.of_match_table	= a20ss_crypto_of_match_table,
- 	},
- };
+ }
+ 
 -- 
 2.21.0
 
