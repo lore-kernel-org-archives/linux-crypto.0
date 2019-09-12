@@ -8,63 +8,63 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 894FEECDE20
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5E6AC49ED9
 	for <linux-crypto@archiver.kernel.org>; Thu, 12 Sep 2019 10:13:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5FA1920830
+	by mail.kernel.org (Postfix) with ESMTP id 9CC9220830
 	for <linux-crypto@archiver.kernel.org>; Thu, 12 Sep 2019 10:13:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BGo10uve"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GaLkX4rm"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730936AbfILKNG (ORCPT
+        id S1731037AbfILKNG (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Thu, 12 Sep 2019 06:13:06 -0400
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:41859 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731037AbfILKNF (ORCPT
+Received: from mail-ed1-f53.google.com ([209.85.208.53]:37890 "EHLO
+        mail-ed1-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730386AbfILKNF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Thu, 12 Sep 2019 06:13:05 -0400
-Received: by mail-ed1-f66.google.com with SMTP id z9so23411586edq.8
-        for <linux-crypto@vger.kernel.org>; Thu, 12 Sep 2019 03:13:04 -0700 (PDT)
+Received: by mail-ed1-f53.google.com with SMTP id a23so21201072edv.5
+        for <linux-crypto@vger.kernel.org>; Thu, 12 Sep 2019 03:13:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=8RK8ctadvpPxabPbDiGr6iVefXFeHDtLg1PlSuCBDmY=;
-        b=BGo10uvevXt/mqWvTi9oKcm0v3Xs9NBYTEjoYL4//+/w1FSAX5z4Z1tAw/n0Z0Jqli
-         omjyE02fhABmQVvZ5MPeFc414sNHXBV18OnDtPEIieBPaoG/DdQEUY4mUs1pG0+7vKhB
-         aouc4w1aRIDkWzkNa5ihqZqRIAcsKonQ0zRVaA/9iyamu7Ch5jeCfdB1TLtQ6TeBDF/K
-         Un5Tk1P0PxvKZxxU/4YSpay9NK16zZWnAAyInmaYR75fZpi+9fSkNy30Oh5uYsfMCeUY
-         BGiJD7h1kl0wghyOCZpCPcf5Brot6p0A4jhI5gJ6vhx4xZwYHpUbbvY/jh1o59e5vKx7
-         e06g==
+        bh=6t270amJZLgOavz3Zzqj4c4sViNremZJWKTXzibWcO0=;
+        b=GaLkX4rm05Rr0Lr2oHJtHSBRpq6+KTsZQWYwPY7iH5F0sGrL8uoiPwqBCaily8Gu50
+         mty430p1njgUQ++aE8Hd4QYSV5ftSdSAIlMOce21YyHwBNChasvBQdYqtDSlluP+YA2y
+         6JPzdSH41uIGactrUYFQ2GJRVQIora6cFyPBgnG5rlkRnFaV4nK4A1VWKGcbf0klArpF
+         7+geNy6tZ49UVPw2EAW09Nipg18RpZEepQkoA5xQVDja+Js09bVv8OH2/3cqqkAcIn2F
+         bpa5TvXQ//AWNvGblNxDPi3tzZ1Jlx1/ozQYxkdHgHpkPMPSYbEf9y5DKtPysXn6mv0t
+         j2Fg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=8RK8ctadvpPxabPbDiGr6iVefXFeHDtLg1PlSuCBDmY=;
-        b=gbDdFBMgYvH51yZWOhyQ1WNEN7BFxhthebsqov2cilEsdj7kXDM1g8qNKtzc0soceV
-         SbouarLyky0yIcqAH1/sQCtECJJw5NLg0e1n+4Tj2XUBDCjjoaCJeEEBDitAjjafiDJj
-         j2S3j0KoWExyvWpjQZ3FsZ+u0/m8HVWQOe7e+BjpQ105WhFtqPs0qCgBBkFZwFlnI16U
-         L7dD6Y+p2vEgPIiXF7pDsXJNOUUFS8cTK6lJxjPIouWQKXv0Uqvj6HHmtxRt1nPUQw9u
-         H5JQOdS5ku3dpbnI/VZOMW9l4lZ8tP4JeB+daYRX8OMyvqGJtAhxNbp6rjMscdtaLV/h
-         SiDw==
-X-Gm-Message-State: APjAAAW0KEGRhESlPvkWdOWhkvM+0hx1QWSNF45kjmRROvDmngzs6A7S
-        0rU6ygzB10EtekubOFP5WAasr3O+
-X-Google-Smtp-Source: APXvYqx3Hnxfg3tF3KcB4l9w2y2+TsG0hr8E1bZQRqPSls5xUMfsgJ82CkYu+ZHEvNttTFB0UlGyEw==
-X-Received: by 2002:a50:9250:: with SMTP id j16mr41145344eda.160.1568283183722;
+        bh=6t270amJZLgOavz3Zzqj4c4sViNremZJWKTXzibWcO0=;
+        b=fAggtjadh0c24vlMzosP4OLDkbjUC2CIJsdKe4Mi3qxq8StloeojOwkoULkr0wjuzU
+         IeKKtQ4ppe5QQMoPIU7zW5+yOWJWjfkCYZcJcJmHjOD+dcilYLjYFus2zzSVFC3MOyiM
+         AMBFnIxQpjmvyS9Gflq66TjEu9wvFdlTPl25vXol1D+nGLSgfEJkaNirD03LZOC4Bi52
+         tz2nWdReTkyQDwogXeI0LRQ33fjk2zk4xK2Aalq/6ZQiyxr3U07Q0ur/FnINIXroXX2v
+         sjiIALdC5HA8YmXEimp75W7fTjiylButa6wFh4rRghrGhHvhBAVOkFn08zgtk6GN8tj5
+         MplQ==
+X-Gm-Message-State: APjAAAUoiMdfc5MCscFmE7GNlHElt08wgSzw2n6dZ3lxED64FeHZnOot
+        I3XtBmqpMEZlxhtQkubESyB5Mu1L
+X-Google-Smtp-Source: APXvYqwV06mgQBOnD5XCKYTtv/jNbRySVKjjjFNeqaYPKabGTsw4zxzsDHjhYekUPyfybW4MQrdhbg==
+X-Received: by 2002:aa7:ccda:: with SMTP id y26mr41075556edt.303.1568283183015;
         Thu, 12 Sep 2019 03:13:03 -0700 (PDT)
 Received: from localhost.localdomain.com ([188.204.2.113])
-        by smtp.gmail.com with ESMTPSA id k11sm2561499ejr.3.2019.09.12.03.13.03
+        by smtp.gmail.com with ESMTPSA id k11sm2561499ejr.3.2019.09.12.03.13.02
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 12 Sep 2019 03:13:03 -0700 (PDT)
+        Thu, 12 Sep 2019 03:13:02 -0700 (PDT)
 From:   Pascal van Leeuwen <pascalvanl@gmail.com>
 X-Google-Original-From: Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
 To:     linux-crypto@vger.kernel.org
 Cc:     antoine.tenart@bootlin.com, herbert@gondor.apana.org.au,
         davem@davemloft.net,
         Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
-Subject: [PATCHv2 3/3] crypto: testmgr - Added testvectors for the hmac(sm3) ahash
-Date:   Thu, 12 Sep 2019 11:10:14 +0200
-Message-Id: <1568279414-16773-4-git-send-email-pvanleeuwen@verimatrix.com>
+Subject: [PATCHv2 2/3] crypto: inside-secure - Added support for HMAC-SM3 ahash
+Date:   Thu, 12 Sep 2019 11:10:13 +0200
+Message-Id: <1568279414-16773-3-git-send-email-pvanleeuwen@verimatrix.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1568279414-16773-1-git-send-email-pvanleeuwen@verimatrix.com>
 References: <1568279414-16773-1-git-send-email-pvanleeuwen@verimatrix.com>
@@ -73,101 +73,120 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Added testvectors for the hmac(sm3) ahash authentication algorithm
+Added support for the hmac(sm3) ahash authentication algorithm
 
 changes since v1:
-- nothing
+- added Acked-by tag below, no changes to the source
 
+Acked-by: Antoine Tenart <antoine.tenart@bootlin.com>
 Signed-off-by: Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
 ---
- crypto/testmgr.c |  6 ++++++
- crypto/testmgr.h | 56 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 62 insertions(+)
+ drivers/crypto/inside-secure/safexcel.c      |  1 +
+ drivers/crypto/inside-secure/safexcel.h      |  1 +
+ drivers/crypto/inside-secure/safexcel_hash.c | 70 ++++++++++++++++++++++++++++
+ 3 files changed, 72 insertions(+)
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 001e62f..3604c9d 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -4921,6 +4921,12 @@ static int alg_test_null(const struct alg_test_desc *desc,
- 			.hash = __VECS(hmac_sha512_tv_template)
- 		}
- 	}, {
-+		.alg = "hmac(sm3)",
-+		.test = alg_test_hash,
-+		.suite = {
-+			.hash = __VECS(hmac_sm3_tv_template)
-+		}
-+	}, {
- 		.alg = "hmac(streebog256)",
- 		.test = alg_test_hash,
- 		.suite = {
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index 25572c3..1f56293 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -2935,6 +2935,62 @@ struct len_range_sel {
- 	}
+diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
+index 826d1fb..7d907d5 100644
+--- a/drivers/crypto/inside-secure/safexcel.c
++++ b/drivers/crypto/inside-secure/safexcel.c
+@@ -1177,6 +1177,7 @@ static int safexcel_request_ring_irq(void *pdev, int irqid,
+ 	&safexcel_alg_chachapoly,
+ 	&safexcel_alg_chachapoly_esp,
+ 	&safexcel_alg_sm3,
++	&safexcel_alg_hmac_sm3,
  };
  
-+/* Example vectors below taken from
-+ * GM/T 0042-2015 Appendix D.3
-+ */
-+static const struct hash_testvec hmac_sm3_tv_template[] = {
-+	{
-+		.key	= "\x01\x02\x03\x04\x05\x06\x07\x08"
-+			  "\x09\x0a\x0b\x0c\x0d\x0e\x0f\x10"
-+			  "\x11\x12\x13\x14\x15\x16\x17\x18"
-+			  "\x19\x1a\x1b\x1c\x1d\x1e\x1f\x20",
-+		.ksize	= 32,
-+		.plaintext = "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq"
-+			     "abcdbcdecdefdefgefghfghighijhijkijkljklmklmnlmnomnopnopq",
-+		.psize	= 112,
-+		.digest	= "\xca\x05\xe1\x44\xed\x05\xd1\x85"
-+			  "\x78\x40\xd1\xf3\x18\xa4\xa8\x66"
-+			  "\x9e\x55\x9f\xc8\x39\x1f\x41\x44"
-+			  "\x85\xbf\xdf\x7b\xb4\x08\x96\x3a",
-+	}, {
-+		.key	= "\x01\x02\x03\x04\x05\x06\x07\x08"
-+			  "\x09\x0a\x0b\x0c\x0d\x0e\x0f\x10"
-+			  "\x11\x12\x13\x14\x15\x16\x17\x18"
-+			  "\x19\x1a\x1b\x1c\x1d\x1e\x1f\x20"
-+			  "\x21\x22\x23\x24\x25",
-+		.ksize	= 37,
-+		.plaintext = "\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd"
-+			"\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd"
-+			"\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd"
-+			"\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd\xcd",
-+		.psize	= 50,
-+		.digest	= "\x22\x0b\xf5\x79\xde\xd5\x55\x39"
-+			  "\x3f\x01\x59\xf6\x6c\x99\x87\x78"
-+			  "\x22\xa3\xec\xf6\x10\xd1\x55\x21"
-+			  "\x54\xb4\x1d\x44\xb9\x4d\xb3\xae",
-+	}, {
-+		.key	= "\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b"
-+			  "\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b\x0b"
-+			 "\x0b\x0b\x0b\x0b\x0b\x0b",
-+		.ksize	= 32,
-+		.plaintext = "Hi There",
-+		.psize	= 8,
-+		.digest	= "\xc0\xba\x18\xc6\x8b\x90\xc8\x8b"
-+			  "\xc0\x7d\xe7\x94\xbf\xc7\xd2\xc8"
-+			  "\xd1\x9e\xc3\x1e\xd8\x77\x3b\xc2"
-+			  "\xb3\x90\xc9\x60\x4e\x0b\xe1\x1e",
-+	}, {
-+		.key	= "Jefe",
-+		.ksize	= 4,
-+		.plaintext = "what do ya want for nothing?",
-+		.psize	= 28,
-+		.digest	= "\x2e\x87\xf1\xd1\x68\x62\xe6\xd9"
-+			  "\x64\xb5\x0a\x52\x00\xbf\x2b\x10"
-+			  "\xb7\x64\xfa\xa9\x68\x0a\x29\x6a"
-+			  "\x24\x05\xf2\x4b\xec\x39\xf8\x82",
+ static int safexcel_register_algorithms(struct safexcel_crypto_priv *priv)
+diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
+index 4c22df8..73055dc 100644
+--- a/drivers/crypto/inside-secure/safexcel.h
++++ b/drivers/crypto/inside-secure/safexcel.h
+@@ -871,5 +871,6 @@ int safexcel_hmac_setkey(const char *alg, const u8 *key, unsigned int keylen,
+ extern struct safexcel_alg_template safexcel_alg_chachapoly;
+ extern struct safexcel_alg_template safexcel_alg_chachapoly_esp;
+ extern struct safexcel_alg_template safexcel_alg_sm3;
++extern struct safexcel_alg_template safexcel_alg_hmac_sm3;
+ 
+ #endif
+diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
+index a4107bb..fdf4bcc 100644
+--- a/drivers/crypto/inside-secure/safexcel_hash.c
++++ b/drivers/crypto/inside-secure/safexcel_hash.c
+@@ -2280,3 +2280,73 @@ struct safexcel_alg_template safexcel_alg_sm3 = {
+ 		},
+ 	},
+ };
++
++static int safexcel_hmac_sm3_setkey(struct crypto_ahash *tfm, const u8 *key,
++				    unsigned int keylen)
++{
++	return safexcel_hmac_alg_setkey(tfm, key, keylen, "safexcel-sm3",
++					SM3_DIGEST_SIZE);
++}
++
++static int safexcel_hmac_sm3_init(struct ahash_request *areq)
++{
++	struct safexcel_ahash_ctx *ctx = crypto_ahash_ctx(crypto_ahash_reqtfm(areq));
++	struct safexcel_ahash_req *req = ahash_request_ctx(areq);
++
++	memset(req, 0, sizeof(*req));
++
++	/* Start from ipad precompute */
++	memcpy(req->state, ctx->ipad, SM3_DIGEST_SIZE);
++	/* Already processed the key^ipad part now! */
++	req->len	= SM3_BLOCK_SIZE;
++	req->processed	= SM3_BLOCK_SIZE;
++
++	ctx->alg = CONTEXT_CONTROL_CRYPTO_ALG_SM3;
++	req->digest = CONTEXT_CONTROL_DIGEST_PRECOMPUTED;
++	req->state_sz = SM3_DIGEST_SIZE;
++	req->block_sz = SM3_BLOCK_SIZE;
++	req->hmac = true;
++
++	return 0;
++}
++
++static int safexcel_hmac_sm3_digest(struct ahash_request *areq)
++{
++	int ret = safexcel_hmac_sm3_init(areq);
++
++	if (ret)
++		return ret;
++
++	return safexcel_ahash_finup(areq);
++}
++
++struct safexcel_alg_template safexcel_alg_hmac_sm3 = {
++	.type = SAFEXCEL_ALG_TYPE_AHASH,
++	.algo_mask = SAFEXCEL_ALG_SM3,
++	.alg.ahash = {
++		.init = safexcel_hmac_sm3_init,
++		.update = safexcel_ahash_update,
++		.final = safexcel_ahash_final,
++		.finup = safexcel_ahash_finup,
++		.digest = safexcel_hmac_sm3_digest,
++		.setkey = safexcel_hmac_sm3_setkey,
++		.export = safexcel_ahash_export,
++		.import = safexcel_ahash_import,
++		.halg = {
++			.digestsize = SM3_DIGEST_SIZE,
++			.statesize = sizeof(struct safexcel_ahash_export_state),
++			.base = {
++				.cra_name = "hmac(sm3)",
++				.cra_driver_name = "safexcel-hmac-sm3",
++				.cra_priority = SAFEXCEL_CRA_PRIORITY,
++				.cra_flags = CRYPTO_ALG_ASYNC |
++					     CRYPTO_ALG_KERN_DRIVER_ONLY,
++				.cra_blocksize = SM3_BLOCK_SIZE,
++				.cra_ctxsize = sizeof(struct safexcel_ahash_ctx),
++				.cra_init = safexcel_ahash_cra_init,
++				.cra_exit = safexcel_ahash_cra_exit,
++				.cra_module = THIS_MODULE,
++			},
++		},
 +	},
 +};
-+
- /*
-  * SHA1 test vectors  from from FIPS PUB 180-1
-  * Long vector from CAVS 5.0
 -- 
 1.8.3.1
 
