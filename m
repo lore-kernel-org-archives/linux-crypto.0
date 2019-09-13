@@ -2,259 +2,489 @@ Return-Path: <SRS0=vORM=XI=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC643C4CEC8
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Sep 2019 19:16:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6F61C4CEC8
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Sep 2019 19:47:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7BD80206A5
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Sep 2019 19:16:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5775320830
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Sep 2019 19:47:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="nr0y/Ypk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OhWTx4BS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729729AbfIMTQU (ORCPT
+        id S2387739AbfIMTrm (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 13 Sep 2019 15:16:20 -0400
-Received: from mail-eopbgr20076.outbound.protection.outlook.com ([40.107.2.76]:21484
-        "EHLO EUR02-VE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2389998AbfIMTQU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 13 Sep 2019 15:16:20 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NOlQZ4khaZMSwhJa3uHbdf+UQDLM0w+KRLl4Z2rdQvbnw0UHzCMCn1tfTvNCoyEZuMZw4rLvosKai/IBKFg5UZiKzaFrmQXoAe90QvygU5IAjfjWgC8h5cmPGlkLGgyAT6lvE9YG2O24llxn4Xn0sIg2CGZCCWwl2nrz416pKAcsNb0wz61K676hkQTTpTo/sY1LzBvwfNz6Ga37NyaWXy6DxYY+oWMkw2Mk/ehBQM5n/iXS+CjJoWrH5a+MgEC7xxnvEjLSNSP4VVpd3OF7NIB9f3sH6RW6KqzILomUYu+DomrM0GRbHNZlSpzY6D41xhBMh3hd8wZPOFiVxbbAaw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4DFMl1tMLb2XrlnWWV30iTmfuw4AoPx1Rqmrn53buz0=;
- b=SXPdYTfHepwUvIamKU4brn78EMOkjYsLyhecKIZL9Xijwm9IgKd5qVTVTGllhoJMAQmPWUP5Sw5QvgWllLKPrhkNjPeoy8ziiGyDYxzfr3A52e+Vp6H0w2ZTVfvf+LYMi2w32b1DAN91mQ/dxD3gEeV2DU4DBNNpBR6Ukiu0n2/95cjjrgwXAMsS81+75XZqBm1T/tQTjrQ8xsHKrapslZ+hYyf/4PqK3FQAhKa1fHz3KuMUMrTC/g6w26LY9RjWl4QRG6HTW3TCnAkxBvppcmqSFvXHQM7fpcrFHDUKAxOjCLNNP9PH0tttspzShJjzPc0l/00DNLfTq1TXs6MyRQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4DFMl1tMLb2XrlnWWV30iTmfuw4AoPx1Rqmrn53buz0=;
- b=nr0y/YpkRfhyC1vM3CvNauUnCwunroHlO7W3hKMh/Uy14QsMjGMwto0y+X1lbiKIMy9AyT4FsmFIsxyJQuGsA5HNGuVGXbRx88hjCHCD0sT7OH9cSGSfGq66g1/E0JwReztc9eYYRBv+6Lfz8oh5XLRY5XNn0brinKy637xSxvQ=
-Received: from VI1PR04MB7023.eurprd04.prod.outlook.com (10.186.159.144) by
- VI1PR04MB7072.eurprd04.prod.outlook.com (10.186.158.207) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2263.17; Fri, 13 Sep 2019 19:16:03 +0000
-Received: from VI1PR04MB7023.eurprd04.prod.outlook.com
- ([fe80::c5e8:90f8:da97:947e]) by VI1PR04MB7023.eurprd04.prod.outlook.com
- ([fe80::c5e8:90f8:da97:947e%3]) with mapi id 15.20.2263.016; Fri, 13 Sep 2019
- 19:16:03 +0000
-From:   Leonard Crestez <leonard.crestez@nxp.com>
-To:     Andrey Smirnov <andrew.smirnov@gmail.com>,
-        Horia Geanta <horia.geanta@nxp.com>
-CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Chris Healy <cphealy@gmail.com>,
-        Lucas Stach <l.stach@pengutronix.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Iuliana Prodan <iuliana.prodan@nxp.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Abel Vesa <abel.vesa@nxp.com>
-Subject: Re: [PATCH 12/12] crypto: caam - change JR device ownership scheme
-Thread-Topic: [PATCH 12/12] crypto: caam - change JR device ownership scheme
-Thread-Index: AQHVYsl8OwUGpRwn4UGFwo5O2e2LiQ==
-Date:   Fri, 13 Sep 2019 19:16:03 +0000
-Message-ID: <VI1PR04MB7023A7EC91599A537CB6A487EEB30@VI1PR04MB7023.eurprd04.prod.outlook.com>
-References: <20190904023515.7107-1-andrew.smirnov@gmail.com>
- <20190904023515.7107-13-andrew.smirnov@gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=leonard.crestez@nxp.com; 
-x-originating-ip: [89.37.124.34]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 946fc8bc-c27e-42a8-0c15-08d7387ed1fd
-x-ms-office365-filtering-ht: Tenant
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600166)(711020)(4605104)(1401327)(4618075)(2017052603328)(7193020);SRVR:VI1PR04MB7072;
-x-ms-traffictypediagnostic: VI1PR04MB7072:|VI1PR04MB7072:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <VI1PR04MB70728042C1C41998B360DDF3EEB30@VI1PR04MB7072.eurprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8273;
-x-forefront-prvs: 0159AC2B97
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(376002)(346002)(366004)(136003)(396003)(39860400002)(199004)(189003)(9686003)(66946007)(66446008)(64756008)(66556008)(66476007)(6636002)(76116006)(91956017)(486006)(74316002)(7736002)(86362001)(71200400001)(71190400001)(52536014)(305945005)(81166006)(25786009)(8676002)(44832011)(8936002)(81156014)(33656002)(476003)(478600001)(4326008)(14454004)(229853002)(99286004)(54906003)(6116002)(110136005)(55016002)(3846002)(186003)(26005)(53936002)(5660300002)(446003)(66066001)(256004)(14444005)(316002)(76176011)(6246003)(53546011)(6506007)(102836004)(7696005)(2906002)(6436002);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR04MB7072;H:VI1PR04MB7023.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: nxp.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: SuUHtvmKE4brosgantS+6SSu2+QKdVNBvaWnDhkzBSB6c/oaRJUGuUMv5uV7jFNk0s0T7z3/D4BLgtZiEf5DmCM5+3TB15LRaVaajGEWrfnjHK6hW4uIJvObXqXQgvkBqGEAlEvUaXqhQ1rdagfsC0fd9bj496IOvTwPS3r7aOcAxV+ppgr2serda9qKMVLxLWwvcDfxqniIv88NL71K8nlZMkzE02L5WUy1qZrAGIvTD2Cbr+wktIUfhydGCfnzFANK1h5N+jeRLA85tY/NrJIesfCmXT5TzlCjHViaPG+n/DpI7T12GO6MoSNie3Ew6XnCSOJYT53EGjDFmEYpYrXZ9hwLdamNiYGpdcK2qqpQg6hZx3jJO6L2PEig0cjtsCex/taXxuJ/FJ3B+ytwlsEPAQsNiAo5PQqrcDoWGtU=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 946fc8bc-c27e-42a8-0c15-08d7387ed1fd
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Sep 2019 19:16:03.5290
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: O+5JGTGPzLRw2jb8vEOQUmXRrMZBsimEQ3ajgRaaUDFutR7WPvcdccWiw1XNAjSq2EVanbQX8pRHgwIjN+2yZQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB7072
+        Fri, 13 Sep 2019 15:47:42 -0400
+Received: from mail-ed1-f65.google.com ([209.85.208.65]:41444 "EHLO
+        mail-ed1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388030AbfIMTrl (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 13 Sep 2019 15:47:41 -0400
+Received: by mail-ed1-f65.google.com with SMTP id z9so28007029edq.8
+        for <linux-crypto@vger.kernel.org>; Fri, 13 Sep 2019 12:47:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=xY74n20zdaQtxdZzW5WKGRjb1iqdoPqxmin5F/SNkS0=;
+        b=OhWTx4BSxsJuhsZIN3sM++kOZjsif+sOBJmQj7y6K9LrlBgatvDbgFntxtToa7smzp
+         M3W7EXjJQv5AC7vEEv/tioUiliiMH8sODIZ8E4yKZK04RnXeGRfFtlRkOQ8F1Nn13cTA
+         FnuW83q9Smh5kcvR/jyOQ8fjckP/FXf35/iVWF8HJe3wfpO6KPysTiUy5FhqQ/5RSeUW
+         HKVhtCPzG+qsXlRvoCj2sDqTB3gbe7PS2C82HhC3otjLS0+4DmveZlCurOiiV02inb7H
+         vYLSkkRPQ9/dk2QM1QlZwvW1HVqVX27IAYs+nDyktKMd9hLx2nQAU8pH/6slrkgcSps9
+         maWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=xY74n20zdaQtxdZzW5WKGRjb1iqdoPqxmin5F/SNkS0=;
+        b=Ay+T5O8z7KN4EyXtik1f04dR8/cg3LVdL/F8GOyorexLMRfW5Bc19RNlTfdAerCVTG
+         Jf+qUyJVZY56qXbNHb4NByrPA8RbNYIhquoKib6siQyhC5MI9WKoFa7nS9M5czIRaZcR
+         pwP3b1mFRghY8yoVluMsi+t1f7lYGpy4wwFJGRYvfXKo53tH9gDmd6DRfBYZBjeQufp2
+         6v/X4LI0Q6JnJ/ewGYx0XgjIEMQ9z7AfRdDh12AYYMGSNXQ51/tc7EGTKFuJHRLnfDi0
+         DkznIzQdNBKVEi7py+kWw9a+vZnq0JmH84jMMytLIyDZONJUCrnii7e+onJ0VUA+AfF+
+         UZOA==
+X-Gm-Message-State: APjAAAUFv75Ef/ZikchfouLycmD04CAT8llrnj7Wc+OWb9p6/9iKFUwa
+        Eqkz3qWSoeynCLUMkoH85Vu7/Ib7
+X-Google-Smtp-Source: APXvYqyrJYBbBebez3Ov8SRiQ/hNqzc/6hNJNHfIMzRevz3E9OAMdg17mibmgo5xlZtOIoQ00xxYKA==
+X-Received: by 2002:aa7:d755:: with SMTP id a21mr49014785eds.18.1568404059200;
+        Fri, 13 Sep 2019 12:47:39 -0700 (PDT)
+Received: from localhost.localdomain.com ([188.204.2.113])
+        by smtp.gmail.com with ESMTPSA id c32sm5299412eda.97.2019.09.13.12.47.38
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 13 Sep 2019 12:47:38 -0700 (PDT)
+From:   Pascal van Leeuwen <pascalvanl@gmail.com>
+X-Google-Original-From: Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
+To:     linux-crypto@vger.kernel.org
+Cc:     antoine.tenart@bootlin.com, herbert@gondor.apana.org.au,
+        davem@davemloft.net,
+        Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
+Subject: [PATCH] crypto: inside-secure - Add SM4 based authenc AEAD ciphersuites
+Date:   Fri, 13 Sep 2019 20:44:50 +0200
+Message-Id: <1568400290-5208-1-git-send-email-pvanleeuwen@verimatrix.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 04.09.2019 05:35, Andrey Smirnov wrote:=0A=
-> Returning -EBUSY from platform device's .remove() callback won't stop=0A=
-> the removal process, so the code in caam_jr_remove() is not going to=0A=
-> have the desired effect of preventing JR from being removed.=0A=
-> =0A=
-> In order to be able to deal with removal of the JR device, change the=0A=
-> code as follows:=0A=
-> =0A=
->    1. To make sure that underlying struct device remains valid for as=0A=
->       long as we have a reference to it, add appropriate device=0A=
->       refcount management to caam_jr_alloc() and caam_jr_free()=0A=
-> =0A=
->    2. To make sure that device removal doesn't happen in parallel to=0A=
->        use using the device in caam_jr_enqueue() augment the latter to=0A=
->        acquire/release device lock for the duration of the subroutine=0A=
-> =0A=
->    3. In order to handle the case when caam_jr_enqueue() is executed=0A=
->       right after corresponding caam_jr_remove(), add code to check=0A=
->       that driver data has not been set to NULL.=0A=
-=0A=
-What happens if a driver is unbound while a transform is executing =0A=
-asynchronously?=0A=
-=0A=
-Doing get_device and put_device in caam_jr_alloc and caam_jr_free =0A=
-doesn't protect you against an explicit unbind of caam_jr, that path =0A=
-doesn't care about device reference counts. For example on imx6qp:=0A=
-=0A=
-# echo 2102000.jr1 > /sys/bus/platform/drivers/caam_jr/unbind=0A=
-=0A=
-CPU: 2 PID: 561 Comm: bash Not tainted 5.3.0-rc7-next-20190904=0A=
-Hardware name: Freescale i.MX6 Quad/DualLite (Device Tree)=0A=
-Backtrace:=0A=
-[<c010f8a4>] (dump_backtrace) from [<c010fc5c>] (show_stack+0x20/0x24)=0A=
-[<c010fc3c>] (show_stack) from [<c0d21600>] (dump_stack+0xdc/0x114)=0A=
-[<c0d21524>] (dump_stack) from [<c0955774>] (caam_jr_remove+0x24/0xf8)=0A=
-[<c0955750>] (caam_jr_remove) from [<c06e2d98>] =0A=
-(platform_drv_remove+0x34/0x4c)=0A=
-[<c06e2d64>] (platform_drv_remove) from [<c06e0b74>] =0A=
-(device_release_driver_internal+0xf8/0x1b0)=0A=
-[<c06e0a7c>] (device_release_driver_internal) from [<c06e0c70>] =0A=
-(device_driver_detach+0x20/0x24)=0A=
-[<c06e0c50>] (device_driver_detach) from [<c06de5a4>] =0A=
-(unbind_store+0x6c/0xe0)=0A=
-[<c06de538>] (unbind_store) from [<c06dd950>] (drv_attr_store+0x30/0x3c)=0A=
-[<c06dd920>] (drv_attr_store) from [<c0364c18>] (sysfs_kf_write+0x50/0x5c)=
-=0A=
-[<c0364bc8>] (sysfs_kf_write) from [<c0363e0c>] =0A=
-(kernfs_fop_write+0x10c/0x1f8)=0A=
-[<c0363d00>] (kernfs_fop_write) from [<c02c3a30>] (__vfs_write+0x44/0x1d0)=
-=0A=
-[<c02c39ec>] (__vfs_write) from [<c02c68ec>] (vfs_write+0xb0/0x194)=0A=
-[<c02c683c>] (vfs_write) from [<c02c6b7c>] (ksys_write+0x64/0xd8)=0A=
-[<c02c6b18>] (ksys_write) from [<c02c6c08>] (sys_write+0x18/0x1c)=0A=
-[<c02c6bf0>] (sys_write) from [<c0101000>] (ret_fast_syscall+0x0/0x28)=0A=
-=0A=
-I think you need to do some form of slow wait loop in jrpriv until =0A=
-jrpriv->tfm_count reaches zero. Preventing new operations from starting =0A=
-would help but isn't strictly necessary for correctness.=0A=
-=0A=
-> diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c=0A=
-> index 47b389cb1c62..8a30bbd7f2aa 100644=0A=
-> --- a/drivers/crypto/caam/jr.c=0A=
-> +++ b/drivers/crypto/caam/jr.c=0A=
-> @@ -124,14 +124,6 @@ static int caam_jr_remove(struct platform_device *pd=
-ev)=0A=
->   	jrdev =3D &pdev->dev;=0A=
->   	jrpriv =3D dev_get_drvdata(jrdev);=0A=
->   =0A=
-> -	/*=0A=
-> -	 * Return EBUSY if job ring already allocated.=0A=
-> -	 */=0A=
-> -	if (atomic_read(&jrpriv->tfm_count)) {=0A=
-> -		dev_err(jrdev, "Device is busy\n");=0A=
-> -		return -EBUSY;=0A=
-> -	}=0A=
-> -=0A=
->   	/* Unregister JR-based RNG & crypto algorithms */=0A=
->   	unregister_algs();=0A=
->   =0A=
-> @@ -300,7 +292,7 @@ struct device *caam_jr_alloc(void)=0A=
->   =0A=
->   	if (min_jrpriv) {=0A=
->   		atomic_inc(&min_jrpriv->tfm_count);=0A=
-> -		dev =3D min_jrpriv->dev;=0A=
-> +		dev =3D get_device(min_jrpriv->dev);=0A=
->   	}=0A=
->   	spin_unlock(&driver_data.jr_alloc_lock);=0A=
->   =0A=
-> @@ -318,13 +310,16 @@ void caam_jr_free(struct device *rdev)=0A=
->   	struct caam_drv_private_jr *jrpriv =3D dev_get_drvdata(rdev);=0A=
->   =0A=
->   	atomic_dec(&jrpriv->tfm_count);=0A=
-> +	put_device(rdev);=0A=
->   }=0A=
->   EXPORT_SYMBOL(caam_jr_free);=0A=
->   =0A=
->   /**=0A=
->    * caam_jr_enqueue() - Enqueue a job descriptor head. Returns 0 if OK,=
-=0A=
->    * -EBUSY if the queue is full, -EIO if it cannot map the caller's=0A=
-> - * descriptor.=0A=
-> + * descriptor, -ENODEV if given device was removed and is no longer=0A=
-> + * valid=0A=
-> + *=0A=
->    * @dev:  device of the job ring to be used. This device should have=0A=
->    *        been assigned prior by caam_jr_register().=0A=
->    * @desc: points to a job descriptor that execute our request. All=0A=
-> @@ -354,15 +349,32 @@ int caam_jr_enqueue(struct device *dev, u32 *desc,=
-=0A=
->   				u32 status, void *areq),=0A=
->   		    void *areq)=0A=
->   {=0A=
-> -	struct caam_drv_private_jr *jrp =3D dev_get_drvdata(dev);=0A=
-> +	struct caam_drv_private_jr *jrp;=0A=
->   	struct caam_jrentry_info *head_entry;=0A=
->   	int head, tail, desc_size;=0A=
->   	dma_addr_t desc_dma;=0A=
->   =0A=
-> +	/*=0A=
-> +	 * Lock the device to prevent it from being removed while we=0A=
-> +	 * are using it=0A=
-> +	 */=0A=
-> +	device_lock(dev);=0A=
-> +=0A=
-> +	/*=0A=
-> +	 * If driver data is NULL, it is very likely that this device=0A=
-> +	 * was removed already. Nothing we can do here but bail out.=0A=
-> +	 */=0A=
-> +	jrp =3D dev_get_drvdata(dev);=0A=
-> +	if (!jrp) {=0A=
-> +		device_unlock(dev);=0A=
-> +		return -ENODEV;=0A=
-> +	}=0A=
-> +=0A=
->   	desc_size =3D (caam32_to_cpu(*desc) & HDR_JD_LENGTH_MASK) * sizeof(u32=
-);=0A=
->   	desc_dma =3D dma_map_single(dev, desc, desc_size, DMA_TO_DEVICE);=0A=
->   	if (dma_mapping_error(dev, desc_dma)) {=0A=
->   		dev_err(dev, "caam_jr_enqueue(): can't map jobdesc\n");=0A=
-> +		device_unlock(dev);=0A=
->   		return -EIO;=0A=
->   	}=0A=
->   =0A=
-> @@ -375,6 +387,7 @@ int caam_jr_enqueue(struct device *dev, u32 *desc,=0A=
->   	    CIRC_SPACE(head, tail, JOBR_DEPTH) <=3D 0) {=0A=
->   		spin_unlock_bh(&jrp->inplock);=0A=
->   		dma_unmap_single(dev, desc_dma, desc_size, DMA_TO_DEVICE);=0A=
-> +		device_unlock(dev);=0A=
->   		return -EBUSY;=0A=
->   	}=0A=
->   =0A=
-> @@ -411,6 +424,7 @@ int caam_jr_enqueue(struct device *dev, u32 *desc,=0A=
->   		jrp->inpring_avail =3D rd_reg32(&jrp->rregs->inpring_avail);=0A=
->   =0A=
->   	spin_unlock_bh(&jrp->inplock);=0A=
-> +	device_unlock(dev);=0A=
->   =0A=
->   	return 0;=0A=
->   }=0A=
+This patch adds support for the authenc(hmac(sha1),cbc(sm4)),
+authenc(hmac(sm3),cbc(sm4)), authenc(hmac(sha1),rfc3686(ctr(sm4))),
+and authenc(hmac(sm3),rfc3686(ctr(sm4))) aead ciphersuites.
+These are necessary to support IPsec according to the Chinese standard
+GM/T 022-1014 - IPsec VPN specification.
+
+Note that there are no testvectors present in testmgr for these
+ciphersuites. However, considering all building blocks have already been
+verified elsewhere, it is fair to assume the generic implementation to be
+correct-by-construction.
+The hardware implementation has been fuzzed against this generic
+implementation by means of a locally modified testmgr. The intention is
+to upstream these testmgr changes but this is pending other testmgr changes
+being made by Eric Biggers.
+
+The patch has been tested with the eip197c_iewxkbc configuration on the
+Xilinx VCU118 development board, using the abovementioned modified testmgr
+
+This patch applies on top of "Add support for SM4 ciphers" and needs to
+be applied before "Add (HMAC) SHA3 support".
+
+Signed-off-by: Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
+---
+ drivers/crypto/inside-secure/safexcel.c        |   4 +
+ drivers/crypto/inside-secure/safexcel.h        |   4 +
+ drivers/crypto/inside-secure/safexcel_cipher.c | 280 +++++++++++++++++++++++--
+ 3 files changed, 274 insertions(+), 14 deletions(-)
+
+diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
+index 3c140d8..8f7fdd0 100644
+--- a/drivers/crypto/inside-secure/safexcel.c
++++ b/drivers/crypto/inside-secure/safexcel.c
+@@ -1183,6 +1183,10 @@ static int safexcel_request_ring_irq(void *pdev, int irqid,
+ 	&safexcel_alg_ofb_sm4,
+ 	&safexcel_alg_cfb_sm4,
+ 	&safexcel_alg_ctr_sm4,
++	&safexcel_alg_authenc_hmac_sha1_cbc_sm4,
++	&safexcel_alg_authenc_hmac_sm3_cbc_sm4,
++	&safexcel_alg_authenc_hmac_sha1_ctr_sm4,
++	&safexcel_alg_authenc_hmac_sm3_ctr_sm4,
+ };
+ 
+ static int safexcel_register_algorithms(struct safexcel_crypto_priv *priv)
+diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
+index 62965fb..1d75044 100644
+--- a/drivers/crypto/inside-secure/safexcel.h
++++ b/drivers/crypto/inside-secure/safexcel.h
+@@ -884,5 +884,9 @@ int safexcel_hmac_setkey(const char *alg, const u8 *key, unsigned int keylen,
+ extern struct safexcel_alg_template safexcel_alg_ofb_sm4;
+ extern struct safexcel_alg_template safexcel_alg_cfb_sm4;
+ extern struct safexcel_alg_template safexcel_alg_ctr_sm4;
++extern struct safexcel_alg_template safexcel_alg_authenc_hmac_sha1_cbc_sm4;
++extern struct safexcel_alg_template safexcel_alg_authenc_hmac_sm3_cbc_sm4;
++extern struct safexcel_alg_template safexcel_alg_authenc_hmac_sha1_ctr_sm4;
++extern struct safexcel_alg_template safexcel_alg_authenc_hmac_sm3_ctr_sm4;
+ 
+ #endif
+diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-secure/safexcel_cipher.c
+index a00f84b..616c214 100644
+--- a/drivers/crypto/inside-secure/safexcel_cipher.c
++++ b/drivers/crypto/inside-secure/safexcel_cipher.c
+@@ -19,6 +19,7 @@
+ #include <crypto/ghash.h>
+ #include <crypto/poly1305.h>
+ #include <crypto/sha.h>
++#include <crypto/sm3.h>
+ #include <crypto/sm4.h>
+ #include <crypto/xts.h>
+ #include <crypto/skcipher.h>
+@@ -349,19 +350,18 @@ static int safexcel_aead_setkey(struct crypto_aead *ctfm, const u8 *key,
+ 	struct crypto_aes_ctx aes;
+ 	int err = -EINVAL;
+ 
+-	if (crypto_authenc_extractkeys(&keys, key, len) != 0)
++	if (unlikely(crypto_authenc_extractkeys(&keys, key, len)))
+ 		goto badkey;
+ 
+ 	if (ctx->mode == CONTEXT_CONTROL_CRYPTO_MODE_CTR_LOAD) {
+-		/* Minimum keysize is minimum AES key size + nonce size */
+-		if (keys.enckeylen < (AES_MIN_KEY_SIZE +
+-				      CTR_RFC3686_NONCE_SIZE))
++		/* Must have at least space for the nonce here */
++		if (unlikely(keys.enckeylen < CTR_RFC3686_NONCE_SIZE))
+ 			goto badkey;
+ 		/* last 4 bytes of key are the nonce! */
+ 		ctx->nonce = *(u32 *)(keys.enckey + keys.enckeylen -
+ 				      CTR_RFC3686_NONCE_SIZE);
+ 		/* exclude the nonce here */
+-		keys.enckeylen -= CONTEXT_CONTROL_CRYPTO_MODE_CTR_LOAD;
++		keys.enckeylen -= CTR_RFC3686_NONCE_SIZE;
+ 	}
+ 
+ 	/* Encryption key */
+@@ -376,6 +376,10 @@ static int safexcel_aead_setkey(struct crypto_aead *ctfm, const u8 *key,
+ 		if (unlikely(err))
+ 			goto badkey;
+ 		break;
++	case SAFEXCEL_SM4:
++		if (unlikely(keys.enckeylen != SM4_KEY_SIZE))
++			goto badkey;
++		break;
+ 	default:
+ 		dev_err(priv->dev, "aead: unsupported cipher algorithm\n");
+ 		goto badkey;
+@@ -412,6 +416,11 @@ static int safexcel_aead_setkey(struct crypto_aead *ctfm, const u8 *key,
+ 					 keys.authkeylen, &istate, &ostate))
+ 			goto badkey;
+ 		break;
++	case CONTEXT_CONTROL_CRYPTO_ALG_SM3:
++		if (safexcel_hmac_setkey("safexcel-sm3", keys.authkey,
++					 keys.authkeylen, &istate, &ostate))
++			goto badkey;
++		break;
+ 	default:
+ 		dev_err(priv->dev, "aead: unsupported hash algorithmn");
+ 		goto badkey;
+@@ -2521,18 +2530,13 @@ static int safexcel_aead_chachapoly_decrypt(struct aead_request *req)
+ 	return safexcel_aead_chachapoly_crypt(req, SAFEXCEL_DECRYPT);
+ }
+ 
+-static int safexcel_aead_chachapoly_cra_init(struct crypto_tfm *tfm)
++static int safexcel_aead_fallback_cra_init(struct crypto_tfm *tfm)
+ {
+ 	struct crypto_aead *aead = __crypto_aead_cast(tfm);
+ 	struct aead_alg *alg = crypto_aead_alg(aead);
+ 	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
+ 	safexcel_aead_cra_init(tfm);
+-	ctx->alg  = SAFEXCEL_CHACHA20;
+-	ctx->mode = CONTEXT_CONTROL_CHACHA20_MODE_256_32 |
+-		    CONTEXT_CONTROL_CHACHA20_MODE_CALC_OTK;
+-	ctx->hash_alg = CONTEXT_CONTROL_CRYPTO_ALG_POLY1305;
+-	ctx->state_sz = 0; /* Precomputed by HW */
+ 
+ 	/* Allocate fallback implementation */
+ 	ctx->fback = crypto_alloc_aead(alg->base.cra_name, 0,
+@@ -2548,7 +2552,20 @@ static int safexcel_aead_chachapoly_cra_init(struct crypto_tfm *tfm)
+ 	return 0;
+ }
+ 
+-static void safexcel_aead_chachapoly_cra_exit(struct crypto_tfm *tfm)
++static int safexcel_aead_chachapoly_cra_init(struct crypto_tfm *tfm)
++{
++	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	safexcel_aead_fallback_cra_init(tfm);
++	ctx->alg  = SAFEXCEL_CHACHA20;
++	ctx->mode = CONTEXT_CONTROL_CHACHA20_MODE_256_32 |
++		    CONTEXT_CONTROL_CHACHA20_MODE_CALC_OTK;
++	ctx->hash_alg = CONTEXT_CONTROL_CRYPTO_ALG_POLY1305;
++	ctx->state_sz = 0; /* Precomputed by HW */
++	return 0;
++}
++
++static void safexcel_aead_fallback_cra_exit(struct crypto_tfm *tfm)
+ {
+ 	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
+ 
+@@ -2578,7 +2595,7 @@ struct safexcel_alg_template safexcel_alg_chachapoly = {
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+ 			.cra_alignmask = 0,
+ 			.cra_init = safexcel_aead_chachapoly_cra_init,
+-			.cra_exit = safexcel_aead_chachapoly_cra_exit,
++			.cra_exit = safexcel_aead_fallback_cra_exit,
+ 			.cra_module = THIS_MODULE,
+ 		},
+ 	},
+@@ -2616,7 +2633,7 @@ struct safexcel_alg_template safexcel_alg_chachapoly_esp = {
+ 			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
+ 			.cra_alignmask = 0,
+ 			.cra_init = safexcel_aead_chachapolyesp_cra_init,
+-			.cra_exit = safexcel_aead_chachapoly_cra_exit,
++			.cra_exit = safexcel_aead_fallback_cra_exit,
+ 			.cra_module = THIS_MODULE,
+ 		},
+ 	},
+@@ -2865,3 +2882,238 @@ struct safexcel_alg_template safexcel_alg_ctr_sm4 = {
+ 		},
+ 	},
+ };
++
++static int safexcel_aead_sm4_blk_encrypt(struct aead_request *req)
++{
++	/* Workaround for HW bug: EIP96 4.3 does not report blocksize error */
++	if (req->cryptlen & (SM4_BLOCK_SIZE - 1))
++		return -EINVAL;
++
++	return safexcel_queue_req(&req->base, aead_request_ctx(req),
++				  SAFEXCEL_ENCRYPT);
++}
++
++static int safexcel_aead_sm4_blk_decrypt(struct aead_request *req)
++{
++	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
++
++	/* Workaround for HW bug: EIP96 4.3 does not report blocksize error */
++	if ((req->cryptlen - crypto_aead_authsize(tfm)) & (SM4_BLOCK_SIZE - 1))
++		return -EINVAL;
++
++	return safexcel_queue_req(&req->base, aead_request_ctx(req),
++				  SAFEXCEL_DECRYPT);
++}
++
++static int safexcel_aead_sm4cbc_sha1_cra_init(struct crypto_tfm *tfm)
++{
++	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	safexcel_aead_cra_init(tfm);
++	ctx->alg = SAFEXCEL_SM4;
++	ctx->hash_alg = CONTEXT_CONTROL_CRYPTO_ALG_SHA1;
++	ctx->state_sz = SHA1_DIGEST_SIZE;
++	return 0;
++}
++
++struct safexcel_alg_template safexcel_alg_authenc_hmac_sha1_cbc_sm4 = {
++	.type = SAFEXCEL_ALG_TYPE_AEAD,
++	.algo_mask = SAFEXCEL_ALG_SM4 | SAFEXCEL_ALG_SHA1,
++	.alg.aead = {
++		.setkey = safexcel_aead_setkey,
++		.encrypt = safexcel_aead_sm4_blk_encrypt,
++		.decrypt = safexcel_aead_sm4_blk_decrypt,
++		.ivsize = SM4_BLOCK_SIZE,
++		.maxauthsize = SHA1_DIGEST_SIZE,
++		.base = {
++			.cra_name = "authenc(hmac(sha1),cbc(sm4))",
++			.cra_driver_name = "safexcel-authenc-hmac-sha1-cbc-sm4",
++			.cra_priority = SAFEXCEL_CRA_PRIORITY,
++			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_KERN_DRIVER_ONLY,
++			.cra_blocksize = SM4_BLOCK_SIZE,
++			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
++			.cra_alignmask = 0,
++			.cra_init = safexcel_aead_sm4cbc_sha1_cra_init,
++			.cra_exit = safexcel_aead_cra_exit,
++			.cra_module = THIS_MODULE,
++		},
++	},
++};
++
++static int safexcel_aead_fallback_setkey(struct crypto_aead *ctfm,
++					 const u8 *key, unsigned int len)
++{
++	struct crypto_tfm *tfm = crypto_aead_tfm(ctfm);
++	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	/* Keep fallback cipher synchronized */
++	return crypto_aead_setkey(ctx->fback, (u8 *)key, len) ?:
++	       safexcel_aead_setkey(ctfm, key, len);
++}
++
++static int safexcel_aead_fallback_setauthsize(struct crypto_aead *ctfm,
++					      unsigned int authsize)
++{
++	struct crypto_tfm *tfm = crypto_aead_tfm(ctfm);
++	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	/* Keep fallback cipher synchronized */
++	return crypto_aead_setauthsize(ctx->fback, authsize);
++}
++
++static int safexcel_aead_fallback_crypt(struct aead_request *req,
++					enum safexcel_cipher_direction dir)
++{
++	struct crypto_aead *aead = crypto_aead_reqtfm(req);
++	struct crypto_tfm *tfm = crypto_aead_tfm(aead);
++	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
++	struct aead_request *subreq = aead_request_ctx(req);
++
++	aead_request_set_tfm(subreq, ctx->fback);
++	aead_request_set_callback(subreq, req->base.flags, req->base.complete,
++				  req->base.data);
++	aead_request_set_crypt(subreq, req->src, req->dst, req->cryptlen,
++			       req->iv);
++	aead_request_set_ad(subreq, req->assoclen);
++
++	return (dir ==  SAFEXCEL_ENCRYPT) ?
++		crypto_aead_encrypt(subreq) :
++		crypto_aead_decrypt(subreq);
++}
++
++static int safexcel_aead_sm4cbc_sm3_encrypt(struct aead_request *req)
++{
++	struct safexcel_cipher_req *creq = aead_request_ctx(req);
++
++	/* Workaround for HW bug: EIP96 4.3 does not report blocksize error */
++	if (req->cryptlen & (SM4_BLOCK_SIZE - 1))
++		return -EINVAL;
++	else if (req->cryptlen || req->assoclen) /* If input length > 0 only */
++		return safexcel_queue_req(&req->base, creq, SAFEXCEL_ENCRYPT);
++
++	/* HW cannot do full (AAD+payload) zero length, use fallback */
++	return safexcel_aead_fallback_crypt(req, SAFEXCEL_ENCRYPT);
++}
++
++static int safexcel_aead_sm4cbc_sm3_decrypt(struct aead_request *req)
++{
++	struct safexcel_cipher_req *creq = aead_request_ctx(req);
++	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
++
++	/* Workaround for HW bug: EIP96 4.3 does not report blocksize error */
++	if ((req->cryptlen - crypto_aead_authsize(tfm)) & (SM4_BLOCK_SIZE - 1))
++		return -EINVAL;
++	else if (req->cryptlen > crypto_aead_authsize(tfm) || req->assoclen)
++		/* If input length > 0 only */
++		return safexcel_queue_req(&req->base, creq, SAFEXCEL_DECRYPT);
++
++	/* HW cannot do full (AAD+payload) zero length, use fallback */
++	return safexcel_aead_fallback_crypt(req, SAFEXCEL_DECRYPT);
++}
++
++static int safexcel_aead_sm4cbc_sm3_cra_init(struct crypto_tfm *tfm)
++{
++	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	safexcel_aead_fallback_cra_init(tfm);
++	ctx->alg = SAFEXCEL_SM4;
++	ctx->hash_alg = CONTEXT_CONTROL_CRYPTO_ALG_SM3;
++	ctx->state_sz = SM3_DIGEST_SIZE;
++	return 0;
++}
++
++struct safexcel_alg_template safexcel_alg_authenc_hmac_sm3_cbc_sm4 = {
++	.type = SAFEXCEL_ALG_TYPE_AEAD,
++	.algo_mask = SAFEXCEL_ALG_SM4 | SAFEXCEL_ALG_SM3,
++	.alg.aead = {
++		.setkey = safexcel_aead_fallback_setkey,
++		.setauthsize = safexcel_aead_fallback_setauthsize,
++		.encrypt = safexcel_aead_sm4cbc_sm3_encrypt,
++		.decrypt = safexcel_aead_sm4cbc_sm3_decrypt,
++		.ivsize = SM4_BLOCK_SIZE,
++		.maxauthsize = SM3_DIGEST_SIZE,
++		.base = {
++			.cra_name = "authenc(hmac(sm3),cbc(sm4))",
++			.cra_driver_name = "safexcel-authenc-hmac-sm3-cbc-sm4",
++			.cra_priority = SAFEXCEL_CRA_PRIORITY,
++			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_KERN_DRIVER_ONLY |
++				     CRYPTO_ALG_NEED_FALLBACK,
++			.cra_blocksize = SM4_BLOCK_SIZE,
++			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
++			.cra_alignmask = 0,
++			.cra_init = safexcel_aead_sm4cbc_sm3_cra_init,
++			.cra_exit = safexcel_aead_fallback_cra_exit,
++			.cra_module = THIS_MODULE,
++		},
++	},
++};
++
++static int safexcel_aead_sm4ctr_sha1_cra_init(struct crypto_tfm *tfm)
++{
++	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	safexcel_aead_sm4cbc_sha1_cra_init(tfm);
++	ctx->mode = CONTEXT_CONTROL_CRYPTO_MODE_CTR_LOAD;
++	return 0;
++}
++
++struct safexcel_alg_template safexcel_alg_authenc_hmac_sha1_ctr_sm4 = {
++	.type = SAFEXCEL_ALG_TYPE_AEAD,
++	.algo_mask = SAFEXCEL_ALG_SM4 | SAFEXCEL_ALG_SHA1,
++	.alg.aead = {
++		.setkey = safexcel_aead_setkey,
++		.encrypt = safexcel_aead_encrypt,
++		.decrypt = safexcel_aead_decrypt,
++		.ivsize = CTR_RFC3686_IV_SIZE,
++		.maxauthsize = SHA1_DIGEST_SIZE,
++		.base = {
++			.cra_name = "authenc(hmac(sha1),rfc3686(ctr(sm4)))",
++			.cra_driver_name = "safexcel-authenc-hmac-sha1-ctr-sm4",
++			.cra_priority = SAFEXCEL_CRA_PRIORITY,
++			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_KERN_DRIVER_ONLY,
++			.cra_blocksize = 1,
++			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
++			.cra_alignmask = 0,
++			.cra_init = safexcel_aead_sm4ctr_sha1_cra_init,
++			.cra_exit = safexcel_aead_cra_exit,
++			.cra_module = THIS_MODULE,
++		},
++	},
++};
++
++static int safexcel_aead_sm4ctr_sm3_cra_init(struct crypto_tfm *tfm)
++{
++	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	safexcel_aead_sm4cbc_sm3_cra_init(tfm);
++	ctx->mode = CONTEXT_CONTROL_CRYPTO_MODE_CTR_LOAD;
++	return 0;
++}
++
++struct safexcel_alg_template safexcel_alg_authenc_hmac_sm3_ctr_sm4 = {
++	.type = SAFEXCEL_ALG_TYPE_AEAD,
++	.algo_mask = SAFEXCEL_ALG_SM4 | SAFEXCEL_ALG_SM3,
++	.alg.aead = {
++		.setkey = safexcel_aead_setkey,
++		.encrypt = safexcel_aead_encrypt,
++		.decrypt = safexcel_aead_decrypt,
++		.ivsize = CTR_RFC3686_IV_SIZE,
++		.maxauthsize = SM3_DIGEST_SIZE,
++		.base = {
++			.cra_name = "authenc(hmac(sm3),rfc3686(ctr(sm4)))",
++			.cra_driver_name = "safexcel-authenc-hmac-sm3-ctr-sm4",
++			.cra_priority = SAFEXCEL_CRA_PRIORITY,
++			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_KERN_DRIVER_ONLY,
++			.cra_blocksize = 1,
++			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
++			.cra_alignmask = 0,
++			.cra_init = safexcel_aead_sm4ctr_sm3_cra_init,
++			.cra_exit = safexcel_aead_cra_exit,
++			.cra_module = THIS_MODULE,
++		},
++	},
++};
+-- 
+1.8.3.1
+
