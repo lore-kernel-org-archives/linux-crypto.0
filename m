@@ -8,63 +8,63 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8794C4CEC5
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Sep 2019 10:13:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E81FC49ED7
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Sep 2019 10:13:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B5AC22084F
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Sep 2019 10:13:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DAA642089F
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Sep 2019 10:13:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dIMohzfI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rLQgfSUy"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729394AbfIMKNd (ORCPT
+        id S1729401AbfIMKNe (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 13 Sep 2019 06:13:33 -0400
-Received: from mail-ed1-f68.google.com ([209.85.208.68]:37437 "EHLO
-        mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729390AbfIMKNd (ORCPT
+        Fri, 13 Sep 2019 06:13:34 -0400
+Received: from mail-ed1-f52.google.com ([209.85.208.52]:44519 "EHLO
+        mail-ed1-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729368AbfIMKNe (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 13 Sep 2019 06:13:33 -0400
-Received: by mail-ed1-f68.google.com with SMTP id i1so26602757edv.4
-        for <linux-crypto@vger.kernel.org>; Fri, 13 Sep 2019 03:13:31 -0700 (PDT)
+        Fri, 13 Sep 2019 06:13:34 -0400
+Received: by mail-ed1-f52.google.com with SMTP id p2so25345086edx.11
+        for <linux-crypto@vger.kernel.org>; Fri, 13 Sep 2019 03:13:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=C+mqKAiglc9zM+YkXXjohbwhh6LP/vTLI0OTUkKcPRM=;
-        b=dIMohzfIjzrL4Une3Zg1t0TLjCdRHFf/bdfGzm86j240WdMaKlk6w0f3n3/8Ixm6sw
-         WXfZQuSdZvzv4UIwPNBiIkrJKBK3KXy9bFb9Yi5RYRweRptbcw6JsrPkdqrBuj+gXZMr
-         z4mPPu0v34rE/97jb13udcSAkM7mEqhbQamRokcoRLRjth2UBNmQa0BJfu6bB0TXEPYm
-         eF66B55aPFAvsJZsj3S+Khl6Pl44eYLWlYNLswsFehknoyvygLpWBiZPrKYGk6bKGrGb
-         VTGhVX8PDIFRUrT/JG4eWSaAsrQdeHQcBg3AjR+yXdPUn8t664YFAQoLgvIwK0PMbJJ8
-         /D/g==
+        bh=nTfuAyuLbmmlhQjE6Xlz+2mZhBEXtYfSxeThopYDhRs=;
+        b=rLQgfSUy3oK44/3qr5l2mbTbqNV3+QPWVIU+suz0GJIVLh337p8pAveaS/FWvM/XSf
+         fnG25he3pjBmKNcuffsJo/xGbacH0LlwWDIZHBlkVwMDMKJUvjCy5g3dWZ4+MC89dyOd
+         la6k4ZASSmz48EUo1pgwHRKW44OAnaMNeMFzaVEAwN8Opl4W2Fiu35mOQUMTW10Xxt+8
+         X+nqD6YxoGR5mzuhkrQHHx1fMRCuezEb4Xes7mKIOQqwQTHjF2T5swAseU6aIez4cFlJ
+         H2poxrf9CLdZpAKDn+eLoPBCu5ZBvzJhzfmaFMMGKjsfx2/Pe2Ii+spLRmf1CK43HkGg
+         ZINg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=C+mqKAiglc9zM+YkXXjohbwhh6LP/vTLI0OTUkKcPRM=;
-        b=Hn4HyJ7ZNqZVqeGh3gaA+qwTw8aFoda0V1ZW/2pSplbEcvBnZhno0mLHK2NoNx50gL
-         f5LrRXStI5eASFSG5Q1atU6Vio6/tpgQXiSHWEe0zjmY3WdipWYy0V8m3w1iuzomX9yq
-         0nYb9A+HhywoIMA5ZhcFj181SOe7dDw1spDEvbbOJSSz23J8WWp5lT5YqafP2IAdDLZ2
-         c4F7Wuk+Qb3rxjGVlHwSO+HW6OGvqHbRNm0ym/ZKMptvv71dC3oeGCcjIABQXCBBjDDv
-         krKduY/d1+0NsY0fo6dGtwr9erg6k8ZMV1HKfum7GC26xbXmYWGUpiz3EKMACvpMcbnJ
-         rmyA==
-X-Gm-Message-State: APjAAAW1qsocxtHfc1WfN1sSbvScdvb82WkPpmI4QaoUyt4XBmutn1zp
-        mmOZw1kOAgULBqLKNAVZIY1pi0Zy
-X-Google-Smtp-Source: APXvYqxjT3VoECmsRWS1N7jbVZ4Uvl+F5n801QqxewnbNscAS+U0MbuFTzeNTqFPj55ibNdoL9ZE1g==
-X-Received: by 2002:a17:906:6dc1:: with SMTP id j1mr38635007ejt.85.1568369610730;
-        Fri, 13 Sep 2019 03:13:30 -0700 (PDT)
+        bh=nTfuAyuLbmmlhQjE6Xlz+2mZhBEXtYfSxeThopYDhRs=;
+        b=s6AS9LZs+27jXmT3yEfJWG9oNG68haPN0GH63lUFHKcA/7DrmdEBW6HRlt9kPHoLVp
+         QEebBDXqp8iTcvNNVJ+B8nN5csXwB4mtvu3qS0KG/erojE5KROqRCf7AngE3T9px0/sk
+         sJZ2aWvMNFigcYqwGMgl2S6FImtF5bv8uU/ta4qLnG5GxN3tJBHU0sXtd6XW8exryheM
+         WljC3HTMomWBOT+LeZ2hO3ymXoXdSfLzOWXiI8xOnriEwoD5bCD8x36iQl7nVw4NREDM
+         Paw/aMzhl9qZTysr7ZR4u7B26c1ogZ2WbBeEzIzInbWVQgJl3uy5t0PLADA3IrgkQFVt
+         MKQQ==
+X-Gm-Message-State: APjAAAXh0yY40v/lc+Zg7BNc+imTKqtpmFIlolGuUB5JmozTtB2EP46b
+        Oht7lF3MKJUNvcsHieMqMGCEPgtC
+X-Google-Smtp-Source: APXvYqyXdcUZP9JFk2FdDxwY3kKvQJj5PMs0kbtaZ69MKspXFUgfqMKpHONjAyTQfv9D83zctZVsYA==
+X-Received: by 2002:a17:906:400c:: with SMTP id v12mr37935957ejj.15.1568369612397;
+        Fri, 13 Sep 2019 03:13:32 -0700 (PDT)
 Received: from localhost.localdomain.com ([188.204.2.113])
-        by smtp.gmail.com with ESMTPSA id z65sm5314382ede.86.2019.09.13.03.13.30
+        by smtp.gmail.com with ESMTPSA id z65sm5314382ede.86.2019.09.13.03.13.31
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 13 Sep 2019 03:13:30 -0700 (PDT)
+        Fri, 13 Sep 2019 03:13:31 -0700 (PDT)
 From:   Pascal van Leeuwen <pascalvanl@gmail.com>
 X-Google-Original-From: Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
 To:     linux-crypto@vger.kernel.org
 Cc:     antoine.tenart@bootlin.com, herbert@gondor.apana.org.au,
         davem@davemloft.net,
         Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
-Subject: [PATCHv2 1/7] crypto: inside-secure - Add support for the ecb(sm4) skcipher
-Date:   Fri, 13 Sep 2019 11:10:36 +0200
-Message-Id: <1568365842-19905-2-git-send-email-pvanleeuwen@verimatrix.com>
+Subject: [PATCHv2 3/7] crypto: inside-secure - Add support for the ofb(sm4) skcipher
+Date:   Fri, 13 Sep 2019 11:10:38 +0200
+Message-Id: <1568365842-19905-4-git-send-email-pvanleeuwen@verimatrix.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1568365842-19905-1-git-send-email-pvanleeuwen@verimatrix.com>
 References: <1568365842-19905-1-git-send-email-pvanleeuwen@verimatrix.com>
@@ -73,175 +73,80 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch adds support for SM4 in ECB mode, i.e. skcipher ecb(sm4).
+This patch adds support for SM4 in OFB mode, i.e. skcipher ofb(sm4).
 
 changes since v1:
-- make SAFEXCEL_SM4 case entry explit, using the proper SM4_BLOCK_SIZE
-  instead of "borrowing" the AES code which "coincidentally" works
+- nothing
 
 Signed-off-by: Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
 ---
  drivers/crypto/inside-secure/safexcel.c        |  1 +
- drivers/crypto/inside-secure/safexcel.h        |  2 +
- drivers/crypto/inside-secure/safexcel_cipher.c | 94 ++++++++++++++++++++++++++
- 3 files changed, 97 insertions(+)
+ drivers/crypto/inside-secure/safexcel.h        |  1 +
+ drivers/crypto/inside-secure/safexcel_cipher.c | 36 ++++++++++++++++++++++++++
+ 3 files changed, 38 insertions(+)
 
 diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
-index 7d907d5..fe785e8 100644
+index 4320992..fbfda68 100644
 --- a/drivers/crypto/inside-secure/safexcel.c
 +++ b/drivers/crypto/inside-secure/safexcel.c
-@@ -1178,6 +1178,7 @@ static int safexcel_request_ring_irq(void *pdev, int irqid,
- 	&safexcel_alg_chachapoly_esp,
- 	&safexcel_alg_sm3,
+@@ -1180,6 +1180,7 @@ static int safexcel_request_ring_irq(void *pdev, int irqid,
  	&safexcel_alg_hmac_sm3,
-+	&safexcel_alg_ecb_sm4,
+ 	&safexcel_alg_ecb_sm4,
+ 	&safexcel_alg_cbc_sm4,
++	&safexcel_alg_ofb_sm4,
  };
  
  static int safexcel_register_algorithms(struct safexcel_crypto_priv *priv)
 diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
-index 73055dc..7a3183e 100644
+index 71eec5c..8e01d24 100644
 --- a/drivers/crypto/inside-secure/safexcel.h
 +++ b/drivers/crypto/inside-secure/safexcel.h
-@@ -359,6 +359,7 @@ struct safexcel_context_record {
- #define CONTEXT_CONTROL_CRYPTO_ALG_AES192	(0x6 << 17)
- #define CONTEXT_CONTROL_CRYPTO_ALG_AES256	(0x7 << 17)
- #define CONTEXT_CONTROL_CRYPTO_ALG_CHACHA20	(0x8 << 17)
-+#define CONTEXT_CONTROL_CRYPTO_ALG_SM4		(0xd << 17)
- #define CONTEXT_CONTROL_DIGEST_PRECOMPUTED	(0x1 << 21)
- #define CONTEXT_CONTROL_DIGEST_XCM		(0x2 << 21)
- #define CONTEXT_CONTROL_DIGEST_HMAC		(0x3 << 21)
-@@ -872,5 +873,6 @@ int safexcel_hmac_setkey(const char *alg, const u8 *key, unsigned int keylen,
- extern struct safexcel_alg_template safexcel_alg_chachapoly_esp;
- extern struct safexcel_alg_template safexcel_alg_sm3;
+@@ -875,5 +875,6 @@ int safexcel_hmac_setkey(const char *alg, const u8 *key, unsigned int keylen,
  extern struct safexcel_alg_template safexcel_alg_hmac_sm3;
-+extern struct safexcel_alg_template safexcel_alg_ecb_sm4;
+ extern struct safexcel_alg_template safexcel_alg_ecb_sm4;
+ extern struct safexcel_alg_template safexcel_alg_cbc_sm4;
++extern struct safexcel_alg_template safexcel_alg_ofb_sm4;
  
  #endif
 diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-secure/safexcel_cipher.c
-index 40f98f1..f389a3c 100644
+index ae2b634..95f9214 100644
 --- a/drivers/crypto/inside-secure/safexcel_cipher.c
 +++ b/drivers/crypto/inside-secure/safexcel_cipher.c
-@@ -19,6 +19,7 @@
- #include <crypto/ghash.h>
- #include <crypto/poly1305.h>
- #include <crypto/sha.h>
-+#include <crypto/sm4.h>
- #include <crypto/xts.h>
- #include <crypto/skcipher.h>
- #include <crypto/internal/aead.h>
-@@ -36,6 +37,7 @@ enum safexcel_cipher_alg {
- 	SAFEXCEL_3DES,
- 	SAFEXCEL_AES,
- 	SAFEXCEL_CHACHA20,
-+	SAFEXCEL_SM4,
- };
- 
- struct safexcel_cipher_ctx {
-@@ -139,6 +141,10 @@ static void safexcel_cipher_token(struct safexcel_cipher_ctx *ctx, u8 *iv,
- 			block_sz = DES3_EDE_BLOCK_SIZE;
- 			cdesc->control_data.options |= EIP197_OPTION_2_TOKEN_IV_CMD;
- 			break;
-+		case SAFEXCEL_SM4:
-+			block_sz = SM4_BLOCK_SIZE;
-+			cdesc->control_data.options |= EIP197_OPTION_4_TOKEN_IV_CMD;
-+			break;
- 		case SAFEXCEL_AES:
- 			block_sz = AES_BLOCK_SIZE;
- 			cdesc->control_data.options |= EIP197_OPTION_4_TOKEN_IV_CMD;
-@@ -535,6 +541,9 @@ static int safexcel_context_control(struct safexcel_cipher_ctx *ctx,
- 	} else if (ctx->alg == SAFEXCEL_CHACHA20) {
- 		cdesc->control_data.control0 |=
- 			CONTEXT_CONTROL_CRYPTO_ALG_CHACHA20;
-+	} else if (ctx->alg == SAFEXCEL_SM4) {
-+		cdesc->control_data.control0 |=
-+			CONTEXT_CONTROL_CRYPTO_ALG_SM4;
- 	}
- 
- 	return 0;
-@@ -2626,3 +2635,88 @@ struct safexcel_alg_template safexcel_alg_chachapoly_esp = {
+@@ -2756,3 +2756,39 @@ struct safexcel_alg_template safexcel_alg_cbc_sm4 = {
  		},
  	},
  };
 +
-+static int safexcel_skcipher_sm4_setkey(struct crypto_skcipher *ctfm,
-+					const u8 *key, unsigned int len)
-+{
-+	struct crypto_tfm *tfm = crypto_skcipher_tfm(ctfm);
-+	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
-+	struct safexcel_crypto_priv *priv = ctx->priv;
-+	int i;
-+
-+	if (len != SM4_KEY_SIZE) {
-+		crypto_skcipher_set_flags(ctfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
-+		return -EINVAL;
-+	}
-+
-+	if (priv->flags & EIP197_TRC_CACHE && ctx->base.ctxr_dma) {
-+		for (i = 0; i < SM4_KEY_SIZE / sizeof(u32); i++) {
-+			if (ctx->key[i] !=
-+			    get_unaligned_le32(key + i * sizeof(u32))) {
-+				ctx->base.needs_inv = true;
-+				break;
-+			}
-+		}
-+	}
-+
-+	for (i = 0; i < SM4_KEY_SIZE / sizeof(u32); i++)
-+		ctx->key[i] = get_unaligned_le32(key + i * sizeof(u32));
-+	ctx->key_len = SM4_KEY_SIZE;
-+
-+	return 0;
-+}
-+
-+static int safexcel_sm4_blk_encrypt(struct skcipher_request *req)
-+{
-+	/* Workaround for HW bug: EIP96 4.3 does not report blocksize error */
-+	if (req->cryptlen & (SM4_BLOCK_SIZE - 1))
-+		return -EINVAL;
-+	else
-+		return safexcel_queue_req(&req->base, skcipher_request_ctx(req),
-+					  SAFEXCEL_ENCRYPT);
-+}
-+
-+static int safexcel_sm4_blk_decrypt(struct skcipher_request *req)
-+{
-+	/* Workaround for HW bug: EIP96 4.3 does not report blocksize error */
-+	if (req->cryptlen & (SM4_BLOCK_SIZE - 1))
-+		return -EINVAL;
-+	else
-+		return safexcel_queue_req(&req->base, skcipher_request_ctx(req),
-+					  SAFEXCEL_DECRYPT);
-+}
-+
-+static int safexcel_skcipher_sm4_ecb_cra_init(struct crypto_tfm *tfm)
++static int safexcel_skcipher_sm4_ofb_cra_init(struct crypto_tfm *tfm)
 +{
 +	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
 +
 +	safexcel_skcipher_cra_init(tfm);
 +	ctx->alg  = SAFEXCEL_SM4;
-+	ctx->mode = CONTEXT_CONTROL_CRYPTO_MODE_ECB;
++	ctx->mode = CONTEXT_CONTROL_CRYPTO_MODE_OFB;
 +	return 0;
 +}
 +
-+struct safexcel_alg_template safexcel_alg_ecb_sm4 = {
++struct safexcel_alg_template safexcel_alg_ofb_sm4 = {
 +	.type = SAFEXCEL_ALG_TYPE_SKCIPHER,
-+	.algo_mask = SAFEXCEL_ALG_SM4,
++	.algo_mask = SAFEXCEL_ALG_SM4 | SAFEXCEL_ALG_AES_XFB,
 +	.alg.skcipher = {
 +		.setkey = safexcel_skcipher_sm4_setkey,
-+		.encrypt = safexcel_sm4_blk_encrypt,
-+		.decrypt = safexcel_sm4_blk_decrypt,
++		.encrypt = safexcel_encrypt,
++		.decrypt = safexcel_decrypt,
 +		.min_keysize = SM4_KEY_SIZE,
 +		.max_keysize = SM4_KEY_SIZE,
++		.ivsize = SM4_BLOCK_SIZE,
 +		.base = {
-+			.cra_name = "ecb(sm4)",
-+			.cra_driver_name = "safexcel-ecb-sm4",
++			.cra_name = "ofb(sm4)",
++			.cra_driver_name = "safexcel-ofb-sm4",
 +			.cra_priority = SAFEXCEL_CRA_PRIORITY,
 +			.cra_flags = CRYPTO_ALG_ASYNC |
 +				     CRYPTO_ALG_KERN_DRIVER_ONLY,
-+			.cra_blocksize = SM4_BLOCK_SIZE,
++			.cra_blocksize = 1,
 +			.cra_ctxsize = sizeof(struct safexcel_cipher_ctx),
 +			.cra_alignmask = 0,
-+			.cra_init = safexcel_skcipher_sm4_ecb_cra_init,
++			.cra_init = safexcel_skcipher_sm4_ofb_cra_init,
 +			.cra_exit = safexcel_skcipher_cra_exit,
 +			.cra_module = THIS_MODULE,
 +		},
