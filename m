@@ -2,69 +2,110 @@ Return-Path: <SRS0=vORM=XI=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F94EC49ED7
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Sep 2019 09:17:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 510A5C49ED7
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Sep 2019 09:20:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 33F5E208C2
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Sep 2019 09:17:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 276E7214AE
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Sep 2019 09:20:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387513AbfIMJRt (ORCPT
+        id S2387671AbfIMJUt (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 13 Sep 2019 05:17:49 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:33530 "EHLO fornost.hmeau.com"
+        Fri, 13 Sep 2019 05:20:49 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:33536 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387424AbfIMJRt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 13 Sep 2019 05:17:49 -0400
+        id S2387424AbfIMJUt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 13 Sep 2019 05:20:49 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
-        id 1i8hhm-0007jT-F3; Fri, 13 Sep 2019 19:17:27 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 13 Sep 2019 19:17:18 +1000
-Date:   Fri, 13 Sep 2019 19:17:18 +1000
+        id 1i8hkx-0007qR-D4; Fri, 13 Sep 2019 19:20:44 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 13 Sep 2019 19:20:36 +1000
+Date:   Fri, 13 Sep 2019 19:20:36 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     Zhou Wang <wangzhou1@hisilicon.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        Hao Fang <fanghao11@huawei.com>,
-        Kenneth Lee <liguozhu@hisilicon.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] crypto: hisilicon - avoid unused function warning
-Message-ID: <20190913091718.GA6382@gondor.apana.org.au>
-References: <20190906152250.1450649-1-arnd@arndb.de>
- <20190906152250.1450649-2-arnd@arndb.de>
+To:     Pascal van Leeuwen <pascalvanl@gmail.com>
+Cc:     linux-crypto@vger.kernel.org, antoine.tenart@bootlin.com,
+        davem@davemloft.net,
+        Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
+Subject: Re: [PATCHv3] crypto: inside-secure - Fix unused variable warning
+ when CONFIG_PCI=n
+Message-ID: <20190913092036.GA6645@gondor.apana.org.au>
+References: <1567783514-24947-1-git-send-email-pvanleeuwen@verimatrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190906152250.1450649-2-arnd@arndb.de>
+In-Reply-To: <1567783514-24947-1-git-send-email-pvanleeuwen@verimatrix.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Sep 06, 2019 at 05:22:30PM +0200, Arnd Bergmann wrote:
-> The only caller of hisi_zip_vf_q_assign() is hidden in an #ifdef,
-> so the function causes a warning when CONFIG_PCI_IOV is disabled:
+On Fri, Sep 06, 2019 at 05:25:14PM +0200, Pascal van Leeuwen wrote:
+> This patch fixes an unused variable warning from the compiler when the
+> driver is being compiled without PCI support in the kernel.
 > 
-> drivers/crypto/hisilicon/zip/zip_main.c:740:12: error: unused function 'hisi_zip_vf_q_assign' [-Werror,-Wunused-function]
+> changes since v1:
+> - capture the platform_register_driver error code as well
+> - actually return the (last) error code
+> - swapped registration to do PCI first as that's just for development
+>   boards anyway, so in case both are done we want the platform error
+>   or no error at all if that passes
+> - also fixes some indentation issue in the affected code
 > 
-> Move it into the same #ifdef.
+> changes since v2:
+> - handle the situation where both CONFIG_PCI and CONFIG_OF are undefined
+>   by always returning a -EINVAL error
+> - only unregister PCI or OF if it was previously successfully registered
 > 
-> Fixes: 79e09f30eeba ("crypto: hisilicon - add SRIOV support for ZIP")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> Signed-off-by: Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
 > ---
->  drivers/crypto/hisilicon/zip/zip_main.c | 2 ++
->  1 file changed, 2 insertions(+)
+>  drivers/crypto/inside-secure/safexcel.c | 35 ++++++++++++++++++++++-----------
+>  1 file changed, 24 insertions(+), 11 deletions(-)
+> 
+> diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
+> index e12a2a3..925c90f 100644
+> --- a/drivers/crypto/inside-secure/safexcel.c
+> +++ b/drivers/crypto/inside-secure/safexcel.c
+> @@ -1501,32 +1501,45 @@ void safexcel_pci_remove(struct pci_dev *pdev)
+>  };
+>  #endif
+>  
+> -static int __init safexcel_init(void)
+> -{
+> -	int rc;
+> -
+> +/* Unfortunately, we have to resort to global variables here */
+> +#if IS_ENABLED(CONFIG_PCI)
+> +int pcireg_rc = -EINVAL; /* Default safe value */
+> +#endif
+>  #if IS_ENABLED(CONFIG_OF)
+> -		/* Register platform driver */
+> -		platform_driver_register(&crypto_safexcel);
+> +int ofreg_rc = -EINVAL; /* Default safe value */
+>  #endif
+>  
+> +static int __init safexcel_init(void)
+> +{
+>  #if IS_ENABLED(CONFIG_PCI)
+> -		/* Register PCI driver */
+> -		rc = pci_register_driver(&safexcel_pci_driver);
+> +	/* Register PCI driver */
+> +	pcireg_rc = pci_register_driver(&safexcel_pci_driver);
+>  #endif
+>  
+> -	return 0;
+> +#if IS_ENABLED(CONFIG_OF)
+> +	/* Register platform driver */
+> +	ofreg_rc = platform_driver_register(&crypto_safexcel);
+> +	return ofreg_rc;
 
-Please find a way to fix this warning without reducing compiler
-coverage.  I prefer to see any compile issues immediately rather
-than through automated build testing.
+If OF registration fails then you will return an error even if
+PCI registration succeeded without undoing the PCI registration.
 
-Thanks,
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
