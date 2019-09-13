@@ -2,74 +2,56 @@ Return-Path: <SRS0=vORM=XI=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EDB4C49ED7
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Sep 2019 11:29:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFDF2C49ED7
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Sep 2019 11:31:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4BB95208C2
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Sep 2019 11:29:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9E3DD20693
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Sep 2019 11:31:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387536AbfIML3e (ORCPT
+        id S2388217AbfIMLbo (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 13 Sep 2019 07:29:34 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:33594 "EHLO fornost.hmeau.com"
+        Fri, 13 Sep 2019 07:31:44 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:33610 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387431AbfIML3e (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 13 Sep 2019 07:29:34 -0400
+        id S2388181AbfIMLba (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 13 Sep 2019 07:31:30 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
-        id 1i8jla-0001LL-T7; Fri, 13 Sep 2019 21:29:32 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 13 Sep 2019 21:29:28 +1000
-Date:   Fri, 13 Sep 2019 21:29:28 +1000
+        id 1i8jnJ-0001Ny-5R; Fri, 13 Sep 2019 21:31:18 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 13 Sep 2019 21:31:14 +1000
+Date:   Fri, 13 Sep 2019 21:31:14 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Pascal van Leeuwen <pascalvanl@gmail.com>
-Cc:     linux-crypto@vger.kernel.org, antoine.tenart@bootlin.com,
-        davem@davemloft.net,
-        Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
-Subject: Re: [PATCH 0/6] crypto: inside-secure - Add supp. for non-Marvell HW
-Message-ID: <20190913112928.GC14972@gondor.apana.org.au>
-References: <1567780313-1579-1-git-send-email-pvanleeuwen@verimatrix.com>
+To:     Uri Shir <uri.shir@arm.com>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Gilad <gilad@benyossef.com>, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH] crypto: ccree - enable CTS support in AES-XTS
+Message-ID: <20190913113113.GD14972@gondor.apana.org.au>
+References: <1567929866-7089-1-git-send-email-uri.shir@arm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1567780313-1579-1-git-send-email-pvanleeuwen@verimatrix.com>
+In-Reply-To: <1567929866-7089-1-git-send-email-uri.shir@arm.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Sep 06, 2019 at 04:31:47PM +0200, Pascal van Leeuwen wrote:
-> This patchset adds support for non-Marvell hardware, probing the HW
-> configuration directly from the HW itself instead of making assumptions
-> based on specific Marvell instances and applying appropriate settings.
-> This should get most EIP97/EIP197 instances out there up and running,
-> albeit not always with optimal settings yet.
+On Sun, Sep 08, 2019 at 11:04:26AM +0300, Uri Shir wrote:
+> In XTS encryption/decryption the plaintext byte size
+> can be >= AES_BLOCK_SIZE. This patch enable the AES-XTS ciphertext
+> stealing implementation in ccree driver.
 > 
-> Still to be done:
-> - support for EIP197 HW with 256 bit internal bus width
-> - optimize settings for newer versions of the HW
-> 
-> This was tested with both the Macchiatobin board, "similar to Marvell"
-> HW on the Xilinx VCU118 devboard and a eip197c-iesb HW3.1 on the Xilinx 
-> VCU118 devboard.
-> 
-> Pascal van Leeuwen (6):
->   crypto: inside-secure - Add EIP97/EIP197 and endianness detection
->   crypto: inside-secure: Corrected configuration of EIP96_TOKEN_CTRL
->   crypto: inside-secure - Enable extended algorithms on newer HW
->   crypto: inside-secure - Base CD fetchcount on actual CD FIFO size
->   crypto: inside-secure - Base RD fetchcount on actual RD FIFO size
->   crypto: inside-secure - Probe transform record cache RAM sizes
-> 
->  drivers/crypto/inside-secure/safexcel.c | 459 ++++++++++++++++++++++++--------
->  drivers/crypto/inside-secure/safexcel.h |  78 ++++--
->  2 files changed, 418 insertions(+), 119 deletions(-)
+> Signed-off-by: Uri Shir <uri.shir@arm.com>
+> ---
+>  drivers/crypto/ccree/cc_cipher.c | 16 ++++++----------
+>  1 file changed, 6 insertions(+), 10 deletions(-)
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
