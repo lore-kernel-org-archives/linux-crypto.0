@@ -2,194 +2,110 @@ Return-Path: <SRS0=vORM=XI=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E879C4CEC5
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Sep 2019 16:23:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A33F6C49ED7
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Sep 2019 16:24:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 451692084F
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Sep 2019 16:23:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 76D792084F
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Sep 2019 16:24:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VVEaYoQX"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yu51cycU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388673AbfIMQXh (ORCPT
+        id S2388704AbfIMQYH (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 13 Sep 2019 12:23:37 -0400
-Received: from mail-ed1-f52.google.com ([209.85.208.52]:36743 "EHLO
-        mail-ed1-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388221AbfIMQXh (ORCPT
+        Fri, 13 Sep 2019 12:24:07 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:33080 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388221AbfIMQYG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 13 Sep 2019 12:23:37 -0400
-Received: by mail-ed1-f52.google.com with SMTP id f2so21214445edw.3
-        for <linux-crypto@vger.kernel.org>; Fri, 13 Sep 2019 09:23:34 -0700 (PDT)
+        Fri, 13 Sep 2019 12:24:06 -0400
+Received: by mail-wm1-f65.google.com with SMTP id r17so2239438wme.0
+        for <linux-crypto@vger.kernel.org>; Fri, 13 Sep 2019 09:24:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=t03O1lGA2w1JthcCeg9Z1ZYH3gKBRQCUleElET66vhg=;
-        b=VVEaYoQXLyiNULnroC4LCOAYl1VGLQXOvcG2uxaNBve0z/YUCwng1zrNQfajcG1kKk
-         k8pSE1AB4nAGxEOHb7a7JW4v52yyJM+6475/+nXNBGfPo+DKS6C63Nb5JmoE5wvPp5mB
-         sX5hnYrcg9MQqEgHOpNCxQqt0BCnnNixWAoim8Z7sF8nvfjh6NU5E3O/tGHaI+VdcMws
-         LWnnX5aXrFKE2anjA/p85/93dpNU/KoRNpu8NjdDSO9g5nryzkH3/1VmUNa1LO+TpGGb
-         QwF0nAaz3dYlwFJi9QBgA1t1G6pug4wZbX/+OAAEUNVnNueDcrBpDAW/KnAa0qKA7yo7
-         f7lg==
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=oMSsFWDeuI+JrpydDI+5Ui7hm8ODpxgYuXhV6cm12Bs=;
+        b=yu51cycUwATFkwbo4DS/11GX9i9iQFs+aAxh7ke5D+UoOxUb5Xx/bH79AZWdH/t91a
+         Yh/fnZbRqDqwoilQVDoT/a9IuKHOMn+4QkMgNKgbwuyWibSXvDWYyFM6aGXZ8DfsnUhT
+         e0oUynYAIj0NXsnDlqtwFMrLFA7rMRxk5oMteH4qYxJAqlROdFRJwcffP07v7D1gT4mi
+         O6BiWGJjG3/o9fHamvYdkgLtqRQPC2AoZBjVBpzz4My6ZgML7aamZqvu/xbIsCxr+gtw
+         FMGl0ivE3pEmhrjNsZYwKyA49vbR/HdKix+vTmgyeDnPU3P+z0q1Uahh0SJWtujoH12A
+         CnjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=t03O1lGA2w1JthcCeg9Z1ZYH3gKBRQCUleElET66vhg=;
-        b=qC6S5l1lrt6ukKXOStzaMYPYv1SENJecpMRWYxA+boOqwUXmc+FlAiZucWn2iSzFqM
-         /5/Wx6nO1nhUPNYo51bc6f/col2ajKU8UYmAWzzqBvGSz+JlD5BichWkFfkmFwOm/Opd
-         9EU6oESui2dz9BQtYIsgZfHdGxn0PcawkcMYZVS4qIGWaEM9qZj+NgxHp7Nj3ryuez0l
-         gDHz2kLZ0a2UN9iPVzbxJwBYIflZE/TNTYr56Nh3Ob1bFF4Ja5A9BASEJfTBBy7UaxuT
-         9KZEs6F4EkLdeGAIaXYK0yruadauGgpNZn+XHdEF9fcx2/fAxNaG9AK2BFzU+GHvb2wz
-         JPpw==
-X-Gm-Message-State: APjAAAW0bsV/zDWslTMgpFni6jvR8AwALhq7VvHDyZ8mUMjpa7ilk8+g
-        al3rTgdJHSFSMl2W9sxfbnOa534o
-X-Google-Smtp-Source: APXvYqwT8EF4fMYovVvDPrgbyK0pHZIfkT/8/EPaEjI6Iw8V+qd2Hs3FtgvbZ353Uj8RqiFZInGPYw==
-X-Received: by 2002:a17:907:2102:: with SMTP id qn2mr40700600ejb.266.1568391813691;
-        Fri, 13 Sep 2019 09:23:33 -0700 (PDT)
-Received: from localhost.localdomain.com ([188.204.2.113])
-        by smtp.gmail.com with ESMTPSA id r18sm5497669edl.6.2019.09.13.09.23.32
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 13 Sep 2019 09:23:32 -0700 (PDT)
-From:   Pascal van Leeuwen <pascalvanl@gmail.com>
-X-Google-Original-From: Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
-To:     linux-crypto@vger.kernel.org
-Cc:     antoine.tenart@bootlin.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net,
-        Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
-Subject: [PATCHv3 2/3] crypto: inside-secure - Added support for HMAC-SM3 ahash
-Date:   Fri, 13 Sep 2019 17:20:37 +0200
-Message-Id: <1568388038-1268-3-git-send-email-pvanleeuwen@verimatrix.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1568388038-1268-1-git-send-email-pvanleeuwen@verimatrix.com>
-References: <1568388038-1268-1-git-send-email-pvanleeuwen@verimatrix.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=oMSsFWDeuI+JrpydDI+5Ui7hm8ODpxgYuXhV6cm12Bs=;
+        b=YjEiLsSNKNMjlJHfS18VWM5EwhcJg/HMP77C//Nl25d0Uk9CbVR7jw/t8O3JDbMQXe
+         P1HMD7/wY3WRXiX7/4F1g8MF+EDtOBU1NJpo3yhB6WCyI6v2PvSUFrE68+6pj3lob8yb
+         268LaktKVjENdRC3nX7j2fMWeN/dp4YGs8JsPyyDs9f4nBZI8BNdySbCnze9vRjlB8r1
+         XHDS5ahnmp4DIiPxT7LC9tgedCpujoqEXvNgGYFEG3szoOYlUV/8d9RqMbhWCVGAm2vK
+         lsoHLa2SBaeZPzX6Y8PM32ez6FMRkRCAmPvmrCcPO+uPWnSovTcksH7mBhDkkTzZwIw0
+         0O6Q==
+X-Gm-Message-State: APjAAAU7kLDot8oM/XlxRu6zODsfyDA3tv2k+IMa/L1OcnNEhjesKIXY
+        YGlpLpZ5qJ+ovlvUYufv0XjRYSK9iMoXbUi6TrcDSQ==
+X-Google-Smtp-Source: APXvYqzBSkcEBo3KrvVfj9Fvo3TlUqeqjaHaxF3rgJP8UAgrgs63rpVoHGnf2Chx2AkrGnA7olXCjk5kXqMPgcwDdTc=
+X-Received: by 2002:a7b:cc86:: with SMTP id p6mr3824749wma.136.1568391844739;
+ Fri, 13 Sep 2019 09:24:04 -0700 (PDT)
+MIME-Version: 1.0
+References: <1568383406-8009-1-git-send-email-pvanleeuwen@verimatrix.com>
+ <1568383406-8009-2-git-send-email-pvanleeuwen@verimatrix.com>
+ <CAKv+Gu_qMDxNDYnMOmV1mA4+JwX3eAB3B-4aC=YJ07oZrz+wCg@mail.gmail.com> <MN2PR20MB2973F80500C43C22E05B2332CAB30@MN2PR20MB2973.namprd20.prod.outlook.com>
+In-Reply-To: <MN2PR20MB2973F80500C43C22E05B2332CAB30@MN2PR20MB2973.namprd20.prod.outlook.com>
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date:   Fri, 13 Sep 2019 17:23:42 +0100
+Message-ID: <CAKv+Gu9-r3bKae_YNkvhWEwwS-GRUhp9qJn6+Lsgug97iGqS+A@mail.gmail.com>
+Subject: Re: [PATCH 1/3] crypto: inside-secure - Added support for authenc HMAC-SHA1/DES-CBC
+To:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+Cc:     Pascal van Leeuwen <pascalvanl@gmail.com>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        Antoine Tenart <antoine.tenart@bootlin.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Added support for the hmac(sm3) ahash authentication algorithm
+On Fri, 13 Sep 2019 at 17:17, Pascal Van Leeuwen
+<pvanleeuwen@verimatrix.com> wrote:
+>
+> > -----Original Message-----
+> > From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> > Sent: Friday, September 13, 2019 5:27 PM
+> > To: Pascal van Leeuwen <pascalvanl@gmail.com>
+> > Cc: open list:HARDWARE RANDOM NUMBER GENERATOR CORE <linux-crypto@vger.kernel.org>;
+> > Antoine Tenart <antoine.tenart@bootlin.com>; Herbert Xu <herbert@gondor.apana.org.au>;
+> > David S. Miller <davem@davemloft.net>; Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+> > Subject: Re: [PATCH 1/3] crypto: inside-secure - Added support for authenc HMAC-
+> > SHA1/DES-CBC
+> >
+> > On Fri, 13 Sep 2019 at 16:06, Pascal van Leeuwen <pascalvanl@gmail.com> wrote:
+> > >
+> > > This patch adds support for the authenc(hmac(sha1),cbc(des)) aead
+> > >
+> > > Signed-off-by: Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
+> >
+> > Please make sure your code is based on cryptodev/master before sending
+> > it to the list.
+> >
+> Looks like with this patchset and the previous (SHA3) patchset I forgot
+> to add the disclaimer that it applies on top of the previous patchset.
+> Mea culpa.
+>
+> So there you go: "Added support for authenc HMAC-SHA1/DES-CBC" applies
+> on top of "Added (HMAC) SHA3 support", which applies on top of
+> "Add support for SM4 ciphers".
+>
 
-changes since v1:
-- added Acked-by tag below, no changes to the source
+Sorry if I wasn't clear, but that was not my point.
 
-changes since v2:
-- nothing
-
-Acked-by: Antoine Tenart <antoine.tenart@bootlin.com>
-Signed-off-by: Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
----
- drivers/crypto/inside-secure/safexcel.c      |  1 +
- drivers/crypto/inside-secure/safexcel.h      |  1 +
- drivers/crypto/inside-secure/safexcel_hash.c | 70 ++++++++++++++++++++++++++++
- 3 files changed, 72 insertions(+)
-
-diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
-index 826d1fb..7d907d5 100644
---- a/drivers/crypto/inside-secure/safexcel.c
-+++ b/drivers/crypto/inside-secure/safexcel.c
-@@ -1177,6 +1177,7 @@ static int safexcel_request_ring_irq(void *pdev, int irqid,
- 	&safexcel_alg_chachapoly,
- 	&safexcel_alg_chachapoly_esp,
- 	&safexcel_alg_sm3,
-+	&safexcel_alg_hmac_sm3,
- };
- 
- static int safexcel_register_algorithms(struct safexcel_crypto_priv *priv)
-diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
-index e2993b5..1b2d709 100644
---- a/drivers/crypto/inside-secure/safexcel.h
-+++ b/drivers/crypto/inside-secure/safexcel.h
-@@ -877,5 +877,6 @@ int safexcel_hmac_setkey(const char *alg, const u8 *key, unsigned int keylen,
- extern struct safexcel_alg_template safexcel_alg_chachapoly;
- extern struct safexcel_alg_template safexcel_alg_chachapoly_esp;
- extern struct safexcel_alg_template safexcel_alg_sm3;
-+extern struct safexcel_alg_template safexcel_alg_hmac_sm3;
- 
- #endif
-diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
-index 873b774..272e5fd 100644
---- a/drivers/crypto/inside-secure/safexcel_hash.c
-+++ b/drivers/crypto/inside-secure/safexcel_hash.c
-@@ -2285,3 +2285,73 @@ struct safexcel_alg_template safexcel_alg_sm3 = {
- 		},
- 	},
- };
-+
-+static int safexcel_hmac_sm3_setkey(struct crypto_ahash *tfm, const u8 *key,
-+				    unsigned int keylen)
-+{
-+	return safexcel_hmac_alg_setkey(tfm, key, keylen, "safexcel-sm3",
-+					SM3_DIGEST_SIZE);
-+}
-+
-+static int safexcel_hmac_sm3_init(struct ahash_request *areq)
-+{
-+	struct safexcel_ahash_ctx *ctx = crypto_ahash_ctx(crypto_ahash_reqtfm(areq));
-+	struct safexcel_ahash_req *req = ahash_request_ctx(areq);
-+
-+	memset(req, 0, sizeof(*req));
-+
-+	/* Start from ipad precompute */
-+	memcpy(req->state, ctx->ipad, SM3_DIGEST_SIZE);
-+	/* Already processed the key^ipad part now! */
-+	req->len	= SM3_BLOCK_SIZE;
-+	req->processed	= SM3_BLOCK_SIZE;
-+
-+	ctx->alg = CONTEXT_CONTROL_CRYPTO_ALG_SM3;
-+	req->digest = CONTEXT_CONTROL_DIGEST_PRECOMPUTED;
-+	req->state_sz = SM3_DIGEST_SIZE;
-+	req->block_sz = SM3_BLOCK_SIZE;
-+	req->hmac = true;
-+
-+	return 0;
-+}
-+
-+static int safexcel_hmac_sm3_digest(struct ahash_request *areq)
-+{
-+	int ret = safexcel_hmac_sm3_init(areq);
-+
-+	if (ret)
-+		return ret;
-+
-+	return safexcel_ahash_finup(areq);
-+}
-+
-+struct safexcel_alg_template safexcel_alg_hmac_sm3 = {
-+	.type = SAFEXCEL_ALG_TYPE_AHASH,
-+	.algo_mask = SAFEXCEL_ALG_SM3,
-+	.alg.ahash = {
-+		.init = safexcel_hmac_sm3_init,
-+		.update = safexcel_ahash_update,
-+		.final = safexcel_ahash_final,
-+		.finup = safexcel_ahash_finup,
-+		.digest = safexcel_hmac_sm3_digest,
-+		.setkey = safexcel_hmac_sm3_setkey,
-+		.export = safexcel_ahash_export,
-+		.import = safexcel_ahash_import,
-+		.halg = {
-+			.digestsize = SM3_DIGEST_SIZE,
-+			.statesize = sizeof(struct safexcel_ahash_export_state),
-+			.base = {
-+				.cra_name = "hmac(sm3)",
-+				.cra_driver_name = "safexcel-hmac-sm3",
-+				.cra_priority = SAFEXCEL_CRA_PRIORITY,
-+				.cra_flags = CRYPTO_ALG_ASYNC |
-+					     CRYPTO_ALG_KERN_DRIVER_ONLY,
-+				.cra_blocksize = SM3_BLOCK_SIZE,
-+				.cra_ctxsize = sizeof(struct safexcel_ahash_ctx),
-+				.cra_init = safexcel_ahash_cra_init,
-+				.cra_exit = safexcel_ahash_cra_exit,
-+				.cra_module = THIS_MODULE,
-+			},
-+		},
-+	},
-+};
--- 
-1.8.3.1
-
+You should really base your code on cryptodev/master since some of the
+DES helpers you are using don't exist anymore.
