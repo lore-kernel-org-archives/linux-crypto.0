@@ -2,213 +2,100 @@ Return-Path: <SRS0=vORM=XI=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE2F3C49ED7
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Sep 2019 16:17:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 563B7C4CEC5
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Sep 2019 16:23:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7F5E62081B
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Sep 2019 16:17:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2D1192084F
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Sep 2019 16:23:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=verimatrix.com header.i=@verimatrix.com header.b="X3LyYMMo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V7PKLnNE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730609AbfIMQRV (ORCPT
+        id S2388631AbfIMQXd (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 13 Sep 2019 12:17:21 -0400
-Received: from mail-eopbgr710052.outbound.protection.outlook.com ([40.107.71.52]:60802
-        "EHLO NAM05-BY2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1730605AbfIMQRV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 13 Sep 2019 12:17:21 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=frTx5MMnI5ZKanDwfLVbFH13Du0h+XiaA4h9xRkWHUxUYHhDo2mPt90UdaCEPh+EKVLuEdHl3IMFUksQfTxle5l1b1Rvw8y8LIOMZm5lYVVNmFpZf6dKGz0dxtZkGGskYViNQG0I5q1a+O92uvL6+J49gyI57YCLWnxgoHmwIrs7jkA7dDlb9arfSVYItwztfaNT/8wZIBorhLGotsWxOrZTSSis0H3fg9mN9xbeJCsPsqWqcP6g65+MMMFWbtUnoeMc8DZlsy9k0jWrtLzzQQG1UbC5TqzzIo334CEZ3g6uzBVuNreKLgxrTui4mb73Vtl9LU+4T5rvGDjuZlwzBw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FyIxHkYVqgHLA80PptZEvXEC5agwUDnrCK1p54jXzPk=;
- b=IQfioE5de+RGdUSV+MpEnDkBx09JOoJLqrpr0pugZIxSgFsFebfOOw63PhQZ3uRrZRoXX1Vbd0Rutlhx/8zykdZpEEE/P6NXt+3U45V/DJHwhf5aHJfF1LQDCrDxGXG/KX5TUIHuq/KqbQ5RC8Sb865DzdWsvkGqn0uHUIoG0Ept1ICkEOfqk80gz+Kf98+looH85NFO4n9asAdg4Vmfw3PxGdI5ofJg1WGmhNyGBoJHU+lod7sItCRuUs1opOYhnrz6AEFG8khyYJK50Ph5+7E0XqXvWy7NWccvVZw9bFSNrjzsbChT+yLWB6oCN3TSNHroj5tjBw40I1BKrM15IA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=verimatrix.com; dmarc=pass action=none
- header.from=verimatrix.com; dkim=pass header.d=verimatrix.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verimatrix.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FyIxHkYVqgHLA80PptZEvXEC5agwUDnrCK1p54jXzPk=;
- b=X3LyYMMoS/11OD0dLDa+Do+gc+SEVzInixJ//To5Ym6SS1IDV2Yi+KDSq9z0Qgx/YPqNA+MpBDq1wC/uFiay1eRD9VpAmF6Gyp3xyrn4vu3+K3KG1y4URdO6tCoD+bkdensZnTuIReCZIOldvewxVjmAWPsL/PnTos7XuABztCQ=
-Received: from MN2PR20MB2973.namprd20.prod.outlook.com (52.132.172.146) by
- MN2PR20MB3054.namprd20.prod.outlook.com (52.132.173.159) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2263.15; Fri, 13 Sep 2019 16:17:14 +0000
-Received: from MN2PR20MB2973.namprd20.prod.outlook.com
- ([fe80::6d07:5f09:97bf:c717]) by MN2PR20MB2973.namprd20.prod.outlook.com
- ([fe80::6d07:5f09:97bf:c717%7]) with mapi id 15.20.2263.021; Fri, 13 Sep 2019
- 16:17:08 +0000
-From:   Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Pascal van Leeuwen <pascalvanl@gmail.com>
-CC:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        Antoine Tenart <antoine.tenart@bootlin.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Subject: RE: [PATCH 1/3] crypto: inside-secure - Added support for authenc
- HMAC-SHA1/DES-CBC
-Thread-Topic: [PATCH 1/3] crypto: inside-secure - Added support for authenc
- HMAC-SHA1/DES-CBC
-Thread-Index: AQHVakTJFPzpgTjNwEGLLTrQOP3DlqcpurqAgAAMuHA=
-Date:   Fri, 13 Sep 2019 16:17:08 +0000
-Message-ID: <MN2PR20MB2973F80500C43C22E05B2332CAB30@MN2PR20MB2973.namprd20.prod.outlook.com>
-References: <1568383406-8009-1-git-send-email-pvanleeuwen@verimatrix.com>
- <1568383406-8009-2-git-send-email-pvanleeuwen@verimatrix.com>
- <CAKv+Gu_qMDxNDYnMOmV1mA4+JwX3eAB3B-4aC=YJ07oZrz+wCg@mail.gmail.com>
-In-Reply-To: <CAKv+Gu_qMDxNDYnMOmV1mA4+JwX3eAB3B-4aC=YJ07oZrz+wCg@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=pvanleeuwen@verimatrix.com; 
-x-originating-ip: [188.204.2.113]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 0a1dfed3-57f0-4f92-b580-08d73865d361
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600166)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:MN2PR20MB3054;
-x-ms-traffictypediagnostic: MN2PR20MB3054:
-x-ms-exchange-purlcount: 1
-x-microsoft-antispam-prvs: <MN2PR20MB3054F4114B1AF4E41C78535ECAB30@MN2PR20MB3054.namprd20.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:7691;
-x-forefront-prvs: 0159AC2B97
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(376002)(396003)(39850400004)(346002)(136003)(366004)(189003)(199004)(13464003)(7736002)(9686003)(55016002)(66476007)(66446008)(229853002)(64756008)(8676002)(7696005)(26005)(52536014)(8936002)(446003)(54906003)(102836004)(186003)(110136005)(66556008)(2906002)(76176011)(14454004)(316002)(76116006)(3846002)(6116002)(6506007)(66946007)(305945005)(53546011)(15974865002)(14444005)(99286004)(476003)(66066001)(11346002)(86362001)(256004)(81156014)(74316002)(5660300002)(6436002)(478600001)(486006)(81166006)(71200400001)(71190400001)(33656002)(6246003)(4326008)(53936002)(25786009)(18886075002);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR20MB3054;H:MN2PR20MB2973.namprd20.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: verimatrix.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: 8Uq61s1sLhrMbjYosHE4jNp3lVRjVIr1VO4ssGCg+N00Y/nQIvhlT1xy1Fi0xmvFWQsJDsXZrtgFPSoY3uyL0jeS7xnWR4OYY6XBSi6BcmR+JdhsLN1IZoFdI8kAcdPVQH01J7XzV0hm+YsAGYBvfgEDe14zvYDCzQRTqPYuWOCuaOGFgtMZP6OAYd+coTeOqPDDoNp84zHfNC6BW/tkpKq8AKbN5VBzl62uQGNFbhvpFbMeAYrXw3JdYIwYL4jYa3/FJNEtdxHgs+dPZOjjJt3M4R/KcPL2rl/ux/HJpo209T+J+lmnn2oRRTCQKF0+f1NtxnuNwse2ALf3DbAQTzbQxdfyAqUWwxzfQMgJpkMGRaRy7BlEVmSfg2/j7Mb7MBHP6YJgi/3WsR/Hfb8hymvvhIsITmglhMX3zkr4fXY=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-OriginatorOrg: verimatrix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0a1dfed3-57f0-4f92-b580-08d73865d361
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Sep 2019 16:17:08.2239
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: dcb260f9-022d-4495-8602-eae51035a0d0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 3kMnmxwAFUuUn2McGv6fad7Ib9hx3CUDSeTeT4ro2NbtroGr2b0feb6OKnqKoniEt7c61osVxCe7gP2FYrbFVTo5rcFzL9vbWIKqr83K15U=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR20MB3054
+        Fri, 13 Sep 2019 12:23:33 -0400
+Received: from mail-ed1-f51.google.com ([209.85.208.51]:42911 "EHLO
+        mail-ed1-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388221AbfIMQXd (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 13 Sep 2019 12:23:33 -0400
+Received: by mail-ed1-f51.google.com with SMTP id y91so27550222ede.9
+        for <linux-crypto@vger.kernel.org>; Fri, 13 Sep 2019 09:23:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=zpmldQ5WUFePVov/0ZwQq+NH0OL8Uftbfd6K9qHxRnY=;
+        b=V7PKLnNELww8rIjXzxtrPV8DCwt4H3+UVgUmwpNaHP3fjBS7tsfsYIcn1nkTxEEQEd
+         2rQGzNYU7AIbVSPkAcv9wjMG92JlVEK2r0wlHSQ94cZ5jL+ZwyOmEPYxQrhOPntmV002
+         l+opa3Dgb4VJNrZA0YEgyHWjK2lV0BwccUGwZDjiRM5ZkQBfu1iJNJjUCwcIub8pjOGX
+         bIufrlAyQkJWI1p5MX/IHx8v65cvf7BkEYNDvy3ScTNPmk7uUrn2mC5MZSTRlevk2tEm
+         S4cbEVNsTMMsZHWZbrWRD6aNMyAFOOK42EbqQ37o39Bn3MXPAGl+9G2ZBJgYFBqMV60o
+         iUrw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=zpmldQ5WUFePVov/0ZwQq+NH0OL8Uftbfd6K9qHxRnY=;
+        b=Ml33ERfhHXrDJ/RVPP7Z5zkBRJfDqbT1mVDP/LzV7jfwt4YR3xVEWg8QcsDLd5xdn3
+         XJ5zypN/7CjqZuYbfNGwvdVDJibmLM4HDnMAAIwv0WHX0FB+2BtBEJ7Wdow1KhAB6O+o
+         /iviYjv6uAqtq74AKXtHJz03ARX9IO+bsTkUFLLTli0kWS9AOpP/vaIn4mzWmqE6+083
+         wvvLxOvAuY+2A7mf8z/OE7yW35/B3Lf+fu00cpE2XEhIZaWqCvLx2WhsvDEsxGR+t/rb
+         VFVU6MIL4N7lV3ft20heLlU9UrrdpveqOYVNUus6lJ2DnKvZgqIj3S4gwJPfCI/GyZXd
+         gjJQ==
+X-Gm-Message-State: APjAAAXa57NU1GSoVQSleAQh9vRRLvMRCOu91ww2tfoWcmiBER7t/E1F
+        fK9jsfR9j5Ea6SbBdrLqczT3HM3M
+X-Google-Smtp-Source: APXvYqyqyBntYpljtDNZrNNxhkLHuA/UJmiVcSQavvh9LFCVXxeHwMTWbrJUA9oVwycKj1TsM6QbvA==
+X-Received: by 2002:a50:b501:: with SMTP id y1mr48288588edd.167.1568391811562;
+        Fri, 13 Sep 2019 09:23:31 -0700 (PDT)
+Received: from localhost.localdomain.com ([188.204.2.113])
+        by smtp.gmail.com with ESMTPSA id r18sm5497669edl.6.2019.09.13.09.23.30
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 13 Sep 2019 09:23:30 -0700 (PDT)
+From:   Pascal van Leeuwen <pascalvanl@gmail.com>
+X-Google-Original-From: Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
+To:     linux-crypto@vger.kernel.org
+Cc:     antoine.tenart@bootlin.com, herbert@gondor.apana.org.au,
+        davem@davemloft.net,
+        Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
+Subject: [PATCHv3 0/3] crypto: inside-secure - Add support for (HMAC) SM3
+Date:   Fri, 13 Sep 2019 17:20:35 +0200
+Message-Id: <1568388038-1268-1-git-send-email-pvanleeuwen@verimatrix.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBBcmQgQmllc2hldXZlbCA8YXJk
-LmJpZXNoZXV2ZWxAbGluYXJvLm9yZz4NCj4gU2VudDogRnJpZGF5LCBTZXB0ZW1iZXIgMTMsIDIw
-MTkgNToyNyBQTQ0KPiBUbzogUGFzY2FsIHZhbiBMZWV1d2VuIDxwYXNjYWx2YW5sQGdtYWlsLmNv
-bT4NCj4gQ2M6IG9wZW4gbGlzdDpIQVJEV0FSRSBSQU5ET00gTlVNQkVSIEdFTkVSQVRPUiBDT1JF
-IDxsaW51eC1jcnlwdG9Admdlci5rZXJuZWwub3JnPjsNCj4gQW50b2luZSBUZW5hcnQgPGFudG9p
-bmUudGVuYXJ0QGJvb3RsaW4uY29tPjsgSGVyYmVydCBYdSA8aGVyYmVydEBnb25kb3IuYXBhbmEu
-b3JnLmF1PjsNCj4gRGF2aWQgUy4gTWlsbGVyIDxkYXZlbUBkYXZlbWxvZnQubmV0PjsgUGFzY2Fs
-IFZhbiBMZWV1d2VuIDxwdmFubGVldXdlbkB2ZXJpbWF0cml4LmNvbT4NCj4gU3ViamVjdDogUmU6
-IFtQQVRDSCAxLzNdIGNyeXB0bzogaW5zaWRlLXNlY3VyZSAtIEFkZGVkIHN1cHBvcnQgZm9yIGF1
-dGhlbmMgSE1BQy0NCj4gU0hBMS9ERVMtQ0JDDQo+IA0KPiBPbiBGcmksIDEzIFNlcCAyMDE5IGF0
-IDE2OjA2LCBQYXNjYWwgdmFuIExlZXV3ZW4gPHBhc2NhbHZhbmxAZ21haWwuY29tPiB3cm90ZToN
-Cj4gPg0KPiA+IFRoaXMgcGF0Y2ggYWRkcyBzdXBwb3J0IGZvciB0aGUgYXV0aGVuYyhobWFjKHNo
-YTEpLGNiYyhkZXMpKSBhZWFkDQo+ID4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBQYXNjYWwgdmFuIExl
-ZXV3ZW4gPHB2YW5sZWV1d2VuQHZlcmltYXRyaXguY29tPg0KPiANCj4gUGxlYXNlIG1ha2Ugc3Vy
-ZSB5b3VyIGNvZGUgaXMgYmFzZWQgb24gY3J5cHRvZGV2L21hc3RlciBiZWZvcmUgc2VuZGluZw0K
-PiBpdCB0byB0aGUgbGlzdC4NCj4gDQpMb29rcyBsaWtlIHdpdGggdGhpcyBwYXRjaHNldCBhbmQg
-dGhlIHByZXZpb3VzIChTSEEzKSBwYXRjaHNldCBJIGZvcmdvdA0KdG8gYWRkIHRoZSBkaXNjbGFp
-bWVyIHRoYXQgaXQgYXBwbGllcyBvbiB0b3Agb2YgdGhlIHByZXZpb3VzIHBhdGNoc2V0Lg0KTWVh
-IGN1bHBhLg0KDQpTbyB0aGVyZSB5b3UgZ286ICJBZGRlZCBzdXBwb3J0IGZvciBhdXRoZW5jIEhN
-QUMtU0hBMS9ERVMtQ0JDIiBhcHBsaWVzDQpvbiB0b3Agb2YgIkFkZGVkIChITUFDKSBTSEEzIHN1
-cHBvcnQiLCB3aGljaCBhcHBsaWVzIG9uIHRvcCBvZg0KIkFkZCBzdXBwb3J0IGZvciBTTTQgY2lw
-aGVycyIuDQoNCj4gLS0NCj4gQXJkLg0KPiANCj4gPiAtLS0NCj4gPiAgZHJpdmVycy9jcnlwdG8v
-aW5zaWRlLXNlY3VyZS9zYWZleGNlbC5jICAgICAgICB8ICAxICsNCj4gPiAgZHJpdmVycy9jcnlw
-dG8vaW5zaWRlLXNlY3VyZS9zYWZleGNlbC5oICAgICAgICB8ICAxICsNCj4gPiAgZHJpdmVycy9j
-cnlwdG8vaW5zaWRlLXNlY3VyZS9zYWZleGNlbF9jaXBoZXIuYyB8IDQ1ICsrKysrKysrKysrKysr
-KysrKysrKysrKysrDQo+ID4gIDMgZmlsZXMgY2hhbmdlZCwgNDcgaW5zZXJ0aW9ucygrKQ0KPiA+
-DQo+ID4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvY3J5cHRvL2luc2lkZS1zZWN1cmUvc2FmZXhjZWwu
-YyBiL2RyaXZlcnMvY3J5cHRvL2luc2lkZS0NCj4gc2VjdXJlL3NhZmV4Y2VsLmMNCj4gPiBpbmRl
-eCAxMmNiOTM5Li42MTdjNzBiIDEwMDY0NA0KPiA+IC0tLSBhL2RyaXZlcnMvY3J5cHRvL2luc2lk
-ZS1zZWN1cmUvc2FmZXhjZWwuYw0KPiA+ICsrKyBiL2RyaXZlcnMvY3J5cHRvL2luc2lkZS1zZWN1
-cmUvc2FmZXhjZWwuYw0KPiA+IEBAIC0xMTk1LDYgKzExOTUsNyBAQCBzdGF0aWMgaW50IHNhZmV4
-Y2VsX3JlcXVlc3RfcmluZ19pcnEodm9pZCAqcGRldiwgaW50IGlycWlkLA0KPiA+ICAgICAgICAg
-JnNhZmV4Y2VsX2FsZ19obWFjX3NoYTNfMjU2LA0KPiA+ICAgICAgICAgJnNhZmV4Y2VsX2FsZ19o
-bWFjX3NoYTNfMzg0LA0KPiA+ICAgICAgICAgJnNhZmV4Y2VsX2FsZ19obWFjX3NoYTNfNTEyLA0K
-PiA+ICsgICAgICAgJnNhZmV4Y2VsX2FsZ19hdXRoZW5jX2htYWNfc2hhMV9jYmNfZGVzLA0KPiA+
-ICB9Ow0KPiA+DQo+ID4gIHN0YXRpYyBpbnQgc2FmZXhjZWxfcmVnaXN0ZXJfYWxnb3JpdGhtcyhz
-dHJ1Y3Qgc2FmZXhjZWxfY3J5cHRvX3ByaXYgKnByaXYpDQo+ID4gZGlmZiAtLWdpdCBhL2RyaXZl
-cnMvY3J5cHRvL2luc2lkZS1zZWN1cmUvc2FmZXhjZWwuaCBiL2RyaXZlcnMvY3J5cHRvL2luc2lk
-ZS0NCj4gc2VjdXJlL3NhZmV4Y2VsLmgNCj4gPiBpbmRleCA4Mjk1M2IzLi5iMDIwZTI3IDEwMDY0
-NA0KPiA+IC0tLSBhL2RyaXZlcnMvY3J5cHRvL2luc2lkZS1zZWN1cmUvc2FmZXhjZWwuaA0KPiA+
-ICsrKyBiL2RyaXZlcnMvY3J5cHRvL2luc2lkZS1zZWN1cmUvc2FmZXhjZWwuaA0KPiA+IEBAIC04
-OTUsNSArODk1LDYgQEAgaW50IHNhZmV4Y2VsX2htYWNfc2V0a2V5KGNvbnN0IGNoYXIgKmFsZywg
-Y29uc3QgdTggKmtleSwgdW5zaWduZWQNCj4gaW50IGtleWxlbiwNCj4gPiAgZXh0ZXJuIHN0cnVj
-dCBzYWZleGNlbF9hbGdfdGVtcGxhdGUgc2FmZXhjZWxfYWxnX2htYWNfc2hhM18yNTY7DQo+ID4g
-IGV4dGVybiBzdHJ1Y3Qgc2FmZXhjZWxfYWxnX3RlbXBsYXRlIHNhZmV4Y2VsX2FsZ19obWFjX3No
-YTNfMzg0Ow0KPiA+ICBleHRlcm4gc3RydWN0IHNhZmV4Y2VsX2FsZ190ZW1wbGF0ZSBzYWZleGNl
-bF9hbGdfaG1hY19zaGEzXzUxMjsNCj4gPiArZXh0ZXJuIHN0cnVjdCBzYWZleGNlbF9hbGdfdGVt
-cGxhdGUgc2FmZXhjZWxfYWxnX2F1dGhlbmNfaG1hY19zaGExX2NiY19kZXM7DQo+ID4NCj4gPiAg
-I2VuZGlmDQo+ID4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvY3J5cHRvL2luc2lkZS1zZWN1cmUvc2Fm
-ZXhjZWxfY2lwaGVyLmMgYi9kcml2ZXJzL2NyeXB0by9pbnNpZGUtDQo+IHNlY3VyZS9zYWZleGNl
-bF9jaXBoZXIuYw0KPiA+IGluZGV4IGJmMmIxZjkuLjQzNWYxODQgMTAwNjQ0DQo+ID4gLS0tIGEv
-ZHJpdmVycy9jcnlwdG8vaW5zaWRlLXNlY3VyZS9zYWZleGNlbF9jaXBoZXIuYw0KPiA+ICsrKyBi
-L2RyaXZlcnMvY3J5cHRvL2luc2lkZS1zZWN1cmUvc2FmZXhjZWxfY2lwaGVyLmMNCj4gPiBAQCAt
-MzQ4LDYgKzM0OCw3IEBAIHN0YXRpYyBpbnQgc2FmZXhjZWxfYWVhZF9zZXRrZXkoc3RydWN0IGNy
-eXB0b19hZWFkICpjdGZtLCBjb25zdCB1OA0KPiAqa2V5LA0KPiA+ICAgICAgICAgc3RydWN0IHNh
-ZmV4Y2VsX2NyeXB0b19wcml2ICpwcml2ID0gY3R4LT5wcml2Ow0KPiA+ICAgICAgICAgc3RydWN0
-IGNyeXB0b19hdXRoZW5jX2tleXMga2V5czsNCj4gPiAgICAgICAgIHN0cnVjdCBjcnlwdG9fYWVz
-X2N0eCBhZXM7DQo+ID4gKyAgICAgICB1MzIgdG1wW0RFU19FWFBLRVlfV09SRFNdOw0KPiA+ICAg
-ICAgICAgdTMyIGZsYWdzOw0KPiA+ICAgICAgICAgaW50IGVyciA9IC1FSU5WQUw7DQo+ID4NCj4g
-PiBAQCAtMzY3LDYgKzM2OCwxNiBAQCBzdGF0aWMgaW50IHNhZmV4Y2VsX2FlYWRfc2V0a2V5KHN0
-cnVjdCBjcnlwdG9fYWVhZCAqY3RmbSwgY29uc3QNCj4gdTggKmtleSwNCj4gPg0KPiA+ICAgICAg
-ICAgLyogRW5jcnlwdGlvbiBrZXkgKi8NCj4gPiAgICAgICAgIHN3aXRjaCAoY3R4LT5hbGcpIHsN
-Cj4gPiArICAgICAgIGNhc2UgU0FGRVhDRUxfREVTOg0KPiA+ICsgICAgICAgICAgICAgICBpZiAo
-a2V5cy5lbmNrZXlsZW4gIT0gREVTX0tFWV9TSVpFKQ0KPiA+ICsgICAgICAgICAgICAgICAgICAg
-ICAgIGdvdG8gYmFka2V5Ow0KPiA+ICsgICAgICAgICAgICAgICBlcnIgPSBkZXNfZWtleSh0bXAs
-IGtleSk7DQo+ID4gKyAgICAgICAgICAgICAgIGlmICh1bmxpa2VseSghZXJyICYmICh0Zm0tPmNy
-dF9mbGFncyAmDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBDUllQ
-VE9fVEZNX1JFUV9GT1JCSURfV0VBS19LRVlTKSkpIHsNCj4gPiArICAgICAgICAgICAgICAgICAg
-ICAgICB0Zm0tPmNydF9mbGFncyB8PSBDUllQVE9fVEZNX1JFU19XRUFLX0tFWTsNCj4gPiArICAg
-ICAgICAgICAgICAgICAgICAgICBnb3RvIGJhZGtleV9leHBmbGFnczsNCj4gPiArICAgICAgICAg
-ICAgICAgfQ0KPiA+ICsgICAgICAgICAgICAgICBicmVhazsNCj4gPiAgICAgICAgIGNhc2UgU0FG
-RVhDRUxfM0RFUzoNCj4gPiAgICAgICAgICAgICAgICAgaWYgKGtleXMuZW5ja2V5bGVuICE9IERF
-UzNfRURFX0tFWV9TSVpFKQ0KPiA+ICAgICAgICAgICAgICAgICAgICAgICAgIGdvdG8gYmFka2V5
-Ow0KPiA+IEBAIC0xODU0LDYgKzE4NjUsNDAgQEAgc3RydWN0IHNhZmV4Y2VsX2FsZ190ZW1wbGF0
-ZQ0KPiBzYWZleGNlbF9hbGdfYXV0aGVuY19obWFjX3NoYTFfY2JjX2RlczNfZWRlID0gew0KPiA+
-ICAgICAgICAgfSwNCj4gPiAgfTsNCj4gPg0KPiA+ICtzdGF0aWMgaW50IHNhZmV4Y2VsX2FlYWRf
-c2hhMV9kZXNfY3JhX2luaXQoc3RydWN0IGNyeXB0b190Zm0gKnRmbSkNCj4gPiArew0KPiA+ICsg
-ICAgICAgc3RydWN0IHNhZmV4Y2VsX2NpcGhlcl9jdHggKmN0eCA9IGNyeXB0b190Zm1fY3R4KHRm
-bSk7DQo+ID4gKw0KPiA+ICsgICAgICAgc2FmZXhjZWxfYWVhZF9zaGExX2NyYV9pbml0KHRmbSk7
-DQo+ID4gKyAgICAgICBjdHgtPmFsZyA9IFNBRkVYQ0VMX0RFUzsgLyogb3ZlcnJpZGUgZGVmYXVs
-dCAqLw0KPiA+ICsgICAgICAgcmV0dXJuIDA7DQo+ID4gK30NCj4gPiArDQo+ID4gK3N0cnVjdCBz
-YWZleGNlbF9hbGdfdGVtcGxhdGUgc2FmZXhjZWxfYWxnX2F1dGhlbmNfaG1hY19zaGExX2NiY19k
-ZXMgPSB7DQo+ID4gKyAgICAgICAudHlwZSA9IFNBRkVYQ0VMX0FMR19UWVBFX0FFQUQsDQo+ID4g
-KyAgICAgICAuYWxnb19tYXNrID0gU0FGRVhDRUxfQUxHX0RFUyB8IFNBRkVYQ0VMX0FMR19TSEEx
-LA0KPiA+ICsgICAgICAgLmFsZy5hZWFkID0gew0KPiA+ICsgICAgICAgICAgICAgICAuc2V0a2V5
-ID0gc2FmZXhjZWxfYWVhZF9zZXRrZXksDQo+ID4gKyAgICAgICAgICAgICAgIC5lbmNyeXB0ID0g
-c2FmZXhjZWxfYWVhZF9lbmNyeXB0LA0KPiA+ICsgICAgICAgICAgICAgICAuZGVjcnlwdCA9IHNh
-ZmV4Y2VsX2FlYWRfZGVjcnlwdCwNCj4gPiArICAgICAgICAgICAgICAgLml2c2l6ZSA9IERFU19C
-TE9DS19TSVpFLA0KPiA+ICsgICAgICAgICAgICAgICAubWF4YXV0aHNpemUgPSBTSEExX0RJR0VT
-VF9TSVpFLA0KPiA+ICsgICAgICAgICAgICAgICAuYmFzZSA9IHsNCj4gPiArICAgICAgICAgICAg
-ICAgICAgICAgICAuY3JhX25hbWUgPSAiYXV0aGVuYyhobWFjKHNoYTEpLGNiYyhkZXMpKSIsDQo+
-ID4gKyAgICAgICAgICAgICAgICAgICAgICAgLmNyYV9kcml2ZXJfbmFtZSA9ICJzYWZleGNlbC1h
-dXRoZW5jLWhtYWMtc2hhMS1jYmMtZGVzIiwNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAu
-Y3JhX3ByaW9yaXR5ID0gU0FGRVhDRUxfQ1JBX1BSSU9SSVRZLA0KPiA+ICsgICAgICAgICAgICAg
-ICAgICAgICAgIC5jcmFfZmxhZ3MgPSBDUllQVE9fQUxHX0FTWU5DIHwNCj4gPiArICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgQ1JZUFRPX0FMR19LRVJOX0RSSVZFUl9PTkxZLA0K
-PiA+ICsgICAgICAgICAgICAgICAgICAgICAgIC5jcmFfYmxvY2tzaXplID0gREVTX0JMT0NLX1NJ
-WkUsDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgLmNyYV9jdHhzaXplID0gc2l6ZW9mKHN0
-cnVjdCBzYWZleGNlbF9jaXBoZXJfY3R4KSwNCj4gPiArICAgICAgICAgICAgICAgICAgICAgICAu
-Y3JhX2FsaWdubWFzayA9IDAsDQo+ID4gKyAgICAgICAgICAgICAgICAgICAgICAgLmNyYV9pbml0
-ID0gc2FmZXhjZWxfYWVhZF9zaGExX2Rlc19jcmFfaW5pdCwNCj4gPiArICAgICAgICAgICAgICAg
-ICAgICAgICAuY3JhX2V4aXQgPSBzYWZleGNlbF9hZWFkX2NyYV9leGl0LA0KPiA+ICsgICAgICAg
-ICAgICAgICAgICAgICAgIC5jcmFfbW9kdWxlID0gVEhJU19NT0RVTEUsDQo+ID4gKyAgICAgICAg
-ICAgICAgIH0sDQo+ID4gKyAgICAgICB9LA0KPiA+ICt9Ow0KPiA+ICsNCj4gPiAgc3RhdGljIGlu
-dCBzYWZleGNlbF9hZWFkX3NoYTFfY3RyX2NyYV9pbml0KHN0cnVjdCBjcnlwdG9fdGZtICp0Zm0p
-DQo+ID4gIHsNCj4gPiAgICAgICAgIHN0cnVjdCBzYWZleGNlbF9jaXBoZXJfY3R4ICpjdHggPSBj
-cnlwdG9fdGZtX2N0eCh0Zm0pOw0KPiA+IC0tDQo+ID4gMS44LjMuMQ0KPiA+DQoNClJlZ2FyZHMs
-DQpQYXNjYWwgdmFuIExlZXV3ZW4NClNpbGljb24gSVAgQXJjaGl0ZWN0LCBNdWx0aS1Qcm90b2Nv
-bCBFbmdpbmVzIEAgVmVyaW1hdHJpeA0Kd3d3Lmluc2lkZXNlY3VyZS5jb20NCg==
+Extend driver support with sm3 and hmac(sm3) ahash support.
+Also add GM/T 0042-2015 hmac(sm3) testvectors to the testmgr.
+The patchset has been tested with the eip197c_iewxkbc configuration
+on the Xilinx VCU118 development board, including the crypto extra tests.
+
+Note that this patchset applies on top of the earlier submitted
+"Add support for the Chacha20 kcipher and the Chacha20-Poly..." series.
+
+changes since v1:
+- incorporated feedback by Antoine Tenart, see individual patches for
+  details
+
+changes since v2:
+- allow compilation if CONFIG_CRYPTO_SM3 is not set
+
+Pascal van Leeuwen (3):
+  crypto: inside-secure - Added support for basic SM3 ahash
+  crypto: inside-secure - Added support for HMAC-SM3 ahash
+  crypto: testmgr - Added testvectors for the hmac(sm3) ahash
+
+ crypto/testmgr.c                             |   6 ++
+ crypto/testmgr.h                             |  56 +++++++++++
+ drivers/crypto/inside-secure/safexcel.c      |   2 +
+ drivers/crypto/inside-secure/safexcel.h      |   9 ++
+ drivers/crypto/inside-secure/safexcel_hash.c | 134 +++++++++++++++++++++++++++
+ 5 files changed, 207 insertions(+)
+
+-- 
+1.8.3.1
+
