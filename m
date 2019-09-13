@@ -2,60 +2,90 @@ Return-Path: <SRS0=vORM=XI=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 625B3C4CEC5
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Sep 2019 13:31:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D18EC49ED7
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Sep 2019 15:06:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 44318205ED
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Sep 2019 13:31:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 606F020CC7
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Sep 2019 15:06:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qYGeodGM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391686AbfIMNbF (ORCPT
+        id S2390890AbfIMPGQ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 13 Sep 2019 09:31:05 -0400
-Received: from mga06.intel.com ([134.134.136.31]:17111 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388620AbfIMNbE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 13 Sep 2019 09:31:04 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 13 Sep 2019 06:31:02 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,501,1559545200"; 
-   d="scan'208";a="192721575"
-Received: from unknown (HELO localhost) ([10.249.39.126])
-  by FMSMGA003.fm.intel.com with ESMTP; 13 Sep 2019 06:30:59 -0700
-Date:   Fri, 13 Sep 2019 14:30:57 +0100
-From:   Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-To:     Sumit Garg <sumit.garg@linaro.org>
-Cc:     dhowells@redhat.com, keyrings@vger.kernel.org,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KEYS: asym_tpm: Use common tpm_buf for asymmetric keys
-Message-ID: <20190913133057.GD7412@linux.intel.com>
-References: <1568200910-31368-1-git-send-email-sumit.garg@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1568200910-31368-1-git-send-email-sumit.garg@linaro.org>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        Fri, 13 Sep 2019 11:06:16 -0400
+Received: from mail-ed1-f53.google.com ([209.85.208.53]:36716 "EHLO
+        mail-ed1-f53.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2390534AbfIMPGQ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 13 Sep 2019 11:06:16 -0400
+Received: by mail-ed1-f53.google.com with SMTP id f2so20992822edw.3
+        for <linux-crypto@vger.kernel.org>; Fri, 13 Sep 2019 08:06:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=l4PYogeEIfK1Wnzm66iOMvWL2Di39/1EQLciiU0aDlc=;
+        b=qYGeodGMYMwlF7JWWqv0Jlbaqq4BzMTt8maqlLoZWRb83/0mgde/O15IlnxGeooNi0
+         1Kpw3KjCGEKH0k8T6Fj6MSBEuiTAGIxB6x91++ucg0sp5EMy9TSgDS/c4A92u5LvFUW+
+         H42RhfNni+c4WOr80pogLAWzNaI4Cgn6jaVxsFmsegk2o9xtaibp920XAKuaKTQ/9lEq
+         fpU3rkugRWCke2lBv24PvMvcbXLrRc2Ljd7jBnzXOp6j5UvLZmcEZoEGcBI4Gg1KvA7g
+         tK/cCrOexfvmtZP/WLTNKsww9JuX13v5gELIdY+EUjT3VOTRdLpXhVnc8uoH4re/MZpe
+         TdOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=l4PYogeEIfK1Wnzm66iOMvWL2Di39/1EQLciiU0aDlc=;
+        b=hGDSiqqUUd5Vj+UMTurNlTPrf7PtjCjj5rxqib5ITfyQIaZxgvxJd28hJ7ZvZZJaKU
+         LrflAZzn/pMS4JjS73PXHNGtfszaMrmGrLQHC0aZQBZ+Sa6ufbIMFYFfsrnlhYDAif2Z
+         uoosJCQK93F3D4XGZVDLz2H4GC1kqezd27f5yN1xvWdB9/t22LTGsP0AN70zZDmago0S
+         l21RJSUcwuKV3a6efccxTKIjCQPcXzZVkoltJ2OjmvYkqqm+LRIklEOUzh3QQXmZiY28
+         +BiytX56TLtdJk6hO2oaz0dEVtXNXf8huRPGsAKuXgQmVtL3djtkgnFCmUmYCSkyR0W1
+         THFA==
+X-Gm-Message-State: APjAAAXJ7wdgDcLBCiVXyzmfQpsO41Q5wGH+JrlC3VWhOWFDXygYFna3
+        9rfsuNmfQ4NAmP0x4A2sZVGPJnDc
+X-Google-Smtp-Source: APXvYqztYcsKTc+3P4eNDUYWUEvvAVdc4x3+CEO8qANStJ2puf1CgkIy9VyAxxLk2o1B/s6q7EcAeg==
+X-Received: by 2002:aa7:dd91:: with SMTP id g17mr4932660edv.175.1568387174015;
+        Fri, 13 Sep 2019 08:06:14 -0700 (PDT)
+Received: from localhost.localdomain.com ([188.204.2.113])
+        by smtp.gmail.com with ESMTPSA id ly10sm3206654ejb.59.2019.09.13.08.06.12
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 13 Sep 2019 08:06:13 -0700 (PDT)
+From:   Pascal van Leeuwen <pascalvanl@gmail.com>
+X-Google-Original-From: Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
+To:     linux-crypto@vger.kernel.org
+Cc:     antoine.tenart@bootlin.com, herbert@gondor.apana.org.au,
+        davem@davemloft.net,
+        Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
+Subject: [PATCH 0/3] crypto: inside-secure - Added more authenc w/ (3)DES
+Date:   Fri, 13 Sep 2019 16:03:23 +0200
+Message-Id: <1568383406-8009-1-git-send-email-pvanleeuwen@verimatrix.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Sep 11, 2019 at 04:51:50PM +0530, Sumit Garg wrote:
-> Switch to utilize common heap based tpm_buf code for TPM based
-> asymmetric keys rather than using stack based tpm_buf code.
-> 
-> Reported-by: kbuild test robot <lkp@intel.com>
-> Signed-off-by: Sumit Garg <sumit.garg@linaro.org>
+This patchset adds the remaining authencs with DES or 3DES currently
+supported with vectors by testmgr.
 
-Can you roll instead a new version of the whole patch set?
+The patchset has been tested with the eip197c_iewxkbc configuration on the
+Xilinx VCU118 development boardi as well as on the Macchiatobin board,
+including the testmgr extra tests.
 
-/Jarkko
+Pascal van Leeuwen (3):
+  crypto: inside-secure - Added support for authenc HMAC-SHA1/DES-CBC
+  crypto: inside-secure - Added support for authenc HMAC-SHA2/3DES-CBC
+  crypto: inside-secure - Added support for authenc HMAC-SHA2/DES-CBC
+
+ drivers/crypto/inside-secure/safexcel.c        |   9 +
+ drivers/crypto/inside-secure/safexcel.h        |   9 +
+ drivers/crypto/inside-secure/safexcel_cipher.c | 317 +++++++++++++++++++++++++
+ 3 files changed, 335 insertions(+)
+
+-- 
+1.8.3.1
+
