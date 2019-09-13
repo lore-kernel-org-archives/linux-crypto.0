@@ -2,107 +2,97 @@ Return-Path: <SRS0=vORM=XI=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67C8DC4CEC9
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Sep 2019 18:36:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F354C4CEC9
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Sep 2019 18:43:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2F0C9206A5
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Sep 2019 18:36:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3B89920830
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Sep 2019 18:43:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gDWUdqbm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i5iC8uEW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389805AbfIMSgn (ORCPT
+        id S1729769AbfIMSnx (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 13 Sep 2019 14:36:43 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:39587 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389788AbfIMSgm (ORCPT
+        Fri, 13 Sep 2019 14:43:53 -0400
+Received: from mail-ed1-f48.google.com ([209.85.208.48]:34295 "EHLO
+        mail-ed1-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726822AbfIMSnx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 13 Sep 2019 14:36:42 -0400
-Received: by mail-wr1-f68.google.com with SMTP id r3so2897711wrj.6
-        for <linux-crypto@vger.kernel.org>; Fri, 13 Sep 2019 11:36:41 -0700 (PDT)
+        Fri, 13 Sep 2019 14:43:53 -0400
+Received: by mail-ed1-f48.google.com with SMTP id c20so18880202eds.1
+        for <linux-crypto@vger.kernel.org>; Fri, 13 Sep 2019 11:43:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
+        d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id;
-        bh=pj41kIDb9Coue4E/MdelRN5iEuUFhPMsEolC9yFleNw=;
-        b=gDWUdqbm1Ed95qny4mrCx8qNYok1fDg0pMqFxi5Oau1NrQhaAaZXWvKsthlK0RLmv6
-         zEs2o21RT1+pHZY7lQnWlwkUGuB0TVTP1iwINFSIK22MFxpiSA8YfyVsvSfWMqyaEPYe
-         uX1+4f6nYjHgfY40zHKR4S34CDUGqcy9ceQdg3p/0EKdDHP4ZAVvVlVhGlcgemNDsKcT
-         FG6eHrMi01tFxZigeLDUMHPmYgODBnZNRvw7WTV8dOe2InZgpx0Y0CjmGB2cFrobcqTu
-         j2ZtiIfJpiOXXL231q/3hdjXygYX2y+TsXjTqtudqom3ho7n5JjnQRnGfAdo7L4sofNa
-         aCWQ==
+        bh=4wVQB7CGzAsUOQ2n0r/M7x6akAc2Sm7bZ12ZX0CRORw=;
+        b=i5iC8uEWdS17FeGD7D1mAo3KGLAG7a6dTT95GdedqUvaSf6BtLQc5WYHHhAdoaFBEc
+         IOsSYtC7apJLwNATxt7VgtsUG9oxZc5yT5MN7DGy49XuEHoQj8KG2U0EOQjDDDPDDYD7
+         dWRWkCgt8AfiJCgFWURYM6aQml+onSeSxplHxeM7kjzkxApcW+HlqCWuuQxcPhN/Dl6h
+         tg8QmBBV5OoGrjB73dNWipNAnvVT6YzIluuBc4nUn70Eo+j5fpT6J++vDJWpYnvFm3R3
+         kGwL5JGmnTERtvWq5t5sGsVO93mfsTh5PK7W49xm6B0cBvQKVOqNUSc7fvs1zJTB5i/d
+         QY0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=pj41kIDb9Coue4E/MdelRN5iEuUFhPMsEolC9yFleNw=;
-        b=Mg8UfbVqEE1m8kz3t/KoZzFrASy6O35bsei0x3sqPxaApzxzMeDGVHRSHam6+Nk5OG
-         AJ0SvRr1UJ1Ar1pIQfLzWCHU4IUb+hMOjzw7B088AcHO7yxX6WWIHfe+BpmQteol+zUk
-         55ZsDxgUAEvb22l6wXp0eWreE+NaLRMPa9xRT5kv127LJsL55eUpvfMR8tGM21OD+0Y7
-         ov5UAK4cvJbUtZ2DPo6ekJiSEB8QO8W7ZmIcIvbds4BoSFjTNx78hUPO6QhNWMizbzs/
-         fYajMI6rbRzgiacfI5lle9AQ3aSOzjm88PrDZlyHtYXrIJP4w0jrN9TGCkvsHSomTG7j
-         mCtQ==
-X-Gm-Message-State: APjAAAV9a9BdhLl9ePvLv8DKjECQ6nN8kjhfGmoYmSSUy9nf8PJ0RiYk
-        fT5Hs4kKmUbsfHeGdU5jIf8KJxV+Dd9ZBPWZ
-X-Google-Smtp-Source: APXvYqxoAdp2qOIhfs1UrkERTgr5SSXLDqQjs2MVZ8QcCSsZGUQlkWoSWix2JuF8nyN8WHO4SBQ7fA==
-X-Received: by 2002:a5d:6846:: with SMTP id o6mr2911647wrw.73.1568399800446;
-        Fri, 13 Sep 2019 11:36:40 -0700 (PDT)
-Received: from e111045-lin.c.hoisthospitality.com ([135.196.99.211])
-        by smtp.gmail.com with ESMTPSA id q10sm56216611wrd.39.2019.09.13.11.36.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 Sep 2019 11:36:39 -0700 (PDT)
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+        bh=4wVQB7CGzAsUOQ2n0r/M7x6akAc2Sm7bZ12ZX0CRORw=;
+        b=r5syQzHexJFnaX/3+wECA//WzvWXDFyRiba70AUNqz+3cd1DebObNqkV8cI3PAgrcm
+         Sp6teEpIRv3M1iyac0ZTDwgGt5icWNFBRaa933kj3lmfW3vsOnj+wA1DeQSYaAXXgwS7
+         vqxdc5+6zDKXLw6PR5OEXAOSuwZZE0/W/dM4H3SEubAx/iPQjmcos6A3zW0UfRu9spxZ
+         tRjeoshYKTjZNKBigS3KW24UmDpyQwDWswEJGrUXYejfktp0nmqygZzO3Qk+lyI2WjM1
+         hnUuks/ZFgq5/41poCtpPe4or7oN5CAxhgH1kDD76RLcBAsOZGQsSzmBU9UXX4lOmutP
+         ysaA==
+X-Gm-Message-State: APjAAAVcYU94MsT/4X+6JpAAbZgS2WYGvoMpTC5BJESrXwD849xLTjSj
+        T2qDCH5q0ci8iSEa/3YN+zwrZYCQ
+X-Google-Smtp-Source: APXvYqxChckr0vlVWmg/W9saMHvLogW+GWoo+seyqaZNPjZ1SQo66zo6IFypwO2IfoeLt3Q6TiEIiA==
+X-Received: by 2002:a17:906:139b:: with SMTP id f27mr41216522ejc.273.1568400231314;
+        Fri, 13 Sep 2019 11:43:51 -0700 (PDT)
+Received: from localhost.localdomain.com ([188.204.2.113])
+        by smtp.gmail.com with ESMTPSA id 16sm2416225ejz.52.2019.09.13.11.43.50
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 13 Sep 2019 11:43:50 -0700 (PDT)
+From:   Pascal van Leeuwen <pascalvanl@gmail.com>
+X-Google-Original-From: Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
 To:     linux-crypto@vger.kernel.org
-Cc:     herbert@gondor.apana.org.au, yvan.roux@linaro.org,
-        maxim.kuvyrkov@linaro.org,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [PATCH] crypto: aegis128-neon - use Clang compatible cflags for ARM
-Date:   Fri, 13 Sep 2019 19:36:18 +0100
-Message-Id: <20190913183618.6817-1-ard.biesheuvel@linaro.org>
-X-Mailer: git-send-email 2.17.1
+Cc:     antoine.tenart@bootlin.com, herbert@gondor.apana.org.au,
+        davem@davemloft.net,
+        Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
+Subject: [PATCHv2 0/3] crypto: inside-secure: Add support for the Chacha20 skcipher and the Chacha20-Poly1305 AEAD suites
+Date:   Fri, 13 Sep 2019 19:40:59 +0200
+Message-Id: <1568396462-20245-1-git-send-email-pvanleeuwen@verimatrix.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The next version of Clang will start policing compiler command line
-options, and will reject combinations of -march and -mfpu that it
-thinks are incompatible.
+Extend driver support with chacha20, rfc7539(chacha20,poly1305) and
+rfc7539esp(chacha20,poly1305) ciphers.
+The patchset has been tested with the eip197c_iesb and eip197c_iewxkbc
+configurations on the Xilinx VCU118 development board, including the
+crypto extra tests.
 
-This results in errors like
+Note that this patchset applies on top of the earlier submitted
+"Add support for the CBCMAC" series.
 
-  clang-10: warning: ignoring extension 'crypto' because the 'armv7-a'
-  architecture does not support it [-Winvalid-command-line-argument]
-  /tmp/aegis128-neon-inner-5ee428.s: Assembler messages:
-            /tmp/aegis128-neon-inner-5ee428.s:73: Error: selected
-  processor does not support `aese.8 q2,q14' in ARM mode
+changes since v1:
+- rebased on top of DES library changes done on cryptodev/master
+- fixed crypto/Kconfig so that generic fallback is compiled as well
 
-when buiding the SIMD aegis128 code for 32-bit ARM, given that the
-'armv7-a' -march argument is considered to be compatible with the
-ARM crypto extensions. Instead, we should use armv8-a, which does
-allow the crypto extensions to be enabled.
+Pascal van Leeuwen (3):
+  crypto: inside-secure - Added support for the CHACHA20 skcipher
+  crypto: inside-secure - Add support for the Chacha20-Poly1305 AEAD
+  crypto: Kconfig - Add CRYPTO_CHACHA20POLY1305 to CRYPTO_DEV_SAFEXCEL
 
-Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
----
- crypto/Makefile | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/crypto/Kconfig                         |   3 +-
+ drivers/crypto/inside-secure/safexcel.c        |   3 +
+ drivers/crypto/inside-secure/safexcel.h        |  11 +
+ drivers/crypto/inside-secure/safexcel_cipher.c | 335 +++++++++++++++++++++++--
+ 4 files changed, 337 insertions(+), 15 deletions(-)
 
-diff --git a/crypto/Makefile b/crypto/Makefile
-index 0d2cdd523fd9..e76d8bd2f72c 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -93,7 +93,7 @@ obj-$(CONFIG_CRYPTO_AEGIS128) += aegis128.o
- aegis128-y := aegis128-core.o
- 
- ifeq ($(ARCH),arm)
--CFLAGS_aegis128-neon-inner.o += -ffreestanding -march=armv7-a -mfloat-abi=softfp
-+CFLAGS_aegis128-neon-inner.o += -ffreestanding -march=armv8-a -mfloat-abi=softfp
- CFLAGS_aegis128-neon-inner.o += -mfpu=crypto-neon-fp-armv8
- aegis128-$(CONFIG_CRYPTO_AEGIS128_SIMD) += aegis128-neon.o aegis128-neon-inner.o
- endif
 -- 
-2.17.1
+1.8.3.1
 
