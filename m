@@ -2,103 +2,99 @@ Return-Path: <SRS0=bf8p=XK=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7367C4CECD
-	for <linux-crypto@archiver.kernel.org>; Sun, 15 Sep 2019 18:35:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 160E0C4CEC7
+	for <linux-crypto@archiver.kernel.org>; Sun, 15 Sep 2019 20:16:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A2D1F20650
-	for <linux-crypto@archiver.kernel.org>; Sun, 15 Sep 2019 18:35:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BDpr1LCc"
+	by mail.kernel.org (Postfix) with ESMTP id D4A89214D9
+	for <linux-crypto@archiver.kernel.org>; Sun, 15 Sep 2019 20:16:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1568578612;
+	bh=d/HrE/iGcEqOEmCdLte6zzmoLMwAvKRRiPAXELWKn3c=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=Q8U5UGk1zRfTKhiJaoAQ7ZU1/y0jxyFP9A1/AaPv00cXEUAHUOqbdkoimrmgZPvpo
+	 EQKuBU4o571w/1YaLZKm4dZFXmihcUN742qB+W2UOTosZQo8akZ867O7c/Xsgs7b5s
+	 XdMAfr6EiX1rctwpiD1swR8ZnsbbV7Zbe1A4vqn0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726527AbfIOSfz (ORCPT
+        id S1727816AbfIOUQv (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 15 Sep 2019 14:35:55 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:51824 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726355AbfIOSfz (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 15 Sep 2019 14:35:55 -0400
-Received: by mail-wm1-f68.google.com with SMTP id 7so7657485wme.1;
-        Sun, 15 Sep 2019 11:35:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=0lspMjLiionZILkbBr8xfiqwsFdKOXlG6Qqe5s5HG7c=;
-        b=BDpr1LCcQBR8RMm+cBgOIclbkpAVbLmO1JLnUiOzNq/PIurUa2s2f92YPB3ZKTopCR
-         MRAYLgrv9CWU5oG5nOtlquC6N85TVGGYrMeARJJpdGLIPbcqgmTtBVT3DUCFKVY0hc7G
-         n6oPbmLkQGjyqa2qVUur8LC5d/wrdeLfHreFpKuLEQJP5wKG1ffm+9gySglEj3TABwBr
-         Ly/t0K+kQlF0ck4Eq8zAMfC2N8uLJYv8k6siXy7Ym69TVO6PQRTziISyR3pYSpbnudRD
-         Msox/dobtnl8zwnoLyePA4tJ0Y+Y8JmYIauAE1rjoDMA9cu1/rsBySEUva62htVazwzc
-         jUew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=0lspMjLiionZILkbBr8xfiqwsFdKOXlG6Qqe5s5HG7c=;
-        b=bjjcQWpjcz5X1rcblXt7SUKCUyAMLfZGFlwLbiWOx0PNrin6AHUDBXC7B8Y3C5ItEn
-         YXSuxOk2T4ij1jZn2XOPaCnl8rnSgwTSBftxJmi+lsRhPWMnOk77MoLJtVT+6AYn9JIn
-         lUEP1IHA9tOoGbNBsTsUI2XdOBbEaCAycDCaXFeBvoPC1X3Y4MM2tYOMWHVShXn+iA7K
-         Gyv5igUa2T7EgpDVfd4mJkuEs5TDW0dZdD64rDHM0XZo9eSGJgUMlV/hvL9hdugFwzlH
-         1bfCU6wCmTc60AJzl8ZZQQsyLoFUIDFftkuDn28K/rx3dZzMtdxFdPdDQQylNDgby7zV
-         oE3Q==
-X-Gm-Message-State: APjAAAXBbwt+mDUKqbGAnJ/PWJpRLVoMriDjNu08SIkuvVQui8DclRI/
-        VZGDKU28k87YsAskiIsCDgQ=
-X-Google-Smtp-Source: APXvYqxaHaJ3pIakOfUWi1LNN/GOhxVtf6MMn4HmvmZuJr5tm/FKdc97pvTfhJrcS2rbUqLHLMFrzA==
-X-Received: by 2002:a1c:a94b:: with SMTP id s72mr11109366wme.9.1568572551931;
-        Sun, 15 Sep 2019 11:35:51 -0700 (PDT)
-Received: from Red.localdomain ([2a01:cb1d:147:7200:2e56:dcff:fed2:c6d6])
-        by smtp.googlemail.com with ESMTPSA id t203sm11365202wmf.42.2019.09.15.11.35.50
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 15 Sep 2019 11:35:51 -0700 (PDT)
-From:   Corentin Labbe <clabbe.montjoie@gmail.com>
-To:     davem@davemloft.net, herbert@gondor.apana.org.au,
-        mripard@kernel.org, wens@csie.org
-Cc:     linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        Sun, 15 Sep 2019 16:16:51 -0400
+Received: from mail.kernel.org ([198.145.29.99]:39606 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727666AbfIOUQv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 15 Sep 2019 16:16:51 -0400
+Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 50F5D214AF;
+        Sun, 15 Sep 2019 20:16:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1568578610;
+        bh=d/HrE/iGcEqOEmCdLte6zzmoLMwAvKRRiPAXELWKn3c=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=RPq2joGQ2Try6Oplud7Geb+58heA5O9WPpaFV+TgsTLEdLYxZJtAWLKcnE5WvUcgY
+         51KdN4G0BdcTMn14Z9pd/5PzdnnYrnnj2ZYSQecLJdj/ECyqpPSRa2m6rBwH22i8jU
+         od3ywG3yXgqXps+9ze5whibROFPS8x+liH1IgW64=
+Date:   Sun, 15 Sep 2019 13:16:48 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Corentin Labbe <clabbe.montjoie@gmail.com>
+Cc:     davem@davemloft.net, herbert@gondor.apana.org.au,
+        mripard@kernel.org, wens@csie.org,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-sunxi@googlegroups.com,
-        Corentin Labbe <clabbe.montjoie@gmail.com>,
         stable@vger.kernel.org
-Subject: [PATCH] crypto: sun4i-ss: erase key after use
-Date:   Sun, 15 Sep 2019 20:35:36 +0200
-Message-Id: <20190915183536.3835-1-clabbe.montjoie@gmail.com>
-X-Mailer: git-send-email 2.21.0
+Subject: Re: [PATCH] crypto: sun4i-ss: erase key after use
+Message-ID: <20190915201648.GA1704@sol.localdomain>
+Mail-Followup-To: Corentin Labbe <clabbe.montjoie@gmail.com>,
+        davem@davemloft.net, herbert@gondor.apana.org.au,
+        mripard@kernel.org, wens@csie.org,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-sunxi@googlegroups.com,
+        stable@vger.kernel.org
+References: <20190915183536.3835-1-clabbe.montjoie@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190915183536.3835-1-clabbe.montjoie@gmail.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-When a TFM is unregistered, the sun4i-ss driver does not clean the key used,
-leaking it in memory.
-This patch adds this absent key cleaning.
+On Sun, Sep 15, 2019 at 08:35:36PM +0200, Corentin Labbe wrote:
+> When a TFM is unregistered, the sun4i-ss driver does not clean the key used,
+> leaking it in memory.
+> This patch adds this absent key cleaning.
+> 
+> Fixes: 6298e948215f ("crypto: sunxi-ss - Add Allwinner Security System crypto accelerator")
+> Cc: <stable@vger.kernel.org> # 4.3+
+> Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+> ---
+>  drivers/crypto/sunxi-ss/sun4i-ss-cipher.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c b/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
+> index fa4b1b47822e..60d99370a4ec 100644
+> --- a/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
+> +++ b/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
+> @@ -503,6 +503,8 @@ int sun4i_ss_cipher_init(struct crypto_tfm *tfm)
+>  void sun4i_ss_cipher_exit(struct crypto_tfm *tfm)
+>  {
+>  	struct sun4i_tfm_ctx *op = crypto_tfm_ctx(tfm);
+> +
+> +	memzero_explicit(op->key, op->keylen);
+>  	crypto_free_sync_skcipher(op->fallback_tfm);
+>  }
+>  
+> -- 
+> 2.21.0
+> 
 
-Fixes: 6298e948215f ("crypto: sunxi-ss - Add Allwinner Security System crypto accelerator")
-Cc: <stable@vger.kernel.org> # 4.3+
-Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
----
- drivers/crypto/sunxi-ss/sun4i-ss-cipher.c | 2 ++
- 1 file changed, 2 insertions(+)
+It's already zeroed by the kzfree() in crypto_destroy_tfm().
 
-diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c b/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
-index fa4b1b47822e..60d99370a4ec 100644
---- a/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
-+++ b/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
-@@ -503,6 +503,8 @@ int sun4i_ss_cipher_init(struct crypto_tfm *tfm)
- void sun4i_ss_cipher_exit(struct crypto_tfm *tfm)
- {
- 	struct sun4i_tfm_ctx *op = crypto_tfm_ctx(tfm);
-+
-+	memzero_explicit(op->key, op->keylen);
- 	crypto_free_sync_skcipher(op->fallback_tfm);
- }
- 
--- 
-2.21.0
-
+- Eric
