@@ -1,173 +1,91 @@
-Return-Path: <SRS0=bf8p=XK=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=68iz=XL=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA378C2BA1D
-	for <linux-crypto@archiver.kernel.org>; Sun, 15 Sep 2019 22:02:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38AC7C49ED7
+	for <linux-crypto@archiver.kernel.org>; Mon, 16 Sep 2019 04:40:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A21FD2067D
-	for <linux-crypto@archiver.kernel.org>; Sun, 15 Sep 2019 22:02:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EE30B20890
+	for <linux-crypto@archiver.kernel.org>; Mon, 16 Sep 2019 04:40:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=verimatrix.com header.i=@verimatrix.com header.b="DvXj8X5U"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mQHbMgmD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725951AbfIOWCm (ORCPT
+        id S1727373AbfIPEkB (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 15 Sep 2019 18:02:42 -0400
-Received: from mail-eopbgr700081.outbound.protection.outlook.com ([40.107.70.81]:40946
-        "EHLO NAM04-SN1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725907AbfIOWCm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 15 Sep 2019 18:02:42 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=efGz+ln6SoJ5pG/1xtbsibRNYLCICw+UssU4xeNV1hQblB3OM1uO/KSnAq1WBI6fdQMywpTUmFEU0SgdLXeFSTUY8xR9n4iDi/uHOCtCO8kOIcQkEoJxsp5K3e/vYIjEz2iv9xfs9spfhWqOa+qBOwrjlZCHlkBloCL+dfAjls6QklX2LOhH2t4A/LyVU61vSVkEnRCz5dQZbXMW78PuGsALthkLf/G4Vct5pyBLsKURmaXeZ3kS2EMKekmZBMZJNPoycRBc59027a3ETDGEJx/JIpbFRRvh1e4C2MywJ+U9ePDTIg7/W5+NKdd/wL5KA5lDVSOD5n+nsAlGau+fpw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hattS8cSH30gHpWqY/OQh6a+91AUb3JIVCmRrKjdMVo=;
- b=ZS6z1b6S8DEmHoW/KvTuVk69APX5H6Yictby+1EJM6dxiQKhbZ5H7Cj4gvMVo7n1PyRaAYwKNgjSN6cmKlGgyGmyEUa8TSSnhItlYpOduJXl8VpgStHpEz1t5OmI59c3x1cyX+7AWm8Y11pwQ09teBehEdilD3CTjeXSq/cO7lFyk8EljTKneBMce9x7mHW8J/L+a2PuVYDAPjxbeNjf1CWPxcFVd4X0VGnsyaqOiTeJvKwkVBISrREwIFtjvakjxbg+5kB/3V8MMxSBO3MYM6knUYbTeoIiccGEVFZKMPAPC8+1af5rtQVucL7w9sf2jDXdcbBL+m9fqDyV6GnVPQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=verimatrix.com; dmarc=pass action=none
- header.from=verimatrix.com; dkim=pass header.d=verimatrix.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verimatrix.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hattS8cSH30gHpWqY/OQh6a+91AUb3JIVCmRrKjdMVo=;
- b=DvXj8X5UZRQaExJG44z+IKdEQ1KntmmG86qblUEYFH43nIX7WVfEjwryzwLtBkC+o50Y4Q+4rCdWrFXUXGm2ho25HqMu90C9A2VFefCYqErMYEDb8FDSUbxdEiJfnS9uv7WykpLe5Ba4fpM37d8WKjvcwVKKSzS+hNiLDdtiJuc=
-Received: from MN2PR20MB2973.namprd20.prod.outlook.com (52.132.172.146) by
- MN2PR20MB2815.namprd20.prod.outlook.com (20.178.252.149) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2263.21; Sun, 15 Sep 2019 22:02:38 +0000
-Received: from MN2PR20MB2973.namprd20.prod.outlook.com
- ([fe80::6d07:5f09:97bf:c717]) by MN2PR20MB2973.namprd20.prod.outlook.com
- ([fe80::6d07:5f09:97bf:c717%7]) with mapi id 15.20.2263.023; Sun, 15 Sep 2019
- 22:02:38 +0000
-From:   Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
-To:     Eric Biggers <ebiggers@kernel.org>
-CC:     Pascal van Leeuwen <pascalvanl@gmail.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "antoine.tenart@bootlin.com" <antoine.tenart@bootlin.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>
-Subject: RE: [PATCH 4/7] crypto: testmgr - Added testvectors for the ofb(sm4)
- & cfb(sm4) skciphers
-Thread-Topic: [PATCH 4/7] crypto: testmgr - Added testvectors for the ofb(sm4)
- & cfb(sm4) skciphers
-Thread-Index: AQHVaJXTG1IIcgClVUajVRoPFqk+JKcmpF4AgAA2P7CABlpJgIAAGMsg
-Date:   Sun, 15 Sep 2019 22:02:38 +0000
-Message-ID: <MN2PR20MB2973393F47319C40574BEA3FCA8D0@MN2PR20MB2973.namprd20.prod.outlook.com>
-References: <1568198304-8101-1-git-send-email-pvanleeuwen@verimatrix.com>
- <1568198304-8101-5-git-send-email-pvanleeuwen@verimatrix.com>
- <20190911160545.GA210122@gmail.com>
- <MN2PR20MB29738D497EDEEC9FBBC939F1CAB10@MN2PR20MB2973.namprd20.prod.outlook.com>
- <20190915202037.GB1704@sol.localdomain>
-In-Reply-To: <20190915202037.GB1704@sol.localdomain>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=pvanleeuwen@verimatrix.com; 
-x-originating-ip: [188.204.2.113]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 145702d9-485e-4228-3031-08d73a286c15
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(4534185)(4627221)(201703031133081)(201702281549075)(8990200)(5600166)(711020)(4605104)(1401327)(2017052603328)(7193020);SRVR:MN2PR20MB2815;
-x-ms-traffictypediagnostic: MN2PR20MB2815:
-x-ms-exchange-purlcount: 1
-x-microsoft-antispam-prvs: <MN2PR20MB281509DE658ED8178B832864CA8D0@MN2PR20MB2815.namprd20.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 01613DFDC8
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(39850400004)(346002)(136003)(376002)(396003)(366004)(13464003)(189003)(199004)(71190400001)(53546011)(6506007)(256004)(6916009)(66556008)(66476007)(446003)(11346002)(5660300002)(76116006)(6436002)(66946007)(478600001)(66446008)(64756008)(99286004)(6116002)(476003)(316002)(3846002)(25786009)(74316002)(71200400001)(53936002)(6246003)(9686003)(305945005)(7736002)(14454004)(33656002)(186003)(229853002)(54906003)(7696005)(102836004)(52536014)(2906002)(86362001)(76176011)(486006)(55016002)(81156014)(81166006)(8676002)(8936002)(66066001)(4326008)(26005)(15974865002)(18886075002);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR20MB2815;H:MN2PR20MB2973.namprd20.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: verimatrix.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: tG4S6ltGIO04mcidMctZmKveEjkpves5Quc6UN4Hou0zEPrnnkkur5hlk+xlIk63uL8dFRU+MHAqXiNLnE5xOfFCA6C31PRFXgo/6z8J/AjK8F4w9AWT9r4cnRoEcrxhWeKRNJAhbcT8Z/Su/I8YB+bUhnNPWvCvWx44NRSUAGoAuFmTbAHzAAcD9whqd6Ak6+aEwfFiJMBTYu4Vhy7JeuOdQJpCVH/UbstTc9ianRnngTp2V2292znP4LtmPmB+2t5fHIdPZNkIOle1i/DyVzwtdIi1/0QrMgbhxfOGeZSSHXVck/PSA9IaKBMYWFvp+N1zCRVNlFgXzaewbg8v+RmDPT22eDpfy/C7oLEtiGBoUZNYpGO1Njf+wcnHcTyoX9mCnpLGFcyhzB5kENextGu6bIR9HAP45nEeoRicJhE=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="Windows-1252"
-Content-Transfer-Encoding: quoted-printable
+        Mon, 16 Sep 2019 00:40:01 -0400
+Received: from mail-lj1-f196.google.com ([209.85.208.196]:45989 "EHLO
+        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725446AbfIPEkA (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 16 Sep 2019 00:40:00 -0400
+Received: by mail-lj1-f196.google.com with SMTP id q64so21856361ljb.12
+        for <linux-crypto@vger.kernel.org>; Sun, 15 Sep 2019 21:39:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=DlspV5URgvRkvXxNuJ156sbYo8cEx/JcT2NW3f+g8Cc=;
+        b=mQHbMgmDPSQo5jWR6FmzdZPro6bVfB3SpjjKxve6qbbF3jZTgThJKB33kvsSmsTnIf
+         SkDWiJWsCqF/NFlQ7CXSlGW3O/37K78hVAcHKlMFrgVpraUw++396y/9pbEf2c8B82cC
+         TtnxKow7s+UeISoCQlJyPnWRAr0+uMY/jk8uD2cky0ezy8RyHG9reqelus3qkmkmXjfQ
+         6xMqFgeBnf4oN+7nSXrd1WDl3g8OfXK2NgwoBxEmWbNdg3N0trbdJJvwGfG9vm13uzL6
+         kCTbUhaw4udJfAvN+EJwM8P3C2nWjyDJsYvfLtMCKu9hQ5FgwuG5Po28u5L9Msm145+G
+         GY7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=DlspV5URgvRkvXxNuJ156sbYo8cEx/JcT2NW3f+g8Cc=;
+        b=LkVk4drQRbMhdhYzC8WoW4YNzC+M5gAP/Xbuo5KFb6cM+asV+kXOmJTCRHI5h77idr
+         TD5y00vtmOgygblgLg6Z88a0nvQmrGxW92zJrmC3ZHnJMpOcqYD1Up+shBhL5YJZHRPf
+         nZOMczDCx1ppLsFuaCQq0++YQj3p3XWri6LWF3uC9Gb6UXTp5dKM4j3aLqtsQixgGvbU
+         DBcDrWYrpoM3qNGzx6tLcr2/aiII7W6Wc4BilovkjSW2A3f8rl71P0/y0sorMc7AaNph
+         fRkdMBfqKBGqePlirUvaLUrMjy/Jb2KsdzcDBshNvULngv3QiJT3IlbeOWylxVk7E4DU
+         A12Q==
+X-Gm-Message-State: APjAAAWAqAAv41nJPB1O94YOKbOq9DAyTDKloCSdOQksjgg+0yvVG7YE
+        B24KOcds4IawsqcN7/xhvLyLKlXUtQ6Hnhk46UB07Q==
+X-Google-Smtp-Source: APXvYqwXAhA1+KV2YeA0HMI/AFvAmR6dcXicZUXuc6v3FG609JnY/H64rM/p0aX+SdvhdtnVqFB6IeHudBlSgubI54w=
+X-Received: by 2002:a2e:504f:: with SMTP id v15mr36798015ljd.67.1568608797345;
+ Sun, 15 Sep 2019 21:39:57 -0700 (PDT)
 MIME-Version: 1.0
-X-OriginatorOrg: verimatrix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 145702d9-485e-4228-3031-08d73a286c15
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Sep 2019 22:02:38.0486
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: dcb260f9-022d-4495-8602-eae51035a0d0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Mx/sQruZ+YsvYsxwfXlxbK2dwo3rJwmqT/CLad3iiPNYoO19GTmVrhZZua5ayZAdUIfCyS8whl0vz8+yAVNmSrlpBx0ZGyiHH11PogZaUjI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR20MB2815
+References: <1568200910-31368-1-git-send-email-sumit.garg@linaro.org> <20190913133057.GD7412@linux.intel.com>
+In-Reply-To: <20190913133057.GD7412@linux.intel.com>
+From:   Sumit Garg <sumit.garg@linaro.org>
+Date:   Mon, 16 Sep 2019 10:09:45 +0530
+Message-ID: <CAFA6WYP3cYM6=sw7pAe_RmiTbxdOLHptPqmk8D=915TLF14Ecw@mail.gmail.com>
+Subject: Re: [PATCH] KEYS: asym_tpm: Use common tpm_buf for asymmetric keys
+To:     Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+Cc:     dhowells@redhat.com, keyrings@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-> -----Original Message-----
-> From: Eric Biggers <ebiggers@kernel.org>
-> Sent: Sunday, September 15, 2019 10:21 PM
-> To: Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
-> Cc: Pascal van Leeuwen <pascalvanl@gmail.com>; linux-crypto@vger.kernel.o=
-rg;
-> antoine.tenart@bootlin.com; herbert@gondor.apana.org.au; davem@davemloft.=
-net
-> Subject: Re: [PATCH 4/7] crypto: testmgr - Added testvectors for the ofb(=
-sm4) & cfb(sm4)
-> skciphers
->=20
-> On Wed, Sep 11, 2019 at 07:34:31PM +0000, Pascal Van Leeuwen wrote:
-> > > -----Original Message-----
-> > > From: Eric Biggers <ebiggers@kernel.org>
-> > > Sent: Wednesday, September 11, 2019 6:06 PM
-> > > To: Pascal van Leeuwen <pascalvanl@gmail.com>
-> > > Cc: linux-crypto@vger.kernel.org; antoine.tenart@bootlin.com; herbert=
-@gondor.apana.org.au;
-> > > davem@davemloft.net; Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
-> > > Subject: Re: [PATCH 4/7] crypto: testmgr - Added testvectors for the =
-ofb(sm4) & cfb(sm4)
-> > > skciphers
-> > >
-> > > On Wed, Sep 11, 2019 at 12:38:21PM +0200, Pascal van Leeuwen wrote:
-> > > > Added testvectors for the ofb(sm4) and cfb(sm4) skcipher algorithms
-> > > >
-> > >
-> > > What is the use case for these algorithms?  Who/what is going to use =
-them?
-> > >
-> > > - Eric
-> > >
-> > SM4 is a Chinese replacement for 128 bit AES, which is mandatory to be =
-used for many
-> > Chinese use cases. So they would use these whereever you would normally=
- use ofb(aes)
-> > or cfb(aes). Frankly, I'm not aware of any practicle use cases for thes=
-e feedback
-> > modes, but we've been supporting them for decades and apparently the Cr=
-ypto API
-> > supports them for AES as well. So they must be useful for something ...
-> >
-> > The obvious advantage over CBC mode was that they only require the encr=
-ypt part of
-> > the cipher, but that holds for the (newer) CTR mode as well. So, my gue=
-ss would be
-> > some legacy uses cases from before the time CTR mode and AEAD's became =
-popular.
-> >
-> > Maybe someone remembers why these were added for AES in the first place=
-?
-> >
->=20
-> So if you have no idea why they should be added, why are you adding them?
+On Fri, 13 Sep 2019 at 19:01, Jarkko Sakkinen
+<jarkko.sakkinen@linux.intel.com> wrote:
 >
-Because our hardware supports these modes and I added support for this to
-the inside-secure driver, so it made sense to be able to test that as well.
-That's the primary reason for adding them, otherwise I would not have bothe=
-red.
+> On Wed, Sep 11, 2019 at 04:51:50PM +0530, Sumit Garg wrote:
+> > Switch to utilize common heap based tpm_buf code for TPM based
+> > asymmetric keys rather than using stack based tpm_buf code.
+> >
+> > Reported-by: kbuild test robot <lkp@intel.com>
+> > Signed-off-by: Sumit Garg <sumit.garg@linaro.org>
+>
+> Can you roll instead a new version of the whole patch set?
 
-> - Eric
+Okay, will send next version of whole patch-set along with this change.
 
-Regards,
-Pascal van Leeuwen
-Silicon IP Architect, Multi-Protocol Engines @ Verimatrix
-www.insidesecure.com
+-Sumit
 
+>
+> /Jarkko
