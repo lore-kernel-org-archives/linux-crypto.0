@@ -8,63 +8,63 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 147C8C4CECE
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Sep 2019 10:58:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D70C9C4CEC9
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Sep 2019 10:58:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DF3EE21881
+	by mail.kernel.org (Postfix) with ESMTP id A46BB21670
 	for <linux-crypto@archiver.kernel.org>; Tue, 17 Sep 2019 10:58:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qvBdxxNX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="t3cFc+ZR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725801AbfIQK6O (ORCPT
+        id S1726394AbfIQK6O (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Tue, 17 Sep 2019 06:58:14 -0400
-Received: from mail-ed1-f68.google.com ([209.85.208.68]:43627 "EHLO
+Received: from mail-ed1-f68.google.com ([209.85.208.68]:39476 "EHLO
         mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726335AbfIQK6O (ORCPT
+        with ESMTP id S1725801AbfIQK6O (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Tue, 17 Sep 2019 06:58:14 -0400
-Received: by mail-ed1-f68.google.com with SMTP id r9so2874743edl.10
-        for <linux-crypto@vger.kernel.org>; Tue, 17 Sep 2019 03:58:11 -0700 (PDT)
+Received: by mail-ed1-f68.google.com with SMTP id g12so2890807eds.6
+        for <linux-crypto@vger.kernel.org>; Tue, 17 Sep 2019 03:58:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=d/mbCij81hsdqkMLMwE2XRa4mruKETckBiNT0oN1tm4=;
-        b=qvBdxxNXITibFG9bgyt6vnIBtI+xEt8+MfXwDmpCj9TZb5uKg7JmkBK3VpHYfR2+XG
-         y9vjZD+xJd7WSAESOLfxLD8JaHo89eXGvZjJ8Ii2hoUfPdjTV9Itr+VM6tGbSqO4BRZS
-         fHSrRI6u82/rciZdIRbdYJHNokqp91TQdflsHougBErtMFxR5oEwHP7GbkWU2H44PpDt
-         0kmv52Z97v9U7f20Ik0LG0xamcHbO77zAk1XX8h6N/BBJ3JLiO1dUlRG7uuSKcvqHmW5
-         LnBoCxxiNGR++UVbk8eWqCoZYbLkot6ct8JwqWj2zh51KHA3X3PipjEC0jkPAqiQZtx8
-         ifPQ==
+        bh=u/Sm1prVqqcjmrC0TkhDmYSkIyM0/8Ira8vhNotBsJ4=;
+        b=t3cFc+ZRi61WxXl9kN2IpU+mfOWeicoMYxupWZ9LW4OCnDYbGqjKfF2gQJ5sifN31n
+         CSr05jcrswMKKaXx9uu66d+MjbU4bFsa8YOrRSisdRt/7FLCfzXI9Ac4vMp5wb9b+6Mh
+         LYC9afkQeT+ntOsxY3Tu1mKVyLRIV8t7dYpnyDscyOSj4Xuj36zNiItxl7dodl4QvlbI
+         i1KmG24RqwDFb32Af4MIDoYUKuFHHP19KNvP6XML/+VNzJj+80dgIcUE00K0yG+5b1NB
+         +/rLOdF3y1hDP+f34YpAmNV6kRx8KWDdIlxr4ochgO5y3maGWX0rnewuxL3WDZYoQVxq
+         JcNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=d/mbCij81hsdqkMLMwE2XRa4mruKETckBiNT0oN1tm4=;
-        b=JfQGpSTownF4v1Jc9FMg9LVMCQ+wBqMM7HZk0vasgzF0FUlDaye2Nea2jX+gKtOhvi
-         Fbrqc6LvAh1g4sp/j//jpCuNl/e0hhFKanQ86oQV028s6n6Q/9NvffF4u0Op24Kad5Hc
-         U0Pt75IrnxlDKtuUJrzD5jOg2ugITIivf02tO+petlB4f80qiXbEJfmb9GAf0HRumUy5
-         0as52K31X/E+dkIqYDyawAWfT/X3xcfQoizXCBwvwa28yePlFhIxOuzh/qx+2+fb0xNr
-         tm+uxaRSPsofqNghdebLWM3NVnTLQl9gY0CcPXU2Q3KSm0knPA9WdSNlzMZ7Cgt1O98J
-         xF5g==
-X-Gm-Message-State: APjAAAWznbxjmjCNE7JBKtg3UzZXP8UMwuMAkc/hOnqJYGnSyayAXBgz
-        cbpmmoLq7MKr259OGOWMcWij4wkB
-X-Google-Smtp-Source: APXvYqwWUsBwVhOl2CA6AvHaDwBEN68wv8yD62itSm9DQtMg/gTAWx1g2zoKydoz5CUqcHZA9fj1dQ==
-X-Received: by 2002:a17:907:40bc:: with SMTP id nu20mr4055300ejb.309.1568717890989;
-        Tue, 17 Sep 2019 03:58:10 -0700 (PDT)
+        bh=u/Sm1prVqqcjmrC0TkhDmYSkIyM0/8Ira8vhNotBsJ4=;
+        b=Z7lSY8MlkHPvEy1EROQ9mz0zLZ7+Yuk01o+YNcLc7BoMvk+Cr832aAFixTv7kRx0kn
+         GKlsDnSL6SkbOPQgq5kamed/iHJuv5A+yrsnf72tb/sKXX3LgVHCfcA0UBx5lusJZjny
+         Qp76shgGPDaSgfxMWH0+URWssjDT0/x/O0sBDoTxpM43SbTz942aIQasyfDCnDbGx5In
+         MQGnvYETH3gFiQdxrbtqjA/KThFx63BPcsz2j4KYTOsZPZAT9Nv847XDFdsCIhHkn4DC
+         vNylLoQcCCWvxmSn5udhcbOXQ0MPSeqMoErC+7eF3ge/4vIIkuCb2+Cm+sin/l3wUaDW
+         T/Og==
+X-Gm-Message-State: APjAAAVIR/mvmNULEe8kA9DqHG1vBJrtHFBRPw+R9g5CPWY6R9QNDlDh
+        M9a0Y4KO6kF4ZjMw6S3SeU+EoLFc
+X-Google-Smtp-Source: APXvYqweOfAVn4j77s/Fuid/sNy/1X+6wVVBfA8ri3BT2jCPI3n7qhf7dMGgPLHfOvhEaJN2l3cHjg==
+X-Received: by 2002:a17:906:8258:: with SMTP id f24mr4186663ejx.234.1568717891680;
+        Tue, 17 Sep 2019 03:58:11 -0700 (PDT)
 Received: from localhost.localdomain.com ([188.204.2.113])
-        by smtp.gmail.com with ESMTPSA id i53sm367253eda.33.2019.09.17.03.58.10
+        by smtp.gmail.com with ESMTPSA id i53sm367253eda.33.2019.09.17.03.58.11
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 17 Sep 2019 03:58:10 -0700 (PDT)
+        Tue, 17 Sep 2019 03:58:11 -0700 (PDT)
 From:   Pascal van Leeuwen <pascalvanl@gmail.com>
 X-Google-Original-From: Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
 To:     linux-crypto@vger.kernel.org
 Cc:     antoine.tenart@bootlin.com, herbert@gondor.apana.org.au,
         davem@davemloft.net,
         Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
-Subject: [PATCH 1/2] crypto: inside-secure: [URGENT] Fix stability issue with Macchiatobin
-Date:   Tue, 17 Sep 2019 11:55:18 +0200
-Message-Id: <1568714119-29945-2-git-send-email-pvanleeuwen@verimatrix.com>
+Subject: [PATCH 2/2] crypto: inside-secure - Fixed corner case TRC admin RAM probing issue
+Date:   Tue, 17 Sep 2019 11:55:19 +0200
+Message-Id: <1568714119-29945-3-git-send-email-pvanleeuwen@verimatrix.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1568714119-29945-1-git-send-email-pvanleeuwen@verimatrix.com>
 References: <1568714119-29945-1-git-send-email-pvanleeuwen@verimatrix.com>
@@ -73,37 +73,151 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch corrects an error in the Transform Record Cache initialization
-code that was causing intermittent stability problems on the Macchiatobin
-board.
-
-Unfortunately, due to HW platform specifics, the problem could not happen
-on the main development platform, being the VCU118 Xilinx development
-board. And since it was a problem with hash table access, it was very
-dependent on the actual physical context record DMA buffers being used,
-i.e. with some (bad) luck it could seemingly work quit stable for a while.
+This patch fixed a corner case admin RAM probing issue witnessed on the
+Xilinx VCU118 FPGA development board with an EIP197 configuration with
+4096 words of admin RAM, of which only 2050 were recognised.
 
 Signed-off-by: Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
 ---
- drivers/crypto/inside-secure/safexcel.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/crypto/inside-secure/safexcel.c | 48 ++++++++++++++++++++++-----------
+ drivers/crypto/inside-secure/safexcel.h |  2 ++
+ 2 files changed, 34 insertions(+), 16 deletions(-)
 
 diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
-index dc04112..ac3e1ed 100644
+index ac3e1ed..ed34118 100644
 --- a/drivers/crypto/inside-secure/safexcel.c
 +++ b/drivers/crypto/inside-secure/safexcel.c
-@@ -221,9 +221,9 @@ static void eip197_trc_cache_init(struct safexcel_crypto_priv *priv)
- 	/* Step #3: Determine log2 of hash table size */
- 	cs_ht_sz = __fls(asize - cs_rc_max) - 2;
- 	/* Step #4: determine current size of hash table in dwords */
--	cs_ht_wc = 16<<cs_ht_sz; /* dwords, not admin words */
-+	cs_ht_wc = 16 << cs_ht_sz; /* dwords, not admin words */
- 	/* Step #5: add back excess words and see if we can fit more records */
--	cs_rc_max = min_t(uint, cs_rc_abs_max, asize - (cs_ht_wc >> 4));
-+	cs_rc_max = min_t(uint, cs_rc_abs_max, asize - (cs_ht_wc >> 2));
+@@ -75,9 +75,9 @@ static void eip197_trc_cache_banksel(struct safexcel_crypto_priv *priv,
+ }
  
- 	/* Clear the cache RAMs */
- 	eip197_trc_cache_clear(priv, cs_rc_max, cs_ht_wc);
+ static u32 eip197_trc_cache_probe(struct safexcel_crypto_priv *priv,
+-				  int maxbanks, u32 probemask)
++				  int maxbanks, u32 probemask, u32 stride)
+ {
+-	u32 val, addrhi, addrlo, addrmid;
++	u32 val, addrhi, addrlo, addrmid, addralias, delta, marker;
+ 	int actbank;
+ 
+ 	/*
+@@ -87,32 +87,37 @@ static u32 eip197_trc_cache_probe(struct safexcel_crypto_priv *priv,
+ 	addrhi = 1 << (16 + maxbanks);
+ 	addrlo = 0;
+ 	actbank = min(maxbanks - 1, 0);
+-	while ((addrhi - addrlo) > 32) {
++	while ((addrhi - addrlo) > stride) {
+ 		/* write marker to lowest address in top half */
+ 		addrmid = (addrhi + addrlo) >> 1;
++		marker = (addrmid ^ 0xabadbabe) & probemask; /* Unique */
+ 		eip197_trc_cache_banksel(priv, addrmid, &actbank);
+-		writel((addrmid | (addrlo << 16)) & probemask,
++		writel(marker,
+ 			priv->base + EIP197_CLASSIFICATION_RAMS +
+ 			(addrmid & 0xffff));
+ 
+-		/* write marker to lowest address in bottom half */
+-		eip197_trc_cache_banksel(priv, addrlo, &actbank);
+-		writel((addrlo | (addrhi << 16)) & probemask,
+-			priv->base + EIP197_CLASSIFICATION_RAMS +
+-			(addrlo & 0xffff));
++		/* write invalid markers to possible aliases */
++		delta = 1 << __fls(addrmid);
++		while (delta >= stride) {
++			addralias = addrmid - delta;
++			eip197_trc_cache_banksel(priv, addralias, &actbank);
++			writel(~marker,
++			       priv->base + EIP197_CLASSIFICATION_RAMS +
++			       (addralias & 0xffff));
++			delta >>= 1;
++		}
+ 
+ 		/* read back marker from top half */
+ 		eip197_trc_cache_banksel(priv, addrmid, &actbank);
+ 		val = readl(priv->base + EIP197_CLASSIFICATION_RAMS +
+ 			    (addrmid & 0xffff));
+ 
+-		if (val == ((addrmid | (addrlo << 16)) & probemask)) {
++		if ((val & probemask) == marker)
+ 			/* read back correct, continue with top half */
+ 			addrlo = addrmid;
+-		} else {
++		else
+ 			/* not read back correct, continue with bottom half */
+ 			addrhi = addrmid;
+-		}
+ 	}
+ 	return addrhi;
+ }
+@@ -150,7 +155,7 @@ static void eip197_trc_cache_clear(struct safexcel_crypto_priv *priv,
+ 		       htable_offset + i * sizeof(u32));
+ }
+ 
+-static void eip197_trc_cache_init(struct safexcel_crypto_priv *priv)
++static int eip197_trc_cache_init(struct safexcel_crypto_priv *priv)
+ {
+ 	u32 val, dsize, asize;
+ 	int cs_rc_max, cs_ht_wc, cs_trc_rec_wc, cs_trc_lg_rec_wc;
+@@ -183,7 +188,7 @@ static void eip197_trc_cache_init(struct safexcel_crypto_priv *priv)
+ 	writel(val, priv->base + EIP197_TRC_PARAMS);
+ 
+ 	/* Probed data RAM size in bytes */
+-	dsize = eip197_trc_cache_probe(priv, maxbanks, 0xffffffff);
++	dsize = eip197_trc_cache_probe(priv, maxbanks, 0xffffffff, 32);
+ 
+ 	/*
+ 	 * Now probe the administration RAM size pretty much the same way
+@@ -196,11 +201,18 @@ static void eip197_trc_cache_init(struct safexcel_crypto_priv *priv)
+ 	writel(val, priv->base + EIP197_TRC_PARAMS);
+ 
+ 	/* Probed admin RAM size in admin words */
+-	asize = eip197_trc_cache_probe(priv, 0, 0xbfffffff) >> 4;
++	asize = eip197_trc_cache_probe(priv, 0, 0x3fffffff, 16) >> 4;
+ 
+ 	/* Clear any ECC errors detected while probing! */
+ 	writel(0, priv->base + EIP197_TRC_ECCCTRL);
+ 
++	/* Sanity check probing results */
++	if (dsize < EIP197_MIN_DSIZE || asize < EIP197_MIN_ASIZE) {
++		dev_err(priv->dev, "Record cache probing failed (%d,%d).",
++			dsize, asize);
++		return -ENODEV;
++	}
++
+ 	/*
+ 	 * Determine optimal configuration from RAM sizes
+ 	 * Note that we assume that the physical RAM configuration is sane
+@@ -251,6 +263,7 @@ static void eip197_trc_cache_init(struct safexcel_crypto_priv *priv)
+ 
+ 	dev_info(priv->dev, "TRC init: %dd,%da (%dr,%dh)\n",
+ 		 dsize, asize, cs_rc_max, cs_ht_wc + cs_ht_wc);
++	return 0;
+ }
+ 
+ static void eip197_init_firmware(struct safexcel_crypto_priv *priv)
+@@ -737,7 +750,10 @@ static int safexcel_hw_init(struct safexcel_crypto_priv *priv)
+ 	writel(GENMASK(30, 20), EIP197_HIA_AIC_G(priv) + EIP197_HIA_AIC_G_ACK);
+ 
+ 	if (priv->flags & SAFEXCEL_HW_EIP197) {
+-		eip197_trc_cache_init(priv);
++		ret = eip197_trc_cache_init(priv);
++		if (ret)
++			return ret;
++
+ 		priv->flags |= EIP197_TRC_CACHE;
+ 
+ 		ret = eip197_load_firmwares(priv);
+diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
+index e473dab..0b95389 100644
+--- a/drivers/crypto/inside-secure/safexcel.h
++++ b/drivers/crypto/inside-secure/safexcel.h
+@@ -442,6 +442,8 @@ struct safexcel_context_record {
+ #define EIP197_TRC_PARAMS2_RC_SZ_SMALL(n)	((n) << 18)
+ 
+ /* Cache helpers */
++#define EIP197_MIN_DSIZE			1024
++#define EIP197_MIN_ASIZE			8
+ #define EIP197_CS_TRC_REC_WC			64
+ #define EIP197_CS_RC_SIZE			(4 * sizeof(u32))
+ #define EIP197_CS_RC_NEXT(x)			(x)
 -- 
 1.8.3.1
 
