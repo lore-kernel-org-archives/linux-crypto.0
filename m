@@ -5,66 +5,66 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4850AC4CEC9
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF90DC4CEC4
 	for <linux-crypto@archiver.kernel.org>; Wed, 18 Sep 2019 07:45:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1F52720640
+	by mail.kernel.org (Postfix) with ESMTP id B2F3F20640
 	for <linux-crypto@archiver.kernel.org>; Wed, 18 Sep 2019 07:45:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d2lsnTae"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kSiCSIYY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727919AbfIRHpd (ORCPT
+        id S1726116AbfIRHpe (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 18 Sep 2019 03:45:33 -0400
-Received: from mail-ed1-f67.google.com ([209.85.208.67]:42324 "EHLO
+        Wed, 18 Sep 2019 03:45:34 -0400
+Received: from mail-ed1-f67.google.com ([209.85.208.67]:33727 "EHLO
         mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726116AbfIRHpd (ORCPT
+        with ESMTP id S1726156AbfIRHpd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Wed, 18 Sep 2019 03:45:33 -0400
-Received: by mail-ed1-f67.google.com with SMTP id y91so5694835ede.9
+Received: by mail-ed1-f67.google.com with SMTP id c4so5751604edl.0
         for <linux-crypto@vger.kernel.org>; Wed, 18 Sep 2019 00:45:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=qsB5A5xVonZFJdPXFRsgXmkeGHfghb52saFIawfLe+Q=;
-        b=d2lsnTaeFRieis98Adjtnt2kCZ5f8iTFK0bheiYviBflzUM1mHqWAok8duPOJ1n8Rk
-         /rGq4Dwg2EoV70ZrH/4D4ph0hijrJGHqLVgdAxFCqjb3lBulrl/MRWnnzqitoF67tvZy
-         00l0G6MWZz6Pxvu5vliFOJ6y7CTbbBPJLeokWSK0XmoXsiW73xTL2LLBlXuiCB0H5ZXY
-         218j8xjvRlBCsO5XD/kCo0KP433LgOlx9Fv1X3KPLcI3l9+I4lq2OpQ3HfV+NspyN7Pc
-         JyTdCGQ93GSy1V6D0A7bTFMQeOMIMKtmN6t9Z2FZQjVPchkrk1uU8AKU50u269/4fKsC
-         MfMg==
+        bh=LKRy397iZrfACOB4xNftZM8/86O37fSlO/gngtpJsj4=;
+        b=kSiCSIYY11p2lchsY0mPVtTwIIxh5gmG9xfQnGBQ5Gw6o55SrgQMCGFrXERLyyWIsv
+         pjtFUhVfgGnHIb9eRHV61e0kxJrK7D/GrAGkAZ/nnkePjZehhdr0l6AZF+ACYcADrWMF
+         dPhduGzJuVpTRh8fXpQ7Cnn3snKSNi8pGzWVT2HXVLnvf2nPLzqCdswlldiaN6QEbpra
+         riTdi/IwufJrwe+gM2LzE0sEtAPxxu8G1PKDcl6UM660OnRhFKdBhzmXRASV2EdrJG9P
+         n/9UcrYDJWV9taf+i7WGYrT4DRLALfA0s0FTEjCHS9ZHl6QGnW/9F2QgYcOlUj/b9LDI
+         vcyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=qsB5A5xVonZFJdPXFRsgXmkeGHfghb52saFIawfLe+Q=;
-        b=TG4DjB4jipV2gGbUK13LEEs2/ImHQl2hBbRbzwfo0pefmg9REbrEBYQjEgmF8jPahF
-         frWxjXdQFv6NV4wmXnHJEnMp5uOymtJQlkU1YFU3rB7BOcFwRM3IfTWM/RG2NNo1QeMc
-         C0ObdhQK7u7vqW3rmXIyLgPstnU1aTX5Tfu6dH7b/puc1mKntHOVyTyCs2yQHWMi2YuJ
-         u7d7V3NfrK3kieU/n111314jBqsoNpviylgvBpXSoNdJqnk32wnqxOTl6XNIQm/2wj40
-         GgQPtvVfxwUjnJOeMWmkgXKuUdVd3M3jDY6VNCR6mQwOESJ/8MUlKxlIT+mle4xwizuh
-         S8FQ==
-X-Gm-Message-State: APjAAAU7kFVpK/0DqOW3QPhesAScU/voEcrNUJtkE1OewSoEU81iauTc
-        0BPN1CLmgBOLRPReRBDB6BGQMJIt
-X-Google-Smtp-Source: APXvYqx93Gje/MOd0UJGmVSR+D0GEfXNOldUwWsufqm1ackeu3xGYQJ0fVsF5+Lj0VykLF70H2qpwQ==
-X-Received: by 2002:a50:e614:: with SMTP id y20mr8757721edm.276.1568792731094;
-        Wed, 18 Sep 2019 00:45:31 -0700 (PDT)
-Received: from localhost.localdomain.com ([188.204.2.113])
-        by smtp.gmail.com with ESMTPSA id hh11sm18332ejb.33.2019.09.18.00.45.30
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        bh=LKRy397iZrfACOB4xNftZM8/86O37fSlO/gngtpJsj4=;
+        b=lnj8xuyJuI3pW9wMDbJjqG3iiLW7vxX0Qp1MZx1gQZkfdllGIfEjep6ijN9wm7kXK6
+         XP/K0m+ZWF4a6qVF5po1ul9ejmAKu3OWWk0lLqnMWaYI8vaRp48hvLg45KCty2vHNmli
+         OWogM4vldcbZc6Wl0xfcq4LD2rALX44bM/mKvVwOD9tH4brVBY8ZL0nNF+wmprg45eFl
+         uxESoB6OpfXgbYKUiV0QLPLqIAdIIHVzBqegcafmkaOGNaQhKQrQ/ZUqjiNxB/hKU4ok
+         ZhMP5Nogq8+WIlLdIs2HGVwHXworl4GISHVPDSryD+P1yXY2fLyICSm0qv5EkRlxqqXG
+         uVzA==
+X-Gm-Message-State: APjAAAUjcBPVA2z/PyOrL4+TRQYO2VTl3SXjGHTvFkCntoJRXtdpBfnQ
+        Z/gydWIlYGNKf5ZEw7o50gi3jmSd
+X-Google-Smtp-Source: APXvYqxD0cg8obQk6mbuPKvGcWzp1uVHslHJlL5ReG9S4lDPU39IH/PU+nrbOzete/zSXxue8lhHng==
+X-Received: by 2002:aa7:d816:: with SMTP id v22mr9052621edq.28.1568792730466;
         Wed, 18 Sep 2019 00:45:30 -0700 (PDT)
+Received: from localhost.localdomain.com ([188.204.2.113])
+        by smtp.gmail.com with ESMTPSA id hh11sm18332ejb.33.2019.09.18.00.45.29
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 18 Sep 2019 00:45:29 -0700 (PDT)
 From:   Pascal van Leeuwen <pascalvanl@gmail.com>
 X-Google-Original-From: Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
 To:     linux-crypto@vger.kernel.org
 Cc:     antoine.tenart@bootlin.com, herbert@gondor.apana.org.au,
         davem@davemloft.net,
         Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
-Subject: [PATCH 2/2] crypto: inside-secure - Add support for HW with less ring AIC's than rings
-Date:   Wed, 18 Sep 2019 08:42:40 +0200
-Message-Id: <1568788960-7829-3-git-send-email-pvanleeuwen@verimatrix.com>
+Subject: [PATCH 1/2] crypto: inside-secure - Add support for 256 bit wide internal bus
+Date:   Wed, 18 Sep 2019 08:42:39 +0200
+Message-Id: <1568788960-7829-2-git-send-email-pvanleeuwen@verimatrix.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1568788960-7829-1-git-send-email-pvanleeuwen@verimatrix.com>
 References: <1568788960-7829-1-git-send-email-pvanleeuwen@verimatrix.com>
@@ -73,102 +73,353 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The current driver assumes one dedicated ring interrupt controller per
-ring. However, some existing EIP(1)97 HW has less ring AIC's than rings.
-This patch allows the driver to work with such HW by detecting how many
-ring AIC's are present and restricting the number of rings it *uses* by
-the number of ring AIC's present. This allows it to at least function.
-(optimization for the future: add ring dispatch functionality in the
-interrupt service routine such that multiple rings can be supported from
-one ring AIC, allowing all rings to be used)
+This patch adds support for large EIP197's with a 256 bit wide internal
+bus, which affects the format of the result descriptor due to internal
+alignment requirements.
 
 Signed-off-by: Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
 ---
- drivers/crypto/inside-secure/safexcel.c | 20 ++++++++++++++++----
- drivers/crypto/inside-secure/safexcel.h |  4 ++++
- 2 files changed, 20 insertions(+), 4 deletions(-)
+ drivers/crypto/inside-secure/safexcel.c      | 101 +++++++++++++++------------
+ drivers/crypto/inside-secure/safexcel.h      |  18 +++--
+ drivers/crypto/inside-secure/safexcel_ring.c |   4 +-
+ 3 files changed, 72 insertions(+), 51 deletions(-)
 
 diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
-index 0bcf36c..c40eb1b 100644
+index ed34118..0bcf36c 100644
 --- a/drivers/crypto/inside-secure/safexcel.c
 +++ b/drivers/crypto/inside-secure/safexcel.c
-@@ -1308,6 +1308,9 @@ static void safexcel_configure(struct safexcel_crypto_priv *priv)
+@@ -492,12 +492,12 @@ static int safexcel_hw_setup_cdesc_rings(struct safexcel_crypto_priv *priv)
+ 		writel(upper_32_bits(priv->ring[i].cdr.base_dma),
+ 		       EIP197_HIA_CDR(priv, i) + EIP197_HIA_xDR_RING_BASE_ADDR_HI);
  
- 	priv->config.pes = priv->hwconfig.hwnumpes;
- 	priv->config.rings = min_t(u32, priv->hwconfig.hwnumrings, max_rings);
-+	/* Cannot currently support more rings than we have ring AICs! */
-+	priv->config.rings = min_t(u32, priv->config.rings,
-+					priv->hwconfig.hwnumraic);
+-		writel(EIP197_xDR_DESC_MODE_64BIT | (priv->config.cd_offset << 16) |
++		writel(EIP197_xDR_DESC_MODE_64BIT | (priv->config.cd_offset << 14) |
+ 		       priv->config.cd_size,
+ 		       EIP197_HIA_CDR(priv, i) + EIP197_HIA_xDR_DESC_SIZE);
+ 		writel(((cd_fetch_cnt *
+ 			 (cd_size_rnd << priv->hwconfig.hwdataw)) << 16) |
+-		       (cd_fetch_cnt * priv->config.cd_offset),
++		       (cd_fetch_cnt * (priv->config.cd_offset / sizeof(u32))),
+ 		       EIP197_HIA_CDR(priv, i) + EIP197_HIA_xDR_CFG);
  
- 	priv->config.cd_size = EIP197_CD64_FETCH_SIZE;
- 	priv->config.cd_offset = (priv->config.cd_size + mask) & ~mask;
-@@ -1481,6 +1484,15 @@ static int safexcel_probe_generic(void *pdev,
- 					    EIP197_N_RINGS_MASK;
+ 		/* Configure DMA tx control */
+@@ -540,13 +540,13 @@ static int safexcel_hw_setup_rdesc_rings(struct safexcel_crypto_priv *priv)
+ 		writel(upper_32_bits(priv->ring[i].rdr.base_dma),
+ 		       EIP197_HIA_RDR(priv, i) + EIP197_HIA_xDR_RING_BASE_ADDR_HI);
+ 
+-		writel(EIP197_xDR_DESC_MODE_64BIT | (priv->config.rd_offset << 16) |
++		writel(EIP197_xDR_DESC_MODE_64BIT | (priv->config.rd_offset << 14) |
+ 		       priv->config.rd_size,
+ 		       EIP197_HIA_RDR(priv, i) + EIP197_HIA_xDR_DESC_SIZE);
+ 
+ 		writel(((rd_fetch_cnt *
+ 			 (rd_size_rnd << priv->hwconfig.hwdataw)) << 16) |
+-		       (rd_fetch_cnt * priv->config.rd_offset),
++		       (rd_fetch_cnt * (priv->config.rd_offset / sizeof(u32))),
+ 		       EIP197_HIA_RDR(priv, i) + EIP197_HIA_xDR_CFG);
+ 
+ 		/* Configure DMA tx control */
+@@ -572,7 +572,7 @@ static int safexcel_hw_setup_rdesc_rings(struct safexcel_crypto_priv *priv)
+ static int safexcel_hw_init(struct safexcel_crypto_priv *priv)
+ {
+ 	u32 val;
+-	int i, ret, pe;
++	int i, ret, pe, opbuflo, opbufhi;
+ 
+ 	dev_dbg(priv->dev, "HW init: using %d pipe(s) and %d ring(s)\n",
+ 		priv->config.pes, priv->config.rings);
+@@ -652,9 +652,16 @@ static int safexcel_hw_init(struct safexcel_crypto_priv *priv)
+ 			;
+ 
+ 		/* DMA transfer size to use */
++		if (priv->hwconfig.hwnumpes > 4) {
++			opbuflo = 9;
++			opbufhi = 10;
++		} else {
++			opbuflo = 7;
++			opbufhi = 8;
++		}
+ 		val = EIP197_HIA_DSE_CFG_DIS_DEBUG;
+-		val |= EIP197_HIA_DxE_CFG_MIN_DATA_SIZE(7) |
+-		       EIP197_HIA_DxE_CFG_MAX_DATA_SIZE(8);
++		val |= EIP197_HIA_DxE_CFG_MIN_DATA_SIZE(opbuflo) |
++		       EIP197_HIA_DxE_CFG_MAX_DATA_SIZE(opbufhi);
+ 		val |= EIP197_HIA_DxE_CFG_DATA_CACHE_CTRL(WR_CACHE_3BITS);
+ 		val |= EIP197_HIA_DSE_CFG_ALWAYS_BUFFERABLE;
+ 		/* FIXME: instability issues can occur for EIP97 but disabling
+@@ -668,8 +675,8 @@ static int safexcel_hw_init(struct safexcel_crypto_priv *priv)
+ 		writel(0, EIP197_HIA_DSE_THR(priv) + EIP197_HIA_DSE_THR_CTRL(pe));
+ 
+ 		/* Configure the procesing engine thresholds */
+-		writel(EIP197_PE_OUT_DBUF_THRES_MIN(7) |
+-		       EIP197_PE_OUT_DBUF_THRES_MAX(8),
++		writel(EIP197_PE_OUT_DBUF_THRES_MIN(opbuflo) |
++		       EIP197_PE_OUT_DBUF_THRES_MAX(opbufhi),
+ 		       EIP197_PE(priv) + EIP197_PE_OUT_DBUF_THRES(pe));
+ 
+ 		/* Processing Engine configuration */
+@@ -709,7 +716,7 @@ static int safexcel_hw_init(struct safexcel_crypto_priv *priv)
+ 		writel(0,
+ 		       EIP197_HIA_CDR(priv, i) + EIP197_HIA_xDR_PROC_PNTR);
+ 
+-		writel((EIP197_DEFAULT_RING_SIZE * priv->config.cd_offset) << 2,
++		writel((EIP197_DEFAULT_RING_SIZE * priv->config.cd_offset),
+ 		       EIP197_HIA_CDR(priv, i) + EIP197_HIA_xDR_RING_SIZE);
  	}
  
-+	/* Scan for ring AIC's */
-+	for (i = 0; i < EIP197_MAX_RING_AIC; i++) {
-+		version = readl(EIP197_HIA_AIC_R(priv) +
-+				EIP197_HIA_AIC_R_VERSION(i));
-+		if (EIP197_REG_LO16(version) != EIP201_VERSION_LE)
-+			break;
-+	}
-+	priv->hwconfig.hwnumraic = i;
+@@ -732,7 +739,7 @@ static int safexcel_hw_init(struct safexcel_crypto_priv *priv)
+ 		       EIP197_HIA_RDR(priv, i) + EIP197_HIA_xDR_PROC_PNTR);
+ 
+ 		/* Ring size */
+-		writel((EIP197_DEFAULT_RING_SIZE * priv->config.rd_offset) << 2,
++		writel((EIP197_DEFAULT_RING_SIZE * priv->config.rd_offset),
+ 		       EIP197_HIA_RDR(priv, i) + EIP197_HIA_xDR_RING_SIZE);
+ 	}
+ 
+@@ -852,20 +859,24 @@ void safexcel_dequeue(struct safexcel_crypto_priv *priv, int ring)
+ 	spin_unlock_bh(&priv->ring[ring].lock);
+ 
+ 	/* let the RDR know we have pending descriptors */
+-	writel((rdesc * priv->config.rd_offset) << 2,
++	writel((rdesc * priv->config.rd_offset),
+ 	       EIP197_HIA_RDR(priv, ring) + EIP197_HIA_xDR_PREP_COUNT);
+ 
+ 	/* let the CDR know we have pending descriptors */
+-	writel((cdesc * priv->config.cd_offset) << 2,
++	writel((cdesc * priv->config.cd_offset),
+ 	       EIP197_HIA_CDR(priv, ring) + EIP197_HIA_xDR_PREP_COUNT);
+ }
+ 
+ inline int safexcel_rdesc_check_errors(struct safexcel_crypto_priv *priv,
+-				       struct safexcel_result_desc *rdesc)
++				       void *rdp)
+ {
+-	if (likely((!rdesc->descriptor_overflow) &&
+-		   (!rdesc->buffer_overflow) &&
+-		   (!rdesc->result_data.error_code)))
++	struct safexcel_result_desc *rdesc = rdp;
++	struct result_data_desc *result_data = rdp + priv->config.res_offset;
 +
++	if (likely((!rdesc->last_seg) || /* Rest only valid if last seg! */
++		   ((!rdesc->descriptor_overflow) &&
++		    (!rdesc->buffer_overflow) &&
++		    (!result_data->error_code))))
+ 		return 0;
+ 
+ 	if (rdesc->descriptor_overflow)
+@@ -874,13 +885,14 @@ inline int safexcel_rdesc_check_errors(struct safexcel_crypto_priv *priv,
+ 	if (rdesc->buffer_overflow)
+ 		dev_err(priv->dev, "Buffer overflow detected");
+ 
+-	if (rdesc->result_data.error_code & 0x4066) {
++	if (result_data->error_code & 0x4066) {
+ 		/* Fatal error (bits 1,2,5,6 & 14) */
+ 		dev_err(priv->dev,
+ 			"result descriptor error (%x)",
+-			rdesc->result_data.error_code);
++			result_data->error_code);
++
+ 		return -EIO;
+-	} else if (rdesc->result_data.error_code &
++	} else if (result_data->error_code &
+ 		   (BIT(7) | BIT(4) | BIT(3) | BIT(0))) {
+ 		/*
+ 		 * Give priority over authentication fails:
+@@ -888,7 +900,7 @@ inline int safexcel_rdesc_check_errors(struct safexcel_crypto_priv *priv,
+ 		 * something wrong with the input!
+ 		 */
+ 		return -EINVAL;
+-	} else if (rdesc->result_data.error_code & BIT(9)) {
++	} else if (result_data->error_code & BIT(9)) {
+ 		/* Authentication failed */
+ 		return -EBADMSG;
+ 	}
+@@ -1019,7 +1031,7 @@ static inline void safexcel_handle_result_descriptor(struct safexcel_crypto_priv
+ acknowledge:
+ 	if (i)
+ 		writel(EIP197_xDR_PROC_xD_PKT(i) |
+-		       EIP197_xDR_PROC_xD_COUNT(tot_descs * priv->config.rd_offset),
++		       (tot_descs * priv->config.rd_offset),
+ 		       EIP197_HIA_RDR(priv, ring) + EIP197_HIA_xDR_PROC_COUNT);
+ 
+ 	/* If the number of requests overflowed the counter, try to proceed more
+@@ -1292,30 +1304,25 @@ static void safexcel_unregister_algorithms(struct safexcel_crypto_priv *priv)
+ 
+ static void safexcel_configure(struct safexcel_crypto_priv *priv)
+ {
+-	u32 val, mask = 0;
+-
+-	val = readl(EIP197_HIA_AIC_G(priv) + EIP197_HIA_OPTIONS);
++	u32 mask = BIT(priv->hwconfig.hwdataw) - 1;
+ 
+-	/* Read number of PEs from the engine */
+-	if (priv->flags & SAFEXCEL_HW_EIP197)
+-		/* Wider field width for all EIP197 type engines */
+-		mask = EIP197_N_PES_MASK;
+-	else
+-		/* Narrow field width for EIP97 type engine */
+-		mask = EIP97_N_PES_MASK;
+-
+-	priv->config.pes = (val >> EIP197_N_PES_OFFSET) & mask;
+-
+-	priv->config.rings = min_t(u32, val & GENMASK(3, 0), max_rings);
++	priv->config.pes = priv->hwconfig.hwnumpes;
++	priv->config.rings = min_t(u32, priv->hwconfig.hwnumrings, max_rings);
+ 
+-	val = (val & GENMASK(27, 25)) >> 25;
+-	mask = BIT(val) - 1;
+-
+-	priv->config.cd_size = (sizeof(struct safexcel_command_desc) / sizeof(u32));
++	priv->config.cd_size = EIP197_CD64_FETCH_SIZE;
+ 	priv->config.cd_offset = (priv->config.cd_size + mask) & ~mask;
+ 
+-	priv->config.rd_size = (sizeof(struct safexcel_result_desc) / sizeof(u32));
++	/* res token is behind the descr, but ofs must be rounded to buswdth */
++	priv->config.res_offset = (EIP197_RD64_FETCH_SIZE + mask) & ~mask;
++	/* now the size of the descr is this 1st part plus the result struct */
++	priv->config.rd_size    = priv->config.res_offset +
++				  EIP197_RD64_RESULT_SIZE;
+ 	priv->config.rd_offset = (priv->config.rd_size + mask) & ~mask;
++
++	/* convert dwords to bytes */
++	priv->config.cd_offset *= sizeof(u32);
++	priv->config.rd_offset *= sizeof(u32);
++	priv->config.res_offset *= sizeof(u32);
+ }
+ 
+ static void safexcel_init_register_offsets(struct safexcel_crypto_priv *priv)
+@@ -1457,6 +1464,10 @@ static int safexcel_probe_generic(void *pdev,
+ 		priv->hwconfig.hwrfsize = ((hiaopt >> EIP197_RFSIZE_OFFSET) &
+ 					   EIP197_RFSIZE_MASK) +
+ 					  EIP197_RFSIZE_ADJUST;
++		priv->hwconfig.hwnumpes	= (hiaopt >> EIP197_N_PES_OFFSET) &
++					  EIP197_N_PES_MASK;
++		priv->hwconfig.hwnumrings = (hiaopt >> EIP197_N_RINGS_OFFSET) &
++					    EIP197_N_RINGS_MASK;
+ 	} else {
+ 		/* EIP97 */
+ 		priv->hwconfig.hwdataw  = (hiaopt >> EIP197_HWDATAW_OFFSET) &
+@@ -1465,6 +1476,9 @@ static int safexcel_probe_generic(void *pdev,
+ 					  EIP97_CFSIZE_MASK;
+ 		priv->hwconfig.hwrfsize = (hiaopt >> EIP97_RFSIZE_OFFSET) &
+ 					  EIP97_RFSIZE_MASK;
++		priv->hwconfig.hwnumpes	= 1; /* by definition */
++		priv->hwconfig.hwnumrings = (hiaopt >> EIP197_N_RINGS_OFFSET) &
++					    EIP197_N_RINGS_MASK;
+ 	}
+ 
  	/* Get supported algorithms from EIP96 transform engine */
- 	priv->hwconfig.algo_flags = readl(EIP197_PE(priv) +
+@@ -1472,8 +1486,9 @@ static int safexcel_probe_generic(void *pdev,
  				    EIP197_PE_EIP96_OPTIONS(0));
-@@ -1488,10 +1500,10 @@ static int safexcel_probe_generic(void *pdev,
+ 
  	/* Print single info line describing what we just detected */
- 	dev_info(priv->dev, "EIP%d:%x(%d,%d,%d,%d)-HIA:%x(%d,%d,%d),PE:%x,alg:%08x\n",
- 		 peid, priv->hwconfig.hwver, hwctg, priv->hwconfig.hwnumpes,
--		 priv->hwconfig.hwnumrings, priv->hwconfig.hiaver,
--		 priv->hwconfig.hwdataw, priv->hwconfig.hwcfsize,
--		 priv->hwconfig.hwrfsize, priv->hwconfig.pever,
--		 priv->hwconfig.algo_flags);
-+		 priv->hwconfig.hwnumrings, priv->hwconfig.hwnumraic,
-+		 priv->hwconfig.hiaver, priv->hwconfig.hwdataw,
-+		 priv->hwconfig.hwcfsize, priv->hwconfig.hwrfsize,
-+		 priv->hwconfig.pever, priv->hwconfig.algo_flags);
- 
- 	safexcel_configure(priv);
- 
+-	dev_info(priv->dev, "EIP%d:%x(%d)-HIA:%x(%d,%d,%d),PE:%x,alg:%08x\n",
+-		 peid, priv->hwconfig.hwver, hwctg, priv->hwconfig.hiaver,
++	dev_info(priv->dev, "EIP%d:%x(%d,%d,%d,%d)-HIA:%x(%d,%d,%d),PE:%x,alg:%08x\n",
++		 peid, priv->hwconfig.hwver, hwctg, priv->hwconfig.hwnumpes,
++		 priv->hwconfig.hwnumrings, priv->hwconfig.hiaver,
+ 		 priv->hwconfig.hwdataw, priv->hwconfig.hwcfsize,
+ 		 priv->hwconfig.hwrfsize, priv->hwconfig.pever,
+ 		 priv->hwconfig.algo_flags);
 diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
-index 73d790a..25dfd8a 100644
+index 173d3c8..73d790a 100644
 --- a/drivers/crypto/inside-secure/safexcel.h
 +++ b/drivers/crypto/inside-secure/safexcel.h
-@@ -19,6 +19,7 @@
- #define EIP97_VERSION_LE			0x9e61
- #define EIP197_VERSION_LE			0x3ac5
- #define EIP96_VERSION_LE			0x9f60
-+#define EIP201_VERSION_LE			0x36c9
- #define EIP197_REG_LO16(reg)			(reg & 0xffff)
- #define EIP197_REG_HI16(reg)			((reg >> 16) & 0xffff)
- #define EIP197_VERSION_MASK(reg)		((reg >> 16) & 0xfff)
-@@ -32,6 +33,7 @@
- #define EIP197_MAX_RINGS			4
- #define EIP197_FETCH_DEPTH			2
- #define EIP197_MAX_BATCH_SZ			64
-+#define EIP197_MAX_RING_AIC			14
+@@ -213,7 +213,6 @@
+ /* EIP197_HIA_xDR_PROC_COUNT */
+ #define EIP197_xDR_PROC_xD_PKT_OFFSET		24
+ #define EIP197_xDR_PROC_xD_PKT_MASK		GENMASK(6, 0)
+-#define EIP197_xDR_PROC_xD_COUNT(n)		((n) << 2)
+ #define EIP197_xDR_PROC_xD_PKT(n)		((n) << 24)
+ #define EIP197_xDR_PROC_CLR_COUNT		BIT(31)
  
- #define EIP197_GFP_FLAGS(base)	((base).flags & CRYPTO_TFM_REQ_MAY_SLEEP ? \
- 				 GFP_KERNEL : GFP_ATOMIC)
-@@ -138,6 +140,7 @@
- #define EIP197_HIA_AIC_R_ENABLED_STAT(r)	(0xe010 - EIP197_HIA_AIC_R_OFF(r))
- #define EIP197_HIA_AIC_R_ACK(r)			(0xe010 - EIP197_HIA_AIC_R_OFF(r))
- #define EIP197_HIA_AIC_R_ENABLE_CLR(r)		(0xe014 - EIP197_HIA_AIC_R_OFF(r))
-+#define EIP197_HIA_AIC_R_VERSION(r)		(0xe01c - EIP197_HIA_AIC_R_OFF(r))
- #define EIP197_HIA_AIC_G_ENABLE_CTRL		0xf808
- #define EIP197_HIA_AIC_G_ENABLED_STAT		0xf810
- #define EIP197_HIA_AIC_G_ACK			0xf810
-@@ -740,6 +743,7 @@ struct safexcel_hwconfig {
+@@ -228,6 +227,8 @@
+ #define EIP197_HIA_RA_PE_CTRL_EN		BIT(30)
+ 
+ /* EIP197_HIA_OPTIONS */
++#define EIP197_N_RINGS_OFFSET			0
++#define EIP197_N_RINGS_MASK			GENMASK(3, 0)
+ #define EIP197_N_PES_OFFSET			4
+ #define EIP197_N_PES_MASK			GENMASK(4, 0)
+ #define EIP97_N_PES_MASK			GENMASK(2, 0)
+@@ -486,16 +487,15 @@ struct safexcel_result_desc {
+ 
+ 	u32 data_lo;
+ 	u32 data_hi;
+-
+-	struct result_data_desc result_data;
+ } __packed;
+ 
+ /*
+  * The EIP(1)97 only needs to fetch the descriptor part of
+  * the result descriptor, not the result token part!
+  */
+-#define EIP197_RD64_FETCH_SIZE		((sizeof(struct safexcel_result_desc) -\
+-					  sizeof(struct result_data_desc)) /\
++#define EIP197_RD64_FETCH_SIZE		(sizeof(struct safexcel_result_desc) /\
++					 sizeof(u32))
++#define EIP197_RD64_RESULT_SIZE		(sizeof(struct result_data_desc) /\
+ 					 sizeof(u32))
+ 
+ struct safexcel_token {
+@@ -582,6 +582,9 @@ struct safexcel_command_desc {
+ 	struct safexcel_control_data_desc control_data;
+ } __packed;
+ 
++#define EIP197_CD64_FETCH_SIZE		(sizeof(struct safexcel_command_desc) /\
++					sizeof(u32))
++
+ /*
+  * Internal structures & functions
+  */
+@@ -625,6 +628,7 @@ struct safexcel_config {
+ 
+ 	u32 rd_size;
+ 	u32 rd_offset;
++	u32 res_offset;
+ };
+ 
+ struct safexcel_work_data {
+@@ -734,6 +738,8 @@ struct safexcel_hwconfig {
+ 	int hwdataw;
+ 	int hwcfsize;
  	int hwrfsize;
- 	int hwnumpes;
- 	int hwnumrings;
-+	int hwnumraic;
++	int hwnumpes;
++	int hwnumrings;
  };
  
  struct safexcel_crypto_priv {
+@@ -805,7 +811,7 @@ struct safexcel_inv_result {
+ 
+ void safexcel_dequeue(struct safexcel_crypto_priv *priv, int ring);
+ int safexcel_rdesc_check_errors(struct safexcel_crypto_priv *priv,
+-				struct safexcel_result_desc *rdesc);
++				void *rdp);
+ void safexcel_complete(struct safexcel_crypto_priv *priv, int ring);
+ int safexcel_invalidate_cache(struct crypto_async_request *async,
+ 			      struct safexcel_crypto_priv *priv,
+diff --git a/drivers/crypto/inside-secure/safexcel_ring.c b/drivers/crypto/inside-secure/safexcel_ring.c
+index 0f269b8..5323e91 100644
+--- a/drivers/crypto/inside-secure/safexcel_ring.c
++++ b/drivers/crypto/inside-secure/safexcel_ring.c
+@@ -14,7 +14,7 @@ int safexcel_init_ring_descriptors(struct safexcel_crypto_priv *priv,
+ 				   struct safexcel_desc_ring *cdr,
+ 				   struct safexcel_desc_ring *rdr)
+ {
+-	cdr->offset = sizeof(u32) * priv->config.cd_offset;
++	cdr->offset = priv->config.cd_offset;
+ 	cdr->base = dmam_alloc_coherent(priv->dev,
+ 					cdr->offset * EIP197_DEFAULT_RING_SIZE,
+ 					&cdr->base_dma, GFP_KERNEL);
+@@ -24,7 +24,7 @@ int safexcel_init_ring_descriptors(struct safexcel_crypto_priv *priv,
+ 	cdr->base_end = cdr->base + cdr->offset * (EIP197_DEFAULT_RING_SIZE - 1);
+ 	cdr->read = cdr->base;
+ 
+-	rdr->offset = sizeof(u32) * priv->config.rd_offset;
++	rdr->offset = priv->config.rd_offset;
+ 	rdr->base = dmam_alloc_coherent(priv->dev,
+ 					rdr->offset * EIP197_DEFAULT_RING_SIZE,
+ 					&rdr->base_dma, GFP_KERNEL);
 -- 
 1.8.3.1
 
