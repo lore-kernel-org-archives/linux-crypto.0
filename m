@@ -2,424 +2,200 @@ Return-Path: <SRS0=f1VZ=XN=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF90DC4CEC4
-	for <linux-crypto@archiver.kernel.org>; Wed, 18 Sep 2019 07:45:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49049C4CEC4
+	for <linux-crypto@archiver.kernel.org>; Wed, 18 Sep 2019 09:39:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B2F3F20640
-	for <linux-crypto@archiver.kernel.org>; Wed, 18 Sep 2019 07:45:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 08B36218AF
+	for <linux-crypto@archiver.kernel.org>; Wed, 18 Sep 2019 09:39:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kSiCSIYY"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="PwdS/Eix";
+	dkim=pass (1024-bit key) header.d=marvell.onmicrosoft.com header.i=@marvell.onmicrosoft.com header.b="m5Y1H/qs"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726116AbfIRHpe (ORCPT
+        id S1726772AbfIRJjr (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 18 Sep 2019 03:45:34 -0400
-Received: from mail-ed1-f67.google.com ([209.85.208.67]:33727 "EHLO
-        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726156AbfIRHpd (ORCPT
+        Wed, 18 Sep 2019 05:39:47 -0400
+Received: from mx0a-0016f401.pphosted.com ([67.231.148.174]:2146 "EHLO
+        mx0b-0016f401.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726382AbfIRJjr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 18 Sep 2019 03:45:33 -0400
-Received: by mail-ed1-f67.google.com with SMTP id c4so5751604edl.0
-        for <linux-crypto@vger.kernel.org>; Wed, 18 Sep 2019 00:45:31 -0700 (PDT)
+        Wed, 18 Sep 2019 05:39:47 -0400
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+        by mx0a-0016f401.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id x8I9ZQYs010577;
+        Wed, 18 Sep 2019 02:39:38 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : content-type : content-transfer-encoding :
+ mime-version; s=pfpt0818; bh=1YxlYm7hz6Dp6VyliP4Ie2oWjHnMdKc0ZotKYsLPgUU=;
+ b=PwdS/Eix0lTovrdbD+vwCPESn0DiYp0FalOJZf/rxpDC0NKmMeHUfQ21795vDGbX8jOF
+ 2ejJSBwDBEAlWdhpOXocC56u8kpuwwstr5PLcbVtNC33ZsWpa4OfGLMBwguzhb4rGc+k
+ vo7R/23cSE/5ESvO/Uqe82lfhRj/n4yhrppjinrBNqsPVFwtT73+9Etf8JvMpLRfN4ai
+ XkeX0TdAUJ69DpydZOw3vgsLK2EyhQ6ksPQbRNVTJJHWVjKD0IBNCWYoAQGA+kGGjNsp
+ Hq/6ghvhw6wbNkA+7WMPQIWRxovDnfJ9NYI/xQpAGG7w2FAkBfOpRhmo2Uc+TuseP4Ek nQ== 
+Received: from sc-exch02.marvell.com ([199.233.58.182])
+        by mx0a-0016f401.pphosted.com with ESMTP id 2v37mg252n-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+        Wed, 18 Sep 2019 02:39:38 -0700
+Received: from SC-EXCH02.marvell.com (10.93.176.82) by SC-EXCH02.marvell.com
+ (10.93.176.82) with Microsoft SMTP Server (TLS) id 15.0.1367.3; Wed, 18 Sep
+ 2019 02:39:36 -0700
+Received: from NAM01-BN3-obe.outbound.protection.outlook.com (104.47.33.54) by
+ SC-EXCH02.marvell.com (10.93.176.82) with Microsoft SMTP Server (TLS) id
+ 15.0.1367.3 via Frontend Transport; Wed, 18 Sep 2019 02:39:36 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=D2yx5RYURJij2Uy3szT8DyJR+vTdAdIFVxli4sxjS3YzqaRjmWMLCDhUdRWdbs8LKj4RKFlR1QTKUgtls0hB2miMjdARg8xOoF3G2hrPLa3jyxjBqx3jyNd7DHTm/qlE6fdj8PXw32WkpSYyZy+Q30v6zckK3Xs5BPZi3iPO60xpyOakkKabfgH+lreihgDZFzM5EbD76kQP/qyC26XOyEeib8tQSpklUGGr94FhAh3QwsBkM6KK5BNUcUfaUFhRxnUJMZY7RUE6hqjBDYtOmWmtTDaa024nb6r1VBWW3l1HaZcl+XlOGENzKPOl0FkZnOro//FbiUgkSHcZMIPdZA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=1YxlYm7hz6Dp6VyliP4Ie2oWjHnMdKc0ZotKYsLPgUU=;
+ b=KPgiOkJ68mArcl0lanhIKQks/v4XVx3OAouJ7UBX4/D0cxDAgnf/s32vMUtsmUIKd2MALklUTHHbbFjjnNHH0uxajSSnpe2U0ZFmraOfIbJ1MBERyQQaPwKCCcJ93PDjqt0mGZek2Zy8Rb+U15GaqQLmtiaOnpkgFNhxRfcq55KS7GWa+YgAvCPmYS4OQhBDt/SLI6NtblGkixf4VwXpiOOLma0ue81DXegSyOBVmDDclbeBmt//VEVC8WwBmr1rmApcwyUUJBb32KHBE4r4Lr43FtVNXEmSV7xm5wIycymklzCt3+uRT7wt6JIUAb3BuL2RcIW2kHYqlDM+oPSYxw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
+ dkim=pass header.d=marvell.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=LKRy397iZrfACOB4xNftZM8/86O37fSlO/gngtpJsj4=;
-        b=kSiCSIYY11p2lchsY0mPVtTwIIxh5gmG9xfQnGBQ5Gw6o55SrgQMCGFrXERLyyWIsv
-         pjtFUhVfgGnHIb9eRHV61e0kxJrK7D/GrAGkAZ/nnkePjZehhdr0l6AZF+ACYcADrWMF
-         dPhduGzJuVpTRh8fXpQ7Cnn3snKSNi8pGzWVT2HXVLnvf2nPLzqCdswlldiaN6QEbpra
-         riTdi/IwufJrwe+gM2LzE0sEtAPxxu8G1PKDcl6UM660OnRhFKdBhzmXRASV2EdrJG9P
-         n/9UcrYDJWV9taf+i7WGYrT4DRLALfA0s0FTEjCHS9ZHl6QGnW/9F2QgYcOlUj/b9LDI
-         vcyQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=LKRy397iZrfACOB4xNftZM8/86O37fSlO/gngtpJsj4=;
-        b=lnj8xuyJuI3pW9wMDbJjqG3iiLW7vxX0Qp1MZx1gQZkfdllGIfEjep6ijN9wm7kXK6
-         XP/K0m+ZWF4a6qVF5po1ul9ejmAKu3OWWk0lLqnMWaYI8vaRp48hvLg45KCty2vHNmli
-         OWogM4vldcbZc6Wl0xfcq4LD2rALX44bM/mKvVwOD9tH4brVBY8ZL0nNF+wmprg45eFl
-         uxESoB6OpfXgbYKUiV0QLPLqIAdIIHVzBqegcafmkaOGNaQhKQrQ/ZUqjiNxB/hKU4ok
-         ZhMP5Nogq8+WIlLdIs2HGVwHXworl4GISHVPDSryD+P1yXY2fLyICSm0qv5EkRlxqqXG
-         uVzA==
-X-Gm-Message-State: APjAAAUjcBPVA2z/PyOrL4+TRQYO2VTl3SXjGHTvFkCntoJRXtdpBfnQ
-        Z/gydWIlYGNKf5ZEw7o50gi3jmSd
-X-Google-Smtp-Source: APXvYqxD0cg8obQk6mbuPKvGcWzp1uVHslHJlL5ReG9S4lDPU39IH/PU+nrbOzete/zSXxue8lhHng==
-X-Received: by 2002:aa7:d816:: with SMTP id v22mr9052621edq.28.1568792730466;
-        Wed, 18 Sep 2019 00:45:30 -0700 (PDT)
-Received: from localhost.localdomain.com ([188.204.2.113])
-        by smtp.gmail.com with ESMTPSA id hh11sm18332ejb.33.2019.09.18.00.45.29
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 18 Sep 2019 00:45:29 -0700 (PDT)
-From:   Pascal van Leeuwen <pascalvanl@gmail.com>
-X-Google-Original-From: Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
-To:     linux-crypto@vger.kernel.org
-Cc:     antoine.tenart@bootlin.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net,
-        Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
-Subject: [PATCH 1/2] crypto: inside-secure - Add support for 256 bit wide internal bus
-Date:   Wed, 18 Sep 2019 08:42:39 +0200
-Message-Id: <1568788960-7829-2-git-send-email-pvanleeuwen@verimatrix.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1568788960-7829-1-git-send-email-pvanleeuwen@verimatrix.com>
-References: <1568788960-7829-1-git-send-email-pvanleeuwen@verimatrix.com>
+ d=marvell.onmicrosoft.com; s=selector2-marvell-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=1YxlYm7hz6Dp6VyliP4Ie2oWjHnMdKc0ZotKYsLPgUU=;
+ b=m5Y1H/qsVVRxMM1Ge9YckR4d5Mhyugr9pnd7PnrvBT1If7Iazv55lqa91LUcDjSh9BQOTDAHC2njeDNGUfMNh1l1JYrNi+9z9kyyLNXBOhh+63PLsBLczyuJlV4RgdJsIPCgVfe02Yfrnh0JoDIqppf3uMqXdXWlWVFktlQsoOY=
+Received: from MN2PR18MB2797.namprd18.prod.outlook.com (20.179.22.16) by
+ MN2PR18MB3085.namprd18.prod.outlook.com (20.179.21.16) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2284.18; Wed, 18 Sep 2019 09:39:35 +0000
+Received: from MN2PR18MB2797.namprd18.prod.outlook.com
+ ([fe80::2010:7134:bdcf:8ad9]) by MN2PR18MB2797.namprd18.prod.outlook.com
+ ([fe80::2010:7134:bdcf:8ad9%7]) with mapi id 15.20.2263.023; Wed, 18 Sep 2019
+ 09:39:35 +0000
+From:   Nagadheeraj Rottela <rnagadheeraj@marvell.com>
+To:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>
+CC:     Srikanth Jampala <jsrikanth@marvell.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Nagadheeraj Rottela <rnagadheeraj@marvell.com>
+Subject: [PATCH] crypto: cavium/nitrox - Add mailbox message to get mcode info
+ in VF
+Thread-Topic: [PATCH] crypto: cavium/nitrox - Add mailbox message to get mcode
+ info in VF
+Thread-Index: AQHVbgT7evuBeNkKn0+ndI98tEnhjw==
+Date:   Wed, 18 Sep 2019 09:39:34 +0000
+Message-ID: <20190918093901.6477-1-rnagadheeraj@marvell.com>
+Accept-Language: en-IN, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: BMXPR01CA0025.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:b00:c::11) To MN2PR18MB2797.namprd18.prod.outlook.com
+ (2603:10b6:208:a0::16)
+x-ms-exchange-messagesentrepresentingtype: 1
+x-mailer: git-send-email 2.13.6
+x-originating-ip: [115.113.156.2]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 7ada9b43-7afb-44d5-d30b-08d73c1c1d77
+x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(5600167)(711020)(4605104)(1401327)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);SRVR:MN2PR18MB3085;
+x-ms-traffictypediagnostic: MN2PR18MB3085:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <MN2PR18MB3085AAC11D3C2EDB70DCB54AD68E0@MN2PR18MB3085.namprd18.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:257;
+x-forefront-prvs: 01644DCF4A
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(39860400002)(396003)(346002)(366004)(376002)(136003)(189003)(199004)(86362001)(2906002)(256004)(66946007)(66556008)(15650500001)(36756003)(2501003)(6116002)(81166006)(81156014)(54906003)(6486002)(107886003)(110136005)(8676002)(3846002)(8936002)(1076003)(316002)(50226002)(5660300002)(66066001)(7736002)(305945005)(102836004)(6506007)(4326008)(55236004)(386003)(26005)(6512007)(25786009)(64756008)(186003)(66476007)(66446008)(486006)(478600001)(71190400001)(99286004)(71200400001)(476003)(2616005)(14454004)(6436002)(52116002)(6606295002);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR18MB3085;H:MN2PR18MB2797.namprd18.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: marvell.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam-message-info: L8CTZ48z1rEuT7adXcHnOtAHag4eBb0AHwhhvYVf/ZZKM93nD6tkxLsNhsxEE+qoD7UnDQ3Pk7928ogK2VjTWhNeP0VZ0rmhsyqjjTnXFcsSXBE5BNMb548uALex/qFIsGmRoWmXv6pnbJGZfMBMIAckGbuEnk3FzqSfJml/7MYvaZp7C9qWpoT9aC+oKehCDtTfvEMlGiToe7bz11mfSjMQU3NsJHFd6N22DUEoOxKsDJQLmMsMYD4KKR6w7g6AuYf/o4pj22vgsnoPxdrSVYIxkb5tm8BwMcSZqTvQ2x4xywu1ZR6v+s0nCDmCltES3DpxfAed+iJEhi7J/acv7SKVoiUdTftovUwN5OS8tiuciAPV2ielTkPx0sk3gUNVJTyuZzHLJYW7WOa7bPzDAQheB1itjpdZz5LC9kmmAVc=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7ada9b43-7afb-44d5-d30b-08d73c1c1d77
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Sep 2019 09:39:34.9516
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: r2A490Cj97sDMKq0ri+KWeZ9CzOik0GupTocX1Jd3z8D9vyR0CW0lfFR3OPJmO2I3WyHQPXkmBlg8vdIbSb7XTAiVkQNHk2Dpl9GIjCkPDQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR18MB3085
+X-OriginatorOrg: marvell.com
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.70,1.0.8
+ definitions=2019-09-18_06:2019-09-17,2019-09-18 signatures=0
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch adds support for large EIP197's with a 256 bit wide internal
-bus, which affects the format of the result descriptor due to internal
-alignment requirements.
+Add support to get microcode information in VF from PF via mailbox
+message.
 
-Signed-off-by: Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
+Signed-off-by: Nagadheeraj Rottela <rnagadheeraj@marvell.com>
+Reviewed-by: Srikanth Jampala <jsrikanth@marvell.com>
 ---
- drivers/crypto/inside-secure/safexcel.c      | 101 +++++++++++++++------------
- drivers/crypto/inside-secure/safexcel.h      |  18 +++--
- drivers/crypto/inside-secure/safexcel_ring.c |   4 +-
- 3 files changed, 72 insertions(+), 51 deletions(-)
+ drivers/crypto/cavium/nitrox/nitrox_dev.h | 15 +++++++++++++++
+ drivers/crypto/cavium/nitrox/nitrox_mbx.c |  8 ++++++++
+ 2 files changed, 23 insertions(+)
 
-diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
-index ed34118..0bcf36c 100644
---- a/drivers/crypto/inside-secure/safexcel.c
-+++ b/drivers/crypto/inside-secure/safexcel.c
-@@ -492,12 +492,12 @@ static int safexcel_hw_setup_cdesc_rings(struct safexcel_crypto_priv *priv)
- 		writel(upper_32_bits(priv->ring[i].cdr.base_dma),
- 		       EIP197_HIA_CDR(priv, i) + EIP197_HIA_xDR_RING_BASE_ADDR_HI);
- 
--		writel(EIP197_xDR_DESC_MODE_64BIT | (priv->config.cd_offset << 16) |
-+		writel(EIP197_xDR_DESC_MODE_64BIT | (priv->config.cd_offset << 14) |
- 		       priv->config.cd_size,
- 		       EIP197_HIA_CDR(priv, i) + EIP197_HIA_xDR_DESC_SIZE);
- 		writel(((cd_fetch_cnt *
- 			 (cd_size_rnd << priv->hwconfig.hwdataw)) << 16) |
--		       (cd_fetch_cnt * priv->config.cd_offset),
-+		       (cd_fetch_cnt * (priv->config.cd_offset / sizeof(u32))),
- 		       EIP197_HIA_CDR(priv, i) + EIP197_HIA_xDR_CFG);
- 
- 		/* Configure DMA tx control */
-@@ -540,13 +540,13 @@ static int safexcel_hw_setup_rdesc_rings(struct safexcel_crypto_priv *priv)
- 		writel(upper_32_bits(priv->ring[i].rdr.base_dma),
- 		       EIP197_HIA_RDR(priv, i) + EIP197_HIA_xDR_RING_BASE_ADDR_HI);
- 
--		writel(EIP197_xDR_DESC_MODE_64BIT | (priv->config.rd_offset << 16) |
-+		writel(EIP197_xDR_DESC_MODE_64BIT | (priv->config.rd_offset << 14) |
- 		       priv->config.rd_size,
- 		       EIP197_HIA_RDR(priv, i) + EIP197_HIA_xDR_DESC_SIZE);
- 
- 		writel(((rd_fetch_cnt *
- 			 (rd_size_rnd << priv->hwconfig.hwdataw)) << 16) |
--		       (rd_fetch_cnt * priv->config.rd_offset),
-+		       (rd_fetch_cnt * (priv->config.rd_offset / sizeof(u32))),
- 		       EIP197_HIA_RDR(priv, i) + EIP197_HIA_xDR_CFG);
- 
- 		/* Configure DMA tx control */
-@@ -572,7 +572,7 @@ static int safexcel_hw_setup_rdesc_rings(struct safexcel_crypto_priv *priv)
- static int safexcel_hw_init(struct safexcel_crypto_priv *priv)
- {
- 	u32 val;
--	int i, ret, pe;
-+	int i, ret, pe, opbuflo, opbufhi;
- 
- 	dev_dbg(priv->dev, "HW init: using %d pipe(s) and %d ring(s)\n",
- 		priv->config.pes, priv->config.rings);
-@@ -652,9 +652,16 @@ static int safexcel_hw_init(struct safexcel_crypto_priv *priv)
- 			;
- 
- 		/* DMA transfer size to use */
-+		if (priv->hwconfig.hwnumpes > 4) {
-+			opbuflo = 9;
-+			opbufhi = 10;
-+		} else {
-+			opbuflo = 7;
-+			opbufhi = 8;
-+		}
- 		val = EIP197_HIA_DSE_CFG_DIS_DEBUG;
--		val |= EIP197_HIA_DxE_CFG_MIN_DATA_SIZE(7) |
--		       EIP197_HIA_DxE_CFG_MAX_DATA_SIZE(8);
-+		val |= EIP197_HIA_DxE_CFG_MIN_DATA_SIZE(opbuflo) |
-+		       EIP197_HIA_DxE_CFG_MAX_DATA_SIZE(opbufhi);
- 		val |= EIP197_HIA_DxE_CFG_DATA_CACHE_CTRL(WR_CACHE_3BITS);
- 		val |= EIP197_HIA_DSE_CFG_ALWAYS_BUFFERABLE;
- 		/* FIXME: instability issues can occur for EIP97 but disabling
-@@ -668,8 +675,8 @@ static int safexcel_hw_init(struct safexcel_crypto_priv *priv)
- 		writel(0, EIP197_HIA_DSE_THR(priv) + EIP197_HIA_DSE_THR_CTRL(pe));
- 
- 		/* Configure the procesing engine thresholds */
--		writel(EIP197_PE_OUT_DBUF_THRES_MIN(7) |
--		       EIP197_PE_OUT_DBUF_THRES_MAX(8),
-+		writel(EIP197_PE_OUT_DBUF_THRES_MIN(opbuflo) |
-+		       EIP197_PE_OUT_DBUF_THRES_MAX(opbufhi),
- 		       EIP197_PE(priv) + EIP197_PE_OUT_DBUF_THRES(pe));
- 
- 		/* Processing Engine configuration */
-@@ -709,7 +716,7 @@ static int safexcel_hw_init(struct safexcel_crypto_priv *priv)
- 		writel(0,
- 		       EIP197_HIA_CDR(priv, i) + EIP197_HIA_xDR_PROC_PNTR);
- 
--		writel((EIP197_DEFAULT_RING_SIZE * priv->config.cd_offset) << 2,
-+		writel((EIP197_DEFAULT_RING_SIZE * priv->config.cd_offset),
- 		       EIP197_HIA_CDR(priv, i) + EIP197_HIA_xDR_RING_SIZE);
- 	}
- 
-@@ -732,7 +739,7 @@ static int safexcel_hw_init(struct safexcel_crypto_priv *priv)
- 		       EIP197_HIA_RDR(priv, i) + EIP197_HIA_xDR_PROC_PNTR);
- 
- 		/* Ring size */
--		writel((EIP197_DEFAULT_RING_SIZE * priv->config.rd_offset) << 2,
-+		writel((EIP197_DEFAULT_RING_SIZE * priv->config.rd_offset),
- 		       EIP197_HIA_RDR(priv, i) + EIP197_HIA_xDR_RING_SIZE);
- 	}
- 
-@@ -852,20 +859,24 @@ void safexcel_dequeue(struct safexcel_crypto_priv *priv, int ring)
- 	spin_unlock_bh(&priv->ring[ring].lock);
- 
- 	/* let the RDR know we have pending descriptors */
--	writel((rdesc * priv->config.rd_offset) << 2,
-+	writel((rdesc * priv->config.rd_offset),
- 	       EIP197_HIA_RDR(priv, ring) + EIP197_HIA_xDR_PREP_COUNT);
- 
- 	/* let the CDR know we have pending descriptors */
--	writel((cdesc * priv->config.cd_offset) << 2,
-+	writel((cdesc * priv->config.cd_offset),
- 	       EIP197_HIA_CDR(priv, ring) + EIP197_HIA_xDR_PREP_COUNT);
- }
- 
- inline int safexcel_rdesc_check_errors(struct safexcel_crypto_priv *priv,
--				       struct safexcel_result_desc *rdesc)
-+				       void *rdp)
- {
--	if (likely((!rdesc->descriptor_overflow) &&
--		   (!rdesc->buffer_overflow) &&
--		   (!rdesc->result_data.error_code)))
-+	struct safexcel_result_desc *rdesc = rdp;
-+	struct result_data_desc *result_data = rdp + priv->config.res_offset;
-+
-+	if (likely((!rdesc->last_seg) || /* Rest only valid if last seg! */
-+		   ((!rdesc->descriptor_overflow) &&
-+		    (!rdesc->buffer_overflow) &&
-+		    (!result_data->error_code))))
- 		return 0;
- 
- 	if (rdesc->descriptor_overflow)
-@@ -874,13 +885,14 @@ inline int safexcel_rdesc_check_errors(struct safexcel_crypto_priv *priv,
- 	if (rdesc->buffer_overflow)
- 		dev_err(priv->dev, "Buffer overflow detected");
- 
--	if (rdesc->result_data.error_code & 0x4066) {
-+	if (result_data->error_code & 0x4066) {
- 		/* Fatal error (bits 1,2,5,6 & 14) */
- 		dev_err(priv->dev,
- 			"result descriptor error (%x)",
--			rdesc->result_data.error_code);
-+			result_data->error_code);
-+
- 		return -EIO;
--	} else if (rdesc->result_data.error_code &
-+	} else if (result_data->error_code &
- 		   (BIT(7) | BIT(4) | BIT(3) | BIT(0))) {
- 		/*
- 		 * Give priority over authentication fails:
-@@ -888,7 +900,7 @@ inline int safexcel_rdesc_check_errors(struct safexcel_crypto_priv *priv,
- 		 * something wrong with the input!
- 		 */
- 		return -EINVAL;
--	} else if (rdesc->result_data.error_code & BIT(9)) {
-+	} else if (result_data->error_code & BIT(9)) {
- 		/* Authentication failed */
- 		return -EBADMSG;
- 	}
-@@ -1019,7 +1031,7 @@ static inline void safexcel_handle_result_descriptor(struct safexcel_crypto_priv
- acknowledge:
- 	if (i)
- 		writel(EIP197_xDR_PROC_xD_PKT(i) |
--		       EIP197_xDR_PROC_xD_COUNT(tot_descs * priv->config.rd_offset),
-+		       (tot_descs * priv->config.rd_offset),
- 		       EIP197_HIA_RDR(priv, ring) + EIP197_HIA_xDR_PROC_COUNT);
- 
- 	/* If the number of requests overflowed the counter, try to proceed more
-@@ -1292,30 +1304,25 @@ static void safexcel_unregister_algorithms(struct safexcel_crypto_priv *priv)
- 
- static void safexcel_configure(struct safexcel_crypto_priv *priv)
- {
--	u32 val, mask = 0;
--
--	val = readl(EIP197_HIA_AIC_G(priv) + EIP197_HIA_OPTIONS);
-+	u32 mask = BIT(priv->hwconfig.hwdataw) - 1;
- 
--	/* Read number of PEs from the engine */
--	if (priv->flags & SAFEXCEL_HW_EIP197)
--		/* Wider field width for all EIP197 type engines */
--		mask = EIP197_N_PES_MASK;
--	else
--		/* Narrow field width for EIP97 type engine */
--		mask = EIP97_N_PES_MASK;
--
--	priv->config.pes = (val >> EIP197_N_PES_OFFSET) & mask;
--
--	priv->config.rings = min_t(u32, val & GENMASK(3, 0), max_rings);
-+	priv->config.pes = priv->hwconfig.hwnumpes;
-+	priv->config.rings = min_t(u32, priv->hwconfig.hwnumrings, max_rings);
- 
--	val = (val & GENMASK(27, 25)) >> 25;
--	mask = BIT(val) - 1;
--
--	priv->config.cd_size = (sizeof(struct safexcel_command_desc) / sizeof(u32));
-+	priv->config.cd_size = EIP197_CD64_FETCH_SIZE;
- 	priv->config.cd_offset = (priv->config.cd_size + mask) & ~mask;
- 
--	priv->config.rd_size = (sizeof(struct safexcel_result_desc) / sizeof(u32));
-+	/* res token is behind the descr, but ofs must be rounded to buswdth */
-+	priv->config.res_offset = (EIP197_RD64_FETCH_SIZE + mask) & ~mask;
-+	/* now the size of the descr is this 1st part plus the result struct */
-+	priv->config.rd_size    = priv->config.res_offset +
-+				  EIP197_RD64_RESULT_SIZE;
- 	priv->config.rd_offset = (priv->config.rd_size + mask) & ~mask;
-+
-+	/* convert dwords to bytes */
-+	priv->config.cd_offset *= sizeof(u32);
-+	priv->config.rd_offset *= sizeof(u32);
-+	priv->config.res_offset *= sizeof(u32);
- }
- 
- static void safexcel_init_register_offsets(struct safexcel_crypto_priv *priv)
-@@ -1457,6 +1464,10 @@ static int safexcel_probe_generic(void *pdev,
- 		priv->hwconfig.hwrfsize = ((hiaopt >> EIP197_RFSIZE_OFFSET) &
- 					   EIP197_RFSIZE_MASK) +
- 					  EIP197_RFSIZE_ADJUST;
-+		priv->hwconfig.hwnumpes	= (hiaopt >> EIP197_N_PES_OFFSET) &
-+					  EIP197_N_PES_MASK;
-+		priv->hwconfig.hwnumrings = (hiaopt >> EIP197_N_RINGS_OFFSET) &
-+					    EIP197_N_RINGS_MASK;
- 	} else {
- 		/* EIP97 */
- 		priv->hwconfig.hwdataw  = (hiaopt >> EIP197_HWDATAW_OFFSET) &
-@@ -1465,6 +1476,9 @@ static int safexcel_probe_generic(void *pdev,
- 					  EIP97_CFSIZE_MASK;
- 		priv->hwconfig.hwrfsize = (hiaopt >> EIP97_RFSIZE_OFFSET) &
- 					  EIP97_RFSIZE_MASK;
-+		priv->hwconfig.hwnumpes	= 1; /* by definition */
-+		priv->hwconfig.hwnumrings = (hiaopt >> EIP197_N_RINGS_OFFSET) &
-+					    EIP197_N_RINGS_MASK;
- 	}
- 
- 	/* Get supported algorithms from EIP96 transform engine */
-@@ -1472,8 +1486,9 @@ static int safexcel_probe_generic(void *pdev,
- 				    EIP197_PE_EIP96_OPTIONS(0));
- 
- 	/* Print single info line describing what we just detected */
--	dev_info(priv->dev, "EIP%d:%x(%d)-HIA:%x(%d,%d,%d),PE:%x,alg:%08x\n",
--		 peid, priv->hwconfig.hwver, hwctg, priv->hwconfig.hiaver,
-+	dev_info(priv->dev, "EIP%d:%x(%d,%d,%d,%d)-HIA:%x(%d,%d,%d),PE:%x,alg:%08x\n",
-+		 peid, priv->hwconfig.hwver, hwctg, priv->hwconfig.hwnumpes,
-+		 priv->hwconfig.hwnumrings, priv->hwconfig.hiaver,
- 		 priv->hwconfig.hwdataw, priv->hwconfig.hwcfsize,
- 		 priv->hwconfig.hwrfsize, priv->hwconfig.pever,
- 		 priv->hwconfig.algo_flags);
-diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
-index 173d3c8..73d790a 100644
---- a/drivers/crypto/inside-secure/safexcel.h
-+++ b/drivers/crypto/inside-secure/safexcel.h
-@@ -213,7 +213,6 @@
- /* EIP197_HIA_xDR_PROC_COUNT */
- #define EIP197_xDR_PROC_xD_PKT_OFFSET		24
- #define EIP197_xDR_PROC_xD_PKT_MASK		GENMASK(6, 0)
--#define EIP197_xDR_PROC_xD_COUNT(n)		((n) << 2)
- #define EIP197_xDR_PROC_xD_PKT(n)		((n) << 24)
- #define EIP197_xDR_PROC_CLR_COUNT		BIT(31)
- 
-@@ -228,6 +227,8 @@
- #define EIP197_HIA_RA_PE_CTRL_EN		BIT(30)
- 
- /* EIP197_HIA_OPTIONS */
-+#define EIP197_N_RINGS_OFFSET			0
-+#define EIP197_N_RINGS_MASK			GENMASK(3, 0)
- #define EIP197_N_PES_OFFSET			4
- #define EIP197_N_PES_MASK			GENMASK(4, 0)
- #define EIP97_N_PES_MASK			GENMASK(2, 0)
-@@ -486,16 +487,15 @@ struct safexcel_result_desc {
- 
- 	u32 data_lo;
- 	u32 data_hi;
--
--	struct result_data_desc result_data;
- } __packed;
- 
- /*
-  * The EIP(1)97 only needs to fetch the descriptor part of
-  * the result descriptor, not the result token part!
-  */
--#define EIP197_RD64_FETCH_SIZE		((sizeof(struct safexcel_result_desc) -\
--					  sizeof(struct result_data_desc)) /\
-+#define EIP197_RD64_FETCH_SIZE		(sizeof(struct safexcel_result_desc) /\
-+					 sizeof(u32))
-+#define EIP197_RD64_RESULT_SIZE		(sizeof(struct result_data_desc) /\
- 					 sizeof(u32))
- 
- struct safexcel_token {
-@@ -582,6 +582,9 @@ struct safexcel_command_desc {
- 	struct safexcel_control_data_desc control_data;
- } __packed;
- 
-+#define EIP197_CD64_FETCH_SIZE		(sizeof(struct safexcel_command_desc) /\
-+					sizeof(u32))
-+
- /*
-  * Internal structures & functions
-  */
-@@ -625,6 +628,7 @@ struct safexcel_config {
- 
- 	u32 rd_size;
- 	u32 rd_offset;
-+	u32 res_offset;
+diff --git a/drivers/crypto/cavium/nitrox/nitrox_dev.h b/drivers/crypto/cav=
+ium/nitrox/nitrox_dev.h
+index 2217a2736c8e..c2d0c23fb81b 100644
+--- a/drivers/crypto/cavium/nitrox/nitrox_dev.h
++++ b/drivers/crypto/cavium/nitrox/nitrox_dev.h
+@@ -109,6 +109,13 @@ struct nitrox_q_vector {
+ 	};
  };
- 
- struct safexcel_work_data {
-@@ -734,6 +738,8 @@ struct safexcel_hwconfig {
- 	int hwdataw;
- 	int hwcfsize;
- 	int hwrfsize;
-+	int hwnumpes;
-+	int hwnumrings;
+=20
++enum mcode_type {
++	MCODE_TYPE_INVALID,
++	MCODE_TYPE_AE,
++	MCODE_TYPE_SE_SSL,
++	MCODE_TYPE_SE_IPSEC,
++};
++
+ /**
+  * mbox_msg - Mailbox message data
+  * @type: message type
+@@ -128,6 +135,14 @@ union mbox_msg {
+ 		u64 chipid: 8;
+ 		u64 vfid: 8;
+ 	} id;
++	struct {
++		u64 type: 2;
++		u64 opcode: 6;
++		u64 count: 4;
++		u64 info: 40;
++		u64 next_se_grp: 3;
++		u64 next_ae_grp: 3;
++	} mcode_info;
  };
- 
- struct safexcel_crypto_priv {
-@@ -805,7 +811,7 @@ struct safexcel_inv_result {
- 
- void safexcel_dequeue(struct safexcel_crypto_priv *priv, int ring);
- int safexcel_rdesc_check_errors(struct safexcel_crypto_priv *priv,
--				struct safexcel_result_desc *rdesc);
-+				void *rdp);
- void safexcel_complete(struct safexcel_crypto_priv *priv, int ring);
- int safexcel_invalidate_cache(struct crypto_async_request *async,
- 			      struct safexcel_crypto_priv *priv,
-diff --git a/drivers/crypto/inside-secure/safexcel_ring.c b/drivers/crypto/inside-secure/safexcel_ring.c
-index 0f269b8..5323e91 100644
---- a/drivers/crypto/inside-secure/safexcel_ring.c
-+++ b/drivers/crypto/inside-secure/safexcel_ring.c
-@@ -14,7 +14,7 @@ int safexcel_init_ring_descriptors(struct safexcel_crypto_priv *priv,
- 				   struct safexcel_desc_ring *cdr,
- 				   struct safexcel_desc_ring *rdr)
- {
--	cdr->offset = sizeof(u32) * priv->config.cd_offset;
-+	cdr->offset = priv->config.cd_offset;
- 	cdr->base = dmam_alloc_coherent(priv->dev,
- 					cdr->offset * EIP197_DEFAULT_RING_SIZE,
- 					&cdr->base_dma, GFP_KERNEL);
-@@ -24,7 +24,7 @@ int safexcel_init_ring_descriptors(struct safexcel_crypto_priv *priv,
- 	cdr->base_end = cdr->base + cdr->offset * (EIP197_DEFAULT_RING_SIZE - 1);
- 	cdr->read = cdr->base;
- 
--	rdr->offset = sizeof(u32) * priv->config.rd_offset;
-+	rdr->offset = priv->config.rd_offset;
- 	rdr->base = dmam_alloc_coherent(priv->dev,
- 					rdr->offset * EIP197_DEFAULT_RING_SIZE,
- 					&rdr->base_dma, GFP_KERNEL);
--- 
-1.8.3.1
+=20
+ /**
+diff --git a/drivers/crypto/cavium/nitrox/nitrox_mbx.c b/drivers/crypto/cav=
+ium/nitrox/nitrox_mbx.c
+index 02ee95064841..b51b0449b478 100644
+--- a/drivers/crypto/cavium/nitrox/nitrox_mbx.c
++++ b/drivers/crypto/cavium/nitrox/nitrox_mbx.c
+@@ -25,6 +25,7 @@ enum mbx_msg_opcode {
+ 	MSG_OP_VF_UP,
+ 	MSG_OP_VF_DOWN,
+ 	MSG_OP_CHIPID_VFID,
++	MSG_OP_MCODE_INFO =3D 11,
+ };
+=20
+ struct pf2vf_work {
+@@ -73,6 +74,13 @@ static void pf2vf_send_response(struct nitrox_device *nd=
+ev,
+ 		vfdev->nr_queues =3D 0;
+ 		atomic_set(&vfdev->state, __NDEV_NOT_READY);
+ 		break;
++	case MSG_OP_MCODE_INFO:
++		msg.data =3D 0;
++		msg.mcode_info.count =3D 2;
++		msg.mcode_info.info =3D MCODE_TYPE_SE_SSL | (MCODE_TYPE_AE << 5);
++		msg.mcode_info.next_se_grp =3D 1;
++		msg.mcode_info.next_ae_grp =3D 1;
++		break;
+ 	default:
+ 		msg.type =3D MBX_MSG_TYPE_NOP;
+ 		break;
+--=20
+2.13.6
 
