@@ -2,124 +2,173 @@ Return-Path: <SRS0=f1VZ=XN=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66895C4CEC4
-	for <linux-crypto@archiver.kernel.org>; Wed, 18 Sep 2019 06:31:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29240C4CECE
+	for <linux-crypto@archiver.kernel.org>; Wed, 18 Sep 2019 07:20:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3DA5521906
-	for <linux-crypto@archiver.kernel.org>; Wed, 18 Sep 2019 06:31:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F193421A49
+	for <linux-crypto@archiver.kernel.org>; Wed, 18 Sep 2019 07:20:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xv6lI474"
+	dkim=pass (1024-bit key) header.d=web.de header.i=@web.de header.b="clwgV87r"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728242AbfIRGbd (ORCPT
+        id S1726984AbfIRHUF (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 18 Sep 2019 02:31:33 -0400
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:34491 "EHLO
-        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729574AbfIRGXV (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 18 Sep 2019 02:23:21 -0400
-Received: by mail-ot1-f67.google.com with SMTP id z26so5362152oto.1
-        for <linux-crypto@vger.kernel.org>; Tue, 17 Sep 2019 23:23:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=wK9VKPT5PALGow0s1AD18j7lV+EvX5g7BMBWsTpeIng=;
-        b=xv6lI474DYSgaSu5RV4eJEBRp8AAJwvehRoTTpWaCo2J8ub7oPk4fmWmvkg1ZEyHq+
-         TtxFAJNA+CkO15cIf36iqqP9X57G/JNY3Jb2I187WuFFnZsD/6zxHIOCkgH6EgYA1jfH
-         YFSSbCekS/IoziCPiLuxaZHnZq5wzOhwRethzETOZxKFgUsGwW/D4ZLudka0rLN2bOSj
-         SAypaAGTp5bpQL5XY1Q813yX/HmVuGih8Q5wEvBX1r4lbpI+8QupHhP+fcbRFrASg2mL
-         7pMs60vrA8DXbpmTG++BM1jE99VkeCVDR9xwYrqoLW/I0P3yuAd+Xz5+qsRpoB02XtZC
-         WfkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=wK9VKPT5PALGow0s1AD18j7lV+EvX5g7BMBWsTpeIng=;
-        b=glXnFxFKCxxCNY7XVukIt9DQhqx9yhf7MMlbHpQLmaE6DhW0wAu1BfbTYZU4cgao0y
-         2ovFu6sPWBpENetsfJUeExYOWasVnS5Ke2/1VkCkTrfmBSjGtcSDS7iKcVhA7cR5BrqA
-         0kO5Dg9qthLtYBrEL7HFS1cYD/33QpiVkPanMld8ZZcOW5XYsnIZrVTbfZnMseqTPx6j
-         dG3M0Z6miwcsO3omZv5GOrvE5JXlKhhp8ib/iQifhfHBYrGiI412oAKlfmUZ62pk7/vs
-         sC0DrNGGwxguo7RnLHZR81E6VSUVVQDGvtzhI5uNGWwESle7IzqNy6UH/UesWDeMSDbe
-         HhgA==
-X-Gm-Message-State: APjAAAU/tfNsGfVSa5QunVeyAdkrgrYfL2TNt4Dw8r8uO4opjx2LwwI5
-        eduAH8pp2sasyf7QnCKIL0EIrDreAHwKz9N/Q03I2w==
-X-Google-Smtp-Source: APXvYqyy689jL78FRCBaToum4k1f1kK7Ku7U2vf7SNBEYUwL9xj0w29sOcLAmo488CIy0XySfEE42rIulH1rHL8wJvo=
-X-Received: by 2002:a9d:24e4:: with SMTP id z91mr1722754ota.41.1568787800000;
- Tue, 17 Sep 2019 23:23:20 -0700 (PDT)
-MIME-Version: 1.0
-References: <1568630064-14887-1-git-send-email-sumit.garg@linaro.org>
- <1568630064-14887-5-git-send-email-sumit.garg@linaro.org> <20190917181415.GA8472@linux.intel.com>
- <20190917181507.GB8472@linux.intel.com>
-In-Reply-To: <20190917181507.GB8472@linux.intel.com>
-From:   Sumit Garg <sumit.garg@linaro.org>
-Date:   Wed, 18 Sep 2019 11:53:08 +0530
-Message-ID: <CAFA6WYMbUGQ6+-XvR9_qSc=oVe1QSTg4kB-+y6rBmQLq+B6skg@mail.gmail.com>
-Subject: Re: [Patch v6 4/4] KEYS: trusted: Move TPM2 trusted keys code
-To:     Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-Cc:     dhowells@redhat.com, peterhuewe@gmx.de, keyrings@vger.kernel.org,
-        linux-integrity@vger.kernel.org,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        linux-security-module@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
-        jgg@ziepe.ca, Arnd Bergmann <arnd@arndb.de>,
+        Wed, 18 Sep 2019 03:20:05 -0400
+Received: from mout.web.de ([212.227.15.4]:43519 "EHLO mout.web.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726077AbfIRHUE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 18 Sep 2019 03:20:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+        s=dbaedf251592; t=1568791161;
+        bh=mZHVM8uPGDHs/8eftxOEninmY5yjMFztwfgfbXzFL/0=;
+        h=X-UI-Sender-Class:To:From:Subject:Cc:Date;
+        b=clwgV87rSvVCe4yBu+Jge0mozWO5w7oV8oHj8hQNjaanjIWt6MSUQNdDT35ls+YL9
+         jH0gr017PY9a/sJufEx0wIwQLZrGHFWJtJiQ0PN3UHONt7foo/S0QGckA3v1tlcG+O
+         1NqfhoZVMLt6X/toBlkmmqJ+6N79lpHxCcRM6ZvE=
+X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
+Received: from [192.168.1.2] ([2.244.2.101]) by smtp.web.de (mrweb001
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 0MJCAc-1iDE4B0BSM-002ldM; Wed, 18
+ Sep 2019 09:19:21 +0200
+To:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        bcm-kernel-feedback-list@broadcom.com,
+        Arnd Bergmann <arnd@arndb.de>,
+        Florian Fainelli <f.fainelli@gmail.com>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        jejb@linux.ibm.com, Mimi Zohar <zohar@linux.ibm.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Jerry Snitselaar <jsnitsel@redhat.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Daniel Thompson <daniel.thompson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Matt Mackall <mpm@selenic.com>, Ray Jui <rjui@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>
+From:   Markus Elfring <Markus.Elfring@web.de>
+Subject: [PATCH] hwrng: iproc-rng200 - Use devm_platform_ioremap_resource() in
+ iproc_rng200_probe()
+Autocrypt: addr=Markus.Elfring@web.de; prefer-encrypt=mutual; keydata=
+ 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 FEE=
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        kernel-janitors@vger.kernel.org,
+        Bartosz Golaszewski <bgolaszewski@baylibre.com>,
+        Himanshu Jha <himanshujha199640@gmail.com>
+Message-ID: <0ecb0679-0558-6cbe-af2f-6ee9122a4a7e@web.de>
+Date:   Wed, 18 Sep 2019 09:19:18 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:zG8nKyPeoG1/iJ+5zOtkf9tAVKXpcEu5K+KWWYLMFoZOYR7Ez8v
+ N4j65B4sScGyu9JK7VDecxkHLIGUT+tL8ZB+LBkZTotbsvc5r0j9QXZg0RCfnrg8Z6QmjAD
+ QmJt38QtOFg6zcDjAvB04EjzxH2s+05nFXcHsnomSsoLTWcIkDv0fuPrzSG9uhb4Waf3ev5
+ TJ08bLOVXuwYw/B/365Bw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:knI0/qaWLC4=:N8e0l9Ha1V57NqnYsDncV8
+ RAEs8wW1kF4fj8UeQQojzpV1ea+OIXrWgJ7yWUM7uK8dTbzLLbd4tiM3bxaHZNMy2zSRvBcXe
+ 504dxKZJMvj3D+I4s9R5dv8BPqD+kslPL652e75ZPSPEO3UEsx7JEugauzzh7a1oQkLEGRM0E
+ qBdnQ/g8fJMAGoneYVD/oD3WMmsN+8p/4nzU/tirwRRFeZ64OPJHkqALoILiIFX/RgscmtSZh
+ ds1ExTBdPfujtUHrZ5aReWyY3A9qOobH/c6Gif5Cj1z4mT3DxhevrT99OCO1Sb/3hwGHmTFjj
+ wyp2bWz1I4KSqp3EQZAKtywiv+iNfOuRt7/ZH52hXnODC/WEy7Qe+qjUYjs/0qVrZu9xVG4+M
+ D1wq7ENrA6AA2OxROwHh+RO20NOhUZv/H0Yn6F7tmR3VGP5P573cvSe54332xBDt0SkUx/sH3
+ PT1JL0yKr2ofdkIujyqle9U11VHZkNNPyVHlSymilNRlW0EYXDZtw3tC3jQeLqavLPHHyVx1N
+ U94CbAI12TrIp/bJbTzWsqlNWgG2dGNjPibDewJ+R9JG9IRsA0pLb1FlZuE0xN69BQegInj0R
+ TxqHc+dsUSnLF6qrBRqb2rDMD/qRilTxUSwawIm1c+MGxPmB6nYzsCtrVdeZKaKSO5NXBYts5
+ ghGH3PYhtM4fat3fkSLaZoLkw5MgNfrpA2WfohDoHPHeOL+onF1oT4zou/z0ftAJDJG5cx43l
+ mZxa4bs2Kq5M28A2bsD3Ap7m7oD3MHeOfQnjxcAMBGIHOrQ73QmS8b5lTIXX+ESc0jE0yhjVy
+ wbUrSTwS5hjMShAWahVaUl6m5ORpbp2v38RYRxoD7FPQ0eKREAnj9xHbuSd7use90n24pDbFM
+ oZ0x5M21ZIylUrK/MmMzVewaMBOL6gtziW/nwU+CqiTDuyWXvNiD39GTPtpc2Z0WQjXZjH17H
+ 9MFLisgz9DpR9cLxAHiq6pf/BHI6Mh+tOUCi5iHJL0icUCaRUdl9BngADvnaaEuPFmcl17DrX
+ 9ZLyc1Q5T9sZ2UEy+Sg9AaqSfqkKpZQcqQcMV3EQDKz98h4QQYYjh9ivAN1HZYRfLkB5crjkQ
+ 2iElmVmRwrlE6f/qII76HDznnAlJcoqDDiCWMCghas0xS0g1XcqSlAtsIsgrlkCtyFYLWr9PI
+ bW7sdCh8Wl9y9xtoQzY3XWg9e7hdYvYu14qon39FzeX7meMzhDz5pMLG0bQJJEcCROUN64xbL
+ 1XeTBCCKPUlhf9G5YoDeIesK1JSa2OnjtpobswWzfUSipr05PwQZyD8F5DyQ=
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 17 Sep 2019 at 23:45, Jarkko Sakkinen
-<jarkko.sakkinen@linux.intel.com> wrote:
->
-> On Tue, Sep 17, 2019 at 09:14:15PM +0300, Jarkko Sakkinen wrote:
-> > On Mon, Sep 16, 2019 at 04:04:24PM +0530, Sumit Garg wrote:
-> > > Move TPM2 trusted keys code to trusted keys subsystem. The reason
-> > > being it's better to consolidate all the trusted keys code to a single
-> > > location so that it can be maintained sanely.
-> > >
-> > > Suggested-by: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-> > > Signed-off-by: Sumit Garg <sumit.garg@linaro.org>
-> > > Reviewed-by: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-> >
-> > This commit has couple of issues that I only noticed when looking into
-> > bug reported by Mimi.
-> >
-> > Right now tpm_send() is the exported function that is used by other
-> > subsystems. tpm_transmit_cmd() is an internal function. This commit adds
-> > two unrelated code paths to send TPM commands, which is unacceptable.
+From: Markus Elfring <elfring@users.sourceforge.net>
+Date: Wed, 18 Sep 2019 09:09:22 +0200
 
-Makes sense, will update.
+Simplify this function implementation by using a known wrapper function.
 
-> >
-> > You should make tpm2 functionality to use tpm_send() instead and remove
-> > tpm_seal_trusted() and tpm_unseal_trusted() completely in this commit.
+This issue was detected by using the Coccinelle software.
 
-Okay.
+Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+=2D--
+ drivers/char/hw_random/iproc-rng200.c | 9 +--------
+ 1 file changed, 1 insertion(+), 8 deletions(-)
 
->
-> The consequence is that the result needs unfortunately re-review. Sorry
-> about that, just took this time to notice this glitch.
+diff --git a/drivers/char/hw_random/iproc-rng200.c b/drivers/char/hw_rando=
+m/iproc-rng200.c
+index 92be1c0ab99f..899ff25f4f28 100644
+=2D-- a/drivers/char/hw_random/iproc-rng200.c
++++ b/drivers/char/hw_random/iproc-rng200.c
+@@ -181,7 +181,6 @@ static void iproc_rng200_cleanup(struct hwrng *rng)
+ static int iproc_rng200_probe(struct platform_device *pdev)
+ {
+ 	struct iproc_rng200_dev *priv;
+-	struct resource *res;
+ 	struct device *dev =3D &pdev->dev;
+ 	int ret;
 
-No worries :). I will send next version of patch-set.
+@@ -190,13 +189,7 @@ static int iproc_rng200_probe(struct platform_device =
+*pdev)
+ 		return -ENOMEM;
 
-FYI, I will be travelling for Linaro Connect next week so you could
-expect some delays in my responses.
+ 	/* Map peripheral */
+-	res =3D platform_get_resource(pdev, IORESOURCE_MEM, 0);
+-	if (!res) {
+-		dev_err(dev, "failed to get rng resources\n");
+-		return -EINVAL;
+-	}
+-
+-	priv->base =3D devm_ioremap_resource(dev, res);
++	priv->base =3D devm_platform_ioremap_resource(pdev, 0);
+ 	if (IS_ERR(priv->base)) {
+ 		dev_err(dev, "failed to remap rng regs\n");
+ 		return PTR_ERR(priv->base);
+=2D-
+2.23.0
 
--Sumit
-
->
-> /Jarkko
